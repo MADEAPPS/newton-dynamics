@@ -89,13 +89,14 @@ class dAnimationJoint: public dCustomAlloc
 	dAnimationJointChildren& GetChidren();
 	const dAnimationJointChildren& GetChidren() const;
 
-	virtual NewtonBody* GetBody() const;
-	virtual dCustomJoint* GetJoint() const;
+	NewtonBody* GetBody() const;
+	dCustomJoint* GetJoint() const;
 
 	protected:
 	dMatrix m_bindMatrix;
 	void* m_userData;
 	NewtonBody* m_body;
+	dCustomJoint* m_joint;
 	dAnimationJoint* m_parent;
 	dAnimationJointChildren m_children;
 };

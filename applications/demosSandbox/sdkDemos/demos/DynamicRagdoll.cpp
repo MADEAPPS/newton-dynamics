@@ -844,18 +844,112 @@ class DynamicRagdollManager: public dAnimationModelManager
 	{
 	}
 
+	//NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dPasiveRagDollDefinition& definition)
+	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart)
+	{
+		NewtonWorld* const world = GetWorld();
+		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
+		dAssert(shape);
+
+		// calculate the bone matrix
+		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
+
+		// create the rigid body that will make this bone
+		NewtonBody* const bone = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		NewtonBodySetMassProperties(bone, 1.0f, shape);
+
+		// save the user data with the bone body (usually the visual geometry)
+		NewtonBodySetUserData(bone, bodyPart);
+
+		// assign the material for early collision culling
+		//NewtonBodySetMaterialGroupID(bone, m_material);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		NewtonBodySetForceAndTorqueCallback(bone, PhysicsApplyGravityForce);
+
+		// destroy the collision helper shape 
+		NewtonDestroyCollision(shape);
+		return bone;
+	}
+
 	void DynamicsRagdollExperiment_1(const dVector& location)
 	{
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
-		DemoEntity* const model = DemoEntity::LoadNGD_mesh("selfbalance_01.ngd", GetWorld(), scene->GetShaderCache());
+		NewtonWorld* const world = GetWorld();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
-		dMatrix matrix0(model->GetCurrentMatrix());
+		DemoEntity* const modelEntity = DemoEntity::LoadNGD_mesh("selfbalance_01.ngd", GetWorld(), scene->GetShaderCache());
+
+		dMatrix matrix0(modelEntity->GetCurrentMatrix());
 		matrix0.m_posit = location;
-		//matrix0.m_posit.m_x += 5.0f;
-		//matrix0.m_posit.m_z += 2.0f;
-		model->ResetMatrix(*scene, matrix0);
+		modelEntity->ResetMatrix(*scene, matrix0);
+		scene->Append(modelEntity);
+/*
+		// add the root bone
+		DemoEntity* const rootEntity = (DemoEntity*)modelEntity->Find(definition[0].m_boneName);
+		NewtonBody* const rootBone = CreateRagDollBodyPart(rootEntity, definition[0]);
 
-		scene->Append(model);
+		// build the rag doll with rigid bodies connected by joints
+		dCustomTransformController* const controller = CreateController(rootBone, dGetIdentityMatrix());
+
+		controller->SetCalculateLocalTransforms(true);
+
+		//dCustomTransformController::dSkeletonBone* const bone0 = controller->AddRoot(rootBone, dGetIdentityMatrix());
+		// save the controller as the collision user data, for collision culling
+		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBone), controller);
+
+		int stackIndex = 0;
+		DemoEntity* childEntities[32];
+		dCustomTransformController::dSkeletonBone* parentBones[32];
+		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
+			parentBones[stackIndex] = controller;
+			childEntities[stackIndex] = child;
+			stackIndex++;
+		}
+
+		// walk model hierarchic adding all children designed as rigid body bones. 
+		while (stackIndex) {
+			stackIndex--;
+			DemoEntity* const entity = childEntities[stackIndex];
+			dCustomTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
+
+			const char* const name = entity->GetName().GetStr();
+			for (int i = 0; i < defintionCount; i++) {
+				if (!strcmp(definition[i].m_boneName, name)) {
+					NewtonBody* const bone = CreateRagDollBodyPart(entity, definition[i]);
+
+					// connect this body part to its parent with a ragdoll joint
+					NewtonBody* const parentBody = parentBone->GetBody();
+					ConnectBodyParts(bone, parentBody, definition[i]);
+
+					dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
+					parentBone = controller->AddBone(bone, bindMatrix, parentBone);
+					// save the controller as the collision user data, for collision culling
+					NewtonCollisionSetUserData(NewtonBodyGetCollision(bone), parentBone);
+					break;
+				}
+			}
+
+			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
+				parentBones[stackIndex] = parentBone;
+				childEntities[stackIndex] = child;
+				stackIndex++;
+			}
+		}
+
+		// set the collision mask
+		// note this container work best with a material call back for setting bit field 
+		//dAssert(0);
+		//controller->SetDefaultSelfCollisionMask();
+
+		// transform the entire contraction to its location
+		dMatrix worldMatrix(rootEntity->GetCurrentMatrix() * location);
+		NewtonBodySetMatrixRecursive(rootBone, &worldMatrix[0][0]);
+
+		return controller;
+*/
+
 
 	}
 };

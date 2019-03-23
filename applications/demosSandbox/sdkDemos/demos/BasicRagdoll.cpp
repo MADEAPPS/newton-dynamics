@@ -36,8 +36,6 @@ struct dPasiveRagDollDefinition
 	};
 
 	char m_boneName[32];
-	dFloat m_mass;
-	dFloat m_radius;
 	dFloat m_friction;
 	dPasiveRagDollJointLimitx m_jointLimits;
 	dPasiveRagDollFrameMatrix m_frameBasics;
@@ -45,24 +43,24 @@ struct dPasiveRagDollDefinition
 
 static dPasiveRagDollDefinition skeletonRagDoll[] =
 {
-	{ "mixamorig:Hips", 30.0f, 0.1f},
-	{ "mixamorig:Spine", 20.0f, 0.07f, 200.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
-	{ "mixamorig:Spine1", 20.0f, 0.07f, 200.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
-	{ "mixamorig:Spine2", 20.0f, 0.07f, 200.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
+	{ "mixamorig:Hips"},
+	{ "mixamorig:Spine", 100.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
+	{ "mixamorig:Spine1", 100.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
+	{ "mixamorig:Spine2", 100.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
 
-	{ "mixamorig:Neck", 20.0f, 0.07f, 200.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
+	{ "mixamorig:Neck", 100.0f, {-15.0f, 15.0f, 30.0f}, {0.0f, 0.0f, 180.0f}},
 
-	{ "mixamorig:LeftArm", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
-	{ "mixamorig:LeftForeArm", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 0.0f, -90.0f}},
+	{ "mixamorig:LeftArm", 100.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
+	{ "mixamorig:LeftForeArm", 50.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 0.0f, -90.0f}},
 	
-	{ "mixamorig:RightArm", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
-	{ "mixamorig:RightForeArm", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 00.0f, 90.0f}},
+	{ "mixamorig:RightArm", 100.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
+	{ "mixamorig:RightForeArm", 50.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 00.0f, 90.0f}},
 
-	{ "mixamorig:LeftUpLeg", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
-	{ "mixamorig:LeftLeg", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 90.0f, 90.0f}},
+	{ "mixamorig:LeftUpLeg", 100.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
+	{ "mixamorig:LeftLeg", 50.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 90.0f, 90.0f}},
 
-	{ "mixamorig:RightUpLeg", 20.0f, 0.07f, 200.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
-	{ "mixamorig:RightLeg", 15.0f, 0.06f, 100.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 90.0f, 90.0f}},
+	{ "mixamorig:RightUpLeg", 100.0f, {-45.0f, 45.0f, 120.0f}, {0.0f, 0.0f, 180.0f}},
+	{ "mixamorig:RightLeg", 50.0f, {-140.0f, 10.0f, 0.0f}, {0.0f, 90.0f, 90.0f}},
 };
 
 
@@ -131,8 +129,8 @@ class PassiveRagdollManager: public dCustomTransformManager
 		origin.m_w = 1.0f;
 	}
 
-	
-	NewtonBody* CreateRagDollBodyPart (DemoEntity* const bodyPart, const dPasiveRagDollDefinition& definition) 
+	//NewtonBody* CreateBodyPart (DemoEntity* const bodyPart, const dPasiveRagDollDefinition& definition) 
+	NewtonBody* CreateBodyPart (DemoEntity* const bodyPart) 
 	{
 		NewtonWorld* const world = GetWorld();
 		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
@@ -145,7 +143,8 @@ class PassiveRagdollManager: public dCustomTransformManager
 		NewtonBody* const bone = NewtonCreateDynamicBody (world, shape, &matrix[0][0]);
 
 		// calculate the moment of inertia and the relative center of mass of the solid
-		NewtonBodySetMassProperties (bone, definition.m_mass, shape);
+		//NewtonBodySetMassProperties (bone, definition.m_mass, shape);
+		NewtonBodySetMassProperties (bone, 1.0f, shape);
 
 		// save the user data with the bone body (usually the visual geometry)
 		NewtonBodySetUserData(bone, bodyPart);
@@ -211,17 +210,16 @@ class PassiveRagdollManager: public dCustomTransformManager
 
 	dCustomTransformController* CreateRagDoll(const dMatrix& location, const DemoEntity* const model, dPasiveRagDollDefinition* const definition, int defintionCount)
 	{
-
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
 		// make a clone of the mesh 
-		DemoEntity* const ragDollEntity = (DemoEntity*)model->CreateClone();
-		scene->Append(ragDollEntity);
+		DemoEntity* const modelEntity = (DemoEntity*)model->CreateClone();
+		scene->Append(modelEntity);
 
 		// add the root bone
-		DemoEntity* const rootEntity = (DemoEntity*)ragDollEntity->Find(definition[0].m_boneName);
-		NewtonBody* const rootBone = CreateRagDollBodyPart(rootEntity, definition[0]);
+		DemoEntity* const rootEntity = (DemoEntity*)modelEntity->Find(definition[0].m_boneName);
+		NewtonBody* const rootBone = CreateBodyPart(rootEntity);
 
 		// build the rag doll with rigid bodies connected by joints
 		dCustomTransformController* const controller = CreateController(rootBone, dGetIdentityMatrix());
@@ -241,6 +239,10 @@ class PassiveRagdollManager: public dCustomTransformManager
 			stackIndex++;
 		}
 
+		int bodyCount = 1;
+		NewtonBody* bodyArray[1024];
+		bodyArray[0] = rootBone;
+
 		// walk model hierarchic adding all children designed as rigid body bones. 
 		while (stackIndex) {
 			stackIndex--;
@@ -250,8 +252,10 @@ class PassiveRagdollManager: public dCustomTransformManager
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < defintionCount; i++) {
 				if (!strcmp(definition[i].m_boneName, name)) {
-					NewtonBody* const bone = CreateRagDollBodyPart(entity, definition[i]);
-
+					NewtonBody* const bone = CreateBodyPart(entity);
+					bodyArray[bodyCount] = bone;
+					bodyCount ++;
+					
 					// connect this body part to its parent with a ragdoll joint
 					NewtonBody* const parentBody = parentBone->GetBody();
 					ConnectBodyParts(bone, parentBody, definition[i]);
@@ -269,6 +273,27 @@ class PassiveRagdollManager: public dCustomTransformManager
 				childEntities[stackIndex] = child;
 				stackIndex++;
 			}
+		}
+
+		dFloat volume = 0.0f;
+		for (int i = 0; i < bodyCount; i ++) {
+			volume += NewtonConvexCollisionCalculateVolume (NewtonBodyGetCollision(bodyArray[i]));
+		}
+		dFloat density = 100.0f / volume;
+
+		for (int i = 0; i < bodyCount; i ++) {
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
+			NewtonBody* const body = bodyArray[i];
+			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+			dFloat scale = density * NewtonConvexCollisionCalculateVolume (NewtonBodyGetCollision(body));
+			mass *= scale;
+			Ixx *= scale;
+			Iyy *= scale;
+			Izz *= scale;
+			NewtonBodySetMassMatrix(body, mass, Ixx, Iyy, Izz);
 		}
 
 		// set the collision mask

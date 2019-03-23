@@ -396,7 +396,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 			entity->m_matrix = matrix;
 			entity->SetNameID(sceneInfo->GetName());
 			const char* const name = entity->GetName().GetStr();
-			if (strstr(name, "Capsule") || strstr(name, "Sphere")) {
+			if (strstr(name, "Sphere") || strstr(name, "Box") || strstr(name, "Capsule")) {
 				entity->m_isVisible = false;
 				dTrace(("%s %s\n", name, entity->GetParent()->GetName().GetStr()));
 			}
@@ -495,7 +495,8 @@ NewtonCollision* DemoEntity::CreateCollisionFromchildren(NewtonWorld* const worl
 			shapeArray[count] = NewtonCreateSphere(world, extremes.m_x, 0, &matrix[0][0]);
 			count++;
 			dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
-
+		} else if (strstr (name, "Box")) {
+			dAssert (0);
 		} else if (strstr (name, "Capsule")) {
 			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
