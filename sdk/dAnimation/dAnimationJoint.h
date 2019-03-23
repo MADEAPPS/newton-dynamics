@@ -90,6 +90,7 @@ class dAnimationJoint: public dCustomAlloc
 	const dAnimationJointChildren& GetChidren() const;
 
 	virtual NewtonBody* GetBody() const;
+	virtual dCustomJoint* GetJoint() const;
 
 	protected:
 	dMatrix m_bindMatrix;
@@ -138,6 +139,10 @@ inline NewtonBody* dAnimationJoint::GetBody() const
 	return m_body; 
 }
 
+inline dCustomJoint* dAnimationJoint::GetJoint() const
+{
+	return NULL;
+}
 
 inline const dAnimationJointChildren& dAnimationJoint::GetChidren() const
 { 
