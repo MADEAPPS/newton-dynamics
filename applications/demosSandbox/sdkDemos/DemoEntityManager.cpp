@@ -575,6 +575,9 @@ void DemoEntityManager::Cleanup ()
 	// set the number of sub steps
 	NewtonSetNumberOfSubsteps (m_world, MAX_PHYSICS_SUB_STEPS);
 
+	// register contact creation destrution callbacks
+	NewtonWorldSetCreateDestroyContactCallback(m_world, OnCreateContact, OnDestroyContact);
+
 	// load all available plug ins
 	char plugInPath[2048];
 //	GetModuleFileNameA(NULL, plugInPath, 256);
@@ -1259,6 +1262,17 @@ int DemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
 	ImGui::Text(string, "");
 	return 0;
 }
+
+void DemoEntityManager::OnCreateContact(NewtonJoint* const contact)
+{
+	//dAssert(0);
+}
+
+void DemoEntityManager::OnDestroyContact(NewtonJoint* const contact)
+{
+//	dAssert(0);
+}
+
 
 void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
 {

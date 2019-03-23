@@ -456,8 +456,8 @@ dgInt32 dgWorld::ClosestPoint(const dgCollisionInstance* const collisionSrcA, co
 	dgContactMaterial material;
 	material.m_penetration = dgFloat32 (0.0f);
 
-	dgContact contactJoint (this, &material);
-	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
+	dgContact contactJoint (this, &material, &collideBodyB, &collideBodyA);
+//	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
 
 	dgCollisionParamProxy proxy(&contactJoint, contacts, threadIndex, false, false);
 
@@ -522,8 +522,8 @@ bool dgWorld::IntersectionTest (const dgCollisionInstance* const collisionSrcA, 
 	dgContactMaterial material; 
 	material.m_penetration = dgFloat32 (0.0f);
 
-	dgContact contactJoint (this, &material);
-	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
+	dgContact contactJoint (this, &material, &collideBodyB, &collideBodyA);
+//	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
 
 	dgBroadPhase::dgPair pair;
 	pair.m_contactCount = 0;
@@ -1244,8 +1244,8 @@ dgInt32 dgWorld::CollideContinue (
 	dgContactMaterial material;
 	material.m_penetration = dgFloat32 (0.0f);
 
-	dgContact contactJoint (this, &material);
-	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
+	dgContact contactJoint (this, &material, &collideBodyB, &collideBodyA);
+//	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
 
 	dgBroadPhase::dgPair pair;
 	pair.m_contact = &contactJoint;
@@ -1329,8 +1329,8 @@ dgInt32 dgWorld::Collide (
 	dgContactMaterial material; 
 	material.m_penetration = dgFloat32 (0.0f);
 
-	dgContact contactJoint (this, &material);
-	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
+	dgContact contactJoint (this, &material, &collideBodyB, &collideBodyA);
+//	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
 
 	dgBroadPhase::dgPair pair;
 	pair.m_contactCount = 0;

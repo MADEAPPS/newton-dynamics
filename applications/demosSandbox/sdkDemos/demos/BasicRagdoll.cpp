@@ -343,6 +343,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	//new dCustom6dof (rootMatrix, ragdoll->GetBody());
 
 	int count = 6;
+	count = 1;
 	for (int x = 0; x < count; x ++) {
 		for (int z = 0; z < count; z ++) {
 			dVector p (origin + dVector (10.0f + (x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));

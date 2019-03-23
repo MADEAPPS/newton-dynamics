@@ -124,6 +124,9 @@ class DemoEntityManager: public dList <DemoEntity*>
 	static void BodySerialization (NewtonBody* const body, void* const userData, NewtonSerializeCallback serializecallback, void* const serializeHandle);
 	static void BodyDeserialization (NewtonBody* const body, void* const userData, NewtonDeserializeCallback serializecallback, void* const serializeHandle);
 
+	static void OnCreateContact(NewtonJoint* const contact);
+	static void OnDestroyContact(NewtonJoint* const contact);
+
 	bool GetMouseKeyState (int button ) const;
 	int Print (const dVector& color, const char *fmt, ... ) const;
 	int GetDebugDisplay() const;

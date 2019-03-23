@@ -746,6 +746,7 @@ void NewtonSetIslandUpdateEvent(const NewtonWorld* const newtonWorld, NewtonIsla
 
 
 
+
 /*!
   Get the first body in the body in the world body list.
 
@@ -981,6 +982,12 @@ NewtonWorldDestructorCallback NewtonWorldGetDestructorCallback(const NewtonWorld
 	return world->m_destructor;
 }
 
+void NewtonWorldSetCreateDestroyContactCallback(const NewtonWorld* const newtonWorld, NewtonCreateContactCallback createContact, NewtonDestroyContactCallback destroyContact)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	world->SetCreateDestroyContactCallback((dgWorld::OnCreateContact) createContact, (dgWorld::OnDestroyContact) destroyContact);
+}
 
 void NewtonWorldSetCollisionConstructorDestructorCallback (const NewtonWorld* const newtonWorld, NewtonCollisionCopyConstructionCallback constructor, NewtonCollisionDestructorCallback destructor)
 {
@@ -988,7 +995,6 @@ void NewtonWorldSetCollisionConstructorDestructorCallback (const NewtonWorld* co
 	Newton* const world = (Newton *) newtonWorld;
 	world->SetCollisionInstanceConstructorDestructor((dgWorld::OnCollisionInstanceDuplicate) constructor, (dgWorld::OnCollisionInstanceDestroy)destructor);
 }
-
 
 void* NewtonWorldGetListenerUserData (const NewtonWorld* const newtonWorld, void* const listener)
 {
