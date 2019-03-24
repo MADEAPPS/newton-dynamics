@@ -398,7 +398,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 			const char* const name = entity->GetName().GetStr();
 			if (strstr(name, "Sphere") || strstr(name, "Box") || strstr(name, "Capsule")) {
 				entity->m_isVisible = false;
-				dTrace(("%s %s\n", name, entity->GetParent()->GetName().GetStr()));
+				//dTrace(("%s %s\n", name, entity->GetParent()->GetName().GetStr()));
 			}
 
 			for (void* child = scene.GetFirstChildLink(sceneNode); child; child = scene.GetNextChildLink(sceneNode, child)) {

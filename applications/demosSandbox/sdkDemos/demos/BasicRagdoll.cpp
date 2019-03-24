@@ -129,7 +129,20 @@ class PassiveRagdollManager: public dCustomTransformManager
 		origin.m_w = 1.0f;
 	}
 
-	//NewtonBody* CreateBodyPart (DemoEntity* const bodyPart, const dPasiveRagDollDefinition& definition) 
+	static void ClampAngularVelocity(const NewtonBody* body, dFloat timestep, int threadIndex)
+	{
+		dVector omega;
+		NewtonBodyGetOmega(body, &omega[0]);
+		omega.m_w = 0.0f;
+		dFloat mag2 = omega.DotProduct3(omega);
+		if (mag2 > (100.0f * 100.0f)) {
+			omega = omega.Normalize().Scale (100.0f);
+			NewtonBodySetOmega(body, &omega[0]);
+		}
+
+		PhysicsApplyGravityForce (body, timestep, threadIndex);
+	}
+
 	NewtonBody* CreateBodyPart (DemoEntity* const bodyPart) 
 	{
 		NewtonWorld* const world = GetWorld();
@@ -153,7 +166,8 @@ class PassiveRagdollManager: public dCustomTransformManager
 		NewtonBodySetMaterialGroupID (bone, m_material);
 
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
-		NewtonBodySetForceAndTorqueCallback (bone, PhysicsApplyGravityForce);
+		//NewtonBodySetForceAndTorqueCallback (bone, PhysicsApplyGravityForce);
+		NewtonBodySetForceAndTorqueCallback (bone, ClampAngularVelocity);
 
 		// destroy the collision helper shape 
 		NewtonDestroyCollision (shape);
