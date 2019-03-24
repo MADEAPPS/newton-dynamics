@@ -887,13 +887,13 @@ class DynamicRagdollManager: public dAnimationModelManager
 		for (int i = 0; i < bodyCount; i++) {
 			volume += NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(bodyArray[i]));
 		}
-		dFloat density = 100.0f / volume;
+		dFloat density = mass / volume;
 
 		for (int i = 0; i < bodyCount; i++) {
 			dFloat Ixx;
 			dFloat Iyy;
 			dFloat Izz;
-			dFloat mass;
+
 			NewtonBody* const body = bodyArray[i];
 			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 			dFloat scale = density * NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(body));

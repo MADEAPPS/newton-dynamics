@@ -257,6 +257,8 @@ DemoEntityManager::DemoEntityManager ()
 	,m_asynchronousPhysicsUpdate(false)
 	,m_solveLargeIslandInParallel(false)
 	,m_showRaycastHit(false)
+	,m_contactlock(0)
+	,m_contactList()
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -1263,14 +1265,20 @@ int DemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
 	return 0;
 }
 
-void DemoEntityManager::OnCreateContact(NewtonJoint* const contact)
+void DemoEntityManager::OnCreateContact(const NewtonWorld* const world, NewtonJoint* const contact)
 {
-	//dAssert(0);
+	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+	dCustomScopeLock lock(&scene->m_contactlock);
+	NewtonJointSetUserData(contact, scene->m_contactList.Append(contact));
 }
 
-void DemoEntityManager::OnDestroyContact(NewtonJoint* const contact)
+void DemoEntityManager::OnDestroyContact(const NewtonWorld* const world, NewtonJoint* const contact)
 {
-//	dAssert(0);
+	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+	dList<NewtonJoint*>::dListNode* const cooky = (dList<NewtonJoint*>::dListNode*)NewtonJointGetUserData(contact);
+	NewtonJointSetUserData(contact, scene->m_contactList.Append(contact));
+	dCustomScopeLock lock(&scene->m_contactlock);
+	scene->m_contactList.Remove(cooky);
 }
 
 

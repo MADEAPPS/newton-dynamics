@@ -175,8 +175,8 @@ class dgWorld
 	,public dgWorldPluginList
 {
 	public:
-	typedef void (dgApi *OnCreateContact) (const dgContact* const contact);
-	typedef void (dgApi *OnDestroyContact) (const dgContact* const contact);
+	typedef void (dgApi *OnCreateContact) (const dgWorld* const world, const dgContact* const contact);
+	typedef void (dgApi *OnDestroyContact) (const dgWorld* const world, const dgContact* const contact);
 	typedef dgUnsigned32 (dgApi *OnClusterUpdate) (const dgWorld* const world, void* island, dgInt32 bodyCount);
 	typedef void (dgApi *OnListenerBodyDestroyCallback) (const dgWorld* const world, void* const listener, dgBody* const body);
 	typedef void (dgApi *OnListenerUpdateCallback) (const dgWorld* const world, void* const listener, dgFloat32 timestep);

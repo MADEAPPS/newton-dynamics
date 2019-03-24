@@ -94,7 +94,7 @@ dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const materi
 	}
 
 	if (world->m_createContact) {
-		world->m_createContact(this);
+		world->m_createContact(world, this);
 	}
 }
 
@@ -124,7 +124,8 @@ dgContact::dgContact(dgContact* const clone)
 	Merge (*clone);
 
 	if (m_body0->m_world->m_createContact) {
-		m_body0->m_world->m_createContact(this);
+		dgAssert(clone->m_body0);
+		m_body0->m_world->m_createContact(clone->m_body0->m_world, this);
 	}
 }
 
@@ -132,7 +133,7 @@ dgContact::~dgContact()
 {
 	dgAssert(m_body0);
 	if (m_body0->m_world->m_destroyContact) {
-		m_body0->m_world->m_destroyContact(this);
+		m_body0->m_world->m_destroyContact(m_body0->m_world, this);
 	}
 
 	dgList<dgContactMaterial>::RemoveAll();

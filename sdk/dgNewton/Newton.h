@@ -363,8 +363,8 @@ extern "C" {
 	typedef void (*NewtonWorldDestructorCallback) (const NewtonWorld* const world);
 	typedef void (*NewtonPostUpdateCallback) (const NewtonWorld* const world, dFloat timestep);
 
-	typedef void(*NewtonCreateContactCallback) (NewtonJoint* const contact);
-	typedef void(*NewtonDestroyContactCallback) (NewtonJoint* const contact);
+	typedef void(*NewtonCreateContactCallback) (const NewtonWorld* const newtonWorld, NewtonJoint* const contact);
+	typedef void(*NewtonDestroyContactCallback) (const NewtonWorld* const newtonWorld, NewtonJoint* const contact);
 
 	typedef void (*NewtonWorldListenerDebugCallback) (const NewtonWorld* const world, void* const listener, void* const debugContext);
 	typedef void (*NewtonWorldListenerBodyDestroyCallback) (const NewtonWorld* const world, void* const listenerUserData, NewtonBody* const body);

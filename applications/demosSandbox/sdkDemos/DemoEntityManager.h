@@ -124,8 +124,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 	static void BodySerialization (NewtonBody* const body, void* const userData, NewtonSerializeCallback serializecallback, void* const serializeHandle);
 	static void BodyDeserialization (NewtonBody* const body, void* const userData, NewtonDeserializeCallback serializecallback, void* const serializeHandle);
 
-	static void OnCreateContact(NewtonJoint* const contact);
-	static void OnDestroyContact(NewtonJoint* const contact);
+	static void OnCreateContact(const NewtonWorld* const world, NewtonJoint* const contact);
+	static void OnDestroyContact(const NewtonWorld* const world, NewtonJoint* const contact);
 
 	bool GetMouseKeyState (int button ) const;
 	int Print (const dVector& color, const char *fmt, ... ) const;
@@ -215,6 +215,9 @@ class DemoEntityManager: public dList <DemoEntity*>
 	bool m_asynchronousPhysicsUpdate;
 	bool m_solveLargeIslandInParallel;
 	bool m_showRaycastHit;
+
+	unsigned m_contactlock;
+	dList<NewtonJoint*> m_contactList;
 
 	static SDKDemos m_demosSelection[];
 	friend class DemoEntityListener;
