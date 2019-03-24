@@ -101,34 +101,6 @@ class PassiveRagdollManager: public dCustomTransformManager
 		return 1;
 	}
 
-	void GetDimentions(DemoEntity* const bodyPart, dVector& origin, dVector& size) const
-	{	
-		DemoMesh* const mesh = (DemoMesh*)bodyPart->GetMesh();
-		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
-
-		dFloat* const array = mesh->m_vertex;
-		dVector pmin( 1.0e20f,  1.0e20f,  1.0e20f, 0.0f);
-		dVector pmax(-1.0e20f, -1.0e20f, -1.0e20f, 0.0f);
-
-		for (int i = 0; i < mesh->m_vertexCount; i ++) {
-			dFloat x = array[i * 3 + 0];
-			dFloat y = array[i * 3 + 1];
-			dFloat z = array[i * 3 + 2];
-
-			pmin.m_x = x < pmin.m_x ? x : pmin.m_x;
-			pmin.m_y = y < pmin.m_y ? y : pmin.m_y;
-			pmin.m_z = z < pmin.m_z ? z : pmin.m_z;
-									  
-			pmax.m_x = x > pmax.m_x ? x : pmax.m_x;
-			pmax.m_y = y > pmax.m_y ? y : pmax.m_y;
-			pmax.m_z = z > pmax.m_z ? z : pmax.m_z;
-		}
-
-		size = (pmax - pmin).Scale (0.5f);
-		origin = (pmax + pmin).Scale (0.5f);
-		origin.m_w = 1.0f;
-	}
-
 	static void ClampAngularVelocity(const NewtonBody* body, dFloat timestep, int threadIndex)
 	{
 		dVector omega;
@@ -222,6 +194,30 @@ class PassiveRagdollManager: public dCustomTransformManager
 		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
 
+	void SetModelMass (dFloat mass, int bodyCount, NewtonBody** const bodyArray) const
+	{
+		dFloat volume = 0.0f;
+		for (int i = 0; i < bodyCount; i++) {
+			volume += NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(bodyArray[i]));
+		}
+		dFloat density = 100.0f / volume;
+
+		for (int i = 0; i < bodyCount; i++) {
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
+			NewtonBody* const body = bodyArray[i];
+			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+			dFloat scale = density * NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(body));
+			mass *= scale;
+			Ixx *= scale;
+			Iyy *= scale;
+			Izz *= scale;
+			NewtonBodySetMassMatrix(body, mass, Ixx, Iyy, Izz);
+		}
+	}
+
 	dCustomTransformController* CreateRagDoll(const dMatrix& location, const DemoEntity* const model, dPasiveRagDollDefinition* const definition, int defintionCount)
 	{
 		NewtonWorld* const world = GetWorld();
@@ -240,7 +236,6 @@ class PassiveRagdollManager: public dCustomTransformManager
 
 		controller->SetCalculateLocalTransforms(true);
 
-		//dCustomTransformController::dSkeletonBone* const bone0 = controller->AddRoot(rootBone, dGetIdentityMatrix());
 		// save the controller as the collision user data, for collision culling
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBone), controller);
 
@@ -289,26 +284,7 @@ class PassiveRagdollManager: public dCustomTransformManager
 			}
 		}
 
-		dFloat volume = 0.0f;
-		for (int i = 0; i < bodyCount; i ++) {
-			volume += NewtonConvexCollisionCalculateVolume (NewtonBodyGetCollision(bodyArray[i]));
-		}
-		dFloat density = 100.0f / volume;
-
-		for (int i = 0; i < bodyCount; i ++) {
-			dFloat Ixx;
-			dFloat Iyy;
-			dFloat Izz;
-			dFloat mass;
-			NewtonBody* const body = bodyArray[i];
-			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-			dFloat scale = density * NewtonConvexCollisionCalculateVolume (NewtonBodyGetCollision(body));
-			mass *= scale;
-			Ixx *= scale;
-			Iyy *= scale;
-			Izz *= scale;
-			NewtonBodySetMassMatrix(body, mass, Ixx, Iyy, Izz);
-		}
+		SetModelMass (100.0f, bodyCount, bodyArray);
 
 		// set the collision mask
 		// note this container work best with a material call back for setting bit field 
@@ -357,7 +333,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	//new dCustom6dof (rootMatrix, ragdoll->GetBody());
 
 	int count = 6;
-	count = 1;
+	//count = 1;
 	for (int x = 0; x < count; x ++) {
 		for (int z = 0; z < count; z ++) {
 			dVector p (origin + dVector (10.0f + (x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));

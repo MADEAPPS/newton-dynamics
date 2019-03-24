@@ -30,8 +30,8 @@ class dAnimationModelManager: public dCustomListener
 	virtual void DestroyModel(dAnimationJointRoot* const model);
 
 	//virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext) = 0;
-	//virtual void OnPreUpdate(dAnimationJointRoot* const controller, dFloat timestep, int threadIndex) const = 0;
-	//virtual void OnUpdateTransform(const dAnimationJointRoot::dAnimationJoint* const bone, const dMatrix& localMatrix) const = 0;
+	virtual void OnPreUpdate(dAnimationJointRoot* const controller, dFloat timestep, int threadIndex) const = 0;
+	virtual void OnUpdateTransform(const dAnimationJoint* const bone, const dMatrix& localMatrix) const = 0;
 
 	protected:
 	virtual void OnDestroy();
@@ -39,7 +39,7 @@ class dAnimationModelManager: public dCustomListener
 	virtual void PostUpdate(dFloat timestep);
 
 	private:
-	dList<dAnimationJointRoot> m_controllerList;
+	dList<dAnimationJointRoot*> m_controllerList;
 };
 
 

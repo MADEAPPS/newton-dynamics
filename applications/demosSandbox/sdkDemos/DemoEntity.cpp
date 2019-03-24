@@ -496,7 +496,23 @@ NewtonCollision* DemoEntity::CreateCollisionFromchildren(NewtonWorld* const worl
 			count++;
 			dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
 		} else if (strstr (name, "Box")) {
-			dAssert (0);
+			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
+			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+			// go over the vertex array and find and collect all vertices's weighted by this bone.
+			dFloat* const array = mesh->m_vertex;
+			dVector extremes(0.0f);
+			for (int i = 0; i < mesh->m_vertexCount; i++) {
+				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
+				extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
+				extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
+			}
+
+			extremes = extremes.Scale (2.0f); 
+			dMatrix matrix(child->GetCurrentMatrix());
+			shapeArray[count] = NewtonCreateBox(world, extremes.m_x, extremes.m_y, extremes.m_z, 0, &matrix[0][0]);
+			count++;
+			dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
+
 		} else if (strstr (name, "Capsule")) {
 			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(DemoMesh::GetRttiType()));

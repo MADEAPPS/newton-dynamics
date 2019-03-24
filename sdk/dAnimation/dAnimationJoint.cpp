@@ -12,6 +12,7 @@
 #include "dAnimationStdAfx.h"
 //#include "dAnimAcyclicJoint.h"
 #include "dAnimationJoint.h"
+#include "dAnimationModelManager.h"
 
 /*
 dAnimAcyclicJoint::dAnimAcyclicJoint(dAnimAcyclicJoint* const parent)
@@ -85,3 +86,32 @@ void dAnimAcyclicJoint::Finalize()
 	}
 }
 */
+
+
+void dAnimationJoint::PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const
+{
+	dMatrix parentMatrixPool[128];
+	const dAnimationJoint* stackPool[128];
+
+	int stack = 1;
+	stackPool[0] = this;
+	parentMatrixPool[0] = dGetIdentityMatrix();
+
+	while (stack) {
+		dMatrix matrix;
+		stack--;
+
+		dMatrix parentMatrix(parentMatrixPool[stack]);
+		const dAnimationJoint* const bone = stackPool[stack];
+
+		NewtonBodyGetMatrix(bone->GetBody(), &matrix[0][0]);
+		manager->OnUpdateTransform(bone, matrix * parentMatrix * bone->GetBindMatrix());
+
+		parentMatrix = matrix.Inverse();
+		for (dAnimationJointChildren::dListNode* ptrNode = m_children.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
+			parentMatrixPool[stack] = parentMatrix;
+			stackPool[stack] = ptrNode->GetInfo();
+			stack++;
+		}
+	}
+}

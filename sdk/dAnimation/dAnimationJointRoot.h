@@ -16,32 +16,50 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationJoint.h"
 
+class dAnimationModelManager;
 
 class dAnimationJointRoot: public dAnimationJoint
 {
 	public:
-	dAnimationJointRoot(NewtonBody* const body)
-		:dAnimationJoint(body, NULL)
-		,m_calculateLocalTransform(true)
-	{
-	}
+	dAnimationJointRoot(NewtonBody* const body, const dMatrix& bindMarix);
+	virtual ~dAnimationJointRoot();
 
-	~dAnimationJointRoot()
-	{
-	}
-
-	dAnimationJoint* AddBone(NewtonBody* const bone, const dMatrix& bindMatrix, dAnimationJoint* const parentBone);
-
-	void SetCalculateLocalTransforms(bool val) { m_calculateLocalTransform = val; }
-	bool GetCalculateLocalTransforms() const { return m_calculateLocalTransform; }
+	void SetCalculateLocalTransforms(bool val);
+	bool GetCalculateLocalTransforms() const;
 
 	private:
-	//void PostUpdate(dCustomTransformManager* const manager, dFloat timestep) const;
+	void PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
 
 	bool m_calculateLocalTransform;
-
-	friend class dCustomTransformManager;
+	friend class dAnimationModelManager;
 };
+
+inline dAnimationJointRoot::dAnimationJointRoot(NewtonBody* const body, const dMatrix& bindMarix)
+	:dAnimationJoint(body, bindMarix, NULL)
+	,m_calculateLocalTransform(true)
+{
+}
+
+inline dAnimationJointRoot::~dAnimationJointRoot()
+{
+}
+
+inline void dAnimationJointRoot::SetCalculateLocalTransforms(bool val) 
+{ 
+	m_calculateLocalTransform = val; 
+}
+
+inline bool dAnimationJointRoot::GetCalculateLocalTransforms() const 
+{ 
+	return m_calculateLocalTransform; 
+}
+
+inline void dAnimationJointRoot::PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const
+{
+	if (m_calculateLocalTransform) {
+		dAnimationJoint::PostUpdate(manager, timestep);
+	}
+}
 
 #endif 
 

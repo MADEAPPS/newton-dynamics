@@ -70,6 +70,8 @@ class dAnimAcyclicJoint: public dContainersAlloc
 */
 
 class dAnimationJoint;
+class dAnimationModelManager;
+
 class dAnimationJointChildren: public dList<dAnimationJoint*>
 {
 };
@@ -77,7 +79,7 @@ class dAnimationJointChildren: public dList<dAnimationJoint*>
 class dAnimationJoint: public dCustomAlloc
 {
 	public:
-	dAnimationJoint(NewtonBody* const body, dAnimationJoint* const parent);
+	dAnimationJoint(NewtonBody* const body, const dMatrix& bindMarix, dAnimationJoint* const parent);
 	virtual ~dAnimationJoint();
 	
 	dAnimationJoint* GetParent() const;
@@ -93,6 +95,8 @@ class dAnimationJoint: public dCustomAlloc
 	dCustomJoint* GetJoint() const;
 
 	protected:
+	void PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
+
 	dMatrix m_bindMatrix;
 	void* m_userData;
 	NewtonBody* m_body;
@@ -101,11 +105,12 @@ class dAnimationJoint: public dCustomAlloc
 	dAnimationJointChildren m_children;
 };
 
-inline dAnimationJoint::dAnimationJoint(NewtonBody* const body, dAnimationJoint* const parent)
+inline dAnimationJoint::dAnimationJoint(NewtonBody* const body, const dMatrix& bindMarix, dAnimationJoint* const parent)
 	:dCustomAlloc()
-	,m_bindMatrix(dGetIdentityMatrix())
+	,m_bindMatrix(bindMarix)
 	,m_userData(NULL)
-	,m_body(m_body)
+	,m_body(body)
+	,m_joint(NULL)
 	,m_parent(parent)
 	,m_children()
 {

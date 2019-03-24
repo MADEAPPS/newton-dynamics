@@ -24,32 +24,43 @@ dAnimationModelManager::~dAnimationModelManager()
 
 dAnimationJointRoot* dAnimationModelManager::CreateModel(NewtonBody* const bone, const dMatrix& bindMatrix)
 {
-	dAssert (0);
-	return NULL;
+	dAnimationJointRoot* const root = new dAnimationJointRoot(bone, bindMatrix);
+	m_controllerList.Append(root);
+	return root;
 }
 
 void dAnimationModelManager::DestroyModel(dAnimationJointRoot* const model)
 {
-	dAssert (0);
+	for (dList<dAnimationJointRoot*>::dListNode* node = m_controllerList.GetFirst(); node;) {
+		if (node->GetInfo() == model) {
+			delete node->GetInfo();
+			m_controllerList.Remove(node);
+			break;
+		}
+	}
 }
 
 void dAnimationModelManager::OnDestroy()
 {
-	for (dList<dAnimationJointRoot>::dListNode* node = m_controllerList.GetFirst(); node;) {
-		dAssert (0);
-		//dCustomTransformController* const controller = &node->GetInfo();
-		//node = node->GetNext();
-		//DestroyController(controller);
+	for (dList<dAnimationJointRoot*>::dListNode* node = m_controllerList.GetFirst(); node;) {
+		dAnimationJointRoot* const controller = node->GetInfo();
+		node = node->GetNext();
+		DestroyModel(controller);
 	}
-
 }
 
 void dAnimationModelManager::PreUpdate(dFloat timestep)
 {
-	dTrace(("fix this function %s \n", __FUNCTION__));
+	for (dList<dAnimationJointRoot*>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
+		dAnimationJointRoot* const controller = node->GetInfo();
+		OnPreUpdate(controller, timestep, 0);
+	}
 }
 
 void dAnimationModelManager::PostUpdate(dFloat timestep)
 {
-	dTrace(("fix this function %s \n", __FUNCTION__));
+	for (dList<dAnimationJointRoot*>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
+		dAnimationJointRoot* const controller = node->GetInfo();
+		controller->PostUpdate(this, timestep);
+	}
 }

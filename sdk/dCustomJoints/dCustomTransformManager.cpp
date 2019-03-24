@@ -107,7 +107,6 @@ void dCustomTransformManager::PostUpdate(dFloat timestep)
 {
 	for (dList<dCustomTransformController>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
 		dCustomTransformController* const controller = &node->GetInfo();
-		//OnPostUpdate(controller, timestep, 0);
 		controller->PostUpdate(this, timestep);
 	}
 }
