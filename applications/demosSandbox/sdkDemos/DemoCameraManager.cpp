@@ -252,7 +252,7 @@ void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mous
 				m_targetPicked = body;
 				NewtonBodyGetMatrix(m_targetPicked, &matrix[0][0]);
 
-				dTrace (("body Id: %d\n", NewtonBodyGetID(m_targetPicked)));
+				//dTrace (("body Id: %d\n", NewtonBodyGetID(m_targetPicked)));
 
 				m_pickedBodyParam = param;
 				#ifdef USE_PICK_BODY_BY_FORCE
