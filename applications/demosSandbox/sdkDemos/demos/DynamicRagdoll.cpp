@@ -772,8 +772,32 @@ xxxx1->ResetMatrix(*scene, matrix1);
 };
 #endif
 
+
 class DynamicRagdollManager: public dAnimationModelManager
 {
+	class dJointDefinition
+	{
+	public:
+		struct dJointLimit
+		{
+			dFloat m_minTwistAngle;
+			dFloat m_maxTwistAngle;
+			dFloat m_coneAngle;
+		};
+
+		struct dFrameMatrix
+		{
+			dFloat m_pitch;
+			dFloat m_yaw;
+			dFloat m_roll;
+		};
+
+		char m_boneName[32];
+		dFloat m_friction;
+		dJointLimit m_jointLimits;
+		dFrameMatrix m_frameBasics;
+	};
+
 	public:
 /*
 	class dAnimationCharacterUserData: public DemoEntity::UserData
@@ -881,8 +905,42 @@ class DynamicRagdollManager: public dAnimationModelManager
 		}
 	}
 
+	dAnimationJoint* ConnectBodyParts(NewtonBody* const bone, NewtonBody* const parent, const dJointDefinition& definition) const
+	{
+		dMatrix matrix;
+		NewtonBodyGetMatrix(bone, &matrix[0][0]);
+
+		dJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
+		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad));
+		pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
+
+		dMatrix parentRollMatrix(dGetIdentityMatrix() * pinAndPivotInGlobalSpace);
+
+		dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
+		dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, parentRollMatrix, bone, parent);
+
+		dFloat friction = definition.m_friction * 0.25f;
+		joint->EnableCone(true);
+		joint->SetConeFriction(friction);
+		joint->SetConeLimits(jointLimits.m_coneAngle * dDegreeToRad);
+
+		joint->EnableTwist(true);
+		joint->SetTwistFriction(friction);
+		joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
+
+		return NULL;
+	}
+
 	void DynamicsRagdollExperiment_1(const dMatrix& location)
 	{
+		static dJointDefinition jointsDefinition[] =
+		{
+			{ "body" },
+			{ "leg", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "foot", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+		};
+		const int definitionCount = sizeof (jointsDefinition)/sizeof (jointsDefinition[0]);
+
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
@@ -893,7 +951,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 		//modelEntity->ResetMatrix(*scene, matrix0);
 		scene->Append(modelEntity);
 
-		// add the root bone
+		// add the root childBody
 		NewtonBody* const rootBone = CreateBodyPart(modelEntity);
 
 		// build the rag doll with rigid bodies connected by joints
@@ -918,26 +976,25 @@ class DynamicRagdollManager: public dAnimationModelManager
 		NewtonBody* bodyArray[1024];
 		bodyArray[0] = rootBone;
 
-/*
 		// walk model hierarchic adding all children designed as rigid body bones. 
 		while (stackIndex) {
 			stackIndex--;
 			DemoEntity* const entity = childEntities[stackIndex];
-			dCustomTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
+			dAnimationJoint* parentBone = parentBones[stackIndex];
 
 			const char* const name = entity->GetName().GetStr();
-			for (int i = 0; i < defintionCount; i++) {
-				if (!strcmp(definition[i].m_boneName, name)) {
-					NewtonBody* const bone = CreateBodyPart(entity, definition[i]);
+			for (int i = 0; i < definitionCount; i++) {
+				if (!strcmp(jointsDefinition[i].m_boneName, name)) {
+					NewtonBody* const childBody = CreateBodyPart(entity);
 
 					// connect this body part to its parent with a ragdoll joint
 					NewtonBody* const parentBody = parentBone->GetBody();
-					ConnectBodyParts(bone, parentBody, definition[i]);
+					//ConnectBodyParts(childBody, parentBody, jointsDefinition[i]);
 
-					dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
-					parentBone = controller->AddBone(bone, bindMatrix, parentBone);
+					//dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
+					//parentBone = controller->AddBone(bone, bindMatrix, parentBone);
 					// save the controller as the collision user data, for collision culling
-					NewtonCollisionSetUserData(NewtonBodyGetCollision(bone), parentBone);
+					//NewtonCollisionSetUserData(NewtonBodyGetCollision(bone), parentBone);
 					break;
 				}
 			}
@@ -948,7 +1005,6 @@ class DynamicRagdollManager: public dAnimationModelManager
 				stackIndex++;
 			}
 		}
-*/
 
 		SetModelMass (100.0f, bodyCount, bodyArray);
 
