@@ -1276,7 +1276,6 @@ void DemoEntityManager::OnDestroyContact(const NewtonWorld* const world, NewtonJ
 {
 	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 	dList<NewtonJoint*>::dListNode* const cooky = (dList<NewtonJoint*>::dListNode*)NewtonJointGetUserData(contact);
-	NewtonJointSetUserData(contact, scene->m_contactList.Append(contact));
 	dCustomScopeLock lock(&scene->m_contactlock);
 	scene->m_contactList.Remove(cooky);
 }
