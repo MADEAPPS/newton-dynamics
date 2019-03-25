@@ -196,6 +196,8 @@ typedef long long unsigned64;
 #include <dNewtonMesh.h>
 
 #include <dAnimationStdAfx.h>
+#include <dAnimationJoint.h>
+#include <dAnimationJointRagdoll.h>
 #include <dAnimationModelManager.h>
 
 /*

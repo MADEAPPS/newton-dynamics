@@ -9,21 +9,7 @@
 * freely
 */
 
+#include "dAnimationStdAfx.h"
+#include "dAnimationJointRoot.h"
 
-#ifndef __D_VEHICLE_SOLVER_H__
-#define __D_VEHICLE_SOLVER_H__
-
-#include "dStdafxVehicle.h"
-
-class dVehicleChassis;
-
-//class dVehicleSolver: public dAnimAcyclicSolver
-class dVehicleSolver
-{
-	public:
-	DVEHICLE_API dVehicleSolver() ;
-	DVEHICLE_API virtual ~dVehicleSolver();
-	DVEHICLE_API void Finalize(dVehicleChassis* const vehicle);
-};
-#endif 
 
