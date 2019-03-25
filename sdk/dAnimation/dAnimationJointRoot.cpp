@@ -13,3 +13,15 @@
 #include "dAnimationJointRoot.h"
 
 
+dAnimationJointRoot::dAnimationJointRoot(NewtonBody* const body, const dMatrix& bindMarix)
+	:dAnimationJoint(body, bindMarix, NULL)
+	,m_solver()
+	,m_staticBody()
+	,m_calculateLocalTransform(true)
+{
+}
+
+dAnimationJointRoot::~dAnimationJointRoot()
+{
+}
+

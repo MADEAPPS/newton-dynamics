@@ -38,6 +38,7 @@
     <ClCompile Include="..\..\dAnimation\dAnimationJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationJointRagdoll.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationJointRoot.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationJointSolver.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationModelManager.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationStdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -54,6 +55,7 @@
     <ClInclude Include="..\..\dAnimation\dAnimationJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationJointRagdoll.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationJointRoot.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationJointSolver.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationModelManager.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationStdAfx.h" />
   </ItemGroup>

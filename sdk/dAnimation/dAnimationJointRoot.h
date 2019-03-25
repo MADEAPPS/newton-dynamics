@@ -15,6 +15,7 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimationJoint.h"
+#include "dAnimationJointSolver.h"
 
 class dAnimationModelManager;
 
@@ -30,19 +31,11 @@ class dAnimationJointRoot: public dAnimationJoint
 	private:
 	void PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
 
+	dAnimationJointSolver m_solver;
+	dComplementaritySolver::dBodyState m_staticBody;
 	bool m_calculateLocalTransform;
 	friend class dAnimationModelManager;
 };
-
-inline dAnimationJointRoot::dAnimationJointRoot(NewtonBody* const body, const dMatrix& bindMarix)
-	:dAnimationJoint(body, bindMarix, NULL)
-	,m_calculateLocalTransform(true)
-{
-}
-
-inline dAnimationJointRoot::~dAnimationJointRoot()
-{
-}
 
 inline void dAnimationJointRoot::SetCalculateLocalTransforms(bool val) 
 { 
