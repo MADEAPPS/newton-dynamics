@@ -42,6 +42,8 @@ class dAnimationJoint: public dCustomAlloc
 	protected:
 	void PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
 
+	dComplementaritySolver::dBodyState m_proxyBody;
+	dComplementaritySolver::dBilateralJoint* m_proxyJoint;
 	dMatrix m_bindMatrix;
 	void* m_userData;
 	NewtonBody* m_body;
