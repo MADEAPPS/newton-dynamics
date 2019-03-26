@@ -1035,12 +1035,11 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-//	dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
-//	return;
 
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
-	DynamicRagdollManager* const manager = new DynamicRagdollManager(scene);
+return;
 
+	DynamicRagdollManager* const manager = new DynamicRagdollManager(scene);
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
