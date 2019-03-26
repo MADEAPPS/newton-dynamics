@@ -352,9 +352,10 @@ DemoEntityManager::DemoEntityManager ()
 //	m_solverPasses = 4;
 //	m_workerThreads = 4;
 //	m_solverSubSteps = 2;
+	m_showRaycastHit = true;
 //	m_showNormalForces = true;
 //	m_showCenterOfMass = false;
-	m_showJointDebugInfo = true;
+//	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
