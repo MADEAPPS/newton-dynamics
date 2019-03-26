@@ -1129,12 +1129,12 @@ NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent
 	dMatrix matrix (ent->CalculateGlobalMatrix(NULL));
 
 	// create the level rigid body
-//	NewtonBody* const level = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
+	NewtonBody* const level = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 
-NewtonCollision* const collision1 = NewtonCreateNull(world);
-NewtonBody* const level = NewtonCreateDynamicBody(world, collision1, &matrix[0][0]);
-NewtonBodySetCollision(level, collision);
-NewtonDestroyCollision (collision1);
+//NewtonCollision* const collision1 = NewtonCreateNull(world);
+//NewtonBody* const level = NewtonCreateDynamicBody(world, collision1, &matrix[0][0]);
+//NewtonBodySetCollision(level, collision);
+//NewtonDestroyCollision (collision1);
 
 	// save the pointer to the graphic object with the body.
 	NewtonBodySetUserData (level, ent);

@@ -5584,6 +5584,7 @@ void NewtonBodySetCollision(const NewtonBody* const bodyPtr, const NewtonCollisi
 	dgBody* const body = (dgBody *)bodyPtr;
 	dgCollisionInstance* const collision = (dgCollisionInstance*) collisionPtr;
 	body->AttachCollision (collision);
+	body->UpdateCollisionMatrix(dgFloat32(0.0f), 0);
 }
 
 void NewtonBodySetCollisionScale (const NewtonBody* const bodyPtr, dFloat scaleX, dFloat scaleY, dFloat scaleZ)
