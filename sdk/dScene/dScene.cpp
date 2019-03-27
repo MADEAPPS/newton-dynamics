@@ -976,7 +976,7 @@ void dScene::Serialize(TiXmlElement* const parentNode)
 
 bool dScene::Deserialize(TiXmlElement* const parentNode)
 {
-	return Deserialize(parentNode);
+	return dSceneGraph::Deserialize(parentNode);
 }
 
 void dScene::Serialize (const char* const fileName)
