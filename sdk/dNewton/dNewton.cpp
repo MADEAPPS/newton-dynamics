@@ -225,6 +225,7 @@ void dNewton::DestroyAllBodies()
 
 void dNewton::ResetTimer()
 {
+    m_frequency = 0;
 	#ifdef _MSC_VER
 		LARGE_INTEGER baseCount;
 		LARGE_INTEGER frequency;
