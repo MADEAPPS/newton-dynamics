@@ -27,6 +27,7 @@ endif()
 add_definitions(-DNEWTONCPU_EXPORTS)
 add_library(${projectName} SHARED ${source})
 
+target_include_directories(${projectName} PUBLIC ../dgCore ../dgPhysics)
 if (NEWTON_BUILD_PROFILER)
 	target_link_libraries (${projectName} dTimeTracker)
 endif ()
@@ -40,8 +41,10 @@ else()
 	target_compile_options(${projectName} PRIVATE -mavx)
 endif()
 
-#install(TARGETS ${projectName} RUNTIME DESTINATION ${dllPath})
-#install(TARGETS ${projectName} ARCHIVE DESTINATION ${libraryPath})
+install(TARGETS ${projectName}
+       LIBRARY DESTINATION lib
+       ARCHIVE DESTINATION lib
+       RUNTIME DESTINATION bin)
 
 add_custom_command(
 	TARGET ${projectName} POST_BUILD

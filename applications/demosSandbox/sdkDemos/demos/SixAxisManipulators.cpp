@@ -443,6 +443,7 @@ origin.m_posit = dVector(-2.0f, 0.5f, 0.0f, 1.0f);
 #else
 
 
+#if 0
 class dSixAxisManager: public dAnimIDManager
 {
 	public:
@@ -652,10 +653,15 @@ return NULL;
 */
 };
 
+#endif
 void SixAxisManipulators(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
+	dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
+	return;
+/*
+
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 	dSixAxisManager* const robotManager = new dSixAxisManager(scene);
 
@@ -678,6 +684,7 @@ origin.m_posit.m_x = 2.0f;
 	//	origin.m_posit = dVector (-3.0f, 0.5f, 0.0f, 1.0f);
 	origin.m_posit = dVector(-2.0f, 0.5f, 0.0f, 1.0f);
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
+*/
 }
 
 #endif

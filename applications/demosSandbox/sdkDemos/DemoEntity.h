@@ -73,6 +73,9 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 	virtual void SimulationPreListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep){};
 	virtual void SimulationPostListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep){};
 
+
+	NewtonCollision* CreateCollisionFromchildren(NewtonWorld* const world) const;
+
 	virtual void MessageHandler (NewtonBody* const sender, int message, void* const data) {}
 	static void TransformCallback(const NewtonBody* body, const dFloat* matrix, int threadIndex);
 
@@ -86,8 +89,8 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 	dMatrix m_meshMatrix;
 	DemoMeshInterface* m_mesh;
 	UserData* m_userData;
-
 	unsigned m_lock;
+	bool m_isVisible;
 	dAddRtti(dClassInfo,DOMMY_API);
 
 	friend class DemoEntityManager;

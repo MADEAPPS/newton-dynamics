@@ -501,10 +501,10 @@ DemoEntity* const entity = DemoEntity::LoadNGD_mesh("cow.ngd", scene->GetNewton(
 dAssert(entity);
 scene->Append(entity);
 
-	int count = 3;
-	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
-	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+//	int count = 3;
+//	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
+//	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);

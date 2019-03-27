@@ -30,6 +30,7 @@ class dMousePickClass
 		,m_param (1.0f)
 		,m_body(NULL)
 	{
+		m_hitBody = false;
 	}
 
 	// implement a ray cast pre-filter
@@ -45,6 +46,13 @@ class dMousePickClass
 		}
 
 		return (NewtonBodyGetType(body) == NEWTON_DYNAMIC_BODY) ? 1 : 0;
+	}
+
+	static bool GetLastHit (dVector& posit, dVector& normal) 
+	{
+		posit = m_lastPoint;
+		normal = m_lastNormal;
+		return m_hitBody;
 	}
 
 	static dFloat RayCastFilter (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const contact, const dFloat* const normal, dLong collisionID, void* const userData, dFloat intersetParam)
@@ -67,19 +75,30 @@ class dMousePickClass
 			data->m_body = body;
 		}
 
-
 		if (intersetParam < data->m_param) {
 			data->m_param = intersetParam;
 			data->m_normal = dVector (normal[0], normal[1], normal[2]);
 		}
+
 		return intersetParam;
 	}
 
 	dVector m_normal;
 	dFloat m_param;
 	const NewtonBody* m_body;
+	static bool m_hitBody;
+	static dVector m_lastPoint;
+	static dVector m_lastNormal;
 };
 
+bool dMousePickClass::m_hitBody;
+dVector dMousePickClass::m_lastPoint;
+dVector dMousePickClass::m_lastNormal;
+
+bool GetLastHit (dVector& posit, dVector& normal)
+{
+	return dMousePickClass::GetLastHit(posit, normal);
+}
 
 dVector ForceBetweenBody (NewtonBody* const body0, NewtonBody* const body1)
 {
@@ -1112,6 +1131,11 @@ NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent
 	// create the level rigid body
 	NewtonBody* const level = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 
+//NewtonCollision* const collision1 = NewtonCreateNull(world);
+//NewtonBody* const level = NewtonCreateDynamicBody(world, collision1, &matrix[0][0]);
+//NewtonBodySetCollision(level, collision);
+//NewtonDestroyCollision (collision1);
+
 	// save the pointer to the graphic object with the body.
 	NewtonBodySetUserData (level, ent);
 
@@ -1260,6 +1284,12 @@ NewtonBody* MousePickBody (NewtonWorld* const nWorld, const dVector& origin, con
 	dMousePickClass rayCast;
 	NewtonWorldRayCast(nWorld, &origin[0], &end[0], dMousePickClass::RayCastFilter, &rayCast, dMousePickClass::RayCastPrefilter, 0);
 
+	if (rayCast.m_param < 1.0f) {
+		dMousePickClass::m_hitBody = true;
+		dMousePickClass::m_lastPoint = origin + (end - origin).Scale (rayCast.m_param);
+		dMousePickClass::m_lastNormal = rayCast.m_normal;
+	}
+
 	if (rayCast.m_body) {
 		positionOut = origin + (end - origin).Scale (rayCast.m_param);
 		normalOut = rayCast.m_normal;
@@ -1338,6 +1368,12 @@ void SetKinematicPose(NewtonBody* const body, const dMatrix& matrix1, dFloat tim
 	dQuaternion q1(matrix1);
 
 	dVector omega(q0.CalcAverageOmega(q1, OneOverDt));
+//	const dFloat maxOmega = 10.0f;
+//	dFloat mag2 = omega.DotProduct3(omega);
+//	if (mag2 > maxOmega) {
+//		omega = omega.Normalize().Scale(maxOmega);
+//	}
+
 	dVector veloc ((matrix1.m_posit - matrix0.m_posit).Scale (OneOverDt));
 
 	NewtonBodySetVelocity(body, &veloc[0]);

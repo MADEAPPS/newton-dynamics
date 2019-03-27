@@ -28,6 +28,7 @@ DemoEntity::DemoEntity(const dMatrix& matrix, DemoEntity* const parent)
 	,m_mesh (NULL)
 	,m_userData(NULL)
 	,m_lock(0) 
+	,m_isVisible(true)
 {
 	if (parent) {
 		Attach (parent);
@@ -36,16 +37,17 @@ DemoEntity::DemoEntity(const dMatrix& matrix, DemoEntity* const parent)
 
 DemoEntity::DemoEntity(DemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<DemoMeshInterface*, dScene::dTreeNode*>& meshCache, DemoEntityManager::EntityDictionary& entityDictionary, DemoEntity* const parent)
 	:dClassInfo()
-	,dHierarchy<DemoEntity>() 
-	,m_matrix(dGetIdentityMatrix()) 
-	,m_curPosition (0.0f, 0.0f, 0.0f, 1.0f)
-	,m_nextPosition (0.0f, 0.0f, 0.0f, 1.0f)
-	,m_curRotation (1.0f, 0.0f, 0.0f, 0.0f)
-	,m_nextRotation (1.0f, 0.0f, 0.0f, 0.0f)
+	,dHierarchy<DemoEntity>()
+	,m_matrix(dGetIdentityMatrix())
+	,m_curPosition(0.0f, 0.0f, 0.0f, 1.0f)
+	,m_nextPosition(0.0f, 0.0f, 0.0f, 1.0f)
+	,m_curRotation(1.0f, 0.0f, 0.0f, 0.0f)
+	,m_nextRotation(1.0f, 0.0f, 0.0f, 0.0f)
 	,m_meshMatrix(dGetIdentityMatrix())
-	,m_mesh (NULL)
+	,m_mesh(NULL)
 	,m_userData(NULL)
-	,m_lock(0) 
+	,m_lock(0)
+	,m_isVisible(true)
 {
 	// add this entity to the dictionary
 	entityDictionary.Insert(this, rootSceneNode);
@@ -97,6 +99,7 @@ DemoEntity::DemoEntity(const DemoEntity& copyFrom)
 	,m_mesh(NULL)
 	,m_userData(NULL)
 	,m_lock(0)
+	,m_isVisible(copyFrom.m_isVisible)
 {
 	m_mesh = copyFrom.m_mesh ? copyFrom.m_mesh->Clone(this) : NULL;
 }
@@ -303,7 +306,7 @@ void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene) const
 	glMultMatrix(&m_matrix[0][0]);
 
 	// Render mesh if there is one 
-	if (m_mesh) {
+	if (m_isVisible && m_mesh) {
 		glPushMatrix();
 		glMultMatrix(&m_meshMatrix[0][0]);
 		m_mesh->Render (scene);
@@ -392,6 +395,11 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 			entity->m_nextRotation = rot;
 			entity->m_matrix = matrix;
 			entity->SetNameID(sceneInfo->GetName());
+			const char* const name = entity->GetName().GetStr();
+			if (strstr(name, "Sphere") || strstr(name, "Box") || strstr(name, "Capsule")) {
+				entity->m_isVisible = false;
+				//dTrace(("%s %s\n", name, entity->GetParent()->GetName().GetStr()));
+			}
 
 			for (void* child = scene.GetFirstChildLink(sceneNode); child; child = scene.GetNextChildLink(sceneNode, child)) {
 				dScene::dTreeNode* const meshNode = scene.GetNodeFromLink(child);
@@ -460,4 +468,76 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 	}
 
 	return returnEntity;
+}
+
+NewtonCollision* DemoEntity::CreateCollisionFromchildren(NewtonWorld* const world) const
+{
+	int count = 1;
+	NewtonCollision* shapeArray[128];
+	
+	shapeArray[0] = NULL;
+	for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
+		const char* const name = child->GetName().GetStr();
+
+		if (strstr (name, "Sphere")) {
+			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
+			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+			// go over the vertex array and find and collect all vertices's weighted by this bone.
+			dFloat* const array = mesh->m_vertex;
+			dVector extremes(0.0f);
+			for (int i = 0; i < mesh->m_vertexCount; i++) {
+				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
+				extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
+				extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
+			}
+
+			dMatrix matrix(child->GetCurrentMatrix());
+			shapeArray[count] = NewtonCreateSphere(world, extremes.m_x, 0, &matrix[0][0]);
+			count++;
+			dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
+		} else if (strstr (name, "Box")) {
+			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
+			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+			// go over the vertex array and find and collect all vertices's weighted by this bone.
+			dFloat* const array = mesh->m_vertex;
+			dVector extremes(0.0f);
+			for (int i = 0; i < mesh->m_vertexCount; i++) {
+				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
+				extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
+				extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
+			}
+
+			extremes = extremes.Scale (2.0f); 
+			dMatrix matrix(child->GetCurrentMatrix());
+			shapeArray[count] = NewtonCreateBox(world, extremes.m_x, extremes.m_y, extremes.m_z, 0, &matrix[0][0]);
+			count++;
+			dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
+
+		} else if (strstr (name, "Capsule")) {
+			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
+			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+			// go over the vertex array and find and collect all vertices's weighted by this bone.
+			dFloat* const array = mesh->m_vertex;
+			dVector extremes(0.0f);
+			for (int i = 0; i < mesh->m_vertexCount; i++) {
+				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
+				extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
+				extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
+			}
+			dFloat high = 2.0f * dMax (extremes.m_y - extremes.m_x, dFloat (0.0f));
+
+			dMatrix alighMatrix(dRollMatrix(90.0f * dDegreeToRad));
+			dMatrix matrix (alighMatrix * child->GetCurrentMatrix());
+			shapeArray[count] = NewtonCreateCapsule(world, extremes.m_x, extremes.m_x, high, 0, &matrix[0][0]);
+			count++;
+			dAssert(count < sizeof(shapeArray)/ sizeof (shapeArray[0]));
+		} 
+	}
+
+	if (count > 2) {
+		dAssert(0);
+	} if (count == 2) {
+		shapeArray[0] = shapeArray[1];
+	}
+	return shapeArray[0];
 }

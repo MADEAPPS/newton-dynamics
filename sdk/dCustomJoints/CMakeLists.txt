@@ -32,16 +32,8 @@ else(NEWTON_BUILD_SHARED_LIBS)
     add_library(${projectName} STATIC ${CPP_SOURCE})
 endif(NEWTON_BUILD_SHARED_LIBS)
 
-target_link_libraries (${projectName} newton dContainers dMath)
-
-if(UNIX)
-    target_include_directories(
-                        ${projectName} PUBLIC
-                        # Headers used from source/build location:
-                        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-    )
-endif(UNIX)
-
+target_include_directories(${projectName} PUBLIC .)
+target_link_libraries (${projectName} newton dMath dContainers)
 if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dTimeTracker)
 endif()
@@ -61,8 +53,8 @@ if (MSVC)
 endif(MSVC)
 
 install(TARGETS ${projectName}
-       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+       LIBRARY DESTINATION lib
+       ARCHIVE DESTINATION lib
+       RUNTIME DESTINATION bin)
 
-install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${projectName})
+install(FILES ${HEADERS} DESTINATION include/${projectName})

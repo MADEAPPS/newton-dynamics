@@ -19,6 +19,7 @@ file(GLOB HEADERS *.h)
 
 add_definitions(-DDTIMETRACKER_EXPORTS)
 add_library(${projectName} SHARED ${CPP_SOURCE})
+target_include_directories(${projectName} PUBLIC .)
 
 if (MSVC)
 	target_link_libraries (${projectName} ws2_32.lib)
@@ -30,11 +31,11 @@ if (MSVC)
 endif(MSVC)
 
 install(TARGETS ${projectName}
-       LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-       ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-       RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+       LIBRARY DESTINATION lib
+       ARCHIVE DESTINATION lib
+       RUNTIME DESTINATION bin)
 
-install(FILES ${HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${projectName})
+install(FILES ${HEADERS} DESTINATION include/${projectName})
 
 if (NEWTON_BUILD_SANDBOX_DEMOS)
 	add_custom_command(

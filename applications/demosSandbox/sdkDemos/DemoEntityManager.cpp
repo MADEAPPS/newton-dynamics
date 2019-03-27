@@ -62,13 +62,13 @@
 //#define DEFAULT_SCENE	26		// simple convex fracturing 
 //#define DEFAULT_SCENE	27		// structured convex fracturing 
 //#define DEFAULT_SCENE	28		// multi ray casting using the threading Job scheduler
-#define DEFAULT_SCENE	29		// standard joints
+//#define DEFAULT_SCENE	29		// standard joints
 //#define DEFAULT_SCENE	30		// servo joints
 //#define DEFAULT_SCENE	31		// articulated joints
 //#define DEFAULT_SCENE	32		// six axis manipulator
 //#define DEFAULT_SCENE	33		// hexapod Robot
 //#define DEFAULT_SCENE	34		// basic rag doll
-//#define DEFAULT_SCENE	35		// dynamic rag doll
+#define DEFAULT_SCENE	35		// dynamic rag doll
 //#define DEFAULT_SCENE	36		// basic Car
 //#define DEFAULT_SCENE	37		// single body vehicle
 //#define DEFAULT_SCENE	38		// David Gravel multi body car
@@ -256,6 +256,9 @@ DemoEntityManager::DemoEntityManager ()
 	,m_suspendPhysicsUpdate(false)
 	,m_asynchronousPhysicsUpdate(false)
 	,m_solveLargeIslandInParallel(false)
+	,m_showRaycastHit(false)
+	,m_contactlock(0)
+	,m_contactList()
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -349,9 +352,10 @@ DemoEntityManager::DemoEntityManager ()
 //	m_solverPasses = 4;
 //	m_workerThreads = 4;
 //	m_solverSubSteps = 2;
+//	m_showRaycastHit = true;
 //	m_showNormalForces = true;
 //	m_showCenterOfMass = false;
-	m_showJointDebugInfo = true;
+//	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
@@ -574,6 +578,9 @@ void DemoEntityManager::Cleanup ()
 	// set the number of sub steps
 	NewtonSetNumberOfSubsteps (m_world, MAX_PHYSICS_SUB_STEPS);
 
+	// register contact creation destrution callbacks
+	NewtonWorldSetCreateDestroyContactCallback(m_world, OnCreateContact, OnDestroyContact);
+
 	// load all available plug ins
 	char plugInPath[2048];
 //	GetModuleFileNameA(NULL, plugInPath, 256);
@@ -791,6 +798,7 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show aabb", &m_showAABB);
 			ImGui::Checkbox("hide visual meshes", &m_hideVisualMeshes);
 			ImGui::Checkbox("show contact points", &m_showContactPoints);
+			ImGui::Checkbox("show ray cast hit point", &m_showRaycastHit);
 			ImGui::Checkbox("show normal forces", &m_showNormalForces);
 			ImGui::Checkbox("show center of mass", &m_showCenterOfMass);
 			ImGui::Checkbox("show body frame", &m_showBodyFrame);
@@ -1258,6 +1266,22 @@ int DemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
 	return 0;
 }
 
+void DemoEntityManager::OnCreateContact(const NewtonWorld* const world, NewtonJoint* const contact)
+{
+	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+	dCustomScopeLock lock(&scene->m_contactlock);
+	NewtonJointSetUserData(contact, scene->m_contactList.Append(contact));
+}
+
+void DemoEntityManager::OnDestroyContact(const NewtonWorld* const world, NewtonJoint* const contact)
+{
+	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+	dList<NewtonJoint*>::dListNode* const cooky = (dList<NewtonJoint*>::dListNode*)NewtonJointGetUserData(contact);
+	dCustomScopeLock lock(&scene->m_contactlock);
+	scene->m_contactList.Remove(cooky);
+}
+
+
 void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
 {
 	m_cameraManager->SetCameraMatrix(this, rotation, position);
@@ -1532,6 +1556,10 @@ void DemoEntityManager::RenderScene()
 
 	if (m_showContactPoints) {
 		RenderContactPoints (m_world);
+	}
+
+	if (m_showRaycastHit) {
+		RenderRayCastHit(m_world);
 	}
 
 	if (m_showBodyFrame) {

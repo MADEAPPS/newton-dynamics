@@ -494,10 +494,7 @@ void dgBody::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 		m_mass.m_y = DG_INFINITE_MASS;
 		m_mass.m_z = DG_INFINITE_MASS;
 		m_mass.m_w = DG_INFINITE_MASS;
-		m_invMass.m_x = dgFloat32(0.0f);
-		m_invMass.m_y = dgFloat32(0.0f);
-		m_invMass.m_z = dgFloat32(0.0f);
-		m_invMass.m_w = dgFloat32(0.0f);
+		m_invMass = dgVector::m_zero;
 
 	} else {
 		Ixx = dgAbs (Ixx);

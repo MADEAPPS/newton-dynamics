@@ -23,8 +23,11 @@ class KinematiocListener: public dCustomListener
 	struct KinematicPlatform
 	{
 		dVector m_omega;
-		dVector m_veloc;
+//		dVector m_veloc;
+		dVector m_origin;
 		NewtonBody* m_plaform;
+		dFloat m_speed;
+		dFloat m_radius;
 		dTree<unsigned, NewtonBody*> m_cargo;
 	};
 
@@ -62,8 +65,17 @@ class KinematiocListener: public dCustomListener
 		for (dList<KinematicPlatform>::dListNode* ptr = m_platformList.GetFirst(); ptr; ptr = ptr->GetNext()) {
 			KinematicPlatform& entry = ptr->GetInfo();
 
+			// set the platform angular velocity
 			NewtonBodySetOmega(entry.m_plaform, &entry.m_omega[0]);
-			NewtonBodySetVelocity(entry.m_plaform, &entry.m_veloc[0]);
+
+			// calculate the speed alone a circular path
+			dMatrix matrix;
+			NewtonBodyGetMatrix(entry.m_plaform, &matrix[0][0]);
+			dVector dir(matrix.m_posit - entry.m_origin);
+			dir = dir.Normalize().Scale(entry.m_radius);
+			dVector veloc(dir.CrossProduct(dVector(0.0f, -entry.m_speed / entry.m_radius, 0.0f, 0.0f)));
+
+			NewtonBodySetVelocity(entry.m_plaform, &veloc[0]);
 
 			UpdateBodies(entry);
 		}
@@ -77,10 +89,14 @@ class KinematiocListener: public dCustomListener
 		}
 	}
 
-	void CreateKinematicTransparentPlatform(const dMatrix& location)
+	void CreateKinematicTransparentPlatform(const dMatrix& location, dFloat speed)
 	{
 		KinematicPlatform& entry = AddPlatform(location);
-		entry.m_omega = dVector(0.0f, 0.5f, 0.0f, 0.0f);
+		entry.m_omega = dVector(0.0f, 1.5f, 0.0f, 0.0f);
+		entry.m_radius = 5.0f;
+		entry.m_speed = speed;
+		entry.m_origin = location.m_posit + location.m_front.Scale(entry.m_radius);
+
 		SetTransparent(entry);
 
 		// this is what make the trigger transparent
@@ -88,10 +104,13 @@ class KinematiocListener: public dCustomListener
 		NewtonCollisionSetMode(collision, 0);
 	}
 
-	void CreateKinematicSolidPlatform(const dMatrix& location)
+	void CreateKinematicSolidPlatform(const dMatrix& location, dFloat speed)
 	{
 		KinematicPlatform& entry = AddPlatform(location);
 		entry.m_omega = dVector(0.0f, -0.5f, 0.0f, 0.0f);
+		entry.m_radius = 5.0f;
+		entry.m_speed = speed;
+		entry.m_origin = location.m_posit + location.m_front.Scale (entry.m_radius);
 		
 		// this is what make the trigger solid like a static body
 		NewtonCollision* const collision = NewtonBodyGetCollision(entry.m_plaform);
@@ -160,8 +179,10 @@ class KinematiocListener: public dCustomListener
 
 		KinematicPlatform& entry = m_platformList.Append()->GetInfo();
 		entry.m_plaform = body;
-		entry.m_veloc = dVector(0.0f);
+		entry.m_origin = dVector(0.0f);
 		entry.m_omega = dVector(0.0f);
+		entry.m_radius = 1.0f;
+		entry.m_speed = 1.0f;
 
 		return entry;
 	}
@@ -189,16 +210,16 @@ void KinematicBodies (DemoEntityManager* const scene)
 	location.m_posit.m_x += 15.0f;
 	location.m_posit.m_y -= 4.25f;
 	location.m_posit.m_z -= 5.0f;
-	kinematicListener->CreateKinematicSolidPlatform(location);
+	kinematicListener->CreateKinematicSolidPlatform(location, 4.0f);
 
 	location.m_posit.m_z += 10.0f;
-	kinematicListener->CreateKinematicTransparentPlatform(location);
+	kinematicListener->CreateKinematicTransparentPlatform(location, -5.0f);
 
 	// add some dynamic bodies 
 	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
 	dVector size(1.0f, 1.0f, 1.6f, 0.0f);
-	int countx = 5;
-	int countz = 5;
+	int countx = 4;
+	int countz = 4;
 	AddPrimitiveArray(scene, 1.0f, location.m_posit, size, countx, countz, 6.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
 
 	dQuaternion rot;

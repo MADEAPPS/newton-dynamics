@@ -23,7 +23,7 @@
 #define VEHICLE_THIRD_PERSON_VIEW_DIST		7.0f
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
 
-
+#if 0
 class SingleBodyVehicleManager: public dVehicleManager
 {
 	public:
@@ -579,12 +579,15 @@ axisCount = 0;
 	bool m_externalView;
 };
 
-
+#endif
 void SingleBodyCar(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
+	dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
+	return;
 
+#if 0
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 //	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 //	AddPrimitiveArray (scene, 0.0f, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, dGetIdentityMatrix());
@@ -656,5 +659,6 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
+#endif
 }
 

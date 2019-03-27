@@ -21,11 +21,17 @@ option("NEWTON_WITH_AVX_PLUGIN" "adding avx parallel solver (forces shared libs)
 option("NEWTON_WITH_AVX2_PLUGIN" "adding avx parallel solver (forces shared libs)" OFF)
 #option("NEWTON_WITH_DX12_PLUGIN" "adding direct compute 12 parallel solver" OFF)
 option("NEWTON_BUILD_SHARED_LIBS" "Build shared library" OFF)
+option("NEWTON_BUILD_CORE_ONLY" "Build the core newton library only" OFF)
 
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
 set(CMAKE_DEBUG_POSTFIX "_d")
 
 project(NewtonSDK)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# Don't use e.g. GNU extension (like -std=gnu++11) for portability
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 if (NEWTON_DOUBLE_PRECISION)
@@ -55,7 +61,7 @@ endif ()
 #check for MAC
 if(APPLE)
   add_definitions(-D_MACOSX_VER)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fms-extensions -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fms-extensions")
 endif(APPLE)
 
 #check for UNIX
@@ -81,20 +87,18 @@ if (UNIX)
             COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
     endif()
 
+    add_compile_options(-msse3)
+
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
-
-    add_definitions(-march=native -fPIC)
 
     set(NEWTON_GENERATE_DLL OFF CACHE BOOL "" FORCE)
     set(NEWTON_STATIC_RUNTIME_LIBRARIES OFF CACHE BOOL "" FORCE)
     set(NEWTON_BUILD_PROFILER OFF CACHE BOOL "" FORCE)
 
-else (UNIX)
-    set(CMAKE_INSTALL_LIBDIR "${PROJECT_BINARY_DIR}/build/lib")
-    set(CMAKE_INSTALL_BINDIR "${PROJECT_BINARY_DIR}/build/bin")
-    set(CMAKE_INSTALL_INCLUDEDIR "${PROJECT_BINARY_DIR}/build/include")
-endif (UNIX)
+elseif (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX "build" CACHE PATH "" FORCE)
+endif ()
 
 if (MSVC)
 	message ("build visual studio projects")
@@ -129,9 +133,17 @@ if (MSVC)
 	message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
 endif()
 
+if(NEWTON_BUILD_SANDBOX_DEMOS)
+  set(NEWTON_BUILD_CORE_ONLY OFF)
+endif()
+
 if(NEWTON_WITH_SSE4_PLUGIN OR NEWTON_WITH_AVX_PLUGIN OR NEWTON_WITH_AVX2_PLUGIN)
   # If building any of the plugins, then switch to shared libraries.
   set(NEWTON_BUILD_SHARED_LIBS ON)
+endif()
+
+if(NEWTON_BUILD_PROFILER)
+	add_definitions(-D_DG_USE_PROFILER)
 endif()
 
 add_subdirectory(sdk)
@@ -165,33 +177,5 @@ if (NEWTON_BUILD_SANDBOX_DEMOS)
         endif(NOT_OpenGL_FOUND)
         
       endif(UNIX)
-endif()
-
-add_dependencies (dgPhysics dgCore)
-add_dependencies (dContainers dMath)
-add_dependencies (newton dgCore dgPhysics)
-add_dependencies (dAnimation dMath dContainers)
-add_dependencies (dCustomJoints dMath dContainers)
-add_dependencies (dNewton newton dMath dContainers dCustomJoints)
-add_dependencies (dVehicle newton dMath dContainers dCustomJoints)
-
-if (NEWTON_BUILD_PROFILER)
-	add_definitions(-D_DG_USE_PROFILER)
-        add_dependencies (newton dTimeTracker)
-        add_dependencies (dNewton dTimeTracker)
-        add_dependencies (dVehicle dTimeTracker)
-        add_dependencies (dAnimation dTimeTracker)
-        add_dependencies (dContainers dTimeTracker)
-        add_dependencies (dCustomJoints dTimeTracker)
-endif ()
-
-if (NEWTON_BUILD_SANDBOX_DEMOS)
-	add_dependencies (demosSandbox newton dMath dScene dNewton dContainers dVehicle dCustomJoints tinyxml imgui glatter)
-    if (MSVC)
-		add_dependencies (demosSandbox glfw)
-		if (NEWTON_BUILD_PROFILER)
-			add_dependencies (demosSandbox dTimeTracker)
-		endif (NEWTON_BUILD_PROFILER)
-    endif (MSVC)
 endif()
 

@@ -363,9 +363,10 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 	
 	virtual void OnUpdateTransform (const dCustomTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{
-		DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(bone->m_body);
+		NewtonBody* const body = bone->GetBody();
+		DemoEntity* const ent = (DemoEntity*) NewtonBodyGetUserData(body);
 		if (ent) {
-			DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(bone->m_body));
+			DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 
 			dQuaternion rot (localMatrix);
 			ent->SetMatrix (*scene, rot, localMatrix.m_posit);
@@ -642,7 +643,10 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 
 	dCustomTransformController::dSkeletonBone* MakeRollerTire(const char* const entName, const char* const tireName, dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const parentBone)
 	{
-		NewtonBody* const parentBody = parentBone->m_body;
+		dAssert(0);
+		return NULL;
+/*
+		NewtonBody* const parentBody = parentBone->GetBody();
 		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
 		DemoEntity* const tireModel = parentModel->Find(entName);
 
@@ -661,10 +665,14 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		tire->SetLimits(0.0f, 0.0f);
 		tire->SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
 		return bone;
+*/
 	}
 
 	dCustomTransformController::dSkeletonBone* MakeSuspensionTire(const char* const entName, const char* const tireName, dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const parentBone)
 	{
+		dAssert(0);
+		return NULL;
+/*
 		NewtonBody* const parentBody = parentBone->m_body;
 		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
 		DemoEntity* const tireModel = parentModel->Find(entName);
@@ -682,10 +690,14 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		joint->SetLimits(-0.5f, 0.01f);
 		joint->SetAsSpringDamper(true, 0.97f, 2050.0f, 200.0f);
 		return bone;
+*/
 	}
 
 	dCustomTransformController::dSkeletonBone* MakeSupportTire(const char* const entName, const char* const tireName, dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const parentBone)
 	{
+		dAssert(0);
+		return NULL;
+/*
 		dFloat width;
 		dFloat radius;
 		NewtonBody* const parentBody = parentBone->m_body;
@@ -717,10 +729,14 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		tire->SetLimits(0.0f, 0.0f);
 		tire->SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
 		return bone;
+*/
 	}
 
 	dCustomJoint* LinkTires(dCustomTransformController::dSkeletonBone* const master, dCustomTransformController::dSkeletonBone* const slave, dCustomTransformController::dSkeletonBone* const root)
 	{
+		dAssert(0);
+		return NULL;
+/*
 		NewtonCollisionInfoRecord slaveTire;
 		NewtonCollisionInfoRecord masterTire;
 		{
@@ -754,6 +770,7 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		dMatrix pinMatrix;
 		NewtonBodyGetMatrix(root->m_body, &pinMatrix[0][0]);
 		return new dCustomGear(slaveRadio / masterRadio, pinMatrix[2], pinMatrix[2].Scale(-1.0f), slave->m_body, master->m_body);
+*/
 	}
 
 	void MakeLeftTrack(dCustomTransformController* const controller)
@@ -1429,6 +1446,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
 return;
 
+#if 0
 	NewtonBody* const floor = CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 	NewtonCollision* const floorCollision = NewtonBodyGetCollision(floor);
@@ -1481,4 +1499,5 @@ return;
 	origin.m_y += 5.0f;
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * dDegreeToRad);  
 	scene->SetCameraMatrix(rot, origin);
+#endif
 }
