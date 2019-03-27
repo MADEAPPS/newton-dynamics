@@ -22,45 +22,44 @@ dAnimationModelManager::~dAnimationModelManager()
 {
 }
 
-dAnimationJointRoot* dAnimationModelManager::CreateModel(NewtonBody* const bone, const dMatrix& bindMatrix)
+void dAnimationModelManager::AddModel(dAnimationJointRoot* const model)
 {
-	dAnimationJointRoot* const root = new dAnimationJointRoot(bone, bindMatrix);
-	m_controllerList.Append(root);
-	return root;
+	dAssert(!model->m_managerNode);
+	model->m_manager = this;
+	model->m_managerNode = m_controllerList.Append(model);
 }
 
-void dAnimationModelManager::DestroyModel(dAnimationJointRoot* const model)
+void dAnimationModelManager::RemoveModel(dAnimationJointRoot* const model)
 {
-	for (dList<dAnimationJointRoot*>::dListNode* node = m_controllerList.GetFirst(); node;) {
-		if (node->GetInfo() == model) {
-			delete node->GetInfo();
-			m_controllerList.Remove(node);
-			break;
-		}
-	}
+	dAssert(model->m_managerNode);
+	dAssert(model->m_manager == this);
+	dAssert(model->m_managerNode->GetInfo() == model);
+	m_controllerList.Remove(model->m_managerNode);
+	model->m_manager = NULL;
+	model->m_managerNode = NULL;
 }
 
 void dAnimationModelManager::OnDestroy()
 {
-	for (dList<dAnimationJointRoot*>::dListNode* node = m_controllerList.GetFirst(); node;) {
-		dAnimationJointRoot* const controller = node->GetInfo();
-		node = node->GetNext();
-		DestroyModel(controller);
+	while (m_controllerList.GetFirst()) {
+		dAnimationJointRoot* const model = m_controllerList.GetFirst()->GetInfo();
+		dAssert(model->m_managerNode == m_controllerList.GetFirst());
+		delete model;
 	}
 }
 
 void dAnimationModelManager::PreUpdate(dFloat timestep)
 {
 	for (dList<dAnimationJointRoot*>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
-		dAnimationJointRoot* const controller = node->GetInfo();
-		OnPreUpdate(controller, timestep, 0);
+		dAnimationJointRoot* const model = node->GetInfo();
+		model->PreUpdate(this, timestep);
 	}
 }
 
 void dAnimationModelManager::PostUpdate(dFloat timestep)
 {
 	for (dList<dAnimationJointRoot*>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
-		dAnimationJointRoot* const controller = node->GetInfo();
-		controller->PostUpdate(this, timestep);
+		dAnimationJointRoot* const model = node->GetInfo();
+		model->PostUpdate(this, timestep);
 	}
 }

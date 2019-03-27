@@ -777,7 +777,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 {
 	class dJointDefinition
 	{
-	public:
+		public:
 		struct dJointLimit
 		{
 			dFloat m_minTwistAngle;
@@ -797,33 +797,26 @@ class DynamicRagdollManager: public dAnimationModelManager
 		dJointLimit m_jointLimits;
 		dFrameMatrix m_frameBasics;
 	};
-
-	public:
-/*
-	class dAnimationCharacterUserData: public DemoEntity::UserData
+	
+	class dDynamicsRagdoll: public dAnimationJointRoot
 	{
 		public:
-		dAnimationCharacterUserData(dAnimIDController* const rig, dAnimIDBlendNodeTwoWay* const walk, dAnimationBipeHipController* const posture)
-			:DemoEntity::UserData()
-			, m_rig(rig)
-			, m_walk(walk)
-			, m_posture(posture)
-			, m_hipHigh(0.0f)
-			, m_walkSpeed(0.0f)
-		{
-			}
-
-		void OnRender(dFloat timestep) const
+		dDynamicsRagdoll(NewtonBody* const body, const dMatrix& bindMarix)
+			:dAnimationJointRoot(body, bindMarix)
 		{
 		}
 
-//		dAnimIDController* m_rig;
-//		dAnimIDBlendNodeTwoWay* m_walk;
-//		dAnimationBipeHipController* m_posture;
-//		dFloat m_hipHigh;
-//		dFloat m_walkSpeed;
+		~dDynamicsRagdoll()
+		{
+		}
+
+		void PreUpdate(dAnimationModelManager* const manager, dFloat timestep) const
+		{
+
+		}
 	};
-*/
+
+	public:
 
 	DynamicRagdollManager(DemoEntityManager* const scene)
 		:dAnimationModelManager(scene->GetNewton())
@@ -905,7 +898,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 		}
 	}
 
-	dAnimationJoint* ConnectBodyParts(NewtonBody* const boneBody, dAnimationJoint* const parent, const dJointDefinition& definition) const
+	dAnimationJoint* CreateChildNode(NewtonBody* const boneBody, dAnimationJoint* const parent, const dJointDefinition& definition) const
 	{
 		dMatrix matrix;
 		NewtonBodyGetMatrix(boneBody, &matrix[0][0]);
@@ -941,35 +934,35 @@ class DynamicRagdollManager: public dAnimationModelManager
 		scene->Append(modelEntity);
 
 		// add the root childBody
-		NewtonBody* const rootBone = CreateBodyPart(modelEntity);
+		NewtonBody* const rootBody = CreateBodyPart(modelEntity);
 
 		// build the rag doll with rigid bodies connected by joints
-		dAnimationJointRoot* const controller = CreateModel(rootBone, dGetIdentityMatrix());
-
-		controller->SetCalculateLocalTransforms(true);
+		dDynamicsRagdoll* const dynamicRagdoll = new dDynamicsRagdoll(rootBody, dGetIdentityMatrix());
+		AddModel(dynamicRagdoll);
+		dynamicRagdoll->SetCalculateLocalTransforms(true);
 
 		// save the controller as the collision user data, for collision culling
-		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBone), controller);
+		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBody), dynamicRagdoll);
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
 		dAnimationJoint* parentBones[32];
 
 		for (DemoEntity* child = modelEntity->GetChild(); child; child = child->GetSibling()) {
-			parentBones[stackIndex] = controller;
+			parentBones[stackIndex] = dynamicRagdoll;
 			childEntities[stackIndex] = child;
 			stackIndex++;
 		}
 
 		int bodyCount = 1;
 		NewtonBody* bodyArray[1024];
-		bodyArray[0] = rootBone;
+		bodyArray[0] = rootBody;
 
 		// walk model hierarchic adding all children designed as rigid body bones. 
 		while (stackIndex) {
 			stackIndex--;
 			DemoEntity* const entity = childEntities[stackIndex];
-			dAnimationJoint* parentBone = parentBones[stackIndex];
+			dAnimationJoint* parentNode = parentBones[stackIndex];
 
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < definitionCount; i++) {
@@ -980,19 +973,15 @@ class DynamicRagdollManager: public dAnimationModelManager
 					bodyCount++;
 
 					// connect this body part to its parent with a rag doll joint
-					//NewtonBody* const parentBody = parentBone->GetBody();
-					parentBone = ConnectBodyParts(childBody, parentBone, jointsDefinition[i]);
+					parentNode = CreateChildNode(childBody, parentNode, jointsDefinition[i]);
 
-					//dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
-					//parentBone = controller->AddBone(bone, bindMatrix, parentBone);
-					// save the controller as the collision user data, for collision culling
-					NewtonCollisionSetUserData(NewtonBodyGetCollision(childBody), parentBone);
+					NewtonCollisionSetUserData(NewtonBodyGetCollision(childBody), parentNode);
 					break;
 				}
 			}
 
 			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
-				parentBones[stackIndex] = parentBone;
+				parentBones[stackIndex] = parentNode;
 				childEntities[stackIndex] = child;
 				stackIndex++;
 			}
@@ -1008,11 +997,10 @@ class DynamicRagdollManager: public dAnimationModelManager
 		// transform the entire contraction to its location
 		dMatrix worldMatrix(modelEntity->GetCurrentMatrix() * location);
 		worldMatrix.m_posit = location.m_posit;
-		NewtonBodySetMatrixRecursive(rootBone, &worldMatrix[0][0]);
+		NewtonBodySetMatrixRecursive(rootBody, &worldMatrix[0][0]);
 
 		//return controller;
 	}
-
 
 	virtual void OnUpdateTransform(const dAnimationJoint* const bone, const dMatrix& localMatrix) const
 	{
@@ -1022,11 +1010,6 @@ class DynamicRagdollManager: public dAnimationModelManager
 
 		dQuaternion rot(localMatrix);
 		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
-	}
-
-	virtual void OnPreUpdate(dAnimationJointRoot* const controller, dFloat timestep, int threadIndex) const
-	{
-
 	}
 };
 

@@ -28,11 +28,15 @@ class dAnimationJointRoot: public dAnimationJoint
 	void SetCalculateLocalTransforms(bool val);
 	bool GetCalculateLocalTransforms() const;
 
-	private:
-	void PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
+	protected:
+	virtual void PreUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
+	virtual void PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
 
 	dAnimationJointSolver m_solver;
 	dComplementaritySolver::dBodyState m_staticBody;
+
+	dAnimationModelManager* m_manager;
+	dList<dAnimationJointRoot*>::dListNode* m_managerNode;
 	bool m_calculateLocalTransform;
 	friend class dAnimationModelManager;
 };

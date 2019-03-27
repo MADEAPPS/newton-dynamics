@@ -41,7 +41,8 @@ class dAnimationJoint: public dCustomAlloc
 	dComplementaritySolver::dBodyState* GetProxyBody(); 
 
 	protected:
-	void PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
+	virtual void PreUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
+	virtual void PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
 
 	dComplementaritySolver::dBodyState m_proxyBody;
 	dMatrix m_bindMatrix;
@@ -98,5 +99,10 @@ inline dAnimationJointChildren& dAnimationJoint::GetChidren()
 {
 	return m_children; 
 }
+
+inline void dAnimationJoint::PreUpdate(dAnimationModelManager* const manager, dFloat timestep) const
+{
+}
+
 #endif
 

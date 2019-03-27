@@ -26,11 +26,11 @@ class dAnimationModelManager: public dCustomListener
 	dAnimationModelManager(NewtonWorld* const world, const char* const name = D_ANIMATION_MODEL_MANAGER);
 	virtual ~dAnimationModelManager();
 
-	virtual dAnimationJointRoot* CreateModel(NewtonBody* const bone, const dMatrix& bindMatrix);
-	virtual void DestroyModel(dAnimationJointRoot* const model);
+	//dAnimationJointRoot* CreateModel(NewtonBody* const bone, const dMatrix& bindMatrix);
+	void AddModel(dAnimationJointRoot* const model);
+	void RemoveModel(dAnimationJointRoot* const model);
 
 	//virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext) = 0;
-	virtual void OnPreUpdate(dAnimationJointRoot* const controller, dFloat timestep, int threadIndex) const = 0;
 	virtual void OnUpdateTransform(const dAnimationJoint* const bone, const dMatrix& localMatrix) const = 0;
 
 	protected:
