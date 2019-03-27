@@ -231,18 +231,19 @@ void dNewton::ResetTimer()
 		m_frequency = dLong (frequency.QuadPart);
 	#endif
 
-	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
-		timespec ts;
+	//#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
+	#ifdef __linux__
+        timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
 		//baseCount = ts.tv_nsec / 1000;
-		m_baseCount = unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
+		m_baseCount = dLong (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
 	#endif
 
 	#ifdef _MACOSX_VER
 		timeval tp;
 		gettimeofday(&tp, NULL);
 		//unsigned64 microsecunds =  unsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
-		dLong microsecunds = dLong(tp.tv_sec) * 1000000 + tp.tv_usec;
+		dLong microsecunds = ((dLong)tp.tv_sec) * 1000000 + tp.tv_usec;
 		m_baseCount = microsecunds;
 	#endif
 
@@ -261,8 +262,9 @@ dLong dNewton::GetTimeInMicrosenconds() const
 		return ticks;
 	#endif
 
-	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
-		timespec ts;
+	//#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
+	#ifdef __linux__
+        timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
 		//return unsigned64 (ts.tv_nsec / 1000) - m_baseCount;
 		
@@ -273,7 +275,7 @@ dLong dNewton::GetTimeInMicrosenconds() const
 		timeval tp;
 		gettimeofday(&tp, NULL);
 		//unsigned64 microsecunds =  unsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
-		dLong microsecunds = dLong(tp.tv_sec) * 1000000 + tp.tv_usec;
+		dLong microsecunds = ((dLong)tp.tv_sec) * 1000000 + tp.tv_usec;
 		return microsecunds - m_baseCount;
 	#endif
 }

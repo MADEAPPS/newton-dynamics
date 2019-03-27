@@ -1340,7 +1340,7 @@ dgInt32 dgContactSolver::CalculateConvexCastContacts()
 
 					m_normal = m_normal.Scale (dgFloat32 (-1.0f));
 					m_proxy->m_contactJoint->m_contactActive = 1;
-					dgVector contactPoint((m_closestPoint0 + m_closestPoint1).Scale(dgFloat32(0.5f)));
+					//dgVector contactPoint((m_closestPoint0 + m_closestPoint1).Scale(dgFloat32(0.5f)));
 					count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_normal);
 					if (count) {
 						count = dgMin(m_proxy->m_maxContacts, count);

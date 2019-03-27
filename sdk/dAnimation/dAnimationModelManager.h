@@ -10,8 +10,8 @@
 */
 
 
-#ifndef __D_ANIM_ID_MANAGER_H__
-#define __D_ANIMATION_MODEL_ANAGER_H__
+#ifndef __D_ANIMATION_MODEL_MANAGER_H__
+#define __D_ANIMATION_MODEL_MANAGER_H__
 
 #include "dAnimationStdAfx.h"
 //#include "dAnimationJoint.h"

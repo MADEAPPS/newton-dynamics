@@ -135,7 +135,7 @@ class dAnimationJointRagdoll::dRagDollMotor: public dCustomBallAndSocket
 		dVector relOmega(omega0 - omega1);
 
 		// do twist angle calculations
-		dMatrix twistMatrix(matrix0 * (matrix1 * coneRotation).Inverse());
+//		dMatrix twistMatrix(matrix0 * (matrix1 * coneRotation).Inverse());
 //		dFloat twistAngle = m_twistAngle.Update(dAtan2(twistMatrix[1][2], twistMatrix[1][1]));
 		if (m_options.m_option0) {
 			dAssert(0);

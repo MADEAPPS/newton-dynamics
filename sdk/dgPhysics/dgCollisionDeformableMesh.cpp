@@ -153,7 +153,7 @@ void dgCollisionDeformableMesh::IntegrateForces(dgFloat32 timestep)
 
 	dgVector comVeloc(dgFloat32(0.0f));
 	dgVector xMassSum(dgFloat32(0.0f));
-	dgVector origin(m_body->m_localCentreOfMass + matrix.m_posit);
+	//dgVector origin(m_body->m_localCentreOfMass + matrix.m_posit);
 
 	dgVector* const posit = &m_posit[0];
 	dgVector* const veloc = &m_veloc[0];
