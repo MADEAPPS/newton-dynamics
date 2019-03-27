@@ -77,7 +77,10 @@ dNewton::ScopeLock::~ScopeLock()
 
 
 dNewton::dNewton()
-	:m_maxUpdatePerIterations(2)
+	:m_frequency(0)
+	,m_baseCount(0)
+	,m_microseconds(0)
+	,m_maxUpdatePerIterations(2)
 {
 	// create a newton world
 	m_world = NewtonCreate();
