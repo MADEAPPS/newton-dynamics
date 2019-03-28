@@ -68,7 +68,7 @@
 //#define DEFAULT_SCENE	32		// six axis manipulator
 //#define DEFAULT_SCENE	33		// hexapod Robot
 //#define DEFAULT_SCENE	34		// basic rag doll
-#define DEFAULT_SCENE	35		// dynamic rag doll
+//#define DEFAULT_SCENE	35		// dynamic rag doll
 //#define DEFAULT_SCENE	36		// basic Car
 //#define DEFAULT_SCENE	37		// single body vehicle
 //#define DEFAULT_SCENE	38		// David Gravel multi body car
@@ -80,7 +80,7 @@
 //#define DEFAULT_SCENE	44		// cloth patch			
 //#define DEFAULT_SCENE	45		// soft bodies	
 //#define DEFAULT_SCENE	46		// joe's joint test
-//#define DEFAULT_SCENE	47		// Misho's Hinge Test
+#define DEFAULT_SCENE	47		// Misho's Hinge Test
 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
