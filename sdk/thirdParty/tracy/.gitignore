@@ -1,0 +1,14 @@
+.vs
+*.opendb
+*.db
+*.vcxproj.user
+x64
+Release
+Debug
+*.d
+*.o
+*.swp
+imgui.ini
+test/tracy_test
+test/tracy_test.exe
+*/build/unix/*-*
