@@ -91,11 +91,13 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 		NewtonBodyGetPosition(otherBody, &positionVector[0]);
 		bodyVectors[1] = matrix.UntransformVector(positionVector);
 
+#ifdef _DEBUG
 		dVector diff = bodyVectors[1] - bodyVectors[0];
 		dFloat distance = dSqrt(diff.DotProduct3(diff));
 		//Nominal object distance at the beginning is 35, so we will subtract that here to get to zero as a starting point.
 		printf("Object distance: %f  local posit(%f %f %f)\n", distance - 35.0f, diff[0], diff[1], diff[2]);
 		dTrace(("Object distance: %f local posit(%f %f %f)\n", distance - 35.0f, diff[0], diff[1], diff[2]));
+#endif
 	}
 
 #ifdef _DEBUG
@@ -109,12 +111,14 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 	dVector veloc;
 	NewtonBodyGetVelocity(otherBody, &veloc[0]);
 	dTrace(("d(%f) v(%f %f %f)\n", distance, veloc[0], veloc[1], veloc[2]));
+	if (bSpaceBar)
+	{
+		printf("Object distance: %f  local posit(%f %f %f)\n", distance - 30.0f, diff[0], diff[1], diff[2]);
+	}
 #endif
 
 	if (name == "LAS")
 		NewtonBodyAddForce(body, &force.m_x);
-	if (bSpaceBar)
-		printf("Object distance: %f  local posit(%f %f %f)\n", distance - 30.0f, diff[0], diff[1], diff[2]);
 }
 
 

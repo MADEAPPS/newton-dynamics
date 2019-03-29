@@ -4,6 +4,7 @@
 #ifdef TRACY_HAS_CALLSTACK
 
 #if defined _WIN32 || defined __CYGWIN__
+#  include <winsock2.h>
 #  include <windows.h>
 #  include <dbghelp.h>
 #elif defined _GNU_SOURCE

@@ -8,8 +8,13 @@
 //
 
 // Define TRACY_ENABLE to enable profiler.
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#define TRACY_ENABLE
 
 #include "common/TracySystem.cpp"
+
 
 #ifdef TRACY_ENABLE
 

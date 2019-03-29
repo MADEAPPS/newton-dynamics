@@ -1498,6 +1498,7 @@ _memory_adjust_size_class(size_t iclass) {
 }
 
 #if defined( _WIN32 ) || defined( __WIN32__ ) || defined( _WIN64 )
+#  include <winsock2.h>
 #  include <windows.h>
 #else
 #  include <sys/mman.h>
