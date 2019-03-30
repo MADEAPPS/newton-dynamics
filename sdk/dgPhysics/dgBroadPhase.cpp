@@ -714,7 +714,8 @@ void dgBroadPhase::CollisionChange (dgBody* const body, dgCollisionInstance* con
 
 void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 {
-	if (m_rootNode && !m_rootNode->IsLeafNode() && body->m_masterNode) {
+	//if (m_rootNode && !m_rootNode->IsLeafNode() && body->m_masterNode) {
+	if (m_rootNode && body->m_masterNode) {
 		dgBroadPhaseBodyNode* const node = body->GetBroadPhase();
 		dgBody* const body1 = node->GetBody();
 		dgAssert(body1 == body);
@@ -733,24 +734,26 @@ void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 			dgAssert(!node->IsAggregate());
 			node->SetAABB(body1->m_minAABB, body1->m_maxAABB);
 
-			const dgBroadPhaseNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? NULL : m_rootNode;
-			for (dgBroadPhaseNode* parent = node->m_parent; parent != root; parent = parent->m_parent) {
-				dgScopeSpinPause lock(&parent->m_criticalSectionLock);
-				if (!parent->IsAggregate()) {
-					dgVector minBox;
-					dgVector maxBox;
-					dgFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
-					if (dgBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox)) {
-						break;
+			if (!m_rootNode->IsLeafNode()) {
+				const dgBroadPhaseNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? NULL : m_rootNode;
+				for (dgBroadPhaseNode* parent = node->m_parent; parent != root; parent = parent->m_parent) {
+					dgScopeSpinPause lock(&parent->m_criticalSectionLock);
+					if (!parent->IsAggregate()) {
+						dgVector minBox;
+						dgVector maxBox;
+						dgFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
+						if (dgBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox)) {
+							break;
+						}
+						parent->m_minBox = minBox;
+						parent->m_maxBox = maxBox;
+						parent->m_surfaceArea = area;
+					} else {
+						dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*)parent;
+						aggregate->m_minBox = aggregate->m_root->m_minBox;
+						aggregate->m_maxBox = aggregate->m_root->m_maxBox;
+						aggregate->m_surfaceArea = aggregate->m_root->m_surfaceArea;
 					}
-					parent->m_minBox = minBox;
-					parent->m_maxBox = maxBox;
-					parent->m_surfaceArea = area;
-				} else {
-					dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*)parent;
-					aggregate->m_minBox = aggregate->m_root->m_minBox;
-					aggregate->m_maxBox = aggregate->m_root->m_maxBox;
-					aggregate->m_surfaceArea = aggregate->m_root->m_surfaceArea;
 				}
 			}
 		}
