@@ -236,5 +236,11 @@
     <ClInclude Include="..\..\dgCore\dgSort.h">
       <Filter>containers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\dgCore\dgVectorScalar.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dgCore\dgVectorSimd.h">
+      <Filter>math</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
