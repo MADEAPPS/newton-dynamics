@@ -5881,7 +5881,7 @@ int NewtonBodyGetAutoSleep(const NewtonBody* const bodyPtr)
 
   @param *bodyPtr is the pointer to the body.
 
-  @return Sleep state: 1 = active. 0 = sleeping.
+  @return Sleep state: 0 = active. 1 = sleeping.
 
   See also: ::NewtonBodySetAutoSleep
 */
