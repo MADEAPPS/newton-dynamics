@@ -35,7 +35,8 @@
 	class dgSoaFloat
 	{
 		public:
-		#define PERMUTE_MASK(w, z, y, x)		_MM_SHUFFLE (w, z, y, x)
+		//#define PERMUTE_MASK(w, z, y, x)		_MM_SHUFFLE (w, z, y, x)
+		#define PERMUT_MASK_DOUBLE(y, x)	_MM_SHUFFLE2 (y, x)
 
 		DG_INLINE dgSoaFloat()
 		{
@@ -48,8 +49,10 @@
 		}
 
 		DG_INLINE dgSoaFloat(const dgVector& type)
-			:m_low(type.m_typeLow)
-			,m_high(type.m_typeHigh)
+//			:m_low(type.m_typeLow)
+//			,m_high(type.m_typeHigh)
+			:m_low(_mm_set_pd(type.m_y, type.m_x))
+			,m_high(_mm_set_pd(type.m_w, type.m_z))
 		{
 		}
 
