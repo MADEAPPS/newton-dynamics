@@ -135,11 +135,12 @@ void dgCollisionDeformableMesh::IntegrateForces(dgFloat32 timestep)
 
 	// calculate particles accelerations
 	CalculateAcceleration (timestep);
-
+#ifdef _DEBUG
 	const dgMatrix& matrix = m_body->GetCollision()->GetGlobalMatrix();
 	dgAssert (matrix[0][0] == dgFloat32 (1.0f));
 	dgAssert (matrix[1][1] == dgFloat32 (1.0f));
 	dgAssert (matrix[2][2] == dgFloat32 (1.0f));
+#endif
 	
 	dgVector damp(dgFloat32(1.0f));
 	if (m_body->m_linearDampOn) {

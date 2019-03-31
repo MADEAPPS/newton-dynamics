@@ -76,6 +76,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dAnimation", "..\..\..\..\s
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "glatter", "..\..\..\..\sdk\thirdParty\glatter\vs2013\glatter.vcxproj", "{29D84729-A048-4F2B-8B4A-FB95509FA0D6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dProfiler", "..\..\..\..\sdk\projects\visualStudio_2013_static_mt\dProfiler.vcxproj", "{89509957-CE86-4ACE-946C-7A65E63F0F23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_double|Win32 = debug_double|Win32
@@ -360,6 +362,22 @@ Global
 		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.Release|Win32.Build.0 = release|Win32
 		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.Release|x64.ActiveCfg = release|x64
 		{29D84729-A048-4F2B-8B4A-FB95509FA0D6}.Release|x64.Build.0 = release|x64
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.debug_double|Win32.ActiveCfg = Debug|Win32
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.debug_double|Win32.Build.0 = Debug|Win32
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.debug_double|x64.ActiveCfg = Debug|x64
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.debug_double|x64.Build.0 = Debug|x64
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.Debug|Win32.ActiveCfg = Debug|Win32
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.Debug|Win32.Build.0 = Debug|Win32
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.Debug|x64.ActiveCfg = Debug|x64
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.Debug|x64.Build.0 = Debug|x64
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.release_double|Win32.ActiveCfg = Release|Win32
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.release_double|Win32.Build.0 = Release|Win32
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.release_double|x64.ActiveCfg = Release|x64
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.release_double|x64.Build.0 = Release|x64
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.Release|Win32.ActiveCfg = Release|Win32
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.Release|Win32.Build.0 = Release|Win32
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.Release|x64.ActiveCfg = Release|x64
+		{89509957-CE86-4ACE-946C-7A65E63F0F23}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

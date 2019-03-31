@@ -11,7 +11,6 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
-#define TRACY_ENABLE
 
 #include "common/TracySystem.cpp"
 

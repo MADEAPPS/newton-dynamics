@@ -22,57 +22,27 @@
 #ifndef __DG_PROFILER_H__
 #define __DG_PROFILER_H__
 
-// uncomment out _DG_USE_PROFILER to enable profiler frame capture profiler traces
-// alternatively the end application can use a command line option to enable this define
-//#define _DG_USE_PROFILER
+#include "dgTypes.h"
 
 #ifdef _DG_USE_PROFILER
-
-void ttDeleteTrack();
-void ttStopRecording();
-void ttCloseRecord(int recordIndex);
-int ttOpenRecord(const char* const name);
-void ttSetTrackName(const char* const threadName);
-void ttStartRecording(const char* const fileName);
-
-inline void dProfilerSetTrackName(const char* const name)
-{
-	ttSetTrackName(name);
-}
-
-inline void dProfilerDeleteTrack()
-{
-	ttDeleteTrack();
-}
-
-inline void dProfilerStartRecording(const char* const fileName)
-{
-	ttStartRecording(fileName);
-}
-
-inline void dProfilerStopRecording()
-{
-	ttStopRecording();
-}
-
 
 class dgProfile
 {
 	public:
 	dgProfile(const char* const functionName)
-		:m_entry(ttOpenRecord(functionName))
-		,m_name(functionName)
+		:m_entry(dProfilerStartTrace(functionName))
+//		,m_name(functionName)
 	{
 	}
 
 	~dgProfile()
 	{
-		ttCloseRecord(m_entry);
+		dProfilerEndTrace(m_entry);
 	}
 
 	private:
 	dgInt32 m_entry;
-	const char* m_name;
+//	const char* m_name;
 };
 
 #define DG_START_RECORDING(fileName) dProfilerStartRecording(fileName)

@@ -33,9 +33,9 @@
 		#endif
 	#endif
 
-#if _MSC_VER >= 1400
-	#define HAVE_STRUCT_TIMESPEC
-#endif
+	#if _MSC_VER >= 1400
+		#define HAVE_STRUCT_TIMESPEC
+	#endif
 #endif
 
 
@@ -162,8 +162,13 @@
 	#include <condition_variable>
 #endif
 
+// uncomment out _DG_USE_PROFILER to enable profiler frame capture profiler traces
+// alternatively the end application can use a command line option to enable this define
+//#define _DG_USE_PROFILER
+
+
 #if defined (_DG_USE_PROFILER) && (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#include <dTimeTracker.h>
+	#include <dProfiler.h>
 #endif
 
 
@@ -308,9 +313,6 @@ class dgVector;
 	#define dgCheckFloat(x) (isfinite(x) && !isnan(x))
 //		#define dgCheckFloat(x) 1
 #endif
-
-// adding frame capture profiler macros
-#include "dgProfiler.h"
 
 typedef void (dgApi *dgDeserialize) (void* const userData, void* buffer, dgInt32 size);
 typedef void (dgApi *dgSerialize) (void* const userData, const void* const buffer, dgInt32 size);
