@@ -52,7 +52,7 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 	DemoEntity* ent = (DemoEntity*)NewtonBodyGetUserData(body);
 
-	dString name = ent->GetName();
+	const dString& name = ent->GetName();
 
 	bool bSpaceBar = false;
 
@@ -70,13 +70,14 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 		force.m_y = 1779288.64f; // LAS rocket motor output, Newtons
 	}
 
-
 	const NewtonBody* otherBody = NULL;
 	for (NewtonBody* bodyZ = NewtonWorldGetFirstBody(world); bodyZ; bodyZ = NewtonWorldGetNextBody(world, bodyZ)) {
 		if (bodyZ != body) {
 			otherBody = bodyZ;
 		}
 	}
+
+
 
 	// pressing P prints out distance between objects...
 	if (scene->GetKeyState('P')) {
@@ -116,8 +117,9 @@ static void ApplyGravityForce(const NewtonBody* body, dFloat timestep, int threa
 		printf("Object distance: %f  local posit(%f %f %f)\n", distance - 30.0f, diff[0], diff[1], diff[2]);
 	}
 #endif
-
-	if (name == "LAS")
+	
+	static dString las("LAS");
+	if (name == las)
 		NewtonBodyAddForce(body, &force.m_x);
 }
 

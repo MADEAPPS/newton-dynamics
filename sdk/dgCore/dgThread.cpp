@@ -170,7 +170,6 @@ void* dgThread::dgThreadSystemCallback(void* threadData)
 	me->Execute(me->m_id);
 	dgInterlockedExchange(&me->m_threadRunning, 0);
 
-	DG_DELETE_TRACK();
 	return 0;
 }
 

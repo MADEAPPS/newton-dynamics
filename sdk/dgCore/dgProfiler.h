@@ -25,13 +25,12 @@
 #include "dgTypes.h"
 
 #ifdef _DG_USE_PROFILER
-
+/*
 class dgProfile
 {
 	public:
 	dgProfile(const char* const functionName)
 		:m_entry(dProfilerStartTrace(functionName))
-//		,m_name(functionName)
 	{
 	}
 
@@ -42,26 +41,21 @@ class dgProfile
 
 	private:
 	dgInt64 m_entry;
-//	const char* m_name;
 };
+*/
 
-#define DG_START_RECORDING(fileName) dProfilerStartRecording(fileName)
-#define DG_STOP_RECORDING() dProfilerStopRecording()
-
-#define DG_DELETE_TRACK() dProfilerDeleteTrack()
 #define DG_SET_TRACK_NAME(trackName) dProfilerSetTrackName(trackName)
+//#define DG_TRACKTIME(name) dgProfile _profile##name(name);
+//#define DG_TRACKTIME_NAMED(name) dgProfile _profile(name);
 
-#define DG_TRACKTIME(name) dgProfile _profile##name(name);
-#define DG_TRACKTIME_NAMED(name) dgProfile _profile(name);
+#define DG_TRACKTIME(name) dProfilerZoneScoped(name)
+#define DG_TRACKTIME_NAMED(name) dProfilerZoneScoped(name)
 
 #else
 
-#define DG_START_RECORDING(fileName);
-#define DG_STOP_RECORDING();
 #define DG_TRACKTIME(name);
 #define DG_TRACKTIME_NAMED(name);
 #define DG_SET_TRACK_NAME(trackName);
-#define DG_DELETE_TRACK();
 
 #endif
 

@@ -19,11 +19,39 @@
 #define D_PROFILER_API __declspec(dllimport)
 #endif
 
+struct dProfilerSourceLocation
+{
+	const char* name;
+	const char* function;
+	const char* file;
+	long long line;
+	long long color;
+};
 
-D_PROFILER_API long long dProfilerStartTrace(const char* const fileName);
+D_PROFILER_API long long dProfilerStartTrace(const dProfilerSourceLocation* const sourceLocation);
 D_PROFILER_API void dProfilerEndTrace(long long id);
-
 D_PROFILER_API void dProfilerSetTrackName(const char* const trackName);
-D_PROFILER_API void dProfilerDeleteTrack();
+
+class dgProfile
+{
+	public:
+	dgProfile(const dProfilerSourceLocation* const location)
+		:m_thread(dProfilerStartTrace(location))
+	{
+	}
+
+	~dgProfile()
+	{
+		dProfilerEndTrace(m_thread);
+	}
+
+	private:
+	long long m_thread;
+};
+
+
+#define dProfilerZoneScoped(name)					\
+static const dProfilerSourceLocation __dprofiler_source_location { name, __FUNCTION__,  __FILE__, (long long)__LINE__, 0 }; \
+dgProfile ___dgprofile_scoped_zone( &__dprofiler_source_location );
 
 #endif

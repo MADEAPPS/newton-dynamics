@@ -17,7 +17,7 @@
 	#include "common\TracySystem.hpp"
 	#include "client\TracyProfiler.hpp"
 	
-	long long dProfilerStartTrace(const char* const srcloc)
+	long long dProfilerStartTrace(const dProfilerSourceLocation* const sourceLocation)
 	{
 		std::thread::native_handle_type thread = (std::thread::native_handle_type)tracy::GetThreadHandle();
 //		m_thread = thread;
@@ -34,7 +34,7 @@
 		tracy::MemWrite(&item->zoneBegin.cpu, cpu);
 #endif
 		tracy::MemWrite(&item->zoneBegin.thread, thread);
-		tracy::MemWrite(&item->zoneBegin.srcloc, (uint64_t)srcloc);
+		tracy::MemWrite(&item->zoneBegin.srcloc, (uint64_t)sourceLocation);
 		tail.store(magic + 1, std::memory_order_release);
 
 		return long long (thread);
