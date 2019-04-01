@@ -93,9 +93,8 @@ dgInt32 dgWorldBase::GetScore() const
 	return m_score;
 }
 
-
 void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
-	DG_TRACKTIME_NAMED(GetId());
+	DG_TRACKTIME(__FUNCTION__);
 	dgSolver::CalculateJointForces(cluster, bodyArray, jointArray, timestep);
 }

@@ -73,6 +73,7 @@ void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* co
 
 void dgSolver::InitWeights()
 {
+	DG_TRACKTIME(__FUNCTION__);
 	const dgJointInfo* const jointArray = m_jointArray;
 	const dgInt32 jointCount = m_cluster->m_jointCount;
 	dgBodyProxy* const weight = m_bodyProxyArray;
@@ -126,6 +127,7 @@ void dgSolver::InitBodyArrayKernel(void* const context, void* const, dgInt32 thr
 
 void dgSolver::InitBodyArray(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	const dgBodyInfo* const bodyArray = m_bodyArray;
 	dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
 
@@ -158,9 +160,9 @@ DG_INLINE void dgSolver::SortWorkGroup(dgInt32 base) const
 	}
 }
 
-
 void dgSolver::InitJacobianMatrix()
 {
+	DG_TRACKTIME(__FUNCTION__);
 	m_jacobianMatrixRowAtomicIndex = 0;
 	dgJacobian* const internalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[0];
 	memset(internalForces, 0, m_cluster->m_bodyCount * sizeof (dgJacobian));
@@ -255,6 +257,7 @@ void dgSolver::TransposeMassMatrixKernel(void* const context, void* const, dgInt
 
 void dgSolver::InitJacobianMatrix(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgLeftHandSide* const leftHandSide = &m_world->GetSolverMemory().m_leftHandSizeBuffer[0];
 	dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
 	dgJacobian* const internalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[0];
@@ -374,6 +377,7 @@ DG_INLINE void dgSolver::TransposeRow(dgSoaMatrixElement* const row, const dgJoi
 
 void dgSolver::TransposeMassMatrix(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	const dgJointInfo* const jointInfoArray = m_jointArray;
 	dgSoaMatrixElement* const massMatrixArray = &m_massMatrix[0];
 
@@ -592,6 +596,7 @@ void dgSolver::UpdateKinematicFeedback()
 
 void dgSolver::CalculateJointsAcceleration(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgJointAccelerationDecriptor joindDesc;
 	joindDesc.m_timeStep = m_timestepRK;
 	joindDesc.m_invTimeStep = m_invTimestepRK;
@@ -625,6 +630,7 @@ DG_INLINE dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const joint
 	dgSoaFloat normalForce[DG_CONSTRAINT_MAX_ROWS + 1];
 	const dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
 
+	DG_TRACKTIME(__FUNCTION__);
 	for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i++) {
 		const dgInt32 m0 = jointInfo[i].m_m0;
 		const dgInt32 m1 = jointInfo[i].m_m1;
@@ -786,6 +792,7 @@ DG_INLINE dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const joint
 
 void dgSolver::CalculateJointsForce(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	const dgInt32* const soaRowStart = m_soaRowStart;
 	const dgBodyInfo* const bodyArray = m_bodyArray;
 	dgSoaMatrixElement* const massMatrix = &m_massMatrix[0];
@@ -901,6 +908,7 @@ void dgSolver::CalculateJointsForce(dgInt32 threadID)
 
 void dgSolver::UpdateRowAcceleration(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgSoaMatrixElement* const massMatrix = &m_massMatrix[0];
 	const dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
 
@@ -929,6 +937,7 @@ void dgSolver::UpdateRowAcceleration(dgInt32 threadID)
 
 void dgSolver::IntegrateBodiesVelocity(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgVector speedFreeze2(m_world->m_freezeSpeed2 * dgFloat32(0.1f));
 	dgVector freezeOmega2(m_world->m_freezeOmega2 * dgFloat32(0.1f));
 
@@ -968,6 +977,7 @@ void dgSolver::IntegrateBodiesVelocity(dgInt32 threadID)
 
 void dgSolver::CalculateBodiesAcceleration(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgVector invTime(m_invTimestep);
 	dgFloat32 maxAccNorm2 = DG_SOLVER_MAX_ERROR * DG_SOLVER_MAX_ERROR;
 
@@ -981,6 +991,7 @@ void dgSolver::CalculateBodiesAcceleration(dgInt32 threadID)
 
 void dgSolver::UpdateForceFeedback(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	const dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
 	dgInt32 hasJointFeeback = 0;
 
@@ -1047,6 +1058,7 @@ void dgSolver::UpdateSkeletons()
 
 void dgSolver::InitSkeletons(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
 	const dgLeftHandSide* const leftHandSide = &m_world->GetSolverMemory().m_leftHandSizeBuffer[0];
 
@@ -1063,6 +1075,7 @@ void dgSolver::InitSkeletons(dgInt32 threadID)
 
 void dgSolver::UpdateSkeletons(dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	const dgInt32 count = m_skeletonCount;
 	const dgInt32 threadCounts = m_world->GetThreadCount();
 	dgSkeletonContainer** const skeletonArray = &m_skeletonArray[0];
@@ -1077,6 +1090,7 @@ void dgSolver::UpdateSkeletons(dgInt32 threadID)
 
 void dgSolver::CalculateForces()
 {
+	DG_TRACKTIME(__FUNCTION__);
 	m_firstPassCoef = dgFloat32(0.0f);
 	const dgInt32 passes = m_solverPasses;
 	const dgInt32 threadCounts = m_world->GetThreadCount();

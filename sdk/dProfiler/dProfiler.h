@@ -56,7 +56,7 @@ class dgProfile
 };
 
 #define dProfilerZoneScoped(name)					\
-static const dProfilerSourceLocation __dprofiler_source_location { name, __FUNCTION__,  __FILE__, (long long)__LINE__, 0 }; \
+static const dProfilerSourceLocation __dprofiler_source_location { NULL, __FUNCTION__,  __FILE__, (long long)__LINE__, 0 }; \
 dgProfile ___dgprofile_scoped_zone( &__dprofiler_source_location );
 
 #define dProfilerSetTrackName(trackName) dProfilerSetTrackName__(trackName) 
