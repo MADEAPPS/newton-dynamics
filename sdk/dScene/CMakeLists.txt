@@ -37,7 +37,7 @@ endif(NEWTON_BUILD_SHARED_LIBS)
 target_include_directories(${projectName} PUBLIC . ../dAnimation)
 target_link_libraries (${projectName} newton dContainers dMath tinyxml)
 if (NEWTON_BUILD_PROFILER)
-    target_link_libraries (${projectName} dTimeTracker)
+    target_link_libraries (${projectName} dProfiler)
 endif()
 
 if (MSVC)

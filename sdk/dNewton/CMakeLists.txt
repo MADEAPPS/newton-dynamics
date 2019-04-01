@@ -37,7 +37,7 @@ target_include_directories(${projectName} PUBLIC .)
 target_link_libraries (${projectName} dCustomJoints)
 
 if (NEWTON_BUILD_PROFILER)
-    target_link_libraries (${projectName} dTimeTracker)
+    target_link_libraries (${projectName} dProfiler)
 endif()
 
 if (MSVC)

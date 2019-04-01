@@ -33,7 +33,7 @@ endif(NEWTON_BUILD_SHARED_LIBS)
 target_include_directories(${projectName} PUBLIC .)
 target_link_libraries (${projectName} dgPhysics)
 if (NEWTON_BUILD_PROFILER)
-    target_link_libraries (${projectName} dTimeTracker)
+    target_link_libraries (${projectName} dProfiler)
 endif()
 
 if(NEWTON_DOUBLE_PRECISION)

@@ -33,7 +33,7 @@ endif(NEWTON_BUILD_SHARED_LIBS)
 
 target_include_directories(${projectName} PUBLIC . ../dMath)
 if (NEWTON_BUILD_PROFILER)
-    target_link_libraries (${projectName} dTimeTracker)
+    target_link_libraries (${projectName} dProfiler)
 endif()
 
 if (MSVC)
