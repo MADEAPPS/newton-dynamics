@@ -155,7 +155,7 @@ void dgRadixSort(T* const array, T* const tmpArray, dgInt32 elements, dgInt32 ra
 template <class T>
 void dgSort(T* const array, dgInt32 elements, dgInt32(*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
 {
-	DG_TRACKTIME(__FUNCTION__);
+	//DG_TRACKTIME(__FUNCTION__);
 	const dgInt32 batchSize = 8;
 	dgInt32 stack[1024][2];
 
@@ -235,7 +235,7 @@ void dgSort(T* const array, dgInt32 elements, dgInt32(*compare) (const T* const 
 template <class T>
 void dgSortIndirect(T** const array, dgInt32 elements, dgInt32(*compare) (const T* const  A, const T* const B, void* const context), void* const context = NULL)
 {
-	DG_TRACKTIME(__FUNCTION__);
+	//DG_TRACKTIME(__FUNCTION__);
 	const dgInt32 batchSize = 8;
 	dgInt32 stack[1024][2];
 
@@ -426,7 +426,7 @@ class dgParallelSourtDesc
 template <class T>
 void dgParallelSort(dgThreadHive& threadPool, T* const array, dgInt32 elements, dgInt32(*compare) (const T* const A, const T* const B, void* const context), void* const context = NULL)
 {
-	DG_TRACKTIME(__FUNCTION__);
+	//DG_TRACKTIME(__FUNCTION__);
 	if ((threadPool.GetThreadCount() <= 1) || (elements < DG_PARALLET_SORT_BATCH_SIZE)) {
 //	if (1) {
 		dgSort(array, elements, compare, context);

@@ -976,17 +976,6 @@ void dgWorld::UpdateTransforms(void* const context, void* const nodePtr, dgInt32
 
 void dgWorld::RunStep ()
 {
-/*
-	static int zzzz;
-	if (zzzz == 500) {
-		DG_START_RECORDING("../../../../sdk/dProfiler/xxxx.tt");
-	}
-	if (zzzz == 800) {
-		DG_STOP_RECORDING();
-	}
-	zzzz++;
-*/
-
 	DG_TRACKTIME(__FUNCTION__);
 	
 	BeginSection();
