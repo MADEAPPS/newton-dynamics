@@ -20,19 +20,10 @@
 #endif
 
 
-D_PROFILER_API int dProfilerStartTrace(const char* const fileName);
-D_PROFILER_API void dProfilerEndTrace(int id);
+D_PROFILER_API long long dProfilerStartTrace(const char* const fileName);
+D_PROFILER_API void dProfilerEndTrace(long long id);
 
 D_PROFILER_API void dProfilerSetTrackName(const char* const trackName);
 D_PROFILER_API void dProfilerDeleteTrack();
-
-//D_PROFILER_API void ttStartRecording(const char* const fileName);
-//D_PROFILER_API void ttStopRecording();
-
-//D_PROFILER_API int ttOpenRecord(const char* const name);
-//D_PROFILER_API void ttCloseRecord(int record);
-
-//D_PROFILER_API void ttDeleteTrack();
-//D_PROFILER_API void ttSetTrackName(const char* const threadName);
 
 #endif

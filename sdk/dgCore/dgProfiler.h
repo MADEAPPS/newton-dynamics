@@ -41,7 +41,7 @@ class dgProfile
 	}
 
 	private:
-	dgInt32 m_entry;
+	dgInt64 m_entry;
 //	const char* m_name;
 };
 

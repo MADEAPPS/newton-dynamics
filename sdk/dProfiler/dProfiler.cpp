@@ -14,19 +14,58 @@
 #if !defined (WIN32) || (_MSC_VER >= 1900)
 
 	#include "Tracy.hpp"
-
-
-	int dProfilerStartTrace(const char* const fileName)
+	#include "common\TracySystem.hpp"
+	#include "client\TracyProfiler.hpp"
+	
+	long long dProfilerStartTrace(const char* const srcloc)
 	{
-		return 0;
+		std::thread::native_handle_type thread = (std::thread::native_handle_type)tracy::GetThreadHandle();
+//		m_thread = thread;
+		tracy::Magic magic;
+		auto& token = tracy::s_token.ptr;
+		auto& tail = token->get_tail_index();
+		auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>(magic);
+		tracy::MemWrite(&item->hdr.type, tracy::QueueType::ZoneBegin);
+#ifdef TRACY_RDTSCP_OPT
+		tracy::MemWrite(&item->zoneBegin.time, tracy::Profiler::GetTime(item->zoneBegin.cpu));
+#else
+		uint32_t cpu;
+		tracy::MemWrite(&item->zoneBegin.time, tracy::Profiler::GetTime(cpu));
+		tracy::MemWrite(&item->zoneBegin.cpu, cpu);
+#endif
+		tracy::MemWrite(&item->zoneBegin.thread, thread);
+		tracy::MemWrite(&item->zoneBegin.srcloc, (uint64_t)srcloc);
+		tail.store(magic + 1, std::memory_order_release);
+
+		return long long (thread);
 	}
 
-	void dProfilerEndTrace(int id)
+	void dProfilerEndTrace(long long threadId)
 	{
+		std::thread::native_handle_type thread = (std::thread::native_handle_type) threadId;
+		tracy::Magic magic;
+		auto& token = tracy::s_token.ptr;
+		auto& tail = token->get_tail_index();
+		auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>(magic);
+		tracy::MemWrite(&item->hdr.type, tracy::QueueType::ZoneEnd);
+#ifdef TRACY_RDTSCP_OPT
+		tracy::MemWrite(&item->zoneEnd.time, tracy::Profiler::GetTime(item->zoneEnd.cpu));
+#else
+		uint32_t cpu;
+		tracy::MemWrite(&item->zoneEnd.time, tracy::Profiler::GetTime(cpu));
+		tracy::MemWrite(&item->zoneEnd.cpu, cpu);
+#endif
+		tracy::MemWrite(&item->zoneEnd.thread, thread);
+		tail.store(magic + 1, std::memory_order_release);
 	}
 
 	void dProfilerSetTrackName(const char* const trackName)
 	{
+		std::thread::native_handle_type handle = (std::thread::native_handle_type) tracy::GetThreadHandle();
+		tracy::SetThreadName(handle, trackName);
+
+		//const char* xxx0 = tracy::GetThreadName(long long (handle));
+		//const char* xxx1 = tracy::GetThreadName(long long (handle));
 	}
 
 	void dProfilerDeleteTrack()
@@ -35,12 +74,12 @@
 
 #else
 
-	int dProfilerStartTrace(const char* const fileName)
+	long long dProfilerStartTrace(const char* const fileName)
 	{
 		return 0;
 	}
 
-	void dProfilerEndTrace(int id)
+	void dProfilerEndTrace(int long long)
 	{
 	}
 

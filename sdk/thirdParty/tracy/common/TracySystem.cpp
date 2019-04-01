@@ -54,7 +54,8 @@ void SetThreadName( std::thread::native_handle_type handle, const char* name )
     };
 #    pragma pack(pop)
 
-    DWORD ThreadId = GetThreadId( static_cast<HANDLE>( handle ) );
+	DWORD ThreadId = GetThreadId( static_cast<HANDLE>( handle ) );
+	//DWORD ThreadId = GetThreadId((HANDLE) handle);
     THREADNAME_INFO info;
     info.dwType = 0x1000;
     info.szName = name;
