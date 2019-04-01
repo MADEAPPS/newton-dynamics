@@ -11,16 +11,17 @@
 
 #include "dProfiler.h"
 
+//#if 0
 #if !defined (WIN32) || (_MSC_VER >= 1900)
+
 
 	#include "Tracy.hpp"
 	#include "common\TracySystem.hpp"
 	#include "client\TracyProfiler.hpp"
 	
-	long long dProfilerStartTrace(const dProfilerSourceLocation* const sourceLocation)
+	long long dProfilerStartTrace__(const dProfilerSourceLocation* const sourceLocation)
 	{
 		std::thread::native_handle_type thread = (std::thread::native_handle_type)tracy::GetThreadHandle();
-//		m_thread = thread;
 		tracy::Magic magic;
 		auto& token = tracy::s_token.ptr;
 		auto& tail = token->get_tail_index();
@@ -40,7 +41,7 @@
 		return long long (thread);
 	}
 
-	void dProfilerEndTrace(long long threadId)
+	void dProfilerEndTrace__(long long threadId)
 	{
 		std::thread::native_handle_type thread = (std::thread::native_handle_type) threadId;
 		tracy::Magic magic;
@@ -59,35 +60,24 @@
 		tail.store(magic + 1, std::memory_order_release);
 	}
 
-	void dProfilerSetTrackName(const char* const trackName)
+	void dProfilerSetTrackName__(const char* const trackName)
 	{
 		std::thread::native_handle_type handle = (std::thread::native_handle_type) tracy::GetThreadHandle();
 		tracy::SetThreadName(handle, trackName);
-
-		//const char* xxx0 = tracy::GetThreadName(long long (handle));
-		//const char* xxx1 = tracy::GetThreadName(long long (handle));
-	}
-
-	void dProfilerDeleteTrack()
-	{
 	}
 
 #else
 
-	long long dProfilerStartTrace(const char* const fileName)
+	long long dProfilerStartTrace__(const dProfilerSourceLocation* const)
 	{
 		return 0;
 	}
 
-	void dProfilerEndTrace(int long long)
+	void dProfilerEndTrace__(int long long)
 	{
 	}
 
-	void dProfilerSetTrackName(const char* const trackName)
-	{
-	}
-
-	void dProfilerDeleteTrack()
+	void dProfilerSetTrackName__(const char* const)
 	{
 	}
 
