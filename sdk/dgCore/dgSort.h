@@ -400,6 +400,7 @@ class dgParallelSourtDesc
 
 	static void dgParallelKernel(void* const context, void* const worldContext, dgInt32 threadID)
 	{
+		DG_TRACKTIME(__FUNCTION__);
 		dgParallelSourtDesc<T>* const me = (dgParallelSourtDesc<T>*) context;
 		me->dgParallelKernel(threadID);
 	}

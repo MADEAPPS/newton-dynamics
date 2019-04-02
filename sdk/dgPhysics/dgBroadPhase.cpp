@@ -1097,6 +1097,7 @@ void dgBroadPhase::CalculatePairContacts (dgPair* const pair, dgInt32 threadID)
 
 void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex)
 {
+//	DG_TRACKTIME(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) m_world;
 	dgBody* const body0 = contact->m_body0;
 	dgBody* const body1 = contact->m_body1;
@@ -1131,7 +1132,6 @@ void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt3
 		}
 	}
 }
-
 
 bool dgBroadPhase::TestOverlaping(const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const
 {
