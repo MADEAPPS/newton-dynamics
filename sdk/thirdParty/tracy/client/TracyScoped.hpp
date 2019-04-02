@@ -15,18 +15,18 @@ namespace tracy
 class ScopedZone
 {
 public:
-    tracy_force_inline ScopedZone( const SourceLocation* srcloc )
+    tracy_force_inline ScopedZone( const SourceLocationData* srcloc, bool is_active = true )
 #ifdef TRACY_ON_DEMAND
-        : m_active( s_profiler.IsConnected() )
+        : m_active( is_active && GetProfiler().IsConnected() )
+#else
+        : m_active( is_active )
 #endif
     {
-#ifdef TRACY_ON_DEMAND
         if( !m_active ) return;
-#endif
         const auto thread = GetThreadHandle();
         m_thread = thread;
         Magic magic;
-        auto& token = s_token.ptr;
+        auto token = GetToken();
         auto& tail = token->get_tail_index();
         auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
         MemWrite( &item->hdr.type, QueueType::ZoneBegin );
@@ -42,18 +42,18 @@ public:
         tail.store( magic + 1, std::memory_order_release );
     }
 
-    tracy_force_inline ScopedZone( const SourceLocation* srcloc, int depth )
+    tracy_force_inline ScopedZone( const SourceLocationData* srcloc, int depth, bool is_active = true )
 #ifdef TRACY_ON_DEMAND
-        : m_active( s_profiler.IsConnected() )
+        : m_active( is_active && GetProfiler().IsConnected() )
+#else
+        : m_active( is_active )
 #endif
     {
-#ifdef TRACY_ON_DEMAND
         if( !m_active ) return;
-#endif
         const auto thread = GetThreadHandle();
         m_thread = thread;
         Magic magic;
-        auto& token = s_token.ptr;
+        auto token = GetToken();
         auto& tail = token->get_tail_index();
         auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
         MemWrite( &item->hdr.type, QueueType::ZoneBeginCallstack );
@@ -68,16 +68,14 @@ public:
         MemWrite( &item->zoneBegin.srcloc, (uint64_t)srcloc );
         tail.store( magic + 1, std::memory_order_release );
 
-        s_profiler.SendCallstack( depth, thread );
+        GetProfiler().SendCallstack( depth, thread );
     }
 
     tracy_force_inline ~ScopedZone()
     {
-#ifdef TRACY_ON_DEMAND
         if( !m_active ) return;
-#endif
         Magic magic;
-        auto& token = s_token.ptr;
+        auto token = GetToken();
         auto& tail = token->get_tail_index();
         auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
         MemWrite( &item->hdr.type, QueueType::ZoneEnd );
@@ -94,11 +92,9 @@ public:
 
     tracy_force_inline void Text( const char* txt, size_t size )
     {
-#ifdef TRACY_ON_DEMAND
         if( !m_active ) return;
-#endif
         Magic magic;
-        auto& token = s_token.ptr;
+        auto token = GetToken();
         auto ptr = (char*)tracy_malloc( size+1 );
         memcpy( ptr, txt, size );
         ptr[size] = '\0';
@@ -112,11 +108,9 @@ public:
 
     tracy_force_inline void Name( const char* txt, size_t size )
     {
-#ifdef TRACY_ON_DEMAND
         if( !m_active ) return;
-#endif
         Magic magic;
-        auto& token = s_token.ptr;
+        auto token = GetToken();
         auto ptr = (char*)tracy_malloc( size+1 );
         memcpy( ptr, txt, size );
         ptr[size] = '\0';
@@ -130,10 +124,7 @@ public:
 
 private:
     uint64_t m_thread;
-
-#ifdef TRACY_ON_DEMAND
     const bool m_active;
-#endif
 };
 
 }

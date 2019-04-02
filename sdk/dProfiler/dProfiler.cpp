@@ -18,52 +18,53 @@
 	#include "Tracy.hpp"
 	#include "common\TracySystem.hpp"
 	#include "client\TracyProfiler.hpp"
+
+	using namespace tracy;
 	
-	long long dProfilerStartTrace__(const dProfilerSourceLocation* const sourceLocation)
+	long long dProfilerStartTrace__(const dProfilerSourceLocation* const srcloc)
 	{
-		std::thread::native_handle_type thread = (std::thread::native_handle_type)tracy::GetThreadHandle();
-		tracy::Magic magic;
-		auto& token = tracy::s_token.ptr;
+		const auto thread = GetThreadHandle();
+		Magic magic;
+		auto token = GetToken();
 		auto& tail = token->get_tail_index();
 		auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>(magic);
-		tracy::MemWrite(&item->hdr.type, tracy::QueueType::ZoneBegin);
+		MemWrite(&item->hdr.type, QueueType::ZoneBegin);
 #ifdef TRACY_RDTSCP_OPT
-		tracy::MemWrite(&item->zoneBegin.time, tracy::Profiler::GetTime(item->zoneBegin.cpu));
+		MemWrite(&item->zoneBegin.time, Profiler::GetTime(item->zoneBegin.cpu));
 #else
 		uint32_t cpu;
-		tracy::MemWrite(&item->zoneBegin.time, tracy::Profiler::GetTime(cpu));
-		tracy::MemWrite(&item->zoneBegin.cpu, cpu);
+		MemWrite(&item->zoneBegin.time, Profiler::GetTime(cpu));
+		MemWrite(&item->zoneBegin.cpu, cpu);
 #endif
-		tracy::MemWrite(&item->zoneBegin.thread, thread);
-		tracy::MemWrite(&item->zoneBegin.srcloc, (uint64_t)sourceLocation);
+		MemWrite(&item->zoneBegin.thread, thread);
+		MemWrite(&item->zoneBegin.srcloc, (uint64_t)srcloc);
 		tail.store(magic + 1, std::memory_order_release);
-
-		return long long (thread);
+		return long long(thread);
 	}
 
 	void dProfilerEndTrace__(long long threadId)
 	{
+		Magic magic;
 		std::thread::native_handle_type thread = (std::thread::native_handle_type) threadId;
-		tracy::Magic magic;
-		auto& token = tracy::s_token.ptr;
+		auto token = GetToken();
 		auto& tail = token->get_tail_index();
 		auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>(magic);
-		tracy::MemWrite(&item->hdr.type, tracy::QueueType::ZoneEnd);
+		MemWrite(&item->hdr.type, QueueType::ZoneEnd);
 #ifdef TRACY_RDTSCP_OPT
-		tracy::MemWrite(&item->zoneEnd.time, tracy::Profiler::GetTime(item->zoneEnd.cpu));
+		MemWrite(&item->zoneEnd.time, Profiler::GetTime(item->zoneEnd.cpu));
 #else
 		uint32_t cpu;
-		tracy::MemWrite(&item->zoneEnd.time, tracy::Profiler::GetTime(cpu));
-		tracy::MemWrite(&item->zoneEnd.cpu, cpu);
+		MemWrite(&item->zoneEnd.time, Profiler::GetTime(cpu));
+		MemWrite(&item->zoneEnd.cpu, cpu);
 #endif
-		tracy::MemWrite(&item->zoneEnd.thread, thread);
+		MemWrite(&item->zoneEnd.thread, thread);
 		tail.store(magic + 1, std::memory_order_release);
 	}
 
 	void dProfilerSetTrackName__(const char* const trackName)
 	{
-		std::thread::native_handle_type handle = (std::thread::native_handle_type) tracy::GetThreadHandle();
-		tracy::SetThreadName(handle, trackName);
+		std::thread::native_handle_type handle = (std::thread::native_handle_type) GetThreadHandle();
+		SetThreadName(handle, trackName);
 	}
 
 #else

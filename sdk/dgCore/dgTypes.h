@@ -164,7 +164,7 @@
 
 // uncomment out _DG_USE_PROFILER to enable profiler frame capture profiler traces
 // alternatively the end application can use a command line option to enable this define
-#define _DG_USE_PROFILER
+//#define _DG_USE_PROFILER
 
 
 #if defined (_DG_USE_PROFILER) && (defined (_WIN_32_VER) || defined (_WIN_64_VER))

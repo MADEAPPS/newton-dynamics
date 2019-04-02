@@ -6,6 +6,17 @@
 #include "../Tracy.hpp"
 #include "../common/TracySystem.hpp"
 
+struct static_init_test_t
+{
+    static_init_test_t()
+    {
+        ZoneScoped;
+        new char[64*1024];
+    }
+};
+
+static const static_init_test_t static_init_test;
+
 void* operator new( std::size_t count )
 {
     auto ptr = malloc( count );
@@ -134,11 +145,18 @@ void MessageTest()
     }
 }
 
+static int Fibonacci( int n );
+
+static inline int FibonacciInline( int n )
+{
+    return Fibonacci( n );
+}
+
 static int Fibonacci( int n )
 {
     ZoneScoped;
     if( n < 2 ) return n;
-    return Fibonacci( n-1 ) + Fibonacci( n-2 );
+    return FibonacciInline( n-1 ) + FibonacciInline( n-2 );
 }
 
 void DepthTest()
@@ -209,6 +227,28 @@ void CallstackTime()
     }
 }
 
+void OnlyMemory()
+{
+    new int;
+}
+
+static TracyLockable( std::mutex, deadlockMutex1 );
+static TracyLockable( std::mutex, deadlockMutex2 );
+
+void DeadlockTest1()
+{
+    deadlockMutex1.lock();
+    std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
+    deadlockMutex2.lock();
+}
+
+void DeadlockTest2()
+{
+    deadlockMutex2.lock();
+    std::this_thread::sleep_for( std::chrono::milliseconds( 100 ) );
+    deadlockMutex1.lock();
+}
+
 int main()
 {
     auto t1 = std::thread( TestFunction );
@@ -230,6 +270,9 @@ int main()
     auto t17 = std::thread( SharedWrite1 );
     auto t18 = std::thread( SharedWrite2 );
     auto t19 = std::thread( CallstackTime );
+    auto t20 = std::thread( OnlyMemory );
+    auto t21 = std::thread( DeadlockTest1 );
+    auto t22 = std::thread( DeadlockTest2 );
 
     tracy::SetThreadName( t1, "First thread" );
     tracy::SetThreadName( t2, "Second thread" );
@@ -250,6 +293,9 @@ int main()
     tracy::SetThreadName( t17, "Shared write 1" );
     tracy::SetThreadName( t18, "Shared write 2" );
     tracy::SetThreadName( t19, "Callstack time" );
+    tracy::SetThreadName( t20, "Only memory" );
+    tracy::SetThreadName( t21, "Deadlock test 1" );
+    tracy::SetThreadName( t22, "Deadlock test 2" );
 
     for(;;)
     {

@@ -41,18 +41,25 @@ D_PROFILER_API void dProfilerSetTrackName__(const char* const trackName);
 class dgProfile
 {
 	public:
-	dgProfile(const dProfilerSourceLocation* const location)
-		:m_thread(dProfilerStartTrace__(location))
+	dgProfile(const dProfilerSourceLocation* const location, bool is_active = true)
+		:m_thread(0)
+		,m_active (is_active)
 	{
+		if (m_active) {
+			m_thread = dProfilerStartTrace__(location);
+		}
 	}
 
 	~dgProfile()
 	{
-		dProfilerEndTrace__(m_thread);
+		if (m_active) {
+			dProfilerEndTrace__(m_thread);
+		}
 	}
 
 	private:
 	long long m_thread;
+	const bool m_active;
 };
 
 #define dProfilerZoneScoped(name)					\

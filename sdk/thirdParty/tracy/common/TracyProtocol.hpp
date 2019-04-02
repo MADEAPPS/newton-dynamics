@@ -9,12 +9,31 @@
 namespace tracy
 {
 
+enum : uint32_t { ProtocolVersion = 5 };
+
 using lz4sz_t = uint32_t;
 
 enum { TargetFrameSize = 256 * 1024 };
 enum { LZ4Size = LZ4_COMPRESSBOUND( TargetFrameSize ) };
 static_assert( LZ4Size <= std::numeric_limits<lz4sz_t>::max(), "LZ4Size greater than lz4sz_t" );
 static_assert( TargetFrameSize * 2 >= 64 * 1024, "Not enough space for LZ4 stream buffer" );
+
+enum { HandshakeShibbolethSize = 8 };
+static const char HandshakeShibboleth[HandshakeShibbolethSize] = { 'T', 'r', 'a', 'c', 'y', 'P', 'r', 'f' };
+
+enum HandshakeStatus : uint8_t
+{
+    HandshakePending,
+    HandshakeWelcome,
+    HandshakeProtocolMismatch,
+    HandshakeNotAvailable,
+    HandshakeDropped
+};
+
+enum { WelcomeMessageProgramNameSize = 64 };
+enum { WelcomeMessageHostInfoSize = 1024 };
+
+#pragma pack( 1 )
 
 enum ServerQuery : uint8_t
 {
@@ -24,11 +43,17 @@ enum ServerQuery : uint8_t
     ServerQuerySourceLocation,
     ServerQueryPlotName,
     ServerQueryCallstackFrame,
+    ServerQueryFrameName,
 };
 
-enum { WelcomeMessageProgramNameSize = 64 };
+struct ServerQueryPacket
+{
+    ServerQuery type;
+    uint64_t ptr;
+};
 
-#pragma pack( 1 )
+enum { ServerQueryPacketSize = sizeof( ServerQueryPacket ) };
+
 
 struct WelcomeMessage
 {
@@ -40,6 +65,7 @@ struct WelcomeMessage
     uint64_t epoch;
     uint8_t onDemand;
     char programName[WelcomeMessageProgramNameSize];
+    char hostInfo[WelcomeMessageHostInfoSize];
 };
 
 enum { WelcomeMessageSize = sizeof( WelcomeMessage ) };

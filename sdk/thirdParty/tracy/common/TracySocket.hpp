@@ -3,13 +3,17 @@
 
 #include <functional>
 
-struct timeval;
-
 namespace tracy
 {
 
+#ifdef _WIN32
+void InitWinSock();
+#endif
+
 class Socket
 {
+    enum { BufSize = 128 * 1024 };
+
 public:
     Socket();
     Socket( int sock );
@@ -19,9 +23,10 @@ public:
     void Close();
 
     int Send( const void* buf, int len );
-    int Recv( void* buf, int len, const timeval* tv );
+    int GetSendBufSize();
 
-    bool Read( void* buf, int len, const timeval* tv, std::function<bool()> exitCb );
+    bool Read( void* buf, int len, int timeout, std::function<bool()> exitCb );
+    bool ReadRaw( void* buf, int len, int timeout );
     bool HasData();
 
     Socket( const Socket& ) = delete;
@@ -30,7 +35,13 @@ public:
     Socket& operator=( Socket&& ) = delete;
 
 private:
+    int RecvBuffered( void* buf, int len, int timeout );
+    int Recv( void* buf, int len, int timeout );
+
+    char* m_buf;
+    char* m_bufPtr;
     int m_sock;
+    int m_bufLeft;
 };
 
 class ListenSocket

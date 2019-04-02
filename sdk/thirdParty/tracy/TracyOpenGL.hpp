@@ -6,11 +6,27 @@
 #if !defined TRACY_ENABLE || defined __APPLE__
 
 #define TracyGpuContext
+#define TracyGpuNamedZone(x,y)
+#define TracyGpuNamedZoneC(x,y,z)
 #define TracyGpuZone(x)
 #define TracyGpuZoneC(x,y)
 #define TracyGpuCollect
+
+#define TracyGpuNamedZoneS(x,y,z)
+#define TracyGpuNamedZoneCS(x,y,z,w)
 #define TracyGpuZoneS(x,y)
 #define TracyGpuZoneCS(x,y,z)
+
+namespace tracy
+{
+struct SourceLocationData;
+class GpuCtxScope
+{
+public:
+    GpuCtxScope( const SourceLocationData* ) {}
+    GpuCtxScope( const SourceLocationData*, int depth ) {}
+};
+}
 
 #else
 
@@ -24,23 +40,34 @@
 #include "common/TracyAlign.hpp"
 #include "common/TracyAlloc.hpp"
 
-#define TracyGpuContext tracy::s_gpuCtx.ptr = (tracy::GpuCtx*)tracy::tracy_malloc( sizeof( tracy::GpuCtx ) ); new(tracy::s_gpuCtx.ptr) tracy::GpuCtx;
-#define TracyGpuZone( name ) static const tracy::SourceLocation __tracy_gpu_source_location { name, __FUNCTION__,  __FILE__, (uint32_t)__LINE__, 0 }; tracy::GpuCtxScope ___tracy_gpu_zone( &__tracy_gpu_source_location );
-#define TracyGpuZoneC( name, color ) static const tracy::SourceLocation __tracy_gpu_source_location { name, __FUNCTION__,  __FILE__, (uint32_t)__LINE__, color }; tracy::GpuCtxScope ___tracy_gpu_zone( &__tracy_gpu_source_location );
-#define TracyGpuCollect tracy::s_gpuCtx.ptr->Collect();
+#define TracyGpuContext tracy::GetGpuCtx().ptr = (tracy::GpuCtx*)tracy::tracy_malloc( sizeof( tracy::GpuCtx ) ); new(tracy::GetGpuCtx().ptr) tracy::GpuCtx;
+#if defined TRACY_HAS_CALLSTACK && defined TRACY_CALLSTACK
+#  define TracyGpuNamedZone( varname, name ) static const tracy::SourceLocationData TracyConcat(__tracy_gpu_source_location,__LINE__) { name, __FUNCTION__,  __FILE__, (uint32_t)__LINE__, 0 }; tracy::GpuCtxScope varname( &TracyConcat(__tracy_gpu_source_location,__LINE__), TRACY_CALLSTACK );
+#  define TracyGpuNamedZoneC( varname, name, color ) static const tracy::SourceLocationData TracyConcat(__tracy_gpu_source_location,__LINE__) { name, __FUNCTION__,  __FILE__, (uint32_t)__LINE__, color }; tracy::GpuCtxScope varname( &TracyConcat(__tracy_gpu_source_location,__LINE__), TRACY_CALLSTACK );
+#  define TracyGpuZone( name ) TracyGpuNamedZoneS( ___tracy_gpu_zone, name, TRACY_CALLSTACK )
+#  define TracyGpuZoneC( name, color ) TracyGpuNamedZoneCS( ___tracy_gpu_zone, name, color, TRACY_CALLSTACK )
+#else
+#  define TracyGpuNamedZone( varname, name ) static const tracy::SourceLocationData TracyConcat(__tracy_gpu_source_location,__LINE__) { name, __FUNCTION__,  __FILE__, (uint32_t)__LINE__, 0 }; tracy::GpuCtxScope varname( &TracyConcat(__tracy_gpu_source_location,__LINE__) );
+#  define TracyGpuNamedZoneC( varname, name, color ) static const tracy::SourceLocationData TracyConcat(__tracy_gpu_source_location,__LINE__) { name, __FUNCTION__,  __FILE__, (uint32_t)__LINE__, color }; tracy::GpuCtxScope varname( &TracyConcat(__tracy_gpu_source_location,__LINE__) );
+#  define TracyGpuZone( name ) TracyGpuNamedZone( ___tracy_gpu_zone, name )
+#  define TracyGpuZoneC( name, color ) TracyGpuNamedZoneC( ___tracy_gpu_zone, name, color )
+#endif
+#define TracyGpuCollect tracy::GetGpuCtx().ptr->Collect();
 
 #ifdef TRACY_HAS_CALLSTACK
-#  define TracyGpuZoneS( name, depth ) static const tracy::SourceLocation __tracy_gpu_source_location { name, __FUNCTION__,  __FILE__, (uint32_t)__LINE__, 0 }; tracy::GpuCtxScope ___tracy_gpu_zone( &__tracy_gpu_source_location, depth );
-#  define TracyGpuZoneCS( name, color, depth ) static const tracy::SourceLocation __tracy_gpu_source_location { name, __FUNCTION__,  __FILE__, (uint32_t)__LINE__, color }; tracy::GpuCtxScope ___tracy_gpu_zone( &__tracy_gpu_source_location, depth );
+#  define TracyGpuNamedZoneS( varname, name, depth ) static const tracy::SourceLocationData TracyConcat(__tracy_gpu_source_location,__LINE__) { name, __FUNCTION__,  __FILE__, (uint32_t)__LINE__, 0 }; tracy::GpuCtxScope varname( &TracyConcat(__tracy_gpu_source_location,__LINE__), depth );
+#  define TracyGpuNamedZoneCS( varname, name, color, depth ) static const tracy::SourceLocationData TracyConcat(__tracy_gpu_source_location,__LINE__) { name, __FUNCTION__,  __FILE__, (uint32_t)__LINE__, color }; tracy::GpuCtxScope varname( &TracyConcat(__tracy_gpu_source_location,__LINE__), depth );
+#  define TracyGpuZoneS( name, depth ) TracyGpuNamedZoneS( ___tracy_gpu_zone, name, depth )
+#  define TracyGpuZoneCS( name, color, depth ) TracyGpuNamedZoneCS( ___tracy_gpu_zone, name, color, depth )
 #else
+#  define TracyGpuNamedZoneS( varname, name, depth ) TracyGpuNamedZone( varname, name )
+#  define TracyGpuNamedZoneCS( varname, name, color, depth ) TracyGpuNamedZoneC( varname, name, color )
 #  define TracyGpuZoneS( name, depth ) TracyGpuZone( name )
 #  define TracyGpuZoneCS( name, color, depth ) TracyGpuZoneC( name, color )
 #endif
 
 namespace tracy
 {
-
-extern std::atomic<uint8_t> s_gpuCtxCounter;
 
 class GpuCtx
 {
@@ -50,7 +77,7 @@ class GpuCtx
 
 public:
     GpuCtx()
-        : m_context( s_gpuCtxCounter.fetch_add( 1, std::memory_order_relaxed ) )
+        : m_context( GetGpuCtxCounter().fetch_add( 1, std::memory_order_relaxed ) )
         , m_head( 0 )
         , m_tail( 0 )
     {
@@ -67,7 +94,7 @@ public:
 
         const float period = 1.f;
         Magic magic;
-        auto& token = s_token.ptr;
+        auto token = GetToken();
         auto& tail = token->get_tail_index();
         auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
         MemWrite( &item->hdr.type, QueueType::GpuNewContext );
@@ -79,7 +106,7 @@ public:
         MemWrite( &item->gpuNewContext.accuracyBits, (uint8_t)bits );
 
 #ifdef TRACY_ON_DEMAND
-        s_profiler.DeferItem( *item );
+        GetProfiler().DeferItem( *item );
 #endif
 
         tail.store( magic + 1, std::memory_order_release );
@@ -92,7 +119,7 @@ public:
         if( m_tail == m_head ) return;
 
 #ifdef TRACY_ON_DEMAND
-        if( !s_profiler.IsConnected() )
+        if( !GetProfiler().IsConnected() )
         {
             m_head = m_tail = 0;
             return;
@@ -121,7 +148,7 @@ public:
         start %= QueryCount;
 
         Magic magic;
-        auto& token = s_token.ptr;
+        auto token = GetToken();
         auto& tail = token->get_tail_index();
 
         while( m_tail != start )
@@ -165,24 +192,22 @@ private:
     unsigned int m_tail;
 };
 
-extern thread_local GpuCtxWrapper s_gpuCtx;
-
 class GpuCtxScope
 {
 public:
-    tracy_force_inline GpuCtxScope( const SourceLocation* srcloc )
+    tracy_force_inline GpuCtxScope( const SourceLocationData* srcloc )
 #ifdef TRACY_ON_DEMAND
-        : m_active( s_profiler.IsConnected() )
+        : m_active( GetProfiler().IsConnected() )
 #endif
     {
 #ifdef TRACY_ON_DEMAND
         if( !m_active ) return;
 #endif
-        const auto queryId = s_gpuCtx.ptr->NextQueryId();
-        glQueryCounter( s_gpuCtx.ptr->TranslateOpenGlQueryId( queryId ), GL_TIMESTAMP );
+        const auto queryId = GetGpuCtx().ptr->NextQueryId();
+        glQueryCounter( GetGpuCtx().ptr->TranslateOpenGlQueryId( queryId ), GL_TIMESTAMP );
 
         Magic magic;
-        auto& token = s_token.ptr;
+        auto token = GetToken();
         auto& tail = token->get_tail_index();
         auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
         MemWrite( &item->hdr.type, QueueType::GpuZoneBegin );
@@ -190,25 +215,25 @@ public:
         MemWrite( &item->gpuZoneBegin.srcloc, (uint64_t)srcloc );
         memset( &item->gpuZoneBegin.thread, 0, sizeof( item->gpuZoneBegin.thread ) );
         MemWrite( &item->gpuZoneBegin.queryId, uint16_t( queryId ) );
-        MemWrite( &item->gpuZoneBegin.context, s_gpuCtx.ptr->GetId() );
+        MemWrite( &item->gpuZoneBegin.context, GetGpuCtx().ptr->GetId() );
         tail.store( magic + 1, std::memory_order_release );
     }
 
-    tracy_force_inline GpuCtxScope( const SourceLocation* srcloc, int depth )
+    tracy_force_inline GpuCtxScope( const SourceLocationData* srcloc, int depth )
 #ifdef TRACY_ON_DEMAND
-        : m_active( s_profiler.IsConnected() )
+        : m_active( GetProfiler().IsConnected() )
 #endif
     {
 #ifdef TRACY_ON_DEMAND
         if( !m_active ) return;
 #endif
-        const auto queryId = s_gpuCtx.ptr->NextQueryId();
-        glQueryCounter( s_gpuCtx.ptr->TranslateOpenGlQueryId( queryId ), GL_TIMESTAMP );
+        const auto queryId = GetGpuCtx().ptr->NextQueryId();
+        glQueryCounter( GetGpuCtx().ptr->TranslateOpenGlQueryId( queryId ), GL_TIMESTAMP );
 
         const auto thread = GetThreadHandle();
 
         Magic magic;
-        auto& token = s_token.ptr;
+        auto token = GetToken();
         auto& tail = token->get_tail_index();
         auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
         MemWrite( &item->hdr.type, QueueType::GpuZoneBeginCallstack );
@@ -216,10 +241,10 @@ public:
         MemWrite( &item->gpuZoneBegin.srcloc, (uint64_t)srcloc );
         MemWrite( &item->gpuZoneBegin.thread, thread );
         MemWrite( &item->gpuZoneBegin.queryId, uint16_t( queryId ) );
-        MemWrite( &item->gpuZoneBegin.context, s_gpuCtx.ptr->GetId() );
+        MemWrite( &item->gpuZoneBegin.context, GetGpuCtx().ptr->GetId() );
         tail.store( magic + 1, std::memory_order_release );
 
-        s_profiler.SendCallstack( depth, thread );
+        GetProfiler().SendCallstack( depth, thread );
     }
 
     tracy_force_inline ~GpuCtxScope()
@@ -227,17 +252,17 @@ public:
 #ifdef TRACY_ON_DEMAND
         if( !m_active ) return;
 #endif
-        const auto queryId = s_gpuCtx.ptr->NextQueryId();
-        glQueryCounter( s_gpuCtx.ptr->TranslateOpenGlQueryId( queryId ), GL_TIMESTAMP );
+        const auto queryId = GetGpuCtx().ptr->NextQueryId();
+        glQueryCounter( GetGpuCtx().ptr->TranslateOpenGlQueryId( queryId ), GL_TIMESTAMP );
 
         Magic magic;
-        auto& token = s_token.ptr;
+        auto token = GetToken();
         auto& tail = token->get_tail_index();
         auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>( magic );
         MemWrite( &item->hdr.type, QueueType::GpuZoneEnd );
         MemWrite( &item->gpuZoneEnd.cpuTime, Profiler::GetTime() );
         MemWrite( &item->gpuZoneEnd.queryId, uint16_t( queryId ) );
-        MemWrite( &item->gpuZoneEnd.context, s_gpuCtx.ptr->GetId() );
+        MemWrite( &item->gpuZoneEnd.context, GetGpuCtx().ptr->GetId() );
         tail.store( magic + 1, std::memory_order_release );
     }
 
