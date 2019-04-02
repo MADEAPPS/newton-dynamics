@@ -59,6 +59,9 @@
     <ProjectReference Include="dgPhysics.vcxproj">
       <Project>{34ad435b-7662-49d5-af13-5974fec5f578}</Project>
     </ProjectReference>
+    <ProjectReference Include="dProfiler.vcxproj">
+      <Project>{89509957-ce86-4ace-946c-7a65e63f0f23}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F8604C1C-867D-4EFD-AFAC-15404F17084E}</ProjectGuid>

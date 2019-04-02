@@ -21,7 +21,7 @@
 
 	using namespace tracy;
 	
-	long long dProfilerStartTrace__(const dProfilerSourceLocation* const srcloc)
+	long long dProfilerStartTraceLow(const dProfilerSourceLocation* const srcloc)
 	{
 		const auto thread = GetThreadHandle();
 		Magic magic;
@@ -42,7 +42,7 @@
 		return long long(thread);
 	}
 
-	void dProfilerEndTrace__(long long threadId)
+	void dProfilerEndTraceLow(long long threadId)
 	{
 		Magic magic;
 		std::thread::native_handle_type thread = (std::thread::native_handle_type) threadId;
@@ -61,7 +61,7 @@
 		tail.store(magic + 1, std::memory_order_release);
 	}
 
-	void dProfilerSetTrackName__(const char* const trackName)
+	void dProfilerSetTrackNameLow(const char* const trackName)
 	{
 		std::thread::native_handle_type handle = (std::thread::native_handle_type) GetThreadHandle();
 		SetThreadName(handle, trackName);
@@ -69,16 +69,16 @@
 
 #else
 
-	long long dProfilerStartTrace__(const dProfilerSourceLocation* const)
+	long long dProfilerStartTraceLow(const dProfilerSourceLocation* const)
 	{
 		return 0;
 	}
 
-	void dProfilerEndTrace__(int long long)
+	void dProfilerEndTraceLow(int long long)
 	{
 	}
 
-	void dProfilerSetTrackName__(const char* const)
+	void dProfilerSetTrackNameLow(const char* const)
 	{
 	}
 

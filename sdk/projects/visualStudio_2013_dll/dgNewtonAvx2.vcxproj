@@ -54,6 +54,11 @@
     <ClInclude Include="..\..\dgNewtonAvx2\dgSolver.h" />
     <ClInclude Include="..\..\dgNewtonAvx2\dgWorldBase.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="dProfiler.vcxproj">
+      <Project>{89509957-ce86-4ace-946c-7a65e63f0f23}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{166B8A05-0AB1-4A9E-9EBA-AC7E116E26CB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
