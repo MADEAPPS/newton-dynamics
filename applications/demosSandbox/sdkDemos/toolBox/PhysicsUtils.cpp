@@ -969,7 +969,9 @@ void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVect
 			matrix.m_posit.m_z = z;
 			dVector floor (FindFloor (world, dVector (matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
 			matrix.m_posit.m_y = floor.m_y + size.m_y * 0.5f + offsetHigh;
-			CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);
+			if (matrix.m_posit.m_y < 900.0f) {
+				CreateSimpleSolid(scene, geometry, mass, matrix, collision, materialID);
+			}
 		}
 	}
 	// do not forget to release the assets	

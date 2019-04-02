@@ -1097,7 +1097,7 @@ void dgBroadPhase::CalculatePairContacts (dgPair* const pair, dgInt32 threadID)
 
 void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex)
 {
-//	DG_TRACKTIME(__FUNCTION__);
+	//DG_TRACKTIME(__FUNCTION__);
 	dgWorld* const world = (dgWorld*) m_world;
 	dgBody* const body0 = contact->m_body0;
 	dgBody* const body1 = contact->m_body1;
@@ -1571,6 +1571,7 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 					contact->m_separationDistance = distance;
 				}
 				if (distance < DG_NARROW_PHASE_DIST) {
+
 					AddPair(contact, timestep, threadID);
 					if (contact->m_maxDOF) {
 						contact->m_timeOfImpact = dgFloat32(1.0e10f);
@@ -1641,7 +1642,6 @@ void dgBroadPhase::AddNewContacts(dgBroadphaseSyncDescriptor* const descriptor, 
 void dgBroadPhase::AttachNewContacts(dgContactList::dgListNode* const lastNode)
 {
 	DG_TRACKTIME(__FUNCTION__);
-
 	dgContactList* const contactList = m_world;
 	dgContactList::dgListNode* nextContactNode;
 	for (dgContactList::dgListNode* contactNode = contactList->GetFirst(); contactNode != lastNode; contactNode = nextContactNode) {

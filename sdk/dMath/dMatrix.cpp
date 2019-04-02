@@ -166,18 +166,18 @@ bool dMatrix::TestOrthogonal() const
 
 void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder order) const
 {
+	// Assuming the angles are in radians.
+#ifdef _NEWTON_USE_DOUBLE
+	const dFloat tol = 0.99999995f;
+#else 
+	const dFloat tol = 0.99995f;
+#endif
+
 	switch (order)
 	{
 		case m_pitchYawRoll:
 		{
 			const dMatrix& matrix = *this;
-			// Assuming the angles are in radians.
-			#ifdef _NEWTON_USE_DOUBLE
-			const dFloat tol = 0.99999995f; 
-			#else 
-			const dFloat tol = 0.99995f; 
-			#endif
-
 			if (matrix[0][2] > tol) {
 				dFloat picth0 = 0.0f;
 				dFloat yaw0 = -dPi * 0.5f;
@@ -243,7 +243,7 @@ void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder 
 		{
 			const dMatrix& matrix = *this;
 			//dMatrix matrix(dPitchMatrix(30.0f * dDegreeToRad) * dRollMatrix(-90.0f * dDegreeToRad) * dYawMatrix(50.0f * dDegreeToRad));
-			if (matrix[0][1] > 0.99995f) {
+			if (matrix[0][1] > tol) {
 
 				dFloat picth0 = 0.0f;
 				dFloat roll0 = dFloat (dPi * 0.5f);
@@ -257,7 +257,7 @@ void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder 
 				euler1[1] = yaw0;
 				euler1[2] = roll0;
 
-			} else if (matrix[0][1] < -0.99995f) {
+			} else if (matrix[0][1] < -tol) {
 
 				dFloat picth0 = 0.0f;
 				dFloat roll0 = dFloat(-dPi * 0.5f);
@@ -317,7 +317,7 @@ void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder 
 			const dMatrix& matrix = *this;
 
 			// Assuming the angles are in radians.
-			if (matrix[a0][a2] > 0.99995f) {
+			if (matrix[a0][a2] > tol) {
 				dFloat picth0 = 0.0f;
 				dFloat yaw0 = -3.141592f * 0.5f;
 				dFloat roll0 = -dAtan2(matrix[a2][a1], matrix[a1][a1]);
@@ -329,7 +329,7 @@ void dMatrix::GetEulerAngles(dVector& euler0, dVector& euler1, dEulerAngleOrder 
 				euler1[a1] = yaw0;
 				euler1[a2] = roll0;
 
-			} else if (matrix[a0][a2] < -0.99995f) {
+			} else if (matrix[a0][a2] < -tol) {
 				dFloat picth0 = 0.0f;
 				dFloat yaw0 = 3.141592f * 0.5f;
 				dFloat roll0 = dAtan2(matrix[a2][a1], matrix[a1][a1]);
