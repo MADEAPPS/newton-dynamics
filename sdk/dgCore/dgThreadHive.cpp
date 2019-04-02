@@ -94,7 +94,7 @@ void dgThreadHive::dgWorkerThread::RunNextJobInQueue(dgInt32 threadId)
 {
 	for (dgInt32 i = 0; i < m_jobsCount; i ++) {
 		const dgThreadJob& job = m_jobPool[i];
-		DG_TRACKTIME_NAMED(job.m_jobName);
+		//DG_TRACKTIME_NAMED(job.m_jobName);
 		job.m_callback (job.m_context0, job.m_context1, m_id);
 	}
 	m_jobsCount = 0;
@@ -152,12 +152,12 @@ void dgThreadHive::SetThreadsCount (dgInt32 threads)
 void dgThreadHive::QueueJob (dgWorkerThreadTaskCallback callback, void* const context0, void* const context1, const char* const functionName)
 {
 	if (!m_workerThreadsCount) {
-		DG_TRACKTIME(functionName);
+		//DG_TRACKTIME(functionName);
 		callback (context0, context1, 0);
 	} else {
 		dgInt32 workerTreadEntry = m_jobsCount % m_workerThreadsCount;
 		#ifdef DG_USE_THREAD_EMULATION
-			DG_TRACKTIME(functionName);
+			//DG_TRACKTIME(functionName);
 			callback (context0, context1, workerTreadEntry);
 		#else 
 			dgInt32 index = m_workerThreads[workerTreadEntry].PushJob(dgThreadJob(context0, context1, callback, functionName));
@@ -182,7 +182,7 @@ void dgThreadHive::OnEndWorkerThread (dgInt32 threadId)
 void dgThreadHive::SynchronizationBarrier ()
 {
 	if (m_workerThreadsCount) {
-		DG_TRACKTIME(__FUNCTION__);
+		//DG_TRACKTIME(__FUNCTION__);
 		for (dgInt32 i = 0; i < m_workerThreadsCount; i ++) {
 			m_workerThreads[i].m_workerSemaphore.Release();
 		}
@@ -222,7 +222,7 @@ void dgThreadHive::dgWorkerThread::RunNextJobInQueue(dgInt32 threadId)
 {
 	for (dgInt32 i = 0; i < m_jobsCount; i++) {
 		const dgThreadJob& job = m_jobPool[i];
-		DG_TRACKTIME_NAMED(job.m_jobName);
+		//DG_TRACKTIME_NAMED(job.m_jobName);
 		job.m_callback(job.m_context0, job.m_context1, m_id);
 	}
 }
@@ -298,7 +298,7 @@ void dgThreadHive::OnEndWorkerThread(dgInt32 threadId)
 void dgThreadHive::BeginSection()
 {
 	if (m_workerThreadsCount) {
-		DG_TRACKTIME(__FUNCTION__);
+		//DG_TRACKTIME(__FUNCTION__);
 		for (dgInt32 i = 0; i < m_workerThreadsCount; i++) {
 			m_workerThreads[i].m_workerSemaphore.Release();
 		}
@@ -309,7 +309,7 @@ void dgThreadHive::BeginSection()
 void dgThreadHive::EndSection()
 {
 	if (m_workerThreadsCount) {
-		DG_TRACKTIME(__FUNCTION__);
+		//DG_TRACKTIME(__FUNCTION__);
 		for (dgInt32 i = 0; i < m_workerThreadsCount; i++) {
 			dgInterlockedExchange(&m_workerThreads[i].m_concurrentWork, 0);
 		}
@@ -320,12 +320,12 @@ void dgThreadHive::EndSection()
 void dgThreadHive::QueueJob(dgWorkerThreadTaskCallback callback, void* const context0, void* const context1, const char* const functionName)
 {
 	if (!m_workerThreadsCount) {
-		DG_TRACKTIME(functionName);
+		//DG_TRACKTIME(functionName);
 		callback(context0, context1, 0);
 	} else {
 		dgInt32 workerTreadEntry = m_jobsCount % m_workerThreadsCount;
 		#ifdef DG_USE_THREAD_EMULATION
-			DG_TRACKTIME(functionName);
+			//DG_TRACKTIME(functionName);
 			callback(context0, context1, workerTreadEntry);
 		#else 
 			dgInt32 index = m_workerThreads[workerTreadEntry].PushJob(dgThreadJob(context0, context1, callback, functionName));
@@ -361,7 +361,7 @@ void dgThreadHive::SetThreadsCount(dgInt32 threads)
 void dgThreadHive::SynchronizationBarrier()
 {
 	if (m_workerThreadsCount) {
-		DG_TRACKTIME(__FUNCTION__);
+		//DG_TRACKTIME(__FUNCTION__);
 
 		#ifndef DG_USE_THREAD_EMULATION
 		m_syncLock = m_workerThreadsCount;

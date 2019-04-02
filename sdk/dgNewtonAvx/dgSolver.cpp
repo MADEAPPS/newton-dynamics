@@ -74,6 +74,7 @@ void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* co
 
 void dgSolver::InitWeights()
 {
+	DG_TRACKTIME(__FUNCTION__);
 	const dgJointInfo* const jointArray = m_jointArray;
 	const dgInt32 jointCount = m_cluster->m_jointCount;
 	dgBodyProxy* const weight = m_bodyProxyArray;
@@ -112,6 +113,7 @@ void dgSolver::InitWeights()
 
 void dgSolver::InitBodyArray()
 {
+	DG_TRACKTIME(__FUNCTION__);
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
 		m_world->QueueJob(InitBodyArrayKernel, this, NULL, "dgSolver::InitBodyArray");
 	}
@@ -121,6 +123,7 @@ void dgSolver::InitBodyArray()
 
 void dgSolver::InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgSolver* const me = (dgSolver*)context;
 	me->InitBodyArray(threadID);
 }
@@ -161,6 +164,7 @@ DG_INLINE void dgSolver::SortWorkGroup(dgInt32 base) const
 
 void dgSolver::InitJacobianMatrix()
 {
+	DG_TRACKTIME(__FUNCTION__);
 	m_jacobianMatrixRowAtomicIndex = 0;
 	dgJacobian* const internalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[0];
 	memset(internalForces, 0, m_cluster->m_bodyCount * sizeof (dgJacobian));
@@ -243,12 +247,14 @@ dgInt32 dgSolver::CompareJointInfos(const dgJointInfo* const infoA, const dgJoin
 
 void dgSolver::InitJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgSolver* const me = (dgSolver*)context;
 	me->InitJacobianMatrix(threadID);
 }
 
 void dgSolver::TransposeMassMatrixKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgSolver* const me = (dgSolver*)context;
 	me->TransposeMassMatrix(threadID);
 }
@@ -489,42 +495,49 @@ DG_INLINE void dgSolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLef
 
 void dgSolver::CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgSolver* const me = (dgSolver*)context;
 	me->CalculateJointsAcceleration(threadID);
 }
 
 void dgSolver::CalculateJointsForceKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgSolver* const me = (dgSolver*)context;
 	me->CalculateJointsForce(threadID);
 }
 
 void dgSolver::IntegrateBodiesVelocityKernel(void* const context, void* const worldContext, dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgSolver* const me = (dgSolver*)context;
 	me->IntegrateBodiesVelocity(threadID);
 }
 
 void dgSolver::CalculateBodiesAccelerationKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgSolver* const me = (dgSolver*)context;
 	me->CalculateBodiesAcceleration(threadID);
 }
 
 void dgSolver::UpdateForceFeedbackKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgSolver* const me = (dgSolver*)context;
 	me->UpdateForceFeedback(threadID);
 }
 
 void dgSolver::UpdateKinematicFeedbackKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgSolver* const me = (dgSolver*)context;
 	me->UpdateKinematicFeedback(threadID);
 }
 
 void dgSolver::UpdateRowAccelerationKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgSolver* const me = (dgSolver*)context;
 	me->UpdateRowAcceleration(threadID);
 }
@@ -1017,12 +1030,14 @@ void dgSolver::UpdateKinematicFeedback(dgInt32 threadID)
 
 void dgSolver::UpdateSkeletonsKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgSolver* const me = (dgSolver*)context;
 	me->UpdateSkeletons(threadID);
 }
 
 void dgSolver::InitSkeletonsKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME(__FUNCTION__);
 	dgSolver* const me = (dgSolver*)context;
 	me->InitSkeletons(threadID);
 }
@@ -1077,6 +1092,7 @@ void dgSolver::UpdateSkeletons(dgInt32 threadID)
 
 void dgSolver::CalculateForces()
 {
+	DG_TRACKTIME(__FUNCTION__);
 	m_firstPassCoef = dgFloat32(0.0f);
 	const dgInt32 passes = m_solverPasses;
 	const dgInt32 threadCounts = m_world->GetThreadCount();
