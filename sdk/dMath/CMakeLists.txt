@@ -36,6 +36,10 @@ endif(MSVC)
 
 target_include_directories(${projectName} PUBLIC .)
 
+if (NEWTON_BUILD_PROFILER)
+    target_link_libraries (${projectName} dProfiler)
+endif()
+
 install(TARGETS ${projectName}
        LIBRARY DESTINATION lib
        ARCHIVE DESTINATION lib

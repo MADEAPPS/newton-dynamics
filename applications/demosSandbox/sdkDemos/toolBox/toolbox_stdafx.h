@@ -123,10 +123,6 @@ typedef long long unsigned64;
 #include <dMathDefines.h>
 #include <dBezierSpline.h>
 
-#ifdef D_PROFILER
-#include <dProfiler.h>
-#endif
-
 #include <dCRC.h>
 #include <dMap.h>
 #include <dHeap.h>

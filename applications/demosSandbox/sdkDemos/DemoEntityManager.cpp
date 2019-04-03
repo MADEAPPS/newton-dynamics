@@ -1627,9 +1627,7 @@ void DemoEntityManager::Run()
 		m_suspendPhysicsUpdate = false;
 		BeginFrame();
 
-		#ifdef D_PROFILER
-		dProfilerZoneScoped(__FUNCTION__);
-		#endif
+		D_TRACKTIME();
 
 		RenderStats();
 		ImGui::Render();
