@@ -266,7 +266,7 @@ bool dgBroadPhase::DoNeedUpdate(dgBodyMasterList::dgListNode* const node) const
 
 void dgBroadPhase::UpdateAggregateEntropy (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseAggregate*>::dgListNode* node, dgInt32 threadID)
 {
-	DG_TRACKTIME(__FUNCTION__);
+	DG_TRACKTIME();
 	const dgInt32 threadCount = m_world->GetThreadCount();
 	while (node) {
 		node->GetInfo()->ImproveEntropy();
@@ -300,7 +300,7 @@ void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descrip
 
 void dgBroadPhase::SleepingState(dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID)
 {
-	DG_TRACKTIME(__FUNCTION__);
+	DG_TRACKTIME();
 	dgFloat32 timestep = descriptor->m_timestep;
 
 	const dgInt32 threadCount = m_world->GetThreadCount();
@@ -847,7 +847,7 @@ dgInt32 dgBroadPhase::CompareNodes(const dgBroadPhaseNode* const nodeA, const dg
 void dgBroadPhase::ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy, dgBroadPhaseNode** const root)
 {
 	if (*root) {
-		DG_TRACKTIME(__FUNCTION__);
+		DG_TRACKTIME();
 		dgBroadPhaseNode* const parent = (*root)->m_parent;
 		(*root)->m_parent = NULL;
 		dgFloat64 entropy = CalculateEntropy(fitness, root);
@@ -1097,7 +1097,7 @@ void dgBroadPhase::CalculatePairContacts (dgPair* const pair, dgInt32 threadID)
 
 void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex)
 {
-	//DG_TRACKTIME(__FUNCTION__);
+	//DG_TRACKTIME();
 	dgWorld* const world = (dgWorld*) m_world;
 	dgBody* const body0 = contact->m_body0;
 	dgBody* const body1 = contact->m_body1;
@@ -1382,12 +1382,11 @@ void dgBroadPhase::ImproveNodeFitness(dgBroadPhaseTreeNode* const node, dgBroadP
 
 dgFloat64 dgBroadPhase::CalculateEntropy (dgFitnessList& fitness, dgBroadPhaseNode** const root)
 {
-	DG_TRACKTIME(__FUNCTION__);
+	DG_TRACKTIME();
 #if 0
 	dgFloat64 cost0 = fitness.TotalCost();
 	dgFloat64 cost1 = cost0;
 	do {
-		DG_TRACKTIME_NAMED("Entropy");
 		cost0 = cost1;
 		for (dgFitnessList::dgListNode* node = fitness.GetFirst(); node; node = node->GetNext()) {
 			ImproveNodeFitness(node->GetInfo(), root);
@@ -1525,7 +1524,7 @@ void dgBroadPhase::UpdateSoftBodyContacts(dgBroadphaseSyncDescriptor* const desc
 
 void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const descriptor, dgContactList::dgListNode* const nodePtr, dgFloat32 timeStep, dgInt32 threadID)
 {
-	DG_TRACKTIME(__FUNCTION__);
+	DG_TRACKTIME();
 	dgContactList::dgListNode* node = nodePtr;
 	dgContactList* const contactList = m_world;
 	const dgFloat32 timestep = descriptor->m_timestep;
@@ -1640,7 +1639,7 @@ void dgBroadPhase::AddNewContacts(dgBroadphaseSyncDescriptor* const descriptor, 
 
 void dgBroadPhase::AttachNewContacts(dgContactList::dgListNode* const lastNode)
 {
-	DG_TRACKTIME(__FUNCTION__);
+	DG_TRACKTIME();
 	dgContactList* const contactList = m_world;
 	dgContactList::dgListNode* nextContactNode;
 	for (dgContactList::dgListNode* contactNode = contactList->GetFirst(); contactNode != lastNode; contactNode = nextContactNode) {
@@ -1671,7 +1670,7 @@ void dgBroadPhase::AttachNewContacts(dgContactList::dgListNode* const lastNode)
 
 void dgBroadPhase::DeleteDeadContacts()
 {
-	DG_TRACKTIME(__FUNCTION__);
+	DG_TRACKTIME();
 	dgContactList* const contactList = m_world;
 	const dgInt32 count = dgMin(contactList->m_deadContactsCount, dgInt32 (sizeof(contactList->m_deadContacts) / sizeof(contactList->m_deadContacts[0])));
 	for (dgInt32 i = 0; i < count; i++) {
@@ -1725,7 +1724,7 @@ bool dgBroadPhase::SanityCheck() const
 
 void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 {
-	DG_TRACKTIME(__FUNCTION__);
+	D_TRACKTIME();
     m_lru = m_lru + 1;
 	m_pendingSoftBodyPairsCount = 0;
 

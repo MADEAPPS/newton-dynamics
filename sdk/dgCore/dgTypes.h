@@ -137,8 +137,13 @@
     #endif
 #endif
 
-//#define DG_SCALAR_VECTOR_CLASS
+// uncomment out D_PROFILER to enable profiler frame capture profiler traces
+// alternatively the end application can use a command line option to enable this define
+//#define D_PROFILER
 
+// uncomment this for Scalar floating proint 
+// alternatively the end application can use a command line option to enable this define
+//#define DG_SCALAR_VECTOR_CLASS
 
 // by default newton run on a separate thread and 
 // optionally concurrent with the calling thread,
@@ -160,15 +165,6 @@
 	#include <mutex>
 	#include <thread>
 	#include <condition_variable>
-#endif
-
-// uncomment out _DG_USE_PROFILER to enable profiler frame capture profiler traces
-// alternatively the end application can use a command line option to enable this define
-//#define _DG_USE_PROFILER
-
-
-#if defined (_DG_USE_PROFILER) && (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#include <dProfiler.h>
 #endif
 
 

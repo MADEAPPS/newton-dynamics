@@ -88,7 +88,7 @@ dgWorldDynamicUpdate::dgWorldDynamicUpdate(dgMemoryAllocator* const allocator)
 
 void dgWorldDynamicUpdate::UpdateDynamics(dgFloat32 timestep)
 {
-	DG_TRACKTIME(__FUNCTION__);
+	D_TRACKTIME();
 
 	m_bodies = 0;
 	m_joints = 0;
@@ -182,7 +182,7 @@ dgInt32 dgWorldDynamicUpdate::CompareClusterInfos(const dgBodyCluster* const clu
 
 void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 {
-	DG_TRACKTIME(__FUNCTION__);
+	DG_TRACKTIME();
 	dgWorld* const world = (dgWorld*) this;
 	dgContactList& contactList = *world;
 	dgBodyMasterList& masterList = *world;
@@ -414,7 +414,7 @@ dgInt32 dgWorldDynamicUpdate::CompareBodyJacobianPair(const dgBodyJacobianPair* 
 
 dgInt32 dgWorldDynamicUpdate::SortClusters(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const
 {
-	DG_TRACKTIME(__FUNCTION__);
+	DG_TRACKTIME();
 	dgWorld* const world = (dgWorld*) this;
 	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster->m_bodyStart];
 	dgJointInfo* const constraintArray = &world->m_jointsMemory[cluster->m_jointStart];

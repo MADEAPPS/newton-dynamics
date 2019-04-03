@@ -53,7 +53,7 @@ class dgWorldDynamicUpdate::dgParallelClusterArray
 
 void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* const clusterArray, dgInt32 clustersCount, dgFloat32 timestep)
 {
-	DG_TRACKTIME(__FUNCTION__);
+	DG_TRACKTIME();
 	dgWorld* const world = (dgWorld*) this;
 
 	dgBodyCluster cluster(MergeClusters(clusterArray, clustersCount));
@@ -94,7 +94,7 @@ void dgWorldDynamicUpdate::IntegrateInslandParallel(dgParallelClusterArray* cons
 
 dgBodyCluster dgWorldDynamicUpdate::MergeClusters(const dgBodyCluster* const clusterArray, dgInt32 clustersCount) const
 {
-	DG_TRACKTIME(__FUNCTION__);
+	DG_TRACKTIME();
 	dgBodyCluster cluster;
 	dgWorld* const world = (dgWorld*) this;
 	dgInt32 bodyCount = 0;
@@ -170,7 +170,7 @@ dgBodyCluster dgWorldDynamicUpdate::MergeClusters(const dgBodyCluster* const clu
 
 void dgParallelBodySolver::InitWeights()
 {
-	DG_TRACKTIME(__FUNCTION__);
+	DG_TRACKTIME();
 	const dgJointInfo* const jointArray = m_jointArray;
 	const dgInt32 jointCount = m_cluster->m_jointCount;
 	dgBodyProxy* const weight = m_bodyProxyArray;

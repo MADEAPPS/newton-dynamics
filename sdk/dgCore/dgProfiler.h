@@ -22,20 +22,25 @@
 #ifndef __DG_PROFILER_H__
 #define __DG_PROFILER_H__
 
-#include "dgTypes.h"
+// uncomment out _DG_USE_PROFILER to enable detail profile captures
+// alternatively the end application can use a command line option to enable this define
+//#define _DG_USE_PROFILER
 
-#ifdef _DG_USE_PROFILER
+#ifdef D_PROFILER
+	#include <dProfiler.h>
 
-#define DG_SET_TRACK_NAME(trackName) dProfilerSetTrackName(trackName)
-#define DG_TRACKTIME(name) dProfilerZoneScoped(name)
-#define DG_TRACKTIME_NAMED(name) dProfilerZoneScoped(name)
-
+	#define D_TRACKTIME() dProfilerZoneScoped(__FUNCTION__)
+	#define D_SET_TRACK_NAME(trackName) dProfilerSetTrackName(trackName)
 #else
+	#define D_TRACKTIME() 
+	#define D_SET_TRACK_NAME(trackName)
+#endif
 
-#define DG_TRACKTIME(name);
-#define DG_TRACKTIME_NAMED(name);
-#define DG_SET_TRACK_NAME(trackName);
-
+	
+#ifdef _DG_USE_PROFILER
+	#define DG_TRACKTIME() D_TRACKTIME()
+#else
+	#define DG_TRACKTIME()
 #endif
 
 #endif
