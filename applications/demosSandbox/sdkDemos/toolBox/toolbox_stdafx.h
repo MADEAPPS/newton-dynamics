@@ -115,8 +115,6 @@ typedef long long unsigned64;
 	#endif
 #endif
 
-
-
 // SDK includes
 #include <Newton.h>
 #include <dVector.h>
@@ -124,6 +122,10 @@ typedef long long unsigned64;
 #include <dQuaternion.h>
 #include <dMathDefines.h>
 #include <dBezierSpline.h>
+
+#ifdef D_PROFILER
+#include <dProfiler.h>
+#endif
 
 #include <dCRC.h>
 #include <dMap.h>

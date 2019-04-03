@@ -25,29 +25,8 @@
 #include "dgTypes.h"
 
 #ifdef _DG_USE_PROFILER
-/*
-class dgProfile
-{
-	public:
-	dgProfile(const char* const functionName)
-		:m_entry(dProfilerStartTrace(functionName))
-	{
-	}
-
-	~dgProfile()
-	{
-		dProfilerEndTrace(m_entry);
-	}
-
-	private:
-	dgInt64 m_entry;
-};
-*/
 
 #define DG_SET_TRACK_NAME(trackName) dProfilerSetTrackName(trackName)
-//#define DG_TRACKTIME(name) dgProfile _profile##name(name);
-//#define DG_TRACKTIME_NAMED(name) dgProfile _profile(name);
-
 #define DG_TRACKTIME(name) dProfilerZoneScoped(name)
 #define DG_TRACKTIME_NAMED(name) dProfilerZoneScoped(name)
 

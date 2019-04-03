@@ -152,6 +152,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void ShowMainMenuBar();
 	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
 
+	void ToggleProfiler();
+
 	static void RenderDrawListsCallback(ImDrawData* const draw_data);
 
 	static void CharCallback(GLFWwindow* window, unsigned int ch);
@@ -216,7 +218,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 	bool m_solveLargeIslandInParallel;
 	bool m_showRaycastHit;
 
-	unsigned m_contactlock;
+	unsigned m_profilerMode;
+	unsigned m_contactLock;
 	dList<NewtonJoint*> m_contactList;
 
 	static SDKDemos m_demosSelection[];

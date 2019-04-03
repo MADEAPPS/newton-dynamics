@@ -33,6 +33,7 @@ struct dProfilerSourceLocation
 
 #ifdef D_PROFILER
 
+D_PROFILER_API void dProfilerEnableProlingLow (int mode);
 D_PROFILER_API long long dProfilerStartTraceLow(const dProfilerSourceLocation* const sourceLocation);
 D_PROFILER_API void dProfilerEndTraceLow(long long id);
 D_PROFILER_API void dProfilerSetTrackNameLow(const char* const trackName);
@@ -41,27 +42,21 @@ D_PROFILER_API void dProfilerSetTrackNameLow(const char* const trackName);
 class dgProfile
 {
 	public:
-	dgProfile(const dProfilerSourceLocation* const location, bool is_active = true)
-		:m_thread(0)
-		,m_active (is_active)
+	dgProfile(const dProfilerSourceLocation* const location)
+		:m_thread(dProfilerStartTraceLow(location))
 	{
-		if (m_active) {
-			m_thread = dProfilerStartTraceLow(location);
-		}
 	}
 
 	~dgProfile()
 	{
-		if (m_active) {
-			dProfilerEndTraceLow(m_thread);
-		}
+		dProfilerEndTraceLow(m_thread);
 	}
 
 	private:
 	long long m_thread;
-	bool m_active;
 };
 
+#define dProfilerEnableProling(mode) dProfilerEnableProlingLow(mode);
 #define dProfilerZoneScoped(name)					\
 static const dProfilerSourceLocation __dprofiler_source_location { NULL, __FUNCTION__,  __FILE__, (long long)__LINE__, 0 }; \
 dgProfile ___dgprofile_scoped_zone( &__dprofiler_source_location );
@@ -70,7 +65,7 @@ dgProfile ___dgprofile_scoped_zone( &__dprofiler_source_location );
 
 #else
 
-
+#define dProfilerEnableProling(mode);
 #define dProfilerZoneScoped(name)
 #define dProfilerSetTrackName(trackName)
 #endif

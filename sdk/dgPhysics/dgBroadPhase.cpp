@@ -1571,7 +1571,6 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 					contact->m_separationDistance = distance;
 				}
 				if (distance < DG_NARROW_PHASE_DIST) {
-
 					AddPair(contact, timestep, threadID);
 					if (contact->m_maxDOF) {
 						contact->m_timeOfImpact = dgFloat32(1.0e10f);

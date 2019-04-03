@@ -44,12 +44,12 @@
 //#define DEFAULT_SCENE	8		// primitive convex cast 
 //#define DEFAULT_SCENE	9		// box stacks
 //#define DEFAULT_SCENE	10		// simple level mesh collision
-#define DEFAULT_SCENE	11		// optimized level mesh collision
+//#define DEFAULT_SCENE	11		// optimized level mesh collision
 //#define DEFAULT_SCENE	12		// height field Collision
 //#define DEFAULT_SCENE	13		// infinite user plane collision
 //#define DEFAULT_SCENE	14		// user height field Collision
 //#define DEFAULT_SCENE	15		// compound Collision
-//#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
+#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	17		// uniform Scaled Collision
 //#define DEFAULT_SCENE	18		// non uniform Scaled Collision
 //#define DEFAULT_SCENE	19		// scaled mesh collision
@@ -257,7 +257,8 @@ DemoEntityManager::DemoEntityManager ()
 	,m_asynchronousPhysicsUpdate(false)
 	,m_solveLargeIslandInParallel(false)
 	,m_showRaycastHit(false)
-	,m_contactlock(0)
+	,m_profilerMode(0)
+	,m_contactLock(0)
 	,m_contactList()
 {
 	// Setup window
@@ -966,12 +967,30 @@ void DemoEntityManager::KeyCallback(GLFWwindow* const window, int key, int, int 
 	io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
 	io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
 	io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
+	
+	static int prevKey;
+	if ((key == GLFW_KEY_F10) && (key != prevKey)) {
+		DemoEntityManager* const manager = (DemoEntityManager*)glfwGetWindowUserPointer(window);
+		manager->ToggleProfiler();
+	}
 
 	if (key == GLFW_KEY_ESCAPE) {
 		glfwSetWindowShouldClose (window, 1);
 	}
+
+	prevKey = io.KeysDown[key] ? key : 0;
 }
 
+void DemoEntityManager::ToggleProfiler()
+{
+	#ifdef D_PROFILER
+		dAssert(m_world);
+		dTrace(("profiler Enable\n"));
+		NewtonWaitForUpdateToFinish(m_world);
+		m_profilerMode = !m_profilerMode;
+		dProfilerEnableProling(m_profilerMode);
+	#endif
+}
 
 void DemoEntityManager::BeginFrame()
 {
@@ -1269,7 +1288,7 @@ int DemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
 void DemoEntityManager::OnCreateContact(const NewtonWorld* const world, NewtonJoint* const contact)
 {
 	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-	dCustomScopeLock lock(&scene->m_contactlock);
+	dCustomScopeLock lock(&scene->m_contactLock);
 	NewtonJointSetUserData(contact, scene->m_contactList.Append(contact));
 }
 
@@ -1277,7 +1296,7 @@ void DemoEntityManager::OnDestroyContact(const NewtonWorld* const world, NewtonJ
 {
 	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 	dList<NewtonJoint*>::dListNode* const cooky = (dList<NewtonJoint*>::dListNode*)NewtonJointGetUserData(contact);
-	dCustomScopeLock lock(&scene->m_contactlock);
+	dCustomScopeLock lock(&scene->m_contactLock);
 	scene->m_contactList.Remove(cooky);
 }
 
@@ -1606,10 +1625,13 @@ void DemoEntityManager::Run()
     while (!glfwWindowShouldClose(m_mainFrame))
     {
 		m_suspendPhysicsUpdate = false;
-
 		BeginFrame();
-		RenderStats();
 
+		#ifdef D_PROFILER
+		dProfilerZoneScoped(__FUNCTION__);
+		#endif
+
+		RenderStats();
 		ImGui::Render();
 		glfwSwapBuffers(m_mainFrame);
     }

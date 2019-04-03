@@ -20,45 +20,58 @@
 	#include "client\TracyProfiler.hpp"
 
 	using namespace tracy;
+
+	static bool profileOn = false;
+
+	void dProfilerEnableProlingLow(int mode)
+	{
+		profileOn = mode ? true : false;
+	}
 	
 	long long dProfilerStartTraceLow(const dProfilerSourceLocation* const srcloc)
 	{
-		const auto thread = GetThreadHandle();
-		Magic magic;
-		auto token = GetToken();
-		auto& tail = token->get_tail_index();
-		auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>(magic);
-		MemWrite(&item->hdr.type, QueueType::ZoneBegin);
+		if (profileOn) {
+			const auto thread = GetThreadHandle();
+			Magic magic;
+			auto token = GetToken();
+			auto& tail = token->get_tail_index();
+			auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>(magic);
+			MemWrite(&item->hdr.type, QueueType::ZoneBegin);
 #ifdef TRACY_RDTSCP_OPT
-		MemWrite(&item->zoneBegin.time, Profiler::GetTime(item->zoneBegin.cpu));
+			MemWrite(&item->zoneBegin.time, Profiler::GetTime(item->zoneBegin.cpu));
 #else
-		uint32_t cpu;
-		MemWrite(&item->zoneBegin.time, Profiler::GetTime(cpu));
-		MemWrite(&item->zoneBegin.cpu, cpu);
+			uint32_t cpu;
+			MemWrite(&item->zoneBegin.time, Profiler::GetTime(cpu));
+			MemWrite(&item->zoneBegin.cpu, cpu);
 #endif
-		MemWrite(&item->zoneBegin.thread, thread);
-		MemWrite(&item->zoneBegin.srcloc, (uint64_t)srcloc);
-		tail.store(magic + 1, std::memory_order_release);
-		return long long(thread);
+			MemWrite(&item->zoneBegin.thread, thread);
+			MemWrite(&item->zoneBegin.srcloc, (uint64_t)srcloc);
+			tail.store(magic + 1, std::memory_order_release);
+			return long long(thread);
+		} else {
+			return 0;
+		}
 	}
 
 	void dProfilerEndTraceLow(long long threadId)
 	{
-		Magic magic;
-		std::thread::native_handle_type thread = (std::thread::native_handle_type) threadId;
-		auto token = GetToken();
-		auto& tail = token->get_tail_index();
-		auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>(magic);
-		MemWrite(&item->hdr.type, QueueType::ZoneEnd);
+		if (profileOn) {
+			Magic magic;
+			std::thread::native_handle_type thread = (std::thread::native_handle_type) threadId;
+			auto token = GetToken();
+			auto& tail = token->get_tail_index();
+			auto item = token->enqueue_begin<tracy::moodycamel::CanAlloc>(magic);
+			MemWrite(&item->hdr.type, QueueType::ZoneEnd);
 #ifdef TRACY_RDTSCP_OPT
-		MemWrite(&item->zoneEnd.time, Profiler::GetTime(item->zoneEnd.cpu));
+			MemWrite(&item->zoneEnd.time, Profiler::GetTime(item->zoneEnd.cpu));
 #else
-		uint32_t cpu;
-		MemWrite(&item->zoneEnd.time, Profiler::GetTime(cpu));
-		MemWrite(&item->zoneEnd.cpu, cpu);
+			uint32_t cpu;
+			MemWrite(&item->zoneEnd.time, Profiler::GetTime(cpu));
+			MemWrite(&item->zoneEnd.cpu, cpu);
 #endif
-		MemWrite(&item->zoneEnd.thread, thread);
-		tail.store(magic + 1, std::memory_order_release);
+			MemWrite(&item->zoneEnd.thread, thread);
+			tail.store(magic + 1, std::memory_order_release);
+		}
 	}
 
 	void dProfilerSetTrackNameLow(const char* const trackName)
@@ -68,6 +81,11 @@
 	}
 
 #else
+
+	void dProfilerEnableProlingLow(int mode)
+	{
+		mode = 0;
+	}
 
 	long long dProfilerStartTraceLow(const dProfilerSourceLocation* const)
 	{

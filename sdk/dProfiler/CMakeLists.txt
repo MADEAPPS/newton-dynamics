@@ -21,7 +21,7 @@ file(GLOB CPP_SOURCE *.cpp ../thirdParty/tracy/TracyClient.cpp)
 add_definitions(-DD_PROFILER_EXPORTS)
 
 if (NOT MSVC OR MSVC_VERSION VERSION_GREATER 1800)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4245 /wd4127 /wd4091 /wd4130 /wd4189 /wd4244 /wd4267 /wd4324 /wd4389 /wd4701 /wd4702 /wd4800 /wd4996")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4245 /wd4127 /wd4091 /wd4130 /wd4189 /wd4244 /wd4267 /wd4324 /wd4389 /wd4456 /wd4701 /wd4702 /wd4800 /wd4996")
 	include_directories(../thirdParty/tracy/)
 	add_definitions(-DTRACY_ENABLE)
 endif()
