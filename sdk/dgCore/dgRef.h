@@ -23,7 +23,6 @@
 #define __dgRef__
 
 #include "dgStdafx.h"
-#include "dgCRC.h"
 #include "dgRtti.h"
 #include "dgDebug.h"
 #include "dgMemory.h"
@@ -174,11 +173,6 @@ inline dgUnsigned32 dgRef::GetRttiType()
 	return m_rtti.GetTypeId();
 }
 
-inline bool dgRef::IsTypeByName (const char *typeName) const
-{
-	return IsType (dgCRC (typeName,  (dgInt32) strlen (typeName)));
-}
-
 
 inline bool dgRef::GetUserFlag0 () const
 {
@@ -227,13 +221,6 @@ inline dgUnsigned32 dgRef::GetNameID () const
 	return m_id;
 }
 
-inline void dgRef::SetName (const char *name)
-{
-	SetNameID (0);
-	if (name) {
-		SetNameID (dgCRC (name));
-	}
-}
 
 inline const char* dgRef::GetName () const
 {

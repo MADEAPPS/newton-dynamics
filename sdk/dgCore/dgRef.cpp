@@ -27,6 +27,19 @@
 
 dgRtti dgRef::m_rtti ("dgRef");
 
+void dgRef::SetName(const char *name)
+{
+	SetNameID(0);
+	if (name) {
+		SetNameID(dgCRC(name));
+	}
+}
+
+bool dgRef::IsTypeByName(const char *typeName) const
+{
+	return IsType(dgCRC(typeName, (dgInt32)strlen(typeName)));
+}
+
 
 void dgRef::AttachRef (
 	dgRef **oldObj, 
