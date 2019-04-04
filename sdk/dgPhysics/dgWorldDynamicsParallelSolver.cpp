@@ -280,6 +280,7 @@ DG_INLINE void dgParallelBodySolver::TransposeRow(dgSolverSoaElement* const row,
 {
 	const dgLeftHandSide* const leftHandSide = &m_world->m_solverMemory.m_leftHandSizeBuffer[0];
 	const dgRightHandSide* const rightHandSide = &m_world->m_solverMemory.m_righHandSizeBuffer[0];
+	dgInt32* const normalIndex = (dgInt32*) &row->m_normalForceIndex[0];
 	if (jointInfoArray[0].m_pairCount == jointInfoArray[DG_WORK_GROUP_SIZE - 1].m_pairCount) {
 		for (dgInt32 i = 0; i < DG_WORK_GROUP_SIZE; i++) {
 			const dgJointInfo* const jointInfo = &jointInfoArray[i];
@@ -318,7 +319,8 @@ DG_INLINE void dgParallelBodySolver::TransposeRow(dgSolverSoaElement* const row,
 			row->m_coordenateAccel[i] = rhs->m_coordenateAccel;
 			row->m_lowerBoundFrictionCoefficent[i] = rhs->m_lowerBoundFrictionCoefficent;
 			row->m_upperBoundFrictionCoefficent[i] = rhs->m_upperBoundFrictionCoefficent;
-			row->m_normalForceIndex.m_i[i] = (rhs->m_normalForceIndex + 1) * DG_WORK_GROUP_SIZE + i;
+			//row->m_normalForceIndex.m_i[i] = (rhs->m_normalForceIndex + 1) * DG_WORK_GROUP_SIZE + i;
+			normalIndex[i] = (rhs->m_normalForceIndex + 1) * DG_WORK_GROUP_SIZE + i;
 		}
 	} else {
 		memset(row, 0, sizeof (dgSolverSoaElement));
@@ -360,10 +362,11 @@ DG_INLINE void dgParallelBodySolver::TransposeRow(dgSolverSoaElement* const row,
 				row->m_coordenateAccel[i] = rhs->m_coordenateAccel;
 				row->m_lowerBoundFrictionCoefficent[i] = rhs->m_lowerBoundFrictionCoefficent;
 				row->m_upperBoundFrictionCoefficent[i] = rhs->m_upperBoundFrictionCoefficent;
-				row->m_normalForceIndex.m_i[i] = (rhs->m_normalForceIndex + 1) * DG_WORK_GROUP_SIZE + i;
+				//row->m_normalForceIndex.m_i[i] = (rhs->m_normalForceIndex + 1) * DG_WORK_GROUP_SIZE + i;
+				normalIndex[i] = (rhs->m_normalForceIndex + 1) * DG_WORK_GROUP_SIZE + i;
 			} else {
-				//row->m_normalForceIndex.SetInt(i, DG_INDEPENDENT_ROW);
-				row->m_normalForceIndex.m_i[i] = i;
+				//row->m_normalForceIndex.m_i[i] = i;
+				normalIndex[i] = i;
 			}
 		}
 	}
