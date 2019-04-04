@@ -24,43 +24,56 @@
 *  Visual C++ 6.0 created by: Julio Jerez
 *
 ****************************************************************************/
-#ifndef __dgPolygonSoupDatabase_H_
-#define __dgPolygonSoupDatabase_H_
-
 
 #include "dgStdafx.h"
-#include "dgRef.h"
-#include "dgArray.h"
-#include "dgIntersections.h"
-
-class dgMatrix;
+#include "dgPolygonSoupDatabase.h"
 
 
-
-class dgPolygonSoupDatabase
+dgPolygonSoupDatabase::dgPolygonSoupDatabase(const char* const name)
 {
-	public:
-	dgFloat32 GetRadius() const;
-	dgInt32 GetVertexCount() const;
-	dgInt32 GetStrideInBytes() const;
-	dgFloat32* GetLocalVertexPool() const;
+	m_vertexCount = 0;
+	m_strideInBytes = 0;
+	m_localVertex = NULL;
+}
 
-	dgUnsigned32 GetTagId(const dgInt32* const face, dgInt32 indexCount) const;
-	void SetTagId(const dgInt32* const face, dgInt32 indexCount, dgUnsigned32 newID) const;
-
-	virtual void Serialize (dgSerialize callback, void* const userData) const = 0;
-	virtual void Deserialize (dgDeserialize callback, void* const userData, dgInt32 revisionNumber) = 0;
-		
-	protected:
-	dgPolygonSoupDatabase(const char* const name = NULL);
-	virtual ~dgPolygonSoupDatabase ();
-
-	dgInt32 m_vertexCount;
-	dgInt32 m_strideInBytes;
-	dgFloat32* m_localVertex;
-};
+dgPolygonSoupDatabase::~dgPolygonSoupDatabase ()
+{
+	if (m_localVertex) {
+		dgFreeStack (m_localVertex);
+	}
+}
 
 
+dgUnsigned32 dgPolygonSoupDatabase::GetTagId(const dgInt32* const face, dgInt32 indexCount) const
+{
+	return dgUnsigned32 (face[indexCount]);
+}
 
-#endif
+void dgPolygonSoupDatabase::SetTagId(const dgInt32* const facePtr, dgInt32 indexCount, dgUnsigned32 newID) const
+{
+	dgUnsigned32* const face = (dgUnsigned32*) facePtr;
+	face[indexCount] = newID;
+}
+
+dgInt32 dgPolygonSoupDatabase::GetVertexCount()	const
+{
+	return m_vertexCount;
+}
+
+dgFloat32* dgPolygonSoupDatabase::GetLocalVertexPool() const
+{
+	return m_localVertex;
+}
+
+dgInt32 dgPolygonSoupDatabase::GetStrideInBytes() const
+{
+	return m_strideInBytes;
+}
+
+dgFloat32 dgPolygonSoupDatabase::GetRadius() const
+{
+	return 0.0f;
+}
+
+
 

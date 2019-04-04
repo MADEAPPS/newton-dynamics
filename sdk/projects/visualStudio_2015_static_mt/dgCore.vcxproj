@@ -52,6 +52,7 @@
     <ClCompile Include="..\..\dgCore\dgNode.cpp" />
     <ClCompile Include="..\..\dgCore\dgObb.cpp" />
     <ClCompile Include="..\..\dgCore\dgPolygonSoupBuilder.cpp" />
+    <ClCompile Include="..\..\dgCore\dgPolygonSoupDatabase.cpp" />
     <ClCompile Include="..\..\dgCore\dgPolyhedra.cpp" />
     <ClCompile Include="..\..\dgCore\dgPolyhedraMassProperties.cpp" />
     <ClCompile Include="..\..\dgCore\dgProfiler.cpp" />
