@@ -123,7 +123,7 @@ void dgSolver::InitBodyArray()
 
 void dgSolver::InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID)
 {
-	DG_TRACKTIME();
+	D_TRACKTIME();
 	dgSolver* const me = (dgSolver*)context;
 	me->InitBodyArray(threadID);
 }
@@ -247,14 +247,14 @@ dgInt32 dgSolver::CompareJointInfos(const dgJointInfo* const infoA, const dgJoin
 
 void dgSolver::InitJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID)
 {
-	DG_TRACKTIME();
+	D_TRACKTIME();
 	dgSolver* const me = (dgSolver*)context;
 	me->InitJacobianMatrix(threadID);
 }
 
 void dgSolver::TransposeMassMatrixKernel(void* const context, void* const, dgInt32 threadID)
 {
-	DG_TRACKTIME();
+	D_TRACKTIME();
 	dgSolver* const me = (dgSolver*)context;
 	me->TransposeMassMatrix(threadID);
 }
@@ -495,49 +495,49 @@ DG_INLINE void dgSolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLef
 
 void dgSolver::CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID)
 {
-	DG_TRACKTIME();
+	D_TRACKTIME();
 	dgSolver* const me = (dgSolver*)context;
 	me->CalculateJointsAcceleration(threadID);
 }
 
 void dgSolver::CalculateJointsForceKernel(void* const context, void* const, dgInt32 threadID)
 {
-	DG_TRACKTIME();
+	D_TRACKTIME();
 	dgSolver* const me = (dgSolver*)context;
 	me->CalculateJointsForce(threadID);
 }
 
 void dgSolver::IntegrateBodiesVelocityKernel(void* const context, void* const worldContext, dgInt32 threadID)
 {
-	DG_TRACKTIME();
+	D_TRACKTIME();
 	dgSolver* const me = (dgSolver*)context;
 	me->IntegrateBodiesVelocity(threadID);
 }
 
 void dgSolver::CalculateBodiesAccelerationKernel(void* const context, void* const, dgInt32 threadID)
 {
-	DG_TRACKTIME();
+	D_TRACKTIME();
 	dgSolver* const me = (dgSolver*)context;
 	me->CalculateBodiesAcceleration(threadID);
 }
 
 void dgSolver::UpdateForceFeedbackKernel(void* const context, void* const, dgInt32 threadID)
 {
-	DG_TRACKTIME();
+	D_TRACKTIME();
 	dgSolver* const me = (dgSolver*)context;
 	me->UpdateForceFeedback(threadID);
 }
 
 void dgSolver::UpdateKinematicFeedbackKernel(void* const context, void* const, dgInt32 threadID)
 {
-	DG_TRACKTIME();
+	D_TRACKTIME();
 	dgSolver* const me = (dgSolver*)context;
 	me->UpdateKinematicFeedback(threadID);
 }
 
 void dgSolver::UpdateRowAccelerationKernel(void* const context, void* const, dgInt32 threadID)
 {
-	DG_TRACKTIME();
+	D_TRACKTIME();
 	dgSolver* const me = (dgSolver*)context;
 	me->UpdateRowAcceleration(threadID);
 }
@@ -585,7 +585,6 @@ void dgSolver::IntegrateBodiesVelocity()
 	}
 	m_world->SynchronizationBarrier();
 }
-
 
 void dgSolver::UpdateForceFeedback()
 {
@@ -1030,14 +1029,14 @@ void dgSolver::UpdateKinematicFeedback(dgInt32 threadID)
 
 void dgSolver::UpdateSkeletonsKernel(void* const context, void* const, dgInt32 threadID)
 {
-	DG_TRACKTIME();
+	D_TRACKTIME();
 	dgSolver* const me = (dgSolver*)context;
 	me->UpdateSkeletons(threadID);
 }
 
 void dgSolver::InitSkeletonsKernel(void* const context, void* const, dgInt32 threadID)
 {
-	DG_TRACKTIME();
+	D_TRACKTIME();
 	dgSolver* const me = (dgSolver*)context;
 	me->InitSkeletons(threadID);
 }

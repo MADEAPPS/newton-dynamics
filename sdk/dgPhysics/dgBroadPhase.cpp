@@ -230,9 +230,9 @@ dgBroadPhaseTreeNode* dgBroadPhase::InsertNode(dgBroadPhaseNode* const root, dgB
 	return parent;
 }
 
-
 void dgBroadPhase::UpdateAggregateEntropyKernel(void* const context, void* const node, dgInt32 threadID)
 {
+	D_TRACKTIME();
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -241,6 +241,7 @@ void dgBroadPhase::UpdateAggregateEntropyKernel(void* const context, void* const
 
 void dgBroadPhase::ForceAndToqueKernel(void* const context, void* const node, dgInt32 threadID)
 {
+	D_TRACKTIME();
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -249,6 +250,7 @@ void dgBroadPhase::ForceAndToqueKernel(void* const context, void* const node, dg
 
 void dgBroadPhase::SleepingStateKernel(void* const context, void* const node, dgInt32 threadID)
 {
+	D_TRACKTIME();
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -275,7 +277,6 @@ void dgBroadPhase::UpdateAggregateEntropy (dgBroadphaseSyncDescriptor* const des
 		}
 	}
 }
-
 
 void dgBroadPhase::ApplyForceAndtorque(dgBroadphaseSyncDescriptor* const descriptor, dgBodyMasterList::dgListNode* node, dgInt32 threadID)
 {
@@ -1462,6 +1463,7 @@ void dgBroadPhase::KinematicBodyActivation (dgContact* const contatJoint) const
 
 void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, dgInt32 threadID)
 {
+	D_TRACKTIME();
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -1470,6 +1472,7 @@ void dgBroadPhase::CollidingPairsKernel(void* const context, void* const node, d
 
 void dgBroadPhase::AddNewContactsKernel(void* const context, void* const newContactNode, dgInt32 threadID)
 {
+	D_TRACKTIME();
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -1478,6 +1481,7 @@ void dgBroadPhase::AddNewContactsKernel(void* const context, void* const newCont
 
 void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
+	D_TRACKTIME();
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*) context;
 	dgWorld* const world = (dgWorld*) worldContext;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -1486,6 +1490,7 @@ void dgBroadPhase::AddGeneratedBodiesContactsKernel (void* const context, void* 
 
 void dgBroadPhase::UpdateSoftBodyContactKernel(void* const context, void* const worldContext, dgInt32 threadID)
 {
+	D_TRACKTIME();
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
@@ -1494,6 +1499,7 @@ void dgBroadPhase::UpdateSoftBodyContactKernel(void* const context, void* const 
 
 void dgBroadPhase::UpdateRigidBodyContactKernel(void* const context, void* const node, dgInt32 threadID)
 {
+	D_TRACKTIME();
 	dgBroadphaseSyncDescriptor* const descriptor = (dgBroadphaseSyncDescriptor*)context;
 	dgWorld* const world = descriptor->m_world;
 	dgBroadPhase* const broadPhase = world->GetBroadPhase();
