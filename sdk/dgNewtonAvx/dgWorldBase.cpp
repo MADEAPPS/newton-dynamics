@@ -66,6 +66,10 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	} else {
 		return NULL;
 	}
+#elif defined (_MACOSX_VER)
+	static dgWorldBase module(world, allocator);
+	module.m_score = 3;
+	return &module;
 #endif
 }
 

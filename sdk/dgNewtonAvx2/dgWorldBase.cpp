@@ -71,6 +71,12 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	} else {
 		return NULL;
 	}
+#elif defined (_MACOSX_VER)
+	// must macs support avx2 bu for now let use do avx only
+	//static dgWorldBase module(world, allocator);
+	//module.m_score = 4;
+	//return &module;
+	return NULL;
 #endif
 }
 
