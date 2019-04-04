@@ -194,7 +194,8 @@ class dgSoaFloat
 	}
 
 	DG_INLINE dgSoaFloat(const dgVector& low, const dgVector& high)
-		: m_type(_mm256_loadu2_m128(&high.m_x, &low.m_x))
+//		:m_type(_mm256_loadu2_m128(&high.m_x, &low.m_x))
+		:m_type(_mm256_set_m128 (high.m_type, low.m_type))
 	{
 	}
 
