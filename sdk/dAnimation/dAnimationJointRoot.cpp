@@ -11,12 +11,14 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimationJointRoot.h"
+#include "dAnimationLoopJoint.h"
 #include "dAnimationModelManager.h"
 
 dAnimationJointRoot::dAnimationJointRoot(NewtonBody* const body, const dMatrix& bindMarix)
 	:dAnimationJoint(body, bindMarix, NULL)
-	,m_solver()
 	,m_staticBody()
+	,m_solver()
+	,m_loopJoints()
 	,m_manager(NULL)
 	,m_managerNode(NULL)
 	,m_calculateLocalTransform(true)
@@ -25,6 +27,10 @@ dAnimationJointRoot::dAnimationJointRoot(NewtonBody* const body, const dMatrix& 
 
 dAnimationJointRoot::~dAnimationJointRoot()
 {
+	for (dAnimationLoopJointList::dListNode* ptr = m_loopJoints.GetFirst(); ptr; ptr = ptr->GetNext()) {
+		delete ptr->GetInfo();
+	}
+
 	if (m_manager) {
 		dAssert(m_managerNode);
 		m_manager->RemoveModel(this);

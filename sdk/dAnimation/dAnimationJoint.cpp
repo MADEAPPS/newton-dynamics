@@ -15,6 +15,7 @@
 
 dAnimationJoint::dAnimationJoint(NewtonBody* const body, const dMatrix& bindMarix, dAnimationJoint* const parent)
 	:dCustomAlloc()
+	,m_proxyBody()
 	,m_bindMatrix(bindMarix)
 	,m_userData(NULL)
 	,m_body(body)
@@ -26,6 +27,7 @@ dAnimationJoint::dAnimationJoint(NewtonBody* const body, const dMatrix& bindMari
 	if (m_parent) {
 		m_parent->m_children.Append(this);
 	}
+	m_proxyBody.m_owner = this;
 }
 
 dAnimationJoint::~dAnimationJoint()

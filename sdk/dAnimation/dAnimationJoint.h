@@ -21,6 +21,18 @@ class dAnimationJointChildren: public dList<dAnimationJoint*>
 {
 };
 
+class dAnimationBody: public dComplementaritySolver::dBodyState
+{
+	public:
+	dAnimationBody ()
+		:dComplementaritySolver::dBodyState()
+		,m_owner(NULL)
+	{
+	}
+
+	dAnimationJoint* m_owner;
+};
+
 class dAnimationJoint: public dCustomAlloc
 {
 	public:
@@ -38,13 +50,13 @@ class dAnimationJoint: public dCustomAlloc
 
 	NewtonBody* GetBody() const;
 	dCustomJoint* GetJoint() const;
-	dComplementaritySolver::dBodyState* GetProxyBody(); 
+	dAnimationBody* GetProxyBody();
 
 	protected:
 	virtual void PreUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
 	virtual void PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
 
-	dComplementaritySolver::dBodyState m_proxyBody;
+	dAnimationBody m_proxyBody;
 	dMatrix m_bindMatrix;
 	void* m_userData;
 	NewtonBody* m_body;
@@ -85,7 +97,7 @@ inline dCustomJoint* dAnimationJoint::GetJoint() const
 	return NULL;
 }
 
-inline dComplementaritySolver::dBodyState* dAnimationJoint::GetProxyBody()
+inline dAnimationBody* dAnimationJoint::GetProxyBody()
 {
 	return &m_proxyBody;
 }

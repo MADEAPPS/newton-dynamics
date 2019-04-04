@@ -17,13 +17,24 @@
 #include "dAnimationJoint.h"
 #include "dAnimationJointSolver.h"
 
+class dAnimationLoopJoint;
 class dAnimationModelManager;
+
+class dAnimationLoopJointList: public dList<dAnimationLoopJoint*>
+{
+};
+
 
 class dAnimationJointRoot: public dAnimationJoint
 {
 	public:
 	dAnimationJointRoot(NewtonBody* const body, const dMatrix& bindMarix);
 	virtual ~dAnimationJointRoot();
+
+	dAnimationLoopJointList& GetLoops();
+	const dAnimationLoopJointList& GetLoops() const;
+
+	dAnimationBody* GetStaticWorld();
 
 	void SetCalculateLocalTransforms(bool val);
 	bool GetCalculateLocalTransforms() const;
@@ -32,14 +43,31 @@ class dAnimationJointRoot: public dAnimationJoint
 	virtual void PreUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
 	virtual void PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
 
+	dAnimationBody m_staticBody;
 	dAnimationJointSolver m_solver;
-	dComplementaritySolver::dBodyState m_staticBody;
+	dAnimationLoopJointList m_loopJoints;
 
 	dAnimationModelManager* m_manager;
 	dList<dAnimationJointRoot*>::dListNode* m_managerNode;
 	bool m_calculateLocalTransform;
 	friend class dAnimationModelManager;
 };
+
+
+inline dAnimationLoopJointList& dAnimationJointRoot::GetLoops()
+{
+	return m_loopJoints;
+}
+
+inline const dAnimationLoopJointList& dAnimationJointRoot::GetLoops() const
+{
+	return m_loopJoints;
+}
+
+inline dAnimationBody* dAnimationJointRoot::GetStaticWorld()
+{
+	return &m_staticBody;
+}
 
 inline void dAnimationJointRoot::SetCalculateLocalTransforms(bool val) 
 { 

@@ -773,6 +773,31 @@ xxxx1->ResetMatrix(*scene, matrix1);
 #endif
 
 
+class dAnimationHipEffector: public dAnimationLoopJoint
+{
+	public:
+	dAnimationHipEffector(dAnimationJointRoot* const root)
+		:dAnimationLoopJoint(root->GetProxyBody(), root->GetStaticWorld())
+	{
+	}
+
+	virtual int GetMaxDof() const
+	{
+		dAssert(0);
+		return 0;
+	}
+
+	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+	{
+		dAssert(0);
+	}
+
+	virtual void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
+	{
+		dAssert(0);
+	}
+};
+
 class DynamicRagdollManager: public dAnimationModelManager
 {
 	class dJointDefinition
@@ -918,7 +943,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 		static dJointDefinition jointsDefinition[] =
 		{
 			{ "body" },
-			{ "leg", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "leg", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 			//{ "foot", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 		};
 		const int definitionCount = sizeof (jointsDefinition)/sizeof (jointsDefinition[0]);
@@ -940,6 +965,9 @@ class DynamicRagdollManager: public dAnimationModelManager
 		dDynamicsRagdoll* const dynamicRagdoll = new dDynamicsRagdoll(rootBody, dGetIdentityMatrix());
 		AddModel(dynamicRagdoll);
 		dynamicRagdoll->SetCalculateLocalTransforms(true);
+
+		// attach a Hip effector to the root body
+		dynamicRagdoll->GetLoops().Append(new dAnimationHipEffector(dynamicRagdoll));
 
 		// save the controller as the collision user data, for collision culling
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBody), dynamicRagdoll);

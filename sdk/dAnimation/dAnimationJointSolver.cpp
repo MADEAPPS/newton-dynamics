@@ -635,6 +635,9 @@ void dAnimationJointSolver::InitMassMatrix()
 
 int dAnimationJointSolver::BuildJacobianMatrix(dFloat timestep, dComplementaritySolver::dBilateralJoint* const joint)
 {
+	dAssert(0);
+	return 0;
+/*
 	dComplementaritySolver::dParamInfo constraintParams;
 	constraintParams.m_timestep = timestep;
 	constraintParams.m_timestepInv = 1.0f / timestep;
@@ -647,8 +650,8 @@ int dAnimationJointSolver::BuildJacobianMatrix(dFloat timestep, dComplementarity
 
 	// complete the derivative matrix for this joint
 	const int index = joint->m_start;
-	dComplementaritySolver::dBodyState* const state0 = joint->m_state0;
-	dComplementaritySolver::dBodyState* const state1 = joint->m_state1;
+	dAnimationBody* const state0 = joint->m_state0;
+	dAnimationBody* const state1 = joint->m_state1;
 	const dMatrix& invInertia0 = state0->GetInvInertia();
 	const dMatrix& invInertia1 = state1->GetInvInertia();
 	dFloat invMass0 = state0->GetInvMass();
@@ -679,6 +682,7 @@ int dAnimationJointSolver::BuildJacobianMatrix(dFloat timestep, dComplementarity
 	}
 
 	return dofCount;
+*/
 }
 
 int dAnimationJointSolver::BuildJacobianMatrix(dFloat timestep)
