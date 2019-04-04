@@ -75,7 +75,7 @@ class dgRef: public dgRefFlags
 	const char* GetName () const;
 	dgUnsigned32 GetNameID () const;
 	inline void SetNameID (dgUnsigned32 newID);
-	virtual inline void SetName (const char *name);
+	virtual void SetName (const char *name);
 
 	void AttachRef (dgRef **oldRef, dgRef *newRef);
 
