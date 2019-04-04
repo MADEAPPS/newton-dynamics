@@ -30,14 +30,13 @@ struct dProfilerSourceLocation
 	long long color;
 };
 
-
-#ifdef D_PROFILER
-
-D_PROFILER_API void dProfilerEnableProlingLow (int mode);
+D_PROFILER_API void dProfilerEnableProlingLow(int mode);
 D_PROFILER_API long long dProfilerStartTraceLow(const dProfilerSourceLocation* const sourceLocation);
 D_PROFILER_API void dProfilerEndTraceLow(long long id);
 D_PROFILER_API void dProfilerSetTrackNameLow(const char* const trackName);
 
+
+#ifdef D_PROFILER
 
 class dgProfile
 {

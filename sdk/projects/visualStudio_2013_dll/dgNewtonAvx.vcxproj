@@ -55,7 +55,7 @@
     <ClInclude Include="..\..\dgNewtonAvx\dgWorldBase.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\visualStudio_2013_static_mt\dProfiler.vcxproj">
+    <ProjectReference Include="dProfiler.vcxproj">
       <Project>{89509957-ce86-4ace-946c-7a65e63f0f23}</Project>
     </ProjectReference>
   </ItemGroup>
