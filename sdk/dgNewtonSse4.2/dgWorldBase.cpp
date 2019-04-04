@@ -66,7 +66,7 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	} else {
 		return NULL;
 	}
-#elsif defined _MACOSX_VER
+#elsif defined (_MACOSX_VER)
 	return NULL;
 #endif
 }
