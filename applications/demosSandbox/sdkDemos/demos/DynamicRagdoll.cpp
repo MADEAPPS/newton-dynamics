@@ -825,11 +825,10 @@ class dDynamicsRagdoll: public dAnimationJointRoot
 		m_proxyBody.SetForce(dVector (0.0f));
 		m_proxyBody.SetTorque(dVector(0.0f));
 
-
 		//if (m_animationTree) {
 		//	m_animationTree->Update(timestep);
 		//}
-		//m_solver.Update(timestep);
+		m_solver.Update(timestep);
 		//UpdateJointAcceleration();
 	}
 };
@@ -1048,6 +1047,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 		worldMatrix.m_posit = location.m_posit;
 		NewtonBodySetMatrixRecursive(rootBody, &worldMatrix[0][0]);
 
+		dynamicRagdoll->Finalize();
 		//return controller;
 	}
 

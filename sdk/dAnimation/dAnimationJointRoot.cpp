@@ -37,6 +37,11 @@ dAnimationJointRoot::~dAnimationJointRoot()
 	}
 }
 
+void dAnimationJointRoot::Finalize()
+{
+	m_solver.Finalize(this);
+}
+
 void dAnimationJointRoot::UpdateTransforms(dFloat timestep) const
 {
 	if (m_calculateLocalTransform) {

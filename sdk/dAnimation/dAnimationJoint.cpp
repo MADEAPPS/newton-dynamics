@@ -67,3 +67,10 @@ void dAnimationJoint::RigidBodyToStates()
 		node->GetInfo()->RigidBodyToStates();
 	}
 }
+
+void dAnimationJoint::ApplyExternalForce(dFloat timestep)
+{
+	for (dAnimationJointChildren::dListNode* node = m_children.GetFirst(); node; node = node->GetNext()) {
+		node->GetInfo()->ApplyExternalForce(timestep);
+	}
+}

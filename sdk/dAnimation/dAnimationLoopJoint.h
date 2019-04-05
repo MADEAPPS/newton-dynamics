@@ -13,10 +13,12 @@
 #define __D_ANIMATION_LOOP_JOINT_H__
 
 #include "dAnimationStdAfx.h"
+#include "dAnimationJoint.h"
 
-class dAnimationJoint;
+//class dAnimationJoint;
 
-class dAnimationLoopJoint: public dCustomAlloc, public dComplementaritySolver::dBilateralJoint
+//class dAnimationLoopJoint: public dCustomAlloc, public dComplementaritySolver::dBilateralJoint
+class dAnimationLoopJoint: public dCustomAlloc, public dAnimationContraint
 {
 	public:
 	dAnimationLoopJoint(dAnimationBody* const owner0, dAnimationBody* const owner1);

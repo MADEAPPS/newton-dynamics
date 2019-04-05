@@ -17,10 +17,10 @@
 
 dAnimationLoopJoint::dAnimationLoopJoint(dAnimationBody* const owner0, dAnimationBody* const owner1)
 	:dCustomAlloc()
-	,dComplementaritySolver::dBilateralJoint()
+	,dAnimationContraint()
 	,m_owner0(owner0)
 	,m_owner1(owner1)
-	,m_isActive(false)
+	,m_isActive(true)
 {
 }
 

@@ -12,6 +12,8 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimationJoint.h"
+#include "dAnimationJointRoot.h"
+#include "dAnimationLoopJoint.h"
 #include "dAnimationJointSolver.h"
 //#include "dAnimationJoint.h"
 //#include "dAnimationJointSolver.h"
@@ -57,7 +59,7 @@ dAnimationJointSolver::dAnimationJointSolver()
 	m_pairs = NULL;
 	m_rootNode = NULL;
 	m_nodesOrder = NULL;
-//	m_loopJoints = NULL;
+	m_loopJoints = NULL;
 	m_deltaForce = NULL;
 	m_leftHandSide = NULL;
 	m_massMatrix10 = NULL;
@@ -121,12 +123,10 @@ void dAnimationJointSolver::SortGraph(dAnimationJoint* const root, int& index)
 */
 }
 
-void dAnimationJointSolver::Finalize(dAnimationJoint* const rootNode)
+void dAnimationJointSolver::Finalize(dAnimationJointRoot* const rootNode)
 {
-	dAssert(0);
-/*
 	m_rootNode = rootNode;
-	if (!rootNode->m_children.GetCount()) {
+	if (!rootNode->GetChidren().GetCount()) {
 		return ;
 	}
 
@@ -134,6 +134,8 @@ void dAnimationJointSolver::Finalize(dAnimationJoint* const rootNode)
 		delete m_nodesOrder;
 	}
 
+	dAssert(0);
+	/*
 	m_nodeCount = CalculateNodeCount ();
 	m_maxNodeCount = m_nodeCount * 2 + 8;
 	m_nodesOrder = new dAnimationJoint*[m_maxNodeCount * sizeof (dAnimationJoint*)];
@@ -1269,42 +1271,48 @@ void dAnimationJointSolver::DebugMassMatrix()
 
 void dAnimationJointSolver::Update(dFloat timestep)
 {
-	dAssert(0);
-/*
-	if (!(m_rootNode && m_rootNode->m_children.GetCount())) {
+	if (!(m_rootNode && m_rootNode->GetChidren().GetCount())) {
 		return;
 	}
 
-	dAnimIDRigKinematicLoopJoint* kinematicLoop[128];
+	dAnimationLoopJoint* kinematicLoop[128];
 	m_loopJoints = kinematicLoop;
 
 	m_rootNode->ApplyExternalForce(timestep);
-
-	m_loopJointCount = m_rootNode->GetKinematicLoops(m_loopJoints);
-
+	
+//	m_loopJointCount = m_rootNode->GetKinematicLoops(m_loopJoints);
+return;
 	int loopDof = 0;
 	m_loopNodeCount = 0;
-	for (int i = 0; i < m_loopJointCount; i ++) {
-		dAnimIDRigKinematicLoopJoint* const loop = m_loopJoints[i];
-		dAssert (loop->IsActive());
-		loopDof += loop->GetMaxDof();
-		dAnimationJoint* const node0 = loop->GetOwner0();
-		dAnimationJoint* const node1 = loop->GetOwner1();
-
-		if (node0->IsLoopNode() && (node0->GetIndex() == -1)) {
-			node0->SetIndex(m_loopNodeCount + m_nodeCount);
-			m_nodesOrder[m_nodeCount + m_loopNodeCount] = node0;
-			dAssert ((m_nodeCount + m_loopNodeCount) < m_maxNodeCount);
-			m_loopNodeCount ++;
-		}
-		if (node1->IsLoopNode() && (node1->GetIndex() == -1)) {
-			node1->SetIndex(m_loopNodeCount + m_nodeCount);
-			m_nodesOrder[m_nodeCount + m_loopNodeCount] = node1;
-			dAssert ((m_nodeCount + m_loopNodeCount) < m_maxNodeCount);
+	const dAnimationLoopJointList& loopList = m_rootNode->GetLoops();
+//	for (int i = 0; i < m_loopJointCount; i ++) {
+	for (dAnimationLoopJointList::dListNode* node = loopList.GetFirst(); node; node = node->GetNext()) {
+		dAnimationLoopJoint* const loop = node->GetInfo();
+		if (loop->IsActive()) {
+			loopDof += loop->GetMaxDof();
+/*
+			dAnimationJoint* const node0 = loop->GetOwner0()->m_owner;
+			dAnimationJoint* const node1 = loop->GetOwner1()->m_owner;
+			if (node0->IsLoopNode() && (node0->GetIndex() == -1)) {
+				node0->SetIndex(m_loopNodeCount + m_nodeCount);
+				m_nodesOrder[m_nodeCount + m_loopNodeCount] = node0;
+				dAssert((m_nodeCount + m_loopNodeCount) < m_maxNodeCount);
+				m_loopNodeCount++;
+			}
+			if (node1->IsLoopNode() && (node1->GetIndex() == -1)) {
+				node1->SetIndex(m_loopNodeCount + m_nodeCount);
+				m_nodesOrder[m_nodeCount + m_loopNodeCount] = node1;
+				dAssert((m_nodeCount + m_loopNodeCount) < m_maxNodeCount);
+				m_loopNodeCount++;
+			}
+*/
+			m_nodesOrder[m_nodeCount + m_loopNodeCount] = loop;
 			m_loopNodeCount++;
 		}
 	}
 
+//	dAssert(0);
+/*
 	int totalJoint = m_nodeCount + m_loopNodeCount;
 	m_data = dAlloca(dBodyJointMatrixDataPair, m_nodeCount);
 	m_leftHandSide = dAlloca(dComplementaritySolver::dJacobianPair, totalJoint * 6 + loopDof);

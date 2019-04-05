@@ -38,6 +38,8 @@ class dAnimationJointRoot: public dAnimationJoint
 	void SetCalculateLocalTransforms(bool val);
 	bool GetCalculateLocalTransforms() const;
 
+	void Finalize();
+
 	protected:
 	virtual void PreUpdate(dFloat timestep) {};
 	virtual void PostUpdate(dFloat timestep) {};
