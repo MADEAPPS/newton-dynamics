@@ -792,8 +792,7 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 
 	virtual int GetMaxDof() const
 	{
-		dAssert(0);
-		return 0;
+		return 6;
 	}
 
 	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)

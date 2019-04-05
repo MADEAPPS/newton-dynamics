@@ -69,8 +69,8 @@ class dAnimationJointSolver: public dCustomAlloc
 	void DebugMassMatrix();
 
 	dAnimationJointRoot* m_rootNode;
-//	dAnimationJoint** m_nodesOrder;
-	dAnimationContraint** m_nodesOrder;
+	dAnimationJoint** m_nodesOrder;
+//	dAnimationContraint** m_nodesOrder;
 
 	// cache temporary variables
 	int* m_matrixRowsIndex;
