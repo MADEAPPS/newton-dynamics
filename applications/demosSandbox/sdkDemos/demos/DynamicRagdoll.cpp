@@ -807,6 +807,34 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 	}
 };
 
+class dDynamicsRagdoll: public dAnimationJointRoot
+{
+	public:
+	dDynamicsRagdoll(NewtonBody* const body, const dMatrix& bindMarix)
+		:dAnimationJointRoot(body, bindMarix)
+	{
+	}
+
+	~dDynamicsRagdoll()
+	{
+	}
+
+	void PreUpdate(dFloat timestep)
+	{
+		dAnimationJointRoot::RigidBodyToStates();
+		m_proxyBody.SetForce(dVector (0.0f));
+		m_proxyBody.SetTorque(dVector(0.0f));
+
+
+		//if (m_animationTree) {
+		//	m_animationTree->Update(timestep);
+		//}
+		//m_solver.Update(timestep);
+		//UpdateJointAcceleration();
+	}
+};
+
+
 class DynamicRagdollManager: public dAnimationModelManager
 {
 	class dJointDefinition
@@ -832,24 +860,6 @@ class DynamicRagdollManager: public dAnimationModelManager
 		dFrameMatrix m_frameBasics;
 	};
 	
-	class dDynamicsRagdoll: public dAnimationJointRoot
-	{
-		public:
-		dDynamicsRagdoll(NewtonBody* const body, const dMatrix& bindMarix)
-			:dAnimationJointRoot(body, bindMarix)
-		{
-		}
-
-		~dDynamicsRagdoll()
-		{
-		}
-
-		void PreUpdate(dAnimationModelManager* const manager, dFloat timestep) const
-		{
-
-		}
-	};
-
 	public:
 
 	DynamicRagdollManager(DemoEntityManager* const scene)
@@ -953,7 +963,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 		static dJointDefinition jointsDefinition[] =
 		{
 			{ "body" },
-			//{ "leg", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "leg", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 			//{ "foot", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 		};
 		const int definitionCount = sizeof (jointsDefinition)/sizeof (jointsDefinition[0]);

@@ -77,6 +77,8 @@ class dAnimationJointRagdoll: public dAnimationJoint
 	dAnimationJointRagdoll(const dMatrix& pinAndPivotInGlobalSpace, NewtonBody* const body, const dMatrix& bindMarix, dAnimationJoint* const parent);
 	virtual ~dAnimationJointRagdoll();
 	protected:
+
+	virtual void RigidBodyToStates();
 };
 
 

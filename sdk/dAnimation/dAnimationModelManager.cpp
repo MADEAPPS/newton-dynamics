@@ -53,6 +53,7 @@ void dAnimationModelManager::OnDestroy()
 void dAnimationModelManager::OnPreUpdate(dAnimationJointRoot* const model, dFloat timestep)
 {
 	D_TRACKTIME();
+	model->PreUpdate(timestep);
 }
 
 void dAnimationModelManager::PreUpdate(NewtonWorld* const world, void* const context, int threadIndex)
@@ -69,7 +70,7 @@ void dAnimationModelManager::PostUpdate(NewtonWorld* const world, void* const co
 	dAnimationJointRoot* const model = (dAnimationJointRoot*)context;
 	dAnimationModelManager* const me = model->m_manager;
 	me->OnPostUpdate(model, me->m_timestep);
-	model->PostUpdate(me, me->m_timestep);
+	model->UpdateTransforms(me->m_timestep);
 }
 
 void dAnimationModelManager::PreUpdate(dFloat timestep)

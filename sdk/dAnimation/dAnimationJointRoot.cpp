@@ -37,8 +37,34 @@ dAnimationJointRoot::~dAnimationJointRoot()
 	}
 }
 
-void dAnimationJointRoot::PreUpdate(dAnimationModelManager* const manager, dFloat timestep) const
+void dAnimationJointRoot::UpdateTransforms(dFloat timestep) const
 {
-	dAssert(manager);
-	dAnimationJoint::PreUpdate(manager, timestep);
+	if (m_calculateLocalTransform) {
+		dMatrix parentMatrixPool[128];
+		const dAnimationJoint* stackPool[128];
+
+		int stack = 1;
+		stackPool[0] = this;
+		parentMatrixPool[0] = dGetIdentityMatrix();
+
+		while (stack) {
+			dMatrix matrix;
+			stack--;
+
+			dMatrix parentMatrix(parentMatrixPool[stack]);
+			const dAnimationJoint* const bone = stackPool[stack];
+
+			NewtonBodyGetMatrix(bone->GetBody(), &matrix[0][0]);
+			m_manager->OnUpdateTransform(bone, matrix * parentMatrix * bone->GetBindMatrix());
+
+			parentMatrix = matrix.Inverse();
+			const dAnimationJointChildren& boneChildren = bone->GetChidren();
+			for (dAnimationJointChildren::dListNode* ptrNode = boneChildren.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
+				parentMatrixPool[stack] = parentMatrix;
+				stackPool[stack] = ptrNode->GetInfo();
+				stack++;
+			}
+		}
+	}
 }
+

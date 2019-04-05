@@ -254,5 +254,11 @@ dAnimationJointRagdoll::dAnimationJointRagdoll(const dMatrix& pinAndPivotInGloba
 
 dAnimationJointRagdoll::~dAnimationJointRagdoll()
 {
+}
 
+void dAnimationJointRagdoll::RigidBodyToStates()
+{
+	dAnimationJoint::RigidBodyToStates();
+	m_proxyBody.SetForce(dVector(0.0f));
+	m_proxyBody.SetTorque(dVector(0.0f));
 }

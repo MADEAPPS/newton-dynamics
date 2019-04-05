@@ -53,8 +53,7 @@ class dAnimationJoint: public dCustomAlloc
 	dAnimationBody* GetProxyBody();
 
 	protected:
-	virtual void PreUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
-	virtual void PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
+	virtual void RigidBodyToStates();
 
 	dAnimationBody m_proxyBody;
 	dMatrix m_bindMatrix;
@@ -112,9 +111,7 @@ inline dAnimationJointChildren& dAnimationJoint::GetChidren()
 	return m_children; 
 }
 
-inline void dAnimationJoint::PreUpdate(dAnimationModelManager* const manager, dFloat timestep) const
-{
-}
+
 
 #endif
 

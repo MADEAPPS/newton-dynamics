@@ -24,7 +24,6 @@ class dAnimationLoopJointList: public dList<dAnimationLoopJoint*>
 {
 };
 
-
 class dAnimationJointRoot: public dAnimationJoint
 {
 	public:
@@ -40,8 +39,9 @@ class dAnimationJointRoot: public dAnimationJoint
 	bool GetCalculateLocalTransforms() const;
 
 	protected:
-	virtual void PreUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
-	virtual void PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const;
+	virtual void PreUpdate(dFloat timestep) {};
+	virtual void PostUpdate(dFloat timestep) {};
+	void UpdateTransforms(dFloat timestep) const;
 
 	dAnimationBody m_staticBody;
 	dAnimationJointSolver m_solver;
@@ -79,12 +79,7 @@ inline bool dAnimationJointRoot::GetCalculateLocalTransforms() const
 	return m_calculateLocalTransform; 
 }
 
-inline void dAnimationJointRoot::PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const
-{
-	if (m_calculateLocalTransform) {
-		dAnimationJoint::PostUpdate(manager, timestep);
-	}
-}
+
 
 #endif 
 

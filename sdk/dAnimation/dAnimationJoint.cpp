@@ -37,30 +37,33 @@ dAnimationJoint::~dAnimationJoint()
 	}
 }
 
-void dAnimationJoint::PostUpdate(dAnimationModelManager* const manager, dFloat timestep) const
+void dAnimationJoint::RigidBodyToStates()
 {
-	dMatrix parentMatrixPool[128];
-	const dAnimationJoint* stackPool[128];
-
-	int stack = 1;
-	stackPool[0] = this;
-	parentMatrixPool[0] = dGetIdentityMatrix();
-
-	while (stack) {
+	if (m_body) {
+		dVector vector;
 		dMatrix matrix;
-		stack--;
 
-		dMatrix parentMatrix(parentMatrixPool[stack]);
-		const dAnimationJoint* const bone = stackPool[stack];
+		// get data from engine rigid body and copied to the vehicle chassis body
+		//NewtonBody* const newtonBody = m_chassis->GetBody();
+		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+		m_proxyBody.SetMatrix(matrix);
 
-		NewtonBodyGetMatrix(bone->GetBody(), &matrix[0][0]);
-		manager->OnUpdateTransform(bone, matrix * parentMatrix * bone->GetBindMatrix());
+		NewtonBodyGetVelocity(m_body, &vector[0]);
+		m_proxyBody.SetVeloc(vector);
 
-		parentMatrix = matrix.Inverse();
-		for (dAnimationJointChildren::dListNode* ptrNode = bone->m_children.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
-			parentMatrixPool[stack] = parentMatrix;
-			stackPool[stack] = ptrNode->GetInfo();
-			stack++;
-		}
+		NewtonBodyGetOmega(m_body, &vector[0]);
+		m_proxyBody.SetOmega(vector);
+
+		NewtonBodyGetForce(m_body, &vector[0]);
+		m_proxyBody.SetForce(vector);
+
+		NewtonBodyGetTorque(m_body, &vector[0]);
+		m_proxyBody.SetTorque(vector);
+
+		m_proxyBody.UpdateInertia();
+	}
+
+	for (dAnimationJointChildren::dListNode* node = m_children.GetFirst(); node; node = node->GetNext()) {
+		node->GetInfo()->RigidBodyToStates();
 	}
 }
