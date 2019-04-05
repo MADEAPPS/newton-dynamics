@@ -783,11 +783,10 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 
 	void SetTarget()
 	{
-		dMatrix matrix;
-		dAnimationJoint* const owner0 = m_owner0->m_owner;
-		NewtonBody* const body = owner0->GetBody();
-		
-		dMatrix posit 
+//		dMatrix matrix;
+//		dAnimationJoint* const owner0 = m_owner0->m_owner;
+//		NewtonBody* const body = owner0->GetBody();
+//		dMatrix posit 
 		
 	}
 
@@ -856,6 +855,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 	DynamicRagdollManager(DemoEntityManager* const scene)
 		:dAnimationModelManager(scene->GetNewton())
 //		, m_currentRig(NULL)
+		,m_hipEffector(NULL)
 	{
 //		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
@@ -977,7 +977,8 @@ class DynamicRagdollManager: public dAnimationModelManager
 		dynamicRagdoll->SetCalculateLocalTransforms(true);
 
 		// attach a Hip effector to the root body
-		dynamicRagdoll->GetLoops().Append(new dAnimationHipEffector(dynamicRagdoll));
+		m_hipEffector = new dAnimationHipEffector(dynamicRagdoll);
+		dynamicRagdoll->GetLoops().Append(m_hipEffector);
 
 		// save the controller as the collision user data, for collision culling
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBody), dynamicRagdoll);
@@ -1060,16 +1061,20 @@ class DynamicRagdollManager: public dAnimationModelManager
 	void OnPreUpdate(dAnimationJointRoot* const model, dFloat timestep)
 	{
 		// position the effector
-		const dAnimationLoopJointList& effectors = model->GetLoops();
-		for (dAnimationLoopJointList::dListNode* node = effectors.GetFirst(); node; node = node->GetNext()) {
-			dAnimationHipEffector* const effector = (dAnimationHipEffector*)node->GetInfo();
-			effector->SetTarget();
-		}
+		//const dAnimationLoopJointList& effectors = model->GetLoops();
+		//for (dAnimationLoopJointList::dListNode* node = effectors.GetFirst(); node; node = node->GetNext()) {
+		//	dAnimationHipEffector* const effector = (dAnimationHipEffector*)node->GetInfo();
+		//	effector->SetTarget();
+		//}
+
+		// update all effectors tartets
+		m_hipEffector->SetTarget();
 
 		// call the solver 
 		dAnimationModelManager::OnPreUpdate(model, timestep);
 	}
 
+	dAnimationHipEffector* m_hipEffector;
 };
 
 
