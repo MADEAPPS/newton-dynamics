@@ -15,6 +15,8 @@
 
 dAnimationModelManager::dAnimationModelManager(NewtonWorld* const world, const char* const name)
 	:dCustomListener(world, name)
+	,m_controllerList()
+	,m_timestep(0.0f)
 {
 }
 
@@ -48,18 +50,58 @@ void dAnimationModelManager::OnDestroy()
 	}
 }
 
+void dAnimationModelManager::OnPreUpdate(dAnimationJointRoot* const model, dFloat timestep)
+{
+	D_TRACKTIME();
+}
+
+void dAnimationModelManager::PreUpdate(NewtonWorld* const world, void* const context, int threadIndex)
+{
+	D_TRACKTIME();
+	dAnimationJointRoot* const model = (dAnimationJointRoot*)context;
+	dAnimationModelManager* const me = model->m_manager;
+	me->OnPreUpdate(model, me->m_timestep);
+}
+
+void dAnimationModelManager::PostUpdate(NewtonWorld* const world, void* const context, int threadIndex)
+{
+	D_TRACKTIME();
+	dAnimationJointRoot* const model = (dAnimationJointRoot*)context;
+	dAnimationModelManager* const me = model->m_manager;
+	me->OnPostUpdate(model, me->m_timestep);
+	model->PostUpdate(me, me->m_timestep);
+}
+
 void dAnimationModelManager::PreUpdate(dFloat timestep)
 {
+	D_TRACKTIME();
+//	for (dList<dAnimationJointRoot*>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
+//		dAnimationJointRoot* const model = node->GetInfo();
+//		model->PreUpdate(this, timestep);
+//	}
+
+	m_timestep = timestep;
+	NewtonWorld* const world = GetWorld();
+
 	for (dList<dAnimationJointRoot*>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
-		dAnimationJointRoot* const model = node->GetInfo();
-		model->PreUpdate(this, timestep);
+		NewtonDispachThreadJob(world, PreUpdate, node->GetInfo(), "dAnimationModelManager");
 	}
+	NewtonSyncThreadJobs(world);
 }
 
 void dAnimationModelManager::PostUpdate(dFloat timestep)
 {
+	D_TRACKTIME();
+//	for (dList<dAnimationJointRoot*>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
+//		dAnimationJointRoot* const model = node->GetInfo();
+//		model->PostUpdate(this, timestep);
+//	}
+
+	m_timestep = timestep;
+	NewtonWorld* const world = GetWorld();
+
 	for (dList<dAnimationJointRoot*>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
-		dAnimationJointRoot* const model = node->GetInfo();
-		model->PostUpdate(this, timestep);
+		NewtonDispachThreadJob(world, PostUpdate, node->GetInfo(), "dAnimationModelManager");
 	}
+	NewtonSyncThreadJobs(world);
 }

@@ -35,11 +35,21 @@ class dAnimationModelManager: public dCustomListener
 
 	protected:
 	virtual void OnDestroy();
+	virtual void OnPreUpdate(dAnimationJointRoot* const model, dFloat timestep);
+	virtual void OnPostUpdate(dAnimationJointRoot* const model, dFloat timestep) {}
+
+	private:
 	virtual void PreUpdate(dFloat timestep);
 	virtual void PostUpdate(dFloat timestep);
 
+	static void PreUpdate(NewtonWorld* const world, void* const context, int threadIndex);
+	static void PostUpdate(NewtonWorld* const world, void* const context, int threadIndex);
+
 	private:
 	dList<dAnimationJointRoot*> m_controllerList;
+	dFloat m_timestep;
+	//unsigned m_lock;
+
 };
 
 

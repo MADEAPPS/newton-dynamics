@@ -781,6 +781,16 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 	{
 	}
 
+	void SetTarget()
+	{
+		dMatrix matrix;
+		dAnimationJoint* const owner0 = m_owner0->m_owner;
+		NewtonBody* const body = owner0->GetBody();
+		
+		dMatrix posit 
+		
+	}
+
 	virtual int GetMaxDof() const
 	{
 		dAssert(0);
@@ -1030,8 +1040,15 @@ class DynamicRagdollManager: public dAnimationModelManager
 		//return controller;
 	}
 
+
+	void OnPostUpdate(dAnimationJointRoot* const model, dFloat timestep)
+	{
+		// do nothing for now
+	}
+
 	virtual void OnUpdateTransform(const dAnimationJoint* const bone, const dMatrix& localMatrix) const
 	{
+		// calculate the local transform for this player body
 		NewtonBody* const body = bone->GetBody();
 		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(body);
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
@@ -1039,6 +1056,20 @@ class DynamicRagdollManager: public dAnimationModelManager
 		dQuaternion rot(localMatrix);
 		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
+
+	void OnPreUpdate(dAnimationJointRoot* const model, dFloat timestep)
+	{
+		// position the effector
+		const dAnimationLoopJointList& effectors = model->GetLoops();
+		for (dAnimationLoopJointList::dListNode* node = effectors.GetFirst(); node; node = node->GetNext()) {
+			dAnimationHipEffector* const effector = (dAnimationHipEffector*)node->GetInfo();
+			effector->SetTarget();
+		}
+
+		// call the solver 
+		dAnimationModelManager::OnPreUpdate(model, timestep);
+	}
+
 };
 
 
