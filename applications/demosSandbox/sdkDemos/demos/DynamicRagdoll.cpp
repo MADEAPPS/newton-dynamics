@@ -778,6 +778,10 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 	public:
 	dAnimationHipEffector(dAnimationJointRoot* const root)
 		:dAnimationLoopJoint(root->GetProxyBody(), root->GetStaticWorld())
+		,m_localMatrix(dGetIdentityMatrix())
+		,m_targetMatrix(dGetIdentityMatrix())
+		,m_linearSpeed(1.0f)
+		,m_linearFriction(100.0f)
 	{
 	}
 
@@ -797,13 +801,62 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 
 	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 	{
-		dAssert(0);
+		const dMatrix& matrix1 = m_targetMatrix;
+		dMatrix matrix0(m_localMatrix * m_state0->GetMatrix());
+
+		dVector omega(0.0f);
+		dVector relPosit(matrix1.m_posit - matrix0.m_posit);
+
+		const dVector& omega0 = m_state0->GetOmega();
+		const dVector& omega1 = m_state1->GetOmega();
+		const dVector& veloc0 = m_state0->GetVelocity();
+		const dVector& veloc1 = m_state1->GetVelocity();
+
+		dAssert(m_linearSpeed >= 0.0f);
+		const dFloat timestep = constraintParams->m_timestep;
+		const dFloat invTimestep = constraintParams->m_timestepInv;
+		const dFloat step = m_linearSpeed * timestep;
+
+		for (int i = 0; i < 3; i++) {
+
+			dFloat currentSpeed = 0.0f;
+			dFloat dist = relPosit.DotProduct3(matrix1[i]);
+			if (dist > step) {
+				currentSpeed = m_linearSpeed;
+			} else if (dist < -step) {
+				currentSpeed = -m_linearSpeed;
+			} else {
+				currentSpeed = 0.3f * dist * invTimestep;
+			}
+
+			AddLinearRowJacobian(constraintParams, matrix0.m_posit, matrix1[i], omega);
+
+			dVector stopVeloc(constraintParams->m_jacobians[i].m_jacobian_J01.m_linear * veloc0 +
+							  constraintParams->m_jacobians[i].m_jacobian_J01.m_angular * omega0 +
+							  constraintParams->m_jacobians[i].m_jacobian_J10.m_linear * veloc1 +
+							  constraintParams->m_jacobians[i].m_jacobian_J10.m_angular * omega1);
+			currentSpeed -= (stopVeloc.m_x + stopVeloc.m_y + stopVeloc.m_z);
+
+			constraintParams->m_jointLowFrictionCoef[i] = -m_linearFriction;
+			constraintParams->m_jointHighFrictionCoef[i] = m_linearFriction;
+			constraintParams->m_jointAccel[i] = currentSpeed * invTimestep;
+			constraintParams->m_normalIndex[i] = 0;
+		}
+
+		m_dof = 3;
+		m_count = 3;
+		constraintParams->m_count = 3;
 	}
 
 	virtual void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
 	{
 		dAssert(0);
 	}
+
+	dMatrix m_localMatrix;
+	dMatrix m_targetMatrix;
+	dFloat m_linearSpeed;
+	dFloat m_linearFriction;
 };
 
 class dDynamicsRagdoll: public dAnimationJointRoot

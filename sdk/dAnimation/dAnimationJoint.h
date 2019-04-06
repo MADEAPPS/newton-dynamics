@@ -61,9 +61,10 @@ class dAnimationJoint: public dCustomAlloc
 	dCustomJoint* GetJoint() const;
 	dAnimationBody* GetProxyBody();
 
+	void CopyRigidBodyMassToStates();
 	protected:
 	void SetIndex(int index);
-
+	void CopyRigidBodyMassToStatesLow();
 	virtual void RigidBodyToStates();
 	virtual void ApplyExternalForce(dFloat timestep);
 

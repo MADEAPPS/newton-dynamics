@@ -71,7 +71,7 @@ dAnimationJointSolver::dAnimationJointSolver()
 	m_nodeCount = 0;
 	m_maxNodeCount = 0;
 	m_loopRowCount = 0;
-	m_loopNodeCount = 0;
+//	m_loopNodeCount = 0;
 	m_loopJointCount = 0;
 	m_auxiliaryRowCount = 0;
 }
@@ -628,11 +628,8 @@ void dAnimationJointSolver::InitMassMatrix()
 */
 }
 
-int dAnimationJointSolver::BuildJacobianMatrix(dFloat timestep, dComplementaritySolver::dBilateralJoint* const joint)
+int dAnimationJointSolver::BuildJacobianMatrix(dFloat timestep, dAnimationContraint* const joint)
 {
-	dAssert(0);
-	return 0;
-/*
 	dComplementaritySolver::dParamInfo constraintParams;
 	constraintParams.m_timestep = timestep;
 	constraintParams.m_timestepInv = 1.0f / timestep;
@@ -645,13 +642,14 @@ int dAnimationJointSolver::BuildJacobianMatrix(dFloat timestep, dComplementarity
 
 	// complete the derivative matrix for this joint
 	const int index = joint->m_start;
-	dAnimationBody* const state0 = joint->m_state0;
-	dAnimationBody* const state1 = joint->m_state1;
+	dAnimationBody* const state0 = (dAnimationBody*)joint->m_state0;
+	dAnimationBody* const state1 = (dAnimationBody*)joint->m_state1;
 	const dMatrix& invInertia0 = state0->GetInvInertia();
 	const dMatrix& invInertia1 = state1->GetInvInertia();
 	dFloat invMass0 = state0->GetInvMass();
 	dFloat invMass1 = state1->GetInvMass();
 	const dFloat weight = 0.9f;
+
 	for (int i = 0; i < dofCount; i++) {
 		dComplementaritySolver::dJacobianPair* const row = &m_leftHandSide[index + i];
 		dComplementaritySolver::dJacobianColum* const col = &m_rightHandSide[index + i];
@@ -677,32 +675,28 @@ int dAnimationJointSolver::BuildJacobianMatrix(dFloat timestep, dComplementarity
 	}
 
 	return dofCount;
-*/
 }
 
 int dAnimationJointSolver::BuildJacobianMatrix(dFloat timestep)
 {
-	return 0;
-	/*
 	int rowCount = 0;
 	for (int j = 0; j < m_nodeCount - 1; j++) {
 		dAnimationJoint* const node = m_nodesOrder[j];
 		dAssert(node && node->m_proxyJoint);
-		dComplementaritySolver::dBilateralJoint* const joint = node->m_proxyJoint;
+		dAnimationContraint* const joint = node->m_proxyJoint;
 		joint->m_start = rowCount;
 		joint->m_count = BuildJacobianMatrix(timestep, joint);
 		rowCount += joint->m_count;
 	}
 
 	for (int i = 0; i < m_loopJointCount; i++) {
-		dAnimIDRigKinematicLoopJoint* const joint = m_loopJoints[i];
+		dAnimationLoopJoint* const joint = m_loopJoints[i];
 		joint->m_start = rowCount;
 		joint->m_count = BuildJacobianMatrix(timestep, joint);
 		rowCount += joint->m_count;
 	}
 
 	return rowCount;
-*/
 }
 
 void dAnimationJointSolver::CalculateJointAccel(dVectorPair* const accel) const
@@ -1274,7 +1268,8 @@ void dAnimationJointSolver::Update(dFloat timestep)
 //	m_loopJointCount = m_rootNode->GetKinematicLoops(m_loopJoints);
 
 	int loopDof = 0;
-	m_loopNodeCount = 0;
+//	m_loopNodeCount = 0;
+	m_loopJointCount = 0;
 	const dAnimationLoopJointList& loopList = m_rootNode->GetLoops();
 //	for (int i = 0; i < m_loopJointCount; i ++) {
 	for (dAnimationLoopJointList::dListNode* node = loopList.GetFirst(); node; node = node->GetNext()) {
@@ -1295,8 +1290,9 @@ void dAnimationJointSolver::Update(dFloat timestep)
 			//	dAssert((m_nodeCount + m_loopNodeCount) < m_maxNodeCount);
 			//	m_loopNodeCount++;
 			//}
-			m_loopJoints[m_loopNodeCount] = loop;
-			m_loopNodeCount++;
+
+			m_loopJoints[m_loopJointCount] = loop;
+			m_loopJointCount++;
 		}
 	}
 
@@ -1306,6 +1302,7 @@ void dAnimationJointSolver::Update(dFloat timestep)
 	m_rightHandSide = dAlloca(dComplementaritySolver::dJacobianColum, m_nodeCount * 6 + loopDof);
 
 	BuildJacobianMatrix(timestep);
+//	dAssert (0);
 /*
 	InitMassMatrix();
 	m_pairs = dAlloca(dNodePair, m_rowCount + m_loopRowCount);

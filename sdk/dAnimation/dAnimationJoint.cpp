@@ -29,12 +29,46 @@ dAnimationJoint::dAnimationJoint(NewtonBody* const body, const dMatrix& bindMari
 		m_parent->m_children.Append(this);
 	}
 	m_proxyBody.m_owner = this;
+
+	CopyRigidBodyMassToStatesLow();
 }
 
 dAnimationJoint::~dAnimationJoint()
 {
 	for (dAnimationJointChildren::dListNode* node = m_children.GetFirst(); node; node = node->GetNext()) {
 		delete node->GetInfo();
+	}
+}
+
+void dAnimationJoint::CopyRigidBodyMassToStatesLow()
+{
+	if (m_body) {
+
+		dMatrix matrix(dGetIdentityMatrix());
+		NewtonBodyGetCentreOfMass(m_body, &matrix.m_posit[0]);
+		matrix.m_posit.m_w = 1.0f;
+		m_proxyBody.SetLocalMatrix(matrix);
+
+		// get data from engine rigid body and copied to the vehicle chassis body
+		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+		m_proxyBody.SetMatrix(matrix);
+
+		dFloat mass;
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		NewtonBodyGetMass(m_body, &mass, &Ixx, &Iyy, &Izz);
+		m_proxyBody.SetMass(mass);
+		m_proxyBody.SetInertia(Ixx, Iyy, Izz);
+		m_proxyBody.UpdateInertia();
+	}
+}
+
+void dAnimationJoint::CopyRigidBodyMassToStates()
+{
+	CopyRigidBodyMassToStatesLow();
+	for (dAnimationJointChildren::dListNode* node = m_children.GetFirst(); node; node = node->GetNext()) {
+		node->GetInfo()->CopyRigidBodyMassToStates();
 	}
 }
 

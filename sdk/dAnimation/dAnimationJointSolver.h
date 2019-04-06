@@ -44,7 +44,7 @@ class dAnimationJointSolver: public dCustomAlloc
 	int BuildJacobianMatrix(dFloat timestep);
 	void GetJacobians(dAnimationJoint* const node);
 	void CalculateLoopMassMatrixCoefficients();
-	int BuildJacobianMatrix(dFloat timestep, dComplementaritySolver::dBilateralJoint* const joint);
+	int BuildJacobianMatrix(dFloat timestep, dAnimationContraint* const joint);
 
 	void CalculateJointDiagonal(dAnimationJoint* const node);
 	void CalculateJacobianBlock(dAnimationJoint* const node);
@@ -88,7 +88,7 @@ class dAnimationJointSolver: public dCustomAlloc
 	int m_nodeCount;
 	int m_maxNodeCount;
 	int m_loopRowCount;
-	int m_loopNodeCount;
+//	int m_loopNodeCount;
 	int m_loopJointCount;
 	int m_auxiliaryRowCount;
 };

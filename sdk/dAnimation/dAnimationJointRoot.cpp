@@ -39,6 +39,7 @@ dAnimationJointRoot::~dAnimationJointRoot()
 
 void dAnimationJointRoot::Finalize()
 {
+	CopyRigidBodyMassToStates();
 	m_solver.Finalize(this);
 }
 
