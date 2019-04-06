@@ -253,7 +253,6 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 		m_applyExtForces(*this, timestep, threadIndex);
 	}
 
-	
 	m_gyroRotation = m_rotation;
 	m_gyroTorque = dgVector::m_zero;
 
@@ -261,6 +260,7 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 	m_externalTorque += m_impulseTorque;
 	m_impulseForce = dgVector::m_zero;
 	m_impulseTorque = dgVector::m_zero;
+	// dgTrace(("%d p(%f %f %f) v(%f %f %f) f(%f %f %f)\n", m_uniqueID, m_matrix.m_posit[0], m_matrix.m_posit[1], m_matrix.m_posit[2], m_veloc[0], m_veloc[1], m_veloc[2], m_externalForce[0], m_externalForce[1], m_externalForce[2]));
 }
 
 void dgDynamicBody::AddDampingAcceleration(dgFloat32 timestep)
