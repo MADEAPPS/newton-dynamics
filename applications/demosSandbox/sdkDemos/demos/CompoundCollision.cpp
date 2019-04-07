@@ -10,7 +10,6 @@
 */
 
 
-
 #include "toolbox_stdafx.h"
 #include "OpenGlUtil.h"
 #include "SkyBox.h"
@@ -20,6 +19,79 @@
 #include "PhysicsUtils.h"
 #include "HeightFieldPrimitive.h"
 
+
+class dShowAllSubShapes: public dCustomListener
+{
+	public:
+	dShowAllSubShapes(DemoEntityManager* const scene)
+		:dCustomListener(scene->GetNewton(), "Pick compound subs shapes")
+		,m_body(NULL)
+		,m_mouseDown(false)
+	{
+	}
+
+	void PreUpdate(dFloat timestep)
+	{
+		NewtonWorld* const workd = GetWorld();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(workd);
+
+		bool mouseClick = scene->GetMouseKeyState(0);
+		if (!m_mouseDown && mouseClick) {
+			if (!m_body) {
+				// pick a body form teh scene
+				int mouseX;
+				int mouseY;
+
+				DemoCamera* const camera = scene->GetCamera();
+				scene->GetMousePosition(mouseX, mouseY);
+
+				dFloat x = dFloat(mouseX);
+				dFloat y = dFloat(mouseY);
+				dVector p0(camera->ScreenToWorld(dVector(x, y, 0.0f, 0.0f)));
+				dVector p1(camera->ScreenToWorld(dVector(x, y, 1.0f, 0.0f)));
+
+				dFloat param;
+				dVector posit;
+				dVector normal;
+				NewtonBody* const body = MousePickBody(scene->GetNewton(), p0, p1, param, posit, normal);
+				if (body) {
+					// if we picked a body see if it has a compound shape
+					NewtonCollision* const collision = NewtonBodyGetCollision(body);
+					int NewtonCollisionGetType(const NewtonCollision* const collision);
+					if (NewtonCollisionGetType(collision) == SERIALIZE_ID_COMPOUND) {
+						m_body = body;
+						RayCastAllSubShapes(p0, p1);
+					}
+				}
+			}
+
+		} else if (m_mouseDown && !mouseClick) {
+			// release the body
+			m_body = NULL;
+		}
+
+		m_mouseDown = mouseClick;
+	}
+
+
+	void RayCastAllSubShapes(const dVector& p0, const dVector& p1)
+	{
+		dMatrix matrix;
+		dVector normal;
+		dLong attribute;
+
+		// code to be implemnets here
+		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+
+		dVector localP0(matrix.UntransformVector(p0));
+		dVector localP1(matrix.UntransformVector(p1));
+		NewtonCollision* const collision = NewtonBodyGetCollision(m_body);
+		dFloat xxx = NewtonCollisionRayCast(collision, &localP0[0], &localP1[0], &normal[0], &attribute);
+	}
+
+	NewtonBody* m_body;
+	bool m_mouseDown;
+};
 
 static void GetCollisionSubShape(const NewtonJoint* const contactJoint, NewtonBody* const body)
 {
@@ -353,7 +425,6 @@ void CompoundCollision (DemoEntityManager* const scene)
 	location.m_x += 40.0f;
 	location.m_z += 40.0f;
 
-
 	int count = 5;
 	dVector size (0.5f, 0.5f, 0.75f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
@@ -365,6 +436,9 @@ void CompoundCollision (DemoEntityManager* const scene)
 
 	// this crash temporarily (I need to make the compound use shape Instance)
 	MakeFunnyCompound(scene, location);
+
+	// add listenr for ray tracing all sub shapes ofa compound
+	new dShowAllSubShapes(scene);
 
 	// place camera into position
 //	dQuaternion rot;
