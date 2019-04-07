@@ -64,7 +64,7 @@ void dAnimationJointRoot::UpdateTransforms(dFloat timestep) const
 			m_manager->OnUpdateTransform(bone, matrix * parentMatrix * bone->GetBindMatrix());
 
 			parentMatrix = matrix.Inverse();
-			const dAnimationJointChildren& boneChildren = bone->GetChidren();
+			const dAnimationJointChildren& boneChildren = bone->GetChildren();
 			for (dAnimationJointChildren::dListNode* ptrNode = boneChildren.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
 				parentMatrixPool[stack] = parentMatrix;
 				stackPool[stack] = ptrNode->GetInfo();

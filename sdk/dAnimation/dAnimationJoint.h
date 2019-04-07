@@ -54,15 +54,17 @@ class dAnimationJoint: public dCustomAlloc
 	void* GetUserData() const;
 	void SetUserData(void* const data);
 	
-	dAnimationJointChildren& GetChidren();
-	const dAnimationJointChildren& GetChidren() const;
+	dAnimationJointChildren& GetChildren();
+	const dAnimationJointChildren& GetChildren() const;
 
 	NewtonBody* GetBody() const;
 	dCustomJoint* GetJoint() const;
 	dAnimationBody* GetProxyBody();
+	dAnimationContraint* GetProxyJoint();
 
 	void CopyRigidBodyMassToStates();
 	protected:
+	int GetIndex() const;
 	void SetIndex(int index);
 	void CopyRigidBodyMassToStatesLow();
 	virtual void RigidBodyToStates();
@@ -82,11 +84,15 @@ class dAnimationJoint: public dCustomAlloc
 };
 
 
+inline int dAnimationJoint::GetIndex() const
+{
+	return m_index;
+}
+
 inline void dAnimationJoint::SetIndex(int index)
 {
 	m_index = index;
 }
-
 
 inline dAnimationJoint* dAnimationJoint::GetParent() const
 {
@@ -123,12 +129,17 @@ inline dAnimationBody* dAnimationJoint::GetProxyBody()
 	return &m_proxyBody;
 }
 
-inline const dAnimationJointChildren& dAnimationJoint::GetChidren() const
+inline dAnimationContraint* dAnimationJoint::GetProxyJoint()
+{
+	return m_proxyJoint;
+}
+
+inline const dAnimationJointChildren& dAnimationJoint::GetChildren() const
 { 
 	return m_children; 
 }
 
-inline dAnimationJointChildren& dAnimationJoint::GetChidren()
+inline dAnimationJointChildren& dAnimationJoint::GetChildren()
 {
 	return m_children; 
 }
