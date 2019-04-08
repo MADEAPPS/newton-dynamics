@@ -100,4 +100,7 @@ void LoadLumberYardMesh(DemoEntityManager* const scene, const dVector& location,
 
 void SetKinematicPose(NewtonBody* const body, const dMatrix& matrix1, dFloat timestep);
 
+
+dFloat ForceBodyAccelerationMichio (NewtonBody* const body);
+
 #endif

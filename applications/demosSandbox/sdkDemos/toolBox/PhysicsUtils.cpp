@@ -100,11 +100,41 @@ bool GetLastHit (dVector& posit, dVector& normal)
 	return dMousePickClass::GetLastHit(posit, normal);
 }
 
+dFloat ForceBodyAccelerationMichio (NewtonBody* const body)
+{
+	dVector reactionforce (0.0f);
+	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(body); joint; joint = NewtonBodyGetNextContactJoint(body, joint)) {
+		if (NewtonJointIsActive(joint)) {
+			for (void* contact = NewtonContactJointGetFirstContact(joint); contact; contact = NewtonContactJointGetNextContact(joint, contact)) {
+				dVector contactForce(0.0f);
+				NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+				NewtonMaterialGetContactForce(material, body, &contactForce[0]);
+				reactionforce += contactForce;
+			}
+		}
+	}
+
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	dFloat mass;
+	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+
+	dVector accel;
+	NewtonBodyGetAcceleration(body, &accel[0]);
+	accel -= reactionforce.Scale (1.0f/mass);
+
+	// do not forget to add the centripetal acceleration here.
+	//accel += CalculateCentripetal()  
+
+	return dSqrt (accel.DotProduct3(accel));
+}
+
 dVector ForceBetweenBody (NewtonBody* const body0, NewtonBody* const body1)
 {
 	dVector reactionforce (0.0f);
 	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(body0); joint; joint = NewtonBodyGetNextContactJoint(body0, joint)) {
-		if ((NewtonJointGetBody0(joint) == body0) || (NewtonJointGetBody0(joint) == body1)) {
+		if (NewtonJointIsActive(joint) &&  (NewtonJointGetBody0(joint) == body0) || (NewtonJointGetBody0(joint) == body1)) {
 			for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {
 				dVector point(0.0f);
 				dVector normal(0.0f);	
@@ -112,7 +142,6 @@ dVector ForceBetweenBody (NewtonBody* const body0, NewtonBody* const body1)
 				NewtonMaterial* const material = NewtonContactGetMaterial (contact);
 				NewtonMaterialGetContactPositionAndNormal (material, body0, &point.m_x, &normal.m_x);
 				NewtonMaterialGetContactForce(material, body0, &contactForce[0]);
-				//forceAcc += normal.Scale (forceMag);
 				reactionforce += contactForce;
 			}
 			break;

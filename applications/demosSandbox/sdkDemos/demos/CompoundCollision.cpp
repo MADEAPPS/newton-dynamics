@@ -55,6 +55,7 @@ class dShowAllSubShapes: public dCustomListener
 				dVector normal;
 				NewtonBody* const body = MousePickBody(scene->GetNewton(), p0, p1, param, posit, normal);
 				if (body) {
+
 					// if we picked a body see if it has a compound shape
 					NewtonCollision* const collision = NewtonBodyGetCollision(body);
 					int NewtonCollisionGetType(const NewtonCollision* const collision);
@@ -80,7 +81,7 @@ class dShowAllSubShapes: public dCustomListener
 		dVector normal;
 		dLong attribute;
 
-		// code to be implemnets here
+		// code to be implements here
 		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
 
 		dVector localP0(matrix.UntransformVector(p0));
