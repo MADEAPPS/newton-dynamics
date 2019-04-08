@@ -243,6 +243,8 @@ class dgBody
 
 	void InitJointSet ();
 
+	void SetCollision(dgCollisionInstance* const collision);
+
 	protected:
 	void UpdateWorlCollisionMatrix() const;
 	void UpdateLumpedMatrix();
@@ -647,6 +649,11 @@ DG_INLINE void dgBody::InitJointSet ()
 	m_index = -1;
 	m_jointSet = 1;
 	m_disjointInfo.Init (this);
+}
+
+DG_INLINE void dgBody::SetCollision(dgCollisionInstance* const collision)
+{
+	m_collision = collision;
 }
 
 #endif 
