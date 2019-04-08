@@ -103,6 +103,7 @@ bool GetLastHit (dVector& posit, dVector& normal)
 dFloat ForceBodyAccelerationMichio (NewtonBody* const body)
 {
 	dVector reactionforce (0.0f);
+	// calcualte accelration generate by all contacts
 	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(body); joint; joint = NewtonBodyGetNextContactJoint(body, joint)) {
 		if (NewtonJointIsActive(joint)) {
 			for (void* contact = NewtonContactJointGetFirstContact(joint); contact; contact = NewtonContactJointGetNextContact(joint, contact)) {
@@ -114,19 +115,31 @@ dFloat ForceBodyAccelerationMichio (NewtonBody* const body)
 		}
 	}
 
+	dMatrix matrix;
+	dVector accel;
+	dVector veloc;
+
 	dFloat Ixx;
 	dFloat Iyy;
 	dFloat Izz;
 	dFloat mass;
 	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-
-	dVector accel;
 	NewtonBodyGetAcceleration(body, &accel[0]);
 	accel -= reactionforce.Scale (1.0f/mass);
 
-	// do not forget to add the centripetal acceleration here.
-	//accel += CalculateCentripetal()  
 
+	//calculate centripetal acceleration here.
+	NewtonBodyGetMatrix(body, &matrix[0][0]);
+	dVector radius(matrix.m_posit.Scale(-1.0f));
+	radius.m_w = 0.0f;
+	dFloat radiusMag = dSqrt(radius.DotProduct3(radius));
+	dVector radiusDir (radius.Normalize());
+	
+	NewtonBodyGetVelocity(body, &veloc[0]);
+	veloc += radiusDir.Scale(veloc.DotProduct3(radiusDir));
+
+	dVector centripetalAccel(veloc.DotProduct3(veloc) / radiusMag);
+	accel += centripetalAccel;
 	return dSqrt (accel.DotProduct3(accel));
 }
 
