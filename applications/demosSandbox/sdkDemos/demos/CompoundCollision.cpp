@@ -49,7 +49,7 @@ class dShowAllSubShapes: public dCustomListener
 				dFloat y = dFloat(mouseY);
 				dVector p0(camera->ScreenToWorld(dVector(x, y, 0.0f, 0.0f)));
 				dVector p1(camera->ScreenToWorld(dVector(x, y, 1.0f, 0.0f)));
-
+/*
 				dFloat param;
 				dVector posit;
 				dVector normal;
@@ -64,9 +64,12 @@ class dShowAllSubShapes: public dCustomListener
 						RayCastAllSubShapes(p0, p1);
 					}
 				}
+*/
+				RayCastCompoundsAllSubShapes(p0, p1);
 			}
 
-		} else if (m_mouseDown && !mouseClick) {
+		}
+		else if (m_mouseDown && !mouseClick) {
 			// release the body
 			m_body = NULL;
 		}
@@ -74,23 +77,50 @@ class dShowAllSubShapes: public dCustomListener
 		m_mouseDown = mouseClick;
 	}
 
-
-	void RayCastAllSubShapes(const dVector& p0, const dVector& p1)
+	static dFloat PickCompound(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam)
 	{
-		dMatrix matrix;
-		dVector normal;
-		dLong attribute;
-
-		// code to be implements here
-		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
-
-		dVector localP0(matrix.UntransformVector(p0));
-		dVector localP1(matrix.UntransformVector(p1));
-		NewtonCollision* const collision = NewtonBodyGetCollision(m_body);
-		dFloat xxx = NewtonCollisionRayCast(collision, &localP0[0], &localP1[0], &normal[0], &attribute);
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+		if (NewtonCollisionGetType(collision) == SERIALIZE_ID_COMPOUND) {
+			dShowAllSubShapes* const me = (dShowAllSubShapes*)userData;
+			if (intersectParam < me->m_param) {
+				me->m_param = intersectParam;
+				me->m_body = body;
+				return intersectParam;
+			}
+		}
+		return 1.2f;
 	}
 
-	NewtonBody* m_body;
+	void RayCastCompoundsAllSubShapes(const dVector& origin, const dVector& end)
+	{
+		m_param = 1.0f;
+		m_body = NULL;
+		NewtonWorld* const world = GetWorld();
+		NewtonWorldRayCast(world, &origin[0], &end[0], PickCompound, this, NULL, 0);
+		if (m_body) {
+			// code to be implements here
+			dMatrix matrix;
+			NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+			dVector localP0(matrix.UntransformVector(origin));
+			dVector localP1(matrix.UntransformVector(end));
+
+			NewtonCollision* const compoundCollision = NewtonBodyGetCollision(m_body);
+			dAssert(NewtonCollisionGetType(compoundCollision) == SERIALIZE_ID_COMPOUND);
+			for (void* node = NewtonCompoundCollisionGetFirstNode(compoundCollision); node; node = NewtonCompoundCollisionGetNextNode(compoundCollision, node)) {
+				dVector normal;
+				dLong attribute;
+				NewtonCollision* const subShape = NewtonCompoundCollisionGetCollisionFromNode(compoundCollision, node);
+				dFloat xxx = NewtonCollisionRayCast(subShape, &localP0[0], &localP1[0], &normal[0], &attribute);
+				if (xxx < 1.0f) {
+					dTrace (("sub shape hit\n"))
+				}
+			}
+		}
+	}
+
+
+	const NewtonBody* m_body;
+	dFloat m_param;
 	bool m_mouseDown;
 };
 
