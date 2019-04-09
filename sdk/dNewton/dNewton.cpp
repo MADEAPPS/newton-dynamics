@@ -238,10 +238,12 @@ void dNewton::ResetTimer()
 
 	//#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
 	#ifdef __linux__
-		timespec ts;
-		clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
-		baseCount = ts.tv_nsec / 1000;
-		m_baseCount = dLong (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
+		dAssert (0);
+		//timespec ts;
+		//clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
+		//baseCount = ts.tv_nsec / 1000;
+		//m_baseCount = dLong (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
+		m_baseCount  = 0;
 	#endif
 
 	#ifdef _MACOSX_VER
@@ -266,9 +268,11 @@ dLong dNewton::GetTimeInMicrosenconds() const
 
 	//#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
 	#ifdef __linux__
-        timespec ts;
-		clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
-		return unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - m_baseCount;
+		dAssert (0);
+        //timespec ts;
+		//clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
+		//return unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - m_baseCount;
+		return 0;
 	#endif
 
 	#ifdef _MACOSX_VER
