@@ -554,12 +554,6 @@ DG_INLINE bool dgBody::GetSleepState () const
 	return m_sleeping;
 }
 
-DG_INLINE void dgBody::SetSleepState (bool state)
-{
-	m_sleeping = state;
-	m_equilibrium = state;
-}
-
 DG_INLINE bool dgBody::GetGyroMode() const
 {
 	return m_gyroTorqueOn;

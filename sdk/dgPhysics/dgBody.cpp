@@ -737,3 +737,18 @@ void dgBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const d
 	}
 }
 
+
+void dgBody::SetSleepState(bool state)
+{
+	m_sleeping = state;
+	m_equilibrium = state;
+	if ((m_invMass.m_w > dgFloat32 (0.0f)) && (m_veloc.DotProduct(m_veloc).GetScalar() < dgFloat32(1.0e-10f)) && (m_omega.DotProduct(m_omega).GetScalar() < dgFloat32(1.0e-10f))) {
+		m_equilibrium = state;
+		for (dgConstraint* contact = GetFirstContact(); contact; contact = GetNextContact(contact)) {
+			dgAssert(contact->GetId() == dgConstraint::m_contactConstraint);
+			dgContact* const contactJoint = (dgContact*)contact;
+			dgAssert(contactJoint->m_contactActive);
+			contactJoint->m_positAcc = dgVector(dgFloat32(10.0f));
+		}
+	}
+}
