@@ -293,13 +293,19 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	dgFloat32 freezeAlpha2 = m_freezeAlpha2;
 	dgFloat32 freezeSpeed2 = m_freezeSpeed2;
 	dgFloat32 freezeOmega2 = m_freezeOmega2;
-	for (dgInt32 i = 0; i < DG_SLEEP_ENTRIES; i ++) {
+
+	m_sleepTable[0].m_maxAccel = freezeAccel2;
+	m_sleepTable[0].m_maxAlpha = freezeAlpha2;
+	m_sleepTable[0].m_maxVeloc = freezeSpeed2 * dgFloat32 (0.1f);
+	m_sleepTable[0].m_maxOmega = freezeOmega2 * dgFloat32(0.1f);
+	m_sleepTable[0].m_steps = steps;
+	for (dgInt32 i = 1; i < DG_SLEEP_ENTRIES; i ++) {
+		steps += 7;
 		m_sleepTable[i].m_maxAccel = freezeAccel2;
 		m_sleepTable[i].m_maxAlpha = freezeAlpha2;
 		m_sleepTable[i].m_maxVeloc = freezeSpeed2;
 		m_sleepTable[i].m_maxOmega = freezeOmega2;
 		m_sleepTable[i].m_steps = steps;
-		steps += 7;
 		freezeAccel2 *= dgFloat32 (1.5f);
 		freezeAlpha2 *= dgFloat32 (1.4f);
 		freezeSpeed2 *= dgFloat32 (1.5f);
@@ -307,8 +313,8 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	}
 
 	steps += 300;
-	m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAccel *= dgFloat32 (100.0f);
-	m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAlpha *= dgFloat32 (100.0f);
+	m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAccel *= dgFloat32 (20.0f);
+	m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAlpha *= dgFloat32 (20.0f);
 	m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxVeloc = 0.25f;
 	m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxOmega = 0.1f;
 	m_sleepTable[DG_SLEEP_ENTRIES - 1].m_steps = steps;
