@@ -184,7 +184,8 @@ void dAnimationJointSolver::GetJacobians(dAnimationJoint* const node)
 
 void dAnimationJointSolver::CalculateBodyDiagonal(dAnimationJoint* const child)
 {
-	dAssert(0);
+//	dAssert(0);
+	dTrace(("xxxxxxxxx \n"));
 /*
 	dAnimationContraint* const joint = child->GetProxyJoint();
 	dAssert(joint);
@@ -217,7 +218,8 @@ void dAnimationJointSolver::CalculateBodyDiagonal(dAnimationJoint* const child)
 
 void dAnimationJointSolver::CalculateJointDiagonal(dAnimationJoint* const node)
 {
-	dAssert(0);
+//	dAssert(0);
+	dTrace(("xxxxxxxxx \n"));
 /*
 	dAnimationContraint* const joint = node->GetProxyJoint();
 
@@ -248,7 +250,8 @@ void dAnimationJointSolver::CalculateJointDiagonal(dAnimationJoint* const node)
 
 void dAnimationJointSolver::CalculateJacobianBlock(dAnimationJoint* const node)
 {
-	dAssert(0);
+//	dAssert(0);
+	dTrace(("xxxxxxxxx \n"));
 /*
 	dAnimationContraint* const joint = node->GetProxyJoint();
 	const int index = node->GetIndex();
@@ -1291,7 +1294,7 @@ void dAnimationJointSolver::Update(dFloat timestep)
 
 	BuildJacobianMatrix(timestep);
 
-//	InitMassMatrix();
+	InitMassMatrix();
 //	dAssert (0);
 /*
 	m_pairs = dAlloca(dNodePair, m_rowCount + m_loopRowCount);

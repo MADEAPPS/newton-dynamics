@@ -224,29 +224,34 @@ dgMatrix dgMatrix::Inverse4x4 () const
 	dgMatrix tmp (*this);
 	dgMatrix inv (dgGetIdentityMatrix());
 	for (dgInt32 i = 0; i < 4; i++) {
-		dgInt32 permute = i;
 		dgFloat32 pivot = dgAbs(tmp[i][i]);
-		for (dgInt32 j = i + 1; j < 4; j++) {
-			dgFloat32 pivot1 = dgAbs(tmp[j][i]);
-			if (pivot1 > pivot) {
-				permute = j;
-				pivot = pivot1;
+		if (pivot < dgFloat32(0.01f)) {
+			dgInt32 permute = i;
+			for (dgInt32 j = i + 1; j < 4; j++) {
+				dgFloat32 pivot1 = dgAbs(tmp[j][i]);
+				if (pivot1 > pivot) {
+					permute = j;
+					pivot = pivot1;
+				}
 			}
-		}
-		dgAssert(pivot > dgFloat32 (1.0e-6f));
-		if (permute != i) {
-			for (dgInt32 j = 0; j < 4; j++) {
-				dgSwap(inv[i][j], inv[permute][j]);
-				dgSwap(tmp[i][j], tmp[permute][j]);
+			dgAssert(pivot > dgFloat32(1.0e-6f));
+			if (permute != i) {
+				//for (dgInt32 j = 0; j < 4; j++) {
+					dgSwap(inv[i], inv[permute]);
+					dgSwap(tmp[i], tmp[permute]);
+				//}
 			}
 		}
 
 		for (dgInt32 j = i + 1; j < 4; j++) {
-			dgFloat32 scale = tmp[j][i] / tmp[i][i];
-			for (dgInt32 k = 0; k < 4; k++) {
-				tmp[j][k] -= scale * tmp[i][k];
-				inv[j][k] -= scale * inv[i][k];
-			}
+//			dgFloat32 scale = tmp[j][i] / tmp[i][i];
+//			for (dgInt32 k = 0; k < 4; k++) {
+//				tmp[j][k] -= scale * tmp[i][k];
+//				inv[j][k] -= scale * inv[i][k];
+//			}
+			dgVector scale (tmp[j][i] / tmp[i][i]);
+			tmp[j] -= tmp[i] * scale;
+			inv[j] -= inv[i] * scale;
 			tmp[j][i] = dgFloat32 (0.0f);
 		}
 	}
@@ -254,19 +259,29 @@ dgMatrix dgMatrix::Inverse4x4 () const
 	for (dgInt32 i = 3; i >= 0; i--) {
 		dgVector acc(dgVector::m_zero);
 		for (dgInt32 j = i + 1; j < 4; j++) {
-			dgFloat32 pivot = tmp[i][j];
-			for (dgInt32 k = 0; k < 4; k++) {
-				acc[k] += pivot * inv[j][k];
-			}
+//			dgFloat32 pivot = tmp[i][j];
+//			for (dgInt32 k = 0; k < 4; k++) {
+//				acc[k] += pivot * inv[j][k];
+//			}
+			dgVector pivot(tmp[i][j]);
+			acc += pivot * inv[j];
 		}
-		dgFloat32 den = 1.0f / tmp[i][i];
-		for (dgInt32 k = 0; k < 4; k++) {
-			inv[i][k] = den * (inv[i][k] - acc[k]);
-		}
+		//dgFloat32 den = dgFloat32(1.0f) / tmp[i][i];
+		//for (dgInt32 k = 0; k < 4; k++) {
+		//	inv[i][k] = den * (inv[i][k] - acc[k]);
+		//}
+		dgVector den(dgFloat32(1.0f) / tmp[i][i]);
+		inv[i] = den * (inv[i] - acc);
 	}
 #ifdef _DEBUG
-	tmp = (*this) * inv;
-	dgAssert (tmp.TestIdentity());
+	tmp = *this * inv;
+	for (dgInt32 i = 0; i < 4; i++) {
+		dgAssert(dgAbs(tmp[i][i] - dgFloat32(1.0f)) < dgFloat32(1.0e-6f));
+		for (dgInt32 j = i + 1; j < 4; j++) {
+			dgAssert(dgAbs(tmp[i][j]) < dgFloat32(1.0e-6f));
+			dgAssert(dgAbs(tmp[j][i]) < dgFloat32(1.0e-6f));
+		}
+	}
 #endif
 
 	return inv;
@@ -713,30 +728,34 @@ dgSpatialMatrix dgSpatialMatrix::Inverse(dgInt32 rows) const
 #else
 
 	for (dgInt32 i = 0; i < rows; i++) {
-		int permute = i;
 		dgFloat64 pivot = dgAbs(tmp[i][i]);
-		for (dgInt32 j = i + 1; j < rows; j++) {
-			dgFloat64 pivot1 = dgAbs(tmp[j][i]);
-			if (pivot1 > pivot) {
-				permute = j;
-				pivot = pivot1;
+		if (pivot < dgFloat64(0.01f)) {
+			int permute = i;
+			for (dgInt32 j = i + 1; j < rows; j++) {
+				dgFloat64 pivot1 = dgAbs(tmp[j][i]);
+				if (pivot1 > pivot) {
+					permute = j;
+					pivot = pivot1;
+				}
 			}
-		}
-		dgAssert(pivot > dgFloat32(1.0e-6f));
-		if (permute != i) {
-			for (dgInt32 j = 0; j < rows; j++) {
-				dgSwap(tmp[i][j], tmp[permute][j]);
-				dgSwap(tmp[i][j], tmp[permute][j]);
+			dgAssert(pivot > dgFloat32(1.0e-6f));
+			if (permute != i) {
+				for (dgInt32 j = 0; j < rows; j++) {
+					dgSwap(tmp[i][j], tmp[permute][j]);
+					dgSwap(tmp[i][j], tmp[permute][j]);
+				}
 			}
 		}
 
 		for (dgInt32 j = i + 1; j < rows; j++) {
 			dgFloat64 scale = tmp[j][i] / tmp[i][i];
-			for (int k = 0; k < rows; k++) {
+			tmp[j][i] = dgFloat64(0.0f);
+			for (int k = i + 1; k < rows; k++) {
 				tmp[j][k] -= scale * tmp[i][k];
+			}
+			for (int k = 0; k <= i; k++) {
 				inv[j][k] -= scale * inv[i][k];
 			}
-			tmp[j][i] = dgFloat64 (0.0f);
 		}
 	}
 
@@ -763,7 +782,7 @@ dgSpatialMatrix dgSpatialMatrix::Inverse(dgInt32 rows) const
 	}
 	for (dgInt32 i = 0; i < rows; i++) {
 		dgSpatialVector v(inv.VectorTimeMatrix(tmp[i], rows));
-		dgAssert(dgAbs(v[i] - dgFloat32(1.0f)) < dgFloat64(1.0e-6f));
+		dgAssert(dgAbs(v[i] - dgFloat64(1.0f)) < dgFloat64(1.0e-6f));
 		for (dgInt32 j = 0; j < rows; j++) {
 			if (j != i) {
 				dgAssert(dgAbs(v[j]) < dgFloat64(1.0e-6f));

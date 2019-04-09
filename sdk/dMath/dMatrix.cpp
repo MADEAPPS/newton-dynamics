@@ -570,8 +570,14 @@ dMatrix dMatrix::Inverse4x4 () const
 	}
 
 #ifdef _DEBUG
-	tmp = (*this) * inv;
-	dAssert(tmp.TestIdentity());
+	tmp = *this * inv;
+	for (int i = 0; i < 4; i++) {
+		dAssert(dAbs(tmp[i][i] - dFloat(1.0f)) < dFloat(1.0e-6f));
+		for (int j = i + 1; j < 4; j++) {
+			dAssert(dAbs(tmp[i][j]) < dFloat(1.0e-6f));
+			dAssert(dAbs(tmp[j][i]) < dFloat(1.0e-6f));
+		}
+	}
 #endif
 
 	return inv;
@@ -899,30 +905,35 @@ dSpatialMatrix dSpatialMatrix::Inverse(int rows) const
 #else
 
 	for (int i = 0; i < rows; i++) {
-		int permute = i;
 		dFloat pivot = dAbs(tmp[i][i]);
-		for (int j = i + 1; j < rows; j++) {
-			dFloat pivot1 = dAbs(tmp[j][i]);
-			if (pivot1 > pivot) {
-				permute = j;
-				pivot = pivot1;
+		dAssert(pivot >= 0.01f);
+		if (pivot <= 0.01f) {
+			int permute = i;
+			for (int j = i + 1; j < rows; j++) {
+				dFloat pivot1 = dAbs(tmp[j][i]);
+				if (pivot1 > pivot) {
+					permute = j;
+					pivot = pivot1;
+				}
 			}
-		}
-		dAssert(pivot > dFloat(1.0e-6f));
-		if (permute != i) {
-			for (int j = 0; j < rows; j++) {
-				dSwap(tmp[i][j], tmp[permute][j]);
-				dSwap(tmp[i][j], tmp[permute][j]);
+			dAssert(pivot > dFloat(1.0e-6f));
+			if (permute != i) {
+				for (int j = 0; j < rows; j++) {
+					dSwap(tmp[i][j], tmp[permute][j]);
+					dSwap(tmp[i][j], tmp[permute][j]);
+				}
 			}
 		}
 
 		for (int j = i + 1; j < rows; j++) {
 			dFloat scale = tmp[j][i] / tmp[i][i];
-			for (int k = 0; k < rows; k++) {
+			tmp[j][i] = 0.0f;
+			for (int k = i + 1; k < rows; k++) {
 				tmp[j][k] -= scale * tmp[i][k];
+			}
+			for (int k = 0; k <= i; k++) {
 				inv[j][k] -= scale * inv[i][k];
 			}
-			tmp[j][i] = 0.0f;
 		}
 	}
 
