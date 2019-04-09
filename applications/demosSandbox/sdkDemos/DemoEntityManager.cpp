@@ -33,7 +33,7 @@
 #define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0		// using NewtonMesh tool
+#define DEFAULT_SCENE	0		// using NewtonMesh tool
 //#define DEFAULT_SCENE	1		// coefficients of friction
 //#define DEFAULT_SCENE	2		// coefficients of restitution
 //#define DEFAULT_SCENE	3		// gyroscope precession
@@ -48,7 +48,7 @@
 //#define DEFAULT_SCENE	12		// height field Collision
 //#define DEFAULT_SCENE	13		// infinite user plane collision
 //#define DEFAULT_SCENE	14		// user height field Collision
-#define DEFAULT_SCENE	15		// compound Collision
+//#define DEFAULT_SCENE	15		// compound Collision
 //#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	17		// uniform Scaled Collision
 //#define DEFAULT_SCENE	18		// non uniform Scaled Collision

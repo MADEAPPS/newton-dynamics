@@ -680,6 +680,8 @@ void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thr
 //mass = 0.0f;
 	dVector force (dir.Scale (mass * DEMO_GRAVITY));
 	NewtonBodySetForce (body, &force.m_x);
+
+	NewtonBodySetSleepState(body, 0);
 }
 
 void GenericContactProcess (const NewtonJoint* contactJoint, dFloat timestep, int threadIndex)
