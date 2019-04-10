@@ -15,18 +15,15 @@
 #include "toolbox_stdafx.h"
 #include "dCustomListener.h"
 
-class DemoEntityListener: public dCustomListener
+class DemoEntityListener: public dCustomParallelListener
 {
 	public:
 	DemoEntityListener(DemoEntityManager* const scene);
 	~DemoEntityListener();
 
 	private:
-	virtual void PreUpdate (dFloat timestep);
-	virtual void PostUpdate (dFloat timestep);
-
-	static void PreUpdateKernel (NewtonWorld* const world, void* const userData, int threadIndex);
-	static void PostUpdateKernel (NewtonWorld* const world, void* const userData, int threadIndex);
+	virtual void PreUpdate (dFloat timestep, int threadID);
+	virtual void PostUpdate (dFloat timestep, int threadID);
 };
 
 #endif

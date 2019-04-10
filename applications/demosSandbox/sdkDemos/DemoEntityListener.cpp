@@ -16,7 +16,7 @@
 
 
 DemoEntityListener::DemoEntityListener(DemoEntityManager* const scene)
-	:dCustomListener (scene->GetNewton(), "entityListener")
+	:dCustomParallelListener(scene->GetNewton(), "entityListener")
 {
 }
 
@@ -24,14 +24,19 @@ DemoEntityListener::~DemoEntityListener()
 {
 }
 
-void DemoEntityListener::PreUpdateKernel (NewtonWorld* const world, void* const userData, int threadIndex)
+void DemoEntityListener::PreUpdate(dFloat timestep, int threadID)
 {
+	D_TRACKTIME();
+	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-	DemoEntityManager::dListNode* node = (DemoEntityManager::dListNode*) userData;
+
+	DemoEntityManager::dListNode* node = scene->dList<DemoEntity*>::GetFirst();
+	for (int i = 0; i < threadID; i++) {
+		node = node ? node->GetNext() : NULL;
+	}
 	if (node) {
 		do {
-			dFloat timestep = scene->m_currentListenerTimestep;
 			DemoEntity* const entity = node->GetInfo();
 			entity->AddRef();
 			entity->SimulationPreListener(scene, node, timestep);
@@ -43,14 +48,19 @@ void DemoEntityListener::PreUpdateKernel (NewtonWorld* const world, void* const 
 	}
 }
 
-void DemoEntityListener::PostUpdateKernel (NewtonWorld* const world, void* const userData, int threadIndex)
+void DemoEntityListener::PostUpdate(dFloat timestep, int threadID)
 {
+	D_TRACKTIME();
+	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-	DemoEntityManager::dListNode* node = (DemoEntityManager::dListNode*) userData;
+
+	DemoEntityManager::dListNode* node = scene->dList<DemoEntity*>::GetFirst();
+	for (int i = 0; i < threadID; i++) {
+		node = node ? node->GetNext() : NULL;
+	}
 	if (node) {
 		do {
-			dFloat timestep = scene->m_currentListenerTimestep;
 			DemoEntity* const entity = node->GetInfo();
 			entity->AddRef();
 			entity->SimulationPostListener(scene, node, timestep);
@@ -60,34 +70,6 @@ void DemoEntityListener::PostUpdateKernel (NewtonWorld* const world, void* const
 			}
 		} while (node);
 	}
-}
-
-void DemoEntityListener::PreUpdate (dFloat timestep)
-{
-	NewtonWorld* const world = GetWorld();
-	const int threadCount = NewtonGetThreadsCount(world);
-	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-	scene->m_currentListenerTimestep = timestep;
-	DemoEntityManager::dListNode* node = scene->dList<DemoEntity*>::GetFirst();
-	for (int i = 0; i < threadCount; i ++) {
-		NewtonDispachThreadJob(world, PreUpdateKernel, node, "DemoEntityListener");
-		node = node ? node->GetNext() : NULL;
-	}
-	NewtonSyncThreadJobs(world);
-}
-
-void DemoEntityListener::PostUpdate (dFloat timestep)
-{
-	NewtonWorld* const world = GetWorld();
-	const int threadCount = NewtonGetThreadsCount(world);
-	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-	scene->m_currentListenerTimestep = timestep;
-	DemoEntityManager::dListNode* node = scene->dList<DemoEntity*>::GetFirst();
-	for (int i = 0; i < threadCount; i++) {
-		NewtonDispachThreadJob(world, PostUpdateKernel, node, "PostUpdateKernel");
-		node = node ? node->GetNext() : NULL;
-	}
-	NewtonSyncThreadJobs(world);
 }
 
 

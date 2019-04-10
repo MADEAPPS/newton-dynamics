@@ -49,10 +49,9 @@ class dCustomTriggerController
 
 	NewtonBody* GetBody() const {return m_kinematicBody; }
 
-	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
-	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadIndex);
-
-	CUSTOM_JOINTS_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+	virtual void PreUpdate(dFloat timestep, int threadIndex) {};
+	virtual void PostUpdate(dFloat timestep, int threadIndex) {};
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const {dAssert(0);}
 
 	private:
 	dTree<unsigned, NewtonBody*> m_manifest;
@@ -63,7 +62,7 @@ class dCustomTriggerController
 	friend class dCustomTriggerManager;
 };
 
-class dCustomTriggerManager: public dCustomListener
+class dCustomTriggerManager: public dCustomParallelListener
 {
 	public:
 	enum dTriggerEventType
@@ -83,7 +82,8 @@ class dCustomTriggerManager: public dCustomListener
 	protected:
 	virtual void Debug () const {};
 	CUSTOM_JOINTS_API virtual void OnDestroyBody (NewtonBody* const body); 
-	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep);
+//	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep);
+	CUSTOM_JOINTS_API void PreUpdate(dFloat timestep, int threadID);
 
 	CUSTOM_JOINTS_API virtual void OnDestroy();
 
@@ -94,7 +94,7 @@ class dCustomTriggerManager: public dCustomListener
 
 	private:
 	void UpdateTrigger (dCustomTriggerController* const controller);
-	static void UpdateTrigger (NewtonWorld* const world, void* const context, int threadIndex);
+//	static void UpdateTrigger (NewtonWorld* const world, void* const context, int threadIndex);
 
 	dList<dCustomTriggerController> m_triggerList;
 	dFloat m_timestep;

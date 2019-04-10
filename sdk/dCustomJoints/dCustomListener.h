@@ -50,8 +50,9 @@ class dCustomParallelListener: public dCustomListener
 	static void ParallerListenPreUpdateCallback (NewtonWorld* const world, void* const userData, int threadIndex);
 	static void ParallerListenPostUpdateCallback(NewtonWorld* const world, void* const userData, int threadIndex);
 
-	virtual void PreUpdate(dFloat timestep);
-	virtual void PostUpdate(dFloat timestep);
+	protected:
+	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep);
+	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep);
 	dFloat m_timestep;
 };
 

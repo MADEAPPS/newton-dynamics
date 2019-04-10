@@ -18,7 +18,7 @@
 #include "dCustomTriggerManager.h"
 
 dCustomTriggerManager::dCustomTriggerManager(NewtonWorld* const world)
-	:dCustomListener(world, TRIGGER_PLUGIN_NAME)
+	:dCustomParallelListener(world, TRIGGER_PLUGIN_NAME)
 	,m_triggerList()
 	,m_timestep(0.0f)
 	,m_lock(0)
@@ -63,17 +63,6 @@ void dCustomTriggerManager::DestroyTrigger (dCustomTriggerController* const trig
 	m_triggerList.Remove(node);
 }
 
-void dCustomTriggerManager::PreUpdate(dFloat timestep)
-{
-	D_TRACKTIME();
-	m_timestep = timestep;
-	NewtonWorld* const world = GetWorld();
-	
-	for (dList<dCustomTriggerController>::dListNode* node = m_triggerList.GetFirst(); node; node = node->GetNext()) {
-		NewtonDispachThreadJob (world, UpdateTrigger, &node->GetInfo(), "UpdateTrigger");
-	}
-	NewtonSyncThreadJobs(world);
-}
 
 void dCustomTriggerManager::OnDestroyBody (NewtonBody* const body)
 {
@@ -129,23 +118,25 @@ void dCustomTriggerManager::UpdateTrigger (dCustomTriggerController* const contr
 	}
 }
 
-void dCustomTriggerManager::UpdateTrigger (NewtonWorld* const world, void* const context, int threadIndex)
+void dCustomTriggerManager::PreUpdate(dFloat timestep, int threadID)
 {
 	D_TRACKTIME();
-	dCustomTriggerController* const controller = (dCustomTriggerController*)context;
-	dCustomTriggerManager* const me = controller->m_manager;
-	me->UpdateTrigger(controller);
+	NewtonWorld* const world = GetWorld();
+	const int threadCount = NewtonGetThreadsCount(world);
+
+	dList<dCustomTriggerController>::dListNode* node = m_triggerList.GetFirst();
+	for (int i = 0; i < threadID; i++) {
+		node = node ? node->GetNext() : NULL;
+	}
+	if (node) {
+		dCustomTriggerController* const controller = &node->GetInfo();
+		UpdateTrigger(controller);
+		do {
+			for (int i = 0; i < threadCount; i++) {
+				node = node ? node->GetNext() : NULL;
+			}
+		} while (node);
+	}
 }
 
-void dCustomTriggerController::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
-{
-	dAssert(0);
-}
 
-void dCustomTriggerController::PostUpdate(dFloat timestep, int threadIndex)
-{
-}
-
-void dCustomTriggerController::PreUpdate(dFloat timestep, int threadIndex)
-{
-}
