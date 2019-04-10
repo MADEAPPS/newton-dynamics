@@ -49,27 +49,9 @@ class dShowAllSubShapes: public dCustomListener
 				dFloat y = dFloat(mouseY);
 				dVector p0(camera->ScreenToWorld(dVector(x, y, 0.0f, 0.0f)));
 				dVector p1(camera->ScreenToWorld(dVector(x, y, 1.0f, 0.0f)));
-/*
-				dFloat param;
-				dVector posit;
-				dVector normal;
-				NewtonBody* const body = MousePickBody(scene->GetNewton(), p0, p1, param, posit, normal);
-				if (body) {
-
-					// if we picked a body see if it has a compound shape
-					NewtonCollision* const collision = NewtonBodyGetCollision(body);
-					int NewtonCollisionGetType(const NewtonCollision* const collision);
-					if (NewtonCollisionGetType(collision) == SERIALIZE_ID_COMPOUND) {
-						m_body = body;
-						RayCastAllSubShapes(p0, p1);
-					}
-				}
-*/
 				RayCastCompoundsAllSubShapes(p0, p1);
 			}
-
-		}
-		else if (m_mouseDown && !mouseClick) {
+		} else if (m_mouseDown && !mouseClick) {
 			// release the body
 			m_body = NULL;
 		}
@@ -98,7 +80,7 @@ class dShowAllSubShapes: public dCustomListener
 		NewtonWorld* const world = GetWorld();
 		NewtonWorldRayCast(world, &origin[0], &end[0], PickCompound, this, NULL, 0);
 		if (m_body) {
-			// code to be implements here
+			// we found a compound, find all sub shape on teh path of the ray
 			dMatrix matrix;
 			NewtonBodyGetMatrix(m_body, &matrix[0][0]);
 			dVector localP0(matrix.UntransformVector(origin));
