@@ -20,7 +20,7 @@
 #define D_ANIMATION_MODEL_MANAGER	"__dAnimationModelManager__"
 
 
-class dAnimationModelManager: public dCustomListener
+class dAnimationModelManager: public dCustomParallelListener
 {
 	public:
 	dAnimationModelManager(NewtonWorld* const world, const char* const name = D_ANIMATION_MODEL_MANAGER);
@@ -39,17 +39,13 @@ class dAnimationModelManager: public dCustomListener
 	virtual void OnPostUpdate(dAnimationJointRoot* const model, dFloat timestep) {}
 
 	private:
-	virtual void PreUpdate(dFloat timestep);
-	virtual void PostUpdate(dFloat timestep);
-
-	static void PreUpdate(NewtonWorld* const world, void* const context, int threadIndex);
-	static void PostUpdate(NewtonWorld* const world, void* const context, int threadIndex);
+	void PreUpdate(dFloat timestep, int threadID);
+	void PostUpdate(dFloat timestep, int threadID);
 
 	private:
 	dList<dAnimationJointRoot*> m_controllerList;
 	dFloat m_timestep;
 	//unsigned m_lock;
-
 };
 
 

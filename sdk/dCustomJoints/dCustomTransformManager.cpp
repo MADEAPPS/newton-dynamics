@@ -79,7 +79,7 @@ void dCustomTransformController::PostUpdate(dCustomTransformManager* const manag
 
 
 dCustomTransformManager::dCustomTransformManager(NewtonWorld* const world, const char* const name)
-	:dCustomListener(world, name)
+	:dCustomParallelListener(world, name)
 {
 }
 
@@ -95,19 +95,57 @@ dCustomTransformController* dCustomTransformManager::CreateController(NewtonBody
 	return controller;
 }
 
-void dCustomTransformManager::PreUpdate(dFloat timestep)
+//void dCustomTransformManager::PreUpdate(dFloat timestep)
+void dCustomTransformManager::PreUpdate(dFloat timestep, int threadID)
 {
-	for (dList<dCustomTransformController>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
+//	for (dList<dCustomTransformController>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
+//		dCustomTransformController* const controller = &node->GetInfo();
+//		OnPreUpdate(controller, timestep, 0);
+//	}
+
+	D_TRACKTIME();
+	NewtonWorld* const world = GetWorld();
+	const int threadCount = NewtonGetThreadsCount(world);
+
+	dList<dCustomTransformController>::dListNode* node = m_controllerList.GetFirst();
+	for (int i = 0; i < threadID; i++) {
+		node = node ? node->GetNext() : NULL;
+	}
+	if (node) {
 		dCustomTransformController* const controller = &node->GetInfo();
-		OnPreUpdate(controller, timestep, 0);
+		OnPreUpdate(controller, timestep, threadID);
+		do {
+			for (int i = 0; i < threadCount; i++) {
+				node = node ? node->GetNext() : NULL;
+			}
+		} while (node);
 	}
 }
 
-void dCustomTransformManager::PostUpdate(dFloat timestep)
+//void dCustomTransformManager::PostUpdate(dFloat timestep)
+void dCustomTransformManager::PostUpdate(dFloat timestep, int threadID)
 {
-	for (dList<dCustomTransformController>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
+//	for (dList<dCustomTransformController>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
+//		dCustomTransformController* const controller = &node->GetInfo();
+//		controller->PostUpdate(this, timestep);
+//	}
+
+	D_TRACKTIME();
+	NewtonWorld* const world = GetWorld();
+	const int threadCount = NewtonGetThreadsCount(world);
+
+	dList<dCustomTransformController>::dListNode* node = m_controllerList.GetFirst();
+	for (int i = 0; i < threadID; i++) {
+		node = node ? node->GetNext() : NULL;
+	}
+	if (node) {
 		dCustomTransformController* const controller = &node->GetInfo();
 		controller->PostUpdate(this, timestep);
+		do {
+			for (int i = 0; i < threadCount; i++) {
+				node = node ? node->GetNext() : NULL;
+			}
+		} while (node);
 	}
 }
 

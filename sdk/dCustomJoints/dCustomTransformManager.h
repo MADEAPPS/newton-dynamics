@@ -83,7 +83,7 @@ class dCustomTransformController: public dSkeletonBone
 	friend class dCustomTransformManager;
 };
 
-class dCustomTransformManager: public dCustomListener
+class dCustomTransformManager: public dCustomParallelListener
 {
 	public:
 	CUSTOM_JOINTS_API dCustomTransformManager(NewtonWorld* const world, const char* const name = HIERACHICAL_ARTICULATED_PLUGIN_NAME);
@@ -98,8 +98,10 @@ class dCustomTransformManager: public dCustomListener
 
 	protected:
 	CUSTOM_JOINTS_API virtual void OnDestroy();
-	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep);
-	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep);
+//	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep);
+//	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep);
+	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadID);
+	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadID);
 
 	private: 
 	dList<dCustomTransformController> m_controllerList;
