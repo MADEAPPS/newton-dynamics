@@ -236,19 +236,12 @@ dgMatrix dgMatrix::Inverse4x4 () const
 			}
 			dgAssert(pivot > dgFloat32(1.0e-6f));
 			if (permute != i) {
-				//for (dgInt32 j = 0; j < 4; j++) {
-					dgSwap(inv[i], inv[permute]);
-					dgSwap(tmp[i], tmp[permute]);
-				//}
+				dgSwap(inv[i], inv[permute]);
+				dgSwap(tmp[i], tmp[permute]);
 			}
 		}
 
 		for (dgInt32 j = i + 1; j < 4; j++) {
-//			dgFloat32 scale = tmp[j][i] / tmp[i][i];
-//			for (dgInt32 k = 0; k < 4; k++) {
-//				tmp[j][k] -= scale * tmp[i][k];
-//				inv[j][k] -= scale * inv[i][k];
-//			}
 			dgVector scale (tmp[j][i] / tmp[i][i]);
 			tmp[j] -= tmp[i] * scale;
 			inv[j] -= inv[i] * scale;
@@ -259,20 +252,13 @@ dgMatrix dgMatrix::Inverse4x4 () const
 	for (dgInt32 i = 3; i >= 0; i--) {
 		dgVector acc(dgVector::m_zero);
 		for (dgInt32 j = i + 1; j < 4; j++) {
-//			dgFloat32 pivot = tmp[i][j];
-//			for (dgInt32 k = 0; k < 4; k++) {
-//				acc[k] += pivot * inv[j][k];
-//			}
 			dgVector pivot(tmp[i][j]);
 			acc += pivot * inv[j];
 		}
-		//dgFloat32 den = dgFloat32(1.0f) / tmp[i][i];
-		//for (dgInt32 k = 0; k < 4; k++) {
-		//	inv[i][k] = den * (inv[i][k] - acc[k]);
-		//}
 		dgVector den(dgFloat32(1.0f) / tmp[i][i]);
 		inv[i] = den * (inv[i] - acc);
 	}
+
 #ifdef _DEBUG
 	tmp = *this * inv;
 	for (dgInt32 i = 0; i < 4; i++) {
@@ -285,33 +271,6 @@ dgMatrix dgMatrix::Inverse4x4 () const
 #endif
 
 	return inv;
-}
-
-dgMatrix dgMatrix::Symetric3by3Inverse () const
-{
-	dgMatrix copy(*this);
-	dgMatrix inverse(dgGetIdentityMatrix());
-	for (dgInt32 i = 0; i < 3; i++) {
-		dgVector den(dgFloat32(1.0f) / copy[i][i]);
-		copy[i] = copy[i] * den;
-		inverse[i] = inverse[i] * den;
-		for (dgInt32 j = 0; j < 3; j++) {
-			if (j != i) {
-				dgVector pivot(copy[j][i]);
-				copy[j] -= copy[i] * pivot;
-				inverse[j] -= inverse[i] * pivot;
-			}
-		}
-	}
-	
-#ifdef _DEBUG
-	dgMatrix test(*this * inverse);
-	dgAssert(dgAbs(test[0][0] - dgFloat32(1.0f)) < dgFloat32(0.01f));
-	dgAssert(dgAbs(test[1][1] - dgFloat32(1.0f)) < dgFloat32(0.01f));
-	dgAssert(dgAbs(test[2][2] - dgFloat32(1.0f)) < dgFloat32(0.01f));
-#endif
-
-	return inverse;
 }
 
 void dgMatrix::CalcPitchYawRoll (dgVector& euler0, dgVector& euler1) const

@@ -527,20 +527,22 @@ dMatrix dMatrix::Inverse4x4 () const
 	dMatrix tmp (*this);
 	dMatrix inv (dGetIdentityMatrix());
 	for (int i = 0; i < 4; i ++) {
-		int permute = i;
 		dFloat pivot = dAbs(tmp[i][i]);
-		for (int j = i + 1; j < 4; j++) {
-			dFloat pivot1 = dAbs(tmp[j][i]);
-			if (pivot1 > pivot) {
-				permute = j;
-				pivot = pivot1;
+		if (pivot < 0.01f) {
+			int permute = i;
+			for (int j = i + 1; j < 4; j++) {
+				dFloat pivot1 = dAbs(tmp[j][i]);
+				if (pivot1 > pivot) {
+					permute = j;
+					pivot = pivot1;
+				}
 			}
-		}
-		dAssert(pivot > 1.0e-6f);
-		if (permute != i) {
-			for (int j = 0; j < 4; j++) {
-				dSwap(inv[i][j], inv[permute][j]);
-				dSwap(tmp[i][j], tmp[permute][j]);
+			dAssert(pivot > 1.0e-6f);
+			if (permute != i) {
+				for (int j = 0; j < 4; j++) {
+					dSwap(inv[i][j], inv[permute][j]);
+					dSwap(tmp[i][j], tmp[permute][j]);
+				}
 			}
 		}
 		

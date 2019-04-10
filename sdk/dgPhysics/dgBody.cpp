@@ -677,7 +677,7 @@ void dgBody::AddImpulse (const dgVector& pointDeltaVeloc, const dgVector& pointP
 	contactMatrix[1][1] += m_invMass.m_w;	
 	contactMatrix[2][2] += m_invMass.m_w;	
 
-	contactMatrix = contactMatrix.Symetric3by3Inverse ();
+	contactMatrix = contactMatrix.Inverse4x4 ();
 
 	// change of momentum
 	dgVector changeOfMomentum (contactMatrix.RotateVector (pointDeltaVeloc));
@@ -736,7 +736,6 @@ void dgBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const d
 		Unfreeze();
 	}
 }
-
 
 void dgBody::SetSleepState(bool state)
 {

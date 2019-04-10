@@ -30,8 +30,6 @@ class dAnimationLoopJoint: public dCustomAlloc, public dAnimationContraint
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugDisplay) const {}
 	virtual int GetMaxDof() const = 0;
 
-//	dAnimationBody* m_owner0;
-//	dAnimationBody* m_owner1;
 	bool m_isActive;
 };
 

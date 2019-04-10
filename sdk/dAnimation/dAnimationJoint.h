@@ -27,10 +27,14 @@ class dAnimationBody: public dComplementaritySolver::dBodyState
 	dAnimationBody ()
 		:dComplementaritySolver::dBodyState()
 		,m_owner(NULL)
+		,m_index(-1)
 	{
 	}
 
+	const int GetIndex() const {dAssert (m_index >= 0); return m_index;}
+
 	dAnimationJoint* m_owner;
+	int m_index;
 };
 
 class dAnimationContraint: public dComplementaritySolver::dBilateralJoint
@@ -63,9 +67,10 @@ class dAnimationJoint: public dCustomAlloc
 	dAnimationContraint* GetProxyJoint();
 
 	void CopyRigidBodyMassToStates();
+
 	protected:
-	int GetIndex() const;
-	void SetIndex(int index);
+//	int GetIndex() const;
+//	void SetIndex(int index);
 	void CopyRigidBodyMassToStatesLow();
 	virtual void RigidBodyToStates();
 	virtual void ApplyExternalForce(dFloat timestep);
@@ -78,12 +83,11 @@ class dAnimationJoint: public dCustomAlloc
 	dAnimationJoint* m_parent;
 	dAnimationContraint* m_proxyJoint;
 	dAnimationJointChildren m_children;
-	int m_index;
-
+	
 	friend class dAnimationJointSolver;
 };
 
-
+/*
 inline int dAnimationJoint::GetIndex() const
 {
 	return m_index;
@@ -93,6 +97,7 @@ inline void dAnimationJoint::SetIndex(int index)
 {
 	m_index = index;
 }
+*/
 
 inline dAnimationJoint* dAnimationJoint::GetParent() const
 {

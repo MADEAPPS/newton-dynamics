@@ -114,7 +114,8 @@ void dAnimationJointSolver::SortGraph(dAnimationJoint* const root, int& index)
 
 	dAssert((m_nodeCount - index - 1) >= 0);
 	m_nodesOrder[index] = root;
-	root->SetIndex (index);
+	//root->SetIndex (index);
+	root->GetProxyBody()->m_index = index;
 	index++;
 	dAssert(index <= m_nodeCount);
 }
@@ -137,12 +138,13 @@ void dAnimationJointSolver::Finalize(dAnimationJointRoot* const rootNode)
 	int index = 0;
 	SortGraph(rootNode, index);
 	dAssert(index == m_nodeCount);
+	rootNode->GetStaticWorld()->m_index = index;
 }
 
 void dAnimationJointSolver::CalculateInertiaMatrix(dAnimationJoint* const node) const
 {
 	dAnimationBody* const body = node->GetProxyBody();
-	dSpatialMatrix& bodyMass = m_data[node->GetIndex()].m_body.m_mass;
+	dSpatialMatrix& bodyMass = m_data[node->GetProxyBody()->GetIndex()].m_body.m_mass;
 	bodyMass = dSpatialMatrix(dFloat32(0.0f));
 
 	if (body->GetInvMass() != dFloat32(0.0f)) {
@@ -163,7 +165,7 @@ void dAnimationJointSolver::GetJacobians(dAnimationJoint* const node)
 	dAssert(node->m_parent);
 	dAnimationContraint* const joint = node->GetProxyJoint();
 
-	const int index = node->GetIndex();
+	const int index = node->GetProxyBody()->GetIndex();
 	dSpatialMatrix& bodyJt = m_data[index].m_body.m_jt;
 	dSpatialMatrix& jointJ = m_data[index].m_joint.m_jt;
 	dSpatialMatrix& jointMass = m_data[index].m_joint.m_mass;
@@ -184,15 +186,12 @@ void dAnimationJointSolver::GetJacobians(dAnimationJoint* const node)
 
 void dAnimationJointSolver::CalculateBodyDiagonal(dAnimationJoint* const child)
 {
-//	dAssert(0);
-	dTrace(("xxxxxxxxx \n"));
-/*
 	dAnimationContraint* const joint = child->GetProxyJoint();
 	dAssert(joint);
 
 	dSpatialMatrix copy(dFloat(0.0f));
 	const int dof = joint->m_dof;
-	const int index = child->GetIndex();
+	const int index = child->GetProxyBody()->GetIndex();
 	const dSpatialMatrix& jacobianMatrix = m_data[index].m_joint.m_jt;
 	const dSpatialMatrix& childDiagonal = m_data[index].m_joint.m_mass;
 	for (int i = 0; i < dof; i++) {
@@ -203,7 +202,7 @@ void dAnimationJointSolver::CalculateBodyDiagonal(dAnimationJoint* const child)
 		}
 	}
 	
-	const int parentIndes = child->GetParent()->GetIndex();
+	const int parentIndes = child->GetParent()->GetProxyBody()->GetIndex();
 	dSpatialMatrix& bodyMass = m_data[parentIndes].m_body.m_mass;
 	for (int i = 0; i < dof; i++) {
 		const dSpatialVector& Jacobian = copy[i];
@@ -213,17 +212,13 @@ void dAnimationJointSolver::CalculateBodyDiagonal(dAnimationJoint* const child)
 			bodyMass[j] = bodyMass[j] + JacobianTranspose.Scale(val);
 		}
 	}
-*/
 }
 
 void dAnimationJointSolver::CalculateJointDiagonal(dAnimationJoint* const node)
 {
-//	dAssert(0);
-	dTrace(("xxxxxxxxx \n"));
-/*
 	dAnimationContraint* const joint = node->GetProxyJoint();
 
-	const int index = node->GetIndex();
+	const int index = node->GetProxyBody()->GetIndex();
 	const dSpatialMatrix& bodyMass = m_data[index].m_body.m_mass;
 	const dSpatialMatrix& bodyJt = m_data[index].m_body.m_jt;
 
@@ -245,16 +240,12 @@ void dAnimationJointSolver::CalculateJointDiagonal(dAnimationJoint* const node)
 
 	dSpatialMatrix& jointInvMass = m_data[index].m_joint.m_invMass;
 	jointInvMass = jointMass.Inverse(joint->m_dof);
-*/
 }
 
 void dAnimationJointSolver::CalculateJacobianBlock(dAnimationJoint* const node)
 {
-//	dAssert(0);
-	dTrace(("xxxxxxxxx \n"));
-/*
 	dAnimationContraint* const joint = node->GetProxyJoint();
-	const int index = node->GetIndex();
+	const int index = node->GetProxyBody()->GetIndex();
 	dSpatialMatrix& jointJ = m_data[index].m_joint.m_jt;
 
 	dSpatialMatrix copy;
@@ -273,7 +264,6 @@ void dAnimationJointSolver::CalculateJacobianBlock(dAnimationJoint* const node)
 			jointJ[j] = jointJ[j] + jacobian.Scale(val);
 		}
 	}
-*/
 }
 
 void dAnimationJointSolver::Factorize(dAnimationJoint* const node)
@@ -305,7 +295,7 @@ void dAnimationJointSolver::Factorize(dAnimationJoint* const node)
 		GetJacobians(node);
 	}
 
-	const int nodeIndex = node->GetIndex();
+	const int nodeIndex = node->GetProxyBody()->GetIndex();
 	dAnimationBody* const body = node->GetProxyBody();
 
 	const dSpatialMatrix& bodyMass = m_data[nodeIndex].m_body.m_mass;
@@ -333,8 +323,10 @@ void dAnimationJointSolver::Factorize(dAnimationJoint* const node)
 
 void dAnimationJointSolver::CalculateLoopMassMatrixCoefficients()
 {
-	dAssert(0);
-/*
+
+dTrace (("xxxxxxxxxxx\n"));
+return;
+
 	const int auxiliaryRowCount = m_auxiliaryRowCount + m_loopRowCount;
 	const int primaryCount = m_rowCount - m_auxiliaryRowCount;
 
@@ -436,13 +428,10 @@ void dAnimationJointSolver::CalculateLoopMassMatrixCoefficients()
 			}
 		}
 	}
-*/
 }
 
 void dAnimationJointSolver::InitLoopMassMatrix()
 {
-	dAssert(0);
-/*
 	int primaryIndex = 0;
 	int auxiliaryIndex = 0;
 	const int primaryCount = m_rowCount - m_auxiliaryRowCount;
@@ -451,10 +440,10 @@ void dAnimationJointSolver::InitLoopMassMatrix()
 		dAnimationJoint* const node = m_nodesOrder[i];
 		const dAnimationContraint* const joint = node->GetProxyJoint();
 		dAssert(joint);
-		dAssert(i == node->GetIndex());
+		dAssert(i == node->GetProxyBody()->GetIndex());
 
-		const int m0 = node->GetIndex();
-		const int m1 = node->m_parent->GetIndex();
+		const int m0 = node->GetProxyBody()->GetIndex();
+		const int m1 = node->m_parent->GetProxyBody()->GetIndex();
 		const int first = joint->m_start;
 		const int primaryDof = joint->m_dof;
 		for (int j = 0; j < primaryDof; j++) {
@@ -477,11 +466,13 @@ void dAnimationJointSolver::InitLoopMassMatrix()
 
 	const int loopJointCount = m_loopJointCount;
 	for (int j = 0; j < loopJointCount; j++) {
-		const dAnimIDRigKinematicLoopJoint* const joint = m_loopJoints[j];
-		const dAnimationJoint* const node0 = joint->GetOwner0();
-		const dAnimationJoint* const node1 = joint->GetOwner1();
-		const int m0 = node0->GetIndex();
-		const int m1 = node1->GetIndex();
+		const dAnimationLoopJoint* const joint = m_loopJoints[j];
+		//dAnimationJoint* const node0 = joint->GetOwner0()->m_owner;
+		//dAnimationJoint* const node1 = joint->GetOwner1()->m_owner;
+		//const int m0 = node0->GetProxyBody()->GetIndex();
+		//const int m1 = node1->GetProxyBody()->GetIndex();
+		const int m0 = joint->GetOwner0()->GetIndex();
+		const int m1 = joint->GetOwner1()->GetIndex();
 		const int first = joint->m_start;
 		const int auxiliaryDof = joint->m_dof;
 		for (int i = 0; i < auxiliaryDof; i++) {
@@ -503,6 +494,9 @@ void dAnimationJointSolver::InitLoopMassMatrix()
 
 	CalculateLoopMassMatrixCoefficients();
 
+dTrace (("xxxxxxxxxxxxx\n"));
+return;
+dAssert (0);
 	const dSpatialVector zero(0.0f);
 	dVectorPair* const accelPair = dAlloca(dVectorPair, m_nodeCount);
 	dVectorPair* const forcePair = dAlloca(dVectorPair, m_nodeCount);
@@ -516,7 +510,7 @@ void dAnimationJointSolver::InitLoopMassMatrix()
 
 		for (int j = 0; j < nodeCount; j++) {
 			dAnimationJoint* const node = m_nodesOrder[j];
-			const int index = node->GetIndex();
+			const int index = node->GetProxyBody()->GetIndex();
 			const dAnimationContraint* const joint = node->GetProxyJoint();
 
 			accelPair[index].m_body = zero;
@@ -541,7 +535,7 @@ void dAnimationJointSolver::InitLoopMassMatrix()
 		for (int j = 0; j < nodeCount; j++) {
 			dAnimationJoint* const node = m_nodesOrder[j];
 			const dAnimationContraint* const joint = node->GetProxyJoint();
-			const int index = node->GetIndex();
+			const int index = node->GetProxyBody()->GetIndex();
 			const dSpatialVector& f = forcePair[index].m_joint;
 			const int count = joint->m_dof;
 			for (int k = 0; k < count; k++) {
@@ -589,7 +583,6 @@ void dAnimationJointSolver::InitLoopMassMatrix()
 	memcpy (tmp, m_massMatrix11, sizeof (dFloat) * auxiliaryIndex * auxiliaryIndex);
 	dAssert (dCholeskyFactorization(auxiliaryIndex, tmp));
 #endif
-*/
 }
 
 void dAnimationJointSolver::InitMassMatrix()
@@ -699,7 +692,7 @@ void dAnimationJointSolver::CalculateJointAccel(dVectorPair* const accel) const
 	dAssert(n == m_nodesOrder[n]->GetIndex());
 	for (int i = 0; i < n; i++) {
 		dAnimationJoint* const node = m_nodesOrder[i];
-		dAssert(i == node->GetIndex());
+		dAssert(i == node->GetProxyBody()->GetIndex());
 
 		dVectorPair& a = accel[i];
 		dAssert(node->GetProxyBody());
@@ -745,7 +738,7 @@ void dAnimationJointSolver::BodyJacobianTimeMassForward(dAnimationJoint* const n
 	dAssert(0);
 	/*
 	const dAnimationContraint* const joint = node->GetProxyJoint();
-	const dSpatialMatrix& jointJ = m_data[node->GetIndex()].m_joint.m_jt;
+	const dSpatialMatrix& jointJ = m_data[node->GetProxyBody()->GetIndex()].m_joint.m_jt;
 	for (int i = 0; i < joint->m_dof; i++) {
 		parentForce.m_body = parentForce.m_body + jointJ[i].Scale(-force.m_joint[i]);
 	}
@@ -757,7 +750,7 @@ void dAnimationJointSolver::JointJacobianTimeMassForward(dAnimationJoint* const 
 	dAssert(0);
 	/*
 	const dAnimationContraint* const joint = node->GetProxyJoint();
-	const dSpatialMatrix& bodyJt = m_data[node->GetIndex()].m_body.m_jt;
+	const dSpatialMatrix& bodyJt = m_data[node->GetProxyBody()->GetIndex()].m_body.m_jt;
 	for (int i = 0; i < joint->m_dof; i++) {
 		force.m_joint[i] -= bodyJt[i].DotProduct(force.m_body);
 	}
@@ -768,7 +761,7 @@ void dAnimationJointSolver::BodyDiagInvTimeSolution(dAnimationJoint* const node,
 {
 	dAssert(0);
 	/*
-	const dSpatialMatrix& bodyInvMass = m_data[node->GetIndex()].m_body.m_invMass;
+	const dSpatialMatrix& bodyInvMass = m_data[node->GetProxyBody()->GetIndex()].m_body.m_invMass;
 	force.m_body = bodyInvMass.VectorTimeMatrix(force.m_body);
 */
 }
@@ -778,7 +771,7 @@ void dAnimationJointSolver::JointDiagInvTimeSolution(dAnimationJoint* const node
 	dAssert(0);
 	/*
 	const dAnimationContraint* const joint = node->GetProxyJoint();
-	const dSpatialMatrix& jointInvMass = m_data[node->GetIndex()].m_joint.m_invMass;
+	const dSpatialMatrix& jointInvMass = m_data[node->GetProxyBody()->GetIndex()].m_joint.m_invMass;
 	force.m_joint = jointInvMass.VectorTimeMatrix(force.m_joint, joint->m_dof);
 */
 }
@@ -788,7 +781,7 @@ void dAnimationJointSolver::JointJacobianTimeSolutionBackward(dAnimationJoint* c
 	dAssert(0);
 /*
 	const dAnimationContraint* const joint = node->GetProxyJoint();
-	const dSpatialMatrix& jointJ = m_data[node->GetIndex()].m_joint.m_jt;
+	const dSpatialMatrix& jointJ = m_data[node->GetProxyBody()->GetIndex()].m_joint.m_jt;
 	const dSpatialVector& f = parentForce.m_body;
 	for (int i = 0; i < joint->m_dof; i++) {
 		force.m_joint[i] -= f.DotProduct(jointJ[i]);
@@ -801,7 +794,7 @@ void dAnimationJointSolver::BodyJacobianTimeSolutionBackward(dAnimationJoint* co
 	dAssert(0);
 /*
 	const dAnimationContraint* const joint = node->GetProxyJoint();
-	const dSpatialMatrix& bodyJt = m_data[node->GetIndex()].m_body.m_jt;
+	const dSpatialMatrix& bodyJt = m_data[node->GetProxyBody()->GetIndex()].m_body.m_jt;
 	for (int i = 0; i < joint->m_dof; i++) {
 		force.m_body = force.m_body + bodyJt[i].Scale(-force.m_joint[i]);
 	}
@@ -822,7 +815,7 @@ void dAnimationJointSolver::SolveForward(dVectorPair* const force, const dVector
 	for (int i = startNode; i < nodeCount; i++) {
 		dAnimationJoint* const node = m_nodesOrder[i];
 		dAssert(node->GetProxyJoint());
-		dAssert(i == node->GetIndex());
+		dAssert(i == node->GetProxyBody()->GetIndex());
 
 		dVectorPair& f = force[i];
 		const dVectorPair& a = accel[i];
@@ -833,7 +826,7 @@ void dAnimationJointSolver::SolveForward(dVectorPair* const force, const dVector
 		for (dList<dAnimationJoint*>::dListNode* childNode = children.GetFirst(); childNode; childNode = childNode->GetNext()) {
 			dAnimationJoint* const child = childNode->GetInfo();
 			dAssert(child->m_parent->GetIndex() == i);
-			BodyJacobianTimeMassForward(child, force[child->GetIndex()], f);
+			BodyJacobianTimeMassForward(child, force[child->GetProxyBody()->GetIndex()], f);
 		}
 		JointJacobianTimeMassForward(node, f);
 	}
@@ -846,7 +839,7 @@ void dAnimationJointSolver::SolveForward(dVectorPair* const force, const dVector
 	for (dList<dAnimationJoint*>::dListNode* childNode = children.GetFirst(); childNode; childNode = childNode->GetNext()) {
 		dAnimationJoint* const child = childNode->GetInfo();
 		dAssert(child->m_parent->GetIndex() == n);
-		BodyJacobianTimeMassForward(child, force[child->GetIndex()], force[n]);
+		BodyJacobianTimeMassForward(child, force[child->GetProxyBody()->GetIndex()], force[n]);
 	}
 
 	for (int i = startNode; i < nodeCount; i++) {
@@ -865,7 +858,7 @@ void dAnimationJointSolver::SolveBackward(dVectorPair* const force, const dVecto
 /*
 	for (int i = m_nodeCount - 2; i >= 0; i--) {
 		dAnimationJoint* const node = m_nodesOrder[i];
-		dAssert(i == node->GetIndex());
+		dAssert(i == node->GetProxyBody()->GetIndex());
 		dVectorPair& f = force[i];
 		JointJacobianTimeSolutionBackward(node, f, force[node->m_parent->GetIndex()]);
 		BodyJacobianTimeSolutionBackward(node, f);
@@ -886,7 +879,7 @@ void dAnimationJointSolver::UpdateForces(const dVectorPair* const force) const
 	dVector zero(0.0f);
 	for (int i = 0; i < m_nodeCount - 1; i++) {
 		dAnimationJoint* const node = m_nodesOrder[i];
-		dAssert(i == node->GetIndex());
+		dAssert(i == node->GetProxyBody()->GetIndex());
 		dAnimationContraint* const joint = node->GetProxyJoint();
 
 		dComplementaritySolver::dJacobian y0;
@@ -1090,9 +1083,9 @@ void dAnimationJointSolver::DebugMassMatrix()
 		dAnimationJoint* const node = m_nodesOrder[i];
 		const dAnimationContraint* const joint = node->GetProxyJoint();
 		dAssert(joint);
-		dAssert(i == node->GetIndex());
+		dAssert(i == node->GetProxyBody()->GetIndex());
 
-		const int m0 = node->GetIndex();
+		const int m0 = node->GetProxyBody()->GetIndex();
 		const int m1 = node->m_parent->GetIndex();
 		const int first = joint->m_start;
 		const int primaryDof = joint->m_dof;
@@ -1109,9 +1102,9 @@ void dAnimationJointSolver::DebugMassMatrix()
 		dAnimationJoint* const node = m_nodesOrder[i];
 		const dAnimationContraint* const joint = node->GetProxyJoint();
 		dAssert(joint);
-		dAssert(i == node->GetIndex());
+		dAssert(i == node->GetProxyBody()->GetIndex());
 
-		const int m0 = node->GetIndex();
+		const int m0 = node->GetProxyBody()->GetIndex();
 		const int m1 = node->m_parent->GetIndex();
 		const int first = joint->m_start;
 		const int primaryDof = joint->m_dof;
@@ -1293,10 +1286,8 @@ void dAnimationJointSolver::Update(dFloat timestep)
 	m_rightHandSide = dAlloca(dComplementaritySolver::dJacobianColum, m_nodeCount * 6 + loopDof);
 
 	BuildJacobianMatrix(timestep);
-
 	InitMassMatrix();
-//	dAssert (0);
-/*
+
 	m_pairs = dAlloca(dNodePair, m_rowCount + m_loopRowCount);
 	m_matrixRowsIndex = dAlloca(int, m_rowCount + m_loopRowCount);
 
@@ -1311,6 +1302,8 @@ void dAnimationJointSolver::Update(dFloat timestep)
 		InitLoopMassMatrix();
 	}
 
+//	dAssert (0);
+/*
 	dVectorPair* const force = dAlloca(dVectorPair, m_nodeCount);
 	dVectorPair* const accel = dAlloca(dVectorPair, m_nodeCount);
 	CalculateJointAccel(accel);

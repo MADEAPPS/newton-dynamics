@@ -60,7 +60,6 @@ class dgMatrix
 	dgMatrix Inverse4x4 () const;
 	dgMatrix Transpose () const;
 	dgMatrix Transpose4X4 () const;
-	dgMatrix Symetric3by3Inverse () const;
 	dgVector RotateVector (const dgVector &v) const;
 	dgVector UnrotateVector (const dgVector &v) const;
 	dgVector TransformVector (const dgVector &v) const;
