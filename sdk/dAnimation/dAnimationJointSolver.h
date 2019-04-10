@@ -69,7 +69,8 @@ class dAnimationJointSolver: public dCustomAlloc
 	void DebugMassMatrix();
 
 	dAnimationJointRoot* m_rootNode;
-	dAnimationJoint** m_nodesOrder;
+//	dAnimationJoint** m_nodesOrder;
+	dAnimationBody** m_nodesOrder;
 
 	// cache temporary variables
 	int* m_matrixRowsIndex;
@@ -87,7 +88,6 @@ class dAnimationJointSolver: public dCustomAlloc
 	int m_nodeCount;
 	int m_maxNodeCount;
 	int m_loopRowCount;
-//	int m_loopNodeCount;
 	int m_loopJointCount;
 	int m_auxiliaryRowCount;
 };
