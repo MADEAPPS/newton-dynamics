@@ -69,10 +69,9 @@ class dAnimationJoint: public dCustomAlloc
 	void CopyRigidBodyMassToStates();
 
 	protected:
-//	int GetIndex() const;
-//	void SetIndex(int index);
 	void CopyRigidBodyMassToStatesLow();
 	virtual void RigidBodyToStates();
+	virtual void UpdateJointAcceleration();
 	virtual void ApplyExternalForce(dFloat timestep);
 
 	dAnimationBody m_proxyBody;
@@ -86,18 +85,6 @@ class dAnimationJoint: public dCustomAlloc
 	
 	friend class dAnimationJointSolver;
 };
-
-/*
-inline int dAnimationJoint::GetIndex() const
-{
-	return m_index;
-}
-
-inline void dAnimationJoint::SetIndex(int index)
-{
-	m_index = index;
-}
-*/
 
 inline dAnimationJoint* dAnimationJoint::GetParent() const
 {
@@ -148,7 +135,6 @@ inline dAnimationJointChildren& dAnimationJoint::GetChildren()
 {
 	return m_children; 
 }
-
 
 
 #endif

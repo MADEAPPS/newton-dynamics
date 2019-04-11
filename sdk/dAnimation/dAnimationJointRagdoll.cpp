@@ -87,7 +87,6 @@ void dAnimAcyclicJoint::Finalize()
 }
 */
 
-class dAnimationJointRagdoll;
 class dAnimationJointRagdoll::dRagDollMotor: public dCustomBallAndSocket
 {
 	public:

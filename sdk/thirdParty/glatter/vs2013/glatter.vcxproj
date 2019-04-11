@@ -109,6 +109,7 @@
       <AdditionalOptions>
       </AdditionalOptions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <DisableSpecificWarnings>4201</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -150,6 +151,7 @@
       <AdditionalOptions>
       </AdditionalOptions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <DisableSpecificWarnings>4201</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -192,6 +194,7 @@
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
       <AdditionalOptions>
       </AdditionalOptions>
+      <DisableSpecificWarnings>4201</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -233,6 +236,7 @@
       <AdditionalIncludeDirectories>..\include</AdditionalIncludeDirectories>
       <AdditionalOptions>
       </AdditionalOptions>
+      <DisableSpecificWarnings>4201</DisableSpecificWarnings>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>

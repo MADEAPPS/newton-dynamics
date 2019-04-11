@@ -881,7 +881,7 @@ class dDynamicsRagdoll: public dAnimationJointRoot
 		//	m_animationTree->Update(timestep);
 		//}
 		m_solver.Update(timestep);
-		//UpdateJointAcceleration();
+		UpdateJointAcceleration();
 	}
 };
 

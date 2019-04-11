@@ -14,8 +14,6 @@
 #define __D_ANIM_ID_CONTROLLER_H__
 
 #include "dAnimationStdAfx.h"
-
-#if 0
 #include "dAnimIDRigJoint.h"
 #include "dAnimAcyclicSolver.h"
 
@@ -27,7 +25,7 @@ class dAnimIDController: public dCustomControllerBase, public dAnimIDRigJoint
 	public:
 	dAnimIDController ();
 	~dAnimIDController ();
-
+	
 	void* GetUserData() const;
 	void SetUserData(void* const userData);
 	
@@ -59,7 +57,7 @@ class dAnimIDController: public dCustomControllerBase, public dAnimIDRigJoint
 	friend class dAnimIDRigEffector;
 	friend class dAnimIDManager;
 };
-#endif
+
 
 #endif 
 

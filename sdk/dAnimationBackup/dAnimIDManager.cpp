@@ -10,10 +10,9 @@
 */
 
 #include "dAnimationStdAfx.h"
-//#include "dAnimIDRigJoint.h"
-//#include "dAnimIDManager.h"
+#include "dAnimIDRigJoint.h"
+#include "dAnimIDManager.h"
 
-#if 0
 dAnimIDManager::dAnimIDManager(NewtonWorld* const world)
 	:dCustomControllerManager<dAnimIDController>(world, D_ANIM_ID_MANAGER)
 {
@@ -52,4 +51,4 @@ void dAnimIDManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 		rig->Debug(debugContext);
 	}
 }
-#endif
+

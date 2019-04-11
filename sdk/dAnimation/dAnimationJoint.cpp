@@ -108,3 +108,11 @@ void dAnimationJoint::ApplyExternalForce(dFloat timestep)
 		node->GetInfo()->ApplyExternalForce(timestep);
 	}
 }
+
+
+void dAnimationJoint::UpdateJointAcceleration()
+{
+	for (dAnimationJointChildren::dListNode* node = m_children.GetFirst(); node; node = node->GetNext()) {
+		node->GetInfo()->UpdateJointAcceleration();
+	}
+}
