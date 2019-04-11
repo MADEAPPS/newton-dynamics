@@ -15,9 +15,6 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationJoint.h"
 
-//class dAnimationJoint;
-
-//class dAnimationLoopJoint: public dCustomAlloc, public dComplementaritySolver::dBilateralJoint
 class dAnimationLoopJoint: public dCustomAlloc, public dAnimationContraint
 {
 	public:
