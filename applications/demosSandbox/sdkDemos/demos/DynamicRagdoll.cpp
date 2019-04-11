@@ -783,6 +783,12 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 		,m_linearSpeed(1.0f)
 		,m_linearFriction(100.0f)
 	{
+		dMatrix matrix;
+		NewtonBody* const body = root->GetBody();
+		NewtonBodyGetMatrix(body, &matrix[0][0]);
+
+		m_localMatrix.m_posit = matrix.m_posit;
+		m_localMatrix = m_localMatrix * matrix.Inverse();
 	}
 
 	void SetTarget()
@@ -791,7 +797,12 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 //		dAnimationJoint* const owner0 = m_owner0->m_owner;
 //		NewtonBody* const body = owner0->GetBody();
 //		dMatrix posit 
-		
+//		NewtonBody* const body = root->GetBody();
+//		NewtonBodyGetMatrix(body, &matrix[0][0]);
+
+		dMatrix matrix(m_localMatrix * m_state0->GetMatrix());
+		m_targetMatrix.m_posit = matrix.m_posit;
+		m_targetMatrix.m_posit.m_x += 0.25f;
 	}
 
 	virtual int GetMaxDof() const
@@ -864,11 +875,14 @@ class dDynamicsRagdoll: public dAnimationJointRoot
 	public:
 	dDynamicsRagdoll(NewtonBody* const body, const dMatrix& bindMarix)
 		:dAnimationJointRoot(body, bindMarix)
+		,m_hipEffector(NULL)
 	{
 	}
 
 	~dDynamicsRagdoll()
 	{
+//		if (m_hipEffector) {
+//		}
 	}
 
 	void PreUpdate(dFloat timestep)
@@ -877,12 +891,16 @@ class dDynamicsRagdoll: public dAnimationJointRoot
 		m_proxyBody.SetForce(dVector (0.0f));
 		m_proxyBody.SetTorque(dVector(0.0f));
 
+		m_hipEffector->SetTarget();
+
 		//if (m_animationTree) {
 		//	m_animationTree->Update(timestep);
 		//}
 		m_solver.Update(timestep);
 		UpdateJointAcceleration();
 	}
+
+	dAnimationHipEffector* m_hipEffector;
 };
 
 
@@ -916,7 +934,6 @@ class DynamicRagdollManager: public dAnimationModelManager
 	DynamicRagdollManager(DemoEntityManager* const scene)
 		:dAnimationModelManager(scene->GetNewton())
 //		, m_currentRig(NULL)
-		,m_hipEffector(NULL)
 	{
 //		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
@@ -1038,8 +1055,8 @@ class DynamicRagdollManager: public dAnimationModelManager
 		dynamicRagdoll->SetCalculateLocalTransforms(true);
 
 		// attach a Hip effector to the root body
-		m_hipEffector = new dAnimationHipEffector(dynamicRagdoll);
-		dynamicRagdoll->GetLoops().Append(m_hipEffector);
+		dynamicRagdoll->m_hipEffector = new dAnimationHipEffector(dynamicRagdoll);
+		dynamicRagdoll->GetLoops().Append(dynamicRagdoll->m_hipEffector);
 
 		// save the controller as the collision user data, for collision culling
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBody), dynamicRagdoll);
@@ -1130,13 +1147,11 @@ class DynamicRagdollManager: public dAnimationModelManager
 		//}
 
 		// update all effectors tartets
-		m_hipEffector->SetTarget();
+		//m_hipEffector->SetTarget();
 
 		// call the solver 
 		dAnimationModelManager::OnPreUpdate(model, timestep);
 	}
-
-	dAnimationHipEffector* m_hipEffector;
 };
 
 
