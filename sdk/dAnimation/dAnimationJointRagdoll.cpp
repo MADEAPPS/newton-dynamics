@@ -114,6 +114,7 @@ class dAnimationJointRagdoll::dRagDollMotor: public dCustomBallAndSocket
 		dMatrix coneRotation(dGetIdentityMatrix());
 		dVector lateralDir(matrix0.m_up);
 
+		const dVector& motorAccel = m_owner->m_rowAccel;
 		if (cosAngleCos < 0.9999f) {
 			lateralDir = coneDir1.CrossProduct(coneDir0);
 			dFloat mag2 = lateralDir.DotProduct3(lateralDir);
@@ -155,7 +156,8 @@ class dAnimationJointRagdoll::dRagDollMotor: public dCustomBallAndSocket
 			NewtonUserJointAddAngularRow(m_joint, 0, &matrix0.m_front[0]);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
-			NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
+			//NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
+			NewtonUserJointSetRowAcceleration(m_joint, motorAccel[0]);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_twistFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
 		}
@@ -218,13 +220,15 @@ class dAnimationJointRagdoll::dRagDollMotor: public dCustomBallAndSocket
 			*/
 		} else {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
-			NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
+			//NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
+			NewtonUserJointSetRowAcceleration(m_joint, motorAccel[1]);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
 
 			dVector upDir(lateralDir.CrossProduct(coneDir0));
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
-			NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
+			//NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
+			NewtonUserJointSetRowAcceleration(m_joint, motorAccel[2]);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
 		}
@@ -241,6 +245,8 @@ class dAnimationJointRagdoll::dRagDollMotor: public dCustomBallAndSocket
 dAnimationJointRagdoll::dAnimationJointRagdoll(const dMatrix& pinAndPivotInGlobalSpace, NewtonBody* const body, const dMatrix& bindMarix, dAnimationJoint* const parent)
 	:dAnimationJoint(body, bindMarix, parent)
 	,dAnimationContraint()
+	,m_rowAccel(0.0f)
+	,m_rows(0)
 {
 //	dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 	dMatrix parentRollMatrix(dGetIdentityMatrix() * pinAndPivotInGlobalSpace);
@@ -304,10 +310,37 @@ void dAnimationJointRagdoll::JacobianDerivative(dComplementaritySolver::dParamIn
 
 	m_dof = fixdof;
 	m_count = fixdof;
+	m_rows = rows;
 	constraintParams->m_count = fixdof;
 }
 
 void dAnimationJointRagdoll::UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
 {
 	dAssert (0);
+}
+
+void dAnimationJointRagdoll::UpdateJointAcceleration()
+{
+	dAnimationBody* const body0 = GetProxyBody();
+	dAnimationBody* const body1 = m_parent->GetProxyBody();
+	const dVector& accel0 = body0->GetForce().Scale(body0->GetInvMass());
+	const dVector& alpha0 = body0->GetInvInertia().RotateVector(body0->GetTorque());
+	const dVector& accel1 = body1->GetForce().Scale(body1->GetInvMass());
+	const dVector& alpha1 = body1->GetInvInertia().RotateVector(body1->GetTorque());
+
+	dRagDollMotor* const ragDollJoint = (dRagDollMotor*)m_joint;
+	const int fixdof = ragDollJoint->GetStructuralDOF();
+
+//	dVector accel(accel0 * m_jacobial01.m_linear + alpha0 * m_jacobial01.m_angular + accel1 * m_jacobial10.m_linear + alpha1 * m_jacobial10.m_angular);
+//	m_rowAccel = accel.m_x + accel.m_y + accel.m_z;
+
+	m_rowAccel = dVector(0.0f);
+	for (int i = fixdof; i < m_rows; i++) {
+		const int j = i - fixdof;
+		const dComplementaritySolver::dJacobian& jacobial01 = m_jacobial01[j];
+		const dComplementaritySolver::dJacobian& jacobial10 = m_jacobial10[j];
+		dVector accel(accel0 * jacobial01.m_linear + alpha0 * jacobial01.m_angular + accel1 * jacobial10.m_linear + alpha1 * jacobial10.m_angular);
+		m_rowAccel[j] = accel.m_x + accel.m_y + accel.m_z;
+	}
+	dAnimationJoint::UpdateJointAcceleration();
 }

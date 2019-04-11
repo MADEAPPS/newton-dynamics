@@ -76,13 +76,11 @@ class dAnimationJointRagdoll: public dAnimationJoint, public dAnimationContraint
 	public:
 	dAnimationJointRagdoll(const dMatrix& pinAndPivotInGlobalSpace, NewtonBody* const body, const dMatrix& bindMarix, dAnimationJoint* const parent);
 	virtual ~dAnimationJointRagdoll();
+
 	protected:
-
 	virtual void RigidBodyToStates();
-
-//	virtual void Init(dBodyState* const state0, dBodyState* const state1);
-
-	//protected:
+	virtual void UpdateJointAcceleration();
+	
 	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 	virtual void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const;
 //	virtual void JointAccelerations(dJointAccelerationDecriptor* const accelParam);
@@ -90,7 +88,7 @@ class dAnimationJointRagdoll: public dAnimationJoint, public dAnimationContraint
 	dComplementaritySolver::dJacobian m_jacobial01[3];
 	dComplementaritySolver::dJacobian m_jacobial10[3];
 	dVector m_rowAccel;
-
+	int m_rows;
 };
 
 
