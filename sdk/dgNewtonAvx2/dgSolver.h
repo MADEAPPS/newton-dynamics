@@ -24,10 +24,7 @@
 
 
 #include "dgPhysicsStdafx.h"
-
-//#ifdef __linux__
 #include <immintrin.h>
-//#endif
 
 
 #ifdef _NEWTON_USE_DOUBLE
@@ -56,14 +53,6 @@ class dgSoaFloat
 	DG_INLINE dgSoaFloat(const dgSoaFloat& copy)
 		:m_low(copy.m_low)
 		,m_high(copy.m_high)
-	{
-	}
-
-	DG_INLINE dgSoaFloat(const dgVector& low, const dgVector& high)
-		//:m_low(_mm256_loadu2_m128d(&low.m_z, &low.m_x))
-		//,m_high(_mm256_loadu2_m128d(&high.m_z, &high.m_x))
-		:m_low(_mm256_set_m128d(low.m_typeHigh, low.m_typeLow))
-		,m_high(_mm256_set_m128d(high.m_typeHigh, high.m_typeLow))
 	{
 	}
 

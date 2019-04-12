@@ -414,12 +414,18 @@ DG_INLINE void dgSolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLef
 
 	dgSoaFloat force0(m_soaZero);
 	if (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-		force0 = dgSoaFloat(body0->m_externalForce, body0->m_externalTorque);
+		//force0 = dgSoaFloat(body0->m_externalForce, body0->m_externalTorque);
+		dgJacobian& f = (dgJacobian&)force0[0]; 
+		f.m_linear = body0->m_externalForce;
+		f.m_angular = body0->m_externalTorque;
 	}
 
 	dgSoaFloat force1(m_soaZero);
 	if (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-		force1 = dgSoaFloat(body1->m_externalForce, body1->m_externalTorque);
+		//force1 = dgSoaFloat(body1->m_externalForce, body1->m_externalTorque);
+		dgJacobian& f = (dgJacobian&)force1[0];
+		f.m_linear = body1->m_externalForce;
+		f.m_angular = body1->m_externalTorque;
 	}
 
 	jointInfo->m_preconditioner0 = dgFloat32(1.0f);
