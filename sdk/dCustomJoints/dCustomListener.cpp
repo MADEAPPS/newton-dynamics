@@ -55,8 +55,6 @@ void dCustomListener::OnDestroyBody (const NewtonWorld* const world, void* const
 	me->OnDestroyBody(body);
 }
 
-
-
 dCustomParallelListener::dCustomParallelListener(NewtonWorld* const world, const char* const listenerName)
 	:dCustomListener(world, listenerName)
 	,m_timestep(0.0f)
@@ -83,7 +81,6 @@ void dCustomParallelListener::ParallerListenPostUpdateCallback(NewtonWorld* cons
 
 void dCustomParallelListener::PreUpdate(dFloat timestep)
 {
-	D_TRACKTIME();
 	m_timestep = timestep;
 	NewtonWorld* const world = GetWorld();
 
@@ -96,7 +93,6 @@ void dCustomParallelListener::PreUpdate(dFloat timestep)
 
 void dCustomParallelListener::PostUpdate(dFloat timestep)
 {
-	D_TRACKTIME();
 	m_timestep = timestep;
 	NewtonWorld* const world = GetWorld();
 

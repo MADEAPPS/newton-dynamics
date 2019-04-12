@@ -182,7 +182,7 @@ dgInt32 dgWorldDynamicUpdate::CompareClusterInfos(const dgBodyCluster* const clu
 
 void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 {
-	DG_TRACKTIME();
+	D_TRACKTIME();
 	dgWorld* const world = (dgWorld*) this;
 	dgContactList& contactList = *world;
 	dgBodyMasterList& masterList = *world;
@@ -566,6 +566,7 @@ dgBody* dgWorldDynamicUpdate::GetClusterBody(const void* const clusterPtr, dgInt
 
 void dgWorldDynamicUpdate::CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID)
 {
+	D_TRACKTIME();
 	dgWorldDynamicUpdateSyncDescriptor* const descriptor = (dgWorldDynamicUpdateSyncDescriptor*) context;
 
 	dgFloat32 timestep = descriptor->m_timestep;
@@ -671,7 +672,6 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 	constraint->ResetInverseDynamics();
 	return rowCount;
 }
-
 
 void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoArray, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dgFloat32 forceImpulseScale) const
 {
