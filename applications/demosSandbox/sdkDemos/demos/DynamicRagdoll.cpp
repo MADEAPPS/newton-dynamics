@@ -855,7 +855,6 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 		dVector lateralDir(matrix1.m_up);
 
 		if (cosAngleCos < 0.9999f) {
-			dAssert (0);
 			lateralDir = coneDir1.CrossProduct(coneDir0);
 			dFloat mag2 = lateralDir.DotProduct3(lateralDir);
 			if (mag2 > 1.0e-4f) {
@@ -863,10 +862,13 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 				coneRotation = dMatrix(dQuaternion(lateralDir, dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)))), matrix1.m_posit);
 			} else {
 				lateralDir = matrix0.m_up.Scale(-1.0f);
-				coneRotation = dMatrix(dQuaternion(matrix0.m_up, 180 * dDegreeToRad), matrix1.m_posit);
+				coneRotation = dMatrix(dQuaternion(matrix0.m_up, dFloat(180.0f) * dDegreeToRad), matrix1.m_posit);
 			}
 		}
 
+		dMatrix xxxx(matrix1 * coneRotation);
+		dMatrix xxxx1(xxxx * matrix0.Inverse());
+		dMatrix xxxx2(xxxx * matrix0.Inverse());
 #if 0
 
 		dVector omega0(0.0f);
@@ -1018,9 +1020,8 @@ class dDynamicsRagdoll: public dAnimationJointRoot
 		//if (m_animationTree) {
 		//	m_animationTree->Update(timestep);
 		//}
-	dTrace (("fix this shit\n"));
-//		m_solver.Update(timestep);
-//		UpdateJointAcceleration();
+		m_solver.Update(timestep);
+		UpdateJointAcceleration();
 	}
 
 	dAnimationHipEffector* m_hipEffector;

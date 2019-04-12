@@ -339,32 +339,27 @@ void dComplementaritySolver::dBilateralJoint::InitPointParam (dPointDerivativePa
 
 void dComplementaritySolver::dBilateralJoint::CalculatePointDerivative (dParamInfo* const constraintParams, const dVector& dir, const dPointDerivativeParam& param)
 {
-//	dAssert (0);
-	dTrace (("fix this shit\n"));
-#if 0
 	int index = constraintParams->m_count;
 
 	dAssert(dir.m_w == 0.0f);
 	dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01; 
-	jacobian0.m_linear = dir;
-	jacobian0.m_angular = param.m_r0.CrossProduct(jacobian0.m_linear);
+	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
 
-	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10; 
-	jacobian1.m_linear = dir.Scale (-1.0f);
+	jacobian0.m_linear = dir;
+	jacobian1.m_linear = dir.Scale(-1.0f);
+
+	jacobian0.m_angular = param.m_r0.CrossProduct(jacobian0.m_linear);
 	jacobian1.m_angular = param.m_r1.CrossProduct(jacobian1.m_linear);
 
-	//dVector j01_linear(dirOmega.CrossProduct(jacobian0.m_linear));
-	//dVector j01_angular(dirOmega.CrossProduct(jacobian0.m_angular));
-	//dVector j10_linear(dirOmega.CrossProduct(jacobian1.m_linear));
-	//dVector j10_angular(dirOmega.CrossProduct(jacobian1.m_angular));
-
-	const dVector& veloc0 = m_state0->m_veloc;
 	const dVector& omega0 = m_state0->m_omega;
-	const dVector& veloc1 = m_state1->m_veloc;
 	const dVector& omega1 = m_state1->m_omega;
-	const dVector accel(j01_linear * veloc0 + j01_angular * omega0 + j10_linear * veloc1 + j10_angular * omega1);
+	dVector centripetal0(omega0.CrossProduct(omega0.CrossProduct(param.m_r0)));
+	dVector centripetal1(omega1.CrossProduct(omega1.CrossProduct(param.m_r1)));
+	const dVector accel(jacobian0.m_linear * centripetal0 + jacobian1.m_linear * centripetal1);
 
 /*
+	const dVector& veloc0 = m_state0->m_veloc;
+	const dVector& veloc1 = m_state1->m_veloc;
 	dFloat dt = constraintParams->m_timestep;
 	dFloat ks = COMPLEMENTARITY_POS_DAMP;
 	dFloat kd = COMPLEMENTARITY_VEL_DAMP;
@@ -381,7 +376,7 @@ void dComplementaritySolver::dBilateralJoint::CalculatePointDerivative (dParamIn
 	constraintParams->m_jointLowFrictionCoef[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
 	constraintParams->m_jointHighFrictionCoef[index] = D_COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;
-#endif
+
 }
 
 void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle)
