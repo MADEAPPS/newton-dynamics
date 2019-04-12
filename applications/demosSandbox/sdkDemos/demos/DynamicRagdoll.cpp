@@ -854,7 +854,7 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 //		dVector lateralDir(matrix0.m_up);
 		dVector lateralDir(matrix1.m_up);
 
-		if (cosAngleCos < 0.9999f) {
+		if (cosAngleCos < 0.99999f) {
 			lateralDir = coneDir1.CrossProduct(coneDir0);
 			dFloat mag2 = lateralDir.DotProduct3(lateralDir);
 			if (mag2 > 1.0e-4f) {
@@ -866,18 +866,18 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 			}
 		}
 
-		dMatrix xxxx(matrix1 * coneRotation);
-		dMatrix xxxx1(xxxx * matrix0.Inverse());
-		dMatrix xxxx2(xxxx * matrix0.Inverse());
+		//dMatrix xxxx(matrix1 * coneRotation);
+		//dMatrix xxxx1(xxxx * matrix0.Inverse());
+
+		dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+		dAssert(dAbs(pitchMatrix[0][0] - dFloat(1.0f)) < dFloat(1.0e-3f));
+		dAssert(dAbs(pitchMatrix[0][1]) < dFloat(1.0e-3f));
+		dAssert(dAbs(pitchMatrix[0][2]) < dFloat(1.0e-3f));
+		//dTrace(("%f %f %f\n", pitchMatrix[0][0], pitchMatrix[0][1], pitchMatrix[0][2]));
+
 #if 0
-
-		dVector omega0(0.0f);
-		dVector omega1(0.0f);
-		NewtonBodyGetOmega(m_body0, &omega0[0]);
-		NewtonBodyGetOmega(m_body1, &omega1[0]);
-
-		dVector relOmega(omega0 - omega1);
-
+//		dVector relOmega(omega0 - omega1);
+/*
 		// do twist angle calculations
 //		dMatrix twistMatrix(matrix0 * (matrix1 * coneRotation).Inverse());
 //		dFloat twistAngle = m_twistAngle.Update(dAtan2(twistMatrix[1][2], twistMatrix[1][1]));
