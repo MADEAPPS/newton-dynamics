@@ -13,8 +13,10 @@
 // RenderPrimitive.cpp: implementation of the RenderPrimitive class.
 //
 //////////////////////////////////////////////////////////////////////
+#ifdef _WIN32 
 #include <windows.h>
 #include <commdlg.h>
+#endif
 
 #include "FileBrowser.h"
 
