@@ -175,10 +175,10 @@ class dComplementaritySolver
 		virtual void JointAccelerations (dJointAccelerationDecriptor* const accelParam);
 
 		void InitPointParam (dPointDerivativeParam& param, const dVector& pivot) const;
-		void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir, const dVector& dirOmega, dFloat jointAngle);
-		void AddLinearRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir, const dVector& dirOmega);
+		void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle);
+		void AddLinearRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir);
 		//void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir0, const dVector& dir1, dFloat ratio);
-		void CalculatePointDerivative (dParamInfo* const constraintParams, const dVector& dir, const dVector& dirOmega, const dPointDerivativeParam& param);
+		void CalculatePointDerivative (dParamInfo* const constraintParams, const dVector& dir, const dPointDerivativeParam& param);
 
 		dFloat m_motorAcceleration[D_MAX_PRAM_INFO_SIZE];
 		dFloat m_jointFeebackForce[D_MAX_PRAM_INFO_SIZE];

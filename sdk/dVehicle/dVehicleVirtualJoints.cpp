@@ -29,6 +29,8 @@ dTireJoint::dTireJoint()
 
 void dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
+	dAssert (0);
+/*
 	dComplementaritySolver::dBodyState* const tire = m_state0;
 	dComplementaritySolver::dBodyState* const chassis = m_state1;
 
@@ -69,6 +71,7 @@ void dTireJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const co
 		constraintParams->m_jointHighFrictionCoef[index] = brakeTorque;
 	}
 	m_tire->SetBrakeTorque(0.0f);
+*/
 }
 
 // *******************************************************************
@@ -82,6 +85,9 @@ dDifferentialMount::dDifferentialMount()
 
 void dDifferentialMount::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
+	dAssert(0);
+	/*
+
 	dComplementaritySolver::dBodyState* const chassis = m_state1;
 	dComplementaritySolver::dBodyState* const differential = m_state0;
 
@@ -98,6 +104,7 @@ void dDifferentialMount::JacobianDerivative(dComplementaritySolver::dParamInfo* 
 	if (m_slipeOn) {
 		dAssert (0);
 	}
+*/
 }
 
 // *******************************************************************
@@ -379,6 +386,8 @@ dEngineBlockJoint::dEngineBlockJoint()
 
 void dEngineBlockJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
+	dAssert(0);
+	/*
 	dComplementaritySolver::dBodyState* const engine = m_state0;
 	dComplementaritySolver::dBodyState* const chassis = m_state1;
 
@@ -393,6 +402,7 @@ void dEngineBlockJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* c
 	// angular constraints	
 	AddAngularRowJacobian(constraintParams, matrix.m_front, omega, 0.0f);
 	AddAngularRowJacobian(constraintParams, matrix.m_up, omega, 0.0f);
+*/
 }
 
 // *******************************************************************

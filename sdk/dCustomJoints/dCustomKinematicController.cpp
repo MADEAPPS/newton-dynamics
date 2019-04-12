@@ -147,8 +147,8 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 	// check if this is an impulsive time step
 	dMatrix matrix0(GetBodyMatrix());
 	dVector omega(0.0f);
-	dVector com(0.0f);
 	dVector pointVeloc(0.0f);
+
 	const dFloat damp = 0.3f;
 	dAssert (timestep > 0.0f);
 	const dFloat invTimestep = 1.0f / timestep;

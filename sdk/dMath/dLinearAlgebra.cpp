@@ -337,8 +337,11 @@ void dComplementaritySolver::dBilateralJoint::InitPointParam (dPointDerivativePa
 }
 
 
-void dComplementaritySolver::dBilateralJoint::CalculatePointDerivative (dParamInfo* const constraintParams, const dVector& dir, const dVector& dirOmega, const dPointDerivativeParam& param)
+void dComplementaritySolver::dBilateralJoint::CalculatePointDerivative (dParamInfo* const constraintParams, const dVector& dir, const dPointDerivativeParam& param)
 {
+//	dAssert (0);
+	dTrace (("fix this shit\n"));
+#if 0
 	int index = constraintParams->m_count;
 
 	dAssert(dir.m_w == 0.0f);
@@ -350,18 +353,10 @@ void dComplementaritySolver::dBilateralJoint::CalculatePointDerivative (dParamIn
 	jacobian1.m_linear = dir.Scale (-1.0f);
 	jacobian1.m_angular = param.m_r1.CrossProduct(jacobian1.m_linear);
 
-//	dVector velocError (param.m_veloc1 - param.m_veloc0);
-//	dVector positError (param.m_posit1 - param.m_posit0);
-//	dVector centrError (param.m_centripetal1 - param.m_centripetal0);
-
-//	dFloat relPosit = positError.DotProduct3(dir);
-//	dFloat relVeloc = velocError.DotProduct3(dir);
-//	dFloat relCentr = centrError.DotProduct3(dir); 
-	
-	dVector j01_linear(dirOmega.CrossProduct(jacobian0.m_linear));
-	dVector j01_angular(dirOmega.CrossProduct(jacobian0.m_angular));
-	dVector j10_linear(dirOmega.CrossProduct(jacobian1.m_linear));
-	dVector j10_angular(dirOmega.CrossProduct(jacobian1.m_angular));
+	//dVector j01_linear(dirOmega.CrossProduct(jacobian0.m_linear));
+	//dVector j01_angular(dirOmega.CrossProduct(jacobian0.m_angular));
+	//dVector j10_linear(dirOmega.CrossProduct(jacobian1.m_linear));
+	//dVector j10_angular(dirOmega.CrossProduct(jacobian1.m_angular));
 
 	const dVector& veloc0 = m_state0->m_veloc;
 	const dVector& omega0 = m_state0->m_omega;
@@ -386,10 +381,13 @@ void dComplementaritySolver::dBilateralJoint::CalculatePointDerivative (dParamIn
 	constraintParams->m_jointLowFrictionCoef[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
 	constraintParams->m_jointHighFrictionCoef[index] = D_COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;
+#endif
 }
 
-void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir, const dVector& dirOmega, dFloat jointAngle)
+void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle)
 {
+	dAssert(0);
+#if 0
 	int index = constraintParams->m_count;
 	dAssert(dir.m_w == 0.0f);
 
@@ -426,6 +424,7 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 	constraintParams->m_jointLowFrictionCoef[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
 	constraintParams->m_jointHighFrictionCoef[index] = D_COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;
+#endif
 }
 
 
@@ -463,11 +462,11 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 }
 */
 
-void dComplementaritySolver::dBilateralJoint::AddLinearRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir, const dVector& dirOmega)
+void dComplementaritySolver::dBilateralJoint::AddLinearRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir)
 {
 	dPointDerivativeParam pointData;
 	InitPointParam (pointData, pivot);
-	CalculatePointDerivative (constraintParams, dir, dirOmega, pointData);
+	CalculatePointDerivative (constraintParams, dir, pointData);
 }
 
 void dComplementaritySolver::dBilateralJoint::JointAccelerations (dJointAccelerationDecriptor* const params)
@@ -573,12 +572,11 @@ void dComplementaritySolver::dFrictionLessContactJoint::SetContacts (int count, 
 
 void dComplementaritySolver::dFrictionLessContactJoint::JacobianDerivative (dParamInfo* const constraintParams)
 {
-	dVector pinOmega(0.0f);
 	for (int i = 0; i < m_count; i ++) {
 
 		dPointDerivativeParam pointData;
 		InitPointParam (pointData, m_contacts[i].m_point);
-		CalculatePointDerivative (constraintParams, m_contacts[i].m_normal, pinOmega, pointData);
+		CalculatePointDerivative (constraintParams, m_contacts[i].m_normal, pointData);
 
 		dVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
 
