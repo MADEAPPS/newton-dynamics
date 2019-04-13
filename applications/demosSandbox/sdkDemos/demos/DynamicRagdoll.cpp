@@ -780,8 +780,9 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 		:dAnimationLoopJoint(root->GetProxyBody(), root->GetStaticWorld())
 		,m_localMatrix(dGetIdentityMatrix())
 		,m_targetMatrix(dGetIdentityMatrix())
-		,m_linearSpeed(1.0f)
-		,m_linearFriction(100.0f)
+		,m_maxStep (0.5f)
+		,m_maxAngle (3.0f * dDegreeToRad)
+		,m_linearFriction(1000.0f)
 		,m_angularFriction(100.0f)
 	{
 		dMatrix matrix;
@@ -796,7 +797,9 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 	{
 		dMatrix matrix(m_localMatrix * m_state0->GetMatrix());
 		m_targetMatrix.m_posit = matrix.m_posit;
-		m_targetMatrix.m_posit.m_x += 0.25f;
+
+		static dVector xxx = m_targetMatrix.m_posit + dVector (1.0f, 0.0f, 0.0f, 0.0f);
+		m_targetMatrix.m_posit = xxx;
 	}
 
 	virtual int GetMaxDof() const
@@ -816,21 +819,20 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 		const dVector& veloc0 = m_state0->GetVelocity();
 		const dVector& veloc1 = m_state1->GetVelocity();
 
-		dAssert(m_linearSpeed >= 0.0f);
-		const dFloat timestep = constraintParams->m_timestep;
+		dAssert(m_maxStep >= 0.0f);
+//		const dFloat timestep = constraintParams->m_timestep;
 		const dFloat invTimestep = constraintParams->m_timestepInv;
-		const dFloat step = m_linearSpeed * timestep;
+//		const dFloat step = m_linearSpeed * timestep;
 
+		int dofCount = 0;
 		for (int i = 0; i < 3; i++) {
-
-			dFloat currentSpeed = 0.0f;
 			dFloat dist = relPosit.DotProduct3(matrix1[i]);
-			if (dist > step) {
-				currentSpeed = m_linearSpeed;
-			} else if (dist < -step) {
-				currentSpeed = -m_linearSpeed;
+			if (dist > m_maxStep) {
+				dist = m_maxStep;
+			} else if (dist < -m_maxStep) {
+				dist = -m_maxStep;
 			} else {
-				currentSpeed = 0.3f * dist * invTimestep;
+				dist *= 0.3f;
 			}
 
 			AddLinearRowJacobian(constraintParams, matrix0.m_posit, matrix1[i]);
@@ -839,12 +841,14 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 							  constraintParams->m_jacobians[i].m_jacobian_J01.m_angular * omega0 +
 							  constraintParams->m_jacobians[i].m_jacobian_J10.m_linear * veloc1 +
 							  constraintParams->m_jacobians[i].m_jacobian_J10.m_angular * omega1);
-			currentSpeed -= (stopVeloc.m_x + stopVeloc.m_y + stopVeloc.m_z);
 
+			dFloat currentSpeed = dist * invTimestep - (stopVeloc.m_x + stopVeloc.m_y + stopVeloc.m_z);
 			constraintParams->m_jointLowFrictionCoef[i] = -m_linearFriction;
 			constraintParams->m_jointHighFrictionCoef[i] = m_linearFriction;
 			constraintParams->m_jointAccel[i] = currentSpeed * invTimestep;
 			constraintParams->m_normalIndex[i] = 0;
+
+			dofCount ++;
 		}
 
 		const dVector& coneDir0 = matrix0.m_front;
@@ -873,36 +877,35 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 			dAssert(dAbs(pitchMatrix[0][1]) < dFloat(1.0e-3f));
 			dAssert(dAbs(pitchMatrix[0][2]) < dFloat(1.0e-3f));
 			//dTrace(("%f %f %f\n", pitchMatrix[0][0], pitchMatrix[0][1], pitchMatrix[0][2]));
+
 		} else {
-
+/*
+			const dFloat angleStep = m_angularSpeed * timestep;
 			// using small angular aproximation to get the joint angle;
-			for (int i = 0; i < 3; i++) {
-				AddAngularRowJacobian (constraintParams, matrix1[0], 0.0f);
-
-				dFloat currentSpeed = 0.0f;
-
-				//dFloat dist = relPosit.DotProduct3(matrix1[i]);
-				//if (dist > step) {
-				//	currentSpeed = m_linearSpeed;
-				//} else if (dist < -step) {
-				//	currentSpeed = -m_linearSpeed;
-				//} else {
-				//	currentSpeed = 0.3f * dist * invTimestep;
-				//}
-				dVector stopOmega(constraintParams->m_jacobians[i].m_jacobian_J01.m_angular * omega0 +
-								  constraintParams->m_jacobians[i].m_jacobian_J10.m_angular * omega1);
-
-				currentSpeed -= (stopOmega.m_x + stopOmega.m_y + stopOmega.m_z);
-				constraintParams->m_jointLowFrictionCoef[i] = -m_angularFriction;
-				constraintParams->m_jointHighFrictionCoef[i] = m_angularFriction;
-				constraintParams->m_jointAccel[i] = currentSpeed * invTimestep;
-				constraintParams->m_normalIndex[i] = 0;
+			AddAngularRowJacobian (constraintParams, matrix1[0], 0.0f);
+			dFloat angleSpeed = 0.0f;
+			dFloat angle = matrix1[1].DotProduct3(matrix1[0]);
+			if (angle > angleStep) {
+				angleSpeed = m_angularSpeed;
+			} else if (angle < -angleStep) {
+				angleSpeed = -m_angularSpeed;
+			} else {
+				angleSpeed = 0.3f * angleStep * invTimestep;
 			}
+			dVector stopOmega(constraintParams->m_jacobians[3].m_jacobian_J01.m_angular * omega0 +
+							  constraintParams->m_jacobians[3].m_jacobian_J10.m_angular * omega1);
+
+			currentSpeed -= (stopOmega.m_x + stopOmega.m_y + stopOmega.m_z);
+			constraintParams->m_jointLowFrictionCoef[3] = -m_angularFriction;
+			constraintParams->m_jointHighFrictionCoef[3] = m_angularFriction;
+			constraintParams->m_jointAccel[3] = currentSpeed * invTimestep;
+			constraintParams->m_normalIndex[3] = 0;
+*/
 		}
 
-		m_dof = 3;
-		m_count = 3;
-		constraintParams->m_count = 3;
+		m_dof = dofCount;
+		m_count = dofCount;
+		constraintParams->m_count = dofCount;
 	}
 
 	virtual void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
@@ -912,7 +915,8 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 
 	dMatrix m_localMatrix;
 	dMatrix m_targetMatrix;
-	dFloat m_linearSpeed;
+	dFloat m_maxStep;
+	dFloat m_maxAngle;
 	dFloat m_linearFriction;
 	dFloat m_angularFriction;
 };
@@ -936,6 +940,7 @@ class dDynamicsRagdoll: public dAnimationJointRoot
 		m_proxyBody.SetForce(dVector (0.0f));
 		m_proxyBody.SetTorque(dVector(0.0f));
 
+		NewtonBodySetSleepState(GetBody(), 0);
 		m_hipEffector->SetTarget();
 
 		//if (m_animationTree) {
