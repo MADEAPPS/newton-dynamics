@@ -381,25 +381,24 @@ void dComplementaritySolver::dBilateralJoint::CalculatePointDerivative (dParamIn
 
 void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle)
 {
-	dAssert(0);
-#if 0
 	int index = constraintParams->m_count;
 	dAssert(dir.m_w == 0.0f);
 
 	dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01; 
-	jacobian0.m_linear = dVector(0.0f);
-	jacobian0.m_angular = dir;
+	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
 
-	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10; 
+	jacobian0.m_linear = dVector(0.0f);
 	jacobian1.m_linear = dVector(0.0f);
+
+	jacobian0.m_angular = dir;
 	jacobian1.m_angular = dir.Scale (-1.0f);
 
-	const dVector& omega0 = m_state0->m_omega;
-	const dVector& omega1 = m_state1->m_omega;
-
-	dVector j01_angular(dirOmega.CrossProduct(jacobian0.m_angular));
-	dVector j10_angular(dirOmega.CrossProduct(jacobian1.m_angular));
-	const dVector accel(j01_angular * omega0 + j10_angular * omega1);
+//	const dVector& omega0 = m_state0->m_omega;
+//	const dVector& omega1 = m_state1->m_omega;
+//	dVector j01_angular(dirOmega.CrossProduct(jacobian0.m_angular));
+//	dVector j10_angular(dirOmega.CrossProduct(jacobian1.m_angular));
+//	const dVector accel(j01_angular * omega0 + j10_angular * omega1);
+	const dVector accel(0.0f);
 /*
 	dFloat omegaError = (omega1 - omega0).DotProduct3(dir);
 	//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
@@ -419,7 +418,6 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 	constraintParams->m_jointLowFrictionCoef[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
 	constraintParams->m_jointHighFrictionCoef[index] = D_COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;
-#endif
 }
 
 
