@@ -136,9 +136,19 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 			}
+
+			{
+				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
+				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+				dFloat pitchAngle = CalculateAngle(&matrix0[1][0], &matrix1[1][0], &matrix0[0][0]);
+				dTrace(("%f\n", pitchAngle * dRadToDegree));
+				dFloat omega = ClipParam(pitchAngle, angularStep) * invTimestep;
+				dFloat relAlpha = omega * invTimestep + stopAlpha;
+				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
+				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+			}
 		}
-
-
 	}
 
 	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
