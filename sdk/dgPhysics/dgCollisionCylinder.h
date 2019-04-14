@@ -56,6 +56,8 @@ class dgCollisionCylinder: public dgCollisionConvex
 	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const;
 	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const;
 
+	virtual void MassProperties();
+
 	dgVector m_profile[4];
 	dgVector m_vertex[DG_TAPED_CYLINDER_SEGMENTS * 2];
 	dgFloat32 m_radio0;

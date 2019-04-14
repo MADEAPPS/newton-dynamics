@@ -159,7 +159,6 @@ void dgCollisionCylinder::SetCollisionBBox (const dgVector& p0, const dgVector& 
 	dgAssert (0);
 }
 
-
 void dgCollisionCylinder::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgTriplex pool[24 * 2];
@@ -202,7 +201,19 @@ void dgCollisionCylinder::DebugCollision (const dgMatrix& matrix, dgCollision::O
 	callback (userData, 24, &face[0].m_x, 0);
 }
 
-
+void dgCollisionCylinder::MassProperties()
+{
+//	dgFloat32 Ixx = (1.0f / 2.0f) * m_radio0 * m_radio0;
+//	dgFloat32 Iyy= (1.0f / 12.0f) * (3.0f * m_radio0 * m_radio0 + 4.0f * m_height * m_height);
+	dgCollisionConvex::MassProperties();
+	
+//	m_centerOfMass = dgVector::m_zero;
+//	m_crossInertia = dgVector::m_zero;
+//	dgFloat32 volume = dgFloat32(4.0f * dgPI / 3.0f) * m_radius *  m_radius * m_radius;
+//	dgFloat32 II = dgFloat32(2.0f / 5.0f) * m_radius *  m_radius;
+//	m_inertia = dgVector(II, II, II, dgFloat32(0.0f));
+//	m_centerOfMass.m_w = volume;
+}
 
 dgVector dgCollisionCylinder::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
