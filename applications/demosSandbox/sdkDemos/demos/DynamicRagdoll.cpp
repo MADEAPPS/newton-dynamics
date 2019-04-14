@@ -49,10 +49,9 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 		dMatrix matrix(m_localMatrix * m_state0->GetMatrix());
 		m_targetMatrix.m_posit = matrix.m_posit;
 
-
 		m_targetMatrix.m_posit += dVector (0.0f, 0.0f, 0.0f, 0.0f);
-		static dMatrix xxx (dPitchMatrix (95.0f * dDegreeToRad) * dYawMatrix (65.0f * dDegreeToRad) * dRollMatrix (85.0f * dDegreeToRad) * matrix);
-		//static dMatrix xxx (dPitchMatrix (0.0f * dDegreeToRad) * dYawMatrix (45.0f * dDegreeToRad) * dRollMatrix (0.0f * dDegreeToRad) * matrix);
+		//static dMatrix xxx (dPitchMatrix (95.0f * dDegreeToRad) * dYawMatrix (65.0f * dDegreeToRad) * dRollMatrix (85.0f * dDegreeToRad) * m_targetMatrix);
+		static dMatrix xxx (dPitchMatrix (0.0f * dDegreeToRad) * dYawMatrix (0.0f * dDegreeToRad) * dRollMatrix (0.0f * dDegreeToRad) * m_targetMatrix);
 		m_targetMatrix = xxx;
 	}
 
@@ -76,8 +75,13 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
 		const dMatrix& matrix1 = m_targetMatrix;
-		dMatrix matrix0(m_localMatrix * m_state0->GetMatrix());
-		const dVector relPosit(matrix1.m_posit - matrix0.m_posit);
+		dMatrix matrix0;
+
+		NewtonBodyGetMatrix(GetBody0(), &matrix0[0][0]);
+		matrix0 = m_localMatrix * matrix0;
+
+		const dVector relPosit(matrix1.UnrotateVector (matrix1.m_posit - matrix0.m_posit));
+		const dVector relPositDir = relPosit.Scale(1.0f / dSqrt(relPosit.DotProduct3(relPosit) + 1.0e-6f));
 
 		dAssert(m_maxLinearSpeed >= 0.0f);
 		const dFloat invTimestep = 1.0f/ timestep;
@@ -85,8 +89,8 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 		for (int i = 0; i < 3; i++) {
 			NewtonUserJointAddLinearRow (m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix1[i][0]);
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
-			dFloat posit = relPosit.DotProduct3(matrix1[i]);
-			dFloat speed = ClipParam(posit, linearStep) * invTimestep;
+			//dFloat posit = relPosit.DotProduct3(matrix1[i]);
+			dFloat speed = ClipParam(relPosit[i], linearStep * dAbs (relPositDir[i])) * invTimestep;
 			dFloat relAccel = speed * invTimestep + stopAccel;
 			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_linearFriction);
@@ -110,22 +114,33 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 				coneRotation = dMatrix(dQuaternion(matrix0.m_up, dFloat(180.0f) * dDegreeToRad), matrix1.m_posit);
 			}
 
-			#ifdef _DEBUG
-				dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
-				dAssert(dAbs(pitchMatrix[0][0] - dFloat(1.0f)) < dFloat(1.0e-3f));
-				dAssert(dAbs(pitchMatrix[0][1]) < dFloat(1.0e-3f));
-				dAssert(dAbs(pitchMatrix[0][2]) < dFloat(1.0e-3f));
+			dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+			dAssert(dAbs(pitchMatrix[0][0] - dFloat(1.0f)) < dFloat(1.0e-3f));
+			dAssert(dAbs(pitchMatrix[0][1]) < dFloat(1.0e-3f));
+			dAssert(dAbs(pitchMatrix[0][2]) < dFloat(1.0e-3f));
 
-				dFloat coneAngle = dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f))) * dRadToDegree;
-				dFloat pitchAngle = dAtan2 (pitchMatrix[1][2], pitchMatrix[1][1]) * dRadToDegree;
-				dTrace(("cone:%f pitch:%f\n", coneAngle, pitchAngle));
-			#endif
+			dFloat pitchAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
+			dFloat coneAngle = -dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)));
+			//dTrace(("cone:%f pitch:%f\n", coneAngle * dRadToDegree, pitchAngle * dRadToDegree));
+
+			dVector angleDir(pitchAngle, coneAngle, dFloat(0.0f), dFloat(0.0f));
+			angleDir = angleDir.Scale(1.0f / dSqrt(angleDir.DotProduct3(angleDir) + 1.0e-6f));
+
+			{
+				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
+				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+
+				dFloat omega = ClipParam(pitchAngle, angleStep * dAbs(angleDir[0])) * invTimestep;
+				dFloat relAlpha = omega * invTimestep + stopAlpha;
+				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
+				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+			}
 
 			{
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
 				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
-				dFloat angle = -dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)));
-				dFloat omega = ClipParam(angle, angleStep) * invTimestep;
+				dFloat omega = ClipParam(coneAngle, angleStep * dAbs (angleDir[1])) * invTimestep;
 				dFloat relAlpha = omega * invTimestep + stopAlpha;
 				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
 				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
@@ -140,19 +155,6 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 			}
-
-			{
-				dMatrix matrix(matrix1 * coneRotation * matrix0.Inverse());
-				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
-				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
-				dFloat angle = dAtan2 (pitchMatrix[1][2], pitchMatrix[1][1]);
-				dFloat omega = ClipParam(angle, angleStep) * invTimestep;
-				dFloat relAlpha = omega * invTimestep + stopAlpha;
-				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-			}
-
 
 		} else {
 
@@ -188,8 +190,6 @@ class dAnimationHipEffector: public dAnimationLoopJoint
 				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
 				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-
-				//dTrace(("%f\n", pitchAngle * dRadToDegree));
 			}
 		}
 	}
