@@ -209,9 +209,10 @@ void dgCollisionCylinder::MassProperties()
 	
 //	m_centerOfMass = dgVector::m_zero;
 //	m_crossInertia = dgVector::m_zero;
-//	dgFloat32 volume = dgFloat32(4.0f * dgPI / 3.0f) * m_radius *  m_radius * m_radius;
-//	dgFloat32 II = dgFloat32(2.0f / 5.0f) * m_radius *  m_radius;
-//	m_inertia = dgVector(II, II, II, dgFloat32(0.0f));
+//	dgFloat32 volume = dgFloat32(2.0f * dgPI) * m_radius *  m_radius * m_height;
+//	dgFloat32 II = (1.0f / 2.0f) * m_radio0 * m_radio0;
+//	dgFloat32 JJ = (1.0f / 12.0f) * (3.0f * m_radio0 * m_radio0 + 4.0f * m_height * m_height);
+//	m_inertia = dgVector(II, JJ, JJ, dgFloat32(0.0f));
 //	m_centerOfMass.m_w = volume;
 }
 
