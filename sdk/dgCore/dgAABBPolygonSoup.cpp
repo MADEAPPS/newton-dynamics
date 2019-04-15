@@ -1223,7 +1223,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 			stackPool[0] = m_aabb;
 			distance[0] = m_aabb->BoxPenetration(obbAabbInfo, vertexArray);
 			if (distance[0] <= dgFloat32(0.0f)) {
-				obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -distance[0]);
+				obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance[0], -distance[0]);
 			}
 			while (stack) {
 				stack --;
@@ -1246,7 +1246,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 									return;
 								}
 							} else {
-								obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -dist1);
+								obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance[0], -dist1);
 							}
 						}
 
@@ -1264,7 +1264,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 							distance[j] = dist1;
 							stack++;
 						} else {
-							obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -dist1);
+							obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance[0], -dist1);
 						}
 					}
 
@@ -1284,7 +1284,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 									return;
 								}
 							} else {
-								obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -dist1);
+								obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance[0], -dist1);
 							}
 						}
 
@@ -1302,7 +1302,7 @@ void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const 
 							distance[j] = dist1;
 							stack++;
 						} else {
-							obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance, -dist1);
+							obbAabbInfo.m_separationDistance = dgMin(obbAabbInfo.m_separationDistance[0], -dist1);
 						}
 					}
 				}

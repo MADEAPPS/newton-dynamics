@@ -96,7 +96,7 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 
 	DG_INLINE dgFloat32 GetSeparetionDistance() const
 	{
-		return m_separationDistance * m_polySoupInstance->GetScale().GetScalar();
+		return m_separationDistance[0] * m_polySoupInstance->GetScale().GetScalar();
 	}
 
 

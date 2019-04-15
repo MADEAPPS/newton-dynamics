@@ -46,7 +46,7 @@
 //#define DEFAULT_SCENE	10		// simple level mesh collision
 //#define DEFAULT_SCENE	11		// optimized level mesh collision
 //#define DEFAULT_SCENE	12		// height field Collision
-//#define DEFAULT_SCENE	13		// infinite user plane collision
+#define DEFAULT_SCENE	13		// infinite user plane collision
 //#define DEFAULT_SCENE	14		// user height field Collision
 //#define DEFAULT_SCENE	15		// compound Collision
 //#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
@@ -68,7 +68,7 @@
 //#define DEFAULT_SCENE	32		// six axis manipulator
 //#define DEFAULT_SCENE	33		// hexapod Robot
 //#define DEFAULT_SCENE	34		// basic rag doll
-#define DEFAULT_SCENE	35		// dynamic rag doll
+//#define DEFAULT_SCENE	35		// dynamic rag doll
 //#define DEFAULT_SCENE	36		// basic Car
 //#define DEFAULT_SCENE	37		// single body vehicle
 //#define DEFAULT_SCENE	38		// David Gravel multi body car
