@@ -323,7 +323,6 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 		dgFloat32 num = ks * jointAngle + kd * omegaError + ksd * omegaError;
 		dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;
 		dgFloat32 alphaError = num / den;
-		//desc.m_zeroRowAcceleration[index] = (jointAngle * desc.m_invTimestep + omegaError) * desc.m_invTimestep;
 		desc.m_zeroRowAcceleration[index] = omegaError * desc.m_invTimestep;
 
 		desc.m_penetration[index] = jointAngle;
@@ -391,9 +390,20 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		const dgVector& centripetal1 (bodyOmega1.CrossProduct(bodyOmega1.CrossProduct(m_r1[index])));
 		const dgVector centripetalAccel (jacobian0.m_linear * centripetal0 + jacobian1.m_linear * centripetal1);
 		dgFloat32 relCentr = -centripetalAccel.AddHorizontal().GetScalar();
-
-		//desc.m_zeroRowAcceleration[index] = (relPosit * desc.m_invTimestep + relVeloc) * desc.m_invTimestep;
 		desc.m_zeroRowAcceleration[index] = relVeloc * desc.m_invTimestep;
+
+#if 0
+const dgVector& omega0 = m_body0->GetOmega();
+const dgVector& omega1 = m_body1->GetOmega();
+const dgVector& veloc0 = m_body0->GetVelocity();
+const dgVector& veloc1 = m_body1->GetVelocity();
+dgVector accel(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 +
+			   jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1);
+dgFloat32 stopAccel = -accel.AddHorizontal().GetScalar() * desc.m_invTimestep;
+dgAssert (dgAbs (stopAccel - desc.m_zeroRowAcceleration[index]) < dgFloat32(1.0e-3f));
+//desc.m_zeroRowAcceleration[index] = stopAccel;
+#endif
+
 
 		//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 		const dgFloat32 dt = desc.m_timestep;

@@ -20,156 +20,6 @@
 #include "HeightFieldPrimitive.h"
 
 
-class dAnimationEndEffector: public dAnimationLoopJoint
-{
-	public:
-	dAnimationEndEffector(dAnimationJointRoot* const root)
-		:dAnimationLoopJoint(root->GetProxyBody(), root->GetStaticWorld())
-		,m_localMatrix(dGetIdentityMatrix())
-		,m_targetMatrix(dGetIdentityMatrix())
-		,m_maxLinearSpeed(0.1f * 120.0f)
-		,m_maxAngularSpeed(3.0f * dDegreeToRad * 120.0f)
-		,m_linearFriction(100000.0f)
-		,m_angularFriction(100000.0f)
-	{
-		dMatrix matrix;
-		NewtonBody* const body = root->GetBody();
-		NewtonBodyGetMatrix(body, &matrix[0][0]);
-
-		m_localMatrix.m_posit = matrix.m_posit;
-		m_localMatrix = m_localMatrix * matrix.Inverse();
-	}
-
-	void SetTarget()
-	{
-		dMatrix matrix(m_localMatrix * m_state0->GetMatrix());
-		m_targetMatrix.m_posit = matrix.m_posit;
-
-		m_targetMatrix.m_posit += dVector (0.0f, 0.0f, 0.0f, 0.0f);
-		//static dMatrix xxx (dPitchMatrix (95.0f * dDegreeToRad) * dYawMatrix (65.0f * dDegreeToRad) * dRollMatrix (85.0f * dDegreeToRad) * m_targetMatrix);
-		static dMatrix xxx (dPitchMatrix (0.0f * dDegreeToRad) * dYawMatrix (0.0f * dDegreeToRad) * dRollMatrix (0.0f * dDegreeToRad) * m_targetMatrix);
-		m_targetMatrix = xxx;
-	}
-
-	virtual int GetMaxDof() const
-	{
-		return 6;
-	}
-
-	dFloat ClipParam (dFloat value, dFloat maxValue) const
-	{
-		if (value > maxValue) {
-			value = maxValue;
-		} else if (value < -maxValue) {
-			value = -maxValue;
-		} else {
-			value *= 0.3f;
-		}
-		return value;
-	}
-
-	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
-	{
-		const dMatrix& matrix1 = m_targetMatrix;
-		dMatrix matrix0(m_localMatrix * m_state0->GetMatrix());
-		
-		const dVector& omega0 = m_state0->GetOmega();
-		const dVector& omega1 = m_state1->GetOmega();
-		const dVector& veloc0 = m_state0->GetVelocity();
-		const dVector& veloc1 = m_state1->GetVelocity();
-		const dVector relPosit(matrix1.m_posit - matrix0.m_posit);
-
-		int dofCount = 0;
-		dAssert(m_maxLinearSpeed >= 0.0f);
-		const dFloat invTimestep = constraintParams->m_timestepInv;
-		const dFloat linearStep = m_maxLinearSpeed * constraintParams->m_timestep;
-		for (int i = 0; i < 3; i++) {
-			AddLinearRowJacobian(constraintParams, matrix0.m_posit, matrix1[i]);
-
-			dVector stopVeloc(constraintParams->m_jacobians[i].m_jacobian_J01.m_linear * veloc0 +
-							  constraintParams->m_jacobians[i].m_jacobian_J01.m_angular * omega0 +
-							  constraintParams->m_jacobians[i].m_jacobian_J10.m_linear * veloc1 +
-							  constraintParams->m_jacobians[i].m_jacobian_J10.m_angular * omega1);
-
-			dFloat dist = ClipParam (relPosit.DotProduct3(matrix1[i]), linearStep);
-			dFloat currentSpeed = dist * invTimestep - (stopVeloc.m_x + stopVeloc.m_y + stopVeloc.m_z);
-			constraintParams->m_jointLowFrictionCoef[i] = -m_linearFriction;
-			constraintParams->m_jointHighFrictionCoef[i] = m_linearFriction;
-			constraintParams->m_jointAccel[i] = currentSpeed * invTimestep;
-			constraintParams->m_normalIndex[i] = 0;
-
-			dofCount ++;
-		}
-
-/*
-		const dVector& coneDir0 = matrix0.m_front;
-		const dVector& coneDir1 = matrix1.m_front;
-		dFloat cosAngleCos = coneDir1.DotProduct3(coneDir0);
-		if (cosAngleCos < 0.9999f) {
-			dMatrix coneRotation(dGetIdentityMatrix());
-			dVector lateralDir (coneDir1.CrossProduct(coneDir0));
-			dFloat mag2 = lateralDir.DotProduct3(lateralDir);
-			if (mag2 > 1.0e-4f) {
-				lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
-				coneRotation = dMatrix(dQuaternion(lateralDir, dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)))), matrix1.m_posit);
-			} else {
-				lateralDir = matrix0.m_up.Scale(-1.0f);
-				coneRotation = dMatrix(dQuaternion(matrix0.m_up, dFloat(180.0f) * dDegreeToRad), matrix1.m_posit);
-			}
-			//dMatrix xxxx(matrix1 * coneRotation);
-			//dMatrix xxxx1(xxxx * matrix0.Inverse());
-
-			dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
-			dAssert(dAbs(pitchMatrix[0][0] - dFloat(1.0f)) < dFloat(1.0e-3f));
-			dAssert(dAbs(pitchMatrix[0][1]) < dFloat(1.0e-3f));
-			dAssert(dAbs(pitchMatrix[0][2]) < dFloat(1.0e-3f));
-			//dTrace(("%f %f %f\n", pitchMatrix[0][0], pitchMatrix[0][1], pitchMatrix[0][2]));
-
-		} else {
-			// using small angular aproximation to get the joint angle;
-			{
-				AddAngularRowJacobian (constraintParams, matrix1[1], 0.0f);
-				dVector stopOmega(constraintParams->m_jacobians[dofCount].m_jacobian_J01.m_angular * omega0 + constraintParams->m_jacobians[dofCount].m_jacobian_J10.m_angular * omega1);
-				dFloat angle = ClipParam (matrix1[2].DotProduct3(matrix1[0]), m_maxAngle);
-				dFloat angleSpeed = angle * invTimestep - (stopOmega.m_x + stopOmega.m_y + stopOmega.m_z);
-				constraintParams->m_jointLowFrictionCoef[dofCount] = -m_angularFriction;
-				constraintParams->m_jointHighFrictionCoef[dofCount] = m_angularFriction;
-				constraintParams->m_jointAccel[dofCount] = angleSpeed * invTimestep;
-				constraintParams->m_normalIndex[dofCount] = 0;
-				dofCount ++;
-			}
-
-			{
-				AddAngularRowJacobian(constraintParams, matrix1[2], 0.0f);
-				dVector stopOmega(constraintParams->m_jacobians[dofCount].m_jacobian_J01.m_angular * omega0 + constraintParams->m_jacobians[dofCount].m_jacobian_J10.m_angular * omega1);
-				dFloat angle = ClipParam(matrix1[1].DotProduct3(matrix1[0]), m_maxAngle);
-				dFloat angleSpeed = angle * invTimestep - (stopOmega.m_x + stopOmega.m_y + stopOmega.m_z);
-				constraintParams->m_jointLowFrictionCoef[dofCount] = -m_angularFriction;
-				constraintParams->m_jointHighFrictionCoef[dofCount] = m_angularFriction;
-				constraintParams->m_jointAccel[dofCount] = angleSpeed * invTimestep;
-				constraintParams->m_normalIndex[dofCount] = 0;
-				dofCount++;
-			}
-		}
-*/
-		m_dof = dofCount;
-		m_count = dofCount;
-		constraintParams->m_count = dofCount;
-	}
-
-	virtual void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
-	{
-		dAssert(0);
-	}
-
-	dMatrix m_localMatrix;
-	dMatrix m_targetMatrix;
-	dFloat m_maxLinearSpeed;
-	dFloat m_maxAngularSpeed;
-	dFloat m_linearFriction;
-	dFloat m_angularFriction;
-};
-
 
 class dAnimationEndEffectorTest: public dAnimationEndEffector, public dCustomJoint
 {
@@ -238,7 +88,6 @@ class dAnimationEndEffectorTest: public dAnimationEndEffector, public dCustomJoi
 			{
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
 				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
-
 				dFloat omega = ClipParam(pitchAngle, angleStep * dAbs(angleDir[0])) * invTimestep;
 				dFloat relAlpha = omega * invTimestep + stopAlpha;
 				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
@@ -269,6 +118,17 @@ class dAnimationEndEffectorTest: public dAnimationEndEffector, public dCustomJoi
 
 			// using small angular aproximation to get the joint angle;
 			{
+				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
+				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+				dFloat angle = dCustomJoint::CalculateAngle(&matrix0[1][0], &matrix1[1][0], &matrix0[0][0]);
+				dFloat omega = ClipParam(angle, angleStep) * invTimestep;
+				dFloat relAlpha = omega * invTimestep + stopAlpha;
+				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
+				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+			}
+
+			{
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[1][0]);
 				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
 				dFloat angle = matrix1[2].DotProduct3(matrix1[0]);
@@ -283,17 +143,6 @@ class dAnimationEndEffectorTest: public dAnimationEndEffector, public dCustomJoi
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[2][0]);
 				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
 				dFloat angle = matrix1[1].DotProduct3(matrix1[0]);
-				dFloat omega = ClipParam(angle, angleStep) * invTimestep;
-				dFloat relAlpha = omega * invTimestep + stopAlpha;
-				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-			}
-
-			{
-				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
-				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
-				dFloat angle = CalculateAngle(&matrix0[1][0], &matrix1[1][0], &matrix0[0][0]);
 				dFloat omega = ClipParam(angle, angleStep) * invTimestep;
 				dFloat relAlpha = omega * invTimestep + stopAlpha;
 				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
@@ -329,8 +178,8 @@ class dDynamicsRagdoll: public dAnimationJointRoot
 		//if (m_animationTree) {
 		//	m_animationTree->Update(timestep);
 		//}
-		//m_solver.Update(timestep);
-		//UpdateJointAcceleration();
+		m_solver.Update(timestep);
+		UpdateJointAcceleration();
 	}
 
 	dAnimationEndEffector* m_hipEffector;
@@ -488,7 +337,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 		dynamicRagdoll->SetCalculateLocalTransforms(true);
 
 		// attach a Hip effector to the root body
-		dynamicRagdoll->m_hipEffector = new dAnimationEndEffectorTest(dynamicRagdoll);
+		dynamicRagdoll->m_hipEffector = new dAnimationEndEffector(dynamicRagdoll);
 		dynamicRagdoll->GetLoops().Append(dynamicRagdoll->m_hipEffector);
 
 		// save the controller as the collision user data, for collision culling

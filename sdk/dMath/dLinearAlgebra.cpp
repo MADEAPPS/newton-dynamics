@@ -420,6 +420,28 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 	constraintParams->m_count = index + 1;
 }
 
+dFloat dComplementaritySolver::dBilateralJoint::CalculateRowZeroAccelaration (dParamInfo* const constraintParams) const
+{
+	const int i = constraintParams->m_count - 1;
+	dAssert (i >= 0);
+
+	const dVector& omega0 = m_state0->GetOmega();
+	const dVector& omega1 = m_state1->GetOmega();
+	const dVector& veloc0 = m_state0->GetVelocity();
+	const dVector& veloc1 = m_state1->GetVelocity();
+	dVector accel(constraintParams->m_jacobians[i].m_jacobian_J01.m_linear * veloc0 +
+				  constraintParams->m_jacobians[i].m_jacobian_J01.m_angular * omega0 +
+				  constraintParams->m_jacobians[i].m_jacobian_J10.m_linear * veloc1 +
+				  constraintParams->m_jacobians[i].m_jacobian_J10.m_angular * omega1);
+	return -(accel.m_x + accel.m_y + accel.m_z) * constraintParams->m_timestepInv;
+}
+
+dFloat dComplementaritySolver::dBilateralJoint::CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const
+{
+	dFloat cosAngle = planeDir.DotProduct3(cosDir);
+	dFloat sinAngle = sinDir.DotProduct3(planeDir.CrossProduct(cosDir));
+	return dAtan2(sinAngle, cosAngle);
+}
 
 /*
 void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir0, const dVector& dir1, dFloat accelerationRatio)

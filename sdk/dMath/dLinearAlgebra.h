@@ -180,6 +180,9 @@ class dComplementaritySolver
 		//void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir0, const dVector& dir1, dFloat ratio);
 		void CalculatePointDerivative (dParamInfo* const constraintParams, const dVector& dir, const dPointDerivativeParam& param);
 
+		dFloat CalculateRowZeroAccelaration (dParamInfo* const constraintParams) const;
+		dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
+
 		dFloat m_motorAcceleration[D_MAX_PRAM_INFO_SIZE];
 		dFloat m_jointFeebackForce[D_MAX_PRAM_INFO_SIZE];
 		int m_rowIsMotor[D_MAX_PRAM_INFO_SIZE];
