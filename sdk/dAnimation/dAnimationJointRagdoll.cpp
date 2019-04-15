@@ -13,7 +13,7 @@
 #include "dAnimationJointRagdoll.h"
 #include "dAnimationModelManager.h"
 
-dAnimationJointRagdoll::dRagDollMotor::dRagDollMotor(dAnimationJointRagdoll* const owner, const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent)
+dAnimationJointRagdoll::dRagdoll3dofMotor::dRagdoll3dofMotor(dAnimationJointRagdoll* const owner, const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomBallAndSocket(pinAndPivotFrame0, pinAndPivotFrame1, child, parent)
 	,m_owner(owner)
 {
@@ -21,7 +21,7 @@ dAnimationJointRagdoll::dRagDollMotor::dRagDollMotor(dAnimationJointRagdoll* con
 	m_twistFriction = 100.0f;
 }
 
-void dAnimationJointRagdoll::dRagDollMotor::SubmitConstraints(dFloat timestep, int threadIndex)
+void dAnimationJointRagdoll::dRagdoll3dofMotor::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -30,127 +30,66 @@ void dAnimationJointRagdoll::dRagDollMotor::SubmitConstraints(dFloat timestep, i
 	CalculateGlobalMatrix(matrix0, matrix1);
 	SubmitLinearRows(0x07, matrix0, matrix1);
 
+	const dVector& motorAccel = m_owner->m_rowAccel;
 	const dVector& coneDir0 = matrix0.m_front;
 	const dVector& coneDir1 = matrix1.m_front;
 
 	dFloat cosAngleCos = coneDir1.DotProduct3(coneDir0);
-	dMatrix coneRotation(dGetIdentityMatrix());
-	dVector lateralDir(matrix0.m_up);
-
-	const dVector& motorAccel = m_owner->m_rowAccel;
 	if (cosAngleCos < 0.9999f) {
-		lateralDir = coneDir1.CrossProduct(coneDir0);
+		dMatrix coneRotation(dGetIdentityMatrix());
+		dVector lateralDir(coneDir1.CrossProduct(coneDir0));
 		dFloat mag2 = lateralDir.DotProduct3(lateralDir);
 		if (mag2 > 1.0e-4f) {
 			lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
 			coneRotation = dMatrix(dQuaternion(lateralDir, dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)))), matrix1.m_posit);
 		} else {
+			dAssert(0);
 			lateralDir = matrix0.m_up.Scale(-1.0f);
-			coneRotation = dMatrix(dQuaternion(matrix0.m_up, 180 * dDegreeToRad), matrix1.m_posit);
+			coneRotation = dMatrix(dQuaternion(matrix0.m_up, dFloat(180.0f) * dDegreeToRad), matrix1.m_posit);
 		}
-	}
 
-	dVector omega0(0.0f);
-	dVector omega1(0.0f);
-	NewtonBodyGetOmega(m_body0, &omega0[0]);
-	NewtonBodyGetOmega(m_body1, &omega1[0]);
+		#ifdef _DEBUG
+			//dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+			//dAssert(dAbs(pitchMatrix[0][0] - dFloat(1.0f)) < dFloat(1.0e-3f));
+			//dAssert(dAbs(pitchMatrix[0][1]) < dFloat(1.0e-3f));
+			//dAssert(dAbs(pitchMatrix[0][2]) < dFloat(1.0e-3f));
 
-	dVector relOmega(omega0 - omega1);
+			//dFloat pitchAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
+			//dFloat coneAngle = -dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)));
+			//dTrace(("cone:%f pitch:%f\n", coneAngle * dRadToDegree, pitchAngle * dRadToDegree));
+			//dVector angleDir(pitchAngle, coneAngle, dFloat(0.0f), dFloat(0.0f));
+			//angleDir = angleDir.Scale(1.0f / dSqrt(angleDir.DotProduct3(angleDir) + 1.0e-6f));
+		#endif
 
-	// do twist angle calculations
-//		dMatrix twistMatrix(matrix0 * (matrix1 * coneRotation).Inverse());
-//		dFloat twistAngle = m_twistAngle.Update(dAtan2(twistMatrix[1][2], twistMatrix[1][1]));
-	if (m_options.m_option0) {
-		dAssert(0);
-/*
-		if ((m_minTwistAngle == 0.0f) && (m_minTwistAngle == 0.0f)) {
-			NewtonUserJointAddAngularRow(m_joint, -twistAngle, &matrix0.m_front[0]);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		} else {
-			if (m_options.m_option1) {
-				// TODO spring option
-				dAssert(0);
-			} else {
-				SubmitConstraintTwistLimits(matrix0, matrix1, relOmega, timestep);
-			}
-		}
-*/
-	} else {
-		NewtonUserJointAddAngularRow(m_joint, 0, &matrix0.m_front[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
-		//NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
 		NewtonUserJointSetRowAcceleration(m_joint, motorAccel[0]);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_twistFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
-	}
 
-	// do twist cone angle calculations
-	if (m_options.m_option2) {
-		dAssert(0);
-/*
-		if ((m_maxConeAngle == 0.0f)) {
-			dMatrix localMatrix(matrix0 * matrix1.Inverse());
-			dVector euler0;
-			dVector euler1;
-			localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
-			NewtonUserJointAddAngularRow(m_joint, -euler0[1], &matrix1[1][0]);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointAddAngularRow(m_joint, -euler0[2], &matrix1[2][0]);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		} else {
-			if (m_options.m_option3) {
-				// TODO spring option
-				dAssert(0);
-			}
-			else {
-				dFloat jointOmega = relOmega.DotProduct3(lateralDir);
-				dFloat currentAngle = dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)));
-				dFloat coneAngle = currentAngle + jointOmega * timestep;
-				if (coneAngle >= m_maxConeAngle) {
-					//dQuaternion rot(lateralDir, coneAngle);
-					//dVector frontDir(rot.RotateVector(coneDir1));
-					//dVector upDir(lateralDir.CrossProduct(frontDir));
-
-					dVector upDir(lateralDir.CrossProduct(coneDir0));
-					NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
-					NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
-					NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
-					NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
-					NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-					NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
-					const dFloat invtimestep = 1.0f / timestep;
-					const dFloat speed = 0.5f * (m_maxConeAngle - currentAngle) * invtimestep;
-					const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
-					NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-
-				}
-				else if (m_coneFriction != 0) {
-					NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
-					NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
-					NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
-					NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
-
-					dVector upDir(lateralDir.CrossProduct(coneDir0));
-					NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
-					NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
-					NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
-					NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
-				}
-			}
-		}
-		*/
-	} else {
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
-		//NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
 		NewtonUserJointSetRowAcceleration(m_joint, motorAccel[1]);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
 
-		dVector upDir(lateralDir.CrossProduct(coneDir0));
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
-		//NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAccelaration(m_joint));
+		dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
+		NewtonUserJointSetRowAcceleration(m_joint, motorAccel[2]);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
+
+	} else {
+		// using small angular aproximation to get the joint angle;
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
+		NewtonUserJointSetRowAcceleration(m_joint, motorAccel[0]);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_twistFriction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
+
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[1][0]);
+		NewtonUserJointSetRowAcceleration(m_joint, motorAccel[1]);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
+
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[2][0]);
 		NewtonUserJointSetRowAcceleration(m_joint, motorAccel[2]);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
@@ -166,7 +105,7 @@ dAnimationJointRagdoll::dAnimationJointRagdoll(const dMatrix& pinAndPivotInGloba
 {
 //	dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 	dMatrix parentRollMatrix(dGetIdentityMatrix() * pinAndPivotInGlobalSpace);
-	dRagDollMotor* const joint = new dRagDollMotor(this, pinAndPivotInGlobalSpace, parentRollMatrix, body, parent->GetBody());
+	dRagdoll3dofMotor* const joint = new dRagdoll3dofMotor(this, pinAndPivotInGlobalSpace, parentRollMatrix, body, parent->GetBody());
 
 	m_joint = joint;
 	//dFloat friction = definition.m_friction * 0.25f;
@@ -198,7 +137,7 @@ void dAnimationJointRagdoll::JacobianDerivative(dComplementaritySolver::dParamIn
 	m_rowAccel = dVector (0.0f);
 	NewtonImmediateModeConstraint descriptor;
 
-	dRagDollMotor* const ragDollJoint = (dRagDollMotor*) m_joint;
+	dRagdoll3dofMotor* const ragDollJoint = (dRagdoll3dofMotor*) m_joint;
 	NewtonJoint* const newtonJoint = ragDollJoint->GetJoint();
 	const int rows = NewtonUserJointSubmitImmediateModeConstraint(newtonJoint, &descriptor, constraintParams->m_timestep);
 	const int fixdof = ragDollJoint->GetStructuralDOF();
@@ -244,7 +183,7 @@ void dAnimationJointRagdoll::UpdateJointAcceleration()
 	const dVector& accel1 = body1->GetForce().Scale(body1->GetInvMass());
 	const dVector& alpha1 = body1->GetInvInertia().RotateVector(body1->GetTorque());
 
-	dRagDollMotor* const ragDollJoint = (dRagDollMotor*)m_joint;
+	dRagdoll3dofMotor* const ragDollJoint = (dRagdoll3dofMotor*)m_joint;
 	const int fixdof = ragDollJoint->GetStructuralDOF();
 
 //	dVector accel(accel0 * m_jacobial01.m_linear + alpha0 * m_jacobial01.m_angular + accel1 * m_jacobial10.m_linear + alpha1 * m_jacobial10.m_angular);

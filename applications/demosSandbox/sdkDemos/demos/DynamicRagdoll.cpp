@@ -48,7 +48,6 @@ class dAnimationEndEffectorTest: public dAnimationEndEffector, public dCustomJoi
 		for (int i = 0; i < 3; i++) {
 			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix1[i][0]);
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
-			//dFloat posit = relPosit.DotProduct3(matrix1[i]);
 			dFloat speed = ClipParam(relPosit[i], linearStep * dAbs(relPositDir[i])) * invTimestep;
 			dFloat relAccel = speed * invTimestep + stopAccel;
 			NewtonUserJointSetRowAcceleration(m_joint, relAccel);

@@ -19,10 +19,10 @@
 
 class dAnimationJointRagdoll: public dAnimationJoint, public dAnimationContraint
 {
-	class dRagDollMotor: public dCustomBallAndSocket
+	class dRagdoll3dofMotor: public dCustomBallAndSocket
 	{
 		public:
-		dRagDollMotor(dAnimationJointRagdoll* const owner, const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent);
+		dRagdoll3dofMotor(dAnimationJointRagdoll* const owner, const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent);
 		void SubmitConstraints(dFloat timestep, int threadIndex);
 		int GetStructuralDOF() const {return 3;}
 		dAnimationJointRagdoll* m_owner;

@@ -142,9 +142,8 @@ void dAnimationEndEffector::JacobianDerivative(dComplementaritySolver::dParamInf
 			constraintParams->m_jointHighFrictionCoef[dofCount] = m_angularFriction;
 			dofCount++;
 		}
+	} else {
 
-	}
-	else {
 		// using small angular aproximation to get the joint angle;
 		{
 			AddAngularRowJacobian(constraintParams, matrix1[0], 0.0f);
