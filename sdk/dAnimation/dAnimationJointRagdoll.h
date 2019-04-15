@@ -19,17 +19,20 @@
 
 class dAnimationJointRagdoll: public dAnimationJoint, public dAnimationContraint
 {
-	class dRagdoll3dofMotor: public dCustomBallAndSocket
-	{
-		public:
-		dRagdoll3dofMotor(dAnimationJointRagdoll* const owner, const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent);
-		void SubmitConstraints(dFloat timestep, int threadIndex);
-		int GetStructuralDOF() const {return 3;}
-		dAnimationJointRagdoll* m_owner;
-	};
+	class dRagdollMotor;
+	class dRagdollMotor_1dof;
+	class dRagdollMotor_2dof;
+	class dRagdollMotor_3dof;
 
 	public:
-	dAnimationJointRagdoll(const dMatrix& pinAndPivotInGlobalSpace, NewtonBody* const body, const dMatrix& bindMarix, dAnimationJoint* const parent);
+	enum dRagdollMotorType
+	{
+		m_oneDof,
+		m_twoDof,
+		m_threeDof,
+	};
+
+	dAnimationJointRagdoll(dRagdollMotorType type, const dMatrix& pinAndPivotInGlobalSpace, NewtonBody* const body, const dMatrix& bindMarix, dAnimationJoint* const parent);
 	virtual ~dAnimationJointRagdoll();
 
 	protected:
@@ -38,7 +41,6 @@ class dAnimationJointRagdoll: public dAnimationJoint, public dAnimationContraint
 	
 	virtual void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 	virtual void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const;
-//	virtual void JointAccelerations(dJointAccelerationDecriptor* const accelParam);
 
 	dComplementaritySolver::dJacobian m_jacobial01[3];
 	dComplementaritySolver::dJacobian m_jacobial10[3];

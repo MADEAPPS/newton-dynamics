@@ -303,7 +303,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 
 		//dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
 		dMatrix bindMatrix(dGetIdentityMatrix());
-		dAnimationJoint* const joint = new dAnimationJointRagdoll(pinAndPivotInGlobalSpace, boneBody, bindMatrix, parent);
+		dAnimationJoint* const joint = new dAnimationJointRagdoll(dAnimationJointRagdoll::m_threeDof, pinAndPivotInGlobalSpace, boneBody, bindMatrix, parent);
 		return joint;
 	}
 
