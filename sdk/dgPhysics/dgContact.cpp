@@ -132,7 +132,7 @@ dgContact::dgContact(dgContact* const clone)
 dgContact::~dgContact()
 {
 	dgAssert(m_body0);
-	if (m_body0->m_world->m_destroyContact) {
+	if (m_body0->m_world && m_body0->m_world->m_destroyContact) {
 		m_body0->m_world->m_destroyContact(m_body0->m_world, this);
 	}
 

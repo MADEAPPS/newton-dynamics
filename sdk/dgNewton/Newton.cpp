@@ -5477,8 +5477,6 @@ void NewtonContactJointRemoveContact(const NewtonJoint* const contactJoint, void
 
 		dgAssert (joint->GetBody0());
 		dgAssert (joint->GetBody1());
-		//dgBody* const body = joint->GetBody0() ? joint->GetBody0() : joint->GetBody1();
-		//dgWorld* const world = body->GetWorld();
 		dgWorld* const world = joint->GetBody0()->GetWorld();
 		world->GlobalLock();
 		joint->Remove(node);
