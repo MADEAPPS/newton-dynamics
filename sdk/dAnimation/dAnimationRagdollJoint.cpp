@@ -10,13 +10,13 @@
 */
 
 #include "dAnimationStdAfx.h"
-#include "dAnimationJointRagdoll.h"
+#include "dAnimationRagdollJoint.h"
 #include "dAnimationModelManager.h"
 
-class dAnimationJointRagdoll::dRagdollMotor: public dCustomBallAndSocket
+class dAnimationRagdollJoint::dRagdollMotor: public dCustomBallAndSocket
 {
 	public:
-	dRagdollMotor(dAnimationJointRagdoll* const owner, const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent)
+	dRagdollMotor(dAnimationRagdollJoint* const owner, const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent)
 		:dCustomBallAndSocket(pinAndPivotFrame0, pinAndPivotFrame1, child, parent)
 		,m_owner(owner)
 		,m_dof(3)
@@ -28,15 +28,15 @@ class dAnimationJointRagdoll::dRagdollMotor: public dCustomBallAndSocket
 		return m_dof; 
 	}
 
-	dAnimationJointRagdoll* m_owner;
+	dAnimationRagdollJoint* m_owner;
 	int m_dof;
 };
 
 
-class dAnimationJointRagdoll::dRagdollMotor_2dof : public dRagdollMotor
+class dAnimationRagdollJoint::dRagdollMotor_2dof : public dRagdollMotor
 {
 	public:
-	dRagdollMotor_2dof(dAnimationJointRagdoll* const owner, const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent)
+	dRagdollMotor_2dof(dAnimationRagdollJoint* const owner, const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent)
 		:dRagdollMotor(owner, pinAndPivotFrame0, pinAndPivotFrame1, child, parent)
 	{
 		m_dof = 2;
@@ -115,10 +115,10 @@ class dAnimationJointRagdoll::dRagdollMotor_2dof : public dRagdollMotor
 };
 
 
-class dAnimationJointRagdoll::dRagdollMotor_3dof: public dRagdollMotor
+class dAnimationRagdollJoint::dRagdollMotor_3dof: public dRagdollMotor
 {
 	public:
-	dRagdollMotor_3dof(dAnimationJointRagdoll* const owner, const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent)
+	dRagdollMotor_3dof(dAnimationRagdollJoint* const owner, const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent)
 		:dRagdollMotor(owner, pinAndPivotFrame0, pinAndPivotFrame1, child, parent)
 	{
 		m_dof = 3;
@@ -201,7 +201,7 @@ class dAnimationJointRagdoll::dRagdollMotor_3dof: public dRagdollMotor
 
 
 
-dAnimationJointRagdoll::dAnimationJointRagdoll(dRagdollMotorType type, const dMatrix& pinAndPivotInGlobalSpace, NewtonBody* const body, const dMatrix& bindMarix, dAnimationJoint* const parent)
+dAnimationRagdollJoint::dAnimationRagdollJoint(dRagdollMotorType type, const dMatrix& pinAndPivotInGlobalSpace, NewtonBody* const body, const dMatrix& bindMarix, dAnimationJoint* const parent)
 	:dAnimationJoint(body, bindMarix, parent)
 	,m_rowAccel(0.0f)
 	,m_rows(0)
@@ -232,18 +232,18 @@ type = m_twoDof;
 	Init(GetProxyBody(), parent->GetProxyBody());
 }
 
-dAnimationJointRagdoll::~dAnimationJointRagdoll()
+dAnimationRagdollJoint::~dAnimationRagdollJoint()
 {
 }
 
-void dAnimationJointRagdoll::RigidBodyToStates()
+void dAnimationRagdollJoint::RigidBodyToStates()
 {
 	dAnimationJoint::RigidBodyToStates();
 	m_proxyBody.SetForce(dVector(0.0f));
 	m_proxyBody.SetTorque(dVector(0.0f));
 }
 
-void dAnimationJointRagdoll::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+void dAnimationRagdollJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	m_rowAccel = dVector (0.0f);
 	NewtonImmediateModeConstraint descriptor;
@@ -282,12 +282,12 @@ void dAnimationJointRagdoll::JacobianDerivative(dComplementaritySolver::dParamIn
 	constraintParams->m_count = fixdof;
 }
 
-void dAnimationJointRagdoll::UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
+void dAnimationRagdollJoint::UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
 {
 	dAssert (0);
 }
 
-void dAnimationJointRagdoll::UpdateJointAcceleration()
+void dAnimationRagdollJoint::UpdateJointAcceleration()
 {
 	dAnimationBody* const body0 = GetProxyBody();
 	dAnimationBody* const body1 = m_parent->GetProxyBody();

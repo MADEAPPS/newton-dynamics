@@ -12,7 +12,7 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationJointRoot.h"
 #include "dAnimationEndEffector.h"
-//#include "dAnimationJointRagdoll.h"
+//#include "dAnimationRagdollJoint.h"
 
 dAnimationEndEffector::dAnimationEndEffector(dAnimationJointRoot* const root)
 	:dAnimationLoopJoint(root->GetProxyBody(), root->GetStaticWorld())

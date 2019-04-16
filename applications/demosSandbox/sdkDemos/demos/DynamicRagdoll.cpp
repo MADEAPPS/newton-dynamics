@@ -20,7 +20,6 @@
 #include "HeightFieldPrimitive.h"
 
 
-
 class dAnimationEndEffectorTest: public dAnimationEndEffector, public dCustomJoint
 {
 	public:
@@ -152,11 +151,35 @@ class dAnimationEndEffectorTest: public dAnimationEndEffector, public dCustomJoi
 	}
 };
 
-class dDynamicsRagdoll: public dAnimationJointRoot
+class dDynamicsRagdollTest: public dAnimationRagdollRoot
+{
+	public:
+	dDynamicsRagdollTest(NewtonBody* const body, const dMatrix& bindMarix)
+		:dAnimationRagdollRoot(body, bindMarix)
+		,m_hipEffector(NULL)
+	{
+	}
+
+	~dDynamicsRagdollTest()
+	{
+	}
+
+	void PreUpdate(dFloat timestep)
+	{
+		NewtonBodySetSleepState(GetBody(), 0);
+		m_hipEffector->SetTarget();
+		//dAnimationRagdollRoot::PreUpdate(timestep);
+	}
+
+	dAnimationEndEffector* m_hipEffector;
+};
+
+
+class dDynamicsRagdoll: public dAnimationRagdollRoot
 {
 	public:
 	dDynamicsRagdoll(NewtonBody* const body, const dMatrix& bindMarix)
-		:dAnimationJointRoot(body, bindMarix)
+		:dAnimationRagdollRoot(body, bindMarix)
 		,m_hipEffector(NULL)
 	{
 	}
@@ -167,18 +190,9 @@ class dDynamicsRagdoll: public dAnimationJointRoot
 
 	void PreUpdate(dFloat timestep)
 	{
-		dAnimationJointRoot::RigidBodyToStates();
-		m_proxyBody.SetForce(dVector (0.0f));
-		m_proxyBody.SetTorque(dVector(0.0f));
-
 		NewtonBodySetSleepState(GetBody(), 0);
 		m_hipEffector->SetTarget();
-
-		//if (m_animationTree) {
-		//	m_animationTree->Update(timestep);
-		//}
-		m_solver.Update(timestep);
-		UpdateJointAcceleration();
+		dAnimationRagdollRoot::PreUpdate(timestep);
 	}
 
 	dAnimationEndEffector* m_hipEffector;
@@ -303,9 +317,104 @@ class DynamicRagdollManager: public dAnimationModelManager
 
 		//dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
 		dMatrix bindMatrix(dGetIdentityMatrix());
-		dAnimationJoint* const joint = new dAnimationJointRagdoll(dAnimationJointRagdoll::m_threeDof, pinAndPivotInGlobalSpace, boneBody, bindMatrix, parent);
+		dAnimationJoint* const joint = new dAnimationRagdollJoint(dAnimationRagdollJoint::m_threeDof, pinAndPivotInGlobalSpace, boneBody, bindMatrix, parent);
 		return joint;
 	}
+
+	void DynamicsRagdollExperiment_0(const dMatrix& location)
+	{
+		static dJointDefinition jointsDefinition[] =
+		{
+			{ "body" },
+			{ "leg", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f } },
+			//{ "foot", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+		};
+		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
+
+		NewtonWorld* const world = GetWorld();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		DemoEntity* const modelEntity = DemoEntity::LoadNGD_mesh("selfbalance_01.ngd", GetWorld(), scene->GetShaderCache());
+
+		dMatrix matrix0(modelEntity->GetCurrentMatrix());
+		//matrix0.m_posit = location;
+		//modelEntity->ResetMatrix(*scene, matrix0);
+		scene->Append(modelEntity);
+
+		// add the root childBody
+		NewtonBody* const rootBody = CreateBodyPart(modelEntity);
+
+		// build the rag doll with rigid bodies connected by joints
+		dDynamicsRagdollTest* const dynamicRagdoll = new dDynamicsRagdollTest(rootBody, dGetIdentityMatrix());
+		AddModel(dynamicRagdoll);
+		dynamicRagdoll->SetCalculateLocalTransforms(true);
+
+		// attach a Hip effector to the root body
+		dynamicRagdoll->m_hipEffector = new dAnimationEndEffectorTest(dynamicRagdoll);
+		dynamicRagdoll->GetLoops().Append(dynamicRagdoll->m_hipEffector);
+
+		// save the controller as the collision user data, for collision culling
+		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBody), dynamicRagdoll);
+
+		int stackIndex = 0;
+		DemoEntity* childEntities[32];
+		dAnimationJoint* parentBones[32];
+
+		for (DemoEntity* child = modelEntity->GetChild(); child; child = child->GetSibling()) {
+			parentBones[stackIndex] = dynamicRagdoll;
+			childEntities[stackIndex] = child;
+			stackIndex++;
+		}
+
+		int bodyCount = 1;
+		NewtonBody* bodyArray[1024];
+		bodyArray[0] = rootBody;
+
+		// walk model hierarchic adding all children designed as rigid body bones. 
+		while (stackIndex) {
+			stackIndex--;
+			DemoEntity* const entity = childEntities[stackIndex];
+			dAnimationJoint* parentNode = parentBones[stackIndex];
+
+			const char* const name = entity->GetName().GetStr();
+			for (int i = 0; i < definitionCount; i++) {
+				if (!strcmp(jointsDefinition[i].m_boneName, name)) {
+					NewtonBody* const childBody = CreateBodyPart(entity);
+
+					bodyArray[bodyCount] = childBody;
+					bodyCount++;
+
+					// connect this body part to its parent with a rag doll joint
+					parentNode = CreateChildNode(childBody, parentNode, jointsDefinition[i]);
+
+					NewtonCollisionSetUserData(NewtonBodyGetCollision(childBody), parentNode);
+					break;
+				}
+			}
+
+			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
+				parentBones[stackIndex] = parentNode;
+				childEntities[stackIndex] = child;
+				stackIndex++;
+			}
+		}
+
+		SetModelMass(100.0f, bodyCount, bodyArray);
+
+		// set the collision mask
+		// note this container work best with a material call back for setting bit field 
+		//dAssert(0);
+		//controller->SetDefaultSelfCollisionMask();
+
+		// transform the entire contraction to its location
+		dMatrix worldMatrix(modelEntity->GetCurrentMatrix() * location);
+		worldMatrix.m_posit = location.m_posit;
+		NewtonBodySetMatrixRecursive(rootBody, &worldMatrix[0][0]);
+
+		dynamicRagdoll->Finalize();
+		//return controller;
+	}
+
 
 	void DynamicsRagdollExperiment_1(const dMatrix& location)
 	{
@@ -401,7 +510,6 @@ class DynamicRagdollManager: public dAnimationModelManager
 		//return controller;
 	}
 
-
 	void OnPostUpdate(dAnimationJointRoot* const model, dFloat timestep)
 	{
 		// do nothing for now
@@ -449,7 +557,9 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
 	origin.m_posit.m_y = 1.2f;
-	manager->DynamicsRagdollExperiment_1(origin);
+	manager->DynamicsRagdollExperiment_0(origin);
+
+//	manager->DynamicsRagdollExperiment_1(origin);
 /*
 //	int count = 10;
 //	count = 1;

@@ -9,15 +9,13 @@
 * freely
 */
 
-#ifndef __D_ANIMATION_JOINT_RAGDOLL_H__
-#define __D_ANIMATION_JOINT_RAGDOLL_H__
+#ifndef __D_ANIMATION_RAGDOLL_JOINT_H__
+#define __D_ANIMATION_RAGDOLL_JOINT_H__
 
 #include "dAnimationStdAfx.h"
 #include "dAnimationJoint.h"
 
-
-
-class dAnimationJointRagdoll: public dAnimationJoint, public dAnimationContraint
+class dAnimationRagdollJoint: public dAnimationJoint, public dAnimationContraint
 {
 	class dRagdollMotor;
 	class dRagdollMotor_1dof;
@@ -32,8 +30,8 @@ class dAnimationJointRagdoll: public dAnimationJoint, public dAnimationContraint
 		m_threeDof,
 	};
 
-	dAnimationJointRagdoll(dRagdollMotorType type, const dMatrix& pinAndPivotInGlobalSpace, NewtonBody* const body, const dMatrix& bindMarix, dAnimationJoint* const parent);
-	virtual ~dAnimationJointRagdoll();
+	dAnimationRagdollJoint(dRagdollMotorType type, const dMatrix& pinAndPivotInGlobalSpace, NewtonBody* const body, const dMatrix& bindMarix, dAnimationJoint* const parent);
+	virtual ~dAnimationRagdollJoint();
 
 	protected:
 	virtual void RigidBodyToStates();
