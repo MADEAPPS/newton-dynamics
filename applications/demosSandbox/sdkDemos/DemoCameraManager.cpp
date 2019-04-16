@@ -166,7 +166,7 @@ void DemoCameraManager::FixUpdate (const NewtonWorld* const world, dFloat timest
 	};
 	dReplay replay;
 
-	#if 0
+	#if 1
 		replay.m_p0 = p0;
 		replay.m_p1 = p1;
 		replay.m_mouseState = mouseState ? 1 : 0;

@@ -20,6 +20,7 @@ class dAnimationRagdollJoint::dRagdollMotor: public dCustomBallAndSocket
 		:dCustomBallAndSocket(pinAndPivotFrame0, pinAndPivotFrame1, child, parent)
 		,m_owner(owner)
 		,m_dof(3)
+		,m_motorTorque (100000.0f)
 	{
 	}
 
@@ -29,6 +30,7 @@ class dAnimationRagdollJoint::dRagdollMotor: public dCustomBallAndSocket
 	}
 
 	dAnimationRagdollJoint* m_owner;
+	dFloat m_motorTorque;
 	int m_dof;
 };
 
@@ -40,8 +42,6 @@ class dAnimationRagdollJoint::dRagdollMotor_2dof : public dRagdollMotor
 		:dRagdollMotor(owner, pinAndPivotFrame0, pinAndPivotFrame1, child, parent)
 	{
 		m_dof = 2;
-		m_coneFriction = 100.0f;
-		m_twistFriction = 100.0f;
 	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
@@ -86,14 +86,14 @@ class dAnimationRagdollJoint::dRagdollMotor_2dof : public dRagdollMotor
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, motorAccel[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 
 			dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, motorAccel[1]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 
 		} else {
 
@@ -103,13 +103,13 @@ class dAnimationRagdollJoint::dRagdollMotor_2dof : public dRagdollMotor
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[1][0]);
 			NewtonUserJointSetRowAcceleration(m_joint, motorAccel[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[2][0]);
 			NewtonUserJointSetRowAcceleration(m_joint, motorAccel[1]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 		}
 	}
 };
@@ -122,8 +122,6 @@ class dAnimationRagdollJoint::dRagdollMotor_3dof: public dRagdollMotor
 		:dRagdollMotor(owner, pinAndPivotFrame0, pinAndPivotFrame1, child, parent)
 	{
 		m_dof = 3;
-		m_coneFriction = 100.0f;
-		m_twistFriction = 100.0f;
 	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
@@ -166,35 +164,35 @@ class dAnimationRagdollJoint::dRagdollMotor_3dof: public dRagdollMotor
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
 			NewtonUserJointSetRowAcceleration(m_joint, motorAccel[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_twistFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, motorAccel[1]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 
 			dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
 			NewtonUserJointSetRowAcceleration(m_joint, motorAccel[2]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 		} else {
 			// using small angular aproximation to get the joint angle;
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
 			NewtonUserJointSetRowAcceleration(m_joint, motorAccel[0]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_twistFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[1][0]);
 			NewtonUserJointSetRowAcceleration(m_joint, motorAccel[1]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[2][0]);
 			NewtonUserJointSetRowAcceleration(m_joint, motorAccel[2]);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 		}
 	}
 };
@@ -208,7 +206,7 @@ dAnimationRagdollJoint::dAnimationRagdollJoint(dRagdollMotorType type, const dMa
 {
 //	dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 	dMatrix parentRollMatrix(dGetIdentityMatrix() * pinAndPivotInGlobalSpace);
-type = m_twoDof;
+//type = m_twoDof;
 
 	if (type == m_threeDof) {
 		m_joint = new dRagdollMotor_3dof(this, pinAndPivotInGlobalSpace, parentRollMatrix, body, parent->GetBody());

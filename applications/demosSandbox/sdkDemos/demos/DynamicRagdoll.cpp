@@ -557,9 +557,8 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
 	origin.m_posit.m_y = 1.2f;
-	manager->DynamicsRagdollExperiment_0(origin);
-
-//	manager->DynamicsRagdollExperiment_1(origin);
+//	manager->DynamicsRagdollExperiment_0(origin);
+	manager->DynamicsRagdollExperiment_1(origin);
 /*
 //	int count = 10;
 //	count = 1;
