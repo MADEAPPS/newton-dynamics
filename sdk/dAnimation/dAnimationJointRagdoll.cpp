@@ -78,7 +78,7 @@ class dAnimationJointRagdoll::dRagdollMotor_2dof : public dRagdollMotor
 			dFloat pitchAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 
 #if 1
-			dFloat coneAngle = -dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)));
+			dFloat coneAngle = dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)));
 			dTrace(("cone:%f pitch:%f\n", coneAngle * dRadToDegree, pitchAngle * dRadToDegree));
 #endif
 
