@@ -11,10 +11,9 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimationJointRoot.h"
-#include "dAnimationEndEffector.h"
-//#include "dAnimationRagdollJoint.h"
+#include "dAnimationRagDollEffector.h"
 
-dAnimationEndEffector::dAnimationEndEffector(dAnimationJointRoot* const root)
+dAnimationRagDollEffector::dAnimationRagDollEffector(dAnimationJointRoot* const root)
 	:dAnimationLoopJoint(root->GetProxyBody(), root->GetStaticWorld())
 	,m_localMatrix(dGetIdentityMatrix())
 	,m_targetMatrix(dGetIdentityMatrix())
@@ -31,9 +30,11 @@ dAnimationEndEffector::dAnimationEndEffector(dAnimationJointRoot* const root)
 	m_localMatrix = m_localMatrix * matrix.Inverse();
 }
 
-void dAnimationEndEffector::SetTarget()
+void dAnimationRagDollEffector::SetTarget()
 {
-	dMatrix matrix(m_localMatrix * m_state0->GetMatrix());
+	dMatrix matrix;
+	NewtonBodyGetMatrix(GetOwner0()->m_owner->GetBody(), &matrix[0][0]);
+	matrix = m_localMatrix * matrix;
 	//m_targetMatrix.m_posit = matrix.m_posit;
 
 	//static dMatrix xxx (dPitchMatrix (95.0f * dDegreeToRad) * dYawMatrix (65.0f * dDegreeToRad) * dRollMatrix (85.0f * dDegreeToRad) * m_targetMatrix);
@@ -42,7 +43,7 @@ void dAnimationEndEffector::SetTarget()
 	m_targetMatrix.m_posit = matrix.m_posit;
 }
 
-dFloat dAnimationEndEffector::ClipParam(dFloat value, dFloat maxValue) const
+dFloat dAnimationRagDollEffector::ClipParam(dFloat value, dFloat maxValue) const
 {
 	if (value > maxValue) {
 		value = maxValue;
@@ -54,7 +55,7 @@ dFloat dAnimationEndEffector::ClipParam(dFloat value, dFloat maxValue) const
 	return value;
 }
 
-void dAnimationEndEffector::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+void dAnimationRagDollEffector::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	const dMatrix& matrix1 = m_targetMatrix;
 	dMatrix matrix0(m_localMatrix * m_state0->GetMatrix());

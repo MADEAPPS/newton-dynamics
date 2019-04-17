@@ -20,11 +20,11 @@
 #include "HeightFieldPrimitive.h"
 
 
-class dAnimationEndEffectorTest: public dAnimationEndEffector, public dCustomJoint
+class dAnimationEndEffectorTest: public dAnimationRagDollEffector, public dCustomJoint
 {
 	public:
 	dAnimationEndEffectorTest(dAnimationJointRoot* const root)
-		:dAnimationEndEffector(root)
+		:dAnimationRagDollEffector(root)
 		,dCustomJoint(6, root->GetBody(), NULL)
 	{
 		SetSolverModel(3);
@@ -171,7 +171,7 @@ class dDynamicsRagdollTest: public dAnimationRagdollRoot
 		//dAnimationRagdollRoot::PreUpdate(timestep);
 	}
 
-	dAnimationEndEffector* m_hipEffector;
+	dAnimationRagDollEffector* m_hipEffector;
 };
 
 
@@ -195,7 +195,7 @@ class dDynamicsRagdoll: public dAnimationRagdollRoot
 		dAnimationRagdollRoot::PreUpdate(timestep);
 	}
 
-	dAnimationEndEffector* m_hipEffector;
+	dAnimationRagDollEffector* m_hipEffector;
 };
 
 
@@ -445,7 +445,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 		dynamicRagdoll->SetCalculateLocalTransforms(true);
 
 		// attach a Hip effector to the root body
-		dynamicRagdoll->m_hipEffector = new dAnimationEndEffector(dynamicRagdoll);
+		dynamicRagdoll->m_hipEffector = new dAnimationRagDollEffector(dynamicRagdoll);
 		dynamicRagdoll->GetLoops().Append(dynamicRagdoll->m_hipEffector);
 
 		// save the controller as the collision user data, for collision culling
@@ -531,7 +531,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 		// position the effector
 		//const dAnimationLoopJointList& effectors = model->GetLoops();
 		//for (dAnimationLoopJointList::dListNode* node = effectors.GetFirst(); node; node = node->GetNext()) {
-		//	dAnimationEndEffector* const effector = (dAnimationEndEffector*)node->GetInfo();
+		//	dAnimationRagDollEffector* const effector = (dAnimationRagDollEffector*)node->GetInfo();
 		//	effector->SetTarget();
 		//}
 

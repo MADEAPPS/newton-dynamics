@@ -197,9 +197,9 @@ typedef long long unsigned64;
 #include <dAnimationJoint.h>
 #include <dAnimationLoopJoint.h>
 #include <dAnimationRagdollRoot.h>
-#include <dAnimationEndEffector.h>
-#include <dAnimationRagdollJoint.h>
 #include <dAnimationModelManager.h>
+#include <dAnimationRagdollJoint.h>
+#include <dAnimationRagDollEffector.h>
 
 /*
 #include <dAnimIKManager.h>

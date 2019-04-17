@@ -35,7 +35,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\dAnimation\dAnimationEndEffector.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationRagDollEffector.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationJoint.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationJointRoot.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationJointSolver.cpp" />
@@ -55,7 +55,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\dAnimation\dAnimationEndEffector.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationRagDollEffector.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationJoint.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationJointRoot.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationJointSolver.h" />

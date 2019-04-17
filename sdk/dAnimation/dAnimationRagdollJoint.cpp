@@ -260,7 +260,7 @@ dAnimationRagdollJoint::dAnimationRagdollJoint(dRagdollMotorType type, const dMa
 {
 //	dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 	dMatrix parentRollMatrix(dGetIdentityMatrix() * pinAndPivotInGlobalSpace);
-//type = m_twoDof;
+type = m_twoDof;
 
 	if (type == m_threeDof) {
 		m_joint = new dRagdollMotor_3dof(this, pinAndPivotInGlobalSpace, parentRollMatrix, body, parent->GetBody());

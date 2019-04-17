@@ -236,14 +236,14 @@ void dComplementaritySolver::dBodyState::UpdateInertia()
 {
 	dMatrix tmpMatrix (dGetZeroMatrix());
 
-	tmpMatrix[0] = m_localInertia * dVector (m_matrix[0][0], m_matrix[1][0], m_matrix[2][0], 0.0f);
-	tmpMatrix[1] = m_localInertia * dVector (m_matrix[0][1], m_matrix[1][1], m_matrix[2][1], 0.0f);
-	tmpMatrix[2] = m_localInertia * dVector (m_matrix[0][2], m_matrix[1][2], m_matrix[2][2], 0.0f);
+	tmpMatrix[0] = m_localInertia * dVector (m_matrix[0][0], m_matrix[1][0], m_matrix[2][0], dFloat(0.0f));
+	tmpMatrix[1] = m_localInertia * dVector (m_matrix[0][1], m_matrix[1][1], m_matrix[2][1], dFloat(0.0f));
+	tmpMatrix[2] = m_localInertia * dVector (m_matrix[0][2], m_matrix[1][2], m_matrix[2][2], dFloat(0.0f));
 	m_inertia = tmpMatrix * m_matrix;
 
-	tmpMatrix[0] = m_localInvInertia * dVector (m_matrix[0][0], m_matrix[1][0], m_matrix[2][0], 0.0f);
-	tmpMatrix[1] = m_localInvInertia * dVector (m_matrix[0][1], m_matrix[1][1], m_matrix[2][1], 0.0f);
-	tmpMatrix[2] = m_localInvInertia * dVector (m_matrix[0][2], m_matrix[1][2], m_matrix[2][2], 0.0f);
+	tmpMatrix[0] = m_localInvInertia * dVector (m_matrix[0][0], m_matrix[1][0], m_matrix[2][0], dFloat(0.0f));
+	tmpMatrix[1] = m_localInvInertia * dVector (m_matrix[0][1], m_matrix[1][1], m_matrix[2][1], dFloat(0.0f));
+	tmpMatrix[2] = m_localInvInertia * dVector (m_matrix[0][2], m_matrix[1][2], m_matrix[2][2], dFloat(0.0f));
 	m_invInertia = tmpMatrix * m_matrix;
 }
 

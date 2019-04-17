@@ -17,10 +17,10 @@
 
 class dAnimationJointRoot;
 
-class dAnimationEndEffector: public dAnimationLoopJoint
+class dAnimationRagDollEffector: public dAnimationLoopJoint
 {
 	public:
-	dAnimationEndEffector(dAnimationJointRoot* const root);
+	dAnimationRagDollEffector(dAnimationJointRoot* const root);
 	void SetTarget();
 
 	virtual int GetMaxDof() const {return 6;}
