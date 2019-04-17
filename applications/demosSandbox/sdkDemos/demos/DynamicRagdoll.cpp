@@ -422,7 +422,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 		{
 			{ "body" },
 			{ "leg", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-			//{ "foot", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "foot", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 		};
 		const int definitionCount = sizeof (jointsDefinition)/sizeof (jointsDefinition[0]);
 

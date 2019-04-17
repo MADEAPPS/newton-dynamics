@@ -29,13 +29,48 @@ class dAnimationRagdollJoint::dRagdollMotor: public dCustomBallAndSocket
 		return m_dof; 
 	}
 
+	void Debug(dDebugDisplay* const debugDisplay) const
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+
+		dCustomJoint::Debug(debugDisplay);
+
+		dFloat scale = debugDisplay->GetScale();
+		debugDisplay->SetScale(1.0f);
+
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		debugDisplay->DrawFrame(matrix0);
+		debugDisplay->DrawFrame(matrix1);
+
+		debugDisplay->SetScale(scale);
+	}
+
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+
+		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+		CalculateGlobalMatrix(matrix0, matrix1);
+		SubmitLinearRows(0x07, matrix0, matrix1);
+		SubmitAngularConstraints(matrix0, matrix1, timestep);
+	}
+
+	virtual void SubmitAngularConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+	{
+		dAssert(0);
+	}
+
 	dAnimationRagdollJoint* m_owner;
 	dFloat m_motorTorque;
 	int m_dof;
 };
 
 
-class dAnimationRagdollJoint::dRagdollMotor_2dof : public dRagdollMotor
+class dAnimationRagdollJoint::dRagdollMotor_2dof: public dRagdollMotor
 {
 	public:
 	dRagdollMotor_2dof(dAnimationRagdollJoint* const owner, const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent)
@@ -44,8 +79,9 @@ class dAnimationRagdollJoint::dRagdollMotor_2dof : public dRagdollMotor
 		m_dof = 2;
 	}
 
-	void SubmitConstraints(dFloat timestep, int threadIndex)
+	virtual void SubmitAngularConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 	{
+/*
 		dMatrix matrix0;
 		dMatrix matrix1;
 
@@ -111,6 +147,31 @@ class dAnimationRagdollJoint::dRagdollMotor_2dof : public dRagdollMotor
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 		}
+*/
+
+		dVector omega0(0.0f);
+		dVector omega1(0.0f);
+		NewtonBodyGetOmega(m_body0, &omega0[0]);
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+
+		dVector euler0;
+		dVector euler1;
+		dMatrix localMatrix(matrix0 * matrix1.Inverse());
+		localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+
+		dVector relOmega(omega0 - omega1);
+		//m_curJointAngle1.Update(euler0.m_y);
+		//dFloat jointOmega = relOmega.DotProduct3(matrix1.m_up);
+
+		// not happy with this method because it is a penalty system, 
+		// but is hard to the the right axis angular derivative.
+		dMatrix rollMatrix(dYawMatrix(euler0[1]) * matrix1);
+		NewtonUserJointAddAngularRow(m_joint, -euler0[2], &rollMatrix.m_right[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		dFloat rollOmega = relOmega.DotProduct3(rollMatrix.m_right);
+		dFloat alphaRollError = -(euler0[2] + rollOmega * timestep) / (timestep * timestep);
+		NewtonUserJointSetRowAcceleration(m_joint, alphaRollError);
+
 	}
 };
 
@@ -124,15 +185,8 @@ class dAnimationRagdollJoint::dRagdollMotor_3dof: public dRagdollMotor
 		m_dof = 3;
 	}
 
-	void SubmitConstraints(dFloat timestep, int threadIndex)
+	virtual void SubmitAngularConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 	{
-		dMatrix matrix0;
-		dMatrix matrix1;
-
-		// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-		CalculateGlobalMatrix(matrix0, matrix1);
-		SubmitLinearRows(0x07, matrix0, matrix1);
-
 		const dVector& motorAccel = m_owner->m_rowAccel;
 		const dVector& coneDir0 = matrix0.m_front;
 		const dVector& coneDir1 = matrix1.m_front;

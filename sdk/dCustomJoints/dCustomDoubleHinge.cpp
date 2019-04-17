@@ -250,7 +250,7 @@ void dCustomDoubleHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix&
 //dTrace(("%f %f %f\n", eulers.m_x * dRadToDegree, eulers.m_y * dRadToDegree, eulers.m_z * dRadToDegree));
 
 #if 1
-	// not happy wit this method becaus eit is a penalty system, 
+	// not happy with this method because it is a penalty system, 
 	// but is hard to the the right axis angular derivative.
 	dMatrix rollMatrix(dYawMatrix(eulers[1]) * matrix1);
 	NewtonUserJointAddAngularRow(m_joint, -eulers[2], &rollMatrix.m_right[0]);
