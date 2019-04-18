@@ -167,7 +167,20 @@ class dDynamicsRagdollTest: public dAnimationRagdollRoot
 	void PreUpdate(dFloat timestep)
 	{
 		NewtonBodySetSleepState(GetBody(), 0);
+		dAssert(0);
+/*
+		dMatrix matrix;
+		NewtonBodyGetMatrix(GetOwner0()->m_owner->GetBody(), &matrix[0][0]);
+		matrix = m_localMatrix * matrix;
+		//m_targetMatrix.m_posit = matrix.m_posit;
+
+		//static dMatrix xxx (dPitchMatrix (95.0f * dDegreeToRad) * dYawMatrix (65.0f * dDegreeToRad) * dRollMatrix (85.0f * dDegreeToRad) * m_targetMatrix);
+		//static dMatrix xxx (dPitchMatrix (0.0f * dDegreeToRad) * dYawMatrix (0.0f * dDegreeToRad) * dRollMatrix (0.0f * dDegreeToRad) * m_targetMatrix);
+		m_targetMatrix = dPitchMatrix(0.0f * dDegreeToRad) * dYawMatrix(0.0f * dDegreeToRad) * dRollMatrix(0.0f * dDegreeToRad);
+		m_targetMatrix.m_posit = matrix.m_posit;
+
 		m_hipEffector->SetTarget();
+*/
 		//dAnimationRagdollRoot::PreUpdate(timestep);
 	}
 
@@ -191,8 +204,8 @@ class dDynamicsRagdoll: public dAnimationRagdollRoot
 
 	void PreUpdate(dFloat timestep)
 	{
-		NewtonBodySetSleepState(GetBody(), 0);
-		m_hipEffector->SetTarget();
+		//NewtonBodySetSleepState(GetBody(), 0);
+		//m_hipEffector->SetTarget();
 		dAnimationRagdollRoot::PreUpdate(timestep);
 	}
 
@@ -268,7 +281,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 		dFloat Izz;
 		dFloat mass;
 
-		dFloat gravity = -10.0f;
+		dFloat gravity = -1.0f;
 		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 		dVector dir(0.0f, gravity, 0.0f);
 		dVector force(dir.Scale(mass));
@@ -565,11 +578,23 @@ class DynamicRagdollManager: public dAnimationModelManager
 		}
 		com = com.Scale(1.0f / totalMass);
 
-
 		dDynamicsRagdoll* const ragDoll = (dDynamicsRagdoll*)model;
 		NewtonBody* const rootBody = ragDoll->GetBody();
 		NewtonBodySetSleepState(rootBody, 0);
-		ragDoll->m_hipEffector->SetTarget();
+		//ragDoll->m_hipEffector->SetTarget();
+
+		dMatrix rootMatrix;
+		NewtonBodyGetMatrix(ragDoll->GetBody(), &rootMatrix[0][0]);
+		dMatrix matrix(dPitchMatrix(0.0f * dDegreeToRad) * dYawMatrix(0.0f * dDegreeToRad) * dRollMatrix(0.0f * dDegreeToRad));
+
+		com.m_y = rootMatrix.m_posit.m_y;
+		com.m_w = 1.0f;
+		//matrix.m_posit = rootMatrix.m_posit;
+		matrix.m_posit = com;
+		ragDoll->m_hipEffector->SetTarget(matrix);
+
+dVector error(rootMatrix.m_posit - com);
+dTrace(("%f %f %f\n", error[0], error[1], error[2]));
 
 		// call the solver 
 		dAnimationModelManager::OnPreUpdate(model, timestep);

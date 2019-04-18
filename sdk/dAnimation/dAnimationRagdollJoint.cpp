@@ -77,6 +77,7 @@ class dAnimationRagdollJoint::dRagdollMotor_2dof: public dRagdollMotor
 		:dRagdollMotor(owner, pinAndPivotFrame0, pinAndPivotFrame1, child, parent)
 	{
 		m_dof = 2;
+		m_dof = 0;
 	}
 
 	virtual void SubmitAngularConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)

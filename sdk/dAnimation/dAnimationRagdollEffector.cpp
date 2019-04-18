@@ -30,8 +30,9 @@ dAnimationRagDollEffector::dAnimationRagDollEffector(dAnimationJoint* const join
 	m_localMatrix = m_localMatrix * matrix.Inverse();
 }
 
-void dAnimationRagDollEffector::SetTarget()
+void dAnimationRagDollEffector::SetTarget(const dMatrix& targetMatrix)
 {
+/*
 	dMatrix matrix;
 	NewtonBodyGetMatrix(GetOwner0()->m_owner->GetBody(), &matrix[0][0]);
 	matrix = m_localMatrix * matrix;
@@ -41,6 +42,8 @@ void dAnimationRagDollEffector::SetTarget()
 	//static dMatrix xxx (dPitchMatrix (0.0f * dDegreeToRad) * dYawMatrix (0.0f * dDegreeToRad) * dRollMatrix (0.0f * dDegreeToRad) * m_targetMatrix);
 	m_targetMatrix = dPitchMatrix(0.0f * dDegreeToRad) * dYawMatrix(0.0f * dDegreeToRad) * dRollMatrix(0.0f * dDegreeToRad);
 	m_targetMatrix.m_posit = matrix.m_posit;
+*/
+	m_targetMatrix = targetMatrix;
 }
 
 dFloat dAnimationRagDollEffector::ClipParam(dFloat value, dFloat maxValue) const

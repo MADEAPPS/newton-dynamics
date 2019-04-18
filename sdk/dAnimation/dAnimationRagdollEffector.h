@@ -20,7 +20,7 @@ class dAnimationRagDollEffector: public dAnimationLoopJoint
 {
 	public:
 	dAnimationRagDollEffector(dAnimationJoint* const root);
-	void SetTarget();
+	void SetTarget(const dMatrix& targetMatrix);
 
 	virtual int GetMaxDof() const {return 6;}
 

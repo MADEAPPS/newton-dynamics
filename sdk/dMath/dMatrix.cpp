@@ -962,10 +962,10 @@ dSpatialMatrix dSpatialMatrix::Inverse(int rows) const
 	}
 	for (int i = 0; i < rows; i++) {
 		dSpatialVector v(inv.VectorTimeMatrix (tmp[i], rows));
-		dAssert (dAbs (v[i] - dFloat (1.0f)) < dFloat(1.0e-6f));
+		dAssert (dAbs (v[i] - dFloat (1.0f)) < dFloat(1.0e-5f));
 		for (int j = 0; j < rows; j++) {
 			if (j != i) {
-				dAssert (dAbs (v[j]) < dFloat(1.0e-6f));
+				dAssert (dAbs (v[j]) < dFloat(1.0e-5f));
 			}
 		}
 	}
