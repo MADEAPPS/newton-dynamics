@@ -222,6 +222,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 		dFloat m_friction;
 		dJointLimit m_jointLimits;
 		dFrameMatrix m_frameBasics;
+		dAnimationRagdollJoint::dRagdollMotorType m_type;
 	};
 	
 	public:
@@ -247,8 +248,16 @@ class DynamicRagdollManager: public dAnimationModelManager
 			omega = omega.Normalize().Scale(100.0f);
 			NewtonBodySetOmega(body, &omega[0]);
 		}
-
 		//PhysicsApplyGravityForce(body, timestep, threadIndex);
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		dFloat mass;
+
+		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+		dVector dir(0.0f, 1.0f, 0.0f);
+		dVector force(dir.Scale(mass * -1.0f));
+		NewtonBodySetForce(body, &force.m_x);
 	}
 
 	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart)
@@ -317,7 +326,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 
 		//dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
 		dMatrix bindMatrix(dGetIdentityMatrix());
-		dAnimationJoint* const joint = new dAnimationRagdollJoint(dAnimationRagdollJoint::m_threeDof, pinAndPivotInGlobalSpace, boneBody, bindMatrix, parent);
+		dAnimationJoint* const joint = new dAnimationRagdollJoint(definition.m_type, pinAndPivotInGlobalSpace, boneBody, bindMatrix, parent);
 		return joint;
 	}
 
@@ -326,8 +335,8 @@ class DynamicRagdollManager: public dAnimationModelManager
 		static dJointDefinition jointsDefinition[] =
 		{
 			{ "body" },
-			{ "leg", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f } },
-			//{ "foot", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "leg", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f }, dAnimationRagdollJoint::m_threeDof },
+			{ "foot", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
 		};
 		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
 
@@ -421,8 +430,8 @@ class DynamicRagdollManager: public dAnimationModelManager
 		static dJointDefinition jointsDefinition[] =
 		{
 			{ "body" },
-			{ "leg", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-			{ "foot", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "leg", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f }, dAnimationRagdollJoint::m_threeDof },
+			//{ "foot", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
 		};
 		const int definitionCount = sizeof (jointsDefinition)/sizeof (jointsDefinition[0]);
 
