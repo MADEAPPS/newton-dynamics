@@ -281,7 +281,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 		dFloat Izz;
 		dFloat mass;
 
-		dFloat gravity = -1.0f;
+		dFloat gravity = -2.0f;
 		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 		dVector dir(0.0f, gravity, 0.0f);
 		dVector force(dir.Scale(mass));
