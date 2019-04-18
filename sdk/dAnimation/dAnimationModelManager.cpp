@@ -41,6 +41,11 @@ void dAnimationModelManager::RemoveModel(dAnimationJointRoot* const model)
 	model->m_managerNode = NULL;
 }
 
+dAnimationJoint* dAnimationModelManager::GetFirstJoint(dAnimationJointRoot* const model) const
+{
+	return GetFirstJoint((dAnimationJoint*)model);
+}
+
 dAnimationJoint* dAnimationModelManager::GetFirstJoint(dAnimationJoint* const root) const
 {
 	dAnimationJoint* joint = root;
@@ -52,16 +57,17 @@ dAnimationJoint* dAnimationModelManager::GetFirstJoint(dAnimationJoint* const ro
 
 dAnimationJoint* dAnimationModelManager::GetNextJoint(dAnimationJoint* const joint) const
 {
-	/*
-	dAssert ()
-	if (joint->m_node->GetNext()->GetNode) {
-	}
-	if (!joint->GetParent()) {
+	dAnimationJoint* const parentJoint = joint->GetParent();
+	if (!parentJoint) {
 		return NULL;
 	}
-	dAnimationJoint* const sibling = ->;
-*/
-	return NULL;
+
+	dAssert(joint->GetNode());
+	const dAnimationJointChildren::dListNode* const siblingNode = joint->GetNode()->GetNext();
+	if (siblingNode) {
+		return GetFirstJoint(siblingNode->GetInfo());
+	}
+	return parentJoint;
 }
 
 

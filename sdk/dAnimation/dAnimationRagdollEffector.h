@@ -15,12 +15,11 @@
 
 #include "dAnimationLoopJoint.h"
 
-class dAnimationJointRoot;
 
 class dAnimationRagDollEffector: public dAnimationLoopJoint
 {
 	public:
-	dAnimationRagDollEffector(dAnimationJointRoot* const root);
+	dAnimationRagDollEffector(dAnimationJoint* const root);
 	void SetTarget();
 
 	virtual int GetMaxDof() const {return 6;}

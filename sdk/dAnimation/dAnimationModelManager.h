@@ -30,7 +30,7 @@ class dAnimationModelManager: public dCustomParallelListener
 	void AddModel(dAnimationJointRoot* const model);
 	void RemoveModel(dAnimationJointRoot* const model);
 
-	dAnimationJoint* GetFirstJoint(dAnimationJointRoot* const model) const {return GetFirstJoint(model);}
+	dAnimationJoint* GetFirstJoint(dAnimationJointRoot* const model) const;
 	dAnimationJoint* GetNextJoint(dAnimationJoint* const joint) const;
 
 	//virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext) = 0;

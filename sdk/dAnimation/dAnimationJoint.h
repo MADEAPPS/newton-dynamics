@@ -15,6 +15,7 @@
 #include "dAnimationStdAfx.h"
 
 class dAnimationJoint;
+class dAnimationJointRoot;
 class dAnimationModelManager;
 
 class dAnimationJointChildren: public dList<dAnimationJoint*>
@@ -54,6 +55,11 @@ class dAnimationJoint: public dCustomAlloc
 	
 	dAnimationJoint* GetParent() const;
 	const dMatrix& GetBindMatrix() const;
+
+	virtual dAnimationJoint* GetAsLeaf();
+	virtual dAnimationJointRoot* GetAsRoot();
+
+	dAnimationJointRoot* GetRoot() const;
 
 	void* GetUserData() const;
 	void SetUserData(void* const data);
@@ -141,6 +147,25 @@ inline dAnimationJointChildren& dAnimationJoint::GetChildren()
 inline const dAnimationJointChildren::dListNode* dAnimationJoint::GetNode() const
 {
 	return m_node;
+}
+
+inline dAnimationJointRoot* dAnimationJoint::GetAsRoot()
+{ 
+	return NULL; 
+}
+
+inline dAnimationJoint* dAnimationJoint::GetAsLeaf()
+{ 
+	return !m_children.GetCount() ? this : NULL; 
+}
+
+inline dAnimationJointRoot* dAnimationJoint::GetRoot() const
+{
+	const dAnimationJoint* root = this;
+	while (root->GetParent()) {
+		root = root->GetParent();
+	}
+	return (dAnimationJointRoot*)root;
 }
 
 #endif

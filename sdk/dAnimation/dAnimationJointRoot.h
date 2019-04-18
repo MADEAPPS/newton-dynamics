@@ -33,6 +33,8 @@ class dAnimationJointRoot: public dAnimationJoint
 	dAnimationLoopJointList& GetLoops();
 	const dAnimationLoopJointList& GetLoops() const;
 
+	virtual dAnimationJointRoot* GetAsRoot() { return this; }
+
 	dAnimationBody* GetStaticWorld();
 
 	void SetCalculateLocalTransforms(bool val);

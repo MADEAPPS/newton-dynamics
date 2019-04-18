@@ -180,6 +180,7 @@ class dDynamicsRagdoll: public dAnimationRagdollRoot
 	public:
 	dDynamicsRagdoll(NewtonBody* const body, const dMatrix& bindMarix)
 		:dAnimationRagdollRoot(body, bindMarix)
+		,m_xxxxx(NULL)
 		,m_hipEffector(NULL)
 	{
 	}
@@ -195,6 +196,18 @@ class dDynamicsRagdoll: public dAnimationRagdollRoot
 		dAnimationRagdollRoot::PreUpdate(timestep);
 	}
 
+	void SetHipEffector(dAnimationJoint* const hip)
+	{
+		m_hipEffector = new dAnimationRagDollEffector(hip);
+		m_loopJoints.Append(m_hipEffector);
+	}
+
+	void SetFootEffector(dAnimationJoint* const joint)
+	{
+		m_xxxxx = joint;
+	}
+
+	dAnimationJoint* m_xxxxx;
 	dAnimationRagDollEffector* m_hipEffector;
 };
 
@@ -248,13 +261,16 @@ class DynamicRagdollManager: public dAnimationModelManager
 			omega = omega.Normalize().Scale(100.0f);
 			NewtonBodySetOmega(body, &omega[0]);
 		}
+
 		//PhysicsApplyGravityForce(body, timestep, threadIndex);
 		dFloat Ixx;
 		dFloat Iyy;
 		dFloat Izz;
 		dFloat mass;
+
+		dFloat gravity = -10.0f;
 		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-		dVector dir(0.0f, -10.0f, 0.0f);
+		dVector dir(0.0f, gravity, 0.0f);
 		dVector force(dir.Scale(mass));
 		NewtonBodySetForce(body, &force.m_x);
 	}
@@ -290,20 +306,19 @@ class DynamicRagdollManager: public dAnimationModelManager
 		return bone;
 	}
 
-	void SetModelMass(dFloat mass, int bodyCount, NewtonBody** const bodyArray) const
+	void SetModelMass( dFloat mass, dAnimationJointRoot* const rootNode) const
 	{
 		dFloat volume = 0.0f;
-		for (int i = 0; i < bodyCount; i++) {
-			volume += NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(bodyArray[i]));
+		for (dAnimationJoint* joint = GetFirstJoint(rootNode); joint; joint = GetNextJoint(joint)) {
+			volume += NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(joint->GetBody()));
 		}
 		dFloat density = mass / volume;
 
-		for (int i = 0; i < bodyCount; i++) {
+		for (dAnimationJoint* joint = GetFirstJoint(rootNode); joint; joint = GetNextJoint(joint)) {
 			dFloat Ixx;
 			dFloat Iyy;
 			dFloat Izz;
-
-			NewtonBody* const body = bodyArray[i];
+			NewtonBody* const body = joint->GetBody();
 			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 			dFloat scale = density * NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(body));
 			mass *= scale;
@@ -374,10 +389,6 @@ class DynamicRagdollManager: public dAnimationModelManager
 			stackIndex++;
 		}
 
-		int bodyCount = 1;
-		NewtonBody* bodyArray[1024];
-		bodyArray[0] = rootBody;
-
 		// walk model hierarchic adding all children designed as rigid body bones. 
 		while (stackIndex) {
 			stackIndex--;
@@ -388,9 +399,6 @@ class DynamicRagdollManager: public dAnimationModelManager
 			for (int i = 0; i < definitionCount; i++) {
 				if (!strcmp(jointsDefinition[i].m_boneName, name)) {
 					NewtonBody* const childBody = CreateBodyPart(entity);
-
-					bodyArray[bodyCount] = childBody;
-					bodyCount++;
 
 					// connect this body part to its parent with a rag doll joint
 					parentNode = CreateChildNode(childBody, parentNode, jointsDefinition[i]);
@@ -407,7 +415,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 			}
 		}
 
-		SetModelMass(100.0f, bodyCount, bodyArray);
+		SetModelMass(100.0f, dynamicRagdoll);
 
 		// set the collision mask
 		// note this container work best with a material call back for setting bit field 
@@ -465,10 +473,6 @@ class DynamicRagdollManager: public dAnimationModelManager
 			stackIndex++;
 		}
 
-		int bodyCount = 1;
-		NewtonBody* bodyArray[1024];
-		bodyArray[0] = rootBody;
-
 		// walk model hierarchic adding all children designed as rigid body bones. 
 		while (stackIndex) {
 			stackIndex--;
@@ -479,10 +483,6 @@ class DynamicRagdollManager: public dAnimationModelManager
 			for (int i = 0; i < definitionCount; i++) {
 				if (!strcmp(jointsDefinition[i].m_boneName, name)) {
 					NewtonBody* const childBody = CreateBodyPart(entity);
-
-					bodyArray[bodyCount] = childBody;
-					bodyCount++;
-
 					// connect this body part to its parent with a rag doll joint
 					parentNode = CreateChildNode(childBody, parentNode, jointsDefinition[i]);
 
@@ -498,7 +498,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 			}
 		}
 
-		SetModelMass (100.0f, bodyCount, bodyArray);
+		SetModelMass (100.0f, dynamicRagdoll);
 
 		// set the collision mask
 		// note this container work best with a material call back for setting bit field 
@@ -511,15 +511,14 @@ class DynamicRagdollManager: public dAnimationModelManager
 		NewtonBodySetMatrixRecursive(rootBody, &worldMatrix[0][0]);
 
 		// attach effectors here
-		// one effector for the hip
-		dynamicRagdoll->m_hipEffector = new dAnimationRagDollEffector(dynamicRagdoll);
-		dynamicRagdoll->GetLoops().Append(dynamicRagdoll->m_hipEffector);
-
-		// one effector for each effector
 		for (dAnimationJoint* joint = GetFirstJoint(dynamicRagdoll); joint; joint = GetNextJoint(joint)) {
-
+			if (joint->GetAsRoot()) {
+				dAssert(dynamicRagdoll == joint);
+				dynamicRagdoll->SetHipEffector(joint);
+			} else if (joint->GetAsLeaf()) {
+				dynamicRagdoll->SetFootEffector(joint);
+			}
 		}
-
 
 		dynamicRagdoll->Finalize();
 		//return controller;
@@ -543,7 +542,34 @@ class DynamicRagdollManager: public dAnimationModelManager
 
 	void OnPreUpdate(dAnimationJointRoot* const model, dFloat timestep)
 	{
-		// do some stuff here or call the model update function 
+		// do most fo the controll here, so that teh is no need do subclass  
+
+		// calculate the center of mass
+		dVector com(0.0f);
+		dFloat totalMass = 0.0f;
+		for (dAnimationJoint* joint = GetFirstJoint(model); joint; joint = GetNextJoint(joint)) {
+			dMatrix matrix;
+			dVector localCom;
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
+
+			NewtonBody* const body = joint->GetBody();
+			NewtonBodyGetMatrix(body, &matrix[0][0]);
+			NewtonBodyGetCentreOfMass(body, &localCom[0]);
+			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+
+			totalMass += mass;
+			com += matrix.TransformVector(localCom).Scale(mass);
+		}
+		com = com.Scale(1.0f / totalMass);
+
+
+		dDynamicsRagdoll* const ragDoll = (dDynamicsRagdoll*)model;
+		NewtonBody* const rootBody = ragDoll->GetBody();
+		NewtonBodySetSleepState(rootBody, 0);
+		ragDoll->m_hipEffector->SetTarget();
 
 		// call the solver 
 		dAnimationModelManager::OnPreUpdate(model, timestep);

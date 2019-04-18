@@ -13,8 +13,8 @@
 #include "dAnimationJointRoot.h"
 #include "dAnimationRagDollEffector.h"
 
-dAnimationRagDollEffector::dAnimationRagDollEffector(dAnimationJointRoot* const root)
-	:dAnimationLoopJoint(root->GetProxyBody(), root->GetStaticWorld())
+dAnimationRagDollEffector::dAnimationRagDollEffector(dAnimationJoint* const joint)
+	:dAnimationLoopJoint(joint->GetProxyBody(), joint->GetRoot()->GetStaticWorld())
 	,m_localMatrix(dGetIdentityMatrix())
 	,m_targetMatrix(dGetIdentityMatrix())
 	,m_maxLinearSpeed(0.1f * 120.0f)
@@ -23,7 +23,7 @@ dAnimationRagDollEffector::dAnimationRagDollEffector(dAnimationJointRoot* const 
 	,m_angularFriction(100000.0f)
 {
 	dMatrix matrix;
-	NewtonBody* const body = root->GetBody();
+	NewtonBody* const body = joint->GetBody();
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
 
 	m_localMatrix.m_posit = matrix.m_posit;
