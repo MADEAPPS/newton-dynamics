@@ -253,10 +253,9 @@ class DynamicRagdollManager: public dAnimationModelManager
 		dFloat Iyy;
 		dFloat Izz;
 		dFloat mass;
-
 		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-		dVector dir(0.0f, 1.0f, 0.0f);
-		dVector force(dir.Scale(mass * -1.0f));
+		dVector dir(0.0f, -10.0f, 0.0f);
+		dVector force(dir.Scale(mass));
 		NewtonBodySetForce(body, &force.m_x);
 	}
 
@@ -431,7 +430,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 		{
 			{ "body" },
 			{ "leg", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f }, dAnimationRagdollJoint::m_threeDof },
-			//{ "foot", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
+			{ "foot", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
 		};
 		const int definitionCount = sizeof (jointsDefinition)/sizeof (jointsDefinition[0]);
 
@@ -452,10 +451,6 @@ class DynamicRagdollManager: public dAnimationModelManager
 		dDynamicsRagdoll* const dynamicRagdoll = new dDynamicsRagdoll(rootBody, dGetIdentityMatrix());
 		AddModel(dynamicRagdoll);
 		dynamicRagdoll->SetCalculateLocalTransforms(true);
-
-		// attach a Hip effector to the root body
-		dynamicRagdoll->m_hipEffector = new dAnimationRagDollEffector(dynamicRagdoll);
-		dynamicRagdoll->GetLoops().Append(dynamicRagdoll->m_hipEffector);
 
 		// save the controller as the collision user data, for collision culling
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBody), dynamicRagdoll);
@@ -515,6 +510,17 @@ class DynamicRagdollManager: public dAnimationModelManager
 		worldMatrix.m_posit = location.m_posit;
 		NewtonBodySetMatrixRecursive(rootBody, &worldMatrix[0][0]);
 
+		// attach effectors here
+		// one effector for the hip
+		dynamicRagdoll->m_hipEffector = new dAnimationRagDollEffector(dynamicRagdoll);
+		dynamicRagdoll->GetLoops().Append(dynamicRagdoll->m_hipEffector);
+
+		// one effector for each effector
+		for (dAnimationJoint* joint = GetFirstJoint(dynamicRagdoll); joint; joint = GetNextJoint(joint)) {
+
+		}
+
+
 		dynamicRagdoll->Finalize();
 		//return controller;
 	}
@@ -537,12 +543,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 
 	void OnPreUpdate(dAnimationJointRoot* const model, dFloat timestep)
 	{
-		// position the effector
-		//const dAnimationLoopJointList& effectors = model->GetLoops();
-		//for (dAnimationLoopJointList::dListNode* node = effectors.GetFirst(); node; node = node->GetNext()) {
-		//	dAnimationRagDollEffector* const effector = (dAnimationRagDollEffector*)node->GetInfo();
-		//	effector->SetTarget();
-		//}
+		// do some stuff here or call the model update function 
 
 		// call the solver 
 		dAnimationModelManager::OnPreUpdate(model, timestep);

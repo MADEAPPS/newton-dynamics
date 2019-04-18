@@ -14,7 +14,7 @@
 #define __D_ANIMATION_MODEL_MANAGER_H__
 
 #include "dAnimationStdAfx.h"
-//#include "dAnimationJoint.h"
+#include "dAnimationJoint.h"
 #include "dAnimationJointRoot.h"
 
 #define D_ANIMATION_MODEL_MANAGER	"__dAnimationModelManager__"
@@ -30,6 +30,9 @@ class dAnimationModelManager: public dCustomParallelListener
 	void AddModel(dAnimationJointRoot* const model);
 	void RemoveModel(dAnimationJointRoot* const model);
 
+	dAnimationJoint* GetFirstJoint(dAnimationJointRoot* const model) const {return GetFirstJoint(model);}
+	dAnimationJoint* GetNextJoint(dAnimationJoint* const joint) const;
+
 	//virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext) = 0;
 	virtual void OnUpdateTransform(const dAnimationJoint* const bone, const dMatrix& localMatrix) const = 0;
 
@@ -41,6 +44,7 @@ class dAnimationModelManager: public dCustomParallelListener
 	private:
 	void PreUpdate(dFloat timestep, int threadID);
 	void PostUpdate(dFloat timestep, int threadID);
+	dAnimationJoint* GetFirstJoint(dAnimationJoint* const joint) const;
 
 	private:
 	dList<dAnimationJointRoot*> m_controllerList;

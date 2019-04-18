@@ -102,19 +102,17 @@ class dAnimationRagdollJoint::dRagdollMotor_2dof: public dRagdollMotor
 		dFloat alphaRollError = -(euler0[2] + rollOmega * timestep) / (timestep * timestep);
 		NewtonUserJointSetRowAcceleration(m_joint, alphaRollError);
 
-		const dVector& motorAccel = m_owner->m_rowAccel;
-
 		NewtonUserJointAddAngularRow(m_joint, 0, &matrix0.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowAcceleration(m_joint, motorAccel[0]);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
+		//NewtonUserJointSetRowAcceleration(m_joint, m_owner->m_rowAccel[0]);
+		//NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+		//NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 		
 		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_up[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowAcceleration(m_joint, motorAccel[1]);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
+		//NewtonUserJointSetRowAcceleration(m_joint, m_owner->m_rowAccel[1]);
+		//NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+		//NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 	}
 };
 

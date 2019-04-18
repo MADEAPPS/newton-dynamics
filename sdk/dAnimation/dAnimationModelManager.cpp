@@ -41,6 +41,30 @@ void dAnimationModelManager::RemoveModel(dAnimationJointRoot* const model)
 	model->m_managerNode = NULL;
 }
 
+dAnimationJoint* dAnimationModelManager::GetFirstJoint(dAnimationJoint* const root) const
+{
+	dAnimationJoint* joint = root;
+	while (joint->GetChildren().GetCount()) {
+		joint = joint->GetChildren().GetFirst()->GetInfo();
+	}
+	return joint;
+}
+
+dAnimationJoint* dAnimationModelManager::GetNextJoint(dAnimationJoint* const joint) const
+{
+	/*
+	dAssert ()
+	if (joint->m_node->GetNext()->GetNode) {
+	}
+	if (!joint->GetParent()) {
+		return NULL;
+	}
+	dAnimationJoint* const sibling = ->;
+*/
+	return NULL;
+}
+
+
 void dAnimationModelManager::OnDestroy()
 {
 	while (m_controllerList.GetFirst()) {
@@ -68,7 +92,8 @@ void dAnimationModelManager::PreUpdate(dFloat timestep, int threadID)
 	}
 	if (node) {
 		dAnimationJointRoot* const model = node->GetInfo();
-		model->PreUpdate(timestep);
+		//model->PreUpdate(timestep);
+		OnPreUpdate(model, timestep);
 		do {
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;

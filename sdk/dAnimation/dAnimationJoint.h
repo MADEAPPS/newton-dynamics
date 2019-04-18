@@ -60,6 +60,7 @@ class dAnimationJoint: public dCustomAlloc
 	
 	dAnimationJointChildren& GetChildren();
 	const dAnimationJointChildren& GetChildren() const;
+	const dAnimationJointChildren::dListNode* GetNode() const;
 
 	NewtonBody* GetBody() const;
 	dCustomJoint* GetJoint() const;
@@ -81,8 +82,9 @@ class dAnimationJoint: public dCustomAlloc
 	dCustomJoint* m_joint;
 	dAnimationJoint* m_parent;
 	dAnimationContraint* m_proxyJoint;
+	dAnimationJointChildren::dListNode* m_node;
 	dAnimationJointChildren m_children;
-	
+
 	friend class dAnimationJointSolver;
 };
 
@@ -136,6 +138,10 @@ inline dAnimationJointChildren& dAnimationJoint::GetChildren()
 	return m_children; 
 }
 
+inline const dAnimationJointChildren::dListNode* dAnimationJoint::GetNode() const
+{
+	return m_node;
+}
 
 #endif
 

@@ -22,10 +22,11 @@ dAnimationJoint::dAnimationJoint(NewtonBody* const body, const dMatrix& bindMari
 	,m_joint(NULL)
 	,m_parent(parent)
 	,m_proxyJoint(NULL)
+	,m_node(NULL)
 	,m_children()
 {
 	if (m_parent) {
-		m_parent->m_children.Append(this);
+		m_node = m_parent->m_children.Append(this);
 	}
 	m_proxyBody.m_owner = this;
 
