@@ -160,8 +160,6 @@ class dAnimationRagdollJoint::dRagdollMotor_2dof: public dRagdollMotor
 		localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
 
 		dVector relOmega(omega0 - omega1);
-		//m_curJointAngle1.Update(euler0.m_y);
-		//dFloat jointOmega = relOmega.DotProduct3(matrix1.m_up);
 
 		// not happy with this method because it is a penalty system, 
 		// but is hard to the the right axis angular derivative.
@@ -171,6 +169,20 @@ class dAnimationRagdollJoint::dRagdollMotor_2dof: public dRagdollMotor
 		dFloat rollOmega = relOmega.DotProduct3(rollMatrix.m_right);
 		dFloat alphaRollError = -(euler0[2] + rollOmega * timestep) / (timestep * timestep);
 		NewtonUserJointSetRowAcceleration(m_joint, alphaRollError);
+
+/*
+		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_up[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowAcceleration(m_joint, -m_jointOmega1 / timestep);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+
+		NewtonUserJointAddAngularRow(m_joint, 0, &matrix0.m_front[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowAcceleration(m_joint, -m_jointOmega / timestep);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+*/
 
 	}
 };
@@ -260,7 +272,7 @@ dAnimationRagdollJoint::dAnimationRagdollJoint(dRagdollMotorType type, const dMa
 {
 //	dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 	dMatrix parentRollMatrix(dGetIdentityMatrix() * pinAndPivotInGlobalSpace);
-type = m_twoDof;
+//type = m_twoDof;
 
 	if (type == m_threeDof) {
 		m_joint = new dRagdollMotor_3dof(this, pinAndPivotInGlobalSpace, parentRollMatrix, body, parent->GetBody());
