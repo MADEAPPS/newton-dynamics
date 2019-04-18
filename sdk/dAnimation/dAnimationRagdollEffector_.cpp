@@ -91,8 +91,7 @@ void dAnimationRagDollEffector::JacobianDerivative(dComplementaritySolver::dPara
 		if (mag2 > 1.0e-4f) {
 			lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
 			coneRotation = dMatrix(dQuaternion(lateralDir, dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)))), matrix1.m_posit);
-		}
-		else {
+		} else {
 			lateralDir = matrix0.m_up.Scale(-1.0f);
 			coneRotation = dMatrix(dQuaternion(matrix0.m_up, dFloat(180.0f) * dDegreeToRad), matrix1.m_posit);
 		}

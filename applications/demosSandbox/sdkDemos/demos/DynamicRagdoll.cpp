@@ -565,7 +565,7 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.0f);
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
-	origin.m_posit.m_y = 1.2f;
+	origin.m_posit.m_y = 2.0f;
 //	manager->DynamicsRagdollExperiment_0(origin);
 	manager->DynamicsRagdollExperiment_1(origin);
 /*

@@ -40,6 +40,5 @@ class dAnimationRagDollEffector: public dAnimationLoopJoint
 	dFloat m_linearFriction;
 	dFloat m_angularFriction;
 };
-
 #endif
 
