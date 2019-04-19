@@ -134,8 +134,7 @@ class dAnimationRagdollJoint::dRagdollMotor_3dof: public dRagdollMotor
 	{
 #ifdef D_TEST_JOINT
 		return;
-#endif
-
+#else
 		const dVector& motorAccel = m_owner->m_rowAccel;
 		const dVector& coneDir0 = matrix0.m_front;
 		const dVector& coneDir1 = matrix1.m_front;
@@ -197,6 +196,7 @@ class dAnimationRagdollJoint::dRagdollMotor_3dof: public dRagdollMotor
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
 		}
+#endif
 	}
 };
 

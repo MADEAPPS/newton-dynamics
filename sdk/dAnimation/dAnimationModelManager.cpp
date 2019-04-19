@@ -12,7 +12,6 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationModelManager.h"
 
-
 dAnimationModelManager::dAnimationModelManager(NewtonWorld* const world, const char* const name)
 	:dCustomParallelListener(world, name)
 	,m_controllerList()
@@ -41,21 +40,21 @@ void dAnimationModelManager::RemoveModel(dAnimationJointRoot* const model)
 	model->m_managerNode = NULL;
 }
 
-dAnimationJoint* dAnimationModelManager::GetFirstJoint(dAnimationJointRoot* const model) const
+dAnimationJoint* dAnimationModelManager::GetFirstJoint(const dAnimationJointRoot* const model) const
 {
 	return GetFirstJoint((dAnimationJoint*)model);
 }
 
-dAnimationJoint* dAnimationModelManager::GetFirstJoint(dAnimationJoint* const root) const
+dAnimationJoint* dAnimationModelManager::GetFirstJoint(const dAnimationJoint* const root) const
 {
-	dAnimationJoint* joint = root;
+	const dAnimationJoint* joint = root;
 	while (joint->GetChildren().GetCount()) {
 		joint = joint->GetChildren().GetFirst()->GetInfo();
 	}
-	return joint;
+	return (dAnimationJoint*)joint;
 }
 
-dAnimationJoint* dAnimationModelManager::GetNextJoint(dAnimationJoint* const joint) const
+dAnimationJoint* dAnimationModelManager::GetNextJoint(const dAnimationJoint* const joint) const
 {
 	dAnimationJoint* const parentJoint = joint->GetParent();
 	if (!parentJoint) {

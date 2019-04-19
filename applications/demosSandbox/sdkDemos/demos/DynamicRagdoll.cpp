@@ -23,9 +23,9 @@
 class dAnimationEndEffectorTest: public dAnimationRagDollEffector, public dCustomJoint
 {
 	public:
-	dAnimationEndEffectorTest(dAnimationJointRoot* const root)
-		:dAnimationRagDollEffector(root)
-		,dCustomJoint(6, root->GetBody(), NULL)
+	dAnimationEndEffectorTest(dAnimationJoint* const joint)
+		:dAnimationRagDollEffector(joint)
+		,dCustomJoint(6, joint->GetBody(), NULL)
 	{
 		SetSolverModel(3);
 	}
@@ -157,11 +157,29 @@ class dDynamicsRagdollTest: public dAnimationRagdollRoot
 	dDynamicsRagdollTest(NewtonBody* const body, const dMatrix& bindMarix)
 		:dAnimationRagdollRoot(body, bindMarix)
 		,m_hipEffector(NULL)
+		,m_leftFootEffector(NULL)
 	{
 	}
 
 	~dDynamicsRagdollTest()
 	{
+	}
+
+	void SetHipEffector(dAnimationJoint* const hip)
+	{
+		m_hipEffector = new dAnimationEndEffectorTest(hip);
+		m_loopJoints.Append(m_hipEffector);
+	}
+
+	void SetFootEffector(dAnimationJoint* const joint)
+	{
+		m_leftFootEffector = new dAnimationEndEffectorTest(joint);
+		m_loopJoints.Append(m_leftFootEffector);
+	}
+
+	dVector CalculateEffectorOrigin(dAnimationRagDollEffector* const hipEffector) const
+	{
+		return dVector(0.0f);
 	}
 
 	void PreUpdate(dFloat timestep)
@@ -170,34 +188,19 @@ class dDynamicsRagdollTest: public dAnimationRagdollRoot
 		//dDynamicsRagdoll* const ragDoll = (dDynamicsRagdoll*)model;
 		NewtonBody* const rootBody = GetBody();
 		NewtonBodySetSleepState(rootBody, 0);
-/*
-		// calculate the center of mass
-		dVector com(0.0f);
-		dFloat totalMass = 0.0f;
-		for (dAnimationJoint* joint = m_manager->GetFirstJoint(this); joint; joint = m_manager->GetNextJoint(joint)) {
-			dMatrix matrix;
-			dVector localCom;
-			dFloat Ixx;
-			dFloat Iyy;
-			dFloat Izz;
-			dFloat mass;
 
-			NewtonBody* const body = joint->GetBody();
-			NewtonBodyGetMatrix(body, &matrix[0][0]);
-			NewtonBodyGetCentreOfMass(body, &localCom[0]);
-			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-
-			totalMass += mass;
-			com += matrix.TransformVector(localCom).Scale(mass);
-		}
-		com = com.Scale(1.0f / totalMass);
-*/
 		// get pivot 
 		dMatrix rootMatrix;
 //		dMatrix pivotMatrix;
 		NewtonBodyGetMatrix(GetBody(), &rootMatrix[0][0]);
+
+		dVector com(CalculateCenterOfMass());
+
+		dMatrix footMatrix (m_leftFootEffector->GetMatrix());
+		m_leftFootEffector->SetTarget(footMatrix);
+
 /*
-		NewtonBodyGetMatrix(ragDoll->m_xxxxx->GetBody(), &pivotMatrix[0][0]);
+		NewtonBodyGetMatrix(ragDoll->m_leftFootEffector->GetBody(), &pivotMatrix[0][0]);
 		
 		dVector comRadius (com - pivotMatrix.m_posit);
 		dVector bodyRadius (rootMatrix.m_posit - pivotMatrix.m_posit);
@@ -226,6 +229,7 @@ dTrace(("%f %f %f\n", error[0], error[1], error[2]));
 	}
 
 	dAnimationRagDollEffector* m_hipEffector;
+	dAnimationRagDollEffector* m_leftFootEffector;
 };
 
 
@@ -234,8 +238,8 @@ class dDynamicsRagdoll: public dAnimationRagdollRoot
 	public:
 	dDynamicsRagdoll(NewtonBody* const body, const dMatrix& bindMarix)
 		:dAnimationRagdollRoot(body, bindMarix)
-		,m_xxxxx(NULL)
 		,m_hipEffector(NULL)
+		,m_leftFootEffector(NULL)
 	{
 	}
 
@@ -245,37 +249,21 @@ class dDynamicsRagdoll: public dAnimationRagdollRoot
 
 	void PreUpdate(dFloat timestep)
 	{
+		dAssert(0);
+/*
 		// do most of the control here, so that the is no need do subclass  
 		//dDynamicsRagdoll* const ragDoll = (dDynamicsRagdoll*)model;
 		NewtonBody* const rootBody = GetBody();
 		NewtonBodySetSleepState(rootBody, 0);
 
 		// calculate the center of mass
-		dVector com(0.0f);
-		dFloat totalMass = 0.0f;
-		for (dAnimationJoint* joint = m_manager->GetFirstJoint(this); joint; joint = m_manager->GetNextJoint(joint)) {
-			dMatrix matrix;
-			dVector localCom;
-			dFloat Ixx;
-			dFloat Iyy;
-			dFloat Izz;
-			dFloat mass;
-
-			NewtonBody* const body = joint->GetBody();
-			NewtonBodyGetMatrix(body, &matrix[0][0]);
-			NewtonBodyGetCentreOfMass(body, &localCom[0]);
-			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-
-			totalMass += mass;
-			com += matrix.TransformVector(localCom).Scale(mass);
-		}
-		com = com.Scale(1.0f / totalMass);
+		dVector com(CalculateCenterOfMass());
 
 		// get pivot 
 		dMatrix rootMatrix;
 		dMatrix pivotMatrix;
 		NewtonBodyGetMatrix(GetBody(), &rootMatrix[0][0]);
-		NewtonBodyGetMatrix(m_xxxxx->GetBody(), &pivotMatrix[0][0]);
+		NewtonBodyGetMatrix(m_leftFootEffector->GetBody(), &pivotMatrix[0][0]);
 		
 		dVector comRadius (com - pivotMatrix.m_posit);
 		dVector bodyRadius (rootMatrix.m_posit - pivotMatrix.m_posit);
@@ -299,8 +287,7 @@ class dDynamicsRagdoll: public dAnimationRagdollRoot
 
 dVector error(matrix.m_posit - rootMatrix.m_posit);
 dTrace(("%f %f %f\n", error[0], error[1], error[2]));
-
-
+*/
 		dAnimationRagdollRoot::PreUpdate(timestep);
 	}
 
@@ -312,11 +299,12 @@ dTrace(("%f %f %f\n", error[0], error[1], error[2]));
 
 	void SetFootEffector(dAnimationJoint* const joint)
 	{
-		m_xxxxx = joint;
+		m_leftFootEffector = new dAnimationEndEffectorTest(joint);
+		m_loopJoints.Append(m_leftFootEffector);
 	}
 
-	dAnimationJoint* m_xxxxx;
 	dAnimationRagDollEffector* m_hipEffector;
+	dAnimationRagDollEffector* m_leftFootEffector;
 };
 
 
@@ -480,10 +468,6 @@ class DynamicRagdollManager: public dAnimationModelManager
 		AddModel(dynamicRagdoll);
 		dynamicRagdoll->SetCalculateLocalTransforms(true);
 
-		// attach a Hip effector to the root body
-		dynamicRagdoll->m_hipEffector = new dAnimationEndEffectorTest(dynamicRagdoll);
-		dynamicRagdoll->GetLoops().Append(dynamicRagdoll->m_hipEffector);
-
 		// save the controller as the collision user data, for collision culling
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBody), dynamicRagdoll);
 
@@ -524,6 +508,17 @@ class DynamicRagdollManager: public dAnimationModelManager
 		}
 
 		SetModelMass(100.0f, dynamicRagdoll);
+
+		// attach effectors here
+		for (dAnimationJoint* joint = GetFirstJoint(dynamicRagdoll); joint; joint = GetNextJoint(joint)) {
+			if (joint->GetAsRoot()) {
+				dAssert(dynamicRagdoll == joint);
+				dynamicRagdoll->SetHipEffector(joint);
+			} else if (joint->GetAsLeaf()) {
+				dynamicRagdoll->SetFootEffector(joint);
+			}
+		}
+
 
 		// transform the entire contraction to its location
 		dMatrix worldMatrix(modelEntity->GetCurrentMatrix() * location);

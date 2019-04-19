@@ -30,6 +30,13 @@ dAnimationRagDollEffector::dAnimationRagDollEffector(dAnimationJoint* const join
 	m_localMatrix = m_localMatrix * matrix.Inverse();
 }
 
+dMatrix dAnimationRagDollEffector::GetMatrix() const
+{
+	dMatrix matrix;
+	NewtonBodyGetMatrix(GetOwner0()->m_owner->GetBody(), &matrix[0][0]);
+	return  m_localMatrix * matrix;
+}
+
 void dAnimationRagDollEffector::SetTarget(const dMatrix& targetMatrix)
 {
 /*

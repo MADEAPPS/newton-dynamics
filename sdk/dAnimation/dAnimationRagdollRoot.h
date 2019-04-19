@@ -22,6 +22,8 @@ class dAnimationRagdollRoot: public dAnimationJointRoot
 	dAnimationRagdollRoot(NewtonBody* const body, const dMatrix& bindMarix);
 	virtual ~dAnimationRagdollRoot();
 
+	dVector CalculateCenterOfMass() const;
+
 	virtual void PreUpdate(dFloat timestep);
 };
 
