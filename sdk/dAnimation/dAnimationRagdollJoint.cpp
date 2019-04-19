@@ -125,10 +125,17 @@ class dAnimationRagdollJoint::dRagdollMotor_3dof: public dRagdollMotor
 		:dRagdollMotor(owner, pinAndPivotFrame0, pinAndPivotFrame1, child, parent)
 	{
 		m_dof = 3;
+#ifdef D_TEST_JOINT
+		m_dof = 0;
+#endif
 	}
 
 	virtual void SubmitAngularConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 	{
+#ifdef D_TEST_JOINT
+		return;
+#endif
+
 		const dVector& motorAccel = m_owner->m_rowAccel;
 		const dVector& coneDir0 = matrix0.m_front;
 		const dVector& coneDir1 = matrix1.m_front;

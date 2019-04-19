@@ -166,22 +166,63 @@ class dDynamicsRagdollTest: public dAnimationRagdollRoot
 
 	void PreUpdate(dFloat timestep)
 	{
-		NewtonBodySetSleepState(GetBody(), 0);
-		dAssert(0);
+		// do most of the control here, so that the is no need do subclass  
+		//dDynamicsRagdoll* const ragDoll = (dDynamicsRagdoll*)model;
+		NewtonBody* const rootBody = GetBody();
+		NewtonBodySetSleepState(rootBody, 0);
 /*
-		dMatrix matrix;
-		NewtonBodyGetMatrix(GetOwner0()->m_owner->GetBody(), &matrix[0][0]);
-		matrix = m_localMatrix * matrix;
-		//m_targetMatrix.m_posit = matrix.m_posit;
+		// calculate the center of mass
+		dVector com(0.0f);
+		dFloat totalMass = 0.0f;
+		for (dAnimationJoint* joint = m_manager->GetFirstJoint(this); joint; joint = m_manager->GetNextJoint(joint)) {
+			dMatrix matrix;
+			dVector localCom;
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
 
-		//static dMatrix xxx (dPitchMatrix (95.0f * dDegreeToRad) * dYawMatrix (65.0f * dDegreeToRad) * dRollMatrix (85.0f * dDegreeToRad) * m_targetMatrix);
-		//static dMatrix xxx (dPitchMatrix (0.0f * dDegreeToRad) * dYawMatrix (0.0f * dDegreeToRad) * dRollMatrix (0.0f * dDegreeToRad) * m_targetMatrix);
-		m_targetMatrix = dPitchMatrix(0.0f * dDegreeToRad) * dYawMatrix(0.0f * dDegreeToRad) * dRollMatrix(0.0f * dDegreeToRad);
-		m_targetMatrix.m_posit = matrix.m_posit;
+			NewtonBody* const body = joint->GetBody();
+			NewtonBodyGetMatrix(body, &matrix[0][0]);
+			NewtonBodyGetCentreOfMass(body, &localCom[0]);
+			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 
-		m_hipEffector->SetTarget();
+			totalMass += mass;
+			com += matrix.TransformVector(localCom).Scale(mass);
+		}
+		com = com.Scale(1.0f / totalMass);
 */
-		//dAnimationRagdollRoot::PreUpdate(timestep);
+		// get pivot 
+		dMatrix rootMatrix;
+//		dMatrix pivotMatrix;
+		NewtonBodyGetMatrix(GetBody(), &rootMatrix[0][0]);
+/*
+		NewtonBodyGetMatrix(ragDoll->m_xxxxx->GetBody(), &pivotMatrix[0][0]);
+		
+		dVector comRadius (com - pivotMatrix.m_posit);
+		dVector bodyRadius (rootMatrix.m_posit - pivotMatrix.m_posit);
+
+		dFloat r0 = dSqrt(comRadius.DotProduct3(comRadius));
+		dFloat r1 = dSqrt(bodyRadius.DotProduct3(bodyRadius));
+
+		dVector updir (0.0f, 1.0f, 0.0f, 0.0f);
+		dVector p1 (pivotMatrix.m_posit + updir.Scale (r0));
+		dVector targtePosit (rootMatrix.m_posit + (p1 - com).Scale (r1/r0));
+		targtePosit.m_w = 1.0f;
+*/		
+		dMatrix matrix(dPitchMatrix(0.0f * dDegreeToRad) * dYawMatrix(0.0f * dDegreeToRad) * dRollMatrix(0.0f * dDegreeToRad));
+		//com.m_y = rootMatrix.m_posit.m_y;
+		//com.m_w = 1.0f;
+		//matrix.m_posit = rootMatrix.m_posit;
+		//matrix.m_posit = com;
+
+		matrix.m_posit = rootMatrix.m_posit;
+		m_hipEffector->SetTarget(matrix);
+
+dVector error(matrix.m_posit - rootMatrix.m_posit);
+dTrace(("%f %f %f\n", error[0], error[1], error[2]));
+
+
 	}
 
 	dAnimationRagDollEffector* m_hipEffector;
@@ -204,8 +245,62 @@ class dDynamicsRagdoll: public dAnimationRagdollRoot
 
 	void PreUpdate(dFloat timestep)
 	{
-		//NewtonBodySetSleepState(GetBody(), 0);
-		//m_hipEffector->SetTarget();
+		// do most of the control here, so that the is no need do subclass  
+		//dDynamicsRagdoll* const ragDoll = (dDynamicsRagdoll*)model;
+		NewtonBody* const rootBody = GetBody();
+		NewtonBodySetSleepState(rootBody, 0);
+
+		// calculate the center of mass
+		dVector com(0.0f);
+		dFloat totalMass = 0.0f;
+		for (dAnimationJoint* joint = m_manager->GetFirstJoint(this); joint; joint = m_manager->GetNextJoint(joint)) {
+			dMatrix matrix;
+			dVector localCom;
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
+
+			NewtonBody* const body = joint->GetBody();
+			NewtonBodyGetMatrix(body, &matrix[0][0]);
+			NewtonBodyGetCentreOfMass(body, &localCom[0]);
+			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+
+			totalMass += mass;
+			com += matrix.TransformVector(localCom).Scale(mass);
+		}
+		com = com.Scale(1.0f / totalMass);
+
+		// get pivot 
+		dMatrix rootMatrix;
+		dMatrix pivotMatrix;
+		NewtonBodyGetMatrix(GetBody(), &rootMatrix[0][0]);
+		NewtonBodyGetMatrix(m_xxxxx->GetBody(), &pivotMatrix[0][0]);
+		
+		dVector comRadius (com - pivotMatrix.m_posit);
+		dVector bodyRadius (rootMatrix.m_posit - pivotMatrix.m_posit);
+
+		dFloat r0 = dSqrt(comRadius.DotProduct3(comRadius));
+		dFloat r1 = dSqrt(bodyRadius.DotProduct3(bodyRadius));
+
+		dVector updir (0.0f, 1.0f, 0.0f, 0.0f);
+		dVector p1 (pivotMatrix.m_posit + updir.Scale (r0));
+		dVector targtePosit (rootMatrix.m_posit + (p1 - com).Scale (r1/r0));
+		targtePosit.m_w = 1.0f;
+		
+		dMatrix matrix(dPitchMatrix(0.0f * dDegreeToRad) * dYawMatrix(0.0f * dDegreeToRad) * dRollMatrix(0.0f * dDegreeToRad));
+		//com.m_y = rootMatrix.m_posit.m_y;
+		//com.m_w = 1.0f;
+		//matrix.m_posit = rootMatrix.m_posit;
+		//matrix.m_posit = com;
+
+		matrix.m_posit = targtePosit;
+		m_hipEffector->SetTarget(matrix);
+
+dVector error(matrix.m_posit - rootMatrix.m_posit);
+dTrace(("%f %f %f\n", error[0], error[1], error[2]));
+
+
 		dAnimationRagdollRoot::PreUpdate(timestep);
 	}
 
@@ -281,7 +376,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 		dFloat Izz;
 		dFloat mass;
 
-		dFloat gravity = -2.0f;
+		dFloat gravity = -0.0f;
 		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 		dVector dir(0.0f, gravity, 0.0f);
 		dVector force(dir.Scale(mass));
@@ -430,11 +525,6 @@ class DynamicRagdollManager: public dAnimationModelManager
 
 		SetModelMass(100.0f, dynamicRagdoll);
 
-		// set the collision mask
-		// note this container work best with a material call back for setting bit field 
-		//dAssert(0);
-		//controller->SetDefaultSelfCollisionMask();
-
 		// transform the entire contraction to its location
 		dMatrix worldMatrix(modelEntity->GetCurrentMatrix() * location);
 		worldMatrix.m_posit = location.m_posit;
@@ -555,47 +645,6 @@ class DynamicRagdollManager: public dAnimationModelManager
 
 	void OnPreUpdate(dAnimationJointRoot* const model, dFloat timestep)
 	{
-		// do most fo the controll here, so that teh is no need do subclass  
-
-		// calculate the center of mass
-		dVector com(0.0f);
-		dFloat totalMass = 0.0f;
-		for (dAnimationJoint* joint = GetFirstJoint(model); joint; joint = GetNextJoint(joint)) {
-			dMatrix matrix;
-			dVector localCom;
-			dFloat Ixx;
-			dFloat Iyy;
-			dFloat Izz;
-			dFloat mass;
-
-			NewtonBody* const body = joint->GetBody();
-			NewtonBodyGetMatrix(body, &matrix[0][0]);
-			NewtonBodyGetCentreOfMass(body, &localCom[0]);
-			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-
-			totalMass += mass;
-			com += matrix.TransformVector(localCom).Scale(mass);
-		}
-		com = com.Scale(1.0f / totalMass);
-
-		dDynamicsRagdoll* const ragDoll = (dDynamicsRagdoll*)model;
-		NewtonBody* const rootBody = ragDoll->GetBody();
-		NewtonBodySetSleepState(rootBody, 0);
-		//ragDoll->m_hipEffector->SetTarget();
-
-		dMatrix rootMatrix;
-		NewtonBodyGetMatrix(ragDoll->GetBody(), &rootMatrix[0][0]);
-		dMatrix matrix(dPitchMatrix(0.0f * dDegreeToRad) * dYawMatrix(0.0f * dDegreeToRad) * dRollMatrix(0.0f * dDegreeToRad));
-
-		com.m_y = rootMatrix.m_posit.m_y;
-		com.m_w = 1.0f;
-		//matrix.m_posit = rootMatrix.m_posit;
-		matrix.m_posit = com;
-		ragDoll->m_hipEffector->SetTarget(matrix);
-
-dVector error(rootMatrix.m_posit - com);
-dTrace(("%f %f %f\n", error[0], error[1], error[2]));
-
 		// call the solver 
 		dAnimationModelManager::OnPreUpdate(model, timestep);
 	}
@@ -618,8 +667,8 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
 	origin.m_posit.m_y = 2.0f;
-//	manager->DynamicsRagdollExperiment_0(origin);
-	manager->DynamicsRagdollExperiment_1(origin);
+	manager->DynamicsRagdollExperiment_0(origin);
+//	manager->DynamicsRagdollExperiment_1(origin);
 /*
 //	int count = 10;
 //	count = 1;

@@ -15,6 +15,8 @@
 #include "dAnimationStdAfx.h"
 #include "dAnimationJoint.h"
 
+#define D_TEST_JOINT
+
 class dAnimationRagdollJoint: public dAnimationJoint, public dAnimationContraint
 {
 	class dRagdollMotor;
