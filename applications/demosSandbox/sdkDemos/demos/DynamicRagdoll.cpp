@@ -20,219 +20,6 @@
 #include "HeightFieldPrimitive.h"
 
 
-class dAnimationEndEffectorTest: public dAnimationRagDollEffector, public dCustomJoint
-{
-	public:
-	dAnimationEndEffectorTest(dAnimationJoint* const joint)
-		:dAnimationRagDollEffector(joint)
-		,dCustomJoint(6, joint->GetBody(), NULL)
-	{
-		SetSolverModel(3);
-	}
-
-	void SubmitConstraints(dFloat timestep, int threadIndex)
-	{
-		const dMatrix& matrix1 = m_targetMatrix;
-		dMatrix matrix0;
-
-		NewtonBodyGetMatrix(GetBody0(), &matrix0[0][0]);
-		matrix0 = m_localMatrix * matrix0;
-
-		const dVector relPosit(matrix1.UnrotateVector(matrix1.m_posit - matrix0.m_posit));
-		const dVector relPositDir = relPosit.Scale(1.0f / dSqrt(relPosit.DotProduct3(relPosit) + 1.0e-6f));
-
-		dAssert(m_maxLinearSpeed >= 0.0f);
-		const dFloat invTimestep = 1.0f / timestep;
-		const dFloat linearStep = m_maxLinearSpeed * timestep;
-		for (int i = 0; i < 3; i++) {
-			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix1[i][0]);
-			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
-			dFloat speed = ClipParam(relPosit[i], linearStep * dAbs(relPositDir[i])) * invTimestep;
-			dFloat relAccel = speed * invTimestep + stopAccel;
-			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_linearFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_linearFriction);
-		}
-
-		const dVector& coneDir0 = matrix0.m_front;
-		const dVector& coneDir1 = matrix1.m_front;
-
-		const dFloat angleStep = m_maxAngularSpeed * timestep;
-		dFloat cosAngleCos = coneDir1.DotProduct3(coneDir0);
-		if (cosAngleCos < 0.9999f) {
-			dMatrix coneRotation(dGetIdentityMatrix());
-			dVector lateralDir(coneDir1.CrossProduct(coneDir0));
-			dFloat mag2 = lateralDir.DotProduct3(lateralDir);
-			if (mag2 > 1.0e-4f) {
-				lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
-				coneRotation = dMatrix(dQuaternion(lateralDir, dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)))), matrix1.m_posit);
-			} else {
-				lateralDir = matrix0.m_up.Scale(-1.0f);
-				coneRotation = dMatrix(dQuaternion(matrix0.m_up, dFloat(180.0f) * dDegreeToRad), matrix1.m_posit);
-			}
-
-			dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
-			dAssert(dAbs(pitchMatrix[0][0] - dFloat(1.0f)) < dFloat(1.0e-3f));
-			dAssert(dAbs(pitchMatrix[0][1]) < dFloat(1.0e-3f));
-			dAssert(dAbs(pitchMatrix[0][2]) < dFloat(1.0e-3f));
-
-			dFloat pitchAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
-			dFloat coneAngle = -dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)));
-			//dTrace(("cone:%f pitch:%f\n", coneAngle * dRadToDegree, pitchAngle * dRadToDegree));
-
-			dVector angleDir(pitchAngle, coneAngle, dFloat(0.0f), dFloat(0.0f));
-			angleDir = angleDir.Scale(1.0f / dSqrt(angleDir.DotProduct3(angleDir) + 1.0e-6f));
-
-			{
-				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
-				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
-				dFloat omega = ClipParam(pitchAngle, angleStep * dAbs(angleDir[0])) * invTimestep;
-				dFloat relAlpha = omega * invTimestep + stopAlpha;
-				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-			}
-
-			{
-				NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
-				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
-				dFloat omega = ClipParam(coneAngle, angleStep * dAbs(angleDir[1])) * invTimestep;
-				dFloat relAlpha = omega * invTimestep + stopAlpha;
-				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-			}
-
-			{
-				dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
-				NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
-				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
-				NewtonUserJointSetRowAcceleration(m_joint, stopAlpha);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-			}
-
-		} else {
-
-			// using small angular aproximation to get the joint angle;
-			{
-				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
-				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
-				dFloat angle = dCustomJoint::CalculateAngle(&matrix0[1][0], &matrix1[1][0], &matrix0[0][0]);
-				dFloat omega = ClipParam(angle, angleStep) * invTimestep;
-				dFloat relAlpha = omega * invTimestep + stopAlpha;
-				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-			}
-
-			{
-				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[1][0]);
-				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
-				dFloat angle = matrix1[2].DotProduct3(matrix1[0]);
-				dFloat omega = ClipParam(angle, angleStep) * invTimestep;
-				dFloat relAlpha = omega * invTimestep + stopAlpha;
-				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-			}
-
-			{
-				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[2][0]);
-				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
-				dFloat angle = matrix1[1].DotProduct3(matrix1[0]);
-				dFloat omega = ClipParam(angle, angleStep) * invTimestep;
-				dFloat relAlpha = omega * invTimestep + stopAlpha;
-				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
-				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-			}
-		}
-	}
-};
-
-class dDynamicsRagdollTest: public dAnimationRagdollRoot
-{
-	public:
-	dDynamicsRagdollTest(NewtonBody* const body, const dMatrix& bindMarix)
-		:dAnimationRagdollRoot(body, bindMarix)
-		,m_hipEffector(NULL)
-		,m_leftFootEffector(NULL)
-	{
-	}
-
-	~dDynamicsRagdollTest()
-	{
-	}
-
-	void SetHipEffector(dAnimationJoint* const hip)
-	{
-		m_hipEffector = new dAnimationEndEffectorTest(hip);
-		m_loopJoints.Append(m_hipEffector);
-	}
-
-	void SetFootEffector(dAnimationJoint* const joint)
-	{
-		m_leftFootEffector = new dAnimationEndEffectorTest(joint);
-		m_loopJoints.Append(m_leftFootEffector);
-	}
-
-	dVector CalculateEffectorOrigin(dAnimationRagDollEffector* const hipEffector) const
-	{
-		return dVector(0.0f);
-	}
-
-	void PreUpdate(dFloat timestep)
-	{
-		// do most of the control here, so that the is no need do subclass  
-		//dDynamicsRagdoll* const ragDoll = (dDynamicsRagdoll*)model;
-		NewtonBody* const rootBody = GetBody();
-		NewtonBodySetSleepState(rootBody, 0);
-
-		// get pivot 
-		dMatrix rootMatrix;
-//		dMatrix pivotMatrix;
-		NewtonBodyGetMatrix(GetBody(), &rootMatrix[0][0]);
-
-		dVector com(CalculateCenterOfMass());
-
-		dMatrix footMatrix (m_leftFootEffector->GetMatrix());
-		m_leftFootEffector->SetTarget(footMatrix);
-
-/*
-		NewtonBodyGetMatrix(ragDoll->m_leftFootEffector->GetBody(), &pivotMatrix[0][0]);
-		
-		dVector comRadius (com - pivotMatrix.m_posit);
-		dVector bodyRadius (rootMatrix.m_posit - pivotMatrix.m_posit);
-
-		dFloat r0 = dSqrt(comRadius.DotProduct3(comRadius));
-		dFloat r1 = dSqrt(bodyRadius.DotProduct3(bodyRadius));
-
-		dVector updir (0.0f, 1.0f, 0.0f, 0.0f);
-		dVector p1 (pivotMatrix.m_posit + updir.Scale (r0));
-		dVector targtePosit (rootMatrix.m_posit + (p1 - com).Scale (r1/r0));
-		targtePosit.m_w = 1.0f;
-*/		
-		dMatrix matrix(dPitchMatrix(0.0f * dDegreeToRad) * dYawMatrix(0.0f * dDegreeToRad) * dRollMatrix(0.0f * dDegreeToRad));
-		//com.m_y = rootMatrix.m_posit.m_y;
-		//com.m_w = 1.0f;
-		//matrix.m_posit = rootMatrix.m_posit;
-		//matrix.m_posit = com;
-
-		matrix.m_posit = rootMatrix.m_posit;
-		m_hipEffector->SetTarget(matrix);
-
-dVector error(matrix.m_posit - rootMatrix.m_posit);
-dTrace(("%f %f %f\n", error[0], error[1], error[2]));
-
-
-	}
-
-	dAnimationRagDollEffector* m_hipEffector;
-	dAnimationRagDollEffector* m_leftFootEffector;
-};
-
-
 class dDynamicsRagdoll: public dAnimationRagdollRoot
 {
 	public:
@@ -299,7 +86,7 @@ dTrace(("%f %f %f\n", error[0], error[1], error[2]));
 
 	void SetFootEffector(dAnimationJoint* const joint)
 	{
-		m_leftFootEffector = new dAnimationEndEffectorTest(joint);
+		m_leftFootEffector = new dAnimationRagDollEffector(joint);
 		m_loopJoints.Append(m_leftFootEffector);
 	}
 
@@ -308,7 +95,7 @@ dTrace(("%f %f %f\n", error[0], error[1], error[2]));
 };
 
 
-class DynamicRagdollManager: public dAnimationModelManager
+class dDynamicRagdollManager: public dAnimationModelManager
 {
 	class dJointDefinition
 	{
@@ -336,14 +123,14 @@ class DynamicRagdollManager: public dAnimationModelManager
 	
 	public:
 
-	DynamicRagdollManager(DemoEntityManager* const scene)
+	dDynamicRagdollManager(DemoEntityManager* const scene)
 		:dAnimationModelManager(scene->GetNewton())
 //		, m_currentRig(NULL)
 	{
 //		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
 
-	~DynamicRagdollManager()
+	~dDynamicRagdollManager()
 	{
 	}
 
@@ -440,97 +227,8 @@ class DynamicRagdollManager: public dAnimationModelManager
 		return joint;
 	}
 
-	void DynamicsRagdollExperiment_0(const dMatrix& location)
-	{
-		static dJointDefinition jointsDefinition[] =
-		{
-			{ "body" },
-			{ "leg", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f }, dAnimationRagdollJoint::m_threeDof },
-			{ "foot", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
-		};
-		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
-
-		NewtonWorld* const world = GetWorld();
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-
-		DemoEntity* const modelEntity = DemoEntity::LoadNGD_mesh("selfbalance_01.ngd", GetWorld(), scene->GetShaderCache());
-
-		dMatrix matrix0(modelEntity->GetCurrentMatrix());
-		//matrix0.m_posit = location;
-		//modelEntity->ResetMatrix(*scene, matrix0);
-		scene->Append(modelEntity);
-
-		// add the root childBody
-		NewtonBody* const rootBody = CreateBodyPart(modelEntity);
-
-		// build the rag doll with rigid bodies connected by joints
-		dDynamicsRagdollTest* const dynamicRagdoll = new dDynamicsRagdollTest(rootBody, dGetIdentityMatrix());
-		AddModel(dynamicRagdoll);
-		dynamicRagdoll->SetCalculateLocalTransforms(true);
-
-		// save the controller as the collision user data, for collision culling
-		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBody), dynamicRagdoll);
-
-		int stackIndex = 0;
-		DemoEntity* childEntities[32];
-		dAnimationJoint* parentBones[32];
-
-		for (DemoEntity* child = modelEntity->GetChild(); child; child = child->GetSibling()) {
-			parentBones[stackIndex] = dynamicRagdoll;
-			childEntities[stackIndex] = child;
-			stackIndex++;
-		}
-
-		// walk model hierarchic adding all children designed as rigid body bones. 
-		while (stackIndex) {
-			stackIndex--;
-			DemoEntity* const entity = childEntities[stackIndex];
-			dAnimationJoint* parentNode = parentBones[stackIndex];
-
-			const char* const name = entity->GetName().GetStr();
-			for (int i = 0; i < definitionCount; i++) {
-				if (!strcmp(jointsDefinition[i].m_boneName, name)) {
-					NewtonBody* const childBody = CreateBodyPart(entity);
-
-					// connect this body part to its parent with a rag doll joint
-					parentNode = CreateChildNode(childBody, parentNode, jointsDefinition[i]);
-
-					NewtonCollisionSetUserData(NewtonBodyGetCollision(childBody), parentNode);
-					break;
-				}
-			}
-
-			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
-				parentBones[stackIndex] = parentNode;
-				childEntities[stackIndex] = child;
-				stackIndex++;
-			}
-		}
-
-		SetModelMass(100.0f, dynamicRagdoll);
-
-		// attach effectors here
-		for (dAnimationJoint* joint = GetFirstJoint(dynamicRagdoll); joint; joint = GetNextJoint(joint)) {
-			if (joint->GetAsRoot()) {
-				dAssert(dynamicRagdoll == joint);
-				dynamicRagdoll->SetHipEffector(joint);
-			} else if (joint->GetAsLeaf()) {
-				dynamicRagdoll->SetFootEffector(joint);
-			}
-		}
-
-
-		// transform the entire contraction to its location
-		dMatrix worldMatrix(modelEntity->GetCurrentMatrix() * location);
-		worldMatrix.m_posit = location.m_posit;
-		NewtonBodySetMatrixRecursive(rootBody, &worldMatrix[0][0]);
-
-		dynamicRagdoll->Finalize();
-		//return controller;
-	}
-
-
-	void DynamicsRagdollExperiment_1(const dMatrix& location)
+	
+	void CreateRagdollExperiment_0(const dMatrix& location)
 	{
 		static dJointDefinition jointsDefinition[] =
 		{
@@ -646,7 +344,7 @@ class DynamicRagdollManager: public dAnimationModelManager
 };
 
 
-void DynamicRagDoll(DemoEntityManager* const scene)
+void DynamicRagdoll(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
@@ -654,7 +352,7 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 
 
-	DynamicRagdollManager* const manager = new DynamicRagdollManager(scene);
+	dDynamicRagdollManager* const manager = new dDynamicRagdollManager(scene);
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
@@ -662,8 +360,7 @@ void DynamicRagDoll(DemoEntityManager* const scene)
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
 	origin.m_posit.m_y = 2.0f;
-	manager->DynamicsRagdollExperiment_0(origin);
-//	manager->DynamicsRagdollExperiment_1(origin);
+	manager->CreateRagdollExperiment_0(origin);
 /*
 //	int count = 10;
 //	count = 1;

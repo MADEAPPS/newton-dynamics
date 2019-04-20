@@ -68,19 +68,20 @@
 //#define DEFAULT_SCENE	32		// six axis manipulator
 //#define DEFAULT_SCENE	33		// hexapod Robot
 //#define DEFAULT_SCENE	34		// basic rag doll
-#define DEFAULT_SCENE	35		// dynamic rag doll
-//#define DEFAULT_SCENE	36		// basic Car
-//#define DEFAULT_SCENE	37		// single body vehicle
-//#define DEFAULT_SCENE	38		// David Gravel multi body car
-//#define DEFAULT_SCENE	39		// super Car
-//#define DEFAULT_SCENE	40		// heavy vehicles
-//#define DEFAULT_SCENE	41		// basic player controller
-//#define DEFAULT_SCENE	42		// animated player controller
-//#define DEFAULT_SCENE	43		// advanced player controller
-//#define DEFAULT_SCENE	44		// cloth patch			
-//#define DEFAULT_SCENE	45		// soft bodies	
-//#define DEFAULT_SCENE	46		// joe's joint test
-//#define DEFAULT_SCENE	47		// Misho's Hinge Test
+#define DEFAULT_SCENE	35		// kinematic rag doll
+//#define DEFAULT_SCENE	36		// dynamic rag doll
+//#define DEFAULT_SCENE	37		// basic Car
+//#define DEFAULT_SCENE	38		// single body vehicle
+//#define DEFAULT_SCENE	39		// David Gravel multi body car
+//#define DEFAULT_SCENE	40		// super Car
+//#define DEFAULT_SCENE	41		// heavy vehicles
+//#define DEFAULT_SCENE	42		// basic player controller
+//#define DEFAULT_SCENE	43		// animated player controller
+//#define DEFAULT_SCENE	44		// advanced player controller
+//#define DEFAULT_SCENE	45		// cloth patch			
+//#define DEFAULT_SCENE	46		// soft bodies	
+//#define DEFAULT_SCENE	47		// joe's joint test
+//#define DEFAULT_SCENE	48		// Misho's Hinge Test
 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
@@ -123,7 +124,8 @@ void HeightFieldCollision (DemoEntityManager* const scene);
 void UserPlaneCollision (DemoEntityManager* const scene);
 void UserHeightFieldCollision (DemoEntityManager* const scene);
 void PassiveRagdoll (DemoEntityManager* const scene);
-void DynamicRagDoll (DemoEntityManager* const scene);
+void KinematicRagdoll (DemoEntityManager* const scene);
+void DynamicRagdoll (DemoEntityManager* const scene);
 void ServoJoints (DemoEntityManager* const scene);
 void ArticulatedJoints (DemoEntityManager* const scene);
 void StandardJoints (DemoEntityManager* const scene);
@@ -171,7 +173,8 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Six axis manipulator", "show using inverse dynamics to control robots", SixAxisManipulators },
 	{"Hexapod walker", "show using inverse dynamics to control robots", Hexapod },
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
-	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagDoll},
+	{"Kinematic rag doll", "demonstrate dynamic rag doll", KinematicRagdoll},
+	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagdoll},
 	{"Basic car", "show how to set up a vehicle controller", BasicCar},
 	{"Single body car", "show a generalized coordinate system body", SingleBodyCar },
 	{"Basic multi body car", "show how to set up a multi body vehicle by Dave Gravel", BasicMultibodyVehicle},

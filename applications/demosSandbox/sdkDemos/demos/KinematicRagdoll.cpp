@@ -233,7 +233,7 @@ dTrace(("%f %f %f\n", error[0], error[1], error[2]));
 };
 
 
-class KinematicRagdollManager: public dAnimationModelManager
+class dKinematicRagdollManager: public dAnimationModelManager
 {
 	class dJointDefinition
 	{
@@ -261,14 +261,14 @@ class KinematicRagdollManager: public dAnimationModelManager
 	
 	public:
 
-	KinematicRagdollManager(DemoEntityManager* const scene)
+	dKinematicRagdollManager(DemoEntityManager* const scene)
 		:dAnimationModelManager(scene->GetNewton())
 //		, m_currentRig(NULL)
 	{
 //		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
 
-	~KinematicRagdollManager()
+	~dKinematicRagdollManager()
 	{
 	}
 
@@ -365,7 +365,7 @@ class KinematicRagdollManager: public dAnimationModelManager
 		return joint;
 	}
 
-	void KinematicRagdollExperiment_0(const dMatrix& location)
+	void CreateRagdollExperiment_0(const dMatrix& location)
 	{
 		static dJointDefinition jointsDefinition[] =
 		{
@@ -389,19 +389,19 @@ class KinematicRagdollManager: public dAnimationModelManager
 		NewtonBody* const rootBody = CreateBodyPart(modelEntity);
 
 		// build the rag doll with rigid bodies connected by joints
-		dKinematicRagdoll* const KinematicRagdoll = new dKinematicRagdoll(rootBody, dGetIdentityMatrix());
-		AddModel(KinematicRagdoll);
-		KinematicRagdoll->SetCalculateLocalTransforms(true);
+		dKinematicRagdoll* const dynamicRagdoll = new dKinematicRagdoll(rootBody, dGetIdentityMatrix());
+		AddModel(dynamicRagdoll);
+		dynamicRagdoll->SetCalculateLocalTransforms(true);
 
 		// save the controller as the collision user data, for collision culling
-		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBody), KinematicRagdoll);
+		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBody), dynamicRagdoll);
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
 		dAnimationJoint* parentBones[32];
 
 		for (DemoEntity* child = modelEntity->GetChild(); child; child = child->GetSibling()) {
-			parentBones[stackIndex] = KinematicRagdoll;
+			parentBones[stackIndex] = dynamicRagdoll;
 			childEntities[stackIndex] = child;
 			stackIndex++;
 		}
@@ -432,15 +432,15 @@ class KinematicRagdollManager: public dAnimationModelManager
 			}
 		}
 
-		SetModelMass(100.0f, KinematicRagdoll);
+		SetModelMass(100.0f, dynamicRagdoll);
 
 		// attach effectors here
-		for (dAnimationJoint* joint = GetFirstJoint(KinematicRagdoll); joint; joint = GetNextJoint(joint)) {
+		for (dAnimationJoint* joint = GetFirstJoint(dynamicRagdoll); joint; joint = GetNextJoint(joint)) {
 			if (joint->GetAsRoot()) {
-				dAssert(KinematicRagdoll == joint);
-				KinematicRagdoll->SetHipEffector(joint);
+				dAssert(dynamicRagdoll == joint);
+				dynamicRagdoll->SetHipEffector(joint);
 			} else if (joint->GetAsLeaf()) {
-				KinematicRagdoll->SetFootEffector(joint);
+				dynamicRagdoll->SetFootEffector(joint);
 			}
 		}
 
@@ -450,7 +450,7 @@ class KinematicRagdollManager: public dAnimationModelManager
 		worldMatrix.m_posit = location.m_posit;
 		NewtonBodySetMatrixRecursive(rootBody, &worldMatrix[0][0]);
 
-		KinematicRagdoll->Finalize();
+		dynamicRagdoll->Finalize();
 		//return controller;
 	}
 
@@ -487,7 +487,7 @@ void KinematicRagdoll(DemoEntityManager* const scene)
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 
 
-	KinematicRagdollManager* const manager = new KinematicRagdollManager(scene);
+	dKinematicRagdollManager* const manager = new dKinematicRagdollManager(scene);
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
@@ -495,7 +495,7 @@ void KinematicRagdoll(DemoEntityManager* const scene)
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
 	origin.m_posit.m_y = 2.0f;
-	manager->KinematicRagdollExperiment_0(origin);
+	manager->CreateRagdollExperiment_0(origin);
 
 /*
 //	int count = 10;
