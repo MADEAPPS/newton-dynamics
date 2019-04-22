@@ -19,6 +19,45 @@
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
 
+class dKinematiocJointDefinition
+{
+	public:
+	struct dJointLimit
+	{
+		dFloat m_minTwistAngle;
+		dFloat m_maxTwistAngle;
+		dFloat m_coneAngle;
+	};
+
+	struct dFrameMatrix
+	{
+		dFloat m_pitch;
+		dFloat m_yaw;
+		dFloat m_roll;
+	};
+
+	char m_boneName[32];
+	dFloat m_friction;
+	dJointLimit m_jointLimits;
+	dFrameMatrix m_frameBasics;
+	dAnimationRagdollJoint::dRagdollMotorType m_type;
+};
+
+static dKinematiocJointDefinition GaitTestDefinition[] =
+{
+	{ "body" },
+	{ "leg", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, dAnimationRagdollJoint::m_threeDof },
+	{ "foot", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
+};
+
+
+static dKinematiocJointDefinition TredDefinition[] =
+{
+	{ "body" },
+	{ "leg", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, dAnimationRagdollJoint::m_threeDof },
+	{ "foot", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
+};
+
 
 class dKinematicEndEffector: public dAnimationRagDollEffector, public dCustomJoint
 {
@@ -235,29 +274,6 @@ dTrace(("%f %f %f\n", error[0], error[1], error[2]));
 
 class dKinematicRagdollManager: public dAnimationModelManager
 {
-	class dJointDefinition
-	{
-		public:
-		struct dJointLimit
-		{
-			dFloat m_minTwistAngle;
-			dFloat m_maxTwistAngle;
-			dFloat m_coneAngle;
-		};
-
-		struct dFrameMatrix
-		{
-			dFloat m_pitch;
-			dFloat m_yaw;
-			dFloat m_roll;
-		};
-
-		char m_boneName[32];
-		dFloat m_friction;
-		dJointLimit m_jointLimits;
-		dFrameMatrix m_frameBasics;
-		dAnimationRagdollJoint::dRagdollMotorType m_type;
-	};
 	
 	public:
 
@@ -350,12 +366,12 @@ class dKinematicRagdollManager: public dAnimationModelManager
 		}
 	}
 
-	dAnimationJoint* CreateChildNode(NewtonBody* const boneBody, dAnimationJoint* const parent, const dJointDefinition& definition) const
+	dAnimationJoint* CreateChildNode(NewtonBody* const boneBody, dAnimationJoint* const parent, const dKinematiocJointDefinition& definition) const
 	{
 		dMatrix matrix;
 		NewtonBodyGetMatrix(boneBody, &matrix[0][0]);
 
-		dJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
+		dKinematiocJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
 		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad));
 		pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
 
@@ -365,26 +381,18 @@ class dKinematicRagdollManager: public dAnimationModelManager
 		return joint;
 	}
 
-	void CreateRagdollExperiment_0(const dMatrix& location)
+	void CreateKinematicModel(const char* const modelName, const dMatrix& location, dKinematiocJointDefinition* const defintion, int size)
 	{
-		static dJointDefinition jointsDefinition[] =
-		{
-			{ "body" },
-			{ "leg", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f }, dAnimationRagdollJoint::m_threeDof },
-			{ "foot", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
-		};
-		const int definitionCount = sizeof(jointsDefinition) / sizeof(jointsDefinition[0]);
-
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
-		DemoEntity* const modelEntity = DemoEntity::LoadNGD_mesh("selfbalance_01.ngd", GetWorld(), scene->GetShaderCache());
+		DemoEntity* const modelEntity = DemoEntity::LoadNGD_mesh(modelName, GetWorld(), scene->GetShaderCache());
 
 		dMatrix matrix0(modelEntity->GetCurrentMatrix());
 		//matrix0.m_posit = location;
 		//modelEntity->ResetMatrix(*scene, matrix0);
 		scene->Append(modelEntity);
-
+return;
 		// add the root childBody
 		NewtonBody* const rootBody = CreateBodyPart(modelEntity);
 
@@ -413,12 +421,12 @@ class dKinematicRagdollManager: public dAnimationModelManager
 			dAnimationJoint* parentNode = parentBones[stackIndex];
 
 			const char* const name = entity->GetName().GetStr();
-			for (int i = 0; i < definitionCount; i++) {
-				if (!strcmp(jointsDefinition[i].m_boneName, name)) {
+			for (int i = 0; i < size; i++) {
+				if (!strcmp(GaitTestDefinition[i].m_boneName, name)) {
 					NewtonBody* const childBody = CreateBodyPart(entity);
 
 					// connect this body part to its parent with a rag doll joint
-					parentNode = CreateChildNode(childBody, parentNode, jointsDefinition[i]);
+					parentNode = CreateChildNode(childBody, parentNode, GaitTestDefinition[i]);
 
 					NewtonCollisionSetUserData(NewtonBodyGetCollision(childBody), parentNode);
 					break;
@@ -495,7 +503,13 @@ void KinematicRagdoll(DemoEntityManager* const scene)
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
 	origin.m_posit.m_y = 2.0f;
-	manager->CreateRagdollExperiment_0(origin);
+
+//	const int definitionCount = sizeof(GaitTestDefinition) / sizeof(GaitTestDefinition[0]);
+//	manager->CreateKinematicModel("selfbalance_01.ngd", origin, GaitTestDefinition, definitionCount);
+
+	const int definitionCount = sizeof(GaitTestDefinition) / sizeof(GaitTestDefinition[0]);
+	manager->CreateKinematicModel("tred.ngd", origin, GaitTestDefinition, definitionCount);
+
 
 /*
 //	int count = 10;
