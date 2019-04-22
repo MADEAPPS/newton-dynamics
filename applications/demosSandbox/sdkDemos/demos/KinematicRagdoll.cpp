@@ -532,7 +532,7 @@ void KinematicRagdoll(DemoEntityManager* const scene)
 		origin.m_posit.m_x += 1.0f;
 	}
 */
-	origin.m_posit.m_x = -3.0f;
+	origin.m_posit.m_x = -8.0f;
 	origin.m_posit.m_y = 1.0f;
 	origin.m_posit.m_z = 0.0f;
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
