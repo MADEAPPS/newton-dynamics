@@ -204,7 +204,8 @@ class dKinematicRagdoll: public dAnimationRagdollRoot
 	dKinematicRagdoll(NewtonBody* const body, const dMatrix& bindMarix)
 		:dAnimationRagdollRoot(body, bindMarix)
 		,m_hipEffector(NULL)
-		,m_leftFootEffector(NULL)
+		,m_leftFootEffector__(NULL)
+		,m_rightFootEffector__(NULL)
 	{
 	}
 
@@ -218,11 +219,18 @@ class dKinematicRagdoll: public dAnimationRagdollRoot
 		m_loopJoints.Append(m_hipEffector);
 	}
 
-	void SetFootEffector(dAnimationJoint* const joint)
+	void SetLeftFootEffector(dAnimationJoint* const joint)
 	{
-		m_leftFootEffector = new dKinematicEndEffector(joint);
-		m_loopJoints.Append(m_leftFootEffector);
+		m_leftFootEffector__ = new dKinematicEndEffector(joint);
+		m_loopJoints.Append(m_leftFootEffector__);
 	}
+
+	void SetRightFootEffector(dAnimationJoint* const joint)
+	{
+		m_rightFootEffector__ = new dKinematicEndEffector(joint);
+		m_loopJoints.Append(m_rightFootEffector__);
+	}
+
 
 	dVector CalculateEffectorOrigin(dAnimationRagDollEffector* const hipEffector) const
 	{
@@ -243,9 +251,14 @@ class dKinematicRagdoll: public dAnimationRagdollRoot
 
 		dVector com(CalculateCenterOfMass());
 
-		if (m_leftFootEffector) {
-			dMatrix footMatrix (m_leftFootEffector->GetMatrix());
-			m_leftFootEffector->SetTarget(footMatrix);
+		if (m_leftFootEffector__) {
+			dMatrix footMatrix (m_leftFootEffector__->GetMatrix());
+			m_leftFootEffector__->SetTarget(footMatrix);
+		}
+
+		if (m_rightFootEffector__) {
+			dMatrix footMatrix(m_rightFootEffector__->GetMatrix());
+			m_rightFootEffector__->SetTarget(footMatrix);
 		}
 
 /*
@@ -274,11 +287,11 @@ class dKinematicRagdoll: public dAnimationRagdollRoot
 dVector error(matrix.m_posit - rootMatrix.m_posit);
 dTrace(("%f %f %f\n", error[0], error[1], error[2]));
 
-
 	}
 
 	dAnimationRagDollEffector* m_hipEffector;
-	dAnimationRagDollEffector* m_leftFootEffector;
+	dAnimationRagDollEffector* m_leftFootEffector__;
+	dAnimationRagDollEffector* m_rightFootEffector__;
 };
 
 
@@ -459,7 +472,13 @@ dTrace(("%s\n", name));
 				dAssert(dynamicRagdoll == joint);
 				dynamicRagdoll->SetHipEffector(joint);
 			} else if (joint->GetAsLeaf()) {
-				dynamicRagdoll->SetFootEffector(joint);
+				NewtonBody* const body = joint->GetBody();
+				DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
+				if (entity->GetName().Find("left") != -1) {
+					dynamicRagdoll->SetLeftFootEffector(joint);
+				} else if (entity->GetName().Find("right") != -1) {
+					dynamicRagdoll->SetRightFootEffector(joint);
+				}
 			}
 		}
 
