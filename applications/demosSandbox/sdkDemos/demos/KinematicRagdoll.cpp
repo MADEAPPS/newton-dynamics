@@ -53,9 +53,14 @@ static dKinematiocJointDefinition GaitTestDefinition[] =
 
 static dKinematiocJointDefinition TredDefinition[] =
 {
-	{ "body" },
-	{ "leg", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f }, dAnimationRagdollJoint::m_threeDof },
-	{ "foot", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
+	{ "bone_pelvis" },
+
+	{ "bone_rightLeg", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_threeDof },
+	{ "bone_righCalf", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 90.0f }, dAnimationRagdollJoint::m_oneDof },
+	{ "bone_rightAnkle", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 90.0f }, dAnimationRagdollJoint::m_oneDof },
+//	{ "bone_rightFoot", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f }, dAnimationRagdollJoint::m_twoDof },
+
+//	{ "foot", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
 };
 
 
@@ -235,8 +240,10 @@ class dKinematicRagdoll: public dAnimationRagdollRoot
 
 		dVector com(CalculateCenterOfMass());
 
-		dMatrix footMatrix (m_leftFootEffector->GetMatrix());
-		m_leftFootEffector->SetTarget(footMatrix);
+		if (m_leftFootEffector) {
+			dMatrix footMatrix (m_leftFootEffector->GetMatrix());
+			m_leftFootEffector->SetTarget(footMatrix);
+		}
 
 /*
 		NewtonBodyGetMatrix(ragDoll->m_leftFootEffector->GetBody(), &pivotMatrix[0][0]);
@@ -392,7 +399,7 @@ class dKinematicRagdollManager: public dAnimationModelManager
 		//matrix0.m_posit = location;
 		//modelEntity->ResetMatrix(*scene, matrix0);
 		scene->Append(modelEntity);
-return;
+
 		// add the root childBody
 		NewtonBody* const rootBody = CreateBodyPart(modelEntity);
 
@@ -418,15 +425,16 @@ return;
 		while (stackIndex) {
 			stackIndex--;
 			DemoEntity* const entity = childEntities[stackIndex];
+			const char* const name = entity->GetName().GetStr();
+dTrace(("%s\n", name));
 			dAnimationJoint* parentNode = parentBones[stackIndex];
 
-			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < size; i++) {
-				if (!strcmp(GaitTestDefinition[i].m_boneName, name)) {
+				if (!strcmp(defintion[i].m_boneName, name)) {
 					NewtonBody* const childBody = CreateBodyPart(entity);
 
 					// connect this body part to its parent with a rag doll joint
-					parentNode = CreateChildNode(childBody, parentNode, GaitTestDefinition[i]);
+					parentNode = CreateChildNode(childBody, parentNode, defintion[i]);
 
 					NewtonCollisionSetUserData(NewtonBodyGetCollision(childBody), parentNode);
 					break;
@@ -507,8 +515,8 @@ void KinematicRagdoll(DemoEntityManager* const scene)
 //	const int definitionCount = sizeof(GaitTestDefinition) / sizeof(GaitTestDefinition[0]);
 //	manager->CreateKinematicModel("selfbalance_01.ngd", origin, GaitTestDefinition, definitionCount);
 
-	const int definitionCount = sizeof(GaitTestDefinition) / sizeof(GaitTestDefinition[0]);
-	manager->CreateKinematicModel("tred.ngd", origin, GaitTestDefinition, definitionCount);
+	const int definitionCount = sizeof(TredDefinition) / sizeof(TredDefinition[0]);
+	manager->CreateKinematicModel("tred.ngd", origin, TredDefinition, definitionCount);
 
 
 /*

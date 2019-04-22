@@ -70,6 +70,108 @@ class dAnimationRagdollJoint::dRagdollMotor: public dCustomBallAndSocket
 };
 
 
+class dAnimationRagdollJoint::dRagdollMotor_1dof : public dRagdollMotor
+{
+	public:
+	dRagdollMotor_1dof(dAnimationRagdollJoint* const owner, const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent)
+		:dRagdollMotor(owner, pinAndPivotFrame0, pinAndPivotFrame1, child, parent)
+	{
+		m_dof = 1;
+		m_dof = 0;
+	}
+
+	virtual void SubmitAngularConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+	{
+/*
+		dVector omega0(0.0f);
+		dVector omega1(0.0f);
+		NewtonBodyGetOmega(m_body0, &omega0[0]);
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+
+		dVector euler0;
+		dVector euler1;
+		dMatrix localMatrix(matrix0 * matrix1.Inverse());
+		localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+
+		dVector relOmega(omega0 - omega1);
+
+		// not happy with this method because it is a penalty system, 
+		// but is hard to the the right axis angular derivative.
+		dMatrix rollMatrix(dYawMatrix(euler0[1]) * matrix1);
+		NewtonUserJointAddAngularRow(m_joint, -euler0[2], &rollMatrix.m_right[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		dFloat rollOmega = relOmega.DotProduct3(rollMatrix.m_right);
+		dFloat alphaRollError = -(euler0[2] + rollOmega * timestep) / (timestep * timestep);
+		NewtonUserJointSetRowAcceleration(m_joint, alphaRollError);
+
+		NewtonUserJointAddAngularRow(m_joint, 0, &matrix0.m_front[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		//NewtonUserJointSetRowAcceleration(m_joint, m_owner->m_rowAccel[0]);
+		//NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+		//NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
+
+		NewtonUserJointAddAngularRow(m_joint, 0, &matrix1.m_up[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		//NewtonUserJointSetRowAcceleration(m_joint, m_owner->m_rowAccel[1]);
+		//NewtonUserJointSetRowMinimumFriction(m_joint, -m_motorTorque);
+		//NewtonUserJointSetRowMaximumFriction(m_joint, m_motorTorque);
+*/
+
+		dVector euler0;
+		dVector euler1;
+		dMatrix localMatrix(matrix0 * matrix1.Inverse());
+		localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+
+		// save the current joint Omega
+//		dVector omega0(0.0f);
+//		dVector omega1(0.0f);
+//		NewtonBodyGetOmega(m_body0, &omega0[0]);
+//		NewtonBodyGetOmega(m_body1, &omega1[0]);
+//		m_jointOmega = matrix0.m_front.DotProduct3(omega0 - omega1);
+
+		// submit the angular rows.
+		NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
+/*
+		if (m_options.m_option2) {
+			// the joint is motor
+			dFloat accel = (m_motorSpeed - m_jointOmega) / timestep;
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, accel);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+		}
+		else {
+			// the joint is not motor
+			if (m_options.m_option0) {
+				if (m_options.m_option1) {
+					SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
+				}
+				else {
+					SubmitConstraintLimits(matrix0, matrix1, timestep);
+				}
+			}
+			else if (m_options.m_option1) {
+				SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
+			}
+			else if (m_friction != 0.0f) {
+				NewtonUserJointAddAngularRow(m_joint, 0, &matrix0.m_front[0]);
+				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+				NewtonUserJointSetRowAcceleration(m_joint, -m_jointOmega / timestep);
+				NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+				NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+			}
+		}
+*/
+	}
+};
+
+
+
 class dAnimationRagdollJoint::dRagdollMotor_2dof: public dRagdollMotor
 {
 	public:
@@ -216,8 +318,7 @@ dAnimationRagdollJoint::dAnimationRagdollJoint(dRagdollMotorType type, const dMa
 	} else if (type == m_twoDof) {
 		m_joint = new dRagdollMotor_2dof(this, pinAndPivotInGlobalSpace, parentRollMatrix, body, parent->GetBody());
 	} else {
-		dAssert(0);
-		dAssert(type == m_oneDof);
+		m_joint = new dRagdollMotor_1dof(this, pinAndPivotInGlobalSpace, parentRollMatrix, body, parent->GetBody());
 	}
 
 	//dFloat friction = definition.m_friction * 0.25f;

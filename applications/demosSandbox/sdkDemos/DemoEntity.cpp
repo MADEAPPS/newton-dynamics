@@ -482,7 +482,6 @@ NewtonCollision* DemoEntity::CreateCollisionFromchildren(NewtonWorld* const worl
 		if (strstr (name, "Sphere")) {
 			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
-			// go over the vertex array and find and collect all vertices's weighted by this bone.
 			dFloat* const array = mesh->m_vertex;
 			dVector extremes(0.0f);
 			for (int i = 0; i < mesh->m_vertexCount; i++) {
@@ -516,7 +515,6 @@ NewtonCollision* DemoEntity::CreateCollisionFromchildren(NewtonWorld* const worl
 		} else if (strstr (name, "Capsule")) {
 			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
-			// go over the vertex array and find and collect all vertices's weighted by this bone.
 			dFloat* const array = mesh->m_vertex;
 			dVector extremes(0.0f);
 			for (int i = 0; i < mesh->m_vertexCount; i++) {
@@ -531,7 +529,15 @@ NewtonCollision* DemoEntity::CreateCollisionFromchildren(NewtonWorld* const worl
 			shapeArray[count] = NewtonCreateCapsule(world, extremes.m_x, extremes.m_x, high, 0, &matrix[0][0]);
 			count++;
 			dAssert(count < sizeof(shapeArray)/ sizeof (shapeArray[0]));
-		} 
+		} else if (strstr(name, "convexhull")) {
+			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
+			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+			dFloat* const array = mesh->m_vertex;
+			dMatrix matrix(child->GetCurrentMatrix());
+			shapeArray[count] = NewtonCreateConvexHull(world, mesh->m_vertexCount, array, 3 * sizeof (dFloat), 0.01f, 0, &matrix[0][0]);
+			count++;
+			dAssert(count < sizeof(shapeArray) / sizeof(shapeArray[0]));
+		}
 	}
 
 	if (count > 2) {
