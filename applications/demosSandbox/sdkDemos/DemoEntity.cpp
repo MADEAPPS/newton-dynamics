@@ -529,7 +529,7 @@ NewtonCollision* DemoEntity::CreateCollisionFromchildren(NewtonWorld* const worl
 			shapeArray[count] = NewtonCreateCapsule(world, extremes.m_x, extremes.m_x, high, 0, &matrix[0][0]);
 			count++;
 			dAssert(count < sizeof(shapeArray)/ sizeof (shapeArray[0]));
-		} else if (strstr(name, "convexhull")) {
+		} else if (strstr(name, "ConvexHull")) {
 			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
 			dFloat* const array = mesh->m_vertex;
