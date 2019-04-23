@@ -145,7 +145,7 @@ class dAnimationRagdollJoint::dRagdollMotor_2dof: public dRagdollMotor
 
 	void Debug(dDebugDisplay* const debugDisplay) const
 	{
-		dRagdollMotor::Debug(debugDisplay);
+//		dRagdollMotor::Debug(debugDisplay);
 	}
 
 	virtual void SubmitAngularConstraints(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
