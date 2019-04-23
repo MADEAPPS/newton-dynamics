@@ -20,6 +20,7 @@
 class dAnimationRagdollJoint: public dAnimationJoint, public dAnimationContraint
 {
 	class dRagdollMotor;
+	class dRagdollMotor_0dof;
 	class dRagdollMotor_1dof;
 	class dRagdollMotor_2dof;
 	class dRagdollMotor_3dof;
@@ -27,6 +28,7 @@ class dAnimationRagdollJoint: public dAnimationJoint, public dAnimationContraint
 	public:
 	enum dRagdollMotorType
 	{
+		m_zeroDof,
 		m_oneDof,
 		m_twoDof,
 		m_threeDof,
