@@ -466,6 +466,12 @@ dTrace(("%s\n", name));
 
 		SetModelMass(100.0f, dynamicRagdoll);
 
+		// transform the entire contraction to its location
+		dMatrix worldMatrix(modelEntity->GetCurrentMatrix() * location);
+		worldMatrix.m_posit = location.m_posit;
+		NewtonBodySetMatrixRecursive(rootBody, &worldMatrix[0][0]);
+
+
 		// attach effectors here
 		for (dAnimationJoint* joint = GetFirstJoint(dynamicRagdoll); joint; joint = GetNextJoint(joint)) {
 			if (joint->GetAsRoot()) {
@@ -482,11 +488,6 @@ dTrace(("%s\n", name));
 			}
 		}
 
-
-		// transform the entire contraction to its location
-		dMatrix worldMatrix(modelEntity->GetCurrentMatrix() * location);
-		worldMatrix.m_posit = location.m_posit;
-		NewtonBodySetMatrixRecursive(rootBody, &worldMatrix[0][0]);
 
 		dynamicRagdoll->Finalize();
 		//return controller;
@@ -531,7 +532,7 @@ void KinematicRagdoll(DemoEntityManager* const scene)
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.0f);
 
-	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
+	dMatrix origin (dYawMatrix(90.0f * dDegreeToRad));
 	origin.m_posit.m_y = 2.0f;
 
 //	const int definitionCount = sizeof(GaitTestDefinition) / sizeof(GaitTestDefinition[0]);
