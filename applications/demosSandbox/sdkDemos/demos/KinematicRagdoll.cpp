@@ -540,20 +540,6 @@ void KinematicRagdoll(DemoEntityManager* const scene)
 	const int definitionCount = sizeof(TredDefinition) / sizeof(TredDefinition[0]);
 	manager->CreateKinematicModel("tred.ngd", origin, TredDefinition, definitionCount);
 
-
-/*
-//	int count = 10;
-//	count = 1;
-//origin = dGetIdentityMatrix();
-	origin.m_posit.m_x = 2.0f;
-//	origin.m_posit.m_y = 2.1f;
-	origin.m_posit.m_y = 3.0f;
-	for (int i = 0; i < count; i++) {
-		manager->CreateRagDoll(scene, origin);
-		//manager->CreateRagDoll (scene, origin1);
-		origin.m_posit.m_x += 1.0f;
-	}
-*/
 	origin.m_posit.m_x = -8.0f;
 	origin.m_posit.m_y = 1.0f;
 	origin.m_posit.m_z = 0.0f;

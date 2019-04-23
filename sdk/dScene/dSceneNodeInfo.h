@@ -71,7 +71,7 @@ class dSceneNodeInfo: public dNodeInfo
 	dMatrix m_eigenScaleAxis;   // principal axis for the scale values
 
 
-	dMatrix m_geometryTransform;   // this transform si only apply to child geometries, but it si no inherited by child nodes
+	dMatrix m_geometryTransform;   // this transform only apply to children geometries, but it is not inherited by child nodes
 
 	dVector m_solidColor;
 	dVector m_editorMinOOBB;	// bounding Box of the body this bod cover in the scene

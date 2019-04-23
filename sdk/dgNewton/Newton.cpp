@@ -7852,6 +7852,13 @@ void NewtonMeshApplyTransform (const NewtonMesh* const mesh, const dFloat* const
 	meshEffect->ApplyTransform(dgMatrix (matrix));
 }
 
+void NewtonMeshFlipWinding(const NewtonMesh* const mesh)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgMeshEffect* const meshEffect = (dgMeshEffect*)mesh;
+	meshEffect->FlipWinding();
+}
+
 void NewtonMeshCalculateOOBB(const NewtonMesh* const mesh, dFloat* const matrix, dFloat* const x, dFloat* const y, dFloat* const z)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -8322,7 +8329,7 @@ NewtonMesh* NewtonMeshCreateFirstSingleSegment (const NewtonMesh* const mesh)
 	effectMesh->BeginConectedSurface();
 	if (effectMesh->GetConectedSurface (segment)) {
 		dgMeshEffect* const solid = new (effectMesh->GetAllocator()) dgMeshEffect(segment, *((dgMeshEffect*)mesh));
-	return (NewtonMesh*)solid;
+		return (NewtonMesh*)solid;
 	} else {
 		return NULL;
 	}

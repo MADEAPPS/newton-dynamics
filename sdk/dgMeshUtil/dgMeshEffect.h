@@ -322,6 +322,7 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	dgMatrix CalculateOOBB (dgBigVector& size) const;
 	void CalculateAABB (dgBigVector& min, dgBigVector& max) const;
 
+	void FlipWinding(); 
 	void UniformBoxMapping (dgInt32 material, const dgMatrix& textureMatrix);
 	void CalculateNormals (dgFloat64 angleInRadians);
 	void SphericalMapping (dgInt32 material, const dgMatrix& uvAligment);

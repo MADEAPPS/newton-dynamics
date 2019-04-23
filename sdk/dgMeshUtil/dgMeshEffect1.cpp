@@ -1279,7 +1279,7 @@ dgMeshEffect::dgMeshEffect(const dgMeshEffect& source)
 	:dgPolyhedra (source) 
 	,m_points(source.m_points)
 	,m_attrib(source.m_attrib)
-	, m_vertexBaseCount(-1)
+	,m_vertexBaseCount(-1)
 	,m_constructionIndex(0)
 {
 	Init();
@@ -1628,6 +1628,37 @@ void dgMeshEffect::SaveOFF (const char* const fileName) const
 	}
 	fclose (file);
 }
+
+void dgMeshEffect::FlipWinding()
+{
+	dgInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
+	dgInt64	userData[DG_MESH_EFFECT_POINT_SPLITED];
+
+	dgPolyhedra polyhedra(*this);
+	RemoveAll();
+
+	dgPolyhedra::BeginFace();
+	dgInt32 mark = polyhedra.IncLRU();
+	dgPolyhedra::Iterator iter(polyhedra);
+	for (iter.Begin(); iter; iter++) {
+		dgEdge* const face = &iter.GetNode()->GetInfo();
+		if ((face->m_mark != mark) && (face->m_incidentFace > 0)) {
+
+			dgEdge* ptr = face;
+			dgInt32 indexCount = 0;
+			do {
+				index[indexCount] = ptr->m_incidentVertex;
+				userData[indexCount] = ptr->m_userData;
+				ptr->m_mark = mark;
+				indexCount++;
+				ptr = ptr->m_prev;
+			} while (ptr != face);
+			AddFace(indexCount, index, userData);
+		}
+	}
+	dgPolyhedra::EndFace();
+}
+
 
 void dgMeshEffect::Triangulate  ()
 {

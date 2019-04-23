@@ -48,8 +48,8 @@ class ImportStackData
 	public:
 	ImportStackData(const dMatrix& parentMatrix, FbxNode* const fbxNode, dScene::dTreeNode* parentNode)
 		:m_parentMatrix(parentMatrix)
-		, m_fbxNode(fbxNode)
-		, m_parentNode(parentNode)
+		,m_fbxNode(fbxNode)
+		,m_parentNode(parentNode)
 	{
 	}
 	dMatrix m_parentMatrix;
@@ -83,7 +83,7 @@ class LocalMaterialMap: public dTree<dScene::dTreeNode*, int>
 
 static int g_materialId = 0;
 static int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene);
-static bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename);
+static bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* const pFilename);
 static void LoadHierarchy(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap);
 static bool ConvertToNgd(dScene* const ngdScene, FbxScene* const fbxScene, bool importMesh, bool importAnimations);
 static void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene, bool importMesh, bool importAnimations);
@@ -95,6 +95,7 @@ static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, Fbx
 static void PrepareSkeleton(FbxScene* const fbxScene);
 static dFloat CalculateAnimationPeriod(FbxScene* const fbxScene, FbxAnimLayer* const animLayer);
 static void ImportAnimations(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap);
+static void RemoveReflexionMatrices(dScene* const ngdScene);
 
 
 int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene)
@@ -125,7 +126,7 @@ int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene)
 	return 1;
 }
 
-bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* pFilename)
+bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* const pFilename)
 {
 	int lFileMajor, lFileMinor, lFileRevision;
 	int lSDKMajor, lSDKMinor, lSDKRevision;
@@ -247,15 +248,14 @@ bool ConvertToNgd(dScene* const ngdScene, FbxScene* const fbxScene, bool importM
 	axisMatrix.m_up = upVector;
 	axisMatrix.m_right = frontVector.CrossProduct(upVector);
 	axisMatrix = axisMatrix * dYawMatrix(dPi);
-//axisMatrix = dGetIdentityMatrix();
 	convertMatrix = axisMatrix * convertMatrix;
 
 	PopulateScene(ngdScene, fbxScene, importMesh, importAnimations);
 
 	ngdScene->RemoveUnusedMaterials();
 	ngdScene->BakeTransform(convertMatrix);
-//	ngdScene->FreezeGeometryPivot();
 	ngdScene->FreezeScale();
+	RemoveReflexionMatrices(ngdScene);
 
 	return true;
 }
@@ -404,6 +404,75 @@ void PrepareSkeleton(FbxScene* const fbxScene)
 		for (int i = 0; i < fbxNode->GetChildCount(); i++) {
 			fbxNodes[stack] = fbxNode->GetChild(i);
 			stack++;
+		}
+	}
+}
+
+void RemoveReflexionMatrices(dScene* const ngdScene)
+{
+//	ngdScene->FreezeScale();
+/*
+	dList<dScene::dTreeNode*> nodeStack;
+	dList<dMatrix> matrixStack;
+
+	for (void* link = ngdScene->GetFirstChildLink(ngdScene->GetRootNode()); link; link = ngdScene->GetNextChildLink(ngdScene->GetRootNode(), link)) {
+		dScene::dTreeNode* const node = ngdScene->GetNodeFromLink(link);
+		dNodeInfo* const nodeInfo = ngdScene->GetInfoFromNode(node);
+		if (nodeInfo->IsType(dSceneNodeInfo::GetRttiType())) {
+			nodeStack.Append(node);
+			matrixStack.Append(dGetIdentityMatrix());
+		}
+	}
+
+	while (nodeStack.GetCount()) {
+		dScene::dTreeNode* const rootNode = nodeStack.GetLast()->GetInfo();
+		dMatrix parentMatrix(matrixStack.GetLast()->GetInfo());
+
+		nodeStack.Remove(nodeStack.GetLast());
+		matrixStack.Remove(matrixStack.GetLast());
+
+		dSceneNodeInfo* const sceneNodeInfo = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(rootNode);
+		dAssert(sceneNodeInfo->IsType(dSceneNodeInfo::GetRttiType()));
+		dMatrix transform(sceneNodeInfo->GetTransform());
+
+		dFloat det = transform[0].DotProduct3(transform[1].CrossProduct(transform[2]));
+		if (det < 0.0f) {
+			dAssert(0);
+		}
+
+		for (void* link = ngdScene->GetFirstChildLink(rootNode); link; link = ngdScene->GetNextChildLink(rootNode, link)) {
+			dScene::dTreeNode* const node = ngdScene->GetNodeFromLink(link);
+			dNodeInfo* const nodeInfo = ngdScene->GetInfoFromNode(node);
+
+			if (nodeInfo->IsType(dSceneNodeInfo::GetRttiType())) {
+				nodeStack.Append(node);
+				matrixStack.Append(dGetIdentityMatrix());
+			}
+		}
+	}
+*/
+
+	dMatrix reflexionMatrix(dGetIdentityMatrix());
+	reflexionMatrix[2] = reflexionMatrix[2].Scale(-1.0f);
+	dScene::Iterator iter(*ngdScene);
+	for (iter.Begin(); iter; iter++) {
+		dScene::dTreeNode* const node = iter.GetNode();
+		dNodeInfo* const nodeInfo = ngdScene->GetInfoFromNode(node);
+		if (nodeInfo->IsType(dMeshNodeInfo::GetRttiType())) {
+			dScene::dTreeNode* const parentNode = ngdScene->FindParentByType(node, dSceneNodeInfo::GetRttiType());
+			dAssert(parentNode);
+			dSceneNodeInfo* const sceneNodeInfo = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(parentNode);
+			dAssert(sceneNodeInfo->IsType(dSceneNodeInfo::GetRttiType()));
+			dMatrix matrix(sceneNodeInfo->GetGeometryTransform());
+			dFloat det = matrix[0].DotProduct3(matrix[1].CrossProduct(matrix[2]));
+			if (det < 0.0f) {
+				matrix = reflexionMatrix * matrix;
+				sceneNodeInfo->SetGeometryTransform(matrix);
+				nodeInfo->BakeTransform(reflexionMatrix);
+
+				dMeshNodeInfo* const meshNodeInfo = (dMeshNodeInfo*)nodeInfo;
+				NewtonMeshFlipWinding(meshNodeInfo->GetMesh());
+			}
 		}
 	}
 }
@@ -1111,3 +1180,5 @@ int main(int argc, char** argv)
 	FBXSDK_printf("Conversion successful!\n");
 	return 0;
 }
+
+
