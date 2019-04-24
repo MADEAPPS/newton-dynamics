@@ -301,10 +301,13 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 		m_sleepTable[i].m_steps = steps;
 		steps += 7;
 		freezeAccel2 *= dgFloat32 (1.5f);
-		freezeAlpha2 *= dgFloat32 (1.4f);
+		freezeAlpha2 *= dgFloat32 (1.5f);
 		freezeSpeed2 *= dgFloat32 (1.5f);
 		freezeOmega2 *= dgFloat32 (1.5f);
 	}
+
+	m_sleepTable[0].m_maxAccel *= dgFloat32(0.009f);
+	m_sleepTable[0].m_maxAlpha *= dgFloat32(0.009f);
 
 	steps += 300;
 	m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAccel *= dgFloat32 (100.0f);

@@ -705,6 +705,7 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 	}
 
 	const dgInt32 passes = world->m_solverIterations;
+	const dgFloat32 maxAccNorm = DG_SOLVER_MAX_ERROR * DG_SOLVER_MAX_ERROR;
 	for (dgInt32 step = 0; step < derivativesEvaluationsRK4; step++) {
 
 		for (dgInt32 i = 0; i < jointCount; i++) {
@@ -731,10 +732,8 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			}
 		}
 		joindDesc.m_firstPassCoefFlag = dgFloat32(1.0f);
-
-		dgFloat32 maxAccNorm = DG_SOLVER_MAX_ERROR * DG_SOLVER_MAX_ERROR;
+	
 		dgFloat32 accNorm = maxAccNorm * dgFloat32(2.0f);
-
 		for (dgInt32 i = 0; (i < passes) && (accNorm > maxAccNorm); i++) {
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 j = 0; j < jointCount; j++) {
@@ -805,8 +804,9 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			hasJointFeeback |= (constraint->m_updaFeedbackCallback ? 1 : 0);
 		}
 
+		const dgFloat32 zeroAceel = (jointCount >= 16) ? DG_SOLVER_MAX_ERROR : DG_SOLVER_MAX_ERROR * dgFloat32 (0.25f);
 		const dgVector invTime(invTimestep);
-		const dgVector maxAccNorm2(DG_SOLVER_MAX_ERROR * DG_SOLVER_MAX_ERROR);
+		const dgVector maxAccNorm2(zeroAceel * zeroAceel);
 
 		for (dgInt32 i = 1; i < bodyCount; i++) {
 			dgBody* const body = bodyArray[i].m_body;
