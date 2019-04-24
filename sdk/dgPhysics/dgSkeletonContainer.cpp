@@ -940,6 +940,7 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 // Old solver more stable but less accurate and slower
 void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
 {
+	D_TRACKTIME();
 	const dgFloat32 sor = dgFloat32(1.125f);
 	const dgFloat32 tol2 = dgFloat32(0.25f);
 	const dgInt32 maxIterCount = 64;
@@ -1004,6 +1005,7 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 // New solver faster more accurate but less stable, needs more testing
 void dgSkeletonContainer::SolveLcp_new(dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
 {
+	D_TRACKTIME();
 	const dgInt32 maxIterCount = 16;
 	const dgFloat32 sor = dgFloat32(1.125f);
 	const dgFloat32 tol2 = dgFloat32(0.25f);

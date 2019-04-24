@@ -747,9 +747,9 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 					accNorm += accel2;
 				}
 			}
-			for (dgInt32 j = 0; j < skeletonCount; j++) {
-				skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces);
-			}
+		}
+		for (dgInt32 j = 0; j < skeletonCount; j++) {
+			skeletonArray[j]->CalculateJointForce(constraintArray, bodyArray, internalForces);
 		}
 
 		if (timestepRK != dgFloat32(0.0f)) {
