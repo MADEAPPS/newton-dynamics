@@ -284,8 +284,8 @@ class dKinematicRagdoll: public dAnimationRagdollRoot
 		matrix.m_posit = rootMatrix.m_posit;
 		m_hipEffector->SetTarget(matrix);
 
-dVector error(matrix.m_posit - rootMatrix.m_posit);
-dTrace(("%f %f %f\n", error[0], error[1], error[2]));
+//dVector error(matrix.m_posit - rootMatrix.m_posit);
+//dTrace(("%f %f %f\n", error[0], error[1], error[2]));
 
 	}
 
