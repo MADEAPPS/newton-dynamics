@@ -335,6 +335,7 @@ void dgWorldDynamicUpdate::CalculateClusterContacts(dgBodyCluster* const cluster
 
 void dgWorldDynamicUpdate::IntegrateExternalForce(const dgBodyCluster* const cluster, dgFloat32 timestep, dgInt32 threadID) const
 {
+	D_TRACKTIME();
 	dgWorld* const world = (dgWorld*) this;
 	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster->m_bodyStart];
 
@@ -662,6 +663,7 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 
 void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const
 {
+	D_TRACKTIME();
 	dgWorld* const world = (dgWorld*) this;
 	const dgInt32 bodyCount = cluster->m_bodyCount;
 	const dgInt32 jointCount = cluster->m_jointCount;

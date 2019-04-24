@@ -790,6 +790,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 
 void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const
 {
+	D_TRACKTIME();
 	dgAssert(cluster->m_bodyCount >= 2);
 
 	dgWorld* const world = (dgWorld*) this;
@@ -882,6 +883,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 
 void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster, dgFloat32 accelTolerance, dgFloat32 timestep, dgInt32 threadID) const
 {
+	D_TRACKTIME();
 	dgWorld* const world = (dgWorld*) this;
 	dgFloat32 velocityDragCoeff = DG_FREEZZING_VELOCITY_DRAG;
 	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster->m_bodyStart + 1];

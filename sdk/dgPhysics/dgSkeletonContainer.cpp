@@ -1399,6 +1399,7 @@ dgInt8* dgSkeletonContainer::CalculateBufferSizeInBytes (const dgJointInfo* cons
 
 void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide)
 {
+	D_TRACKTIME();
 	dgInt32 rowCount = 0;
 	dgInt32 auxiliaryCount = 0;
 	m_leftHandSide = leftHandSide;
@@ -1436,6 +1437,7 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 
 void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces)
 {
+	D_TRACKTIME();
 	dgForcePair* const force = dgAlloca(dgForcePair, m_nodeCount);
 	dgForcePair* const accel = dgAlloca(dgForcePair, m_nodeCount);
 
