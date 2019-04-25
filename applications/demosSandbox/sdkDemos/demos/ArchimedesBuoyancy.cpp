@@ -41,7 +41,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 		public:
 		BuoyancyForce(dCustomTriggerController* const controller)
 			:TriggerCallback (controller)
-			,m_plane(0.0f)
+			,m_waterSufaceRestHeight(0.0f)
 		{
 			// get the fluid plane for the upper face of the trigger volume
 			NewtonBody* const body = m_controller->GetBody();
@@ -50,7 +50,8 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 			dMatrix matrix;
 			NewtonBodyGetMatrix(body, &matrix[0][0]);
 			dVector floor(FindFloor(world, dVector(matrix.m_posit.m_x, 20.0f, matrix.m_posit.m_z, 0.0f), 40.0f));
-			m_plane = dVector (0.0f, 1.0f, 0.0f, -floor.m_y);
+			//m_plane = dVector (0.0f, 1.0f, 0.0f, -floor.m_y);
+			m_waterSufaceRestHeight = floor.m_y;
 		}
 
 		void OnEnter(NewtonBody* const visitor)
@@ -63,6 +64,25 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 			NewtonCollisionGetMaterial (collision, &collisionMaterial);
 			collisionMaterial.m_userParam[0]= density;
 			NewtonCollisionSetMaterial (collision, &collisionMaterial);
+		}
+
+		dVector CalculateWaterPlane(const dVector& position) const
+		{
+			BuoyancyTriggerManager* const manager = (BuoyancyTriggerManager*)m_controller->GetManager();
+
+			dFloat xAngle = 2.0f * (position.m_x / manager->m_wavePeriod) * dPi;
+			dFloat yAngle = 2.0f * (position.m_z / manager->m_wavePeriod) * dPi;
+
+			dFloat heigh = -m_waterSufaceRestHeight;
+			dFloat amplitud = manager->m_waveAmplitud;
+			for (int i = 0; i < 3; i++) {
+				heigh += amplitud * dSin(xAngle + manager->m_faceAngle) * dCos(yAngle + manager->m_faceAngle);
+				amplitud *= 0.5f;
+				xAngle *= 0.5f;
+				yAngle *= 0.5f;
+			}
+
+			return dVector(0.0f, 1.0f, 0.0f, heigh);
 		}
 
 		void OnInside(NewtonBody* const visitor)
@@ -81,7 +101,8 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 				NewtonCollision* const collision = NewtonBodyGetCollision(visitor);
 				
 				// calculate the volume and center of mass of the shape under the water surface 
-				dFloat volume = NewtonConvexCollisionCalculateBuoyancyVolume (collision, &matrix[0][0], &m_plane[0], &cenyterOfPreasure[0]);
+				dVector plane(CalculateWaterPlane(matrix.m_posit));
+				dFloat volume = NewtonConvexCollisionCalculateBuoyancyVolume (collision, &matrix[0][0], &plane[0], &cenyterOfPreasure[0]);
 				if (volume > 0.0f) {
 					// if some part of the shape si under water, calculate the buoyancy force base on 
 					// Archimedes's buoyancy principle, which is the buoyancy force is equal to the 
@@ -123,16 +144,28 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 			}
 		}
 
-		dVector m_plane;
+		dFloat m_waterSufaceRestHeight;
 	};
 
 	BuoyancyTriggerManager(NewtonWorld* const world)
 		:dCustomTriggerManager(world)
+		,m_faceAngle (0.0f)
+		,m_waveSpeed(1.0f)
+		,m_wavePeriod (3.0f)
+		,m_waveAmplitud (0.25f)
 	{
 	}
 
 	~BuoyancyTriggerManager()
 	{
+	}
+
+	void PreUpdate(dFloat timestep, int threadID)
+	{
+		// update stationary swimming pool water surface
+		m_faceAngle = dMod(m_faceAngle + m_waveSpeed * timestep, dFloat (2.0f * dPi));
+
+		dCustomTriggerManager::PreUpdate(timestep, threadID);
 	}
 
 	void CreateBuoyancyTrigger (const dMatrix& matrix, NewtonCollision* const convexShape)
@@ -199,6 +232,11 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 			}
 		}
 	}
+
+	dFloat m_faceAngle;
+	dFloat m_waveSpeed;
+	dFloat m_wavePeriod;
+	dFloat m_waveAmplitud;
 };
 
 
@@ -241,12 +279,12 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+////	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 }

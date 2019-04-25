@@ -48,6 +48,7 @@ class dCustomTriggerController
 	void SetUserData(void* const data) {m_userData = data;}
 
 	NewtonBody* GetBody() const {return m_kinematicBody; }
+	dCustomTriggerManager* GetManager() const { return m_manager; }
 
 	virtual void PreUpdate(dFloat timestep, int threadIndex) {};
 	virtual void PostUpdate(dFloat timestep, int threadIndex) {};
@@ -82,7 +83,6 @@ class dCustomTriggerManager: public dCustomParallelListener
 	protected:
 	virtual void Debug () const {};
 	CUSTOM_JOINTS_API virtual void OnDestroyBody (NewtonBody* const body); 
-//	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep);
 	CUSTOM_JOINTS_API void PreUpdate(dFloat timestep, int threadID);
 
 	CUSTOM_JOINTS_API virtual void OnDestroy();

@@ -231,10 +231,14 @@ class dKinematicRagdoll: public dAnimationRagdollRoot
 		m_loopJoints.Append(m_rightFootEffector__);
 	}
 
-
 	dVector CalculateEffectorOrigin(dAnimationRagDollEffector* const hipEffector) const
 	{
 		return dVector(0.0f);
+	}
+
+	void SelftBalance()
+	{
+
 	}
 
 	void PreUpdate(dFloat timestep)
