@@ -74,7 +74,7 @@ dgQuaternion::dgQuaternion (const dgMatrix& matrix)
 	}
 
 	dgFloat32 err = dgAbs (DotProduct(*this) - dgFloat32(1.0f));
-	dgAssert (err < dgFloat32(dgEPSILON * 100.0f));
+	dgAssert (err < dgFloat32(dgEpsilon * 100.0f));
 #endif
 }
 
@@ -85,8 +85,8 @@ dgQuaternion::dgQuaternion (const dgVector &unitAxis, dgFloat32 angle)
 	dgFloat32 sinAng = dgSin (angle);
 
 #ifdef _DEBUG
-	if (dgAbs (angle) > dgFloat32(dgEPSILON / 10.0f)) {
-		dgAssert (dgAbs (dgFloat32(1.0f) - unitAxis.DotProduct3(unitAxis)) < dgFloat32(dgEPSILON * 10.0f));
+	if (dgAbs (angle) > dgFloat32(dgEpsilon / 10.0f)) {
+		dgAssert (dgAbs (dgFloat32(1.0f) - unitAxis.DotProduct3(unitAxis)) < dgFloat32(dgEpsilon * 10.0f));
 	} 
 #endif
 	m_x = unitAxis.m_x * sinAng;
@@ -121,10 +121,10 @@ dgQuaternion dgQuaternion::Slerp (const dgQuaternion &q1, dgFloat32 t) const
 	dgQuaternion q0;
 
 	dgFloat32 dot = DotProduct (q1);
-	if ((dot + dgFloat32(1.0f)) > dgEPSILON) {
+	if ((dot + dgFloat32(1.0f)) > dgEpsilon) {
 		dgFloat32 Sclp;
 		dgFloat32 Sclq;
-		if (dot < (dgFloat32(1.0f) - dgEPSILON) ) {
+		if (dot < (dgFloat32(1.0f) - dgEpsilon) ) {
 			dgFloat32 ang = dgAcos (dot);
 
 			dgFloat32 sinAng = dgSin (ang);
@@ -148,8 +148,8 @@ dgQuaternion dgQuaternion::Slerp (const dgQuaternion &q1, dgFloat32 t) const
 		q0.m_y =  m_x;
 		q0.m_z =  m_w;
 
-		dgFloat32 Sclp = dgSin ((dgFloat32(1.0f) - t) * dgPI * dgFloat32 (0.5f));
-		dgFloat32 Sclq = dgSin (t * dgPI * dgFloat32 (0.5f));
+		dgFloat32 Sclp = dgSin ((dgFloat32(1.0f) - t) * dgPi * dgFloat32 (0.5f));
+		dgFloat32 Sclq = dgSin (t * dgPi * dgFloat32 (0.5f));
 
 		q0.m_w = m_w * Sclp + q0.m_w * Sclq;
 		q0.m_x = m_x * Sclp + q0.m_x * Sclq;
@@ -158,7 +158,7 @@ dgQuaternion dgQuaternion::Slerp (const dgQuaternion &q1, dgFloat32 t) const
 	}
 
 	dot = q0.DotProduct (q0);
-	if ((dot) < dgFloat32(1.0f - dgEPSILON * 10.0f) ) {
+	if ((dot) < dgFloat32(1.0f - dgEpsilon * 10.0f) ) {
 		//dot = dgFloat32(1.0f) / dgSqrt (dot);
 		dot = dgRsqrt (dot);
 		q0.m_w *= dot;

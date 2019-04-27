@@ -275,16 +275,12 @@ class dgTriplex
 	dgFloat32 m_z;
 };
 
-
-#define dgPI			 	dgFloat32 (3.141592f)
-#define dgPI2			 	dgFloat32 (dgPI * 2.0f)
-#define dgEXP			 	dgFloat32 (2.71828f)
-#define dgEPSILON	  	 	dgFloat32 (1.0e-5f)
-#define dgGRAVITY	  	 	dgFloat32 (9.8f)
-#define dgDEG2RAD	  	 	dgFloat32 (dgPI / 180.0f)
-#define dgRAD2DEG	  	 	dgFloat32 (180.0f / dgPI)
-#define dgKMH2MPSEC		 	dgFloat32 (0.278f)
-
+#define dgPi		 	dgFloat32 (3.141592f)
+#define dgPI2		 	dgFloat32 (dgPi * 2.0f)
+#define dgEXP		 	dgFloat32 (2.71828f)
+#define dgEpsilon	  	dgFloat32 (1.0e-5f)
+#define dgDegreeToRad  	dgFloat32 (dgPi / 180.0f)
+#define dgRadToDegree  	dgFloat32 (180.0f / dgPi)
 
 class dgBigVector;
 #ifndef _NEWTON_USE_DOUBLE
@@ -453,8 +449,8 @@ union dgDoubleInt
 
 
 void dgGetMinMax (dgBigVector &Min, dgBigVector &Max, const dgFloat64* const vArray, dgInt32 vCount, dgInt32 strideInBytes);
-dgInt32 dgVertexListToIndexList (dgFloat64* const vertexList, dgInt32 strideInBytes, dgInt32 compareCount,     dgInt32 vertexCount,         dgInt32* const indexListOut, dgFloat64 tolerance = dgEPSILON);
-dgInt32 dgVertexListToIndexList (dgFloat32* const vertexList, dgInt32 strideInBytes, dgInt32 floatSizeInBytes, dgInt32 unsignedSizeInBytes, dgInt32 vertexCount, dgInt32* const indexListOut, dgFloat32 tolerance = dgEPSILON);
+dgInt32 dgVertexListToIndexList (dgFloat64* const vertexList, dgInt32 strideInBytes, dgInt32 compareCount,     dgInt32 vertexCount,         dgInt32* const indexListOut, dgFloat64 tolerance = dgEpsilon);
+dgInt32 dgVertexListToIndexList (dgFloat32* const vertexList, dgInt32 strideInBytes, dgInt32 floatSizeInBytes, dgInt32 unsignedSizeInBytes, dgInt32 vertexCount, dgInt32* const indexListOut, dgFloat32 tolerance = dgEpsilon);
 
 #define PointerToInt(x) ((size_t)x)
 #define IntToPointer(x) ((void*)(size_t(x)))

@@ -172,7 +172,7 @@ void dgBallConstraint::SetPivotPoint(const dgVector &pivot)
 	dgMatrix matrix0;
 	dgMatrix matrix1;
 	CalculateGlobalMatrixAndAngle (m_localMatrix0, m_localMatrix1, matrix0, matrix1);
-	SetLimits (matrix0.m_front, -dgPI * dgFloat32 (0.5f), dgPI * dgFloat32 (0.5f), dgPI * dgFloat32 (0.5f), matrix0.m_right, dgFloat32 (0.0f), dgFloat32 (0.0f));
+	SetLimits (matrix0.m_front, -dgPi * dgFloat32 (0.5f), dgPi * dgFloat32 (0.5f), dgPi * dgFloat32 (0.5f), matrix0.m_right, dgFloat32 (0.0f), dgFloat32 (0.0f));
 }
 
 void dgBallConstraint::SetLimits (
@@ -214,8 +214,8 @@ void dgBallConstraint::SetLimits (
 
 	const dgMatrix& body1_Matrix = m_body1->GetMatrix();
 
-	m_twistAngle = dgClamp (maxTwistAngle, dgFloat32 (5.0f) * dgDEG2RAD, dgFloat32 (90.0f) * dgDEG2RAD);
-	m_coneAngle = dgClamp ((maxConeAngle - minConeAngle) * dgFloat32 (0.5f), dgFloat32 (5.0f) * dgDEG2RAD, 175.0f * dgDEG2RAD);
+	m_twistAngle = dgClamp (maxTwistAngle, dgFloat32 (5.0f) * dgDegreeToRad, dgFloat32 (90.0f) * dgDegreeToRad);
+	m_coneAngle = dgClamp ((maxConeAngle - minConeAngle) * dgFloat32 (0.5f), dgFloat32 (5.0f) * dgDegreeToRad, 175.0f * dgDegreeToRad);
 	m_coneAngleCos = dgCos (m_coneAngle);
 
 	dgMatrix coneMatrix (dgPitchMatrix((maxConeAngle + minConeAngle) * dgFloat32 (0.5f)));

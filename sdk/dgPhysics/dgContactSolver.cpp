@@ -393,7 +393,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 		dgAssert (e0.m_w == dgFloat32 (0.0f));
 		dgAssert(e0.DotProduct(e0).GetScalar() > dgFloat32(0.0f));
 		dgMatrix matrix(e0.Scale(dgRsqrt(e0.DotProduct(e0).GetScalar())));
-		dgMatrix rotation(dgPitchMatrix(dgFloat32(45.0f * dgDEG2RAD)));
+		dgMatrix rotation(dgPitchMatrix(dgFloat32(45.0f * dgDegreeToRad)));
 		dgFloat32 maxArea = dgFloat32(0.0f);
 		for (dgInt32 i = 0; i < 8; i++) {
 			SupportVertex(matrix[1], 3);

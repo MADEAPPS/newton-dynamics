@@ -1398,7 +1398,7 @@ bool dgCollisionCompoundFractured::CanChunk (dgConectivityGraph::dgListNode* con
 //			projection.StoreScalar(&val);
 			dgFloat32 val = projection.GetScalar();
 			dgAssert (val > dgFloat32 (-1.0f));
-			dgFloat32 angle = dgAcos (val) - dgFloat32 (90.0f * dgDEG2RAD) + dgFloat32 (15.0f * dgDEG2RAD);
+			dgFloat32 angle = dgAcos (val) - dgFloat32 (90.0f * dgDegreeToRad) + dgFloat32 (15.0f * dgDegreeToRad);
 			dgVector axis (himespherePlane.CrossProduct(directionsMap[i]));
 			axis = axis.Normalize();
 			dgQuaternion rot (axis, angle);

@@ -306,7 +306,7 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	m_globalCentreOfMass += m_veloc.Scale (timestep); 
 	dgFloat32 omegaMag2 = m_omega.DotProduct(m_omega).GetScalar();
 #ifdef _DEBUG
-	const dgFloat32 err = dgFloat32(90.0f * dgDEG2RAD);
+	const dgFloat32 err = dgFloat32(90.0f * dgDegreeToRad);
 	const dgFloat32 err2 = err * err;
 	const dgFloat32 step2 = omegaMag2 * timestep * timestep;
 	if (step2 > err2) {
@@ -315,7 +315,7 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 #endif
 
 	// this is correct
-	if (omegaMag2 > ((dgFloat32 (0.0125f) * dgDEG2RAD) * (dgFloat32 (0.0125f) * dgDEG2RAD))) {
+	if (omegaMag2 > ((dgFloat32 (0.0125f) * dgDegreeToRad) * (dgFloat32 (0.0125f) * dgDegreeToRad))) {
 		dgFloat32 invOmegaMag = dgRsqrt (omegaMag2);
 		dgVector omegaAxis (m_omega.Scale (invOmegaMag));
 		dgFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;

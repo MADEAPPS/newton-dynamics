@@ -583,60 +583,23 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 	if (body->m_gyroTorqueOn) {
 		dgVector dtHalf(timestep * dgVector::m_half);
 		dgMatrix matrix(body->m_gyroRotation, dgVector::m_wOne);
-dgFloat32 xxx = dgRAD2DEG * dgAtan2 (matrix[0][2], matrix[0][0]);
-dgTrace (("%f\n", xxx));
-if (xxx < -90.0)
-xxx *=1;
-
 		dgVector localOmega(matrix.UnrotateVector(body->m_omega));
 		dgVector localTorque(matrix.UnrotateVector(torque));
 
-		// and solving for alpha we get the angular acceleration at t + dt
-		// calculate gradient at a full time step
-		dgVector gradientStep(localTorque * timestep);
-
 		// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
 		dgVector dw(localOmega * dtHalf);
-
 		dgVector inertia(body->m_mass);
-		dgFloat32 jacobianMatrix[3][3];
 
-		jacobianMatrix[0][0] = inertia[0];
-		jacobianMatrix[0][1] = (inertia[2] - inertia[1]) * dw[2];
-		jacobianMatrix[0][2] = (inertia[2] - inertia[1]) * dw[1];
+		dgMatrix jacobianMatrix(
+			dgVector(inertia[0], (inertia[2] - inertia[1]) * dw[2], (inertia[2] - inertia[1]) * dw[1], dgFloat32(0.0f)),
+			dgVector((inertia[0] - inertia[2]) * dw[2], inertia[1], (inertia[0] - inertia[2]) * dw[0], dgFloat32(1.0f)),
+			dgVector((inertia[1] - inertia[0]) * dw[1], (inertia[1] - inertia[0]) * dw[0], inertia[2], dgFloat32(1.0f)),
+			dgVector::m_wOne);
 
-		jacobianMatrix[1][0] = (inertia[0] - inertia[2]) * dw[2];
-		jacobianMatrix[1][1] = inertia[1];
-		jacobianMatrix[1][2] = (inertia[0] - inertia[2]) * dw[0];
-
-		jacobianMatrix[2][0] = (inertia[1] - inertia[0]) * dw[1];
-		jacobianMatrix[2][1] = (inertia[1] - inertia[0]) * dw[0];
-		jacobianMatrix[2][2] = inertia[2];
-
-		dgAssert(jacobianMatrix[0][0] > dgFloat32(0.0f));
-		dgFloat32 den = dgFloat32(1.0f) / jacobianMatrix[0][0];
-		dgFloat32 scale = jacobianMatrix[1][0] * den;
-		jacobianMatrix[1][0] -= jacobianMatrix[0][0] * scale;
-		jacobianMatrix[1][1] -= jacobianMatrix[0][1] * scale;
-		jacobianMatrix[1][2] -= jacobianMatrix[0][2] * scale;
-		gradientStep[1] -= gradientStep[0] * scale;
-
-		scale = jacobianMatrix[2][0] * den;
-		jacobianMatrix[2][0] -= jacobianMatrix[0][0] * scale;
-		jacobianMatrix[2][1] -= jacobianMatrix[0][1] * scale;
-		jacobianMatrix[2][2] -= jacobianMatrix[0][2] * scale;
-		gradientStep[2] -= gradientStep[0] * scale;
-
-		dgAssert(jacobianMatrix[1][1] > dgFloat32(0.0f));
-		scale = jacobianMatrix[2][1] / jacobianMatrix[1][1];
-		jacobianMatrix[2][1] -= jacobianMatrix[1][1] * scale;
-		jacobianMatrix[2][2] -= jacobianMatrix[1][2] * scale;
-		gradientStep[2] -= gradientStep[1] * scale;
-
-		dgAssert(jacobianMatrix[2][2] > dgFloat32(0.0f));
-		gradientStep[2] = gradientStep[2] / jacobianMatrix[2][2];
-		gradientStep[1] = (gradientStep[1] - jacobianMatrix[1][2] * gradientStep[2]) / jacobianMatrix[1][1];
-		gradientStep[0] = (gradientStep[0] - jacobianMatrix[0][1] * gradientStep[1] - jacobianMatrix[0][2] * gradientStep[2]) / jacobianMatrix[0][0];
+		// and solving for alpha we get the angular acceleration at t + dt
+		// calculate gradient at a full time step
+		//dgVector gradientStep(localTorque * timestep);
+		dgVector gradientStep (jacobianMatrix.SolveByGaussianElimination(localTorque * timestep));
 
 		dgVector omega(matrix.RotateVector(localOmega + gradientStep));
 		dgAssert(omega.m_w == dgFloat32(0.0f));

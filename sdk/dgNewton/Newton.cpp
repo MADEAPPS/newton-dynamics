@@ -6326,8 +6326,8 @@ void NewtonBallSetConeLimits(const NewtonJoint* const ball, const dFloat* pin, d
 
 	maxConeAngle = dgAbs (maxConeAngle);
 	maxTwistAngle = dgAbs (maxTwistAngle);
-	joint->SetConeLimitState ((maxConeAngle > dgDEG2RAD) ? true : false); 
-	joint->SetTwistLimitState ((maxTwistAngle > dgDEG2RAD) ? true : false);
+	joint->SetConeLimitState ((maxConeAngle > dgDegreeToRad) ? true : false); 
+	joint->SetTwistLimitState ((maxTwistAngle > dgDegreeToRad) ? true : false);
 	joint->SetLatealLimitState (false); 
 	joint->SetLimits (coneAxis, -maxConeAngle, maxConeAngle, maxTwistAngle, lateral, 0.0f, 0.0f);
 }

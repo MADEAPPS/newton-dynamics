@@ -70,9 +70,9 @@
 #endif 
 
 // some constants
-#define	dPi			  3.141592f
-#define	dRadToDegree (180.0f / dPi)
-#define	dDegreeToRad (1.0f / dRadToDegree)
+#define	dPi			  dFloat (3.141592f)
+#define	dRadToDegree (dFloat (180.0f) / dPi)
+#define	dDegreeToRad (dFloat (1.0f) / dRadToDegree)
 
 // transcendental functions
 #define	dSqrt(x)	dFloat (sqrt (dFloat(x))) 

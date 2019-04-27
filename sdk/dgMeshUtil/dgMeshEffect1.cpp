@@ -1367,7 +1367,7 @@ dgMeshEffect::dgMeshEffect(dgCollisionInstance* const collision)
 	BuildFromIndexList (&vertexFormat);
 
     RepairTJoints();
-	CalculateNormals(dgFloat32 (45.0f * dgDEG2RAD));
+	CalculateNormals(dgFloat32 (45.0f * dgDegreeToRad));
 }
 
 // create a convex hull

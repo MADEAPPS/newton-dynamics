@@ -147,7 +147,7 @@ namespace InternalSphere
 			dgFloat64 Iyz = p0.m_y * p0.m_z + p1.m_y * p1.m_z + p2.m_y * p2.m_z;	
 			dgFloat64 Ixz = p0.m_x * p0.m_z + p1.m_x * p1.m_z + p2.m_x * p2.m_z;	
 
-			if (area > dgEPSILON * 10.0) {
+			if (area > dgEpsilon * 10.0) {
 				dgFloat64 K = area / dgFloat64 (12.0);
 				//Coriolis theorem for Inertia of a triangle in an arbitrary orientation
 				Ixx = K * (Ixx + 9.0 * centre.m_x * centre.m_x);
@@ -166,7 +166,7 @@ namespace InternalSphere
 			cov += dgVector ((dgFloat32)Ixy, (dgFloat32)Ixz, (dgFloat32)Iyz, dgFloat32 (0.0f));
 		}
 
-		if (totalArea > dgEPSILON * 10.0) {
+		if (totalArea > dgEpsilon * 10.0) {
 			dgFloat64 K = dgFloat64 (1.0) / totalArea; 
 			var = var.Scale ((dgFloat32)K);
 			cov = cov.Scale ((dgFloat32)K);

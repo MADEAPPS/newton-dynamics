@@ -68,7 +68,7 @@ void dgCollisionChamferCylinder::Init (dgFloat32 radius, dgFloat32 height)
 	m_height = dgMax (dgAbs (height * dgFloat32 (0.5f)), D_MIN_CONVEX_SHAPE_SIZE);
 
 	dgFloat32 sliceAngle = dgFloat32 (0.0f);
-	dgFloat32 sliceStep = dgPI  / DG_CHAMFERCYLINDER_SLICES; 
+	dgFloat32 sliceStep = dgPi  / DG_CHAMFERCYLINDER_SLICES; 
 	dgFloat32 breakStep = dgPI2 / DG_CHAMFERCYLINDER_BRAKES;
 
 	dgMatrix rot (dgPitchMatrix (breakStep));	
@@ -156,7 +156,7 @@ void dgCollisionChamferCylinder::DebugCollision (const dgMatrix& matrix, dgColli
 	dgInt32 slices = 12;
 	dgInt32 brakes = 24;
 	dgFloat32 sliceAngle = dgFloat32 (0.0f);
-	dgFloat32 sliceStep = dgPI  / slices; 
+	dgFloat32 sliceStep = dgPi  / slices; 
 	dgFloat32 breakStep = dgPI2 / brakes;
 
 	dgTriplex pool[24 * (12 + 1)];
