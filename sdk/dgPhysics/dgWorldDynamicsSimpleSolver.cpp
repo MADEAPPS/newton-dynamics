@@ -583,6 +583,11 @@ dgJacobian dgWorldDynamicUpdate::IntegrateForceAndToque(dgDynamicBody* const bod
 	if (body->m_gyroTorqueOn) {
 		dgVector dtHalf(timestep * dgVector::m_half);
 		dgMatrix matrix(body->m_gyroRotation, dgVector::m_wOne);
+dgFloat32 xxx = dgRAD2DEG * dgAtan2 (matrix[0][2], matrix[0][0]);
+dgTrace (("%f\n", xxx));
+if (xxx < -90.0)
+xxx *=1;
+
 		dgVector localOmega(matrix.UnrotateVector(body->m_omega));
 		dgVector localTorque(matrix.UnrotateVector(torque));
 

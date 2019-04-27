@@ -36,7 +36,7 @@
 //#define DEFAULT_SCENE	0		// using NewtonMesh tool
 //#define DEFAULT_SCENE	1		// coefficients of friction
 //#define DEFAULT_SCENE	2		// coefficients of restitution
-//#define DEFAULT_SCENE	3		// gyroscope precession
+#define DEFAULT_SCENE	3		// gyroscope precession
 //#define DEFAULT_SCENE	4		// closest distance
 //#define DEFAULT_SCENE	5		// primitive collision
 //#define DEFAULT_SCENE	6		// kinematic bodies
@@ -49,7 +49,7 @@
 //#define DEFAULT_SCENE	13		// infinite user plane collision
 //#define DEFAULT_SCENE	14		// user height field Collision
 //#define DEFAULT_SCENE	15		// compound Collision
-#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
+//#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	17		// uniform Scaled Collision
 //#define DEFAULT_SCENE	18		// non uniform Scaled Collision
 //#define DEFAULT_SCENE	19		// scaled mesh collision

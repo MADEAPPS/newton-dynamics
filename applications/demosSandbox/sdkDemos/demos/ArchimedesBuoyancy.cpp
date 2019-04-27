@@ -108,7 +108,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 					// Archimedes's buoyancy principle, which is the buoyancy force is equal to the 
 					// weight of the fluid displaced by the volume under water. 
 					dVector cog(0.0f);
-					const dFloat viscousDrag = 0.997f;
+					const dFloat viscousDrag = 0.99f;
 					//const dFloat solidDentityFactor = 1.35f;
 
 					// Get the body density form the collision material.

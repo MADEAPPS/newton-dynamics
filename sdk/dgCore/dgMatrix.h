@@ -66,6 +66,7 @@ class dgMatrix
 	dgVector UntransformVector (const dgVector &v) const;
 	dgPlane TransformPlane (const dgPlane &localPlane) const;
 	dgPlane UntransformPlane (const dgPlane &globalPlane) const;
+	dgVector SolveByGaussianElimination(const dgVector &v) const;
 	void TransformBBox (const dgVector& p0local, const dgVector& p1local, dgVector& p0, dgVector& p1) const; 
 
 	void CalcPitchYawRoll (dgVector& euler0, dgVector& euler1) const;

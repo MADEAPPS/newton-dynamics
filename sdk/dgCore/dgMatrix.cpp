@@ -273,6 +273,45 @@ dgMatrix dgMatrix::Inverse4x4 () const
 	return inv;
 }
 
+dgVector dgMatrix::SolveByGaussianElimination(const dgVector &v) const
+{
+//	return  Inverse4x4().UnrotateVector(v);
+	dgMatrix tmp(*this);
+	dgVector ret(v);
+	for (dgInt32 i = 0; i < 4; i++) {
+		dgFloat32 pivot = dgAbs(tmp[i][i]);
+		if (pivot < dgFloat32(0.01f)) {
+			dgInt32 permute = i;
+			for (dgInt32 j = i + 1; j < 4; j++) {
+				dgFloat32 pivot1 = dgAbs(tmp[j][i]);
+				if (pivot1 > pivot) {
+					permute = j;
+					pivot = pivot1;
+				}
+			}
+			dgAssert(pivot > dgFloat32(1.0e-6f));
+			if (permute != i) {
+				dgSwap(ret[i], ret[permute]);
+				dgSwap(tmp[i], tmp[permute]);
+			}
+		}
+
+		for (dgInt32 j = i + 1; j < 4; j++) {
+			dgVector scale(tmp[j][i] / tmp[i][i]);
+			tmp[j] -= tmp[i] * scale;
+			ret[j] -= ret[i] * scale.GetScalar();
+			tmp[j][i] = dgFloat32(0.0f);
+		}
+	}
+
+	for (dgInt32 i = 3; i >= 0; i--) {
+		dgVector pivot(tmp[i] * ret);
+		ret[i] = (ret[i] - pivot.AddHorizontal().GetScalar() + tmp[i][i] * ret[i]) / tmp[i][i];
+	}
+
+	return ret;
+}
+
 void dgMatrix::CalcPitchYawRoll (dgVector& euler0, dgVector& euler1) const
 {
 	const dgMatrix& matrix = *this;
