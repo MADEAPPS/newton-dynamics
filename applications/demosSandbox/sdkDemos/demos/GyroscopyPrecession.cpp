@@ -234,6 +234,7 @@ static NewtonBody* CreateFlyWheel (DemoEntityManager* const scene, const dVector
 
 static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& posit, dFloat speed, dFloat radius, dFloat lenght, dFloat tiltAnsgle)
 {
+	speed *= -1.0f;
 	NewtonBody* const flyWheel = CreateFlyWheel(scene, posit, speed, radius, lenght);
 
 	dMatrix matrix(dGetIdentityMatrix());

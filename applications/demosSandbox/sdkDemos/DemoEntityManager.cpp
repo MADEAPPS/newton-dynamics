@@ -36,7 +36,7 @@
 //#define DEFAULT_SCENE	0		// using NewtonMesh tool
 //#define DEFAULT_SCENE	1		// coefficients of friction
 //#define DEFAULT_SCENE	2		// coefficients of restitution
-#define DEFAULT_SCENE	3		// gyroscope precession
+//#define DEFAULT_SCENE	3		// gyroscope precession
 //#define DEFAULT_SCENE	4		// closest distance
 //#define DEFAULT_SCENE	5		// primitive collision
 //#define DEFAULT_SCENE	6		// kinematic bodies
@@ -62,7 +62,7 @@
 //#define DEFAULT_SCENE	26		// simple convex fracturing 
 //#define DEFAULT_SCENE	27		// structured convex fracturing 
 //#define DEFAULT_SCENE	28		// multi ray casting using the threading Job scheduler
-//#define DEFAULT_SCENE	29		// standard joints
+#define DEFAULT_SCENE	29		// standard joints
 //#define DEFAULT_SCENE	30		// servo joints
 //#define DEFAULT_SCENE	31		// articulated joints
 //#define DEFAULT_SCENE	32		// six axis manipulator
@@ -900,8 +900,11 @@ void DemoEntityManager::ShowMainMenuBar()
 		{
 			// load a demo 
 			if (m_currentScene != -1) {
+				char newTitle[256];
 				Cleanup();
 				m_demosSelection[m_currentScene].m_launchDemoCallback(this);
+				sprintf (newTitle, "Newton Game Dynamics 3.14 demo: %s", m_demosSelection[m_currentScene].m_name);
+				glfwSetWindowTitle(m_mainFrame, newTitle);
 				ApplyMenuOptions();
 				ResetTimer();
 				m_currentScene = -1;
