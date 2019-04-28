@@ -124,6 +124,7 @@ void dCustomTriggerManager::PreUpdate(dFloat timestep, int threadID)
 	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 
+	m_timestep = timestep;
 	dList<dCustomTriggerController>::dListNode* node = m_triggerList.GetFirst();
 	for (int i = 0; i < threadID; i++) {
 		node = node ? node->GetNext() : NULL;

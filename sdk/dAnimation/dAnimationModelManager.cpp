@@ -91,6 +91,7 @@ void dAnimationModelManager::PreUpdate(dFloat timestep, int threadID)
 	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 
+	m_timestep = timestep;
 	dList<dAnimationJointRoot*>::dListNode* node = m_controllerList.GetFirst();
 	for (int i = 0; i < threadID; i++) {
 		node = node ? node->GetNext() : NULL;

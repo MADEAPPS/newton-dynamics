@@ -11,7 +11,7 @@
 
 #include "dAnimationStdAfx.h"
 #include "dAnimationJointRoot.h"
-#include "dAnimationRagDollEffector.h"
+#include "dAnimationRagdollEffector.h"
 
 dAnimationRagDollEffector::dAnimationRagDollEffector(dAnimationJoint* const joint)
 	:dAnimationLoopJoint(joint->GetProxyBody(), joint->GetRoot()->GetStaticWorld())
