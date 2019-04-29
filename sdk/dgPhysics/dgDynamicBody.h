@@ -85,6 +85,8 @@ class dgDynamicBody : public dgBody
 	virtual void IntegrateOpenLoopExternalForce(dgFloat32 timeStep);
 	const dgVector& GetDampCoeffcient (dgFloat32 timestep);
 
+	virtual dgJacobian IntegrateForceAndToque(const dgVector& force, const dgVector& torque, const dgVector& timestep);
+
 	private:
 	virtual void AddDampingAcceleration(dgFloat32 timestep);
 

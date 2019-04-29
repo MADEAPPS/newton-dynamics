@@ -177,6 +177,7 @@ class dgLeftHandSide
 } DG_GCC_VECTOR_ALIGMENT;
 
 
+DG_MSC_VECTOR_ALIGMENT
 class dgRightHandSide
 {
 	public:
@@ -187,19 +188,19 @@ class dgRightHandSide
 
 	dgFloat32 m_lowerBoundFrictionCoefficent;
 	dgFloat32 m_upperBoundFrictionCoefficent;
-	dgFloat32 m_gyroAccel;
-	dgFloat32 m_maxImpact;
-
 	dgFloat32 m_deltaAccel;
 	dgFloat32 m_restitution;
-	dgFloat32 m_penetration;
-	dgFloat32 m_stiffness;
 
-	//	dgFloat32 m_jinvMJt;
-	dgForceImpactPair* m_jointFeebackForce;
+	dgFloat32 m_stiffness;
+	dgFloat32 m_maxImpact;
+	dgFloat32 m_penetration;
 	dgFloat32 m_penetrationStiffness;
+
+	//dgFloat32 m_gyroAccel;
+	//dgFloat32 m_jinvMJt;
+	dgForceImpactPair* m_jointFeebackForce;
 	dgInt32 m_normalForceIndex;
-};
+} DG_GCC_VECTOR_ALIGMENT;
 
 class dgJacobianMemory
 {

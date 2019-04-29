@@ -240,6 +240,7 @@ class dgBody
 
 	dgInt32 GetSerializedID() const;
 	void CalcInvInertiaMatrix();
+	void UpdateGyroData();
 
 	void InitJointSet ();
 
@@ -266,7 +267,8 @@ class dgBody
 	dgVector m_localCentreOfMass;	
 	dgVector m_globalCentreOfMass;	
 	dgVector m_impulseForce;	
-	dgVector m_impulseTorque;	
+	dgVector m_impulseTorque;
+	dgVector m_gyroAlpha;
 	dgVector m_gyroTorque;
 	dgQuaternion m_gyroRotation;
 
@@ -287,7 +289,7 @@ class dgBody
 			dgUnsigned32 m_continueCollisionMode	: 1;
 			dgUnsigned32 m_collideWithLinkedBodies	: 1;
 			dgUnsigned32 m_transformIsDirty			: 1;
-			dgUnsigned32 m_gyroTorqueOn				: 1;
+			dgUnsigned32 m_gyroTorqueOn			: 1;
 		};
 	};
 
@@ -599,6 +601,17 @@ DG_INLINE dgBroadPhaseAggregate* dgBody::GetBroadPhaseAggregate() const
 DG_INLINE void dgBody::SetBroadPhaseAggregate(dgBroadPhaseAggregate* const aggregate)
 {
 	m_broadPhaseaggregateNode = aggregate;
+}
+
+DG_INLINE void dgBody::UpdateGyroData()
+{
+	if (m_gyroTorqueOn) {
+		m_gyroTorque = m_omega.CrossProduct(CalculateAngularMomentum());
+		m_gyroAlpha = m_invWorldInertiaMatrix.RotateVector(m_gyroTorque);
+	} else {
+		m_gyroTorque = dgVector::m_zero;
+		m_gyroAlpha = dgVector::m_zero;
+	}
 }
 
 DG_INLINE void dgBody::CalcInvInertiaMatrix ()

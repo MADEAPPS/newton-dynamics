@@ -202,8 +202,6 @@ dgUnsigned32 dgContact::JacobianDerivative (dgContraintDescritor& params)
 	return dgUnsigned32 (frictionIndex);
 }
 
-
-
 void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const dgContactMaterial& contact, dgInt32 normalIndex, dgInt32& frictionIndex) 
 {
 	dgPointParam pointData;
@@ -213,12 +211,21 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	InitPointParam (pointData, dgFloat32 (1.0f), contact.m_point, contact.m_point);
 	CalculatePointDerivative (normalIndex, params, contact.m_normal, pointData); 
 
-	dgAssert (contact.m_normal.m_w == dgFloat32 (0.0f));
-	dgVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
-	dgFloat32 restitution = contact.m_restitution;
-	dgFloat32 relVelocErr = velocError.DotProduct(contact.m_normal).GetScalar();
-	dgFloat32 penetration = dgClamp (contact.m_penetration - DG_RESTING_CONTACT_PENETRATION, dgFloat32(0.0f), dgFloat32(0.5f));
+	const dgVector veloc0 = m_body0->m_veloc;
+	const dgVector omega0 = m_body0->m_omega;
+	const dgVector veloc1 = m_body1->m_veloc;
+	const dgVector omega1 = m_body1->m_omega;
 
+	const dgVector gyroAlpha0(m_body0->m_gyroAlpha);
+	const dgVector gyroAlpha1(m_body1->m_gyroAlpha);
+
+	dgAssert (contact.m_normal.m_w == dgFloat32 (0.0f));
+	const dgJacobian &normalJacobian0 = params.m_jacobian[normalIndex].m_jacobianM0;
+	const dgJacobian &normalJacobian1 = params.m_jacobian[normalIndex].m_jacobianM1;
+
+	dgFloat32 restitution = contact.m_restitution;
+	dgFloat32 relVelocErr = -(normalJacobian0.m_linear * veloc0 + normalJacobian0.m_angular * omega0 + normalJacobian1.m_linear * veloc1 + normalJacobian1.m_angular * omega1).AddHorizontal().GetScalar();
+	dgFloat32 penetration = dgClamp (contact.m_penetration - DG_RESTING_CONTACT_PENETRATION, dgFloat32(0.0f), dgFloat32(0.5f));
 //restitution = 0.0f;
 //penetration = 0.0f;
 
@@ -238,9 +245,10 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	params.m_forceBounds[normalIndex].m_jointForce = (dgForceImpactPair*) &contact.m_normal_Force;
 	params.m_jointStiffness[normalIndex] = dgFloat32 (0.0f);
 
+	const dgFloat32 relGyro = (normalJacobian0.m_angular * m_body0->m_gyroAlpha + normalJacobian1.m_angular * m_body1->m_gyroAlpha).AddHorizontal().GetScalar();
 //	params.m_jointAccel[normalIndex] = GetMax (dgFloat32 (-4.0f), relVelocErr + penetrationVeloc) * params.m_invTimestep;
 //	params.m_jointAccel[normalIndex] = dgMax (dgFloat32 (-4.0f), relVelocErr + penetrationVeloc) * impulseOrForceScale;
-	params.m_jointAccel[normalIndex] = dgMax (dgFloat32 (-MAX_SEPARATING_SPEED), relVelocErr + penetrationVeloc) * impulseOrForceScale;
+	params.m_jointAccel[normalIndex] = dgMax (impulseOrForceScale * dgFloat32 (-MAX_SEPARATING_SPEED), relGyro + (relVelocErr + penetrationVeloc) * impulseOrForceScale);
 	if (contact.m_flags & dgContactMaterial::m_overrideNormalAccel) {
 		dgAssert(0);
 		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
@@ -253,7 +261,11 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		frictionIndex += 1;
 		dgAssert (contact.m_dir0.m_w == dgFloat32 (0.0f));
 		CalculatePointDerivative (jacobIndex, params, contact.m_dir0, pointData); 
-		relVelocErr = velocError.DotProduct(contact.m_dir0).GetScalar();
+
+		const dgJacobian &jacobian0 = params.m_jacobian[jacobIndex].m_jacobianM0;
+		const dgJacobian &jacobian1 = params.m_jacobian[jacobIndex].m_jacobianM1;
+		relVelocErr = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
+
 		params.m_forceBounds[jacobIndex].m_normalIndex = dgInt16 ((contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_INDEPENDENT_ROW : normalIndex);
 		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.0f);
 
@@ -267,8 +279,9 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 			params.m_restitution[jacobIndex] = dgFloat32 (-1.0f);
 			params.m_jointAccel[jacobIndex] = contact.m_dir0_Force.m_force;
 		} else {
+			const dgFloat32 relFrictionGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 			params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
-			params.m_jointAccel[jacobIndex] = relVelocErr * impulseOrForceScale;
+			params.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * impulseOrForceScale;
 		}
 		if (dgAbs (relVelocErr) > MAX_DYNAMIC_FRICTION_SPEED) {
 			params.m_forceBounds[jacobIndex].m_low = -contact.m_dynamicFriction0;
@@ -285,7 +298,11 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		frictionIndex += 1;
 		dgAssert (contact.m_dir1.m_w == dgFloat32 (0.0f));
 		CalculatePointDerivative (jacobIndex, params, contact.m_dir1, pointData); 
-		relVelocErr = velocError.DotProduct(contact.m_dir1).GetScalar();
+
+		const dgJacobian &jacobian0 = params.m_jacobian[jacobIndex].m_jacobianM0;
+		const dgJacobian &jacobian1 = params.m_jacobian[jacobIndex].m_jacobianM1;
+		relVelocErr = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
+
 		params.m_forceBounds[jacobIndex].m_normalIndex = dgInt16 ((contact.m_flags & dgContactMaterial::m_override1Friction) ? DG_INDEPENDENT_ROW : normalIndex);
 		params.m_jointStiffness[jacobIndex] = dgFloat32(0.0f);
 		
@@ -298,8 +315,9 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 			params.m_restitution[jacobIndex] = dgFloat32 (-1.0f);
 			params.m_jointAccel[jacobIndex] = contact.m_dir1_Force.m_force;
 		} else {
+			const dgFloat32 relFrictionGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 			params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
-			params.m_jointAccel[jacobIndex] = relVelocErr * impulseOrForceScale;
+			params.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * impulseOrForceScale;
 		}
 		if (dgAbs (relVelocErr) > MAX_DYNAMIC_FRICTION_SPEED) {
 			params.m_forceBounds[jacobIndex].m_low = - contact.m_dynamicFriction1;
@@ -311,7 +329,6 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		params.m_forceBounds[jacobIndex].m_jointForce = (dgForceImpactPair*)&contact.m_dir1_Force;
 	}
 }
-
 
 void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 {
@@ -332,13 +349,18 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 	dgRightHandSide* const rightHandSide = params->m_rightHandSide;
 	const dgLeftHandSide* const leftHandSide = params->m_leftHandSide;
 
+	const dgVector gyroAlpha0(m_body0->m_gyroAlpha);
+	const dgVector gyroAlpha1(m_body1->m_gyroAlpha);
+
 	for (dgInt32 k = 0; k < count; k ++) {
 		// note: using restitution been negative to indicate that the acceleration was override
 		if (rightHandSide[k].m_restitution >= dgFloat32 (0.0f)) {
 			dgRightHandSide* const rhs = &rightHandSide[k];
 			const dgLeftHandSide* const row = &leftHandSide[k];
+			const dgJacobian &jacobian0 = row->m_Jt.m_jacobianM0;
+			const dgJacobian &jacobian1 = row->m_Jt.m_jacobianM1;
 
-			dgVector relVeloc (row->m_Jt.m_jacobianM0.m_linear * bodyVeloc0 + row->m_Jt.m_jacobianM0.m_angular * bodyOmega0 + row->m_Jt.m_jacobianM1.m_linear * bodyVeloc1 + row->m_Jt.m_jacobianM1.m_angular * bodyOmega1);
+			dgVector relVeloc (jacobian0.m_linear * bodyVeloc0 + jacobian0.m_angular * bodyOmega0 + jacobian1.m_linear * bodyVeloc1 + jacobian1.m_angular * bodyOmega1);
 			dgFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
 			dgFloat32 aRel = rhs->m_deltaAccel;
 
@@ -365,7 +387,10 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 				vRel = vRel * restitution + penetrationVeloc;
 				vRel = dgMin (MAX_SEPARATING_SPEED, vRel);
 			}
-			rhs->m_coordenateAccel = aRel - vRel * invTimestep;
+
+			const dgFloat32 relGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
+			//dgFloat32 relGyro = dgFloat32 (0.0f);
+			rhs->m_coordenateAccel = relGyro + aRel - vRel * invTimestep;
 		}
 	}
 }

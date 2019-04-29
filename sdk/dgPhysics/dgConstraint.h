@@ -193,8 +193,6 @@ class dgConstraint
 		dgVector m_r1;
 		dgVector m_posit0;
 		dgVector m_posit1;
-		dgVector m_veloc0;
-		dgVector m_veloc1;
 		dgFloat32 m_stiffness;
 	};
 
