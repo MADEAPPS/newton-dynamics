@@ -1000,6 +1000,8 @@ void dgSkeletonContainer::SolveLcp(dgInt32 size, const dgFloat32* const matrix, 
 			base += size;
 		}
 	}
+
+//	dgTrace(("%d %f\n", iterCount, tolerance));
 }
 
 // New solver faster more accurate but less stable, needs more testing

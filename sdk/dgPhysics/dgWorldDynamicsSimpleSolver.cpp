@@ -700,7 +700,8 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			accNorm = dgFloat32(0.0f);
 			for (dgInt32 j = 0; j < jointCount; j++) {
 				dgJointInfo* const jointInfo = &constraintArray[j];
-				if (!jointInfo->m_joint->IsSkeleton()) {
+				//if (!jointInfo->m_joint->IsSkeleton()) 
+				{
 					//dgFloat32 accel2 = CalculateJointForce_3_13(jointInfo, bodyArray, internalForces, leftHandSide);
 					dgFloat32 accel2 = CalculateJointForce(jointInfo, bodyArray, internalForces, leftHandSide, rightHandSide);
 					accNorm += accel2;
