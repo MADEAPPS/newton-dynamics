@@ -227,10 +227,19 @@ void dCustomCorkScrew::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 	dFloat angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_up[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	if (dAbs(angle0) > dFloat(5.0f) * dDegreeToRad) {
+		const dFloat alpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + angle0 / (timestep * timestep);
+		NewtonUserJointSetRowAcceleration(m_joint, alpha);
+	}
 
 	dFloat angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	NewtonUserJointAddAngularRow(m_joint, angle1, &matrix1.m_right[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	if (dAbs(angle1) > dFloat(5.0f) * dDegreeToRad) {
+		const dFloat alpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + angle1 / (timestep * timestep);
+		NewtonUserJointSetRowAcceleration(m_joint, alpha);
+	}
+
 
 dTrace(("%f %f\n", angle0 * dRadToDegree, angle1 * dRadToDegree));
 }
