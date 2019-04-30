@@ -974,15 +974,22 @@ void dgSolver::IntegrateBodiesVelocity(dgInt32 threadID)
 			const dgVector force(body->m_externalForce + forceAndTorque.m_linear);
 			const dgVector torque(body->m_externalTorque + forceAndTorque.m_angular);
 
-			const dgVector velocStep((force.Scale(body->m_invMass.m_w)) * timestep4);
-			const dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)) * timestep4);
+			//const dgVector velocStep((force.Scale(body->m_invMass.m_w)) * timestep4);
+			//const dgVector omegaStep((body->m_invWorldInertiaMatrix.RotateVector(torque)) * timestep4);
+
+			const dgJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
 
 			if (!body->m_resting) {
-				body->m_veloc += velocStep;
-				body->m_omega += omegaStep;
+				//body->m_veloc += velocStep;
+				//body->m_omega += omegaStep;
+				body->m_veloc += velocStep.m_linear;
+				body->m_omega += velocStep.m_angular;
 			} else {
-				const dgVector velocStep2(velocStep.DotProduct(velocStep));
-				const dgVector omegaStep2(omegaStep.DotProduct(omegaStep));
+				//const dgVector velocStep2(velocStep.DotProduct(velocStep));
+				//const dgVector omegaStep2(omegaStep.DotProduct(omegaStep));
+				const dgVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
+				const dgVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
+
 				const dgVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & m_negOne);
 				const dgInt32 equilibrium = test.GetSignMask() ? 0 : 1;
 				body->m_resting &= equilibrium;

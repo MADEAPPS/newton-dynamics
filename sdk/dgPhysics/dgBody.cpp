@@ -75,6 +75,7 @@ dgBody::dgBody()
 {
 	m_autoSleep = true;
 	m_collidable = true;
+//	m_gyroTorqueOn = true;
 	m_transformIsDirty = true;
 	m_collideWithLinkedBodies = true;
 	m_invWorldInertiaMatrix[3][3] = dgFloat32 (1.0f);
@@ -617,15 +618,15 @@ dgMatrix dgBody::CalculateInvInertiaMatrix () const
 	const dgVector invIyy(m_invMass[1]);
 	const dgVector invIzz(m_invMass[2]);
 	return dgMatrix(m_matrix.m_front.Scale(m_matrix.m_front[0]) * invIxx +
-					m_matrix.m_up.Scale(m_matrix.m_up[0])		 * invIyy +
+					m_matrix.m_up.Scale(m_matrix.m_up[0])		* invIyy +
 					m_matrix.m_right.Scale(m_matrix.m_right[0]) * invIzz,
 
 					m_matrix.m_front.Scale(m_matrix.m_front[1]) * invIxx +
-					m_matrix.m_up.Scale(m_matrix.m_up[1])		 * invIyy +
+					m_matrix.m_up.Scale(m_matrix.m_up[1])		* invIyy +
 					m_matrix.m_right.Scale(m_matrix.m_right[1]) * invIzz,
 
 					m_matrix.m_front.Scale(m_matrix.m_front[2]) * invIxx +
-					m_matrix.m_up.Scale(m_matrix.m_up[2])		 * invIyy +
+					m_matrix.m_up.Scale(m_matrix.m_up[2])		* invIyy +
 					m_matrix.m_right.Scale(m_matrix.m_right[2]) * invIzz,
 					dgVector::m_wOne);
 #endif

@@ -816,7 +816,6 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 				dgAssert(body->m_invMass.m_w > dgFloat32(0.0f));
 				body->AddDampingAcceleration(timestep);
 				body->CalcInvInertiaMatrix();
-				body->UpdateGyroData();
 			}
 
 			// re use these variables for temp storage 

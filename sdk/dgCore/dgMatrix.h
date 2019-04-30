@@ -169,30 +169,16 @@ DG_INLINE const dgVector& dgMatrix::operator[] (dgInt32  i) const
 
 DG_INLINE dgMatrix dgMatrix::Transpose () const
 {
-#if 1
 	dgMatrix inv;
 	dgVector::Transpose4x4(inv[0], inv[1], inv[2], inv[3], m_front, m_up, m_right, dgVector::m_wOne);
 	return inv;
-#else
-	return dgMatrix (dgVector (m_front.m_x, m_up.m_x, m_right.m_x, dgFloat32(0.0f)),
-					 dgVector (m_front.m_y, m_up.m_y, m_right.m_y, dgFloat32(0.0f)),
-					 dgVector (m_front.m_z, m_up.m_z, m_right.m_z, dgFloat32(0.0f)),
-					 dgVector::m_wOne);
-#endif
 }
 
 DG_INLINE dgMatrix dgMatrix::Transpose4X4 () const
 {
-#if 1
 	dgMatrix inv;
 	dgVector::Transpose4x4(inv[0], inv[1], inv[2], inv[3], m_front, m_up, m_right, m_posit);
 	return inv;
-#else
-	return dgMatrix (dgVector (m_front.m_x, m_up.m_x, m_right.m_x, m_posit.m_x),
-					 dgVector (m_front.m_y, m_up.m_y, m_right.m_y, m_posit.m_y),
-					 dgVector (m_front.m_z, m_up.m_z, m_right.m_z, m_posit.m_z),
-					 dgVector (m_front.m_w, m_up.m_w, m_right.m_w, m_posit.m_w));
-#endif
 }
 
 DG_INLINE dgVector dgMatrix::RotateVector (const dgVector &v) const
@@ -202,11 +188,8 @@ DG_INLINE dgVector dgMatrix::RotateVector (const dgVector &v) const
 
 DG_INLINE dgVector dgMatrix::UnrotateVector (const dgVector &v) const
 {
-#if 1
-	return Transpose().RotateVector(v);
-#else
-	return (v.DotProduct(m_front) & dgVector::m_xMask) + (v.DotProduct(m_up) & dgVector::m_yMask) + (v.DotProduct(m_right) & dgVector::m_zMask);
-#endif
+	//return Transpose().RotateVector(v);
+	return dgVector ((m_front * v).AddHorizontal().GetScalar(), (m_up * v).AddHorizontal().GetScalar(), (m_right * v).AddHorizontal().GetScalar(), dgFloat32 (0.0f));
 }
 
 DG_INLINE dgVector dgMatrix::TransformVector (const dgVector &v) const
@@ -237,18 +220,11 @@ DG_INLINE void dgMatrix::EigenVectors (const dgMatrix* const initialGuess)
 
 DG_INLINE dgMatrix dgMatrix::Inverse () const
 {
-#if 1
 	// much faster inverse
 	dgMatrix inv;
 	dgVector::Transpose4x4 (inv[0], inv[1], inv[2], inv[3], m_front, m_up, m_right, dgVector::m_wOne);
 	inv.m_posit -= inv[0] * m_posit.BroadcastX() + inv[1] * m_posit.BroadcastY() + inv[2] * m_posit.BroadcastZ();
 	return inv;
-#else
-	return dgMatrix (dgVector (m_front.m_x, m_up.m_x, m_right.m_x, dgFloat32(0.0f)),
-					 dgVector (m_front.m_y, m_up.m_y, m_right.m_y, dgFloat32(0.0f)),
-					 dgVector (m_front.m_z, m_up.m_z, m_right.m_z, dgFloat32(0.0f)),
-					 dgVector (- m_posit.DotProduct(m_front).GetScalar(), - m_posit.DotProduct(m_up).GetScalar(), - m_posit.DotProduct(m_right).GetScalar(), dgFloat32(1.0f)));
-#endif
 }
 
 DG_INLINE bool dgMatrix::TestIdentity() const
@@ -311,7 +287,6 @@ DG_INLINE bool dgMatrix::TestSymetric3x3() const
 		   (me[3][2] == dgFloat32 (0.0f)) &&
 		   (me[3][3] == dgFloat32 (1.0f));
 }
-
 
 DG_INLINE dgMatrix dgPitchMatrix(dgFloat32 ang)
 {

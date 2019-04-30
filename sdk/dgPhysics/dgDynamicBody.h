@@ -245,7 +245,6 @@ DG_INLINE void dgDynamicBody::SetSkeleton(dgSkeletonContainer* const skeleton)
 	m_skeleton = skeleton;
 }
 
-
 DG_INLINE const dgVector& dgDynamicBody::GetDampCoeffcient (dgFloat32 timestep)
 {
 	if (dgAbs(m_cachedTimeStep - timestep) > dgFloat32(1.0e-6f)) {

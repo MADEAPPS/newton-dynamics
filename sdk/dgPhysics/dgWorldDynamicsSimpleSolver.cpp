@@ -717,9 +717,10 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 				dgDynamicBody* const body = (dgDynamicBody*)bodyArray[i].m_body;
 				dgAssert(body->m_index == i);
 				if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-					const dgVector force(internalForces[i].m_linear + body->m_externalForce);
-					const dgVector torque(internalForces[i].m_angular + body->m_externalTorque - body->m_gyroTorque);
-					//dgJacobian velocStep(IntegrateForceAndToque(body, force, torque, timestep4));
+					const dgJacobian& forceAndTorque = internalForces[i];
+					const dgVector force(body->m_externalForce + forceAndTorque.m_linear);
+					const dgVector torque(body->m_externalTorque + forceAndTorque.m_angular);
+
 					dgJacobian velocStep(body->IntegrateForceAndToque(force, torque, timestep4));
 					if (!body->m_resting) {
 						body->m_veloc += velocStep.m_linear;

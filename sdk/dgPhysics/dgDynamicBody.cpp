@@ -373,7 +373,7 @@ dgJacobian dgDynamicBody::IntegrateForceAndToque(const dgVector& force, const dg
 		dgMatrix matrix(m_gyroRotation, dgVector::m_wOne);
 
 		dgVector localOmega(matrix.UnrotateVector(m_omega));
-		dgVector localTorque(matrix.UnrotateVector(torque));
+		dgVector localTorque(matrix.UnrotateVector(torque - m_gyroTorque));
 
 		// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
 		dgVector dw(localOmega * dtHalf);
@@ -411,7 +411,7 @@ dgJacobian dgDynamicBody::IntegrateForceAndToque(const dgVector& force, const dg
 
 		velocStep.m_angular = matrix.RotateVector(gradientStep);
 	} else {
-		velocStep.m_angular = m_invWorldInertiaMatrix.RotateVector(torque - m_gyroTorque) * timestep;
+		velocStep.m_angular = m_invWorldInertiaMatrix.RotateVector(torque) * timestep;
 		//velocStep.m_angular = velocStep.m_angular * dgVector::m_half;
 	}
 

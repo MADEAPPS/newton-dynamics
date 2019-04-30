@@ -289,7 +289,7 @@ class dgBody
 			dgUnsigned32 m_continueCollisionMode	: 1;
 			dgUnsigned32 m_collideWithLinkedBodies	: 1;
 			dgUnsigned32 m_transformIsDirty			: 1;
-			dgUnsigned32 m_gyroTorqueOn			: 1;
+			dgUnsigned32 m_gyroTorqueOn				: 1;
 		};
 	};
 
@@ -603,14 +603,27 @@ DG_INLINE void dgBody::SetBroadPhaseAggregate(dgBroadPhaseAggregate* const aggre
 	m_broadPhaseaggregateNode = aggregate;
 }
 
+DG_INLINE dgVector dgBody::CalculateLinearMomentum() const
+{
+	return dgVector(m_veloc.Scale(m_mass.m_w));
+}
+
+DG_INLINE dgVector dgBody::CalculateAngularMomentum() const
+{
+	dgVector localOmega(m_matrix.UnrotateVector(m_omega));
+	dgVector localAngularMomentum(m_mass * localOmega);
+	return m_matrix.RotateVector(localAngularMomentum);
+}
+
 DG_INLINE void dgBody::UpdateGyroData()
 {
 	if (m_gyroTorqueOn) {
 		m_gyroTorque = m_omega.CrossProduct(CalculateAngularMomentum());
 		m_gyroAlpha = m_invWorldInertiaMatrix.RotateVector(m_gyroTorque);
 	} else {
-		m_gyroTorque = dgVector::m_zero;
-		m_gyroAlpha = dgVector::m_zero;
+		dgVector zero(0.0f);
+		m_gyroTorque = zero;
+		m_gyroAlpha = zero;
 	}
 }
 
@@ -627,18 +640,8 @@ DG_INLINE void dgBody::CalcInvInertiaMatrix ()
 	dgAssert (m_invWorldInertiaMatrix[1][3] == dgFloat32 (0.0f));
 	dgAssert (m_invWorldInertiaMatrix[2][3] == dgFloat32 (0.0f));
 	dgAssert (m_invWorldInertiaMatrix[3][3] == dgFloat32 (1.0f));
-}
 
-DG_INLINE dgVector dgBody::CalculateLinearMomentum() const
-{
-	return dgVector (m_veloc.Scale (m_mass.m_w));
-}
-
-DG_INLINE dgVector dgBody::CalculateAngularMomentum() const
-{
-	dgVector localOmega(m_matrix.UnrotateVector(m_omega));
-	dgVector localAngularMomentum(m_mass * localOmega);
-	return m_matrix.RotateVector(localAngularMomentum);
+	UpdateGyroData();
 }
 
 DG_INLINE dgSkeletonContainer* dgBody::GetSkeleton() const
