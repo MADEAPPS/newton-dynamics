@@ -174,6 +174,7 @@ void dCustomCorkScrew::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0,
 
 void dCustomCorkScrew::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
+/*
 	dMatrix localMatrix(matrix0 * matrix1.Inverse());
 	dVector euler0;
 	dVector euler1;
@@ -214,6 +215,24 @@ void dCustomCorkScrew::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 	}
+*/
+
+//	dMatrix localMatrix(matrix0 * matrix1.Inverse());
+//	dVector euler0;
+//	dVector euler1;
+//	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+//	dVector rollPin(dSin(euler0[1]), dFloat(0.0f), dCos(euler0[1]), dFloat(0.0f));
+//	rollPin = matrix1.RotateVector(rollPin);
+
+	dFloat angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+	NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_up[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
+	dFloat angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+	NewtonUserJointAddAngularRow(m_joint, angle1, &matrix1.m_right[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
+dTrace(("%f %f\n", angle0 * dRadToDegree, angle1 * dRadToDegree));
 }
 
 void dCustomCorkScrew::Debug(dDebugDisplay* const debugDisplay) const
