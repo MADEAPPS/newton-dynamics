@@ -222,7 +222,7 @@ void dCustomDoubleHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const 
 		}
 	}
 	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-	dFloat accel0 = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed0 * invTimeStep;
+	dFloat accel0 = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + currentSpeed0 * invTimeStep;
 	NewtonUserJointSetRowAcceleration(m_joint, accel0);
 	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque0);
 	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque0);
@@ -247,7 +247,7 @@ void dCustomDoubleHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const 
 		}
 
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
+		dFloat accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + currentSpeed * invTimeStep;
 		NewtonUserJointSetRowAcceleration(m_joint, accel);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque0);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque0);
@@ -274,7 +274,7 @@ void dCustomDoubleHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const 
 	}
 
 	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
-	dFloat accel1 = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed1 * invTimeStep;
+	dFloat accel1 = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + currentSpeed1 * invTimeStep;
 	NewtonUserJointSetRowAcceleration(m_joint, accel1);
 	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque1);
 	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque1);
@@ -298,7 +298,7 @@ void dCustomDoubleHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const 
 		}
 
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
-		dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
+		dFloat accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + currentSpeed * invTimeStep;
 		NewtonUserJointSetRowAcceleration(m_joint, accel);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque1);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque1);

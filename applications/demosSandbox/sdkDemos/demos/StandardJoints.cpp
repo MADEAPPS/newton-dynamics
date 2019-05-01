@@ -436,6 +436,8 @@ static void AddSliderBug(DemoEntityManager* const scene, const dVector& origin)
 	dMatrix matrix;
 	NewtonBodyGetMatrix(cylinder, &matrix[0][0]);
 	dCustomCorkScrew* const slider = new dCustomCorkScrew(matrix, outerBody, cylinder);
+//	dCustomSlider* const slider = new dCustomSlider(matrix, outerBody, cylinder);
+//	dCustomSlidingContact* const slider = new dCustomSlidingContact(matrix, outerBody, cylinder);
 
 	// set limit on second axis
 	slider->EnableLimits(true);

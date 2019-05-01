@@ -38,6 +38,7 @@ dCustomJoint::dCustomJoint ()
 	,m_world(NULL)
 	,m_userDestructor(NULL)
 	,m_stiffness(1.0f)
+	,m_maxAngleError(5.0f * dDegreeToRad)
 	,m_maxDof(0)
 	,m_autoDestroy(0)
 	,m_options()
@@ -65,6 +66,7 @@ dCustomJoint::dCustomJoint(NewtonInverseDynamics* const invDynSolver, void* cons
 	m_maxDof = 6;
 	m_autoDestroy = 0;
 	m_stiffness = 1.0f;
+	m_maxAngleError = 5.0f * dDegreeToRad;
 	m_body0 = NewtonInverseDynamicsGetBody (invDynSolver, invDynNode);
 	m_world = NewtonBodyGetWorld(m_body0);
 	m_joint = NewtonInverseDynamicsCreateEffector(invDynSolver, invDynNode, SubmitConstraints);
@@ -91,18 +93,24 @@ dCustomJoint::dCustomJoint (NewtonBody* const body0, NewtonBody* const body1, Ne
 	,m_world(NULL)
 	,m_userDestructor(NULL)
 	,m_stiffness(1.0f)
+	,m_maxAngleError(5.0f * dDegreeToRad)
 	,m_maxDof(0)
 	,m_autoDestroy(0)
 {
 	int solverModel;
+	Init(m_maxDof, body0, body1);
+
 	callback (userData, &m_localMatrix0, sizeof (m_localMatrix0));
 	callback (userData, &m_localMatrix1, sizeof (m_localMatrix1));
 	callback (userData, &m_maxDof, sizeof (m_maxDof));
+
+	Init(m_maxDof, body0, body1);
+
 	callback (userData, &m_stiffness, sizeof (m_stiffness));
+	callback (userData, &m_maxAngleError, sizeof (m_maxAngleError));
 	callback(userData, &m_options, sizeof(m_options));
 	callback(userData, &solverModel, sizeof(solverModel));
 
-	Init (m_maxDof, body0, body1);
 	SetSolverModel(solverModel);
 }
 
@@ -143,6 +151,7 @@ void dCustomJoint::Init (int maxDOF, NewtonBody* const body0, NewtonBody* const 
 	m_maxDof = maxDOF;
 	m_autoDestroy = 0;
 	m_stiffness = 1.0f;
+	m_maxAngleError = 5.0f * dDegreeToRad;
 
 	m_world	= body0 ? NewtonBodyGetWorld (body0) : NewtonBodyGetWorld (body1);
 	m_joint = NewtonConstraintCreateUserJoint (m_world, maxDOF, SubmitConstraints, m_body0, m_body1); 
@@ -154,7 +163,6 @@ void dCustomJoint::Init (int maxDOF, NewtonBody* const body0, NewtonBody* const 
 	m_userDestructor = NULL;
 }
 
-
 const dMatrix& dCustomJoint::GetMatrix0() const
 {
 	return m_localMatrix0;
@@ -164,7 +172,6 @@ const dMatrix& dCustomJoint::GetMatrix1() const
 {
 	return m_localMatrix1;
 }
-
 
 NewtonBody* dCustomJoint::GetBody0 () const
 {
@@ -184,6 +191,16 @@ NewtonJoint* dCustomJoint::GetJoint () const
 dFloat dCustomJoint::GetStiffness() const
 {
 	return m_stiffness;
+}
+
+void dCustomJoint::SetMaxAngleError(dFloat angleError)
+{
+	m_maxAngleError = dClamp (dAbs (angleError), dFloat (1.0f * dDegreeToRad), dFloat (10.0f * dDegreeToRad)); 
+}
+
+dFloat dCustomJoint::GetMaxAngleError() const
+{
+	return m_maxAngleError;
 }
 
 void dCustomJoint::SetStiffness(dFloat stiffness)
@@ -288,20 +305,14 @@ void dCustomJoint::CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) co
 	matrix1 = m_localMatrix1 * body1Matrix;
 }
 
-dFloat dCustomJoint::CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const
-{
-	cosAngle = dir.DotProduct3(cosDir);
-	sinAngle = sinDir.DotProduct3(dir.CrossProduct(cosDir));
-	return dAtan2(sinAngle, cosAngle);
-}
-
 dFloat dCustomJoint::CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir) const
 {
-	dFloat sinAngle;
-	dFloat cosAngle;
-	return CalculateAngle (dir, cosDir, sinDir, sinAngle, cosAngle);
+	dAssert(dAbs(sinDir.DotProduct3(cosDir)) < dFloat (1.0e-4f));
+	dVector projectDir(dir - sinDir.Scale(dir.DotProduct3(sinDir)));
+	dFloat cosAngle = projectDir.DotProduct3(cosDir);
+	dFloat sinAngle = sinDir.DotProduct3(projectDir.CrossProduct(cosDir));
+	return dAtan2(sinAngle, cosAngle);
 }
-
 
 void dCustomJoint::SetBodiesCollisionState (int state)
 {
@@ -364,6 +375,7 @@ void dCustomJoint::Serialize (NewtonSerializeCallback callback, void* const user
 	callback (userData, &m_localMatrix1, sizeof (m_localMatrix1));
 	callback (userData, &m_maxDof, sizeof (m_maxDof));
 	callback (userData, &m_stiffness, sizeof (m_stiffness));
+	callback (userData, &m_maxAngleError, sizeof (m_maxAngleError));
 	callback(userData, &m_options, sizeof(m_options));
 	callback(userData, &solverModel, sizeof(solverModel));
 }

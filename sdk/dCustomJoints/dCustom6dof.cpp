@@ -323,7 +323,7 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 					NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 
 					speed = 0.5f * (m_minLinearLimits[i] - posit) * invtimestep;
-					const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+					const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
 					NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
 				} else if (x > m_maxLinearLimits[i]) {
@@ -332,7 +332,7 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 					NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 
 					speed = 0.5f * (m_maxLinearLimits[i] - posit) * invtimestep;
-					const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+					const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
 					NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 				}
 			}
@@ -357,7 +357,7 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 
 				const dFloat speed = 0.5f * (m_pitch.m_minAngle - pitchAngle) * invtimestep;
-				const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+				const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
 				NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			} else if (projectAngle > m_pitch.m_maxAngle) {
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
@@ -365,7 +365,7 @@ void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
 				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 
 				const dFloat speed = 0.5f * (m_pitch.m_maxAngle - pitchAngle) * invtimestep;
-				const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+				const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
 				NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			}
 		}

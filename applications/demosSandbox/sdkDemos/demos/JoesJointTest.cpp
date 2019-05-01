@@ -459,7 +459,7 @@ if (vis) Vis::Vector (debugDisplay, matrix0.m_posit, twistAxis, 0,1,1);
 					if (!vis) {
 						NewtonUserJointAddAngularRow(m_joint, 0, &axis[0]);
 
-						dFloat restAcc = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+						dFloat restAcc = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 						dFloat limitAcc = dFloat(0.5) * errorAngle * invTimestep;
 						dFloat motorAcc = angAcc2.DotProduct3(axis);
 						if ((limitAcc>0 && motorAcc<0) || (limitAcc<0 && motorAcc>0)) motorAcc = 0; // turn off motor if working against limit
@@ -494,7 +494,7 @@ if (vis) Vis::Vector (debugDisplay, matrix0.m_posit, twistAxis, 0,1,1);
 					if (!vis) {
 						NewtonUserJointAddAngularRow(m_joint, 0, &axis[0]);
 
-						dFloat restAcc = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+						dFloat restAcc = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 						dFloat limitAcc = dFloat(0.5) * swingErrorAngle * invTimestep;
 						dFloat motorAcc = angAcc2.DotProduct3(axis);
 						if ((limitAcc>0 && motorAcc<0) || (limitAcc<0 && motorAcc>0)) motorAcc = 0; // turn off motor if working against limit
@@ -541,7 +541,7 @@ if (vis) Vis::Vector (debugDisplay, matrix0.m_posit, swingAxis.CrossProduct(twis
 				if (!vis) {
 					NewtonUserJointAddAngularRow(m_joint, 0, &axis[0]);
 
-					dFloat restAcc = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+					dFloat restAcc = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 					dFloat limitAcc = dFloat(0.5) * swingErrorAngle * invTimestep;
 					dFloat motorAcc = angAcc2.DotProduct3(axis);
 					if ((limitAcc>0 && motorAcc<0) || (limitAcc<0 && motorAcc>0)) motorAcc = 0; // turn off motor if working against limit

@@ -153,7 +153,7 @@ void dCustomSlider::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix
 
 			const dFloat invtimestep = 1.0f / timestep;
 			const dFloat speed = 0.5f * (m_minDist - m_posit) * invtimestep;
-			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
 		} else if (x > m_maxDist) {
@@ -163,7 +163,7 @@ void dCustomSlider::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix
 
 			const dFloat invtimestep = 1.0f / timestep;
 			const dFloat speed = 0.5f * (m_maxDist - m_posit) * invtimestep;
-			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
 		} else if (m_friction != 0.0f) {
@@ -187,7 +187,7 @@ void dCustomSlider::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, co
 		const dFloat invtimestep = 1.0f / timestep;
 		const dFloat speed = 0.5f * (m_minDist - m_posit) * invtimestep;
 		const dFloat springAccel = NewtonCalculateSpringDamperAcceleration(timestep, m_spring, m_posit, m_damper, m_speed);
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep + springAccel;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep + springAccel;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
 	} else if (x > m_maxDist) {
@@ -198,7 +198,7 @@ void dCustomSlider::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, co
 		const dFloat invtimestep = 1.0f / timestep;
 		const dFloat speed = 0.5f * (m_maxDist - m_posit) * invtimestep;
 		const dFloat springAccel = NewtonCalculateSpringDamperAcceleration(timestep, m_spring, m_posit, m_damper, m_speed);
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep + springAccel;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep + springAccel;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 	} else {
 		SubmitConstraintSpringDamper(matrix0, matrix1, &p0[0], &p1[0], timestep);
@@ -207,22 +207,31 @@ void dCustomSlider::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, co
 
 void dCustomSlider::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-	dMatrix localMatrix(matrix0 * matrix1.Inverse());
-	dVector euler0;
-	dVector euler1;
-	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+	const dFloat angleError = GetMaxAngleError();
 
-	dVector rollPin(dSin(euler0[1]), dFloat(0.0f), dCos(euler0[1]), dFloat(0.0f));
-	rollPin = matrix1.RotateVector(rollPin);
-
-	NewtonUserJointAddAngularRow(m_joint, -euler0[0], &matrix0[0][0]);
+	dFloat angle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
+	NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_front[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
-	NewtonUserJointAddAngularRow(m_joint, -euler0[1], &matrix1[1][0]);
+	if (dAbs(angle0) > angleError) {
+		const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle0 / (timestep * timestep);
+		NewtonUserJointSetRowAcceleration(m_joint, alpha);
+	}
+	
+	dFloat angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+	NewtonUserJointAddAngularRow(m_joint, angle1, &matrix1.m_up[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	if (dAbs(angle1) > angleError) {
+		const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle1 / (timestep * timestep);
+		NewtonUserJointSetRowAcceleration(m_joint, alpha);
+	}
 
-	NewtonUserJointAddAngularRow(m_joint, -euler0[2], &rollPin[0]);
+	dFloat angle2 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+	NewtonUserJointAddAngularRow(m_joint, angle2, &matrix1.m_right[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	if (dAbs(angle2) > angleError) {
+		const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle2 / (timestep * timestep);
+		NewtonUserJointSetRowAcceleration(m_joint, alpha);
+	}
 }
 
 void dCustomSlider::SubmitConstraints(dFloat timestep, int threadIndex)

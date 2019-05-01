@@ -296,6 +296,9 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API virtual bool IsType (dCRCTYPE type) const;
 	CUSTOM_JOINTS_API virtual const char* GetTypeName() const;
 	CUSTOM_JOINTS_API virtual dCRCTYPE GetSerializeKey() const;
+
+	CUSTOM_JOINTS_API void SetMaxAngleError(dFloat angleError);
+	CUSTOM_JOINTS_API dFloat GetMaxAngleError() const;
 	
 	// these member function are only used by the C interface or for hooking callback to customize a particular 
 	// joint without deriving a new one
@@ -325,7 +328,6 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API static void Serialize (const NewtonJoint* const me, NewtonSerializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API static void Deserialize (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
 	
-	
 	protected:
 	CUSTOM_JOINTS_API dCustomJoint (NewtonInverseDynamics* const invDynSolver, void* const invDynNode);
 	CUSTOM_JOINTS_API void Init (int maxDOF, NewtonBody* const body0, NewtonBody* const body1);
@@ -337,7 +339,6 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API void CalculateLocalMatrix (const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
 	CUSTOM_JOINTS_API static dSerializeMetaDataDictionary& GetDictionary();
 	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
-	CUSTOM_JOINTS_API dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir, dFloat& sinAngle, dFloat& cosAngle) const;
 	
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
@@ -352,6 +353,7 @@ class dCustomJoint: public dCustomAlloc
 	NewtonWorld* m_world;
 	dJointUserDestructorCallback m_userDestructor;
 	dFloat m_stiffness;
+	dFloat m_maxAngleError;
 	int m_maxDof;
 	int m_autoDestroy;
 	dOptions m_options;

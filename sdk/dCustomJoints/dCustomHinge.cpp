@@ -207,7 +207,7 @@ void dCustomHinge::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix&
 
 			const dFloat invtimestep = 1.0f / timestep;
 			const dFloat speed = 0.5f * (m_minAngle - m_curJointAngle.GetAngle()) * invtimestep;
-			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 		} else if (angle > m_maxAngle) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
@@ -216,7 +216,7 @@ void dCustomHinge::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix&
 
 			const dFloat invtimestep = 1.0f / timestep;
 			const dFloat speed = 0.5f * (m_maxAngle - m_curJointAngle.GetAngle()) * invtimestep;
-			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 		} else if (m_friction != 0.0f) {
 			m_limitReached = false;
@@ -240,7 +240,7 @@ void dCustomHinge::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, con
 		const dFloat invtimestep = 1.0f / timestep;
 		const dFloat speed = 0.5f * (m_minAngle - m_curJointAngle.GetAngle()) * invtimestep;
 		const dFloat springAccel = NewtonCalculateSpringDamperAcceleration(timestep, m_spring, m_curJointAngle.GetAngle(), m_damper, m_jointOmega);
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep + springAccel;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep + springAccel;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
 	} else if (angle > m_maxAngle) {
@@ -251,7 +251,7 @@ void dCustomHinge::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, con
 		const dFloat invtimestep = 1.0f / timestep;
 		const dFloat speed = 0.5f * (m_maxAngle - m_curJointAngle.GetAngle()) * invtimestep;
 		const dFloat springAccel = NewtonCalculateSpringDamperAcceleration(timestep, m_spring, m_curJointAngle.GetAngle(), m_damper, m_jointOmega);
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep + springAccel;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep + springAccel;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
 	} else {

@@ -924,7 +924,7 @@ void dCustomInverseDynamics::SubmitHingeConstraints(const dMatrix& matrix0, cons
 
 		const dFloat invtimestep = 1.0f / timestep;
 		const dFloat speed = 0.5f * (m_minTwistAngle - angle) * invtimestep;
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 		NewtonUserJointSetRowAsInverseDynamics(m_joint);
 
@@ -936,7 +936,7 @@ void dCustomInverseDynamics::SubmitHingeConstraints(const dMatrix& matrix0, cons
 
 		const dFloat invtimestep = 1.0f / timestep;
 		const dFloat speed = 0.5f * (m_maxTwistAngle - angle) * invtimestep;
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 		NewtonUserJointSetRowAsInverseDynamics(m_joint);
 

@@ -148,7 +148,7 @@ void dCustomWheel::SubmitAnglarStructuralRows(const dMatrix& matrix0, const dMat
 		}
 	}
 	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_front[0]);
-	dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
+	dFloat accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + currentSpeed * invTimeStep;
 	NewtonUserJointSetRowAcceleration(m_joint, accel);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 }

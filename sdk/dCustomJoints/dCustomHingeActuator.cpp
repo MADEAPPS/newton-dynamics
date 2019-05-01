@@ -149,7 +149,7 @@ void dCustomHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatri
 	}
 
 	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-	dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
+	dFloat accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + currentSpeed * invTimeStep;
 	NewtonUserJointSetRowAcceleration(m_joint, accel);
 	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque);
 	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque);

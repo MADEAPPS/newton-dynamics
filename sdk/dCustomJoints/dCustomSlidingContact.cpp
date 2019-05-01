@@ -120,7 +120,7 @@ void dCustomSlidingContact::SubmitConstraintLimits(const dMatrix& matrix0, const
 
 		const dFloat invtimestep = 1.0f / timestep;
 		const dFloat speed = 0.5f * (m_minAngle - m_curJointAngle.GetAngle()) * invtimestep;
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 	} else if (angle > m_maxAngle) {
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
@@ -129,7 +129,7 @@ void dCustomSlidingContact::SubmitConstraintLimits(const dMatrix& matrix0, const
 
 		const dFloat invtimestep = 1.0f / timestep;
 		const dFloat speed = 0.5f * (m_maxAngle - m_curJointAngle.GetAngle()) * invtimestep;
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
 	} else if (m_angularFriction != 0.0f) {
@@ -152,7 +152,7 @@ void dCustomSlidingContact::SubmitConstraintLimitSpringDamper(const dMatrix& mat
 		const dFloat invtimestep = 1.0f / timestep;
 		const dFloat speed = 0.5f * (m_minAngle - m_curJointAngle.GetAngle()) * invtimestep;
 		const dFloat springAccel = NewtonCalculateSpringDamperAcceleration(timestep, m_angularSpring, m_curJointAngle.GetAngle(), m_angularDamper, m_angularOmega);
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep + springAccel;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep + springAccel;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
 	} else if (angle > m_maxAngle) {
@@ -163,7 +163,7 @@ void dCustomSlidingContact::SubmitConstraintLimitSpringDamper(const dMatrix& mat
 		const dFloat invtimestep = 1.0f / timestep;
 		const dFloat speed = 0.5f * (m_maxAngle - m_curJointAngle.GetAngle()) * invtimestep;
 		const dFloat springAccel = NewtonCalculateSpringDamperAcceleration(timestep, m_angularSpring, m_curJointAngle.GetAngle(), m_angularDamper, m_angularOmega);
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + speed * invtimestep + springAccel;
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep + springAccel;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
 	} else {
@@ -173,6 +173,8 @@ void dCustomSlidingContact::SubmitConstraintLimitSpringDamper(const dMatrix& mat
 
 void dCustomSlidingContact::SubmitAnglarStructuralRows(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
+	dAssert (0);
+/*
 	dMatrix localMatrix(matrix0 * matrix1.Inverse());
 	dVector euler0;
 	dVector euler1;
@@ -188,10 +190,12 @@ void dCustomSlidingContact::SubmitAnglarStructuralRows(const dMatrix& matrix0, c
 
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
 	m_curJointAngle.Update(euler0.m_y);
+*/
 }
 
 void dCustomSlidingContact::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
+/*
 	// save the current joint Omega
 	dVector omega0(0.0f);
 	dVector omega1(0.0f);
@@ -200,8 +204,37 @@ void dCustomSlidingContact::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 	}
 	m_angularOmega = (omega0 - omega1).DotProduct3(matrix1[1]);
-
 	SubmitAnglarStructuralRows(matrix0, matrix1, timestep);
+*/
+
+
+	const dFloat angleError = GetMaxAngleError();
+
+	dFloat angle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
+	NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_front[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	if (dAbs(angle0) > angleError) {
+		const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle0 / (timestep * timestep);
+		NewtonUserJointSetRowAcceleration(m_joint, alpha);
+	}
+
+	dFloat angle1 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_right);
+	NewtonUserJointAddAngularRow(m_joint, angle1, &matrix1.m_right[0]);
+	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	if (dAbs(angle1) > angleError) {
+		const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle1 / (timestep * timestep);
+		NewtonUserJointSetRowAcceleration(m_joint, alpha);
+	}
+
+	dVector omega0(0.0f);
+	dVector omega1(0.0f);
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	if (m_body1) {
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+	}
+	m_angularOmega = (omega0 - omega1).DotProduct3(matrix1[1]);
+	dFloat angle2 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+	m_curJointAngle.Update(angle2);
 
 	if (m_options.m_option2) {
 		if (m_options.m_option3) {

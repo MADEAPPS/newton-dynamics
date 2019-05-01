@@ -93,7 +93,7 @@ class dKinematicEndEffector: public dAnimationRagDollEffector, public dCustomJoi
 		const dFloat linearStep = m_maxLinearSpeed * timestep;
 		for (int i = 0; i < 3; i++) {
 			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix1[i][0]);
-			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			dFloat speed = ClipParam(relPosit[i], linearStep * dAbs(relPositDir[i])) * invTimestep;
 			dFloat relAccel = speed * invTimestep + stopAccel;
 			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
@@ -132,7 +132,7 @@ class dKinematicEndEffector: public dAnimationRagDollEffector, public dCustomJoi
 
 			{
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
-				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 				dFloat omega = ClipParam(pitchAngle, angleStep * dAbs(angleDir[0])) * invTimestep;
 				dFloat relAlpha = omega * invTimestep + stopAlpha;
 				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
@@ -142,7 +142,7 @@ class dKinematicEndEffector: public dAnimationRagDollEffector, public dCustomJoi
 
 			{
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
-				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 				dFloat omega = ClipParam(coneAngle, angleStep * dAbs(angleDir[1])) * invTimestep;
 				dFloat relAlpha = omega * invTimestep + stopAlpha;
 				NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
@@ -153,7 +153,7 @@ class dKinematicEndEffector: public dAnimationRagDollEffector, public dCustomJoi
 			{
 				dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
-				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 				NewtonUserJointSetRowAcceleration(m_joint, stopAlpha);
 				NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 				NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
@@ -164,7 +164,7 @@ class dKinematicEndEffector: public dAnimationRagDollEffector, public dCustomJoi
 			// using small angular aproximation to get the joint angle;
 			{
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
-				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 				dFloat angle = dCustomJoint::CalculateAngle(&matrix0[1][0], &matrix1[1][0], &matrix0[0][0]);
 				dFloat omega = ClipParam(angle, angleStep) * invTimestep;
 				dFloat relAlpha = omega * invTimestep + stopAlpha;
@@ -175,7 +175,7 @@ class dKinematicEndEffector: public dAnimationRagDollEffector, public dCustomJoi
 
 			{
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[1][0]);
-				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 				dFloat angle = matrix1[2].DotProduct3(matrix1[0]);
 				dFloat omega = ClipParam(angle, angleStep) * invTimestep;
 				dFloat relAlpha = omega * invTimestep + stopAlpha;
@@ -186,7 +186,7 @@ class dKinematicEndEffector: public dAnimationRagDollEffector, public dCustomJoi
 
 			{
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[2][0]);
-				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAccelaration(m_joint);
+				const dFloat stopAlpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 				dFloat angle = matrix1[1].DotProduct3(matrix1[0]);
 				dFloat omega = ClipParam(angle, angleStep) * invTimestep;
 				dFloat relAlpha = omega * invTimestep + stopAlpha;

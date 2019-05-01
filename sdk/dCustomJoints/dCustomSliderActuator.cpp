@@ -170,7 +170,7 @@ void dCustomSliderActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 //dTrace(("%f\n", m_force));
 
 	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
-	dFloat accel = NewtonUserJointCalculateRowZeroAccelaration(m_joint) + currentSpeed * invTimeStep;
+	dFloat accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + currentSpeed * invTimeStep;
 	NewtonUserJointSetRowAcceleration(m_joint, accel);
 	NewtonUserJointSetRowMinimumFriction(m_joint, m_minForce);
 	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxForce);
