@@ -1356,13 +1356,13 @@ void StandardJoints (DemoEntityManager* const scene)
 //	joints still with problems
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 
-	AddSliderBug(scene, dVector(-20.0f, 0.0f, 17.0f));
+//	AddSliderBug(scene, dVector(-20.0f, 0.0f, 17.0f));
 //	AddDoubleHinge(scene, dVector(-20.0f, 0.0f, 17.0f));
 //	AddPathFollow(scene, dVector(20.0f, 0.0f, 0.0f));
 #if 1
-////	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
+//	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 //	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
-//	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
+	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 //	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
@@ -1383,7 +1383,8 @@ void StandardJoints (DemoEntityManager* const scene)
     dQuaternion rot (camMatrix);
 //	dVector origin (-50.0f, 7.0f, 0.0f, 0.0f);
 //	dVector origin(-30.0f, 7.0f, 20.0f, 0.0f);
-	dVector origin(-30.0f, 2.0f, 20.0f, 0.0f);
+//	dVector origin(-30.0f, 2.0f, 20.0f, 0.0f);
+	dVector origin(-30.0f, 2.0f, -15.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
 
