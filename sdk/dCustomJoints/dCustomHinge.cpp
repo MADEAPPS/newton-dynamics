@@ -259,13 +259,30 @@ void dCustomHinge::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, con
 	}
 }
 
-void dCustomHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& euler, dFloat timestep)
+void dCustomHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
+	const dFloat angleError = GetMaxAngleError();
 	// two rows to restrict rotation around around the parent coordinate system
-	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
+
+//	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
+//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	dFloat angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+	NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_up[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
+	if (dAbs(angle0) > angleError) {
+		const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle0 / (timestep * timestep);
+		NewtonUserJointSetRowAcceleration(m_joint, alpha);
+	}
+
+//	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
+//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	dFloat angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+	NewtonUserJointAddAngularRow(m_joint, angle1, &matrix1.m_right[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	if (dAbs(angle1) > angleError) {
+		const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle1 / (timestep * timestep);
+		NewtonUserJointSetRowAcceleration(m_joint, alpha);
+	}
 }
 
 void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
@@ -279,13 +296,14 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
 	SubmitLinearRows(0x07, matrix0, matrix1);
 
-	dMatrix localMatrix(matrix0 * matrix1.Inverse());
-	dVector euler0;
-	dVector euler1;
-	localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+//dMatrix localMatrix(matrix0 * matrix1.Inverse());
+//dVector euler0;
+//dVector euler1;
+//localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
+//dFloat xxx = CalculateAngle(matrix1.m_up, matrix0.m_up, matrix0.m_front);
 
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
-	m_curJointAngle.Update(euler0.m_x);
+	m_curJointAngle.Update(CalculateAngle(matrix1.m_up, matrix0.m_up, matrix0.m_front));
 
 	// save the current joint Omega
 	dVector omega0(0.0f);
@@ -297,7 +315,7 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 	m_jointOmega = matrix0.m_front.DotProduct3(omega0 - omega1);
 
 	// submit the angular rows.
-	SubmitAngularRow(matrix0, matrix1, euler0, timestep);
+	SubmitAngularRow(matrix0, matrix1, timestep);
 
 	if (m_options.m_option2) {
 		// the joint is motor

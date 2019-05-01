@@ -198,36 +198,11 @@ void dCustomDoubleHingeActuator::SetMaxTorque0(dFloat torque)
 }
 
 
-void dCustomDoubleHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
+void dCustomDoubleHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-	dCustomDoubleHinge::SubmitAngularRow(matrix0, matrix1, eulers, timestep);
+	dCustomDoubleHinge::SubmitAngularRow(matrix0, matrix1, timestep);
 
 	dFloat invTimeStep = 1.0f / timestep;
-/*
-	const dFloat tol0 = 0.0f;
-	dFloat angle0 = m_curJointAngle.GetAngle();
-	dFloat targetAngle0 = m_targetAngle0.GetAngle();
-	dFloat currentSpeed0 = 0.0f;
-	if (angle0 > (targetAngle0 + tol0)) {
-		currentSpeed0 = -m_motorSpeed;
-		dFloat predictAngle = angle0 + currentSpeed0 * timestep;
-		if (predictAngle < targetAngle0) {
-			currentSpeed0 = 0.5f * (targetAngle0 - angle0) * invTimeStep;
-		}
-	} else if (angle0 < (targetAngle0 - tol0)) {
-		currentSpeed0 = m_motorSpeed;
-		dFloat predictAngle = angle0 + currentSpeed0 * timestep;
-		if (predictAngle > targetAngle0) {
-			currentSpeed0 = 0.5f * (targetAngle0 - angle0) * invTimeStep;
-		}
-	}
-	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-	dFloat accel0 = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + currentSpeed0 * invTimeStep;
-	NewtonUserJointSetRowAcceleration(m_joint, accel0);
-	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque0);
-	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque0);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-*/
 	{
 		dAssert(m_motorSpeed >= 0.0f);
 		const dFloat angle = m_curJointAngle.GetAngle();
@@ -253,33 +228,7 @@ void dCustomDoubleHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const 
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque0);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	}
-/*
-	//const dFloat tol1 = m_angularRate1 * timestep;
-	const dFloat tol1 = 0.0f;
-	dFloat angle1 = m_curJointAngle1.GetAngle();
-	dFloat targetAngle1 = m_targetAngle1.GetAngle();
-	dFloat currentSpeed1 = 0.0f;
-	if (angle1 > (targetAngle1 + tol1)) {
-		currentSpeed1 = -m_angularRate1;
-		dFloat predictAngle = angle1 + currentSpeed1 * timestep;
-		if (predictAngle < targetAngle1) {
-			currentSpeed1 = 0.5f * (targetAngle1 - angle1) * invTimeStep;
-		}
-	} else if (angle1 < (targetAngle1 - tol1)) {
-		currentSpeed1 = m_angularRate1;
-		dFloat predictAngle = angle1 + currentSpeed1 * timestep;
-		if (predictAngle > targetAngle1) {
-			currentSpeed1 = 0.5f * (targetAngle1 - angle1) * invTimeStep;
-		}
-	}
 
-	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
-	dFloat accel1 = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + currentSpeed1 * invTimeStep;
-	NewtonUserJointSetRowAcceleration(m_joint, accel1);
-	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque1);
-	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque1);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-*/
 	{
 		dAssert(m_motorSpeed >= 0.0f);
 		const dFloat angle = m_curJointAngle1.GetAngle();

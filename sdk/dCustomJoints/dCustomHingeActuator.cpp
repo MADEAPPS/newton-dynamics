@@ -123,12 +123,12 @@ void dCustomHingeActuator::SetMaxTorque(dFloat torque)
 }
 
 
-void dCustomHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& eulers, dFloat timestep)
+void dCustomHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
 	// make sure not other option is activated
 	m_options.m_value = 0;
 
-	dCustomHinge::SubmitAngularRow(matrix0, matrix1, eulers, timestep);
+	dCustomHinge::SubmitAngularRow(matrix0, matrix1, timestep);
 
 	dAssert(m_motorSpeed >= 0.0f);
 	const dFloat angle = m_curJointAngle.GetAngle();

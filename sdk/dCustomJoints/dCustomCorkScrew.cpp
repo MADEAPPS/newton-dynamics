@@ -171,7 +171,6 @@ void dCustomCorkScrew::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0,
 	}
 }
 
-
 void dCustomCorkScrew::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
 	const dFloat angleError = GetMaxAngleError();
@@ -191,10 +190,8 @@ void dCustomCorkScrew::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& m
 		NewtonUserJointSetRowAcceleration(m_joint, alpha);
 	}
 
-	dFloat jointAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
-
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
-	m_curJointAngle.Update(jointAngle);
+	m_curJointAngle.Update(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front));
 
 	// save the current joint Omega
 	dVector omega0(0.0f);
@@ -263,5 +260,3 @@ void dCustomCorkScrew::Debug(dDebugDisplay* const debugDisplay) const
 		}
 	}
 }
-
-
