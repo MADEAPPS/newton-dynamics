@@ -181,9 +181,9 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 {
 	dVector size(1.0f, 1.0f, 1.0f);
 	NewtonBody* const base = CreateBox(scene, origin + dVector (0.0f,  5.0f + size.m_y + 0.25f, 0.0f, 0.0f), size.Scale (0.2f));
-	NewtonBody* const box0 = CreateCapule(scene, origin + dVector(0.0f, 5.0f, 0.0f, 0.0f), size);
-	NewtonBody* const box1 = CreateCapule(scene, origin + dVector(0.0f, 5.0f- size.m_y * 2.0f, 0.0f, 0.0f), size);
 
+	NewtonBody* const box0 = CreateCapule(scene, origin + dVector(0.0f, 5.0f, 0.0f, 0.0f), size);
+	NewtonBodySetGyroscopicTorque(box0, 1);
 	NewtonBodySetMassMatrix(base, 0.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix pinMatrix(dGrammSchmidt(dVector(0.0f, -1.0f, 0.0f, 0.0f)));
 
@@ -200,7 +200,9 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	joint0->SetConeLimits (60.0f * dDegreeToRad);
 	joint0->SetTwistLimits (-1000.0f * dDegreeToRad, 1000.0f * dDegreeToRad);
 
+/*
 	// connect first box1 to box0 the world
+	NewtonBody* const box1 = CreateCapule(scene, origin + dVector(0.0f, 5.0f - size.m_y * 2.0f, 0.0f, 0.0f), size);
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
@@ -209,6 +211,7 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	joint1->SetConeLimits(30.0f * dDegreeToRad);
 	joint1->EnableTwist(true);
 	joint1->SetTwistLimits(-30.0f * dDegreeToRad, 30.0f * dDegreeToRad);
+*/
 }
 
 static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const dVector& origin)
@@ -282,49 +285,6 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	//joint1->DisableRotationX();
 }
 
-/*
-// add force and torque to rigid body
-static void ApplyGravityForce____(const NewtonBody* body, dFloat timestep, int threadIndex)
-{
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-	dFloat mass;
-
-	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-	dVector dir(0.0f, 1.0f, 0.0f);
-	//	dVector dir(1.0f, 0.0f, 0.0f);
-	//mass = 0.0f;
-//	dVector force(dir.Scale(mass * DEMO_GRAVITY));
-//	NewtonBodySetForce(body, &force.m_x);
-
-	dMatrix matrix;
-	NewtonBodyGetMatrix(body, &matrix[0][0]);
-
-static dVector xxxxx0 (matrix.m_front);
-dVector xxxxx1 (matrix.m_front);
-dFloat xxxxx2 (xxxxx1.CrossProduct(xxxxx0).DotProduct3(dVector(0.0f, 1.0f, 0.0f, 0.0f)));
-xxxxx0 = xxxxx1;
-dTrace(("p(%f)\n", xxxxx2/timestep));
-
-	dVector sideVector((matrix.m_front.CrossProduct(dVector(0.0f, 1.0f, 0.0f, 0.0f))).Normalize());
-	dVector gyroTorque(sideVector.Scale(5.0f));
-//	NewtonBodySetTorque(body, &gyroTorque.m_x);
-
-	dVector p (matrix.m_posit + matrix.m_front.Scale (10.0f));
-	dVector v;
-	NewtonBodyGetPointVelocity(body, &p[0], &v[0]);
-//	dTrace(("p(%f %f %f) v(%f %f %f)\n", p[0], p[1], p[2], v[0], v[1], v[2]));
-
-	dMatrix inertia;
-	dVector omega(0.0f);
-	NewtonBodyGetOmega(body, &omega[0]);
-	NewtonBodyGetInertiaMatrix(body, &inertia[0][0]);
-	dVector angularMomentum (inertia.RotateVector(omega));
-//	dTrace(("w (%f %f %f)\n", omega[0], omega[1], omega[2]));
-//	dTrace(("w(%f %f %f) L(%f %f %f)\n", omega[0], omega[1], omega[2], angularMomentum[0], angularMomentum[1], angularMomentum[2]));
-}
-*/
 
 static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin)
 {
