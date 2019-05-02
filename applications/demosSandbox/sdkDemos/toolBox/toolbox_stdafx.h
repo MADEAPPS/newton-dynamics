@@ -136,12 +136,12 @@ typedef long long unsigned64;
 #include <dBaseHierarchy.h>
 
 #include <dCustomJoint.h>
-#include <dCustom6dof.h>
 #include <dCustomGear.h>
 #include <dCustomHinge.h>
 #include <dCustomPlane.h>
 #include <dCustomWheel.h>
 #include <dCustomMotor.h>
+#include <dCustomSixdof.h>
 #include <dCustomSlider.h>
 #include <dCustomPulley.h>
 #include <dCustomCorkScrew.h>

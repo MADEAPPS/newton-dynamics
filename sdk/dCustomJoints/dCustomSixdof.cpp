@@ -12,15 +12,15 @@
 
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
-#include "dCustom6dof.h"
+#include "dCustomSixdof.h"
 
 
-IMPLEMENT_CUSTOM_JOINT(dCustom6dof);
+IMPLEMENT_CUSTOM_JOINT(dCustomSixdof);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+dCustomSixdof::dCustomSixdof (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomJoint(6, child, parent)
 	,m_minLinearLimits(0.0f)
 	,m_maxLinearLimits(0.0f)
@@ -32,7 +32,7 @@ dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotFrame, NewtonBody* const chi
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
-dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotChildFrame, const dMatrix& pinAndPivotParentFrame,  NewtonBody* const child, NewtonBody* const parent)
+dCustomSixdof::dCustomSixdof (const dMatrix& pinAndPivotChildFrame, const dMatrix& pinAndPivotParentFrame,  NewtonBody* const child, NewtonBody* const parent)
 	:dCustomJoint(6, child, parent)
 	,m_minLinearLimits(0.0f)
 	,m_maxLinearLimits(0.0f)
@@ -46,11 +46,11 @@ dCustom6dof::dCustom6dof (const dMatrix& pinAndPivotChildFrame, const dMatrix& p
 	CalculateLocalMatrix(pinAndPivotParentFrame, dummy, m_localMatrix1);
 }
 
-dCustom6dof::~dCustom6dof()
+dCustomSixdof::~dCustomSixdof()
 {
 }
 
-void dCustom6dof::Deserialize (NewtonDeserializeCallback callback, void* const userData)
+void dCustomSixdof::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	callback(userData, &m_minLinearLimits, sizeof(m_minLinearLimits));
 	callback(userData, &m_maxLinearLimits, sizeof(m_maxLinearLimits));
@@ -59,7 +59,7 @@ void dCustom6dof::Deserialize (NewtonDeserializeCallback callback, void* const u
 	callback(userData, &m_pitch, sizeof(m_pitch));
 }
 
-void dCustom6dof::Serialize (NewtonSerializeCallback callback, void* const userData) const
+void dCustomSixdof::Serialize (NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomJoint::Serialize (callback, userData);
 	callback(userData, &m_minLinearLimits, sizeof (m_minLinearLimits));
@@ -69,43 +69,43 @@ void dCustom6dof::Serialize (NewtonSerializeCallback callback, void* const userD
 	callback(userData, &m_pitch, sizeof(m_pitch));
 }
 
-void dCustom6dof::DisableAxisX()
+void dCustomSixdof::DisableAxisX()
 {
 	dAssert(0);
 //	m_xAxis = 0;
 }
 
-void dCustom6dof::DisableAxisY()
+void dCustomSixdof::DisableAxisY()
 {
 	dAssert(0);
 //	m_yAxis = 0;
 }
 
-void dCustom6dof::DisableAxisZ()
+void dCustomSixdof::DisableAxisZ()
 {
 	dAssert(0);
 //	m_zAxis = 0;
 }
 
-void dCustom6dof::DisableRotationX()
+void dCustomSixdof::DisableRotationX()
 {
 	dAssert(0);
 //	m_pitchAxis = 0;
 }
 
-void dCustom6dof::DisableRotationY()
+void dCustomSixdof::DisableRotationY()
 {
 	dAssert(0);
 //	m_yawAxis = 0;
 }
 
-void dCustom6dof::DisableRotationZ()
+void dCustomSixdof::DisableRotationZ()
 {
 	dAssert(0);
 //	m_rollAxis = 0;
 }
 
-void dCustom6dof::SetLinearLimits (const dVector& minLinearLimits, const dVector& maxLinearLimits)
+void dCustomSixdof::SetLinearLimits (const dVector& minLinearLimits, const dVector& maxLinearLimits)
 {
 	for (int i = 0; i < 3; i ++) {
 		m_minLinearLimits[i] =  (dAbs (minLinearLimits[i]) < dFloat (1.0e-3f)) ? dFloat(0.0f) : -dAbs (minLinearLimits[i]);
@@ -113,50 +113,50 @@ void dCustom6dof::SetLinearLimits (const dVector& minLinearLimits, const dVector
 	}
 }
 
-void dCustom6dof::GetLinearLimits (dVector& minLinearLimits, dVector& maxLinearLimits) const
+void dCustomSixdof::GetLinearLimits (dVector& minLinearLimits, dVector& maxLinearLimits) const
 {
 	minLinearLimits = m_minLinearLimits;
 	maxLinearLimits = m_maxLinearLimits;
 }
 
-void dCustom6dof::SetYawLimits(dFloat minAngle, dFloat maxAngle)
+void dCustomSixdof::SetYawLimits(dFloat minAngle, dFloat maxAngle)
 {
 	m_yaw.m_maxAngle = dAbs(maxAngle);
 	m_yaw.m_minAngle = -dAbs(minAngle);
 }
 
-void dCustom6dof::SetRollLimits(dFloat minAngle, dFloat maxAngle)
+void dCustomSixdof::SetRollLimits(dFloat minAngle, dFloat maxAngle)
 {
 	m_roll.m_maxAngle = dAbs(maxAngle);
 	m_roll.m_minAngle = -dAbs(minAngle);
 }
 
-void dCustom6dof::SetPitchLimits(dFloat minAngle, dFloat maxAngle)
+void dCustomSixdof::SetPitchLimits(dFloat minAngle, dFloat maxAngle)
 {
 	m_pitch.m_maxAngle = dAbs(maxAngle);
 	m_pitch.m_minAngle = -dAbs(minAngle);
 }
 
-void dCustom6dof::GetYawLimits(dFloat& minAngle, dFloat& maxAngle) const
+void dCustomSixdof::GetYawLimits(dFloat& minAngle, dFloat& maxAngle) const
 {
 	maxAngle = m_yaw.m_maxAngle;
 	minAngle = m_yaw.m_minAngle;
 }
 
-void dCustom6dof::GetRollLimits(dFloat& minAngle, dFloat& maxAngle) const
+void dCustomSixdof::GetRollLimits(dFloat& minAngle, dFloat& maxAngle) const
 {
 	maxAngle = m_roll.m_maxAngle;
 	minAngle = m_roll.m_minAngle;
 }
 
-void dCustom6dof::GetPitchLimits(dFloat& minAngle, dFloat& maxAngle) const
+void dCustomSixdof::GetPitchLimits(dFloat& minAngle, dFloat& maxAngle) const
 {
 	maxAngle = m_pitch.m_maxAngle;
 	minAngle = m_pitch.m_minAngle;
 }
 
 
-void dCustom6dof::CalculateJointAngles(const dMatrix& matrix0, const dMatrix& matrix1)
+void dCustomSixdof::CalculateJointAngles(const dMatrix& matrix0, const dMatrix& matrix1)
 {
 	dMatrix localMatrix(matrix0 * matrix1.Inverse());
 	dVector euler0;
@@ -189,7 +189,7 @@ void dCustom6dof::CalculateJointAngles(const dMatrix& matrix0, const dMatrix& ma
 	m_pitch.m_currentAngle.Update(euler0.m_x);
 }
 
-void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
+void dCustomSixdof::Debug(dDebugDisplay* const debugDisplay) const
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -279,7 +279,7 @@ void dCustom6dof::Debug(dDebugDisplay* const debugDisplay) const
 }
 
 
-void dCustom6dof::SubmitConstraints (dFloat timestep, int threadIndex)
+void dCustomSixdof::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;

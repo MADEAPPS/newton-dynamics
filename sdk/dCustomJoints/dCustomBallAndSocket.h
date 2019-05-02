@@ -43,6 +43,10 @@ class dCustomBallAndSocket: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const; 
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
+
+	void SubmitAngularConeAxis (const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
+	void SubmitAngularFrontAxisAligned (const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
+	
 	void SubmitConstraintTwistLimits(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& relOmega, dFloat timestep);
 
 	dAngularIntegration m_twistAngle;

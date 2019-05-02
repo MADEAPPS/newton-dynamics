@@ -193,24 +193,25 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
 	// tilt the cone limit
-	dMatrix tiltConeMatrix (dYawMatrix(-30.0f * dDegreeToRad) * pinMatrix);
+//	dMatrix tiltConeMatrix (dYawMatrix(-30.0f * dDegreeToRad) * pinMatrix);
+	dMatrix tiltConeMatrix (dYawMatrix(0.0f * dDegreeToRad) * pinMatrix);
 	dCustomBallAndSocket* const joint0 = new dCustomBallAndSocket(pinMatrix, tiltConeMatrix, box0, base);
 	joint0->EnableCone(true);
 	joint0->EnableTwist(true);
 	joint0->SetConeLimits (60.0f * dDegreeToRad);
-	joint0->SetTwistLimits (-1000.0f * dDegreeToRad, 1000.0f * dDegreeToRad);
+//	joint0->SetTwistLimits (-1000.0f * dDegreeToRad, 1000.0f * dDegreeToRad);
+	joint0->SetTwistLimits (0.0f * dDegreeToRad, 0.0f * dDegreeToRad);
 
 	// connect first box1 to box0 the world
-	NewtonBody* const box1 = CreateCapule(scene, origin + dVector(0.0f, 5.0f - size.m_y * 2.0f, 0.0f, 0.0f), size);
-	NewtonBodySetGyroscopicTorque(box1, 1);
-	NewtonBodyGetMatrix(box1, &matrix[0][0]);
-	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
-
-	dCustomBallAndSocket* const joint1 = new dCustomBallAndSocket(pinMatrix, box1, box0);
-	joint1->EnableCone(true);
-	joint1->SetConeLimits(30.0f * dDegreeToRad);
-	joint1->EnableTwist(true);
-	joint1->SetTwistLimits(-30.0f * dDegreeToRad, 30.0f * dDegreeToRad);
+//	NewtonBody* const box1 = CreateCapule(scene, origin + dVector(0.0f, 5.0f - size.m_y * 2.0f, 0.0f, 0.0f), size);
+//	NewtonBodySetGyroscopicTorque(box1, 1);
+//	NewtonBodyGetMatrix(box1, &matrix[0][0]);
+//	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
+//	dCustomBallAndSocket* const joint1 = new dCustomBallAndSocket(pinMatrix, box1, box0);
+//	joint1->EnableCone(true);
+//	joint1->SetConeLimits(30.0f * dDegreeToRad);
+//	joint1->EnableTwist(true);
+//	joint1->SetTwistLimits(-30.0f * dDegreeToRad, 30.0f * dDegreeToRad);
 }
 
 static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const dVector& origin)
@@ -266,7 +267,7 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	dMatrix matrix0;
 	NewtonBodyGetMatrix (box0, & matrix0[0][0]);
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
-	dCustom6dof* const joint0 = new dCustom6dof (pinMatrix, box0, base);
+	dCustomSixdof* const joint0 = new dCustomSixdof (pinMatrix, box0, base);
 	joint0->SetYawLimits (-yawLimit, yawLimit);
 	joint0->SetPitchLimits(-pitchLimit, pitchLimit);
 	joint0->SetRollLimits(-rollLimit, rollLimit);
@@ -277,7 +278,7 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	dMatrix matrix1;
 	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
 	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
-	dCustom6dof* const joint1 = new dCustom6dof (pinMatrix, box1, box0);
+	dCustomSixdof* const joint1 = new dCustomSixdof (pinMatrix, box1, box0);
 	joint1->SetYawLimits(-yawLimit, yawLimit);
 	joint1->SetRollLimits(-rollLimit, rollLimit);
 	joint1->SetPitchLimits(-pitchLimit, pitchLimit);

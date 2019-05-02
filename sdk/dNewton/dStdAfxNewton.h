@@ -62,10 +62,10 @@
 
 #include <Newton.h>
 #include <dCustomJoint.h>
-#include <dCustom6dof.h>
 #include <dCustomGear.h>
 #include <dCustomHinge.h>
 #include <dCustomWheel.h>
+#include <dCustomSixdof.h>
 #include <dCustomSlider.h>
 #include <dCustomPulley.h>
 #include <dCustomCorkScrew.h>

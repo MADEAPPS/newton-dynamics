@@ -249,6 +249,7 @@ void dCustomBallAndSocket::SubmitConstraintTwistLimits(const dMatrix& matrix0, c
 	}
 }
 
+
 void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -257,53 +258,76 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
 	SubmitLinearRows(0x07, matrix0, matrix1);
-/*
+
 	const dVector& coneDir0 = matrix0.m_front;
 	const dVector& coneDir1 = matrix1.m_front;
 
 	dFloat cosAngleCos = coneDir1.DotProduct3(coneDir0);
-	dMatrix coneRotation(dGetIdentityMatrix());
-	dVector lateralDir(matrix0.m_up);
-
-	if (cosAngleCos < 0.9999f) {
-		lateralDir = coneDir1.CrossProduct(coneDir0);
-		dFloat mag2 = lateralDir.DotProduct3(lateralDir);
-		if (mag2 > 1.0e-4f) {
-			lateralDir = lateralDir.Scale(1.0f / dSqrt(mag2));
-			coneRotation = dMatrix(dQuaternion(lateralDir, dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)))), matrix1.m_posit);
-		} else {
-			lateralDir = matrix0.m_up.Scale (-1.0f);
-			coneRotation = dMatrix(dQuaternion(matrix0.m_up, 180.0f * dDegreeToRad), matrix1.m_posit);
-		}
+	if (cosAngleCos < dFloat(0.99995f)) {
+		SubmitAngularConeAxis (matrix0, matrix1, timestep);
+	} else {
+		// front axis are aligned solve by 
+		SubmitAngularFrontAxisAligned (matrix0, matrix1, timestep);
 	}
+}
 
-	dVector omega0(0.0f);
-	dVector omega1(0.0f);
-	NewtonBodyGetOmega(m_body0, &omega0[0]);
-	if (m_body1) {
-		NewtonBodyGetOmega(m_body1, &omega1[0]);
-	}
-	dVector relOmega(omega0 - omega1);
+void dCustomBallAndSocket::SubmitAngularFrontAxisAligned(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+{
+	dTrace(("%s\n", __FUNCTION__));
+}
+
+void dCustomBallAndSocket::SubmitAngularConeAxis (const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+{
+	const dVector& coneDir0 = matrix0.m_front;
+	const dVector& coneDir1 = matrix1.m_front;
+	const dVector lateralDir ((coneDir1.CrossProduct(coneDir0)).Normalize());
+	const dQuaternion coneRotation (lateralDir, dAcos(dClamp(coneDir1.DotProduct3(coneDir0), dFloat(-1.0f), dFloat(1.0f))));
+
+	//	dVector omega0(0.0f);
+	//	dVector omega1(0.0f);
+	//	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	//	if (m_body1) {
+	//		NewtonBodyGetOmega(m_body1, &omega1[0]);
+	//	}
+	//	dVector relOmega(omega0 - omega1);
 
 	// do twist angle calculations
-	dMatrix twistMatrix(matrix0 * (matrix1 * coneRotation).Inverse());
+	dMatrix coneMatrix(coneRotation, dVector(0.0f, 0.0f, 0.0f, 1.0f));
+	//dMatrix twistMatrix(matrix0 * (matrix1 * coneRotation).Inverse());
+	dMatrix twistMatrix(matrix1 * coneMatrix * matrix0.Inverse());
+	dAssert(dAbs(twistMatrix[0][1]) < 1.0e-5f);
+	dAssert(dAbs(twistMatrix[0][2]) < 1.0e-5f);
+	dAssert(dAbs(twistMatrix[0][0] - 1.0f) < 1.0e-5f);
 	dFloat twistAngle = m_twistAngle.Update(dAtan2(twistMatrix[1][2], twistMatrix[1][1]));
+
+static int xxxx;
+dTrace (("%d %f\n", xxxx, twistAngle * dRadToDegree));
+xxxx ++;
+dAssert (dAbs (twistAngle * dRadToDegree) < 10.0f);
+
+	const dFloat angleError = GetMaxAngleError();
 	if (m_options.m_option0) {
 		if ((m_minTwistAngle == 0.0f) && (m_minTwistAngle == 0.0f)) {
-			NewtonUserJointAddAngularRow(m_joint, -twistAngle, &matrix0.m_front[0]);
+			NewtonUserJointAddAngularRow(m_joint, twistAngle, &matrix0.m_front[0]);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			if (dAbs(twistAngle) > angleError) {
+				const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * twistAngle / (timestep * timestep);
+				NewtonUserJointSetRowAcceleration(m_joint, alpha);
+			}
 		} else {
 			if (m_options.m_option1) {
 				// TODO spring option
-				dAssert (0);
+				dAssert(0);
 			} else {
-				SubmitConstraintTwistLimits(matrix0, matrix1, relOmega, timestep);
+				dAssert(0);
+				//				SubmitConstraintTwistLimits(matrix0, matrix1, relOmega, timestep);
 			}
 		}
 	} else if (m_options.m_option1) {
 		// TODO spring option
-		dAssert (0);
+		dAssert(0);
 	} else if (m_twistFriction > 0.0f) {
+		dAssert(0);
 		NewtonUserJointAddAngularRow(m_joint, 0, &matrix0.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
@@ -312,8 +336,10 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
 	}
 
+return;
 	// do cone angle calculations
 	if (m_options.m_option2) {
+		dAssert(0);
 		if (m_maxConeAngle == 0.0f) {
 			dMatrix localMatrix(matrix0 * matrix1.Inverse());
 			dVector euler0;
@@ -323,50 +349,55 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			NewtonUserJointAddAngularRow(m_joint, -euler0[2], &matrix1[2][0]);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		} else {
+		}
+		else {
 			if (m_options.m_option3) {
 				// TODO spring option
 				dAssert(0);
-			} else {
-				dFloat jointOmega = relOmega.DotProduct3(lateralDir);
-				dFloat currentAngle = dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)));
-				dFloat coneAngle = currentAngle + jointOmega * timestep;
-				if (coneAngle >= m_maxConeAngle) {
-					//dQuaternion rot(lateralDir, coneAngle);
-					//dVector frontDir(rot.RotateVector(coneDir1));
-					//dVector upDir(lateralDir.CrossProduct(frontDir));
-
-					dVector upDir(lateralDir.CrossProduct(coneDir0));
-					NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
-					NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAcceleration(m_joint));
-					NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
-					NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
-					NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-					NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
-					const dFloat invtimestep = 1.0f / timestep;
-					const dFloat speed = 0.5f * (m_maxConeAngle - currentAngle) * invtimestep;
-					const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
-					NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-
-				} else if (m_coneFriction != 0) {
-					NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
-					NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAcceleration(m_joint));
-					NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
-					NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
-
-					dVector upDir(lateralDir.CrossProduct(coneDir0));
-					NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
-					NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAcceleration(m_joint));
-					NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
-					NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
-				}
+			}
+			else {
+				dAssert(0);
+				//dFloat jointOmega = relOmega.DotProduct3(lateralDir);
+				//dFloat currentAngle = dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)));
+				//dFloat coneAngle = currentAngle + jointOmega * timestep;
+				//if (coneAngle >= m_maxConeAngle) {
+				//	//dQuaternion rot(lateralDir, coneAngle);
+				//	//dVector frontDir(rot.RotateVector(coneDir1));
+				//	//dVector upDir(lateralDir.CrossProduct(frontDir));
+				//
+				//	dVector upDir(lateralDir.CrossProduct(coneDir0));
+				//	NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
+				//	NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAcceleration(m_joint));
+				//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+				//
+				//	NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
+				//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+				//	NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
+				//	const dFloat invtimestep = 1.0f / timestep;
+				//	const dFloat speed = 0.5f * (m_maxConeAngle - currentAngle) * invtimestep;
+				//	const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
+				//	NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+				//
+				//} else if (m_coneFriction != 0) {
+				//	NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
+				//	NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAcceleration(m_joint));
+				//	NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
+				//	NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
+				//
+				//	dVector upDir(lateralDir.CrossProduct(coneDir0));
+				//	NewtonUserJointAddAngularRow(m_joint, 0.0f, &upDir[0]);
+				//	NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAcceleration(m_joint));
+				//	NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
+				//	NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
+				//}
 			}
 		}
-	} else if (m_options.m_option3) {
+	}
+	else if (m_options.m_option3) {
 		// TODO spring option
 		dAssert(0);
 	} else if (m_coneFriction > 0.0f) {
+		dAssert(0);
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
 		NewtonUserJointSetRowAcceleration(m_joint, NewtonUserJointCalculateRowZeroAcceleration(m_joint));
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
@@ -378,5 +409,4 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
 	}
-*/
 }

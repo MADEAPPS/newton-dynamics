@@ -13,12 +13,12 @@
 // dCustom6DOF.h: interface for the dCustom6DOF class.
 //////////////////////////////////////////////////////////////////////
 
-#ifndef _CUSTOM_6DOF_H_
-#define _CUSTOM_6DOF_H_
+#ifndef _CUSTOM_SIXDOF_H_
+#define _CUSTOM_SIXDOF_H_
 
 #include "dCustomJoint.h"
 
-class dCustom6dof: public dCustomJoint  
+class dCustomSixdof: public dCustomJoint  
 {
 	class dAngleData
 	{
@@ -36,9 +36,9 @@ class dCustom6dof: public dCustomJoint
 	};
 
 	public:
-	CUSTOM_JOINTS_API dCustom6dof (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API dCustom6dof (const dMatrix& pinAndPivotChildFrame, const dMatrix& pinAndPivotParentFrame,  NewtonBody* const child, NewtonBody* const parent = NULL);
-	CUSTOM_JOINTS_API virtual ~dCustom6dof();
+	CUSTOM_JOINTS_API dCustomSixdof (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API dCustomSixdof (const dMatrix& pinAndPivotChildFrame, const dMatrix& pinAndPivotParentFrame,  NewtonBody* const child, NewtonBody* const parent = NULL);
+	CUSTOM_JOINTS_API virtual ~dCustomSixdof();
 
 	CUSTOM_JOINTS_API void DisableAxisX();
 	CUSTOM_JOINTS_API void DisableAxisY();
@@ -79,7 +79,7 @@ class dCustom6dof: public dCustomJoint
 	dAngleData m_yaw;
 	dAngleData m_roll;
 
-	DECLARE_CUSTOM_JOINT(dCustom6dof, dCustomJoint)
+	DECLARE_CUSTOM_JOINT(dCustomSixdof, dCustomJoint)
 };
 
 #endif

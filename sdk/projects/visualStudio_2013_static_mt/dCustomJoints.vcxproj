@@ -35,7 +35,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\dCustomJoints\dCustom6dof.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomAlloc.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomListener.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomTireSpringDG.cpp" />
@@ -79,7 +78,6 @@
     <ClCompile Include="..\..\dCustomJoints\dCustomWheel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\dCustomJoints\dCustom6dof.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomAlloc.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomListener.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomTireSpringDG.h" />
