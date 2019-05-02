@@ -18,13 +18,15 @@
 #define D_CUSTOM_PLAYER_CONTROLLER_MANAGER_H_
 
 #include "dCustomJointLibraryStdAfx.h"
-#include "dCustomControllerManager.h"
+//#include "dCustomControllerManager.h"
+#include "dCustomListener.h"
 
 
 #define PLAYER_PLUGIN_NAME				"__playerManager__"
 #define PLAYER_CONTROLLER_MAX_CONTACTS	32
 #define PLAYER_MIN_RESTRAINING_DISTANCE	1.0e-2f
 
+/*
 class dCustomPlayerController: public dCustomControllerBase
 {
 	public:
@@ -112,6 +114,35 @@ class dCustomPlayerControllerManager: public dCustomControllerManager<dCustomPla
 
 	CUSTOM_JOINTS_API virtual dCustomPlayerController* CreatePlayer (dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis);
 	CUSTOM_JOINTS_API virtual int ProcessContacts (const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const; 
+};
+*/
+
+
+class dCustomPlayerControllerManager;
+class dCustomPlayerController
+{
+	public:
+	void* m_userData;
+	NewtonBody* m_kinematicBody;
+	dCustomPlayerControllerManager* m_manager;
+};
+
+class dCustomPlayerControllerManager: public dCustomParallelListener
+{
+	public:
+	CUSTOM_JOINTS_API dCustomPlayerControllerManager(NewtonWorld* const world);
+	CUSTOM_JOINTS_API ~dCustomPlayerControllerManager();
+
+//	CUSTOM_JOINTS_API virtual void ApplyPlayerMove(dCustomPlayerController* const controller, dFloat timestep) = 0;
+	CUSTOM_JOINTS_API virtual dCustomPlayerController* CreatePlayer(dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis);
+	CUSTOM_JOINTS_API virtual int ProcessContacts(const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const;
+
+	protected:
+	virtual void PreUpdate(dFloat timestep) {}
+	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadID);
+
+	dList<dCustomPlayerController> m_playerList;
+	dFloat m_timestep;
 };
 
 #endif 

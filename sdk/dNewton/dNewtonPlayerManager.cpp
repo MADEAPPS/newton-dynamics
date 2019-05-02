@@ -37,36 +37,42 @@ dNewtonPlayerManager::~dNewtonPlayerManager ()
 
 dNewtonPlayerManager::dNewtonPlayer* dNewtonPlayerManager::GetFirstPlayer() const
 {
+	dAssert(0);
+/*
 	dListNode* const node = GetFirst();
 	if (node) {
 		return (dNewtonPlayerManager::dNewtonPlayer*) NewtonBodyGetUserData (node->GetInfo().GetBody());
 	}
+*/
 	return NULL;
 }
 
 dNewtonPlayerManager::dNewtonPlayer* dNewtonPlayerManager::GetNextPlayer(const dNewtonPlayer* const player) const
 {
+	dAssert(0);
+/*
 	dAssert (player);
 	dAssert (GetNodeFromInfo(*player->m_controller));
 	dListNode* const node = GetNodeFromInfo(*player->m_controller)->GetNext();
 	if (node) {
 		return (dNewtonPlayerManager::dNewtonPlayer*) NewtonBodyGetUserData (node->GetInfo().GetBody());
 	}
+*/
 	return NULL;
 }
 
-
-
 void dNewtonPlayerManager::ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
 {
-	dNewtonPlayer* const body = (dNewtonPlayer*) NewtonBodyGetUserData(controller->GetBody());
-	body->OnPlayerMove (timestep);
+	dAssert(0);
+//	dNewtonPlayer* const body = (dNewtonPlayer*) NewtonBodyGetUserData(controller->GetBody());
+//	body->OnPlayerMove (timestep);
 }
-
 
 dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const manager, void* const userData, dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dFloat* const upDir, const dFloat* const frontDir, dLong collisionMask)
 	:dNewtonKinematicBody(NULL)
 {
+	dAssert(0);
+/*
 	dMatrix playerAxis; 
 	playerAxis[0] = dVector (upDir); // the y axis is the character up vector
 	playerAxis[1] = dVector (frontDir); // the x axis is the character front direction
@@ -110,26 +116,31 @@ dNewtonPlayerManager::dNewtonPlayer::dNewtonPlayer (dNewtonPlayerManager* const 
 				dAssert (0);
 		}
 	}
-
+*/
 }
 
 dNewtonPlayerManager::dNewtonPlayer::~dNewtonPlayer ()
 {
+	dAssert(0);
+/*
 	NewtonBody* const body = m_controller->GetBody();	
 	if (NewtonBodyGetDestructorCallback(body)) {
 		SetBody(NULL);
 		dNewtonPlayerManager* const manager = (dNewtonPlayerManager*)m_controller->GetManager();
 		manager->DestroyController (m_controller);
 	}
+*/
 }
-
 
 void dNewtonPlayerManager::dNewtonPlayer::SetPlayerVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dFloat* const gravity, dFloat timestep)
 {
-	m_controller->SetPlayerVelocity (forwardSpeed, lateralSpeed, verticalSpeed, headingAngle, dVector(gravity), timestep);
+	dAssert(0);
+//	m_controller->SetPlayerVelocity (forwardSpeed, lateralSpeed, verticalSpeed, headingAngle, dVector(gravity), timestep);
 }
 
 dFloat dNewtonPlayerManager::dNewtonPlayer::GetPlayerHigh() const
 {
-	return m_controller->GetHigh();
+	dAssert(0);
+	return 0;
+//	return m_controller->GetHigh();
 }

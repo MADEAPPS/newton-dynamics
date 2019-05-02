@@ -110,7 +110,8 @@ class AdvancePlayerEntity: public DemoEntity
 	{
 		// add this entity to the scene for rendering
 		scene->Append(this);
-
+		dAssert(0);
+/*
 		// now make a simple player controller, 
 		dMatrix playerAxis; 
 		playerAxis[0] = dVector (0.0f, 1.0f, 0.0f, 0.0f); // the y axis is the character up vector
@@ -143,12 +144,14 @@ class AdvancePlayerEntity: public DemoEntity
 
 		SetMesh(geometry, dGetIdentityMatrix());
 		geometry->Release(); 
+*/
 	}
 
 	~AdvancePlayerEntity ()
 	{
 		// destroy the player controller and its rigid body
-		((dCustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
+		dAssert(0);
+//		((dCustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
 	void SetInput (const InputRecord& inputs)
@@ -217,6 +220,8 @@ class AdvancePlayerControllerManager: public dCustomPlayerControllerManager
 	// apply gravity 
 	virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
 	{
+		dAssert(0);
+/*
 		NewtonBody* const body = controller->GetBody();
 		AdvancePlayerEntity* const player = (AdvancePlayerEntity*) NewtonBodyGetUserData(body);
 		
@@ -225,6 +230,7 @@ class AdvancePlayerControllerManager: public dCustomPlayerControllerManager
 
 		// set player linear and angular velocity
 		controller->SetPlayerVelocity (player->m_inputs.m_forwarSpeed, player->m_inputs.m_strafeSpeed, player->m_inputs.m_jumpSpeed, player->m_inputs.m_headinAngle, gravity, timestep);
+*/
 	}
 
 
@@ -357,6 +363,8 @@ class AdvancedPlayerInputManager: public dCustomInputManager
 
 	void OnEndUpdate (dFloat timestepInSecunds)
 	{
+		dAssert(0);
+/*
         if (m_player) {
 		    DemoCamera* const camera = m_scene->GetCamera();
 
@@ -388,6 +396,7 @@ class AdvancedPlayerInputManager: public dCustomInputManager
 			    SpawnRandomProp (camera->GetNextMatrix());
 		    }
         }
+*/
 	}
 
 	void AddPlayer (AdvancePlayerEntity* const player)

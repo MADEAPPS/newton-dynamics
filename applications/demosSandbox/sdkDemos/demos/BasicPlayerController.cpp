@@ -46,6 +46,8 @@ class BasicPlayerEntity: public DemoEntity
 	BasicPlayerEntity (DemoEntityManager* const scene, dCustomPlayerControllerManager* const manager, dFloat radius, dFloat height, const dMatrix& location)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 	{
+		dAssert(0);
+/*
 		// add this entity to the scene for rendering
 		scene->Append(this);
 
@@ -89,13 +91,14 @@ class BasicPlayerEntity: public DemoEntity
 		DemoMesh* const geometry = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 		SetMesh(geometry, dGetIdentityMatrix());
 		geometry->Release(); 
+*/
 	}
-
 
 	~BasicPlayerEntity ()
 	{
 		// destroy the player controller and its rigid body
-		((dCustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
+		dAssert(0);
+//		((dCustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
 	void SetInput (const InputRecord& inputs)
@@ -130,6 +133,8 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 	// apply gravity 
 	virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
 	{
+		dAssert(0);
+/*
 		NewtonBody* const body = controller->GetBody();
 		BasicPlayerEntity* const player = (BasicPlayerEntity*) NewtonBodyGetUserData(body);
 
@@ -138,6 +143,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 
 		// set player linear and angular velocity
 		controller->SetPlayerVelocity (player->m_inputs.m_forwarSpeed, player->m_inputs.m_strafeSpeed, player->m_inputs.m_jumpSpeed, player->m_inputs.m_headinAngle, gravity, timestep);
+*/
 	}
 
 
@@ -245,6 +251,8 @@ class BasicPlayerInputManager: public dCustomInputManager
 
 	void OnEndUpdate (dFloat timestepInSecunds)
 	{
+		dAssert(0);
+/*
 		DemoCamera* const camera = m_scene->GetCamera();
 
 		dMatrix camMatrix(camera->GetNextMatrix());
@@ -274,6 +282,7 @@ class BasicPlayerInputManager: public dCustomInputManager
 		if (m_shootState) {
 			SpawnRandomProp (camera->GetNextMatrix());
 		}
+*/
 	}
 
 	void AddPlayer (BasicPlayerEntity* const player)

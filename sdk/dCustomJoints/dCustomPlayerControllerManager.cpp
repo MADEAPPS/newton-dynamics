@@ -24,6 +24,7 @@
 #define D_PLAYER_CONTACT_SKIN_THICKNESS		0.025f
 
 
+#if 0
 dCustomPlayerController::dCustomPlayerController()
 {
 }
@@ -511,4 +512,54 @@ void dCustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 	// set player velocity, position and orientation
 	NewtonBodySetVelocity(m_body, &veloc[0]);
 	NewtonBodySetMatrix (m_body, &matrix[0][0]);
+}
+#endif
+
+
+dCustomPlayerControllerManager::dCustomPlayerControllerManager(NewtonWorld* const world)
+	:dCustomParallelListener(world, PLAYER_PLUGIN_NAME)
+	,m_playerList()
+	,m_timestep(0.0f)
+{
+}
+
+dCustomPlayerControllerManager::~dCustomPlayerControllerManager()
+{
+	dAssert(m_playerList.GetCount() == 0);
+}
+
+dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayer(dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis)
+{
+	dAssert(0);
+	return NULL;
+}
+
+
+void dCustomPlayerControllerManager::PostUpdate(dFloat timestep, int threadID)
+{
+	D_TRACKTIME();
+	NewtonWorld* const world = GetWorld();
+	const int threadCount = NewtonGetThreadsCount(world);
+
+	m_timestep = timestep;
+	dList<dCustomPlayerController>::dListNode* node = m_playerList.GetFirst();
+	for (int i = 0; i < threadID; i++) {
+		node = node ? node->GetNext() : NULL;
+	}
+	if (node) {
+		dAssert(0);
+//		dCustomPlayerController* const controller = &node->GetInfo();
+//		UpdateTrigger(controller);
+		do {
+			for (int i = 0; i < threadCount; i++) {
+				node = node ? node->GetNext() : NULL;
+			}
+		} while (node);
+	}
+}
+
+int dCustomPlayerControllerManager::ProcessContacts(const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const
+{
+	dAssert(0);
+	return 0;
 }
