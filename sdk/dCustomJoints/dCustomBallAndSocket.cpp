@@ -257,7 +257,7 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
 	SubmitLinearRows(0x07, matrix0, matrix1);
-
+/*
 	const dVector& coneDir0 = matrix0.m_front;
 	const dVector& coneDir1 = matrix1.m_front;
 
@@ -273,7 +273,7 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 			coneRotation = dMatrix(dQuaternion(lateralDir, dAcos(dClamp(cosAngleCos, dFloat(-1.0f), dFloat(1.0f)))), matrix1.m_posit);
 		} else {
 			lateralDir = matrix0.m_up.Scale (-1.0f);
-			coneRotation = dMatrix(dQuaternion(matrix0.m_up, 180 * dDegreeToRad), matrix1.m_posit);
+			coneRotation = dMatrix(dQuaternion(matrix0.m_up, 180.0f * dDegreeToRad), matrix1.m_posit);
 		}
 	}
 
@@ -312,7 +312,7 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
 	}
 
-	// do twist cone angle calculations
+	// do cone angle calculations
 	if (m_options.m_option2) {
 		if (m_maxConeAngle == 0.0f) {
 			dMatrix localMatrix(matrix0 * matrix1.Inverse());
@@ -378,4 +378,5 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
 	}
+*/
 }

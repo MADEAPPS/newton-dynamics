@@ -200,9 +200,9 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	joint0->SetConeLimits (60.0f * dDegreeToRad);
 	joint0->SetTwistLimits (-1000.0f * dDegreeToRad, 1000.0f * dDegreeToRad);
 
-/*
 	// connect first box1 to box0 the world
 	NewtonBody* const box1 = CreateCapule(scene, origin + dVector(0.0f, 5.0f - size.m_y * 2.0f, 0.0f, 0.0f), size);
+	NewtonBodySetGyroscopicTorque(box1, 1);
 	NewtonBodyGetMatrix(box1, &matrix[0][0]);
 	pinMatrix.m_posit = matrix.m_posit + dVector(0.0f, size.m_y, 0.0f, 0.0f);
 
@@ -211,7 +211,6 @@ static void AddLimitedBallAndSocket (DemoEntityManager* const scene, const dVect
 	joint1->SetConeLimits(30.0f * dDegreeToRad);
 	joint1->EnableTwist(true);
 	joint1->SetTwistLimits(-30.0f * dDegreeToRad, 30.0f * dDegreeToRad);
-*/
 }
 
 static void AddBallAndSockectWithFriction (DemoEntityManager* const scene, const dVector& origin)
