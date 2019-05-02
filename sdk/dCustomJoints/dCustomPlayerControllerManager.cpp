@@ -528,12 +528,6 @@ dCustomPlayerControllerManager::~dCustomPlayerControllerManager()
 	dAssert(m_playerList.GetCount() == 0);
 }
 
-dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayer(dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis)
-{
-	dAssert(0);
-	return NULL;
-}
-
 
 void dCustomPlayerControllerManager::PostUpdate(dFloat timestep, int threadID)
 {
@@ -562,4 +556,103 @@ int dCustomPlayerControllerManager::ProcessContacts(const dCustomPlayerControlle
 {
 	dAssert(0);
 	return 0;
+}
+
+
+dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayer(const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height)
+{
+//	dAssert(stairStep >= 0.0f);
+//	dAssert(innerRadius >= 0.0f);
+//	dAssert(outerRadius >= innerRadius);
+//	dAssert(height >= stairStep);
+//	dAssert(localAxis[0].m_w == dFloat(0.0f));
+//	dAssert(localAxis[1].m_w == dFloat(0.0f));
+//	dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis)
+
+//	dCustomPlayerControllerManager* const manager = (dCustomPlayerControllerManager*)GetManager();
+	NewtonWorld* const world = GetWorld();
+
+//	SetRestrainingDistance(0.0f);
+//
+//	m_outerRadio = outerRadius;
+//	m_innerRadio = innerRadius;
+//	m_height = height;
+//	m_stairStep = stairStep;
+//	SetClimbSlope(45.0f * dDegreeToRad);
+//	m_upVector = localAxis[0];
+//	m_frontVector = localAxis[1];
+//
+//	m_groundPlane = dVector(0.0f);
+//	m_groundVelocity = dVector(0.0f);
+//
+//	const int steps = 12;
+//	dVector convexPoints[2][steps];
+//
+//	// create an inner thin cylinder
+//	dFloat shapeHigh = height;
+//	dAssert(shapeHigh > 0.0f);
+//	dVector p0(0.0f, m_innerRadio, 0.0f, 0.0f);
+//	dVector p1(shapeHigh, m_innerRadio, 0.0f, 0.0f);
+//	for (int i = 0; i < steps; i++) {
+//		dMatrix rotation(dPitchMatrix(i * 2.0f * dPi / steps));
+//		convexPoints[0][i] = localAxis.RotateVector(rotation.RotateVector(p0));
+//		convexPoints[1][i] = localAxis.RotateVector(rotation.RotateVector(p1));
+//	}
+//	NewtonCollision* const supportShape = NewtonCreateConvexHull(world, steps * 2, &convexPoints[0][0].m_x, sizeof(dVector), 0.0f, 0, NULL);
+//
+//	// create the outer thick cylinder
+//	dMatrix outerShapeMatrix(localAxis);
+//	dFloat capsuleHigh = m_height - stairStep;
+//	dAssert(capsuleHigh > 0.0f);
+//	m_sphereCastOrigin = capsuleHigh * 0.5f + stairStep;
+//	outerShapeMatrix.m_posit = outerShapeMatrix[0].Scale(m_sphereCastOrigin);
+//	outerShapeMatrix.m_posit.m_w = 1.0f;
+//	NewtonCollision* const bodyCapsule = NewtonCreateCapsule(world, 0.25f, 0.25f, 0.5f, 0, &outerShapeMatrix[0][0]);
+//	NewtonCollisionSetScale(bodyCapsule, capsuleHigh, m_outerRadio * 4.0f, m_outerRadio * 4.0f);
+
+	height = dMax (height - 2.0f * radius, dFloat (0.1f));
+	NewtonCollision* const bodyCapsule = NewtonCreateCapsule(world, radius, radius, height, 0, NULL);
+
+	// compound collision player controller
+//	NewtonCollision* const playerShape = NewtonCreateCompoundCollision(world, 0);
+//	NewtonCompoundCollisionBeginAddRemove(playerShape);
+//	NewtonCompoundCollisionAddSubCollision(playerShape, supportShape);
+//	NewtonCompoundCollisionAddSubCollision(playerShape, bodyCapsule);
+//	NewtonCompoundCollisionEndAddRemove(playerShape);
+
+	// create the kinematic body
+	dMatrix locationMatrix(dGetIdentityMatrix());
+	NewtonBody* const body = NewtonCreateKinematicBody(world, bodyCapsule, &locationMatrix[0][0]);
+
+	// players must have weight, otherwise they are infinitely strong when they collide
+	NewtonCollision* const shape = NewtonBodyGetCollision(body);
+	NewtonBodySetMassProperties(body, mass, shape);
+
+	// make the body collidable with other dynamics bodies, by default
+	NewtonBodySetCollidable(body, 1);
+
+/*
+	dFloat castHigh = capsuleHigh * 0.4f;
+	dFloat castRadio = (m_innerRadio * 0.5f > 0.05f) ? m_innerRadio * 0.5f : 0.05f;
+
+	dVector q0(0.0f, castRadio, 0.0f, 0.0f);
+	dVector q1(castHigh, castRadio, 0.0f, 0.0f);
+	for (int i = 0; i < steps; i++) {
+		dMatrix rotation(dPitchMatrix(i * 2.0f * dPi / steps));
+		convexPoints[0][i] = localAxis.RotateVector(rotation.RotateVector(q0));
+		convexPoints[1][i] = localAxis.RotateVector(rotation.RotateVector(q1));
+	}
+	m_castingShape = NewtonCreateConvexHull(world, steps * 2, &convexPoints[0][0].m_x, sizeof(dVector), 0.0f, 0, NULL);
+
+	m_supportShape = NewtonCompoundCollisionGetCollisionFromNode(shape, NewtonCompoundCollisionGetNodeByIndex(shape, 0));
+	m_upperBodyShape = NewtonCompoundCollisionGetCollisionFromNode(shape, NewtonCompoundCollisionGetNodeByIndex(shape, 1));
+	
+	NewtonDestroyCollision(supportShape);
+	NewtonDestroyCollision(playerShape);
+
+	m_isJumping = false;
+*/
+	NewtonDestroyCollision(bodyCapsule);
+
+	return NULL;
 }

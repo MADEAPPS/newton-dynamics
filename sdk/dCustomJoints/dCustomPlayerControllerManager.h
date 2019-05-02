@@ -117,8 +117,8 @@ class dCustomPlayerControllerManager: public dCustomControllerManager<dCustomPla
 };
 */
 
-
 class dCustomPlayerControllerManager;
+
 class dCustomPlayerController
 {
 	public:
@@ -134,7 +134,7 @@ class dCustomPlayerControllerManager: public dCustomParallelListener
 	CUSTOM_JOINTS_API ~dCustomPlayerControllerManager();
 
 //	CUSTOM_JOINTS_API virtual void ApplyPlayerMove(dCustomPlayerController* const controller, dFloat timestep) = 0;
-	CUSTOM_JOINTS_API virtual dCustomPlayerController* CreatePlayer(dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis);
+	CUSTOM_JOINTS_API virtual dCustomPlayerController* CreatePlayer(const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height);
 	CUSTOM_JOINTS_API virtual int ProcessContacts(const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const;
 
 	protected:

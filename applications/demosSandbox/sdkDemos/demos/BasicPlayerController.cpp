@@ -146,6 +146,11 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 */
 	}
 
+	dCustomPlayerController* MakePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
+	{
+		dMatrix localAxis(dGetIdentityMatrix());
+		return CreatePlayer(localAxis, mass, radius, height);
+	}
 
 	virtual int ProcessContacts (const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const 
 	{
@@ -335,8 +340,9 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	NewtonWorld* const world = scene->GetNewton();
 
+
 	// add an input Manage to manage the inputs and user interaction 
-	BasicPlayerInputManager* const inputManager = new BasicPlayerInputManager (scene);
+//	BasicPlayerInputManager* const inputManager = new BasicPlayerInputManager (scene);
 
 	// create a character controller manager
 	BasicPlayerControllerManager* const playerManager = new BasicPlayerControllerManager (world);
@@ -352,8 +358,10 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit.m_z = 27.254711f;
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 10.0f);
-	BasicPlayerEntity* const player = new BasicPlayerEntity (scene, playerManager, 0.5f, 1.9f, location);
+//	BasicPlayerEntity* const player = new BasicPlayerEntity (scene, playerManager, 0.5f, 1.9f, location);
+	dCustomPlayerController*  const player = playerManager->MakePlayer(location, 1.9f, 0.5, 100.0f);
 
+/*
 	// set as the player with the camera
 	inputManager->AddPlayer(player);
 
@@ -364,7 +372,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	int count = 0;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
-
+*/
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
