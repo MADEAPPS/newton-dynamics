@@ -519,15 +519,35 @@ void dCustomPlayerController::PostUpdate(dFloat timestep, int threadIndex)
 dCustomPlayerControllerManager::dCustomPlayerControllerManager(NewtonWorld* const world)
 	:dCustomParallelListener(world, PLAYER_PLUGIN_NAME)
 	,m_playerList()
-	,m_timestep(0.0f)
 {
 }
 
 dCustomPlayerControllerManager::~dCustomPlayerControllerManager()
 {
+	m_playerList.RemoveAll();
 	dAssert(m_playerList.GetCount() == 0);
 }
 
+void dCustomPlayerControllerManager::PreUpdate(dFloat timestep, int threadID)
+{
+	D_TRACKTIME();
+	NewtonWorld* const world = GetWorld();
+	const int threadCount = NewtonGetThreadsCount(world);
+
+	dList<dCustomPlayerController>::dListNode* node = m_playerList.GetFirst();
+	for (int i = 0; i < threadID; i++) {
+		node = node ? node->GetNext() : NULL;
+	}
+	if (node) {
+		dCustomPlayerController* const controller = &node->GetInfo();
+		controller->PreUpdate(timestep);
+		do {
+			for (int i = 0; i < threadCount; i++) {
+				node = node ? node->GetNext() : NULL;
+			}
+		} while (node);
+	}
+}
 
 void dCustomPlayerControllerManager::PostUpdate(dFloat timestep, int threadID)
 {
@@ -535,15 +555,13 @@ void dCustomPlayerControllerManager::PostUpdate(dFloat timestep, int threadID)
 	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 
-	m_timestep = timestep;
 	dList<dCustomPlayerController>::dListNode* node = m_playerList.GetFirst();
 	for (int i = 0; i < threadID; i++) {
 		node = node ? node->GetNext() : NULL;
 	}
 	if (node) {
-		dAssert(0);
-//		dCustomPlayerController* const controller = &node->GetInfo();
-//		UpdateTrigger(controller);
+		dCustomPlayerController* const controller = &node->GetInfo();
+		controller->PostUpdate(timestep);
 		do {
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
@@ -559,7 +577,7 @@ int dCustomPlayerControllerManager::ProcessContacts(const dCustomPlayerControlle
 }
 
 
-dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayer(const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height)
+dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayerController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height)
 {
 //	dAssert(stairStep >= 0.0f);
 //	dAssert(innerRadius >= 0.0f);
@@ -610,8 +628,11 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayer(const dMat
 //	NewtonCollision* const bodyCapsule = NewtonCreateCapsule(world, 0.25f, 0.25f, 0.5f, 0, &outerShapeMatrix[0][0]);
 //	NewtonCollisionSetScale(bodyCapsule, capsuleHigh, m_outerRadio * 4.0f, m_outerRadio * 4.0f);
 
+	dMatrix shapeMatrix(localAxis);
+	shapeMatrix.m_posit = shapeMatrix.m_front.Scale (height * 0.5f);
+	shapeMatrix.m_posit.m_w = 1.0f;
 	height = dMax (height - 2.0f * radius, dFloat (0.1f));
-	NewtonCollision* const bodyCapsule = NewtonCreateCapsule(world, radius, radius, height, 0, NULL);
+	NewtonCollision* const bodyCapsule = NewtonCreateCapsule(world, radius, radius, height, 0, &shapeMatrix[0][0]);
 
 	// compound collision player controller
 //	NewtonCollision* const playerShape = NewtonCreateCompoundCollision(world, 0);
@@ -621,8 +642,7 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayer(const dMat
 //	NewtonCompoundCollisionEndAddRemove(playerShape);
 
 	// create the kinematic body
-	dMatrix locationMatrix(dGetIdentityMatrix());
-	NewtonBody* const body = NewtonCreateKinematicBody(world, bodyCapsule, &locationMatrix[0][0]);
+	NewtonBody* const body = NewtonCreateKinematicBody(world, bodyCapsule, &location[0][0]);
 
 	// players must have weight, otherwise they are infinitely strong when they collide
 	NewtonCollision* const shape = NewtonBodyGetCollision(body);
@@ -654,5 +674,18 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayer(const dMat
 */
 	NewtonDestroyCollision(bodyCapsule);
 
-	return NULL;
+	dCustomPlayerController& controller = m_playerList.Append()->GetInfo();
+	controller.m_manager = this;
+	controller.m_kinematicBody = body;
+	return &controller;
+}
+
+
+void dCustomPlayerController::PreUpdate(dFloat timestep)
+{
+}
+
+void dCustomPlayerController::PostUpdate(dFloat timestep)
+{
+
 }

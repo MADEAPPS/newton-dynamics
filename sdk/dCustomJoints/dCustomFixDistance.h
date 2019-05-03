@@ -14,7 +14,7 @@
 #ifndef _D_CUSTOM_FIX_DISTANCE_H_
 #define _D_CUSTOM_FIX_DISTANCE_H_
 
-#include "dCustomSixdof.h"
+#include "dCustomJoint.h"
 
 
 class dCustomFixDistance: public dCustomJoint  

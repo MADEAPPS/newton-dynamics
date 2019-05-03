@@ -122,9 +122,32 @@ class dCustomPlayerControllerManager;
 class dCustomPlayerController
 {
 	public:
+	dCustomPlayerController ()
+		:m_userData(NULL)
+		,m_kinematicBody(NULL)
+		,m_manager(NULL)
+	{
+	}
+
+	~dCustomPlayerController () 
+	{
+	}
+
+	void* GetUserData () const {return m_userData;}
+	NewtonBody* GetBody() {return m_kinematicBody;}
+	dCustomPlayerControllerManager* GetManager() const {return m_manager;}
+	
+	void SetUserData(void* const userData) {m_userData = userData;}
+
+	private:
+	void PreUpdate(dFloat timestep);
+	void PostUpdate(dFloat timestep);
+
+
 	void* m_userData;
 	NewtonBody* m_kinematicBody;
 	dCustomPlayerControllerManager* m_manager;
+	friend class dCustomPlayerControllerManager;
 };
 
 class dCustomPlayerControllerManager: public dCustomParallelListener
@@ -134,15 +157,14 @@ class dCustomPlayerControllerManager: public dCustomParallelListener
 	CUSTOM_JOINTS_API ~dCustomPlayerControllerManager();
 
 //	CUSTOM_JOINTS_API virtual void ApplyPlayerMove(dCustomPlayerController* const controller, dFloat timestep) = 0;
-	CUSTOM_JOINTS_API virtual dCustomPlayerController* CreatePlayer(const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height);
+	CUSTOM_JOINTS_API virtual dCustomPlayerController* CreatePlayerController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height);
 	CUSTOM_JOINTS_API virtual int ProcessContacts(const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const;
 
 	protected:
-	virtual void PreUpdate(dFloat timestep) {}
+	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadID);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadID);
 
 	dList<dCustomPlayerController> m_playerList;
-	dFloat m_timestep;
 };
 
 #endif 

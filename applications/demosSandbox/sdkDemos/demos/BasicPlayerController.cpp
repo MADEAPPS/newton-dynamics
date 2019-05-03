@@ -146,10 +146,46 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 */
 	}
 
-	dCustomPlayerController* MakePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
+	dCustomPlayerController* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
 	{
+		// get the scene 
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
+
+		// set the play coordinate system
 		dMatrix localAxis(dGetIdentityMatrix());
-		return CreatePlayer(localAxis, mass, radius, height);
+
+		//up is first vector
+		localAxis[0] = dVector (0.0, 1.0f, 0.0f, 0.0f);
+		// up is the second vector
+		localAxis[1] = dVector (1.0, 0.0f, 0.0f, 0.0f);
+		// size if the cross product
+		localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
+
+		// make a play controller with default values.
+		dCustomPlayerController* const controller = CreatePlayerController(location, localAxis, mass, radius, height);
+
+		// get body from player, and set some parameter
+		NewtonBody* const body = controller->GetBody();
+
+		// create the visual mesh from the player collision shape
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+		DemoMesh* const geometry = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+		DemoEntity* const playerEntity = new DemoEntity(location, NULL);
+		scene->Append(playerEntity);
+		playerEntity->SetMesh(geometry, dGetIdentityMatrix());
+		geometry->Release();
+
+		// set the user data
+		NewtonBodySetUserData(body, playerEntity);
+
+		// set the transform callback
+		NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
+
+		// save player model with the controller
+		controller->SetUserData(playerEntity);
+
+		return controller;
 	}
 
 	virtual int ProcessContacts (const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const 
@@ -353,13 +389,13 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit.m_y = 5.0f;
 	location.m_posit.m_z = 0.0f;
 
-	location.m_posit.m_x = 98.710999f;
-	location.m_posit.m_y =-0.96156919f; 
-	location.m_posit.m_z = 27.254711f;
+//	location.m_posit.m_x = 98.710999f;
+//	location.m_posit.m_y =-0.96156919f; 
+//	location.m_posit.m_z = 27.254711f;
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 10.0f);
 //	BasicPlayerEntity* const player = new BasicPlayerEntity (scene, playerManager, 0.5f, 1.9f, location);
-	dCustomPlayerController*  const player = playerManager->MakePlayer(location, 1.9f, 0.5, 100.0f);
+	dCustomPlayerController*  const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 
 /*
 	// set as the player with the camera
