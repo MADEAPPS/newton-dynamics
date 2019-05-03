@@ -18,13 +18,15 @@
 #include "dCustomPlayerControllerManager.h"
 
 
-#define D_DESCRETE_MOTION_STEPS				8
-#define D_PLAYER_MAX_INTERGRATION_STEPS		8
-#define D_PLAYER_MAX_SOLVER_ITERATIONS		16
-#define D_PLAYER_CONTACT_SKIN_THICKNESS		0.025f
-
+#define D_DESCRETE_MOTION_STEPS		4
 
 #if 0
+
+//#define D_DESCRETE_MOTION_STEPS				8
+//#define D_PLAYER_MAX_INTERGRATION_STEPS		8
+//#define D_PLAYER_MAX_SOLVER_ITERATIONS		16
+//#define D_PLAYER_CONTACT_SKIN_THICKNESS		0.025f
+
 dCustomPlayerController::dCustomPlayerController()
 {
 }
@@ -587,11 +589,9 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayerController(
 //	dAssert(localAxis[1].m_w == dFloat(0.0f));
 //	dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis)
 
-//	dCustomPlayerControllerManager* const manager = (dCustomPlayerControllerManager*)GetManager();
 	NewtonWorld* const world = GetWorld();
 
 //	SetRestrainingDistance(0.0f);
-//
 //	m_outerRadio = outerRadius;
 //	m_innerRadio = innerRadius;
 //	m_height = height;
@@ -675,21 +675,42 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayerController(
 	NewtonDestroyCollision(bodyCapsule);
 
 	dCustomPlayerController& controller = m_playerList.Append()->GetInfo();
+
+	controller.m_mass = mass;
+	controller.m_invMass = 1.0f / mass;
 	controller.m_manager = this;
 	controller.m_kinematicBody = body;
 	return &controller;
 }
 
-
 void dCustomPlayerController::PreUpdate(dFloat timestep)
 {
+	m_impulse = dVector(0.0f);
 	m_manager->ApplyPlayerMove(this, timestep);
 
-	NewtonBodySetVelocity(m_kinematicBody, &m_veloc[0]);
+	dVector veloc(m_veloc + m_impulse.Scale(m_invMass));
+	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+}
+
+dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)
+{
+	return timestep;
 }
 
 void dCustomPlayerController::PostUpdate(dFloat timestep)
 {
+	dFloat timeLeft = timestep;
+	const dFloat timeEpsilon = timestep * (1.0f / 16.0f);
+	for (int i = 0; (i < D_DESCRETE_MOTION_STEPS) && (timeLeft > timeEpsilon); i++) {
+		if (timeLeft > timeEpsilon) {
+//			dAssert(0);
+		}
 
-	NewtonBodyIntegrateVelocity (m_kinematicBody, timestep);
+		dFloat predicetdTime = PredictTimestep(timestep);
+		NewtonBodyIntegrateVelocity(m_kinematicBody, predicetdTime);
+		timeLeft -= predicetdTime;
+	}
+
+	dAssert(timeLeft < timeEpsilon);
+	NewtonBodyGetVelocity(m_kinematicBody, &m_veloc[0]);
 }

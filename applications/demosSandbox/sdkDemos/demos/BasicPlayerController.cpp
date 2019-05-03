@@ -76,11 +76,6 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		// save player model with the controller
 		controller->SetUserData(playerEntity);
 
-		// set the player gravity 
-		// calculate desired linear and angular velocity form the input
-		dVector gravity(0.0f, DEMO_GRAVITY, 0.0f, 0.0f);
-		controller->SetGravity(gravity);
-
 		return controller;
 	}
 
@@ -94,12 +89,14 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 	virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
 	{
 		// calculate the gravity contribution to the velocity
-		dVector veloc (controller->GetVelocity() + controller->GetGravity().Scale (0.5f * timestep));
+		dVector gravityImpulse(0.0f, DEMO_GRAVITY * controller->GetMass() * timestep, 0.0f, 0.0f);
+
+		dVector totalImpulse (controller->GetImpulse() + gravityImpulse);
 
 		// set player linear and angular velocity
 		//controller->SetPlayerVelocity (player->m_inputs.m_forwarSpeed, player->m_inputs.m_strafeSpeed, player->m_inputs.m_jumpSpeed, player->m_inputs.m_headinAngle, gravity, timestep);
 
-		controller->SetVelocity(veloc);
+		controller->SetImpulse(totalImpulse);
 	}
 };
 
@@ -135,6 +132,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 //	location.m_posit.m_z = 27.254711f;
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 10.0f);
+	location.m_posit.m_y += 4.0f;
 	dCustomPlayerController*  const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 
 /*

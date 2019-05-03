@@ -18,7 +18,6 @@
 #define D_CUSTOM_PLAYER_CONTROLLER_MANAGER_H_
 
 #include "dCustomJointLibraryStdAfx.h"
-//#include "dCustomControllerManager.h"
 #include "dCustomListener.h"
 
 
@@ -124,7 +123,9 @@ class dCustomPlayerController
 	public:
 	dCustomPlayerController ()
 		:m_veloc(0.0f)
-		,m_gravity(0.0f)
+		,m_impulse(0.0f)
+		,m_mass(0.0f)
+		,m_invMass(0.0f)
 		,m_userData(NULL)
 		,m_kinematicBody(NULL)
 		,m_manager(NULL)
@@ -139,19 +140,24 @@ class dCustomPlayerController
 	NewtonBody* GetBody() {return m_kinematicBody;}
 	void SetUserData(void* const userData) {m_userData = userData;}
 	dCustomPlayerControllerManager* GetManager() const {return m_manager;}
-	
+
+	const dFloat GetMass() { return m_mass;}
 	const dVector& GetVelocity() {return m_veloc;}
 	void SetVelocity(const dVector& veloc) {m_veloc = veloc;}
 
-	const dVector& GetGravity() {return m_gravity;}
-	void SetGravity(const dVector& gravity) {m_gravity = gravity;}
+	const dVector& GetImpulse() {return m_impulse;}
+	void SetImpulse(const dVector& impulse) { m_impulse = impulse;}
 
 	private:
 	void PreUpdate(dFloat timestep);
 	void PostUpdate(dFloat timestep);
 
+	dFloat PredictTimestep(dFloat timestep);
+
 	dVector m_veloc;
-	dVector m_gravity;
+	dVector m_impulse;
+	dFloat m_mass;
+	dFloat m_invMass;
 	void* m_userData;
 	NewtonBody* m_kinematicBody;
 	dCustomPlayerControllerManager* m_manager;
