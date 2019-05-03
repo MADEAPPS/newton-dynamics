@@ -24,6 +24,7 @@
 #define PLAYER_JUMP_SPEED				6.0f
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 
+#if 0
 class BasicPlayerEntity: public DemoEntity
 {
 	public: 
@@ -116,83 +117,6 @@ class BasicPlayerEntity: public DemoEntity
 
 	InputRecord	m_inputs;
 	dCustomPlayerController* m_controller; 
-};
-
-class BasicPlayerControllerManager: public dCustomPlayerControllerManager
-{
-	public:
-	BasicPlayerControllerManager (NewtonWorld* const world)
-		:dCustomPlayerControllerManager (world)
-	{
-	}
-
-	~BasicPlayerControllerManager ()
-	{
-	}
-
-	// apply gravity 
-	virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
-	{
-		dAssert(0);
-/*
-		NewtonBody* const body = controller->GetBody();
-		BasicPlayerEntity* const player = (BasicPlayerEntity*) NewtonBodyGetUserData(body);
-
-		// calculate desired linear and angular velocity form the input
-		dVector gravity (0.0f, DEMO_GRAVITY, 0.0f, 0.0f);
-
-		// set player linear and angular velocity
-		controller->SetPlayerVelocity (player->m_inputs.m_forwarSpeed, player->m_inputs.m_strafeSpeed, player->m_inputs.m_jumpSpeed, player->m_inputs.m_headinAngle, gravity, timestep);
-*/
-	}
-
-	dCustomPlayerController* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
-	{
-		// get the scene 
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
-
-		// set the play coordinate system
-		dMatrix localAxis(dGetIdentityMatrix());
-
-		//up is first vector
-		localAxis[0] = dVector (0.0, 1.0f, 0.0f, 0.0f);
-		// up is the second vector
-		localAxis[1] = dVector (1.0, 0.0f, 0.0f, 0.0f);
-		// size if the cross product
-		localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
-
-		// make a play controller with default values.
-		dCustomPlayerController* const controller = CreatePlayerController(location, localAxis, mass, radius, height);
-
-		// get body from player, and set some parameter
-		NewtonBody* const body = controller->GetBody();
-
-		// create the visual mesh from the player collision shape
-		NewtonCollision* const collision = NewtonBodyGetCollision(body);
-		DemoMesh* const geometry = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
-
-		DemoEntity* const playerEntity = new DemoEntity(location, NULL);
-		scene->Append(playerEntity);
-		playerEntity->SetMesh(geometry, dGetIdentityMatrix());
-		geometry->Release();
-
-		// set the user data
-		NewtonBodySetUserData(body, playerEntity);
-
-		// set the transform callback
-		NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
-
-		// save player model with the controller
-		controller->SetUserData(playerEntity);
-
-		return controller;
-	}
-
-	virtual int ProcessContacts (const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const 
-	{
-		count = dCustomPlayerControllerManager::ProcessContacts (controller, contacts, count); 
-		return count;
-	}
 };
 
 // we recommend using and input manage to control input for all games
@@ -345,7 +269,6 @@ class BasicPlayerInputManager: public dCustomInputManager
 		scene->Print (color, "change player direction: Left mouse button");
 	}
 
-
 	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context)
 	{
 		BasicPlayerInputManager* const me = (BasicPlayerInputManager*) context;
@@ -360,6 +283,86 @@ class BasicPlayerInputManager: public dCustomInputManager
 	DemoEntityManager::ButtonKey m_shootProp;
 
 	int m_shootState;
+};
+#endif
+
+
+class BasicPlayerControllerManager: public dCustomPlayerControllerManager
+{
+	public:
+	BasicPlayerControllerManager (NewtonWorld* const world)
+		:dCustomPlayerControllerManager (world)
+	{
+	}
+
+	~BasicPlayerControllerManager ()
+	{
+	}
+
+	dCustomPlayerController* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
+	{
+		// get the scene 
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
+
+		// set the play coordinate system
+		dMatrix localAxis(dGetIdentityMatrix());
+
+		//up is first vector
+		localAxis[0] = dVector (0.0, 1.0f, 0.0f, 0.0f);
+		// up is the second vector
+		localAxis[1] = dVector (1.0, 0.0f, 0.0f, 0.0f);
+		// size if the cross product
+		localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
+
+		// make a play controller with default values.
+		dCustomPlayerController* const controller = CreatePlayerController(location, localAxis, mass, radius, height);
+
+		// get body from player, and set some parameter
+		NewtonBody* const body = controller->GetBody();
+
+		// create the visual mesh from the player collision shape
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+		DemoMesh* const geometry = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+		DemoEntity* const playerEntity = new DemoEntity(location, NULL);
+		scene->Append(playerEntity);
+		playerEntity->SetMesh(geometry, dGetIdentityMatrix());
+		geometry->Release();
+
+		// set the user data
+		NewtonBodySetUserData(body, playerEntity);
+
+		// set the transform callback
+		NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
+
+		// save player model with the controller
+		controller->SetUserData(playerEntity);
+
+		// set the player gravity 
+		// calculate desired linear and angular velocity form the input
+		dVector gravity(0.0f, DEMO_GRAVITY, 0.0f, 0.0f);
+		controller->SetGravity(gravity);
+
+		return controller;
+	}
+
+	virtual int ProcessContacts (const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const 
+	{
+		count = dCustomPlayerControllerManager::ProcessContacts (controller, contacts, count); 
+		return count;
+	}
+
+	// apply gravity 
+	virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
+	{
+		// calculate the gravity contribution to the velocity
+		dVector veloc (controller->GetVelocity() + controller->GetGravity().Scale (0.5f * timestep));
+
+		// set player linear and angular velocity
+		//controller->SetPlayerVelocity (player->m_inputs.m_forwarSpeed, player->m_inputs.m_strafeSpeed, player->m_inputs.m_jumpSpeed, player->m_inputs.m_headinAngle, gravity, timestep);
+
+		controller->SetVelocity(veloc);
+	}
 };
 
 

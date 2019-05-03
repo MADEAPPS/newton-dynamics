@@ -683,9 +683,13 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayerController(
 
 void dCustomPlayerController::PreUpdate(dFloat timestep)
 {
+	m_manager->ApplyPlayerMove(this, timestep);
+
+	NewtonBodySetVelocity(m_kinematicBody, &m_veloc[0]);
 }
 
 void dCustomPlayerController::PostUpdate(dFloat timestep)
 {
 
+	NewtonBodyIntegrateVelocity (m_kinematicBody, timestep);
 }
