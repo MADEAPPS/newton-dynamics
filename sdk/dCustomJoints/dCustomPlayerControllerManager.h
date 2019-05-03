@@ -31,8 +31,7 @@ class dCustomPlayerController
 {
 	public:
 	dCustomPlayerController ()
-		:m_veloc(0.0f)
-		,m_impulse(0.0f)
+		:m_impulse(0.0f)
 		,m_mass(0.0f)
 		,m_invMass(0.0f)
 		,m_userData(NULL)
@@ -51,11 +50,11 @@ class dCustomPlayerController
 	dCustomPlayerControllerManager* GetManager() const {return m_manager;}
 
 	const dFloat GetMass() { return m_mass;}
-	const dVector& GetVelocity() {return m_veloc;}
-	void SetVelocity(const dVector& veloc) {m_veloc = veloc;}
-
 	const dVector& GetImpulse() {return m_impulse;}
 	void SetImpulse(const dVector& impulse) { m_impulse = impulse;}
+
+	CUSTOM_JOINTS_API dVector GetVelocity() const;
+	CUSTOM_JOINTS_API void SetVelocity(const dVector& veloc);
 
 	private:
 	void PreUpdate(dFloat timestep);
@@ -65,7 +64,6 @@ class dCustomPlayerController
 	dFloat PredictTimestep(dFloat timestep);
 	static unsigned dCustomPlayerController::PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData);
 
-	dVector m_veloc;
 	dVector m_impulse;
 	dFloat m_mass;
 	dFloat m_invMass;

@@ -82,68 +82,15 @@ int dCustomPlayerControllerManager::ProcessContacts(const dCustomPlayerControlle
 	return 0;
 }
 
-
 dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayerController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height)
 {
-//	dAssert(stairStep >= 0.0f);
-//	dAssert(innerRadius >= 0.0f);
-//	dAssert(outerRadius >= innerRadius);
-//	dAssert(height >= stairStep);
-//	dAssert(localAxis[0].m_w == dFloat(0.0f));
-//	dAssert(localAxis[1].m_w == dFloat(0.0f));
-//	dFloat mass, dFloat outerRadius, dFloat innerRadius, dFloat height, dFloat stairStep, const dMatrix& localAxis)
-
 	NewtonWorld* const world = GetWorld();
-
-//	SetRestrainingDistance(0.0f);
-//	m_outerRadio = outerRadius;
-//	m_innerRadio = innerRadius;
-//	m_height = height;
-//	m_stairStep = stairStep;
-//	SetClimbSlope(45.0f * dDegreeToRad);
-//	m_upVector = localAxis[0];
-//	m_frontVector = localAxis[1];
-//
-//	m_groundPlane = dVector(0.0f);
-//	m_groundVelocity = dVector(0.0f);
-//
-//	const int steps = 12;
-//	dVector convexPoints[2][steps];
-//
-//	// create an inner thin cylinder
-//	dFloat shapeHigh = height;
-//	dAssert(shapeHigh > 0.0f);
-//	dVector p0(0.0f, m_innerRadio, 0.0f, 0.0f);
-//	dVector p1(shapeHigh, m_innerRadio, 0.0f, 0.0f);
-//	for (int i = 0; i < steps; i++) {
-//		dMatrix rotation(dPitchMatrix(i * 2.0f * dPi / steps));
-//		convexPoints[0][i] = localAxis.RotateVector(rotation.RotateVector(p0));
-//		convexPoints[1][i] = localAxis.RotateVector(rotation.RotateVector(p1));
-//	}
-//	NewtonCollision* const supportShape = NewtonCreateConvexHull(world, steps * 2, &convexPoints[0][0].m_x, sizeof(dVector), 0.0f, 0, NULL);
-//
-//	// create the outer thick cylinder
-//	dMatrix outerShapeMatrix(localAxis);
-//	dFloat capsuleHigh = m_height - stairStep;
-//	dAssert(capsuleHigh > 0.0f);
-//	m_sphereCastOrigin = capsuleHigh * 0.5f + stairStep;
-//	outerShapeMatrix.m_posit = outerShapeMatrix[0].Scale(m_sphereCastOrigin);
-//	outerShapeMatrix.m_posit.m_w = 1.0f;
-//	NewtonCollision* const bodyCapsule = NewtonCreateCapsule(world, 0.25f, 0.25f, 0.5f, 0, &outerShapeMatrix[0][0]);
-//	NewtonCollisionSetScale(bodyCapsule, capsuleHigh, m_outerRadio * 4.0f, m_outerRadio * 4.0f);
 
 	dMatrix shapeMatrix(localAxis);
 	shapeMatrix.m_posit = shapeMatrix.m_front.Scale (height * 0.5f);
 	shapeMatrix.m_posit.m_w = 1.0f;
 	height = dMax (height - 2.0f * radius, dFloat (0.1f));
 	NewtonCollision* const bodyCapsule = NewtonCreateCapsule(world, radius, radius, height, 0, &shapeMatrix[0][0]);
-
-	// compound collision player controller
-//	NewtonCollision* const playerShape = NewtonCreateCompoundCollision(world, 0);
-//	NewtonCompoundCollisionBeginAddRemove(playerShape);
-//	NewtonCompoundCollisionAddSubCollision(playerShape, supportShape);
-//	NewtonCompoundCollisionAddSubCollision(playerShape, bodyCapsule);
-//	NewtonCompoundCollisionEndAddRemove(playerShape);
 
 	// create the kinematic body
 	NewtonBody* const body = NewtonCreateKinematicBody(world, bodyCapsule, &location[0][0]);
@@ -154,28 +101,6 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayerController(
 
 	// make the body collidable with other dynamics bodies, by default
 	NewtonBodySetCollidable(body, 1);
-
-/*
-	dFloat castHigh = capsuleHigh * 0.4f;
-	dFloat castRadio = (m_innerRadio * 0.5f > 0.05f) ? m_innerRadio * 0.5f : 0.05f;
-
-	dVector q0(0.0f, castRadio, 0.0f, 0.0f);
-	dVector q1(castHigh, castRadio, 0.0f, 0.0f);
-	for (int i = 0; i < steps; i++) {
-		dMatrix rotation(dPitchMatrix(i * 2.0f * dPi / steps));
-		convexPoints[0][i] = localAxis.RotateVector(rotation.RotateVector(q0));
-		convexPoints[1][i] = localAxis.RotateVector(rotation.RotateVector(q1));
-	}
-	m_castingShape = NewtonCreateConvexHull(world, steps * 2, &convexPoints[0][0].m_x, sizeof(dVector), 0.0f, 0, NULL);
-
-	m_supportShape = NewtonCompoundCollisionGetCollisionFromNode(shape, NewtonCompoundCollisionGetNodeByIndex(shape, 0));
-	m_upperBodyShape = NewtonCompoundCollisionGetCollisionFromNode(shape, NewtonCompoundCollisionGetNodeByIndex(shape, 1));
-	
-	NewtonDestroyCollision(supportShape);
-	NewtonDestroyCollision(playerShape);
-
-	m_isJumping = false;
-*/
 	NewtonDestroyCollision(bodyCapsule);
 
 	dCustomPlayerController& controller = m_playerList.Append()->GetInfo();
@@ -187,12 +112,26 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayerController(
 	return &controller;
 }
 
+
+dVector dCustomPlayerController::GetVelocity() const
+{ 
+	dVector veloc(0.0);
+	NewtonBodyGetVelocity(m_kinematicBody, &veloc[0]);
+	return veloc; 
+}
+
+void dCustomPlayerController::SetVelocity(const dVector& veloc) 
+{ 
+	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+}
+
+
 void dCustomPlayerController::PreUpdate(dFloat timestep)
 {
 	m_impulse = dVector(0.0f);
 	m_manager->ApplyPlayerMove(this, timestep);
 
-	dVector veloc(m_veloc + m_impulse.Scale(m_invMass));
+	dVector veloc(GetVelocity() + m_impulse.Scale(m_invMass));
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 }
 
@@ -213,7 +152,7 @@ void dCustomPlayerController::PostUpdate(dFloat timestep)
 	}
 
 //	dAssert(timeLeft < timeEpsilon);
-	NewtonBodyGetVelocity(m_kinematicBody, &m_veloc[0]);
+//	NewtonBodyGetVelocity(m_kinematicBody, &m_veloc[0]);
 }
 
 
@@ -237,11 +176,34 @@ void dCustomPlayerController::ResolveCollision()
 	NewtonCollision* const shape = NewtonBodyGetCollision(m_kinematicBody);
 
 	int contactCount = NewtonWorldCollide(world, &matrix[0][0], shape, this, PrefilterCallback, info, 4, 0);
-	if (contactCount) {
-		m_veloc = dVector(0.0f);
-		NewtonBodySetVelocity(m_kinematicBody, &m_veloc[0]);
-		dTrace(("implment collsion rsolution !!!\n"));
+	if (!contactCount) {
+		return;
 	}
+
+	int rowCount;
+	dVector zero(0.0f);
+
+	dMatrix invInertia;
+	dComplementaritySolver::dJacobian jt[16];
+	dComplementaritySolver::dJacobian jInvMass[16];
+	dFloat rhs[16];
+
+	NewtonBodyGetInvInertiaMatrix(m_kinematicBody, &invInertia[0][0]);
+
+	for (int i = 0; i < 3; i++) {
+		rhs[i] = 0.0f;
+		jt[i].m_linear = zero;
+		jt[i].m_angular = zero;
+		jt[i].m_angular[i] = dFloat(1.0f);
+
+		jInvMass[i].m_linear = zero;
+		jInvMass[i].m_angular = invInertia.UnrotateVector(jt[i].m_angular);
+	}
+	
+
+	dVector veloc(0.0f);
+	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+	dTrace(("implement collsion rsolution !!!\n"));
 }
 
 dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)
