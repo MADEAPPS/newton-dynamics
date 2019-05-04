@@ -20,6 +20,8 @@
 
 #define D_DESCRETE_MOTION_STEPS		4
 #define D_MAX_COLLIONSION_STEPS		8
+
+#define D_MAX_ROWS					8
 #define D_MAX_COLLISION_PENTRATION	dFloat (2.0e-3f)
 
 dCustomPlayerControllerManager::dCustomPlayerControllerManager(NewtonWorld* const world)
@@ -168,7 +170,7 @@ unsigned dCustomPlayerController::PrefilterCallback(const NewtonBody* const body
 void dCustomPlayerController::ResolveCollision()
 {
 	dMatrix matrix;
-	NewtonWorldConvexCastReturnInfo info[16];
+	NewtonWorldConvexCastReturnInfo info[D_MAX_ROWS - 3];
 
 	NewtonWorld* const world = m_manager->GetWorld();
 		
@@ -184,14 +186,20 @@ void dCustomPlayerController::ResolveCollision()
 	dVector zero(0.0f);
 
 	dMatrix invInertia;
-	dComplementaritySolver::dJacobian jt[16];
-	dComplementaritySolver::dJacobian jInvMass[16];
-	dFloat rhs[16];
+	dComplementaritySolver::dJacobian jt[D_MAX_ROWS];
+	dComplementaritySolver::dJacobian jInvMass[D_MAX_ROWS];
+	dFloat rhs[D_MAX_ROWS];
+	dFloat low[D_MAX_ROWS];
+	dFloat high[D_MAX_ROWS];
+	dFloat massMatrix[D_MAX_ROWS][D_MAX_ROWS];
 
 	NewtonBodyGetInvInertiaMatrix(m_kinematicBody, &invInertia[0][0]);
 
 	for (int i = 0; i < 3; i++) {
 		rhs[i] = 0.0f;
+		low[i] = -1.0e12f;
+		high[i] = -1.0e12f;
+
 		jt[i].m_linear = zero;
 		jt[i].m_angular = zero;
 		jt[i].m_angular[i] = dFloat(1.0f);
@@ -199,6 +207,25 @@ void dCustomPlayerController::ResolveCollision()
 		jInvMass[i].m_linear = zero;
 		jInvMass[i].m_angular = invInertia.UnrotateVector(jt[i].m_angular);
 	}
+
+	
+
+	rowCount = 3;
+	for (int i = 0; i < rowCount; i++) {
+		const dComplementaritySolver::dJacobian& J0 = jInvMass[i];
+		dVector tmp(J0.m_linear * jt[i].m_linear + J0.m_angular * jt[i].m_angular);
+
+		dFloat a00 = (tmp.m_x + tmp.m_y + tmp.m_z) * 1.0001f;
+		massMatrix[i][i] = a00;
+
+		for (int j = i + 1; j < rowCount; j++) {
+			dVector tmp1(J0.m_linear * jt[j].m_linear + J0.m_angular * jt[j].m_angular);
+			dFloat a01 = tmp1.m_x + tmp1.m_y + tmp1.m_z;
+			massMatrix[i][j] = a01;
+			massMatrix[j][1] = a01;
+		}
+	}
+
 	
 
 	dVector veloc(0.0f);
