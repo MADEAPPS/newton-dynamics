@@ -60,7 +60,7 @@ class dCustomPlayerController
 	void PreUpdate(dFloat timestep);
 	void PostUpdate(dFloat timestep);
 
-	void ResolveCollision();
+	bool ResolveCollision();
 	dFloat PredictTimestep(dFloat timestep);
 	static unsigned dCustomPlayerController::PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData);
 
