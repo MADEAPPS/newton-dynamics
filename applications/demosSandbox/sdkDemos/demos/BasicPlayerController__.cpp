@@ -284,7 +284,7 @@ class BasicPlayerInputManager: public dCustomInputManager
 
 	int m_shootState;
 };
-#endif
+
 
 
 class BasicPlayerControllerManager: public dCustomPlayerControllerManager
@@ -418,6 +418,6 @@ void BasicPlayerController (DemoEntityManager* const scene)
 }
 
 
-
+#endif
 
 
