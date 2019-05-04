@@ -152,9 +152,7 @@ void dCustomPlayerController::PostUpdate(dFloat timestep)
 		NewtonBodyIntegrateVelocity(m_kinematicBody, predicetdTime);
 		timeLeft -= predicetdTime;
 	}
-
-//	dAssert(timeLeft < timeEpsilon);
-//	NewtonBodyGetVelocity(m_kinematicBody, &m_veloc[0]);
+	dAssert(timeLeft < timeEpsilon);
 }
 
 
@@ -167,71 +165,6 @@ unsigned dCustomPlayerController::PrefilterCallback(const NewtonBody* const body
 	return 1;
 }
 
-void dCustomPlayerController::ResolveCollision()
-{
-	dMatrix matrix;
-	NewtonWorldConvexCastReturnInfo info[D_MAX_ROWS - 3];
-
-	NewtonWorld* const world = m_manager->GetWorld();
-		
-	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
-	NewtonCollision* const shape = NewtonBodyGetCollision(m_kinematicBody);
-
-	int contactCount = NewtonWorldCollide(world, &matrix[0][0], shape, this, PrefilterCallback, info, 4, 0);
-	if (!contactCount) {
-		return;
-	}
-
-	int rowCount;
-	dVector zero(0.0f);
-
-	dMatrix invInertia;
-	dComplementaritySolver::dJacobian jt[D_MAX_ROWS];
-	dComplementaritySolver::dJacobian jInvMass[D_MAX_ROWS];
-	dFloat rhs[D_MAX_ROWS];
-	dFloat low[D_MAX_ROWS];
-	dFloat high[D_MAX_ROWS];
-	dFloat massMatrix[D_MAX_ROWS][D_MAX_ROWS];
-
-	NewtonBodyGetInvInertiaMatrix(m_kinematicBody, &invInertia[0][0]);
-
-	for (int i = 0; i < 3; i++) {
-		rhs[i] = 0.0f;
-		low[i] = -1.0e12f;
-		high[i] = -1.0e12f;
-
-		jt[i].m_linear = zero;
-		jt[i].m_angular = zero;
-		jt[i].m_angular[i] = dFloat(1.0f);
-
-		jInvMass[i].m_linear = zero;
-		jInvMass[i].m_angular = invInertia.UnrotateVector(jt[i].m_angular);
-	}
-
-	
-
-	rowCount = 3;
-	for (int i = 0; i < rowCount; i++) {
-		const dComplementaritySolver::dJacobian& J0 = jInvMass[i];
-		dVector tmp(J0.m_linear * jt[i].m_linear + J0.m_angular * jt[i].m_angular);
-
-		dFloat a00 = (tmp.m_x + tmp.m_y + tmp.m_z) * 1.0001f;
-		massMatrix[i][i] = a00;
-
-		for (int j = i + 1; j < rowCount; j++) {
-			dVector tmp1(J0.m_linear * jt[j].m_linear + J0.m_angular * jt[j].m_angular);
-			dFloat a01 = tmp1.m_x + tmp1.m_y + tmp1.m_z;
-			massMatrix[i][j] = a01;
-			massMatrix[j][1] = a01;
-		}
-	}
-
-	
-
-	dVector veloc(0.0f);
-	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
-	dTrace(("implement collsion rsolution !!!\n"));
-}
 
 dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)
 {
@@ -276,4 +209,105 @@ dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)
 	}
 
 	return timestep;
+}
+
+
+void dCustomPlayerController::ResolveCollision()
+{
+	dMatrix matrix;
+	NewtonWorldConvexCastReturnInfo info[D_MAX_ROWS - 3];
+
+	NewtonWorld* const world = m_manager->GetWorld();
+
+	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
+	NewtonCollision* const shape = NewtonBodyGetCollision(m_kinematicBody);
+
+	int contactCount = NewtonWorldCollide(world, &matrix[0][0], shape, this, PrefilterCallback, info, 4, 0);
+	if (!contactCount) {
+		return;
+	}
+
+	int rowCount = 0;
+	dVector zero(0.0f);
+
+	dMatrix invInertia;
+	dVector com(0.0f);
+	dVector veloc(0.0f);
+	dComplementaritySolver::dJacobian jt[D_MAX_ROWS];
+	dComplementaritySolver::dJacobian jInvMass[D_MAX_ROWS];
+	dFloat rhs[D_MAX_ROWS];
+	dFloat low[D_MAX_ROWS];
+	dFloat high[D_MAX_ROWS];
+	dFloat impulseMag[D_MAX_ROWS];
+	int normalIndex[D_MAX_ROWS];
+	dFloat massMatrix[D_MAX_ROWS][D_MAX_ROWS];
+	
+	NewtonBodyGetVelocity(m_kinematicBody, &veloc[0]);
+	NewtonBodyGetCentreOfMass(m_kinematicBody, &com[0]);
+	NewtonBodyGetInvInertiaMatrix(m_kinematicBody, &invInertia[0][0]);
+
+	com = matrix.TransformVector(com);
+
+	for (int i = 0; i < contactCount; i++) {
+		NewtonWorldConvexCastReturnInfo& contact = info[i];
+		dVector point (contact.m_point[0], contact.m_point[1], contact.m_point[2], 0.0f);
+
+		jt[rowCount].m_linear = contact.m_normal;
+		jt[rowCount].m_angular = (point - com).CrossProduct(contact.m_normal);
+		jt[rowCount].m_angular.m_w = 0.0f;
+
+		jInvMass[rowCount].m_linear = jt[rowCount].m_linear.Scale (m_invMass);
+		jInvMass[rowCount].m_angular = invInertia.UnrotateVector(jt[rowCount].m_angular);
+
+		low[rowCount] = 0.0f;
+		high[rowCount] = 1.0e12f;
+		normalIndex[rowCount] = 0;
+
+		dVector tmp (m_impulse * jInvMass[rowCount].m_linear + veloc * jt[rowCount].m_linear);
+		rhs[rowCount] = - (tmp.m_x + tmp.m_y + tmp.m_z);
+		rowCount ++;
+	}
+
+	for (int i = 0; i < 3; i++) {
+		jt[rowCount].m_linear = zero;
+		jt[rowCount].m_angular = zero;
+		jt[rowCount].m_angular[i] = dFloat(1.0f);
+
+		jInvMass[rowCount].m_linear = zero;
+		jInvMass[rowCount].m_angular = invInertia.UnrotateVector(jt[rowCount].m_angular);
+
+		rhs[rowCount] = 0.0f;
+		impulseMag[rowCount] = 0;
+		low[rowCount] = -1.0e12f;
+		high[rowCount] = 1.0e12f;
+		normalIndex[rowCount] = 0;
+
+		rowCount ++;
+		dAssert (rowCount < D_MAX_ROWS);
+	}
+
+	for (int i = 0; i < rowCount; i++) {
+		const dComplementaritySolver::dJacobian& J0 = jInvMass[i];
+		dVector tmp(J0.m_linear * jt[i].m_linear + J0.m_angular * jt[i].m_angular);
+
+		dFloat a00 = (tmp.m_x + tmp.m_y + tmp.m_z) * 1.0001f;
+		massMatrix[i][i] = a00;
+
+		for (int j = i + 1; j < rowCount; j++) {
+			dVector tmp1(J0.m_linear * jt[j].m_linear + J0.m_angular * jt[j].m_angular);
+			dFloat a01 = tmp1.m_x + tmp1.m_y + tmp1.m_z;
+			massMatrix[i][j] = a01;
+			massMatrix[j][i] = a01;
+		}
+	}
+
+	dGaussSeidelLcpSor(rowCount, D_MAX_ROWS, &massMatrix[0][0], impulseMag, rhs, normalIndex, low, high, 1.0e-2f, 32, 1.1f);
+
+	dVector netImpulse (m_impulse + veloc.Scale (m_mass));
+	for (int i = 0; i < contactCount; i++) {
+		netImpulse += jt[i].m_linear.Scale (impulseMag[i]);
+	}
+
+	veloc = netImpulse.Scale (m_invMass);
+	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 }

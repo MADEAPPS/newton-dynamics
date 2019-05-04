@@ -771,20 +771,27 @@ bool dSolvePartitionDantzigLCP(int size, T* const symmetricMatrixPSD, T* const x
 // high(i) = infinity.
 // this the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
-void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const T* const b, const int* const normalIndex, const T* const low, const T* const high, T tol2, int maxIterCount, T sor)
+void dGaussSeidelLcpSor(const int size, const int stride, const T* const matrix, T* const x, const T* const b, const int* const normalIndex, const T* const low, const T* const high, T tol2, int maxIterCount, T sor)
 {
 	const T* const me = matrix;
 	T* const invDiag1 = dAlloca(T, size);
+	T* const u = dAlloca(T, size + 1);
+	int* const index = dAlloca(int, size);
 
-	int stride = 0;
+	u[size] = T(1.0f);
+	int rowStart = 0;
 	for (int j = 0; j < size; j++) {
-		const int index = normalIndex[j];
-		const T val = index ? x[j + index] : 1.0f;
+		u[j] = x[j];
+		index[j] = normalIndex[j] ? j + normalIndex[j] : size;
+	}
+
+	for (int j = 0; j < size; j++) {
+		const T val = u[index[j]];
 		const T l = low[j] * val;
 		const T h = high[j] * val;
-		x[j] = dClamp(x[j], l, h);
-		invDiag1[j] = T(1.0f) / me[stride + j];
-		stride += size;
+		u[j] = dClamp(u[j], l, h);
+		invDiag1[j] = T(1.0f) / me[rowStart + j];
+		rowStart += stride;
 	}
 
 	T tolerance(tol2 * 2.0f);
@@ -795,22 +802,21 @@ void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const
 		tolerance = T(0.0f);
 		for (int j = 0; j < size; j++) {
 			const T* const row = &me[base];
-			T r(b[j] - dDotProduct(size, row, x));
-			T f((r + row[j] * x[j]) * invDiag[j]);
+			T r(b[j] - dDotProduct(size, row, u));
+			T f((r + row[j] * u[j]) * invDiag[j]);
 
-			const int index = normalIndex[j];
-			const T val = index ? x[j + index] : 1.0f;
+			const T val = u[index[j]];
 			const T l = low[j] * val;
 			const T h = high[j] * val;
 			if (f > h) {
-				x[j] = h;
+				u[j] = h;
 			} else if (f < l) {
-				x[j] = l;
+				u[j] = l;
 			} else {
 				tolerance += r * r;
-				x[j] = f;
+				u[j] = f;
 			}
-			base += size;
+			base += stride;
 		}
 	}
 
@@ -825,24 +831,27 @@ void dGaussSeidelLcpSor(const int size, const T* const matrix, T* const x, const
 #endif
 		for (int j = 0; j < size; j++) {
 			const T* const row = &me[base];
-			T r(b[j] - dDotProduct(size, row, x));
-			T f((r + row[j] * x[j]) * invDiag[j]);
-			f = x[j] + (f - x[j]) * sor;
+			T r(b[j] - dDotProduct(size, row, u));
+			T f((r + row[j] * u[j]) * invDiag[j]);
+			f = u[j] + (f - u[j]) * sor;
 
-			const int index = normalIndex[j];
-			const T val = index ? x[j + index] : 1.0f;
+			const T val = u[index[j]];
 			const T l = low[j] * val;
 			const T h = high[j] * val;
 			if (f > h) {
-				x[j] = h;
+				u[j] = h;
 			} else if (f < l) {
-				x[j] = l;
+				u[j] = l;
 			} else {
 				tolerance += r * r;
-				x[j] = f;
+				u[j] = f;
 			}
-			base += size;
+			base += stride;
 		}
+	}
+
+	for (int j = 0; j < size; j++) {
+		x[j] = u[j];
 	}
 }
 

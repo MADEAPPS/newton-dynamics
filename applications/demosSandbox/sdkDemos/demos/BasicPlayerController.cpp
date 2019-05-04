@@ -88,7 +88,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 	// apply gravity 
 	virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
 	{
-		// calculate the gravity contribwution to the velocity
+		// calculate the gravity contribution to the velocity
 		dVector gravityImpulse(0.0f, DEMO_GRAVITY * controller->GetMass() * timestep, 0.0f, 0.0f);
 
 		dVector totalImpulse (controller->GetImpulse() + gravityImpulse);
