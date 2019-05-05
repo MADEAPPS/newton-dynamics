@@ -31,13 +31,21 @@ class dCustomPlayerController
 {
 	public:
 	dCustomPlayerController ()
-		:m_impulse___(0.0f)
+		:m_localFrame(dGetIdentityMatrix())
+		,m_impulse(0.0f)
 		,m_mass(0.0f)
 		,m_invMass(0.0f)
+		,m_friction(1.0f)
+		,m_headingAngle(0.0f)
+		,m_forwardSpeed(0.0f)
+		,m_lateralSpeed(0.0f)
 		,m_userData(NULL)
 		,m_kinematicBody(NULL)
 		,m_manager(NULL)
 	{
+		//m_forwardSpeed = 1.0f;
+		//m_lateralSpeed = 1.0f;
+		//m_headingAngle = 0.0f * dDegreeToRad;
 	}
 
 	~dCustomPlayerController () 
@@ -49,9 +57,22 @@ class dCustomPlayerController
 	void SetUserData(void* const userData) {m_userData = userData;}
 	dCustomPlayerControllerManager* GetManager() const {return m_manager;}
 
-	const dFloat GetMass() { return m_mass;}
-	const dVector& GetImpulse() {return m_impulse___;}
-	void SetImpulse(const dVector& impulse) { m_impulse___ = impulse;}
+	const dFloat GetMass() const { return m_mass;}
+
+	dFloat GetFriction() const { return m_friction;}
+	void SetFriction(dFloat friction) {m_friction = dClamp (friction, dFloat (0.0f), dFloat (2.0f));}
+
+	const dVector& GetImpulse() { return m_impulse; }
+	void SetImpulse(const dVector& impulse) { m_impulse = impulse;}
+
+	dFloat GetForwardSpeed() const { return m_forwardSpeed; }
+	void SetForwardSpeed(dFloat speed) {m_forwardSpeed = speed; }
+
+	dFloat GetLateralSpeed() const { return m_lateralSpeed; }
+	void SetLateralSpeed(dFloat speed) { m_lateralSpeed = speed; }
+
+	dFloat GetHeadingAngle() const { return m_headingAngle; }
+	void SetHeadingAngle(dFloat angle) {m_headingAngle = dClamp (angle, dFloat (-dPi), dFloat (dPi));}
 
 	CUSTOM_JOINTS_API dVector GetVelocity() const;
 	CUSTOM_JOINTS_API void SetVelocity(const dVector& veloc);
@@ -67,9 +88,14 @@ class dCustomPlayerController
 	
 	static unsigned dCustomPlayerController::PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData);
 
-	dVector m_impulse___;
+	dMatrix m_localFrame;
+	dVector m_impulse;
 	dFloat m_mass;
 	dFloat m_invMass;
+	dFloat m_friction;
+	dFloat m_headingAngle;
+	dFloat m_forwardSpeed;
+	dFloat m_lateralSpeed;
 	void* m_userData;
 	NewtonBody* m_kinematicBody;
 	dCustomPlayerControllerManager* m_manager;

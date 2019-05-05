@@ -108,6 +108,7 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayerController(
 
 	dCustomPlayerController& controller = m_playerList.Append()->GetInfo();
 
+	controller.m_localFrame = localAxis;
 	controller.m_mass = mass;
 	controller.m_invMass = 1.0f / mass;
 	controller.m_manager = this;
@@ -129,10 +130,10 @@ void dCustomPlayerController::SetVelocity(const dVector& veloc)
 
 void dCustomPlayerController::PreUpdate(dFloat timestep)
 {
-	m_impulse___ = dVector(0.0f);
+	m_impulse = dVector(0.0f);
 	m_manager->ApplyPlayerMove(this, timestep);
 
-	dVector veloc(GetVelocity() + m_impulse___.Scale(m_invMass));
+	dVector veloc(GetVelocity() + m_impulse.Scale(m_invMass));
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 }
 
@@ -267,15 +268,18 @@ int dCustomPlayerController::ResolveInterpenetrations(int contactCount, NewtonWo
 		NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
 		NewtonBodyGetCentreOfMass(m_kinematicBody, &com[0]);
 		com = matrix.TransformVector(com);
+		com.m_w = 0.0f;
 
 		int rowCount = 3;
 		for (int i = 0; i < contactCount; i++) {
 			NewtonWorldConvexCastReturnInfo& contact = contactArray[i];
-			dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], 0.0f);
 
-			jt[rowCount].m_linear = contact.m_normal;
-			jt[rowCount].m_angular = (point - com).CrossProduct(contact.m_normal);
-			jt[rowCount].m_angular.m_w = 0.0f;
+			dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], 0.0f);
+			dVector normal(contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], 0.0f);
+
+			jt[rowCount].m_linear = normal;
+			jt[rowCount].m_angular = (point - com).CrossProduct(normal);
+
 			low[rowCount] = 0.0f;
 			high[rowCount] = 1.0e12f;
 			normalIndex[rowCount] = 0;
@@ -346,22 +350,57 @@ void dCustomPlayerController::ResolveCollision()
 	NewtonBodyGetCentreOfMass(m_kinematicBody, &com[0]);
 	NewtonBodyGetInvInertiaMatrix(m_kinematicBody, &invInertia[0][0]);
 
+	const dMatrix localFrame (dPitchMatrix(m_headingAngle) * m_localFrame * matrix);
+	
+
 	com = matrix.TransformVector(com);
+	com.m_w = 0.0f;
 	for (int i = 0; i < contactCount; i++) {
 		NewtonWorldConvexCastReturnInfo& contact = info[i];
-		dVector point (contact.m_point[0], contact.m_point[1], contact.m_point[2], 0.0f);
 
-		jt[rowCount].m_linear = contact.m_normal;
-		jt[rowCount].m_angular = (point - com).CrossProduct(contact.m_normal);
-		jt[rowCount].m_angular.m_w = 0.0f;
+		dVector point (contact.m_point[0], contact.m_point[1], contact.m_point[2], 0.0f);
+		dVector normal (contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], 0.0f);
+
+		jt[rowCount].m_linear = normal;
+		jt[rowCount].m_angular = (point - com).CrossProduct(normal);
 
 		low[rowCount] = 0.0f;
 		high[rowCount] = 1.0e12f;
 		normalIndex[rowCount] = 0;
-		dVector tmp (veloc * jt[rowCount].m_linear);
-
+		dVector tmp (veloc * jt[rowCount].m_linear.Scale (1.001f));
 		rhs[rowCount] = - (tmp.m_x + tmp.m_y + tmp.m_z);
 		rowCount ++;
+		dAssert (rowCount < (D_MAX_ROWS - 3));
+
+		dFloat updir = localFrame.m_front.DotProduct3(normal);
+		if (updir > 0.1f)
+		{
+			// add lateral traction friction
+			dVector sideDir (localFrame.m_up.CrossProduct(normal).Normalize());
+
+			jt[rowCount].m_linear = sideDir;
+			jt[rowCount].m_angular = (point - com).CrossProduct(sideDir);
+
+			low[rowCount] = -m_friction;
+			high[rowCount] = m_friction;
+			normalIndex[rowCount] = -1;
+			rhs[rowCount] = m_lateralSpeed;
+			rowCount++;
+			dAssert (rowCount < (D_MAX_ROWS - 3));
+
+			// add longitudinal  traction friction
+			dVector frontDir (normal.CrossProduct(sideDir));
+			jt[rowCount].m_linear = frontDir;
+			jt[rowCount].m_angular = (point - com).CrossProduct(frontDir);
+
+			low[rowCount] = -m_friction;
+			high[rowCount] = m_friction;
+			normalIndex[rowCount] = -2;
+			rhs[rowCount] = m_forwardSpeed;
+			rowCount++;
+			dAssert(rowCount < (D_MAX_ROWS - 3));
+
+		}
 	}
 
 	for (int i = 0; i < 3; i++) {
