@@ -30,13 +30,21 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 	public:
 	BasicPlayerControllerManager (NewtonWorld* const world)
 		:dCustomPlayerControllerManager (world)
+		,m_player(NULL)
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
+
+		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, NULL, this);
 	}
 
 	~BasicPlayerControllerManager ()
 	{
+	}
+
+	void SetAsPlayer(dCustomPlayerController* const controller)
+	{
+		m_player = controller;
 	}
 
 	void RenderPlayerHelp(DemoEntityManager* const scene) const
@@ -59,6 +67,11 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		me->RenderPlayerHelp(scene);
 	}
 
+	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
+	{
+		BasicPlayerControllerManager* const me = (BasicPlayerControllerManager*)context;
+		me->SetCamera();
+	}
 
 	dCustomPlayerController* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
 	{
@@ -108,38 +121,42 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		return count;
 	}
 
-	void SetCamera (dCustomPlayerController* const controller)
+	void SetCamera ()
 	{
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
-		DemoCamera* const camera = scene->GetCamera();
-		dMatrix camMatrix(camera->GetNextMatrix());
+		if (m_player) {
+			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+			DemoCamera* const camera = scene->GetCamera();
+			dMatrix camMatrix(camera->GetNextMatrix());
 
-		DemoEntity* player = (DemoEntity*)NewtonBodyGetUserData(controller->GetBody());
-		dMatrix playerMatrix(player->GetNextMatrix());
+			DemoEntity* player = (DemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
+			dMatrix playerMatrix(player->GetNextMatrix());
 
-		dFloat height = 2.0f;
-		dVector frontDir (camMatrix[0]);
-		dVector upDir (0.0f, 1.0f, 0.0f, 0.0f);
-		dVector camOrigin = playerMatrix.TransformVector(upDir.Scale(height));
-		camOrigin -= frontDir.Scale(PLAYER_THIRD_PERSON_VIEW_DIST);
-	
-		camera->SetNextMatrix (*scene, camMatrix, camOrigin);
+			dFloat height = 2.0f;
+			dVector frontDir(camMatrix[0]);
+			dVector upDir(0.0f, 1.0f, 0.0f, 0.0f);
+			dVector camOrigin = playerMatrix.TransformVector(upDir.Scale(height));
+			camOrigin -= frontDir.Scale(PLAYER_THIRD_PERSON_VIEW_DIST);
+
+			camera->SetNextMatrix(*scene, camMatrix, camOrigin);
+		}
 	}
 
 	void ApplyPlayImputs (dCustomPlayerController* const controller)
 	{
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
-		dFloat forwarSpeed = (int(scene->GetKeyState('W')) - int(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
-		dFloat strafeSpeed = (int(scene->GetKeyState('D')) - int(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
+		if (controller == m_player) {
+			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+			dFloat forwarSpeed = (int(scene->GetKeyState('W')) - int(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
+			dFloat strafeSpeed = (int(scene->GetKeyState('D')) - int(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
 
-		if (forwarSpeed && strafeSpeed) {
-			dFloat invMag = PLAYER_WALK_SPEED / dSqrt (forwarSpeed * forwarSpeed + strafeSpeed * strafeSpeed);
-			forwarSpeed *= invMag;
-			strafeSpeed *= invMag;
+			if (forwarSpeed && strafeSpeed) {
+				dFloat invMag = PLAYER_WALK_SPEED / dSqrt(forwarSpeed * forwarSpeed + strafeSpeed * strafeSpeed);
+				forwarSpeed *= invMag;
+				strafeSpeed *= invMag;
+			}
+
+			controller->SetForwardSpeed(forwarSpeed);
+			controller->SetLateralSpeed(strafeSpeed);
 		}
-
-		controller->SetForwardSpeed(forwarSpeed);
-		controller->SetLateralSpeed(strafeSpeed);
 	}
 	
 	// apply gravity 
@@ -152,9 +169,9 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 
 		// apply play movement
 		ApplyPlayImputs (controller);
-
-		SetCamera (controller);
 	}
+
+	dCustomPlayerController* m_player;
 };
 
 
@@ -191,7 +208,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 10.0f);
 	location.m_posit.m_y -= .5f;
 	dCustomPlayerController*  const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
-
+	playerManager->SetAsPlayer(player);
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	location.m_posit.m_x += 5.0f;

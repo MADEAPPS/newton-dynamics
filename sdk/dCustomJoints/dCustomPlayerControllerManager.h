@@ -65,11 +65,11 @@ class dCustomPlayerController
 	const dVector& GetImpulse() { return m_impulse; }
 	void SetImpulse(const dVector& impulse) { m_impulse = impulse;}
 
-	dFloat GetForwardSpeed() const { return m_forwardSpeed; }
-	void SetForwardSpeed(dFloat speed) {m_forwardSpeed = speed; }
+	dFloat GetForwardSpeed() const { return -m_forwardSpeed; }
+	void SetForwardSpeed(dFloat speed) {m_forwardSpeed = -speed; }
 
-	dFloat GetLateralSpeed() const { return m_lateralSpeed; }
-	void SetLateralSpeed(dFloat speed) { m_lateralSpeed = speed; }
+	dFloat GetLateralSpeed() const { return -m_lateralSpeed; }
+	void SetLateralSpeed(dFloat speed) { m_lateralSpeed = -speed; }
 
 	dFloat GetHeadingAngle() const { return m_headingAngle; }
 	void SetHeadingAngle(dFloat angle) {m_headingAngle = dClamp (angle, dFloat (-dPi), dFloat (dPi));}
@@ -78,10 +78,8 @@ class dCustomPlayerController
 	CUSTOM_JOINTS_API void SetVelocity(const dVector& veloc);
 
 	private:
-	void PreUpdate(dFloat timestep);
-	void PostUpdate(dFloat timestep);
-
 	void ResolveCollision();
+	void PreUpdate(dFloat timestep);
 	dFloat PredictTimestep(dFloat timestep);
 	int ResolveInterpenetrations(int contactCount, NewtonWorldConvexCastReturnInfo* const contacts);
 	dVector CalculateImpulse(int rows, const dFloat* const rhs, const dFloat* const low, const dFloat* const high, const int* const normalIndex, const dComplementaritySolver::dJacobian* const jt) const;
@@ -113,9 +111,10 @@ class dCustomPlayerControllerManager: public dCustomParallelListener
 	CUSTOM_JOINTS_API virtual dCustomPlayerController* CreatePlayerController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height);
 	CUSTOM_JOINTS_API virtual int ProcessContacts(const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const;
 
+	virtual void PostUpdate(dFloat timestep) {}
 	protected:
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadID);
-	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadID);
+//	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadID);
 
 	dList<dCustomPlayerController> m_playerList;
 };
