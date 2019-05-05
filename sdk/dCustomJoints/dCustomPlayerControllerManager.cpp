@@ -20,7 +20,7 @@
 #define D_DESCRETE_MOTION_STEPS		4
 #define D_MAX_COLLIONSION_STEPS		8
 
-#define D_MAX_ROWS					8
+#define D_MAX_ROWS					16
 #define D_MAX_COLLISION_PENETRATION	dFloat (5.0e-3f)
 
 dCustomPlayerControllerManager::dCustomPlayerControllerManager(NewtonWorld* const world)

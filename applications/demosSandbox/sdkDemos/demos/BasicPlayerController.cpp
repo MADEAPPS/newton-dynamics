@@ -132,6 +132,12 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		dFloat forwarSpeed = (int(scene->GetKeyState('W')) - int(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
 		dFloat strafeSpeed = (int(scene->GetKeyState('D')) - int(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
 
+		if (forwarSpeed && strafeSpeed) {
+			dFloat invMag = PLAYER_WALK_SPEED / dSqrt (forwarSpeed * forwarSpeed + strafeSpeed * strafeSpeed);
+			forwarSpeed *= invMag;
+			strafeSpeed *= invMag;
+		}
+
 		controller->SetForwardSpeed(forwarSpeed);
 		controller->SetLateralSpeed(strafeSpeed);
 	}
@@ -186,15 +192,15 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit.m_y -= .5f;
 	dCustomPlayerController*  const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 
-/*
+
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	location.m_posit.m_x += 5.0f;
 	dVector size (2.0f, 2.0f, 2.0f, 0.0f);
 
-	int count = 0;
+	int count = 1;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
-*/
+
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
