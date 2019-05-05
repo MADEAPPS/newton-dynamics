@@ -132,7 +132,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 //	location.m_posit.m_z = 27.254711f;
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 10.0f);
-	location.m_posit.m_y -= 0.5f;
+	location.m_posit.m_y -= .5f;
 	dCustomPlayerController*  const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 
 /*

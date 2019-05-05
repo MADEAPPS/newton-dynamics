@@ -17,13 +17,11 @@
 #include "dCustomJoint.h"
 #include "dCustomPlayerControllerManager.h"
 
-
 #define D_DESCRETE_MOTION_STEPS		4
 #define D_MAX_COLLIONSION_STEPS		8
 
 #define D_MAX_ROWS					8
-#define D_MAX_COLLISION_PENTRATION	dFloat (2.0e-3f)
-#define D_PENETRATION_RECOVER_SPEED	dFloat (5.0f)
+#define D_MAX_COLLISION_PENETRATION	dFloat (5.0e-3f)
 
 dCustomPlayerControllerManager::dCustomPlayerControllerManager(NewtonWorld* const world)
 	:dCustomParallelListener(world, PLAYER_PLUGIN_NAME)
@@ -47,6 +45,7 @@ void dCustomPlayerControllerManager::PreUpdate(dFloat timestep, int threadID)
 	for (int i = 0; i < threadID; i++) {
 		node = node ? node->GetNext() : NULL;
 	}
+
 	if (node) {
 		dCustomPlayerController* const controller = &node->GetInfo();
 		controller->PreUpdate(timestep);
@@ -68,6 +67,7 @@ void dCustomPlayerControllerManager::PostUpdate(dFloat timestep, int threadID)
 	for (int i = 0; i < threadID; i++) {
 		node = node ? node->GetNext() : NULL;
 	}
+
 	if (node) {
 		dCustomPlayerController* const controller = &node->GetInfo();
 		controller->PostUpdate(timestep);
@@ -115,7 +115,6 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayerController(
 	return &controller;
 }
 
-
 dVector dCustomPlayerController::GetVelocity() const
 { 
 	dVector veloc(0.0);
@@ -128,37 +127,13 @@ void dCustomPlayerController::SetVelocity(const dVector& veloc)
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 }
 
-
 void dCustomPlayerController::PreUpdate(dFloat timestep)
 {
-	m_impulse = dVector(0.0f);
+	m_impulse___ = dVector(0.0f);
 	m_manager->ApplyPlayerMove(this, timestep);
 
-	dVector veloc(GetVelocity() + m_impulse.Scale(m_invMass));
+	dVector veloc(GetVelocity() + m_impulse___.Scale(m_invMass));
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
-}
-
-void dCustomPlayerController::PostUpdate(dFloat timestep)
-{
-	dFloat timeLeft = timestep;
-	const dFloat timeEpsilon = timestep * (1.0f / 16.0f);
-
-	if (ResolveCollision()) {
-		dFloat predicetdTime = PredictTimestep(timestep);
-		NewtonBodyIntegrateVelocity(m_kinematicBody, predicetdTime);
-		timeLeft -= predicetdTime;
-		for (int i = 0; (i < D_DESCRETE_MOTION_STEPS) && (timeLeft > timeEpsilon); i++) {
-			if (timeLeft > timeEpsilon) {
-				ResolveCollision();
-			}
-
-			predicetdTime = PredictTimestep(timestep);
-			NewtonBodyIntegrateVelocity(m_kinematicBody, predicetdTime);
-			timeLeft -= predicetdTime;
-		}
-	} else {
-		NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
-	}
 }
 
 unsigned dCustomPlayerController::PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
@@ -202,7 +177,7 @@ dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)
 				for (int j = 0; j < contactCount; j++) {
 					penetration = dMax(penetration, info[j].m_penetration);
 				}
-				if (penetration < D_MAX_COLLISION_PENTRATION) {
+				if (penetration < D_MAX_COLLISION_PENETRATION) {
 					break;
 				}
 				timestep -= dt;
@@ -215,12 +190,125 @@ dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)
 	return timestep;
 }
 
+dVector dCustomPlayerController::CalculateImpulse(
+	int rows, 
+	const dFloat* const rhs,
+	const dFloat* const low,
+	const dFloat* const high,
+	const int* const normalIndex,
+	const dComplementaritySolver::dJacobian* const jt) const
+{
+	dMatrix invInertia;
+	dFloat impulseMag[D_MAX_ROWS];
+	dFloat massMatrix[D_MAX_ROWS][D_MAX_ROWS];
 
-bool dCustomPlayerController::ResolveCollision()
+	NewtonBodyGetInvInertiaMatrix(m_kinematicBody, &invInertia[0][0]);
+	for (int i = 0; i < rows; i++) {
+		dComplementaritySolver::dJacobian jInvMass(jt[i]);
+
+		jInvMass.m_linear = jInvMass.m_linear.Scale (m_invMass);
+		jInvMass.m_angular = invInertia.RotateVector (jInvMass.m_angular);
+
+		dVector tmp(jInvMass.m_linear * jt[i].m_linear + jInvMass.m_angular * jt[i].m_angular);
+
+		dFloat a00 = (tmp.m_x + tmp.m_y + tmp.m_z) * 1.0001f;
+		massMatrix[i][i] = a00;
+
+		for (int j = i + 1; j < rows; j++) {
+			dVector tmp1(jInvMass.m_linear * jt[j].m_linear + jInvMass.m_angular * jt[j].m_angular);
+			dFloat a01 = tmp1.m_x + tmp1.m_y + tmp1.m_z;
+			massMatrix[i][j] = a01;
+			massMatrix[j][i] = a01;
+		}
+	}
+
+	dGaussSeidelLcpSor(rows, D_MAX_ROWS, &massMatrix[0][0], impulseMag, rhs, normalIndex, low, high, 1.0e-2f, 32, 1.1f);
+
+	dVector netImpulse(0.0f);
+	for (int i = 0; i < rows; i++) {
+		netImpulse += jt[i].m_linear.Scale(impulseMag[i]);
+	}
+	return netImpulse;
+}
+
+int dCustomPlayerController::ResolveInterpenetrations(int contactCount, NewtonWorldConvexCastReturnInfo* const contactArray)
+{
+	dVector zero (0.0f);
+	dVector veloc (0.0f);
+	dVector savedVeloc (0.0f);
+
+	NewtonBodyGetVelocity(m_kinematicBody, &savedVeloc[0]);
+	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+
+	dFloat timestep = 0.1f;
+	dFloat invTimestep = 1.0f / timestep;
+
+	dComplementaritySolver::dJacobian jt[D_MAX_ROWS];
+	dFloat rhs[D_MAX_ROWS];
+	dFloat low[D_MAX_ROWS];
+	dFloat high[D_MAX_ROWS];
+	int normalIndex[D_MAX_ROWS];
+
+	NewtonWorld* const world = m_manager->GetWorld();
+	for (int i = 0; i < 3; i++) {
+		jt[i].m_linear = zero;
+		jt[i].m_angular = zero;
+		jt[i].m_angular[i] = dFloat(1.0f);
+		rhs[i] = 0.0f;
+		low[i] = -1.0e12f;
+		high[i] = 1.0e12f;
+		normalIndex[i] = 0;
+	}
+
+	dFloat penetration = D_MAX_COLLISION_PENETRATION * 10.0f;
+	for (int i = 0; (i < 8) && (penetration > D_MAX_COLLISION_PENETRATION) ; i ++) {
+		dMatrix matrix;
+		dVector com(0.0f);
+		NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
+		NewtonBodyGetCentreOfMass(m_kinematicBody, &com[0]);
+		com = matrix.TransformVector(com);
+
+		int rowCount = 3;
+		for (int i = 0; i < contactCount; i++) {
+			NewtonWorldConvexCastReturnInfo& contact = contactArray[i];
+			dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], 0.0f);
+
+			jt[rowCount].m_linear = contact.m_normal;
+			jt[rowCount].m_angular = (point - com).CrossProduct(contact.m_normal);
+			jt[rowCount].m_angular.m_w = 0.0f;
+			low[rowCount] = 0.0f;
+			high[rowCount] = 1.0e12f;
+			normalIndex[rowCount] = 0;
+			dFloat penetration = dClamp(contact.m_penetration - D_MAX_COLLISION_PENETRATION * 0.5f, dFloat(0.0f), dFloat(0.5f));
+			rhs[rowCount] = penetration * invTimestep;
+			rowCount++;
+		}
+
+		dVector impulse (CalculateImpulse(rowCount, rhs, low, high, normalIndex, jt));
+
+		impulse = impulse.Scale(m_invMass);
+		NewtonBodySetVelocity(m_kinematicBody, &impulse[0]);
+		NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
+
+		NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
+		NewtonCollision* const shape = NewtonBodyGetCollision(m_kinematicBody);
+
+		contactCount = NewtonWorldCollide(world, &matrix[0][0], shape, this, PrefilterCallback, contactArray, 4, 0);
+
+		penetration = 0.0f;
+		for (int i = 0; i < contactCount; i++) {
+			penetration = dMax(contactArray[i].m_penetration, penetration);
+		}
+	}
+
+	NewtonBodySetVelocity(m_kinematicBody, &savedVeloc[0]);
+	return contactCount;
+}
+
+void dCustomPlayerController::ResolveCollision()
 {
 	dMatrix matrix;
-	NewtonWorldConvexCastReturnInfo info[D_MAX_ROWS - 3];
-
+	NewtonWorldConvexCastReturnInfo info[D_MAX_ROWS];
 	NewtonWorld* const world = m_manager->GetWorld();
 
 	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
@@ -228,9 +316,19 @@ bool dCustomPlayerController::ResolveCollision()
 
 	int contactCount = NewtonWorldCollide(world, &matrix[0][0], shape, this, PrefilterCallback, info, 4, 0);
 	if (!contactCount) {
-		return true;
+		return;
 	}
 
+	dFloat maxPenetration = 0.0f;
+	for (int i = 0; i < contactCount; i ++) {
+		maxPenetration = dMax (info[i].m_penetration, maxPenetration);
+	}
+
+	if (maxPenetration > D_MAX_COLLISION_PENETRATION) {
+		ResolveInterpenetrations(contactCount, info);
+		NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
+	}
+	
 	int rowCount = 0;
 	dVector zero(0.0f);
 
@@ -238,19 +336,16 @@ bool dCustomPlayerController::ResolveCollision()
 	dVector com(0.0f);
 	dVector veloc(0.0f);
 	dComplementaritySolver::dJacobian jt[D_MAX_ROWS];
-	dComplementaritySolver::dJacobian jInvMass[D_MAX_ROWS];
 	dFloat rhs[D_MAX_ROWS];
 	dFloat low[D_MAX_ROWS];
 	dFloat high[D_MAX_ROWS];
 	dFloat impulseMag[D_MAX_ROWS];
 	int normalIndex[D_MAX_ROWS];
-	dFloat massMatrix[D_MAX_ROWS][D_MAX_ROWS];
 	
 	NewtonBodyGetVelocity(m_kinematicBody, &veloc[0]);
 	NewtonBodyGetCentreOfMass(m_kinematicBody, &com[0]);
 	NewtonBodyGetInvInertiaMatrix(m_kinematicBody, &invInertia[0][0]);
 
-	bool ret = true;
 	com = matrix.TransformVector(com);
 	for (int i = 0; i < contactCount; i++) {
 		NewtonWorldConvexCastReturnInfo& contact = info[i];
@@ -260,18 +355,12 @@ bool dCustomPlayerController::ResolveCollision()
 		jt[rowCount].m_angular = (point - com).CrossProduct(contact.m_normal);
 		jt[rowCount].m_angular.m_w = 0.0f;
 
-		jInvMass[rowCount].m_linear = jt[rowCount].m_linear.Scale (m_invMass);
-		jInvMass[rowCount].m_angular = invInertia.UnrotateVector(jt[rowCount].m_angular);
-
 		low[rowCount] = 0.0f;
 		high[rowCount] = 1.0e12f;
 		normalIndex[rowCount] = 0;
-		dFloat penetration = dClamp (contact.m_penetration - dFloat(5.0e-3f), dFloat (0.0f), dFloat(0.5f));
-
-		ret = ret & (penetration == 0.0f);
-//		dVector tmp (m_impulse * jInvMass[rowCount].m_linear + veloc * jt[rowCount].m_linear);
 		dVector tmp (veloc * jt[rowCount].m_linear);
-		rhs[rowCount] = - (tmp.m_x + tmp.m_y + tmp.m_z) + penetration * D_PENETRATION_RECOVER_SPEED;
+
+		rhs[rowCount] = - (tmp.m_x + tmp.m_y + tmp.m_z);
 		rowCount ++;
 	}
 
@@ -279,10 +368,6 @@ bool dCustomPlayerController::ResolveCollision()
 		jt[rowCount].m_linear = zero;
 		jt[rowCount].m_angular = zero;
 		jt[rowCount].m_angular[i] = dFloat(1.0f);
-
-		jInvMass[rowCount].m_linear = zero;
-		jInvMass[rowCount].m_angular = invInertia.UnrotateVector(jt[rowCount].m_angular);
-
 		rhs[rowCount] = 0.0f;
 		impulseMag[rowCount] = 0;
 		low[rowCount] = -1.0e12f;
@@ -293,29 +378,23 @@ bool dCustomPlayerController::ResolveCollision()
 		dAssert (rowCount < D_MAX_ROWS);
 	}
 
-	for (int i = 0; i < rowCount; i++) {
-		const dComplementaritySolver::dJacobian& J0 = jInvMass[i];
-		dVector tmp(J0.m_linear * jt[i].m_linear + J0.m_angular * jt[i].m_angular);
-
-		dFloat a00 = (tmp.m_x + tmp.m_y + tmp.m_z) * 1.0001f;
-		massMatrix[i][i] = a00;
-
-		for (int j = i + 1; j < rowCount; j++) {
-			dVector tmp1(J0.m_linear * jt[j].m_linear + J0.m_angular * jt[j].m_angular);
-			dFloat a01 = tmp1.m_x + tmp1.m_y + tmp1.m_z;
-			massMatrix[i][j] = a01;
-			massMatrix[j][i] = a01;
-		}
-	}
-
-	dGaussSeidelLcpSor(rowCount, D_MAX_ROWS, &massMatrix[0][0], impulseMag, rhs, normalIndex, low, high, 1.0e-2f, 32, 1.1f);
-
-	dVector netImpulse (veloc.Scale (m_mass));
-	for (int i = 0; i < contactCount; i++) {
-		netImpulse += jt[i].m_linear.Scale (impulseMag[i]);
-	}
-
-	veloc = netImpulse.Scale (m_invMass);
+	dVector impulse (veloc.Scale (m_mass) + CalculateImpulse(rowCount, rhs, low, high, normalIndex, jt));
+	veloc = impulse.Scale(m_invMass);
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
-	return ret;
+}
+
+void dCustomPlayerController::PostUpdate(dFloat timestep)
+{
+	dFloat timeLeft = timestep;
+	const dFloat timeEpsilon = timestep * (1.0f / 16.0f);
+
+	for (int i = 0; (i < D_DESCRETE_MOTION_STEPS) && (timeLeft > timeEpsilon); i++) {
+		if (timeLeft > timeEpsilon) {
+			ResolveCollision();
+		}
+
+		dFloat predicetdTime = PredictTimestep(timestep);
+		NewtonBodyIntegrateVelocity(m_kinematicBody, predicetdTime);
+		timeLeft -= predicetdTime;
+	}
 }

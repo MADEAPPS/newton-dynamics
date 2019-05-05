@@ -31,7 +31,7 @@ class dCustomPlayerController
 {
 	public:
 	dCustomPlayerController ()
-		:m_impulse(0.0f)
+		:m_impulse___(0.0f)
 		,m_mass(0.0f)
 		,m_invMass(0.0f)
 		,m_userData(NULL)
@@ -50,8 +50,8 @@ class dCustomPlayerController
 	dCustomPlayerControllerManager* GetManager() const {return m_manager;}
 
 	const dFloat GetMass() { return m_mass;}
-	const dVector& GetImpulse() {return m_impulse;}
-	void SetImpulse(const dVector& impulse) { m_impulse = impulse;}
+	const dVector& GetImpulse() {return m_impulse___;}
+	void SetImpulse(const dVector& impulse) { m_impulse___ = impulse;}
 
 	CUSTOM_JOINTS_API dVector GetVelocity() const;
 	CUSTOM_JOINTS_API void SetVelocity(const dVector& veloc);
@@ -60,11 +60,14 @@ class dCustomPlayerController
 	void PreUpdate(dFloat timestep);
 	void PostUpdate(dFloat timestep);
 
-	bool ResolveCollision();
+	void ResolveCollision();
 	dFloat PredictTimestep(dFloat timestep);
+	int ResolveInterpenetrations(int contactCount, NewtonWorldConvexCastReturnInfo* const contacts);
+	dVector CalculateImpulse(int rows, const dFloat* const rhs, const dFloat* const low, const dFloat* const high, const int* const normalIndex, const dComplementaritySolver::dJacobian* const jt) const;
+	
 	static unsigned dCustomPlayerController::PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData);
 
-	dVector m_impulse;
+	dVector m_impulse___;
 	dFloat m_mass;
 	dFloat m_invMass;
 	void* m_userData;
