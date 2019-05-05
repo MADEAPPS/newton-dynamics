@@ -31,11 +31,34 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 	BasicPlayerControllerManager (NewtonWorld* const world)
 		:dCustomPlayerControllerManager (world)
 	{
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
+		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, NULL, this);
 	}
 
 	~BasicPlayerControllerManager ()
 	{
 	}
+
+	void RenderPlayerHelp(DemoEntityManager* const scene) const
+	{
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print(color, "Navigation Keys");
+		scene->Print(color, "walk forward:            W");
+		scene->Print(color, "walk backward:           S");
+		scene->Print(color, "strafe right:            D");
+		scene->Print(color, "strafe left:             A");
+		//scene->Print(color, "toggle camera mode:      C");
+		//scene->Print(color, "jump:                    Space");
+		//scene->Print(color, "hide help:               H");
+		//scene->Print(color, "change player direction: Left mouse button");
+	}
+
+	static void RenderPlayerHelp(DemoEntityManager* const scene, void* const context)
+	{
+		BasicPlayerControllerManager* const me = (BasicPlayerControllerManager*)context;
+		me->RenderPlayerHelp(scene);
+	}
+
 
 	dCustomPlayerController* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
 	{
@@ -85,18 +108,46 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		return count;
 	}
 
+	void SetCamera (dCustomPlayerController* const controller)
+	{
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
+		DemoCamera* const camera = scene->GetCamera();
+		dMatrix camMatrix(camera->GetNextMatrix());
+
+		DemoEntity* player = (DemoEntity*)NewtonBodyGetUserData(controller->GetBody());
+		dMatrix playerMatrix(player->GetNextMatrix());
+
+		dFloat height = 2.0f;
+		dVector frontDir (camMatrix[0]);
+		dVector upDir (0.0f, 1.0f, 0.0f, 0.0f);
+		dVector camOrigin = playerMatrix.TransformVector(upDir.Scale(height));
+		camOrigin -= frontDir.Scale(PLAYER_THIRD_PERSON_VIEW_DIST);
+	
+		camera->SetNextMatrix (*scene, camMatrix, camOrigin);
+	}
+
+	void ApplyPlayImputs (dCustomPlayerController* const controller)
+	{
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
+		dFloat forwarSpeed = (int(scene->GetKeyState('W')) - int(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
+		dFloat strafeSpeed = (int(scene->GetKeyState('D')) - int(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
+
+		controller->SetForwardSpeed(forwarSpeed);
+		controller->SetLateralSpeed(strafeSpeed);
+	}
+	
 	// apply gravity 
 	virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
 	{
 		// calculate the gravity contribution to the velocity
 		dVector gravityImpulse(0.0f, DEMO_GRAVITY * controller->GetMass() * timestep, 0.0f, 0.0f);
-
 		dVector totalImpulse (controller->GetImpulse() + gravityImpulse);
-
-		// set player linear and angular velocity
-		//controller->SetPlayerVelocity (player->m_inputs.m_forwarSpeed, player->m_inputs.m_strafeSpeed, player->m_inputs.m_jumpSpeed, player->m_inputs.m_headinAngle, gravity, timestep);
-
 		controller->SetImpulse(totalImpulse);
+
+		// apply play movement
+		ApplyPlayImputs (controller);
+
+		SetCamera (controller);
 	}
 };
 
@@ -148,8 +199,4 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
 }
-
-
-
-
 

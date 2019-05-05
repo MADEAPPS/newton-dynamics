@@ -384,7 +384,9 @@ void dCustomPlayerController::ResolveCollision()
 			low[rowCount] = -m_friction;
 			high[rowCount] = m_friction;
 			normalIndex[rowCount] = -1;
-			rhs[rowCount] = m_lateralSpeed;
+
+			dVector tmp1 (veloc * jt[rowCount].m_linear);
+			rhs[rowCount] = m_lateralSpeed - (tmp1.m_x + tmp1.m_y + tmp1.m_z);
 			rowCount++;
 			dAssert (rowCount < (D_MAX_ROWS - 3));
 
@@ -396,10 +398,10 @@ void dCustomPlayerController::ResolveCollision()
 			low[rowCount] = -m_friction;
 			high[rowCount] = m_friction;
 			normalIndex[rowCount] = -2;
-			rhs[rowCount] = m_forwardSpeed;
+			dVector tmp2 (veloc * jt[rowCount].m_linear);
+			rhs[rowCount] = m_forwardSpeed - (tmp2.m_x + tmp2.m_y + tmp2.m_z);
 			rowCount++;
 			dAssert(rowCount < (D_MAX_ROWS - 3));
-
 		}
 	}
 
