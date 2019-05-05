@@ -114,8 +114,8 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		controller->SetUserData(playerEntity);
 
 		// set higher that 1.0f friction
-		//controller->SetFriction(2.0f);
-		controller->SetFriction(1.0f);
+		controller->SetFriction(2.0f);
+		//controller->SetFriction(1.0f);
 
 		return controller;
 	}
@@ -167,6 +167,16 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 			controller->SetHeadingAngle(camera->GetYawAngle());
 		}
 	}
+
+	dFloat ProccessContact(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
+	{ 
+		// clip steep slope contacts
+		if (normal.m_y < 0.9f) {
+			return 0.0f;
+		} else {
+			return controller->GetFriction(); 
+		}
+	}
 	
 	// apply gravity 
 	virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
@@ -197,10 +207,6 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	//CreateLevelMesh (scene, "sibenik.ngd", true);
 
 	NewtonWorld* const world = scene->GetNewton();
-
-
-	// add an input Manage to manage the inputs and user interaction 
-//	BasicPlayerInputManager* const inputManager = new BasicPlayerInputManager (scene);
 
 	// create a character controller manager
 	BasicPlayerControllerManager* const playerManager = new BasicPlayerControllerManager (world);

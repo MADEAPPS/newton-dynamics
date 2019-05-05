@@ -366,8 +366,9 @@ void dCustomPlayerController::ResolveCollision()
 		rowCount ++;
 		dAssert (rowCount < (D_MAX_ROWS - 3));
 
-		dFloat updir = localFrame.m_front.DotProduct3(normal);
-		if (updir > 0.1f)
+		//dFloat updir = localFrame.m_front.DotProduct3(normal);
+		dFloat friction = m_manager->ProccessContact(this, point, normal, contact.m_hitBody);
+		if (friction > 0.0f)
 		{
 			// add lateral traction friction
 			dVector sideDir (localFrame.m_up.CrossProduct(normal).Normalize());
@@ -375,8 +376,8 @@ void dCustomPlayerController::ResolveCollision()
 			jt[rowCount].m_linear = sideDir;
 			jt[rowCount].m_angular = (point - com).CrossProduct(sideDir);
 
-			low[rowCount] = -m_friction;
-			high[rowCount] = m_friction;
+			low[rowCount] = -friction;
+			high[rowCount] = friction;
 			normalIndex[rowCount] = -1;
 
 			dVector tmp1 (veloc * jt[rowCount].m_linear);
@@ -389,8 +390,8 @@ void dCustomPlayerController::ResolveCollision()
 			jt[rowCount].m_linear = frontDir;
 			jt[rowCount].m_angular = (point - com).CrossProduct(frontDir);
 
-			low[rowCount] = -m_friction;
-			high[rowCount] = m_friction;
+			low[rowCount] = -friction;
+			high[rowCount] = friction;
 			normalIndex[rowCount] = -2;
 			dVector tmp2 (veloc * jt[rowCount].m_linear);
 			rhs[rowCount] = -m_forwardSpeed - (tmp2.m_x + tmp2.m_y + tmp2.m_z);

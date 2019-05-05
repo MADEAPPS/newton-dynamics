@@ -111,10 +111,11 @@ class dCustomPlayerControllerManager: public dCustomParallelListener
 	CUSTOM_JOINTS_API virtual dCustomPlayerController* CreatePlayerController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height);
 	CUSTOM_JOINTS_API virtual int ProcessContacts(const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const;
 
+	virtual dFloat ProccessContact(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const {return controller->GetFriction();}
+
 	virtual void PostUpdate(dFloat timestep) {}
 	protected:
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadID);
-//	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep, int threadID);
 
 	dList<dCustomPlayerController> m_playerList;
 };
