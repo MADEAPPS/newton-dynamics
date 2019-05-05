@@ -60,7 +60,7 @@ class dCustomPlayerController
 	const dFloat GetMass() const { return m_mass;}
 
 	dFloat GetFriction() const { return m_friction;}
-	void SetFriction(dFloat friction) {m_friction = dClamp (friction, dFloat (0.0f), dFloat (2.0f));}
+	void SetFriction(dFloat friction) {m_friction = dClamp (friction, dFloat (0.0f), dFloat (3.0f));}
 
 	const dVector& GetImpulse() { return m_impulse; }
 	void SetImpulse(const dVector& impulse) { m_impulse = impulse;}

@@ -18,9 +18,10 @@
 #include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "DebugDisplay.h"
+#include "HeightFieldPrimitive.h"
 
 #define PLAYER_MASS						80.0f
-#define PLAYER_WALK_SPEED				4.0f
+#define PLAYER_WALK_SPEED				8.0f
 #define PLAYER_JUMP_SPEED				6.0f
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 
@@ -112,6 +113,10 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		// save player model with the controller
 		controller->SetUserData(playerEntity);
 
+		// set higher that 1.0f friction
+		//controller->SetFriction(2.0f);
+		controller->SetFriction(1.0f);
+
 		return controller;
 	}
 
@@ -154,8 +159,12 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 				strafeSpeed *= invMag;
 			}
 
+			DemoCamera* const camera = scene->GetCamera();
+			dMatrix camMatrix(camera->GetNextMatrix());
+
 			controller->SetForwardSpeed(forwarSpeed);
 			controller->SetLateralSpeed(strafeSpeed);
+			controller->SetHeadingAngle(camera->GetYawAngle());
 		}
 	}
 	
@@ -180,7 +189,8 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-	CreateLevelMesh (scene, "flatPlane.ngd", true);
+	//CreateLevelMesh (scene, "flatPlane.ngd", true);
+	CreateHeightFieldTerrain(scene, 10, 2.0f, 1.5f, 0.3f, 200.0f, -50.0f);
 	//CreateLevelMesh (scene, "playground.ngd", true);
 	//CreateLevelMesh (scene, "castle.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
@@ -201,12 +211,10 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit.m_y = 5.0f;
 	location.m_posit.m_z = 0.0f;
 
-//	location.m_posit.m_x = 98.710999f;
-//	location.m_posit.m_y =-0.96156919f; 
-//	location.m_posit.m_z = 27.254711f;
+	location.m_posit.m_y = 15.0f;
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 10.0f);
-	location.m_posit.m_y -= .5f;
+	location.m_posit.m_y += 1.0f;
 	dCustomPlayerController*  const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 	playerManager->SetAsPlayer(player);
 

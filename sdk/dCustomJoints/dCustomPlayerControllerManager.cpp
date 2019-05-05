@@ -208,6 +208,7 @@ dVector dCustomPlayerController::CalculateImpulse(
 		dFloat a00 = (tmp.m_x + tmp.m_y + tmp.m_z) * 1.0001f;
 		massMatrix[i][i] = a00;
 
+		impulseMag[i] = 0.0f;
 		for (int j = i + 1; j < rows; j++) {
 			dVector tmp1(jInvMass.m_linear * jt[j].m_linear + jInvMass.m_angular * jt[j].m_angular);
 			dFloat a01 = tmp1.m_x + tmp1.m_y + tmp1.m_z;
