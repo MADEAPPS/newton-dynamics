@@ -80,11 +80,11 @@ class dCustomPlayerController
 	private:
 	void ResolveCollision();
 	void PreUpdate(dFloat timestep);
+	void ResolveStep(dFloat timestep);
 	dFloat PredictTimestep(dFloat timestep);
 	int ResolveInterpenetrations(int contactCount, NewtonWorldConvexCastReturnInfo* const contacts);
 	dVector CalculateImpulse(int rows, const dFloat* const rhs, const dFloat* const low, const dFloat* const high, const int* const normalIndex, const dComplementaritySolver::dJacobian* const jt) const;
-
-	int PruneContacts (int count, NewtonWorldConvexCastReturnInfo* const contacts);
+	
 	static unsigned dCustomPlayerController::PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData);
 
 	dMatrix m_localFrame;
@@ -107,13 +107,14 @@ class dCustomPlayerControllerManager: public dCustomParallelListener
 	public:
 	CUSTOM_JOINTS_API dCustomPlayerControllerManager(NewtonWorld* const world);
 	CUSTOM_JOINTS_API ~dCustomPlayerControllerManager();
+	CUSTOM_JOINTS_API virtual dCustomPlayerController* CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height);
+
+	virtual void ApplyMove(dCustomPlayerController* const controller, dFloat timestep) = 0;
+	virtual bool ProccessContact(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const { return true; }
+	virtual dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const { return controller->GetFriction(); }
 
 	protected:
-	CUSTOM_JOINTS_API virtual void ApplyMove(dCustomPlayerController* const controller, dFloat timestep) = 0;
-	CUSTOM_JOINTS_API virtual dCustomPlayerController* CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height);
-	CUSTOM_JOINTS_API virtual bool ProccessContact(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const { return true; }
-	CUSTOM_JOINTS_API virtual dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const { return controller->GetFriction(); }
-	CUSTOM_JOINTS_API void PostUpdate(dFloat timestep) {}
+	void PostUpdate(dFloat timestep) {}
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadID);
 
 	private:

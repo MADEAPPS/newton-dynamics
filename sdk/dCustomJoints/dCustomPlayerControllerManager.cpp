@@ -137,8 +137,9 @@ unsigned dCustomPlayerController::PrefilterCallback(const NewtonBody* const body
 	return 1;
 }
 
-int dCustomPlayerController::PruneContacts (int count, NewtonWorldConvexCastReturnInfo* const contacts)
+void dCustomPlayerController::ResolveStep(dFloat timestep)
 {
+/*
 	for (int i = count - 1; i >= 0; i--) {
 		NewtonWorldConvexCastReturnInfo& contact = contacts[i];
 
@@ -152,7 +153,7 @@ int dCustomPlayerController::PruneContacts (int count, NewtonWorldConvexCastRetu
 	}
 
 	return count;
-
+*/
 }
 
 dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)
@@ -169,7 +170,6 @@ dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)
 	NewtonBodyGetMatrix(m_kinematicBody, &predicMatrix[0][0]);
 	int contactCount = NewtonWorldCollide(world, &predicMatrix[0][0], shape, this, PrefilterCallback, info, 4, 0);
 	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
-	contactCount = PruneContacts (contactCount, info);
 
 	if (contactCount) {
 		dFloat t0 = 0.0f;
@@ -330,7 +330,6 @@ void dCustomPlayerController::ResolveCollision()
 	NewtonCollision* const shape = NewtonBodyGetCollision(m_kinematicBody);
 
 	int contactCount = NewtonWorldCollide(world, &matrix[0][0], shape, this, PrefilterCallback, info, 4, 0);
-	contactCount = PruneContacts (contactCount, info);
 	if (!contactCount) {
 		return;
 	}
@@ -447,6 +446,7 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 
 	dVector veloc(GetVelocity() + m_impulse.Scale(m_invMass));
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+	ResolveStep(timestep);
 
 	for (int i = 0; (i < D_DESCRETE_MOTION_STEPS) && (timeLeft > timeEpsilon); i++) {
 		if (timeLeft > timeEpsilon) {
