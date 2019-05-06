@@ -218,7 +218,7 @@ class AdvancePlayerControllerManager: public dCustomPlayerControllerManager
 	}
 
 	// apply gravity 
-	virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
+	virtual void ApplyMove (dCustomPlayerController* const controller, dFloat timestep)
 	{
 		dAssert(0);
 /*
@@ -236,6 +236,7 @@ class AdvancePlayerControllerManager: public dCustomPlayerControllerManager
 
 	virtual int ProcessContacts (const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const 
 	{
+		dAssert (0);
 		// here you need to process the contact and reject the one you do not need.
 		//there are different ways to do this:
 		// 1-by assigning a collision ID to the colliding shape in the contact
@@ -258,7 +259,7 @@ class AdvancePlayerControllerManager: public dCustomPlayerControllerManager
 				newCount --;
 			}
 		}
-		count = dCustomPlayerControllerManager::ProcessContacts (controller, contacts, newCount); 
+//		count = dCustomPlayerControllerManager::ProcessContacts (controller, contacts, newCount); 
 		return count;
 	}
 };

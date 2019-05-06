@@ -32,6 +32,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 	BasicPlayerControllerManager (NewtonWorld* const world)
 		:dCustomPlayerControllerManager (world)
 		,m_player(NULL)
+		,m_stepHigh (0.0f)
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 
@@ -90,7 +91,10 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
 		// make a play controller with default values.
-		dCustomPlayerController* const controller = CreatePlayerController(location, localAxis, mass, radius, height);
+		dCustomPlayerController* const controller = CreateController(location, localAxis, mass, radius, height);
+
+		// set player step high to 1.0f
+		m_stepHigh = 1.0f;
 
 		// get body from player, and set some parameter
 		NewtonBody* const body = controller->GetBody();
@@ -120,12 +124,6 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		return controller;
 	}
 
-	virtual int ProcessContacts (const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const 
-	{
-		count = dCustomPlayerControllerManager::ProcessContacts (controller, contacts, count); 
-		return count;
-	}
-
 	void SetCamera ()
 	{
 		if (m_player) {
@@ -146,7 +144,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		}
 	}
 
-	void ApplyPlayImputs (dCustomPlayerController* const controller)
+	void ApplyInputs (dCustomPlayerController* const controller)
 	{
 		if (controller == m_player) {
 			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
@@ -168,7 +166,18 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		}
 	}
 
-	dFloat ProccessContact(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
+	bool ProccessContact(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
+	{
+		if (normal.m_y < 0.9f) {
+			dMatrix matrix;
+			NewtonBodyGetMatrix(controller->GetBody(), &matrix[0][0]);
+			dFloat h = (position - matrix.m_posit).DotProduct3(matrix.m_up);
+			return (h >= m_stepHigh) ? true : false;
+		} 
+		return true;
+	}
+
+	dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
 	{ 
 		// clip steep slope contacts
 		if (normal.m_y < 0.9f) {
@@ -179,7 +188,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 	}
 	
 	// apply gravity 
-	virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
+	virtual void ApplyMove (dCustomPlayerController* const controller, dFloat timestep)
 	{
 		// calculate the gravity contribution to the velocity
 		dVector gravityImpulse(0.0f, DEMO_GRAVITY * controller->GetMass() * timestep, 0.0f, 0.0f);
@@ -187,10 +196,11 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		controller->SetImpulse(totalImpulse);
 
 		// apply play movement
-		ApplyPlayImputs (controller);
+		ApplyInputs (controller);
 	}
 
 	dCustomPlayerController* m_player;
+	dFloat m_stepHigh;
 };
 
 
@@ -199,8 +209,9 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-	//CreateLevelMesh (scene, "flatPlane.ngd", true);
-	CreateHeightFieldTerrain(scene, 10, 2.0f, 1.5f, 0.3f, 200.0f, -50.0f);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
+	//CreateLevelMesh (scene, "casttle.ngd", true);
+	//CreateHeightFieldTerrain(scene, 10, 2.0f, 1.5f, 0.3f, 200.0f, -50.0f);
 
 	NewtonWorld* const world = scene->GetNewton();
 
@@ -215,18 +226,20 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	location.m_posit.m_y = 15.0f;
 
-	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 10.0f);
+	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 20.0f);
 	location.m_posit.m_y += 1.0f;
 	dCustomPlayerController*  const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 	playerManager->SetAsPlayer(player);
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	location.m_posit.m_x += 5.0f;
-	dVector size (2.0f, 2.0f, 2.0f, 0.0f);
 
 	int count = 1;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
+//	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
+
+	location.m_posit.m_x += 5.0f;
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 0.5f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
 
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;

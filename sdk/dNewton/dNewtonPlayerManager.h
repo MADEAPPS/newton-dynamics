@@ -52,7 +52,7 @@ class dNewtonPlayerManager: public dCustomPlayerControllerManager
 	CNEWTON_API dNewtonPlayer* GetFirstPlayer() const;
 	CNEWTON_API dNewtonPlayer* GetNextPlayer(const dNewtonPlayer* const player) const;
 
-	CNEWTON_API virtual void ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep);
+	CNEWTON_API virtual void ApplyMove (dCustomPlayerController* const controller, dFloat timestep);
 };
 
 

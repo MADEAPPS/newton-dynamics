@@ -81,21 +81,19 @@ void dCustomPlayerControllerManager::PostUpdate(dFloat timestep, int threadID)
 }
 */
 
-int dCustomPlayerControllerManager::ProcessContacts(const dCustomPlayerController* const controller, NewtonWorldConvexCastReturnInfo* const contacts, int count) const
-{
-	dAssert(0);
-	return 0;
-}
 
-dCustomPlayerController* dCustomPlayerControllerManager::CreatePlayerController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height)
+dCustomPlayerController* dCustomPlayerControllerManager::CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height)
 {
 	NewtonWorld* const world = GetWorld();
 
 	dMatrix shapeMatrix(localAxis);
 	shapeMatrix.m_posit = shapeMatrix.m_front.Scale (height * 0.5f);
 	shapeMatrix.m_posit.m_w = 1.0f;
-	height = dMax (height - 2.0f * radius, dFloat (0.1f));
-	NewtonCollision* const bodyCapsule = NewtonCreateCapsule(world, radius, radius, height, 0, &shapeMatrix[0][0]);
+
+	dFloat scale = 3.0f;
+	height = dMax(height - 2.0f * radius / scale, dFloat(0.1f));
+	NewtonCollision* const bodyCapsule = NewtonCreateCapsule(world, radius / scale, radius / scale, height, 0, &shapeMatrix[0][0]);
+	NewtonCollisionSetScale(bodyCapsule, 1.0f, scale, scale);
 
 	// create the kinematic body
 	NewtonBody* const body = NewtonCreateKinematicBody(world, bodyCapsule, &location[0][0]);
@@ -139,6 +137,24 @@ unsigned dCustomPlayerController::PrefilterCallback(const NewtonBody* const body
 	return 1;
 }
 
+int dCustomPlayerController::PruneContacts (int count, NewtonWorldConvexCastReturnInfo* const contacts)
+{
+	for (int i = count - 1; i >= 0; i--) {
+		NewtonWorldConvexCastReturnInfo& contact = contacts[i];
+
+		dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], 0.0f);
+		dVector normal(contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], 0.0f);
+
+		if (!m_manager->ProccessContact(this, point, normal, contact.m_hitBody)) {
+			count --;
+			contacts[i] = contacts[count];
+		}
+	}
+
+	return count;
+
+}
+
 dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)
 {
 	dMatrix matrix;
@@ -153,6 +169,7 @@ dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)
 	NewtonBodyGetMatrix(m_kinematicBody, &predicMatrix[0][0]);
 	int contactCount = NewtonWorldCollide(world, &predicMatrix[0][0], shape, this, PrefilterCallback, info, 4, 0);
 	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
+	contactCount = PruneContacts (contactCount, info);
 
 	if (contactCount) {
 		dFloat t0 = 0.0f;
@@ -313,6 +330,7 @@ void dCustomPlayerController::ResolveCollision()
 	NewtonCollision* const shape = NewtonBodyGetCollision(m_kinematicBody);
 
 	int contactCount = NewtonWorldCollide(world, &matrix[0][0], shape, this, PrefilterCallback, info, 4, 0);
+	contactCount = PruneContacts (contactCount, info);
 	if (!contactCount) {
 		return;
 	}
@@ -345,15 +363,15 @@ void dCustomPlayerController::ResolveCollision()
 	NewtonBodyGetInvInertiaMatrix(m_kinematicBody, &invInertia[0][0]);
 
 	const dMatrix localFrame (dPitchMatrix(m_headingAngle) * m_localFrame * matrix);
-	
 
 	com = matrix.TransformVector(com);
 	com.m_w = 0.0f;
-	for (int i = 0; i < contactCount; i++) {
+	for (int i = 0; i < contactCount; i ++) {
 		NewtonWorldConvexCastReturnInfo& contact = info[i];
 
 		dVector point (contact.m_point[0], contact.m_point[1], contact.m_point[2], 0.0f);
 		dVector normal (contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], 0.0f);
+
 
 		jt[rowCount].m_linear = normal;
 		jt[rowCount].m_angular = (point - com).CrossProduct(normal);
@@ -367,7 +385,7 @@ void dCustomPlayerController::ResolveCollision()
 		dAssert (rowCount < (D_MAX_ROWS - 3));
 
 		//dFloat updir = localFrame.m_front.DotProduct3(normal);
-		dFloat friction = m_manager->ProccessContact(this, point, normal, contact.m_hitBody);
+		dFloat friction = m_manager->ContactFriction(this, point, normal, contact.m_hitBody);
 		if (friction > 0.0f)
 		{
 			// add lateral traction friction
@@ -425,7 +443,7 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 	const dFloat timeEpsilon = timestep * (1.0f / 16.0f);
 
 	m_impulse = dVector(0.0f);
-	m_manager->ApplyPlayerMove(this, timestep);
+	m_manager->ApplyMove(this, timestep);
 
 	dVector veloc(GetVelocity() + m_impulse.Scale(m_invMass));
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);

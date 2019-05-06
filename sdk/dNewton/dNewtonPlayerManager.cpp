@@ -61,7 +61,7 @@ dNewtonPlayerManager::dNewtonPlayer* dNewtonPlayerManager::GetNextPlayer(const d
 	return NULL;
 }
 
-void dNewtonPlayerManager::ApplyPlayerMove (dCustomPlayerController* const controller, dFloat timestep)
+void dNewtonPlayerManager::ApplyMove (dCustomPlayerController* const controller, dFloat timestep)
 {
 	dAssert(0);
 //	dNewtonPlayer* const body = (dNewtonPlayer*) NewtonBodyGetUserData(controller->GetBody());
