@@ -206,7 +206,6 @@ void ClosestDistance (DemoEntityManager* const scene)
 	dMatrix offsetMatrix (dGetIdentityMatrix());
 
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-	//	CreateLevelMesh (scene, "playground.ngd", 0);
 
 	int materialID = NewtonMaterialGetDefaultGroupID (world);
 

@@ -180,9 +180,6 @@ void MultiRayCast (DemoEntityManager* const scene)
 
 	// load the scene from a ngd file format
 	NewtonBody* const levelBody = CreateLevelMesh (scene, "flatPlane.ngd", true);
-//	CreateLevelMesh (scene, "playground.ngd", true);
-//	CreateLevelMesh (scene, "sponza.ngd", true);
-
 
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);

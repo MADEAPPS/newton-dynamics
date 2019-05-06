@@ -416,8 +416,6 @@ void CompoundCollision (DemoEntityManager* const scene)
 
 	// load the scene from a ngd file format
 //	CreateLevelMesh (scene, "flatPlane.ngd", true);
-//	CreateLevelMesh (scene, "playground.ngd", true);
-//	CreateLevelMesh (scene, "sponza.ngd", true);
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());

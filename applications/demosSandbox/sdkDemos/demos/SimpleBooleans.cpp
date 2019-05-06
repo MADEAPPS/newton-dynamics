@@ -110,7 +110,6 @@ return;
 /*
 	// load the scene from a ngd file format
 	NewtonBody* const body = CreateLevelMesh (scene, "flatPlane.ngd", true);
-//	NewtonBody* const body = CreateLevelMesh (scene, "playground.ngd", true);
 //	NewtonBody* const body = CreateLevelMesh (scene, "sponza.ngd", true);
 //	NewtonBody* const body = CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 

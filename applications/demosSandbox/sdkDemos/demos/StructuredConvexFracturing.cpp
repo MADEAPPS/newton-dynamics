@@ -378,24 +378,17 @@ static void AddStructuredFractured (DemoEntityManager* const scene, const dVecto
 	NewtonDestroyCollision (structuredFracturedCollision);
 }
 
-
-
 void StructuredConvexFracturing (DemoEntityManager* const scene)
 {
 	// load the skybox
 	scene->CreateSkyBox();
 
+	dAssert (0);
+/*
 	// load the scene from a ngd file format
-	//CreateLevelMesh (scene, "ruinsFloor.ngd", true);
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", true);
-	//CreateLevelMesh (scene, "sponza.ngd", true);
 	AddPrimitiveArray (scene, 0.0f, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, dGetIdentityMatrix());
-
-
-
-	AddStructuredFractured (scene, dVector (0.0f, 0.0f, 0.0f, 0.0f), 0, "colum.ngd");
-
 
 	// create a shattered mesh array
 	//CreateSimpleVoronoiFracture (scene);
@@ -409,6 +402,7 @@ void StructuredConvexFracturing (DemoEntityManager* const scene)
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * dDegreeToRad); 
 	dVector origin (-45.0f, 20.0f, -15.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
+*/
 }
 
 

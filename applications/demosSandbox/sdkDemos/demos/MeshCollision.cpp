@@ -25,8 +25,6 @@ static void SimpleMeshLevel (DemoEntityManager* const scene, bool optimization)
 	// load the scene from a ngd file format
 //	CreateLevelMesh (scene, "flatPlane.ngd", optimization);
 	CreateLevelMesh (scene, "sponza.ngd", optimization);
-//	CreateLevelMesh (scene, "cattle.ngd", fileName);
-//	CreateLevelMesh (scene, "playground.ngd", optimization);
 
 //	dMatrix camMatrix (dRollMatrix(-20.0f * dDegreeToRad) * dYawMatrix(-45.0f * dDegreeToRad));
 	dMatrix camMatrix (dGetIdentityMatrix());

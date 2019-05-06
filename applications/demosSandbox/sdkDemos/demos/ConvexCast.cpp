@@ -401,7 +401,6 @@ void ConvexCast (DemoEntityManager* const scene)
 //	dMatrix offsetMatrix (dGetIdentityMatrix());
 
 	//	CreateLevelMesh (scene, "flatPlane.ngd", 0);
-	//	CreateLevelMesh (scene, "playground.ngd", 0);
 
 	StupidComplexOfConvexShapes* const stupidLevel = new StupidComplexOfConvexShapes (scene, 100);
 	new dConvexCastManager (scene, stupidLevel);

@@ -201,10 +201,6 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	//CreateLevelMesh (scene, "flatPlane.ngd", true);
 	CreateHeightFieldTerrain(scene, 10, 2.0f, 1.5f, 0.3f, 200.0f, -50.0f);
-	//CreateLevelMesh (scene, "playground.ngd", true);
-	//CreateLevelMesh (scene, "castle.ngd", true);
-	//CreateLevelMesh (scene, "sponza.ngd", true);
-	//CreateLevelMesh (scene, "sibenik.ngd", true);
 
 	NewtonWorld* const world = scene->GetNewton();
 

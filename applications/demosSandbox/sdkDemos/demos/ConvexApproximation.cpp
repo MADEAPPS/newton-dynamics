@@ -124,9 +124,7 @@ dAssert(0);
 return;
 /*
 	// load the scene from a ngd file format
-//	NewtonBody* const body = CreateLevelMesh (scene, "xxxx.ngd", true);
 	NewtonBody* const body = CreateLevelMesh (scene, "flatPlane.ngd", true);
-//	NewtonBody* const body = CreateLevelMesh (scene, "playground.ngd", true);
 //	NewtonBody* const body = CreateLevelMesh (scene, "sponza.ngd", true);
 //	NewtonBody* const body = CreateHeightFieldTerrain (scene, 10, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 
@@ -151,10 +149,9 @@ return;
 	CreateConvexAproximation ("lshape.ngd", scene, location, 3, "camo.tga");
 	CreateConvexAproximation ("hollowBox.ngd", scene, location, 3, "KAMEN.tga");
 //	CreateConvexAproximation ("hollowCylinder.ngd", scene, location, 3, "frowny.tga");
-////	CreateConvexAproximation ("chair.ngd", scene, location, 3, "checker.tga");
+//	CreateConvexAproximation ("chair.ngd", scene, location, 3, "checker.tga");
 //	CreateConvexAproximation ("cow.ngd", scene, location + dVector (10, 0, 0, 0), 3, "cow.tga");
 //	CreateConvexAproximation ("camel.ngd", scene, location + dVector (17, 0, 0, 0), 3, "jirafe.tga");
-
 //	CreateConvexAproximation ("tree.ngd", scene, location, 1, "KAMEN.tga");
 //	CreateConvexAproximation ("beetle.ngd", scene, location, 1, "KAMEN.tga");
 //	CreateConvexAproximation ("armadello.ngd", scene, location, 1, "KAMEN.tga");

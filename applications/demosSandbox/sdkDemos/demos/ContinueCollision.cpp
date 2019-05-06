@@ -44,11 +44,7 @@ void ContinuousCollision (DemoEntityManager* const scene)
 	//PlaceLargeFloorBox (scene);
 //	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 //	CreateLevelMesh (scene, "sponza.ngd", optimization);
-//	CreateLevelMesh (scene, "cattle.ngd", fileName);
-//	CreateLevelMesh (scene, "playground.ngd", fileName);
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
-
-
 
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (world);

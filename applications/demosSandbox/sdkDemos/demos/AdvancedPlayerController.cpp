@@ -1072,7 +1072,6 @@ static void LoadHangingBridge (DemoEntityManager* const scene, TriggerManager* c
 }
 
 
-
 static void LoadPlayGroundScene(DemoEntityManager* const scene, TriggerManager* const triggerManager)
 {
 	NewtonWorld* const world = scene->GetNewton();
@@ -1094,7 +1093,8 @@ static void LoadPlayGroundScene(DemoEntityManager* const scene, TriggerManager* 
 	{
 		// load a flat floor
 		LoadFloor(scene, sceneCollision);
-
+		dAssert (0);
+/*
 #ifndef SPEK_CRASH_TEST
 		// load a slide platform
 		dMatrix slideMatrix(dGetIdentityMatrix());
@@ -1112,6 +1112,7 @@ static void LoadPlayGroundScene(DemoEntityManager* const scene, TriggerManager* 
 		bridgeMatrix.m_posit.m_z += 20.0f;
 		LoadFerryBridge(scene, triggerManager, sceneCollision, "platformBridge.ngd", bridgeMatrix, playGroundBody);
 #endif	
+*/
 	}
 
 	// finalize adding shapes to this scene collisions 

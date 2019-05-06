@@ -474,8 +474,6 @@ void SimpleConvexFracturing(DemoEntityManager* const scene)
 
 	// load the scene from a ngd file format
 	CreateLevelMesh(scene, "flatPlane.ngd", false);
-	//	CreateLevelMesh (scene, "sponza.ngd", false);
-	//	CreateLevelMesh (scene, "sponza.ngd", true);
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
 	dVector location(0.0f, 0.0f, 0.0f, 0.0f);
