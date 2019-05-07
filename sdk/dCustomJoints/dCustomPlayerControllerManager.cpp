@@ -139,6 +139,55 @@ unsigned dCustomPlayerController::PrefilterCallback(const NewtonBody* const body
 
 void dCustomPlayerController::ResolveStep(dFloat timestep)
 {
+	dMatrix matrix;
+	dVector veloc;
+	dVector zero(0.0f);
+
+	dAssert(0);
+
+	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
+	NewtonBodyGetVelocity(m_kinematicBody, &veloc[0]);
+
+	dMatrix coodinateMatrix (m_localFrame * matrix);
+
+	dComplementaritySolver::dJacobian jt[3];
+	dFloat rhs[3];
+	dFloat low[3];
+	dFloat high[3];
+	int normalIndex[3];
+
+	jt[0].m_linear = coodinateMatrix[0];
+	jt[0].m_angular = zero;
+	low[0] = 0.0f;
+	high[0] = 1.0e12f;
+	normalIndex[0] = 0;
+	rhs[0] = 0;
+
+	// add lateral traction friction
+	jt[1].m_linear = coodinateMatrix[1];
+	jt[1].m_angular = zero;
+	low[1] = -m_friction;
+	high[1] = m_friction;
+	normalIndex[1] = -1;
+	dVector tmp1(veloc * jt[1].m_linear);
+	rhs[1] = -m_lateralSpeed - (tmp1.m_x + tmp1.m_y + tmp1.m_z);
+
+	// add longitudinal  traction friction
+	jt[2].m_linear = coodinateMatrix[2];
+	jt[2].m_angular = zero;
+	low[2] = -m_friction;
+	high[2] = m_friction;
+	normalIndex[2] = -2;
+	dVector tmp2(veloc * jt[2].m_linear);
+	rhs[2] = -m_forwardSpeed - (tmp2.m_x + tmp2.m_y + tmp2.m_z);
+	
+	dVector impulse(veloc.Scale(m_mass) + CalculateImpulse(3, rhs, low, high, normalIndex, jt));
+
+	impulse = impulse.Scale(m_invMass);
+	NewtonBodySetVelocity(m_kinematicBody, &impulse[0]);
+	NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
+
+
 /*
 	for (int i = count - 1; i >= 0; i--) {
 		NewtonWorldConvexCastReturnInfo& contact = contacts[i];
@@ -154,6 +203,8 @@ void dCustomPlayerController::ResolveStep(dFloat timestep)
 
 	return count;
 */
+	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
+	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 }
 
 dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)
