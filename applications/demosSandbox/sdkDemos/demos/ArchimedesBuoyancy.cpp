@@ -23,14 +23,17 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 
 		virtual void OnEnter(NewtonBody* const visitor)
 		{
+			dTrace(("enter\n"));
 		}
 
 		virtual void OnInside(NewtonBody* const visitor)
 		{
+			dTrace(("in trigger\n"));
 		}
 
 		virtual void OnExit(NewtonBody* const visitor)
 		{
+			dTrace(("exit\n"));
 		}
 
 		dCustomTriggerController* m_controller;
@@ -56,6 +59,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 
 		void OnEnter(NewtonBody* const visitor)
 		{
+			TriggerCallback::OnEnter(visitor);
 			// make some random density, and store on the collision shape for more interesting effect. 
 			dFloat density = 1.1f + dGaussianRandom (0.4f);
 			NewtonCollision* const collision = NewtonBodyGetCollision(visitor);
@@ -92,6 +96,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 			dFloat Izz;
 			dFloat mass;
 
+			TriggerCallback::OnInside(visitor);
 			NewtonBodyGetMass(visitor, &mass, &Ixx, &Iyy, &Izz);
 			if (mass > 0.0f) {
 				dMatrix matrix;
@@ -273,7 +278,7 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 
-	int count = 6;
+	int count = 1;
 	dVector size (1.0f, 0.5f, 0.5f);
 	dVector location (10.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
