@@ -983,8 +983,7 @@ void dAnimationJointSolver::SolveAuxiliary(dVectorPair* const force, const dVect
 		b[i] -= r;
 	}
 
-dAssert (0);
-//	dGaussSeidelLcpSor(n, m_massMatrix11, u, b, normalIndex, low, high, dFloat(0.001f), 30, dFloat(1.15f));
+	dGaussSeidelLcpSor(n, n, m_massMatrix11, u, b, normalIndex, low, high, dFloat(0.001f), 30, dFloat(1.15f));
 
 	for (int i = 0; i < n; i++) {
 		const dFloat s = u[i];
