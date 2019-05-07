@@ -17,6 +17,7 @@ dCustomListener::dCustomListener(NewtonWorld* const world, const char* const lis
 	,m_world(world)
 {
 	void* const listener = NewtonWorldAddListener (world, listenerName, this);
+	NewtonWorldListenerSetDebugCallback(world, listener, Debug);
 	NewtonWorldListenerSetDestructorCallback (world, listener, Destroy);
 	NewtonWorldListenerSetPreUpdateCallback (world, listener, PreUpdate);
 	NewtonWorldListenerSetPostUpdateCallback (world, listener, PostUpdate);
@@ -32,6 +33,13 @@ void dCustomListener::Destroy(const NewtonWorld* const world, void* const listen
 	dCustomListener* const me = (dCustomListener*)listenerUserData;
 	me->OnDestroy();
 	delete me;
+}
+
+void dCustomListener::Debug(const NewtonWorld* const world, void* const listenerUserData, void* const context)
+{
+	dCustomListener* const me = (dCustomListener*)listenerUserData;
+	dAssert(me->m_world == world);
+	me->OnDebug((dCustomJoint::dDebugDisplay*) context);
 }
 
 void dCustomListener::PreUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep)

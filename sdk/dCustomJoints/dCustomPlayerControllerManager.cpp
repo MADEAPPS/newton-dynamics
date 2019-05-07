@@ -143,7 +143,7 @@ void dCustomPlayerController::ResolveStep(dFloat timestep)
 	dVector veloc;
 	dVector zero(0.0f);
 
-	dAssert(0);
+//	dAssert(0);
 
 	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
 	NewtonBodyGetVelocity(m_kinematicBody, &veloc[0]);

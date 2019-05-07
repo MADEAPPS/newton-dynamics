@@ -13,7 +13,9 @@
 #define __DCUSTUM_LISTENER_H__
 
 #include "dCustomJointLibraryStdAfx.h"
+#include "dCustomJoint.h"
 #include "dCustomAlloc.h"
+
 
 class dCustomListener: public dCustomAlloc
 {
@@ -27,12 +29,15 @@ class dCustomListener: public dCustomAlloc
 
 	virtual void OnDestroy () {};
 	virtual void OnDestroyBody(NewtonBody* const body) {};
+	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext) {}
 
 	private:
 	static void Destroy (const NewtonWorld* const world, void* const listenerUserData);
+	static void Debug(const NewtonWorld* const world, void* const listenerUserData, void* const context);
 	static void PreUpdate(const NewtonWorld* const world, void* const listenerUserData, dFloat tiemstep);
 	static void PostUpdate(const NewtonWorld* const world, void* const listenerUserData, dFloat tiemstep);
 	static void OnDestroyBody (const NewtonWorld* const world, void* const listener, NewtonBody* const body);
+	
 	NewtonWorld* m_world;
 };
 
