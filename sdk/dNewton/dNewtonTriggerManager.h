@@ -52,7 +52,10 @@ class dNewtonTriggerManager: public dCustomTriggerManager
 
 	CNEWTON_API dNewtonTrigger* GetFirstTrigger() const;
 	CNEWTON_API dNewtonTrigger* GetNextTrigger(const dNewtonTrigger* const trigger) const;
-	CNEWTON_API virtual void EventCallback (const dCustomTriggerController* const trigger, dTriggerEventType event, NewtonBody* const guess) const;
+
+	CNEWTON_API virtual void OnEnter(const dCustomTriggerController* const me, NewtonBody* const guess) const {};
+	CNEWTON_API virtual void OnExit(const dCustomTriggerController* const me, NewtonBody* const guess) const {};
+	CNEWTON_API virtual void WhileIn (const dCustomTriggerController* const trigger, NewtonBody* const guess) const;
 };
 
 

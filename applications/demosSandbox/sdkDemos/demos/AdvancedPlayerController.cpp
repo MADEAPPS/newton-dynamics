@@ -49,7 +49,7 @@ class TriggerManager: public dCustomTriggerManager
 	{
 	}
 
-	virtual void EventCallback (const dCustomTriggerController* const me, dTriggerEventType event, NewtonBody* const visitor) const
+	virtual void EventCallback (const dCustomTriggerController* const me, NewtonBody* const visitor) const
 	{
 		dAssert(0);
 /*

@@ -71,7 +71,7 @@ void dCustomTriggerManager::OnDestroyBody (NewtonBody* const body)
 		dTree<unsigned,NewtonBody*>& manifest = controller.m_manifest;
 		dTree<unsigned,NewtonBody*>::dTreeNode* const passengerNode = manifest.Find (body);
 		if (passengerNode) {
-			EventCallback (&controller, m_exitTrigger, body);
+			OnExit (&controller, body);
 
 			dCustomScopeLock lock (&m_lock);
 			manifest.Remove (passengerNode);
@@ -97,9 +97,9 @@ void dCustomTriggerManager::UpdateTrigger (dCustomTriggerController* const contr
 		if (!node) {
 			dCustomScopeLock lock(&m_lock);
 			node = manifest.Insert(m_lru, cargoBody);
-			EventCallback (controller, m_enterTrigger, cargoBody);
+			OnEnter (controller, cargoBody);
 		} else {
-			EventCallback (controller, m_inTrigger, cargoBody);
+			WhileIn (controller, cargoBody);
 		}
 		node->GetInfo() = m_lru;
 	}
@@ -110,7 +110,7 @@ void dCustomTriggerManager::UpdateTrigger (dCustomTriggerController* const contr
 		iter++;
 		if (node->GetInfo() != m_lru) {
 			NewtonBody* const cargoBody = node->GetKey();
-			EventCallback (controller, m_exitTrigger, cargoBody);
+			OnExit (controller, cargoBody);
 
 			dCustomScopeLock lock(&m_lock);
 			manifest.Remove(cargoBody);
@@ -140,4 +140,15 @@ void dCustomTriggerManager::PreUpdate(dFloat timestep, int threadID)
 	}
 }
 
+void dCustomTriggerManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+{
+	for (dList<dCustomTriggerController>::dListNode* node = GetControllersList().GetFirst(); node; node = node->GetNext()) {
+		const dCustomTriggerController& controller = node->GetInfo();
 
+		dTree<unsigned, NewtonBody*>::Iterator iter (controller.m_manifest);
+		for (iter.Begin(); iter; iter++) {
+			const NewtonBody* const body = iter.GetKey();
+			OnDebug(debugContext, &controller, body);
+		}
+	}
+}

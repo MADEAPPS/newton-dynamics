@@ -50,10 +50,6 @@ class dCustomTriggerController
 	NewtonBody* GetBody() const {return m_kinematicBody; }
 	dCustomTriggerManager* GetManager() const { return m_manager; }
 
-	virtual void PreUpdate(dFloat timestep, int threadIndex) {};
-	virtual void PostUpdate(dFloat timestep, int threadIndex) {};
-	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const {dAssert(0);}
-
 	private:
 	dTree<unsigned, NewtonBody*> m_manifest;
 	void* m_userData;
@@ -66,26 +62,27 @@ class dCustomTriggerController
 class dCustomTriggerManager: public dCustomParallelListener
 {
 	public:
-	enum dTriggerEventType
-	{
-		m_inTrigger,
-		m_exitTrigger,
-		m_enterTrigger,
-	};
-
 	CUSTOM_JOINTS_API dCustomTriggerManager (NewtonWorld* const world);
 	CUSTOM_JOINTS_API virtual ~dCustomTriggerManager();
 	
 	CUSTOM_JOINTS_API virtual dCustomTriggerController* CreateTrigger (const dMatrix& matrix, NewtonCollision* const convexShape, void* const userData);
 	CUSTOM_JOINTS_API virtual void DestroyTrigger (dCustomTriggerController* const trigger);
-	CUSTOM_JOINTS_API virtual void EventCallback (const dCustomTriggerController* const me, dTriggerEventType eventType, NewtonBody* const guess) const = 0;
+
+	virtual void OnEnter (const dCustomTriggerController* const me, NewtonBody* const guess) const {}
+	virtual void OnExit (const dCustomTriggerController* const me, NewtonBody* const guess) const {}
+	virtual void WhileIn (const dCustomTriggerController* const me, NewtonBody* const guess) const {}
+
+	dList<dCustomTriggerController>& GetControllersList () {return m_triggerList;}
+	const dList<dCustomTriggerController>& GetControllersList () const {return m_triggerList;}
 
 	protected:
-	virtual void Debug () const {};
-	CUSTOM_JOINTS_API virtual void OnDestroyBody (NewtonBody* const body); 
-	CUSTOM_JOINTS_API void PreUpdate(dFloat timestep, int threadID);
-
 	CUSTOM_JOINTS_API virtual void OnDestroy();
+	CUSTOM_JOINTS_API void PreUpdate(dFloat timestep, int threadID);
+	CUSTOM_JOINTS_API virtual void OnDestroyBody (NewtonBody* const body); 
+
+	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext, const dCustomTriggerController* const controller, const NewtonBody* const guess) const 
+	{
+	}
 
 	virtual void PostUpdate(dFloat timestep)
 	{
@@ -94,7 +91,7 @@ class dCustomTriggerManager: public dCustomParallelListener
 
 	private:
 	void UpdateTrigger (dCustomTriggerController* const controller);
-//	static void UpdateTrigger (NewtonWorld* const world, void* const context, int threadIndex);
+	CUSTOM_JOINTS_API void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
 
 	dList<dCustomTriggerController> m_triggerList;
 	dFloat m_timestep;

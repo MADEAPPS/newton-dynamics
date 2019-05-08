@@ -85,7 +85,7 @@ dNewtonTriggerManager::dNewtonTrigger::~dNewtonTrigger ()
 */
 }
 
-void dNewtonTriggerManager::EventCallback (const dCustomTriggerController* const trigger, dTriggerEventType event, NewtonBody* const guess) const
+void dNewtonTriggerManager::WhileIn (const dCustomTriggerController* const trigger, NewtonBody* const guess) const
 {
 	dAssert(0);
 /*

@@ -21,20 +21,11 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 		{
 		}
 
-		virtual void OnEnter(NewtonBody* const visitor)
-		{
-			dTrace(("enter\n"));
-		}
+		virtual void OnEnter(NewtonBody* const visitor){}
+		virtual void OnInside(NewtonBody* const visitor){}
+		virtual void OnExit(NewtonBody* const visitor){}
 
-		virtual void OnInside(NewtonBody* const visitor)
-		{
-			dTrace(("in trigger\n"));
-		}
-
-		virtual void OnExit(NewtonBody* const visitor)
-		{
-			dTrace(("exit\n"));
-		}
+		virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext, const NewtonBody* const visitor) const {}
 
 		dCustomTriggerController* m_controller;
 	};
@@ -70,14 +61,14 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 			NewtonCollisionSetMaterial (collision, &collisionMaterial);
 		}
 
-		dVector CalculateWaterPlane(const dVector& position) const
+		dVector CalculateSurfacePosition(const dVector& position) const
 		{
 			BuoyancyTriggerManager* const manager = (BuoyancyTriggerManager*)m_controller->GetManager();
 
 			dFloat xAngle = 2.0f * (position.m_x / manager->m_wavePeriod) * dPi;
 			dFloat yAngle = 2.0f * (position.m_z / manager->m_wavePeriod) * dPi;
 
-			dFloat heigh = -m_waterSufaceRestHeight;
+			dFloat heigh = m_waterSufaceRestHeight;
 			dFloat amplitud = manager->m_waveAmplitud;
 			for (int i = 0; i < 3; i++) {
 				heigh += amplitud * dSin(xAngle + manager->m_faceAngle) * dCos(yAngle + manager->m_faceAngle);
@@ -85,8 +76,26 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 				xAngle *= 0.5f;
 				yAngle *= 0.5f;
 			}
+			return dVector (position.m_x, heigh, position.m_z, 1.0f);
+		}
 
-			return dVector(0.0f, 1.0f, 0.0f, heigh);
+		dVector CalculateWaterPlane(const dVector& position) const
+		{
+			dVector origin (CalculateSurfacePosition(position));
+
+			dVector px0 (position.m_x - 0.1f, position.m_y, position.m_z, position.m_w);
+			dVector px1 (position.m_x + 0.1f, position.m_y, position.m_z, position.m_w);
+			dVector pz0(position.m_x, position.m_y, position.m_z - 0.1f, position.m_w);
+			dVector pz1(position.m_x, position.m_y, position.m_z + 0.1f, position.m_w);
+
+			dVector ex (CalculateSurfacePosition(px1) - CalculateSurfacePosition(px0));
+			dVector ez (CalculateSurfacePosition(pz1) - CalculateSurfacePosition(pz0));
+
+			dVector surfacePlane (ez.CrossProduct(ex));
+			surfacePlane.m_w = 0.0f;
+			surfacePlane = surfacePlane.Normalize();
+			surfacePlane.m_w = - surfacePlane.DotProduct3(origin);
+			return surfacePlane;
 		}
 
 		void OnInside(NewtonBody* const visitor)
@@ -149,14 +158,47 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 			}
 		}
 
+		void OnDebug(dCustomJoint::dDebugDisplay* const debugContext, const NewtonBody* const visitor) const 
+		{
+			//dTrace(("draw water surface here !!\n"));
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
+			NewtonBodyGetMass(visitor, &mass, &Ixx, &Iyy, &Izz);
+			if (mass > 0.0f) {
+				dMatrix matrix;
+				NewtonBodyGetMatrix(visitor, &matrix[0][0]);
+
+				dVector position(matrix.m_posit);
+				dVector px0(position.m_x - 0.1f, position.m_y, position.m_z, position.m_w);
+				dVector px1(position.m_x + 0.1f, position.m_y, position.m_z, position.m_w);
+				dVector pz0(position.m_x, position.m_y, position.m_z - 0.1f, position.m_w);
+				dVector pz1(position.m_x, position.m_y, position.m_z + 0.1f, position.m_w);
+
+				dVector ex(CalculateSurfacePosition(px1) - CalculateSurfacePosition(px0));
+				dVector ez(CalculateSurfacePosition(pz1) - CalculateSurfacePosition(pz0));
+
+				dFloat scale = 0.75f;
+				ex = ex.Normalize().Scale (scale);
+				ez = ez.Normalize().Scale (scale);
+				dVector origin(CalculateSurfacePosition(position));
+
+				debugContext->DrawLine(origin - ez - ex, origin - ez + ex);
+				debugContext->DrawLine(origin + ez - ex, origin + ez + ex);
+				debugContext->DrawLine(origin - ex - ez, origin - ex + ez);
+				debugContext->DrawLine(origin + ex - ez, origin + ex + ez);
+			}
+		}
+
 		dFloat m_waterSufaceRestHeight;
 	};
 
 	BuoyancyTriggerManager(NewtonWorld* const world)
 		:dCustomTriggerManager(world)
 		,m_faceAngle (0.0f)
-		,m_waveSpeed(1.0f)
-		,m_wavePeriod (3.0f)
+		,m_waveSpeed(0.75f)
+		,m_wavePeriod (4.0f)
 		,m_waveAmplitud (0.25f)
 	{
 	}
@@ -211,31 +253,33 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 		delete userData;
 		dCustomTriggerManager::DestroyTrigger (trigger);
 	}
-	
-	virtual void EventCallback (const dCustomTriggerController* const me, dTriggerEventType event, NewtonBody* const visitor) const
+
+	virtual void OnEnter(const dCustomTriggerController* const trigger, NewtonBody* const visitor) const
+	{
+		//dTrace(("enter\n"));
+		TriggerCallback* const callback = (TriggerCallback*) trigger->GetUserData();
+		callback->OnEnter(visitor);
+	}
+
+	virtual void OnExit(const dCustomTriggerController* const trigger, NewtonBody* const visitor) const 
+	{
+		//dTrace(("exit\n"));
+		TriggerCallback* const callback = (TriggerCallback*) trigger->GetUserData();
+		callback->OnExit(visitor);
+	}
+		
+	virtual void WhileIn (const dCustomTriggerController* const trigger, NewtonBody* const visitor) const
 	{
 		// each trigger has it own callback for some effect 
-		TriggerCallback* const callback = (TriggerCallback*) me->GetUserData();
-		switch (event) 
-		{
-			case m_enterTrigger:
-			{
-				callback->OnEnter(visitor);
-				break;
-			}
+		//dTrace(("in pool\n"));
+		TriggerCallback* const callback = (TriggerCallback*) trigger->GetUserData();
+		callback->OnInside(visitor);
+	}
 
-			case m_exitTrigger:
-			{
-				callback->OnExit(visitor);
-				break;
-			}
-
-			case m_inTrigger:
-			{
-				callback->OnInside(visitor);
-				break;
-			}
-		}
+	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext, const dCustomTriggerController* const trigger, const NewtonBody* const visitor) const
+	{
+		TriggerCallback* const callback = (TriggerCallback*) trigger->GetUserData();
+		callback->OnDebug(debugContext, visitor);
 	}
 
 	dFloat m_faceAngle;
@@ -278,13 +322,13 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 
-	int count = 1;
+	int count = 6;
 	dVector size (1.0f, 0.5f, 0.5f);
 	dVector location (10.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
-	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 //	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
