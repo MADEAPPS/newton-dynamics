@@ -49,8 +49,8 @@ void dgConstraint::InitPointParam (dgPointParam& param, dgFloat32 stiffness, con
 	param.m_posit0 = p0Global;
 	param.m_posit1 = p1Global;
 
-	param.m_r0 = ((p0Global - m_body0->m_globalCentreOfMass) & dgVector::m_triplexMask) | dgVector::m_wOne;
-	param.m_r1 = ((p1Global - m_body1->m_globalCentreOfMass) & dgVector::m_triplexMask) | dgVector::m_wOne;;
+	param.m_r0 = (p0Global - m_body0->m_globalCentreOfMass) & dgVector::m_triplexMask;
+	param.m_r1 = (p1Global - m_body1->m_globalCentreOfMass) & dgVector::m_triplexMask;
 }
 
 void dgConstraint::InitInfo (dgConstraintInfo* const info) const

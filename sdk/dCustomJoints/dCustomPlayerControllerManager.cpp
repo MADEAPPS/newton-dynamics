@@ -267,7 +267,7 @@ dVector dCustomPlayerController::CalculateImpulse(
 		}
 	}
 
-	dGaussSeidelLcpSor(rows, D_MAX_ROWS, &massMatrix[0][0], impulseMag, rhs, normalIndex, low, high, 1.0e-2f, 32, 1.1f);
+	dGaussSeidelLcpSor(rows, D_MAX_ROWS, &massMatrix[0][0], impulseMag, rhs, normalIndex, low, high, dFloat(1.0e-2f), 32, dFloat(1.1f));
 
 	dVector netImpulse(0.0f);
 	for (int i = 0; i < rows; i++) {
