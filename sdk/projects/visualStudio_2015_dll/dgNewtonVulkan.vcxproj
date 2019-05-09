@@ -55,7 +55,7 @@
     <ClInclude Include="..\..\dgNewtonVulkan\dgWorldBase.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{49F386BF-6DAC-4399-9C4E-6762A58F58A8}</ProjectGuid>
+    <ProjectGuid>{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>NewtonCpu</RootNamespace>
     <ProjectName>dgNewtonVulkan</ProjectName>

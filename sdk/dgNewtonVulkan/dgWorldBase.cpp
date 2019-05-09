@@ -46,17 +46,42 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	inst_info.enabledExtensionCount = 0;
 	inst_info.ppEnabledExtensionNames = NULL;
 
-	VkInstance instance;
-	VkResult error = vkCreateInstance(&inst_info, NULL, &instance);
+	VkAllocationCallbacks* allocators = NULL;
 
+	VkInstance instance;
+	VkResult error = vkCreateInstance(&inst_info, allocators, &instance);
 	if (error != VK_SUCCESS) {
 		return NULL;
+	}
+
+	uint32_t gpu_count = 0;
+	error = vkEnumeratePhysicalDevices(instance, &gpu_count, NULL);
+	if ((error != VK_SUCCESS) || (gpu_count == 0)) {
+		vkDestroyInstance (instance, allocators);
+		return NULL;
+	}
+
+	dgAssert (gpu_count < 8);
+	VkPhysicalDevice physical_gpus[8];
+	error = vkEnumeratePhysicalDevices(instance, &gpu_count, &physical_gpus[0]);
+	dgAssert (error == VK_SUCCESS);
+	dgAssert (gpu_count >= 1);
+
+	if (gpu_count > 1) {
+		dgAssert (0);
+		// try sort gpus such that the best gpu is the first
+		//VkPhysicalDevice *physical_devices = malloc(sizeof(VkPhysicalDevice)* gpu_count);
+		//err = vkEnumeratePhysicalDevices(demo->inst, &gpu_count, physical_devices);
+		//assert(!err);
 	}
 
 	static dgWorldBase module(world, allocator);
 	//	memset(m_vendor, 0, sizeof(m_vendor));
 	//	module.m_score = _stricmp(m_vendor, "GenuineIntel") ? 3 : 4;
+
+
 	module.m_score = 10;
+	module.m_gpu = physical_gpus[0];
 	module.m_instance = instance;
 	return &module;
 }
@@ -69,6 +94,8 @@ dgWorldBase::dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocato
 
 dgWorldBase::~dgWorldBase()
 {
+	VkAllocationCallbacks* allocators = NULL;
+	vkDestroyInstance(m_instance, allocators);
 }
 
 const char* dgWorldBase::GetId() const
