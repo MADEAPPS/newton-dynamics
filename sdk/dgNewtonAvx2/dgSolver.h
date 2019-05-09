@@ -26,10 +26,9 @@
 #include "dgPhysicsStdafx.h"
 #include <immintrin.h>
 
-
-#ifdef _NEWTON_USE_DOUBLE
 #define DG_SOA_WORD_GROUP_SIZE	8 
 
+#ifdef _NEWTON_USE_DOUBLE
 DG_MSC_AVX_ALIGMENT
 class dgSoaFloat
 {
@@ -164,8 +163,7 @@ class dgSoaFloat
 } DG_GCC_AVX_ALIGMENT;
 
 #else 
-#if 1
-#define DG_SOA_WORD_GROUP_SIZE	8 
+
 class dgSoaFloat
 {
 	public:
@@ -285,144 +283,6 @@ class dgSoaFloat
 		dgFloat32 m_f[DG_SOA_WORD_GROUP_SIZE];
 	};
 } DG_GCC_AVX_ALIGMENT;
-
-#else
-#define DG_SOA_WORD_GROUP_SIZE	16 
-
-DG_MSC_AVX_ALIGMENT
-class dgSoaFloat
-{
-	public:
-	DG_INLINE dgSoaFloat()
-	{
-	}
-
-	DG_INLINE dgSoaFloat(const dgFloat32 val)
-		:m_low(_mm256_set1_ps (val))
-		,m_high(m_low)
-	{
-	}
-
-	DG_INLINE dgSoaFloat(const __m256 low, const __m256 high)
-		:m_low(low)
-		,m_high(high)
-	{
-	}
-
-	DG_INLINE dgSoaFloat(const dgSoaFloat& copy)
-		:m_low(copy.m_low)
-		,m_high(copy.m_high)
-	{
-	}
-
-	DG_INLINE dgSoaFloat (const dgSoaFloat* const baseAddr, const dgSoaFloat& index)
-		:m_low(_mm256_i32gather_ps(baseAddr->m_f, index.m_lowInt, 4))
-		,m_high(_mm256_i32gather_ps(baseAddr->m_f, index.m_highInt, 4))
-	{
-	}
-
-	DG_INLINE dgFloat32& operator[] (dgInt32 i)
-	{
-		dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
-		dgAssert(i >= 0);
-		return m_f[i];
-	}
-
-	DG_INLINE const dgFloat32& operator[] (dgInt32 i) const
-	{
-		dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
-		dgAssert(i >= 0);
-		return m_f[i];
-	}
-
-	DG_INLINE dgSoaFloat operator+ (const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(_mm256_add_ps(m_low, A.m_low), _mm256_add_ps(m_high, A.m_high));
-	}
-
-	DG_INLINE dgSoaFloat operator- (const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(_mm256_sub_ps(m_low, A.m_low), _mm256_sub_ps(m_high, A.m_high));
-	}
-
-	DG_INLINE dgSoaFloat operator* (const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(_mm256_mul_ps(m_low, A.m_low), _mm256_mul_ps(m_high, A.m_high));
-	}
-
-	DG_INLINE dgSoaFloat MulAdd(const dgSoaFloat& A, const dgSoaFloat& B) const
-	{
-		return dgSoaFloat(_mm256_fmadd_ps(A.m_low, B.m_low, m_low), _mm256_fmadd_ps(A.m_high, B.m_high, m_high));
-	}
-
-	DG_INLINE dgSoaFloat MulSub(const dgSoaFloat& A, const dgSoaFloat& B) const
-	{
-		return dgSoaFloat(_mm256_fnmadd_ps(A.m_low, B.m_low, m_low), _mm256_fnmadd_ps(A.m_high, B.m_high, m_high));
-	}
-
-	DG_INLINE dgSoaFloat operator> (const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(_mm256_cmp_ps (m_low, A.m_low, _CMP_GT_OQ), _mm256_cmp_ps(m_high, A.m_high, _CMP_GT_OQ));
-	}
-
-	DG_INLINE dgSoaFloat operator< (const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(_mm256_cmp_ps (m_low, A.m_low, _CMP_LT_OQ), _mm256_cmp_ps(m_high, A.m_high, _CMP_LT_OQ));
-	}
-
-	DG_INLINE dgSoaFloat operator| (const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(_mm256_or_ps (m_low, A.m_low), _mm256_or_ps(m_high, A.m_high));
-	}
-
-	DG_INLINE dgSoaFloat AndNot (const dgSoaFloat& A) const
-	{
-		return  dgSoaFloat(_mm256_andnot_ps (A.m_low, m_low), _mm256_andnot_ps(A.m_high, m_high));
-	}
-
-	DG_INLINE dgSoaFloat GetMin(const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(_mm256_min_ps (m_low, A.m_low), _mm256_min_ps(m_high, A.m_high));
-	}
-
-	DG_INLINE dgSoaFloat GetMax(const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(_mm256_max_ps (m_low, A.m_low), _mm256_max_ps(m_high, A.m_high));
-	}
-
-	DG_INLINE dgFloat32 AddHorizontal() const
-	{
-		dgSoaFloat ret;
-		__m256 tmp0(_mm256_add_ps(m_low, m_high));
-		__m256 tmp1(_mm256_add_ps(tmp0, _mm256_permute2f128_ps(tmp0, tmp0, 1)));
-		__m256 tmp2(_mm256_hadd_ps(tmp1, tmp1));
-		__m256 tmp3(_mm256_hadd_ps(tmp2, tmp2));
-		_mm256_store_ps(ret.m_f, tmp3);
-		return ret.m_f[0];
-	}
-
-	static DG_INLINE void FlushRegisters()
-	{
-		_mm256_zeroall ();
-	}
-
-	union
-	{
-		struct
-		{
-			__m256 m_low;
-			__m256 m_high;
-		};
-		struct
-		{
-			__m256i m_lowInt;
-			__m256i m_highInt;
-		};
-		dgInt32 m_i[DG_SOA_WORD_GROUP_SIZE];
-		dgFloat32 m_f[DG_SOA_WORD_GROUP_SIZE];
-	};
-} DG_GCC_AVX_ALIGMENT;
-#endif
 
 #endif
 
