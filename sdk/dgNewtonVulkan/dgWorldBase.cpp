@@ -75,6 +75,10 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 		//assert(!err);
 	}
 
+	VkPhysicalDeviceProperties gpu_props;
+	Clear(&gpu_props);
+	vkGetPhysicalDeviceProperties(physical_gpus[0], &gpu_props);
+
 	static dgWorldBase module(world, allocator);
 	//	memset(m_vendor, 0, sizeof(m_vendor));
 	//	module.m_score = _stricmp(m_vendor, "GenuineIntel") ? 3 : 4;
@@ -82,6 +86,7 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 
 	module.m_score = 10;
 	module.m_gpu = physical_gpus[0];
+	module.m_gpu_props = gpu_props;
 	module.m_instance = instance;
 	return &module;
 }
@@ -100,11 +105,7 @@ dgWorldBase::~dgWorldBase()
 
 const char* dgWorldBase::GetId() const
 {
-#ifdef _DEBUG
-	return "newtonVulkan_d";
-#else
-	return "newtonVulkan";
-#endif
+	return m_gpu_props.deviceName;
 }
 
 dgInt32 dgWorldBase::GetScore() const

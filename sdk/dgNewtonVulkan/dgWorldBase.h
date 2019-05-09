@@ -45,6 +45,7 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 	
 	VkInstance m_instance;
 	VkPhysicalDevice m_gpu;
+    VkPhysicalDeviceProperties m_gpu_props;
 //	VkAllocationCallbacks m_allocators;
 	int m_score;
 };
