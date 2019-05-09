@@ -236,7 +236,7 @@ dgMatrix dgMatrix::Inverse4x4 () const
 				}
 			}
 			dgAssert(pivot > dgFloat32(0.0f));
-			dgAssert((pivot > dgFloat32(1.0e-6f)) || (dgConditionNumber(4, 4, (dgFloat32*)&(*this)[0][0]) < dgFloat32(10000.0f)));
+			dgAssert((pivot > dgFloat32(1.0e-6f)) || (dgConditionNumber(4, 4, (dgFloat32*)&(*this)[0][0]) < dgFloat32(1.0e5f)));
 			if (permute != i) {
 				dgSwap(inv[i], inv[permute]);
 				dgSwap(tmp[i], tmp[permute]);
@@ -718,7 +718,7 @@ for (dgInt32 i = 0; i < rows; i++) {
 				}
 			}
 			dgAssert(pivot > dgFloat32(0.0f));
-			dgAssert((pivot > dgFloat32(1.0e-6f)) || (dgConditionNumber(rows, 6, (dgFloat64*)&m_rows[0]) < dgFloat32(1.0e-5f)));
+			dgAssert((pivot > dgFloat32(1.0e-6f)) || (dgConditionNumber(rows, 6, (dgFloat64*)&m_rows[0]) < dgFloat32(1.0e5f)));
 			if (permute != i) {
 				for (dgInt32 j = 0; j < rows; j++) {
 					dgSwap(tmp[i][j], tmp[permute][j]);
