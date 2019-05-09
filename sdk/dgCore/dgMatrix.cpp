@@ -696,10 +696,6 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix* const initia
 
 dgSpatialMatrix dgSpatialMatrix::Inverse(dgInt32 rows) const
 {
-for (dgInt32 i = 0; i < rows; i++) {
-	*((dgFloat64*)&m_rows[i * 6]) = 1.e-7f;
-}
-
 	dgSpatialMatrix tmp(*this);
 	dgSpatialMatrix inv(dgFloat64(0.0f));
 	for (dgInt32 i = 0; i < rows; i++) {
@@ -725,7 +721,7 @@ for (dgInt32 i = 0; i < rows; i++) {
 					for (dgInt32 n = 0; n < rows; n++) {
 						dgTrace(("%f ", m_rows[m][n]));
 					}
-					dgTrace(("%f\n"));
+					dgTrace(("\n"));
 				}
 				dgAssert(0);
 			}
