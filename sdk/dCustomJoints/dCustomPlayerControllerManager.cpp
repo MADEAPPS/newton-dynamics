@@ -57,32 +57,8 @@ void dCustomPlayerControllerManager::PreUpdate(dFloat timestep, int threadID)
 	}
 }
 
-/*
-void dCustomPlayerControllerManager::PostUpdate(dFloat timestep, int threadID)
-{
-	D_TRACKTIME();
-	NewtonWorld* const world = GetWorld();
-	const int threadCount = NewtonGetThreadsCount(world);
 
-	dList<dCustomPlayerController>::dListNode* node = m_playerList.GetFirst();
-	for (int i = 0; i < threadID; i++) {
-		node = node ? node->GetNext() : NULL;
-	}
-
-	if (node) {
-		dCustomPlayerController* const controller = &node->GetInfo();
-		controller->PostUpdate(timestep);
-		do {
-			for (int i = 0; i < threadCount; i++) {
-				node = node ? node->GetNext() : NULL;
-			}
-		} while (node);
-	}
-}
-*/
-
-
-dCustomPlayerController* dCustomPlayerControllerManager::CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height)
+dCustomPlayerController* dCustomPlayerControllerManager::CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
 {
 	NewtonWorld* const world = GetWorld();
 
@@ -113,6 +89,9 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreateController(const 
 	controller.m_invMass = 1.0f / mass;
 	controller.m_manager = this;
 	controller.m_kinematicBody = body;
+	controller.m_contactPatch = radius / scale;
+	controller.m_stepHeight = dMax (stepHeight, controller.m_contactPatch * 2.0f);
+
 	return &controller;
 }
 
@@ -140,10 +119,10 @@ unsigned dCustomPlayerController::PrefilterCallback(const NewtonBody* const body
 void dCustomPlayerController::ResolveStep(dFloat timestep)
 {
 	dMatrix matrix;
-	dVector veloc;
+	dMatrix stepMatrix;
+	dVector veloc(0.0f);
 	dVector zero(0.0f);
-
-//	dAssert(0);
+	NewtonWorldConvexCastReturnInfo info[16];
 
 	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
 	NewtonBodyGetVelocity(m_kinematicBody, &veloc[0]);
@@ -161,7 +140,7 @@ void dCustomPlayerController::ResolveStep(dFloat timestep)
 	low[0] = 0.0f;
 	high[0] = 1.0e12f;
 	normalIndex[0] = 0;
-	rhs[0] = 0;
+	rhs[0] = -m_impulse.DotProduct3(jt[0].m_linear) * m_invMass;
 
 	// add lateral traction friction
 	jt[1].m_linear = coodinateMatrix[1];
@@ -187,24 +166,27 @@ void dCustomPlayerController::ResolveStep(dFloat timestep)
 	NewtonBodySetVelocity(m_kinematicBody, &impulse[0]);
 	NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
 
+	NewtonWorld* const world = m_manager->GetWorld();
+	NewtonCollision* const shape = NewtonBodyGetCollision(m_kinematicBody);
+	
+	NewtonBodyGetMatrix(m_kinematicBody, &stepMatrix[0][0]);
+	int contactCount = NewtonWorldCollide(world, &stepMatrix[0][0], shape, this, PrefilterCallback, info, 4, 0);
 
-/*
-	for (int i = count - 1; i >= 0; i--) {
-		NewtonWorldConvexCastReturnInfo& contact = contacts[i];
-
-		dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], 0.0f);
-		dVector normal(contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], 0.0f);
-
-		if (!m_manager->ProccessContact(this, point, normal, contact.m_hitBody)) {
-			count --;
-			contacts[i] = contacts[count];
-		}
-	}
-
-	return count;
-*/
 	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+
+	dFloat maxHigh = 0.0f;
+	for (int i = 0; i < contactCount; i++) {
+		NewtonWorldConvexCastReturnInfo& contact = info[i];
+		dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], 0.0f);
+		point = m_localFrame.UntransformVector (stepMatrix.UntransformVector(point));
+		maxHigh = dMax (point.m_x, maxHigh);
+	}
+	if ((maxHigh < m_stepHeight) && (maxHigh > m_contactPatch)) {
+		dVector step (stepMatrix.RotateVector(m_localFrame.RotateVector (dVector(maxHigh, dFloat(0.0f), dFloat(0.0f), dFloat(0.0f)))));
+		matrix.m_posit += step;
+		NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
+	}
 }
 
 dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)

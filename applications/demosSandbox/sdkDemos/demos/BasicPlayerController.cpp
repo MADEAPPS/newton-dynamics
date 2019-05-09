@@ -32,7 +32,6 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 	BasicPlayerControllerManager (NewtonWorld* const world)
 		:dCustomPlayerControllerManager (world)
 		,m_player(NULL)
-		,m_stepHigh (0.0f)
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 
@@ -91,10 +90,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
 		// make a play controller with default values.
-		dCustomPlayerController* const controller = CreateController(location, localAxis, mass, radius, height);
-
-		// set player step high to 1.0f
-		m_stepHigh = 1.0f;
+		dCustomPlayerController* const controller = CreateController(location, localAxis, mass, radius, height, height / 3.0f);
 
 		// get body from player, and set some parameter
 		NewtonBody* const body = controller->GetBody();
@@ -168,12 +164,14 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 
 	bool ProccessContact(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
 	{
+/*
 		if (normal.m_y < 0.9f) {
 			dMatrix matrix;
 			NewtonBodyGetMatrix(controller->GetBody(), &matrix[0][0]);
 			dFloat h = (position - matrix.m_posit).DotProduct3(matrix.m_up);
 			return (h >= m_stepHigh) ? true : false;
 		} 
+*/
 		return true;
 	}
 
@@ -200,7 +198,6 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 	}
 
 	dCustomPlayerController* m_player;
-	dFloat m_stepHigh;
 };
 
 

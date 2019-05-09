@@ -39,6 +39,8 @@ class dCustomPlayerController
 		,m_headingAngle(0.0f)
 		,m_forwardSpeed(0.0f)
 		,m_lateralSpeed(0.0f)
+		,m_stepHeight(0.0f)
+		,m_contactPatch(0.0f)
 		,m_userData(NULL)
 		,m_kinematicBody(NULL)
 		,m_manager(NULL)
@@ -95,6 +97,8 @@ class dCustomPlayerController
 	dFloat m_headingAngle;
 	dFloat m_forwardSpeed;
 	dFloat m_lateralSpeed;
+	dFloat m_stepHeight;
+	dFloat m_contactPatch;
 	void* m_userData;
 	NewtonBody* m_kinematicBody;
 	dCustomPlayerControllerManager* m_manager;
@@ -107,7 +111,7 @@ class dCustomPlayerControllerManager: public dCustomParallelListener
 	public:
 	CUSTOM_JOINTS_API dCustomPlayerControllerManager(NewtonWorld* const world);
 	CUSTOM_JOINTS_API ~dCustomPlayerControllerManager();
-	CUSTOM_JOINTS_API virtual dCustomPlayerController* CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height);
+	CUSTOM_JOINTS_API virtual dCustomPlayerController* CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight);
 
 	virtual void ApplyMove(dCustomPlayerController* const controller, dFloat timestep) = 0;
 	virtual bool ProccessContact(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const { return true; }

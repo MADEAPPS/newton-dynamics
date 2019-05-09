@@ -49,7 +49,7 @@
 //#define DEFAULT_SCENE	13		// infinite user plane collision
 //#define DEFAULT_SCENE	14		// user height field Collision
 //#define DEFAULT_SCENE	15		// compound Collision
-#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
+//#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	17		// uniform Scaled Collision
 //#define DEFAULT_SCENE	18		// non uniform Scaled Collision
 //#define DEFAULT_SCENE	19		// scaled mesh collision
@@ -75,7 +75,7 @@
 //#define DEFAULT_SCENE	39		// David Gravel multi body car
 //#define DEFAULT_SCENE	40		// super Car
 //#define DEFAULT_SCENE	41		// heavy vehicles
-//#define DEFAULT_SCENE	42		// basic player controller
+#define DEFAULT_SCENE	42		// basic player controller
 //#define DEFAULT_SCENE	43		// animated player controller
 //#define DEFAULT_SCENE	44		// advanced player controller
 //#define DEFAULT_SCENE	45		// cloth patch			
