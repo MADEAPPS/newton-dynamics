@@ -42,13 +42,8 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 	virtual dgInt32 GetScore() const;
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
-	accelerator m_accelerator;
+	VkInstance m_instance;
 	int m_score;
-	char m_deviceName[64];
-
-
-	void TestAmp();
-	
 };
 
 #endif

@@ -70,6 +70,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dgNewtonSse4.2", "..\..\..\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dgNewtonAvx", "..\..\..\..\sdk\projects\visualStudio_2013_static_mt\dgNewtonAvx.vcxproj", "{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dgNewtonVulkan", "..\..\..\..\sdk\projects\visualStudio_2013_dll\dgNewtonVulkan.vcxproj", "{49F386BF-6DAC-4399-9C4E-6762A58F58A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug_double|Win32 = debug_double|Win32
@@ -370,6 +372,22 @@ Global
 		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}.Release|Win32.Build.0 = Release|Win32
 		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}.Release|x64.ActiveCfg = Release|x64
 		{4BBE2D98-FD50-4DBA-B098-DAB4F3B66997}.Release|x64.Build.0 = Release|x64
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.debug_double|Win32.ActiveCfg = debug_double|Win32
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.debug_double|Win32.Build.0 = debug_double|Win32
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.debug_double|x64.ActiveCfg = debug_double|x64
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.debug_double|x64.Build.0 = debug_double|x64
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.Debug|Win32.Build.0 = Debug|Win32
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.Debug|x64.ActiveCfg = Debug|x64
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.Debug|x64.Build.0 = Debug|x64
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.release_double|Win32.ActiveCfg = release_double|Win32
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.release_double|Win32.Build.0 = release_double|Win32
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.release_double|x64.ActiveCfg = release_double|x64
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.release_double|x64.Build.0 = release_double|x64
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.Release|Win32.ActiveCfg = Release|Win32
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.Release|Win32.Build.0 = Release|Win32
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.Release|x64.ActiveCfg = Release|x64
+		{49F386BF-6DAC-4399-9C4E-6762A58F58A8}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

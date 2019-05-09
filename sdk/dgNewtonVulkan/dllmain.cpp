@@ -19,25 +19,24 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _DG_NEWTON_PLUGIN_STDADX_
-#define _DG_NEWTON_PLUGIN_STDADX_
+#include "dgNewtonPluginStdafx.h"
 
-// Exclude rarely-used stuff from Windows headers
-#define WIN32_LEAN_AND_MEAN             
-#include <windows.h>
-#include <dg.h>
-#include <dgPhysics.h>
+#ifdef _WIN32
+BOOL APIENTRY DllMain( HMODULE hModule,
+                       DWORD  ul_reason_for_call,
+                       LPVOID lpReserved
+					 )
+{
+	switch (ul_reason_for_call)
+	{
+		case DLL_PROCESS_ATTACH:
+		case DLL_THREAD_ATTACH:
+		case DLL_THREAD_DETACH:
+		case DLL_PROCESS_DETACH:
+			break;
+	}
 
-#include <amp.h>  
-#include <iostream>  
-using namespace concurrency;
-
-#ifdef NEWTONCPU_EXPORTS
-	#define NEWTONCPU_API __declspec(dllexport)
-#else
-	#define NEWTONCPU_API __declspec(dllimport)
-#endif
-
-#pragma warning (disable: 4100) //unreferenced formal parameter
-
+	// GPU module are assumed to be valid at this point
+	return TRUE;
+}
 #endif

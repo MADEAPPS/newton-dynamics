@@ -19,22 +19,41 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dgNewtonPluginStdafx.h"
+#ifndef _DG_NEWTON_PLUGIN_STDADX_
+#define _DG_NEWTON_PLUGIN_STDADX_
+
+#ifdef _WIN32
+	// Exclude rarely-used stuff from Windows headers
+	#define WIN32_LEAN_AND_MEAN             
+	#include <windows.h>
+#endif
+
+#include <dg.h>
+#include <dgPhysics.h>
+#include <vulkan/vulkan.h>
+
+#ifdef NEWTONCPU_EXPORTS
+	#ifdef _WIN32
+		#define NEWTONCPU_API __declspec (dllexport)
+	#else
+		#define NEWTONCPU_API __attribute__ ((visibility("default")))
+	#endif
+#else
+	#ifdef _WIN32
+		#define NEWTONCPU_API __declspec (dllimport)
+	#else
+		#define NEWTONCPU_API
+	#endif
+#endif
+
+#pragma warning (disable: 4100) //unreferenced formal parameter
 
 
-BOOL APIENTRY DllMain( HMODULE hModule,
-                       DWORD  ul_reason_for_call,
-                       LPVOID lpReserved
-					 )
+template <class T>
+void Clear(T* data)
 {
-	switch (ul_reason_for_call)
-	{
-		case DLL_PROCESS_ATTACH:
-		case DLL_THREAD_ATTACH:
-		case DLL_THREAD_DETACH:
-		case DLL_PROCESS_DETACH:
-			break;
-	}
-	return TRUE;
+	memset(data, 0, sizeof(T));
 }
 
+
+#endif

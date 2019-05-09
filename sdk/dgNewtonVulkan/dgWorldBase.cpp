@@ -23,34 +23,48 @@
 #include "dgWorldBase.h"
 
 
+
+
 // This is an example of an exported function.
 dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 {
+	VkApplicationInfo app;
+	Clear(&app);
+	app.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+	app.pApplicationName = "NewtonVulkanSolver";
+	app.applicationVersion = 100;
+	app.pEngineName = "Newton-3.14";
+	app.engineVersion = 314;
+	app.apiVersion = VK_API_VERSION_1_0;
+
+	VkInstanceCreateInfo inst_info;
+	Clear(&inst_info);
+	inst_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	inst_info.pApplicationInfo = &app;
+	inst_info.enabledLayerCount = 0;
+	inst_info.ppEnabledLayerNames = NULL;
+	inst_info.enabledExtensionCount = 0;
+	inst_info.ppEnabledExtensionNames = NULL;
+
+	VkInstance instance;
+	VkResult error = vkCreateInstance(&inst_info, NULL, &instance);
+
+	if (error != VK_SUCCESS) {
+		return NULL;
+	}
+
 	static dgWorldBase module(world, allocator);
+	//	memset(m_vendor, 0, sizeof(m_vendor));
+	//	module.m_score = _stricmp(m_vendor, "GenuineIntel") ? 3 : 4;
+	module.m_score = 10;
+	module.m_instance = instance;
 	return &module;
 }
 
 dgWorldBase::dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocator)
 	:dgWorldPlugin(world, allocator)
 	,dgSolver(world, allocator)
-	,m_score(5)
-//	,m_accelerator(accelerator::default_accelerator)
-//	,m_accelerator(accelerator::cpu_accelerator)
-	,m_accelerator(accelerator::direct3d_warp)
-//	,m_accelerator(accelerator::direct3d_ref)
 {
-	accelerator_view acc_v = m_accelerator.default_view;
-
-	std::wstring desc (m_accelerator.get_description());
-	for (int i = 0; i < dgInt32 (desc.size()); i++) {
-		wctomb(&m_deviceName[i], desc[i]);
-		m_deviceName[i + 1] = 0;
-	}
-#ifdef _DEBUG
-	strcat(m_deviceName, "_d");
-#endif
-
-	TestAmp();
 }
 
 dgWorldBase::~dgWorldBase()
@@ -59,8 +73,11 @@ dgWorldBase::~dgWorldBase()
 
 const char* dgWorldBase::GetId() const
 {
-	return m_deviceName;
-//	return "gpu experimental";
+#ifdef _DEBUG
+	return "newtonVulkan_d";
+#else
+	return "newtonVulkan";
+#endif
 }
 
 dgInt32 dgWorldBase::GetScore() const
@@ -68,42 +85,7 @@ dgInt32 dgWorldBase::GetScore() const
 	return m_score;
 }
 
-
 void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
-	DG_TRACKTIME_NAMED(GetId());
 	dgSolver::CalculateJointForces(cluster, bodyArray, jointArray, timestep);
-}
-
-
-void ScaleElements(index<1> idx, array_view<int, 1> a) restrict(amp)
-{
-	a[idx] = a[idx] * 10;
-}
-
-void dgWorldBase::TestAmp()
-{
-	std::vector<int> data(5);
-
-	for (int count = 0; count < 5; count++)
-	{
-		data[count] = count;
-	}
-
-	array<int, 1> a(5, data.begin(), data.end());
-
-
-	parallel_for_each(
-		a.extent,
-		[=, &a](index<1> idx) restrict(amp)
-	{
-		ScaleElements(idx, a);
-	});
-
-
-	data = a;
-	for (int i = 0; i < 5; i++)
-	{
-		std::cout << data[i] << "\n";
-	}
 }

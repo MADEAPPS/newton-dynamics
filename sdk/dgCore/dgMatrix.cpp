@@ -700,31 +700,6 @@ dgSpatialMatrix dgSpatialMatrix::Inverse(dgInt32 rows) const
 		inv[i][i] = dgFloat32(1.0f);
 	}
 
-#if 0
-	for (dgInt32 i = 0; i < rows; i++) {
-		dgFloat64 val = tmp[i][i];
-		dgAssert(fabs(val) > dgFloat32(1.0e-12f));
-		dgFloat64 den = dgFloat32(1.0f) / val;
-
-		tmp[i] = tmp[i].Scale(den);
-		tmp[i][i] = dgFloat32(1.0f);
-		inv[i] = inv[i].Scale(den);
-
-		for (dgInt32 j = 0; j < i; j++) {
-			dgFloat64 pivot = -tmp[j][i];
-			tmp[j] = tmp[j] + tmp[i].Scale(pivot);
-			inv[j] = inv[j] + inv[i].Scale(pivot);
-		}
-
-		for (dgInt32 j = i + 1; j < rows; j++) {
-			dgFloat64 pivot = -tmp[j][i];
-			tmp[j] = tmp[j] + tmp[i].Scale(pivot);
-			inv[j] = inv[j] + inv[i].Scale(pivot);
-		}
-	}
-
-#else
-
 	for (dgInt32 i = 0; i < rows; i++) {
 		dgFloat64 pivot = dgAbs(tmp[i][i]);
 		if (pivot < dgFloat64(0.01f)) {
@@ -736,7 +711,7 @@ dgSpatialMatrix dgSpatialMatrix::Inverse(dgInt32 rows) const
 					pivot = pivot1;
 				}
 			}
-			dgAssert(pivot > dgFloat32(1.0e-6f));
+			dgAssert(pivot > dgFloat32(1.0e-8f));
 			if (permute != i) {
 				for (dgInt32 j = 0; j < rows; j++) {
 					dgSwap(tmp[i][j], tmp[permute][j]);
@@ -770,7 +745,7 @@ dgSpatialMatrix dgSpatialMatrix::Inverse(dgInt32 rows) const
 			inv[i][k] = den * (inv[i][k] - acc[k]);
 		}
 	}
-#endif
+
 
 #ifdef _DEBUG
 	for (dgInt32 i = 0; i < rows; i++) {
