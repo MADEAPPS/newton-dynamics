@@ -423,20 +423,19 @@ bool dgSolveGaussian(dgInt32 size, T* const matrix, T* const b)
 	return true;
 }
 
-
 template <class T>
-void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const eigenValues)
+void dgEigenValues(const dgInt32 size, const dgInt32 stride, const T* const choleskyMatrix, T* const eigenValues)
 {
 	T* const offDiag = dgAlloca(T, size);
-	T* const matrix = dgAlloca(T, size * size);
+	T* const matrix = dgAlloca(T, size * stride);
 	dgCheckAligment16(offDiag);
 	dgCheckAligment16(matrix);
 
-	memcpy(matrix, choleskyMatrix, sizeof(T) * size * size);
+	memcpy(matrix, choleskyMatrix, sizeof(T) * size * stride);
 
 	for (dgInt32 i = size - 1; i > 0; i--) {
 		T h(0.0f);
-		T* const rowI = &matrix[i * size];
+		T* const rowI = &matrix[i * stride];
 
 		if (i > 1) {
 			T scale(0.0f);
@@ -461,12 +460,12 @@ void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const e
 
 				for (dgInt32 j = 0; j < i; j++) {
 					g = T(0.0f);
-					const T* const rowJ = &matrix[j * size];
+					const T* const rowJ = &matrix[j * stride];
 					for (dgInt32 k = 0; k <= j; k++) {
 						g += rowJ[k] * rowI[k];
 					}
 					for (dgInt32 k = j + 1; k < i; k++) {
-						g += matrix[k * size + j] * rowI[k];
+						g += matrix[k * stride + j] * rowI[k];
 					}
 					offDiag[j] = g / h;
 					f += offDiag[j] * rowI[j];
@@ -477,7 +476,7 @@ void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const e
 					T f1 (rowI[j]);
 					T g1(offDiag[j] - hh * f1);
 					offDiag[j] = g1;
-					T* const rowJ = &matrix[j * size];
+					T* const rowJ = &matrix[j * stride];
 					for (dgInt32 k = 0; k <= j; k++) {
 						rowJ[k] -= (f1 * offDiag[k] + g1 * rowI[k]);
 					}
@@ -489,12 +488,12 @@ void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const e
 		eigenValues[i] = h;
 	}
 
-	dgInt32 index = size;
+	dgInt32 index = stride;
 	eigenValues[0] = matrix[0];
 	for (dgInt32 i = 1; i < size; i++) {
 		eigenValues[i] = matrix[index + i];
 		offDiag[i - 1] = offDiag[i];
-		index += size;
+		index += stride;
 	}
 
 	for (dgInt32 i = 0; i < size; i++) {
@@ -552,6 +551,23 @@ void dgEigenValues(const dgInt32 size, const T* const choleskyMatrix, T* const e
 		} while (j != i);
 	}
 }
+
+template <class T>
+T dgConditionNumber(const dgInt32 size, const dgInt32 stride, const T* const choleskyMatrix)
+{
+	T* const eigenValues = dgAlloca(T, size);
+	dgEigenValues(size, stride, choleskyMatrix, eigenValues);
+
+	T minVal = T(1.0e20f);
+	T maxVal = T(-1.0e20f);
+	for (int i = 0; i < size; i++) {
+		minVal = dgMin(minVal, eigenValues[i]);
+		maxVal = dgMax(maxVal, eigenValues[i]);
+	}
+	T condition = T(dgAbs(maxVal) / dgAbs(minVal));
+	return condition;
+}
+
 
 // solve a general Linear complementary program (LCP)
 // A * x = b + r

@@ -686,7 +686,7 @@ dgInt32 dgWorld::PruneContactsByRank(dgInt32 count, dgCollisionParamProxy& proxy
 	}
 
 	dgFloat32 eigenValues[DG_CONSTRAINT_MAX_ROWS / 3];
-	dgEigenValues(count, massMatrix, eigenValues);
+	dgEigenValues(count, count, massMatrix, eigenValues);
 
 	for (dgInt32 i = 1; i < count; i++) {
 		dgFloat32 value = eigenValues[i];

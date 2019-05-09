@@ -22,6 +22,7 @@
 #include "dgStdafx.h"
 #include "dgMatrix.h"
 #include "dgQuaternion.h"
+#include "dgGeneralMatrix.h"
 
 dgBigVector dgBigVector::m_zero (dgFloat64 (0.0f));
 dgBigVector dgBigVector::m_one (dgFloat64 (1.0f));
@@ -234,7 +235,8 @@ dgMatrix dgMatrix::Inverse4x4 () const
 					pivot = pivot1;
 				}
 			}
-			dgAssert(pivot > dgFloat32(1.0e-6f));
+			dgAssert(pivot > dgFloat32(0.0f));
+			dgAssert((pivot > dgFloat32(1.0e-6f)) || (dgConditionNumber(4, 4, (dgFloat32*)&(*this)[0][0]) < dgFloat32(10000.0f)));
 			if (permute != i) {
 				dgSwap(inv[i], inv[permute]);
 				dgSwap(tmp[i], tmp[permute]);
@@ -694,6 +696,10 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix* const initia
 
 dgSpatialMatrix dgSpatialMatrix::Inverse(dgInt32 rows) const
 {
+for (dgInt32 i = 0; i < rows; i++) {
+	*((dgFloat64*)&m_rows[i * 6]) = 1.e-7f;
+}
+
 	dgSpatialMatrix tmp(*this);
 	dgSpatialMatrix inv(dgFloat64(0.0f));
 	for (dgInt32 i = 0; i < rows; i++) {
@@ -711,7 +717,8 @@ dgSpatialMatrix dgSpatialMatrix::Inverse(dgInt32 rows) const
 					pivot = pivot1;
 				}
 			}
-			dgAssert(pivot > dgFloat32(1.0e-8f));
+			dgAssert(pivot > dgFloat32(0.0f));
+			dgAssert((pivot > dgFloat32(1.0e-6f)) || (dgConditionNumber(rows, 6, (dgFloat64*)&m_rows[0]) < dgFloat32(1.0e-5f)));
 			if (permute != i) {
 				for (dgInt32 j = 0; j < rows; j++) {
 					dgSwap(tmp[i][j], tmp[permute][j]);
