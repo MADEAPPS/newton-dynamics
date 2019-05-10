@@ -714,17 +714,17 @@ dgSpatialMatrix dgSpatialMatrix::Inverse(dgInt32 rows) const
 				}
 			}
 			dgAssert(pivot > dgFloat32(0.0f));
-			//dgAssert((pivot > dgFloat32(1.0e-6f)) || (dgConditionNumber(rows, 6, (dgFloat64*)&m_rows[0]) < dgFloat32(1.0e5f)));
-			if (!((pivot > dgFloat32(1.0e-6f)) || (dgConditionNumber(rows, 6, (dgFloat64*)&m_rows[0]) < dgFloat32(1.0e5f))))
-			{
-				for (dgInt32 m = 0; m < rows; m++) {
-					for (dgInt32 n = 0; n < rows; n++) {
-						dgTrace(("%f ", m_rows[m][n]));
-					}
-					dgTrace(("\n"));
-				}
-				dgAssert(0);
-			}
+			dgAssert((pivot > dgFloat32(1.0e-6f)) || (dgConditionNumber(rows, 6, (dgFloat64*)&m_rows[0]) < dgFloat32(1.0e5f)));
+			//if (!((pivot > dgFloat32(1.0e-6f)) || (dgConditionNumber(rows, 6, (dgFloat64*)&m_rows[0]) < dgFloat32(1.0e5f))))
+			//{
+			//	for (dgInt32 m = 0; m < rows; m++) {
+			//		for (dgInt32 n = 0; n < rows; n++) {
+			//			dgTrace(("%f ", m_rows[m][n]));
+			//		}
+			//		dgTrace(("\n"));
+			//	}
+			//	dgAssert(0);
+			//}
 
 			if (permute != i) {
 				for (dgInt32 j = 0; j < rows; j++) {
