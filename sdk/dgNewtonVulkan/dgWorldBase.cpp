@@ -80,11 +80,7 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	vkGetPhysicalDeviceProperties(physical_gpus[0], &gpu_props);
 
 	static dgWorldBase module(world, allocator);
-	//	memset(m_vendor, 0, sizeof(m_vendor));
-	//	module.m_score = _stricmp(m_vendor, "GenuineIntel") ? 3 : 4;
-
-
-	module.m_score = 10;
+	module.m_score = 0;
 	module.m_gpu = physical_gpus[0];
 	module.m_gpu_props = gpu_props;
 	module.m_instance = instance;
