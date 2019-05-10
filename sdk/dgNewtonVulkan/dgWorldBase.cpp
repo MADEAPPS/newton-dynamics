@@ -46,7 +46,7 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	inst_info.enabledExtensionCount = 0;
 	inst_info.ppEnabledExtensionNames = NULL;
 
-	VkAllocationCallbacks* allocators = NULL;
+VkAllocationCallbacks* allocators = NULL;
 
 	VkInstance instance;
 	VkResult error = vkCreateInstance(&inst_info, allocators, &instance);
@@ -79,6 +79,29 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	Clear(&gpu_props);
 	vkGetPhysicalDeviceProperties(physical_gpus[0], &gpu_props);
 
+	/* Call with NULL data to get count */
+	uint32_t queue_family_count; 
+	vkGetPhysicalDeviceQueueFamilyProperties(physical_gpus[0], &queue_family_count, NULL);
+	dgAssert(queue_family_count >= 1);
+	dgAssert(queue_family_count < 16);
+
+	VkQueueFamilyProperties queue_props[16];
+	vkGetPhysicalDeviceQueueFamilyProperties(physical_gpus[0], &queue_family_count, queue_props);
+
+	// Query fine-grained feature support for this device.
+	//  If app has specific feature requirements it should check supported
+	//  features based on this query
+	VkPhysicalDeviceFeatures physDevFeatures;
+	vkGetPhysicalDeviceFeatures(physical_gpus[0], &physDevFeatures);
+
+//	GET_INSTANCE_PROC_ADDR(demo->inst, GetPhysicalDeviceSurfaceSupportKHR);
+//	GET_INSTANCE_PROC_ADDR(demo->inst, GetPhysicalDeviceSurfaceCapabilitiesKHR);
+//	GET_INSTANCE_PROC_ADDR(demo->inst, GetPhysicalDeviceSurfaceFormatsKHR);
+//	GET_INSTANCE_PROC_ADDR(demo->inst, GetPhysicalDeviceSurfacePresentModesKHR);
+//	GET_INSTANCE_PROC_ADDR(demo->inst, GetSwapchainImagesKHR);
+//	PFN_vkVoidFunction xxxx = vkGetInstanceProcAddr(instance, GetPhysicalDeviceSurfaceSupportKHR);
+
+
 	static dgWorldBase module(world, allocator);
 	module.m_score = 0;
 	module.m_gpu = physical_gpus[0];
@@ -96,6 +119,9 @@ dgWorldBase::dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocato
 dgWorldBase::~dgWorldBase()
 {
 	VkAllocationCallbacks* allocators = NULL;
+
+//	vkDeviceWaitIdle(m_gpu);
+//	vkDeviceWaitIdle(m_device);
 	vkDestroyInstance(m_instance, allocators);
 }
 

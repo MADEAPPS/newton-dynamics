@@ -32,6 +32,18 @@ extern "C"
 #endif
 
 
+/*
+#define GET_INSTANCE_PROC_ADDR(inst, entrypoint)                                                              \
+{                                                                                                         \
+	demo->fp##entrypoint = (PFN_vk##entrypoint)vkGetInstanceProcAddr(inst, "vk" #entrypoint);             \
+	if (demo->fp##entrypoint == NULL) {
+	\
+	ERR_EXIT("vkGetInstanceProcAddr failed to find vk" #entrypoint, "vkGetInstanceProcAddr Failure"); \
+}                                                                                                     \
+}
+*/
+
+
 class dgWorldBase: public dgWorldPlugin, public dgSolver
 {
 	public:
