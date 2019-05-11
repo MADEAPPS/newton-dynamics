@@ -306,11 +306,6 @@ void dCustomBallAndSocket::SubmitFullAngularAxis (const dMatrix& matrix0, const 
 
 void dCustomBallAndSocket::ApplyTwistAngleRow(const dVector& pin, dFloat twistAngle, dFloat timestep)
 {
-static int xxxx;
-dTrace(("%d %f\n", xxxx, twistAngle * dRadToDegree));
-xxxx++;
-dAssert(dAbs(twistAngle * dRadToDegree) < 10.0f);
-
 	const dFloat angleError = GetMaxAngleError();
 	if (m_options.m_option0) {
 		if ((m_minTwistAngle == 0.0f) && (m_minTwistAngle == 0.0f)) {
