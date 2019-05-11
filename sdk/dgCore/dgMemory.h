@@ -93,6 +93,7 @@ class dgMemoryAllocator
 	virtual void FreeLow (void* const retPtr);
 	virtual void *Malloc (dgInt32 memsize);
 	virtual void Free (void* const retPtr);
+	virtual int GetSize (void* const retPtr);
 
 	static dgInt32 GetGlobalMemoryUsed ();
 	static void SetGlobalAllocators (dgMemAlloc alloc, dgMemFree free);

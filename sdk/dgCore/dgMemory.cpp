@@ -367,6 +367,12 @@ void dgMemoryAllocator::Free (void* const retPtr)
 	}
 }
 
+int dgMemoryAllocator::GetSize (void* const retPtr)
+{
+	dgMemoryInfo* const info = ((dgMemoryInfo*)(retPtr)) - 1;
+	return info->m_size;
+}
+
 // Set the pointer of memory allocation functions
 void dgMemoryAllocator::SetGlobalAllocators (dgMemAlloc malloc, dgMemFree free)
 {

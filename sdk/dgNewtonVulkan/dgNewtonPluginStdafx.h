@@ -50,9 +50,9 @@
 
 
 template <class T>
-void Clear(T* data)
+void Clear(T* data, int count = 1)
 {
-	memset(data, 0, sizeof(T));
+	memset(data, 0, count * sizeof(T));
 }
 
 

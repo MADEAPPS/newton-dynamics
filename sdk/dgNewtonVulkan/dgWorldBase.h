@@ -54,12 +54,26 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 	virtual dgInt32 GetScore() const;
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
+	private:
+
+
+	public:
+	void InitDevice ();
+	static void VKAPI_PTR vkFreeFunction(void* pUserData, void* pMemory);
+	static void* VKAPI_PTR vkAllocationFunction(void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope allocationScope);
+	static void* VKAPI_PTR vkReallocationFunction(void* pUserData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope allocationScope);
+	static void VKAPI_PTR vkInternalAllocationNotification(void* pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope);
+	static void VKAPI_PTR vkInternalFreeNotification(void* pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope);
+
+	VkDevice m_device;
 	VkInstance m_instance;
 	VkPhysicalDevice m_gpu;
     VkPhysicalDeviceProperties m_gpu_props;
 	char m_hardwareDeviceName[64];
-//	VkAllocationCallbacks m_allocators;
+	VkAllocationCallbacks m_allocators;
 	int m_score;
+
+	int m_computeQueueIndex;
 };
 
 #endif
