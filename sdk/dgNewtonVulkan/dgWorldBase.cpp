@@ -101,12 +101,12 @@ VkAllocationCallbacks* allocators = NULL;
 //	GET_INSTANCE_PROC_ADDR(demo->inst, GetSwapchainImagesKHR);
 //	PFN_vkVoidFunction xxxx = vkGetInstanceProcAddr(instance, GetPhysicalDeviceSurfaceSupportKHR);
 
-
 	static dgWorldBase module(world, allocator);
 	module.m_score = 0;
 	module.m_gpu = physical_gpus[0];
 	module.m_gpu_props = gpu_props;
 	module.m_instance = instance;
+	sprintf (module.m_hardwareDeviceName, "Newton gpu: %s", module.m_gpu_props.deviceName);
 	return &module;
 }
 
@@ -127,7 +127,8 @@ dgWorldBase::~dgWorldBase()
 
 const char* dgWorldBase::GetId() const
 {
-	return m_gpu_props.deviceName;
+//	return m_gpu_props.deviceName;
+	return m_hardwareDeviceName;
 }
 
 dgInt32 dgWorldBase::GetScore() const

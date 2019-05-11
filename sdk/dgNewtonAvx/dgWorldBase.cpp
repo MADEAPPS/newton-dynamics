@@ -57,11 +57,23 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	m_reg[1] = info.m_edx;
 	m_reg[2] = info.m_ecx;
 	module.m_score = _stricmp(m_vendor, "GenuineIntel") ? 2 : 3;
+
+#ifdef _DEBUG
+	sprintf(module.m_hardwareDeviceName, "Newton cpu: avx_d");
+#else
+	sprintf(module.m_hardwareDeviceName, "Newton cpu: avx");
+#endif
+
 	return &module;
 #elif __linux__
 	if(__builtin_cpu_supports("avx")) {
 		static dgWorldBase module(world, allocator);
 		module.m_score = 3;
+#ifdef _DEBUG
+		sprintf(module.m_hardwareDeviceName, "Newton cpu: avx_d");
+#else
+		sprintf(module.m_hardwareDeviceName, "Newton cpu: avx");
+#endif
 		return &module;
 	} else {
 		return NULL;
@@ -69,6 +81,11 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 #elif defined (_MACOSX_VER)
 	static dgWorldBase module(world, allocator);
 	module.m_score = 3;
+#ifdef _DEBUG
+	sprintf(module.m_hardwareDeviceName, "Newton cpu: avx_d");
+#else
+	sprintf(module.m_hardwareDeviceName, "Newton cpu: avx");
+#endif
 	return &module;
 #endif
 }
@@ -85,11 +102,7 @@ dgWorldBase::~dgWorldBase()
 
 const char* dgWorldBase::GetId() const
 {
-#ifdef _DEBUG
-	return "newtonAVX_d";
-#else
-	return "newtonAVX";
-#endif
+	return m_hardwareDeviceName;
 }
 
 dgInt32 dgWorldBase::GetScore() const

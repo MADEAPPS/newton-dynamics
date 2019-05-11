@@ -54,10 +54,10 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 	virtual dgInt32 GetScore() const;
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
-	
 	VkInstance m_instance;
 	VkPhysicalDevice m_gpu;
     VkPhysicalDeviceProperties m_gpu_props;
+	char m_hardwareDeviceName[64];
 //	VkAllocationCallbacks m_allocators;
 	int m_score;
 };
