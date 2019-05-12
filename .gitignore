@@ -38,12 +38,13 @@ bld/
 *.pdb
 *.dll
 *.lib
+*.exe
+*.spv
 *.dat
 *.log
 *.exp
 *.ilk
 *.map
-*.exe
 *.idb
 *.bin
 *.ncb

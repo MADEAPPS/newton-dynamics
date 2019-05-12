@@ -54,6 +54,35 @@
     <ClInclude Include="..\..\dgNewtonVulkan\dgSolver.h" />
     <ClInclude Include="..\..\dgNewtonVulkan\dgWorldBase.h" />
   </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\dgNewtonVulkan\shaders\test.comp">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).spv  </Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">%(Filename).spv  </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).spv  </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">%(Filename).spv  </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">%(Filename).spv  </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).spv  </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).spv  </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">%(Filename).spv  </Outputs>
+    </CustomBuild>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{49F386BF-6DAC-4399-9C4E-6762A58F58A8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -195,13 +224,13 @@
       <PrecompiledHeaderFile>dgNewtonPluginStdafx.h</PrecompiledHeaderFile>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/VulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/shaders;../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../dgNewtonVulkan/VulkanSDK/1.1.106.0/Lib32</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Lib32</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
@@ -219,13 +248,13 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <PrecompiledHeaderFile>dgNewtonPluginStdafx.h</PrecompiledHeaderFile>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/VulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/shaders;../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../dgNewtonVulkan/VulkanSDK/1.1.106.0/Lib32</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Lib32</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
@@ -243,7 +272,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <PrecompiledHeaderFile>dgNewtonPluginStdafx.h</PrecompiledHeaderFile>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/VulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/shaders;../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -265,7 +294,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <PrecompiledHeaderFile>dgNewtonPluginStdafx.h</PrecompiledHeaderFile>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/VulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/shaders;../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -289,7 +318,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <PrecompiledHeaderFile>dgNewtonPluginStdafx.h</PrecompiledHeaderFile>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/VulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/shaders;../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -298,7 +327,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../dgNewtonVulkan/VulkanSDK/1.1.106.0/Lib32</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Lib32</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
@@ -317,7 +346,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <PrecompiledHeaderFile>dgNewtonPluginStdafx.h</PrecompiledHeaderFile>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/VulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/shaders;../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -326,7 +355,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../../dgNewtonVulkan/VulkanSDK/1.1.106.0/Lib32</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Lib32</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
@@ -345,7 +374,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <PrecompiledHeaderFile>dgNewtonPluginStdafx.h</PrecompiledHeaderFile>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/VulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/shaders;../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -371,7 +400,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <PrecompiledHeaderFile>dgNewtonPluginStdafx.h</PrecompiledHeaderFile>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/VulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/shaders;../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
