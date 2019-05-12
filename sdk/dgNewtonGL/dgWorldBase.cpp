@@ -26,6 +26,7 @@
 // This is an example of an exported function.
 dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 {
+/*
 #ifdef _WIN32
 	union cpuInfo
 	{
@@ -90,6 +91,11 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	//return &module;
 	return NULL;
 #endif
+*/
+	static dgWorldBase module(world, allocator);
+	module.m_score = 0;
+	sprintf (module.m_hardwareDeviceName, "Newton opengl 4.50");
+	return &module;
 }
 
 dgWorldBase::dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocator)

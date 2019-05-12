@@ -423,71 +423,69 @@ template<class T>
 void dgList<T>::InsertAfter (dgListNode* const root, dgListNode* const node)
 {
 	dgAssert (root);
-	dgAssert (node != root);
-	
-	if (root->m_next != node) {
-		if (node == m_first) {
-			m_first = node->m_next;
-		}
-		if (node == m_last) {
-			m_last = node->m_prev;
-		}
-		node->Unlink ();
+	if (node != root) {
+		if (root->m_next != node) {
+			if (node == m_first) {
+				m_first = node->m_next;
+			}
+			if (node == m_last) {
+				m_last = node->m_prev;
+			}
+			node->Unlink ();
 		
-		node->m_prev = root;
-		node->m_next = root->m_next;
-		if (root->m_next) {
-			root->m_next->m_prev = node;
-		} 
-		root->m_next = node;
+			node->m_prev = root;
+			node->m_next = root->m_next;
+			if (root->m_next) {
+				root->m_next->m_prev = node;
+			} 
+			root->m_next = node;
 
-		if (node->m_next == NULL) {
-			m_last = node;
+			if (node->m_next == NULL) {
+				m_last = node;
+			}
+
+			dgAssert (m_last);
+			dgAssert (!m_last->m_next);
+			dgAssert (m_first);
+			dgAssert (!m_first->m_prev);
+			dgAssert (SanityCheck ());
 		}
-
-		dgAssert (m_last);
-		dgAssert (!m_last->m_next);
-		dgAssert (m_first);
-		dgAssert (!m_first->m_prev);
-		dgAssert (SanityCheck ());
 	}
 }
-
 
 template<class T>
 void dgList<T>::InsertBefore (dgListNode* const root, dgListNode* const node)
 {
 	dgAssert (root);
-	dgAssert (node != root);
-	
-	if (root->m_prev != node) {
-		if (node == m_last) {
-			m_last = node->m_prev;
-		}
-		if (node == m_first) {
-			m_first = node->m_next;
-		}
-		node->Unlink ();
+	if (node != root) {
+		if (root->m_prev != node) {
+			if (node == m_last) {
+				m_last = node->m_prev;
+			}
+			if (node == m_first) {
+				m_first = node->m_next;
+			}
+			node->Unlink ();
 		
-		node->m_next = root;
-		node->m_prev = root->m_prev;
-		if (root->m_prev) {
-			root->m_prev->m_next = node;
-		} 
-		root->m_prev = node;
+			node->m_next = root;
+			node->m_prev = root->m_prev;
+			if (root->m_prev) {
+				root->m_prev->m_next = node;
+			} 
+			root->m_prev = node;
 
-		if (node->m_prev == NULL) {
-			m_first = node;
+			if (node->m_prev == NULL) {
+				m_first = node;
+			}
+
+			dgAssert (m_first);
+			dgAssert (!m_first->m_prev);
+			dgAssert (m_last);
+			dgAssert (!m_last->m_next);
+			dgAssert (SanityCheck ());
 		}
-
-		dgAssert (m_first);
-		dgAssert (!m_first->m_prev);
-		dgAssert (m_last);
-		dgAssert (!m_last->m_next);
-		dgAssert (SanityCheck ());
 	}
 }
-
 
 template<class T>
 void dgList<T>::RotateToEnd (dgListNode* const node)

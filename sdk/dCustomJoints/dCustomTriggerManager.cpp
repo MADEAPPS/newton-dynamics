@@ -80,7 +80,6 @@ void dCustomTriggerManager::OnDestroyBody (NewtonBody* const body)
 	}
 }
 
-
 void dCustomTriggerManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 {
 	for (dList<dCustomTriggerController>::dListNode* node = GetControllersList().GetFirst(); node; node = node->GetNext()) {

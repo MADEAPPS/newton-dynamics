@@ -59,9 +59,9 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	module.m_score = _stricmp(m_vendor, "GenuineIntel") ? 2 : 3;
 
 #ifdef _DEBUG
-	sprintf(module.m_hardwareDeviceName, "Newton cpu: avx_d");
+	sprintf(module.m_hardwareDeviceName, "Newton avx_d");
 #else
-	sprintf(module.m_hardwareDeviceName, "Newton cpu: avx");
+	sprintf(module.m_hardwareDeviceName, "Newton avx");
 #endif
 
 	return &module;
@@ -70,9 +70,9 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 		static dgWorldBase module(world, allocator);
 		module.m_score = 3;
 #ifdef _DEBUG
-		sprintf(module.m_hardwareDeviceName, "Newton cpu: avx_d");
+		sprintf(module.m_hardwareDeviceName, "Newton avx_d");
 #else
-		sprintf(module.m_hardwareDeviceName, "Newton cpu: avx");
+		sprintf(module.m_hardwareDeviceName, "Newton avx");
 #endif
 		return &module;
 	} else {
@@ -82,9 +82,9 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	static dgWorldBase module(world, allocator);
 	module.m_score = 3;
 #ifdef _DEBUG
-	sprintf(module.m_hardwareDeviceName, "Newton cpu: avx_d");
+	sprintf(module.m_hardwareDeviceName, "Newton avx_d");
 #else
-	sprintf(module.m_hardwareDeviceName, "Newton cpu: avx");
+	sprintf(module.m_hardwareDeviceName, "Newton avx");
 #endif
 	return &module;
 #endif

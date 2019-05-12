@@ -145,13 +145,99 @@ dgWorldBase::dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocato
 
 dgWorldBase::~dgWorldBase()
 {
+//	vkDeviceWaitIdle(demo->device);
+	vkDeviceWaitIdle(m_device);
+
+//	// Wait for fences from present operations
+//	for (i = 0; i < FRAME_LAG; i++) {
+//		vkWaitForFences(demo->device, 1, &demo->fences[i], VK_TRUE, UINT64_MAX);
+//		vkDestroyFence(demo->device, demo->fences[i], NULL);
+//		vkDestroySemaphore(demo->device, demo->image_acquired_semaphores[i], NULL);
+//		vkDestroySemaphore(demo->device, demo->draw_complete_semaphores[i], NULL);
+//		if (demo->separate_present_queue) {
+//			vkDestroySemaphore(demo->device, demo->image_ownership_semaphores[i], NULL);
+//		}
+//	}
+//
+//	// If the window is currently minimized, demo_resize has already done some cleanup for us.
+//	if (!demo->is_minimized) {
+//		for (i = 0; i < demo->swapchainImageCount; i++) {
+//			vkDestroyFramebuffer(demo->device, demo->swapchain_image_resources[i].framebuffer, NULL);
+//		}
+//		vkDestroyDescriptorPool(demo->device, demo->desc_pool, NULL);
+//
+//		vkDestroyPipeline(demo->device, demo->pipeline, NULL);
+//		vkDestroyPipelineCache(demo->device, demo->pipelineCache, NULL);
+//		vkDestroyRenderPass(demo->device, demo->render_pass, NULL);
+//		vkDestroyPipelineLayout(demo->device, demo->pipeline_layout, NULL);
+//		vkDestroyDescriptorSetLayout(demo->device, demo->desc_layout, NULL);
+//
+//		for (i = 0; i < DEMO_TEXTURE_COUNT; i++) {
+//			vkDestroyImageView(demo->device, demo->textures[i].view, NULL);
+//			vkDestroyImage(demo->device, demo->textures[i].image, NULL);
+//			vkFreeMemory(demo->device, demo->textures[i].mem, NULL);
+//			vkDestroySampler(demo->device, demo->textures[i].sampler, NULL);
+//		}
+//		demo->fpDestroySwapchainKHR(demo->device, demo->swapchain, NULL);
+//
+//		vkDestroyImageView(demo->device, demo->depth.view, NULL);
+//		vkDestroyImage(demo->device, demo->depth.image, NULL);
+//		vkFreeMemory(demo->device, demo->depth.mem, NULL);
+//
+//		for (i = 0; i < demo->swapchainImageCount; i++) {
+//			vkDestroyImageView(demo->device, demo->swapchain_image_resources[i].view, NULL);
+//			vkFreeCommandBuffers(demo->device, demo->cmd_pool, 1, &demo->swapchain_image_resources[i].cmd);
+//			vkDestroyBuffer(demo->device, demo->swapchain_image_resources[i].uniform_buffer, NULL);
+//			vkFreeMemory(demo->device, demo->swapchain_image_resources[i].uniform_memory, NULL);
+//		}
+//		free(demo->swapchain_image_resources);
+//		free(demo->queue_props);
+//		vkDestroyCommandPool(demo->device, demo->cmd_pool, NULL);
+//
+//		if (demo->separate_present_queue) {
+//			vkDestroyCommandPool(demo->device, demo->present_cmd_pool, NULL);
+//		}
+//	}
+
+//	vkDeviceWaitIdle(demo->device);
+//	vkDestroyDevice(demo->device, NULL);
+
 	vkDeviceWaitIdle(m_device);
 	vkDestroyDevice(m_device, &m_allocators);
+
+//	if (demo->validate) {
+//		demo->DestroyDebugUtilsMessengerEXT(demo->inst, demo->dbg_messenger, NULL);
+//	}
+//	vkDestroySurfaceKHR(demo->inst, demo->surface, NULL);
+//
+//#if defined(VK_USE_PLATFORM_XLIB_KHR)
+//	XDestroyWindow(demo->display, demo->xlib_window);
+//	XCloseDisplay(demo->display);
+//#elif defined(VK_USE_PLATFORM_XCB_KHR)
+//	xcb_destroy_window(demo->connection, demo->xcb_window);
+//	xcb_disconnect(demo->connection);
+//	free(demo->atom_wm_delete_window);
+//#elif defined(VK_USE_PLATFORM_WAYLAND_KHR)
+//	wl_keyboard_destroy(demo->keyboard);
+//	wl_pointer_destroy(demo->pointer);
+//	wl_seat_destroy(demo->seat);
+//	wl_shell_surface_destroy(demo->shell_surface);
+//	wl_surface_destroy(demo->window);
+//	wl_shell_destroy(demo->shell);
+//	wl_compositor_destroy(demo->compositor);
+//	wl_registry_destroy(demo->registry);
+//	wl_display_disconnect(demo->display);
+//#endif
+//
+
+
+//	vkDestroyInstance(demo->inst, NULL);
 	vkDestroyInstance(m_instance, &m_allocators);
 }
 
 void dgWorldBase::InitDevice ()
 {
+	VkResult err = VK_SUCCESS;
 	float queue_priorities[1] = { 0.0 };
 	VkDeviceQueueCreateInfo queues[2];
 	Clear(queues, sizeof(queues) / sizeof (queues[0]));
@@ -174,8 +260,11 @@ void dgWorldBase::InitDevice ()
 	deviceInfo.enabledExtensionCount = 0;
 	deviceInfo.ppEnabledExtensionNames = NULL;
 	deviceInfo.pEnabledFeatures = NULL;
-  	VkResult err = vkCreateDevice(m_gpu, &deviceInfo, &m_allocators, &m_device);
+  	err = vkCreateDevice(m_gpu, &deviceInfo, &m_allocators, &m_device);
 	dgAssert(err == VK_SUCCESS);
+
+    vkGetDeviceQueue(m_device, m_computeQueueIndex, 0, &m_queue);
+	vkGetPhysicalDeviceMemoryProperties(m_gpu, &m_memory_properties);
 }
 
 

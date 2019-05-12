@@ -58,9 +58,9 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	m_reg[2] = info.m_ecx;
 	module.m_score = _stricmp(m_vendor, "GenuineIntel") ? 4 : 2;
 #ifdef _DEBUG
-	sprintf(module.m_hardwareDeviceName, "Newton cpu: sse4.2_d");
+	sprintf(module.m_hardwareDeviceName, "Newton sse4.2_d");
 #else
-	sprintf(module.m_hardwareDeviceName, "Newton cpu: sse4.2");
+	sprintf(module.m_hardwareDeviceName, "Newton sse4.2");
 #endif
 	return &module;
 #elif __linux__
@@ -68,9 +68,9 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 		static dgWorldBase module(world, allocator);
 		module.m_score = 2;
 #ifdef _DEBUG
-		sprintf(module.m_hardwareDeviceName, "Newton cpu: sse4.2_d");
+		sprintf(module.m_hardwareDeviceName, "Newton sse4.2_d");
 #else
-		sprintf(module.m_hardwareDeviceName, "Newton cpu: sse4.2");
+		sprintf(module.m_hardwareDeviceName, "Newton sse4.2");
 #endif
 
 		return &module;

@@ -65,12 +65,15 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 	static void VKAPI_PTR vkInternalAllocationNotification(void* pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope);
 	static void VKAPI_PTR vkInternalFreeNotification(void* pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope);
 
+
+	VkQueue m_queue;
 	VkDevice m_device;
 	VkInstance m_instance;
 	VkPhysicalDevice m_gpu;
     VkPhysicalDeviceProperties m_gpu_props;
 	char m_hardwareDeviceName[64];
 	VkAllocationCallbacks m_allocators;
+	VkPhysicalDeviceMemoryProperties m_memory_properties;
 	int m_score;
 
 	int m_computeQueueIndex;

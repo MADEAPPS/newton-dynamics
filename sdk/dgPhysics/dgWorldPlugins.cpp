@@ -66,6 +66,19 @@ void dgWorldPluginList::LoadVisualStudioPlugins(const char* const plugInPath)
 						dgWorldPluginModulePair entry(plugin, module);
 						dgListNode* const node = Append(entry);
 						dgInt32 pluginValue = plugin->GetScore();
+						bool wasMoved = false;
+						for (dgListNode* ptr = GetLast()->GetPrev(); ptr; ptr = ptr->GetPrev()) {
+							dgInt32 value = ptr->GetInfo().m_plugin->GetScore();
+							if (value > pluginValue) {
+								InsertAfter (ptr, node);
+								wasMoved = true;
+								break;
+							}
+						}
+						if (!wasMoved) {
+							InsertBefore (GetFirst(), node);
+						}
+						
 						if (pluginValue > score) {
 							score = pluginValue;
 							m_preferedPlugin = node; 
