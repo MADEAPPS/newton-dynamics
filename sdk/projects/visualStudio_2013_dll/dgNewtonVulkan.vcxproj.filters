@@ -17,8 +17,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\dgNewtonVulkan\shaders\test.comp">
+    <CustomBuild Include="..\..\dgNewtonVulkan\shaders\test.comp">
       <Filter>shaders</Filter>
-    </None>
+    </CustomBuild>
   </ItemGroup>
 </Project>
