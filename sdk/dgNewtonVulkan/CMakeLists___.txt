@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.10.0)
 
-set (projectName "dgNewtonDx12")
+set (projectName "dgNewtonVulkan")
 message (${projectName})
 
 # low level core

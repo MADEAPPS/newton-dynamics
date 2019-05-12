@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.10.0)
 
-set (projectName "dgNewtonAvx2")
+set (projectName "dgNewtonGL")
 message (${projectName})
 
 # low level core
