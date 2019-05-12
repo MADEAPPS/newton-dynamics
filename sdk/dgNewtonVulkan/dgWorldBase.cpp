@@ -174,7 +174,7 @@ void dgWorldBase::InitDevice ()
 	deviceInfo.enabledExtensionCount = 0;
 	deviceInfo.ppEnabledExtensionNames = NULL;
 	deviceInfo.pEnabledFeatures = NULL;
-	VkResult err = vkCreateDevice(m_gpu, &deviceInfo, &m_allocators, &m_device);
+  	VkResult err = vkCreateDevice(m_gpu, &deviceInfo, &m_allocators, &m_device);
 	dgAssert(err == VK_SUCCESS);
 }
 

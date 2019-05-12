@@ -58,6 +58,7 @@
 #include <dCRC.h>
 #include <dTree.h>
 #include <dList.h>
+#include <dArray.h>
 #include <dString.h>
 #include <dVector.h>
 #include <dMatrix.h>

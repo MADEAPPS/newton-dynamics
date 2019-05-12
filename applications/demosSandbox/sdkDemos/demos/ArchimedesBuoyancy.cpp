@@ -207,12 +207,12 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 	{
 	}
 
-	void PreUpdate(dFloat timestep, int threadID)
+	void PreUpdate(dFloat timestep)
 	{
 		// update stationary swimming pool water surface
 		m_faceAngle = dMod(m_faceAngle + m_waveSpeed * timestep, dFloat (2.0f * dPi));
 
-		dCustomTriggerManager::PreUpdate(timestep, threadID);
+		dCustomTriggerManager::PreUpdate(timestep);
 	}
 
 	void CreateBuoyancyTrigger (const dMatrix& matrix, NewtonCollision* const convexShape)

@@ -30,6 +30,10 @@ class dCustomTriggerManager;
 
 class dCustomTriggerController
 {
+	class dTriggerManifest: public dTree<unsigned, NewtonBody*>
+	{
+	};
+
 	public:
 	dCustomTriggerController()
 		:m_manifest()
@@ -51,7 +55,7 @@ class dCustomTriggerController
 	dCustomTriggerManager* GetManager() const { return m_manager; }
 
 	private:
-	dTree<unsigned, NewtonBody*> m_manifest;
+	dTriggerManifest m_manifest;
 	void* m_userData;
 	NewtonBody* m_kinematicBody;
 	dCustomTriggerManager* m_manager;
@@ -61,6 +65,13 @@ class dCustomTriggerController
 
 class dCustomTriggerManager: public dCustomParallelListener
 {
+	class dTriggerGuestPair
+	{
+		public:
+		dCustomTriggerController* m_trigger;
+		dCustomTriggerController::dTriggerManifest::dTreeNode* m_bodyNode;
+	};
+
 	public:
 	CUSTOM_JOINTS_API dCustomTriggerManager (NewtonWorld* const world);
 	CUSTOM_JOINTS_API virtual ~dCustomTriggerManager();
@@ -84,17 +95,20 @@ class dCustomTriggerManager: public dCustomParallelListener
 	{
 	}
 
+	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep);
+
 	virtual void PostUpdate(dFloat timestep)
 	{
 		// bypass the entire Post Update call by not calling the base class
 	}
 
 	private:
-	void UpdateTrigger (dCustomTriggerController* const controller);
 	CUSTOM_JOINTS_API void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
 
 	dList<dCustomTriggerController> m_triggerList;
+	dArray<dTriggerGuestPair> m_pairCache;
 	dFloat m_timestep;
+	int m_cacheCount;
 	unsigned m_lock;
 	unsigned m_lru;
 };

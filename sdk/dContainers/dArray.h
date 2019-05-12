@@ -61,7 +61,7 @@ T& dArray<T>::operator[] (int i)
 {
 	dAssert(i >= 0);
 	while (i >= m_capacity) {
-		Resize(i * 2);
+		Resize(dMax (i * 2, 1));
 	}
 	return m_data[i];
 }
@@ -71,7 +71,7 @@ const T& dArray<T>::operator[] (int i) const
 {
 	dAssert(i >= 0);
 	while (i >= m_capacity) {
-		Resize(i * 2);
+		Resize(dMax (i * 2, 1));
 	}
 	return m_data[i];
 }

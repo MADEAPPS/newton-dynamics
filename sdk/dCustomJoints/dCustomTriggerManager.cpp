@@ -20,7 +20,9 @@
 dCustomTriggerManager::dCustomTriggerManager(NewtonWorld* const world)
 	:dCustomParallelListener(world, TRIGGER_PLUGIN_NAME)
 	,m_triggerList()
+	,m_pairCache ()
 	,m_timestep(0.0f)
+	,m_cacheCount(0)
 	,m_lock(0)
 	,m_lru(0)
 {
@@ -68,52 +70,26 @@ void dCustomTriggerManager::OnDestroyBody (NewtonBody* const body)
 {
 	for (dList<dCustomTriggerController>::dListNode* node = m_triggerList.GetFirst(); node; node = node->GetNext()) {
 		dCustomTriggerController& controller = node->GetInfo();
-		dTree<unsigned,NewtonBody*>& manifest = controller.m_manifest;
-		dTree<unsigned,NewtonBody*>::dTreeNode* const passengerNode = manifest.Find (body);
+		dCustomTriggerController::dTriggerManifest::dTreeNode* const passengerNode = controller.m_manifest.Find (body);
 		if (passengerNode) {
 			OnExit (&controller, body);
 
 			dCustomScopeLock lock (&m_lock);
-			manifest.Remove (passengerNode);
+			controller.m_manifest.Remove (passengerNode);
 		}
 	}
 }
 
-void dCustomTriggerManager::UpdateTrigger (dCustomTriggerController* const controller)
+
+void dCustomTriggerManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 {
-	NewtonBody* const triggerBody = controller->GetBody();
-	dTree<unsigned,NewtonBody*>& manifest = controller->m_manifest;
+	for (dList<dCustomTriggerController>::dListNode* node = GetControllersList().GetFirst(); node; node = node->GetNext()) {
+		const dCustomTriggerController& controller = node->GetInfo();
 
-	m_lru++;
-	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint (triggerBody); joint; joint = NewtonBodyGetNextContactJoint (triggerBody, joint)) {
-		dAssert (NewtonJointIsActive (joint));
-		//int isActive = NewtonJointIsActive (joint);
-		NewtonBody* const body0 = NewtonJointGetBody0(joint);
-		NewtonBody* const body1 = NewtonJointGetBody1(joint);
-		NewtonBody* const cargoBody = (body0 != triggerBody) ? body0 : body1; 
-
-		dTree<unsigned, NewtonBody*>::dTreeNode* node = manifest.Find(cargoBody); 
-
-		if (!node) {
-			dCustomScopeLock lock(&m_lock);
-			node = manifest.Insert(m_lru, cargoBody);
-			OnEnter (controller, cargoBody);
-		} else {
-			WhileIn (controller, cargoBody);
-		}
-		node->GetInfo() = m_lru;
-	}
-
-	dTree<unsigned, NewtonBody*>::Iterator iter(manifest);
-	for (iter.Begin(); iter;) {
-		dTree<unsigned, NewtonBody*>::dTreeNode* const node = iter.GetNode();
-		iter++;
-		if (node->GetInfo() != m_lru) {
-			NewtonBody* const cargoBody = node->GetKey();
-			OnExit (controller, cargoBody);
-
-			dCustomScopeLock lock(&m_lock);
-			manifest.Remove(cargoBody);
+		dCustomTriggerController::dTriggerManifest::Iterator iter (controller.m_manifest);
+		for (iter.Begin(); iter; iter++) {
+			const NewtonBody* const body = iter.GetKey();
+			OnDebug(debugContext, &controller, body);
 		}
 	}
 }
@@ -121,34 +97,64 @@ void dCustomTriggerManager::UpdateTrigger (dCustomTriggerController* const contr
 void dCustomTriggerManager::PreUpdate(dFloat timestep, int threadID)
 {
 	D_TRACKTIME();
+
 	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 
-	m_timestep = timestep;
-	dList<dCustomTriggerController>::dListNode* node = m_triggerList.GetFirst();
-	for (int i = 0; i < threadID; i++) {
-		node = node ? node->GetNext() : NULL;
-	}
-	if (node) {
-		dCustomTriggerController* const controller = &node->GetInfo();
-		UpdateTrigger(controller);
-		do {
-			for (int i = 0; i < threadCount; i++) {
-				node = node ? node->GetNext() : NULL;
-			}
-		} while (node);
+	for (int i = threadID; i < m_cacheCount; i += threadCount) {
+		dTriggerGuestPair& cacheEntry = m_pairCache[i];
+		if (cacheEntry.m_bodyNode->GetInfo() != m_lru) {
+			cacheEntry.m_bodyNode->GetInfo() = m_lru;
+			WhileIn (cacheEntry.m_trigger, cacheEntry.m_bodyNode->GetKey());
+		}
 	}
 }
 
-void dCustomTriggerManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+void dCustomTriggerManager::PreUpdate(dFloat timestep)
 {
+	m_lru++;
+	m_cacheCount = 0;
+	m_timestep = timestep;
 	for (dList<dCustomTriggerController>::dListNode* node = GetControllersList().GetFirst(); node; node = node->GetNext()) {
-		const dCustomTriggerController& controller = node->GetInfo();
+		dCustomTriggerController& controller = node->GetInfo();
 
-		dTree<unsigned, NewtonBody*>::Iterator iter (controller.m_manifest);
-		for (iter.Begin(); iter; iter++) {
-			const NewtonBody* const body = iter.GetKey();
-			OnDebug(debugContext, &controller, body);
+		NewtonBody* const triggerBody = controller.GetBody();
+		dCustomTriggerController::dTriggerManifest& manifest = controller.m_manifest;
+
+		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(triggerBody); joint; joint = NewtonBodyGetNextContactJoint(triggerBody, joint)) {
+			dAssert(NewtonJointIsActive(joint));
+			NewtonBody* const body0 = NewtonJointGetBody0(joint);
+			NewtonBody* const body1 = NewtonJointGetBody1(joint);
+			NewtonBody* cargoBody = (body0 != triggerBody) ? body0 : body1;
+			dCustomTriggerController::dTriggerManifest::dTreeNode* node = manifest.Find(cargoBody);
+			if (!node) {
+				dCustomScopeLock lock(&m_lock);
+				node = manifest.Insert(m_lru, cargoBody);
+				OnEnter(&controller, cargoBody);
+			}
+			dTriggerGuestPair& cacheEntry = m_pairCache[m_cacheCount];
+			cacheEntry.m_trigger = &controller;
+			cacheEntry.m_bodyNode = node;
+			m_cacheCount++;
+		}
+	}
+
+	dCustomParallelListener::PreUpdate(timestep);
+
+	for (dList<dCustomTriggerController>::dListNode* node = GetControllersList().GetFirst(); node; node = node->GetNext()) {
+		dCustomTriggerController* const controller = &node->GetInfo();
+		dCustomTriggerController::dTriggerManifest::Iterator iter(controller->m_manifest);
+
+		for (iter.Begin(); iter;) {
+			dCustomTriggerController::dTriggerManifest::dTreeNode* const node = iter.GetNode();
+			iter++;
+			if (node->GetInfo() != m_lru) {
+				NewtonBody* const cargoBody = node->GetKey();
+				OnExit(controller, cargoBody);
+
+				dCustomScopeLock lock(&m_lock);
+				controller->m_manifest.Remove(cargoBody);
+			}
 		}
 	}
 }
