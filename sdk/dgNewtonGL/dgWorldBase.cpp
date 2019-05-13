@@ -22,39 +22,33 @@
 #include "dgNewtonPluginStdafx.h"
 #include "dgWorldBase.h"
 
-//#include "NewtonCSGPU.glsl"
+#include "NewtonCSGPU.glsl"
 
 
 // This is an example of an exported function.
 dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 {
-	char *cs_Err;
+//	char *cs_Err;
 	GLsizei length = 0;
 
 //	GLuint mShaderID;
 //	GLuint mComputeShader;
 	GLuint mShaderID = glCreateProgram();
 	if (mShaderID != 0) {
-		dgAssert(0);
-/*
-		mComputeShader = glCreateShader(GL_COMPUTE_SHADER);
+		GLuint mComputeShader = glCreateShader(GL_COMPUTE_SHADER);
 		if (mComputeShader != 0) {
-			std::string shdf = readshader(mShaderComputeFile);
-			const char *c_str = shdf.c_str();
-			glShaderSource(mComputeShader, 1, &c_str, NULL);
+			glShaderSource(mComputeShader, 1, &shaderName, NULL);
 			glCompileShader(mComputeShader);
-			//
+			
 			int CSErr;
 			glGetShaderiv(mComputeShader, GL_COMPILE_STATUS, &CSErr);
-			//
-			if (!CSErr)
-			{
+			if (CSErr != GL_TRUE) {
 				glGetShaderiv(mComputeShader, GL_INFO_LOG_LENGTH, &length);
-				cs_Err = (char *)malloc(length);
+				char cs_Err[GL_INFO_LOG_LENGTH + 1024];
 				glGetShaderInfoLog(mComputeShader, GL_INFO_LOG_LENGTH, &length, cs_Err);
-				//printf("Error: Compiler log:\n%s\n", cs_Err);
-				free(cs_Err);
+				printf("Error: Compiler log:\n%s\n", cs_Err);
 			}
+
 			// Attach and link the shader against the compute program.
 			glAttachShader(mShaderID, mComputeShader);
 			glLinkProgram(mShaderID);
@@ -62,19 +56,19 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 			// Check if there were any issues linking the shader.
 			glGetProgramiv(mShaderID, GL_LINK_STATUS, &CSErr);
 			//
-			//
+/*
 			if (!CSErr)
 			{
 				glGetProgramiv(mShaderID, GL_INFO_LOG_LENGTH, &length);
 				cs_Err = (char *)malloc(length);
 				glGetProgramInfoLog(mShaderID, GL_INFO_LOG_LENGTH, &length, cs_Err);
 				//printf("Error: Linker log:\n%s\n", cs_Err);
-				free(cs_Err);
 			}
-			if (mComputeShader != 0)
+			if (mComputeShader != 0) {
 				glDeleteShader(mComputeShader);
-		}
+			}
 */
+		}
 	}
 
 	static dgWorldBase module(world, allocator);

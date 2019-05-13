@@ -16,4 +16,9 @@
     <ClInclude Include="..\..\dgNewtonGL\dgSolver.h" />
     <ClInclude Include="..\..\dgNewtonGL\dgWorldBase.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\dgNewtonGL\shaders\NewtonCSGPU.glsl">
+      <Filter>shaders</Filter>
+    </None>
+  </ItemGroup>
 </Project>

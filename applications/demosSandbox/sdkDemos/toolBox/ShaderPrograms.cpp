@@ -76,7 +76,7 @@ GLuint ShaderPrograms::CreateShaderEffect (const char* const vertexShaderName, c
 	GLint state;
 	char tmpName[256];
 	char buffer[1024 * 64];
-	char errorLog[1024 * 64];
+	char errorLog[GL_INFO_LOG_LENGTH];
 
 	const char* const vPtr = buffer;
 	GLuint program = glCreateProgram();
