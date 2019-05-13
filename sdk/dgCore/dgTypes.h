@@ -600,7 +600,6 @@ DG_INLINE void dgSpinLock(dgInt32* const ptr)
 {
 #ifndef DG_USE_THREAD_EMULATION 
 	while (dgInterlockedExchange(ptr, 1)) {
-//		DG_TRACKTIME_NAMED("lock");
 		dgThreadYield();
 	}
 #endif
@@ -641,7 +640,6 @@ class dgScopeSpinPause
 		:m_atomicLock(lock)
 	{
 		while (dgInterlockedExchange(m_atomicLock, 1)) {
-			//DG_TRACKTIME_NAMED("pause");
 			dgThreadPause();
 		}
 	}

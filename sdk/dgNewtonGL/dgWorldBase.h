@@ -43,6 +43,7 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
 	int m_score;
+	char m_hardwareDeviceName[64];
 };
 
 #endif

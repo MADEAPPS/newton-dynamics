@@ -22,12 +22,68 @@
 #include "dgNewtonPluginStdafx.h"
 #include "dgWorldBase.h"
 
+//#include "NewtonCSGPU.glsl"
+
 
 // This is an example of an exported function.
 dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 {
+	char *cs_Err;
+	GLsizei length = 0;
+
+//	GLuint mShaderID;
+//	GLuint mComputeShader;
+	GLuint mShaderID = glCreateProgram();
+	if (mShaderID != 0) {
+		dgAssert(0);
+/*
+		mComputeShader = glCreateShader(GL_COMPUTE_SHADER);
+		if (mComputeShader != 0) {
+			std::string shdf = readshader(mShaderComputeFile);
+			const char *c_str = shdf.c_str();
+			glShaderSource(mComputeShader, 1, &c_str, NULL);
+			glCompileShader(mComputeShader);
+			//
+			int CSErr;
+			glGetShaderiv(mComputeShader, GL_COMPILE_STATUS, &CSErr);
+			//
+			if (!CSErr)
+			{
+				glGetShaderiv(mComputeShader, GL_INFO_LOG_LENGTH, &length);
+				cs_Err = (char *)malloc(length);
+				glGetShaderInfoLog(mComputeShader, GL_INFO_LOG_LENGTH, &length, cs_Err);
+				//printf("Error: Compiler log:\n%s\n", cs_Err);
+				free(cs_Err);
+			}
+			// Attach and link the shader against the compute program.
+			glAttachShader(mShaderID, mComputeShader);
+			glLinkProgram(mShaderID);
+			//
+			// Check if there were any issues linking the shader.
+			glGetProgramiv(mShaderID, GL_LINK_STATUS, &CSErr);
+			//
+			//
+			if (!CSErr)
+			{
+				glGetProgramiv(mShaderID, GL_INFO_LOG_LENGTH, &length);
+				cs_Err = (char *)malloc(length);
+				glGetProgramInfoLog(mShaderID, GL_INFO_LOG_LENGTH, &length, cs_Err);
+				//printf("Error: Linker log:\n%s\n", cs_Err);
+				free(cs_Err);
+			}
+			if (mComputeShader != 0)
+				glDeleteShader(mComputeShader);
+		}
+*/
+	}
+
 	static dgWorldBase module(world, allocator);
 	module.m_score = 1;
+#ifdef _DEBUG
+	sprintf(module.m_hardwareDeviceName, "Newton opengl_d");
+#else
+	sprintf(module.m_hardwareDeviceName, "Newton opengl");
+#endif
 	return &module;
 }
 
@@ -43,11 +99,7 @@ dgWorldBase::~dgWorldBase()
 
 const char* dgWorldBase::GetId() const
 {
-#ifdef _DEBUG
-	return "newtonSSE_d";
-#else
-	return "newtonSSE";
-#endif
+	return m_hardwareDeviceName;
 }
 
 dgInt32 dgWorldBase::GetScore() const
@@ -55,9 +107,7 @@ dgInt32 dgWorldBase::GetScore() const
 	return m_score;
 }
 
-
 void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
-	DG_TRACKTIME_NAMED(GetId());
 	dgSolver::CalculateJointForces(cluster, bodyArray, jointArray, timestep);
 }

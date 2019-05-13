@@ -23,8 +23,6 @@
 #include "dgWorldBase.h"
 
 
-
-
 // This is an example of an exported function.
 dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 {

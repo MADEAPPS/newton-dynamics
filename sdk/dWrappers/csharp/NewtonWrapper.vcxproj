@@ -55,7 +55,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;NEWTONWRAPPER_EXPORTS;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\;wrapperSdk;$(NEWTON_DYNAMICS)\sdk\dMath;$(NEWTON_DYNAMICS)\sdk\dgNewton;$(NEWTON_DYNAMICS)\sdk\dContainers;$(NEWTON_DYNAMICS)\sdk\dCustomJoints;$(NEWTON_DYNAMICS)\sdk\dgTimeTracker</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;wrapperSdk;$(NEWTON_DYNAMICS)\sdk\dMath;$(NEWTON_DYNAMICS)\sdk\dgNewton;$(NEWTON_DYNAMICS)\sdk\dContainers;$(NEWTON_DYNAMICS)\sdk\dCustomJoints</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -88,7 +88,7 @@ xcopy  "$(OutDir)$(TargetName).pdb" "../Demos/Assets/Plugins/*.*"  /F /Y /R</Com
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_WARNINGS;NEWTONWRAPPER_EXPORTS;_NEWTON_STATIC_LIB;_CUSTOM_JOINTS_STATIC_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>.\;wrapperSdk;$(NEWTON_DYNAMICS)\sdk\dMath;$(NEWTON_DYNAMICS)\sdk\dgNewton;$(NEWTON_DYNAMICS)\sdk\dContainers;$(NEWTON_DYNAMICS)\sdk\dCustomJoints;$(NEWTON_DYNAMICS)\sdk\dgTimeTracker</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;wrapperSdk;$(NEWTON_DYNAMICS)\sdk\dMath;$(NEWTON_DYNAMICS)\sdk\dgNewton;$(NEWTON_DYNAMICS)\sdk\dContainers;$(NEWTON_DYNAMICS)\sdk\dCustomJoints</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
