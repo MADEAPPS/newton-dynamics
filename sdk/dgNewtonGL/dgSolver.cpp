@@ -29,6 +29,16 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgWorldDynamicsParallelSolver.h"
 
+char* dgSolver::m_testShaderSource =
+	"#version 450 core\n"
+	"layout(local_size_x = 1024, local_size_y = 1, local_size_z = 1) in;\n"
+	"void main()\n"
+	"{\n"
+	"	// do nothing for now.\n"
+	"}\n"
+;
+
+
 dgSolver::dgSolver(dgWorld* const world, dgMemoryAllocator* const allocator)
 	:dgParallelBodySolver(allocator)
 	,m_soaOne(1.0f)
@@ -36,13 +46,75 @@ dgSolver::dgSolver(dgWorld* const world, dgMemoryAllocator* const allocator)
 	,m_zero(0.0f)
 	,m_negOne(-1.0f)
 	,m_massMatrix(allocator)
+	,m_shadersCount(0)
 {
 	m_world = world;
 }
 
 dgSolver::~dgSolver()
 {
+	for (int i = 0; i < m_shadersCount; i++) {
+		glDeleteShader(m_shaderArray[i]);
+	}
 }
+
+int dgSolver::CompileAllShaders(GLuint* const shaderArray)
+{
+	int count = 0;
+	shaderArray[count] = CompileComputeShader(m_testShaderSource);
+	count++;
+	return count;
+}
+
+void dgSolver::SetShaders(int count, GLuint* const shaderArray)
+{
+	m_shadersCount = count;
+	for (int i = 0; i < count; i++) {
+		m_shaderArray[i] = shaderArray[i];
+	}
+}
+
+
+GLuint dgSolver::CompileComputeShader(char* const shaderSource)
+{
+	GLint state;
+//	GLchar shaderSource[1024 * 64];
+	char errorLog[GL_INFO_LOG_LENGTH];
+
+//	memset(shaderSource, 0, sizeof(shaderSource));
+//	LoadShaderCode(shaderName, shaderSource);
+
+	GLuint program = glCreateProgram();
+	GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
+
+	GLchar* ptr[2];
+	ptr[0] = shaderSource;
+	ptr[1] = NULL;
+	glShaderSource(computeShader, 1, ptr, NULL);
+	//	error = glGetError();
+	//	dgAssert(error == GL_NO_ERROR);
+
+	glCompileShader(computeShader);
+	glGetShaderiv(computeShader, GL_COMPILE_STATUS, &state);
+	if (state != GL_TRUE) {
+		GLsizei length;
+		glGetShaderInfoLog(computeShader, sizeof(shaderSource), &length, errorLog);
+		dgTrace((errorLog));
+	}
+	glAttachShader(program, computeShader);
+
+	glLinkProgram(program);
+	glGetProgramiv(program, GL_LINK_STATUS, &state);
+	dgAssert(state == GL_TRUE);
+
+	glValidateProgram(program);
+	glGetProgramiv(program, GL_VALIDATE_STATUS, &state);
+	dgAssert(state == GL_TRUE);
+
+	glDeleteShader(computeShader);
+	return program;
+}
+
 
 void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {

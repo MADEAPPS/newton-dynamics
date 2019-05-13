@@ -336,6 +336,9 @@ class dgSolver: public dgParallelBodySolver
 	~dgSolver();
 	void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
+	static int CompileAllShaders(GLuint* const shaderArray);
+	void SetShaders(int count, GLuint* const shaderArray);
+
 	private:
 	void InitWeights();
 	void InitBodyArray();
@@ -385,11 +388,25 @@ class dgSolver: public dgParallelBodySolver
 	//	DG_INLINE dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgJacobian* const internalForces) const;
 	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgJacobian* const internalForces) const;
 
+	static GLuint CompileComputeShader(char* const shaderSource);
+
 	dgSoaFloat m_soaOne;
 	dgSoaFloat m_soaZero;
 	dgVector m_zero;
 	dgVector m_negOne;
 	dgArray<dgSoaMatrixElement> m_massMatrix;
+
+	int m_shadersCount;
+
+	static char* m_testShaderSource;
+	union{
+		GLuint m_shaderArray[64];
+		struct {
+			GLuint m_testShader;
+		};
+	};
+
+	friend class dgWorldBase;
 } DG_GCC_AVX_ALIGMENT;
 
 

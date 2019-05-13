@@ -22,7 +22,7 @@
 #include "dgNewtonPluginStdafx.h"
 #include "dgWorldBase.h"
 
-char dgWorldBase::m_shaderDirectory[1024];
+//char dgWorldBase::m_shaderDirectory[1024];
 
 // This is an example of an exported function.
 dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
@@ -32,49 +32,11 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 		return NULL;
 	}
 
-
-#if 0
-//	GLuint mShaderID;
-//	GLuint mComputeShader;
-	GLuint mShaderID = glCreateProgram();
-	if (mShaderID != 0) {
-		GLuint mComputeShader = glCreateShader(GL_COMPUTE_SHADER);
-		if (mComputeShader != 0) {
-			glShaderSource(mComputeShader, 1, &shaderName, NULL);
-			glCompileShader(mComputeShader);
-			
-			int CSErr;
-			glGetShaderiv(mComputeShader, GL_COMPILE_STATUS, &CSErr);
-			if (CSErr != GL_TRUE) {
-				glGetShaderiv(mComputeShader, GL_INFO_LOG_LENGTH, &length);
-				char cs_Err[GL_INFO_LOG_LENGTH + 1024];
-				glGetShaderInfoLog(mComputeShader, GL_INFO_LOG_LENGTH, &length, cs_Err);
-				printf("Error: Compiler log:\n%s\n", cs_Err);
-			}
-
-			// Attach and link the shader against the compute program.
-			glAttachShader(mShaderID, mComputeShader);
-			glLinkProgram(mShaderID);
-			//
-			// Check if there were any issues linking the shader.
-			glGetProgramiv(mShaderID, GL_LINK_STATUS, &CSErr);
-			//
-/*
-			if (!CSErr)
-			{
-				glGetProgramiv(mShaderID, GL_INFO_LOG_LENGTH, &length);
-				cs_Err = (char *)malloc(length);
-				glGetProgramInfoLog(mShaderID, GL_INFO_LOG_LENGTH, &length, cs_Err);
-				//printf("Error: Linker log:\n%s\n", cs_Err);
-			}
-			if (mComputeShader != 0) {
-				glDeleteShader(mComputeShader);
-			}
-*/
-		}
+	GLuint shaderArray[1024];
+	int shaderCount = dgSolver::CompileAllShaders(shaderArray);
+	if (!shaderCount) {
+		return NULL;
 	}
-#endif
-
 
 	static dgWorldBase module(world, allocator);
 	module.m_score = 1;
@@ -84,7 +46,7 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	sprintf(module.m_hardwareDeviceName, "Newton opengl");
 #endif
 
-	module.m_shaderPrograms.LoadAllShaders();
+	module.SetShaders(shaderCount, shaderArray);
 	return &module;
 }
 
@@ -97,6 +59,7 @@ dgWorldBase::dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocato
 dgWorldBase::~dgWorldBase()
 {
 }
+
 
 const char* dgWorldBase::GetId() const
 {
@@ -113,18 +76,10 @@ void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo*
 	dgSolver::CalculateJointForces(cluster, bodyArray, jointArray, timestep);
 }
 
-
-
+/*
 dgShaderPrograms::dgShaderPrograms(void)
 {
 	m_testShader = 0;
-/*
-	m_solidColor = 0;
-	m_decalEffect = 0;
-	m_diffuseEffect = 0;
-	m_skinningDiffuseEffect = 0;
-	m_diffuseNoTextureEffect = 0;
-*/
 }
 
 dgShaderPrograms::~dgShaderPrograms(void)
@@ -160,16 +115,6 @@ void dgShaderPrograms::LoadShaderCode(const char* const shaderName, char* const 
 	dgAssert(error); error = 0;
 	fclose(file);
 }
-
-/*
-static char* testShader =
-"#version 450 core\n"
-"layout(local_size_x = 1024, local_size_y = 1, local_size_z = 1) in;\n"
-"void main()\n"
-"{\n"
-"	// do nothing for now.\n"
-"}\n";
-*/
 
 GLuint dgShaderPrograms::LoadComputeShader(const char* const shaderName)
 {
@@ -210,3 +155,4 @@ GLuint dgShaderPrograms::LoadComputeShader(const char* const shaderName)
 	glDeleteShader(computeShader);
 	return program;
 }
+*/

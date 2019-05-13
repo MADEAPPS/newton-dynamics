@@ -31,7 +31,7 @@ extern "C"
 }
 #endif
 
-
+/*
 class dgShaderPrograms
 {
 	public:
@@ -52,6 +52,7 @@ class dgShaderPrograms
 	//	GLuint m_skinningDiffuseEffect;
 	//	GLuint m_diffuseNoTextureEffect;
 };
+*/
 
 class dgWorldBase: public dgWorldPlugin, public dgSolver
 {
@@ -66,8 +67,8 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 	int m_score;
 	char m_hardwareDeviceName[64];
 
-	dgShaderPrograms m_shaderPrograms;
-	static char m_shaderDirectory[1024];
+//	dgShaderPrograms m_shaderPrograms;
+//	static char m_shaderDirectory[1024];
 };
 
 #endif

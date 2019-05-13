@@ -59,20 +59,19 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 //	if (strcmp((char*)version, "4.50") < 0) {
 //		return NULL;
 //	}
-
-	char shaderDir[256];
-	GetModuleFileNameA(hModule, shaderDir, sizeof(shaderDir));
-
-	char* ptr = strrchr(shaderDir, '\\');
-	if (!ptr) {
-		ptr = strrchr(shaderDir, '/');
-	}
-	if (!ptr) {
-		return NULL;
-	}
-	ptr++;
-	*ptr = 0;
-	strcpy(dgWorldBase::m_shaderDirectory, shaderDir);
+//	char shaderDir[256];
+//	GetModuleFileNameA(hModule, shaderDir, sizeof(shaderDir));
+//
+//	char* ptr = strrchr(shaderDir, '\\');
+//	if (!ptr) {
+//		ptr = strrchr(shaderDir, '/');
+//	}
+//	if (!ptr) {
+//		return NULL;
+//	}
+//	ptr++;
+//	*ptr = 0;
+//	strcpy(dgWorldBase::m_shaderDirectory, shaderDir);
 
 	return TRUE;
 }
