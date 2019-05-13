@@ -22,15 +22,18 @@
 #include "dgNewtonPluginStdafx.h"
 #include "dgWorldBase.h"
 
-#include "NewtonCSGPU.glsl"
-
+char dgWorldBase::m_shaderDirectory[1024];
 
 // This is an example of an exported function.
 dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 {
-//	char *cs_Err;
-	GLsizei length = 0;
+	const GLubyte* const version = glGetString(GL_SHADING_LANGUAGE_VERSION);
+	if (strcmp((char*)version, "4.50") < 0) {
+		return NULL;
+	}
 
+
+#if 0
 //	GLuint mShaderID;
 //	GLuint mComputeShader;
 	GLuint mShaderID = glCreateProgram();
@@ -70,6 +73,8 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 */
 		}
 	}
+#endif
+
 
 	static dgWorldBase module(world, allocator);
 	module.m_score = 1;
@@ -78,6 +83,8 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 #else
 	sprintf(module.m_hardwareDeviceName, "Newton opengl");
 #endif
+
+	module.m_shaderPrograms.LoadAllShaders();
 	return &module;
 }
 
@@ -104,4 +111,102 @@ dgInt32 dgWorldBase::GetScore() const
 void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
 	dgSolver::CalculateJointForces(cluster, bodyArray, jointArray, timestep);
+}
+
+
+
+dgShaderPrograms::dgShaderPrograms(void)
+{
+	m_testShader = 0;
+/*
+	m_solidColor = 0;
+	m_decalEffect = 0;
+	m_diffuseEffect = 0;
+	m_skinningDiffuseEffect = 0;
+	m_diffuseNoTextureEffect = 0;
+*/
+}
+
+dgShaderPrograms::~dgShaderPrograms(void)
+{
+	if (m_testShader) {
+		glDeleteShader(m_testShader);
+	}
+}
+
+bool dgShaderPrograms::LoadAllShaders()
+{
+	m_testShader = LoadComputeShader("dgTestShader.glsl");
+
+	return true;
+}
+
+void dgShaderPrograms::LoadShaderCode(const char* const shaderName, char* const buffer)
+{
+	int size;
+	FILE* file;
+	char fullPathName[2048];
+
+	sprintf(fullPathName, "%s%s", dgWorldBase::m_shaderDirectory, shaderName);
+
+	file = fopen(fullPathName, "rb");
+	dgAssert(file);
+	fseek(file, 0, SEEK_END);
+
+	size = ftell(file);
+	fseek(file, 0, SEEK_SET);
+	size_t error = fread(buffer, size, 1, file);
+	// for GCC shit
+	dgAssert(error); error = 0;
+	fclose(file);
+}
+
+/*
+static char* testShader =
+"#version 450 core\n"
+"layout(local_size_x = 1024, local_size_y = 1, local_size_z = 1) in;\n"
+"void main()\n"
+"{\n"
+"	// do nothing for now.\n"
+"}\n";
+*/
+
+GLuint dgShaderPrograms::LoadComputeShader(const char* const shaderName)
+{
+	GLint state;
+	GLchar shaderSource[1024 * 64];
+	char errorLog[GL_INFO_LOG_LENGTH];
+
+	memset(shaderSource, 0, sizeof(shaderSource));
+	LoadShaderCode(shaderName, shaderSource);
+
+	GLuint program = glCreateProgram();
+	GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
+
+	GLchar* ptr[2];
+	ptr[0] = shaderSource;
+	ptr[1] = NULL;
+	glShaderSource(computeShader, 1, ptr, NULL);
+//	error = glGetError();
+//	dgAssert(error == GL_NO_ERROR);
+
+	glCompileShader(computeShader);
+	glGetShaderiv(computeShader, GL_COMPILE_STATUS, &state);
+	if (state != GL_TRUE) {
+		GLsizei length;
+		glGetShaderInfoLog(computeShader, sizeof(shaderSource), &length, errorLog);
+		dgTrace((errorLog));
+	}
+	glAttachShader(program, computeShader);
+
+	glLinkProgram(program);
+	glGetProgramiv(program, GL_LINK_STATUS, &state);
+	dgAssert(state == GL_TRUE);
+
+	glValidateProgram(program);
+	glGetProgramiv(program, GL_VALIDATE_STATUS, &state);
+	dgAssert(state == GL_TRUE);
+
+	glDeleteShader(computeShader);
+	return program;
 }

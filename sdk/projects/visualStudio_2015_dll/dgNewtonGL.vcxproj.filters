@@ -17,8 +17,8 @@
     <ClInclude Include="..\..\dgNewtonGL\dgWorldBase.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\dgNewtonGL\shaders\NewtonCSGPU.glsl">
+    <CustomBuild Include="..\..\dgNewtonGL\shaders\dgTestShader.glsl">
       <Filter>shaders</Filter>
-    </None>
+    </CustomBuild>
   </ItemGroup>
 </Project>

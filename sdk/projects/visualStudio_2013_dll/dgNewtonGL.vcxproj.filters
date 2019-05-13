@@ -6,7 +6,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\dgNewtonGL\shaders\NewtonCSGPU.glsl">
+    <ClCompile Include="..\..\dgNewtonGL\dgNewtonPluginStdafx.cpp" />
+    <ClCompile Include="..\..\dgNewtonGL\dgSolver.cpp" />
+    <ClCompile Include="..\..\dgNewtonGL\dgWorldBase.cpp" />
+    <ClCompile Include="..\..\dgNewtonGL\dllmain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\dgNewtonGL\dgNewtonPluginStdafx.h" />
+    <ClInclude Include="..\..\dgNewtonGL\dgSolver.h" />
+    <ClInclude Include="..\..\dgNewtonGL\dgWorldBase.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\dgNewtonGL\shaders\dgTestShader.glsl">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

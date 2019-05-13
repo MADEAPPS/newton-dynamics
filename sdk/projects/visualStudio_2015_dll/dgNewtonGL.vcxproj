@@ -66,7 +66,49 @@
     <ClInclude Include="..\..\dgNewtonGL\dgWorldBase.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\dgNewtonGL\shaders\NewtonCSGPU.glsl" />
+    <CustomBuild Include="..\..\dgNewtonGL\shaders\dgTestShader.glsl">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">xcopy  %(FullPath)  "../../../applications/demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R      
+
+</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">xcopy  %(FullPath)  "../demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*" </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">xcopy  %(FullPath)  "../../../applications/demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R      
+
+</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">xcopy  %(FullPath)  "../demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*" </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">xcopy  %(FullPath)  "../../../applications/demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R      
+
+</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">xcopy  %(FullPath)  "../demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*" </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">xcopy  %(FullPath)  "../../../applications/demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R      
+
+</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">xcopy  %(FullPath)  "../demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*" </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">xcopy  %(FullPath)  "../../../applications/demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R      
+
+</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">xcopy  %(FullPath)  "../demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*" </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">xcopy  %(FullPath)  "../../../applications/demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R      
+
+</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">xcopy  %(FullPath)  "../demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*" </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">xcopy  %(FullPath)  "../../../applications/demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R      
+
+</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">xcopy  %(FullPath)  "../demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*" </Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">xcopy  %(FullPath)  "../../../applications/demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R      
+
+</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">xcopy  %(FullPath)  "../demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*" </Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(FullPath)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">%(FullPath)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(FullPath)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">%(FullPath)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(FullPath)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">%(FullPath)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(FullPath)</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">%(FullPath)</Outputs>
+    </CustomBuild>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3E98D8BD-F525-4449-AA5D-DB3E2E364327}</ProjectGuid>
@@ -219,8 +261,7 @@
     </Link>
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-      </Command>
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">
@@ -242,8 +283,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
     </Link>
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-      </Command>
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -265,8 +305,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
     </Link>
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-      </Command>
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">
@@ -288,8 +327,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
     </Link>
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-      </Command>
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -315,8 +353,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
     </Link>
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-</Command>
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">
@@ -342,8 +379,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
     </Link>
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-</Command>
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -369,8 +405,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
     </Link>
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-</Command>
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">
@@ -396,8 +431,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
     </Link>
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-</Command>
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
