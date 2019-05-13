@@ -31,29 +31,6 @@ extern "C"
 }
 #endif
 
-/*
-class dgShaderPrograms
-{
-	public:
-	dgShaderPrograms();
-	~dgShaderPrograms();
-
-	bool LoadAllShaders();
-
-	private:
-	void LoadShaderCode(const char* const name, char* const buffer);
-	GLuint LoadComputeShader(const char* const shaderName);
-
-	public:
-	GLuint m_testShader;
-	//	GLuint m_solidColor;
-	//	GLuint m_decalEffect;
-	//	GLuint m_diffuseEffect;
-	//	GLuint m_skinningDiffuseEffect;
-	//	GLuint m_diffuseNoTextureEffect;
-};
-*/
-
 class dgWorldBase: public dgWorldPlugin, public dgSolver
 {
 	public:
@@ -66,9 +43,6 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 
 	int m_score;
 	char m_hardwareDeviceName[64];
-
-//	dgShaderPrograms m_shaderPrograms;
-//	static char m_shaderDirectory[1024];
 };
 
 #endif

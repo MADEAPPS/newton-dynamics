@@ -78,11 +78,7 @@ void dgSolver::SetShaders(int count, GLuint* const shaderArray)
 GLuint dgSolver::CompileComputeShader(char* const shaderSource)
 {
 	GLint state;
-//	GLchar shaderSource[1024 * 64];
 	char errorLog[GL_INFO_LOG_LENGTH];
-
-//	memset(shaderSource, 0, sizeof(shaderSource));
-//	LoadShaderCode(shaderName, shaderSource);
 
 	GLuint program = glCreateProgram();
 	GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
@@ -114,7 +110,6 @@ GLuint dgSolver::CompileComputeShader(char* const shaderSource)
 	glDeleteShader(computeShader);
 	return program;
 }
-
 
 void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
@@ -1230,5 +1225,4 @@ void dgSolver::CalculateForces()
 		UpdateKinematicFeedback();
 	}
 }
-
 

@@ -22,8 +22,6 @@
 #include "dgNewtonPluginStdafx.h"
 #include "dgWorldBase.h"
 
-//char dgWorldBase::m_shaderDirectory[1024];
-
 // This is an example of an exported function.
 dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 {
@@ -75,84 +73,3 @@ void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo*
 {
 	dgSolver::CalculateJointForces(cluster, bodyArray, jointArray, timestep);
 }
-
-/*
-dgShaderPrograms::dgShaderPrograms(void)
-{
-	m_testShader = 0;
-}
-
-dgShaderPrograms::~dgShaderPrograms(void)
-{
-	if (m_testShader) {
-		glDeleteShader(m_testShader);
-	}
-}
-
-bool dgShaderPrograms::LoadAllShaders()
-{
-	m_testShader = LoadComputeShader("dgTestShader.glsl");
-
-	return true;
-}
-
-void dgShaderPrograms::LoadShaderCode(const char* const shaderName, char* const buffer)
-{
-	int size;
-	FILE* file;
-	char fullPathName[2048];
-
-	sprintf(fullPathName, "%s%s", dgWorldBase::m_shaderDirectory, shaderName);
-
-	file = fopen(fullPathName, "rb");
-	dgAssert(file);
-	fseek(file, 0, SEEK_END);
-
-	size = ftell(file);
-	fseek(file, 0, SEEK_SET);
-	size_t error = fread(buffer, size, 1, file);
-	// for GCC shit
-	dgAssert(error); error = 0;
-	fclose(file);
-}
-
-GLuint dgShaderPrograms::LoadComputeShader(const char* const shaderName)
-{
-	GLint state;
-	GLchar shaderSource[1024 * 64];
-	char errorLog[GL_INFO_LOG_LENGTH];
-
-	memset(shaderSource, 0, sizeof(shaderSource));
-	LoadShaderCode(shaderName, shaderSource);
-
-	GLuint program = glCreateProgram();
-	GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
-
-	GLchar* ptr[2];
-	ptr[0] = shaderSource;
-	ptr[1] = NULL;
-	glShaderSource(computeShader, 1, ptr, NULL);
-//	error = glGetError();
-//	dgAssert(error == GL_NO_ERROR);
-
-	glCompileShader(computeShader);
-	glGetShaderiv(computeShader, GL_COMPILE_STATUS, &state);
-	if (state != GL_TRUE) {
-		GLsizei length;
-		glGetShaderInfoLog(computeShader, sizeof(shaderSource), &length, errorLog);
-		dgTrace((errorLog));
-	}
-	glAttachShader(program, computeShader);
-
-	glLinkProgram(program);
-	glGetProgramiv(program, GL_LINK_STATUS, &state);
-	dgAssert(state == GL_TRUE);
-
-	glValidateProgram(program);
-	glGetProgramiv(program, GL_VALIDATE_STATUS, &state);
-	dgAssert(state == GL_TRUE);
-
-	glDeleteShader(computeShader);
-	return program;
-}
-*/
