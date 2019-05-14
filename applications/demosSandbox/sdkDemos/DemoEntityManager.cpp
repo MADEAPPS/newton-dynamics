@@ -76,8 +76,8 @@
 //#define DEFAULT_SCENE	40		// super Car
 //#define DEFAULT_SCENE	41		// heavy vehicles
 //#define DEFAULT_SCENE	42		// basic player controller
-//#define DEFAULT_SCENE	43		// animated player controller
-#define DEFAULT_SCENE	44		// advanced player controller
+#define DEFAULT_SCENE	43		// animated player controller
+//#define DEFAULT_SCENE	44		// advanced player controller
 //#define DEFAULT_SCENE	45		// cloth patch			
 //#define DEFAULT_SCENE	46		// soft bodies	
 //#define DEFAULT_SCENE	47		// joe's joint test
@@ -360,7 +360,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showNormalForces = true;
 //	m_showCenterOfMass = false;
 	m_showJointDebugInfo = true;
-//	m_collisionDisplayMode = 2;
+	m_collisionDisplayMode = 2;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
 

@@ -24,7 +24,7 @@ class dPointer
 	T* operator-> ();
 
 	private:
-	T*	m_data; 
+	T* m_data; 
 };
 
 template<class T>

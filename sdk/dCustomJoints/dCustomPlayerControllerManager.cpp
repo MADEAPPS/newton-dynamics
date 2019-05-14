@@ -394,7 +394,8 @@ void dCustomPlayerController::ResolveCollision()
 	NewtonBodyGetCentreOfMass(m_kinematicBody, &com[0]);
 	NewtonBodyGetInvInertiaMatrix(m_kinematicBody, &invInertia[0][0]);
 
-	const dMatrix localFrame (dPitchMatrix(m_headingAngle) * m_localFrame * matrix);
+//	const dMatrix localFrame (dPitchMatrix(m_headingAngle) * m_localFrame * matrix);
+	const dMatrix localFrame (m_localFrame * matrix);
 
 	com = matrix.TransformVector(com);
 	com.m_w = 0.0f;
@@ -477,10 +478,23 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 	m_impulse = dVector(0.0f);
 	m_manager->ApplyMove(this, timestep);
 
+//SetForwardSpeed(1.0f);
+//SetLateralSpeed(0.0f);
+//SetHeadingAngle(45.0f*dDegreeToRad);
+
+	// set player orientation
+	dMatrix matrix(dYawMatrix(GetHeadingAngle()));
+	NewtonBodyGetPosition(m_kinematicBody, &matrix.m_posit[0]);
+	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
+
+	// set play desired velocity
 	dVector veloc(GetVelocity() + m_impulse.Scale(m_invMass));
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+
+	// determine if player has to step over obstacles lower than step hight
 	ResolveStep(timestep);
 
+	// advance player until it hit a collision point, until there is not more time left
 	for (int i = 0; (i < D_DESCRETE_MOTION_STEPS) && (timeLeft > timeEpsilon); i++) {
 		if (timeLeft > timeEpsilon) {
 			ResolveCollision();
