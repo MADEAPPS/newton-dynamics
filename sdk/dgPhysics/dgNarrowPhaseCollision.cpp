@@ -547,10 +547,8 @@ static inline dgInt32 CompareContact (const dgContactPoint* const contactA, cons
 	}
 }
 
-
 dgInt32 dgWorld::ReduceContacts (dgInt32 count, dgContactPoint* const contact,  dgInt32 maxCount, dgFloat32 tol, dgInt32 arrayIsSorted) const
 {
-//	if ((count > maxCount) && (maxCount > 1)) {
 	if (count > maxCount) {
 		dgUnsigned8 mask[DG_MAX_CONTATCS];
 
@@ -600,9 +598,90 @@ dgInt32 dgWorld::ReduceContacts (dgInt32 count, dgContactPoint* const contact,  
 	return maxCount;
 }
 
+dgInt32 dgWorld::PruneSupport(int count, const dgVector& dir, const dgVector* points) const
+{
+	dgInt32 index = 0;
+	dgFloat32 maxVal = dgFloat32(-1.0e20f);
+	for (dgInt32 i = 0; i < count; i++) {
+		dgFloat32 dist = dir.DotProduct(points[i]).GetScalar();
+		if (dist > maxVal) {
+			index = i;
+			maxVal = dist;
+		}
+	}
+	return index;
+}
+
+dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contact, int maxCount) const
+{
+	dgVector array[DG_MAX_CONTATCS];
+	dgInt32 indexArray[DG_MAX_CONTATCS];
+	for (dgInt32 i = 0; i < count; i++) {
+		dgVector p(matrix.UntransformVector(contact[i].m_point));
+		array[i] = p;
+		indexArray[i];
+	}
+
+	dgVector dir0(dgFloat32 (1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+	dgVector dir1(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+
+
+	int hullCount = 0;
+	dgContactPoint hull[DG_MAX_CONTATCS];
+
+	
+	dgVector stack[DG_MAX_CONTATCS * 2][2];
+
+	dgInt32 i0 = PruneSupport(count, dir0, array);
+	count--;
+	hull[hullCount] = contact[i0];
+	hullCount++;
+	stack[0][0] = array[i0];
+	array[i0] = array[count];
+
+	dgInt32 i1 = PruneSupport(count, dir0.Scale(dgFloat32(-1.0f)), array);
+	count--;
+	hull[hullCount] = contact[i1];
+	hullCount++;
+	stack[0][1] = array[i1];
+	array[i1] = array[count];
+
+	stack[1][0] = stack[0][1];
+	stack[1][1] = stack[0][0];
+
+	dgVector up(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
+	int hullVertexCount = 2;
+	while (hullVertexCount) {
+		hullVertexCount--;
+
+		dgVector pq(stack[hullVertexCount][1] - stack[hullVertexCount][0]);
+		dgVector dir(up.CrossProduct (pq));
+		dgInt32 newIndex = PruneSupport(count, dir, array);
+
+		dgVector edge(array[newIndex] - stack[hullVertexCount][0]);
+		dgVector normal(pq.CrossProduct(edge));
+		if (normal.m_z > dgFloat32 (0.1f)) {
+			hull[hullCount] = contact[newIndex];
+			hullCount++;
+			stack[hullVertexCount + 1][1] = stack[hullVertexCount][1];
+			stack[hullVertexCount + 1][0] = array[newIndex];
+			stack[hullVertexCount][1] = array[newIndex];
+			hullVertexCount += 2;
+		}
+		count--;
+		array[newIndex] = array[count];
+		contact[newIndex] = contact[count];
+	}
+
+	for (dgInt32 i = 0; i < hullCount; i++) {
+		contact[i] = hull[i];
+	}
+	return hullCount;
+}
 
 dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPointArray, dgFloat32 distTolerenace, dgInt32 maxCount) const
 {
+#if 1
 	if (count > 1) {
 		dgUnsigned8 mask[DG_MAX_CONTATCS];
 
@@ -653,6 +732,52 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPoin
 		}
 	}
 	return count;
+
+#else
+
+	dgVector origin(dgVector::m_zero);
+	dgMatrix covariance(dgGetZeroMatrix());
+	for (dgInt32 i = 0; i < count; i++) {
+		origin += contactPointArray[i].m_point;
+	}
+	origin = origin.Scale(dgFloat32(1.0) / count);
+
+	for (dgInt32 i = 0; i < count; i++) {
+		dgVector local(contactPointArray[i].m_point - origin);
+		dgMatrix matrix(local, local);
+		covariance.m_front += matrix.m_front;
+		covariance.m_up += matrix.m_up;
+		covariance.m_right += matrix.m_right;
+	}
+
+	dgVector eigen;
+	covariance.EigenVectors(eigen);
+	covariance.m_posit = origin;
+
+	dgInt32 minIndex = (eigen[0] < eigen[1]) ? 0 : 1;
+	minIndex = (eigen[minIndex] < eigen[2]) ? minIndex : 2;
+	if (dgAbs(eigen[minIndex]) > dgFloat32 (1.0e-3f)) {
+		// 3d convex Hull
+		dgAssert(0);
+	} else {
+		// is a 2d or 1d convex hull
+		dgSwap(eigen[minIndex], eigen[2]);
+		dgSwap(covariance[minIndex], covariance[2]);
+
+		minIndex = (eigen[0] < eigen[1]) ? 0 : 1;
+		if (dgAbs(eigen[minIndex]) > dgFloat32(1.0e-3f)) {
+			// is a 2d convex hull
+			return Prune2dContacts(covariance, count, contactPointArray, maxCount);
+		} else {
+			// is a 1d convex hull
+			dgAssert(0);
+			dgSwap(covariance[0], covariance[1]);
+		}
+	}
+
+	
+	return 0;
+#endif
 }
 
 
@@ -1697,7 +1822,8 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 
 	dgInt32 count = 0;
 	dgInt32 maxContacts = proxy.m_maxContacts;
-	dgInt32 maxReduceLimit = maxContacts >> 2;
+//	dgInt32 maxReduceLimit = maxContacts >> 2;
+	dgInt32 maxReduceLimit = maxContacts - 8;
 	dgInt32 countleft = maxContacts;
 
 	const dgVector& polygonInstanceScale = polySoupInstance->GetScale();

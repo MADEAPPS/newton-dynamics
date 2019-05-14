@@ -128,8 +128,8 @@ static NewtonBody* CreateSimpleBox_NewtonMesh (DemoEntityManager* const scene, c
 	matrix.m_posit.m_w = 1.0f;
 
 	NewtonBody* const body = CreateSimpleSolid(scene, visualMesh, mass, matrix, collision, 0);
-	dVector veloc(1, 0, 2, 0);
-	NewtonBodySetVelocity(body, &veloc[0]);
+//	dVector veloc(1, 0, 2, 0);
+//	NewtonBodySetVelocity(body, &veloc[0]);
 
 	visualMesh->Release();
 	NewtonDestroyCollision(collision);
@@ -239,7 +239,7 @@ static void DebugJernejLMesh (DemoEntityManager* const scene)
 	NewtonTreeCollisionEndBuild(collision, 0);
 	fclose(file);
 	dMatrix matrix(dPitchMatrix(90.0f * dDegreeToRad));
-	matrix.m_posit.m_y += 4.0f;
+	matrix.m_posit.m_y += 0.0f;
 	matrix.m_posit.m_x -= 40.0f;
 	NewtonBody* const level = NewtonCreateDynamicBody(scene->GetNewton(), collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);
@@ -252,7 +252,7 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	// load the scene from a ngd file format
-	CreateLevelMesh (scene, "flatPlane.ngd", true);
+//	CreateLevelMesh (scene, "flatPlane.ngd", true);
 
 	NewtonSetContactMergeTolerance (scene->GetNewton(), 1.0e-3f);
 
@@ -266,7 +266,8 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 DebugJernejLMesh (scene);
 
 	dQuaternion rot;
-	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+//	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-10.0f, 1.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 //	ExportScene (scene->GetNewton(), "test1.ngd");
