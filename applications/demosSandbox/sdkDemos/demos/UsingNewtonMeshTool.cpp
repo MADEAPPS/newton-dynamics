@@ -197,8 +197,8 @@ static NewtonBody* CreateSimpledBox_dNetwonMesh(DemoEntityManager* const scene, 
 	matrix.m_posit.m_w = 1.0f;
 
 	NewtonBody* const body = CreateSimpleSolid(scene, visualMesh, mass, matrix, collision, 0);
-	dVector veloc (1, 0, 2, 0);
-	NewtonBodySetVelocity(body, &veloc[0]);
+	//dVector veloc (1, 0, 2, 0);
+	//NewtonBodySetVelocity(body, &veloc[0]);
 
 	visualMesh->Release();
 	NewtonDestroyCollision(collision);
@@ -236,10 +236,11 @@ static void DebugJernejLMesh (DemoEntityManager* const scene)
 			NewtonTreeCollisionAddFace(collision, end - start, &array[start].m_x, sizeof (dVector), 0);
 		}
 	}
-	NewtonTreeCollisionEndBuild(collision, 1);
+	NewtonTreeCollisionEndBuild(collision, 0);
 	fclose(file);
 	dMatrix matrix(dPitchMatrix(90.0f * dDegreeToRad));
 	matrix.m_posit.m_y += 4.0f;
+	matrix.m_posit.m_x -= 40.0f;
 	NewtonBody* const level = NewtonCreateDynamicBody(scene->GetNewton(), collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);
 }
@@ -259,7 +260,7 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	CreateSimpleBox_NewtonMesh (scene, dVector (0.0f, 2.0f, -2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 	// make a box using the dNetwonMesh Class
-	CreateSimpledBox_dNetwonMesh (scene, dVector (4.0f, 2.0f, 2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
+//	CreateSimpledBox_dNetwonMesh (scene, dVector (4.0f, 2.0f, 2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 
 DebugJernejLMesh (scene);

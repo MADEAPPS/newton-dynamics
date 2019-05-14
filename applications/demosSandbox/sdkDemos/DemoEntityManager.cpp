@@ -33,7 +33,7 @@
 #define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0		// using NewtonMesh tool
+#define DEFAULT_SCENE	0		// using NewtonMesh tool
 //#define DEFAULT_SCENE	1		// coefficients of friction
 //#define DEFAULT_SCENE	2		// coefficients of restitution
 //#define DEFAULT_SCENE	3		// gyroscope precession
@@ -76,7 +76,7 @@
 //#define DEFAULT_SCENE	40		// super Car
 //#define DEFAULT_SCENE	41		// heavy vehicles
 //#define DEFAULT_SCENE	42		// basic player controller
-#define DEFAULT_SCENE	43		// animated player controller
+//#define DEFAULT_SCENE	43		// animated player controller
 //#define DEFAULT_SCENE	44		// advanced player controller
 //#define DEFAULT_SCENE	45		// cloth patch			
 //#define DEFAULT_SCENE	46		// soft bodies	
@@ -349,8 +349,8 @@ DemoEntityManager::DemoEntityManager ()
 
 //	m_showUI = false;
 //	m_showAABB = false;
-//	m_showContactPoints = false;
-//	m_hideVisualMeshes = true;
+	m_showContactPoints = true;
+	m_hideVisualMeshes = true;
 //	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
