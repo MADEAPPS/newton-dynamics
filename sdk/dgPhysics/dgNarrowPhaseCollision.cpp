@@ -615,16 +615,11 @@ dgInt32 dgWorld::PruneSupport(int count, const dgVector& dir, const dgVector* po
 dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contact, int maxCount) const
 {
 	dgVector array[DG_MAX_CONTATCS];
-	dgInt32 indexArray[DG_MAX_CONTATCS];
 	for (dgInt32 i = 0; i < count; i++) {
-		dgVector p(matrix.UntransformVector(contact[i].m_point));
-		array[i] = p;
-		indexArray[i];
+		array[i] = matrix.UntransformVector(contact[i].m_point);
 	}
 
 	dgVector dir0(dgFloat32 (1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
-	dgVector dir1(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
-
 
 	int hullCount = 0;
 	dgContactPoint hull[DG_MAX_CONTATCS];
@@ -638,6 +633,7 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 	hullCount++;
 	stack[0][0] = array[i0];
 	array[i0] = array[count];
+	contact[i0] = contact[count];
 
 	dgInt32 i1 = PruneSupport(count, dir0.Scale(dgFloat32(-1.0f)), array);
 	count--;
@@ -645,6 +641,7 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 	hullCount++;
 	stack[0][1] = array[i1];
 	array[i1] = array[count];
+	contact[i1] = contact[count];
 
 	stack[1][0] = stack[0][1];
 	stack[1][1] = stack[0][0];
@@ -667,11 +664,12 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 			stack[hullVertexCount + 1][0] = array[newIndex];
 			stack[hullVertexCount][1] = array[newIndex];
 			hullVertexCount += 2;
+			count--;
+			array[newIndex] = array[count];
+			contact[newIndex] = contact[count];
 		}
-		count--;
-		array[newIndex] = array[count];
-		contact[newIndex] = contact[count];
 	}
+
 
 	for (dgInt32 i = 0; i < hullCount; i++) {
 		contact[i] = hull[i];
@@ -754,29 +752,35 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPoin
 	covariance.EigenVectors(eigen);
 	covariance.m_posit = origin;
 
-	dgInt32 minIndex = (eigen[0] < eigen[1]) ? 0 : 1;
-	minIndex = (eigen[minIndex] < eigen[2]) ? minIndex : 2;
-	if (dgAbs(eigen[minIndex]) > dgFloat32 (1.0e-3f)) {
-		// 3d convex Hull
-		dgAssert(0);
-	} else {
-		// is a 2d or 1d convex hull
-		dgSwap(eigen[minIndex], eigen[2]);
-		dgSwap(covariance[minIndex], covariance[2]);
-
-		minIndex = (eigen[0] < eigen[1]) ? 0 : 1;
-		if (dgAbs(eigen[minIndex]) > dgFloat32(1.0e-3f)) {
-			// is a 2d convex hull
-			return Prune2dContacts(covariance, count, contactPointArray, maxCount);
-		} else {
-			// is a 1d convex hull
-			dgAssert(0);
-			dgSwap(covariance[0], covariance[1]);
-		}
+	if (eigen[1] < eigen[2]) {
+		dgSwap(eigen[1], eigen[2]);
+		dgSwap(covariance[1], covariance[2]);
+	}
+	if (eigen[0] < eigen[1]) {
+		dgSwap(eigen[0], eigen[1]);
+		dgSwap(covariance[0], covariance[1]);
+	}
+	if (eigen[1] < eigen[2]) {
+		dgSwap(eigen[1], eigen[2]);
+		dgSwap(covariance[1], covariance[2]);
 	}
 
+	if (eigen[2] > dgFloat32 (1.0e-3f)) {
+		// 3d convex Hull
+//		dgAssert(0);
+		return Prune2dContacts(covariance, count, contactPointArray, maxCount);
+	} else if (eigen[1] > dgFloat32(1.0e-3f)) {
+		// is a 2d or 1d convex hull
+		return Prune2dContacts(covariance, count, contactPointArray, maxCount);
+	} else if (eigen[0] > dgFloat32(1.0e-3f)) {
+		// is a 1d or 1d convex hull
+		dgAssert(0);
+	} else {
+		// a single point
+		dgAssert(0);
+	}
 	
-	return 0;
+	return 1;
 #endif
 }
 
