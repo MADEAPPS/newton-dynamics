@@ -207,6 +207,44 @@ static NewtonBody* CreateSimpledBox_dNetwonMesh(DemoEntityManager* const scene, 
 }
 
 
+static void DebugJernejLMesh (DemoEntityManager* const scene) 
+{
+	char fileName[2048];
+	dGetWorkingFileName("MeshBug.txt", fileName);
+	FILE* file = fopen(fileName, "rb");
+
+	char name[128];
+	dArray<dVector> array;
+	// create the collision tree geometry
+	NewtonCollision* collision = NewtonCreateTreeCollision(scene->GetNewton(), 0);
+	// prepare to create collision geometry
+	NewtonTreeCollisionBeginBuild(collision);
+	while (!feof(file)) {
+		fscanf(file, "%s", name);
+		if (!strcmp(name, "Vertex")) {
+			int index;
+			dVector point(0.0f);
+			fscanf(file, "%d %f, %f, %f", &index, &point.m_x, &point.m_y, &point.m_z);
+			array[index] = point;
+		}
+		else if (!strcmp(name, "Face")) {
+			//Face 2765 11060 - 11063
+			int index;
+			int start;
+			int end;
+			fscanf(file, "%d %d - %d", &index, &start, &end);
+			NewtonTreeCollisionAddFace(collision, end - start, &array[start].m_x, sizeof (dVector), 0);
+		}
+	}
+	NewtonTreeCollisionEndBuild(collision, 1);
+	fclose(file);
+	dMatrix matrix(dPitchMatrix(90.0f * dDegreeToRad));
+	matrix.m_posit.m_y += 4.0f;
+	NewtonBody* const level = NewtonCreateDynamicBody(scene->GetNewton(), collision, &matrix[0][0]);
+	NewtonDestroyCollision(collision);
+}
+
+
 void UsingNewtonMeshTool (DemoEntityManager* const scene)
 {
 	// load the skybox
@@ -222,6 +260,9 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 
 	// make a box using the dNetwonMesh Class
 	CreateSimpledBox_dNetwonMesh (scene, dVector (4.0f, 2.0f, 2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
+
+
+DebugJernejLMesh (scene);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
