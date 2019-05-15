@@ -739,7 +739,7 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 #else
 	class dgConveFaceNode
 	{
-	public:
+		public:
 		dgConveFaceNode* m_next;
 		dgConveFaceNode* m_prev;
 		dgInt32 m_index;
@@ -747,7 +747,7 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 
 	class dgHullStackSegment
 	{
-	public:
+		public:
 		dgVector m_p0;
 		dgVector m_p1;
 		dgConveFaceNode* m_edgeP0;
@@ -1177,14 +1177,14 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPoin
 	}
 
 
-dgMatrix xxx0 (dgPitchMatrix(30.0f * dgDegreeToRad) * dgYawMatrix(40.0f * dgDegreeToRad) * dgRollMatrix(70.0f * dgDegreeToRad));
-dgMatrix xxx1 (dgGetIdentityMatrix());
-xxx1[0][0] = 5.0f;
-xxx1[1][1] = 10.0f;
-xxx1[2][2] = 0.0f;
-dgMatrix xxx2 (xxx0.Transpose() * xxx1 * xxx0);
-dgVector eigen1 (xxx2.EigenVectors());
-//xxx2.EigenVectors(eigen1);
+//dgMatrix xxx0 (dgPitchMatrix(30.0f * dgDegreeToRad) * dgYawMatrix(40.0f * dgDegreeToRad) * dgRollMatrix(70.0f * dgDegreeToRad));
+//dgMatrix xxx1 (dgGetIdentityMatrix());
+//xxx1[0][0] = 5.0f;
+//xxx1[1][1] = 10.0f;
+//xxx1[2][2] = 0.0f;
+//dgMatrix xxx2 (xxx0.Transpose() * xxx1 * xxx0);
+//dgVector eigen1 (xxx2.EigenVectors());
+
 
 	dgVector eigen (covariance.EigenVectors());
 	covariance.m_posit = origin;
