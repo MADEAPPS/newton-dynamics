@@ -1177,17 +1177,16 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPoin
 	}
 
 
-//dgMatrix xxx0 (dgPitchMatrix(30.0f * dgDegreeToRad) * dgYawMatrix(40.0f * dgDegreeToRad) * dgRollMatrix(70.0f * dgDegreeToRad));
-//dgMatrix xxx1 (dgGetIdentityMatrix());
-//xxx1[0][0] = 5.0f;
-//xxx1[1][1] = 10.0f;
-//xxx1[2][2] = 0.0f;
-//dgMatrix xxx2 (xxx0.Transpose() * xxx1 * xxx0);
-//dgVector eigen1;
+dgMatrix xxx0 (dgPitchMatrix(30.0f * dgDegreeToRad) * dgYawMatrix(40.0f * dgDegreeToRad) * dgRollMatrix(70.0f * dgDegreeToRad));
+dgMatrix xxx1 (dgGetIdentityMatrix());
+xxx1[0][0] = 5.0f;
+xxx1[1][1] = 10.0f;
+xxx1[2][2] = 0.0f;
+dgMatrix xxx2 (xxx0.Transpose() * xxx1 * xxx0);
+dgVector eigen1 (xxx2.EigenVectors());
 //xxx2.EigenVectors(eigen1);
 
-	dgVector eigen;
-	covariance.EigenVectors(eigen);
+	dgVector eigen (covariance.EigenVectors());
 	covariance.m_posit = origin;
 
 	if (eigen[1] < eigen[2]) {

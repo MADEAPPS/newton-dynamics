@@ -60,9 +60,9 @@ void dgDynamicBodyAsymetric::Serialize(const dgTree<dgInt32, const dgCollision*>
 
 void dgDynamicBodyAsymetric::SetMassMatrix(dgFloat32 mass, const dgMatrix& inertia)
 {
-	dgVector II;
+	//dgVector II;
 	m_principalAxis = inertia;
-	m_principalAxis.EigenVectors(II);
+	dgVector II (m_principalAxis.EigenVectors());
 	dgMatrix massMatrix(dgGetIdentityMatrix());
 	massMatrix[0][0] = II[0];
 	massMatrix[1][1] = II[1];

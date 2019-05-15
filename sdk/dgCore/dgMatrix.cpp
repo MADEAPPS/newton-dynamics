@@ -441,78 +441,11 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 	// a polar decomposition decompose matrix A = O * S
 	// where S = sqrt (transpose (L) * L)
 
-/*
-	// calculate transpose (L) * L 
-	dgMatrix LL ((*this) * Transpose());
-
-	// check is this is a pure uniformScale * rotation * translation
-	dgFloat32 det2 = (LL[0][0] + LL[1][1] + LL[2][2]) * dgFloat32 (1.0f / 3.0f);
-
-	dgFloat32 invdet2 = 1.0f / det2;
-
-	dgMatrix pureRotation (LL);
-	pureRotation[0] = pureRotation[0].Scale (invdet2);
-	pureRotation[1] = pureRotation[1].Scale (invdet2);
-	pureRotation[2] = pureRotation[2].Scale (invdet2);
-
-	dgFloat32 sign = ((((*this)[0] * (*this)[1]) % (*this)[2]) > 0.0f) ? 1.0f : -1.0f;
-	dgFloat32 det = (pureRotation[0] * pureRotation[1]) % pureRotation[2];
-	if (dgAbs (det - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f)) {
-		// this is a pure scale * rotation * translation
-		det = sign * dgSqrt (det2);
-		scale[0] = det;
-		scale[1] = det;
-		scale[2] = det;
-		det = dgFloat32 (1.0f)/ det;
-		transformMatrix.m_front = m_front.Scale (det);
-		transformMatrix.m_up = m_up.Scale (det);
-		transformMatrix.m_right = m_right.Scale (det);
-		transformMatrix[0][3] = dgFloat32 (0.0f);
-		transformMatrix[1][3] = dgFloat32 (0.0f);
-		transformMatrix[2][3] = dgFloat32 (0.0f);
-		transformMatrix.m_posit = m_posit;
-		stretchAxis = dgGetIdentityMatrix();
-
-	} else {
-		stretchAxis = LL;
-		stretchAxis.EigenVectors (scale);
-
-		// I need to deal with by seeing of some of the Scale are duplicated
-		// do this later (maybe by a given rotation around the non uniform axis but I do not know if it will work)
-		// for now just us the matrix
-
-		scale[0] = sign * dgSqrt (scale[0]);
-		scale[1] = sign * dgSqrt (scale[1]);
-		scale[2] = sign * dgSqrt (scale[2]);
-		scale[3] = dgFloat32 (0.0f);
-
-		dgMatrix scaledAxis;
-		scaledAxis[0] = stretchAxis[0].Scale (dgFloat32 (1.0f) / scale[0]);
-		scaledAxis[1] = stretchAxis[1].Scale (dgFloat32 (1.0f) / scale[1]);
-		scaledAxis[2] = stretchAxis[2].Scale (dgFloat32 (1.0f) / scale[2]);
-		scaledAxis[3] = stretchAxis[3];
-		dgMatrix symetricInv (stretchAxis.Transpose() * scaledAxis);
-
-		transformMatrix = symetricInv * (*this);
-		transformMatrix.m_posit = m_posit;
-	}
-*/
-/*
-// test the fucking factorization 
-dgMatrix xxxxx(dgRollMatrix(30.0f * dgDEG2RAD));
-xxxxx = dgYawMatrix(30.0f * dgDEG2RAD) * xxxxx;
-dgMatrix xxxxx1(dgGetIdentityMatrix());
-xxxxx1[0][0] = 2.0f;
-dgMatrix xxxxx2(xxxxx.Inverse() * xxxxx1 * xxxxx);
-dgMatrix xxxxx3 (xxxxx2);
-xxxxx2.EigenVectors(scale);
-dgMatrix xxxxx4(xxxxx2.Inverse() * xxxxx1 * xxxxx2);
-*/
-
 	const dgMatrix& me = *this;
 	dgFloat32 sign = dgSign (me[2].DotProduct3 (me[0].CrossProduct(me[1])));
 	stretchAxis = me * Transpose();
-	stretchAxis.EigenVectors (scale);
+	//stretchAxis.EigenVectors (scale);
+	scale = stretchAxis.EigenVectors();
 
 	// I need to deal with by seeing of some of the Scale are duplicated
 	// do this later (maybe by a given rotation around the non uniform axis but I do not know if it will work)
@@ -535,93 +468,78 @@ dgMatrix xxxxx4(xxxxx2.Inverse() * xxxxx1 * xxxxx2);
 }
 
 
-/*
-for some reason I cannot get this to work
-void dgMatrix::EigenVectors (dgVector& eigenValues, const dgMatrix& initialGuess)
+dgVector dgMatrix::EigenVectors ()
 {
-	dgVector xxx1;
-	dgMatrix xxx0 (*this);
-	xxx0.EigenVectors____ (xxx1, initialGuess);
+/*
+	dgMatrix thidiagonal(*this);
+	dgMatrix eigenVector(dgGetIdentityMatrix());
+	if (dgAbs(m_front.m_z) > dgFloat32 (1.0e-6f)) {
+		// convert to tridiagonal matrix using householder
+		dgVector u(m_front);
+		u.m_x = dgFloat32(0.0f);
+		u.m_y -= dgSqrt(u.DotProduct(u).GetScalar());
+		dgAssert(dgAbs (u.m_y) > dgFloat32(1.0e-6f));
+		dgVector v(u.Scale(-dgFloat32(2.0f) / u.DotProduct(u).GetScalar()));
 
-	static dgInt32 offDiagonalIndex[][2] = {{0, 1}, {0, 2}, {1, 2}};
-
-	dgMatrix eigenVector (dgGetIdentityMatrix());
-	dgMatrix& mat = *this;
-
-	for (dgInt32 m = 0; m < 20; m ++) {
-		dgFloat32 ajk[3];
-		ajk[0] = dgAbs(mat[0][1]);
-		ajk[1] = dgAbs(mat[0][2]);
-		ajk[2] = dgAbs(mat[1][2]);
-		dgFloat32 sm = ajk[0] + ajk[1] + ajk[2];
-		if (sm < dgFloat32 (1.0e-12f)) {
-			eigenValues = dgVector (mat[0][0], mat[1][1], mat[2][2], dgFloat32 (1.0f));
-			*this = eigenVector;
-			return;
-		}
-
-		dgInt32 index = 0;
-		dgFloat32 maxA = ajk[0];
-		if (maxA < ajk[1]) {
-			index = 1;
-			maxA = ajk[1];
-		}
-
-		if (maxA < ajk[2]) {
-			index = 2;
-			maxA = ajk[2];
-		}
-
-		dgInt32 j = offDiagonalIndex[index][0];
-		dgInt32 k = offDiagonalIndex[index][1];
-
-		dgFloat32 Ajj = mat[j][j];
-		dgFloat32 Akk = mat[k][k];
-		dgFloat32 Ajk = mat[j][k];
-		dgFloat32 phi = dgFloat32 (0.5f) * dgAtan2 (dgFloat32 (2.0f) * Ajk, Akk - Ajj);
-
-		dgFloat32 c = dgCos (phi);
-		dgFloat32 s = dgSin (phi);
-
-		dgMatrix givensRotation (dgGetIdentityMatrix());
-		givensRotation[j][j] = c;
-		givensRotation[k][k] = c;
-		givensRotation[j][k] = -s;
-		givensRotation[k][j] = s;
-
-		eigenVector = eigenVector * givensRotation;
-		mat = givensRotation * mat * givensRotation.Transpose();
-		mat[j][k] = dgFloat32 (0.0f);
-		mat[k][j] = dgFloat32 (0.0f);
+		eigenVector = dgMatrix(v, u);
+		eigenVector[0][0] += dgFloat32(1.0f);
+		eigenVector[1][1] += dgFloat32(1.0f);
+		eigenVector[2][2] += dgFloat32(1.0f);
+		thidiagonal = eigenVector.Transpose() * thidiagonal * eigenVector;
+		dgAssert(dgAbs(thidiagonal[0][2]) < dgFloat32(1.0e-4f));
+		dgAssert(dgAbs(thidiagonal[2][0]) < dgFloat32(1.0e-4f));
+		thidiagonal[0][2] = dgFloat32(0.0f);
+		thidiagonal[2][0] = dgFloat32(0.0f);
 	}
-	dgAssert (0);
-}
+
+	// try using QR allgorith
+	if (dgAbs(upperTriangular.m_up.m_z) > 1.0e-6f) {
+		dgVector u(upperTriangular.m_up);
+		u.m_x = dgFloat32(0.0f);
+		u.m_y -= dgSqrt(u.DotProduct(u).GetScalar());
+
+		dgVector v(u.Scale(-dgFloat32(2.0f) / u.DotProduct(u).GetScalar()));
+		dgMatrix househoulder(dgGetIdentityMatrix());
+
+		househoulder.m_up.m_y += v.m_y * u.m_y;
+		househoulder.m_up.m_z = v.m_y * u.m_z;
+		househoulder.m_right.m_y = v.m_y * u.m_z;
+		househoulder.m_right.m_z += v.m_z * u.m_z;
+
+		reflectionMatrix = househoulder * reflectionMatrix;
+		upperTriangular = upperTriangular * househoulder.Transpose();
+		upperTriangular = reflectionMatrix * upperTriangular;
+	}
 */
 
-void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix* const initialGuess)
-{
-//dgMatrix xxxxx (*this);
-//dgVector xxxxx1;
-//dgEigenValues(3, 4, &xxxxx[0][0], &xxxxx1[0]);
-
 	dgMatrix& mat = *this;
-	dgMatrix eigenVectors (dgGetIdentityMatrix());
-	if (initialGuess) {
-		eigenVectors = *initialGuess;
-		mat = eigenVectors.Transpose4X4() * mat * eigenVectors;
+	dgMatrix eigenVectors(dgGetIdentityMatrix());
+	if (dgAbs(m_front.m_z) > dgFloat32(1.0e-6f)) {
+		// calcualte initial guess by convert to tridiagonal matrix using householder
+		dgVector u(m_front);
+		u.m_x = dgFloat32(0.0f);
+		u.m_y -= dgSqrt(u.DotProduct(u).GetScalar());
+		dgAssert(dgAbs(u.m_y) > dgFloat32(1.0e-6f));
+		dgVector v(u.Scale(-dgFloat32(2.0f) / u.DotProduct(u).GetScalar()));
+
+		eigenVectors = dgMatrix(v, u);
+		eigenVectors[0][0] += dgFloat32(1.0f);
+		eigenVectors[1][1] += dgFloat32(1.0f);
+		eigenVectors[2][2] += dgFloat32(1.0f);
+		mat = eigenVectors.Transpose() * mat * eigenVectors;
 	}
+
+	mat[0][2] = dgFloat32(0.0f);
+	mat[2][0] = dgFloat32(0.0f);
 
 	dgVector d (mat[0][0], mat[1][1], mat[2][2], dgFloat32 (0.0f)); 
 	dgVector b (d);
 	for (dgInt32 i = 0; i < 50; i++) {
-		dgFloat32 sm = dgAbs(mat[0][1]) + dgAbs(mat[0][2]) + dgAbs(mat[1][2]);
-
+		dgFloat32 sm = mat[0][1] * mat[0][1] + mat[0][2] * mat[0][2] + mat[1][2] * mat[0][2];
 		if (sm < dgFloat32 (1.0e-12f)) {
 			// order the eigenvalue vectors	
 			dgVector tmp (eigenVectors.m_front.CrossProduct(eigenVectors.m_up));
 			if (tmp.DotProduct3(eigenVectors.m_right) < dgFloat32(0.0f)) {
-				dgAssert (0.0f);
-				//eigenVectors.m_right = eigenVectors.m_right.Scale (-dgFloat32(1.0f));
 				eigenVectors.m_right = eigenVectors.m_right * dgVector::m_negOne;
 			}
 			break;
@@ -694,8 +612,9 @@ void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix* const initia
 		d = b; 
 	}
 
-	eigenValues = d;
+	//eigenValues = d;
 	*this = eigenVectors;
+	return d;
 }
 
 dgSpatialMatrix dgSpatialMatrix::Inverse(dgInt32 rows) const

@@ -184,7 +184,7 @@ namespace InternalSphere
 		sphere.m_front = dgVector ((dgFloat32)Ixx, (dgFloat32)Ixy, (dgFloat32)Ixz, dgFloat32 (0.0f));
 		sphere.m_up    = dgVector ((dgFloat32)Ixy, (dgFloat32)Iyy, (dgFloat32)Iyz, dgFloat32 (0.0f));
 		sphere.m_right = dgVector ((dgFloat32)Ixz, (dgFloat32)Iyz, (dgFloat32)Izz, dgFloat32 (0.0f));
-		sphere.EigenVectors(eigenValues);
+		eigenValues = sphere.EigenVectors();
 	}
 
 	
@@ -221,7 +221,7 @@ namespace InternalSphere
 		sphere.m_front = dgVector (dgFloat32(Ixx), dgFloat32(Ixy), dgFloat32(Ixz), dgFloat32 (0.0f));
 		sphere.m_up    = dgVector (dgFloat32(Ixy), dgFloat32(Iyy), dgFloat32(Iyz), dgFloat32 (0.0f));
 		sphere.m_right = dgVector (dgFloat32(Ixz), dgFloat32(Iyz), dgFloat32(Izz), dgFloat32 (0.0f));
- 		sphere.EigenVectors (eigenValues);
+		eigenValues = sphere.EigenVectors ();
 	}
 
 /*

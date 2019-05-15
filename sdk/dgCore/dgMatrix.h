@@ -89,8 +89,8 @@ class dgMatrix
 	dgMatrix operator* (const dgMatrix &B) const;
 
 	// these function can only be called when dgMatrix is a PDS matrix
-	void EigenVectors (const dgMatrix* initialGuess = NULL);
-	void EigenVectors (dgVector &eigenValues, const dgMatrix* const initialGuess = NULL);
+	//void EigenVectors ();
+	dgVector EigenVectors ();
 	void PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, dgMatrix& stretchAxis, const dgMatrix* initialStretchAxis = NULL) const;
 
 	// constructor for polar composition
@@ -212,11 +212,13 @@ DG_INLINE dgPlane dgMatrix::UntransformPlane (const dgPlane &globalPlane) const
 	return dgPlane (UnrotateVector (globalPlane), globalPlane.Evalue(m_posit));
 }
 
-DG_INLINE void dgMatrix::EigenVectors (const dgMatrix* const initialGuess)
+/*
+DG_INLINE void dgMatrix::EigenVectors ()
 {
 	dgVector eigenValues;
-	EigenVectors (eigenValues, initialGuess);
+	EigenVectors (eigenValues);
 }
+*/
 
 DG_INLINE dgMatrix dgMatrix::Inverse () const
 {
