@@ -424,14 +424,14 @@ bool dgSolveGaussian(dgInt32 size, T* const matrix, T* const b)
 }
 
 template <class T>
-void dgEigenValues(const dgInt32 size, const dgInt32 stride, const T* const choleskyMatrix, T* const eigenValues)
+void dgEigenValues(const dgInt32 size, const dgInt32 stride, const T* const symmetricMatrix, T* const eigenValues)
 {
 	T* const offDiag = dgAlloca(T, size);
 	T* const matrix = dgAlloca(T, size * stride);
 	dgCheckAligment16(offDiag);
 	dgCheckAligment16(matrix);
 
-	memcpy(matrix, choleskyMatrix, sizeof(T) * size * stride);
+	memcpy(matrix, symmetricMatrix, sizeof(T) * size * stride);
 
 	for (dgInt32 i = size - 1; i > 0; i--) {
 		T h(0.0f);
@@ -501,7 +501,7 @@ void dgEigenValues(const dgInt32 size, const dgInt32 stride, const T* const chol
 		dgInt32 iter = 0;
 		do {
 			for (j = i; j < size - 1; j++) {
-				T dd(dgAbs(eigenValues[j]) + dgAbs(eigenValues[j + 1]));
+  				T dd(dgAbs(eigenValues[j]) + dgAbs(eigenValues[j + 1]));
 				if (dgAbs(offDiag[j]) <= (T(1.e-6f) * dd)) {
 					break;
 				}

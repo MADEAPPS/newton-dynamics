@@ -600,6 +600,10 @@ void dgMatrix::EigenVectors (dgVector& eigenValues, const dgMatrix& initialGuess
 
 void dgMatrix::EigenVectors (dgVector &eigenValues, const dgMatrix* const initialGuess)
 {
+//dgMatrix xxxxx (*this);
+//dgVector xxxxx1;
+//dgEigenValues(3, 4, &xxxxx[0][0], &xxxxx1[0]);
+
 	dgMatrix& mat = *this;
 	dgMatrix eigenVectors (dgGetIdentityMatrix());
 	if (initialGuess) {

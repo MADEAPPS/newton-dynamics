@@ -598,85 +598,6 @@ dgInt32 dgWorld::ReduceContacts (dgInt32 count, dgContactPoint* const contact,  
 	return maxCount;
 }
 
-dgInt32 dgWorld::PruneSupport(int count, const dgVector& dir, const dgVector* points) const
-{
-	dgInt32 index = 0;
-	dgFloat32 maxVal = dgFloat32(-1.0e20f);
-	for (dgInt32 i = 0; i < count; i++) {
-		dgFloat32 dist = dir.DotProduct(points[i]).GetScalar();
-		if (dist > maxVal) {
-			index = i;
-			maxVal = dist;
-		}
-	}
-	return index;
-}
-
-dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contact, int maxCount) const
-{
-	dgVector array[DG_MAX_CONTATCS];
-	for (dgInt32 i = 0; i < count; i++) {
-		array[i] = matrix.UntransformVector(contact[i].m_point);
-	}
-
-	dgVector dir0(dgFloat32 (1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
-
-	int hullCount = 0;
-	dgContactPoint hull[DG_MAX_CONTATCS];
-
-	
-	dgVector stack[DG_MAX_CONTATCS * 2][2];
-
-	dgInt32 i0 = PruneSupport(count, dir0, array);
-	count--;
-	hull[hullCount] = contact[i0];
-	hullCount++;
-	stack[0][0] = array[i0];
-	array[i0] = array[count];
-	contact[i0] = contact[count];
-
-	dgInt32 i1 = PruneSupport(count, dir0.Scale(dgFloat32(-1.0f)), array);
-	count--;
-	hull[hullCount] = contact[i1];
-	hullCount++;
-	stack[0][1] = array[i1];
-	array[i1] = array[count];
-	contact[i1] = contact[count];
-
-	stack[1][0] = stack[0][1];
-	stack[1][1] = stack[0][0];
-
-	dgVector up(dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
-	int hullVertexCount = 2;
-	while (hullVertexCount) {
-		hullVertexCount--;
-
-		dgVector pq(stack[hullVertexCount][1] - stack[hullVertexCount][0]);
-		dgVector dir(up.CrossProduct (pq));
-		dgInt32 newIndex = PruneSupport(count, dir, array);
-
-		dgVector edge(array[newIndex] - stack[hullVertexCount][0]);
-		dgVector normal(pq.CrossProduct(edge));
-		if (normal.m_z > dgFloat32 (0.1f)) {
-			hull[hullCount] = contact[newIndex];
-			hullCount++;
-			stack[hullVertexCount + 1][1] = stack[hullVertexCount][1];
-			stack[hullVertexCount + 1][0] = array[newIndex];
-			stack[hullVertexCount][1] = array[newIndex];
-			hullVertexCount += 2;
-			count--;
-			array[newIndex] = array[count];
-			contact[newIndex] = contact[count];
-		}
-	}
-
-
-	for (dgInt32 i = 0; i < hullCount; i++) {
-		contact[i] = hull[i];
-	}
-	return hullCount;
-}
-
 dgInt32 dgWorld::OldPruneContacts(dgInt32 count, dgContactPoint* const contactPointArray, dgFloat32 distTolerenace, dgInt32 maxCount) const
 {
 	if (count > 1) {
@@ -731,10 +652,405 @@ dgInt32 dgWorld::OldPruneContacts(dgInt32 count, dgContactPoint* const contactPo
 	return count;
 }
 
+dgInt32 dgWorld::PruneSupport(int count, const dgVector& dir, const dgVector* points) const
+{
+	dgInt32 index = 0;
+	dgFloat32 maxVal = dgFloat32(-1.0e20f);
+	for (dgInt32 i = 0; i < count; i++) {
+		dgFloat32 dist = dir.DotProduct(points[i]).GetScalar();
+		if (dist > maxVal) {
+			index = i;
+			maxVal = dist;
+		}
+	}
+	return index;
+}
+
+
+dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contact, int maxCount, dgFloat32 tol) const
+{
+	dgVector array[DG_MAX_CONTATCS];
+	dgContactPoint hull[DG_MAX_CONTATCS];
+	dgVector stack[DG_MAX_CONTATCS][2];
+
+	dgVector dir0(dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+	dgVector up(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f));
+
+	for (dgInt32 i = 0; i < count; i++) {
+		array[i] = matrix.UntransformVector(contact[i].m_point);
+	}
+
+	int hullCount = 0;
+
+	dgInt32 i0 = PruneSupport(count, dir0, array);
+	count--;
+	hull[hullCount] = contact[i0];
+	hullCount++;
+	stack[0][0] = array[i0];
+	array[i0] = array[count];
+	contact[i0] = contact[count];
+
+	dgInt32 i1 = PruneSupport(count, dir0.Scale(dgFloat32(-1.0f)), array);
+	count--;
+	hull[hullCount] = contact[i1];
+	hullCount++;
+	stack[0][1] = array[i1];
+	array[i1] = array[count];
+	contact[i1] = contact[count];
+
+	stack[1][0] = stack[0][1];
+	stack[1][1] = stack[0][0];
+	
+	int stackIndex = 2;
+	dgFloat32 tol2 = tol * tol;
+	while (stackIndex) {
+		stackIndex--;
+
+		dgVector pq(stack[stackIndex][1] - stack[stackIndex][0]);
+		dgVector dir(up.CrossProduct(pq));
+		dgInt32 newIndex = PruneSupport(count, dir, array);
+
+		dgVector edge(array[newIndex] - stack[stackIndex][0]);
+		dgVector normal(pq.CrossProduct(edge));
+		if (normal.m_z > dgFloat32(1.e-4f)) {
+			dgVector dist (edge + pq.Scale (edge.DotProduct(pq).GetScalar() / pq.DotProduct(pq).GetScalar()));
+			dgFloat32 mag2 = dist.DotProduct(dist).GetScalar();
+			if (mag2 > tol2) {
+				dgAssert (stackIndex < (DG_MAX_CONTATCS - 2));
+				hull[hullCount] = contact[newIndex];
+				hullCount++;
+				stack[stackIndex + 1][1] = stack[stackIndex][1];
+				stack[stackIndex + 1][0] = array[newIndex];
+				stack[stackIndex][1] = array[newIndex];
+				stackIndex += 2;
+				count--;
+				array[newIndex] = array[count];
+				contact[newIndex] = contact[count];
+			}
+		}
+	}
+
+	for (dgInt32 i = 0; i < hullCount; i++) {
+		contact[i] = hull[i];
+	}
+	return hullCount;
+}
+
+
+DG_MSC_VECTOR_ALIGMENT
+class dgMinkFace___
+{
+	public:
+	dgPlane m_plane;
+	dgMinkFace___* m_twin[3];
+	dgInt16 m_vertex[3];
+	dgInt8 m_mark;
+	dgInt8 m_alive;
+} DG_GCC_VECTOR_ALIGMENT;
+
+#define DG_PRUNE_SIZE 64
+class dgContactSolver___: public dgDownHeap<dgMinkFace___*, dgFloat32>  
+{
+	class dgFaceFreeList
+	{
+		public:
+		dgFaceFreeList* m_next;
+	};
+
+	public:
+	dgContactSolver___()
+		:dgDownHeap<dgMinkFace___*, dgFloat32>(m_heapBuffer, sizeof (m_heapBuffer))
+		,m_freeFace(NULL)
+		,m_faceIndex(0)
+	{
+	}
+
+	dgMinkFace___* NewFace()
+	{
+		dgMinkFace___* face = (dgMinkFace___*)m_freeFace;
+		if (m_freeFace) {
+			m_freeFace = m_freeFace->m_next;
+		} else {
+			face = &m_facePool[m_faceIndex];
+			m_faceIndex++;
+			if (m_faceIndex >= DG_CONVEX_MINK_MAX_FACES) {
+				return NULL;
+			}
+		}
+
+#ifdef _DEBUG
+		memset(face, 0, sizeof (dgMinkFace));
+#endif
+		return face;
+	}
+
+	void DeleteFace(dgMinkFace___* const face)
+	{
+		dgFaceFreeList* const freeFace = (dgFaceFreeList*)face;
+		freeFace->m_next = m_freeFace;
+		m_freeFace = freeFace;
+	}
+
+	dgMinkFace___* AddFace(dgInt32 v0, dgInt32 v1, dgInt32 v2)
+	{
+		dgMinkFace___* const face = NewFace();
+		face->m_mark = 0;
+		face->m_vertex[0] = dgInt16(v0);
+		face->m_vertex[1] = dgInt16(v1);
+		face->m_vertex[2] = dgInt16(v2);
+		return face;
+	}
+
+	dgMinkFace___ m_facePool[DG_PRUNE_SIZE];
+	dgInt8 m_heapBuffer[DG_PRUNE_SIZE * (sizeof (dgFloat32) + sizeof (dgMinkFace___ *))];
+	dgFaceFreeList* m_freeFace; 
+	dgInt32 m_faceIndex;
+};
+
+dgInt32 dgWorld::Prune3dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contact, int maxCount, dgFloat32 distTol) const
+{
+	dgVector array[DG_MAX_CONTATCS];
+	for (dgInt32 i = 0; i < count; i++) {
+		array[i] = matrix.UntransformVector(contact[i].m_point);
+	}
+
+	dgVector dir0(dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+	dgInt32 i0 = PruneSupport(count, dir0, array);
+	count--;
+//	hull[hullCount] = contact[i0];
+//	hullCount++;
+//	stack[0][0] = array[i0];
+	array[i0] = array[count];
+	contact[i0] = contact[count];
+
+	dgInt32 i1 = PruneSupport(count, dir0.Scale(dgFloat32(-1.0f)), array);
+//	count--;
+//	hull[hullCount] = contact[i1];
+//	hullCount++;
+//	stack[0][1] = array[i1];
+	array[i1] = array[count];
+	contact[i1] = contact[count];
+
+	dgVector dir1(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f));
+	dgInt32 i2 = PruneSupport(count, dir0.Scale(dgFloat32(-1.0f)), array);
+//	count--;
+//	hull[hullCount] = contact[i2];
+//	hullCount++;
+//	stack[0][1] = array[i2];
+	array[i2] = array[count];
+	contact[i2] = contact[count];
+
+	dgContactSolver___ heap;
+
+
+	// clear the face cache!!
+//	Flush();
+//	m_faceIndex = 0;
+//	m_vertexIndex = 4;
+//	m_freeFace = NULL;
+//
+//	dgMinkFace* const f0 = AddFace(0, 1, 2);
+//	dgMinkFace* const f1 = AddFace(0, 2, 3);
+//	dgMinkFace* const f2 = AddFace(2, 1, 3);
+//	dgMinkFace* const f3 = AddFace(1, 0, 3);
+//
+//	f0->m_twin[0] = f3;
+//	f0->m_twin[1] = f2;
+//	f0->m_twin[2] = f1;
+//
+//	f1->m_twin[0] = f0;
+//	f1->m_twin[1] = f2;
+//	f1->m_twin[2] = f3;
+//
+//	f2->m_twin[0] = f0;
+//	f2->m_twin[1] = f3;
+//	f2->m_twin[2] = f1;
+//
+//	f3->m_twin[0] = f0;
+//	f3->m_twin[1] = f1;
+//	f3->m_twin[2] = f2;
+//
+//	PushFace(f0);
+//	PushFace(f1);
+//	PushFace(f2);
+//	PushFace(f3);
+	dgMinkFace___* const f0 = heap.AddFace(0, 1, 2);
+	dgMinkFace___* const f1 = heap.AddFace(2, 1, 0);
+
+	f0->m_twin[0] = f1;
+	f0->m_twin[1] = f1;
+	f0->m_twin[2] = f1;
+
+	f1->m_twin[0] = f0;
+	f1->m_twin[1] = f0;
+	f1->m_twin[2] = f0;
+
+//	dgInt32 cycling = 0;
+//	dgInt32 iterCount = 0;
+//	dgFloat32 cyclingMem[4];
+//	cyclingMem[0] = dgFloat32(1.0e10f);
+//	cyclingMem[1] = dgFloat32(1.0e10f);
+//	cyclingMem[2] = dgFloat32(1.0e10f);
+//	cyclingMem[3] = dgFloat32(1.0e10f);
+//
+//	const dgFloat32 resolutionScale = dgFloat32(0.125f);
+//	const dgFloat32 minTolerance = DG_PENETRATION_TOL;
+
+	while (heap.GetCount()) {
+		dgMinkFace___* const faceNode = heap[0];
+		heap.Pop();
+
+		if (faceNode->m_alive) {
+/*
+			SupportVertex(faceNode->m_plane & dgVector::m_triplexMask, m_vertexIndex);
+			const dgVector& p = m_hullDiff[m_vertexIndex];
+			dgFloat32 dist = faceNode->m_plane.Evalue(p);
+			dgFloat32 distTolerance = dgMax(dgAbs(faceNode->m_plane.m_w) * resolutionScale, minTolerance);
+
+			if (dist < distTolerance) {
+				dgVector sum[3];
+				dgVector diff[3];
+				m_normal = faceNode->m_plane & dgVector::m_triplexMask;
+				for (dgInt32 i = 0; i < 3; i++) {
+					dgInt32 j = faceNode->m_vertex[i];
+					sum[i] = m_hullSum[j];
+					diff[i] = m_hullDiff[j];
+				}
+				for (dgInt32 i = 0; i < 3; i++) {
+					m_hullSum[i] = sum[i];
+					m_hullDiff[i] = diff[i];
+				}
+				return 3;
+			}
+
+			iterCount++;
+			bool isCycling = false;
+			cyclingMem[cycling] = dist;
+			if (iterCount > 10) {
+				dgInt32 cyclingIndex = cycling;
+				for (dgInt32 i = 0; i < 3; i++) {
+					dgInt32 cyclingIndex0 = (cyclingIndex - 1) & 3;
+					if (((cyclingMem[cyclingIndex0] - cyclingMem[cyclingIndex]) < dgFloat32(-1.0e-5f))) {
+						isCycling = true;
+						cyclingMem[0] = dgFloat32(1.0e10f);
+						cyclingMem[1] = dgFloat32(1.0e10f);
+						cyclingMem[2] = dgFloat32(1.0e10f);
+						cyclingMem[3] = dgFloat32(1.0e10f);
+						break;
+					}
+					cyclingIndex = cyclingIndex0;
+				}
+			}
+			cycling = (cycling + 1) & 3;
+
+			if (!isCycling) {
+				m_faceStack[0] = faceNode;
+				dgInt32 stackIndex = 1;
+				dgInt32 deletedCount = 0;
+
+				while (stackIndex) {
+					stackIndex--;
+					dgMinkFace* const face = m_faceStack[stackIndex];
+
+					if (!face->m_mark && (face->m_plane.Evalue(p) > dgFloat32(0.0f))) {
+#ifdef _DEBUG
+						for (dgInt32 i = 0; i < deletedCount; i++) {
+							dgAssert(m_deletedFaceList[i] != face);
+						}
+#endif
+
+						m_deletedFaceList[deletedCount] = face;
+						deletedCount++;
+						dgAssert(deletedCount < sizeof (m_deletedFaceList) / sizeof (m_deletedFaceList[0]));
+						face->m_mark = 1;
+
+						for (dgInt32 i = 0; i < 3; i++) {
+							dgMinkFace* const twinFace = face->m_twin[i];
+							if (twinFace && !twinFace->m_mark) {
+								m_faceStack[stackIndex] = twinFace;
+								stackIndex++;
+								dgAssert(stackIndex < sizeof (m_faceStack) / sizeof (m_faceStack[0]));
+							}
+						}
+					}
+				}
+
+				//dgAssert (SanityCheck());
+				dgInt32 newCount = 0;
+				for (dgInt32 i = 0; i < deletedCount; i++) {
+					dgMinkFace* const face = m_deletedFaceList[i];
+					face->m_alive = 0;
+					dgAssert(face->m_mark == 1);
+					dgInt32 j0 = 2;
+					for (dgInt32 j1 = 0; j1 < 3; j1++) {
+						dgMinkFace* const twinFace = face->m_twin[j0];
+						if (twinFace && !twinFace->m_mark) {
+							//dgMinkFace* const newFace = AddFace(m_vertexIndex, face->m_vertex[j0], face->m_vertex[j1]);
+							dgMinkFace* const newFace = NewFace();
+							if (newFace) {
+								newFace->m_mark = 0;
+								newFace->m_vertex[0] = dgInt16(m_vertexIndex);
+								newFace->m_vertex[1] = dgInt16(face->m_vertex[j0]);
+								newFace->m_vertex[2] = dgInt16(face->m_vertex[j1]);
+								PushFace(newFace);
+
+								newFace->m_twin[1] = twinFace;
+								dgInt32 index = (twinFace->m_twin[0] == face) ? 0 : ((twinFace->m_twin[1] == face) ? 1 : 2);
+								twinFace->m_twin[index] = newFace;
+
+								m_coneFaceList[newCount] = newFace;
+								newCount++;
+								dgAssert(newCount < sizeof(m_coneFaceList) / sizeof(m_coneFaceList[0]));
+							}
+							else {
+								// this is very rare but is does happend with some degenerated faces.
+								return -1;
+							}
+						}
+						j0 = j1;
+					}
+				}
+
+				dgInt32 i0 = newCount - 1;
+				for (dgInt32 i1 = 0; i1 < newCount; i1++) {
+					dgMinkFace* const faceA = m_coneFaceList[i0];
+					dgAssert(faceA->m_mark == 0);
+
+					dgInt32 j0 = newCount - 1;
+					for (dgInt32 j1 = 0; j1 < newCount; j1++) {
+						if (i0 != j0) {
+							dgMinkFace* const faceB = m_coneFaceList[j0];
+							dgAssert(faceB->m_mark == 0);
+							if (faceA->m_vertex[2] == faceB->m_vertex[1]) {
+								faceA->m_twin[2] = faceB;
+								faceB->m_twin[0] = faceA;
+								break;
+							}
+						}
+						j0 = j1;
+					}
+					i0 = i1;
+				}
+
+				m_vertexIndex++;
+				dgAssert(m_vertexIndex < sizeof (m_hullDiff) / sizeof (m_hullDiff[0]));
+
+				dgAssert(SanityCheck());
+			}
+*/
+		} else {
+			heap.DeleteFace(faceNode);
+		}
+	}
+
+	dgAssert (0);
+	return 0;
+}
+
 
 dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPointArray, dgFloat32 distTolerenace, dgInt32 maxCount) const
 {
-#if 1
+#if 0
 	return OldPruneContacts(count, contactPointArray, distTolerenace, maxCount);
 
 #else
@@ -753,6 +1069,16 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPoin
 		covariance.m_up += matrix.m_up;
 		covariance.m_right += matrix.m_right;
 	}
+
+
+//dgMatrix xxx0 (dgPitchMatrix(30.0f * dgDegreeToRad) * dgYawMatrix(40.0f * dgDegreeToRad) * dgRollMatrix(70.0f * dgDegreeToRad));
+//dgMatrix xxx1 (dgGetIdentityMatrix());
+//xxx1[0][0] = 5.0f;
+//xxx1[1][1] = 10.0f;
+//xxx1[2][2] = 0.0f;
+//dgMatrix xxx2 (xxx0.Transpose() * xxx1 * xxx0);
+//dgVector eigen1;
+//xxx2.EigenVectors(eigen1);
 
 	dgVector eigen;
 	covariance.EigenVectors(eigen);
@@ -773,12 +1099,11 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPoin
 
 	if (eigen[2] > dgFloat32 (1.0e-3f)) {
 		// 3d convex Hull
-//		dgAssert(0);
-//		return Prune2dContacts(covariance, count, contactPointArray, maxCount);
-		return OldPruneContacts(count, contactPointArray, distTolerenace, maxCount);
+		return Prune3dContacts(covariance, count, contactPointArray, maxCount, distTolerenace);
+		//return Prune3dContacts(covariance, count, contactPointArray, maxCount, distTolerenace);
 	} else if (eigen[1] > dgFloat32(1.0e-3f)) {
 		// is a 2d or 1d convex hull
-		return Prune2dContacts(covariance, count, contactPointArray, maxCount);
+		return Prune2dContacts(covariance, count, contactPointArray, maxCount, distTolerenace);
 	} else if (eigen[0] > dgFloat32(1.0e-3f)) {
 		// is a 1d or 1d convex hull
 		if (count > 2) {

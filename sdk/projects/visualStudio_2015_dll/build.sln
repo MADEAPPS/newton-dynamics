@@ -43,8 +43,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dVehicle", "dVehicle.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dProfiler", "dProfiler.vcxproj", "{89509957-CE86-4ACE-946C-7A65E63F0F23}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dgNewtonVulkan", "dgNewtonVulkan.vcxproj", "{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dgNewtonGL", "dgNewtonGL.vcxproj", "{3E98D8BD-F525-4449-AA5D-DB3E2E364327}"
 EndProject
 Global
@@ -281,22 +279,6 @@ Global
 		{89509957-CE86-4ACE-946C-7A65E63F0F23}.release|Win32.Build.0 = Release|Win32
 		{89509957-CE86-4ACE-946C-7A65E63F0F23}.release|x64.ActiveCfg = Release|x64
 		{89509957-CE86-4ACE-946C-7A65E63F0F23}.release|x64.Build.0 = Release|x64
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.debug_double|Win32.ActiveCfg = debug_double|Win32
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.debug_double|Win32.Build.0 = debug_double|Win32
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.debug_double|x64.ActiveCfg = debug_double|x64
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.debug_double|x64.Build.0 = debug_double|x64
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.debug|Win32.ActiveCfg = Debug|Win32
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.debug|Win32.Build.0 = Debug|Win32
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.debug|x64.ActiveCfg = Debug|x64
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.debug|x64.Build.0 = Debug|x64
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.release_double|Win32.ActiveCfg = release_double|Win32
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.release_double|Win32.Build.0 = release_double|Win32
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.release_double|x64.ActiveCfg = release_double|x64
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.release_double|x64.Build.0 = release_double|x64
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.release|Win32.ActiveCfg = Release|Win32
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.release|Win32.Build.0 = Release|Win32
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.release|x64.ActiveCfg = Release|x64
-		{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}.release|x64.Build.0 = Release|x64
 		{3E98D8BD-F525-4449-AA5D-DB3E2E364327}.debug_double|Win32.ActiveCfg = debug_double|Win32
 		{3E98D8BD-F525-4449-AA5D-DB3E2E364327}.debug_double|Win32.Build.0 = debug_double|Win32
 		{3E98D8BD-F525-4449-AA5D-DB3E2E364327}.debug_double|x64.ActiveCfg = debug_double|x64
