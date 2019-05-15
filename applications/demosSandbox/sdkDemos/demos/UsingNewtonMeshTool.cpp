@@ -226,14 +226,18 @@ static void DebugJernejLMesh (DemoEntityManager* const scene)
 			dVector point(0.0f);
 			fscanf(file, "%d %f, %f, %f", &index, &point.m_x, &point.m_y, &point.m_z);
 			array[index] = point;
-		}
-		else if (!strcmp(name, "Face")) {
+		} else if (!strcmp(name, "Face")) {
 			//Face 2765 11060 - 11063
 			int index;
 			int start;
 			int end;
 			fscanf(file, "%d %d - %d", &index, &start, &end);
-			NewtonTreeCollisionAddFace(collision, end - start, &array[start].m_x, sizeof (dVector), 0);
+			dVector point[16];
+			int count = 0;
+			for (int i = end - 1; i >= start; i--) {
+				point[count++] = array[i];
+			}
+			NewtonTreeCollisionAddFace(collision, count, &point[0].m_x, sizeof (dVector), 0);
 		}
 	}
 	NewtonTreeCollisionEndBuild(collision, 0);

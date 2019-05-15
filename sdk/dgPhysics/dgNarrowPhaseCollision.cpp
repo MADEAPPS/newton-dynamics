@@ -677,9 +677,8 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 	return hullCount;
 }
 
-dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPointArray, dgFloat32 distTolerenace, dgInt32 maxCount) const
+dgInt32 dgWorld::OldPruneContacts(dgInt32 count, dgContactPoint* const contactPointArray, dgFloat32 distTolerenace, dgInt32 maxCount) const
 {
-#if 1
 	if (count > 1) {
 		dgUnsigned8 mask[DG_MAX_CONTATCS];
 
@@ -689,22 +688,22 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPoin
 		dgFloat32 window = distTolerenace;
 		dgFloat32 window2 = window * window;
 
-		memset (mask, 0, size_t (count));
-		dgSort (contactPointArray, count, CompareContact, NULL);
+		memset(mask, 0, size_t(count));
+		dgSort(contactPointArray, count, CompareContact, NULL);
 
-		for (dgInt32 i = 0; i < count; i ++) {
+		for (dgInt32 i = 0; i < count; i++) {
 			if (!mask[i]) {
 				dgFloat32 val = contactPointArray[i].m_point[index] + window;
-				for (dgInt32 j = i + 1; (j < count) && (contactPointArray[j].m_point[index] < val) ; j ++) {
+				for (dgInt32 j = i + 1; (j < count) && (contactPointArray[j].m_point[index] < val); j++) {
 					if (!mask[j]) {
-						dgVector dp (contactPointArray[j].m_point - contactPointArray[i].m_point);
-						dgAssert (dp.m_w == dgFloat32 (0.0f));
+						dgVector dp(contactPointArray[j].m_point - contactPointArray[i].m_point);
+						dgAssert(dp.m_w == dgFloat32(0.0f));
 						dgFloat32 dist2 = dp.DotProduct(dp).GetScalar();
 						if (dist2 < window2) {
-							if (contactPointArray[i].m_penetration < contactPointArray[j].m_penetration ) {
+							if (contactPointArray[i].m_penetration < contactPointArray[j].m_penetration) {
 								contactPointArray[i].m_point = contactPointArray[j].m_point;
 								contactPointArray[i].m_normal = contactPointArray[j].m_normal;
-								contactPointArray[i].m_penetration =contactPointArray[j].m_penetration;
+								contactPointArray[i].m_penetration = contactPointArray[j].m_penetration;
 							}
 							mask[j] = 1;
 							packContacts = 1;
@@ -716,20 +715,27 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPoin
 
 		if (packContacts) {
 			dgInt32 j = 0;
-			for (dgInt32 i = 0; i < count; i ++) {
+			for (dgInt32 i = 0; i < count; i++) {
 				if (!mask[i]) {
 					contactPointArray[j] = contactPointArray[i];
-					j ++;
+					j++;
 				}
 			}
 			count = j;
 		}
 
 		if (count > maxCount) {
-			count = ReduceContacts (count, contactPointArray, maxCount, window * dgFloat32 (2.0f), 1);
+			count = ReduceContacts(count, contactPointArray, maxCount, window * dgFloat32(2.0f), 1);
 		}
 	}
 	return count;
+}
+
+
+dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPointArray, dgFloat32 distTolerenace, dgInt32 maxCount) const
+{
+#if 1
+	return OldPruneContacts(count, contactPointArray, distTolerenace, maxCount);
 
 #else
 
@@ -768,16 +774,35 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPoin
 	if (eigen[2] > dgFloat32 (1.0e-3f)) {
 		// 3d convex Hull
 //		dgAssert(0);
-		return Prune2dContacts(covariance, count, contactPointArray, maxCount);
+//		return Prune2dContacts(covariance, count, contactPointArray, maxCount);
+		return OldPruneContacts(count, contactPointArray, distTolerenace, maxCount);
 	} else if (eigen[1] > dgFloat32(1.0e-3f)) {
 		// is a 2d or 1d convex hull
 		return Prune2dContacts(covariance, count, contactPointArray, maxCount);
 	} else if (eigen[0] > dgFloat32(1.0e-3f)) {
 		// is a 1d or 1d convex hull
-		dgAssert(0);
-	} else {
-		// a single point
-		dgAssert(0);
+		if (count > 2) {
+			dgFloat32 maxValue = dgFloat32(-1.0e10f);
+			dgFloat32 minValue = dgFloat32(-1.0e10f);
+			dgInt32 j0 = 0;
+			dgInt32 j1 = 0;
+			for (dgInt32 i = 0; i < count; i++) {
+				dgFloat32 dist = contactPointArray[i].m_point.DotProduct(covariance.m_front).GetScalar();
+				if (dist > maxValue) {
+					j0 = i;
+					maxValue = dist;
+				}
+				if (-dist > minValue) {
+					j1 = i;
+					minValue = -dist;
+				}
+			}
+			dgContactPoint c0(contactPointArray[j0]);
+			dgContactPoint c1(contactPointArray[j1]);
+			contactPointArray[0] = c0;
+			contactPointArray[1] = c1;
+		}
+		return 2;
 	}
 	
 	return 1;

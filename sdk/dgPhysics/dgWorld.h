@@ -440,6 +440,8 @@ class dgWorld
 
 	dgInt32 PruneSupport(int count, const dgVector& dir, const dgVector* points) const;
 	dgInt32 Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contact, int maxCount) const;
+
+dgInt32 OldPruneContacts(dgInt32 count, dgContactPoint* const contact, dgFloat32 distTolerenace, dgInt32 maxCount = (DG_CONSTRAINT_MAX_ROWS / 3)) const;
 	dgInt32 PruneContacts (dgInt32 count, dgContactPoint* const contact, dgFloat32 distTolerenace, dgInt32 maxCount = (DG_CONSTRAINT_MAX_ROWS / 3)) const;
 	dgInt32 ReduceContacts (dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount, dgFloat32 tol, dgInt32 arrayIsSorted = 0) const;
 	dgInt32 CalculateConvexPolygonToHullContactsDescrete (dgCollisionParamProxy& proxy) const;
