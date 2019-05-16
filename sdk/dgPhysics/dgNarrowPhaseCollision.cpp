@@ -819,10 +819,13 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 			dgFloat32 mag2 = dist.DotProduct(dist).GetScalar();
 			if (mag2 > tol2) {
 				dgAssert(stackIndex < (DG_MAX_CONTATCS - 2));
-				//				hull[hullCount] = contact[newIndex];
-				//				hullCount++;
+				//hull[hullCount] = contact[newIndex];
+				//hullCount++;
 				convexHull[hullCount].m_index = vertecIndex[newIndex];
+				convexHull[hullCount].m_next = segment.m_edgeP0->m_next;
+				convexHull[hullCount].m_prev = segment.m_edgeP0;
 
+				hullCount++;
 
 				stack[stackIndex + 1][1] = stack[stackIndex][1];
 				stack[stackIndex + 1][0] = array[newIndex];

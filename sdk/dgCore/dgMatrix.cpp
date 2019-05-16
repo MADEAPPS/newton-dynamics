@@ -470,48 +470,68 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 
 dgVector dgMatrix::EigenVectors ()
 {
-/*
-	dgMatrix thidiagonal(*this);
-	dgMatrix eigenVector(dgGetIdentityMatrix());
-	if (dgAbs(m_front.m_z) > dgFloat32 (1.0e-6f)) {
-		// convert to tridiagonal matrix using householder
-		dgVector u(m_front);
+#if 0
+	// still have teh same problem I had in teh pass, becaually QR algorith is really bad 
+	// at converging for matroces with very dioffrent eiegen values. 
+	// the solution is to use RD with double shift. 
+	dgMatrix eigenValues (*this);
+	dgMatrix& eigenVectors = *this;
+	eigenVectors = dgGetIdentityMatrix();
+	if (dgAbs(eigenValues.m_front.m_z) > dgFloat32(1.0e-6f)) {
+		// calcualte initial guess by convert to tridiagonal matrix using householder
+		dgVector u(eigenValues.m_front);
 		u.m_x = dgFloat32(0.0f);
 		u.m_y -= dgSqrt(u.DotProduct(u).GetScalar());
-		dgAssert(dgAbs (u.m_y) > dgFloat32(1.0e-6f));
+		dgAssert(dgAbs(u.m_y) > dgFloat32(1.0e-6f));
 		dgVector v(u.Scale(-dgFloat32(2.0f) / u.DotProduct(u).GetScalar()));
 
-		eigenVector = dgMatrix(v, u);
-		eigenVector[0][0] += dgFloat32(1.0f);
-		eigenVector[1][1] += dgFloat32(1.0f);
-		eigenVector[2][2] += dgFloat32(1.0f);
-		thidiagonal = eigenVector.Transpose() * thidiagonal * eigenVector;
-		dgAssert(dgAbs(thidiagonal[0][2]) < dgFloat32(1.0e-4f));
-		dgAssert(dgAbs(thidiagonal[2][0]) < dgFloat32(1.0e-4f));
-		thidiagonal[0][2] = dgFloat32(0.0f);
-		thidiagonal[2][0] = dgFloat32(0.0f);
+		eigenVectors = dgMatrix(v, u);
+		eigenVectors[0][0] += dgFloat32(1.0f);
+		eigenVectors[1][1] += dgFloat32(1.0f);
+		eigenVectors[2][2] += dgFloat32(1.0f);
+		eigenValues = eigenVectors.Transpose() * eigenValues * eigenVectors;
 	}
 
-	// try using QR allgorith
-	if (dgAbs(upperTriangular.m_up.m_z) > 1.0e-6f) {
-		dgVector u(upperTriangular.m_up);
-		u.m_x = dgFloat32(0.0f);
-		u.m_y -= dgSqrt(u.DotProduct(u).GetScalar());
+	eigenValues[0][2] = dgFloat32(0.0f);
+	eigenValues[2][0] = dgFloat32(0.0f);
+	for (dgInt32 i = 0; (i < 16) && ((m_front.m_y * m_front.m_y + m_front.m_z * m_front.m_z + m_up.m_z * m_up.m_z) > dgFloat32(1.0e-12f)); i++) {
+		dgMatrix householder(dgGetIdentityMatrix());
+		dgFloat32 mag2 = eigenValues.m_front.m_y * eigenValues.m_front.m_y + eigenValues.m_front.m_z * eigenValues.m_front.m_z;
+		if (mag2 > dgFloat32(1.0e-12f)) {
+			// convert to tridiagonal matrix using householder
+			dgVector u(eigenValues.m_front);
+			u.m_x -= dgSqrt(eigenValues.m_front.m_x * eigenValues.m_front.m_x + mag2);
+			dgAssert(dgAbs(u.m_x) > dgFloat32(1.0e-12f));
+			dgVector v(u.Scale(-dgFloat32(2.0f) / u.DotProduct(u).GetScalar()));
 
-		dgVector v(u.Scale(-dgFloat32(2.0f) / u.DotProduct(u).GetScalar()));
-		dgMatrix househoulder(dgGetIdentityMatrix());
+			householder = dgMatrix(v, u);
+			householder[0][0] += dgFloat32(1.0f);
+			householder[1][1] += dgFloat32(1.0f);
+			householder[2][2] += dgFloat32(1.0f);
+			eigenValues = eigenValues * householder.Transpose();
+		}
 
-		househoulder.m_up.m_y += v.m_y * u.m_y;
-		househoulder.m_up.m_z = v.m_y * u.m_z;
-		househoulder.m_right.m_y = v.m_y * u.m_z;
-		househoulder.m_right.m_z += v.m_z * u.m_z;
+		if (dgAbs(eigenValues.m_up.m_z) > 1.0e-6f) {
+			dgVector u(eigenValues.m_up);
+			u.m_x = dgFloat32(0.0f);
+			u.m_y -= dgSqrt(u.DotProduct(u).GetScalar());
+			dgVector v(u.Scale(-dgFloat32(2.0f) / u.DotProduct(u).GetScalar()));
 
-		reflectionMatrix = househoulder * reflectionMatrix;
-		upperTriangular = upperTriangular * househoulder.Transpose();
-		upperTriangular = reflectionMatrix * upperTriangular;
+			dgMatrix househoulder1(dgGetIdentityMatrix());
+			househoulder1.m_up.m_y += v.m_y * u.m_y;
+			househoulder1.m_up.m_z = v.m_y * u.m_z;
+			househoulder1.m_right.m_y = v.m_y * u.m_z;
+			househoulder1.m_right.m_z += v.m_z * u.m_z;
+			householder = househoulder1 * householder;
+			eigenValues = eigenValues * househoulder1.Transpose();
+		}
+		eigenVectors = householder * eigenVectors;
+		eigenValues = householder * eigenValues;
 	}
-*/
 
+	return dgVector(0.0f);
+
+#else
 	dgMatrix& mat = *this;
 	dgMatrix eigenVectors(dgGetIdentityMatrix());
 	if (dgAbs(m_front.m_z) > dgFloat32(1.0e-6f)) {
@@ -615,6 +635,7 @@ dgVector dgMatrix::EigenVectors ()
 	//eigenValues = d;
 	*this = eigenVectors;
 	return d;
+#endif
 }
 
 dgSpatialMatrix dgSpatialMatrix::Inverse(dgInt32 rows) const
