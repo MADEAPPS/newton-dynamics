@@ -539,7 +539,9 @@ class dgWorld
 	dgArray<dgUnsigned8> m_solverJacobiansMemory;  
 	dgArray<dgUnsigned8> m_solverRightHandSideMemory;
 	dgArray<dgUnsigned8> m_solverForceAccumulatorMemory;
-	
+
+	static dgVector m_pruneUpDir;
+	static dgVector m_pruneSupportX;
 	
 	bool m_concurrentUpdate;
 	

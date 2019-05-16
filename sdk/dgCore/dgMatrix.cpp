@@ -535,11 +535,12 @@ dgVector dgMatrix::EigenVectors ()
 	dgMatrix& mat = *this;
 	dgMatrix eigenVectors(dgGetIdentityMatrix());
 	if (dgAbs(m_front.m_z) > dgFloat32(1.0e-6f)) {
-		// calcualte initial guess by convert to tridiagonal matrix using householder
+		// calculate initial guess by convert to tridiagonal matrix using householder
 		dgVector u(m_front);
 		u.m_x = dgFloat32(0.0f);
 		u.m_y -= dgSqrt(u.DotProduct(u).GetScalar());
-		dgAssert(dgAbs(u.m_y) > dgFloat32(1.0e-6f));
+		dgAssert(dgAbs(u.m_y) > dgFloat32(1.0e-12f));
+		dgAssert(u.DotProduct(u).GetScalar() > dgFloat32(0.0f));
 		dgVector v(u.Scale(-dgFloat32(2.0f) / u.DotProduct(u).GetScalar()));
 
 		eigenVectors = dgMatrix(v, u);
