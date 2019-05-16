@@ -844,9 +844,10 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 			dgVector dist(p1p0 - p2p0.Scale(p1p0.DotProduct(p2p0).GetScalar() / p2p0.DotProduct(p2p0).GetScalar()));
 			dgFloat32 mag2 = dist.DotProduct(dist).GetScalar();
 			if (mag2 < tol2) {
-				colinearEdge = true;
-				dgAssert (ptr->m_next != hullPoint);
-				ptr->m_next = ptr->m_next->m_next;
+				dgTrace (("Fix this xxxxx !!!\n"))
+//				colinearEdge = true;
+//				dgAssert (ptr->m_next != hullPoint);
+//				ptr->m_next = ptr->m_next->m_next;
 			}
 		}
 		hullCount ++;
