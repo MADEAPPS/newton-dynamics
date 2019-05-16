@@ -827,6 +827,8 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 		}
 	}
 
+
+/*
 	hullCount = 0;
 	dgFloat32 tol2 = tol * tol;
 	dgConveFaceNode* hullPoint = &convexHull[0];
@@ -857,6 +859,28 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 	if (hullCount > maxCount) {
 		dgAssert (0);
 	}
+*/
+
+	
+	dgConveFaceNode* hullPoint = &convexHull[0];
+	dgConveFaceNode* ptr = hullPoint;
+/*
+	dgVector p0(ptr->m_contact.m_point);
+	dgVector area(dgVector::m_zero);
+	ptr = ptr->m_next;
+	dgVector e0(ptr->m_contact.m_point - p0);
+	ptr = ptr->m_next;
+	do {
+		dgVector e1(ptr->m_contact.m_point - p0);
+		area += e0.CrossProduct(e1);
+		e0 = e1;
+		ptr = ptr->m_next;
+	} while (ptr != hullPoint);
+
+	dgFloat32 totalArea = area.DotProduct(matrix.m_right).GetScalar();
+	dgAssert(totalArea > 0.0f);
+*/
+	
 
 	hullCount = 0;
 	ptr = hullPoint;
