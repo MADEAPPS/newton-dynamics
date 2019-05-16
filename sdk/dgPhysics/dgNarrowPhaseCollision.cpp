@@ -1216,8 +1216,16 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPoin
 	covariance.m_front = covariance.m_front * scale - matrix1.m_front;
 	covariance.m_up = covariance.m_up * scale - matrix1.m_up;
 	covariance.m_right = covariance.m_right * scale - matrix1.m_right;
-	covariance.m_posit = origin;
 
+	for (dgInt32 i = 0; i < 3; i++) {
+		if (dgAbs(covariance[i][i]) < (1.0e-6f)) {
+			for (dgInt32 j = 0; j < 3; j++) {
+				covariance[i][j] = dgFloat32(0.0f);
+				covariance[j][i] = dgFloat32(0.0f);
+			}
+		}
+	}
+	covariance.m_posit = origin;
 
 	dgVector eigen (covariance.EigenVectors());
 	covariance.m_posit = origin;
