@@ -979,6 +979,10 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 					}
 				}
 			} else {
+				if (count < 8) {
+					// delay small islands for about 10 seconds
+					sleepCounter >>= 8; 
+				}
 				dgInt32 timeScaleSleepCount = dgInt32(dgFloat32(60.0f) * sleepCounter * timestep);
 
 				dgInt32 index = DG_SLEEP_ENTRIES;
