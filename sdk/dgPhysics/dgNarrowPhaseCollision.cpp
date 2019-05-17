@@ -1085,7 +1085,6 @@ dgAssert (0);
 
 dgInt32 dgWorld::OldReduceContacts(dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount, dgFloat32 tol, dgInt32 arrayIsSorted) const
 {
-	dgAssert(0);
 	if (count > maxCount) {
 		dgUnsigned8 mask[DG_MAX_CONTATCS];
 
@@ -1612,7 +1611,6 @@ void dgWorld::ProcessContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadI
 	PopulateContacts (pair, threadIndex);
 }
 
-
 void dgWorld::ConvexContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
 	dgContact* const constraint = pair->m_contact;
@@ -1635,7 +1633,6 @@ void dgWorld::ConvexContacts (dgBroadPhase::dgPair* const pair, dgCollisionParam
 		pair->m_contactCount = CalculateConvexToNonConvexContacts (proxy);
 	}
 }
-
 
 void dgWorld::CompoundContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const
 {
@@ -2271,7 +2268,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 				count = CalculatePolySoupToHullContactsDescrete(proxy);
 			}
 
-			if (count > 1) {
+			if (count > 0) {
 				proxy.m_contactJoint->m_contactActive = 1;
 #ifdef DE_USE_OLD_CONTACT_FILTER
 				count = OldPruneContacts(count, proxy.m_contacts, proxy.m_contactJoint->GetPruningTolerance());
