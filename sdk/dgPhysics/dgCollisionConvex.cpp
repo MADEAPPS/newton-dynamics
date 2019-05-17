@@ -587,6 +587,8 @@ bool dgCollisionConvex::SanityCheck(dgInt32 count, const dgVector& normal, dgVec
 
 dgInt32 dgCollisionConvex::SimplifyClipPolygon (dgInt32 count, const dgVector& normal, dgVector* const polygon) const
 {
+dgAssert (0);
+dgTrace (("Fix this xxxxxxxx\n"));
 	dgInt8 mark[DG_MAX_VERTEX_CLIP_FACE * 8];
 	dgInt8 buffer[8 * DG_MAX_VERTEX_CLIP_FACE * (sizeof (dgInt32) + sizeof (dgFloat32))];
 
@@ -643,6 +645,7 @@ dgInt32 dgCollisionConvex::SimplifyClipPolygon (dgInt32 count, const dgVector& n
 
 dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& normal, dgVector* const contactsOut) const
 {
+#ifdef DE_USE_OLD_CONTACT_FILTER
 	struct DG_CONVEX_FIXUP_FACE
 	{
 		dgInt32 m_vertex;
@@ -742,6 +745,89 @@ dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& no
 
 	dgAssert (SanityCheck(count, normal, contactsOut));
 	return count;
+#else
+
+	class dgConveFaceNode
+	{
+		public:
+		dgInt32 m_vertexIndex;
+		dgConveFaceNode* m_next;
+		dgConveFaceNode* m_prev;
+		dgInt32 m_mask;
+	};
+
+	dgConveFaceNode convexHull[DG_MAX_CONTATCS + 1];
+	char buffer[DG_MAX_CONTATCS * (sizeof (void*) + sizeof (dgFloat32))];
+
+	dgInt32 start = count;
+	dgInt32 i0 = count - 1;
+	for (dgInt32 i = 0; i < count; i ++) {
+		convexHull[i].m_vertexIndex = i;
+		convexHull[i].m_next = &convexHull[i + 1];
+		convexHull[i].m_prev = &convexHull[i0];
+		i0 = i;
+	}
+	convexHull[count - 1].m_next = &convexHull[0];
+
+	dgVector hullArea (dgVector::m_zero);
+	dgVector edge0 (contactsOut[1] - contactsOut[0]);
+	for (dgInt32 i = 2; i < count; i ++) {
+		dgVector edge1 (contactsOut[i] - contactsOut[0]);
+		hullArea += edge1.CrossProduct(edge0);
+		edge0 = edge1;
+	}
+
+	dgFloat32 totalArea = dgAbs (hullArea.DotProduct(normal).GetScalar());
+	dgConveFaceNode* hullPoint = &convexHull[0];
+	
+	bool hasLinearCombination = true;
+	dgUpHeap<dgConveFaceNode*, dgFloat32> sortHeap(buffer, sizeof (buffer));
+	while (hasLinearCombination) {
+		hasLinearCombination = false;
+		sortHeap.Flush();
+		dgConveFaceNode* ptr = hullPoint;
+		dgVector e0(contactsOut[ptr->m_next->m_vertexIndex] - contactsOut[ptr->m_vertexIndex]);
+		do {
+			dgVector e1(contactsOut[ptr->m_next->m_next->m_vertexIndex] - contactsOut[ptr->m_next->m_vertexIndex]);
+			dgFloat32 area = dgAbs (e0.CrossProduct(e1).DotProduct(normal).GetScalar());
+			sortHeap.Push(ptr->m_next, area);
+			e0 = e1;
+			ptr->m_mask = 1;
+			ptr = ptr->m_next;
+		} while (ptr != hullPoint);
+	
+		while (sortHeap.GetCount() && (sortHeap.Value() * dgFloat32(16.0f) < totalArea)) {
+			dgConveFaceNode* const corner = sortHeap[0];
+			if (corner->m_mask && corner->m_prev->m_mask) {
+				if (hullPoint == corner) {
+					hullPoint = corner->m_prev;
+				}
+				count --;
+				hasLinearCombination = true;
+				corner->m_prev->m_mask = 0;
+				corner->m_next->m_prev = corner->m_prev;
+				corner->m_prev->m_next = corner->m_next;
+			}
+			sortHeap.Pop();
+		}
+	}
+
+	while (count > DG_MAX_VERTEX_CLIP_FACE) {
+		dgAssert (0);
+	}
+	
+	
+	dgInt32 index = start;
+	dgConveFaceNode* ptr = hullPoint;
+	do {
+		contactsOut[index] = contactsOut[ptr->m_vertexIndex];
+		index ++;
+		ptr = ptr->m_next;
+	} while (ptr != hullPoint);
+	memcpy (contactsOut, &contactsOut[start], count * sizeof (dgVector));
+
+	return count;
+#endif
 }
 
 dgVector dgCollisionConvex::SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const 

@@ -960,7 +960,7 @@ dgInt32 dgContactSolver::ConvexPolygonToLineIntersection(const dgVector& normal,
 }
 
 
-DG_INLINE dgContactSolver::dgPerimenterEdge* dgContactSolver::ReduceContacts(dgPerimenterEdge* poly, dgInt32 maxCount) const
+DG_INLINE dgContactSolver::dgPerimenterEdge* dgContactSolver::ReduceContacts____(dgPerimenterEdge* poly, dgInt32 maxCount) const
 {
 	dgInt32 buffer[DG_MAX_EDGE_COUNT];
 	dgUpHeap<dgPerimenterEdge*, dgFloat32> heap(buffer, sizeof (buffer));
@@ -1138,7 +1138,9 @@ dgInt32 dgContactSolver::ConvexPolygonsIntersection(const dgVector& normal, dgIn
 		}
 
 		dgAssert(poly);
-		poly = ReduceContacts(poly, maxContacts);
+#ifdef DE_USE_OLD_CONTACT_FILTER
+		poly = ReduceContacts____(poly, maxContacts);
+#endif
 		count = 0;
 		dgPerimenterEdge* intersection = poly;
 		do {
@@ -1427,11 +1429,6 @@ dgInt32 dgContactSolver::CalculateConvexToConvexContacts ()
 				contactOut[i].m_point = m_hullDiff[i];
 				contactOut[i].m_normal = m_normal;
 				contactOut[i].m_penetration = penetration;
-
-//dgTrace (("p (%f %f %f) ", contactOut[i].m_point.m_x, contactOut[i].m_point.m_y, contactOut[i].m_point.m_z));
-//dgTrace (("n (%f %f %f) ", contactOut[i].m_normal.m_x, contactOut[i].m_normal.m_y, contactOut[i].m_normal.m_z));
-//dgTrace (("h (%f) ", contactOut[i].m_normal.m_x));
-//dgTrace (("\n", penetration)); 
 			}
 		}
 	}

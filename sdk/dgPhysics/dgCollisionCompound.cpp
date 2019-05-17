@@ -1827,7 +1827,12 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgBroadPhase::dgPair* 
 							}
 							contactCount += count;
 							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#ifdef DE_USE_OLD_CONTACT_FILTER
+								contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#else
+								dgAssert(0);
+								contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
+#endif
 							}
 						} else if (count == -1) {
 							contactCount = -1;
@@ -1982,7 +1987,12 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPai
 							contactCount += count;
 
 							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#ifdef DE_USE_OLD_CONTACT_FILTER
+								contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#else
+								dgAssert(0);
+								contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
+#endif
 							}
 						} else if (count == -1) {
 							contactCount = -1;
@@ -2084,7 +2094,12 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgBroadPhase
 							contactCount += count;
 
 							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#ifdef DE_USE_OLD_CONTACT_FILTER
+								contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#else
+								dgAssert(0);
+								contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
+#endif
 							}
 						} else if (count == -1) {
 							contactCount = -1;
@@ -2180,7 +2195,12 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgBroadPhase::dgPair* co
 							}
 							contactCount += count;
 							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#ifdef DE_USE_OLD_CONTACT_FILTER
+								contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#else
+								dgAssert(0);
+								contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
+#endif
 							}
 						} else if (count == -1) {
 							contactCount = -1;
@@ -2301,7 +2321,12 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgP
 							}
 							contactCount += count;
 							if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-								contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#ifdef DE_USE_OLD_CONTACT_FILTER
+								contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#else
+								dgAssert(0);
+								contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
+#endif
 							}
 						} else if (count == -1) {
 							contactCount = -1;
@@ -2550,7 +2575,12 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgP
 								contactCount += count;
 
 								if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-									contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#ifdef DE_USE_OLD_CONTACT_FILTER
+									contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#else
+									dgAssert(0);
+									contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
+#endif
 								}
 
 								if (maxParam == dgFloat32 (0.0f)) {
@@ -2703,7 +2733,12 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::d
 								contactCount += count;
 
 								if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-									contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#ifdef DE_USE_OLD_CONTACT_FILTER
+									contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#else
+									dgAssert(0);
+									contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
+#endif
 								}
 
 								if (maxParam == dgFloat32 (0.0f)) {
@@ -2914,7 +2949,12 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 								contactCount += count;
 
 								if (contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
-									contactCount = m_world->ReduceContacts (contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#ifdef DE_USE_OLD_CONTACT_FILTER
+									contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
+#else
+									dgAssert(0);
+									contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
+#endif
 								}
 
 								if (maxParam == dgFloat32 (0.0f)) {

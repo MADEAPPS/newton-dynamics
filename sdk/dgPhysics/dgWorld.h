@@ -40,6 +40,8 @@
 #define DG_SLEEP_ENTRIES					8
 #define DG_MAX_DESTROYED_BODIES_BY_FORCE	8
 
+#define DE_USE_OLD_CONTACT_FILTER
+
 class dgBody;
 class dgDynamicBody;
 class dgKinematicBody;
@@ -439,7 +441,10 @@ class dgWorld
 	void CalculateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex, bool ccdMode, bool intersectionTestOnly);
 
 	dgInt32 PruneContacts (dgInt32 count, dgContactPoint* const contact, dgFloat32 distTolerenace, dgInt32 maxCount = (DG_CONSTRAINT_MAX_ROWS / 3)) const;
-	dgInt32 ReduceContacts (dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount, dgFloat32 tol, dgInt32 arrayIsSorted = 0) const;
+#ifdef DE_USE_OLD_CONTACT_FILTER
+	dgInt32 OldPruneContacts(dgInt32 count, dgContactPoint* const contact, dgFloat32 distTolerenace, dgInt32 maxCount = (DG_CONSTRAINT_MAX_ROWS / 3)) const;
+	dgInt32 OldReduceContacts (dgInt32 count, dgContactPoint* const contact, dgInt32 maxCount, dgFloat32 tol, dgInt32 arrayIsSorted = 0) const;
+#endif
 	dgInt32 CalculateConvexPolygonToHullContactsDescrete (dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy& proxy) const;
 	dgInt32 CalculateConvexToNonConvexContactsContinue (dgCollisionParamProxy& proxy) const;
@@ -473,8 +478,6 @@ class dgWorld
 
 	dgInt32 Prune3dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contact, int maxCount, dgFloat32 distTol) const;
 	dgInt32 Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contact, int maxCount, dgFloat32 distTol) const;
-	dgInt32 OldPruneContacts(dgInt32 count, dgContactPoint* const contact, dgFloat32 distTolerenace, dgInt32 maxCount = (DG_CONSTRAINT_MAX_ROWS / 3)) const;
-
 	DG_INLINE dgInt32 PruneSupport(int count, const dgVector& dir, const dgVector* points) const;
 
 	DG_INLINE dgBody* FindRoot(dgBody* const body) const;
@@ -539,9 +542,6 @@ class dgWorld
 	dgArray<dgUnsigned8> m_solverJacobiansMemory;  
 	dgArray<dgUnsigned8> m_solverRightHandSideMemory;
 	dgArray<dgUnsigned8> m_solverForceAccumulatorMemory;
-
-	static dgVector m_pruneUpDir;
-	static dgVector m_pruneSupportX;
 	
 	bool m_concurrentUpdate;
 	

@@ -89,11 +89,10 @@ class dgContactSolver: public dgDownHeap<dgMinkFace *, dgFloat32>
 	DG_INLINE void TranslateSimplex(const dgVector& step);
 	
 	DG_INLINE void CalculateContactFromFeacture(dgInt32 featureType);
-	DG_INLINE dgPerimenterEdge* ReduceContacts(dgPerimenterEdge* poly, dgInt32 maxCount) const;
-//	DG_INLINE void ReduceDegeneratedTriangle();
 	DG_INLINE dgBigVector ReduceLine(dgInt32& indexOut);
 	DG_INLINE dgBigVector ReduceTriangle (dgInt32& indexOut);
 	DG_INLINE dgBigVector ReduceTetrahedrum (dgInt32& indexOut);
+	DG_INLINE dgPerimenterEdge* ReduceContacts____(dgPerimenterEdge* poly, dgInt32 maxCount) const;
 
 	bool SanityCheck() const;
 	dgInt32 ConvexPolygonsIntersection(const dgVector& normal, dgInt32 count1, dgVector* const shape1, dgInt32 count2, dgVector* const shape2, dgVector* const contactOut, dgInt32 maxContacts) const;
