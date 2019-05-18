@@ -72,7 +72,6 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 #else
 		sprintf(module.m_hardwareDeviceName, "Newton sse4.2");
 #endif
-
 		return &module;
 	} else {
 		return NULL;

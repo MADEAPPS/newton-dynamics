@@ -68,7 +68,6 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 #else
 	sprintf(module.m_hardwareDeviceName, "Newton avx2");
 #endif
-
 	return &module;
 #elif __linux__
 	if(__builtin_cpu_supports("avx2")) {
@@ -84,7 +83,7 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 		return NULL;
 	}
 #elif defined (_MACOSX_VER)
-	// must macs support avx2 bu for now let use do avx only
+	// must macs support avx2 but for now let use do avx only
 	//static dgWorldBase module(world, allocator);
 	//module.m_score = 4;
 	//return &module;
