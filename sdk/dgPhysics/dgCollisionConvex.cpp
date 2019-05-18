@@ -585,10 +585,8 @@ bool dgCollisionConvex::SanityCheck(dgInt32 count, const dgVector& normal, dgVec
 	return true;
 }
 
-dgInt32 dgCollisionConvex::SimplifyClipPolygon (dgInt32 count, const dgVector& normal, dgVector* const polygon) const
+dgInt32 dgCollisionConvex::OldSimplifyClipPolygon (dgInt32 count, const dgVector& normal, dgVector* const polygon) const
 {
-dgAssert (0);
-dgTrace (("Fix this xxxxxxxx\n"));
 	dgInt8 mark[DG_MAX_VERTEX_CLIP_FACE * 8];
 	dgInt8 buffer[8 * DG_MAX_VERTEX_CLIP_FACE * (sizeof (dgInt32) + sizeof (dgFloat32))];
 
@@ -598,9 +596,6 @@ dgTrace (("Fix this xxxxxxxx\n"));
 	dgAssert (normal.m_w == dgFloat32 (0.0f));
 	while (count > DG_MAX_VERTEX_CLIP_FACE) {
 		sortHeap.Flush();
-
-		//dgInt32 i0 = count - 2;
-		//dgInt32 i1 = count - 1;
 		for (dgInt32 i0 = count - 2, i1 = count - 1, i2 = 0; i2 < count; i2 ++) {
 			mark[i2] = 0;
 
@@ -740,11 +735,12 @@ dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& no
 
 
 	if (count > DG_MAX_VERTEX_CLIP_FACE) {
-		count = SimplifyClipPolygon (count, normal, contactsOut);
+		count = OldSimplifyClipPolygon (count, normal, contactsOut);
 	}
 
 	dgAssert (SanityCheck(count, normal, contactsOut));
 	return count;
+
 #else
 
 	class dgConveFaceNode

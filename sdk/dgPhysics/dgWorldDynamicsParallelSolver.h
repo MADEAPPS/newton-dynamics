@@ -59,12 +59,10 @@ class dgWorkGroupFloat
 
 	DG_INLINE dgWorkGroupFloat(const dgWorkGroupFloat* const baseAddr, const dgWorkGroupFloat& index)
 	{
-		//const dgFloat32* const ptr = baseAddr->m_f;
 		const dgInt32* const indirectIndex = (dgInt32*) &index[0];
 		const dgFloat32* const src = &(*baseAddr)[0];
 		dgFloat32* const dst = &(*this)[0];
 		for (dgInt32 i = 0; i < DG_WORK_GROUP_SIZE; i++) {
-			//m_f[i] = ptr[index.m_i[i]];
 			dst[i] = src[indirectIndex[i]];
 		}
 	}
@@ -73,7 +71,6 @@ class dgWorkGroupFloat
 	{
 		dgAssert(i >= 0);
 		dgAssert(i < DG_WORK_GROUP_SIZE);
-		//dgFloat32* const ptr = &m_f[0];
 		dgFloat32* const ptr = &m_low[0];
 		return ptr[i];
 	}
@@ -82,7 +79,6 @@ class dgWorkGroupFloat
 	{
 		dgAssert(i >= 0);
 		dgAssert(i < DG_WORK_GROUP_SIZE);
-		//const dgFloat32* const ptr = &m_f[0];
 		const dgFloat32* const ptr = &m_low[0];
 		return ptr[i];
 	}
@@ -152,14 +148,6 @@ class dgWorkGroupFloat
 		return (m_low.GetMax(m_high)).GetMax();
 	}
 
-//	union {
-//		dgFloat32 m_f[DG_WORK_GROUP_SIZE];
-//		dgInt32 m_i[DG_WORK_GROUP_SIZE];
-//		struct {
-//			dgVector m_low;
-//			dgVector m_high;
-//		};
-//	};
 	dgVector m_low;
 	dgVector m_high;
 

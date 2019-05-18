@@ -40,7 +40,7 @@
 #define DG_SLEEP_ENTRIES					8
 #define DG_MAX_DESTROYED_BODIES_BY_FORCE	8
 
-//#define DE_USE_OLD_CONTACT_FILTER
+#define DE_USE_OLD_CONTACT_FILTER
 
 class dgBody;
 class dgDynamicBody;

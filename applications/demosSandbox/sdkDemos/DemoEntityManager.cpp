@@ -372,7 +372,7 @@ DemoEntityManager::DemoEntityManager ()
 			break;
 		}
 	}
-//m_currentPlugin = 0;
+m_currentPlugin = 3;
 
 	m_shadeCache.CreateAllEffects();
 
