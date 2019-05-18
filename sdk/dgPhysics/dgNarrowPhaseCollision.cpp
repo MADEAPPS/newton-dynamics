@@ -595,9 +595,11 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 	dgConveFaceNode convexHull[16];
 	dgContactPoint buffer[16];
 
+	dgFloat32 maxPenetration = 0.0f;
 	dgVector m_xyMask(dgVector::m_xMask | dgVector::m_yMask);
 	for (dgInt32 i = 0; i < count; i++) {
 		array[i] = matrix.UntransformVector(contact[i].m_point) & m_xyMask;
+		maxPenetration = dgMax (maxPenetration, contact[i].m_penetration);
 	}
 
 	dgInt32 i0 = PruneSupport(count, dgCollisionContactCloud::m_pruneSupportX, array);
@@ -670,12 +672,13 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 		}
 	}
 
+	dgUpHeap<dgConveFaceNode*, dgFloat32> sortHeap(array, sizeof (array));
 	dgConveFaceNode* hullPoint = &convexHull[0];
 
 	bool hasLinearCombination = true;
 	while (hasLinearCombination) {
+		sortHeap.Flush();
 		hasLinearCombination = false;
-		dgUpHeap<dgConveFaceNode*, dgFloat32> sortHeap(array, sizeof (array));
 		dgConveFaceNode* ptr = hullPoint;
 		dgVector e0 (ptr->m_next->m_point2d - ptr->m_point2d);
 		do {
@@ -693,6 +696,7 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 				if (hullPoint == corner) {
 					hullPoint = corner->m_prev;
 				}
+				hullCount --;
 				hasLinearCombination = true;
 				corner->m_prev->m_mask = 0; 
 				corner->m_next->m_prev = corner->m_prev;
@@ -702,11 +706,40 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 		}
 	}
 	
+	while (hullCount > maxCount) {
+		sortHeap.Flush();
+		dgConveFaceNode* ptr = hullPoint;
+		dgVector e0(ptr->m_next->m_point2d - ptr->m_point2d);
+		do {
+			dgVector e1(ptr->m_next->m_next->m_point2d - ptr->m_next->m_point2d);
+			dgFloat32 area = e0.m_y * e1.m_x - e0.m_x * e1.m_y;
+			sortHeap.Push(ptr->m_next, area);
+			e0 = e1;
+			ptr->m_mask = 1;
+			ptr = ptr->m_next;
+		} while (ptr != hullPoint);
+
+		while (sortHeap.GetCount() && (hullCount > maxCount)) {
+			dgConveFaceNode* const corner = sortHeap[0];
+			if (corner->m_mask && corner->m_prev->m_mask) {
+				if (hullPoint == corner) {
+					hullPoint = corner->m_prev;
+				}
+				hullCount--;
+				hasLinearCombination = true;
+				corner->m_prev->m_mask = 0;
+				corner->m_next->m_prev = corner->m_prev;
+				corner->m_prev->m_next = corner->m_next;
+			}
+			sortHeap.Pop();
+		}
+	}
 
 	hullCount = 0;
 	dgConveFaceNode* ptr = hullPoint;
 	do {
 		contact[hullCount] = ptr->m_contact;
+		contact[hullCount].m_penetration = maxPenetration;
 		hullCount ++;
 		ptr = ptr->m_next;
 	} while (ptr != hullPoint);
@@ -1229,8 +1262,6 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPoin
 			}
 		}
 	}
-	covariance.m_posit = origin;
-
 	dgVector eigen (covariance.EigenVectors());
 	covariance.m_posit = origin;
 
@@ -1247,13 +1278,14 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactPoin
 		dgSwap(covariance[1], covariance[2]);
 	}
 
-	if (eigen[2] > dgFloat32 (1.0e-3f)) {
+	const dgFloat32 eigenValueError = dgFloat32 (1.0e-4f);
+	if (eigen[2] > eigenValueError) {
 		// 3d convex Hull
 		return Prune3dContacts(covariance, count, contactPointArray, maxCount, distTolerenace);
-	} else if (eigen[1] > dgFloat32(1.0e-3f)) {
+	} else if (eigen[1] > eigenValueError) {
 		// is a 2d or 1d convex hull
 		return Prune2dContacts(covariance, count, contactPointArray, maxCount, distTolerenace);
-	} else if (eigen[0] > dgFloat32(1.0e-3f)) {
+	} else if (eigen[0] > eigenValueError) {
 		// is a 1d or 1d convex hull
 		if (count > 2) {
 			dgFloat32 maxValue = dgFloat32(-1.0e10f);
@@ -1643,15 +1675,13 @@ void dgWorld::CompoundContacts (dgBroadPhase::dgPair* const pair, dgCollisionPar
 	dgCollisionCompound* const compound = (dgCollisionCompound*) instance->GetChildShape();
 	dgAssert (compound->IsType(dgCollision::dgCollisionCompound_RTTI));
 	compound->CalculateContacts (pair, proxy);
+
+#ifdef DE_USE_OLD_CONTACT_FILTER
 	if (pair->m_contactCount) {
 		// prune close contacts
-dgAssert (0);
-//		pair->m_contactCount = PruneContacts (pair->m_contactCount, proxy.m_contacts, proxy.m_contactJoint->GetPruningTolerance());
+		pair->m_contactCount = OldPruneContacts (pair->m_contactCount, proxy.m_contacts, proxy.m_contactJoint->GetPruningTolerance());
 	}
-
-//	if (pair->m_contactCount > 8) {
-//		pair->m_contactCount = PruneContactsByRank(pair->m_contactCount, proxy, 8);
-//	}
+#endif
 
 	proxy.m_contactJoint->m_separationDistance = dgFloat32 (0.0f);
 }

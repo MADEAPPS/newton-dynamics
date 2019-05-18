@@ -357,7 +357,7 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	CreateLevelMesh (scene, "flatPlane.ngd", 0);
-//	AddPrimitiveArray (scene, 0.0f, dVector (0.0f, -0.5f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, dGetIdentityMatrix(), -0.5f, 0.0f);
+	AddFloorBox(scene, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f));
 
 	// tower is very hard to stabilize, needs more iteration 
 	//BuildTower(scene, 0.25f, 0.0f, 1.0f, dVector(-2.0f, 0.65f, 25.0f), 0.35f, 0.5f, 1.0f, 1, 80, 12);

@@ -266,7 +266,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	m_delayDelateLock = 0;
 	m_clusterLRU = 0;
 
-	m_useParallelSolver = 0;
+	m_useParallelSolver = 1;
 
 	m_solverIterations = DG_DEFAULT_SOLVER_ITERATION_COUNT;
 	m_dynamicsLru = 0;

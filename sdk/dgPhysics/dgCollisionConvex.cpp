@@ -812,10 +812,34 @@ dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& no
 		}
 	}
 
-	while (count > DG_MAX_VERTEX_CLIP_FACE) {
-		dgAssert (0);
+	const dgInt32 maxVertexCount = DG_MAX_VERTEX_CLIP_FACE;
+	while (count > maxVertexCount) {
+		sortHeap.Flush();
+		dgConveFaceNode* ptr = hullPoint;
+		dgVector e0(contactsOut[ptr->m_next->m_vertexIndex] - contactsOut[ptr->m_vertexIndex]);
+		do {
+			dgVector e1(contactsOut[ptr->m_next->m_next->m_vertexIndex] - contactsOut[ptr->m_next->m_vertexIndex]);
+			dgFloat32 area = dgAbs(e0.CrossProduct(e1).DotProduct(normal).GetScalar());
+			sortHeap.Push(ptr->m_next, area);
+			e0 = e1;
+			ptr->m_mask = 1;
+			ptr = ptr->m_next;
+		} while (ptr != hullPoint);
+
+		while (sortHeap.GetCount() && (count > maxVertexCount)) {
+			dgConveFaceNode* const corner = sortHeap[0];
+			if (corner->m_mask && corner->m_prev->m_mask) {
+				if (hullPoint == corner) {
+					hullPoint = corner->m_prev;
+				}
+				count--;
+				corner->m_prev->m_mask = 0;
+				corner->m_next->m_prev = corner->m_prev;
+				corner->m_prev->m_next = corner->m_next;
+			}
+			sortHeap.Pop();
+		}
 	}
-	
 	
 	dgInt32 index = start;
 	dgConveFaceNode* ptr = hullPoint;
