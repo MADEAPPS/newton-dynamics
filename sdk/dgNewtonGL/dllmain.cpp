@@ -55,24 +55,6 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		return FALSE;
 	}
 
-//	const GLubyte* const version = glGetString(GL_SHADING_LANGUAGE_VERSION);
-//	if (strcmp((char*)version, "4.50") < 0) {
-//		return NULL;
-//	}
-//	char shaderDir[256];
-//	GetModuleFileNameA(hModule, shaderDir, sizeof(shaderDir));
-//
-//	char* ptr = strrchr(shaderDir, '\\');
-//	if (!ptr) {
-//		ptr = strrchr(shaderDir, '/');
-//	}
-//	if (!ptr) {
-//		return NULL;
-//	}
-//	ptr++;
-//	*ptr = 0;
-//	strcpy(dgWorldBase::m_shaderDirectory, shaderDir);
-
 	return TRUE;
 }
 #endif

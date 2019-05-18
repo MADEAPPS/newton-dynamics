@@ -58,7 +58,6 @@ dgWorldBase::~dgWorldBase()
 {
 }
 
-
 const char* dgWorldBase::GetId() const
 {
 	return m_hardwareDeviceName;

@@ -31,6 +31,7 @@ extern "C"
 }
 #endif
 
+
 class dgWorldBase: public dgWorldPlugin, public dgSolver
 {
 	public:
