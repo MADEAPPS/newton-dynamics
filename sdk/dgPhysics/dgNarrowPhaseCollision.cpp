@@ -820,7 +820,8 @@ class dgContactSolver___: public dgDownHeap<dgMinkFace___*, dgFloat32>
 dgInt32 dgWorld::Prune3dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contact, int maxCount, dgFloat32 distTol) const
 {
 #if 1
-	dgAssert (0);
+//	dgAssert (0);
+	dgTrace (("Fix This %s", __FUNCTION__));
 	if (count > 1) {
 		dgUnsigned8 mask[DG_MAX_CONTATCS];
 
