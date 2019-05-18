@@ -56,8 +56,8 @@
 		}
 
 		DG_INLINE dgSoaFloat(const dgSoaFloat* const baseAddr, const dgSoaFloat& index)
-			:m_low(_mm256_i64gather_pd(&baseAddr->m_f[0], index.m_lowInt, 8))
-			,m_high(_mm256_i64gather_pd(&baseAddr->m_f[0], index.m_highInt, 8))
+			:m_low(_mm256_i64gather_pd(&(*baseAddr)[0], index.m_lowInt, 8))
+			,m_high(_mm256_i64gather_pd(&(*baseAddr)[0], index.m_highInt, 8))
 		{
 		}
 
@@ -65,14 +65,18 @@
 		{
 			dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
 			dgAssert(i >= 0);
-			return m_f[i];
+			//return m_f[i];
+			dgFloat32* const ptr = (dgFloat32*)&m_low;
+			return ptr[i];
 		}
 
 		DG_INLINE const dgFloat32& operator[] (dgInt32 i) const
 		{
 			dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
 			dgAssert(i >= 0);
-			return m_f[i];
+			//return m_f[i];
+			const dgFloat32* const ptr = (dgFloat32*)&m_low;
+			return ptr[i];
 		}
 
 		DG_INLINE dgSoaFloat operator+ (const dgSoaFloat& A) const
@@ -132,12 +136,13 @@
 
 		DG_INLINE dgFloat32 AddHorizontal() const
 		{
-			dgSoaFloat ret;
 			__m256d tmp0(_mm256_add_pd(m_low, m_high));
 			__m256d tmp1(_mm256_hadd_pd(tmp0, tmp0));
 			__m256d tmp2(_mm256_add_pd(tmp1, _mm256_permute2f128_pd(tmp1, tmp1, 1)));
-			_mm256_storeu_pd (ret.m_f, tmp2);
-			return ret.m_f[0];
+			//dgSoaFloat ret;
+			//_mm256_storeu_pd (ret.m_f, tmp2);
+			//return ret.m_f[0];
+			return *((dgFloat32*)&tmp2);
 		}
 
 		static DG_INLINE void FlushRegisters()
@@ -157,8 +162,8 @@
 				__m256i m_lowInt;
 				__m256i m_highInt;
 			};
-			dgInt64 m_i[DG_SOA_WORD_GROUP_SIZE];
-			dgFloat32 m_f[DG_SOA_WORD_GROUP_SIZE];
+			//dgInt64 m_i[DG_SOA_WORD_GROUP_SIZE];
+			//dgFloat32 m_f[DG_SOA_WORD_GROUP_SIZE];
 		};
 	} DG_GCC_AVX_ALIGMENT;
 
@@ -187,7 +192,7 @@
 		}
 
 		DG_INLINE dgSoaFloat(const dgSoaFloat* const baseAddr, const dgSoaFloat& index)
-			:m_type(_mm256_i32gather_ps(baseAddr->m_f, index.m_typeInt, 4))
+			:m_type(_mm256_i32gather_ps(&(*baseAddr)[0], index.m_typeInt, 4))
 		{
 		}
 
@@ -195,14 +200,18 @@
 		{
 			dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
 			dgAssert(i >= 0);
-			return m_f[i];
+			//return m_f[i];
+			dgFloat32* const ptr = (dgFloat32*)&m_type;
+			return ptr[i];
 		}
 
 		DG_INLINE const dgFloat32& operator[] (dgInt32 i) const
 		{
 			dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
 			dgAssert(i >= 0);
-			return m_f[i];
+			//return m_f[i];
+			const dgFloat32* const ptr = (dgFloat32*)&m_type;
+			return ptr[i];
 		}
 
 		DG_INLINE dgSoaFloat operator+ (const dgSoaFloat& A) const
@@ -262,12 +271,13 @@
 
 		DG_INLINE dgFloat32 AddHorizontal() const
 		{
-			dgSoaFloat ret;
 			__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
 			__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
 			__m256 tmp2(_mm256_hadd_ps(tmp1, tmp1));
-			_mm256_store_ps(ret.m_f, tmp2);
-			return ret.m_f[0];
+			//dgSoaFloat ret;
+			//_mm256_store_ps(ret.m_f, tmp2);
+			//return ret.m_f[0];
+			return *((dgFloat32*)&tmp2);
 		}
 
 		static DG_INLINE void FlushRegisters()
@@ -279,8 +289,6 @@
 		{
 			__m256 m_type;
 			__m256i m_typeInt;
-			dgInt32 m_i[DG_SOA_WORD_GROUP_SIZE];
-			dgFloat32 m_f[DG_SOA_WORD_GROUP_SIZE];
 		};
 	} DG_GCC_AVX_ALIGMENT;
 #endif

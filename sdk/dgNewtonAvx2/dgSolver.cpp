@@ -289,6 +289,12 @@ DG_INLINE void dgSolver::TransposeRow(dgSoaMatrixElement* const row, const dgJoi
 {
 	const dgLeftHandSide* const leftHandSide = &m_world->GetSolverMemory().m_leftHandSizeBuffer[0];
 	const dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
+#ifdef _NEWTON_USE_DOUBLE
+	dgInt64* const normalIndex = (dgInt64*) &row->m_normalForceIndex[0];
+#else
+	dgInt32* const normalIndex = (dgInt32*) &row->m_normalForceIndex[0];
+#endif
+
 	if (jointInfoArray[0].m_pairCount == jointInfoArray[DG_SOA_WORD_GROUP_SIZE - 1].m_pairCount) {
 		for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i++) {
 			const dgJointInfo* const jointInfo = &jointInfoArray[i];
@@ -327,7 +333,8 @@ DG_INLINE void dgSolver::TransposeRow(dgSoaMatrixElement* const row, const dgJoi
 			row->m_coordenateAccel[i] = rhs->m_coordenateAccel;
 			row->m_lowerBoundFrictionCoefficent[i] = rhs->m_lowerBoundFrictionCoefficent;
 			row->m_upperBoundFrictionCoefficent[i] = rhs->m_upperBoundFrictionCoefficent;
-			row->m_normalForceIndex.m_i[i] = (rhs->m_normalForceIndex + 1) * DG_SOA_WORD_GROUP_SIZE + i;
+			//row->m_normalForceIndex.m_i[i] = (rhs->m_normalForceIndex + 1) * DG_SOA_WORD_GROUP_SIZE + i;
+			normalIndex[i] = (rhs->m_normalForceIndex + 1) * DG_SOA_WORD_GROUP_SIZE + i;
 		}
 	} else {
 		memset(row, 0, sizeof (dgSoaMatrixElement));
@@ -369,10 +376,11 @@ DG_INLINE void dgSolver::TransposeRow(dgSoaMatrixElement* const row, const dgJoi
 				row->m_coordenateAccel[i] = rhs->m_coordenateAccel;
 				row->m_lowerBoundFrictionCoefficent[i] = rhs->m_lowerBoundFrictionCoefficent;
 				row->m_upperBoundFrictionCoefficent[i] = rhs->m_upperBoundFrictionCoefficent;
-				row->m_normalForceIndex.m_i[i] = (rhs->m_normalForceIndex + 1) * DG_SOA_WORD_GROUP_SIZE + i;
+				//row->m_normalForceIndex.m_i[i] = (rhs->m_normalForceIndex + 1) * DG_SOA_WORD_GROUP_SIZE + i;
+				normalIndex[i] = (rhs->m_normalForceIndex + 1) * DG_SOA_WORD_GROUP_SIZE + i;
 			} else {
-				//row->m_normalForceIndex.m_i[i] = DG_INDEPENDENT_ROW;
-				row->m_normalForceIndex.m_i[i] = i;
+				//row->m_normalForceIndex.m_i[i] = i;
+				normalIndex[i] = i;
 			}
 		}
 	}
