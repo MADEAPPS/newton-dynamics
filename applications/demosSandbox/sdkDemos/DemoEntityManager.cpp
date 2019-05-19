@@ -42,7 +42,7 @@
 //#define DEFAULT_SCENE	6		// kinematic bodies
 //#define DEFAULT_SCENE	7		// Object Placement
 //#define DEFAULT_SCENE	8		// primitive convex cast 
-#define DEFAULT_SCENE	9		// box stacks
+//#define DEFAULT_SCENE	9		// box stacks
 //#define DEFAULT_SCENE	10		// simple level mesh collision
 //#define DEFAULT_SCENE	11		// optimized level mesh collision
 //#define DEFAULT_SCENE	12		// height field Collision
@@ -52,7 +52,7 @@
 //#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	17		// uniform Scaled Collision
 //#define DEFAULT_SCENE	18		// non uniform Scaled Collision
-//#define DEFAULT_SCENE	19		// scaled mesh collision
+#define DEFAULT_SCENE	19		// scaled mesh collision
 //#define DEFAULT_SCENE	20		// continuous collision
 //#define DEFAULT_SCENE	21		// paper wall continuous collision
 //#define DEFAULT_SCENE	22		// puck slide continuous collision
@@ -372,7 +372,7 @@ DemoEntityManager::DemoEntityManager ()
 			break;
 		}
 	}
-m_currentPlugin = 3;
+//m_currentPlugin = 3;
 
 	m_shadeCache.CreateAllEffects();
 
