@@ -100,8 +100,6 @@ class ComplexScene: public DemoEntity
 		glPopMatrix();
 	}
 
-	
-
 	void AddCollisionTreeMesh (DemoEntityManager* const scene)
 	{
 		// open the level data
@@ -141,7 +139,7 @@ class ComplexScene: public DemoEntity
 				NewtonTreeCollisionAddFace(tree, 3, &face[0].m_x, sizeof (dVector), matID);
 			}
 		}
-		NewtonTreeCollisionEndBuild (tree, 0);
+		NewtonTreeCollisionEndBuild (tree, 1);
 
 		// add the collision tree to the collision scene
 		void* const proxy = NewtonSceneCollisionAddSubCollision (m_sceneCollision, tree);
@@ -180,10 +178,10 @@ class ComplexScene: public DemoEntity
 
 	void AddCollisionHeightFieldMesh(DemoEntityManager* const scene)
 	{
-		int size = 101;
+		int size = 65;
 		dFloat* const elevation = new dFloat[size * size];
 
-		//y = a * sin(x)* (sin (z)) ^2
+		dFloat elevationScale = 0.25f;
 		for (int i = 0; i < size; i ++) {
 			dFloat z = dPi * i / (size - 1);
 			dFloat z2 = dSin (z);
@@ -191,10 +189,10 @@ class ComplexScene: public DemoEntity
 			for (int j = 0; j < size; j ++) {
 				dFloat x = dPi * j / (size - 1);
 				dFloat y = z2 * dSin(x);
-				elevation[j * size + i] = y;
+				elevation[j * size + i] = y * elevationScale;
 			}
 		}
-		dFloat cellsize = 0.25f;
+		dFloat cellsize = 0.125f;
 		DemoMesh* const mesh = new DemoMesh ("terrain", scene->GetShaderCache(), elevation, size, cellsize, 1.0f/16.0f, size - 1);
 		
 		int width = size;
@@ -206,12 +204,11 @@ class ComplexScene: public DemoEntity
 		void* const proxy  = NewtonSceneCollisionAddSubCollision (m_sceneCollision, collision);
 		NewtonDestroyCollision(collision);
 
-
 		// set the parameter on the added collision share
 		dMatrix matrix (dGetIdentityMatrix());
-		matrix.m_posit.m_y = -2.0f;
-		matrix.m_posit.m_x = -15.0f;
-		matrix.m_posit.m_z = -10.0f;
+		matrix.m_posit.m_y = -0.125f;
+		matrix.m_posit.m_x = -cellsize * size / 2;
+		matrix.m_posit.m_z = -cellsize * size / 2;
 		NewtonCollision* const terrainCollision = NewtonSceneCollisionGetCollisionFromNode (m_sceneCollision, proxy );
 
 		NewtonSceneCollisionSetSubCollisionMatrix (m_sceneCollision, proxy, &matrix[0][0]);	
@@ -316,13 +313,11 @@ void SceneCollision (DemoEntityManager* const scene)
 	ComplexScene* const visualMesh = new ComplexScene(sceneCollision);
 	scene->Append (visualMesh);
 
-
 	// add some shapes
 	visualMesh->AddPrimitives(scene);
 
 	// this is optional, finish the scene construction, optimize the collision scene
 	dMatrix matrix (dGetIdentityMatrix());
-
 
 	// create the level body and add it to the world
 	NewtonBody* const level = NewtonCreateDynamicBody (world, sceneCollision, &matrix[0][0]);
@@ -342,8 +337,6 @@ void SceneCollision (DemoEntityManager* const scene)
 	NewtonMaterialSetCollisionCallback (world, defaultMaterialID, defaultMaterialID, OnBodyAABBOverlap, OnContactCollision); 
 	NewtonMaterialSetCompoundCollisionCallback(world, defaultMaterialID, defaultMaterialID, OnSubShapeAABBOverlapTest);
 
-
-
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
 	dVector size (0.25f, 0.25f, 0.25f, 0.0f);
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
@@ -360,6 +353,6 @@ void SceneCollision (DemoEntityManager* const scene)
 
 	dMatrix camMatrix (dRollMatrix(-20.0f * dDegreeToRad) * dYawMatrix(-45.0f * dDegreeToRad));
 	dQuaternion rot (camMatrix);
-	dVector origin (-15.0f, 5.0f, -5.0f, 0.0f);
+	dVector origin (-8.0f, 5.0f, -8.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

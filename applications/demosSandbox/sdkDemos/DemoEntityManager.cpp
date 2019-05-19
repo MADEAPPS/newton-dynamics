@@ -48,7 +48,7 @@
 //#define DEFAULT_SCENE	12		// height field Collision
 //#define DEFAULT_SCENE	13		// infinite user plane collision
 //#define DEFAULT_SCENE	14		// user height field Collision
-#define DEFAULT_SCENE	15		// compound Collision
+//#define DEFAULT_SCENE	15		// compound Collision
 //#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	17		// uniform Scaled Collision
 //#define DEFAULT_SCENE	18		// non uniform Scaled Collision
@@ -57,7 +57,7 @@
 //#define DEFAULT_SCENE	21		// paper wall continuous collision
 //#define DEFAULT_SCENE	22		// puck slide continuous collision
 //#define DEFAULT_SCENE	23		// simple convex decomposition
-//#define DEFAULT_SCENE	24		// scene Collision
+#define DEFAULT_SCENE	24		// scene Collision
 //#define DEFAULT_SCENE	25		// simple boolean operators 
 //#define DEFAULT_SCENE	26		// simple convex fracturing 
 //#define DEFAULT_SCENE	27		// structured convex fracturing 

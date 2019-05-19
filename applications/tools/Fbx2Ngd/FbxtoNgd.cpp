@@ -641,44 +641,6 @@ void ImportTexture(FbxScene* const fbxScene, dScene* const ngdScene, FbxProperty
 
 					const char* const texPathName = fileTexture->GetFileName();
 
-					/*
-					DisplayDouble("            Scale U: ", pTexture->GetScaleU());
-					DisplayDouble("            Scale V: ", pTexture->GetScaleV());
-					DisplayDouble("            Translation U: ", pTexture->GetTranslationU());
-					DisplayDouble("            Translation V: ", pTexture->GetTranslationV());
-					DisplayBool("            Swap UV: ", pTexture->GetSwapUV());
-					DisplayDouble("            Rotation U: ", pTexture->GetRotationU());
-					DisplayDouble("            Rotation V: ", pTexture->GetRotationV());
-					DisplayDouble("            Rotation W: ", pTexture->GetRotationW());
-					const char* lAlphaSources[] = { "None", "RGB Intensity", "Black" };
-					DisplayString("            Alpha Source: ", lAlphaSources[pTexture->GetAlphaSource()]);
-					DisplayDouble("            Cropping Left: ", pTexture->GetCroppingLeft());
-					DisplayDouble("            Cropping Top: ", pTexture->GetCroppingTop());
-					DisplayDouble("            Cropping Right: ", pTexture->GetCroppingRight());
-					DisplayDouble("            Cropping Bottom: ", pTexture->GetCroppingBottom());
-					const char* lMappingTypes[] = { "Null", "Planar", "Spherical", "Cylindrical", "Box", "Face", "UV", "Environment" };
-					DisplayString("            Mapping Type: ", lMappingTypes[pTexture->GetMappingType()]);
-					if (pTexture->GetMappingType() == FbxTexture::ePlanar) {
-					const char* lPlanarMappingNormals[] = { "X", "Y", "Z" };
-
-					DisplayString("            Planar Mapping Normal: ", lPlanarMappingNormals[pTexture->GetPlanarMappingNormal()]);
-					}
-
-					const char* lBlendModes[]   = { "Translucent", "Add", "Modulate", "Modulate2" };
-					if(pBlendMode >= 0)
-					DisplayString("            Blend Mode: ", lBlendModes[pBlendMode]);
-					DisplayDouble("            Alpha: ", pTexture->GetDefaultAlpha());
-
-					if (lFileTexture) {
-					const char* lMaterialUses[] = { "Model Material", "Default Material" };
-					DisplayString("            Material Use: ", lMaterialUses[lFileTexture->GetMaterialUse()]);
-					}
-
-					const char* pTextureUses[] = { "Standard", "Shadow Map", "Light Map", "Spherical Reflexion Map", "Sphere Reflexion Map", "Bump Normal Map" };
-					DisplayString("            Texture Use: ", pTextureUses[pTexture->GetTextureUse()]);
-					DisplayString("");
-
-					*/
 					char path[2048];
 					const char* const texName = dGetNameFromPath(texPathName);
 					dExtractPathFromFullName(texPathName, path);

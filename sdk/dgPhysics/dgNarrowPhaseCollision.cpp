@@ -1825,9 +1825,8 @@ void dgWorld::SceneChildContacts (dgBroadPhase::dgPair* const pair, dgCollisionP
 	proxy.m_contacts = savedBuffer;
 	if (pair->m_contactCount > (DG_MAX_CONTATCS - 2 * (DG_CONSTRAINT_MAX_ROWS / 3))) {
 #ifdef DE_USE_OLD_CONTACT_FILTER
-		pair->m_contactCount = dgInt16 (OldReduceContacts (pair->m_contactCount, proxy.m_contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance()));
+		pair->m_contactCount = OldReduceContacts (pair->m_contactCount, proxy.m_contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
 #else
-		dgAssert(0);
 		pair->m_contactCount = PruneContacts(pair->m_contactCount, proxy.m_contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
 #endif
 	}
@@ -1855,8 +1854,9 @@ void dgWorld::SceneContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamP
 		scene->CollidePair (pair, proxy);
 		if (pair->m_contactCount > 0) {
 			// prune close contacts
-dgAssert (0);
-//			pair->m_contactCount = dgInt16 (PruneContacts (pair->m_contactCount, proxy.m_contacts, proxy.m_contactJoint->GetPruningTolerance()));
+#ifdef DE_USE_OLD_CONTACT_FILTER
+			pair->m_contactCount = OldPruneContacts (pair->m_contactCount, proxy.m_contacts, proxy.m_contactJoint->GetPruningTolerance());
+#endif
 		}
 	} else if (otherInstance->IsType (dgCollision::dgCollisionCompound_RTTI) & ~otherInstance->IsType (dgCollision::dgCollisionScene_RTTI)) {
 		proxy.m_body0 = otherBody;
@@ -1868,8 +1868,9 @@ dgAssert (0);
 		scene->CollideCompoundPair (pair, proxy);
 		if (pair->m_contactCount > 0) {
 			// prune close contacts
-dgAssert (0);
-//			pair->m_contactCount = dgInt16 (PruneContacts (pair->m_contactCount, proxy.m_contacts, proxy.m_contactJoint->GetPruningTolerance()));
+#ifdef DE_USE_OLD_CONTACT_FILTER
+			pair->m_contactCount = OldPruneContacts (pair->m_contactCount, proxy.m_contacts, proxy.m_contactJoint->GetPruningTolerance());
+#endif
 		}
 	} else {
 		dgAssert (0);
@@ -2040,8 +2041,11 @@ dgInt32 dgWorld::CollideContinue (
 	count = pair.m_contactCount;
 	if (count) {
 		if (count > maxContacts) {
-dgAssert (0);
-//			count = PruneContacts (count, contacts, contactJoint.GetPruningTolerance(), maxContacts);
+			#ifdef DE_USE_OLD_CONTACT_FILTER
+			count = OldPruneContacts (count, contacts, contactJoint.GetPruningTolerance(), maxContacts);
+			#else 
+			count = PruneContacts (count, contacts, contactJoint.GetPruningTolerance(), maxContacts);
+			#endif
 		}
 
 		if (pair.m_flipContacts) {
@@ -2124,7 +2128,6 @@ dgInt32 dgWorld::Collide (
 #ifdef DE_USE_OLD_CONTACT_FILTER
 		count = OldReduceContacts (count, contacts, maxContacts, contactJoint.GetPruningTolerance());
 #else
-		dgAssert(0);
 		count = PruneContacts(count, contacts, contactJoint.GetPruningTolerance(), maxContacts);
 #endif
 		count = dgMin (count, maxContacts);
@@ -2555,6 +2558,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	contactJoint->m_closestDistance = closestDist;
 
 	bool contactsValid = true;
+#ifdef DE_USE_OLD_CONTACT_FILTER
 	const dgFloat32 dist = dgFloat32 (0.0078125f);
 	const dgFloat32 dist2 = dist * dist;
 	for (dgInt32 i = 0; i < count; i ++) {
@@ -2575,6 +2579,16 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 			}
 		}
 	} 
+#else
+	dgVector averageNormal (dgVector::m_zero);
+	for (dgInt32 i = 0; i < count; i ++) {
+		averageNormal += contactOut[i].m_normal;
+	}
+	for (dgInt32 i = 0; (i < count) && contactsValid; i ++) {
+		const dgFloat32 project = averageNormal.DotProduct(contactOut[i].m_normal).GetScalar();
+		contactsValid = contactsValid && (project > dgFloat32(0.0f));
+	}
+#endif
 
 	if (!contactsValid) {
 		dgCollisionContactCloud contactCloud (GetAllocator(), count, contactOut);

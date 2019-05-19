@@ -1606,7 +1606,6 @@ bool dScene::Deserialize (const char* const fileName)
 	doc.LoadFile();
 	dAssert (!doc.Error());
 
-
 	bool state = true;
 	const TiXmlElement* const rootNode = doc.RootElement();
 	if (rootNode && (doc.FirstChild (D_SCENE_ROOT_NODE_NAME) || doc.FirstChild ("alchemedia"))){
