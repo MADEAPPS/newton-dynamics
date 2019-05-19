@@ -959,8 +959,8 @@ dgInt32 dgContactSolver::ConvexPolygonToLineIntersection(const dgVector& normal,
 	return count2;
 }
 
-
-DG_INLINE dgContactSolver::dgPerimenterEdge* dgContactSolver::ReduceContacts____(dgPerimenterEdge* poly, dgInt32 maxCount) const
+#ifdef DE_USE_OLD_CONTACT_FILTER
+DG_INLINE dgContactSolver::dgPerimenterEdge* dgContactSolver::OldReduceContacts(dgPerimenterEdge* poly, dgInt32 maxCount) const
 {
 	dgInt32 buffer[DG_MAX_EDGE_COUNT];
 	dgUpHeap<dgPerimenterEdge*, dgFloat32> heap(buffer, sizeof (buffer));
@@ -1020,6 +1020,7 @@ DG_INLINE dgContactSolver::dgPerimenterEdge* dgContactSolver::ReduceContacts____
 
 	return poly;
 }
+#endif
 
 dgInt32 dgContactSolver::ConvexPolygonsIntersection(const dgVector& normal, dgInt32 count0, dgVector* const shape0, dgInt32 count1, dgVector* const shape1, dgVector* const contactOut, dgInt32 maxContacts) const
 {
@@ -1139,7 +1140,7 @@ dgInt32 dgContactSolver::ConvexPolygonsIntersection(const dgVector& normal, dgIn
 
 		dgAssert(poly);
 #ifdef DE_USE_OLD_CONTACT_FILTER
-		poly = ReduceContacts____(poly, maxContacts);
+		poly = OldReduceContacts(poly, maxContacts);
 #endif
 		count = 0;
 		dgPerimenterEdge* intersection = poly;

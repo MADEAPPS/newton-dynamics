@@ -66,8 +66,6 @@ class dgCollisionConvex: public dgCollision
 	virtual dgFloat32 GetBoxMaxRadius () const;
 
 	dgInt32 RayCastClosestFace (dgVector* tetrahedrum, const dgVector& origin, dgFloat32& pointDist) const;
-	dgInt32 OldSimplifyClipPolygon (dgInt32 count, const dgVector& normal, dgVector* const polygon) const;
-
 	dgVector CalculateVolumeIntegral (const dgPlane& plane) const; 
 	
 	void SetVolumeAndCG ();

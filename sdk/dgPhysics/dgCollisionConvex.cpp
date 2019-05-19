@@ -187,8 +187,6 @@ bool dgCollisionConvex::SanityCheck (dgPolyhedra& hull) const
 	return true;
 }
 
-
-
 void dgCollisionConvex::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgInt8 mark[DG_MAX_EDGE_COUNT];
@@ -585,164 +583,8 @@ bool dgCollisionConvex::SanityCheck(dgInt32 count, const dgVector& normal, dgVec
 	return true;
 }
 
-dgInt32 dgCollisionConvex::OldSimplifyClipPolygon (dgInt32 count, const dgVector& normal, dgVector* const polygon) const
-{
-	dgInt8 mark[DG_MAX_VERTEX_CLIP_FACE * 8];
-	dgInt8 buffer[8 * DG_MAX_VERTEX_CLIP_FACE * (sizeof (dgInt32) + sizeof (dgFloat32))];
-
-	dgAssert (count < dgInt32 (sizeof (mark) / sizeof (mark[0])));
-	dgUpHeap<dgInt32, dgFloat32> sortHeap (buffer, sizeof (buffer));	
-
-	dgAssert (normal.m_w == dgFloat32 (0.0f));
-	while (count > DG_MAX_VERTEX_CLIP_FACE) {
-		sortHeap.Flush();
-		for (dgInt32 i0 = count - 2, i1 = count - 1, i2 = 0; i2 < count; i2 ++) {
-			mark[i2] = 0;
-
-			dgVector e0 = polygon[i1] - polygon[i0];
-			dgVector e1 = polygon[i2] - polygon[i0];
-			dgFloat32 area = dgAbs (normal.DotProduct(e0.CrossProduct(e1)).GetScalar());
-
-			sortHeap.Push(i1, area);
-
-			i0 = i1;
-			i1 = i2;
-		}
-
-		dgInt32 removeCount = count - DG_MAX_VERTEX_CLIP_FACE;
-		while (sortHeap.GetCount() && removeCount) {
-			dgInt32 m1 = sortHeap[0];
-			sortHeap.Pop();
-
-			dgInt32 m0 = (m1 - 1) >= 0 ? m1 - 1 : count - 1;
-			dgInt32 m2 = (m1 + 1) < count ? m1 + 1 : 0;
-			dgAssert (m0 >= 0);
-
-			if (!(mark[m0] || mark[m2])) {
-				mark[m1] = 1;
-				removeCount --;
-			}
-		}
-
-		dgInt32 i0 = 0;
-		for (dgInt32 i1 = 0; i1 < count; i1 ++) {
-			if (!mark[i1]) {
-				polygon[i0] = polygon[i1];
-				i0 ++;
-			}
-		}
-		count = i0;
-	}
-
-	return count;
-}
-
-
 dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& normal, dgVector* const contactsOut) const
 {
-#ifdef DE_USE_OLD_CONTACT_FILTER
-	struct DG_CONVEX_FIXUP_FACE
-	{
-		dgInt32 m_vertex;
-		DG_CONVEX_FIXUP_FACE* m_next;
-	};
-
-	DG_CONVEX_FIXUP_FACE linkFace[DG_CLIP_MAX_POINT_COUNT * 2];
-
-	dgAssert (count > 2);
-	dgAssert (normal.m_w == dgFloat32 (0.0f));
-	DG_CONVEX_FIXUP_FACE* poly = &linkFace[0];
-	for (dgInt32 i = 0; i < count; i ++) {
-		dgAssert (contactsOut[i].m_w == dgFloat32 (0.0f));
-		linkFace[i].m_vertex = i;
-		linkFace[i].m_next = &linkFace[i + 1];
-	}
-	linkFace[count - 1].m_next = &linkFace[0];
-
-	dgInt32 restart = 1;
-	dgInt32 tmpCount = count;
-	while (restart && (tmpCount >= 2)) {
-		restart = 0;
-		DG_CONVEX_FIXUP_FACE* ptr = poly; 
-		dgInt32 loops = tmpCount;
-		do {
-			dgInt32 i0 = ptr->m_vertex;
-			dgInt32 i1 = ptr->m_next->m_vertex;
-			dgVector error (contactsOut[i1] - contactsOut[i0]);
-			dgAssert (error.m_w == dgFloat32 (0.0f));
-			dgFloat32 dist2 = error.DotProduct(error).GetScalar();
-			if (dist2 < dgFloat32 (0.003f * 0.003f)) {
-				if (ptr->m_next == poly) {
-					poly = ptr;
-				} 
-				restart = 1;
-				tmpCount --;
-				contactsOut[i1].m_w = dgFloat32 (1.0f);
-				ptr->m_next = ptr->m_next->m_next;
-			} else {
-				ptr = ptr->m_next;
-			}
-
-			loops --;
-		} while (loops);
-	}
-
-	restart = 1;
-	while (restart && (tmpCount >= 3)) {
-		restart = 0;
-		DG_CONVEX_FIXUP_FACE* ptr = poly;
-		dgInt32 loops = tmpCount;
-		do {
-			dgInt32 i0 = ptr->m_vertex;
-			dgInt32 i1 = ptr->m_next->m_vertex;
-			dgInt32 i2 = ptr->m_next->m_next->m_vertex;
-			dgVector e0 (contactsOut[i2] - contactsOut[i1]);
-			dgVector e1 (contactsOut[i0] - contactsOut[i1]);
-			dgVector n (e0.CrossProduct(e1));
-			dgFloat32 area = normal.DotProduct(n).GetScalar();
-			if (area <= dgFloat32 (1.0e-5f)) {
-				if (ptr->m_next == poly) {
-					poly = ptr;
-				}
-				restart = 1;
-				tmpCount --;
-				contactsOut[i1].m_w = dgFloat32 (1.0f);
-				ptr->m_next = ptr->m_next->m_next;
-			} else {
-				ptr = ptr->m_next;
-			}
-			loops --;
-		} while (loops);
-	}
-
-	if (tmpCount < count) {
-		dgInt32 newCount = 0;
-		for (; newCount < count; newCount ++) {
-			if (contactsOut[newCount].m_w == dgFloat32 (1.0f)) {
-				break;
-			}
-		}
-
-		for (dgInt32 i = newCount + 1; i < count; i ++) {
-			if (contactsOut[i].m_w == dgFloat32 (0.0f)) {
-				contactsOut[newCount] = contactsOut[i];
-				newCount ++;
-			}
-		}
-		count = newCount;
-		dgAssert (tmpCount == count);
-	}
-
-
-	if (count > DG_MAX_VERTEX_CLIP_FACE) {
-		count = OldSimplifyClipPolygon (count, normal, contactsOut);
-	}
-
-	dgAssert (SanityCheck(count, normal, contactsOut));
-	return count;
-
-#else
-
 	class dgConveFaceNode
 	{
 		public:
@@ -846,8 +688,8 @@ dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& no
 	} while (ptr != hullPoint);
 	memcpy (contactsOut, &contactsOut[start], count * sizeof (dgVector));
 
+	dgAssert (SanityCheck(count, normal, contactsOut));
 	return count;
-#endif
 }
 
 dgVector dgCollisionConvex::SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const 

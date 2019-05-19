@@ -256,7 +256,7 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	// load the scene from a ngd file format
-//	CreateLevelMesh (scene, "flatPlane.ngd", true);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
 
 	NewtonSetContactMergeTolerance (scene->GetNewton(), 1.0e-3f);
 
@@ -264,14 +264,14 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	CreateSimpleBox_NewtonMesh (scene, dVector (0.0f, 2.0f, -2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 	// make a box using the dNetwonMesh Class
-//	CreateSimpledBox_dNetwonMesh (scene, dVector (4.0f, 2.0f, 2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
+	CreateSimpledBox_dNetwonMesh (scene, dVector (4.0f, 2.0f, 2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 
-DebugJernejLMesh (scene);
+//DebugJernejLMesh (scene);
 
 	dQuaternion rot;
-//	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
-	dVector origin(-10.0f, 1.0f, 0.0f, 0.0f);
+	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+//	dVector origin(-10.0f, 1.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 //	ExportScene (scene->GetNewton(), "test1.ngd");

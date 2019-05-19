@@ -48,11 +48,11 @@
 //#define DEFAULT_SCENE	12		// height field Collision
 //#define DEFAULT_SCENE	13		// infinite user plane collision
 //#define DEFAULT_SCENE	14		// user height field Collision
-//#define DEFAULT_SCENE	15		// compound Collision
+#define DEFAULT_SCENE	15		// compound Collision
 //#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	17		// uniform Scaled Collision
 //#define DEFAULT_SCENE	18		// non uniform Scaled Collision
-#define DEFAULT_SCENE	19		// scaled mesh collision
+//#define DEFAULT_SCENE	19		// scaled mesh collision
 //#define DEFAULT_SCENE	20		// continuous collision
 //#define DEFAULT_SCENE	21		// paper wall continuous collision
 //#define DEFAULT_SCENE	22		// puck slide continuous collision
@@ -349,8 +349,8 @@ DemoEntityManager::DemoEntityManager ()
 
 //	m_showUI = false;
 //	m_showAABB = false;
-	m_showContactPoints = true;
-	m_hideVisualMeshes = true;
+//	m_showContactPoints = true;
+//	m_hideVisualMeshes = true;
 //	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
@@ -359,8 +359,8 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showRaycastHit = true;
 //	m_showNormalForces = true;
 //	m_showCenterOfMass = false;
-	m_showJointDebugInfo = true;
-	m_collisionDisplayMode = 2;
+//	m_showJointDebugInfo = true;
+//	m_collisionDisplayMode = 2;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
 

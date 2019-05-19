@@ -448,7 +448,7 @@ void CompoundCollision (DemoEntityManager* const scene)
 	// this crash temporarily (I need to make the compound use shape Instance)
 	MakeFunnyCompound(scene, location);
 
-	// add listenr for ray tracing all sub shapes ofa compound
+	// add listener for ray tracing all sub shapes of a compound
 	new dShowAllSubShapes(scene);
 
 	// place camera into position
