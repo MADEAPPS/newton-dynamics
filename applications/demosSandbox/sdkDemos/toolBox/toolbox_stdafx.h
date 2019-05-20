@@ -271,7 +271,7 @@ inline void glMaterialParam (GLenum face, GLenum pname, const dFloat *params)
 #endif
 
 
-
+#define DEMO_CHECK_ASYN_UPDATE
 #define dRAND_MAX		0x0fffffff
 
 unsigned dRand ();

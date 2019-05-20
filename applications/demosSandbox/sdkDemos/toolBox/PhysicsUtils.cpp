@@ -18,6 +18,10 @@
 #include "DebugDisplay.h"
 #include "dHighResolutionTimer.h"
 
+#ifdef DEMO_CHECK_ASYN_UPDATE
+int g_checkAsyncUpdate = 1;
+#endif
+
 //const D_MESH_HEADER	"Newton Mesh"
 static const char* D_MESH_HEADER = "Newton Mesh";
 
@@ -652,8 +656,6 @@ void GetContactOnBody (NewtonBody* const body)
 	}
 }
 
-
-
 // rigid body destructor
 void  PhysicsBodyDestructor (const NewtonBody* body)
 {
@@ -680,6 +682,11 @@ void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thr
 //mass = 0.0f;
 	dVector force (dir.Scale (mass * DEMO_GRAVITY));
 	NewtonBodySetForce (body, &force.m_x);
+
+#ifdef DEMO_CHECK_ASYN_UPDATE
+	dAssert(g_checkAsyncUpdate);
+#endif
+
 
 	// test going to sleep bug
 //	NewtonBodySetSleepState(body, 0);
