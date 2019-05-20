@@ -2061,7 +2061,6 @@ void NewtonMaterialSetContactNormalAcceleration(const NewtonMaterial* const mate
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
-	dgAssert(0);
 	material->m_normal_Force.m_force = accel;
 	material->m_flags |= dgContactMaterial::m_overrideNormalAccel;
 }
