@@ -1340,13 +1340,13 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 #endif
 			if (m_asynchronousPhysicsUpdate) {
 				NewtonUpdateAsync(m_world, timestepInSecunds);
+#ifdef DEMO_CHECK_ASYN_UPDATE
+				NewtonWaitForUpdateToFinish(m_world);
+				g_checkAsyncUpdate = 0;
+#endif
 			} else {
 				NewtonUpdate(m_world, timestepInSecunds);
 			}
-#ifdef DEMO_CHECK_ASYN_UPDATE
-			NewtonWaitForUpdateToFinish(m_world);
-			g_checkAsyncUpdate = 0;
-#endif
 
 
 			physicsTime += NewtonGetLastUpdateTime(m_world);
