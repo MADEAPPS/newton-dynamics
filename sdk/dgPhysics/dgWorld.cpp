@@ -232,6 +232,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,m_solverJacobiansMemory (allocator, 64)
 	,m_solverRightHandSideMemory (allocator, 64)
 	,m_solverForceAccumulatorMemory (allocator, 64)
+	,m_testAsynUpdate(1)
 	,m_concurrentUpdate(false)
 {
 	//TestAStart();
@@ -951,6 +952,7 @@ void dgWorld::Sync ()
 	while (IsBusy()) {
 		dgThreadYield();
 	}
+	m_testAsynUpdate = 0;
 }
 
 void dgWorld::UpdateTransforms(dgBodyMasterList::dgListNode* node, dgInt32 threadID)
@@ -959,6 +961,8 @@ void dgWorld::UpdateTransforms(dgBodyMasterList::dgListNode* node, dgInt32 threa
 	while (node) {
 		dgBody* const body = node->GetInfo().GetBody();
 		if (body->m_transformIsDirty && body->m_matrixUpdate) {
+
+			dgAssert(m_testAsynUpdate);
 			body->m_matrixUpdate (*body, body->m_matrix, threadID);
 		}
 		body->m_transformIsDirty = false;
@@ -1013,6 +1017,8 @@ void dgWorld::RunStep ()
 		m_mutex.Release();
 	}
 	m_lastExecutionTime = (dgGetTimeInMicrosenconds() - timeAcc) * dgFloat32 (1.0e-6f);
+
+	dgAssert(m_testAsynUpdate);
 	EndSection();
 }
 
@@ -1024,6 +1030,8 @@ void dgWorld::TickCallback (dgInt32 threadID)
 void dgWorld::Update (dgFloat32 timestep)
 {
 	m_concurrentUpdate = false;
+	Sync();
+	m_testAsynUpdate = 1;
 	m_savetimestep = timestep;
 	#ifdef DG_USE_THREAD_EMULATION
 		dgFloatExceptions exception;
@@ -1041,6 +1049,7 @@ void dgWorld::UpdateAsync (dgFloat32 timestep)
 {
 	m_concurrentUpdate = true;
 	Sync ();
+	m_testAsynUpdate = 1;
 	m_savetimestep = timestep;
 	#ifdef DG_USE_THREAD_EMULATION
 		dgFloatExceptions exception;

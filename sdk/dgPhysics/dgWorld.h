@@ -546,6 +546,7 @@ dgInt32 ReduceContactsFallback (dgInt32 count, dgContactPoint* const contact, dg
 	dgArray<dgUnsigned8> m_solverRightHandSideMemory;
 	dgArray<dgUnsigned8> m_solverForceAccumulatorMemory;
 	
+	dgInt32 m_testAsynUpdate;
 	bool m_concurrentUpdate;
 	
 	friend class dgBody;
