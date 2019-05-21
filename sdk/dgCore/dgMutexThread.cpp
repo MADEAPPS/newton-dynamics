@@ -71,6 +71,7 @@ dgAsyncThread::dgAsyncThread(const char* const name, dgInt32 id)
 	:dgThread(name, id)
 	,m_mutex()
 	,m_inUpdate(0)
+	,m_beginUpdate(0)
 {
 	Init();
 }
@@ -100,7 +101,11 @@ void dgAsyncThread::Tick()
 {
 	// let the thread run until the update function return  
 	Sync();
+	m_beginUpdate = 0;
 	m_mutex.Release();
+	while (!m_beginUpdate) {
+		dgThreadPause();
+	}
 }
 
 
@@ -111,6 +116,7 @@ void dgAsyncThread::Execute(dgInt32 threadID)
 		m_mutex.Wait();
 		if (!m_terminate) {
 			dgInterlockedExchange(&m_inUpdate, 1);
+			dgInterlockedExchange(&m_beginUpdate, 1);
 			TickCallback(threadID);
 			dgInterlockedExchange(&m_inUpdate, 0);
 		}

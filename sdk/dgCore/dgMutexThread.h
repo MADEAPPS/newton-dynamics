@@ -61,5 +61,6 @@ class dgAsyncThread: public dgThread
 	private:
 	dgSemaphore m_mutex;
 	dgInt32 m_inUpdate;
+	dgInt32 m_beginUpdate;
 };
 #endif
