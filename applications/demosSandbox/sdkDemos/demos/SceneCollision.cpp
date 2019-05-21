@@ -230,7 +230,7 @@ class ComplexScene: public DemoEntity
 		NewtonCollision* shape;
 		
 		matrix = dRollMatrix(15.0f * dDegreeToRad);
-		matrix.m_posit.m_y = 4.0f;
+		matrix.m_posit.m_y = 3.0f;
 		matrix.m_posit.m_x = 3.0f;
 		matrix.m_posit.m_z = 0.0f;
 		proxy = NewtonSceneCollisionAddSubCollision (m_sceneCollision, box);
@@ -241,7 +241,7 @@ class ComplexScene: public DemoEntity
 
 		
 		matrix = dRollMatrix(-15.0f * dDegreeToRad);
-		matrix.m_posit.m_y = 8.0f;
+		matrix.m_posit.m_y = 5.0f;
 		matrix.m_posit.m_x = -3.0f;
 		matrix.m_posit.m_z = 0.0f;
 		proxy = NewtonSceneCollisionAddSubCollision (m_sceneCollision, box);

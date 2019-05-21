@@ -74,7 +74,6 @@ void dgSolver::SetShaders(int count, GLuint* const shaderArray)
 	}
 }
 
-
 GLuint dgSolver::CompileComputeShader(char* const shaderSource)
 {
 	GLint state;

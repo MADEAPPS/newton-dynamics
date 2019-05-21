@@ -687,7 +687,6 @@ void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thr
 	dAssert(g_checkAsyncUpdate);
 #endif
 
-
 	// test going to sleep bug
 //	NewtonBodySetSleepState(body, 0);
 }

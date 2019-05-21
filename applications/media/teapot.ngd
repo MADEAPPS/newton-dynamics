@@ -44,11 +44,11 @@
         </dMeshNodeInfo>
         <dMaterialNodeInfo id="0">
             <dNodeInfo name="01 - Default" nodeID="6" editorFlags="0" />
-            <ambient textureId="6928621225667475877" color="0.588235 0.588235 0.588235 1" />
-            <diffuse textureId="6928621225667475877" color="0.588235 0.588235 0.588235 1" />
-            <specular textureId="6928621225667475877" color="0.9 0.9 0.9 1" />
+            <ambient textureId="3119067162880686587" color="0.588235 0.588235 0.588235 1" />
+            <diffuse textureId="3119067162880686587" color="0.588235 0.588235 0.588235 1" />
+            <specular textureId="3119067162880686587" color="0.9 0.9 0.9 1" />
             <emissive textureId="-1" color="0 0 0 1" />
-            <shininess float="2.000000" />
+            <shininess float="97.005836" />
             <opacity float="1.000000" />
             <parentNodes count="2" indices="1 5" />
             <childrenNodes count="1" indices="8" />
@@ -58,8 +58,8 @@
             <parentNodes count="1" indices="0" />
             <childrenNodes count="1" indices="8" />
         </dSceneCacheInfo>
-        <dTextureNodeInfo path="breaklig.tga">
-            <dNodeInfo name="breaklig.tga" nodeID="8" editorFlags="0" />
+        <dTextureNodeInfo path="marble.tga">
+            <dNodeInfo name="marble.tga" nodeID="8" editorFlags="0" />
             <parentNodes count="2" indices="7 6" />
         </dTextureNodeInfo>
     </nodes>

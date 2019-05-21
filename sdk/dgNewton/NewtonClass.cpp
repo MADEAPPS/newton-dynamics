@@ -58,7 +58,6 @@ void Newton::UpdatePhysicsAsync (dgFloat32 timestep)
 	UpdateAsync (timestep);
 }
 
-
 NewtonUserJoint::NewtonUserJoint(NewtonUserBilateralCallback callback, dgBody* const body)
 	:dgUserConstraint(NULL, body, NULL, 1)
 	,m_forceArray(m_jointForce)

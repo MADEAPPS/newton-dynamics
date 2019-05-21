@@ -19,7 +19,6 @@
 extern int g_checkAsyncUpdate;
 #endif
 
-
 enum PrimitiveType
 {
 	_NULL_PRIMITIVE,

@@ -643,7 +643,6 @@ void NewtonUpdate(const NewtonWorld* const newtonWorld, dFloat timestep)
 	world->UpdatePhysics (timestep);
 }
 
-
 void NewtonUpdateAsync (const NewtonWorld* const newtonWorld, dFloat timestep)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -651,7 +650,6 @@ void NewtonUpdateAsync (const NewtonWorld* const newtonWorld, dFloat timestep)
 
 	world->UpdatePhysicsAsync(timestep);
 }
-
 
 void NewtonWaitForUpdateToFinish (const NewtonWorld* const newtonWorld)
 {
