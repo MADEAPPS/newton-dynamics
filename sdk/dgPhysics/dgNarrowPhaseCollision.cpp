@@ -2582,9 +2582,9 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	} 
 #else
 	for (dgInt32 i = 0; (i < count) && contactsValid; i++) {
-		const dgVector& p0 = contactOut[i].m_point;
+		const dgVector& normal = contactOut[i].m_normal;
 		for (dgInt32 j = i + 1; (j < count) && contactsValid; j++) {
-			const dgFloat32 project = (contactOut[i].m_normal.DotProduct(contactOut[j].m_normal)).GetScalar();
+			const dgFloat32 project = (normal.DotProduct(contactOut[j].m_normal)).GetScalar();
 			contactsValid = contactsValid && (project > dgFloat32(-0.1f));
 		}
 	}
