@@ -2558,7 +2558,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	contactJoint->m_closestDistance = closestDist;
 
 	bool contactsValid = true;
-#ifdef DE_USE_OLD_CONTACT_FILTER
+
 	const dgFloat32 dist = dgFloat32 (0.0078125f);
 	const dgFloat32 dist2 = dist * dist;
 	for (dgInt32 i = 0; i < count; i ++) {
@@ -2579,16 +2579,6 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 			}
 		}
 	} 
-#else
-	dgVector averageNormal (dgVector::m_zero);
-	for (dgInt32 i = 0; i < count; i ++) {
-		averageNormal += contactOut[i].m_normal;
-	}
-	for (dgInt32 i = 0; (i < count) && contactsValid; i ++) {
-		const dgFloat32 project = averageNormal.DotProduct(contactOut[i].m_normal).GetScalar();
-		contactsValid = contactsValid && (project > dgFloat32(0.0f));
-	}
-#endif
 
 	if (!contactsValid) {
 		dgCollisionContactCloud contactCloud (GetAllocator(), count, contactOut);
