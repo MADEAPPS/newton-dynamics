@@ -23,7 +23,7 @@ option("NEWTON_WITH_AVX2_PLUGIN" "adding avx2 parallel solver (forces shared lib
 option("NEWTON_BUILD_SHARED_LIBS" "build shared library" OFF)
 option("NEWTON_BUILD_CORE_ONLY" "build the core newton library only" OFF)
 
-set(CMAKE_CONFIGURATION_TYPES Debug Release)
+set(CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo Release)
 set(CMAKE_DEBUG_POSTFIX "_d")
 
 project(NewtonSDK)
@@ -45,7 +45,7 @@ endif ()
 #If no build type set, Release as default
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING
-          "Choose the type of build, options are: Debug Release"
+          "Choose the type of build, options are: Debug RelWithDebInfo Release"
           FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
@@ -106,14 +106,20 @@ if (MSVC)
 	if(NEWTON_STATIC_RUNTIME_LIBRARIES)
 		message ("link to static runtime libraries")
 		set(CMAKE_C_FLAGS_DEBUG "/MTd")
+    set(CMAKE_C_FLAGS_RELWITHDEBINFO "/MT")
 		set(CMAKE_C_FLAGS_RELEASE "/MT")
+
 		set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/MT")
 		set(CMAKE_CXX_FLAGS_RELEASE "/MT")
 	else()
 		message ("link to dynamic runtime libraries")
 		set(CMAKE_C_FLAGS_DEBUG "/MDd")
+    set(CMAKE_C_FLAGS_RELWITHDEBINFO "/MD")
 		set(CMAKE_C_FLAGS_RELEASE "/MD")
+
 		set(CMAKE_CXX_FLAGS_DEBUG "/MDd")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "/MD")
 		set(CMAKE_CXX_FLAGS_RELEASE "/MD")
 	endif()
 
@@ -127,10 +133,13 @@ if (MSVC)
 	endif()
 
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Zi /W4 /Od")
+  set(CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELEASE})
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /GS- /W4 /Ox /Oi /Ot /Ob2 /fp:fast")
 
 	message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
+  message("CMAKE_CXX_FLAGS_RELWITHDEBINFO is ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
 	message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
+
 endif()
 
 if(NEWTON_BUILD_SANDBOX_DEMOS)
