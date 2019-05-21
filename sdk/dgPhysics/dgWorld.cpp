@@ -222,7 +222,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,m_pointCollision(NULL)
 	,m_userData(NULL)
 	,m_allocator (allocator)
-	,m_mutex()
+//	,m_mainThreadMutex()
 	,m_postUpdateCallback(NULL)
 	,m_listeners(allocator)
 	,m_perInstanceData(allocator)
@@ -232,8 +232,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,m_solverJacobiansMemory (allocator, 64)
 	,m_solverRightHandSideMemory (allocator, 64)
 	,m_solverForceAccumulatorMemory (allocator, 64)
-	,m_testAsynUpdate(1)
-	,m_concurrentUpdate(false)
+//	,m_concurrentUpdate(false)
 {
 	//TestAStart();
 	//TestSort();
@@ -947,13 +946,13 @@ void dgWorld::Execute (dgInt32 threadID)
 	dgMutexThread::Execute (threadID);
 }
 
-void dgWorld::Sync ()
-{
-	while (IsBusy()) {
-		dgThreadYield();
-	}
-	m_testAsynUpdate = 0;
-}
+//void dgWorld::Sync ()
+//{
+////	while (IsBusy()) {
+////		dgThreadYield();
+////	}
+//	IsBusy();
+//}
 
 void dgWorld::UpdateTransforms(dgBodyMasterList::dgListNode* node, dgInt32 threadID)
 {
@@ -961,8 +960,6 @@ void dgWorld::UpdateTransforms(dgBodyMasterList::dgListNode* node, dgInt32 threa
 	while (node) {
 		dgBody* const body = node->GetInfo().GetBody();
 		if (body->m_transformIsDirty && body->m_matrixUpdate) {
-
-			dgAssert(m_testAsynUpdate);
 			body->m_matrixUpdate (*body, body->m_matrix, threadID);
 		}
 		body->m_transformIsDirty = false;
@@ -1013,12 +1010,10 @@ void dgWorld::RunStep ()
 		m_postUpdateCallback (this, m_savetimestep);
 	}
 
-	if (!m_concurrentUpdate) {
-		m_mutex.Release();
-	}
+//	if (!m_concurrentUpdate) {
+//		m_mutex.Release();
+//	}
 	m_lastExecutionTime = (dgGetTimeInMicrosenconds() - timeAcc) * dgFloat32 (1.0e-6f);
-
-	dgAssert(m_testAsynUpdate);
 	EndSection();
 }
 
@@ -1029,9 +1024,6 @@ void dgWorld::TickCallback (dgInt32 threadID)
 
 void dgWorld::Update (dgFloat32 timestep)
 {
-	m_concurrentUpdate = false;
-	Sync();
-	m_testAsynUpdate = 1;
 	m_savetimestep = timestep;
 	#ifdef DG_USE_THREAD_EMULATION
 		dgFloatExceptions exception;
@@ -1041,15 +1033,13 @@ void dgWorld::Update (dgFloat32 timestep)
 		// runs the update in a separate thread and wait until the update is completed before it returns.
 		// this will run well on single core systems, since the two thread are mutually exclusive 
 		Tick();
-		SuspendExecution(dgWorld::m_mutex);
 	#endif
 }
 
 void dgWorld::UpdateAsync (dgFloat32 timestep)
 {
-	m_concurrentUpdate = true;
-	Sync ();
-	m_testAsynUpdate = 1;
+Update (timestep);
+/*
 	m_savetimestep = timestep;
 	#ifdef DG_USE_THREAD_EMULATION
 		dgFloatExceptions exception;
@@ -1059,6 +1049,7 @@ void dgWorld::UpdateAsync (dgFloat32 timestep)
 		// execute one update, but do not wait for the update to finish, instead return immediately to the caller
 		Tick();
 	#endif
+*/
 }
 
 void dgWorld::SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor)

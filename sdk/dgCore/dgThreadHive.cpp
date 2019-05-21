@@ -69,7 +69,7 @@ void dgThreadHive::dgWorkerThread::Execute (dgInt32 threadId)
 
 	while (!m_terminate) {
 		dgInterlockedExchange(&m_isBusy, 0);
-		SuspendExecution(m_workerSemaphore);
+		Wait(m_workerSemaphore);
 		dgInterlockedExchange(&m_isBusy, 1);
 		if (!m_terminate) {
 			RunNextJobInQueue(threadId);
@@ -185,7 +185,7 @@ void dgThreadHive::SynchronizationBarrier ()
 		for (dgInt32 i = 0; i < m_workerThreadsCount; i ++) {
 			m_workerThreads[i].m_workerSemaphore.Release();
 		}
-		m_parentThread->SuspendExecution(m_workerThreadsCount, m_beginSectionSemaphores);
+		m_parentThread->Wait(m_workerThreadsCount, m_beginSectionSemaphores);
 	}
 	m_jobsCount = 0;
 }
@@ -252,7 +252,7 @@ void dgThreadHive::dgWorkerThread::Execute(dgInt32 threadId)
 	m_hive->OnBeginWorkerThread(threadId);
 
 	while (!m_terminate) {
-		SuspendExecution(m_workerSemaphore);
+		m_workerSemaphore.Wait();
 		if (!m_terminate) {
 			m_concurrentWork = 1;
 			m_hive->m_beginSectionSemaphores[threadId].Release();
@@ -300,7 +300,7 @@ void dgThreadHive::BeginSection()
 		for (dgInt32 i = 0; i < m_workerThreadsCount; i++) {
 			m_workerThreads[i].m_workerSemaphore.Release();
 		}
-		m_parentThread->SuspendExecution(m_workerThreadsCount, m_beginSectionSemaphores);
+		m_parentThread->Wait(m_workerThreadsCount, m_beginSectionSemaphores);
 	}
 }
 
@@ -311,7 +311,7 @@ void dgThreadHive::EndSection()
 		for (dgInt32 i = 0; i < m_workerThreadsCount; i++) {
 			dgInterlockedExchange(&m_workerThreads[i].m_concurrentWork, 0);
 		}
-		m_parentThread->SuspendExecution(m_workerThreadsCount, m_endSectionSemaphores);
+		m_parentThread->Wait(m_workerThreadsCount, m_endSectionSemaphores);
 	}
 }
 

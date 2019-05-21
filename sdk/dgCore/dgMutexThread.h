@@ -32,16 +32,16 @@ class dgMutexThread: public dgThread
 	virtual ~dgMutexThread(void);
 
 	void Tick(); 
+	void Sync();
 	void Terminate(); 
-	bool IsBusy() const;
 
 	protected:
 	virtual void Execute (dgInt32 threadID);
 	virtual void TickCallback (dgInt32 threadID) = 0;
 
 	private:
-	dgInt32 m_isBusy;
 	dgSemaphore m_mutex;
+	dgSemaphore m_parentMutex;
 };
 
 #endif

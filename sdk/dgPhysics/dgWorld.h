@@ -424,7 +424,7 @@ class dgWorld
 	dgFloat32 GetContactMergeTolerance() const;
 	void SetContactMergeTolerance(dgFloat32 tolerenace);
 
-	void Sync ();
+//	void Sync ();
 
 	void SetSubsteps (dgInt32 subSteps);
 	dgInt32 GetSubsteps () const;
@@ -526,7 +526,7 @@ dgInt32 ReduceContactsFallback (dgInt32 count, dgContactPoint* const contact, dg
 	void* m_userData;
 	dgMemoryAllocator* m_allocator;
 
-	dgSemaphore m_mutex;
+	
 	OnClusterUpdate m_clusterUpdate;
 	OnCreateContact m_createContact;
 	OnDestroyContact m_destroyContact;
@@ -545,9 +545,7 @@ dgInt32 ReduceContactsFallback (dgInt32 count, dgContactPoint* const contact, dg
 	dgArray<dgUnsigned8> m_solverJacobiansMemory;  
 	dgArray<dgUnsigned8> m_solverRightHandSideMemory;
 	dgArray<dgUnsigned8> m_solverForceAccumulatorMemory;
-	
-	dgInt32 m_testAsynUpdate;
-	bool m_concurrentUpdate;
+//	bool m_concurrentUpdate;
 	
 	friend class dgBody;
 	friend class dgSolver;

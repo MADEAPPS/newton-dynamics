@@ -539,7 +539,7 @@ dgVector dgMatrix::EigenVectors ()
 		dgVector u(m_front);
 		u.m_x = dgFloat32(0.0f);
 		u.m_y -= dgSqrt(u.DotProduct(u).GetScalar());
-		dgAssert(dgAbs(u.m_y) > dgFloat32(1.0e-12f));
+		//dgAssert(dgAbs(u.m_y) > dgFloat32(1.0e-12f));
 		dgAssert(u.DotProduct(u).GetScalar() > dgFloat32(0.0f));
 		dgVector v(u.Scale(-dgFloat32(2.0f) / u.DotProduct(u).GetScalar()));
 

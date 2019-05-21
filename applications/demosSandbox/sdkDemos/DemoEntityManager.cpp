@@ -52,12 +52,12 @@
 //#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	17		// uniform Scaled Collision
 //#define DEFAULT_SCENE	18		// non uniform Scaled Collision
-//#define DEFAULT_SCENE	19		// scaled mesh collision
+#define DEFAULT_SCENE	19		// scaled mesh collision
 //#define DEFAULT_SCENE	20		// continuous collision
 //#define DEFAULT_SCENE	21		// paper wall continuous collision
 //#define DEFAULT_SCENE	22		// puck slide continuous collision
 //#define DEFAULT_SCENE	23		// simple convex decomposition
-#define DEFAULT_SCENE	24		// scene Collision
+//#define DEFAULT_SCENE	24		// scene Collision
 //#define DEFAULT_SCENE	25		// simple boolean operators 
 //#define DEFAULT_SCENE	26		// simple convex fracturing 
 //#define DEFAULT_SCENE	27		// structured convex fracturing 
@@ -361,7 +361,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
-//	m_asynchronousPhysicsUpdate = true;
+	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
 
 	m_currentPlugin = 0;
@@ -1348,7 +1348,6 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 				NewtonUpdate(m_world, timestepInSecunds);
 			}
 
-
 			physicsTime += NewtonGetLastUpdateTime(m_world);
 			
 			nextTime -= timestepMicrosecunds;
@@ -1530,6 +1529,7 @@ void DemoEntityManager::RenderScene()
 	GLfloat lightSpecular0[] = { 1.0f, 1.0f, 1.0f, 0.0f };
 	GLfloat lightPosition0[] = { 0.0f, 200.0f, 150.0f, 0.0f };
 	
+	glMaterialf(GL_FRONT, GL_SHININESS, 60.0f);
 	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition0);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient0);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse0);
@@ -1543,6 +1543,7 @@ void DemoEntityManager::RenderScene()
 	GLfloat lightSpecular1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	GLfloat lightPosition1[] = {0.0f, 0.0f, 0.0f, 1.0f};
 
+	glMaterialf(GL_FRONT, GL_SHININESS, 60.0f);
 	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
 	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);

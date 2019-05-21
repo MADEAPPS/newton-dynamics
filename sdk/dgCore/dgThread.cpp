@@ -83,12 +83,12 @@ void dgThread::Close ()
 {
 }
 
-void dgThread::SuspendExecution (dgSemaphore& mutex)
+void dgThread::Wait (dgSemaphore& mutex)
 {
 }
 
 
-void dgThread::SuspendExecution (dgInt32 count, dgSemaphore* const semArray)
+void dgThread::Wait (dgInt32 count, dgSemaphore* const semArray)
 {
 }
 
@@ -119,6 +119,7 @@ void dgThread::dgSemaphore::Release ()
 void dgThread::dgSemaphore::Wait()
 {
 	std::unique_lock <std::mutex> lck(m_mutex);
+	dgAssert (m_count >= 0);
 	while (m_count == 0)
 	{
 		m_sem.wait(lck);
@@ -145,18 +146,12 @@ void dgThread::Close ()
 	m_handle.join();
 }
 
-void dgThread::SuspendExecution (dgSemaphore& mutex)
-{
-	mutex.Wait();
-}
-
-void dgThread::SuspendExecution (dgInt32 count, dgSemaphore* const semArray)
+void dgThread::Wait (dgInt32 count, dgSemaphore* const semArray)
 {
 	for (dgInt32 i = 0; i < count; i ++) {
-		SuspendExecution (semArray[i]);
+		semArray[i].Wait();
 	}
 }
-
 
 void* dgThread::dgThreadSystemCallback(void* threadData)
 {

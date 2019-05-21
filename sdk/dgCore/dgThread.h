@@ -38,6 +38,8 @@ class dgThread
 		void Wait();
 		void Release();
 
+		dgInt32 GetCount() const {return m_count;}
+
 		private:
 		#ifdef DG_USE_THREAD_EMULATION
 			dgInt32 m_sem;
@@ -55,8 +57,7 @@ class dgThread
 	virtual void Execute (dgInt32 threadId) = 0;
 	
 	bool IsThreadActive() const;
-	void SuspendExecution (dgSemaphore& mutex);
-	void SuspendExecution (dgInt32 count, dgSemaphore* const mutexes);
+	void Wait (dgInt32 count, dgSemaphore* const mutexes);
 
 	protected:
 	void Init ();
