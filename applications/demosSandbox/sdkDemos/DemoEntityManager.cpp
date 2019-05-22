@@ -1316,6 +1316,7 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 {
 	// update the physics
 	if (m_world && !m_suspendPhysicsUpdate) {
+		D_TRACKTIME();
 
 		dFloat timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
 		unsigned64 timestepMicrosecunds = unsigned64 (timestepInSecunds * 1000000.0f);
@@ -1487,6 +1488,7 @@ void DemoEntityManager::RenderScene()
 	CalculateFPS(timestep);
 	UpdatePhysics(timestep);
 
+	D_TRACKTIME();
 	// Get the interpolated location of each body in the scene
 	m_cameraManager->InterpolateMatrices (this, CalculateInteplationParam());
 

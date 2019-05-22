@@ -1044,8 +1044,8 @@ void dgWorld::UpdateAsync (dgFloat32 timestep)
 		Update(timestep);
 	#else
 		m_savetimestep = timestep;
-		//dgAsyncThread::Tick();
-		Update(timestep);
+		dgAsyncThread::Tick();
+		//Update(timestep);
 	#endif
 }
 
