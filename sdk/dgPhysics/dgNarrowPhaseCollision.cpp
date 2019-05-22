@@ -2513,6 +2513,11 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
 	data.SortFaceArray();
 
+static int xxx;
+xxx++;
+if (xxx > 13364)
+xxx *= 1;
+
 	for (dgInt32 i = data.m_faceCount - 1; (i >= 0) && (count < 32); i --) {
 		dgInt32 address = data.m_faceIndexStart[i];
 		const dgInt32* const localIndexArray = &indexArray[address];
