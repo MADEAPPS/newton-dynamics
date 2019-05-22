@@ -2127,10 +2127,8 @@ dgInt32 dgWorld::Collide (
 	if (count > maxContacts) {
 #ifdef DE_USE_OLD_CONTACT_FILTER
 		count = OldReduceContacts (count, contacts, maxContacts, contactJoint.GetPruningTolerance());
-#else
-		count = PruneContacts(count, contacts, contactJoint.GetPruningTolerance(), maxContacts);
-#endif
 		count = dgMin (count, maxContacts);
+#endif
 	}
 
 	dgFloat32 swapContactScale = (contactJoint.GetBody0() != &collideBodyA) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f);

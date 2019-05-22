@@ -206,8 +206,8 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-	CreateLevelMesh (scene, "flatPlane.ngd", true);
-	//CreateLevelMesh (scene, "casttle.ngd", true);
+	//CreateLevelMesh (scene, "flatPlane.ngd", true);
+	CreateLevelMesh (scene, "playerarena.ngd", true);
 	//CreateHeightFieldTerrain(scene, 10, 2.0f, 1.5f, 0.3f, 200.0f, -50.0f);
 
 	NewtonWorld* const world = scene->GetNewton();

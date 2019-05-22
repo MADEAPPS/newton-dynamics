@@ -478,9 +478,9 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 	m_impulse = dVector(0.0f);
 	m_manager->ApplyMove(this, timestep);
 
-//SetForwardSpeed(1.0f);
-//SetLateralSpeed(0.0f);
-//SetHeadingAngle(45.0f*dDegreeToRad);
+SetForwardSpeed(1.0f);
+SetLateralSpeed(0.0f);
+SetHeadingAngle(90.0f*dDegreeToRad);
 
 	// set player orientation
 	dMatrix matrix(dYawMatrix(GetHeadingAngle()));

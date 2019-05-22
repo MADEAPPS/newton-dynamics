@@ -52,7 +52,7 @@
 //#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	17		// uniform Scaled Collision
 //#define DEFAULT_SCENE	18		// non uniform Scaled Collision
-#define DEFAULT_SCENE	19		// scaled mesh collision
+//#define DEFAULT_SCENE	19		// scaled mesh collision
 //#define DEFAULT_SCENE	20		// continuous collision
 //#define DEFAULT_SCENE	21		// paper wall continuous collision
 //#define DEFAULT_SCENE	22		// puck slide continuous collision
@@ -76,7 +76,7 @@
 //#define DEFAULT_SCENE	40		// super Car
 //#define DEFAULT_SCENE	41		// heavy vehicles
 //#define DEFAULT_SCENE	42		// basic player controller
-//#define DEFAULT_SCENE	43		// animated player controller
+#define DEFAULT_SCENE	43		// animated player controller
 //#define DEFAULT_SCENE	44		// advanced player controller
 //#define DEFAULT_SCENE	45		// cloth patch			
 //#define DEFAULT_SCENE	46		// soft bodies	
@@ -361,7 +361,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
-	m_asynchronousPhysicsUpdate = true;
+//	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
 
 	m_currentPlugin = 0;
