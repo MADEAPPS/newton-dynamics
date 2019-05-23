@@ -115,6 +115,10 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 
 	dgClippedFaceEdge clippedFace [2 * sizeof (m_localPoly) / sizeof (m_localPoly[0]) + 8];
 
+static int xxxx;
+xxxx++;
+dgTrace(("%d %f %f %f\n", xxxx, m_normal[0], m_normal[1], m_normal[2]));
+
 	dgVector dir (m_localPoly[1] - m_localPoly[0]);
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
 	dgAssert (dir.DotProduct(dir).GetScalar() > dgFloat32 (1.0e-8f));
@@ -277,7 +281,6 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 	} while (ptr != first);
 
 	m_count = count;
-
 #ifdef DG_FIX_CONVEX_BUG
 	dgInt32 i0 = m_count - 1;
 	for (dgInt32 i = 0; i < m_count; i++) {
@@ -286,7 +289,7 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 		const dgInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[i0];
 		dgVector localAdjacentNormal(&m_vertex[adjacentNormalIndex * m_stride]);
 		dgVector adjacentNormal(CalculateGlobalNormal(parentMesh, localAdjacentNormal & dgVector::m_triplexMask));
-		dgVector edgeSkirt(adjacentNormal.CrossProduct(edge).Scale (dgFloat32 (0.1f)));
+		dgVector edgeSkirt(edge.CrossProduct(adjacentNormal).Scale (dgFloat32 (0.1f)));
 
 		m_localPoly[count + 0] = m_localPoly[i] + edgeSkirt;
 		m_localPoly[count + 1] = m_localPoly[i0] + edgeSkirt;
