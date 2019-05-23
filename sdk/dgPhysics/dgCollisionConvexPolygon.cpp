@@ -28,8 +28,8 @@
 #include "dgCollisionConvexPolygon.h"
 
 //#define DG_FIX_CONVEX_BUG
-
 #define DG_CONVEX_POLYGON_CRC 0x12341234
+#define DG_CONVEX_POLYGON_SKIRT_LENGTH dgFloat32 (0.025f)
 
 dgCollisionConvexPolygon::dgCollisionConvexPolygon (dgMemoryAllocator* const allocator)
 	:dgCollisionConvex (allocator, DG_CONVEX_POLYGON_CRC, m_polygonCollision)
@@ -289,7 +289,7 @@ dgTrace(("%d %f %f %f\n", xxxx, m_normal[0], m_normal[1], m_normal[2]));
 		const dgInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[i0];
 		dgVector localAdjacentNormal(&m_vertex[adjacentNormalIndex * m_stride]);
 		dgVector adjacentNormal(CalculateGlobalNormal(parentMesh, localAdjacentNormal & dgVector::m_triplexMask));
-		dgVector edgeSkirt(edge.CrossProduct(adjacentNormal).Scale (dgFloat32 (0.1f)));
+		dgVector edgeSkirt(edge.CrossProduct(adjacentNormal).Scale (DG_CONVEX_POLYGON_SKIRT_LENGTH));
 
 		m_localPoly[count + 0] = m_localPoly[i] + edgeSkirt;
 		m_localPoly[count + 1] = m_localPoly[i0] + edgeSkirt;
