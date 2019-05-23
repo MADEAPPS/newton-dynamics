@@ -2523,6 +2523,7 @@ xxx *= 1;
 		const dgInt32* const localIndexArray = &indexArray[address];
 		polygon.m_vertexIndex = localIndexArray;
 		polygon.m_count = data.m_faceIndexCount[i];
+		polygon.m_paddedCount = polygon.m_count;
 		polygon.m_adjacentFaceEdgeNormalIndex = data.GetAdjacentFaceEdgeNormalArray (localIndexArray, polygon.m_count);
 		polygon.m_faceId = data.GetFaceId (localIndexArray, polygon.m_count);
 		polygon.m_faceClipSize = data.GetFaceSize (localIndexArray, polygon.m_count);
@@ -2681,6 +2682,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue(dgCollisionParamProx
 		const dgInt32* const localIndexArray = &indexArray[address];
 		polygon.m_vertexIndex = localIndexArray;
 		polygon.m_count = data.m_faceIndexCount[i];
+		polygon.m_paddedCount = polygon.m_count;
 		polygon.m_adjacentFaceEdgeNormalIndex = data.GetAdjacentFaceEdgeNormalArray(localIndexArray, polygon.m_count);
 		polygon.m_faceId = data.GetFaceId(localIndexArray, polygon.m_count);
 		polygon.m_faceClipSize = data.GetFaceSize(localIndexArray, polygon.m_count);
