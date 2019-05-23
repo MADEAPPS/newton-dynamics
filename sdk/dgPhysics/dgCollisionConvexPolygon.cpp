@@ -701,6 +701,12 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		i0 = i;
 	}
 
+static int xxx;
+xxx++;
+if (xxx >= 17217)
+xxx *= 1;
+
+
 	//inside = false;
 	dgFloat32 convexSphapeUmbra = hull->GetUmbraClipSize();
 	if (m_faceClipSize > convexSphapeUmbra) {
@@ -709,7 +715,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		hull->CalcAABB (hullMatrix, boxP0, boxP1);
 		dgVector origin (dgVector::m_half * (boxP1 + boxP1));
 
-		//BeamClipping(dgVector(dgFloat32(0.0f)), convexSphapeUmbra);
 		BeamClipping(origin, convexSphapeUmbra);
 		m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
 	}
@@ -746,7 +751,8 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 					dgVector sideDir(m_localPoly[j1] - m_localPoly[j0]);
 					dgAssert(sideDir.m_w == dgFloat32(0.0f));
 					const dgInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[j0];
-					dgVector adjacentNormal(CalculateGlobalNormal(parentMesh, dgVector(&m_vertex[adjacentNormalIndex * m_stride]) & dgVector::m_triplexMask));
+					dgVector localAdjacentNormal(&m_vertex[adjacentNormalIndex * m_stride]);
+					dgVector adjacentNormal(CalculateGlobalNormal(parentMesh, localAdjacentNormal & dgVector::m_triplexMask));
 					dgFloat32 val0 = sideDir.DotProduct(normal.CrossProduct(m_normal)).GetScalar();
 					dgFloat32 val1 = sideDir.DotProduct(normal.CrossProduct(adjacentNormal)).GetScalar();
 					if (((val0 * val1) > dgFloat32(0.0f)) && (val0 < dgFloat32(0.0f)) && (val1 < dgFloat32(0.0f))) {
