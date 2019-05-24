@@ -569,14 +569,6 @@ DG_INLINE dgInt32 dgWorld::PruneSupport(int count, const dgVector& dir, const dg
 	return index;
 }
 
-
-//void XXXXXX (dgInt32 count, dgContactPoint* const contactArray)
-//{
-//	for (dgInt32 i = 0; i < count; i++) {
-//		dgTrace(("c(%f %f %f) n(%f %f %f)\n", contactArray[i].m_point.m_x, contactArray[i].m_point.m_y, contactArray[i].m_point.m_z, contactArray[i].m_normal.m_x, contactArray[i].m_normal.m_y, contactArray[i].m_normal.m_z));
-//	}
-//}
-
 dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contactArray, int maxCount, dgFloat32 tol) const
 {
 	class dgConveFaceNode
@@ -597,7 +589,6 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 		dgConveFaceNode* m_edgeP0;
 	};
 
-//	dgVector averageNormal(dgVector::m_zero);
 	dgVector xyMask(dgVector::m_xMask | dgVector::m_yMask);
 
 	dgVector array[DG_MAX_CONTATCS];
@@ -608,14 +599,9 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 
 	dgFloat32 maxPenetration = dgFloat32(0.0f);
 	for (dgInt32 i = 0; i < count; i++) {
-//		averageNormal += contactArray[i].m_normal;
 		array[i] = matrix.UntransformVector(contactArray[i].m_point) & xyMask;
 		maxPenetration = dgMax (maxPenetration, contactArray[i].m_penetration);
 	}
-//	averageNormal = (matrix.m_right * averageNormal.DotProduct(matrix.m_right)).Normalize();
-
-//XXXXXX (count, contactArray);
-//dgTrace (("average: %f %f %f\n", averageNormal.m_x, averageNormal.m_y, averageNormal.m_z));
 
 	dgInt32 i0 = PruneSupport(count, dgCollisionContactCloud::m_pruneSupportX, array);
 	count--;
@@ -2512,11 +2498,6 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	dgInt32* const indexArray = (dgInt32*)data.m_faceVertexIndex;
 	data.SortFaceArray();
-
-static int xxx;
-xxx++;
-if (xxx > 13364)
-xxx *= 1;
 
 	for (dgInt32 i = data.m_faceCount - 1; (i >= 0) && (count < 32); i --) {
 		dgInt32 address = data.m_faceIndexStart[i];

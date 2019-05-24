@@ -217,9 +217,9 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	// add main player
 	dMatrix location (dGetIdentityMatrix());
-	location.m_posit.m_x = -4.0f;
+	location.m_posit.m_x = 42.0f;
 	location.m_posit.m_y = 5.0f;
-	location.m_posit.m_z = 0.0f;
+	location.m_posit.m_z = -24.0f;
 
 	location.m_posit.m_y = 15.0f;
 

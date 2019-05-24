@@ -27,7 +27,7 @@
 #include "dgCollisionInstance.h"
 #include "dgCollisionConvexPolygon.h"
 
-//#define DG_FIX_CONVEX_BUG
+#define DG_FIX_CONVEX_BUG
 #define DG_CONVEX_POLYGON_CRC 0x12341234
 #define DG_CONVEX_POLYGON_SKIRT_LENGTH dgFloat32 (0.025f)
 
@@ -114,10 +114,6 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 	dgVector points[sizeof (m_localPoly) / sizeof (m_localPoly[0]) + 8];
 
 	dgClippedFaceEdge clippedFace [2 * sizeof (m_localPoly) / sizeof (m_localPoly[0]) + 8];
-
-static int xxxx;
-xxxx++;
-dgTrace(("%d %f %f %f\n", xxxx, m_normal[0], m_normal[1], m_normal[2]));
 
 	dgVector dir (m_localPoly[1] - m_localPoly[0]);
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
@@ -712,12 +708,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		}
 		i0 = i;
 	}
-
-static int xxx;
-xxx++;
-if (xxx >= 17217)
-xxx *= 1;
-
 
 	//inside = false;
 	dgFloat32 convexSphapeUmbra = hull->GetUmbraClipSize();
