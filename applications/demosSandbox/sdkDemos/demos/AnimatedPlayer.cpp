@@ -566,10 +566,19 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 		scene->Set2DDisplayRenderFunction(RenderPlayerHelp, NULL, this);
+
+		// load the animation sequences.
+		GetAnimationSequence("whiteman_idle.ngd");
+		GetAnimationSequence("whiteman_walk.ngd");
 	}
 
 	~AnimatedPlayerControllerManager()
 	{
+		while (m_animCache) {
+			dAnimationKeyframesSequence* const data = m_animCache.GetRoot()->GetInfo();
+			data->Release();
+			m_animCache.Remove(m_animCache.GetRoot());
+		}
 	}
 
 	void SetAsPlayer(dCustomPlayerController* const controller)
@@ -603,6 +612,88 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 		me->SetCamera();
 	}
 
+	//dAnimTakeData* LoadAnimation(dAnimIKController* const controller, const char* const animName)
+	dAnimationKeyframesSequence* GetAnimationSequence(const char* const animName)
+	{
+		dTree<dAnimationKeyframesSequence*, dString>::dTreeNode* cachedAnimNode = m_animCache.Find(animName);
+		if (!cachedAnimNode) {
+			dScene scene(GetWorld());
+			char pathName[2048];
+			dGetWorkingFileName(animName, pathName);
+			scene.Deserialize(pathName);
+
+			dScene::dTreeNode* const animTakeNode = scene.FindChildByType(scene.GetRootNode(), dAnimationTake::GetRttiType());
+			if (animTakeNode) {
+				//dTree<dAnimimationKeyFramesTrack*, dString> map;
+				//const dAnimPose& basePose = controller->GetBasePose();
+				//dAnimTakeData* const animdata = new dAnimTakeData(basePose.GetCount());
+				dAnimationKeyframesSequence* const animdata = new dAnimationKeyframesSequence();
+				dAnimationTake* const animTake = (dAnimationTake*)scene.GetInfoFromNode(animTakeNode);
+				animdata->SetPeriod(animTake->GetPeriod());
+
+				cachedAnimNode = m_animCache.Insert(animdata, animName);
+
+				//dList<dAnimimationKeyFramesTrack>& tracks = animdata->GetTracks();
+				//dList<dAnimimationKeyFramesTrack>::dListNode* ptr = tracks.GetFirst();
+				//dList<dAnimimationKeyFramesTrack>::dListNode* ptr = tracks.Append();
+				//for (dAnimPose::dListNode* ptrNode = basePose.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
+				//	DemoEntity* const entity = (DemoEntity*)ptrNode->GetInfo().m_userData;
+				//	map.Insert(&ptr->GetInfo(), entity->GetName());
+				//	ptr = ptr->GetNext();
+				//}
+
+				dList<dAnimimationKeyFramesTrack>& tracks = animdata->GetTracks();
+				for (void* link = scene.GetFirstChildLink(animTakeNode); link; link = scene.GetNextChildLink(animTakeNode, link)) {
+					dScene::dTreeNode* const node = scene.GetNodeFromLink(link);
+					dAnimationTrack* const srcTrack = (dAnimationTrack*)scene.GetInfoFromNode(node);
+
+					if (srcTrack->IsType(dAnimationTrack::GetRttiType())) {
+						//dTree<dAnimimationKeyFramesTrack*, dString>::dTreeNode* const ptrNode = map.Find(srcTrack->GetName());
+						//dAssert(ptrNode);
+						//dAnimTakeData::dAnimTakeTrack* const dstTrack = ptrNode->GetInfo();
+						dAnimimationKeyFramesTrack* const dstTrack = &tracks.Append()->GetInfo();
+						dstTrack->SetName(srcTrack->GetName());
+
+						const dList<dAnimationTrack::dCurveValue>& rotations = srcTrack->GetRotations();
+						dstTrack->m_rotation.Resize(rotations.GetCount());
+						int index = 0;
+						for (dList<dAnimationTrack::dCurveValue>::dListNode* node = rotations.GetFirst(); node; node = node->GetNext()) {
+							dAnimationTrack::dCurveValue keyFrame(node->GetInfo());
+
+							dMatrix matrix(dPitchMatrix(keyFrame.m_x) * dYawMatrix(keyFrame.m_y) * dRollMatrix(keyFrame.m_z));
+							dQuaternion rot(matrix);
+							dstTrack->m_rotation[index].m_rotation = rot;
+							dstTrack->m_rotation[index].m_time = keyFrame.m_time;
+							index++;
+						}
+
+						for (int i = 0; i < rotations.GetCount() - 1; i++) {
+							dFloat dot = dstTrack->m_rotation[i].m_rotation.DotProduct(dstTrack->m_rotation[i + 1].m_rotation);
+							if (dot < 0.0f) {
+								dstTrack->m_rotation[i + 1].m_rotation.m_x *= -1.0f;
+								dstTrack->m_rotation[i + 1].m_rotation.m_y *= -1.0f;
+								dstTrack->m_rotation[i + 1].m_rotation.m_z *= -1.0f;
+								dstTrack->m_rotation[i + 1].m_rotation.m_w *= -1.0f;
+							}
+						}
+
+						const dList<dAnimationTrack::dCurveValue>& positions = srcTrack->GetPositions();
+						dstTrack->m_position.Resize(positions.GetCount());
+						index = 0;
+						for (dList<dAnimationTrack::dCurveValue>::dListNode* node = positions.GetFirst(); node; node = node->GetNext()) {
+							dAnimationTrack::dCurveValue keyFrame(node->GetInfo());
+							dstTrack->m_position[index].m_posit = dVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, dFloat(1.0f));
+							dstTrack->m_position[index].m_time = keyFrame.m_time;
+							index++;
+						}
+					}
+				}
+			}
+		}
+		dAssert(cachedAnimNode);
+		return cachedAnimNode->GetInfo();
+	}
+	
 	dCustomPlayerController* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
 	{
 		// get the scene 
@@ -623,11 +714,6 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 
 		// get body from player, and set some parameter
 		NewtonBody* const body = controller->GetBody();
-
-		// create the visual mesh from the player collision shape
-		//NewtonCollision* const collision = NewtonBodyGetCollision(body);
-		//DemoMesh* const geometry = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
-		//DemoEntity* const playerEntity = new DemoEntity(location, NULL);
 		
 		DemoEntity* const playerEntity = DemoEntity::LoadNGD_mesh("whiteman.ngd", scene->GetNewton(), scene->GetShaderCache());
 		scene->Append(playerEntity);
@@ -726,6 +812,7 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 	}
 
 	dCustomPlayerController* m_player;
+	dTree<dAnimationKeyframesSequence*, dString> m_animCache;
 };
 
 

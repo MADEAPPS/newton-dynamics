@@ -201,6 +201,8 @@ typedef long long unsigned64;
 #include <dAnimationRagdollJoint.h>
 #include <dAnimationRagDollEffector.h>
 
+#include <dAnimationKeyframesSequence.h>
+
 /*
 #include <dAnimIKManager.h>
 #include <dAnimIK3dofJoint.h>
