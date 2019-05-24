@@ -710,7 +710,7 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 		localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
 		// make a play controller with default values.
-		dCustomPlayerController* const controller = CreateController(location, localAxis, mass, radius, height, height / 3.0f);
+		dCustomPlayerController* const controller = CreateController(location, localAxis, mass, radius, height, 0.4f);
 
 		// get body from player, and set some parameter
 		NewtonBody* const body = controller->GetBody();
@@ -816,6 +816,38 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 };
 
 
+static NewtonBody* CreateCylinder(DemoEntityManager* const scene, const dVector& location, dFloat mass, dFloat radius, dFloat height)
+{
+	NewtonWorld* const world = scene->GetNewton();
+	int materialID = NewtonMaterialGetDefaultGroupID(world);
+	dVector size(radius, height, radius, 0.0f);
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _CYLINDER_PRIMITIVE, 0);
+	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+	dMatrix matrix(dRollMatrix (90.0f * dDegreeToRad));
+	matrix.m_posit = location;
+	matrix.m_posit.m_w = 1.0f;
+	NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, matrix, collision, materialID);
+
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+	return body;
+}
+
+
+static void AddMerryGoRound(DemoEntityManager* const scene, const dVector& location)
+{
+	NewtonBody* const pole = CreateCylinder(scene, location, 0.0f, 0.2f, 3.0f);
+
+	dVector platformPosit(location);
+	platformPosit.m_y += 0.2f;
+	NewtonBody* const platform = CreateCylinder(scene, platformPosit, 200.0f, 10.0f, 0.2f);
+
+	dMatrix pivot;
+	NewtonBodyGetMatrix(platform, &pivot[0][0]);
+	dCustomHinge* const hinge = new dCustomHinge(pivot, platform, pole);
+}
+
 void AnimatedPlayerController(DemoEntityManager* const scene)
 {
 	// load the sky box
@@ -827,12 +859,13 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 
 	NewtonWorld* const world = scene->GetNewton();
 
+
 	// create a character controller manager
 	AnimatedPlayerControllerManager* const playerManager = new AnimatedPlayerControllerManager(world);
 
 	// add main player
 	dMatrix location(dGetIdentityMatrix());
-	location.m_posit.m_x = 42.0f;
+	location.m_posit.m_x = 30.0f;
 	location.m_posit.m_y = 5.0f;
 	location.m_posit.m_z = -24.0f;
 
@@ -843,12 +876,15 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 	dCustomPlayerController*  const player = playerManager->CreatePlayer(location, 1.8f, 0.3f, 100.0f);
 	playerManager->SetAsPlayer(player);
 
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
 	location.m_posit.m_x += 5.0f;
 
-	int count = 1;
-	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
-	//	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
+	//int count = 1;
+	//dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
+	//AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
+
+	// add some objects to interact with
+	AddMerryGoRound(scene, dVector(40.0f, 0.0f, -15.0f, 0.0f));
 
 	location.m_posit.m_x += 5.0f;
 //	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector(2.0f, 0.5f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
@@ -857,7 +893,4 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
 }
-
-
-
 

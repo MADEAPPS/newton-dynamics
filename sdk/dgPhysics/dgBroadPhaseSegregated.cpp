@@ -495,7 +495,7 @@ dgInt32 dgBroadPhaseSegregated::Collide(dgCollisionInstance* const shape, const 
 		dgVector boxP0;
 		dgVector boxP1;
 		dgAssert(matrix.TestOrthogonal());
-		shape->CalcAABB(matrix, boxP0, boxP1);
+		shape->CalcAABB(shape->GetLocalMatrix() * matrix, boxP0, boxP1);
 
 		dgInt32 overlaped[DG_BROADPHASE_MAX_STACK_DEPTH];
 		const dgBroadPhaseNode* stackPool[DG_BROADPHASE_MAX_STACK_DEPTH];
