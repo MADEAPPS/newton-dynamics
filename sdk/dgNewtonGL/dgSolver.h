@@ -319,6 +319,98 @@ class dgSoaJacobianPair
 	dgSoaVector6 m_jacobianM1;
 } DG_GCC_AVX_ALIGMENT;
 
+// GPU stuff start here
+
+#define DG_GPU_WORKGROUP_SIZE		256 
+#define DG_GPU_BODY_INITIAL_COUNT	4096
+
+template<class T>
+class dgArrayGPU
+{
+	public:
+	dgArrayGPU()
+		:m_buffertId(0)
+	{
+	}
+
+	~dgArrayGPU()
+	{
+		if (m_buffertId) {
+			glDeleteBuffers(1, &m_buffertId);
+		}
+	}
+
+	void Alloc(dgInt32 size) 
+	{
+		dgAssert((size % DG_GPU_WORKGROUP_SIZE) == 0);
+
+		glGenBuffers(1, &m_buffertId);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffertId);
+		glBufferData(GL_SHADER_STORAGE_BUFFER, size * sizeof(T), NULL, GL_STATIC_DRAW);
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	}
+
+	void Free()
+	{
+		if (m_buffertId) {
+			glDeleteBuffers(1, &m_buffertId);
+		}
+	}
+
+	T* Lock(dgInt32 size)
+	{
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffertId);
+		return (T *) glMapBufferRange(GL_SHADER_STORAGE_BUFFER, 0, size * sizeof(T), GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT);
+	}
+
+	void Unlock()
+	{
+		glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_buffertId);
+		glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+	}
+
+	GLuint m_buffertId;
+};
+
+class dgGpuBody
+{
+	public:
+	dgGpuBody()
+		:m_count(0)
+		,m_bufferSize(0)
+		,m_veloc()
+		,m_omega()
+		,m_damp()
+	{
+	}
+
+	void Resize(int size)
+	{
+		if (size > m_count) {
+			m_damp.Free();
+			m_veloc.Free();
+			m_omega.Free();
+
+			m_count = size;
+			size = dgMax (size, DG_GPU_BODY_INITIAL_COUNT);
+			while (size < m_bufferSize) {
+				size *= 2;
+			}
+
+			m_damp.Alloc(size);
+			m_veloc.Alloc(size);
+			m_omega.Alloc(size);
+			m_bufferSize = size;
+		}
+	}
+
+	dgInt32 m_count;
+	dgInt32 m_bufferSize;
+	dgArrayGPU<dgVector> m_veloc;
+	dgArrayGPU<dgVector> m_omega;
+	dgArrayGPU<dgVector> m_damp;
+};
+
 DG_MSC_AVX_ALIGMENT
 class dgSoaMatrixElement
 {
@@ -392,7 +484,6 @@ class dgSolver: public dgParallelBodySolver
 	DG_INLINE void SortWorkGroup(dgInt32 base) const;
 	DG_INLINE void TransposeRow (dgSoaMatrixElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
 	DG_INLINE void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
-	//	DG_INLINE dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgJacobian* const internalForces) const;
 	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgJacobian* const internalForces) const;
 
 	static GLuint CompileComputeShader(char* const shaderSource);
@@ -406,12 +497,17 @@ class dgSolver: public dgParallelBodySolver
 	int m_shadersCount;
 
 	static char* m_testShaderSource;
-	union{
+	union
+	{
 		GLuint m_shaderArray[64];
-		struct {
+		struct 
+		{
 			GLuint m_testShader;
 		};
 	};
+
+
+	dgGpuBody m_gpuBodyArray;
 
 	friend class dgWorldBase;
 } DG_GCC_AVX_ALIGMENT;

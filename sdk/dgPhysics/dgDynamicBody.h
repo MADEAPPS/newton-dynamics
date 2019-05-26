@@ -106,8 +106,6 @@ class dgDynamicBody : public dgBody
 	dgUnsigned32 m_isInDestructionArrayLRU;
 	dgSkeletonContainer* m_skeleton;
 	OnApplyExtForceAndTorque m_applyExtForces;
-	bool m_linearDampOn;
-	bool m_angularDampOn;
 	static dgVector m_equilibriumError2;
 
 	friend class dgWorld;
@@ -171,8 +169,6 @@ DG_INLINE void dgDynamicBody::SetLinearDamping (dgFloat32 linearDamp)
 {
 	linearDamp = dgClamp (linearDamp, dgFloat32(0.0f), dgFloat32(1.0f));
 	m_dampCoef.m_w = DG_MAX_SPEED_ATT * linearDamp;
-
-	m_linearDampOn = m_dampCoef.m_w > dgFloat32 (1.0e-7f);
 	m_cachedTimeStep = dgFloat32(0.0f);
 }
 
@@ -187,7 +183,6 @@ DG_INLINE void dgDynamicBody::SetAngularDamping (const dgVector& angularDamp)
 	tmp = dgClamp (angularDamp.m_z, dgFloat32(0.0f), dgFloat32(1.0f));
 	m_dampCoef.m_z = DG_MAX_SPEED_ATT * tmp;
 
-	m_angularDampOn = m_dampCoef.DotProduct(m_dampCoef & dgVector::m_triplexMask).GetScalar() > dgFloat32 (1.0e-12f);
 	m_cachedTimeStep = dgFloat32(0.0f);
 }
 

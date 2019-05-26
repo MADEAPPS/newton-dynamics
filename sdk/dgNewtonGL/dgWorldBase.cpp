@@ -26,7 +26,9 @@
 dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 {
 	const GLubyte* const version = glGetString(GL_SHADING_LANGUAGE_VERSION);
-	if (strcmp((char*)version, "4.50") < 0) {
+
+	dgInt32 versionNumber = dgInt32 (dgCeil (100.0f * atof ((char*)version)));
+	if (versionNumber < 450) {
 		return NULL;
 	}
 
@@ -45,6 +47,11 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 #endif
 
 	module.SetShaders(shaderCount, shaderArray);
+
+// test making a buffer this works
+dgArrayGPU<dgVector> xxx;
+xxx.Alloc (DG_GPU_WORKGROUP_SIZE);
+
 	return &module;
 }
 
@@ -70,5 +77,20 @@ dgInt32 dgWorldBase::GetScore() const
 
 void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
+// this does not works
+//const GLubyte* const version = glGetString(GL_SHADING_LANGUAGE_VERSION);
+//GLuint program = glCreateProgram();
+//GLuint computeShader = glCreateShader(GL_COMPUTE_SHADER);
+//dgArrayGPU<dgVector> xxx;
+//xxx.Alloc (DG_GPU_WORKGROUP_SIZE);
+//glfwInit();
+//glfwMakeContextCurrent(NULL);
+
+
+// here the same funtion fail 
+dgArrayGPU<dgVector> xxx;
+xxx.Alloc (DG_GPU_WORKGROUP_SIZE);
+
+
 	dgSolver::CalculateJointForces(cluster, bodyArray, jointArray, timestep);
 }
