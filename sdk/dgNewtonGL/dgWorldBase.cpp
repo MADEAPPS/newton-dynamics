@@ -87,10 +87,9 @@ void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo*
 //glfwMakeContextCurrent(NULL);
 
 
-// here the same funtion fail 
+// here the same function fail 
 dgArrayGPU<dgVector> xxx;
 xxx.Alloc (DG_GPU_WORKGROUP_SIZE);
-
 
 	dgSolver::CalculateJointForces(cluster, bodyArray, jointArray, timestep);
 }
