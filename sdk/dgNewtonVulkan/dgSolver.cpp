@@ -141,9 +141,6 @@ void dgSolver::InitBodyArray(dgInt32 threadID)
 	const dgBodyInfo* const bodyArray = m_bodyArray;
 	dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
 
-//	dgVector* xxx = m_gpuBodyArray.m_damp.Lock(m_context, m_cluster->m_bodyCount);
-//	m_gpuBodyArray.m_damp.Unlock(m_context);
-
 	const dgInt32 step = m_threadCounts;
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
 	dgInt32 groupCount = DG_GPU_WORKGROUP_SIZE * ((bodyCount + DG_GPU_WORKGROUP_SIZE) / DG_GPU_WORKGROUP_SIZE);
