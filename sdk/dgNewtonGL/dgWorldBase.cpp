@@ -39,11 +39,11 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	}
 
 	static dgWorldBase module(world, allocator);
-	module.m_score = 1;
+	module.m_score = 0;
 #ifdef _DEBUG
-	sprintf(module.m_hardwareDeviceName, "Newton opengl_d");
+	sprintf(module.m_hardwareDeviceName, "Newton opengl_d %s", version);
 #else
-	sprintf(module.m_hardwareDeviceName, "Newton opengl");
+	sprintf(module.m_hardwareDeviceName, "Newton opengl %s", version);
 #endif
 
 	module.SetShaders(shaderCount, shaderArray);

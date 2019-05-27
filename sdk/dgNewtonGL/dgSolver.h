@@ -319,7 +319,11 @@ class dgSoaJacobianPair
 	dgSoaVector6 m_jacobianM1;
 } DG_GCC_AVX_ALIGMENT;
 
+// ******************************************************************************
+//
 // GPU stuff start here
+//
+// ******************************************************************************
 
 #define DG_GPU_WORKGROUP_SIZE		256 
 #define DG_GPU_BODY_INITIAL_COUNT	4096

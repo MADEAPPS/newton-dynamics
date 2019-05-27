@@ -846,6 +846,7 @@ static void AddMerryGoRound(DemoEntityManager* const scene, const dVector& locat
 	dMatrix pivot;
 	NewtonBodyGetMatrix(platform, &pivot[0][0]);
 	dCustomHinge* const hinge = new dCustomHinge(pivot, platform, pole);
+	hinge;
 }
 
 void AnimatedPlayerController(DemoEntityManager* const scene)

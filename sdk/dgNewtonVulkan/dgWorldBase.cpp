@@ -124,13 +124,14 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 //	PFN_vkVoidFunction xxxx = vkGetInstanceProcAddr(instance, GetPhysicalDeviceSurfaceSupportKHR);
 
 	static dgWorldBase module(world, allocator);
-	module.m_score = 0;
-	module.m_gpu = physical_gpus[0];
-	module.m_gpu_props = gpu_props;
-	module.m_instance = instance;
-	module.m_allocators = vkAllocators;
-	module.m_computeQueueIndex = computeQueueIndex;
-	sprintf (module.m_hardwareDeviceName, "Newton %s", module.m_gpu_props.deviceName);
+	dgVulkanContext& context = module.GetContext();
+	module.m_score = 10;
+	context.m_gpu = physical_gpus[0];
+	context.m_gpu_props = gpu_props;
+	context.m_instance = instance;
+	context.m_allocators = vkAllocators;
+	context.m_computeQueueIndex = computeQueueIndex;
+	sprintf (module.m_hardwareDeviceName, "NewtonVK %s", context.m_gpu_props.deviceName);
 	module.InitDevice();
 	return &module;
 }
@@ -143,8 +144,11 @@ dgWorldBase::dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocato
 
 dgWorldBase::~dgWorldBase()
 {
+	Cleanup();
+	dgVulkanContext& context = GetContext();
+
 //	vkDeviceWaitIdle(demo->device);
-	vkDeviceWaitIdle(m_device);
+	vkDeviceWaitIdle(context.m_device);
 
 //	// Wait for fences from present operations
 //	for (i = 0; i < FRAME_LAG; i++) {
@@ -200,8 +204,8 @@ dgWorldBase::~dgWorldBase()
 //	vkDeviceWaitIdle(demo->device);
 //	vkDestroyDevice(demo->device, NULL);
 
-	vkDeviceWaitIdle(m_device);
-	vkDestroyDevice(m_device, &m_allocators);
+	vkDeviceWaitIdle(context.m_device);
+	vkDestroyDevice(context.m_device, &context.m_allocators);
 
 //	if (demo->validate) {
 //		demo->DestroyDebugUtilsMessengerEXT(demo->inst, demo->dbg_messenger, NULL);
@@ -230,18 +234,20 @@ dgWorldBase::~dgWorldBase()
 
 
 //	vkDestroyInstance(demo->inst, NULL);
-	vkDestroyInstance(m_instance, &m_allocators);
+	vkDestroyInstance(context.m_instance, &context.m_allocators);
 }
 
 void dgWorldBase::InitDevice ()
 {
+	dgVulkanContext& context = GetContext();
+
 	VkResult err = VK_SUCCESS;
 	float queue_priorities[1] = { 0.0 };
 	VkDeviceQueueCreateInfo queues[2];
 	Clear(queues, sizeof(queues) / sizeof (queues[0]));
 	queues[0].sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 	queues[0].pNext = NULL;
-	queues[0].queueFamilyIndex = m_computeQueueIndex;
+	queues[0].queueFamilyIndex = context.m_computeQueueIndex;
 	queues[0].queueCount = 1;
 	queues[0].pQueuePriorities = queue_priorities;
 	queues[0].flags = 0;
@@ -258,13 +264,12 @@ void dgWorldBase::InitDevice ()
 	deviceInfo.enabledExtensionCount = 0;
 	deviceInfo.ppEnabledExtensionNames = NULL;
 	deviceInfo.pEnabledFeatures = NULL;
-  	err = vkCreateDevice(m_gpu, &deviceInfo, &m_allocators, &m_device);
+  	err = vkCreateDevice(context.m_gpu, &deviceInfo, &context.m_allocators, &context.m_device);
 	dgAssert(err == VK_SUCCESS);
 
-    vkGetDeviceQueue(m_device, m_computeQueueIndex, 0, &m_queue);
-	vkGetPhysicalDeviceMemoryProperties(m_gpu, &m_memory_properties);
+    vkGetDeviceQueue(context.m_device, context.m_computeQueueIndex, 0, &context.m_queue);
+	vkGetPhysicalDeviceMemoryProperties(context.m_gpu, &context.m_memory_properties);
 }
-
 
 void* dgWorldBase::vkAllocationFunction(void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope allocationScope)
 {
