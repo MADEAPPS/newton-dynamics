@@ -561,6 +561,4 @@ class dgSolver: public dgParallelBodySolver
 	dgGpuBody m_gpuBodyArray;
 } DG_GCC_AVX_ALIGMENT;
 
-
 #endif
-
