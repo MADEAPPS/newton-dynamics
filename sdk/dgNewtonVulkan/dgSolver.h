@@ -428,9 +428,10 @@ class dgArrayGPU
 	{
 		void* ptr;
 		VkResult result = VK_SUCCESS;
-		VkFlags flags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
-		result = vkMapMemory(context.m_device, m_memory, 0, size * sizeof (T), flags, &ptr);
+		//VkFlags flags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
+		result = vkMapMemory(context.m_device, m_memory, 0, size * sizeof (T), 0, &ptr);
 		dgAssert(result == VK_SUCCESS);
+		dgAssert((((dgUnsigned64)ptr) & 0xf) == 0);
 		return (T*)ptr;
 	}
 

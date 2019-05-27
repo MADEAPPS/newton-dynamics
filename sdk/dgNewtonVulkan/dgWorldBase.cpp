@@ -274,8 +274,8 @@ void dgWorldBase::InitDevice ()
 void* dgWorldBase::vkAllocationFunction(void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope allocationScope)
 {
 	dgMemoryAllocator* const allocator = (dgMemoryAllocator*) pUserData;
-	void* const ptr = allocator->Malloc (size);
-	dgAssert (alignment * ((dgInt64)ptr / alignment) == (dgInt64)ptr);
+	void* const ptr = allocator->Malloc (dgInt32 (size));
+	dgAssert (alignment * ((size_t)ptr / alignment) == (size_t)ptr);
 	return ptr;
 }
 
