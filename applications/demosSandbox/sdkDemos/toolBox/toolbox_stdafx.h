@@ -201,6 +201,8 @@ typedef long long unsigned64;
 #include <dAnimationRagdollJoint.h>
 #include <dAnimationRagDollEffector.h>
 
+#include <dAnimationKeyframesSequence.h>
+
 /*
 #include <dAnimIKManager.h>
 #include <dAnimIK3dofJoint.h>
@@ -271,7 +273,7 @@ inline void glMaterialParam (GLenum face, GLenum pname, const dFloat *params)
 #endif
 
 
-#define DEMO_CHECK_ASYN_UPDATE
+//#define DEMO_CHECK_ASYN_UPDATE
 #define dRAND_MAX		0x0fffffff
 
 unsigned dRand ();

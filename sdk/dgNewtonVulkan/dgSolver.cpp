@@ -24,6 +24,7 @@
 
 #include "dgBody.h"
 #include "dgWorld.h"
+#include "dgWorldBase.h"
 #include "dgConstraint.h"
 #include "dgDynamicBody.h"
 #include "dgWorldDynamicUpdate.h"
@@ -42,6 +43,11 @@ dgSolver::dgSolver(dgWorld* const world, dgMemoryAllocator* const allocator)
 
 dgSolver::~dgSolver()
 {
+}
+
+void dgSolver::Cleanup()
+{
+	m_gpuBodyArray.Clear(m_context);
 }
 
 void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
@@ -65,6 +71,8 @@ void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* co
 
 	m_bodyProxyArray = dgAlloca(dgBodyProxy, cluster.m_bodyCount);
 	m_soaRowStart = dgAlloca(dgInt32, cluster.m_jointCount / DG_SOA_WORD_GROUP_SIZE + 1);
+
+	m_gpuBodyArray.Resize(m_context, cluster.m_bodyCount);
 
 	InitWeights();
 	InitBodyArray();
@@ -114,6 +122,31 @@ void dgSolver::InitWeights()
 void dgSolver::InitBodyArray()
 {
 	DG_TRACKTIME();
+
+	dgBodyInfo* const bodyArray = m_bodyArray;
+	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+	const dgInt32 groupCount = DG_GPU_WORKGROUP_SIZE * ((bodyCount + DG_GPU_WORKGROUP_SIZE) / DG_GPU_WORKGROUP_SIZE);
+
+	dgVector* const veloc = m_gpuBodyArray.m_veloc.Lock(m_context, groupCount);
+	dgVector* const omega = m_gpuBodyArray.m_omega.Lock(m_context, groupCount);
+	dgVector* const damp = m_gpuBodyArray.m_damp.Lock(m_context, groupCount);
+	for (dgInt32 i = 0; i < bodyCount; i ++) {
+		const dgBodyInfo* const bodyInfo = &bodyArray[i];
+		dgDynamicBody* const body = (dgDynamicBody*)bodyInfo->m_body;
+		veloc[i] = body->m_veloc;
+		omega[i] = body->m_omega;
+		damp[i] = body->GetDampCoeffcient(m_timestep);
+	}
+	dgVector zero(m_zero);
+	for (dgInt32 i = bodyCount; i < groupCount; i++) {
+		damp[i] = zero;
+		veloc[i] = zero;
+		omega[i] = zero;
+	}
+	m_gpuBodyArray.m_damp.Unlock(m_context);
+	m_gpuBodyArray.m_omega.Unlock(m_context);
+	m_gpuBodyArray.m_veloc.Unlock(m_context);
+
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
 		m_world->QueueJob(InitBodyArrayKernel, this, NULL, "dgSolver::InitBodyArray");
 	}
@@ -133,12 +166,12 @@ void dgSolver::InitBodyArray(dgInt32 threadID)
 	const dgBodyInfo* const bodyArray = m_bodyArray;
 	dgBodyProxy* const bodyProxyArray = m_bodyProxyArray;
 
-	const dgInt32 step = m_threadCounts;;
+	const dgInt32 step = m_threadCounts;
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
 	for (dgInt32 i = threadID; i < bodyCount; i += step) {
 		const dgBodyInfo* const bodyInfo = &bodyArray[i];
 		dgBody* const body = (dgDynamicBody*)bodyInfo->m_body;
-		body->AddDampingAcceleration(m_timestep);
+//		body->AddDampingAcceleration(m_timestep);
 		body->CalcInvInertiaMatrix();
 		body->m_accel = body->m_veloc;
 		body->m_alpha = body->m_omega;

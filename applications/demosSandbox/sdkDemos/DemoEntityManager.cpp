@@ -42,7 +42,7 @@
 //#define DEFAULT_SCENE	6		// kinematic bodies
 //#define DEFAULT_SCENE	7		// Object Placement
 //#define DEFAULT_SCENE	8		// primitive convex cast 
-//#define DEFAULT_SCENE	9		// box stacks
+#define DEFAULT_SCENE	9		// box stacks
 //#define DEFAULT_SCENE	10		// simple level mesh collision
 //#define DEFAULT_SCENE	11		// optimized level mesh collision
 //#define DEFAULT_SCENE	12		// height field Collision
@@ -52,7 +52,7 @@
 //#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	17		// uniform Scaled Collision
 //#define DEFAULT_SCENE	18		// non uniform Scaled Collision
-#define DEFAULT_SCENE	19		// scaled mesh collision
+//#define DEFAULT_SCENE	19		// scaled mesh collision
 //#define DEFAULT_SCENE	20		// continuous collision
 //#define DEFAULT_SCENE	21		// paper wall continuous collision
 //#define DEFAULT_SCENE	22		// puck slide continuous collision
@@ -361,7 +361,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
-	m_asynchronousPhysicsUpdate = true;
+//	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
 
 	m_currentPlugin = 0;
@@ -1316,6 +1316,7 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 {
 	// update the physics
 	if (m_world && !m_suspendPhysicsUpdate) {
+		D_TRACKTIME();
 
 		dFloat timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
 		unsigned64 timestepMicrosecunds = unsigned64 (timestepInSecunds * 1000000.0f);
@@ -1487,6 +1488,7 @@ void DemoEntityManager::RenderScene()
 	CalculateFPS(timestep);
 	UpdatePhysics(timestep);
 
+	D_TRACKTIME();
 	// Get the interpolated location of each body in the scene
 	m_cameraManager->InterpolateMatrices (this, CalculateInteplationParam());
 

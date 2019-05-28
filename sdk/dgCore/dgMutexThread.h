@@ -32,7 +32,6 @@ class dgMutexThread: public dgThread
 	virtual ~dgMutexThread(void);
 
 	void Tick(); 
-	void Sync();
 	void Terminate(); 
 
 	protected:
@@ -44,4 +43,24 @@ class dgMutexThread: public dgThread
 	dgSemaphore m_parentMutex;
 };
 
+
+class dgAsyncThread: public dgThread
+{
+	public:
+	dgAsyncThread(const char* const name, dgInt32 id);
+	virtual ~dgAsyncThread(void);
+
+	void Tick();
+	void Sync();
+	void Terminate();
+
+	protected:
+	virtual void Execute(dgInt32 threadID);
+	virtual void TickCallback(dgInt32 threadID) = 0;
+
+	private:
+	dgSemaphore m_mutex;
+	dgInt32 m_inUpdate;
+	dgInt32 m_beginUpdate;
+};
 #endif

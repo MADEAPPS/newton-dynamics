@@ -142,11 +142,12 @@ void dgCollisionDeformableMesh::IntegrateForces(dgFloat32 timestep)
 	dgAssert (matrix[2][2] == dgFloat32 (1.0f));
 #endif
 	
-	dgVector damp(dgFloat32(1.0f));
-	if (m_body->m_linearDampOn) {
-		const dgFloat32 tau = dgFloat32(1.0f) / (dgFloat32(60.0f) * timestep);
-		damp = dgVector(dgPow(dgFloat32(1.0f) - m_body->m_dampCoef.m_w, tau));
-	}
+dgAssert (0);
+//	dgVector damp(dgFloat32(1.0f));
+//	if (m_body->m_linearDampOn) {
+//		const dgFloat32 tau = dgFloat32(1.0f) / (dgFloat32(60.0f) * timestep);
+//		damp = dgVector(dgPow(dgFloat32(1.0f) - m_body->m_dampCoef.m_w, tau));
+//	}
 
 	// rigid body dynamic state
 	dgVector timeV (timestep);

@@ -172,25 +172,25 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir>$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir>$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir>$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
     <IntDir>$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)_d</TargetName>
@@ -226,6 +226,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -250,6 +251,7 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <FloatingPointModel>Fast</FloatingPointModel>
       <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -274,10 +276,13 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <FloatingPointModel>Fast</FloatingPointModel>
       <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
@@ -296,10 +301,13 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <FloatingPointModel>Fast</FloatingPointModel>
       <AdditionalIncludeDirectories>../../dgCore;../../dProfiler;../../dgPhysics;../../dgMeshUtil;../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
@@ -382,6 +390,8 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
@@ -408,6 +418,8 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R

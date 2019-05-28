@@ -1830,7 +1830,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompound (dgBroadPhase::dgPair* 
 #ifdef DE_USE_OLD_CONTACT_FILTER
 								contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
 #else
-								dgAssert(0);
 								contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
 #endif
 							}
@@ -1990,7 +1989,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToHeightField (dgBroadPhase::dgPai
 #ifdef DE_USE_OLD_CONTACT_FILTER
 								contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
 #else
-								dgAssert(0);
 								contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
 #endif
 							}
@@ -2097,7 +2095,6 @@ dgInt32 dgCollisionCompound::CalculateContactsUserDefinedCollision (dgBroadPhase
 #ifdef DE_USE_OLD_CONTACT_FILTER
 								contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
 #else
-								dgAssert(0);
 								contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
 #endif
 							}
@@ -2198,7 +2195,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingle (dgBroadPhase::dgPair* co
 #ifdef DE_USE_OLD_CONTACT_FILTER
 								contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
 #else
-								dgAssert(0);
 								contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
 #endif
 							}
@@ -2324,7 +2320,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTree (dgBroadPhase::dgP
 #ifdef DE_USE_OLD_CONTACT_FILTER
 								contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
 #else
-								dgAssert(0);
 								contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
 #endif
 							}
@@ -2578,7 +2573,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToSingleContinue(dgBroadPhase::dgP
 #ifdef DE_USE_OLD_CONTACT_FILTER
 									contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
 #else
-									dgAssert(0);
 									contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
 #endif
 								}
@@ -2736,7 +2730,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToCompoundContinue(dgBroadPhase::d
 #ifdef DE_USE_OLD_CONTACT_FILTER
 									contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
 #else
-									dgAssert(0);
 									contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
 #endif
 								}
@@ -2952,7 +2945,6 @@ dgInt32 dgCollisionCompound::CalculateContactsToCollisionTreeContinue (dgBroadPh
 #ifdef DE_USE_OLD_CONTACT_FILTER
 									contactCount = m_world->OldReduceContacts(contactCount, contacts, DG_CONSTRAINT_MAX_ROWS / 3, proxy.m_contactJoint->GetPruningTolerance());
 #else
-									dgAssert(0);
 									contactCount = m_world->PruneContacts(contactCount, contacts, proxy.m_contactJoint->GetPruningTolerance(), 16);
 #endif
 								}

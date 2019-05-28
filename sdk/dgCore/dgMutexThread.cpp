@@ -60,13 +60,6 @@ void dgMutexThread::Execute (dgInt32 threadID)
 	}
 }
 
-void dgMutexThread::Sync()
-{
-//	while (m_mutex.GetCount()) {
-//		dgThreadYield();
-//	}
-}
-
 void dgMutexThread::Tick()
 {
 	// let the thread run until the update function return  
@@ -74,3 +67,58 @@ void dgMutexThread::Tick()
 	m_parentMutex.Wait();
 }
 
+dgAsyncThread::dgAsyncThread(const char* const name, dgInt32 id)
+	:dgThread(name, id)
+	,m_mutex()
+	,m_inUpdate(0)
+	,m_beginUpdate(0)
+{
+	Init();
+}
+
+dgAsyncThread::~dgAsyncThread(void)
+{
+	Terminate();
+}
+
+void dgAsyncThread::Terminate()
+{
+	if (IsThreadActive()) {
+		dgInterlockedExchange(&m_terminate, 1);
+		m_mutex.Release();
+		Close();
+	}
+}
+
+void dgAsyncThread::Sync()
+{
+	while (m_inUpdate) {
+		dgThreadYield();
+	}
+}
+
+void dgAsyncThread::Tick()
+{
+	// let the thread run until the update function return  
+	Sync();
+	m_beginUpdate = 0;
+	m_mutex.Release();
+	while (!m_beginUpdate) {
+		dgThreadPause();
+	}
+}
+
+
+void dgAsyncThread::Execute(dgInt32 threadID)
+{
+	dgAssert(threadID == m_id);
+	while (!m_terminate) {
+		m_mutex.Wait();
+		if (!m_terminate) {
+			dgInterlockedExchange(&m_inUpdate, 1);
+			dgInterlockedExchange(&m_beginUpdate, 1);
+			TickCallback(threadID);
+			dgInterlockedExchange(&m_inUpdate, 0);
+		}
+	}
+}

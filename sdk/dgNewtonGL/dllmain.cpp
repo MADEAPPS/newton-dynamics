@@ -49,12 +49,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		};
 	} info;
 
-	// check for instruction set support (avx is bit 28 in reg ecx)
-	__cpuid(info.m_data, 1);
-	if (!(info.m_ecx & (1 << 28))) {
-		return FALSE;
-	}
-
-	return TRUE;
+	//return TRUE;
+	return FALSE;
 }
 #endif

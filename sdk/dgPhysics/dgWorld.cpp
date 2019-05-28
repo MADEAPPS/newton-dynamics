@@ -50,6 +50,8 @@
 #include "dgCorkscrewConstraint.h"
 
 #define DG_DEFAULT_SOLVER_ITERATION_COUNT	4
+#define DG_SYNC_THREAD	1
+#define DG_ASYNC_THREAD	2
 
 /*
 static dgInt32 TestSort(const dgInt32* const  A, const dgInt32* const B, void* const)
@@ -212,7 +214,8 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,dgContactList(allocator) 
 	,dgBilateralConstraintList(allocator)
 	,dgWorldDynamicUpdate(allocator)
-	,dgMutexThread("newtonMainThread", 0)
+	,dgMutexThread("newtonMainThread", DG_SYNC_THREAD)
+	,dgAsyncThread("newtonAsyncThread", DG_ASYNC_THREAD)
 	,dgWorldThreadPool(allocator)
 	,dgDeadBodies(allocator)
 	,dgDeadJoints(allocator)
@@ -332,7 +335,8 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 dgWorld::~dgWorld()
 {	
 	Sync();
-	Terminate();
+	dgAsyncThread::Terminate();
+	dgMutexThread::Terminate();
 
 	UnloadPlugins();
 	m_listeners.RemoveAll();
@@ -766,14 +770,6 @@ dgUniversalConstraint* dgWorld::CreateUniversalConstraint (
 	return constraint;
 }
 
-
-/*
-dgInt32 dgWorld::GetActiveBodiesCount() const
-{
-	return m_activeBodiesCount;
-}
-*/
-
 dgInt32 dgWorld::GetBodiesCount() const
 {
 	const dgBodyMasterList& list = *this;
@@ -903,7 +899,6 @@ void dgWorld::FlushCache()
 	SortMasterList();
 }
 
-
 void dgWorld::StepDynamics (dgFloat32 timestep)
 {
 	//SerializeToFile ("xxx.bin");
@@ -945,14 +940,6 @@ void dgWorld::Execute (dgInt32 threadID)
 {
 	dgMutexThread::Execute (threadID);
 }
-
-//void dgWorld::Sync ()
-//{
-////	while (IsBusy()) {
-////		dgThreadYield();
-////	}
-//	IsBusy();
-//}
 
 void dgWorld::UpdateTransforms(dgBodyMasterList::dgListNode* node, dgInt32 threadID)
 {
@@ -1010,16 +997,13 @@ void dgWorld::RunStep ()
 		m_postUpdateCallback (this, m_savetimestep);
 	}
 
-//	if (!m_concurrentUpdate) {
-//		m_mutex.Release();
-//	}
 	m_lastExecutionTime = (dgGetTimeInMicrosenconds() - timeAcc) * dgFloat32 (1.0e-6f);
 	EndSection();
 }
 
-void dgWorld::TickCallback (dgInt32 threadID)
+void dgWorld::TickCallback(dgInt32 threadID)
 {
-	RunStep ();
+	RunStep();
 }
 
 void dgWorld::Update (dgFloat32 timestep)
@@ -1032,24 +1016,20 @@ void dgWorld::Update (dgFloat32 timestep)
 	#else 
 		// runs the update in a separate thread and wait until the update is completed before it returns.
 		// this will run well on single core systems, since the two thread are mutually exclusive 
-		Tick();
+		dgMutexThread::Tick();
 	#endif
 }
 
 void dgWorld::UpdateAsync (dgFloat32 timestep)
 {
-Update (timestep);
-/*
-	m_savetimestep = timestep;
+	
 	#ifdef DG_USE_THREAD_EMULATION
-		dgFloatExceptions exception;
-		dgSetPrecisionDouble precision;
-		RunStep ();
-	#else 
-		// execute one update, but do not wait for the update to finish, instead return immediately to the caller
-		Tick();
+		Update(timestep);
+	#else
+		m_savetimestep = timestep;
+		dgAsyncThread::Tick();
+		//Update(timestep);
 	#endif
-*/
 }
 
 void dgWorld::SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor)

@@ -171,6 +171,7 @@ class dgWorld
 	,public dgBilateralConstraintList
 	,public dgWorldDynamicUpdate
 	,public dgMutexThread
+	,public dgAsyncThread
 	,public dgWorldThreadPool
 	,public dgDeadBodies
 	,public dgDeadJoints

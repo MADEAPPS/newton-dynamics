@@ -569,14 +569,6 @@ DG_INLINE dgInt32 dgWorld::PruneSupport(int count, const dgVector& dir, const dg
 	return index;
 }
 
-
-//void XXXXXX (dgInt32 count, dgContactPoint* const contactArray)
-//{
-//	for (dgInt32 i = 0; i < count; i++) {
-//		dgTrace(("c(%f %f %f) n(%f %f %f)\n", contactArray[i].m_point.m_x, contactArray[i].m_point.m_y, contactArray[i].m_point.m_z, contactArray[i].m_normal.m_x, contactArray[i].m_normal.m_y, contactArray[i].m_normal.m_z));
-//	}
-//}
-
 dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contactArray, int maxCount, dgFloat32 tol) const
 {
 	class dgConveFaceNode
@@ -597,7 +589,6 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 		dgConveFaceNode* m_edgeP0;
 	};
 
-//	dgVector averageNormal(dgVector::m_zero);
 	dgVector xyMask(dgVector::m_xMask | dgVector::m_yMask);
 
 	dgVector array[DG_MAX_CONTATCS];
@@ -608,14 +599,9 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 
 	dgFloat32 maxPenetration = dgFloat32(0.0f);
 	for (dgInt32 i = 0; i < count; i++) {
-//		averageNormal += contactArray[i].m_normal;
 		array[i] = matrix.UntransformVector(contactArray[i].m_point) & xyMask;
 		maxPenetration = dgMax (maxPenetration, contactArray[i].m_penetration);
 	}
-//	averageNormal = (matrix.m_right * averageNormal.DotProduct(matrix.m_right)).Normalize();
-
-//XXXXXX (count, contactArray);
-//dgTrace (("average: %f %f %f\n", averageNormal.m_x, averageNormal.m_y, averageNormal.m_z));
 
 	dgInt32 i0 = PruneSupport(count, dgCollisionContactCloud::m_pruneSupportX, array);
 	count--;
@@ -942,7 +928,7 @@ dgInt32 dgWorld::PruneContactsFallback(dgInt32 count, dgContactPoint* const cont
 
 dgInt32 dgWorld::Prune3dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contactArray, int maxCount, dgFloat32 distTol) const
 {
-//return PruneContactsFallback(count, contactArray, distTol, maxCount);
+return PruneContactsFallback(count, contactArray, distTol, maxCount);
 
 	dgFloat32 maxPenetration = dgFloat32 (0.0f);
 	dgVector array[DG_MAX_CONTATCS];
@@ -2127,10 +2113,8 @@ dgInt32 dgWorld::Collide (
 	if (count > maxContacts) {
 #ifdef DE_USE_OLD_CONTACT_FILTER
 		count = OldReduceContacts (count, contacts, maxContacts, contactJoint.GetPruningTolerance());
-#else
-		count = PruneContacts(count, contacts, contactJoint.GetPruningTolerance(), maxContacts);
-#endif
 		count = dgMin (count, maxContacts);
+#endif
 	}
 
 	dgFloat32 swapContactScale = (contactJoint.GetBody0() != &collideBodyA) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f);
@@ -2520,6 +2504,7 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 		const dgInt32* const localIndexArray = &indexArray[address];
 		polygon.m_vertexIndex = localIndexArray;
 		polygon.m_count = data.m_faceIndexCount[i];
+		polygon.m_paddedCount = polygon.m_count;
 		polygon.m_adjacentFaceEdgeNormalIndex = data.GetAdjacentFaceEdgeNormalArray (localIndexArray, polygon.m_count);
 		polygon.m_faceId = data.GetFaceId (localIndexArray, polygon.m_count);
 		polygon.m_faceClipSize = data.GetFaceSize (localIndexArray, polygon.m_count);
@@ -2582,9 +2567,9 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	} 
 #else
 	for (dgInt32 i = 0; (i < count) && contactsValid; i++) {
-		const dgVector& p0 = contactOut[i].m_point;
+		const dgVector& normal = contactOut[i].m_normal;
 		for (dgInt32 j = i + 1; (j < count) && contactsValid; j++) {
-			const dgFloat32 project = (contactOut[i].m_normal.DotProduct(contactOut[j].m_normal)).GetScalar();
+			const dgFloat32 project = (normal.DotProduct(contactOut[j].m_normal)).GetScalar();
 			contactsValid = contactsValid && (project > dgFloat32(-0.1f));
 		}
 	}
@@ -2678,6 +2663,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue(dgCollisionParamProx
 		const dgInt32* const localIndexArray = &indexArray[address];
 		polygon.m_vertexIndex = localIndexArray;
 		polygon.m_count = data.m_faceIndexCount[i];
+		polygon.m_paddedCount = polygon.m_count;
 		polygon.m_adjacentFaceEdgeNormalIndex = data.GetAdjacentFaceEdgeNormalArray(localIndexArray, polygon.m_count);
 		polygon.m_faceId = data.GetFaceId(localIndexArray, polygon.m_count);
 		polygon.m_faceClipSize = data.GetFaceSize(localIndexArray, polygon.m_count);

@@ -18,31 +18,6 @@
 #include "OpenGlUtil.h"
 
 
-class CheckDaveGravelCustomJoint
-{
-	private:
-	NewtonJoint* aJoint;
-	protected:
-
-	static void SubmitConstraints(const NewtonJoint* const userJoint, dFloat timestep, int threadIndex) {};
-	public:
-
-	CheckDaveGravelCustomJoint(DemoEntityManager* const scene, const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent = NULL)
-	{
-		NewtonWorld* const world = scene->GetNewton();
-		aJoint = NewtonConstraintCreateUserJoint(world, 1, SubmitConstraints, child, parent);
-		NewtonJointSetUserData(aJoint, this);
-	};
-	CheckDaveGravelCustomJoint(DemoEntityManager* const scene, const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, NewtonBody* const child, NewtonBody* const parent = NULL)
-	{
-		NewtonWorld* const world = scene->GetNewton();
-		aJoint = NewtonConstraintCreateUserJoint(world, 1, SubmitConstraints, child, parent);
-		NewtonJointSetUserData(aJoint, this);
-	};
-};
-
-
-
 static NewtonBody* CreateBox (DemoEntityManager* const scene, const dVector& location, const dVector& size, const char* const textName = "smilli.tga")
 {
     NewtonWorld* const world = scene->GetNewton();

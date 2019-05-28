@@ -122,8 +122,6 @@ dgDynamicBody::dgDynamicBody()
 	,m_isInDestructionArrayLRU(0)
 	,m_skeleton(NULL)
 	,m_applyExtForces(NULL)
-	,m_linearDampOn(true)
-	,m_angularDampOn(true)
 {
 	m_type = m_dynamicBody;
 	m_rtti |= m_dynamicBodyRTTI;
@@ -143,8 +141,6 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 	,m_isInDestructionArrayLRU(0)
 	,m_skeleton(NULL)
 	,m_applyExtForces(NULL)
-	,m_linearDampOn(true)
-	,m_angularDampOn(true)
 {
 	dgInt32 val;
 	m_type = m_dynamicBody;
@@ -155,8 +151,6 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 	serializeCallback (userData, &m_invMass, sizeof (m_invMass));
 	serializeCallback (userData, &m_dampCoef, sizeof (m_dampCoef));
 	serializeCallback(userData, &val, sizeof (dgInt32));
-	m_linearDampOn = (val & 1) ? true : false;
-	m_angularDampOn = (val & 2) ? true : false;
 }
 
 dgDynamicBody::~dgDynamicBody()
@@ -172,11 +166,9 @@ void dgDynamicBody::Serialize (const dgTree<dgInt32, const dgCollision*>& collis
 {
 	dgBody::Serialize (collisionRemapId, serializeCallback, userData);
 
-	dgInt32 val = (m_linearDampOn ? 1 : 0) & (m_angularDampOn ? 2 : 0) ;
 	serializeCallback (userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_invMass, sizeof (m_invMass));
 	serializeCallback (userData, &m_dampCoef, sizeof (m_dampCoef));
-	serializeCallback (userData, &val, sizeof (dgInt32));
 }
 
 
@@ -265,15 +257,11 @@ void dgDynamicBody::ApplyExtenalForces (dgFloat32 timestep, dgInt32 threadIndex)
 void dgDynamicBody::AddDampingAcceleration(dgFloat32 timestep)
 {
 	dgVector damp (GetDampCoeffcient (timestep));
-	if (m_linearDampOn) {
-		m_veloc = m_veloc.Scale(damp.m_w);
-	}
+	dgVector omegaDamp(damp & dgVector::m_triplexMask);
+	dgVector omega(m_matrix.UnrotateVector(m_omega) * omegaDamp);
 
-	if (m_angularDampOn) {
-		dgVector omegaDamp(damp & dgVector::m_triplexMask);
-		dgVector omega(m_matrix.UnrotateVector(m_omega) * omegaDamp);
-		m_omega = m_matrix.RotateVector(omega);
-	}
+	m_veloc = m_veloc.Scale(damp.m_w);
+	m_omega = m_matrix.RotateVector(omega);
 }
 
 void dgDynamicBody::InvalidateCache ()

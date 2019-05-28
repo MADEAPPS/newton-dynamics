@@ -37,7 +37,6 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	}
 
 	// GPU module are assumed to be valid at this point
-return FALSE;
 	return TRUE;
 }
 #endif

@@ -31,7 +31,7 @@
 
 char* dgSolver::m_testShaderSource =
 	"#version 450 core\n"
-	"layout(local_size_x = 1024, local_size_y = 1, local_size_z = 1) in;\n"
+	"layout(local_size_x = 256) in;\n"
 	"void main()\n"
 	"{\n"
 	"	// do nothing for now.\n"
@@ -132,6 +132,8 @@ void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* co
 	m_bodyProxyArray = dgAlloca(dgBodyProxy, cluster.m_bodyCount);
 	m_soaRowStart = dgAlloca(dgInt32, cluster.m_jointCount / DG_SOA_WORD_GROUP_SIZE + 1);
 
+//	m_gpuBodyArray.Resize(cluster.m_bodyCount);
+
 	InitWeights();
 	InitBodyArray();
 	InitJacobianMatrix();
@@ -201,9 +203,25 @@ void dgSolver::InitBodyArray(dgInt32 threadID)
 
 	const dgInt32 step = m_threadCounts;;
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+
+//	dgVector* const veloc = m_gpuBodyArray.m_veloc.Lock(bodyCount);
+//	dgVector* const omega = m_gpuBodyArray.m_omega.Lock(bodyCount);
+//	dgVector* const damp = m_gpuBodyArray.m_damp.Lock(bodyCount);
+//	for (dgInt32 i = threadID; i < bodyCount; i += step) {
+//		const dgBodyInfo* const bodyInfo = &bodyArray[i];
+//		dgDynamicBody* const body = (dgDynamicBody*)bodyInfo->m_body;
+//		damp[i] = body->GetDampCoeffcient(m_timestep);
+//		veloc[i] = body->m_veloc;
+//		omega[i] = body->m_omega;
+//	}
+//	m_gpuBodyArray.m_damp.Unlock();
+//	m_gpuBodyArray.m_omega.Unlock();
+//	m_gpuBodyArray.m_veloc.Unlock();
+
+
 	for (dgInt32 i = threadID; i < bodyCount; i += step) {
 		const dgBodyInfo* const bodyInfo = &bodyArray[i];
-		dgBody* const body = (dgDynamicBody*)bodyInfo->m_body;
+		dgBody* const body = bodyInfo->m_body;
 		body->AddDampingAcceleration(m_timestep);
 		body->CalcInvInertiaMatrix();
 		body->m_accel = body->m_veloc;

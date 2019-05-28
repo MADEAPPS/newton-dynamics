@@ -56,9 +56,8 @@
 #include <dTree.h>
 #include <dRtti.h>
 #include <dArray.h>
-
-//#include <dClassInfo.h>
-//#include <dRefCounter.h>
+#include <dClassInfo.h>
+#include <dRefCounter.h>
 //#include <dBaseHierarchy.h>
 
 #include <dCustomJoint.h>
