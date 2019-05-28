@@ -29,7 +29,7 @@
 #define REST_RELATIVE_VELOCITY			dgFloat32 (1.0e-3f)
 #define MAX_DYNAMIC_FRICTION_SPEED		dgFloat32 (0.3f)
 #define MAX_PENETRATION_STIFFNESS		dgFloat32 (50.0f)
-#define MAX_SEPARATING_SPEED			dgFloat32 (4.0f)
+//#define MAX_SEPARATING_SPEED			dgFloat32 (4.0f)
 
 
 //////////////////////////////////////////////////////////////////////
@@ -248,9 +248,8 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	const dgFloat32 relGyro = (normalJacobian0.m_angular * m_body0->m_gyroAlpha + normalJacobian1.m_angular * m_body1->m_gyroAlpha).AddHorizontal().GetScalar();
 //	params.m_jointAccel[normalIndex] = GetMax (dgFloat32 (-4.0f), relVelocErr + penetrationVeloc) * params.m_invTimestep;
 //	params.m_jointAccel[normalIndex] = dgMax (dgFloat32 (-4.0f), relVelocErr + penetrationVeloc) * impulseOrForceScale;
-	params.m_jointAccel[normalIndex] = dgMax (impulseOrForceScale * dgFloat32 (-MAX_SEPARATING_SPEED), relGyro + (relVelocErr + penetrationVeloc) * impulseOrForceScale);
+	params.m_jointAccel[normalIndex] = relGyro + (relVelocErr + penetrationVeloc) * impulseOrForceScale;
 	if (contact.m_flags & dgContactMaterial::m_overrideNormalAccel) {
-		dgAssert(0);
 		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
 
@@ -385,7 +384,7 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 				}
 
 				vRel = vRel * restitution + penetrationVeloc;
-				vRel = dgMin (MAX_SEPARATING_SPEED, vRel);
+				//vRel = dgMin (MAX_SEPARATING_SPEED, vRel);
 			}
 
 			const dgFloat32 relGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();

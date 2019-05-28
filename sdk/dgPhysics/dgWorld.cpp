@@ -770,14 +770,6 @@ dgUniversalConstraint* dgWorld::CreateUniversalConstraint (
 	return constraint;
 }
 
-
-/*
-dgInt32 dgWorld::GetActiveBodiesCount() const
-{
-	return m_activeBodiesCount;
-}
-*/
-
 dgInt32 dgWorld::GetBodiesCount() const
 {
 	const dgBodyMasterList& list = *this;
@@ -907,7 +899,6 @@ void dgWorld::FlushCache()
 	SortMasterList();
 }
 
-
 void dgWorld::StepDynamics (dgFloat32 timestep)
 {
 	//SerializeToFile ("xxx.bin");
@@ -949,14 +940,6 @@ void dgWorld::Execute (dgInt32 threadID)
 {
 	dgMutexThread::Execute (threadID);
 }
-
-//void dgWorld::Sync ()
-//{
-////	while (IsBusy()) {
-////		dgThreadYield();
-////	}
-//	IsBusy();
-//}
 
 void dgWorld::UpdateTransforms(dgBodyMasterList::dgListNode* node, dgInt32 threadID)
 {
