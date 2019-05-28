@@ -928,7 +928,7 @@ dgInt32 dgWorld::PruneContactsFallback(dgInt32 count, dgContactPoint* const cont
 
 dgInt32 dgWorld::Prune3dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contactArray, int maxCount, dgFloat32 distTol) const
 {
-//return PruneContactsFallback(count, contactArray, distTol, maxCount);
+return PruneContactsFallback(count, contactArray, distTol, maxCount);
 
 	dgFloat32 maxPenetration = dgFloat32 (0.0f);
 	dgVector array[DG_MAX_CONTATCS];

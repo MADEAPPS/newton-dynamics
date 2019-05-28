@@ -147,7 +147,6 @@ void dgSolver::InitBodyArray()
 	m_gpuBodyArray.m_omega.Unlock(m_context);
 	m_gpuBodyArray.m_veloc.Unlock(m_context);
 
-
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
 		m_world->QueueJob(InitBodyArrayKernel, this, NULL, "dgSolver::InitBodyArray");
 	}
