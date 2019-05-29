@@ -1,0 +1,45 @@
+#version 450 core
+
+layout(local_size_x = 256) in;
+
+layout( std140, binding=1 ) buffer rotation
+{
+    vec4 m_rotation[];
+};
+
+layout( std140, binding=2 ) buffer position
+{
+    vec4 m_position[];
+};
+
+layout( std140, binding=3 ) buffer velocity
+{
+    vec4 m_veloc[];
+};
+
+layout( std140, binding=4 ) buffer omega
+{
+    vec4 m_omega[];
+};
+
+layout( std140, binding=5 ) buffer damping
+{
+    vec4 m_damp[];
+};
+
+
+void main()
+{
+	uint i = gl_GlobalInvocationID.x;
+
+	vec4 rotation = m_rotation[i];
+	vec4 damp = m_damp[i];
+    vec4 veloc = m_veloc[i];
+    vec4 omega = m_omega[i];
+
+	veloc = veloc * damp.w;
+	omega = omega * damp;
+
+	m_veloc[i] = veloc;
+	m_omega[i] = omega;
+}

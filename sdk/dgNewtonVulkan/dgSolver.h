@@ -485,9 +485,12 @@ class dgGpuBody
 
 	dgInt32 m_count;
 	dgInt32 m_bufferSize;
+	dgArrayGPU<dgVector> m_rotation;
+	dgArrayGPU<dgVector> m_position;
 	dgArrayGPU<dgVector> m_veloc;
 	dgArrayGPU<dgVector> m_omega;
 	dgArrayGPU<dgVector> m_damp;
+	
 };
 
 

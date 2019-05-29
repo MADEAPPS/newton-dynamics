@@ -20,5 +20,8 @@
     <CustomBuild Include="..\..\dgNewtonVulkan\shaders\test.comp">
       <Filter>shaders</Filter>
     </CustomBuild>
+    <CustomBuild Include="..\..\dgNewtonVulkan\shaders\InitBodyArray.comp">
+      <Filter>shaders</Filter>
+    </CustomBuild>
   </ItemGroup>
 </Project>

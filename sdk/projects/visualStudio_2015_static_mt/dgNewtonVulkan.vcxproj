@@ -83,6 +83,35 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">%(Filename).spv  </Outputs>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\dgNewtonVulkan\shaders\InitBodyArray.comp">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).spv  </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">%(Filename).spv  </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).spv  </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">%(Filename).spv  </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).spv  </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">%(Filename).spv  </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).spv  </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">%(Filename).spv  </Outputs>
+    </CustomBuild>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5FBED6C8-AB56-48A3-ABFE-39C108792CE3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
