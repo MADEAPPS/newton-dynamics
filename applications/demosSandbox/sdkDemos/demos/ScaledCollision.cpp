@@ -43,7 +43,8 @@ static void AddUniformScaledPrimitives (DemoEntityManager* const scene, dFloat m
 			matrix.m_posit.m_x = x;
 			matrix.m_posit.m_z = z;
 			dVector floor (FindFloor (world, dVector (matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
-			matrix.m_posit.m_y = floor.m_y + 4.f;
+			//matrix.m_posit.m_y = floor.m_y + 4.0f;
+			matrix.m_posit.m_y = floor.m_y + 2.0f;
 
 			// create a solid
 			CreateSimpleSolid (scene, geometry, mass, matrix, collision, materialID);

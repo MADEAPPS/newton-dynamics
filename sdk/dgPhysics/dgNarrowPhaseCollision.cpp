@@ -928,14 +928,12 @@ dgInt32 dgWorld::PruneContactsFallback(dgInt32 count, dgContactPoint* const cont
 
 dgInt32 dgWorld::Prune3dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contactArray, int maxCount, dgFloat32 distTol) const
 {
-return PruneContactsFallback(count, contactArray, distTol, maxCount);
+//return PruneContactsFallback(count, contactArray, distTol, maxCount);
 
-	dgFloat32 maxPenetration = dgFloat32 (0.0f);
 	dgVector array[DG_MAX_CONTATCS];
 	dgFloat32 max_x = dgFloat32 (1.0e20f);
 	dgInt32 maxIndex = 0;
 	for (dgInt32 i = 0; i < count; i++) {
-		maxPenetration = dgMax(maxPenetration, contactArray[i].m_penetration);
 		array[i] = matrix.UntransformVector(contactArray[i].m_point);
 		array[i].m_w = dgFloat32 (i);
 		if (array[i].m_x < max_x) {
@@ -996,7 +994,6 @@ return PruneContactsFallback(count, contactArray, distTol, maxCount);
 	for (dgInt32 i = 0; i < count; i++) {
 		dgInt32 index = dgInt32 (array[i].m_w);
 		tmpContact[i] = contactArray[index];
-		tmpContact[i].m_penetration = maxPenetration;
 	}
 
 	memcpy (contactArray, tmpContact, count * sizeof (dgContactPoint));

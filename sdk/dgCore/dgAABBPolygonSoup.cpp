@@ -737,10 +737,6 @@ dgAABBPolygonSoup::dgNodeBuilder* dgAABBPolygonSoup::BuildTopDown (dgNodeBuilder
 	}
 }
 
-
-
-
-
 void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild)
 {
 	if (builder.m_faceCount == 0) {
@@ -1197,7 +1193,6 @@ void dgAABBPolygonSoup::ForAllSectorsRayHit (const dgFastRayTest& raySrc, dgFloa
 		}
 	}
 }
-
 
 void dgAABBPolygonSoup::ForAllSectors (const dgFastAABBInfo& obbAabbInfo, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const
 {

@@ -3906,7 +3906,6 @@ void NewtonCollisionForEachPolygonDo(const NewtonCollision* const collisionPtr, 
 	collision->DebugCollision (dgMatrix (matrixPtr), (dgCollision::OnDebugCollisionMeshCallback) callback, userDataPtr);
 }
 
-
 int NewtonCollisionGetType(const NewtonCollision* const collision)
 {
 	TRACE_FUNCTION(__FUNCTION__);
