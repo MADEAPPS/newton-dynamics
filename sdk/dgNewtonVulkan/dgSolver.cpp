@@ -36,6 +36,7 @@ dgSolver::dgSolver(dgWorld* const world, dgMemoryAllocator* const allocator)
 	,m_soaZero(0.0f)
 	,m_zero(0.0f)
 	,m_negOne(-1.0f)
+	,m_unitRotation(0.0f, 0.0f, 0.0f, 1.0f)
 	,m_massMatrix(allocator)
 {
 	m_world = world;
@@ -125,27 +126,44 @@ void dgSolver::InitBodyArray()
 
 	dgBodyInfo* const bodyArray = m_bodyArray;
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
-	const dgInt32 groupCount = DG_GPU_WORKGROUP_SIZE * ((bodyCount + DG_GPU_WORKGROUP_SIZE) / DG_GPU_WORKGROUP_SIZE);
 
+	const dgInt32 groupCount = DG_GPU_WORKGROUP_SIZE * dgInt32 ((bodyCount + DG_GPU_WORKGROUP_SIZE - 1) / DG_GPU_WORKGROUP_SIZE);
+
+	dgVector* const damp = m_gpuBodyArray.m_damp.Lock(m_context, groupCount);
 	dgVector* const veloc = m_gpuBodyArray.m_veloc.Lock(m_context, groupCount);
 	dgVector* const omega = m_gpuBodyArray.m_omega.Lock(m_context, groupCount);
-	dgVector* const damp = m_gpuBodyArray.m_damp.Lock(m_context, groupCount);
+	dgVector* const invMass = m_gpuBodyArray.m_invMass.Lock(m_context, groupCount);
+	dgVector* const position = m_gpuBodyArray.m_position.Lock(m_context, groupCount);
+	dgVector* const rotation = m_gpuBodyArray.m_rotation.Lock(m_context, groupCount);
+
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
 		const dgBodyInfo* const bodyInfo = &bodyArray[i];
 		dgDynamicBody* const body = (dgDynamicBody*)bodyInfo->m_body;
 		veloc[i] = body->m_veloc;
 		omega[i] = body->m_omega;
+		invMass[i] = body->m_invMass;
+		position[i] = body->m_matrix.m_posit;
+		rotation[i] = dgVector(&body->m_rotation.m_x);
 		damp[i] = body->GetDampCoeffcient(m_timestep);
 	}
+
 	dgVector zero(m_zero);
+	dgVector unitRotation(m_unitRotation);
 	for (dgInt32 i = bodyCount; i < groupCount; i++) {
 		damp[i] = zero;
 		veloc[i] = zero;
 		omega[i] = zero;
+		invMass[i] = zero;
+		position[i] = zero;
+		rotation[i] = unitRotation;
 	}
+
 	m_gpuBodyArray.m_damp.Unlock(m_context);
 	m_gpuBodyArray.m_omega.Unlock(m_context);
 	m_gpuBodyArray.m_veloc.Unlock(m_context);
+	m_gpuBodyArray.m_invMass.Unlock(m_context);
+	m_gpuBodyArray.m_position.Unlock(m_context);
+	m_gpuBodyArray.m_rotation.Unlock(m_context);
 
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
 		m_world->QueueJob(InitBodyArrayKernel, this, NULL, "dgSolver::InitBodyArray");

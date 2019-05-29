@@ -428,7 +428,6 @@ class dgArrayGPU
 	{
 		void* ptr;
 		VkResult result = VK_SUCCESS;
-		//VkFlags flags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
 		result = vkMapMemory(context.m_device, m_memory, 0, size * sizeof (T), 0, &ptr);
 		dgAssert(result == VK_SUCCESS);
 		dgAssert((((dgUnsigned64)ptr) & 0xf) == 0);
@@ -449,48 +448,61 @@ class dgGpuBody
 	public:
 	dgGpuBody()
 		:m_count(0)
-		,m_bufferSize(DG_GPU_BODY_INITIAL_COUNT)
-		,m_veloc()
-		,m_omega()
-		,m_damp()
+		,m_bufferSize(0)
 	{
+	}
+
+	~dgGpuBody()
+	{
+		dgAssert(!m_bufferSize);
 	}
 
 	void Clear(dgVulkanContext& context)
 	{
-		m_damp.Free(context);
-		m_veloc.Free(context);
-		m_omega.Free(context);
+		if (m_bufferSize) {
+			m_damp.Free(context);
+			m_veloc.Free(context);
+			m_omega.Free(context);
+			m_invMass.Free(context);
+			m_rotation.Free(context);
+			m_position.Free(context);
+		}
+		m_bufferSize = 0;
+	}
+
+	void Alloc(dgVulkanContext& context, dgInt32 size)
+	{
+		m_damp.Alloc(context, size);
+		m_veloc.Alloc(context, size);
+		m_omega.Alloc(context, size);
+		m_invMass.Alloc(context, size);
+		m_rotation.Alloc(context, size);
+		m_position.Alloc(context, size);
+		m_bufferSize = size;
 	}
 
 	void Resize(dgVulkanContext& context, dgInt32 size)
 	{
-		if (size > m_count) {
-			m_damp.Free(context);
-			m_veloc.Free(context);
-			m_omega.Free(context);
-		
-			m_count = size;
-			size = dgMax(size, DG_GPU_BODY_INITIAL_COUNT);
-			while (size < m_bufferSize) {
-				size *= 2;
+		m_count = size;
+		dgInt32 roundSize = DG_GPU_BODY_INITIAL_COUNT * dgInt32((size + DG_GPU_BODY_INITIAL_COUNT - 1) / DG_GPU_BODY_INITIAL_COUNT);
+		if (roundSize > m_bufferSize) {
+			const dgInt32 bufferSize = m_bufferSize;
+			Clear(context);
+			while (roundSize < bufferSize) {
+				roundSize *= 2;
 			}
-		
-			m_damp.Alloc(context, size);
-			m_veloc.Alloc(context, size);
-			m_omega.Alloc(context, size);
-			m_bufferSize = size;
+			Alloc(context, roundSize);
 		}
 	}
 
 	dgInt32 m_count;
 	dgInt32 m_bufferSize;
-	dgArrayGPU<dgVector> m_rotation;
-	dgArrayGPU<dgVector> m_position;
+	dgArrayGPU<dgVector> m_invMass;
 	dgArrayGPU<dgVector> m_veloc;
 	dgArrayGPU<dgVector> m_omega;
 	dgArrayGPU<dgVector> m_damp;
-	
+	dgArrayGPU<dgVector> m_rotation;
+	dgArrayGPU<dgVector> m_position;
 };
 
 
@@ -558,6 +570,7 @@ class dgSolver: public dgParallelBodySolver
 	dgSoaFloat m_soaZero;
 	dgVector m_zero;
 	dgVector m_negOne;
+	dgVector m_unitRotation;
 	dgArray<dgSoaMatrixElement> m_massMatrix;
 
 	dgVulkanContext m_context;
