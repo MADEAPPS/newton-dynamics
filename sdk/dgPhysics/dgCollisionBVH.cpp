@@ -375,7 +375,6 @@ void dgCollisionBVH::GetLocalAABB (const dgVector& p0, const dgVector& p1, dgVec
 	dgAssert (0);
 }
 
-
 struct dgCollisionBVHShowPolyContext
 {
 	dgMatrix m_matrix;
@@ -397,12 +396,11 @@ dgIntersectStatus dgCollisionBVH::ShowDebugPolygon (void* const context, const d
 		triplex[i].m_y = p.m_y;
 		triplex[i].m_z = p.m_z;
 	}
-	data.m_callback (data.m_userData, indexCount, &triplex[0].m_x, indexArray[-1]);
+//	data.m_callback (data.m_userData, indexCount, &triplex[0].m_x, indexArray[-1]);
+	data.m_callback (data.m_userData, indexCount, &triplex[0].m_x, indexArray[indexCount]);
 
 	return t_ContinueSearh;
 }
-
-
 
 void dgCollisionBVH::DebugCollision (const dgMatrix& matrixPtr, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {

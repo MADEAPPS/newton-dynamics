@@ -216,7 +216,7 @@ DG_MSC_VECTOR_ALIGMENT
 class dgCollision
 {
 	public:
-	typedef void (dgApi *OnDebugCollisionMeshCallback) (void* userData, int vertexCount, const dgFloat32* FaceArray, int faceId);
+	typedef void (dgApi *OnDebugCollisionMeshCallback) (void* userData, int vertexCount, const dgFloat32* faceArray, int faceId);
 
 	enum dgRTTI {
 		dgCollisionNull_RTTI						= 1<<0,
