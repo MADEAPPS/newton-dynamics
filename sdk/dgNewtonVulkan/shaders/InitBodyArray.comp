@@ -32,14 +32,43 @@ void main()
 {
 	uint i = gl_GlobalInvocationID.x;
 
+	// convert quat to 3x 3 matrix 
+	mat3 rotationMatrix;
 	vec4 rotation = m_rotation[i];
-	vec4 damp = m_damp[i];
-    vec4 veloc = m_veloc[i];
-    vec4 omega = m_omega[i];
 
-	veloc = veloc * damp.w;
-	omega = omega * damp;
+	float x2 = 2.0f * rotation.x * rotation.x;
+	float y2 = 2.0f * rotation.y * rotation.y;
+	float z2 = 2.0f * rotation.z * rotation.z;
 
-	m_veloc[i] = veloc;
-	m_omega[i] = omega;
+	float xy = 2.0 * rotation.x * rotation.y;
+	float xz = 2.0 * rotation.x * rotation.z;
+	float xw = 2.0 * rotation.x * rotation.w;
+	float yz = 2.0 * rotation.y * rotation.z;
+	float yw = 2.0 * rotation.y * rotation.w;
+	float zw = 2.0 * rotation.z * rotation.w;
+
+	rotationMatrix[0][0] = 1.0 - y2 - z2;
+	rotationMatrix[0][1] = xy + zw;
+	rotationMatrix[0][2] = xz - yw;
+
+	rotationMatrix[1][0] = xy - zw;
+	rotationMatrix[1][1] = 1.0 - x2 - z2;
+	rotationMatrix[1][2] = yz + xw;
+
+	rotationMatrix[2][0] = xz + yw;
+	rotationMatrix[2][1] = yz - xw;
+	rotationMatrix[2][2] = 1.0 - x2 - y2;
+	
+	// load damping coeficients
+	float velocDamp = m_damp[i].w;
+	vec3 omegaDamp = vec3 (m_damp[i].x, m_damp[i].y, m_damp[i].z);
+
+    vec3 veloc = vec3 (m_veloc[i].x, m_veloc[i].y, m_veloc[i].z);
+    vec3 omega = vec3 (m_omega[i].x, m_omega[i].y, m_omega[i].z);
+
+	veloc = veloc * velocDamp;
+	omega = ((rotationMatrix * omega) * omegaDamp) * rotationMatrix;
+
+	m_veloc[i] = vec4 (veloc, 0.0);
+	m_omega[i] = vec4 (omega, 0.0);
 }
