@@ -131,7 +131,11 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	context.m_instance = instance;
 	context.m_allocators = vkAllocators;
 	context.m_computeQueueIndex = computeQueueIndex;
-	sprintf (module.m_hardwareDeviceName, "NewtonVK %s", context.m_gpu_props.deviceName);
+#ifdef _DEBUG
+	sprintf (module.m_hardwareDeviceName, "NewtonVK_d %s", context.m_gpu_props.deviceName);
+#else
+	sprintf(module.m_hardwareDeviceName, "NewtonVK %s", context.m_gpu_props.deviceName);
+#endif
 	module.InitDevice();
 	return &module;
 }
