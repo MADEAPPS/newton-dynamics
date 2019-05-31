@@ -277,21 +277,12 @@ void dgWorldBase::InitDevice ()
 	vkGetPhysicalDeviceMemoryProperties(context.m_gpu, &context.m_memory_properties);
 
 	VkShaderModule xxx = CreateShaderModule("InitBodyArray");
-/*
-	VkShaderModuleCreateInfo shaderModuleCreateInfo = {
-		VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-		0,
-		0,
-		sizeof(shader),
-		(uint32_t*)&shader[0]
-	};
-*/
 }
 
 VkShaderModule dgWorldBase::CreateShaderModule(const char* const shaderName)
 {
 	char fullPath[1024];
-	uint32_t shaderCode[1024 * 32];
+	uint32_t shaderByteCode[1024 * 32];
 
 	sprintf(fullPath, "%s%s.spv", m_libPath, shaderName);
 	FILE* const file = fopen(fullPath, "rb");
@@ -300,14 +291,24 @@ VkShaderModule dgWorldBase::CreateShaderModule(const char* const shaderName)
 
 	int count = 1;
 	uint32_t code;
-	fscanf(file, "%x", &shaderCode);
-	while (!feof(file) && fscanf(file, ",%x", &code)) {
-		shaderCode[count] = code;
+	fscanf(file, "%x", &shaderByteCode);
+	while (!feof(file) && fscanf(file, ", %x", &code)) {
+		shaderByteCode[count] = code;
 		count++;
-		dgAssert(count < sizeof(shaderCode) / sizeof(shaderCode[0]));
+		dgAssert(count < sizeof(shaderByteCode) / sizeof(shaderByteCode[0]));
 	}
 
 	fclose(file);
+	
+	VkShaderModuleCreateInfo shaderModuleCreateInfo = {
+		VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+		0,
+		0,
+		count * sizeof (uint32_t),
+		(uint32_t*)&shaderByteCode[0]
+	};
+	
+
 	return 0;
 }
 
