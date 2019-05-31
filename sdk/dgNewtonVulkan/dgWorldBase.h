@@ -56,13 +56,18 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 
 	public:
 	void InitDevice ();
+	VkShaderModule CreateShaderModule (const char* const shaderName);
+
 	static void VKAPI_PTR vkFreeFunction(void* pUserData, void* pMemory);
 	static void* VKAPI_PTR vkAllocationFunction(void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope allocationScope);
 	static void* VKAPI_PTR vkReallocationFunction(void* pUserData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope allocationScope);
 	static void VKAPI_PTR vkInternalAllocationNotification(void* pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope);
 	static void VKAPI_PTR vkInternalFreeNotification(void* pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope);
 
+
+
 	char m_hardwareDeviceName[64];
+	static char m_libPath[];
 	int m_score;
 };
 

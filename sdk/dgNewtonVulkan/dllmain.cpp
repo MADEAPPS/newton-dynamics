@@ -20,6 +20,7 @@
 */
 
 #include "dgNewtonPluginStdafx.h"
+#include "dgWorldBase.h"
 
 #ifdef _WIN32
 BOOL APIENTRY DllMain( HMODULE hModule,
@@ -37,6 +38,17 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	}
 
 	// GPU module are assumed to be valid at this point
+
+#if defined (_MSC_VER)
+	GetModuleFileNameA(hModule, dgWorldBase::m_libPath, 256);
+	char* ptr = strrchr(dgWorldBase::m_libPath, '/');
+	if (!ptr) {
+		ptr = strrchr(dgWorldBase::m_libPath, '\\');
+	}
+	ptr[0] = '/';
+	ptr[1] = 0;
+#endif
+
 	return TRUE;
 }
 #endif

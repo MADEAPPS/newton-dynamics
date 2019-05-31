@@ -587,7 +587,6 @@ void DemoEntityManager::Cleanup ()
 
 	// load all available plug ins
 	char plugInPath[2048];
-//	GetModuleFileNameA(NULL, plugInPath, 256);
 	plugInPath[0] = 0;
 	#if defined (_MSC_VER)
 		GetModuleFileNameA(NULL, plugInPath, 256);

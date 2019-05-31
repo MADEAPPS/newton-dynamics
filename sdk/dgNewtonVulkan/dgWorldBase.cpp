@@ -22,6 +22,8 @@
 #include "dgNewtonPluginStdafx.h"
 #include "dgWorldBase.h"
 
+char dgWorldBase::m_libPath[256];
+
 
 // This is an example of an exported function.
 dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
@@ -273,6 +275,40 @@ void dgWorldBase::InitDevice ()
 
     vkGetDeviceQueue(context.m_device, context.m_computeQueueIndex, 0, &context.m_queue);
 	vkGetPhysicalDeviceMemoryProperties(context.m_gpu, &context.m_memory_properties);
+
+	VkShaderModule xxx = CreateShaderModule("InitBodyArray");
+/*
+	VkShaderModuleCreateInfo shaderModuleCreateInfo = {
+		VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+		0,
+		0,
+		sizeof(shader),
+		(uint32_t*)&shader[0]
+	};
+*/
+}
+
+VkShaderModule dgWorldBase::CreateShaderModule(const char* const shaderName)
+{
+	char fullPath[1024];
+	uint32_t shaderCode[1024 * 32];
+
+	sprintf(fullPath, "%s%s.spv", m_libPath, shaderName);
+	FILE* const file = fopen(fullPath, "rb");
+	dgAssert(file);
+	fgets(fullPath, sizeof (fullPath), file);
+
+	int count = 1;
+	uint32_t code;
+	fscanf(file, "%x", &shaderCode);
+	while (!feof(file) && fscanf(file, ",%x", &code)) {
+		shaderCode[count] = code;
+		count++;
+		dgAssert(count < sizeof(shaderCode) / sizeof(shaderCode[0]));
+	}
+
+	fclose(file);
+	return 0;
 }
 
 void* dgWorldBase::vkAllocationFunction(void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope allocationScope)
