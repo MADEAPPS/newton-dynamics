@@ -300,14 +300,18 @@ VkShaderModule dgWorldBase::CreateShaderModule(const char* const shaderName)
 
 	fclose(file);
 	
-	VkShaderModuleCreateInfo shaderModuleCreateInfo = {
-		VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-		0,
-		0,
-		count * sizeof (uint32_t),
-		(uint32_t*)&shaderByteCode[0]
-	};
+	VkShaderModuleCreateInfo shaderModuleCreateInfo;
+	Clear(&shaderModuleCreateInfo);
+	shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	shaderModuleCreateInfo.codeSize = count * sizeof(uint32_t);
+	shaderModuleCreateInfo.pCode = (uint32_t*)&shaderByteCode[0];
 	
+	VkShaderModule module;
+	VkResult err = VK_SUCCESS;
+
+//	dgVulkanContext& context = GetContext();
+//	err = vkCreateShaderModule(context.m_device, &shaderModuleCreateInfo, 0, &module);
+//	dgAssert(err == VK_SUCCESS);
 
 	return 0;
 }
