@@ -1,3 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\dgNewtonVulkan\dgNewtonPluginStdafx.cpp" />
+    <ClCompile Include="..\..\dgNewtonVulkan\dgSolver.cpp" />
+    <ClCompile Include="..\..\dgNewtonVulkan\dgWorldBase.cpp" />
+    <ClCompile Include="..\..\dgNewtonVulkan\dllmain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\dgNewtonVulkan\dgNewtonPluginStdafx.h" />
+    <ClInclude Include="..\..\dgNewtonVulkan\dgSolver.h" />
+    <ClInclude Include="..\..\dgNewtonVulkan\dgWorldBase.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{7c4396af-1d14-4632-9c0a-aa90bcb5a7d4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\dgNewtonVulkan\shaders\test.comp">
+      <Filter>shaders</Filter>
+    </CustomBuild>
+  </ItemGroup>
 </Project>
