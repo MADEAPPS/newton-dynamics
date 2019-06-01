@@ -17,8 +17,8 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\dgNewtonVulkan\shaders\InitBodyArray.comp">
+    <CustomBuild Include="..\..\dgNewtonVulkan\shaders\InitBodyArray.comp">
       <Filter>shaders</Filter>
-    </None>
+    </CustomBuild>
   </ItemGroup>
 </Project>

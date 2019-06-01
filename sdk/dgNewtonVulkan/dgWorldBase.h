@@ -31,19 +31,6 @@ extern "C"
 }
 #endif
 
-
-/*
-#define GET_INSTANCE_PROC_ADDR(inst, entrypoint)                                                              \
-{                                                                                                         \
-	demo->fp##entrypoint = (PFN_vk##entrypoint)vkGetInstanceProcAddr(inst, "vk" #entrypoint);             \
-	if (demo->fp##entrypoint == NULL) {
-	\
-	ERR_EXIT("vkGetInstanceProcAddr failed to find vk" #entrypoint, "vkGetInstanceProcAddr Failure"); \
-}                                                                                                     \
-}
-*/
-
-
 class dgWorldBase: public dgWorldPlugin, public dgSolver
 {
 	public:
@@ -55,7 +42,8 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
 	public:
-	void InitDevice ();
+	void InitDevice (VkInstance instance, VkAllocationCallbacks* const allocators);
+	void DestroyDevice ();
 	VkShaderModule CreateShaderModule (const char* const shaderName);
 
 	static void VKAPI_PTR vkFreeFunction(void* pUserData, void* pMemory);
@@ -64,10 +52,9 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 	static void VKAPI_PTR vkInternalAllocationNotification(void* pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope);
 	static void VKAPI_PTR vkInternalFreeNotification(void* pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope);
 
-
-
 	char m_hardwareDeviceName[64];
 	static char m_libPath[];
+	static dgInt32 m_totalMemory;
 	int m_score;
 };
 

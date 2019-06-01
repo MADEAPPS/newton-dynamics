@@ -1,7 +1,12 @@
 #version 450 core
 
-layout(local_size_x = 256) in;
+layout(local_size_x = 1) in;
 
+void main()
+{
+}
+
+#if 0
 layout( std140, binding=1 ) buffer rotation
 {
     vec4 m_rotation[];
@@ -72,3 +77,5 @@ void main()
 	m_veloc[i] = vec4 (veloc, 0.0);
 	m_omega[i] = vec4 (omega, 0.0);
 }
+
+#endif

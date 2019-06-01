@@ -348,14 +348,23 @@ class dgVulkanContext
 		memset(this, 0, sizeof(dgVulkanContext));
 	}
 
+	dgInt32 m_totalMemory;
+	dgInt32 m_computeQueueIndex;
+
 	VkQueue m_queue;
 	VkDevice m_device;
 	VkInstance m_instance;
 	VkPhysicalDevice m_gpu;
-	VkPhysicalDeviceProperties m_gpu_props;
 	VkAllocationCallbacks m_allocators;
+	VkPhysicalDeviceProperties m_gpu_props;
 	VkPhysicalDeviceMemoryProperties m_memory_properties;
-	int m_computeQueueIndex;
+	
+	VkPipelineCache m_pipeLineCache;
+
+	VkPipeline m_initBodyPipeLine;
+	VkShaderModule m_initBodyModule;
+	VkDescriptorSetLayout m_initBodyLayout;
+	VkPipelineLayout m_initBodyPipelineLayout;
 };
 
 

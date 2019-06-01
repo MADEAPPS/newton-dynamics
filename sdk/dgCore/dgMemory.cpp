@@ -52,7 +52,7 @@ class dgMemoryAllocator::dgMemoryBin
 		public:
 		dgInt32 m_count;
 		dgInt32 m_totalCount;
-		dgInt32 m_stepInBites;
+		dgInt32 m_stepInBytes;
 		dgMemoryBin* m_next;
 		dgMemoryBin* m_prev;
 	};
@@ -250,7 +250,7 @@ void *dgMemoryAllocator::Malloc (dgInt32 memsize)
 			dgInt32 count = dgInt32 (sizeof (bin->m_pool) / paddedSize);
 			bin->m_info.m_count = 0;
 			bin->m_info.m_totalCount = count;
-			bin->m_info.m_stepInBites = paddedSize;
+			bin->m_info.m_stepInBytes = paddedSize;
 			bin->m_info.m_next = m_memoryDirectory[entry].m_first;
 			bin->m_info.m_prev = NULL;
 			if (bin->m_info.m_next) {
@@ -324,15 +324,15 @@ void dgMemoryAllocator::Free (void* const retPtr)
 
 		dgAssert (bin);
 #ifdef _DEBUG
-		dgAssert ((bin->m_info.m_stepInBites - DG_MEMORY_GRANULARITY) > 0);
-		memset (retPtr, 0, size_t(bin->m_info.m_stepInBites - DG_MEMORY_GRANULARITY));
+		dgAssert ((bin->m_info.m_stepInBytes - DG_MEMORY_GRANULARITY) > 0);
+		memset (retPtr, 0, size_t(bin->m_info.m_stepInBytes - DG_MEMORY_GRANULARITY));
 #endif
 
 		bin->m_info.m_count --;
 		if (bin->m_info.m_count == 0) {
 
 			dgInt32 count = bin->m_info.m_totalCount;
-			dgInt32 sizeInBytes = bin->m_info.m_stepInBites;
+			dgInt32 sizeInBytes = bin->m_info.m_stepInBytes;
 			char* charPtr = bin->m_pool;
 			for (dgInt32 i = 0; i < count; i ++) {
 				dgMemoryCacheEntry* const tmpCashe1 = (dgMemoryCacheEntry*)charPtr;

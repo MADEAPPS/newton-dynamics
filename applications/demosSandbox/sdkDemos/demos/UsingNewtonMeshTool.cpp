@@ -245,7 +245,8 @@ static void DebugJernejLMesh (DemoEntityManager* const scene)
 	dMatrix matrix(dPitchMatrix(90.0f * dDegreeToRad));
 	matrix.m_posit.m_y += 0.0f;
 	matrix.m_posit.m_x -= 40.0f;
-	NewtonBody* const level = NewtonCreateDynamicBody(scene->GetNewton(), collision, &matrix[0][0]);
+	NewtonBody* level = NULL;
+	level = NewtonCreateDynamicBody(scene->GetNewton(), collision, &matrix[0][0]);
 	NewtonDestroyCollision(collision);
 }
 
