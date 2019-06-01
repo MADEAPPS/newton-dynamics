@@ -277,10 +277,12 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 	} while (ptr != first);
 
 	m_count = count;
+
 #ifdef DG_FIX_CONVEX_BUG
 	dgInt32 i0 = m_count - 1;
 	for (dgInt32 i = 0; i < m_count; i++) {
 		dgVector edge(m_localPoly[i] - m_localPoly[i0]);
+		dgAssert(edge.DotProduct(edge).GetScalar() > dgFloat32(0.0f));
 		edge = edge.Normalize();
 		const dgInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[i0];
 		dgVector localAdjacentNormal(&m_vertex[adjacentNormalIndex * m_stride]);
