@@ -1,81 +1,68 @@
 #version 450 core
 
-layout(local_size_x = 1) in;
+struct BodyData
+{
+	vec4 m_rotation;
+	vec4 m_position;
+	vec4 m_veloc;
+	vec4 m_omega;
+	vec4 m_damp;
+};
+
+layout (std430, binding = 0) buffer bodyArray
+{
+   BodyData m_body[];
+};
+
+
+layout(local_size_x = 256) in;
 
 void main()
 {
-}
-
-#if 0
-layout( std140, binding=1 ) buffer rotation
-{
-    vec4 m_rotation[];
-};
-
-layout( std140, binding=2 ) buffer position
-{
-    vec4 m_position[];
-};
-
-layout( std140, binding=3 ) buffer velocity
-{
-    vec4 m_veloc[];
-};
-
-layout( std140, binding=4 ) buffer omega
-{
-    vec4 m_omega[];
-};
-
-layout( std140, binding=5 ) buffer damping
-{
-    vec4 m_damp[];
-};
-
-
-void main()
-{
+/*
 	uint i = gl_GlobalInvocationID.x;
 
+	BodyData body = m_body[i];
+
 	// convert quat to 3x 3 matrix 
-	mat3 rotationMatrix;
-	vec4 rotation = m_rotation[i];
+	vec4 quat0 = body.m_rotation;
+	vec4 quat1 = quat0 * 2.0;
 
-	float x2 = 2.0f * rotation.x * rotation.x;
-	float y2 = 2.0f * rotation.y * rotation.y;
-	float z2 = 2.0f * rotation.z * rotation.z;
+	float x2 = quat0.x * quat1.x;
+	float y2 = quat0.y * quat1.y;
+	float z2 = quat0.z * quat1.z;
+	float xy = quat0.x * quat1.y;
+	float xz = quat0.x * quat1.z;
+	float xw = quat0.x * quat1.w;
+	float yz = quat0.y * quat1.z;
+	float yw = quat0.y * quat1.w;
+	float zw = quat0.z * quat1.w;
 
-	float xy = 2.0 * rotation.x * rotation.y;
-	float xz = 2.0 * rotation.x * rotation.z;
-	float xw = 2.0 * rotation.x * rotation.w;
-	float yz = 2.0 * rotation.y * rotation.z;
-	float yw = 2.0 * rotation.y * rotation.w;
-	float zw = 2.0 * rotation.z * rotation.w;
+	mat3 rotation;
+	rotation[0][0] = 1.0 - y2 - z2;
+	rotation[0][1] = xy + zw;
+	rotation[0][2] = xz - yw;
 
-	rotationMatrix[0][0] = 1.0 - y2 - z2;
-	rotationMatrix[0][1] = xy + zw;
-	rotationMatrix[0][2] = xz - yw;
+	rotation[1][0] = xy - zw;
+	rotation[1][1] = 1.0 - x2 - z2;
+	rotation[1][2] = yz + xw;
 
-	rotationMatrix[1][0] = xy - zw;
-	rotationMatrix[1][1] = 1.0 - x2 - z2;
-	rotationMatrix[1][2] = yz + xw;
+	rotation[2][0] = xz + yw;
+	rotation[2][1] = yz - xw;
+	rotation[2][2] = 1.0 - x2 - y2;
 
-	rotationMatrix[2][0] = xz + yw;
-	rotationMatrix[2][1] = yz - xw;
-	rotationMatrix[2][2] = 1.0 - x2 - y2;
-	
-	// load damping coeficients
-	float velocDamp = m_damp[i].w;
-	vec3 omegaDamp = vec3 (m_damp[i].x, m_damp[i].y, m_damp[i].z);
+	float velocDamp = body.m_damp.w;
+	vec3 omegaDamp = vec3 (body.m_damp.x, body.m_damp.y, body.m_damp.z);
 
-    vec3 veloc = vec3 (m_veloc[i].x, m_veloc[i].y, m_veloc[i].z);
-    vec3 omega = vec3 (m_omega[i].x, m_omega[i].y, m_omega[i].z);
+	vec3 veloc = vec3 (body.m_veloc.x, body.m_veloc.y, body.m_veloc.z);
+	vec3 omega = vec3 (body.m_omega.x, body.m_omega.y, body.m_omega.z);
 
-	veloc = veloc * velocDamp;
-	omega = ((rotationMatrix * omega) * omegaDamp) * rotationMatrix;
+//	veloc = veloc * velocDamp;
+//	omega = ((rotation * omega) * omegaDamp) * rotation;
+//	omega = rotation * omega;
 
-	m_veloc[i] = vec4 (veloc, 0.0);
-	m_omega[i] = vec4 (omega, 0.0);
+//	m_body[i].m_veloc = vec4 (veloc, 0.0);
+//	m_body[i].m_omega = vec4 (omega, 0.0);
+*/
 }
 
-#endif

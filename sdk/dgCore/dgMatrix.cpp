@@ -87,28 +87,30 @@ const dgMatrix& dgGetZeroMatrix ()
 }
 
 
-dgMatrix::dgMatrix (const dgQuaternion &rotation, const dgVector &position)
+dgMatrix::dgMatrix (const dgQuaternion &quat0, const dgVector &position)
 {
-	dgFloat32 x2 = dgFloat32 (2.0f) * rotation.m_x * rotation.m_x;
-	dgFloat32 y2 = dgFloat32 (2.0f) * rotation.m_y * rotation.m_y;
-	dgFloat32 z2 = dgFloat32 (2.0f) * rotation.m_z * rotation.m_z;
+	dgQuaternion quat1 (quat0);
+	quat1.Scale(dgFloat32 (2.0f));
+
+	dgFloat32 x2 = quat0.m_x * quat1.m_x;
+	dgFloat32 y2 = quat0.m_y * quat1.m_y;
+	dgFloat32 z2 = quat0.m_z * quat1.m_z;
 
 #ifdef _DEBUG
-	dgFloat32 w2 = dgFloat32 (2.0f) * rotation.m_w * rotation.m_w;
+	dgFloat32 w2 = quat0.m_w * quat1.m_w;
 	dgAssert (dgAbs (w2 + x2 + y2 + z2 - dgFloat32(2.0f)) <dgFloat32 (1.0e-3f));
 #endif
 
-	dgFloat32 xy = dgFloat32 (2.0f) * rotation.m_x * rotation.m_y;
-	dgFloat32 xz = dgFloat32 (2.0f) * rotation.m_x * rotation.m_z;
-	dgFloat32 xw = dgFloat32 (2.0f) * rotation.m_x * rotation.m_w;
-	dgFloat32 yz = dgFloat32 (2.0f) * rotation.m_y * rotation.m_z;
-	dgFloat32 yw = dgFloat32 (2.0f) * rotation.m_y * rotation.m_w;
-	dgFloat32 zw = dgFloat32 (2.0f) * rotation.m_z * rotation.m_w;
+	dgFloat32 xy = quat0.m_x * quat1.m_y;
+	dgFloat32 xz = quat0.m_x * quat1.m_z;
+	dgFloat32 xw = quat0.m_x * quat1.m_w;
+	dgFloat32 yz = quat0.m_y * quat1.m_z;
+	dgFloat32 yw = quat0.m_y * quat1.m_w;
+	dgFloat32 zw = quat0.m_z * quat1.m_w;
 
-	m_front = dgVector (dgFloat32(1.0f) - y2 - z2, xy + zw,                   xz - yw				    , dgFloat32(0.0f));
-	m_up    = dgVector (xy - zw,                   dgFloat32(1.0f) - x2 - z2, yz + xw					, dgFloat32(0.0f));
-	m_right = dgVector (xz + yw,                   yz - xw,                   dgFloat32(1.0f) - x2 - y2 , dgFloat32(0.0f));
-
+	m_front = dgVector (dgFloat32(1.0f) - y2 - z2, xy + zw, xz - yw, dgFloat32(0.0f));
+	m_up    = dgVector (xy - zw, dgFloat32(1.0f) - x2 - z2, yz + xw, dgFloat32(0.0f));
+	m_right = dgVector (xz + yw, yz - xw, dgFloat32(1.0f) - x2 - y2, dgFloat32(0.0f));
 
 	m_posit.m_x = position.m_x;
 	m_posit.m_y = position.m_y;
