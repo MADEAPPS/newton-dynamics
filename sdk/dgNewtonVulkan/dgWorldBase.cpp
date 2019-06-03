@@ -25,10 +25,13 @@
 dgInt32 dgWorldBase::m_totalMemory = 0;
 char dgWorldBase::m_libPath[256];
 
+const char* dgWorldBase::m_validationLayer0 = "VK_LAYER_KHRONOS_validation";
+
 
 // This is an example of an exported function.
 dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
 {
+	VkResult error = VK_SUCCESS;
 	VkApplicationInfo app;
 	Clear(&app);
 	app.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -38,12 +41,31 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	app.engineVersion = 314;
 	app.apiVersion = VK_API_VERSION_1_0;
 
+	uint32_t layersCount;
+	const char* layersNames[64];
+	error = vkEnumerateInstanceLayerProperties(&layersCount, NULL);
+	dgAssert(error == VK_SUCCESS);
+
+	if (layersCount) {
+		VkLayerProperties layers[64];
+		dgAssert(layersCount < sizeof (layers) / sizeof (layers[0]));
+		error = vkEnumerateInstanceLayerProperties(&layersCount, layers);
+		dgAssert(error == VK_SUCCESS);
+
+		dgInt32 index = dgWorldBase::FindLayer(dgWorldBase::m_validationLayer0, layersCount, layers);
+		dgAssert (index != -1);
+
+		layersNames[0] = dgWorldBase::m_validationLayer0;
+		layersCount = 1;
+	}
+
+
 	VkInstanceCreateInfo inst_info;
 	Clear(&inst_info);
 	inst_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
 	inst_info.pApplicationInfo = &app;
-	inst_info.enabledLayerCount = 0;
-	inst_info.ppEnabledLayerNames = NULL;
+	inst_info.enabledLayerCount = layersCount;
+	inst_info.ppEnabledLayerNames = layersNames;
 	inst_info.enabledExtensionCount = 0;
 	inst_info.ppEnabledExtensionNames = NULL;
 
@@ -57,7 +79,7 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	vkAllocators.pfnInternalFree = dgWorldBase::vkInternalFreeNotification;
 
 	VkInstance instance;
-	VkResult error = vkCreateInstance(&inst_info, &vkAllocators, &instance);
+	error = vkCreateInstance(&inst_info, &vkAllocators, &instance);
 	if (error != VK_SUCCESS) {
 		return NULL;
 	}
@@ -177,7 +199,6 @@ void dgWorldBase::InitDevice (VkInstance instance, VkAllocationCallbacks* const 
 	deviceInfo.pEnabledFeatures = NULL;
   	err = vkCreateDevice(context.m_gpu, &deviceInfo, &context.m_allocators, &context.m_device);
 	dgAssert(err == VK_SUCCESS);
-
 
 	vkGetPhysicalDeviceMemoryProperties(context.m_gpu, &context.m_memory_properties);
 	vkGetDeviceQueue(context.m_device, context.m_computeQueueIndex, 0, &context.m_queue);
@@ -304,6 +325,16 @@ VkShaderModule dgWorldBase::CreateShaderModule(const char* const shaderName)
 	dgAssert(err == VK_SUCCESS);
 
 	return module;
+}
+
+dgInt32 dgWorldBase::FindLayer(const char* const name, dgInt32 count, VkLayerProperties* const layers)
+{
+	for (dgInt32 i = 0; i < count; i++) {
+		if (!strcmp(name, layers[i].layerName)) {
+			return i;
+		}
+	}
+	return -1;
 }
 
 void* dgWorldBase::vkAllocationFunction(void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope allocationScope)

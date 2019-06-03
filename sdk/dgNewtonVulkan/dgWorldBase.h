@@ -44,16 +44,21 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 	public:
 	void InitDevice (VkInstance instance, VkAllocationCallbacks* const allocators);
 	void DestroyDevice ();
-	VkShaderModule CreateShaderModule (const char* const shaderName);
+	
 
+	VkShaderModule CreateShaderModule (const char* const shaderName);
+	
 	static void VKAPI_PTR vkFreeFunction(void* pUserData, void* pMemory);
 	static void* VKAPI_PTR vkAllocationFunction(void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope allocationScope);
 	static void* VKAPI_PTR vkReallocationFunction(void* pUserData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope allocationScope);
 	static void VKAPI_PTR vkInternalAllocationNotification(void* pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope);
 	static void VKAPI_PTR vkInternalFreeNotification(void* pUserData, size_t size, VkInternalAllocationType allocationType, VkSystemAllocationScope allocationScope);
 
+	static dgInt32 FindLayer(const char* const name, dgInt32 count, VkLayerProperties* const layers);
+
 	char m_hardwareDeviceName[64];
 	static char m_libPath[];
+	static const char* m_validationLayer0;
 	static dgInt32 m_totalMemory;
 	int m_score;
 };
