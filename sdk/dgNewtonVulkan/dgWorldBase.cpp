@@ -52,8 +52,8 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 		error = vkEnumerateInstanceLayerProperties(&layersCount, layers);
 		dgAssert(error == VK_SUCCESS);
 
-		dgInt32 index = dgWorldBase::FindLayer(dgWorldBase::m_validationLayer0, layersCount, layers);
-		dgAssert (index != -1);
+		dgAssert(dgWorldBase::FindLayer(dgWorldBase::m_validationLayer0, layersCount, layers) != -1);
+		dgAssert(dgWorldBase::FindLayer(dgWorldBase::m_validationLayer1, layersCount, layers) != -1);
 
 		layersNames[0] = dgWorldBase::m_validationLayer0;
 		layersNames[1] = dgWorldBase::m_validationLayer1;
@@ -214,7 +214,8 @@ void dgWorldBase::InitDevice (VkInstance instance, VkAllocationCallbacks* const 
 	context.m_initBodyModule = CreateShaderModule("InitBodyArray");
 
 
-	VkDescriptorSetLayoutBinding descriptorSetLayoutBindings[2] = {
+	VkDescriptorSetLayoutBinding descriptorSetLayoutBindings[2] = 
+	{
 		{
 			0,
 			VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -231,38 +232,21 @@ void dgWorldBase::InitDevice (VkInstance instance, VkAllocationCallbacks* const 
 		}
 	};
 
-	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo = {
-		VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-		0,
-		0,
-		2,
-		descriptorSetLayoutBindings
-	};
+	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo;
+	Clear (&descriptorSetLayoutCreateInfo);
 
-	//Clear (&descriptorSetLayoutCreateInfo);
-
-	//descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-
-	err = vkCreateDescriptorSetLayout(context.m_device, &descriptorSetLayoutCreateInfo, 0, &context.m_initBodyLayout);
+	descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	descriptorSetLayoutCreateInfo.bindingCount = 2;
+	descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayoutBindings;
+	err = vkCreateDescriptorSetLayout(context.m_device, &descriptorSetLayoutCreateInfo, &context.m_allocators, &context.m_initBodyLayout);
 	dgAssert(err == VK_SUCCESS);
 
-	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo = {
-		VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-		0,
-		0,
-		1,
-		&context.m_initBodyLayout,//descriptorSetLayout,
-		0,
-		0
-	};
-
-	//VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
-	//Clear (&pipelineLayoutCreateInfo);
-	//pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	//pipelineLayoutCreateInfo.setLayoutCount;
-	//pipelineLayoutCreateInfo.pSetLayouts = &context.m_initBodyLayout;
-
-	err = vkCreatePipelineLayout(context.m_device, &pipelineLayoutCreateInfo, 0, &context.m_initBodyPipelineLayout);
+	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
+	Clear (&pipelineLayoutCreateInfo);
+	pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipelineLayoutCreateInfo.setLayoutCount = 1;
+	pipelineLayoutCreateInfo.pSetLayouts = &context.m_initBodyLayout;
+	err = vkCreatePipelineLayout(context.m_device, &pipelineLayoutCreateInfo, &context.m_allocators, &context.m_initBodyPipelineLayout);
 	dgAssert(err == VK_SUCCESS);
 
 	VkPipelineShaderStageCreateInfo loadPipelineShaderStage;

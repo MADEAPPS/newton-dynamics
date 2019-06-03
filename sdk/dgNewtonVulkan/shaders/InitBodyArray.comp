@@ -17,19 +17,10 @@ layout (std430, binding = 0) buffer bodyArray
 
 layout(local_size_x = 256) in;
 
-void main()
+
+mat3 QuatToMatrix(vec4 quat0)
 {
-// changing the if 0 top if 1 makes vkCreateComputePipelines fail
-#if 1
-
-	uint i = gl_GlobalInvocationID.x;
-
-	BodyData body = m_body[i];
-
-	// convert quat to 3x 3 matrix 
-	vec4 quat0 = body.m_rotation;
 	vec4 quat1 = quat0 * 2.0;
-
 	float x2 = quat0.x * quat1.x;
 	float y2 = quat0.y * quat1.y;
 	float z2 = quat0.z * quat1.z;
@@ -52,6 +43,17 @@ void main()
 	rotation[2][0] = xz + yw;
 	rotation[2][1] = yz - xw;
 	rotation[2][2] = 1.0 - x2 - y2;
+	
+	return rotation;
+}
+
+
+void main()
+{
+	uint i = gl_GlobalInvocationID.x;
+
+	BodyData body = m_body[i];
+	mat3 rotation = QuatToMatrix(body.m_rotation);
 
 	float velocDamp = body.m_damp.w;
 	vec3 omegaDamp = vec3 (body.m_damp.x, body.m_damp.y, body.m_damp.z);
@@ -65,6 +67,5 @@ void main()
 
 	m_body[i].m_veloc = vec4 (veloc, 0.0);
 	m_body[i].m_omega = vec4 (omega, 0.0);
-#endif
 }
 
