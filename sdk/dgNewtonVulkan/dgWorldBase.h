@@ -59,6 +59,7 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 	char m_hardwareDeviceName[64];
 	static char m_libPath[];
 	static const char* m_validationLayer0;
+	static const char* m_validationLayer1;
 	static dgInt32 m_totalMemory;
 	int m_score;
 };
