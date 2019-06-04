@@ -111,11 +111,6 @@ dgVector dgCollisionConvexPolygon::SupportVertex (const dgVector& dir, dgInt32* 
 //#pragma optimize( "", off )
 void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 dist, const dgCollisionInstance* const parentMesh)
 {
-
-dgExpandTraceMessage ("********* tracing poygon bug ***************\n");
-dgExpandTraceMessage ("dist %f origin(%f %f %f)\n", dist, origin.m_x, origin.m_y, origin.m_z);
-
-
 	dgPlane planes[4];
 	dgVector points[sizeof (m_localPoly) / sizeof (m_localPoly[0]) + 8];
 
@@ -135,13 +130,11 @@ dgExpandTraceMessage ("dist %f origin(%f %f %f)\n", dist, origin.m_x, origin.m_y
 	planes[1] = dgPlane (dir, dist - distV);
 	planes[3] = dgPlane (dir * dgVector::m_negOne, dist + distV);
 
-dgExpandTraceMessage ("original poly \n");
 	for (dgInt32 i = 0; i < m_count; i ++) {
 		dgInt32 j = i << 1;
 		dgAssert (j < sizeof (clippedFace) / sizeof (clippedFace[0]));
 
 		points[i] = m_localPoly[i];
-dgExpandTraceMessage ("%f %f %f\n", m_localPoly[i].m_x, m_localPoly[i].m_y, m_localPoly[i].m_z);
 
 		clippedFace[j + 0].m_twin = &clippedFace[j + 1];
 		clippedFace[j + 0].m_next = &clippedFace[j + 2];
@@ -277,11 +270,9 @@ dgExpandTraceMessage ("%f %f %f\n", m_localPoly[i].m_x, m_localPoly[i].m_y, m_lo
 
 	dgInt32 count = 0;
 	m_adjacentFaceEdgeNormalIndex = &m_clippEdgeNormal[0];
-dgExpandTraceMessage ("clip poly\n");
 	do {
 		m_clippEdgeNormal[count] = ptr->m_incidentNormal;
 		m_localPoly[count] = points[ptr->m_incidentVertex];
-dgExpandTraceMessage ("%f %f %f\n", m_localPoly[count].m_x, m_localPoly[count].m_y, m_localPoly[count].m_z);
 		count ++;
 		ptr = ptr->m_next;
 	} while (ptr != first);
@@ -729,6 +720,18 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		hull->CalcAABB (hullMatrix, boxP0, boxP1);
 		dgVector origin (dgVector::m_half * (boxP1 + boxP1));
 
+#if 1
+		static FILE* file = fopen("log.txt", "wb");
+		fprintf(file, "dist: %f\n", convexSphapeUmbra);
+		fprintf(file, "origin: %f %f %f\n", origin.m_x, origin.m_y, origin.m_z);
+		fprintf(file, "normal: %f %f %f\n", m_normal.m_x, m_normal.m_y, m_normal.m_z);
+		fprintf(file, "points: %d\n", m_count);
+		for (dgInt32 i = 0; i < m_count; i++) {
+			fprintf(file, "p %f %f %f\n", m_localPoly[i].m_x, m_localPoly[i].m_y, m_localPoly[i].m_z);
+		}
+		fprintf(file, "\n");
+		fflush(file);
+#endif
 		BeamClipping(origin, convexSphapeUmbra, parentMesh);
 		m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
 	}
