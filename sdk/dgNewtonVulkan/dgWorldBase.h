@@ -45,9 +45,6 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 	void InitDevice (VkInstance instance, VkAllocationCallbacks* const allocators);
 	void DestroyDevice ();
 	
-
-	VkShaderModule CreateShaderModule (const char* const shaderName);
-	
 	static void VKAPI_PTR vkFreeFunction(void* pUserData, void* pMemory);
 	static void* VKAPI_PTR vkAllocationFunction(void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope allocationScope);
 	static void* VKAPI_PTR vkReallocationFunction(void* pUserData, void* pOriginal, size_t size, size_t alignment, VkSystemAllocationScope allocationScope);

@@ -106,6 +106,110 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	return &module;
 }
 
+void dgVulkanShaderInfo::CreateInitBody (dgVulkanContext& context)
+{
+	VkResult err = VK_SUCCESS;
+
+	context.m_initBody.m_module = CreateShaderModule(context, "InitBodyArray");
+	VkDescriptorSetLayoutBinding descriptorSetLayoutBindings[2] =
+	{
+		{
+			0,
+			VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			1,
+			VK_SHADER_STAGE_COMPUTE_BIT,
+			0
+		},
+		{
+			1,
+			VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+			1,
+			VK_SHADER_STAGE_COMPUTE_BIT,
+			0
+		}
+	};
+
+	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo;
+	Clear(&descriptorSetLayoutCreateInfo);
+
+	descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	descriptorSetLayoutCreateInfo.bindingCount = 2;
+	descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayoutBindings;
+	err = vkCreateDescriptorSetLayout(context.m_device, &descriptorSetLayoutCreateInfo, &context.m_allocators, &context.m_initBody.m_layout);
+	dgAssert(err == VK_SUCCESS);
+
+	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
+	Clear(&pipelineLayoutCreateInfo);
+	pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipelineLayoutCreateInfo.setLayoutCount = 1;
+	pipelineLayoutCreateInfo.pSetLayouts = &context.m_initBody.m_layout;
+	err = vkCreatePipelineLayout(context.m_device, &pipelineLayoutCreateInfo, &context.m_allocators, &context.m_initBody.m_pipelineLayout);
+	dgAssert(err == VK_SUCCESS);
+
+	VkPipelineShaderStageCreateInfo loadPipelineShaderStage;
+	Clear(&loadPipelineShaderStage);
+	loadPipelineShaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	loadPipelineShaderStage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
+	loadPipelineShaderStage.module = context.m_initBody.m_module;
+	loadPipelineShaderStage.pName = "main";
+	loadPipelineShaderStage.pSpecializationInfo = NULL;
+
+	VkComputePipelineCreateInfo computePipeLineInfo;
+	Clear(&computePipeLineInfo);
+	computePipeLineInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
+	computePipeLineInfo.stage = loadPipelineShaderStage;
+	computePipeLineInfo.flags = 0;
+	computePipeLineInfo.layout = context.m_initBody.m_pipelineLayout;
+
+	err = vkCreateComputePipelines(context.m_device, context.m_pipeLineCache, 1, &computePipeLineInfo, &context.m_allocators, &context.m_initBody.m_pipeLine);
+	dgAssert(err == VK_SUCCESS);
+}
+
+void dgVulkanShaderInfo::Destroy (dgVulkanContext& context)
+{
+	vkDestroyPipelineLayout(context.m_device, context.m_initBody.m_pipelineLayout, &context.m_allocators);
+	vkDestroyDescriptorSetLayout(context.m_device, context.m_initBody.m_layout, &context.m_allocators);
+	vkDestroyPipeline(context.m_device, context.m_initBody.m_pipeLine, &context.m_allocators);
+	vkDestroyShaderModule(context.m_device, context.m_initBody.m_module, &context.m_allocators);
+}
+
+VkShaderModule dgVulkanShaderInfo::CreateShaderModule(dgVulkanContext& context, const char* const shaderName) const
+{
+	char fullPath[1024];
+	uint32_t shaderByteCode[1024 * 32];
+
+	sprintf(fullPath, "%s%s.spv", dgWorldBase::m_libPath, shaderName);
+	FILE* const file = fopen(fullPath, "rb");
+	dgAssert(file);
+	fgets(fullPath, sizeof (fullPath), file);
+
+	int count = 1;
+	uint32_t code;
+	fscanf(file, "%x", &shaderByteCode);
+	while (!feof(file) && fscanf(file, ", %x", &code)) {
+		shaderByteCode[count] = code;
+		count++;
+		dgAssert(count < sizeof(shaderByteCode) / sizeof(shaderByteCode[0]));
+	}
+
+	fclose(file);
+
+	VkShaderModuleCreateInfo shaderModuleCreateInfo;
+	Clear(&shaderModuleCreateInfo);
+	shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+	shaderModuleCreateInfo.codeSize = count * sizeof(uint32_t);
+	shaderModuleCreateInfo.pCode = (uint32_t*)&shaderByteCode[0];
+
+	VkShaderModule module;
+	VkResult err = VK_SUCCESS;
+
+	err = vkCreateShaderModule(context.m_device, &shaderModuleCreateInfo, &context.m_allocators, &module);
+	dgAssert(err == VK_SUCCESS);
+
+	return module;
+}
+
+
 dgWorldBase::dgWorldBase(dgWorld* const world, dgMemoryAllocator* const allocator)
 	:dgWorldPlugin(world, allocator)
 	,dgSolver(world, allocator)
@@ -163,19 +267,11 @@ void dgWorldBase::InitDevice (VkInstance instance, VkAllocationCallbacks* const 
 	VkPhysicalDeviceFeatures physDevFeatures;
 	vkGetPhysicalDeviceFeatures(physical_gpus[0], &physDevFeatures);
 
-	//	GET_INSTANCE_PROC_ADDR(demo->inst, GetPhysicalDeviceSurfaceSupportKHR);
-	//	GET_INSTANCE_PROC_ADDR(demo->inst, GetPhysicalDeviceSurfaceCapabilitiesKHR);
-	//	GET_INSTANCE_PROC_ADDR(demo->inst, GetPhysicalDeviceSurfaceFormatsKHR);
-	//	GET_INSTANCE_PROC_ADDR(demo->inst, GetPhysicalDeviceSurfacePresentModesKHR);
-	//	GET_INSTANCE_PROC_ADDR(demo->inst, GetSwapchainImagesKHR);
-	//	PFN_vkVoidFunction xxxx = vkGetInstanceProcAddr(instance, GetPhysicalDeviceSurfaceSupportKHR);
-
 	context.m_instance = instance;
 	context.m_allocators = *allocators;
 	context.m_gpu = physical_gpus[0];
 	context.m_gpu_props = gpu_props;
 	context.m_computeQueueIndex = computeQueueIndex;
-
 
 	float queue_priorities = 1.0f;	
 	VkDeviceQueueCreateInfo queues[2];
@@ -211,61 +307,7 @@ void dgWorldBase::InitDevice (VkInstance instance, VkAllocationCallbacks* const 
 	err = vkCreatePipelineCache(context.m_device, &pipeLineCacheInfo, &context.m_allocators, &context.m_pipeLineCache);
 	dgAssert(err == VK_SUCCESS);
 
-	context.m_initBodyModule = CreateShaderModule("InitBodyArray");
-
-
-	VkDescriptorSetLayoutBinding descriptorSetLayoutBindings[2] = 
-	{
-		{
-			0,
-			VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			1,
-			VK_SHADER_STAGE_COMPUTE_BIT,
-			0
-		},
-		{
-			1,
-			VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			1,
-			VK_SHADER_STAGE_COMPUTE_BIT,
-			0
-		}
-	};
-
-	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo;
-	Clear (&descriptorSetLayoutCreateInfo);
-
-	descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	descriptorSetLayoutCreateInfo.bindingCount = 2;
-	descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayoutBindings;
-	err = vkCreateDescriptorSetLayout(context.m_device, &descriptorSetLayoutCreateInfo, &context.m_allocators, &context.m_initBodyLayout);
-	dgAssert(err == VK_SUCCESS);
-
-	VkPipelineLayoutCreateInfo pipelineLayoutCreateInfo;
-	Clear (&pipelineLayoutCreateInfo);
-	pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutCreateInfo.setLayoutCount = 1;
-	pipelineLayoutCreateInfo.pSetLayouts = &context.m_initBodyLayout;
-	err = vkCreatePipelineLayout(context.m_device, &pipelineLayoutCreateInfo, &context.m_allocators, &context.m_initBodyPipelineLayout);
-	dgAssert(err == VK_SUCCESS);
-
-	VkPipelineShaderStageCreateInfo loadPipelineShaderStage;
-	Clear(&loadPipelineShaderStage);
-	loadPipelineShaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-	loadPipelineShaderStage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-	loadPipelineShaderStage.module = context.m_initBodyModule;
-	loadPipelineShaderStage.pName = "main";
-	loadPipelineShaderStage.pSpecializationInfo = NULL;
-
-	VkComputePipelineCreateInfo computePipeLineInfo;
-	Clear (&computePipeLineInfo);
-	computePipeLineInfo.sType = VK_STRUCTURE_TYPE_COMPUTE_PIPELINE_CREATE_INFO;
-	computePipeLineInfo.stage = loadPipelineShaderStage;
-	computePipeLineInfo.flags = 0;
-	computePipeLineInfo.layout = context.m_initBodyPipelineLayout;
-
-	err = vkCreateComputePipelines(context.m_device, context.m_pipeLineCache, 1, &computePipeLineInfo, &context.m_allocators, &context.m_initBodyPipeLine);
-	dgAssert(err == VK_SUCCESS);
+	context.m_initBody.CreateInitBody(context);
 }
 
 void dgWorldBase::DestroyDevice ()
@@ -274,52 +316,13 @@ void dgWorldBase::DestroyDevice ()
 
 	vkDeviceWaitIdle(context.m_device);
 
-	vkDestroyPipelineLayout(context.m_device, context.m_initBodyPipelineLayout, &context.m_allocators);
-	vkDestroyDescriptorSetLayout(context.m_device, context.m_initBodyLayout, &context.m_allocators);
-	vkDestroyPipeline(context.m_device, context.m_initBodyPipeLine, &context.m_allocators);
-	vkDestroyShaderModule (context.m_device, context.m_initBodyModule, &context.m_allocators);
-	vkDestroyPipelineCache(context.m_device, context.m_pipeLineCache, &context.m_allocators);
+	context.m_initBody.Destroy(context);
 
+	vkDestroyPipelineCache(context.m_device, context.m_pipeLineCache, &context.m_allocators);
 	vkDestroyDevice(context.m_device, &context.m_allocators);
 	vkDestroyInstance(context.m_instance, &context.m_allocators);
 }
 
-VkShaderModule dgWorldBase::CreateShaderModule(const char* const shaderName)
-{
-	char fullPath[1024];
-	uint32_t shaderByteCode[1024 * 32];
-
-	sprintf(fullPath, "%s%s.spv", m_libPath, shaderName);
-	FILE* const file = fopen(fullPath, "rb");
-	dgAssert(file);
-	fgets(fullPath, sizeof (fullPath), file);
-
-	int count = 1;
-	uint32_t code;
-	fscanf(file, "%x", &shaderByteCode);
-	while (!feof(file) && fscanf(file, ", %x", &code)) {
-		shaderByteCode[count] = code;
-		count++;
-		dgAssert(count < sizeof(shaderByteCode) / sizeof(shaderByteCode[0]));
-	}
-
-	fclose(file);
-	
-	VkShaderModuleCreateInfo shaderModuleCreateInfo;
-	Clear(&shaderModuleCreateInfo);
-	shaderModuleCreateInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-	shaderModuleCreateInfo.codeSize = count * sizeof(uint32_t);
-	shaderModuleCreateInfo.pCode = (uint32_t*)&shaderByteCode[0];
-	
-	VkShaderModule module;
-	VkResult err = VK_SUCCESS;
-
-	dgVulkanContext& context = GetContext();
-	err = vkCreateShaderModule(context.m_device, &shaderModuleCreateInfo, &context.m_allocators, &module);
-	dgAssert(err == VK_SUCCESS);
-
-	return module;
-}
 
 dgInt32 dgWorldBase::FindLayer(const char* const name, dgInt32 count, VkLayerProperties* const layers)
 {

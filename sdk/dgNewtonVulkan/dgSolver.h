@@ -340,6 +340,28 @@ class dgSoaMatrixElement
 #define DG_GPU_WORKGROUP_SIZE		256 
 #define DG_GPU_BODY_INITIAL_COUNT	4096
 
+class dgVulkanContext;
+
+class dgVulkanShaderInfo
+{
+	public:
+	dgVulkanShaderInfo()
+	{
+		memset (this, 0, sizeof (dgVulkanShaderInfo));
+	}
+
+	void CreateInitBody (dgVulkanContext& context);
+	void Destroy (dgVulkanContext& context);
+
+	private:
+	VkShaderModule CreateShaderModule (dgVulkanContext& context, const char* const shaderName) const;
+
+	VkPipeline m_pipeLine;
+	VkShaderModule m_module;
+	VkDescriptorSetLayout m_layout;
+	VkPipelineLayout m_pipelineLayout;
+};
+
 class dgVulkanContext
 {
 	public:
@@ -361,10 +383,7 @@ class dgVulkanContext
 	
 	VkPipelineCache m_pipeLineCache;
 
-	VkPipeline m_initBodyPipeLine;
-	VkShaderModule m_initBodyModule;
-	VkDescriptorSetLayout m_initBodyLayout;
-	VkPipelineLayout m_initBodyPipelineLayout;
+	dgVulkanShaderInfo m_initBody;
 };
 
 
