@@ -108,8 +108,13 @@ dgVector dgCollisionConvexPolygon::SupportVertex (const dgVector& dir, dgInt32* 
 	return m_localPoly[index];
 }
 
+//#pragma optimize( "", off )
 void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 dist, const dgCollisionInstance* const parentMesh)
 {
+
+dgExpandTraceMessage ("dist %f origin(%f %f %f)\n", dist, origin.m_x, origin.m_y, origin.m_z);
+
+
 	dgPlane planes[4];
 	dgVector points[sizeof (m_localPoly) / sizeof (m_localPoly[0]) + 8];
 
@@ -129,11 +134,13 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 	planes[1] = dgPlane (dir, dist - distV);
 	planes[3] = dgPlane (dir * dgVector::m_negOne, dist + distV);
 
+dgExpandTraceMessage ("original poly \n");
 	for (dgInt32 i = 0; i < m_count; i ++) {
 		dgInt32 j = i << 1;
 		dgAssert (j < sizeof (clippedFace) / sizeof (clippedFace[0]));
 
 		points[i] = m_localPoly[i];
+dgExpandTraceMessage ("%f %f %f\n", m_localPoly[i].m_x, m_localPoly[i].m_y, m_localPoly[i].m_z);
 
 		clippedFace[j + 0].m_twin = &clippedFace[j + 1];
 		clippedFace[j + 0].m_next = &clippedFace[j + 2];
@@ -269,9 +276,11 @@ void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 
 	dgInt32 count = 0;
 	m_adjacentFaceEdgeNormalIndex = &m_clippEdgeNormal[0];
+dgExpandTraceMessage ("clip poly\n");
 	do {
 		m_clippEdgeNormal[count] = ptr->m_incidentNormal;
 		m_localPoly[count] = points[ptr->m_incidentVertex];
+dgExpandTraceMessage ("%f %f %f\n", m_localPoly[count].m_x, m_localPoly[count].m_y, m_localPoly[count].m_z);
 		count ++;
 		ptr = ptr->m_next;
 	} while (ptr != first);
@@ -657,8 +666,8 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 	dgAssert(proxy.m_instance1->IsType(dgCollision::dgCollisionConvexPolygon_RTTI));
 	dgAssert (proxy.m_instance1->GetGlobalMatrix().TestIdentity());
 
-	const dgCollisionInstance* const polygonInstance = proxy.m_instance1;
-	dgAssert(this == polygonInstance->GetChildShape());
+	//const dgCollisionInstance* const polygonInstance = proxy.m_instance1;
+	dgAssert(this == proxy.m_instance1->GetChildShape());
 	dgAssert(m_count);
 	dgAssert(m_count < dgInt32(sizeof (m_localPoly) / sizeof (m_localPoly[0])));
 
