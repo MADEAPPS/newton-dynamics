@@ -112,6 +112,7 @@ dgVector dgCollisionConvexPolygon::SupportVertex (const dgVector& dir, dgInt32* 
 void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 dist, const dgCollisionInstance* const parentMesh)
 {
 
+dgExpandTraceMessage ("********* tracing poygon bug ***************\n");
 dgExpandTraceMessage ("dist %f origin(%f %f %f)\n", dist, origin.m_x, origin.m_y, origin.m_z);
 
 
