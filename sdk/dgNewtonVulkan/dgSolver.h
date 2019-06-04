@@ -22,8 +22,8 @@
 #ifndef _DG_SOLVER_H_
 #define _DG_SOLVER_H_
 
-
 #include "dgPhysicsStdafx.h"
+#include "dgVulcanContext.h"
 #include <immintrin.h>
 
 #define DG_SOA_WORD_GROUP_SIZE	8 
@@ -337,56 +337,6 @@ class dgSoaMatrixElement
 //
 // ******************************************************************************
 
-#define DG_GPU_WORKGROUP_SIZE		256 
-#define DG_GPU_BODY_INITIAL_COUNT	4096
-
-class dgVulkanContext;
-
-class dgVulkanShaderInfo
-{
-	public:
-	dgVulkanShaderInfo()
-	{
-		memset (this, 0, sizeof (dgVulkanShaderInfo));
-	}
-
-	void CreateInitBody (dgVulkanContext& context);
-	void Destroy (dgVulkanContext& context);
-
-	private:
-	VkShaderModule CreateShaderModule (dgVulkanContext& context, const char* const shaderName) const;
-
-	VkPipeline m_pipeLine;
-	VkShaderModule m_module;
-	VkDescriptorSetLayout m_layout;
-	VkPipelineLayout m_pipelineLayout;
-};
-
-class dgVulkanContext
-{
-	public:
-	dgVulkanContext()
-	{
-		memset(this, 0, sizeof(dgVulkanContext));
-	}
-
-	dgInt32 m_totalMemory;
-	dgInt32 m_computeQueueIndex;
-
-	VkQueue m_queue;
-	VkDevice m_device;
-	VkInstance m_instance;
-	VkPhysicalDevice m_gpu;
-	VkAllocationCallbacks m_allocators;
-	VkPhysicalDeviceProperties m_gpu_props;
-	VkPhysicalDeviceMemoryProperties m_memory_properties;
-	
-	VkPipelineCache m_pipeLineCache;
-
-	dgVulkanShaderInfo m_initBody;
-};
-
-
 template<class T>
 class dgArrayGPU
 {
@@ -412,7 +362,7 @@ class dgArrayGPU
 		bufferInfo.flags = 0;
 
 		VkResult result = VK_SUCCESS;
-		result = vkCreateBuffer(context.m_device, &bufferInfo, &context.m_allocators, &m_buffer);
+		result = vkCreateBuffer(context.m_device, &bufferInfo, &context.m_allocator, &m_buffer);
 		dgAssert(result == VK_SUCCESS);
 
 		VkMemoryRequirements memReqs;
@@ -437,7 +387,7 @@ class dgArrayGPU
 		memInfo.allocationSize = bufferInfo.size;
 		memInfo.memoryTypeIndex = memoryTypeIndex;
 
-		result = vkAllocateMemory(context.m_device, &memInfo, &context.m_allocators, &m_memory);
+		result = vkAllocateMemory(context.m_device, &memInfo, &context.m_allocator, &m_memory);
 		dgAssert(result == VK_SUCCESS);
 
 		result = vkBindBufferMemory(context.m_device, m_buffer, m_memory, 0);
@@ -447,8 +397,8 @@ class dgArrayGPU
 	void Free(dgVulkanContext& context)
 	{
 		if (m_buffer) {
-			vkFreeMemory(context.m_device, m_memory, &context.m_allocators);
-			vkDestroyBuffer(context.m_device, m_buffer, &context.m_allocators);
+			vkFreeMemory(context.m_device, m_memory, &context.m_allocator);
+			vkDestroyBuffer(context.m_device, m_buffer, &context.m_allocator);
 		}
 	}
 
