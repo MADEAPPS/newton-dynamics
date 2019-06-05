@@ -720,7 +720,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		hull->CalcAABB (hullMatrix, boxP0, boxP1);
 		dgVector origin (dgVector::m_half * (boxP1 + boxP1));
 
-#if 1
+#if 0
 		static FILE* file = fopen("log.txt", "wb");
 		fprintf(file, "dist: %f\n", convexSphapeUmbra);
 		fprintf(file, "origin: %f %f %f\n", origin.m_x, origin.m_y, origin.m_z);
