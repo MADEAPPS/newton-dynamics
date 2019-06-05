@@ -334,6 +334,21 @@ class dgSoaMatrixElement
 class dgGpuBody
 {
 	public:
+	class dgTransform
+	{
+		public:
+		dgVector m_quaternion;
+		dgVector m_position;
+	};
+
+	class dgConstant
+	{
+		public:
+		dgVector m_damp;
+		dgVector m_invMass;
+	};
+
+
 	dgGpuBody()
 		:m_count(0)
 		,m_bufferSize(0)
@@ -345,29 +360,6 @@ class dgGpuBody
 		dgAssert(!m_bufferSize);
 	}
 
-	void Clear(dgVulkanContext& context)
-	{
-		if (m_bufferSize) {
-			m_damp.Free(context);
-			m_veloc.Free(context);
-			m_omega.Free(context);
-			m_invMass.Free(context);
-			m_rotation.Free(context);
-			m_position.Free(context);
-		}
-		m_bufferSize = 0;
-	}
-
-	void Alloc(dgVulkanContext& context, dgInt32 size)
-	{
-		m_damp.Alloc(context, size);
-		m_veloc.Alloc(context, size);
-		m_omega.Alloc(context, size);
-		m_invMass.Alloc(context, size);
-		m_rotation.Alloc(context, size);
-		m_position.Alloc(context, size);
-		m_bufferSize = size;
-	}
 
 	void Resize(dgVulkanContext& context, dgInt32 size)
 	{
@@ -375,7 +367,7 @@ class dgGpuBody
 		dgInt32 roundSize = DG_GPU_BODY_INITIAL_COUNT * dgInt32((size + DG_GPU_BODY_INITIAL_COUNT - 1) / DG_GPU_BODY_INITIAL_COUNT);
 		if (roundSize > m_bufferSize) {
 			const dgInt32 bufferSize = m_bufferSize;
-			Clear(context);
+			Free(context);
 			while (roundSize < bufferSize) {
 				roundSize *= 2;
 			}
@@ -383,14 +375,29 @@ class dgGpuBody
 		}
 	}
 
+	void Alloc(dgVulkanContext& context, dgInt32 size)
+	{
+		m_transform.Alloc(context, size);
+		m_velocity.Alloc(context, size);
+		m_constant.Alloc(context, size);
+		m_bufferSize = size;
+	}
+
+	void Free(dgVulkanContext& context)
+	{
+		if (m_bufferSize) {
+			m_transform.Free(context);
+			m_velocity.Free(context);
+			m_constant.Free(context);
+		}
+		m_bufferSize = 0;
+	}
+
 	dgInt32 m_count;
 	dgInt32 m_bufferSize;
-	dgArrayVector<dgVector> m_invMass;
-	dgArrayVector<dgVector> m_veloc;
-	dgArrayVector<dgVector> m_omega;
-	dgArrayVector<dgVector> m_damp;
-	dgArrayVector<dgVector> m_rotation;
-	dgArrayVector<dgVector> m_position;
+	dgArrayVector<dgTransform> m_transform;
+	dgArrayVector<dgJacobian> m_velocity;
+	dgArrayVector<dgConstant> m_constant;
 };
 
 

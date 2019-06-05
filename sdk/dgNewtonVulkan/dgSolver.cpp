@@ -48,7 +48,7 @@ dgSolver::~dgSolver()
 
 void dgSolver::Cleanup()
 {
-	m_gpuBodyArray.Clear(m_context);
+	m_gpuBodyArray.Free(m_context);
 }
 
 void dgSolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
@@ -129,41 +129,35 @@ void dgSolver::InitBodyArray()
 
 	const dgInt32 groupCount = DG_GPU_WORKGROUP_SIZE * dgInt32 ((bodyCount + DG_GPU_WORKGROUP_SIZE - 1) / DG_GPU_WORKGROUP_SIZE);
 
-	dgVector* const damp = m_gpuBodyArray.m_damp.Lock(m_context, groupCount);
-	dgVector* const veloc = m_gpuBodyArray.m_veloc.Lock(m_context, groupCount);
-	dgVector* const omega = m_gpuBodyArray.m_omega.Lock(m_context, groupCount);
-	dgVector* const invMass = m_gpuBodyArray.m_invMass.Lock(m_context, groupCount);
-	dgVector* const position = m_gpuBodyArray.m_position.Lock(m_context, groupCount);
-	dgVector* const rotation = m_gpuBodyArray.m_rotation.Lock(m_context, groupCount);
-
+	dgGpuBody::dgTransform* const transform = m_gpuBodyArray.m_transform.Lock(m_context, groupCount);
+	dgGpuBody::dgConstant* const constant = m_gpuBodyArray.m_constant.Lock(m_context, groupCount);
+	dgJacobian* const velocity = m_gpuBodyArray.m_velocity.Lock(m_context, groupCount);
 	for (dgInt32 i = 0; i < bodyCount; i ++) {
 		const dgBodyInfo* const bodyInfo = &bodyArray[i];
 		dgDynamicBody* const body = (dgDynamicBody*)bodyInfo->m_body;
-		veloc[i] = body->m_veloc;
-		omega[i] = body->m_omega;
-		invMass[i] = body->m_invMass;
-		position[i] = body->m_matrix.m_posit;
-		rotation[i] = dgVector(&body->m_rotation.m_x);
-		damp[i] = body->GetDampCoeffcient(m_timestep);
+		transform[i].m_quaternion = dgVector(&body->m_rotation.m_x);
+		transform[i].m_position = body->m_matrix.m_posit;
+		velocity[i].m_linear = body->m_veloc;
+		velocity[i].m_angular = body->m_omega;
+		constant[i].m_damp = body->m_dampCoef;
+		constant[i].m_invMass = body->m_invMass;
 	}
 
 	dgVector zero(m_zero);
 	dgVector unitRotation(m_unitRotation);
 	for (dgInt32 i = bodyCount; i < groupCount; i++) {
-		damp[i] = zero;
-		veloc[i] = zero;
-		omega[i] = zero;
-		invMass[i] = zero;
-		position[i] = zero;
-		rotation[i] = unitRotation;
+		constant[i].m_damp = zero;
+		constant[i].m_invMass = zero;
+		velocity[i].m_linear = zero;
+		velocity[i].m_angular = zero;
+		transform[i].m_quaternion = unitRotation;
+		transform[i].m_quaternion = unitRotation;
 	}
 
-	m_gpuBodyArray.m_damp.Unlock(m_context);
-	m_gpuBodyArray.m_omega.Unlock(m_context);
-	m_gpuBodyArray.m_veloc.Unlock(m_context);
-	m_gpuBodyArray.m_invMass.Unlock(m_context);
-	m_gpuBodyArray.m_position.Unlock(m_context);
-	m_gpuBodyArray.m_rotation.Unlock(m_context);
+	m_gpuBodyArray.m_constant.Unlock(m_context);
+	m_gpuBodyArray.m_velocity.Unlock(m_context);
+	m_gpuBodyArray.m_transform.Unlock(m_context);
+
 
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
 		m_world->QueueJob(InitBodyArrayKernel, this, NULL, "dgSolver::InitBodyArray");

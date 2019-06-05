@@ -34,29 +34,33 @@ void dgVulkanShaderInfo::CreateInitBody (dgVulkanContext& context)
 	VkResult err = VK_SUCCESS;
 
 	context.m_initBody.m_module = CreateShaderModule(context, "InitBodyArray");
-	VkDescriptorSetLayoutBinding descriptorSetLayoutBindings[2] =
-	{
-		{
-			0,
-			VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			1,
-			VK_SHADER_STAGE_COMPUTE_BIT,
-			0
-		},
-		{
-			1,
-			VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-			1,
-			VK_SHADER_STAGE_COMPUTE_BIT,
-			0
-		}
-	};
+
+	VkDescriptorSetLayoutBinding descriptorSetLayoutBindings[3];
+	Clear (descriptorSetLayoutBindings, sizeof (descriptorSetLayoutBindings) / sizeof (descriptorSetLayoutBindings[0]));
+	descriptorSetLayoutBindings[0].binding = 0;
+	descriptorSetLayoutBindings[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	descriptorSetLayoutBindings[0].descriptorCount = 1;
+	descriptorSetLayoutBindings[0].stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+	descriptorSetLayoutBindings[0].pImmutableSamplers = NULL;
+
+	descriptorSetLayoutBindings[1].binding = 1;
+	descriptorSetLayoutBindings[1].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	descriptorSetLayoutBindings[1].descriptorCount = 1;
+	descriptorSetLayoutBindings[1].stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+	descriptorSetLayoutBindings[1].pImmutableSamplers = NULL;
+
+	descriptorSetLayoutBindings[2].binding = 2;
+	descriptorSetLayoutBindings[2].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	descriptorSetLayoutBindings[2].descriptorCount = 1;
+	descriptorSetLayoutBindings[2].stageFlags = VK_SHADER_STAGE_COMPUTE_BIT;
+	descriptorSetLayoutBindings[2].pImmutableSamplers = NULL;
+
 
 	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCreateInfo;
 	Clear(&descriptorSetLayoutCreateInfo);
 
 	descriptorSetLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	descriptorSetLayoutCreateInfo.bindingCount = 2;
+	descriptorSetLayoutCreateInfo.bindingCount = sizeof (descriptorSetLayoutBindings) / sizeof (descriptorSetLayoutBindings[0]);
 	descriptorSetLayoutCreateInfo.pBindings = descriptorSetLayoutBindings;
 	err = vkCreateDescriptorSetLayout(context.m_device, &descriptorSetLayoutCreateInfo, &context.m_allocator, &context.m_initBody.m_layout);
 	dgAssert(err == VK_SUCCESS);
