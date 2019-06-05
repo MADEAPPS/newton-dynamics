@@ -1,22 +1,58 @@
 #version 450 core
 
-struct BodyData
+struct dgTransform
 {
 	vec4 m_rotation;
 	vec4 m_position;
-	vec4 m_veloc;
-	vec4 m_omega;
+};
+
+struct dgVector6
+{
+	vec4 m_linear;
+	vec4 m_angular;
+};
+
+struct dgConstant
+{
 	vec4 m_damp;
 };
 
-layout (std430, binding = 0) buffer bodyArray
+layout (std430, binding = 0) buffer bodyTransform
 {
-   BodyData m_body[];
+   dgTransform m_transform[];
+};
+
+layout (std430, binding = 1) buffer bodyVelocity
+{
+   dgVector6 m_velocity[];
+};
+
+layout (std430, binding = 2) buffer bodyConstants
+{
+   dgConstant m_constats[];
 };
 
 
 layout(local_size_x = 256) in;
 
+mat3 QuatToMatrix(vec4 quat0);
+
+void main()
+{
+	uint i = gl_GlobalInvocationID.x;
+
+	dgTransform transform = m_transform[i];
+	dgVector6 velocity = m_velocity[i];
+	dgConstant damp = m_constats[i];
+
+	vec3 omegaDamp = vec3 (damp.m_damp.x, damp.m_damp.y, damp.m_damp.z);
+
+	mat3 rotation = QuatToMatrix(transform.m_rotation);
+
+	velocity.m_linear = vec4 (velocity.m_linear.xyz * damp.m_damp.w, 0.0);
+	velocity.m_angular = vec4 (((rotation * velocity.m_angular.xyz) * omegaDamp) * rotation, 0.0);
+	m_velocity[i] = velocity;
+}
 
 mat3 QuatToMatrix(vec4 quat0)
 {
@@ -45,27 +81,5 @@ mat3 QuatToMatrix(vec4 quat0)
 	rotation[2][2] = 1.0 - x2 - y2;
 	
 	return rotation;
-}
-
-
-void main()
-{
-	uint i = gl_GlobalInvocationID.x;
-
-	BodyData body = m_body[i];
-	mat3 rotation = QuatToMatrix(body.m_rotation);
-
-	float velocDamp = body.m_damp.w;
-	vec3 omegaDamp = vec3 (body.m_damp.x, body.m_damp.y, body.m_damp.z);
-
-	vec3 veloc = vec3 (body.m_veloc.x, body.m_veloc.y, body.m_veloc.z);
-	vec3 omega = vec3 (body.m_omega.x, body.m_omega.y, body.m_omega.z);
-
-	veloc = veloc * velocDamp;
-	omega = ((rotation * omega) * omegaDamp) * rotation;
-	omega = rotation * omega;
-
-	m_body[i].m_veloc = vec4 (veloc, 0.0);
-	m_body[i].m_omega = vec4 (omega, 0.0);
 }
 
