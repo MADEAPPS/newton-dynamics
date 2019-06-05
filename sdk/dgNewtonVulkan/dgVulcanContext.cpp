@@ -179,11 +179,35 @@ void dgVulkanContext::InitDevice(VkInstance instance)
 	dgAssert(err == VK_SUCCESS);
 
 	m_initBody.CreateInitBody(*this);
+
+
+	// make decriptor pool (I have no idea what thiis is)
+	VkCommandPoolCreateInfo commandPoolCreateInfo;
+	Clear(&commandPoolCreateInfo);
+	commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	commandPoolCreateInfo.queueFamilyIndex = m_computeQueueIndex;
+
+	VkDescriptorPoolSize descriptorPoolSize;
+	Clear(&descriptorPoolSize);
+	descriptorPoolSize.type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
+	descriptorPoolSize.descriptorCount = 3;
+
+	VkDescriptorPoolCreateInfo descriptorPoolCreateInfo;
+	Clear(&descriptorPoolCreateInfo);
+	descriptorPoolCreateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	descriptorPoolCreateInfo.maxSets = 1;
+	descriptorPoolCreateInfo.poolSizeCount = 1;
+	descriptorPoolCreateInfo.pPoolSizes = &descriptorPoolSize;
+
+	err = vkCreateDescriptorPool(m_device, &descriptorPoolCreateInfo, 0, &m_descriptolPool);
+	dgAssert(err == VK_SUCCESS);
 }
 
 void dgVulkanContext::DestroyDevice()
 {
 	vkDeviceWaitIdle(m_device);
+
+	vkDestroyDescriptorPool(m_device, m_descriptolPool, &m_allocator);
 
 	m_initBody.Destroy(*this);
 

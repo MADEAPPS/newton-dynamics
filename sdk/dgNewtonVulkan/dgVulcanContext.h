@@ -55,6 +55,7 @@ class dgVulkanContext
 	VkPhysicalDeviceProperties m_gpu_props;
 	VkPhysicalDeviceMemoryProperties m_memory_properties;
 
+	VkDescriptorPool m_descriptolPool;
 	VkPipelineCache m_pipeLineCache;
 	dgVulkanShaderInfo m_initBody;
 
