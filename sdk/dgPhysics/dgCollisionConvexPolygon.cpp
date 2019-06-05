@@ -108,11 +108,10 @@ dgVector dgCollisionConvexPolygon::SupportVertex (const dgVector& dir, dgInt32* 
 	return m_localPoly[index];
 }
 
-//#pragma optimize( "", off )
 void dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 dist, const dgCollisionInstance* const parentMesh)
 {
 	dgPlane planes[4];
-	dgVector points[sizeof (m_localPoly) / sizeof (m_localPoly[0]) + 8];
+	dgVector points[DG_CONVEX_POLYGON_MAX_VERTEX_COUNT];
 
 	dgClippedFaceEdge clippedFace [2 * sizeof (m_localPoly) / sizeof (m_localPoly[0]) + 8];
 
@@ -723,8 +722,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		hull->CalcAABB (hullMatrix, boxP0, boxP1);
 		dgVector origin (dgVector::m_half * (boxP1 + boxP1));
 
-#if 1
-
+#if 0
 		{	
 			dgScopeSpinLock scopeLock (&lock);
 			if (!file) {
@@ -777,6 +775,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 				contactsOut[i].m_shapeId1 = m_faceId;
 			}
 #else
+			const dgCollisionInstance* const polygonInstance = proxy.m_instance1;
 			dgContactPoint* const contactsOut = proxy.m_contacts;
 			dgVector normal(contactsOut[0].m_normal);
 			if (normal.DotProduct(m_normal).GetScalar() < dgFloat32(0.9995f)) {
