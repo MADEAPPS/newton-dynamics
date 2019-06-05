@@ -46,12 +46,17 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\dgNewtonVulkan\dgSolver.cpp" />
+    <ClCompile Include="..\..\dgNewtonVulkan\dgVulcanContext.cpp" />
+    <ClCompile Include="..\..\dgNewtonVulkan\dgVulcanShader.cpp" />
     <ClCompile Include="..\..\dgNewtonVulkan\dgWorldBase.cpp" />
     <ClCompile Include="..\..\dgNewtonVulkan\dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dgNewtonVulkan\dgNewtonPluginStdafx.h" />
     <ClInclude Include="..\..\dgNewtonVulkan\dgSolver.h" />
+    <ClInclude Include="..\..\dgNewtonVulkan\dgVulcanContext.h" />
+    <ClInclude Include="..\..\dgNewtonVulkan\dgVulcanShader.h" />
+    <ClInclude Include="..\..\dgNewtonVulkan\dgVulcanVector.h" />
     <ClInclude Include="..\..\dgNewtonVulkan\dgWorldBase.h" />
   </ItemGroup>
   <ItemGroup>

@@ -5,11 +5,16 @@
     <ClCompile Include="..\..\dgNewtonVulkan\dgSolver.cpp" />
     <ClCompile Include="..\..\dgNewtonVulkan\dgWorldBase.cpp" />
     <ClCompile Include="..\..\dgNewtonVulkan\dllmain.cpp" />
+    <ClCompile Include="..\..\dgNewtonVulkan\dgVulcanContext.cpp" />
+    <ClCompile Include="..\..\dgNewtonVulkan\dgVulcanShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dgNewtonVulkan\dgNewtonPluginStdafx.h" />
     <ClInclude Include="..\..\dgNewtonVulkan\dgSolver.h" />
     <ClInclude Include="..\..\dgNewtonVulkan\dgWorldBase.h" />
+    <ClInclude Include="..\..\dgNewtonVulkan\dgVulcanContext.h" />
+    <ClInclude Include="..\..\dgNewtonVulkan\dgVulcanShader.h" />
+    <ClInclude Include="..\..\dgNewtonVulkan\dgVulcanVector.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="shaders">
