@@ -51,8 +51,10 @@ class dgVulkanShaderInfo
 
 	VkPipeline m_pipeLine;
 	VkShaderModule m_module;
+	VkDescriptorSet m_descriptorSet;
 	VkDescriptorSetLayout m_layout;
 	VkPipelineLayout m_pipelineLayout;
+	VkDescriptorPool m_descriptolPool;
 };
 
 
