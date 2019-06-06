@@ -45,15 +45,11 @@ void main()
 	dgTransform transform = m_transform[i];
 	dgVector6 velocity = m_velocity[i];
 	dgConstant damp = m_constants[i];
+
 	float linearDamp = damp.m_damp.w;
 	vec3 angularDamp = vec3 (damp.m_damp.xyz);
 
-//float linearDamp = 1.0f;
-//vec3 angularDamp = vec3 (1.0f);
-
-	vec3 omegaDamp = vec3 (0.0);
 	mat3 rotation = QuatToMatrix(transform.m_rotation);
-
 	velocity.m_linear = vec4 (velocity.m_linear.xyz * linearDamp, 0.0);
 	velocity.m_angular = vec4 (((rotation * velocity.m_angular.xyz) * angularDamp) * rotation, 0.0);
 	m_velocity[i] = velocity;
