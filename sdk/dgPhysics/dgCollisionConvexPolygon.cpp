@@ -27,7 +27,6 @@
 #include "dgCollisionInstance.h"
 #include "dgCollisionConvexPolygon.h"
 
-#define DG_FIX_CONVEX_BUG
 #define DG_CONVEX_POLYGON_CRC 0x12341234
 #define DG_CONVEX_POLYGON_SKIRT_LENGTH dgFloat32 (0.025f)
 
@@ -278,26 +277,25 @@ bool dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 
 	m_count = count;
 
-#ifdef DG_FIX_CONVEX_BUG
 	if (m_count >= 3) {
-	dgInt32 i0 = m_count - 1;
-	for (dgInt32 i = 0; i < m_count; i++) {
-		dgVector edge(m_localPoly[i] - m_localPoly[i0]);
-		dgAssert(edge.DotProduct(edge).GetScalar() > dgFloat32(0.0f));
-		edge = edge.Normalize();
-		const dgInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[i0];
-		dgVector localAdjacentNormal(&m_vertex[adjacentNormalIndex * m_stride]);
-		dgVector adjacentNormal(CalculateGlobalNormal(parentMesh, localAdjacentNormal & dgVector::m_triplexMask));
-		dgVector edgeSkirt(edge.CrossProduct(adjacentNormal).Scale (DG_CONVEX_POLYGON_SKIRT_LENGTH));
+		dgInt32 i0 = m_count - 1;
+		for (dgInt32 i = 0; i < m_count; i++) {
+			dgVector edge(m_localPoly[i] - m_localPoly[i0]);
+			dgAssert(edge.DotProduct(edge).GetScalar() > dgFloat32(0.0f));
+			edge = edge.Normalize();
+			const dgInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[i0];
+			dgVector localAdjacentNormal(&m_vertex[adjacentNormalIndex * m_stride]);
+			dgVector adjacentNormal(CalculateGlobalNormal(parentMesh, localAdjacentNormal & dgVector::m_triplexMask));
+			dgVector edgeSkirt(edge.CrossProduct(adjacentNormal).Scale(DG_CONVEX_POLYGON_SKIRT_LENGTH));
 
-		m_localPoly[count + 0] = m_localPoly[i] + edgeSkirt;
-		m_localPoly[count + 1] = m_localPoly[i0] + edgeSkirt;
-		count += 2;
-		i0 = i;
+			m_localPoly[count + 0] = m_localPoly[i] + edgeSkirt;
+			m_localPoly[count + 1] = m_localPoly[i0] + edgeSkirt;
+			count += 2;
+			i0 = i;
+		}
+
+		m_paddedCount = count;
 	}
-#endif
-	m_paddedCount = count;
-}
 
 	return (m_count >= 3);
 }
@@ -752,49 +750,12 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		m_vertexCount = dgUnsigned16(m_count);
 		count = world->CalculateConvexToConvexContacts(proxy);
 		dgAssert(proxy.m_intersectionTestOnly || (count >= 0));
-
 		if (count >= 1) {
-#ifdef DG_FIX_CONVEX_BUG
 			dgContactPoint* const contactsOut = proxy.m_contacts;
 			for (dgInt32 i = 0; i < count; i++) {
 				contactsOut[i].m_shapeId0 = hullId;
 				contactsOut[i].m_shapeId1 = m_faceId;
 			}
-#else
-			const dgCollisionInstance* const polygonInstance = proxy.m_instance1;
-			dgContactPoint* const contactsOut = proxy.m_contacts;
-			dgVector normal(contactsOut[0].m_normal);
-			if (normal.DotProduct(m_normal).GetScalar() < dgFloat32(0.9995f)) {
-				for (dgInt32 j0 = m_vertexCount - 1, j1 = 0; j1 < m_vertexCount; j1++) {
-					dgVector sideDir(m_localPoly[j1] - m_localPoly[j0]);
-					dgAssert(sideDir.m_w == dgFloat32(0.0f));
-					const dgInt32 adjacentNormalIndex = m_adjacentFaceEdgeNormalIndex[j0];
-					dgVector localAdjacentNormal(&m_vertex[adjacentNormalIndex * m_stride]);
-					dgVector adjacentNormal(CalculateGlobalNormal(parentMesh, localAdjacentNormal & dgVector::m_triplexMask));
-					dgFloat32 val0 = sideDir.DotProduct(normal.CrossProduct(m_normal)).GetScalar();
-					dgFloat32 val1 = sideDir.DotProduct(normal.CrossProduct(adjacentNormal)).GetScalar();
-					if (((val0 * val1) > dgFloat32(0.0f)) && (val0 < dgFloat32(0.0f)) && (val1 < dgFloat32(0.0f))) {
-						dgVector lateral(sideDir * (sideDir.DotProduct(adjacentNormal).GetScalar() / (sideDir.DotProduct(sideDir).GetScalar())));
-						dgVector diff(adjacentNormal - lateral);
-						dgAssert(diff.m_w == dgFloat32(0.0f));
-						dgVector longitudinal(adjacentNormal.Scale(dgSqrt(diff.DotProduct(diff).GetScalar())));
-						normal = longitudinal + lateral;
-					}
-					j0 = j1;
-				}
-				normal = polygonInstance->m_globalMatrix.RotateVector(normal);
-				for (dgInt32 i = 0; i < count; i++) {
-					contactsOut[i].m_normal = normal;
-					contactsOut[i].m_shapeId0 = hullId;
-					contactsOut[i].m_shapeId1 = m_faceId;
-				}
-			} else {
-				for (dgInt32 i = 0; i < count; i++) {
-					contactsOut[i].m_shapeId0 = hullId;
-					contactsOut[i].m_shapeId1 = m_faceId;
-				}
-			}
-#endif
 		}
 	}
 	return count;
