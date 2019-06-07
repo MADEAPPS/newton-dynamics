@@ -737,7 +737,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		dgVector step(normalInHull.Scale((proxy.m_skinThickness - penetration) * dgFloat32(0.5f)));
 
 		dgContactPoint* const contactsOut = proxy.m_contacts;
-		dgAssert(contactsOut);
 		for (dgInt32 i = 0; i < count; i++) {
 			contactsOut[i].m_point = hullMatrix.TransformVector(contactPoints[i] + step);
 			contactsOut[i].m_normal = m_normal;
