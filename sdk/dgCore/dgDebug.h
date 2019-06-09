@@ -23,15 +23,8 @@
 #define __dgDebug__
 
 #include "dgStdafx.h"
-#ifdef _MSC_VER 
-	#ifdef _DEBUG 
-		#define DG_TRACE
-	#endif
-#endif
 
 
-#ifdef DG_TRACE
-	//void dgApi dgExpandTraceMessage (const char *fmt, ...);
 	inline void dgApi dgExpandTraceMessage(const char *fmt, ...)
 	{
 		va_list v_args;
@@ -49,6 +42,14 @@
 	#endif
 	}
 
+#ifdef _MSC_VER 
+	#ifdef _DEBUG 
+		#define DG_TRACE
+	#endif
+#endif
+
+
+#ifdef DG_TRACE
 	#define dgTrace(x)	dgExpandTraceMessage x;
 #else
 	#define dgTrace(x)

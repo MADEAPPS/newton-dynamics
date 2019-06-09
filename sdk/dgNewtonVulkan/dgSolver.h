@@ -22,8 +22,9 @@
 #ifndef _DG_SOLVER_H_
 #define _DG_SOLVER_H_
 
-
 #include "dgPhysicsStdafx.h"
+#include "dgVulcanContext.h"
+#include "dgVulcanVector.h"
 #include <immintrin.h>
 
 #define DG_SOA_WORD_GROUP_SIZE	8 
@@ -330,164 +331,73 @@ class dgSoaMatrixElement
 
 
 
-
-// ******************************************************************************
-//
-// GPU stuff start here
-//
-// ******************************************************************************
-
-#define DG_GPU_WORKGROUP_SIZE		256 
-#define DG_GPU_BODY_INITIAL_COUNT	4096
-
-class dgVulkanContext
+class dgGpuBody
 {
 	public:
-	dgVulkanContext()
+	class dgTransform
 	{
-		memset(this, 0, sizeof(dgVulkanContext));
-	}
+		public:
+		dgVector m_quaternion;
+		dgVector m_position;
+	};
 
-	VkQueue m_queue;
-	VkDevice m_device;
-	VkInstance m_instance;
-	VkPhysicalDevice m_gpu;
-	VkPhysicalDeviceProperties m_gpu_props;
-	VkAllocationCallbacks m_allocators;
-	VkPhysicalDeviceMemoryProperties m_memory_properties;
-	int m_computeQueueIndex;
-};
+	class dgConstant
+	{
+		public:
+		dgVector m_damp;
+		dgVector m_invMass;
+	};
 
 
-template<class T>
-class dgArrayGPU
-{
-	public:
-	dgArrayGPU()
-		:m_buffer(0)
+	dgGpuBody()
+		:m_count(0)
+		,m_bufferSize(0)
 	{
 	}
 
-	~dgArrayGPU()
+	~dgGpuBody()
 	{
+		dgAssert(!m_bufferSize);
+	}
+
+
+	void Resize(dgVulkanContext& context, dgInt32 size)
+	{
+		m_count = size;
+		dgInt32 roundSize = DG_GPU_BODY_INITIAL_COUNT * dgInt32((size + DG_GPU_BODY_INITIAL_COUNT - 1) / DG_GPU_BODY_INITIAL_COUNT);
+		if (roundSize > m_bufferSize) {
+			const dgInt32 bufferSize = m_bufferSize;
+			Free(context);
+			while (roundSize < bufferSize) {
+				roundSize *= 2;
+			}
+			Alloc(context, roundSize);
+		}
 	}
 
 	void Alloc(dgVulkanContext& context, dgInt32 size)
 	{
-		dgAssert((size % DG_GPU_WORKGROUP_SIZE) == 0);
-
-		VkBufferCreateInfo bufferInfo;
-		Clear(&bufferInfo);
-		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-		bufferInfo.size = size * sizeof(T);
-		bufferInfo.usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-		bufferInfo.flags = 0;
-
-		VkResult result = VK_SUCCESS;
-		result = vkCreateBuffer(context.m_device, &bufferInfo, &context.m_allocators, &m_buffer);
-		dgAssert(result == VK_SUCCESS);
-
-		VkMemoryRequirements memReqs;
-		vkGetBufferMemoryRequirements(context.m_device, m_buffer, &memReqs);
-		dgAssert(memReqs.size == bufferInfo.size);
-
-		uint32_t memoryTypeIndex;
-		//VkFlags memoryProperty = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-		VkFlags memoryProperty = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
-		VkPhysicalDeviceMemoryProperties& memoryProperties = context.m_memory_properties;
-		for (memoryTypeIndex = 0; memoryTypeIndex < memoryProperties.memoryTypeCount; ++memoryTypeIndex) {
-			if (((memoryProperties.memoryTypes[memoryTypeIndex].propertyFlags & memoryProperty) == memoryProperty) &&
-				((memReqs.memoryTypeBits >> memoryTypeIndex) & 1)) {
-				break;
-			}
-		}
-		dgAssert(memoryTypeIndex < memoryProperties.memoryTypeCount);
-
-		VkMemoryAllocateInfo memInfo;
-		Clear(&memInfo);
-		memInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-		memInfo.allocationSize = bufferInfo.size;
-		memInfo.memoryTypeIndex = memoryTypeIndex;
-
-		result = vkAllocateMemory(context.m_device, &memInfo, &context.m_allocators, &m_memory);
-		dgAssert(result == VK_SUCCESS);
-
-		result = vkBindBufferMemory(context.m_device, m_buffer, m_memory, 0);
-		dgAssert(result == VK_SUCCESS);
+		m_transform.Alloc(context, size);
+		m_velocity.Alloc(context, size);
+		m_constant.Alloc(context, size);
+		m_bufferSize = size;
 	}
 
 	void Free(dgVulkanContext& context)
 	{
-		if (m_buffer) {
-			vkFreeMemory(context.m_device, m_memory, &context.m_allocators);
-			vkDestroyBuffer(context.m_device, m_buffer, &context.m_allocators);
+		if (m_bufferSize) {
+			m_transform.Free(context);
+			m_velocity.Free(context);
+			m_constant.Free(context);
 		}
-	}
-
-	T* Lock(dgVulkanContext& context, dgInt32 size)
-	{
-		void* ptr;
-		VkResult result = VK_SUCCESS;
-		//VkFlags flags = VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;
-		result = vkMapMemory(context.m_device, m_memory, 0, size * sizeof (T), 0, &ptr);
-		dgAssert(result == VK_SUCCESS);
-		dgAssert((((dgUnsigned64)ptr) & 0xf) == 0);
-		return (T*)ptr;
-	}
-
-	void Unlock(dgVulkanContext& context)
-	{
-		vkUnmapMemory(context.m_device, m_memory);
-	}
-
-	VkBuffer m_buffer; 
-	VkDeviceMemory m_memory;
-};
-
-class dgGpuBody
-{
-	public:
-	dgGpuBody()
-		:m_count(0)
-		,m_bufferSize(DG_GPU_BODY_INITIAL_COUNT)
-		,m_veloc()
-		,m_omega()
-		,m_damp()
-	{
-	}
-
-	void Clear(dgVulkanContext& context)
-	{
-		m_damp.Free(context);
-		m_veloc.Free(context);
-		m_omega.Free(context);
-	}
-
-	void Resize(dgVulkanContext& context, dgInt32 size)
-	{
-		if (size > m_count) {
-			m_damp.Free(context);
-			m_veloc.Free(context);
-			m_omega.Free(context);
-		
-			m_count = size;
-			size = dgMax(size, DG_GPU_BODY_INITIAL_COUNT);
-			while (size < m_bufferSize) {
-				size *= 2;
-			}
-		
-			m_damp.Alloc(context, size);
-			m_veloc.Alloc(context, size);
-			m_omega.Alloc(context, size);
-			m_bufferSize = size;
-		}
+		m_bufferSize = 0;
 	}
 
 	dgInt32 m_count;
 	dgInt32 m_bufferSize;
-	dgArrayGPU<dgVector> m_veloc;
-	dgArrayGPU<dgVector> m_omega;
-	dgArrayGPU<dgVector> m_damp;
+	dgArrayVector<dgTransform> m_transform;
+	dgArrayVector<dgJacobian> m_velocity;
+	dgArrayVector<dgConstant> m_constant;
 };
 
 
@@ -555,6 +465,7 @@ class dgSolver: public dgParallelBodySolver
 	dgSoaFloat m_soaZero;
 	dgVector m_zero;
 	dgVector m_negOne;
+	dgVector m_unitRotation;
 	dgArray<dgSoaMatrixElement> m_massMatrix;
 
 	dgVulkanContext m_context;

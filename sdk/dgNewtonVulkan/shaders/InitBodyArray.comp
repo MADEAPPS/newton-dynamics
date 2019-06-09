@@ -1,0 +1,86 @@
+#version 450 core
+
+struct dgTransform
+{
+	vec4 m_rotation;
+	vec4 m_position;
+};
+
+struct dgVector6
+{
+	vec4 m_linear;
+	vec4 m_angular;
+};
+
+struct dgConstant
+{
+	vec4 m_damp;
+	vec4 m_invMass;
+};
+
+layout (std430, binding = 0) buffer bodyTransform
+{
+   dgTransform m_transform[];
+};
+
+layout (std430, binding = 1) buffer bodyVelocity
+{
+   dgVector6 m_velocity[];
+};
+
+layout (std430, binding = 2) buffer bodyConstants
+{
+   dgConstant m_constants[];
+};
+
+
+layout(local_size_x = 256) in;
+
+mat3 QuatToMatrix(vec4 quat0);
+
+void main()
+{
+	uint i = gl_GlobalInvocationID.x;
+
+	dgTransform transform = m_transform[i];
+	dgVector6 velocity = m_velocity[i];
+	dgConstant damp = m_constants[i];
+
+	float linearDamp = damp.m_damp.w;
+	vec3 angularDamp = vec3 (damp.m_damp.xyz);
+
+	mat3 rotation = QuatToMatrix(transform.m_rotation);
+	velocity.m_linear = vec4 (velocity.m_linear.xyz * linearDamp, 0.0);
+	velocity.m_angular = vec4 (((rotation * velocity.m_angular.xyz) * angularDamp) * rotation, 0.0);
+	m_velocity[i] = velocity;
+}
+
+mat3 QuatToMatrix(vec4 quat0)
+{
+	vec4 quat1 = quat0 * 2.0;
+	float x2 = quat0.x * quat1.x;
+	float y2 = quat0.y * quat1.y;
+	float z2 = quat0.z * quat1.z;
+	float xy = quat0.x * quat1.y;
+	float xz = quat0.x * quat1.z;
+	float xw = quat0.x * quat1.w;
+	float yz = quat0.y * quat1.z;
+	float yw = quat0.y * quat1.w;
+	float zw = quat0.z * quat1.w;
+
+	mat3 rotation;
+	rotation[0][0] = 1.0 - y2 - z2;
+	rotation[0][1] = xy + zw;
+	rotation[0][2] = xz - yw;
+
+	rotation[1][0] = xy - zw;
+	rotation[1][1] = 1.0 - x2 - z2;
+	rotation[1][2] = yz + xw;
+
+	rotation[2][0] = xz + yw;
+	rotation[2][1] = yz - xw;
+	rotation[2][2] = 1.0 - x2 - y2;
+	
+	return rotation;
+}
+

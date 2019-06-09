@@ -57,7 +57,7 @@ class dgCollisionConvexPolygon: public dgCollisionConvex
 	virtual dgFloat32 GetBoxMinRadius () const; 
 	virtual dgFloat32 GetBoxMaxRadius () const;
 	
-	void BeamClipping (const dgVector& origin, dgFloat32 size, const dgCollisionInstance* const parentMesh);
+	bool BeamClipping (const dgVector& origin, dgFloat32 size, const dgCollisionInstance* const parentMesh);
 	dgVector CalculateGlobalNormal (const dgCollisionInstance* const parentMesh, const dgVector& localNormal) const;
 	dgInt32 CalculateContactToConvexHullDescrete(const dgWorld* const world, const dgCollisionInstance* const parentMesh, dgCollisionParamProxy& proxy);
 	dgInt32 CalculateContactToConvexHullContinue (const dgWorld* const world, const dgCollisionInstance* const parentMesh, dgCollisionParamProxy& proxy);

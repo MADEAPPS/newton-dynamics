@@ -46,21 +46,24 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\dgNewtonVulkan\dgSolver.cpp" />
+    <ClCompile Include="..\..\dgNewtonVulkan\dgVulcanContext.cpp" />
+    <ClCompile Include="..\..\dgNewtonVulkan\dgVulcanShader.cpp" />
     <ClCompile Include="..\..\dgNewtonVulkan\dgWorldBase.cpp" />
     <ClCompile Include="..\..\dgNewtonVulkan\dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dgNewtonVulkan\dgNewtonPluginStdafx.h" />
     <ClInclude Include="..\..\dgNewtonVulkan\dgSolver.h" />
+    <ClInclude Include="..\..\dgNewtonVulkan\dgVulcanContext.h" />
+    <ClInclude Include="..\..\dgNewtonVulkan\dgVulcanShader.h" />
+    <ClInclude Include="..\..\dgNewtonVulkan\dgVulcanVector.h" />
     <ClInclude Include="..\..\dgNewtonVulkan\dgWorldBase.h" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="..\..\dgNewtonVulkan\shaders\test.comp">
+    <CustomBuild Include="..\..\dgNewtonVulkan\shaders\InitBodyArray.comp">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).spv  </Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
@@ -68,6 +71,7 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
@@ -75,6 +79,7 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">glslangValidator  %(FullPath) -V -x -o %(Filename).spv  </Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">%(Filename).spv  </Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).spv  </Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).spv  </Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">%(Filename).spv  </Outputs>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">%(Filename).spv  </Outputs>
@@ -235,9 +240,9 @@
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-      </Command>
+      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"  /F /Y /R
+xcopy   "$(ProjectDir)/../../dgNewtonVulkan/shaders/*.spv"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">
@@ -260,9 +265,9 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-      </Command>
+      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"  /F /Y /R
+xcopy   "$(ProjectDir)/../../dgNewtonVulkan/shaders/*.spv"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -284,9 +289,9 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <AdditionalLibraryDirectories>../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-      </Command>
+      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"  /F /Y /R
+xcopy   "$(ProjectDir)/../../dgNewtonVulkan/shaders/*.spv"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">
@@ -308,9 +313,9 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <AdditionalLibraryDirectories>../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-      </Command>
+      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"  /F /Y /R
+xcopy   "$(ProjectDir)/../../dgNewtonVulkan/shaders/*.spv"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -336,9 +341,9 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <AdditionalLibraryDirectories>../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Lib32</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-</Command>
+      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"  /F /Y /R
+xcopy   "$(ProjectDir)/../../dgNewtonVulkan/shaders/*.spv"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">
@@ -364,9 +369,9 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <AdditionalLibraryDirectories>../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Lib32</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-</Command>
+      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"  /F /Y /R
+xcopy   "$(ProjectDir)/../../dgNewtonVulkan/shaders/*.spv"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -392,9 +397,9 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <AdditionalLibraryDirectories>../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-</Command>
+      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"  /F /Y /R
+xcopy   "$(ProjectDir)/../../dgNewtonVulkan/shaders/*.spv"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">
@@ -420,9 +425,9 @@ xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newto
       <AdditionalLibraryDirectories>../../dgNewtonVulkan/vulkanSDK/1.1.106.0/Lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"         /F /Y /R
-</Command>
+      <Command>xcopy   "$(OutDir)/*.dll"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R
+xcopy   "$(OutDir)/*.pdb"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"  /F /Y /R
+xcopy   "$(ProjectDir)/../../dgNewtonVulkan/shaders/*.spv"  "../../../applications\demosSandbox/$(Platform)/newtonPlugins/$(Configuration)/*.*"   /F /Y /R</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
