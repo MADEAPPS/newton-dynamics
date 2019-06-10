@@ -237,7 +237,7 @@ void dgDownHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
 	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = obj;
 
-	dgAssert (SanityCheck());
+//	dgAssert (SanityCheck());
 }
 
 template <class OBJECT, class KEY>
@@ -286,13 +286,12 @@ void dgDownHeap<OBJECT,KEY>::Pop ()
 	}
 	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
 	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_obj;
-	dgAssert (SanityCheck());
+//	dgAssert (SanityCheck());
 }
 
 template <class OBJECT, class KEY>
 void dgDownHeap<OBJECT,KEY>::Sort ()
 {
-
 	dgInt32 count = dgHeapBase<OBJECT,KEY>::m_curCount;
 	for (dgInt32 i = 1; i < count; i ++) {
 		KEY key (dgHeapBase<OBJECT,KEY>::m_pool[0].m_key);
@@ -384,7 +383,7 @@ void dgUpHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 	dgAssert (i);
 	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
 	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = obj;
-	dgAssert (SanityCheck());
+//	dgAssert (SanityCheck());
 }
 
 template <class OBJECT, class KEY>
@@ -460,7 +459,7 @@ void dgUpHeap<OBJECT,KEY>::Pop ()
 	}
 	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
 	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_obj;
-	dgAssert (SanityCheck());
+//	dgAssert (SanityCheck());
 }
 
 #endif
