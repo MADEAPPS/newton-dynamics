@@ -231,10 +231,11 @@ void dDownHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 template <class OBJECT, class KEY>
 void dDownHeap<OBJECT,KEY>::Remove (int index)
 {
-	if (index == 0) {
-		Pop();
-	} else if (index == dHeapBase<OBJECT, KEY>::m_curCount - 1) {
+	if (index >= dHeapBase<OBJECT, KEY>::m_curCount - 2) {
 		dHeapBase<OBJECT, KEY>::m_curCount--;
+		dHeapBase<OBJECT, KEY>::m_pool[index] = dHeapBase<OBJECT, KEY>::m_pool[dHeapBase<OBJECT, KEY>::m_curCount];
+	} else if (index == 0) {
+		Pop();
 	} else {
 		const int count = dHeapBase<OBJECT, KEY>::m_curCount;
 		dHeapBase<OBJECT, KEY>::m_curCount = index;
@@ -263,11 +264,11 @@ void dDownHeap<OBJECT,KEY>::Pop ()
 		}
 		dHeapBase<OBJECT,KEY>::m_pool[i - 1] = dHeapBase<OBJECT,KEY>::m_pool[j - 1];
 	}
-	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
-	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = dHeapBase<OBJECT,KEY>::m_pool[dHeapBase<OBJECT,KEY>::m_curCount].m_obj;
+	//dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
+	//dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = dHeapBase<OBJECT,KEY>::m_pool[dHeapBase<OBJECT,KEY>::m_curCount].m_obj;
+	dHeapBase<OBJECT, KEY>::m_pool[i - 1] = dHeapBase<OBJECT, KEY>::m_pool[dHeapBase<OBJECT, KEY>::m_curCount];
 	dAssert (SanityCheck());
 }
-
 
 template <class OBJECT, class KEY>
 void dDownHeap<OBJECT,KEY>::Sort ()
@@ -378,10 +379,11 @@ void dUpHeap<OBJECT,KEY>::Sort ()
 template <class OBJECT, class KEY>
 void dUpHeap<OBJECT,KEY>::Remove (int index)
 {
-	if (index == 0) {
+	if (index >= dHeapBase<OBJECT,KEY>::m_curCount - 2) {
+		dHeapBase<OBJECT, KEY>::m_curCount--;
+		dHeapBase<OBJECT, KEY>::m_pool[index] = dHeapBase<OBJECT, KEY>::m_pool[dHeapBase<OBJECT, KEY>::m_curCount];
+	} else if (index == 0) {
 		Pop();
-	} else if (index == dHeapBase<OBJECT,KEY>::m_curCount - 1) {
-		dHeapBase<OBJECT,KEY>::m_curCount --;
 	} else {
 		const int count = dHeapBase<OBJECT,KEY>::m_curCount;
 		dHeapBase<OBJECT,KEY>::m_curCount = index;
@@ -402,17 +404,17 @@ void dUpHeap<OBJECT,KEY>::Pop ()
 	int i = 1;
 	for (; i <= (dHeapBase<OBJECT,KEY>::m_curCount>>1); i = j) {
 		j = i + i;
-		if ((j < dHeapBase<OBJECT,KEY>::m_curCount) && 
-			(dHeapBase<OBJECT,KEY>::m_pool[j - 1].m_key > dHeapBase<OBJECT,KEY>::m_pool[j].m_key)) {
-				j ++;
+		if ((j < dHeapBase<OBJECT,KEY>::m_curCount) && (dHeapBase<OBJECT,KEY>::m_pool[j - 1].m_key > dHeapBase<OBJECT,KEY>::m_pool[j].m_key)) {
+			j ++;
 		}
 		if (key <= dHeapBase<OBJECT,KEY>::m_pool[j - 1].m_key) {
 			break;
 		}
 		dHeapBase<OBJECT,KEY>::m_pool[i - 1] = dHeapBase<OBJECT,KEY>::m_pool[j - 1];
 	}
-	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
-	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = dHeapBase<OBJECT,KEY>::m_pool[dHeapBase<OBJECT,KEY>::m_curCount].m_obj;
+//	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
+//	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = dHeapBase<OBJECT,KEY>::m_pool[dHeapBase<OBJECT,KEY>::m_curCount].m_obj;
+	dHeapBase<OBJECT, KEY>::m_pool[i - 1] = dHeapBase<OBJECT, KEY>::m_pool[dHeapBase<OBJECT, KEY>::m_curCount];
 	dAssert (SanityCheck());
 }
 
