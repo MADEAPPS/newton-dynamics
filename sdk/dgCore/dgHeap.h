@@ -243,24 +243,17 @@ void dgDownHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 template <class OBJECT, class KEY>
 void dgDownHeap<OBJECT,KEY>::Remove (dgInt32 index)
 {
-	dgHeapBase<OBJECT,KEY>::m_curCount--;
-	KEY key (dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_key);
-
-	dgInt32 j;
-	dgInt32 i = index + 1;
-	for (; i <= (dgHeapBase<OBJECT,KEY>::m_curCount>>1); i = j) {
-		j = i + i;
-		if ((j < dgHeapBase<OBJECT,KEY>::m_curCount) && 
-			(dgHeapBase<OBJECT,KEY>::m_pool[j - 1].m_key < dgHeapBase<OBJECT,KEY>::m_pool[j].m_key)) {
-				j ++;
+	if (index == 0) {
+		Pop();
+	} else if (index == dgHeapBase<OBJECT, KEY>::m_curCount - 1) {
+		dgHeapBase<OBJECT, KEY>::m_curCount--;
+	} else {
+		const dgInt32 count = dgHeapBase<OBJECT, KEY>::m_curCount;
+		dgHeapBase<OBJECT, KEY>::m_curCount = index;
+		for (dgInt32 i = index + 1; i < count; i++) {
+			Push(dgHeapBase<OBJECT, KEY>::m_pool[i].m_obj, dgHeapBase<OBJECT, KEY>::m_pool[i].m_key);
 		}
-		if (key >= dgHeapBase<OBJECT,KEY>::m_pool[j - 1].m_key) {
-			break;
-		}
-		dgHeapBase<OBJECT,KEY>::m_pool[i - 1] = dgHeapBase<OBJECT,KEY>::m_pool[j - 1];
 	}
-	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
-	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_obj;
 
 	dgAssert (SanityCheck());
 }
@@ -417,24 +410,18 @@ void dgUpHeap<OBJECT,KEY>::Sort ()
 template <class OBJECT, class KEY>
 void dgUpHeap<OBJECT,KEY>::Remove (dgInt32 index)
 {
-	dgHeapBase<OBJECT,KEY>::m_curCount--;
-
-	dgInt32 j;
-	dgInt32 i = index + 1;
-	KEY key (dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_key);
-	for (; i <= (dgHeapBase<OBJECT,KEY>::m_curCount>>1); i = j) {
-		j = i + i;
-		if ((j < dgHeapBase<OBJECT,KEY>::m_curCount) && 
-			(dgHeapBase<OBJECT,KEY>::m_pool[j - 1].m_key > dgHeapBase<OBJECT,KEY>::m_pool[j].m_key)) {
-				j ++;
+	if (index == 0) {
+		Pop();
+	} else if (index == dgHeapBase<OBJECT, KEY>::m_curCount - 1) {
+		dgHeapBase<OBJECT, KEY>::m_curCount--;
+	} else {
+		const dgInt32 count = dgHeapBase<OBJECT, KEY>::m_curCount;
+		dgHeapBase<OBJECT, KEY>::m_curCount = index;
+		for (dgInt32 i = index + 1; i < count; i++) {
+			Push(dgHeapBase<OBJECT, KEY>::m_pool[i].m_obj, dgHeapBase<OBJECT, KEY>::m_pool[i].m_key);
 		}
-		if (key <= dgHeapBase<OBJECT,KEY>::m_pool[j - 1].m_key) {
-			break;
-		}
-		dgHeapBase<OBJECT,KEY>::m_pool[i - 1] = dgHeapBase<OBJECT,KEY>::m_pool[j - 1];
 	}
-	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
-	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_obj;
+
 	dgAssert (SanityCheck());
 }
 
