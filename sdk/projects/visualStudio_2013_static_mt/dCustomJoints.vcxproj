@@ -37,6 +37,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\dCustomJoints\dCustomAlloc.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomListener.cpp" />
+    <ClCompile Include="..\..\dCustomJoints\dCustomSixdof.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomTireSpringDG.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomTransformManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomBallAndSocket.cpp" />
@@ -80,6 +81,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\dCustomJoints\dCustomAlloc.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomListener.h" />
+    <ClInclude Include="..\..\dCustomJoints\dCustomSixdof.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomTireSpringDG.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomTransformManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomBallAndSocket.h" />

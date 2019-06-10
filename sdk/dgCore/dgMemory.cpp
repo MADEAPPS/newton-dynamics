@@ -194,7 +194,8 @@ void dgMemoryAllocator::SetAllocatorsCallback (dgMemAlloc memAlloc, dgMemFree me
 
 void *dgMemoryAllocator::MallocLow (dgInt32 workingSize, dgInt32 alignment)
 {
-	dgAssert (alignment >= DG_MEMORY_GRANULARITY);
+	alignment = dgMax (alignment, DG_MEMORY_GRANULARITY);
+//	dgAssert (alignment >= DG_MEMORY_GRANULARITY);
 	dgAssert (((-alignment) & (alignment - 1)) == 0);
 	dgInt32 size = workingSize + alignment * 2;
 	void* const ptr = m_malloc(dgUnsigned32 (size));
