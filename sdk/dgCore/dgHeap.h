@@ -243,18 +243,18 @@ void dgDownHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 template <class OBJECT, class KEY>
 void dgDownHeap<OBJECT,KEY>::Remove (dgInt32 index)
 {
-	if (index >= dgHeapBase<OBJECT, KEY>::m_curCount - 2) {
-		dgHeapBase<OBJECT, KEY>::m_curCount--;
-		dgHeapBase<OBJECT, KEY>::m_pool[index] = dgHeapBase<OBJECT, KEY>::m_pool[dgHeapBase<OBJECT, KEY>::m_curCount];
-	} else if (index == 0) {
+	if (index == 0) {
 		Pop();
+	} else if (index == dgHeapBase<OBJECT, KEY>::m_curCount - 1) {
+		dgHeapBase<OBJECT, KEY>::m_curCount--;
 	} else {
-		const int count = dgHeapBase<OBJECT, KEY>::m_curCount;
+		const dgInt32 count = dgHeapBase<OBJECT, KEY>::m_curCount;
 		dgHeapBase<OBJECT, KEY>::m_curCount = index;
-		for (int i = index + 1; i < count; i++) {
+		for (dgInt32 i = index + 1; i < count; i++) {
 			Push(dgHeapBase<OBJECT, KEY>::m_pool[i].m_obj, dgHeapBase<OBJECT, KEY>::m_pool[i].m_key);
 		}
 	}
+
 	dgAssert (SanityCheck());
 }
 
@@ -410,18 +410,18 @@ void dgUpHeap<OBJECT,KEY>::Sort ()
 template <class OBJECT, class KEY>
 void dgUpHeap<OBJECT,KEY>::Remove (dgInt32 index)
 {
-	if (index >= dgHeapBase<OBJECT, KEY>::m_curCount - 2) {
-		dgHeapBase<OBJECT, KEY>::m_curCount--;
-		dgHeapBase<OBJECT, KEY>::m_pool[index] = dgHeapBase<OBJECT, KEY>::m_pool[dgHeapBase<OBJECT, KEY>::m_curCount];
-	} else if (index == 0) {
+	if (index == 0) {
 		Pop();
+	} else if (index == dgHeapBase<OBJECT, KEY>::m_curCount - 1) {
+		dgHeapBase<OBJECT, KEY>::m_curCount--;
 	} else {
-		const int count = dgHeapBase<OBJECT, KEY>::m_curCount;
+		const dgInt32 count = dgHeapBase<OBJECT, KEY>::m_curCount;
 		dgHeapBase<OBJECT, KEY>::m_curCount = index;
-		for (int i = index + 1; i < count; i++) {
+		for (dgInt32 i = index + 1; i < count; i++) {
 			Push(dgHeapBase<OBJECT, KEY>::m_pool[i].m_obj, dgHeapBase<OBJECT, KEY>::m_pool[i].m_key);
 		}
 	}
+
 	dgAssert (SanityCheck());
 }
 
