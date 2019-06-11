@@ -277,8 +277,9 @@ void dgDownHeap<OBJECT,KEY>::Pop ()
 		}
 		dgHeapBase<OBJECT,KEY>::m_pool[i - 1] = dgHeapBase<OBJECT,KEY>::m_pool[j - 1];
 	}
-	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
-	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_obj;
+	//dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
+	//dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_obj;
+	dgHeapBase<OBJECT,KEY>::m_pool[i - 1] = dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount];
 //	dgAssert (SanityCheck());
 }
 
@@ -444,8 +445,9 @@ void dgUpHeap<OBJECT,KEY>::Pop ()
 		}
 		dgHeapBase<OBJECT,KEY>::m_pool[i - 1] = dgHeapBase<OBJECT,KEY>::m_pool[j - 1];
 	}
-	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
-	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_obj;
+//	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
+//	dgHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount].m_obj;
+	dgHeapBase<OBJECT,KEY>::m_pool[i - 1] = dgHeapBase<OBJECT,KEY>::m_pool[dgHeapBase<OBJECT,KEY>::m_curCount];
 //	dgAssert (SanityCheck());
 }
 

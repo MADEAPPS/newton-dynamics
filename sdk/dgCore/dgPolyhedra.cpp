@@ -1079,10 +1079,10 @@ void dgPolyhedra::MarkAdjacentCoplanarFaces (dgPolyhedra& polyhedraOut, dgEdge* 
 	const dgFloat64 normalDeviation = dgFloat64 (0.9999f);
 	const dgFloat64 distanceFromPlane = dgFloat64 (1.0f / 128.0f);
 
-	dgInt32 faceIndex[DG_LOCAL_BUFFER_SIZE * 4];
-	dgInt64 userIndex[DG_LOCAL_BUFFER_SIZE * 4];
-	dgEdge* stack[DG_LOCAL_BUFFER_SIZE * 4];
-	dgEdge* deleteEdge[DG_LOCAL_BUFFER_SIZE * 4];
+	dgInt32 faceIndex[DG_LOCAL_BUFFER_SIZE * 8];
+	dgInt64 userIndex[DG_LOCAL_BUFFER_SIZE * 8];
+	dgEdge* stack[DG_LOCAL_BUFFER_SIZE * 8];
+	dgEdge* deleteEdge[DG_LOCAL_BUFFER_SIZE * 32];
 
 	dgInt32 deleteCount = 1;
 	deleteEdge[0] = face;
