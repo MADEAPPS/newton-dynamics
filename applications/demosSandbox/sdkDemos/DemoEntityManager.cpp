@@ -402,7 +402,7 @@ DemoEntityManager::DemoEntityManager ()
 */
 
 	int xxx = 0;
-	const int xxxxxx = 15;
+	const int xxxxxx = 150;
 	dUpHeap<int, unsigned> xxxxx (xxxxxx + 2);
 	for (int i = 0; i < xxxxxx; i ++){
 		xxxxx.Push (xxx, i);

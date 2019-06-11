@@ -377,7 +377,7 @@ void dUpHeap<OBJECT,KEY>::Sort ()
 template <class OBJECT, class KEY>
 void dUpHeap<OBJECT,KEY>::Remove (int index)
 {
-#if 1
+#if 0
 	if (index == 0) {
 		Pop();
 	} else if (index == dHeapBase<OBJECT,KEY>::m_curCount - 1) {
@@ -391,13 +391,11 @@ void dUpHeap<OBJECT,KEY>::Remove (int index)
 	}
 #else
 
-static int xxxx;
-xxxx++;
-dAssert(SanityCheck());
 	dHeapBase<OBJECT, KEY>::m_curCount--;
 	dHeapBase<OBJECT, KEY>::m_pool[index] = dHeapBase<OBJECT, KEY>::m_pool[dHeapBase<OBJECT, KEY>::m_curCount];
-	if (index && dHeapBase<OBJECT, KEY>::m_pool[(index - 1) >> 1].m_key > dHeapBase<OBJECT, KEY>::m_pool[index].m_key) {
+	while (index && dHeapBase<OBJECT, KEY>::m_pool[(index - 1) >> 1].m_key > dHeapBase<OBJECT, KEY>::m_pool[index].m_key) {
 		dSwap(dHeapBase<OBJECT, KEY>::m_pool[(index - 1) >> 1], dHeapBase<OBJECT, KEY>::m_pool[index]);
+		index = (index - 1) >> 1;
 	}
 
 	while ((2 * index + 1) < dHeapBase<OBJECT, KEY>::m_curCount) {
