@@ -263,8 +263,6 @@ void dDownHeap<OBJECT,KEY>::Pop ()
 		}
 		dHeapBase<OBJECT,KEY>::m_pool[i - 1] = dHeapBase<OBJECT,KEY>::m_pool[j - 1];
 	}
-//	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
-//	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = dHeapBase<OBJECT,KEY>::m_pool[dHeapBase<OBJECT,KEY>::m_curCount].m_obj;
 	dHeapBase<OBJECT,KEY>::m_pool[i - 1] = dHeapBase<OBJECT,KEY>::m_pool[dHeapBase<OBJECT,KEY>::m_curCount];
 	dAssert (SanityCheck());
 }
@@ -412,8 +410,6 @@ void dUpHeap<OBJECT,KEY>::Pop ()
 		}
 		dHeapBase<OBJECT,KEY>::m_pool[i - 1] = dHeapBase<OBJECT,KEY>::m_pool[j - 1];
 	}
-//	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_key = key;
-//	dHeapBase<OBJECT,KEY>::m_pool[i - 1].m_obj = dHeapBase<OBJECT,KEY>::m_pool[dHeapBase<OBJECT,KEY>::m_curCount].m_obj;
 	dHeapBase<OBJECT,KEY>::m_pool[i - 1] = dHeapBase<OBJECT,KEY>::m_pool[dHeapBase<OBJECT,KEY>::m_curCount];
 	dAssert (SanityCheck());
 }
