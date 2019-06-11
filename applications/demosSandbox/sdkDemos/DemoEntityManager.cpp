@@ -402,8 +402,8 @@ DemoEntityManager::DemoEntityManager ()
 */
 
 	int xxx = 0;
-	const int xxxxxx = 150;
-	dUpHeap<int, unsigned> xxxxx (xxxxxx + 2);
+	const int xxxxxx = 450;
+	dDownHeap<int, unsigned> xxxxx (xxxxxx + 2);
 	for (int i = 0; i < xxxxxx; i ++){
 		xxxxx.Push (xxx, i);
 	}

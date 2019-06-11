@@ -231,17 +231,31 @@ void dDownHeap<OBJECT,KEY>::Push (OBJECT &obj, KEY key)
 template <class OBJECT, class KEY>
 void dDownHeap<OBJECT,KEY>::Remove (int index)
 {
-	if (index == 0) {
-		Pop();
-	} else if (index == dHeapBase<OBJECT, KEY>::m_curCount - 1) {
-		dHeapBase<OBJECT, KEY>::m_curCount--;
-	} else {
-		const int count = dHeapBase<OBJECT, KEY>::m_curCount;
-		dHeapBase<OBJECT, KEY>::m_curCount = index;
-		for (int i = index + 1; i < count; i++) {
-			Push(dHeapBase<OBJECT, KEY>::m_pool[i].m_obj, dHeapBase<OBJECT, KEY>::m_pool[i].m_key);
+	dHeapBase<OBJECT, KEY>::m_curCount--;
+	dHeapBase<OBJECT, KEY>::m_pool[index] = dHeapBase<OBJECT, KEY>::m_pool[dHeapBase<OBJECT, KEY>::m_curCount];
+	while (index && dHeapBase<OBJECT, KEY>::m_pool[(index - 1) >> 1].m_key < dHeapBase<OBJECT, KEY>::m_pool[index].m_key) {
+		dSwap(dHeapBase<OBJECT, KEY>::m_pool[(index - 1) >> 1], dHeapBase<OBJECT, KEY>::m_pool[index]);
+		index = (index - 1) >> 1;
+	}
+
+	while ((2 * index + 1) < dHeapBase<OBJECT, KEY>::m_curCount) {
+		int i0 = 2 * index + 1;
+		int i1 = 2 * index + 2;
+		if (i1 < dHeapBase<OBJECT, KEY>::m_curCount) {
+			i0 = (dHeapBase<OBJECT, KEY>::m_pool[i0].m_key > dHeapBase<OBJECT, KEY>::m_pool[i1].m_key) ? i0 : i1;
+			if (dHeapBase<OBJECT, KEY>::m_pool[i0].m_key <= dHeapBase<OBJECT, KEY>::m_pool[index].m_key) {
+				break;
+			}
+			dSwap(dHeapBase<OBJECT, KEY>::m_pool[i0], dHeapBase<OBJECT, KEY>::m_pool[index]);
+			index = i0;
+		} else {
+			if (dHeapBase<OBJECT, KEY>::m_pool[i0].m_key > dHeapBase<OBJECT, KEY>::m_pool[index].m_key) {
+				dSwap(dHeapBase<OBJECT, KEY>::m_pool[i0], dHeapBase<OBJECT, KEY>::m_pool[index]);
+			}
+			index = i0;
 		}
 	}
+
 	dAssert(SanityCheck());
 }
 
@@ -377,20 +391,6 @@ void dUpHeap<OBJECT,KEY>::Sort ()
 template <class OBJECT, class KEY>
 void dUpHeap<OBJECT,KEY>::Remove (int index)
 {
-#if 0
-	if (index == 0) {
-		Pop();
-	} else if (index == dHeapBase<OBJECT,KEY>::m_curCount - 1) {
-		dHeapBase<OBJECT,KEY>::m_curCount --;
-	} else {
-		const int count = dHeapBase<OBJECT,KEY>::m_curCount;
-		dHeapBase<OBJECT,KEY>::m_curCount = index;
-		for (int i = index + 1; i < count; i ++) {
-			Push (dHeapBase<OBJECT,KEY>::m_pool[i].m_obj, dHeapBase<OBJECT,KEY>::m_pool[i].m_key);
-		}
-	}
-#else
-
 	dHeapBase<OBJECT, KEY>::m_curCount--;
 	dHeapBase<OBJECT, KEY>::m_pool[index] = dHeapBase<OBJECT, KEY>::m_pool[dHeapBase<OBJECT, KEY>::m_curCount];
 	while (index && dHeapBase<OBJECT, KEY>::m_pool[(index - 1) >> 1].m_key > dHeapBase<OBJECT, KEY>::m_pool[index].m_key) {
@@ -415,7 +415,6 @@ void dUpHeap<OBJECT,KEY>::Remove (int index)
 			index = i0;
 		}
 	}
-#endif
 	dAssert (SanityCheck());
 }
 
