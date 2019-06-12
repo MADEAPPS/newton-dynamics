@@ -399,7 +399,6 @@ DemoEntityManager::DemoEntityManager ()
 	
 	dMatrixTimeVector(2, &A[0][0], x, b);
 	dSolveDantzigLCP(2, &A[0][0], x, b, l, h);
-*/
 
 	int xxx = 0;
 	const int xxxxxx = 450;
@@ -414,6 +413,7 @@ DemoEntityManager::DemoEntityManager ()
 		xxxxx.Remove (index);
 		xxxxx.Push (xxx, key);
 	}
+*/
 }
 
 DemoEntityManager::~DemoEntityManager ()

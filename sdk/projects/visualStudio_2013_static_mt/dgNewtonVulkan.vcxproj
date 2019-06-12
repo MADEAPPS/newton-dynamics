@@ -63,7 +63,7 @@
     <CustomBuild Include="..\..\dgNewtonVulkan\shaders\InitBodyArray.comp">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -H -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">..\..\dgNewtonVulkan\vulkanSDK\1.1.106.0\glslang\glslangValidator  %(FullPath) -V -x -o %(RootDir)%(Directory)%(Filename).spv  </Command>
