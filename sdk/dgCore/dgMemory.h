@@ -184,6 +184,8 @@ class dgMemoryAllocator
 	public:
 	#define DG_MEMORY_GRANULARITY_BITS	6	
 	#define DG_MEMORY_GRANULARITY		(1 << DG_MEMORY_GRANULARITY_BITS)	
+//	#define DG_MEMORY_BEAMS_COUNT		10
+	#define DG_MEMORY_BEAMS_COUNT		1
 
 	class dgMemoryHeader
 	{
@@ -202,6 +204,29 @@ class dgMemoryAllocator
 			dgMemoryHeader m_aligment;
 			char m_padd1[DG_MEMORY_GRANULARITY];
 		};
+	};
+
+	class dgMemoryPage
+	{
+		public:
+		dgMemoryPage(dgInt32 size);
+		~dgMemoryPage();
+		void *operator new (size_t size);
+		void operator delete (void* const ptr);
+	};
+
+	class dgMemoryBeam
+	{
+		public:
+		dgMemoryBeam();
+		~dgMemoryBeam();
+
+		void* Malloc(dgInt32 size);
+		void Free(void* const ptr);
+
+		dgMemoryPage* m_firstPage;
+		dgInt32 m_beamSize;
+		
 	};
 
 	dgMemoryAllocator();
@@ -226,6 +251,11 @@ class dgMemoryAllocator
 
 	void *operator new (size_t size);
 	void operator delete (void* const ptr);
+
+	private:
+	dgMemoryBeam* FindBeam(dgInt32 size);
+
+	dgMemoryBeam m_beams[DG_MEMORY_BEAMS_COUNT];
 };
 
 

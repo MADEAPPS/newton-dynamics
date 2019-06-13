@@ -418,8 +418,7 @@ void dgApi dgFree (void* const ptr)
 #else
 
 
-#define DG_CHUNK_SIZES_COUNT	1
-
+//#define DG_CHUNK_SIZES_COUNT	1
 
 
 class dgGlobalAllocator: public dgMemoryAllocator//, public dgList<dgMemoryAllocator*>
@@ -430,16 +429,11 @@ class dgGlobalAllocator: public dgMemoryAllocator//, public dgList<dgMemoryAlloc
 		,m_free(__free__)
 		,m_malloc(__malloc__) 
 		,m_memoryUsed(0)
-//		,dgList<dgMemoryAllocator*>(NULL)
 	{
-//		SetAllocator(this);
-		m_chunkSizes[0] = 0;
 	}
 
 	~dgGlobalAllocator()
 	{
-//		dgAssert(GetCount() == 0);
-//		dgAssert(0);
 	}
 
 	static void* dgApi __malloc__(dgUnsigned32 size)
@@ -482,7 +476,6 @@ class dgGlobalAllocator: public dgMemoryAllocator//, public dgList<dgMemoryAlloc
 	void Free(void* const ptr)
 	{
 		dgMemoryHeader* const info = ((dgMemoryHeader*)ptr) - 1;
-		//dgGlobalAllocator& globalAllocator = dgGlobalAllocator::GetGlobalAllocator();
 		dgAssert(info->m_allocator == this);
 	
 		dgAtomicExchangeAndAdd(&m_memoryUsed, -info->m_paddedSize);
@@ -499,18 +492,72 @@ class dgGlobalAllocator: public dgMemoryAllocator//, public dgList<dgMemoryAlloc
 	dgMemFree m_free;
 	dgMemAlloc m_malloc;
 	dgInt32 m_memoryUsed;
-	dgInt32 m_chunkSizes[DG_CHUNK_SIZES_COUNT + 1];
 };
+
+
+
+
+dgMemoryAllocator::dgMemoryPage::dgMemoryPage(dgInt32 size)
+{
+	dgAssert(0);
+}
+
+dgMemoryAllocator::dgMemoryPage::~dgMemoryPage()
+{
+	dgAssert(0);
+}
+
+void *dgMemoryAllocator::dgMemoryPage::operator new (size_t size)
+{
+	dgGlobalAllocator& globalAllocator = dgGlobalAllocator::GetGlobalAllocator();
+	return globalAllocator.Malloc(size);
+}
+
+void dgMemoryAllocator::dgMemoryPage::operator delete (void* const ptr)
+{
+	dgGlobalAllocator& globalAllocator = dgGlobalAllocator::GetGlobalAllocator();
+	globalAllocator.Free(ptr);
+}
+
+dgMemoryAllocator::dgMemoryBeam::dgMemoryBeam()
+	:m_firstPage(NULL)
+	,m_beamSize(0)
+{
+}
+
+dgMemoryAllocator::dgMemoryBeam::~dgMemoryBeam()
+{
+	if (m_firstPage) {
+		delete m_firstPage;
+	}
+	m_firstPage = NULL;
+}
+
+void* dgMemoryAllocator::dgMemoryBeam::Malloc(dgInt32 size)
+{
+	dgGlobalAllocator& globalAllocator = dgGlobalAllocator::GetGlobalAllocator();
+	return globalAllocator.Malloc(size);
+}
+
+void dgMemoryAllocator::dgMemoryBeam::Free(void* const ptr)
+{
+	//dgAssert(0);
+	//	dgMemoryHeader* const info = ((dgMemoryHeader*)ptr) - 1;
+	dgGlobalAllocator& globalAllocator = dgGlobalAllocator::GetGlobalAllocator();
+	globalAllocator.Free(ptr);
+}
 
 
 dgMemoryAllocator::dgMemoryAllocator()
 {
-//	dgAssert (0);
+	for (dgInt32 i = 0; i < DG_MEMORY_BEAMS_COUNT; i++) {
+		dgInt32 size = ((dgInt32 (sizeof (dgMemoryGranularity) * (dgPow(dgFloat32(1.6f), i + 2) - dgPow(dgFloat32(1.6f), i + 1))) + sizeof(dgMemoryGranularity) - 1) & -dgInt32 (sizeof(dgMemoryGranularity))) - sizeof (dgMemoryHeader);
+		m_beams[i].m_beamSize = size;
+	}
 }
 
 dgMemoryAllocator::~dgMemoryAllocator()
 {
-//	dgAssert (0);
 }
 
 void *dgMemoryAllocator::operator new (size_t size)
@@ -544,11 +591,11 @@ dgInt32 dgMemoryAllocator::GetSize (void* const ptr)
 void* dgMemoryAllocator::Malloc(dgInt32 size)
 {
 	dgGlobalAllocator& globalAllocator = dgGlobalAllocator::GetGlobalAllocator();
-	if (size > globalAllocator.m_chunkSizes[0]) {
+	if (size > m_beams[DG_MEMORY_BEAMS_COUNT-1].m_beamSize) {
 		return globalAllocator.Malloc(size);
 	} else {
-		dgAssert (0);
-		return NULL;
+		dgMemoryBeam* const beam = FindBeam(size);
+		return beam->Malloc(size);
 	}
 }
 
@@ -556,15 +603,24 @@ void dgMemoryAllocator::Free(void* const ptr)
 {
 	dgMemoryHeader* const info = ((dgMemoryHeader*)ptr) - 1;
 	dgGlobalAllocator& globalAllocator = dgGlobalAllocator::GetGlobalAllocator();
-	if (info->m_size > globalAllocator.m_chunkSizes[0]) {
+	if (info->m_size > m_beams[DG_MEMORY_BEAMS_COUNT - 1].m_beamSize) {
 		globalAllocator.Free (ptr);
 	} else {
-		dgAssert(0);
+		dgMemoryBeam* const beam = FindBeam(info->m_size);
+		beam->Free(ptr);
 	}
 }
 
-
-
+dgMemoryAllocator::dgMemoryBeam* dgMemoryAllocator::FindBeam(dgInt32 size)
+{
+	for (dgInt32 i = 0; i < DG_MEMORY_BEAMS_COUNT; i++) {
+		if (m_beams[i].m_beamSize >= size) {
+			return &m_beams[i];
+		}
+	}
+	dgAssert(0);
+	return NULL;
+}
 
 void* dgMalloc(size_t size, dgMemoryAllocator* const allocator)
 {
