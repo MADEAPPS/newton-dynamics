@@ -26,17 +26,6 @@
 
 class dgMemoryAllocator;
 
-void* dgApi dgMalloc (size_t size, dgMemoryAllocator* const allocator);
-void  dgApi dgFree (void* const ptr);
-
-void* dgApi dgMallocStack (size_t size);
-void* dgApi dgMallocAligned (size_t size, dgInt32 alignmentInBytes);
-void  dgApi dgFreeStack (void* const ptr);
-
-typedef void* (dgApi *dgMemAlloc) (dgUnsigned32 size);
-typedef void (dgApi *dgMemFree) (void* const ptr, dgUnsigned32 size);
-
-
 #define DG_CLASS_ALLOCATOR_NEW(allocator)			DG_INLINE void *operator new (size_t size, dgMemoryAllocator* const allocator) { return dgMalloc(size, allocator);}
 #define DG_CLASS_ALLOCATOR_NEW_ARRAY(allocator)		DG_INLINE void *operator new[] (size_t size, dgMemoryAllocator* const allocator) { return dgMalloc(size, allocator);}
 #define DG_CLASS_ALLOCATOR_DELETE(allocator)		DG_INLINE void operator delete (void* const ptr, dgMemoryAllocator* const allocator) { dgFree(ptr); }
@@ -56,6 +45,22 @@ typedef void (dgApi *dgMemFree) (void* const ptr, dgUnsigned32 size);
 	DG_CLASS_ALLOCATOR_NEW_ARRAY_DUMMY				\
 	DG_CLASS_ALLOCATOR_DELETE_DUMMY					\
 	DG_CLASS_ALLOCATOR_DELETE_ARRAY_DUMMY
+
+typedef void* (dgApi *dgMemAlloc) (dgUnsigned32 size);
+typedef void (dgApi *dgMemFree) (void* const ptr, dgUnsigned32 size);
+
+#define DG_OLD_ALLOCATOR
+
+#ifdef DG_OLD_ALLOCATOR
+
+void* dgApi dgMalloc (size_t size, dgMemoryAllocator* const allocator);
+void  dgApi dgFree (void* const ptr);
+
+void* dgApi dgMallocStack (size_t size);
+void* dgApi dgMallocAligned (size_t size, dgInt32 alignmentInBytes);
+void  dgApi dgFreeStack (void* const ptr);
+
+
 
 class dgMemoryAllocator
 {
@@ -166,6 +171,65 @@ class dgStackMemoryAllocator: public dgMemoryAllocator
 	dgInt32 m_index;
 	dgInt32 m_size;
 };
+
+#else
+
+void* dgApi dgMalloc(size_t size, dgMemoryAllocator* const allocator);
+void  dgApi dgFree(void* const ptr);
+void* dgApi dgMallocStack(size_t size);
+void dgApi dgFreeStack(void* const ptr);
+
+class dgMemoryAllocator
+{
+	public:
+	#define DG_MEMORY_GRANULARITY_BITS	6	
+	#define DG_MEMORY_GRANULARITY		(1 << DG_MEMORY_GRANULARITY_BITS)	
+
+	class dgMemoryHeader
+	{
+		public:
+		void* ptr;
+		dgMemoryAllocator* m_allocator;
+		dgInt32 m_size;
+		dgInt32 m_paddedSize;
+	};
+
+	class dgMemoryGranularity
+	{
+		public:
+		union
+		{
+			dgMemoryHeader m_aligment;
+			char m_padd1[DG_MEMORY_GRANULARITY];
+		};
+	};
+
+	dgMemoryAllocator();
+	virtual ~dgMemoryAllocator();
+
+	virtual void* Malloc(dgInt32 size);
+	virtual void Free(void* const ptr);
+	virtual dgInt32 GetSize (void* const ptr);
+
+	void* MallocLow(dgInt32 size, dgInt32 aligment=DG_MEMORY_GRANULARITY)
+	{
+		return Malloc(size);
+	}
+
+	void FreeLow(void* const ptr)
+	{
+		Free (ptr);
+	}
+
+	static dgInt32 GetGlobalMemoryUsed();
+	static void SetGlobalAllocators(dgMemAlloc alloc, dgMemFree free);
+
+	void *operator new (size_t size);
+	void operator delete (void* const ptr);
+};
+
+
+#endif
 
 #endif
 
