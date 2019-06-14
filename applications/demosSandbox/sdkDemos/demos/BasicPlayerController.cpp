@@ -180,12 +180,27 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 
 	dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
 	{ 
-		// clip steep slope contacts
+		
 		if (normal.m_y < 0.9f) {
+			// steep slope are friction less
 			return 0.0f;
 		} else {
-			//return controller->GetFriction(); 
-			return 1.0f;
+			switch (contactId)
+			{
+				case 1:
+					// this the brick wall
+					return 0.5f;
+				case 2:
+					// this the wood floor
+					return 1.0f;
+				case 3:
+					// this the cemment floor
+					//return 2.0f;
+					return 0.2f;
+				default: 
+					// this is everythong else
+					return 0.1f;
+			}
 		}
 	}
 	
@@ -239,7 +254,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 //	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
 
-	location.m_posit.m_x += 5.0f;
+	location.m_posit.m_x -= 10.0f;
 	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 0.5f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
 
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);

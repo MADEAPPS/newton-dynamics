@@ -1133,7 +1133,15 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* const world, DemoEntity* cons
 		dFloat* const vertex = mesh->m_vertex;
 		for (DemoMesh::dListNode* nodes = mesh->GetFirst(); nodes; nodes = nodes->GetNext()) {
 			DemoSubMesh& segment = nodes->GetInfo();
-			int matID = segment.m_textureHandle;
+			//int matID = segment.m_textureHandle;
+			int matID = 1;
+			if (segment.m_textureName.Find("wood") != -1) {
+				matID  = 2;
+			} else if (segment.m_textureName.Find("floor") != -1) {
+				matID = 3;
+			}
+
+
 			for (int i = 0; i < segment.m_indexCount; i += 3) {
 				dFloat face[3][3];
 				for (int j = 0; j < 3; j ++) {

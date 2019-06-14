@@ -2423,7 +2423,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 			contactOut[i].m_collision0 = collision0;
 			contactOut[i].m_collision1 = collision1;
 			contactOut[i].m_shapeId0 = collision0->GetUserDataID();
-			contactOut[i].m_shapeId1 = collision1->GetUserDataID();
+			//contactOut[i].m_shapeId1 = collision1->GetUserDataID();
 		}
 
 		instance0.m_material.m_userData = NULL;
@@ -2440,7 +2440,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 			contactOut[i].m_collision0 = collision0;
 			contactOut[i].m_collision1 = collision1;
 			contactOut[i].m_shapeId0 = collision0->GetUserDataID();
-			contactOut[i].m_shapeId1 = collision1->GetUserDataID();
+			//contactOut[i].m_shapeId1 = collision1->GetUserDataID();
 		}
 	}
 
