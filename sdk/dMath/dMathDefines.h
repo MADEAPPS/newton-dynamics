@@ -797,7 +797,8 @@ void dGaussSeidelLcpSor(const int size, const int stride, const T* const matrix,
 	T tolerance(tol2 * 2.0f);
 	const T* const invDiag = invDiag1;
 	const int maxCount = dMax (8, size);
-	for (int i = 0; (i < maxCount) && (tolerance > T(1.0e-8f)); i++) {
+//	for (int i = 0; (i < maxCount) && (tolerance > T(1.0e-8f)); i++) {
+	for (int i = 0; (i < maxCount) && (tolerance > tol2); i++) {
 		int base = 0;
 		tolerance = T(0.0f);
 		for (int j = 0; j < size; j++) {

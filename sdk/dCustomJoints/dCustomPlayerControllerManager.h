@@ -35,7 +35,7 @@ class dCustomPlayerController
 		,m_impulse(0.0f)
 		,m_mass(0.0f)
 		,m_invMass(0.0f)
-		,m_friction(1.0f)
+		,m_friction___(1.0f)
 		,m_headingAngle(0.0f)
 		,m_forwardSpeed(0.0f)
 		,m_lateralSpeed(0.0f)
@@ -57,9 +57,6 @@ class dCustomPlayerController
 	dCustomPlayerControllerManager* GetManager() const {return m_manager;}
 
 	const dFloat GetMass() const { return m_mass;}
-
-	dFloat GetFriction() const { return m_friction;}
-	void SetFriction(dFloat friction) {m_friction = dClamp (friction, dFloat (0.0f), dFloat (3.0f));}
 
 	const dVector& GetImpulse() { return m_impulse; }
 	void SetImpulse(const dVector& impulse) { m_impulse = impulse;}
@@ -93,7 +90,7 @@ class dCustomPlayerController
 	dVector m_impulse;
 	dFloat m_mass;
 	dFloat m_invMass;
-	dFloat m_friction;
+	dFloat m_friction___;
 	dFloat m_headingAngle;
 	dFloat m_forwardSpeed;
 	dFloat m_lateralSpeed;
@@ -115,7 +112,7 @@ class dCustomPlayerControllerManager: public dCustomParallelListener
 
 	virtual void ApplyMove(dCustomPlayerController* const controller, dFloat timestep) = 0;
 	virtual bool ProccessContact(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const { return true; }
-	virtual dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const { return controller->GetFriction(); }
+	virtual dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const { return controller->m_friction___; }
 
 	protected:
 	void PostUpdate(dFloat timestep) {}

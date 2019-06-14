@@ -1287,7 +1287,7 @@ class AdvancedPlayerControllerManager : public dCustomPlayerControllerManager
 		controller->SetUserData(playerEntity);
 
 		// set higher that 1.0f friction
-		controller->SetFriction(2.0f);
+		//controller->SetFriction(2.0f);
 		//controller->SetFriction(1.0f);
 
 		return controller;
@@ -1348,14 +1348,15 @@ class AdvancedPlayerControllerManager : public dCustomPlayerControllerManager
 		return true;
 	}
 
-	dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
+	dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
 	{
 		// clip steep slope contacts
 		if (normal.m_y < 0.9f) {
 			return 0.0f;
 		}
 		else {
-			return controller->GetFriction();
+			//return controller->GetFriction();
+			return 1.0f;
 		}
 	}
 

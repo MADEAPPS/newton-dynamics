@@ -164,8 +164,8 @@ void dCustomPlayerController::ResolveStep(dFloat timestep)
 	// add lateral traction friction
 	jt[1].m_linear = coodinateMatrix[1];
 	jt[1].m_angular = zero;
-	low[1] = -m_friction;
-	high[1] = m_friction;
+	low[1] = -m_friction___;
+	high[1] = m_friction___;
 	normalIndex[1] = -1;
 	dVector tmp1(veloc * jt[1].m_linear);
 	rhs[1] = -m_lateralSpeed - (tmp1.m_x + tmp1.m_y + tmp1.m_z);
@@ -173,8 +173,8 @@ void dCustomPlayerController::ResolveStep(dFloat timestep)
 	// add longitudinal  traction friction
 	jt[2].m_linear = coodinateMatrix[2];
 	jt[2].m_angular = zero;
-	low[2] = -m_friction;
-	high[2] = m_friction;
+	low[2] = -m_friction___;
+	high[2] = m_friction___;
 	normalIndex[2] = -2;
 	dVector tmp2(veloc * jt[2].m_linear);
 	rhs[2] = -m_forwardSpeed - (tmp2.m_x + tmp2.m_y + tmp2.m_z);
@@ -286,7 +286,7 @@ dVector dCustomPlayerController::CalculateImpulse(
 		}
 	}
 
-	dGaussSeidelLcpSor(rows, D_MAX_ROWS, &massMatrix[0][0], impulseMag, rhs, normalIndex, low, high, dFloat(1.0e-2f), 32, dFloat(1.1f));
+	dGaussSeidelLcpSor(rows, D_MAX_ROWS, &massMatrix[0][0], impulseMag, rhs, normalIndex, low, high, dFloat(1.0e-6f), 32, dFloat(1.1f));
 
 	dVector netImpulse(0.0f);
 	for (int i = 0; i < rows; i++) {
@@ -436,7 +436,7 @@ void dCustomPlayerController::ResolveCollision()
 		dAssert (rowCount < (D_MAX_ROWS - 3));
 
 		//dFloat updir = localFrame.m_front.DotProduct3(normal);
-		dFloat friction = m_manager->ContactFriction(this, point, normal, contact.m_hitBody);
+		dFloat friction = m_manager->ContactFriction(this, point, normal, int (contact.m_contactID), contact.m_hitBody);
 		if (friction > 0.0f)
 		{
 			// add lateral traction friction
