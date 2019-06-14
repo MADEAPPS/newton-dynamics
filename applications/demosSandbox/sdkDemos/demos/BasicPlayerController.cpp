@@ -92,6 +92,9 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		// make a play controller with default values.
 		dCustomPlayerController* const controller = CreateController(location, localAxis, mass, radius, height, height / 3.0f);
 
+		// Test Local Matrix manipulations
+		controller->SetFrame(dRollMatrix(45.0f * dDegreeToRad) * controller->GetFrame());
+
 		// get body from player, and set some parameter
 		NewtonBody* const body = controller->GetBody();
 

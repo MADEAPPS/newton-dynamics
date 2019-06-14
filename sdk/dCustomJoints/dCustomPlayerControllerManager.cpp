@@ -63,8 +63,9 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreateController(const 
 	NewtonWorld* const world = GetWorld();
 
 	dMatrix shapeMatrix(localAxis);
-	shapeMatrix.m_posit = shapeMatrix.m_front.Scale (height * 0.5f);
-	shapeMatrix.m_posit.m_w = 1.0f;
+	shapeMatrix.m_posit = dVector (height * 0.5f, 0.0f, 0.0f, 1.0f);
+	//shapeMatrix.m_posit = shapeMatrix.m_front.Scale (height * 0.5f);
+	//shapeMatrix.m_posit.m_w = 1.0f;
 
 	dFloat scale = 3.0f;
 	height = dMax(height - 2.0f * radius / scale, dFloat(0.1f));
@@ -84,7 +85,8 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreateController(const 
 
 	dCustomPlayerController& controller = m_playerList.Append()->GetInfo();
 
-	controller.m_localFrame = localAxis;
+	shapeMatrix.m_posit.m_x = 0.0f;
+	controller.m_localFrame = shapeMatrix;
 	controller.m_mass = mass;
 	controller.m_invMass = 1.0f / mass;
 	controller.m_manager = this;
@@ -105,6 +107,23 @@ dVector dCustomPlayerController::GetVelocity() const
 void dCustomPlayerController::SetVelocity(const dVector& veloc) 
 { 
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+}
+
+
+void dCustomPlayerController::SetFrame(const dMatrix& frame)
+{
+	dAssert (frame.TestOrthogonal());
+	m_localFrame = frame;
+	m_localFrame.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
+
+	NewtonCollision* const capsule = NewtonBodyGetCollision(m_kinematicBody);
+
+	dMatrix oldMatrix;
+	dMatrix newMatrix(m_localFrame);
+	NewtonCollisionGetMatrix(capsule, &oldMatrix[0][0]);
+
+	newMatrix.m_posit = oldMatrix.m_posit;
+	NewtonCollisionSetMatrix(capsule, &newMatrix[0][0]);
 }
 
 unsigned dCustomPlayerController::PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
@@ -394,7 +413,6 @@ void dCustomPlayerController::ResolveCollision()
 	NewtonBodyGetCentreOfMass(m_kinematicBody, &com[0]);
 	NewtonBodyGetInvInertiaMatrix(m_kinematicBody, &invInertia[0][0]);
 
-//	const dMatrix localFrame (dPitchMatrix(m_headingAngle) * m_localFrame * matrix);
 	const dMatrix localFrame (m_localFrame * matrix);
 
 	com = matrix.TransformVector(com);

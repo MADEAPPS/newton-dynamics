@@ -45,9 +45,6 @@ class dCustomPlayerController
 		,m_kinematicBody(NULL)
 		,m_manager(NULL)
 	{
-		//m_forwardSpeed = 1.0f;
-		//m_lateralSpeed = 1.0f;
-		//m_headingAngle = 0.0f * dDegreeToRad;
 	}
 
 	~dCustomPlayerController () 
@@ -75,6 +72,9 @@ class dCustomPlayerController
 
 	dFloat GetHeadingAngle() const { return m_headingAngle; }
 	void SetHeadingAngle(dFloat angle) {m_headingAngle = dClamp (angle, dFloat (-dPi), dFloat (dPi));}
+
+	dMatrix GetFrame() const { return m_localFrame; }
+	CUSTOM_JOINTS_API void SetFrame(const dMatrix& frame);
 
 	CUSTOM_JOINTS_API dVector GetVelocity() const;
 	CUSTOM_JOINTS_API void SetVelocity(const dVector& veloc);
