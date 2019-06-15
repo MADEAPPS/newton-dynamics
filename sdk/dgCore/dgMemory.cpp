@@ -418,8 +418,6 @@ void dgApi dgFree (void* const ptr)
 #else
 
 
-//#define DG_CHUNK_SIZES_COUNT	1
-
 
 class dgGlobalAllocator: public dgMemoryAllocator//, public dgList<dgMemoryAllocator*>
 {
@@ -465,7 +463,7 @@ class dgGlobalAllocator: public dgMemoryAllocator//, public dgList<dgMemoryAlloc
 		dgUnsigned64 address = dgUnsigned64(ptr + sizeof (dgMemoryHeader) + sizeof (dgMemoryGranularity)-1) & ~(sizeof (dgMemoryGranularity)-1);
 		
 		dgMemoryHeader* const info = ((dgMemoryHeader*)address) - 1;
-		info->ptr = ptr;
+		info->m_ptr____ = ptr;
 		info->m_allocator = this;
 		info->m_size = size;
 		info->m_paddedSize = paddedSize;
@@ -479,9 +477,8 @@ class dgGlobalAllocator: public dgMemoryAllocator//, public dgList<dgMemoryAlloc
 		dgAssert(info->m_allocator == this);
 	
 		dgAtomicExchangeAndAdd(&m_memoryUsed, -info->m_paddedSize);
-		m_free(info->ptr, info->m_paddedSize);
+		m_free(info->m_ptr____, info->m_paddedSize);
 	}
-
 
 	static dgGlobalAllocator& GetGlobalAllocator()
 	{
@@ -495,11 +492,37 @@ class dgGlobalAllocator: public dgMemoryAllocator//, public dgList<dgMemoryAlloc
 };
 
 
-
-
-dgMemoryAllocator::dgMemoryPage::dgMemoryPage(dgInt32 size)
+dgMemoryAllocator::dgMemoryPage::dgMemoryPage(dgInt32 size, dgMemoryPage* const root, dgMemoryAllocator* const allocator)
+	:m_next(NULL)
+	,m_prev(root)
+	,m_freeList (NULL)
+	,m_count(0)
+	,m_capacity(0)
 {
-	dgAssert(0);
+	if (root) {
+		dgAssert (!root->m_prev);
+		root->m_prev = this;
+	}
+	dgInt32 paddSize = size + sizeof (dgMemoryHeader);
+	dgAssert ((paddSize & (sizeof (dgMemoryGranularity) - 1)) == 0);
+	
+	const char* const ptr1 = &m_buffer[sizeof (m_buffer) - paddSize];
+	for (char* ptr = &m_buffer[sizeof (dgMemoryGranularity)]; ptr <= ptr1; ptr += paddSize) {
+		dgAssert ((dgUnsigned64(ptr) & (sizeof (dgMemoryGranularity) - 1)) == 0);
+
+		dgMemoryGranularity* const freeList = (dgMemoryGranularity*) ptr;
+		dgMemoryHeader* const header = ((dgMemoryHeader*)freeList) - 1;
+		header->m_page = this;
+		header->m_allocator = allocator;
+		header->m_size = 0;
+		header->m_paddedSize = size;
+
+		freeList->m_next = m_freeList;
+		m_freeList = freeList;
+		m_count ++;
+	}
+
+	m_capacity = m_count;
 }
 
 dgMemoryAllocator::dgMemoryPage::~dgMemoryPage()
@@ -510,13 +533,37 @@ dgMemoryAllocator::dgMemoryPage::~dgMemoryPage()
 void *dgMemoryAllocator::dgMemoryPage::operator new (size_t size)
 {
 	dgGlobalAllocator& globalAllocator = dgGlobalAllocator::GetGlobalAllocator();
-	return globalAllocator.Malloc(size);
+	return globalAllocator.Malloc(dgInt32 (size));
 }
 
 void dgMemoryAllocator::dgMemoryPage::operator delete (void* const ptr)
 {
 	dgGlobalAllocator& globalAllocator = dgGlobalAllocator::GetGlobalAllocator();
 	globalAllocator.Free(ptr);
+}
+
+void* dgMemoryAllocator::dgMemoryPage::Malloc(dgInt32 size)
+{
+	m_count --;
+	dgAssert (m_count >= 0);
+	dgMemoryGranularity* const freeList = m_freeList;
+	m_freeList = m_freeList->m_next;
+
+	dgMemoryHeader* const header = ((dgMemoryHeader*)freeList) - 1;
+	header->m_size = size;
+	return freeList;
+}
+
+void dgMemoryAllocator::dgMemoryPage::Free(void* const ptr)
+{
+	m_count++;
+	dgAssert(m_count <= m_capacity);
+	dgMemoryHeader* const info = ((dgMemoryHeader*)ptr) - 1;
+	info->m_size = 0;
+
+	dgMemoryGranularity* const freeList = (dgMemoryGranularity*) ptr;
+	freeList->m_next = m_freeList;
+	m_freeList = freeList;
 }
 
 dgMemoryAllocator::dgMemoryBeam::dgMemoryBeam()
@@ -535,24 +582,36 @@ dgMemoryAllocator::dgMemoryBeam::~dgMemoryBeam()
 
 void* dgMemoryAllocator::dgMemoryBeam::Malloc(dgInt32 size)
 {
-	dgGlobalAllocator& globalAllocator = dgGlobalAllocator::GetGlobalAllocator();
-	return globalAllocator.Malloc(size);
+	dgAssert (size <= m_beamSize);
+	if (!m_firstPage) {
+		m_firstPage = new dgMemoryPage (m_beamSize, m_firstPage, m_allocator);
+	}
+	dgAssert (m_firstPage->m_count > 0);
+	return m_firstPage->Malloc (size);
 }
 
 void dgMemoryAllocator::dgMemoryBeam::Free(void* const ptr)
 {
-	//dgAssert(0);
-	//	dgMemoryHeader* const info = ((dgMemoryHeader*)ptr) - 1;
-	dgGlobalAllocator& globalAllocator = dgGlobalAllocator::GetGlobalAllocator();
-	globalAllocator.Free(ptr);
+	dgMemoryHeader* const info = ((dgMemoryHeader*)ptr) - 1;
+	dgMemoryPage* const page = info->m_page;
+	page->Free(ptr);
+	dgAssert (page->m_count <= page->m_capacity);
+	if (page->m_count == page->m_capacity) {
+		dgAssert (0);
+	}
 }
 
+void dgMemoryAllocator::dgMemoryBeam::Init(dgInt32 size, dgMemoryAllocator* const allocator)
+{
+	m_beamSize = size;
+	m_allocator = allocator;
+}
 
 dgMemoryAllocator::dgMemoryAllocator()
 {
 	for (dgInt32 i = 0; i < DG_MEMORY_BEAMS_COUNT; i++) {
 		dgInt32 size = ((dgInt32 (sizeof (dgMemoryGranularity) * (dgPow(dgFloat32(1.6f), i + 2) - dgPow(dgFloat32(1.6f), i + 1))) + sizeof(dgMemoryGranularity) - 1) & -dgInt32 (sizeof(dgMemoryGranularity))) - sizeof (dgMemoryHeader);
-		m_beams[i].m_beamSize = size;
+		m_beams[i].Init (size, this);
 	}
 }
 
@@ -563,7 +622,7 @@ dgMemoryAllocator::~dgMemoryAllocator()
 void *dgMemoryAllocator::operator new (size_t size)
 {
 	dgGlobalAllocator& globalAllocator = dgGlobalAllocator::GetGlobalAllocator();
-	return globalAllocator.Malloc(size);
+	return globalAllocator.Malloc(dgInt32 (size));
 }
 
 void dgMemoryAllocator::operator delete (void* const ptr)
@@ -624,7 +683,7 @@ dgMemoryAllocator::dgMemoryBeam* dgMemoryAllocator::FindBeam(dgInt32 size)
 
 void* dgMalloc(size_t size, dgMemoryAllocator* const allocator)
 {
-	void* const ptr = allocator->Malloc(size);
+	void* const ptr = allocator->Malloc(dgInt32 (size));
 	return ptr;
 }
 

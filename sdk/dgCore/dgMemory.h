@@ -187,11 +187,16 @@ class dgMemoryAllocator
 //	#define DG_MEMORY_BEAMS_COUNT		10
 	#define DG_MEMORY_BEAMS_COUNT		1
 
+
+	class dgMemoryPage;
 	class dgMemoryHeader
 	{
 		public:
-		void* ptr;
 		dgMemoryAllocator* m_allocator;
+		union {
+			void* m_ptr____;
+			dgMemoryPage* m_page;
+		};
 		dgInt32 m_size;
 		dgInt32 m_paddedSize;
 	};
@@ -201,7 +206,7 @@ class dgMemoryAllocator
 		public:
 		union
 		{
-			dgMemoryHeader m_aligment;
+			dgMemoryGranularity* m_next;
 			char m_padd1[DG_MEMORY_GRANULARITY];
 		};
 	};
@@ -209,10 +214,21 @@ class dgMemoryAllocator
 	class dgMemoryPage
 	{
 		public:
-		dgMemoryPage(dgInt32 size);
+		dgMemoryPage(dgInt32 size, dgMemoryPage* const root, dgMemoryAllocator* const allocator);
 		~dgMemoryPage();
 		void *operator new (size_t size);
 		void operator delete (void* const ptr);
+
+		void* Malloc(dgInt32 size);
+		void Free(void* const ptr);
+
+		char m_buffer[1024 * 64];
+		dgMemoryPage* m_next;
+		dgMemoryPage* m_prev;
+		dgMemoryGranularity* m_freeList;
+
+		dgInt32 m_count;
+		dgInt32 m_capacity;
 	};
 
 	class dgMemoryBeam
@@ -220,13 +236,14 @@ class dgMemoryAllocator
 		public:
 		dgMemoryBeam();
 		~dgMemoryBeam();
+		void Init(dgInt32 size, dgMemoryAllocator* const allocator);
 
 		void* Malloc(dgInt32 size);
 		void Free(void* const ptr);
 
 		dgMemoryPage* m_firstPage;
+		dgMemoryAllocator* m_allocator;
 		dgInt32 m_beamSize;
-		
 	};
 
 	dgMemoryAllocator();

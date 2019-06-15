@@ -791,12 +791,29 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 
 	dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
 	{
-		// clip steep slope contacts
 		if (normal.m_y < 0.9f) {
+			// steep slope are friction less
 			return 0.0f;
-		} else {
-			//return controller->GetFriction();
-			return 1.0f;
+		}
+		else {
+			//NewtonCollision* const collision = NewtonBodyGetCollision(otherbody);
+			//int type = NewtonCollisionGetType (collision);
+			//if ((type == SERIALIZE_ID_TREE) || (type == SERIALIZE_ID_TREE)) {
+			//} else {
+			switch (contactId) {
+				case 1:
+					// this the brick wall
+					return 0.5f;
+				case 2:
+					// this the wood floor
+					return 1.0f;
+				case 3:
+					// this the cement floor
+					return 2.0f;
+				default:
+					// this is everything else
+					return 1.0f;
+			}
 		}
 	}
 

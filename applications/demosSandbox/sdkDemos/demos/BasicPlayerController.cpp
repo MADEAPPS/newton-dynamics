@@ -93,7 +93,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		dCustomPlayerController* const controller = CreateController(location, localAxis, mass, radius, height, height / 3.0f);
 
 		// Test Local Matrix manipulations
-		controller->SetFrame(dRollMatrix(60.0f * dDegreeToRad) * controller->GetFrame());
+		//controller->SetFrame(dRollMatrix(60.0f * dDegreeToRad) * controller->GetFrame());
 
 		// get body from player, and set some parameter
 		NewtonBody* const body = controller->GetBody();
@@ -180,11 +180,14 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 
 	dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
 	{ 
-		
 		if (normal.m_y < 0.9f) {
 			// steep slope are friction less
 			return 0.0f;
 		} else {
+			//NewtonCollision* const collision = NewtonBodyGetCollision(otherbody);
+			//int type = NewtonCollisionGetType (collision);
+			//if ((type == SERIALIZE_ID_TREE) || (type == SERIALIZE_ID_TREE)) {
+			//} else {
 			switch (contactId)
 			{
 				case 1:
@@ -194,12 +197,12 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 					// this the wood floor
 					return 1.0f;
 				case 3:
-					// this the cemment floor
+					// this the cement floor
 					//return 2.0f;
 					return 0.2f;
 				default: 
-					// this is everythong else
-					return 0.1f;
+					// this is everything else
+					return 1.0f;
 			}
 		}
 	}
