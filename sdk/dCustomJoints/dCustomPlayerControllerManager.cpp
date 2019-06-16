@@ -63,9 +63,8 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreateController(const 
 	NewtonWorld* const world = GetWorld();
 
 	dMatrix shapeMatrix(localAxis);
-	shapeMatrix.m_posit = dVector (height * 0.5f, 0.0f, 0.0f, 1.0f);
-	//shapeMatrix.m_posit = shapeMatrix.m_front.Scale (height * 0.5f);
-	//shapeMatrix.m_posit.m_w = 1.0f;
+	shapeMatrix.m_posit = shapeMatrix.m_front.Scale (height * 0.5f);
+	shapeMatrix.m_posit.m_w = 1.0f;
 
 	dFloat scale = 3.0f;
 	height = dMax(height - 2.0f * radius / scale, dFloat(0.1f));
@@ -79,13 +78,13 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreateController(const 
 	NewtonCollision* const shape = NewtonBodyGetCollision(body);
 	NewtonBodySetMassProperties(body, mass, shape);
 
-	// make the body collidable with other dynamics bodies, by default
+	// make the body collide with other dynamics bodies, by default
 	NewtonBodySetCollidable(body, 1);
 	NewtonDestroyCollision(bodyCapsule);
 
 	dCustomPlayerController& controller = m_playerList.Append()->GetInfo();
 
-	shapeMatrix.m_posit.m_x = 0.0f;
+	shapeMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 	controller.m_localFrame = shapeMatrix;
 	controller.m_mass = mass;
 	controller.m_invMass = 1.0f / mass;
@@ -164,8 +163,8 @@ void dCustomPlayerController::ResolveStep(dFloat timestep)
 	// add lateral traction friction
 	jt[1].m_linear = coodinateMatrix[1];
 	jt[1].m_angular = zero;
-	low[1] = -m_friction___;
-	high[1] = m_friction___;
+	low[1] = -m_friction;
+	high[1] = m_friction;
 	normalIndex[1] = -1;
 	dVector tmp1(veloc * jt[1].m_linear);
 	rhs[1] = -m_lateralSpeed - (tmp1.m_x + tmp1.m_y + tmp1.m_z);
@@ -173,8 +172,8 @@ void dCustomPlayerController::ResolveStep(dFloat timestep)
 	// add longitudinal  traction friction
 	jt[2].m_linear = coodinateMatrix[2];
 	jt[2].m_angular = zero;
-	low[2] = -m_friction___;
-	high[2] = m_friction___;
+	low[2] = -m_friction;
+	high[2] = m_friction;
 	normalIndex[2] = -2;
 	dVector tmp2(veloc * jt[2].m_linear);
 	rhs[2] = -m_forwardSpeed - (tmp2.m_x + tmp2.m_y + tmp2.m_z);

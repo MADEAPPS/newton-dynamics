@@ -116,10 +116,6 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		// save player model with the controller
 		controller->SetUserData(playerEntity);
 
-		// set higher that 1.0f friction
-		//controller->SetFriction(2.0f);
-		//controller->SetFriction(1.0f);
-
 		return controller;
 	}
 
@@ -198,8 +194,8 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 					return 1.0f;
 				case 3:
 					// this the cement floor
-					//return 2.0f;
-					return 0.2f;
+					return 2.0f;
+					//return 0.2f;
 				default: 
 					// this is everything else
 					return 1.0f;

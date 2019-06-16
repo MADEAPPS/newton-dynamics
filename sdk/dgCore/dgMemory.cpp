@@ -493,8 +493,8 @@ class dgGlobalAllocator: public dgMemoryAllocator//, public dgList<dgMemoryAlloc
 
 
 dgMemoryAllocator::dgMemoryPage::dgMemoryPage(dgInt32 size, dgMemoryPage* const root, dgMemoryAllocator* const allocator)
-	:m_next(NULL)
-	,m_prev(root)
+	:m_next(root)
+	,m_prev(NULL)
 	,m_freeList (NULL)
 	,m_count(0)
 	,m_capacity(0)
@@ -527,7 +527,7 @@ dgMemoryAllocator::dgMemoryPage::dgMemoryPage(dgInt32 size, dgMemoryPage* const 
 
 dgMemoryAllocator::dgMemoryPage::~dgMemoryPage()
 {
-	dgAssert(0);
+	dgAssert(m_count == m_capacity);
 }
 
 void *dgMemoryAllocator::dgMemoryPage::operator new (size_t size)
@@ -574,9 +574,15 @@ dgMemoryAllocator::dgMemoryBeam::dgMemoryBeam()
 
 dgMemoryAllocator::dgMemoryBeam::~dgMemoryBeam()
 {
-	if (m_firstPage) {
-		delete m_firstPage;
+	while (m_firstPage) {
+		if (m_firstPage->m_next) {
+			m_firstPage->m_next->m_prev = NULL;
+		}
+		dgMemoryPage* const firstPage = m_firstPage;
+		m_firstPage = m_firstPage->m_next;
+		delete firstPage;
 	}
+
 	m_firstPage = NULL;
 }
 
@@ -586,7 +592,10 @@ void* dgMemoryAllocator::dgMemoryBeam::Malloc(dgInt32 size)
 	if (!m_firstPage) {
 		m_firstPage = new dgMemoryPage (m_beamSize, m_firstPage, m_allocator);
 	}
-	dgAssert (m_firstPage->m_count > 0);
+
+	if (m_firstPage->m_count == 0) {
+		m_firstPage = new dgMemoryPage (m_beamSize, m_firstPage, m_allocator);
+	}
 	return m_firstPage->Malloc (size);
 }
 
@@ -597,7 +606,18 @@ void dgMemoryAllocator::dgMemoryBeam::Free(void* const ptr)
 	page->Free(ptr);
 	dgAssert (page->m_count <= page->m_capacity);
 	if (page->m_count == page->m_capacity) {
-		dgAssert (0);
+		if (page == m_firstPage) {
+			m_firstPage = m_firstPage->m_next;
+		}
+		if (page->m_next) {
+			page->m_next->m_prev = page->m_prev;
+		}
+		if (page->m_prev) {
+			page->m_prev->m_next = page->m_next;
+		}
+		page->m_next = NULL;
+		page->m_prev = NULL;
+		delete page;
 	}
 }
 
