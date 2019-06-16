@@ -5129,20 +5129,20 @@ void NewtonBodyGetTorque(const NewtonBody* const bodyPtr, dFloat* const vectorPt
   Matrix matrix;
   Vector center;
 
-  NewtonGatMetrix(body, matrix)
+  NewtonGetMatrix(body, matrix)
   NewtonGetCentreOfMass(body, center);
 
-  for global space torque.
+  //for global space torque.
   Vector localForce (fx, fy, fz);
   Vector localPosition (x, y, z);
-  Vector localTroque (crossproduct ((localPosition - center). localForce);
-  Vector globalTroque (matrix.RotateVector (localTroque));
+  Vector localTorque (crossproduct ((localPosition - center). localForce);
+  Vector globalTorque (matrix.RotateVector (localTorque));
 
-  for global space torque.
+  //for global space torque.
   Vector globalCentre (matrix.TranformVector (center));
   Vector globalPosition (x, y, z);
   Vector globalForce (fx, fy, fz);
-  Vector globalTroque (crossproduct ((globalPosition - globalCentre). globalForce);
+  Vector globalTorque (crossproduct ((globalPosition - globalCentre). globalForce);
 
   See also: ::NewtonConvexCollisionCalculateInertialMatrix, ::NewtonBodyGetCentreOfMass
 */
