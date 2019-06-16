@@ -463,7 +463,7 @@ class dgGlobalAllocator: public dgMemoryAllocator//, public dgList<dgMemoryAlloc
 		dgUnsigned64 address = dgUnsigned64(ptr + sizeof (dgMemoryHeader) + sizeof (dgMemoryGranularity)-1) & ~(sizeof (dgMemoryGranularity)-1);
 		
 		dgMemoryHeader* const info = ((dgMemoryHeader*)address) - 1;
-		info->m_ptr____ = ptr;
+		info->m_ptr = ptr;
 		info->m_allocator = this;
 		info->m_size = size;
 		info->m_paddedSize = paddedSize;
@@ -477,7 +477,7 @@ class dgGlobalAllocator: public dgMemoryAllocator//, public dgList<dgMemoryAlloc
 		dgAssert(info->m_allocator == this);
 	
 		dgAtomicExchangeAndAdd(&m_memoryUsed, -info->m_paddedSize);
-		m_free(info->m_ptr____, info->m_paddedSize);
+		m_free(info->m_ptr, info->m_paddedSize);
 	}
 
 	static dgGlobalAllocator& GetGlobalAllocator()

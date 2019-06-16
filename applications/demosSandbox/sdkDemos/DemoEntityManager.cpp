@@ -42,7 +42,7 @@
 //#define DEFAULT_SCENE	6		// kinematic bodies
 //#define DEFAULT_SCENE	7		// Object Placement
 //#define DEFAULT_SCENE	8		// primitive convex cast 
-//#define DEFAULT_SCENE	9		// box stacks
+#define DEFAULT_SCENE	9		// box stacks
 //#define DEFAULT_SCENE	10		// simple level mesh collision
 //#define DEFAULT_SCENE	11		// optimized level mesh collision
 //#define DEFAULT_SCENE	12		// height field Collision
@@ -75,7 +75,7 @@
 //#define DEFAULT_SCENE	39		// David Gravel multi body car
 //#define DEFAULT_SCENE	40		// super Car
 //#define DEFAULT_SCENE	41		// heavy vehicles
-#define DEFAULT_SCENE	42		// basic player controller
+//#define DEFAULT_SCENE	42		// basic player controller
 //#define DEFAULT_SCENE	43		// animated player controller
 //#define DEFAULT_SCENE	44		// advanced player controller
 //#define DEFAULT_SCENE	45		// cloth patch			

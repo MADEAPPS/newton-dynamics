@@ -26,14 +26,14 @@
 
 class dgMemoryAllocator;
 
-#define DG_CLASS_ALLOCATOR_NEW(allocator)			DG_INLINE void *operator new (size_t size, dgMemoryAllocator* const allocator) { return dgMalloc(size, allocator);}
-#define DG_CLASS_ALLOCATOR_NEW_ARRAY(allocator)		DG_INLINE void *operator new[] (size_t size, dgMemoryAllocator* const allocator) { return dgMalloc(size, allocator);}
-#define DG_CLASS_ALLOCATOR_DELETE(allocator)		DG_INLINE void operator delete (void* const ptr, dgMemoryAllocator* const allocator) { dgFree(ptr); }
-#define DG_CLASS_ALLOCATOR_DELETE_ARRAY(allocator)	DG_INLINE void operator delete[] (void* const ptr, dgMemoryAllocator* const allocator) { dgFree(ptr); }
-#define DG_CLASS_ALLOCATOR_NEW_DUMMY				DG_INLINE void *operator new (size_t size) { dgAssert (0); return dgMalloc(size, NULL);}
-#define DG_CLASS_ALLOCATOR_NEW_ARRAY_DUMMY			DG_INLINE void *operator new[] (size_t size) { dgAssert (0); return dgMalloc(size, NULL);}
-#define DG_CLASS_ALLOCATOR_DELETE_DUMMY				DG_INLINE void operator delete (void* const ptr) { dgFree(ptr); }
-#define DG_CLASS_ALLOCATOR_DELETE_ARRAY_DUMMY		DG_INLINE void operator delete[] (void* const ptr) { dgFree(ptr); }
+#define DG_CLASS_ALLOCATOR_NEW(allocator)			DG_INLINE void* operator new (size_t size, dgMemoryAllocator* const allocator) { return dgMalloc(size, allocator);}
+#define DG_CLASS_ALLOCATOR_NEW_ARRAY(allocator)		DG_INLINE void* operator new[] (size_t size, dgMemoryAllocator* const allocator) { return dgMalloc(size, allocator);}
+#define DG_CLASS_ALLOCATOR_DELETE(allocator)		DG_INLINE void  operator delete (void* const ptr, dgMemoryAllocator* const allocator) { dgFree(ptr); }
+#define DG_CLASS_ALLOCATOR_DELETE_ARRAY(allocator)	DG_INLINE void  operator delete[] (void* const ptr, dgMemoryAllocator* const allocator) { dgFree(ptr); }
+#define DG_CLASS_ALLOCATOR_NEW_DUMMY				DG_INLINE void* operator new (size_t size) { dgAssert (0); return dgMalloc(size, NULL);}
+#define DG_CLASS_ALLOCATOR_NEW_ARRAY_DUMMY			DG_INLINE void* operator new[] (size_t size) { dgAssert (0); return dgMalloc(size, NULL);}
+#define DG_CLASS_ALLOCATOR_DELETE_DUMMY				DG_INLINE void  operator delete (void* const ptr) { dgFree(ptr); }
+#define DG_CLASS_ALLOCATOR_DELETE_ARRAY_DUMMY		DG_INLINE void  operator delete[] (void* const ptr) { dgFree(ptr); }
 
 
 #define DG_CLASS_ALLOCATOR(allocator)				\
@@ -194,7 +194,7 @@ class dgMemoryAllocator
 		public:
 		dgMemoryAllocator* m_allocator;
 		union {
-			void* m_ptr____;
+			void* m_ptr;
 			dgMemoryPage* m_page;
 		};
 		dgInt32 m_size;
