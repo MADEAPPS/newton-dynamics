@@ -475,6 +475,7 @@ dgMemoryAllocator::dgMemoryPage::dgMemoryPage(dgInt32 size, dgMemoryPage* const 
 	,m_freeList (NULL)
 	,m_count(0)
 	,m_capacity(0)
+	,m_isFull(false)
 {
 	if (root) {
 		dgAssert (!root->m_prev);
@@ -585,24 +586,28 @@ void* dgMemoryAllocator::dgMemoryBeam::Malloc(dgInt32 size)
 	if (m_firstPage->m_count == 0) {
 		m_firstPage = new dgMemoryPage (m_beamSize, m_firstPage, m_allocator);
 	}
+
 	void* ptr = m_firstPage->Malloc(size);
-//	if (m_firstPage->m_count == 0) {
-//		if (m_firstPage->m_next) {
-//			dgMemoryPage* const page = m_firstPage;
-//			m_firstPage = page->m_next;
-//			page->m_next->m_prev = NULL;
-//			page->m_next = NULL;
-//
-//
-//
-//			//dgMemoryPage* last = m_firstPage;
-//			//while (last->m_next) { 
-//			//	last = last->m_next;
-//			//}
-//			//last->m_next = page;
-//			//page->m_prev = last;
-//		}
-//	}
+	if (m_firstPage->m_count == 0) {
+		dgMemoryPage* const page = m_firstPage;
+
+		dgAssert(!page->m_isFull);
+		page->m_isFull = true;
+		m_firstPage = page->m_next;
+		if (m_firstPage) {
+			m_firstPage->m_prev = NULL;
+		}
+		page->m_next = NULL;
+		page->m_prev = NULL;
+
+		dgAssert(!page->m_fullPageNext);
+		dgAssert(!page->m_fullPagePrev);
+		page->m_fullPageNext = m_fullPage;
+		if (m_fullPage) {
+			m_fullPage->m_fullPagePrev = page;
+		}
+		m_fullPage = page;
+	}
 	return ptr;
 }
 
@@ -610,6 +615,7 @@ void dgMemoryAllocator::dgMemoryBeam::Free(void* const ptr)
 {
 	dgMemoryHeader* const info = ((dgMemoryHeader*)ptr) - 1;
 	dgMemoryPage* const page = info->m_page;
+
 	page->Free(ptr);
 	dgAssert (page->m_count <= page->m_capacity);
 	if (page->m_count == page->m_capacity) {
@@ -625,6 +631,31 @@ void dgMemoryAllocator::dgMemoryBeam::Free(void* const ptr)
 		page->m_next = NULL;
 		page->m_prev = NULL;
 		delete page;
+	} else if (page->m_count == 1) {
+
+		dgAssert(page->m_isFull);
+		page->m_isFull = false;
+
+		if (page == m_fullPage) {
+			m_fullPage = m_fullPage->m_fullPageNext;
+		}
+		if (page->m_fullPageNext) {
+			page->m_fullPageNext->m_fullPagePrev = page->m_fullPagePrev;
+		}
+		if (page->m_fullPagePrev) {
+			page->m_fullPagePrev->m_fullPageNext = page->m_fullPageNext;
+		}
+		page->m_fullPagePrev = NULL;
+		page->m_fullPageNext = NULL;
+
+		dgAssert(!page->m_next);
+		dgAssert(!page->m_prev);
+		page->m_next = m_firstPage;
+		if (m_firstPage) {
+			m_firstPage->m_prev = page;
+		}
+		m_firstPage = page;
+
 //	} else if (page->m_prev) {
 //		dgInt32 key = page->GetSortKey();
 //		dgMemoryPage* prevPage = page->m_prev;

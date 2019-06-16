@@ -261,14 +261,15 @@ class dgMemoryAllocator: public dgMemoryAllocatorBase
 		void Free(void* const ptr);
 
 		char m_buffer[1024 * 64];
+
 		dgMemoryPage* m_next;
 		dgMemoryPage* m_prev;
 		dgMemoryPage* m_fullPageNext;
 		dgMemoryPage* m_fullPagePrev;
 		dgMemoryGranularity* m_freeList;
-
 		dgInt32 m_count;
 		dgInt32 m_capacity;
+		bool m_isFull;
 	};
 
 	class dgMemoryBeam
