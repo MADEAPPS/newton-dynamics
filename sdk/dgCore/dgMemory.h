@@ -174,25 +174,63 @@ class dgStackMemoryAllocator: public dgMemoryAllocator
 
 #else
 
-void* dgApi dgMalloc(size_t size, dgMemoryAllocator* const allocator);
-void  dgApi dgFree(void* const ptr);
-void* dgApi dgMallocStack(size_t size);
-void dgApi dgFreeStack(void* const ptr);
 
-class dgMemoryAllocator
+class dgMemoryAllocatorBase
+{
+	public:
+	dgMemoryAllocatorBase() {}
+	virtual ~dgMemoryAllocatorBase() {}
+
+	virtual void* Malloc(dgInt32 size) = 0;
+	virtual void Free(void* const ptr) = 0;
+};
+
+class dgGlobalAllocator: public dgMemoryAllocatorBase
+{
+	public:
+	dgGlobalAllocator()
+		:dgMemoryAllocatorBase()
+		,m_free(__free__)
+		,m_malloc(__malloc__)
+		,m_memoryUsed(0)
+	{
+	}
+
+	~dgGlobalAllocator() 
+	{
+	}
+
+	void SetAllocatorsCallback(dgMemAlloc malloc, dgMemFree free);
+
+	static dgMemoryAllocatorBase& GetGlobalAllocator();
+	dgInt32 GetMemoryUsed() const { return m_memoryUsed; }
+
+	private:
+	static void* dgApi __malloc__(dgUnsigned32 size);
+	static void dgApi __free__(void* const ptr, dgUnsigned32 size);
+	
+	void* Malloc(dgInt32 size);
+	void Free(void* const ptr);
+
+	dgMemFree m_free;
+	dgMemAlloc m_malloc;
+	dgInt32 m_memoryUsed;
+};
+
+
+class dgMemoryAllocator: public dgMemoryAllocatorBase
 {
 	public:
 	#define DG_MEMORY_GRANULARITY_BITS	6	
 	#define DG_MEMORY_GRANULARITY		(1 << DG_MEMORY_GRANULARITY_BITS)	
-//	#define DG_MEMORY_BEAMS_COUNT		10
-	#define DG_MEMORY_BEAMS_COUNT		1
-
+	#define DG_MEMORY_BEAMS_COUNT		10
+//	#define DG_MEMORY_BEAMS_COUNT		1
 
 	class dgMemoryPage;
 	class dgMemoryHeader
 	{
 		public:
-		dgMemoryAllocator* m_allocator;
+		dgMemoryAllocatorBase* m_allocator;
 		union {
 			void* m_ptr;
 			dgMemoryPage* m_page;
@@ -274,6 +312,30 @@ class dgMemoryAllocator
 
 	dgMemoryBeam m_beams[DG_MEMORY_BEAMS_COUNT];
 };
+
+
+DG_INLINE void* dgMalloc(size_t size, dgMemoryAllocatorBase* const allocator)
+{
+	void* const ptr = allocator->Malloc(dgInt32(size));
+	return ptr;
+}
+
+DG_INLINE void dgFree(void* const ptr)
+{
+	dgMemoryAllocator::dgMemoryHeader* const info = ((dgMemoryAllocator::dgMemoryHeader*)ptr) - 1;
+	dgAssert(info->m_allocator);
+	info->m_allocator->Free(ptr);
+}
+
+DG_INLINE void* dgMallocStack(size_t size)
+{
+	return dgMalloc(size, (dgGlobalAllocator*) &dgGlobalAllocator::GetGlobalAllocator());
+}
+
+DG_INLINE void dgFreeStack(void* const ptr)
+{
+	dgFree(ptr);
+}
 
 
 #endif

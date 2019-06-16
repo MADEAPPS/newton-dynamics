@@ -368,7 +368,7 @@ high = 30;
 //high = 40;
 //high = 50;
 //high = 100;
-high = 12;
+//high = 12;
 	for (int i = 0; i < 1; i ++) {
 		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0f), high, _BOX_PRIMITIVE);
 //		BuildPyramid (scene, 10.0f, dVector( 10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.75f, 0.35f, 0.75f, 0.0f), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * dPi));
