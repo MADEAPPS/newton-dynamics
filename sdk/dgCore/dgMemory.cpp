@@ -470,6 +470,8 @@ dgMemoryAllocatorBase& dgGlobalAllocator::GetGlobalAllocator()
 dgMemoryAllocator::dgMemoryPage::dgMemoryPage(dgInt32 size, dgMemoryPage* const root, dgMemoryAllocator* const allocator)
 	:m_next(root)
 	,m_prev(NULL)
+	,m_fullPageNext(NULL)
+	,m_fullPagePrev(NULL)
 	,m_freeList (NULL)
 	,m_count(0)
 	,m_capacity(0)
@@ -543,6 +545,7 @@ void dgMemoryAllocator::dgMemoryPage::Free(void* const ptr)
 
 dgMemoryAllocator::dgMemoryBeam::dgMemoryBeam()
 	:m_firstPage(NULL)
+	,m_fullPage(NULL)
 	,m_beamSize(0)
 {
 }
@@ -558,6 +561,17 @@ dgMemoryAllocator::dgMemoryBeam::~dgMemoryBeam()
 		delete firstPage;
 	}
 
+	while (m_fullPage) {
+		dgAssert(0);
+		if (m_fullPage->m_fullPageNext) {
+			m_fullPage->m_fullPageNext->m_fullPagePrev = NULL;
+		}
+		dgMemoryPage* const fullPage = m_fullPage;
+		m_fullPage = m_fullPage->m_fullPageNext;
+		delete fullPage;
+	}
+
+	m_fullPage = NULL;
 	m_firstPage = NULL;
 }
 
@@ -571,7 +585,25 @@ void* dgMemoryAllocator::dgMemoryBeam::Malloc(dgInt32 size)
 	if (m_firstPage->m_count == 0) {
 		m_firstPage = new dgMemoryPage (m_beamSize, m_firstPage, m_allocator);
 	}
-	return m_firstPage->Malloc (size);
+	void* ptr = m_firstPage->Malloc(size);
+//	if (m_firstPage->m_count == 0) {
+//		if (m_firstPage->m_next) {
+//			dgMemoryPage* const page = m_firstPage;
+//			m_firstPage = page->m_next;
+//			page->m_next->m_prev = NULL;
+//			page->m_next = NULL;
+//
+//
+//
+//			//dgMemoryPage* last = m_firstPage;
+//			//while (last->m_next) { 
+//			//	last = last->m_next;
+//			//}
+//			//last->m_next = page;
+//			//page->m_prev = last;
+//		}
+//	}
+	return ptr;
 }
 
 void dgMemoryAllocator::dgMemoryBeam::Free(void* const ptr)
@@ -593,6 +625,19 @@ void dgMemoryAllocator::dgMemoryBeam::Free(void* const ptr)
 		page->m_next = NULL;
 		page->m_prev = NULL;
 		delete page;
+//	} else if (page->m_prev) {
+//		dgInt32 key = page->GetSortKey();
+//		dgMemoryPage* prevPage = page->m_prev;
+//		while (prevPage && prevPage->GetSortKey() < key)
+//		{
+//			prevPage = prevPage->m_prev;
+//		}
+//
+//		if (prevPage) {
+//			dgAssert(0);
+//		} else {
+//			dgAssert(0);
+//		}
 	}
 }
 
