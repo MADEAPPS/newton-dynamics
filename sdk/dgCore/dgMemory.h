@@ -123,7 +123,8 @@ class dgMemoryAllocator
 	dgInt32 m_isInList;
 
 	public:
-	static dgInt32 m_lock;
+	static dgInt32 m_lock0;
+	static dgInt32 m_lock1;
 };
 
 class dgStackMemoryAllocator: public dgMemoryAllocator 
@@ -223,7 +224,7 @@ class dgMemoryAllocator: public dgMemoryAllocatorBase
 	public:
 	#define DG_MEMORY_GRANULARITY_BITS	6	
 	#define DG_MEMORY_GRANULARITY		(1 << DG_MEMORY_GRANULARITY_BITS)	
-	#define DG_MEMORY_BEAMS_COUNT		10
+	#define DG_MEMORY_BEAMS_COUNT		16
 //	#define DG_MEMORY_BEAMS_COUNT		1
 	#define DG_MEMORY_BEAMS_BUFFER_SIZE	(1024 * 32)
 
