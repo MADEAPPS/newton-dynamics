@@ -225,6 +225,7 @@ class dgMemoryAllocator: public dgMemoryAllocatorBase
 	#define DG_MEMORY_GRANULARITY		(1 << DG_MEMORY_GRANULARITY_BITS)	
 	#define DG_MEMORY_BEAMS_COUNT		10
 //	#define DG_MEMORY_BEAMS_COUNT		1
+	#define DG_MEMORY_BEAMS_BUFFER_SIZE	(1024 * 32)
 
 	class dgMemoryPage;
 	class dgMemoryHeader
@@ -260,7 +261,7 @@ class dgMemoryAllocator: public dgMemoryAllocatorBase
 		void* Malloc(dgInt32 size);
 		void Free(void* const ptr);
 
-		char m_buffer[1024 * 64];
+		char m_buffer[DG_MEMORY_BEAMS_BUFFER_SIZE];
 
 		dgMemoryPage* m_next;
 		dgMemoryPage* m_prev;
@@ -269,7 +270,6 @@ class dgMemoryAllocator: public dgMemoryAllocatorBase
 		dgMemoryGranularity* m_freeList;
 		dgInt32 m_count;
 		dgInt32 m_capacity;
-		bool m_isFull;
 	};
 
 	class dgMemoryBeam
@@ -286,6 +286,9 @@ class dgMemoryAllocator: public dgMemoryAllocatorBase
 		dgMemoryPage* m_fullPage;
 		dgMemoryAllocator* m_allocator;
 		dgInt32 m_beamSize;
+
+		dgInt32 m_inUsedCount;
+		dgInt32 m_fullPageCount;
 	};
 
 	dgMemoryAllocator();

@@ -475,7 +475,6 @@ dgMemoryAllocator::dgMemoryPage::dgMemoryPage(dgInt32 size, dgMemoryPage* const 
 	,m_freeList (NULL)
 	,m_count(0)
 	,m_capacity(0)
-	,m_isFull(false)
 {
 	if (root) {
 		dgAssert (!root->m_prev);
@@ -548,6 +547,8 @@ dgMemoryAllocator::dgMemoryBeam::dgMemoryBeam()
 	:m_firstPage(NULL)
 	,m_fullPage(NULL)
 	,m_beamSize(0)
+	,m_inUsedCount(0)
+	,m_fullPageCount(0)
 {
 }
 
@@ -581,18 +582,21 @@ void* dgMemoryAllocator::dgMemoryBeam::Malloc(dgInt32 size)
 	dgAssert (size <= m_beamSize);
 	if (!m_firstPage) {
 		m_firstPage = new dgMemoryPage (m_beamSize, m_firstPage, m_allocator);
+		m_inUsedCount ++;
 	}
 
-	if (m_firstPage->m_count == 0) {
-		m_firstPage = new dgMemoryPage (m_beamSize, m_firstPage, m_allocator);
-	}
+	dgAssert (m_firstPage->m_count);
+	//if (m_firstPage->m_count == 0) {
+	//	m_firstPage = new dgMemoryPage (m_beamSize, m_firstPage, m_allocator);
+	//}
 
 	void* ptr = m_firstPage->Malloc(size);
 	if (m_firstPage->m_count == 0) {
 		dgMemoryPage* const page = m_firstPage;
 
-		dgAssert(!page->m_isFull);
-		page->m_isFull = true;
+		m_inUsedCount --;
+		m_fullPageCount ++;
+
 		m_firstPage = page->m_next;
 		if (m_firstPage) {
 			m_firstPage->m_prev = NULL;
@@ -619,6 +623,7 @@ void dgMemoryAllocator::dgMemoryBeam::Free(void* const ptr)
 	page->Free(ptr);
 	dgAssert (page->m_count <= page->m_capacity);
 	if (page->m_count == page->m_capacity) {
+		m_inUsedCount --;
 		if (page == m_firstPage) {
 			m_firstPage = m_firstPage->m_next;
 		}
@@ -633,8 +638,8 @@ void dgMemoryAllocator::dgMemoryBeam::Free(void* const ptr)
 		delete page;
 	} else if (page->m_count == 1) {
 
-		dgAssert(page->m_isFull);
-		page->m_isFull = false;
+		m_inUsedCount++;
+		m_fullPageCount--;
 
 		if (page == m_fullPage) {
 			m_fullPage = m_fullPage->m_fullPageNext;
