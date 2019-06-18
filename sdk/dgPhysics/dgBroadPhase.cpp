@@ -154,7 +154,7 @@ dgBroadPhase::dgBroadPhase(dgWorld* const world)
 	,m_contactCache(world->GetAllocator())
 	,m_pendingSoftBodyCollisions(world->GetAllocator(), 64)
 	,m_pendingSoftBodyPairsCount(0)
-	,m_contacJointLock(0)
+//	,m_contacJointLock(0)
 	,m_criticalSectionLock(0)
 {
 }
@@ -1244,7 +1244,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 							contact = new (m_world->m_allocator) dgContact(m_world, material, body0, body1);
 							dgAssert(contact);
 
-							dgScopeSpinPause lock(&m_contacJointLock);
+							//dgScopeSpinPause lock(&m_contacJointLock);
 							contact->AppendToContactList();
 							contact->m_contactActive = 0;
 							contact->m_positAcc = dgVector(dgFloat32(10.0f));

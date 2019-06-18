@@ -583,7 +583,7 @@ class dgBroadPhase
 	dgContactCache m_contactCache;
 	dgArray<dgPendingCollisionSoftBodies> m_pendingSoftBodyCollisions;
 	dgInt32 m_pendingSoftBodyPairsCount;
-	dgInt32 m_contacJointLock;
+//	dgInt32 m_contacJointLock;
 	dgInt32 m_criticalSectionLock;
 
 	static dgVector m_velocTol;

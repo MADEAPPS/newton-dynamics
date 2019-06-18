@@ -43,11 +43,19 @@ class dgContactList: public dgList<dgContact*>
 	public:
 	dgContactList(dgMemoryAllocator* const allocator)
 		:dgList<dgContact*>(allocator)
+		,m_contacJointLock(0)
 		,m_deadContactsCount(0)
 		,m_activeContactsCount(0)
 	{
 	}
 
+	dgListNode* Addtop(dgContact* const contact)
+	{
+		dgScopeSpinPause lock(&m_contacJointLock);
+		return dgList<dgContact*>::Addtop(contact);
+	}
+
+	dgInt32 m_contacJointLock;
 	dgInt32 m_deadContactsCount;
 	dgInt32 m_activeContactsCount;
 	dgContactList::dgListNode* m_deadContacts[128];
