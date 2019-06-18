@@ -93,8 +93,8 @@ dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const materi
 		m_body1 = body0;
 	}
 
-	if (world->m_createContact) {
-		world->m_createContact(world, this);
+	if (world->m_onCreateContact) {
+		world->m_onCreateContact(world, this);
 	}
 }
 
@@ -123,17 +123,17 @@ dgContact::dgContact(dgContact* const clone)
 	m_enableCollision = clone->m_enableCollision;
 	Merge (*clone);
 
-	if (m_body0->m_world->m_createContact) {
+	if (m_body0->m_world->m_onCreateContact) {
 		dgAssert(clone->m_body0);
-		m_body0->m_world->m_createContact(clone->m_body0->m_world, this);
+		m_body0->m_world->m_onCreateContact(clone->m_body0->m_world, this);
 	}
 }
 
 dgContact::~dgContact()
 {
 	dgAssert(m_body0);
-	if (m_body0->m_world && m_body0->m_world->m_destroyContact) {
-		m_body0->m_world->m_destroyContact(m_body0->m_world, this);
+	if (m_body0->m_world && m_body0->m_world->m_onDestroyContact) {
+		m_body0->m_world->m_onDestroyContact(m_body0->m_world, this);
 	}
 
 	dgList<dgContactMaterial>::RemoveAll();

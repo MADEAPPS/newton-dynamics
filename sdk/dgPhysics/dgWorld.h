@@ -158,7 +158,7 @@ class dgDeadBodies: public dgTree<dgBody*, void* >
 	dgInt32 m_lock;
 };
 
-typedef void (*dgPostUpdateCallback) (const dgWorld* const world, dgFloat32 timestep);
+typedef void (*OnPostUpdateCallback) (const dgWorld* const world, dgFloat32 timestep);
 
 DG_MSC_VECTOR_ALIGMENT
 class dgWorld
@@ -254,8 +254,8 @@ class dgWorld
 	dgInt32 GetSolverIterations() const;
 	void SetSolverIterations (dgInt32 mode);
 
-	dgPostUpdateCallback GetPostUpdateCallback() const;
-	void SetPostUpdateCallback (dgPostUpdateCallback callback);
+	OnPostUpdateCallback GetPostUpdateCallback() const;
+	void SetPostUpdateCallback (OnPostUpdateCallback callback);
 
 	void EnableParallelSolverOnLargeIsland(dgInt32 mode);
 	dgInt32 GetParallelSolverOnLargeIsland() const;
@@ -528,15 +528,14 @@ dgInt32 ReduceContactsFallback (dgInt32 count, dgContactPoint* const contact, dg
 	dgMemoryAllocator* m_allocator;
 
 	
-	OnClusterUpdate m_clusterUpdate;
-	OnCreateContact m_createContact;
-	OnDestroyContact m_destroyContact;
-
+	OnClusterUpdate m_onClusterUpdate;
+	OnCreateContact m_onCreateContact;
+	OnDestroyContact m_onDestroyContact;
 	OnCollisionInstanceDestroy	m_onCollisionInstanceDestruction;
 	OnCollisionInstanceDuplicate m_onCollisionInstanceCopyConstrutor;
-	OnJointSerializationCallback m_serializedJointCallback;	
-	OnJointDeserializationCallback m_deserializedJointCallback;	
-	dgPostUpdateCallback m_postUpdateCallback;
+	OnJointSerializationCallback m_onSerializeJointCallback;	
+	OnJointDeserializationCallback m_onDeserializeJointCallback;	
+	OnPostUpdateCallback m_onPostUpdateCallback;
 
 	dgListenerList m_listeners;
 	dgTree<void*, unsigned> m_perInstanceData;
@@ -546,7 +545,6 @@ dgInt32 ReduceContactsFallback (dgInt32 count, dgContactPoint* const contact, dg
 	dgArray<dgUnsigned8> m_solverJacobiansMemory;  
 	dgArray<dgUnsigned8> m_solverRightHandSideMemory;
 	dgArray<dgUnsigned8> m_solverForceAccumulatorMemory;
-//	bool m_concurrentUpdate;
 	
 	friend class dgBody;
 	friend class dgSolver;
@@ -617,14 +615,14 @@ inline dgFloat32 dgWorld::GetUpdateTime() const
 	return m_lastExecutionTime;
 }
 
-inline dgPostUpdateCallback dgWorld::GetPostUpdateCallback() const
+inline OnPostUpdateCallback dgWorld::GetPostUpdateCallback() const
 {
-	return m_postUpdateCallback;
+	return m_onPostUpdateCallback;
 }
 
-inline void dgWorld::SetPostUpdateCallback(dgPostUpdateCallback callback)
+inline void dgWorld::SetPostUpdateCallback(OnPostUpdateCallback callback)
 {
-	m_postUpdateCallback = callback;
+	m_onPostUpdateCallback = callback;
 }
 
 inline dgUnsigned64 dgWorld::GetTimeInMicrosenconds() const

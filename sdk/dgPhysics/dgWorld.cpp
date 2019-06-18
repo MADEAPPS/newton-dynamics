@@ -226,7 +226,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,m_userData(NULL)
 	,m_allocator (allocator)
 //	,m_mainThreadMutex()
-	,m_postUpdateCallback(NULL)
+	,m_onPostUpdateCallback(NULL)
 	,m_listeners(allocator)
 	,m_perInstanceData(allocator)
 	,m_bodiesMemory (allocator, 64)
@@ -257,8 +257,8 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	m_onCollisionInstanceDestruction = NULL;
 	m_onCollisionInstanceCopyConstrutor = NULL;
 
-	m_serializedJointCallback = NULL;	
-	m_deserializedJointCallback = NULL;	
+	m_onSerializeJointCallback = NULL;	
+	m_onDeserializeJointCallback = NULL;	
 
 	m_inUpdate = 0;
 	m_bodyGroupID = 0;
@@ -279,9 +279,9 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	m_frictiomTheshold = dgFloat32 (0.25f);
 
 	m_userData = NULL;
-	m_clusterUpdate = NULL;
-	m_createContact = NULL;
-	m_destroyContact = NULL;
+	m_onClusterUpdate = NULL;
+	m_onCreateContact = NULL;
+	m_onDestroyContact = NULL;
 
 
 	m_freezeAccel2 = DG_FREEZE_ACCEL2;
@@ -593,13 +593,13 @@ void* dgWorld::GetUserData() const
 
 void dgWorld::SetIslandUpdateCallback (OnClusterUpdate callback)
 {
-	m_clusterUpdate = callback;
+	m_onClusterUpdate = callback;
 }
 
 void dgWorld::SetCreateDestroyContactCallback(OnCreateContact createContactCallback, OnDestroyContact destroyContactCallback)
 {
-	m_createContact = createContactCallback;
-	m_destroyContact = destroyContactCallback;
+	m_onCreateContact = createContactCallback;
+	m_onDestroyContact = destroyContactCallback;
 }
 
 void* dgWorld::AddListener (const char* const nameid, void* const userData)
@@ -993,8 +993,8 @@ void dgWorld::RunStep ()
 	}
 	SynchronizationBarrier();
 
-	if (m_postUpdateCallback) {
-		m_postUpdateCallback (this, m_savetimestep);
+	if (m_onPostUpdateCallback) {
+		m_onPostUpdateCallback (this, m_savetimestep);
 	}
 
 	m_lastExecutionTime = (dgGetTimeInMicrosenconds() - timeAcc) * dgFloat32 (1.0e-6f);
@@ -1543,14 +1543,14 @@ void dgWorld::OnBodySerializeToFile(dgBody& body, void* const userData, dgSerial
 
 void dgWorld::SetJointSerializationCallbacks(OnJointSerializationCallback serializeJoint, OnJointDeserializationCallback deserializeJoint)
 {
-	m_serializedJointCallback = serializeJoint;
-	m_deserializedJointCallback = deserializeJoint;
+	m_onSerializeJointCallback = serializeJoint;
+	m_onDeserializeJointCallback = deserializeJoint;
 }
 
 void dgWorld::GetJointSerializationCallbacks(OnJointSerializationCallback* const serializeJoint, OnJointDeserializationCallback* const deserializeJoint) const
 {
-	*serializeJoint = m_serializedJointCallback;
-	*deserializeJoint = m_deserializedJointCallback;
+	*serializeJoint = m_onSerializeJointCallback;
+	*deserializeJoint = m_onDeserializeJointCallback;
 }
 
 dgBody* dgWorld::FindBodyFromSerializedID(dgInt32 serializedID) const
@@ -1706,7 +1706,7 @@ void dgWorld::DeserializeJointArray (const dgTree<dgBody*, dgInt32>&bodyMap, dgD
 	serializeCallback(userData, &count, sizeof (count));	
 
 	for (dgInt32 i = 0; i < count; i ++) {
-		if (m_deserializedJointCallback) {
+		if (m_onDeserializeJointCallback) {
 			dgInt32 bodyIndex0; 
 			dgInt32 bodyIndex1; 
 
@@ -1715,7 +1715,7 @@ void dgWorld::DeserializeJointArray (const dgTree<dgBody*, dgInt32>&bodyMap, dgD
 
 			dgBody* const body0 = (bodyIndex0 != -1) ? bodyMap.Find (bodyIndex0)->GetInfo() : NULL;
 			dgBody* const body1 = (bodyIndex1 != -1) ? bodyMap.Find (bodyIndex1)->GetInfo() : NULL;
-			m_deserializedJointCallback (body0, body1, serializeCallback, userData);
+			m_onDeserializeJointCallback (body0, body1, serializeCallback, userData);
 		}
 		dgDeserializeMarker(serializeCallback, userData);
 	}

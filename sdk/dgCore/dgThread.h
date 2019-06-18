@@ -63,6 +63,7 @@ class dgThread
 	void Init ();
 	void Init (const char* const name, dgInt32 id);
 	void Close ();
+	void SetName ();
 	static void* dgThreadSystemCallback(void* threadData);
 
 	#ifndef DG_USE_THREAD_EMULATION

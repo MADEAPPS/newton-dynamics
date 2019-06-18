@@ -39,7 +39,6 @@ dgThread::dgThread (const char* const name, dgInt32 id)
 	strncpy (m_name, name, sizeof (m_name) - 1);
 }
 
-
 void dgThread::Init (const char* const name, dgInt32 id)
 {
 	m_id = id;
@@ -131,6 +130,38 @@ dgThread::~dgThread ()
 {
 }
 
+
+void dgThread::SetName()
+{
+#ifdef WIN32
+	// a hideous way to set the thread name, bu this is how Microsoft does it
+	const DWORD MS_VC_EXCEPTION = 0x406D1388;
+	#pragma pack(push,8)  
+	struct THREADNAME_INFO
+	{
+		DWORD dwType; // Must be 0x1000.  
+		LPCSTR szName; // Pointer to name (in user addr space).  
+		DWORD dwThreadID; // Thread ID (-1=caller thread).  
+		DWORD dwFlags; // Reserved for future use, must be zero.  
+	};
+	#pragma pack(pop)  
+
+
+	THREADNAME_INFO info;
+	info.dwType = 0x1000;
+	info.szName = m_name;
+	info.dwThreadID = GetThreadId(m_handle.native_handle());
+	info.dwFlags = 0;
+	__try {
+		RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+	}
+#endif
+}
+
+
 void dgThread::Init ()
 {
 	// This must be set now because otherwise if this thread is
@@ -139,6 +170,8 @@ void dgThread::Init ()
 	dgInterlockedExchange(&m_threadRunning, 1);
 	m_handle = std::thread(dgThreadSystemCallback, this);
 	dgThreadYield();
+
+	SetName();
 }
 
 void dgThread::Close ()
@@ -153,12 +186,17 @@ void dgThread::Wait (dgInt32 count, dgSemaphore* const semArray)
 	}
 }
 
+
+
+
 void* dgThread::dgThreadSystemCallback(void* threadData)
 {
 	dgFloatExceptions exception;
 	dgSetPrecisionDouble precision;
 
 	dgThread* const me = (dgThread*) threadData;
+
+
 
 	D_SET_TRACK_NAME(me->m_name);
 

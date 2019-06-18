@@ -189,7 +189,7 @@ void NewtonSetPostUpdateCallback(const NewtonWorld* const newtonWorld, NewtonPos
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	world->SetPostUpdateCallback((dgPostUpdateCallback) callback);
+	world->SetPostUpdateCallback((OnPostUpdateCallback) callback);
 }
 
 NewtonPostUpdateCallback NewtonGetPostUpdateCallback(const NewtonWorld* const newtonWorld)

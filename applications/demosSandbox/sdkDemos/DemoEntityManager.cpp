@@ -354,7 +354,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
-//	m_workerThreads = 4;
+	m_workerThreads = 4;
 //	m_solverSubSteps = 2;
 //	m_showRaycastHit = true;
 //	m_showNormalForces = true;
@@ -1306,17 +1306,17 @@ int DemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
 
 void DemoEntityManager::OnCreateContact(const NewtonWorld* const world, NewtonJoint* const contact)
 {
-	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
-	dCustomScopeLock lock(&scene->m_contactLock);
-	NewtonJointSetUserData(contact, scene->m_contactList.Append(contact));
+//	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+//	dCustomScopeLock lock(&scene->m_contactLock);
+//	NewtonJointSetUserData(contact, scene->m_contactList.Append(contact));
 }
 
 void DemoEntityManager::OnDestroyContact(const NewtonWorld* const world, NewtonJoint* const contact)
 {
-	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-	dList<NewtonJoint*>::dListNode* const cooky = (dList<NewtonJoint*>::dListNode*)NewtonJointGetUserData(contact);
-	dCustomScopeLock lock(&scene->m_contactLock);
-	scene->m_contactList.Remove(cooky);
+//	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+//	dList<NewtonJoint*>::dListNode* const cooky = (dList<NewtonJoint*>::dListNode*)NewtonJointGetUserData(contact);
+//	dCustomScopeLock lock(&scene->m_contactLock);
+//	scene->m_contactList.Remove(cooky);
 }
 
 
