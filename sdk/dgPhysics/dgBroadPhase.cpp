@@ -1241,9 +1241,10 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 							m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body1 = body1;
 							m_pendingSoftBodyPairsCount++;
 						} else {
-							dgScopeSpinPause lock(&m_contacJointLock);
 							contact = new (m_world->m_allocator) dgContact(m_world, material, body0, body1);
 							dgAssert(contact);
+
+							dgScopeSpinPause lock(&m_contacJointLock);
 							contact->AppendToContactList();
 							contact->m_contactActive = 0;
 							contact->m_positAcc = dgVector(dgFloat32(10.0f));
