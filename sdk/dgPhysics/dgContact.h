@@ -52,7 +52,7 @@ class dgContactList: public dgList<dgContact*>
 	dgListNode* Addtop(dgContact* const contact)
 	{
 		dgScopeSpinPause lock(&m_contacJointLock);
-		return dgList<dgContact*>::Addtop(contact);
+		return dgList<dgContact*>::SafeAddtop(contact);
 	}
 
 	dgInt32 m_contacJointLock;

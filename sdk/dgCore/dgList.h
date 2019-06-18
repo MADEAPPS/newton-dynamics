@@ -199,7 +199,6 @@ class dgList
 	public:
 	DG_CLASS_ALLOCATOR(allocator)
 
-//	dgList ();
 	dgList (dgMemoryAllocator* const allocator);
 	virtual ~dgList ();
 
@@ -208,14 +207,14 @@ class dgList
 
 	operator dgInt32() const;
 	dgInt32 GetCount() const;
-	dgListNode *GetLast() const;
-	dgListNode *GetFirst() const;
-	dgListNode *Append ();
-	dgListNode *Append (dgListNode* const node);
-	dgListNode *Append (const T &element);
-	dgListNode *Addtop ();
-	dgListNode *Addtop (dgListNode* const node);
-	dgListNode *Addtop (const T &element);
+	dgListNode* GetLast() const;
+	dgListNode* GetFirst() const;
+	dgListNode* Append ();
+	dgListNode* Append (dgListNode* const node);
+	dgListNode* Append (const T &element);
+	dgListNode* Addtop ();
+	dgListNode* Addtop (dgListNode* const node);
+	dgListNode* Addtop (const T &element);
 	
 	void RotateToEnd (dgListNode* const node);
 	void RotateToBegin (dgListNode* const node);
@@ -223,8 +222,8 @@ class dgList
 	void InsertBefore (dgListNode* const root, dgListNode* const node);
 
 
-	dgListNode *Find (const T &element) const;
-	dgListNode *GetNodeFromInfo (T &m_info) const;
+	dgListNode* Find (const T &element) const;
+	dgListNode* GetNodeFromInfo (T &m_info) const;
 	void Remove (dgListNode* const node);
 	void Remove (const T &element);
 	void RemoveAll ();
@@ -233,14 +232,17 @@ class dgList
 	void Unlink (dgListNode* const node);
 	bool SanityCheck () const;
 
+	protected:
+	dgListNode* SafeAddtop(const T &element);
+
 
 	// ***********************************************************
 	// member variables
 	// ***********************************************************
 	private:
 	dgInt32 m_count;
-	dgListNode *m_first;
-	dgListNode *m_last;
+	dgListNode* m_first;
+	dgListNode* m_last;
 	dgMemoryAllocator* m_allocator;
 
 //	static dgInt32 m_size;
@@ -366,6 +368,7 @@ typename dgList<T>::dgListNode *dgList<T>::Append (const T &element)
 	return m_last;
 }
 
+
 template<class T>
 typename dgList<T>::dgListNode *dgList<T>::Addtop (dgListNode* const node)
 {
@@ -418,6 +421,39 @@ typename dgList<T>::dgListNode *dgList<T>::Addtop (const T &element)
 #endif
 	return m_first;
 }
+
+template<class T>
+typename dgList<T>::dgListNode *dgList<T>::SafeAddtop(const T &element)
+{
+	return Addtop(element);
+/*
+	m_count++;
+
+	dgListNode* const node = new (m_allocator) dgListNode(element, NULL, NULL);
+
+	if (m_last == NULL) {
+		m_last = node;
+		m_first = m_last;
+	} else {
+		//m_first = new (m_allocator) dgListNode(element, NULL, m_first);
+
+		node->m_prev = NULL;
+		node->m_next = next;
+		if (m_prev) {
+			m_prev->m_next = this;
+		}
+		if (m_next) {
+			m_next->m_prev = this;
+		}
+
+	}
+#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
+	dgAssert(SanityCheck());
+#endif
+	return m_first;
+*/
+}
+
 
 template<class T>
 void dgList<T>::InsertAfter (dgListNode* const root, dgListNode* const node)
