@@ -194,7 +194,7 @@ void dgVulkanContext::DestroyDevice()
 void* dgVulkanContext::vkAllocationFunction(void* pUserData, size_t size, size_t alignment, VkSystemAllocationScope allocationScope)
 {
 	dgMemoryAllocator* const allocator = (dgMemoryAllocator*)pUserData;
-	void* const ptr = allocator->MallocLow(dgInt32(size), alignment);
+	void* const ptr = allocator->MallocLow(dgInt32(size), dgInt32(alignment));
 	dgAssert(alignment * ((size_t)ptr / alignment) == (size_t)ptr);
 	dgVulkanContext::m_totalMemory += allocator->GetSize(ptr);
 	return ptr;
