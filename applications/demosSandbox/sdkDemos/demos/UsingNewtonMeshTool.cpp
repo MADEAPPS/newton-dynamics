@@ -251,6 +251,80 @@ static void DebugJernejLMesh (DemoEntityManager* const scene)
 }
 
 
+class TestTriggerManager : public dCustomTriggerManager
+{
+	public:
+	TestTriggerManager(NewtonWorld* const world)
+		:dCustomTriggerManager(world)
+	{
+	}
+
+	~TestTriggerManager()
+	{
+	}
+
+	void PreUpdate(dFloat timestep)
+	{
+		dCustomTriggerManager::PreUpdate(timestep);
+	}
+
+	void CreateTestTrigger(const dMatrix& matrix, NewtonCollision* const convexShape)
+	{
+		NewtonWorld* const world = GetWorld();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		// create a large summing pool, using a trigger volume 
+		dCustomTriggerController* const trigger = CreateTrigger(matrix, convexShape, NULL);
+		NewtonBody* const triggerBody = trigger->GetBody();
+
+		NewtonBodySetTransformCallback(triggerBody, DemoEntity::TransformCallback);
+		DemoMesh* const geometry = new DemoMesh("pool", scene->GetShaderCache(), convexShape, "", "", "");
+		DemoEntity* const entity = new DemoEntity(matrix, NULL);
+		scene->Append(entity);
+		entity->SetMesh(geometry, dGetIdentityMatrix());
+		NewtonBodySetUserData(triggerBody, entity);
+
+		for (DemoMesh::dListNode* ptr = geometry->GetFirst(); ptr; ptr = ptr->GetNext()) {
+			DemoSubMesh* const subMesh = &ptr->GetInfo();
+			subMesh->SetOpacity(0.25f);
+			subMesh->m_diffuse.m_x = 0.0f;
+			subMesh->m_diffuse.m_y = 0.0f;
+			subMesh->m_diffuse.m_z = 1.0f;
+			subMesh->m_diffuse.m_z = 1.0f;
+		}
+		geometry->OptimizeForRender();
+
+		geometry->Release();
+	}
+
+	void DestroyTrigger(dCustomTriggerController* const trigger)
+	{
+		dCustomTriggerManager::DestroyTrigger(trigger);
+	}
+
+	virtual void OnEnter(const dCustomTriggerController* const trigger, NewtonBody* const visitor) const
+	{
+		dTrace(("enter trigger\n"));
+	}
+
+	virtual void OnExit(const dCustomTriggerController* const trigger, NewtonBody* const visitor) const
+	{
+		dTrace(("exit trigger\n"));
+	}
+
+	virtual void WhileIn(const dCustomTriggerController* const trigger, NewtonBody* const visitor) const
+	{
+		dTrace(("in trigger\n"));
+	}
+
+	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext, const dCustomTriggerController* const trigger, const NewtonBody* const visitor) const
+	{
+		//TriggerCallback* const callback = (TriggerCallback*)trigger->GetUserData();
+		//callback->OnDebug(debugContext, visitor);
+	}
+};
+
+
 void UsingNewtonMeshTool (DemoEntityManager* const scene)
 {
 	// load the skybox
@@ -265,7 +339,16 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	CreateSimpleBox_NewtonMesh (scene, dVector (0.0f, 2.0f, -2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 	// make a box using the dNetwonMesh Class
-	CreateSimpledBox_dNetwonMesh (scene, dVector (4.0f, 2.0f, 2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
+//	CreateSimpledBox_dNetwonMesh (scene, dVector (4.0f, 2.0f, 2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
+
+	
+	dMatrix triggerLocation(dGetIdentityMatrix());
+	triggerLocation. m_posit = dVector(15.0f, 0.0f, 0.0f, 1.0f);
+	TestTriggerManager* const triggerManager = new TestTriggerManager(scene->GetNewton());
+	NewtonCollision* const poolBox = NewtonCreateBox(scene->GetNewton(), 20.0f, 10.0f, 20.0f, 0, NULL);
+	triggerManager->CreateTestTrigger(triggerLocation, poolBox);
+	NewtonDestroyCollision(poolBox);
+
 
 
 //DebugJernejLMesh (scene);
