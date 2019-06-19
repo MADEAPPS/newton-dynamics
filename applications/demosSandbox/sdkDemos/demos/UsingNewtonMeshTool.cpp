@@ -309,7 +309,7 @@ class TestTriggerManager : public dCustomTriggerManager
 
 	virtual void OnExit(const dCustomTriggerController* const trigger, NewtonBody* const visitor) const
 	{
-		dTrace(("exit trigger\n"));
+		dTrace(("exit trigger\n\n"));
 	}
 
 	virtual void WhileIn(const dCustomTriggerController* const trigger, NewtonBody* const visitor) const
