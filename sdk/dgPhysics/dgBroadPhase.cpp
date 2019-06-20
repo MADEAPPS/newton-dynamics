@@ -1563,17 +1563,26 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 				if (distance >= DG_NARROW_PHASE_DIST) {
 					const dgVector veloc0 (body0->GetVelocity());
 					const dgVector veloc1 (body1->GetVelocity());
+
+					const dgVector veloc(veloc1 - veloc0);
 					const dgVector omega0 (body0->GetOmega());
 					const dgVector omega1 (body1->GetOmega());
 					const dgCollisionInstance* const collision0 = body0->GetCollision();
 					const dgCollisionInstance* const collision1 = body1->GetCollision();
-					const dgFloat32 maxDiameter0 = dgFloat32 (3.5f) * collision0->GetBoxMaxRadius(); 
-					const dgFloat32 maxDiameter1 = dgFloat32 (3.5f) * collision1->GetBoxMaxRadius(); 
 
-					const dgVector velocLinear (veloc1 - veloc0);
-					const dgFloat32 velocAngular0 = dgSqrt((omega0.DotProduct(omega0)).GetScalar()) * maxDiameter0;
-					const dgFloat32 velocAngular1 = dgSqrt((omega1.DotProduct(omega1)).GetScalar()) * maxDiameter1;
-					const dgFloat32 speed = dgSqrt ((velocLinear.DotProduct(velocLinear)).GetScalar()) + velocAngular1 + velocAngular0 + dgFloat32 (0.5f);
+					#if 1
+						const dgFloat32 maxDiameter0 = dgFloat32 (3.5f) * collision0->GetBoxMaxRadius(); 
+						const dgFloat32 maxDiameter1 = dgFloat32 (3.5f) * collision1->GetBoxMaxRadius(); 
+						const dgFloat32 velocLinear = dgSqrt((veloc.DotProduct(veloc)).GetScalar());
+						const dgFloat32 velocAngular0 = dgSqrt((omega0.DotProduct(omega0)).GetScalar()) * maxDiameter0;
+						const dgFloat32 velocAngular1 = dgSqrt((omega1.DotProduct(omega1)).GetScalar()) * maxDiameter1;
+						const dgFloat32 speed = velocLinear + velocAngular1 + velocAngular0 + dgFloat32(0.5f);
+					#else
+						const dgVector scale(dgFloat32(1.0f), dgFloat32(3.5f) * collision0->GetBoxMaxRadius(), dgFloat32(3.5f) * collision1->GetBoxMaxRadius(), dgFloat32(0.0f));
+						const dgVector velocMag2(veloc.DotProduct(veloc).GetScalar(), omega0.DotProduct(omega0).GetScalar(), omega1.DotProduct(omega1).GetScalar(), dgFloat32(0.0f));
+						const dgVector velocMag(velocMag2.Sqrt() * scale);
+						const dgFloat32 speed = velocMag.AddHorizontal().GetScalar() + dgFloat32(0.5f);
+					#endif
 					distance -= speed * timestep;
 					contact->m_separationDistance = distance;
 				}
