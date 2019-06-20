@@ -542,6 +542,25 @@ DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 	#endif
 }
 
+DG_INLINE void* dgInterlockedExchange(void** const ptr, void* value)
+{
+	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+		#ifdef _M_X64 
+			return (void*)_InterlockedExchange64((dgInt64*)ptr, dgInt64 (value));
+		#else
+			return (void*)_InterlockedExchange((long*) ptr, dgInt32(value));
+		#endif
+	#elif (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+		return InterlockedExchange((long*)ptr, value);
+	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
+		//__sync_synchronize();
+		return __sync_lock_test_and_set((int32_t*)ptr, value);
+	#else
+		#error "dgInterlockedExchange implementation required"
+	#endif
+}
+
+
 DG_INLINE dgInt32 dgInterlockedTest(dgInt32* const ptr, dgInt32 value)
 {
 	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))

@@ -423,35 +423,22 @@ typename dgList<T>::dgListNode *dgList<T>::Addtop (const T &element)
 }
 
 template<class T>
-typename dgList<T>::dgListNode *dgList<T>::SafeAddtop(const T &element)
+typename dgList<T>::dgListNode *dgList<T>::SafeAddtop(const T& element)
 {
-	return Addtop(element);
-/*
+	dgAssert (m_last);
 	m_count++;
 
 	dgListNode* const node = new (m_allocator) dgListNode(element, NULL, NULL);
+	dgListNode* const first = (dgListNode*) dgInterlockedExchange ((void**) &m_first, (void*) node);
 
-	if (m_last == NULL) {
-		m_last = node;
-		m_first = m_last;
-	} else {
-		//m_first = new (m_allocator) dgListNode(element, NULL, m_first);
+	node->m_next = first;
+	first->m_prev = node;
+	dgAssert (m_last);
 
-		node->m_prev = NULL;
-		node->m_next = next;
-		if (m_prev) {
-			m_prev->m_next = this;
-		}
-		if (m_next) {
-			m_next->m_prev = this;
-		}
-
-	}
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	dgAssert(SanityCheck());
 #endif
-	return m_first;
-*/
+	return node;
 }
 
 

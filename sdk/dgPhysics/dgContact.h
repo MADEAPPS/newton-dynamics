@@ -47,11 +47,16 @@ class dgContactList: public dgList<dgContact*>
 		,m_deadContactsCount(0)
 		,m_activeContactsCount(0)
 	{
+		dgList<dgContact*>::Addtop();
+	}
+
+	~dgContactList()
+	{
 	}
 
 	dgListNode* Addtop(dgContact* const contact)
 	{
-		dgScopeSpinPause lock(&m_contacJointLock);
+		//dgScopeSpinPause lock(&m_contacJointLock);
 		return dgList<dgContact*>::SafeAddtop(contact);
 	}
 

@@ -35,7 +35,6 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-
 dgContactMaterial::dgContactMaterial()
 	:m_dir0 (dgFloat32 (0.0f))
 	,m_dir1 (dgFloat32 (0.0f))
@@ -66,7 +65,8 @@ dgContactMaterial::dgContactMaterial()
 }
 
 dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const material, dgBody* const body0, dgBody* const body1)
-	:dgConstraint(), dgList<dgContactMaterial>(world->GetAllocator())
+	:dgConstraint()
+	,dgList<dgContactMaterial>(world->GetAllocator())
 	,m_positAcc (dgVector::m_zero)
 	,m_rotationAcc ()
 	,m_closestDistance (dgFloat32 (0.0f))
@@ -99,7 +99,8 @@ dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const materi
 }
 
 dgContact::dgContact(dgContact* const clone)
-	:dgConstraint(*clone), dgList<dgContactMaterial>(clone->GetAllocator())
+	:dgConstraint(*clone)
+	,dgList<dgContactMaterial>(clone->GetAllocator())
 	,m_positAcc(clone->m_positAcc)
 	,m_rotationAcc(clone->m_rotationAcc)
 	,m_separtingVector (clone->m_separtingVector)
