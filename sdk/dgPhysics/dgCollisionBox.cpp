@@ -193,13 +193,15 @@ dgVector dgCollisionBox::SupportVertex (const dgVector& dir0, dgInt32* const ver
 
 	dgAssert (dgAbs(dir.DotProduct(dir).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
-	dgVector mask (dir < dgVector (dgFloat32 (0.0f)));
+//	dgVector mask (dir < dgVector (dgFloat32 (0.0f)));
+	dgVector mask(dir < dgVector::m_zero);
 	if (vertexIndex) {
 		dgVector index (m_indexMark * (mask & dgVector::m_one));
 		index = (index.AddHorizontal()).GetInt();
 		*vertexIndex = dgInt32 (index.m_ix);
 	}
-	return (m_size[1] & mask) + m_size[0].AndNot(mask);
+//	return (m_size[1] & mask) + m_size[0].AndNot(mask);
+	return m_size[0].Select(m_size[1], mask);
 }
 
 dgVector dgCollisionBox::SupportVertexSpecial(const dgVector& dir0, dgFloat32 skinThickness, dgInt32* const vertexIndex) const

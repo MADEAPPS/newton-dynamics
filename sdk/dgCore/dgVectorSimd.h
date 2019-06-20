@@ -364,6 +364,14 @@ class dgVector
 		return _mm_andnot_ps (data.m_type, m_type);	
 	}
 
+	DG_INLINE dgVector Select(const dgVector& data, const dgVector& mask) const
+	{
+		// (((b ^ a) & mask)^a)
+		return  _mm_or_ps (_mm_and_ps (mask.m_type, data.m_type), _mm_andnot_ps(mask.m_type, m_type));
+		//return  _mm_xor_ps(m_type, _mm_and_ps (mask.m_type, _mm_xor_ps(m_type, data.m_type)));
+	}
+
+
 	DG_INLINE dgInt32 GetSignMask() const
 	{
 		return _mm_movemask_ps(m_type);

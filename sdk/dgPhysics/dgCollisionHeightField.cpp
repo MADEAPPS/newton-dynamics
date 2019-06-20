@@ -419,7 +419,6 @@ DG_INLINE void dgCollisionHeightField::CalculateMinExtend2d(const dgVector& p0, 
 	dgVector q0(p0.GetMin(p1) - m_padding);
 	dgVector q1(p0.GetMax(p1) + scale + m_padding);
 
-	//dgVector elevationPadding (dgVector(dgFloat32(1.0e10f)).AndNot(m_yMask));
 	dgVector invScale (m_horizontalScaleInv_x, dgFloat32 (0.0f), m_horizontalScaleInv_z, dgFloat32 (0.0f));
 	boxP0 = (((q0 * invScale).Floor() * scale)         & m_yMask) - m_elevationPadding;
 	boxP1 = (((q1 * invScale).Floor() * scale + scale) & m_yMask) + m_elevationPadding;
