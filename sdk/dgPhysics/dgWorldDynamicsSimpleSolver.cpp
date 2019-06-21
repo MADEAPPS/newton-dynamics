@@ -423,10 +423,11 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_3_13(const dgJointInfo* cons
 				dgVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
 				dgVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
 
-				accel = accel.AndNot((force > upperFrictionForce) | (force < lowerFrictionForce));
+				//accel = accel.And__Not((force > upperFrictionForce) | (force < lowerFrictionForce));
+				accel = accel & (force < upperFrictionForce) & (force > lowerFrictionForce);
 				force = force.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-
 				maxAccel = maxAccel.GetMax(accel.Abs());
+
 				dgAssert(maxAccel.m_x >= dgAbs(accel.m_x));
 
 				accNorm = accNorm.GetMax(maxAccel * firstPass);
@@ -502,11 +503,11 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 			dgVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
 			dgVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
 
-			a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
+			//a = a.And__Not((f > upperFrictionForce) | (f < lowerFrictionForce));
+			a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 			f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-
-			//accNorm += a * a;
 			accNorm = accNorm.MulAdd(a, a);
+
 			dgVector deltaForce(f - dgVector(rhs->m_force));
 
 			rhs->m_force = f.GetScalar();
@@ -543,10 +544,9 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 				dgVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
 				dgVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
 
-				a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
+				//a = a.And__Not((f > upperFrictionForce) | (f < lowerFrictionForce));
+				a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 				f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-
-				//maxAccel += a * a;
 				maxAccel = maxAccel.MulAdd (a, a);
 
 				dgVector deltaForce(f - dgVector(rhs->m_force));

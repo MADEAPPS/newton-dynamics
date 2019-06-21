@@ -970,10 +970,11 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 		dgWorkGroupFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
 		dgWorkGroupFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
 
-		a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
+		//a = a.And__Not((f > upperFrictionForce) | (f < lowerFrictionForce));
+		a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 		f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-
 		accNorm = accNorm.MulAdd(a, a);
+
 		dgWorkGroupFloat deltaForce(f - row->m_force);
 
 		row->m_force = f;
@@ -1027,10 +1028,11 @@ dgFloat32 dgParallelBodySolver::CalculateJointForce(const dgJointInfo* const joi
 			dgWorkGroupFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
 			dgWorkGroupFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
 
-			a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
+			//a = a.And__Not((f > upperFrictionForce) | (f < lowerFrictionForce));
+			a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 			f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-
 			maxAccel = maxAccel.MulAdd(a, a);
+
 			dgWorkGroupFloat deltaForce(f - row->m_force);
 
 			row->m_force = f;
@@ -1232,10 +1234,11 @@ void dgParallelBodySolver::CalculateJointsForce(dgInt32 threadID)
 				const dgVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
 				const dgVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
 
-				a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
+				//a = a.And__Not((f > upperFrictionForce) | (f < lowerFrictionForce));
+				a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 				f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-
 				accNorm = accNorm.MulAdd(a, a);
+
 				dgVector deltaForce(f - dgVector(rhs->m_force));
 
 				rhs->m_force = f.GetScalar();
@@ -1276,10 +1279,11 @@ void dgParallelBodySolver::CalculateJointsForce(dgInt32 threadID)
 					const dgVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
 					const dgVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
 
-					a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
+					//a = a.And__Not((f > upperFrictionForce) | (f < lowerFrictionForce));
+					a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 					f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-
 					maxAccel = maxAccel.MulAdd(a, a);
+
 					dgVector deltaForce(f - rhs->m_force);
 
 					rhs->m_force = f.GetScalar();

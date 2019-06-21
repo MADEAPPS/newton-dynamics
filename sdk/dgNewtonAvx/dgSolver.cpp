@@ -634,7 +634,8 @@ void dgSolver::CalculateJointsAcceleration(dgInt32 threadID)
 	}
 }
 
-DG_INLINE dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgSoaFloat* const internalForces) const
+//DG_INLINE dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgSoaFloat* const internalForces) const
+dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgSoaFloat* const internalForces) const
 {
 	dgSoaVector6 forceM0;
 	dgSoaVector6 forceM1;
@@ -716,10 +717,11 @@ DG_INLINE dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const joint
 		dgSoaFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
 		dgSoaFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
 
-		a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
+		//a = a.And__Not((f > upperFrictionForce) | (f < lowerFrictionForce));
+		a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 		f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
+		accNorm = accNorm.MulAdd(a, a);
 
-		accNorm = accNorm + a * a;
 		dgSoaFloat deltaForce(f - row->m_force);
 
 		row->m_force = f;
@@ -774,9 +776,10 @@ DG_INLINE dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const joint
 			dgSoaFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
 			dgSoaFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
 
-			a = a.AndNot((f > upperFrictionForce) | (f < lowerFrictionForce));
+			//a = a.And__Not((f > upperFrictionForce) | (f < lowerFrictionForce));
+			a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 			f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-			maxAccel = maxAccel + a * a;
+			maxAccel = maxAccel.MulAdd(a, a);
 
 			dgSoaFloat deltaForce(f - row->m_force);
 

@@ -123,10 +123,15 @@ class dgWorkGroupFloat
 		return dgWorkGroupFloat(m_low | A.m_low, m_high | A.m_high);
 	}
 
-	DG_INLINE dgWorkGroupFloat AndNot (const dgWorkGroupFloat& A) const
+	DG_INLINE dgWorkGroupFloat operator& (const dgWorkGroupFloat& A) const
 	{
-		return dgWorkGroupFloat(m_low.AndNot(A.m_low), m_high.AndNot(A.m_high));
+		return dgWorkGroupFloat(m_low & A.m_low, m_high & A.m_high);
 	}
+
+	//DG_INLINE dgWorkGroupFloat AndNot (const dgWorkGroupFloat& A) const
+	//{
+	//	return dgWorkGroupFloat(m_low.AndNot(A.m_low), m_high.AndNot(A.m_high));
+	//}
 
 	DG_INLINE dgWorkGroupFloat GetMin(const dgWorkGroupFloat& A) const
 	{

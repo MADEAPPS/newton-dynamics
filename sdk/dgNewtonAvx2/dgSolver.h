@@ -254,9 +254,14 @@
 			return _mm256_or_ps (m_type, A.m_type);
 		}
 
-		DG_INLINE dgSoaFloat AndNot (const dgSoaFloat& A) const
+		//DG_INLINE dgSoaFloat And__Not (const dgSoaFloat& A) const
+		//{
+		//	return  _mm256_and__not_ps (A.m_type, m_type);
+		//}
+
+		DG_INLINE dgSoaFloat operator& (const dgSoaFloat& A) const
 		{
-			return  _mm256_andnot_ps (A.m_type, m_type);
+			return _mm256_and_ps(m_type, A.m_type);
 		}
 
 		DG_INLINE dgSoaFloat GetMin(const dgSoaFloat& A) const
