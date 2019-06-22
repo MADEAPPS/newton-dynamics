@@ -141,7 +141,7 @@
 // alternatively the end application can use a command line option to enable this define
 //#define D_PROFILER
 
-// uncomment this for Scalar floating proint 
+// uncomment this for Scalar floating point 
 // alternatively the end application can use a command line option to enable this define
 //#define DG_SCALAR_VECTOR_CLASS
 

@@ -116,7 +116,7 @@ class dgOldSolverNetwon_1_5
 			const dgInt32 frictionIndex = m_frictionIndex[i];
 			const dgVector low(m_low[i] * m_x[frictionIndex]);
 			const dgVector high(m_high[i] * m_x[frictionIndex]);
-			error = error.AndNot((x > high) | (x < low));
+			error = error & (x < high) & (x > low);
 			accelNorm += error.GetScalar() * error.GetScalar();
 			stride += m_size;
 		}
@@ -139,7 +139,7 @@ class dgOldSolverNetwon_1_5
 					dgVector x((r + row[j] * m_x[j]) * m_invDiag[j]);
 
 					dgVector a(r);
-					a = a.AndNot((x > high) | (x < low));
+					a = a & (x < high) & (x > low);
 					x = x.GetMax(low).GetMin(high);
 					m_x[j] = x.GetScalar();
 

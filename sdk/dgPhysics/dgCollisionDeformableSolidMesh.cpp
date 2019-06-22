@@ -315,7 +315,7 @@ dgFloat32 kVolumetricStiffness = dgFloat32(20000000.0f);
 			const dgVector length2(p0p1.DotProduct(p0p1));
 			const dgVector mask(length2 > m_smallestLenght2);
 
-			const dgVector lenght2 ((length2 & mask) | length2.AndNot(mask));
+			const dgVector lenght2 ((length2 & mask) | length2.And__Not(mask));
 			const dgFloat32 length = (lenght2.Sqrt()).GetScalar();
 			const dgFloat32 den = dgFloat32 (1.0f) / length;
 			const dgFloat32 lenghtRatio = restLenght[i] * den;

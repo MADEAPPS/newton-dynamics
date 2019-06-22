@@ -425,8 +425,11 @@ DG_INLINE void dgCollisionHeightField::CalculateMinExtend2d(const dgVector& p0, 
 	dgAssert (boxP0.m_w == dgFloat32 (0.0f));
 	dgAssert (boxP1.m_w == dgFloat32 (0.0f));
 
-	dgVector minBox((m_minBox & m_yMask) + boxP0.AndNot(m_yMask));
-	dgVector maxBox((m_maxBox & m_yMask) + boxP1.AndNot(m_yMask));
+//	dgVector minBox((m_minBox & m_yMask) + boxP0.AndNot(m_yMask));
+//	dgVector maxBox((m_maxBox & m_yMask) + boxP1.AndNot(m_yMask));
+	dgVector minBox(boxP0.Select(m_minBox, m_yMask));
+	dgVector maxBox(boxP1.Select(m_maxBox, m_yMask));
+
 	boxP0 = boxP0.GetMax(minBox);
 	boxP1 = boxP1.GetMin(maxBox);
 }
@@ -444,16 +447,22 @@ DG_INLINE void dgCollisionHeightField::CalculateMinExtend3d(const dgVector& p0, 
 	dgVector q1(p0.GetMax(p1) + scale + m_padding);
 
 	dgVector invScale(m_horizontalScaleInv_x, dgFloat32(0.0f), m_horizontalScaleInv_z, dgFloat32(0.0f));
-	boxP0 = (((q0 * invScale).Floor() * scale        ) & m_yMask) + q0.AndNot(m_yMask);
-	boxP1 = (((q1 * invScale).Floor() * scale + scale) & m_yMask) + q1.AndNot(m_yMask);
+
+	//boxP0 = (((q0 * invScale).Floor() * scale        ) & m_yMask) + q0.AndNot(m_yMask);
+	//boxP1 = (((q1 * invScale).Floor() * scale + scale) & m_yMask) + q1.AndNot(m_yMask);
+	boxP0 = q0.Select((q0 * invScale).Floor() * scale, m_yMask);
+	boxP1 = q1.Select((q1 * invScale).Floor() * scale + scale, m_yMask);
 
 	if (m_horizontalDisplacement) {
 		boxP0 -= dgVector(m_horizontalScale_x, dgFloat32(0.0f), m_horizontalScale_z, dgFloat32(0.0f));
 		boxP1 += dgVector(m_horizontalScale_x, dgFloat32(0.0f), m_horizontalScale_z, dgFloat32(0.0f));
 	}
 
-	dgVector minBox((m_minBox & m_yMask) + boxP0.AndNot(m_yMask));
-	dgVector maxBox((m_maxBox & m_yMask) + boxP1.AndNot(m_yMask));
+	//dgVector minBox((m_minBox & m_yMask) + boxP0.AndNot(m_yMask));
+	//dgVector maxBox((m_maxBox & m_yMask) + boxP1.AndNot(m_yMask));
+	dgVector minBox(boxP0.Select(m_minBox, m_yMask));
+	dgVector maxBox(boxP1.Select(m_maxBox, m_yMask));
+
 	boxP0 = boxP0.GetMax(minBox);
 	boxP1 = boxP1.GetMin(maxBox);
 }
@@ -973,11 +982,13 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 
 	// the user data is the pointer to the collision geometry
 	CalculateMinExtend3d (data->m_p0, data->m_p1, boxP0, boxP1);
-	boxP0 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace < dgVector (dgFloat32 (0.0f)));  
-	boxP1 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace > dgVector (dgFloat32 (0.0f)));  
+	boxP0 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace < dgVector::m_zero);  
+	boxP1 += data->m_boxDistanceTravelInMeshSpace & (data->m_boxDistanceTravelInMeshSpace > dgVector::m_zero);  
 
-	boxP0 = (boxP0.GetMax(dgVector (dgFloat32 (0.0f))) & m_yMask) + boxP0.AndNot(m_yMask);
-	boxP1 = (boxP1.GetMax(dgVector (dgFloat32 (0.0f))) & m_yMask) + boxP1.AndNot(m_yMask);
+	//boxP0 = (boxP0.GetMax(dgVector::m_zero) & m_yMask) + boxP0.AndNot(m_yMask);
+	//boxP1 = (boxP1.GetMax(dgVector::m_zero) & m_yMask) + boxP1.AndNot(m_yMask);
+	boxP0 = boxP0.Select(boxP0.GetMax(dgVector::m_zero), m_yMask);
+	boxP1 = boxP1.Select(boxP1.GetMax(dgVector::m_zero), m_yMask);
 
 	dgVector p0 (boxP0.Scale(m_horizontalScaleInv_x).GetInt());
 	dgVector p1 (boxP1.Scale(m_horizontalScaleInv_x).GetInt());

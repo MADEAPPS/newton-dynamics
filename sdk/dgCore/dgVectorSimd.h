@@ -359,12 +359,7 @@ class dgVector
 		return _mm_xor_ps (m_type, data.m_type);	
 	}
 
-	DG_INLINE dgVector AndNot (const dgVector& data) const
-	{
-		return _mm_andnot_ps (data.m_type, m_type);	
-	}
-
-	DG_INLINE dgVector And__Not(const dgVector& data) const
+	DG_INLINE dgVector AndNot(const dgVector& data) const
 	{
 		return _mm_andnot_ps(data.m_type, m_type);
 	}

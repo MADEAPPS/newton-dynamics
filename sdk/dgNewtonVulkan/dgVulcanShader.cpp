@@ -110,7 +110,7 @@ void dgVulkanShaderInfo::CreateInitBody (dgVulkanContext& context)
 	descriptorPoolCreateInfo.poolSizeCount = 1;
 	descriptorPoolCreateInfo.pPoolSizes = &descriptorPoolSize;
 
-	err = vkCreateDescriptorPool(context.m_device, &descriptorPoolCreateInfo, 0, &m_descriptolPool);
+	err = vkCreateDescriptorPool(context.m_device, &descriptorPoolCreateInfo, &context.m_allocator, &m_descriptolPool);
 	dgAssert(err == VK_SUCCESS);
 
 	VkDescriptorSetAllocateInfo descriptorSetAllocateInfo;
@@ -181,7 +181,7 @@ void dgVulkanShaderInfo::CreateInitBody (dgVulkanContext& context)
 
 void dgVulkanShaderInfo::Destroy (dgVulkanContext& context)
 {
-	vkFreeDescriptorSets(context.m_device, m_descriptolPool, 1, &m_descriptorSet);
+	//vkFreeDescriptorSets(context.m_device, m_descriptolPool, 1, &m_descriptorSet);
 	vkDestroyDescriptorPool(context.m_device, m_descriptolPool, &context.m_allocator);
 	vkDestroyPipelineLayout(context.m_device, m_pipelineLayout, &context.m_allocator);
 	vkDestroyDescriptorSetLayout(context.m_device, m_layout, &context.m_allocator);

@@ -746,7 +746,6 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 		dgSoaFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
 		dgSoaFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
 
-		//a = a.And__Not((f > upperFrictionForce) | (f < lowerFrictionForce));
 		a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 		f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 		accNorm = accNorm.MulAdd(a, a);
@@ -805,7 +804,6 @@ dgFloat32 dgSolver::CalculateJointForce(const dgJointInfo* const jointInfo, dgSo
 			dgSoaFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
 			dgSoaFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
 
-			//a = a.And__Not((f > upperFrictionForce) | (f < lowerFrictionForce));
 			a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 			f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 			maxAccel = maxAccel.MulAdd(a, a);

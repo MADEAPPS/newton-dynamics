@@ -423,7 +423,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce_3_13(const dgJointInfo* cons
 				dgVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
 				dgVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
 
-				//accel = accel.And__Not((force > upperFrictionForce) | (force < lowerFrictionForce));
 				accel = accel & (force < upperFrictionForce) & (force > lowerFrictionForce);
 				force = force.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 				maxAccel = maxAccel.GetMax(accel.Abs());
@@ -503,7 +502,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 			dgVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
 			dgVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
 
-			//a = a.And__Not((f > upperFrictionForce) | (f < lowerFrictionForce));
 			a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 			f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 			accNorm = accNorm.MulAdd(a, a);
@@ -544,7 +542,6 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 				dgVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
 				dgVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
 
-				//a = a.And__Not((f > upperFrictionForce) | (f < lowerFrictionForce));
 				a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
 				f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
 				maxAccel = maxAccel.MulAdd (a, a);

@@ -145,7 +145,8 @@ class dgFastRayTest
 
 		dgAssert (m_diff.DotProduct(m_diff).GetScalar() > dgFloat32 (0.0f));
 		m_isParallel = (m_diff.Abs() < dgVector(1.0e-8f));
-		m_dpInv = (((dgVector(dgFloat32(1.0e-20)) & m_isParallel) | m_diff.AndNot(m_isParallel)).Reciproc()) & dgVector::m_triplexMask;
+		//m_dpInv = (((dgVector(dgFloat32(1.0e-20)) & m_isParallel) | m_diff.AndNot(m_isParallel)).Reciproc()) & dgVector::m_triplexMask;
+		m_dpInv = m_diff.Select (dgVector(dgFloat32(1.0e-20f)), m_isParallel).Reciproc() & dgVector::m_triplexMask;
 		m_unitDir = m_diff.Normalize();
 	}
 
@@ -218,7 +219,8 @@ class dgFastRayTest
 		t1 = t1.GetMin(t1.ShiftTripleRight());
 		dgVector mask(t0 < t1);
 		dgVector maxDist(dgFloat32(1.2f));
-		t0 = (t0 & mask) | maxDist.AndNot(mask);
+		//t0 = (t0 & mask) | maxDist.AndNot(mask);
+		t0 = maxDist.Select(t0, mask);
 		dgAssert((mask.GetSignMask() & 1) == (t0.m_x < dgFloat32(1.0f)));
 		return t0.GetScalar();
 	}

@@ -128,11 +128,6 @@ class dgWorkGroupFloat
 		return dgWorkGroupFloat(m_low & A.m_low, m_high & A.m_high);
 	}
 
-	//DG_INLINE dgWorkGroupFloat AndNot (const dgWorkGroupFloat& A) const
-	//{
-	//	return dgWorkGroupFloat(m_low.AndNot(A.m_low), m_high.AndNot(A.m_high));
-	//}
-
 	DG_INLINE dgWorkGroupFloat GetMin(const dgWorkGroupFloat& A) const
 	{
 		return dgWorkGroupFloat(m_low.GetMin(A.m_low), m_high.GetMin(A.m_high));
@@ -155,9 +150,6 @@ class dgWorkGroupFloat
 
 	dgVector m_low;
 	dgVector m_high;
-
-	static dgWorkGroupFloat m_one;
-	static dgWorkGroupFloat m_zero;
 } DG_GCC_VECTOR_ALIGMENT;
 
 DG_MSC_VECTOR_ALIGMENT
@@ -291,6 +283,9 @@ class dgParallelBodySolver
 	dgInt32* m_bodyRowStart;
 
 	private:
+	dgWorkGroupFloat m_one;
+	dgWorkGroupFloat m_zero;
+
 	dgArray<dgSolverSoaElement> m_massMatrix;
 	friend class dgWorldDynamicUpdate;
 };
@@ -317,6 +312,8 @@ DG_INLINE dgParallelBodySolver::dgParallelBodySolver(dgMemoryAllocator* const al
 	,m_soaRowStart(NULL)
 	,m_bodyRowStart(NULL)
 	,m_massMatrix(allocator)
+	,m_one(dgFloat32 (1.0f))
+	,m_zero(dgFloat32 (0.0f))
 {
 	m_skeletonArray[32] = NULL;
 }

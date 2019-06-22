@@ -58,6 +58,7 @@ class dgCollisionBox: public dgCollisionConvex
 	static dgInt32 m_initSimplex;
 	static dgInt32 m_faces[][4];
 	static dgVector m_indexMark;
+	static dgVector m_penetrationTol;
 	static dgConvexSimplexEdge m_edgeArray[];
 	static dgConvexSimplexEdge* m_edgeEdgeMap[];
 	static dgConvexSimplexEdge* m_vertexToEdgeMap[];

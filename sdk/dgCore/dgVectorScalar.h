@@ -397,6 +397,12 @@ class dgVector
 		return dgVector (a[0] & ~b[0], a[1] & ~b[1], a[2] & ~b[2], a[3] & ~b[3]); 
 	}
 
+	DG_INLINE dgVector Select (const dgVector& data, const dgVector& mask) const
+	{
+		// (((b ^ a) & mask)^a)
+		return  (*this) ^ (mask & (data ^ (*this)));
+	}
+
 	DG_INLINE dgInt32 GetSignMask() const
 	{
 		const dgInt32* const a = (dgInt32*)&m_x;
@@ -819,6 +825,12 @@ class dgBigVector
 		const dgInt64* const a = (dgInt64*)&m_x;
 		const dgInt64* const b = (dgInt64*)&data.m_x;
 		return dgBigVector (a[0] & ~b[0], a[1] & ~b[1], a[2] & ~b[2], a[3] & ~b[3]); 
+	}
+
+	DG_INLINE dgBigVector Select(const dgBigVector& data, const dgBigVector& mask) const
+	{
+		// (((b ^ a) & mask)^a)
+		return  (*this) ^ (mask & (data ^ (*this)));
 	}
 
 	DG_INLINE dgInt32 GetSignMask() const

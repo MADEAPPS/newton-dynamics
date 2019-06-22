@@ -234,10 +234,14 @@ class dgCollisionCompound: public dgCollision
 
 DG_INLINE dgFloat32 dgCollisionCompound::dgOOBBTestData::UpdateSeparatingDistance(const dgVector& box0Min, const dgVector& box0Max, const dgVector& box1Min, const dgVector& box1Max) const
 {
-	dgVector minBox(box0Min - box1Max);
-	dgVector maxBox(box0Max - box1Min);
-	dgVector mask((minBox * maxBox) < dgVector::m_zero);
-	dgVector dist((mask & m_maxDist) | ((maxBox.Abs()).GetMin(minBox.Abs())).AndNot(mask));
+	const dgVector minBox(box0Min - box1Max);
+	const dgVector maxBox(box0Max - box1Min);
+	const dgVector mask((minBox * maxBox) < dgVector::m_zero);
+	const dgVector boxDist ((maxBox.Abs()).GetMin(minBox.Abs()));
+
+	//dgVector dist((mask & m_maxDist) | boxDist.AndNot(mask));
+	dgVector dist(boxDist.Select(m_maxDist, mask));
+
 	dist = dist.GetMin(dist.ShiftTripleRight());
 	dist = dist.GetMin(dist.ShiftTripleRight());
 	return dist.GetScalar();

@@ -168,7 +168,7 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 			const dgVector length2(p0p1.DotProduct(p0p1));
 			const dgVector mask(length2 > m_smallestLenght2);
 
-			const dgVector lenght2((length2 & mask) | length2.AndNot(mask));
+			const dgVector lenght2((length2 & mask) | length2.And__Not(mask));
 			const dgFloat32 length = (lenght2.Sqrt()).GetScalar();
 			const dgFloat32 den = dgFloat32(1.0f) / length;
 			const dgFloat32 lenghtRatio = links[i].m_restlength * den;
@@ -309,7 +309,7 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 			const dgVector mag2(p0p1.DotProduct(p0p1));
 			const dgVector mask(mag2 > m_smallestLenght2);
 
-			const dgVector lenght2((mag2 & mask) | mag2.AndNot(mask));
+			const dgVector lenght2((mag2 & mask) | mag2.And__Not(mask));
 			const dgFloat32 length = (lenght2.Sqrt()).GetScalar();
 			const dgFloat32 invDen = dgFloat32(1.0f) / length;
 			const dgFloat32 lenghtRatio = restLenght[i] * invDen;
@@ -337,7 +337,8 @@ void dgCollisionMassSpringDamperSystem::CalculateAcceleration(dgFloat32 timestep
 
 			const dgVector p0p1Mag2(p0p1.DotProduct(p0p1));
 			const dgVector p0p1Mask(p0p1Mag2 > m_smallestLenght2);
-			const dgVector p0p1Lenght2((p0p1Mag2 & p0p1Mask) | m_smallestLenght2.AndNot(p0p1Mask));
+			//const dgVector p0p1Lenght2((p0p1Mag2 & p0p1Mask) | m_smallestLenght2.AndNot(p0p1Mask));
+			const dgVector p0p1Lenght2(m_smallestLenght2.Select (p0p1Mag2, p0p1Mask));
 
 			const dgFloat32 p0p1Length = p0p1Lenght2.Sqrt().GetScalar();
 			const dgFloat32 p0p1InvMag = dgFloat32 (1.0f) / p0p1Length;
