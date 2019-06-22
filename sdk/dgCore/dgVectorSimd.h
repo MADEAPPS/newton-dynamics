@@ -376,7 +376,6 @@ class dgVector
 		return  _mm_xor_ps(m_type, _mm_and_ps (mask.m_type, _mm_xor_ps(m_type, data.m_type)));
 	}
 
-
 	DG_INLINE dgInt32 GetSignMask() const
 	{
 		return _mm_movemask_ps(m_type);
@@ -746,6 +745,14 @@ class dgBigVector
 	DG_INLINE dgBigVector AndNot(const dgBigVector& data) const
 	{
 		return dgBigVector(_mm_andnot_pd(data.m_typeLow, m_typeLow), _mm_andnot_pd(data.m_typeHigh, m_typeHigh));
+	}
+
+	DG_INLINE dgBigVector Select(const dgBigVector& data, const dgBigVector& mask) const
+	{
+		// (((b ^ a) & mask)^a)
+		//return  _mm_or_ps (_mm_and_ps (mask.m_type, data.m_type), _mm_andnot_ps(mask.m_type, m_type));
+		return  dgBigVector(_mm_xor_pd(m_typeLow, _mm_and_pd(mask.m_typeLow, _mm_xor_pd(m_typeLow, data.m_typeLow))),
+							_mm_xor_pd(m_typeHigh, _mm_and_pd(mask.m_typeHigh, _mm_xor_pd(m_typeHigh, data.m_typeHigh))));
 	}
 
 	DG_INLINE dgBigVector ShiftTripleRight() const
