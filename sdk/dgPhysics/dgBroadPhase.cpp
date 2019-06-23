@@ -1573,7 +1573,7 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 					const dgCollisionInstance* const collision0 = body0->GetCollision();
 					const dgCollisionInstance* const collision1 = body1->GetCollision();
 
-					#if 1
+					#if 0
 						const dgFloat32 maxDiameter0 = dgFloat32 (3.5f) * collision0->GetBoxMaxRadius(); 
 						const dgFloat32 maxDiameter1 = dgFloat32 (3.5f) * collision1->GetBoxMaxRadius(); 
 						const dgFloat32 velocLinear = dgSqrt((veloc.DotProduct(veloc)).GetScalar());
@@ -1583,7 +1583,7 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 					#else
 						const dgVector scale(dgFloat32(1.0f), dgFloat32(3.5f) * collision0->GetBoxMaxRadius(), dgFloat32(3.5f) * collision1->GetBoxMaxRadius(), dgFloat32(0.0f));
 						const dgVector velocMag2(veloc.DotProduct(veloc).GetScalar(), omega0.DotProduct(omega0).GetScalar(), omega1.DotProduct(omega1).GetScalar(), dgFloat32(0.0f));
-						const dgVector velocMag(velocMag2.Sqrt() * scale);
+						const dgVector velocMag(velocMag2.GetMax(dgVector::m_epsilon).InvSqrt() * velocMag2 * scale);
 						const dgFloat32 speed = velocMag.AddHorizontal().GetScalar() + dgFloat32(0.5f);
 					#endif
 					distance -= speed * timestep;

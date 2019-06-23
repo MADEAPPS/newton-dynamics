@@ -616,6 +616,9 @@ dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& no
 	}
 
 	dgFloat32 totalArea = dgAbs (hullArea.DotProduct(normal).GetScalar());
+	if (totalArea < dgFloat32 (1.0e-5f)) {
+		return 1;
+	}
 	dgConveFaceNode* hullPoint = &convexHull[0];
 	
 	bool hasLinearCombination = true;

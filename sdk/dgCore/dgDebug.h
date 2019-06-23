@@ -52,7 +52,7 @@
 #ifdef DG_TRACE
 	#define dgTrace(x)	dgExpandTraceMessage x;
 #else
-	#define dgTrace(x)
+	#define dgTrace(x);
 #endif
 
 

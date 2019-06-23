@@ -63,7 +63,7 @@ class dgContactList: public dgList<dgContact*>
 	dgInt32 m_contacJointLock;
 	dgInt32 m_deadContactsCount;
 	dgInt32 m_activeContactsCount;
-	dgContactList::dgListNode* m_deadContacts[128];
+	dgContactList::dgListNode* m_deadContacts[1024 * 2];
 };
 
 DG_MSC_VECTOR_ALIGMENT

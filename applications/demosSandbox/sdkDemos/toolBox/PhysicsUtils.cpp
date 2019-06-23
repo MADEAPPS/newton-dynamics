@@ -683,6 +683,17 @@ void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thr
 	dVector force (dir.Scale (mass * DEMO_GRAVITY));
 	NewtonBodySetForce (body, &force.m_x);
 
+	// for regular gravity objects, clamp high angular velocities 
+	dVector omega(0.0f);
+	NewtonBodyGetOmega(body, &omega[0]);
+	dFloat mag2 = omega.DotProduct3(omega);
+	dFloat maxMag = 50.0f;
+	if (mag2 > (maxMag * maxMag)) {
+		omega = omega.Normalize().Scale(maxMag);
+		NewtonBodySetOmega(body, &omega[0]);
+	}
+
+
 #ifdef DEMO_CHECK_ASYN_UPDATE
 	dAssert(g_checkAsyncUpdate);
 #endif

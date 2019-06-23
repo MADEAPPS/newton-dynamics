@@ -466,6 +466,7 @@ class dgVector
 	static dgVector m_yMask;
 	static dgVector m_zMask;
 	static dgVector m_wMask;
+	static dgVector m_epsilon;
 	static dgVector m_signMask;
 	static dgVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
@@ -899,6 +900,7 @@ class dgBigVector
 	static dgBigVector m_yMask;
 	static dgBigVector m_zMask;
 	static dgBigVector m_wMask;
+	static dgBigVector m_epsilon;
 	static dgBigVector m_signMask;
 	static dgBigVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;

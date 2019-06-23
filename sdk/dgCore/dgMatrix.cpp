@@ -24,12 +24,32 @@
 #include "dgQuaternion.h"
 #include "dgGeneralMatrix.h"
 
+#ifndef _NEWTON_USE_DOUBLE
+
+	dgVector dgVector::m_xMask(dgInt32(-1), dgInt32(0), dgInt32(0), dgInt32(0));
+	dgVector dgVector::m_yMask(dgInt32(0), dgInt32(-1), dgInt32(0), dgInt32(0));
+	dgVector dgVector::m_zMask(dgInt32(0), dgInt32(0), dgInt32(-1), dgInt32(0));
+	dgVector dgVector::m_wMask(dgInt32(0), dgInt32(0), dgInt32(0), dgInt32(-1));
+	dgVector dgVector::m_triplexMask(dgInt32(-1), dgInt32(-1), dgInt32(-1), dgInt32(0));
+	dgVector dgVector::m_signMask(dgVector(dgInt32(-1), dgInt32(-1), dgInt32(-1), dgInt32(-1)).ShiftRightLogical(1));
+
+	dgVector dgVector::m_zero(dgFloat32(0.0f));
+	dgVector dgVector::m_one(dgFloat32(1.0f));
+	dgVector dgVector::m_two(dgFloat32(2.0f));
+	dgVector dgVector::m_half(dgFloat32(0.5f));
+	dgVector dgVector::m_three(dgFloat32(3.0f));
+	dgVector dgVector::m_negOne(dgFloat32(-1.0f));
+	dgVector dgVector::m_epsilon(dgFloat32(1.0e-20f));
+	dgVector dgVector::m_wOne(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f));
+#endif
+
 dgBigVector dgBigVector::m_zero (dgFloat64 (0.0f));
 dgBigVector dgBigVector::m_one (dgFloat64 (1.0f));
 dgBigVector dgBigVector::m_two (dgFloat64 (2.0f));
 dgBigVector dgBigVector::m_half (dgFloat32 (0.5f));
 dgBigVector dgBigVector::m_three (dgFloat32 (3.0f));
 dgBigVector dgBigVector::m_negOne (dgFloat32 (-1.0f));
+dgBigVector dgBigVector::m_epsilon(dgFloat32(1.0e-20f));
 dgBigVector dgBigVector::m_wOne (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (1.0f));
 dgBigVector dgBigVector::m_triplexMask (dgInt32 (-1), dgInt32 (-1),	dgInt32 (-1), dgInt32 (0));
 dgBigVector dgBigVector::m_signMask (dgBigVector(dgInt32 (-1), dgInt32 (-1), dgInt32 (-1), dgInt32 (-1)).ShiftRightLogical(1));
@@ -40,26 +60,6 @@ dgBigVector dgBigVector::m_zMask (dgInt32 ( 0), dgInt32 ( 0),	dgInt32 (-1), dgIn
 dgBigVector dgBigVector::m_wMask (dgInt32 ( 0), dgInt32 ( 0),	dgInt32 ( 0), dgInt32 (-1));
 
 dgSpatialVector dgSpatialVector::m_zero (dgFloat32 (0.0f));
-
-
-#ifndef _NEWTON_USE_DOUBLE
-
-dgVector dgVector::m_xMask (dgInt32 (-1), dgInt32 ( 0),	dgInt32 ( 0), dgInt32 ( 0));
-dgVector dgVector::m_yMask (dgInt32 ( 0), dgInt32 (-1),	dgInt32 ( 0), dgInt32 ( 0));
-dgVector dgVector::m_zMask (dgInt32 ( 0), dgInt32 ( 0),	dgInt32 (-1), dgInt32 ( 0));
-dgVector dgVector::m_wMask (dgInt32 ( 0), dgInt32 ( 0),	dgInt32 ( 0), dgInt32 (-1));
-dgVector dgVector::m_triplexMask (dgInt32 (-1), dgInt32 (-1), dgInt32 (-1), dgInt32 (0));
-dgVector dgVector::m_signMask (dgVector(dgInt32 (-1), dgInt32 (-1), dgInt32 (-1), dgInt32 (-1)).ShiftRightLogical(1));
-
-dgVector dgVector::m_zero (dgFloat32 (0.0f));
-dgVector dgVector::m_one  (dgFloat32 (1.0f));
-dgVector dgVector::m_two  (dgFloat32 (2.0f));
-dgVector dgVector::m_wOne (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (1.0f));
-dgVector dgVector::m_half (dgFloat32 (0.5f));
-dgVector dgVector::m_three (dgFloat32 (3.0f));
-dgVector dgVector::m_negOne (dgFloat32 (-1.0f));
-
-#endif
 
 
 dgMatrix dgMatrix::m_zeroMatrix (dgVector (dgFloat32(0.0f)),

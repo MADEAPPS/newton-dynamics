@@ -445,6 +445,7 @@ class dgVector
 	static dgVector m_yMask;
 	static dgVector m_zMask;
 	static dgVector m_wMask;
+	static dgVector m_epsilon;
 	static dgVector m_signMask;
 	static dgVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
@@ -493,7 +494,6 @@ class dgBigVector
 #ifdef _NEWTON_USE_DOUBLE
 	DG_INLINE dgBigVector (const dgFloat32* const ptr)
 		:m_typeLow(_mm_loadu_pd(ptr))
-//		,m_typeHigh(_mm_set_pd(ptr[3], ptr[2]))
 		,m_typeHigh(_mm_loadu_pd(&ptr[2]))
 	{
 	}
@@ -508,7 +508,6 @@ class dgBigVector
 
 	DG_INLINE dgBigVector(const dgFloat64* const ptr)
 		:m_typeLow(_mm_loadu_pd(ptr))
-		//,m_typeHigh(_mm_set_pd(dgFloat64(0.0f), ptr[2]))
 		,m_typeHigh(_mm_loadu_pd(&ptr[2]))
 	{
 	}
@@ -887,6 +886,7 @@ class dgBigVector
 	static dgBigVector m_yMask;
 	static dgBigVector m_zMask;
 	static dgBigVector m_wMask;
+	static dgBigVector m_epsilon;
 	static dgBigVector m_signMask;
 	static dgBigVector m_triplexMask;
 } DG_GCC_VECTOR_ALIGMENT;
