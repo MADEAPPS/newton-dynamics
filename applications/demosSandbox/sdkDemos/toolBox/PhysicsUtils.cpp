@@ -687,7 +687,7 @@ void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thr
 	dVector omega(0.0f);
 	NewtonBodyGetOmega(body, &omega[0]);
 	dFloat mag2 = omega.DotProduct3(omega);
-	dFloat maxMag = 50.0f;
+	dFloat maxMag = 100.0f;
 	if (mag2 > (maxMag * maxMag)) {
 		omega = omega.Normalize().Scale(maxMag);
 		NewtonBodySetOmega(body, &omega[0]);

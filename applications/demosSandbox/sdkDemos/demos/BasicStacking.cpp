@@ -284,6 +284,12 @@ static void CapsuleStack(DemoEntityManager* const scene, dFloat mass, const dVec
 		matrix3.m_posit.m_y += vertialStep * 2.0f;
 	}
 
+	for (int i = 0; i < bodyCount; i++) {
+		NewtonBody* const body = bodyArray[i];
+		NewtonBodySetGyroscopicTorque(body, 1);
+	}
+
+
 	// hack the inertia (yes I know it is a cheat, but this can be fix with more iterations as well)
 	dFloat inertiaScale = 3.0f;
 	for (int i = 0; i < bodyCount; i++) {
