@@ -885,13 +885,12 @@ void dgWorld::FlushCache()
 {
 	// delete all contacts
 	dgContactList& contactList = *this;
-	for (dgContactList::dgListNode* contactNode = contactList.GetLast()->GetPrev(); contactNode; ) {
-		dgContact* const contact = contactNode->GetInfo();
-		dgAssert (contact);
-		contactNode = contactNode->GetPrev();
+	//for (dgContactList::dgListNode* contactNode = contactList.GetLast()->GetPrev(); contactNode; ) {
+	for (dgInt32 i = contactList.m_contactCount - 1; i >= 0; i--) {
+		dgContact* const contact = contactList[i];
 		DestroyConstraint (contact);
 	}
-	dgAssert (contactList.GetCount() == 1);
+	dgAssert (contactList.m_contactCount == 0);
 
 	// clean up memory in bradPhase
 	m_broadPhase->InvalidateCache ();

@@ -1908,7 +1908,7 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 {
 	dgBroadPhase::dgPair pair;
 
-	dgInt32 isActive = contact->m_contactActive;
+	dgInt32 isActive = contact->m_isActive;
 	dgInt32 contactCount = contact->m_maxDOF;
 	dgFloat32 separationDistance = contact->m_separationDistance;
 
@@ -1958,7 +1958,7 @@ dgFloat32 dgWorld::CalculateTimeToImpact (dgContact* const contact, dgFloat32 ti
 	}
 
 	contact->m_maxDOF = contactCount;
-	contact->m_contactActive = isActive;
+	contact->m_isActive = isActive;
 	contact->m_separationDistance = separationDistance;
 	return proxy.m_timestep;
 }
@@ -2199,7 +2199,7 @@ dgInt32 dgWorld::CalculateUserContacts(dgCollisionParamProxy& proxy) const
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	int count = contactJoint->m_material->m_contactGeneration(*contactJoint->m_material, *proxy.m_body0, proxy.m_instance0, *proxy.m_body1, proxy.m_instance1, buffer, sizeof (buffer) / sizeof (buffer[0]), proxy.m_threadIndex);
 	if (count) {
-		proxy.m_contactJoint->m_contactActive = 1;
+		proxy.m_contactJoint->m_isActive = 1;
 		dgContactPoint* const contactOut = proxy.m_contacts;
 		for (dgInt32 i = 0; i < count; i++) {
 			dgAssert (buffer[i].m_normal.m_w == dgFloat32 (0.0f));
@@ -2405,7 +2405,7 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContacts(dgCollisionParamProxy& proxy
 			}
 
 			if (count > 0) {
-				proxy.m_contactJoint->m_contactActive = 1;
+				proxy.m_contactJoint->m_isActive = 1;
 #ifdef DE_USE_OLD_CONTACT_FILTER
 				count = OldPruneContacts(count, proxy.m_contacts, proxy.m_contactJoint->GetPruningTolerance());
 #endif

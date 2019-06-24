@@ -187,7 +187,7 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	dgContactList& contactList = *world;
 	dgBodyMasterList& masterList = *world;
 	const dgBilateralConstraintList& jointList = *world;
-	dgInt32 jointCount = contactList.m_activeContactsCount;
+	dgInt32 jointCount = contactList.m_activeContactCount;
 
 	dgArray<dgJointInfo>& jointArray = world->m_jointsMemory;
 	jointArray.ResizeIfNecessary(jointCount + jointList.GetCount());
@@ -211,8 +211,8 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 		dgConstraint* const joint = node->GetInfo();
 		if (joint->GetBody0()->m_invMass.m_w || joint->GetBody1()->m_invMass.m_w) {
 			baseJointArray[jointCount].m_joint = joint;
-		jointCount++;
-	}
+			jointCount++;
+		}
 	}
 
 	// form all disjoints sets

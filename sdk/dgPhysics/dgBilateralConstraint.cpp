@@ -42,7 +42,7 @@ dgBilateralConstraint::dgBilateralConstraint ()
 {
 	m_maxDOF = 6;
 	m_isBilateral = true;
-	m_contactActive = true;
+	m_isActive = true;
 	m_solverModel = 0;
 	m_rowIsIk = 0;
 	m_rowIsMotor = 0;

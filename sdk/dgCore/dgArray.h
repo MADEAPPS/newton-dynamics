@@ -115,7 +115,6 @@ dgArray<T>::dgArray(const dgArray& source)
 	}
 }
 
-
 template<class T>
 dgArray<T>::~dgArray ()
 {
@@ -155,7 +154,6 @@ dgInt32 dgArray<T>::GetElementsCapacity () const
 {
 	return m_maxSize;
 }
-
 
 template<class T>
 dgInt32 dgArray<T>::GetBytesCapacity () const
@@ -213,7 +211,6 @@ void dgArray<T>::Resize (dgInt32 size) const
 		m_maxSize = size;
 	}
 }
-
 
 template<class T>
 DG_INLINE void dgArray<T>::ResizeIfNecessary  (dgInt32 size) const

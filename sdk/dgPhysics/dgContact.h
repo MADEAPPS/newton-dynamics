@@ -38,32 +38,37 @@ class dgCollisionInstance;
 #define DG_RESTING_CONTACT_PENETRATION	(DG_PENETRATION_TOL + dgFloat32 (1.0f / 1024.0f))
 #define DG_DIAGONAL_PRECONDITIONER		dgFloat32 (25.0f)
 
-class dgContactList: public dgList<dgContact*>
+class dgContactList: public dgArray<dgContact*>
 {
 	public:
 	dgContactList(dgMemoryAllocator* const allocator)
-		:dgList<dgContact*>(allocator)
-		,m_contacJointLock(0)
-		,m_deadContactsCount(0)
-		,m_activeContactsCount(0)
+		:dgArray<dgContact*>(allocator)
+		,m_contactCount(0)
+		,m_contactCountReset(0)
+		,m_activeContactCount(0)
 	{
-		dgList<dgContact*>::Addtop();
+		Resize (1024 * 32);
 	}
 
 	~dgContactList()
 	{
 	}
 
-	dgListNode* Addtop(dgContact* const contact)
+	//dgListNode* Addtop(dgContact* const contact)
+	//{
+	//	return dgList<dgContact*>::SafeAddtop(contact);
+	//}
+
+	void Push (dgContact* const contact)
 	{
-		//dgScopeSpinPause lock(&m_contacJointLock);
-		return dgList<dgContact*>::SafeAddtop(contact);
+		dgInt32 index = dgAtomicExchangeAndAdd(&m_contactCount, 1);
+		dgAssert (index < GetElementsCapacity());
+		(*this)[index] = contact;
 	}
 
-	dgInt32 m_contacJointLock;
-	dgInt32 m_deadContactsCount;
-	dgInt32 m_activeContactsCount;
-	dgContactList::dgListNode* m_deadContacts[1024 * 2];
+	dgInt32 m_contactCount;
+	dgInt32 m_contactCountReset;
+	dgInt32 m_activeContactCount;
 };
 
 DG_MSC_VECTOR_ALIGMENT
@@ -230,7 +235,6 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	void JacobianContactDerivative (dgContraintDescritor& params, const dgContactMaterial& contact, dgInt32 normalIndex, dgInt32& frictionIndex); 
 	void CalculatePointDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& dir, const dgPointParam& param) const;
 
-	void AppendToContactList();
 	void SwapBodies();
 
 	dgVector m_positAcc;
@@ -240,9 +244,9 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	dgFloat32 m_separationDistance;
 	dgFloat32 m_timeOfImpact;
 	const dgContactMaterial* m_material;
-	dgContactList::dgListNode* m_contactNode;
 	dgFloat32 m_contactPruningTolereance;
 	dgUnsigned32 m_broadphaseLru;
+	dgUnsigned32 m_killContact				: 1;
 	dgUnsigned32 m_isNewContact				: 1;
 	dgUnsigned32 m_skeletonIntraCollision	: 1;
 	dgUnsigned32 m_skeletonSelftCollision	: 1;

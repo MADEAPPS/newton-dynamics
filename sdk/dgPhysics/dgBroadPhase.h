@@ -405,6 +405,7 @@ class dgBroadPhase
 			:m_world(world)
 			,m_timestep(timestep)
 			,m_atomicIndex(0)
+			,m_contactStart(0)
 			,m_atomicDynamicsCount(0)
 			,m_atomicPendingBodiesCount(0)
 			,m_fullScan(false)
@@ -414,6 +415,7 @@ class dgBroadPhase
 		dgWorld* m_world;
 		dgFloat32 m_timestep;
 		dgInt32 m_atomicIndex;
+		dgInt32 m_contactStart;
 		dgInt32 m_atomicDynamicsCount;
 		dgInt32 m_atomicPendingBodiesCount;
 		bool m_fullScan;
@@ -498,8 +500,6 @@ class dgBroadPhase
 	virtual dgInt32 ConvexCast (dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const = 0;
 	virtual void FindCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgList<dgBroadPhaseNode*>::dgListNode* const node, dgInt32 threadID) = 0;
 
-	void DeleteDeadContacts();
-	void AttachNewContacts(dgContactList::dgListNode* const lastNode);
 	void UpdateBody(dgBody* const body, dgInt32 threadIndex);
 	void AddInternallyGeneratedBody(dgBody* const body)
 	{
@@ -552,15 +552,18 @@ class dgBroadPhase
 	
 	void FindGeneratedBodiesCollidingPairs (dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID);
 	void UpdateSoftBodyContacts(dgBroadphaseSyncDescriptor* const descriptor, dgFloat32 timeStep, dgInt32 threadID);
-	void UpdateRigidBodyContacts (dgBroadphaseSyncDescriptor* const descriptor, dgContactList::dgListNode* const node, dgFloat32 timeStep, dgInt32 threadID);
+	void UpdateRigidBodyContacts (dgBroadphaseSyncDescriptor* const descriptor, dgFloat32 timeStep, dgInt32 threadID);
 	void SubmitPairs (dgBroadPhaseNode* const body, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threaCount, dgInt32 threadID);
-	void AddNewContacts(dgBroadphaseSyncDescriptor* const descriptor, dgContactList::dgListNode* const nodeConstactNode, dgInt32 threadID);
+
 	bool SanityCheck() const;
+	//void AttachNewContacts(dgInt32 startCount);
+	//void DeleteDeadContacts();
+	void UpdateContactList(dgInt32 startCount);
+
 		
 	static void SleepingStateKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void ForceAndToqueKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void CollidingPairsKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
-	static void AddNewContactsKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void UpdateAggregateEntropyKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void AddGeneratedBodiesContactsKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void UpdateRigidBodyContactKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);

@@ -220,7 +220,7 @@ class dgConstraint
 	dgUnsigned32 m_constId				: 6;		
 	dgUnsigned32 m_solverModel			: 2;
 	dgUnsigned32 m_enableCollision		: 1;
-	dgUnsigned32 m_contactActive		: 1;
+	dgUnsigned32 m_isActive				: 1;
 	dgUnsigned32 m_isBilateral			: 1;
 	dgUnsigned32 m_graphTagged			: 1;
 	dgUnsigned32 m_isInSkeleton			: 1;
@@ -253,7 +253,7 @@ DG_INLINE dgConstraint::dgConstraint()
 	,m_constId(m_unknownConstraint)
 	,m_solverModel(2)
 	,m_enableCollision(false)
-	,m_contactActive(false)
+	,m_isActive(false)
 	,m_isBilateral(false)
 	,m_graphTagged(false)
 	,m_isInSkeleton(false)
@@ -362,7 +362,9 @@ DG_INLINE dgInt32 dgConstraint::GetMaxDOF() const
 
 DG_INLINE bool dgConstraint::IsActive() const
 {
-	return m_contactActive ? true : false;
+	dgAssert (0);
+	return false;
+//	return m_contactActive ? true : false;
 }
 
 DG_INLINE void dgConstraint::SetIndex (dgInt32 index)

@@ -67,21 +67,22 @@ dgContactMaterial::dgContactMaterial()
 dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const material, dgBody* const body0, dgBody* const body1)
 	:dgConstraint()
 	,dgList<dgContactMaterial>(world->GetAllocator())
-	,m_positAcc (dgVector::m_zero)
+	,m_positAcc(dgFloat32 (10.0f))
 	,m_rotationAcc ()
 	,m_closestDistance (dgFloat32 (0.0f))
 	,m_separationDistance(dgFloat32 (0.0f))
-	,m_timeOfImpact(dgFloat32 (0.0f))
+	,m_timeOfImpact(dgFloat32 (1.0e10f))
 	,m_material(material)
-	,m_contactNode(NULL)
 	,m_contactPruningTolereance(world->GetContactMergeTolerance())
 	,m_broadphaseLru(0)
+	,m_killContact(0)
 	,m_isNewContact(1)
 	,m_skeletonIntraCollision(1)
 	,m_skeletonSelftCollision(1)
 {
 	dgAssert ((((dgUnsigned64) this) & 15) == 0);
 	m_maxDOF = 0;
+	m_isActive = 0;
 	m_enableCollision = true;
 	m_constId = m_contactConstraint;
 
@@ -108,9 +109,9 @@ dgContact::dgContact(dgContact* const clone)
 	,m_separationDistance(clone->m_separationDistance)
 	,m_timeOfImpact(clone->m_timeOfImpact)
 	,m_material(clone->m_material)
-	,m_contactNode(clone->m_contactNode)
 	,m_contactPruningTolereance(clone->m_contactPruningTolereance)
 	,m_broadphaseLru(clone->m_broadphaseLru)
+	,m_killContact(clone->m_killContact)
 	,m_isNewContact(clone->m_isNewContact)
 	,m_skeletonIntraCollision(clone->m_skeletonIntraCollision)
 	,m_skeletonSelftCollision(clone->m_skeletonSelftCollision)
@@ -120,7 +121,7 @@ dgContact::dgContact(dgContact* const clone)
 	m_body1 = clone->m_body1;
 	m_maxDOF = clone->m_maxDOF;
 	m_constId = m_contactConstraint;
-	m_contactActive = clone->m_contactActive;
+	m_isActive = clone->m_isActive;
 	m_enableCollision = clone->m_enableCollision;
 	Merge (*clone);
 
@@ -138,21 +139,8 @@ dgContact::~dgContact()
 	}
 
 	dgList<dgContactMaterial>::RemoveAll();
-	if (m_contactNode) {
-		dgAssert (m_body0);
-		dgContactList* const contactList = m_body0->m_world;
-		contactList->Remove (m_contactNode);
-	}
 }
 
-void dgContact::AppendToContactList()
-{
-	dgAssert (m_body0);
-	dgAssert (!m_contactNode);
-	dgAssert(m_body0->m_invMass.m_w > dgFloat32 (0.0f));
-	dgContactList* const contactList = m_body0->m_world;
-	m_contactNode = contactList->Addtop(this);
-}
 
 void dgContact::SwapBodies()
 {

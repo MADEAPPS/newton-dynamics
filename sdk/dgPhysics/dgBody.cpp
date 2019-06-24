@@ -388,7 +388,7 @@ dgConstraint* dgBody::GetFirstContact() const
 			dgAssert (joint);
 			if (joint && (joint->GetId() == dgConstraint::m_contactConstraint)) {
 				dgContact* const contactJoint = (dgContact*) joint;
-				if (contactJoint->m_contactActive) {
+				if (contactJoint->m_isActive) {
 					return joint;
 				}
 			}
@@ -410,7 +410,7 @@ dgConstraint* dgBody::GetNextContact(dgConstraint* const joint) const
 			dgAssert (joint1);
 			if (joint1 && (joint1->GetId() == dgConstraint::m_contactConstraint)) {
 				dgContact* const contactJoint = (dgContact*) joint1;
-				if (contactJoint->m_contactActive) {
+				if (contactJoint->m_isActive) {
 					return joint1;
 				}
 			}
@@ -748,7 +748,7 @@ void dgBody::SetSleepState(bool state)
 		for (dgConstraint* contact = GetFirstContact(); contact; contact = GetNextContact(contact)) {
 			dgAssert(contact->GetId() == dgConstraint::m_contactConstraint);
 			dgContact* const contactJoint = (dgContact*)contact;
-			dgAssert(contactJoint->m_contactActive);
+			dgAssert(contactJoint->m_isActive);
 			contactJoint->m_positAcc = dgVector(dgFloat32(10.0f));
 		}
 	}
