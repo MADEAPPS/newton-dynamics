@@ -525,7 +525,6 @@ class dgBroadPhase
 	void ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy, dgBroadPhaseNode** const root);
 
 	void CalculatePairContacts (dgPair* const pair, dgInt32 threadID);
-	bool ValidateContactCache(dgContact* const contact, dgFloat32 timestep) const;
 	void AddPair (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex);
 	void AddPair (dgBody* const body0, dgBody* const body1, dgFloat32 timestep, dgInt32 threadID);	
 
@@ -556,10 +555,9 @@ class dgBroadPhase
 	void SubmitPairs (dgBroadPhaseNode* const body, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threaCount, dgInt32 threadID);
 
 	bool SanityCheck() const;
-	//void AttachNewContacts(dgInt32 startCount);
-	//void DeleteDeadContacts();
 	void UpdateContactList(dgInt32 startCount);
 
+	DG_INLINE bool ValidateContactCache(dgContact* const contact, const dgVector& timestep) const;
 		
 	static void SleepingStateKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
 	static void ForceAndToqueKernel(void* const descriptor, void* const worldContext, dgInt32 threadID);
@@ -586,7 +584,6 @@ class dgBroadPhase
 	dgContactCache m_contactCache;
 	dgArray<dgPendingCollisionSoftBodies> m_pendingSoftBodyCollisions;
 	dgInt32 m_pendingSoftBodyPairsCount;
-//	dgInt32 m_contacJointLock;
 	dgInt32 m_criticalSectionLock;
 
 	static dgVector m_velocTol;

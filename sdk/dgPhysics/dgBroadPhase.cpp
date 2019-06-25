@@ -1046,23 +1046,21 @@ void dgBroadPhase::RotateRight (dgBroadPhaseTreeNode* const node, dgBroadPhaseNo
 	}
 }
 
-
-bool dgBroadPhase::ValidateContactCache(dgContact* const contact, dgFloat32 timestep) const
+DG_INLINE bool dgBroadPhase::ValidateContactCache(dgContact* const contact, const dgVector& timestep) const
 {
 	dgAssert(contact && (contact->GetId() == dgConstraint::m_contactConstraint));
 
+	dgBody* const body0 = contact->GetBody0();
+	dgBody* const body1 = contact->GetBody1();
 	if (!contact->m_material->m_contactGeneration) {
-		dgBody* const body0 = contact->GetBody0();
-		dgBody* const body1 = contact->GetBody1();
-
-		dgVector deltaTime(timestep);
-		dgVector positStep(deltaTime * (body0->m_veloc - body1->m_veloc));
+//		dgVector deltaTime(timestep);
+		dgVector positStep(timestep * (body0->m_veloc - body1->m_veloc));
 		positStep = ((positStep.DotProduct(positStep)) > m_velocTol) & positStep;
 		contact->m_positAcc += positStep;
 
 		dgVector positError2(contact->m_positAcc.DotProduct(contact->m_positAcc));
 		if ((positError2 < m_linearContactError2).GetSignMask()) {
-			dgVector rotationStep(deltaTime * (body0->m_omega - body1->m_omega));
+			dgVector rotationStep(timestep * (body0->m_omega - body1->m_omega));
 			rotationStep = ((rotationStep.DotProduct(rotationStep)) > m_velocTol) & rotationStep;
 			contact->m_rotationAcc = contact->m_rotationAcc * dgQuaternion(dgFloat32(1.0f), rotationStep.m_x, rotationStep.m_y, rotationStep.m_z);
 
@@ -1075,7 +1073,6 @@ bool dgBroadPhase::ValidateContactCache(dgContact* const contact, dgFloat32 time
 	}
 	return false;
 }
-
 
 void dgBroadPhase::CalculatePairContacts (dgPair* const pair, dgInt32 threadID)
 {
@@ -1533,6 +1530,7 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 	const dgInt32 contactCount = contactList.m_contactCount;
 	dgContact** const contactArray = &contactList[0];
 
+	dgVector deltaTime(timestep);
 	for (dgInt32 i = threadID; i < contactCount; i += threadCount) {
 		dgContact* const contact = contactArray[i];
 		dgAssert (contact);
@@ -1541,7 +1539,7 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 		dgBody* const body1 = contact->GetBody1();
 		if (!(body0->m_equilibrium & body1->m_equilibrium)) {
 			bool isActive = contact->m_isActive;
-			if (ValidateContactCache(contact, timestep)) {
+			if (ValidateContactCache(contact, deltaTime)) {
 				contact->m_broadphaseLru = m_lru;
 				contact->m_timeOfImpact = dgFloat32(1.0e10f);
 			} else {
@@ -1559,20 +1557,11 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 					const dgVector omega1 (body1->GetOmega());
 					const dgCollisionInstance* const collision0 = body0->GetCollision();
 					const dgCollisionInstance* const collision1 = body1->GetCollision();
+					const dgVector scale(dgFloat32(1.0f), dgFloat32(3.5f) * collision0->GetBoxMaxRadius(), dgFloat32(3.5f) * collision1->GetBoxMaxRadius(), dgFloat32(0.0f));
+					const dgVector velocMag2(veloc.DotProduct(veloc).GetScalar(), omega0.DotProduct(omega0).GetScalar(), omega1.DotProduct(omega1).GetScalar(), dgFloat32(0.0f));
+					const dgVector velocMag(velocMag2.GetMax(dgVector::m_epsilon).InvSqrt() * velocMag2 * scale);
+					const dgFloat32 speed = velocMag.AddHorizontal().GetScalar() + dgFloat32(0.5f);
 
-					#if 0
-						const dgFloat32 maxDiameter0 = dgFloat32 (3.5f) * collision0->GetBoxMaxRadius(); 
-						const dgFloat32 maxDiameter1 = dgFloat32 (3.5f) * collision1->GetBoxMaxRadius(); 
-						const dgFloat32 velocLinear = dgSqrt((veloc.DotProduct(veloc)).GetScalar());
-						const dgFloat32 velocAngular0 = dgSqrt((omega0.DotProduct(omega0)).GetScalar()) * maxDiameter0;
-						const dgFloat32 velocAngular1 = dgSqrt((omega1.DotProduct(omega1)).GetScalar()) * maxDiameter1;
-						const dgFloat32 speed = velocLinear + velocAngular1 + velocAngular0 + dgFloat32(0.5f);
-					#else
-						const dgVector scale(dgFloat32(1.0f), dgFloat32(3.5f) * collision0->GetBoxMaxRadius(), dgFloat32(3.5f) * collision1->GetBoxMaxRadius(), dgFloat32(0.0f));
-						const dgVector velocMag2(veloc.DotProduct(veloc).GetScalar(), omega0.DotProduct(omega0).GetScalar(), omega1.DotProduct(omega1).GetScalar(), dgFloat32(0.0f));
-						const dgVector velocMag(velocMag2.GetMax(dgVector::m_epsilon).InvSqrt() * velocMag2 * scale);
-						const dgFloat32 speed = velocMag.AddHorizontal().GetScalar() + dgFloat32(0.5f);
-					#endif
 					distance -= speed * timestep;
 					contact->m_separationDistance = distance;
 				}
