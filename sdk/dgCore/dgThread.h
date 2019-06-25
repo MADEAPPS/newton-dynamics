@@ -38,7 +38,14 @@ class dgThread
 		void Wait();
 		void Release();
 
-		dgInt32 GetCount() const {return m_count;}
+		dgInt32 GetCount() const 
+		{
+			#ifdef DG_USE_THREAD_EMULATION
+				return 0;
+			#else
+				return m_count;
+			#endif
+		}
 
 		private:
 		#ifdef DG_USE_THREAD_EMULATION

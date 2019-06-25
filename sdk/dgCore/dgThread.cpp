@@ -69,6 +69,9 @@ void dgThread::dgSemaphore::Release ()
 {
 }
 
+void dgThread::dgSemaphore::Wait()
+{
+}
 
 dgThread::~dgThread ()
 {
@@ -82,15 +85,13 @@ void dgThread::Close ()
 {
 }
 
-void dgThread::Wait (dgSemaphore& mutex)
-{
-}
-
+//void dgThread::Wait (dgSemaphore& mutex)
+//{
+//}
 
 void dgThread::Wait (dgInt32 count, dgSemaphore* const semArray)
 {
 }
-
 
 void* dgThread::dgThreadSystemCallback(void* threadData)
 {
