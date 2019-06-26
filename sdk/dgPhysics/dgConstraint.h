@@ -362,9 +362,7 @@ DG_INLINE dgInt32 dgConstraint::GetMaxDOF() const
 
 DG_INLINE bool dgConstraint::IsActive() const
 {
-	dgAssert (0);
-	return false;
-//	return m_contactActive ? true : false;
+	return m_isActive ? true : false;
 }
 
 DG_INLINE void dgConstraint::SetIndex (dgInt32 index)
