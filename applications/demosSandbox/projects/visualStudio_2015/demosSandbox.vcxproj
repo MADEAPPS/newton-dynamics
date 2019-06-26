@@ -40,6 +40,7 @@
     <ClCompile Include="..\..\sdkDemos\DemoEntity.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoEntityListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoEntityManager.cpp" />
+    <ClCompile Include="..\..\sdkDemos\DemoInstanceEntity.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoMesh.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\AdvancedPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\AnimatedPlayer.cpp" />
@@ -122,6 +123,7 @@
     <ClInclude Include="..\..\sdkDemos\DemoEntity.h" />
     <ClInclude Include="..\..\sdkDemos\DemoEntityListener.h" />
     <ClInclude Include="..\..\sdkDemos\DemoEntityManager.h" />
+    <ClInclude Include="..\..\sdkDemos\DemoInstanceEntity.h" />
     <ClInclude Include="..\..\sdkDemos\DemoMesh.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.h" />

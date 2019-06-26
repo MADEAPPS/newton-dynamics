@@ -198,6 +198,9 @@
     <ClCompile Include="..\..\sdkDemos\demos\KinematicRagdoll.cpp">
       <Filter>demos</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\DemoInstanceEntity.cpp">
+      <Filter>mainLogic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h">
@@ -250,6 +253,9 @@
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\toolBox\FileBrowser.h">
       <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\DemoInstanceEntity.h">
+      <Filter>mainLogic</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
