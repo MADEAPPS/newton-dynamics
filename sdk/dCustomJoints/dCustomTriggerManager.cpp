@@ -93,6 +93,8 @@ void dCustomTriggerManager::OnDebug(dCustomJoint::dDebugDisplay* const debugCont
 	}
 }
 
+
+static int xxxxx;
 void dCustomTriggerManager::PreUpdate(dFloat timestep, int threadID)
 {
 	D_TRACKTIME();
@@ -104,6 +106,7 @@ void dCustomTriggerManager::PreUpdate(dFloat timestep, int threadID)
 		dTriggerGuestPair& cacheEntry = m_pairCache[i];
 		if (cacheEntry.m_bodyNode->GetInfo() != m_lru) {
 			cacheEntry.m_bodyNode->GetInfo() = m_lru;
+			dTrace(("in trigger body:%d lru:%d frame:%d\n", NewtonBodyGetID(cacheEntry.m_bodyNode->GetKey()), cacheEntry.m_bodyNode->GetInfo(), xxxxx));
 			WhileIn (cacheEntry.m_trigger, cacheEntry.m_bodyNode->GetKey());
 		}
 	}
@@ -114,8 +117,10 @@ void dCustomTriggerManager::PreUpdate(dFloat timestep)
 	m_lru++;
 	m_cacheCount = 0;
 	m_timestep = timestep;
-	for (dList<dCustomTriggerController>::dListNode* node = GetControllersList().GetFirst(); node; node = node->GetNext()) {
-		dCustomTriggerController& controller = node->GetInfo();
+
+xxxxx++;
+	for (dList<dCustomTriggerController>::dListNode* triggerNode = GetControllersList().GetFirst(); triggerNode; triggerNode = triggerNode->GetNext()) {
+		dCustomTriggerController& controller = triggerNode->GetInfo();
 
 		NewtonBody* const triggerBody = controller.GetBody();
 		dCustomTriggerController::dTriggerManifest& manifest = controller.m_manifest;
@@ -125,15 +130,16 @@ void dCustomTriggerManager::PreUpdate(dFloat timestep)
 			NewtonBody* const body0 = NewtonJointGetBody0(joint);
 			NewtonBody* const body1 = NewtonJointGetBody1(joint);
 			NewtonBody* cargoBody = (body0 != triggerBody) ? body0 : body1;
-			dCustomTriggerController::dTriggerManifest::dTreeNode* node = manifest.Find(cargoBody);
-			if (!node) {
+			dCustomTriggerController::dTriggerManifest::dTreeNode* uniqueEntryNode = manifest.Find(cargoBody);
+			if (!uniqueEntryNode) {
 				dCustomScopeLock lock(&m_lock);
-				node = manifest.Insert(m_lru, cargoBody);
+				uniqueEntryNode = manifest.Insert(m_lru, cargoBody);
+				dTrace(("entering trigger body:%d lru:%d frame:%d\n", NewtonBodyGetID(cargoBody), m_lru, xxxxx));
 				OnEnter(&controller, cargoBody);
 			}
 			dTriggerGuestPair& cacheEntry = m_pairCache[m_cacheCount];
 			cacheEntry.m_trigger = &controller;
-			cacheEntry.m_bodyNode = node;
+			cacheEntry.m_bodyNode = uniqueEntryNode;
 			m_cacheCount++;
 		}
 	}
@@ -149,8 +155,9 @@ void dCustomTriggerManager::PreUpdate(dFloat timestep)
 			iter++;
 			if (node->GetInfo() != m_lru) {
 				NewtonBody* const cargoBody = node->GetKey();
-				OnExit(controller, cargoBody);
 
+				dTrace(("exiting trigger body:%d lru:%d frame:%d\n\n", NewtonBodyGetID(cargoBody), node->GetInfo(), xxxxx));
+				OnExit(controller, cargoBody);
 				dCustomScopeLock lock(&m_lock);
 				controller->m_manifest.Remove(cargoBody);
 			}

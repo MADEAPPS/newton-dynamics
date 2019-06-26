@@ -1596,7 +1596,8 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 			contact->m_broadphaseLru = m_lru;
 		}
 
-		contact->m_killContact = contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium & !(contact->m_maxDOF && contact->m_isActive));
+		//contact->m_killContact = contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium & !(contact->m_maxDOF && contact->m_isActive));
+		contact->m_killContact = contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_isActive);
 	}
 }
 
