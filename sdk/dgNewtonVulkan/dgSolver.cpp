@@ -183,7 +183,7 @@ void dgSolver::InitBodyArray(dgInt32 threadID)
 	for (dgInt32 i = threadID; i < bodyCount; i += step) {
 		const dgBodyInfo* const bodyInfo = &bodyArray[i];
 		dgBody* const body = (dgDynamicBody*)bodyInfo->m_body;
-//		body->AddDampingAcceleration(m_timestep);
+		body->AddDampingAcceleration(m_timestep);
 		body->CalcInvInertiaMatrix();
 		body->m_accel = body->m_veloc;
 		body->m_alpha = body->m_omega;

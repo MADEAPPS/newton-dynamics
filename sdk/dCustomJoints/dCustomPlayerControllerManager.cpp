@@ -495,6 +495,9 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 	m_impulse = dVector(0.0f);
 	m_manager->ApplyMove(this, timestep);
 
+//static int xxxxx;
+//xxxxx ++;
+//if (xxxxx > 500)
 //SetForwardSpeed(1.0f);
 //SetLateralSpeed(0.0f);
 //SetHeadingAngle(45.0f*dDegreeToRad);
@@ -517,7 +520,7 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 			ResolveCollision();
 		}
 
-		dFloat predicetdTime = PredictTimestep(timestep);
+		dFloat predicetdTime = PredictTimestep(timeLeft);
 		NewtonBodyIntegrateVelocity(m_kinematicBody, predicetdTime);
 		timeLeft -= predicetdTime;
 	}
