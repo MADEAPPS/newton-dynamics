@@ -77,11 +77,19 @@ class dCustomPlayerController
 	CUSTOM_JOINTS_API void SetVelocity(const dVector& veloc);
 
 	private:
+	enum dCollisionState
+	{
+		m_colliding,
+		m_freeMovement,
+		m_deepPenetration,
+	};
+
 	void ResolveCollision();
 	void PreUpdate(dFloat timestep);
 	void ResolveStep(dFloat timestep);
 	dFloat PredictTimestep(dFloat timestep);
 	int ResolveInterpenetrations(int contactCount, NewtonWorldConvexCastReturnInfo* const contacts);
+	dCollisionState TestPredictCollision(int count, const NewtonWorldConvexCastReturnInfo* const contacts, const dVector& veloc) const;
 	dVector CalculateImpulse(int rows, const dFloat* const rhs, const dFloat* const low, const dFloat* const high, const int* const normalIndex, const dComplementaritySolver::dJacobian* const jt) const;
 	
 	static unsigned dCustomPlayerController::PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData);

@@ -207,21 +207,87 @@ void dCustomPlayerController::ResolveStep(dFloat timestep)
 	}
 }
 
+dCustomPlayerController::dCollisionState dCustomPlayerController::TestPredictCollision(int count,  const NewtonWorldConvexCastReturnInfo* const contactArray, const dVector& veloc) const
+{
+	for (int i = 0; i < count; i++) {
+		const NewtonWorldConvexCastReturnInfo& contact = contactArray[i];
+		if (contact.m_penetration >= D_MAX_COLLISION_PENETRATION) {
+			return m_deepPenetration;
+		}
+	}
+
+	for (int i = 0; i < count; i ++) {
+		const NewtonWorldConvexCastReturnInfo& contact = contactArray[i];
+		dFloat projecSpeed = veloc.DotProduct3(contact.m_normal);
+		if (projecSpeed < dFloat (0.0f)) {
+			return m_colliding;
+		}
+	}
+	return m_freeMovement;
+}
+
 dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)
 {
 	dMatrix matrix;
 	dMatrix predicMatrix;
-	NewtonWorld* const world = m_manager->GetWorld();
-	
+	dVector veloc(0.0f);
 	NewtonWorldConvexCastReturnInfo info[16];
-	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
+	NewtonWorld* const world = m_manager->GetWorld();
 	NewtonCollision* const shape = NewtonBodyGetCollision(m_kinematicBody);
+
+//static int xxxxxxx;
+//xxxxxxx++;
+//if (xxxxxxx > 1850)
+//xxxxxxx *= 1;
 	
+	NewtonBodyGetVelocity(m_kinematicBody, &veloc[0]);
+	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
 	NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
 	NewtonBodyGetMatrix(m_kinematicBody, &predicMatrix[0][0]);
 	int contactCount = NewtonWorldCollide(world, &predicMatrix[0][0], shape, this, PrefilterCallback, info, 4, 0);
 	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
+	
+#if 0
+	dCollisionState playerCollide = TestPredictCollision(contactCount, info, veloc);
+	if (playerCollide == m_deepPenetration) 
+	{
+		dFloat savedTimeStep = timestep;
+		timestep *= 0.5f;
+		dFloat dt = timestep;
+		for (int i = 0; i < D_MAX_COLLIONSION_STEPS; i++) {
+			NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
+			NewtonBodyGetMatrix(m_kinematicBody, &predicMatrix[0][0]);
+			contactCount = NewtonWorldCollide(world, &predicMatrix[0][0], shape, this, PrefilterCallback, info, 4, 0);
+			NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
 
+			dt *= 0.5f;
+			playerCollide = TestPredictCollision(contactCount, info, veloc);
+			if (playerCollide == m_colliding) {
+				return timestep;
+			} 
+			if (playerCollide == m_deepPenetration) {
+				timestep -= dt;
+			} else {
+				timestep += dt;
+			}
+		}
+
+		dt = savedTimeStep / D_MAX_COLLIONSION_STEPS;
+		timestep = dt;
+		for (int i = 1; i < D_MAX_COLLIONSION_STEPS; i++) {
+			NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
+			NewtonBodyGetMatrix(m_kinematicBody, &predicMatrix[0][0]);
+			contactCount = NewtonWorldCollide(world, &predicMatrix[0][0], shape, this, PrefilterCallback, info, 4, 0);
+			NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
+			playerCollide = TestPredictCollision(contactCount, info, veloc);
+			if (playerCollide != m_freeMovement) {
+				return timestep;
+			}
+			timestep += dt;
+		}
+		dAssert(0);
+	}
+#else
 	if (contactCount) {
 		dFloat t0 = 0.0f;
 		dFloat t1 = timestep;
@@ -248,6 +314,7 @@ dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)
 			}
 		}
 	}
+#endif 
 
 	return timestep;
 }
@@ -497,8 +564,11 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 
 //static int xxxxx;
 //xxxxx ++;
-//if (xxxxx > 500)
+//if (xxxxx > 510)
 //SetForwardSpeed(1.0f);
+//
+//if (xxxxx > 520)
+//xxxxx *= 1;
 //SetLateralSpeed(0.0f);
 //SetHeadingAngle(45.0f*dDegreeToRad);
 
