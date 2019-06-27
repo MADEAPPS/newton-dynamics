@@ -234,11 +234,6 @@ dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)
 	NewtonWorldConvexCastReturnInfo info[16];
 	NewtonWorld* const world = m_manager->GetWorld();
 	NewtonCollision* const shape = NewtonBodyGetCollision(m_kinematicBody);
-
-//static int xxxxxxx;
-//xxxxxxx++;
-//if (xxxxxxx > 1850)
-//xxxxxxx *= 1;
 	
 	NewtonBodyGetVelocity(m_kinematicBody, &veloc[0]);
 	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
@@ -247,7 +242,7 @@ dFloat dCustomPlayerController::PredictTimestep(dFloat timestep)
 	int contactCount = NewtonWorldCollide(world, &predicMatrix[0][0], shape, this, PrefilterCallback, info, 4, 0);
 	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
 	
-#if 0
+#if 1
 	dCollisionState playerCollide = TestPredictCollision(contactCount, info, veloc);
 	if (playerCollide == m_deepPenetration) 
 	{
@@ -562,13 +557,31 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 	m_impulse = dVector(0.0f);
 	m_manager->ApplyMove(this, timestep);
 
-//static int xxxxx;
-//xxxxx ++;
-//if (xxxxx > 510)
+#if 0
+static int xxxx;
+xxxx++;
+if (xxxx > 1500)
+xxxx *= 1;
+
+	#if 0
+		static FILE* file = fopen("log.bin", "wb");
+		if (file) {
+			fwrite(&m_headingAngle, sizeof(m_headingAngle), 1, file);
+			fwrite(&m_forwardSpeed, sizeof(m_forwardSpeed), 1, file);
+			fwrite(&m_lateralSpeed, sizeof(m_lateralSpeed), 1, file);
+			fflush(file);
+		}
+	#else 
+		static FILE* file = fopen("log.bin", "rb");
+		if (file) {
+			fread(&m_headingAngle, sizeof(m_headingAngle), 1, file);
+			fread(&m_forwardSpeed, sizeof(m_forwardSpeed), 1, file);
+			fread(&m_lateralSpeed, sizeof(m_lateralSpeed), 1, file);
+		}
+	#endif
+#endif
+
 //SetForwardSpeed(1.0f);
-//
-//if (xxxxx > 520)
-//xxxxx *= 1;
 //SetLateralSpeed(0.0f);
 //SetHeadingAngle(45.0f*dDegreeToRad);
 
@@ -588,6 +601,7 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 	for (int i = 0; (i < D_DESCRETE_MOTION_STEPS) && (timeLeft > timeEpsilon); i++) {
 		if (timeLeft > timeEpsilon) {
 			ResolveCollision();
+			NewtonBodyGetVelocity(m_kinematicBody, &veloc[0]);
 		}
 
 		dFloat predicetdTime = PredictTimestep(timeLeft);
