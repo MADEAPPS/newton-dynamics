@@ -342,12 +342,12 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 //	CreateSimpledBox_dNetwonMesh (scene, dVector (4.0f, 2.0f, 2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 	
-//	dMatrix triggerLocation(dGetIdentityMatrix());
-//	triggerLocation. m_posit = dVector(15.0f, 0.0f, 0.0f, 1.0f);
-//	TestTriggerManager* const triggerManager = new TestTriggerManager(scene->GetNewton());
-//	NewtonCollision* const poolBox = NewtonCreateBox(scene->GetNewton(), 20.0f, 10.0f, 20.0f, 0, NULL);
-//	triggerManager->CreateTestTrigger(triggerLocation, poolBox);
-//	NewtonDestroyCollision(poolBox);
+	dMatrix triggerLocation(dGetIdentityMatrix());
+	triggerLocation. m_posit = dVector(15.0f, 0.0f, 0.0f, 1.0f);
+	TestTriggerManager* const triggerManager = new TestTriggerManager(scene->GetNewton());
+	NewtonCollision* const poolBox = NewtonCreateBox(scene->GetNewton(), 20.0f, 10.0f, 20.0f, 0, NULL);
+	triggerManager->CreateTestTrigger(triggerLocation, poolBox);
+	NewtonDestroyCollision(poolBox);
 
 	//DebugJernejLMesh (scene);
 

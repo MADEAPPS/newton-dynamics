@@ -555,7 +555,8 @@ class dgBroadPhase
 	void SubmitPairs (dgBroadPhaseNode* const body, dgBroadPhaseNode* const node, dgFloat32 timestep, dgInt32 threaCount, dgInt32 threadID);
 
 	bool SanityCheck() const;
-	void UpdateContactList(dgInt32 startCount);
+	void DeleteDeadContact();
+	void AttachNewContact(dgInt32 startCount);
 
 	DG_INLINE bool ValidateContactCache(dgContact* const contact, const dgVector& timestep) const;
 		

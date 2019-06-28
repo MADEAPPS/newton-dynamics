@@ -1601,49 +1601,6 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 	}
 }
 
-void dgBroadPhase::UpdateContactList(dgInt32 startCount)
-{
-	DG_TRACKTIME();
-
-	dgContactList& contactList = *m_world;
-	if (contactList.m_contactCountReset > contactList.m_contactCount) {
-		contactList.Resize (contactList.GetElementsCapacity() * 2);
-	}
-	dgContact** const contactArray = &contactList[0]; 
-	
-	for (dgInt32 i = contactList.m_contactCount - 1; i >= startCount; i--) {
-		dgContact* const contact = contactArray[i];
-		if (m_contactCache.AddContactJoint(contact)) {
-			m_world->AttachContact(contact);
-		} else {
-			contactList.m_contactCount--;
-			contactArray[i] = contactList[contactList.m_contactCount];
-			delete contact;
-		}
-	}
-	dgAssert(SanityCheck());
-
-	dgInt32 activeCount = 0;
-	dgArray<dgJointInfo>& constraintArray = m_world->m_jointsMemory;
-	for (dgInt32 i = contactList.m_contactCount - 1; i >= 0; i--) {
-		dgContact* const contact = contactArray[i];
-		if (contact->m_killContact) {
-			m_contactCache.RemoveContactJoint(contact);
-			m_world->RemoveContact(contact);
-			contactList.m_contactCount--;
-			contactArray[i] = contactList[contactList.m_contactCount];
-			delete contact;
-		} else if (contact->m_isActive && contact->m_maxDOF) {
-			constraintArray[activeCount].m_joint = contact;
-			activeCount ++;
-		}
-	}
-	dgAssert(SanityCheck());
-	contactList.m_activeContactCount = activeCount;
-//dgTrace (("%d %d\n", contactList.m_activeContactCount, contactList.m_contactCount));
-}
-
-
 bool dgBroadPhase::SanityCheck() const
 {
 #ifdef _DEBUG
@@ -1685,6 +1642,53 @@ bool dgBroadPhase::SanityCheck() const
 	}
 #endif
 	return true;
+}
+
+void dgBroadPhase::AttachNewContact(dgInt32 startCount)
+{
+	DG_TRACKTIME();
+	dgContactList& contactList = *m_world;
+	if (contactList.m_contactCountReset > contactList.m_contactCount) {
+		contactList.Resize(contactList.GetElementsCapacity() * 2);
+	}
+
+	dgContact** const contactArray = &contactList[0];
+	for (dgInt32 i = contactList.m_contactCount - 1; i >= startCount; i--) {
+		dgContact* const contact = contactArray[i];
+		if (m_contactCache.AddContactJoint(contact)) {
+			m_world->AttachContact(contact);
+		} else {
+			contactList.m_contactCount--;
+			contactArray[i] = contactList[contactList.m_contactCount];
+			delete contact;
+		}
+	}
+	dgAssert(SanityCheck());
+}
+
+void dgBroadPhase::DeleteDeadContact()
+{
+	DG_TRACKTIME();
+	dgInt32 activeCount = 0;
+	dgContactList& contactList = *m_world;
+	dgContact** const contactArray = &contactList[0];
+	dgArray<dgJointInfo>& constraintArray = m_world->m_jointsMemory;
+	for (dgInt32 i = contactList.m_contactCount - 1; i >= 0; i--) {
+		dgContact* const contact = contactArray[i];
+		if (contact->m_killContact) {
+			m_contactCache.RemoveContactJoint(contact);
+			m_world->RemoveContact(contact);
+			contactList.m_contactCount--;
+			contactArray[i] = contactList[contactList.m_contactCount];
+			delete contact;
+		} else if (contact->m_isActive && contact->m_maxDOF) {
+			constraintArray[activeCount].m_joint = contact;
+			activeCount++;
+		}
+	}
+	dgAssert(SanityCheck());
+	contactList.m_activeContactCount = activeCount;
+	//dgTrace (("%d %d\n", contactList.m_activeContactCount, contactList.m_contactCount));
 }
 
 void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
@@ -1747,6 +1751,7 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 	}
 	m_world->SynchronizationBarrier();
 
+	AttachNewContact(syncPoints.m_contactStart);
 	for (dgInt32 i = 0; i < threadsCount; i++) {
 		m_world->QueueJob(UpdateRigidBodyContactKernel, &syncPoints, NULL, "dgBroadPhase::UpdateRigidBodyContact");
 	}
@@ -1777,5 +1782,5 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		//m_generatedBodies.RemoveAll();
 	}
 
-	UpdateContactList(syncPoints.m_contactStart);
+	DeleteDeadContact();
 }
