@@ -49,6 +49,8 @@ void ExportScene (NewtonWorld* const world, const char* const fileName);
 class DemoMesh;
 class DemoEntity;
 class DemoEntityManager;
+class DemoInstanceEntity;
+
 /*
 void InitEyePoint (const dVector& dir, const dVector& origin);
 void SetShowIslands (SceneManager& me, int mode);
@@ -90,6 +92,8 @@ NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent
 NewtonBody* CreateSimpleBody(NewtonWorld* const world, void* const userData, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia = false);
 NewtonBody* CreateSimpleSolid (DemoEntityManager* const scene, DemoMesh* const mesh, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia = false);
 void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix, dFloat findFloorElevation = 1000.0f, dFloat offsetHigh = 5.0f);
+
+NewtonBody* CreateInstancedSolid(DemoEntityManager* const scene, DemoInstanceEntity* const parent, DemoMesh* const mesh, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia = false);
 
 NewtonBody* AddFloorBox(DemoEntityManager* const scene, const dVector& origin, const dVector& size);
 NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const levelName, bool optimized);

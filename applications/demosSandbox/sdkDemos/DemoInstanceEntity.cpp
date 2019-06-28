@@ -10,6 +10,7 @@
 */
 
 #include "toolbox_stdafx.h"
+#include "DemoMesh.h"
 #include "DemoInstanceEntity.h"
 
 
@@ -22,15 +23,29 @@ DemoInstanceEntity::DemoInstanceEntity(const DemoInstanceEntity& copyFrom)
 DemoInstanceEntity::DemoInstanceEntity(const dMatrix& matrix, DemoEntity* const parent)
 	:DemoEntity(matrix, parent)
 {
-	dAssert(0);
 }
 
 DemoInstanceEntity::~DemoInstanceEntity(void)
 {
-	dAssert(0);
 }
 
 void DemoInstanceEntity::Render(dFloat timeStep, DemoEntityManager* const scene) const
 {
-	dAssert(0);
+//	DemoEntity::Render(timeStep, scene);
+
+	glPushMatrix();
+
+	// Set The matrix for this entity Node
+	glMultMatrix(&m_matrix[0][0]);
+
+	for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
+		glPushMatrix();
+		DemoMesh* const mesh = (DemoMesh*) child->GetMesh();
+		dMatrix matrix(child->GetMeshMatrix() * child->GetRenderMatrix());
+		glMultMatrix(&matrix[0][0]);
+		mesh->Render(scene);
+		glPopMatrix();
+	}
+
+	glPopMatrix();
 }

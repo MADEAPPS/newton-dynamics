@@ -14,6 +14,7 @@
 #include "DemoEntity.h"
 #include "PhysicsUtils.h"
 #include "DemoEntityManager.h"
+#include "DemoInstanceEntity.h"
 #include "OpenGlUtil.h"
 #include "DebugDisplay.h"
 #include "dHighResolutionTimer.h"
@@ -1008,6 +1009,18 @@ NewtonBody* CreateSimpleSolid (DemoEntityManager* const scene, DemoMesh* const m
 		entity->SetMesh(mesh, dGetIdentityMatrix());
 	}
 	return CreateSimpleBody (scene->GetNewton(), entity, mass, matrix, collision, materialId, generalInertia);
+}
+
+NewtonBody* CreateInstancedSolid(DemoEntityManager* const scene, DemoInstanceEntity* const parent, DemoMesh* const mesh, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
+{
+	dAssert(collision);
+
+	// add an new entity to the world
+	DemoEntity* const entity = new DemoEntity(matrix, parent);
+	if (mesh) {
+		entity->SetMesh(mesh, dGetIdentityMatrix());
+	}
+	return CreateSimpleBody(scene->GetNewton(), entity, mass, matrix, collision, materialId, generalInertia);
 }
 
 void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix, dFloat startElevation, dFloat offsetHigh)

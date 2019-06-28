@@ -13,6 +13,7 @@
 #include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "DemoEntityManager.h"
+#include "DemoInstanceEntity.h"
 #include "DemoCamera.h"
 #include "DemoMesh.h"
 #include "PhysicsUtils.h"
@@ -166,10 +167,15 @@ static void BuildPyramid (DemoEntityManager* const scene, dFloat mass, const dVe
 	dFloat z0 = matrix.m_posit.m_z - stepz * count / 2;
 
 	matrix.m_posit.m_y = y0;
+
+	DemoInstanceEntity* const parentInstance = new DemoInstanceEntity(dGetIdentityMatrix(), NULL);
+	scene->Append(parentInstance);
+
 	for (int j = 0; j < count; j ++) {
 		matrix.m_posit.m_z = z0;
 		for (int i = 0; i < (count - j) ; i ++) {
-			CreateSimpleSolid (scene, geometry, mass, matrix, collision, defaultMaterialID);
+			//CreateSimpleSolid (scene, geometry, mass, matrix, collision, defaultMaterialID);
+			CreateInstancedSolid(scene, parentInstance, geometry, mass, matrix, collision, defaultMaterialID);
 			matrix.m_posit.m_z += stepz;
 		}
 		z0 += stepz * 0.5f;
