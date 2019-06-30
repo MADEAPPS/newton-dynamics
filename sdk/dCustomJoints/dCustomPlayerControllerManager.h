@@ -29,13 +29,15 @@ class dCustomPlayerControllerManager;
 
 class dCustomPlayerController
 {
+	class dContactSolver;
+	class dImpulseSolver;
+
 	public:
 	dCustomPlayerController ()
 		:m_localFrame(dGetIdentityMatrix())
 		,m_impulse(0.0f)
 		,m_mass(0.0f)
 		,m_invMass(0.0f)
-		,m_friction(1.0f)
 		,m_headingAngle(0.0f)
 		,m_forwardSpeed(0.0f)
 		,m_lateralSpeed(0.0f)
@@ -44,6 +46,7 @@ class dCustomPlayerController
 		,m_userData(NULL)
 		,m_kinematicBody(NULL)
 		,m_manager(NULL)
+		,m_isAirbone(false)
 	{
 	}
 
@@ -56,6 +59,7 @@ class dCustomPlayerController
 	void SetUserData(void* const userData) {m_userData = userData;}
 	dCustomPlayerControllerManager* GetManager() const {return m_manager;}
 
+	bool IsAirBorn () const {return m_isAirbone;}
 	const dFloat GetMass() const { return m_mass;}
 
 	const dVector& GetImpulse() { return m_impulse; }
@@ -84,21 +88,17 @@ class dCustomPlayerController
 		m_deepPenetration,
 	};
 
-	void ResolveCollision();
 	void PreUpdate(dFloat timestep);
-	void ResolveStep(dFloat timestep);
-	dFloat PredictTimestep(dFloat timestep);
-	int ResolveInterpenetrations(int contactCount, NewtonWorldConvexCastReturnInfo* const contacts);
-	dCollisionState TestPredictCollision(int count, const NewtonWorldConvexCastReturnInfo* const contacts, const dVector& veloc) const;
-	dVector CalculateImpulse(int rows, const dFloat* const rhs, const dFloat* const low, const dFloat* const high, const int* const normalIndex, const dComplementaritySolver::dJacobian* const jt) const;
-	
-	static unsigned dCustomPlayerController::PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData);
+	void ResolveCollision(dContactSolver& contactSolver);
+	void ResolveStep(dFloat timestep, dContactSolver& contactSolver);
+	dFloat PredictTimestep(dFloat timestep, dContactSolver& contactSolver);
+	void ResolveInterpenetrations(dContactSolver& contactSolver, dImpulseSolver& impulseSolver);
+	dCollisionState TestPredictCollision(const dContactSolver& contactSolver, const dVector& veloc) const;
 
 	dMatrix m_localFrame;
 	dVector m_impulse;
 	dFloat m_mass;
 	dFloat m_invMass;
-	dFloat m_friction;
 	dFloat m_headingAngle;
 	dFloat m_forwardSpeed;
 	dFloat m_lateralSpeed;
@@ -107,6 +107,7 @@ class dCustomPlayerController
 	void* m_userData;
 	NewtonBody* m_kinematicBody;
 	dCustomPlayerControllerManager* m_manager;
+	bool m_isAirbone;
 
 	friend class dCustomPlayerControllerManager;
 };
@@ -120,7 +121,7 @@ class dCustomPlayerControllerManager: public dCustomParallelListener
 
 	virtual void ApplyMove(dCustomPlayerController* const controller, dFloat timestep) = 0;
 	virtual bool ProccessContact(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const { return true; }
-	virtual dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const { return controller->m_friction; }
+	virtual dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const {return 2.0f;}
 
 	protected:
 	void PostUpdate(dFloat timestep) {}

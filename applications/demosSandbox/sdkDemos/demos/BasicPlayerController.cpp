@@ -56,8 +56,9 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		scene->Print(color, "walk backward:           S");
 		scene->Print(color, "strafe right:            D");
 		scene->Print(color, "strafe left:             A");
+		scene->Print(color, "jump:                    Space");
 		//scene->Print(color, "toggle camera mode:      C");
-		//scene->Print(color, "jump:                    Space");
+		
 		//scene->Print(color, "hide help:               H");
 		//scene->Print(color, "change player direction: Left mouse button");
 	}
@@ -146,6 +147,13 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 			dFloat forwarSpeed = (int(scene->GetKeyState('W')) - int(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
 			dFloat strafeSpeed = (int(scene->GetKeyState('D')) - int(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
 
+			if (scene->GetKeyState(' ') && !controller->IsAirBorn ()) {
+				dFloat jumpSpeed = 2.0f;
+				dVector jumpImpule(controller->GetFrame().RotateVector(dVector(jumpSpeed * controller->GetMass(), 0.0f, 0.0f, 0.0f)));
+				dVector totalImpulse(controller->GetImpulse() + jumpImpule);
+				controller->SetImpulse(totalImpulse);
+			}
+
 			if (forwarSpeed && strafeSpeed) {
 				dFloat invMag = PLAYER_WALK_SPEED / dSqrt(forwarSpeed * forwarSpeed + strafeSpeed * strafeSpeed);
 				forwarSpeed *= invMag;
@@ -219,6 +227,39 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 };
 
 
+static NewtonBody* CreateCylinder(DemoEntityManager* const scene, const dVector& location, dFloat mass, dFloat radius, dFloat height)
+{
+	NewtonWorld* const world = scene->GetNewton();
+	int materialID = NewtonMaterialGetDefaultGroupID(world);
+	dVector size(radius, height, radius, 0.0f);
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _CYLINDER_PRIMITIVE, 0);
+	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
+
+	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
+	matrix.m_posit = location;
+	matrix.m_posit.m_w = 1.0f;
+	NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, matrix, collision, materialID);
+
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+	return body;
+}
+
+static void AddMerryGoRound(DemoEntityManager* const scene, const dVector& location)
+{
+	NewtonBody* const pole = CreateCylinder(scene, location, 0.0f, 0.2f, 3.0f);
+
+	dVector platformPosit(location);
+	platformPosit.m_y += 0.2f;
+	NewtonBody* const platform = CreateCylinder(scene, platformPosit, 200.0f, 10.0f, 0.2f);
+
+	dMatrix pivot;
+	NewtonBodyGetMatrix(platform, &pivot[0][0]);
+	dCustomHinge* const hinge = new dCustomHinge(pivot, platform, pole);
+	hinge;
+}
+
+
 void BasicPlayerController (DemoEntityManager* const scene)
 {
 	// load the sky box
@@ -246,15 +287,19 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	dCustomPlayerController*  const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 	playerManager->SetAsPlayer(player);
 
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	location.m_posit.m_x += 5.0f;
+
+	// add some objects to interact with
+	dVector merryPosit (FindFloor (scene->GetNewton(), location.m_posit + dVector(-5.0f, 0.0f, 15.0f, 0.0f), 20.0f));
+	AddMerryGoRound(scene, merryPosit);
 
 	int count = 1;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 //	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
 
 	location.m_posit.m_x -= 10.0f;
-//	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 0.5f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 0.5f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
 
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;

@@ -852,7 +852,6 @@ static NewtonBody* CreateCylinder(DemoEntityManager* const scene, const dVector&
 	return body;
 }
 
-
 static void AddMerryGoRound(DemoEntityManager* const scene, const dVector& location)
 {
 	NewtonBody* const pole = CreateCylinder(scene, location, 0.0f, 0.2f, 3.0f);
