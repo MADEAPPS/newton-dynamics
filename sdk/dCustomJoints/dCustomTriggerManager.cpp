@@ -93,8 +93,6 @@ void dCustomTriggerManager::OnDebug(dCustomJoint::dDebugDisplay* const debugCont
 	}
 }
 
-
-static int xxxxx;
 void dCustomTriggerManager::PreUpdate(dFloat timestep, int threadID)
 {
 	D_TRACKTIME();
@@ -106,7 +104,7 @@ void dCustomTriggerManager::PreUpdate(dFloat timestep, int threadID)
 		dTriggerGuestPair& cacheEntry = m_pairCache[i];
 		if (cacheEntry.m_bodyNode->GetInfo() != m_lru) {
 			cacheEntry.m_bodyNode->GetInfo() = m_lru;
-			dTrace(("in trigger body:%d lru:%d frame:%d\n", NewtonBodyGetID(cacheEntry.m_bodyNode->GetKey()), cacheEntry.m_bodyNode->GetInfo(), xxxxx));
+//			dTrace(("in trigger body:%d lru:%d frame:%d\n", NewtonBodyGetID(cacheEntry.m_bodyNode->GetKey()), cacheEntry.m_bodyNode->GetInfo(), xxxxx));
 			WhileIn (cacheEntry.m_trigger, cacheEntry.m_bodyNode->GetKey());
 		}
 	}
@@ -118,7 +116,6 @@ void dCustomTriggerManager::PreUpdate(dFloat timestep)
 	m_cacheCount = 0;
 	m_timestep = timestep;
 
-xxxxx++;
 	for (dList<dCustomTriggerController>::dListNode* triggerNode = GetControllersList().GetFirst(); triggerNode; triggerNode = triggerNode->GetNext()) {
 		dCustomTriggerController& controller = triggerNode->GetInfo();
 
@@ -134,7 +131,7 @@ xxxxx++;
 			if (!uniqueEntryNode) {
 				dCustomScopeLock lock(&m_lock);
 				uniqueEntryNode = manifest.Insert(m_lru, cargoBody);
-				dTrace(("entering trigger body:%d lru:%d frame:%d\n", NewtonBodyGetID(cargoBody), m_lru, xxxxx));
+//				dTrace(("entering trigger body:%d lru:%d frame:%d\n", NewtonBodyGetID(cargoBody), m_lru, xxxxx));
 				OnEnter(&controller, cargoBody);
 			}
 			dTriggerGuestPair& cacheEntry = m_pairCache[m_cacheCount];
@@ -156,7 +153,7 @@ xxxxx++;
 			if (node->GetInfo() != m_lru) {
 				NewtonBody* const cargoBody = node->GetKey();
 
-				dTrace(("exiting trigger body:%d lru:%d frame:%d\n\n", NewtonBodyGetID(cargoBody), node->GetInfo(), xxxxx));
+//				dTrace(("exiting trigger body:%d lru:%d frame:%d\n\n", NewtonBodyGetID(cargoBody), node->GetInfo(), xxxxx));
 				OnExit(controller, cargoBody);
 				dCustomScopeLock lock(&m_lock);
 				controller->m_manifest.Remove(cargoBody);

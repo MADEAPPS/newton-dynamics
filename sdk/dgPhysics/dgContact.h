@@ -54,11 +54,6 @@ class dgContactList: public dgArray<dgContact*>
 	{
 	}
 
-	//dgListNode* Addtop(dgContact* const contact)
-	//{
-	//	return dgList<dgContact*>::SafeAddtop(contact);
-	//}
-
 	void Push (dgContact* const contact)
 	{
 		dgInt32 index = dgAtomicExchangeAndAdd(&m_contactCount, 1);
