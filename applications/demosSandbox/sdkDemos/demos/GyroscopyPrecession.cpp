@@ -195,7 +195,6 @@ static NewtonBody* RattleBack(DemoEntityManager* const scene, const dVector& pos
 	return ball;
 }
 
-
 static NewtonBody* CreateFlyWheel (DemoEntityManager* const scene, const dVector& posit, dFloat speed, dFloat radius, dFloat lenght)
 {
 	NewtonWorld* const world = scene->GetNewton();
@@ -247,7 +246,6 @@ static NewtonBody* CreateFlyWheel (DemoEntityManager* const scene, const dVector
 	return wheelBody;
 }
 
-
 static void CreateBicycleWheel(DemoEntityManager* const scene, const dVector& posit, dFloat speed, dFloat radius, dFloat lenght, dFloat tiltAnsgle)
 {
 	speed *= -1.0f;
@@ -298,7 +296,6 @@ static void PrecessingTop(DemoEntityManager* const scene, const dVector& posit)
 	NewtonDestroyCollision(cone);
 }
 
-
 static void TippeTop(DemoEntityManager* const scene, const dVector& posit, dVector omega, dFloat radius, dFloat lenght)
 {
 	NewtonBody* const top = CreateFlyWheel(scene, posit, 100.0f, 0.5f, 0.3f);
@@ -316,6 +313,26 @@ static void TippeTop(DemoEntityManager* const scene, const dVector& posit, dVect
 
 	NewtonBodySetMatrix(top, &matrix[0][0]);
 	NewtonBodySetOmega(top, &omega[0]);
+}
+
+static void TestGyroContacts(DemoEntityManager* const scene, const dVector& posit)
+{
+	NewtonWorld* const world = scene->GetNewton();
+
+	NewtonCollision* const shape = NewtonCreateBox(world, .125f, 0.125f, 0.5f, 0, NULL);
+
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = posit;
+	matrix.m_posit.m_w = 1.0f;
+	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), shape, "wood_1.tga", "wood_1.tga", "wood_1.tga");
+
+	NewtonBody* const bar0 = CreateSimpleSolid(scene, geometry, 10.0f, matrix, shape, 0);
+
+	NewtonBodySetGyroscopicTorque(bar0, 1);
+	NewtonBodySetMassProperties(bar0, 10.0f, shape);
+
+	geometry->Release();
+	NewtonDestroyCollision(shape);
 }
 
 
@@ -362,13 +379,15 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 //	RattleBack(scene, dVector(-2.0f, 0.5f, - 6.0, 1.0f), 2.0f, 1.0f);
 //	RattleBack(scene, dVector(-2.0f, 0.5f, - 9.0, 1.0f), -2.0f, 1.0f);
 
+	TestGyroContacts(scene, dVector(-4.0f, 0.5f, -5.0, 1.0f));
+
 	// place a toy tops
 	int topsCount = 4;
 topsCount = 1;
 	const dFloat spacing = 3.0f;
 	for (int i = 0; i < topsCount; i++) {
 		for (int j = 0; j < topsCount; j++) {
-			PrecessingTop(scene, dVector(spacing * j, 0.5f, -spacing * i - spacing, 1.0f));
+//			PrecessingTop(scene, dVector(spacing * j, 0.5f, -spacing * i - spacing, 1.0f));
 		}
 		//PhiTop(scene, dVector(30.0f, 0.4f, -spacing * i - spacing, 1.0f), i * 5.0f + 10.0f, 1.0f);
 		//TippeTop(scene, dVector(-6.0f, 0.3f, -spacing * i - spacing, 1.0f), 0.0f, 0.0f, 0.0f);
