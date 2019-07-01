@@ -315,7 +315,7 @@ static void TippeTop(DemoEntityManager* const scene, const dVector& posit, dVect
 	NewtonBodySetOmega(top, &omega[0]);
 }
 
-static void TestGyroContacts(DemoEntityManager* const scene, const dVector& posit)
+static void TestGyroContacts(DemoEntityManager* const scene, const dVector& posit, int enableGyro)
 {
 	NewtonWorld* const world = scene->GetNewton();
 
@@ -326,8 +326,6 @@ static void TestGyroContacts(DemoEntityManager* const scene, const dVector& posi
 	matrix.m_posit.m_w = 1.0f;
 	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), shape, "wood_1.tga", "wood_1.tga", "wood_1.tga");
 
-	int enableGyro = 0;
-	
 	NewtonBody* const bar0 = CreateSimpleSolid(scene, geometry, 10.0f, matrix, shape, 0);
 	NewtonBodySetGyroscopicTorque(bar0, enableGyro);
 	NewtonBodySetMassProperties(bar0, 10.0f, shape);
@@ -401,7 +399,8 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 //	RattleBack(scene, dVector(-2.0f, 0.5f, - 6.0, 1.0f), 2.0f, 1.0f);
 //	RattleBack(scene, dVector(-2.0f, 0.5f, - 9.0, 1.0f), -2.0f, 1.0f);
 
-	TestGyroContacts(scene, dVector(-4.0f, 1.5f, -5.0, 1.0f));
+	TestGyroContacts(scene, dVector(-4.0f, 1.5f, -5.0, 1.0f), 1);
+	TestGyroContacts(scene, dVector(-4.0f, 1.5f, -2.0, 1.0f), 0);
 
 	// place a toy tops
 	int topsCount = 4;
