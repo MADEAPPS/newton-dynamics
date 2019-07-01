@@ -959,69 +959,6 @@ dgInt32 dgContactSolver::ConvexPolygonToLineIntersection(const dgVector& normal,
 	return count2;
 }
 
-#ifdef DE_USE_OLD_CONTACT_FILTER
-DG_INLINE dgContactSolver::dgPerimenterEdge* dgContactSolver::OldReduceContacts(dgPerimenterEdge* poly, dgInt32 maxCount) const
-{
-	dgInt32 buffer[DG_MAX_EDGE_COUNT];
-	dgUpHeap<dgPerimenterEdge*, dgFloat32> heap(buffer, sizeof (buffer));
-
-	dgInt32 restart = 1;
-	while (restart) {
-		restart = 0;
-		dgPerimenterEdge* ptr0 = poly;
-		poly = poly->m_next;
-		if (poly->m_next != poly) {
-			heap.Flush();
-			dgPerimenterEdge* ptr = poly;
-			do {
-				dgVector error(*ptr->m_next->m_vertex - *ptr->m_vertex);
-				dgAssert(error.m_w == 0.0f);
-				dgFloat32 dist2 = error.DotProduct(error).GetScalar();
-				if (dist2 < DG_MINK_VERTEX_ERR2) {
-					ptr0->m_next = ptr->m_next;
-					if (ptr == poly) {
-						poly = ptr0;
-						restart = 1;
-						break;
-					}
-					ptr = ptr0;
-				} else {
-					heap.Push(ptr, dist2);
-					ptr0 = ptr;
-				}
-
-				ptr = ptr->m_next;
-			} while (ptr != poly);
-		}
-	}
-
-	if (heap.GetCount()) {
-		if (maxCount > 8) {
-			maxCount = 8;
-		}
-		while (heap.GetCount() > maxCount) {
-			dgPerimenterEdge* ptr = heap[0];
-			heap.Pop();
-			for (dgInt32 i = 0; i < heap.GetCount(); i++) {
-				if (heap[i] == ptr->m_next) {
-					heap.Remove(i);
-					break;
-				}
-			}
-
-			ptr->m_next = ptr->m_next->m_next;
-			dgVector error(*ptr->m_next->m_vertex - *ptr->m_vertex);
-			dgAssert(error.m_w == 0.0f);
-			dgFloat32 dist2 = error.DotProduct(error).GetScalar();
-			heap.Push(ptr, dist2);
-		}
-		poly = heap[0];
-	}
-
-	return poly;
-}
-#endif
-
 dgInt32 dgContactSolver::ConvexPolygonsIntersection(const dgVector& normal, dgInt32 count0, dgVector* const shape0, dgInt32 count1, dgVector* const shape1, dgVector* const contactOut, dgInt32 maxContacts) const
 {
 	dgInt32 count = 0;
@@ -1139,9 +1076,6 @@ dgInt32 dgContactSolver::ConvexPolygonsIntersection(const dgVector& normal, dgIn
 		}
 
 		dgAssert(poly);
-#ifdef DE_USE_OLD_CONTACT_FILTER
-		poly = OldReduceContacts(poly, maxContacts);
-#endif
 		count = 0;
 		dgPerimenterEdge* intersection = poly;
 		do {
