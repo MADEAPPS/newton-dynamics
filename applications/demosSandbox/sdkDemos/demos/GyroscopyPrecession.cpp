@@ -326,16 +326,17 @@ static void TestGyroContacts(DemoEntityManager* const scene, const dVector& posi
 	matrix.m_posit.m_w = 1.0f;
 	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), shape, "wood_1.tga", "wood_1.tga", "wood_1.tga");
 
+	int enableGyro = 0;
 	
 	NewtonBody* const bar0 = CreateSimpleSolid(scene, geometry, 10.0f, matrix, shape, 0);
-	NewtonBodySetGyroscopicTorque(bar0, 1);
+	NewtonBodySetGyroscopicTorque(bar0, enableGyro);
 	NewtonBodySetMassProperties(bar0, 10.0f, shape);
 
 	dMatrix matrix1 (dPitchMatrix (90.0f * dDegreeToRad) * matrix);
 	matrix1.m_posit.m_z += 0.25f + 0.125f * 0.5f;
 	matrix1.m_posit.m_y -= (0.25f - 0.125f * 0.5f);
 	NewtonBody* const bar1 = CreateSimpleSolid(scene, geometry, 10.0f, matrix1, shape, 0);
-	NewtonBodySetGyroscopicTorque(bar1, 1);
+	NewtonBodySetGyroscopicTorque(bar1, enableGyro);
 	NewtonBodySetMassProperties(bar1, 10.0f, shape);
 	dMatrix pivotMatrix1(matrix);
 	pivotMatrix1.m_posit.m_y += 0.25f;
@@ -345,7 +346,7 @@ static void TestGyroContacts(DemoEntityManager* const scene, const dVector& posi
 	matrix2.m_posit.m_z -= 0.25f + 0.125f * 0.5f;
 	matrix2.m_posit.m_y -= (0.25f - 0.125f * 0.5f);
 	NewtonBody* const bar2 = CreateSimpleSolid(scene, geometry, 10.0f, matrix2, shape, 0);
-	NewtonBodySetGyroscopicTorque(bar2, 1);
+	NewtonBodySetGyroscopicTorque(bar2, enableGyro);
 	NewtonBodySetMassProperties(bar2, 10.0f, shape);
 	dMatrix pivotMatrix2(matrix);
 	pivotMatrix2.m_posit.m_y -= 0.25f;
@@ -367,7 +368,7 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
-	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
+	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.6f);
 
 	// should spins very slowly, with a tilt angle of 30 degrees
 //	CreateBicycleWheel(scene, dVector(0.0f, 3.0f, -8.0f, 1.0f), 100.0f, 0.6f, 0.3f, 30.0f);
