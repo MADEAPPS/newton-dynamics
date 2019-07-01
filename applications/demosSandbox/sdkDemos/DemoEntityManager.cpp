@@ -36,13 +36,13 @@
 //#define DEFAULT_SCENE	0		// using NewtonMesh tool
 //#define DEFAULT_SCENE	1		// coefficients of friction
 //#define DEFAULT_SCENE	2		// coefficients of restitution
-//#define DEFAULT_SCENE	3		// gyroscope precession
+#define DEFAULT_SCENE	3		// gyroscope precession
 //#define DEFAULT_SCENE	4		// closest distance
 //#define DEFAULT_SCENE	5		// primitive collision
 //#define DEFAULT_SCENE	6		// kinematic bodies
 //#define DEFAULT_SCENE	7		// Object Placement
 //#define DEFAULT_SCENE	8		// primitive convex cast 
-#define DEFAULT_SCENE	9		// box stacks
+//#define DEFAULT_SCENE	9		// box stacks
 //#define DEFAULT_SCENE	10		// simple level mesh collision
 //#define DEFAULT_SCENE	11		// optimized level mesh collision
 //#define DEFAULT_SCENE	12		// height field Collision

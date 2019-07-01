@@ -8,7 +8,7 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#version 330
+#version 120
 
 varying vec3 normal;
 varying vec3 position;
