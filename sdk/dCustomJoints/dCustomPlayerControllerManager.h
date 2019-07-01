@@ -47,6 +47,7 @@ class dCustomPlayerController
 		,m_kinematicBody(NULL)
 		,m_manager(NULL)
 		,m_isAirbone(false)
+		,m_isOnFloor(false)
 	{
 	}
 
@@ -60,6 +61,7 @@ class dCustomPlayerController
 	dCustomPlayerControllerManager* GetManager() const {return m_manager;}
 
 	bool IsAirBorn () const {return m_isAirbone;}
+	bool IsOnFloor () const {return m_isOnFloor;}
 	const dFloat GetMass() const { return m_mass;}
 
 	const dVector& GetImpulse() { return m_impulse; }
@@ -108,6 +110,7 @@ class dCustomPlayerController
 	NewtonBody* m_kinematicBody;
 	dCustomPlayerControllerManager* m_manager;
 	bool m_isAirbone;
+	bool m_isOnFloor;
 
 	friend class dCustomPlayerControllerManager;
 };

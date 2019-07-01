@@ -147,7 +147,8 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 			dFloat forwarSpeed = (int(scene->GetKeyState('W')) - int(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
 			dFloat strafeSpeed = (int(scene->GetKeyState('D')) - int(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
 
-			if (scene->GetKeyState(' ') && !controller->IsAirBorn ()) {
+			//if (scene->GetKeyState(' ') && !controller->IsAirBorn ()) {
+			if (scene->GetKeyState(' ') && controller->IsOnFloor ()) {
 				dFloat jumpSpeed = 2.0f;
 				dVector jumpImpule(controller->GetFrame().RotateVector(dVector(jumpSpeed * controller->GetMass(), 0.0f, 0.0f, 0.0f)));
 				dVector totalImpulse(controller->GetImpulse() + jumpImpule);

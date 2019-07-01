@@ -485,8 +485,9 @@ void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver)
 	const dMatrix frameMatrix (m_localFrame * matrix);
 	com = matrix.TransformVector(com);
 
-	dVector surfaceVeloc(0.0f);
 	impulseSolver.Reset(this);
+	dVector surfaceVeloc(0.0f);
+	const dFloat contactPatchHigh = m_contactPatch * dFloat (0.995f);
 	for (int i = 0; i < contactSolver.m_contactCount; i ++) {
 		NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
 
@@ -499,7 +500,8 @@ void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver)
 
 		m_isAirbone = false;
 		dVector localPooint (frameMatrix.UntransformVector(point));
-		if (localPooint.m_x < m_contactPatch) {
+		if (localPooint.m_x < contactPatchHigh) {
+			m_isOnFloor = true;
 			dFloat friction = m_manager->ContactFriction(this, point, normal, int (contact.m_contactID), contact.m_hitBody);
 			if (friction > 0.0f) {
 				// add lateral traction friction
@@ -572,6 +574,7 @@ xxxx *= 1;
 	ResolveStep(timestep, contactSolver);
 
 	m_isAirbone = true;
+	m_isOnFloor = false;
 	// advance player until it hit a collision point, until there is not more time left
 	for (int i = 0; (i < D_DESCRETE_MOTION_STEPS) && (timeLeft > timeEpsilon); i++) {
 		if (timeLeft > timeEpsilon) {

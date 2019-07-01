@@ -37,13 +37,11 @@ void DemoInstanceEntity::Render(dFloat timeStep, DemoEntityManager* const scene)
 
 	// Set The matrix for this entity Node
 	glMultMatrix(&m_matrix[0][0]);
-
 	for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
 		glPushMatrix();
-		DemoMesh* const mesh = (DemoMesh*) child->GetMesh();
-		dMatrix matrix(child->GetMeshMatrix() * child->GetRenderMatrix());
+		dMatrix matrix(m_meshMatrix * child->GetRenderMatrix());
 		glMultMatrix(&matrix[0][0]);
-		mesh->Render(scene);
+		m_mesh->Render(scene);
 		glPopMatrix();
 	}
 
