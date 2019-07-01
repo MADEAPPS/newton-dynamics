@@ -326,10 +326,31 @@ static void TestGyroContacts(DemoEntityManager* const scene, const dVector& posi
 	matrix.m_posit.m_w = 1.0f;
 	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), shape, "wood_1.tga", "wood_1.tga", "wood_1.tga");
 
+	
 	NewtonBody* const bar0 = CreateSimpleSolid(scene, geometry, 10.0f, matrix, shape, 0);
-
 	NewtonBodySetGyroscopicTorque(bar0, 1);
 	NewtonBodySetMassProperties(bar0, 10.0f, shape);
+
+	dMatrix matrix1 (dPitchMatrix (90.0f * dDegreeToRad) * matrix);
+	matrix1.m_posit.m_z += 0.25f + 0.125f * 0.5f;
+	matrix1.m_posit.m_y -= (0.25f - 0.125f * 0.5f);
+	NewtonBody* const bar1 = CreateSimpleSolid(scene, geometry, 10.0f, matrix1, shape, 0);
+	NewtonBodySetGyroscopicTorque(bar1, 1);
+	NewtonBodySetMassProperties(bar1, 10.0f, shape);
+	dMatrix pivotMatrix1(matrix);
+	pivotMatrix1.m_posit.m_y += 0.25f;
+	new dCustomSixdof(pivotMatrix1, bar0, bar1);
+
+	dMatrix matrix2(dPitchMatrix(90.0f * dDegreeToRad) * matrix);
+	matrix2.m_posit.m_z -= 0.25f + 0.125f * 0.5f;
+	matrix2.m_posit.m_y -= (0.25f - 0.125f * 0.5f);
+	NewtonBody* const bar2 = CreateSimpleSolid(scene, geometry, 10.0f, matrix2, shape, 0);
+	NewtonBodySetGyroscopicTorque(bar2, 1);
+	NewtonBodySetMassProperties(bar2, 10.0f, shape);
+	dMatrix pivotMatrix2(matrix);
+	pivotMatrix2.m_posit.m_y -= 0.25f;
+	new dCustomSixdof(pivotMatrix2, bar0, bar2);
+
 
 	geometry->Release();
 	NewtonDestroyCollision(shape);
@@ -379,7 +400,7 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 //	RattleBack(scene, dVector(-2.0f, 0.5f, - 6.0, 1.0f), 2.0f, 1.0f);
 //	RattleBack(scene, dVector(-2.0f, 0.5f, - 9.0, 1.0f), -2.0f, 1.0f);
 
-	TestGyroContacts(scene, dVector(-4.0f, 0.5f, -5.0, 1.0f));
+	TestGyroContacts(scene, dVector(-4.0f, 1.5f, -5.0, 1.0f));
 
 	// place a toy tops
 	int topsCount = 4;
