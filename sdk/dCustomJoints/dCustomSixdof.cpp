@@ -311,7 +311,8 @@ void dCustomSixdof::SubmitConstraints (dFloat timestep, int threadIndex)
 			if ((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f)) {
 				const dVector& dir = matrix1[i];
 				dVector prejectPoint(p0 - dir.Scale(dir.DotProduct3(dp)));
-				NewtonUserJointAddLinearRow(m_joint, &p0[0], &prejectPoint[0], &dir[0]);
+				//NewtonUserJointAddLinearRow(m_joint, &p0[0], &prejectPoint[0], &dir[0]);
+				NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &dir[0]);
 				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			} else {
 				dFloat posit = dp.DotProduct3(matrix1[i]);
