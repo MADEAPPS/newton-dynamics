@@ -8,7 +8,7 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */
-#version 120
+#version 330
 
 uniform sampler2D texture;
 
