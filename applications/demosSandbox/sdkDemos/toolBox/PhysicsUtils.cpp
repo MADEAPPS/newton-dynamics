@@ -14,7 +14,6 @@
 #include "DemoEntity.h"
 #include "PhysicsUtils.h"
 #include "DemoEntityManager.h"
-//#include "DemoInstanceEntity.h"
 #include "OpenGlUtil.h"
 #include "DebugDisplay.h"
 #include "dHighResolutionTimer.h"

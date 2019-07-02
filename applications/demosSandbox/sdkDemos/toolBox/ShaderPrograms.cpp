@@ -17,6 +17,7 @@ ShaderPrograms::ShaderPrograms(void)
 	m_solidColor = 0;
 	m_decalEffect = 0;
 	m_diffuseEffect = 0;
+	m_diffuseIntanceEffect = 0;
 	m_skinningDiffuseEffect = 0;
 	m_diffuseNoTextureEffect = 0;
 }
@@ -38,6 +39,9 @@ ShaderPrograms::~ShaderPrograms(void)
 	if (m_skinningDiffuseEffect) {
 		glDeleteShader(m_skinningDiffuseEffect);
 	}
+	if (m_diffuseIntanceEffect) {
+		glDeleteShader(m_diffuseIntanceEffect);
+	}
 }
 
 bool ShaderPrograms::CreateAllEffects()
@@ -46,6 +50,8 @@ bool ShaderPrograms::CreateAllEffects()
 	m_diffuseEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuse");
 	m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse", "DirectionalDiffuse");
 	m_diffuseNoTextureEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuseNoTexture");
+
+	m_diffuseIntanceEffect = CreateShaderEffect ("DirectionalDiffuseInstance", "DirectionalDiffuseInstance");
 	return true;
 }
 
@@ -112,8 +118,12 @@ GLuint ShaderPrograms::CreateShaderEffect (const char* const vertexShaderName, c
 
 	glLinkProgram(program);
 	glGetProgramiv(program, GL_LINK_STATUS, &state);   
-	dAssert (state == GL_TRUE);
-
+	if (state != GL_TRUE ) {
+		GLsizei length;  
+		glGetProgramInfoLog(program, sizeof (buffer), &length, errorLog);
+		dTrace((errorLog));
+	}
+	
 	glValidateProgram(program);
 	glGetProgramiv(program,  GL_VALIDATE_STATUS, &state);   
 	dAssert (state == GL_TRUE);

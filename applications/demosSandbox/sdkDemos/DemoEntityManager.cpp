@@ -36,56 +36,58 @@
 //#define DEFAULT_SCENE	0		// using NewtonMesh tool
 //#define DEFAULT_SCENE	1		// coefficients of friction
 //#define DEFAULT_SCENE	2		// coefficients of restitution
-#define DEFAULT_SCENE	3		// gyroscope precession
-//#define DEFAULT_SCENE	4		// closest distance
-//#define DEFAULT_SCENE	5		// primitive collision
-//#define DEFAULT_SCENE	6		// kinematic bodies
-//#define DEFAULT_SCENE	7		// Object Placement
-//#define DEFAULT_SCENE	8		// primitive convex cast 
-//#define DEFAULT_SCENE	9		// box stacks
-//#define DEFAULT_SCENE	10		// simple level mesh collision
-//#define DEFAULT_SCENE	11		// optimized level mesh collision
-//#define DEFAULT_SCENE	12		// height field Collision
-//#define DEFAULT_SCENE	13		// infinite user plane collision
-//#define DEFAULT_SCENE	14		// user height field Collision
-//#define DEFAULT_SCENE	15		// compound Collision
-//#define DEFAULT_SCENE	16		// simple Archimedes buoyancy
-//#define DEFAULT_SCENE	17		// uniform Scaled Collision
-//#define DEFAULT_SCENE	18		// non uniform Scaled Collision
-//#define DEFAULT_SCENE	19		// scaled mesh collision
-//#define DEFAULT_SCENE	20		// continuous collision
-//#define DEFAULT_SCENE	21		// paper wall continuous collision
-//#define DEFAULT_SCENE	22		// puck slide continuous collision
-//#define DEFAULT_SCENE	23		// simple convex decomposition
-//#define DEFAULT_SCENE	24		// scene Collision
-//#define DEFAULT_SCENE	25		// simple boolean operators 
-//#define DEFAULT_SCENE	26		// simple convex fracturing 
-//#define DEFAULT_SCENE	27		// structured convex fracturing 
-//#define DEFAULT_SCENE	28		// multi ray casting using the threading Job scheduler
-//#define DEFAULT_SCENE	29		// standard joints
-//#define DEFAULT_SCENE	30		// servo joints
-//#define DEFAULT_SCENE	31		// articulated joints
-//#define DEFAULT_SCENE	32		// six axis manipulator
-//#define DEFAULT_SCENE	33		// hexapod Robot
-//#define DEFAULT_SCENE	34		// basic rag doll
-//#define DEFAULT_SCENE	35		// kinematic rag doll
-//#define DEFAULT_SCENE	36		// dynamic rag doll
-//#define DEFAULT_SCENE	37		// basic Car
-//#define DEFAULT_SCENE	38		// single body vehicle
-//#define DEFAULT_SCENE	39		// David Gravel multi body car
-//#define DEFAULT_SCENE	40		// super Car
-//#define DEFAULT_SCENE	41		// heavy vehicles
-//#define DEFAULT_SCENE	42		// basic player controller
-//#define DEFAULT_SCENE	43		// animated player controller
-//#define DEFAULT_SCENE	44		// advanced player controller
-//#define DEFAULT_SCENE	45		// cloth patch			
-//#define DEFAULT_SCENE	46		// soft bodies	
-//#define DEFAULT_SCENE	47		// joe's joint test
-//#define DEFAULT_SCENE	48		// Misho's Hinge Test
+#define DEFAULT_SCENE	3		// newton cradle
+//#define DEFAULT_SCENE	4		// gyroscope precession
+//#define DEFAULT_SCENE	5		// closest distance
+//#define DEFAULT_SCENE	6		// primitive collision
+//#define DEFAULT_SCENE	7		// kinematic bodies
+//#define DEFAULT_SCENE	8		// Object Placement
+//#define DEFAULT_SCENE	9		// primitive convex cast 
+//#define DEFAULT_SCENE	10		// box stacks
+//#define DEFAULT_SCENE	11		// simple level mesh collision
+//#define DEFAULT_SCENE	12		// optimized level mesh collision
+//#define DEFAULT_SCENE	13		// height field Collision
+//#define DEFAULT_SCENE	14		// infinite user plane collision
+//#define DEFAULT_SCENE	15		// user height field Collision
+//#define DEFAULT_SCENE	16		// compound Collision
+//#define DEFAULT_SCENE	17		// simple Archimedes buoyancy
+//#define DEFAULT_SCENE	18		// uniform Scaled Collision
+//#define DEFAULT_SCENE	19		// non uniform Scaled Collision
+//#define DEFAULT_SCENE	20		// scaled mesh collision
+//#define DEFAULT_SCENE	21		// continuous collision
+//#define DEFAULT_SCENE	22		// paper wall continuous collision
+//#define DEFAULT_SCENE	23		// puck slide continuous collision
+//#define DEFAULT_SCENE	24		// simple convex decomposition
+//#define DEFAULT_SCENE	25		// scene Collision
+//#define DEFAULT_SCENE	26		// simple boolean operators 
+//#define DEFAULT_SCENE	27		// simple convex fracturing 
+//#define DEFAULT_SCENE	28		// structured convex fracturing 
+//#define DEFAULT_SCENE	29		// multi ray casting using the threading Job scheduler
+//#define DEFAULT_SCENE	30		// standard joints
+//#define DEFAULT_SCENE	31		// servo joints
+//#define DEFAULT_SCENE	32		// articulated joints
+//#define DEFAULT_SCENE	33		// six axis manipulator
+//#define DEFAULT_SCENE	34		// hexapod Robot
+//#define DEFAULT_SCENE	35		// basic rag doll
+//#define DEFAULT_SCENE	36		// kinematic rag doll
+//#define DEFAULT_SCENE	37		// dynamic rag doll
+//#define DEFAULT_SCENE	38		// basic Car
+//#define DEFAULT_SCENE	39		// single body vehicle
+//#define DEFAULT_SCENE	40		// David Gravel multi body car
+//#define DEFAULT_SCENE	41		// super Car
+//#define DEFAULT_SCENE	42		// heavy vehicles
+//#define DEFAULT_SCENE	43		// basic player controller
+//#define DEFAULT_SCENE	44		// animated player controller
+//#define DEFAULT_SCENE	45		// advanced player controller
+//#define DEFAULT_SCENE	46		// cloth patch			
+//#define DEFAULT_SCENE	47		// soft bodies	
+//#define DEFAULT_SCENE	48		// joe's joint test
+//#define DEFAULT_SCENE	49		// Misho's Hinge Test
 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
 void Restitution (DemoEntityManager* const scene);
+void NewtonCradle (DemoEntityManager* const scene);
 void GyroscopyPrecession(DemoEntityManager* const scene);
 void ClosestDistance (DemoEntityManager* const scene);
 void ConvexCast (DemoEntityManager* const scene);
@@ -141,6 +143,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Using the newton mesh tool", "demonstrate how to use the newton mesh tool for mesh manipulation", UsingNewtonMeshTool},
 	{"Coefficients of friction", "demonstrate the effect of various coefficient of friction", Friction},
 	{"Coefficients of restitution", "demonstrate the effect of various coefficient of restitution", Restitution},
+	{"Newton Cradle", "demonstrate the effect of various versus multiple bodes", NewtonCradle},
 	{"Gyroscopic precession", "show natural precession", GyroscopyPrecession},
 	{"Closest distance", "demonstrate closest distance to a convex shape", ClosestDistance},
 	{"Primitive Collision", "demonstrate separate collision of primitives", PrimitiveCollision},

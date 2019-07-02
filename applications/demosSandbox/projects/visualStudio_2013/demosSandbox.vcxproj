@@ -66,6 +66,7 @@
     <ClCompile Include="..\..\sdkDemos\demos\Hexapod.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\JoesJointTest.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\KinematicBodies.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\NewtonCradle.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ObjectPlacement.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\MeshCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\MishosRocketTest.cpp" />

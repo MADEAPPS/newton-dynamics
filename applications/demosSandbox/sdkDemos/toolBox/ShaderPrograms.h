@@ -45,6 +45,7 @@ class ShaderPrograms
 	GLuint m_solidColor;
 	GLuint m_decalEffect;
 	GLuint m_diffuseEffect;
+	GLuint m_diffuseIntanceEffect;
 	GLuint m_skinningDiffuseEffect;
 	GLuint m_diffuseNoTextureEffect;
 };
