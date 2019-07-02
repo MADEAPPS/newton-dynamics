@@ -16,7 +16,13 @@
 #include "PhysicsUtils.h"
 #include "DemoMesh.h"
 #include "OpenGlUtil.h"
-//#include <dCustomHinge.h>
+
+
+static void CraddleGravityForce(const NewtonBody* body, dFloat timestep, int threadIndex)
+{
+//	PhysicsApplyGravityForce(body, timestep, threadIndex);
+}
+
 
 static void UserContactRestitution (const NewtonJoint* contactJoint, dFloat timestep, int threadIndex)
 {
@@ -107,17 +113,27 @@ void NewtonCradle (DemoEntityManager* const scene)
 	// create a simple scene
 	int count = 2;
 	for (int i = 0; i < count; i ++) {
-		NewtonBody* const ball = CradleBall(scene, sphereMesh, mass, matrix, sphereCollision, defaultMaterialID, 1.0f);
-		DemoEntity* const ballEntity = (DemoEntity*)NewtonBodyGetUserData(ball);
+		NewtonBody* const ballBody = CradleBall(scene, sphereMesh, mass, matrix, sphereCollision, defaultMaterialID, 1.0f);
+		NewtonBodySetForceAndTorqueCallback(ballBody, CraddleGravityForce);
+
+		DemoEntity* const ballEntity = (DemoEntity*)NewtonBodyGetUserData(ballBody);
 		DemoEntity* ballString = new DemoEntity (stringMatrix, ballEntity);
 		ballString->SetMesh(stringMesh, dGetIdentityMatrix());
 
 		dMatrix hingePivot (matrix);
 		hingePivot.m_posit.m_y += stringLength.m_y;
-		new dCustomHinge (hingePivot, ball, NULL);
+		//new dCustomHinge (hingePivot, ballBody, NULL);
 
 		matrix.m_posit.m_z -= 1.0f;
 	}
+
+	matrix.m_posit.m_z -= 5.0f;
+	dVector veloc(0, 0, 10.0f);
+	NewtonBody* const ballBody = CradleBall(scene, sphereMesh, mass, matrix, sphereCollision, defaultMaterialID, 1.0f);
+	NewtonBodySetForceAndTorqueCallback(ballBody, CraddleGravityForce);
+	NewtonBodySetVelocity(ballBody, &veloc[0]);
+
+
 
 	stringMesh->Release();
 	sphereMesh->Release();
