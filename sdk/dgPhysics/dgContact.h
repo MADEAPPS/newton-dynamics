@@ -218,6 +218,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 
 	virtual void ResetMaxDOF();
 	virtual void ResetInverseDynamics();
+	virtual dgFloat32 GetImpulseContactSpeed() const;
 	virtual void GetInfo (dgConstraintInfo* const info) const;
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params); 
 	virtual void JointAccelerations (dgJointAccelerationDecriptor* const params); 
@@ -235,10 +236,11 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	dgVector m_positAcc;
 	dgQuaternion m_rotationAcc;
 	dgVector m_separtingVector;
+	const dgContactMaterial* m_material;
 	dgFloat32 m_closestDistance;
 	dgFloat32 m_separationDistance;
 	dgFloat32 m_timeOfImpact;
-	const dgContactMaterial* m_material;
+	dgFloat32 m_impulseSpeed;
 	dgFloat32 m_contactPruningTolereance;
 	dgUnsigned32 m_broadphaseLru;
 	dgUnsigned32 m_killContact				: 1;
@@ -354,6 +356,11 @@ DG_INLINE void dgContact::ResetSkeletonSelftCollision()
 DG_INLINE bool dgContact::IsSkeletonSelftCollision() const
 {
 	return m_skeletonSelftCollision;
+}
+
+DG_INLINE dgFloat32 dgContact::GetImpulseContactSpeed() const
+{
+	return m_impulseSpeed;
 }
 
 

@@ -154,8 +154,6 @@ class dgConstraint
 	dgBody* GetBody0 ()	const;
 	dgBody* GetBody1 ()	const;
 
-//	void SetBodies (dgBody* const body0, dgBody* const body1);
-
 	dgBodyMasterListRow::dgListNode* GetLink0()	const;
 	dgBodyMasterListRow::dgListNode* GetLink1()	const;
 	void* GetUserData () const;
@@ -166,8 +164,9 @@ class dgConstraint
 	bool IsSkeleton () const;
 	bool IsSkeletonLoop () const;
 
-	virtual void ResetMaxDOF();
 	dgInt32 GetMaxDOF() const;
+	virtual void ResetMaxDOF();
+	virtual dgFloat32 GetImpulseContactSpeed() const;
 	
 	void SetUserData (void *userData);
 	void SetCollidable (bool state);
@@ -353,6 +352,11 @@ DG_INLINE void dgConstraint::SetSolverModel(dgInt32 model)
 
 DG_INLINE void dgConstraint::ResetMaxDOF()
 {
+}
+
+DG_INLINE dgFloat32 dgConstraint::GetImpulseContactSpeed() const
+{
+	return dgFloat32 (0.0f);
 }
 
 DG_INLINE dgInt32 dgConstraint::GetMaxDOF() const

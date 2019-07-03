@@ -858,6 +858,9 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 
 	dgInt32 rowCount = 0;
 	const dgInt32 jointCount = cluster->m_jointCount;
+
+	dgContact* firstImpulseContact = NULL;
+	dgFloat32 maxImpulesSpeed = dgFloat32 (0.0f);
 	for (dgInt32 i = 0; i < jointCount; i++) {
 		dgJointInfo* const jointInfo = &constraintArray[i];
 		dgConstraint* const constraint = jointInfo->m_joint;
@@ -875,6 +878,16 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 		dgAssert(jointInfo->m_m1 >= 0);
 		dgAssert(jointInfo->m_m1 < bodyCount);
 		BuildJacobianMatrix(bodyArray, jointInfo, internalForces, leftHandSide, rightHandSide, forceOrImpulseScale);
+
+		dgFloat32 impulseSpeed = constraint->GetImpulseContactSpeed();
+		if (impulseSpeed > maxImpulesSpeed) {
+			maxImpulesSpeed = impulseSpeed;
+			firstImpulseContact = (dgContact*) constraint;
+		}
+	}
+
+	if (maxImpulesSpeed > dgFloat32 (0.8f)) {
+		//dgAssert (0);
 	}
 }
 

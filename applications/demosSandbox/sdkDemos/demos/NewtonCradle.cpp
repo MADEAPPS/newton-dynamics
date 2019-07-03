@@ -111,7 +111,7 @@ void NewtonCradle (DemoEntityManager* const scene)
 	dFloat mass = 1.0f;
 
 	// create a simple scene
-	int count = 2;
+	int count = 1;
 	for (int i = 0; i < count; i ++) {
 		NewtonBody* const ballBody = CradleBall(scene, sphereMesh, mass, matrix, sphereCollision, defaultMaterialID, 1.0f);
 		NewtonBodySetForceAndTorqueCallback(ballBody, CraddleGravityForce);

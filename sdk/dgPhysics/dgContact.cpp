@@ -69,10 +69,11 @@ dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const materi
 	,dgList<dgContactMaterial>(world->GetAllocator())
 	,m_positAcc(dgFloat32 (10.0f))
 	,m_rotationAcc ()
+	,m_material(material)
 	,m_closestDistance (dgFloat32 (0.0f))
 	,m_separationDistance(dgFloat32 (0.0f))
 	,m_timeOfImpact(dgFloat32 (1.0e10f))
-	,m_material(material)
+	,m_impulseSpeed (dgFloat32 (0.0f))
 	,m_contactPruningTolereance(world->GetContactMergeTolerance())
 	,m_broadphaseLru(0)
 	,m_killContact(0)
@@ -105,10 +106,11 @@ dgContact::dgContact(dgContact* const clone)
 	,m_positAcc(clone->m_positAcc)
 	,m_rotationAcc(clone->m_rotationAcc)
 	,m_separtingVector (clone->m_separtingVector)
+	,m_material(clone->m_material)
 	,m_closestDistance(clone->m_closestDistance)
 	,m_separationDistance(clone->m_separationDistance)
 	,m_timeOfImpact(clone->m_timeOfImpact)
-	,m_material(clone->m_material)
+	,m_impulseSpeed (clone->m_impulseSpeed)
 	,m_contactPruningTolereance(clone->m_contactPruningTolereance)
 	,m_broadphaseLru(clone->m_broadphaseLru)
 	,m_killContact(clone->m_killContact)
@@ -178,6 +180,7 @@ void dgContact::CalculatePointDerivative (dgInt32 index, dgContraintDescritor& d
 dgUnsigned32 dgContact::JacobianDerivative (dgContraintDescritor& params)
 {
 	dgInt32 frictionIndex = 0;
+	m_impulseSpeed = dgFloat32 (0.0f);
 	if (m_maxDOF) {
 		dgInt32 i = 0;
 		frictionIndex = GetCount();
@@ -212,22 +215,23 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	const dgJacobian &normalJacobian0 = params.m_jacobian[normalIndex].m_jacobianM0;
 	const dgJacobian &normalJacobian1 = params.m_jacobian[normalIndex].m_jacobianM1;
 
-	dgFloat32 restitution = contact.m_restitution;
-	dgFloat32 relVelocErr = -(normalJacobian0.m_linear * veloc0 + normalJacobian0.m_angular * omega0 + normalJacobian1.m_linear * veloc1 + normalJacobian1.m_angular * omega1).AddHorizontal().GetScalar();
+	dgFloat32 restitutionCoefficient = contact.m_restitution;
+	dgFloat32 relVeloc = -(normalJacobian0.m_linear * veloc0 + normalJacobian0.m_angular * omega0 + normalJacobian1.m_linear * veloc1 + normalJacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 	dgFloat32 penetration = dgClamp (contact.m_penetration - DG_RESTING_CONTACT_PENETRATION, dgFloat32(0.0f), dgFloat32(0.5f));
-//restitution = 0.0f;
+//restitutionCoefficient = 0.0f;
 //penetration = 0.0f;
 
 	dgFloat32 penetrationStiffness = MAX_PENETRATION_STIFFNESS * contact.m_softness;
 	dgFloat32 penetrationVeloc = penetration * penetrationStiffness;
 	dgAssert (dgAbs (penetrationVeloc - MAX_PENETRATION_STIFFNESS * contact.m_softness * penetration) < dgFloat32 (1.0e-6f));
-	if (relVelocErr > REST_RELATIVE_VELOCITY) {
-		relVelocErr *= (restitution + dgFloat32 (1.0f));
-	}
+	//if (relVelocErr > REST_RELATIVE_VELOCITY) {
+	//	relVelocErr *= (restitutionCoefficient + dgFloat32 (1.0f));
+	//}
+	dgFloat32 restitutionVelocity = (relVeloc > REST_RELATIVE_VELOCITY) ? relVeloc * restitutionCoefficient : dgFloat32 (0.0f);
+	m_impulseSpeed = dgMax (m_impulseSpeed, restitutionVelocity);
 
-	params.m_restitution[normalIndex] = restitution;
 	params.m_penetration[normalIndex] = penetration;
-
+	params.m_restitution[normalIndex] = restitutionCoefficient;
 	params.m_penetrationStiffness[normalIndex] = penetrationStiffness;
 	params.m_forceBounds[normalIndex].m_low = dgFloat32 (0.0f);
 	params.m_forceBounds[normalIndex].m_normalIndex = DG_INDEPENDENT_ROW;
@@ -235,9 +239,9 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	params.m_jointStiffness[normalIndex] = dgFloat32 (0.0f);
 
 	const dgFloat32 relGyro = (normalJacobian0.m_angular * m_body0->m_gyroAlpha + normalJacobian1.m_angular * m_body1->m_gyroAlpha).AddHorizontal().GetScalar();
-//	params.m_jointAccel[normalIndex] = GetMax (dgFloat32 (-4.0f), relVelocErr + penetrationVeloc) * params.m_invTimestep;
-//	params.m_jointAccel[normalIndex] = dgMax (dgFloat32 (-4.0f), relVelocErr + penetrationVeloc) * impulseOrForceScale;
-	params.m_jointAccel[normalIndex] = relGyro + (relVelocErr + penetrationVeloc) * impulseOrForceScale;
+	//params.m_jointAccel[normalIndex] = relGyro + (relVelocErr + penetrationVeloc) * impulseOrForceScale;
+	relVeloc += dgMax (restitutionVelocity, penetrationVeloc);
+	params.m_jointAccel[normalIndex] = relGyro + relVeloc * impulseOrForceScale;
 	if (contact.m_flags & dgContactMaterial::m_overrideNormalAccel) {
 		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
@@ -252,7 +256,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 
 		const dgJacobian &jacobian0 = params.m_jacobian[jacobIndex].m_jacobianM0;
 		const dgJacobian &jacobian1 = params.m_jacobian[jacobIndex].m_jacobianM1;
-		relVelocErr = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
+		dgFloat32 relVelocErr = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 
 		params.m_forceBounds[jacobIndex].m_normalIndex = dgInt16 ((contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_INDEPENDENT_ROW : normalIndex);
 		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.0f);
@@ -289,7 +293,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 
 		const dgJacobian &jacobian0 = params.m_jacobian[jacobIndex].m_jacobianM0;
 		const dgJacobian &jacobian1 = params.m_jacobian[jacobIndex].m_jacobianM1;
-		relVelocErr = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
+		dgFloat32 relVelocErr = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 
 		params.m_forceBounds[jacobIndex].m_normalIndex = dgInt16 ((contact.m_flags & dgContactMaterial::m_override1Friction) ? DG_INDEPENDENT_ROW : normalIndex);
 		params.m_jointStiffness[jacobIndex] = dgFloat32(0.0f);
