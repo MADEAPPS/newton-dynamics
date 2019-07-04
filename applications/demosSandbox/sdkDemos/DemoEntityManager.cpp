@@ -36,7 +36,7 @@
 //#define DEFAULT_SCENE	0		// using NewtonMesh tool
 //#define DEFAULT_SCENE	1		// coefficients of friction
 //#define DEFAULT_SCENE	2		// coefficients of restitution
-#define DEFAULT_SCENE	3		// newton cradle
+//#define DEFAULT_SCENE	3		// newton cradle
 //#define DEFAULT_SCENE	4		// gyroscope precession
 //#define DEFAULT_SCENE	5		// closest distance
 //#define DEFAULT_SCENE	6		// primitive collision
@@ -76,7 +76,7 @@
 //#define DEFAULT_SCENE	40		// David Gravel multi body car
 //#define DEFAULT_SCENE	41		// super Car
 //#define DEFAULT_SCENE	42		// heavy vehicles
-//#define DEFAULT_SCENE	43		// basic player controller
+#define DEFAULT_SCENE	43		// basic player controller
 //#define DEFAULT_SCENE	44		// animated player controller
 //#define DEFAULT_SCENE	45		// advanced player controller
 //#define DEFAULT_SCENE	46		// cloth patch			

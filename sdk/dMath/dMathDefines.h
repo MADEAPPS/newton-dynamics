@@ -251,6 +251,58 @@ void dMatrixTimeVector(int size, const T* const matrix, const T* const v, T* con
 }
 
 template<class T>
+bool dSolveGaussian(int size, T* const matrix, T* const b)
+{
+	for (int i = 0; i < size - 1; i++) {
+		const T* const rowI = &matrix[i * size];
+		int m = i;
+		T maxVal(dAbs(rowI[i]));
+		for (int j = i + 1; j < size - 1; j++) {
+			T val(dAbs(matrix[size * j + i]));
+			if (val > maxVal) {
+				m = j;
+				maxVal = val;
+			}
+		}
+
+		if (maxVal < T(1.0e-12f)) {
+			return false;
+		}
+
+		if (m != i) {
+			T* const rowK = &matrix[m * size];
+			T* const rowJ = &matrix[i * size];
+			for (int j = 0; j < size; j++) {
+				dSwap(rowK[j], rowJ[j]);
+			}
+			dSwap(b[i], b[m]);
+		}
+
+		T den = T(1.0f) / rowI[i];
+		for (int k = i + 1; k < size; k++) {
+			T* const rowK = &matrix[size * k];
+			T factor(-rowK[i] * den);
+			for (int j = i + 1; j < size; j++) {
+				rowK[j] += rowI[j] * factor;
+			}
+			rowK[i] = T(0.0f);
+			b[k] += b[i] * factor;
+		}
+	}
+
+	for (int i = size - 1; i >= 0; i--) {
+		T acc(0);
+		T* const rowI = &matrix[i * size];
+		for (int j = i + 1; j < size; j++) {
+			acc = acc + rowI[j] * b[j];
+		}
+		b[i] = (b[i] - acc) / rowI[i];
+	}
+	return true;
+}
+
+
+template<class T>
 void dCholeskySolve(int size, int n, const T* const choleskyMatrix, T* const x)
 {
 	int stride = 0;
