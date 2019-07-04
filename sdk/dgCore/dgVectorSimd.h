@@ -179,12 +179,12 @@ class dgVector
 	}
 
 	// return dot product
-	DG_INLINE dgFloat32 DotProduct3(const dgVector& A) const
-	{
-		dgVector tmp(A & m_triplexMask);
-		dgAssert((m_w * tmp.m_w) == dgFloat32(0.0f));
-		return (*this * tmp).AddHorizontal().GetScalar();
-	}
+	//DG_INLINE dgFloat32 DotProduct3(const dgVector& A) const
+	//{
+	//	dgVector tmp(A & m_triplexMask);
+	//	dgAssert((m_w * tmp.m_w) == dgFloat32(0.0f));
+	//	return (*this * tmp).AddHorizontal().GetScalar();
+	//}
 
 	DG_INLINE dgVector DotProduct(const dgVector& A) const
 	{

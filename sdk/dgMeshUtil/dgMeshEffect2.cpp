@@ -168,20 +168,20 @@ class dgTetraIsoSufaceStuffing
 		void TessellateTriangle(dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count)
 		{
 			if (level) {
-				dgAssert(dgAbs(p0.DotProduct3(p0) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-				dgAssert(dgAbs(p1.DotProduct3(p1) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-				dgAssert(dgAbs(p2.DotProduct3(p2) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbs(p0.DotProduct(p0).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbs(p1.DotProduct(p1).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbs(p2.DotProduct(p2).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 				dgVector p01(p0 + p1);
 				dgVector p12(p1 + p2);
 				dgVector p20(p2 + p0);
 
-				p01 = p01.Scale(dgRsqrt(p01.DotProduct3(p01)));
-				p12 = p12.Scale(dgRsqrt(p12.DotProduct3(p12)));
-				p20 = p20.Scale(dgRsqrt(p20.DotProduct3(p20)));
+				p01 = p01.Scale(dgRsqrt(p01.DotProduct(p01).GetScalar()));
+				p12 = p12.Scale(dgRsqrt(p12.DotProduct(p12).GetScalar()));
+				p20 = p20.Scale(dgRsqrt(p20.DotProduct(p20).GetScalar()));
 
-				dgAssert(dgAbs(p01.DotProduct3(p01) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-				dgAssert(dgAbs(p12.DotProduct3(p12) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
-				dgAssert(dgAbs(p20.DotProduct3(p20) - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbs(p01.DotProduct(p01).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbs(p12.DotProduct(p12).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
+				dgAssert(dgAbs(p20.DotProduct(p20).GetScalar() - dgFloat32(1.0f)) < dgFloat32(1.0e-4f));
 
 				TessellateTriangle(level - 1, p0, p01, p20, count);
 				TessellateTriangle(level - 1, p1, p12, p01, count);

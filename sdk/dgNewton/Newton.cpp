@@ -1705,7 +1705,8 @@ dFloat NewtonMaterialGetContactNormalSpeed(const NewtonMaterial* const materialH
 
 	dgVector dv (v1 - v0);
 
-	dFloat speed = dv.DotProduct3(material->m_normal);
+	dgAssert (material->m_normal.m_w == dgFloat32 (0.0f));
+	dFloat speed = dv.DotProduct(material->m_normal).GetScalar();
 	return speed;
 }
 
@@ -1737,7 +1738,8 @@ dFloat NewtonMaterialGetContactTangentSpeed(const NewtonMaterial* const material
 
 	dgVector dv (v1 - v0);
 	dgVector dir (index ? material->m_dir1 : material->m_dir0);
-	dFloat speed = dv.DotProduct3(dir);
+	dgAssert (dir.m_w == dgFloat32 (0.0f));
+	dFloat speed = dv.DotProduct(dir).GetScalar();
 	return - speed;
 }
 
@@ -2137,7 +2139,7 @@ void NewtonMaterialSetContactNormalDirection(const NewtonMaterial* const materia
 	dgVector normal (direction[0], direction[1], direction[2], dgFloat32 (0.0f));
 
 	//dgAssert (normal.DotProduct3(material->m_normal) > dgFloat32 (0.01f));
-	if (normal.DotProduct3(material->m_normal) < dgFloat32 (0.0f)) {
+	if (normal.DotProduct(material->m_normal).GetScalar() < dgFloat32 (0.0f)) {
 		normal = normal * dgVector::m_negOne;
 	}
 	material->m_normal = normal;
@@ -6303,15 +6305,15 @@ void NewtonBallSetConeLimits(const NewtonJoint* const ball, const dFloat* pin, d
 
 	dgVector coneAxis (pin[0], pin[1], pin[2], dgFloat32 (0.0f)); 
 
-	if (coneAxis.DotProduct3(coneAxis) < 1.0e-3f) {
+	if (coneAxis.DotProduct(coneAxis).GetScalar() < 1.0e-3f) {
 		coneAxis.m_x = dgFloat32(1.0f);
 	}
 	dgVector tmp (dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
-	if (dgAbs (tmp.DotProduct3(coneAxis)) > dgFloat32 (0.999f)) {
+	if (dgAbs (tmp.DotProduct(coneAxis).GetScalar()) > dgFloat32 (0.999f)) {
 		tmp = dgVector (dgFloat32 (0.0f), dgFloat32(1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
-		if (dgAbs (tmp.DotProduct3(coneAxis)) > dgFloat32 (0.999f)) {
+		if (dgAbs (tmp.DotProduct(coneAxis).GetScalar()) > dgFloat32 (0.999f)) {
 			tmp = dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32(1.0f), dgFloat32 (0.0f)); 
-			dgAssert (dgAbs (tmp.DotProduct3(coneAxis)) < dgFloat32 (0.999f));
+			dgAssert (dgAbs (tmp.DotProduct(coneAxis).GetScalar()) < dgFloat32 (0.999f));
 		}
 	}
 	dgVector lateral (tmp.CrossProduct(coneAxis)); 
@@ -7222,7 +7224,7 @@ void NewtonUserJointAddLinearRow(const NewtonJoint* const joint, const dFloat* c
 	TRACE_FUNCTION(__FUNCTION__);
 	dgVector direction (dir[0], dir[1], dir[2], dgFloat32 (0.0f)); 
 	direction = direction.Normalize();
-	dgAssert (dgAbs (direction.DotProduct3(direction) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+	dgAssert (dgAbs (direction.DotProduct(direction).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 	dgVector pivotPoint0 (pivot0[0], pivot0[1], pivot0[2], dgFloat32 (0.0f)); 
 	dgVector pivotPoint1 (pivot1[0], pivot1[1], pivot1[2], dgFloat32 (0.0f)); 
 	
@@ -7257,7 +7259,7 @@ void NewtonUserJointAddAngularRow(const NewtonJoint* const joint, dFloat relativ
 	NewtonUserJoint* const userJoint = (NewtonUserJoint*) joint;
 	dgVector direction (pin[0], pin[1], pin[2], dgFloat32 (0.0f));
 	direction = direction.Normalize();
-	dgAssert (dgAbs (direction.DotProduct3(direction) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
+	dgAssert (dgAbs (direction.DotProduct(direction).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 
 	userJoint->AddAngularRowJacobian (direction, relativeAngleError);
 }

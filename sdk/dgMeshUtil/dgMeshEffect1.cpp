@@ -1970,11 +1970,16 @@ void dgMeshEffect::EndBuildFace ()
 				const dgBigVector& p0 = points.m_vertex[i0];
 				const dgBigVector& p1 = points.m_vertex[i1];
 				const dgBigVector& p2 = points.m_vertex[i2];
-
+				
 				dgBigVector e1(p1 - p0);
 				dgBigVector e2(p2 - p0);
 				dgBigVector n(e1.CrossProduct(e2));
-				dgFloat64 mag3 = n.DotProduct3(n);
+
+				dgAssert (e1.m_w == dgFloat32 (0.0f));
+				dgAssert (e2.m_w == dgFloat32 (0.0f));
+				dgAssert (n.m_w == dgFloat32 (0.0f));
+
+				dgFloat64 mag3 = n.DotProduct(n).GetScalar();
 				if (mag3 >= dgFloat64(DG_MESH_EFFECT_PRECISION_SCALE_INV * DG_MESH_EFFECT_PRECISION_SCALE_INV)) {
 					dgInt32 index[] = {i0, i1, i2};
 					for (dgInt32 i = 0; i < 3; i ++) {
@@ -2020,7 +2025,11 @@ void dgMeshEffect::EndBuildFace ()
 		dgBigVector e1(p1 - p0);
 		dgBigVector e2(p2 - p0);
 		dgBigVector n(e1.CrossProduct(e2));
-		dgFloat64 mag3 = n.DotProduct3(n);
+		dgAssert(e1.m_w == dgFloat32(0.0f));
+		dgAssert(e2.m_w == dgFloat32(0.0f));
+		dgAssert(n.m_w == dgFloat32(0.0f));
+
+		dgFloat64 mag3 = n.DotProduct(n).GetScalar();
 		if (mag3 < dgFloat64(DG_MESH_EFFECT_PRECISION_SCALE_INV * DG_MESH_EFFECT_PRECISION_SCALE_INV)) {
 			m_attrib.SetCount (m_constructionIndex);
 			m_points.SetCount (m_constructionIndex);
@@ -2231,7 +2240,11 @@ void dgMeshEffect::EndBuild (dgFloat64 tol, bool fixTjoint)
 		dgBigVector e1 (p1 - p0);
 		dgBigVector e2 (p2 - p0);
 		dgBigVector n (e1.CrossProduct(e2));
-		dgFloat64 mag2 = n.DotProduct3(n);
+
+		dgAssert(e1.m_w == dgFloat32(0.0f));
+		dgAssert(e2.m_w == dgFloat32(0.0f));
+		dgAssert(n.m_w == dgFloat32(0.0f));
+		dgFloat64 mag2 = n.DotProduct(n).GetScalar();
 		dgAssert (mag2 > dgFloat32 (0.0f));
 	}
 #endif
@@ -2248,9 +2261,12 @@ void dgMeshEffect::EndBuild (dgFloat64 tol, bool fixTjoint)
 
 		dgBigVector e1 (m_points.m_vertex[index[1]] - m_points.m_vertex[index[0]]);
 		dgBigVector e2 (m_points.m_vertex[index[2]] - m_points.m_vertex[index[0]]);
-
 		dgBigVector n (e1.CrossProduct(e2));
-		dgFloat64 mag2 = n.DotProduct3(n);
+
+		dgAssert(e1.m_w == dgFloat32(0.0f));
+		dgAssert(e2.m_w == dgFloat32(0.0f));
+		dgAssert(n.m_w == dgFloat32(0.0f));
+		dgFloat64 mag2 = n.DotProduct(n).GetScalar();
 		if (mag2 > dgFloat64 (1.0e-12f)) {
 			userdata[0] = i * 3 + 0;
 			userdata[1] = i * 3 + 1;
@@ -2300,7 +2316,11 @@ void dgMeshEffect::EndBuild (dgFloat64 tol, bool fixTjoint)
 			dgBigVector e1 (p1 - p0);
 			dgBigVector e2 (p2 - p0);
 			dgBigVector n (e1.CrossProduct(e2));
-			dgFloat64 mag2 = n.DotProduct3(n);
+
+			dgAssert(e1.m_w == dgFloat32(0.0f));
+			dgAssert(e2.m_w == dgFloat32(0.0f));
+			dgAssert(n.m_w == dgFloat32(0.0f));
+			dgFloat64 mag2 = n.DotProduct(n).GetScalar();
 			dgAssert (mag2 >= dgFloat32 (0.0f));
 		}
 	}
@@ -3268,8 +3288,11 @@ dgInt32 dgMeshEffect::AddInterpolatedHalfAttribute(dgEdge* const edge, dgInt32 m
 	dgBigVector p2(m_points.m_vertex[edge->m_next->m_incidentVertex]);
 	dgBigVector p1(m_points.m_vertex[midPoint]);
 	dgBigVector p2p0(p2 - p0);
-	dgFloat64 den = p2p0.DotProduct3(p2p0);
-	dgFloat64 param = p2p0.DotProduct3(p1 - p0) / den;
+
+	dgAssert(p2p0.m_w == dgFloat32(0.0f));
+
+	dgFloat64 den = p2p0.DotProduct(p2p0).GetScalar();
+	dgFloat64 param = p2p0.DotProduct(p1 - p0).GetScalar() / den;
 	dgFloat64 t1 = param;
 	dgFloat64 t0 = dgFloat64(1.0f) - t1;
 	dgAssert(t1 >= dgFloat64(0.0f));
@@ -3730,7 +3753,8 @@ void dgMeshEffect::RepairTJoints ()
 			const dgBigVector& p0 = m_points.m_vertex[edge->m_incidentVertex];
 			const dgBigVector& p1 = m_points.m_vertex[edge->m_twin->m_incidentVertex];
 			dgBigVector dist (p1 - p0);
-			dgFloat64 mag2 = dist.DotProduct3(dist);
+			dgAssert(dist.m_w == dgFloat32(0.0f));
+			dgFloat64 mag2 = dist.DotProduct(dist).GetScalar();
 			if (mag2 < tol2) {
 				bool move = true;
 				while (move) {
@@ -3814,10 +3838,12 @@ void dgMeshEffect::RepairTJoints ()
 
 			dgBigVector A (p1 - p0);
 			dgBigVector B (p2 - p1);
-			dgFloat64 ab = A.DotProduct3(B);
+			dgAssert(A.m_w == dgFloat32(0.0f));
+			dgAssert(B.m_w == dgFloat32(0.0f));
+			dgFloat64 ab = A.DotProduct(B).GetScalar();
 			if (ab >= 0.0f) {
-				dgFloat64 aa = A.DotProduct3(A);
-				dgFloat64 bb = B.DotProduct3(B);
+				dgFloat64 aa = A.DotProduct(A).GetScalar();
+				dgFloat64 bb = B.DotProduct(B).GetScalar();
 
 				dgFloat64 magab2 = ab * ab;
 				dgFloat64 magaabb = aa * bb * tol2;
@@ -3951,10 +3977,13 @@ void dgMeshEffect::RepairTJoints ()
 
 						dgBigVector A0 (p3 - p2);
 						dgBigVector B0 (p2 - p1);
-						dgFloat64 ab0 = A0.DotProduct3(B0);
+						dgAssert(A0.m_w == dgFloat32(0.0f));
+						dgAssert(B0.m_w == dgFloat32(0.0f));
+
+						dgFloat64 ab0 = A0.DotProduct(B0).GetScalar();
 						if (ab0 >= 0.0) {
-							dgFloat64 aa0 = A0.DotProduct3(A0);
-							dgFloat64 bb0 = B0.DotProduct3(B0);
+							dgFloat64 aa0 = A0.DotProduct(A0).GetScalar();
+							dgFloat64 bb0 = B0.DotProduct(B0).GetScalar();
 
 							dgFloat64 ab0ab0 = ab0 * ab0;
 							dgFloat64 aa0bb0 = aa0 * bb0 * tol2;
@@ -3963,7 +3992,9 @@ void dgMeshEffect::RepairTJoints ()
 									const dgBigVector& p4 = m_points.m_vertex[openEdge->m_prev->m_incidentVertex];
 									dgBigVector A1 (p1 - p0);
 									dgBigVector B1 (p1 - p4);
-									dgFloat64 ab1 = A1.DotProduct3(B1);
+									dgAssert(A1.m_w == dgFloat32(0.0f));
+									dgAssert(B1.m_w == dgFloat32(0.0f));
+									dgFloat64 ab1 = A1.DotProduct(B1).GetScalar();
 									if (ab1 < 0.0f) {
 										dgFloat64 ab1ab1 = ab1 * ab1;
 										dgFloat64 aa1bb1 = aa0 * bb0 * tol2;

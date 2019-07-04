@@ -307,7 +307,7 @@ void dCustomJoint::CalculateGlobalMatrix (dMatrix& matrix0, dMatrix& matrix1) co
 
 dFloat dCustomJoint::CalculateAngle (const dVector& dir, const dVector& cosDir, const dVector& sinDir) const
 {
-	dAssert(dAbs(sinDir.DotProduct3(cosDir)) < dFloat (1.0e-4f));
+	//dAssert(dAbs(sinDir.DotProduct3(cosDir)) < dFloat (1.0e-4f));
 	dVector projectDir(dir - sinDir.Scale(dir.DotProduct3(sinDir)));
 	dFloat cosAngle = projectDir.DotProduct3(cosDir);
 	dFloat sinAngle = sinDir.DotProduct3(projectDir.CrossProduct(cosDir));

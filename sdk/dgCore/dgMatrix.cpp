@@ -319,8 +319,8 @@ dgVector dgMatrix::SolveByGaussianElimination(const dgVector &v) const
 void dgMatrix::CalcPitchYawRoll (dgVector& euler0, dgVector& euler1) const
 {
 	const dgMatrix& matrix = *this;
-	dgAssert (matrix[2].DotProduct3(matrix[0].CrossProduct(matrix[1])) > 0.0f);
-	dgAssert (dgAbs (matrix[2].DotProduct3(matrix[0].CrossProduct(matrix[1])) - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
+	dgAssert (matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() > 0.0f);
+	dgAssert (dgAbs (matrix[2].DotProduct(matrix[0].CrossProduct(matrix[1])).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f));
 /*
 	// Assuming the angles are in radians.
 	if (matrix[0][2] > dgFloat32 (0.99995f)) {
@@ -444,7 +444,7 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 	// where S = sqrt (transpose (L) * L)
 
 	const dgMatrix& me = *this;
-	dgFloat32 sign = dgSign (me[2].DotProduct3 (me[0].CrossProduct(me[1])));
+	dgFloat32 sign = dgSign (me[2].DotProduct(me[0].CrossProduct(me[1])).GetScalar());
 	stretchAxis = me * Transpose();
 	//stretchAxis.EigenVectors (scale);
 	scale = stretchAxis.EigenVectors();
@@ -562,7 +562,7 @@ dgVector dgMatrix::EigenVectors ()
 		if (sm < dgFloat32 (1.0e-12f)) {
 			// order the eigenvalue vectors	
 			dgVector tmp (eigenVectors.m_front.CrossProduct(eigenVectors.m_up));
-			if (tmp.DotProduct3(eigenVectors.m_right) < dgFloat32(0.0f)) {
+			if (tmp.DotProduct(eigenVectors.m_right).GetScalar() < dgFloat32(0.0f)) {
 				eigenVectors.m_right = eigenVectors.m_right * dgVector::m_negOne;
 			}
 			break;

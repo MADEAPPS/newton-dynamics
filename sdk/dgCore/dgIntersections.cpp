@@ -119,7 +119,7 @@ dgBigVector dgPointToRayDistance (const dgBigVector& point, const dgBigVector& r
 {
 	dgBigVector dp (ray_p1 - ray_p0);
 	dgAssert (dp.m_w == dgFloat32 (0.0f));
-	dgFloat64 t = dgClamp (dp.DotProduct3 (point - ray_p0) / dp.DotProduct3 (dp), dgFloat64(0.0f), dgFloat64 (1.0f));
+	dgFloat64 t = dgClamp (dp.DotProduct(point - ray_p0).GetScalar() / dp.DotProduct(dp).GetScalar(), dgFloat64(0.0f), dgFloat64 (1.0f));
 	return ray_p0 + dp.Scale (t);
 }
 
@@ -212,12 +212,15 @@ void dgApi dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, c
 	dgVector u (ray_p1 - ray_p0);
 	dgVector v (ray_q1 - ray_q0);
 	dgVector w (ray_p0 - ray_q0);
+	dgAssert (u.m_w == dgFloat32 (0.0f));
+	dgAssert (v.m_w == dgFloat32 (0.0f));
+	dgAssert (w.m_w == dgFloat32 (0.0f));
 
-	dgFloat32 a = u.DotProduct3(u);        
-	dgFloat32 b = u.DotProduct3(v);
-	dgFloat32 c = v.DotProduct3(v);        
-	dgFloat32 d = u.DotProduct3(w);
-	dgFloat32 e = v.DotProduct3(w);
+	dgFloat32 a = u.DotProduct(u).GetScalar();        
+	dgFloat32 b = u.DotProduct(v).GetScalar();
+	dgFloat32 c = v.DotProduct(v).GetScalar();        
+	dgFloat32 d = u.DotProduct(w).GetScalar();
+	dgFloat32 e = v.DotProduct(w).GetScalar();
 	dgFloat32 D = a*c - b*b;   
 	dgFloat32 sD = D;			
 	dgFloat32 tD = D;			
@@ -286,11 +289,13 @@ void dgApi dgRayToRayDistance (const dgVector& ray_p0, const dgVector& ray_p1, c
 dgFloat32 dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVector& origin, dgFloat32 radius)
 {
 	dgVector p0Origin (p0 - origin);
-	if (p0Origin.DotProduct3(p0Origin) < (dgFloat32 (100.0f) * radius * radius)) {
+	dgAssert (p0Origin.m_w == dgFloat32 (0.0f));
+	if (p0Origin.DotProduct(p0Origin).GetScalar() < (dgFloat32 (100.0f) * radius * radius)) {
 		dgVector dp (p1 - p0);
-		dgFloat32 a = dp.DotProduct3(dp);
-		dgFloat32 b = dgFloat32 (2.0f) * p0Origin.DotProduct3(dp);
-		dgFloat32 c = p0Origin.DotProduct3(p0Origin) - radius * radius;
+		dgAssert (dp.m_w == dgFloat32 (0.0f));
+		dgFloat32 a = dp.DotProduct(dp).GetScalar();
+		dgFloat32 b = dgFloat32 (2.0f) * p0Origin.DotProduct(dp).GetScalar();
+		dgFloat32 c = p0Origin.DotProduct(p0Origin).GetScalar() - radius * radius;
 		dgFloat32 desc = b * b - dgFloat32 (4.0f) * a * c;
 		if (desc >= 0.0f) {
 			desc = dgSqrt (desc);
@@ -315,9 +320,10 @@ dgFloat32 dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVecto
 	} else {
 		dgBigVector p0Origin1 (p0Origin);
 		dgBigVector dp (p1 - p0);
-		dgFloat64 a = dp.DotProduct3(dp);
-		dgFloat64 b = dgFloat32 (2.0f) * p0Origin1.DotProduct3(dp);
-		dgFloat64 c = p0Origin1.DotProduct3(p0Origin1) - dgFloat64(radius) * radius;
+		dgAssert (dp.m_w == dgFloat32 (0.0f));
+		dgFloat64 a = dp.DotProduct(dp).GetScalar();
+		dgFloat64 b = dgFloat32 (2.0f) * p0Origin1.DotProduct(dp).GetScalar();
+		dgFloat64 c = p0Origin1.DotProduct(p0Origin1).GetScalar() - dgFloat64(radius) * radius;
 		dgFloat64 desc = b * b - dgFloat32 (4.0f) * a * c;
 		if (desc >= 0.0f) {
 			desc = sqrt (desc);

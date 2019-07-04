@@ -117,7 +117,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 		dgVector jMinvM1angular(preconditioner1 * row->m_JMinv.m_jacobianM1.m_angular);
 
 		dgVector tmpDiag(jMinvM0linear * row->m_Jt.m_jacobianM0.m_linear + jMinvM0angular * row->m_Jt.m_jacobianM0.m_angular +
-			jMinvM1linear * row->m_Jt.m_jacobianM1.m_linear + jMinvM1angular * row->m_Jt.m_jacobianM1.m_angular);
+						 jMinvM1linear * row->m_Jt.m_jacobianM1.m_linear + jMinvM1angular * row->m_Jt.m_jacobianM1.m_angular);
 
 		dgAssert(tmpDiag.m_w == dgFloat32(0.0f));
 		dgFloat32 diag = (tmpDiag.AddHorizontal()).GetScalar();
@@ -247,7 +247,19 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 	}
 
 	if (impactJoints.GetCount()) {
-
+		while (impactJoints.GetCount()) {
+			dgContact* const contact = impactJoints[0];
+			impactJoints.Pop();
+			if (contact->GetImpulseContactSpeed() > impactSpeed) {
+				dgBody* body = contact->GetBody0();
+				dgBody* const body1 = contact->GetBody1();
+				bool test = body1->GetInvMass().m_w >= dgFloat32 (0.0f);
+				test = test && (body1->m_veloc.DotProduct(body1->m_veloc).GetScalar() > body->m_veloc.DotProduct(body->m_veloc).GetScalar());
+				if (test) {
+					body = body1;
+				}
+			}
+		}
 	}
 }
 
