@@ -266,8 +266,8 @@ static void CreateBridge(DemoEntityManager* const scene)
 
 	//dVector p0(1.35f, 8.60f, -28.0f, 0.0f);
 	dVector p0(1.35f, 8.35f, -28.1f, 0.0f);
-	dVector p1(1.35f, 8.60f,  28.43f, 0.0f);
-	dVector p2(1.35f, 4.0f, 0.0, 0.0f);
+	dVector p1(1.35f, 8.40f,  28.9f, 0.0f);
+	dVector p2(1.35f, 6.0f, 0.0, 0.0f);
 
 	dFloat y[3];
 	dFloat matrix[3][3];
