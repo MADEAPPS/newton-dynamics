@@ -135,6 +135,11 @@ class dCustomPlayerController::dImpulseSolver
 		}
 		return netImpulse;
 	}
+
+	void ApplyReaction()
+	{
+
+	}
 	
 	dMatrix m_invInertia;
 	dVector m_veloc;
@@ -520,6 +525,8 @@ void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver)
 	impulseSolver.AddAngularRows();
 
 	veloc += impulseSolver.CalculateImpulse().Scale(m_invMass);
+	impulseSolver.ApplyReaction();
+
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 }
 
