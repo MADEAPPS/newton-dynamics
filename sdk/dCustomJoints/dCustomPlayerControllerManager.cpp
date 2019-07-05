@@ -78,6 +78,7 @@ class dCustomPlayerController::dImpulseSolver
 	{
 		dVector zero (0.0f);
 		for (int i = 0; i < 3; i ++) {
+			m_otherBody[m_rowCount] = NULL;
 			m_jacobian[m_rowCount].m_linear = zero;
 			m_jacobian[m_rowCount].m_angular = zero;
 			m_jacobian[m_rowCount].m_angular[i] = dFloat(1.0f);
@@ -93,6 +94,7 @@ class dCustomPlayerController::dImpulseSolver
 
 	int AddLinearRow (const dVector& dir, const dVector& r, dFloat accel, dFloat low, dFloat high, int normalIndex = -1)
 	{
+		m_otherBody[m_rowCount] = NULL;
 		m_jacobian[m_rowCount].m_linear = dir;
 		m_jacobian[m_rowCount].m_angular = r.CrossProduct(dir);
 		m_low[m_rowCount] = low;
@@ -138,12 +140,19 @@ class dCustomPlayerController::dImpulseSolver
 
 	void ApplyReaction()
 	{
-
+		for (int i = 0; i < m_rowCount; i++) {
+			if (m_otherBody[i]) {
+				dVector angularImpulse(0.0f);
+				dVector linearImpulse(m_jacobian[i].m_linear.Scale(-m_impulseMag[i]));
+				NewtonBodyApplyImpulsePair(m_otherBody[i], &linearImpulse[0], &angularImpulse[0], 1.0f / 120.0f);
+			}
+		}
 	}
 	
 	dMatrix m_invInertia;
 	dVector m_veloc;
 	dComplementaritySolver::dJacobian m_jacobian[D_MAX_ROWS];
+	NewtonBody* m_otherBody[D_MAX_ROWS];
 	dFloat m_rhs[D_MAX_ROWS];
 	dFloat m_low[D_MAX_ROWS];
 	dFloat m_high[D_MAX_ROWS];
@@ -500,8 +509,16 @@ void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver)
 		dVector normal (contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat (0.0f));
 		const int normalIndex = impulseSolver.AddLinearRow(normal, point - com, 0.0f, 0.0f, 1.0e12f);
 
+		dFloat invMass;
+		dFloat invIxx;
+		dFloat invIyy;
+		dFloat invIzz;
 		NewtonBodyGetPointVelocity (contact.m_hitBody, &point[0], &surfaceVeloc[0]);
 		impulseSolver.m_rhs[impulseSolver.m_rowCount-1] += surfaceVeloc.DotProduct3(normal);
+
+		NewtonBodyGetInvMass(contact.m_hitBody, &invMass, &invIxx, &invIyy, &invIzz);
+		const NewtonBody* const otheBody = (invMass > 0.0f) ? contact.m_hitBody : NULL;
+		//impulseSolver.m_otherBody[impulseSolver.m_rowCount - 1] = (NewtonBody*) otheBody;
 
 		m_isAirbone = false;
 		dVector localPooint (frameMatrix.UntransformVector(point));
@@ -513,11 +530,13 @@ void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver)
 				dVector sideDir (frameMatrix.m_up.CrossProduct(normal).Normalize());
 				impulseSolver.AddLinearRow(sideDir, point - com, -m_lateralSpeed, -friction, friction, normalIndex);
 				impulseSolver.m_rhs[impulseSolver.m_rowCount-1] += surfaceVeloc.DotProduct3(sideDir);
+				impulseSolver.m_otherBody[impulseSolver.m_rowCount - 1] = (NewtonBody*)otheBody;
 
 				// add longitudinal  traction friction
 				dVector frontDir (normal.CrossProduct(sideDir));
 				impulseSolver.AddLinearRow(frontDir, point - com, -m_forwardSpeed, -friction, friction, normalIndex);
 				impulseSolver.m_rhs[impulseSolver.m_rowCount-1] += surfaceVeloc.DotProduct3(frontDir);
+				impulseSolver.m_otherBody[impulseSolver.m_rowCount - 1] = (NewtonBody*)otheBody;
 			}
 		}
 	}

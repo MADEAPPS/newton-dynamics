@@ -698,7 +698,7 @@ void dgBody::ApplyImpulsePair (const dgVector& linearImpulseIn, const dgVector& 
 {
 	dgAssert(linearImpulseIn.m_w == dgFloat32(0.0f));
 	dgAssert(angularImpulseIn.m_w == dgFloat32(0.0f));
-	if ((linearImpulseIn.DotProduct(linearImpulseIn).GetScalar() > dgFloat32(1.0e-6f)) &&
+	if ((linearImpulseIn.DotProduct(linearImpulseIn).GetScalar() > dgFloat32(1.0e-6f)) ||
 		(angularImpulseIn.DotProduct(angularImpulseIn).GetScalar() > dgFloat32(1.0e-6f))) {
 
 		m_impulseForce += linearImpulseIn.Scale(1.0f / timestep);
@@ -728,7 +728,7 @@ void dgBody::ApplyImpulsesAtPoint (dgInt32 count, dgInt32 strideInBytes, const d
 		angularImpulse += Q;
 	}
 
-	if ((impulse.DotProduct(impulse).GetScalar() > dgFloat32(1.0e-6f)) &&
+	if ((impulse.DotProduct(impulse).GetScalar() > dgFloat32(1.0e-6f)) ||
 		(angularImpulse.DotProduct(angularImpulse).GetScalar() > dgFloat32(1.0e-6f))) {
 		m_impulseForce += impulse.Scale(1.0f / timestep);
 		m_impulseTorque += angularImpulse.Scale(1.0f / timestep);

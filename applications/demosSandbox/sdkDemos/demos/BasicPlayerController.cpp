@@ -250,7 +250,7 @@ static void AddMerryGoRound(DemoEntityManager* const scene, const dVector& locat
 
 	dVector platformPosit(location);
 	platformPosit.m_y += 0.2f;
-	NewtonBody* const platform = CreateCylinder(scene, platformPosit, 200.0f, 10.0f, 0.2f);
+	NewtonBody* const platform = CreateCylinder(scene, platformPosit, 100.0f, 10.0f, 0.2f);
 
 	dMatrix pivot;
 	NewtonBodyGetMatrix(platform, &pivot[0][0]);
