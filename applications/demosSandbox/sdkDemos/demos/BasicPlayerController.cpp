@@ -22,7 +22,7 @@
 
 #define PLAYER_MASS						80.0f
 #define PLAYER_WALK_SPEED				8.0f
-#define PLAYER_JUMP_SPEED				6.0f
+#define PLAYER_JUMP_SPEED				3.0f
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 
 
@@ -58,9 +58,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		scene->Print(color, "strafe left:             A");
 		scene->Print(color, "jump:                    Space");
 		//scene->Print(color, "toggle camera mode:      C");
-		
 		//scene->Print(color, "hide help:               H");
-		//scene->Print(color, "change player direction: Left mouse button");
 	}
 
 	static void RenderPlayerHelp(DemoEntityManager* const scene, void* const context)
@@ -149,8 +147,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 
 			//if (scene->GetKeyState(' ') && !controller->IsAirBorn ()) {
 			if (scene->GetKeyState(' ') && controller->IsOnFloor ()) {
-				dFloat jumpSpeed = 2.0f;
-				dVector jumpImpule(controller->GetFrame().RotateVector(dVector(jumpSpeed * controller->GetMass(), 0.0f, 0.0f, 0.0f)));
+				dVector jumpImpule(controller->GetFrame().RotateVector(dVector(PLAYER_JUMP_SPEED * controller->GetMass(), 0.0f, 0.0f, 0.0f)));
 				dVector totalImpulse(controller->GetImpulse() + jumpImpule);
 				controller->SetImpulse(totalImpulse);
 			}

@@ -551,7 +551,7 @@ for (int i = 0; i < 10; i ++) {
 
 #define PLAYER_MASS						80.0f
 #define PLAYER_WALK_SPEED				1.8f
-#define PLAYER_JUMP_SPEED				0.8f
+//#define PLAYER_JUMP_SPEED				5.8f
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 
 
