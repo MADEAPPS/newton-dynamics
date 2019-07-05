@@ -200,10 +200,10 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 					return 0.5f;
 				case 2:
 					// this the wood floor
-					return 1.0f;
+					return 2.0f;
 				case 3:
 					// this the cement floor
-					return 2.0f;
+					return 4.0f;
 					//return 0.2f;
 				default: 
 					// this is everything else
@@ -216,7 +216,8 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 	virtual void ApplyMove (dCustomPlayerController* const controller, dFloat timestep)
 	{
 		// calculate the gravity contribution to the velocity
-		dVector gravity(controller->GetFrame().RotateVector(dVector(DEMO_GRAVITY, 0.0f, 0.0f, 0.0f)));
+		dFloat g = 2.0f * DEMO_GRAVITY;
+		dVector gravity(controller->GetFrame().RotateVector(dVector(g, 0.0f, 0.0f, 0.0f)));
 		dVector totalImpulse(controller->GetImpulse() + gravity.Scale (controller->GetMass() * timestep));
 		controller->SetImpulse(totalImpulse);
 
@@ -260,34 +261,31 @@ static void AddMerryGoRound(DemoEntityManager* const scene, const dVector& locat
 	hinge;
 }
 
-
-static void CreateBridge(DemoEntityManager* const scene) 
+static void CreateBridge(DemoEntityManager* const scene, NewtonBody* const playgroundBody) 
 {
-
-	//dVector p0(1.35f, 8.60f, -28.0f, 0.0f);
 	dVector p0(1.35f, 8.35f, -28.1f, 0.0f);
 	dVector p1(1.35f, 8.40f,  28.9f, 0.0f);
 	dVector p2(1.35f, 6.0f, 0.0, 0.0f);
 
 	dFloat y[3];
-	dFloat matrix[3][3];
+	dFloat splineMatrix[3][3];
 
 	y[0] = p0.m_y;
-	matrix[0][0] = p0.m_z * p0.m_z;
-	matrix[0][1] = p0.m_z;
-	matrix[0][2] = 1.0f;
+	splineMatrix[0][0] = p0.m_z * p0.m_z;
+	splineMatrix[0][1] = p0.m_z;
+	splineMatrix[0][2] = 1.0f;
 
 	y[1] = p1.m_y;
-	matrix[1][0] = p1.m_z * p1.m_z;
-	matrix[1][1] = p1.m_z;
-	matrix[1][2] = 1.0f;
+	splineMatrix[1][0] = p1.m_z * p1.m_z;
+	splineMatrix[1][1] = p1.m_z;
+	splineMatrix[1][2] = 1.0f;
 
 	y[2] = p2.m_y;
-	matrix[2][0] = p2.m_z * p2.m_z;
-	matrix[2][1] = p2.m_z;
-	matrix[2][2] = 1.0f;
+	splineMatrix[2][0] = p2.m_z * p2.m_z;
+	splineMatrix[2][1] = p2.m_z;
+	splineMatrix[2][2] = 1.0f;
 
-	dSolveGaussian(3, &matrix[0][0], y);
+	dSolveGaussian(3, &splineMatrix[0][0], y);
 
 	dFloat plankLentgh = 3.0f;
 	NewtonWorld* const world = scene->GetNewton();
@@ -296,6 +294,7 @@ static void CreateBridge(DemoEntityManager* const scene)
 	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	int count = 0;
+	dFloat mass = 10.0f;
 	dFloat lenght = 0.0f;
 	dFloat step = 1.0e-3f;
 	dFloat y0 = y[0] * p0.m_z * p0.m_z + y[1] * p0.m_z + y[2];
@@ -317,8 +316,7 @@ static void CreateBridge(DemoEntityManager* const scene)
 			matrix.m_right = right.Normalize();
 			matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front);
 
-			array[count] = CreateSimpleSolid(scene, geometry, 0.0f, matrix, collision, 0);
-
+			array[count] = CreateSimpleSolid(scene, geometry, mass, matrix, collision, 0);
 
 			q0 = q1;
 			lenght = 0.0f;
@@ -328,33 +326,46 @@ static void CreateBridge(DemoEntityManager* const scene)
 		y0 = y1;
 	}
 
+	dMatrix matrix;
+	NewtonBodyGetMatrix(array[0], &matrix[0][0]);
+	matrix.m_posit = matrix.m_posit + matrix.m_up.Scale(size.m_y * 0.5f) - matrix.m_right.Scale(size.m_z * 0.5f);
+	dCustomHinge* hinge = new dCustomHinge(matrix, array[0], playgroundBody);
+	hinge->SetAsSpringDamper(true, 0.9f, 0.0f, 20.0f);
+
+	for (int i = 1; i < count; i ++) {
+		dMatrix matrix;
+		NewtonBodyGetMatrix(array[i], &matrix[0][0]);
+		matrix.m_posit = matrix.m_posit + matrix.m_up.Scale(size.m_y * 0.5f) - matrix.m_right.Scale(size.m_z * 0.5f);
+		dCustomHinge* const hinge = new dCustomHinge(matrix, array[i-1], array[i]);
+		hinge->SetAsSpringDamper(true, 0.9f, 0.0f, 20.0f);
+	}
+
+	NewtonBodyGetMatrix(array[count - 1], &matrix[0][0]);
+	matrix.m_posit = matrix.m_posit + matrix.m_up.Scale(size.m_y * 0.5f) + matrix.m_right.Scale(size.m_z * 0.5f);
+	hinge = new dCustomHinge(matrix, array[count - 1], playgroundBody);
+	hinge->SetAsSpringDamper(true, 0.9f, 0.0f, 20.0f);
+
+
 	geometry->Release();
 	NewtonDestroyCollision(collision);
 }
-
-
 
 void BasicPlayerController (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
 
-	//CreateLevelMesh (scene, "flatPlane.ngd", true);
-	CreateLevelMesh (scene, "playerarena.ngd", true);
-	//CreateHeightFieldTerrain(scene, 10, 2.0f, 1.5f, 0.3f, 200.0f, -50.0f);
-
 	NewtonWorld* const world = scene->GetNewton();
+	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "playerarena.ngd", true);
 
 	// create a character controller manager
 	BasicPlayerControllerManager* const playerManager = new BasicPlayerControllerManager (world);
 
 	// add main player
 	dMatrix location (dGetIdentityMatrix());
-	location.m_posit.m_x = 42.0f;
-	location.m_posit.m_y = 5.0f;
-	location.m_posit.m_z = -24.0f;
-
+	location.m_posit.m_x = -20.0f;
 	location.m_posit.m_y = 15.0f;
+	location.m_posit.m_z = 20.0f;
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 20.0f);
 	location.m_posit.m_y += 1.0f;
@@ -368,14 +379,15 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	dVector merryPosit (FindFloor (scene->GetNewton(), location.m_posit + dVector(-5.0f, 0.0f, 15.0f, 0.0f), 20.0f));
 	AddMerryGoRound(scene, merryPosit);
 
+	// add a hanging bridge
+	CreateBridge(scene, playgroundBody);
+
 	int count = 1;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 //	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
 
 	location.m_posit.m_x -= 10.0f;
 	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 0.5f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
-
-	CreateBridge(scene);
 
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;
