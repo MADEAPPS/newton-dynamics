@@ -291,7 +291,7 @@ static void CreateBridge(DemoEntityManager* const scene, NewtonBody* const playg
 	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	int count = 0;
-	dFloat mass = 10.0f;
+	dFloat mass = 50.0f;
 	dFloat lenght = 0.0f;
 	dFloat step = 1.0e-3f;
 	dFloat y0 = y[0] * p0.m_z * p0.m_z + y[1] * p0.m_z + y[2];
@@ -381,7 +381,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	int count = 1;
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-//	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
 
 	location.m_posit.m_x -= 10.0f;
 	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 0.5f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
