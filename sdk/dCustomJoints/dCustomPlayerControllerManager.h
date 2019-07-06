@@ -91,8 +91,8 @@ class dCustomPlayerController
 	};
 
 	void PreUpdate(dFloat timestep);
-	void ResolveCollision(dContactSolver& contactSolver);
 	void ResolveStep(dFloat timestep, dContactSolver& contactSolver);
+	void ResolveCollision(dContactSolver& contactSolver, dFloat timestep);
 	dFloat PredictTimestep(dFloat timestep, dContactSolver& contactSolver);
 	void ResolveInterpenetrations(dContactSolver& contactSolver, dImpulseSolver& impulseSolver);
 	dCollisionState TestPredictCollision(const dContactSolver& contactSolver, const dVector& veloc) const;

@@ -63,6 +63,7 @@ class dCustomPlayerController::dImpulseSolver
 	public: 
 	dImpulseSolver (dCustomPlayerController* const controller)
 	{
+		m_mass = controller->m_mass;
 		m_invMass = controller->m_invMass;
 		NewtonBodyGetInvInertiaMatrix(controller->m_kinematicBody, &m_invInertia[0][0]);
 		Reset(controller);
@@ -138,20 +139,28 @@ class dCustomPlayerController::dImpulseSolver
 		return netImpulse;
 	}
 
-	void ApplyReaction()
+	void ApplyReaction(dFloat timestep)
 	{
+		dMatrix matrix;
 		dVector com(0.0f);
+		dFloat mass; 
+		dFloat Ixx; 
+		dFloat Iyy; 
+		dFloat Izz; 
 		for (int i = 0; i < m_rowCount; i++) {
 			if (m_contactPoint[i]) {
-				dMatrix matrix;
+				
 				NewtonBodyGetMatrix(m_contactPoint[i]->m_hitBody, &matrix[0][0]);
 				NewtonBodyGetCentreOfMass(m_contactPoint[i]->m_hitBody, &com[0]);
 				dVector point(m_contactPoint[i]->m_point[0], m_contactPoint[i]->m_point[1], m_contactPoint[i]->m_point[2], 0.0f);
 				dVector r (point - matrix.TransformVector(com));
+				NewtonBodyGetMass(m_contactPoint[i]->m_hitBody, &mass, &Ixx, &Iyy, &Izz);
+		
+				mass *= 0.1f;
 
-				dVector linearImpulse(m_jacobian[i].m_linear.Scale(-m_impulseMag[i]));
+				dVector linearImpulse(m_jacobian[i].m_linear.Scale(- m_impulseMag[i] * mass / (mass + m_mass)));
 				dVector angularImpulse(r.CrossProduct(linearImpulse));
-				NewtonBodyApplyImpulsePair(m_contactPoint[i]->m_hitBody, &linearImpulse[0], &angularImpulse[0], 1.0f / 120.0f);
+				NewtonBodyApplyImpulsePair(m_contactPoint[i]->m_hitBody, &linearImpulse[0], &angularImpulse[0], timestep);
 			}
 		}
 	}
@@ -165,6 +174,7 @@ class dCustomPlayerController::dImpulseSolver
 	dFloat m_high[D_MAX_ROWS];
 	dFloat m_impulseMag[D_MAX_ROWS];
 	int m_normalIndex[D_MAX_ROWS];
+	dFloat m_mass;	
 	dFloat m_invMass;	
 	int m_rowCount;
 };
@@ -475,7 +485,7 @@ void dCustomPlayerController::ResolveInterpenetrations(dContactSolver& contactSo
 	NewtonBodySetVelocity(m_kinematicBody, &savedVeloc[0]);
 }
 
-void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver)
+void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver, dFloat timestep)
 {
 	dMatrix matrix;
 	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
@@ -551,7 +561,7 @@ void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver)
 	impulseSolver.AddAngularRows();
 
 	veloc += impulseSolver.CalculateImpulse().Scale(m_invMass);
-	impulseSolver.ApplyReaction();
+	impulseSolver.ApplyReaction(timestep);
 
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 }
@@ -611,7 +621,7 @@ xxxx *= 1;
 	// advance player until it hit a collision point, until there is not more time left
 	for (int i = 0; (i < D_DESCRETE_MOTION_STEPS) && (timeLeft > timeEpsilon); i++) {
 		if (timeLeft > timeEpsilon) {
-			ResolveCollision(contactSolver);
+			ResolveCollision(contactSolver, timestep);
 		}
 
 		dFloat predicetdTime = PredictTimestep(timeLeft, contactSolver);
