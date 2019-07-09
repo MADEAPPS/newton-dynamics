@@ -240,6 +240,7 @@ class dgWorldDynamicUpdate
 	static void IntegrateClustersParallelKernel (void* const context, void* const worldContext, dgInt32 threadID);
 	static void CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dgInt32 threadID);
 
+	void ResolveImpulse(dgDownHeap<dgContact*, dgFloat32> impactJoints) const;
 	void BuildJacobianMatrix (dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
 	void ResolveClusterForces (dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;
 	void IntegrateReactionsForces(const dgBodyCluster* const cluster, dgInt32 threadID, dgFloat32 timestep) const;

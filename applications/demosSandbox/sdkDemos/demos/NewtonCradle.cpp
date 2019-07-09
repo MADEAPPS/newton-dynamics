@@ -122,7 +122,7 @@ void NewtonCradle (DemoEntityManager* const scene)
 
 		dMatrix hingePivot (matrix);
 		hingePivot.m_posit.m_y += stringLength.m_y;
-		//new dCustomHinge (hingePivot, ballBody, NULL);
+		new dCustomHinge (hingePivot, ballBody, NULL);
 
 		matrix.m_posit.m_z -= 1.0f;
 	}
