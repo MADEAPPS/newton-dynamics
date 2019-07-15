@@ -102,7 +102,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 		row->m_JMinv.m_jacobianM1.m_angular = invInertia1.RotateVector(row->m_Jt.m_jacobianM1.m_angular);
 
 		dgVector tmpAccel(row->m_JMinv.m_jacobianM0.m_linear * force0 + row->m_JMinv.m_jacobianM0.m_angular * torque0 +
-			row->m_JMinv.m_jacobianM1.m_linear * force1 + row->m_JMinv.m_jacobianM1.m_angular * torque1);
+						  row->m_JMinv.m_jacobianM1.m_linear * force1 + row->m_JMinv.m_jacobianM1.m_angular * torque1);
 
 		dgAssert(tmpAccel.m_w == dgFloat32(0.0f));
 		dgFloat32 extenalAcceleration = -(tmpAccel.AddHorizontal()).GetScalar();
@@ -219,7 +219,6 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 
 	dgInt32 rowCount = 0;
 	const dgInt32 jointCount = cluster->m_jointCount;
-
 	
 	dgUnsigned8 impactBuffer[256 * (sizeof(dgContact*) + sizeof(dgFloat32))];
 	dgDownHeap<dgContact*, dgFloat32> impactJoints(impactBuffer, sizeof(impactBuffer));
@@ -250,38 +249,33 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 	}
 
 	if (impactJoints.GetCount()) {
-		ResolveImpulse(impactJoints);
+		ResolveImpulse(constraintArrayPtr, leftHandSide, rightHandSide, impactJoints);
 	}
 }
 
-void dgWorldDynamicUpdate::ResolveImpulse(dgDownHeap<dgContact*, dgFloat32> impactJoints) const
+void dgWorldDynamicUpdate::ResolveImpulse(const dgJointInfo* const constraintArray, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dgDownHeap<dgContact*, dgFloat32>& impactJoints) const
 {
-	class dgImpulseJoint
-	{
-		public:
-		dgContact* m_contact;
-		dgInt32 m_m0;
-		dgInt32 m_m1;
-	};
-
-	dgBody* bodyArray[DG_IMPULSE_COUNT];
-	dgImpulseJoint contactArray[DG_IMPULSE_COUNT];
+	dgJacobian impulse[DG_IMPULSE_COUNT];
+	dgBodyInfo bodyArray[DG_IMPULSE_COUNT];
+	dgJointInfo contactArray[DG_IMPULSE_COUNT];
 
 	while (impactJoints.GetCount()) {
 		dgContact* const contact = impactJoints[0];
 		impactJoints.Pop();
 		if (contact->GetImpulseContactSpeed() > DG_IMPULSE_CONTACT_SPEED) {
 			dgBody* body = contact->GetBody0();
-			dgBody* const body1 = contact->GetBody1();
-			bool test = body1->GetInvMass().m_w >= dgFloat32(0.0f);
-			test = test && (body1->m_veloc.DotProduct(body1->m_veloc).GetScalar() > body->m_veloc.DotProduct(body->m_veloc).GetScalar());
+			dgBody* const otherBody = contact->GetBody1();
+			bool test = otherBody->GetInvMass().m_w >= dgFloat32(0.0f);
+			test = test && (otherBody->m_veloc.DotProduct(otherBody->m_veloc).GetScalar() > body->m_veloc.DotProduct(body->m_veloc).GetScalar());
 			if (test) {
-				body = body1;
+				body = otherBody;
 			}
 
 			dgInt32 bodyCount = 1;
 			dgInt32 contactCount = 0;
-			bodyArray[0] = body;
+			bodyArray[0].m_body = body;
+			impulse[0].m_linear = dgVector::m_zero;
+			impulse[0].m_angular = dgVector::m_zero;
 			for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
 				dgBodyMasterListCell* const cell = &jointNode->GetInfo();
 				dgConstraint* const constraint = cell->m_joint;
@@ -293,14 +287,18 @@ void dgWorldDynamicUpdate::ResolveImpulse(dgDownHeap<dgContact*, dgFloat32> impa
 						dgBody* const body1 = contactJoint->GetBody1();
 						dgAssert ((body0 == body) || (body1 == body));
 
-						contactArray[contactCount].m_contact = contactJoint;
+						contactArray[contactCount] = constraintArray[contactJoint->m_index];
+						dgAssert(contactArray[contactCount].m_joint == contactJoint);
 
-						bodyArray[bodyCount] = (body1 != body) ? body1 : body0;
+						bodyArray[bodyCount].m_body = (body1 != body) ? body1 : body0;
 						contactArray[contactCount].m_m0 = (body1 != body) ? 0 : bodyCount;
 						contactArray[contactCount].m_m1 = (body1 != body) ? bodyCount : 0;
-			
-						dgAssert (bodyArray[contactArray[contactCount].m_m0] == contactJoint->GetBody0());
-						dgAssert (bodyArray[contactArray[contactCount].m_m1] == contactJoint->GetBody1());
+
+						impulse[bodyCount].m_linear = dgVector::m_zero;
+						impulse[bodyCount].m_angular = dgVector::m_zero;
+		
+						dgAssert (bodyArray[contactArray[contactCount].m_m0].m_body == contactJoint->GetBody0());
+						dgAssert (bodyArray[contactArray[contactCount].m_m1].m_body == contactJoint->GetBody1());
 
 						bodyCount++;
 						contactCount++;
@@ -309,7 +307,56 @@ void dgWorldDynamicUpdate::ResolveImpulse(dgDownHeap<dgContact*, dgFloat32> impa
 				}
 			}
 
+			//dgJointAccelerationDecriptor joindDesc;
+			//joindDesc.m_timeStep = timestepRK;
+			//joindDesc.m_invTimeStep = invTimestepRK;
+			//joindDesc.m_firstPassCoefFlag = dgFloat32(0.0f);
+			for (dgInt32 i = 0; i < contactCount; i++) {
+				dgJointInfo* const jointInfo = &contactArray[i];
+				//dgContact* const contact = (dgContact*)jointInfo->m_joint;
+				//const dgInt32 pairStart = jointInfo->m_pairStart;
+				//joindDesc.m_rowsCount = jointInfo->m_pairCount;
+				//joindDesc.m_leftHandSide = &leftHandSide[pairStart];
+				//joindDesc.m_rightHandSide = &rightHandSide[pairStart];
+				//constraint->JointAccelerations(&joindDesc);
+				//CalculateImpulseVeloc(jointInfo, leftHandSide, rightHandSide);
+			}
 
+			for (dgInt32 i = 0; i < contactCount; i++) {
+				//dgJointInfo* const jointInfo = &contactArray[i];
+				//CalculateJointForce(jointInfo, bodyArray, impulse, leftHandSide, rightHandSide);
+			}
+		}
+	}
+}
+
+void dgWorldDynamicUpdate::CalculateImpulseVeloc(dgJointInfo* const jointInfo, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide) const
+{
+	dgContact* const contact = (dgContact*)jointInfo->m_joint;
+	const dgVector& bodyVeloc0 = contact->GetBody0()->m_veloc;
+	const dgVector& bodyOmega0 = contact->GetBody0()->m_omega;
+	const dgVector& bodyVeloc1 = contact->GetBody1()->m_veloc;
+	const dgVector& bodyOmega1 = contact->GetBody1()->m_omega;
+
+	const dgInt32 count = jointInfo->m_pairCount;
+	for (dgInt32 k = 0; k < count; k++) {
+		dgAssert(rightHandSide[k].m_restitution >= dgFloat32(0.0f));
+		//if (rightHandSide[k].m_restitution >= dgFloat32(0.0f)) 
+		{
+			dgRightHandSide* const rhs = &rightHandSide[k];
+			const dgLeftHandSide* const row = &leftHandSide[k];
+			const dgJacobian &jacobian0 = row->m_Jt.m_jacobianM0;
+			const dgJacobian &jacobian1 = row->m_Jt.m_jacobianM1;
+
+			dgVector relVeloc(jacobian0.m_linear * bodyVeloc0 + jacobian0.m_angular * bodyOmega0 + jacobian1.m_linear * bodyVeloc1 + jacobian1.m_angular * bodyOmega1);
+			dgFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
+			if (rhs->m_normalForceIndex == DG_INDEPENDENT_ROW) {
+				dgAssert(rhs->m_restitution >= 0.0f);
+				dgAssert(rhs->m_restitution <= 2.0f);
+				dgFloat32 restitution = (vRel <= dgFloat32(0.0f)) ? (dgFloat32(1.0f) + rhs->m_restitution) : dgFloat32(1.0f);
+				vRel = vRel * restitution;
+			}
+			rhs->m_coordenateAccel = - vRel;
 		}
 	}
 }
