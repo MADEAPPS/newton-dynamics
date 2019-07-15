@@ -30,6 +30,7 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgBilateralConstraint.h"
 
+#define DG_IMPULSE_COUNT		 (DG_PARALLEL_JOINT_COUNT_CUT_OFF + 32)
 #define DG_IMPULSE_CONTACT_SPEED dgFloat32(0.8f)
 
 void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoArray, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dgFloat32 forceImpulseScale) const
@@ -250,51 +251,21 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 
 	if (impactJoints.GetCount()) {
 		ResolveImpulse(impactJoints);
-/*
-		while (impactJoints.GetCount()) {
-			dgContact* const contact = impactJoints[0];
-			impactJoints.Pop();
-			if (contact->GetImpulseContactSpeed() > DG_IMPULSE_CONTACT_SPEED) {
-				dgBody* body = contact->GetBody0();
-				dgBody* const body1 = contact->GetBody1();
-				bool test = body1->GetInvMass().m_w >= dgFloat32 (0.0f);
-				test = test && (body1->m_veloc.DotProduct(body1->m_veloc).GetScalar() > body->m_veloc.DotProduct(body->m_veloc).GetScalar());
-				if (test) {
-					body = body1;
-				}
-
-				dgInt32 bodyCount = 1;
-				dgInt32 contactCount = 0;
-				dgBody* bodyArray[256];
-				dgContact* contactArray[256];
-
-				bodyArray[0] = body;
-				for (dgBodyMasterListRow::dgListNode* jointNode = body->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
-					dgBodyMasterListCell* const cell = &jointNode->GetInfo();
-					dgConstraint* const constraint = cell->m_joint;
-
-					if (constraint->IsActive() && (constraint->GetId() == dgConstraint::m_contactConstraint)) {
-						dgContact* const contactJoint = (dgContact*)constraint;
-						if (contactJoint->GetImpulseContactSpeed() > impactSpeed) {
-
-							contactArray[contactCount] = contactJoint;
-							bodyArray[bodyCount] = (contactJoint->GetBody1() != body) ? contactJoint->GetBody1() ? contactJoint->GetBody0();
-							contactCount++;
-							bodyCount++;
-							dgAssert(bodyCount < sizeof(bodyArray) / sizeof(bodyArray[0));
-						}
-					}
-				}
-			}
-		}
-*/
 	}
 }
 
 void dgWorldDynamicUpdate::ResolveImpulse(dgDownHeap<dgContact*, dgFloat32> impactJoints) const
 {
-	dgBody* bodyArray[256];
-	dgContact* contactArray[256];
+	class dgImpulseJoint
+	{
+		public:
+		dgContact* m_contact;
+		dgInt32 m_m0;
+		dgInt32 m_m1;
+	};
+
+	dgBody* bodyArray[DG_IMPULSE_COUNT];
+	dgImpulseJoint contactArray[DG_IMPULSE_COUNT];
 
 	while (impactJoints.GetCount()) {
 		dgContact* const contact = impactJoints[0];
@@ -308,7 +279,6 @@ void dgWorldDynamicUpdate::ResolveImpulse(dgDownHeap<dgContact*, dgFloat32> impa
 				body = body1;
 			}
 
-
 			dgInt32 bodyCount = 1;
 			dgInt32 contactCount = 0;
 			bodyArray[0] = body;
@@ -319,11 +289,21 @@ void dgWorldDynamicUpdate::ResolveImpulse(dgDownHeap<dgContact*, dgFloat32> impa
 				if (constraint->IsActive() && (constraint->GetId() == dgConstraint::m_contactConstraint)) {
 					dgContact* const contactJoint = (dgContact*)constraint;
 					if (contactJoint->GetImpulseContactSpeed() > DG_IMPULSE_CONTACT_SPEED) {
+						dgBody* const body0 = contactJoint->GetBody0();
+						dgBody* const body1 = contactJoint->GetBody1();
+						dgAssert ((body0 == body) || (body1 == body));
 
-						contactArray[contactCount] = contactJoint;
-						bodyArray[bodyCount] = (contactJoint->GetBody1() != body) ? contactJoint->GetBody1() : contactJoint->GetBody0();
-						contactCount++;
+						contactArray[contactCount].m_contact = contactJoint;
+
+						bodyArray[bodyCount] = (body1 != body) ? body1 : body0;
+						contactArray[contactCount].m_m0 = (body1 != body) ? 0 : bodyCount;
+						contactArray[contactCount].m_m1 = (body1 != body) ? bodyCount : 0;
+			
+						dgAssert (bodyArray[contactArray[contactCount].m_m0] == contactJoint->GetBody0());
+						dgAssert (bodyArray[contactArray[contactCount].m_m1] == contactJoint->GetBody1());
+
 						bodyCount++;
+						contactCount++;
 						dgAssert(bodyCount < sizeof(bodyArray) / sizeof(bodyArray[0]));
 					}
 				}

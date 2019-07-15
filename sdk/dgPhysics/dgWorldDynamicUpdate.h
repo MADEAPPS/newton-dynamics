@@ -27,14 +27,18 @@
 #include "dgWorldDynamicsParallelSolver.h"
 
 
-#define	DG_BODY_LRU_STEP				2	
-#define	DG_MAX_SKELETON_JOINT_COUNT		256
-#define DG_MAX_CONTINUE_COLLISON_STEPS	8
-#define	DG_SMALL_ISLAND_COUNT			2
+#define	DG_BODY_LRU_STEP					2	
+#define	DG_MAX_SKELETON_JOINT_COUNT			256
+#define DG_MAX_CONTINUE_COLLISON_STEPS		8
+#define	DG_SMALL_ISLAND_COUNT				2
 
-#define	DG_FREEZZING_VELOCITY_DRAG		dgFloat32 (0.9f)
-#define	DG_PSD_DAMP_TOL					dgFloat32 (1.0e-3f)
-#define	DG_SOLVER_MAX_ERROR				(DG_FREEZE_MAG * dgFloat32 (0.5f))
+#define	DG_FREEZZING_VELOCITY_DRAG			dgFloat32 (0.9f)
+#define	DG_PSD_DAMP_TOL						dgFloat32 (1.0e-3f)
+#define	DG_SOLVER_MAX_ERROR					(DG_FREEZE_MAG * dgFloat32 (0.5f))
+
+#define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
+#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(64)
+//#define DG_PARALLEL_JOINT_COUNT_CUT_OFF	(2)
 
 
 // the solver is a RK order 4, but instead of weighting the intermediate derivative by the usual 1/6, 1/3, 1/3, 1/6 coefficients
