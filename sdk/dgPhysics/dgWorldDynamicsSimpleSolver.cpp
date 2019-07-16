@@ -249,7 +249,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 	}
 
 	if (impactJoints.GetCount()) {
-		ResolveImpulse(constraintArrayPtr, leftHandSide, rightHandSide, impactJoints);
+		//ResolveImpulse(constraintArrayPtr, leftHandSide, rightHandSide, impactJoints);
 	}
 }
 
