@@ -237,9 +237,9 @@ dgMatrix dgMatrix::Inverse4x4 () const
 					pivot = pivot1;
 				}
 			}
-			dgAssert(pivot > dgFloat32(0.0f));
-			dgAssert((pivot > dgFloat32(1.0e-6f)) || (dgConditionNumber(4, 4, (dgFloat32*)&(*this)[0][0]) < dgFloat32(1.0e5f)));
 			if (permute != i) {
+				dgAssert(pivot > dgFloat32(0.0f));
+				dgAssert((pivot > dgFloat32(1.0e-6f)) || (dgConditionNumber(4, 4, (dgFloat32*)&(*this)[0][0]) < dgFloat32(1.0e5f)));
 				dgSwap(inv[i], inv[permute]);
 				dgSwap(tmp[i], tmp[permute]);
 			}
