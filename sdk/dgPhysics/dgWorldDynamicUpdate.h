@@ -274,7 +274,7 @@ class dgWorldDynamicUpdate
 
 	void CalculateImpulseVeloc(dgJointImpulseInfo* const jointInfo, const dgLeftHandSide* const leftHandSide, const dgRightHandSide* const rightHandSide, dgFloat32* const contactVeloc) const;
 	void ResolveImpulse(const dgJointInfo* const constraintArray, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dgDownHeap<dgContact*, dgFloat32>& impactJoints) const;
-	dgFloat32 CalculateJointImpulse(const dgJointImpulseInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide) const;
+	dgFloat32 CalculateJointImpulse(const dgJointImpulseInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgLeftHandSide* const matrixRow, const dgRightHandSide* const rightHandSide, dgFloat32* const relVel, dgFloat32* const outImpulse) const;
 
 	
 	dgInt32 m_bodies;

@@ -114,7 +114,7 @@ void NewtonCradle (DemoEntityManager* const scene)
 	int count = 1;
 	for (int i = 0; i < count; i ++) {
 		NewtonBody* const ballBody = CradleBall(scene, sphereMesh, mass, matrix, sphereCollision, defaultMaterialID, 1.0f);
-		NewtonBodySetForceAndTorqueCallback(ballBody, CraddleGravityForce);
+		//NewtonBodySetForceAndTorqueCallback(ballBody, CraddleGravityForce);
 
 		DemoEntity* const ballEntity = (DemoEntity*)NewtonBodyGetUserData(ballBody);
 		DemoEntity* ballString = new DemoEntity (stringMatrix, ballEntity);
