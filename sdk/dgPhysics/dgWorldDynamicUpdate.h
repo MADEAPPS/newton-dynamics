@@ -220,6 +220,7 @@ class dgRightHandSide
 class dgJacobianMemory
 {
 	public:
+	dgJacobianMemory() {}
 	void Init (dgWorld* const world, dgInt32 rowsCount, dgInt32 bodyCount);
 
 	dgJacobian* m_internalForcesBuffer;
@@ -275,18 +276,19 @@ class dgWorldDynamicUpdate
 	void CalculateImpulseVeloc(dgJointImpulseInfo* const jointInfo, const dgLeftHandSide* const leftHandSide, const dgRightHandSide* const rightHandSide, dgFloat32* const contactVeloc) const;
 	void ResolveImpulse(const dgJointInfo* const constraintArray, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dgDownHeap<dgContact*, dgFloat32>& impactJoints) const;
 	dgFloat32 CalculateJointImpulse(const dgJointImpulseInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgLeftHandSide* const matrixRow, const dgRightHandSide* const rightHandSide, dgFloat32* const relVel, dgFloat32* const outImpulse) const;
-
 	
+	dgJacobianMemory m_solverMemory;
+	dgParallelBodySolver m_parallelSolver;
+	dgBodyCluster* m_clusterData;
+
 	dgInt32 m_bodies;
 	dgInt32 m_joints;
 	dgInt32 m_clusters;
 	dgInt32 m_markLru;
 	dgInt32 m_softBodiesCount;
-	dgJacobianMemory m_solverMemory;
-	dgInt32 m_softBodyCriticalSectionLock;
-	dgBodyCluster* m_clusterData;
-	
-	dgParallelBodySolver m_parallelSolver;
+	mutable dgInt32 m_impulseLru;
+	mutable dgInt32 m_softBodyCriticalSectionLock;
+
 	static dgVector m_velocTol;
 
 	friend class dgWorld;

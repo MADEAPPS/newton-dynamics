@@ -72,13 +72,16 @@ void dgJacobianMemory::Init(dgWorld* const world, dgInt32 rowsCount, dgInt32 bod
 //////////////////////////////////////////////////////////////////////
 
 dgWorldDynamicUpdate::dgWorldDynamicUpdate(dgMemoryAllocator* const allocator)
-	:m_bodies(0)
+	:m_solverMemory()
+	,m_parallelSolver(allocator)
+	,m_clusterData(NULL)
+	,m_bodies(0)
 	,m_joints(0)
 	,m_clusters(0)
 	,m_markLru(0)
+	,m_softBodiesCount(0)
+	,m_impulseLru(0)
 	,m_softBodyCriticalSectionLock(0)
-	,m_clusterData(NULL)
-	,m_parallelSolver(allocator)
 {
 	m_parallelSolver.m_world = (dgWorld*) this;
 }

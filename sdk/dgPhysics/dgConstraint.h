@@ -167,6 +167,7 @@ class dgConstraint
 	dgInt32 GetMaxDOF() const;
 	virtual void ResetMaxDOF();
 	virtual dgFloat32 GetImpulseContactSpeed() const;
+	virtual void SetImpulseContactSpeed(dgFloat32 speed);
 	
 	void SetUserData (void *userData);
 	void SetCollidable (bool state);
@@ -214,6 +215,7 @@ class dgConstraint
 	ConstraintsForceFeeback m_updaFeedbackCallback;
 	dgInt32 m_clusterLRU;
 	dgUnsigned32 m_index;
+	dgUnsigned32 m_impulseLru;
 	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_maxDOF				: 6;
 	dgUnsigned32 m_constId				: 6;		
@@ -247,6 +249,7 @@ DG_INLINE dgConstraint::dgConstraint()
 	,m_updaFeedbackCallback(NULL)
 	,m_clusterLRU(-1)
 	,m_index(0)
+	,m_impulseLru(0)
 	,m_dynamicsLru(0)
 	,m_maxDOF(6)
 	,m_constId(m_unknownConstraint)
@@ -351,6 +354,10 @@ DG_INLINE void dgConstraint::SetSolverModel(dgInt32 model)
 }
 
 DG_INLINE void dgConstraint::ResetMaxDOF()
+{
+}
+
+DG_INLINE void dgConstraint::SetImpulseContactSpeed(dgFloat32 speed)
 {
 }
 

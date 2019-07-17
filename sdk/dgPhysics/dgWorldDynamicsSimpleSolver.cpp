@@ -212,8 +212,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 	constraintParams.m_invTimestep = (timestep > dgFloat32(1.0e-5f)) ? dgFloat32(1.0f / timestep) : dgFloat32(0.0f);
 	const dgFloat32 forceOrImpulseScale = (timestep > dgFloat32(0.0f)) ? dgFloat32(1.0f) : dgFloat32(0.0f);
 
-	dgJointInfo* const constraintArrayPtr = &world->m_jointsMemory[0];
-	dgJointInfo* const constraintArray = &constraintArrayPtr[cluster->m_jointStart];
+	dgJointInfo* const constraintArray = &world->m_jointsMemory[cluster->m_jointStart];
 	dgLeftHandSide* const leftHandSide = &m_solverMemory.m_leftHandSizeBuffer[cluster->m_rowStart];
 	dgRightHandSide* const rightHandSide = &m_solverMemory.m_righHandSizeBuffer[cluster->m_rowStart];
 
@@ -230,7 +229,6 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 		dgAssert(dgInt32(constraint->m_index) == i);
 		dgAssert(jointInfo->m_m0 < cluster->m_bodyCount);
 		dgAssert(jointInfo->m_m1 < cluster->m_bodyCount);
-		//dgAssert (constraint->m_index == dgUnsigned32(i));
 
 		rowCount = GetJacobianDerivatives(constraintParams, jointInfo, constraint, leftHandSide, rightHandSide, rowCount);
 		dgAssert(rowCount <= cluster->m_rowCount);
@@ -249,7 +247,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(dgBodyCluster* const cluster, dgI
 	}
 
 	if (impactJoints.GetCount()) {
-		//ResolveImpulse(constraintArrayPtr, leftHandSide, rightHandSide, impactJoints);
+//		ResolveImpulse(constraintArray, leftHandSide, rightHandSide, impactJoints);
 	}
 }
 
@@ -261,13 +259,14 @@ void dgWorldDynamicUpdate::ResolveImpulse(const dgJointInfo* const constraintArr
 	dgFloat32 relVeloc[DG_IMPULSE_COUNT];
 	dgFloat32 outImpulse[DG_IMPULSE_COUNT];
 
+	dgAtomicExchangeAndAdd(&m_impulseLru, 1);
 	while (impactJoints.GetCount()) {
 		dgContact* const contact = impactJoints[0];
 		impactJoints.Pop();
 		if (contact->GetImpulseContactSpeed() > DG_IMPULSE_CONTACT_SPEED) {
 			dgBody* body = contact->GetBody0();
 			dgBody* const otherBody = contact->GetBody1();
-			bool test = otherBody->GetInvMass().m_w >= dgFloat32(0.0f);
+			bool test = otherBody->GetInvMass().m_w > dgFloat32(0.0f);
 			test = test && (otherBody->m_veloc.DotProduct(otherBody->m_veloc).GetScalar() > body->m_veloc.DotProduct(body->m_veloc).GetScalar());
 			if (test) {
 				body = otherBody;
@@ -318,9 +317,12 @@ void dgWorldDynamicUpdate::ResolveImpulse(const dgJointInfo* const constraintArr
 				}
 			}
 
+			dgInt32 lru = dgAtomicExchangeAndAdd(&m_impulseLru, 1);
 			memset(outImpulse, 0, rowsCount * sizeof(dgFloat32));
 			for (dgInt32 i = 0; i < contactCount; i++) {
 				dgJointImpulseInfo* const jointInfo = &contactArray[i];
+				jointInfo->m_joint->m_impulseLru = lru;
+				jointInfo->m_joint->SetImpulseContactSpeed(dgFloat32 (0.0f));
 				const dgInt32 index = jointInfo->m_pairStart;
 				CalculateImpulseVeloc(jointInfo, &leftHandSide[index], &rightHandSide[index], &relVeloc[jointInfo->m_rhsStart]);
 			}
@@ -343,6 +345,20 @@ void dgWorldDynamicUpdate::ResolveImpulse(const dgJointInfo* const constraintArr
 				const dgVector omegaStep(impulseBody->m_invWorldInertiaMatrix.RotateVector(impulse[i].m_angular));
 				impulseBody->m_veloc += velocStep;
 				impulseBody->m_omega += omegaStep;
+			}
+
+			for (dgInt32 i = 0; i < bodyCount; i ++) {
+				dgBody* const fanBody = bodyArray[i].m_body;
+				if (fanBody->GetInvMass().m_w > dgFloat32 (0.0f)) {
+					for (dgBodyMasterListRow::dgListNode* jointNode = fanBody->m_masterNode->GetInfo().GetFirst(); jointNode; jointNode = jointNode->GetNext()) {
+						dgBodyMasterListCell* const cell = &jointNode->GetInfo();
+						dgConstraint* const constraint = cell->m_joint;
+
+						if ((constraint->m_index != lru) && constraint->IsActive() && (constraint->GetId() == dgConstraint::m_contactConstraint)) {
+							dgAssert (0);
+						}
+					}
+				}
 			}
 		}
 	}
