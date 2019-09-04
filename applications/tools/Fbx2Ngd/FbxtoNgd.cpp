@@ -92,7 +92,7 @@ static void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, Fb
 static void ImportSkinModifier(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxNode* const fbxMeshNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache);
 static void ImportTexture(FbxScene* const fbxScene, dScene* const ngdScene, FbxProperty pProperty, dScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache);
 static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* const fbxNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials, int boneId);
-static void PrepareSkeleton(FbxScene* const fbxScene);
+//static void PrepareSkeleton(FbxScene* const fbxScene);
 static dFloat CalculateAnimationPeriod(FbxScene* const fbxScene, FbxAnimLayer* const animLayer);
 static void ImportAnimations(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap);
 static void RemoveReflexionMatrices(dScene* const ngdScene);
@@ -377,7 +377,7 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene, bool import
 		ImportAnimations(ngdScene, fbxScene, nodeMap);
 	}
 }
-
+/*
 void PrepareSkeleton(FbxScene* const fbxScene)
 {
 	int stack = 1;
@@ -407,6 +407,7 @@ void PrepareSkeleton(FbxScene* const fbxScene)
 		}
 	}
 }
+*/
 
 void RemoveReflexionMatrices(dScene* const ngdScene)
 {
@@ -1015,7 +1016,8 @@ void LoadHierarchy(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeM
 		FbxNode* const fbxNode = data.m_fbxNode;
 		dMatrix localMatrix(fbxNode->EvaluateLocalTransform());
 
-		info->SetName(fbxNode->GetName());
+		const char* const name = fbxNode->GetName();
+		info->SetName(name);
 		info->SetTransform(localMatrix);
 		nodeMap.Insert(node, fbxNode);
 		dAssert (nodeMap.Find(fbxNode));

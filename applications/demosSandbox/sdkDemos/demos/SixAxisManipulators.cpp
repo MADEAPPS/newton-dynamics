@@ -390,6 +390,10 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		scene->Append(model);
 		model->ResetMatrix(*scene, origin);
 
+DemoEntity* const model1 = DemoEntity::LoadNGD_mesh("robot2.ngd", scene->GetNewton(), scene->GetShaderCache());
+scene->Append(model1);
+model1->ResetMatrix(*scene, origin);
+
 		dSixAxisController* const controller = (dSixAxisController*)CreateController();
 		controller->MakeKukaRobot(scene, model);
 		m_currentController = controller;
