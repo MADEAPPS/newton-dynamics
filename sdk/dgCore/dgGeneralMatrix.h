@@ -648,9 +648,10 @@ void dgGaussSeidelLcpSor(const dgInt32 size, const T* const matrix, T* const x, 
 // high(i) = infinity.
 // this the same as enforcing the constraint: x(i) * r(i) = 0
 template <class T>
-void dgGaussSeidelLCP(const dgInt32 size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T sor = T(1.3f))
+void dgGaussSeidelLCP(const dgInt32 size, const T* const matrix, T* const x, const T* const b, const T* const low, const T* const high, T sor = T(1.2f))
 {
-	dgGaussSeidelLcpSor(size, matrix, x, b, low, high, T(1.0e-5f), size * size, sor);
+	dgInt16* const clipped = dgAlloca(dgInt16, size);
+	dgGaussSeidelLcpSor(size, matrix, x, b, low, high, T(1.0e-3f), size * size, clipped, sor);
 }
 
 template<class T>

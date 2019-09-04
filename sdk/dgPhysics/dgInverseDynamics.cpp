@@ -1098,7 +1098,8 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalForc
 		b[i] -= r;
 	}
 
-	dgSolveDantzigLCP(m_auxiliaryRowCount, massMatrix11, u, b, low, high);
+	//dgSolveDantzigLCP(m_auxiliaryRowCount, massMatrix11, u, b, low, high);
+	dgGaussSeidelLCP(m_auxiliaryRowCount, massMatrix11, u, b, low, high);
 
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		const dgFloat32 s = u[i];
