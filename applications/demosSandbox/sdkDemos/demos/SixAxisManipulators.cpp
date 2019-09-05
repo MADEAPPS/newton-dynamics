@@ -27,16 +27,18 @@ struct dArmRobotConfig
 	dFloat m_maxLimit;
 };
 
-static dArmRobotConfig armRobotConfig[] =
-{
-	{ "bone_base", 210.0f, -1000.0f, 1000.0f},
-	{ "bone_base1", 200.0f, -1000.0f, 1000.0f},
-	{ "bone_arm0", 180.0f, -45.0f, 135.0f},
-	{ "bone_arm1", 160.0f, -90.0f, 35.0f},
-	{ "effector_arm", 1000.0f, 0.0f, 0.0f}
-};
 
 #if 1
+
+static dArmRobotConfig armRobotConfig[] =
+{
+	{ "bone_base", 210.0f, -1000.0f, 1000.0f },
+	{ "bone_base1", 200.0f, -1000.0f, 1000.0f },
+	{ "bone_arm0", 180.0f, -45.0f, 135.0f },
+	{ "bone_arm1", 160.0f, -90.0f, 35.0f },
+	{ "effector_arm", 1000.0f, 0.0f, 0.0f }
+};
+
 class dSixAxisController: public dCustomControllerBase
 {
 	public:
@@ -418,6 +420,111 @@ model1->ResetMatrix(*scene, origin);
 
 #else
 
+class dSixAxisRobot: public dAnimationRagdollRoot
+{
+	public:
+	dSixAxisRobot(NewtonBody* const body, const dMatrix& bindMarix)
+		:dAnimationRagdollRoot(body, bindMarix)
+//		,m_hipEffector(NULL)
+//		,m_leftFootEffector__(NULL)
+//		,m_rightFootEffector__(NULL)
+	{
+	}
+
+	~dSixAxisRobot()
+	{
+	}
+
+/*
+	void SetHipEffector(dAnimationJoint* const hip)
+	{
+		m_hipEffector = new dKinematicEndEffector(hip);
+		m_loopJoints.Append(m_hipEffector);
+	}
+
+	void SetLeftFootEffector(dAnimationJoint* const joint)
+	{
+		m_leftFootEffector__ = new dKinematicEndEffector(joint);
+		m_loopJoints.Append(m_leftFootEffector__);
+	}
+
+	void SetRightFootEffector(dAnimationJoint* const joint)
+	{
+		m_rightFootEffector__ = new dKinematicEndEffector(joint);
+		m_loopJoints.Append(m_rightFootEffector__);
+	}
+
+	dVector CalculateEffectorOrigin(dAnimationRagDollEffector* const hipEffector) const
+	{
+		return dVector(0.0f);
+	}
+
+	void SelftBalance()
+	{
+	}
+*/
+
+	void PreUpdate(dFloat timestep)
+	{
+//		dAssert(0);
+/*
+		// do most of the control here, so that the is no need do subclass  
+		//dDynamicsRagdoll* const ragDoll = (dDynamicsRagdoll*)model;
+		NewtonBody* const rootBody = GetBody();
+		NewtonBodySetSleepState(rootBody, 0);
+
+		// get pivot 
+		dMatrix rootMatrix;
+		//		dMatrix pivotMatrix;
+		NewtonBodyGetMatrix(GetBody(), &rootMatrix[0][0]);
+
+		dVector com(CalculateCenterOfMass());
+
+		if (m_leftFootEffector__) {
+			dMatrix footMatrix(m_leftFootEffector__->GetMatrix());
+			m_leftFootEffector__->SetTarget(footMatrix);
+		}
+
+		if (m_rightFootEffector__) {
+			dMatrix footMatrix(m_rightFootEffector__->GetMatrix());
+			m_rightFootEffector__->SetTarget(footMatrix);
+		}
+*/
+
+		/*
+		NewtonBodyGetMatrix(ragDoll->m_leftFootEffector->GetBody(), &pivotMatrix[0][0]);
+
+		dVector comRadius (com - pivotMatrix.m_posit);
+		dVector bodyRadius (rootMatrix.m_posit - pivotMatrix.m_posit);
+
+		dFloat r0 = dSqrt(comRadius.DotProduct3(comRadius));
+		dFloat r1 = dSqrt(bodyRadius.DotProduct3(bodyRadius));
+
+		dVector updir (0.0f, 1.0f, 0.0f, 0.0f);
+		dVector p1 (pivotMatrix.m_posit + updir.Scale (r0));
+		dVector targtePosit (rootMatrix.m_posit + (p1 - com).Scale (r1/r0));
+		targtePosit.m_w = 1.0f;
+		*/
+		dMatrix matrix(dPitchMatrix(0.0f * dDegreeToRad) * dYawMatrix(0.0f * dDegreeToRad) * dRollMatrix(0.0f * dDegreeToRad));
+		//com.m_y = rootMatrix.m_posit.m_y;
+		//com.m_w = 1.0f;
+		//matrix.m_posit = rootMatrix.m_posit;
+		//matrix.m_posit = com;
+
+		//matrix.m_posit = rootMatrix.m_posit;
+		//m_hipEffector->SetTarget(matrix);
+
+		//dVector error(matrix.m_posit - rootMatrix.m_posit);
+		//dTrace(("%f %f %f\n", error[0], error[1], error[2]));
+
+	}
+
+//	dAnimationRagDollEffector* m_hipEffector;
+//	dAnimationRagDollEffector* m_leftFootEffector__;
+//	dAnimationRagDollEffector* m_rightFootEffector__;
+};
+
+
 class dSixAxisManager: public dAnimationModelManager
 {
 	public:
@@ -477,22 +584,22 @@ class dSixAxisManager: public dAnimationModelManager
 
 		// add the root childBody
 		NewtonBody* const rootBody = CreateBodyPart(modelEntity);
+		dAssert(rootBody);
 
-/*
 		// build the rag doll with rigid bodies connected by joints
-		dKinematicRagdoll* const dynamicRagdoll = new dKinematicRagdoll(rootBody, dGetIdentityMatrix());
-		AddModel(dynamicRagdoll);
-		dynamicRagdoll->SetCalculateLocalTransforms(true);
-
+		dSixAxisRobot* const robot = new dSixAxisRobot(rootBody, dGetIdentityMatrix());
+		AddModel(robot);
+		robot->SetCalculateLocalTransforms(true);
+/*
 		// save the controller as the collision user data, for collision culling
-		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBody), dynamicRagdoll);
+		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBody), robot);
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];
 		dAnimationJoint* parentBones[32];
 
 		for (DemoEntity* child = modelEntity->GetChild(); child; child = child->GetSibling()) {
-			parentBones[stackIndex] = dynamicRagdoll;
+			parentBones[stackIndex] = robot;
 			childEntities[stackIndex] = child;
 			stackIndex++;
 		}
@@ -524,7 +631,7 @@ class dSixAxisManager: public dAnimationModelManager
 			}
 		}
 
-		SetModelMass(100.0f, dynamicRagdoll);
+		SetModelMass(100.0f, robot);
 
 		// transform the entire contraction to its location
 		dMatrix worldMatrix(modelEntity->GetCurrentMatrix() * location);
@@ -533,29 +640,53 @@ class dSixAxisManager: public dAnimationModelManager
 
 
 		// attach effectors here
-		for (dAnimationJoint* joint = GetFirstJoint(dynamicRagdoll); joint; joint = GetNextJoint(joint)) {
+		for (dAnimationJoint* joint = GetFirstJoint(robot); joint; joint = GetNextJoint(joint)) {
 			if (joint->GetAsRoot()) {
-				dAssert(dynamicRagdoll == joint);
-				dynamicRagdoll->SetHipEffector(joint);
+				dAssert(robot == joint);
+				robot->SetHipEffector(joint);
 			}
 			else if (joint->GetAsLeaf()) {
 				NewtonBody* const body = joint->GetBody();
 				DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
 				if (entity->GetName().Find("left") != -1) {
-					dynamicRagdoll->SetLeftFootEffector(joint);
+					robot->SetLeftFootEffector(joint);
 				}
 				else if (entity->GetName().Find("right") != -1) {
-					dynamicRagdoll->SetRightFootEffector(joint);
+					robot->SetRightFootEffector(joint);
 				}
 			}
 		}
 
 
-		dynamicRagdoll->Finalize();
+		robot->Finalize();
 */
 	}
 
 	private:
+
+	static void ClampAngularVelocity(const NewtonBody* body, dFloat timestep, int threadIndex)
+	{
+		dVector omega;
+		NewtonBodyGetOmega(body, &omega[0]);
+		omega.m_w = 0.0f;
+		dFloat mag2 = omega.DotProduct3(omega);
+		if (mag2 > (100.0f * 100.0f)) {
+			omega = omega.Normalize().Scale(100.0f);
+			NewtonBodySetOmega(body, &omega[0]);
+		}
+
+		//PhysicsApplyGravityForce(body, timestep, threadIndex);
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		dFloat mass;
+
+		dFloat gravity = -0.0f;
+		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+		dVector dir(0.0f, gravity, 0.0f);
+		dVector force(dir.Scale(mass));
+		NewtonBodySetForce(body, &force.m_x);
+	}
 
 	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart)
 	{
@@ -580,16 +711,13 @@ class dSixAxisManager: public dAnimationModelManager
 		//NewtonBodySetMaterialGroupID(bone, m_material);
 
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
-		//NewtonBodySetForceAndTorqueCallback (bone, PhysicsApplyGravityForce);
+		NewtonBodySetForceAndTorqueCallback (bone, PhysicsApplyGravityForce);
 		//NewtonBodySetForceAndTorqueCallback(bone, ClampAngularVelocity);
 
 		// destroy the collision helper shape 
 		NewtonDestroyCollision(shape);
 		return bone;
 	}
-
-
-
 };
 
 #endif
