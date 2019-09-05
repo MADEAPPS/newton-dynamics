@@ -413,7 +413,7 @@ class dKinematicRagdollManager: public dAnimationModelManager
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
-		DemoEntity* const modelEntity = DemoEntity::LoadNGD_mesh(modelName, GetWorld(), scene->GetShaderCache());
+		DemoEntity* const modelEntity = DemoEntity::LoadNGD_mesh(modelName, world, scene->GetShaderCache());
 
 		dMatrix matrix0(modelEntity->GetCurrentMatrix());
 		//matrix0.m_posit = location;

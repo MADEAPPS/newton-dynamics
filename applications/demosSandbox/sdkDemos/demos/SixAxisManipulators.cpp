@@ -191,7 +191,7 @@ class dSixAxisController: public dCustomControllerBase
 		return body;
 	}
 
-	void MakeKukaRobot(DemoEntityManager* const scene, DemoEntity* const model)
+	void MakeSixAxisRobot(DemoEntityManager* const scene, DemoEntity* const model)
 	{
 		m_kinematicSolver = NewtonCreateInverseDynamics(scene->GetNewton());
 
@@ -383,7 +383,7 @@ class dSixAxisManager: public dCustomControllerManager<dSixAxisController>
 		return (dSixAxisController*)dCustomControllerManager<dSixAxisController>::CreateController();
 	}
 
-	dSixAxisController* MakeKukaRobot(DemoEntityManager* const scene, const dMatrix& origin)
+	dSixAxisController* MakeSixAxisRobot(DemoEntityManager* const scene, const dMatrix& origin)
 	{
 		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton(), scene->GetShaderCache());
 
@@ -395,7 +395,7 @@ scene->Append(model1);
 model1->ResetMatrix(*scene, origin);
 
 		dSixAxisController* const controller = (dSixAxisController*)CreateController();
-		controller->MakeKukaRobot(scene, model);
+		controller->MakeSixAxisRobot(scene, model);
 		m_currentController = controller;
 		return controller;
 	}
@@ -432,6 +432,164 @@ class dSixAxisManager: public dAnimationModelManager
 	{
 	}
 
+	virtual void OnUpdateTransform(const dAnimationJoint* const bone, const dMatrix& localMatrix) const
+	{
+		dAssert(0);
+/*
+		// calculate the local transform for this player body
+		NewtonBody* const body = bone->GetBody();
+		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(body);
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
+
+		dQuaternion rot(localMatrix);
+		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
+*/
+	}
+
+
+	void MakeSixAxisRobot(DemoEntityManager* const scene, const dMatrix& origin)
+	{
+/*
+		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton(), scene->GetShaderCache());
+
+		scene->Append(model);
+		model->ResetMatrix(*scene, origin);
+
+		DemoEntity* const model1 = DemoEntity::LoadNGD_mesh("robot2.ngd", scene->GetNewton(), scene->GetShaderCache());
+		scene->Append(model1);
+		model1->ResetMatrix(*scene, origin);
+
+		dSixAxisController* const controller = (dSixAxisController*)CreateController();
+		controller->MakeSixAxisRobot(scene, model);
+		m_currentController = controller;
+		return controller;
+*/
+
+		NewtonWorld* const world = GetWorld();
+		dAssert (scene == (DemoEntityManager*)NewtonWorldGetUserData(world));
+
+		DemoEntity* const modelEntity = DemoEntity::LoadNGD_mesh("robot2.ngd", world, scene->GetShaderCache());
+
+		//dMatrix matrix0(modelEntity->GetCurrentMatrix());
+		//matrix0.m_posit = location;
+		modelEntity->ResetMatrix(*scene, origin);
+		scene->Append(modelEntity);
+
+		// add the root childBody
+		NewtonBody* const rootBody = CreateBodyPart(modelEntity);
+
+/*
+		// build the rag doll with rigid bodies connected by joints
+		dKinematicRagdoll* const dynamicRagdoll = new dKinematicRagdoll(rootBody, dGetIdentityMatrix());
+		AddModel(dynamicRagdoll);
+		dynamicRagdoll->SetCalculateLocalTransforms(true);
+
+		// save the controller as the collision user data, for collision culling
+		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBody), dynamicRagdoll);
+
+		int stackIndex = 0;
+		DemoEntity* childEntities[32];
+		dAnimationJoint* parentBones[32];
+
+		for (DemoEntity* child = modelEntity->GetChild(); child; child = child->GetSibling()) {
+			parentBones[stackIndex] = dynamicRagdoll;
+			childEntities[stackIndex] = child;
+			stackIndex++;
+		}
+
+		// walk model hierarchic adding all children designed as rigid body bones. 
+		while (stackIndex) {
+			stackIndex--;
+			DemoEntity* const entity = childEntities[stackIndex];
+			const char* const name = entity->GetName().GetStr();
+			dTrace(("%s\n", name));
+			dAnimationJoint* parentNode = parentBones[stackIndex];
+
+			for (int i = 0; i < size; i++) {
+				if (!strcmp(defintion[i].m_boneName, name)) {
+					NewtonBody* const childBody = CreateBodyPart(entity);
+
+					// connect this body part to its parent with a rag doll joint
+					parentNode = CreateChildNode(childBody, parentNode, defintion[i]);
+
+					NewtonCollisionSetUserData(NewtonBodyGetCollision(childBody), parentNode);
+					break;
+				}
+			}
+
+			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
+				parentBones[stackIndex] = parentNode;
+				childEntities[stackIndex] = child;
+				stackIndex++;
+			}
+		}
+
+		SetModelMass(100.0f, dynamicRagdoll);
+
+		// transform the entire contraction to its location
+		dMatrix worldMatrix(modelEntity->GetCurrentMatrix() * location);
+		worldMatrix.m_posit = location.m_posit;
+		NewtonBodySetMatrixRecursive(rootBody, &worldMatrix[0][0]);
+
+
+		// attach effectors here
+		for (dAnimationJoint* joint = GetFirstJoint(dynamicRagdoll); joint; joint = GetNextJoint(joint)) {
+			if (joint->GetAsRoot()) {
+				dAssert(dynamicRagdoll == joint);
+				dynamicRagdoll->SetHipEffector(joint);
+			}
+			else if (joint->GetAsLeaf()) {
+				NewtonBody* const body = joint->GetBody();
+				DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(body);
+				if (entity->GetName().Find("left") != -1) {
+					dynamicRagdoll->SetLeftFootEffector(joint);
+				}
+				else if (entity->GetName().Find("right") != -1) {
+					dynamicRagdoll->SetRightFootEffector(joint);
+				}
+			}
+		}
+
+
+		dynamicRagdoll->Finalize();
+*/
+	}
+
+	private:
+
+	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart)
+	{
+		NewtonWorld* const world = GetWorld();
+		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
+		dAssert(shape);
+
+		// calculate the bone matrix
+		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
+
+		// create the rigid body that will make this bone
+		NewtonBody* const bone = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		//NewtonBodySetMassProperties (bone, definition.m_mass, shape);
+		NewtonBodySetMassProperties(bone, 1.0f, shape);
+
+		// save the user data with the bone body (usually the visual geometry)
+		NewtonBodySetUserData(bone, bodyPart);
+
+		// assign the material for early collision culling
+		//NewtonBodySetMaterialGroupID(bone, m_material);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		//NewtonBodySetForceAndTorqueCallback (bone, PhysicsApplyGravityForce);
+		//NewtonBodySetForceAndTorqueCallback(bone, ClampAngularVelocity);
+
+		// destroy the collision helper shape 
+		NewtonDestroyCollision(shape);
+		return bone;
+	}
+
+
+
 };
 
 #endif
@@ -455,8 +613,8 @@ count = 1;
 origin = dGetIdentityMatrix();
 origin.m_posit.m_x = 2.0f;
 	for (int i = 0; i < count; i ++) {
-		robotManager->MakeKukaRobot (scene, origin);
-//		robotManager->MakeKukaRobot (scene, origin1);
+		robotManager->MakeSixAxisRobot (scene, origin);
+//		robotManager->MakeSixAxisRobot (scene, origin1);
 		origin.m_posit.m_x += 1.0f;
 		origin1.m_posit.m_x += 1.0f;
 	}
