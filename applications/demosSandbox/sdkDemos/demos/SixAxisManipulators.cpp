@@ -36,7 +36,7 @@ static dArmRobotConfig armRobotConfig[] =
 	{ "effector_arm", 1000.0f, 0.0f, 0.0f}
 };
 
-
+#if 1
 class dSixAxisController: public dCustomControllerBase
 {
 	public:
@@ -415,6 +415,27 @@ model1->ResetMatrix(*scene, origin);
 	dFloat32 m_gripper_roll;
 	dFloat32 m_gripper_pitch;
 };
+
+#else
+
+class dSixAxisManager: public dAnimationModelManager
+{
+	public:
+	dSixAxisManager(DemoEntityManager* const scene)
+		:dAnimationModelManager(scene->GetNewton())
+		//, m_currentRig(NULL)
+	{
+		//scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
+	}
+
+	~dSixAxisManager()
+	{
+	}
+
+};
+
+#endif
+
 
 
 void SixAxisManipulators(DemoEntityManager* const scene)
