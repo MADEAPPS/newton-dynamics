@@ -28,7 +28,7 @@ struct dArmRobotConfig
 };
 
 
-#if 1
+#if 0
 
 static dArmRobotConfig armRobotConfig[] =
 {
@@ -420,6 +420,48 @@ model1->ResetMatrix(*scene, origin);
 
 #else
 
+
+class dRobotJointDefinition
+{
+	public:
+	struct dJointLimit
+	{
+		dFloat m_minTwistAngle;
+		dFloat m_maxTwistAngle;
+		dFloat m_coneAngle;
+	};
+
+	struct dFrameMatrix
+	{
+		dFloat m_pitch;
+		dFloat m_yaw;
+		dFloat m_roll;
+	};
+
+	char m_boneName[32];
+	dFloat m_friction;
+	dJointLimit m_jointLimits;
+	dFrameMatrix m_frameBasics;
+	dAnimationRagdollJoint::dRagdollMotorType m_type;
+};
+
+
+static dRobotJointDefinition robot2Definition[] =
+{
+	{ "bone_base000" },
+
+	{ "bone_base001", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_threeDof },
+//	{ "bone_righCalf", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 90.0f }, dAnimationRagdollJoint::m_oneDof },
+//	{ "bone_rightAnkle", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 90.0f }, dAnimationRagdollJoint::m_zeroDof },
+//	{ "bone_rightFoot", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, -90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
+
+//	{ "bone_leftLeg", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_threeDof },
+//	{ "bone_leftCalf", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 90.0f }, dAnimationRagdollJoint::m_oneDof },
+//	{ "bone_leftAnkle", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 90.0f }, dAnimationRagdollJoint::m_zeroDof },
+//	{ "bone_leftFoot", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, -90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
+};
+
+
 class dSixAxisRobot: public dAnimationRagdollRoot
 {
 	public:
@@ -541,8 +583,6 @@ class dSixAxisManager: public dAnimationModelManager
 
 	virtual void OnUpdateTransform(const dAnimationJoint* const bone, const dMatrix& localMatrix) const
 	{
-		dAssert(0);
-/*
 		// calculate the local transform for this player body
 		NewtonBody* const body = bone->GetBody();
 		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(body);
@@ -550,9 +590,7 @@ class dSixAxisManager: public dAnimationModelManager
 
 		dQuaternion rot(localMatrix);
 		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
-*/
 	}
-
 
 	void MakeSixAxisRobot(DemoEntityManager* const scene, const dMatrix& origin)
 	{
@@ -590,7 +628,7 @@ class dSixAxisManager: public dAnimationModelManager
 		dSixAxisRobot* const robot = new dSixAxisRobot(rootBody, dGetIdentityMatrix());
 		AddModel(robot);
 		robot->SetCalculateLocalTransforms(true);
-/*
+
 		// save the controller as the collision user data, for collision culling
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBody), robot);
 
@@ -630,7 +668,7 @@ class dSixAxisManager: public dAnimationModelManager
 				stackIndex++;
 			}
 		}
-
+/*
 		SetModelMass(100.0f, robot);
 
 		// transform the entire contraction to its location

@@ -51,7 +51,7 @@ static dKinematiocJointDefinition GaitTestDefinition[] =
 };
 
 
-static dKinematiocJointDefinition TredDefinition[] =
+static dKinematiocJointDefinition tredDefinition[] =
 {
 	{ "bone_pelvis" },
 
@@ -238,7 +238,6 @@ class dKinematicRagdoll: public dAnimationRagdollRoot
 
 	void SelftBalance()
 	{
-
 	}
 
 	void PreUpdate(dFloat timestep)
@@ -542,8 +541,8 @@ void KinematicRagdoll(DemoEntityManager* const scene)
 //	const int definitionCount = sizeof(GaitTestDefinition) / sizeof(GaitTestDefinition[0]);
 //	manager->CreateKinematicModel("selfbalance_01.ngd", origin, GaitTestDefinition, definitionCount);
 
-	const int definitionCount = sizeof(TredDefinition) / sizeof(TredDefinition[0]);
-	manager->CreateKinematicModel("tred.ngd", origin, TredDefinition, definitionCount);
+	const int definitionCount = sizeof(tredDefinition) / sizeof(tredDefinition[0]);
+	manager->CreateKinematicModel("tred.ngd", origin, tredDefinition, definitionCount);
 
 	origin.m_posit.m_x = -8.0f;
 	origin.m_posit.m_y = 1.0f;
