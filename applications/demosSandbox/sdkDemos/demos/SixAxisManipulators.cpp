@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2016> <Newton Game Dynamics>
+/* Copyright (c) <2003-2019> <Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -641,7 +641,7 @@ class dSixAxisManager: public dAnimationModelManager
 			childEntities[stackIndex] = child;
 			stackIndex++;
 		}
-
+/*
 		// walk model hierarchic adding all children designed as rigid body bones. 
 		while (stackIndex) {
 			stackIndex--;
@@ -668,7 +668,7 @@ class dSixAxisManager: public dAnimationModelManager
 				stackIndex++;
 			}
 		}
-/*
+
 		SetModelMass(100.0f, robot);
 
 		// transform the entire contraction to its location
