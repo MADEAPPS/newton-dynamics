@@ -461,7 +461,7 @@ static dRobotJointDefinition robot2Definition[] =
 //	{ "bone_leftFoot", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, -90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
 };
 
-
+#if 0
 class dSixAxisRobot: public dAnimationRagdollRoot
 {
 	public:
@@ -757,6 +757,104 @@ class dSixAxisManager: public dAnimationModelManager
 		return bone;
 	}
 };
+#endif
+
+
+
+class dSixAxisManager: public dModelManager
+{
+public:
+	dSixAxisManager(DemoEntityManager* const scene)
+		:dModelManager(scene->GetNewton())
+//		,m_currentController(NULL)
+//		,m_azimuth(0.0f)
+//		,m_posit_x(0.0f)
+//		,m_posit_y(0.0f)
+//		,m_gripper_roll(0.0f)
+//		,m_gripper_pitch(0.0f)
+	{
+//			scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
+	}
+
+	~dSixAxisManager()
+	{
+	}
+
+/*
+	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
+	{
+		dSixAxisManager* const me = (dSixAxisManager*)context;
+
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print(color, "Use sliders to manipulate robot");
+		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -150.0f, 150.0f);
+		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
+		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
+
+		//		ImGui::Separator();
+		//		ImGui::Separator();
+		//		ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
+		//		ImGui::SliderFloat("eff_pitch", &me->m_gripper_pitch, -60.0f, 60.0f);
+
+		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
+			dSixAxisController* const controller = &node->GetInfo();
+			controller->SetTarget(me->m_posit_x, me->m_posit_y, me->m_azimuth * dDegreeToRad, me->m_gripper_pitch * dDegreeToRad, me->m_gripper_roll * dDegreeToRad);
+		}
+	}
+
+	virtual dSixAxisController* CreateController()
+	{
+		return (dSixAxisController*)dCustomControllerManager<dSixAxisController>::CreateController();
+	}
+
+	dSixAxisController* MakeSixAxisRobot(DemoEntityManager* const scene, const dMatrix& origin)
+	{
+		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton(), scene->GetShaderCache());
+
+		scene->Append(model);
+		model->ResetMatrix(*scene, origin);
+
+		DemoEntity* const model1 = DemoEntity::LoadNGD_mesh("robot2.ngd", scene->GetNewton(), scene->GetShaderCache());
+		scene->Append(model1);
+		model1->ResetMatrix(*scene, origin);
+
+		dSixAxisController* const controller = (dSixAxisController*)CreateController();
+		controller->MakeSixAxisRobot(scene, model);
+		m_currentController = controller;
+		return controller;
+	}
+
+	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+	{
+		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+			dSixAxisController* const controller = &node->GetInfo();
+			controller->Debug(debugContext);
+		}
+	}
+*/
+
+	void MakeSixAxisRobot(DemoEntityManager* const scene, const dMatrix& origin)
+	{
+		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robot2.ngd", scene->GetNewton(), scene->GetShaderCache());
+		scene->Append(model);
+		model->ResetMatrix(*scene, origin);
+
+		//dSixAxisController* const controller = (dSixAxisController*)CreateController();
+		//controller->MakeSixAxisRobot(scene, model);
+		//m_currentController = controller;
+		//return controller;
+	}
+
+/*
+	dSixAxisController* m_currentController;
+	dFloat32 m_azimuth;
+	dFloat32 m_posit_x;
+	dFloat32 m_posit_y;
+	dFloat32 m_gripper_roll;
+	dFloat32 m_gripper_pitch;
+*/
+};
+
 
 #endif
 

@@ -193,6 +193,11 @@ typedef long long unsigned64;
 #include <dStdAfxNewton.h>
 #include <dNewtonMesh.h>
 
+
+#include <dModelManager.h>
+
+
+
 #include <dAnimationStdAfx.h>
 #include <dAnimationJoint.h>
 #include <dAnimationLoopJoint.h>
