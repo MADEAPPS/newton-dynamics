@@ -20,7 +20,6 @@ dModelNode::dModelNode(NewtonBody* const modelBody, const dMatrix& bindMatrix, d
 	,m_children()
 {
 	if (m_parent) {
-		dAssert (0);
 		dList<dPointer<dModelNode>>::dListNode* const node = m_parent->m_children.Append();
 		node->GetInfo().SetData(this);
 	}
