@@ -763,7 +763,7 @@ class dSixAxisManager: public dAnimationModelManager
 
 class dSixAxisManager: public dModelManager
 {
-public:
+	public:
 	dSixAxisManager(DemoEntityManager* const scene)
 		:dModelManager(scene->GetNewton())
 //		,m_currentController(NULL)
@@ -838,6 +838,9 @@ public:
 		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robot2.ngd", scene->GetNewton(), scene->GetShaderCache());
 		scene->Append(model);
 		model->ResetMatrix(*scene, origin);
+
+		dModelRootNode* root = new dModelRootNode();
+		AddRoot(root);
 
 		//dSixAxisController* const controller = (dSixAxisController*)CreateController();
 		//controller->MakeSixAxisRobot(scene, model);

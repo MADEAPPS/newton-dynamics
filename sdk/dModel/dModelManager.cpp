@@ -13,7 +13,7 @@
 #include "dModelManager.h"
 
 dModelManager::dModelManager(NewtonWorld* const world, const char* const name)
-	:dCustomTransformManager(world, name)
+	:dCustomParallelListener(world, name)
 	//,m_controllerList()
 	//,m_timestep(0.0f)
 {
@@ -132,7 +132,7 @@ void dModelManager::PostUpdate(dFloat timestep, int threadID)
 }
 */
 
-
+/*
 void dModelManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 {
 	dAssert (0);
@@ -146,4 +146,11 @@ void dModelManager::OnPreUpdate(dCustomTransformController* const controller, dF
 void dModelManager::OnUpdateTransform(const dCustomTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 {
 	dAssert (0);
+}
+*/
+
+void dModelManager::AddRoot(dModelRootNode* const root)
+{
+	dList<dPointer<dModelRootNode>>::dListNode* const node = m_controllerList.Append();
+	node->GetInfo().SetData(root);
 }

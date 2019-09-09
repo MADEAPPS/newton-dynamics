@@ -18,25 +18,38 @@ template <typename T>
 class dPointer
 {
 	public:
-	dPointer(T* const pValue);
+	dPointer();
+	dPointer(T* const data);
 	~dPointer();
 	T& operator* ();
 	T* operator-> ();
+
+	T* GetData() const;
+	void SetData(T* const data);
 
 	private:
 	T* m_data; 
 };
 
 template<class T>
-dPointer<T>::dPointer(T* pValue)
-	:m_data(pValue)
+dPointer<T>::dPointer()
+	:m_data(NULL)
+{
+}
+
+
+template<class T>
+dPointer<T>::dPointer(T* const data)
+	:m_data(data)
 {
 }
 
 template<class T>
 dPointer<T>::~dPointer()
 {
-	delete m_data;
+	if (m_data) {
+		delete m_data;
+	}
 }
 
 template<class T>
@@ -49,6 +62,18 @@ template<class T>
 T* dPointer<T>::operator-> ()
 {
 	return m_data;
+}
+
+template<class T>
+T* dPointer<T>::GetData() const
+{
+	return m_data;
+}
+
+template<class T>
+void dPointer<T>::SetData(T* const data)
+{
+	m_data = data;
 }
 
 #endif

@@ -56,6 +56,7 @@
 #include <dTree.h>
 #include <dRtti.h>
 #include <dArray.h>
+#include <dPointer.h>
 #include <dClassInfo.h>
 #include <dRefCounter.h>
 

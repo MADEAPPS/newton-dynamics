@@ -13,19 +13,19 @@
 #ifndef __D_MODEL_MANAGER_H__
 #define __D_MODEL_MANAGER_H__
 
-//#include "dModelStdAfx.h"
-//#include "dAnimationJoint.h"
-//#include "dAnimationJointRoot.h"
-#include <dCustomTransformManager.h>
+#include "dModelStdAfx.h"
+#include "dModelRootNode.h"
 
 #define D_MODEL_MANAGER	"__dModelManager__"
 
-class dModelManager: public dCustomTransformManager
+
+class dModelManager: public dCustomParallelListener
 {
 	public:
 	dModelManager(NewtonWorld* const world, const char* const name = D_MODEL_MANAGER);
 	virtual ~dModelManager();
 
+	void AddRoot(dModelRootNode* const root);
 	//dAnimationJointRoot* CreateModel(NewtonBody* const bone, const dMatrix& bindMatrix);
 //	void AddModel(dAnimationJointRoot* const model);
 //	void RemoveModel(dAnimationJointRoot* const model);
@@ -36,9 +36,9 @@ class dModelManager: public dCustomTransformManager
 	//virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext) = 0;
 //	virtual void OnUpdateTransform(const dAnimationJoint* const bone, const dMatrix& localMatrix) const = 0;
 
-	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
-	virtual void OnPreUpdate(dCustomTransformController* const controller, dFloat timestep, int threadIndex) const;
-	virtual void OnUpdateTransform(const dCustomTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const;
+//	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
+//	virtual void OnPreUpdate(dCustomTransformController* const controller, dFloat timestep, int threadIndex) const;
+//	virtual void OnUpdateTransform(const dCustomTransformController::dModelNode* const bone, const dMatrix& localMatrix) const;
 
 	protected:
 //	virtual void OnDestroy();
@@ -51,8 +51,8 @@ class dModelManager: public dCustomTransformManager
 //	dAnimationJoint* GetFirstJoint(const dAnimationJoint* const joint) const;
 
 	private:
-//	dList<dAnimationJointRoot*> m_controllerList;
-//	dFloat m_timestep;
+	dList<dPointer<dModelRootNode> > m_controllerList;
+	dFloat m_timestep;
 };
 
 
