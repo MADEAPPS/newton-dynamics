@@ -833,20 +833,81 @@ class dSixAxisManager: public dModelManager
 	}
 */
 
+	static void ClampAngularVelocity(const NewtonBody* body, dFloat timestep, int threadIndex)
+	{
+		dVector omega;
+		NewtonBodyGetOmega(body, &omega[0]);
+		omega.m_w = 0.0f;
+		dFloat mag2 = omega.DotProduct3(omega);
+		if (mag2 > (100.0f * 100.0f)) {
+			omega = omega.Normalize().Scale(100.0f);
+			NewtonBodySetOmega(body, &omega[0]);
+		}
+
+		PhysicsApplyGravityForce(body, timestep, threadIndex);
+	}
+
+	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart)
+	{
+		NewtonWorld* const world = GetWorld();
+		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
+		dAssert(shape);
+
+		// calculate the bone matrix
+		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
+
+		// create the rigid body that will make this bone
+		NewtonBody* const bone = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		//NewtonBodySetMassProperties (bone, definition.m_mass, shape);
+		NewtonBodySetMassProperties(bone, 1.0f, shape);
+
+		// save the user data with the bone body (usually the visual geometry)
+		NewtonBodySetUserData(bone, bodyPart);
+
+		// assign the material for early collision culling
+		//NewtonBodySetMaterialGroupID(bone, m_material);
+		NewtonBodySetMaterialGroupID(bone, 0);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		//NewtonBodySetForceAndTorqueCallback (bone, PhysicsApplyGravityForce);
+		NewtonBodySetForceAndTorqueCallback(bone, ClampAngularVelocity);
+
+		// destroy the collision helper shape 
+		NewtonDestroyCollision(shape);
+		return bone;
+	}
+
 	void MakeSixAxisRobot(DemoEntityManager* const scene, const dMatrix& origin)
 	{
 		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robot2.ngd", scene->GetNewton(), scene->GetShaderCache());
 		scene->Append(model);
 		model->ResetMatrix(*scene, origin);
 
-		dModelRootNode* root = new dModelRootNode();
+		NewtonBody* const rootBody = CreateBodyPart(model);
+
+		dModelRootNode* const root = new dModelRootNode(rootBody, dGetIdentityMatrix());
 		AddRoot(root);
+
+		root->SetTranformMode(true);
 
 		//dSixAxisController* const controller = (dSixAxisController*)CreateController();
 		//controller->MakeSixAxisRobot(scene, model);
 		//m_currentController = controller;
 		//return controller;
 	}
+
+	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const
+	{
+		NewtonBody* const body = bone->GetBody();
+		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(body);
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
+
+		dQuaternion rot(localMatrix);
+		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
+	}
+
 
 /*
 	dSixAxisController* m_currentController;

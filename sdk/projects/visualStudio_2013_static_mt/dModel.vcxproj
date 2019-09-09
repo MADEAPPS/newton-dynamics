@@ -36,6 +36,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dModel\dModelManager.cpp" />
+    <ClCompile Include="..\..\dModel\dModelNode.cpp" />
+    <ClCompile Include="..\..\dModel\dModelRootNode.cpp" />
     <ClCompile Include="..\..\dModel\dModelStdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -49,6 +51,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dModel\dModelManager.h" />
+    <ClInclude Include="..\..\dModel\dModelNode.h" />
+    <ClInclude Include="..\..\dModel\dModelRootNode.h" />
     <ClInclude Include="..\..\dModel\dModelStdAfx.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

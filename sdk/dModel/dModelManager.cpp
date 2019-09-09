@@ -80,11 +80,6 @@ void dModelManager::OnDestroy()
 	}
 }
 
-void dModelManager::OnPreUpdate(dAnimationJointRoot* const model, dFloat timestep)
-{
-	D_TRACKTIME();
-	model->PreUpdate(timestep);
-}
 
 void dModelManager::PreUpdate(dFloat timestep, int threadID)
 {
@@ -109,27 +104,6 @@ void dModelManager::PreUpdate(dFloat timestep, int threadID)
 	}
 }
 
-void dModelManager::PostUpdate(dFloat timestep, int threadID)
-{
-	D_TRACKTIME();
-	NewtonWorld* const world = GetWorld();
-	const int threadCount = NewtonGetThreadsCount(world);
-
-	dList<dAnimationJointRoot*>::dListNode* node = m_controllerList.GetFirst();
-	for (int i = 0; i < threadID; i++) {
-		node = node ? node->GetNext() : NULL;
-	}
-	if (node) {
-		dAnimationJointRoot* const model = node->GetInfo();
-		OnPostUpdate(model, timestep);
-		model->UpdateTransforms(timestep);
-		do {
-			for (int i = 0; i < threadCount; i++) {
-				node = node ? node->GetNext() : NULL;
-			}
-		} while (node);
-	}
-}
 */
 
 /*
@@ -153,4 +127,29 @@ void dModelManager::AddRoot(dModelRootNode* const root)
 {
 	dList<dPointer<dModelRootNode>>::dListNode* const node = m_controllerList.Append();
 	node->GetInfo().SetData(root);
+}
+
+
+void dModelManager::PostUpdate(dFloat timestep, int threadID)
+{
+	D_TRACKTIME();
+	NewtonWorld* const world = GetWorld();
+	const int threadCount = NewtonGetThreadsCount(world);
+
+	dList<dPointer<dModelRootNode>>::dListNode* node = m_controllerList.GetFirst();
+	for (int i = 0; i < threadID; i++) {
+		node = node ? node->GetNext() : NULL;
+	}
+
+	if (node) {
+		dModelRootNode* const model = node->GetInfo().GetData();
+		model->PostUpdate(this, timestep);
+		//OnPostUpdate(model, timestep);
+		//model->UpdateTransforms(timestep);
+		do {
+			for (int i = 0; i < threadCount; i++) {
+				node = node ? node->GetNext() : NULL;
+			}
+		} while (node);
+	}
 }

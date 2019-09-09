@@ -26,6 +26,10 @@ class dModelManager: public dCustomParallelListener
 	virtual ~dModelManager();
 
 	void AddRoot(dModelRootNode* const root);
+
+
+	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const = 0;
+
 	//dAnimationJointRoot* CreateModel(NewtonBody* const bone, const dMatrix& bindMatrix);
 //	void AddModel(dAnimationJointRoot* const model);
 //	void RemoveModel(dAnimationJointRoot* const model);
@@ -34,7 +38,7 @@ class dModelManager: public dCustomParallelListener
 //	dAnimationJoint* GetNextJoint(const dAnimationJoint* const joint) const;
 
 	//virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext) = 0;
-//	virtual void OnUpdateTransform(const dAnimationJoint* const bone, const dMatrix& localMatrix) const = 0;
+	
 
 //	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
 //	virtual void OnPreUpdate(dCustomTransformController* const controller, dFloat timestep, int threadIndex) const;
@@ -42,16 +46,15 @@ class dModelManager: public dCustomParallelListener
 
 	protected:
 //	virtual void OnDestroy();
-//	virtual void OnPreUpdate(dAnimationJointRoot* const model, dFloat timestep);
 //	virtual void OnPostUpdate(dAnimationJointRoot* const model, dFloat timestep) {}
 
-	private:
+	void PostUpdate(dFloat timestep, int threadID);
 //	void PreUpdate(dFloat timestep, int threadID);
-//	void PostUpdate(dFloat timestep, int threadID);
 //	dAnimationJoint* GetFirstJoint(const dAnimationJoint* const joint) const;
+	private:
 
 	private:
-	dList<dPointer<dModelRootNode> > m_controllerList;
+	dList<dPointer<dModelRootNode>> m_controllerList;
 	dFloat m_timestep;
 };
 

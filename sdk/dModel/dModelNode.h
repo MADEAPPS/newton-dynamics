@@ -18,17 +18,8 @@
 class dModelNode
 {
 	public:
-	dModelNode()
-		:m_bindMatrix(dGetIdentityMatrix())
-		,m_body(NULL)
-		,m_parent(NULL)
-		,m_children()
-	{
-	}
-
-	virtual ~dModelNode()
-	{
-	}
+	dModelNode(NewtonBody* const modelBody, const dMatrix& bindMatrix, dModelNode* const parent);
+	virtual ~dModelNode();
 
 	NewtonBody* GetBody() const { return m_body; }
 	const dMatrix& GetBindMatrix() const { return m_bindMatrix; }
@@ -43,9 +34,10 @@ class dModelNode
 	NewtonBody* m_body;
 	dModelNode* m_parent;
 	void* m_userData;
-	dList<dPointer<dModelNode> > m_children;
+	dList<dPointer<dModelNode>> m_children;
 
-	friend class dCustomTransformController;
+	friend class dModelManager;
+	friend class dModelRootNode;
 };
 
 

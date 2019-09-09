@@ -16,17 +16,19 @@
 #include "dModelStdAfx.h"
 #include "dModelNode.h"
 
+class dModelManager;
+
 class dModelRootNode: public dModelNode
 {
 	public:
-	dModelRootNode()
-	{
-	}
+	dModelRootNode(NewtonBody* const rootBody, const dMatrix& bindMatrix);
+	virtual ~dModelRootNode();
 
-	virtual ~dModelRootNode()
-	{
-	}
+	void SetTranformMode(bool localTransform) {m_localTransformMode = localTransform;}
+	virtual void PostUpdate(dModelManager* const manager, dFloat timestep) const;
 
+	protected:
+	bool m_localTransformMode;
 	friend class dModelManager;
 };
 
