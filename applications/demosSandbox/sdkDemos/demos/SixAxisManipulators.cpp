@@ -767,12 +767,11 @@ class dSixAxisManager: public dModelManager
 	class dJointDefinition
 	{
 		public:
-		//struct dJointLimit
-		//{
-		//	dFloat m_minTwistAngle;
-		//	dFloat m_maxTwistAngle;
-		//	dFloat m_coneAngle;
-		//};
+		struct dJointLimit
+		{
+			dFloat m_minTwistAngle;
+			dFloat m_maxTwistAngle;
+		};
 
 		//struct dFrameMatrix
 		//{
@@ -783,7 +782,7 @@ class dSixAxisManager: public dModelManager
 
 		char m_boneName[32];
 		//dFloat m_friction;
-		//dJointLimit m_jointLimits;
+		dJointLimit m_jointLimits;
 		//dFrameMatrix m_frameBasics;
 	};
 
@@ -918,45 +917,53 @@ class dSixAxisManager: public dModelManager
 		//dMatrix parentRollMatrix(dGetIdentityMatrix() * pinAndPivotInGlobalSpace);
 		//dJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
 		//dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, parentRollMatrix, bone, parent);
-
-		dCustomHinge* const joint = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
-
 		//dFloat friction = definition.m_friction * 0.25f;
 		//joint->EnableCone(true);
 		//joint->SetConeFriction(friction);
 		//joint->SetConeLimits(jointLimits.m_coneAngle * dDegreeToRad);
-		//
 		//joint->EnableTwist(true);
 		//joint->SetTwistFriction(friction);
 		//joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
+
+		dCustomHinge* const joint = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
+		if (definition.m_jointLimits.m_maxTwistAngle < 360.0f) {
+			joint->EnableLimits(true);
+			joint->SetLimits(definition.m_jointLimits.m_minTwistAngle * dDegreeToRad, definition.m_jointLimits.m_maxTwistAngle * dDegreeToRad);
+		}
 	}
 
+	void SetModelMass(dFloat mass, int bodyCount, NewtonBody** const bodyArray) const
+	{
+		dFloat volume = 0.0f;
+		for (int i = 0; i < bodyCount; i++) {
+			volume += NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(bodyArray[i]));
+		}
+		dFloat density = mass / volume;
 
+		for (int i = 0; i < bodyCount; i++) {
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+
+			NewtonBody* const body = bodyArray[i];
+			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+			dFloat scale = density * NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(body));
+			mass *= scale;
+			Ixx *= scale;
+			Iyy *= scale;
+			Izz *= scale;
+			NewtonBodySetMassMatrix(body, mass, Ixx, Iyy, Izz);
+		}
+	}
 
 	void MakeSixAxisRobot(DemoEntityManager* const scene, const dMatrix& origin)
 	{
 		static dJointDefinition jointsDefinition[] =
 		{
-			{ "bone_base001" },
-			//{ "bone_base002"},
-			//{ "mixamorig:Spine1", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f } },
-			//{ "mixamorig:Spine2", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f } },
-			//
-			//{ "mixamorig:Neck", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 180.0f } },
-			//
-			//{ "mixamorig:LeftArm", 100.0f,{ -45.0f, 45.0f, 120.0f },{ 0.0f, 0.0f, 180.0f } },
-			//{ "mixamorig:LeftForeArm", 50.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 0.0f, -90.0f } },
-			//
-			//{ "mixamorig:RightArm", 100.0f,{ -45.0f, 45.0f, 120.0f },{ 0.0f, 0.0f, 180.0f } },
-			//{ "mixamorig:RightForeArm", 50.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 00.0f, 90.0f } },
-			//
-			//{ "mixamorig:LeftUpLeg", 100.0f,{ -45.0f, 45.0f, 120.0f },{ 0.0f, 0.0f, 180.0f } },
-			//{ "mixamorig:LeftLeg", 50.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 90.0f, 90.0f } },
-			//
-			//{ "mixamorig:RightUpLeg", 100.0f,{ -45.0f, 45.0f, 120.0f },{ 0.0f, 0.0f, 180.0f } },
-			//{ "mixamorig:RightLeg", 50.0f,{ -140.0f, 10.0f, 0.0f },{ 0.0f, 90.0f, 90.0f } },
+			{ "bone_base001" , {-1000.0f, 1000.0f } },
+			{ "bone_base002" , {-15.0f, 150.0f } },
+			{ "bone_base003" , { -1000.0f, 1000.0f } },
 		};
-
 
 
 		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robot2.ngd", scene->GetNewton(), scene->GetShaderCache());
@@ -1025,9 +1032,13 @@ class dSixAxisManager: public dModelManager
 			}
 		}
 
-/*
-		SetModelMass(100.0f, bodyCount, bodyArray);
+		// set mass distibution by density and volume
+		SetModelMass(500.0f, bodyCount, bodyArray);
 
+		// make root body static
+		NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
+
+/*
 		// set the collision mask
 		// note this container work best with a material call back for setting bit field 
 		//dAssert(0);
