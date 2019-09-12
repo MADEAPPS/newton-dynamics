@@ -66,7 +66,7 @@ class KinematiocListener: public dCustomListener
 			KinematicPlatform& entry = ptr->GetInfo();
 
 			// set the platform angular velocity
-			NewtonBodySetOmega(entry.m_plaform, &entry.m_omega[0]);
+			//NewtonBodySetOmega(entry.m_plaform, &entry.m_omega[0]);
 
 			// calculate the speed alone a circular path
 			dMatrix matrix;
@@ -225,6 +225,7 @@ void KinematicBodies (DemoEntityManager* const scene)
 	AddPrimitiveArray(scene, 1.0f, location.m_posit, size, countx, countz, 6.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
 
 	dQuaternion rot;
+	origin.m_x -= 10.0f;
 	scene->SetCameraMatrix(rot, origin);
 
 //	ExportScene (scene->GetNewton(), "test1.ngd");
