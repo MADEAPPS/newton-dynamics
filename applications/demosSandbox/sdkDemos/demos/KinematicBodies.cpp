@@ -164,7 +164,9 @@ class KinematiocListener: public dCustomListener
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 
-		NewtonCollision* const box = NewtonCreateBox(world, 5.0f, 0.25f, 4.0f, 0, NULL);
+		//NewtonCollision* const box = NewtonCreateBox(world, 5.0f, 0.25f, 4.0f, 0, NULL);
+		dMatrix aligment(dRollMatrix(90.0f * dDegreeToRad));
+		NewtonCollision* const box = NewtonCreateCylinder(world, 15.5f, 15.5f, 0.5f, 0, &aligment[0][0]);
 		NewtonBody* const body = NewtonCreateKinematicBody(world, box, &location[0][0]);
 
 		NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
@@ -213,7 +215,7 @@ void KinematicBodies (DemoEntityManager* const scene)
 	kinematicListener->CreateKinematicSolidPlatform(location, 4.0f);
 
 	location.m_posit.m_z += 10.0f;
-	kinematicListener->CreateKinematicTransparentPlatform(location, -5.0f);
+	//kinematicListener->CreateKinematicTransparentPlatform(location, -5.0f);
 
 	// add some dynamic bodies 
 	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
