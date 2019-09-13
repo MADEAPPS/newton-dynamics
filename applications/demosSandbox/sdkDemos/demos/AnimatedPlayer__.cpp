@@ -554,8 +554,6 @@ for (int i = 0; i < 10; i ++) {
 //#define PLAYER_JUMP_SPEED				5.8f
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 
-static NewtonBody* abody = NULL;
-
 
 class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 {
@@ -758,19 +756,10 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 
 	void ApplyInputs(dCustomPlayerController* const controller)
 	{
-		//abody
-		//
 		if (controller == m_player) {
 			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
 			dFloat forwarSpeed = (int(scene->GetKeyState('W')) - int(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
 			dFloat strafeSpeed = (int(scene->GetKeyState('D')) - int(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
-
-			if (scene->GetKeyState('C') != false) {
-				if (abody != NULL) {
-				  NewtonDestroyBody(abody);
-				  abody = NULL;
-			   }
-			}
 
 			if (forwarSpeed && strafeSpeed) {
 				dFloat invMag = PLAYER_WALK_SPEED / dSqrt(forwarSpeed * forwarSpeed + strafeSpeed * strafeSpeed);
@@ -995,20 +984,6 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 	int count = 1;
 	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
 	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix, 10.0f);
-
-	//
-	NewtonCollision* collision = NULL;
-	collision = CreateConvexCollision(world, shapeOffsetMatrix, dVector(2.0f, 2.0f, 2.0f, 0.0f), _BOX_PRIMITIVE, defaultMaterialID);
-	DemoMesh* const geometryX = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
-	dMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit.m_y = 10.0f;
-	matrix.m_posit.m_x = 30.0f;
-	if (matrix.m_posit.m_y < 900.0f) {
-		abody = CreateSimpleSolid(scene, geometryX, 10, matrix, collision, defaultMaterialID);
-	}
-	geometryX->Release();
-	NewtonDestroyCollision(collision);
-	//
 
 	// add some objects to interact with
 	AddMerryGoRound(scene, dVector(40.0f, 0.0f, -15.0f, 0.0f));

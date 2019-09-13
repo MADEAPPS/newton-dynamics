@@ -40,7 +40,7 @@
 //#define DEFAULT_SCENE	4		// gyroscope precession
 //#define DEFAULT_SCENE	5		// closest distance
 //#define DEFAULT_SCENE	6		// primitive collision
-#define DEFAULT_SCENE	7		// kinematic bodies
+//#define DEFAULT_SCENE	7		// kinematic bodies
 //#define DEFAULT_SCENE	8		// Object Placement
 //#define DEFAULT_SCENE	9		// primitive convex cast 
 //#define DEFAULT_SCENE	10		// box stacks
@@ -77,7 +77,7 @@
 //#define DEFAULT_SCENE	41		// super Car
 //#define DEFAULT_SCENE	42		// heavy vehicles
 //#define DEFAULT_SCENE	43		// basic player controller
-//#define DEFAULT_SCENE	44		// animated player controller
+#define DEFAULT_SCENE	44		// animated player controller
 //#define DEFAULT_SCENE	45		// advanced player controller
 //#define DEFAULT_SCENE	46		// cloth patch			
 //#define DEFAULT_SCENE	47		// soft bodies	
