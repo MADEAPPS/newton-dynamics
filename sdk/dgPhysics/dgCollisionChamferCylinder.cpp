@@ -381,22 +381,14 @@ dgInt32 dgCollisionChamferCylinder::CalculatePlaneIntersection (const dgVector& 
 		dgMatrix matrix(normal);
 		dgFloat32 x = dgSqrt (dgMax (m_height * m_height - origin.m_x * origin.m_x, dgFloat32 (0.0f)));
 		matrix.m_posit.m_x = origin.m_x;
-		dgVector scale(m_radius + x);
-		const int n = sizeof (m_unitCircle) / sizeof (m_unitCircle[0]);
-		for (dgInt32 i = 0; i < n; i++) {
-			contactsOut[i] = matrix.TransformVector(m_unitCircle[i] * scale) & dgVector::m_triplexMask;
-		}
-		count = RectifyConvexSlice(n, normal, contactsOut);
+		count = BuildCylinderCapPoly (m_radius + x, matrix, contactsOut);
+		//count = RectifyConvexSlice(n, normal, contactsOut);
 	} else if (normal.m_x > inclination) {
 		dgMatrix matrix(normal);
 		dgFloat32 x = dgSqrt (dgMax (m_height * m_height - origin.m_x * origin.m_x, dgFloat32 (0.0f)));
 		matrix.m_posit.m_x = origin.m_x;
-		dgVector scale(m_radius + x);
-		const int n = sizeof (m_unitCircle) / sizeof (m_unitCircle[0]);
-		for (dgInt32 i = 0; i < n; i++) {
-			contactsOut[i] = matrix.TransformVector(m_unitCircle[i] * scale) & dgVector::m_triplexMask;
-		}
-		count = RectifyConvexSlice(n, normal, contactsOut);
+		count = BuildCylinderCapPoly (m_radius + x, matrix, contactsOut);
+		//count = RectifyConvexSlice(n, normal, contactsOut);
 	} else {
 		count = 1;
 		contactsOut[0] = SupportVertex (normal, NULL);

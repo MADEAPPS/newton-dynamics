@@ -1032,8 +1032,6 @@ void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVect
 	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 	dMatrix matrix (dGetIdentityMatrix());
-xCount = 1;
-zCount = 1;
 	for (int i = 0; i < xCount; i ++) {
 		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
 		for (int j = 0; j < zCount; j ++) {
@@ -1044,16 +1042,7 @@ zCount = 1;
 			dVector floor (FindFloor (world, dVector (matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
 			matrix.m_posit.m_y = floor.m_y + size.m_y * 0.5f + offsetHigh;
 			if (matrix.m_posit.m_y < 900.0f) {
-				//if (j == 2)
-				{
-					matrix.m_posit.m_x = -7.00000000f;
-					matrix.m_posit.m_y = 5.50000000f;
-					matrix.m_posit.m_z = 5.00000000f;
-
-					NewtonBody* body = CreateSimpleSolid(scene, geometry, mass, matrix, collision, materialID);
-					int xxx = NewtonBodyGetID(body);
-					dTrace(("%d %d %d\n", i, j, xxx));
-				}
+				CreateSimpleSolid(scene, geometry, mass, matrix, collision, materialID);
 			}
 		}
 	}

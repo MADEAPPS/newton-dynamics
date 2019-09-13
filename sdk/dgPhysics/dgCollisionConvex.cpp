@@ -38,22 +38,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-dgVector dgCollisionConvex::m_unitCircle[] = { dgVector(dgFloat32(0.0f), dgFloat32(0.000000f), dgFloat32(1.000000f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(-0.382683f), dgFloat32(0.923880f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(-0.707107f), dgFloat32(0.707107f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(-0.923879f), dgFloat32(0.382684f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(-1.000000f), dgFloat32(0.000000f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(-0.923880f), dgFloat32(-0.382683f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(-0.707107f), dgFloat32(-0.707106f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(-0.382684f), dgFloat32(-0.923879f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(-0.000001f), dgFloat32(-1.000000f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(0.382683f), dgFloat32(-0.923880f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(0.707106f), dgFloat32(-0.707107f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(0.923879f), dgFloat32(-0.382684f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(1.000000f), dgFloat32(-0.000001f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(0.923880f), dgFloat32(0.382683f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(0.707108f), dgFloat32(0.707106f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(0.382685f), dgFloat32(0.923879f), dgFloat32(0.0f))};
 
 dgCollisionConvex::dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgCollisionID id)
 	:dgCollision(allocator, signature, id) 
@@ -645,7 +629,7 @@ dgInt32 dgCollisionConvex::RectifyConvexSlice (dgInt32 count, const dgVector& no
 			ptr = ptr->m_next;
 		} while (ptr != hullPoint);
 	
-		while (sortHeap.GetCount() && (sortHeap.Value() * dgFloat32(16.0f) < totalArea)) {
+		while (sortHeap.GetCount() && (sortHeap.Value() * dgFloat32(32.0f) < totalArea)) {
 			dgConveFaceNode* const corner = sortHeap[0];
 			if (corner->m_mask && corner->m_prev->m_mask) {
 				if (hullPoint == corner) {
@@ -921,3 +905,36 @@ dgInt32 dgCollisionConvex::CalculatePlaneIntersection (const dgVector& normal, c
 	return count;
 }
 
+dgInt32 dgCollisionConvex::BuildCylinderCapPoly (dgFloat32 radius, const dgMatrix& transform, dgVector* const vertexOut) const
+{
+/*
+	dgFloat32 h = 2.0;
+	dgInt32 n = 8;
+	dgFloat32 a0 = h * h * (dgPi / n);
+
+	dgFloat32 h0 = h * dgSin (0.5 * dgPI2 / n);
+	dgFloat32 h1 = h * dgCos (0.5 * dgPI2 / n);
+	dgFloat32 a1 = h * h * (dgSin (0.5 * dgPI2 / n) * dgCos (0.5 * dgPI2 / n));
+
+	dgFloat32 a = h * h * (dgPi / n - 0.5f * dgSin (dgPI2 / n));
+
+	for (int i = 8; i < 16; i ++) {
+		dgFloat32 den = dgPi / i - 0.5f * dgSin (dgPI2 / i);
+		dgFloat32 h1 = dgSqrt (a / den);
+		dgFloat32 h2 = dgSqrt (a / den);
+	}
+*/
+
+	dgInt32 count = (radius < dgFloat32 (1.0f)) ? 8 : ((radius < dgFloat32 (2.0f)) ? 12 : 16);
+
+	dgFloat32 angle = dgPI2 / count;
+	dgVector r (dgFloat32 (0.0f), dgFloat32 (0.0f), radius, dgFloat32 (0.0f));
+	dgMatrix rotation (dgPitchMatrix(angle));
+
+	for (dgInt32 i = 0; i < count; i++) {
+		vertexOut[i] = transform.TransformVector(r); 
+		r = rotation.RotateVector(r);
+	}
+
+	return count;
+}

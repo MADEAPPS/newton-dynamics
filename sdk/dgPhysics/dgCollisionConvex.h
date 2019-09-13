@@ -83,6 +83,8 @@ class dgCollisionConvex: public dgCollision
 	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const;
 	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const;
 	virtual const dgConvexSimplexEdge** GetVertexToEdgeMapping() const {return NULL;}
+
+	dgInt32 BuildCylinderCapPoly (dgFloat32 radius, const dgMatrix& transform, dgVector* const vertexOut) const;
 	
 	dgVector* m_vertex;
 	dgConvexSimplexEdge* m_simplex;
@@ -95,7 +97,6 @@ class dgCollisionConvex: public dgCollision
 	dgUnsigned16 m_vertexCount;
 	
 	public:	
-	static dgVector m_unitCircle[16];	
 
 	friend class dgWorld;
 	friend class dgBroadPhase;
