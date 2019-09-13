@@ -95,7 +95,7 @@ class dgCollisionConvex: public dgCollision
 	dgUnsigned16 m_vertexCount;
 	
 	public:	
-	static dgVector m_unitCircle[6];	
+	static dgVector m_unitCircle[16];	
 
 	friend class dgWorld;
 	friend class dgBroadPhase;

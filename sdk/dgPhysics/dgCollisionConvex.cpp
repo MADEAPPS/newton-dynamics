@@ -38,14 +38,22 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-dgVector dgCollisionConvex::m_unitCircle[] = { dgVector(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.000000f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(0.5f), dgFloat32(0.866025f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(-0.5f), dgFloat32(0.866026f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(-1.0f), dgFloat32(0.000000f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(-0.5f), dgFloat32(-0.866025f), dgFloat32(0.0f)),
-												dgVector(dgFloat32(0.0f), dgFloat32(0.5f), dgFloat32(-0.866026f), dgFloat32(0.0f)) };
-
-
+dgVector dgCollisionConvex::m_unitCircle[] = { dgVector(dgFloat32(0.0f), dgFloat32(0.000000f), dgFloat32(1.000000f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(-0.382683f), dgFloat32(0.923880f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(-0.707107f), dgFloat32(0.707107f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(-0.923879f), dgFloat32(0.382684f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(-1.000000f), dgFloat32(0.000000f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(-0.923880f), dgFloat32(-0.382683f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(-0.707107f), dgFloat32(-0.707106f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(-0.382684f), dgFloat32(-0.923879f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(-0.000001f), dgFloat32(-1.000000f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(0.382683f), dgFloat32(-0.923880f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(0.707106f), dgFloat32(-0.707107f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(0.923879f), dgFloat32(-0.382684f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(1.000000f), dgFloat32(-0.000001f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(0.923880f), dgFloat32(0.382683f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(0.707108f), dgFloat32(0.707106f), dgFloat32(0.0f)),
+												dgVector(dgFloat32(0.0f), dgFloat32(0.382685f), dgFloat32(0.923879f), dgFloat32(0.0f))};
 
 dgCollisionConvex::dgCollisionConvex (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgCollisionID id)
 	:dgCollision(allocator, signature, id) 
