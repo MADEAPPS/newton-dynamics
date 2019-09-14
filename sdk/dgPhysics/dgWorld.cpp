@@ -1136,27 +1136,21 @@ void dgWorld::DestroyInverseDynamics(dgInverseDynamics* const inverseDynamics)
 	delete inverseDynamics;
 }
 
+dgDeadJoints::dgDeadJoints(dgMemoryAllocator* const allocator)
+	:dgTree<dgConstraint*, void* >(allocator)
+	,m_lock(0)
+{
+}
+
 void dgDeadJoints::DestroyJoint(dgConstraint* const joint)
 {
-	dgAssert (0);
-/*
-	dgSpinLock (&m_lock);
-
-	dgWorld& me = *((dgWorld*)this);
-	if (me.m_delayDelateLock) {
-		// the engine is busy in the previous update, deferred the deletion
-		Insert (joint, joint);
-	} else {
-		me.DestroyConstraint (joint);
-	}
-
-	dgSpinUnlock(&m_lock);
-*/
+	dgScopeSpinLock lock(&m_lock);
+	Insert (joint, joint);
 }
 
 void dgDeadJoints::DestroyJoints(dgWorld& world)
 {
-	dgSpinLock (&m_lock);
+	dgScopeSpinLock lock(&m_lock);
 	Iterator iter (*this);
 	for (iter.Begin(); iter; iter++) {
 		dgTreeNode* const node = iter.GetNode();
@@ -1164,7 +1158,6 @@ void dgDeadJoints::DestroyJoints(dgWorld& world)
 		world.DestroyConstraint (joint);
 	}
 	RemoveAll ();
-	dgSpinUnlock(&m_lock);
 }
 
 dgDeadBodies::dgDeadBodies(dgMemoryAllocator* const allocator)

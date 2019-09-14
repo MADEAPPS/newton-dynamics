@@ -129,12 +129,7 @@ class dgWorldThreadPool: public dgThreadHive
 class dgDeadJoints: public dgTree<dgConstraint*, void* >
 {
 	public: 
-	dgDeadJoints(dgMemoryAllocator* const allocator)
-		:dgTree<dgConstraint*, void* >(allocator)
-		,m_lock(0)
-	{
-	}
-	
+	dgDeadJoints(dgMemoryAllocator* const allocator);
 	void DestroyJoints(dgWorld& world);
 	void DestroyJoint(dgConstraint* const joint);
 	private:
