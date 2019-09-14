@@ -547,16 +547,17 @@ dgKinematicBody* dgWorld::CreateKinematicBody (dgCollisionInstance* const collis
 
 void dgWorld::DestroyBody(dgBody* const body)
 {
+	for (dgListenerList::dgListNode* node = m_listeners.GetLast(); node; node = node->GetPrev()) {
+		dgListener& listener = node->GetInfo();
+		if (listener.m_onBodyDestroy) {
+			listener.m_onBodyDestroy(this, node, body);
+		}
+	}
+
 	if (m_delayDelateLock) {
 		dgDeadBodies& deadBodyList = *this;
 		deadBodyList.DestroyBody(body);
 	} else {
-		for (dgListenerList::dgListNode* node = m_listeners.GetLast(); node; node = node->GetPrev()) {
-			dgListener& listener = node->GetInfo();
-			if (listener.m_onBodyDestroy) {
-				listener.m_onBodyDestroy(this, node, body);
-			}
-		}
 
 		if (body->m_destructor) {
 			body->m_destructor(*body);
@@ -1192,10 +1193,14 @@ void dgDeadBodies::DestroyBodies(dgWorld& world)
 		for (iter.Begin(); iter; iter++) {
 			dgTreeNode* const node = iter.GetNode();
 			dgBody* const body = node->GetInfo();
-			for (dgConstraint* contact = body->GetFirstContact(); contact; contact = body->GetNextContact(contact)) {
-				dgAssert(contact->GetId() == dgConstraint::m_contactConstraint);
-				dgContact* const contactJoint = (dgContact*)contact;
-				contactJoint->m_killContact = 1;
+
+			for (dgBodyMasterListRow::dgListNode* node = body->GetMasterList()->GetInfo().GetFirst(); node; node = node->GetNext()) {
+				dgConstraint* const joint = node->GetInfo().m_joint;
+				dgAssert(joint);
+				if (joint && (joint->GetId() == dgConstraint::m_contactConstraint)) {
+					dgContact* const contactJoint = (dgContact*)joint;
+					contactJoint->m_killContact = 1;
+				}
 			}
 		}
 
