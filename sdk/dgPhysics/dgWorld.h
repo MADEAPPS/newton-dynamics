@@ -144,11 +144,7 @@ class dgDeadJoints: public dgTree<dgConstraint*, void* >
 class dgDeadBodies: public dgTree<dgBody*, void* >
 {
 	public: 
-	dgDeadBodies(dgMemoryAllocator* const allocator)
-		:dgTree<dgBody*, void*>(allocator)
-		,m_lock(0)
-	{
-	}
+	dgDeadBodies(dgMemoryAllocator* const allocator);
 	void DestroyBody(dgBody* const body);
 	void DestroyBodies(dgWorld& world);
 

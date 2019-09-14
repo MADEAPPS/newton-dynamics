@@ -547,27 +547,32 @@ dgKinematicBody* dgWorld::CreateKinematicBody (dgCollisionInstance* const collis
 
 void dgWorld::DestroyBody(dgBody* const body)
 {
-	for (dgListenerList::dgListNode* node = m_listeners.GetLast(); node; node = node->GetPrev()) {
-		dgListener& listener = node->GetInfo();
-		if (listener.m_onBodyDestroy) {
-			listener.m_onBodyDestroy (this, node, body);
-		}
-	}
-
-	if (body->m_destructor) {
-		body->m_destructor (*body);
-	}
-	
-	if (m_disableBodies.Find(body)) {
-		m_disableBodies.Remove(body);
+	if (m_delayDelateLock) {
+		dgDeadBodies& deadBodyList = *this;
+		deadBodyList.DestroyBody(body);
 	} else {
-		m_broadPhase->Remove (body);
-		dgBodyMasterList::RemoveBody (body);
-	}
+		for (dgListenerList::dgListNode* node = m_listeners.GetLast(); node; node = node->GetPrev()) {
+			dgListener& listener = node->GetInfo();
+			if (listener.m_onBodyDestroy) {
+				listener.m_onBodyDestroy(this, node, body);
+			}
+		}
 
-	dgAssert (body->m_collision);
-	body->m_collision->Release();
-	delete body;
+		if (body->m_destructor) {
+			body->m_destructor(*body);
+		}
+
+		if (m_disableBodies.Find(body)) {
+			m_disableBodies.Remove(body);
+		} else {
+			m_broadPhase->Remove(body);
+			dgBodyMasterList::RemoveBody(body);
+		}
+
+		dgAssert(body->m_collision);
+		body->m_collision->Release();
+		delete body;
+	}
 }
 
 void dgWorld::DestroyConstraint(dgConstraint* const constraint)
@@ -1167,35 +1172,42 @@ void dgDeadJoints::DestroyJoints(dgWorld& world)
 	dgSpinUnlock(&m_lock);
 }
 
+dgDeadBodies::dgDeadBodies(dgMemoryAllocator* const allocator)
+	:dgTree<dgBody*, void*>(allocator)
+	,m_lock(0)
+{
+}
 
 void dgDeadBodies::DestroyBody(dgBody* const body)
 {
-	dgAssert (0);
-	dgSpinLock (&m_lock);
-
-	dgWorld& me = *((dgWorld*)this);
-	if (me.m_delayDelateLock) {
-		// the engine is busy in the previous update, deferred the deletion
-		Insert (body, body);
-	} else {
-		me.DestroyBody(body);
-	}
-	dgSpinUnlock(&m_lock);
+	dgScopeSpinLock lock(&m_lock);
+	Insert (body, body);
 }
-
 
 void dgDeadBodies::DestroyBodies(dgWorld& world)
 {
-	dgSpinLock (&m_lock);
+	dgScopeSpinLock lock(&m_lock);
+	if (GetCount()) {
+		Iterator iter(*this);
+		for (iter.Begin(); iter; iter++) {
+			dgTreeNode* const node = iter.GetNode();
+			dgBody* const body = node->GetInfo();
+			for (dgConstraint* contact = body->GetFirstContact(); contact; contact = body->GetNextContact(contact)) {
+				dgAssert(contact->GetId() == dgConstraint::m_contactConstraint);
+				dgContact* const contactJoint = (dgContact*)contact;
+				contactJoint->m_killContact = 1;
+			}
+		}
 
-	Iterator iter (*this);
-	for (iter.Begin(); iter; iter++) {
-		dgTreeNode* const node = iter.GetNode();
-		dgBody* const body = node->GetInfo();
-		world.DestroyBody(body);
+		world.GetBroadPhase()->DeleteDeadContact();
+
+		for (iter.Begin(); iter; iter++) {
+			dgTreeNode* const node = iter.GetNode();
+			dgBody* const body = node->GetInfo();
+			world.DestroyBody(body);
+		}
+		RemoveAll();
 	}
-	RemoveAll ();
-	dgSpinUnlock(&m_lock);
 }
 
 void dgWorld::UpdateBroadphase(dgFloat32 timestep)

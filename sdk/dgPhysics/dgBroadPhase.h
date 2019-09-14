@@ -593,6 +593,7 @@ class dgBroadPhase
 
 	friend class dgBody;
 	friend class dgWorld;
+	friend class dgDeadBodies;
 	friend class dgWorldDynamicUpdate;
 	friend class dgBroadPhaseAggregate;
 	friend class dgCollisionCompoundFractured;

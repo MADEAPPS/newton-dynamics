@@ -251,6 +251,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 
     friend class dgBody;
 	friend class dgWorld;
+	friend class dgDeadBodies;
 	friend class dgBroadPhase;
 	friend class dgContactList;
 	friend class dgContactSolver;
