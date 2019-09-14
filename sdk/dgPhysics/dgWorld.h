@@ -493,7 +493,6 @@ class dgWorld
 	dgUnsigned32 m_bodiesUniqueID;
 	dgUnsigned32 m_useParallelSolver;
 	dgUnsigned32 m_genericLRUMark;
-	dgInt32 m_delayDelateLock;
 	dgInt32 m_clusterLRU;
 
 	dgFloat32 m_freezeAccel2;
