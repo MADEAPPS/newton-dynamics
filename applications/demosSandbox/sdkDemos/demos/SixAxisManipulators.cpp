@@ -961,10 +961,10 @@ class dSixAxisManager: public dModelManager
 		static dJointDefinition jointsDefinition[] =
 		{
 			{ "bone_base001" , {-1000.0f, 1000.0f } },
-			{ "bone_base002" , {-15.0f, 125.0f } },
-			{ "bone_base003" , {-10.0f, 120.0f } },
+			{ "bone_base002" , {-120.0f, 45.0f } },
+			{ "bone_base003" , {-120.0f, 15.0f } },
 			{ "bone_base004" , {-1000.0f, 1000.0f } },
-			{ "bone_base005" , {-90.0f, 160.0f } },
+			{ "bone_base005" , {-225.0f, 45.0f } },
 			{ "bone_base006" , {-1000.0f, 1000.0f } },
 		};
 
