@@ -868,7 +868,7 @@ class dSixAxisManager: public dModelManager
 			NewtonBodySetOmega(body, &omega[0]);
 		}
 
-		PhysicsApplyGravityForce(body, timestep, threadIndex);
+//		PhysicsApplyGravityForce(body, timestep, threadIndex);
 	}
 
 	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart)
@@ -961,12 +961,15 @@ class dSixAxisManager: public dModelManager
 		static dJointDefinition jointsDefinition[] =
 		{
 			{ "bone_base001" , {-1000.0f, 1000.0f } },
-			{ "bone_base002" , {-15.0f, 150.0f } },
-			{ "bone_base003" , { -1000.0f, 1000.0f } },
+			{ "bone_base002" , {-15.0f, 125.0f } },
+			{ "bone_base003" , {-10.0f, 120.0f } },
+			{ "bone_base004" , {-1000.0f, 1000.0f } },
+			{ "bone_base005" , {-90.0f, 160.0f } },
+			{ "bone_base006" , {-1000.0f, 1000.0f } },
 		};
 
 
-		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robot2.ngd", scene->GetNewton(), scene->GetShaderCache());
+		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robot1.ngd", scene->GetNewton(), scene->GetShaderCache());
 		scene->Append(model);
 		model->ResetMatrix(*scene, origin);
 
@@ -976,7 +979,7 @@ class dSixAxisManager: public dModelManager
 		// make a kinematic controlled model.
 		dModelRootNode* const root = new dModelRootNode(rootBody, dGetIdentityMatrix());
 
-		// the the model to calculat ethe local transformation
+		// the the model to calculate the local transformation
 		root->SetTranformMode(true);
 
 		// add the model to the manager
@@ -1032,7 +1035,7 @@ class dSixAxisManager: public dModelManager
 			}
 		}
 
-		// set mass distibution by density and volume
+		// set mass distribution by density and volume
 		SetModelMass(500.0f, bodyCount, bodyArray);
 
 		// make root body static
