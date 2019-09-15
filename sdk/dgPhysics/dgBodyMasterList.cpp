@@ -193,7 +193,12 @@ void dgBodyMasterList::AttachConstraint(dgConstraint* const constraint,	dgBody* 
 	}
 	dgAssert (body1);
 
-	dgAssert (!FindBilateralJoint(body0, body1));
+	#ifdef _DEBUG
+	if (FindBilateralJoint(body0, body1))
+	{
+		dgTrace (("warning!! bilateral joint duplication between bodied: %d and %d\n", body0->m_uniqueID, body1->m_uniqueID));
+	}
+	#endif
 
 	constraint->m_body0 = body0;
 	constraint->m_body1 = body1;
