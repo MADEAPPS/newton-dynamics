@@ -966,6 +966,7 @@ class dSixAxisManager: public dModelManager
 			{ "bone_base004" , {-1000.0f, 1000.0f } },
 			{ "bone_base005" , {-225.0f, 45.0f } },
 			{ "bone_base006" , {-1000.0f, 1000.0f } },
+			//{ "effector" , {-1000.0f, 1000.0f } },
 		};
 
 

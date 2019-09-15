@@ -1145,7 +1145,9 @@ dgDeadJoints::dgDeadJoints(dgMemoryAllocator* const allocator)
 void dgDeadJoints::DestroyJoint(dgConstraint* const joint)
 {
 	dgScopeSpinLock lock(&m_lock);
-	Insert (joint, joint);
+	//Insert (joint, joint);
+	dgWorld& me = *((dgWorld*)this);
+	me.DestroyConstraint(joint);
 }
 
 void dgDeadJoints::DestroyJoints(dgWorld& world)

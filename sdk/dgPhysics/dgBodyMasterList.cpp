@@ -193,6 +193,8 @@ void dgBodyMasterList::AttachConstraint(dgConstraint* const constraint,	dgBody* 
 	}
 	dgAssert (body1);
 
+	dgAssert (!FindBilateralJoint(body0, body1));
+
 	constraint->m_body0 = body0;
 	constraint->m_body1 = body1;
 
