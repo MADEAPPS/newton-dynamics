@@ -123,12 +123,19 @@ void dModelManager::OnUpdateTransform(const dCustomTransformController::dSkeleto
 }
 */
 
+void dModelManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+{
+	for (dList<dPointer<dModelRootNode>>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
+		dModelRootNode* const model = node->GetInfo().GetData();
+		OnDebug(model, debugContext);
+	}
+}
+
 void dModelManager::AddRoot(dModelRootNode* const root)
 {
 	dList<dPointer<dModelRootNode>>::dListNode* const node = m_controllerList.Append();
 	node->GetInfo().SetData(root);
 }
-
 
 void dModelManager::PostUpdate(dFloat timestep, int threadID)
 {

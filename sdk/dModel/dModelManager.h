@@ -27,33 +27,16 @@ class dModelManager: public dCustomParallelListener
 
 	void AddRoot(dModelRootNode* const root);
 
-
+	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext) {}
 	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const = 0;
 
-	//dAnimationJointRoot* CreateModel(NewtonBody* const bone, const dMatrix& bindMatrix);
-//	void AddModel(dAnimationJointRoot* const model);
-//	void RemoveModel(dAnimationJointRoot* const model);
-
-//	dAnimationJoint* GetFirstJoint(const dAnimationJointRoot* const model) const;
-//	dAnimationJoint* GetNextJoint(const dAnimationJoint* const joint) const;
-
-	//virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext) = 0;
-	
-
-//	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
-//	virtual void OnPreUpdate(dCustomTransformController* const controller, dFloat timestep, int threadIndex) const;
-//	virtual void OnUpdateTransform(const dCustomTransformController::dModelNode* const bone, const dMatrix& localMatrix) const;
-
 	protected:
-//	virtual void OnDestroy();
-//	virtual void OnPostUpdate(dAnimationJointRoot* const model, dFloat timestep) {}
-
 	void PostUpdate(dFloat timestep, int threadID);
 //	void PreUpdate(dFloat timestep, int threadID);
-//	dAnimationJoint* GetFirstJoint(const dAnimationJoint* const joint) const;
-	private:
 
 	private:
+	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
+
 	dList<dPointer<dModelRootNode>> m_controllerList;
 	dFloat m_timestep;
 };

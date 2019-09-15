@@ -109,6 +109,7 @@ void RenderRayCastHit(NewtonWorld* const world);
 void RenderNormalForces (NewtonWorld* const world);
 void RenderContactPoints (NewtonWorld* const world); 
 void RenderJointsDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug);
+void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug);
 
 void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat* const faceVertec, int faceId);
 

@@ -258,6 +258,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_updateMenuOptions(true)
 	,m_showContactPoints(false)
 	,m_showJointDebugInfo(false)
+	,m_showListenersDebugInfo(false)
 	,m_showCollidingFaces(false)
 	,m_suspendPhysicsUpdate(false)
 	,m_asynchronousPhysicsUpdate(false)
@@ -363,6 +364,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showNormalForces = true;
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
+//	m_showListenersDebugInfo = false;
 //	m_collisionDisplayMode = 2;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
@@ -822,7 +824,8 @@ void DemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show normal forces", &m_showNormalForces);
 			ImGui::Checkbox("show center of mass", &m_showCenterOfMass);
 			ImGui::Checkbox("show body frame", &m_showBodyFrame);
-			ImGui::Checkbox("show Joint debug info", &m_showJointDebugInfo);
+			ImGui::Checkbox("show joint debug info", &m_showJointDebugInfo);
+			ImGui::Checkbox("show listeners debug info", &m_showListenersDebugInfo);
 			ImGui::Checkbox("show colliding faces", &m_showCollidingFaces);
 
 			ImGui::EndMenu();
@@ -1623,9 +1626,14 @@ void DemoEntityManager::RenderScene()
 		RenderCenterOfMass(m_world);
 	}
 
+	if (m_showListenersDebugInfo) {
+		dJointDebugDisplay listenerDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
+		RenderListenersDebugInfo (m_world, &listenerDebugRender);
+	}
+
 	if (m_showJointDebugInfo) {
 		dJointDebugDisplay jointDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
-		jointDebugRender.SetScale(1.5f);
+		jointDebugRender.SetScale(0.5f);
 		//jointDebugRender.SetScale(0.01f);
 
 		RenderJointsDebugInfo(m_world, &jointDebugRender);

@@ -500,5 +500,10 @@ void RenderJointsDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const 
 			}
 		}
 	}
+	
+}
+
+void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug)
+{
 	NewtonWorldListenerDebug(world, jointDebug);
 }

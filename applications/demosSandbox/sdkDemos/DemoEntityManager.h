@@ -212,6 +212,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	bool m_updateMenuOptions;
 	bool m_showContactPoints;
 	bool m_showJointDebugInfo;
+	bool m_showListenersDebugInfo;
 	bool m_showCollidingFaces;
 	bool m_suspendPhysicsUpdate;
 	bool m_asynchronousPhysicsUpdate;
