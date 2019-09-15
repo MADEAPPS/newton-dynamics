@@ -907,9 +907,6 @@ class dSixAxisManager: public dModelManager
 
 	void ConnectWithEffectoJoint(DemoEntity* const effectorNode, NewtonBody* const parent, const dSixAxisJointDefinition& definition)
 	{
-		//dMatrix matrix;
-		//NewtonBodyGetMatrix(parent, &matrix[0][0]);
-
 		dMatrix matrix(effectorNode->CalculateGlobalMatrix());
 		m_effector = new dCustomKinematicController (parent, matrix);
 		m_effector->SetMaxLinearFriction(1000.0f);
@@ -921,22 +918,7 @@ class dSixAxisManager: public dModelManager
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone, &matrix[0][0]);
 
-		//dSixAxisJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
-		//dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad));
-		//pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
-
 		dMatrix pinAndPivotInGlobalSpace(dRollMatrix(90.0f * dDegreeToRad) * matrix);
-
-		//dMatrix parentRollMatrix(dGetIdentityMatrix() * pinAndPivotInGlobalSpace);
-		//dSixAxisJointDefinition::dJointLimit jointLimits(definition.m_jointLimits);
-		//dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, parentRollMatrix, bone, parent);
-		//dFloat friction = definition.m_friction * 0.25f;
-		//joint->EnableCone(true);
-		//joint->SetConeFriction(friction);
-		//joint->SetConeLimits(jointLimits.m_coneAngle * dDegreeToRad);
-		//joint->EnableTwist(true);
-		//joint->SetTwistFriction(friction);
-		//joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
 
 		dCustomHinge* const joint = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
 		if (definition.m_jointLimits.m_maxTwistAngle < 360.0f) {
@@ -1110,16 +1092,15 @@ void SixAxisManipulators(DemoEntityManager* const scene)
 	int count = 10;
 count = 1;
 origin = dGetIdentityMatrix();
-origin.m_posit.m_x = 2.0f;
+origin.m_posit.m_x = 0.0f;
 	for (int i = 0; i < count; i ++) {
 		robotManager->MakeSixAxisRobot (scene, origin, robot1);
-//		robotManager->MakeSixAxisRobot (scene, origin1);
 		origin.m_posit.m_x += 1.0f;
 		origin1.m_posit.m_x += 1.0f;
 	}
-	
-	origin.m_posit = dVector (-3.0f, 0.5f, 0.0f, 1.0f);
-origin.m_posit = dVector(-2.0f, 0.5f, 0.0f, 1.0f);
-	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
+
+	origin.m_posit = dVector(0.0f, 1.0f, 3.0f, 1.0f);
+	dMatrix rotation (dYawMatrix(90.0f * dDegreeToRad));
+	scene->SetCameraMatrix(rotation, origin.m_posit);
 }
 
