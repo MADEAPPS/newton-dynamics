@@ -432,25 +432,18 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 	// we not longer cap excessive angular velocities, it is left to the client application. 
 	NewtonBodyGetOmega(m_body0, &omega[0]);
 
-	//cap excessive angular velocities
-//	dFloat mag2 = omega.DotProduct3(omega);
-//	if (mag2 > (m_omegaCap * m_omegaCap)) {
-//		omega = omega.Normalize().Scale(m_omegaCap);
-//		NewtonBodySetOmega(m_body0, &omega[0]);
-//	}
-
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
 	dVector relPosit(matrix1.m_posit - matrix0.m_posit);
 	NewtonBodyGetPointVelocity(m_body0, &matrix1.m_posit[0], &pointVeloc[0]);
 
 	for (int i = 0; i < 3; i++) {
-		// Restrict the movement on the pivot point along all tree orthonormal direction
+		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
+
 		dFloat speed = pointVeloc.DotProduct3(matrix1[i]);
 		dFloat dist = relPosit.DotProduct3(matrix1[i]) * damp;
 		dFloat relSpeed = dist * invTimestep - speed;
 		dFloat relAccel = relSpeed * invTimestep;
-		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix1[i][0]);
 		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
