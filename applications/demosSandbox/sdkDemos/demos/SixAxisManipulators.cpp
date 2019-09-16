@@ -307,8 +307,8 @@ class dSixAxisManager: public dModelManager
 		// make root body static
 		NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 #else
-		dVector veloc(0.0f, 1.0f, 0.0f, 0.0f);
-		NewtonBodySetVelocity(rootBody, &veloc[0]);
+		//dVector veloc(0.0f, 4.0f, 0.0f, 0.0f);
+		//NewtonBodySetVelocity(rootBody, &veloc[0]);
 		//NewtonBodySetOmega(rootBody, &veloc[0]);
 #endif
 

@@ -368,8 +368,6 @@ void dCustomKinematicController::Debug(dDebugDisplay* const debugDisplay) const
 
 void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadIndex)
 {
-#if 0
-	// check if this is an impulsive time step
 	dMatrix matrix0;
 	dMatrix matrix1;
 	dVector omega0(0.0f);
@@ -389,7 +387,8 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 	const dFloat invTimestep = 1.0f / timestep;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	const dFloat maxStep = m_maxSpeed * timestep;
+	const dFloat damp = 0.3f;
+	const dFloat maxStep = 2.0f * m_maxSpeed * timestep;
 	for (int i = 0; i < 3; i++) {
 		// Restrict the movement on the pivot point along all tree orthonormal direction
 		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
@@ -398,58 +397,22 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 		dVector pointPosit (matrix0.m_posit * jacobian0.m_linear + matrix1.m_posit * jacobian1.m_linear);
 		dVector pointVeloc (veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
 
-		dFloat step = pointPosit.m_x + pointPosit.m_y + pointPosit.m_z;
+		dFloat dist = pointPosit.m_x + pointPosit.m_y + pointPosit.m_z;
 		dFloat speed = pointVeloc.m_x + pointVeloc.m_y + pointVeloc.m_z;
 
-		dFloat v = m_maxSpeed * dSign(step);
-		if ((step < maxStep) && (step > -maxStep)) {
-			v = step *  invTimestep;
+		dFloat v = m_maxSpeed * dSign(dist);
+		if ((dist < maxStep) && (dist > -maxStep)) {
+			v = damp * dist * invTimestep;
 		}
 		dAssert(dAbs(v) <= m_maxSpeed);
-		dTrace(("pv(%f %f %f) ", step, speed, v));
+		//dTrace(("pv(%f %f %f) ", step, speed, v));
 
 		dFloat relAccel = (v + speed) * invTimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, -relAccel);
-
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
 	}
 	dTrace(("\n"));
-
-#else
-
-	// check if this is an impulsive time step
-	dMatrix matrix0;
-	dMatrix matrix1;
-
-	dVector omega(0.0f);
-	dVector pointVeloc(0.0f);
-
-	const dFloat damp = 0.3f;
-	dAssert(timestep > 0.0f);
-	const dFloat invTimestep = 1.0f / timestep;
-
-	// we not longer cap excessive angular velocities, it is left to the client application. 
-	NewtonBodyGetOmega(m_body0, &omega[0]);
-
-	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix(matrix0, matrix1);
-	dVector relPosit(matrix1.m_posit - matrix0.m_posit);
-	NewtonBodyGetPointVelocity(m_body0, &matrix1.m_posit[0], &pointVeloc[0]);
-
-	for (int i = 0; i < 3; i++) {
-		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
-
-		dFloat speed = pointVeloc.DotProduct3(matrix1[i]);
-		dFloat dist = relPosit.DotProduct3(matrix1[i]) * damp;
-		dFloat relSpeed = dist * invTimestep - speed;
-		dFloat relAccel = relSpeed * invTimestep;
-		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-	}
-
-#endif
 }
 
 #endif
