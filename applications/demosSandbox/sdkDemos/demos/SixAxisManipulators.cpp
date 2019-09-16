@@ -46,12 +46,23 @@ static dSixAxisJointDefinition robot1[] =
 	{ NULL, NULL},
 };
 
+class dSixAxisRobot: public dModelRootNode
+{
+	public:
+	dSixAxisRobot(NewtonBody* const rootBody, const dMatrix& bindMatrix)
+		:dModelRootNode(rootBody, bindMatrix)
+		,m_effector(NULL)
+	{
+	}
+
+	dCustomKinematicController* m_effector;
+};
+
 class dSixAxisManager: public dModelManager
 {
 	public:
 	dSixAxisManager(DemoEntityManager* const scene)
 		:dModelManager(scene->GetNewton())
-		,m_effector(NULL)
 //		,m_currentController(NULL)
 //		,m_azimuth(0.0f)
 //		,m_posit_x(0.0f)
@@ -165,12 +176,17 @@ class dSixAxisManager: public dModelManager
 		return bone;
 	}
 
-	void ConnectWithEffectoJoint(DemoEntity* const effectorNode, NewtonBody* const parent, const dSixAxisJointDefinition& definition)
+	dCustomKinematicController* ConnectWithEffectoJoint(NewtonBody* const effectorReferenceBody, DemoEntity* const effectorNode, NewtonBody* const parent, const dSixAxisJointDefinition& definition)
 	{
 		dMatrix matrix(effectorNode->CalculateGlobalMatrix());
-		m_effector = new dCustomKinematicController (parent, matrix);
-		m_effector->SetMaxLinearFriction(SIZE_ROBOT_MASS * DEMO_GRAVITY * 50.0f);
-		m_effector->SetMaxAngularFriction(SIZE_ROBOT_MASS * 50.0f);
+#ifdef USE_OLD_KINEMATICS
+		dCustomKinematicController* const effector = new dCustomKinematicController (parent, matrix);
+#else
+		dCustomKinematicController* const effector = new dCustomKinematicController(parent, matrix, effectorReferenceBody);
+#endif
+		effector->SetMaxLinearFriction(SIZE_ROBOT_MASS * DEMO_GRAVITY * 50.0f);
+		effector->SetMaxAngularFriction(SIZE_ROBOT_MASS * 50.0f);
+		return effector;
 	}
 
 	void ConnectWithHingeJoint(NewtonBody* const bone, NewtonBody* const parent, const dSixAxisJointDefinition& definition)
@@ -221,13 +237,13 @@ class dSixAxisManager: public dModelManager
 		NewtonBody* const rootBody = CreateBodyPart(model);
 
 		// make a kinematic controlled model.
-		dModelRootNode* const root = new dModelRootNode(rootBody, dGetIdentityMatrix());
-
-		// the the model to calculate the local transformation
-		root->SetTranformMode(true);
+		dSixAxisRobot* const robot = new dSixAxisRobot(rootBody, dGetIdentityMatrix());
 
 		// add the model to the manager
-		AddRoot(root);
+		AddRoot(robot);
+
+		// the the model to calculate the local transformation
+		robot->SetTranformMode(true);
 
 		// save the controller as the collision user data, for collision culling
 		//NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBone), controller);
@@ -236,7 +252,7 @@ class dSixAxisManager: public dModelManager
 		DemoEntity* childEntities[32];
 		dModelNode* parentBones[32];
 		for (DemoEntity* child = model->GetChild(); child; child = child->GetSibling()) {
-			parentBones[stackIndex] = root;
+			parentBones[stackIndex] = robot;
 			childEntities[stackIndex] = child;
 			stackIndex++;
 		}
@@ -246,7 +262,6 @@ class dSixAxisManager: public dModelManager
 		bodyArray[0] = rootBody;
 
 		// walk model hierarchic adding all children designed as rigid body bones. 
-//		const int definitionCount = sizeof(robot1) / sizeof(robot1[0]);
 		while (stackIndex) {
 			stackIndex--;
 			DemoEntity* const entity = childEntities[stackIndex];
@@ -277,7 +292,8 @@ class dSixAxisManager: public dModelManager
 						}
 					} else if (strstr (name, "effector")) {	
 						NewtonBody* const parentBody = parentBone->GetBody();
-						ConnectWithEffectoJoint(entity, parentBody, definition[i]);
+						dCustomKinematicController* effector = ConnectWithEffectoJoint(rootBody, entity, parentBody, definition[i]);
+						robot->m_effector = effector;
 					}
 					break;
 				}
@@ -287,8 +303,14 @@ class dSixAxisManager: public dModelManager
 		// set mass distribution by density and volume
 		SetModelMass(SIZE_ROBOT_MASS, bodyCount, bodyArray);
 
+#ifdef USE_OLD_KINEMATICS
 		// make root body static
 		NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
+#else
+		//dVector veloc(0.0f, 3.0f, 0.0f, 0.0f);
+		//NewtonBodySetVelocity(rootBody, &veloc[0]);
+		//NewtonBodySetOmega(rootBody, &veloc[0]);
+#endif
 
 /*
 		// set the collision mask
@@ -304,8 +326,9 @@ class dSixAxisManager: public dModelManager
 
 	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext) 
 	{
-		if (m_effector) {
-			m_effector->Debug(debugContext);
+		dSixAxisRobot* const robot = (dSixAxisRobot*)model;
+		if (robot->m_effector) {
+			robot->m_effector->Debug(debugContext);
 		}
 	}
 
@@ -320,7 +343,7 @@ class dSixAxisManager: public dModelManager
 	}
 
 
-	dCustomKinematicController* m_effector;
+	
 /*
 	dSixAxisController* m_currentController;
 	dFloat32 m_azimuth;

@@ -22,6 +22,8 @@
 
 IMPLEMENT_CUSTOM_JOINT(dCustomKinematicController)
 
+#ifdef USE_OLD_KINEMATICS
+
 dCustomKinematicController::dCustomKinematicController(NewtonBody* const body, const dVector& handleInGlobalSpace)
 	:dCustomJoint(6, body, NULL)
 {
@@ -29,21 +31,20 @@ dCustomKinematicController::dCustomKinematicController(NewtonBody* const body, c
 	dAssert (GetBody0() == body);
 	NewtonBodyGetMatrix (body, &matrix[0][0]);
 	matrix.m_posit = handleInGlobalSpace;
-	Init (body, matrix);
+	Init (matrix);
 }
 
 dCustomKinematicController::dCustomKinematicController (NewtonBody* const body, const dMatrix& attachmentMatrixInGlobalSpace)
 	:dCustomJoint(6, body, NULL)
 {
-	Init (body, attachmentMatrixInGlobalSpace);
+	Init (attachmentMatrixInGlobalSpace);
 }
 
 dCustomKinematicController::dCustomKinematicController(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& handleInGlobalSpace)
 	:dCustomJoint(invDynSolver, invDynNode)
 {
-	Init(GetBody0(), handleInGlobalSpace);
+	Init(handleInGlobalSpace);
 }
-
 
 void dCustomKinematicController::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
@@ -66,10 +67,11 @@ dCustomKinematicController::~dCustomKinematicController()
 	NewtonBodySetAutoSleep (m_body0, m_autoSleepState);
 }
 
-void dCustomKinematicController::Init (NewtonBody* const body, const dMatrix& matrix)
+void dCustomKinematicController::Init (const dMatrix& matrix)
 {
 	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
 
+	NewtonBody* const body = GetBody0();
 	m_autoSleepState = NewtonBodyGetAutoSleep(body) ? true : false;
 	NewtonBodySetSleepState(body, 0);
 
@@ -227,5 +229,233 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 	}
 }
 
+#else
 
+
+dCustomKinematicController::dCustomKinematicController(NewtonBody* const body, const dVector& handleInGlobalSpace, NewtonBody* const referenceBody)
+	:dCustomJoint(6, body, referenceBody)
+{
+	dMatrix matrix;
+	dAssert (GetBody0() == body);
+	NewtonBodyGetMatrix (body, &matrix[0][0]);
+	matrix.m_posit = handleInGlobalSpace;
+	Init (matrix);
+}
+
+dCustomKinematicController::dCustomKinematicController (NewtonBody* const body, const dMatrix& attachmentMatrixInGlobalSpace, NewtonBody* const referenceBody)
+	:dCustomJoint(6, body, referenceBody)
+{
+	Init (attachmentMatrixInGlobalSpace);
+}
+
+dCustomKinematicController::dCustomKinematicController(NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& handleInGlobalSpace)
+	:dCustomJoint(invDynSolver, invDynNode)
+{
+	Init(handleInGlobalSpace);
+}
+
+void dCustomKinematicController::Deserialize (NewtonDeserializeCallback callback, void* const userData)
+{
+	dAssert (0);
+}
+
+void dCustomKinematicController::Serialize (NewtonSerializeCallback callback, void* const userData) const
+{
+	dAssert (0);
+}
+
+void dCustomKinematicController::ResetAutoSleep ()
+{
+	NewtonBodySetAutoSleep(GetBody0(), 0);
+}
+
+dCustomKinematicController::~dCustomKinematicController()
+{
+	NewtonBodySetAutoSleep (m_body0, m_autoSleepState);
+}
+
+void dCustomKinematicController::Init (const dMatrix& matrix)
+{
+	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
+
+	NewtonBody* const body = GetBody0(); 
+	m_autoSleepState = NewtonBodyGetAutoSleep(body) ? true : false;
+	NewtonBodySetSleepState(body, 0);
+
+	SetPickMode(1);
+	SetLimitRotationVelocity(10.0f);
+	SetTargetMatrix(matrix);
+	SetMaxLinearFriction(1.0f);
+	SetMaxAngularFriction(1.0f);
+
+	// set as soft joint
+	SetSolverModel(3);
+}
+
+void dCustomKinematicController::SetPickMode (int mode)
+{
+	m_pickingMode = char (dClamp (mode, 0, 2));
+}
+
+void dCustomKinematicController::SetLimitRotationVelocity(dFloat omegaCap)
+{
+	m_omegaCap = dMax (omegaCap, dFloat (1.0f));
+}
+
+void dCustomKinematicController::SetMaxLinearFriction(dFloat frictionForce)
+{
+	m_maxLinearFriction = dAbs (frictionForce);
+}
+
+void dCustomKinematicController::SetMaxAngularFriction(dFloat frictionTorque)
+{
+	m_maxAngularFriction = dAbs (frictionTorque);
+}
+
+void dCustomKinematicController::SetTargetRotation(const dQuaternion& rotation)
+{
+	NewtonBodySetSleepState(m_body0, 0);
+
+	dMatrix dymmyMatrix;
+	dMatrix matrix (GetTargetMatrix());
+	matrix = dMatrix(rotation, matrix.m_posit);
+	CalculateLocalMatrix(matrix, dymmyMatrix, m_localMatrix1);
+}
+
+void dCustomKinematicController::SetTargetPosit(const dVector& posit)
+{
+	NewtonBodySetSleepState(m_body0, 0);
+
+	dMatrix dymmyMatrix;
+	dMatrix matrix(GetTargetMatrix());
+	matrix.m_posit = posit;
+	matrix.m_posit.m_w = 1.0f;
+	CalculateLocalMatrix(matrix, dymmyMatrix, m_localMatrix1);
+}
+
+void dCustomKinematicController::SetTargetMatrix(const dMatrix& matrix)
+{
+	NewtonBodySetSleepState(m_body0, 0);
+
+	dMatrix dymmyMatrix;
+	CalculateLocalMatrix(matrix, dymmyMatrix, m_localMatrix1);
+}
+
+dMatrix dCustomKinematicController::GetTargetMatrix () const
+{
+	dMatrix matrix1 (dGetIdentityMatrix());
+	if (m_body1) {
+		NewtonBodyGetMatrix(m_body1, &matrix1[0][0]);
+	}
+	return m_localMatrix1 * matrix1;
+}
+
+dMatrix dCustomKinematicController::GetBodyMatrix () const
+{
+	dMatrix matrix0;
+	NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
+	return m_localMatrix0 * matrix0;
+}
+
+void dCustomKinematicController::Debug(dDebugDisplay* const debugDisplay) const
+{
+	debugDisplay->DrawFrame(GetBodyMatrix());
+	debugDisplay->DrawFrame(GetTargetMatrix());
+}
+
+
+void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadIndex)
+{
+	// check if this is an impulsive time step
+	dMatrix matrix0;
+	dMatrix matrix1;
+	dVector omega0(0.0f);
+	dVector omega1(0.0f);
+	dVector pointVeloc0(0.0f);
+	dVector pointVeloc1(0.0f);
+
+	const dFloat damp = 0.3f;
+	dAssert (timestep > 0.0f);
+	const dFloat invTimestep = 1.0f / timestep;
+
+	// we not longer cap excessive angular velocities, it is left to the client application. 
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+
+	//cap excessive angular velocities
+	dFloat mag2 = omega0.DotProduct3(omega0);
+	if (mag2 > (m_omegaCap * m_omegaCap)) {
+		omega0 = omega0.Normalize().Scale(m_omegaCap);
+		NewtonBodySetOmega(m_body0, &omega0[0]);
+	}
+
+	CalculateGlobalMatrix(matrix0, matrix1);
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	dVector relPosit(matrix1.m_posit - matrix0.m_posit);
+	NewtonBodyGetPointVelocity(m_body0, &matrix1.m_posit[0], &pointVeloc0[0]);
+	if (m_body1) {
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+		NewtonBodyGetPointVelocity(m_body1, &matrix1.m_posit[0], &pointVeloc1[0]);
+	}
+
+	dVector relVeloc(pointVeloc0 - pointVeloc1);
+	if ((relPosit.DotProduct3(relPosit) > 0.1f) || (relVeloc.DotProduct3(relVeloc) > 9.0f)) {
+		dTrace(("p(%f %f %f) v(%f %f %f)\n", relPosit.m_x, relPosit.m_y, relPosit.m_z, relVeloc.m_x, relVeloc.m_y, relVeloc.m_z));
+	}
+	for (int i = 0; i < 3; i ++) {
+		// Restrict the movement on the pivot point along all tree orthonormal direction
+		dFloat speed = relVeloc.DotProduct3(matrix1[i]);
+		dFloat dist = relPosit.DotProduct3(matrix1[i]) * damp;
+		dFloat relSpeed = dist * invTimestep - speed;
+		dFloat relAccel = relSpeed * invTimestep;
+		NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix1[i][0]);
+		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
+	}	
+
+/*
+	if (m_pickingMode == 1) {
+		dQuaternion rotation (matrix0.Inverse() * matrix1);
+		if (dAbs (rotation.m_w) < 0.99998f) {
+			dMatrix rot (dGrammSchmidt(dVector (rotation.m_x, rotation.m_y, rotation.m_z, dFloat32 (0.0f))));
+			dFloat angle = 2.0f * dAcos(dClamp(rotation.m_w, dFloat(-1.0f), dFloat(1.0f)));
+
+			dFloat speed = (omega0 - omega1).DotProduct3(rot[0]);
+			dFloat relSpeed = angle * invTimestep - speed;
+			dFloat relAccel = relSpeed * invTimestep;
+			NewtonUserJointAddAngularRow (m_joint, angle, &rot.m_front[0]);
+			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+			NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxAngularFriction);
+			NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxAngularFriction);
+
+			NewtonUserJointAddAngularRow (m_joint, 0.0f, &rot.m_up[0]);
+			NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxAngularFriction);
+			NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxAngularFriction);
+
+			NewtonUserJointAddAngularRow (m_joint, 0.0f, &rot.m_right[0]);
+			NewtonUserJointSetRowMinimumFriction (m_joint, -m_maxAngularFriction);
+			NewtonUserJointSetRowMaximumFriction (m_joint,  m_maxAngularFriction);
+
+		} else {
+			for (int i = 0; i < 3; i++) {
+				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[i][0]);
+				NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
+				NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+			}
+		}
+
+	} else {
+		for (int i = 0; i < 3; i ++) {
+			dFloat relSpeed = -omega0.DotProduct3(matrix1[i]);
+			dFloat relAccel = relSpeed * invTimestep;
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[i][0]);
+			NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+		}
+	}
+*/
+}
+
+#endif
 
