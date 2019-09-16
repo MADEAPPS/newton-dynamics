@@ -365,7 +365,6 @@ void dCustomKinematicController::Debug(dDebugDisplay* const debugDisplay) const
 	debugDisplay->DrawFrame(GetTargetMatrix());
 }
 
-
 void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -405,14 +404,29 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 			v = damp * dist * invTimestep;
 		}
 		dAssert(dAbs(v) <= m_maxSpeed);
-		//dTrace(("pv(%f %f %f) ", step, speed, v));
 
 		dFloat relAccel = (v + speed) * invTimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, -relAccel);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
 	}
-	dTrace(("\n"));
+
+	if (m_pickingMode != 1) {
+		for (int i = 0; i < 3; i++) {
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[i][0]);
+			NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
+
+			dVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+			dFloat relSpeed = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
+			dFloat relAccel = relSpeed * invTimestep;
+
+			NewtonUserJointSetRowAcceleration(m_joint, -relAccel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+		}
+	} else {
+		//dAssert(0);
+	}
 }
 
 #endif
