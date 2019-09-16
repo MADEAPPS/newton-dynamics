@@ -371,6 +371,52 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 	dMatrix matrix1;
 	dVector omega0(0.0f);
 	dVector omega1(0.0f);
+	dVector veloc0(0.0f);
+	dVector veloc1(0.0f);
+	dComplementaritySolver::dJacobian jacobian0;
+	dComplementaritySolver::dJacobian jacobian1;
+
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	NewtonBodyGetVelocity(m_body0, &veloc0[0]);
+	if (m_body1) {
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+		NewtonBodyGetVelocity(m_body1, &veloc1[0]);
+	}
+
+	const dFloat invTimestep = 1.0f / timestep;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	const dFloat maxStep = 30.0f * timestep;
+	for (int i = 0; i < 3; i++) {
+		// Restrict the movement on the pivot point along all tree orthonormal direction
+		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
+		NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
+
+		dVector pointPosit (matrix0.m_posit * jacobian0.m_linear + matrix1.m_posit * jacobian1.m_linear);
+		dVector pointVeloc (veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
+
+		dFloat step = pointPosit.m_x + pointPosit.m_y + pointPosit.m_z;
+		dFloat speed = pointVeloc.m_x + pointVeloc.m_y + pointVeloc.m_z;
+
+		dFloat v = maxStep * dSign(step);
+		if (step > maxStep) {
+			v = step *  invTimestep;
+		} else if (step < maxStep) {
+			v = step *  invTimestep;
+		}
+		
+		dTrace(("pv(%f %f %f) ", step, speed, v));
+		dFloat relAccel = (v + speed) * invTimestep;
+		NewtonUserJointSetRowAcceleration(m_joint, -relAccel);
+
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
+	}
+	dTrace(("\n"));
+
+/*
+	dVector omega0(0.0f);
+	dVector omega1(0.0f);
 	dVector pointVeloc0(0.0f);
 	dVector pointVeloc1(0.0f);
 
@@ -412,7 +458,7 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
 	}	
-
+*/
 /*
 	if (m_pickingMode == 1) {
 		dQuaternion rotation (matrix0.Inverse() * matrix1);

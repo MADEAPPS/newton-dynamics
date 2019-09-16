@@ -151,9 +151,20 @@ void NewtonUserJoint::GetJacobianAt(dgInt32 index, dgFloat32* const jacobian0, d
 			jacobian0[i + 3] = m_param->m_jacobian[index].m_jacobianM0.m_angular[i];
 			jacobian1[i + 3] = m_param->m_jacobian[index].m_jacobianM1.m_angular[i];
 		}
-	
 	}
 }
+
+void NewtonUserJoint::GetJacobian(dgJacobian& jacobian0, dgJacobian& jacobian1) const
+{
+	dgInt32 index = m_rows - 1;
+	if ((index >= 0) && (index < dgInt32(m_maxDOF))) {
+		jacobian0.m_linear = m_param->m_jacobian[index].m_jacobianM0.m_linear;
+		jacobian0.m_angular = m_param->m_jacobian[index].m_jacobianM0.m_angular;
+		jacobian1.m_linear = m_param->m_jacobian[index].m_jacobianM1.m_linear;
+		jacobian1.m_angular = m_param->m_jacobian[index].m_jacobianM1.m_angular;
+	}
+}
+
 
 dFloat NewtonUserJoint::GetAcceleration () const
 {
@@ -213,7 +224,6 @@ dgFloat32 NewtonUserJoint::CalculateZeroMotorAcceleration() const
 	return accel;
 }
 
-
 void NewtonUserJoint::SetSpringDamperAcceleration (dgFloat32 rowStiffness, dFloat spring, dFloat damper)
 {
 	dgInt32 index = m_rows - 1;
@@ -221,7 +231,6 @@ void NewtonUserJoint::SetSpringDamperAcceleration (dgFloat32 rowStiffness, dFloa
 		dgBilateralConstraint::SetSpringDamperAcceleration (index, *m_param, rowStiffness, spring, damper);
 	}
 }
-
 
 void NewtonUserJoint::SetHighFriction (dgFloat32 friction)
 {
@@ -263,7 +272,6 @@ void NewtonUserJoint::SetLowerFriction (dgFloat32 friction)
 	}
 }
 
-
 void NewtonUserJoint::SetRowStiffness (dgFloat32 stiffness)
 {
 	dgInt32 index = m_rows - 1;
@@ -272,8 +280,6 @@ void NewtonUserJoint::SetRowStiffness (dgFloat32 stiffness)
 		m_param->m_jointStiffness[index] = stiffness;
 	}
 }
-
-
 
 dgFloat32 NewtonUserJoint::GetRowForce (dgInt32 row) const
 {

@@ -7366,6 +7366,21 @@ dFloat NewtonUserJointGetRowAcceleration (const NewtonJoint* const joint)
 	return userJoint->GetAcceleration();
 }
 
+void NewtonUserJointGetRowJacobian(const NewtonJoint* const joint, dFloat* const linear0, dFloat* const angular0, dFloat* const linear1, dFloat* const angular1)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	NewtonUserJoint* const userJoint = (NewtonUserJoint*)joint;
+	dgJacobian jacobian0;
+	dgJacobian jacobian1;
+	userJoint->GetJacobian(jacobian0, jacobian1);
+	for (dgInt32 i = 0; i < 3; i++) {
+		linear0[i] = jacobian0.m_linear[i];
+		angular0[i] = jacobian0.m_angular[i];
+		linear1[i] = jacobian1.m_linear[i];
+		angular1[i] = jacobian1.m_angular[i];
+	}
+}
+
 /*
 dFloat NewtonUserJointGetRowInverseDynamicsAcceleration (const NewtonJoint* const joint)
 {
