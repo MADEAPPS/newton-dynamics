@@ -19,7 +19,7 @@
 
 #include "dCustomJoint.h"
 
-#define USE_OLD_KINEMATICS
+//#define USE_OLD_KINEMATICS
 
 class dCustomKinematicController: public dCustomJoint
 {
@@ -63,6 +63,7 @@ class dCustomKinematicController: public dCustomJoint
 	dFloat m_maxLinearFriction;
 	dFloat m_maxAngularFriction;
 	dFloat m_omegaCap;
+	dFloat m_maxSpeed;
 	char m_pickingMode;
 	char m_autoSleepState;
 

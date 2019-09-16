@@ -282,6 +282,8 @@ void dCustomKinematicController::Init (const dMatrix& matrix)
 	m_autoSleepState = NewtonBodyGetAutoSleep(body) ? true : false;
 	NewtonBodySetSleepState(body, 0);
 
+	m_maxSpeed = 30.0f;
+
 	SetPickMode(1);
 	SetLimitRotationVelocity(10.0f);
 	SetTargetMatrix(matrix);
@@ -386,7 +388,7 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 	const dFloat invTimestep = 1.0f / timestep;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	const dFloat maxStep = 30.0f * timestep;
+	const dFloat maxStep = m_maxSpeed * timestep;
 	for (int i = 0; i < 3; i++) {
 		// Restrict the movement on the pivot point along all tree orthonormal direction
 		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
@@ -398,14 +400,13 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 		dFloat step = pointPosit.m_x + pointPosit.m_y + pointPosit.m_z;
 		dFloat speed = pointVeloc.m_x + pointVeloc.m_y + pointVeloc.m_z;
 
-		dFloat v = maxStep * dSign(step);
-		if (step > maxStep) {
-			v = step *  invTimestep;
-		} else if (step < maxStep) {
+		dFloat v = m_maxSpeed * dSign(step);
+		if ((step < maxStep) && (step > -maxStep)) {
 			v = step *  invTimestep;
 		}
-		
-		dTrace(("pv(%f %f %f) ", step, speed, v));
+		dAssert(dAbs(v) <= m_maxSpeed);
+
+		//dTrace(("pv(%f %f %f) ", step, speed, v));
 		dFloat relAccel = (v + speed) * invTimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, -relAccel);
 
