@@ -19,7 +19,7 @@
 
 #include "dCustomJoint.h"
 
-#define USE_OLD_KINEMATICS
+//#define USE_OLD_KINEMATICS
 
 class dCustomKinematicController: public dCustomJoint
 {
@@ -38,6 +38,9 @@ class dCustomKinematicController: public dCustomJoint
 	CUSTOM_JOINTS_API void SetPickMode (int mode);
 	CUSTOM_JOINTS_API void SetMaxLinearFriction(dFloat force); 
 	CUSTOM_JOINTS_API void SetMaxAngularFriction(dFloat torque); 
+	CUSTOM_JOINTS_API void SetMaxSpeed(dFloat speedInMetersPerSeconds); 
+	CUSTOM_JOINTS_API void SetMaxOmega(dFloat speedInRadiansPerSeconds); 
+
 	CUSTOM_JOINTS_API void SetLimitRotationVelocity(dFloat omegaCap);
 
 	CUSTOM_JOINTS_API void SetTargetPosit (const dVector& posit); 
@@ -59,11 +62,12 @@ class dCustomKinematicController: public dCustomJoint
 
 #ifdef USE_OLD_KINEMATICS
 	dMatrix m_targetMatrix;
+	dFloat m_omegaCap;
 #endif
 	dFloat m_maxLinearFriction;
 	dFloat m_maxAngularFriction;
-	dFloat m_omegaCap;
 	dFloat m_maxSpeed;
+	dFloat m_maxOmega;
 	char m_pickingMode;
 	char m_autoSleepState;
 

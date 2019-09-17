@@ -184,6 +184,7 @@ class dSixAxisManager: public dModelManager
 #else
 		dCustomKinematicController* const effector = new dCustomKinematicController(parent, matrix, effectorReferenceBody);
 #endif
+		//effector->SetSolverModel(2);
 		effector->SetMaxLinearFriction(SIZE_ROBOT_MASS * DEMO_GRAVITY * 50.0f);
 		effector->SetMaxAngularFriction(SIZE_ROBOT_MASS * 50.0f);
 		return effector;
@@ -278,7 +279,7 @@ class dSixAxisManager: public dModelManager
 
 						// connect this body part to its parent with a rag doll joint
 						NewtonBody* const parentBody = parentBone->GetBody();
-						ConnectWithHingeJoint(childBody, parentBody, definition[i]);
+						//ConnectWithHingeJoint(childBody, parentBody, definition[i]);
 					
 						dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
 						parentBone = new dModelNode(childBody, bindMatrix, parentBone);
