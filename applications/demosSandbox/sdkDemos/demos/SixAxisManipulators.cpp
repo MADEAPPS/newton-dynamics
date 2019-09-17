@@ -143,7 +143,7 @@ class dSixAxisManager: public dModelManager
 			NewtonBodySetOmega(body, &omega[0]);
 		}
 
-//		PhysicsApplyGravityForce(body, timestep, threadIndex);
+		PhysicsApplyGravityForce(body, timestep, threadIndex);
 	}
 
 	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dSixAxisJointDefinition& definition)
