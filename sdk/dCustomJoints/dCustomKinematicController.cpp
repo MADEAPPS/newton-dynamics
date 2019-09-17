@@ -439,7 +439,7 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 		dFloat pitchAngle = 0.0f;
 		const dFloat maxAngle = 2.0f * m_maxOmega * timestep;
 		dFloat cosAngle = matrix1[0].DotProduct3(matrix0[0]);
-		if (cosAngle > 0.999f) {
+		if (cosAngle > 0.998f) {
 			for (int i = 1; i < 3; i ++) {
 				dFloat coneAngle = -damp * CalculateAngle(matrix0[0], matrix1[0], matrix1[i]);
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[i][0]);

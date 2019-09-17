@@ -206,10 +206,22 @@ class dSixAxisManager: public dModelManager
 
 	void SetModelMass(dFloat mass, int bodyCount, NewtonBody** const bodyArray) const
 	{
+
+		dFloat maxVolume = 0.0f;
+		for (int i = 0; i < bodyCount; i++) {
+			maxVolume = dMax(NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(bodyArray[i])), maxVolume);
+		}
+
+		maxVolume /= 20.0f;
 		dFloat volume = 0.0f;
 		for (int i = 0; i < bodyCount; i++) {
-			volume += NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(bodyArray[i]));
+			dFloat vol = NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(bodyArray[i]));
+			if (vol < maxVolume) {
+				vol = maxVolume;
+			}
+			volume += vol;
 		}
+
 		dFloat density = mass / volume;
 
 		for (int i = 0; i < bodyCount; i++) {
@@ -219,11 +231,23 @@ class dSixAxisManager: public dModelManager
 
 			NewtonBody* const body = bodyArray[i];
 			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-			dFloat scale = density * NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(body));
+			dFloat vol = NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(bodyArray[i]));
+			bool isSmall = false;
+			if (vol < maxVolume) {
+				isSmall = true;
+				vol = maxVolume;
+			}
+			dFloat scale = density * vol;
 			mass *= scale;
 			Ixx *= scale;
 			Iyy *= scale;
 			Izz *= scale;
+			if (isSmall) {
+				dFloat maxInertia = 4.0f* dMax(Ixx, dMax(Iyy, Izz));
+				Ixx = maxInertia;
+				Iyy = maxInertia;
+				Izz = maxInertia;
+			}
 			NewtonBodySetMassMatrix(body, mass, Ixx, Iyy, Izz);
 		}
 	}
@@ -280,9 +304,11 @@ class dSixAxisManager: public dModelManager
 						// connect this body part to its parent with a rag doll joint
 						NewtonBody* const parentBody = parentBone->GetBody();
 						if (
-							strstr (name, "base004") ||
-							strstr (name, "base005") ||
-							strstr (name, "base006")){
+							strstr(name, "base002") ||
+							strstr(name, "base003") ||
+							strstr(name, "base004") ||
+							strstr(name, "base005") ||
+							strstr(name, "base006")){
 							ConnectWithHingeJoint(childBody, parentBody, definition[i]);
 						}
 					
