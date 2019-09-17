@@ -279,7 +279,12 @@ class dSixAxisManager: public dModelManager
 
 						// connect this body part to its parent with a rag doll joint
 						NewtonBody* const parentBody = parentBone->GetBody();
-						//ConnectWithHingeJoint(childBody, parentBody, definition[i]);
+						if (
+							strstr (name, "base004") ||
+							strstr (name, "base005") ||
+							strstr (name, "base006")){
+							ConnectWithHingeJoint(childBody, parentBody, definition[i]);
+						}
 					
 						dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
 						parentBone = new dModelNode(childBody, bindMatrix, parentBone);
