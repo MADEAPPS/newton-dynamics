@@ -443,7 +443,7 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 		if (cosAngle > 0.99f) {
 
 			for (int i = 1; i < 3; i ++) {
-				dFloat coneAngle = damp * CalculateAngle(matrix0[0], matrix1[0], matrix1[1]);
+				dFloat coneAngle = -damp * CalculateAngle(matrix0[0], matrix1[0], matrix1[i]);
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[i][0]);
 				NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
 
@@ -454,7 +454,10 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 				if ((coneAngle < maxAngle) && (coneAngle > -maxAngle)) {
 					w = damp * coneAngle * invTimestep;
 				}
-w = 0;
+				if (i==1) {
+					//w *= -1.0f;
+				}
+
 				dAssert(dAbs(w) <= m_maxOmega);
 				dFloat relAlpha = (w + relOmega) * invTimestep;
 
