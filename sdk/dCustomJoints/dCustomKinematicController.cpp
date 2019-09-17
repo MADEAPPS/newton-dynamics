@@ -439,8 +439,9 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 		dFloat pitchAngle = 0.0f;
 		const dFloat maxAngle = 2.0f * m_maxOmega * timestep;
 		dFloat cosAngle = matrix1[0].DotProduct3(matrix0[0]);
-		if (cosAngle > 0.99985f) {
-return;
+//		if (cosAngle > 0.99985f) {
+		if (cosAngle > 0.99f) {
+
 			for (int i = 1; i < 3; i ++) {
 				dFloat coneAngle = damp * CalculateAngle(matrix0[0], matrix1[0], matrix1[1]);
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[i][0]);
@@ -453,6 +454,7 @@ return;
 				if ((coneAngle < maxAngle) && (coneAngle > -maxAngle)) {
 					w = damp * coneAngle * invTimestep;
 				}
+w = 0;
 				dAssert(dAbs(w) <= m_maxOmega);
 				dFloat relAlpha = (w + relOmega) * invTimestep;
 
@@ -463,7 +465,7 @@ return;
 			pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
 
 		} else {
-
+return;
 			dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 			dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
 			lateralDir = lateralDir.Normalize();
@@ -503,7 +505,7 @@ return;
 			dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 			pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 		}
-
+/*
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
 		NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
 		dVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
@@ -519,6 +521,7 @@ return;
 		NewtonUserJointSetRowAcceleration(m_joint, -relAlpha);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+*/
 	}
 }
 
