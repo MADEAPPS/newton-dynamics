@@ -32,17 +32,19 @@ class dSixAxisJointDefinition
 	char* m_boneName;
 	char* m_parentNoneName;
 	dJointLimit m_jointLimits;
+	dFloat m_massFraction;
 };
 
 static dSixAxisJointDefinition robot1[] =
 {
-	{ "bone_base001", NULL, { -1000.0f, 1000.0f } },
-	{ "bone_base002", NULL, { -120.0f, 45.0f } },
-	{ "bone_base003", NULL, { -120.0f, 15.0f } },
-	{ "bone_base004", NULL, { -1000.0f, 1000.0f } },
-	{ "bone_base005", NULL, { -225.0f, 45.0f } },
-	{ "bone_base006", NULL, { -1000.0f, 1000.0f } },
-	{ "effector", "bone_base001", { -1000.0f, 1000.0f } },
+	{ "bone_base000", NULL,{ -1000.0f, 1000.0f }, 1.0f },
+	{ "bone_base001", NULL, { -1000.0f, 1000.0f }, 0.4f },
+	{ "bone_base002", NULL, { -120.0f, 45.0f }, 0.3f },
+	{ "bone_base003", NULL, { -120.0f, 15.0f }, 0.2f },
+	{ "bone_base004", NULL, { -1000.0f, 1000.0f }, 0.1f },
+	{ "bone_base005", NULL, { -225.0f, 45.0f }, 0.06f },
+	{ "bone_base006", NULL, { -1000.0f, 1000.0f }, 0.06f },
+	{ "effector", "bone_base001", { -1000.0f, 1000.0f }},
 	{ NULL, NULL},
 };
 
@@ -144,7 +146,7 @@ class dSixAxisManager: public dModelManager
 //		PhysicsApplyGravityForce(body, timestep, threadIndex);
 	}
 
-	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart)
+	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dSixAxisJointDefinition& definition)
 	{
 		NewtonWorld* const world = GetWorld();
 		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
@@ -158,7 +160,7 @@ class dSixAxisManager: public dModelManager
 
 		// calculate the moment of inertia and the relative center of mass of the solid
 		//NewtonBodySetMassProperties (bone, definition.m_mass, shape);
-		NewtonBodySetMassProperties(bone, 1.0f, shape);
+		NewtonBodySetMassProperties(bone, definition.m_massFraction, shape);
 
 		// save the user data with the bone body (usually the visual geometry)
 		NewtonBodySetUserData(bone, bodyPart);
@@ -204,9 +206,9 @@ class dSixAxisManager: public dModelManager
 		}
 	}
 
-	void SetModelMass(dFloat mass, int bodyCount, NewtonBody** const bodyArray) const
+	void SetModelMass(dFloat modelMass, int bodyCount, NewtonBody** const bodyArray) const
 	{
-
+/*
 		dFloat maxVolume = 0.0f;
 		for (int i = 0; i < bodyCount; i++) {
 			maxVolume = dMax(NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(bodyArray[i])), maxVolume);
@@ -250,6 +252,45 @@ class dSixAxisManager: public dModelManager
 			}
 			NewtonBodySetMassMatrix(body, mass, Ixx, Iyy, Izz);
 		}
+*/
+
+		dFloat32 totalMass = 0.0f;
+		for (int i = 0; i < bodyCount; i++) {
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
+
+			NewtonBody* const body = bodyArray[i];
+			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+			totalMass += mass;
+		}
+
+		dFloat32 massNormalize = modelMass / totalMass;
+		for (int i = 0; i < bodyCount; i++) {
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
+
+			NewtonBody* const body = bodyArray[i];
+			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+
+			mass *= massNormalize;
+			Ixx *= massNormalize;
+			Iyy *= massNormalize;
+			Izz *= massNormalize;
+
+			dFloat minInertia = dMin(Ixx, dMin(Iyy, Izz));
+			if (minInertia < 10.0f) {
+				dFloat maxInertia = dMax(10.0f, dMax(Ixx, dMax(Iyy, Izz)));
+				Ixx = maxInertia;
+				Iyy = maxInertia;
+				Izz = maxInertia;
+			}
+
+			NewtonBodySetMassMatrix(body, mass, Ixx, Iyy, Izz);
+		}
 	}
 
 	void MakeSixAxisRobot(DemoEntityManager* const scene, const dMatrix& origin, dSixAxisJointDefinition* const definition)
@@ -259,7 +300,7 @@ class dSixAxisManager: public dModelManager
 		model->ResetMatrix(*scene, origin);
 
 		// create the root body, do not set the transform call back 
-		NewtonBody* const rootBody = CreateBodyPart(model);
+		NewtonBody* const rootBody = CreateBodyPart(model, definition[0]);
 
 		// make a kinematic controlled model.
 		dSixAxisRobot* const robot = new dSixAxisRobot(rootBody, dGetIdentityMatrix());
@@ -297,7 +338,7 @@ class dSixAxisManager: public dModelManager
 			for (int i = 0; definition[i].m_boneName; i++) {
 				if (!strcmp(definition[i].m_boneName, name)) {
 					if (strstr (name, "bone")) {
-						NewtonBody* const childBody = CreateBodyPart(entity);
+						NewtonBody* const childBody = CreateBodyPart(entity, definition[i]);
 						bodyArray[bodyCount] = childBody;
 						bodyCount++;
 
