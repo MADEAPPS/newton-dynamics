@@ -19,7 +19,7 @@
 
 #include "dCustomJoint.h"
 
-//#define USE_OLD_KINEMATICS
+#define USE_OLD_KINEMATICS
 
 class dCustomKinematicController: public dCustomJoint
 {

@@ -361,7 +361,5 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API static dSerializeMetaData m_metaData_CustomJoint;
 };
 
-
-
 #endif 
 
