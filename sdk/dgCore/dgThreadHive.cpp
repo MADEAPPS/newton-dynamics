@@ -69,7 +69,7 @@ void dgThreadHive::dgWorkerThread::Execute (dgInt32 threadId)
 
 	while (!m_terminate) {
 		dgInterlockedExchange(&m_isBusy, 0);
-		Wait(m_workerSemaphore);
+		Wait(1, &m_workerSemaphore);
 		dgInterlockedExchange(&m_isBusy, 1);
 		if (!m_terminate) {
 			RunNextJobInQueue(threadId);

@@ -188,8 +188,6 @@ void dgThread::Wait (dgInt32 count, dgSemaphore* const semArray)
 }
 
 
-
-
 void* dgThread::dgThreadSystemCallback(void* threadData)
 {
 	dgFloatExceptions exception;
