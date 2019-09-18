@@ -90,44 +90,14 @@ class dSixAxisManager: public dModelManager
 		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
 
-		//		ImGui::Separator();
-		//		ImGui::Separator();
-		//		ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
-		//		ImGui::SliderFloat("eff_pitch", &me->m_gripper_pitch, -60.0f, 60.0f);
+		//ImGui::Separator();
+		//ImGui::Separator();
+		//ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
+		//ImGui::SliderFloat("eff_pitch", &me->m_gripper_pitch, -60.0f, 60.0f);
 
 		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 			dSixAxisController* const controller = &node->GetInfo();
 			controller->SetTarget(me->m_posit_x, me->m_posit_y, me->m_azimuth * dDegreeToRad, me->m_gripper_pitch * dDegreeToRad, me->m_gripper_roll * dDegreeToRad);
-		}
-	}
-
-	virtual dSixAxisController* CreateController()
-	{
-		return (dSixAxisController*)dCustomControllerManager<dSixAxisController>::CreateController();
-	}
-
-	dSixAxisController* MakeSixAxisRobot(DemoEntityManager* const scene, const dMatrix& origin)
-	{
-		DemoEntity* const model = DemoEntity::LoadNGD_mesh("robotArm.ngd", scene->GetNewton(), scene->GetShaderCache());
-
-		scene->Append(model);
-		model->ResetMatrix(*scene, origin);
-
-		DemoEntity* const model1 = DemoEntity::LoadNGD_mesh("robot2.ngd", scene->GetNewton(), scene->GetShaderCache());
-		scene->Append(model1);
-		model1->ResetMatrix(*scene, origin);
-
-		dSixAxisController* const controller = (dSixAxisController*)CreateController();
-		controller->MakeSixAxisRobot(scene, model);
-		m_currentController = controller;
-		return controller;
-	}
-
-	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
-	{
-		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			dSixAxisController* const controller = &node->GetInfo();
-			controller->Debug(debugContext);
 		}
 	}
 */
@@ -208,52 +178,6 @@ class dSixAxisManager: public dModelManager
 
 	void SetModelMass(dFloat modelMass, int bodyCount, NewtonBody** const bodyArray) const
 	{
-/*
-		dFloat maxVolume = 0.0f;
-		for (int i = 0; i < bodyCount; i++) {
-			maxVolume = dMax(NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(bodyArray[i])), maxVolume);
-		}
-
-		maxVolume /= 20.0f;
-		dFloat volume = 0.0f;
-		for (int i = 0; i < bodyCount; i++) {
-			dFloat vol = NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(bodyArray[i]));
-			if (vol < maxVolume) {
-				vol = maxVolume;
-			}
-			volume += vol;
-		}
-
-		dFloat density = mass / volume;
-
-		for (int i = 0; i < bodyCount; i++) {
-			dFloat Ixx;
-			dFloat Iyy;
-			dFloat Izz;
-
-			NewtonBody* const body = bodyArray[i];
-			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-			dFloat vol = NewtonConvexCollisionCalculateVolume(NewtonBodyGetCollision(bodyArray[i]));
-			bool isSmall = false;
-			if (vol < maxVolume) {
-				isSmall = true;
-				vol = maxVolume;
-			}
-			dFloat scale = density * vol;
-			mass *= scale;
-			Ixx *= scale;
-			Iyy *= scale;
-			Izz *= scale;
-			if (isSmall) {
-				dFloat maxInertia = 4.0f* dMax(Ixx, dMax(Iyy, Izz));
-				Ixx = maxInertia;
-				Iyy = maxInertia;
-				Izz = maxInertia;
-			}
-			NewtonBodySetMassMatrix(body, mass, Ixx, Iyy, Izz);
-		}
-*/
-
 		dFloat32 totalMass = 0.0f;
 		for (int i = 0; i < bodyCount; i++) {
 			dFloat Ixx;
@@ -344,14 +268,6 @@ class dSixAxisManager: public dModelManager
 
 						// connect this body part to its parent with a rag doll joint
 						NewtonBody* const parentBody = parentBone->GetBody();
-						//if (
-						//	strstr(name, "base002") ||
-						//	strstr(name, "base003") ||
-						//	strstr(name, "base004") ||
-						//	strstr(name, "base005") ||
-						//	strstr(name, "base006")){
-						//	ConnectWithHingeJoint(childBody, parentBody, definition[i]);
-						//}
 						ConnectWithHingeJoint(childBody, parentBody, definition[i]);
 					
 						dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
@@ -381,7 +297,7 @@ class dSixAxisManager: public dModelManager
 		// make root body static
 		NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 #else
-		//NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
+		NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 #endif
 
 /*
@@ -413,8 +329,6 @@ class dSixAxisManager: public dModelManager
 		dQuaternion rot(localMatrix);
 		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
-
-
 	
 /*
 	dSixAxisController* m_currentController;
