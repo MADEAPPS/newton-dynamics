@@ -200,7 +200,7 @@ class dSixAxisManager: public dModelManager
 
 	void SetModelMass(dFloat modelMass, int bodyCount, NewtonBody** const bodyArray) const
 	{
-		dFloat32 totalMass = 0.0f;
+		dFloat totalMass = 0.0f;
 		for (int i = 0; i < bodyCount; i++) {
 			dFloat Ixx;
 			dFloat Iyy;
@@ -212,7 +212,7 @@ class dSixAxisManager: public dModelManager
 			totalMass += mass;
 		}
 
-		dFloat32 massNormalize = modelMass / totalMass;
+		dFloat massNormalize = modelMass / totalMass;
 		for (int i = 0; i < bodyCount; i++) {
 			dFloat Ixx;
 			dFloat Iyy;
@@ -229,7 +229,7 @@ class dSixAxisManager: public dModelManager
 
 			dFloat minInertia = dMin(Ixx, dMin(Iyy, Izz));
 			if (minInertia < 10.0f) {
-				dFloat maxInertia = dMax(10.0f, dMax(Ixx, dMax(Iyy, Izz)));
+				dFloat maxInertia = dMax(dFloat(10.0f), dMax(Ixx, dMax(Iyy, Izz)));
 				Ixx = maxInertia;
 				Iyy = maxInertia;
 				Izz = maxInertia;

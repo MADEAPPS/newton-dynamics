@@ -315,7 +315,6 @@ void dCustomKinematicController::SetMaxOmega(dFloat speedInRadiansPerSeconds)
 	m_maxOmega = dAbs (speedInRadiansPerSeconds);
 }
 
-
 void dCustomKinematicController::SetMaxLinearFriction(dFloat frictionForce)
 {
 	m_maxLinearFriction = dAbs (frictionForce);
