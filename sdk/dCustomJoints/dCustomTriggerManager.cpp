@@ -143,8 +143,8 @@ void dCustomTriggerManager::PreUpdate(dFloat timestep)
 
 	dCustomParallelListener::PreUpdate(timestep);
 
-	for (dList<dCustomTriggerController>::dListNode* node = GetControllersList().GetFirst(); node; node = node->GetNext()) {
-		dCustomTriggerController* const controller = &node->GetInfo();
+	for (dList<dCustomTriggerController>::dListNode* controllerNode = GetControllersList().GetFirst(); controllerNode; controllerNode = controllerNode->GetNext()) {
+		dCustomTriggerController* const controller = &controllerNode->GetInfo();
 		dCustomTriggerController::dTriggerManifest::Iterator iter(controller->m_manifest);
 
 		for (iter.Begin(); iter;) {
