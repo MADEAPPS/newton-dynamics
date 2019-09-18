@@ -38,6 +38,7 @@ class dCustomKinematicController: public dCustomJoint
 	CUSTOM_JOINTS_API void SetPickMode (int mode);
 	CUSTOM_JOINTS_API void SetMaxLinearFriction(dFloat force); 
 	CUSTOM_JOINTS_API void SetMaxAngularFriction(dFloat torque); 
+	CUSTOM_JOINTS_API void SetAngularViscuosFrictionCoefficient(dFloat coefficient);
 	CUSTOM_JOINTS_API void SetMaxSpeed(dFloat speedInMetersPerSeconds); 
 	CUSTOM_JOINTS_API void SetMaxOmega(dFloat speedInRadiansPerSeconds); 
 
@@ -66,6 +67,7 @@ class dCustomKinematicController: public dCustomJoint
 #endif
 	dFloat m_maxLinearFriction;
 	dFloat m_maxAngularFriction;
+	dFloat m_angularFrictionCoefficient;
 	dFloat m_maxSpeed;
 	dFloat m_maxOmega;
 	char m_pickingMode;
