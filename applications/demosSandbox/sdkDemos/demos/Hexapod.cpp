@@ -388,10 +388,10 @@ class dHexapodController: public dCustomControllerBase
 	dAnimationHipController* m_postureModifier; // do not delete 
 };
 
-class dHexapodManager: public dCustomControllerManager<dHexapodController>
+class dHexapodManager_old: public dCustomControllerManager<dHexapodController>
 {
 	public:
-	dHexapodManager(DemoEntityManager* const scene)
+	dHexapodManager_old(DemoEntityManager* const scene)
 		:dCustomControllerManager<dHexapodController>(scene->GetNewton(), "sixAxisManipulator")
 		,m_currentController(NULL)
 		,m_yaw(0.0f)
@@ -404,13 +404,13 @@ class dHexapodManager: public dCustomControllerManager<dHexapodController>
 		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
 
-	~dHexapodManager()
+	~dHexapodManager_old()
 	{
 	}
 
 	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
 	{
-		dHexapodManager* const me = (dHexapodManager*)context;
+		dHexapodManager_old* const me = (dHexapodManager_old*)context;
 
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Hexapod controller");
@@ -466,6 +466,90 @@ class dHexapodManager: public dCustomControllerManager<dHexapodController>
 	dFloat32 m_speed;
 };
 
+
+
+
+class dHexapodWalker: public dModelRootNode
+{
+	public:
+	dHexapodWalker(NewtonBody* const rootBody, const dMatrix& bindMatrix)
+		:dModelRootNode(rootBody, bindMatrix)
+		//,m_pivotMatrix(dGetIdentityMatrix())
+		//,m_gripperMatrix(dGetIdentityMatrix())
+		//,m_effector(NULL)
+		//,m_azimuth(0.0f)
+		//,m_posit_x(0.0f)
+		//,m_posit_y(0.0f)
+		//,m_pitch(0.0f)
+		//,m_yaw(0.0f)
+		//,m_roll(0.0f)
+	{
+	}
+
+/*
+	void SetPivotMatrix()
+	{
+		dMatrix baseMatrix;
+		dMatrix pivotMatrix;
+		dModelNode* const referenceNode = GetChildren().GetFirst()->GetInfo().GetData();
+		NewtonBodyGetMatrix(GetBody(), &baseMatrix[0][0]);
+		NewtonBodyGetMatrix(referenceNode->GetBody(), &pivotMatrix[0][0]);
+		m_pivotMatrix = pivotMatrix * baseMatrix.Inverse();
+		m_gripperMatrix = m_effector->GetTargetMatrix() * m_pivotMatrix.Inverse();
+	}
+
+	void UpdateEffectors(dFloat azimuth, dFloat posit_x, dFloat posit_y, dFloat pitch, dFloat yaw, dFloat roll)
+	{
+		m_azimuth = azimuth;
+		m_posit_x = posit_x;
+		m_posit_y = posit_y;
+		m_pitch = pitch;
+		m_yaw = yaw;
+		m_roll = roll;
+
+		dMatrix yawMatrix(dYawMatrix(m_azimuth * dDegreeToRad));
+		dMatrix gripperMatrix(dPitchMatrix(m_pitch * dDegreeToRad) * dYawMatrix(m_yaw * dDegreeToRad) * dRollMatrix(m_roll * dDegreeToRad) * m_gripperMatrix);
+
+		gripperMatrix.m_posit.m_x += m_posit_x;
+		gripperMatrix.m_posit.m_y += m_posit_y;
+		m_effector->SetTargetMatrix(gripperMatrix * yawMatrix * m_pivotMatrix);
+	}
+
+	dMatrix m_pivotMatrix;
+	dMatrix m_gripperMatrix;
+	dCustomKinematicController* m_effector;
+	dFloat m_azimuth;
+	dFloat m_posit_x;
+	dFloat m_posit_y;
+	dFloat m_pitch;
+	dFloat m_yaw;
+	dFloat m_roll;
+*/
+};
+
+
+class dHexapodManager: public dModelManager
+{
+	public:
+	dHexapodManager(DemoEntityManager* const scene)
+		:dModelManager(scene->GetNewton())
+		//, m_currentController(NULL)
+		//, m_azimuth(0.0f)
+		//, m_posit_x(0.0f)
+		//, m_posit_y(0.0f)
+		//, m_gripper_pitch(0.0f)
+		//, m_gripper_yaw(0.0f)
+		//, m_gripper_roll(0.0f)
+	{
+		//		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
+	}
+
+	~dHexapodManager()
+	{
+	}
+};
+
+
 void Hexapod(DemoEntityManager* const scene)
 {
 	// load the sky box
@@ -476,7 +560,7 @@ void Hexapod(DemoEntityManager* const scene)
 
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
-	dHexapodManager* const robotManager = new dHexapodManager(scene);
+	dHexapodManager_old* const robotManager = new dHexapodManager_old(scene);
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
 
@@ -485,7 +569,7 @@ void Hexapod(DemoEntityManager* const scene)
 	location.m_posit.m_y += 1.0f;
 
 	int count = 5;
-//count = 1;
+count = 1;
 	dMatrix location1(location);
 	dFloat x0 = location.m_posit.m_x;
 	for (int j = 0; j < 1; j++) {
@@ -493,9 +577,7 @@ void Hexapod(DemoEntityManager* const scene)
 		location.m_posit.m_x = x0;
 		for (int i = 0; i < count; i++) {
 			location.m_posit.m_x += 2.0f;
-			//location1.m_posit.m_x += 2.0f;
 			robotManager->MakeHexapod(scene, location);
-			//robotManager->MakeHexapod (scene, location1);
 		}
 	}
 

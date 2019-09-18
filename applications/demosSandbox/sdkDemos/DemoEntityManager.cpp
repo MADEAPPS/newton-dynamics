@@ -40,7 +40,7 @@
 //#define DEFAULT_SCENE	4		// gyroscope precession
 //#define DEFAULT_SCENE	5		// closest distance
 //#define DEFAULT_SCENE	6		// primitive collision
-#define DEFAULT_SCENE	7		// kinematic bodies
+//#define DEFAULT_SCENE	7		// kinematic bodies
 //#define DEFAULT_SCENE	8		// Object Placement
 //#define DEFAULT_SCENE	9		// primitive convex cast 
 //#define DEFAULT_SCENE	10		// box stacks
@@ -67,7 +67,7 @@
 //#define DEFAULT_SCENE	31		// servo joints
 //#define DEFAULT_SCENE	32		// articulated joints
 //#define DEFAULT_SCENE	33		// six axis manipulator
-//#define DEFAULT_SCENE	34		// hexapod Robot
+#define DEFAULT_SCENE	34		// hexapod Robot
 //#define DEFAULT_SCENE	35		// basic rag doll
 //#define DEFAULT_SCENE	36		// kinematic rag doll
 //#define DEFAULT_SCENE	37		// dynamic rag doll
