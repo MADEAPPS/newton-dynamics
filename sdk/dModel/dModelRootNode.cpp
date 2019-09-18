@@ -23,35 +23,3 @@ dModelRootNode::~dModelRootNode()
 {
 }
 
-
-void dModelRootNode::PostUpdate(dModelManager* const manager, dFloat timestep) const
-{
-	if (m_localTransformMode) {
-
-		dMatrix parentMatrixPool[128];
-		const dModelNode* stackPool[128];
-
-		int stack = 1;
-		stackPool[0] = this;
-		parentMatrixPool[0] = dGetIdentityMatrix();
-
-		while (stack) {
-			dMatrix matrix;
-			stack--;
-
-			dMatrix parentMatrix(parentMatrixPool[stack]);
-			const dModelNode* const bone = stackPool[stack];
-
-			NewtonBodyGetMatrix(bone->GetBody(), &matrix[0][0]);
-			manager->OnUpdateTransform(bone, matrix * parentMatrix * bone->GetBindMatrix());
-
-			parentMatrix = matrix.Inverse();
-			for (dList<dPointer<dModelNode>>::dListNode* ptrNode = bone->m_children.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
-				parentMatrixPool[stack] = parentMatrix;
-				stackPool[stack] = ptrNode->GetInfo().GetData();
-				stack++;
-			}
-		}
-	}
-}
-

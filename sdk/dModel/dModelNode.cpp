@@ -17,10 +17,10 @@ dModelNode::dModelNode(NewtonBody* const modelBody, const dMatrix& bindMatrix, d
 	:m_bindMatrix(bindMatrix)
 	,m_body(modelBody)
 	,m_parent(parent)
-	,m_children()
+	,m_children____()
 {
 	if (m_parent) {
-		dList<dPointer<dModelNode>>::dListNode* const node = m_parent->m_children.Append();
+		dModelChildrenList::dListNode* const node = m_parent->m_children____.Append();
 		node->GetInfo().SetData(this);
 	}
 }

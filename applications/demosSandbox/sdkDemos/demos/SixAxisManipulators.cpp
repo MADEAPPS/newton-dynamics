@@ -53,11 +53,34 @@ class dSixAxisRobot: public dModelRootNode
 	public:
 	dSixAxisRobot(NewtonBody* const rootBody, const dMatrix& bindMatrix)
 		:dModelRootNode(rootBody, bindMatrix)
+		,m_pivotMatrix(dGetIdentityMatrix())
+		,m_gripperMatrix(dGetIdentityMatrix())
 		,m_effector(NULL)
+		,m_azimuth(0.0f)
 	{
 	}
 
+	void UpdateEffectors ()
+	{
+		dMatrix yawMatrix (dYawMatrix(m_azimuth * dDegreeToRad));
+		m_effector->SetTargetMatrix (m_gripperMatrix * yawMatrix * m_pivotMatrix);
+	}
+
+	void SetPivotMatrix()
+	{
+		dMatrix baseMatrix;
+		dMatrix pivotMatrix;
+		dModelNode* const referenceNode = GetChildren().GetFirst()->GetInfo().GetData();
+		NewtonBodyGetMatrix(GetBody(), &baseMatrix[0][0]);
+		NewtonBodyGetMatrix(referenceNode->GetBody(), &pivotMatrix[0][0]);
+		m_pivotMatrix = pivotMatrix * baseMatrix.Inverse();
+		m_gripperMatrix = m_effector->GetTargetMatrix() * m_pivotMatrix.Inverse();
+	}
+	
+	dMatrix m_pivotMatrix;
+	dMatrix m_gripperMatrix;
 	dCustomKinematicController* m_effector;
+	dFloat m_azimuth;
 };
 
 class dSixAxisManager: public dModelManager
@@ -65,31 +88,30 @@ class dSixAxisManager: public dModelManager
 	public:
 	dSixAxisManager(DemoEntityManager* const scene)
 		:dModelManager(scene->GetNewton())
-//		,m_currentController(NULL)
-//		,m_azimuth(0.0f)
+		,m_currentController(NULL)
+		,m_azimuth(0.0f)
 //		,m_posit_x(0.0f)
 //		,m_posit_y(0.0f)
 //		,m_gripper_roll(0.0f)
 //		,m_gripper_pitch(0.0f)
 	{
-//			scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
+		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
 
 	~dSixAxisManager()
 	{
 	}
 
-/*
 	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
 	{
 		dSixAxisManager* const me = (dSixAxisManager*)context;
 
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Use sliders to manipulate robot");
-		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -150.0f, 150.0f);
-		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
-		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
-
+		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -180.0f, 180.0f);
+		//ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
+		//ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
+/*
 		//ImGui::Separator();
 		//ImGui::Separator();
 		//ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
@@ -99,8 +121,8 @@ class dSixAxisManager: public dModelManager
 			dSixAxisController* const controller = &node->GetInfo();
 			controller->SetTarget(me->m_posit_x, me->m_posit_y, me->m_azimuth * dDegreeToRad, me->m_gripper_pitch * dDegreeToRad, me->m_gripper_roll * dDegreeToRad);
 		}
-	}
 */
+	}
 
 	static void ClampAngularVelocity(const NewtonBody* body, dFloat timestep, int threadIndex)
 	{
@@ -300,6 +322,10 @@ class dSixAxisManager: public dModelManager
 		NewtonBodySetMassMatrix(rootBody, 0.0f, 0.0f, 0.0f, 0.0f);
 #endif
 
+		m_currentController = robot;
+		robot->SetPivotMatrix();
+
+
 /*
 		// set the collision mask
 		// note this container work best with a material call back for setting bit field 
@@ -329,15 +355,22 @@ class dSixAxisManager: public dModelManager
 		dQuaternion rot(localMatrix);
 		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
+
+	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const 
+	{
+		if (model == m_currentController) {
+			m_currentController->m_azimuth = m_azimuth;
+			m_currentController->UpdateEffectors ();
+		}
+	}
 	
-/*
-	dSixAxisController* m_currentController;
+	dSixAxisRobot* m_currentController;
+
 	dFloat32 m_azimuth;
-	dFloat32 m_posit_x;
-	dFloat32 m_posit_y;
-	dFloat32 m_gripper_roll;
-	dFloat32 m_gripper_pitch;
-*/
+	//dFloat32 m_posit_x;
+	//dFloat32 m_posit_y;
+	//dFloat32 m_gripper_roll;
+	//dFloat32 m_gripper_pitch;
 };
 
 

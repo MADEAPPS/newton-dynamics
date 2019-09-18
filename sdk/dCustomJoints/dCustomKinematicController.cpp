@@ -283,7 +283,8 @@ void dCustomKinematicController::Init (const dMatrix& matrix)
 	NewtonBodySetSleepState(body, 0);
 
 	SetPickMode(1);
-	SetTargetMatrix(matrix);
+	//SetTargetMatrix(matrix);
+	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
 	SetMaxLinearFriction(1.0f);
 	SetMaxAngularFriction(1.0f);
 	SetMaxSpeed(30.0f);
@@ -329,6 +330,7 @@ void dCustomKinematicController::SetTargetRotation(const dQuaternion& rotation)
 {
 	NewtonBodySetSleepState(m_body0, 0);
 
+	dAssert (0);
 	dMatrix dymmyMatrix;
 	dMatrix matrix (GetTargetMatrix());
 	matrix = dMatrix(rotation, matrix.m_posit);
@@ -339,6 +341,7 @@ void dCustomKinematicController::SetTargetPosit(const dVector& posit)
 {
 	NewtonBodySetSleepState(m_body0, 0);
 
+	dAssert (0);
 	dMatrix dymmyMatrix;
 	dMatrix matrix(GetTargetMatrix());
 	matrix.m_posit = posit;
@@ -350,17 +353,19 @@ void dCustomKinematicController::SetTargetMatrix(const dMatrix& matrix)
 {
 	NewtonBodySetSleepState(m_body0, 0);
 
-	dMatrix dymmyMatrix;
-	CalculateLocalMatrix(matrix, dymmyMatrix, m_localMatrix1);
+//	dMatrix dymmyMatrix;
+//	CalculateLocalMatrix(matrix, dymmyMatrix, m_localMatrix1);
+	m_localMatrix1 = matrix;
 }
 
 dMatrix dCustomKinematicController::GetTargetMatrix () const
 {
-	dMatrix matrix1 (dGetIdentityMatrix());
-	if (m_body1) {
-		NewtonBodyGetMatrix(m_body1, &matrix1[0][0]);
-	}
-	return m_localMatrix1 * matrix1;
+//	dMatrix matrix1 (dGetIdentityMatrix());
+//	if (m_body1) {
+//		NewtonBodyGetMatrix(m_body1, &matrix1[0][0]);
+//	}
+//	return m_localMatrix1 * matrix1;
+	return m_localMatrix1;
 }
 
 dMatrix dCustomKinematicController::GetBodyMatrix () const

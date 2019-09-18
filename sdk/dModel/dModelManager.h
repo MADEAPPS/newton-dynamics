@@ -30,12 +30,17 @@ class dModelManager: public dCustomParallelListener
 	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext) {}
 	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const = 0;
 
+	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const {};
+	virtual void OnPostUpdate(dModelRootNode* const model, dFloat timestep) const {};
+
 	protected:
+	void PreUpdate(dFloat timestep, int threadID);
 	void PostUpdate(dFloat timestep, int threadID);
-//	void PreUpdate(dFloat timestep, int threadID);
 
 	private:
+	void UpdateLocalTranforms(dModelRootNode* const model) const;
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
+	
 
 	dList<dPointer<dModelRootNode>> m_controllerList;
 	dFloat m_timestep;

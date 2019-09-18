@@ -106,22 +106,6 @@ void dModelManager::PreUpdate(dFloat timestep, int threadID)
 
 */
 
-/*
-void dModelManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
-{
-	dAssert (0);
-}
-
-void dModelManager::OnPreUpdate(dCustomTransformController* const controller, dFloat timestep, int threadIndex) const
-{
-	dAssert (0);
-}
-
-void dModelManager::OnUpdateTransform(const dCustomTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
-{
-	dAssert (0);
-}
-*/
 
 void dModelManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 {
@@ -137,6 +121,56 @@ void dModelManager::AddRoot(dModelRootNode* const root)
 	node->GetInfo().SetData(root);
 }
 
+void dModelManager::UpdateLocalTranforms(dModelRootNode* const model) const
+{
+	dMatrix parentMatrixPool[128];
+	const dModelNode* stackPool[128];
+
+	int stack = 1;
+	stackPool[0] = model;
+	parentMatrixPool[0] = dGetIdentityMatrix();
+
+	while (stack) {
+		dMatrix matrix;
+		stack--;
+
+		dMatrix parentMatrix(parentMatrixPool[stack]);
+		const dModelNode* const bone = stackPool[stack];
+
+		NewtonBodyGetMatrix(bone->GetBody(), &matrix[0][0]);
+		OnUpdateTransform(bone, matrix * parentMatrix * bone->GetBindMatrix());
+
+		parentMatrix = matrix.Inverse();
+		for (dModelChildrenList::dListNode* ptrNode = bone->m_children____.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
+			parentMatrixPool[stack] = parentMatrix;
+			stackPool[stack] = ptrNode->GetInfo().GetData();
+			stack++;
+		}
+	}
+}
+
+void dModelManager::PreUpdate(dFloat timestep, int threadID)
+{
+	D_TRACKTIME();
+	NewtonWorld* const world = GetWorld();
+	const int threadCount = NewtonGetThreadsCount(world);
+
+	dList<dPointer<dModelRootNode>>::dListNode* node = m_controllerList.GetFirst();
+	for (int i = 0; i < threadID; i++) {
+		node = node ? node->GetNext() : NULL;
+	}
+
+	if (node) {
+		dModelRootNode* const model = node->GetInfo().GetData();
+		OnPreUpdate(model, timestep);
+		do {
+			for (int i = 0; i < threadCount; i++) {
+				node = node ? node->GetNext() : NULL;
+			}
+		} while (node);
+	}
+}
+
 void dModelManager::PostUpdate(dFloat timestep, int threadID)
 {
 	D_TRACKTIME();
@@ -150,9 +184,10 @@ void dModelManager::PostUpdate(dFloat timestep, int threadID)
 
 	if (node) {
 		dModelRootNode* const model = node->GetInfo().GetData();
-		model->PostUpdate(this, timestep);
-		//OnPostUpdate(model, timestep);
-		//model->UpdateTransforms(timestep);
+		OnPostUpdate(model, timestep);
+		if (model->m_localTransformMode) {
+			UpdateLocalTranforms(model);
+		}
 		do {
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;

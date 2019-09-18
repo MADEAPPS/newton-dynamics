@@ -15,6 +15,20 @@
 
 #include "dModelStdAfx.h"
 
+class dModelNode;
+class dModelChildrenList: public dList<dPointer<dModelNode>>
+{
+	public:
+	dModelChildrenList()
+		:dList<dPointer<dModelNode>>()
+	{
+	}
+
+	~dModelChildrenList()
+	{
+	}
+};
+
 class dModelNode
 {
 	public:
@@ -26,6 +40,8 @@ class dModelNode
 
 	void* GetUserData() const { return m_userData; }
 	void SetUserData(void* const data) { m_userData = data; }
+	dModelNode* GetParent() const {return m_parent;}
+	dModelChildrenList& GetChildren() {return m_children____;}
 
 	dCustomJoint* GetParentJoint() const;
 
@@ -34,7 +50,7 @@ class dModelNode
 	NewtonBody* m_body;
 	dModelNode* m_parent;
 	void* m_userData;
-	dList<dPointer<dModelNode>> m_children;
+	dModelChildrenList m_children____;
 
 	friend class dModelManager;
 	friend class dModelRootNode;
