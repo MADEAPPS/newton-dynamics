@@ -57,13 +57,9 @@ class dSixAxisRobot: public dModelRootNode
 		,m_gripperMatrix(dGetIdentityMatrix())
 		,m_effector(NULL)
 		,m_azimuth(0.0f)
+		,m_posit_x(0.0f)
+		,m_posit_y(0.0f)
 	{
-	}
-
-	void UpdateEffectors ()
-	{
-		dMatrix yawMatrix (dYawMatrix(m_azimuth * dDegreeToRad));
-		m_effector->SetTargetMatrix (m_gripperMatrix * yawMatrix * m_pivotMatrix);
 	}
 
 	void SetPivotMatrix()
@@ -76,11 +72,27 @@ class dSixAxisRobot: public dModelRootNode
 		m_pivotMatrix = pivotMatrix * baseMatrix.Inverse();
 		m_gripperMatrix = m_effector->GetTargetMatrix() * m_pivotMatrix.Inverse();
 	}
+
+	void UpdateEffectors (dFloat azimuth, dFloat posit_x, dFloat posit_y, dFloat pitch, dFloat yaw, dFloat roll)
+	{
+		m_azimuth = azimuth;
+		m_posit_x = posit_x;
+		m_posit_y = posit_y;
+
+		dMatrix yawMatrix (dYawMatrix(m_azimuth * dDegreeToRad));
+		dMatrix gripperMatrix (m_gripperMatrix);
+
+		gripperMatrix.m_posit.m_x += m_posit_x;
+		gripperMatrix.m_posit.m_y += m_posit_y;
+		m_effector->SetTargetMatrix (gripperMatrix * yawMatrix * m_pivotMatrix);
+	}
 	
 	dMatrix m_pivotMatrix;
 	dMatrix m_gripperMatrix;
 	dCustomKinematicController* m_effector;
 	dFloat m_azimuth;
+	dFloat m_posit_x;
+	dFloat m_posit_y;
 };
 
 class dSixAxisManager: public dModelManager
@@ -90,10 +102,11 @@ class dSixAxisManager: public dModelManager
 		:dModelManager(scene->GetNewton())
 		,m_currentController(NULL)
 		,m_azimuth(0.0f)
-//		,m_posit_x(0.0f)
-//		,m_posit_y(0.0f)
-//		,m_gripper_roll(0.0f)
-//		,m_gripper_pitch(0.0f)
+		,m_posit_x(0.0f)
+		,m_posit_y(0.0f)
+		,m_gripper_pitch(0.0f)
+		,m_gripper_yaw(0.0f)
+		,m_gripper_roll(0.0f)
 	{
 		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
@@ -107,21 +120,16 @@ class dSixAxisManager: public dModelManager
 		dSixAxisManager* const me = (dSixAxisManager*)context;
 
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print(color, "Use sliders to manipulate robot");
+		scene->Print(color, "linear degrees of freedom");
 		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -180.0f, 180.0f);
-		//ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
-		//ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
-/*
-		//ImGui::Separator();
-		//ImGui::Separator();
-		//ImGui::SliderFloat("eff_roll", &me->m_gripper_roll, -360.0f, 360.0f);
-		//ImGui::SliderFloat("eff_pitch", &me->m_gripper_pitch, -60.0f, 60.0f);
+		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.4f, 0.2f);
+		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.2f, 0.4f);
 
-		for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
-			dSixAxisController* const controller = &node->GetInfo();
-			controller->SetTarget(me->m_posit_x, me->m_posit_y, me->m_azimuth * dDegreeToRad, me->m_gripper_pitch * dDegreeToRad, me->m_gripper_roll * dDegreeToRad);
-		}
-*/
+		//ImGui::Separator();
+		//scene->Print(color, "angular degrees of freedom");
+		//ImGui::SliderFloat("pitch", &me->m_gripper_pitch, -180.0f, 180.0f);
+		//ImGui::SliderFloat("yaw", &me->m_gripper_yaw, -180.0f, 180.0f);
+		//ImGui::SliderFloat("roll", &me->m_gripper_roll, -180.0f, 180.0f);
 	}
 
 	static void ClampAngularVelocity(const NewtonBody* body, dFloat timestep, int threadIndex)
@@ -359,18 +367,19 @@ class dSixAxisManager: public dModelManager
 	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const 
 	{
 		if (model == m_currentController) {
-			m_currentController->m_azimuth = m_azimuth;
-			m_currentController->UpdateEffectors ();
+			m_currentController->UpdateEffectors (m_azimuth, m_posit_x, m_posit_y, 
+												  m_gripper_pitch, m_gripper_yaw, m_gripper_roll);
 		}
 	}
 	
 	dSixAxisRobot* m_currentController;
 
 	dFloat32 m_azimuth;
-	//dFloat32 m_posit_x;
-	//dFloat32 m_posit_y;
-	//dFloat32 m_gripper_roll;
-	//dFloat32 m_gripper_pitch;
+	dFloat32 m_posit_x;
+	dFloat32 m_posit_y;
+	dFloat32 m_gripper_pitch;
+	dFloat32 m_gripper_yaw;
+	dFloat32 m_gripper_roll;
 };
 
 
