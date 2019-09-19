@@ -35,6 +35,8 @@ class dCustomKinematicController: public dCustomJoint
 	CUSTOM_JOINTS_API dCustomKinematicController (NewtonInverseDynamics* const invDynSolver, void* const invDynNode, const dMatrix& attachmentMatrixInGlobalSpace);
 	CUSTOM_JOINTS_API virtual ~dCustomKinematicController();
 
+	CUSTOM_JOINTS_API void SetAsLinear();
+	CUSTOM_JOINTS_API void SetAsLinearAndAngular();
 	CUSTOM_JOINTS_API void SetPickMode (int mode);
 	CUSTOM_JOINTS_API void SetMaxLinearFriction(dFloat force); 
 	CUSTOM_JOINTS_API void SetMaxAngularFriction(dFloat torque); 
@@ -72,6 +74,7 @@ class dCustomKinematicController: public dCustomJoint
 	dFloat m_maxOmega;
 	char m_pickingMode;
 	char m_autoSleepState;
+	char m_controlAngularDof;
 
 	DECLARE_CUSTOM_JOINT(dCustomKinematicController, dCustomJoint)
 };

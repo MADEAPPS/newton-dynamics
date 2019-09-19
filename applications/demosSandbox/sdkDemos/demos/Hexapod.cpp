@@ -534,10 +534,16 @@ class dHexapod: public dModelRootNode
 	public:
 	dHexapod(NewtonBody* const rootBody, const dMatrix& bindMatrix)
 		:dModelRootNode(rootBody, bindMatrix)
+		,m_legEffectorCount(0)
 	{
 	}
+
+	int m_legEffectorCount;
+	dArray<dCustomKinematicController*> m_effectors;
 };
 
+
+#define HEXAPOD_MASS 500.0f
 
 class dHexapodManager: public dModelManager
 {
@@ -567,6 +573,65 @@ class dHexapodManager: public dModelManager
 		dFloat mass;
 		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 		NewtonBodySetMassMatrix(body, mass, Ixx * factor, Iyy * factor, Izz * factor);
+	}
+
+	void NormalizeMassAndInertia(dHexapod* const model, dFloat modelMass) const
+	{
+		int stack = 1;
+		int bodyCount = 0;
+		NewtonBody* bodyArray[1024];
+		dModelNode* stackBuffer[32];
+
+		stackBuffer[0] = model;
+		while (stack) {
+			stack--;
+			dModelNode* const root = stackBuffer[stack];
+			bodyArray[bodyCount] = root->GetBody();
+			bodyCount++;
+			const dModelChildrenList& children = root->GetChildren();
+			for (dModelChildrenList::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
+				stackBuffer[stack] = node->GetInfo().GetData();
+				stack++;
+			}
+		}
+
+		dFloat totalMass = 0.0f;
+		for (int i = 0; i < bodyCount; i++) {
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
+
+			NewtonBody* const body = bodyArray[i];
+			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+			totalMass += mass;
+		}
+
+		dFloat massNormalize = modelMass / totalMass;
+		for (int i = 0; i < bodyCount; i++) {
+			dFloat Ixx;
+			dFloat Iyy;
+			dFloat Izz;
+			dFloat mass;
+
+			NewtonBody* const body = bodyArray[i];
+			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+
+			mass *= massNormalize;
+			Ixx *= massNormalize;
+			Iyy *= massNormalize;
+			Izz *= massNormalize;
+
+			dFloat minInertia = dMin(Ixx, dMin(Iyy, Izz));
+			if (minInertia < 4.0f) {
+				dFloat maxInertia = dMax(dFloat(10.0f), dMax(Ixx, dMax(Iyy, Izz)));
+				Ixx = maxInertia;
+				Iyy = maxInertia;
+				Izz = maxInertia;
+			}
+
+			NewtonBodySetMassMatrix(body, mass, Ixx, Iyy, Izz);
+		}
 	}
 
 	NewtonBody* CreateBox(DemoEntityManager* const scene, const dMatrix& location, const dVector& size, dFloat mass, dFloat inertiaScale) const
@@ -654,20 +719,21 @@ class dHexapodManager: public dModelManager
 		armHinge->EnableLimits(true);
 		armHinge->SetLimits(-80.0f * dDegreeToRad, -80.0f * dDegreeToRad);
 		dModelNode* const armHingeNode = new dModelNode(arm, dGetIdentityMatrix(), forwardArmHingeNode);
+		
 
-/*
 		dMatrix effectorMatrix(dGetIdentityMatrix());
 		effectorMatrix.m_posit = armPivot.m_posit;
 		effectorMatrix.m_posit.m_y -= armSize;
-		dHexapodEffector* const effector = new dHexapodEffector(m_kinematicSolver, armHingeNode, parent, effectorMatrix * matrix);
-		effector->SetAsThreedof();
-		effector->SetMaxLinearFriction(partMass * DEMO_GRAVITY * 10.0f);
-		effector->SetMaxAngularFriction(partMass * DEMO_GRAVITY * 10.0f);
+		//dHexapodEffector* const effector = new dHexapodEffector(m_kinematicSolver, armHingeNode, parent, effectorMatrix * matrix);
+		dCustomKinematicController* const effector = new dCustomKinematicController(armHingeNode->GetBody(), matrix, parent);
+		effector->SetAsLinear();
+		effector->SetSolverModel(1);
+		//effector->SetAsThreedof();
+		effector->SetMaxLinearFriction(HEXAPOD_MASS * 9.8f * 10.0f);
 
 		return effector;
-*/
-		return NULL;
 	}
+
 
 	void MakeHexapod(DemoEntityManager* const scene, const dMatrix& location)
 	{
@@ -693,24 +759,22 @@ class dHexapodManager: public dModelManager
 		//baseMatrix.m_posit.m_y -= 0.06f;
 		// make the hexapod six limbs
 
-		int legEffectorCount = 0;
-		dCustomKinematicController* legEffectors[32];
-
-		for (int i = 0; i < 3; i++) {
-
+		for (int i = 0; i < 1; i++) {
 			dMatrix rightLocation(baseMatrix);
 			rightLocation.m_posit += rightLocation.m_right.Scale(size.m_z * 0.65f);
 			rightLocation.m_posit += rightLocation.m_front.Scale(size.m_x * 0.3f - size.m_x * i / 3.0f);
-			legEffectors[legEffectorCount] = AddLeg(scene, robot, rightLocation * location, 0.1f, 0.3f);
-			legEffectorCount++;
+			robot->m_effectors[robot->m_legEffectorCount] = AddLeg(scene, robot, rightLocation * location, 0.1f, 0.3f);
+			robot->m_legEffectorCount++;
 
-			dMatrix similarTransform(dGetIdentityMatrix());
-			similarTransform.m_posit.m_x = rightLocation.m_posit.m_x;
-			similarTransform.m_posit.m_y = rightLocation.m_posit.m_y;
-			dMatrix leftLocation(rightLocation * similarTransform.Inverse() * dYawMatrix(dPi) * similarTransform);
-			legEffectors[legEffectorCount] = AddLeg(scene, robot, leftLocation * location, 0.1f, 0.3f);
-			legEffectorCount++;
+			//dMatrix similarTransform(dGetIdentityMatrix());
+			//similarTransform.m_posit.m_x = rightLocation.m_posit.m_x;
+			//similarTransform.m_posit.m_y = rightLocation.m_posit.m_y;
+			//dMatrix leftLocation(rightLocation * similarTransform.Inverse() * dYawMatrix(dPi) * similarTransform);
+			//robot->m_effectors[robot->m_legEffectorCount] = AddLeg(scene, robot, leftLocation * location, 0.1f, 0.3f);
+			//robot->m_legEffectorCount++;
 		}
+
+ 		NormalizeMassAndInertia(robot, HEXAPOD_MASS);
 /*
 		// finalize inverse dynamics solver
 		NewtonInverseDynamicsEndBuild(m_kinematicSolver);
@@ -743,6 +807,15 @@ class dHexapodManager: public dModelManager
 		}
 */
 	}
+
+	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext)
+	{
+		dHexapod* const hexapod = (dHexapod*)model;
+		for (int i = 0; i < hexapod->m_legEffectorCount; i ++) {
+			hexapod->m_effectors[i]->Debug(debugContext);
+		}
+	}
+
 };
 
 

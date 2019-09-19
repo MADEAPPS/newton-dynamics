@@ -187,13 +187,13 @@ class dSixAxisManager: public dModelManager
 		return bone;
 	}
 
-	dCustomKinematicController* ConnectWithEffectoJoint(NewtonBody* const effectorReferenceBody, DemoEntity* const effectorNode, NewtonBody* const parent, const dSixAxisJointDefinition& definition)
+	dCustomKinematicController* ConnectWithEffectoJoint(NewtonBody* const effectorReferenceBody, DemoEntity* const effectorNode, NewtonBody* const body, const dSixAxisJointDefinition& definition)
 	{
 		dMatrix matrix(effectorNode->CalculateGlobalMatrix());
 #ifdef USE_OLD_KINEMATICS
-		dCustomKinematicController* const effector = new dCustomKinematicController (parent, matrix);
+		dCustomKinematicController* const effector = new dCustomKinematicController (body, matrix);
 #else
-		dCustomKinematicController* const effector = new dCustomKinematicController(parent, matrix, effectorReferenceBody);
+		dCustomKinematicController* const effector = new dCustomKinematicController(body, matrix, effectorReferenceBody);
 #endif
 		effector->SetSolverModel(1);
 		effector->SetMaxLinearFriction(SIZE_ROBOT_MASS * DEMO_GRAVITY * 50.0f);
@@ -215,7 +215,7 @@ class dSixAxisManager: public dModelManager
 		}
 	}
 
-	void SetModelMass(dFloat modelMass, int bodyCount, NewtonBody** const bodyArray) const
+	void NormalizeMassAndInertia(dFloat modelMass, int bodyCount, NewtonBody** const bodyArray) const
 	{
 		dFloat totalMass = 0.0f;
 		for (int i = 0; i < bodyCount; i++) {
@@ -330,7 +330,7 @@ class dSixAxisManager: public dModelManager
 		}
 
 		// set mass distribution by density and volume
-		SetModelMass(SIZE_ROBOT_MASS, bodyCount, bodyArray);
+		NormalizeMassAndInertia(SIZE_ROBOT_MASS, bodyCount, bodyArray);
 
 #ifdef USE_OLD_KINEMATICS
 		// make root body static
