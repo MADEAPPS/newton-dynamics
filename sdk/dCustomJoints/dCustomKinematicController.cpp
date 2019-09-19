@@ -287,7 +287,7 @@ void dCustomKinematicController::Init (const dMatrix& matrix)
 	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
 	SetMaxLinearFriction(1.0f);
 	SetMaxAngularFriction(1.0f);
-	SetAngularViscuosFrictionCoefficient(0.5f);
+	SetAngularViscuosFrictionCoefficient(1.0f);
 	SetMaxSpeed(30.0f);
 	SetMaxOmega(10.0f * 360.0f * dDegreeToRad);
 
@@ -328,7 +328,12 @@ void dCustomKinematicController::SetMaxAngularFriction(dFloat frictionTorque)
 
 void dCustomKinematicController::SetAngularViscuosFrictionCoefficient(dFloat coefficient)
 {
-	m_angularFrictionCoefficient = dAbs(coefficient);
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	dFloat mass;
+	NewtonBodyGetMass(m_body0, &mass, &Ixx, &Iyy, &Izz);
+	m_angularFrictionCoefficient = dAbs(coefficient) * dMax(Ixx, dMax(Iyy, Izz));
 }
 
 void dCustomKinematicController::SetTargetRotation(const dQuaternion& rotation)
@@ -416,15 +421,8 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 	}
 
 	if (m_pickingMode != 1) {
-		dFloat Ixx;
-		dFloat Iyy;
-		dFloat Izz;
-		dFloat mass;
-		NewtonBodyGetMass(m_body0, &mass, &Ixx, &Iyy, &Izz);
-		Ixx = dMax(Ixx, dMax(Iyy, Izz));
-
 		dFloat omegaMag2 = omega0.DotProduct3(omega0);
-		dFloat angularFriction = m_maxAngularFriction + m_angularFrictionCoefficient * Ixx * omegaMag2;
+		dFloat angularFriction = m_maxAngularFriction + m_angularFrictionCoefficient * omegaMag2;
 		//dTrace(("angular friction %f %f %f\n", omegaMag2, m_maxAngularFriction, angularFriction));
 		for (int i = 0; i < 3; i++) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[i][0]);
