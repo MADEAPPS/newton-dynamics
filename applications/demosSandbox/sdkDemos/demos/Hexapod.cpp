@@ -737,11 +737,6 @@ class dHexapodManager: public dModelManager
 
 	void MakeHexapod(DemoEntityManager* const scene, const dMatrix& location)
 	{
-		//dFloat mass = 30.0f;
-
-		// make the kinematic solver
-		//m_kinematicSolver = NewtonCreateInverseDynamics(scene->GetNewton());
-
 		// make the root body
 		dMatrix baseMatrix(dGetIdentityMatrix());
 		baseMatrix.m_posit.m_y += 0.35f;
@@ -754,11 +749,7 @@ class dHexapodManager: public dModelManager
 		// add the model to the manager
 		AddRoot(robot);
 
-		//void* const hexaBodyNode = NewtonInverseDynamicsAddRoot(m_kinematicSolver, hexaBody);
-		//dCustomInverseDynamicsEffector* legEffectors[32];
-		//baseMatrix.m_posit.m_y -= 0.06f;
-		// make the hexapod six limbs
-
+		// add all the hexa limbs procedurally
 		for (int i = 0; i < 3; i++) {
 			dMatrix rightLocation(baseMatrix);
 			rightLocation.m_posit += rightLocation.m_right.Scale(size.m_z * 0.65f);
@@ -774,13 +765,12 @@ class dHexapodManager: public dModelManager
 			robot->m_legEffectorCount++;
 		}
 
+		// normalize the mass of body parts
  		NormalizeMassAndInertia(robot, HEXAPOD_MASS);
-/*
-		// finalize inverse dynamics solver
-		NewtonInverseDynamicsEndBuild(m_kinematicSolver);
 
 		// create a fix pose frame generator
-		dEffectorTreeFixPose* const idlePose = new dEffectorTreeFixPose(hexaBody);
+		//dEffectorTreeFixPose* const idlePose = new dEffectorTreeFixPose(hexaBody);
+/*
 		dEffectorTreeFixPose* const walkPoseGenerator = new dEffectorWalkPoseGenerator(hexaBody);
 		m_walkIdleBlender = new dEffectorBlendIdleWalk(hexaBody, idlePose, walkPoseGenerator);
 

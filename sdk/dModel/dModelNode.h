@@ -29,7 +29,7 @@ class dModelChildrenList: public dList<dPointer<dModelNode>>
 	}
 };
 
-class dModelNode
+class dModelNode: public dCustomAlloc
 {
 	public:
 	dModelNode(NewtonBody* const modelBody, const dMatrix& bindMatrix, dModelNode* const parent);

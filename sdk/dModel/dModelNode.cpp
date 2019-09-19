@@ -14,7 +14,8 @@
 #include "dModelManager.h"
 
 dModelNode::dModelNode(NewtonBody* const modelBody, const dMatrix& bindMatrix, dModelNode* const parent)
-	:m_bindMatrix(bindMatrix)
+	:dCustomAlloc()
+	,m_bindMatrix(bindMatrix)
 	,m_body(modelBody)
 	,m_parent(parent)
 	,m_children____()
