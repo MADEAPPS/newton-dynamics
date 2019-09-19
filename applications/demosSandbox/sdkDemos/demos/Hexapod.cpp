@@ -293,8 +293,8 @@ class dHexapodController: public dCustomControllerBase
 		effectorMatrix.m_posit.m_y -= armSize;
 		dHexapodEffector* const effector = new dHexapodEffector(m_kinematicSolver, armHingeNode, parent, effectorMatrix * matrix);
 		effector->SetAsThreedof();
-		effector->SetMaxLinearFriction(partMass * DEMO_GRAVITY * 10.0f);
-		effector->SetMaxAngularFriction(partMass * DEMO_GRAVITY * 10.0f);
+		effector->SetMaxLinearFriction(partMass * 9.8f * 10.0f);
+		effector->SetMaxAngularFriction(partMass * 9.8f * 10.0f);
 
 		return effector;
 	}
