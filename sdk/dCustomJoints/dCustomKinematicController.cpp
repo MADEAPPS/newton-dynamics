@@ -425,7 +425,7 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 
 		dFloat omegaMag2 = omega0.DotProduct3(omega0);
 		dFloat angularFriction = m_maxAngularFriction + m_angularFrictionCoefficient * Ixx * omegaMag2;
-		dTrace(("angular friction %f %f %f\n", omegaMag2, m_maxAngularFriction, angularFriction));
+		//dTrace(("angular friction %f %f %f\n", omegaMag2, m_maxAngularFriction, angularFriction));
 		for (int i = 0; i < 3; i++) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[i][0]);
 			NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
