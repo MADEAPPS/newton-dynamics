@@ -381,8 +381,13 @@ dMatrix dCustomKinematicController::GetBodyMatrix () const
 
 void dCustomKinematicController::Debug(dDebugDisplay* const debugDisplay) const
 {
+	dMatrix matrix1(GetTargetMatrix());
+	if (m_body1) {
+		NewtonBodyGetMatrix(m_body1, &matrix1[0][0]);
+		matrix1 = GetTargetMatrix() * matrix1;
+	}
+	debugDisplay->DrawFrame(matrix1);
 	debugDisplay->DrawFrame(GetBodyMatrix());
-	debugDisplay->DrawFrame(GetTargetMatrix());
 }
 
 void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadIndex)

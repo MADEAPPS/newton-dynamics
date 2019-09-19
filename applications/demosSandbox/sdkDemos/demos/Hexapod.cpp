@@ -725,7 +725,7 @@ class dHexapodManager: public dModelManager
 		effectorMatrix.m_posit = armPivot.m_posit;
 		effectorMatrix.m_posit.m_y -= armSize;
 		//dHexapodEffector* const effector = new dHexapodEffector(m_kinematicSolver, armHingeNode, parent, effectorMatrix * matrix);
-		dCustomKinematicController* const effector = new dCustomKinematicController(armHingeNode->GetBody(), matrix, parent);
+		dCustomKinematicController* const effector = new dCustomKinematicController(armHingeNode->GetBody(), effectorMatrix * matrix, parent);
 		effector->SetAsLinear();
 		effector->SetSolverModel(1);
 		//effector->SetAsThreedof();
@@ -759,19 +759,19 @@ class dHexapodManager: public dModelManager
 		//baseMatrix.m_posit.m_y -= 0.06f;
 		// make the hexapod six limbs
 
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 3; i++) {
 			dMatrix rightLocation(baseMatrix);
 			rightLocation.m_posit += rightLocation.m_right.Scale(size.m_z * 0.65f);
 			rightLocation.m_posit += rightLocation.m_front.Scale(size.m_x * 0.3f - size.m_x * i / 3.0f);
 			robot->m_effectors[robot->m_legEffectorCount] = AddLeg(scene, robot, rightLocation * location, 0.1f, 0.3f);
 			robot->m_legEffectorCount++;
 
-			//dMatrix similarTransform(dGetIdentityMatrix());
-			//similarTransform.m_posit.m_x = rightLocation.m_posit.m_x;
-			//similarTransform.m_posit.m_y = rightLocation.m_posit.m_y;
-			//dMatrix leftLocation(rightLocation * similarTransform.Inverse() * dYawMatrix(dPi) * similarTransform);
-			//robot->m_effectors[robot->m_legEffectorCount] = AddLeg(scene, robot, leftLocation * location, 0.1f, 0.3f);
-			//robot->m_legEffectorCount++;
+			dMatrix similarTransform(dGetIdentityMatrix());
+			similarTransform.m_posit.m_x = rightLocation.m_posit.m_x;
+			similarTransform.m_posit.m_y = rightLocation.m_posit.m_y;
+			dMatrix leftLocation(rightLocation * similarTransform.Inverse() * dYawMatrix(dPi) * similarTransform);
+			robot->m_effectors[robot->m_legEffectorCount] = AddLeg(scene, robot, leftLocation * location, 0.1f, 0.3f);
+			robot->m_legEffectorCount++;
 		}
 
  		NormalizeMassAndInertia(robot, HEXAPOD_MASS);
@@ -815,7 +815,6 @@ class dHexapodManager: public dModelManager
 			hexapod->m_effectors[i]->Debug(debugContext);
 		}
 	}
-
 };
 
 
