@@ -27,11 +27,10 @@ class dModelManager: public dCustomParallelListener
 
 	void AddRoot(dModelRootNode* const root);
 
-	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext) {}
-	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const = 0;
-
 	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const {};
 	virtual void OnPostUpdate(dModelRootNode* const model, dFloat timestep) const {};
+	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const {}
+	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext) {}
 
 	protected:
 	void PreUpdate(dFloat timestep, int threadID);
