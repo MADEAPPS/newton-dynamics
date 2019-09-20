@@ -38,7 +38,7 @@ class dModelAnimTreePoseBlender: public dModelAnimTree
 		return m_param;
 	}
 
-	dFloat SetParam(dFloat param)
+	void SetParam(dFloat param)
 	{
 		m_param = dClamp(param, dFloat (0.0f), dFloat (1.0f));
 	}
