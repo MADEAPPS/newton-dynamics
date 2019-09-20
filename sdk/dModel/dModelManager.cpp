@@ -141,7 +141,7 @@ void dModelManager::UpdateLocalTranforms(dModelRootNode* const model) const
 		OnUpdateTransform(bone, matrix * parentMatrix * bone->GetBindMatrix());
 
 		parentMatrix = matrix.Inverse();
-		for (dModelChildrenList::dListNode* ptrNode = bone->m_children____.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
+		for (dModelChildrenList::dListNode* ptrNode = bone->m_children.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
 			parentMatrixPool[stack] = parentMatrix;
 			stackPool[stack] = ptrNode->GetInfo().GetData();
 			stack++;

@@ -19,16 +19,26 @@ class dModelAnimTreePose: public dModelAnimTree
 {
 	public:
 	dModelAnimTreePose(dModelRootNode* const model)
-		:dModelAnimTree(rootBody)
+		:dModelAnimTree(model)
 	{
 	}
 
-	//dModelAnimTreePose& GetPose() { return m_pose; }
-	virtual dModelAnimTreePose& GetPose() = 0;
+	dModelKeyFramePose& GetPose() 
+	{
+		return m_pose;
+	}
 
 	protected:
-	virtual void Evaluate(dModelAnimTreePose& output, dFloat timestep) = 0;
-	//dModelAnimTreePose m_pose;
+	virtual void Evaluate(dFloat timestep)
+	{
+	}
+
+	virtual void GeneratePose(dModelKeyFramePose& output)
+	{
+		m_pose.CopyKeyFrames(output);
+	}
+
+	dModelKeyFramePose m_pose;
 };
 
 

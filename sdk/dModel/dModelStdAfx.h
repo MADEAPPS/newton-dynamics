@@ -62,8 +62,8 @@
 
 #include <dCustomJoint.h>
 #include <dCustomListener.h>
-#include <dCustomBallAndSocket.h>
-
+//#include <dCustomBallAndSocket.h>
+#include <dCustomKinematicController.h>
 
 
 #endif

@@ -40,9 +40,7 @@ class dModelManager: public dCustomParallelListener
 	void UpdateLocalTranforms(dModelRootNode* const model) const;
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
 	
-
 	dList<dPointer<dModelRootNode>> m_controllerList;
-	dFloat m_timestep;
 };
 
 

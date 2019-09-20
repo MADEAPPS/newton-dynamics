@@ -195,7 +195,8 @@ typedef long long unsigned64;
 
 
 #include <dModelManager.h>
-
+#include <dModelAnimTree.h>
+#include <dModelAnimTreePose.h>
 
 
 #include <dAnimationStdAfx.h>

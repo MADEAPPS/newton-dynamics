@@ -529,36 +529,44 @@ class dHexapodWalker: public dModelRootNode
 
 
 
+#define HEXAPOD_MASS 500.0f
+
 class dHexapod: public dModelRootNode
 {
 	public:
 	dHexapod(NewtonBody* const rootBody, const dMatrix& bindMatrix)
 		:dModelRootNode(rootBody, bindMatrix)
-		,m_legEffectorCount(0)
+		,m_pose()
+		,m_animtree(0)
+		//,m_legEffectorCount(0)
 	{
 	}
 
-	int m_legEffectorCount;
-	dArray<dCustomKinematicController*> m_effectors;
+	~dHexapod()
+	{
+		if (m_animtree) {
+			delete m_animtree;
+		}
+	}
+
+	void ApplyAnimTree ()
+	{
+		m_animtree->GeneratePose(m_pose);
+	}
+
+	dModelKeyFramePose m_pose;
+	dModelAnimTree* m_animtree;
 };
 
-
-#define HEXAPOD_MASS 500.0f
 
 class dHexapodManager: public dModelManager
 {
 	public:
 	dHexapodManager(DemoEntityManager* const scene)
 		:dModelManager(scene->GetNewton())
-		//, m_currentController(NULL)
-		//, m_azimuth(0.0f)
-		//, m_posit_x(0.0f)
-		//, m_posit_y(0.0f)
-		//, m_gripper_pitch(0.0f)
-		//, m_gripper_yaw(0.0f)
-		//, m_gripper_roll(0.0f)
+		,m_currentController(NULL)
 	{
-		//		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
+		//scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
 
 	~dHexapodManager()
@@ -744,67 +752,77 @@ class dHexapodManager: public dModelManager
 		NewtonBody* const hexaBody = CreateBox(scene, baseMatrix * location, size, 1.0f, 1.0f);
 
 		// make a kinematic controlled model.
-		dHexapod* const robot = new dHexapod(hexaBody, dGetIdentityMatrix());
+		dHexapod* const hexapod = new dHexapod(hexaBody, dGetIdentityMatrix());
 
 		// add the model to the manager
-		AddRoot(robot);
+		AddRoot(hexapod);
 
-		// add all the hexa limbs procedurally
+		// add all the hexapod limbs procedurally
 		for (int i = 0; i < 3; i++) {
+			dModelKeyFrame keyFrame;
+
+			// make right legs
 			dMatrix rightLocation(baseMatrix);
 			rightLocation.m_posit += rightLocation.m_right.Scale(size.m_z * 0.65f);
 			rightLocation.m_posit += rightLocation.m_front.Scale(size.m_x * 0.3f - size.m_x * i / 3.0f);
-			robot->m_effectors[robot->m_legEffectorCount] = AddLeg(scene, robot, rightLocation * location, 0.1f, 0.3f);
-			robot->m_legEffectorCount++;
+			keyFrame.m_effector = AddLeg(scene, hexapod, rightLocation * location, 0.1f, 0.3f);
+			dMatrix matrix (keyFrame.m_effector->GetTargetMatrix());
+			keyFrame.m_posit = matrix.m_posit;
+			keyFrame.m_rotation = dQuaternion(matrix);
+			hexapod->m_pose.Append(keyFrame);
 
+			// make left legs
 			dMatrix similarTransform(dGetIdentityMatrix());
 			similarTransform.m_posit.m_x = rightLocation.m_posit.m_x;
 			similarTransform.m_posit.m_y = rightLocation.m_posit.m_y;
 			dMatrix leftLocation(rightLocation * similarTransform.Inverse() * dYawMatrix(dPi) * similarTransform);
-			robot->m_effectors[robot->m_legEffectorCount] = AddLeg(scene, robot, leftLocation * location, 0.1f, 0.3f);
-			robot->m_legEffectorCount++;
+			keyFrame.m_effector = AddLeg(scene, hexapod, leftLocation * location, 0.1f, 0.3f);
+			matrix = keyFrame.m_effector->GetTargetMatrix();
+			keyFrame.m_posit = matrix.m_posit;
+			keyFrame.m_rotation = dQuaternion(matrix);
+			hexapod->m_pose.Append(keyFrame);
 		}
 
 		// normalize the mass of body parts
- 		NormalizeMassAndInertia(robot, HEXAPOD_MASS);
+ 		NormalizeMassAndInertia(hexapod, HEXAPOD_MASS);
 
 		// create a fix pose frame generator
-		//dEffectorTreeFixPose* const idlePose = new dEffectorTreeFixPose(hexaBody);
-/*
-		dEffectorTreeFixPose* const walkPoseGenerator = new dEffectorWalkPoseGenerator(hexaBody);
-		m_walkIdleBlender = new dEffectorBlendIdleWalk(hexaBody, idlePose, walkPoseGenerator);
+		dModelAnimTreePose* const idlePose = new dModelAnimTreePose(hexapod);
 
-		m_postureModifier = new dAnimationHipController(m_walkIdleBlender);
-		m_animTreeNode = new dEffectorTreeRoot(hexaBody, m_postureModifier);
+		//dEffectorTreeFixPose* const walkPoseGenerator = new dEffectorWalkPoseGenerator(hexaBody);
+		//m_walkIdleBlender = new dEffectorBlendIdleWalk(hexaBody, idlePose, walkPoseGenerator);
+		//
+		//m_postureModifier = new dAnimationHipController(m_walkIdleBlender);
+		//m_animTreeNode = new dEffectorTreeRoot(hexaBody, m_postureModifier);
 
-		dMatrix rootMatrix;
-		NewtonBodyGetMatrix(hexaBody, &rootMatrix[0][0]);
-		rootMatrix = rootMatrix.Inverse();
-		for (int i = 0; i < legEffectorCount; i++) {
-			dEffectorTreeInterface::dEffectorTransform frame;
-			dCustomInverseDynamicsEffector* const effector = legEffectors[i];
-			dMatrix effectorMatrix(effector->GetBodyMatrix());
-
-			dMatrix poseMatrix(effectorMatrix * rootMatrix);
-
-			frame.m_effector = effector;
-			frame.m_posit = poseMatrix.m_posit;
-			frame.m_rotation = dQuaternion(poseMatrix);
-
-			idlePose->GetPose().Append(frame);
-			walkPoseGenerator->GetPose().Append(frame);
-			m_animTreeNode->GetPose().Append(frame);
+		for (dModelKeyFramePose::dListNode* srcNode = hexapod->m_pose.GetFirst(); srcNode; srcNode = srcNode->GetNext()) {
+			idlePose->GetPose().Append(srcNode->GetInfo());
+			//walkPoseGenerator->GetPose().Append(frame);
+			//m_animTreeNode->GetPose().Append(frame);
 		}
-*/
+
+		hexapod->m_animtree = idlePose;
+		m_currentController = hexapod;
 	}
 
 	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext)
 	{
 		dHexapod* const hexapod = (dHexapod*)model;
-		for (int i = 0; i < hexapod->m_legEffectorCount; i ++) {
-			hexapod->m_effectors[i]->Debug(debugContext);
+		for (dModelKeyFramePose::dListNode* node = hexapod->m_pose.GetFirst(); node; node = node->GetNext()) {
+			const dModelKeyFrame& keyFrame = node->GetInfo();
+			keyFrame.m_effector->Debug(debugContext);
 		}
 	}
+
+	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const
+	{
+		if (model == m_currentController) {
+			m_currentController->m_animtree->Evaluate(timestep);
+			m_currentController->ApplyAnimTree ();
+		}
+	}
+
+	dHexapod* m_currentController;
 };
 
 

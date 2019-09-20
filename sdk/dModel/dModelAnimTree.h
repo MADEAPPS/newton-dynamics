@@ -13,26 +13,38 @@
 #ifndef __D_MODEL_ANIM_TREE_H__
 #define __D_MODEL_ANIM_TREE_H__
 
-#include "dCustomJoint.h"
+#include "dModelStdAfx.h"
 
 class dModelRootNode;
 
-class dModelAnimTreeKeyFrame
+class dModelKeyFrame
 {
 	public:
 	dVector m_posit;
 	dQuaternion m_rotation;
-//	dCustomInverseDynamicsEffector* m_effector;
+	dCustomKinematicController* m_effector;
 };
 
-class dModelAnimTreePose: public dList<dModelAnimTreeKeyFrame>
+class dModelKeyFramePose: public dList<dModelKeyFrame>
 {
 	public:
-	dModelAnimTreePose() : dList<dModelAnimTreeKeyFrame>(), m_childNode(NULL) 
-		:dList<dModelAnimTreeKeyFrame>()
+	dModelKeyFramePose()
+		:dList<dModelKeyFrame>()
 	{
 	}
-	dModelAnimTree* m_childNode;
+
+	void CopyKeyFrames(dModelKeyFramePose& output) const
+	{
+		dAssert (GetCount() == output.GetCount());
+		for (dListNode* srcNode = GetFirst(), *dstNode = output.GetFirst(); srcNode; srcNode = srcNode->GetNext(), dstNode = dstNode->GetNext()) {
+			dModelKeyFrame& dst = dstNode->GetInfo();
+			const dModelKeyFrame& src = srcNode->GetInfo();
+			
+			dst.m_posit = src.m_posit;
+			dst.m_rotation = src.m_rotation;
+			dAssert(dst.m_effector == src.m_effector);
+		}
+	}
 };
 
 
@@ -48,11 +60,11 @@ class dModelAnimTree: public dCustomAlloc
 	virtual ~dModelAnimTree()
 	{
 	}
+	
+	virtual void Evaluate(dFloat timestep) = 0;
+	virtual void GeneratePose(dModelKeyFramePose& output) = 0;
 
-	virtual void Evaluate(dModelAnimTreePose& output, dFloat timestep)
-	{
-	}
-
+	protected:
 	dModelRootNode* m_model;
 };
 
