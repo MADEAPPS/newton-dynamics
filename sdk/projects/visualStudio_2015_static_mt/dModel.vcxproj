@@ -50,6 +50,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\dModel\dModelAnimTree.h" />
+    <ClInclude Include="..\..\dModel\dModelAnimTreePose.h" />
+    <ClInclude Include="..\..\dModel\dModelAnimTreeposeBlender.h" />
     <ClInclude Include="..\..\dModel\dModelManager.h" />
     <ClInclude Include="..\..\dModel\dModelNode.h" />
     <ClInclude Include="..\..\dModel\dModelRootNode.h" />
