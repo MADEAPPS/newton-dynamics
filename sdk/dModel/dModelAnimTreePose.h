@@ -18,8 +18,9 @@
 class dModelAnimTreePose: public dModelAnimTree
 {
 	public:
-	dModelAnimTreePose(dModelRootNode* const model)
+	dModelAnimTreePose(dModelRootNode* const model, const dModelKeyFramePose& pose)
 		:dModelAnimTree(model)
+		,m_pose(pose)
 	{
 	}
 
@@ -28,7 +29,6 @@ class dModelAnimTreePose: public dModelAnimTree
 		return m_pose;
 	}
 
-	protected:
 	virtual void Evaluate(dFloat timestep)
 	{
 	}
@@ -38,6 +38,7 @@ class dModelAnimTreePose: public dModelAnimTree
 		m_pose.CopyKeyFrames(output);
 	}
 
+	protected:
 	dModelKeyFramePose m_pose;
 };
 

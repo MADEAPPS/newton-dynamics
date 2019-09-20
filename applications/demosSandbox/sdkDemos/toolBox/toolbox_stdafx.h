@@ -166,6 +166,13 @@ typedef long long unsigned64;
 #include <dCustomPlayerControllerManager.h>
 #include <dCustomVehicleControllerManager.h>
 
+#include <dModelStdAfx.h>
+#include <dModelManager.h>
+#include <dModelAnimTree.h>
+#include <dModelAnimTreePose.h>
+#include <dModelAnimTreePoseBlender.h>
+
+
 #include <dStdafxVehicle.h>
 #include <dVehicleChassis.h>
 #include <dVehicleManager.h>
@@ -192,12 +199,6 @@ typedef long long unsigned64;
 
 #include <dStdAfxNewton.h>
 #include <dNewtonMesh.h>
-
-
-#include <dModelManager.h>
-#include <dModelAnimTree.h>
-#include <dModelAnimTreePose.h>
-
 
 #include <dAnimationStdAfx.h>
 #include <dAnimationJoint.h>

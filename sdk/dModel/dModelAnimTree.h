@@ -33,6 +33,14 @@ class dModelKeyFramePose: public dList<dModelKeyFrame>
 	{
 	}
 
+	dModelKeyFramePose(const dModelKeyFramePose& src)
+		:dList<dModelKeyFrame>()
+	{
+		for (dListNode* node = src.GetFirst(); node; node = node->GetNext()) {
+			Append (node->GetInfo());
+		}
+	}
+
 	void CopyKeyFrames(dModelKeyFramePose& output) const
 	{
 		dAssert (GetCount() == output.GetCount());

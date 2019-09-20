@@ -531,14 +531,101 @@ class dHexapodWalker: public dModelRootNode
 
 #define HEXAPOD_MASS 500.0f
 
+
+class dModelAnimTreePoseWalkSequence: public dModelAnimTreePose
+{
+	public:
+	dModelAnimTreePoseWalkSequence(dModelRootNode* const model, const dModelKeyFramePose& pose)
+		:dModelAnimTreePose(model, pose)
+		,m_acc(0.0f)
+		,m_amplitud_x(0.35f)
+		,m_amplitud_y(0.1f)
+		,m_period(1.0f)
+		,m_cycle()
+	{
+		m_sequence[0] = 0;
+		m_sequence[3] = 0;
+		m_sequence[4] = 0;
+		m_sequence[1] = 1;
+		m_sequence[2] = 1;
+		m_sequence[5] = 1;
+
+		// make left walk cycle
+		const int size = 11;
+		const int splite = (size - 1) / 2 - 1;
+		dFloat64 knots[size];
+		dBigVector leftControlPoints[size + 2];
+		for (int i = 0; i < size; i++) {
+			knots[i] = dFloat(i) / (size - 1);
+		}
+		memset(leftControlPoints, 0, sizeof (leftControlPoints));
+
+		dFloat x = -m_amplitud_x / 2.0f;
+		dFloat step_x = m_amplitud_x / splite;
+		for (int i = 0; i <= splite; i++) {
+			leftControlPoints[i + 1].m_y = m_amplitud_y * dSin(dPi * dFloat(i) / splite);
+			leftControlPoints[i + 1].m_x = x;
+			x += step_x;
+		}
+
+		x = m_amplitud_x / 2.0f;
+		step_x = -m_amplitud_x / (size - splite - 1);
+		for (int i = splite; i < size; i++) {
+			leftControlPoints[i + 1].m_x = x;
+			x += step_x;
+		}
+		leftControlPoints[0].m_x = leftControlPoints[1].m_x;
+		leftControlPoints[size + 1].m_x = leftControlPoints[size].m_x;
+
+		//cycle.CreateFromKnotVectorAndControlPoints(3, size, knots, leftControlPoints);
+		m_cycle.CreateFromKnotVectorAndControlPoints(1, size, knots, &leftControlPoints[1]);
+	}
+
+	void Evaluate(dFloat timestep)
+	{
+		m_acc = dMod(m_acc + timestep, m_period);
+	}
+
+	virtual void GeneratePose(dModelKeyFramePose& output)
+	{
+		dModelAnimTreePose::GeneratePose(output);
+
+		dFloat param = m_acc / m_period;
+		dBigVector left(m_cycle.CurvePoint(param));
+		dBigVector right(m_cycle.CurvePoint(dMod(param + 0.5f, 1.0f)));
+
+		dFloat high[2];
+		dFloat stride[2];
+		high[0] = dFloat(left.m_y);
+		high[1] = dFloat(right.m_y);
+		stride[0] = dFloat(left.m_x);
+		stride[1] = dFloat(right.m_x);
+
+		int index = 0;
+		for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+			dModelKeyFrame& transform = node->GetInfo();
+			transform.m_posit.m_y += high[m_sequence[index]];
+			transform.m_posit.m_x += stride[m_sequence[index]];
+			index++;
+		}
+	}
+
+	dFloat m_acc;
+	dFloat m_period;
+	dFloat m_amplitud_x;
+	dFloat m_amplitud_y;
+	dBezierSpline m_cycle;
+	int m_sequence[6];
+};
+
 class dHexapod: public dModelRootNode
 {
 	public:
 	dHexapod(NewtonBody* const rootBody, const dMatrix& bindMatrix)
 		:dModelRootNode(rootBody, bindMatrix)
 		,m_pose()
-		,m_animtree(0)
-		//,m_legEffectorCount(0)
+		,m_animtree(NULL)
+		,m_walkIdleBlender(NULL)
 	{
 	}
 
@@ -552,10 +639,18 @@ class dHexapod: public dModelRootNode
 	void ApplyAnimTree ()
 	{
 		m_animtree->GeneratePose(m_pose);
+
+		for (dModelKeyFramePose::dListNode* node = m_pose.GetFirst(); node; node = node->GetNext()) {
+			dModelKeyFrame& transform = node->GetInfo();
+			transform.m_effector->SetTargetMatrix(dMatrix (transform.m_rotation, transform.m_posit));
+		}
 	}
 
 	dModelKeyFramePose m_pose;
 	dModelAnimTree* m_animtree;
+
+	// do no delete !!
+	dModelAnimTreePoseBlender* m_walkIdleBlender;
 };
 
 
@@ -787,21 +882,14 @@ class dHexapodManager: public dModelManager
  		NormalizeMassAndInertia(hexapod, HEXAPOD_MASS);
 
 		// create a fix pose frame generator
-		dModelAnimTreePose* const idlePose = new dModelAnimTreePose(hexapod);
-
-		//dEffectorTreeFixPose* const walkPoseGenerator = new dEffectorWalkPoseGenerator(hexaBody);
-		//m_walkIdleBlender = new dEffectorBlendIdleWalk(hexaBody, idlePose, walkPoseGenerator);
+		dModelAnimTreePose* const idlePose = new dModelAnimTreePose(hexapod, hexapod->m_pose);
+		dModelAnimTreePose* const walkPoseGenerator = new dModelAnimTreePoseWalkSequence(hexapod, hexapod->m_pose);
+		hexapod->m_walkIdleBlender = new dModelAnimTreePoseBlender(hexapod, idlePose, walkPoseGenerator);
 		//
 		//m_postureModifier = new dAnimationHipController(m_walkIdleBlender);
 		//m_animTreeNode = new dEffectorTreeRoot(hexaBody, m_postureModifier);
 
-		for (dModelKeyFramePose::dListNode* srcNode = hexapod->m_pose.GetFirst(); srcNode; srcNode = srcNode->GetNext()) {
-			idlePose->GetPose().Append(srcNode->GetInfo());
-			//walkPoseGenerator->GetPose().Append(frame);
-			//m_animTreeNode->GetPose().Append(frame);
-		}
-
-		hexapod->m_animtree = idlePose;
+		hexapod->m_animtree = hexapod->m_walkIdleBlender;
 		m_currentController = hexapod;
 	}
 
@@ -836,7 +924,7 @@ void Hexapod(DemoEntityManager* const scene)
 
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
-	dHexapodManager_old* const robotManager = new dHexapodManager_old(scene);
+	dHexapodManager_old* const robotManager_old = new dHexapodManager_old(scene);
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.1f);
 
@@ -853,21 +941,20 @@ count = 1;
 		location.m_posit.m_x = x0;
 		for (int i = 0; i < count; i++) {
 			location.m_posit.m_x += 2.0f;
-			robotManager->MakeHexapod(scene, location);
+			robotManager_old->MakeHexapod(scene, location);
 		}
 	}
 
-	dHexapodManager* const robotManager1 = new dHexapodManager(scene);
+	dHexapodManager* const robotManager = new dHexapodManager(scene);
 	location.m_posit.m_z -= 4.0f;
 	for (int j = 0; j < 1; j++) {
 		location.m_posit.m_z += 2.0f;
 		location.m_posit.m_x = x0;
 		for (int i = 0; i < count; i++) {
 			location.m_posit.m_x += 2.0f;
-			robotManager1->MakeHexapod(scene, location);
+			robotManager->MakeHexapod(scene, location);
 		}
 	}
-
 
 	location.m_posit = dVector(FindFloor(scene->GetNewton(), dVector(-0.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 	dVector origin(FindFloor(world, dVector(-4.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
