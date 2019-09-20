@@ -676,11 +676,6 @@ class dHexapodManager: public dModelManager
 		scene->Print(color, "inverse Dynamics Hexapod");
 
 		ImGui::Separator();
-		//scene->Print(color, "control mode");
-		//ImGui::RadioButton("rotate body", &xxxx, 1);
-		//ImGui::RadioButton("translate body", &xxxx, 0);
-		//ImGui::Separator();
-
 		ImGui::SliderFloat("speed", &me->m_speed, 0.0f, 1.0f);
 		ImGui::SliderFloat("pitch", &me->m_pitch, -10.0f, 10.0f);
 		ImGui::SliderFloat("yaw", &me->m_yaw, -10.0f, 10.0f);
@@ -691,7 +686,7 @@ class dHexapodManager: public dModelManager
 		//for (dListNode* node = me->GetFirst(); node; node = node->GetNext()) {
 		//	dHexapodController* const controller = &node->GetInfo();
 		//	controller->m_walkIdleBlender->SetBlendFactor(me->m_speed);
-		//	controller->SetTarget(me->m_posit_x, -me->m_posit_y, -me->m_pitch * dDegreeToRad, -me->m_yaw * dDegreeToRad, -me->m_roll * dDegreeToRad);
+		//	controller->SetTarget(me->m_posit_x, -me->m_posit_y, -me->m_pitch, -me->m_yaw, -me->m_roll);
 		//}
 	}
 
