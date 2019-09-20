@@ -52,8 +52,6 @@ bool dgThread::IsThreadActive() const
 	return m_threadRunning ? true : false;
 }
 
-
-
 #ifdef DG_USE_THREAD_EMULATION
 
 dgThread::dgSemaphore::dgSemaphore ()
@@ -168,9 +166,12 @@ void dgThread::Init ()
 	// This must be set now because otherwise if this thread is
 	// immediately closed the Terminate method won't detect that the
 	// thread is running
-	dgInterlockedExchange(&m_threadRunning, 1);
+	dgInterlockedExchange(&m_threadRunning, 0);
 	m_handle = std::thread(dgThreadSystemCallback, this);
-	dgThreadYield();
+	// wait until the thread procedure is called.
+	while (!m_threadRunning) {
+		dgThreadYield();
+	}
 
 	SetName();
 }
@@ -196,6 +197,7 @@ void* dgThread::dgThreadSystemCallback(void* threadData)
 	dgThread* const me = (dgThread*) threadData;
 
 	D_SET_TRACK_NAME(me->m_name);
+	dgInterlockedExchange(&me->m_threadRunning, 1);
 	me->Execute(me->m_id);
 	dgInterlockedExchange(&me->m_threadRunning, 0);
 
