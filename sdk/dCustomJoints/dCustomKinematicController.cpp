@@ -355,6 +355,11 @@ void dCustomKinematicController::CheckSleep() const
 	matrix.m_posit.m_w = 0.0f;
 	if (matrix.m_posit.DotProduct3(matrix.m_posit) > 1.0e-6f) {
 		NewtonBodySetSleepState(m_body0, 0);
+	} else if (m_controlAngularDof) {
+		dFloat32 trace = matrix[0][0] * matrix[1][1] * matrix[2][2];
+		if (trace < 0.9995f) {
+			NewtonBodySetSleepState(m_body0, 0);
+		}
 	}
 }
 
@@ -464,8 +469,8 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 				NewtonUserJointSetRowMinimumFriction(m_joint, -angularFriction);
 				NewtonUserJointSetRowMaximumFriction(m_joint, angularFriction);
 			}
-		}
-		else {
+		} else {
+
 			dFloat pitchAngle = 0.0f;
 			const dFloat maxAngle = 2.0f * m_maxOmega * timestep;
 			dFloat cosAngle = matrix1[0].DotProduct3(matrix0[0]);
@@ -492,8 +497,8 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 				}
 				pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
 
-			}
-			else {
+			} else {
+
 				dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 				dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
 				lateralDir = lateralDir.Normalize();
