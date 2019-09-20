@@ -56,7 +56,6 @@ void dCustomKinematicController::Serialize (NewtonSerializeCallback callback, vo
 	dAssert (0);
 }
 
-
 void dCustomKinematicController::ResetAutoSleep ()
 {
 	NewtonBodySetAutoSleep(GetBody0(), 0);
@@ -305,7 +304,6 @@ void dCustomKinematicController::SetAsLinearAndAngular()
 	m_controlAngularDof = 1;
 }
 
-
 void dCustomKinematicController::SetPickMode (int mode)
 {
 	m_pickingMode = char (dClamp (mode, 0, 2));
@@ -347,24 +345,37 @@ void dCustomKinematicController::SetAngularViscuosFrictionCoefficient(dFloat coe
 	m_angularFrictionCoefficient = dAbs(coefficient) * dMax(Ixx, dMax(Iyy, Izz));
 }
 
+void dCustomKinematicController::CheckSleep() const
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	dMatrix matrix (matrix1 * matrix0.Inverse());
+	matrix.m_posit.m_w = 0.0f;
+	if (matrix.m_posit.DotProduct3(matrix.m_posit) > 1.0e-6f) {
+		NewtonBodySetSleepState(m_body0, 0);
+	}
+}
+
 void dCustomKinematicController::SetTargetRotation(const dQuaternion& rotation)
 {
-	NewtonBodySetSleepState(m_body0, 0);
 	m_localMatrix1 = dMatrix (rotation, m_localMatrix1.m_posit);
 	m_localMatrix1.m_posit.m_w = 1.0f;
+	CheckSleep();
 }
 
 void dCustomKinematicController::SetTargetPosit(const dVector& posit)
 {
-	NewtonBodySetSleepState(m_body0, 0);
 	m_localMatrix1.m_posit = posit;
 	m_localMatrix1.m_posit.m_w = 1.0f;
+	CheckSleep();
 }
 
 void dCustomKinematicController::SetTargetMatrix(const dMatrix& matrix)
 {
-	NewtonBodySetSleepState(m_body0, 0);
 	m_localMatrix1 = matrix;
+	CheckSleep();
 }
 
 dMatrix dCustomKinematicController::GetTargetMatrix () const
