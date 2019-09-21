@@ -23,7 +23,7 @@
 
 #ifdef OLD_KINEMATIC_RAGDOLL
 
-class dKinematiocJointDefinition
+class dKinematicBoneDefinition
 {
 	public:
 	struct dJointLimit
@@ -47,7 +47,7 @@ class dKinematiocJointDefinition
 	dAnimationRagdollJoint::dRagdollMotorType m_type;
 };
 
-static dKinematiocJointDefinition tredDefinition[] =
+static dKinematicBoneDefinition tredDefinition[] =
 {
 	{ "bone_pelvis" },
 
@@ -386,12 +386,12 @@ class dKinematicRagdollManager: public dAnimationModelManager
 		}
 	}
 
-	dAnimationJoint* CreateChildNode(NewtonBody* const boneBody, dAnimationJoint* const parent, const dKinematiocJointDefinition& definition) const
+	dAnimationJoint* CreateChildNode(NewtonBody* const boneBody, dAnimationJoint* const parent, const dKinematicBoneDefinition& definition) const
 	{
 		dMatrix matrix;
 		NewtonBodyGetMatrix(boneBody, &matrix[0][0]);
 
-		dKinematiocJointDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
+		dKinematicBoneDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
 		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad));
 		pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
 
@@ -401,7 +401,7 @@ class dKinematicRagdollManager: public dAnimationModelManager
 		return joint;
 	}
 
-	void CreateKinematicModel(const char* const modelName, const dMatrix& location, dKinematiocJointDefinition* const defintion, int size)
+	void CreateKinematicModel(const char* const modelName, const dMatrix& location, dKinematicBoneDefinition* const defintion, int size)
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
@@ -512,7 +512,7 @@ dTrace(("%s\n", name));
 #else
 
 
-class dKinematiocJointDefinition
+class dKinematicBoneDefinition
 {
 	public:
 	//struct dJointLimit
@@ -531,15 +531,16 @@ class dKinematiocJointDefinition
 
 	char* m_boneName;
 	char* m_parentNoneName;
+	dFloat m_massFraction;
 	//dFloat m_friction;
 	//dJointLimit m_jointLimits;
 	//dFrameMatrix m_frameBasics;
 	//dAnimationRagdollJoint::dRagdollMotorType m_type;
 };
 
-static dKinematiocJointDefinition tredDefinition[] =
+static dKinematicBoneDefinition tredDefinition[] =
 {
-	{ "bone_pelvis", NULL },
+	{ "bone_pelvis", NULL, 1.0f },
 
 	//{ "bone_rightLeg", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_threeDof },
 	//{ "bone_righCalf", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 90.0f }, dAnimationRagdollJoint::m_oneDof },
@@ -556,8 +557,8 @@ static dKinematiocJointDefinition tredDefinition[] =
 class dModelDescritor
 {
 	public:
-	char* n_filename;
-	dKinematiocJointDefinition* m_skeletondefintion;
+	char* m_filename;
+	dKinematicBoneDefinition* m_skeletonDefinition;
 };
 
 static dModelDescritor tred = {"tred.ngd", tredDefinition};
@@ -583,22 +584,22 @@ class dKinematicRagdollManager: public dModelManager
 	{
 	}
 
-/*
+
 	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
 	{
-		dKinematicRagdollManager* const me = (dKinematicRagdollManager*)context;
-
-		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print(color, "linear degrees of freedom");
-		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -180.0f, 180.0f);
-		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.4f, 0.2f);
-		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.2f, 0.4f);
-
-		ImGui::Separator();
-		scene->Print(color, "angular degrees of freedom");
-		ImGui::SliderFloat("pitch", &me->m_gripper_pitch, -180.0f, 180.0f);
-		ImGui::SliderFloat("yaw", &me->m_gripper_yaw, -80.0f, 80.0f);
-		ImGui::SliderFloat("roll", &me->m_gripper_roll, -180.0f, 180.0f);
+		dAssert (0);
+		//dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		//dKinematicRagdollManager* const me = (dKinematicRagdollManager*)context;
+		//scene->Print(color, "linear degrees of freedom");
+		//ImGui::SliderFloat("Azimuth", &me->m_azimuth, -180.0f, 180.0f);
+		//ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.4f, 0.2f);
+		//ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.2f, 0.4f);
+		//
+		//ImGui::Separator();
+		//scene->Print(color, "angular degrees of freedom");
+		//ImGui::SliderFloat("pitch", &me->m_gripper_pitch, -180.0f, 180.0f);
+		//ImGui::SliderFloat("yaw", &me->m_gripper_yaw, -80.0f, 80.0f);
+		//ImGui::SliderFloat("roll", &me->m_gripper_roll, -180.0f, 180.0f);
 	}
 
 	static void ClampAngularVelocity(const NewtonBody* body, dFloat timestep, int threadIndex)
@@ -612,10 +613,10 @@ class dKinematicRagdollManager: public dModelManager
 			NewtonBodySetOmega(body, &omega[0]);
 		}
 
-		PhysicsApplyGravityForce(body, timestep, threadIndex);
+//		PhysicsApplyGravityForce(body, timestep, threadIndex);
 	}
 
-	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dSixAxisJointDefinition& definition)
+	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dKinematicBoneDefinition& definition)
 	{
 		NewtonWorld* const world = GetWorld();
 		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
@@ -647,6 +648,7 @@ class dKinematicRagdollManager: public dModelManager
 		return bone;
 	}
 
+/*
 	dCustomKinematicController* ConnectWithEffectoJoint(NewtonBody* const effectorReferenceBody, DemoEntity* const effectorNode, NewtonBody* const body, const dSixAxisJointDefinition& definition)
 	{
 		dMatrix matrix(effectorNode->CalculateGlobalMatrix());
@@ -718,15 +720,9 @@ class dKinematicRagdollManager: public dModelManager
 */
 
 //	void MakeSixAxisRobot(DemoEntityManager* const scene, const dMatrix& origin, dSixAxisJointDefinition* const definition)
-//	void CreateKinematicModel(const char* const modelName, const dMatrix& location, dKinematiocJointDefinition* const defintion, int size)
+//	void CreateKinematicModel(const char* const modelName, const dMatrix& location, dKinematicBoneDefinition* const defintion, int size)
 	void CreateKinematicModel(dModelDescritor& descriptor, const dMatrix& location) 
 	{
-		//NewtonWorld* const world = GetWorld();
-		//DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-		//
-		//DemoEntity* const modelEntity = DemoEntity::LoadNGD_mesh(modelName, world, scene->GetShaderCache());
-		//dMatrix matrix0(modelEntity->GetCurrentMatrix());
-		//scene->Append(modelEntity);
 		//NewtonBody* const rootBody = CreateBodyPart(modelEntity);
 		//
 		//dKinematicRagdoll* const dynamicRagdoll = new dKinematicRagdoll(rootBody, dGetIdentityMatrix());
@@ -804,15 +800,15 @@ class dKinematicRagdollManager: public dModelManager
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
-		DemoEntity* const model = DemoEntity::LoadNGD_mesh(descriptor.n_filename, world, scene->GetShaderCache());
+		DemoEntity* const model = DemoEntity::LoadNGD_mesh(descriptor.m_filename, world, scene->GetShaderCache());
 		scene->Append(model);
 		dMatrix matrix0(model->GetCurrentMatrix());
 		model->ResetMatrix(*scene, matrix0 * location);
 
-/*
 		// create the root body, do not set the transform call back 
-		NewtonBody* const rootBody = CreateBodyPart(model, definition[0]);
+		NewtonBody* const rootBody = CreateBodyPart(model, descriptor.m_skeletonDefinition[0]);
 
+/*
 		// make a kinematic controlled model.
 		dSixAxisRobot* const robot = new dSixAxisRobot(rootBody, dGetIdentityMatrix());
 
