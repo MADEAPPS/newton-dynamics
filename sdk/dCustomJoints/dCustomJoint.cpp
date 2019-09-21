@@ -51,33 +51,6 @@ dCustomJoint::dCustomJoint (int maxDOF, NewtonBody* const body0, NewtonBody* con
 	Init (maxDOF, body0, body1);
 }
 
-dCustomJoint::dCustomJoint(NewtonInverseDynamics* const invDynSolver, void* const invDynNode)
-	:dCustomAlloc()
-	,m_localMatrix0(dGetIdentityMatrix())
-	,m_localMatrix1(dGetIdentityMatrix())
-	,m_force0(0.0f)
-	,m_force1(0.0f)
-	,m_torque0(0.0f)
-	,m_torque1(0.0f)
-	,m_options()
-{
-	m_joint = NULL;
-	m_body1 = NULL;
-	m_maxDof = 6;
-	m_autoDestroy = 0;
-	m_stiffness = 1.0f;
-	m_maxAngleError = 5.0f * dDegreeToRad;
-	m_body0 = NewtonInverseDynamicsGetBody (invDynSolver, invDynNode);
-	m_world = NewtonBodyGetWorld(m_body0);
-	m_joint = NewtonInverseDynamicsCreateEffector(invDynSolver, invDynNode, SubmitConstraints);
-
-	NewtonJointSetUserData(m_joint, this);
-	NewtonJointSetDestructor(m_joint, Destructor);
-
-	m_userData = NULL;
-	m_userDestructor = NULL;
-}
-
 dCustomJoint::dCustomJoint (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData)
 	:dCustomAlloc()
 	,m_localMatrix0(dGetIdentityMatrix())
