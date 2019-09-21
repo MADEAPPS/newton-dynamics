@@ -67,7 +67,6 @@
     <ClCompile Include="..\..\dCustomJoints\dCustomPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomPulley.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomRackAndPinion.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\dCustomInverseDynamics.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomSlider.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomSliderActuator.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomSlidingContact.cpp" />
@@ -102,7 +101,6 @@
     <ClInclude Include="..\..\dCustomJoints\dCustomPlayerControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomPulley.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomRackAndPinion.h" />
-    <ClInclude Include="..\..\dCustomJoints\dCustomInverseDynamics.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomSlider.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomSliderActuator.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomSlidingContact.h" />

@@ -67,9 +67,9 @@
 //#define DEFAULT_SCENE	31		// servo joints
 //#define DEFAULT_SCENE	32		// articulated joints
 //#define DEFAULT_SCENE	33		// six axis manipulator
-#define DEFAULT_SCENE	34		// hexapod Robot
+//#define DEFAULT_SCENE	34		// hexapod Robot
 //#define DEFAULT_SCENE	35		// basic rag doll
-//#define DEFAULT_SCENE	36		// kinematic rag doll
+#define DEFAULT_SCENE	36		// kinematic rag doll
 //#define DEFAULT_SCENE	37		// dynamic rag doll
 //#define DEFAULT_SCENE	38		// basic Car
 //#define DEFAULT_SCENE	39		// single body vehicle
