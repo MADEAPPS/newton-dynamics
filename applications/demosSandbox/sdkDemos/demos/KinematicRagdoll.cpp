@@ -550,7 +550,7 @@ static dKinematicBoneDefinition tredDefinition[] =
 {
 	{ "bone_pelvis", NULL, 1.0f, dKinematicBoneDefinition::m_none },
 
-	{ "bone_rightLeg", NULL, 0.3f, dKinematicBoneDefinition::m_3dof, {60.0f, 60.0f, 0.0f}, { 0.0f, 90.0f, 0.0f }},
+	{ "bone_rightLeg", NULL, 0.3f, dKinematicBoneDefinition::m_3dof, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
 	{ "bone_righCalf", NULL, 0.3f, dKinematicBoneDefinition::m_1dof, {-80.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
 	//{ "bone_rightAnkle", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 90.0f }, dAnimationRagdollJoint::m_zeroDof },
 	//{ "bone_rightFoot", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, -90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
