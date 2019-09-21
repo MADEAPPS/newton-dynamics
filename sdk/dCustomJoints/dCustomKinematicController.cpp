@@ -294,8 +294,6 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 				if ((coneAngle < maxAngle) && (coneAngle > -maxAngle)) {
 					w = damp * coneAngle * invTimestep;
 				}
-				//w = 0.0f;
-				//dAssert(w >= 0.0f);
 				dFloat relAlpha = (w + relOmega) * invTimestep;
 
 				NewtonUserJointSetRowAcceleration(m_joint, -relAlpha);

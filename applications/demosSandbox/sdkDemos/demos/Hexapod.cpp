@@ -249,7 +249,7 @@ class dHexapodManager: public dModelManager
 		NewtonBodySetMassMatrix(body, mass, Ixx * factor, Iyy * factor, Izz * factor);
 	}
 
-	void NormalizeMassAndInertia(dHexapod* const model, dFloat modelMass) const
+	void NormalizeMassAndInertia(dModelRootNode* const model, dFloat modelMass) const
 	{
 		int stack = 1;
 		int bodyCount = 0;
