@@ -56,10 +56,10 @@ static dKinematicBoneDefinition tredDefinition[] =
 	{ "bone_rightAnkle", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 90.0f }, dAnimationRagdollJoint::m_zeroDof },
 	{ "bone_rightFoot", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, -90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
 
-	{ "bone_leftLeg", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_threeDof },
-	{ "bone_leftCalf", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 90.0f }, dAnimationRagdollJoint::m_oneDof },
-	{ "bone_leftAnkle", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 90.0f }, dAnimationRagdollJoint::m_zeroDof },
-	{ "bone_leftFoot", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, -90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
+//	{ "bone_leftLeg", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 90.0f, 0.0f }, dAnimationRagdollJoint::m_threeDof },
+//	{ "bone_leftCalf", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 90.0f }, dAnimationRagdollJoint::m_oneDof },
+//	{ "bone_leftAnkle", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, 0.0f, 90.0f }, dAnimationRagdollJoint::m_zeroDof },
+//	{ "bone_leftFoot", 100.0f,{ -15.0f, 15.0f, 30.0f },{ 0.0f, -90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
 };
 
 class dKinematicEndEffector: public dAnimationRagDollEffector, public dCustomJoint
@@ -518,6 +518,7 @@ class dKinematicBoneDefinition
 	enum jointType
 	{
 		m_none,
+		m_0dof,
 		m_1dof,
 		m_2dof,
 		m_3dof,
@@ -539,20 +540,20 @@ class dKinematicBoneDefinition
 	};
 
 	char* m_boneName;
-	char* m_parentNoneName;
-	dFloat m_massFraction;
 	jointType m_type;
+	dFloat m_massFraction;
 	dJointLimit m_jointLimits;
 	dFrameMatrix m_frameBasics;
 };
 
 static dKinematicBoneDefinition tredDefinition[] =
 {
-	{ "bone_pelvis", NULL, 1.0f, dKinematicBoneDefinition::m_none },
+	{ "bone_pelvis", dKinematicBoneDefinition::m_none, 1.0f },
 
-	{ "bone_rightLeg", NULL, 0.3f, dKinematicBoneDefinition::m_3dof, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
-	{ "bone_righCalf", NULL, 0.3f, dKinematicBoneDefinition::m_1dof, {-80.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
-	//{ "bone_rightAnkle", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 90.0f }, dAnimationRagdollJoint::m_zeroDof },
+	{ "bone_rightLeg", dKinematicBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
+	{ "bone_righCalf", dKinematicBoneDefinition::m_1dof, 0.2f, {-80.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
+	{ "bone_rightAnkle", dKinematicBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
+	{ "effector_rightAnkle", dKinematicBoneDefinition::m_effector},
 	//{ "bone_rightFoot", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, -90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
 	
 	//{ "bone_leftLeg", NULL, 0.3f, dKinematicBoneDefinition::m_3dof, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
@@ -566,10 +567,11 @@ class dModelDescritor
 {
 	public:
 	char* m_filename;
+	dFloat m_mass;
 	dKinematicBoneDefinition* m_skeletonDefinition;
 };
 
-static dModelDescritor tred = {"tred.ngd", tredDefinition};
+static dModelDescritor tred = {"tred.ngd", 500.0f, tredDefinition};
 
 
 class dKinematicRagdoll: public dModelRootNode
@@ -666,21 +668,16 @@ class dKinematicRagdollManager: public dModelManager
 		return bone;
 	}
 
-/*
-	dCustomKinematicController* ConnectWithEffectoJoint(NewtonBody* const effectorReferenceBody, DemoEntity* const effectorNode, NewtonBody* const body, const dSixAxisJointDefinition& definition)
+	dCustomKinematicController* ConnectEffector(dModelRootNode* const model, dFloat mass, DemoEntity* const effectorNode, NewtonBody* const body, const dKinematicBoneDefinition& definition)
 	{
+		NewtonBody* const effectorReferenceBody = model->GetBody();
 		dMatrix matrix(effectorNode->CalculateGlobalMatrix());
-#ifdef USE_OLD_KINEMATICS
-		dCustomKinematicController* const effector = new dCustomKinematicController (body, matrix);
-#else
 		dCustomKinematicController* const effector = new dCustomKinematicController(body, matrix, effectorReferenceBody);
-#endif
+		effector->SetAsLinear();
 		effector->SetSolverModel(1);
-		effector->SetMaxLinearFriction(SIZE_ROBOT_MASS * DEMO_GRAVITY * 50.0f);
-		effector->SetMaxAngularFriction(SIZE_ROBOT_MASS * 50.0f);
+		effector->SetMaxLinearFriction(mass * 9.8f * 10.0f);
 		return effector;
 	}
-*/
 
 	void ConnectLimb(NewtonBody* const bone, NewtonBody* const parent, const dKinematicBoneDefinition& definition)
 	{
@@ -695,6 +692,14 @@ class dKinematicRagdollManager: public dModelManager
 
 		switch (definition.m_type)
 		{
+			case dKinematicBoneDefinition::m_0dof:
+			{
+				dCustomHinge* const joint = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
+				joint->EnableLimits(true);
+				joint->SetLimits(0.0f, 0.0f);
+				break;
+			}
+
 			case dKinematicBoneDefinition::m_1dof:
 			{
 				dCustomHinge* const joint = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
@@ -870,12 +875,14 @@ class dKinematicRagdollManager: public dModelManager
 		//NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBone), controller);
 
 		int stackIndex = 0;
-		DemoEntity* childEntities[32];
 		dModelNode* parentBones[32];
+		DemoEntity* childEntities[32];
 		for (DemoEntity* child = entityModel->GetChild(); child; child = child->GetSibling()) {
 			parentBones[stackIndex] = model;
 			childEntities[stackIndex] = child;
 			stackIndex++;
+			const char* const name = child->GetName().GetStr();
+			dTrace(("name: %s\n", name));
 		}
 
 		// walk model hierarchic adding all children designed as rigid body bones. 
@@ -891,8 +898,7 @@ class dKinematicRagdollManager: public dModelManager
 				if (!strcmp(descriptor.m_skeletonDefinition[i].m_boneName, name)) {
 					NewtonBody* const parentBody = parentBone->GetBody();
 					if (descriptor.m_skeletonDefinition[i].m_type == dKinematicBoneDefinition::m_effector) {
-						dAssert (0);
-						//robot->m_effector = ConnectEffector(rootBody, entity, parentBody, definition[i]);
+						ConnectEffector(model, descriptor.m_mass, entity, parentBody, descriptor.m_skeletonDefinition[i]);
 					} else {
 						NewtonBody* const childBody = CreateBodyPart(entity, descriptor.m_skeletonDefinition[i]);
 						ConnectLimb(childBody, parentBody, descriptor.m_skeletonDefinition[i]);

@@ -398,7 +398,6 @@ class dHexapodManager: public dModelManager
 		dMatrix effectorMatrix(dGetIdentityMatrix());
 		effectorMatrix.m_posit = armPivot.m_posit;
 		effectorMatrix.m_posit.m_y -= armSize;
-		//dHexapodEffector* const effector = new dHexapodEffector(m_kinematicSolver, armHingeNode, parent, effectorMatrix * matrix);
 		dCustomKinematicController* const effector = new dCustomKinematicController(armHingeNode->GetBody(), effectorMatrix * matrix, parent);
 		effector->SetAsLinear();
 		effector->SetSolverModel(1);

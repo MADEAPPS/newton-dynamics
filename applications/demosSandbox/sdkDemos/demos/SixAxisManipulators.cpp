@@ -37,7 +37,6 @@ class dSixAxisJointDefinition
 	};
 
 	char* m_boneName;
-	char* m_parentNoneName;
 	jointType m_type;
 	dJointLimit m_jointLimits;
 	dFloat m_massFraction;
@@ -45,15 +44,15 @@ class dSixAxisJointDefinition
 
 static dSixAxisJointDefinition robot1[] =
 {
-	{ "bone_base000", NULL, dSixAxisJointDefinition::m_node, { -1000.0f, 1000.0f }, 1.0f },
-	{ "bone_base001", NULL, dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.4f },
-	{ "bone_base002", NULL, dSixAxisJointDefinition::m_hinge, { -120.0f, 45.0f }, 0.3f },
-	{ "bone_base003", NULL, dSixAxisJointDefinition::m_hinge, { -120.0f, 15.0f }, 0.2f },
-	{ "bone_base004", NULL, dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.1f },
-	{ "bone_base005", NULL, dSixAxisJointDefinition::m_hinge, { -225.0f, 45.0f }, 0.06f },
-	{ "bone_base006", NULL, dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.06f },
-	{ "effector", "bone_base001", dSixAxisJointDefinition::m_effector, { -1000.0f, 1000.0f }},
-	{ NULL, NULL},
+	{ "bone_base000", dSixAxisJointDefinition::m_node, { -1000.0f, 1000.0f }, 1.0f },
+	{ "bone_base001", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.4f },
+	{ "bone_base002", dSixAxisJointDefinition::m_hinge, { -120.0f, 45.0f }, 0.3f },
+	{ "bone_base003", dSixAxisJointDefinition::m_hinge, { -120.0f, 15.0f }, 0.2f },
+	{ "bone_base004", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.1f },
+	{ "bone_base005", dSixAxisJointDefinition::m_hinge, { -225.0f, 45.0f }, 0.06f },
+	{ "bone_base006", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.06f },
+	{ "effector", dSixAxisJointDefinition::m_effector, { -1000.0f, 1000.0f }},
+	{ NULL},
 };
 
 class dSixAxisRobot: public dModelRootNode
@@ -195,13 +194,14 @@ class dSixAxisManager: public dModelManager
 		return bone;
 	}
 
-	dCustomKinematicController* ConnectEffector(NewtonBody* const effectorReferenceBody, DemoEntity* const effectorNode, NewtonBody* const body, const dSixAxisJointDefinition& definition)
+	dCustomKinematicController* ConnectEffector(dModelRootNode* const model, dFloat mass, DemoEntity* const effectorNode, NewtonBody* const body, const dSixAxisJointDefinition& definition)
 	{
+		NewtonBody* const effectorReferenceBody = model->GetBody(); 
 		dMatrix matrix(effectorNode->CalculateGlobalMatrix());
 		dCustomKinematicController* const effector = new dCustomKinematicController(body, matrix, effectorReferenceBody);
 		effector->SetSolverModel(1);
-		effector->SetMaxLinearFriction(SIZE_ROBOT_MASS * DEMO_GRAVITY * 50.0f);
-		effector->SetMaxAngularFriction(SIZE_ROBOT_MASS * 50.0f);
+		effector->SetMaxLinearFriction(mass * 9.8f * 50.0f);
+		effector->SetMaxAngularFriction(mass * 50.0f);
 		return effector;
 	}
 
@@ -317,7 +317,7 @@ class dSixAxisManager: public dModelManager
 				if (!strcmp(definition[i].m_boneName, name)) {
 					NewtonBody* const parentBody = parentBone->GetBody();
 					if (definition[i].m_type == dSixAxisJointDefinition::m_effector) {
-						robot->m_effector = ConnectEffector(rootBody, entity, parentBody, definition[i]);
+						robot->m_effector = ConnectEffector(robot, SIZE_ROBOT_MASS, entity, parentBody, definition[i]);
 					} else {
 						NewtonBody* const childBody = CreateBodyPart(entity, definition[i]);
 						ConnectWithHingeJoint(childBody, parentBody, definition[i]);
