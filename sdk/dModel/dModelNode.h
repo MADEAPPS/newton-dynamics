@@ -44,6 +44,7 @@ class dModelNode: public dCustomAlloc
 	const dModelNode* GetRoot() const;
 	const dModelNode* GetParent() const {return m_parent;}
 	dModelChildrenList& GetChildren() {return m_children;}
+	const dModelChildrenList& GetChildren() const {return m_children;}
 
 	dCustomJoint* GetParentJoint() const;
 
