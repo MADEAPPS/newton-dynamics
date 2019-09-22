@@ -574,15 +574,44 @@ class dModelDescritor
 static dModelDescritor tred = {"tred.ngd", 500.0f, tredDefinition};
 
 
+class dKinematicRagDollEffector4dof: public dCustomKinematicController
+{
+	public:
+	dKinematicRagDollEffector4dof(dModelNode* const effectorNode, const dMatrix& attachmentMatrixInGlobalSpace, dFloat modelMass)
+		:dCustomKinematicController (effectorNode->GetBody(), attachmentMatrixInGlobalSpace, effectorNode->GetRoot()->GetBody())
+	{
+		SetAsLinear();
+		SetSolverModel(1);
+		SetMaxLinearFriction(modelMass * 9.8f * 10.0f);
+	}
+
+	void SubmitConstraints (dFloat timestep, int threadIndex)
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+		SubmitLinearConstraints(matrix0, matrix1, timestep);
+	}
+};
+
 class dKinematicRagdoll: public dModelRootNode
 {
 	public:
 	dKinematicRagdoll(NewtonBody* const rootBody)
 		:dModelRootNode(rootBody, dGetIdentityMatrix())
+		,m_pose()
+		,m_animtree(NULL)
 	{
 	}
-};
 
+	~dKinematicRagdoll()
+	{
+
+	}
+
+	dModelKeyFramePose m_pose;
+	dModelAnimTree* m_animtree;
+};
 
 class dKinematicRagdollManager: public dModelManager
 {
@@ -668,15 +697,9 @@ class dKinematicRagdollManager: public dModelManager
 		return bone;
 	}
 
-	dCustomKinematicController* ConnectEffector(dModelRootNode* const model, dFloat mass, DemoEntity* const effectorNode, NewtonBody* const body, const dKinematicBoneDefinition& definition)
+	dCustomKinematicController* ConnectEffector(dModelNode* const effectorNode, const dMatrix& effectorMatrix, const dFloat bodyMass)
 	{
-		NewtonBody* const effectorReferenceBody = model->GetBody();
-		dMatrix matrix(effectorNode->CalculateGlobalMatrix());
-		dCustomKinematicController* const effector = new dCustomKinematicController(body, matrix, effectorReferenceBody);
-		effector->SetAsLinear();
-		effector->SetSolverModel(1);
-		effector->SetMaxLinearFriction(mass * 9.8f * 10.0f);
-		return effector;
+		return new dKinematicRagDollEffector4dof(effectorNode, effectorMatrix, bodyMass);
 	}
 
 	void ConnectLimb(NewtonBody* const bone, NewtonBody* const parent, const dKinematicBoneDefinition& definition)
@@ -687,8 +710,6 @@ class dKinematicRagdollManager: public dModelManager
 		dKinematicBoneDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
 		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad));
 		pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
-
-		//dMatrix pinAndPivotInGlobalSpace(dRollMatrix(90.0f * dDegreeToRad) * matrix);
 
 		switch (definition.m_type)
 		{
@@ -898,7 +919,13 @@ class dKinematicRagdollManager: public dModelManager
 				if (!strcmp(descriptor.m_skeletonDefinition[i].m_boneName, name)) {
 					NewtonBody* const parentBody = parentBone->GetBody();
 					if (descriptor.m_skeletonDefinition[i].m_type == dKinematicBoneDefinition::m_effector) {
-						ConnectEffector(model, descriptor.m_mass, entity, parentBody, descriptor.m_skeletonDefinition[i]);
+						dModelKeyFrame effectorPose;
+						dMatrix effectorMatrix(entity->CalculateGlobalMatrix());
+						effectorPose.m_effector = ConnectEffector(parentBone, effectorMatrix, descriptor.m_mass);
+
+						effectorPose.SetMatrix (effectorPose.m_effector->GetTargetMatrix());
+						model->m_pose.Append(effectorPose);
+
 					} else {
 						NewtonBody* const childBody = CreateBodyPart(entity, descriptor.m_skeletonDefinition[i]);
 						ConnectLimb(childBody, parentBody, descriptor.m_skeletonDefinition[i]);
@@ -926,12 +953,16 @@ class dKinematicRagdollManager: public dModelManager
 		//robot->SetPivotMatrix();
 	}
 
-	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext) 
+	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext)
 	{
-		//dKinematicRagdoll* const ragdoll = (dKinematicRagdoll*)model;
-		//if (robot->m_effector) {
-		//	robot->m_effector->Debug(debugContext);
-		//}
+		dKinematicRagdoll* const hexapod = (dKinematicRagdoll*)model;
+		dFloat scale = debugContext->GetScale();
+		debugContext->SetScale(1.0f);
+		for (dModelKeyFramePose::dListNode* node = hexapod->m_pose.GetFirst(); node; node = node->GetNext()) {
+			const dModelKeyFrame& keyFrame = node->GetInfo();
+			keyFrame.m_effector->Debug(debugContext);
+		}
+		debugContext->SetScale(scale);
 	}
 
 	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const

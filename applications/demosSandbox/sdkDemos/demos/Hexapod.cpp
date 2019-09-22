@@ -155,7 +155,6 @@ class dModelAnimTreeHipController: public dModelAnimTree
 	dModelAnimTree* m_child;
 };
 
-
 class dHexapod: public dModelRootNode
 {
 	public:
@@ -407,7 +406,6 @@ class dHexapodManager: public dModelManager
 		return effector;
 	}
 
-
 	void MakeHexapod(DemoEntityManager* const scene, const dMatrix& location)
 	{
 		// make the root body
@@ -431,9 +429,7 @@ class dHexapodManager: public dModelManager
 			rightLocation.m_posit += rightLocation.m_right.Scale(size.m_z * 0.65f);
 			rightLocation.m_posit += rightLocation.m_front.Scale(size.m_x * 0.3f - size.m_x * i / 3.0f);
 			keyFrame.m_effector = AddLeg(scene, hexapod, rightLocation * location, 0.1f, 0.3f);
-			dMatrix matrix (keyFrame.m_effector->GetTargetMatrix());
-			keyFrame.m_posit = matrix.m_posit;
-			keyFrame.m_rotation = dQuaternion(matrix);
+			keyFrame.SetMatrix (keyFrame.m_effector->GetTargetMatrix());
 			hexapod->m_pose.Append(keyFrame);
 
 			// make left legs
@@ -442,9 +438,7 @@ class dHexapodManager: public dModelManager
 			similarTransform.m_posit.m_y = rightLocation.m_posit.m_y;
 			dMatrix leftLocation(rightLocation * similarTransform.Inverse() * dYawMatrix(dPi) * similarTransform);
 			keyFrame.m_effector = AddLeg(scene, hexapod, leftLocation * location, 0.1f, 0.3f);
-			matrix = keyFrame.m_effector->GetTargetMatrix();
-			keyFrame.m_posit = matrix.m_posit;
-			keyFrame.m_rotation = dQuaternion(matrix);
+			keyFrame.SetMatrix (keyFrame.m_effector->GetTargetMatrix());
 			hexapod->m_pose.Append(keyFrame);
 		}
 
@@ -464,10 +458,13 @@ class dHexapodManager: public dModelManager
 	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext)
 	{
 		dHexapod* const hexapod = (dHexapod*)model;
+		dFloat scale = debugContext->GetScale();
+		debugContext->SetScale(0.5f);
 		for (dModelKeyFramePose::dListNode* node = hexapod->m_pose.GetFirst(); node; node = node->GetNext()) {
 			const dModelKeyFrame& keyFrame = node->GetInfo();
 			keyFrame.m_effector->Debug(debugContext);
 		}
+		debugContext->SetScale(scale);
 	}
 
 	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const

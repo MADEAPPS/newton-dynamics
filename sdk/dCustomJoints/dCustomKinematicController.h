@@ -50,6 +50,8 @@ class dCustomKinematicController: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const;
 
+	CUSTOM_JOINTS_API void SubmitLinearConstraints (const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
+
 	void CheckSleep() const;
 	void Init(const dMatrix& matrix);
 	

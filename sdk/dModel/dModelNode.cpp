@@ -30,5 +30,12 @@ dModelNode::~dModelNode()
 {
 }
 
-
+const dModelNode* dModelNode::GetRoot() const
+{
+	const dModelNode* root = this;
+	while (root->GetParent()) {
+		root = root->GetParent();
+	}
+	return root;
+}
 

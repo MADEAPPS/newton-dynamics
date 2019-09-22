@@ -185,10 +185,8 @@ void dCustomKinematicController::Debug(dDebugDisplay* const debugDisplay) const
 	debugDisplay->DrawFrame(GetBodyMatrix());
 }
 
-void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadIndex)
+void dCustomKinematicController::SubmitLinearConstraints (const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-	dMatrix matrix0;
-	dMatrix matrix1;
 	dVector omega0(0.0f);
 	dVector omega1(0.0f);
 	dVector veloc0(0.0f);
@@ -204,7 +202,6 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 	}
 
 	const dFloat invTimestep = 1.0f / timestep;
-	CalculateGlobalMatrix(matrix0, matrix1);
 
 	const dFloat damp = 0.3f;
 	const dFloat maxDistance = 2.0f * m_maxSpeed * timestep;
@@ -213,8 +210,8 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
 		NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
 
-		dVector pointPosit (matrix0.m_posit * jacobian0.m_linear + matrix1.m_posit * jacobian1.m_linear);
-		dVector pointVeloc (veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
+		dVector pointPosit(matrix0.m_posit * jacobian0.m_linear + matrix1.m_posit * jacobian1.m_linear);
+		dVector pointVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
 
 		dFloat dist = pointPosit.m_x + pointPosit.m_y + pointPosit.m_z;
 		dFloat speed = pointVeloc.m_x + pointVeloc.m_y + pointVeloc.m_z;
@@ -230,8 +227,32 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
 		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
 	}
+}
+
+void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadIndex)
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	SubmitLinearConstraints (matrix0, matrix1, timestep);
 
 	if (m_controlAngularDof) {
+		dVector omega0(0.0f);
+		dVector omega1(0.0f);
+		dVector veloc0(0.0f);
+		dVector veloc1(0.0f);
+		dComplementaritySolver::dJacobian jacobian0;
+		dComplementaritySolver::dJacobian jacobian1;
+
+		NewtonBodyGetOmega(m_body0, &omega0[0]);
+		NewtonBodyGetVelocity(m_body0, &veloc0[0]);
+		if (m_body1) {
+			NewtonBodyGetOmega(m_body1, &omega1[0]);
+			NewtonBodyGetVelocity(m_body1, &veloc1[0]);
+		}
+
+		const dFloat damp = 0.3f;
+		const dFloat invTimestep = 1.0f / timestep;
 		if (m_pickingMode != 1) {
 			dFloat omegaMag2 = omega0.DotProduct3(omega0);
 			dFloat angularFriction = m_maxAngularFriction + m_angularFrictionCoefficient * omegaMag2;
@@ -334,5 +355,4 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 		}
 	}
 }
-
 

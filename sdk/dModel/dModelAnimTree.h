@@ -20,6 +20,12 @@ class dModelRootNode;
 class dModelKeyFrame
 {
 	public:
+	void SetMatrix(const dMatrix& matrix)
+	{
+		m_posit = matrix.m_posit;
+		m_rotation = dQuaternion(matrix);
+	}
+
 	dVector m_posit;
 	dQuaternion m_rotation;
 	dCustomKinematicController* m_effector;

@@ -33,6 +33,8 @@ class dModelAnimTreePoseBlender: public dModelAnimTree
 		delete m_pose1;
 	}
 
+	dModelAnimTreePoseBlender& operator=(const dModelAnimTreePoseBlender& src);
+
 	dFloat GetParam() const
 	{
 		return m_param;
