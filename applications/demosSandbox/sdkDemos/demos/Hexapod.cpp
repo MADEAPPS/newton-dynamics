@@ -174,6 +174,15 @@ class dHexapod: public dModelRootNode
 		}
 	}
 
+	void SetAnimTree()
+	{
+		dModelAnimTreePose* const idlePose = new dModelAnimTreePose(this, m_pose);
+		dModelAnimTreePose* const walkPoseGenerator = new dModelAnimTreePoseWalkSequence(this, m_pose);
+		m_walkIdleBlender = new dModelAnimTreePoseBlender(this, idlePose, walkPoseGenerator);
+		m_postureModifier = new dModelAnimTreeHipController(this, m_walkIdleBlender);
+		m_animtree = m_postureModifier;
+	}
+
 	void ApplyControls (dFloat timestep, dFloat speed, dFloat z, dFloat y, dFloat roll, dFloat yaw, dFloat pitch)
 	{
 		m_walkIdleBlender->SetParam(speed);
@@ -445,14 +454,11 @@ class dHexapodManager: public dModelManager
 		// normalize the mass of body parts
  		NormalizeMassAndInertia(hexapod, HEXAPOD_MASS);
 
-		// create a fix pose frame generator
-		dModelAnimTreePose* const idlePose = new dModelAnimTreePose(hexapod, hexapod->m_pose);
-		dModelAnimTreePose* const walkPoseGenerator = new dModelAnimTreePoseWalkSequence(hexapod, hexapod->m_pose);
-		hexapod->m_walkIdleBlender = new dModelAnimTreePoseBlender(hexapod, idlePose, walkPoseGenerator);
-		hexapod->m_postureModifier = new dModelAnimTreeHipController(hexapod, hexapod->m_walkIdleBlender);
+		// setup the pose generator 
+		hexapod->SetAnimTree();
 
 		m_currentController = hexapod;
-		hexapod->m_animtree = hexapod->m_postureModifier;
+		//hexapod->m_animtree = hexapod->m_postureModifier;
 	}
 
 	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext)
@@ -467,9 +473,9 @@ class dHexapodManager: public dModelManager
 		debugContext->SetScale(scale);
 	}
 
-	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const
+	virtual void OnPreUpdate(dModelRootNode* const root, dFloat timestep) const
 	{
-		if (model == m_currentController) {
+		if (root == m_currentController) {
 			m_currentController->ApplyControls(timestep, m_speed, m_posit_x, m_posit_y, m_roll, m_yaw, m_pitch);
 		}
 	}
