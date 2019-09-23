@@ -947,6 +947,7 @@ void ServoJoints (DemoEntityManager* const scene)
 
 	// add an input Manage to manage the inputs and user interaction 
 	ServoInputManager* const inputManager = new ServoInputManager (scene);
+	inputManager;
 
 	//  create a skeletal transform controller for controlling rag doll
 	ServoVehicleManagerManager* const vehicleManager = new ServoVehicleManagerManager (scene);
@@ -957,6 +958,7 @@ void ServoJoints (DemoEntityManager* const scene)
 	
 	// load a the mesh of the articulate vehicle
 	dCustomTransformController* const forklift = vehicleManager->CreateForklift(matrix, "forklift.ngd", sizeof(inverseKinematicsRidParts) / sizeof (inverseKinematicsRidParts[0]), inverseKinematicsRidParts);
+	forklift;
 
 dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
 #if 0

@@ -58,16 +58,18 @@ static dKinematicBoneDefinition tredDefinition[] =
 {
 	{ "bone_pelvis", dKinematicBoneDefinition::m_none, 1.0f },
 
-	{ "bone_rightLeg", dKinematicBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
-	{ "bone_righCalf", dKinematicBoneDefinition::m_1dof, 0.2f, {-80.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
-	{ "bone_rightAnkle", dKinematicBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
-	{ "bone_rightFoot", dKinematicBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 30.0f}, { 0.0f, 0.0f, 0.0f }},
-	{ "effector_rightAnkle", dKinematicBoneDefinition::m_effector},
-	
-	//{ "bone_leftLeg", NULL, 0.3f, dKinematicBoneDefinition::m_3dof, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
-	//{ "bone_leftCalf", NULL, 0.3f, dKinematicBoneDefinition::m_1dof, { -80.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
-	//{ "bone_leftAnkle", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 90.0f }, dAnimationRagdollJoint::m_zeroDof },
-	//{ "bone_leftFoot", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, -90.0f, 0.0f }, dAnimationRagdollJoint::m_twoDof },
+	//{ "bone_rightLeg", dKinematicBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
+	//{ "bone_righCalf", dKinematicBoneDefinition::m_1dof, 0.2f, {-80.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
+	//{ "bone_rightAnkle", dKinematicBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
+	//{ "bone_rightFoot", dKinematicBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 30.0f}, { 0.0f, 0.0f, 0.0f }},
+	//{ "effector_rightAnkle", dKinematicBoneDefinition::m_effector},
+
+	{ "bone_leftLeg", dKinematicBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "bone_leftCalf", dKinematicBoneDefinition::m_1dof, 0.2f, { -80.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
+	{ "bone_leftAnkle", dKinematicBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+	{ "bone_leftFoot", dKinematicBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+	{ "effector_leftAnkle", dKinematicBoneDefinition::m_effector },
+
 	{ NULL},
 };
 
@@ -81,48 +83,29 @@ class dModelDescritor
 
 static dModelDescritor tred = {"tred.ngd", 500.0f, tredDefinition};
 
-class dKinematicRagdoll: public dModelRootNode
+
+class dModelAnimTreeSelfBalanceCalculator: public dModelAnimTree
 {
 	public:
-	dKinematicRagdoll(NewtonBody* const rootBody)
-		:dModelRootNode(rootBody, dGetIdentityMatrix())
-		,m_pose()
-		,m_animtree(NULL)
+	dModelAnimTreeSelfBalanceCalculator(dModelRootNode* const model, dModelAnimTree* const child, dCustomKinematicController* const footEffector0)
+		:dModelAnimTree(model)
+		,m_child(child)
+		,m_rootEffector0(footEffector0)
 	{
 	}
 
-	~dKinematicRagdoll()
+	~dModelAnimTreeSelfBalanceCalculator()
 	{
-		if (m_animtree) {
-			delete m_animtree;
-		}
+		delete m_child;
 	}
 
-	void SetAnimTree()
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 	{
-		dModelAnimTreePose* const idlePose = new dModelAnimTreePose(this, m_pose);
-		//dModelAnimTreePose* const walkPoseGenerator = new dModelAnimTreePoseWalkSequence(this, m_pose);
-		//m_walkIdleBlender = new dModelAnimTreePoseBlender(this, idlePose, walkPoseGenerator);
-		//m_postureModifier = new dModelAnimTreeHipController(this, m_walkIdleBlender);
-		//m_animtree = m_postureModifier;
-		m_animtree = idlePose;
-	}
-
-	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
-	{
-		dFloat scale = debugContext->GetScale();
-		debugContext->SetScale(0.5f);
-		for (dModelKeyFramePose::dListNode* node = m_pose.GetFirst(); node; node = node->GetNext()) {
-			const dModelKeyFrame& keyFrame = node->GetInfo();
-			keyFrame.m_effector->Debug(debugContext);
-		}
-		
 		dMatrix matrix;
-		NewtonBodyGetMatrix(GetBody(), &matrix[0][0]);
+		NewtonBodyGetMatrix(GetRoot()->GetBody(), &matrix[0][0]);
 		matrix.m_posit = CalculateCenterOfMass();
 		debugContext->DrawFrame(matrix);
-
-		debugContext->SetScale(scale);
+		m_child->Debug(debugContext);
 	}
 
 	dVector CalculateCenterOfMass() const
@@ -140,7 +123,7 @@ class dKinematicRagdoll: public dModelRootNode
 		int bodyCount = 0;
 		const dModelNode* stackBuffer[32];
 
-		stackBuffer[0] = this;
+		stackBuffer[0] = GetRoot();
 		while (stack) {
 			stack--;
 			const dModelNode* const root = stackBuffer[stack];
@@ -166,10 +149,81 @@ class dKinematicRagdoll: public dModelRootNode
 		return com;
 	}
 
+	void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
+	{
+		m_child->GeneratePose(timestep, output);
+
+		dMatrix matrix0;
+		dMatrix effectorMatrix (m_rootEffector0->GetTargetMatrix());
+		NewtonBodyGetMatrix(GetRoot()->GetBody(), &matrix0[0][0]);
+		
+		matrix0 = effectorMatrix * matrix0;
+		dVector com (CalculateCenterOfMass());
+
+		dVector error (com - matrix0.m_posit);
+		error.m_y = 0.0f;
+		//error.m_z = 0.0f;
+		dTrace (("%f %f %f\n", error.m_x, error.m_y, error.m_z));
+
+//		dMatrix matrix1 (dGetIdentityMatrix());
+//		matrix1.m_posit -= error.Scale (0.01f);
+//		dMatrix balanceMatrix (effectorMatrix * matrix0 * matrix1 * matrix0.Inverse());
+
+		for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+			dModelKeyFrame& transform = node->GetInfo();
+//			transform.SetMatrix(balanceMatrix);
+		}
+
+	}
+
+	dModelAnimTree* m_child;
+	dCustomKinematicController* m_rootEffector0;
+};
+
+
+class dKinematicRagdoll: public dModelRootNode
+{
+	public:
+	dKinematicRagdoll(NewtonBody* const rootBody)
+		:dModelRootNode(rootBody, dGetIdentityMatrix())
+		,m_pose()
+		,m_animtree(NULL)
+	{
+	}
+
+	~dKinematicRagdoll()
+	{
+		if (m_animtree) {
+			delete m_animtree;
+		}
+	}
+
+	void SetAnimTree(dCustomKinematicController* const rootEffector0)
+	{
+		dModelAnimTreePose* const idlePose = new dModelAnimTreePose(this, m_pose);
+		dModelAnimTreeSelfBalanceCalculator* const balanceCalculator = new dModelAnimTreeSelfBalanceCalculator(this, idlePose, rootEffector0);
+		m_animtree = balanceCalculator;
+	}
+
+	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+	{
+		dFloat scale = debugContext->GetScale();
+		debugContext->SetScale(0.5f);
+		for (dModelKeyFramePose::dListNode* node = m_pose.GetFirst(); node; node = node->GetNext()) {
+			const dModelKeyFrame& keyFrame = node->GetInfo();
+			keyFrame.m_effector->Debug(debugContext);
+		}
+
+		if (m_animtree) {
+			m_animtree->Debug(debugContext);
+		}
+
+		debugContext->SetScale(scale);
+	}
+
 	void ApplyControls (dFloat timestep)
 	{
-		m_animtree->Evaluate(timestep);
-		m_animtree->GeneratePose(m_pose);
+		m_animtree->GeneratePose(timestep, m_pose);
 
 		for (dModelKeyFramePose::dListNode* node = m_pose.GetFirst(); node; node = node->GetNext()) {
 			dModelKeyFrame& transform = node->GetInfo();
@@ -181,20 +235,15 @@ class dKinematicRagdoll: public dModelRootNode
 	dModelAnimTree* m_animtree;
 };
 
+
 class dKinematicRagdollManager: public dModelManager
 {
 	public:
 	dKinematicRagdollManager(DemoEntityManager* const scene)
 		:dModelManager(scene->GetNewton())
 		//,m_currentController(NULL)
-		//,m_azimuth(0.0f)
-		//,m_posit_x(0.0f)
-		//,m_posit_y(0.0f)
-		//,m_gripper_pitch(0.0f)
-		//,m_gripper_yaw(0.0f)
-		//,m_gripper_roll(0.0f)
 	{
-//		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
+		//scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
 
 	~dKinematicRagdollManager()
@@ -412,6 +461,8 @@ class dKinematicRagdollManager: public dModelManager
 		}
 
 		// walk model hierarchic adding all children designed as rigid body bones. 
+
+		dCustomKinematicController* rootEffector0;
 		while (stackIndex) {
 			stackIndex--;
 
@@ -430,6 +481,8 @@ class dKinematicRagdollManager: public dModelManager
 
 						effectorPose.SetMatrix (effectorPose.m_effector->GetTargetMatrix());
 						model->m_pose.Append(effectorPose);
+
+						rootEffector0 = effectorPose.m_effector;
 
 					} else {
 						NewtonBody* const childBody = CreateBodyPart(entity, descriptor.m_skeletonDefinition[i]);
@@ -459,7 +512,7 @@ class dKinematicRagdollManager: public dModelManager
 #endif
 
 		// setup the pose generator 
-		model->SetAnimTree();
+		model->SetAnimTree(rootEffector0);
 
 		//m_currentController = robot;
 	}
@@ -487,12 +540,6 @@ class dKinematicRagdollManager: public dModelManager
 	}
 	
 	//dSixAxisRobot* m_currentController;
-	//dFloat32 m_azimuth;
-	//dFloat32 m_posit_x;
-	//dFloat32 m_posit_y;
-	//dFloat32 m_gripper_pitch;
-	//dFloat32 m_gripper_yaw;
-	//dFloat32 m_gripper_roll;
 };
 
 

@@ -71,15 +71,11 @@ class dModelAnimTreePoseWalkSequence: public dModelAnimTreePose
 		m_cycle.CreateFromKnotVectorAndControlPoints(1, size, knots, &leftControlPoints[1]);
 	}
 
-	void Evaluate(dFloat timestep)
+	virtual void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
 	{
+		dModelAnimTreePose::GeneratePose(timestep, output);
+
 		m_acc = dMod(m_acc + timestep, m_period);
-	}
-
-	virtual void GeneratePose(dModelKeyFramePose& output)
-	{
-		dModelAnimTreePose::GeneratePose(output);
-
 		dFloat param = m_acc / m_period;
 		dBigVector left(m_cycle.CurvePoint(param));
 		dBigVector right(m_cycle.CurvePoint(dMod(param + 0.5f, 1.0f)));
@@ -125,11 +121,6 @@ class dModelAnimTreeHipController: public dModelAnimTree
 		delete m_child;
 	}
 
-	virtual void Evaluate(dFloat timestep)
-	{
-		m_child->Evaluate(timestep);
-	}
-
 	void SetTarget(dFloat z, dFloat y, dFloat roll, dFloat yaw, dFloat pitch)
 	{
 		m_position.m_y = y;
@@ -139,9 +130,9 @@ class dModelAnimTreeHipController: public dModelAnimTree
 		m_euler.m_z = roll * dDegreeToRad;
 	}
 
-	virtual void GeneratePose(dModelKeyFramePose& output)
+	virtual void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
 	{
-		m_child->GeneratePose(output);
+		m_child->GeneratePose(timestep, output);
 		dQuaternion rotation(dPitchMatrix(m_euler.m_x) * dYawMatrix(m_euler.m_y) * dRollMatrix(m_euler.m_z));
 		for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
 			dModelKeyFrame& transform = node->GetInfo();
@@ -187,9 +178,7 @@ class dHexapod: public dModelRootNode
 	{
 		m_walkIdleBlender->SetParam(speed);
 		m_postureModifier->SetTarget(z, y, roll, yaw, pitch);
-
-		m_animtree->Evaluate(timestep);
-		m_animtree->GeneratePose(m_pose);
+		m_animtree->GeneratePose(timestep, m_pose);
 
 		for (dModelKeyFramePose::dListNode* node = m_pose.GetFirst(); node; node = node->GetNext()) {
 			dModelKeyFrame& transform = node->GetInfo();

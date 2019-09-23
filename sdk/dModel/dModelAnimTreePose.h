@@ -29,11 +29,7 @@ class dModelAnimTreePose: public dModelAnimTree
 		return m_pose;
 	}
 
-	virtual void Evaluate(dFloat timestep)
-	{
-	}
-
-	virtual void GeneratePose(dModelKeyFramePose& output)
+	virtual void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
 	{
 		m_pose.CopyKeyFrames(output);
 	}

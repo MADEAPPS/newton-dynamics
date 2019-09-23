@@ -19,7 +19,7 @@
 class dModelAnimTreePoseBlender: public dModelAnimTree
 {
 	public:
-	dModelAnimTreePoseBlender(dModelRootNode* const model, dModelAnimTreePose* const pose0, dModelAnimTreePose* const pose1)
+	dModelAnimTreePoseBlender(dModelRootNode* const model, dModelAnimTree* const pose0, dModelAnimTree* const pose1)
 		:dModelAnimTree(model)
 		,m_pose0(pose0)
 		,m_pose1(pose1)
@@ -31,6 +31,12 @@ class dModelAnimTreePoseBlender: public dModelAnimTree
 	{
 		delete m_pose0;
 		delete m_pose1;
+	}
+
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		m_pose0->Debug(debugContext);
+		m_pose1->Debug(debugContext);
 	}
 
 	dModelAnimTreePoseBlender& operator=(const dModelAnimTreePoseBlender& src);
@@ -45,28 +51,22 @@ class dModelAnimTreePoseBlender: public dModelAnimTree
 		m_param = dClamp(param, dFloat (0.0f), dFloat (1.0f));
 	}
 
-	virtual void Evaluate(dFloat timestep)
-	{
-		m_pose0->Evaluate(timestep);
-		m_pose1->Evaluate(timestep);
-	}
-
-	virtual void GeneratePose(dModelKeyFramePose& output)
+	virtual void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
 	{
 		if (m_param < 0.001f) {
-			m_pose0->GeneratePose(output);
+			m_pose0->GeneratePose(timestep, output);
 		} else if (m_param > 0.999f) {
-			m_pose1->GeneratePose(output);
+			m_pose1->GeneratePose(timestep, output);
 		} else {
 			int index = 0;
-			m_pose1->GeneratePose(output);
+			m_pose1->GeneratePose(timestep, output);
 			dModelKeyFrame* const tmpKeyFrame = dAlloca(dModelKeyFrame, output.GetCount());
 			for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
 				tmpKeyFrame[index] = node->GetInfo();
 				index++;
 			}
 			index = 0;
-			m_pose0->GeneratePose(output);
+			m_pose0->GeneratePose(timestep, output);
 			for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
 				dModelKeyFrame& dst = node->GetInfo();
 				const dModelKeyFrame& src = tmpKeyFrame[index];
@@ -82,8 +82,8 @@ class dModelAnimTreePoseBlender: public dModelAnimTree
 	}
 
 	protected:
-	dModelAnimTreePose* const m_pose0;
-	dModelAnimTreePose* const m_pose1;
+	dModelAnimTree* const m_pose0;
+	dModelAnimTree* const m_pose1;
 	dFloat m_param;
 };
 

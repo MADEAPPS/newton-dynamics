@@ -24,6 +24,7 @@ class dModelKeyFrame
 	{
 		m_posit = matrix.m_posit;
 		m_rotation = dQuaternion(matrix);
+		m_rotation.Normalize();
 	}
 
 	dVector m_posit;
@@ -61,7 +62,6 @@ class dModelKeyFramePose: public dList<dModelKeyFrame>
 	}
 };
 
-
 class dModelAnimTree: public dCustomAlloc
 {
 	public:
@@ -74,9 +74,11 @@ class dModelAnimTree: public dCustomAlloc
 	virtual ~dModelAnimTree()
 	{
 	}
-	
-	virtual void Evaluate(dFloat timestep) = 0;
-	virtual void GeneratePose(dModelKeyFramePose& output) = 0;
+
+	dModelRootNode* GetRoot() const {return m_model;}
+
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const {}
+	virtual void GeneratePose(dFloat timestep, dModelKeyFramePose& output) = 0;
 
 	protected:
 	dModelRootNode* m_model;
