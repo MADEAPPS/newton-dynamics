@@ -222,6 +222,33 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 	{
 	}
 
+	bool CalculateUpVector(dVector& upvector, dCustomKinematicController* const effector) const
+	{
+		bool ret = false;
+/*
+		NewtonBody* const body0 = effector->GetBody0();
+		for (NewtonJoint* contactjoint = NewtonBodyGetFirstContactJoint(body0); contactjoint; contactjoint = NewtonBodyGetNextContactJoint(body0, contactjoint)) {
+			ret = true;
+			dVector averageNormal(0.0f);
+			for (void* contact = NewtonContactJointGetFirstContact(contactjoint); contact; contact = NewtonContactJointGetNextContact(contactjoint, contact)) {
+				NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+				dVector point(0.0f);
+				dVector normal(0.0f);
+				NewtonMaterialGetContactPositionAndNormal(material, body0, &point.m_x, &normal.m_x);
+				averageNormal += normal;
+			}
+			upvector = averageNormal.Normalize();
+			break;
+		}
+
+		ret = true;
+		upvector = dVector (0.0f, 1.0f, 0.0f, 0.0f);
+		upvector = dPitchMatrix(30.0f * dDegreeToRad).RotateVector(upvector);
+*/		
+		return ret;
+
+	}
+
 	void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
 	{
 		m_child->GeneratePose(timestep, output);
@@ -233,16 +260,27 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 			dModelKeyFrame* const transform = feetPose[i];
 			dCustomKinematicController* const effector = transform->m_effector;
 
-			// claculate foot desired matrix
-			NewtonBodyGetMatrix(effector->GetBody1(), &rootMatrix[0][0]);
-			dMatrix pivotMatrix(dMatrix(transform->m_rotation, transform->m_posit) * rootMatrix);
-			//dMatrix pivotMatrix(effector->GetBodyMatrix());
+			dVector upvector;
+			if (CalculateUpVector(upvector, effector)) {
+				// calculate foot desired matrix
+				NewtonBodyGetMatrix(effector->GetBody1(), &rootMatrix[0][0]);
+				dMatrix pivotMatrix(dMatrix(transform->m_rotation, transform->m_posit) * rootMatrix);
+				dFloat cosAngle = upvector.DotProduct3(pivotMatrix.m_up);
+				if (cosAngle < 0.9997f) {
+					// align the matrix to the floor contacts.
+					//dVector lateralDir(upvector.CrossProduct(pivotMatrix.m_up));
+					dVector lateralDir(pivotMatrix.m_up.CrossProduct(upvector));
+					dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
+					lateralDir = lateralDir.Normalize();
+					dFloat coneAngle = dAcos(dClamp(cosAngle, dFloat(-1.0f), dFloat(1.0f)));
+					dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), pivotMatrix.m_posit);
+					pivotMatrix = pivotMatrix * coneRotation;
+					pivotMatrix.m_posit = coneRotation.m_posit;
 
-			// align the matrix to the floor contacts.
-			// TODO
-
-			// calculate and set new modified effector matrix.
-			transform->SetMatrix(pivotMatrix * rootMatrix.Inverse());
+					// calculate and set new modified effector matrix.
+					transform->SetMatrix(pivotMatrix * rootMatrix.Inverse());
+				}
+			}
 		}
 	}
 };
@@ -412,8 +450,8 @@ class dKinematicRagdollManager: public dModelManager
 	{
 		dCustomKinematicController* const effector = new dCustomKinematicController(effectorNode->GetBody(), effectorMatrix, effectorNode->GetRoot()->GetBody());
 		effector->SetSolverModel(1);
-		effector->SetMaxLinearFriction(modelMass * 9.8f * 10.0f);
 		effector->SetMaxAngularFriction(modelMass * 100.0f);
+		effector->SetMaxLinearFriction(modelMass * 9.8f * 10.0f);
 		return effector;
 	}
 
@@ -660,7 +698,7 @@ void KinematicRagdoll(DemoEntityManager* const scene)
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.0f);
 
 	dMatrix origin (dYawMatrix(90.0f * dDegreeToRad));
-	origin.m_posit.m_y += 3.0f;
+	origin.m_posit.m_y += 1.0f;
 	manager->CreateKinematicModel(tred, origin);
 
 	origin.m_posit.m_x = -8.0f;
