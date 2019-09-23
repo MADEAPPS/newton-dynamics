@@ -1381,7 +1381,8 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			hasJointFeeback |= (constraint->m_updaFeedbackCallback ? 1 : 0);
 		}
 
-		const dgFloat32 zeroAceel = (jointCount >= 16) ? DG_SOLVER_MAX_ERROR : DG_SOLVER_MAX_ERROR * dgFloat32 (0.25f);
+		//const dgFloat32 zeroAceel = (jointCount >= 16) ? DG_SOLVER_MAX_ERROR : DG_SOLVER_MAX_ERROR * dgFloat32 (0.25f);
+		const dgFloat32 zeroAceel = (bodyCount >= DG_SMALL_ISLAND_COUNT) ? DG_SOLVER_MAX_ERROR : DG_SOLVER_MAX_ERROR * dgFloat32 (0.125f);
 		const dgVector invTime(invTimestep);
 		const dgVector maxAccNorm2(zeroAceel * zeroAceel);
 

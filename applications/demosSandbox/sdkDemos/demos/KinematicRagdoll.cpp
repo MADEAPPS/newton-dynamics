@@ -64,11 +64,11 @@ static dKinematicBoneDefinition tredDefinition[] =
 	{ "bone_rightFoot", dKinematicBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 30.0f}, { 0.0f, 0.0f, 0.0f }},
 	{ "effector_rightAnkle", dKinematicBoneDefinition::m_effector},
 
-	//{ "bone_leftLeg", dKinematicBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
-	//{ "bone_leftCalf", dKinematicBoneDefinition::m_1dof, 0.2f, { -80.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
-	//{ "bone_leftAnkle", dKinematicBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
-	//{ "bone_leftFoot", dKinematicBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
-	//{ "effector_leftAnkle", dKinematicBoneDefinition::m_effector },
+	{ "bone_leftLeg", dKinematicBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "bone_leftCalf", dKinematicBoneDefinition::m_1dof, 0.2f, { -80.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
+	{ "bone_leftAnkle", dKinematicBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+	{ "bone_leftFoot", dKinematicBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+	{ "effector_leftAnkle", dKinematicBoneDefinition::m_effector },
 
 	{ NULL},
 };
@@ -171,7 +171,7 @@ class dModelAnimTreeSelfBalanceCalculator: public dModelAnimTree
 		dMatrix effectorMatrix (pivotMatrix * rootMatrix.Inverse());
 		for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
 			dModelKeyFrame& transform = node->GetInfo();
-			transform.m_posit = effectorMatrix.m_posit;
+			//transform.m_posit = effectorMatrix.m_posit;
 			//transform.SetMatrix(effectorMatrix);
 		}
 	}
@@ -287,30 +287,34 @@ class dKinematicRagdollManager: public dModelManager
 		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
 		dAssert(shape);
 
-		// calculate the bone matrix
+		// calculate the boneBody matrix
 		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
 
-		// create the rigid body that will make this bone
-		NewtonBody* const bone = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
+		// create the rigid body that will make this boneBody
+		NewtonBody* const boneBody = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
 
 		// calculate the moment of inertia and the relative center of mass of the solid
-		//NewtonBodySetMassProperties (bone, definition.m_mass, shape);
-		NewtonBodySetMassProperties(bone, definition.m_massFraction, shape);
+		//NewtonBodySetMassProperties (boneBody, definition.m_mass, shape);
+		NewtonBodySetMassProperties(boneBody, definition.m_massFraction, shape);
 
-		// save the user data with the bone body (usually the visual geometry)
-		NewtonBodySetUserData(bone, bodyPart);
+		// save the user data with the boneBody body (usually the visual geometry)
+		NewtonBodySetUserData(boneBody, bodyPart);
 
 		// assign the material for early collision culling
-		//NewtonBodySetMaterialGroupID(bone, m_material);
-		NewtonBodySetMaterialGroupID(bone, 0);
+		//NewtonBodySetMaterialGroupID(boneBody, m_material);
+		NewtonBodySetMaterialGroupID(boneBody, 0);
+
+		//dVector damping (0.0f);
+		//NewtonBodySetLinearDamping(boneBody, damping.m_x);
+		//NewtonBodySetAngularDamping(boneBody, &damping[0]);
 
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
-		//NewtonBodySetForceAndTorqueCallback (bone, PhysicsApplyGravityForce);
-		NewtonBodySetForceAndTorqueCallback(bone, ClampAngularVelocity);
+		//NewtonBodySetForceAndTorqueCallback (boneBody, PhysicsApplyGravityForce);
+		NewtonBodySetForceAndTorqueCallback(boneBody, ClampAngularVelocity);
 
 		// destroy the collision helper shape 
 		NewtonDestroyCollision(shape);
-		return bone;
+		return boneBody;
 	}
 
 	dCustomKinematicController* ConnectEffector(dModelNode* const effectorNode, const dMatrix& effectorMatrix, const dFloat modelMass)
@@ -505,7 +509,7 @@ class dKinematicRagdollManager: public dModelManager
 		// set mass distribution by density and volume
 		NormalizeMassAndInertia(model, descriptor.m_mass);
 
-#if 1
+#if 0
 		dCustomHinge* fixToWorld = new dCustomHinge (matrix0 * location, model->GetBody(), NULL);
 		fixToWorld->EnableLimits(true);
 		fixToWorld->SetLimits(0.0f, 0.0f);
@@ -558,15 +562,8 @@ void KinematicRagdoll(DemoEntityManager* const scene)
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.0f);
 
 	dMatrix origin (dYawMatrix(90.0f * dDegreeToRad));
-	origin.m_posit.m_y += 0.5f;
-	
-#ifdef OLD_KINEMATIC_RAGDOLL
-	origin.m_posit.m_y = 2.0f;
-	const int definitionCount = sizeof(tredDefinition) / sizeof(tredDefinition[0]);
-	manager->CreateKinematicModel("tred.ngd", origin, tredDefinition, definitionCount);
-#else
+	origin.m_posit.m_y += 0.1f;
 	manager->CreateKinematicModel(tred, origin);
-#endif
 
 	origin.m_posit.m_x = -8.0f;
 	origin.m_posit.m_y = 1.0f;
