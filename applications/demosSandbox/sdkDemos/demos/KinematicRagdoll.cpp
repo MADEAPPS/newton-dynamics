@@ -153,27 +153,26 @@ class dModelAnimTreeSelfBalanceCalculator: public dModelAnimTree
 	{
 		m_child->GeneratePose(timestep, output);
 
-		dMatrix matrix0;
-		dMatrix effectorMatrix (m_rootEffector0->GetTargetMatrix());
-		NewtonBodyGetMatrix(GetRoot()->GetBody(), &matrix0[0][0]);
-		
-		matrix0 = effectorMatrix * matrix0;
+		dMatrix pivotMatrix (m_rootEffector0->GetBodyMatrix());
 		dVector com (CalculateCenterOfMass());
 
-		dVector error (com - matrix0.m_posit);
+		dVector error (pivotMatrix.m_posit - com);
+		//error.m_x = 0.0f;
 		error.m_y = 0.0f;
 		//error.m_z = 0.0f;
-		dTrace (("%f %f %f\n", error.m_x, error.m_y, error.m_z));
 
-//		dMatrix matrix1 (dGetIdentityMatrix());
-//		matrix1.m_posit -= error.Scale (0.01f);
-//		dMatrix balanceMatrix (effectorMatrix * matrix0 * matrix1 * matrix0.Inverse());
+		pivotMatrix.m_posit -= error.Scale (0.35f);
+		dTrace (("(%f %f %f) (%f %f %f)\n", com.m_x, com.m_y, com.m_z
+										  , pivotMatrix.m_posit.m_x, pivotMatrix.m_posit.m_y, pivotMatrix.m_posit.m_z));
 
+		dMatrix rootMatrix;
+		NewtonBodyGetMatrix (m_rootEffector0->GetBody1(), &rootMatrix[0][0]);
+		
+		dMatrix effectorMatrix (pivotMatrix * rootMatrix.Inverse());
 		for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
 			dModelKeyFrame& transform = node->GetInfo();
-//			transform.SetMatrix(balanceMatrix);
+			transform.SetMatrix(effectorMatrix);
 		}
-
 	}
 
 	dModelAnimTree* m_child;
