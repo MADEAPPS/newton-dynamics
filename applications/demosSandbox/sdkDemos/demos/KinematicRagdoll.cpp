@@ -61,7 +61,7 @@ static dKinematicBoneDefinition tredDefinition[] =
 	{ "bone_rightLeg", dKinematicBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
 	{ "bone_righCalf", dKinematicBoneDefinition::m_1dof, 0.2f, {-80.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
 	{ "bone_rightAnkle", dKinematicBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
-	{ "bone_rightFoot", dKinematicBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 30.0f}, { 0.0f, 0.0f, 0.0f }},
+	{ "bone_rightFoot", dKinematicBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 0.0f }},
 	{ "effector_rightAnkle", dKinematicBoneDefinition::m_effector},
 
 	{ "bone_leftLeg", dKinematicBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
@@ -163,8 +163,7 @@ class dModelAnimTreeSelfBalanceCalculator: public dModelAnimTree
 		//error.m_z = 0.0f;
 
 		pivotMatrix.m_posit -= error.Scale (0.35f);
-		dTrace (("(%f %f %f) (%f %f %f)\n", com.m_x, com.m_y, com.m_z
-										  , pivotMatrix.m_posit.m_x, pivotMatrix.m_posit.m_y, pivotMatrix.m_posit.m_z));
+		//dTrace (("(%f %f %f) (%f %f %f)\n", com.m_x, com.m_y, com.m_z, pivotMatrix.m_posit.m_x, pivotMatrix.m_posit.m_y, pivotMatrix.m_posit.m_z));
 
 		dMatrix rootMatrix;
 		NewtonBodyGetMatrix (m_rootEffector0->GetBody1(), &rootMatrix[0][0]);
@@ -257,6 +256,30 @@ class dKinematicRagdoll: public dModelRootNode
 			delete m_animtree;
 		}
 	}
+
+	void SetAllPartNonCollideble()
+	{
+		int stack = 1;
+		dModelNode* stackBuffer[32];
+
+		stackBuffer[0] = this;
+		void* const aggregate = NewtonCollisionAggregateCreate(NewtonBodyGetWorld(GetBody()));
+		while (stack) {
+			stack--;
+			dModelNode* const root = stackBuffer[stack];
+			NewtonBody* const body = root->GetBody();
+			NewtonCollisionAggregateAddBody(aggregate, body);
+
+			const dModelChildrenList& children = root->GetChildren();
+			for (dModelChildrenList::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
+				stackBuffer[stack] = node->GetInfo().GetData();
+				stack++;
+			}
+		}
+
+		NewtonCollisionAggregateSetSelfCollision(aggregate, false);
+	}
+
 
 	void SetAnimTree(dCustomKinematicController* const rootEffector0, dCustomKinematicController* const rootEffector1)
 	{
@@ -489,6 +512,7 @@ class dKinematicRagdollManager: public dModelManager
 		}
 	}
 
+
 	void CreateKinematicModel(dModelDescritor& descriptor, const dMatrix& location) 
 	{
 		NewtonWorld* const world = GetWorld();
@@ -573,6 +597,8 @@ class dKinematicRagdollManager: public dModelManager
 		// set mass distribution by density and volume
 		NormalizeMassAndInertia(model, descriptor.m_mass);
 
+		// make internal part non collidable
+		model->SetAllPartNonCollideble();
 #if 0
 		dCustomHinge* fixToWorld = new dCustomHinge (matrix0 * location, model->GetBody(), NULL);
 		fixToWorld->EnableLimits(true);
@@ -581,6 +607,7 @@ class dKinematicRagdollManager: public dModelManager
 
 		// setup the pose generator 
 		model->SetAnimTree(footEffectors[0], footEffectors[1]);
+
 
 		//m_currentController = robot;
 	}
@@ -626,7 +653,7 @@ void KinematicRagdoll(DemoEntityManager* const scene)
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.0f);
 
 	dMatrix origin (dYawMatrix(90.0f * dDegreeToRad));
-	origin.m_posit.m_y += 4.0f;
+	origin.m_posit.m_y += 0.1f;
 	manager->CreateKinematicModel(tred, origin);
 
 	origin.m_posit.m_x = -8.0f;

@@ -380,7 +380,9 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 
 void dCustomBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat pitchAngle)
 {
-	if (pitchAngle > m_maxTwistAngle) {
+	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * dDegreeToRad)) {
+		NewtonUserJointAddAngularRow(m_joint, -pitchAngle, &pin[0]);
+	} else if (pitchAngle > m_maxTwistAngle) {
 		pitchAngle -= m_maxTwistAngle;
 		NewtonUserJointAddAngularRow(m_joint, -pitchAngle, &pin[0]);
 		NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);

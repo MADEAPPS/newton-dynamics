@@ -263,9 +263,6 @@ void dCustomHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matri
 {
 	const dFloat angleError = GetMaxAngleError();
 	// two rows to restrict rotation around around the parent coordinate system
-
-//	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
-//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	dFloat angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_up[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
@@ -274,8 +271,6 @@ void dCustomHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matri
 		NewtonUserJointSetRowAcceleration(m_joint, alpha);
 	}
 
-//	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
-//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	dFloat angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	NewtonUserJointAddAngularRow(m_joint, angle1, &matrix1.m_right[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
@@ -295,12 +290,6 @@ void dCustomHinge::SubmitConstraints(dFloat timestep, int threadIndex)
 
 	// Restrict the movement on the pivot point along all two orthonormal axis direction perpendicular to the motion
 	SubmitLinearRows(0x07, matrix0, matrix1);
-
-//dMatrix localMatrix(matrix0 * matrix1.Inverse());
-//dVector euler0;
-//dVector euler1;
-//localMatrix.GetEulerAngles(euler0, euler1, m_pitchRollYaw);
-//dFloat xxx = CalculateAngle(matrix1.m_up, matrix0.m_up, matrix0.m_front);
 
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
 	m_curJointAngle.Update(CalculateAngle(matrix1.m_up, matrix0.m_up, matrix0.m_front));
