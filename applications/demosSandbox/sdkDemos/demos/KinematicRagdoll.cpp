@@ -105,6 +105,19 @@ class dModelAnimTreeFootBase: public dModelAnimTree
 		m_child->Debug(debugContext);
 	}
 
+	int GetModelKeyFrames(const dModelKeyFramePose& input, dModelKeyFrame** const output) const
+	{
+		int count = 0;
+		for (dModelKeyFramePose::dListNode* node = input.GetFirst(); node; node = node->GetNext()) {
+			dModelKeyFrame& transform = node->GetInfo();
+			if ((transform.m_effector == m_rootEffector0) || (transform.m_effector == m_rootEffector1)) {
+				output[count] = &transform;
+				count++;
+			}
+		}
+		return count;
+	}
+
 	dModelAnimTree* m_child;
 	dCustomKinematicController* m_rootEffector0;
 	dCustomKinematicController* m_rootEffector1;
@@ -171,28 +184,33 @@ class dModelAnimTreePoseBalance: public dModelAnimTreeFootBase
 	void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
 	{
 		m_child->GeneratePose(timestep, output);
-/*
-		dMatrix pivotMatrix (m_rootEffector0->GetBodyMatrix());
-		dVector com (CalculateCenterOfMass());
-
-		dVector error (pivotMatrix.m_posit - com);
-		//error.m_x = 0.0f;
-		error.m_y = 0.0f;
-		//error.m_z = 0.0f;
-
-		pivotMatrix.m_posit -= error.Scale (0.35f);
-		//dTrace (("(%f %f %f) (%f %f %f)\n", com.m_x, com.m_y, com.m_z, pivotMatrix.m_posit.m_x, pivotMatrix.m_posit.m_y, pivotMatrix.m_posit.m_z));
-
-		dMatrix rootMatrix;
-		NewtonBodyGetMatrix (m_rootEffector0->GetBody1(), &rootMatrix[0][0]);
 		
-		dMatrix effectorMatrix (pivotMatrix * rootMatrix.Inverse());
-		for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
-			//dModelKeyFrame& transform = node->GetInfo();
-			//transform.m_posit = effectorMatrix.m_posit;
-			//transform.SetMatrix(effectorMatrix);
+		dModelKeyFrame* feetPose[2];
+		const int count = GetModelKeyFrames(output, &feetPose[0]);
+		for (int i = 0; i < count; i++) {
+			/*
+					dMatrix pivotMatrix (m_rootEffector0->GetBodyMatrix());
+					dVector com (CalculateCenterOfMass());
+
+					dVector error (pivotMatrix.m_posit - com);
+					//error.m_x = 0.0f;
+					error.m_y = 0.0f;
+					//error.m_z = 0.0f;
+
+					pivotMatrix.m_posit -= error.Scale (0.35f);
+					//dTrace (("(%f %f %f) (%f %f %f)\n", com.m_x, com.m_y, com.m_z, pivotMatrix.m_posit.m_x, pivotMatrix.m_posit.m_y, pivotMatrix.m_posit.m_z));
+
+					dMatrix rootMatrix;
+					NewtonBodyGetMatrix (m_rootEffector0->GetBody1(), &rootMatrix[0][0]);
+
+					dMatrix effectorMatrix (pivotMatrix * rootMatrix.Inverse());
+					for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+						//dModelKeyFrame& transform = node->GetInfo();
+						//transform.m_posit = effectorMatrix.m_posit;
+						//transform.SetMatrix(effectorMatrix);
+					}
+			*/
 		}
-*/
 	}
 };
 
@@ -207,32 +225,27 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 	void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
 	{
 		m_child->GeneratePose(timestep, output);
-/*
-		dMatrix pivotMatrix(m_rootEffector0->GetBodyMatrix());
-		dVector com(CalculateCenterOfMass());
 
-		dVector error(pivotMatrix.m_posit - com);
-		//error.m_x = 0.0f;
-		error.m_y = 0.0f;
-		//error.m_z = 0.0f;
+		dModelKeyFrame* feetPose[2];
+		const int count = GetModelKeyFrames(output, &feetPose[0]);
+		for (int i = 0; i < count; i++) {
+			dMatrix rootMatrix;
+			dModelKeyFrame* const transform = feetPose[i];
+			dCustomKinematicController* const effector = transform->m_effector;
 
-		pivotMatrix.m_posit -= error.Scale(0.35f);
-		dTrace(("(%f %f %f) (%f %f %f)\n", com.m_x, com.m_y, com.m_z
-			, pivotMatrix.m_posit.m_x, pivotMatrix.m_posit.m_y, pivotMatrix.m_posit.m_z));
+			// claculate foot desired matrix
+			NewtonBodyGetMatrix(effector->GetBody1(), &rootMatrix[0][0]);
+			dMatrix pivotMatrix(dMatrix(transform->m_rotation, transform->m_posit) * rootMatrix);
+			//dMatrix pivotMatrix(effector->GetBodyMatrix());
 
-		dMatrix rootMatrix;
-		NewtonBodyGetMatrix(m_rootEffector0->GetBody1(), &rootMatrix[0][0]);
+			// align the matrix to the floor contacts.
+			// TODO
 
-		dMatrix effectorMatrix(pivotMatrix * rootMatrix.Inverse());
-		for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
-			dModelKeyFrame& transform = node->GetInfo();
-			//transform.m_posit = effectorMatrix.m_posit;
-			//transform.SetMatrix(effectorMatrix);
+			// calculate and set new modified effector matrix.
+			transform->SetMatrix(pivotMatrix * rootMatrix.Inverse());
 		}
-*/
 	}
 };
-
 
 class dKinematicRagdoll: public dModelRootNode
 {
