@@ -58,17 +58,17 @@ static dKinematicBoneDefinition tredDefinition[] =
 {
 	{ "bone_pelvis", dKinematicBoneDefinition::m_none, 1.0f },
 
-	//{ "bone_rightLeg", dKinematicBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
-	//{ "bone_righCalf", dKinematicBoneDefinition::m_1dof, 0.2f, {-80.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
-	//{ "bone_rightAnkle", dKinematicBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
-	//{ "bone_rightFoot", dKinematicBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 30.0f}, { 0.0f, 0.0f, 0.0f }},
-	//{ "effector_rightAnkle", dKinematicBoneDefinition::m_effector},
+	{ "bone_rightLeg", dKinematicBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
+	{ "bone_righCalf", dKinematicBoneDefinition::m_1dof, 0.2f, {-80.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
+	{ "bone_rightAnkle", dKinematicBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
+	{ "bone_rightFoot", dKinematicBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 30.0f}, { 0.0f, 0.0f, 0.0f }},
+	{ "effector_rightAnkle", dKinematicBoneDefinition::m_effector},
 
-	{ "bone_leftLeg", dKinematicBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "bone_leftCalf", dKinematicBoneDefinition::m_1dof, 0.2f, { -80.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
-	{ "bone_leftAnkle", dKinematicBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
-	{ "bone_leftFoot", dKinematicBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
-	{ "effector_leftAnkle", dKinematicBoneDefinition::m_effector },
+	//{ "bone_leftLeg", dKinematicBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
+	//{ "bone_leftCalf", dKinematicBoneDefinition::m_1dof, 0.2f, { -80.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
+	//{ "bone_leftAnkle", dKinematicBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+	//{ "bone_leftFoot", dKinematicBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+	//{ "effector_leftAnkle", dKinematicBoneDefinition::m_effector },
 
 	{ NULL},
 };
@@ -171,7 +171,8 @@ class dModelAnimTreeSelfBalanceCalculator: public dModelAnimTree
 		dMatrix effectorMatrix (pivotMatrix * rootMatrix.Inverse());
 		for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
 			dModelKeyFrame& transform = node->GetInfo();
-			transform.SetMatrix(effectorMatrix);
+			transform.m_posit = effectorMatrix.m_posit;
+			//transform.SetMatrix(effectorMatrix);
 		}
 	}
 
