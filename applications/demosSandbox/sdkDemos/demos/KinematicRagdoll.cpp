@@ -87,10 +87,11 @@ static dModelDescritor tred = {"tred.ngd", 500.0f, tredDefinition};
 class dModelAnimTreeSelfBalanceCalculator: public dModelAnimTree
 {
 	public:
-	dModelAnimTreeSelfBalanceCalculator(dModelRootNode* const model, dModelAnimTree* const child, dCustomKinematicController* const footEffector0)
+	dModelAnimTreeSelfBalanceCalculator(dModelRootNode* const model, dModelAnimTree* const child, dCustomKinematicController* const footEffector0, dCustomKinematicController* const footEffector1)
 		:dModelAnimTree(model)
 		,m_child(child)
 		,m_rootEffector0(footEffector0)
+		,m_rootEffector1(footEffector1)
 	{
 	}
 
@@ -170,7 +171,7 @@ class dModelAnimTreeSelfBalanceCalculator: public dModelAnimTree
 		
 		dMatrix effectorMatrix (pivotMatrix * rootMatrix.Inverse());
 		for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
-			dModelKeyFrame& transform = node->GetInfo();
+			//dModelKeyFrame& transform = node->GetInfo();
 			//transform.m_posit = effectorMatrix.m_posit;
 			//transform.SetMatrix(effectorMatrix);
 		}
@@ -178,6 +179,65 @@ class dModelAnimTreeSelfBalanceCalculator: public dModelAnimTree
 
 	dModelAnimTree* m_child;
 	dCustomKinematicController* m_rootEffector0;
+	dCustomKinematicController* m_rootEffector1;
+};
+
+class dModelAnimTreeFootAligment: public dModelAnimTree
+{
+	public:
+	dModelAnimTreeFootAligment(dModelRootNode* const model, dModelAnimTree* const child, dCustomKinematicController* const footEffector0, dCustomKinematicController* const footEffector1)
+		:dModelAnimTree(model)
+		,m_child(child)
+		,m_rootEffector0(footEffector0)
+		,m_rootEffector1(footEffector1)
+	{
+	}
+
+	~dModelAnimTreeFootAligment()
+	{
+		delete m_child;
+	}
+
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		//dMatrix matrix;
+		//NewtonBodyGetMatrix(GetRoot()->GetBody(), &matrix[0][0]);
+		//matrix.m_posit = CalculateCenterOfMass();
+		//debugContext->DrawFrame(matrix);
+		m_child->Debug(debugContext);
+	}
+
+	void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
+	{
+		m_child->GeneratePose(timestep, output);
+/*
+		dMatrix pivotMatrix(m_rootEffector0->GetBodyMatrix());
+		dVector com(CalculateCenterOfMass());
+
+		dVector error(pivotMatrix.m_posit - com);
+		//error.m_x = 0.0f;
+		error.m_y = 0.0f;
+		//error.m_z = 0.0f;
+
+		pivotMatrix.m_posit -= error.Scale(0.35f);
+		dTrace(("(%f %f %f) (%f %f %f)\n", com.m_x, com.m_y, com.m_z
+			, pivotMatrix.m_posit.m_x, pivotMatrix.m_posit.m_y, pivotMatrix.m_posit.m_z));
+
+		dMatrix rootMatrix;
+		NewtonBodyGetMatrix(m_rootEffector0->GetBody1(), &rootMatrix[0][0]);
+
+		dMatrix effectorMatrix(pivotMatrix * rootMatrix.Inverse());
+		for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+			dModelKeyFrame& transform = node->GetInfo();
+			//transform.m_posit = effectorMatrix.m_posit;
+			//transform.SetMatrix(effectorMatrix);
+		}
+*/
+	}
+
+	dModelAnimTree* m_child;
+	dCustomKinematicController* m_rootEffector0;
+	dCustomKinematicController* m_rootEffector1;
 };
 
 
@@ -198,10 +258,11 @@ class dKinematicRagdoll: public dModelRootNode
 		}
 	}
 
-	void SetAnimTree(dCustomKinematicController* const rootEffector0)
+	void SetAnimTree(dCustomKinematicController* const rootEffector0, dCustomKinematicController* const rootEffector1)
 	{
-		dModelAnimTreePose* const idlePose = new dModelAnimTreePose(this, m_pose);
-		dModelAnimTreeSelfBalanceCalculator* const balanceCalculator = new dModelAnimTreeSelfBalanceCalculator(this, idlePose, rootEffector0);
+		dModelAnimTree* const idlePose = new dModelAnimTreePose(this, m_pose);
+		dModelAnimTree* const footControl = new dModelAnimTreeFootAligment (this, idlePose, rootEffector0, rootEffector1);
+		dModelAnimTreeSelfBalanceCalculator* const balanceCalculator = new dModelAnimTreeSelfBalanceCalculator(this, footControl, rootEffector0, rootEffector1);
 		m_animtree = balanceCalculator;
 	}
 
@@ -465,8 +526,10 @@ class dKinematicRagdollManager: public dModelManager
 		}
 
 		// walk model hierarchic adding all children designed as rigid body bones. 
-
-		dCustomKinematicController* rootEffector0;
+		int footEffectorsCoint = 0;
+		dCustomKinematicController* footEffectors[2];
+		footEffectors[0] = NULL;
+		footEffectors[1] = NULL;
 		while (stackIndex) {
 			stackIndex--;
 
@@ -486,7 +549,8 @@ class dKinematicRagdollManager: public dModelManager
 						effectorPose.SetMatrix (effectorPose.m_effector->GetTargetMatrix());
 						model->m_pose.Append(effectorPose);
 
-						rootEffector0 = effectorPose.m_effector;
+						footEffectors[footEffectorsCoint] = effectorPose.m_effector;
+						footEffectorsCoint ++;
 
 					} else {
 						NewtonBody* const childBody = CreateBodyPart(entity, descriptor.m_skeletonDefinition[i]);
@@ -516,7 +580,7 @@ class dKinematicRagdollManager: public dModelManager
 #endif
 
 		// setup the pose generator 
-		model->SetAnimTree(rootEffector0);
+		model->SetAnimTree(footEffectors[0], footEffectors[1]);
 
 		//m_currentController = robot;
 	}
