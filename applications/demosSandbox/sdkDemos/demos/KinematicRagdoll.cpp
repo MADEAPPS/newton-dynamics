@@ -653,7 +653,7 @@ void KinematicRagdoll(DemoEntityManager* const scene)
 	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.0f);
 
 	dMatrix origin (dYawMatrix(90.0f * dDegreeToRad));
-	origin.m_posit.m_y += 0.1f;
+	origin.m_posit.m_y += 3.0f;
 	manager->CreateKinematicModel(tred, origin);
 
 	origin.m_posit.m_x = -8.0f;
