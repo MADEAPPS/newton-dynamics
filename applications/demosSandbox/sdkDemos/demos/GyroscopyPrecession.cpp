@@ -405,7 +405,7 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 	// place a toy tops
 	int topsCount = 4;
 topsCount = 1;
-	const dFloat spacing = 3.0f;
+	//const dFloat spacing = 3.0f;
 	for (int i = 0; i < topsCount; i++) {
 		for (int j = 0; j < topsCount; j++) {
 //			PrecessingTop(scene, dVector(spacing * j, 0.5f, -spacing * i - spacing, 1.0f));

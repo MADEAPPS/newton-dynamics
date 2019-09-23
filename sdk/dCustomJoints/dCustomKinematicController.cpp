@@ -135,7 +135,7 @@ void dCustomKinematicController::CheckSleep() const
 	if (matrix.m_posit.DotProduct3(matrix.m_posit) > 1.0e-6f) {
 		NewtonBodySetSleepState(m_body0, 0);
 	} else if (m_controlAngularDof) {
-		dFloat32 trace = matrix[0][0] * matrix[1][1] * matrix[2][2];
+		dFloat trace = matrix[0][0] * matrix[1][1] * matrix[2][2];
 		if (trace < 0.9995f) {
 			NewtonBodySetSleepState(m_body0, 0);
 		}

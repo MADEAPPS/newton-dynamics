@@ -470,12 +470,12 @@ class dHexapodManager: public dModelManager
 	}
 
 	dHexapod* m_currentController;
-	dFloat m_yaw;
-	dFloat m_roll;
-	dFloat m_pitch;
-	dFloat m_posit_x;
-	dFloat m_posit_y;
-	dFloat m_speed;
+	dFloat32 m_yaw;
+	dFloat32 m_roll;
+	dFloat32 m_pitch;
+	dFloat32 m_posit_x;
+	dFloat32 m_posit_y;
+	dFloat32 m_speed;
 };
 
 void Hexapod(DemoEntityManager* const scene)
