@@ -557,7 +557,6 @@ class dKinematicRagdollManager: public dModelManager
 		}
 	}
 
-
 	void CreateKinematicModel(dModelDescritor& descriptor, const dMatrix& location) 
 	{
 		NewtonWorld* const world = GetWorld();
@@ -590,8 +589,7 @@ class dKinematicRagdollManager: public dModelManager
 			parentBones[stackIndex] = model;
 			childEntities[stackIndex] = child;
 			stackIndex++;
-			const char* const name = child->GetName().GetStr();
-			dTrace(("name: %s\n", name));
+			//dTrace(("name: %s\n", child->GetName().GetStr()));
 		}
 
 		// walk model hierarchic adding all children designed as rigid body bones. 
