@@ -20,7 +20,7 @@
 #include "HeightFieldPrimitive.h"
 
 
-class dKinematicBoneDefinition
+class dBalancingRagdollBoneDefinition
 {
 	public:
 	enum jointType
@@ -54,21 +54,21 @@ class dKinematicBoneDefinition
 	dFrameMatrix m_frameBasics;
 };
 
-static dKinematicBoneDefinition tredDefinition[] =
+static dBalancingRagdollBoneDefinition tredDefinition[] =
 {
-	{ "bone_pelvis", dKinematicBoneDefinition::m_none, 1.0f },
+	{ "bone_pelvis", dBalancingRagdollBoneDefinition::m_none, 1.0f },
 
-	{ "bone_rightLeg", dKinematicBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
-	{ "bone_righCalf", dKinematicBoneDefinition::m_1dof, 0.2f, {-80.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
-	{ "bone_rightAnkle", dKinematicBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
-	{ "bone_rightFoot", dKinematicBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 0.0f }},
-	{ "effector_rightAnkle", dKinematicBoneDefinition::m_effector},
+	{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
+	{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-80.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
+	{ "bone_rightAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
+	{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 0.0f }},
+	{ "effector_rightAnkle", dBalancingRagdollBoneDefinition::m_effector},
 
-	{ "bone_leftLeg", dKinematicBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "bone_leftCalf", dKinematicBoneDefinition::m_1dof, 0.2f, { -80.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
-	{ "bone_leftAnkle", dKinematicBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
-	{ "bone_leftFoot", dKinematicBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
-	{ "effector_leftAnkle", dKinematicBoneDefinition::m_effector },
+	//{ "bone_leftLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
+	//{ "bone_leftCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, { -80.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
+	//{ "bone_leftAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+	//{ "bone_leftFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+	//{ "effector_leftAnkle", dBalancingRagdollBoneDefinition::m_effector },
 
 	{ NULL},
 };
@@ -78,7 +78,7 @@ class dModelDescritor
 	public:
 	char* m_filename;
 	dFloat m_mass;
-	dKinematicBoneDefinition* m_skeletonDefinition;
+	dBalancingRagdollBoneDefinition* m_skeletonDefinition;
 };
 
 static dModelDescritor tred = {"tred.ngd", 500.0f, tredDefinition};
@@ -244,7 +244,67 @@ class dModelAnimTreePoseBalance: public dModelAnimTreeFootBase
 
 class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 {
-	#define RAY_CAST_LENGHT 0.25f
+	#define RAY_CAST_LENGHT0	0.125f
+	#define RAY_CAST_LENGHT1	2.0f
+	class dFeetRayHitSensor
+	{
+		public:
+		dFeetRayHitSensor(dCustomKinematicController* const effector)
+			:m_rotation()
+			,m_footBody(NULL)
+			,m_ankleBody(NULL)
+			,m_effector(effector)
+		{
+			if (m_effector) {
+				m_footBody = effector->GetBody0();
+				NewtonCollision* const box = NewtonBodyGetCollision(m_footBody);
+
+				dMatrix matrix;
+				NewtonBodyGetMatrix(m_footBody, &matrix[0][0]);
+
+				dVector worldDir[] = { { 1.0f, -1.0f, 1.0, 0.0f },{ -1.0f, -1.0f, 1.0, 0.0f },{ -1.0f, -1.0f, -1.0, 0.0f },{ 1.0f, -1.0f, -1.0, 0.0f } };
+				for (int i = 0; i < 4; i++) {
+					dVector dir = matrix.UnrotateVector(worldDir[i]);
+					NewtonCollisionSupportVertex(box, &dir[0], &m_sensorHitPoint[i][0]);
+					m_sensorHitPoint[i].m_w = 0.0f;
+				}
+
+				for (NewtonJoint* joint = NewtonBodyGetFirstJoint(m_footBody); joint; joint = NewtonBodyGetNextJoint(m_footBody, joint)) {
+					dCustomJoint* const customJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
+					NewtonBody* const body0 = customJoint->GetBody0();
+					NewtonBody* const body1 = customJoint->GetBody1();
+					NewtonBody* const otherBody = (body0 == m_footBody) ? body1 : body0;
+					if (otherBody != m_footBody) {
+						m_ankleBody = otherBody;
+						break;
+					}
+				}
+			}
+		}
+
+		void DebugDraw(dCustomJoint::dDebugDisplay* const debugContext) const
+		{
+			if (m_effector) {
+				dMatrix matrix;
+				NewtonBodyGetMatrix(m_footBody, &matrix[0][0]);
+
+				for (int i = 0; i < 4; i++) {
+					dVector point0(matrix.TransformVector(m_sensorHitPoint[i]));
+					dVector point1(point0);
+					point0.m_y += RAY_CAST_LENGHT0;
+					point1.m_y -= RAY_CAST_LENGHT1;
+					debugContext->DrawLine(point0, point1);
+				}
+			}
+		}
+
+		dVector m_sensorHitPoint[4];
+		dQuaternion m_rotation;
+		NewtonBody* m_footBody;
+		NewtonBody* m_ankleBody;
+		dCustomKinematicController* m_effector;
+	};
+
 	public:
 	class FloorSensorFilterData
 	{
@@ -263,47 +323,12 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 
 	dModelAnimTreeFootAligment(dModelRootNode* const model, dModelAnimTree* const child, dCustomKinematicController* const footEffector0, dCustomKinematicController* const footEffector1)
 		:dModelAnimTreeFootBase(model, child, footEffector0, footEffector1)
-		,m_effector0(footEffector0)
-		,m_effector1(footEffector1)
-		,m_ankle0(FindAnkle (footEffector0))
-		,m_ankle1(FindAnkle (footEffector1))
+		,m_foot0(footEffector0)
+		,m_foot1(footEffector1)
 	{
-		InitFloorSensors (footEffector0, m_effector0_floorSensor);
-		InitFloorSensors (footEffector1, m_effector1_floorSensor);
 	}
 
-	NewtonBody* FindAnkle (dCustomKinematicController* const effector)
-	{
-		NewtonBody* const feetBody = effector->GetBody0();
-		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(feetBody); joint; joint = NewtonBodyGetNextJoint(feetBody, joint)) {
-			dCustomJoint* const customJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
-			NewtonBody* const body0 = customJoint->GetBody0();
-			NewtonBody* const body1 = customJoint->GetBody1();
-			NewtonBody* const otherBody = (body0 == feetBody) ? body1 : body0;
-			if (otherBody != feetBody) {
-				return otherBody;
-			}
-		}
-		return NULL;
-
-	}
-
-	void InitFloorSensors (dCustomKinematicController* const effector, dVector* const pointsOut) 
-	{
-		NewtonBody* const body = effector->GetBody0();
-		NewtonCollision* const box = NewtonBodyGetCollision(body);
-
-		dMatrix matrix;
-		NewtonBodyGetMatrix (body, &matrix[0][0]);
-
-		dVector worldDir[] = {{1.0f, -1.0f, 1.0, 0.0f}, {-1.0f, -1.0f, 1.0, 0.0f}, {-1.0f, -1.0f, -1.0, 0.0f}, {1.0f, -1.0f, -1.0, 0.0f}};
-		for (int i = 0; i < 4; i ++) {
-			dVector dir = matrix.UnrotateVector(worldDir[i]);
-			NewtonCollisionSupportVertex (box, &dir[0], &pointsOut[i][0]);
-			pointsOut[i].m_w = 0.0f;
-		}
-	}
-
+/*
 	static unsigned FindFloorPrefilter(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
 	{
 		FloorSensorFilterData* const data = (FloorSensorFilterData*)userData;
@@ -320,7 +345,6 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 		}
 		return data->m_param;
 	}	
-	
 
 	bool CalculateUpVector(dVector& upvector, dCustomKinematicController* const effector) const
 	{
@@ -330,7 +354,6 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 
 		NewtonBody* const ankleBody = (effector == m_effector0) ? m_ankle0 : m_ankle1;
 		const dVector* const origins = (effector == m_effector0) ? m_effector0_floorSensor : m_effector1_floorSensor;
-		
 
 		dMatrix matrix;
 		dVector supportPlane[4];
@@ -344,7 +367,8 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 			dVector point0 (matrix.TransformVector(origins[i]));
 			dVector point1 (point0);
 			point0.m_y += RAY_CAST_LENGHT;
-			point1.m_y -= RAY_CAST_LENGHT * 2.0f;
+			//point1.m_y -= RAY_CAST_LENGHT * 4.0f;
+			point1.m_y -= RAY_CAST_LENGHT * 40.0f;
 			FloorSensorFilterData data(feetBody, ankleBody);
 			NewtonWorldRayCast (world, &point0[0], &point1[0], FindFloor, &data, FindFloorPrefilter, 0);
 			if (data.m_param < 1.0f) {
@@ -354,52 +378,25 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 		}
 
 		if (count >= 3) {
-
-		}
-
-/*
-		NewtonBody* const body0 = effector->GetBody0();
-		for (NewtonJoint* contactjoint = NewtonBodyGetFirstContactJoint(body0); contactjoint; contactjoint = NewtonBodyGetNextContactJoint(body0, contactjoint)) {
-			ret = true;
-			dVector averageNormal(0.0f);
-			for (void* contact = NewtonContactJointGetFirstContact(contactjoint); contact; contact = NewtonContactJointGetNextContact(contactjoint, contact)) {
-				NewtonMaterial* const material = NewtonContactGetMaterial(contact);
-				dVector point(0.0f);
-				dVector normal(0.0f);
-				NewtonMaterialGetContactPositionAndNormal(material, body0, &point.m_x, &normal.m_x);
-				averageNormal += normal;
+			dVector area(0.0f);
+			dVector e0(supportPlane[1] - supportPlane[0]);
+			for (int i = 2; i < count; i++) {
+				dVector e1(supportPlane[i] - supportPlane[0]);
+				area += e1.CrossProduct(e0);
+				e0 = e1;
 			}
-			upvector = averageNormal.Normalize();
-			break;
+			ret = true;
+			upvector = area.Normalize();
+			//upvector = dPitchMatrix(45.0f * dDegreeToRad).RotateVector(dVector (0, 1.0f, 0.0f, 0.0f));
 		}
-
-		ret = true;
-		upvector = dVector (0.0f, 1.0f, 0.0f, 0.0f);
-		upvector = dPitchMatrix(30.0f * dDegreeToRad).RotateVector(upvector);
-*/		
 		return ret;
-
 	}
 
-	void DrawSensor (dCustomJoint::dDebugDisplay* const debugContext, dCustomKinematicController* const effector, const dVector* const points) const
-	{
-		dMatrix matrix;
-		NewtonBody* const body = effector->GetBody0();
-		NewtonBodyGetMatrix(body, &matrix[0][0]);
-
-		for (int i = 0; i < 4; i++) {
-			dVector point0(matrix.TransformVector(points[i]));
-			dVector point1(point0);
-			point0.m_y += RAY_CAST_LENGHT;
-			point1.m_y -= RAY_CAST_LENGHT * 2.0f;
-			debugContext->DrawLine(point0, point1);
-		}
-	}
-
+*/
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 	{
-		DrawSensor (debugContext, m_effector0, m_effector0_floorSensor);
-		DrawSensor (debugContext, m_effector1, m_effector1_floorSensor);
+		m_foot0.DebugDraw(debugContext);
+		m_foot1.DebugDraw(debugContext);
 		m_child->Debug(debugContext);
 	}
 
@@ -407,7 +404,7 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 	void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
 	{
 		m_child->GeneratePose(timestep, output);
-
+/*
 		dModelKeyFrame* feetPose[2];
 		const int count = GetModelKeyFrames(output, &feetPose[0]);
 		for (int i = 0; i < count; i++) {
@@ -421,14 +418,18 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 				NewtonBodyGetMatrix(effector->GetBody1(), &rootMatrix[0][0]);
 				dMatrix pivotMatrix(dMatrix(transform->m_rotation, transform->m_posit) * rootMatrix);
 				dFloat cosAngle = upvector.DotProduct3(pivotMatrix.m_up);
+				if (cosAngle < 0.85f) {
+					//dAssert(0);
+				}
 				if (cosAngle < 0.9997f) {
 					// align the matrix to the floor contacts.
-					//dVector lateralDir(upvector.CrossProduct(pivotMatrix.m_up));
 					dVector lateralDir(pivotMatrix.m_up.CrossProduct(upvector));
 					dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
 					lateralDir = lateralDir.Normalize();
 					dFloat coneAngle = dAcos(dClamp(cosAngle, dFloat(-1.0f), dFloat(1.0f)));
-					dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), pivotMatrix.m_posit);
+
+					dQuaternion rotation(lateralDir, coneAngle);
+					dMatrix coneRotation(rotation, pivotMatrix.m_posit);
 					pivotMatrix = pivotMatrix * coneRotation;
 					pivotMatrix.m_posit = coneRotation.m_posit;
 
@@ -437,27 +438,24 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 				}
 			}
 		}
+*/
 	}
 
-	dCustomKinematicController* m_effector0;
-	dCustomKinematicController* m_effector1;
-	NewtonBody* m_ankle0;
-	NewtonBody* m_ankle1;
-	dVector m_effector0_floorSensor[4];
-	dVector m_effector1_floorSensor[4];
+	dFeetRayHitSensor m_foot0;
+	dFeetRayHitSensor m_foot1;
 };
 
-class dKinematicRagdoll: public dModelRootNode
+class dBalancingRagdoll: public dModelRootNode
 {
 	public:
-	dKinematicRagdoll(NewtonBody* const rootBody)
+	dBalancingRagdoll(NewtonBody* const rootBody)
 		:dModelRootNode(rootBody, dGetIdentityMatrix())
 		,m_pose()
 		,m_animtree(NULL)
 	{
 	}
 
-	~dKinematicRagdoll()
+	~dBalancingRagdoll()
 	{
 		if (m_animtree) {
 			delete m_animtree;
@@ -527,17 +525,17 @@ class dKinematicRagdoll: public dModelRootNode
 };
 
 
-class dKinematicRagdollManager: public dModelManager
+class dBalancingRagdollManager: public dModelManager
 {
 	public:
-	dKinematicRagdollManager(DemoEntityManager* const scene)
+	dBalancingRagdollManager(DemoEntityManager* const scene)
 		:dModelManager(scene->GetNewton())
 		//,m_currentController(NULL)
 	{
 		//scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
 
-	~dKinematicRagdollManager()
+	~dBalancingRagdollManager()
 	{
 	}
 
@@ -545,7 +543,7 @@ class dKinematicRagdollManager: public dModelManager
 	{
 		dAssert (0);
 		//dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		//dKinematicRagdollManager* const me = (dKinematicRagdollManager*)context;
+		//dBalancingRagdollManager* const me = (dBalancingRagdollManager*)context;
 		//scene->Print(color, "linear degrees of freedom");
 		//ImGui::SliderFloat("Azimuth", &me->m_azimuth, -180.0f, 180.0f);
 		//ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.4f, 0.2f);
@@ -569,10 +567,10 @@ class dKinematicRagdollManager: public dModelManager
 			NewtonBodySetOmega(body, &omega[0]);
 		}
 
-		PhysicsApplyGravityForce(body, timestep, threadIndex);
+		//PhysicsApplyGravityForce(body, timestep, threadIndex);
 	}
 
-	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dKinematicBoneDefinition& definition)
+	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dBalancingRagdollBoneDefinition& definition)
 	{
 		NewtonWorld* const world = GetWorld();
 		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
@@ -617,18 +615,18 @@ class dKinematicRagdollManager: public dModelManager
 		return effector;
 	}
 
-	void ConnectLimb(NewtonBody* const bone, NewtonBody* const parent, const dKinematicBoneDefinition& definition)
+	void ConnectLimb(NewtonBody* const bone, NewtonBody* const parent, const dBalancingRagdollBoneDefinition& definition)
 	{
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone, &matrix[0][0]);
 
-		dKinematicBoneDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
+		dBalancingRagdollBoneDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
 		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad));
 		pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
 
 		switch (definition.m_type)
 		{
-			case dKinematicBoneDefinition::m_0dof:
+			case dBalancingRagdollBoneDefinition::m_0dof:
 			{
 				dCustomHinge* const joint = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
 				joint->EnableLimits(true);
@@ -636,7 +634,7 @@ class dKinematicRagdollManager: public dModelManager
 				break;
 			}
 
-			case dKinematicBoneDefinition::m_1dof:
+			case dBalancingRagdollBoneDefinition::m_1dof:
 			{
 				dCustomHinge* const joint = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
 				joint->EnableLimits(true);
@@ -644,7 +642,7 @@ class dKinematicRagdollManager: public dModelManager
 				break;
 			}
 
-			case dKinematicBoneDefinition::m_3dof:
+			case dBalancingRagdollBoneDefinition::m_3dof:
 			{
 				dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, bone, parent);
 				joint->EnableTwist(true);
@@ -733,7 +731,7 @@ class dKinematicRagdollManager: public dModelManager
 		NewtonBody* const rootBody = CreateBodyPart(entityModel, descriptor.m_skeletonDefinition[0]);
 
 		// make a kinematic controlled model.
-		dKinematicRagdoll* const model = new dKinematicRagdoll(rootBody);
+		dBalancingRagdoll* const model = new dBalancingRagdoll(rootBody);
 
 		// add the model to the manager
 		AddRoot(model);
@@ -770,7 +768,7 @@ class dKinematicRagdollManager: public dModelManager
 			for (int i = 1; descriptor.m_skeletonDefinition[i].m_boneName; i++) {
 				if (!strcmp(descriptor.m_skeletonDefinition[i].m_boneName, name)) {
 					NewtonBody* const parentBody = parentBone->GetBody();
-					if (descriptor.m_skeletonDefinition[i].m_type == dKinematicBoneDefinition::m_effector) {
+					if (descriptor.m_skeletonDefinition[i].m_type == dBalancingRagdollBoneDefinition::m_effector) {
 						dModelKeyFrame effectorPose;
 						dMatrix effectorMatrix(entity->CalculateGlobalMatrix());
 						effectorPose.m_effector = ConnectEffector(parentBone, effectorMatrix, descriptor.m_mass);
@@ -819,7 +817,7 @@ class dKinematicRagdollManager: public dModelManager
 
 	virtual void OnDebug(dModelRootNode* const root, dCustomJoint::dDebugDisplay* const debugContext)
 	{
-		dKinematicRagdoll* const model = (dKinematicRagdoll*)root;
+		dBalancingRagdoll* const model = (dBalancingRagdoll*)root;
 		model->OnDebug(debugContext);
 	}
 
@@ -835,23 +833,23 @@ class dKinematicRagdollManager: public dModelManager
 
 	virtual void OnPreUpdate(dModelRootNode* const root, dFloat timestep) const 
 	{
-		dKinematicRagdoll* const model = (dKinematicRagdoll*)root;
+		dBalancingRagdoll* const model = (dBalancingRagdoll*)root;
 		model->ApplyControls (timestep);
 	}
 	
-	//dSixAxisRobot* m_currentController;
+	//dBalancingRagdoll* m_currentController;
 };
 
 
 
-void KinematicRagdoll(DemoEntityManager* const scene)
+void BalancingRagdoll(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
 
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 
-	dKinematicRagdollManager* const manager = new dKinematicRagdollManager(scene);
+	dBalancingRagdollManager* const manager = new dBalancingRagdollManager(scene);
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
@@ -866,7 +864,3 @@ void KinematicRagdoll(DemoEntityManager* const scene)
 	origin.m_posit.m_z = 0.0f;
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
 }
-
-
-
-

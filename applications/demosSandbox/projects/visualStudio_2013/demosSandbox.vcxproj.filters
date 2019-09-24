@@ -195,7 +195,7 @@
     <ClCompile Include="..\..\sdkDemos\toolBox\FileBrowser.cpp">
       <Filter>utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\KinematicRagdoll.cpp">
+    <ClCompile Include="..\..\sdkDemos\demos\BalancingRagdoll.cpp">
       <Filter>demos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\DemoInstanceEntity.cpp">

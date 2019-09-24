@@ -126,7 +126,7 @@ void HeightFieldCollision (DemoEntityManager* const scene);
 void UserPlaneCollision (DemoEntityManager* const scene);
 void UserHeightFieldCollision (DemoEntityManager* const scene);
 void PassiveRagdoll (DemoEntityManager* const scene);
-void KinematicRagdoll (DemoEntityManager* const scene);
+void BalancingRagdoll (DemoEntityManager* const scene);
 void DynamicRagdoll (DemoEntityManager* const scene);
 void ServoJoints (DemoEntityManager* const scene);
 void ArticulatedJoints (DemoEntityManager* const scene);
@@ -176,7 +176,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Six axis manipulator", "show using inverse dynamics to control robots", SixAxisManipulators },
 	{"Hexapod walker", "show using inverse dynamics to control robots", Hexapod },
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
-	{"Kinematic rag doll", "demonstrate dynamic rag doll", KinematicRagdoll},
+	{"Kinematic rag doll", "demonstrate dynamic rag doll", BalancingRagdoll},
 	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagdoll},
 	{"Basic car", "show how to set up a vehicle controller", BasicCar},
 	{"Single body car", "show a generalized coordinate system body", SingleBodyCar },
