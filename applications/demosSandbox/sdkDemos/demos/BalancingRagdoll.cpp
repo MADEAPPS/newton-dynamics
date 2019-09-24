@@ -312,8 +312,12 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 				NewtonBodyGetMatrix(m_effector->GetBody1(), &rootMatrix[0][0]);
 				dMatrix pivotMatrix(dMatrix(transform->m_rotation, transform->m_posit) * rootMatrix);
 				dFloat cosAngle = upvector.DotProduct3(pivotMatrix.m_up);
-				if (cosAngle < 0.85f) {
-					//dAssert(0);
+				if (cosAngle < 0.87f) {
+					dVector lateralDir(pivotMatrix.m_up.CrossProduct(upvector));
+					lateralDir = lateralDir.Normalize();
+					dFloat angle = dAcos(0.87f);
+					dQuaternion rotation(lateralDir, angle);
+					upvector = rotation.RotateVector(pivotMatrix.m_up);
 				}
 
 				if (cosAngle < 0.9997f) {
@@ -414,7 +418,6 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 		m_foot1.DebugDraw(debugContext);
 		m_child->Debug(debugContext);
 	}
-
 
 	void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
 	{
