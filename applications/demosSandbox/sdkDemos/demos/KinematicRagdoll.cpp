@@ -140,6 +140,34 @@ class dModelAnimTreePoseBalance: public dModelAnimTreeFootBase
 		m_child->Debug(debugContext);
 	}
 
+/*
+	bool CalculateUpVector(dVector& upvector, dCustomKinematicController* const effector) const
+	{
+		bool ret = false;
+		NewtonBody* const body0 = effector->GetBody0();
+		for (NewtonJoint* contactjoint = NewtonBodyGetFirstContactJoint(body0); contactjoint; contactjoint = NewtonBodyGetNextContactJoint(body0, contactjoint)) {
+			ret = true;
+			dVector averageNormal(0.0f);
+			for (void* contact = NewtonContactJointGetFirstContact(contactjoint); contact; contact = NewtonContactJointGetNextContact(contactjoint, contact)) {
+				NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+				dVector point(0.0f);
+				dVector normal(0.0f);
+				NewtonMaterialGetContactPositionAndNormal(material, body0, &point.m_x, &normal.m_x);
+				averageNormal += normal;
+			}
+			upvector = averageNormal.Normalize();
+			break;
+		}
+
+		ret = true;
+		upvector = dVector (0.0f, 1.0f, 0.0f, 0.0f);
+		upvector = dPitchMatrix(30.0f * dDegreeToRad).RotateVector(upvector);
+
+		return ret;
+
+	}
+*/
+
 	dVector CalculateCenterOfMass() const
 	{
 		dMatrix matrix;
@@ -188,43 +216,147 @@ class dModelAnimTreePoseBalance: public dModelAnimTreeFootBase
 		dModelKeyFrame* feetPose[2];
 		const int count = GetModelKeyFrames(output, &feetPose[0]);
 		for (int i = 0; i < count; i++) {
-			/*
-					dMatrix pivotMatrix (m_rootEffector0->GetBodyMatrix());
-					dVector com (CalculateCenterOfMass());
+		/*
+			dMatrix pivotMatrix (m_rootEffector0->GetBodyMatrix());
+			dVector com (CalculateCenterOfMass());
 
-					dVector error (pivotMatrix.m_posit - com);
-					//error.m_x = 0.0f;
-					error.m_y = 0.0f;
-					//error.m_z = 0.0f;
+			dVector error (pivotMatrix.m_posit - com);
+			//error.m_x = 0.0f;
+			error.m_y = 0.0f;
+			//error.m_z = 0.0f;
 
-					pivotMatrix.m_posit -= error.Scale (0.35f);
-					//dTrace (("(%f %f %f) (%f %f %f)\n", com.m_x, com.m_y, com.m_z, pivotMatrix.m_posit.m_x, pivotMatrix.m_posit.m_y, pivotMatrix.m_posit.m_z));
+			pivotMatrix.m_posit -= error.Scale (0.35f);
+			//dTrace (("(%f %f %f) (%f %f %f)\n", com.m_x, com.m_y, com.m_z, pivotMatrix.m_posit.m_x, pivotMatrix.m_posit.m_y, pivotMatrix.m_posit.m_z));
 
-					dMatrix rootMatrix;
-					NewtonBodyGetMatrix (m_rootEffector0->GetBody1(), &rootMatrix[0][0]);
+			dMatrix rootMatrix;
+			NewtonBodyGetMatrix (m_rootEffector0->GetBody1(), &rootMatrix[0][0]);
 
-					dMatrix effectorMatrix (pivotMatrix * rootMatrix.Inverse());
-					for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
-						//dModelKeyFrame& transform = node->GetInfo();
-						//transform.m_posit = effectorMatrix.m_posit;
-						//transform.SetMatrix(effectorMatrix);
-					}
-			*/
+			dMatrix effectorMatrix (pivotMatrix * rootMatrix.Inverse());
+			for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+				//dModelKeyFrame& transform = node->GetInfo();
+				//transform.m_posit = effectorMatrix.m_posit;
+				//transform.SetMatrix(effectorMatrix);
+			}
+		*/
 		}
 	}
 };
 
 class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 {
+	#define RAY_CAST_LENGHT 0.25f
 	public:
+	class FloorSensorFilterData
+	{
+		public: 
+		FloorSensorFilterData(NewtonBody* const feet, NewtonBody* const ankle)
+			:m_feetBody (feet)
+			,m_ankleBody(ankle)
+			,m_param (1.0f)
+		{
+		}
+
+		NewtonBody* m_feetBody;
+		NewtonBody* m_ankleBody;
+		dFloat m_param;
+	};
+
 	dModelAnimTreeFootAligment(dModelRootNode* const model, dModelAnimTree* const child, dCustomKinematicController* const footEffector0, dCustomKinematicController* const footEffector1)
 		:dModelAnimTreeFootBase(model, child, footEffector0, footEffector1)
+		,m_effector0(footEffector0)
+		,m_effector1(footEffector1)
+		,m_ankle0(FindAnkle (footEffector0))
+		,m_ankle1(FindAnkle (footEffector1))
 	{
+		InitFloorSensors (footEffector0, m_effector0_floorSensor);
+		InitFloorSensors (footEffector1, m_effector1_floorSensor);
 	}
+
+	NewtonBody* FindAnkle (dCustomKinematicController* const effector)
+	{
+		NewtonBody* const feetBody = effector->GetBody0();
+		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(feetBody); joint; joint = NewtonBodyGetNextJoint(feetBody, joint)) {
+			dCustomJoint* const customJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
+			NewtonBody* const body0 = customJoint->GetBody0();
+			NewtonBody* const body1 = customJoint->GetBody1();
+			NewtonBody* const otherBody = (body0 == feetBody) ? body1 : body0;
+			if (otherBody != feetBody) {
+				return otherBody;
+			}
+		}
+		return NULL;
+
+	}
+
+	void InitFloorSensors (dCustomKinematicController* const effector, dVector* const pointsOut) 
+	{
+		NewtonBody* const body = effector->GetBody0();
+		NewtonCollision* const box = NewtonBodyGetCollision(body);
+
+		dMatrix matrix;
+		NewtonBodyGetMatrix (body, &matrix[0][0]);
+
+		dVector worldDir[] = {{1.0f, -1.0f, 1.0, 0.0f}, {-1.0f, -1.0f, 1.0, 0.0f}, {-1.0f, -1.0f, -1.0, 0.0f}, {1.0f, -1.0f, -1.0, 0.0f}};
+		for (int i = 0; i < 4; i ++) {
+			dVector dir = matrix.UnrotateVector(worldDir[i]);
+			NewtonCollisionSupportVertex (box, &dir[0], &pointsOut[i][0]);
+			pointsOut[i].m_w = 0.0f;
+		}
+	}
+
+	static unsigned FindFloorPrefilter(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
+	{
+		FloorSensorFilterData* const data = (FloorSensorFilterData*)userData;
+		return ((data->m_feetBody == body) || (data->m_ankleBody == body)) ? 0 : 1;
+	}
+
+	static dFloat FindFloor(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam)
+	{
+		FloorSensorFilterData* const data = (FloorSensorFilterData*)userData;
+		dAssert (body != data->m_feetBody);
+		dAssert (body != data->m_ankleBody);
+		if (intersectParam < data->m_param) {
+			data->m_param = intersectParam;
+		}
+		return data->m_param;
+	}	
+	
 
 	bool CalculateUpVector(dVector& upvector, dCustomKinematicController* const effector) const
 	{
 		bool ret = false;
+
+		dAssert ((effector == m_effector0) || (effector == m_effector1));
+
+		NewtonBody* const ankleBody = (effector == m_effector0) ? m_ankle0 : m_ankle1;
+		const dVector* const origins = (effector == m_effector0) ? m_effector0_floorSensor : m_effector1_floorSensor;
+		
+
+		dMatrix matrix;
+		dVector supportPlane[4];
+		NewtonBody* const feetBody = effector->GetBody0();
+		NewtonWorld* const world = NewtonBodyGetWorld(feetBody);
+
+		NewtonBodyGetMatrix(feetBody, &matrix[0][0]);
+
+		int count = 0;
+		for (int i = 0; i < 4; i ++) {
+			dVector point0 (matrix.TransformVector(origins[i]));
+			dVector point1 (point0);
+			point0.m_y += RAY_CAST_LENGHT;
+			point1.m_y -= RAY_CAST_LENGHT * 2.0f;
+			FloorSensorFilterData data(feetBody, ankleBody);
+			NewtonWorldRayCast (world, &point0[0], &point1[0], FindFloor, &data, FindFloorPrefilter, 0);
+			if (data.m_param < 1.0f) {
+				supportPlane[count] = point0 + (point1 - point0).Scale (data.m_param);
+				count ++;
+			}
+		}
+
+		if (count >= 3) {
+
+		}
+
 /*
 		NewtonBody* const body0 = effector->GetBody0();
 		for (NewtonJoint* contactjoint = NewtonBodyGetFirstContactJoint(body0); contactjoint; contactjoint = NewtonBodyGetNextContactJoint(body0, contactjoint)) {
@@ -248,6 +380,29 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 		return ret;
 
 	}
+
+	void DrawSensor (dCustomJoint::dDebugDisplay* const debugContext, dCustomKinematicController* const effector, const dVector* const points) const
+	{
+		dMatrix matrix;
+		NewtonBody* const body = effector->GetBody0();
+		NewtonBodyGetMatrix(body, &matrix[0][0]);
+
+		for (int i = 0; i < 4; i++) {
+			dVector point0(matrix.TransformVector(points[i]));
+			dVector point1(point0);
+			point0.m_y += RAY_CAST_LENGHT;
+			point1.m_y -= RAY_CAST_LENGHT * 2.0f;
+			debugContext->DrawLine(point0, point1);
+		}
+	}
+
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		DrawSensor (debugContext, m_effector0, m_effector0_floorSensor);
+		DrawSensor (debugContext, m_effector1, m_effector1_floorSensor);
+		m_child->Debug(debugContext);
+	}
+
 
 	void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
 	{
@@ -283,6 +438,13 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 			}
 		}
 	}
+
+	dCustomKinematicController* m_effector0;
+	dCustomKinematicController* m_effector1;
+	NewtonBody* m_ankle0;
+	NewtonBody* m_ankle1;
+	dVector m_effector0_floorSensor[4];
+	dVector m_effector1_floorSensor[4];
 };
 
 class dKinematicRagdoll: public dModelRootNode
