@@ -26,6 +26,7 @@ class dBalancingRagdollBoneDefinition
 	enum jointType
 	{
 		m_none,
+		m_ball,
 		m_0dof,
 		m_1dof,
 		m_2dof,
@@ -61,14 +62,15 @@ static dBalancingRagdollBoneDefinition tredDefinition[] =
 	{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
 	{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-80.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
 	{ "bone_rightAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
-	{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 0.0f }},
+//	{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 180.0f }},
+	{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_ball, 0.2f,{ 0.0f, 0.0f, 45.0f },{ 0.0f, 0.0f, 180.0f } },
 	{ "effector_rightAnkle", dBalancingRagdollBoneDefinition::m_effector},
 
-	{ "bone_leftLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "bone_leftCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, { -80.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
-	{ "bone_leftAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
-	{ "bone_leftFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
-	{ "effector_leftAnkle", dBalancingRagdollBoneDefinition::m_effector },
+	//{ "bone_leftLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
+	//{ "bone_leftCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, { -80.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
+	//{ "bone_leftAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+	//{ "bone_leftFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 45.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "effector_leftAnkle", dBalancingRagdollBoneDefinition::m_effector },
 
 	{ NULL},
 };
@@ -313,11 +315,11 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 				dMatrix pivotMatrix(dMatrix(transform->m_rotation, transform->m_posit) * rootMatrix);
 				dFloat cosAngle = upvector.DotProduct3(pivotMatrix.m_up);
 				if (cosAngle < 0.87f) {
-					dVector lateralDir(pivotMatrix.m_up.CrossProduct(upvector));
-					lateralDir = lateralDir.Normalize();
-					dFloat angle = dAcos(0.87f);
-					dQuaternion rotation(lateralDir, angle);
-					upvector = rotation.RotateVector(pivotMatrix.m_up);
+	//				dVector lateralDir(pivotMatrix.m_up.CrossProduct(upvector));
+	//				lateralDir = lateralDir.Normalize();
+	//				dFloat angle = dAcos(0.87f);
+	//				dQuaternion rotation(lateralDir, angle);
+	//				upvector = rotation.RotateVector(pivotMatrix.m_up);
 				}
 
 				if (cosAngle < 0.9997f) {
@@ -359,7 +361,7 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 		bool CalculateSupportNormal(dVector& upvector)
 		{
 			bool ret = false;
-
+/*
 			dMatrix matrix;
 			dVector supportPlane[4];
 			NewtonWorld* const world = NewtonBodyGetWorld(m_footBody);
@@ -370,10 +372,9 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 			for (int i = 0; i < 4; i++) {
 				dVector point0(matrix.TransformVector(m_sensorHitPoint[i]));
 				dVector point1(point0);
+				m_hitParam = 1.2f;
 				point0.m_y += RAY_CAST_LENGHT0;
 				point1.m_y -= RAY_CAST_LENGHT1;
-				//FloorSensorFilterData data(feetBody, ankleBody);
-				m_hitParam = 1.2f;
 				NewtonWorldRayCast(world, &point0[0], &point1[0], FindFloor, this, FindFloorPrefilter, 0);
 				if (m_hitParam < 1.0f) {
 					supportPlane[count] = point0 + (point1 - point0).Scale(m_hitParam);
@@ -393,6 +394,15 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 				upvector = area.Normalize();
 				//upvector = dPitchMatrix(45.0f * dDegreeToRad).RotateVector(dVector (0, 1.0f, 0.0f, 0.0f));
 			}
+*/
+			ret = true;
+			static dFloat angle = 0.0f;
+			dMatrix xxxx(dPitchMatrix(angle));
+			angle += 0.001f;
+			upvector = xxxx[1];
+			//upvector = area.Normalize();
+			//upvector = dPitchMatrix(45.0f * dDegreeToRad).RotateVector(dVector (0, 1.0f, 0.0f, 0.0f));
+
 			return ret;
 		}
 
@@ -565,7 +575,7 @@ class dBalancingRagdollManager: public dModelManager
 			NewtonBodySetOmega(body, &omega[0]);
 		}
 
-		PhysicsApplyGravityForce(body, timestep, threadIndex);
+		//PhysicsApplyGravityForce(body, timestep, threadIndex);
 	}
 
 	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dBalancingRagdollBoneDefinition& definition)
@@ -624,6 +634,14 @@ class dBalancingRagdollManager: public dModelManager
 
 		switch (definition.m_type)
 		{
+			case dBalancingRagdollBoneDefinition::m_ball:
+			{
+				dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, bone, parent);
+				joint->EnableCone(false);
+				joint->EnableTwist(false);
+				break;
+			}
+
 			case dBalancingRagdollBoneDefinition::m_0dof:
 			{
 				dCustomHinge* const joint = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
@@ -800,7 +818,7 @@ class dBalancingRagdollManager: public dModelManager
 
 		// make internal part non collidable
 		model->SetAllPartsNonCollidable();
-#if 0
+#if 1
 		dCustomHinge* fixToWorld = new dCustomHinge (matrix0 * location, model->GetBody(), NULL);
 		fixToWorld->EnableLimits(true);
 		fixToWorld->SetLimits(0.0f, 0.0f);
