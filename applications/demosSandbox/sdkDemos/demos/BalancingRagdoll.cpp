@@ -64,11 +64,11 @@ static dBalancingRagdollBoneDefinition tredDefinition[] =
 	{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 0.0f }},
 	{ "effector_rightAnkle", dBalancingRagdollBoneDefinition::m_effector},
 
-	//{ "bone_leftLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
-	//{ "bone_leftCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, { -80.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
-	//{ "bone_leftAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
-	//{ "bone_leftFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
-	//{ "effector_leftAnkle", dBalancingRagdollBoneDefinition::m_effector },
+	{ "bone_leftLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "bone_leftCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, { -80.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
+	{ "bone_leftAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+	{ "bone_leftFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 30.0f }, { 0.0f, 0.0f, 0.0f } },
+	{ "effector_leftAnkle", dBalancingRagdollBoneDefinition::m_effector },
 
 	{ NULL},
 };
@@ -282,6 +282,11 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 			}
 		}
 
+		dCustomKinematicController* GetEffector() const
+		{
+			return m_effector;
+		}
+
 		void DebugDraw(dCustomJoint::dDebugDisplay* const debugContext) const
 		{
 			if (m_effector) {
@@ -298,129 +303,19 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 			}
 		}
 
-		dVector m_sensorHitPoint[4];
-		dQuaternion m_rotation;
-		NewtonBody* m_footBody;
-		NewtonBody* m_ankleBody;
-		dCustomKinematicController* m_effector;
-	};
-
-	public:
-	class FloorSensorFilterData
-	{
-		public: 
-		FloorSensorFilterData(NewtonBody* const feet, NewtonBody* const ankle)
-			:m_feetBody (feet)
-			,m_ankleBody(ankle)
-			,m_param (1.0f)
+		void AlignMatrix(dModelKeyFrame* const transform, dFloat timestep)
 		{
-		}
-
-		NewtonBody* m_feetBody;
-		NewtonBody* m_ankleBody;
-		dFloat m_param;
-	};
-
-	dModelAnimTreeFootAligment(dModelRootNode* const model, dModelAnimTree* const child, dCustomKinematicController* const footEffector0, dCustomKinematicController* const footEffector1)
-		:dModelAnimTreeFootBase(model, child, footEffector0, footEffector1)
-		,m_foot0(footEffector0)
-		,m_foot1(footEffector1)
-	{
-	}
-
-/*
-	static unsigned FindFloorPrefilter(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
-	{
-		FloorSensorFilterData* const data = (FloorSensorFilterData*)userData;
-		return ((data->m_feetBody == body) || (data->m_ankleBody == body)) ? 0 : 1;
-	}
-
-	static dFloat FindFloor(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam)
-	{
-		FloorSensorFilterData* const data = (FloorSensorFilterData*)userData;
-		dAssert (body != data->m_feetBody);
-		dAssert (body != data->m_ankleBody);
-		if (intersectParam < data->m_param) {
-			data->m_param = intersectParam;
-		}
-		return data->m_param;
-	}	
-
-	bool CalculateUpVector(dVector& upvector, dCustomKinematicController* const effector) const
-	{
-		bool ret = false;
-
-		dAssert ((effector == m_effector0) || (effector == m_effector1));
-
-		NewtonBody* const ankleBody = (effector == m_effector0) ? m_ankle0 : m_ankle1;
-		const dVector* const origins = (effector == m_effector0) ? m_effector0_floorSensor : m_effector1_floorSensor;
-
-		dMatrix matrix;
-		dVector supportPlane[4];
-		NewtonBody* const feetBody = effector->GetBody0();
-		NewtonWorld* const world = NewtonBodyGetWorld(feetBody);
-
-		NewtonBodyGetMatrix(feetBody, &matrix[0][0]);
-
-		int count = 0;
-		for (int i = 0; i < 4; i ++) {
-			dVector point0 (matrix.TransformVector(origins[i]));
-			dVector point1 (point0);
-			point0.m_y += RAY_CAST_LENGHT;
-			//point1.m_y -= RAY_CAST_LENGHT * 4.0f;
-			point1.m_y -= RAY_CAST_LENGHT * 40.0f;
-			FloorSensorFilterData data(feetBody, ankleBody);
-			NewtonWorldRayCast (world, &point0[0], &point1[0], FindFloor, &data, FindFloorPrefilter, 0);
-			if (data.m_param < 1.0f) {
-				supportPlane[count] = point0 + (point1 - point0).Scale (data.m_param);
-				count ++;
-			}
-		}
-
-		if (count >= 3) {
-			dVector area(0.0f);
-			dVector e0(supportPlane[1] - supportPlane[0]);
-			for (int i = 2; i < count; i++) {
-				dVector e1(supportPlane[i] - supportPlane[0]);
-				area += e1.CrossProduct(e0);
-				e0 = e1;
-			}
-			ret = true;
-			upvector = area.Normalize();
-			//upvector = dPitchMatrix(45.0f * dDegreeToRad).RotateVector(dVector (0, 1.0f, 0.0f, 0.0f));
-		}
-		return ret;
-	}
-
-*/
-	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
-	{
-		m_foot0.DebugDraw(debugContext);
-		m_foot1.DebugDraw(debugContext);
-		m_child->Debug(debugContext);
-	}
-
-
-	void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
-	{
-		m_child->GeneratePose(timestep, output);
-/*
-		dModelKeyFrame* feetPose[2];
-		const int count = GetModelKeyFrames(output, &feetPose[0]);
-		for (int i = 0; i < count; i++) {
-			dMatrix rootMatrix;
-			dModelKeyFrame* const transform = feetPose[i];
-			dCustomKinematicController* const effector = transform->m_effector;
-
 			dVector upvector;
-			if (CalculateUpVector(upvector, effector)) {
+			if (CalculateSupportNormal(upvector)) {
 				// calculate foot desired matrix
-				NewtonBodyGetMatrix(effector->GetBody1(), &rootMatrix[0][0]);
+				dMatrix rootMatrix;
+				NewtonBodyGetMatrix(m_effector->GetBody1(), &rootMatrix[0][0]);
 				dMatrix pivotMatrix(dMatrix(transform->m_rotation, transform->m_posit) * rootMatrix);
 				dFloat cosAngle = upvector.DotProduct3(pivotMatrix.m_up);
 				if (cosAngle < 0.85f) {
 					//dAssert(0);
 				}
+
 				if (cosAngle < 0.9997f) {
 					// align the matrix to the floor contacts.
 					dVector lateralDir(pivotMatrix.m_up.CrossProduct(upvector));
@@ -438,7 +333,107 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 				}
 			}
 		}
-*/
+
+		private:
+		static unsigned FindFloorPrefilter(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
+		{
+			dFeetRayHitSensor* const data = (dFeetRayHitSensor*)userData;
+			return ((data->m_footBody == body) || (data->m_ankleBody == body)) ? 0 : 1;
+		}
+
+		static dFloat FindFloor(const NewtonBody* const body, const NewtonCollision* const shapeHit, const dFloat* const hitContact, const dFloat* const hitNormal, dLong collisionID, void* const userData, dFloat intersectParam)
+		{
+			dFeetRayHitSensor* const data = (dFeetRayHitSensor*)userData;
+			dAssert(body != data->m_footBody);
+			dAssert(body != data->m_ankleBody);
+			if (intersectParam < data->m_hitParam) {
+				data->m_hitParam = intersectParam;
+			}
+			return data->m_hitParam;
+		}
+
+		bool CalculateSupportNormal(dVector& upvector)
+		{
+			bool ret = false;
+
+			dMatrix matrix;
+			dVector supportPlane[4];
+			NewtonWorld* const world = NewtonBodyGetWorld(m_footBody);
+
+			NewtonBodyGetMatrix(m_footBody, &matrix[0][0]);
+
+			int count = 0;
+			for (int i = 0; i < 4; i++) {
+				dVector point0(matrix.TransformVector(m_sensorHitPoint[i]));
+				dVector point1(point0);
+				point0.m_y += RAY_CAST_LENGHT0;
+				point1.m_y -= RAY_CAST_LENGHT1;
+				//FloorSensorFilterData data(feetBody, ankleBody);
+				m_hitParam = 1.2f;
+				NewtonWorldRayCast(world, &point0[0], &point1[0], FindFloor, this, FindFloorPrefilter, 0);
+				if (m_hitParam < 1.0f) {
+					supportPlane[count] = point0 + (point1 - point0).Scale(m_hitParam);
+					count++;
+				}
+			}
+
+			if (count >= 3) {
+				dVector area(0.0f);
+				dVector e0(supportPlane[1] - supportPlane[0]);
+				for (int i = 2; i < count; i++) {
+					dVector e1(supportPlane[i] - supportPlane[0]);
+					area += e1.CrossProduct(e0);
+					e0 = e1;
+				}
+				ret = true;
+				upvector = area.Normalize();
+				//upvector = dPitchMatrix(45.0f * dDegreeToRad).RotateVector(dVector (0, 1.0f, 0.0f, 0.0f));
+			}
+			return ret;
+		}
+
+		dVector m_sensorHitPoint[4];
+		dQuaternion m_rotation;
+		NewtonBody* m_footBody;
+		NewtonBody* m_ankleBody;
+		dCustomKinematicController* m_effector;
+		dFloat m_hitParam;
+	};
+
+	public:
+	dModelAnimTreeFootAligment(dModelRootNode* const model, dModelAnimTree* const child, dCustomKinematicController* const footEffector0, dCustomKinematicController* const footEffector1)
+		:dModelAnimTreeFootBase(model, child, footEffector0, footEffector1)
+		,m_foot0(footEffector0)
+		,m_foot1(footEffector1)
+	{
+	}
+
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		m_foot0.DebugDraw(debugContext);
+		m_foot1.DebugDraw(debugContext);
+		m_child->Debug(debugContext);
+	}
+
+
+	void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
+	{
+		m_child->GeneratePose(timestep, output);
+
+		dModelKeyFrame* feetPose[2];
+		const int count = GetModelKeyFrames(output, &feetPose[0]);
+		for (int i = 0; i < count; i++) {
+
+			dMatrix rootMatrix;
+			dModelKeyFrame* const transform = feetPose[i];
+			dCustomKinematicController* const effector = transform->m_effector;
+			if (effector == m_foot0.GetEffector()) {
+				m_foot0.AlignMatrix(transform, timestep);
+			}
+			if (effector == m_foot1.GetEffector()) {
+				m_foot1.AlignMatrix(transform, timestep);
+			}
+		}
 	}
 
 	dFeetRayHitSensor m_foot0;
@@ -567,7 +562,7 @@ class dBalancingRagdollManager: public dModelManager
 			NewtonBodySetOmega(body, &omega[0]);
 		}
 
-		//PhysicsApplyGravityForce(body, timestep, threadIndex);
+		PhysicsApplyGravityForce(body, timestep, threadIndex);
 	}
 
 	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dBalancingRagdollBoneDefinition& definition)
