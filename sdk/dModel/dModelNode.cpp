@@ -30,6 +30,12 @@ dModelNode::~dModelNode()
 {
 }
 
+dCustomJoint* dModelNode::GetParentJoint() const
+{
+	dAssert(0);
+	return NULL;
+}
+
 const dModelNode* dModelNode::GetRoot() const
 {
 	const dModelNode* root = this;

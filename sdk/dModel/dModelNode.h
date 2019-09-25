@@ -42,11 +42,10 @@ class dModelNode: public dCustomAlloc
 	void SetUserData(void* const data) { m_userData = data; }
 
 	const dModelNode* GetRoot() const;
+	dCustomJoint* GetParentJoint() const;
 	const dModelNode* GetParent() const {return m_parent;}
 	dModelChildrenList& GetChildren() {return m_children;}
 	const dModelChildrenList& GetChildren() const {return m_children;}
-
-	dCustomJoint* GetParentJoint() const;
 
 	protected:
 	dMatrix m_bindMatrix;

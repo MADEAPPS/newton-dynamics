@@ -62,8 +62,8 @@ static dBalancingRagdollBoneDefinition tredDefinition[] =
 	{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
 	{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-80.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
 	{ "bone_rightAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
-//	{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 180.0f }},
-{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 120.0f}, { 0.0f, 0.0f, 180.0f }},
+	{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 180.0f }},
+//{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 120.0f}, { 0.0f, 0.0f, 180.0f }},
 	{ "effector_rightAnkle", dBalancingRagdollBoneDefinition::m_effector},
 
 	//{ "bone_leftLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
@@ -214,11 +214,10 @@ class dModelAnimTreePoseBalance: public dModelAnimTreeFootBase
 	void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
 	{
 		m_child->GeneratePose(timestep, output);
-		
+/*		
 		dModelKeyFrame* feetPose[2];
 		const int count = GetModelKeyFrames(output, &feetPose[0]);
 		for (int i = 0; i < count; i++) {
-		/*
 			dMatrix targetMatrix (m_rootEffector0->GetBodyMatrix());
 			dVector com (CalculateCenterOfMass());
 
@@ -239,12 +238,12 @@ class dModelAnimTreePoseBalance: public dModelAnimTreeFootBase
 				//transform.m_posit = effectorMatrix.m_posit;
 				//transform.SetMatrix(effectorMatrix);
 			}
-		*/
 		}
+*/
 	}
 };
 
-class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
+class dModelAnimTreeFootAlignment: public dModelAnimTreeFootBase
 {
 	#define RAY_CAST_LENGHT0	0.125f
 	#define RAY_CAST_LENGHT1	2.0f
@@ -320,29 +319,25 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 				NewtonBodyGetMatrix(m_effector->GetBody1(), &rootMatrix[0][0]);
 				dMatrix targetMatrix(dMatrix(transform->m_rotation, transform->m_posit) * rootMatrix);
 				dFloat cosAngle = upvector.DotProduct3(targetMatrix.m_up);
-				//if (cosAngle < 0.87f) {
-				//	dVector lateralDir(targetMatrix.m_up.CrossProduct(upvector));
-				//	lateralDir = lateralDir.Normalize();
-				//	dFloat angle = dAcos(0.87f);
-				//	dQuaternion rotation(lateralDir, angle);
-				//	upvector = rotation.RotateVector(targetMatrix.m_up);
-				//}
+				if (cosAngle < 0.9997f) {
+					if (cosAngle > 0.87f) {
+						// align the matrix to the floor contacts.
+						dVector lateralDir(targetMatrix.m_up.CrossProduct(upvector));
+						lateralDir = lateralDir.Normalize();
+						dFloat coneAngle = dAcos(dClamp(cosAngle, dFloat(-1.0f), dFloat(1.0f)));
 
-				if ((cosAngle < 0.9997f) && (cosAngle > 0.0f)) {
-					// align the matrix to the floor contacts.
-					dVector lateralDir(targetMatrix.m_up.CrossProduct(upvector));
-					lateralDir = lateralDir.Normalize();
-					dFloat coneAngle = dAcos(dClamp(cosAngle, dFloat(-1.0f), dFloat(1.0f)));
+						dMatrix pivotMatrix(m_effector->GetMatrix0().Inverse() * targetMatrix);
 
-					dMatrix pivotMatrix (m_effector->GetMatrix0().Inverse() * targetMatrix);
+						dQuaternion rotation(lateralDir, coneAngle);
+						dMatrix coneRotation(rotation, pivotMatrix.m_posit);
+						coneRotation.m_posit -= coneRotation.RotateVector(pivotMatrix.m_posit);
+						targetMatrix = targetMatrix * coneRotation;
 
-					dQuaternion rotation(lateralDir, coneAngle);
-					dMatrix coneRotation(rotation, pivotMatrix.m_posit);
-					coneRotation.m_posit -= coneRotation.RotateVector(pivotMatrix.m_posit);
-					targetMatrix = targetMatrix * coneRotation;
-
-					// calculate and set new modified effector matrix.
-					transform->SetMatrix(targetMatrix * rootMatrix.Inverse());
+						// calculate and set new modified effector matrix.
+						transform->SetMatrix(targetMatrix * rootMatrix.Inverse());
+					} else {
+						cosAngle = 0;
+					}
 				}
 			}
 		}
@@ -422,7 +417,7 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 	};
 
 	public:
-	dModelAnimTreeFootAligment(dModelRootNode* const model, dModelAnimTree* const child, dCustomKinematicController* const footEffector0, dCustomKinematicController* const footEffector1)
+	dModelAnimTreeFootAlignment(dModelRootNode* const model, dModelAnimTree* const child, dCustomKinematicController* const footEffector0, dCustomKinematicController* const footEffector1)
 		:dModelAnimTreeFootBase(model, child, footEffector0, footEffector1)
 		,m_foot0(footEffector0)
 		,m_foot1(footEffector1)
@@ -505,7 +500,7 @@ class dBalancingRagdoll: public dModelRootNode
 	{
 		dModelAnimTree* const poseGenerator = new dModelAnimTreePose(this, m_pose);
 		dModelAnimTreePoseBalance* const poseBalance = new dModelAnimTreePoseBalance(this, poseGenerator, rootEffector0, rootEffector1);
-		dModelAnimTree* const footRoll = new dModelAnimTreeFootAligment(this, poseBalance, rootEffector0, rootEffector1);
+		dModelAnimTree* const footRoll = new dModelAnimTreeFootAlignment(this, poseBalance, rootEffector0, rootEffector1);
 		m_animtree = footRoll;
 	}
 

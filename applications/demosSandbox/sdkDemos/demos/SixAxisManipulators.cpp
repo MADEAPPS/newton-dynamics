@@ -138,7 +138,8 @@ class dSixAxisManager: public dModelManager
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "linear degrees of freedom");
 		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -180.0f, 180.0f);
-		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.4f, 0.2f);
+		//ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.4f, 0.2f);
+		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.4f, 1.0f);
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.2f, 0.4f);
 
 		ImGui::Separator();
