@@ -63,7 +63,7 @@ static dBalancingRagdollBoneDefinition tredDefinition[] =
 	{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-80.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
 	{ "bone_rightAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
 //	{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 180.0f }},
-	{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_ball, 0.2f,{ 0.0f, 0.0f, 45.0f },{ 0.0f, 0.0f, 180.0f } },
+{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 120.0f}, { 0.0f, 0.0f, 180.0f }},
 	{ "effector_rightAnkle", dBalancingRagdollBoneDefinition::m_effector},
 
 	//{ "bone_leftLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
