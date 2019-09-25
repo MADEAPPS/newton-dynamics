@@ -219,21 +219,21 @@ class dModelAnimTreePoseBalance: public dModelAnimTreeFootBase
 		const int count = GetModelKeyFrames(output, &feetPose[0]);
 		for (int i = 0; i < count; i++) {
 		/*
-			dMatrix pivotMatrix (m_rootEffector0->GetBodyMatrix());
+			dMatrix targetMatrix (m_rootEffector0->GetBodyMatrix());
 			dVector com (CalculateCenterOfMass());
 
-			dVector error (pivotMatrix.m_posit - com);
+			dVector error (targetMatrix.m_posit - com);
 			//error.m_x = 0.0f;
 			error.m_y = 0.0f;
 			//error.m_z = 0.0f;
 
-			pivotMatrix.m_posit -= error.Scale (0.35f);
-			//dTrace (("(%f %f %f) (%f %f %f)\n", com.m_x, com.m_y, com.m_z, pivotMatrix.m_posit.m_x, pivotMatrix.m_posit.m_y, pivotMatrix.m_posit.m_z));
+			targetMatrix.m_posit -= error.Scale (0.35f);
+			//dTrace (("(%f %f %f) (%f %f %f)\n", com.m_x, com.m_y, com.m_z, targetMatrix.m_posit.m_x, targetMatrix.m_posit.m_y, targetMatrix.m_posit.m_z));
 
 			dMatrix rootMatrix;
 			NewtonBodyGetMatrix (m_rootEffector0->GetBody1(), &rootMatrix[0][0]);
 
-			dMatrix effectorMatrix (pivotMatrix * rootMatrix.Inverse());
+			dMatrix effectorMatrix (targetMatrix * rootMatrix.Inverse());
 			for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
 				//dModelKeyFrame& transform = node->GetInfo();
 				//transform.m_posit = effectorMatrix.m_posit;
@@ -264,7 +264,13 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 				dMatrix matrix;
 				NewtonBodyGetMatrix(m_footBody, &matrix[0][0]);
 
-				dVector worldDir[] = { { 1.0f, -1.0f, 1.0, 0.0f },{ -1.0f, -1.0f, 1.0, 0.0f },{ -1.0f, -1.0f, -1.0, 0.0f },{ 1.0f, -1.0f, -1.0, 0.0f } };
+				dVector worldDir[] = { 
+					{ 1.0f, -1.0f, 1.0, 0.0f },
+					{ -1.0f, -1.0f, 1.0, 0.0f },
+					{ -1.0f, -1.0f, -1.0, 0.0f },
+					{ 1.0f, -1.0f, -1.0, 0.0f }
+				};
+
 				for (int i = 0; i < 4; i++) {
 					dVector dir = matrix.UnrotateVector(worldDir[i]);
 					NewtonCollisionSupportVertex(box, &dir[0], &m_sensorHitPoint[i][0]);
@@ -312,29 +318,31 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 				// calculate foot desired matrix
 				dMatrix rootMatrix;
 				NewtonBodyGetMatrix(m_effector->GetBody1(), &rootMatrix[0][0]);
-				dMatrix pivotMatrix(dMatrix(transform->m_rotation, transform->m_posit) * rootMatrix);
-				dFloat cosAngle = upvector.DotProduct3(pivotMatrix.m_up);
-				if (cosAngle < 0.87f) {
-	//				dVector lateralDir(pivotMatrix.m_up.CrossProduct(upvector));
-	//				lateralDir = lateralDir.Normalize();
-	//				dFloat angle = dAcos(0.87f);
-	//				dQuaternion rotation(lateralDir, angle);
-	//				upvector = rotation.RotateVector(pivotMatrix.m_up);
-				}
+				dMatrix targetMatrix(dMatrix(transform->m_rotation, transform->m_posit) * rootMatrix);
+				dFloat cosAngle = upvector.DotProduct3(targetMatrix.m_up);
+				//if (cosAngle < 0.87f) {
+				//	dVector lateralDir(targetMatrix.m_up.CrossProduct(upvector));
+				//	lateralDir = lateralDir.Normalize();
+				//	dFloat angle = dAcos(0.87f);
+				//	dQuaternion rotation(lateralDir, angle);
+				//	upvector = rotation.RotateVector(targetMatrix.m_up);
+				//}
 
-				if ((cosAngle < 0.9997f) && (cosAngle > -0.9997f)) {
+				if ((cosAngle < 0.9997f) && (cosAngle > 0.0f)) {
 					// align the matrix to the floor contacts.
-					dVector lateralDir(pivotMatrix.m_up.CrossProduct(upvector));
+					dVector lateralDir(targetMatrix.m_up.CrossProduct(upvector));
 					lateralDir = lateralDir.Normalize();
 					dFloat coneAngle = dAcos(dClamp(cosAngle, dFloat(-1.0f), dFloat(1.0f)));
 
+					dMatrix pivotMatrix (m_effector->GetMatrix0().Inverse() * targetMatrix);
+
 					dQuaternion rotation(lateralDir, coneAngle);
 					dMatrix coneRotation(rotation, pivotMatrix.m_posit);
-					pivotMatrix = pivotMatrix * coneRotation;
-					pivotMatrix.m_posit = coneRotation.m_posit;
+					coneRotation.m_posit -= coneRotation.RotateVector(pivotMatrix.m_posit);
+					targetMatrix = targetMatrix * coneRotation;
 
 					// calculate and set new modified effector matrix.
-					transform->SetMatrix(pivotMatrix * rootMatrix.Inverse());
+					transform->SetMatrix(targetMatrix * rootMatrix.Inverse());
 				}
 			}
 		}
