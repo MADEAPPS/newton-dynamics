@@ -322,10 +322,9 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 	//				upvector = rotation.RotateVector(pivotMatrix.m_up);
 				}
 
-				if (cosAngle < 0.9997f) {
+				if ((cosAngle < 0.9997f) && (cosAngle > -0.9997f)) {
 					// align the matrix to the floor contacts.
 					dVector lateralDir(pivotMatrix.m_up.CrossProduct(upvector));
-					dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
 					lateralDir = lateralDir.Normalize();
 					dFloat coneAngle = dAcos(dClamp(cosAngle, dFloat(-1.0f), dFloat(1.0f)));
 
@@ -398,7 +397,7 @@ class dModelAnimTreeFootAligment: public dModelAnimTreeFootBase
 			ret = true;
 			static dFloat angle = 0.0f;
 			dMatrix xxxx(dPitchMatrix(angle));
-			angle += 0.001f;
+			angle -= 0.002f;
 			upvector = xxxx[1];
 			//upvector = area.Normalize();
 			//upvector = dPitchMatrix(45.0f * dDegreeToRad).RotateVector(dVector (0, 1.0f, 0.0f, 0.0f));
