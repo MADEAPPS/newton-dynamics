@@ -16,9 +16,10 @@
 dModelNode::dModelNode(NewtonBody* const modelBody, const dMatrix& bindMatrix, dModelNode* const parent)
 	:dCustomAlloc()
 	,m_bindMatrix(bindMatrix)
+	,m_userData(NULL)
 	,m_body(modelBody)
 	,m_parent(parent)
-	,m_children()
+	,m_joint(NULL)
 {
 	if (m_parent) {
 		dModelChildrenList::dListNode* const node = m_parent->m_children.Append();
@@ -28,12 +29,6 @@ dModelNode::dModelNode(NewtonBody* const modelBody, const dMatrix& bindMatrix, d
 
 dModelNode::~dModelNode()
 {
-}
-
-dCustomJoint* dModelNode::GetParentJoint() const
-{
-	dAssert(0);
-	return NULL;
 }
 
 const dModelNode* dModelNode::GetRoot() const
