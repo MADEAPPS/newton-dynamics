@@ -45,13 +45,17 @@ class dSixAxisJointDefinition
 static dSixAxisJointDefinition robot1[] =
 {
 	{ "bone_base000", dSixAxisJointDefinition::m_node, { -1000.0f, 1000.0f }, 1.0f },
-	{ "bone_base001", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.4f },
-	{ "bone_base002", dSixAxisJointDefinition::m_hinge, { -120.0f, 45.0f }, 0.3f },
-	{ "bone_base003", dSixAxisJointDefinition::m_hinge, { -120.0f, 15.0f }, 0.2f },
-	{ "bone_base004", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.1f },
-	{ "bone_base005", dSixAxisJointDefinition::m_hinge, { -225.0f, 45.0f }, 0.06f },
-	{ "bone_base006", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.06f },
-	{ "effector", dSixAxisJointDefinition::m_effector, { -1000.0f, 1000.0f }},
+//	{ "bone_base001", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.4f },
+//	{ "bone_base002", dSixAxisJointDefinition::m_hinge, { -120.0f, 45.0f }, 0.3f },
+//	{ "bone_base003", dSixAxisJointDefinition::m_hinge, { -120.0f, 15.0f }, 0.2f },
+{ "bone_base001", dSixAxisJointDefinition::m_hinge,{ -0.0f, 0.0f }, 0.4f },
+{ "bone_base002", dSixAxisJointDefinition::m_hinge,{ -0.0f, 0.0f }, 0.3f },
+{ "bone_base003", dSixAxisJointDefinition::m_hinge,{ -20.0f, 20.0f }, 0.2f },
+
+//	{ "bone_base004", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.1f },
+//	{ "bone_base005", dSixAxisJointDefinition::m_hinge, { -225.0f, 45.0f }, 0.06f },
+//	{ "bone_base006", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.06f },
+//	{ "effector", dSixAxisJointDefinition::m_effector, { -1000.0f, 1000.0f }},
 	{ NULL},
 };
 
@@ -74,30 +78,34 @@ class dSixAxisRobot: public dModelRootNode
 
 	void SetPivotMatrix()
 	{
-		dMatrix baseMatrix;
-		dMatrix pivotMatrix;
-		dModelNode* const referenceNode = GetChildren().GetFirst()->GetInfo().GetData();
-		NewtonBodyGetMatrix(GetBody(), &baseMatrix[0][0]);
-		NewtonBodyGetMatrix(referenceNode->GetBody(), &pivotMatrix[0][0]);
-		m_pivotMatrix = pivotMatrix * baseMatrix.Inverse();
-		m_gripperMatrix = m_effector->GetTargetMatrix() * m_pivotMatrix.Inverse();
+		if (m_effector) {
+			dMatrix baseMatrix;
+			dMatrix pivotMatrix;
+			dModelNode* const referenceNode = GetChildren().GetFirst()->GetInfo().GetData();
+			NewtonBodyGetMatrix(GetBody(), &baseMatrix[0][0]);
+			NewtonBodyGetMatrix(referenceNode->GetBody(), &pivotMatrix[0][0]);
+			m_pivotMatrix = pivotMatrix * baseMatrix.Inverse();
+			m_gripperMatrix = m_effector->GetTargetMatrix() * m_pivotMatrix.Inverse();
+		}
 	}
 
 	void UpdateEffectors (dFloat azimuth, dFloat posit_x, dFloat posit_y, dFloat pitch, dFloat yaw, dFloat roll)
 	{
-		m_azimuth = azimuth;
-		m_posit_x = posit_x;
-		m_posit_y = posit_y;
-		m_pitch = pitch;
-		m_yaw = yaw;
-		m_roll = roll;
+		if (m_effector) {
+			m_azimuth = azimuth;
+			m_posit_x = posit_x;
+			m_posit_y = posit_y;
+			m_pitch = pitch;
+			m_yaw = yaw;
+			m_roll = roll;
 
-		dMatrix yawMatrix (dYawMatrix(m_azimuth * dDegreeToRad));
-		dMatrix gripperMatrix (dPitchMatrix(m_pitch * dDegreeToRad) * dYawMatrix(m_yaw * dDegreeToRad) * dRollMatrix(m_roll * dDegreeToRad) * m_gripperMatrix);
+			dMatrix yawMatrix(dYawMatrix(m_azimuth * dDegreeToRad));
+			dMatrix gripperMatrix(dPitchMatrix(m_pitch * dDegreeToRad) * dYawMatrix(m_yaw * dDegreeToRad) * dRollMatrix(m_roll * dDegreeToRad) * m_gripperMatrix);
 
-		gripperMatrix.m_posit.m_x += m_posit_x;
-		gripperMatrix.m_posit.m_y += m_posit_y;
-		m_effector->SetTargetMatrix (gripperMatrix * yawMatrix * m_pivotMatrix);
+			gripperMatrix.m_posit.m_x += m_posit_x;
+			gripperMatrix.m_posit.m_y += m_posit_y;
+			m_effector->SetTargetMatrix(gripperMatrix * yawMatrix * m_pivotMatrix);
+		}
 	}
 	
 	dMatrix m_pivotMatrix;
