@@ -199,7 +199,8 @@ void dCustomHinge::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix&
 		NewtonUserJointAddAngularRow(m_joint, -angle, &matrix1.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
 	} else {
-		dFloat angle = m_curJointAngle.GetAngle() + m_jointOmega * timestep;
+//		dFloat angle = m_curJointAngle.GetAngle() + m_jointOmega * timestep;
+		dFloat angle = m_curJointAngle.GetAngle() + 4.0f * m_jointOmega * timestep;
 		if (angle < m_minAngle) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
