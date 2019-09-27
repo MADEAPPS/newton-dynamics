@@ -194,41 +194,34 @@ void dCustomHinge::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix&
 {
 	m_limitReached = true;
 	if ((m_minAngle > -1.e-4f) && (m_maxAngle < 1.e-4f)) {
-		dFloat angle = m_curJointAngle.GetAngle();
+		const dFloat angle = m_curJointAngle.GetAngle();
 		NewtonUserJointAddAngularRow(m_joint, -angle, &matrix1.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
 	} else {
 		//dFloat angle = m_curJointAngle.GetAngle() + m_jointOmega * timestep;
-		//dFloat angle = m_curJointAngle.GetAngle() + 10.0f * m_jointOmega * timestep;
-		//dFloat step = 3.0f * m_jointOmega * timestep;
-		//dFloat angleStep = 0.0f;
-		//if (step > 0.0f) {
-		//	angleStep = dMax(dFloat (5.0f * dDegreeToRad), angleStep);
-		//} else if (step < 0.0f) {
-		//	angleStep = dMin(dFloat(-5.0f * dDegreeToRad), angleStep);
-		//}
-		dFloat angle0 = m_curJointAngle.GetAngle();
-		//dFloat angle1 = angle0 + angleStep;
-		//dTrace(("%f %f\n", angle0, angle1));
-		if (angle0 <= m_minAngle) {
+		const dFloat step = dMax (dAbs (m_jointOmega * timestep), dFloat(5.0f * dDegreeToRad));
+		const dFloat angle = m_curJointAngle.GetAngle();
+		if (angle <= m_minAngle) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
-		} else if (angle0 >= m_maxAngle) {
+		} else if (angle >= m_maxAngle) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
-		} else if ((angle0 - 5.0f * dDegreeToRad )<= m_minAngle) {
+		} else if ((angle - step) <= m_minAngle) {
+			dTrace(("%f %f\n", angle, step));
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
-		} else if ((angle0 + 5.0f * dDegreeToRad )>= m_maxAngle) {
+		} else if ((angle + step) >= m_maxAngle) {
+			dTrace(("%f %f\n", angle, step));
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
