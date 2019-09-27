@@ -45,17 +45,18 @@ class dSixAxisJointDefinition
 static dSixAxisJointDefinition robot1[] =
 {
 	{ "bone_base000", dSixAxisJointDefinition::m_node, { -1000.0f, 1000.0f }, 1.0f },
-//	{ "bone_base001", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.4f },
-//	{ "bone_base002", dSixAxisJointDefinition::m_hinge, { -120.0f, 45.0f }, 0.3f },
-//	{ "bone_base003", dSixAxisJointDefinition::m_hinge, { -120.0f, 15.0f }, 0.2f },
-{ "bone_base001", dSixAxisJointDefinition::m_hinge,{ -0.0f, 0.0f }, 0.4f },
-{ "bone_base002", dSixAxisJointDefinition::m_hinge,{ -0.0f, 0.0f }, 0.3f },
-{ "bone_base003", dSixAxisJointDefinition::m_hinge,{ -20.0f, 20.0f }, 0.2f },
 
-//	{ "bone_base004", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.1f },
-//	{ "bone_base005", dSixAxisJointDefinition::m_hinge, { -225.0f, 45.0f }, 0.06f },
-//	{ "bone_base006", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.06f },
-//	{ "effector", dSixAxisJointDefinition::m_effector, { -1000.0f, 1000.0f }},
+//	{ "bone_base001", dSixAxisJointDefinition::m_hinge, { -0.0f, 0.0f }, 0.4f },
+//	{ "bone_base002", dSixAxisJointDefinition::m_hinge, { -0.0f, 0.0f }, 0.3f },
+//	{ "bone_base003", dSixAxisJointDefinition::m_hinge, { -20.0f, 20.0f }, 0.2f },
+
+	{ "bone_base001", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.4f },
+	{ "bone_base002", dSixAxisJointDefinition::m_hinge, { -120.0f, 45.0f }, 0.3f },
+	{ "bone_base003", dSixAxisJointDefinition::m_hinge, { -120.0f, 15.0f }, 0.2f },
+	{ "bone_base004", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.1f },
+	{ "bone_base005", dSixAxisJointDefinition::m_hinge, { -225.0f, 45.0f }, 0.06f },
+	{ "bone_base006", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.06f },
+	{ "effector", dSixAxisJointDefinition::m_effector, { -1000.0f, 1000.0f }},
 	{ NULL},
 };
 
@@ -126,8 +127,8 @@ class dSixAxisManager: public dModelManager
 		:dModelManager(scene->GetNewton())
 		,m_currentController(NULL)
 		,m_azimuth(0.0f)
-		,m_posit_x(0.0f)
-		,m_posit_y(0.0f)
+		,m_posit_x(-0.5f)
+		,m_posit_y(-0.5f)
 		,m_gripper_pitch(0.0f)
 		,m_gripper_yaw(0.0f)
 		,m_gripper_roll(0.0f)
@@ -146,9 +147,7 @@ class dSixAxisManager: public dModelManager
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "linear degrees of freedom");
 		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -180.0f, 180.0f);
-		//ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.4f, 0.2f);
-me->m_posit_x = 0.2f;
-ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.4f, 1.0f);
+		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.4f, 0.2f);
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.2f, 0.4f);
 
 		ImGui::Separator();
