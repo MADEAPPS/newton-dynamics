@@ -151,7 +151,7 @@ void dCustomHinge::Debug(dDebugDisplay* const debugDisplay) const
 
 	if (m_options.m_option0) {
 
-		const int subdiv = 12;
+		const int subdiv = 8;
 		dVector arch[subdiv + 1];
 		const dFloat radius = debugDisplay->m_debugScale;
 
@@ -282,8 +282,8 @@ void dCustomHinge::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, con
 
 void dCustomHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-	const dFloat angleError = GetMaxAngleError();
 	// two rows to restrict rotation around around the parent coordinate system
+	const dFloat angleError = GetMaxAngleError();
 	dFloat angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_up[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);

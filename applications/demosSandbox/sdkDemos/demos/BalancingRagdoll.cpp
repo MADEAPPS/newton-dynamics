@@ -59,15 +59,17 @@ static dBalancingRagdollBoneDefinition tredDefinition[] =
 {
 	{ "bone_pelvis", dBalancingRagdollBoneDefinition::m_none, 1.0f },
 
-	{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
-	{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-80.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
-	{ "bone_rightAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
-	{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 180.0f }},
-//{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 120.0f}, { 0.0f, 0.0f, 180.0f }},
-	{ "effector_rightAnkle", dBalancingRagdollBoneDefinition::m_effector},
+{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_0dof, 0.3f, {60.0f, 60.0f, 0.0f}, { 0.0f, 90.0f, 0.0f }},
+{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
+
+	//{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
+	//{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
+	//{ "bone_rightAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
+	//{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 180.0f }},
+	//{ "effector_rightAnkle", dBalancingRagdollBoneDefinition::m_effector},
 
 	//{ "bone_leftLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
-	//{ "bone_leftCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, { -80.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
+	//{ "bone_leftCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
 	//{ "bone_leftAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
 	//{ "bone_leftFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 45.0f }, { 0.0f, 0.0f, 180.0f } },
 	//{ "effector_leftAnkle", dBalancingRagdollBoneDefinition::m_effector },
@@ -654,9 +656,18 @@ class dBalancingRagdollManager: public dModelManager
 
 			case dBalancingRagdollBoneDefinition::m_1dof:
 			{
+#if 0
 				dCustomHinge* const joint = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
 				joint->EnableLimits(true);
 				joint->SetLimits(definition.m_jointLimits.m_minTwistAngle * dDegreeToRad, definition.m_jointLimits.m_maxTwistAngle * dDegreeToRad);
+#else
+				dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, bone, parent);
+				joint->EnableTwist(true);
+				joint->SetTwistLimits(definition.m_jointLimits.m_minTwistAngle * dDegreeToRad, definition.m_jointLimits.m_maxTwistAngle * dDegreeToRad);
+
+				joint->EnableCone(true);
+				joint->SetConeLimits(0.0f);
+#endif
 				break;
 			}
 
