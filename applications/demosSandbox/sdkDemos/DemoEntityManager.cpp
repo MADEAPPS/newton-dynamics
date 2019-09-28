@@ -66,10 +66,10 @@
 //#define DEFAULT_SCENE	30		// standard joints
 //#define DEFAULT_SCENE	31		// servo joints
 //#define DEFAULT_SCENE	32		// articulated joints
-#define DEFAULT_SCENE	33		// six axis manipulator
+//#define DEFAULT_SCENE	33		// six axis manipulator
 //#define DEFAULT_SCENE	34		// hexapod Robot
 //#define DEFAULT_SCENE	35		// basic rag doll
-//#define DEFAULT_SCENE	36		// kinematic rag doll
+#define DEFAULT_SCENE	36		// balancing rag doll
 //#define DEFAULT_SCENE	37		// dynamic rag doll
 //#define DEFAULT_SCENE	38		// basic Car
 //#define DEFAULT_SCENE	39		// single body vehicle
@@ -176,7 +176,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Six axis manipulator", "show using inverse dynamics to control robots", SixAxisManipulators },
 	{"Hexapod walker", "show using inverse dynamics to control robots", Hexapod },
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
-	{"Kinematic rag doll", "demonstrate dynamic rag doll", BalancingRagdoll},
+	{"Balancing rag doll", "demonstrate dynamic rag doll", BalancingRagdoll},
 	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagdoll},
 	{"Basic car", "show how to set up a vehicle controller", BasicCar},
 	{"Single body car", "show a generalized coordinate system body", SingleBodyCar },

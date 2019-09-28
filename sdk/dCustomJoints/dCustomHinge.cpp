@@ -226,14 +226,14 @@ void dCustomHinge::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix&
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
 		} else if ((angle - step) <= m_minAngle) {
-			dTrace(("%f %f\n", angle, step));
+			//dTrace(("%f %f\n", angle, step));
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
 		} else if ((angle + step) >= m_maxAngle) {
-			dTrace(("%f %f\n", angle, step));
+			//dTrace(("%f %f\n", angle, step));
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
