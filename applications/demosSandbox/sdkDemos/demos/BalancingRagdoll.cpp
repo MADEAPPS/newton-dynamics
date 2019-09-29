@@ -59,8 +59,8 @@ static dBalancingRagdollBoneDefinition tredDefinition[] =
 {
 	{ "bone_pelvis", dBalancingRagdollBoneDefinition::m_none, 1.0f },
 
-{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_0dof, 0.3f, {60.0f, 60.0f, 0.0f}, { 0.0f, 90.0f, 0.0f }},
-{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
+{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_2dof, 0.3f, {60.0f, 60.0f, 45.0f}, { 0.0f, 90.0f, 0.0f }},
+//{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
 
 	//{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
 	//{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
@@ -668,6 +668,17 @@ class dBalancingRagdollManager: public dModelManager
 				joint->EnableCone(true);
 				joint->SetConeLimits(0.0f);
 #endif
+				break;
+			}
+
+			case dBalancingRagdollBoneDefinition::m_2dof:
+			{
+				dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, bone, parent);
+				joint->EnableTwist(true);
+				joint->SetTwistLimits(0.0f, 0.0f);
+
+				joint->EnableCone(true);
+				joint->SetConeLimits(definition.m_jointLimits.m_coneAngle * dDegreeToRad);
 				break;
 			}
 
