@@ -142,9 +142,6 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 	dMatrix matrix0;
 	dMatrix matrix1;
 
-dFloat scale = debugDisplay->GetScale(); 
-debugDisplay->SetScale(scale * 4.0f);
-
 	dCustomJoint::Debug(debugDisplay);
 
 	CalculateGlobalMatrix(matrix0, matrix1);
@@ -152,8 +149,7 @@ debugDisplay->SetScale(scale * 4.0f);
 	debugDisplay->DrawFrame(matrix0);
 	debugDisplay->DrawFrame(matrix1);
 
-//	const int subdiv = 8;
-	const int subdiv = 24;
+	const int subdiv = 8;
 	const dVector& coneDir0 = matrix0.m_front;
 	const dVector& coneDir1 = matrix1.m_front;
 	dFloat cosAngleCos = coneDir0.DotProduct3(coneDir1);
@@ -218,8 +214,6 @@ debugDisplay->SetScale(scale * 4.0f);
 			debugDisplay->DrawLine(arch[i], arch[i + 1]);
 		}
 	}
-
- debugDisplay->SetScale(scale); 
 }
 
 void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
@@ -320,18 +314,6 @@ void dCustomBallAndSocket::SubmitAngularAxisCartisianApproximation(const dMatrix
 
 void dCustomBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-	dVector omega0(0.0f);
-	dVector omega1(0.0f);
-	dComplementaritySolver::dJacobian jacobian0;
-	dComplementaritySolver::dJacobian jacobian1;
-
-	NewtonBodyGetOmega(m_body0, &omega0[0]);
-	if (m_body1) {
-		NewtonBodyGetOmega(m_body1, &omega1[0]);
-	}
-
-	dFloat invTimestep = 1.0f / timestep;
-
 	dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
 	dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
 	lateralDir = lateralDir.Normalize();
@@ -339,23 +321,33 @@ void dCustomBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 	dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
 
 	if (m_options.m_option2) {
+		const dFloat step = dMax(dAbs(coneAngle * timestep), dFloat(5.0f * dDegreeToRad));
 		if (coneAngle > m_maxConeAngle) {
+			dFloat restoringOmega = 0.25f;
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
-			NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
-			
-			dVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-			dFloat relOmega = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
-			
-			dFloat errorAngle = coneAngle - m_maxConeAngle;
-			dFloat w = 0.3f * errorAngle * invTimestep;
-			dFloat relAlpha = (w + relOmega) * invTimestep;
-			
-			NewtonUserJointSetRowAcceleration(m_joint, -relAlpha);
+			const dFloat invtimestep = 1.0f / timestep;
+			const dFloat error0 = coneAngle - m_maxConeAngle;
+			const dFloat error1 = error0 - restoringOmega * timestep;
+			if (error1 < 0.0f) {
+				restoringOmega = error0 * invtimestep;
+			}
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) - restoringOmega / timestep;
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 
 			dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
-			
+
+		} else if ((coneAngle + step) >= m_maxConeAngle) {
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+
+			dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
 		}
 	}
 

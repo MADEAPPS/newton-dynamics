@@ -59,14 +59,14 @@ static dBalancingRagdollBoneDefinition tredDefinition[] =
 {
 	{ "bone_pelvis", dBalancingRagdollBoneDefinition::m_none, 1.0f },
 
-{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_2dof, 0.3f, {60.0f, 60.0f, 45.0f}, { 0.0f, 90.0f, 0.0f }},
+//{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_2dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 0.0f, 45.0f }},
 //{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
 
-	//{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
-	//{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
-	//{ "bone_rightAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
-	//{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 180.0f }},
-	//{ "effector_rightAnkle", dBalancingRagdollBoneDefinition::m_effector},
+	{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
+	{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
+	{ "bone_rightAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
+	{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 180.0f }},
+	{ "effector_rightAnkle", dBalancingRagdollBoneDefinition::m_effector},
 
 	//{ "bone_leftLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
 	//{ "bone_leftCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
