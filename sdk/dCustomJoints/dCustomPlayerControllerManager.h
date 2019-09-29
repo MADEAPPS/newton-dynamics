@@ -127,7 +127,7 @@ class dCustomPlayerControllerManager: public dCustomParallelListener
 	virtual dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const {return 2.0f;}
 
 	protected:
-	void PostUpdate(dFloat timestep) {}
+	virtual void PostUpdate(dFloat timestep) {}
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadID);
 
 	private:

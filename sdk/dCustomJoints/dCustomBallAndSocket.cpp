@@ -233,28 +233,27 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 	}
 }
 
-void dCustomBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat pitchAngle, dFloat timestep)
+void dCustomBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat angle, dFloat timestep)
 {
 	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * dDegreeToRad)) {
-		NewtonUserJointAddAngularRow(m_joint, -pitchAngle, &pin[0]);
+		NewtonUserJointAddAngularRow(m_joint, -angle, &pin[0]);
 	} else {
-		//if (pitchAngle < m_minTwistAngle) {
-		//	pitchAngle -= m_minTwistAngle;
-		//	NewtonUserJointAddAngularRow(m_joint, -pitchAngle, &pin[0]);
+		//if (angle < m_minTwistAngle) {
+		//	angle -= m_minTwistAngle;
+		//	NewtonUserJointAddAngularRow(m_joint, -angle, &pin[0]);
 		//	NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-		//} else if (pitchAngle > m_maxTwistAngle) {
-		//	pitchAngle -= m_maxTwistAngle;
-		//	NewtonUserJointAddAngularRow(m_joint, -pitchAngle, &pin[0]);
+		//} else if (angle > m_maxTwistAngle) {
+		//	angle -= m_maxTwistAngle;
+		//	NewtonUserJointAddAngularRow(m_joint, -angle, &pin[0]);
 		//	NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		//}
 
 		dFloat restoringOmega = 0.25f;
-		//const dFloat step = dMax(dAbs(m_jointOmega * timestep), dFloat(3.0f * dDegreeToRad));
-		//const dFloat angle = m_curJointAngle.GetAngle();
-		if (pitchAngle < m_minTwistAngle) {
+		const dFloat step = dMax(dAbs(angle * timestep), dFloat(5.0f * dDegreeToRad));
+		if (angle < m_minTwistAngle) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
 			const dFloat invtimestep = 1.0f / timestep;
-			const dFloat error0 = pitchAngle - m_minTwistAngle;
+			const dFloat error0 = angle - m_minTwistAngle;
 			const dFloat error1 = error0 + restoringOmega * timestep;
 			if (error1 > 0.0f) {
 				restoringOmega = -error0 * invtimestep;
@@ -263,10 +262,10 @@ void dCustomBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat pitchAngl
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
-		} else if (pitchAngle >= m_maxTwistAngle) {
+		} else if (angle >= m_maxTwistAngle) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
 			const dFloat invtimestep = 1.0f / timestep;
-			const dFloat error0 = pitchAngle - m_maxTwistAngle;
+			const dFloat error0 = angle - m_maxTwistAngle;
 			const dFloat error1 = error0 - restoringOmega * timestep;
 			if (error1 < 0.0f) {
 				restoringOmega = error0 * invtimestep;
@@ -275,20 +274,20 @@ void dCustomBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat pitchAngl
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
-		//} else if ((angle - step) <= m_minAngle) {
-		//	//dTrace(("%f %f\n", angle, step));
-		//	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-		//	const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
-		//	NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-		//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		//	NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
-		//} else if ((angle + step) >= m_maxAngle) {
-		//	//dTrace(("%f %f\n", angle, step));
-		//	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-		//	const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
-		//	NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-		//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		//	NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
+		} else if ((angle - step) <= m_minTwistAngle) {
+			//dTrace(("%f %f\n", angle, step));
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		} else if ((angle + step) >= m_maxTwistAngle) {
+			//dTrace(("%f %f\n", angle, step));
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		}
 	}
 }
