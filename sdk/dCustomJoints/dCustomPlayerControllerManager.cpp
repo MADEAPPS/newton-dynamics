@@ -577,11 +577,6 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 	m_manager->ApplyMove(this, timestep);
 
 #if 0
-static int xxxx;
-xxxx++;
-if (xxxx > 6800)
-xxxx *= 1;
-
 	#if 0
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
@@ -600,10 +595,6 @@ xxxx *= 1;
 	#endif
 #endif
 
-//SetForwardSpeed(1.0f);
-//SetLateralSpeed(0.0f);
-//SetHeadingAngle(45.0f*dDegreeToRad);
-
 	// set player orientation
 	dMatrix matrix(dYawMatrix(GetHeadingAngle()));
 	NewtonBodyGetPosition(m_kinematicBody, &matrix.m_posit[0]);
@@ -612,6 +603,11 @@ xxxx *= 1;
 	// set play desired velocity
 	dVector veloc(GetVelocity() + m_impulse.Scale(m_invMass));
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+
+//static int xxxx;
+//xxxx++;
+//if (xxxx >= 39)
+//xxxx *= 1;
 
 	// determine if player has to step over obstacles lower than step hight
 	ResolveStep(timestep, contactSolver);
