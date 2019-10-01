@@ -97,10 +97,10 @@ void dAnimationModelManager::PreUpdate(dFloat timestep, int threadID)
 		node = node ? node->GetNext() : NULL;
 	}
 	if (node) {
-		dAnimationJointRoot* const model = node->GetInfo();
-		//model->PreUpdate(timestep);
-		OnPreUpdate(model, timestep);
 		do {
+			dAnimationJointRoot* const model = node->GetInfo();
+			//model->PreUpdate(timestep);
+			OnPreUpdate(model, timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
 			}

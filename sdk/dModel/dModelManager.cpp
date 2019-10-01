@@ -161,9 +161,9 @@ void dModelManager::PreUpdate(dFloat timestep, int threadID)
 	}
 
 	if (node) {
-		dModelRootNode* const model = node->GetInfo().GetData();
-		OnPreUpdate(model, timestep);
 		do {
+			dModelRootNode* const model = node->GetInfo().GetData();
+			OnPreUpdate(model, timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
 			}
@@ -183,12 +183,12 @@ void dModelManager::PostUpdate(dFloat timestep, int threadID)
 	}
 
 	if (node) {
-		dModelRootNode* const model = node->GetInfo().GetData();
-		OnPostUpdate(model, timestep);
-		if (model->m_localTransformMode) {
-			UpdateLocalTranforms(model);
-		}
 		do {
+			dModelRootNode* const model = node->GetInfo().GetData();
+			OnPostUpdate(model, timestep);
+			if (model->m_localTransformMode) {
+				UpdateLocalTranforms(model);
+			}
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
 			}

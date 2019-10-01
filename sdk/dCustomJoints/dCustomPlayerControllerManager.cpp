@@ -203,9 +203,9 @@ void dCustomPlayerControllerManager::PreUpdate(dFloat timestep, int threadID)
 	}
 
 	if (node) {
-		dCustomPlayerController* const controller = &node->GetInfo();
-		controller->PreUpdate(timestep);
 		do {
+			dCustomPlayerController* const controller = &node->GetInfo();
+			controller->PreUpdate(timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
 			}
@@ -604,10 +604,10 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 	dVector veloc(GetVelocity() + m_impulse.Scale(m_invMass));
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 
-//static int xxxx;
-//xxxx++;
-//if (xxxx >= 39)
-//xxxx *= 1;
+static int xxxx;
+xxxx++;
+if (xxxx >= 124)
+xxxx *= 1;
 
 	// determine if player has to step over obstacles lower than step hight
 	ResolveStep(timestep, contactSolver);
