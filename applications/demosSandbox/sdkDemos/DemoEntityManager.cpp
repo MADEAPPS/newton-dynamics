@@ -69,14 +69,14 @@
 //#define DEFAULT_SCENE	33		// six axis manipulator
 //#define DEFAULT_SCENE	34		// hexapod Robot
 //#define DEFAULT_SCENE	35		// basic rag doll
-#define DEFAULT_SCENE	36		// balancing character
+//#define DEFAULT_SCENE	36		// balancing character
 //#define DEFAULT_SCENE	37		// dynamic rag doll
 //#define DEFAULT_SCENE	38		// basic Car
 //#define DEFAULT_SCENE	39		// single body vehicle
 //#define DEFAULT_SCENE	40		// David Gravel multi body car
 //#define DEFAULT_SCENE	41		// super Car
 //#define DEFAULT_SCENE	42		// heavy vehicles
-//#define DEFAULT_SCENE	43		// basic player controller
+#define DEFAULT_SCENE	43		// basic player controller
 //#define DEFAULT_SCENE	44		// animated player controller
 //#define DEFAULT_SCENE	45		// advanced player controller
 //#define DEFAULT_SCENE	46		// cloth patch			
@@ -348,9 +348,6 @@ DemoEntityManager::DemoEntityManager ()
 	m_mousePressed[2] = false;
 
 	// initialized the physics world for the new scene
-	Cleanup ();
-	ResetTimer();
-
 //	m_showUI = false;
 //	m_showAABB = false;
 //	m_showContactPoints = true;
@@ -368,6 +365,9 @@ DemoEntityManager::DemoEntityManager ()
 	m_collisionDisplayMode = 2;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
+
+	Cleanup();
+	ResetTimer();
 
 	m_currentPlugin = 0;
 	void* preferedPlugin = NewtonGetPreferedPlugin(m_world);
