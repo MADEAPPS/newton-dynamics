@@ -281,7 +281,8 @@ void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mous
 
 					m_pickJoint = new DemoCameraPickBodyJoint (body, posit, this);
 					// set this to 1 for full matrix control
-					m_pickJoint->SetPickMode (2);
+					//m_pickJoint->SetPickMode (2);
+					m_pickJoint->SetControlMode(dCustomKinematicController::m_linearPlusAngularFriction);
 
 					m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
 					m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);

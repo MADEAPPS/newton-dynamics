@@ -624,8 +624,9 @@ class dBalancingRagdollManager: public dModelManager
 	dCustomKinematicController* ConnectEffector(dModelNode* const effectorNode, const dMatrix& effectorMatrix, const dFloat modelMass)
 	{
 		dCustomKinematicController* const effector = new dCustomKinematicController(effectorNode->GetBody(), effectorMatrix, effectorNode->GetRoot()->GetBody());
-		effector->SetAsLinear();
+		//effector->SetAsLinear();
 		effector->SetSolverModel(1);
+		effector->SetControlMode(dCustomKinematicController::m_linearAndTwist);
 		effector->SetMaxAngularFriction(modelMass * 100.0f);
 		effector->SetMaxLinearFriction(modelMass * 9.8f * 10.0f);
 		return effector;

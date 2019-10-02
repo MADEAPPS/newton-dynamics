@@ -22,13 +22,23 @@
 class dCustomKinematicController: public dCustomJoint
 {
 	public:
+	enum dControlModes
+	{	
+		m_linear,
+		m_full6dof,
+		m_linearAndTwist,
+		m_linearAndCone,
+		m_linearPlusAngularFriction, // this is pickmode from screen
+	};
+
 	CUSTOM_JOINTS_API dCustomKinematicController(NewtonBody* const body, const dVector& attachmentPointInGlobalSpace, NewtonBody* const refernceBody = NULL);
 	CUSTOM_JOINTS_API dCustomKinematicController(NewtonBody* const body, const dMatrix& attachmentMatrixInGlobalSpace, NewtonBody* const refernceBody = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomKinematicController();
 
-	CUSTOM_JOINTS_API void SetAsLinear();
-	CUSTOM_JOINTS_API void SetAsLinearAndAngular();
-	CUSTOM_JOINTS_API void SetPickMode (int mode);
+//	CUSTOM_JOINTS_API void SetPickMode (int mode);
+	CUSTOM_JOINTS_API dControlModes GetControlMode() const;
+	CUSTOM_JOINTS_API void SetControlMode(dControlModes mode);
+
 	CUSTOM_JOINTS_API void SetMaxLinearFriction(dFloat force); 
 	CUSTOM_JOINTS_API void SetMaxAngularFriction(dFloat torque); 
 	CUSTOM_JOINTS_API void SetAngularViscuosFrictionCoefficient(dFloat coefficient);
@@ -60,9 +70,10 @@ class dCustomKinematicController: public dCustomJoint
 	dFloat m_angularFrictionCoefficient;
 	dFloat m_maxSpeed;
 	dFloat m_maxOmega;
-	char m_pickingMode;
+//	char m_pickingMode;
 	char m_autoSleepState;
-	char m_controlAngularDof;
+	//char m_controlAngularDof;
+	dControlModes m_controlMode;
 
 	DECLARE_CUSTOM_JOINT(dCustomKinematicController, dCustomJoint)
 };
