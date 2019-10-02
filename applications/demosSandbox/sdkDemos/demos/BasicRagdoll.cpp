@@ -149,6 +149,7 @@ class PassiveRagdollManager: public dCustomTransformManager
 		joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
 	}
 
+/*
 	dCustomJoint* FindJoint(NewtonBody* const child, NewtonBody* const parent)
 	{
 		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(child); joint; joint = NewtonBodyGetNextJoint(child, joint)) {
@@ -161,6 +162,7 @@ class PassiveRagdollManager: public dCustomTransformManager
 		dAssert (0);
 		return NULL;
 	}
+*/
 
 	virtual void OnUpdateTransform(const dCustomTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{

@@ -42,8 +42,6 @@ class MakeViualMesh : public dScene::dSceneExportCallback
 	NewtonWorld* m_world;
 };
 
-
-
 void ExportScene (NewtonWorld* const world, const char* const fileName);
 
 class DemoMesh;
@@ -73,6 +71,7 @@ void GetContactOnBody (NewtonBody* const body);
 void HandlecollisionPoints (NewtonJoint* const contactjoint);
 NewtonJoint* CheckIfBodiesCollide (NewtonBody* const body0, NewtonBody* const body1);
 
+dCustomJoint* FindJoint(const NewtonBody* const body0, const NewtonBody* const body1);
 dVector FindFloor (const NewtonWorld* world, const dVector& origin, dFloat dist, dVector* const normal = NULL);
 
 void PhysicsBodyDestructor (const NewtonBody* body);

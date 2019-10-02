@@ -1438,6 +1438,18 @@ void LoadLumberYardMesh(DemoEntityManager* const scene, const dVector& location,
 	delete entity;
 }
 
+dCustomJoint* FindJoint(const NewtonBody* const body0, const NewtonBody* const body1)
+{
+	for (NewtonJoint* joint = NewtonBodyGetFirstJoint(body0); joint; joint = NewtonBodyGetNextJoint(body0, joint)) {
+		dCustomJoint* const cJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
+		if (((body0 == cJoint->GetBody0()) && (body1 == cJoint->GetBody1())) ||
+			((body0 == cJoint->GetBody1()) && (body1 == cJoint->GetBody0()))) {
+			return cJoint;
+		}
+	}
+	dAssert(0);
+	return NULL;
+}
 
 
 void SetKinematicPose(NewtonBody* const body, const dMatrix& matrix1, dFloat timestep)

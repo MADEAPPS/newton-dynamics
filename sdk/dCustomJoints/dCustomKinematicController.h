@@ -31,8 +31,8 @@ class dCustomKinematicController: public dCustomJoint
 		m_linearPlusAngularFriction, // this is pickmode from screen
 	};
 
-	CUSTOM_JOINTS_API dCustomKinematicController(NewtonBody* const body, const dVector& attachmentPointInGlobalSpace, NewtonBody* const refernceBody = NULL);
-	CUSTOM_JOINTS_API dCustomKinematicController(NewtonBody* const body, const dMatrix& attachmentMatrixInGlobalSpace, NewtonBody* const refernceBody = NULL);
+	CUSTOM_JOINTS_API dCustomKinematicController(NewtonBody* const body, const dVector& attachmentPointInGlobalSpace, NewtonBody* const referenceBody = NULL);
+	CUSTOM_JOINTS_API dCustomKinematicController(NewtonBody* const body, const dMatrix& attachmentMatrixInGlobalSpace, NewtonBody* const referenceBody = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomKinematicController();
 
 //	CUSTOM_JOINTS_API void SetPickMode (int mode);

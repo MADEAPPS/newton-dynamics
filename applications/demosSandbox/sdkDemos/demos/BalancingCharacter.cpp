@@ -88,6 +88,21 @@ class dModelDescritor
 static dModelDescritor tred = {"tred.ngd", 500.0f, tredDefinition};
 
 
+class dBalacingRagollEffector: public dCustomKinematicController
+{
+	public:
+	dBalacingRagollEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace, dFloat modelMass)
+		:dCustomKinematicController(body, attachmentMatrixInGlobalSpace, referenceBody)
+	{
+		SetSolverModel(1);
+		SetControlMode(dCustomKinematicController::m_linearAndTwist);
+		SetMaxAngularFriction(modelMass * 100.0f);
+		SetMaxLinearFriction(modelMass * 9.8f * 10.0f);
+	}
+
+
+};
+
 class dModelAnimTreeFootBase: public dModelAnimTree
 {
 	public:
@@ -623,12 +638,11 @@ class dBalancingRagdollManager: public dModelManager
 
 	dCustomKinematicController* ConnectEffector(dModelNode* const effectorNode, const dMatrix& effectorMatrix, const dFloat modelMass)
 	{
-		dCustomKinematicController* const effector = new dCustomKinematicController(effectorNode->GetBody(), effectorMatrix, effectorNode->GetRoot()->GetBody());
-		//effector->SetAsLinear();
-		effector->SetSolverModel(1);
-		effector->SetControlMode(dCustomKinematicController::m_linearAndTwist);
-		effector->SetMaxAngularFriction(modelMass * 100.0f);
-		effector->SetMaxLinearFriction(modelMass * 9.8f * 10.0f);
+		const dModelNode* const referenceNode = effectorNode->GetParent()->GetParent();
+		dAssert(referenceNode);
+		dCustomJoint* const joint = FindJoint(referenceNode->GetBody(), referenceNode->GetParent()->GetBody());
+		dAssert(joint);
+		dBalacingRagollEffector* const effector = new dBalacingRagollEffector(effectorNode->GetBody(), effectorNode->GetRoot()->GetBody(), effectorMatrix, modelMass);
 		return effector;
 	}
 
