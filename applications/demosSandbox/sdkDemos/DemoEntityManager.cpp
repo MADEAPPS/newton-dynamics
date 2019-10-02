@@ -69,14 +69,14 @@
 //#define DEFAULT_SCENE	33		// six axis manipulator
 //#define DEFAULT_SCENE	34		// hexapod Robot
 //#define DEFAULT_SCENE	35		// basic rag doll
-//#define DEFAULT_SCENE	36		// balancing character
+#define DEFAULT_SCENE	36		// balancing character
 //#define DEFAULT_SCENE	37		// dynamic rag doll
 //#define DEFAULT_SCENE	38		// basic Car
 //#define DEFAULT_SCENE	39		// single body vehicle
 //#define DEFAULT_SCENE	40		// David Gravel multi body car
 //#define DEFAULT_SCENE	41		// super Car
 //#define DEFAULT_SCENE	42		// heavy vehicles
-#define DEFAULT_SCENE	43		// basic player controller
+//#define DEFAULT_SCENE	43		// basic player controller
 //#define DEFAULT_SCENE	44		// animated player controller
 //#define DEFAULT_SCENE	45		// advanced player controller
 //#define DEFAULT_SCENE	46		// cloth patch			
@@ -126,7 +126,7 @@ void HeightFieldCollision (DemoEntityManager* const scene);
 void UserPlaneCollision (DemoEntityManager* const scene);
 void UserHeightFieldCollision (DemoEntityManager* const scene);
 void PassiveRagdoll (DemoEntityManager* const scene);
-void BalancingRagdoll (DemoEntityManager* const scene);
+void BalancingCharacter (DemoEntityManager* const scene);
 void DynamicRagdoll (DemoEntityManager* const scene);
 void ServoJoints (DemoEntityManager* const scene);
 void ArticulatedJoints (DemoEntityManager* const scene);
@@ -176,7 +176,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Six axis manipulator", "show using inverse dynamics to control robots", SixAxisManipulators },
 	{"Hexapod walker", "show using inverse dynamics to control robots", Hexapod },
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
-	{"Balancing rag doll", "demonstrate dynamic rag doll", BalancingRagdoll},
+	{"Balancing character", "demonstrate dynamic character", BalancingCharacter},
 	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagdoll},
 	{"Basic car", "show how to set up a vehicle controller", BasicCar},
 	{"Single body car", "show a generalized coordinate system body", SingleBodyCar },
@@ -360,7 +360,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showRaycastHit = true;
 //	m_showNormalForces = true;
 //	m_showCenterOfMass = false;
-	m_showJointDebugInfo = true;
+//	m_showJointDebugInfo = true;
 	m_showListenersDebugInfo = true;
 	m_collisionDisplayMode = 2;
 //	m_asynchronousPhysicsUpdate = true;

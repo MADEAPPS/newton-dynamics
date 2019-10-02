@@ -195,13 +195,13 @@
     <ClCompile Include="..\..\sdkDemos\toolBox\FileBrowser.cpp">
       <Filter>utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\BalancingRagdoll.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\DemoInstanceEntity.cpp">
       <Filter>mainLogic</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\NewtonCradle.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\BalancingCharacter.cpp">
       <Filter>demos</Filter>
     </ClCompile>
   </ItemGroup>

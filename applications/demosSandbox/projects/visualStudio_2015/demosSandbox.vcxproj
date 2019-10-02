@@ -46,6 +46,7 @@
     <ClCompile Include="..\..\sdkDemos\demos\AnimatedPlayer.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ArticulatedJoints.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\BalancingCharacter.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicFriction.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicMultibodyVehicle.cpp" />
@@ -65,7 +66,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\Hexapod.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\JoesJointTest.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\KinematicBodies.cpp" />
-    <ClCompile Include="..\..\sdkDemos\demos\BalancingRagdoll.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\MeshCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\MishosRocketTest.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\MultiRayCasting.cpp" />
