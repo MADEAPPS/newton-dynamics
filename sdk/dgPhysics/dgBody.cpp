@@ -316,8 +316,6 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	}
 #endif
 
-dgTrace (("warning bodies %d w(%f %f %f)\n", m_uniqueID, m_veloc.m_x, m_veloc.m_y, m_veloc.m_z));
-
 	// this is correct
 	if (omegaMag2 > ((dgFloat32 (0.0125f) * dgDegreeToRad) * (dgFloat32 (0.0125f) * dgDegreeToRad))) {
 		dgFloat32 invOmegaMag = dgRsqrt (omegaMag2);

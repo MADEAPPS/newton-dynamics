@@ -156,6 +156,7 @@ class dCustomPlayerController::dImpulseSolver
 				dVector r (point - matrix.TransformVector(com));
 				NewtonBodyGetMass(m_contactPoint[i]->m_hitBody, &mass, &Ixx, &Iyy, &Izz);
 		
+				// temporary hack until I fix the player solver
 				mass *= 0.1f;
 
 				dVector linearImpulse(m_jacobian[i].m_linear.Scale(- m_impulseMag[i] * mass / (mass + m_mass)));
@@ -603,11 +604,6 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 	// set play desired velocity
 	dVector veloc(GetVelocity() + m_impulse.Scale(m_invMass));
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
-
-static int xxxx;
-xxxx++;
-if (xxxx >= 124)
-xxxx *= 1;
 
 	// determine if player has to step over obstacles lower than step hight
 	ResolveStep(timestep, contactSolver);
