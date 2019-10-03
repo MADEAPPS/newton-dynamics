@@ -65,14 +65,15 @@ static dBalancingCharacterBoneDefinition tredDefinition[] =
 	{ "bone_rightLeg", dBalancingCharacterBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
 	{ "bone_righCalf", dBalancingCharacterBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
 	{ "bone_rightAnkle", dBalancingCharacterBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
-	{ "bone_rightFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 180.0f }},
+//	{ "bone_rightFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 180.0f }},
+{ "bone_rightFoot", dBalancingCharacterBoneDefinition::m_0dof, 0.2f,{ 0.0f, 0.0f, 45.0f },{ 0.0f, 0.0f, 180.0f } },
 	{ "effector_rightAnkle", dBalancingCharacterBoneDefinition::m_effector},
 
-	{ "bone_leftLeg", dBalancingCharacterBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "bone_leftCalf", dBalancingCharacterBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
-	{ "bone_leftAnkle", dBalancingCharacterBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
-	{ "bone_leftFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 45.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "effector_leftAnkle", dBalancingCharacterBoneDefinition::m_effector },
+	//{ "bone_leftLeg", dBalancingCharacterBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
+	//{ "bone_leftCalf", dBalancingCharacterBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
+	//{ "bone_leftAnkle", dBalancingCharacterBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+	//{ "bone_leftFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 45.0f }, { 0.0f, 0.0f, 180.0f } },
+	//{ "effector_leftAnkle", dBalancingCharacterBoneDefinition::m_effector },
 
 	{ NULL},
 };
@@ -96,7 +97,7 @@ class dBalacingCharacterEffector: public dCustomKinematicController
 		,m_origin(GetTargetMatrix())
 	{
 		SetSolverModel(1);
-		SetControlMode(dCustomKinematicController::m_full6dof);
+		SetControlMode(dCustomKinematicController::m_linearAndTwist);
 		SetMaxAngularFriction(modelMass * 100.0f);
 		SetMaxLinearFriction(modelMass * 9.8f * 10.0f);
 		dVector euler0;
@@ -107,9 +108,10 @@ class dBalacingCharacterEffector: public dCustomKinematicController
 		m_roll = euler0.m_z;
 	}
 
-	void SetMatrix (dFloat x, dFloat y, dFloat z, dFloat pitch, dFloat yaw, dFloat roll)
+	//void SetMatrix (dFloat x, dFloat y, dFloat z, dFloat pitch, dFloat yaw, dFloat roll)
+	void SetMatrix(dFloat x, dFloat y, dFloat z, dFloat pitch)
 	{
-		dMatrix matrix (dPitchMatrix(m_pitch + pitch) * dYawMatrix(m_yaw + yaw) * dRollMatrix(m_roll + roll));
+		dMatrix matrix (dPitchMatrix(m_pitch + pitch) * dYawMatrix(m_yaw) * dRollMatrix(m_roll));
 		matrix.m_posit = m_origin.TransformVector(dVector (x, y, z, dFloat (1.0f)));
 		SetTargetMatrix(matrix);
 	}
@@ -557,7 +559,7 @@ class dBalancingCharacter: public dModelRootNode
 		debugContext->SetScale(scale);
 	}
 
-	void ApplyControls (dFloat timestep, dFloat x, dFloat y, dFloat z, dFloat pitch, dFloat yaw, dFloat roll)
+	void ApplyControls (dFloat timestep, dFloat x, dFloat y, dFloat z, dFloat pitch)
 	{
 		m_animtree->GeneratePose(timestep, m_pose);
 
@@ -565,7 +567,7 @@ class dBalancingCharacter: public dModelRootNode
 			dModelKeyFrame& transform = node->GetInfo();
 			//transform.m_effector->SetTargetMatrix(dMatrix(transform.m_rotation, transform.m_posit));
 			dBalacingCharacterEffector* const effector = (dBalacingCharacterEffector*)transform.m_effector;
-			effector->SetMatrix (x, y, z, pitch, yaw, roll);
+			effector->SetMatrix (x, y, z, pitch);
 			break;
 		}
 	}
@@ -582,12 +584,10 @@ class dBalancingCharacterManager: public dModelManager
 		:dModelManager(scene->GetNewton())
 		//,m_currentController(NULL)
 	{
+		m_pitch = 0.0f;
 		m_posit_x = 0.0f;
 		m_posit_y = 0.0f;
 		m_posit_z = 0.0f;
-		m_pitch = 0.0f;
-		m_yaw = 0.0f;
-		m_roll = 0.0f;
 		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
 
@@ -601,8 +601,6 @@ class dBalancingCharacterManager: public dModelManager
 		dBalancingCharacterManager* const me = (dBalancingCharacterManager*)context;
 		scene->Print(color, "linear degrees of freedom");
 		ImGui::SliderFloat("pitch", &me->m_pitch, -30.0f, 30.0f);
-		ImGui::SliderFloat("yaw", &me->m_yaw, -30.0f, 30.0f);
-		ImGui::SliderFloat("roll", &me->m_roll, -30.0f, 30.0f);
 		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
 		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
 		ImGui::SliderFloat("posit_z", &me->m_posit_z, -1.0f, 1.0f);
@@ -923,14 +921,11 @@ class dBalancingCharacterManager: public dModelManager
 	virtual void OnPreUpdate(dModelRootNode* const root, dFloat timestep) const 
 	{
 		dBalancingCharacter* const model = (dBalancingCharacter*)root;
-		model->ApplyControls (timestep, m_posit_x, m_posit_y, m_posit_z, 
-							  dDegreeToRad * m_pitch, dDegreeToRad * m_yaw, dDegreeToRad * m_roll);
+		model->ApplyControls (timestep, m_posit_x, m_posit_y, m_posit_z, dDegreeToRad * m_pitch);
 	}
 	
 	//dBalancingCharacter* m_currentController;
 	dFloat m_pitch;
-	dFloat m_yaw;
-	dFloat m_roll;
 	dFloat m_posit_x;
 	dFloat m_posit_y;
 	dFloat m_posit_z;
