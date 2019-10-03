@@ -20,7 +20,7 @@
 #include "HeightFieldPrimitive.h"
 
 
-class dBalancingRagdollBoneDefinition
+class dBalancingCharacterBoneDefinition
 {
 	public:
 	enum jointType
@@ -55,24 +55,24 @@ class dBalancingRagdollBoneDefinition
 	dFrameMatrix m_frameBasics;
 };
 
-static dBalancingRagdollBoneDefinition tredDefinition[] =
+static dBalancingCharacterBoneDefinition tredDefinition[] =
 {
-	{ "bone_pelvis", dBalancingRagdollBoneDefinition::m_none, 1.0f },
+	{ "bone_pelvis", dBalancingCharacterBoneDefinition::m_none, 1.0f },
 
 //{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_2dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 0.0f, 45.0f }},
 //{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
 
-	{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
-	{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
-	{ "bone_rightAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
-	{ "bone_rightFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 180.0f }},
-	{ "effector_rightAnkle", dBalancingRagdollBoneDefinition::m_effector},
+	{ "bone_rightLeg", dBalancingCharacterBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
+	{ "bone_righCalf", dBalancingCharacterBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
+	{ "bone_rightAnkle", dBalancingCharacterBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
+	{ "bone_rightFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 180.0f }},
+	{ "effector_rightAnkle", dBalancingCharacterBoneDefinition::m_effector},
 
-	{ "bone_leftLeg", dBalancingRagdollBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "bone_leftCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
-	{ "bone_leftAnkle", dBalancingRagdollBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
-	{ "bone_leftFoot", dBalancingRagdollBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 45.0f }, { 0.0f, 0.0f, 180.0f } },
-	{ "effector_leftAnkle", dBalancingRagdollBoneDefinition::m_effector },
+	{ "bone_leftLeg", dBalancingCharacterBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "bone_leftCalf", dBalancingCharacterBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
+	{ "bone_leftAnkle", dBalancingCharacterBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+	{ "bone_leftFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 45.0f }, { 0.0f, 0.0f, 180.0f } },
+	{ "effector_leftAnkle", dBalancingCharacterBoneDefinition::m_effector },
 
 	{ NULL},
 };
@@ -82,40 +82,42 @@ class dModelDescritor
 	public:
 	char* m_filename;
 	dFloat m_mass;
-	dBalancingRagdollBoneDefinition* m_skeletonDefinition;
+	dBalancingCharacterBoneDefinition* m_skeletonDefinition;
 };
 
 static dModelDescritor tred = {"tred.ngd", 500.0f, tredDefinition};
 
 
-class dBalacingRagollEffector: public dCustomKinematicController
+class dBalacingCharacterEffector: public dCustomKinematicController
 {
 	public:
-	dBalacingRagollEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace, dFloat modelMass, const dVector& localPivot)
+	dBalacingCharacterEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace, dFloat modelMass, dCustomJoint* const pivotJoint)
 		:dCustomKinematicController(body, attachmentMatrixInGlobalSpace, referenceBody)
+		,m_origin(GetTargetMatrix())
 	{
-		dMatrix matrix1(GetMatrix1());
-		m_localPivot = GetMatrix1();
-		m_localPivot.m_posit = localPivot;
-		m_localPivot = matrix1 * m_localPivot.Inverse();
-
-		m_x = matrix1.m_posit.m_x - m_localPivot.m_posit.m_x;
-		m_y = matrix1.m_posit.m_y - m_localPivot.m_posit.m_y;
-		m_z = matrix1.m_posit.m_z - m_localPivot.m_posit.m_z;
-		m_angle = 0.0f;
-
 		SetSolverModel(1);
-		SetControlMode(dCustomKinematicController::m_linearAndTwist);
+		SetControlMode(dCustomKinematicController::m_full6dof);
 		SetMaxAngularFriction(modelMass * 100.0f);
 		SetMaxLinearFriction(modelMass * 9.8f * 10.0f);
+		dVector euler0;
+		dVector euler1;
+		m_origin.GetEulerAngles(euler0, euler1);
+		m_pitch = euler0.m_x;
+		m_yaw = euler0.m_y;
+		m_roll = euler0.m_z;
 	}
 
+	void SetMatrix (dFloat x, dFloat y, dFloat z, dFloat pitch, dFloat yaw, dFloat roll)
+	{
+		dMatrix matrix (dPitchMatrix(m_pitch + pitch) * dYawMatrix(m_yaw + yaw) * dRollMatrix(m_roll + roll));
+		matrix.m_posit = m_origin.TransformVector(dVector (x, y, z, dFloat (1.0f)));
+		SetTargetMatrix(matrix);
+	}
 
-	dMatrix m_localPivot;
-	dFloat m_x;
-	dFloat m_y;
-	dFloat m_z;
-	dFloat m_angle;
+	dMatrix m_origin;
+	dFloat m_pitch;
+	dFloat m_yaw;
+	dFloat m_roll;
 };
 
 class dModelAnimTreeFootBase: public dModelAnimTree
@@ -489,17 +491,17 @@ class dModelAnimTreeFootAlignment: public dModelAnimTreeFootBase
 };
 */
 
-class dBalancingRagdoll: public dModelRootNode
+class dBalancingCharacter: public dModelRootNode
 {
 	public:
-	dBalancingRagdoll(NewtonBody* const rootBody)
+	dBalancingCharacter(NewtonBody* const rootBody)
 		:dModelRootNode(rootBody, dGetIdentityMatrix())
 		,m_pose()
 		,m_animtree(NULL)
 	{
 	}
 
-	~dBalancingRagdoll()
+	~dBalancingCharacter()
 	{
 		if (m_animtree) {
 			delete m_animtree;
@@ -555,13 +557,16 @@ class dBalancingRagdoll: public dModelRootNode
 		debugContext->SetScale(scale);
 	}
 
-	void ApplyControls (dFloat timestep)
+	void ApplyControls (dFloat timestep, dFloat x, dFloat y, dFloat z, dFloat pitch, dFloat yaw, dFloat roll)
 	{
 		m_animtree->GeneratePose(timestep, m_pose);
 
 		for (dModelKeyFramePose::dListNode* node = m_pose.GetFirst(); node; node = node->GetNext()) {
 			dModelKeyFrame& transform = node->GetInfo();
-			transform.m_effector->SetTargetMatrix(dMatrix(transform.m_rotation, transform.m_posit));
+			//transform.m_effector->SetTargetMatrix(dMatrix(transform.m_rotation, transform.m_posit));
+			dBalacingCharacterEffector* const effector = (dBalacingCharacterEffector*)transform.m_effector;
+			effector->SetMatrix (x, y, z, pitch, yaw, roll);
+			break;
 		}
 	}
 
@@ -570,29 +575,37 @@ class dBalancingRagdoll: public dModelRootNode
 };
 
 
-class dBalancingRagdollManager: public dModelManager
+class dBalancingCharacterManager: public dModelManager
 {
 	public:
-	dBalancingRagdollManager(DemoEntityManager* const scene)
+	dBalancingCharacterManager(DemoEntityManager* const scene)
 		:dModelManager(scene->GetNewton())
 		//,m_currentController(NULL)
 	{
-		//scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
+		m_posit_x = 0.0f;
+		m_posit_y = 0.0f;
+		m_posit_z = 0.0f;
+		m_pitch = 0.0f;
+		m_yaw = 0.0f;
+		m_roll = 0.0f;
+		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
 	}
 
-	~dBalancingRagdollManager()
+	~dBalancingCharacterManager()
 	{
 	}
 
 	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
 	{
-		dAssert (0);
-		//dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		//dBalancingRagdollManager* const me = (dBalancingRagdollManager*)context;
-		//scene->Print(color, "linear degrees of freedom");
-		//ImGui::SliderFloat("Azimuth", &me->m_azimuth, -180.0f, 180.0f);
-		//ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.4f, 0.2f);
-		//ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.2f, 0.4f);
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		dBalancingCharacterManager* const me = (dBalancingCharacterManager*)context;
+		scene->Print(color, "linear degrees of freedom");
+		ImGui::SliderFloat("pitch", &me->m_pitch, -30.0f, 30.0f);
+		ImGui::SliderFloat("yaw", &me->m_yaw, -30.0f, 30.0f);
+		ImGui::SliderFloat("roll", &me->m_roll, -30.0f, 30.0f);
+		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.0f, 1.0f);
+		ImGui::SliderFloat("posit_y", &me->m_posit_y, -1.0f, 1.0f);
+		ImGui::SliderFloat("posit_z", &me->m_posit_z, -1.0f, 1.0f);
 		//
 		//ImGui::Separator();
 		//scene->Print(color, "angular degrees of freedom");
@@ -615,7 +628,7 @@ class dBalancingRagdollManager: public dModelManager
 		PhysicsApplyGravityForce(body, timestep, threadIndex);
 	}
 
-	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dBalancingRagdollBoneDefinition& definition)
+	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, const dBalancingCharacterBoneDefinition& definition)
 	{
 		NewtonWorld* const world = GetWorld();
 		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
@@ -651,30 +664,30 @@ class dBalancingRagdollManager: public dModelManager
 		return boneBody;
 	}
 
-	dBalacingRagollEffector* ConnectEffector(dModelNode* const effectorNode, const dMatrix& effectorMatrix, const dFloat modelMass)
+	dBalacingCharacterEffector* ConnectEffector(dModelNode* const effectorNode, const dMatrix& effectorMatrix, const dFloat modelMass)
 	{
 		const dModelNode* const referenceNode = effectorNode->GetParent()->GetParent();
 		dAssert(referenceNode);
-		dCustomJoint* const joint = FindJoint(referenceNode->GetBody(), referenceNode->GetParent()->GetBody());
-		dAssert(joint);
-		dAssert(joint->GetBody1() == effectorNode->GetRoot()->GetBody());
-		dMatrix pivotMatrix(joint->GetMatrix1());
-		dBalacingRagollEffector* const effector = new dBalacingRagollEffector(effectorNode->GetBody(), effectorNode->GetRoot()->GetBody(), effectorMatrix, modelMass, pivotMatrix.m_posit);
+		dCustomJoint* const pivotJoint = FindJoint(referenceNode->GetBody(), referenceNode->GetParent()->GetBody());
+		dAssert(pivotJoint);
+		//Assert(joint->GetBody1() == effectorNode->GetRoot()->GetBody());
+		//Matrix pivotMatrix(joint->GetMatrix1());
+		dBalacingCharacterEffector* const effector = new dBalacingCharacterEffector(effectorNode->GetBody(), effectorNode->GetRoot()->GetBody(), effectorMatrix, modelMass, pivotJoint);
 		return effector;
 	}
 
-	void ConnectLimb(NewtonBody* const bone, NewtonBody* const parent, const dBalancingRagdollBoneDefinition& definition)
+	void ConnectLimb(NewtonBody* const bone, NewtonBody* const parent, const dBalancingCharacterBoneDefinition& definition)
 	{
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone, &matrix[0][0]);
 
-		dBalancingRagdollBoneDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
+		dBalancingCharacterBoneDefinition::dFrameMatrix frameAngle(definition.m_frameBasics);
 		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad));
 		pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
 
 		switch (definition.m_type)
 		{
-			case dBalancingRagdollBoneDefinition::m_ball:
+			case dBalancingCharacterBoneDefinition::m_ball:
 			{
 				dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, bone, parent);
 				joint->EnableCone(false);
@@ -682,7 +695,7 @@ class dBalancingRagdollManager: public dModelManager
 				break;
 			}
 
-			case dBalancingRagdollBoneDefinition::m_0dof:
+			case dBalancingCharacterBoneDefinition::m_0dof:
 			{
 				dCustomHinge* const joint = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
 				joint->EnableLimits(true);
@@ -690,7 +703,7 @@ class dBalancingRagdollManager: public dModelManager
 				break;
 			}
 
-			case dBalancingRagdollBoneDefinition::m_1dof:
+			case dBalancingCharacterBoneDefinition::m_1dof:
 			{
 #if 0
 				dCustomHinge* const joint = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
@@ -707,7 +720,7 @@ class dBalancingRagdollManager: public dModelManager
 				break;
 			}
 
-			case dBalancingRagdollBoneDefinition::m_2dof:
+			case dBalancingCharacterBoneDefinition::m_2dof:
 			{
 				dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, bone, parent);
 				joint->EnableTwist(true);
@@ -718,7 +731,7 @@ class dBalancingRagdollManager: public dModelManager
 				break;
 			}
 
-			case dBalancingRagdollBoneDefinition::m_3dof:
+			case dBalancingCharacterBoneDefinition::m_3dof:
 			{
 				dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, bone, parent);
 				joint->EnableTwist(true);
@@ -807,7 +820,7 @@ class dBalancingRagdollManager: public dModelManager
 		NewtonBody* const rootBody = CreateBodyPart(entityModel, descriptor.m_skeletonDefinition[0]);
 
 		// make a kinematic controlled model.
-		dBalancingRagdoll* const model = new dBalancingRagdoll(rootBody);
+		dBalancingCharacter* const model = new dBalancingCharacter(rootBody);
 
 		// add the model to the manager
 		AddRoot(model);
@@ -844,7 +857,7 @@ class dBalancingRagdollManager: public dModelManager
 			for (int i = 1; descriptor.m_skeletonDefinition[i].m_boneName; i++) {
 				if (!strcmp(descriptor.m_skeletonDefinition[i].m_boneName, name)) {
 					NewtonBody* const parentBody = parentBone->GetBody();
-					if (descriptor.m_skeletonDefinition[i].m_type == dBalancingRagdollBoneDefinition::m_effector) {
+					if (descriptor.m_skeletonDefinition[i].m_type == dBalancingCharacterBoneDefinition::m_effector) {
 						dModelKeyFrame effectorPose;
 						dMatrix effectorMatrix(entity->CalculateGlobalMatrix());
 						effectorPose.m_effector = ConnectEffector(parentBone, effectorMatrix, descriptor.m_mass);
@@ -878,7 +891,7 @@ class dBalancingRagdollManager: public dModelManager
 
 		// make internal part non collidable
 		model->SetAllPartsNonCollidable();
-#if 0
+#if 1
 		dCustomHinge* fixToWorld = new dCustomHinge (matrix0 * location, model->GetBody(), NULL);
 		fixToWorld->EnableLimits(true);
 		fixToWorld->SetLimits(0.0f, 0.0f);
@@ -893,7 +906,7 @@ class dBalancingRagdollManager: public dModelManager
 
 	virtual void OnDebug(dModelRootNode* const root, dCustomJoint::dDebugDisplay* const debugContext)
 	{
-		dBalancingRagdoll* const model = (dBalancingRagdoll*)root;
+		dBalancingCharacter* const model = (dBalancingCharacter*)root;
 		model->OnDebug(debugContext);
 	}
 
@@ -909,11 +922,18 @@ class dBalancingRagdollManager: public dModelManager
 
 	virtual void OnPreUpdate(dModelRootNode* const root, dFloat timestep) const 
 	{
-		dBalancingRagdoll* const model = (dBalancingRagdoll*)root;
-		model->ApplyControls (timestep);
+		dBalancingCharacter* const model = (dBalancingCharacter*)root;
+		model->ApplyControls (timestep, m_posit_x, m_posit_y, m_posit_z, 
+							  dDegreeToRad * m_pitch, dDegreeToRad * m_yaw, dDegreeToRad * m_roll);
 	}
 	
-	//dBalancingRagdoll* m_currentController;
+	//dBalancingCharacter* m_currentController;
+	dFloat m_pitch;
+	dFloat m_yaw;
+	dFloat m_roll;
+	dFloat m_posit_x;
+	dFloat m_posit_y;
+	dFloat m_posit_z;
 };
 
 
@@ -925,7 +945,7 @@ void BalancingCharacter(DemoEntityManager* const scene)
 
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 
-	dBalancingRagdollManager* const manager = new dBalancingRagdollManager(scene);
+	dBalancingCharacterManager* const manager = new dBalancingCharacterManager(scene);
 	NewtonWorld* const world = scene->GetNewton();
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
 	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);

@@ -149,20 +149,20 @@ class PassiveRagdollManager: public dCustomTransformManager
 		joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
 	}
 
-/*
+
 	dCustomJoint* FindJoint(NewtonBody* const child, NewtonBody* const parent)
 	{
-		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(child); joint; joint = NewtonBodyGetNextJoint(child, joint)) {
-			dCustomJoint* const cJoint = (dCustomJoint*) NewtonJointGetUserData(joint);
-			if (((child == cJoint->GetBody0()) && (parent == cJoint->GetBody1())) ||
-				((child == cJoint->GetBody1()) && (parent == cJoint->GetBody0()))) {
-				return cJoint;
-			}
-		}
-		dAssert (0);
-		return NULL;
+		//for (NewtonJoint* joint = NewtonBodyGetFirstJoint(child); joint; joint = NewtonBodyGetNextJoint(child, joint)) {
+		//	dCustomJoint* const cJoint = (dCustomJoint*) NewtonJointGetUserData(joint);
+		//	if (((child == cJoint->GetBody0()) && (parent == cJoint->GetBody1())) ||
+		//		((child == cJoint->GetBody1()) && (parent == cJoint->GetBody0()))) {
+		//		return cJoint;
+		//	}
+		//}
+		//dAssert (0);
+		//return NULL;
+		return ::FindJoint(child, parent);
 	}
-*/
 
 	virtual void OnUpdateTransform(const dCustomTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
 	{

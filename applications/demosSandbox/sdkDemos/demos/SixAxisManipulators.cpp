@@ -45,11 +45,6 @@ class dSixAxisJointDefinition
 static dSixAxisJointDefinition robot1[] =
 {
 	{ "bone_base000", dSixAxisJointDefinition::m_node, { -1000.0f, 1000.0f }, 1.0f },
-
-//	{ "bone_base001", dSixAxisJointDefinition::m_hinge, { -0.0f, 0.0f }, 0.4f },
-//	{ "bone_base002", dSixAxisJointDefinition::m_hinge, { -0.0f, 0.0f }, 0.3f },
-//	{ "bone_base003", dSixAxisJointDefinition::m_hinge, { -20.0f, 20.0f }, 0.2f },
-
 	{ "bone_base001", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.4f },
 	{ "bone_base002", dSixAxisJointDefinition::m_hinge, { -120.0f, 45.0f }, 0.3f },
 	{ "bone_base003", dSixAxisJointDefinition::m_hinge, { -120.0f, 15.0f }, 0.2f },
