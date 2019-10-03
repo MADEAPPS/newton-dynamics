@@ -91,9 +91,19 @@ static dModelDescritor tred = {"tred.ngd", 500.0f, tredDefinition};
 class dBalacingRagollEffector: public dCustomKinematicController
 {
 	public:
-	dBalacingRagollEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace, dFloat modelMass)
+	dBalacingRagollEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace, dFloat modelMass, const dVector& localPivot)
 		:dCustomKinematicController(body, attachmentMatrixInGlobalSpace, referenceBody)
 	{
+		dMatrix matrix1(GetMatrix1());
+		m_localPivot = GetMatrix1();
+		m_localPivot.m_posit = localPivot;
+		m_localPivot = matrix1 * m_localPivot.Inverse();
+
+		m_x = matrix1.m_posit.m_x - m_localPivot.m_posit.m_x;
+		m_y = matrix1.m_posit.m_y - m_localPivot.m_posit.m_y;
+		m_z = matrix1.m_posit.m_z - m_localPivot.m_posit.m_z;
+		m_angle = 0.0f;
+
 		SetSolverModel(1);
 		SetControlMode(dCustomKinematicController::m_linearAndTwist);
 		SetMaxAngularFriction(modelMass * 100.0f);
@@ -101,6 +111,11 @@ class dBalacingRagollEffector: public dCustomKinematicController
 	}
 
 
+	dMatrix m_localPivot;
+	dFloat m_x;
+	dFloat m_y;
+	dFloat m_z;
+	dFloat m_angle;
 };
 
 class dModelAnimTreeFootBase: public dModelAnimTree
@@ -636,13 +651,15 @@ class dBalancingRagdollManager: public dModelManager
 		return boneBody;
 	}
 
-	dCustomKinematicController* ConnectEffector(dModelNode* const effectorNode, const dMatrix& effectorMatrix, const dFloat modelMass)
+	dBalacingRagollEffector* ConnectEffector(dModelNode* const effectorNode, const dMatrix& effectorMatrix, const dFloat modelMass)
 	{
 		const dModelNode* const referenceNode = effectorNode->GetParent()->GetParent();
 		dAssert(referenceNode);
 		dCustomJoint* const joint = FindJoint(referenceNode->GetBody(), referenceNode->GetParent()->GetBody());
 		dAssert(joint);
-		dBalacingRagollEffector* const effector = new dBalacingRagollEffector(effectorNode->GetBody(), effectorNode->GetRoot()->GetBody(), effectorMatrix, modelMass);
+		dAssert(joint->GetBody1() == effectorNode->GetRoot()->GetBody());
+		dMatrix pivotMatrix(joint->GetMatrix1());
+		dBalacingRagollEffector* const effector = new dBalacingRagollEffector(effectorNode->GetBody(), effectorNode->GetRoot()->GetBody(), effectorMatrix, modelMass, pivotMatrix.m_posit);
 		return effector;
 	}
 
