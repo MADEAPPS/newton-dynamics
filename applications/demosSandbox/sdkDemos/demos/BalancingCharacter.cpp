@@ -65,15 +65,14 @@ static dBalancingCharacterBoneDefinition tredDefinition[] =
 	{ "bone_rightLeg", dBalancingCharacterBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
 	{ "bone_righCalf", dBalancingCharacterBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
 	{ "bone_rightAnkle", dBalancingCharacterBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
-//	{ "bone_rightFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, {0.0f, 0.0f, 45.0f}, { 0.0f, 0.0f, 180.0f }},
-{ "bone_rightFoot", dBalancingCharacterBoneDefinition::m_0dof, 0.2f,{ 0.0f, 0.0f, 45.0f },{ 0.0f, 0.0f, 180.0f } },
 	{ "effector_rightAnkle", dBalancingCharacterBoneDefinition::m_effector},
+	{ "bone_rightFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, {-30.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
 
-	//{ "bone_leftLeg", dBalancingCharacterBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
-	//{ "bone_leftCalf", dBalancingCharacterBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
-	//{ "bone_leftAnkle", dBalancingCharacterBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
-	//{ "bone_leftFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, { 0.0f, 0.0f, 45.0f }, { 0.0f, 0.0f, 180.0f } },
-	//{ "effector_leftAnkle", dBalancingCharacterBoneDefinition::m_effector },
+	{ "bone_leftLeg", dBalancingCharacterBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "bone_leftCalf", dBalancingCharacterBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
+	{ "bone_leftAnkle", dBalancingCharacterBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
+	{ "effector_leftAnkle", dBalancingCharacterBoneDefinition::m_effector },
+	{ "bone_leftFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, { -30.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
 
 	{ NULL},
 };
@@ -92,7 +91,7 @@ static dModelDescritor tred = {"tred.ngd", 500.0f, tredDefinition};
 class dBalacingCharacterEffector: public dCustomKinematicController
 {
 	public:
-	dBalacingCharacterEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace, dFloat modelMass, dCustomJoint* const pivotJoint)
+	dBalacingCharacterEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace, dFloat modelMass)
 		:dCustomKinematicController(body, attachmentMatrixInGlobalSpace, referenceBody)
 		,m_origin(GetTargetMatrix())
 	{
@@ -561,15 +560,19 @@ class dBalancingCharacter: public dModelRootNode
 
 	void ApplyControls (dFloat timestep, dFloat x, dFloat y, dFloat z, dFloat pitch)
 	{
-		m_animtree->GeneratePose(timestep, m_pose);
+		//m_animtree->GeneratePose(timestep, m_pose);
+		//for (dModelKeyFramePose::dListNode* node = m_pose.GetFirst(); node; node = node->GetNext()) {
+		//	dModelKeyFrame& transform = node->GetInfo();
+		//	transform.m_effector->SetTargetMatrix(dMatrix(transform.m_rotation, transform.m_posit));
+		//	//dBalacingCharacterEffector* const effector = (dBalacingCharacterEffector*)transform.m_effector;
+		//	//effector->SetMatrix (x, y, z, pitch);
+		//	//break;
+		//}
 
-		for (dModelKeyFramePose::dListNode* node = m_pose.GetFirst(); node; node = node->GetNext()) {
-			dModelKeyFrame& transform = node->GetInfo();
-			//transform.m_effector->SetTargetMatrix(dMatrix(transform.m_rotation, transform.m_posit));
-			dBalacingCharacterEffector* const effector = (dBalacingCharacterEffector*)transform.m_effector;
-			effector->SetMatrix (x, y, z, pitch);
-			break;
-		}
+		dModelKeyFramePose::dListNode* node = m_pose.GetFirst();
+		dModelKeyFrame& transform = node->GetInfo();
+		dBalacingCharacterEffector* const effector = (dBalacingCharacterEffector*)transform.m_effector;
+		effector->SetMatrix (x, y, z, pitch);
 	}
 
 	dModelKeyFramePose m_pose;
@@ -664,13 +667,14 @@ class dBalancingCharacterManager: public dModelManager
 
 	dBalacingCharacterEffector* ConnectEffector(dModelNode* const effectorNode, const dMatrix& effectorMatrix, const dFloat modelMass)
 	{
-		const dModelNode* const referenceNode = effectorNode->GetParent()->GetParent();
-		dAssert(referenceNode);
-		dCustomJoint* const pivotJoint = FindJoint(referenceNode->GetBody(), referenceNode->GetParent()->GetBody());
-		dAssert(pivotJoint);
+		//const dModelNode* const referenceNode = effectorNode->GetParent()->GetParent();
+		//dAssert(referenceNode);
+		//dCustomJoint* const pivotJoint = FindJoint(referenceNode->GetBody(), referenceNode->GetParent()->GetBody());
+		//dAssert(pivotJoint);
 		//Assert(joint->GetBody1() == effectorNode->GetRoot()->GetBody());
 		//Matrix pivotMatrix(joint->GetMatrix1());
-		dBalacingCharacterEffector* const effector = new dBalacingCharacterEffector(effectorNode->GetBody(), effectorNode->GetRoot()->GetBody(), effectorMatrix, modelMass, pivotJoint);
+		//dBalacingCharacterEffector* const effector = new dBalacingCharacterEffector(effectorNode->GetBody(), effectorNode->GetRoot()->GetBody(), effectorMatrix, modelMass, pivotJoint);
+		dBalacingCharacterEffector* const effector = new dBalacingCharacterEffector(effectorNode->GetBody(), effectorNode->GetRoot()->GetBody(), effectorMatrix, modelMass);
 		return effector;
 	}
 

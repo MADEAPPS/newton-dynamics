@@ -147,10 +147,49 @@ void dCustomKinematicController::CheckSleep() const
 	matrix.m_posit.m_w = 0.0f;
 	if (matrix.m_posit.DotProduct3(matrix.m_posit) > dFloat(1.0e-6f)) {
 		NewtonBodySetSleepState(m_body0, 0);
-	} else if (m_controlMode != m_linear) {
-		dFloat trace = matrix[0][0] * matrix[1][1] * matrix[2][2];
-		if (trace < 0.9995f) {
-			NewtonBodySetSleepState(m_body0, 0);
+	} else {
+		switch (m_controlMode)
+		{
+			case m_full6dof:
+			case m_linearPlusAngularFriction:
+			{
+				dFloat trace = matrix[0][0] * matrix[1][1] * matrix[2][2];
+				if (trace < 0.9995f) {
+					NewtonBodySetSleepState(m_body0, 0);
+				}
+				break;
+			} 
+
+			case m_linearAndCone:
+			{
+				dFloat cosAngle = matrix1[0].DotProduct3(matrix0[0]);
+				if (cosAngle > 0.998f) {
+					NewtonBodySetSleepState(m_body0, 0);
+				}
+				break;
+			}
+
+			case m_linearAndTwist:
+			{
+				 dFloat pitchAngle = 0.0f;
+				 dFloat cosAngle = matrix1[0].DotProduct3(matrix0[0]);
+				 if (cosAngle > 0.998f) {
+					pitchAngle = CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
+				 } else {
+					dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
+					dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
+					lateralDir = lateralDir.Normalize();
+					dFloat coneAngle = dAcos(dClamp(cosAngle, dFloat(-1.0f), dFloat(1.0f)));
+					dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+					dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+					pitchAngle = dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
+				}
+
+				if (dAbs (pitchAngle) > (1.0 * dDegreeToRad)) {
+					NewtonBodySetSleepState(m_body0, 0);
+				}
+				break;
+			}
 		}
 	}
 }
@@ -269,7 +308,6 @@ void dCustomKinematicController::SubmitConstraints (dFloat timestep, int threadI
 		if (m_controlMode == m_linearPlusAngularFriction) {
 			dFloat omegaMag2 = omega0.DotProduct3(omega0);
 			dFloat angularFriction = m_maxAngularFriction + m_angularFrictionCoefficient * omegaMag2;
-			//dTrace(("angular friction %f %f %f\n", omegaMag2, m_maxAngularFriction, angularFriction));
 			for (int i = 0; i < 3; i++) {
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[i][0]);
 				NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
