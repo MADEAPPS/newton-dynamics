@@ -66,8 +66,6 @@ void dCustomKinematicController::Init (const dMatrix& matrix)
 	m_autoSleepState = NewtonBodyGetAutoSleep(body) ? true : false;
 	NewtonBodySetSleepState(body, 0);
 
-//	SetPickMode(1);
-//	SetAsLinearAndAngular();
 	SetControlMode(m_full6dof);
 	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
 	SetMaxLinearFriction(1.0f);
@@ -79,23 +77,6 @@ void dCustomKinematicController::Init (const dMatrix& matrix)
 	// set as soft joint
 	SetSolverModel(3);
 }
-
-/*
-void dCustomKinematicController::SetAsLinear()
-{
-	m_controlAngularDof = false;
-}
-
-void dCustomKinematicController::SetAsLinearAndAngular()
-{
-	m_controlAngularDof = 1;
-}
-
-void dCustomKinematicController::SetPickMode (int mode)
-{
-	m_pickingMode = char (dClamp (mode, 0, 2));
-}
-*/
 
 dCustomKinematicController::dControlModes dCustomKinematicController::GetControlMode() const
 {

@@ -31,7 +31,8 @@ class dBalancingCharacterBoneDefinition
 		m_1dof,
 		m_2dof,
 		m_3dof,
-		m_effector,
+		m_ikEffector,
+		m_fkEffector,
 	};
 
 	struct dJointLimit
@@ -59,20 +60,17 @@ static dBalancingCharacterBoneDefinition tredDefinition[] =
 {
 	{ "bone_pelvis", dBalancingCharacterBoneDefinition::m_none, 1.0f },
 
-//{ "bone_rightLeg", dBalancingRagdollBoneDefinition::m_2dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 0.0f, 45.0f }},
-//{ "bone_righCalf", dBalancingRagdollBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
-
 	{ "bone_rightLeg", dBalancingCharacterBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
 	{ "bone_righCalf", dBalancingCharacterBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
-	{ "bone_rightAnkle", dBalancingCharacterBoneDefinition::m_0dof, 0.2f, {0.0f, 0.0f, 0.0f}, { 0.0f, 0.0f, 0.0f }},
-	{ "effector_rightAnkle", dBalancingCharacterBoneDefinition::m_effector},
-	{ "bone_rightFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, {-30.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
+	{ "bone_rightAnkle", dBalancingCharacterBoneDefinition::m_fkEffector, 0.2f, {0.0f, 0.0f, 0.0f}, {-90.0f, 0.0f, 90.0f } },
+	//{ "effector_rightAnkle", dBalancingCharacterBoneDefinition::m_ikEffector},
+	//{ "bone_rightFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, {-30.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
 
-	{ "bone_leftLeg", dBalancingCharacterBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
-	{ "bone_leftCalf", dBalancingCharacterBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
-	{ "bone_leftAnkle", dBalancingCharacterBoneDefinition::m_0dof, 0.2f, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f } },
-	{ "effector_leftAnkle", dBalancingCharacterBoneDefinition::m_effector },
-	{ "bone_leftFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, { -30.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
+	//{ "bone_leftLeg", dBalancingCharacterBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
+	//{ "bone_leftCalf", dBalancingCharacterBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
+	//{ "bone_leftAnkle", dBalancingCharacterBoneDefinition::m_fkEffector, 0.2f,{ 0.0f, 0.0f, 0.0f },{ -90.0f, 0.0f, 90.0f } },
+	//{ "effector_leftAnkle", dBalancingCharacterBoneDefinition::m_ikEffector},
+	//{ "bone_leftFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, { -30.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
 
 	{ NULL},
 };
@@ -570,9 +568,11 @@ class dBalancingCharacter: public dModelRootNode
 		//}
 
 		dModelKeyFramePose::dListNode* node = m_pose.GetFirst();
-		dModelKeyFrame& transform = node->GetInfo();
-		dBalacingCharacterEffector* const effector = (dBalacingCharacterEffector*)transform.m_effector;
-		effector->SetMatrix (x, y, z, pitch);
+		if (node) {
+			dModelKeyFrame& transform = node->GetInfo();
+			dBalacingCharacterEffector* const effector = (dBalacingCharacterEffector*)transform.m_effector;
+			effector->SetMatrix(x, y, z, pitch);
+		}
 	}
 
 	dModelKeyFramePose m_pose;
@@ -707,18 +707,12 @@ class dBalancingCharacterManager: public dModelManager
 
 			case dBalancingCharacterBoneDefinition::m_1dof:
 			{
-#if 0
-				dCustomHinge* const joint = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
-				joint->EnableLimits(true);
-				joint->SetLimits(definition.m_jointLimits.m_minTwistAngle * dDegreeToRad, definition.m_jointLimits.m_maxTwistAngle * dDegreeToRad);
-#else
 				dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, bone, parent);
 				joint->EnableTwist(true);
 				joint->SetTwistLimits(definition.m_jointLimits.m_minTwistAngle * dDegreeToRad, definition.m_jointLimits.m_maxTwistAngle * dDegreeToRad);
 
 				joint->EnableCone(true);
 				joint->SetConeLimits(0.0f);
-#endif
 				break;
 			}
 
@@ -741,6 +735,16 @@ class dBalancingCharacterManager: public dModelManager
 
 				joint->EnableCone(true);
 				joint->SetConeLimits(definition.m_jointLimits.m_coneAngle * dDegreeToRad);
+				break;
+			}
+
+			case dBalancingCharacterBoneDefinition::m_fkEffector:
+			{
+				dCustomKinematicController* const effector = new dCustomKinematicController(bone, pinAndPivotInGlobalSpace, parent);
+				effector->SetSolverModel(1);
+				effector->SetControlMode(dCustomKinematicController::m_full6dof);
+				effector->SetMaxAngularFriction(1.0e20f);
+				effector->SetMaxLinearFriction(1.0e20f);
 				break;
 			}
 
@@ -859,7 +863,7 @@ class dBalancingCharacterManager: public dModelManager
 			for (int i = 1; descriptor.m_skeletonDefinition[i].m_boneName; i++) {
 				if (!strcmp(descriptor.m_skeletonDefinition[i].m_boneName, name)) {
 					NewtonBody* const parentBody = parentBone->GetBody();
-					if (descriptor.m_skeletonDefinition[i].m_type == dBalancingCharacterBoneDefinition::m_effector) {
+					if (descriptor.m_skeletonDefinition[i].m_type == dBalancingCharacterBoneDefinition::m_ikEffector) {
 						dModelKeyFrame effectorPose;
 						dMatrix effectorMatrix(entity->CalculateGlobalMatrix());
 						effectorPose.m_effector = ConnectEffector(parentBone, effectorMatrix, descriptor.m_mass);
