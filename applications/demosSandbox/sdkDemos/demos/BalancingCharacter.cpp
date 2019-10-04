@@ -531,13 +531,13 @@ class dBalancingCharacter: public dModelRootNode
 	}
 
 
-	void SetAnimTree(dCustomKinematicController* const rootEffector0, dCustomKinematicController* const rootEffector1)
+	void SetAnimTree(int count, dCustomKinematicController** const effectors)
 	{
-		dModelAnimTree* const poseGenerator = new dModelAnimTreePose(this, m_pose);
-		dModelAnimTreePoseBalance* const poseBalance = new dModelAnimTreePoseBalance(this, poseGenerator, rootEffector0, rootEffector1);
+		//dModelAnimTree* const poseGenerator = new dModelAnimTreePose(this, m_pose);
+		//dModelAnimTreePoseBalance* const poseBalance = new dModelAnimTreePoseBalance(this, poseGenerator, rootEffector0, rootEffector1);
 		//dModelAnimTree* const footRoll = new dModelAnimTreeFootAlignment(this, poseBalance, rootEffector0, rootEffector1);
 		//m_animtree = footRoll;
-		m_animtree = poseBalance;
+		//m_animtree = poseBalance;
 	}
 
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
@@ -567,12 +567,12 @@ class dBalancingCharacter: public dModelRootNode
 		//	//break;
 		//}
 
-		dModelKeyFramePose::dListNode* node = m_pose.GetFirst();
-		if (node) {
-			dModelKeyFrame& transform = node->GetInfo();
-			dBalacingCharacterEffector* const effector = (dBalacingCharacterEffector*)transform.m_effector;
-			effector->SetMatrix(x, y, z, pitch);
-		}
+		//dModelKeyFramePose::dListNode* node = m_pose.GetFirst();
+		//if (node) {
+		//	dModelKeyFrame& transform = node->GetInfo();
+		//	dBalacingCharacterEffector* const effector = (dBalacingCharacterEffector*)transform.m_effector;
+		//	effector->SetMatrix(x, y, z, pitch);
+		//}
 	}
 
 	dModelKeyFramePose m_pose;
@@ -665,7 +665,7 @@ class dBalancingCharacterManager: public dModelManager
 		return boneBody;
 	}
 
-	dBalacingCharacterEffector* ConnectEffector(dModelNode* const effectorNode, const dMatrix& effectorMatrix, const dFloat modelMass)
+	dCustomKinematicController* ConnectEffector(dModelNode* const effectorNode, const dMatrix& effectorMatrix, const dFloat modelMass)
 	{
 		//const dModelNode* const referenceNode = effectorNode->GetParent()->GetParent();
 		//dAssert(referenceNode);
@@ -678,7 +678,7 @@ class dBalancingCharacterManager: public dModelManager
 		return effector;
 	}
 
-	void ConnectLimb(NewtonBody* const bone, NewtonBody* const parent, const dBalancingCharacterBoneDefinition& definition)
+	dCustomJoint* ConnectLimb(NewtonBody* const bone, NewtonBody* const parent, const dBalancingCharacterBoneDefinition& definition)
 	{
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone, &matrix[0][0]);
@@ -687,6 +687,7 @@ class dBalancingCharacterManager: public dModelManager
 		dMatrix pinAndPivotInGlobalSpace(dPitchMatrix(frameAngle.m_pitch * dDegreeToRad) * dYawMatrix(frameAngle.m_yaw * dDegreeToRad) * dRollMatrix(frameAngle.m_roll * dDegreeToRad));
 		pinAndPivotInGlobalSpace = pinAndPivotInGlobalSpace * matrix;
 
+		dCustomJoint* ret = NULL;
 		switch (definition.m_type)
 		{
 			case dBalancingCharacterBoneDefinition::m_ball:
@@ -694,6 +695,7 @@ class dBalancingCharacterManager: public dModelManager
 				dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotInGlobalSpace, bone, parent);
 				joint->EnableCone(false);
 				joint->EnableTwist(false);
+				ret = joint;
 				break;
 			}
 
@@ -702,6 +704,7 @@ class dBalancingCharacterManager: public dModelManager
 				dCustomHinge* const joint = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
 				joint->EnableLimits(true);
 				joint->SetLimits(0.0f, 0.0f);
+				ret = joint;
 				break;
 			}
 
@@ -713,6 +716,7 @@ class dBalancingCharacterManager: public dModelManager
 
 				joint->EnableCone(true);
 				joint->SetConeLimits(0.0f);
+				ret = joint;
 				break;
 			}
 
@@ -724,6 +728,7 @@ class dBalancingCharacterManager: public dModelManager
 
 				joint->EnableCone(true);
 				joint->SetConeLimits(definition.m_jointLimits.m_coneAngle * dDegreeToRad);
+				ret = joint;
 				break;
 			}
 
@@ -735,6 +740,7 @@ class dBalancingCharacterManager: public dModelManager
 
 				joint->EnableCone(true);
 				joint->SetConeLimits(definition.m_jointLimits.m_coneAngle * dDegreeToRad);
+				ret = joint;
 				break;
 			}
 
@@ -745,12 +751,15 @@ class dBalancingCharacterManager: public dModelManager
 				effector->SetControlMode(dCustomKinematicController::m_full6dof);
 				effector->SetMaxAngularFriction(1.0e20f);
 				effector->SetMaxLinearFriction(1.0e20f);
+				ret = effector;
 				break;
 			}
 
 			default:
+				ret = NULL;
 				dAssert (0);
 		}
+		return ret;
 	}
 
 	void NormalizeMassAndInertia(dModelRootNode* const model, dFloat modelMass) const
@@ -848,10 +857,8 @@ class dBalancingCharacterManager: public dModelManager
 		}
 
 		// walk model hierarchic adding all children designed as rigid body bones. 
-		int footEffectorsCoint = 0;
-		dCustomKinematicController* footEffectors[2];
-		footEffectors[0] = NULL;
-		footEffectors[1] = NULL;
+		int effectorsCount = 0;
+		dCustomKinematicController* effectorList[16];
 		while (stackIndex) {
 			stackIndex--;
 
@@ -871,15 +878,22 @@ class dBalancingCharacterManager: public dModelManager
 						effectorPose.SetMatrix (effectorPose.m_effector->GetTargetMatrix());
 						model->m_pose.Append(effectorPose);
 
-						footEffectors[footEffectorsCoint] = effectorPose.m_effector;
-						footEffectorsCoint ++;
-
+						effectorList[effectorsCount] = effectorPose.m_effector;
+						effectorsCount++;
 					} else {
 						NewtonBody* const childBody = CreateBodyPart(entity, descriptor.m_skeletonDefinition[i]);
-						ConnectLimb(childBody, parentBody, descriptor.m_skeletonDefinition[i]);
-
+						dCustomJoint* const joint = ConnectLimb(childBody, parentBody, descriptor.m_skeletonDefinition[i]);
 						dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
 						dModelNode* const bone = new dModelNode(childBody, bindMatrix, parentBone);
+
+						if (joint->IsType(dCustomKinematicController::GetType())) {
+							dModelKeyFrame effectorPose;
+							effectorPose.m_effector = (dCustomKinematicController*)joint;
+							effectorPose.SetMatrix(effectorPose.m_effector->GetTargetMatrix());
+							model->m_pose.Append(effectorPose);
+							effectorList[effectorsCount] = effectorPose.m_effector;
+							effectorsCount++;
+						}
 
 						for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
 							parentBones[stackIndex] = bone;
@@ -904,7 +918,7 @@ class dBalancingCharacterManager: public dModelManager
 #endif
 
 		// setup the pose generator 
-		model->SetAnimTree(footEffectors[0], footEffectors[1]);
+		model->SetAnimTree(effectorsCount, effectorList);
 
 
 		//m_currentController = robot;
