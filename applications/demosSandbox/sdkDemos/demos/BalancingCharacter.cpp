@@ -490,6 +490,92 @@ class dModelAnimTreeFootAlignment: public dModelAnimTreeFootBase
 };
 */
 
+
+class dModelAnimTreeAnkleAndFootController: public dModelAnimTree
+{
+	public:
+	dModelAnimTreeAnkleAndFootController(dModelRootNode* const model, dModelAnimTree* const child, int count, dCustomKinematicController** const effectors)
+		:dModelAnimTree(model)
+		,m_child(child)
+	{
+	}
+
+	~dModelAnimTreeAnkleAndFootController()
+	{
+		delete m_child;
+	}
+
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		//dMatrix matrix;
+		//NewtonBodyGetMatrix(GetRoot()->GetBody(), &matrix[0][0]);
+		//matrix.m_posit = CalculateCenterOfMass();
+		//debugContext->DrawFrame(matrix);
+		m_child->Debug(debugContext);
+	}
+
+	/*
+	bool CalculateUpVector(dVector& upvector, dCustomKinematicController* const effector) const
+	{
+	bool ret = false;
+	NewtonBody* const body0 = effector->GetBody0();
+	for (NewtonJoint* contactjoint = NewtonBodyGetFirstContactJoint(body0); contactjoint; contactjoint = NewtonBodyGetNextContactJoint(body0, contactjoint)) {
+	ret = true;
+	dVector averageNormal(0.0f);
+	for (void* contact = NewtonContactJointGetFirstContact(contactjoint); contact; contact = NewtonContactJointGetNextContact(contactjoint, contact)) {
+	NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+	dVector point(0.0f);
+	dVector normal(0.0f);
+	NewtonMaterialGetContactPositionAndNormal(material, body0, &point.m_x, &normal.m_x);
+	averageNormal += normal;
+	}
+	upvector = averageNormal.Normalize();
+	break;
+	}
+
+	ret = true;
+	upvector = dVector (0.0f, 1.0f, 0.0f, 0.0f);
+	upvector = dPitchMatrix(30.0f * dDegreeToRad).RotateVector(upvector);
+
+	return ret;
+
+	}
+	*/
+
+	void GeneratePose(dFloat timestep, dModelKeyFramePose& output)
+	{
+		m_child->GeneratePose(timestep, output);
+		/*
+		dModelKeyFrame* feetPose[2];
+		const int count = GetModelKeyFrames(output, &feetPose[0]);
+		for (int i = 0; i < count; i++) {
+		dMatrix targetMatrix (m_rootEffector0->GetBodyMatrix());
+		dVector com (CalculateCenterOfMass());
+
+		dVector error (targetMatrix.m_posit - com);
+		//error.m_x = 0.0f;
+		error.m_y = 0.0f;
+		//error.m_z = 0.0f;
+
+		targetMatrix.m_posit -= error.Scale (0.35f);
+		//dTrace (("(%f %f %f) (%f %f %f)\n", com.m_x, com.m_y, com.m_z, targetMatrix.m_posit.m_x, targetMatrix.m_posit.m_y, targetMatrix.m_posit.m_z));
+
+		dMatrix rootMatrix;
+		NewtonBodyGetMatrix (m_rootEffector0->GetBody1(), &rootMatrix[0][0]);
+
+		dMatrix effectorMatrix (targetMatrix * rootMatrix.Inverse());
+		for (dModelKeyFramePose::dListNode* node = output.GetFirst(); node; node = node->GetNext()) {
+		//dModelKeyFrame& transform = node->GetInfo();
+		//transform.m_posit = effectorMatrix.m_posit;
+		//transform.SetMatrix(effectorMatrix);
+		}
+		}
+		*/
+	}
+
+	dModelAnimTree* m_child;
+};
+
 class dBalancingCharacter: public dModelRootNode
 {
 	public:
@@ -533,11 +619,14 @@ class dBalancingCharacter: public dModelRootNode
 
 	void SetAnimTree(int count, dCustomKinematicController** const effectors)
 	{
-		//dModelAnimTree* const poseGenerator = new dModelAnimTreePose(this, m_pose);
+		dModelAnimTree* const poseGenerator = new dModelAnimTreePose(this, m_pose);
+		dModelAnimTree* const feetController = new dModelAnimTreeAnkleAndFootController(this, poseGenerator, count, effectors);
 		//dModelAnimTreePoseBalance* const poseBalance = new dModelAnimTreePoseBalance(this, poseGenerator, rootEffector0, rootEffector1);
 		//dModelAnimTree* const footRoll = new dModelAnimTreeFootAlignment(this, poseBalance, rootEffector0, rootEffector1);
 		//m_animtree = footRoll;
 		//m_animtree = poseBalance;
+		m_animtree = feetController;
+		//m_animtree = poseGenerator;
 	}
 
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
@@ -558,7 +647,7 @@ class dBalancingCharacter: public dModelRootNode
 
 	void ApplyControls (dFloat timestep, dFloat x, dFloat y, dFloat z, dFloat pitch)
 	{
-		//m_animtree->GeneratePose(timestep, m_pose);
+		m_animtree->GeneratePose(timestep, m_pose);
 		//for (dModelKeyFramePose::dListNode* node = m_pose.GetFirst(); node; node = node->GetNext()) {
 		//	dModelKeyFrame& transform = node->GetInfo();
 		//	transform.m_effector->SetTargetMatrix(dMatrix(transform.m_rotation, transform.m_posit));
