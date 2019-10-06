@@ -1036,10 +1036,10 @@ class dBalancingCharacterManager: public dModelManager
 	}
 	
 	//dBalancingCharacter* m_currentController;
-	dFloat m_pitch;
-	dFloat m_posit_x;
-	dFloat m_posit_y;
-	dFloat m_posit_z;
+	dFloat32 m_pitch;
+	dFloat32 m_posit_x;
+	dFloat32 m_posit_y;
+	dFloat32 m_posit_z;
 };
 
 

@@ -101,13 +101,13 @@ class dSixAxisRobot: public dModelRootNode
 			// clamp rotation to not more than one degree per step.
 			dFloat angleStep = 0.5f;
 			dFloat azimuthError = dClamp (azimuth - m_azimuth, -angleStep, angleStep);
-			m_azimuth += azimuthError;
+			m_azimuth += dFloat32 (azimuthError);
 
-			m_posit_x = posit_x;
-			m_posit_y = posit_y;
-			m_pitch = pitch;
-			m_yaw = yaw;
-			m_roll = roll;
+			m_posit_x = dFloat32 (posit_x);
+			m_posit_y = dFloat32 (posit_y);
+			m_pitch = dFloat32 (pitch);
+			m_yaw = dFloat32 (yaw);
+			m_roll = dFloat32 (roll);
 
 			dMatrix yawMatrix(dYawMatrix(m_azimuth * dDegreeToRad));
 			dMatrix gripperMatrix(dPitchMatrix(m_pitch * dDegreeToRad) * dYawMatrix(m_yaw * dDegreeToRad) * dRollMatrix(m_roll * dDegreeToRad) * m_gripperMatrix);
@@ -117,7 +117,7 @@ class dSixAxisRobot: public dModelRootNode
 			m_effector->SetTargetMatrix(gripperMatrix * yawMatrix * m_pivotMatrix);
 		}
 
-		m_gripperPosit = gripper;
+		m_gripperPosit = dFloat32 (gripper);
 		if (m_gripper0) {
 			m_gripper0->SetTargetPosit(m_gripperPosit);
 		}
