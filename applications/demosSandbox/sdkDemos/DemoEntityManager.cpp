@@ -66,10 +66,10 @@
 //#define DEFAULT_SCENE	30		// standard joints
 //#define DEFAULT_SCENE	31		// servo joints
 //#define DEFAULT_SCENE	32		// articulated joints
-//#define DEFAULT_SCENE	33		// six axis manipulator
+#define DEFAULT_SCENE	33		// six axis manipulator
 //#define DEFAULT_SCENE	34		// hexapod Robot
 //#define DEFAULT_SCENE	35		// basic rag doll
-#define DEFAULT_SCENE	36		// balancing character
+//#define DEFAULT_SCENE	36		// balancing character
 //#define DEFAULT_SCENE	37		// dynamic rag doll
 //#define DEFAULT_SCENE	38		// basic Car
 //#define DEFAULT_SCENE	39		// single body vehicle
@@ -351,7 +351,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showUI = false;
 //	m_showAABB = false;
 //	m_showContactPoints = true;
-	m_hideVisualMeshes = true;
+//	m_hideVisualMeshes = true;
 //	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
@@ -360,9 +360,9 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showRaycastHit = true;
 //	m_showNormalForces = true;
 //	m_showCenterOfMass = false;
-	m_showJointDebugInfo = true;
-	m_showListenersDebugInfo = true;
-	m_collisionDisplayMode = 2;
+//	m_showJointDebugInfo = true;
+//	m_showListenersDebugInfo = true;
+//	m_collisionDisplayMode = 2;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
 

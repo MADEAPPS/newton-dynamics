@@ -27,13 +27,14 @@ class dSixAxisJointDefinition
 	{
 		m_node,
 		m_hinge,
+		m_sliderActuator,
 		m_effector,
 	};
 
 	struct dJointLimit
 	{
-		dFloat m_minTwistAngle;
-		dFloat m_maxTwistAngle;
+		dFloat m_minLimit;
+		dFloat m_maxLimit;
 	};
 
 	char* m_boneName;
@@ -51,6 +52,8 @@ static dSixAxisJointDefinition robot1[] =
 	{ "bone_base004", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.1f },
 	{ "bone_base005", dSixAxisJointDefinition::m_hinge, { -225.0f, 45.0f }, 0.06f },
 	{ "bone_base006", dSixAxisJointDefinition::m_hinge, { -1000.0f, 1000.0f }, 0.06f },
+	{ "actuator_slider0", dSixAxisJointDefinition::m_sliderActuator, { -0.3f, 0.1f }, 0.02f},
+	{ "actuator_slider1", dSixAxisJointDefinition::m_sliderActuator, { -0.3f, 0.1f }, 0.02f},
 	{ "effector", dSixAxisJointDefinition::m_effector, { -1000.0f, 1000.0f }},
 	{ NULL},
 };
@@ -63,12 +66,19 @@ class dSixAxisRobot: public dModelRootNode
 		,m_pivotMatrix(dGetIdentityMatrix())
 		,m_gripperMatrix(dGetIdentityMatrix())
 		,m_effector(NULL)
+		,m_gripper0(NULL)
+		,m_gripper1(NULL)
+		,m_gripperPosit(0.0f)
 		,m_azimuth(0.0f)
 		,m_posit_x(0.0f)
 		,m_posit_y(0.0f)
 		,m_pitch(0.0f)
 		,m_yaw(0.0f)
 		,m_roll(0.0f)
+	{
+	}
+
+	~dSixAxisRobot()
 	{
 	}
 
@@ -85,10 +95,14 @@ class dSixAxisRobot: public dModelRootNode
 		}
 	}
 
-	void UpdateEffectors (dFloat azimuth, dFloat posit_x, dFloat posit_y, dFloat pitch, dFloat yaw, dFloat roll)
+	void UpdateEffectors (dFloat gripper, dFloat azimuth, dFloat posit_x, dFloat posit_y, dFloat pitch, dFloat yaw, dFloat roll)
 	{
 		if (m_effector) {
-			m_azimuth = azimuth;
+			// clamp rotation to not more than one degree per step.
+			dFloat angleStep = 0.5f;
+			dFloat azimuthError = dClamp (azimuth - m_azimuth, -angleStep, angleStep);
+			m_azimuth += azimuthError;
+
 			m_posit_x = posit_x;
 			m_posit_y = posit_y;
 			m_pitch = pitch;
@@ -102,17 +116,29 @@ class dSixAxisRobot: public dModelRootNode
 			gripperMatrix.m_posit.m_y += m_posit_y;
 			m_effector->SetTargetMatrix(gripperMatrix * yawMatrix * m_pivotMatrix);
 		}
+
+		m_gripperPosit = gripper;
+		if (m_gripper0) {
+			m_gripper0->SetTargetPosit(m_gripperPosit);
+		}
+		if (m_gripper1) {
+			m_gripper1->SetTargetPosit(m_gripperPosit);
+		}
 	}
 	
 	dMatrix m_pivotMatrix;
 	dMatrix m_gripperMatrix;
 	dCustomKinematicController* m_effector;
-	dFloat m_azimuth;
-	dFloat m_posit_x;
-	dFloat m_posit_y;
-	dFloat m_pitch;
-	dFloat m_yaw;
-	dFloat m_roll;
+	dCustomSliderActuator* m_gripper0;
+	dCustomSliderActuator* m_gripper1;
+
+	dFloat32 m_gripperPosit;
+	dFloat32 m_azimuth;
+	dFloat32 m_posit_x;
+	dFloat32 m_posit_y;
+	dFloat32 m_pitch;
+	dFloat32 m_yaw;
+	dFloat32 m_roll;
 };
 
 class dSixAxisManager: public dModelManager
@@ -121,6 +147,7 @@ class dSixAxisManager: public dModelManager
 	dSixAxisManager(DemoEntityManager* const scene)
 		:dModelManager(scene->GetNewton())
 		,m_currentController(NULL)
+		,m_gripperPosit(0.0f)
 		,m_azimuth(0.0f)
 		,m_posit_x(-0.5f)
 		,m_posit_y(-0.5f)
@@ -140,6 +167,9 @@ class dSixAxisManager: public dModelManager
 		dSixAxisManager* const me = (dSixAxisManager*)context;
 
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print(color, "gripper position");
+		ImGui::SliderFloat("Gripper", &me->m_gripperPosit, -0.2f, 0.03f);
+
 		scene->Print(color, "linear degrees of freedom");
 		ImGui::SliderFloat("Azimuth", &me->m_azimuth, -180.0f, 180.0f);
 		ImGui::SliderFloat("posit_x", &me->m_posit_x, -1.4f, 0.2f);
@@ -209,18 +239,28 @@ class dSixAxisManager: public dModelManager
 		return effector;
 	}
 
-	void ConnectWithHingeJoint(NewtonBody* const bone, NewtonBody* const parent, const dSixAxisJointDefinition& definition)
+	dCustomJoint* ConnectJoint(NewtonBody* const bone, NewtonBody* const parent, const dSixAxisJointDefinition& definition)
 	{
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone, &matrix[0][0]);
 
 		dMatrix pinAndPivotInGlobalSpace(dRollMatrix(90.0f * dDegreeToRad) * matrix);
 
-		dCustomHinge* const joint = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
-		if (definition.m_jointLimits.m_maxTwistAngle < 360.0f) {
-			joint->EnableLimits(true);
-			joint->SetLimits(definition.m_jointLimits.m_minTwistAngle * dDegreeToRad, definition.m_jointLimits.m_maxTwistAngle * dDegreeToRad);
+		dCustomJoint* joint = NULL;
+		if (definition.m_type == dSixAxisJointDefinition::m_hinge) {
+			dCustomHinge* const hinge = new dCustomHinge(pinAndPivotInGlobalSpace, bone, parent);
+			if (definition.m_jointLimits.m_maxLimit < 360.0f) {
+				hinge->EnableLimits(true);
+				hinge->SetLimits(definition.m_jointLimits.m_minLimit * dDegreeToRad, definition.m_jointLimits.m_maxLimit * dDegreeToRad);
+			}
+			joint = hinge;
+		} else if (definition.m_type == dSixAxisJointDefinition::m_sliderActuator) {
+			dCustomSliderActuator* const slider = new dCustomSliderActuator (pinAndPivotInGlobalSpace, 2.0f, definition.m_jointLimits.m_minLimit, definition.m_jointLimits.m_maxLimit, bone, parent);
+			slider->SetMinForce (-9.8f * 100.0f);
+			slider->SetMaxForce (1.0e20f);
+			joint = slider;
 		}
+		return joint;
 	}
 
 	void NormalizeMassAndInertia(dModelRootNode* const model, dFloat modelMass) const
@@ -324,8 +364,15 @@ class dSixAxisManager: public dModelManager
 						robot->m_effector = ConnectEffector(robot, SIZE_ROBOT_MASS, entity, parentBody, definition[i]);
 					} else {
 						NewtonBody* const childBody = CreateBodyPart(entity, definition[i]);
-						ConnectWithHingeJoint(childBody, parentBody, definition[i]);
-
+						dCustomJoint* const joint = ConnectJoint(childBody, parentBody, definition[i]);
+						if (joint->IsType(dCustomSliderActuator::GetType())) {
+							if (!robot->m_gripper0) {
+								robot->m_gripper0 = (dCustomSliderActuator*) joint;
+							} else {
+								robot->m_gripper1 = (dCustomSliderActuator*) joint;
+							}
+						}
+						
 						dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
 						dModelNode* const bone = new dModelNode(childBody, bindMatrix, parentBone);
 
@@ -371,13 +418,14 @@ class dSixAxisManager: public dModelManager
 	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const 
 	{
 		if (model == m_currentController) {
-			m_currentController->UpdateEffectors (m_azimuth, m_posit_x, m_posit_y, 
+			m_currentController->UpdateEffectors (m_gripperPosit, m_azimuth, m_posit_x, m_posit_y, 
 												  m_gripper_pitch, m_gripper_yaw, m_gripper_roll);
 		}
 	}
 	
 	dSixAxisRobot* m_currentController;
 
+	dFloat32 m_gripperPosit;
 	dFloat32 m_azimuth;
 	dFloat32 m_posit_x;
 	dFloat32 m_posit_y;

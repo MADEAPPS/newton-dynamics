@@ -104,7 +104,11 @@ void dCustomHingeActuator::SetAngularRate(dFloat rate)
 
 void dCustomHingeActuator::SetTargetAngle(dFloat angle)
 {
-	m_targetAngle.SetAngle (dClamp (angle, m_minAngle, m_maxAngle));
+	angle = dClamp (angle, m_minAngle, m_maxAngle);
+	if (dAbs (angle - m_targetAngle.GetAngle()) > dFloat (1.0e-3f)) {
+		NewtonBodySetSleepState(m_body0, 0);
+		m_targetAngle.SetAngle (dClamp (angle, m_minAngle, m_maxAngle));
+	}
 }
 
 dFloat dCustomHingeActuator::GetActuatorAngle() const
@@ -151,7 +155,13 @@ void dCustomHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatri
 	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
 	dFloat accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + currentSpeed * invTimeStep;
 	NewtonUserJointSetRowAcceleration(m_joint, accel);
-	NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque);
-	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	if (angle > GetMaxAngularLimit()) {
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque);
+	} else if (angle < GetMinAngularLimit()) {
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque);
+	} else {
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxTorque);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxTorque);
+	}
 }
