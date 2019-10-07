@@ -355,12 +355,11 @@ void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& conta
 
 	// clip player velocity along the high contacts
 	bool applyStep = false; 
-	dVector veloc (0.0f);
 	dImpulseSolver impulseSolver(this);
 	int index = impulseSolver.AddLinearRow(coodinateMatrix[0], impulseSolver.m_zero, 0.0f, 0.0f, 1.0e12f);
 	impulseSolver.AddLinearRow(coodinateMatrix[1], impulseSolver.m_zero, -m_forwardSpeed, -D_STEP_FRICTION, D_STEP_FRICTION, index);
 	impulseSolver.AddLinearRow(coodinateMatrix[2], impulseSolver.m_zero, m_lateralSpeed, -D_STEP_FRICTION, D_STEP_FRICTION, index);
-	veloc = saveVeloc + impulseSolver.CalculateImpulse().Scale(m_invMass);
+	dVector veloc (saveVeloc + impulseSolver.CalculateImpulse().Scale(m_invMass));
 
 	for (int i = 0; !applyStep && (i < 4); i ++) {
 		NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
@@ -526,7 +525,6 @@ void dCustomPlayerController::ResolveInterpenetrations(dContactSolver& contactSo
 		com.m_w = 0.0f;
 
 		impulseSolver.Reset(this);
-		impulseSolver.AddAngularRows();
 		for (int i = 0; i < contactSolver.m_contactCount; i++) {
 			NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
 
@@ -534,12 +532,10 @@ void dCustomPlayerController::ResolveInterpenetrations(dContactSolver& contactSo
 			dVector normal(contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat (0.0f));
 			int index = impulseSolver.AddContactRow(&contact, normal, point - com, 0.0f, 0.0f, 1.0e12f);
 
-			dFloat impulse = 0.0f;
-			if (!impulseSolver.m_contactPoint[i]) {
-				impulse = invTimestep * dClamp(contact.m_penetration - D_MAX_COLLISION_PENETRATION * 0.5f, dFloat(0.0f), dFloat(0.5f));
-			}
+			dFloat impulse = invTimestep * dClamp(contact.m_penetration - D_MAX_COLLISION_PENETRATION * 0.5f, dFloat(0.0f), dFloat(0.5f));
 			impulseSolver.m_rhs[index] = impulse;
 		}
+		impulseSolver.AddAngularRows();
 
 		dVector veloc (impulseSolver.CalculateImpulse().Scale (m_invMass));
 		NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
