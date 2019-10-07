@@ -364,7 +364,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit.m_z = 20.0f;
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 20.0f);
-//	location.m_posit.m_y += 1.0f;
+	location.m_posit.m_y += 1.0f;
 	dCustomPlayerController*  const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 	playerManager->SetAsPlayer(player);
 
@@ -383,13 +383,22 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	// add a hanging bridge
 	CreateBridge(scene, playgroundBody);
-	
+
 	int count = 1;
+	// add heavy box
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-	AddPrimitiveArray(scene, 30.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
+	AddPrimitiveArray(scene, 200.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
+
+	// add equal weight box
+	location.m_posit.m_z -= 4.0f;
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector(2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
+	
+	// add light weight box
+	location.m_posit.m_z -= 4.0f;
+	AddPrimitiveArray(scene, 30.0f, location.m_posit, dVector(2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
 
 	location.m_posit.m_x -= 5.0f;
-	//AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 0.5f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 0.5f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
 
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;

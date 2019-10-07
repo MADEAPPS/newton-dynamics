@@ -597,10 +597,12 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 	dgConveFaceNode convexHull[32];
 	dgContactPoint buffer[32];
 
-	dgFloat32 maxPenetration = dgFloat32(0.0f);
+	// it is a big mistake to set contact to deepest penetration because si cause unwanted pops.
+	// is better to present the original contact penetrations
+	//dgFloat32 maxPenetration = dgFloat32(0.0f);
 	for (dgInt32 i = 0; i < count; i++) {
 		array[i] = matrix.UntransformVector(contactArray[i].m_point) & xyMask;
-		maxPenetration = dgMax (maxPenetration, contactArray[i].m_penetration);
+	//	maxPenetration = dgMax (maxPenetration, contactArray[i].m_penetration);
 	}
 
 	dgInt32 i0 = PruneSupport(count, dgCollisionContactCloud::m_pruneSupportX, array);
@@ -741,7 +743,7 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 	do {
 		contactArray[hullCount] = ptr->m_contact;
 		//contactArray[hullCount].m_normal = averageNormal;
-		contactArray[hullCount].m_penetration = maxPenetration;
+		//contactArray[hullCount].m_penetration = maxPenetration;
 		hullCount ++;
 		ptr = ptr->m_next;
 	} while (ptr != hullPoint);

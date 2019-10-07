@@ -66,7 +66,7 @@
 //#define DEFAULT_SCENE	30		// standard joints
 //#define DEFAULT_SCENE	31		// servo joints
 //#define DEFAULT_SCENE	32		// articulated joints
-#define DEFAULT_SCENE	33		// six axis manipulator
+//#define DEFAULT_SCENE	33		// six axis manipulator
 //#define DEFAULT_SCENE	34		// hexapod Robot
 //#define DEFAULT_SCENE	35		// basic rag doll
 //#define DEFAULT_SCENE	36		// balancing character
@@ -76,7 +76,7 @@
 //#define DEFAULT_SCENE	40		// David Gravel multi body car
 //#define DEFAULT_SCENE	41		// super Car
 //#define DEFAULT_SCENE	42		// heavy vehicles
-//#define DEFAULT_SCENE	43		// basic player controller
+#define DEFAULT_SCENE	43		// basic player controller
 //#define DEFAULT_SCENE	44		// animated player controller
 //#define DEFAULT_SCENE	45		// advanced player controller
 //#define DEFAULT_SCENE	46		// cloth patch			

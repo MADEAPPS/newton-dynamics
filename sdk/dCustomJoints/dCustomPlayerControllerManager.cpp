@@ -62,6 +62,7 @@ class dCustomPlayerController::dImpulseSolver
 {
 	public: 
 	dImpulseSolver (dCustomPlayerController* const controller)
+		:m_zero(0.0f)
 	{
 		m_mass = controller->m_mass;
 		m_invMass = controller->m_invMass;
@@ -77,31 +78,82 @@ class dCustomPlayerController::dImpulseSolver
 
 	void AddAngularRows ()
 	{
-		dVector zero (0.0f);
 		for (int i = 0; i < 3; i ++) {
 			m_contactPoint[m_rowCount] = NULL;
-			m_jacobian[m_rowCount].m_linear = zero;
-			m_jacobian[m_rowCount].m_angular = zero;
-			m_jacobian[m_rowCount].m_angular[i] = dFloat(1.0f);
+			m_jacobianPairs[m_rowCount].m_jacobian_J10.m_linear = m_zero;
+			m_jacobianPairs[m_rowCount].m_jacobian_J10.m_angular = m_zero;
+			m_jacobianPairs[m_rowCount].m_jacobian_J01.m_linear = m_zero;
+			m_jacobianPairs[m_rowCount].m_jacobian_J01.m_angular = m_zero;
+			m_jacobianPairs[m_rowCount].m_jacobian_J01.m_angular[i] = dFloat(1.0f);
 			m_rhs[m_rowCount] = 0.0f;
-			m_impulseMag[m_rowCount] = 0;
 			m_low[m_rowCount] = -1.0e12f;
 			m_high[m_rowCount] = 1.0e12f;
+			m_impulseMag[m_rowCount] = 0.0f;
 			m_normalIndex[m_rowCount] = 0;
 			m_rowCount++;
 			dAssert(m_rowCount < D_MAX_ROWS);
 		}
 	}
 
-	int AddLinearRow (const dVector& dir, const dVector& r, dFloat accel, dFloat low, dFloat high, int normalIndex = -1)
+	int AddLinearRow (const dVector& dir, const dVector& r, dFloat speed, dFloat low, dFloat high, int normalIndex = -1)
 	{
 		m_contactPoint[m_rowCount] = NULL;
-		m_jacobian[m_rowCount].m_linear = dir;
-		m_jacobian[m_rowCount].m_angular = r.CrossProduct(dir);
+		m_jacobianPairs[m_rowCount].m_jacobian_J01.m_linear = dir;
+		m_jacobianPairs[m_rowCount].m_jacobian_J01.m_angular = r.CrossProduct(dir);
+		m_jacobianPairs[m_rowCount].m_jacobian_J10.m_linear = m_zero;
+		m_jacobianPairs[m_rowCount].m_jacobian_J10.m_angular = m_zero;
+
 		m_low[m_rowCount] = low;
 		m_high[m_rowCount] = high;
 		m_normalIndex[m_rowCount] = (normalIndex == -1) ? 0 : normalIndex - m_rowCount;
-		m_rhs[m_rowCount] = accel - m_veloc.DotProduct3(m_jacobian[m_rowCount].m_linear);
+		m_rhs[m_rowCount] = speed - m_veloc.DotProduct3(m_jacobianPairs[m_rowCount].m_jacobian_J01.m_linear);
+		m_rowCount++;
+		dAssert(m_rowCount < D_MAX_ROWS);
+		return m_rowCount - 1;
+	}
+
+	int AddContactRow (const NewtonWorldConvexCastReturnInfo* const contact, const dVector& dir, const dVector& r, dFloat speed, dFloat low, dFloat high, int normalIndex = -1)
+	{
+		dFloat invIxx;
+		dFloat invIyy;
+		dFloat invIzz;
+		dFloat invMass;
+		dAssert (contact->m_hitBody);
+		NewtonBodyGetInvMass (contact->m_hitBody, &invMass, &invIxx, &invIyy, &invIzz);
+		if (invMass == 0.0f) {
+			return AddLinearRow(dir, r, speed, low, high, normalIndex);
+		}
+
+		dMatrix matrix;
+		dVector com;
+		dVector veloc;
+		dVector omega;
+
+		NewtonBodyGetOmega(contact->m_hitBody, &omega[0]);
+		NewtonBodyGetVelocity(contact->m_hitBody, &veloc[0]);
+		NewtonBodyGetMatrix(contact->m_hitBody, &matrix[0][0]);
+		NewtonBodyGetCentreOfMass(contact->m_hitBody, &com[0]);
+		com = matrix.TransformVector(com);
+
+		dVector p1(contact->m_point[0], contact->m_point[1], contact->m_point[2], dFloat(0.0f));
+		dVector r1 (p1 - com);
+		dVector dir1 (dir.Scale (-1.0f));
+
+		m_contactPoint[m_rowCount] = contact;
+		m_jacobianPairs[m_rowCount].m_jacobian_J01.m_linear = dir;
+		m_jacobianPairs[m_rowCount].m_jacobian_J01.m_angular = r.CrossProduct(dir);
+		m_jacobianPairs[m_rowCount].m_jacobian_J10.m_linear = dir1;
+		m_jacobianPairs[m_rowCount].m_jacobian_J10.m_angular = r1.CrossProduct(dir1);
+
+		m_low[m_rowCount] = low;
+		m_high[m_rowCount] = high;
+		m_normalIndex[m_rowCount] = (normalIndex == -1) ? 0 : normalIndex - m_rowCount;
+
+		dVector s (m_veloc * m_jacobianPairs[m_rowCount].m_jacobian_J01.m_linear + 
+				   veloc * m_jacobianPairs[m_rowCount].m_jacobian_J10.m_linear + 
+				   omega * m_jacobianPairs[m_rowCount].m_jacobian_J10.m_angular);
+		m_rhs[m_rowCount] = speed - s.m_x - s.m_y - s.m_z;
+									
 		m_rowCount++;
 		dAssert(m_rowCount < D_MAX_ROWS);
 		return m_rowCount - 1;
@@ -111,19 +163,41 @@ class dCustomPlayerController::dImpulseSolver
 	{
 		dFloat massMatrix[D_MAX_ROWS][D_MAX_ROWS];
 		for (int i = 0; i < m_rowCount; i++) {
-			dComplementaritySolver::dJacobian jInvMass(m_jacobian[i]);
+			dComplementaritySolver::dJacobianPair jInvMass(m_jacobianPairs[i]);
 
-			jInvMass.m_linear = jInvMass.m_linear.Scale(m_invMass);
-			jInvMass.m_angular = m_invInertia.RotateVector(jInvMass.m_angular);
+			jInvMass.m_jacobian_J01.m_linear = jInvMass.m_jacobian_J01.m_linear.Scale(m_invMass);
+			jInvMass.m_jacobian_J01.m_angular = m_invInertia.RotateVector(jInvMass.m_jacobian_J01.m_angular);
+			if (m_contactPoint[i]) {
+				dMatrix invInertia;
+				dFloat invIxx;
+				dFloat invIyy;
+				dFloat invIzz;
+				dFloat invMass;
 
-			dVector tmp(jInvMass.m_linear * m_jacobian[i].m_linear + jInvMass.m_angular * m_jacobian[i].m_angular);
+				NewtonBodyGetInvMass(m_contactPoint[i]->m_hitBody, &invMass, &invIxx, &invIyy, &invIzz);
+				NewtonBodyGetInvInertiaMatrix(m_contactPoint[i]->m_hitBody, &invInertia[0][0]);
+				jInvMass.m_jacobian_J10.m_linear = jInvMass.m_jacobian_J10.m_linear.Scale (invMass);
+				jInvMass.m_jacobian_J10.m_angular = invInertia.RotateVector(jInvMass.m_jacobian_J10.m_angular);
 
+			} else {
+				jInvMass.m_jacobian_J10.m_linear = m_zero;
+				jInvMass.m_jacobian_J10.m_angular = m_zero;
+			}
+
+			dVector tmp(jInvMass.m_jacobian_J01.m_linear * m_jacobianPairs[i].m_jacobian_J01.m_linear + 
+						jInvMass.m_jacobian_J01.m_angular * m_jacobianPairs[i].m_jacobian_J01.m_angular +
+						jInvMass.m_jacobian_J10.m_linear * m_jacobianPairs[i].m_jacobian_J10.m_linear + 
+						jInvMass.m_jacobian_J10.m_angular * m_jacobianPairs[i].m_jacobian_J10.m_angular);
 			dFloat a00 = (tmp.m_x + tmp.m_y + tmp.m_z) * 1.0001f;
+
 			massMatrix[i][i] = a00;
 
 			m_impulseMag[i] = 0.0f;
 			for (int j = i + 1; j < m_rowCount; j++) {
-				dVector tmp1(jInvMass.m_linear * m_jacobian[j].m_linear + jInvMass.m_angular * m_jacobian[j].m_angular);
+				dVector tmp1(jInvMass.m_jacobian_J01.m_linear * m_jacobianPairs[j].m_jacobian_J01.m_linear + 
+							 jInvMass.m_jacobian_J01.m_angular * m_jacobianPairs[j].m_jacobian_J01.m_angular +
+							 jInvMass.m_jacobian_J10.m_linear * m_jacobianPairs[j].m_jacobian_J10.m_linear +
+							 jInvMass.m_jacobian_J10.m_angular * m_jacobianPairs[j].m_jacobian_J10.m_angular);
 				dFloat a01 = tmp1.m_x + tmp1.m_y + tmp1.m_z;
 				massMatrix[i][j] = a01;
 				massMatrix[j][i] = a01;
@@ -134,41 +208,28 @@ class dCustomPlayerController::dImpulseSolver
 
 		dVector netImpulse(0.0f);
 		for (int i = 0; i < m_rowCount; i++) {
-			netImpulse += m_jacobian[i].m_linear.Scale(m_impulseMag[i]);
+			netImpulse += m_jacobianPairs[i].m_jacobian_J01.m_linear.Scale(m_impulseMag[i]);
 		}
 		return netImpulse;
 	}
 
 	void ApplyReaction(dFloat timestep)
 	{
-		dMatrix matrix;
-		dVector com(0.0f);
-		dFloat mass; 
-		dFloat Ixx; 
-		dFloat Iyy; 
-		dFloat Izz; 
+		dFloat invTimeStep = 0.1f / timestep;
 		for (int i = 0; i < m_rowCount; i++) {
 			if (m_contactPoint[i]) {
-				
-				NewtonBodyGetMatrix(m_contactPoint[i]->m_hitBody, &matrix[0][0]);
-				NewtonBodyGetCentreOfMass(m_contactPoint[i]->m_hitBody, &com[0]);
-				dVector point(m_contactPoint[i]->m_point[0], m_contactPoint[i]->m_point[1], m_contactPoint[i]->m_point[2], 0.0f);
-				dVector r (point - matrix.TransformVector(com));
-				NewtonBodyGetMass(m_contactPoint[i]->m_hitBody, &mass, &Ixx, &Iyy, &Izz);
-		
-				// temporary hack until I fix the player solver
-				mass *= 0.1f;
-
-				dVector linearImpulse(m_jacobian[i].m_linear.Scale(- m_impulseMag[i] * mass / (mass + m_mass)));
-				dVector angularImpulse(r.CrossProduct(linearImpulse));
-				NewtonBodyApplyImpulsePair(m_contactPoint[i]->m_hitBody, &linearImpulse[0], &angularImpulse[0], timestep);
+				dVector force (m_jacobianPairs[i].m_jacobian_J10.m_linear.Scale (m_impulseMag[i] * invTimeStep));
+				dVector torque (m_jacobianPairs[i].m_jacobian_J10.m_angular.Scale (m_impulseMag[i] * invTimeStep));
+				NewtonBodyAddForce(m_contactPoint[i]->m_hitBody, &force[0]);
+				NewtonBodyAddTorque(m_contactPoint[i]->m_hitBody, &torque[0]);
 			}
 		}
 	}
 	
 	dMatrix m_invInertia;
 	dVector m_veloc;
-	dComplementaritySolver::dJacobian m_jacobian[D_MAX_ROWS];
+	dVector m_zero;
+	dComplementaritySolver::dJacobianPair m_jacobianPairs[D_MAX_ROWS];
 	const NewtonWorldConvexCastReturnInfo* m_contactPoint[D_MAX_ROWS];
 	dFloat m_rhs[D_MAX_ROWS];
 	dFloat m_low[D_MAX_ROWS];
@@ -285,7 +346,6 @@ void dCustomPlayerController::SetFrame(const dMatrix& frame)
 void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& contactSolver)
 {
 	dMatrix matrix;
-	dVector zero(0.0f);
 	dVector saveVeloc(0.0f);
 
 	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
@@ -293,65 +353,79 @@ void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& conta
 
 	dMatrix coodinateMatrix (m_localFrame * matrix);
 
+	// clip player velocity along the high contacts
+	bool applyStep = false; 
+	dVector veloc (0.0f);
 	dImpulseSolver impulseSolver(this);
-	int index = impulseSolver.AddLinearRow(coodinateMatrix[0], zero, 0.0f, 0.0f, 1.0e12f);
-	impulseSolver.AddLinearRow(coodinateMatrix[1], zero, -m_forwardSpeed, -D_STEP_FRICTION, D_STEP_FRICTION, index);
-	impulseSolver.AddLinearRow(coodinateMatrix[2], zero,  m_lateralSpeed, -D_STEP_FRICTION, D_STEP_FRICTION, index);
-	dVector veloc (saveVeloc + impulseSolver.CalculateImpulse().Scale(m_invMass));
+	int index = impulseSolver.AddLinearRow(coodinateMatrix[0], impulseSolver.m_zero, 0.0f, 0.0f, 1.0e12f);
+	impulseSolver.AddLinearRow(coodinateMatrix[1], impulseSolver.m_zero, -m_forwardSpeed, -D_STEP_FRICTION, D_STEP_FRICTION, index);
+	impulseSolver.AddLinearRow(coodinateMatrix[2], impulseSolver.m_zero, m_lateralSpeed, -D_STEP_FRICTION, D_STEP_FRICTION, index);
+	veloc = saveVeloc + impulseSolver.CalculateImpulse().Scale(m_invMass);
 
-	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
-	NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
-	contactSolver.CalculateContacts();
+	for (int i = 0; !applyStep && (i < 4); i ++) {
+		NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
+		NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+		NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
 
-	if (contactSolver.m_contactCount) {
-		dMatrix stepMatrix;
-		dVector com;
-
-		NewtonBodyGetMatrix(m_kinematicBody, &stepMatrix[0][0]);
-		NewtonBodyGetCentreOfMass(m_kinematicBody, &com[0]);
-		com = stepMatrix.TransformVector(com);
-
-		impulseSolver.Reset(this);
-		for (int i = 0; i < contactSolver.m_contactCount; i++) {
-			NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
-			dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], dFloat(0.0f));
-			dVector localPointpoint (m_localFrame.UntransformVector(stepMatrix.UntransformVector(point)));
-			if (localPointpoint.m_x > m_stepHeight) {
-				dVector normal(contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat(0.0f));
-				impulseSolver.AddLinearRow(normal, point - com, 0.0f, 0.0f, 1.0e12f);
-			}
-		}
-
-		if (impulseSolver.m_rowCount) {
-			impulseSolver.AddAngularRows();
-			veloc += impulseSolver.CalculateImpulse().Scale(m_invMass);
-
-			NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
-			NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
-			NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
-			contactSolver.CalculateContacts();
+		applyStep = true;
+		contactSolver.CalculateContacts();
+		if (contactSolver.m_contactCount) {
+			dMatrix stepMatrix;
 			NewtonBodyGetMatrix(m_kinematicBody, &stepMatrix[0][0]);
-		}
-
-		bool applyStep = false;
-		dFloat maxHigh = 0.0f;
-		for (int i = 0; i < contactSolver.m_contactCount; i++) {
-			NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
-			dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], dFloat(0.0f));
-			point = m_localFrame.UntransformVector(stepMatrix.UntransformVector(point));
-			if ((point.m_x < m_stepHeight) && (point.m_x > m_contactPatch)) {
-				dVector normal(contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat(0.0f));
-				dFloat relSpeed = normal.DotProduct3(veloc);
-				if (relSpeed < dFloat(-1.0e-2f)) {
-					applyStep = true;
-					maxHigh = dMax(point.m_x, maxHigh);
+			int highContactCount = contactSolver.m_contactCount;
+			for (int i = contactSolver.m_contactCount - 1; i >= 0; i--) {
+				NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
+				dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], dFloat(0.0f));
+				dVector localPointpoint(m_localFrame.UntransformVector(stepMatrix.UntransformVector(point)));
+				if (localPointpoint.m_x <= m_stepHeight) {
+					highContactCount --;
+					contactSolver.m_contactBuffer[i] = contactSolver.m_contactBuffer[highContactCount];
 				}
 			}
-		}
+			if (highContactCount) {
+				dVector com;
+				NewtonBodyGetCentreOfMass(m_kinematicBody, &com[0]);
+				com = stepMatrix.TransformVector(com);
 
-		if (applyStep) {
-			dVector step (stepMatrix.RotateVector(m_localFrame.RotateVector (dVector(maxHigh, dFloat(0.0f), dFloat(0.0f), dFloat(0.0f)))));
-			matrix.m_posit += step;
+				impulseSolver.Reset(this);
+				for (int i = 0; i < highContactCount; i++) {
+					NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
+					dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], dFloat(0.0f));
+					dVector normal(contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat(0.0f));
+					impulseSolver.AddContactRow(&contact, normal, point - com, 0.0f, 0.0f, 1.0e12f);
+				}
+
+				applyStep = false;
+				impulseSolver.AddAngularRows();
+				veloc += impulseSolver.CalculateImpulse().Scale(m_invMass);
+			}
+		}
+	}
+
+	if (applyStep) {
+		contactSolver.CalculateContacts();
+		if (contactSolver.m_contactCount) {
+			dMatrix stepMatrix;
+			NewtonBodyGetMatrix(m_kinematicBody, &stepMatrix[0][0]);
+
+			dFloat maxHigh = 0.0f;
+			for (int i = 0; i < contactSolver.m_contactCount; i++) {
+				NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
+				dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], dFloat(0.0f));
+				point = m_localFrame.UntransformVector(stepMatrix.UntransformVector(point));
+				if ((point.m_x < m_stepHeight) && (point.m_x > m_contactPatch)) {
+					dVector normal(contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat(0.0f));
+					dFloat relSpeed = normal.DotProduct3(veloc);
+					if (relSpeed < dFloat(-1.0e-2f)) {
+						maxHigh = dMax(point.m_x, maxHigh);
+					}
+				}
+			}
+
+			if (maxHigh > 0.0f) {
+				dVector step(stepMatrix.RotateVector(m_localFrame.RotateVector(dVector(maxHigh, dFloat(0.0f), dFloat(0.0f), dFloat(0.0f)))));
+				matrix.m_posit += step;
+			}
 		}
 	}
 
@@ -381,16 +455,10 @@ dCustomPlayerController::dCollisionState dCustomPlayerController::TestPredictCol
 dFloat dCustomPlayerController::PredictTimestep(dFloat timestep, dContactSolver& contactSolver)
 {
 	dMatrix matrix;
-	//dMatrix predicMatrix;
 	dVector veloc(0.0f);
 	
 	NewtonBodyGetVelocity(m_kinematicBody, &veloc[0]);
 	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
-
-	//NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
-	//NewtonBodyGetMatrix(m_kinematicBody, &predicMatrix[0][0]);
-	//contactSolver.CalculateContacts();
-	//NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
 
 	NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
 	dCollisionState playerCollide = TestPredictCollision(contactSolver, veloc);
@@ -401,8 +469,6 @@ dFloat dCustomPlayerController::PredictTimestep(dFloat timestep, dContactSolver&
 		dFloat dt = timestep;
 		for (int i = 0; i < D_MAX_COLLIONSION_STEPS; i++) {
 			NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
-			//NewtonBodyGetMatrix(m_kinematicBody, &predicMatrix[0][0]);
-			//contactCount = NewtonWorldCollide(world, &predicMatrix[0][0], shape, this, PrefilterCallback, contactBuffer, D_MAX_CONTACTS, 0);
 			contactSolver.CalculateContacts();
 			NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
 
@@ -466,10 +532,13 @@ void dCustomPlayerController::ResolveInterpenetrations(dContactSolver& contactSo
 
 			dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], dFloat (0.0f));
 			dVector normal(contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat (0.0f));
+			int index = impulseSolver.AddContactRow(&contact, normal, point - com, 0.0f, 0.0f, 1.0e12f);
 
-			penetration = dClamp(contact.m_penetration - D_MAX_COLLISION_PENETRATION * 0.5f, dFloat(0.0f), dFloat(0.5f));
-			int index = impulseSolver.AddLinearRow(normal, point - com, 0.0f, 0.0f, 1.0e12f);
-			impulseSolver.m_rhs[index] = penetration * invTimestep;
+			dFloat impulse = 0.0f;
+			if (!impulseSolver.m_contactPoint[i]) {
+				impulse = invTimestep * dClamp(contact.m_penetration - D_MAX_COLLISION_PENETRATION * 0.5f, dFloat(0.0f), dFloat(0.5f));
+			}
+			impulseSolver.m_rhs[index] = impulse;
 		}
 
 		dVector veloc (impulseSolver.CalculateImpulse().Scale (m_invMass));
@@ -525,18 +594,7 @@ void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver, dF
 
 		dVector point (contact.m_point[0], contact.m_point[1], contact.m_point[2], dFloat (0.0f));
 		dVector normal (contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat (0.0f));
-		const int normalIndex = impulseSolver.AddLinearRow(normal, point - com, 0.0f, 0.0f, 1.0e12f);
-
-		dFloat invMass;
-		dFloat invIxx;
-		dFloat invIyy;
-		dFloat invIzz;
-		NewtonBodyGetPointVelocity (contact.m_hitBody, &point[0], &surfaceVeloc[0]);
-		impulseSolver.m_rhs[impulseSolver.m_rowCount-1] += surfaceVeloc.DotProduct3(normal);
-
-		NewtonBodyGetInvMass(contact.m_hitBody, &invMass, &invIxx, &invIyy, &invIzz);
-		const NewtonWorldConvexCastReturnInfo* const otherBodyContact = (invMass > 0.0f) ? &contact : NULL;
-		impulseSolver.m_contactPoint[impulseSolver.m_rowCount - 1] = otherBodyContact;
+		const int normalIndex = impulseSolver.AddContactRow(&contact, normal, point - com, 0.0f, 0.0f, 1.0e12f);
 
 		m_isAirbone = false;
 		dVector localPooint (frameMatrix.UntransformVector(point));
@@ -546,15 +604,11 @@ void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver, dF
 			if (friction > 0.0f) {
 				// add lateral traction friction
 				dVector sideDir (frameMatrix.m_up.CrossProduct(normal).Normalize());
-				impulseSolver.AddLinearRow(sideDir, point - com, -m_lateralSpeed, -friction, friction, normalIndex);
-				impulseSolver.m_rhs[impulseSolver.m_rowCount-1] += surfaceVeloc.DotProduct3(sideDir);
-				impulseSolver.m_contactPoint[impulseSolver.m_rowCount - 1] = otherBodyContact;
+				impulseSolver.AddContactRow(&contact, sideDir, point - com, -m_lateralSpeed, -friction, friction, normalIndex);
 
 				// add longitudinal  traction friction
 				dVector frontDir (normal.CrossProduct(sideDir));
-				impulseSolver.AddLinearRow(frontDir, point - com, -m_forwardSpeed, -friction, friction, normalIndex);
-				impulseSolver.m_rhs[impulseSolver.m_rowCount-1] += surfaceVeloc.DotProduct3(frontDir);
-				impulseSolver.m_contactPoint[impulseSolver.m_rowCount - 1] = otherBodyContact;
+				impulseSolver.AddContactRow(&contact, frontDir, point - com, -m_forwardSpeed, -friction, friction, normalIndex);
 			}
 		}
 	}
@@ -578,7 +632,7 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 	m_manager->ApplyMove(this, timestep);
 
 #if 0
-	#if 0
+	#if 1
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
 			fwrite(&m_headingAngle, sizeof(m_headingAngle), 1, file);
@@ -620,7 +674,4 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 		NewtonBodyIntegrateVelocity(m_kinematicBody, predicetdTime);
 		timeLeft -= predicetdTime;
 	}
-
-//veloc = GetVelocity();
-//dTrace (("%d %f %f %f\n", xxxx, veloc.m_x, veloc.m_y, veloc.m_z));
 }
