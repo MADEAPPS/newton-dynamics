@@ -323,9 +323,9 @@ dVector dCustomPlayerController::GetVelocity() const
 
 void dCustomPlayerController::SetVelocity(const dVector& veloc) 
 { 
+	dAssert(veloc.DotProduct3(veloc) < 10000.0f);
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 }
-
 
 void dCustomPlayerController::SetFrame(const dMatrix& frame)
 {
@@ -363,7 +363,8 @@ void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& conta
 
 	for (int j = 0; !applyStep && (j < 4); j ++) {
 		NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
-		NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+		//NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+		SetVelocity(veloc);
 		NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
 
 		applyStep = true;
@@ -429,7 +430,8 @@ void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& conta
 	}
 
 	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
-	NewtonBodySetVelocity(m_kinematicBody, &saveVeloc[0]);
+	//NewtonBodySetVelocity(m_kinematicBody, &saveVeloc[0]);
+	SetVelocity(saveVeloc);
 }
 
 dCustomPlayerController::dCollisionState dCustomPlayerController::TestPredictCollision(const dContactSolver& contactSolver, const dVector& veloc) const
@@ -518,7 +520,8 @@ void dCustomPlayerController::ResolveInterpenetrations(dContactSolver& contactSo
 		dMatrix matrix;
 		dVector com(0.0f);
 
-		NewtonBodySetVelocity(m_kinematicBody, &zero[0]);
+		//NewtonBodySetVelocity(m_kinematicBody, &zero[0]);
+		SetVelocity(zero);
 		NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
 		NewtonBodyGetCentreOfMass(m_kinematicBody, &com[0]);
 		com = matrix.TransformVector(com);
@@ -538,7 +541,8 @@ void dCustomPlayerController::ResolveInterpenetrations(dContactSolver& contactSo
 		impulseSolver.AddAngularRows();
 
 		dVector veloc (impulseSolver.CalculateImpulse().Scale (m_invMass));
-		NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+		//NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+		SetVelocity(veloc);
 		NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
 
 		penetration = 0.0f;
@@ -548,7 +552,8 @@ void dCustomPlayerController::ResolveInterpenetrations(dContactSolver& contactSo
 		}
 	}
 
-	NewtonBodySetVelocity(m_kinematicBody, &savedVeloc[0]);
+	//NewtonBodySetVelocity(m_kinematicBody, &savedVeloc[0]);
+	SetVelocity(savedVeloc);
 }
 
 void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver, dFloat timestep)
@@ -617,7 +622,8 @@ void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver, dF
 	veloc += impulseSolver.CalculateImpulse().Scale(m_invMass);
 	impulseSolver.ApplyReaction(timestep);
 
-	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+	//NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+	SetVelocity(veloc);
 }
 
 void dCustomPlayerController::PreUpdate(dFloat timestep)
@@ -656,7 +662,8 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 
 	// set play desired velocity
 	dVector veloc(GetVelocity() + m_impulse.Scale(m_invMass));
-	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+	//NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
+	SetVelocity(veloc);
 
 	// determine if player has to step over obstacles lower than step hight
 	ResolveStep(timestep, contactSolver);
