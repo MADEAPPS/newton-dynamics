@@ -353,6 +353,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	NewtonWorld* const world = scene->GetNewton();
 	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "playerarena.ngd", true);
+//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 
 	// create a character controller manager
 	BasicPlayerControllerManager* const playerManager = new BasicPlayerControllerManager (world);
@@ -374,8 +375,10 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit.m_y += 5.0f;
 	playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 
-//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 	location.m_posit.m_x += 5.0f;
+
+	int count = 1;
+	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
 
 	// add some objects to interact with
 	dVector merryPosit (FindFloor (scene->GetNewton(), location.m_posit + dVector(-5.0f, 0.0f, 15.0f, 0.0f), 20.0f));
@@ -384,9 +387,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	// add a hanging bridge
 	CreateBridge(scene, playgroundBody);
 
-	int count = 1;
 	// add heavy box
-	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 	AddPrimitiveArray(scene, 200.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
 
 	// add equal weight box

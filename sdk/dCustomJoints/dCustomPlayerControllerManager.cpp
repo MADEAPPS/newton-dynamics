@@ -361,7 +361,7 @@ void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& conta
 	impulseSolver.AddLinearRow(coodinateMatrix[2], impulseSolver.m_zero, m_lateralSpeed, -D_STEP_FRICTION, D_STEP_FRICTION, index);
 	dVector veloc (saveVeloc + impulseSolver.CalculateImpulse().Scale(m_invMass));
 
-	for (int i = 0; !applyStep && (i < 4); i ++) {
+	for (int j = 0; !applyStep && (j < 4); j ++) {
 		NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
 		NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 		NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
@@ -587,14 +587,17 @@ void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver, dF
 	const dFloat contactPatchHigh = m_contactPatch * dFloat (0.995f);
 	for (int i = 0; i < contactSolver.m_contactCount; i ++) {
 		NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
-
 		dVector point (contact.m_point[0], contact.m_point[1], contact.m_point[2], dFloat (0.0f));
 		dVector normal (contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat (0.0f));
 		const int normalIndex = impulseSolver.AddContactRow(&contact, normal, point - com, 0.0f, 0.0f, 1.0e12f);
+		dVector localPooint (frameMatrix.UntransformVector(point));
 
 		m_isAirbone = false;
-		dVector localPooint (frameMatrix.UntransformVector(point));
 		if (localPooint.m_x < contactPatchHigh) {
+			if (impulseSolver.m_contactPoint[normalIndex]) {
+				impulseSolver.m_jacobianPairs[normalIndex].m_jacobian_J10.m_linear = impulseSolver.m_zero;
+				impulseSolver.m_jacobianPairs[normalIndex].m_jacobian_J10.m_angular = impulseSolver.m_zero;
+			}
 			m_isOnFloor = true;
 			dFloat friction = m_manager->ContactFriction(this, point, normal, int (contact.m_contactID), contact.m_hitBody);
 			if (friction > 0.0f) {
