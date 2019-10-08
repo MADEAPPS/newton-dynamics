@@ -206,51 +206,6 @@ static NewtonBody* CreateSimpledBox_dNetwonMesh(DemoEntityManager* const scene, 
 	return body;
 }
 
-
-static void DebugJernejLMesh (DemoEntityManager* const scene) 
-{
-	char fileName[2048];
-	dGetWorkingFileName("MeshBug.txt", fileName);
-	FILE* file = fopen(fileName, "rb");
-
-	char name[128];
-	dArray<dVector> array;
-	// create the collision tree geometry
-	NewtonCollision* collision = NewtonCreateTreeCollision(scene->GetNewton(), 0);
-	// prepare to create collision geometry
-	NewtonTreeCollisionBeginBuild(collision);
-	while (!feof(file)) {
-		fscanf(file, "%s", name);
-		if (!strcmp(name, "Vertex")) {
-			int index;
-			dVector point(0.0f);
-			fscanf(file, "%d %f, %f, %f", &index, &point.m_x, &point.m_y, &point.m_z);
-			array[index] = point;
-		} else if (!strcmp(name, "Face")) {
-			//Face 2765 11060 - 11063
-			int index;
-			int start;
-			int end;
-			fscanf(file, "%d %d - %d", &index, &start, &end);
-			dVector point[16];
-			int count = 0;
-			for (int i = end - 1; i >= start; i--) {
-				point[count++] = array[i];
-			}
-			NewtonTreeCollisionAddFace(collision, count, &point[0].m_x, sizeof (dVector), 0);
-		}
-	}
-	NewtonTreeCollisionEndBuild(collision, 0);
-	fclose(file);
-	dMatrix matrix(dPitchMatrix(90.0f * dDegreeToRad));
-	matrix.m_posit.m_y += 0.0f;
-	matrix.m_posit.m_x -= 40.0f;
-	NewtonBody* level = NULL;
-	level = NewtonCreateDynamicBody(scene->GetNewton(), collision, &matrix[0][0]);
-	NewtonDestroyCollision(collision);
-}
-
-
 class TestTriggerManager: public dCustomTriggerManager
 {
 	public:
@@ -348,8 +303,6 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	NewtonCollision* const poolBox = NewtonCreateBox(scene->GetNewton(), 20.0f, 10.0f, 20.0f, 0, NULL);
 	triggerManager->CreateTestTrigger(triggerLocation, poolBox);
 	NewtonDestroyCollision(poolBox);
-
-	//DebugJernejLMesh (scene);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
