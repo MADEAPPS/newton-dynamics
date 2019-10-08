@@ -380,7 +380,7 @@ void dCustomPlayerController::SetFrame(const dMatrix& frame)
 	NewtonCollisionSetMatrix(capsule, &newMatrix[0][0]);
 }
 
-#if 1
+#if 0
 void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& contactSolver)
 {
 	dMatrix matrix;
@@ -568,14 +568,36 @@ xxx++;
 		}
 	}
 
-/*
-	if (maxHigh > 0.0f) {
-		//dVector step(matrix.RotateVector(m_localFrame.RotateVector(dVector(maxHigh, dFloat(0.0f), dFloat(0.0f), dFloat(0.0f)))));
-		dVector step(coodinateMatrix.RotateVector(dVector(maxHigh, dFloat(0.0f), dFloat(0.0f), dFloat(0.0f))));
-		matrix.m_posit += step;
-		NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
+	SetVelocity(veloc);
+	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
+	NewtonBodyIntegrateVelocity(m_kinematicBody, timestep * 0.5f);
+	contactSolver.CalculateContacts();
+	if (contactSolver.m_contactCount) {
+		dMatrix stepMatrix;
+		NewtonBodyGetMatrix(m_kinematicBody, &stepMatrix[0][0]);
+
+		dFloat maxHigh = 0.0f;
+		for (int i = 0; i < contactSolver.m_contactCount; i++) {
+			NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
+			if (contact.m_penetration >= maxPenetration) {
+				dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], dFloat(0.0f));
+				point = m_localFrame.UntransformVector(stepMatrix.UntransformVector(point));
+				if ((point.m_x < m_stepHeight) && (point.m_x > m_contactPatch)) {
+					dVector normal(contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat(0.0f));
+					dFloat relSpeed = normal.DotProduct3(veloc);
+					if (relSpeed < dFloat(-1.0e-2f)) {
+						maxHigh = dMax(point.m_x, maxHigh);
+					}
+				}
+			}
+		}
+
+		if (maxHigh > 0.0f) {
+			dVector step(stepMatrix.RotateVector(m_localFrame.RotateVector(dVector(maxHigh, dFloat(0.0f), dFloat(0.0f), dFloat(0.0f)))));
+			matrix.m_posit += step;
+		}
 	}
-*/
+
 	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
 	SetVelocity(saveVeloc);
 }
