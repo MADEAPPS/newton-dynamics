@@ -283,6 +283,29 @@ void dCustomPlayerControllerManager::PreUpdate(dFloat timestep, int threadID)
 }
 
 
+dCustomPlayerController::dCustomPlayerController()
+	:m_localFrame(dGetIdentityMatrix())
+	,m_impulse(0.0f)
+	,m_mass(0.0f)
+	,m_invMass(0.0f)
+	,m_headingAngle(0.0f)
+	,m_forwardSpeed(0.0f)
+	,m_lateralSpeed(0.0f)
+	,m_stepHeight(0.0f)
+	,m_contactPatch(0.0f)
+	,m_userData(NULL)
+	,m_kinematicBody(NULL)
+	,m_manager(NULL)
+	,m_isAirbone(false)
+	,m_isOnFloor(false)
+{
+}
+
+dCustomPlayerController::~dCustomPlayerController()
+{
+	NewtonDestroyBody(m_kinematicBody);
+}
+
 dCustomPlayerController* dCustomPlayerControllerManager::CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
 {
 	NewtonWorld* const world = GetWorld();
@@ -319,6 +342,13 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreateController(const 
 	controller.m_stepHeight = dMax (stepHeight, controller.m_contactPatch * 2.0f);
 
 	return &controller;
+}
+
+void dCustomPlayerControllerManager::DestroyController(dCustomPlayerController* const player)
+{
+	dList<dCustomPlayerController>::dListNode* const node = m_playerList.GetNodeFromInfo(*player);
+	dAssert(node);
+	m_playerList.Remove(node);
 }
 
 dVector dCustomPlayerController::GetVelocity() const

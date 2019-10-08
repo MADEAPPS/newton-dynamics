@@ -33,27 +33,8 @@ class dCustomPlayerController
 	class dImpulseSolver;
 
 	public:
-	dCustomPlayerController ()
-		:m_localFrame(dGetIdentityMatrix())
-		,m_impulse(0.0f)
-		,m_mass(0.0f)
-		,m_invMass(0.0f)
-		,m_headingAngle(0.0f)
-		,m_forwardSpeed(0.0f)
-		,m_lateralSpeed(0.0f)
-		,m_stepHeight(0.0f)
-		,m_contactPatch(0.0f)
-		,m_userData(NULL)
-		,m_kinematicBody(NULL)
-		,m_manager(NULL)
-		,m_isAirbone(false)
-		,m_isOnFloor(false)
-	{
-	}
-
-	~dCustomPlayerController () 
-	{
-	}
+	CUSTOM_JOINTS_API dCustomPlayerController();
+	CUSTOM_JOINTS_API ~dCustomPlayerController();
 
 	void* GetUserData () const {return m_userData;}
 	NewtonBody* GetBody() {return m_kinematicBody;}
@@ -120,7 +101,9 @@ class dCustomPlayerControllerManager: public dCustomParallelListener
 	public:
 	CUSTOM_JOINTS_API dCustomPlayerControllerManager(NewtonWorld* const world);
 	CUSTOM_JOINTS_API ~dCustomPlayerControllerManager();
+
 	CUSTOM_JOINTS_API virtual dCustomPlayerController* CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight);
+	CUSTOM_JOINTS_API virtual void DestroyController(dCustomPlayerController* const player);
 
 	virtual void ApplyMove(dCustomPlayerController* const controller, dFloat timestep) = 0;
 	virtual bool ProccessContact(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const { return true; }

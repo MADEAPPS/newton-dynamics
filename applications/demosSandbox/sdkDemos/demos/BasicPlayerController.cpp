@@ -366,15 +366,16 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 20.0f);
 	location.m_posit.m_y += 1.0f;
-	dCustomPlayerController*  const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	dCustomPlayerController* const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 	playerManager->SetAsPlayer(player);
 
 	// add second player for testing
 	location.m_posit.m_x += 4.0f;
 	location.m_posit.m_z += 2.0f;
 	location.m_posit.m_y += 5.0f;
-//	playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
-//
+	dCustomPlayerController* const player1 = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	//playerManager->DestroyController (player1);
+
 //	location.m_posit.m_x += 5.0f;
 //
 //	int count = 1;
