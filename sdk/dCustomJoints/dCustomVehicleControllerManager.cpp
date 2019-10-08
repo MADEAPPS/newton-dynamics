@@ -2056,7 +2056,7 @@ void dCustomVehicleController::CalculateSuspensionForces(dFloat timestep)
 		}
 	}
 
-	dCholeskyFactorization(tireCount, massMatrix);
+	dCholeskyFactorization(tireCount, tireCount, massMatrix);
 	dCholeskySolve(tireCount, tireCount, massMatrix, accel);
 	for (int i = 0; i < tireCount; i++) {
 		NewtonBody* const tirebody = tires[i]->GetTireBody();

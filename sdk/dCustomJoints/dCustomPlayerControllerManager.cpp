@@ -162,20 +162,25 @@ class dCustomPlayerController::dImpulseSolver
 	dVector CalculateImpulse()
 	{
 		dFloat massMatrix[D_MAX_ROWS][D_MAX_ROWS];
+		const NewtonBody* bodyArray[D_MAX_ROWS];
+		for (int i = 0; i < m_rowCount; i++) {
+			bodyArray[i] = m_contactPoint[i] ? m_contactPoint[i]->m_hitBody : NULL; 
+		}
+
 		for (int i = 0; i < m_rowCount; i++) {
 			dComplementaritySolver::dJacobianPair jInvMass(m_jacobianPairs[i]);
 
 			jInvMass.m_jacobian_J01.m_linear = jInvMass.m_jacobian_J01.m_linear.Scale(m_invMass);
 			jInvMass.m_jacobian_J01.m_angular = m_invInertia.RotateVector(jInvMass.m_jacobian_J01.m_angular);
-			if (m_contactPoint[i]) {
+			if (bodyArray[i]) {
 				dMatrix invInertia;
 				dFloat invIxx;
 				dFloat invIyy;
 				dFloat invIzz;
 				dFloat invMass;
 
-				NewtonBodyGetInvMass(m_contactPoint[i]->m_hitBody, &invMass, &invIxx, &invIyy, &invIzz);
-				NewtonBodyGetInvInertiaMatrix(m_contactPoint[i]->m_hitBody, &invInertia[0][0]);
+				NewtonBodyGetInvMass(bodyArray[i], &invMass, &invIxx, &invIyy, &invIzz);
+				NewtonBodyGetInvInertiaMatrix(bodyArray[i], &invInertia[0][0]);
 				jInvMass.m_jacobian_J10.m_linear = jInvMass.m_jacobian_J10.m_linear.Scale (invMass);
 				jInvMass.m_jacobian_J10.m_angular = invInertia.RotateVector(jInvMass.m_jacobian_J10.m_angular);
 
@@ -188,22 +193,26 @@ class dCustomPlayerController::dImpulseSolver
 						jInvMass.m_jacobian_J01.m_angular * m_jacobianPairs[i].m_jacobian_J01.m_angular +
 						jInvMass.m_jacobian_J10.m_linear * m_jacobianPairs[i].m_jacobian_J10.m_linear + 
 						jInvMass.m_jacobian_J10.m_angular * m_jacobianPairs[i].m_jacobian_J10.m_angular);
-			dFloat a00 = (tmp.m_x + tmp.m_y + tmp.m_z) * 1.0001f;
+			dFloat a00 = (tmp.m_x + tmp.m_y + tmp.m_z) * 1.0004f;
 
 			massMatrix[i][i] = a00;
 
 			m_impulseMag[i] = 0.0f;
 			for (int j = i + 1; j < m_rowCount; j++) {
-				dVector tmp1(jInvMass.m_jacobian_J01.m_linear * m_jacobianPairs[j].m_jacobian_J01.m_linear + 
-							 jInvMass.m_jacobian_J01.m_angular * m_jacobianPairs[j].m_jacobian_J01.m_angular +
-							 jInvMass.m_jacobian_J10.m_linear * m_jacobianPairs[j].m_jacobian_J10.m_linear +
-							 jInvMass.m_jacobian_J10.m_angular * m_jacobianPairs[j].m_jacobian_J10.m_angular);
+				dVector tmp1(jInvMass.m_jacobian_J01.m_linear * m_jacobianPairs[j].m_jacobian_J01.m_linear +
+							 jInvMass.m_jacobian_J01.m_angular * m_jacobianPairs[j].m_jacobian_J01.m_angular);
+				if (bodyArray[i] == bodyArray[j]) {
+					tmp1 += jInvMass.m_jacobian_J10.m_linear * m_jacobianPairs[j].m_jacobian_J10.m_linear;
+					tmp1 += jInvMass.m_jacobian_J10.m_angular * m_jacobianPairs[j].m_jacobian_J10.m_angular;
+				}
+
 				dFloat a01 = tmp1.m_x + tmp1.m_y + tmp1.m_z;
 				massMatrix[i][j] = a01;
 				massMatrix[j][i] = a01;
 			}
 		}
 
+		dAssert (dTestPSDmatrix(m_rowCount, D_MAX_ROWS, &massMatrix[0][0]));
 		dGaussSeidelLcpSor(m_rowCount, D_MAX_ROWS, &massMatrix[0][0], m_impulseMag, m_rhs, m_normalIndex, m_low, m_high, dFloat(1.0e-6f), 32, dFloat(1.1f));
 
 		dVector netImpulse(0.0f);
@@ -362,9 +371,8 @@ void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& conta
 	dVector veloc (saveVeloc + impulseSolver.CalculateImpulse().Scale(m_invMass));
 
 	for (int j = 0; !applyStep && (j < 4); j ++) {
-		NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
-		//NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 		SetVelocity(veloc);
+		NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
 		NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
 
 		applyStep = true;
@@ -430,7 +438,6 @@ void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& conta
 	}
 
 	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
-	//NewtonBodySetVelocity(m_kinematicBody, &saveVeloc[0]);
 	SetVelocity(saveVeloc);
 }
 
@@ -520,7 +527,6 @@ void dCustomPlayerController::ResolveInterpenetrations(dContactSolver& contactSo
 		dMatrix matrix;
 		dVector com(0.0f);
 
-		//NewtonBodySetVelocity(m_kinematicBody, &zero[0]);
 		SetVelocity(zero);
 		NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
 		NewtonBodyGetCentreOfMass(m_kinematicBody, &com[0]);
@@ -541,7 +547,6 @@ void dCustomPlayerController::ResolveInterpenetrations(dContactSolver& contactSo
 		impulseSolver.AddAngularRows();
 
 		dVector veloc (impulseSolver.CalculateImpulse().Scale (m_invMass));
-		//NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 		SetVelocity(veloc);
 		NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
 
@@ -552,7 +557,6 @@ void dCustomPlayerController::ResolveInterpenetrations(dContactSolver& contactSo
 		}
 	}
 
-	//NewtonBodySetVelocity(m_kinematicBody, &savedVeloc[0]);
 	SetVelocity(savedVeloc);
 }
 
@@ -622,7 +626,6 @@ void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver, dF
 	veloc += impulseSolver.CalculateImpulse().Scale(m_invMass);
 	impulseSolver.ApplyReaction(timestep);
 
-	//NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 	SetVelocity(veloc);
 }
 
@@ -637,7 +640,7 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 	m_manager->ApplyMove(this, timestep);
 
 #if 0
-	#if 1
+	#if 0
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
 			fwrite(&m_headingAngle, sizeof(m_headingAngle), 1, file);
@@ -662,7 +665,6 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 
 	// set play desired velocity
 	dVector veloc(GetVelocity() + m_impulse.Scale(m_invMass));
-	//NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 	SetVelocity(veloc);
 
 	// determine if player has to step over obstacles lower than step hight

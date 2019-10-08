@@ -356,7 +356,7 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 			}
 		}
 
-		dCholeskyFactorization(m_tireCount, massMatrix);
+		dCholeskyFactorization(m_tireCount, m_tireCount, massMatrix);
 		dCholeskySolve(m_tireCount, m_tireCount, massMatrix, accel);
 
 		dVector chassisForce(0.0f);

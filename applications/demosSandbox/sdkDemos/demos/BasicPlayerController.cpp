@@ -398,6 +398,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit.m_z -= 4.0f;
 	AddPrimitiveArray(scene, 30.0f, location.m_posit, dVector(2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
 
+	// add a thin box to step on
 	location.m_posit.m_x -= 5.0f;
 	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 0.5f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
 

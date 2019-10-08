@@ -574,11 +574,7 @@ void dAnimationJointSolver::InitLoopMassMatrix()
 		}
 	}
 
-#ifdef _DEBUG
-	dFloat* const tmp = dAlloca (dFloat, auxiliaryIndex * auxiliaryIndex);
-	memcpy (tmp, m_massMatrix11, sizeof (dFloat) * auxiliaryIndex * auxiliaryIndex);
-	dAssert (dCholeskyFactorization(auxiliaryIndex, tmp));
-#endif
+	dAssert (dTestPSDmatrix(auxiliaryIndex, auxiliaryIndex, m_massMatrix11));
 }
 
 void dAnimationJointSolver::InitMassMatrix()
