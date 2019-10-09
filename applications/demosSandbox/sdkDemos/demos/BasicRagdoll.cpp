@@ -40,6 +40,7 @@ class PassiveRagdollManager: public dModelManager
 		};
 
 		char m_boneName[32];
+		int m_collide;
 		dFloat m_friction;
 		dJointLimit m_jointLimits;
 		dFrameMatrix m_frameBasics;
@@ -65,19 +66,19 @@ class PassiveRagdollManager: public dModelManager
 
 	static int OnBoneAABBOverlap(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 	{
-//		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
-//		const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
-//		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
-//		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
-//		const dCustomTransformController::dSkeletonBone* const bone0 = (dCustomTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision0);
-//		const dCustomTransformController::dSkeletonBone* const bone1 = (dCustomTransformController::dSkeletonBone*)NewtonCollisionGetUserData (collision1);
-//
-//		dAssert (bone0);
-//		dAssert (bone1);
-////		if (bone0->m_controller && bone1->m_controller) {
-////			return bone0->m_controller->SelfCollisionTest (bone0, bone1) ? 1 : 0;
-////		}
-		return 1;
+		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
+		const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
+		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
+		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
+
+		NewtonCollisionMaterial collisionMaterial0;
+		NewtonCollisionMaterial collisionMaterial1;
+		NewtonCollisionGetMaterial(collision0, &collisionMaterial0);
+		NewtonCollisionGetMaterial(collision1, &collisionMaterial1);
+		if (collisionMaterial0.m_userData != collisionMaterial1.m_userData) {
+			return 1;
+		}
+		return collisionMaterial0.m_userFlags == collisionMaterial1.m_userFlags;
 	}
 
 	static void ClampAngularVelocity(const NewtonBody* body, dFloat timestep, int threadIndex)
@@ -201,24 +202,23 @@ class PassiveRagdollManager: public dModelManager
 	{
 		static dJointDefinition jointsDefinition[] =
 		{
-			{ "mixamorig:Hips" },
-			{ "mixamorig:Spine", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-			{ "mixamorig:Spine1", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-			{ "mixamorig:Spine2", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:Hips", 1 },
+			//{ "mixamorig:Neck", 1, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:Spine", 1, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:Spine1", 0, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:Spine2", 1, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 			
-			//{ "mixamorig:Neck", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:LeftArm", 1, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:LeftForeArm", 1, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
 			
-			{ "mixamorig:LeftArm", 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-			{ "mixamorig:LeftForeArm", 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+			//{ "mixamorig:RightArm", 1, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:RightForeArm", 1, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
 			
-			//{ "mixamorig:RightArm", 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-			//{ "mixamorig:RightForeArm", 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
-			
-			//{ "mixamorig:LeftUpLeg", 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-			//{ "mixamorig:LeftLeg", 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+			//{ "mixamorig:LeftUpLeg", 1, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:LeftLeg", 1, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
 			//
-			//{ "mixamorig:RightUpLeg", 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-			//{ "mixamorig:RightLeg", 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+			//{ "mixamorig:RightUpLeg", 1, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:RightLeg", 1, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
 		};
 
 		const int definitionCount = sizeof (jointsDefinition)/sizeof (jointsDefinition[0]);
@@ -244,7 +244,13 @@ class PassiveRagdollManager: public dModelManager
 		controller->SetTranformMode(true);
 
 		// save the controller as the collision user data, for collision culling
-		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBone), controller);
+		//NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBone), rootBone);
+
+		NewtonCollisionMaterial collisionMaterial;
+		NewtonCollisionGetMaterial(NewtonBodyGetCollision(rootBone), &collisionMaterial);
+		collisionMaterial.m_userData = rootBone;
+		collisionMaterial.m_userFlags = 1;
+		NewtonCollisionSetMaterial(NewtonBodyGetCollision(rootBone), &collisionMaterial);
 
 		int stackIndex = 0;
 		dModelNode* parentBones[32];
@@ -277,11 +283,15 @@ class PassiveRagdollManager: public dModelManager
 					ConnectBodyParts(childBody, parentBody, jointsDefinition[i]);
 
 					dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
-					//parentBone = controller->AddBone(childBody, bindMatrix, parentBone);
 					parentBone = new dModelNode(childBody, bindMatrix, parentBone);
 
 					// save the controller as the collision user data, for collision culling
-					NewtonCollisionSetUserData(NewtonBodyGetCollision(childBody), parentBone);
+					//NewtonCollisionSetUserData(NewtonBodyGetCollision(childBody), rootBone);
+					NewtonCollisionMaterial collisionMaterial;
+					NewtonCollisionGetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
+					collisionMaterial.m_userData = rootBone;
+					collisionMaterial.m_userFlags = jointsDefinition[i].m_collide;
+					NewtonCollisionSetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
 					break;
 				}
 			}
