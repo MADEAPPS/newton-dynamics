@@ -70,7 +70,6 @@
 #include <dCustomPulley.h>
 #include <dCustomCorkScrew.h>
 #include <dCustomDoubleHinge.h>
-#include <dCustomInputManager.h>
 #include <dCustomBallAndSocket.h>
 #include <dCustomHingeActuator.h>
 #include <dCustomRackAndPinion.h>
