@@ -122,7 +122,8 @@ extern "C" {
 	{
 		void* m_userData;
 		int m_userId;
-		int m_userFlags;
+		int m_userFlags0;
+		int m_userFlags1;
 		dFloat m_userParam[8];
 	} NewtonCollisionMaterial;
 

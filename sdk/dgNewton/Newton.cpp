@@ -3987,8 +3987,9 @@ void NewtonCollisionSetMaterial (const NewtonCollision* const collision, const N
 	dgCollisionInfo::dgInstanceMaterial& data = instance->m_material;
 	data.m_userData = userData->m_userData;
 	data.m_userId = userData->m_userId;
-	data.m_userFlags = userData->m_userFlags;
-	for (dgInt32 i = 0; i < 4; i++) {
+	data.m_userFlags0 = userData->m_userFlags0;
+	data.m_userFlags1 = userData->m_userFlags1;
+	for (dgInt32 i = 0; i < sizeof (data.m_userParam)/sizeof (data.m_userParam[0]); i++) {
 		data.m_userParam[i] = userData->m_userParam[i];
 	}
 	instance->SetMaterial (data);
@@ -4001,8 +4002,9 @@ void NewtonCollisionGetMaterial (const NewtonCollision* const collision, NewtonC
 	const dgCollisionInfo::dgInstanceMaterial data(instance->GetMaterial());
 	userData->m_userData = data.m_userData;
 	userData->m_userId = data.m_userId;
-	userData->m_userFlags = data.m_userFlags;
-	for (dgInt32 i = 0; i < 4; i ++) {
+	userData->m_userFlags0 = data.m_userFlags0;
+	userData->m_userFlags1 = data.m_userFlags1;
+	for (dgInt32 i = 0; i < sizeof(data.m_userParam) / sizeof(data.m_userParam[0]); i++) {
 		userData->m_userParam[i] = data.m_userParam[i];
 	}
 }

@@ -25,6 +25,14 @@ class PassiveRagdollManager: public dModelManager
 	class dJointDefinition
 	{
 		public:
+		enum dCollsionMask
+		{
+			m_type0,
+			m_type1,
+			m_type2,
+			m_type3,
+		};
+
 		struct dJointLimit
 		{
 			dFloat m_minTwistAngle;
@@ -40,7 +48,8 @@ class PassiveRagdollManager: public dModelManager
 		};
 
 		char m_boneName[32];
-		int m_collide;
+		int m_type;
+		int m_typeMask;
 		dFloat m_friction;
 		dJointLimit m_jointLimits;
 		dFrameMatrix m_frameBasics;
@@ -78,7 +87,10 @@ class PassiveRagdollManager: public dModelManager
 		if (collisionMaterial0.m_userData != collisionMaterial1.m_userData) {
 			return 1;
 		}
-		return collisionMaterial0.m_userFlags == collisionMaterial1.m_userFlags;
+
+		int val0 = (collisionMaterial0.m_userFlags0 & collisionMaterial1.m_userFlags1);
+		int val1 = (collisionMaterial1.m_userFlags0 & collisionMaterial0.m_userFlags1);
+		return (val0 && val1) ? 1 : 0;
 	}
 
 	static void ClampAngularVelocity(const NewtonBody* body, dFloat timestep, int threadIndex)
@@ -202,11 +214,11 @@ class PassiveRagdollManager: public dModelManager
 	{
 		static dJointDefinition jointsDefinition[] =
 		{
-			{ "mixamorig:Hips", 1 },
-			//{ "mixamorig:Neck", 1, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-			{ "mixamorig:Spine", 1, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-			{ "mixamorig:Spine1", 0, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-			{ "mixamorig:Spine2", 1, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:Hips", 1, 16 },
+			//{ "mixamorig:Neck", 16, 31, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:Spine", 2, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:Spine1", 4, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:Spine2", 8, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 			
 			//{ "mixamorig:LeftArm", 1, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 			//{ "mixamorig:LeftForeArm", 1, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
@@ -243,13 +255,11 @@ class PassiveRagdollManager: public dModelManager
 		//controller->SetCalculateLocalTransforms(true);
 		controller->SetTranformMode(true);
 
-		// save the controller as the collision user data, for collision culling
-		//NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBone), rootBone);
-
 		NewtonCollisionMaterial collisionMaterial;
 		NewtonCollisionGetMaterial(NewtonBodyGetCollision(rootBone), &collisionMaterial);
 		collisionMaterial.m_userData = rootBone;
-		collisionMaterial.m_userFlags = 1;
+		collisionMaterial.m_userFlags0 = jointsDefinition[0].m_type;
+		collisionMaterial.m_userFlags1 = jointsDefinition[0].m_typeMask;
 		NewtonCollisionSetMaterial(NewtonBodyGetCollision(rootBone), &collisionMaterial);
 
 		int stackIndex = 0;
@@ -286,11 +296,11 @@ class PassiveRagdollManager: public dModelManager
 					parentBone = new dModelNode(childBody, bindMatrix, parentBone);
 
 					// save the controller as the collision user data, for collision culling
-					//NewtonCollisionSetUserData(NewtonBodyGetCollision(childBody), rootBone);
 					NewtonCollisionMaterial collisionMaterial;
 					NewtonCollisionGetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
 					collisionMaterial.m_userData = rootBone;
-					collisionMaterial.m_userFlags = jointsDefinition[i].m_collide;
+					collisionMaterial.m_userFlags0 = jointsDefinition[i].m_type;
+					collisionMaterial.m_userFlags1 = jointsDefinition[i].m_typeMask;
 					NewtonCollisionSetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
 					break;
 				}
