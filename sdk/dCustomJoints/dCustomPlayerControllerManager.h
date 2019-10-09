@@ -72,6 +72,7 @@ class dCustomPlayerController
 	};
 
 	void PreUpdate(dFloat timestep);
+	void UpdatePlayerStatus(dContactSolver& contactSolver);
 	void ResolveStep(dFloat timestep, dContactSolver& contactSolver);
 	void ResolveCollision(dContactSolver& contactSolver, dFloat timestep);
 	dFloat PredictTimestep(dFloat timestep, dContactSolver& contactSolver);

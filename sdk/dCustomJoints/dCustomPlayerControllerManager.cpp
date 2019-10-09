@@ -380,7 +380,10 @@ void dCustomPlayerController::SetFrame(const dMatrix& frame)
 	NewtonCollisionSetMatrix(capsule, &newMatrix[0][0]);
 }
 
-#if 1
+
+#define USE_OLD_STE_ALGORITHM
+
+#ifdef USE_OLD_STE_ALGORITHM
 void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& contactSolver)
 {
 	dMatrix matrix;
@@ -761,15 +764,14 @@ void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver, dF
 		dVector point (contact.m_point[0], contact.m_point[1], contact.m_point[2], dFloat (0.0f));
 		dVector normal (contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat (0.0f));
 		const int normalIndex = impulseSolver.AddContactRow(&contact, normal, point - com, 0.0f, 0.0f, 1.0e12f);
-		dVector localPooint (frameMatrix.UntransformVector(point));
+		dVector localPoint (frameMatrix.UntransformVector(point));
 
-		m_isAirbone = false;
-		if (localPooint.m_x < contactPatchHigh) {
+		if (localPoint.m_x < contactPatchHigh) {
 			if (impulseSolver.m_contactPoint[normalIndex]) {
 				impulseSolver.m_jacobianPairs[normalIndex].m_jacobian_J10.m_linear = impulseSolver.m_zero;
 				impulseSolver.m_jacobianPairs[normalIndex].m_jacobian_J10.m_angular = impulseSolver.m_zero;
 			}
-			m_isOnFloor = true;
+
 			dFloat friction = m_manager->ContactFriction(this, point, normal, int (contact.m_contactID), contact.m_hitBody);
 			if (friction > 0.0f) {
 				// add lateral traction friction
@@ -789,6 +791,32 @@ void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver, dF
 	impulseSolver.ApplyReaction(timestep);
 
 	SetVelocity(veloc);
+}
+
+
+void dCustomPlayerController::UpdatePlayerStatus(dContactSolver& contactSolver)
+{
+	dMatrix matrix;
+	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
+
+	m_isAirbone = true;
+	m_isOnFloor = false;
+	matrix = m_localFrame * matrix;
+	contactSolver.CalculateContacts();
+	dFloat contactPatch = m_contactPatch * 0.99f;
+	for (int i = 0; i < contactSolver.m_contactCount; i++) {
+		m_isAirbone = false;
+		NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
+		dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], dFloat(0.0f));
+		dVector localPoint(matrix.UntransformVector(point));
+		if (localPoint.m_x < m_contactPatch) {
+			dVector normal(contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat(0.0f));
+			dVector localNormal(matrix.UnrotateVector(normal));
+			if (localNormal.m_x > 0.99f) {
+				m_isOnFloor = true;
+			}
+		}
+	}
 }
 
 void dCustomPlayerController::PreUpdate(dFloat timestep)
@@ -832,8 +860,6 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 	// determine if player has to step over obstacles lower than step hight
 	ResolveStep(timestep, contactSolver);
 
-	m_isAirbone = true;
-	m_isOnFloor = false;
 	// advance player until it hit a collision point, until there is not more time left
 	for (int i = 0; (i < D_DESCRETE_MOTION_STEPS) && (timeLeft > timeEpsilon); i++) {
 		if (timeLeft > timeEpsilon) {
@@ -844,4 +870,6 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 		NewtonBodyIntegrateVelocity(m_kinematicBody, predicetdTime);
 		timeLeft -= predicetdTime;
 	}
+
+	UpdatePlayerStatus(contactSolver);
 }
