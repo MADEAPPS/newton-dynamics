@@ -1280,11 +1280,11 @@ return NULL;
 };
 
 // we recommend using and input manage to control input for all games
-class AriculatedJointInputManager: public dCustomInputManager
+class AriculatedJointInputManager: public dCustomListener
 {
 	public:
 	AriculatedJointInputManager (DemoEntityManager* const scene)
-		:dCustomInputManager(scene->GetNewton())
+		:dCustomListener(scene->GetNewton(), "D_LISTENER")
 		,m_scene(scene)
 		,m_cameraMode(true)
 		,m_changeVehicle(true)

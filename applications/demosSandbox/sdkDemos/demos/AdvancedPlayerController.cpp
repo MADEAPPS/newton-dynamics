@@ -266,11 +266,11 @@ class AdvancePlayerControllerManager: public dCustomPlayerControllerManager
 
 
 // we recommend using and input manage to control input for all games
-class AdvancedPlayerInputManager: public dCustomInputManager
+class AdvancedPlayerInputManagerr: public dCustomListener
 {
 	public:
 	AdvancedPlayerInputManager (DemoEntityManager* const scene)
-		:dCustomInputManager(scene->GetNewton())
+		:dCustomListener(scene->GetNewton(), "D_LISTENER")
 		,m_scene(scene)
 		,m_player(NULL)
 		,m_jumpKey(false)

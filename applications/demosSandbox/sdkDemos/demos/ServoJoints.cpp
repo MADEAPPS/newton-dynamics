@@ -118,7 +118,7 @@ class dLifterUserData: public DemoEntity::UserData
 };
 
 
-class ServoInputManager: public dCustomInputManager
+class ServoInputManager: public dCustomListener
 {
 	public:
 	class InputRecord
@@ -137,7 +137,7 @@ class ServoInputManager: public dCustomInputManager
 	};
 
 	ServoInputManager(DemoEntityManager* const scene)
-		:dCustomInputManager(scene->GetNewton())
+		:dCustomListener(scene->GetNewton(), "D_LISTENER")
 		,m_scene(scene)
 		,m_cameraMode(true)
 		,m_changeVehicle(true)

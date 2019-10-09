@@ -156,7 +156,6 @@ typedef long long unsigned64;
 #include <dCustomSlidingContact.h>
 #include <dCustomDoubleHingeActuator.h>
 
-#include <dCustomInputManager.h>
 #include <dCustomTriggerManager.h>
 #include <dCustomTransformManager.h>
 #include <dCustomControllerManager.h>
