@@ -1001,7 +1001,7 @@ class dBalancingCharacterManager: public dModelManager
 		// make internal part non collidable
 		model->SetAllPartsNonCollidable();
 #if 1
-		dCustomHinge* fixToWorld = new dCustomHinge (matrix0 * location, model->GetBody(), NULL);
+		dCustomHinge* const fixToWorld = new dCustomHinge (matrix0 * location, model->GetBody(), NULL);
 		fixToWorld->EnableLimits(true);
 		fixToWorld->SetLimits(0.0f, 0.0f);
 #endif

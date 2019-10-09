@@ -20,7 +20,7 @@
 #include "HeightFieldPrimitive.h"
 
 
-class PassiveRagdollManager: public dCustomTransformManager
+class PassiveRagdollManager: public dModelManager
 {
 	class dJointDefinition
 	{
@@ -47,7 +47,7 @@ class PassiveRagdollManager: public dCustomTransformManager
 
 	public: 
 	PassiveRagdollManager (DemoEntityManager* const scene)
-		:dCustomTransformManager (scene->GetNewton())
+		:dModelManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
 		m_material = NewtonMaterialCreateGroupID(scene->GetNewton());
@@ -59,7 +59,7 @@ class PassiveRagdollManager: public dCustomTransformManager
 	{
 	}
 
-	virtual void OnPreUpdate (dCustomTransformController* const controller, dFloat timestep, int threadIndex) const
+	virtual void OnPreUpdate(dModelRootNode* const root, dFloat timestep) const
 	{
 	}
 
@@ -149,7 +149,6 @@ class PassiveRagdollManager: public dCustomTransformManager
 		joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
 	}
 
-
 	dCustomJoint* FindJoint(NewtonBody* const child, NewtonBody* const parent)
 	{
 		//for (NewtonJoint* joint = NewtonBodyGetFirstJoint(child); joint; joint = NewtonBodyGetNextJoint(child, joint)) {
@@ -159,12 +158,12 @@ class PassiveRagdollManager: public dCustomTransformManager
 		//		return cJoint;
 		//	}
 		//}
-		//dAssert (0);
+		dAssert (0);
 		//return NULL;
 		return ::FindJoint(child, parent);
 	}
 
-	virtual void OnUpdateTransform(const dCustomTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
+	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const
 	{
 		NewtonBody* const body = bone->GetBody();
 		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(body);
@@ -198,7 +197,7 @@ class PassiveRagdollManager: public dCustomTransformManager
 		}
 	}
 
-	dCustomTransformController* CreateRagDoll(const dMatrix& location, const DemoEntity* const model)
+	dModelRootNode* CreateRagDoll(const dMatrix& location, const DemoEntity* const model)
 	{
 		static dJointDefinition jointsDefinition[] =
 		{
@@ -206,20 +205,20 @@ class PassiveRagdollManager: public dCustomTransformManager
 			{ "mixamorig:Spine", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 			{ "mixamorig:Spine1", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 			{ "mixamorig:Spine2", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-
-			{ "mixamorig:Neck", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-
+			
+			//{ "mixamorig:Neck", 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			
 			{ "mixamorig:LeftArm", 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 			{ "mixamorig:LeftForeArm", 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-
-			{ "mixamorig:RightArm", 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-			{ "mixamorig:RightForeArm", 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
-
-			{ "mixamorig:LeftUpLeg", 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-			{ "mixamorig:LeftLeg", 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
-
-			{ "mixamorig:RightUpLeg", 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-			{ "mixamorig:RightLeg", 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+			
+			//{ "mixamorig:RightArm", 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:RightForeArm", 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
+			
+			//{ "mixamorig:LeftUpLeg", 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:LeftLeg", 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+			//
+			//{ "mixamorig:RightUpLeg", 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:RightLeg", 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
 		};
 
 		const int definitionCount = sizeof (jointsDefinition)/sizeof (jointsDefinition[0]);
@@ -236,16 +235,20 @@ class PassiveRagdollManager: public dCustomTransformManager
 		NewtonBody* const rootBone = CreateBodyPart(rootEntity);
 
 		// build the rag doll with rigid bodies connected by joints
-		dCustomTransformController* const controller = CreateController(rootBone, dGetIdentityMatrix());
+		dModelRootNode* const controller = new dModelRootNode(rootBone, dGetIdentityMatrix());
 
-		controller->SetCalculateLocalTransforms(true);
+		// add this root model 
+		AddRoot(controller);
+
+		//controller->SetCalculateLocalTransforms(true);
+		controller->SetTranformMode(true);
 
 		// save the controller as the collision user data, for collision culling
 		NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBone), controller);
 
 		int stackIndex = 0;
+		dModelNode* parentBones[32];
 		DemoEntity* childEntities[32];
-		dCustomTransformController::dSkeletonBone* parentBones[32];
 		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
 			parentBones[stackIndex] = controller;
 			childEntities[stackIndex] = child;
@@ -259,10 +262,10 @@ class PassiveRagdollManager: public dCustomTransformManager
 		// walk model hierarchic adding all children designed as rigid body bones. 
 		while (stackIndex) {
 			stackIndex--;
+			dModelNode* parentBone = parentBones[stackIndex];
 			DemoEntity* const entity = childEntities[stackIndex];
-			dCustomTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
-
 			const char* const name = entity->GetName().GetStr();
+			dTrace(("name: %s\n", name));
 			for (int i = 0; i < definitionCount; i++) {
 				if (!strcmp(jointsDefinition[i].m_boneName, name)) {
 					NewtonBody* const childBody = CreateBodyPart(entity);
@@ -274,7 +277,9 @@ class PassiveRagdollManager: public dCustomTransformManager
 					ConnectBodyParts(childBody, parentBody, jointsDefinition[i]);
 
 					dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
-					parentBone = controller->AddBone(childBody, bindMatrix, parentBone);
+					//parentBone = controller->AddBone(childBody, bindMatrix, parentBone);
+					parentBone = new dModelNode(childBody, bindMatrix, parentBone);
+
 					// save the controller as the collision user data, for collision culling
 					NewtonCollisionSetUserData(NewtonBodyGetCollision(childBody), parentBone);
 					break;
@@ -309,8 +314,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-
-
+	
 	//CreateLevelMesh (scene, "flatPlane.ngd", true);
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
 
@@ -329,12 +333,16 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	dVector p(origin + dVector(0.0f, 0.0f, 0.0f, 0.0f));
 	matrix.m_posit = FindFloor(world, p, 100.0f);
 	matrix.m_posit.m_y += 2.0f;
-	dCustomTransformController* const ragdoll = manager->CreateRagDoll(matrix, &(*ragDollModel));
+	dModelRootNode* const ragdoll = manager->CreateRagDoll(matrix, &(*ragDollModel));
 
 	// attach this ragdoll to world with a fix joint
 	dMatrix rootMatrix; 
 	NewtonBodyGetMatrix(ragdoll->GetBody(), &rootMatrix[0][0]);
-	//new dCustom6dof (rootMatrix, ragdoll->GetBody());
+#if 1
+	dCustomHinge* const fixToWorld = new dCustomHinge(rootMatrix, ragdoll->GetBody(), NULL);
+	fixToWorld->EnableLimits(true);
+	fixToWorld->SetLimits(0.0f, 0.0f);
+#endif
 
 	int count = 6;
 	//count = 1;
@@ -343,7 +351,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 			dVector p (origin + dVector (10.0f + (x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
 			matrix.m_posit = FindFloor (world, p, 100.0f);
 			matrix.m_posit.m_y += 2.0f;
-			manager->CreateRagDoll(matrix, &(*ragDollModel));
+//			manager->CreateRagDoll(matrix, &(*ragDollModel));
 		}
 	}
 

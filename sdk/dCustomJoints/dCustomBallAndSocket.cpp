@@ -216,24 +216,6 @@ void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
 	}
 }
 
-void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
-{
-	dMatrix matrix0;
-	dMatrix matrix1;
-
-	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
-	CalculateGlobalMatrix(matrix0, matrix1);
-	SubmitLinearRows(0x07, matrix0, matrix1);
-
-	dFloat cosAngleCos = matrix1.m_front.DotProduct3(matrix0.m_front);
-	if (cosAngleCos < dFloat(0.998f)) {
-		SubmitAngularAxis(matrix0, matrix1, timestep);
-	} else {
-		// front axis are aligned solve by Cartesian approximation
-		SubmitAngularAxisCartisianApproximation(matrix0, matrix1, timestep);
-	}
-}
-
 void dCustomBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat angle, dFloat timestep)
 {
 	if ((m_maxTwistAngle - m_minTwistAngle) < (2.0f * dDegreeToRad)) {
@@ -252,7 +234,7 @@ void dCustomBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat angle, dF
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + restoringOmega * invtimestep;
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_twistFriction);
 		} else if (angle >= m_maxTwistAngle) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
 			const dFloat invtimestep = 1.0f / timestep;
@@ -264,19 +246,26 @@ void dCustomBallAndSocket::SubmitTwistAngle(const dVector& pin, dFloat angle, dF
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) - restoringOmega / timestep;
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
 		} else if ((angle - step) <= m_minTwistAngle) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_twistFriction);
 		} else if ((angle + step) >= m_maxTwistAngle) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
+		} else if (m_twistFriction > 0.0f) {
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_twistFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_twistFriction);
 		}
 	}
 }
@@ -334,7 +323,7 @@ void dCustomBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) - restoringOmega / timestep;
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
 
 			dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
@@ -344,10 +333,22 @@ void dCustomBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
 
 			dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
+		} else if (m_coneFriction > 0.0f) {
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
+
+			dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
 		}
 	}
 
@@ -355,5 +356,23 @@ void dCustomBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 		dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 		dFloat pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 		SubmitTwistAngle(matrix0.m_front, pitchAngle, timestep);
+	}
+}
+
+void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+
+	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
+	CalculateGlobalMatrix(matrix0, matrix1);
+	SubmitLinearRows(0x07, matrix0, matrix1);
+
+	dFloat cosAngleCos = matrix1.m_front.DotProduct3(matrix0.m_front);
+	if (cosAngleCos < dFloat(0.998f)) {
+		SubmitAngularAxis(matrix0, matrix1, timestep);
+	} else {
+		// front axis are aligned solve by Cartesian approximation
+		SubmitAngularAxisCartisianApproximation(matrix0, matrix1, timestep);
 	}
 }
