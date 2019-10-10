@@ -803,7 +803,6 @@ void dCustomPlayerController::UpdatePlayerStatus(dContactSolver& contactSolver)
 	m_isOnFloor = false;
 	matrix = m_localFrame * matrix;
 	contactSolver.CalculateContacts();
-	dFloat contactPatch = m_contactPatch * 0.99f;
 	for (int i = 0; i < contactSolver.m_contactCount; i++) {
 		m_isAirbone = false;
 		NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
