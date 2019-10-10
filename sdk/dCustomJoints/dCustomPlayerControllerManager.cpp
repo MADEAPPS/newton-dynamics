@@ -526,7 +526,7 @@ void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& conta
 				NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
 				dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], dFloat(0.0f));
 				dVector normal(contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat(0.0f));
-				dFloat speed = (contact.m_penetration + D_MAX_COLLISION_PENETRATION) * invTimeStep;
+				dFloat speed = dMin((contact.m_penetration + D_MAX_COLLISION_PENETRATION), dFloat (0.25f)) * invTimeStep;
 				impulseSolver.AddLinearRow(normal, point - com, speed, 0.0f, 1.0e12f);
 			}
 
@@ -538,7 +538,7 @@ void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& conta
 		}
 	}
 
-	dAssert (hasStartMatrix);
+	//dAssert (hasStartMatrix);
 	if (hasStartMatrix) {
 		// clip player velocity along the high contacts
 
