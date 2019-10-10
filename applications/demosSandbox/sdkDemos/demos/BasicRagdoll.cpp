@@ -162,20 +162,6 @@ class PassiveRagdollManager: public dModelManager
 		joint->SetTwistLimits(jointLimits.m_minTwistAngle * dDegreeToRad, jointLimits.m_maxTwistAngle * dDegreeToRad);
 	}
 
-	dCustomJoint* FindJoint(NewtonBody* const child, NewtonBody* const parent)
-	{
-		//for (NewtonJoint* joint = NewtonBodyGetFirstJoint(child); joint; joint = NewtonBodyGetNextJoint(child, joint)) {
-		//	dCustomJoint* const cJoint = (dCustomJoint*) NewtonJointGetUserData(joint);
-		//	if (((child == cJoint->GetBody0()) && (parent == cJoint->GetBody1())) ||
-		//		((child == cJoint->GetBody1()) && (parent == cJoint->GetBody0()))) {
-		//		return cJoint;
-		//	}
-		//}
-		dAssert (0);
-		//return NULL;
-		return ::FindJoint(child, parent);
-	}
-
 	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const
 	{
 		NewtonBody* const body = bone->GetBody();
@@ -215,22 +201,23 @@ class PassiveRagdollManager: public dModelManager
 		static dJointDefinition jointsDefinition[] =
 		{
 			{ "mixamorig:Hips", 1, 16 },
-			//{ "mixamorig:Neck", 16, 31, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-			{ "mixamorig:Spine", 2, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+
+			{ "mixamorig:Neck", 16, 31, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:Spine", 2, 16, 100.0f, { -15.0f, 15.0f,  30.0f }, { 0.0f, 0.0f, 180.0f } },
 			{ "mixamorig:Spine1", 4, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 			{ "mixamorig:Spine2", 8, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
 			
-			//{ "mixamorig:LeftArm", 1, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-			//{ "mixamorig:LeftForeArm", 1, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+			{ "mixamorig:LeftArm", 16, 27, 100.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:LeftForeArm", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
 			
-			//{ "mixamorig:RightArm", 1, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-			//{ "mixamorig:RightForeArm", 1, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
+			{ "mixamorig:RightArm", 16, 27, 100.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:RightForeArm", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
 			
-			//{ "mixamorig:LeftUpLeg", 1, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-			//{ "mixamorig:LeftLeg", 1, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
-			//
-			//{ "mixamorig:RightUpLeg", 1, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
-			//{ "mixamorig:RightLeg", 1, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+			{ "mixamorig:LeftUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:LeftLeg", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+			
+			{ "mixamorig:RightUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:RightLeg", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
 		};
 
 		const int definitionCount = sizeof (jointsDefinition)/sizeof (jointsDefinition[0]);
@@ -358,20 +345,20 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	// attach this ragdoll to world with a fix joint
 	dMatrix rootMatrix; 
 	NewtonBodyGetMatrix(ragdoll->GetBody(), &rootMatrix[0][0]);
-#if 1
+
+#if 0
 	dCustomHinge* const fixToWorld = new dCustomHinge(rootMatrix, ragdoll->GetBody(), NULL);
 	fixToWorld->EnableLimits(true);
 	fixToWorld->SetLimits(0.0f, 0.0f);
 #endif
 
-	int count = 6;
-	//count = 1;
+	int count = 5;
 	for (int x = 0; x < count; x ++) {
 		for (int z = 0; z < count; z ++) {
 			dVector p (origin + dVector (10.0f + (x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));
 			matrix.m_posit = FindFloor (world, p, 100.0f);
 			matrix.m_posit.m_y += 2.0f;
-//			manager->CreateRagDoll(matrix, &(*ragDollModel));
+			manager->CreateRagDoll(matrix, &(*ragDollModel));
 		}
 	}
 
