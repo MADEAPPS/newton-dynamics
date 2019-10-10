@@ -166,10 +166,12 @@ class PassiveRagdollManager: public dModelManager
 	{
 		NewtonBody* const body = bone->GetBody();
 		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(body);
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
+		if (ent) {
+			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 
-		dQuaternion rot(localMatrix);
-		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
+			dQuaternion rot(localMatrix);
+			ent->SetMatrix(*scene, rot, localMatrix.m_posit);
+		}
 	}
 
 	void SetModelMass (dFloat mass, int bodyCount, NewtonBody** const bodyArray) const

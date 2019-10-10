@@ -438,7 +438,7 @@ class ServoVehicleManagerManager: public dModelManager
 */
 	}
 
-	virtual void OnUpdateTransform(const dCustomTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
+	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const
 	{
 		NewtonBody* const body = bone->GetBody();
 		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(body);
