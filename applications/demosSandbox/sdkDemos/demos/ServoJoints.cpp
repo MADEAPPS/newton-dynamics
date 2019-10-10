@@ -117,7 +117,6 @@ class dLifterUserData: public DemoEntity::UserData
 	dFloat m_maxEngineSpeed;
 };
 
-
 class ServoInputManager: public dCustomListener
 {
 	public:
@@ -153,10 +152,8 @@ class ServoInputManager: public dCustomListener
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 	}
 
-	void OnBeginUpdate(dFloat timestepInSecunds)
+	void PreUpdate(dFloat timestepInSecunds)
 	{
-		dTrace(("sorry servo joints demo temporarilly disabled\n"));
-/*
 		if (!m_player[m_currentPlayer % m_playersCount]) {
 			return ;
 		}
@@ -171,6 +168,7 @@ class ServoInputManager: public dCustomListener
 		inputs.m_liftValue = m_listPosit;
 		inputs.m_forkValue = m_forkAngle * dDegreeToRad;
 
+#if 0
 		// check if we must activate the player
 		if (m_needsWakeUp ||
 			m_scene->GetKeyState('A') ||
@@ -180,7 +178,7 @@ class ServoInputManager: public dCustomListener
 			NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetRoot()->m_body;
 			NewtonBodySetSleepState(body, false);
 		}
-#if 0
+
 #if 0
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
@@ -195,7 +193,6 @@ class ServoInputManager: public dCustomListener
 #endif
 #endif
 		lifterData->SetInput(inputs);
-*/
 	}
 
 	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
@@ -242,7 +239,7 @@ class ServoInputManager: public dCustomListener
 	{
 	}
 
-	void AddPlayer(dCustomTransformController* const player)
+	void AddPlayer(dModelRootNode* const player)
 	{
 		m_player[m_playersCount] = player;
 		m_playersCount++;
@@ -269,9 +266,8 @@ class ServoInputManager: public dCustomListener
 		me->RenderPlayerHelp(scene);
 	}
 
-
 	DemoEntityManager* m_scene;
-	dCustomTransformController* m_player[2];
+	dModelRootNode* m_player[2];
 	DemoEntityManager::ButtonKey m_cameraMode;
 	DemoEntityManager::ButtonKey m_changeVehicle;
 	dFloat32 m_palette;
@@ -283,11 +279,11 @@ class ServoInputManager: public dCustomListener
 };
 
 
-class ServoVehicleManagerManager: public dCustomTransformManager
+class ServoVehicleManagerManager: public dModelManager
 {
 	public:
 	ServoVehicleManagerManager(DemoEntityManager* const scene)
-		:dCustomTransformManager(scene->GetNewton())
+		:dModelManager(scene->GetNewton())
 	{
 		// create a material for early collision culling
 		int material = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
@@ -347,7 +343,6 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 			}
 		}
 	}
-
 
 	static int CompoundSubCollisionAABBOverlap (const NewtonJoint* const contact, dFloat timestep, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
 	{
@@ -807,7 +802,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		return new dCustomMotor(engineMatrix.m_up, engine, chassis);
 	}
 
-	dCustomTransformController* CreateForklift(const dMatrix& location, const char* const filename, int bodyPartsCount, SERVO_VEHICLE_DEFINITION* const definition)
+	dModelRootNode* CreateForklift(const dMatrix& location, const char* const filename, int bodyPartsCount, SERVO_VEHICLE_DEFINITION* const definition)
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
@@ -822,11 +817,17 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		DemoEntity* const rootEntity = (DemoEntity*)vehicleModel->Find(definition[0].m_boneName);
 		NewtonBody* const rootBody = CreateBodyPart(rootEntity, definition[0]);
 
-		dCustomTransformController* const controller = CreateController(rootBody, dGetIdentityMatrix());
+//		dCustomTransformController* const controller = CreateController(rootBody, dGetIdentityMatrix());
+		dModelRootNode* const controller = new dModelRootNode(rootBody, dGetIdentityMatrix());
+
+		// add this root model 
+		AddRoot(controller);
+
+		//controller->SetCalculateLocalTransforms(true);
+		controller->SetTranformMode(true);
 
 		//controller->SetSelfCollision(0);
 		controller->SetUserData(vehicleModel);
-		controller->SetCalculateLocalTransforms(true);
 
 		// move the center of mass a lithe to the back, and lower
 		dVector com(0.0f);
@@ -842,6 +843,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		dLifterUserData* const lifterData = new dLifterUserData(vehicleModel);
 		vehicleModel->SetUserData(lifterData);
 
+/*
 		// add engine
 		dCustomTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, controller);
 		lifterData->m_engineJoint = (dCustomDoubleHinge*)engineBone->GetParentJoint();
@@ -889,7 +891,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 				stackIndex++;
 			}
 		}
-
+*/
 		return controller;
 	}
 };
@@ -957,12 +959,12 @@ void ServoJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_y += 0.5f;
 	
 	// load a the mesh of the articulate vehicle
-	dCustomTransformController* const forklift = vehicleManager->CreateForklift(matrix, "forklift.ngd", sizeof(inverseKinematicsRidParts) / sizeof (inverseKinematicsRidParts[0]), inverseKinematicsRidParts);
-	forklift;
+	dModelRootNode* const forklift = vehicleManager->CreateForklift(matrix, "forklift.ngd", sizeof(inverseKinematicsRidParts) / sizeof (inverseKinematicsRidParts[0]), inverseKinematicsRidParts);
 
-dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
-#if 0
 	inputManager->AddPlayer(forklift);
+
+	dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
+#if 0
 
 	// place heavy load to show reproduce black bird dream problems
 	matrix.m_posit.m_x += 2.0f;	

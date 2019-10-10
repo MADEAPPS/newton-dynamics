@@ -302,11 +302,6 @@ class PassiveRagdollManager: public dModelManager
 
 		SetModelMass (100.0f, bodyCount, bodyArray);
 
-		// set the collision mask
-		// note this container work best with a material call back for setting bit field 
-		//dAssert(0);
-		//controller->SetDefaultSelfCollisionMask();
-
 		// transform the entire contraction to its location
 		dMatrix worldMatrix(rootEntity->GetCurrentMatrix() * location);
 		NewtonBodySetMatrixRecursive(rootBone, &worldMatrix[0][0]);
