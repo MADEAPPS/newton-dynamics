@@ -500,7 +500,7 @@ void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& conta
 	dFloat invTimeStep = 1.0f / timestep;
 	bool hasStartMatrix = false;
 
-	for (int i = 0; !hasStartMatrix && (i < 4); i ++) {
+	for (int j = 0; !hasStartMatrix && (j < 4); j ++) {
 		hasStartMatrix = true;
 		contactSolver.CalculateContacts();
 		int count = contactSolver.m_contactCount;
@@ -825,7 +825,6 @@ void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver, dF
 	SetVelocity(veloc);
 }
 
-
 void dCustomPlayerController::UpdatePlayerStatus(dContactSolver& contactSolver)
 {
 	dMatrix matrix;
@@ -843,7 +842,7 @@ void dCustomPlayerController::UpdatePlayerStatus(dContactSolver& contactSolver)
 		if (localPoint.m_x < m_contactPatch) {
 			dVector normal(contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat(0.0f));
 			dVector localNormal(matrix.UnrotateVector(normal));
-			if (localNormal.m_x > 0.99f) {
+			if (localNormal.m_x > 0.95f) {
 				m_isOnFloor = true;
 			}
 		}
