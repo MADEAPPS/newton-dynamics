@@ -19,8 +19,7 @@
 #include "../toolBox/OpenGlUtil.h"
 
 
-
-class dClosestDistanceRecord: public dCustomControllerBase
+class dClosestDistanceRecord
 {
 	class ClosestDistanceEntity: public DemoEntity
 	{
@@ -64,13 +63,16 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		int m_contactsCount;
 	};
 
-
 	public:
-	void PreUpdate(dFloat timestep, int threadIndex)
+	dClosestDistanceRecord()
 	{
 	}
 
-	void PostUpdate(dFloat timestep, int threadIndex)
+	~dClosestDistanceRecord()
+	{
+	}
+
+	void Update(dFloat timestep)
 	{
 		dMatrix matrixA;
 		NewtonBodyGetMatrix(m_body, &matrixA[0][0]);
@@ -107,19 +109,18 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		}
 	}
 
-	void Init (dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID, PrimitiveType castingShapeType)
+	void Init (NewtonWorld* const world, dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID, PrimitiveType castingShapeType)
 	{
+		dMatrix matrix;
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
 		m_pith = dGaussianRandom (dPi * 2.0f);
 		m_yaw = dGaussianRandom (dPi * 2.0f);
 		m_roll = dGaussianRandom (dPi * 2.0f);
 		m_step = 15.0f * (dAbs (dGaussianRandom (0.25f)) + 0.0001f) * dDegreeToRad;
 
-		CreatCasterBody(location_x, location_z, shapeType, materialID);
-
-		NewtonWorld* const world = ((dCustomControllerManager<dClosestDistanceRecord>*)GetManager())->GetWorld();
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-
-		dMatrix matrix;
+		CreatCasterBody(world, location_x, location_z, shapeType, materialID);
+		
 		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
 		matrix.m_posit.m_y += 10.0f;
 		m_castingVisualEntity = new ClosestDistanceEntity (scene, matrix, materialID, castingShapeType);
@@ -130,11 +131,9 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		dAssert(0);
 	}
 
-
 	private:
-	void CreatCasterBody(dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID)
+	void CreatCasterBody(NewtonWorld* const world, dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID)
 	{
-		NewtonWorld* const world = ((dCustomControllerManager<dClosestDistanceRecord>*)GetManager())->GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
 		//dMatrix matrix (GetIdentityMatrix());
@@ -151,7 +150,6 @@ class dClosestDistanceRecord: public dCustomControllerBase
 		DemoMesh* const geometry = new DemoMesh("convexShape", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 		m_body = CreateSimpleSolid (scene, geometry, 1.0f, matrix, collision, materialID);
 
-
 		geometry->Release(); 
 		NewtonDestroyCollision (collision);
 	}
@@ -166,11 +164,11 @@ class dClosestDistanceRecord: public dCustomControllerBase
 };
 
 
-class dClosestDistanceManager: public dCustomControllerManager<dClosestDistanceRecord> 
+class dClosestDistanceManager: public dCustomParallelListener
 {
 	public:
 	dClosestDistanceManager(DemoEntityManager* const scene)
-		:dCustomControllerManager<dClosestDistanceRecord>(scene->GetNewton(), "dConvexCastManager")
+		:dCustomParallelListener(scene->GetNewton(), "dConvexCastManager")
 	{
 	}
 
@@ -184,13 +182,37 @@ class dClosestDistanceManager: public dCustomControllerManager<dClosestDistanceR
 		for (int i = 0; i < count; i ++) {
 			dFloat x = location.m_x - step * count / 2;
 			for (int j = 0; j < count; j ++) {
-				dClosestDistanceRecord* const caster = (dClosestDistanceRecord*)CreateController();
-				caster->Init(x, z, shapeType, materialID, castingShapeType);
+				//dClosestDistanceRecord* const caster = (dClosestDistanceRecord*)CreateController();
+				dClosestDistanceRecord* const caster = &m_list.Append()->GetInfo();
+				caster->Init(GetWorld(), x, z, shapeType, materialID, castingShapeType);
 				x += step;
 			}
 			z += step;
 		}
 	}
+
+	void PostUpdate(dFloat timestep, int threadID)
+	{
+		NewtonWorld* const world = GetWorld();
+		const int threadCount = NewtonGetThreadsCount(world);
+
+		dList<dClosestDistanceRecord>::dListNode* node = m_list.GetFirst();
+		for (int i = 0; i < threadID; i++) {
+			node = node ? node->GetNext() : NULL;
+		}
+
+		if (node) {
+			do {
+				dClosestDistanceRecord& record = node->GetInfo();
+				record.Update(timestep);
+				for (int i = 0; i < threadCount; i++) {
+					node = node ? node->GetNext() : NULL;
+				}
+			} while (node);
+		}
+	}
+
+	dList<dClosestDistanceRecord> m_list;
 };
 
 
