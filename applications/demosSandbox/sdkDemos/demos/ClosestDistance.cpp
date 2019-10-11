@@ -126,11 +126,6 @@ class dClosestDistanceRecord
 		m_castingVisualEntity = new ClosestDistanceEntity (scene, matrix, materialID, castingShapeType);
 	}
 
-	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
-	{
-		dAssert(0);
-	}
-
 	private:
 	void CreatCasterBody(NewtonWorld* const world, dFloat location_x, dFloat location_z, PrimitiveType shapeType, int materialID)
 	{
@@ -169,6 +164,7 @@ class dClosestDistanceManager: public dCustomParallelListener
 	public:
 	dClosestDistanceManager(DemoEntityManager* const scene)
 		:dCustomParallelListener(scene->GetNewton(), "dConvexCastManager")
+		,m_list()
 	{
 	}
 

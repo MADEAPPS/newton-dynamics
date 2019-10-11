@@ -75,7 +75,6 @@
 #include <dCustomRackAndPinion.h>
 #include <dCustomSliderActuator.h>
 #include <dCustomTriggerManager.h>
-#include <dCustomControllerManager.h>
 #include <dCustomDoubleHingeActuator.h>
 #include <dCustomPlayerControllerManager.h>
 #include <dCustomVehicleControllerManager.h>
