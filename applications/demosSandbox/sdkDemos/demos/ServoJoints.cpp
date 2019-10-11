@@ -455,13 +455,11 @@ class ServoVehicleManagerManager: public dModelManager
 	{
 		//dAssert(0);
 		dTrace(("sorry servo joints demo temporarilly disabled\n"));
-		/*
-		//ServoEntityModel* const lifterData = (ServoEntityModel*)controller->GetUserData();
 		dLifterUserData* const lifterData = (dLifterUserData*) ((DemoEntity*)controller->GetUserData())->GetUserData();
 		if (!lifterData) {
 			return;
 		}
-
+		/*
 		dFloat brakeTorque = 10000.0f;
 		if (lifterData->m_engineJoint) {
 			dFloat engineRPM = 0.0f;
@@ -686,8 +684,6 @@ class ServoVehicleManagerManager: public dModelManager
 		NewtonBodyGetMatrix(tire, &matrix[0][0]);
 		dMatrix tireHingeMatrix(dRollMatrix(0.0f * dDegreeToRad) * matrix);
 		tireHingeMatrix = wheel->GetMatrix0() * tireHingeMatrix;
-
-		//dLifterUserData* const lifterData = (dLifterUserData*) ((DemoEntity*)controller->GetUserData())->GetUserData();
 
 		dAssert (chassis == lifterData->m_engineJoint->GetBody1());
 		NewtonBody* const engine = lifterData->m_engineJoint->GetBody0();
