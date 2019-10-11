@@ -25,7 +25,7 @@
 #define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
 #define ARTICULATED_VEHICLE_CAMERA_DISTANCE			13.0f
 
-
+#if 0
 struct ARTICULATED_VEHICLE_DEFINITION
 {
 	enum SHAPES_ID
@@ -134,11 +134,11 @@ class ArticulatedEntityModel: public DemoEntity
 	InputRecord m_inputs;
 };
 
-class ArticulatedVehicleManagerManager: public dCustomTransformManager
+class ArticulatedVehicleManagerManager: public dModelManager
 {
 	public:
 	ArticulatedVehicleManagerManager (DemoEntityManager* const scene)
-		:dCustomTransformManager (scene->GetNewton())
+		:dModelManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
 		int material = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
@@ -1444,7 +1444,7 @@ class AriculatedJointInputManager: public dCustomListener
 	dFloat32 m_gripperRoll; 
 	dFloat32 m_gripperPitch; 
 };
-
+#endif
 
 void ArticulatedJoints (DemoEntityManager* const scene)
 {

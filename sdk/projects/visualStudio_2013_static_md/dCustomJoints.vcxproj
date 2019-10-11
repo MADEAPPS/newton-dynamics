@@ -39,7 +39,6 @@
     <ClCompile Include="..\..\dCustomJoints\dCustomSixdof.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomAlloc.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomTireSpringDG.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\dCustomTransformManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomBallAndSocket.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomCorkScrew.cpp" />
@@ -81,7 +80,6 @@
     <ClInclude Include="..\..\dCustomJoints\dCustomSixdof.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomAlloc.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomTireSpringDG.h" />
-    <ClInclude Include="..\..\dCustomJoints\dCustomTransformManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomBallAndSocket.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomCorkScrew.h" />
