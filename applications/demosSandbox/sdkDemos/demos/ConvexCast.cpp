@@ -144,7 +144,6 @@ class StupidComplexOfConvexShapes: public DemoEntity
 		return m_castingShapeArray[m_currentCastingShape];
 	}
 
-
 	void SetCastingLine (const dVector& p0, const dVector& p1)
 	{
 		m_rayP0 = p0;
@@ -161,7 +160,6 @@ class StupidComplexOfConvexShapes: public DemoEntity
 	{
 		m_castingEntity->ResetMatrix(*scene, matrix);
 	}
-
 
 	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
 	{
@@ -187,29 +185,11 @@ class StupidComplexOfConvexShapes: public DemoEntity
 	NewtonCollision** m_castingShapeArray;
 };
 
-
-class dConvexCastRecord: public dCustomControllerBase
-{
-public:
-	void PreUpdate(dFloat timestep, int threadIndex)
-	{
-		(void)timestep;
-		(void)threadIndex;
-	}
-
-	void PostUpdate(dFloat timestep, int threadIndex)
-	{
-		(void)timestep;
-		(void)threadIndex;
-	}
-};
-
-
-class dConvexCastManager: public dCustomControllerManager<dConvexCastRecord>
+class dConvexCastManager: public dCustomListener
 {
 	public:
 	dConvexCastManager(DemoEntityManager* const scene, StupidComplexOfConvexShapes* const stupidLevel)
-		:dCustomControllerManager<dConvexCastRecord>(scene->GetNewton(), "dConvexCastManager")
+		:dCustomListener(scene->GetNewton(), "dConvexCastManager")
 		,m_selectShape (true)
 		,m_stupidLevel(stupidLevel)
 	{
@@ -335,6 +315,7 @@ static void AddSingleCompound(DemoEntityManager* const scene)
 
 static void AddStaticMesh(DemoEntityManager* const scene)
 {
+/*
 	char fileName[2048];
 
 	NewtonWorld* const world = scene->GetNewton();
@@ -352,6 +333,7 @@ static void AddStaticMesh(DemoEntityManager* const scene)
 	CreateLevelMeshBody (world, entity, true);
 
 	NewtonMeshDestroy (ntMesh);
+*/
 }
 
 static void AddUserDefineStaticMesh(DemoEntityManager* const scene)
