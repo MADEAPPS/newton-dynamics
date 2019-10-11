@@ -157,7 +157,6 @@ typedef long long unsigned64;
 #include <dCustomDoubleHingeActuator.h>
 
 #include <dCustomTriggerManager.h>
-#include <dCustomControllerManager.h>
 #include <dCustomKinematicController.h>
 #include <dCustomPlayerControllerManager.h>
 #include <dCustomPlayerControllerManager.h>

@@ -25,48 +25,8 @@
 //////////////////////////////////////////////////////////////////////
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomTireSpringDG.h"
-#include "dCustomControllerManager.h"
 
 IMPLEMENT_CUSTOM_JOINT(dCustomTireSpringDG);
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/* dCustomVehicleControllerDG */
-
-void dCustomVehicleControllerDG::Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
-{
-  //dCustomVehicleControllerManagerDG* const manager = (dCustomVehicleControllerManagerDG*)GetManager();
-  //NewtonWorld* const world = manager->GetWorld();
-  //
-}
-
-void dCustomVehicleControllerDG::Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
-{
-  //dCustomVehicleControllerManagerDG* const manager = (dCustomVehicleControllerManagerDG*)GetManager();
-  //NewtonWorld* const world = manager->GetWorld();
-  //
-
-}
-
-void dCustomVehicleControllerDG::PreUpdate(dFloat timestep, int threadIndex)
-{
-	//dCustomVehicleControllerManagerDG* const manager = (dCustomVehicleControllerManagerDG*)GetManager();
-	//
-	//Beep(200,400);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/* dCustomVehicleControllerManagerDG */
-
-dCustomVehicleControllerManagerDG::dCustomVehicleControllerManagerDG(NewtonWorld* const world, int materialCount, int* const otherMaterials)
-  :dCustomControllerManager<dCustomVehicleControllerDG>(world, VEHICLE_DG_PLUGIN_NAME)
-{
-  //
-}
-
-dCustomVehicleControllerManagerDG::~dCustomVehicleControllerManagerDG()
-{
-  //
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /* dCustomTireSpringDG */

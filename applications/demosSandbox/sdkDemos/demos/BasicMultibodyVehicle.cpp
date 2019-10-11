@@ -172,11 +172,7 @@ static dFloat dRandRangeFloat(dFloat amin, dFloat amax)
 	return (amin + r * (amax - amin));
 }
 
-
-class MultibodyVehicleControllerDG;
-static bool IsPlayer(const MultibodyVehicleControllerDG* const controller);
-
-class MultibodyVehicleControllerDG: public dCustomControllerBase
+class MultibodyVehicleControllerDG
 {
 	public:
 	void Init(NewtonBody* const body)
@@ -184,6 +180,11 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 		m_body = body;
 		m_tireCount = 0;
 		mEngineFpsRequest = 120.0f;
+	}
+
+	NewtonBody* GetBody() const
+	{
+		return m_body;
 	}
 
 	protected:
@@ -380,9 +381,9 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 		return mEngineFpsRequest;
 	}
 
-	void OnBeginUpdate(dFloat timestepInSecunds)
+	void OnBeginUpdate(NewtonWorld* const world, dFloat timestepInSecunds)
 	{
-		NewtonWorld* const world = GetManager()->GetWorld();
+		//NewtonWorld* const world = GetManager()->GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 		int Accelerator = int(scene->GetKeyState(265)) - int(scene->GetKeyState(264));
 		int SteerAction = int(scene->GetKeyState(263)) - int(scene->GetKeyState(262));
@@ -402,6 +403,7 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 			}
 	#endif
 #endif
+
 		//int HardBreakAction = ;
 		//
 		// The best is to create a engine value with graduation for the torque.
@@ -534,12 +536,8 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 #endif
 	}
 
-	virtual void PreUpdate(dFloat timestep, int threadIndex)
+	void Update(dFloat timestep)
 	{
-		if (IsPlayer(this)) {
-			OnBeginUpdate(timestep);
-		}
-
 		//ApplyTireSuspensionForcesOld (timestep);
 		ApplyTireSuspensionForces (timestep);
 
@@ -551,24 +549,22 @@ class MultibodyVehicleControllerDG: public dCustomControllerBase
 			}
 		}
 	}
-
-	virtual void PostUpdate(dFloat timestep, int threadIndex) 
-	{
-	}
 	
 	int m_tireCount;
 	dFloat mEngineFpsRequest;
+	NewtonBody* m_body;
+	MultibodyVehicleControllerDG* m_manager;
 	dCustomTireSpringDG* m_tireJoint[4];
 	friend class MultibodyVehicleControllerManagerDG;
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<MultibodyVehicleControllerDG>
+class MultibodyVehicleControllerManagerDG: public dCustomListener
 {
 	public:
 	MultibodyVehicleControllerManagerDG(NewtonWorld* const world)
-		:dCustomControllerManager<MultibodyVehicleControllerDG>(world, "Multi body Vehicle Manage DG")
+		:dCustomListener(world, "Multi body Vehicle Manage DG")
 		,m_currentController(NULL)
 		,m_tireMaterial(0)
 	{
@@ -790,8 +786,7 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 	{
 		NewtonBody* const chassis = CreateChassis(location, 1200.0f, dVector(-0.15f, -0.65f, 0.0f), dVector(4.0f, 1.125f, 2.55f));
 
-		MultibodyVehicleControllerDG* const controller = CreateController();
-		//cVcontroller = controller;
+		MultibodyVehicleControllerDG* const controller = &m_list.Append()->GetInfo();
 		controller->Init(chassis);
 
 		// front tires
@@ -804,16 +799,23 @@ class MultibodyVehicleControllerManagerDG: public dCustomControllerManager<Multi
 
 		return controller;
 	}
+
+	void PreUpdate(dFloat timestep)
+	{
+		for (dList<MultibodyVehicleControllerDG>::dListNode* node = m_list.GetFirst(); node; node = node->GetNext()) {
+			MultibodyVehicleControllerDG* const vehicle = &node->GetInfo();
+			if (vehicle == m_currentController) {
+				vehicle->OnBeginUpdate(GetWorld(), timestep);
+			}
+			vehicle->Update(timestep);
+		}
+	}
 	
 	MultibodyVehicleControllerDG* m_currentController;
+	dList<MultibodyVehicleControllerDG> m_list;
 	int m_tireMaterial;
 	friend class dCustomVehicleControllerDG;
 };
-
-static bool IsPlayer(const MultibodyVehicleControllerDG* const controller)
-{
-	return ((MultibodyVehicleControllerManagerDG*)controller->GetManager())->m_currentController ? true : false;
-}
 
 static void BuildPyramid(DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count, PrimitiveType type, const dMatrix& shapeMatrix = dGetIdentityMatrix())
 {

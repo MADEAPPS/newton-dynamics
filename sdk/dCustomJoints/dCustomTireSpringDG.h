@@ -29,9 +29,6 @@
 
 #include "dCustomJoint.h"
 #include "dCustomAlloc.h"
-#include "dCustomControllerManager.h"
-
-#define VEHICLE_DG_PLUGIN_NAME			"__davegravelvehicleMan__"
 
 const dFloat VEHICLE_DEGTOANG = 3.141592f / 180.0f;
 const dFloat VEHICLE_ANGTODEG = 180.0f / 3.141592f;
@@ -41,31 +38,6 @@ const dFloat VEHICLE_STEER_ACTIVE = 1.0e-4f;
 const dFloat VEHICLE_BREAK_CHECK = 1.0e-3f;
 const dFloat VEHICLE_ATTACH_FORCE_SIDE = -1;
 
-class dCustomVehicleControllerDG : public dCustomControllerBase
-{
-	public:
-	CUSTOM_JOINTS_API void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-	CUSTOM_JOINTS_API void Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-
-	protected:
-	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadIndex);
-	virtual void PostUpdate(dFloat timestep, int threadIndex) {};
-	//
-	friend class dCustomVehicleControllerManager;
-};
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-class dCustomVehicleControllerManagerDG : public dCustomControllerManager<dCustomVehicleControllerDG>
-{
-	public:
-	CUSTOM_JOINTS_API dCustomVehicleControllerManagerDG(NewtonWorld* const world, int materialCount, int* const otherMaterials);
-	CUSTOM_JOINTS_API virtual ~dCustomVehicleControllerManagerDG();
-	//
-	friend class dCustomVehicleControllerDG;
-};
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class dCustomTireSpringDG : public dCustomJoint
 {
