@@ -50,7 +50,6 @@
     <ClCompile Include="..\..\dNewton\dNewtonRayCast.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonScopeBuffer.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonTransformLerp.cpp" />
-    <ClCompile Include="..\..\dNewton\dNewtonTransformManager.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonTriggerManager.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonVehicleManager.cpp" />
     <ClCompile Include="..\..\dNewton\dStdAfxNewton.cpp">
@@ -80,8 +79,7 @@
     <ClInclude Include="..\..\dNewton\dNewtonRayCast.h" />
     <ClInclude Include="..\..\dNewton\dNewtonScopeBuffer.h" />
     <ClInclude Include="..\..\dNewton\dNewtonTransformLerp.h" />
-    <ClInclude Include="..\..\dNewton\dNewtonTransformManager.h" />
-    <ClInclude Include="..\..\dNewton\dNewtonTriggerManager.h" />
+        <ClInclude Include="..\..\dNewton\dNewtonTriggerManager.h" />
     <ClInclude Include="..\..\dNewton\dNewtonVehicleManager.h" />
     <ClInclude Include="..\..\dNewton\dStdAfxNewton.h" />
   </ItemGroup>

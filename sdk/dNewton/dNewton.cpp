@@ -24,8 +24,6 @@
 #include "dNewtonBody.h"
 #include "dNewtonMaterial.h"
 #include "dNewtonCollision.h"
-#include "dNewtonTransformManager.h"
-
 
 #ifdef _CNEWTON_BUILD_DLL
 	#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
@@ -104,7 +102,8 @@ dNewton::dNewton()
 	NewtonMaterialSetCollisionCallback (m_world, defaultMaterial, defaultMaterial, OnBodiesAABBOverlap, OnContactProcess);
 
 	// add a hierarchical transform manage to update local transforms
-	new dNewtonTransformManager (this);
+	dAssert (0);
+//	new dNewtonTransformManager (this);
 
 	// set the timer
 	ResetTimer();
