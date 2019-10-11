@@ -41,6 +41,11 @@ class dCustomWheel: public dCustomSlidingContact
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 	CUSTOM_JOINTS_API virtual void SubmitAnglarStructuralRows(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dCustomSlidingContact::SubmitConstraints(timestep, threadIndex);
+	}
+
 	dFloat m_steerAngle;
 	dFloat m_steerSpeed;
 	dFloat m_currentSteerAngle;

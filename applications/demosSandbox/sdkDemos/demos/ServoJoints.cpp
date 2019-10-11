@@ -168,29 +168,29 @@ class ServoInputManager: public dCustomListener
 		inputs.m_liftValue = m_listPosit;
 		inputs.m_forkValue = m_forkAngle * dDegreeToRad;
 
-#if 0
 		// check if we must activate the player
 		if (m_needsWakeUp ||
 			m_scene->GetKeyState('A') ||
 			m_scene->GetKeyState('D') ||
 			m_scene->GetKeyState('W') ||
 			m_scene->GetKeyState('S')) {
-			NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetRoot()->m_body;
+			NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetBody();
 			NewtonBodySetSleepState(body, false);
 		}
 
 #if 0
-		static FILE* file = fopen("log.bin", "wb");
-		if (file) {
-			fwrite(&inputs, sizeof(inputs), 1, file);
-			fflush(file);
-		}
-#else 
-		static FILE* file = fopen("log.bin", "rb");
-		if (file) {
-			fread(&inputs, sizeof(inputs), 1, file);
-		}
-#endif
+	#if 0
+			static FILE* file = fopen("log.bin", "wb");
+			if (file) {
+				fwrite(&inputs, sizeof(inputs), 1, file);
+				fflush(file);
+			}
+	#else 
+			static FILE* file = fopen("log.bin", "rb");
+			if (file) {
+				fread(&inputs, sizeof(inputs), 1, file);
+			}
+	#endif
 #endif
 		lifterData->SetInput(inputs);
 	}
@@ -203,9 +203,6 @@ class ServoInputManager: public dCustomListener
 
 	void UpdateCamera(dFloat timestepInSecunds)
 	{
-		dTrace(("Fix this shit\n"));
-		/*
-
 		if (!m_player[m_currentPlayer % m_playersCount]) {
 			return;
 		}
@@ -232,7 +229,6 @@ class ServoInputManager: public dCustomListener
 		}
 
 		camera->SetNextMatrix(*m_scene, camMatrix, camOrigin);
-*/
 	}
 
 	void OnEndUpdate(dFloat timestepInSecunds)
@@ -453,13 +449,11 @@ class ServoVehicleManagerManager: public dModelManager
 	//virtual void OnPreUpdate (dCustomTransformController* const controller, dFloat timestep, int threadIndex) const
 	virtual void OnPreUpdate(dModelRootNode* const controller, dFloat timestep) const
 	{
-		//dAssert(0);
-		dTrace(("sorry servo joints demo temporarilly disabled\n"));
 		dLifterUserData* const lifterData = (dLifterUserData*) ((DemoEntity*)controller->GetUserData())->GetUserData();
 		if (!lifterData) {
 			return;
 		}
-		/*
+		
 		dFloat brakeTorque = 10000.0f;
 		if (lifterData->m_engineJoint) {
 			dFloat engineRPM = 0.0f;
@@ -513,7 +507,6 @@ class ServoVehicleManagerManager: public dModelManager
 		if (lifterData->m_paletteJoints[1]) {
 			lifterData->m_paletteJoints[1]->SetTargetPosit(lifterData->m_inputs.m_paletteValue);
 		}
-*/
 	}
 
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
