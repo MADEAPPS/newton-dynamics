@@ -51,7 +51,6 @@
     <ClCompile Include="..\..\dNewton\dNewtonScopeBuffer.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonTransformLerp.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonTriggerManager.cpp" />
-    <ClCompile Include="..\..\dNewton\dNewtonVehicleManager.cpp" />
     <ClCompile Include="..\..\dNewton\dStdAfxNewton.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
@@ -80,7 +79,6 @@
     <ClInclude Include="..\..\dNewton\dNewtonScopeBuffer.h" />
     <ClInclude Include="..\..\dNewton\dNewtonTransformLerp.h" />
     <ClInclude Include="..\..\dNewton\dNewtonTriggerManager.h" />
-    <ClInclude Include="..\..\dNewton\dNewtonVehicleManager.h" />
     <ClInclude Include="..\..\dNewton\dStdAfxNewton.h" />
   </ItemGroup>
   <ItemGroup>

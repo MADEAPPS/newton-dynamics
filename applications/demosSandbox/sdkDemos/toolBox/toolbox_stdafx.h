@@ -159,15 +159,12 @@ typedef long long unsigned64;
 #include <dCustomTriggerManager.h>
 #include <dCustomKinematicController.h>
 #include <dCustomPlayerControllerManager.h>
-#include <dCustomPlayerControllerManager.h>
-#include <dCustomVehicleControllerManager.h>
 
 #include <dModelStdAfx.h>
 #include <dModelManager.h>
 #include <dModelAnimTree.h>
 #include <dModelAnimTreePose.h>
 #include <dModelAnimTreePoseBlender.h>
-
 
 #include <dStdafxVehicle.h>
 #include <dVehicleChassis.h>

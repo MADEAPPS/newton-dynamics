@@ -77,6 +77,5 @@
 #include <dCustomTriggerManager.h>
 #include <dCustomDoubleHingeActuator.h>
 #include <dCustomPlayerControllerManager.h>
-#include <dCustomVehicleControllerManager.h>
 
 #endif

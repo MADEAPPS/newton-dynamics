@@ -71,7 +71,6 @@
     <ClCompile Include="..\..\dCustomJoints\dCustomDoubleHinge.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomDoubleHingeActuator.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomUpVector.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\dCustomVehicleControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomWheel.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -102,7 +101,6 @@
     <ClInclude Include="..\..\dCustomJoints\dCustomDoubleHinge.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomDoubleHingeActuator.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomUpVector.h" />
-    <ClInclude Include="..\..\dCustomJoints\dCustomVehicleControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomWheel.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
