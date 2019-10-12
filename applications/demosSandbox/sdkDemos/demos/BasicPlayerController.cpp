@@ -401,23 +401,31 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	// add second player for testing
 	location.m_posit.m_x += 4.0f;
-	location.m_posit.m_z += 2.0f;
+	location.m_posit.m_z += 1.0f;
 	location.m_posit.m_y += 5.0f;
 	dCustomPlayerController* const player1 = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
-	//tilt player transform
-	dMatrix playerMatrix;
-	NewtonCollisionGetMatrix(NewtonBodyGetCollision(player1->GetBody()), &playerMatrix[0][0]);
-	playerMatrix = dYawMatrix(20.0f * dDegreeToRad) * playerMatrix;
-	NewtonCollisionSetMatrix(NewtonBodyGetCollision(player1->GetBody()), &playerMatrix[0][0]);
+	location.m_posit.m_z += 3.0f;
+	dCustomPlayerController* const player2 = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	player1;
+	player2;
 
-	//location.m_posit.m_z += 2.0f;
-	//dCustomPlayerController* const player2 = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
-	//player1;
-	//player2;
+	// show player special effects
+	{
+		//tilt player transform
+		dMatrix playerMatrix;
+		NewtonCollisionGetMatrix(NewtonBodyGetCollision(player1->GetBody()), &playerMatrix[0][0]);
+		playerMatrix = dYawMatrix(20.0f * dDegreeToRad) * playerMatrix;
+		NewtonCollisionSetMatrix(NewtonBodyGetCollision(player1->GetBody()), &playerMatrix[0][0]);
 
+		// make play flat of ground
+		player2->ToggleCrouch();
+		dFloat scaleX, scaleY, scaleZ;
+		NewtonCollisionGetScale (NewtonBodyGetCollision(player2->GetBody()), &scaleX, &scaleY, &scaleZ);
+		scaleZ *= 3.5f;										  
+		NewtonCollisionSetScale (NewtonBodyGetCollision(player2->GetBody()), scaleX, scaleY, scaleZ);
+	}
 
-//	//playerManager->DestroyController (player1);
-
+	//playerManager->DestroyController (player1);
 	location.m_posit.m_x += 5.0f;
 
 	int count = 1;
