@@ -16,9 +16,9 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleChassis.h"
 
-#define D_VEHICLE_MANAGER_NAME			"__ReducedCoordinadeVehicleManager__"
+#define D_VEHICLE_MANAGER_NAME			"__SingleBodyVehicleManager__"
 
-class dVehicleManager: public dCustomControllerManager<dVehicleChassis>
+class dVehicleManager: public dCustomParallelListener
 {
 	public:
 	DVEHICLE_API dVehicleManager(NewtonWorld* const world);
@@ -33,10 +33,16 @@ class dVehicleManager: public dCustomControllerManager<dVehicleChassis>
 	DVEHICLE_API virtual dVehicleChassis* CreateSingleBodyVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 
 	DVEHICLE_API virtual void DestroyController(dVehicleChassis* const controller);
+
 	protected:
+
+	DVEHICLE_API virtual void PreUpdate(dFloat timestep, int threadID);
+	DVEHICLE_API virtual void PostUpdate(dFloat timestep, int threadID);
 
 	DVEHICLE_API virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
 	friend class dVehicleChassis;
+
+	dList<dVehicleChassis> m_list;
 };
 
 

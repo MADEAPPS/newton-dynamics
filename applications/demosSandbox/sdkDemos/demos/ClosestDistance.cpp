@@ -158,7 +158,6 @@ class dClosestDistanceRecord
 	dFloat m_step;
 };
 
-
 class dClosestDistanceManager: public dCustomParallelListener
 {
 	public:

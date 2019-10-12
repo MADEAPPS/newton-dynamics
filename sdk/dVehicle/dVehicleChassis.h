@@ -19,7 +19,7 @@
 #include "dVehicleDashControl.h"
 
 
-class dVehicleChassis: public dCustomControllerBase
+class dVehicleChassis
 {
 	public:
 	class dDriverInput
@@ -163,7 +163,10 @@ class dVehicleChassis: public dCustomControllerBase
 
 	public:
 	DVEHICLE_API dVehicleChassis ();
-	dVehicleInterface* GetVehicle() {return m_vehicle;}
+	DVEHICLE_API ~dVehicleChassis();
+
+	NewtonBody* GetBody() const { return m_body; }
+	dVehicleInterface* GetVehicle() const {return m_vehicle;}
 	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
 	DVEHICLE_API dVehicleDifferentialInterface* AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire);
 	DVEHICLE_API dVehicleEngineInterface* AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential);
@@ -179,14 +182,14 @@ class dVehicleChassis: public dCustomControllerBase
 
 	void ApplyExternalForces(dFloat timestep);
 
-	protected:
-	DVEHICLE_API virtual void PreUpdate(dFloat timestep, int threadIndex);
-	DVEHICLE_API virtual void PostUpdate(dFloat timestep, int threadIndex);
-	DVEHICLE_API virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+	private:
+	void PreUpdate(dFloat timestep);
+	void PostUpdate(dFloat timestep);
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
 	void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-	void Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-	void Cleanup();
+	void Init(NewtonWorld* const world, NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+//	void Cleanup();
 	
 	void CalculateTireContacts(dFloat timestep);
 	void CalculateSuspensionForces(dFloat timestep);
@@ -199,6 +202,7 @@ class dVehicleChassis: public dCustomControllerBase
 	dVector m_obbSize;
 	dVector m_obbOrigin;
 
+	NewtonBody* m_body;
 	dVehicleInterface* m_vehicle;
 	dVehicleBrakeControl* m_brakeControl;
 	dVehicleEngineControl* m_engineControl;

@@ -21,6 +21,7 @@ dVehicleChassis::dVehicleChassis ()
 	,m_gravity(0.0f)
 	,m_obbSize(0.0f)
 	,m_obbOrigin(0.0f)
+	,m_body(NULL)
 	,m_vehicle(NULL)
 	,m_brakeControl(NULL)
 	,m_engineControl(NULL)
@@ -30,10 +31,33 @@ dVehicleChassis::dVehicleChassis ()
 	dAssert(0);
 }
 
-void dVehicleChassis::Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+dVehicleChassis::~dVehicleChassis()
 {
-	dVehicleManager* const manager = (dVehicleManager*)GetManager();
-	NewtonWorld* const world = manager->GetWorld();
+	if (m_brakeControl) {
+		delete m_brakeControl;
+	}
+
+	if (m_handBrakeControl) {
+		delete m_handBrakeControl;
+	}
+
+	if (m_engineControl) {
+		delete m_engineControl;
+	}
+
+	if (m_steeringControl) {
+		delete m_steeringControl;
+	}
+
+	if (m_vehicle) {
+		delete m_vehicle;
+	}
+}
+
+void dVehicleChassis::Init(NewtonWorld* const world, NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+{
+//	dVehicleManager* const manager = (dVehicleManager*)GetManager();
+//	NewtonWorld* const world = manager->GetWorld();
 
 	// create a body and call the low level init function
 	dMatrix locationMatrix(dGetIdentityMatrix());
@@ -72,6 +96,7 @@ void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, Ne
 */
 }
 
+/*
 void dVehicleChassis::Cleanup()
 {
 	if (m_brakeControl) {
@@ -94,6 +119,7 @@ void dVehicleChassis::Cleanup()
 		delete m_vehicle;
 	}
 }
+*/
 
 dVehicleBrakeControl* dVehicleChassis::GetBrakeControl()
 {
@@ -237,12 +263,12 @@ void dVehicleChassis::CalculateTireContacts(dFloat timestep)
 */
 }
 
-void dVehicleChassis::PostUpdate(dFloat timestep, int threadIndex)
+void dVehicleChassis::PostUpdate(dFloat timestep)
 {
 	m_vehicle->RigidBodyToStates();
 }
 
-void dVehicleChassis::PreUpdate(dFloat timestep, int threadIndex)
+void dVehicleChassis::PreUpdate(dFloat timestep)
 {
 	dAssert(0);
 	/*
