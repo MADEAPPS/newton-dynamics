@@ -404,7 +404,18 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit.m_z += 2.0f;
 	location.m_posit.m_y += 5.0f;
 	dCustomPlayerController* const player1 = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
-	player1;
+	//tilt player transform
+	dMatrix playerMatrix;
+	NewtonCollisionGetMatrix(NewtonBodyGetCollision(player1->GetBody()), &playerMatrix[0][0]);
+	playerMatrix = dYawMatrix(20.0f * dDegreeToRad) * playerMatrix;
+	NewtonCollisionSetMatrix(NewtonBodyGetCollision(player1->GetBody()), &playerMatrix[0][0]);
+
+	//location.m_posit.m_z += 2.0f;
+	//dCustomPlayerController* const player2 = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	//player1;
+	//player2;
+
+
 //	//playerManager->DestroyController (player1);
 
 	location.m_posit.m_x += 5.0f;
