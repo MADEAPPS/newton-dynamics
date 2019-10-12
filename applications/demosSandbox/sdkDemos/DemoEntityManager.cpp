@@ -72,10 +72,10 @@
 //#define DEFAULT_SCENE	36		// balancing character
 //#define DEFAULT_SCENE	37		// dynamic rag doll
 //#define DEFAULT_SCENE	38		// basic Car
-//#define DEFAULT_SCENE	39		// single body vehicle
+#define DEFAULT_SCENE	39		// single body vehicle
 //#define DEFAULT_SCENE	40		// super Car
 //#define DEFAULT_SCENE	41		// heavy vehicles
-#define DEFAULT_SCENE	42		// basic player controller
+//#define DEFAULT_SCENE	42		// basic player controller
 //#define DEFAULT_SCENE	43		// animated player controller
 //#define DEFAULT_SCENE	44		// advanced player controller
 //#define DEFAULT_SCENE	45		// cloth patch			
@@ -359,7 +359,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
 //	m_showListenersDebugInfo = true;
-	m_collisionDisplayMode = 2;
+//	m_collisionDisplayMode = 2;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
 

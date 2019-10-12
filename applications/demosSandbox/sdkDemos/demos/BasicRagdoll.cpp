@@ -342,7 +342,8 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	dVector p(origin + dVector(0.0f, 0.0f, 0.0f, 0.0f));
 	matrix.m_posit = FindFloor(world, p, 100.0f);
 	matrix.m_posit.m_y += 2.0f;
-	dModelRootNode* const ragdoll = manager->CreateRagDoll(matrix, &(*ragDollModel));
+	//dModelRootNode* const ragdoll = manager->CreateRagDoll(matrix, &(*ragDollModel));
+	dModelRootNode* const ragdoll = manager->CreateRagDoll(matrix, ragDollModel.GetData());
 	ragdoll;
 
 #if 0

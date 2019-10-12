@@ -410,6 +410,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	player2;
 
 	// show player special effects
+	if (0)
 	{
 		//tilt player transform
 		dMatrix playerMatrix;

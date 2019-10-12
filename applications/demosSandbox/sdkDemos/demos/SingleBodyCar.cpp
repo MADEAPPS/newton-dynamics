@@ -23,10 +23,11 @@
 #define VEHICLE_THIRD_PERSON_VIEW_DIST		7.0f
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
 
-#if 0
+
 class SingleBodyVehicleManager: public dVehicleManager
 {
 	public:
+#if 0
 	class VehicleUserData: public DemoEntity::UserData
 	{
 		public:
@@ -64,34 +65,36 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dVehicleChassis* m_vehicleChassis;
 		int m_gearMap[10];
 	};
+#endif
 
 	SingleBodyVehicleManager(NewtonWorld* const world)
 		:dVehicleManager(world)
-		,m_player(NULL)
-		,m_externalView(true)
+//		,m_player(NULL)
+//		,m_externalView(true)
 	{
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
-
-		scene->Set2DDisplayRenderFunction(RenderHelpMenu, RenderUI, this);
-
-		// load 2d display assets
-		m_gears = LoadTexture("gears_font.tga");
-		m_odometer = LoadTexture("kmh_dial.tga");
-		m_tachometer = LoadTexture("rpm_dial.tga");
-		m_redNeedle = LoadTexture("needle_red.tga");
-		m_greenNeedle = LoadTexture("needle_green.tga");
+		//DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+		//scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
+		//
+		//scene->Set2DDisplayRenderFunction(RenderHelpMenu, RenderUI, this);
+		//
+		//// load 2d display assets
+		//m_gears = LoadTexture("gears_font.tga");
+		//m_odometer = LoadTexture("kmh_dial.tga");
+		//m_tachometer = LoadTexture("rpm_dial.tga");
+		//m_redNeedle = LoadTexture("needle_red.tga");
+		//m_greenNeedle = LoadTexture("needle_green.tga");
 	}
 
 	~SingleBodyVehicleManager()
 	{
-		ReleaseTexture (m_gears);
-		ReleaseTexture (m_odometer);
-		ReleaseTexture (m_redNeedle);
-		ReleaseTexture (m_tachometer);
-		ReleaseTexture (m_greenNeedle);
+		//ReleaseTexture (m_gears);
+		//ReleaseTexture (m_odometer);
+		//ReleaseTexture (m_redNeedle);
+		//ReleaseTexture (m_tachometer);
+		//ReleaseTexture (m_greenNeedle);
 	}
 
+#if 0
 	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
 	{
 		SingleBodyVehicleManager* const me = (SingleBodyVehicleManager*)context;
@@ -302,23 +305,6 @@ return;
 		return shape;
 	}
 
-	DemoEntity* const LoadModel_ndg(const char* const modelName)
-	{
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
-		DemoEntity* const entity = DemoEntity::LoadNGD_mesh(modelName, GetWorld(), scene->GetShaderCache());
-		return entity;
-	}
-
-	DemoEntity* const LoadVisualModel (const char* const modelName)
-	{
-		NewtonWorld* const world = GetWorld();
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-		DemoEntity* const entity = LoadModel_ndg(modelName);
-		dAssert (entity);
-		scene->Append(entity);
-		return entity;
-	}
-
 	dVehicleTireInterface* AddTire(dVehicleChassis* const vehicle, const char* const tireName, dFloat width, dFloat radius, dFloat vehicleMass)
 	{
 		DemoEntity* const entity = (DemoEntity*)vehicle->GetVehicle()->GetUserData();
@@ -356,18 +342,21 @@ return;
 		tire->SetUserData(tirePart);
 		return tire;
 	}
-	
-	dVehicleChassis* CreateVehicle(const char* const carModelName, const dMatrix& location)
+#endif
+
+	dVehicleChassis* CreateVehicle(const dMatrix& location, const DemoEntity* const entity)
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
-		// load vehicle visual mesh
-		DemoEntity* const vehicleEntity = LoadVisualModel (carModelName);
+		DemoEntity* const vehicleEntity = (DemoEntity*)entity->CreateClone();
+		scene->Append(vehicleEntity);
 
 		// set entity world location
 		vehicleEntity->ResetMatrix(*scene, location);
 
+return NULL;
+/*
 		// make chassis collision shape;
 		NewtonCollision* const chassisCollision = CreateChassisCollision(vehicleEntity, world);
 
@@ -480,8 +469,10 @@ return NULL;
 		vehicle->Finalize();
 		
 		return vehicle;
+*/
 	}
 
+#if 0
 	void UpdateDriverInput(dVehicleChassis* const vehicle, dFloat timestep) 
 	{
 //		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
@@ -575,23 +566,20 @@ axisCount = 0;
 	GLuint m_redNeedle;
 	GLuint m_tachometer;
 	GLuint m_greenNeedle;
-
 	bool m_externalView;
+#endif
 };
 
-#endif
+
 void SingleBodyCar(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-	dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
-	return;
 
-#if 0
+
 	CreateLevelMesh (scene, "flatPlane.ngd", 1);
 //	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 //	AddPrimitiveArray (scene, 0.0f, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, dGetIdentityMatrix());
-
 
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit = dVector (0.0f, 10.0f, 0.0f, 1.0f);
@@ -602,11 +590,13 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	NewtonWorld* const world = scene->GetNewton();
 
 	// create a vehicle controller manager
+	dPointer<DemoEntity> viperModel (DemoEntity::LoadNGD_mesh("viper.ngd", scene->GetNewton(), scene->GetShaderCache()));
 	SingleBodyVehicleManager* const manager = new SingleBodyVehicleManager(world);
-	
-	// load 
-	dVehicleChassis* const player = manager->CreateVehicle("viper.ngd", location);
 
+	// load 
+	dVehicleChassis* const player = manager->CreateVehicle(location, viperModel.GetData());
+
+#if 0
 	// set this vehicle as the player
 //	manager->SetAsPlayer(player);
 
@@ -655,10 +645,10 @@ void SingleBodyCar(DemoEntityManager* const scene)
 
 //	camMatrix.m_posit.m_x -= 5.0f;
 //	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
+#endif
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
-#endif
 }
 
