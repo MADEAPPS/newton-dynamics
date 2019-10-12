@@ -63,14 +63,14 @@ static dBalancingCharacterBoneDefinition tredDefinition[] =
 	{ "bone_rightLeg", dBalancingCharacterBoneDefinition::m_3dof, 0.3f, {60.0f, 60.0f, 70.0f}, { 0.0f, 90.0f, 0.0f }},
 	{ "bone_righCalf", dBalancingCharacterBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
 	{ "bone_rightAnkle", dBalancingCharacterBoneDefinition::m_fkEffector, 0.2f, {0.0f, 0.0f, 0.0f}, {-90.0f, 0.0f, 90.0f } },
-	//{ "effector_rightAnkle", dBalancingCharacterBoneDefinition::m_ikEffector},
-	//{ "bone_rightFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, {-30.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
+	{ "effector_rightAnkle", dBalancingCharacterBoneDefinition::m_ikEffector},
+	{ "bone_rightFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, {-30.0f, 30.0f, 0.0f}, { 0.0f, 0.0f, 90.0f }},
 
-	//{ "bone_leftLeg", dBalancingCharacterBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
-	//{ "bone_leftCalf", dBalancingCharacterBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
-	//{ "bone_leftAnkle", dBalancingCharacterBoneDefinition::m_fkEffector, 0.2f,{ 0.0f, 0.0f, 0.0f },{ -90.0f, 0.0f, 90.0f } },
-	//{ "effector_leftAnkle", dBalancingCharacterBoneDefinition::m_ikEffector},
-	//{ "bone_leftFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, { -30.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
+	{ "bone_leftLeg", dBalancingCharacterBoneDefinition::m_3dof, 0.3f, { 60.0f, 60.0f, 70.0f }, { 0.0f, 90.0f, 0.0f } },
+	{ "bone_leftCalf", dBalancingCharacterBoneDefinition::m_1dof, 0.2f, {-60.0f, 60.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
+	{ "bone_leftAnkle", dBalancingCharacterBoneDefinition::m_fkEffector, 0.2f,{ 0.0f, 0.0f, 0.0f },{ -90.0f, 0.0f, 90.0f } },
+	{ "effector_leftAnkle", dBalancingCharacterBoneDefinition::m_ikEffector},
+	{ "bone_leftFoot", dBalancingCharacterBoneDefinition::m_3dof, 0.2f, { -30.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 90.0f } },
 
 	{ NULL},
 };
@@ -1000,7 +1000,7 @@ class dBalancingCharacterManager: public dModelManager
 
 		// make internal part non collidable
 		model->SetAllPartsNonCollidable();
-#if 1
+#if 0
 		dCustomHinge* const fixToWorld = new dCustomHinge (matrix0 * location, model->GetBody(), NULL);
 		fixToWorld->EnableLimits(true);
 		fixToWorld->SetLimits(0.0f, 0.0f);
@@ -1041,8 +1041,6 @@ class dBalancingCharacterManager: public dModelManager
 	dFloat32 m_posit_y;
 	dFloat32 m_posit_z;
 };
-
-
 
 void BalancingCharacter(DemoEntityManager* const scene)
 {
