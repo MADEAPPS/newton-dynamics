@@ -148,7 +148,6 @@ typedef long long unsigned64;
 #include <dCustomPathFollow.h>
 #include <dCustomDoubleHinge.h>
 #include <dCustomFixDistance.h>
-#include <dCustomTireSpringDG.h>
 #include <dCustomRackAndPinion.h>
 #include <dCustomHingeActuator.h>
 #include <dCustomBallAndSocket.h>

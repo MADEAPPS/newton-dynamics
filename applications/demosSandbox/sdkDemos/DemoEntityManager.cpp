@@ -73,17 +73,16 @@
 //#define DEFAULT_SCENE	37		// dynamic rag doll
 //#define DEFAULT_SCENE	38		// basic Car
 //#define DEFAULT_SCENE	39		// single body vehicle
-//#define DEFAULT_SCENE	40		// David Gravel multi body car
-//#define DEFAULT_SCENE	41		// super Car
-//#define DEFAULT_SCENE	42		// heavy vehicles
-#define DEFAULT_SCENE	43		// basic player controller
-//#define DEFAULT_SCENE	44		// animated player controller
-//#define DEFAULT_SCENE	45		// advanced player controller
-//#define DEFAULT_SCENE	46		// cloth patch			
-//#define DEFAULT_SCENE	47		// soft bodies	
-//#define DEFAULT_SCENE	48		// joe's joint test
-//#define DEFAULT_SCENE	49		// Misho's Hinge Test
-
+//#define DEFAULT_SCENE	40		// super Car
+//#define DEFAULT_SCENE	41		// heavy vehicles
+#define DEFAULT_SCENE	42		// basic player controller
+//#define DEFAULT_SCENE	43		// animated player controller
+//#define DEFAULT_SCENE	44		// advanced player controller
+//#define DEFAULT_SCENE	45		// cloth patch			
+//#define DEFAULT_SCENE	46		// soft bodies	
+//#define DEFAULT_SCENE	47		// joe's joint test
+//#define DEFAULT_SCENE	48		// Misho's Hinge Test
+						 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
 void Restitution (DemoEntityManager* const scene);
@@ -116,7 +115,6 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene);
 void MultiRayCast (DemoEntityManager* const scene);
 void BasicCar (DemoEntityManager* const scene);
 void SingleBodyCar(DemoEntityManager* const scene);
-void BasicMultibodyVehicle(DemoEntityManager* const scene);
 void SuperCar (DemoEntityManager* const scene);
 void MilitaryTransport (DemoEntityManager* const scene);
 void BasicPlayerController (DemoEntityManager* const scene);
@@ -180,7 +178,6 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagdoll},
 	{"Basic car", "show how to set up a vehicle controller", BasicCar},
 	{"Single body car", "show a generalized coordinate system body", SingleBodyCar },
-	{"Basic multi body car", "show how to set up a multi body vehicle by Dave Gravel", BasicMultibodyVehicle},
 	{"Super car", "implement a hight performance sport car", SuperCar},
 	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
 	{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},

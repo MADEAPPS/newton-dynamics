@@ -49,7 +49,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\BalancingCharacter.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicFriction.cpp" />
-    <ClCompile Include="..\..\sdkDemos\demos\BasicMultibodyVehicle.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicRagdoll.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicRestitution.cpp" />
