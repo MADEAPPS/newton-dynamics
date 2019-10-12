@@ -64,6 +64,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		scene->Print(color, "walk backward:           S");
 		scene->Print(color, "strafe right:            D");
 		scene->Print(color, "strafe left:             A");
+		scene->Print(color, "crouch:				  C");
 		scene->Print(color, "jump:                    Space");
 		//scene->Print(color, "toggle camera mode:      C");
 		//scene->Print(color, "hide help:               H");
