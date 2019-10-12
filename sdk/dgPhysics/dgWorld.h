@@ -194,6 +194,7 @@ class dgWorld
 		dgListener()
 			:m_world(NULL)
 			,m_userData(NULL)
+			,m_onPostStep(NULL)
 			,m_onPreUpdate(NULL)
 			,m_onPostUpdate(NULL)
 			,m_onDebugCallback(NULL)
@@ -212,6 +213,7 @@ class dgWorld
 		char m_name[32];
 		dgWorld* m_world;
 		void* m_userData;
+		OnListenerUpdateCallback m_onPostStep;
 		OnListenerUpdateCallback m_onPreUpdate;
 		OnListenerUpdateCallback m_onPostUpdate;
 		OnListenerDebugCallback m_onDebugCallback;
@@ -286,9 +288,10 @@ class dgWorld
 	void* FindListener (const char* const nameid) const;
 
 	void* AddListener (const char* const nameid, void* const userData);
-	void ListenerSetDestroyCallback (void* const listener, OnListenerDestroyCallback destroyCallback);
-	void ListenerSetPreUpdate (void* const listener, OnListenerUpdateCallback updateCallback);
+	void ListenerSetPostStep (void* const listener, OnListenerUpdateCallback updateCallback);
 	void ListenerSetPostUpdate (void* const listener, OnListenerUpdateCallback updateCallback);
+	void ListenerSetPreUpdate (void* const listener, OnListenerUpdateCallback updateCallback);
+	void ListenerSetDestroyCallback (void* const listener, OnListenerDestroyCallback destroyCallback);
 	
 	void SetListenerBodyDebugCallback (void* const listener, OnListenerDebugCallback callback);
 	void SetListenerBodyDestroyCallback (void* const listener, OnListenerBodyDestroyCallback callback);

@@ -24,6 +24,7 @@ class dCustomListener: public dCustomAlloc
 	CUSTOM_JOINTS_API virtual ~dCustomListener();
 
 	NewtonWorld* GetWorld() const {return m_world;}
+	virtual void PostStep (dFloat timestep) {};
 	virtual void PreUpdate (dFloat timestep) {};
 	virtual void PostUpdate (dFloat timestep) {};
 
@@ -34,6 +35,7 @@ class dCustomListener: public dCustomAlloc
 	private:
 	static void Destroy (const NewtonWorld* const world, void* const listenerUserData);
 	static void Debug(const NewtonWorld* const world, void* const listenerUserData, void* const context);
+	static void PostStep(const NewtonWorld* const world, void* const listenerUserData, dFloat tiemstep);
 	static void PreUpdate(const NewtonWorld* const world, void* const listenerUserData, dFloat tiemstep);
 	static void PostUpdate(const NewtonWorld* const world, void* const listenerUserData, dFloat tiemstep);
 	static void OnDestroyBody (const NewtonWorld* const world, void* const listener, NewtonBody* const body);
@@ -48,14 +50,17 @@ class dCustomParallelListener: public dCustomListener
 	CUSTOM_JOINTS_API dCustomParallelListener(NewtonWorld* const world, const char* const listenerName);
 	CUSTOM_JOINTS_API virtual ~dCustomParallelListener();
 
+	virtual void PostStep(dFloat timestep, int threadID) {}
 	virtual void PreUpdate(dFloat timestep, int threadID) {}
 	virtual void PostUpdate(dFloat timestep, int threadID) {}
 
 	private:
+	static void ParallerListenPostStepCallback (NewtonWorld* const world, void* const userData, int threadIndex);
 	static void ParallerListenPreUpdateCallback (NewtonWorld* const world, void* const userData, int threadIndex);
 	static void ParallerListenPostUpdateCallback(NewtonWorld* const world, void* const userData, int threadIndex);
 
 	protected:
+	CUSTOM_JOINTS_API virtual void PostStep(dFloat timestep);
 	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep);
 	CUSTOM_JOINTS_API virtual void PostUpdate(dFloat timestep);
 	dFloat m_timestep;

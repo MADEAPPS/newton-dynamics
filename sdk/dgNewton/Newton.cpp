@@ -994,6 +994,20 @@ void NewtonWorldSetCollisionConstructorDestructorCallback (const NewtonWorld* co
 	world->SetCollisionInstanceConstructorDestructor((dgWorld::OnCollisionInstanceDuplicate) constructor, (dgWorld::OnCollisionInstanceDestroy)destructor);
 }
 
+void* NewtonWorldAddListener(const NewtonWorld* const newtonWorld, const char* const nameId, void* const listenerUserData)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	return world->AddListener(nameId, listenerUserData);
+}
+
+void* NewtonWorldGetListener(const NewtonWorld* const newtonWorld, const char* const nameId)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	return world->FindListener(nameId);
+}
+
 void* NewtonWorldGetListenerUserData (const NewtonWorld* const newtonWorld, void* const listener)
 {
 	TRACE_FUNCTION(__FUNCTION__);
@@ -1008,56 +1022,46 @@ NewtonWorldListenerBodyDestroyCallback NewtonWorldListenerGetBodyDestroyCallback
 	return (NewtonWorldListenerBodyDestroyCallback) world->GetListenerBodyDestroyCallback (listener);
 }
 
-void NewtonWorldListenerSetBodyDestroyCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldListenerBodyDestroyCallback bodyDestroyCallback)
+void NewtonWorldListenerSetBodyDestroyCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldListenerBodyDestroyCallback callback)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *) newtonWorld;
-	world->SetListenerBodyDestroyCallback (listener, (dgWorld::OnListenerBodyDestroyCallback) bodyDestroyCallback);
+	world->SetListenerBodyDestroyCallback (listener, (dgWorld::OnListenerBodyDestroyCallback) callback);
 }
 
-
-void* NewtonWorldAddListener (const NewtonWorld* const newtonWorld, const char* const nameId, void* const listenerUserData)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *) newtonWorld;
-	return world->AddListener (nameId, listenerUserData);
-}
-
-void NewtonWorldListenerSetDestructorCallback(const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldDestroyListenerCallback destroy)
+void NewtonWorldListenerSetDestructorCallback(const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldDestroyListenerCallback callback)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	return world->ListenerSetDestroyCallback(listener, (dgWorld::OnListenerDestroyCallback) destroy);
+	return world->ListenerSetDestroyCallback(listener, (dgWorld::OnListenerDestroyCallback) callback);
 }
 
-void NewtonWorldListenerSetPreUpdateCallback(const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldUpdateListenerCallback update)
+void NewtonWorldListenerSetPreUpdateCallback(const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldUpdateListenerCallback callback)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	return world->ListenerSetPreUpdate(listener, (dgWorld::OnListenerUpdateCallback) update);
+	return world->ListenerSetPreUpdate(listener, (dgWorld::OnListenerUpdateCallback) callback);
 }
 
-void NewtonWorldListenerSetPostUpdateCallback(const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldUpdateListenerCallback update)
+void NewtonWorldListenerSetPostUpdateCallback(const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldUpdateListenerCallback callback)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	return world->ListenerSetPostUpdate(listener, (dgWorld::OnListenerUpdateCallback) update);
+	return world->ListenerSetPostUpdate(listener, (dgWorld::OnListenerUpdateCallback) callback);
 }
 
-
-void* NewtonWorldGetListener (const NewtonWorld* const newtonWorld, const char* const nameId)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *) newtonWorld;
-	return world->FindListener (nameId);
-}
-
-
-void NewtonWorldListenerSetDebugCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldListenerDebugCallback debugCallback)
+void NewtonWorldListenerSetPostStepCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldUpdateListenerCallback callback)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
-	return world->SetListenerBodyDebugCallback (listener, (dgWorld::OnListenerDebugCallback) debugCallback);
+	return world->ListenerSetPostStep(listener, (dgWorld::OnListenerUpdateCallback) callback);
+}
+
+void NewtonWorldListenerSetDebugCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldListenerDebugCallback callback)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	Newton* const world = (Newton *)newtonWorld;
+	return world->SetListenerBodyDebugCallback (listener, (dgWorld::OnListenerDebugCallback) callback);
 }
 
 void NewtonWorldListenerDebug(const NewtonWorld* const newtonWorld, void* const context)

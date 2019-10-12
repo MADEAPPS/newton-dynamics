@@ -19,6 +19,7 @@ dCustomListener::dCustomListener(NewtonWorld* const world, const char* const lis
 	void* const listener = NewtonWorldAddListener (world, listenerName, this);
 	NewtonWorldListenerSetDebugCallback(world, listener, Debug);
 	NewtonWorldListenerSetDestructorCallback (world, listener, Destroy);
+	NewtonWorldListenerSetPostStepCallback (world, listener, PostStep);
 	NewtonWorldListenerSetPreUpdateCallback (world, listener, PreUpdate);
 	NewtonWorldListenerSetPostUpdateCallback (world, listener, PostUpdate);
 	NewtonWorldListenerSetBodyDestroyCallback (world, listener, OnDestroyBody);
@@ -40,6 +41,13 @@ void dCustomListener::Debug(const NewtonWorld* const world, void* const listener
 	dCustomListener* const me = (dCustomListener*)listenerUserData;
 	dAssert(me->m_world == world);
 	me->OnDebug((dCustomJoint::dDebugDisplay*) context);
+}
+
+void dCustomListener::PostStep(const NewtonWorld* const world, void* const listenerUserData, dFloat timestep)
+{
+	dCustomListener* const me = (dCustomListener*)listenerUserData;
+	dAssert(me->m_world == world);
+	me->PostStep(timestep);
 }
 
 void dCustomListener::PreUpdate (const NewtonWorld* const world, void* const listenerUserData, dFloat timestep)
@@ -73,6 +81,13 @@ dCustomParallelListener::~dCustomParallelListener()
 {
 }
 
+void dCustomParallelListener::ParallerListenPostStepCallback(NewtonWorld* const world, void* const context, int threadIndex)
+{
+	D_TRACKTIME();
+	dCustomParallelListener* const manager = (dCustomParallelListener*)context;
+	manager->PostStep(manager->m_timestep, threadIndex);
+}
+
 void dCustomParallelListener::ParallerListenPreUpdateCallback(NewtonWorld* const world, void* const context, int threadIndex)
 {
 	D_TRACKTIME();
@@ -85,6 +100,18 @@ void dCustomParallelListener::ParallerListenPostUpdateCallback(NewtonWorld* cons
 	D_TRACKTIME();
 	dCustomParallelListener* const manager = (dCustomParallelListener*)context;
 	manager->PostUpdate(manager->m_timestep, threadIndex);
+}
+
+void dCustomParallelListener::PostStep(dFloat timestep)
+{
+	m_timestep = timestep;
+	NewtonWorld* const world = GetWorld();
+
+	int threadCount = NewtonGetThreadsCount(world);
+	for (int i = 0; i < threadCount; i++) {
+		NewtonDispachThreadJob(world, ParallerListenPostStepCallback, this, "dCustomParallelListener");
+	}
+	NewtonSyncThreadJobs(world);
 }
 
 void dCustomParallelListener::PreUpdate(dFloat timestep)

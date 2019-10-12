@@ -615,6 +615,9 @@ class ServoVehicleManagerManager: public dModelManager
 		// assign a body part id
 		NewtonCollisionSetUserID(collision, definition.m_bodyPartID);
 
+		// make sure to set the tranform callback to null because this is a hierachical model;
+		NewtonBodySetTransformCallback(body, NULL);
+
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
 		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
 		return body;

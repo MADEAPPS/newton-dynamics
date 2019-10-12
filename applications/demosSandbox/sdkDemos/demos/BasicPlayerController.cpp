@@ -404,6 +404,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit.m_z += 2.0f;
 	location.m_posit.m_y += 5.0f;
 	dCustomPlayerController* const player1 = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	player1;
 //	//playerManager->DestroyController (player1);
 
 	location.m_posit.m_x += 5.0f;

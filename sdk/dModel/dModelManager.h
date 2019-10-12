@@ -33,6 +33,7 @@ class dModelManager: public dCustomParallelListener
 	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext) {}
 
 	protected:
+	void PostStep(dFloat timestep, int threadID);
 	void PreUpdate(dFloat timestep, int threadID);
 	void PostUpdate(dFloat timestep, int threadID);
 
