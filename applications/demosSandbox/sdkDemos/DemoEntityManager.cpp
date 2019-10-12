@@ -42,7 +42,7 @@
 //#define DEFAULT_SCENE	6		// primitive collision
 //#define DEFAULT_SCENE	7		// kinematic bodies
 //#define DEFAULT_SCENE	8		// Object Placement
-#define DEFAULT_SCENE	9		// primitive convex cast 
+//#define DEFAULT_SCENE	9		// primitive convex cast 
 //#define DEFAULT_SCENE	10		// box stacks
 //#define DEFAULT_SCENE	11		// simple level mesh collision
 //#define DEFAULT_SCENE	12		// optimized level mesh collision
@@ -76,7 +76,7 @@
 //#define DEFAULT_SCENE	40		// David Gravel multi body car
 //#define DEFAULT_SCENE	41		// super Car
 //#define DEFAULT_SCENE	42		// heavy vehicles
-//#define DEFAULT_SCENE	43		// basic player controller
+#define DEFAULT_SCENE	43		// basic player controller
 //#define DEFAULT_SCENE	44		// animated player controller
 //#define DEFAULT_SCENE	45		// advanced player controller
 //#define DEFAULT_SCENE	46		// cloth patch			
@@ -362,7 +362,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
 //	m_showListenersDebugInfo = true;
-//	m_collisionDisplayMode = 2;
+	m_collisionDisplayMode = 2;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
 

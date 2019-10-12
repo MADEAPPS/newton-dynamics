@@ -30,7 +30,10 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 	public:
 	BasicPlayerControllerManager (NewtonWorld* const world)
 		:dCustomPlayerControllerManager (world)
+		,m_croudMesh(NULL)
+		,m_standingMesh(NULL)
 		,m_player(NULL)
+		,m_crowchKey(false)
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 
@@ -40,6 +43,12 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 
 	~BasicPlayerControllerManager ()
 	{
+		if (m_croudMesh) {
+			m_croudMesh->Release();
+		}
+		if (m_standingMesh) {
+			m_standingMesh->Release();
+		}
 	}
 
 	void SetAsPlayer(dCustomPlayerController* const controller)
@@ -97,13 +106,19 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		NewtonBody* const body = controller->GetBody();
 
 		// create the visual mesh from the player collision shape
-		NewtonCollision* const collision = NewtonBodyGetCollision(body);
-		DemoMesh* const geometry = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		if (!m_croudMesh) {
+			NewtonCollision* const collision = NewtonBodyGetCollision(body);
+			controller->ToggleCrouch();
+			m_croudMesh = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
+			controller->ToggleCrouch();
+			m_standingMesh = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		}
+
+		// make standing and crouch meshes
 		DemoEntity* const playerEntity = new DemoEntity(location, NULL);
 		scene->Append(playerEntity);
-		playerEntity->SetMesh(geometry, dGetIdentityMatrix());
-		geometry->Release();
+		playerEntity->SetMesh(m_standingMesh, dGetIdentityMatrix());
 
 		// set the user data
 		NewtonBodySetUserData(body, playerEntity);
@@ -144,7 +159,18 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 			dFloat forwarSpeed = (int(scene->GetKeyState('W')) - int(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
 			dFloat strafeSpeed = (int(scene->GetKeyState('D')) - int(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
 
-			//if (scene->GetKeyState(' ') && !controller->IsAirBorn ()) {
+			bool crowchKey = scene->GetKeyState('C') ? true : false;
+			if (m_crowchKey.UpdateTrigger(crowchKey))
+			{
+				controller->ToggleCrouch();
+				DemoEntity* const playerEntity = (DemoEntity*)NewtonBodyGetUserData(controller->GetBody());
+				if (controller->IsCrouched()) {
+					playerEntity->SetMesh(m_croudMesh, dGetIdentityMatrix());
+				} else {
+					playerEntity->SetMesh(m_standingMesh, dGetIdentityMatrix());
+				}
+			}
+
 			if (scene->GetKeyState(' ') && controller->IsOnFloor ()) {
 				dVector jumpImpule(controller->GetFrame().RotateVector(dVector(PLAYER_JUMP_SPEED * controller->GetMass(), 0.0f, 0.0f, 0.0f)));
 				dVector totalImpulse(controller->GetImpulse() + jumpImpule);
@@ -221,7 +247,10 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		ApplyInputs (controller);
 	}
 
+	DemoMesh* m_croudMesh;
+	DemoMesh* m_standingMesh;
 	dCustomPlayerController* m_player;
+	DemoEntityManager::ButtonKey m_crowchKey;
 };
 
 

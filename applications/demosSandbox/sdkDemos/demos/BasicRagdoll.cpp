@@ -231,10 +231,10 @@ class PassiveRagdollManager: public dModelManager
 		DemoEntity* const modelEntity = (DemoEntity*)model->CreateClone();
 		scene->Append(modelEntity);
 
-dMatrix xxxx(modelEntity->GetCurrentMatrix() * location);
-modelEntity->SetMatrixUsafe(dQuaternion(xxxx), xxxx.m_posit);
-modelEntity->SetMatrixUsafe(dQuaternion(xxxx), xxxx.m_posit);
-return NULL;
+//dMatrix xxxx(modelEntity->GetCurrentMatrix() * location);
+//modelEntity->SetMatrixUsafe(dQuaternion(xxxx), xxxx.m_posit);
+//modelEntity->SetMatrixUsafe(dQuaternion(xxxx), xxxx.m_posit);
+//return NULL;
 
 		// add the root bone
 		DemoEntity* const rootEntity = (DemoEntity*)modelEntity->Find(jointsDefinition[0].m_boneName);
@@ -343,6 +343,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 	matrix.m_posit = FindFloor(world, p, 100.0f);
 	matrix.m_posit.m_y += 2.0f;
 	dModelRootNode* const ragdoll = manager->CreateRagDoll(matrix, &(*ragDollModel));
+	ragdoll;
 
 #if 0
 	// for test only, attach this ragdoll to world with a fix joint
@@ -354,7 +355,7 @@ void PassiveRagdoll (DemoEntityManager* const scene)
 #endif
 
 	int count = 5;
-count = 10;
+//count = 10;
 	for (int x = 0; x < count; x ++) {
 		for (int z = 0; z < count; z ++) {
 			dVector p (origin + dVector (10.0f + (x - count / 2) * 3.0f - count / 2, 0.0f, (z - count / 2) * 3.0f, 0.0f));

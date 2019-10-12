@@ -293,11 +293,15 @@ dCustomPlayerController::dCustomPlayerController()
 	,m_lateralSpeed(0.0f)
 	,m_stepHeight(0.0f)
 	,m_contactPatch(0.0f)
+	,m_height(1.0f)
+	,m_weistScale(1.0f)
+	,m_crouchScale(0.5f)
 	,m_userData(NULL)
 	,m_kinematicBody(NULL)
 	,m_manager(NULL)
 	,m_isAirbone(false)
 	,m_isOnFloor(false)
+	,m_isCrouched(false)
 {
 }
 
@@ -309,15 +313,19 @@ dCustomPlayerController::~dCustomPlayerController()
 dCustomPlayerController* dCustomPlayerControllerManager::CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
 {
 	NewtonWorld* const world = GetWorld();
-
 	dMatrix shapeMatrix(localAxis);
 	shapeMatrix.m_posit = shapeMatrix.m_front.Scale (height * 0.5f);
 	shapeMatrix.m_posit.m_w = 1.0f;
 
-	dFloat scale = 3.0f;
-	height = dMax(height - 2.0f * radius / scale, dFloat(0.1f));
-	NewtonCollision* const bodyCapsule = NewtonCreateCapsule(world, radius / scale, radius / scale, height, 0, &shapeMatrix[0][0]);
-	NewtonCollisionSetScale(bodyCapsule, 1.0f, scale, scale);
+	dCustomPlayerController& controller = m_playerList.Append()->GetInfo();
+
+	controller.m_height = height;
+	controller.m_weistScale = 3.0f;
+	controller.m_crouchScale = 0.5f;
+
+	height = dMax(height - 2.0f * radius / controller.m_weistScale, dFloat(0.1f));
+	NewtonCollision* const bodyCapsule = NewtonCreateCapsule(world, radius / controller.m_weistScale, radius / controller.m_weistScale, height, 0, &shapeMatrix[0][0]);
+	NewtonCollisionSetScale(bodyCapsule, 1.0f, controller.m_weistScale, controller.m_weistScale);
 
 	// create the kinematic body
 	NewtonBody* const body = NewtonCreateKinematicBody(world, bodyCapsule, &location[0][0]);
@@ -330,17 +338,14 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreateController(const 
 	NewtonBodySetCollidable(body, 1);
 	NewtonDestroyCollision(bodyCapsule);
 
-	dCustomPlayerController& controller = m_playerList.Append()->GetInfo();
-
 	shapeMatrix.m_posit = dVector (0.0f, dFloat (0.0f), dFloat (0.0f), 1.0f);
 	controller.m_localFrame = shapeMatrix;
 	controller.m_mass = mass;
 	controller.m_invMass = 1.0f / mass;
 	controller.m_manager = this;
 	controller.m_kinematicBody = body;
-	controller.m_contactPatch = radius / scale;
+	controller.m_contactPatch = radius / controller.m_weistScale;
 	controller.m_stepHeight = dMax (stepHeight, controller.m_contactPatch * 2.0f);
-
 	return &controller;
 }
 
@@ -349,6 +354,24 @@ void dCustomPlayerControllerManager::DestroyController(dCustomPlayerController* 
 	dList<dCustomPlayerController>::dListNode* const node = m_playerList.GetNodeFromInfo(*player);
 	dAssert(node);
 	m_playerList.Remove(node);
+}
+
+void dCustomPlayerController::ToggleCrouch ()
+{
+	dMatrix matrix;
+	m_isCrouched = !m_isCrouched;
+
+	NewtonCollision* const shape = NewtonBodyGetCollision(m_kinematicBody);
+	NewtonCollisionGetMatrix(shape, &matrix[0][0]);
+	if (m_isCrouched) {
+		matrix.m_posit = matrix.m_front.Scale(m_height * m_crouchScale * 0.5f);
+		NewtonCollisionSetScale(shape, m_crouchScale, m_weistScale, m_weistScale);
+	} else {
+		matrix.m_posit = matrix.m_front.Scale(m_height * 0.5f);
+		NewtonCollisionSetScale(shape, dFloat(1.0f), m_weistScale, m_weistScale);
+	}
+	matrix.m_posit.m_w = 1.0f;
+	NewtonCollisionSetMatrix(shape, &matrix[0][0]);
 }
 
 dVector dCustomPlayerController::GetVelocity() const
@@ -860,7 +883,7 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 	m_manager->ApplyMove(this, timestep);
 
 #if 0
-	#if 1
+	#if 0
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
 			fwrite(&m_headingAngle, sizeof(m_headingAngle), 1, file);

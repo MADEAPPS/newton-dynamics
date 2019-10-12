@@ -41,6 +41,9 @@ class dCustomPlayerController
 	void SetUserData(void* const userData) {m_userData = userData;}
 	dCustomPlayerControllerManager* GetManager() const {return m_manager;}
 
+	CUSTOM_JOINTS_API void ToggleCrouch ();
+
+	bool IsCrouched () const {return m_isCrouched;}
 	bool IsAirBorn () const {return m_isAirbone;}
 	bool IsOnFloor () const {return m_isOnFloor;}
 	const dFloat GetMass() const { return m_mass;}
@@ -88,12 +91,15 @@ class dCustomPlayerController
 	dFloat m_lateralSpeed;
 	dFloat m_stepHeight;
 	dFloat m_contactPatch;
+	dFloat m_height;
+	dFloat m_weistScale;
+	dFloat m_crouchScale;
 	void* m_userData;
 	NewtonBody* m_kinematicBody;
 	dCustomPlayerControllerManager* m_manager;
 	bool m_isAirbone;
 	bool m_isOnFloor;
-
+	bool m_isCrouched;
 	friend class dCustomPlayerControllerManager;
 };
 
