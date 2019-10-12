@@ -19,7 +19,7 @@
 
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomAlloc.h"
-#include "dCustomControllerManager.h"
+#include "dCustomListener.h"
 
 #define VEHICLE_PLUGIN_NAME			"__vehicleManager__"
 //#define VEHICLE_USE_ZERO_TORQUE_DIFFERENTIAL
@@ -561,10 +561,12 @@ class dBrakeController: public dVehicleController
 	friend class dCustomVehicleController;
 };
 
-class dCustomVehicleController: public dCustomControllerBase
+class dCustomVehicleController
 {
 	class dTireFilter;
 	public:
+	
+	NewtonBody* GetBody() const { return m_body; }
 	CUSTOM_JOINTS_API void ApplyDefualtDriver(const dVehicleDriverInput& driveInputs, dFloat timestep);
 
 	CUSTOM_JOINTS_API void Finalize();
@@ -639,6 +641,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	dList<dWheelJoint*> m_tireList;
 	dList<dDifferentialJoint*> m_differentialList;
 
+	NewtonBody* m_body;
 	dEngineJoint* m_engine;
 	void* m_collisionAggregate;
 	
@@ -649,6 +652,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	dTireFrictionModel* m_contactFilter;
 	NewtonApplyForceAndTorque m_forceAndTorqueCallback;
 
+	
 	dFloat m_speed;
 	dFloat m_totalMass;
 	dFloat m_gravityMag;
@@ -665,7 +669,7 @@ class dCustomVehicleController: public dCustomControllerBase
 	friend class dCustomVehicleControllerManager;
 };
 
-class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVehicleController> 
+class dCustomVehicleControllerManager: public dCustomParallelListener
 {
 	public:
 	CUSTOM_JOINTS_API dCustomVehicleControllerManager(NewtonWorld* const world, int materialCount, int* const otherMaterials);
@@ -694,6 +698,7 @@ class dCustomVehicleControllerManager: public dCustomControllerManager<dCustomVe
 	NewtonCollision* m_tireShapeTemplate;
 	int m_tireMaterial;
 
+	dList<dCustomVehicleController> m_list;
 	friend class dCustomVehicleController;
 };
 

@@ -127,12 +127,15 @@ dNewtonVehicleManager::dNewtonVehicle::dNewtonVehicle (dNewtonVehicleManager* co
 
 dNewtonVehicleManager::dNewtonVehicle::~dNewtonVehicle ()
 {
+	dAssert(0);
+/*
 	NewtonBody* const body = m_controller->GetBody();	
 	if (NewtonBodyGetDestructorCallback(body)) {
 		SetBody(NULL);
 		dNewtonVehicleManager* const manager = (dNewtonVehicleManager*)m_controller->GetManager();
 		manager->DestroyController (m_controller);
 	}
+*/
 }
 
 /*

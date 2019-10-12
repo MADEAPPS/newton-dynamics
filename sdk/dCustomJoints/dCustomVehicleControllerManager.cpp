@@ -1006,10 +1006,13 @@ void dBrakeController::Update(dFloat timestep)
 
 void dCustomVehicleControllerManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 {
+	dAssert(0);
+/*
 	for (dCustomControllerManager<dCustomVehicleController>::dListNode* vehicleNode = GetFirst(); vehicleNode; vehicleNode = vehicleNode->GetNext()) {
 		dCustomVehicleController* const vehicle = &vehicleNode->GetInfo();
 		vehicle->Debug(debugContext);
 	}
+*/
 }
 
 void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const debugContext, dFloat x, dFloat y, dFloat scale) const
@@ -1149,7 +1152,7 @@ void dCustomVehicleController::DrawSchematic(dCustomJoint::dDebugDisplay* const 
 }
 
 dCustomVehicleControllerManager::dCustomVehicleControllerManager(NewtonWorld* const world, int materialCount, int* const materialsList)
-	:dCustomControllerManager<dCustomVehicleController> (world, VEHICLE_PLUGIN_NAME)
+	:dCustomParallelListener(world, VEHICLE_PLUGIN_NAME)
 	,m_tireMaterial(NewtonMaterialCreateGroupID(world))
 {
 	// create the normalized size tire shape
@@ -1173,8 +1176,9 @@ dCustomVehicleControllerManager::~dCustomVehicleControllerManager()
 
 void dCustomVehicleControllerManager::DestroyController(dCustomVehicleController* const controller)
 {
-	controller->Cleanup();
-	dCustomControllerManager<dCustomVehicleController>::DestroyController(controller);
+	dAssert(0);
+//	controller->Cleanup();
+//	dCustomControllerManager<dCustomVehicleController>::DestroyController(controller);
 }
 
 int dCustomVehicleControllerManager::GetTireMaterial() const
@@ -1184,18 +1188,26 @@ int dCustomVehicleControllerManager::GetTireMaterial() const
 
 dCustomVehicleController* dCustomVehicleControllerManager::CreateVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
+	dAssert(0);
+	return NULL;
+/*
 	dCustomVehicleController* const controller = CreateController();
 	controller->Init (body, vehicleFrame, forceAndTorque, gravityMag);
 	return controller;
+*/
 }
 
 dCustomVehicleController* dCustomVehicleControllerManager::CreateVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
-	dCustomVehicleController* const controller = CreateController();
-	controller->Init(chassisShape, mass, vehicleFrame, forceAndTorque, gravityMag);
-	return controller;
+	dAssert(0);
+	return NULL;
+
+//	dCustomVehicleController* const controller = CreateController();
+//	controller->Init(chassisShape, mass, vehicleFrame, forceAndTorque, gravityMag);
+//	return controller;
 }
 
+/*
 class dCustomVehicleController::dTireFilter: public dCustomControllerConvexCastPreFilter
 {
 	public:
@@ -1227,10 +1239,12 @@ class dCustomVehicleController::dTireFilter: public dCustomControllerConvexCastP
 	const dWheelJoint* m_tire;
 	const dCustomVehicleController* m_controller;
 };
-
+*/
 
 void dCustomVehicleController::Init(NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
+	dAssert(0);
+/*
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
 	NewtonWorld* const world = manager->GetWorld();
 
@@ -1243,10 +1257,13 @@ void dCustomVehicleController::Init(NewtonCollision* const chassisShape, dFloat 
 
 	// initialize 
 	Init(body, localFrame, forceAndTorque, gravityMag);
+*/
 }
 
 void dCustomVehicleController::Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
+	dAssert(0);
+/*
 	m_body = body;
 	m_speed = 0.0f;
 	m_sideSlip = 0.0f;
@@ -1296,6 +1313,7 @@ void dCustomVehicleController::Init(NewtonBody* const body, const dMatrix& local
 	file_xxx = fopen("vehiceLog.csv", "wb");
 	fprintf (file_xxx, "eng_rpm, eng_torque, eng_nominalTorque,\n");
 #endif
+*/
 }
 
 dVector dCustomVehicleController::GetUpAxis() const
@@ -1585,6 +1603,9 @@ return NULL;
 
 dDifferentialJoint* dCustomVehicleController::AddDifferential(dDifferentialJoint* const leftDifferential, dDifferentialJoint* const rightDifferential)
 {
+	dAssert(0);
+	return NULL;
+/*
 	dMatrix matrix;
 	dVector origin;
 	dFloat Ixx;
@@ -1592,7 +1613,7 @@ dDifferentialJoint* dCustomVehicleController::AddDifferential(dDifferentialJoint
 	dFloat Izz;
 	dFloat mass;
 
-dAssert(0);
+
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
 	NewtonWorld* const world = ((dCustomVehicleControllerManager*)manager)->GetWorld();
 
@@ -1644,10 +1665,14 @@ dAssert(0);
 	new dAxelJoint(rightDifferentialMatrix[1], differentialMatrix[0].Scale(1.0f), chassisMatrix[2], rightDifferentialBody, differentialBody);
 
 	return differentialJoint;
+*/
 }
 
 dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const leftTire, dWheelJoint* const rightTire)
 {
+	dAssert(0);
+	return NULL;
+/*
 	dMatrix matrix(GetBasisMatrix());
 	dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
 	NewtonWorld* const world = ((dCustomVehicleControllerManager*)manager)->GetWorld();
@@ -1702,10 +1727,14 @@ dDifferentialJoint* dCustomVehicleController::AddDifferential(dWheelJoint* const
 	new dAxelJoint(rightTireMatrix[0], pinMatrix[0].Scale(1.0f), pinMatrix[1], rightTireBody, differentialBody);
 
 	return differentialJoint;
+*/
 }
 
 dEngineJoint* dCustomVehicleController::AddEngineJoint(dFloat mass, dFloat armatureRadius)
 {
+	dAssert(0);
+	return NULL;
+/*
 	dVector origin;
 	dMatrix matrix(GetBasisMatrix());
 
@@ -1743,9 +1772,8 @@ dEngineJoint* dCustomVehicleController::AddEngineJoint(dFloat mass, dFloat armat
 	m_bodyList.Append(engineBody);
 	NewtonCollisionAggregateAddBody(m_collisionAggregate, engineBody);
 	return m_engine;
+*/
 }
-
-
 
 void dCustomVehicleController::LinkTiresKinematically(dWheelJoint* const tire0, dWheelJoint* const tire1)
 {
@@ -2350,6 +2378,8 @@ void dCustomVehicleController::ApplyDefualtDriver(const dVehicleDriverInput& dri
 
 void dCustomVehicleController::PreUpdate(dFloat timestep, int threadID)
 {
+	dAssert(0);
+/*
 	if (m_finalized) {
 		dCustomVehicleControllerManager* const manager = (dCustomVehicleControllerManager*)GetManager();
 		manager->UpdateDriverInput(this, timestep);
@@ -2378,10 +2408,13 @@ void dCustomVehicleController::PreUpdate(dFloat timestep, int threadID)
 			NewtonBodySetSleepState(m_body, 0);
 		}
 	}
+*/
 }
 
 void dCustomVehicleController::Collide(dWheelJoint* const tire, int threadIndex)
 {
+	dAssert(0);
+/*
 	class CheckBadContact: public dTireFilter
 	{
 		public:
@@ -2389,7 +2422,7 @@ void dCustomVehicleController::Collide(dWheelJoint* const tire, int threadIndex)
 			:dTireFilter(tire, controller)
 			, m_oldCount(oldCount)
 			, m_oldInfo(oldInfo)
-{
+	{
 	}
 
 		unsigned Prefilter(const NewtonBody* const body, const NewtonCollision* const myCollision)
@@ -2526,6 +2559,7 @@ void dCustomVehicleController::Collide(dWheelJoint* const tire, int threadIndex)
 		}
 		tire->m_contactCount += count;
 	}
+*/
 }
 
 void dTireFrictionModel::CalculateTireForces(
