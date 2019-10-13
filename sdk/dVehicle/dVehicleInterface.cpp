@@ -38,7 +38,7 @@ dVehicleTireInterface::dVehicleTireInterface(dVehicleNode* const parent, const d
 dVehicleInterface::dVehicleInterface(dVehicleChassis* const chassis)
 	:dVehicleNode(NULL)
 {
-	dAssert(0);
+	dTrace (("%s\n", __FUNCTION__));
 //	SetWorld(NewtonBodyGetWorld(chassis->GetBody()));
 }
 

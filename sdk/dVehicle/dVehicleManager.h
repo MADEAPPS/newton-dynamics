@@ -24,18 +24,17 @@ class dVehicleManager: public dCustomParallelListener
 	DVEHICLE_API dVehicleManager(NewtonWorld* const world);
 	DVEHICLE_API virtual ~dVehicleManager();
 	
-	DVEHICLE_API virtual void UpdateDriverInput(dVehicleChassis* const vehicle, dFloat timestep) {}
+	virtual void UpdateDriverInput(dVehicleChassis* const vehicle, dFloat timestep) {}
+	virtual void OnUpdateTransform(const dVehicleChassis* const vehicle, dFloat timestep) const {}
 
 //	DVEHICLE_API virtual dVehicleChassis* CreateVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 //	DVEHICLE_API virtual dVehicleChassis* CreateVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 
-	DVEHICLE_API virtual dVehicleChassis* CreateSingleBodyVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-	DVEHICLE_API virtual dVehicleChassis* CreateSingleBodyVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-
+	DVEHICLE_API virtual dVehicleChassis* CreateSingleBodyVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, dFloat gravityMag);
 	DVEHICLE_API virtual void DestroyController(dVehicleChassis* const controller);
 
 	protected:
-
+	DVEHICLE_API virtual void PostStep(dFloat timestep, int threadID);
 	DVEHICLE_API virtual void PreUpdate(dFloat timestep, int threadID);
 	DVEHICLE_API virtual void PostUpdate(dFloat timestep, int threadID);
 

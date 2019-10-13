@@ -187,8 +187,9 @@ class dVehicleChassis
 	void PostUpdate(dFloat timestep);
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
-	void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-	void Init(NewtonWorld* const world, NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+	void Init(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag);
+//	void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+//	void Init(NewtonWorld* const world, NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 //	void Cleanup();
 	
 	void CalculateTireContacts(dFloat timestep);

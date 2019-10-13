@@ -28,7 +28,6 @@ dVehicleChassis::dVehicleChassis ()
 	,m_handBrakeControl(NULL)
 	,m_steeringControl(NULL)
 {
-	dAssert(0);
 }
 
 dVehicleChassis::~dVehicleChassis()
@@ -54,6 +53,7 @@ dVehicleChassis::~dVehicleChassis()
 	}
 }
 
+/*
 void dVehicleChassis::Init(NewtonWorld* const world, NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
 //	dVehicleManager* const manager = (dVehicleManager*)GetManager();
@@ -69,11 +69,12 @@ void dVehicleChassis::Init(NewtonWorld* const world, NewtonCollision* const chas
 	// initialize 
 	Init(body, localFrame, forceAndTorque, gravityMag);
 }
+*/
 
-void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+//void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
 {
 	m_body = body;
-	NewtonBodySetForceAndTorqueCallback(m_body, forceAndTorque);
 	m_vehicle = new dVehicleSingleBody(this);
 
 	m_localFrame = localFrame;
@@ -270,7 +271,7 @@ void dVehicleChassis::PostUpdate(dFloat timestep)
 
 void dVehicleChassis::PreUpdate(dFloat timestep)
 {
-	dAssert(0);
+	dTrace (("%s\n", __FUNCTION__));
 	/*
 	dVehicleManager* const manager = (dVehicleManager*)GetManager();
 	manager->UpdateDriverInput(this, timestep);

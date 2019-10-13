@@ -16,7 +16,7 @@
 dVehicleNode::dVehicleNode(dVehicleNode* const parent)
 //	:dAnimAcyclicJoint(parent)
 {
-	dAssert(0);
+	dTrace (("%s\n", __FUNCTION__));
 }
 
 dVehicleNode::~dVehicleNode()

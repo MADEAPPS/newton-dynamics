@@ -22,17 +22,10 @@ dVehicleManager::~dVehicleManager()
 {
 }
 
-dVehicleChassis* dVehicleManager::CreateSingleBodyVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+dVehicleChassis* dVehicleManager::CreateSingleBodyVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, dFloat gravityMag)
 {
 	dVehicleChassis* const vehicle = &m_list.Append()->GetInfo();
-	vehicle->Init(body, vehicleFrame, forceAndTorque, gravityMag);
-	return vehicle;
-}
-
-dVehicleChassis* dVehicleManager::CreateSingleBodyVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
-{
-	dVehicleChassis* const vehicle = &m_list.Append()->GetInfo();
-	vehicle->Init(GetWorld(), chassisShape, mass, vehicleFrame, forceAndTorque, gravityMag);
+	vehicle->Init(body, vehicleFrame, gravityMag);
 	return vehicle;
 }
 
@@ -40,6 +33,7 @@ void dVehicleManager::DestroyController(dVehicleChassis* const vehicle)
 {
 //	dAssert();
 //	vehicle->Cleanup();
+	dAssert (0);
 	dList<dVehicleChassis>::dListNode* const node = m_list.GetNodeFromInfo(*vehicle);
 	m_list.Remove(node);
 }
@@ -94,3 +88,23 @@ void dVehicleManager::PostUpdate(dFloat timestep, int threadID)
 	}
 }
 
+void dVehicleManager::PostStep(dFloat timestep, int threadID)
+{
+	NewtonWorld* const world = GetWorld();
+	const int threadCount = NewtonGetThreadsCount(world);
+
+	dList<dVehicleChassis>::dListNode* node = m_list.GetFirst();
+	for (int i = 0; i < threadID; i++) {
+		node = node ? node->GetNext() : NULL;
+	}
+
+	if (node) {
+		do {
+			const dVehicleChassis& chassis = node->GetInfo();
+			OnUpdateTransform(&chassis, timestep);
+			for (int i = 0; i < threadCount; i++) {
+				node = node ? node->GetNext() : NULL;
+			}
+		} while (node);
+	}
+}

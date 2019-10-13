@@ -290,20 +290,6 @@ return;
 		NewtonDestroyCollision(collision);
 	}
 
-	NewtonCollision* CreateChassisCollision(const DemoEntity* const carEntity, NewtonWorld* const world) const
-	{
-		DemoEntity* const chassis = carEntity->Find("car_body");
-		dAssert(chassis);
-
-		DemoMesh* const mesh = (DemoMesh*)chassis->GetMesh();
-		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
-		const dMatrix& meshMatrix = chassis->GetMeshMatrix();
-
-		dArray<dFloat> temp(mesh->m_vertexCount * 3);
-		meshMatrix.TransformTriplex(&temp[0], 3 * sizeof (dFloat), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
-		NewtonCollision* const shape = NewtonCreateConvexHull(world, mesh->m_vertexCount, &temp[0], 3 * sizeof (dFloat), 0.001f, 0, NULL);
-		return shape;
-	}
 
 	dVehicleTireInterface* AddTire(dVehicleChassis* const vehicle, const char* const tireName, dFloat width, dFloat radius, dFloat vehicleMass)
 	{
@@ -344,6 +330,44 @@ return;
 	}
 #endif
 
+	NewtonBody* CreateChassisBody(dFloat mass, DemoEntity* const carEntity) const
+	{
+		dAssert(carEntity->Find("car_body"));
+		dAssert(carEntity->Find("car_body") == carEntity);
+
+		DemoMesh* const mesh = (DemoMesh*)carEntity->GetMesh();
+		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+		const dMatrix& meshMatrix = carEntity->GetMeshMatrix();
+
+		dArray<dFloat> temp(mesh->m_vertexCount * 3);
+		meshMatrix.TransformTriplex(&temp[0], 3 * sizeof (dFloat), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
+		NewtonCollision* const shape = NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &temp[0], 3 * sizeof (dFloat), 0.001f, 0, NULL);
+
+		// create a body and call the low level init function
+		dMatrix locationMatrix(dGetIdentityMatrix());
+		NewtonBody* const body = NewtonCreateDynamicBody(GetWorld(), shape, &locationMatrix[0][0]);
+
+		NewtonBodySetUserData(body, carEntity);
+		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+
+		// set vehicle mass, inertia and center of mass
+		NewtonBodySetMassProperties(body, mass, shape);
+
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+		Ixx *= 2.0f;
+		Iyy *= 2.0f; 
+		Izz *= 2.0f;
+		NewtonBodySetMassMatrix(body, mass, Ixx, Iyy, Izz);
+
+		NewtonDestroyCollision(shape);
+
+		return body;
+	}
+
+
 	dVehicleChassis* CreateVehicle(const dMatrix& location, const DemoEntity* const entity)
 	{
 		NewtonWorld* const world = GetWorld();
@@ -354,11 +378,6 @@ return;
 
 		// set entity world location
 		vehicleEntity->ResetMatrix(*scene, location);
-
-return NULL;
-/*
-		// make chassis collision shape;
-		NewtonCollision* const chassisCollision = CreateChassisCollision(vehicleEntity, world);
 
 		// create the vehicle controller
 		dMatrix chassisMatrix;
@@ -372,9 +391,13 @@ return NULL;
 		chassisMatrix.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
 
 		// create a single body vehicle 
-		dFloat chassisMass = 1000.0f;
-		dVehicleChassis* const vehicle = CreateSingleBodyVehicle(chassisCollision, chassisMatrix, chassisMass, PhysicsApplyGravityForce, DEMO_GRAVITY);
+		dFloat chassisMass = 1200.0f;
+		NewtonBody* const chassisBody = CreateChassisBody(chassisMass, vehicleEntity);
 
+		dVehicleChassis* const vehicle = CreateSingleBodyVehicle(chassisBody, chassisMatrix, DEMO_GRAVITY);
+
+return NULL;
+/*
 		// save the vehicle chassis with the vehicle visual for update children matrices 
 		VehicleUserData* const renderCallback = new VehicleUserData(vehicle);
 		vehicleEntity->SetUserData(renderCallback);
@@ -396,10 +419,6 @@ return NULL;
 //		for (int i = 0; i < int((sizeof(m_gearMap) / sizeof(m_gearMap[0]))); i++) {
 //			m_gearMap[i] = i;
 //		}
-
-		// destroy chassis collision shape 
-		NewtonDestroyCollision(chassisCollision);
-
 
 		// add Tires
 		dFloat width;
@@ -559,7 +578,20 @@ axisCount = 0;
 
 		vehicle->ApplyDriverInputs(driverInput, timestep);
 	}
+#endif
 
+	void OnUpdateTransform(const dVehicleChassis* const vehicle, dFloat timestep) const 
+	{
+		dMatrix matrix;
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+		DemoEntity* const model = (DemoEntity*) NewtonBodyGetUserData(vehicle->GetBody());
+		
+		NewtonBodyGetMatrix(vehicle->GetBody(), &matrix[0][0]);
+		model->SetMatrix(*scene, dQuaternion (matrix), matrix.m_posit);
+
+	}
+
+#if 0
 	dVehicleChassis* m_player;
 	GLuint m_gears;
 	GLuint m_odometer;
@@ -595,6 +627,7 @@ void SingleBodyCar(DemoEntityManager* const scene)
 
 	// load 
 	dVehicleChassis* const player = manager->CreateVehicle(location, viperModel.GetData());
+	player;
 
 #if 0
 	// set this vehicle as the player

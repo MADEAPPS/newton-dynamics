@@ -22,7 +22,7 @@ dVehicleSingleBody::dVehicleSingleBody(dVehicleChassis* const chassis)
 	,m_groundNode(NULL)
 	,m_chassis(chassis)
 {
-	dAssert(0);
+	dTrace (("%s\n", __FUNCTION__));
 /*
 	dVector tmp;
 	dComplementaritySolver::dBodyState* const chassisBody = GetProxyBody();
@@ -77,7 +77,7 @@ void dVehicleSingleBody::CalculateNodeAABB(const dMatrix& matrix, dVector& minP,
 
 void dVehicleSingleBody::RigidBodyToStates()
 {
-	dAssert(0);
+	dTrace (("%s\n", __FUNCTION__));
 /*
 	dVector vector;
 	dMatrix matrix;
