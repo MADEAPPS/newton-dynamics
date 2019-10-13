@@ -150,11 +150,12 @@ class ServoInputManager: public dCustomListener
 		// plug a callback for 2d help display
 		scene->Set2DDisplayRenderFunction(RenderPlayerHelp, NULL, this);
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
+		memset (m_player, 0, sizeof (m_player));
 	}
 
 	void PreUpdate(dFloat timestepInSecunds)
 	{
-		if (!m_player[m_currentPlayer % m_playersCount]) {
+		if (!(m_playersCount && m_player[m_currentPlayer % m_playersCount])) {
 			return ;
 		}
 		dLifterUserData::InputRecord inputs;
@@ -203,7 +204,7 @@ class ServoInputManager: public dCustomListener
 
 	void UpdateCamera(dFloat timestepInSecunds)
 	{
-		if (!m_player[m_currentPlayer % m_playersCount]) {
+		if (!(m_playersCount && m_player[m_currentPlayer % m_playersCount])) {
 			return;
 		}
 
@@ -949,7 +950,6 @@ void ServoJoints (DemoEntityManager* const scene)
 	
 	// load a the mesh of the articulate vehicle
 	dModelRootNode* const forklift = vehicleManager->CreateForklift(matrix, "forklift.ngd", sizeof(inverseKinematicsRidParts) / sizeof (inverseKinematicsRidParts[0]), inverseKinematicsRidParts);
-
 	inputManager->AddPlayer(forklift);
 
 	dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));

@@ -75,7 +75,3 @@
 #include <dCustomJoint.h>
 #include <dCustomListener.h>
 
-#include <dAnimationStdAfx.h>
-//#include <dAnimAcyclicJoint.h>
-//#include <dAnimAcyclicSolver.h>
-//#include <dAnimIDRigKinematicLoopJoint.h>

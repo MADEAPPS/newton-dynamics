@@ -234,7 +234,7 @@ class dModelAnimTreePoseBalance: public dModelAnimTreeFootBase
 			bodyCount++;
 			const dModelChildrenList& children = root->GetChildren();
 			for (const dModelChildrenList::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
-				stackBuffer[stack] = node->GetInfo().GetData();
+				stackBuffer[stack] = node->GetInfo();
 				stack++;
 			}
 		}
@@ -608,7 +608,7 @@ class dBalancingCharacter: public dModelRootNode
 
 			const dModelChildrenList& children = root->GetChildren();
 			for (dModelChildrenList::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
-				stackBuffer[stack] = node->GetInfo().GetData();
+				stackBuffer[stack] = node->GetInfo();
 				stack++;
 			}
 		}
@@ -866,7 +866,7 @@ class dBalancingCharacterManager: public dModelManager
 			bodyCount++;
 			const dModelChildrenList& children = root->GetChildren();
 			for (dModelChildrenList::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
-				stackBuffer[stack] = node->GetInfo().GetData();
+				stackBuffer[stack] = node->GetInfo();
 				stack++;
 			}
 		}

@@ -261,7 +261,7 @@ class dHexapodManager: public dModelManager
 			bodyCount++;
 			const dModelChildrenList& children = root->GetChildren();
 			for (dModelChildrenList::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
-				stackBuffer[stack] = node->GetInfo().GetData();
+				stackBuffer[stack] = node->GetInfo();
 				stack++;
 			}
 		}

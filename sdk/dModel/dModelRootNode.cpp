@@ -15,11 +15,16 @@
 
 dModelRootNode::dModelRootNode(NewtonBody* const rootBody, const dMatrix& bindMatrix)
 	:dModelNode(rootBody, bindMatrix, NULL)
+	,m_manager(NULL)
+	,m_node(NULL)
 	,m_localTransformMode(false)
 {
 }
 
 dModelRootNode::~dModelRootNode()
 {
+	if (m_node) {
+		m_manager->RemoveRoot(this);
+	}
 }
 

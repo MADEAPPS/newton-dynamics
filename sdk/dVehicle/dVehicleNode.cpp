@@ -13,16 +13,24 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
 
-dVehicleNode::dVehicleNode(dVehicleNode* const parent)
-//	:dAnimAcyclicJoint(parent)
+dVehicleNode::dVehicleNode(const dMatrix& bindMatrix, dVehicleNode* const parent)
+	:dCustomAlloc()
+	,m_parent(parent)
 {
-	dTrace (("%s\n", __FUNCTION__));
+	if (m_parent) {
+		m_parent->m_children.Append(this);
+	}
 }
 
 dVehicleNode::~dVehicleNode()
 {
+	while (m_children.GetCount()) {
+		delete m_children.GetFirst()->GetInfo();
+		m_children.Remove(m_children.GetFirst());
+	}
 }
 
+#if 0
 void dVehicleNode::CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const
 {
 	for (int i = 0; i < 3; i++) {
@@ -82,3 +90,5 @@ void dVehicleNode::Integrate(dFloat timestep)
 	}
 */
 }
+
+#endif

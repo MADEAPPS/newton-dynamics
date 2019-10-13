@@ -14,34 +14,51 @@
 #define __D_VEHICLE_MANAGER_H__
 
 #include "dStdafxVehicle.h"
-#include "dVehicleChassis.h"
 
-#define D_VEHICLE_MANAGER_NAME			"__SingleBodyVehicleManager__"
+
+#define D_VEHICLE_MANAGER_NAME			"__VehicleManager__"
+
+class dVehicleNode;
+class dVehicleChassis;
 
 class dVehicleManager: public dCustomParallelListener
 {
 	public:
 	DVEHICLE_API dVehicleManager(NewtonWorld* const world);
 	DVEHICLE_API virtual ~dVehicleManager();
-	
-	virtual void UpdateDriverInput(dVehicleChassis* const vehicle, dFloat timestep) {}
-	virtual void OnUpdateTransform(const dVehicleChassis* const vehicle, dFloat timestep) const {}
 
+	DVEHICLE_API void AddRoot(dVehicleChassis* const root);
+	DVEHICLE_API void RemoveRoot(dVehicleChassis* const root);
+	DVEHICLE_API void RemoveAndDeleteRoot(dVehicleChassis* const root);
+
+	
+//	DVEHICLE_API virtual void UpdateDriverInput(dVehicleChassis* const vehicle, dFloat timestep) {}
 //	DVEHICLE_API virtual dVehicleChassis* CreateVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 //	DVEHICLE_API virtual dVehicleChassis* CreateVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+//	DVEHICLE_API virtual dVehicleChassis* CreateSingleBodyVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+//	DVEHICLE_API virtual dVehicleChassis* CreateSingleBodyVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
+//	DVEHICLE_API virtual void DestroyController(dVehicleChassis* const controller);
 
-	DVEHICLE_API virtual dVehicleChassis* CreateSingleBodyVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, dFloat gravityMag);
-	DVEHICLE_API virtual void DestroyController(dVehicleChassis* const controller);
+	//protected:
+	//DVEHICLE_API virtual void PreUpdate(dFloat timestep, int threadID);
+	//DVEHICLE_API virtual void PostUpdate(dFloat timestep, int threadID);
+	//
+	//DVEHICLE_API virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
+	//friend class dVehicleChassis;
+
+	virtual void OnUpdateTransform(const dVehicleChassis* const vehicle) const {}
+	virtual void OnPreUpdate(dVehicleChassis* const model, dFloat timestep) const {};
+	virtual void OnPostUpdate(dVehicleChassis* const model, dFloat timestep) const {};
+	
+	virtual void OnDebug(dVehicleChassis* const model, dCustomJoint::dDebugDisplay* const debugContext) {}
 
 	protected:
-	DVEHICLE_API virtual void PostStep(dFloat timestep, int threadID);
-	DVEHICLE_API virtual void PreUpdate(dFloat timestep, int threadID);
-	DVEHICLE_API virtual void PostUpdate(dFloat timestep, int threadID);
+	void PostStep(dFloat timestep, int threadID);
+	void PreUpdate(dFloat timestep, int threadID);
+	void PostUpdate(dFloat timestep, int threadID);
+//	void UpdateLocalTranforms(dVehicleChassis* const model) const;
 
-	DVEHICLE_API virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
-	friend class dVehicleChassis;
-
-	dList<dVehicleChassis> m_list;
+	dList<dVehicleChassis*> m_list;
 };
 
 

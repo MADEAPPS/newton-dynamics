@@ -15,30 +15,49 @@
 
 #include "dStdafxVehicle.h"
 
-class dVehicleInterface;
-class dKinematicLoopJoint;
-class dVehicleTireInterface;
+//class dVehicleInterface;
+//class dKinematicLoopJoint;
+//class dVehicleTireInterface;
 
 
-//class dVehicleNode: public dAnimAcyclicJoint
-class dVehicleNode
+class dVehicleNode;
+
+class dVehicleNodeChildrenList: public dList<dVehicleNode*>
 {
 	public:
-	DVEHICLE_API dVehicleNode(dVehicleNode* const parent);
+	dVehicleNodeChildrenList()
+		:dList<dVehicleNode*>()
+	{
+	}
+
+	~dVehicleNodeChildrenList()
+	{
+	}
+};
+
+
+class dVehicleNode: public dCustomAlloc
+{
+	public:
+	DVEHICLE_API dVehicleNode(const dMatrix& bindMatrix, dVehicleNode* const parent);
 	DVEHICLE_API virtual ~dVehicleNode();
 	
-	DVEHICLE_API virtual void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
-
-	virtual dVehicleInterface* GetAsVehicle() const { return NULL; }
-	virtual dVehicleTireInterface* GetAsTire() const { return NULL; }
+	//DVEHICLE_API virtual void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
+	//virtual dVehicleInterface* GetAsVehicle() const { return NULL; }
+	//virtual dVehicleTireInterface* GetAsTire() const { return NULL; }
 
 	protected:
-	virtual void RigidBodyToStates();
-	virtual void Integrate(dFloat timestep);
-	virtual void StatesToRigidBody(dFloat timestep);
-	void CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const;
+	//virtual void RigidBodyToStates();
+	//virtual void Integrate(dFloat timestep);
+	//virtual void StatesToRigidBody(dFloat timestep);
+	//void CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const;
+	//friend class dVehicleSolver;
 
-	friend class dVehicleSolver;
+	dVehicleNode* m_parent;
+	dVehicleNodeChildrenList m_children;
+
+	friend class dVehicleManager;
+	friend class dVehicleChassis;
 };
 
 

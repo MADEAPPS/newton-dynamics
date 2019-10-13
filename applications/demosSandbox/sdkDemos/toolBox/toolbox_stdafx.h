@@ -160,16 +160,17 @@ typedef long long unsigned64;
 #include <dCustomPlayerControllerManager.h>
 
 #include <dModelStdAfx.h>
+#include <dModelNode.h>
 #include <dModelManager.h>
+#include <dModelRootNode.h>
 #include <dModelAnimTree.h>
 #include <dModelAnimTreePose.h>
 #include <dModelAnimTreePoseBlender.h>
 
 #include <dStdafxVehicle.h>
-#include <dVehicleChassis.h>
+#include <dVehicleNode.h>
 #include <dVehicleManager.h>
-#include <dVehicleInterface.h>
-#include <dVehicleDashControl.h>
+#include <dVehicleChassis.h>
 
 #include <dSceneStdafx.h>
 #include <dScene.h>

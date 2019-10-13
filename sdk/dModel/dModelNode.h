@@ -16,11 +16,11 @@
 #include "dModelStdAfx.h"
 
 class dModelNode;
-class dModelChildrenList: public dList<dPointer<dModelNode>>
+class dModelChildrenList: public dList<dModelNode*>
 {
 	public:
 	dModelChildrenList()
-		:dList<dPointer<dModelNode>>()
+		:dList<dModelNode*>()
 	{
 	}
 

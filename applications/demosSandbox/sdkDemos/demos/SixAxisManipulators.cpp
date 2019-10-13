@@ -87,7 +87,7 @@ class dSixAxisRobot: public dModelRootNode
 		if (m_effector) {
 			dMatrix baseMatrix;
 			dMatrix pivotMatrix;
-			dModelNode* const referenceNode = GetChildren().GetFirst()->GetInfo().GetData();
+			dModelNode* const referenceNode = GetChildren().GetFirst()->GetInfo();
 			NewtonBodyGetMatrix(GetBody(), &baseMatrix[0][0]);
 			NewtonBodyGetMatrix(referenceNode->GetBody(), &pivotMatrix[0][0]);
 			m_pivotMatrix = pivotMatrix * baseMatrix.Inverse();
@@ -278,7 +278,7 @@ class dSixAxisManager: public dModelManager
 			bodyCount++;
 			const dModelChildrenList& children = root->GetChildren();
 			for (dModelChildrenList::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
-				stackBuffer[stack] = node->GetInfo().GetData();
+				stackBuffer[stack] = node->GetInfo();
 				stack++;
 			}
 		}

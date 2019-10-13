@@ -10,6 +10,8 @@
 */
 
 #include "dStdafxVehicle.h"
+#include "dVehicleNode.h"
+#include "dVehicleChassis.h"
 #include "dVehicleManager.h"
 
 dVehicleManager::dVehicleManager(NewtonWorld* const world)
@@ -20,12 +22,48 @@ dVehicleManager::dVehicleManager(NewtonWorld* const world)
 
 dVehicleManager::~dVehicleManager()
 {
+	while (m_list.GetCount()) {
+		RemoveAndDeleteRoot(m_list.GetFirst()->GetInfo());
+	}
 }
 
-dVehicleChassis* dVehicleManager::CreateSingleBodyVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, dFloat gravityMag)
+void dVehicleManager::AddRoot(dVehicleChassis* const root)
+{
+	dAssert(!root->m_node);
+	dAssert(!root->m_manager);
+	root->m_node = m_list.Append(root);
+	root->m_manager = this;
+}
+
+void dVehicleManager::RemoveRoot(dVehicleChassis* const root)
+{
+	if (root->m_node) {
+		dList<dVehicleChassis*>::dListNode* const node = (dList<dVehicleChassis*>::dListNode*) root->m_node;
+		root->m_node = NULL;
+		root->m_manager = NULL;
+		m_list.Remove(node);
+	}
+}
+
+void dVehicleManager::RemoveAndDeleteRoot(dVehicleChassis* const root)
+{
+	RemoveRoot(root);
+	delete root;
+}
+
+
+#if 0
+dVehicleChassis* dVehicleManager::CreateSingleBodyVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
 {
 	dVehicleChassis* const vehicle = &m_list.Append()->GetInfo();
-	vehicle->Init(body, vehicleFrame, gravityMag);
+	vehicle->Init(body, vehicleFrame, forceAndTorque, gravityMag);
+	return vehicle;
+}
+
+dVehicleChassis* dVehicleManager::CreateSingleBodyVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+{
+	dVehicleChassis* const vehicle = &m_list.Append()->GetInfo();
+	vehicle->Init(GetWorld(), chassisShape, mass, vehicleFrame, forceAndTorque, gravityMag);
 	return vehicle;
 }
 
@@ -33,7 +71,6 @@ void dVehicleManager::DestroyController(dVehicleChassis* const vehicle)
 {
 //	dAssert();
 //	vehicle->Cleanup();
-	dAssert (0);
 	dList<dVehicleChassis>::dListNode* const node = m_list.GetNodeFromInfo(*vehicle);
 	m_list.Remove(node);
 }
@@ -45,21 +82,22 @@ void dVehicleManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 		vehicle->Debug(debugContext);
 	}
 }
+#endif
 
 void dVehicleManager::PreUpdate(dFloat timestep, int threadID)
 {
 	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 
-	dList<dVehicleChassis>::dListNode* node = m_list.GetFirst();
+	dList<dVehicleChassis*>::dListNode* node = m_list.GetFirst();
 	for (int i = 0; i < threadID; i++) {
 		node = node ? node->GetNext() : NULL;
 	}
 
 	if (node) {
 		do {
-			dVehicleChassis& chassis = node->GetInfo();
-			chassis.PreUpdate(timestep);
+			dVehicleChassis* const chassis = node->GetInfo();
+			OnPreUpdate(chassis, timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
 			}
@@ -72,15 +110,15 @@ void dVehicleManager::PostUpdate(dFloat timestep, int threadID)
 	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 
-	dList<dVehicleChassis>::dListNode* node = m_list.GetFirst();
+	dList<dVehicleChassis*>::dListNode* node = m_list.GetFirst();
 	for (int i = 0; i < threadID; i++) {
 		node = node ? node->GetNext() : NULL;
 	}
 
 	if (node) {
 		do {
-			dVehicleChassis& chassis = node->GetInfo();
-			chassis.PostUpdate(timestep);
+			dVehicleChassis* const chassis = node->GetInfo();
+			OnPostUpdate(chassis, timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
 			}
@@ -90,21 +128,24 @@ void dVehicleManager::PostUpdate(dFloat timestep, int threadID)
 
 void dVehicleManager::PostStep(dFloat timestep, int threadID)
 {
+	D_TRACKTIME();
 	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 
-	dList<dVehicleChassis>::dListNode* node = m_list.GetFirst();
+	dList<dVehicleChassis*>::dListNode* node = m_list.GetFirst();
 	for (int i = 0; i < threadID; i++) {
 		node = node ? node->GetNext() : NULL;
 	}
 
 	if (node) {
 		do {
-			const dVehicleChassis& chassis = node->GetInfo();
-			OnUpdateTransform(&chassis, timestep);
+			dVehicleChassis* const chassis = node->GetInfo();
+			OnUpdateTransform(chassis);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
 			}
 		} while (node);
 	}
 }
+
+

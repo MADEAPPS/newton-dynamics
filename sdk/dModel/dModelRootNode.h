@@ -27,6 +27,8 @@ class dModelRootNode: public dModelNode
 	void SetTranformMode(bool localTransform) {m_localTransformMode = localTransform;}
 
 	protected:
+	dModelManager* m_manager;
+	void* m_node;
 	bool m_localTransformMode;
 	friend class dModelManager;
 };

@@ -11,6 +11,7 @@
 
 #include "dModelStdAfx.h"
 #include "dModelManager.h"
+#include "dModelRootNode.h"
 
 dModelManager::dModelManager(NewtonWorld* const world, const char* const name)
 	:dCustomParallelListener(world, name)
@@ -19,20 +20,41 @@ dModelManager::dModelManager(NewtonWorld* const world, const char* const name)
 
 dModelManager::~dModelManager()
 {
-}
-
-void dModelManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
-{
-	for (dList<dPointer<dModelRootNode>>::dListNode* node = m_controllerList.GetFirst(); node; node = node->GetNext()) {
-		dModelRootNode* const model = node->GetInfo().GetData();
-		OnDebug(model, debugContext);
+	while (m_modelList.GetCount()) {
+		RemoveAndDeleteRoot(m_modelList.GetFirst()->GetInfo());
 	}
 }
 
 void dModelManager::AddRoot(dModelRootNode* const root)
 {
-	dList<dPointer<dModelRootNode>>::dListNode* const node = m_controllerList.Append();
-	node->GetInfo().SetData(root);
+	dAssert(!root->m_node);
+	dAssert(!root->m_manager);
+	root->m_node = m_modelList.Append(root);
+	root->m_manager = this;
+}
+
+void dModelManager::RemoveRoot(dModelRootNode* const root)
+{
+	if (root->m_node) {
+		dList<dModelRootNode*>::dListNode* const node = (dList<dModelRootNode*>::dListNode*) root->m_node;
+		root->m_node = NULL;
+		root->m_manager = NULL;
+		m_modelList.Remove(node);
+	}
+}
+
+void dModelManager::RemoveAndDeleteRoot(dModelRootNode* const root)
+{
+	RemoveRoot(root);
+	delete root;
+}
+
+void dModelManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+{
+	for (dList<dModelRootNode*>::dListNode* node = m_modelList.GetFirst(); node; node = node->GetNext()) {
+		dModelRootNode* const model = node->GetInfo();
+		OnDebug(model, debugContext);
+	}
 }
 
 void dModelManager::UpdateLocalTranforms(dModelRootNode* const model) const
@@ -57,7 +79,7 @@ void dModelManager::UpdateLocalTranforms(dModelRootNode* const model) const
 		parentMatrix = matrix.Inverse();
 		for (dModelChildrenList::dListNode* ptrNode = bone->m_children.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
 			parentMatrixPool[stack] = parentMatrix;
-			stackPool[stack] = ptrNode->GetInfo().GetData();
+			stackPool[stack] = ptrNode->GetInfo();
 			stack++;
 		}
 	}
@@ -69,14 +91,14 @@ void dModelManager::PreUpdate(dFloat timestep, int threadID)
 	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 
-	dList<dPointer<dModelRootNode>>::dListNode* node = m_controllerList.GetFirst();
+	dList<dModelRootNode*>::dListNode* node = m_modelList.GetFirst();
 	for (int i = 0; i < threadID; i++) {
 		node = node ? node->GetNext() : NULL;
 	}
 
 	if (node) {
 		do {
-			dModelRootNode* const model = node->GetInfo().GetData();
+			dModelRootNode* const model = node->GetInfo();
 			OnPreUpdate(model, timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
@@ -91,14 +113,14 @@ void dModelManager::PostUpdate(dFloat timestep, int threadID)
 	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 
-	dList<dPointer<dModelRootNode>>::dListNode* node = m_controllerList.GetFirst();
+	dList<dModelRootNode*>::dListNode* node = m_modelList.GetFirst();
 	for (int i = 0; i < threadID; i++) {
 		node = node ? node->GetNext() : NULL;
 	}
 
 	if (node) {
 		do {
-			dModelRootNode* const model = node->GetInfo().GetData();
+			dModelRootNode* const model = node->GetInfo();
 			OnPostUpdate(model, timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
@@ -113,14 +135,14 @@ void dModelManager::PostStep(dFloat timestep, int threadID)
 	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 
-	dList<dPointer<dModelRootNode>>::dListNode* node = m_controllerList.GetFirst();
+	dList<dModelRootNode*>::dListNode* node = m_modelList.GetFirst();
 	for (int i = 0; i < threadID; i++) {
 		node = node ? node->GetNext() : NULL;
 	}
 
 	if (node) {
 		do {
-			dModelRootNode* const model = node->GetInfo().GetData();
+			dModelRootNode* const model = node->GetInfo();
 			if (model->m_localTransformMode) {
 				UpdateLocalTranforms(model);
 			}
