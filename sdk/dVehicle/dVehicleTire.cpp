@@ -361,3 +361,7 @@ const void dVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 	//}
 }
 
+void dVehicleTire::RigidBodyToProxyBody()
+{
+
+}

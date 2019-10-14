@@ -39,6 +39,15 @@ const void dVehicleNode::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 	}
 }
 
+void dVehicleNode::RigidBodyToProxyBody()
+{
+	for (dVehicleNodeChildrenList::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		dVehicleNode* const node = (dVehicleNode*)child->GetInfo();
+		node->RigidBodyToProxyBody();
+	}
+}
+
+
 #if 0
 void dVehicleNode::CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const
 {
@@ -63,18 +72,6 @@ void dVehicleNode::CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVect
 {
 	minP = matrix.m_posit;
 	maxP = matrix.m_posit;
-}
-
-
-void dVehicleNode::RigidBodyToStates()
-{
-	dAssert(0);
-/*
-	for (dList<dAnimAcyclicJoint*>::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
-		dVehicleNode* const node = (dVehicleNode*)child->GetInfo();
-		node->RigidBodyToStates();
-	}
-*/
 }
 
 void dVehicleNode::StatesToRigidBody(dFloat timestep)

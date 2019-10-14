@@ -95,6 +95,7 @@ class dVehicleTire: public dVehicleNode
 //	void CalculateContacts(const dVehicleChassis::dCollectCollidingBodies& bodyArray, dFloat timestep);
 
 	private: 
+	void RigidBodyToProxyBody();
 	const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id);
 

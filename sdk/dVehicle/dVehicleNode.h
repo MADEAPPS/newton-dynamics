@@ -49,11 +49,13 @@ class dVehicleNode: public dCustomAlloc
 
 	protected:
 	//virtual void RigidBodyToStates();
+	virtual void RigidBodyToProxyBody();
 	//virtual void Integrate(dFloat timestep);
 	//virtual void StatesToRigidBody(dFloat timestep);
 	//void CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	//friend class dVehicleSolver;
 
+	
 	virtual const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
 	dComplementaritySolver::dBodyState m_proxyBody;

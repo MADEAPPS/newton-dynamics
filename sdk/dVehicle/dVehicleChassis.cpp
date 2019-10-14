@@ -610,10 +610,9 @@ const void dVehicleChassis::Debug(dCustomJoint::dDebugDisplay* const debugContex
 {
 	//dAssert(0);
 	dVehicleNode::Debug(debugContext);
-	dTrace(("%s\n", __FUNCDNAME__));
+	dTrace(("%s\n", __FUNCTION__));
 	//m_vehicle->Debug(debugContext);
 }
-
 
 dVehicleTire* dVehicleChassis::AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo)
 {
@@ -645,7 +644,7 @@ void dVehicleChassis::RigidBodyToProxyBody()
 
 	m_proxyBody.UpdateInertia();
 
-//	dVehicleInterface::RigidBodyToStates();
+	dVehicleNode::RigidBodyToProxyBody();
 }
 
 void dVehicleChassis::PreUpdate(dFloat timestep)

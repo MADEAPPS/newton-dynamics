@@ -136,7 +136,7 @@ class dVehicleChassis: public dVehicleNode
 	void PreUpdate(dFloat timestep);
 	//void PostUpdate(dFloat timestep);
 
-	void RigidBodyToProxyBody();
+	virtual void RigidBodyToProxyBody();
 
 	dMatrix m_localFrame;
 	dVector m_gravity;
