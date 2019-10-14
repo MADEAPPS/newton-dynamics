@@ -67,7 +67,7 @@ class dVehicleChassis: public dVehicleNode
 #endif
 
 	public:
-	DVEHICLE_API dVehicleChassis (NewtonBody* const rootBody, const dMatrix& bindMatrix, dFloat gravityMag);
+	DVEHICLE_API dVehicleChassis (NewtonBody* const rootBody, const dMatrix& localFrame, dFloat gravityMag);
 	DVEHICLE_API ~dVehicleChassis();
 
 	NewtonBody* GetBody() const { return m_chassisBody; }
@@ -103,7 +103,7 @@ class dVehicleChassis: public dVehicleNode
 
 	static int OnAABBOverlap(const NewtonBody * const body, void* const me);
 	
-	dMatrix m_localFrame;
+	
 //	dVehicleSolver m_solver;
 	dVector m_gravity;
 	dVector m_obbSize;
@@ -126,6 +126,7 @@ class dVehicleChassis: public dVehicleNode
 	//void PreUpdate(dFloat timestep);
 	//void PostUpdate(dFloat timestep);
 
+	dMatrix m_localFrame;
 	NewtonBody* m_chassisBody;
 	void* m_node;
 	dVehicleManager* m_manager;

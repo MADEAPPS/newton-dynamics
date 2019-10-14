@@ -13,8 +13,9 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
 
-dVehicleNode::dVehicleNode(const dMatrix& bindMatrix, dVehicleNode* const parent)
+dVehicleNode::dVehicleNode(dVehicleNode* const parent)
 	:dCustomAlloc()
+	,m_usedData(NULL)
 	,m_parent(parent)
 {
 	if (m_parent) {

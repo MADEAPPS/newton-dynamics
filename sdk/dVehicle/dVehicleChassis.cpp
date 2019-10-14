@@ -596,8 +596,9 @@ void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
 
 #endif
 
-dVehicleChassis::dVehicleChassis(NewtonBody* const body, const dMatrix& bindMatrix, dFloat gravityMag)
-	:dVehicleNode(bindMatrix, NULL)
+dVehicleChassis::dVehicleChassis(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
+	:dVehicleNode(NULL)
+	,m_localFrame()
 	,m_chassisBody(body)
 	,m_node(NULL)
 	,m_manager(NULL)

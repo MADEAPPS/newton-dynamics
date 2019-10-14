@@ -254,8 +254,11 @@ return;
 		m_player = player;
 	}
 
-	dVehicleTireInterface* AddTire(dVehicleChassis* const vehicle, const char* const tireName, dFloat width, dFloat radius, dFloat vehicleMass)
+#endif
+	dVehicleTire* AddTire(dVehicleChassis* const vehicle, const char* const tireName, dFloat width, dFloat radius, dFloat vehicleMass)
 	{
+		return NULL;
+/*
 		DemoEntity* const entity = (DemoEntity*)vehicle->GetVehicle()->GetUserData();
 		DemoEntity* const tirePart = entity->Find(tireName);
 
@@ -290,8 +293,8 @@ return;
 		dVehicleTireInterface* const tire = vehicle->AddTire(tireMatrix, tireInfo);
 		tire->SetUserData(tirePart);
 		return tire;
+*/
 	}
-#endif
 
 	void CalculateTireDimensions(const char* const tireName, dFloat& width, dFloat& radius, NewtonWorld* const world, DemoEntity* const vehEntity) const
 	{
@@ -347,6 +350,7 @@ return;
 		NewtonBody* const body = NewtonCreateDynamicBody(GetWorld(), shape, &locationMatrix[0][0]);
 
 		NewtonBodySetUserData(body, carEntity);
+		//NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
 		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
 
 		// set vehicle mass, inertia and center of mass
@@ -390,39 +394,29 @@ return;
 		dFloat chassisMass = 1200.0f;
 		NewtonBody* const chassisBody = CreateChassisBody(chassisMass, vehicleEntity);
 
-		dVehicleChassis* const vehicle = new dVehicleChassis (chassisBody, dGetIdentityMatrix(), DEMO_GRAVITY);
+		// set the player matrix 
+		NewtonBodySetMatrix(chassisBody, &location[0][0]);
+
+		dVehicleChassis* const vehicle = new dVehicleChassis (chassisBody, chassisMatrix, DEMO_GRAVITY);
 		AddRoot(vehicle);
 
-		//dVehicleChassis* const vehicle = CreateSingleBodyVehicle(chassisBody, chassisMatrix, DEMO_GRAVITY);
+		// save entity as use data
+		vehicle->SetUserData(vehicleEntity);
 
 		// save the vehicle chassis with the vehicle visual for update children matrices 
 		//VehicleUserData* const renderCallback = new VehicleUserData(vehicle);
 		//vehicleEntity->SetUserData(renderCallback);
-		//
-		//// get the inteface and assig a user data;
-		//dVehicleInterface* const vehicleRoot = vehicle->GetVehicle();
-		//vehicleRoot->SetUserData(vehicleEntity);
-		//
-		//// get body from player
-		//NewtonBody* const chassisBody = vehicle->GetBody();
-		//
-		//// set the player matrix 
-		//NewtonBodySetMatrix(chassisBody, &location[0][0]);
-		//
-		//// set the transform callback
-		//NewtonBodySetUserData(chassisBody, vehicleEntity);
-		//NewtonBodySetTransformCallback(chassisBody, DemoEntity::TransformCallback);
-		//
-//		//for (int i = 0; i < int((sizeof(m_gearMap) / sizeof(m_gearMap[0]))); i++) {
-//		//	m_gearMap[i] = i;
-//		//}
+
+		//for (int i = 0; i < int((sizeof(m_gearMap) / sizeof(m_gearMap[0]))); i++) {
+		//	m_gearMap[i] = i;
+		//}
 
 		// add Tires
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions ("fl_tire", width, radio, world, vehicleEntity);
 
-//		dVehicleTireInterface* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, chassisMass);
+		dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, chassisMass);
 //		dVehicleTireInterface* const frontRight = AddTire(vehicle, "fr_tire", width, radio, chassisMass);
 /*
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);

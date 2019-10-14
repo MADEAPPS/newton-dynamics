@@ -13,7 +13,7 @@
 #include "dVehicleNode.h"
 #include "dVehicleChassis.h"
 #include "dVehicleSingleBody.h"
-#include "dVehicleVirtualTire.h"
+#include "dVehicleTire.h"
 #include "dVehicleVirtualEngine.h"
 #include "dVehicleVirtualJoints.h"
 

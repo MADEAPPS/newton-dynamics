@@ -15,11 +15,6 @@
 
 #include "dStdafxVehicle.h"
 
-//class dVehicleInterface;
-//class dKinematicLoopJoint;
-//class dVehicleTireInterface;
-
-
 class dVehicleNode;
 
 class dVehicleNodeChildrenList: public dList<dVehicleNode*>
@@ -39,12 +34,15 @@ class dVehicleNodeChildrenList: public dList<dVehicleNode*>
 class dVehicleNode: public dCustomAlloc
 {
 	public:
-	DVEHICLE_API dVehicleNode(const dMatrix& bindMatrix, dVehicleNode* const parent);
+	DVEHICLE_API dVehicleNode(dVehicleNode* const parent);
 	DVEHICLE_API virtual ~dVehicleNode();
 	
 	//DVEHICLE_API virtual void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	//virtual dVehicleInterface* GetAsVehicle() const { return NULL; }
 	//virtual dVehicleTireInterface* GetAsTire() const { return NULL; }
+
+	void* GetUserData() const {return m_usedData;}
+	void SetUserData(void* const userData) {m_usedData = userData;}
 
 	protected:
 	//virtual void RigidBodyToStates();
@@ -53,6 +51,7 @@ class dVehicleNode: public dCustomAlloc
 	//void CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	//friend class dVehicleSolver;
 
+	void* m_usedData;
 	dVehicleNode* m_parent;
 	dVehicleNodeChildrenList m_children;
 

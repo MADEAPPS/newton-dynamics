@@ -12,7 +12,7 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleChassis.h"
 #include "dVehicleSingleBody.h"
-#include "dVehicleVirtualTire.h"
+#include "dVehicleTire.h"
 #include "dVehicleVirtualEngine.h"
 #include "dVehicleVirtualDifferential.h"
 

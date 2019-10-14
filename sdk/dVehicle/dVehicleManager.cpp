@@ -84,29 +84,9 @@ void dVehicleManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 }
 #endif
 
-void dVehicleManager::PreUpdate(dFloat timestep, int threadID)
-{
-	NewtonWorld* const world = GetWorld();
-	const int threadCount = NewtonGetThreadsCount(world);
-
-	dList<dVehicleChassis*>::dListNode* node = m_list.GetFirst();
-	for (int i = 0; i < threadID; i++) {
-		node = node ? node->GetNext() : NULL;
-	}
-
-	if (node) {
-		do {
-			dVehicleChassis* const chassis = node->GetInfo();
-			OnPreUpdate(chassis, timestep);
-			for (int i = 0; i < threadCount; i++) {
-				node = node ? node->GetNext() : NULL;
-			}
-		} while (node);
-	}
-}
-
 void dVehicleManager::PostUpdate(dFloat timestep, int threadID)
 {
+	D_TRACKTIME();
 	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 
@@ -148,4 +128,25 @@ void dVehicleManager::PostStep(dFloat timestep, int threadID)
 	}
 }
 
+void dVehicleManager::PreUpdate(dFloat timestep, int threadID)
+{
+	D_TRACKTIME();
+	NewtonWorld* const world = GetWorld();
+	const int threadCount = NewtonGetThreadsCount(world);
+
+	dList<dVehicleChassis*>::dListNode* node = m_list.GetFirst();
+	for (int i = 0; i < threadID; i++) {
+		node = node ? node->GetNext() : NULL;
+	}
+
+	if (node) {
+		do {
+			dVehicleChassis* const chassis = node->GetInfo();
+			OnPreUpdate(chassis, timestep);
+			for (int i = 0; i < threadCount; i++) {
+				node = node ? node->GetNext() : NULL;
+			}
+		} while (node);
+	}
+}
 

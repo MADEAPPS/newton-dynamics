@@ -12,19 +12,22 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleChassis.h"
 #include "dVehicleSingleBody.h"
-#include "dVehicleVirtualTire.h"
+#include "dVehicleTire.h"
 
-dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info, const dMatrix& localFrame)
-	:dVehicleTireInterface(parent, info)
-	,m_proxyJoint()
-	,m_dynamicContactBodyNode(NULL)
-	,m_omega(0.0f)
-	,m_speed(0.0f)
-	,m_position(0.0f)
-	,m_tireAngle(0.0f)
-	,m_brakeTorque(0.0f)
-	,m_steeringAngle(0.0f)
-	,m_invSuspensionLength(m_info.m_suspensionLength > 0.0f ? 1.0f/m_info.m_suspensionLength : 0.0f)
+//dVehicleTire::dVehicleTire(dVehicleNode* const parent, const dMatrix& locationInGlobalSpace, const dTireInfo& info, const dMatrix& localFrame)
+//	:dVehicleTireInterface(parent, info)
+
+dVehicleTire::dVehicleTire(dVehicleNode* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info, const dMatrix& localFrame)
+	:dVehicleNode(chassis)
+//	,m_proxyJoint()
+//	,m_dynamicContactBodyNode(NULL)
+//	,m_omega(0.0f)
+//	,m_speed(0.0f)
+//	,m_position(0.0f)
+//	,m_tireAngle(0.0f)
+//	,m_brakeTorque(0.0f)
+//	,m_steeringAngle(0.0f)
+//	,m_invSuspensionLength(m_info.m_suspensionLength > 0.0f ? 1.0f/m_info.m_suspensionLength : 0.0f)
 {
 	dAssert(0);
 /*
@@ -77,6 +80,7 @@ dVehicleVirtualTire::dVehicleVirtualTire(dVehicleNode* const parent, const dMatr
 */
 }
 
+#if 0
 dVehicleVirtualTire::~dVehicleVirtualTire()
 {
 	NewtonDestroyCollision(m_tireShape);
@@ -360,3 +364,5 @@ void dVehicleVirtualTire::Debug(dCustomJoint::dDebugDisplay* const debugContext)
 	}
 */
 }
+
+#endif

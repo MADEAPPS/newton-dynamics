@@ -1119,10 +1119,6 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	}
 	m_mesh->ResetOptimization();
 
-
-	glUseProgram(m_shader);
-	int matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
-
 	int count = CalculateMatrixPalette(&bindMatrix[0]);
 	GLfloat* const glMatrixPallete = dAlloca (GLfloat, 16 * count);
 	ConvertToGlMatrix(count, &bindMatrix[0], glMatrixPallete);
@@ -1132,6 +1128,8 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 //glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &xxx0);
 //glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS, &xxx1);
 
+	glUseProgram(m_shader);
+	int matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
 	glUniformMatrix4fv(matrixPalette, count, GL_FALSE, glMatrixPallete);
 	dAssert (glGetError() == GL_NO_ERROR);
 
