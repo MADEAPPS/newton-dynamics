@@ -42,13 +42,13 @@ class dVehicleManager: public dCustomParallelListener
 	virtual void OnUpdateTransform(const dVehicleChassis* const vehicle) const {}
 	virtual void OnPreUpdate(dVehicleChassis* const model, dFloat timestep) const {};
 	virtual void OnPostUpdate(dVehicleChassis* const model, dFloat timestep) const {};
-	
 	virtual void OnDebug(dVehicleChassis* const model, dCustomJoint::dDebugDisplay* const debugContext) {}
 
 	protected:
-	void PostStep(dFloat timestep, int threadID);
-	void PreUpdate(dFloat timestep, int threadID);
-	void PostUpdate(dFloat timestep, int threadID);
+	DVEHICLE_API void PostStep(dFloat timestep, int threadID);
+	DVEHICLE_API void PreUpdate(dFloat timestep, int threadID);
+	DVEHICLE_API void PostUpdate(dFloat timestep, int threadID);
+	DVEHICLE_API void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
 
 	dList<dVehicleChassis*> m_list;
 	//friend class dVehicleChassis;

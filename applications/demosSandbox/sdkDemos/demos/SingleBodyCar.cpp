@@ -257,9 +257,7 @@ return;
 #endif
 	dVehicleTire* AddTire(dVehicleChassis* const vehicle, const char* const tireName, dFloat width, dFloat radius, dFloat vehicleMass)
 	{
-		return NULL;
-/*
-		DemoEntity* const entity = (DemoEntity*)vehicle->GetVehicle()->GetUserData();
+		DemoEntity* const entity = (DemoEntity*)vehicle->GetUserData();
 		DemoEntity* const tirePart = entity->Find(tireName);
 
 		// for simplicity, tires are position in global space
@@ -270,7 +268,7 @@ return;
 		//tireMatrix.m_posit -= vehicle->GetUpAxis().Scale(0.0f);
 
 		// add the tire to the vehicle
-		dVehicleTireInterface::dTireInfo tireInfo;
+		dTireInfo tireInfo;
 		tireInfo.m_mass = 40.0f;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
@@ -290,10 +288,9 @@ return;
 		//tireInfo.m_hasFender = definition.m_wheelHasCollisionFenders;
 		//tireInfo.m_suspentionType = definition.m_tireSuspensionType;
 
-		dVehicleTireInterface* const tire = vehicle->AddTire(tireMatrix, tireInfo);
+		dVehicleTire* const tire = vehicle->AddTire(tireMatrix, tireInfo);
 		tire->SetUserData(tirePart);
 		return tire;
-*/
 	}
 
 	void CalculateTireDimensions(const char* const tireName, dFloat& width, dFloat& radius, NewtonWorld* const world, DemoEntity* const vehEntity) const
@@ -415,15 +412,14 @@ return;
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions ("fl_tire", width, radio, world, vehicleEntity);
-
 		dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, chassisMass);
-//		dVehicleTireInterface* const frontRight = AddTire(vehicle, "fr_tire", width, radio, chassisMass);
-/*
-		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
-		dVehicleTireInterface* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, chassisMass);
-		dVehicleTireInterface* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
-return NULL;
+		dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", width, radio, chassisMass);
 
+		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
+		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, chassisMass);
+		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
+
+/*
 		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
 		steeringControl->AddTire(frontLeft);
@@ -478,10 +474,8 @@ return NULL;
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		vehicle->Finalize();
-		
+*/		
 		return vehicle;
-*/
-		return NULL;
 	}
 
 #if 0

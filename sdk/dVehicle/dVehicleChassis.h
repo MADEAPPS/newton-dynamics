@@ -17,6 +17,9 @@
 #include "dVehicleNode.h"
 #include "dVehicleSolver.h"
 
+class dTireInfo;
+class dVehicleTire;
+
 class dVehicleChassis: public dVehicleNode
 {
 	public:
@@ -71,10 +74,17 @@ class dVehicleChassis: public dVehicleNode
 	DVEHICLE_API ~dVehicleChassis();
 
 	NewtonBody* GetBody() const { return m_chassisBody; }
+	const dMatrix& GetLocalFrame() const { return m_localFrame; }
+	dVehicleChassis* GetAsVehicle() const { return (dVehicleChassis*)this; }
+
+	DVEHICLE_API const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+	DVEHICLE_API dVehicleTire* AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
+	
+	
 #if 0
 	
-	dVehicleInterface* GetVehicle() const {return m_vehicle;}
-	DVEHICLE_API dVehicleTireInterface* AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo);
+	
+	
 	DVEHICLE_API dVehicleDifferentialInterface* AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire);
 	DVEHICLE_API dVehicleEngineInterface* AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential);
 
@@ -123,10 +133,13 @@ class dVehicleChassis: public dVehicleNode
 #endif
 
 	private:
-	//void PreUpdate(dFloat timestep);
+	void PreUpdate(dFloat timestep);
 	//void PostUpdate(dFloat timestep);
 
+	void RigidBodyToProxyBody();
+
 	dMatrix m_localFrame;
+	dVector m_gravity;
 	NewtonBody* m_chassisBody;
 	void* m_node;
 	dVehicleManager* m_manager;

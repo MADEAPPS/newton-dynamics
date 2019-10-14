@@ -16,11 +16,7 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
 
-//#include "dVehicleInterface.h"
-//#include "dVehicleVirtualJoints.h"
-//class dAnimIDRigKinematicLoopJoint;
-//class dVehicleTire: public dVehicleTireInterface
-
+class dVehicleChassis;
 class dTireInfo
 {
 	public:
@@ -73,16 +69,14 @@ class dTireInfo
 	//dSuspensionType m_suspentionType;
 };
 
-
-
 class dVehicleTire: public dVehicleNode
 {
 	public:
-	DVEHICLE_API dVehicleTire(dVehicleNode* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info, const dMatrix& localFrame);
+	DVEHICLE_API dVehicleTire(dVehicleChassis* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info);
 	DVEHICLE_API virtual ~dVehicleTire();
 
-//	DVEHICLE_API dMatrix GetLocalMatrix () const;
-//	DVEHICLE_API virtual dMatrix GetGlobalMatrix () const;
+	DVEHICLE_API dMatrix GetLocalMatrix () const;
+	DVEHICLE_API virtual dMatrix GetGlobalMatrix () const;
 //	DVEHICLE_API virtual NewtonCollision* GetCollisionShape() const;
 //
 //	DVEHICLE_API virtual dFloat GetSteeringAngle() const;
@@ -95,27 +89,29 @@ class dVehicleTire: public dVehicleNode
 //	void ApplyExternalForce(dFloat timestep);
 //	void Integrate(dFloat timestep);
 //	dComplementaritySolver::dBilateralJoint* GetProxyJoint();
-//	dMatrix GetHardpointMatrix (dFloat param) const;
+	dMatrix GetHardpointMatrix (dFloat param) const;
 //	int GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray);
 //	void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 //	void CalculateContacts(const dVehicleChassis::dCollectCollidingBodies& bodyArray, dFloat timestep);
-//
-//	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
-//	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id);
 
-//	dMatrix m_matrix;
-//	dMatrix m_bindingRotation;
+	private: 
+	const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id);
+
+	dMatrix m_matrix;
+	dMatrix m_bindingRotation;
 //	dTireJoint m_proxyJoint;
 //	dVehicleNode m_dynamicContactBodyNode;
 //	dTireContact m_contactsJoints[3];
-//	NewtonCollision* m_tireShape;
+	dTireInfo m_info;
+	NewtonCollision* m_tireShape;
 //	dFloat m_omega;
 //	dFloat m_speed;
-//	dFloat m_position;
-//	dFloat m_tireAngle;
+	dFloat m_position;
+	dFloat m_tireAngle;
 //	dFloat m_brakeTorque;
-//	dFloat m_steeringAngle;
-//	dFloat m_invSuspensionLength;
+	dFloat m_steeringAngle;
+	dFloat m_invSuspensionLength;
 //	friend class dVehicleChassis;
 };
 

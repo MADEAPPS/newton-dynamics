@@ -31,6 +31,14 @@ dVehicleNode::~dVehicleNode()
 	}
 }
 
+const void dVehicleNode::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+	for (dVehicleNodeChildrenList::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		dVehicleNode* const node = child->GetInfo();
+		node->Debug(debugContext);
+	}
+}
+
 #if 0
 void dVehicleNode::CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const
 {

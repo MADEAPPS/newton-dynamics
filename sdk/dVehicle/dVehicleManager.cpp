@@ -75,14 +75,16 @@ void dVehicleManager::DestroyController(dVehicleChassis* const vehicle)
 	m_list.Remove(node);
 }
 
+#endif
+
 void dVehicleManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 {
-	for (dList<dVehicleChassis>::dListNode* vehicleNode = m_list.GetFirst(); vehicleNode; vehicleNode = vehicleNode->GetNext()) {
-		dVehicleChassis* const vehicle = &vehicleNode->GetInfo();
+	for (dList<dVehicleChassis*>::dListNode* vehicleNode = m_list.GetFirst(); vehicleNode; vehicleNode = vehicleNode->GetNext()) {
+		dVehicleChassis* const vehicle = vehicleNode->GetInfo();
+		OnDebug(vehicle, debugContext);
 		vehicle->Debug(debugContext);
 	}
 }
-#endif
 
 void dVehicleManager::PostUpdate(dFloat timestep, int threadID)
 {
@@ -143,6 +145,7 @@ void dVehicleManager::PreUpdate(dFloat timestep, int threadID)
 		do {
 			dVehicleChassis* const chassis = node->GetInfo();
 			OnPreUpdate(chassis, timestep);
+			chassis->PreUpdate(timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
 			}

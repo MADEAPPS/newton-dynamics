@@ -10,10 +10,11 @@
 */
 
 #include "dStdafxVehicle.h"
-#include "dVehicleManager.h"
+#include "dVehicleNode.h"
+#include "dVehicleTire.h"
 #include "dVehicleChassis.h"
-//#include "dVehicleSingleBody.h"
-//#include "dVehicleVirtualTire.h"
+#include "dVehicleManager.h"
+
 
 #if 0
 dVehicleChassis::dVehicleChassis ()
@@ -154,10 +155,6 @@ dVehicleEngineControl* dVehicleChassis::GetEngineControl()
 	return m_engineControl;
 }
 
-dVehicleTireInterface* dVehicleChassis::AddTire (const dMatrix& locationInGlobalSpace, const dVehicleTireInterface::dTireInfo& tireInfo)
-{
-	return m_vehicle->AddTire(locationInGlobalSpace, tireInfo, m_localFrame);
-}
 
 dVehicleDifferentialInterface* dVehicleChassis::AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire)
 {
@@ -167,12 +164,6 @@ dVehicleDifferentialInterface* dVehicleChassis::AddDifferential(dVehicleTireInte
 dVehicleEngineInterface* dVehicleChassis::AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential)
 {
 	return m_vehicle->AddEngine(engineInfo, differential);
-}
-
-void dVehicleChassis::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
-{
-	dAssert(0);
-//	m_vehicle->Debug(debugContext);
 }
 
 void dVehicleChassis::Finalize()
@@ -269,35 +260,6 @@ void dVehicleChassis::PostUpdate(dFloat timestep)
 	m_vehicle->RigidBodyToStates();
 }
 
-void dVehicleChassis::PreUpdate(dFloat timestep)
-{
-	dAssert(0);
-	/*
-	dVehicleManager* const manager = (dVehicleManager*)GetManager();
-	manager->UpdateDriverInput(this, timestep);
-
-	if (m_steeringControl) {
-		m_steeringControl->Update(timestep);
-	}
-
-	if (m_brakeControl) {
-		m_brakeControl->Update(timestep);
-	}
-
-	if (m_handBrakeControl) {
-		m_handBrakeControl->Update(timestep);
-	}
-
-	if (m_engineControl) {
-		m_engineControl->Update(timestep);
-	}
-	
-	m_vehicle->RigidBodyToStates();
-	m_solver.Update(timestep);
-	m_vehicle->Integrate(timestep);
-	m_vehicle->StatesToRigidBody(timestep);
-*/
-}
 
 void dVehicleChassis::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep)
 {
@@ -598,11 +560,43 @@ void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
 
 dVehicleChassis::dVehicleChassis(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
 	:dVehicleNode(NULL)
-	,m_localFrame()
+	,m_localFrame(localFrame)
+	,m_gravity(0.0f, -dAbs(gravityMag), 0.0f, 0.0f)
 	,m_chassisBody(body)
 	,m_node(NULL)
 	,m_manager(NULL)
 {
+	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+	dAssert(m_localFrame.TestOrthogonal());
+
+	// set linear and angular drag to zero
+	dVector drag(0.0f);
+	NewtonBodySetLinearDamping(m_chassisBody, 0.0f);
+	NewtonBodySetAngularDamping(m_chassisBody, &drag[0]);
+
+	/*
+	m_aerodynamicsDownForce0 = 0.0f;
+	m_aerodynamicsDownForce1 = 0.0f;
+	m_aerodynamicsDownSpeedCutOff = 0.0f;
+	m_aerodynamicsDownForceCoefficient = 0.0f;
+	SetAerodynamicsDownforceCoefficient(0.5f, 0.4f, 1.0f);
+	*/
+
+	dVector tmp;
+	//dComplementaritySolver::dBodyState* const chassisBody = GetProxyBody();
+	//m_groundNode.SetWorld(m_world);
+	//m_groundNode.SetLoopNode(true);
+
+	// set the inertia matrix;
+	//NewtonBody* const newtonBody = chassis->GetBody();
+	NewtonBodyGetMass(m_chassisBody, &tmp.m_w, &tmp.m_x, &tmp.m_y, &tmp.m_z);
+	m_proxyBody.SetMass(tmp.m_w);
+	m_proxyBody.SetInertia(tmp.m_x, tmp.m_y, tmp.m_z);
+
+	dMatrix matrix(dGetIdentityMatrix());
+	NewtonBodyGetCentreOfMass(m_chassisBody, &matrix.m_posit[0]);
+	matrix.m_posit.m_w = 1.0f;
+	m_proxyBody.SetLocalMatrix(matrix);
 }
 
 dVehicleChassis::~dVehicleChassis()
@@ -610,4 +604,74 @@ dVehicleChassis::~dVehicleChassis()
 	if (m_node) {
 		m_manager->RemoveRoot(this);
 	}
+}
+
+const void dVehicleChassis::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+	//dAssert(0);
+	dVehicleNode::Debug(debugContext);
+	dTrace(("%s\n", __FUNCDNAME__));
+	//m_vehicle->Debug(debugContext);
+}
+
+
+dVehicleTire* dVehicleChassis::AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo)
+{
+	dVehicleTire* const tire = new dVehicleTire(this, locationInGlobalSpace, tireInfo);
+	return tire;
+}
+
+void dVehicleChassis::RigidBodyToProxyBody()
+{
+	dVector vector;
+	dMatrix matrix;
+
+	// get data from engine rigid body and copied to the vehicle chassis body
+	//NewtonBody* const newtonBody = m_chassis->GetBody();
+	NewtonBodyGetMatrix(m_chassisBody, &matrix[0][0]);
+	m_proxyBody.SetMatrix(matrix);
+
+	NewtonBodyGetVelocity(m_chassisBody, &vector[0]);
+	m_proxyBody.SetVeloc(vector);
+
+	NewtonBodyGetOmega(m_chassisBody, &vector[0]);
+	m_proxyBody.SetOmega(vector);
+
+	NewtonBodyGetForce(m_chassisBody, &vector[0]);
+	m_proxyBody.SetForce(vector);
+
+	NewtonBodyGetTorque(m_chassisBody, &vector[0]);
+	m_proxyBody.SetTorque(vector);
+
+	m_proxyBody.UpdateInertia();
+
+//	dVehicleInterface::RigidBodyToStates();
+}
+
+void dVehicleChassis::PreUpdate(dFloat timestep)
+{
+	//dVehicleManager* const manager = (dVehicleManager*)GetManager();
+	//manager->UpdateDriverInput(this, timestep);
+	//
+	//if (m_steeringControl) {
+	//	m_steeringControl->Update(timestep);
+	//}
+	//
+	//if (m_brakeControl) {
+	//	m_brakeControl->Update(timestep);
+	//}
+	//
+	//if (m_handBrakeControl) {
+	//	m_handBrakeControl->Update(timestep);
+	//}
+	//
+	//if (m_engineControl) {
+	//	m_engineControl->Update(timestep);
+	//}
+
+	RigidBodyToProxyBody();
+
+	//m_solver.Update(timestep);
+	//m_vehicle->Integrate(timestep);
+	//m_vehicle->StatesToRigidBody(timestep);
 }
