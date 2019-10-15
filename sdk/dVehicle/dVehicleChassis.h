@@ -25,8 +25,8 @@ class dCollectCollidingBodies
 	public:
 	dCollectCollidingBodies(NewtonBody* const me)
 		:m_exclude(me)
-		, m_count(0)
-		, m_staticCount(0)
+		,m_count(0)
+		,m_staticCount(0)
 	{
 	}
 
@@ -35,7 +35,6 @@ class dCollectCollidingBodies
 	int m_staticCount;
 	NewtonBody* m_array[16];
 };
-
 
 class dVehicleChassis: public dVehicleNode
 {

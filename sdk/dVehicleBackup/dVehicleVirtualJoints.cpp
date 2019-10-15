@@ -155,7 +155,7 @@ void dTireContact::ResetContact ()
 void dTireContact::SetContact(const dVector& posit, const dVector& normal, const dVector& longitudinalDir, dFloat penetration, dFloat staticFriction, dFloat kineticFriction)
 {
 	dAssert(0);
-/*
+
 	m_point = posit;
 	m_normal = normal;
 	m_longitudinalDir = longitudinalDir;
@@ -174,7 +174,7 @@ void dTireContact::SetContact(const dVector& posit, const dVector& normal, const
 	m_staticFriction = staticFriction;
 	m_kineticFriction = kineticFriction;
 	m_penetration = dClamp (penetration, dFloat(-D_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
-*/
+
 }
 
 void dTireContact::TireForces(dFloat longitudinalSlip, dFloat lateralSlip, dFloat frictionCoef)
