@@ -75,6 +75,7 @@ class dVehicleTire: public dVehicleNode
 	DVEHICLE_API dVehicleTire(dVehicleChassis* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info);
 	DVEHICLE_API virtual ~dVehicleTire();
 
+	virtual dVehicleTire* GetAsTire() const { return (dVehicleTire*)this; }
 	DVEHICLE_API dMatrix GetLocalMatrix () const;
 	DVEHICLE_API virtual dMatrix GetGlobalMatrix () const;
 //	DVEHICLE_API virtual NewtonCollision* GetCollisionShape() const;
@@ -95,7 +96,7 @@ class dVehicleTire: public dVehicleNode
 //	void CalculateContacts(const dVehicleChassis::dCollectCollidingBodies& bodyArray, dFloat timestep);
 
 	private: 
-	void RigidBodyToProxyBody();
+	void ApplyExternalForce();
 	const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id);
 
@@ -106,14 +107,14 @@ class dVehicleTire: public dVehicleNode
 //	dTireContact m_contactsJoints[3];
 	dTireInfo m_info;
 	NewtonCollision* m_tireShape;
-//	dFloat m_omega;
-//	dFloat m_speed;
+	dFloat m_omega;
+	dFloat m_speed;
 	dFloat m_position;
 	dFloat m_tireAngle;
 //	dFloat m_brakeTorque;
 	dFloat m_steeringAngle;
 	dFloat m_invSuspensionLength;
-//	friend class dVehicleChassis;
+	friend class dVehicleChassis;
 };
 
 

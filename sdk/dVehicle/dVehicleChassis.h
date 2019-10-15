@@ -107,10 +107,6 @@ class dVehicleChassis: public dVehicleNode
 	void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 	void Init(NewtonWorld* const world, NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
 //	void Cleanup();
-	
-	void CalculateTireContacts(dFloat timestep);
-	void CalculateSuspensionForces(dFloat timestep);
-
 	static int OnAABBOverlap(const NewtonBody * const body, void* const me);
 	
 	
@@ -133,17 +129,21 @@ class dVehicleChassis: public dVehicleNode
 #endif
 
 	private:
+	void ApplyExternalForce();
+	void CalculateTireContacts(dFloat timestep);
+	void CalculateSuspensionForces(dFloat timestep);
+
 	void PreUpdate(dFloat timestep);
 	//void PostUpdate(dFloat timestep);
 
-	virtual void RigidBodyToProxyBody();
-
 	dMatrix m_localFrame;
 	dVector m_gravity;
+	dVehicleNode m_groundProxyBody;
 	NewtonBody* m_chassisBody;
 	void* m_node;
 	dVehicleManager* m_manager;
 
+	friend class dVehicleTire;
 	friend class dVehicleManager;
 };
 

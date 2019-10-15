@@ -25,8 +25,8 @@ dVehicleTire::dVehicleTire(dVehicleChassis* const chassis, const dMatrix& locati
 //	,m_dynamicContactBodyNode(NULL)
 	,m_info(info)
 	,m_tireShape(NULL)
-//	,m_omega(0.0f)
-//	,m_speed(0.0f)
+	,m_omega(0.0f)
+	,m_speed(0.0f)
 	,m_position(0.0f)
 	,m_tireAngle(0.0f)
 //	,m_brakeTorque(0.0f)
@@ -124,26 +124,6 @@ dFloat dVehicleVirtualTire::GetBrakeTorque() const
 void dVehicleVirtualTire::SetBrakeTorque(dFloat brakeTorque)
 {
 	m_brakeTorque = dAbs (brakeTorque);
-}
-
-void dVehicleVirtualTire::ApplyExternalForce(dFloat timestep)
-{
-	dAssert(0);
-/*
-	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
-	dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetProxyBody();
-
-	dMatrix tireMatrix (GetHardpointMatrix (m_position * m_invSuspensionLength) * chassisBody->GetMatrix());
-	m_proxyBody.SetMatrix(tireMatrix);
-		  
-	m_proxyBody.SetOmega(chassisBody->GetOmega() + tireMatrix.m_front.Scale(m_omega));
-	m_proxyBody.SetVeloc(chassisBody->CalculatePointVelocity (tireMatrix.m_posit) + tireMatrix.m_right.Scale(m_speed));
-		  
-	m_proxyBody.SetTorque(dVector (0.0f));
-	m_proxyBody.SetForce(chassisNode->m_gravity.Scale (m_proxyBody.GetMass()));
-
-	dVehicleTireInterface::ApplyExternalForce(timestep);
-*/
 }
 
 int dVehicleVirtualTire::GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray)
@@ -361,7 +341,17 @@ const void dVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 	//}
 }
 
-void dVehicleTire::RigidBodyToProxyBody()
+void dVehicleTire::ApplyExternalForce()
 {
+	dVehicleChassis* const chassisNode = m_parent->GetAsVehicle();
+	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 
+	dMatrix tireMatrix(GetHardpointMatrix(m_position * m_invSuspensionLength) * chassisBody->GetMatrix());
+	m_proxyBody.SetMatrix(tireMatrix);
+
+	m_proxyBody.SetOmega(chassisBody->GetOmega() + tireMatrix.m_front.Scale(m_omega));
+	m_proxyBody.SetVeloc(chassisBody->CalculatePointVelocity(tireMatrix.m_posit) + tireMatrix.m_right.Scale(m_speed));
+
+	m_proxyBody.SetTorque(dVector(0.0f));
+	m_proxyBody.SetForce(chassisNode->m_gravity.Scale(m_proxyBody.GetMass()));
 }

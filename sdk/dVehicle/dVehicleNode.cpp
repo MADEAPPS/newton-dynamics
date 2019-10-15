@@ -39,11 +39,11 @@ const void dVehicleNode::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 	}
 }
 
-void dVehicleNode::RigidBodyToProxyBody()
+void dVehicleNode::ApplyExternalForce()
 {
 	for (dVehicleNodeChildrenList::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
 		dVehicleNode* const node = (dVehicleNode*)child->GetInfo();
-		node->RigidBodyToProxyBody();
+		node->ApplyExternalForce();
 	}
 }
 
