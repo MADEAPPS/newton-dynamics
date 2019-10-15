@@ -471,10 +471,10 @@ return;
 		// Set Engine Control
 		dVehicleEngineControl* const engineControl = vehicle->GetEngineControl();
 		engineControl->SetEngine(engine);
-
+*/
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		vehicle->Finalize();
-*/		
+
 		return vehicle;
 	}
 

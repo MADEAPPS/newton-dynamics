@@ -106,7 +106,7 @@ class dVehicleTire: public dVehicleNode
 	dMatrix m_bindingRotation;
 //	dTireJoint m_proxyJoint;
 //	dVehicleNode m_dynamicContactBodyNode;
-//	dTireContact m_contactsJoints[3];
+	dTireContact m_contactsJoints[3];
 	dTireInfo m_info;
 	NewtonCollision* m_tireShape;
 	dFloat m_omega;

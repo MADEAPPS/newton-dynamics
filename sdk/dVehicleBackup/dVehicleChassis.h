@@ -15,7 +15,7 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
-//#include "dVehicleSolver.h"
+#include "dVehicleSolver.h"
 
 class dTireInfo;
 class dVehicleTire;

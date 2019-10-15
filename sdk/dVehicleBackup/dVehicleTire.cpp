@@ -199,11 +199,11 @@ void dVehicleVirtualTire::Integrate(dFloat timestep)
 
 void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, dFloat timestep)
 {
-/*
 	for (int i = 0; i < sizeof(m_contactsJoints) / sizeof(m_contactsJoints[0]); i++) {
 		m_contactsJoints[i].ResetContact();
 	}
 
+/*
 	int contactCount = 0;
 	dFloat friction = m_info.m_frictionCoefficient;
 	if (bodyArray.m_staticCount) {
