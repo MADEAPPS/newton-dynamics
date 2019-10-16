@@ -49,6 +49,7 @@
     <ClCompile Include="..\..\dVehicle\dVehicleManager.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleNode.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleTire.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleTireContact.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dVehicle\dStdafxVehicle.h" />
@@ -56,6 +57,7 @@
     <ClInclude Include="..\..\dVehicle\dVehicleManager.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleNode.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleTire.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleTireContact.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="dAnimation.vcxproj">

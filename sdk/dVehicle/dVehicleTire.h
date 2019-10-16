@@ -15,6 +15,7 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
+#include "dVehicleTireContact.h"
 
 class dVehicleChassis;
 class dCollectCollidingBodies;
@@ -69,54 +70,6 @@ class dTireInfo
 	//dFloat m_aligningMomentTrail;
 	//int m_hasFender;
 	//dSuspensionType m_suspentionType;
-};
-
-class dTireContact
-{
-	public:
-	class dTireModel
-	{
-		public:
-		dTireModel()
-			:m_lateralSlip(0.0f)
-			,m_longitodinalSlip(0.0f)
-			,m_alingMoment(0.0f)
-			,m_lateralForce(0.0f)
-			,m_longitunalForce(0.0f)
-		{
-		}
-
-		dFloat m_lateralSlip;
-		dFloat m_longitodinalSlip;
-		dFloat m_alingMoment;
-		dFloat m_lateralForce;
-		dFloat m_longitunalForce;
-	};
-
-	dTireContact();
-	void ResetContact();
-	void Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const;
-	void SetContact(const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat staticFriction, dFloat kineticFriction);
-
-	private:
-	int GetMaxDof() const { return 3; }
-	void TireForces(dFloat longitudinalSlip, dFloat lateralSlip, dFloat frictionCoef);
-	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
-	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
-
-	dVector m_point;
-	dVector m_normal;
-	dVector m_lateralDir;
-	dVector m_longitudinalDir;
-	dFloat m_penetration;
-	dFloat m_staticFriction;
-	dFloat m_kineticFriction;
-	dFloat m_load;
-	dTireModel m_tireModel;
-	dFloat m_normalFilter[4];
-	bool m_isActiveFilter[4];
-
-	friend class dVehicleVirtualTire;
 };
 
 class dVehicleTire: public dVehicleNode
