@@ -659,4 +659,8 @@ void dVehicleChassis::PreUpdate(dFloat timestep)
 	//m_solver.Update(timestep);
 	//m_vehicle->Integrate(timestep);
 	//m_vehicle->StatesToRigidBody(timestep);
+
+dVector xxx(0.0f);
+NewtonBodySetForce(m_chassisBody, &xxx[0]);
+NewtonBodySetTorque(m_chassisBody, &xxx[0]);
 }
