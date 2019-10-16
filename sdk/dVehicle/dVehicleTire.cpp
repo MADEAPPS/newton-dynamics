@@ -18,8 +18,9 @@
 
 dVehicleTire::dVehicleTire(dVehicleChassis* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info)
 	:dVehicleNode(chassis)
-	, m_matrix(dGetIdentityMatrix())
-	, m_bindingRotation(dGetIdentityMatrix())
+	,dBilateralJoint()
+	,m_matrix(dGetIdentityMatrix())
+	,m_bindingRotation(dGetIdentityMatrix())
 	,m_proxyJoint()
 	,m_dynamicContactBodyNode(NULL)
 	,m_info(info)
@@ -35,6 +36,8 @@ dVehicleTire::dVehicleTire(dVehicleChassis* const chassis, const dMatrix& locati
 	//SetWorld(parent->GetWorld());
 	//m_dynamicContactBodyNode.SetLoopNode(true);
 	//m_dynamicContactBodyNode.SetWorld(m_world);
+
+	Init(&m_proxyBody, &m_parent->GetProxyBody());
 	
 	NewtonBody* const chassisBody = chassis->GetBody();
 	NewtonWorld* const world = NewtonBodyGetWorld(chassis->GetBody());
@@ -351,4 +354,56 @@ void dVehicleTire::ApplyExternalForce()
 
 	m_proxyBody.SetTorque(dVector(0.0f));
 	m_proxyBody.SetForce(chassisNode->m_gravity.Scale(m_proxyBody.GetMass()));
+}
+
+void dVehicleTire::UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
+{
+	dAssert(0);
+}
+
+void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+{
+	dTrace(("%s\n", __FUNCTION__));
+/*
+	dComplementaritySolver::dBodyState* const tire = m_state0;
+	dComplementaritySolver::dBodyState* const chassis = m_state1;
+
+	const dVector& omega = chassis->GetOmega();
+	const dMatrix& tireMatrix = tire->GetMatrix();
+
+	// lateral force
+	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_front, omega);
+
+	// longitudinal force
+	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_up, omega);
+
+	// angular constraints
+	AddAngularRowJacobian(constraintParams, tireMatrix.m_up, omega, 0.0f);
+	AddAngularRowJacobian(constraintParams, tireMatrix.m_right, omega, 0.0f);
+
+	// dry rolling friction (for now contact, but it should be a function of the tire angular velocity)
+	//int index = constraintParams->m_count;
+	//AddAngularRowJacobian(constraintParams, tire->m_matrix[0], 0.0f);
+	//constraintParams->m_jointLowFriction[index] = -chassis->m_dryRollingFrictionTorque;
+	//constraintParams->m_jointHighFriction[index] = chassis->m_dryRollingFrictionTorque;
+
+	dFloat brakeTorque = m_tire->GetBrakeTorque();
+	//brakeTorque = 1000;
+	if (brakeTorque > 1.0e-3f) {
+
+		int index = constraintParams->m_count;
+		AddAngularRowJacobian(constraintParams, tireMatrix.m_front, omega, 0.0f);
+
+		const dVector& omega0 = m_state0->GetOmega();
+		const dVector& omega1 = m_state1->GetOmega();
+		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
+		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
+		const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+		dFloat relOmega = -(relVeloc.m_x + relVeloc.m_y + relVeloc.m_z);
+		constraintParams->m_jointAccel[index] = relOmega * constraintParams->m_timestepInv;
+		constraintParams->m_jointLowFrictionCoef[index] = -brakeTorque;
+		constraintParams->m_jointHighFrictionCoef[index] = brakeTorque;
+	}
+	m_tire->SetBrakeTorque(0.0f);
+*/
 }

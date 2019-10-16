@@ -631,19 +631,22 @@ void dVehicleSolver::InitMassMatrix()
 }
 
 //int dVehicleSolver::BuildJacobianMatrix(dFloat timestep, dAnimationContraint* const joint)
-int dVehicleSolver::BuildJacobianMatrix(dFloat timestep, dVehicleNode* const joint)
+int dVehicleSolver::BuildJacobianMatrix(dFloat timestep, dVehicleNode* const node)
 {
-	dAssert(0);
-return 0;
-	/*
 	dComplementaritySolver::dParamInfo constraintParams;
 	constraintParams.m_timestep = timestep;
 	constraintParams.m_timestepInv = 1.0f / timestep;
+
+	dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
+	dAssert(joint);
 
 	constraintParams.m_count = 0;
 	memset (&constraintParams.m_normalIndex, 0, sizeof (constraintParams.m_normalIndex));
 	joint->JacobianDerivative(&constraintParams);
 
+dTrace(("%s\n", __FUNCTION__));
+return 0;
+/*
 	const int dofCount = constraintParams.m_count;
 
 	// complete the derivative matrix for this joint
@@ -686,19 +689,19 @@ return 0;
 
 int dVehicleSolver::BuildJacobianMatrix(dFloat timestep)
 {
-dTrace(("%s\n", __FUNCTION__));
-return 0;
-	/*
 	int rowCount = 0;
 	for (int j = 0; j < m_nodeCount - 1; j++) {
-		dVehicleNode* const node = m_nodesOrder[j]->m_owner;
-		dAssert(node && node->m_proxyJoint);
-		dAnimationContraint* const joint = node->m_proxyJoint;
+		dVehicleNode* const node = m_nodesOrder[j];
+		dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
+		dAssert(joint);
 		joint->m_start = rowCount;
-		joint->m_count = BuildJacobianMatrix(timestep, joint);
+		joint->m_count = BuildJacobianMatrix(timestep, node);
 		rowCount += joint->m_count;
 	}
 
+dTrace(("%s\n", __FUNCTION__));
+return 0;
+	/*
 	for (int i = 0; i < m_loopJointCount; i++) {
 		dAnimationLoopJoint* const joint = m_loopJoints[i];
 		joint->m_start = rowCount;

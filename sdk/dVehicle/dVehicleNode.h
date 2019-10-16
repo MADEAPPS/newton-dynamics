@@ -40,9 +40,10 @@ class dVehicleNode: public dCustomAlloc
 	DVEHICLE_API virtual ~dVehicleNode();
 	
 	DVEHICLE_API virtual void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
-
+	
 	virtual dVehicleTire* GetAsTire() const { return NULL; }
 	virtual dVehicleChassis* GetAsVehicle() const { return NULL; }
+	virtual dComplementaritySolver::dBilateralJoint* GetJoint() { return NULL; }
 		
 	void* GetUserData() const {return m_usedData;}
 	void SetUserData(void* const userData) {m_usedData = userData;}

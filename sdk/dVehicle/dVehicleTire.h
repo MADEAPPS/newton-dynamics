@@ -74,7 +74,7 @@ class dTireInfo
 	//dSuspensionType m_suspentionType;
 };
 
-class dVehicleTire: public dVehicleNode
+class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilateralJoint
 {
 	public:
 	DVEHICLE_API dVehicleTire(dVehicleChassis* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info);
@@ -102,8 +102,13 @@ class dVehicleTire: public dVehicleNode
 
 	private: 
 	void ApplyExternalForce();
+	dComplementaritySolver::dBilateralJoint* GetJoint() {return this;}
 	const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id);
+
+	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
+	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const;
+
 
 	dMatrix m_matrix;
 	dMatrix m_bindingRotation;
