@@ -14,6 +14,7 @@
 #include "dVehicleNode.h"
 #include "dVehicleSolver.h"
 #include "dVehicleChassis.h"
+#include "dVehicleLoopJoint.h"
 
 #define D_DIAG_DAMP		 dFloat(1.0e-6f)
 #define D_DIAG_REGULARIZER	 dFloat(1.0e-4f)
@@ -55,7 +56,7 @@ dVehicleSolver::dVehicleSolver()
 	m_pairs = NULL;
 //	m_rootNode = NULL;
 	m_nodesOrder = NULL;
-//	m_loopJoints = NULL;
+	m_loopJoints = NULL;
 	m_deltaForce = NULL;
 	m_leftHandSide = NULL;
 	m_massMatrix10 = NULL;
@@ -685,7 +686,7 @@ return 0;
 
 int dVehicleSolver::BuildJacobianMatrix(dFloat timestep)
 {
-dAssert(0);
+dTrace(("%s\n", __FUNCTION__));
 return 0;
 	/*
 	int rowCount = 0;
@@ -1271,20 +1272,19 @@ void dVehicleSolver::DebugMassMatrix()
 
 void dVehicleSolver::Update(dFloat timestep)
 {
-	dAssert(0);
-/*
-	if (!(m_rootNode && m_rootNode->GetChildren().GetCount())) {
+	dVehicleChassis* const rootNode = (dVehicleChassis*)this;
+	if (!(rootNode->m_children.GetCount())) {
 		return;
 	}
 
-	dAnimationLoopJoint* kinematicLoop[128];
+	dVehicleLoopJoint* kinematicLoop[128];
 	m_loopJoints = kinematicLoop;
 
-	m_rootNode->ApplyExternalForce(timestep);
-	
-//	m_loopJointCount = m_rootNode->GetKinematicLoops(m_loopJoints);
-
+//	m_rootNode->ApplyExternalForce(timestep);
+	m_loopJointCount = rootNode->GetKinematicLoops(m_loopJoints);
+	dAssert(!m_loopJointCount);
 	int loopDof = 0;
+/*
 //	m_loopNodeCount = 0;
 	m_loopJointCount = 0;
 	const dAnimationLoopJointList& loopList = m_rootNode->GetLoops();
@@ -1312,6 +1312,8 @@ void dVehicleSolver::Update(dFloat timestep)
 			m_loopJointCount++;
 		}
 	}
+*/
+
 
 	//int totalJoint = m_nodeCount + m_loopNodeCount;
 	m_data = dAlloca(dBodyJointMatrixDataPair, m_nodeCount);
@@ -1319,6 +1321,7 @@ void dVehicleSolver::Update(dFloat timestep)
 	m_rightHandSide = dAlloca(dComplementaritySolver::dJacobianColum, m_nodeCount * 6 + loopDof);
 
 	BuildJacobianMatrix(timestep);
+/*
 	InitMassMatrix();
 
 	m_pairs = dAlloca(dNodePair, m_rowCount + m_loopRowCount);

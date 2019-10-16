@@ -19,6 +19,7 @@
 
 class dTireInfo;
 class dVehicleTire;
+class dVehicleLoopJoint;
 
 class dCollectCollidingBodies
 {
@@ -123,6 +124,7 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 	void ApplyExternalForce();
 	void CalculateTireContacts(dFloat timestep);
 	void CalculateSuspensionForces(dFloat timestep);
+	virtual int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 
 	void PreUpdate(dFloat timestep);
 	//void PostUpdate(dFloat timestep);

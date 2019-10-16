@@ -41,6 +41,15 @@ const void dVehicleNode::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 	}
 }
 
+int dVehicleNode::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
+{
+	int count = 0;
+	for (dVehicleNodeChildrenList::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
+		count += child->GetInfo()->GetKinematicLoops(&jointArray[count]);
+	}
+	return count;
+}
+
 void dVehicleNode::ApplyExternalForce()
 {
 	for (dVehicleNodeChildrenList::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {

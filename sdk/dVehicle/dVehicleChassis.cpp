@@ -456,6 +456,11 @@ const void dVehicleChassis::Debug(dCustomJoint::dDebugDisplay* const debugContex
 	//m_vehicle->Debug(debugContext);
 }
 
+int dVehicleChassis::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
+{
+	return dVehicleNode::GetKinematicLoops(jointArray);
+}
+
 dVehicleTire* dVehicleChassis::AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo)
 {
 	dVehicleTire* const tire = new dVehicleTire(this, locationInGlobalSpace, tireInfo);
@@ -609,7 +614,6 @@ int dVehicleChassis::OnAABBOverlap(const NewtonBody * const body, void* const co
 	return 1;
 }
 
-
 void dVehicleChassis::CalculateTireContacts(dFloat timestep)
 {
 	const dMatrix& matrix = m_proxyBody.GetMatrix();
@@ -655,8 +659,7 @@ void dVehicleChassis::PreUpdate(dFloat timestep)
 	ApplyExternalForce();
 	CalculateSuspensionForces(timestep);
 	CalculateTireContacts(timestep);
-
-	//m_solver.Update(timestep);
+	dVehicleSolver::Update(timestep);
 	//m_vehicle->Integrate(timestep);
 	//m_vehicle->StatesToRigidBody(timestep);
 

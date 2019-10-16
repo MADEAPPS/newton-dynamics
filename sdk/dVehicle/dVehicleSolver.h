@@ -17,6 +17,7 @@
 
 class dVehicleNode;
 class dVehicleChassis;
+class dVehicleLoopJoint;
 
 class dVehicleSolver
 {
@@ -78,7 +79,7 @@ class dVehicleSolver
 	dFloat* m_massMatrix10;
 	dFloat* m_massMatrix11;
 	dBodyJointMatrixDataPair* m_data;
-//	dAnimationLoopJoint** m_loopJoints;
+	dVehicleLoopJoint** m_loopJoints;
 	
 	dComplementaritySolver::dJacobianPair* m_leftHandSide;
 	dComplementaritySolver::dJacobianColum* m_rightHandSide;

@@ -18,6 +18,7 @@
 class dVehicleNode;
 class dVehicleTire;
 class dVehicleChassis;
+class dVehicleLoopJoint;
 
 class dVehicleNodeChildrenList: public dList<dVehicleNode*>
 {
@@ -53,8 +54,10 @@ class dVehicleNode: public dCustomAlloc
 	virtual void ApplyExternalForce();
 	//virtual void Integrate(dFloat timestep);
 	//virtual void StatesToRigidBody(dFloat timestep);
+
+	virtual int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 	void CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const;
-	//friend class dVehicleSolver;
+	
 
 	
 	virtual const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
