@@ -32,7 +32,6 @@ class dVehicleNodeChildrenList: public dList<dVehicleNode*>
 	}
 };
 
-
 class dVehicleNode: public dCustomAlloc
 {
 	public:
@@ -64,7 +63,9 @@ class dVehicleNode: public dCustomAlloc
 	void* m_usedData;
 	dVehicleNode* m_parent;
 	dVehicleNodeChildrenList m_children;
+	int m_index;
 
+	friend class dVehicleSolver;
 	friend class dVehicleManager;
 	friend class dVehicleChassis;
 };

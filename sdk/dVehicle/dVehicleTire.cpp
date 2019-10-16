@@ -14,28 +14,28 @@
 #include "dVehicleTire.h"
 #include "dVehicleChassis.h"
 
+
+
 dVehicleTire::dVehicleTire(dVehicleChassis* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info)
 	:dVehicleNode(chassis)
 	, m_matrix(dGetIdentityMatrix())
 	, m_bindingRotation(dGetIdentityMatrix())
-	//	,m_proxyJoint()
-	//	,m_dynamicContactBodyNode(NULL)
-	, m_info(info)
-	, m_tireShape(NULL)
-	, m_omega(0.0f)
-	, m_speed(0.0f)
-	, m_position(0.0f)
-	, m_tireAngle(0.0f)
-	//	,m_brakeTorque(0.0f)
-	, m_steeringAngle(0.0f)
-	, m_invSuspensionLength(m_info.m_suspensionLength > 0.0f ? 1.0f / m_info.m_suspensionLength : 0.0f)
+	,m_proxyJoint()
+	,m_dynamicContactBodyNode(NULL)
+	,m_info(info)
+	,m_tireShape(NULL)
+	,m_omega(0.0f)
+	,m_speed(0.0f)
+	,m_position(0.0f)
+	,m_tireAngle(0.0f)
+	,m_brakeTorque(0.0f)
+	,m_steeringAngle(0.0f)
+	,m_invSuspensionLength(m_info.m_suspensionLength > 0.0f ? 1.0f / m_info.m_suspensionLength : 0.0f)
 {
 	//SetWorld(parent->GetWorld());
 	//m_dynamicContactBodyNode.SetLoopNode(true);
 	//m_dynamicContactBodyNode.SetWorld(m_world);
-	//
-	//dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*) m_parent;
-	//NewtonBody* const newtonBody = chassis->GetBody();
+	
 	NewtonBody* const chassisBody = chassis->GetBody();
 	NewtonWorld* const world = NewtonBodyGetWorld(chassis->GetBody());
 
@@ -63,18 +63,18 @@ dVehicleTire::dVehicleTire(dVehicleChassis* const chassis, const dMatrix& locati
 	// simplify calculation by making wheel inertia spherical
 	inertia = dVector(m_info.m_mass * dMax(dMax(inertia.m_x, inertia.m_y), inertia.m_z));
 
-	//m_proxyBody.SetMass(m_info.m_mass);
-	//m_proxyBody.SetInertia(inertia.m_x, inertia.m_y, inertia.m_z);
-	//m_proxyBody.UpdateInertia();
-	//
-	//// set the tire joint
-	//m_proxyJoint.Init (&m_proxyBody, m_parent->GetProxyBody());
-	//m_proxyJoint.m_tire = this;
-	//
-	//for (int i = 0 ; i < sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1; i ++) {
-	//	m_contactsJoints[i].SetOwners (this, &chassisNode->m_groundNode);
-	//}
-	//m_contactsJoints[sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1].SetOwners(this, &m_dynamicContactBodyNode);
+	m_proxyBody.SetMass(m_info.m_mass);
+	m_proxyBody.SetInertia(inertia.m_x, inertia.m_y, inertia.m_z);
+	m_proxyBody.UpdateInertia();
+	
+	// set the tire joint
+	m_proxyJoint.Init (&m_proxyBody, &m_parent->GetProxyBody());
+	m_proxyJoint.m_tire = this;
+	
+	for (int i = 0 ; i < sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1; i ++) {
+		m_contactsJoints[i].SetOwners (this, &chassis->m_groundProxyBody);
+	}
+	m_contactsJoints[sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1].SetOwners(this, &m_dynamicContactBodyNode);
 
 ////m_brakeTorque = 100.0f;
 ////m_omega = -20.0f;

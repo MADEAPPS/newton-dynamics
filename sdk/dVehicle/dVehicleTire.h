@@ -15,10 +15,12 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
+#include "dVehicleTireJoint.h"
 #include "dVehicleTireContact.h"
 
 class dVehicleChassis;
 class dCollectCollidingBodies;
+
 
 class dTireInfo
 {
@@ -54,7 +56,7 @@ class dTireInfo
 		m_longitudinalStiffness = dAbs(vehicleMass * gravity * 1.0f);
 	}
 
-	dVector m_location;
+	//dVector m_location;
 	dFloat m_mass;
 	dFloat m_radio;
 	dFloat m_width;
@@ -105,16 +107,16 @@ class dVehicleTire: public dVehicleNode
 
 	dMatrix m_matrix;
 	dMatrix m_bindingRotation;
-//	dTireJoint m_proxyJoint;
-//	dVehicleNode m_dynamicContactBodyNode;
-	dTireContact m_contactsJoints[3];
+	dTireJoint m_proxyJoint;
+	dVehicleNode m_dynamicContactBodyNode;
+	dVehicleTireContact m_contactsJoints[3];
 	dTireInfo m_info;
 	NewtonCollision* m_tireShape;
 	dFloat m_omega;
 	dFloat m_speed;
 	dFloat m_position;
 	dFloat m_tireAngle;
-//	dFloat m_brakeTorque;
+	dFloat m_brakeTorque;
 	dFloat m_steeringAngle;
 	dFloat m_invSuspensionLength;
 	friend class dVehicleChassis;

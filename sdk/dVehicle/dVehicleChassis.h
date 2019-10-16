@@ -15,7 +15,7 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
-//#include "dVehicleSolver.h"
+#include "dVehicleSolver.h"
 
 class dTireInfo;
 class dVehicleTire;
@@ -36,7 +36,7 @@ class dCollectCollidingBodies
 	NewtonBody* m_array[16];
 };
 
-class dVehicleChassis: public dVehicleNode
+class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 {
 	public:
 #if 0
@@ -139,6 +139,7 @@ class dVehicleChassis: public dVehicleNode
 	dVehicleManager* m_manager;
 
 	friend class dVehicleTire;
+	friend class dVehicleSolver;
 	friend class dVehicleManager;
 };
 

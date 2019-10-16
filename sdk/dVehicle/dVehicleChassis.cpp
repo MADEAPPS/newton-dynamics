@@ -370,6 +370,7 @@ m_engineControl->SetGear(dVehicleEngineInterface::m_firstGear);
 
 dVehicleChassis::dVehicleChassis(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
 	:dVehicleNode(NULL)
+	,dVehicleSolver()
 	,m_localFrame(localFrame)
 	,m_gravity(0.0f, -dAbs(gravityMag), 0.0f, 0.0f)
 	,m_obbSize(0.0f)
@@ -443,9 +444,9 @@ void dVehicleChassis::Finalize()
 	m_obbSize = (maxP - minP).Scale(0.5f) + dVector(0.1f, 0.1f, 0.1f, 0.0f);
 
 //	m_vehicle->RigidBodyToStates();
-//	m_solver.Finalize(this);
+	ApplyExternalForce();
+	dVehicleSolver::Finalize();
 }
-
 
 const void dVehicleChassis::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {

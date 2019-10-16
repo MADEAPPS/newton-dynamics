@@ -17,6 +17,8 @@ dVehicleNode::dVehicleNode(dVehicleNode* const parent)
 	:dCustomAlloc()
 	,m_usedData(NULL)
 	,m_parent(parent)
+	,m_children()
+	,m_index(-1)
 {
 	if (m_parent) {
 		m_parent->m_children.Append(this);

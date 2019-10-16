@@ -14,12 +14,13 @@
 #define __D_VEHICLE_TIRE_CONTACT_H__
 
 #include "dStdafxVehicle.h"
+#include "dVehicleLoopJoint.h"
 
 #define D_TIRE_MAX_LATERAL_SLIP				(0.175f)
 #define D_TIRE_MAX_ELASTIC_DEFORMATION		(0.05f)
 #define D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS (10.0f / D_TIRE_MAX_ELASTIC_DEFORMATION)
 
-class dTireContact
+class dVehicleTireContact: public dVehicleLoopJoint
 {
 	public:
 	class dTireModel
@@ -41,7 +42,7 @@ class dTireContact
 		dFloat m_longitunalForce;
 	};
 
-	dTireContact();
+	dVehicleTireContact();
 	void ResetContact();
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const;
 	void SetContact(const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat staticFriction, dFloat kineticFriction);

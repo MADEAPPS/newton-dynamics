@@ -46,18 +46,24 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\dVehicle\dVehicleChassis.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleLoopJoint.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleManager.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleNode.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleSolver.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleTire.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleTireContact.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleTireJoint.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dVehicle\dStdafxVehicle.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleChassis.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleLoopJoint.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleManager.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleNode.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleSolver.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleTire.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleTireContact.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleTireJoint.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="dAnimation.vcxproj">
