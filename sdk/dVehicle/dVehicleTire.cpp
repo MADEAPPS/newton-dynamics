@@ -100,6 +100,16 @@ void dVehicleTire::CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVect
 	CalculateAABB(GetCollisionShape(), matrix, minP, maxP);
 }
 
+dFloat dVehicleTire::GetBrakeTorque() const
+{
+	return m_brakeTorque;
+}
+
+void dVehicleTire::SetBrakeTorque(dFloat brakeTorque)
+{
+	m_brakeTorque = dAbs(brakeTorque);
+}
+
 
 #if 0
 
@@ -118,15 +128,6 @@ dFloat dVehicleVirtualTire::GetSteeringAngle() const
 	return m_steeringAngle;
 }
 
-dFloat dVehicleVirtualTire::GetBrakeTorque() const
-{
-	return m_brakeTorque;
-}
-
-void dVehicleVirtualTire::SetBrakeTorque(dFloat brakeTorque)
-{
-	m_brakeTorque = dAbs(brakeTorque);
-}
 
 int dVehicleVirtualTire::GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray)
 {
@@ -363,23 +364,21 @@ void dVehicleTire::UpdateSolverForces(const dComplementaritySolver::dJacobianPai
 
 void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-	dTrace(("%s\n", __FUNCTION__));
-/*
 	dComplementaritySolver::dBodyState* const tire = m_state0;
-	dComplementaritySolver::dBodyState* const chassis = m_state1;
+//	dComplementaritySolver::dBodyState* const chassis = m_state1;
 
-	const dVector& omega = chassis->GetOmega();
+//	const dVector& omega = chassis->GetOmega();
 	const dMatrix& tireMatrix = tire->GetMatrix();
 
 	// lateral force
-	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_front, omega);
+	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_front);
 
 	// longitudinal force
-	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_up, omega);
+	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_up);
 
 	// angular constraints
-	AddAngularRowJacobian(constraintParams, tireMatrix.m_up, omega, 0.0f);
-	AddAngularRowJacobian(constraintParams, tireMatrix.m_right, omega, 0.0f);
+	AddAngularRowJacobian(constraintParams, tireMatrix.m_up, 0.0f);
+	AddAngularRowJacobian(constraintParams, tireMatrix.m_right, 0.0f);
 
 	// dry rolling friction (for now contact, but it should be a function of the tire angular velocity)
 	//int index = constraintParams->m_count;
@@ -387,23 +386,23 @@ void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 	//constraintParams->m_jointLowFriction[index] = -chassis->m_dryRollingFrictionTorque;
 	//constraintParams->m_jointHighFriction[index] = chassis->m_dryRollingFrictionTorque;
 
-	dFloat brakeTorque = m_tire->GetBrakeTorque();
+
+	//dFloat brakeTorque = m_tire->GetBrakeTorque();
 	//brakeTorque = 1000;
-	if (brakeTorque > 1.0e-3f) {
+	if (m_brakeTorque > 1.0e-3f) {
 
 		int index = constraintParams->m_count;
-		AddAngularRowJacobian(constraintParams, tireMatrix.m_front, omega, 0.0f);
+		AddAngularRowJacobian(constraintParams, tireMatrix.m_front, 0.0f);
 
-		const dVector& omega0 = m_state0->GetOmega();
-		const dVector& omega1 = m_state1->GetOmega();
-		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
-		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
-		const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-		dFloat relOmega = -(relVeloc.m_x + relVeloc.m_y + relVeloc.m_z);
-		constraintParams->m_jointAccel[index] = relOmega * constraintParams->m_timestepInv;
-		constraintParams->m_jointLowFrictionCoef[index] = -brakeTorque;
-		constraintParams->m_jointHighFrictionCoef[index] = brakeTorque;
+		//const dVector& omega0 = m_state0->GetOmega();
+		//const dVector& omega1 = m_state1->GetOmega();
+		//const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
+		//const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
+		//const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+		//dFloat relOmega = -(relVeloc.m_x + relVeloc.m_y + relVeloc.m_z);
+		//constraintParams->m_jointAccel[index] = relOmega * constraintParams->m_timestepInv;
+		constraintParams->m_jointLowFrictionCoef[index] = -m_brakeTorque;
+		constraintParams->m_jointHighFrictionCoef[index] = m_brakeTorque;
 	}
-	m_tire->SetBrakeTorque(0.0f);
-*/
+	m_brakeTorque = 0.0f;
 }

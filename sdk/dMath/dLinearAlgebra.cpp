@@ -326,16 +326,11 @@ void dComplementaritySolver::dBilateralJoint::InitPointParam (dPointDerivativePa
 	param.m_posit0 = pivot;
 	param.m_r0 = pivot - m_state0->m_globalCentreOfMass;
 	param.m_veloc0 = m_state0->m_omega.CrossProduct(param.m_r0);
-	//param.m_centripetal0 = m_state0->m_omega.CrossProduct(param.m_veloc0);
-	//param.m_veloc0 += m_state0->m_veloc;
 
 	param.m_posit1 = pivot;
 	param.m_r1 = pivot - m_state1->m_globalCentreOfMass;
 	param.m_veloc1 = m_state1->m_omega.CrossProduct(param.m_r1);
-	//param.m_centripetal1 = m_state1->m_omega.CrossProduct(param.m_veloc1);
-	//param.m_veloc1 += m_state1->m_veloc;
 }
-
 
 void dComplementaritySolver::dBilateralJoint::CalculatePointDerivative (dParamInfo* const constraintParams, const dVector& dir, const dPointDerivativeParam& param)
 {
@@ -346,37 +341,27 @@ void dComplementaritySolver::dBilateralJoint::CalculatePointDerivative (dParamIn
 	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
 
 	jacobian0.m_linear = dir;
-	jacobian1.m_linear = dir.Scale(-1.0f);
-
 	jacobian0.m_angular = param.m_r0.CrossProduct(jacobian0.m_linear);
+
+	jacobian1.m_linear = dir.Scale(-1.0f);
 	jacobian1.m_angular = param.m_r1.CrossProduct(jacobian1.m_linear);
 
 	const dVector& omega0 = m_state0->m_omega;
 	const dVector& omega1 = m_state1->m_omega;
+	const dVector& veloc0 = m_state0->m_veloc;
+	const dVector& veloc1 = m_state1->m_veloc;
+
 	dVector centripetal0(omega0.CrossProduct(omega0.CrossProduct(param.m_r0)));
 	dVector centripetal1(omega1.CrossProduct(omega1.CrossProduct(param.m_r1)));
 	const dVector accel(jacobian0.m_linear * centripetal0 + jacobian1.m_linear * centripetal1);
+	const dVector veloc(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1);
+	const dVector relAccel(accel + veloc.Scale (constraintParams->m_timestep));
 
-/*
-	const dVector& veloc0 = m_state0->m_veloc;
-	const dVector& veloc1 = m_state1->m_veloc;
-	dFloat dt = constraintParams->m_timestep;
-	dFloat ks = COMPLEMENTARITY_POS_DAMP;
-	dFloat kd = COMPLEMENTARITY_VEL_DAMP;
-	dFloat ksd = dt * ks;
-	dFloat num = ks * relPosit + kd * relVeloc + ksd * relVeloc;
-	dFloat den = dFloat (1.0f) + dt * kd + dt * ksd;
-	dFloat accelError = num / den;
-
-	m_rowIsMotor[index] = false;
-	m_motorAcceleration[index] = 0.0f;
-	constraintParams->m_jointAccel[index] = accelError + relCentr;
-*/
-	constraintParams->m_jointAccel[index] = - (accel.m_x + accel.m_y + accel.m_z);
+	dAssert (relAccel.m_w == 0.0f);
+	constraintParams->m_jointAccel[index] = - (relAccel.m_x + relAccel.m_y + relAccel.m_z);
 	constraintParams->m_jointLowFrictionCoef[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
 	constraintParams->m_jointHighFrictionCoef[index] = D_COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;
-
 }
 
 void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle)
@@ -393,28 +378,12 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 	jacobian0.m_angular = dir;
 	jacobian1.m_angular = dir.Scale (-1.0f);
 
-//	const dVector& omega0 = m_state0->m_omega;
-//	const dVector& omega1 = m_state1->m_omega;
-//	dVector j01_angular(dirOmega.CrossProduct(jacobian0.m_angular));
-//	dVector j10_angular(dirOmega.CrossProduct(jacobian1.m_angular));
-//	const dVector accel(j01_angular * omega0 + j10_angular * omega1);
-	const dVector accel(0.0f);
-/*
-	dFloat omegaError = (omega1 - omega0).DotProduct3(dir);
-	//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
-	dFloat dt = constraintParams->m_timestep;
-	dFloat ks = COMPLEMENTARITY_POS_DAMP;
-	dFloat kd = COMPLEMENTARITY_VEL_DAMP;
-	dFloat ksd = dt * ks;
-	dFloat num = ks * jointAngle + kd * omegaError + ksd * omegaError;
-	dFloat den = dFloat (1.0f) + dt * kd + dt * ksd;
-	dFloat alphaError = num / den;
+	const dVector& omega0 = m_state0->m_omega;
+	const dVector& omega1 = m_state1->m_omega;
+	const dVector omega (omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+	const dVector alpha (omega.Scale (constraintParams->m_timestep));
 
-	m_rowIsMotor[index] = false;
-	m_motorAcceleration[index] = 0.0f;
-	constraintParams->m_jointAccel[index] = alphaError;
-*/
-	constraintParams->m_jointAccel[index] = -(accel.m_x + accel.m_y + accel.m_z);
+	constraintParams->m_jointAccel[index] = -(alpha.m_x + alpha.m_y + alpha.m_z);
 	constraintParams->m_jointLowFrictionCoef[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
 	constraintParams->m_jointHighFrictionCoef[index] = D_COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;

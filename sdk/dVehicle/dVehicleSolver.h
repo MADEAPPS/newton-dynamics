@@ -44,7 +44,7 @@ class dVehicleSolver
 	void GetJacobians(dVehicleNode* const node);
 	void CalculateLoopMassMatrixCoefficients();
 //	int BuildJacobianMatrix(dFloat timestep, dAnimationContraint* const joint);
-	int BuildJacobianMatrix(dFloat timestep, dVehicleNode* const joint);
+	int BuildJacobianMatrix(dFloat timestep, dComplementaritySolver::dBilateralJoint* const joint);
 
 	void CalculateJointDiagonal(dVehicleNode* const node);
 	void CalculateJacobianBlock(dVehicleNode* const node);

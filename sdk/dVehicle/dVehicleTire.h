@@ -87,9 +87,9 @@ class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilater
 //
 //	DVEHICLE_API virtual dFloat GetSteeringAngle() const;
 //	DVEHICLE_API virtual void SetSteeringAngle(dFloat steeringAngle);
-//
-//	DVEHICLE_API virtual dFloat GetBrakeTorque() const;
-//	DVEHICLE_API virtual void SetBrakeTorque(dFloat brakeTorque);
+
+	DVEHICLE_API virtual dFloat GetBrakeTorque() const;
+	DVEHICLE_API virtual void SetBrakeTorque(dFloat brakeTorque);
 
 	protected:
 //	void ApplyExternalForce(dFloat timestep);
