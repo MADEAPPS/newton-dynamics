@@ -13,7 +13,6 @@
 #include "dMathDefines.h"
 #include "dLinearAlgebra.h"
 
-
 #define COMPLEMENTARITY_VEL_DAMP			dFloat(100.0f)
 #define COMPLEMENTARITY_POS_DAMP			dFloat(1500.0f)
 #define COMPLEMENTARITY_PSD_DAMP_TOL		dFloat(1.0e-4f)
@@ -318,10 +317,9 @@ void dComplementaritySolver::dBilateralJoint::Init(dBodyState* const state0, dBo
 	m_state1 = state1;
 }
 
-void dComplementaritySolver::dBilateralJoint::InitPointParam (dPointDerivativeParam& param, const dVector& pivot) const
+void dComplementaritySolver::dBilateralJoint::AddLinearRowJacobian(dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir)
 {
-	dAssert (m_state0);
-	dAssert (m_state1);
+	dPointDerivativeParam param;
 
 	param.m_posit0 = pivot;
 	param.m_r0 = pivot - m_state0->m_globalCentreOfMass;
@@ -330,14 +328,11 @@ void dComplementaritySolver::dBilateralJoint::InitPointParam (dPointDerivativePa
 	param.m_posit1 = pivot;
 	param.m_r1 = pivot - m_state1->m_globalCentreOfMass;
 	param.m_veloc1 = m_state1->m_omega.CrossProduct(param.m_r1);
-}
 
-void dComplementaritySolver::dBilateralJoint::CalculatePointDerivative (dParamInfo* const constraintParams, const dVector& dir, const dPointDerivativeParam& param)
-{
 	int index = constraintParams->m_count;
 
 	dAssert(dir.m_w == 0.0f);
-	dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01; 
+	dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
 	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
 
 	jacobian0.m_linear = dir;
@@ -355,10 +350,10 @@ void dComplementaritySolver::dBilateralJoint::CalculatePointDerivative (dParamIn
 	dVector centripetal1(omega1.CrossProduct(omega1.CrossProduct(param.m_r1)));
 	const dVector accel(jacobian0.m_linear * centripetal0 + jacobian1.m_linear * centripetal1);
 	const dVector veloc(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1);
-	const dVector relAccel(accel + veloc.Scale (constraintParams->m_timestep));
+	const dVector relAccel(accel + veloc.Scale(constraintParams->m_timestep));
 
-	dAssert (relAccel.m_w == 0.0f);
-	constraintParams->m_jointAccel[index] = - (relAccel.m_x + relAccel.m_y + relAccel.m_z);
+	dAssert(relAccel.m_w == 0.0f);
+	constraintParams->m_jointAccel[index] = -(relAccel.m_x + relAccel.m_y + relAccel.m_z);
 	constraintParams->m_jointLowFrictionCoef[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
 	constraintParams->m_jointHighFrictionCoef[index] = D_COMPLEMENTARITY_MAX_FRICTION_BOUND;
 	constraintParams->m_count = index + 1;
@@ -445,13 +440,6 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 	constraintParams->m_count = index + 1;
 }
 */
-
-void dComplementaritySolver::dBilateralJoint::AddLinearRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir)
-{
-	dPointDerivativeParam pointData;
-	InitPointParam (pointData, pivot);
-	CalculatePointDerivative (constraintParams, dir, pointData);
-}
 
 void dComplementaritySolver::dBilateralJoint::JointAccelerations (dJointAccelerationDecriptor* const params)
 {
@@ -557,13 +545,10 @@ void dComplementaritySolver::dFrictionLessContactJoint::SetContacts (int count, 
 void dComplementaritySolver::dFrictionLessContactJoint::JacobianDerivative (dParamInfo* const constraintParams)
 {
 	for (int i = 0; i < m_count; i ++) {
-
-		dPointDerivativeParam pointData;
-		InitPointParam (pointData, m_contacts[i].m_point);
-		CalculatePointDerivative (constraintParams, m_contacts[i].m_normal, pointData);
-
+		AddLinearRowJacobian(constraintParams, m_contacts[i].m_point, m_contacts[i].m_point);
+		dAssert(0);
+/*
 		dVector velocError (pointData.m_veloc1 - pointData.m_veloc0);
-
 		//dFloat restitution = 0.05f;
 		dFloat relVelocErr = velocError.DotProduct3(m_contacts[i].m_normal);
 		dFloat penetration = 0.0f;
@@ -577,9 +562,9 @@ void dComplementaritySolver::dFrictionLessContactJoint::JacobianDerivative (dPar
 		constraintParams->m_normalIndex[i] = 0;
 		constraintParams->m_jointLowFrictionCoef[i] = dFloat (0.0f);
 		constraintParams->m_jointAccel[i] = dMax (dFloat (-4.0f), relVelocErr + penetrationVeloc) * constraintParams->m_timestepInv;
+*/
 	}
 }
-
 
 void dComplementaritySolver::dFrictionLessContactJoint::JointAccelerations (dJointAccelerationDecriptor* const params)
 {
