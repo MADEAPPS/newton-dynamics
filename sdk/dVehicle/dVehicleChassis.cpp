@@ -673,7 +673,7 @@ void dVehicleChassis::PreUpdate(dFloat timestep)
 	//}
 
 	ApplyExternalForce();
-	CalculateSuspensionForces(timestep);
+//	CalculateSuspensionForces(timestep);
 	CalculateTireContacts(timestep);
 	dVehicleSolver::Update(timestep);
 	Integrate(timestep);
