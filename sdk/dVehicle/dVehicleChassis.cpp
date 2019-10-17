@@ -635,6 +635,22 @@ void dVehicleChassis::CalculateTireContacts(dFloat timestep)
 	}
 }
 
+void dVehicleChassis::CalculateFreeDof()
+{
+	dVehicleNode::CalculateFreeDof();
+	/*
+	dComplementaritySolver::dBodyState* const chassisBody = GetProxyBody();
+
+	dVector force(chassisBody->GetForce());
+	dVector torque(chassisBody->GetTorque());
+	NewtonBody* const newtonBody = m_chassis->GetBody();
+	NewtonBodySetForce(newtonBody, &force[0]);
+	NewtonBodySetTorque(newtonBody, &torque[0]);
+*/
+	
+}
+
+
 void dVehicleChassis::PreUpdate(dFloat timestep)
 {
 	//dVehicleManager* const manager = (dVehicleManager*)GetManager();
@@ -660,8 +676,8 @@ void dVehicleChassis::PreUpdate(dFloat timestep)
 	CalculateSuspensionForces(timestep);
 	CalculateTireContacts(timestep);
 	dVehicleSolver::Update(timestep);
-	//m_vehicle->Integrate(timestep);
-	//m_vehicle->StatesToRigidBody(timestep);
+	Integrate(timestep);
+	CalculateFreeDof();
 
 dVector xxx(0.0f);
 NewtonBodySetForce(m_chassisBody, &xxx[0]);

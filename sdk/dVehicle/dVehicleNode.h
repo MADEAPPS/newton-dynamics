@@ -53,8 +53,8 @@ class dVehicleNode: public dCustomAlloc
 	protected:
 	//virtual void RigidBodyToStates();
 	virtual void ApplyExternalForce();
-	//virtual void Integrate(dFloat timestep);
-	//virtual void StatesToRigidBody(dFloat timestep);
+	virtual void Integrate(dFloat timestep);
+	virtual void CalculateFreeDof();
 
 	virtual int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 	virtual const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;

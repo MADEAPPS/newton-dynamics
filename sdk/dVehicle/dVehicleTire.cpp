@@ -14,8 +14,6 @@
 #include "dVehicleTire.h"
 #include "dVehicleChassis.h"
 
-
-
 dVehicleTire::dVehicleTire(dVehicleChassis* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info)
 	:dVehicleNode(chassis)
 	,dBilateralJoint()
@@ -144,52 +142,6 @@ int dVehicleVirtualTire::GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const 
 	*/
 }
 
-void dVehicleVirtualTire::Integrate(dFloat timestep)
-{
-	dAssert(0);
-	/*
-		dVehicleTireInterface::Integrate(timestep);
-
-		dVehicleSingleBody* const chassis = (dVehicleSingleBody*)m_parent;
-		dComplementaritySolver::dBodyState* const chassisBody = chassis->GetProxyBody();
-
-		const dMatrix chassisMatrix(chassisBody->GetMatrix());
-		const dMatrix tireMatrix(GetHardpointMatrix(0.0f) * chassisBody->GetMatrix());
-
-		dVector tireOmega(m_proxyBody.GetOmega());
-		dVector chassisOmega(chassisBody->GetOmega());
-		dVector localOmega(tireOmega - chassisOmega);
-		m_omega = tireMatrix.m_front.DotProduct3(localOmega);
-		// check if the tire is going to rest
-		if (dAbs(m_omega) < 0.25f) {
-			dFloat alpha = tireMatrix.m_front.DotProduct3(m_proxyBody.GetTorque()) * m_proxyBody.GetInvInertia()[0][0];
-			if (alpha < 0.2f) {
-				m_omega = 0.0f;
-			}
-		}
-
-		m_tireAngle += m_omega * timestep;
-		while (m_tireAngle < 0.0f)
-		{
-			m_tireAngle += 2.0f * dPi;
-		}
-		m_tireAngle = dMod(m_tireAngle, dFloat(2.0f * dPi));
-
-		dVector tireVeloc(m_proxyBody.GetVelocity());
-		dVector chassisPointVeloc (chassisBody->CalculatePointVelocity(tireMatrix.m_posit));
-		dVector localVeloc (tireVeloc - chassisPointVeloc);
-
-		m_speed = tireMatrix.m_right.DotProduct3(localVeloc);
-		m_position += m_speed * timestep;
-		if (m_position <= 0.0f) {
-			m_speed = 0.0f;
-			m_position = 0.0f;
-		} else if (m_position >= m_info.m_suspensionLength) {
-			m_speed = 0.0f;
-			m_position = m_info.m_suspensionLength;
-		}
-	*/
-}
 #endif
 
 void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, dFloat timestep)
@@ -350,6 +302,60 @@ void dVehicleTire::ApplyExternalForce()
 	m_proxyBody.SetTorque(dVector(0.0f));
 	m_proxyBody.SetForce(chassisNode->m_gravity.Scale(m_proxyBody.GetMass()));
 }
+
+
+void dVehicleTire::CalculateFreeDof()
+{
+	dVehicleChassis* const chassis = m_parent->GetAsVehicle();
+	dComplementaritySolver::dBodyState* const chassisBody = &chassis->GetProxyBody();
+
+	//const dMatrix chassisMatrix(chassisBody->GetMatrix());
+	//const dMatrix tireMatrix(GetHardpointMatrix(0.0f) * chassisBody->GetMatrix());
+	//const dMatrix tireMatrix(GetHardpointMatrix(0.0f) * chassisBody->GetMatrix());
+
+	dMatrix chassisMatrix(GetHardpointMatrix(0.0f) * chassisBody->GetMatrix());
+	dMatrix tireMatrix (m_proxyBody.GetMatrix());
+
+	dVector tireOmega(m_proxyBody.GetOmega());
+	dVector chassisOmega(chassisBody->GetOmega());
+	dVector localOmega(tireOmega - chassisOmega);
+	m_omega = tireMatrix.m_front.DotProduct3(localOmega);
+	dAssert(tireMatrix.m_front.DotProduct3(chassisMatrix.m_front) > 0.999f);
+
+	// check if the tire is going to rest
+	//if (dAbs(m_omega) < 0.25f) {
+	//	dFloat alpha = tireMatrix.m_front.DotProduct3(m_proxyBody.GetTorque()) * m_proxyBody.GetInvInertia()[0][0];
+	//	if (alpha < 0.2f) {
+	//		m_omega = 0.0f;
+	//	}
+	//}
+
+	//m_tireAngle += m_omega * timestep;
+	//while (m_tireAngle < 0.0f)
+	//{
+	//	m_tireAngle += 2.0f * dPi;
+	//}
+	//m_tireAngle = dMod(m_tireAngle, dFloat(2.0f * dPi));
+	dFloat cosAngle = tireMatrix.m_right.DotProduct3(chassisMatrix.m_right);
+	dFloat sinAngle = chassisMatrix.m_front.DotProduct3(tireMatrix.m_right.CrossProduct(chassisMatrix.m_right));
+	m_tireAngle = dAtan2(sinAngle, cosAngle);
+
+	dVector tireVeloc(m_proxyBody.GetVelocity());
+	dVector chassisPointVeloc(chassisBody->CalculatePointVelocity(tireMatrix.m_posit));
+	dVector localVeloc(tireVeloc - chassisPointVeloc);
+	m_speed = tireMatrix.m_right.DotProduct3(localVeloc);
+
+	//m_position += m_speed * timestep;
+	m_position = chassisMatrix.m_right.DotProduct3(tireMatrix.m_posit - chassisMatrix.m_posit);
+	//if (m_position <= 0.0f) {
+	//	m_speed = 0.0f;
+	//	m_position = 0.0f;
+	//} else if (m_position >= m_info.m_suspensionLength) {
+	//	m_speed = 0.0f;
+	//	m_position = m_info.m_suspensionLength;
+	//}
+}
+
 
 void dVehicleTire::UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
 {

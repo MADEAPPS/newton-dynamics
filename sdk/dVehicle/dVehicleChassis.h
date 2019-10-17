@@ -121,6 +121,7 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 #endif
 
 	private:
+	void CalculateFreeDof();
 	void ApplyExternalForce();
 	void CalculateTireContacts(dFloat timestep);
 	void CalculateSuspensionForces(dFloat timestep);
