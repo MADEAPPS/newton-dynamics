@@ -15,12 +15,10 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
-#include "dVehicleTireJoint.h"
 #include "dVehicleTireContact.h"
 
 class dVehicleChassis;
 class dCollectCollidingBodies;
-
 
 class dTireInfo
 {
@@ -109,10 +107,8 @@ class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilater
 	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const;
 
-
 	dMatrix m_matrix;
 	dMatrix m_bindingRotation;
-	dTireJoint m_proxyJoint;
 	dVehicleNode m_dynamicContactBodyNode;
 	dVehicleTireContact m_contactsJoints[3];
 	dTireInfo m_info;
