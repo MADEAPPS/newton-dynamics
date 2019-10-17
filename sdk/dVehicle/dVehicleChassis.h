@@ -75,7 +75,7 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 	DVEHICLE_API dVehicleChassis (NewtonBody* const rootBody, const dMatrix& localFrame, dFloat gravityMag);
 	DVEHICLE_API ~dVehicleChassis();
 
-	NewtonBody* GetBody() const { return m_chassisBody; }
+	NewtonBody* GetBody() const { return m_newtonBody; }
 	const dMatrix& GetLocalFrame() const { return m_localFrame; }
 	dVehicleChassis* GetAsVehicle() const { return (dVehicleChassis*)this; }
 
@@ -137,7 +137,7 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 	dVector m_obbSize;
 	dVector m_obbOrigin;
 	dVehicleNode m_groundProxyBody;
-	NewtonBody* m_chassisBody;
+	NewtonBody* m_newtonBody;
 	void* m_node;
 	dVehicleManager* m_manager;
 

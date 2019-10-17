@@ -331,14 +331,15 @@ void dVehicleTire::CalculateFreeDof()
 	//}
 
 	//m_tireAngle += m_omega * timestep;
-	//while (m_tireAngle < 0.0f)
-	//{
-	//	m_tireAngle += 2.0f * dPi;
-	//}
-	//m_tireAngle = dMod(m_tireAngle, dFloat(2.0f * dPi));
 	dFloat cosAngle = tireMatrix.m_right.DotProduct3(chassisMatrix.m_right);
 	dFloat sinAngle = chassisMatrix.m_front.DotProduct3(tireMatrix.m_right.CrossProduct(chassisMatrix.m_right));
-	m_tireAngle = dAtan2(sinAngle, cosAngle);
+	m_tireAngle += dAtan2(sinAngle, cosAngle);
+	while (m_tireAngle < 0.0f)
+	{
+		m_tireAngle += 2.0f * dPi;
+	}
+	m_tireAngle = dMod(m_tireAngle, dFloat(2.0f * dPi));
+
 
 	dVector tireVeloc(m_proxyBody.GetVelocity());
 	dVector chassisPointVeloc(chassisBody->CalculatePointVelocity(tireMatrix.m_posit));
@@ -355,7 +356,6 @@ void dVehicleTire::CalculateFreeDof()
 	//	m_position = m_info.m_suspensionLength;
 	//}
 }
-
 
 void dVehicleTire::UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
 {

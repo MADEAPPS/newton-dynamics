@@ -376,7 +376,7 @@ dVehicleChassis::dVehicleChassis(NewtonBody* const body, const dMatrix& localFra
 	,m_obbSize(0.0f)
 	,m_obbOrigin(0.0f)
 	,m_groundProxyBody(NULL)
-	,m_chassisBody(body)
+	,m_newtonBody(body)
 	,m_node(NULL)
 	,m_manager(NULL)
 {
@@ -385,8 +385,8 @@ dVehicleChassis::dVehicleChassis(NewtonBody* const body, const dMatrix& localFra
 
 	// set linear and angular drag to zero
 	dVector drag(0.0f);
-	NewtonBodySetLinearDamping(m_chassisBody, 0.0f);
-	NewtonBodySetAngularDamping(m_chassisBody, &drag[0]);
+	NewtonBodySetLinearDamping(m_newtonBody, 0.0f);
+	NewtonBodySetAngularDamping(m_newtonBody, &drag[0]);
 
 	/*
 	m_aerodynamicsDownForce0 = 0.0f;
@@ -402,12 +402,12 @@ dVehicleChassis::dVehicleChassis(NewtonBody* const body, const dMatrix& localFra
 	//m_groundNode.SetLoopNode(true);
 
 	// set the inertia matrix;
-	NewtonBodyGetMass(m_chassisBody, &tmp.m_w, &tmp.m_x, &tmp.m_y, &tmp.m_z);
+	NewtonBodyGetMass(m_newtonBody, &tmp.m_w, &tmp.m_x, &tmp.m_y, &tmp.m_z);
 	m_proxyBody.SetMass(tmp.m_w);
 	m_proxyBody.SetInertia(tmp.m_x, tmp.m_y, tmp.m_z);
 
 	dMatrix matrix(dGetIdentityMatrix());
-	NewtonBodyGetCentreOfMass(m_chassisBody, &matrix.m_posit[0]);
+	NewtonBodyGetCentreOfMass(m_newtonBody, &matrix.m_posit[0]);
 	matrix.m_posit.m_w = 1.0f;
 	m_proxyBody.SetLocalMatrix(matrix);
 }
@@ -423,7 +423,7 @@ void dVehicleChassis::Finalize()
 {
 	dVector minP;
 	dVector maxP;
-	NewtonCollision* const collision = NewtonBodyGetCollision(m_chassisBody);
+	NewtonCollision* const collision = NewtonBodyGetCollision(m_newtonBody);
 	CalculateAABB(collision, dGetIdentityMatrix(), minP, maxP);
 
 	for (dVehicleNodeChildrenList::dListNode* node = m_children.GetFirst(); node; node = node->GetNext()) {
@@ -476,24 +476,30 @@ void dVehicleChassis::ApplyExternalForce()
 	m_groundProxyBody.m_proxyBody.SetTorque(vector);
 
 	// get data from engine rigid body and copied to the vehicle chassis body
-	NewtonBodyGetMatrix(m_chassisBody, &matrix[0][0]);
+	NewtonBodyGetMatrix(m_newtonBody, &matrix[0][0]);
 	m_proxyBody.SetMatrix(matrix);
 	m_proxyBody.UpdateInertia();
 
-	NewtonBodyGetVelocity(m_chassisBody, &vector[0]);
+	NewtonBodyGetVelocity(m_newtonBody, &vector[0]);
 	m_proxyBody.SetVeloc(vector);
 
-	NewtonBodyGetOmega(m_chassisBody, &vector[0]);
+	NewtonBodyGetOmega(m_newtonBody, &vector[0]);
 	m_proxyBody.SetOmega(vector);
 
-	NewtonBodyGetForce(m_chassisBody, &vector[0]);
+	NewtonBodyGetForce(m_newtonBody, &vector[0]);
 	m_proxyBody.SetForce(vector);
 	m_gravity = vector.Scale(m_proxyBody.GetInvMass());
 
-	NewtonBodyGetTorque(m_chassisBody, &vector[0]);
+	NewtonBodyGetTorque(m_newtonBody, &vector[0]);
 	m_proxyBody.SetTorque(vector);
 
 	dVehicleNode::ApplyExternalForce();
+
+vector = dVector(0.0f);
+m_proxyBody.SetForce(vector);
+m_proxyBody.SetTorque(vector);
+NewtonBodySetForce(m_newtonBody, &vector[0]);
+NewtonBodySetTorque(m_newtonBody, &vector[0]);
 }
 
 void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
@@ -638,18 +644,12 @@ void dVehicleChassis::CalculateTireContacts(dFloat timestep)
 void dVehicleChassis::CalculateFreeDof()
 {
 	dVehicleNode::CalculateFreeDof();
-	/*
-	dComplementaritySolver::dBodyState* const chassisBody = GetProxyBody();
 
-	dVector force(chassisBody->GetForce());
-	dVector torque(chassisBody->GetTorque());
-	NewtonBody* const newtonBody = m_chassis->GetBody();
-	NewtonBodySetForce(newtonBody, &force[0]);
-	NewtonBodySetTorque(newtonBody, &torque[0]);
-*/
-	
+	dVector force(m_proxyBody.GetForce());
+	dVector torque(m_proxyBody.GetTorque());
+	NewtonBodySetForce(m_newtonBody, &force[0]);
+	NewtonBodySetTorque(m_newtonBody, &torque[0]);
 }
-
 
 void dVehicleChassis::PreUpdate(dFloat timestep)
 {
@@ -673,13 +673,9 @@ void dVehicleChassis::PreUpdate(dFloat timestep)
 	//}
 
 	ApplyExternalForce();
-	CalculateSuspensionForces(timestep);
+//	CalculateSuspensionForces(timestep);
 	CalculateTireContacts(timestep);
 	dVehicleSolver::Update(timestep);
 	Integrate(timestep);
 	CalculateFreeDof();
-
-dVector xxx(0.0f);
-NewtonBodySetForce(m_chassisBody, &xxx[0]);
-NewtonBodySetTorque(m_chassisBody, &xxx[0]);
 }

@@ -86,6 +86,8 @@ void dVehicleNode::CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVect
 void dVehicleNode::Integrate(dFloat timestep)
 {
 	m_proxyBody.IntegrateForce(timestep, m_proxyBody.GetForce(), m_proxyBody.GetTorque());
+	m_proxyBody.IntegrateVelocity(timestep);
+
 	for (dVehicleNodeChildrenList::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
 		dVehicleNode* const node = child->GetInfo();
 		node->Integrate(timestep);
