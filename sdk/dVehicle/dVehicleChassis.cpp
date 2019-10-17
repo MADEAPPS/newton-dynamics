@@ -673,9 +673,13 @@ void dVehicleChassis::PreUpdate(dFloat timestep)
 	//}
 
 	ApplyExternalForce();
-//	CalculateSuspensionForces(timestep);
+	CalculateSuspensionForces(timestep);
 	CalculateTireContacts(timestep);
 	dVehicleSolver::Update(timestep);
 	Integrate(timestep);
 	CalculateFreeDof();
+
+dVector vector(0.0f);
+NewtonBodySetForce(m_newtonBody, &vector[0]);
+NewtonBodySetTorque(m_newtonBody, &vector[0]);
 }
