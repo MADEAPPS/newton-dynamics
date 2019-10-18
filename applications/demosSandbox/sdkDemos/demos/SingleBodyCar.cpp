@@ -575,6 +575,19 @@ axisCount = 0;
 		
 		NewtonBodyGetMatrix(vehicle->GetBody(), &matrix[0][0]);
 		model->SetMatrix(*scene, dQuaternion (matrix), matrix.m_posit);
+
+		dMatrix chassisMatrixInv(matrix.Inverse());
+		const dList<dVehicleNode*>& children = vehicle->GetChildrenList();
+		for (dList<dVehicleNode*>::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
+			dVehicleTire* const tire = node->GetInfo()->GetAsTire();
+			if (tire) {
+				DemoEntity* const tireMesh = (DemoEntity*)tire->GetUserData();
+				//dMatrix tireMatrix(tire->GetGlobalMatrix() * chassisMatrixInv);
+				dMatrix tireMatrix(tire->GetLocalMatrix());
+				dQuaternion rotation(tireMatrix);
+				tireMesh->SetMatrixUsafe(rotation, tireMatrix.m_posit);
+			}
+		}
 	}
 
 #if 0

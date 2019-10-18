@@ -48,10 +48,12 @@ class dVehicleNode: public dCustomAlloc
 	void* GetUserData() const {return m_usedData;}
 	void SetUserData(void* const userData) {m_usedData = userData;}
 
+	dVehicleNodeChildrenList& GetChildrenList() { return m_children; }
+	const dVehicleNodeChildrenList& GetChildrenList() const { return m_children; }
+
 	dComplementaritySolver::dBodyState& GetProxyBody() { return m_proxyBody; }
 
 	protected:
-	//virtual void RigidBodyToStates();
 	virtual void ApplyExternalForce();
 	virtual void Integrate(dFloat timestep);
 	virtual void CalculateFreeDof();
