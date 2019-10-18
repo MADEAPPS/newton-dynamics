@@ -68,28 +68,56 @@ class dVehicleDashControl
 	mutable dFloat m_timer;
 };
 
-class dVehicleSteeringControl: public dVehicleDashControl
+class dVehicleTireControl: public dVehicleDashControl
 {
-	public:
-	dVehicleSteeringControl() 
+	protected:
+	dVehicleTireControl()
 		:m_tires()
 		,m_isSleeping(false)
 	{
 	}
 
+	public:
 	void AddTire(dVehicleTire* const tire)
 	{
 		m_tires.Append(tire);
 	}
 
 	protected:
-	virtual void Update(dFloat timestep);
-	friend class dVehicleChassis;
-
 	dList<dVehicleTire*> m_tires;
 	bool m_isSleeping;
+	friend class dVehicleChassis;
 };
 
+class dVehicleSteeringControl: public dVehicleTireControl
+{
+	protected:
+	virtual void Update(dFloat timestep);
+	friend class dVehicleChassis;
+};
+
+class dVehicleBrakeControl: public dVehicleTireControl
+{
+	public:
+	dVehicleBrakeControl()
+	{
+	}
+
+	dFloat GetBrakeTorque() const
+	{
+		return m_maxTorque;
+	}
+
+	void SetBrakeTorque(dFloat torque)
+	{
+		m_maxTorque = dAbs(torque);
+	}
+
+	protected:
+	virtual void Update(dFloat timestep);
+	dFloat m_maxTorque;
+	friend class dVehicleChassis;
+};
 
 /*
 class dVehicleEngineControl: public dVehicleDashControl 
@@ -122,20 +150,7 @@ class dVehicleTireControl: public dVehicleDashControl
 };
 
 
-class dVehicleBrakeControl: public dVehicleTireControl
-{
-	public:
-	dVehicleBrakeControl(dVehicleChassis* const vehicle);
 
-	DVEHICLE_API dFloat GetBrakeTorque () const;
-	DVEHICLE_API void SetBrakeTorque (dFloat torque);
-
-	protected:
-	virtual void Update(dFloat timestep);
-
-	dFloat m_maxTorque;
-	friend class dVehicleChassis;
-};
 */
 
 #endif 

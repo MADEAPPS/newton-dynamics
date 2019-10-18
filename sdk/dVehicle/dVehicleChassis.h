@@ -78,43 +78,20 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 	DVEHICLE_API void Finalize();
 	DVEHICLE_API const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	DVEHICLE_API dVehicleTire* AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
-	
+
+	DVEHICLE_API dVehicleBrakeControl* GetBrakeControl();
+	DVEHICLE_API dVehicleBrakeControl* GetHandBrakeControl();
 	DVEHICLE_API dVehicleSteeringControl* GetSteeringControl();
+
 
 	DVEHICLE_API void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep);
 
 #if 0
 	DVEHICLE_API dVehicleDifferentialInterface* AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire);
 	DVEHICLE_API dVehicleEngineInterface* AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential);
-
-	DVEHICLE_API dVehicleBrakeControl* GetBrakeControl();
 	DVEHICLE_API dVehicleEngineControl* GetEngineControl();
-	DVEHICLE_API dVehicleBrakeControl* GetHandBrakeControl();
-	
-
-	
-
 	private:
-	void PreUpdate(dFloat timestep);
-	void PostUpdate(dFloat timestep);
-	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
-
-	void Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-	void Init(NewtonWorld* const world, NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-//	void Cleanup();
-//	dVehicleSolver m_solver;
-	dVector m_gravity;
-
-	NewtonBody* m_body;
-	dVehicleInterface* m_vehicle;
-	dVehicleBrakeControl* m_brakeControl;
 	dVehicleEngineControl* m_engineControl;
-	dVehicleBrakeControl* m_handBrakeControl;
-	
-
-	friend class dVehicleSolver;
-	friend class dVehicleManager;
-	friend class dVehicleVirtualTire;
 	friend class dVehicleVirtualDifferential;
 #endif
 
@@ -135,6 +112,8 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 	dVector m_obbSize;
 	dVector m_obbOrigin;
 	dVehicleNode m_groundProxyBody;
+	dVehicleBrakeControl m_brakeControl;
+	dVehicleBrakeControl m_handBrakeControl;
 	dVehicleSteeringControl m_steeringControl;
 	NewtonBody* m_newtonBody;
 	void* m_node;

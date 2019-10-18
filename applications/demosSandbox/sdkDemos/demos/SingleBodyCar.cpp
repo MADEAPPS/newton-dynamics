@@ -425,7 +425,6 @@ return;
 		steeringControl->AddTire(frontRight);
 		steeringControl->SetParam(1.0f);
 
-/*
 		// add vehicle hand brake control 
 		dVehicleBrakeControl* const handBrakeControl = vehicle->GetHandBrakeControl();
 		handBrakeControl->SetBrakeTorque(1000.0f);
@@ -440,6 +439,7 @@ return;
 		brakeControl->AddTire(rearLeft);
 		brakeControl->AddTire(rearRight);
 
+/*
 		// add a differential 
 		dVehicleDifferentialInterface* const differential = vehicle->AddDifferential(rearLeft, rearRight);
 

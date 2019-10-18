@@ -17,127 +17,6 @@
 
 
 #if 0
-dVehicleChassis::dVehicleChassis ()
-	:m_localFrame(dGetIdentityMatrix())
-//	,m_solver()
-	,m_gravity(0.0f)
-	,m_obbSize(0.0f)
-	,m_obbOrigin(0.0f)
-	,m_body(NULL)
-	,m_vehicle(NULL)
-	,m_brakeControl(NULL)
-	,m_engineControl(NULL)
-	,m_handBrakeControl(NULL)
-	,m_steeringControl(NULL)
-{
-	dAssert(0);
-}
-
-dVehicleChassis::~dVehicleChassis()
-{
-	if (m_brakeControl) {
-		delete m_brakeControl;
-	}
-
-	if (m_handBrakeControl) {
-		delete m_handBrakeControl;
-	}
-
-	if (m_engineControl) {
-		delete m_engineControl;
-	}
-
-	if (m_steeringControl) {
-		delete m_steeringControl;
-	}
-
-	if (m_vehicle) {
-		delete m_vehicle;
-	}
-}
-
-void dVehicleChassis::Init(NewtonWorld* const world, NewtonCollision* const chassisShape, dFloat mass, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
-{
-//	dVehicleManager* const manager = (dVehicleManager*)GetManager();
-//	NewtonWorld* const world = manager->GetWorld();
-
-	// create a body and call the low level init function
-	dMatrix locationMatrix(dGetIdentityMatrix());
-	NewtonBody* const body = NewtonCreateDynamicBody(world, chassisShape, &locationMatrix[0][0]);
-
-	// set vehicle mass, inertia and center of mass
-	NewtonBodySetMassProperties(body, mass, chassisShape);
-
-	// initialize 
-	Init(body, localFrame, forceAndTorque, gravityMag);
-}
-
-void dVehicleChassis::Init(NewtonBody* const body, const dMatrix& localFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
-{
-	m_body = body;
-	NewtonBodySetForceAndTorqueCallback(m_body, forceAndTorque);
-	m_vehicle = new dVehicleSingleBody(this);
-
-	m_localFrame = localFrame;
-	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
-	dAssert(m_localFrame.TestOrthogonal());
-
-	m_gravity = dVector (0.0f, -dAbs(gravityMag), 0.0f, 0.0f);
-
-	// set linear and angular drag to zero
-	dVector drag(0.0f);
-	NewtonBodySetLinearDamping(m_body, 0.0f);
-	NewtonBodySetAngularDamping(m_body, &drag[0]);
-
-/*
-	m_aerodynamicsDownForce0 = 0.0f;
-	m_aerodynamicsDownForce1 = 0.0f;
-	m_aerodynamicsDownSpeedCutOff = 0.0f;
-	m_aerodynamicsDownForceCoefficient = 0.0f;
-	SetAerodynamicsDownforceCoefficient(0.5f, 0.4f, 1.0f);
-*/
-}
-
-/*
-void dVehicleChassis::Cleanup()
-{
-	if (m_brakeControl) {
-		delete m_brakeControl;
-	}
-
-	if (m_handBrakeControl) {
-		delete m_handBrakeControl;
-	}
-
-	if (m_engineControl) {
-		delete m_engineControl;
-	}
-
-	if (m_steeringControl) {
-		delete m_steeringControl;
-	}
-
-	if (m_vehicle) {
-		delete m_vehicle;
-	}
-}
-*/
-
-dVehicleBrakeControl* dVehicleChassis::GetBrakeControl()
-{
-	if (!m_brakeControl) {
-		m_brakeControl = new dVehicleBrakeControl(this);
-	}
-	return m_brakeControl;
-}
-
-dVehicleBrakeControl* dVehicleChassis::GetHandBrakeControl()
-{
-	if (!m_handBrakeControl) {
-		m_handBrakeControl = new dVehicleBrakeControl(this);
-	}
-	return m_handBrakeControl;
-}
 
 
 dVehicleEngineControl* dVehicleChassis::GetEngineControl()
@@ -178,6 +57,8 @@ dVehicleChassis::dVehicleChassis(NewtonBody* const body, const dMatrix& localFra
 	,m_node(NULL)
 	,m_manager(NULL)
 {
+	m_brakeControl.Init(this);
+	m_handBrakeControl.Init(this);
 	m_steeringControl.Init(this);
 
 	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
@@ -258,17 +139,11 @@ const void dVehicleChassis::Debug(dCustomJoint::dDebugDisplay* const debugContex
 
 void dVehicleChassis::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep)
 {
+	m_brakeControl.SetParam(driveInputs.m_brakePedal);
+	m_handBrakeControl.SetParam(driveInputs.m_handBrakeValue);
 	m_steeringControl.SetParam(driveInputs.m_steeringValue);
 
 #if 0
-	if (m_brakeControl) {
-		m_brakeControl->SetParam(driveInputs.m_brakePedal);
-	}
-
-	if (m_handBrakeControl) {
-		m_handBrakeControl->SetParam(driveInputs.m_handBrakeValue);
-	}
-
 	if (m_engineControl) {
 		m_engineControl->SetParam(driveInputs.m_throttle);
 		m_engineControl->SetClutch(driveInputs.m_clutchPedal);
@@ -466,6 +341,17 @@ dVehicleSteeringControl* dVehicleChassis::GetSteeringControl()
 	return &m_steeringControl;
 }
 
+dVehicleBrakeControl* dVehicleChassis::GetBrakeControl()
+{
+	return &m_brakeControl;
+}
+
+dVehicleBrakeControl* dVehicleChassis::GetHandBrakeControl()
+{
+	return &m_handBrakeControl;
+}
+
+
 void dVehicleChassis::ApplyExternalForce()
 {
 	dMatrix matrix;
@@ -653,22 +539,16 @@ void dVehicleChassis::CalculateFreeDof()
 void dVehicleChassis::PreUpdate(dFloat timestep)
 {
 	m_manager->UpdateDriverInput(this, timestep);
+	m_brakeControl.Update(timestep);
+	m_handBrakeControl.Update(timestep);
 	m_steeringControl.Update(timestep);
 	
-	//if (m_brakeControl) {
-	//	m_brakeControl->Update(timestep);
-	//}
-	//
-	//if (m_handBrakeControl) {
-	//	m_handBrakeControl->Update(timestep);
-	//}
-	//
 	//if (m_engineControl) {
 	//	m_engineControl->Update(timestep);
 	//}
 
 	ApplyExternalForce();
-//	CalculateSuspensionForces(timestep);
+	CalculateSuspensionForces(timestep);
 	CalculateTireContacts(timestep);
 	dVehicleSolver::Update(timestep);
 	Integrate(timestep);

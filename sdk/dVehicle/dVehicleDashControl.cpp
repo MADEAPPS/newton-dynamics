@@ -43,6 +43,17 @@ void dVehicleSteeringControl::Update(dFloat timestep)
 }
 
 
+void dVehicleBrakeControl::Update(dFloat timestep)
+{
+	m_isSleeping = true;
+	for (dList<dVehicleTire*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
+		dVehicleTire* const tire = node->GetInfo();
+		dFloat torque = dMax(m_maxTorque * m_param, tire->GetBrakeTorque());
+		tire->SetBrakeTorque(torque);
+	}
+}
+
+
 #if 0
 // ****************************************************************************
 //
@@ -76,57 +87,6 @@ void dVehicleEngineControl::SetClutch (dFloat clutch)
 {
 	if (m_engine) {
 		m_engine->SetClutch(clutch);
-	}
-}
-
-// ****************************************************************************
-//
-// ****************************************************************************
-dVehicleTireControl::dVehicleTireControl(dVehicleChassis* const vehicle)
-	:dVehicleDashControl(vehicle)
-	,m_tires()
-	,m_isSleeping(false)
-{
-}
-	
-dVehicleTireControl::~dVehicleTireControl()
-{
-	m_tires.RemoveAll();
-}
-
-void dVehicleTireControl::AddTire(dVehicleTireInterface* const tire)
-{
-	m_tires.Append(tire);
-}
-
-
-
-// ****************************************************************************
-//
-// ****************************************************************************
-dVehicleBrakeControl::dVehicleBrakeControl(dVehicleChassis* const vehicle)
-	:dVehicleTireControl(vehicle)
-	,m_maxTorque(0.0f)
-{
-}
-
-dFloat dVehicleBrakeControl::GetBrakeTorque() const
-{
-	return m_maxTorque;
-}
-
-void dVehicleBrakeControl::SetBrakeTorque(dFloat torque)
-{
-	m_maxTorque = dAbs(torque);
-}
-
-void dVehicleBrakeControl::Update(dFloat timestep)
-{
-	m_isSleeping = true;
-	for (dList<dVehicleTireInterface*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
-		dVehicleTireInterface* const tire = node->GetInfo();
-		dFloat torque = dMax(m_maxTorque * m_param, tire->GetBrakeTorque());
-		tire->SetBrakeTorque(torque);
 	}
 }
 #endif
