@@ -205,6 +205,7 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 		}
 	}
 
+	dTrace(("%s\n", __FUNCTION__));
 /*
 	if (bodyArray.m_count > bodyArray.m_staticCount) {
 		// for now ignore tire collision with dynamics bodies,
