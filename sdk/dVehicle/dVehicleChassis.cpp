@@ -380,11 +380,11 @@ void dVehicleChassis::ApplyExternalForce()
 
 	dVehicleNode::ApplyExternalForce();
 
-vector = dVector(0.0f);
-m_proxyBody.SetForce(vector);
-m_proxyBody.SetTorque(vector);
-NewtonBodySetForce(m_newtonBody, &vector[0]);
-NewtonBodySetTorque(m_newtonBody, &vector[0]);
+//vector = dVector(0.0f);
+//m_proxyBody.SetForce(vector);
+//m_proxyBody.SetTorque(vector);
+//NewtonBodySetForce(m_newtonBody, &vector[0]);
+//NewtonBodySetTorque(m_newtonBody, &vector[0]);
 }
 
 void dVehicleChassis::CalculateSuspensionForces(dFloat timestep)
@@ -554,7 +554,7 @@ void dVehicleChassis::PreUpdate(dFloat timestep)
 	Integrate(timestep);
 	CalculateFreeDof();
 
-dVector vector(0.0f);
-NewtonBodySetForce(m_newtonBody, &vector[0]);
-NewtonBodySetTorque(m_newtonBody, &vector[0]);
+//dVector vector(0.0f);
+//NewtonBodySetForce(m_newtonBody, &vector[0]);
+//NewtonBodySetTorque(m_newtonBody, &vector[0]);
 }
