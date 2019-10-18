@@ -906,13 +906,39 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 			primaryIndex++;
 		}
 
+		dVehicleNode* const node0 = node;
+		dVehicleNode* const node1 = node->m_parent;
+		dComplementaritySolver::dBodyState* const state0 = &node0->GetProxyBody();
+		dComplementaritySolver::dBodyState* const state1 = &node1->GetProxyBody();
+		dAssert(state0 == &m_nodesOrder[node0->m_index]->GetProxyBody());
+		dAssert(state1 == &m_nodesOrder[node1->m_index]->GetProxyBody());
+
+		const dVector& force0 = state0->GetForce();
+		const dVector& torque0 = state0->GetTorque();
+
+		const dVector& force1 = state1->GetForce();
+		const dVector& torque1 = state1->GetTorque();
+
+		const dMatrix& invInertia0 = state0->GetInvInertia();
+		const dMatrix& invInertia1 = state1->GetInvInertia();
+
+		const dFloat invMass0 = state0->GetInvMass();
+		const dFloat invMass1 = state1->GetInvMass();
+
 		const int auxiliaryDof = joint->m_count - primaryDof;
 		for (int j = 0; j < auxiliaryDof; j++) {
 			const int index = joint->m_sourceJacobianIndex[primaryDof + j];
-			dComplementaritySolver::dJacobianColum* const rhs = &m_rightHandSide[first + index];
+			const dComplementaritySolver::dJacobianColum* const rhs = &m_rightHandSide[first + index];
+			const dComplementaritySolver::dJacobianPair* const row = &m_leftHandSide[first + index];
 
 			f[auxiliaryIndex + primaryCount] = rhs->m_force;
-			b[auxiliaryIndex] = -dFloat(accelSpatial[primaryDof + j]);
+
+			//b[auxiliaryIndex] = -dFloat(accelSpatial[primaryDof + j]);
+			dVector acc(row[i].m_jacobian_J01.m_linear.Scale(invMass0) * force0 +
+						row[i].m_jacobian_J01.m_angular * invInertia0.RotateVector(torque0) +
+						row[i].m_jacobian_J10.m_linear.Scale(invMass1) * force1 +
+						row[i].m_jacobian_J10.m_angular * invInertia1.RotateVector(torque1));
+			b[auxiliaryIndex] = rhs[i].m_coordenateAccel - acc.m_x - acc.m_y - acc.m_z;
 
 			dAssert(rhs->m_force >= rhs->m_jointLowFriction * dFloat(2.0f));
 			dAssert(rhs->m_force <= rhs->m_jointHighFriction * dFloat(2.0f));
@@ -933,16 +959,8 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 		const int first = joint->m_start;
 		const int auxiliaryDof = joint->m_count;
 
-		//dAssert (node0 == m_nodesOrder[node0->GetIndex()]);
-		//dAssert (node1 == m_nodesOrder[node1->GetIndex()]);
-		//dComplementaritySolver::dBodyState* const state0 = node0->GetProxyBody();
-		//dComplementaritySolver::dBodyState* const state1 = node1->GetProxyBody();
-
 		dComplementaritySolver::dBodyState* const state0 = &joint->GetOwner0()->GetProxyBody();
 		dComplementaritySolver::dBodyState* const state1 = &joint->GetOwner1()->GetProxyBody();
-
-		//dAssert (state0 == m_nodesOrder[node0->GetIndex()]->GetProxyBody());
-		//dAssert (state1 == m_nodesOrder[node1->GetIndex()]->GetProxyBody());
 
 		const dVector& force0 = state0->GetForce();
 		const dVector& torque0 = state0->GetTorque();
