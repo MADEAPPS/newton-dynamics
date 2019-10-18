@@ -11,36 +11,39 @@
 
 
 #include "dStdafxVehicle.h"
+#include "dVehicleTire.h"
 #include "dVehicleDashControl.h"
 
-dVehicleDashControl::dVehicleDashControl(dVehicleChassis* const vehicle)
-	:dCustomAlloc()
-	,m_vehicle(vehicle)
-	,m_param(0.0f)
-	,m_paramMemory(0.0f)
-	,m_timer(60)
+// ****************************************************************************
+//
+// ****************************************************************************
+void dVehicleSteeringControl::Update(dFloat timestep)
 {
-}
+	m_isSleeping = true;
+	for (dList<dVehicleTire*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
+		dVehicleTire* const tire = node->GetInfo();
+		const dTireInfo& info = tire->GetInfo();
 
-dVehicleDashControl::~dVehicleDashControl()
-{
-}
-
-void dVehicleDashControl::SetParam(dFloat param)
-{
-	m_paramMemory = m_param;
-	m_param = param;
-}
-
-bool dVehicleDashControl::ParamChanged() const
-{
-	m_timer--;
-	if (dAbs(m_paramMemory - m_param) > 1.e-3f) {
-		m_timer = 30;
+		dFloat angle = tire->GetSteeringAngle();
+		dFloat targetAngle = m_param * info.m_maxSteeringAngle;
+		if (angle < targetAngle) {
+			angle += info.m_steerRate * timestep;
+			if (angle > targetAngle) {
+				angle = targetAngle;
+			}
+		} else if (angle > targetAngle) {
+			angle -= info.m_steerRate * timestep;
+			if (angle < targetAngle) {
+				angle = targetAngle;
+			}
+		}
+		tire->SetSteeringAngle(angle);
+		m_isSleeping &= dAbs(targetAngle - angle) < 1.0e-4f;
 	}
-	return m_timer > 0;
 }
 
+
+#if 0
 // ****************************************************************************
 //
 // ****************************************************************************
@@ -97,38 +100,6 @@ void dVehicleTireControl::AddTire(dVehicleTireInterface* const tire)
 }
 
 
-// ****************************************************************************
-//
-// ****************************************************************************
-dVehicleSteeringControl::dVehicleSteeringControl(dVehicleChassis* const vehicle)
-	:dVehicleTireControl(vehicle)
-{
-}
-
-void dVehicleSteeringControl::Update(dFloat timestep)
-{
-	m_isSleeping = true;
-	for (dList<dVehicleTireInterface*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
-		dVehicleTireInterface* const tire = node->GetInfo();
-		const dVehicleTireInterface::dTireInfo& info = tire->GetInfo();
-
-		dFloat angle = tire->GetSteeringAngle();
-		dFloat targetAngle = m_param * info.m_maxSteeringAngle;
-		if (angle < targetAngle) {
-			angle += info.m_steerRate * timestep;
-			if (angle > targetAngle) {
-				angle = targetAngle;
-			}
-		} else if (angle > targetAngle) {
-			angle -= info.m_steerRate * timestep;
-			if (angle < targetAngle) {
-				angle = targetAngle;
-			}
-		}
-		tire->SetSteeringAngle(angle);
-		m_isSleeping &= dAbs(targetAngle - angle) < 1.0e-4f;
-	}
-}
 
 // ****************************************************************************
 //
@@ -158,3 +129,4 @@ void dVehicleBrakeControl::Update(dFloat timestep)
 		tire->SetBrakeTorque(torque);
 	}
 }
+#endif

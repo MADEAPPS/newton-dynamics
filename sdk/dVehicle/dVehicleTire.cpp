@@ -102,25 +102,23 @@ void dVehicleTire::SetBrakeTorque(dFloat brakeTorque)
 	m_brakeTorque = dAbs(brakeTorque);
 }
 
-
-#if 0
-
-dComplementaritySolver::dBilateralJoint* dVehicleVirtualTire::GetProxyJoint()
+const dTireInfo& dVehicleTire::GetInfo() const
 {
-	return &m_proxyJoint;
+	return m_info;
 }
 
-void dVehicleVirtualTire::SetSteeringAngle(dFloat steeringAngle)
+void dVehicleTire::SetSteeringAngle(dFloat steeringAngle)
 {
 	m_steeringAngle = steeringAngle;
 }
 
-dFloat dVehicleVirtualTire::GetSteeringAngle() const
+dFloat dVehicleTire::GetSteeringAngle() const
 {
 	return m_steeringAngle;
 }
 
 
+#if 0
 int dVehicleVirtualTire::GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray)
 {
 	dAssert(0);
@@ -410,20 +408,10 @@ void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 		constraintParams->m_jointHighFrictionCoef[index] = 0.0f;
 	}
 	
-	//dFloat brakeTorque = m_tire->GetBrakeTorque();
-	//brakeTorque = 1000;
+	//m_brakeTorque = 100.0f;
 	if (m_brakeTorque > 1.0e-3f) {
-
 		int index = constraintParams->m_count;
 		AddAngularRowJacobian(constraintParams, tireMatrix.m_front, 0.0f);
-
-		//const dVector& omega0 = m_state0->GetOmega();
-		//const dVector& omega1 = m_state1->GetOmega();
-		//const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
-		//const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
-		//const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-		//dFloat relOmega = -(relVeloc.m_x + relVeloc.m_y + relVeloc.m_z);
-		//constraintParams->m_jointAccel[index] = relOmega * constraintParams->m_timestepInv;
 		constraintParams->m_jointLowFrictionCoef[index] = -m_brakeTorque;
 		constraintParams->m_jointHighFrictionCoef[index] = m_brakeTorque;
 	}

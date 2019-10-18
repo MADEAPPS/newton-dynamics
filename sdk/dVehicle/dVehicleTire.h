@@ -82,9 +82,10 @@ class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilater
 	DVEHICLE_API dMatrix GetLocalMatrix () const;
 	DVEHICLE_API virtual dMatrix GetGlobalMatrix () const;
 	DVEHICLE_API virtual NewtonCollision* GetCollisionShape() const;
-//
-//	DVEHICLE_API virtual dFloat GetSteeringAngle() const;
-//	DVEHICLE_API virtual void SetSteeringAngle(dFloat steeringAngle);
+
+	DVEHICLE_API const dTireInfo& GetInfo() const;
+	DVEHICLE_API virtual dFloat GetSteeringAngle() const;
+	DVEHICLE_API virtual void SetSteeringAngle(dFloat steeringAngle);
 
 	DVEHICLE_API virtual dFloat GetBrakeTorque() const;
 	DVEHICLE_API virtual void SetBrakeTorque(dFloat brakeTorque);

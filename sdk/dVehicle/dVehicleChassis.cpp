@@ -139,13 +139,6 @@ dVehicleBrakeControl* dVehicleChassis::GetHandBrakeControl()
 	return m_handBrakeControl;
 }
 
-dVehicleSteeringControl* dVehicleChassis::GetSteeringControl ()
-{
-	if (!m_steeringControl) {
-		m_steeringControl = new dVehicleSteeringControl(this);
-	}
-	return m_steeringControl;
-}
 
 dVehicleEngineControl* dVehicleChassis::GetEngineControl()
 {
@@ -171,12 +164,103 @@ void dVehicleChassis::PostUpdate(dFloat timestep)
 	m_vehicle->RigidBodyToStates();
 }
 
-void dVehicleChassis::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep)
+#endif
+
+dVehicleChassis::dVehicleChassis(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
+	:dVehicleNode(NULL)
+	,dVehicleSolver()
+	,m_localFrame(localFrame)
+	,m_gravity(0.0f, -dAbs(gravityMag), 0.0f, 0.0f)
+	,m_obbSize(0.0f)
+	,m_obbOrigin(0.0f)
+	,m_groundProxyBody(NULL)
+	,m_newtonBody(body)
+	,m_node(NULL)
+	,m_manager(NULL)
 {
-	if (m_steeringControl) {
-		m_steeringControl->SetParam(driveInputs.m_steeringValue);
+	m_steeringControl.Init(this);
+
+	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+	dAssert(m_localFrame.TestOrthogonal());
+
+	// set linear and angular drag to zero
+	dVector drag(0.0f);
+	NewtonBodySetLinearDamping(m_newtonBody, 0.0f);
+	NewtonBodySetAngularDamping(m_newtonBody, &drag[0]);
+
+	/*
+	m_aerodynamicsDownForce0 = 0.0f;
+	m_aerodynamicsDownForce1 = 0.0f;
+	m_aerodynamicsDownSpeedCutOff = 0.0f;
+	m_aerodynamicsDownForceCoefficient = 0.0f;
+	SetAerodynamicsDownforceCoefficient(0.5f, 0.4f, 1.0f);
+	*/
+
+	dVector tmp;
+	//dComplementaritySolver::dBodyState* const chassisBody = GetProxyBody();
+	//m_groundNode.SetWorld(m_world);
+	//m_groundNode.SetLoopNode(true);
+
+	// set the inertia matrix;
+	NewtonBodyGetMass(m_newtonBody, &tmp.m_w, &tmp.m_x, &tmp.m_y, &tmp.m_z);
+	m_proxyBody.SetMass(tmp.m_w);
+	m_proxyBody.SetInertia(tmp.m_x, tmp.m_y, tmp.m_z);
+
+	dMatrix matrix(dGetIdentityMatrix());
+	NewtonBodyGetCentreOfMass(m_newtonBody, &matrix.m_posit[0]);
+	matrix.m_posit.m_w = 1.0f;
+	m_proxyBody.SetLocalMatrix(matrix);
+}
+
+dVehicleChassis::~dVehicleChassis()
+{
+	if (m_node) {
+		m_manager->RemoveRoot(this);
+	}
+}
+
+void dVehicleChassis::Finalize()
+{
+	dVector minP;
+	dVector maxP;
+	NewtonCollision* const collision = NewtonBodyGetCollision(m_newtonBody);
+	CalculateAABB(collision, dGetIdentityMatrix(), minP, maxP);
+
+	for (dVehicleNodeChildrenList::dListNode* node = m_children.GetFirst(); node; node = node->GetNext()) {
+		dVehicleTire* const tire = node->GetInfo()->GetAsTire();
+		if (tire) {
+			dVector tireMinP;
+			dVector tireMaxP;
+
+			dMatrix tireMatrix(tire->GetHardpointMatrix(0.0f));
+			tire->CalculateNodeAABB(tireMatrix, tireMinP, tireMaxP);
+
+			minP = minP.Min(tireMinP);
+			maxP = maxP.Max(tireMaxP);
+		}
 	}
 
+	m_obbOrigin = (maxP + minP).Scale(0.5f);
+	m_obbSize = (maxP - minP).Scale(0.5f) + dVector(0.1f, 0.1f, 0.1f, 0.0f);
+
+//	m_vehicle->RigidBodyToStates();
+	ApplyExternalForce();
+	dVehicleSolver::Finalize();
+}
+
+const void dVehicleChassis::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+	//dAssert(0);
+	dVehicleNode::Debug(debugContext);
+	//dTrace(("%s\n", __FUNCTION__));
+	//m_vehicle->Debug(debugContext);
+}
+
+void dVehicleChassis::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep)
+{
+	m_steeringControl.SetParam(driveInputs.m_steeringValue);
+
+#if 0
 	if (m_brakeControl) {
 		m_brakeControl->SetParam(driveInputs.m_brakePedal);
 	}
@@ -185,14 +269,14 @@ void dVehicleChassis::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat 
 		m_handBrakeControl->SetParam(driveInputs.m_handBrakeValue);
 	}
 
-if (m_engineControl) {
-m_engineControl->SetParam(driveInputs.m_throttle);
-m_engineControl->SetClutch(driveInputs.m_clutchPedal);
-m_engineControl->SetGear(dVehicleEngineInterface::m_firstGear);
-}
+	if (m_engineControl) {
+		m_engineControl->SetParam(driveInputs.m_throttle);
+		m_engineControl->SetClutch(driveInputs.m_clutchPedal);
+		m_engineControl->SetGear(dVehicleEngineInterface::m_firstGear);
+	}
 
 
-/*
+#if 0
 	if (m_engineControl) {
 		m_engineControl->SetDifferentialLock(driveInputs.m_lockDifferential ? true : false);
 
@@ -362,98 +446,8 @@ m_engineControl->SetGear(dVehicleEngineInterface::m_firstGear);
 	else if (m_handBrakesControl) {
 		m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
 	}
-*/
-}
-
 #endif
-
-
-dVehicleChassis::dVehicleChassis(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
-	:dVehicleNode(NULL)
-	,dVehicleSolver()
-	,m_localFrame(localFrame)
-	,m_gravity(0.0f, -dAbs(gravityMag), 0.0f, 0.0f)
-	,m_obbSize(0.0f)
-	,m_obbOrigin(0.0f)
-	,m_groundProxyBody(NULL)
-	,m_newtonBody(body)
-	,m_node(NULL)
-	,m_manager(NULL)
-{
-	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
-	dAssert(m_localFrame.TestOrthogonal());
-
-	// set linear and angular drag to zero
-	dVector drag(0.0f);
-	NewtonBodySetLinearDamping(m_newtonBody, 0.0f);
-	NewtonBodySetAngularDamping(m_newtonBody, &drag[0]);
-
-	/*
-	m_aerodynamicsDownForce0 = 0.0f;
-	m_aerodynamicsDownForce1 = 0.0f;
-	m_aerodynamicsDownSpeedCutOff = 0.0f;
-	m_aerodynamicsDownForceCoefficient = 0.0f;
-	SetAerodynamicsDownforceCoefficient(0.5f, 0.4f, 1.0f);
-	*/
-
-	dVector tmp;
-	//dComplementaritySolver::dBodyState* const chassisBody = GetProxyBody();
-	//m_groundNode.SetWorld(m_world);
-	//m_groundNode.SetLoopNode(true);
-
-	// set the inertia matrix;
-	NewtonBodyGetMass(m_newtonBody, &tmp.m_w, &tmp.m_x, &tmp.m_y, &tmp.m_z);
-	m_proxyBody.SetMass(tmp.m_w);
-	m_proxyBody.SetInertia(tmp.m_x, tmp.m_y, tmp.m_z);
-
-	dMatrix matrix(dGetIdentityMatrix());
-	NewtonBodyGetCentreOfMass(m_newtonBody, &matrix.m_posit[0]);
-	matrix.m_posit.m_w = 1.0f;
-	m_proxyBody.SetLocalMatrix(matrix);
-}
-
-dVehicleChassis::~dVehicleChassis()
-{
-	if (m_node) {
-		m_manager->RemoveRoot(this);
-	}
-}
-
-void dVehicleChassis::Finalize()
-{
-	dVector minP;
-	dVector maxP;
-	NewtonCollision* const collision = NewtonBodyGetCollision(m_newtonBody);
-	CalculateAABB(collision, dGetIdentityMatrix(), minP, maxP);
-
-	for (dVehicleNodeChildrenList::dListNode* node = m_children.GetFirst(); node; node = node->GetNext()) {
-		dVehicleTire* const tire = node->GetInfo()->GetAsTire();
-		if (tire) {
-			dVector tireMinP;
-			dVector tireMaxP;
-
-			dMatrix tireMatrix(tire->GetHardpointMatrix(0.0f));
-			tire->CalculateNodeAABB(tireMatrix, tireMinP, tireMaxP);
-
-			minP = minP.Min(tireMinP);
-			maxP = maxP.Max(tireMaxP);
-		}
-	}
-
-	m_obbOrigin = (maxP + minP).Scale(0.5f);
-	m_obbSize = (maxP - minP).Scale(0.5f) + dVector(0.1f, 0.1f, 0.1f, 0.0f);
-
-//	m_vehicle->RigidBodyToStates();
-	ApplyExternalForce();
-	dVehicleSolver::Finalize();
-}
-
-const void dVehicleChassis::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
-{
-	//dAssert(0);
-	dVehicleNode::Debug(debugContext);
-	//dTrace(("%s\n", __FUNCTION__));
-	//m_vehicle->Debug(debugContext);
+#endif
 }
 
 int dVehicleChassis::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
@@ -465,6 +459,11 @@ dVehicleTire* dVehicleChassis::AddTire(const dMatrix& locationInGlobalSpace, con
 {
 	dVehicleTire* const tire = new dVehicleTire(this, locationInGlobalSpace, tireInfo);
 	return tire;
+}
+
+dVehicleSteeringControl* dVehicleChassis::GetSteeringControl()
+{
+	return &m_steeringControl;
 }
 
 void dVehicleChassis::ApplyExternalForce()
@@ -653,13 +652,9 @@ void dVehicleChassis::CalculateFreeDof()
 
 void dVehicleChassis::PreUpdate(dFloat timestep)
 {
-	//dVehicleManager* const manager = (dVehicleManager*)GetManager();
-	//manager->UpdateDriverInput(this, timestep);
-	//
-	//if (m_steeringControl) {
-	//	m_steeringControl->Update(timestep);
-	//}
-	//
+	m_manager->UpdateDriverInput(this, timestep);
+	m_steeringControl.Update(timestep);
+	
 	//if (m_brakeControl) {
 	//	m_brakeControl->Update(timestep);
 	//}

@@ -30,14 +30,7 @@ class dVehicleManager: public dCustomParallelListener
 	DVEHICLE_API void AddRoot(dVehicleChassis* const root);
 	DVEHICLE_API void RemoveRoot(dVehicleChassis* const root);
 	DVEHICLE_API void RemoveAndDeleteRoot(dVehicleChassis* const root);
-
-//	DVEHICLE_API virtual void UpdateDriverInput(dVehicleChassis* const vehicle, dFloat timestep) {}
-//	DVEHICLE_API virtual dVehicleChassis* CreateVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-//	DVEHICLE_API virtual dVehicleChassis* CreateVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-//	DVEHICLE_API virtual dVehicleChassis* CreateSingleBodyVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-//	DVEHICLE_API virtual dVehicleChassis* CreateSingleBodyVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag);
-//	DVEHICLE_API virtual void DestroyController(dVehicleChassis* const controller);
-
+	DVEHICLE_API virtual void UpdateDriverInput(dVehicleChassis* const vehicle, dFloat timestep) {}
 
 	virtual void OnUpdateTransform(const dVehicleChassis* const vehicle) const {}
 	virtual void OnPreUpdate(dVehicleChassis* const model, dFloat timestep) const {};

@@ -1,0 +1,142 @@
+/* Copyright (c) <2003-2019> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/
+
+
+#ifndef __D_VEHICLE_DASH_CONTROL_H__
+#define __D_VEHICLE_DASH_CONTROL_H__
+
+#include "dStdafxVehicle.h"
+
+class dVehicleTire;
+class dVehicleChassis;
+
+class dVehicleDashControl
+{
+	public:
+	dVehicleDashControl()
+		:m_vehicle(NULL)
+		,m_param(0.0f)
+		,m_paramMemory(0.0f)
+		,m_timer(60)
+	{
+	}
+
+	virtual ~dVehicleDashControl()
+	{
+	}
+
+	void Init(dVehicleChassis* const vehicle)
+	{
+		m_vehicle = vehicle;
+	}
+
+	void SetParam(dFloat param)
+	{
+		m_paramMemory = m_param;
+		m_param = param;
+	}
+
+
+	dFloat GetParam() const
+	{
+		return m_param;
+	}
+
+	bool ParamChanged() const
+	{
+		m_timer--;
+		if (dAbs(m_paramMemory - m_param) > 1.e-3f) {
+			m_timer = 30;
+		}
+		return m_timer > 0;
+	}
+
+	virtual void Update(dFloat timestep) = 0;
+
+	protected:
+	dVehicleChassis* m_vehicle;
+	dFloat m_param;
+	dFloat m_paramMemory;
+	mutable dFloat m_timer;
+};
+
+class dVehicleSteeringControl: public dVehicleDashControl
+{
+	public:
+	dVehicleSteeringControl() 
+		:m_tires()
+		,m_isSleeping(false)
+	{
+	}
+
+	void AddTire(dVehicleTire* const tire)
+	{
+		m_tires.Append(tire);
+	}
+
+	protected:
+	virtual void Update(dFloat timestep);
+	friend class dVehicleChassis;
+
+	dList<dVehicleTire*> m_tires;
+	bool m_isSleeping;
+};
+
+
+/*
+class dVehicleEngineControl: public dVehicleDashControl 
+{
+	public:
+	DVEHICLE_API dVehicleEngineControl(dVehicleChassis* const vehicle);
+	DVEHICLE_API void SetEngine (dVehicleEngineInterface* const engine);
+
+	void SetGear (int gear);
+	void SetClutch (dFloat clutch);
+	dVehicleEngineInterface* GetEngine() const {return m_engine;}
+
+	virtual void Update(dFloat timestep);
+
+	private:
+	dVehicleEngineInterface* m_engine;
+};
+
+class dVehicleTireControl: public dVehicleDashControl 
+{
+	public:
+	DVEHICLE_API dVehicleTireControl(dVehicleChassis* const vehicle);
+	DVEHICLE_API virtual ~dVehicleTireControl();
+
+	
+	
+	protected:
+	dList<dVehicleTireInterface*> m_tires;
+	bool m_isSleeping;
+};
+
+
+class dVehicleBrakeControl: public dVehicleTireControl
+{
+	public:
+	dVehicleBrakeControl(dVehicleChassis* const vehicle);
+
+	DVEHICLE_API dFloat GetBrakeTorque () const;
+	DVEHICLE_API void SetBrakeTorque (dFloat torque);
+
+	protected:
+	virtual void Update(dFloat timestep);
+
+	dFloat m_maxTorque;
+	friend class dVehicleChassis;
+};
+*/
+
+#endif 
+

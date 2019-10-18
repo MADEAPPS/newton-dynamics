@@ -16,6 +16,7 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
 #include "dVehicleSolver.h"
+#include "dVehicleDashControl.h"
 
 class dTireInfo;
 class dVehicleTire;
@@ -40,7 +41,6 @@ class dCollectCollidingBodies
 class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 {
 	public:
-#if 0
 	class dDriverInput
 	{
 		public:
@@ -67,11 +67,7 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 		int m_lockDifferential;
 		int m_manualTransmission;
 	};
-#endif
 
-	private:
-
-	public:
 	DVEHICLE_API dVehicleChassis (NewtonBody* const rootBody, const dMatrix& localFrame, dFloat gravityMag);
 	DVEHICLE_API ~dVehicleChassis();
 
@@ -83,7 +79,10 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 	DVEHICLE_API const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	DVEHICLE_API dVehicleTire* AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
 	
-	
+	DVEHICLE_API dVehicleSteeringControl* GetSteeringControl();
+
+	DVEHICLE_API void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep);
+
 #if 0
 	DVEHICLE_API dVehicleDifferentialInterface* AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire);
 	DVEHICLE_API dVehicleEngineInterface* AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential);
@@ -91,10 +90,9 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 	DVEHICLE_API dVehicleBrakeControl* GetBrakeControl();
 	DVEHICLE_API dVehicleEngineControl* GetEngineControl();
 	DVEHICLE_API dVehicleBrakeControl* GetHandBrakeControl();
-	DVEHICLE_API dVehicleSteeringControl* GetSteeringControl ();
+	
 
-	DVEHICLE_API void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep);
-	void ApplyExternalForces(dFloat timestep);
+	
 
 	private:
 	void PreUpdate(dFloat timestep);
@@ -112,7 +110,7 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 	dVehicleBrakeControl* m_brakeControl;
 	dVehicleEngineControl* m_engineControl;
 	dVehicleBrakeControl* m_handBrakeControl;
-	dVehicleSteeringControl* m_steeringControl;
+	
 
 	friend class dVehicleSolver;
 	friend class dVehicleManager;
@@ -137,6 +135,7 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 	dVector m_obbSize;
 	dVector m_obbOrigin;
 	dVehicleNode m_groundProxyBody;
+	dVehicleSteeringControl m_steeringControl;
 	NewtonBody* m_newtonBody;
 	void* m_node;
 	dVehicleManager* m_manager;

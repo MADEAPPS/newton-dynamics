@@ -336,8 +336,7 @@ return;
 
 		DemoMesh* const mesh = (DemoMesh*)carEntity->GetMesh();
 		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
-		const dMatrix& meshMatrix = carEntity->GetMeshMatrix();
-
+		//const dMatrix& meshMatrix = carEntity->GetMeshMatrix();
 		//dArray<dFloat> temp(mesh->m_vertexCount * 3);
 		//meshMatrix.TransformTriplex(&temp[0], 3 * sizeof (dFloat), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
 		//NewtonCollision* const shape = NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &temp[0], 3 * sizeof (dFloat), 0.001f, 0, NULL);
@@ -420,12 +419,13 @@ return;
 		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, chassisMass);
 		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
 
-/*
 		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
 		steeringControl->AddTire(frontLeft);
 		steeringControl->AddTire(frontRight);
+		steeringControl->SetParam(1.0f);
 
+/*
 		// add vehicle hand brake control 
 		dVehicleBrakeControl* const handBrakeControl = vehicle->GetHandBrakeControl();
 		handBrakeControl->SetBrakeTorque(1000.0f);
@@ -479,7 +479,6 @@ return;
 		return vehicle;
 	}
 
-#if 0
 	void UpdateDriverInput(dVehicleChassis* const vehicle, dFloat timestep) 
 	{
 //		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
@@ -566,7 +565,7 @@ axisCount = 0;
 
 		vehicle->ApplyDriverInputs(driverInput, timestep);
 	}
-#endif
+
 
 	void OnUpdateTransform(const dVehicleChassis* const vehicle) const 
 	{
