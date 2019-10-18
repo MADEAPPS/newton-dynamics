@@ -666,7 +666,6 @@ int dVehicleSolver::BuildJacobianMatrix(dFloat timestep)
 	}
 
 	for (int i = 0; i < m_loopJointCount; i++) {
-		dAssert (0);
 		dVehicleLoopJoint* const joint = m_loopJoints[i];
 		joint->m_start = rowCount;
 		joint->m_count = BuildJacobianMatrix(timestep, joint);
@@ -1231,41 +1230,14 @@ void dVehicleSolver::Update(dFloat timestep)
 	}
 
 	dVehicleLoopJoint* kinematicLoop[128];
-	m_loopJoints = kinematicLoop;
-
-//	m_rootNode->ApplyExternalForce(timestep);
-	m_loopJointCount = rootNode->GetKinematicLoops(m_loopJoints);
-	dAssert(!m_loopJointCount);
+	
 	int loopDof = 0;
-
-//	m_loopNodeCount = 0;
-	m_loopJointCount = 0;
-//	const dVehicleLoopJointList& loopList = m_rootNode->GetLoops();
+	m_loopJoints = kinematicLoop;
+	m_loopJointCount = rootNode->GetKinematicLoops(m_loopJoints);
 	for (int i = 0; i < m_loopJointCount; i ++) {
-//	for (dVehicleLoopJointList::dListNode* node = loopList.GetFirst(); node; node = node->GetNext()) {
-		//dVehicleLoopJoint* const loop = node->GetInfo();
-		dAssert(0);
 		dVehicleLoopJoint* const loop = m_loopJoints[i];
-		if (loop->IsActive()) {
-			loopDof += loop->GetMaxDof();
-			//dVehicleNode* const node0 = loop->GetOwner0()->m_owner;
-			//dVehicleNode* const node1 = loop->GetOwner1()->m_owner;
-			//if (node0->IsLoopNode() && (node0->GetIndex() == -1)) {
-			//	node0->SetIndex(m_loopNodeCount + m_nodeCount);
-			//	m_nodesOrder[m_nodeCount + m_loopNodeCount] = node0;
-			//	dAssert((m_nodeCount + m_loopNodeCount) < m_maxNodeCount);
-			//	m_loopNodeCount++;
-			//}
-			//if (node1->IsLoopNode() && (node1->GetIndex() == -1)) {
-			//	node1->SetIndex(m_loopNodeCount + m_nodeCount);
-			//	m_nodesOrder[m_nodeCount + m_loopNodeCount] = node1;
-			//	dAssert((m_nodeCount + m_loopNodeCount) < m_maxNodeCount);
-			//	m_loopNodeCount++;
-			//}
-
-			m_loopJoints[m_loopJointCount] = loop;
-			m_loopJointCount++;
-		}
+		dAssert(loop->IsActive());
+		loopDof += loop->GetMaxDof();
 	}
 
 	//int totalJoint = m_nodeCount + m_loopNodeCount;

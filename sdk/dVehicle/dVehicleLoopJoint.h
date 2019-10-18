@@ -24,8 +24,8 @@ class dVehicleLoopJoint: public dComplementaritySolver::dBilateralJoint
 	bool IsActive() const { return m_isActive; }
 	void SetOwners(dVehicleNode* const owner0, dVehicleNode* const owner1);
 
-	dVehicleNode* GetOwner0() const { return (dVehicleNode*)m_state0;}
-	dVehicleNode* GetOwner1() const { return (dVehicleNode*)m_state1;}
+	dVehicleNode* GetOwner0() const { return m_owner0;}
+	dVehicleNode* GetOwner1() const { return m_owner1;}
 
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugDisplay) const {}
 	virtual int GetMaxDof() const = 0;

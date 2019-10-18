@@ -117,30 +117,22 @@ dFloat dVehicleTire::GetSteeringAngle() const
 	return m_steeringAngle;
 }
 
-
-#if 0
-int dVehicleVirtualTire::GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray)
+int dVehicleTire::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 {
-	dAssert(0);
-	return 0;
-	/*
-		int count = 0;
-		for (int i = 0; i < sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]); i ++) {
-			dAnimIDRigKinematicLoopJoint* const loop = &m_contactsJoints[i];
-			if (loop->IsActive ()) {
-				jointArray[count] = loop;
-				dAssert (!loop->GetOwner0()->IsLoopNode());
-				if (loop->GetOwner1()->IsLoopNode()) {
-					loop->GetOwner1()->SetIndex(-1);
-				}
-				count ++;
-			}
+	int count = 0;
+	for (int i = 0; i < sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]); i ++) {
+		dVehicleLoopJoint* const loop = &m_contactsJoints[i];
+		if (loop->IsActive ()) {
+			jointArray[count] = loop;
+			//dAssert (!loop->GetOwner0()->IsLoopNode());
+			//if (loop->GetOwner1()->IsLoopNode()) {
+			//	loop->GetOwner1()->SetIndex(-1);
+			//}
+			count ++;
 		}
-		return dVehicleTireInterface::GetKinematicLoops(&jointArray[count]) + count;
-	*/
+	}
+	return count;
 }
-
-#endif
 
 void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, dFloat timestep)
 {
@@ -205,14 +197,10 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 		}
 	}
 
-	dTrace(("%s\n", __FUNCTION__));
-/*
 	if (bodyArray.m_count > bodyArray.m_staticCount) {
 		// for now ignore tire collision with dynamics bodies,
-		// later tire collision with dynamic bodies will no be CCD
-		//dAssert (0);
+		dAssert (0);
 	}
-
 
 	if (contactCount > 1) {
 		for (int i = 0; i < contactCount - 1; i ++) {
@@ -226,7 +214,6 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 			}
 		}
 	}
-*/
 }
 
 dMatrix dVehicleTire::GetHardpointMatrix(dFloat param) const

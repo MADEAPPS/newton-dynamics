@@ -92,7 +92,7 @@ class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilater
 
 	protected:
 	dMatrix GetHardpointMatrix (dFloat param) const;
-//	int GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray);
+	int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 	void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	void CalculateContacts(const dCollectCollidingBodies& bodyArray, dFloat timestep);
 

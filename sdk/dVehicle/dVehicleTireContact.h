@@ -65,7 +65,7 @@ class dVehicleTireContact: public dVehicleLoopJoint
 	dFloat m_normalFilter[4];
 	bool m_isActiveFilter[4];
 
-	friend class dVehicleVirtualTire;
+	friend class dVehicleTire;
 };
 
 #endif 

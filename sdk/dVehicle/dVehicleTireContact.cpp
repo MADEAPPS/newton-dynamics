@@ -72,7 +72,8 @@ void dVehicleTireContact::SetContact(const dVector& posit, const dVector& normal
 
 void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-	dAssert (0);
+	//dAssert (0);
+	dTrace(("%s\n", __FUNCTION__));
 /*
 	dComplementaritySolver::dBodyState* const tire = m_state0;
 	dComplementaritySolver::dBodyState* const chassis = m_state1;
