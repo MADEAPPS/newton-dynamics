@@ -386,13 +386,27 @@ void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 	//constraintParams->m_jointLowFriction[index] = -chassis->m_dryRollingFrictionTorque;
 	//constraintParams->m_jointHighFriction[index] = chassis->m_dryRollingFrictionTorque;
 
-	if (m_position <= 0.0f) {
+	if (m_position < 0.0f) {
 		int index = constraintParams->m_count;
 		AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right);
+		dFloat speed = -0.1f;
+		dFloat step = 2.0f * speed * constraintParams->m_timestep;
+		if (m_position > step) {
+			speed = 0.25f * m_position * constraintParams->m_timestepInv;
+		}
+		dFloat accel = GetRowAccelaration(constraintParams) - speed * constraintParams->m_timestepInv;
+		SetRowAccelaration(constraintParams, accel);
 		constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
 	} else if (m_position >= m_info.m_suspensionLength) {
 		int index = constraintParams->m_count;
 		AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right);
+		dFloat speed = 0.1f;
+		dFloat step = 2.0f * speed * constraintParams->m_timestep;
+		if ((m_position - m_info.m_suspensionLength) > step) {
+			speed = 0.25f * (m_position - m_info.m_suspensionLength) * constraintParams->m_timestepInv;
+		}
+		dFloat accel = GetRowAccelaration(constraintParams) - speed * constraintParams->m_timestepInv;
+		SetRowAccelaration(constraintParams, accel);
 		constraintParams->m_jointHighFrictionCoef[index] = 0.0f;
 	}
 	

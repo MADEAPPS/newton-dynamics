@@ -75,8 +75,8 @@ void dAnimationRagDollEffector::JacobianDerivative(dComplementaritySolver::dPara
 
 	int dofCount = 0;
 	dAssert(m_maxLinearSpeed >= 0.0f);
-	const dFloat invTimestep = constraintParams->m_timestepInv;
-	const dFloat linearStep = m_maxLinearSpeed * constraintParams->m_timestep;
+	//const dFloat invTimestep = constraintParams->m_timestepInv;
+	//const dFloat linearStep = m_maxLinearSpeed * constraintParams->m_timestep;
 	for (int i = 0; i < 3; i++) {
 		AddLinearRowJacobian(constraintParams, matrix0.m_posit, matrix1[i]);
 		dAssert(0);

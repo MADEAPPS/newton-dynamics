@@ -898,9 +898,8 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 		const int first = joint->m_start;
 		const int primaryDof = joint->m_dof;
 
-		const dSpatialVector& accelSpatial = accel[i].m_joint;
+		//const dSpatialVector& accelSpatial = accel[i].m_joint;
 		const dSpatialVector& forceSpatial = force[i].m_joint;
-
 		for (int j = 0; j < primaryDof; j++) {
 			f[primaryIndex] = dFloat(forceSpatial[j]);
 			primaryIndex++;
@@ -934,11 +933,11 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 			f[auxiliaryIndex + primaryCount] = rhs->m_force;
 
 			//b[auxiliaryIndex] = -dFloat(accelSpatial[primaryDof + j]);
-			dVector acc(row[i].m_jacobian_J01.m_linear.Scale(invMass0) * force0 +
-						row[i].m_jacobian_J01.m_angular * invInertia0.RotateVector(torque0) +
-						row[i].m_jacobian_J10.m_linear.Scale(invMass1) * force1 +
-						row[i].m_jacobian_J10.m_angular * invInertia1.RotateVector(torque1));
-			b[auxiliaryIndex] = rhs[i].m_coordenateAccel - acc.m_x - acc.m_y - acc.m_z;
+			dVector acc(row->m_jacobian_J01.m_linear.Scale(invMass0) * force0 +
+						row->m_jacobian_J01.m_angular * invInertia0.RotateVector(torque0) +
+						row->m_jacobian_J10.m_linear.Scale(invMass1) * force1 +
+						row->m_jacobian_J10.m_angular * invInertia1.RotateVector(torque1));
+			b[auxiliaryIndex] = rhs->m_coordenateAccel - acc.m_x - acc.m_y - acc.m_z;
 
 			dAssert(rhs->m_force >= rhs->m_jointLowFriction * dFloat(2.0f));
 			dAssert(rhs->m_force <= rhs->m_jointHighFriction * dFloat(2.0f));

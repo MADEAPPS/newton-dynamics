@@ -322,12 +322,9 @@ void dComplementaritySolver::dBilateralJoint::AddLinearRowJacobian(dParamInfo* c
 	dPointDerivativeParam param;
 
 	param.m_posit0 = pivot;
-	param.m_r0 = pivot - m_state0->m_globalCentreOfMass;
-	param.m_veloc0 = m_state0->m_omega.CrossProduct(param.m_r0);
-
 	param.m_posit1 = pivot;
+	param.m_r0 = pivot - m_state0->m_globalCentreOfMass;
 	param.m_r1 = pivot - m_state1->m_globalCentreOfMass;
-	param.m_veloc1 = m_state1->m_omega.CrossProduct(param.m_r1);
 
 	int index = constraintParams->m_count;
 
@@ -350,7 +347,7 @@ void dComplementaritySolver::dBilateralJoint::AddLinearRowJacobian(dParamInfo* c
 	dVector centripetal1(omega1.CrossProduct(omega1.CrossProduct(param.m_r1)));
 	const dVector accel(jacobian0.m_linear * centripetal0 + jacobian1.m_linear * centripetal1);
 	const dVector veloc(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1);
-	const dVector relAccel(accel + veloc.Scale(constraintParams->m_timestep));
+	const dVector relAccel(accel + veloc.Scale(constraintParams->m_timestepInv));
 
 	dAssert(relAccel.m_w == 0.0f);
 	constraintParams->m_jointAccel[index] = -(relAccel.m_x + relAccel.m_y + relAccel.m_z);
@@ -376,7 +373,7 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 	const dVector& omega0 = m_state0->m_omega;
 	const dVector& omega1 = m_state1->m_omega;
 	const dVector omega (omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-	const dVector alpha (omega.Scale (constraintParams->m_timestep));
+	const dVector alpha (omega.Scale (constraintParams->m_timestepInv));
 
 	constraintParams->m_jointAccel[index] = -(alpha.m_x + alpha.m_y + alpha.m_z);
 	constraintParams->m_jointLowFrictionCoef[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
@@ -386,8 +383,14 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 
 dFloat dComplementaritySolver::dBilateralJoint::GetRowAccelaration(dParamInfo* const constraintParams) const
 { 
-	dAssert(m_count > 0);
-	return constraintParams->m_jointAccel[m_count - 1]; 
+	dAssert(constraintParams->m_count > 0);
+	return constraintParams->m_jointAccel[constraintParams->m_count - 1]; 
+}
+
+void dComplementaritySolver::dBilateralJoint::SetRowAccelaration(dParamInfo* const constraintParams, dFloat accel)
+{
+	dAssert(constraintParams->m_count > 0);
+	constraintParams->m_jointAccel[constraintParams->m_count - 1] = accel;
 }
 
 /*

@@ -125,20 +125,15 @@ class dComplementaritySolver
 		dPointDerivativeParam()
 			:m_r0(0.0f)
 			,m_posit0(0.0f)
-			,m_veloc0(0.0f)
 			,m_r1(0.0f)
 			,m_posit1(0.0f)
-			,m_veloc1(0.0f)
 		{
 		}
 
 		dVector m_r0;
 		dVector m_posit0;
-		dVector m_veloc0;
-
 		dVector m_r1;
 		dVector m_posit1;
-		dVector m_veloc1;
 	};
 
 	class dJointAccelerationDecriptor
@@ -176,6 +171,7 @@ class dComplementaritySolver
 		void AddLinearRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir);
 
 		dFloat GetRowAccelaration(dParamInfo* const constraintParams) const;
+		void SetRowAccelaration(dParamInfo* const constraintParams, dFloat accel);
 		//dFloat CalculateRowZeroAccelaration (dParamInfo* const constraintParams) const;
 		dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
 

@@ -338,9 +338,10 @@ return;
 		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
 		const dMatrix& meshMatrix = carEntity->GetMeshMatrix();
 
-		dArray<dFloat> temp(mesh->m_vertexCount * 3);
-		meshMatrix.TransformTriplex(&temp[0], 3 * sizeof (dFloat), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
-		NewtonCollision* const shape = NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &temp[0], 3 * sizeof (dFloat), 0.001f, 0, NULL);
+		//dArray<dFloat> temp(mesh->m_vertexCount * 3);
+		//meshMatrix.TransformTriplex(&temp[0], 3 * sizeof (dFloat), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
+		//NewtonCollision* const shape = NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &temp[0], 3 * sizeof (dFloat), 0.001f, 0, NULL);
+		NewtonCollision* const shape = carEntity->CreateCollisionFromchildren(GetWorld());
 
 		// create a body and call the low level init function
 		dMatrix locationMatrix(dGetIdentityMatrix());
@@ -412,12 +413,12 @@ return;
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions ("fl_tire", width, radio, world, vehicleEntity);
-		//dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, chassisMass);
-		//dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", width, radio, chassisMass);
+		dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, chassisMass);
+		dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", width, radio, chassisMass);
 
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
 		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, chassisMass);
-		//dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
+		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
 
 /*
 		// add vehicle steering control 

@@ -395,7 +395,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 			entity->m_matrix = matrix;
 			entity->SetNameID(sceneInfo->GetName());
 			const char* const name = entity->GetName().GetStr();
-			if (strstr(name, "Sphere") || strstr(name, "Box") || strstr(name, "Capsule")) {
+			if (strstr(name, "Sphere") || strstr(name, "Box") || strstr(name, "Capsule") || strstr(name, "ConvexHull")) {
 				entity->m_isVisible = false;
 				//dTrace(("%s %s\n", name, entity->GetParent()->GetName().GetStr()));
 			}
@@ -540,7 +540,15 @@ NewtonCollision* DemoEntity::CreateCollisionFromchildren(NewtonWorld* const worl
 	}
 
 	if (count > 2) {
-		dAssert(0);
+		NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
+		NewtonCompoundCollisionBeginAddRemove (compound);	
+		for (int i = 1; i < count; i ++) {
+			NewtonCompoundCollisionAddSubCollision (compound, shapeArray[i]);
+			NewtonDestroyCollision(shapeArray[i]);
+		}
+		NewtonCompoundCollisionEndAddRemove (compound);	
+		shapeArray[0] = compound;
+		count = 1;
 	} if (count == 2) {
 		shapeArray[0] = shapeArray[1];
 	}
