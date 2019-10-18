@@ -388,9 +388,10 @@ void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 
 	if (m_position <= 0.0f) {
 		dTrace(("%s\n", __FUNCTION__));
-		//int index = constraintParams->m_count;
-		//AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right);
-		//constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
+		int index = constraintParams->m_count;
+		AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right);
+		constraintParams->m_jointLowFrictionCoef[index] = -1000.0f;
+		constraintParams->m_jointHighFrictionCoef[index] = 1000.0f;
 	} else if (m_position >= m_info.m_suspensionLength) {
 		dAssert(0);
 	//	m_speed = 0.0f;

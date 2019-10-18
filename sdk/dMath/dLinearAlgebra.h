@@ -175,7 +175,8 @@ class dComplementaritySolver
 		void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle);
 		void AddLinearRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir);
 
-		dFloat CalculateRowZeroAccelaration (dParamInfo* const constraintParams) const;
+		dFloat GetRowAccelaration(dParamInfo* const constraintParams) const;
+		//dFloat CalculateRowZeroAccelaration (dParamInfo* const constraintParams) const;
 		dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
 
 		dFloat m_motorAcceleration[D_MAX_PRAM_INFO_SIZE];

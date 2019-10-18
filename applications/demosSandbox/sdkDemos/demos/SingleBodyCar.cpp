@@ -412,12 +412,12 @@ return;
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions ("fl_tire", width, radio, world, vehicleEntity);
-		dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, chassisMass);
-		dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", width, radio, chassisMass);
+		//dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, chassisMass);
+		//dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", width, radio, chassisMass);
 
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
 		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, chassisMass);
-		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
+		//dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
 
 /*
 		// add vehicle steering control 

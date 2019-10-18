@@ -323,8 +323,6 @@ void dVehicleSolver::Factorize(dVehicleNode* const node)
 
 void dVehicleSolver::CalculateLoopMassMatrixCoefficients()
 {
-	dAssert(0);
-	/*
 	const int auxiliaryRowCount = m_auxiliaryRowCount + m_loopRowCount;
 	const int primaryCount = m_rowCount - m_auxiliaryRowCount;
 
@@ -343,8 +341,8 @@ void dVehicleSolver::CalculateLoopMassMatrixCoefficients()
 		//dVehicleNode* const node1 = m_nodesOrder[m1_i];
 		//dComplementaritySolver::dBodyState* const state0 = node0->GetProxyBody();
 		//dComplementaritySolver::dBodyState* const state1 = node1->GetProxyBody();
-		dComplementaritySolver::dBodyState* const state0 = m_nodesOrder[m0_i];
-		dComplementaritySolver::dBodyState* const state1 = m_nodesOrder[m1_i];
+		dComplementaritySolver::dBodyState* const state0 = &m_nodesOrder[m0_i]->GetProxyBody();
+		dComplementaritySolver::dBodyState* const state1 = &m_nodesOrder[m1_i]->GetProxyBody();
 
 		const dMatrix& invInertia0 = state0->GetInvInertia();
 		const dMatrix& invInertia1 = state1->GetInvInertia();
@@ -428,24 +426,21 @@ void dVehicleSolver::CalculateLoopMassMatrixCoefficients()
 			}
 		}
 	}
-*/
 }
 
 void dVehicleSolver::InitLoopMassMatrix()
 {
-	dAssert(0);
-	/*
 	int primaryIndex = 0;
 	int auxiliaryIndex = 0;
 	const int primaryCount = m_rowCount - m_auxiliaryRowCount;
 	const int nodeCount = m_nodeCount - 1;
 	for (int i = 0; i < nodeCount; i++) {
-		dVehicleNode* const node = m_nodesOrder[i]->m_owner;
+		dVehicleNode* const node = m_nodesOrder[i];
 		const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
 		dAssert(joint);
-		dAssert(i == node->GetProxyBody()->GetIndex());
-		const int m0 = node->GetProxyBody()->GetIndex();
-		const int m1 = node->m_parent->GetProxyBody()->GetIndex();
+		dAssert(i == node->m_index);
+		const int m0 = node->m_index;
+		const int m1 = node->m_parent->m_index;
 
 		const int first = joint->m_start;
 		const int primaryDof = joint->m_dof;
@@ -474,8 +469,8 @@ void dVehicleSolver::InitLoopMassMatrix()
 		//dVehicleNode* const node1 = joint->GetOwner1()->m_owner;
 		//const int m0 = node0->GetProxyBody()->GetIndex();
 		//const int m1 = node1->GetProxyBody()->GetIndex();
-		const int m0 = joint->GetOwner0()->GetIndex();
-		const int m1 = joint->GetOwner1()->GetIndex();
+		const int m0 = joint->GetOwner0()->m_index;
+		const int m1 = joint->GetOwner1()->m_index;
 		const int first = joint->m_start;
 		const int auxiliaryDof = joint->m_dof;
 		for (int i = 0; i < auxiliaryDof; i++) {
@@ -509,8 +504,8 @@ void dVehicleSolver::InitLoopMassMatrix()
 		const dFloat* const matrixRow10 = &m_massMatrix10[i * primaryCount];
 
 		for (int j = 0; j < nodeCount; j++) {
-			dVehicleNode* const node = m_nodesOrder[j]->m_owner;
-			const int index = node->GetProxyBody()->GetIndex();
+			dVehicleNode* const node = m_nodesOrder[j];
+			const int index = node->m_index;
 			const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
 
 			accelPair[index].m_body = zero;
@@ -533,9 +528,9 @@ void dVehicleSolver::InitLoopMassMatrix()
 
 		dFloat* const deltaForcePtr = &m_deltaForce[i * primaryCount];
 		for (int j = 0; j < nodeCount; j++) {
-			dVehicleNode* const node = m_nodesOrder[j]->m_owner;
+			dVehicleNode* const node = m_nodesOrder[j];
 			const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
-			const int index = node->GetProxyBody()->GetIndex();
+			const int index = node->m_index;
 			const dSpatialVector& f = forcePair[index].m_joint;
 			const int count = joint->m_dof;
 			for (int k = 0; k < count; k++) {
@@ -579,7 +574,6 @@ void dVehicleSolver::InitLoopMassMatrix()
 	}
 
 	dAssert (dTestPSDmatrix(auxiliaryIndex, auxiliaryIndex, m_massMatrix11));
-*/
 }
 
 void dVehicleSolver::InitMassMatrix()
@@ -887,8 +881,6 @@ void dVehicleSolver::UpdateForces(const dVectorPair* const force) const
 
 void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair* const accel) const
 {
-	dAssert(0);
-/*
 	const int n = m_loopRowCount + m_auxiliaryRowCount;
 	dFloat* const f = dAlloca(dFloat, m_rowCount + n);
 	dFloat* const u = dAlloca(dFloat, n);
@@ -901,7 +893,7 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 	int auxiliaryIndex = 0;
 	const int primaryCount = m_rowCount - m_auxiliaryRowCount;
 	for (int i = 0; i < m_nodeCount - 1; i++) {
-		dVehicleNode* const node = m_nodesOrder[i]->m_owner;
+		dVehicleNode* const node = m_nodesOrder[i];
 		const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
 		const int first = joint->m_start;
 		const int primaryDof = joint->m_dof;
@@ -946,8 +938,8 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 		//dComplementaritySolver::dBodyState* const state0 = node0->GetProxyBody();
 		//dComplementaritySolver::dBodyState* const state1 = node1->GetProxyBody();
 
-		dComplementaritySolver::dBodyState* const state0 = joint->GetOwner0();
-		dComplementaritySolver::dBodyState* const state1 = joint->GetOwner1();
+		dComplementaritySolver::dBodyState* const state0 = &joint->GetOwner0()->GetProxyBody();
+		dComplementaritySolver::dBodyState* const state1 = &joint->GetOwner1()->GetProxyBody();
 
 		//dAssert (state0 == m_nodesOrder[node0->GetIndex()]->GetProxyBody());
 		//dAssert (state1 == m_nodesOrder[node1->GetIndex()]->GetProxyBody());
@@ -1011,8 +1003,8 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 
 		//dComplementaritySolver::dBodyState* const state0 = m_nodesOrder[m0]->GetProxyBody();
 		//dComplementaritySolver::dBodyState* const state1 = m_nodesOrder[m1]->GetProxyBody();
-		dComplementaritySolver::dBodyState* const state0 = m_nodesOrder[m0];
-		dComplementaritySolver::dBodyState* const state1 = m_nodesOrder[m1];
+		dComplementaritySolver::dBodyState* const state0 = &m_nodesOrder[m0]->GetProxyBody();
+		dComplementaritySolver::dBodyState* const state1 = &m_nodesOrder[m1]->GetProxyBody();
 
 		rhs->m_force = f[i];
 		dVector jointForce(f[i]);
@@ -1023,7 +1015,7 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 	}
 
 	for (int i = 0; i < m_nodeCount - 1; i++) {
-		dVehicleNode* const node = m_nodesOrder[i]->m_owner;
+		dVehicleNode* const node = m_nodesOrder[i];
 		dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
 		const int first = joint->m_start;
 		const int count = joint->m_count;
@@ -1043,7 +1035,6 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 			joint->m_jointFeebackForce[j] = rhs[j].m_force;
 		}
 	}
-*/
 }
 
 void dVehicleSolver::DebugMassMatrix()
@@ -1278,7 +1269,6 @@ void dVehicleSolver::Update(dFloat timestep)
 	m_massMatrix11 = dAlloca(dFloat, col * col);
 
 	if (m_auxiliaryRowCount || m_loopRowCount) {
-		dAssert(0);
 		InitLoopMassMatrix();
 	}
 	dVectorPair* const force = dAlloca(dVectorPair, m_nodeCount + 1);

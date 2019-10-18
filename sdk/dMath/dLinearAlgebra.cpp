@@ -384,6 +384,13 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 	constraintParams->m_count = index + 1;
 }
 
+dFloat dComplementaritySolver::dBilateralJoint::GetRowAccelaration(dParamInfo* const constraintParams) const
+{ 
+	dAssert(m_count > 0);
+	return constraintParams->m_jointAccel[m_count - 1]; 
+}
+
+/*
 dFloat dComplementaritySolver::dBilateralJoint::CalculateRowZeroAccelaration (dParamInfo* const constraintParams) const
 {
 	const int i = constraintParams->m_count - 1;
@@ -399,6 +406,7 @@ dFloat dComplementaritySolver::dBilateralJoint::CalculateRowZeroAccelaration (dP
 				  constraintParams->m_jacobians[i].m_jacobian_J10.m_angular * omega1);
 	return -(accel.m_x + accel.m_y + accel.m_z) * constraintParams->m_timestepInv;
 }
+*/
 
 dFloat dComplementaritySolver::dBilateralJoint::CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const
 {
