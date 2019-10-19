@@ -14,15 +14,15 @@
         <dSceneNodeInfo>
             <dNodeInfo name="car_body" nodeID="3" editorFlags="0" />
             <color float4="0.75 0.75 0 0" />
-            <transform position="0.103373 0.355591 0.000925245 1" eulerAngles="0 -0 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
-            <geometryTransform matrix="1 2.22796e-09 -3.0598e-07 0 -2.22793e-09 1 9.53694e-08 0 3.0598e-07 -9.53694e-08 1 0 -0.045325 0.346387 5.53065e-10 1" />
+            <transform position="0.103373 0.460324 0.000925245 1" eulerAngles="0 -0 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="1 2.22796e-09 -3.0598e-07 0 -2.22793e-09 1 9.53694e-08 0 3.0598e-07 -9.53694e-08 1 0 -0.045325 0.241654 5.53065e-10 1" />
             <parentNodes count="1" indices="0" />
             <childrenNodes count="7" indices="4 5 6 7 8 9 33" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="ConvexHull_Hidden_01" nodeID="4" editorFlags="0" />
             <color float4="0.75 0.75 0 0" />
-            <transform position="2.42233e-08 0 -2.42233e-08 1" eulerAngles="0 -4.76837e-07 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <transform position="2.42233e-08 -0.104733 -2.42233e-08 1" eulerAngles="0 -4.76837e-07 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 2.22796e-09 -3.0598e-07 0 -2.22793e-09 1 9.53694e-08 0 3.0598e-07 -9.53694e-08 1 0 -0.045325 0.346387 5.53065e-10 1" />
             <parentNodes count="1" indices="3" />
             <childrenNodes count="1" indices="35" />
@@ -30,7 +30,7 @@
         <dSceneNodeInfo>
             <dNodeInfo name="ConvexHull_Hidden_02" nodeID="5" editorFlags="0" />
             <color float4="0.75 0.75 0 0" />
-            <transform position="2.42233e-08 0 -2.42233e-08 1" eulerAngles="0 -4.76837e-07 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <transform position="2.42233e-08 -0.104733 -2.42233e-08 1" eulerAngles="0 -4.76837e-07 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 2.22796e-09 -3.0598e-07 0 -2.22793e-09 1 9.53694e-08 0 3.0598e-07 -9.53694e-08 1 0 -0.045325 0.346387 5.53065e-10 1" />
             <parentNodes count="1" indices="3" />
             <childrenNodes count="1" indices="31" />
@@ -38,32 +38,32 @@
         <dSceneNodeInfo>
             <dNodeInfo name="rr_tire" nodeID="6" editorFlags="0" />
             <color float4="0.75 0.75 0 0" />
-            <transform position="-1.21908 -0.0310147 0.735674 1" eulerAngles="0 1.5708 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
-            <geometryTransform matrix="-8.54632e-05 3.62338e-05 38.475 0 -38.475 -1.92454e-11 -8.54631e-05 0 -6.12395e-11 -38.475 3.62338e-05 0 0 0 0 1" />
+            <transform position="-1.22316 -0.0990041 0.705952 1" eulerAngles="0 1.5708 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="-8.54632e-05 3.62338e-05 38.475 0 -38.475 -1.92454e-11 -8.54631e-05 0 -6.12395e-11 -38.475 3.62338e-05 0 -0.0297219 -0.0367436 0.00407832 1" />
             <parentNodes count="1" indices="3" />
             <childrenNodes count="1" indices="30" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="rl_tire" nodeID="7" editorFlags="0" />
             <color float4="0.75 0.75 0 0" />
-            <transform position="-1.21908 -0.0310147 -0.737526 1" eulerAngles="0 -1.5708 -0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
-            <geometryTransform matrix="-8.54632e-05 3.62338e-05 38.475 0 -38.475 -1.92454e-11 -8.54631e-05 0 -6.12395e-11 -38.475 3.62338e-05 0 0 0 0 1" />
+            <transform position="-1.215 -0.0990041 -0.707804 1" eulerAngles="0 -1.5708 -0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="-8.54632e-05 3.62338e-05 38.475 0 -38.475 -1.92454e-11 -8.54631e-05 0 -6.12395e-11 -38.475 3.62338e-05 0 -0.0297219 -0.0367436 0.00407832 1" />
             <parentNodes count="1" indices="3" />
             <childrenNodes count="1" indices="29" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="fr_tire" nodeID="8" editorFlags="0" />
             <color float4="0.75 0.75 0 0" />
-            <transform position="1.15712 -0.0310148 0.735676 1" eulerAngles="0 1.5708 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
-            <geometryTransform matrix="-3.04242e-05 3.62338e-05 38.475 0 -38.475 -1.96774e-12 -3.04242e-05 0 -2.66843e-11 -38.475 3.62338e-05 0 0 0 0 1" />
+            <transform position="1.15304 -0.0990042 0.705954 1" eulerAngles="0 1.5708 0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="-3.04242e-05 3.62338e-05 38.475 0 -38.475 -1.96774e-12 -3.04242e-05 0 -2.66843e-11 -38.475 3.62338e-05 0 -0.0297219 -0.0367436 0.00407832 1" />
             <parentNodes count="1" indices="3" />
             <childrenNodes count="1" indices="28" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="fl_tire" nodeID="9" editorFlags="0" />
             <color float4="0.75 0.75 0 0" />
-            <transform position="1.15712 -0.0310148 -0.737524 1" eulerAngles="0 -1.5708 -0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
-            <geometryTransform matrix="-3.04242e-05 3.62338e-05 38.475 0 -38.475 -1.96774e-12 -3.04242e-05 0 -2.66843e-11 -38.475 3.62338e-05 0 0 0 0 1" />
+            <transform position="1.1612 -0.0990042 -0.707803 1" eulerAngles="0 -1.5708 -0 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
+            <geometryTransform matrix="-3.04242e-05 3.62338e-05 38.475 0 -38.475 -1.96774e-12 -3.04242e-05 0 -2.66843e-11 -38.475 3.62338e-05 0 -0.0297219 -0.0367436 0.00407832 1" />
             <parentNodes count="1" indices="3" />
             <childrenNodes count="1" indices="11" />
         </dSceneNodeInfo>
