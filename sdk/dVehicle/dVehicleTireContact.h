@@ -59,11 +59,14 @@ class dVehicleTireContact: public dVehicleLoopJoint
 	dVector m_longitudinalDir;
 	dFloat m_penetration;
 	dFloat m_staticFriction;
-	dFloat m_kineticFriction;
-	dFloat m_load;
+//	dFloat m_kineticFriction;
+	dFloat m_load____;
+	dFloat m_lateralSlip;
+	dFloat m_longitudinalSlip;
+
 	dTireModel m_tireModel;
-	dFloat m_normalFilter[4];
-	bool m_isActiveFilter[4];
+//	dFloat m_normalFilter[4];
+//	bool m_isActiveFilter[4];
 
 	friend class dVehicleTire;
 };
