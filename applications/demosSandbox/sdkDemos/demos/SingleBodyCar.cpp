@@ -358,9 +358,9 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dFloat Iyy;
 		dFloat Izz;
 		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-		Ixx *= 2.0f;
-		Iyy *= 2.0f; 
-		Izz *= 2.0f;
+		Ixx *= 1.5f;
+		Iyy *= 1.5f; 
+		Izz *= 1.5f;
 		NewtonBodySetMassMatrix(body, mass, Ixx, Iyy, Izz);
 		NewtonDestroyCollision(shape);
 		return body;

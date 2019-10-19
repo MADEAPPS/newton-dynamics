@@ -10,6 +10,9 @@
 */
 
 #include "dStdafxVehicle.h"
+#include "dVehicleNode.h"
+#include "dVehicleTire.h"
+#include "dVehicleChassis.h"
 #include "dVehicleTireContact.h"
 
 dVehicleTireContact::dVehicleTireContact()
@@ -72,6 +75,46 @@ void dVehicleTireContact::SetContact(const dVector& posit, const dVector& normal
 	m_staticFriction = staticFriction;
 //	m_kineticFriction = kineticFriction;
 	m_penetration = dClamp(penetration, dFloat(-D_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
+}
+
+void dVehicleTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const
+{
+	dVehicleTire* const tire = GetOwner0()->GetAsTire();
+	dVehicleChassis* const chassis = GetOwner0()->GetParent()->GetAsVehicle();
+
+	dAssert(tire);
+	dAssert(chassis);
+
+	const dMatrix& tireMatrix = tire->GetProxyBody().GetMatrix();
+	const dMatrix& chassisMatrix = chassis->GetProxyBody().GetMatrix();
+
+	dVector localPosit(chassisMatrix.UntransformVector(tireMatrix.m_posit));
+	dVector origin(m_point + m_normal.Scale(1.0f / 32.0f));
+	if (localPosit.m_z > 0.0f) {
+		origin += m_lateralDir.Scale(1.0f / 4.0f);
+	}
+	else {
+		origin -= m_lateralDir.Scale(1.0f / 4.0f);
+	}
+
+	scale *= 4.0f;
+
+	// show tire load
+	debugContext->SetColor(dVector(0.0f, 0.0f, 1.0f, 1.0f));
+	dVector p1(origin + m_normal.Scale(scale * m_jointFeebackForce[0]));
+	debugContext->DrawLine(origin, p1);
+
+	scale *= 1.0f;
+	// show tire longitudinal force
+	debugContext->SetColor(dVector(0.0f, 1.0f, 0.0f, 1.0f));
+	dVector p2(origin + m_longitudinalDir.Scale(scale * m_jointFeebackForce[1]));
+	debugContext->DrawLine(origin, p2);
+
+	// show tire lateral force
+	debugContext->SetColor(dVector(1.0f, 0.0f, 0.0f, 1.0f));
+	dVector p3(origin + m_lateralDir.Scale(scale * m_jointFeebackForce[2]));
+
+	debugContext->DrawLine(origin, p3);
 }
 
 void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)

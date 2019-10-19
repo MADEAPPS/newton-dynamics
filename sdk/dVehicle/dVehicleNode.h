@@ -48,6 +48,7 @@ class dVehicleNode: public dCustomAlloc
 	void* GetUserData() const {return m_usedData;}
 	void SetUserData(void* const userData) {m_usedData = userData;}
 
+	dVehicleNode* GetParent() const {return m_parent;}
 	dVehicleNodeChildrenList& GetChildrenList() { return m_children; }
 	const dVehicleNodeChildrenList& GetChildrenList() const { return m_children; }
 

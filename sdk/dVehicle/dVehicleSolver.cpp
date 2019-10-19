@@ -158,7 +158,7 @@ void dVehicleSolver::CalculateInertiaMatrix(dVehicleNode* const node) const
 
 void dVehicleSolver::GetJacobians(dVehicleNode* const node)
 {
-	dAssert(node->m_parent);
+	dAssert(node->GetParent());
 	dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
 
 	//const int index = node->GetProxyBody()->GetIndex();
@@ -200,7 +200,7 @@ void dVehicleSolver::CalculateBodyDiagonal(dVehicleNode* const child)
 	}
 	
 	//const int parentIndes = child->GetParent()->GetProxyBody()->GetIndex();
-	const int parentIndex = child->m_parent->m_index;
+	const int parentIndex = child->GetParent()->m_index;
 	dSpatialMatrix& bodyMass = m_data[parentIndex].m_body.m_mass;
 	for (int i = 0; i < dof; i++) {
 		const dSpatialVector& Jacobian = copy[i];
@@ -271,7 +271,7 @@ void dVehicleSolver::Factorize(dVehicleNode* const node)
 	if (joint) {
 
 		joint->m_ordinals = 0x050403020100ll;
-		dAssert(node->m_parent);
+		dAssert(node->GetParent());
 
 		joint->m_dof = 0;
 		int count = joint->m_count;
@@ -311,7 +311,7 @@ void dVehicleSolver::Factorize(dVehicleNode* const node)
 
 	if (joint) {
 		dSpatialMatrix& bodyJt = m_data[nodeIndex].m_body.m_jt;
-		dAssert(node->m_parent);
+		dAssert(node->GetParent());
 		for (int i = 0; i < joint->m_dof; i++) {
 			bodyJt[i] = bodyInvMass.VectorTimeMatrix(bodyJt[i]);
 		}
@@ -435,7 +435,7 @@ void dVehicleSolver::InitLoopMassMatrix()
 		dAssert(joint);
 		dAssert(i == node->m_index);
 		const int m0 = node->m_index;
-		const int m1 = node->m_parent->m_index;
+		const int m1 = node->GetParent()->m_index;
 
 		const int first = joint->m_start;
 		const int primaryDof = joint->m_dof;
@@ -789,7 +789,7 @@ void dVehicleSolver::SolveForward(dVectorPair* const force, const dVectorPair* c
 		//for (dList<dVehicleNode*>::dListNode* childNode = children.GetFirst(); childNode; childNode = childNode->GetNext()) {
 		for (dVehicleNodeChildrenList::dListNode* childNode = node->m_children.GetFirst(); childNode; childNode = childNode->GetNext()) {
 			dVehicleNode* const child = childNode->GetInfo();
-			dAssert(child->m_parent->m_index == i);
+			dAssert(child->GetParent()->m_index == i);
 			BodyJacobianTimeMassForward(child, force[child->m_index], f);
 		}
 		JointJacobianTimeMassForward(node, f);
@@ -803,7 +803,7 @@ void dVehicleSolver::SolveForward(dVectorPair* const force, const dVectorPair* c
 	//for (dList<dVehicleNode*>::dListNode* childNode = children.GetFirst(); childNode; childNode = childNode->GetNext()) {
 	for (dVehicleNodeChildrenList::dListNode* childNode = rootNode->m_children.GetFirst(); childNode; childNode = childNode->GetNext()) {
 		dVehicleNode* const child = childNode->GetInfo();
-		dAssert(child->m_parent->m_index == n);
+		dAssert(child->GetParent()->m_index == n);
 		BodyJacobianTimeMassForward(child, force[child->m_index], force[n]);
 	}
 
@@ -822,8 +822,8 @@ void dVehicleSolver::SolveBackward(dVectorPair* const force, const dVectorPair* 
 		dVehicleNode* const node = m_nodesOrder[i];
 		dAssert(i == node->m_index);
 		dVectorPair& f = force[i];
-		//JointJacobianTimeSolutionBackward(node, f, force[node->m_parent->GetProxyBody()->GetIndex()]);
-		JointJacobianTimeSolutionBackward(node, f, force[node->m_parent->m_index]);
+		//JointJacobianTimeSolutionBackward(node, f, force[node->GetParent()->GetProxyBody()->GetIndex()]);
+		JointJacobianTimeSolutionBackward(node, f, force[node->GetParent()->m_index]);
 		BodyJacobianTimeSolutionBackward(node, f);
 	}
 }
@@ -861,7 +861,7 @@ void dVehicleSolver::UpdateForces(const dVectorPair* const force) const
 		}
 
 		dAssert(&node->GetProxyBody() == joint->m_state0);
-		dAssert(&node->m_parent->GetProxyBody() == joint->m_state1);
+		dAssert(&node->GetParent()->GetProxyBody() == joint->m_state1);
 		dComplementaritySolver::dBodyState* const body0 = (dComplementaritySolver::dBodyState *)joint->m_state0;
 		dComplementaritySolver::dBodyState* const body1 = (dComplementaritySolver::dBodyState *)joint->m_state1;
 
@@ -994,7 +994,7 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 		}
 
 		dVehicleNode* const node0 = node;
-		dVehicleNode* const node1 = node->m_parent;
+		dVehicleNode* const node1 = node->GetParent();
 		dComplementaritySolver::dBodyState* const state0 = &node0->GetProxyBody();
 		dComplementaritySolver::dBodyState* const state1 = &node1->GetProxyBody();
 		dAssert(state0 == &m_nodesOrder[node0->m_index]->GetProxyBody());

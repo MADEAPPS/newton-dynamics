@@ -102,10 +102,33 @@ void dVehicleChassis::Finalize()
 
 const void dVehicleChassis::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
-	//dAssert(0);
 	dVehicleNode::Debug(debugContext);
-	//dTrace(("%s\n", __FUNCTION__));
-	//m_vehicle->Debug(debugContext);
+
+	const dMatrix& matrix = m_proxyBody.GetMatrix();
+
+	// draw velocity
+	dVector veloc(m_proxyBody.GetVelocity());
+	veloc = veloc - matrix.m_up.Scale(veloc.DotProduct3(matrix.m_up));
+	dFloat mag = dSqrt(veloc.DotProduct3(veloc));
+	veloc = veloc.Scale(dLog(mag) / (mag + 0.1f));
+
+	debugContext->SetColor(dVector(1.0f, 0.65f, 0.0f, 1.0f));
+	dVector p0(matrix.m_posit + matrix.m_up.Scale(1.0f));
+	dVector p1(p0 + veloc);
+	debugContext->DrawLine(p0, p1);
+
+	debugContext->SetColor(dVector(0.5f, 0.5f, 0.5f, 1.0f));
+	dVector p2(p0 + matrix.m_front.Scale(2.0f));
+	debugContext->DrawLine(p0, p2);
+
+	//draw vehicle weight
+	if (m_gravity.DotProduct3(m_gravity) > 0.1) {
+		// for now weight is normalize to 2.0
+		debugContext->SetColor(dVector(0.0f, 0.0f, 1.0f, 1.0f));
+		dVector gravity(m_gravity.Normalize());
+		dVector p3(p0 - gravity.Scale(2.0f));
+		debugContext->DrawLine(p0, p3);
+	}
 }
 
 void dVehicleChassis::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep)
@@ -121,8 +144,6 @@ void dVehicleChassis::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat 
 		m_engineControl->SetGear(dVehicleEngineInterface::m_firstGear);
 	}
 
-
-#if 0
 	if (m_engineControl) {
 		m_engineControl->SetDifferentialLock(driveInputs.m_lockDifferential ? true : false);
 
@@ -292,7 +313,7 @@ void dVehicleChassis::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat 
 	else if (m_handBrakesControl) {
 		m_handBrakesControl->SetParam(driveInputs.m_handBrakeValue);
 	}
-#endif
+
 #endif
 }
 

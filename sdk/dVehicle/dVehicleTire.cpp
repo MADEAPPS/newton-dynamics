@@ -33,7 +33,7 @@ dVehicleTire::dVehicleTire(dVehicleChassis* const chassis, const dMatrix& locati
 	//SetWorld(parent->GetWorld());
 	//m_dynamicContactBodyNode.SetLoopNode(true);
 	//m_dynamicContactBodyNode.SetWorld(m_world);
-	Init(&m_proxyBody, &m_parent->GetProxyBody());
+	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 	
 	NewtonBody* const chassisBody = chassis->GetBody();
 	NewtonWorld* const world = NewtonBodyGetWorld(chassis->GetBody());
@@ -139,7 +139,7 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 	int contactCount = 0;
 	dFloat friction = m_info.m_frictionCoefficient;
 	if (bodyArray.m_staticCount) {
-		dVehicleChassis* const chassisNode = m_parent->GetAsVehicle();
+		dVehicleChassis* const chassisNode = GetParent()->GetAsVehicle();
 		NewtonWorld* const world = NewtonBodyGetWorld(chassisNode->GetBody());
 		dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 
@@ -227,7 +227,7 @@ dMatrix dVehicleTire::GetLocalMatrix() const
 dMatrix dVehicleTire::GetGlobalMatrix() const
 {
 	dMatrix newtonBodyMatrix;
-	dVehicleChassis* const chassisNode = m_parent->GetAsVehicle();
+	dVehicleChassis* const chassisNode = GetParent()->GetAsVehicle();
 	dAssert(chassisNode);
 	return GetLocalMatrix() * chassisNode->GetProxyBody().GetMatrix();
 }
@@ -253,26 +253,28 @@ const void dVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 	dMatrix tireMatrix(m_bindingRotation.Transpose() * GetGlobalMatrix());
 	NewtonCollisionForEachPolygonDo(m_tireShape, &tireMatrix[0][0], RenderDebugTire, debugContext);
 
-	//dVehicleChassis* const chassis = (dVehicleChassis*)(m_parent->GetVehicle());
-	//dAssert (chassis);
+	dVehicleChassis* const chassis = GetParent()->GetAsVehicle();
+	dAssert (chassis);
+
 	// render tire matrix
-	//dMatrix hubTireMatrix(GetHardpointMatrix(m_position * m_invSuspensionLength) * chassis->GetMatrix());
+	dComplementaritySolver::dBodyState* const chassisBody = &chassis->GetProxyBody();
+	//dMatrix hubTireMatrix(GetHardpointMatrix(m_position * m_invSuspensionLength) * chassisBody->GetMatrix());
 	//debugContext->DrawFrame(hubTireMatrix, 1.0f);
 	//debugContext->DrawFrame(tireMatrix, 1.0f);
 
-	//dVector weight (chassis->m_gravity.Scale(chassis->GetProxyBody()->GetMass()));
-	//dFloat scale (1.0f / dSqrt (weight.DotProduct3(weight)));
-	//for (int i = 0; i < sizeof (m_contactsJoints)/sizeof (m_contactsJoints[0]); i ++) {
-	//	const dTireContact* const contact = &m_contactsJoints[i];
-	//	if (contact->IsActive()) {
-	//		contact->Debug(debugContext, scale);
-	//	}
-	//}
+	dVector weight (chassis->m_gravity.Scale(chassisBody->GetMass()));
+	dFloat scale (1.0f / dSqrt (weight.DotProduct3(weight)));
+	for (int i = 0; i < sizeof (m_contactsJoints)/sizeof (m_contactsJoints[0]); i ++) {
+		const dVehicleTireContact* const contact = &m_contactsJoints[i];
+		if (contact->IsActive()) {
+			contact->Debug(debugContext, scale);
+		}
+	}
 }
 
 void dVehicleTire::ApplyExternalForce()
 {
-	dVehicleChassis* const chassisNode = m_parent->GetAsVehicle();
+	dVehicleChassis* const chassisNode = GetParent()->GetAsVehicle();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 
 	dMatrix tireMatrix(GetHardpointMatrix(m_position * m_invSuspensionLength) * chassisBody->GetMatrix());
@@ -288,7 +290,7 @@ void dVehicleTire::ApplyExternalForce()
 
 void dVehicleTire::CalculateFreeDof()
 {
-	dVehicleChassis* const chassis = m_parent->GetAsVehicle();
+	dVehicleChassis* const chassis = GetParent()->GetAsVehicle();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassis->GetProxyBody();
 
 	//const dMatrix chassisMatrix(chassisBody->GetMatrix());
@@ -331,13 +333,11 @@ void dVehicleTire::CalculateFreeDof()
 	//m_position += m_speed * timestep;
 	m_position = chassisMatrix.m_right.DotProduct3(tireMatrix.m_posit - chassisMatrix.m_posit);
 	if (m_position <= -m_info.m_suspensionLength * 0.25f) {
-		dAssert (0);
-		//m_speed = 0.0f;
-		//m_position = 0.0f;
+		m_speed = 0.0f;
+		m_position = 0.0f;
 	} else if (m_position >= m_info.m_suspensionLength * 1.25f) {
-		dAssert (0);
-		//m_speed = 0.0f;
-		//m_position = m_info.m_suspensionLength;
+		m_speed = 0.0f;
+		m_position = m_info.m_suspensionLength;
 	}
 }
 
