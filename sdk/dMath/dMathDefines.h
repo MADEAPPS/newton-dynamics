@@ -227,7 +227,6 @@ void dSort (T* const array, int elements, int (*compare) (const T* const  A, con
 #endif
 }
 
-
 // return dot product
 template<class T>
 T dDotProduct(int size, const T* const A, const T* const B)
@@ -238,7 +237,6 @@ T dDotProduct(int size, const T* const A, const T* const B)
 	}
 	return val;
 }
-
 
 template<class T>
 void dMatrixTimeVector(int size, const T* const matrix, const T* const v, T* const out)

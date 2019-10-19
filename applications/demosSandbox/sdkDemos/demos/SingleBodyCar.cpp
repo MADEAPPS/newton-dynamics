@@ -335,8 +335,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dAssert(carEntity->Find("car_body"));
 		dAssert(carEntity->Find("car_body") == carEntity);
 
-		DemoMesh* const mesh = (DemoMesh*)carEntity->GetMesh();
-		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+		//DemoMesh* const mesh = (DemoMesh*)carEntity->GetMesh();
+		//dAssert(mesh->IsType(DemoMesh::GetRttiType()));
 		//const dMatrix& meshMatrix = carEntity->GetMeshMatrix();
 		//dArray<dFloat> temp(mesh->m_vertexCount * 3);
 		//meshMatrix.TransformTriplex(&temp[0], 3 * sizeof (dFloat), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);

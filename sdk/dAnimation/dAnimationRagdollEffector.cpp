@@ -93,7 +93,7 @@ void dAnimationRagDollEffector::JacobianDerivative(dComplementaritySolver::dPara
 	const dVector& coneDir0 = matrix0.m_front;
 	const dVector& coneDir1 = matrix1.m_front;
 
-	const dFloat angleStep = m_maxAngularSpeed * constraintParams->m_timestep;
+	//const dFloat angleStep = m_maxAngularSpeed * constraintParams->m_timestep;
 	dFloat cosAngleCos = coneDir1.DotProduct3(coneDir0);
 	if (cosAngleCos < 0.9999f) {
 		dMatrix coneRotation(dGetIdentityMatrix());

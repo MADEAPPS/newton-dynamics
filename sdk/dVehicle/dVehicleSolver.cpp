@@ -9,7 +9,6 @@
 * freely
 */
 
-
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
 #include "dVehicleSolver.h"
@@ -337,10 +336,6 @@ void dVehicleSolver::CalculateLoopMassMatrixCoefficients()
 		const int m0_i = m_pairs[primaryCount + i].m_m0;
 		const int m1_i = m_pairs[primaryCount + i].m_m1;
 
-		//dVehicleNode* const node0 = m_nodesOrder[m0_i];
-		//dVehicleNode* const node1 = m_nodesOrder[m1_i];
-		//dComplementaritySolver::dBodyState* const state0 = node0->GetProxyBody();
-		//dComplementaritySolver::dBodyState* const state1 = node1->GetProxyBody();
 		dComplementaritySolver::dBodyState* const state0 = &m_nodesOrder[m0_i]->GetProxyBody();
 		dComplementaritySolver::dBodyState* const state1 = &m_nodesOrder[m1_i]->GetProxyBody();
 
@@ -877,6 +872,101 @@ void dVehicleSolver::UpdateForces(const dVectorPair* const force) const
 	}
 }
 
+void dVehicleSolver::dGaussSeidelLcpSor(const int size, dFloat* const x, const dFloat* const b, const int* const normalIndex, dFloat* const low, dFloat* const high) const
+{
+	const dFloat* const me = m_massMatrix11;
+	dFloat* const invDiag1 = dAlloca(dFloat, size);
+	dFloat* const u = dAlloca(dFloat, size + 1);
+	int* const index = dAlloca(int, size);
+	
+	const dFloat sor = 1.15f;
+	const dFloat tol2 = 0.001f;
+	const int maxIterCount = 30; 
+
+	u[size] = dFloat(1.0f);
+	int rowStart = 0;
+	for (int j = 0; j < size; j++) {
+		u[j] = x[j];
+		index[j] = normalIndex[j] ? j + normalIndex[j] : size;
+	}
+
+	for (int j = 0; j < size; j++) {
+		const dFloat val = u[index[j]];
+		const dFloat l = low[j] * val;
+		const dFloat h = high[j] * val;
+		u[j] = dClamp(u[j], l, h);
+		invDiag1[j] = dFloat(1.0f) / me[rowStart + j];
+		rowStart += size;
+	}
+
+
+	dFloat tolerance = tol2 * 2.0f;
+	const dFloat* const invDiag = invDiag1;
+	const int maxCount = dMax(8, size);
+	for (int i = 0; (i < maxCount) && (tolerance > tol2); i++) {
+		int base = 0;
+		tolerance = dFloat(0.0f);
+		for (int j = 0; j < size; j++) {
+			const dFloat* const row = &me[base];
+			dFloat r = b[j];
+			for (int k = 0; k < size; k++) {
+				r -= row[k] * u[k];
+			}
+			dFloat f = (r + row[j] * u[j]) * invDiag[j];
+
+			const dFloat val = u[index[j]];
+			const dFloat l = low[j] * val;
+			const dFloat h = high[j] * val;
+			if (f > h) {
+				u[j] = h;
+			} else if (f < l) {
+				u[j] = l;
+			} else {
+				tolerance += r * r;
+				u[j] = f;
+			}
+			base += size;
+		}
+	}
+
+#ifdef _DEBUG 
+	int passes = 0;
+#endif
+	for (int i = 0; (i < maxIterCount) && (tolerance > tol2); i++) {
+		int base = 0;
+		tolerance = dFloat(0.0f);
+#ifdef _DEBUG 
+		passes++;
+#endif
+		for (int j = 0; j < size; j++) {
+			const dFloat* const row = &me[base];
+			dFloat r = b[j];
+			for (int k = 0; k < size; k++) {
+				r -= row[k] * u[k];
+			}
+			dFloat f = (r + row[j] * u[j]) * invDiag[j];
+			f = u[j] + (f - u[j]) * sor;
+
+			const dFloat val = u[index[j]];
+			const dFloat l = low[j] * val;
+			const dFloat h = high[j] * val;
+			if (f > h) {
+				u[j] = h;
+			} else if (f < l) {
+				u[j] = l;
+			} else {
+				tolerance += r * r;
+				u[j] = f;
+			}
+			base += size;
+		}
+	}
+
+	for (int j = 0; j < size; j++) {
+		x[j] = u[j];
+	}
+}
+
 void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair* const accel) const
 {
 	const int n = m_loopRowCount + m_auxiliaryRowCount;
@@ -950,9 +1040,6 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 
 	for (int j = 0; j < m_loopJointCount; j++) {
 		dVehicleLoopJoint* const joint = m_loopJoints[j];
-
-		//dVehicleNode* const node0 = joint->GetOwner0();
-		//dVehicleNode* const node1 = joint->GetOwner1();
 		const int first = joint->m_start;
 		const int auxiliaryDof = joint->m_count;
 
@@ -998,7 +1085,7 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 		b[i] -= r;
 	}
 
-	dGaussSeidelLcpSor(n, n, m_massMatrix11, u, b, normalIndex, low, high, dFloat(0.001f), 30, dFloat(1.15f));
+	dGaussSeidelLcpSor(n, u, b, normalIndex, low, high);
 
 	for (int i = 0; i < n; i++) {
 		const dFloat s = u[i];
@@ -1016,8 +1103,6 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 		const int m0 = m_pairs[i].m_m0;
 		const int m1 = m_pairs[i].m_m1;
 
-		//dComplementaritySolver::dBodyState* const state0 = m_nodesOrder[m0]->GetProxyBody();
-		//dComplementaritySolver::dBodyState* const state1 = m_nodesOrder[m1]->GetProxyBody();
 		dComplementaritySolver::dBodyState* const state0 = &m_nodesOrder[m0]->GetProxyBody();
 		dComplementaritySolver::dBodyState* const state1 = &m_nodesOrder[m1]->GetProxyBody();
 
@@ -1050,175 +1135,6 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 			joint->m_jointFeebackForce[j] = rhs[j].m_force;
 		}
 	}
-}
-
-void dVehicleSolver::DebugMassMatrix()
-{
-	dAssert(0);
-/*
-	dNodePair pairs[30];
-	dFloat matrix[30 * 30];
-	int matrixRowsIndex[30];
-
-	int rows = 0;
-	int auxiliaryCount = 0;
-	for (int i = 0; i < m_nodeCount - 1; i++) {
-		dVehicleNode* const node = m_nodesOrder[i];
-		const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
-		dAssert(joint);
-		dAssert(i == node->GetProxyBody()->GetIndex());
-
-		const int m0 = node->GetProxyBody()->GetIndex();
-		const int m1 = node->m_parent->GetIndex();
-		const int first = joint->m_start;
-		const int primaryDof = joint->m_dof;
-		for (int j = 0; j < primaryDof; j++) {
-			const int index = joint->m_sourceJacobianIndex[j];
-			pairs[rows].m_m0 = m0;
-			pairs[rows].m_m1 = m1;
-			matrixRowsIndex[rows] = first + index;
-			rows++;
-		}
-	}
-
-	for (int i = 0; i < m_nodeCount - 1; i++) {
-		dVehicleNode* const node = m_nodesOrder[i];
-		const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
-		dAssert(joint);
-		dAssert(i == node->GetProxyBody()->GetIndex());
-
-		const int m0 = node->GetProxyBody()->GetIndex();
-		const int m1 = node->m_parent->GetIndex();
-		const int first = joint->m_start;
-		const int primaryDof = joint->m_dof;
-		const int auxiliaryDof = joint->m_count - primaryDof;
-		for (int j = 0; j < auxiliaryDof; j++) {
-			const int index = joint->m_sourceJacobianIndex[primaryDof + j];
-			pairs[rows].m_m0 = m0;
-			pairs[rows].m_m1 = m1;
-			matrixRowsIndex[rows] = first + index;
-			rows++;
-			auxiliaryCount ++;
-		}
-	}
-
-	for (int j = 0; j < m_loopJointCount; j ++) {
-		dAnimIDRigKinematicLoopJoint* const joint = m_loopJoints[j];	
-		const dVehicleNode* const node0 = joint->GetOwner0();
-		const dVehicleNode* const node1 = joint->GetOwner1();
-		const int m0 = node0->GetIndex();
-		const int m1 = node1->GetIndex();
-		const int first = joint->m_start;
-		const int auxiliaryDof = joint->m_dof;
-		for (int i = 0; i < auxiliaryDof; i++) {
-			pairs[rows].m_m0 = m0;
-			pairs[rows].m_m1 = m1;
-			matrixRowsIndex[rows] = first + i;
-			rows++;
-			auxiliaryCount++;
-		}
-	}
-	
-	dFloat u[30];
-	dFloat b[30];
-	dFloat low[30];
-	dFloat high[30];
-	int normalIndex[30];
-	const dVector zero(0.0f);
-	memset (matrix, 0, sizeof (dFloat) * rows * rows);
-	for (int i = 0; i < rows; i++) {
-		const int ii = matrixRowsIndex[i];
-
-		const dComplementaritySolver::dJacobianPair* const row_i = &m_leftHandSide[ii];
-		const dComplementaritySolver::dJacobianColum* const rhs_i = &m_rightHandSide[ii];
-		dFloat* const matrixRow11 = &matrix[rows * i];
-
-		const int m0_i = pairs[i].m_m0;
-		const int m1_i = pairs[i].m_m1;
-
-		dVehicleNode* const node0 = m_nodesOrder[m0_i];
-		dVehicleNode* const node1 = m_nodesOrder[m1_i];
-		dComplementaritySolver::dBodyState* const state0 = node0->GetProxyBody();
-		dComplementaritySolver::dBodyState* const state1 = node1->GetProxyBody();
-
-		const dMatrix& invInertia0 = state0->GetInvInertia();
-		const dMatrix& invInertia1 = state1->GetInvInertia();
-
-		const dFloat invMass0 = state0->GetInvMass();
-		const dFloat invMass1 = state1->GetInvMass();
-
-		dComplementaritySolver::dJacobian J01invM0(row_i->m_jacobian_J01.m_linear.Scale(invMass0), invInertia0.RotateVector(row_i->m_jacobian_J01.m_angular));
-		dComplementaritySolver::dJacobian J10invM1(row_i->m_jacobian_J10.m_linear.Scale(invMass1), invInertia1.RotateVector(row_i->m_jacobian_J10.m_angular));
-		
-		dVector force0 (state0->GetForce());
-		dVector torque0 (state0->GetTorque());
-		dVector force1(state1->GetForce());
-		dVector torque1(state1->GetTorque());
-
-		dVector accel (J01invM0.m_linear * force0 + J01invM0.m_angular * torque0 +
-					   J10invM1.m_linear * force1 + J10invM1.m_angular * torque1);
-		
-		u[i] = 0.0f;
-		b[i] = rhs_i->m_coordenateAccel - accel.m_x - accel.m_y - accel.m_z;
-		low[i] = rhs_i->m_jointLowFriction;
-		high[i] = rhs_i->m_jointHighFriction;
-		normalIndex[i] = rhs_i->m_normalIndex;
-
-		for (int j = 0; j < rows; j++) {
-			const int jj = matrixRowsIndex[j];
-			const dComplementaritySolver::dJacobianPair* const row_j = &m_leftHandSide[jj];
-
-			const int k = j;
-			const int m0_j = pairs[k].m_m0;
-			const int m1_j = pairs[k].m_m1;
-
-			bool hasEffect = false;
-
-			dVector acc(zero);
-			if (m0_i == m0_j) {
-				hasEffect = true;
-				acc += J01invM0.m_linear * row_j->m_jacobian_J01.m_linear + J01invM0.m_angular * row_j->m_jacobian_J01.m_angular;
-			} else if (m0_i == m1_j) {
-				hasEffect = true;
-				acc += J01invM0.m_linear * row_j->m_jacobian_J10.m_linear + J01invM0.m_angular * row_j->m_jacobian_J10.m_angular;
-			}
-
-			if (m1_i == m1_j) {
-				hasEffect = true;
-				acc += J10invM1.m_linear * row_j->m_jacobian_J10.m_linear + J10invM1.m_angular * row_j->m_jacobian_J10.m_angular;
-			} else if (m1_i == m0_j) {
-				hasEffect = true;
-				acc += J10invM1.m_linear * row_j->m_jacobian_J01.m_linear + J10invM1.m_angular * row_j->m_jacobian_J01.m_angular;
-			}
-
-			if (hasEffect) {
-				dFloat offDiagValue = acc.m_x + acc.m_y + acc.m_z;
-				matrixRow11[j] = offDiagValue;
-			}
-		}
-	}
-
-//	for (int i = 0; i < rows; i++) {
-//		for (int j = 0; j < rows; j++) {
-//			dTrace(("%f ", matrix[i * rows + j]));
-//		}
-//		dTrace (("\n"));
-//	}
-//
-//	dTrace(("\n"));
-//	for (int i = 0; i < rows; i++) {
-//		dTrace(("%f ", b[i]));
-//	}
-//	dTrace(("\n"));
-
-//	dGaussSeidelLcpSor(rows, matrix, u, b, normalIndex, low, high, dFloat(1.0e-3f), 1000, dFloat(1.15f));
-	dSolvePartitionDantzigLCP(rows, matrix, u, b, low, high, rows - auxiliaryCount);
-
-	for (int i = 0; i < rows; i++) {
-		dTrace(("%f ", u[i]));
-	}
-//	dTrace(("\n"));
-*/
 }
 
 void dVehicleSolver::Update(dFloat timestep)
@@ -1269,20 +1185,4 @@ void dVehicleSolver::Update(dFloat timestep)
 	} else {
 		UpdateForces(force);
 	}
-
-////DebugMassMatrix();
-//for (int i = 0; i < m_nodeCount - 1; i++) {
-//	dAnimationAcyclicJoint* const node = m_nodesOrder[i];
-//	const dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
-//	for (int j = 0; j < joint->m_dof; j++) {
-//		dTrace(("%f ", joint->m_jointFeebackForce[j]));
-//	}
-//}
-//for (int i = 0; i < m_loopJointCount; i++) {
-//	dAnimIDRigKinematicLoopJoint* const joint = m_loopJoints[i];
-//	for (int j = 0; j < joint->m_dof; j++) {
-//		dTrace(("%f ", joint->m_jointFeebackForce[j]));
-//	}
-//}
-//dTrace(("\n"));
 }

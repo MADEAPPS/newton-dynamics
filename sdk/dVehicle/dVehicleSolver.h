@@ -43,7 +43,6 @@ class dVehicleSolver
 	int BuildJacobianMatrix(dFloat timestep);
 	void GetJacobians(dVehicleNode* const node);
 	void CalculateLoopMassMatrixCoefficients();
-//	int BuildJacobianMatrix(dFloat timestep, dAnimationContraint* const joint);
 	int BuildJacobianMatrix(dFloat timestep, dComplementaritySolver::dBilateralJoint* const joint);
 
 	void CalculateJointDiagonal(dVehicleNode* const node);
@@ -65,14 +64,10 @@ class dVehicleSolver
 	void BodyJacobianTimeSolutionBackward(dVehicleNode* const node, dVectorPair& force) const;
 	void BodyJacobianTimeMassForward(dVehicleNode* const node, const dVectorPair& force, dVectorPair& parentForce) const;
 	void JointJacobianTimeSolutionBackward(dVehicleNode* const node, dVectorPair& force, const dVectorPair& parentForce) const;
+	void dGaussSeidelLcpSor(const int size, dFloat* const x, const dFloat* const b, const int* const normalIndex, 
+							dFloat* const low, dFloat* const high) const;
 
-	void DebugMassMatrix();
-
-//	dVehicleChassis* m_rootNode;
 	dVehicleNode** m_nodesOrder;
-//	dAnimationBody** m_nodesOrder;
-
-	// cache temporary variables
 	int* m_matrixRowsIndex;
 	dNodePair* m_pairs;
 	dFloat* m_deltaForce;
@@ -80,7 +75,6 @@ class dVehicleSolver
 	dFloat* m_massMatrix11;
 	dBodyJointMatrixDataPair* m_data;
 	dVehicleLoopJoint** m_loopJoints;
-	
 	dComplementaritySolver::dJacobianPair* m_leftHandSide;
 	dComplementaritySolver::dJacobianColum* m_rightHandSide;
 	
@@ -91,7 +85,6 @@ class dVehicleSolver
 	int m_loopJointCount;
 	int m_auxiliaryRowCount;
 };
-
 
 #endif 
 
