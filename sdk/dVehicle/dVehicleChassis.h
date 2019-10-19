@@ -113,6 +113,7 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 	dVector m_obbOrigin;
 	dVehicleNode m_groundProxyBody;
 	dVehicleBrakeControl m_brakeControl;
+	dVehicleEngineControl m_engineControl;
 	dVehicleBrakeControl m_handBrakeControl;
 	dVehicleSteeringControl m_steeringControl;
 	NewtonBody* m_newtonBody;

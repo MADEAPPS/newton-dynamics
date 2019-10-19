@@ -15,36 +15,6 @@
 #include "dVehicleChassis.h"
 #include "dVehicleManager.h"
 
-
-#if 0
-
-
-dVehicleEngineControl* dVehicleChassis::GetEngineControl()
-{
-	if (!m_engineControl) {
-		m_engineControl = new dVehicleEngineControl(this);
-	}
-	return m_engineControl;
-}
-
-
-dVehicleDifferentialInterface* dVehicleChassis::AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire)
-{
-	return m_vehicle->AddDifferential(leftTire, rightTire);
-}
-
-dVehicleEngineInterface* dVehicleChassis::AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential)
-{
-	return m_vehicle->AddEngine(engineInfo, differential);
-}
-
-void dVehicleChassis::PostUpdate(dFloat timestep)
-{
-	m_vehicle->RigidBodyToStates();
-}
-
-#endif
-
 dVehicleChassis::dVehicleChassis(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
 	:dVehicleNode(NULL)
 	,dVehicleSolver()
@@ -58,8 +28,9 @@ dVehicleChassis::dVehicleChassis(NewtonBody* const body, const dMatrix& localFra
 	,m_manager(NULL)
 {
 	m_brakeControl.Init(this);
-	m_handBrakeControl.Init(this);
+	m_engineControl.Init(this);
 	m_steeringControl.Init(this);
+	m_handBrakeControl.Init(this);
 
 	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
 	dAssert(m_localFrame.TestOrthogonal());
@@ -351,6 +322,26 @@ dVehicleBrakeControl* dVehicleChassis::GetHandBrakeControl()
 	return &m_handBrakeControl;
 }
 
+#if 0
+
+dVehicleDifferentialInterface* dVehicleChassis::AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire)
+{
+	return m_vehicle->AddDifferential(leftTire, rightTire);
+}
+
+dVehicleEngineInterface* dVehicleChassis::AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential)
+{
+	return m_vehicle->AddEngine(engineInfo, differential);
+}
+
+void dVehicleChassis::PostUpdate(dFloat timestep)
+{
+	m_vehicle->RigidBodyToStates();
+}
+
+#endif
+
+
 
 void dVehicleChassis::ApplyExternalForce()
 {
@@ -542,10 +533,7 @@ void dVehicleChassis::PreUpdate(dFloat timestep)
 	m_brakeControl.Update(timestep);
 	m_handBrakeControl.Update(timestep);
 	m_steeringControl.Update(timestep);
-	
-	//if (m_engineControl) {
-	//	m_engineControl->Update(timestep);
-	//}
+	m_engineControl.Update(timestep);
 
 	ApplyExternalForce();
 	CalculateSuspensionForces(timestep);
@@ -558,3 +546,5 @@ void dVehicleChassis::PreUpdate(dFloat timestep)
 //NewtonBodySetForce(m_newtonBody, &vector[0]);
 //NewtonBodySetTorque(m_newtonBody, &vector[0]);
 }
+
+

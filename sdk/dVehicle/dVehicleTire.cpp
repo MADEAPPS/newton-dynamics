@@ -330,13 +330,15 @@ void dVehicleTire::CalculateFreeDof()
 
 	//m_position += m_speed * timestep;
 	m_position = chassisMatrix.m_right.DotProduct3(tireMatrix.m_posit - chassisMatrix.m_posit);
-	//if (m_position <= 0.0f) {
-	//	m_speed = 0.0f;
-	//	m_position = 0.0f;
-	//} else if (m_position >= m_info.m_suspensionLength) {
-	//	m_speed = 0.0f;
-	//	m_position = m_info.m_suspensionLength;
-	//}
+	if (m_position <= -m_info.m_suspensionLength * 0.25f) {
+		dAssert (0);
+		//m_speed = 0.0f;
+		//m_position = 0.0f;
+	} else if (m_position >= m_info.m_suspensionLength * 1.25f) {
+		dAssert (0);
+		//m_speed = 0.0f;
+		//m_position = m_info.m_suspensionLength;
+	}
 }
 
 void dVehicleTire::UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const

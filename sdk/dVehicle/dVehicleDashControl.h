@@ -16,6 +16,7 @@
 #include "dStdafxVehicle.h"
 
 class dVehicleTire;
+class dVehicleEngine;
 class dVehicleChassis;
 
 class dVehicleDashControl
@@ -119,39 +120,20 @@ class dVehicleBrakeControl: public dVehicleTireControl
 	friend class dVehicleChassis;
 };
 
-/*
 class dVehicleEngineControl: public dVehicleDashControl 
 {
 	public:
-	DVEHICLE_API dVehicleEngineControl(dVehicleChassis* const vehicle);
-	DVEHICLE_API void SetEngine (dVehicleEngineInterface* const engine);
 
-	void SetGear (int gear);
-	void SetClutch (dFloat clutch);
-	dVehicleEngineInterface* GetEngine() const {return m_engine;}
-
-	virtual void Update(dFloat timestep);
+//	void SetEngine (dVehicleEngine* const engine) {m_engine = m_engine;}
+	dVehicleEngine* GetEngine() const {return m_engine;}
+//	void SetGear (int gear);
+//	void SetClutch (dFloat clutch);
+	virtual void Update(dFloat timestep) {}
 
 	private:
-	dVehicleEngineInterface* m_engine;
+	dVehicleEngine* m_engine;
 };
 
-class dVehicleTireControl: public dVehicleDashControl 
-{
-	public:
-	DVEHICLE_API dVehicleTireControl(dVehicleChassis* const vehicle);
-	DVEHICLE_API virtual ~dVehicleTireControl();
-
-	
-	
-	protected:
-	dList<dVehicleTireInterface*> m_tires;
-	bool m_isSleeping;
-};
-
-
-
-*/
 
 #endif 
 
