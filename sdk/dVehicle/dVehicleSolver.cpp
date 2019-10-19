@@ -596,7 +596,6 @@ void dVehicleSolver::InitMassMatrix()
 
 	int loopRowCount = 0;
 	for (int j = 0; j < m_loopJointCount; j++) {
-		dAssert(0);
 		const dVehicleLoopJoint* const joint = m_loopJoints[j];
 		loopRowCount += joint->m_count;
 	}

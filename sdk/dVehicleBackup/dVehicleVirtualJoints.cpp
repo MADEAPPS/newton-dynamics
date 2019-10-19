@@ -213,7 +213,7 @@ void dTireContact::TireForces(dFloat longitudinalSlip, dFloat lateralSlip, dFloa
 
 void dTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-/*
+#if 0
 FILE* file_xxx = fopen("xxxxx.csv", "wb");
 fprintf(file_xxx, "tireforce\n");
 m_load = 1000.0f;
@@ -224,11 +224,10 @@ for (int i = 0; i < 100; i++) {
 	fprintf(file_xxx, "%f,\n", m_tireModel.m_lateralForce);
 }
 fclose(file_xxx);
-*/
+#endif
 
 
-	dAssert(0);
-/*
+#if 0
 	dVector omega(0.0f);
 
 	// normal constraint
@@ -331,7 +330,7 @@ fclose(file_xxx);
 	m_dof = n;
 	m_count = n;
 	constraintParams->m_count = n;
-*/
+#endif
 }
 
 void dTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const

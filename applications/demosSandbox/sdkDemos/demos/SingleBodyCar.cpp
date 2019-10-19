@@ -69,12 +69,12 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 	SingleBodyVehicleManager(NewtonWorld* const world)
 		:dVehicleManager(world)
-//		,m_player(NULL)
-//		,m_externalView(true)
+		,m_player(NULL)
+		,m_externalView(true)
 	{
-		//DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-		//scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
-		//
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
+		
 		//scene->Set2DDisplayRenderFunction(RenderHelpMenu, RenderUI, this);
 		//
 		//// load 2d display assets
@@ -94,13 +94,14 @@ class SingleBodyVehicleManager: public dVehicleManager
 		//ReleaseTexture (m_greenNeedle);
 	}
 
-#if 0
+
 	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
 	{
 		SingleBodyVehicleManager* const me = (SingleBodyVehicleManager*)context;
 		me->UpdateCamera(timestep);
 	}
 
+#if 0
 	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
 	{
 		//SingleBodyVehicleManager* const me = (SingleBodyVehicleManager*)context;
@@ -216,6 +217,17 @@ class SingleBodyVehicleManager: public dVehicleManager
 		}
 	}
 
+#endif
+
+	void SetAsPlayer(dVehicleChassis* const player)
+	{
+		//dEngineController* const engine = player->m_controller->GetEngine();
+		//if (engine) {
+		//	engine->SetIgnition(false);
+		//}
+		m_player = player;
+	}
+
 	void UpdateCamera(dFloat timestep)
 	{
 //		SuperCarEntity* player = m_player;
@@ -224,7 +236,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 //			player = (SuperCarEntity*)NewtonBodyGetUserData(controller->GetBody());
 //		}
 
-return;
 		DemoEntity* const player = (DemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
 		DemoCamera* const camera = scene->GetCamera();
@@ -245,16 +256,6 @@ return;
 		camera->SetNextMatrix(*scene, camMatrix, camOrigin);
 	}
 
-	void SetAsPlayer(dVehicleChassis* const player)
-	{
-		//dEngineController* const engine = player->m_controller->GetEngine();
-		//if (engine) {
-		//	engine->SetIgnition(false);
-		//}
-		m_player = player;
-	}
-
-#endif
 	dVehicleTire* AddTire(dVehicleChassis* const vehicle, const char* const tireName, dFloat width, dFloat radius, dFloat vehicleMass)
 	{
 		DemoEntity* const entity = (DemoEntity*)vehicle->GetUserData();
@@ -590,15 +591,16 @@ axisCount = 0;
 		}
 	}
 
-#if 0
 	dVehicleChassis* m_player;
+#if 0
+
 	GLuint m_gears;
 	GLuint m_odometer;
 	GLuint m_redNeedle;
 	GLuint m_tachometer;
 	GLuint m_greenNeedle;
-	bool m_externalView;
 #endif
+	bool m_externalView;
 };
 
 
@@ -626,12 +628,11 @@ void SingleBodyCar(DemoEntityManager* const scene)
 
 	// load 
 	dVehicleChassis* const player = manager->CreateVehicle(location, viperModel.GetData());
-	player;
+	
+	// set this vehicle as the player
+	manager->SetAsPlayer(player);
 
 #if 0
-	// set this vehicle as the player
-//	manager->SetAsPlayer(player);
-
 	int count = 5;
 	count = 0;
 	for (int i = 0; i < count; i++) {

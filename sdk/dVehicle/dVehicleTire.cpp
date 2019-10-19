@@ -124,10 +124,6 @@ int dVehicleTire::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 		dVehicleLoopJoint* const loop = &m_contactsJoints[i];
 		if (loop->IsActive ()) {
 			jointArray[count] = loop;
-			//dAssert (!loop->GetOwner0()->IsLoopNode());
-			//if (loop->GetOwner1()->IsLoopNode()) {
-			//	loop->GetOwner1()->SetIndex(-1);
-			//}
 			count ++;
 		}
 	}
@@ -318,7 +314,7 @@ void dVehicleTire::CalculateFreeDof()
 
 	//m_tireAngle += m_omega * timestep;
 	dFloat cosAngle = tireMatrix.m_right.DotProduct3(chassisMatrix.m_right);
-	dFloat sinAngle = chassisMatrix.m_front.DotProduct3(tireMatrix.m_right.CrossProduct(chassisMatrix.m_right));
+	dFloat sinAngle = chassisMatrix.m_front.DotProduct3(chassisMatrix.m_right.CrossProduct(tireMatrix.m_right));
 	m_tireAngle += dAtan2(sinAngle, cosAngle);
 	while (m_tireAngle < 0.0f)
 	{
