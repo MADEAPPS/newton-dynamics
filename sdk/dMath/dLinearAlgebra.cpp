@@ -317,6 +317,44 @@ void dComplementaritySolver::dBilateralJoint::Init(dBodyState* const state0, dBo
 	m_state1 = state1;
 }
 
+void dComplementaritySolver::dBilateralJoint::AddContactRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir, dFloat restitution)
+{
+	dPointDerivativeParam param;
+
+	param.m_posit0 = pivot;
+	param.m_posit1 = pivot;
+	param.m_r0 = pivot - m_state0->m_globalCentreOfMass;
+	param.m_r1 = pivot - m_state1->m_globalCentreOfMass;
+
+	int index = constraintParams->m_count;
+
+	dAssert(dir.m_w == 0.0f);
+	dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
+	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
+
+	jacobian0.m_linear = dir;
+	jacobian0.m_angular = param.m_r0.CrossProduct(jacobian0.m_linear);
+
+	jacobian1.m_linear = dir.Scale(-1.0f);
+	jacobian1.m_angular = param.m_r1.CrossProduct(jacobian1.m_linear);
+
+	const dVector& omega0 = m_state0->m_omega;
+	const dVector& omega1 = m_state1->m_omega;
+	const dVector& veloc0 = m_state0->m_veloc;
+	const dVector& veloc1 = m_state1->m_veloc;
+
+	const dVector veloc(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1);
+	const dVector relAccel(veloc.Scale(constraintParams->m_timestepInv * (1.0f + restitution)));
+
+	dAssert(relAccel.m_w == 0.0f);
+	constraintParams->m_frictionCallback[index] = NULL;
+	constraintParams->m_jointAccel[index] = -(relAccel.m_x + relAccel.m_y + relAccel.m_z);
+	constraintParams->m_jointLowFrictionCoef[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
+	constraintParams->m_jointHighFrictionCoef[index] = D_COMPLEMENTARITY_MAX_FRICTION_BOUND;
+	constraintParams->m_count = index + 1;
+}
+
+
 void dComplementaritySolver::dBilateralJoint::AddLinearRowJacobian(dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir)
 {
 	dPointDerivativeParam param;

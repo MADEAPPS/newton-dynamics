@@ -236,7 +236,7 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 	{
 		// normal constraint
 		int index = constraintParams->m_count;
-		AddLinearRowJacobian(constraintParams, m_point, m_normal);
+		AddContactRowJacobian(constraintParams, m_point, m_normal, 0.0f);
 		constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
 		constraintParams->m_frictionCallback[index] = this;
 		constraintParams->m_jointAccel[index] += D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS * m_penetration * constraintParams->m_timestepInv;
@@ -245,7 +245,7 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 	{
 	// longitudinal force row
 		int index = constraintParams->m_count;
-		AddLinearRowJacobian(constraintParams, m_point, m_longitudinalDir);
+		AddContactRowJacobian(constraintParams, m_point, m_longitudinalDir, 0.0f);
 		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
 		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
 
@@ -280,7 +280,7 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 	{
 		// lateral force row
 		int index = constraintParams->m_count;
-		AddLinearRowJacobian(constraintParams, m_point, m_lateralDir);
+		AddContactRowJacobian(constraintParams, m_point, m_lateralDir, 0.0f);
 		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
 		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
 

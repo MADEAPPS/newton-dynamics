@@ -172,6 +172,7 @@ class dComplementaritySolver
 
 		void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle);
 		void AddLinearRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir);
+		void AddContactRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir, dFloat restitution);
 
 		dFloat GetRowAccelaration(dParamInfo* const constraintParams) const;
 		void SetRowAccelaration(dParamInfo* const constraintParams, dFloat accel);
