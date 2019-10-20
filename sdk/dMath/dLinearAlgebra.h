@@ -168,7 +168,7 @@ class dComplementaritySolver
 		virtual void JacobianDerivative (dParamInfo* const constraintParams) = 0; 
 		virtual void UpdateSolverForces (const dJacobianPair* const jacobians) const = 0; 
 		virtual void JointAccelerations (dJointAccelerationDecriptor* const accelParam);
-		virtual void SpecialSolverFrictionCallback(dFloat force, dFloat* const lowFriction, dFloat* const highFriction) const {}
+		virtual void SpecialSolverFrictionCallback(const dFloat* const force, dFloat* const lowFriction, dFloat* const highFriction) const {}
 
 		void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle);
 		void AddLinearRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir);

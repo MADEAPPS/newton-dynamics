@@ -91,53 +91,56 @@ void dVehicleTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext,
 	//dVector p3(origin + m_lateralDir.Scale(scale * m_jointFeebackForce[2]));
 	dVector p3(origin + m_lateralDir.Scale(scale * m_tireModel.m_lateralForce));
 
+if (tire->GetIndex() == 3) {
+dTrace(("%f %f %f\n", m_tireModel.m_tireLoad, m_tireModel.m_longitunalForce, m_tireModel.m_lateralForce));
+}
+
+
 	debugContext->DrawLine(origin, p3);
 }
 
-void dVehicleTireContact::SpecialSolverFrictionCallback(dFloat load, dFloat* const lowFriction, dFloat* const highFriction) const
+void dVehicleTireContact::SpecialSolverFrictionCallback(const dFloat* const load, dFloat* const lowFriction, dFloat* const highFriction) const
 {
-	//lowFriction[1] = -load * m_staticFriction;
-	//lowFriction[2] = -load * m_staticFriction;
-	//highFriction[1] = load * m_staticFriction;
-	//highFriction[2] = load * m_staticFriction;
-
-	dFloat f = dMax(m_staticFriction * load, dFloat(1.0f));
+	dFloat f = dMax(m_staticFriction * load[0], dFloat(1.0f));
 	dFloat g = m_tireModel.m_gammaStiffness;
-	dFloat r = g / f;
-
-	if (g < (3.0f * f)) {
-		f = g * (1.0f - (1.0f / 3.0f) * r + (1.0f / 27.0f) * r * r);
-	}
-	r = f / (g + 1.0e-3f);
 
 	dVehicleTire* const tire = GetOwner0()->GetAsTire();
 	const dTireInfo& tireInfo = tire->GetInfo();
-	dFloat y = tireInfo.m_corneringStiffness * m_tireModel.m_lateralSlip;
-	dFloat x = tireInfo.m_longitudinalStiffness * m_tireModel.m_longitudinalSlip;
-
-	m_tireModel.m_tireLoad = load;
+	m_tireModel.m_tireLoad = load[0];
 	m_tireModel.m_alingMoment = 0.0f;
-	m_tireModel.m_lateralForce = y * r;
-	m_tireModel.m_longitunalForce = x * r;
-	dAssert(m_tireModel.m_lateralForce >= 0.0f);
-	dAssert(m_tireModel.m_longitunalForce >= 0.0f);
+	m_tireModel.m_lateralForce = load[2];
+	m_tireModel.m_longitunalForce = load[1];
 
-if (tire->GetIndex() == 3) {
-	dTrace(("%f %f %f %f\n", m_tireModel.m_tireLoad, m_tireModel.m_gammaStiffness, m_tireModel.m_longitudinalSlip, m_tireModel.m_lateralSlip));
-}
-	if (g < (0.1f * load)) {
-		lowFriction[1] = -load * m_staticFriction;
-		highFriction[1] = load * m_staticFriction;
+//if (tire->GetIndex() == 3) {
+//	dTrace(("%f %f %f %f\n", m_tireModel.m_tireLoad, m_tireModel.m_gammaStiffness, m_tireModel.m_longitudinalSlip, m_tireModel.m_lateralSlip));
+//}
+	if (g < (0.1f * load[0])) {
+		// low speed just apply static friction 
+		lowFriction[1] = -load[0] * m_staticFriction;
+		highFriction[1] = load[0] * m_staticFriction;
 
-		lowFriction[2] = -load * m_staticFriction;
-		highFriction[2] = load * m_staticFriction;
+		lowFriction[2] = -load[0] * m_staticFriction;
+		highFriction[2] = load[0] * m_staticFriction;
 	} else {
+		// apply brush tire model
 
-		lowFriction[1] = -m_tireModel.m_longitunalForce;
-		highFriction[1] = m_tireModel.m_longitunalForce;
+		dFloat r = g / f;
+		if (g < (3.0f * f)) {
+			f = g * (1.0f - (1.0f / 3.0f) * r + (1.0f / 27.0f) * r * r);
+		}
+		r = f / (g + 1.0e-3f);
 
-		lowFriction[2] = -m_tireModel.m_lateralForce;
-		highFriction[2] = m_tireModel.m_lateralForce;
+		dFloat y = tireInfo.m_corneringStiffness * m_tireModel.m_lateralSlip;
+		dFloat x = tireInfo.m_longitudinalStiffness * m_tireModel.m_longitudinalSlip;
+
+		dAssert(x >= 0.0f);
+		dAssert(y >= 0.0f);
+	
+		lowFriction[1] = -x * r;
+		highFriction[1] = x * r;
+
+		lowFriction[2] = -y * r;
+		highFriction[2] = y * r;
 	}
 }
 

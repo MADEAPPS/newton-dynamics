@@ -30,9 +30,6 @@ dVehicleTire::dVehicleTire(dVehicleChassis* const chassis, const dMatrix& locati
 	,m_steeringAngle(0.0f)
 	,m_invSuspensionLength(m_info.m_suspensionLength > 0.0f ? 1.0f / m_info.m_suspensionLength : 0.0f)
 {
-	//SetWorld(parent->GetWorld());
-	//m_dynamicContactBodyNode.SetLoopNode(true);
-	//m_dynamicContactBodyNode.SetWorld(m_world);
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 	
 	NewtonBody* const chassisBody = chassis->GetBody();

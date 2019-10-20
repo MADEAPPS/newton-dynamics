@@ -928,7 +928,7 @@ void dVehicleSolver::dGaussSeidelLcpSor(const int size, dFloat* const x, const d
 				u[j] = f;
 			}
 			if (frictionCallback[j]) {
-				frictionCallback[j]->SpecialSolverFrictionCallback(u[j], &low[j], &high[j]);
+				frictionCallback[j]->SpecialSolverFrictionCallback(&u[j], &low[j], &high[j]);
 			}
 			base += size;
 		}
@@ -965,7 +965,7 @@ void dVehicleSolver::dGaussSeidelLcpSor(const int size, dFloat* const x, const d
 			}
 
 			if (frictionCallback[j]) {
-				frictionCallback[j]->SpecialSolverFrictionCallback(u[j], &low[j], &high[j]);
+				frictionCallback[j]->SpecialSolverFrictionCallback(&u[j], &low[j], &high[j]);
 			}
 			base += size;
 		}

@@ -275,7 +275,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		tireInfo.m_width = width;
 		tireInfo.m_pivotOffset = 0.01f;
 		tireInfo.m_steerRate = 0.5f * dPi;
-		tireInfo.m_frictionCoefficient = 0.8f;
+		//tireInfo.m_frictionCoefficient = 0.8f;
+		tireInfo.m_frictionCoefficient = 1.0f;
 		tireInfo.m_maxSteeringAngle = 40.0f * dDegreeToRad;
 
 		tireInfo.m_suspensionLength = 0.22f;

@@ -50,7 +50,7 @@ class dVehicleTireContact: public dVehicleLoopJoint
 	void TireForces(dFloat longitudinalSlip, dFloat lateralSlip, dFloat frictionCoef);
 	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const {}
-	void SpecialSolverFrictionCallback(dFloat force, dFloat* const lowFriction, dFloat* const highFriction) const;
+	void SpecialSolverFrictionCallback(const dFloat* const force, dFloat* const lowFriction, dFloat* const highFriction) const;
 
 	dVector m_point;
 	dVector m_normal;
