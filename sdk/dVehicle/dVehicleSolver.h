@@ -65,7 +65,7 @@ class dVehicleSolver
 	void BodyJacobianTimeMassForward(dVehicleNode* const node, const dVectorPair& force, dVectorPair& parentForce) const;
 	void JointJacobianTimeSolutionBackward(dVehicleNode* const node, dVectorPair& force, const dVectorPair& parentForce) const;
 	void dGaussSeidelLcpSor(const int size, dFloat* const x, const dFloat* const b, const int* const normalIndex, 
-							dFloat* const low, dFloat* const high) const;
+							dFloat* const low, dFloat* const high, dComplementaritySolver::dBilateralJoint** const frictionCallback) const;
 
 	dVehicleNode** m_nodesOrder;
 	int* m_matrixRowsIndex;

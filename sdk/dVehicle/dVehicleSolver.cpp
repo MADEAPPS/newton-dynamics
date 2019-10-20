@@ -636,6 +636,7 @@ int dVehicleSolver::BuildJacobianMatrix(dFloat timestep, dComplementaritySolver:
 		col->m_diagDamp = diag * D_DIAG_DAMP;
 		col->m_coordenateAccel = constraintParams.m_jointAccel[i];
 		col->m_normalIndex = constraintParams.m_normalIndex[i];
+		col->m_frictionCallback = constraintParams.m_frictionCallback[i];
 		col->m_jointLowFriction = constraintParams.m_jointLowFrictionCoef[i];
 		col->m_jointHighFriction = constraintParams.m_jointHighFrictionCoef[i];
 		dFloat normal = col->m_normalIndex ? col[col->m_normalIndex].m_force : 1.0f;
@@ -872,7 +873,8 @@ void dVehicleSolver::UpdateForces(const dVectorPair* const force) const
 	}
 }
 
-void dVehicleSolver::dGaussSeidelLcpSor(const int size, dFloat* const x, const dFloat* const b, const int* const normalIndex, dFloat* const low, dFloat* const high) const
+void dVehicleSolver::dGaussSeidelLcpSor(const int size, dFloat* const x, const dFloat* const b, const int* const normalIndex, 
+										dFloat* const low, dFloat* const high, dComplementaritySolver::dBilateralJoint** const frictionCallback) const
 {
 	const dFloat* const me = m_massMatrix11;
 	dFloat* const invDiag1 = dAlloca(dFloat, size);
@@ -925,6 +927,9 @@ void dVehicleSolver::dGaussSeidelLcpSor(const int size, dFloat* const x, const d
 				tolerance += r * r;
 				u[j] = f;
 			}
+			if (frictionCallback[j]) {
+				frictionCallback[j]->SpecialSolverFrictionCallback(u[j], &low[j], &high[j]);
+			}
 			base += size;
 		}
 	}
@@ -958,6 +963,10 @@ void dVehicleSolver::dGaussSeidelLcpSor(const int size, dFloat* const x, const d
 				tolerance += r * r;
 				u[j] = f;
 			}
+
+			if (frictionCallback[j]) {
+				frictionCallback[j]->SpecialSolverFrictionCallback(u[j], &low[j], &high[j]);
+			}
 			base += size;
 		}
 	}
@@ -976,6 +985,7 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 	dFloat* const low = dAlloca(dFloat, n);
 	dFloat* const high = dAlloca(dFloat, n);
 	int* const normalIndex = dAlloca(int, n);
+	dComplementaritySolver::dBilateralJoint** const frictionCallback = dAlloca(dComplementaritySolver::dBilateralJoint*, n);
 
 	int primaryIndex = 0;
 	int auxiliaryIndex = 0;
@@ -1033,6 +1043,7 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 			low[auxiliaryIndex] = rhs->m_jointLowFriction;
 			high[auxiliaryIndex] = rhs->m_jointHighFriction;
 			normalIndex[auxiliaryIndex] = rhs->m_normalIndex;
+			frictionCallback[auxiliaryIndex] = rhs->m_frictionCallback;
 			dAssert (normalIndex[auxiliaryIndex] == 0);
 			auxiliaryIndex++;
 		}
@@ -1072,6 +1083,7 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 			low[auxiliaryIndex] = rhs[i].m_jointLowFriction;
 			high[auxiliaryIndex] = rhs[i].m_jointHighFriction;
 			normalIndex[auxiliaryIndex] = rhs[i].m_normalIndex;
+			frictionCallback[auxiliaryIndex] = rhs[i].m_frictionCallback;
 			auxiliaryIndex++;
 		}
 	}
@@ -1085,7 +1097,7 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 		b[i] -= r;
 	}
 
-	dGaussSeidelLcpSor(n, u, b, normalIndex, low, high);
+	dGaussSeidelLcpSor(n, u, b, normalIndex, low, high, frictionCallback);
 
 	for (int i = 0; i < n; i++) {
 		const dFloat s = u[i];

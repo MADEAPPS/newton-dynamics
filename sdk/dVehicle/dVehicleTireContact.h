@@ -51,7 +51,8 @@ class dVehicleTireContact: public dVehicleLoopJoint
 	int GetMaxDof() const { return 3; }
 	void TireForces(dFloat longitudinalSlip, dFloat lateralSlip, dFloat frictionCoef);
 	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
-	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
+	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const {}
+	void SpecialSolverFrictionCallback(dFloat force, dFloat* const lowFriction, dFloat* const highFriction) const;
 
 	dVector m_point;
 	dVector m_normal;

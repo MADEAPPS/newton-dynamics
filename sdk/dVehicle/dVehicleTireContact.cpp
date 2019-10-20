@@ -117,6 +117,14 @@ void dVehicleTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext,
 	debugContext->DrawLine(origin, p3);
 }
 
+void dVehicleTireContact::SpecialSolverFrictionCallback(dFloat force, dFloat* const lowFriction, dFloat* const highFriction) const
+{
+	lowFriction[1] = -force;
+	lowFriction[2] = -force;
+	highFriction[1] = force;
+	highFriction[2] = force;
+}
+
 void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	//dAssert (0);
@@ -230,6 +238,7 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		int index = constraintParams->m_count;
 		AddLinearRowJacobian(constraintParams, m_point, m_normal);
 		constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
+		constraintParams->m_frictionCallback[index] = this;
 		constraintParams->m_jointAccel[index] += D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS * m_penetration * constraintParams->m_timestepInv;
 	}
 

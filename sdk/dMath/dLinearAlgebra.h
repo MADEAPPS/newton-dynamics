@@ -103,6 +103,7 @@ class dComplementaritySolver
 		dFloat m_coordenateAccel;
 		dFloat m_jointLowFriction;
 		dFloat m_jointHighFriction;
+		dBilateralJoint* m_frictionCallback;
 		int m_normalIndex;
 	};
 
@@ -114,6 +115,7 @@ class dComplementaritySolver
 		dFloat m_jointLowFrictionCoef[D_MAX_PRAM_INFO_SIZE];
 		dFloat m_jointHighFrictionCoef[D_MAX_PRAM_INFO_SIZE];
 		int m_normalIndex[D_MAX_PRAM_INFO_SIZE];
+		dBilateralJoint* m_frictionCallback[D_MAX_PRAM_INFO_SIZE];
 		dFloat m_timestep;
 		dFloat m_timestepInv;
 		int m_count;
@@ -166,12 +168,14 @@ class dComplementaritySolver
 		virtual void JacobianDerivative (dParamInfo* const constraintParams) = 0; 
 		virtual void UpdateSolverForces (const dJacobianPair* const jacobians) const = 0; 
 		virtual void JointAccelerations (dJointAccelerationDecriptor* const accelParam);
+		virtual void SpecialSolverFrictionCallback(dFloat force, dFloat* const lowFriction, dFloat* const highFriction) const {}
 
 		void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle);
 		void AddLinearRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir);
 
 		dFloat GetRowAccelaration(dParamInfo* const constraintParams) const;
 		void SetRowAccelaration(dParamInfo* const constraintParams, dFloat accel);
+
 		//dFloat CalculateRowZeroAccelaration (dParamInfo* const constraintParams) const;
 		dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
 
