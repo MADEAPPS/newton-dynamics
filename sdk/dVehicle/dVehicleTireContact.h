@@ -27,19 +27,17 @@ class dVehicleTireContact: public dVehicleLoopJoint
 	{
 		public:
 		dTireModel()
-			:m_lateralSlip(0.0f)
-			,m_longitodinalSlip(0.0f)
-			,m_alingMoment(0.0f)
-			,m_lateralForce(0.0f)
-			,m_longitunalForce(0.0f)
 		{
+			memset (this, 0, sizeof (dTireModel));
 		}
 
-		dFloat m_lateralSlip;
-		dFloat m_longitodinalSlip;
-		dFloat m_alingMoment;
+		dFloat m_tireLoad;
 		dFloat m_lateralForce;
 		dFloat m_longitunalForce;
+		dFloat m_alingMoment;
+		dFloat m_lateralSlip;
+		dFloat m_longitudinalSlip;
+		dFloat m_gammaStiffness;
 	};
 
 	dVehicleTireContact();
@@ -60,14 +58,11 @@ class dVehicleTireContact: public dVehicleLoopJoint
 	dVector m_longitudinalDir;
 	dFloat m_penetration;
 	dFloat m_staticFriction;
-//	dFloat m_kineticFriction;
-	dFloat m_load____;
-	dFloat m_lateralSlip;
-	dFloat m_longitudinalSlip;
-
-	dTireModel m_tireModel;
-//	dFloat m_normalFilter[4];
-//	bool m_isActiveFilter[4];
+	//dFloat m_load;
+	//dFloat m_lateralSlip;
+	//dFloat m_longitudinalSlip;
+	//dFloat m_gamma;
+	mutable dTireModel m_tireModel;
 
 	friend class dVehicleTire;
 };

@@ -54,6 +54,8 @@ class dVehicleNode: public dCustomAlloc
 
 	dComplementaritySolver::dBodyState& GetProxyBody() { return m_proxyBody; }
 
+	int GetIndex() const {return m_index;}
+
 	protected:
 	virtual void ApplyExternalForce();
 	virtual void Integrate(dFloat timestep);

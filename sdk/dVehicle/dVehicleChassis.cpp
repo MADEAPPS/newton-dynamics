@@ -563,6 +563,20 @@ void dVehicleChassis::PreUpdate(dFloat timestep)
 	Integrate(timestep);
 	CalculateFreeDof();
 
+#if 0
+	FILE* file_xxx = fopen("xxxxx.csv", "wb");
+	fprintf(file_xxx, "tireforce\n");
+	m_load = 1000.0f;
+	for (int i = 0; i < 100; i++) {
+		float u = 0.01f * i;
+		TireForces(0.0f, u, 1.0f);
+		//fprintf(file_xxx, "%f,\n", m_tireModel.m_longitunalForce);
+		fprintf(file_xxx, "%f,\n", m_tireModel.m_lateralForce);
+	}
+	fclose(file_xxx);
+#endif
+
+
 //dVector vector(0.0f);
 //NewtonBodySetForce(m_newtonBody, &vector[0]);
 //NewtonBodySetTorque(m_newtonBody, &vector[0]);
