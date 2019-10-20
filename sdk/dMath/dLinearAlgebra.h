@@ -121,23 +121,6 @@ class dComplementaritySolver
 		int m_count;
 	};
 
-	class dPointDerivativeParam
-	{
-		public:
-		dPointDerivativeParam()
-			:m_r0(0.0f)
-			,m_posit0(0.0f)
-			,m_r1(0.0f)
-			,m_posit1(0.0f)
-		{
-		}
-
-		dVector m_r0;
-		dVector m_posit0;
-		dVector m_r1;
-		dVector m_posit1;
-	};
-
 	class dJointAccelerationDecriptor
 	{
 		public:

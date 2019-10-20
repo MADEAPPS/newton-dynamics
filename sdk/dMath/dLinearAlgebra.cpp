@@ -319,12 +319,8 @@ void dComplementaritySolver::dBilateralJoint::Init(dBodyState* const state0, dBo
 
 void dComplementaritySolver::dBilateralJoint::AddContactRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir, dFloat restitution)
 {
-	dPointDerivativeParam param;
-
-	param.m_posit0 = pivot;
-	param.m_posit1 = pivot;
-	param.m_r0 = pivot - m_state0->m_globalCentreOfMass;
-	param.m_r1 = pivot - m_state1->m_globalCentreOfMass;
+	dVector r0 (pivot - m_state0->m_globalCentreOfMass);
+	dVector r1 (pivot - m_state1->m_globalCentreOfMass);
 
 	int index = constraintParams->m_count;
 
@@ -333,10 +329,10 @@ void dComplementaritySolver::dBilateralJoint::AddContactRowJacobian (dParamInfo*
 	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
 
 	jacobian0.m_linear = dir;
-	jacobian0.m_angular = param.m_r0.CrossProduct(jacobian0.m_linear);
+	jacobian0.m_angular = r0.CrossProduct(jacobian0.m_linear);
 
 	jacobian1.m_linear = dir.Scale(-1.0f);
-	jacobian1.m_angular = param.m_r1.CrossProduct(jacobian1.m_linear);
+	jacobian1.m_angular = r1.CrossProduct(jacobian1.m_linear);
 
 	const dVector& omega0 = m_state0->m_omega;
 	const dVector& omega1 = m_state1->m_omega;
@@ -357,12 +353,8 @@ void dComplementaritySolver::dBilateralJoint::AddContactRowJacobian (dParamInfo*
 
 void dComplementaritySolver::dBilateralJoint::AddLinearRowJacobian(dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir)
 {
-	dPointDerivativeParam param;
-
-	param.m_posit0 = pivot;
-	param.m_posit1 = pivot;
-	param.m_r0 = pivot - m_state0->m_globalCentreOfMass;
-	param.m_r1 = pivot - m_state1->m_globalCentreOfMass;
+	dVector r0 (pivot - m_state0->m_globalCentreOfMass);
+	dVector r1 (pivot - m_state1->m_globalCentreOfMass);
 
 	int index = constraintParams->m_count;
 
@@ -371,18 +363,18 @@ void dComplementaritySolver::dBilateralJoint::AddLinearRowJacobian(dParamInfo* c
 	dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
 
 	jacobian0.m_linear = dir;
-	jacobian0.m_angular = param.m_r0.CrossProduct(jacobian0.m_linear);
+	jacobian0.m_angular = r0.CrossProduct(jacobian0.m_linear);
 
 	jacobian1.m_linear = dir.Scale(-1.0f);
-	jacobian1.m_angular = param.m_r1.CrossProduct(jacobian1.m_linear);
+	jacobian1.m_angular = r1.CrossProduct(jacobian1.m_linear);
 
 	const dVector& omega0 = m_state0->m_omega;
 	const dVector& omega1 = m_state1->m_omega;
 	const dVector& veloc0 = m_state0->m_veloc;
 	const dVector& veloc1 = m_state1->m_veloc;
 
-	dVector centripetal0(omega0.CrossProduct(omega0.CrossProduct(param.m_r0)));
-	dVector centripetal1(omega1.CrossProduct(omega1.CrossProduct(param.m_r1)));
+	dVector centripetal0(omega0.CrossProduct(omega0.CrossProduct(r0)));
+	dVector centripetal1(omega1.CrossProduct(omega1.CrossProduct(r1)));
 	const dVector accel(jacobian0.m_linear * centripetal0 + jacobian1.m_linear * centripetal1);
 	const dVector veloc(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1);
 	const dVector relAccel(accel + veloc.Scale(constraintParams->m_timestepInv));

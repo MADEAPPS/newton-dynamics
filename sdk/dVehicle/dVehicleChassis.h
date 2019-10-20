@@ -21,6 +21,7 @@
 class dTireInfo;
 class dVehicleTire;
 class dVehicleLoopJoint;
+class dVehicleDifferential;
 
 class dCollectCollidingBodies
 {
@@ -75,19 +76,21 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 	const dMatrix& GetLocalFrame() const { return m_localFrame; }
 	dVehicleChassis* GetAsVehicle() const { return (dVehicleChassis*)this; }
 
+	const dVector& GetGravity() const {return m_gravity;}
+
 	DVEHICLE_API void Finalize();
 	DVEHICLE_API const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	DVEHICLE_API dVehicleTire* AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
+	DVEHICLE_API dVehicleDifferential* AddDifferential(dFloat mass, dFloat radius, dVehicleTire* const leftTire, dVehicleTire* const rightTire);
 
 	DVEHICLE_API dVehicleBrakeControl* GetBrakeControl();
 	DVEHICLE_API dVehicleBrakeControl* GetHandBrakeControl();
 	DVEHICLE_API dVehicleSteeringControl* GetSteeringControl();
-
-
+	
 	DVEHICLE_API void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep);
 
 #if 0
-	DVEHICLE_API dVehicleDifferentialInterface* AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire);
+	
 	DVEHICLE_API dVehicleEngineInterface* AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential);
 	DVEHICLE_API dVehicleEngineControl* GetEngineControl();
 	private:
@@ -98,6 +101,7 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 	private:
 	void CalculateFreeDof();
 	void ApplyExternalForce();
+	void Integrate(dFloat timestep);
 	void CalculateTireContacts(dFloat timestep);
 	void CalculateSuspensionForces(dFloat timestep);
 	virtual int GetKinematicLoops(dVehicleLoopJoint** const jointArray);

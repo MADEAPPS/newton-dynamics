@@ -99,6 +99,7 @@ class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilater
 	private: 
 	void CalculateFreeDof();
 	void ApplyExternalForce();
+	void Integrate(dFloat timestep);
 	dComplementaritySolver::dBilateralJoint* GetJoint() {return this;}
 	const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id);

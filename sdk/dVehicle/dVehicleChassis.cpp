@@ -14,6 +14,7 @@
 #include "dVehicleTire.h"
 #include "dVehicleChassis.h"
 #include "dVehicleManager.h"
+#include "dVehicleDifferential.h"
 
 dVehicleChassis::dVehicleChassis(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
 	:dVehicleNode(NULL)
@@ -95,7 +96,6 @@ void dVehicleChassis::Finalize()
 	m_obbOrigin = (maxP + minP).Scale(0.5f);
 	m_obbSize = (maxP - minP).Scale(0.5f) + dVector(0.1f, 0.1f, 0.1f, 0.0f);
 
-//	m_vehicle->RigidBodyToStates();
 	ApplyExternalForce();
 	dVehicleSolver::Finalize();
 }
@@ -122,11 +122,11 @@ const void dVehicleChassis::Debug(dCustomJoint::dDebugDisplay* const debugContex
 	debugContext->DrawLine(p0, p2);
 
 	//draw vehicle weight
-	if (m_gravity.DotProduct3(m_gravity) > 0.1) {
+	if (m_gravity.DotProduct3(m_gravity) > 0.1f) {
 		// for now weight is normalize to 2.0
 		debugContext->SetColor(dVector(0.0f, 0.0f, 1.0f, 1.0f));
-		dVector gravity(m_gravity.Normalize());
-		dVector p3(p0 - gravity.Scale(2.0f));
+		dVector gravityDir(m_gravity.Normalize());
+		dVector p3(p0 - gravityDir.Scale(2.0f));
 		debugContext->DrawLine(p0, p3);
 	}
 }
@@ -328,6 +328,12 @@ dVehicleTire* dVehicleChassis::AddTire(const dMatrix& locationInGlobalSpace, con
 	return tire;
 }
 
+dVehicleDifferential* dVehicleChassis::AddDifferential(dFloat mass, dFloat radius, dVehicleTire* const leftTire, dVehicleTire* const rightTire)
+{
+	dVehicleDifferential* const differential = new dVehicleDifferential(this, mass, radius, leftTire, rightTire);
+	return differential;
+}
+
 dVehicleSteeringControl* dVehicleChassis::GetSteeringControl()
 {
 	return &m_steeringControl;
@@ -344,12 +350,6 @@ dVehicleBrakeControl* dVehicleChassis::GetHandBrakeControl()
 }
 
 #if 0
-
-dVehicleDifferentialInterface* dVehicleChassis::AddDifferential(dVehicleTireInterface* const leftTire, dVehicleTireInterface* const rightTire)
-{
-	return m_vehicle->AddDifferential(leftTire, rightTire);
-}
-
 dVehicleEngineInterface* dVehicleChassis::AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential)
 {
 	return m_vehicle->AddEngine(engineInfo, differential);
@@ -536,6 +536,13 @@ void dVehicleChassis::CalculateTireContacts(dFloat timestep)
 			tire->CalculateContacts(bodyList, timestep);
 		}
 	}
+}
+
+void dVehicleChassis::Integrate(dFloat timestep)
+{
+	m_proxyBody.IntegrateForce(timestep, m_proxyBody.GetForce(), m_proxyBody.GetTorque());
+	m_proxyBody.IntegrateVelocity(timestep);
+	dVehicleNode::Integrate(timestep);
 }
 
 void dVehicleChassis::CalculateFreeDof()

@@ -24,6 +24,11 @@
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
 
 
+#define VIPER_TIRE_MASS	40.0f
+#define VIPER_DIFF_MASS	40.0f
+#define VIPER_DIFF_RADIUS 1.0f
+
+
 class SingleBodyVehicleManager: public dVehicleManager
 {
 	public:
@@ -270,7 +275,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 		// add the tire to the vehicle
 		dTireInfo tireInfo;
-		tireInfo.m_mass = 40.0f;
+		tireInfo.m_mass = VIPER_TIRE_MASS;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
 		tireInfo.m_pivotOffset = 0.01f;
@@ -441,10 +446,12 @@ class SingleBodyVehicleManager: public dVehicleManager
 		brakeControl->AddTire(rearLeft);
 		brakeControl->AddTire(rearRight);
 
-/*
-		// add a differential 
-		dVehicleDifferentialInterface* const differential = vehicle->AddDifferential(rearLeft, rearRight);
 
+		// add a differential 
+		dVehicleDifferential* const differential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, rearLeft, rearRight);
+		differential;
+
+/*
 		// add and internal combustion engine
 		dVehicleEngineInterface::dEngineInfo engineInfo;
 		engineInfo.m_mass = 50.0f;

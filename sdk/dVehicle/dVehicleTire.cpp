@@ -259,7 +259,7 @@ const void dVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 	//debugContext->DrawFrame(hubTireMatrix, 1.0f);
 	//debugContext->DrawFrame(tireMatrix, 1.0f);
 
-	dVector weight (chassis->m_gravity.Scale(chassisBody->GetMass()));
+	dVector weight (chassis->GetGravity().Scale(chassisBody->GetMass()));
 	dFloat scale (1.0f / dSqrt (weight.DotProduct3(weight)));
 	for (int i = 0; i < sizeof (m_contactsJoints)/sizeof (m_contactsJoints[0]); i ++) {
 		const dVehicleTireContact* const contact = &m_contactsJoints[i];
@@ -267,6 +267,12 @@ const void dVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 			contact->Debug(debugContext, scale);
 		}
 	}
+}
+
+void dVehicleTire::Integrate(dFloat timestep)
+{
+	m_proxyBody.IntegrateForce(timestep, m_proxyBody.GetForce(), m_proxyBody.GetTorque());
+	m_proxyBody.IntegrateVelocity(timestep);
 }
 
 void dVehicleTire::ApplyExternalForce()
@@ -281,9 +287,8 @@ void dVehicleTire::ApplyExternalForce()
 	m_proxyBody.SetVeloc(chassisBody->CalculatePointVelocity(tireMatrix.m_posit) + tireMatrix.m_right.Scale(m_speed));
 
 	m_proxyBody.SetTorque(dVector(0.0f));
-	m_proxyBody.SetForce(chassisNode->m_gravity.Scale(m_proxyBody.GetMass()));
+	m_proxyBody.SetForce(chassisNode->GetGravity().Scale(m_proxyBody.GetMass()));
 }
-
 
 void dVehicleTire::CalculateFreeDof()
 {
@@ -299,8 +304,8 @@ void dVehicleTire::CalculateFreeDof()
 
 	dVector tireOmega(m_proxyBody.GetOmega());
 	dVector chassisOmega(chassisBody->GetOmega());
-	dVector localOmega(tireOmega - chassisOmega);
-	m_omega = tireMatrix.m_front.DotProduct3(localOmega);
+	dVector relativeOmega(tireOmega - chassisOmega);
+	m_omega = tireMatrix.m_front.DotProduct3(relativeOmega);
 	dAssert(tireMatrix.m_front.DotProduct3(chassisMatrix.m_front) > 0.999f);
 
 	// check if the tire is going to rest
