@@ -91,10 +91,9 @@ void dVehicleTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext,
 	//dVector p3(origin + m_lateralDir.Scale(scale * m_jointFeebackForce[2]));
 	dVector p3(origin + m_lateralDir.Scale(scale * m_tireModel.m_lateralForce));
 
-if (tire->GetIndex() == 3) {
-dTrace(("%f %f %f\n", m_tireModel.m_tireLoad, m_tireModel.m_longitunalForce, m_tireModel.m_lateralForce));
-}
-
+//if (tire->GetIndex() == 3) {
+//dTrace(("%f %f %f\n", m_tireModel.m_tireLoad, m_tireModel.m_longitunalForce, m_tireModel.m_lateralForce));
+//}
 
 	debugContext->DrawLine(origin, p3);
 }
@@ -111,9 +110,6 @@ void dVehicleTireContact::SpecialSolverFrictionCallback(const dFloat* const load
 	m_tireModel.m_lateralForce = load[2];
 	m_tireModel.m_longitunalForce = load[1];
 
-//if (tire->GetIndex() == 3) {
-//	dTrace(("%f %f %f %f\n", m_tireModel.m_tireLoad, m_tireModel.m_gammaStiffness, m_tireModel.m_longitudinalSlip, m_tireModel.m_lateralSlip));
-//}
 	if (g < (0.1f * load[0])) {
 		// low speed just apply static friction 
 		lowFriction[1] = -load[0] * m_staticFriction;
@@ -175,6 +171,7 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		omegaSpeed = dAbs(omegaSpeed);
 		linearSpeed = dAbs(linearSpeed);
 
+		m_tireModel.m_lateralSlip = linearSpeed;
 		m_tireModel.m_longitudinalSlip = 0.0f;
 		if ((omegaSpeed > 0.2f) || (linearSpeed > 0.2f)) {
 			if (relSpeed < 0.0f) {
@@ -196,8 +193,8 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 
 		const dVector relVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
 		dFloat lateralSpeed = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
-		dFloat longitudinalSpeed = dAbs(m_longitudinalDir.DotProduct3(relVeloc)) + 0.01f;
-		m_tireModel.m_lateralSlip = lateralSpeed / longitudinalSpeed;
+		//dFloat longitudinalSpeed = dAbs(m_longitudinalDir.DotProduct3(relVeloc)) + 0.01f;
+		m_tireModel.m_lateralSlip = lateralSpeed / (dAbs (m_tireModel.m_lateralSlip) + 1.0e-3f);
 	}
 
 	dVehicleTire* const tire = GetOwner0()->GetAsTire();

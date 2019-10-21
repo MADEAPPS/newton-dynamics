@@ -434,7 +434,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 		// add vehicle hand brake control 
 		dVehicleBrakeControl* const handBrakeControl = vehicle->GetHandBrakeControl();
-		handBrakeControl->SetBrakeTorque(1000.0f);
+		handBrakeControl->SetBrakeTorque(2000.0f);
 		handBrakeControl->AddTire(rearLeft);
 		handBrakeControl->AddTire(rearRight);
 
@@ -556,18 +556,18 @@ axisCount = 0;
 		}
 
 		driverInput.m_clutchPedal = 0.0f;
-		//xxxxxx
-#if 0
-	#if 0
+
+#if 1
+	#if 1
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
-			fwrite(&driverInput, sizeof(dVehicleDriverInput), 1, file);
+			fwrite(&driverInput, sizeof(dVehicleChassis::dDriverInput), 1, file);
 			fflush(file);
 		}
 	#else 
 		static FILE* file = fopen("log.bin", "rb");
 		if (file) {
-			fread(&driverInput, sizeof(dVehicleDriverInput), 1, file);
+			fread(&driverInput, sizeof(dVehicleChassis::dDriverInput), 1, file);
 		}
 	#endif
 #endif
