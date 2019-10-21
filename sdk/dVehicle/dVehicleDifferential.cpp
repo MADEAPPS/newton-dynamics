@@ -34,7 +34,6 @@ dVehicleDifferential::dVehicleDifferential(dVehicleChassis* const chassis, dFloa
 	m_proxyBody.UpdateInertia();
 
 	// set the tire joint
-	//m_differential.Init(&m_proxyBody, m_parent->GetProxyBody());
 	m_leftAxle.SetOwners(this, m_leftNode);
 	m_rightAxle.SetOwners(this, m_rightNode);
 

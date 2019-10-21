@@ -82,14 +82,13 @@ dVehicleEngine::dVehicleEngine(dVehicleChassis* const chassis, const dEngineInfo
 	//,m_gearBox()
 	//,m_omega(0.0f)
 {
-	dAssert(0);
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
-/*
-	dFloat inertia = 0.7f * m_info.m_mass * m_info.m_armatureRadius * m_info.m_armatureRadius;
-	m_proxyBody.SetMass(m_info.m_mass);
+
+	dFloat inertia = (2.0f / 5.0f) * m_metricInfo.m_mass * m_metricInfo.m_armatureRadius * m_metricInfo.m_armatureRadius;
+	m_proxyBody.SetMass(m_metricInfo.m_mass);
 	m_proxyBody.SetInertia(inertia, inertia, inertia);
 	m_proxyBody.UpdateInertia();
-
+/*
 	dVehicleSingleBody* const chassis = (dVehicleSingleBody*) ((dVehicleNode*)m_parent)->GetAsVehicle();
 	// set the tire joint
 	m_blockJoint.Init(&m_proxyBody, chassis->GetProxyBody());
@@ -223,6 +222,50 @@ void dVehicleEngine::Integrate(dFloat timestep)
 }
 #endif
 
+void dVehicleEngine::CalculateFreeDof()
+{
+	dAssert(0);
+/*
+	dVehicleChassis* const chassisNode = GetParent()->GetAsVehicle();
+	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
+	const dMatrix chassisMatrix(m_localAxis * chassisBody->GetMatrix());
+
+	dVector omega(m_proxyBody.GetOmega());
+	dVector chassisOmega(chassisBody->GetOmega());
+	dVector relativeOmega(omega - chassisOmega);
+	m_diffOmega = chassisMatrix.m_up.DotProduct3(relativeOmega);
+	m_shaftOmega = chassisMatrix.m_front.DotProduct3(relativeOmega);
+*/
+}
+
+void dVehicleEngine::Integrate(dFloat timestep)
+{
+	dAssert(0);
+	m_proxyBody.IntegrateForce(timestep, m_proxyBody.GetForce(), m_proxyBody.GetTorque());
+}
+
+void dVehicleEngine::ApplyExternalForce()
+{
+	dAssert(0);
+/*
+	dVehicleChassis* const chassisNode = GetParent()->GetAsVehicle();
+	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
+
+	dMatrix matrix(chassisBody->GetMatrix());
+	matrix.m_posit = matrix.TransformVector(chassisBody->GetCOM());
+	m_proxyBody.SetMatrix(matrix);
+
+	matrix = m_localAxis * matrix;
+	m_proxyBody.SetVeloc(chassisBody->GetVelocity());
+	m_proxyBody.SetOmega(chassisBody->GetOmega() + matrix.m_front.Scale(m_shaftOmega) + matrix.m_up.Scale(m_diffOmega));
+	m_proxyBody.SetTorque(dVector(0.0f));
+
+	dVector xxxx(matrix.m_front.Scale(-500.0f));
+	m_proxyBody.SetTorque(xxxx);
+
+	m_proxyBody.SetForce(chassisNode->GetGravity().Scale(m_proxyBody.GetMass()));
+*/
+}
 
 void dVehicleEngine::UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
 {

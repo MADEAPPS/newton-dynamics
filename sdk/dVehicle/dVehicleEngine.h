@@ -111,26 +111,22 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 /*
 	virtual dFloat GetRpm() const;
 	virtual dFloat GetRedLineRpm() const;
-
-	void ApplyExternalForce(dFloat timestep);
-	void InitEngineTorqueCurve();
-	void Integrate(dFloat timestep);
-
 	void SetGear (int gear);
 	void SetClutch (dFloat clutch);
 	void SetThrottle (dFloat throttle);
-
 	void SetInfo(const dEngineInfo& info);
-	
 	dComplementaritySolver::dBilateralJoint* GetProxyJoint();
 	int GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray);
-
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	dEngineBlockJoint m_blockJoint;
 	dEngineCrankJoint m_crankJoint;
 	dGearBoxJoint m_gearBox;
 	dFloat m_omega;
 */
+
+	void CalculateFreeDof();
+	void ApplyExternalForce();
+	void Integrate(dFloat timestep);
 
 	dComplementaritySolver::dBilateralJoint* GetJoint() { return this; }
 	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);

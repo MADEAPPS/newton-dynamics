@@ -196,30 +196,29 @@ class SingleBodyVehicleManager: public dVehicleManager
 			
 			//dVehicleEngineInterface* const engine = m_player->GetEngineControl()->GetEngine();
 			//if (engine) {
-			if (1) {
-				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-				dFloat gageSize = 200.0f;
-				dFloat y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
 
-				// draw the tachometer
-				dFloat x = gageSize / 2 + 20.0f;
-				//dFloat rpm = engine->GetRpm() / engine->GetRedLineRpm();
-				dFloat rpm = 0.0f;
-				DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 0.0f);
+			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			dFloat gageSize = 200.0f;
+			dFloat y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
 
-				// draw the odometer
-				x += gageSize;
-				//dFloat speed = dAbs(engine->GetSpeed()) * 3.6f / 340.0f;
-				//dFloat speed = dAbs(engine->GetSpeed()) / engine->GetTopSpeed();
-				dFloat speed = 0.0f;
-				DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize, -180.0f, 90.0f);
+			// draw the tachometer
+			dFloat x = gageSize / 2 + 20.0f;
+			//dFloat rpm = engine->GetRpm() / engine->GetRedLineRpm();
+			dFloat rpm = 0.0f;
+			DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 0.0f);
 
-				// draw the current gear
-				//int gear = engine->GetGear();
-				//int gear = 1;
-				//VehicleUserData* const playerData = (VehicleUserData*)playerEnt->GetUserData();
-				//DrawGear(speed, x, y + 98, playerData->m_gearMap[gear], gageSize);
-			}
+			// draw the odometer
+			x += gageSize;
+			//dFloat speed = dAbs(engine->GetSpeed()) * 3.6f / 340.0f;
+			//dFloat speed = dAbs(engine->GetSpeed()) / engine->GetTopSpeed();
+			dFloat speed = 0.4f;
+			DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize, -180.0f, 90.0f);
+
+			// draw the current gear
+			//int gear = engine->GetGear();
+			//int gear = 1;
+			//VehicleUserData* const playerData = (VehicleUserData*)playerEnt->GetUserData();
+			//DrawGear(speed, x, y + 98, playerData->m_gearMap[gear], gageSize);
 		}
 	}
 
