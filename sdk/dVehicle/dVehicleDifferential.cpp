@@ -18,7 +18,6 @@ dVehicleDifferential::dVehicleDifferential(dVehicleChassis* const chassis, dFloa
 	:dVehicleNode(chassis)
 	,dBilateralJoint()
 	,m_localAxis(dYawMatrix (90.0f * dDegreeToRad))
-//	,m_differential()
 	,m_leftAxle()
 	,m_rightAxle()
 	,m_leftNode(leftNode)

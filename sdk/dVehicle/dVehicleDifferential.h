@@ -10,8 +10,8 @@
 */
 
 
-#ifndef __D_VEHICLE_VIRTUAL_DIFFERENTIAL_H__
-#define __D_VEHICLE_VIRTUAL_DIFFERENTIAL_H__
+#ifndef __D_VEHICLE_DIFFERENTIAL_H__
+#define __D_VEHICLE_DIFFERENTIAL_H__
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"

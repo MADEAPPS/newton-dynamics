@@ -446,14 +446,12 @@ class SingleBodyVehicleManager: public dVehicleManager
 		brakeControl->AddTire(rearLeft);
 		brakeControl->AddTire(rearRight);
 
-
 		// add a differential 
 		dVehicleDifferential* const differential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, rearLeft, rearRight);
 		differential;
 
-/*
 		// add and internal combustion engine
-		dVehicleEngineInterface::dEngineInfo engineInfo;
+		dEngineInfo engineInfo;
 		engineInfo.m_mass = 50.0f;
 		engineInfo.m_armatureRadius = 0.125f;
 		engineInfo.m_idleTorque = 200.0f;			// IDLE_TORQUE
@@ -467,21 +465,21 @@ class SingleBodyVehicleManager: public dVehicleManager
 		engineInfo.m_crownGear = 4.0f;
 		engineInfo.m_clutchTorque = 600.0f;
 
-		engineInfo.m_gearRatios[dVehicleEngineInterface::m_reverseGear] = -2.90f;	// reverse
-		engineInfo.m_gearRatios[dVehicleEngineInterface::m_neutralGear] = 0.0f;     // neutral
-		engineInfo.m_gearRatios[dVehicleEngineInterface::m_firstGear + 0] = 2.66f;  // GEAR_1
-		engineInfo.m_gearRatios[dVehicleEngineInterface::m_firstGear + 1] = 1.78f;	// GEAR_2
-		engineInfo.m_gearRatios[dVehicleEngineInterface::m_firstGear + 2] = 1.30f;	// GEAR_3
-		engineInfo.m_gearRatios[dVehicleEngineInterface::m_firstGear + 3] = 1.00f;	// GEAR_4
-		engineInfo.m_gearRatios[dVehicleEngineInterface::m_firstGear + 4] = 0.74f;	// GEAR_5
-		engineInfo.m_gearRatios[dVehicleEngineInterface::m_firstGear + 5] = 0.50f;	// GEAR_6
+		engineInfo.m_gearRatios[dEngineInfo::m_reverseGear] = -2.90f;	// reverse
+		engineInfo.m_gearRatios[dEngineInfo::m_neutralGear] = 0.0f;     // neutral
+		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 0] = 2.66f;  // GEAR_1
+		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 1] = 1.78f;	// GEAR_2
+		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 2] = 1.30f;	// GEAR_3
+		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 3] = 1.00f;	// GEAR_4
+		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 4] = 0.74f;	// GEAR_5
+		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 5] = 0.50f;	// GEAR_6
 		engineInfo.m_gearsCount = 8;
 
-		dVehicleEngineInterface* const engine = vehicle->AddEngine(engineInfo, differential);
+//		dVehicleEngine* const engine = vehicle->AddEngine(engineInfo, differential);
 		// Set Engine Control
-		dVehicleEngineControl* const engineControl = vehicle->GetEngineControl();
-		engineControl->SetEngine(engine);
-*/
+//		dVehicleEngineControl* const engineControl = vehicle->GetEngineControl();
+//		engineControl->SetEngine(engine);
+
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		vehicle->Finalize();
 

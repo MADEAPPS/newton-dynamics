@@ -18,8 +18,6 @@
 dVehicleEngine::dEngineMetricInfo::dEngineMetricInfo(const dEngineInfo& info)
 	:dEngineInfo(info)
 {
-	dAssert(0);
-/*
 	const dFloat horsePowerToWatts = 735.5f;
 	const dFloat rpmToRadiansPerSecunds = 0.105f;
 	const dFloat poundFootToNewtonMeters = 1.356f;
@@ -44,9 +42,7 @@ dVehicleEngine::dEngineMetricInfo::dEngineMetricInfo(const dEngineInfo& info)
 	dAssert(m_idleTorque > 0.0f);
 	dAssert(m_peakTorque > m_peakPowerTorque);
 	dAssert((m_peakTorque * m_rpmAtPeakTorque) < m_peakHorsePower);
-*/
 }
-
 
 dFloat dVehicleEngine::dEngineMetricInfo::GetTorque (dFloat rpm) const
 {
@@ -78,6 +74,7 @@ dFloat dVehicleEngine::dEngineMetricInfo::GetTorque (dFloat rpm) const
 dVehicleEngine::dVehicleEngine(dVehicleChassis* const chassis, const dEngineInfo& info, dVehicleDifferential* const differential)
 	:dVehicleNode(chassis)
 	,dBilateralJoint()
+	,m_localAxis(dYawMatrix(90.0f * dDegreeToRad))
 	,m_metricInfo(info)
 	,m_differential(differential)
 	//,m_blockJoint()
@@ -86,9 +83,8 @@ dVehicleEngine::dVehicleEngine(dVehicleChassis* const chassis, const dEngineInfo
 	//,m_omega(0.0f)
 {
 	dAssert(0);
+	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 /*
-	SetWorld(parent->GetWorld());
-
 	dFloat inertia = 0.7f * m_info.m_mass * m_info.m_armatureRadius * m_info.m_armatureRadius;
 	m_proxyBody.SetMass(m_info.m_mass);
 	m_proxyBody.SetInertia(inertia, inertia, inertia);
@@ -225,5 +221,30 @@ void dVehicleEngine::Integrate(dFloat timestep)
 //dTrace (("eng(%f)\n", m_omega));
 */
 }
-
 #endif
+
+
+void dVehicleEngine::UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
+{
+	dAssert(0);
+}
+
+void dVehicleEngine::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+{
+	dAssert(0);
+/*
+	dComplementaritySolver::dBodyState* const diffBody = m_state0;
+	dMatrix matrix(m_localAxis * diffBody->GetMatrix());
+
+	/// three rigid attachment to chassis
+	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_front);
+	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_up);
+	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_right);
+
+	// angular constraints	
+	AddAngularRowJacobian(constraintParams, matrix.m_right, 0.0f);
+	//if (m_slipeOn) {
+	//	dAssert(0);
+	//}
+*/
+}

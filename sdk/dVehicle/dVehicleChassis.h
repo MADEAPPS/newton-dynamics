@@ -19,6 +19,7 @@
 #include "dVehicleDashControl.h"
 
 class dTireInfo;
+class dEngineInfo;
 class dVehicleTire;
 class dVehicleLoopJoint;
 class dVehicleDifferential;
@@ -81,6 +82,7 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 	DVEHICLE_API void Finalize();
 	DVEHICLE_API const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	DVEHICLE_API dVehicleTire* AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
+	DVEHICLE_API dVehicleEngine* AddEngine(const dEngineInfo& engineInfo, dVehicleDifferential* const differential);
 	DVEHICLE_API dVehicleDifferential* AddDifferential(dFloat mass, dFloat radius, dVehicleTire* const leftTire, dVehicleTire* const rightTire);
 
 	DVEHICLE_API dVehicleBrakeControl* GetBrakeControl();
@@ -91,7 +93,7 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 
 #if 0
 	
-	DVEHICLE_API dVehicleEngineInterface* AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential);
+	
 	DVEHICLE_API dVehicleEngineControl* GetEngineControl();
 	private:
 	dVehicleEngineControl* m_engineControl;

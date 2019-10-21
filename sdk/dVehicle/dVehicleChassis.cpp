@@ -12,6 +12,7 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
 #include "dVehicleTire.h"
+#include "dVehicleEngine.h"
 #include "dVehicleChassis.h"
 #include "dVehicleManager.h"
 #include "dVehicleDifferential.h"
@@ -334,6 +335,12 @@ dVehicleDifferential* dVehicleChassis::AddDifferential(dFloat mass, dFloat radiu
 	return differential;
 }
 
+dVehicleEngine* dVehicleChassis::AddEngine(const dEngineInfo& engineInfo, dVehicleDifferential* const differential)
+{
+	dVehicleEngine* const engine = new dVehicleEngine(this, engineInfo, differential);
+	return engine;
+}
+
 dVehicleSteeringControl* dVehicleChassis::GetSteeringControl()
 {
 	return &m_steeringControl;
@@ -350,10 +357,6 @@ dVehicleBrakeControl* dVehicleChassis::GetHandBrakeControl()
 }
 
 #if 0
-dVehicleEngineInterface* dVehicleChassis::AddEngine(const dVehicleEngineInterface::dEngineInfo& engineInfo, dVehicleDifferentialInterface* const differential)
-{
-	return m_vehicle->AddEngine(engineInfo, differential);
-}
 
 void dVehicleChassis::PostUpdate(dFloat timestep)
 {

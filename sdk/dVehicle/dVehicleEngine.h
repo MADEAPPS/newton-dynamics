@@ -126,14 +126,17 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	int GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray);
 
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
-	
-
-	
 	dEngineBlockJoint m_blockJoint;
 	dEngineCrankJoint m_crankJoint;
 	dGearBoxJoint m_gearBox;
 	dFloat m_omega;
 */
+
+	dComplementaritySolver::dBilateralJoint* GetJoint() { return this; }
+	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
+	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const;
+
+	dMatrix m_localAxis;
 	dEngineMetricInfo m_metricInfo;
 	dVehicleDifferential* m_differential;
 	friend class dVehicleChassis;
