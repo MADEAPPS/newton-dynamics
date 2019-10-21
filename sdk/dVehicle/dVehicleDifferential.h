@@ -55,7 +55,6 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const;
 
 	dMatrix m_localAxis;
-	//dDifferentialMount m_differential;
 	dTireAxleJoint m_leftAxle;
 	dTireAxleJoint m_rightAxle;
 	dVehicleNode* m_leftNode;
