@@ -81,32 +81,31 @@ class SingleBodyVehicleManager: public dVehicleManager
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 		
 		//scene->Set2DDisplayRenderFunction(RenderHelpMenu, RenderUI, this);
-		//
+		scene->Set2DDisplayRenderFunction(NULL, RenderUI, this);
+		
 		//// load 2d display assets
-		//m_gears = LoadTexture("gears_font.tga");
-		//m_odometer = LoadTexture("kmh_dial.tga");
-		//m_tachometer = LoadTexture("rpm_dial.tga");
-		//m_redNeedle = LoadTexture("needle_red.tga");
-		//m_greenNeedle = LoadTexture("needle_green.tga");
+		m_gears = LoadTexture("gears_font.tga");
+		m_odometer = LoadTexture("kmh_dial.tga");
+		m_tachometer = LoadTexture("rpm_dial.tga");
+		m_redNeedle = LoadTexture("needle_red.tga");
+		m_greenNeedle = LoadTexture("needle_green.tga");
 	}
 
 	~SingleBodyVehicleManager()
 	{
-		//ReleaseTexture (m_gears);
-		//ReleaseTexture (m_odometer);
-		//ReleaseTexture (m_redNeedle);
-		//ReleaseTexture (m_tachometer);
-		//ReleaseTexture (m_greenNeedle);
+		ReleaseTexture (m_gears);
+		ReleaseTexture (m_odometer);
+		ReleaseTexture (m_redNeedle);
+		ReleaseTexture (m_tachometer);
+		ReleaseTexture (m_greenNeedle);
 	}
-
-
+	
 	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
 	{
 		SingleBodyVehicleManager* const me = (SingleBodyVehicleManager*)context;
 		me->UpdateCamera(timestep);
 	}
 
-#if 0
 	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
 	{
 		//SingleBodyVehicleManager* const me = (SingleBodyVehicleManager*)context;
@@ -195,15 +194,17 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 			DemoEntity* const playerEnt = (DemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
 			
-			dVehicleEngineInterface* const engine = m_player->GetEngineControl()->GetEngine();
-			if (engine) {
+			//dVehicleEngineInterface* const engine = m_player->GetEngineControl()->GetEngine();
+			//if (engine) {
+			if (1) {
 				glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 				dFloat gageSize = 200.0f;
 				dFloat y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
 
 				// draw the tachometer
 				dFloat x = gageSize / 2 + 20.0f;
-				dFloat rpm = engine->GetRpm() / engine->GetRedLineRpm();
+				//dFloat rpm = engine->GetRpm() / engine->GetRedLineRpm();
+				dFloat rpm = 0.0f;
 				DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 0.0f);
 
 				// draw the odometer
@@ -215,14 +216,13 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 				// draw the current gear
 				//int gear = engine->GetGear();
-				int gear = 1;
-				VehicleUserData* const playerData = (VehicleUserData*)playerEnt->GetUserData();
-				DrawGear(speed, x, y + 98, playerData->m_gearMap[gear], gageSize);
+				//int gear = 1;
+				//VehicleUserData* const playerData = (VehicleUserData*)playerEnt->GetUserData();
+				//DrawGear(speed, x, y + 98, playerData->m_gearMap[gear], gageSize);
 			}
 		}
 	}
 
-#endif
 
 	void SetAsPlayer(dVehicleChassis* const player)
 	{
@@ -600,14 +600,11 @@ axisCount = 0;
 	}
 
 	dVehicleChassis* m_player;
-#if 0
-
 	GLuint m_gears;
 	GLuint m_odometer;
 	GLuint m_redNeedle;
 	GLuint m_tachometer;
 	GLuint m_greenNeedle;
-#endif
 	bool m_externalView;
 };
 
