@@ -982,11 +982,11 @@ void dgWorld::RunStep ()
 	}
 
 	const dgBodyMasterList* const masterList = this;
-	dgBodyMasterList::dgListNode* node = masterList->GetFirst();
+	dgBodyMasterList::dgListNode* threadNode = masterList->GetFirst();
 	const dgInt32 threadsCount = GetThreadCount();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
-		QueueJob(UpdateTransforms, this, node, "dgWorld::UpdateTransforms");
-		node = node ? node->GetNext() : NULL;
+		QueueJob(UpdateTransforms, this, threadNode, "dgWorld::UpdateTransforms");
+		threadNode = threadNode ? threadNode->GetNext() : NULL;
 	}
 	SynchronizationBarrier();
 
