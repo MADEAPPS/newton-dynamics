@@ -58,10 +58,6 @@ class dVehicleTireContact: public dVehicleLoopJoint
 	dVector m_longitudinalDir;
 	dFloat m_penetration;
 	dFloat m_staticFriction;
-	//dFloat m_load;
-	//dFloat m_lateralSlip;
-	//dFloat m_longitudinalSlip;
-	//dFloat m_gamma;
 	mutable dTireModel m_tireModel;
 
 	friend class dVehicleTire;

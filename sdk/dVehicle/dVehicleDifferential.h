@@ -15,11 +15,30 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
+#include "dVehicleLoopJoint.h"
 
 class dVehicleChassis;
 
 class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::dBilateralJoint
 {
+	class dTireAxleJoint: public dVehicleLoopJoint
+	{
+		public:
+		dTireAxleJoint()
+			:dVehicleLoopJoint()
+			,m_diffSign(1.0f)
+		{
+		}
+
+		private:
+		int GetMaxDof() const { return 1; }
+		void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
+		void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
+
+		dFloat m_diffSign;
+		friend class dVehicleDifferential;
+	};
+
 	public:
 	DVEHICLE_API dVehicleDifferential(dVehicleChassis* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode);
 	DVEHICLE_API virtual ~dVehicleDifferential();
@@ -28,7 +47,7 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	void CalculateFreeDof();
 	void ApplyExternalForce();
 	void Integrate(dFloat timestep);
-	//int GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray);
+	int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 	//void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
 	dComplementaritySolver::dBilateralJoint* GetJoint() {return this;}
@@ -37,10 +56,10 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 
 	dMatrix m_localAxis;
 	//dDifferentialMount m_differential;
-	//dTireAxleJoint m_leftAxle;
-	//dTireAxleJoint m_rightAxle;
-	//dVehicleTireInterface* m_leftTire;
-	//dVehicleTireInterface* m_rightTire;
+	dTireAxleJoint m_leftAxle;
+	dTireAxleJoint m_rightAxle;
+	dVehicleNode* m_leftNode;
+	dVehicleNode* m_rightNode;
 	dFloat m_diffOmega;
 	dFloat m_shaftOmega;
 

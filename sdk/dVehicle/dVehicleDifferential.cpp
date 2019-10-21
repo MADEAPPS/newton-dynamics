@@ -19,35 +19,31 @@ dVehicleDifferential::dVehicleDifferential(dVehicleChassis* const chassis, dFloa
 	,dBilateralJoint()
 	,m_localAxis(dYawMatrix (90.0f * dDegreeToRad))
 //	,m_differential()
-//	,m_leftAxle()
-//	,m_rightAxle()
-//	,m_leftTire(leftTire)
-//	,m_rightTire(rightTire)
+	,m_leftAxle()
+	,m_rightAxle()
+	,m_leftNode(leftNode)
+	,m_rightNode(rightNode)
 	,m_diffOmega(0.0f)
 	,m_shaftOmega(0.0f)
 {
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 
-	//dFloat mass = 0.75f * 0.5f * (m_leftTire->GetInfo().m_mass + m_rightTire->GetInfo().m_mass);
-	//dFloat radius = m_leftTire->GetInfo().m_radio * 0.5f;
-	dFloat inertia = (2.0f / 3.0f) * mass * radius * radius;
+	dFloat inertia = (2.0f / 5.0f) * mass * radius * radius;
 
 	m_proxyBody.SetMass(mass);
 	m_proxyBody.SetInertia(inertia, inertia, inertia);
 	m_proxyBody.UpdateInertia();
 
-/*
 	// set the tire joint
-	m_differential.Init(&m_proxyBody, m_parent->GetProxyBody());
-	m_leftAxle.Init(&m_proxyBody, m_leftTire->GetProxyBody());
-	m_rightAxle.Init(&m_proxyBody, m_rightTire->GetProxyBody());
+	//m_differential.Init(&m_proxyBody, m_parent->GetProxyBody());
+	m_leftAxle.SetOwners(this, m_leftNode);
+	m_rightAxle.SetOwners(this, m_rightNode);
 
-	m_leftAxle.SetOwners(this, m_leftTire);
-	m_rightAxle.SetOwners(this, m_rightTire);
+	m_leftAxle.Init(&m_proxyBody, &m_leftNode->GetProxyBody());
+	m_rightAxle.Init(&m_proxyBody, &m_rightNode->GetProxyBody());
 
 	m_leftAxle.m_diffSign = -1.0f;
 	m_rightAxle.m_diffSign = 1.0f;
-*/
 }
 
 dVehicleDifferential::~dVehicleDifferential()
@@ -65,18 +61,14 @@ void dVehicleDifferential::Debug(dCustomJoint::dDebugDisplay* const debugContext
 	dAssert(0);
 //	dVehicleDifferentialInterface::Debug(debugContext);
 }
+#endif
 
-int dVehicleDifferential::GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray)
+int dVehicleDifferential::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 {
-	dAssert(0);
-	return 0;
-/*
 	jointArray[0] = &m_leftAxle;
 	jointArray[1] = &m_rightAxle;
-	return dVehicleDifferentialInterface::GetKinematicLoops(&jointArray[2]) + 2;
-*/
+	return 2;
 }
-#endif
 
 void dVehicleDifferential::CalculateFreeDof()
 {
@@ -109,6 +101,10 @@ void dVehicleDifferential::ApplyExternalForce()
 	m_proxyBody.SetVeloc(chassisBody->GetVelocity());
 	m_proxyBody.SetOmega(chassisBody->GetOmega() + matrix.m_front.Scale (m_shaftOmega) + matrix.m_up.Scale (m_diffOmega));
 	m_proxyBody.SetTorque(dVector(0.0f));
+
+dVector xxxx (matrix.m_front.Scale (-500.0f));
+m_proxyBody.SetTorque(xxxx);
+
 	m_proxyBody.SetForce(chassisNode->GetGravity().Scale(m_proxyBody.GetMass()));
 }
 
@@ -119,12 +115,8 @@ void dVehicleDifferential::UpdateSolverForces(const dComplementaritySolver::dJac
 
 void dVehicleDifferential::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-	//dComplementaritySolver::dBodyState* const chassis = m_state1;
-	dComplementaritySolver::dBodyState* const differential = m_state0;
-	//dComplementaritySolver::dBodyState* const chassisBody = m_state1;
-	
-	//const dVector& omega = chassis->GetOmega();
-	dMatrix matrix (m_localAxis * differential->GetMatrix());
+	dComplementaritySolver::dBodyState* const diffBody = m_state0;
+	dMatrix matrix (m_localAxis * diffBody->GetMatrix());
 	
 	/// three rigid attachment to chassis
 	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_front);
@@ -136,5 +128,33 @@ void dVehicleDifferential::JacobianDerivative(dComplementaritySolver::dParamInfo
 	//if (m_slipeOn) {
 	//	dAssert(0);
 	//}
+}
+
+void dVehicleDifferential::dTireAxleJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+{
+	dVehicleDifferential* const differential = (dVehicleDifferential*)GetOwner0();
+	//dVehicleDifferential* const childNode = (dVehicleDifferential*)GetOwner1();
+
+	dMatrix diffMatrix (differential->m_localAxis * m_state0->GetMatrix());
+	const dMatrix& tireMatrix = m_state1->GetMatrix();
+
+	AddAngularRowJacobian(constraintParams, tireMatrix.m_front, 0.0f);
+
+	dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_J01;
+	dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_J10;
+
+	jacobian0.m_angular = diffMatrix.m_front + diffMatrix.m_up.Scale(m_diffSign);
+
+	const dVector& omega0 = m_state0->GetOmega();
+	const dVector& omega1 = m_state1->GetOmega();
+
+	const dVector relOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+	dFloat w = relOmega.m_x + relOmega.m_y + relOmega.m_z;
+
+	constraintParams->m_jointAccel[0] = -w * constraintParams->m_timestepInv;
+
+	m_dof = 1;
+	m_count = 1;
+	constraintParams->m_count = 1;
 }
 
