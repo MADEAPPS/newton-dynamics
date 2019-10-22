@@ -103,6 +103,37 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 		dEngineTorqueNode m_torqueCurve[5];
 	};
 
+	class dGearBoxAndClutchJoint: public dVehicleLoopJoint
+	{
+		public:
+		dGearBoxAndClutchJoint()
+			:dVehicleLoopJoint()
+		{
+		}
+
+		void SetGearRatio(dFloat ratio)
+		{
+			m_gearRatio = ratio;
+		}
+
+		void SetClutchTorque(dFloat clutchTorque)
+		{
+			m_clutchTorque = clutchTorque;
+		}
+
+
+		private:
+		int GetMaxDof() const { return 1; }
+
+		void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
+		void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
+
+		dFloat m_gearRatio;
+		//dFloat m_crowndGear;
+		dFloat m_clutchTorque;
+	};
+
+
 	public:
 	DVEHICLE_API dVehicleEngine(dVehicleChassis* const chassis, const dEngineInfo& info, dVehicleDifferential* const differential);
 	DVEHICLE_API virtual ~dVehicleEngine();
@@ -115,7 +146,6 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	void SetClutch (dFloat clutch);
 	void SetThrottle (dFloat throttle);
 	void SetInfo(const dEngineInfo& info);
-	dComplementaritySolver::dBilateralJoint* GetProxyJoint();
 	int GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray);
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	dEngineBlockJoint m_blockJoint;
@@ -127,14 +157,21 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	void CalculateFreeDof();
 	void ApplyExternalForce();
 	void Integrate(dFloat timestep);
+	int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 
+	dVehicleEngine* GetAsEngine() const { return (dVehicleEngine*)this;}
 	dComplementaritySolver::dBilateralJoint* GetJoint() { return this; }
+
+	const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const;
 
 	dMatrix m_localAxis;
 	dEngineMetricInfo m_metricInfo;
+	dGearBoxAndClutchJoint m_gearBox;
 	dVehicleDifferential* m_differential;
+	dFloat m_omega;
+
 	friend class dVehicleChassis;
 };
 

@@ -48,18 +48,11 @@ dVehicleDifferential::~dVehicleDifferential()
 {
 }
 
-#if 0
-dComplementaritySolver::dBilateralJoint* dVehicleDifferential::GetProxyJoint()
+const void dVehicleDifferential::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
-	return &m_differential;
-}
-
-void dVehicleDifferential::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
-{
-	dAssert(0);
+//	dAssert(0);
 //	dVehicleDifferentialInterface::Debug(debugContext);
 }
-#endif
 
 int dVehicleDifferential::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 {
@@ -100,9 +93,6 @@ void dVehicleDifferential::ApplyExternalForce()
 	m_proxyBody.SetOmega(chassisBody->GetOmega() + matrix.m_front.Scale (m_shaftOmega) + matrix.m_up.Scale (m_diffOmega));
 	m_proxyBody.SetTorque(dVector(0.0f));
 
-dVector xxxx (matrix.m_front.Scale (-500.0f));
-m_proxyBody.SetTorque(xxxx);
-
 	m_proxyBody.SetForce(chassisNode->GetGravity().Scale(m_proxyBody.GetMass()));
 }
 
@@ -130,7 +120,8 @@ void dVehicleDifferential::JacobianDerivative(dComplementaritySolver::dParamInfo
 
 void dVehicleDifferential::dTireAxleJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-	dVehicleDifferential* const differential = (dVehicleDifferential*)GetOwner0();
+	dVehicleDifferential* const differential = GetOwner0()->GetAsDifferential();
+	dAssert (differential);
 	//dVehicleDifferential* const childNode = (dVehicleDifferential*)GetOwner1();
 
 	dMatrix diffMatrix (differential->m_localAxis * m_state0->GetMatrix());

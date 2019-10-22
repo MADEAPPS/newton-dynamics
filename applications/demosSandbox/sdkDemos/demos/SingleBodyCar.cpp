@@ -474,7 +474,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 5] = 0.50f;	// GEAR_6
 		engineInfo.m_gearsCount = 8;
 
-//		dVehicleEngine* const engine = vehicle->AddEngine(engineInfo, differential);
+		dVehicleEngine* const engine = vehicle->AddEngine(engineInfo, differential);
 		// Set Engine Control
 //		dVehicleEngineControl* const engineControl = vehicle->GetEngineControl();
 //		engineControl->SetEngine(engine);

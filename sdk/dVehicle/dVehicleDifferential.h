@@ -48,9 +48,11 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	void ApplyExternalForce();
 	void Integrate(dFloat timestep);
 	int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
-	//void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 
 	dComplementaritySolver::dBilateralJoint* GetJoint() {return this;}
+	dVehicleDifferential* GetAsDifferential() const { return (dVehicleDifferential*)this; }
+	
+	const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const;
 

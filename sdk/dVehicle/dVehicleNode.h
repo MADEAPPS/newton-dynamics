@@ -17,8 +17,10 @@
 
 class dVehicleNode;
 class dVehicleTire;
+class dVehicleEngine;
 class dVehicleChassis;
 class dVehicleLoopJoint;
+class dVehicleDifferential;
 
 class dVehicleNodeChildrenList: public dList<dVehicleNode*>
 {
@@ -42,7 +44,9 @@ class dVehicleNode: public dCustomAlloc
 	DVEHICLE_API virtual void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	
 	virtual dVehicleTire* GetAsTire() const { return NULL; }
+	virtual dVehicleEngine* GetAsEngine() const { return NULL; }
 	virtual dVehicleChassis* GetAsVehicle() const { return NULL; }
+	virtual dVehicleDifferential* GetAsDifferential() const { return NULL; }
 	virtual dComplementaritySolver::dBilateralJoint* GetJoint() { return NULL; }
 		
 	void* GetUserData() const {return m_usedData;}

@@ -80,7 +80,7 @@ dVehicleEngine::dVehicleEngine(dVehicleChassis* const chassis, const dEngineInfo
 	//,m_blockJoint()
 	//,m_crankJoint()
 	//,m_gearBox()
-	//,m_omega(0.0f)
+	,m_omega(0.0f)
 {
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 
@@ -101,6 +101,9 @@ dVehicleEngine::dVehicleEngine(dVehicleChassis* const chassis, const dEngineInfo
 
 	SetInfo(info);
 */
+
+	m_gearBox.SetOwners(this, m_differential);
+	m_gearBox.Init(&m_proxyBody, &m_differential->GetProxyBody());
 }
 
 dVehicleEngine::~dVehicleEngine()
@@ -132,12 +135,6 @@ dComplementaritySolver::dBilateralJoint* dVehicleEngine::GetProxyJoint()
 	return &m_blockJoint;
 }
 
-void dVehicleEngine::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
-{
-	dAssert(0);
-//	dVehicleEngineInterface::Debug(debugContext);
-}
-
 dFloat dVehicleEngine::GetRpm() const
 {
 	return -m_omega * 9.549f;
@@ -167,65 +164,22 @@ void dVehicleEngine::SetClutch (dFloat clutch)
 	clutch = dClamp (clutch, dFloat (0.0f), dFloat (1.0f));
 	m_gearBox.SetClutchTorque(clutch * m_metricInfo.m_clutchTorque);
 }
-
-int dVehicleEngine::GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray)
-{
-	dAssert(0);
-	return 0;
-/*
-	jointArray[0] = &m_crankJoint;
-	jointArray[1] = &m_gearBox;
-
-	int count = 2;
-	return dVehicleEngineInterface::GetKinematicLoops(&jointArray[count]) + count;
-*/
-}
-
-void dVehicleEngine::ApplyExternalForce(dFloat timestep)
-{
-	dAssert(0);
-/*
-	dVehicleSingleBody* const chassisNode = (dVehicleSingleBody*)m_parent;
-	dComplementaritySolver::dBodyState* const chassisBody = chassisNode->GetProxyBody();
-
-	dMatrix matrix(chassisBody->GetMatrix());
-	matrix.m_posit = matrix.TransformVector(chassisBody->GetCOM());
-	m_proxyBody.SetMatrix(matrix);
-
-	m_proxyBody.SetVeloc(chassisBody->GetVelocity());
-	m_proxyBody.SetOmega(chassisBody->GetOmega() + matrix.m_right.Scale (m_omega));
-	m_proxyBody.SetTorque(dVector(0.0f));
-	m_proxyBody.SetForce(chassisNode->m_gravity.Scale(m_proxyBody.GetMass()));
-
-	dVehicleEngineInterface::ApplyExternalForce(timestep);
-*/
-}
-
-void dVehicleEngine::Integrate(dFloat timestep)
-{
-	dAssert(0);
-/*
-	dVehicleEngineInterface::Integrate(timestep);
-
-	dVehicleSingleBody* const chassis = (dVehicleSingleBody*)m_parent;
-	dComplementaritySolver::dBodyState* const chassisBody = chassis->GetProxyBody();
-
-	const dMatrix chassisMatrix(chassisBody->GetMatrix());
-
-	dVector omega(m_proxyBody.GetOmega());
-	dVector chassisOmega(chassisBody->GetOmega());
-	dVector localOmega(omega - chassisOmega);
-	m_omega = chassisMatrix.m_right.DotProduct3(localOmega);
-
-//dTrace (("eng(%f)\n", m_omega));
-*/
-}
 #endif
+
+const void dVehicleEngine::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+//	dAssert(0);
+//	dVehicleEngineInterface::Debug(debugContext);
+}
+
+int dVehicleEngine::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
+{
+	jointArray[0] = &m_gearBox;
+	return 1;
+}
 
 void dVehicleEngine::CalculateFreeDof()
 {
-	dAssert(0);
-/*
 	dVehicleChassis* const chassisNode = GetParent()->GetAsVehicle();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 	const dMatrix chassisMatrix(m_localAxis * chassisBody->GetMatrix());
@@ -233,21 +187,16 @@ void dVehicleEngine::CalculateFreeDof()
 	dVector omega(m_proxyBody.GetOmega());
 	dVector chassisOmega(chassisBody->GetOmega());
 	dVector relativeOmega(omega - chassisOmega);
-	m_diffOmega = chassisMatrix.m_up.DotProduct3(relativeOmega);
-	m_shaftOmega = chassisMatrix.m_front.DotProduct3(relativeOmega);
-*/
+	m_omega = chassisMatrix.m_front.DotProduct3(relativeOmega);
 }
 
 void dVehicleEngine::Integrate(dFloat timestep)
 {
-	dAssert(0);
 	m_proxyBody.IntegrateForce(timestep, m_proxyBody.GetForce(), m_proxyBody.GetTorque());
 }
 
 void dVehicleEngine::ApplyExternalForce()
 {
-	dAssert(0);
-/*
 	dVehicleChassis* const chassisNode = GetParent()->GetAsVehicle();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 
@@ -257,14 +206,13 @@ void dVehicleEngine::ApplyExternalForce()
 
 	matrix = m_localAxis * matrix;
 	m_proxyBody.SetVeloc(chassisBody->GetVelocity());
-	m_proxyBody.SetOmega(chassisBody->GetOmega() + matrix.m_front.Scale(m_shaftOmega) + matrix.m_up.Scale(m_diffOmega));
+	m_proxyBody.SetOmega(chassisBody->GetOmega() + matrix.m_front.Scale(m_omega));
 	m_proxyBody.SetTorque(dVector(0.0f));
 
-	dVector xxxx(matrix.m_front.Scale(-500.0f));
-	m_proxyBody.SetTorque(xxxx);
+dVector xxxx(matrix.m_front.Scale(-500.0f));
+m_proxyBody.SetTorque(xxxx);
 
 	m_proxyBody.SetForce(chassisNode->GetGravity().Scale(m_proxyBody.GetMass()));
-*/
 }
 
 void dVehicleEngine::UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
@@ -274,10 +222,8 @@ void dVehicleEngine::UpdateSolverForces(const dComplementaritySolver::dJacobianP
 
 void dVehicleEngine::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-	dAssert(0);
-/*
-	dComplementaritySolver::dBodyState* const diffBody = m_state0;
-	dMatrix matrix(m_localAxis * diffBody->GetMatrix());
+	dComplementaritySolver::dBodyState* const engine = m_state0;
+	dMatrix matrix(m_localAxis * engine->GetMatrix());
 
 	/// three rigid attachment to chassis
 	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_front);
@@ -285,9 +231,47 @@ void dVehicleEngine::JacobianDerivative(dComplementaritySolver::dParamInfo* cons
 	AddLinearRowJacobian(constraintParams, matrix.m_posit, matrix.m_right);
 
 	// angular constraints	
+	AddAngularRowJacobian(constraintParams, matrix.m_up, 0.0f);
 	AddAngularRowJacobian(constraintParams, matrix.m_right, 0.0f);
-	//if (m_slipeOn) {
-	//	dAssert(0);
-	//}
-*/
+}
+
+void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+{
+	m_dof = 0;
+	m_count = 0;
+	constraintParams->m_count = 0;
+	if (dAbs(m_gearRatio) > 1.0e-3f) {
+
+		dVehicleEngine* const engineNode = GetOwner0()->GetAsEngine();
+		dAssert (engineNode);
+		//dComplementaritySolver::dBodyState* const chassis = &engineNode->GetProxyBody();
+		//const dEngineInfo& info = engineNode->GetInfo();
+
+		const dMatrix& matrix = m_state0->GetMatrix();
+		AddAngularRowJacobian(constraintParams, matrix.m_right, 0.0f);
+
+		dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_J01;
+		dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_J10;
+
+		//dFloat gain = info.m_crownGear * m_gearRatio;
+		dFloat gain = 1.0f;
+		jacobian1.m_angular = jacobian1.m_angular.Scale(gain);
+
+		const dVector& omega0 = m_state0->GetOmega();
+		const dVector& omega1 = m_state1->GetOmega();
+
+		const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+		dFloat w = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
+
+		constraintParams->m_jointAccel[0] = -w * constraintParams->m_timestepInv;
+		constraintParams->m_jointLowFrictionCoef[0] = -m_clutchTorque;
+		constraintParams->m_jointHighFrictionCoef[0] = m_clutchTorque;
+
+		//constraintParams->m_jointLowFrictionCoef[0] = -50;
+		//constraintParams->m_jointHighFrictionCoef[0] = 50;
+
+		m_dof = 1;
+		m_count = 1;
+		constraintParams->m_count = 1;
+	}
 }
