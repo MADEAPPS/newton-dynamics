@@ -245,7 +245,7 @@ void dVehicleEngine::JacobianDerivative(dComplementaritySolver::dParamInfo* cons
 	// try steady state calibration
 	int index = constraintParams->m_count;
 	AddAngularRowJacobian(constraintParams, matrix.m_front, 0.0f);
-	constraintParams->m_jointAccel[index] += -10.0f / constraintParams->m_timestep;
+	constraintParams->m_jointAccel[index] += -20.0f / constraintParams->m_timestep;
 	constraintParams->m_jointLowFrictionCoef[index] = -500.0f;
 	constraintParams->m_jointHighFrictionCoef[index] = 500.0f;
 }
