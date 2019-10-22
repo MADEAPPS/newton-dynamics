@@ -15,9 +15,9 @@
 #include "dVehicleChassis.h"
 #include "dVehicleLoopJoint.h"
 
-#define D_DIAG_DAMP		 dFloat(1.0e-6f)
-#define D_DIAG_REGULARIZER	 dFloat(1.0e-4f)
-#define D_MAX_FRICTION_BOUND (D_COMPLEMENTARITY_MAX_FRICTION_BOUND * dFloat(0.5f))
+#define D_DIAG_DAMP				dFloat(1.0e-6f)
+#define D_DIAG_REGULARIZER		dFloat(1.0e-4f)
+#define D_MAX_FRICTION_BOUND	(D_COMPLEMENTARITY_MAX_FRICTION_BOUND * dFloat(0.5f))
 
 class dVehicleSolver::dMatrixData
 {
@@ -48,12 +48,10 @@ class dVehicleSolver::dBodyJointMatrixDataPair
 	dMatrixData m_joint;
 };
 
-//dVehicleSolver::dVehicleSolver(dVehicleChassis* const root): m_rootNode(root)
 dVehicleSolver::dVehicleSolver()
 {
 	m_data = NULL;
 	m_pairs = NULL;
-//	m_rootNode = NULL;
 	m_nodesOrder = NULL;
 	m_loopJoints = NULL;
 	m_deltaForce = NULL;
@@ -67,7 +65,6 @@ dVehicleSolver::dVehicleSolver()
 	m_nodeCount = 0;
 	m_maxNodeCount = 0;
 	m_loopRowCount = 0;
-//	m_loopNodeCount = 0;
 	m_loopJointCount = 0;
 	m_auxiliaryRowCount = 0;
 }
@@ -139,7 +136,6 @@ void dVehicleSolver::Finalize()
 void dVehicleSolver::CalculateInertiaMatrix(dVehicleNode* const node) const
 {
 	dComplementaritySolver::dBodyState* const body = &node->GetProxyBody();
-//	dSpatialMatrix& bodyMass = m_data[node->GetProxyBody()->GetIndex()].m_body.m_mass;
 	dSpatialMatrix& bodyMass = m_data[node->m_index].m_body.m_mass;
 	bodyMass = dSpatialMatrix(dFloat32(0.0f));
 
@@ -161,7 +157,6 @@ void dVehicleSolver::GetJacobians(dVehicleNode* const node)
 	dAssert(node->GetParent());
 	dComplementaritySolver::dBilateralJoint* const joint = node->GetJoint();
 
-	//const int index = node->GetProxyBody()->GetIndex();
 	const int index = node->m_index;
 	dSpatialMatrix& bodyJt = m_data[index].m_body.m_jt;
 	dSpatialMatrix& jointJ = m_data[index].m_joint.m_jt;
@@ -199,7 +194,6 @@ void dVehicleSolver::CalculateBodyDiagonal(dVehicleNode* const child)
 		}
 	}
 	
-	//const int parentIndes = child->GetParent()->GetProxyBody()->GetIndex();
 	const int parentIndex = child->GetParent()->m_index;
 	dSpatialMatrix& bodyMass = m_data[parentIndex].m_body.m_mass;
 	for (int i = 0; i < dof; i++) {
@@ -294,7 +288,6 @@ void dVehicleSolver::Factorize(dVehicleNode* const node)
 		GetJacobians(node);
 	}
 
-	//const int nodeIndex = node->GetProxyBody()->GetIndex();
 	const int nodeIndex = node->m_index;
 	dComplementaritySolver::dBodyState* const body = &node->GetProxyBody();
 
@@ -460,10 +453,6 @@ void dVehicleSolver::InitLoopMassMatrix()
 	const int loopJointCount = m_loopJointCount;
 	for (int j = 0; j < loopJointCount; j++) {
 		const dVehicleLoopJoint* const joint = m_loopJoints[j];
-		//dVehicleNode* const node0 = joint->GetOwner0()->m_owner;
-		//dVehicleNode* const node1 = joint->GetOwner1()->m_owner;
-		//const int m0 = node0->GetProxyBody()->GetIndex();
-		//const int m1 = node1->GetProxyBody()->GetIndex();
 		const int m0 = joint->GetOwner0()->m_index;
 		const int m1 = joint->GetOwner1()->m_index;
 		const int first = joint->m_start;
@@ -678,7 +667,6 @@ void dVehicleSolver::CalculateJointAccel(dVectorPair* const accel) const
 	dAssert(n == m_nodesOrder[n]->m_index);
 	for (int i = 0; i < n; i++) {
 		dVehicleNode* const node = m_nodesOrder[i];
-		//dAssert(i == node->GetProxyBody()->GetIndex());
 		dAssert(i == node->m_index);
 
 		dVectorPair& a = accel[i];
@@ -786,8 +774,6 @@ void dVehicleSolver::SolveForward(dVectorPair* const force, const dVectorPair* c
 		f.m_body = a.m_body;
 		f.m_joint = a.m_joint;
 
-		//const dList<dVehicleNode*>& children = node->GetChildren();
-		//for (dList<dVehicleNode*>::dListNode* childNode = children.GetFirst(); childNode; childNode = childNode->GetNext()) {
 		for (dVehicleNodeChildrenList::dListNode* childNode = node->m_children.GetFirst(); childNode; childNode = childNode->GetNext()) {
 			dVehicleNode* const child = childNode->GetInfo();
 			dAssert(child->GetParent()->m_index == i);
@@ -800,8 +786,6 @@ void dVehicleSolver::SolveForward(dVectorPair* const force, const dVectorPair* c
 	dAssert(n == m_nodesOrder[n]->m_index);
 	dVehicleNode* const rootNode = m_nodesOrder[n];
 	force[n] = accel[n];
-	//const dList<dVehicleNode*>& children = rootNode->GetChildren();
-	//for (dList<dVehicleNode*>::dListNode* childNode = children.GetFirst(); childNode; childNode = childNode->GetNext()) {
 	for (dVehicleNodeChildrenList::dListNode* childNode = rootNode->m_children.GetFirst(); childNode; childNode = childNode->GetNext()) {
 		dVehicleNode* const child = childNode->GetInfo();
 		dAssert(child->GetParent()->m_index == n);
@@ -1167,7 +1151,6 @@ void dVehicleSolver::Update(dFloat timestep)
 		loopDof += loop->GetMaxDof();
 	}
 
-	//int totalJoint = m_nodeCount + m_loopNodeCount;
 	m_data = dAlloca(dBodyJointMatrixDataPair, m_nodeCount);
 	m_leftHandSide = dAlloca(dComplementaritySolver::dJacobianPair, m_nodeCount * 6 + loopDof);
 	m_rightHandSide = dAlloca(dComplementaritySolver::dJacobianColum, m_nodeCount * 6 + loopDof);
