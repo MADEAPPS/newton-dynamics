@@ -885,7 +885,6 @@ void dVehicleSolver::dGaussSeidelLcpSor(const int size, dFloat* const x, const d
 		rowStart += size;
 	}
 
-
 	dFloat tolerance = tol2 * 2.0f;
 	const dFloat* const invDiag = invDiag1;
 	const int maxCount = dMax(8, size);

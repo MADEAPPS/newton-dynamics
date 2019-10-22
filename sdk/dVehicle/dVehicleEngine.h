@@ -111,6 +111,8 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 		public:
 		dGearBoxAndClutchJoint()
 			:dVehicleLoopJoint()
+			,m_gearRatio(1.0f)
+			,m_clutchTorque(1.0e20f)
 		{
 		}
 
@@ -123,7 +125,6 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 		{
 			m_clutchTorque = clutchTorque;
 		}
-
 
 		private:
 		int GetMaxDof() const { return 1; }

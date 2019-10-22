@@ -22,6 +22,7 @@ dVehicleNode::dVehicleNode(dVehicleNode* const parent)
 {
 	if (m_parent) {
 		m_parent->m_children.Append(this);
+		//m_parent->m_children.Addtop(this);
 	}
 }
 

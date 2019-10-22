@@ -275,9 +275,6 @@ void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementarity
 		constraintParams->m_jointLowFrictionCoef[0] = -m_clutchTorque;
 		constraintParams->m_jointHighFrictionCoef[0] = m_clutchTorque;
 
-		//constraintParams->m_jointLowFrictionCoef[0] = -50;
-		//constraintParams->m_jointHighFrictionCoef[0] = 50;
-
 		m_dof = 1;
 		m_count = 1;
 		constraintParams->m_count = 1;
