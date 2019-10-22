@@ -192,7 +192,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 	{
 		// set to transparent color
 		if (m_player) {
-			//DemoEntity* const playerEnt = (DemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
 			dVehicleEngine* const engine = m_player->GetEngineControl() ? m_player->GetEngineControl()->GetEngine() : NULL;
 			
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -201,8 +200,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 			// draw the tachometer
 			dFloat x = gageSize / 2 + 20.0f;
-			//dFloat rpm = engine->GetRpm() / engine->GetRedLineRpm();
-			dFloat rpm = 0.0f;
+			dFloat rpm = engine ? engine->GetRpm() / engine->GetRedLineRpm() : 0.0f;
 			DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 0.0f);
 
 			// draw the odometer

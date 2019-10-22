@@ -129,7 +129,6 @@ dFloat dVehicleEngine::GetSpeed() const
 	return veloc.DotProduct3(matrix.m_front);
 }
 
-
 void dVehicleEngine::InitEngineTorqueCurve()
 {
 	m_metricInfo = dEngineMetricInfo(m_info);
@@ -141,7 +140,6 @@ void dVehicleEngine::InitEngineTorqueCurve()
 	m_metricInfo.m_torqueCurve[4] = dEngineTorqueNode(m_metricInfo.m_rpmAtRedLine, m_metricInfo.m_idleTorque);
 }
 
-#if 0
 dFloat dVehicleEngine::GetRpm() const
 {
 	return -m_omega * 9.549f;
@@ -152,6 +150,7 @@ dFloat dVehicleEngine::GetRedLineRpm() const
 	return m_metricInfo.m_rpmAtRedLine * 9.549f;
 }
 
+#if 0
 void dVehicleEngine::SetThrottle (dFloat throttle)
 {
 	dFloat torque = m_metricInfo.GetTorque(dAbs (m_omega));

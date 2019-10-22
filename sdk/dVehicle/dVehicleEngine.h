@@ -148,13 +148,12 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	DVEHICLE_API dFloat GetSpeed() const;
 	dFloat GetTopSpeed() const {return m_info.m_topSpeedInMetersPerSeconds;}
 
-/*
 	virtual dFloat GetRpm() const;
 	virtual dFloat GetRedLineRpm() const;
-	void SetGear (int gear);
-	void SetClutch (dFloat clutch);
-	void SetThrottle (dFloat throttle);
-*/
+	//void SetGear (int gear);
+	//void SetClutch (dFloat clutch);
+	//void SetThrottle (dFloat throttle);
+
 	protected:
 	void CalculateFreeDof();
 	void ApplyExternalForce();
