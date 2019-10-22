@@ -51,32 +51,6 @@ void dVehicleManager::RemoveAndDeleteRoot(dVehicleChassis* const root)
 	delete root;
 }
 
-
-#if 0
-dVehicleChassis* dVehicleManager::CreateSingleBodyVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
-{
-	dVehicleChassis* const vehicle = &m_list.Append()->GetInfo();
-	vehicle->Init(body, vehicleFrame, forceAndTorque, gravityMag);
-	return vehicle;
-}
-
-dVehicleChassis* dVehicleManager::CreateSingleBodyVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
-{
-	dVehicleChassis* const vehicle = &m_list.Append()->GetInfo();
-	vehicle->Init(GetWorld(), chassisShape, mass, vehicleFrame, forceAndTorque, gravityMag);
-	return vehicle;
-}
-
-void dVehicleManager::DestroyController(dVehicleChassis* const vehicle)
-{
-//	dAssert();
-//	vehicle->Cleanup();
-	dList<dVehicleChassis>::dListNode* const node = m_list.GetNodeFromInfo(*vehicle);
-	m_list.Remove(node);
-}
-
-#endif
-
 void dVehicleManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 {
 	for (dList<dVehicleChassis*>::dListNode* vehicleNode = m_list.GetFirst(); vehicleNode; vehicleNode = vehicleNode->GetNext()) {
