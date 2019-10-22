@@ -341,6 +341,11 @@ dVehicleEngine* dVehicleChassis::AddEngine(const dEngineInfo& engineInfo, dVehic
 	return engine;
 }
 
+dVehicleEngineControl* dVehicleChassis::GetEngineControl()
+{
+	return &m_engineControl;
+}
+
 dVehicleSteeringControl* dVehicleChassis::GetSteeringControl()
 {
 	return &m_steeringControl;
@@ -355,17 +360,6 @@ dVehicleBrakeControl* dVehicleChassis::GetHandBrakeControl()
 {
 	return &m_handBrakeControl;
 }
-
-#if 0
-
-void dVehicleChassis::PostUpdate(dFloat timestep)
-{
-	m_vehicle->RigidBodyToStates();
-}
-
-#endif
-
-
 
 void dVehicleChassis::ApplyExternalForce()
 {

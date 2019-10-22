@@ -44,6 +44,8 @@ class dEngineInfo
 		m_peakHorsePower = 400.0f;			// PEAK_HP
 		m_rpmAtPeakHorsePower = 5200.0f;	// PEAK_HP_RPM
 		m_rpmAtRedLine = 6000.0f;			// REDLINE_TORQUE_RPM
+		m_topSpeedInMetersPerSeconds = 50.0f;					// 50 m/s (160 kmh) top speed
+
 
 		m_gearsCount = 8;
 		m_crownGear = 4.0f;
@@ -68,6 +70,7 @@ class dEngineInfo
 	dFloat m_peakHorsePower;
 	dFloat m_rpmAtPeakHorsePower;
 	dFloat m_rpmAtRedLine;
+	dFloat m_topSpeedInMetersPerSeconds;
 
 	dFloat m_crownGear;
 	dFloat m_clutchTorque;
@@ -138,24 +141,23 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	DVEHICLE_API dVehicleEngine(dVehicleChassis* const chassis, const dEngineInfo& info, dVehicleDifferential* const differential);
 	DVEHICLE_API virtual ~dVehicleEngine();
 
-	protected:
+	DVEHICLE_API void SetInfo(const dEngineInfo& info);
+	const dEngineInfo& GetInfo() const { return m_info; }
+	
+	DVEHICLE_API dFloat GetSpeed() const;
+	dFloat GetTopSpeed() const {return m_info.m_topSpeedInMetersPerSeconds;}
+
 /*
 	virtual dFloat GetRpm() const;
 	virtual dFloat GetRedLineRpm() const;
 	void SetGear (int gear);
 	void SetClutch (dFloat clutch);
 	void SetThrottle (dFloat throttle);
-	void SetInfo(const dEngineInfo& info);
-	int GetKinematicLoops(dAnimIDRigKinematicLoopJoint** const jointArray);
-	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
-	dEngineBlockJoint m_blockJoint;
-	dEngineCrankJoint m_crankJoint;
-	dGearBoxJoint m_gearBox;
-	dFloat m_omega;
 */
-
+	protected:
 	void CalculateFreeDof();
 	void ApplyExternalForce();
+	void InitEngineTorqueCurve();
 	void Integrate(dFloat timestep);
 	int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 
@@ -167,6 +169,7 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const;
 
 	dMatrix m_localAxis;
+	dEngineInfo m_info;
 	dEngineMetricInfo m_metricInfo;
 	dGearBoxAndClutchJoint m_gearBox;
 	dVehicleDifferential* m_differential;

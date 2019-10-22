@@ -75,6 +75,7 @@ dVehicleEngine::dVehicleEngine(dVehicleChassis* const chassis, const dEngineInfo
 	:dVehicleNode(chassis)
 	,dBilateralJoint()
 	,m_localAxis(dYawMatrix(90.0f * dDegreeToRad))
+	,m_info(info)
 	,m_metricInfo(info)
 	,m_differential(differential)
 	//,m_blockJoint()
@@ -110,7 +111,25 @@ dVehicleEngine::~dVehicleEngine()
 {
 }
 
-#if 0
+void dVehicleEngine::SetInfo(const dEngineInfo& info)
+{
+	m_info = info;
+	InitEngineTorqueCurve();
+}
+
+dFloat dVehicleEngine::GetSpeed() const
+{
+	dMatrix matrix;
+	dVector veloc(0.0f);
+	dAssert (GetParent()->GetAsVehicle());
+	NewtonBody* const chassis = GetParent()->GetAsVehicle()->GetBody();
+
+	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
+	NewtonBodyGetVelocity(chassis, &veloc[0]);
+	return veloc.DotProduct3(matrix.m_front);
+}
+
+
 void dVehicleEngine::InitEngineTorqueCurve()
 {
 	m_metricInfo = dEngineMetricInfo(m_info);
@@ -122,19 +141,7 @@ void dVehicleEngine::InitEngineTorqueCurve()
 	m_metricInfo.m_torqueCurve[4] = dEngineTorqueNode(m_metricInfo.m_rpmAtRedLine, m_metricInfo.m_idleTorque);
 }
 
-void dVehicleEngine::SetInfo(const dEngineInfo& info)
-{
-	dVehicleEngineInterface::SetInfo(info);
-	InitEngineTorqueCurve();
-
-//	m_controller->SetAerodynamicsDownforceCoefficient(info.m_aerodynamicDownforceFactor, info.m_aerodynamicDownForceSurfaceCoeficident, info.m_aerodynamicDownforceFactorAtTopSpeed);
-}
-
-dComplementaritySolver::dBilateralJoint* dVehicleEngine::GetProxyJoint()
-{
-	return &m_blockJoint;
-}
-
+#if 0
 dFloat dVehicleEngine::GetRpm() const
 {
 	return -m_omega * 9.549f;
@@ -209,6 +216,7 @@ void dVehicleEngine::ApplyExternalForce()
 	m_proxyBody.SetOmega(chassisBody->GetOmega() + matrix.m_front.Scale(m_omega));
 	m_proxyBody.SetTorque(dVector(0.0f));
 
+dTrace (("speed:%f (kmh)\n", GetSpeed() * 3.6f));
 dVector xxxx(matrix.m_front.Scale(-500.0f));
 m_proxyBody.SetTorque(xxxx);
 

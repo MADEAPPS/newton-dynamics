@@ -86,6 +86,7 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 	DVEHICLE_API dVehicleDifferential* AddDifferential(dFloat mass, dFloat radius, dVehicleTire* const leftTire, dVehicleTire* const rightTire);
 
 	DVEHICLE_API dVehicleBrakeControl* GetBrakeControl();
+	DVEHICLE_API dVehicleEngineControl* GetEngineControl();
 	DVEHICLE_API dVehicleBrakeControl* GetHandBrakeControl();
 	DVEHICLE_API dVehicleSteeringControl* GetSteeringControl();
 	

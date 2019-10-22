@@ -191,12 +191,9 @@ class SingleBodyVehicleManager: public dVehicleManager
 	{
 		// set to transparent color
 		if (m_player) {
-
-			DemoEntity* const playerEnt = (DemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
+			//DemoEntity* const playerEnt = (DemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
+			dVehicleEngine* const engine = m_player->GetEngineControl() ? m_player->GetEngineControl()->GetEngine() : NULL;
 			
-			//dVehicleEngineInterface* const engine = m_player->GetEngineControl()->GetEngine();
-			//if (engine) {
-
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			dFloat gageSize = 200.0f;
 			dFloat y = scene->GetHeight() - (gageSize / 2.0f + 20.0f);
@@ -209,9 +206,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 			// draw the odometer
 			x += gageSize;
-			//dFloat speed = dAbs(engine->GetSpeed()) * 3.6f / 340.0f;
-			//dFloat speed = dAbs(engine->GetSpeed()) / engine->GetTopSpeed();
-			dFloat speed = 0.4f;
+			dFloat speed = engine ? dAbs(engine->GetSpeed()) / engine->GetTopSpeed() : 0.0f;
 			DrawGage(m_odometer, m_greenNeedle, speed, x, y, gageSize, -180.0f, 90.0f);
 
 			// draw the current gear
@@ -464,6 +459,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		engineInfo.m_crownGear = 4.0f;
 		engineInfo.m_clutchTorque = 600.0f;
 
+		engineInfo.m_topSpeedInMetersPerSeconds = 100.0f;
+
 		engineInfo.m_gearRatios[dEngineInfo::m_reverseGear] = -2.90f;	// reverse
 		engineInfo.m_gearRatios[dEngineInfo::m_neutralGear] = 0.0f;     // neutral
 		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 0] = 2.66f;  // GEAR_1
@@ -474,10 +471,11 @@ class SingleBodyVehicleManager: public dVehicleManager
 		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 5] = 0.50f;	// GEAR_6
 		engineInfo.m_gearsCount = 8;
 
+
+		// Set Engine and engine control
 		dVehicleEngine* const engine = vehicle->AddEngine(engineInfo, differential);
-		// Set Engine Control
-//		dVehicleEngineControl* const engineControl = vehicle->GetEngineControl();
-//		engineControl->SetEngine(engine);
+		dVehicleEngineControl* const engineControl = vehicle->GetEngineControl();
+		engineControl->SetEngine(engine);
 
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		vehicle->Finalize();
