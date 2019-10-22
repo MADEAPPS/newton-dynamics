@@ -24,10 +24,11 @@
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
 
 
-#define VIPER_TIRE_MASS	40.0f
-#define VIPER_DIFF_MASS	40.0f
-#define VIPER_DIFF_RADIUS 1.0f
-
+#define VIPER_TIRE_MASS		30.0f
+#define VIPER_DIFF_MASS		30.0f
+#define VIPER_ENGINE_MASS	40.0f
+#define VIPER_DIFF_RADIUS	0.5f
+#define VIPER_ENGINE_RADIUS 0.5f
 
 class SingleBodyVehicleManager: public dVehicleManager
 {
@@ -442,12 +443,11 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 		// add a differential 
 		dVehicleDifferential* const differential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, rearLeft, rearRight);
-		differential;
 
 		// add and internal combustion engine
 		dEngineInfo engineInfo;
-		engineInfo.m_mass = 50.0f;
-		engineInfo.m_armatureRadius = 0.125f;
+		engineInfo.m_mass = VIPER_ENGINE_MASS;
+		engineInfo.m_armatureRadius = VIPER_ENGINE_RADIUS;
 		engineInfo.m_idleTorque = 200.0f;			// IDLE_TORQUE
 		engineInfo.m_rpmAtIdleTorque = 450.0f;		// IDLE_TORQUE_RPM
 		engineInfo.m_peakTorque = 500.0f;			// PEAK_TORQUE
