@@ -632,18 +632,18 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	// set this vehicle as the player
 	manager->SetAsPlayer(player);
 
-#if 0
-	int count = 5;
-	count = 0;
+
+	int count = 10;
+//	count = 0;
 	for (int i = 0; i < count; i++) {
 		for (int j = 0; j < count; j++) {
-			//dVector offset(j * 4.0f, 0.0f, i * 4.0f + 4.0f, 0.0f);
 			dMatrix offset(location);
 			offset.m_posit += dVector (j * 4.0f + 4.0f, 0.0f, i * 4.0f, 0.0f);
-			manager->CreateVehicle("viper.ngd", offset);
+			manager->CreateVehicle(offset, viperModel.GetData());
 		}
 	}
 
+#if 0
 /*
 	DemoEntity* const vehicleEntity = (DemoEntity*)NewtonBodyGetUserData(player->GetBody());
 	dMatrix camMatrix (vehicleEntity->GetNextMatrix());

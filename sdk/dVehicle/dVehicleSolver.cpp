@@ -807,7 +807,6 @@ void dVehicleSolver::SolveBackward(dVectorPair* const force, const dVectorPair* 
 		dVehicleNode* const node = m_nodesOrder[i];
 		dAssert(i == node->m_index);
 		dVectorPair& f = force[i];
-		//JointJacobianTimeSolutionBackward(node, f, force[node->GetParent()->GetProxyBody()->GetIndex()]);
 		JointJacobianTimeSolutionBackward(node, f, force[node->GetParent()->m_index]);
 		BodyJacobianTimeSolutionBackward(node, f);
 	}
