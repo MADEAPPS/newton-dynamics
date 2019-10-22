@@ -216,9 +216,9 @@ void dVehicleEngine::ApplyExternalForce()
 	m_proxyBody.SetOmega(chassisBody->GetOmega() + matrix.m_front.Scale(m_omega));
 	m_proxyBody.SetTorque(dVector(0.0f));
 
-dTrace (("speed:%f (kmh)\n", GetSpeed() * 3.6f));
-dVector xxxx(matrix.m_front.Scale(-500.0f));
-m_proxyBody.SetTorque(xxxx);
+//dTrace (("speed:%f (kmh)\n", GetSpeed() * 3.6f));
+//dVector xxxx(matrix.m_front.Scale(-500.0f));
+//m_proxyBody.SetTorque(xxxx);
 
 	m_proxyBody.SetForce(chassisNode->GetGravity().Scale(m_proxyBody.GetMass()));
 }
@@ -241,6 +241,13 @@ void dVehicleEngine::JacobianDerivative(dComplementaritySolver::dParamInfo* cons
 	// angular constraints	
 	AddAngularRowJacobian(constraintParams, matrix.m_up, 0.0f);
 	AddAngularRowJacobian(constraintParams, matrix.m_right, 0.0f);
+
+	// try steady state calibration
+	int index = constraintParams->m_count;
+	AddAngularRowJacobian(constraintParams, matrix.m_front, 0.0f);
+	constraintParams->m_jointAccel[index] += -10.0f / constraintParams->m_timestep;
+	constraintParams->m_jointLowFrictionCoef[index] = -500.0f;
+	constraintParams->m_jointHighFrictionCoef[index] = 500.0f;
 }
 
 void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)

@@ -634,7 +634,7 @@ void SingleBodyCar(DemoEntityManager* const scene)
 
 
 	int count = 10;
-//	count = 0;
+	count = 0;
 	for (int i = 0; i < count; i++) {
 		for (int j = 0; j < count; j++) {
 			dMatrix offset(location);
