@@ -250,8 +250,8 @@ void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementarity
 	constraintParams->m_count = 0;
 	if (dAbs(m_gearRatio) > 1.0e-3f) {
 
-		dVehicleEngine* const engineNode = GetOwner0()->GetAsEngine();
-		dAssert (engineNode);
+		dAssert(GetOwner0()->GetAsEngine());
+		//dVehicleEngine* const engineNode = GetOwner0()->GetAsEngine();
 		//dComplementaritySolver::dBodyState* const chassis = &engineNode->GetProxyBody();
 		//const dEngineInfo& info = engineNode->GetInfo();
 
