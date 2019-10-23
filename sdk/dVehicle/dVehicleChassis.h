@@ -89,17 +89,7 @@ class dVehicleChassis: public dVehicleNode, public dVehicleSolver
 	DVEHICLE_API dVehicleEngineControl* GetEngineControl();
 	DVEHICLE_API dVehicleBrakeControl* GetHandBrakeControl();
 	DVEHICLE_API dVehicleSteeringControl* GetSteeringControl();
-	
 	DVEHICLE_API void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep);
-
-#if 0
-	
-	
-	DVEHICLE_API dVehicleEngineControl* GetEngineControl();
-	private:
-	dVehicleEngineControl* m_engineControl;
-	friend class dVehicleVirtualDifferential;
-#endif
 
 	private:
 	void CalculateFreeDof();

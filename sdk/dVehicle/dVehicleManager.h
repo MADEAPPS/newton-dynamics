@@ -44,7 +44,6 @@ class dVehicleManager: public dCustomParallelListener
 	DVEHICLE_API void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
 
 	dList<dVehicleChassis*> m_list;
-	//friend class dVehicleChassis;
 };
 
 
