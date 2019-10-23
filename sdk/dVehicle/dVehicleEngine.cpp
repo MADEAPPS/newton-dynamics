@@ -245,8 +245,8 @@ void dVehicleEngine::JacobianDerivative(dComplementaritySolver::dParamInfo* cons
 	int index = constraintParams->m_count;
 	AddAngularRowJacobian(constraintParams, matrix.m_front, 0.0f);
 	constraintParams->m_jointAccel[index] += -20.0f / constraintParams->m_timestep;
-	constraintParams->m_jointLowFrictionCoef[index] = -500.0f;
-	constraintParams->m_jointHighFrictionCoef[index] = 500.0f;
+	constraintParams->m_jointLowFrictionCoef[index] = -2500.0f;
+	constraintParams->m_jointHighFrictionCoef[index] = 2500.0f;
 }
 
 void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
