@@ -281,8 +281,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		tireInfo.m_dampingRatio = 15.0f * vehicleMass;
 		tireInfo.m_springStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 8.0f / tireInfo.m_suspensionLength);
 
-		tireInfo.m_corneringStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 0.5f);
-		tireInfo.m_longitudinalStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 0.25f);
+		tireInfo.m_corneringStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 40.0f);
+		tireInfo.m_longitudinalStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 2.0f);
 
 		//tireInfo.m_aligningMomentTrail = definition.m_tireAligningMomemtTrail;
 		//tireInfo.m_hasFender = definition.m_wheelHasCollisionFenders;
@@ -427,7 +427,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 		// add vehicle hand brake control 
 		dVehicleBrakeControl* const handBrakeControl = vehicle->GetHandBrakeControl();
-		handBrakeControl->SetBrakeTorque(2000.0f);
+		handBrakeControl->SetBrakeTorque(5000.0f);
 		handBrakeControl->AddTire(rearLeft);
 		handBrakeControl->AddTire(rearRight);
 
@@ -602,15 +602,29 @@ axisCount = 0;
 };
 
 
+static void AddBackground(DemoEntityManager* const scene)
+{
+	CreateLevelMesh(scene, "flatPlane.ngd", 1);
+
+	//CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
+	NewtonBody* const terrain = CreateHeightFieldTerrain(scene, 7, 1.0f, 1.0f, 0.1f, 10.0f, -15.0f);
+	DemoEntity* const terrainEntity = (DemoEntity*)NewtonBodyGetUserData(terrain);
+
+	dMatrix location(dGetIdentityMatrix());
+	location.m_posit.m_x += 20.0f;
+	location.m_posit.m_z -= 20.0f;
+	NewtonBodySetMatrix(terrain, &location[0][0]);
+	terrainEntity->SetMatrixUsafe(dQuaternion(location), location.m_posit);
+	terrainEntity->SetMatrixUsafe(dQuaternion(location), location.m_posit);
+
+	//AddPrimitiveArray (scene, 0.0f, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, dGetIdentityMatrix());
+}
+
 void SingleBodyCar(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
-//	CreateHeightFieldTerrain (scene, 7, 2.0f, 3.0f, 0.1f, 10.0f, -15.0f);
-//	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
-//	AddPrimitiveArray (scene, 0.0f, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, dGetIdentityMatrix());
+	AddBackground(scene);
 
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit = dVector (0.0f, 10.0f, 0.0f, 1.0f);
