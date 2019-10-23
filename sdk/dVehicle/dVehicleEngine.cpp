@@ -77,10 +77,8 @@ dVehicleEngine::dVehicleEngine(dVehicleChassis* const chassis, const dEngineInfo
 	,m_localAxis(dYawMatrix(90.0f * dDegreeToRad))
 	,m_info(info)
 	,m_metricInfo(info)
+	,m_gearBox()
 	,m_differential(differential)
-	//,m_blockJoint()
-	//,m_crankJoint()
-	//,m_gearBox()
 	,m_omega(0.0f)
 {
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
@@ -89,19 +87,6 @@ dVehicleEngine::dVehicleEngine(dVehicleChassis* const chassis, const dEngineInfo
 	m_proxyBody.SetMass(m_metricInfo.m_mass);
 	m_proxyBody.SetInertia(inertia, inertia, inertia);
 	m_proxyBody.UpdateInertia();
-/*
-	dVehicleSingleBody* const chassis = (dVehicleSingleBody*) ((dVehicleNode*)m_parent)->GetAsVehicle();
-	// set the tire joint
-	m_blockJoint.Init(&m_proxyBody, chassis->GetProxyBody());
-
-	m_gearBox.Init(&m_proxyBody, differential->GetProxyBody());
-	m_gearBox.SetOwners(this, differential);
-
-	m_crankJoint.Init(&m_proxyBody, chassis->m_groundNode.GetProxyBody());
-	m_crankJoint.SetOwners(this, &chassis->m_groundNode);
-
-	SetInfo(info);
-*/
 
 	m_gearBox.SetOwners(this, m_differential);
 	m_gearBox.Init(&m_proxyBody, &m_differential->GetProxyBody());
