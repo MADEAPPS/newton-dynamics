@@ -392,8 +392,6 @@ freq *= 0.5f;
 	}
 };
 
-	
-
 NewtonBody* CreateHeightFieldTerrain (DemoEntityManager* const scene, int sizeInPowerOfTwos, dFloat cellSize, dFloat elevationScale, dFloat roughness, dFloat maxElevation, dFloat minElevation)
 {
 	return HeightfieldMap::CreateHeightFieldTerrain (scene, sizeInPowerOfTwos, cellSize, elevationScale, roughness, maxElevation, minElevation);
