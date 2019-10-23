@@ -282,7 +282,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		tireInfo.m_springStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 8.0f / tireInfo.m_suspensionLength);
 
 		tireInfo.m_corneringStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 40.0f);
-		tireInfo.m_longitudinalStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 2.0f);
+		tireInfo.m_longitudinalStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 1.0f);
 
 		//tireInfo.m_aligningMomentTrail = definition.m_tireAligningMomemtTrail;
 		//tireInfo.m_hasFender = definition.m_wheelHasCollisionFenders;
