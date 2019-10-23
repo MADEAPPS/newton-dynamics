@@ -1785,6 +1785,7 @@ dgInt32 dgWorld::CollideContinue (
 			count = PruneContacts (count, contacts, contactJoint.GetPruningTolerance(), maxContacts);
 		}
 
+		count = dgMin(count, maxContacts);
 		if (pair.m_flipContacts) {
  			for (dgInt32 i = 0; i < count; i++) {
 				dgVector step ((collideBodyA.m_veloc - collideBodyB.m_veloc).Scale (pair.m_timestep));
