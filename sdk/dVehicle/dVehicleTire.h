@@ -17,7 +17,7 @@
 #include "dVehicleNode.h"
 #include "dVehicleTireContact.h"
 
-class dVehicleChassis;
+class dVehicleMultiBody;
 class dCollectCollidingBodies;
 
 class dTireInfo
@@ -75,7 +75,7 @@ class dTireInfo
 class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilateralJoint
 {
 	public:
-	DVEHICLE_API dVehicleTire(dVehicleChassis* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info);
+	DVEHICLE_API dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info);
 	DVEHICLE_API virtual ~dVehicleTire();
 
 	virtual dVehicleTire* GetAsTire() const { return (dVehicleTire*)this; }
@@ -120,7 +120,7 @@ class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilater
 	dFloat m_brakeTorque;
 	dFloat m_steeringAngle;
 	dFloat m_invSuspensionLength;
-	friend class dVehicleChassis;
+	friend class dVehicleMultiBody;
 };
 
 

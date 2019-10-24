@@ -10,8 +10,8 @@
 */
 
 #include "dStdafxVehicle.h"
+#include "dVehicle.h"
 #include "dVehicleNode.h"
-#include "dVehicleChassis.h"
 #include "dVehicleManager.h"
 
 dVehicleManager::dVehicleManager(NewtonWorld* const world)
@@ -27,25 +27,25 @@ dVehicleManager::~dVehicleManager()
 	}
 }
 
-void dVehicleManager::AddRoot(dVehicleChassis* const root)
+void dVehicleManager::AddRoot(dVehicle* const root)
 {
-	dAssert(!root->m_node);
 	dAssert(!root->m_manager);
-	root->m_node = m_list.Append(root);
+	dAssert(!root->m_managerNode);
+	root->m_managerNode = m_list.Append(root);
 	root->m_manager = this;
 }
 
-void dVehicleManager::RemoveRoot(dVehicleChassis* const root)
+void dVehicleManager::RemoveRoot(dVehicle* const root)
 {
-	if (root->m_node) {
-		dList<dVehicleChassis*>::dListNode* const node = (dList<dVehicleChassis*>::dListNode*) root->m_node;
-		root->m_node = NULL;
+	if (root->m_managerNode) {
+		dList<dVehicle*>::dListNode* const node = (dList<dVehicle*>::dListNode*) root->m_managerNode;
+		root->m_managerNode = NULL;
 		root->m_manager = NULL;
 		m_list.Remove(node);
 	}
 }
 
-void dVehicleManager::RemoveAndDeleteRoot(dVehicleChassis* const root)
+void dVehicleManager::RemoveAndDeleteRoot(dVehicle* const root)
 {
 	RemoveRoot(root);
 	delete root;
@@ -53,8 +53,8 @@ void dVehicleManager::RemoveAndDeleteRoot(dVehicleChassis* const root)
 
 void dVehicleManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 {
-	for (dList<dVehicleChassis*>::dListNode* vehicleNode = m_list.GetFirst(); vehicleNode; vehicleNode = vehicleNode->GetNext()) {
-		dVehicleChassis* const vehicle = vehicleNode->GetInfo();
+	for (dList<dVehicle*>::dListNode* vehicleNode = m_list.GetFirst(); vehicleNode; vehicleNode = vehicleNode->GetNext()) {
+		dVehicle* const vehicle = vehicleNode->GetInfo();
 		OnDebug(vehicle, debugContext);
 		vehicle->Debug(debugContext);
 	}
@@ -66,37 +66,15 @@ void dVehicleManager::PostUpdate(dFloat timestep, int threadID)
 	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 
-	dList<dVehicleChassis*>::dListNode* node = m_list.GetFirst();
+	dList<dVehicle*>::dListNode* node = m_list.GetFirst();
 	for (int i = 0; i < threadID; i++) {
 		node = node ? node->GetNext() : NULL;
 	}
 
 	if (node) {
 		do {
-			dVehicleChassis* const chassis = node->GetInfo();
-			OnPostUpdate(chassis, timestep);
-			for (int i = 0; i < threadCount; i++) {
-				node = node ? node->GetNext() : NULL;
-			}
-		} while (node);
-	}
-}
-
-void dVehicleManager::PostStep(dFloat timestep, int threadID)
-{
-	D_TRACKTIME();
-	NewtonWorld* const world = GetWorld();
-	const int threadCount = NewtonGetThreadsCount(world);
-
-	dList<dVehicleChassis*>::dListNode* node = m_list.GetFirst();
-	for (int i = 0; i < threadID; i++) {
-		node = node ? node->GetNext() : NULL;
-	}
-
-	if (node) {
-		do {
-			dVehicleChassis* const chassis = node->GetInfo();
-			OnUpdateTransform(chassis);
+			dVehicle* const vehicle = node->GetInfo();
+			OnPostUpdate(vehicle, timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
 			}
@@ -110,16 +88,38 @@ void dVehicleManager::PreUpdate(dFloat timestep, int threadID)
 	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 
-	dList<dVehicleChassis*>::dListNode* node = m_list.GetFirst();
+	dList<dVehicle*>::dListNode* node = m_list.GetFirst();
 	for (int i = 0; i < threadID; i++) {
 		node = node ? node->GetNext() : NULL;
 	}
 
 	if (node) {
 		do {
-			dVehicleChassis* const chassis = node->GetInfo();
-			OnPreUpdate(chassis, timestep);
-			chassis->PreUpdate(timestep);
+			dVehicle* const vehicle = node->GetInfo();
+			OnPreUpdate(vehicle, timestep);
+			vehicle->PreUpdate(timestep);
+			for (int i = 0; i < threadCount; i++) {
+				node = node ? node->GetNext() : NULL;
+			}
+		} while (node);
+	}
+}
+
+void dVehicleManager::PostStep(dFloat timestep, int threadID)
+{
+	D_TRACKTIME();
+	NewtonWorld* const world = GetWorld();
+	const int threadCount = NewtonGetThreadsCount(world);
+
+	dList<dVehicle*>::dListNode* node = m_list.GetFirst();
+	for (int i = 0; i < threadID; i++) {
+		node = node ? node->GetNext() : NULL;
+	}
+
+	if (node) {
+		do {
+			dVehicle* const vehicle = node->GetInfo();
+			OnUpdateTransform(vehicle);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
 			}

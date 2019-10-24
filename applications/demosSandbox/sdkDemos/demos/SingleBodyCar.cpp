@@ -192,7 +192,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 	{
 		// set to transparent color
 		if (m_player) {
-			dVehicleEngine* const engine = m_player->GetEngineControl() ? m_player->GetEngineControl()->GetEngine() : NULL;
+	//		dVehicleEngine* const engine = m_player->GetEngineControl() ? m_player->GetEngineControl()->GetEngine() : NULL;
+			dVehicleEngine* const engine = NULL;
 			
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			dFloat gageSize = 200.0f;
@@ -217,7 +218,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 	}
 
 
-	void SetAsPlayer(dVehicleChassis* const player)
+	void SetAsPlayer(dVehicle* const player)
 	{
 		//dEngineController* const engine = player->m_controller->GetEngine();
 		//if (engine) {
@@ -254,7 +255,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		camera->SetNextMatrix(*scene, camMatrix, camOrigin);
 	}
 
-	dVehicleTire* AddTire(dVehicleChassis* const vehicle, const char* const tireName, dFloat width, dFloat radius, dFloat vehicleMass)
+	dVehicleTire* AddTire(dVehicleMultiBody* const vehicle, const char* const tireName, dFloat width, dFloat radius, dFloat vehicleMass)
 	{
 		DemoEntity* const entity = (DemoEntity*)vehicle->GetUserData();
 		DemoEntity* const tirePart = entity->Find(tireName);
@@ -365,7 +366,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		return body;
 	}
 
-	dVehicleChassis* CreateVehicle(const dMatrix& location, const DemoEntity* const entity)
+	dVehicle* CreateVehicle(const dMatrix& location, const DemoEntity* const entity)
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
@@ -394,7 +395,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// set the player matrix 
 		NewtonBodySetMatrix(chassisBody, &location[0][0]);
 
-		dVehicleChassis* const vehicle = new dVehicleChassis (chassisBody, chassisMatrix, DEMO_GRAVITY);
+		dVehicleMultiBody* const vehicle = new dVehicleMultiBody (chassisBody, chassisMatrix, DEMO_GRAVITY);
 		AddRoot(vehicle);
 
 		// save entity as use data
@@ -481,7 +482,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		return vehicle;
 	}
 
-	void UpdateDriverInput(dVehicleChassis* const vehicle, dFloat timestep) 
+	void UpdateDriverInput(dVehicle* const vehicle, dFloat timestep) 
 	{
 //		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
 
@@ -492,7 +493,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		//dEngineController* const engine = vehicle->GetEngine();
 		//int gear = engine ? engine->GetGear() : 0;
 
-		dVehicleChassis::dDriverInput driverInput;
+		dVehicleMultiBody::dDriverInput driverInput;
 
 		dFloat axis[32];
 		int axisCount = scene->GetJoystickAxis(axis);
@@ -569,7 +570,7 @@ axisCount = 0;
 	}
 
 
-	void OnUpdateTransform(const dVehicleChassis* const vehicle) const 
+	void OnUpdateTransform(const dVehicle* const vehicle) const 
 	{
 		dMatrix matrix;
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
@@ -592,7 +593,7 @@ axisCount = 0;
 		}
 	}
 
-	dVehicleChassis* m_player;
+	dVehicle* m_player;
 	GLuint m_gears;
 	GLuint m_odometer;
 	GLuint m_redNeedle;
@@ -639,7 +640,7 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	SingleBodyVehicleManager* const manager = new SingleBodyVehicleManager(world);
 
 	// load 
-	dVehicleChassis* const player = manager->CreateVehicle(location, viperModel.GetData());
+	dVehicle* const player = manager->CreateVehicle(location, viperModel.GetData());
 	
 	// set this vehicle as the player
 	manager->SetAsPlayer(player);

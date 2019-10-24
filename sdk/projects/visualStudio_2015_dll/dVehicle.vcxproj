@@ -62,7 +62,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\dVehicle\dVehicleChassis.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicle.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleDashControl.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleDifferential.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleEngine.cpp" />
@@ -75,7 +76,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dVehicle\dStdafxVehicle.h" />
-    <ClInclude Include="..\..\dVehicle\dVehicleChassis.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicle.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleDashControl.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleDifferential.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleEngine.h" />

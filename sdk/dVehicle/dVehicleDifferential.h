@@ -17,7 +17,7 @@
 #include "dVehicleNode.h"
 #include "dVehicleLoopJoint.h"
 
-class dVehicleChassis;
+class dVehicleMultiBody;
 
 class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::dBilateralJoint
 {
@@ -40,7 +40,7 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	};
 
 	public:
-	DVEHICLE_API dVehicleDifferential(dVehicleChassis* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode);
+	DVEHICLE_API dVehicleDifferential(dVehicleMultiBody* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode);
 	DVEHICLE_API virtual ~dVehicleDifferential();
 	
 	protected:
@@ -64,7 +64,7 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	dFloat m_diffOmega;
 	dFloat m_shaftOmega;
 
-	friend class dVehicleChassis;
+	friend class dVehicleMultiBody;
 };
 
 

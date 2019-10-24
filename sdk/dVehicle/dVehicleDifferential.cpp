@@ -10,11 +10,11 @@
 */
 
 #include "dStdafxVehicle.h"
-#include "dVehicleChassis.h"
+#include "dVehicleMultiBody.h"
 #include "dVehicleDifferential.h"
 
 
-dVehicleDifferential::dVehicleDifferential(dVehicleChassis* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode)
+dVehicleDifferential::dVehicleDifferential(dVehicleMultiBody* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode)
 	:dVehicleNode(chassis)
 	,dBilateralJoint()
 	,m_localAxis(dYawMatrix (90.0f * dDegreeToRad))
@@ -63,7 +63,7 @@ int dVehicleDifferential::GetKinematicLoops(dVehicleLoopJoint** const jointArray
 
 void dVehicleDifferential::CalculateFreeDof()
 {
-	dVehicleChassis* const chassisNode = GetParent()->GetAsVehicle();
+	dVehicleMultiBody* const chassisNode = GetParent()->GetAsVehicleMultiBody();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 	const dMatrix chassisMatrix(m_localAxis * chassisBody->GetMatrix());
 
@@ -81,7 +81,7 @@ void dVehicleDifferential::Integrate(dFloat timestep)
 
 void dVehicleDifferential::ApplyExternalForce()
 {
-	dVehicleChassis* const chassisNode = GetParent()->GetAsVehicle();
+	dVehicleMultiBody* const chassisNode = GetParent()->GetAsVehicleMultiBody();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 	
 	dMatrix matrix (chassisBody->GetMatrix());

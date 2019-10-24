@@ -17,7 +17,7 @@
 
 class dVehicleTire;
 class dVehicleEngine;
-class dVehicleChassis;
+class dVehicleMultiBody;
 
 class dVehicleDashControl
 {
@@ -34,7 +34,7 @@ class dVehicleDashControl
 	{
 	}
 
-	void Init(dVehicleChassis* const vehicle)
+	void Init(dVehicleMultiBody* const vehicle)
 	{
 		m_vehicle = vehicle;
 	}
@@ -63,7 +63,7 @@ class dVehicleDashControl
 	virtual void Update(dFloat timestep) = 0;
 
 	protected:
-	dVehicleChassis* m_vehicle;
+	dVehicleMultiBody* m_vehicle;
 	dFloat m_param;
 	dFloat m_paramMemory;
 	mutable dFloat m_timer;
@@ -87,14 +87,14 @@ class dVehicleTireControl: public dVehicleDashControl
 	protected:
 	dList<dVehicleTire*> m_tires;
 	bool m_isSleeping;
-	friend class dVehicleChassis;
+	friend class dVehicleMultiBody;
 };
 
 class dVehicleSteeringControl: public dVehicleTireControl
 {
 	protected:
 	virtual void Update(dFloat timestep);
-	friend class dVehicleChassis;
+	friend class dVehicleMultiBody;
 };
 
 class dVehicleBrakeControl: public dVehicleTireControl
@@ -117,7 +117,7 @@ class dVehicleBrakeControl: public dVehicleTireControl
 	protected:
 	virtual void Update(dFloat timestep);
 	dFloat m_maxTorque;
-	friend class dVehicleChassis;
+	friend class dVehicleMultiBody;
 };
 
 class dVehicleEngineControl: public dVehicleDashControl 

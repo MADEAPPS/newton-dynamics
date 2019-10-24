@@ -18,8 +18,8 @@
 
 #define D_VEHICLE_MANAGER_NAME			"__VehicleManager__"
 
+class dVehicle;
 class dVehicleNode;
-class dVehicleChassis;
 
 class dVehicleManager: public dCustomParallelListener
 {
@@ -27,15 +27,15 @@ class dVehicleManager: public dCustomParallelListener
 	DVEHICLE_API dVehicleManager(NewtonWorld* const world);
 	DVEHICLE_API virtual ~dVehicleManager();
 
-	DVEHICLE_API void AddRoot(dVehicleChassis* const root);
-	DVEHICLE_API void RemoveRoot(dVehicleChassis* const root);
-	DVEHICLE_API void RemoveAndDeleteRoot(dVehicleChassis* const root);
-	DVEHICLE_API virtual void UpdateDriverInput(dVehicleChassis* const vehicle, dFloat timestep) {}
+	DVEHICLE_API void AddRoot(dVehicle* const root);
+	DVEHICLE_API void RemoveRoot(dVehicle* const root);
+	DVEHICLE_API void RemoveAndDeleteRoot(dVehicle* const root);
+	DVEHICLE_API virtual void UpdateDriverInput(dVehicle* const vehicle, dFloat timestep) {}
 
-	virtual void OnUpdateTransform(const dVehicleChassis* const vehicle) const {}
-	virtual void OnPreUpdate(dVehicleChassis* const model, dFloat timestep) const {};
-	virtual void OnPostUpdate(dVehicleChassis* const model, dFloat timestep) const {};
-	virtual void OnDebug(dVehicleChassis* const model, dCustomJoint::dDebugDisplay* const debugContext) {}
+	virtual void OnUpdateTransform(const dVehicle* const vehicle) const {}
+	virtual void OnPreUpdate(dVehicle* const model, dFloat timestep) const {};
+	virtual void OnPostUpdate(dVehicle* const model, dFloat timestep) const {};
+	virtual void OnDebug(dVehicle* const model, dCustomJoint::dDebugDisplay* const debugContext) {}
 
 	protected:
 	DVEHICLE_API void PostStep(dFloat timestep, int threadID);
@@ -43,7 +43,7 @@ class dVehicleManager: public dCustomParallelListener
 	DVEHICLE_API void PostUpdate(dFloat timestep, int threadID);
 	DVEHICLE_API void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
 
-	dList<dVehicleChassis*> m_list;
+	dList<dVehicle*> m_list;
 };
 
 

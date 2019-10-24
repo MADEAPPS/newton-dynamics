@@ -17,7 +17,7 @@
 #include "dVehicleNode.h"
 #include "dVehicleLoopJoint.h"
 
-class dVehicleChassis;
+class dVehicleMultiBody;
 class dVehicleDifferential;
 
 class dEngineInfo
@@ -139,7 +139,7 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 
 
 	public:
-	DVEHICLE_API dVehicleEngine(dVehicleChassis* const chassis, const dEngineInfo& info, dVehicleDifferential* const differential);
+	DVEHICLE_API dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineInfo& info, dVehicleDifferential* const differential);
 	DVEHICLE_API virtual ~dVehicleEngine();
 
 	DVEHICLE_API void SetInfo(const dEngineInfo& info);
@@ -175,7 +175,7 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	dVehicleDifferential* m_differential;
 	dFloat m_omega;
 
-	friend class dVehicleChassis;
+	friend class dVehicleMultiBody;
 };
 
 

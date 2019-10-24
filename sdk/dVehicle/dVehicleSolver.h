@@ -16,7 +16,7 @@
 #include "dStdafxVehicle.h"
 
 class dVehicleNode;
-class dVehicleChassis;
+class dVehicleMultiBody;
 class dVehicleLoopJoint;
 
 class dVehicleSolver

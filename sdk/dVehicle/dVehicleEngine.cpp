@@ -11,7 +11,7 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleEngine.h"
-#include "dVehicleChassis.h"
+#include "dVehicleMultiBody.h"
 #include "dVehicleDifferential.h"
 
 
@@ -71,7 +71,7 @@ dFloat dVehicleEngine::dEngineMetricInfo::GetTorque (dFloat rpm) const
 }
 
 
-dVehicleEngine::dVehicleEngine(dVehicleChassis* const chassis, const dEngineInfo& info, dVehicleDifferential* const differential)
+dVehicleEngine::dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineInfo& info, dVehicleDifferential* const differential)
 	:dVehicleNode(chassis)
 	,dBilateralJoint()
 	,m_localAxis(dYawMatrix(90.0f * dDegreeToRad))
@@ -106,8 +106,8 @@ dFloat dVehicleEngine::GetSpeed() const
 {
 	dMatrix matrix;
 	dVector veloc(0.0f);
-	dAssert (GetParent()->GetAsVehicle());
-	NewtonBody* const chassis = GetParent()->GetAsVehicle()->GetBody();
+	dAssert (GetParent()->GetAsVehicleMultiBody());
+	NewtonBody* const chassis = GetParent()->GetAsVehicleMultiBody()->GetBody();
 
 	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
 	NewtonBodyGetVelocity(chassis, &veloc[0]);
@@ -171,7 +171,7 @@ int dVehicleEngine::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 
 void dVehicleEngine::CalculateFreeDof()
 {
-	dVehicleChassis* const chassisNode = GetParent()->GetAsVehicle();
+	dVehicleMultiBody* const chassisNode = GetParent()->GetAsVehicleMultiBody();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 	const dMatrix chassisMatrix(m_localAxis * chassisBody->GetMatrix());
 
@@ -188,7 +188,7 @@ void dVehicleEngine::Integrate(dFloat timestep)
 
 void dVehicleEngine::ApplyExternalForce()
 {
-	dVehicleChassis* const chassisNode = GetParent()->GetAsVehicle();
+	dVehicleMultiBody* const chassisNode = GetParent()->GetAsVehicleMultiBody();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 
 	dMatrix matrix(chassisBody->GetMatrix());

@@ -12,7 +12,7 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
 #include "dVehicleTire.h"
-#include "dVehicleChassis.h"
+#include "dVehicleMultiBody.h"
 #include "dVehicleTireContact.h"
 
 dVehicleTireContact::dVehicleTireContact()
@@ -55,7 +55,7 @@ void dVehicleTireContact::SetContact(const dVector& posit, const dVector& normal
 void dVehicleTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const
 {
 	dVehicleTire* const tire = GetOwner0()->GetAsTire();
-	dVehicleChassis* const chassis = GetOwner0()->GetParent()->GetAsVehicle();
+	dVehicleMultiBody* const chassis = GetOwner0()->GetParent()->GetAsVehicleMultiBody();
 
 	dAssert(tire);
 	dAssert(chassis);

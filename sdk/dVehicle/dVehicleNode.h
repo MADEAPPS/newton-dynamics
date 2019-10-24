@@ -18,7 +18,7 @@
 class dVehicleNode;
 class dVehicleTire;
 class dVehicleEngine;
-class dVehicleChassis;
+class dVehicleMultiBody;
 class dVehicleLoopJoint;
 class dVehicleDifferential;
 
@@ -45,8 +45,8 @@ class dVehicleNode: public dCustomAlloc
 	
 	virtual dVehicleTire* GetAsTire() const { return NULL; }
 	virtual dVehicleEngine* GetAsEngine() const { return NULL; }
-	virtual dVehicleChassis* GetAsVehicle() const { return NULL; }
 	virtual dVehicleDifferential* GetAsDifferential() const { return NULL; }
+	virtual dVehicleMultiBody* GetAsVehicleMultiBody() const { return NULL; }
 	virtual dComplementaritySolver::dBilateralJoint* GetJoint() { return NULL; }
 		
 	void* GetUserData() const {return m_usedData;}
@@ -78,7 +78,7 @@ class dVehicleNode: public dCustomAlloc
 
 	friend class dVehicleSolver;
 	friend class dVehicleManager;
-	friend class dVehicleChassis;
+	friend class dVehicleMultiBody;
 };
 
 
