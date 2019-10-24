@@ -152,7 +152,7 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	virtual dFloat GetRedLineRpm() const;
 	//void SetGear (int gear);
 	//void SetClutch (dFloat clutch);
-	//void SetThrottle (dFloat throttle);
+	void SetThrottle (dFloat throttle, dFloat timestep);
 
 	protected:
 	void CalculateFreeDof();
@@ -174,6 +174,8 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	dGearBoxAndClutchJoint m_gearBox;
 	dVehicleDifferential* m_differential;
 	dFloat m_omega;
+	dFloat m_throttle;
+	dFloat m_throttleSpeed;
 
 	friend class dVehicleMultiBody;
 };

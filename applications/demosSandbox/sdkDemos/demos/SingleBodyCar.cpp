@@ -192,8 +192,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 	{
 		// set to transparent color
 		if (m_player) {
-	//		dVehicleEngine* const engine = m_player->GetEngineControl() ? m_player->GetEngineControl()->GetEngine() : NULL;
-			dVehicleEngine* const engine = NULL;
+			dVehicleEngine* const engine = m_player->GetEngineControl() ? m_player->GetEngineControl()->GetEngine() : NULL;
 			
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			dFloat gageSize = 200.0f;
@@ -224,7 +223,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		//if (engine) {
 		//	engine->SetIgnition(false);
 		//}
-		m_player = player;
+		m_player = player->GetAsVehicleMultiBody();
 	}
 
 	void UpdateCamera(dFloat timestep)
@@ -593,7 +592,7 @@ axisCount = 0;
 		}
 	}
 
-	dVehicle* m_player;
+	dVehicleMultiBody* m_player;
 	GLuint m_gears;
 	GLuint m_odometer;
 	GLuint m_redNeedle;

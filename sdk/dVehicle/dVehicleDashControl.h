@@ -125,9 +125,9 @@ class dVehicleEngineControl: public dVehicleDashControl
 	public:
 	dVehicleEngine* GetEngine() const {return m_engine;}
 	void SetEngine (dVehicleEngine* const engine) {m_engine = engine;}
-//	void SetGear (int gear);
-//	void SetClutch (dFloat clutch);
-	virtual void Update(dFloat timestep) {}
+	void SetGear (int gear);
+	void SetClutch (dFloat clutch);
+	virtual void Update(dFloat timestep);
 
 	private:
 	dVehicleEngine* m_engine;

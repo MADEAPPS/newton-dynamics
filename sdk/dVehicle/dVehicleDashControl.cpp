@@ -12,6 +12,7 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleTire.h"
+#include "dVehicleEngine.h"
 #include "dVehicleDashControl.h"
 
 // ****************************************************************************
@@ -53,40 +54,25 @@ void dVehicleBrakeControl::Update(dFloat timestep)
 	}
 }
 
-
-#if 0
-// ****************************************************************************
-//
-// ****************************************************************************
-dVehicleEngineControl::dVehicleEngineControl(dVehicleChassis* const vehicle)
-	:dVehicleDashControl(vehicle)
-	,m_engine(NULL)
-{
-}
-
-void dVehicleEngineControl::SetEngine (dVehicleEngineInterface* const engine)
-{
-	m_engine = engine; 
-}
-
 void dVehicleEngineControl::Update(dFloat timestep)
 {
 	if (m_engine) {
-		m_engine->SetThrottle (m_param);
+		m_engine->SetThrottle (m_param, timestep);
 	}
 }
 
 void dVehicleEngineControl::SetGear (int gear)
 {
 	if (m_engine) {
-		m_engine->SetGear(gear);
+		dAssert(0);
+//		m_engine->SetGear(gear);
 	}
 }
 
 void dVehicleEngineControl::SetClutch (dFloat clutch)
 {
 	if (m_engine) {
-		m_engine->SetClutch(clutch);
+		dAssert(0);
+//		m_engine->SetClutch(clutch);
 	}
 }
-#endif

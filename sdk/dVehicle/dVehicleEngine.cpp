@@ -14,7 +14,6 @@
 #include "dVehicleMultiBody.h"
 #include "dVehicleDifferential.h"
 
-
 dVehicleEngine::dEngineMetricInfo::dEngineMetricInfo(const dEngineInfo& info)
 	:dEngineInfo(info)
 {
@@ -80,6 +79,8 @@ dVehicleEngine::dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineIn
 	,m_gearBox()
 	,m_differential(differential)
 	,m_omega(0.0f)
+	,m_throttle(0.0f)
+	,m_throttleSpeed(1.e-3f)
 {
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 
@@ -135,14 +136,29 @@ dFloat dVehicleEngine::GetRedLineRpm() const
 	return m_metricInfo.m_rpmAtRedLine * 9.549f;
 }
 
-#if 0
-void dVehicleEngine::SetThrottle (dFloat throttle)
+
+void dVehicleEngine::SetThrottle (dFloat throttle, dFloat timestep)
 {
-	dFloat torque = m_metricInfo.GetTorque(dAbs (m_omega));
-	dFloat omega = m_metricInfo.m_rpmAtRedLine * dClamp(throttle, dFloat (0.0f), dFloat (1.0f));
-	m_crankJoint.SetTorqueAndRpm(torque, omega);
+	dTrace(("%s\n", __FUNCTION__));
+	//dFloat torque = m_metricInfo.GetTorque(dAbs (m_omega));
+	//dFloat omega = m_metricInfo.m_rpmAtRedLine * dClamp(throttle, dFloat (0.0f), dFloat (1.0f));
+	//m_crankJoint.SetTorqueAndRpm(torque, omega);
+
+/*
+	dFloat ratio = dAbs (m_omega / m_metricInfo.m_rpmAtRedLine);
+	dFloat error = throttle - ratio;
+	dFloat step = m_throttleSpeed * timestep;
+	if (error > step) {
+		dAssert(0);
+	} else if (error < -step) {
+		dAssert(0);
+	} else {
+		dAssert(0);
+	}
+*/
 }
 
+#if 0
 void dVehicleEngine::SetGear (int gear)
 {
 	gear = dClamp (gear, int (m_reverseGear), m_metricInfo.m_gearsCount);
@@ -166,7 +182,8 @@ const void dVehicleEngine::Debug(dCustomJoint::dDebugDisplay* const debugContext
 int dVehicleEngine::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 {
 	jointArray[0] = &m_gearBox;
-	return 1;
+//	return 1;
+	return 0;
 }
 
 void dVehicleEngine::CalculateFreeDof()
