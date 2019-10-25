@@ -201,7 +201,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 			// draw the tachometer
 			dFloat x = gageSize / 2 + 20.0f;
 			dFloat rpm = engine ? engine->GetRpm() / engine->GetRedLineRpm() : 0.0f;
-			DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 0.0f);
+			DrawGage(m_tachometer, m_redNeedle, rpm, x, y, gageSize, -180.0f, 90.0f);
 
 			// draw the odometer
 			x += gageSize;
@@ -333,12 +333,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dAssert(carEntity->Find("car_body"));
 		dAssert(carEntity->Find("car_body") == carEntity);
 
-		//DemoMesh* const mesh = (DemoMesh*)carEntity->GetMesh();
-		//dAssert(mesh->IsType(DemoMesh::GetRttiType()));
-		//const dMatrix& meshMatrix = carEntity->GetMeshMatrix();
-		//dArray<dFloat> temp(mesh->m_vertexCount * 3);
-		//meshMatrix.TransformTriplex(&temp[0], 3 * sizeof (dFloat), mesh->m_vertex, 3 * sizeof (dFloat), mesh->m_vertexCount);
-		//NewtonCollision* const shape = NewtonCreateConvexHull(GetWorld(), mesh->m_vertexCount, &temp[0], 3 * sizeof (dFloat), 0.001f, 0, NULL);
 		NewtonCollision* const shape = carEntity->CreateCollisionFromchildren(GetWorld());
 
 		// create a body and call the low level init function
@@ -389,6 +383,12 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// create a single body vehicle 
 		dFloat chassisMass = 1200.0f;
 		NewtonBody* const chassisBody = CreateChassisBody(chassisMass, vehicleEntity);
+
+		// make the vehicle a little over steering by shitting the com to the front
+		dVector com(0.0f);
+		NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
+		com += chassisMatrix.m_front.Scale (0.3f);
+		NewtonBodySetCentreOfMass(chassisBody, &com[0]);
 
 		// set the player matrix 
 		NewtonBodySetMatrix(chassisBody, &location[0][0]);

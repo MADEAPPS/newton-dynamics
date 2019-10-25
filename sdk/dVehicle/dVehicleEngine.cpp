@@ -73,7 +73,7 @@ dFloat dVehicleEngine::dEngineMetricInfo::GetTorque (dFloat rpm) const
 dVehicleEngine::dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineInfo& info, dVehicleDifferential* const differential)
 	:dVehicleNode(chassis)
 	,dBilateralJoint()
-	,m_localAxis(dYawMatrix(90.0f * dDegreeToRad))
+	,m_localAxis(dYawMatrix(-90.0f * dDegreeToRad))
 	,m_info(info)
 	,m_metricInfo(info)
 	,m_gearBox()
@@ -136,7 +136,6 @@ dFloat dVehicleEngine::GetRedLineRpm() const
 	return m_metricInfo.m_rpmAtRedLine * 9.549f;
 }
 
-
 void dVehicleEngine::SetThrottle (dFloat throttle, dFloat timestep)
 {
 	//dTrace(("%s\n", __FUNCTION__));
@@ -154,8 +153,8 @@ void dVehicleEngine::SetThrottle (dFloat throttle, dFloat timestep)
 		step = 0.0f;
 	}
 	m_throttle = dClamp(m_throttle + step, dFloat(0.0f), dFloat(1.0f));
-//m_throttle = 0.5f;
-	dTrace(("%f %f\n", m_throttle, step));
+
+dTrace (("%f %f\n", m_omega, m_metricInfo.m_rpmAtRedLine));
 }
 
 #if 0
