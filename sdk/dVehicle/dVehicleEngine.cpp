@@ -45,9 +45,6 @@ dVehicleEngine::dEngineMetricInfo::dEngineMetricInfo(const dEngineInfo& info)
 
 dFloat dVehicleEngine::dEngineMetricInfo::GetTorque (dFloat rpm) const
 {
-	dAssert(0);
-	return 0;
-/*
 	dAssert(rpm >= -0.1f);
 	const int maxIndex = sizeof (m_torqueCurve) / sizeof (m_torqueCurve[0]);
 	rpm = dClamp(rpm, dFloat(0.0f), m_torqueCurve[maxIndex - 1].m_rpm);
@@ -66,9 +63,7 @@ dFloat dVehicleEngine::dEngineMetricInfo::GetTorque (dFloat rpm) const
 	}
 
 	return m_torqueCurve[maxIndex - 1].m_torque;
-*/
 }
-
 
 dVehicleEngine::dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineInfo& info, dVehicleDifferential* const differential)
 	:dVehicleNode(chassis)
@@ -82,6 +77,7 @@ dVehicleEngine::dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineIn
 	,m_throttle(0.0f)
 	,m_throttleSpeed(1.e1f)
 {
+	InitEngineTorqueCurve();
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 
 	dFloat inertia = (2.0f / 5.0f) * m_metricInfo.m_mass * m_metricInfo.m_armatureRadius * m_metricInfo.m_armatureRadius;
@@ -138,11 +134,6 @@ dFloat dVehicleEngine::GetRedLineRpm() const
 
 void dVehicleEngine::SetThrottle (dFloat throttle, dFloat timestep)
 {
-	//dTrace(("%s\n", __FUNCTION__));
-	//dFloat torque = m_metricInfo.GetTorque(dAbs (m_omega));
-	//dFloat omega = m_metricInfo.m_rpmAtRedLine * dClamp(throttle, dFloat (0.0f), dFloat (1.0f));
-	//m_crankJoint.SetTorqueAndRpm(torque, omega);
-
 	m_throttle = dAbs (m_omega / m_metricInfo.m_rpmAtRedLine);
 	dFloat step = throttle - m_throttle;
 	if (step > 1.0e-6f) {
@@ -153,8 +144,6 @@ void dVehicleEngine::SetThrottle (dFloat throttle, dFloat timestep)
 		step = 0.0f;
 	}
 	m_throttle = dClamp(m_throttle + step, dFloat(0.0f), dFloat(1.0f));
-
-dTrace (("%f %f\n", m_omega, m_metricInfo.m_rpmAtRedLine));
 }
 
 #if 0
@@ -215,11 +204,6 @@ void dVehicleEngine::ApplyExternalForce()
 	m_proxyBody.SetVeloc(chassisBody->GetVelocity());
 	m_proxyBody.SetOmega(chassisBody->GetOmega() + matrix.m_front.Scale(m_omega));
 	m_proxyBody.SetTorque(dVector(0.0f));
-
-//dTrace (("speed:%f (kmh)\n", GetSpeed() * 3.6f));
-//dVector xxxx(matrix.m_front.Scale(-500.0f));
-//m_proxyBody.SetTorque(xxxx);
-
 	m_proxyBody.SetForce(chassisNode->GetGravity().Scale(m_proxyBody.GetMass()));
 }
 
@@ -244,13 +228,13 @@ void dVehicleEngine::JacobianDerivative(dComplementaritySolver::dParamInfo* cons
 
 	// try steady state calibration
 	int index = constraintParams->m_count;
+	dFloat rpm = m_throttle * m_metricInfo.m_rpmAtRedLine;
+	dFloat torque = m_metricInfo.GetTorque(rpm);
+
 	AddAngularRowJacobian(constraintParams, matrix.m_front, 0.0f);
-//	AddAngularRowJacobian(constraintParams, matrix.m_front.Scale (-1.0f), 0.0f);
-//	constraintParams->m_jointAccel[index] += -20.0f / constraintParams->m_timestep;
-	dFloat speed = m_throttle * m_metricInfo.m_rpmAtRedLine;
-	constraintParams->m_jointAccel[index] += -speed * constraintParams->m_timestepInv;
-	constraintParams->m_jointLowFrictionCoef[index] = -2500.0f;
-	constraintParams->m_jointHighFrictionCoef[index] = 2500.0f;
+	constraintParams->m_jointAccel[index] += -rpm * constraintParams->m_timestepInv;
+	constraintParams->m_jointLowFrictionCoef[index] = -torque;
+	constraintParams->m_jointHighFrictionCoef[index] = torque;
 }
 
 void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)

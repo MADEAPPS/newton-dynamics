@@ -27,8 +27,8 @@
 #define VIPER_TIRE_MASS		30.0f
 #define VIPER_DIFF_MASS		30.0f
 #define VIPER_ENGINE_MASS	40.0f
-#define VIPER_DIFF_RADIUS	0.5f
-#define VIPER_ENGINE_RADIUS 0.5f
+#define VIPER_DIFF_RADIUS	0.25f
+#define VIPER_ENGINE_RADIUS 0.25f
 
 class SingleBodyVehicleManager: public dVehicleManager
 {
