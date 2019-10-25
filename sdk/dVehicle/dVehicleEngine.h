@@ -46,7 +46,6 @@ class dEngineInfo
 		m_rpmAtRedLine = 6000.0f;			// REDLINE_TORQUE_RPM
 		m_topSpeedInMetersPerSeconds = 50.0f;					// 50 m/s (160 kmh) top speed
 
-
 		m_gearsCount = 8;
 		m_crownGear = 4.0f;
 		m_clutchTorque = 1000.0f;
@@ -111,7 +110,8 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 		public:
 		dGearBoxAndClutchJoint()
 			:dVehicleLoopJoint()
-			,m_gearRatio(1.0f)
+			,m_gearRatio(3.0f)
+			,m_crowndGear(10.0f)
 			,m_clutchTorque(1.0e20f)
 		{
 		}
@@ -133,7 +133,7 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 		void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
 
 		dFloat m_gearRatio;
-		//dFloat m_crowndGear;
+		dFloat m_crowndGear;
 		dFloat m_clutchTorque;
 	};
 

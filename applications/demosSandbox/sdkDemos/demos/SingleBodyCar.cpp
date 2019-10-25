@@ -533,8 +533,7 @@ axisCount = 0;
 			//dTrace (("%d %d %d\n", gear, ignitionButton, m_engineKeySwitch.GetPushButtonState()));
 */
 		} else {
-			driverInput.m_throttle = scene->GetKeyState('W') ? 1.0f : 0.0f;
-			//driverInput.m_throttle = scene->GetKeyState('W') ? 0.5f : 0.0f;
+			driverInput.m_throttle = scene->GetKeyState('W') ? 0.85f : 0.0f;
 			driverInput.m_clutchPedal = scene->GetKeyState('K') ? 0.0f : 1.0f;
 			driverInput.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
 			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;

@@ -136,12 +136,13 @@ void dVehicleEngine::SetThrottle (dFloat throttle, dFloat timestep)
 {
 	m_throttle = dAbs (m_omega / m_metricInfo.m_rpmAtRedLine);
 	dFloat step = throttle - m_throttle;
-	if (step > 1.0e-6f) {
+	dFloat maxStep = 2.0f * m_throttleSpeed * timestep;
+	if (step > maxStep) {
 		step = m_throttleSpeed * timestep;
-	} else if (step < -1.0e-6f) {
+	} else if (step < -maxStep) {
 		step = -m_throttleSpeed * timestep;
 	} else {
-		step = 0.0f;
+		step *= 0.25f;
 	}
 	m_throttle = dClamp(m_throttle + step, dFloat(0.0f), dFloat(1.0f));
 }
@@ -170,8 +171,8 @@ const void dVehicleEngine::Debug(dCustomJoint::dDebugDisplay* const debugContext
 int dVehicleEngine::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 {
 	jointArray[0] = &m_gearBox;
-//	return 1;
-	return 0;
+	return 1;
+//	return 0;
 }
 
 void dVehicleEngine::CalculateFreeDof()
@@ -232,9 +233,11 @@ void dVehicleEngine::JacobianDerivative(dComplementaritySolver::dParamInfo* cons
 	dFloat torque = m_metricInfo.GetTorque(rpm);
 
 	AddAngularRowJacobian(constraintParams, matrix.m_front, 0.0f);
-	constraintParams->m_jointAccel[index] += -rpm * constraintParams->m_timestepInv;
+	constraintParams->m_jointAccel[index] -= rpm * constraintParams->m_timestepInv;
 	constraintParams->m_jointLowFrictionCoef[index] = -torque;
 	constraintParams->m_jointHighFrictionCoef[index] = torque;
+
+//dTrace (("rpm %f   torque %f\n", rpm, torque));
 }
 
 void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
@@ -255,9 +258,10 @@ void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementarity
 		dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_J01;
 		dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_J10;
 
-		//dFloat gain = info.m_crownGear * m_gearRatio;
-		dFloat gain = -1.0f;
-		jacobian1.m_angular = jacobian1.m_angular.Scale(gain);
+		//dFloat gain = -1.0f;
+		dFloat gain = m_crowndGear * m_gearRatio;
+//gain *=-1.0f;
+		jacobian1.m_angular = jacobian1.m_angular.Scale(-gain);
 
 		const dVector& omega0 = m_state0->GetOmega();
 		const dVector& omega1 = m_state1->GetOmega();
