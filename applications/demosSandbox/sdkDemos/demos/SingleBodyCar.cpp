@@ -23,7 +23,7 @@
 #define VEHICLE_THIRD_PERSON_VIEW_DIST		7.0f
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
 
-
+#define VIPER_CHASSIS_MASS	1200.0f
 #define VIPER_TIRE_MASS		30.0f
 #define VIPER_DIFF_MASS		30.0f
 #define VIPER_ENGINE_MASS	40.0f
@@ -380,13 +380,13 @@ class SingleBodyVehicleManager: public dVehicleManager
 		chassisMatrix.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
 
 		// create a single body vehicle 
-		dFloat chassisMass = 1200.0f;
-		NewtonBody* const chassisBody = CreateChassisBody(chassisMass, vehicleEntity);
+		NewtonBody* const chassisBody = CreateChassisBody(VIPER_CHASSIS_MASS, vehicleEntity);
 
 		// make the vehicle a little over steering by shitting the com to the front
 		dVector com(0.0f);
 		NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
 		com += chassisMatrix.m_front.Scale (0.3f);
+		com += chassisMatrix.m_up.Scale(-0.2f);
 		NewtonBodySetCentreOfMass(chassisBody, &com[0]);
 
 		// set the player matrix 
@@ -410,12 +410,12 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions ("fl_tire", width, radio, world, vehicleEntity);
-		dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, chassisMass);
-		dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", width, radio, chassisMass);
+		dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, VIPER_CHASSIS_MASS);
+		dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", width, radio, VIPER_CHASSIS_MASS);
 
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
-		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, chassisMass);
-		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", width, radio, chassisMass);
+		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, VIPER_CHASSIS_MASS);
+		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", width, radio, VIPER_CHASSIS_MASS);
 
 		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
@@ -425,7 +425,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 		// add vehicle hand brake control 
 		dVehicleBrakeControl* const handBrakeControl = vehicle->GetHandBrakeControl();
-		handBrakeControl->SetBrakeTorque(5000.0f);
+		handBrakeControl->SetBrakeTorque(3000.0f);
 		handBrakeControl->AddTire(rearLeft);
 		handBrakeControl->AddTire(rearRight);
 
