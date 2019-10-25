@@ -80,7 +80,7 @@ dVehicleEngine::dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineIn
 	,m_differential(differential)
 	,m_omega(0.0f)
 	,m_throttle(0.0f)
-	,m_throttleSpeed(1.e-3f)
+	,m_throttleSpeed(1.e1f)
 {
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 
@@ -139,23 +139,23 @@ dFloat dVehicleEngine::GetRedLineRpm() const
 
 void dVehicleEngine::SetThrottle (dFloat throttle, dFloat timestep)
 {
-	dTrace(("%s\n", __FUNCTION__));
+	//dTrace(("%s\n", __FUNCTION__));
 	//dFloat torque = m_metricInfo.GetTorque(dAbs (m_omega));
 	//dFloat omega = m_metricInfo.m_rpmAtRedLine * dClamp(throttle, dFloat (0.0f), dFloat (1.0f));
 	//m_crankJoint.SetTorqueAndRpm(torque, omega);
 
-/*
-	dFloat ratio = dAbs (m_omega / m_metricInfo.m_rpmAtRedLine);
-	dFloat error = throttle - ratio;
-	dFloat step = m_throttleSpeed * timestep;
-	if (error > step) {
-		dAssert(0);
-	} else if (error < -step) {
-		dAssert(0);
+	m_throttle = dAbs (m_omega / m_metricInfo.m_rpmAtRedLine);
+	dFloat step = throttle - m_throttle;
+	if (step > 1.0e-6f) {
+		step = m_throttleSpeed * timestep;
+	} else if (step < -1.0e-6f) {
+		step = -m_throttleSpeed * timestep;
 	} else {
-		dAssert(0);
+		step = 0.0f;
 	}
-*/
+	m_throttle = dClamp(m_throttle + step, dFloat(0.0f), dFloat(1.0f));
+//m_throttle = 0.5f;
+	dTrace(("%f %f\n", m_throttle, step));
 }
 
 #if 0
@@ -246,7 +246,10 @@ void dVehicleEngine::JacobianDerivative(dComplementaritySolver::dParamInfo* cons
 	// try steady state calibration
 	int index = constraintParams->m_count;
 	AddAngularRowJacobian(constraintParams, matrix.m_front, 0.0f);
-	constraintParams->m_jointAccel[index] += -20.0f / constraintParams->m_timestep;
+//	AddAngularRowJacobian(constraintParams, matrix.m_front.Scale (-1.0f), 0.0f);
+//	constraintParams->m_jointAccel[index] += -20.0f / constraintParams->m_timestep;
+	dFloat speed = m_throttle * m_metricInfo.m_rpmAtRedLine;
+	constraintParams->m_jointAccel[index] += -speed * constraintParams->m_timestepInv;
 	constraintParams->m_jointLowFrictionCoef[index] = -2500.0f;
 	constraintParams->m_jointHighFrictionCoef[index] = 2500.0f;
 }

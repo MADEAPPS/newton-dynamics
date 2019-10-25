@@ -130,10 +130,10 @@ void dVehicleMultiBody::ApplyDriverInputs(const dDriverInput& driveInputs, dFloa
 	m_brakeControl.SetParam(driveInputs.m_brakePedal);
 	m_handBrakeControl.SetParam(driveInputs.m_handBrakeValue);
 	m_steeringControl.SetParam(driveInputs.m_steeringValue);
+	m_engineControl.SetParam(driveInputs.m_throttle);
 
 #if 0
 	if (m_engineControl) {
-		m_engineControl->SetParam(driveInputs.m_throttle);
 		m_engineControl->SetClutch(driveInputs.m_clutchPedal);
 		m_engineControl->SetGear(dVehicleEngineInterface::m_firstGear);
 	}

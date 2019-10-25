@@ -216,7 +216,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 		}
 	}
 
-
 	void SetAsPlayer(dVehicle* const player)
 	{
 		//dEngineController* const engine = player->m_controller->GetEngine();
