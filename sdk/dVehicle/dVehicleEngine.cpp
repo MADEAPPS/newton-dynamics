@@ -245,18 +245,18 @@ void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementarity
 	if (dAbs(m_gearRatio) > 1.0e-3f) {
 
 		dAssert(GetOwner0()->GetAsEngine());
-		//dVehicleEngine* const engineNode = GetOwner0()->GetAsEngine();
-		//dComplementaritySolver::dBodyState* const chassis = &engineNode->GetProxyBody();
-		//const dEngineInfo& info = engineNode->GetInfo();
+		dVehicleEngine* const engineNode = GetOwner0()->GetAsEngine();
 
-		const dMatrix& matrix = m_state0->GetMatrix();
-		AddAngularRowJacobian(constraintParams, matrix.m_right, 0.0f);
+		//dMatrix matrix0 (m_state0->GetMatrix());
+		//dMatrix matrix (engineNode->m_localAxis * m_state0->GetMatrix());
+		dVector gearBoxPin (m_state0->GetMatrix().RotateVector(engineNode->m_localAxis.m_front));
+		AddAngularRowJacobian(constraintParams, gearBoxPin, 0.0f);
 
 		dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_J01;
 		dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_J10;
 
 		//dFloat gain = info.m_crownGear * m_gearRatio;
-		dFloat gain = 1.0f;
+		dFloat gain = -1.0f;
 		jacobian1.m_angular = jacobian1.m_angular.Scale(gain);
 
 		const dVector& omega0 = m_state0->GetOmega();
