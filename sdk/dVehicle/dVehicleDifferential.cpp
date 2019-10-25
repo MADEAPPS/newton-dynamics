@@ -113,16 +113,25 @@ void dVehicleDifferential::JacobianDerivative(dComplementaritySolver::dParamInfo
 
 	// angular constraints	
 	AddAngularRowJacobian(constraintParams, matrix.m_right, 0.0f);
-	//if (m_slipeOn) {
-	//	dAssert(0);
-	//}
+
+	const dVector& omega = m_state0->GetOmega();
+	dFloat omegax = matrix.m_front.DotProduct3(omega);
+	dFloat omegay = matrix.m_up.DotProduct3(omega);
+
+	dFloat slipDiffOmega = 0.5f * dMax(dFloat (5.0f), dAbs(omegax));
+	if (omegay > slipDiffOmega) {
+		dTrace(("+ "));
+	} else if (omegay < -slipDiffOmega) {
+		dTrace(("- "));
+	}
+dTrace(("wx=%f wy=%f\n", omegax, omegay));
+
 }
 
 void dVehicleDifferential::dTireAxleJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	dVehicleDifferential* const differential = GetOwner0()->GetAsDifferential();
 	dAssert (differential);
-	//dVehicleDifferential* const childNode = (dVehicleDifferential*)GetOwner1();
 
 	dMatrix diffMatrix (differential->m_localAxis * m_state0->GetMatrix());
 	const dMatrix& tireMatrix = m_state1->GetMatrix();
