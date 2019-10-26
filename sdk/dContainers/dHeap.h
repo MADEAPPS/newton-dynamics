@@ -292,13 +292,13 @@ template <class OBJECT, class KEY>
 bool dDownHeap<OBJECT, KEY>::SanityCheck()
 {
 #ifdef D_CHECK_HEAP
-	for (int i = 0; i < m_curCount; i++) {
+	for (int i = 0; i < this->m_curCount; i++) {
 		int i1 = 2 * i + 1;
 		int i2 = 2 * i + 2;
-		if ((i1 < m_curCount) && (dHeapBase<OBJECT, KEY>::m_pool[i].m_key < dHeapBase<OBJECT, KEY>::m_pool[i1].m_key)) {
+		if ((i1 < this->m_curCount) && (dHeapBase<OBJECT, KEY>::m_pool[i].m_key < dHeapBase<OBJECT, KEY>::m_pool[i1].m_key)) {
 			return false;
 		}
-		if ((i2 < m_curCount) && (dHeapBase<OBJECT, KEY>::m_pool[i].m_key < dHeapBase<OBJECT, KEY>::m_pool[i2].m_key)) {
+		if ((i2 < this->m_curCount) && (dHeapBase<OBJECT, KEY>::m_pool[i].m_key < dHeapBase<OBJECT, KEY>::m_pool[i2].m_key)) {
 			return false;
 		}
 	}
@@ -402,13 +402,13 @@ template <class OBJECT, class KEY>
 bool dUpHeap<OBJECT, KEY>::SanityCheck()
 {
 #ifdef D_CHECK_HEAP
-	for (int i = 0; i < m_curCount; i++) {
+	for (int i = 0; i < this->m_curCount; i++) {
 		int i1 = 2 * i + 1;
 		int i2 = 2 * i + 2;
-		if ((i1 < m_curCount) && (dHeapBase<OBJECT, KEY>::m_pool[i].m_key > dHeapBase<OBJECT, KEY>::m_pool[i1].m_key)) {
+		if ((i1 < this->m_curCount) && (dHeapBase<OBJECT, KEY>::m_pool[i].m_key > dHeapBase<OBJECT, KEY>::m_pool[i1].m_key)) {
 			return false;
 		}
-		if ((i2 < m_curCount) && (dHeapBase<OBJECT, KEY>::m_pool[i].m_key > dHeapBase<OBJECT, KEY>::m_pool[i2].m_key)) {
+		if ((i2 < this->m_curCount) && (dHeapBase<OBJECT, KEY>::m_pool[i].m_key > dHeapBase<OBJECT, KEY>::m_pool[i2].m_key)) {
 			return false;
 		}
 	}
