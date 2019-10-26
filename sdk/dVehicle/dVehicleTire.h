@@ -120,6 +120,7 @@ class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilater
 	dFloat m_brakeTorque;
 	dFloat m_steeringAngle;
 	dFloat m_invSuspensionLength;
+	int m_contactCount;
 	friend class dVehicleMultiBody;
 };
 

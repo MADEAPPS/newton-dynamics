@@ -381,11 +381,15 @@ void dVehicleMultiBody::ApplyExternalForce()
 	NewtonBodyGetTorque(m_newtonBody, &vector[0]);
 	m_proxyBody.SetTorque(vector);
 
+/*
+static int xxx;
 dVector veloc(m_proxyBody.GetVelocity());
 veloc = veloc - matrix.m_up.Scale(veloc.DotProduct3(matrix.m_up));
-float xxxx = veloc.DotProduct3(matrix.m_front);
+float xxxx = dAbs (veloc.DotProduct3(matrix.m_front)) + 0.01f;
 float yyyy = veloc.DotProduct3(matrix.m_right);
-dTrace(("chassisBeta =%f  ", dAtan2(yyyy, xxxx) * dRadToDegree));
+dTrace(("%d chassisBeta=%f  ", xxx, dAtan2(yyyy, xxxx) * dRadToDegree));
+xxx ++;
+*/
 
 	dVehicleNode::ApplyExternalForce();
 }

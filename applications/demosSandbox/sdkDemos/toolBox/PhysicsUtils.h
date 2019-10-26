@@ -13,7 +13,7 @@
 #define __PHYSICS_UTIL__
 
 #define DEMO_GRAVITY  dFloat(-10.0f)
-//#define DEMO_GRAVITY  dFloat(-0.0f)
+//#define DEMO_GRAVITY  dFloat(0.0f)
 
 #ifdef DEMO_CHECK_ASYN_UPDATE
 extern int g_checkAsyncUpdate;

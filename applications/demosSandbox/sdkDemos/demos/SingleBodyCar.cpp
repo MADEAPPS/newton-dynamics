@@ -273,13 +273,13 @@ class SingleBodyVehicleManager: public dVehicleManager
 		tireInfo.m_pivotOffset = 0.01f;
 		tireInfo.m_steerRate = 0.5f * dPi;
 		tireInfo.m_frictionCoefficient = 1.0f;
-		tireInfo.m_maxSteeringAngle = 30.0f * dDegreeToRad;
+		tireInfo.m_maxSteeringAngle = 35.0f * dDegreeToRad;
 
 		tireInfo.m_suspensionLength = 0.22f;
 		tireInfo.m_dampingRatio = 15.0f * vehicleMass;
 		tireInfo.m_springStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 8.0f / tireInfo.m_suspensionLength);
 
-		tireInfo.m_corneringStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 40.0f);
+		tireInfo.m_corneringStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 20.0f);
 		tireInfo.m_longitudinalStiffness = dAbs(vehicleMass * DEMO_GRAVITY * 2.0f);
 
 		//tireInfo.m_aligningMomentTrail = definition.m_tireAligningMomemtTrail;
@@ -604,7 +604,7 @@ static void AddBackground(DemoEntityManager* const scene)
 	CreateLevelMesh(scene, "flatPlane.ngd", 1);
 
 	//CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
-#if 0
+#if 1
 	NewtonBody* const terrain = CreateHeightFieldTerrain(scene, 7, 1.0f, 1.0f, 0.1f, 10.0f, -15.0f);
 	DemoEntity* const terrainEntity = (DemoEntity*)NewtonBodyGetUserData(terrain);
 
@@ -659,8 +659,6 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	dMatrix camMatrix (vehicleEntity->GetNextMatrix());
 	//	scene->SetCameraMouseLock (true);
 
-
-//
 	//	dVector location (origin);
 	//	location.m_x += 20.0f;
 	//	location.m_z += 20.0f;

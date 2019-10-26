@@ -43,7 +43,7 @@ class dVehicleTireContact: public dVehicleLoopJoint
 	dVehicleTireContact();
 	void ResetContact();
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const;
-	void SetContact(const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat staticFriction, dFloat kineticFriction);
+	void SetContact(const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat staticFriction);
 
 	private:
 	int GetMaxDof() const { return 3; }

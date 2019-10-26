@@ -29,6 +29,7 @@ dVehicleTire::dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& loca
 	,m_brakeTorque(0.0f)
 	,m_steeringAngle(0.0f)
 	,m_invSuspensionLength(m_info.m_suspensionLength > 0.0f ? 1.0f / m_info.m_suspensionLength : 0.0f)
+	,m_contactCount(0)
 {
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 	
@@ -67,9 +68,6 @@ dVehicleTire::dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& loca
 		m_contactsJoints[i].SetOwners (this, &chassis->m_groundProxyBody);
 	}
 	m_contactsJoints[sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1].SetOwners(this, &m_dynamicContactBodyNode);
-
-////m_brakeTorque = 100.0f;
-////m_omega = -20.0f;
 }
 
 dVehicleTire::~dVehicleTire()
@@ -183,7 +181,7 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 
 					contact -= tireMatrix.m_up.Scale (dist);
 					contact.m_w = 1.0f;
-					m_contactsJoints[contactCount].SetContact(contact, normal, longitudinalDir, penetration, friction, friction * 0.8f);
+					m_contactsJoints[contactCount].SetContact(contact, normal, longitudinalDir, penetration, friction);
 					contactCount ++;
 				}
 			}
@@ -207,6 +205,8 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 			}
 		}
 	}
+
+	m_contactCount = contactCount; 
 }
 
 dMatrix dVehicleTire::GetHardpointMatrix(dFloat param) const
@@ -289,12 +289,14 @@ void dVehicleTire::ApplyExternalForce()
 	m_proxyBody.SetTorque(dVector(0.0f));
 	m_proxyBody.SetForce(chassisNode->GetGravity().Scale(m_proxyBody.GetMass()));
 
+/*
 if (m_index == 3) {
 	dVector veloc(m_proxyBody.GetVelocity());
-	float xxxx = veloc.DotProduct3(tireMatrix.m_up);
+	float xxxx = dAbs (veloc.DotProduct3(tireMatrix.m_up)) + 0.01f;
 	float yyyy = veloc.DotProduct3(tireMatrix.m_front);
 	dTrace(("tireBeta =%f\n", dAtan2(yyyy, xxxx) * dRadToDegree));
 }
+*/
 
 }
 
@@ -316,15 +318,6 @@ void dVehicleTire::CalculateFreeDof()
 	m_omega = tireMatrix.m_front.DotProduct3(relativeOmega);
 	dAssert(tireMatrix.m_front.DotProduct3(chassisMatrix.m_front) > 0.999f);
 
-	// check if the tire is going to rest
-	//if (dAbs(m_omega) < 0.25f) {
-	//	dFloat alpha = tireMatrix.m_front.DotProduct3(m_proxyBody.GetTorque()) * m_proxyBody.GetInvInertia()[0][0];
-	//	if (alpha < 0.2f) {
-	//		m_omega = 0.0f;
-	//	}
-	//}
-
-	//m_tireAngle += m_omega * timestep;
 	dFloat cosAngle = tireMatrix.m_right.DotProduct3(chassisMatrix.m_right);
 	dFloat sinAngle = chassisMatrix.m_front.DotProduct3(chassisMatrix.m_right.CrossProduct(tireMatrix.m_right));
 	m_tireAngle += dAtan2(sinAngle, cosAngle);
@@ -334,13 +327,11 @@ void dVehicleTire::CalculateFreeDof()
 	}
 	m_tireAngle = dMod(m_tireAngle, dFloat(2.0f * dPi));
 
-
 	dVector tireVeloc(m_proxyBody.GetVelocity());
 	dVector chassisPointVeloc(chassisBody->CalculatePointVelocity(tireMatrix.m_posit));
 	dVector localVeloc(tireVeloc - chassisPointVeloc);
 	m_speed = tireMatrix.m_right.DotProduct3(localVeloc);
 
-	//m_position += m_speed * timestep;
 	m_position = chassisMatrix.m_right.DotProduct3(tireMatrix.m_posit - chassisMatrix.m_posit);
 	if (m_position <= -m_info.m_suspensionLength * 0.25f) {
 		m_speed = 0.0f;
@@ -359,9 +350,6 @@ void dVehicleTire::UpdateSolverForces(const dComplementaritySolver::dJacobianPai
 void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	dComplementaritySolver::dBodyState* const tire = m_state0;
-//	dComplementaritySolver::dBodyState* const chassis = m_state1;
-
-//	const dVector& omega = chassis->GetOmega();
 	const dMatrix& tireMatrix = tire->GetMatrix();
 
 	// lateral force
@@ -373,12 +361,6 @@ void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 	// angular constraints
 	AddAngularRowJacobian(constraintParams, tireMatrix.m_up, 0.0f);
 	AddAngularRowJacobian(constraintParams, tireMatrix.m_right, 0.0f);
-
-	// dry rolling friction (for now contact, but it should be a function of the tire angular velocity)
-	//int index = constraintParams->m_count;
-	//AddAngularRowJacobian(constraintParams, tire->m_matrix[0], 0.0f);
-	//constraintParams->m_jointLowFriction[index] = -chassis->m_dryRollingFrictionTorque;
-	//constraintParams->m_jointHighFriction[index] = chassis->m_dryRollingFrictionTorque;
 
 	if (m_position < 0.0f) {
 		int index = constraintParams->m_count;
@@ -404,12 +386,13 @@ void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 		constraintParams->m_jointHighFrictionCoef[index] = 0.0f;
 	}
 	
-	//m_brakeTorque = 100.0f;
-	if (m_brakeTorque > 1.0e-3f) {
+	if ((m_brakeTorque > 1.0e-3f) || !m_contactCount)  {
 		int index = constraintParams->m_count;
 		AddAngularRowJacobian(constraintParams, tireMatrix.m_front, 0.0f);
-		constraintParams->m_jointLowFrictionCoef[index] = -m_brakeTorque;
-		constraintParams->m_jointHighFrictionCoef[index] = m_brakeTorque;
+
+		const dFloat brake = m_contactCount ? m_brakeTorque : 50.0f;
+		constraintParams->m_jointLowFrictionCoef[index] = -brake;
+		constraintParams->m_jointHighFrictionCoef[index] = brake;
 	}
 	m_brakeTorque = 0.0f;
 }

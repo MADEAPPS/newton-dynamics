@@ -118,14 +118,19 @@ void dVehicleDifferential::JacobianDerivative(dComplementaritySolver::dParamInfo
 	dFloat omegax = matrix.m_front.DotProduct3(omega);
 	dFloat omegay = matrix.m_up.DotProduct3(omega);
 
-	dFloat slipDiffOmega = 0.5f * dMax(dFloat (5.0f), dAbs(omegax));
+	dFloat slipDiffOmega = dMax(dFloat (8.0f), 0.5f * dAbs(omegax));
 	if (omegay > slipDiffOmega) {
-//		dTrace(("+ "));
-	} else if (omegay < -slipDiffOmega) {
-//		dTrace(("- "));
-	}
-//dTrace(("wx=%f wy=%f\n", omegax, omegay));
+		int index = constraintParams->m_count;
+		AddAngularRowJacobian(constraintParams, matrix.m_up, 0.0f);
+		constraintParams->m_jointAccel[index] -= slipDiffOmega * constraintParams->m_timestepInv;
+		constraintParams->m_jointHighFrictionCoef[index] = 0.0f;
 
+	} else if (omegay < -slipDiffOmega) {
+		int index = constraintParams->m_count;
+		AddAngularRowJacobian(constraintParams, matrix.m_up, 0.0f);
+		constraintParams->m_jointAccel[index] -= -slipDiffOmega * constraintParams->m_timestepInv;
+		constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
+	}
 }
 
 void dVehicleDifferential::dTireAxleJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)

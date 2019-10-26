@@ -40,7 +40,7 @@ void dVehicleTireContact::ResetContact()
 	m_isActive = false;
 }
 
-void dVehicleTireContact::SetContact(const dVector& posit, const dVector& normal, const dVector& longitudinalDir, dFloat penetration, dFloat staticFriction, dFloat kineticFriction)
+void dVehicleTireContact::SetContact(const dVector& posit, const dVector& normal, const dVector& longitudinalDir, dFloat penetration, dFloat staticFriction)
 {
 	m_point = posit;
 	m_normal = normal;
@@ -98,6 +98,10 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 	const dVector& omega0 = m_state0->GetOmega();
 	const dVector& veloc1 = m_state1->GetVelocity();
 	const dVector& omega1 = m_state1->GetOmega();
+	const dVehicleTire* const tire = GetOwner0()->GetAsTire();
+
+static int xxx;
+xxx ++;
 
 	{
 		// normal constraint
@@ -143,21 +147,23 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
 		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
 
-		const dVector relVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
+		//const dVector relVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
+		const dVector relVeloc(veloc0 * jacobian0.m_linear + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
 		dFloat lateralSpeed = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
-		m_tireModel.m_lateralSlip = lateralSpeed / (dAbs (m_tireModel.m_lateralSlip) + 1.0e-3f);
+		dAssert ((m_tireModel.m_lateralSlip + 1.0e-3f) > 0.0f);
+		m_tireModel.m_lateralSlip = lateralSpeed / (m_tireModel.m_lateralSlip + 1.0e-3f);
 	}
 
-	dVehicleTire* const tire = GetOwner0()->GetAsTire();
+
 	const dTireInfo& tireInfo = tire->GetInfo();
 
 	dFloat v = dAbs(m_tireModel.m_lateralSlip);
 	dFloat u = dAbs(m_tireModel.m_longitudinalSlip);
 	dFloat invden = 1.0f / (1.0f + u);
 
-if (tire->GetIndex() == 3) {
+//if (tire->GetIndex() == 3) {
 //dTrace(("index=%d u=%4.3f v=%4.3f\n", tire->GetIndex(), u, v));
-}
+//}
 
 	m_tireModel.m_lateralSlip = v * invden;
 	m_tireModel.m_longitudinalSlip = u * invden;
