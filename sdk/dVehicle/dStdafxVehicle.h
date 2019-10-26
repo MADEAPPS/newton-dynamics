@@ -20,8 +20,8 @@
 */
 
 
-#ifndef __D_VEHICLE_H__
-#define __D_VEHICLE_H__
+#ifndef __D_STDAFX_VEHICLE_H__
+#define __D_STDAFX_VEHICLE_H__
 
 
 #ifdef _DVEHICLE_STATIC_LIB
@@ -73,9 +73,5 @@
 #include <dCustomJointLibraryStdAfx.h>
 #include <dCustomAlloc.h>
 #include <dCustomJoint.h>
-#include <dCustomControllerManager.h>
+#include <dCustomListener.h>
 
-#include <dAnimationStdAfx.h>
-//#include <dAnimAcyclicJoint.h>
-//#include <dAnimAcyclicSolver.h>
-//#include <dAnimIDRigKinematicLoopJoint.h>

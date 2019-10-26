@@ -79,28 +79,12 @@ class PhantomPlacement: public DemoEntity
     DemoMesh* m_blueMesh;
 };
 
-class dKinematicPlacement: public dCustomControllerBase
-{
-	public:
-	void PreUpdate(dFloat timestep, int threadIndex)
-	{
-	}
-
-	void PostUpdate(dFloat timestep, int threadIndex)
-	{
-	}
-
-	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
-	{
-		dAssert(0);
-	}
-};
-
-class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlacement>, public dComplementaritySolver 
+class dKinematicPlacementManager: public dCustomListener, public dComplementaritySolver
 {
 	public:
 	dKinematicPlacementManager(DemoEntityManager* const scene)
-		:dCustomControllerManager<dKinematicPlacement>(scene->GetNewton(), "dKinematicPlacementManager")
+		:dCustomListener(scene->GetNewton(), "dKinematicPlacementManager")
+		,dComplementaritySolver()
 		,m_castDir (0.0f, -1.0f, 0.0f, 0.0f)
 		,m_phantomEntity(NULL)
 		,m_selectShape (true)
@@ -135,7 +119,6 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 	virtual void Debug () const 
 	{
 	}
-
 
 	bool CanBeRayCasted(const NewtonBody* const body) const 
 	{
@@ -269,7 +252,6 @@ class dKinematicPlacementManager: public dCustomControllerManager<dKinematicPlac
 	    NewtonWorldForEachBodyInAABBDo(world, &minP.m_x, &maxP.m_x, TranslationCollisionCallback, this);
 		return m_isInPenetration;
     }
-
 
 	bool CalculateTranslationMatrix (dMatrix& matrix) const
 	{

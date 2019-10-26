@@ -75,24 +75,25 @@ void dAnimationRagDollEffector::JacobianDerivative(dComplementaritySolver::dPara
 
 	int dofCount = 0;
 	dAssert(m_maxLinearSpeed >= 0.0f);
-	const dFloat invTimestep = constraintParams->m_timestepInv;
-	const dFloat linearStep = m_maxLinearSpeed * constraintParams->m_timestep;
+	//const dFloat invTimestep = constraintParams->m_timestepInv;
+	//const dFloat linearStep = m_maxLinearSpeed * constraintParams->m_timestep;
 	for (int i = 0; i < 3; i++) {
 		AddLinearRowJacobian(constraintParams, matrix0.m_posit, matrix1[i]);
-		const dFloat stopAccel = CalculateRowZeroAccelaration(constraintParams);
-		dFloat speed = ClipParam(relPosit[i], linearStep * dAbs(relPositDir[i])) * invTimestep;
-		dFloat relAccel = speed * invTimestep + stopAccel;
-		constraintParams->m_normalIndex[dofCount] = 0;
-		constraintParams->m_jointAccel[dofCount] = relAccel;
-		constraintParams->m_jointLowFrictionCoef[dofCount] = -m_linearFriction;
-		constraintParams->m_jointHighFrictionCoef[dofCount] = m_linearFriction;
+		dAssert(0);
+		//const dFloat stopAccel = CalculateRowZeroAccelaration(constraintParams);
+		//dFloat speed = ClipParam(relPosit[i], linearStep * dAbs(relPositDir[i])) * invTimestep;
+		//dFloat relAccel = speed * invTimestep + stopAccel;
+		//constraintParams->m_normalIndex[dofCount] = 0;
+		//constraintParams->m_jointAccel[dofCount] = relAccel;
+		//constraintParams->m_jointLowFrictionCoef[dofCount] = -m_linearFriction;
+		//constraintParams->m_jointHighFrictionCoef[dofCount] = m_linearFriction;
 		dofCount++;
 	}
 
 	const dVector& coneDir0 = matrix0.m_front;
 	const dVector& coneDir1 = matrix1.m_front;
 
-	const dFloat angleStep = m_maxAngularSpeed * constraintParams->m_timestep;
+	//const dFloat angleStep = m_maxAngularSpeed * constraintParams->m_timestep;
 	dFloat cosAngleCos = coneDir1.DotProduct3(coneDir0);
 	if (cosAngleCos < 0.9999f) {
 		dMatrix coneRotation(dGetIdentityMatrix());
@@ -120,36 +121,39 @@ void dAnimationRagDollEffector::JacobianDerivative(dComplementaritySolver::dPara
 
 		{
 			AddAngularRowJacobian(constraintParams, matrix1[0], 0.0f);
-			const dFloat stopAlpha = CalculateRowZeroAccelaration(constraintParams);
-			dFloat omega = ClipParam(pitchAngle, angleStep * dAbs(angleDir[0])) * invTimestep;
-			dFloat relAlpha = omega * invTimestep + stopAlpha;
-			constraintParams->m_normalIndex[dofCount] = 0;
-			constraintParams->m_jointAccel[dofCount] = relAlpha;
-			constraintParams->m_jointLowFrictionCoef[dofCount] = -m_angularFriction;
-			constraintParams->m_jointHighFrictionCoef[dofCount] = m_angularFriction;
+			dAssert(0);
+			//const dFloat stopAlpha = CalculateRowZeroAccelaration(constraintParams);
+			//dFloat omega = ClipParam(pitchAngle, angleStep * dAbs(angleDir[0])) * invTimestep;
+			//dFloat relAlpha = omega * invTimestep + stopAlpha;
+			//constraintParams->m_normalIndex[dofCount] = 0;
+			//constraintParams->m_jointAccel[dofCount] = relAlpha;
+			//constraintParams->m_jointLowFrictionCoef[dofCount] = -m_angularFriction;
+			//constraintParams->m_jointHighFrictionCoef[dofCount] = m_angularFriction;
 			dofCount++;
 		}
 
 		{
 			AddAngularRowJacobian(constraintParams, lateralDir, 0.0f);
-			const dFloat stopAlpha = CalculateRowZeroAccelaration(constraintParams);
-			dFloat omega = ClipParam(coneAngle, angleStep * dAbs(angleDir[1])) * invTimestep;
-			dFloat relAlpha = omega * invTimestep + stopAlpha;
-			constraintParams->m_normalIndex[dofCount] = 0;
-			constraintParams->m_jointAccel[dofCount] = relAlpha;
-			constraintParams->m_jointLowFrictionCoef[dofCount] = -m_angularFriction;
-			constraintParams->m_jointHighFrictionCoef[dofCount] = m_angularFriction;
+			dAssert(0);
+			//const dFloat stopAlpha = CalculateRowZeroAccelaration(constraintParams);
+			//dFloat omega = ClipParam(coneAngle, angleStep * dAbs(angleDir[1])) * invTimestep;
+			//dFloat relAlpha = omega * invTimestep + stopAlpha;
+			//constraintParams->m_normalIndex[dofCount] = 0;
+			//constraintParams->m_jointAccel[dofCount] = relAlpha;
+			//constraintParams->m_jointLowFrictionCoef[dofCount] = -m_angularFriction;
+			//constraintParams->m_jointHighFrictionCoef[dofCount] = m_angularFriction;
 			dofCount++;
 		}
 
 		{
 			dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
 			AddAngularRowJacobian(constraintParams, sideDir, 0.0f);
-			const dFloat stopAlpha = CalculateRowZeroAccelaration(constraintParams);
-			constraintParams->m_normalIndex[dofCount] = 0;
-			constraintParams->m_jointAccel[dofCount] = stopAlpha;
-			constraintParams->m_jointLowFrictionCoef[dofCount] = -m_angularFriction;
-			constraintParams->m_jointHighFrictionCoef[dofCount] = m_angularFriction;
+			dAssert(0);
+			//const dFloat stopAlpha = CalculateRowZeroAccelaration(constraintParams);
+			//constraintParams->m_normalIndex[dofCount] = 0;
+			//constraintParams->m_jointAccel[dofCount] = stopAlpha;
+			//constraintParams->m_jointLowFrictionCoef[dofCount] = -m_angularFriction;
+			//constraintParams->m_jointHighFrictionCoef[dofCount] = m_angularFriction;
 			dofCount++;
 		}
 	} else {
@@ -157,40 +161,43 @@ void dAnimationRagDollEffector::JacobianDerivative(dComplementaritySolver::dPara
 		// using small angular aproximation to get the joint angle;
 		{
 			AddAngularRowJacobian(constraintParams, matrix1[0], 0.0f);
-			const dFloat stopAlpha = CalculateRowZeroAccelaration(constraintParams);
-			dFloat angle = CalculateAngle(&matrix0[1][0], &matrix1[1][0], &matrix0[0][0]);
-			dFloat omega = ClipParam(angle, angleStep) * invTimestep;
-			dFloat relAlpha = omega * invTimestep + stopAlpha;
-			constraintParams->m_normalIndex[dofCount] = 0;
-			constraintParams->m_jointAccel[dofCount] = relAlpha;
-			constraintParams->m_jointLowFrictionCoef[dofCount] = -m_angularFriction;
-			constraintParams->m_jointHighFrictionCoef[dofCount] = m_angularFriction;
+			dAssert(0);
+			//const dFloat stopAlpha = CalculateRowZeroAccelaration(constraintParams);
+			//dFloat angle = CalculateAngle(&matrix0[1][0], &matrix1[1][0], &matrix0[0][0]);
+			//dFloat omega = ClipParam(angle, angleStep) * invTimestep;
+			//dFloat relAlpha = omega * invTimestep + stopAlpha;
+			//constraintParams->m_normalIndex[dofCount] = 0;
+			//constraintParams->m_jointAccel[dofCount] = relAlpha;
+			//constraintParams->m_jointLowFrictionCoef[dofCount] = -m_angularFriction;
+			//constraintParams->m_jointHighFrictionCoef[dofCount] = m_angularFriction;
 			dofCount++;
 		}
 
 		{
 			AddAngularRowJacobian(constraintParams, matrix1[1], 0.0f);
-			const dFloat stopAlpha = CalculateRowZeroAccelaration(constraintParams);
-			dFloat angle = matrix1[2].DotProduct3(matrix1[0]);
-			dFloat omega = ClipParam(angle, angleStep) * invTimestep;
-			dFloat relAlpha = omega * invTimestep + stopAlpha;
-			constraintParams->m_normalIndex[dofCount] = 0;
-			constraintParams->m_jointAccel[dofCount] = relAlpha;
-			constraintParams->m_jointLowFrictionCoef[dofCount] = -m_angularFriction;
-			constraintParams->m_jointHighFrictionCoef[dofCount] = m_angularFriction;
+			dAssert(0);
+			//const dFloat stopAlpha = CalculateRowZeroAccelaration(constraintParams);
+			//dFloat angle = matrix1[2].DotProduct3(matrix1[0]);
+			//dFloat omega = ClipParam(angle, angleStep) * invTimestep;
+			//dFloat relAlpha = omega * invTimestep + stopAlpha;
+			//constraintParams->m_normalIndex[dofCount] = 0;
+			//constraintParams->m_jointAccel[dofCount] = relAlpha;
+			//constraintParams->m_jointLowFrictionCoef[dofCount] = -m_angularFriction;
+			//constraintParams->m_jointHighFrictionCoef[dofCount] = m_angularFriction;
 			dofCount++;
 		}
 
 		{
 			AddAngularRowJacobian(constraintParams, matrix1[2], 0.0f);
-			const dFloat stopAlpha = CalculateRowZeroAccelaration(constraintParams);
-			dFloat angle = matrix1[1].DotProduct3(matrix1[0]);
-			dFloat omega = ClipParam(angle, angleStep) * invTimestep;
-			dFloat relAlpha = omega * invTimestep + stopAlpha;
-			constraintParams->m_normalIndex[dofCount] = 0;
-			constraintParams->m_jointAccel[dofCount] = relAlpha;
-			constraintParams->m_jointLowFrictionCoef[dofCount] = -m_angularFriction;
-			constraintParams->m_jointHighFrictionCoef[dofCount] = m_angularFriction;
+			dAssert(0);
+			//const dFloat stopAlpha = CalculateRowZeroAccelaration(constraintParams);
+			//dFloat angle = matrix1[1].DotProduct3(matrix1[0]);
+			//dFloat omega = ClipParam(angle, angleStep) * invTimestep;
+			//dFloat relAlpha = omega * invTimestep + stopAlpha;
+			//constraintParams->m_normalIndex[dofCount] = 0;
+			//constraintParams->m_jointAccel[dofCount] = relAlpha;
+			//constraintParams->m_jointLowFrictionCoef[dofCount] = -m_angularFriction;
+			//constraintParams->m_jointHighFrictionCoef[dofCount] = m_angularFriction;
 			dofCount++;
 		}
 	}

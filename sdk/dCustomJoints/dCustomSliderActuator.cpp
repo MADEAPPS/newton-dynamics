@@ -80,7 +80,11 @@ dFloat dCustomSliderActuator::GetTargetPosit() const
 
 void dCustomSliderActuator::SetTargetPosit(dFloat posit)
 {
-	m_targetPosit = dClamp(posit, m_minDist, m_maxDist);
+	posit = dClamp(posit, m_minDist, m_maxDist);
+	if (dAbs(posit - m_targetPosit) > dFloat (1.0e-3f)) {
+		NewtonBodySetSleepState(m_body0, 0);
+		m_targetPosit = dClamp(posit, m_minDist, m_maxDist);
+	}
 }
 
 dFloat dCustomSliderActuator::GetLinearRate() const
@@ -149,32 +153,35 @@ void dCustomSliderActuator::SubmitAngularRow(const dMatrix& matrix0, const dMatr
 
 	dAssert(m_linearRate >= 0.0f);
 	dFloat posit = GetJointPosit();
-	dFloat targetPosit = m_targetPosit;
-
 	dFloat invTimeStep = 1.0f / timestep;
 	dFloat step = m_linearRate * timestep;
 	dFloat currentSpeed = 0.0f;
 	
-	if (posit < (targetPosit - step)) {
+	if (posit < (m_targetPosit - step)) {
 		currentSpeed = m_linearRate;
-	} else if (posit < targetPosit) {
-		currentSpeed = 0.3f * (targetPosit - posit) * invTimeStep;
-	} else if (posit > (targetPosit + step)) {
+	} else if (posit < m_targetPosit) {
+		currentSpeed = 0.3f * (m_targetPosit - posit) * invTimeStep;
+	} else if (posit > (m_targetPosit + step)) {
 		currentSpeed = -m_linearRate;
-	} else if (posit > targetPosit) {
-		currentSpeed = 0.3f * (targetPosit - posit) * invTimeStep;
+	} else if (posit > m_targetPosit) {
+		currentSpeed = 0.3f * (m_targetPosit - posit) * invTimeStep;
 	}
 
 	//update on the active dof.
 	m_force = NewtonUserJointGetRowForce(m_joint, 5);
-//dTrace(("%f\n", m_force));
 
 	NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix1.m_posit[0], &matrix1.m_front[0]);
 	dFloat accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + currentSpeed * invTimeStep;
 	NewtonUserJointSetRowAcceleration(m_joint, accel);
-	NewtonUserJointSetRowMinimumFriction(m_joint, m_minForce);
-	NewtonUserJointSetRowMaximumFriction(m_joint, m_maxForce);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	if (posit > m_maxDist) {
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxForce);
+	} else if (posit < m_minDist) {
+		NewtonUserJointSetRowMinimumFriction(m_joint, m_minForce);
+	} else {
+		NewtonUserJointSetRowMinimumFriction(m_joint, m_minForce);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxForce);
+	}
 }
 
 

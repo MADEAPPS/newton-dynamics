@@ -237,14 +237,27 @@ freq *= 0.5f;
 		int size = (1 << sizeInPowerOfTwos) + 1;
 		dAssert (size < int (sizeof (map) / sizeof map[0]));
 		MakeMap (elevation, map, size);
+		//for (int i = 0; i < (size + 1) * (size + 1); i++) {
+		//	elevation[i] = -1.0e6f;
+		//}
 
-		dFloat f = GetElevation (size, elevationScale, maxElevation, minElevation, roughness);
-		map[0][0] = Guassian(f);
-		map[0][size-1] = Guassian(f);
-		map[size-1][0] = Guassian(f);
-		map[size-1][size-1] = Guassian(f);
+		for (int i = 0; i < size; i++) {
+			map[0][i] = 0.0f;
+			map[size - 1][i] = 0.0f;
+			map[i][0] = 0.0f;
+			map[i][size - 1] = 0.0f;
+		}
+
+		//dFloat f = GetElevation (size, elevationScale, maxElevation, minElevation, roughness);
+		//map[0][0] = Guassian(f);
+		//map[0][size-1] = Guassian(f);
+		//map[size-1][0] = Guassian(f);
+		//map[size-1][size-1] = Guassian(f);
+		//map[0][0] = 0.0f;
+		//map[0][size-1] = 0.0f;
+		//map[size-1][0] = 0.0f;
+		//map[size-1][size-1] = 0.0f;
 		for (int frequency = size - 1; frequency > 1; frequency = frequency / 2 ) {
-			//dFloat f = pow (dFloat (frequency) * elevationScale, 1.0f + roughness);
 			dFloat h = GetElevation (frequency, elevationScale, maxElevation, minElevation, roughness);
 
 			for(int y0 = 0; y0 < (size - frequency); y0 += frequency) {
@@ -257,23 +270,27 @@ freq *= 0.5f;
 
 					map[y1][x1] = (map[y0][x0] + map[y0][x2] + map[y2][x0] + map[y2][x2]) * 0.25f + Guassian(h);
 
-					map[y0][x1] = (map[y0][x0] + map[y0][x2]) * 0.5f + Guassian(h);
-					map[y2][x1] = (map[y2][x0] + map[y2][x2]) * 0.5f + Guassian(h);
+					if (y0) {
+						map[y0][x1] = (map[y0][x0] + map[y0][x2]) * 0.5f + Guassian(h);
+					}
+					if (y2 != size - 1) {
+						map[y2][x1] = (map[y2][x0] + map[y2][x2]) * 0.5f + Guassian(h);
+					}
 
-					map[y1][x0] = (map[y0][x0] + map[y2][x0]) * 0.5f + Guassian(h);
-					map[y1][x2] = (map[y0][x2] + map[y2][x2]) * 0.5f + Guassian(h);
+					if (x0) {
+						map[y1][x0] = (map[y0][x0] + map[y2][x0]) * 0.5f + Guassian(h);
+					}
+
+					if (x2 != size - 1) {
+						map[y1][x2] = (map[y0][x2] + map[y2][x2]) * 0.5f + Guassian(h);
+					}
 
 					// this trick eliminate the creases 
 					#ifdef RE_SAMPLE_CORNER
-						map[y0][x0] = (map[y0][x1] + map[y1][x0]) * 0.5f + Guassian(h);
-						map[y0][x2] = (map[y0][x1] + map[y1][x2]) * 0.5f + Guassian(h);
-						map[y2][x0] = (map[y1][x0] + map[y2][x1]) * 0.5f + Guassian(h);
-						map[y2][x2] = (map[y2][x1] + map[y1][x2]) * 0.5f + Guassian(h);
-
-//						map[y0][x1] = (map[y0][x0] + map[y0][x2]) * 0.5f + Guassian(f);
-//						map[y2][x1] = (map[y2][x0] + map[y2][x2]) * 0.5f + Guassian(f);
-//						map[y1][x0] = (map[y0][x0] + map[y2][x0]) * 0.5f + Guassian(f);
-//						map[y1][x2] = (map[y0][x2] + map[y2][x2]) * 0.5f + Guassian(f);
+						//map[y0][x0] = (map[y0][x1] + map[y1][x0]) * 0.5f + Guassian(h);
+						//map[y0][x2] = (map[y0][x1] + map[y1][x2]) * 0.5f + Guassian(h);
+						//map[y2][x0] = (map[y1][x0] + map[y2][x1]) * 0.5f + Guassian(h);
+						//map[y2][x2] = (map[y2][x1] + map[y1][x2]) * 0.5f + Guassian(h);
 					#endif
 				}
 			}
@@ -298,7 +315,6 @@ freq *= 0.5f;
 		for (int i = 0; i < 4; i ++) {
 			ApplySmoothFilter (elevation, size);
 		}
-//memset (elevation, 0, size * size * sizeof (dFloat));
 
 		//SetBaseHeight (elevation, size);
 		// apply simple calderas
@@ -391,8 +407,6 @@ freq *= 0.5f;
 		return terrainBody;
 	}
 };
-
-	
 
 NewtonBody* CreateHeightFieldTerrain (DemoEntityManager* const scene, int sizeInPowerOfTwos, dFloat cellSize, dFloat elevationScale, dFloat roughness, dFloat maxElevation, dFloat minElevation)
 {

@@ -629,7 +629,11 @@ void dgWorld::ListenerSetPostUpdate(void* const listenerNode, OnListenerUpdateCa
 	listener.m_onPostUpdate = updateCallback;
 }
 
-
+void dgWorld::ListenerSetPostStep(void* const listenerNode, OnListenerUpdateCallback updateCallback)
+{
+	dgListener& listener = ((dgListenerList::dgListNode*) listenerNode)->GetInfo();
+	listener.m_onPostStep = updateCallback;
+}
 
 void* dgWorld::GetListenerUserData (void* const listenerNode) const
 {
@@ -923,15 +927,12 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 	m_inUpdate --;
 }
 
-
 void dgWorldThreadPool::OnBeginWorkerThread (dgInt32 threadId)
 {
-
 }
 
 void dgWorldThreadPool::OnEndWorkerThread (dgInt32 threadId)
 {
-
 }
 
 void dgWorld::Execute (dgInt32 threadID)
@@ -981,13 +982,22 @@ void dgWorld::RunStep ()
 	}
 
 	const dgBodyMasterList* const masterList = this;
-	dgBodyMasterList::dgListNode* node = masterList->GetFirst();
+	dgBodyMasterList::dgListNode* threadNode = masterList->GetFirst();
 	const dgInt32 threadsCount = GetThreadCount();
 	for (dgInt32 i = 0; i < threadsCount; i++) {
-		QueueJob(UpdateTransforms, this, node, "dgWorld::UpdateTransforms");
-		node = node ? node->GetNext() : NULL;
+		QueueJob(UpdateTransforms, this, threadNode, "dgWorld::UpdateTransforms");
+		threadNode = threadNode ? threadNode->GetNext() : NULL;
 	}
 	SynchronizationBarrier();
+
+	if (m_listeners.GetCount()) {
+		for (dgListenerList::dgListNode* node = m_listeners.GetFirst(); node; node = node->GetNext()) {
+			dgListener& listener = node->GetInfo();
+			if (listener.m_onPostStep) {
+				listener.m_onPostStep(this, listener.m_userData, m_savetimestep);
+			}
+		}
+	}
 
 	if (m_onPostUpdateCallback) {
 		m_onPostUpdateCallback (this, m_savetimestep);

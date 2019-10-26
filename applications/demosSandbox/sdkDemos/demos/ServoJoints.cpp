@@ -117,8 +117,7 @@ class dLifterUserData: public DemoEntity::UserData
 	dFloat m_maxEngineSpeed;
 };
 
-
-class ServoInputManager: public dCustomInputManager
+class ServoInputManager: public dCustomListener
 {
 	public:
 	class InputRecord
@@ -137,7 +136,7 @@ class ServoInputManager: public dCustomInputManager
 	};
 
 	ServoInputManager(DemoEntityManager* const scene)
-		:dCustomInputManager(scene->GetNewton())
+		:dCustomListener(scene->GetNewton(), "D_LISTENER")
 		,m_scene(scene)
 		,m_cameraMode(true)
 		,m_changeVehicle(true)
@@ -151,13 +150,12 @@ class ServoInputManager: public dCustomInputManager
 		// plug a callback for 2d help display
 		scene->Set2DDisplayRenderFunction(RenderPlayerHelp, NULL, this);
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
+		memset (m_player, 0, sizeof (m_player));
 	}
 
-	void OnBeginUpdate(dFloat timestepInSecunds)
+	void PreUpdate(dFloat timestepInSecunds)
 	{
-		dTrace(("sorry servo joints demo temporarilly disabled\n"));
-/*
-		if (!m_player[m_currentPlayer % m_playersCount]) {
+		if (!(m_playersCount && m_player[m_currentPlayer % m_playersCount])) {
 			return ;
 		}
 		dLifterUserData::InputRecord inputs;
@@ -177,25 +175,25 @@ class ServoInputManager: public dCustomInputManager
 			m_scene->GetKeyState('D') ||
 			m_scene->GetKeyState('W') ||
 			m_scene->GetKeyState('S')) {
-			NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetRoot()->m_body;
+			NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetBody();
 			NewtonBodySetSleepState(body, false);
 		}
+
 #if 0
-#if 0
-		static FILE* file = fopen("log.bin", "wb");
-		if (file) {
-			fwrite(&inputs, sizeof(inputs), 1, file);
-			fflush(file);
-		}
-#else 
-		static FILE* file = fopen("log.bin", "rb");
-		if (file) {
-			fread(&inputs, sizeof(inputs), 1, file);
-		}
-#endif
+	#if 0
+			static FILE* file = fopen("log.bin", "wb");
+			if (file) {
+				fwrite(&inputs, sizeof(inputs), 1, file);
+				fflush(file);
+			}
+	#else 
+			static FILE* file = fopen("log.bin", "rb");
+			if (file) {
+				fread(&inputs, sizeof(inputs), 1, file);
+			}
+	#endif
 #endif
 		lifterData->SetInput(inputs);
-*/
 	}
 
 	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
@@ -206,10 +204,7 @@ class ServoInputManager: public dCustomInputManager
 
 	void UpdateCamera(dFloat timestepInSecunds)
 	{
-		dTrace(("Fix this shit\n"));
-		/*
-
-		if (!m_player[m_currentPlayer % m_playersCount]) {
+		if (!(m_playersCount && m_player[m_currentPlayer % m_playersCount])) {
 			return;
 		}
 
@@ -235,14 +230,13 @@ class ServoInputManager: public dCustomInputManager
 		}
 
 		camera->SetNextMatrix(*m_scene, camMatrix, camOrigin);
-*/
 	}
 
 	void OnEndUpdate(dFloat timestepInSecunds)
 	{
 	}
 
-	void AddPlayer(dCustomTransformController* const player)
+	void AddPlayer(dModelRootNode* const player)
 	{
 		m_player[m_playersCount] = player;
 		m_playersCount++;
@@ -269,9 +263,8 @@ class ServoInputManager: public dCustomInputManager
 		me->RenderPlayerHelp(scene);
 	}
 
-
 	DemoEntityManager* m_scene;
-	dCustomTransformController* m_player[2];
+	dModelRootNode* m_player[2];
 	DemoEntityManager::ButtonKey m_cameraMode;
 	DemoEntityManager::ButtonKey m_changeVehicle;
 	dFloat32 m_palette;
@@ -283,11 +276,11 @@ class ServoInputManager: public dCustomInputManager
 };
 
 
-class ServoVehicleManagerManager: public dCustomTransformManager
+class ServoVehicleManagerManager: public dModelManager
 {
 	public:
 	ServoVehicleManagerManager(DemoEntityManager* const scene)
-		:dCustomTransformManager(scene->GetNewton())
+		:dModelManager(scene->GetNewton())
 	{
 		// create a material for early collision culling
 		int material = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
@@ -347,7 +340,6 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 			}
 		}
 	}
-
 
 	static int CompoundSubCollisionAABBOverlap (const NewtonJoint* const contact, dFloat timestep, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
 	{
@@ -443,7 +435,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 */
 	}
 
-	virtual void OnUpdateTransform(const dCustomTransformController::dSkeletonBone* const bone, const dMatrix& localMatrix) const
+	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const
 	{
 		NewtonBody* const body = bone->GetBody();
 		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(body);
@@ -455,17 +447,14 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		}
 	}
 
-	virtual void OnPreUpdate (dCustomTransformController* const controller, dFloat timestep, int threadIndex) const
+	//virtual void OnPreUpdate (dCustomTransformController* const controller, dFloat timestep, int threadIndex) const
+	virtual void OnPreUpdate(dModelRootNode* const controller, dFloat timestep) const
 	{
-		//dAssert(0);
-		dTrace(("sorry servo joints demo temporarilly disabled\n"));
-		/*
-		//ServoEntityModel* const lifterData = (ServoEntityModel*)controller->GetUserData();
 		dLifterUserData* const lifterData = (dLifterUserData*) ((DemoEntity*)controller->GetUserData())->GetUserData();
 		if (!lifterData) {
 			return;
 		}
-
+		
 		dFloat brakeTorque = 10000.0f;
 		if (lifterData->m_engineJoint) {
 			dFloat engineRPM = 0.0f;
@@ -519,7 +508,6 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		if (lifterData->m_paletteJoints[1]) {
 			lifterData->m_paletteJoints[1]->SetTargetPosit(lifterData->m_inputs.m_paletteValue);
 		}
-*/
 	}
 
 	NewtonCollision* MakeConvexHull(DemoEntity* const bodyPart) const
@@ -628,6 +616,9 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		// assign a body part id
 		NewtonCollisionSetUserID(collision, definition.m_bodyPartID);
 
+		// make sure to set the tranform callback to null because this is a hierachical model;
+		NewtonBodySetTransformCallback(body, NULL);
+
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
 		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
 		return body;
@@ -678,7 +669,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		return wheel;
 	}
 
-	dCustomWheel* LinkFrontTireJoint(dCustomTransformController* const controller, NewtonBody* const chassis, NewtonBody* const tire)
+	dCustomWheel* LinkFrontTireJoint(dLifterUserData* const lifterData, NewtonBody* const chassis, NewtonBody* const tire)
 	{
 		dCustomWheel* const wheel = LinkTireJoint(chassis, tire);
 
@@ -691,8 +682,6 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		dMatrix tireHingeMatrix(dRollMatrix(0.0f * dDegreeToRad) * matrix);
 		tireHingeMatrix = wheel->GetMatrix0() * tireHingeMatrix;
 
-		dLifterUserData* const lifterData = (dLifterUserData*) ((DemoEntity*)controller->GetUserData())->GetUserData();
-
 		dAssert (chassis == lifterData->m_engineJoint->GetBody1());
 		NewtonBody* const engine = lifterData->m_engineJoint->GetBody0();
 		lifterData->m_engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
@@ -703,14 +692,12 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		return wheel;
 	}
 
-	void ConnectBodyPart(dCustomTransformController* const controller, NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation, dList<dCustomJoint*>& cycleLinks)
+	void ConnectBodyPart(dLifterUserData* const lifterData,  NewtonBody* const parent, NewtonBody* const child, const dString& jointArticulation, dList<dCustomJoint*>& cycleLinks)
 	{
-		dLifterUserData* const lifterData = (dLifterUserData*) ((DemoEntity*)controller->GetUserData())->GetUserData();
-
 		if (jointArticulation == "") {
 			// this is the root body do nothing
 		} else if (jointArticulation == "frontTire") {
-			dCustomWheel* const tire = LinkFrontTireJoint(controller, parent, child);
+			dCustomWheel* const tire = LinkFrontTireJoint(lifterData, parent, child);
 			if (!lifterData->m_frontTiresJoints[0]) {
 				lifterData->m_frontTiresJoints[0] = tire;
 			} else {
@@ -752,7 +739,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		}
 	}
 
-	dCustomTransformController::dSkeletonBone* CreateEngineNode(dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const chassisBone)
+	dModelNode* CreateEngineNode(dModelNode* const chassisBone)
 	{
 		NewtonWorld* const world = GetWorld();
 		NewtonCollision* const shape = NewtonCreateCylinder(world, 0.125f, 0.125f, 0.75f, 0, NULL);
@@ -794,10 +781,10 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		dCustomDoubleHinge* const engineJoint = new dCustomDoubleHinge(engineAxis, engineBody, chassis);
 		engineJoint->EnableLimits(false);
 		engineJoint->EnableLimits1(false);
-		return controller->AddBone(engineBody, dGetIdentityMatrix(), chassisBone);
+		return new dModelNode(engineBody, dGetIdentityMatrix(), chassisBone);
 	}
 
-	dCustomMotor* CreateEngineMotor(dCustomTransformController* const controller, dCustomDoubleHinge* const engineJoint)
+	dCustomMotor* CreateEngineMotor(dCustomDoubleHinge* const engineJoint)
 	{
 		dMatrix engineMatrix;
 		dMatrix chassisMatrix;
@@ -807,7 +794,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		return new dCustomMotor(engineMatrix.m_up, engine, chassis);
 	}
 
-	dCustomTransformController* CreateForklift(const dMatrix& location, const char* const filename, int bodyPartsCount, SERVO_VEHICLE_DEFINITION* const definition)
+	dModelRootNode* CreateForklift(const dMatrix& location, const char* const filename, int bodyPartsCount, SERVO_VEHICLE_DEFINITION* const definition)
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
@@ -821,12 +808,16 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 		DemoEntity* const rootEntity = (DemoEntity*)vehicleModel->Find(definition[0].m_boneName);
 		NewtonBody* const rootBody = CreateBodyPart(rootEntity, definition[0]);
+		dModelRootNode* const controller = new dModelRootNode(rootBody, dGetIdentityMatrix());
 
-		dCustomTransformController* const controller = CreateController(rootBody, dGetIdentityMatrix());
+		// add this root model 
+		AddRoot(controller);
+
+		//controller->SetCalculateLocalTransforms(true);
+		controller->SetTranformMode(true);
 
 		//controller->SetSelfCollision(0);
 		controller->SetUserData(vehicleModel);
-		controller->SetCalculateLocalTransforms(true);
 
 		// move the center of mass a lithe to the back, and lower
 		dVector com(0.0f);
@@ -843,9 +834,11 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		vehicleModel->SetUserData(lifterData);
 
 		// add engine
-		dCustomTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, controller);
-		lifterData->m_engineJoint = (dCustomDoubleHinge*)engineBone->GetParentJoint();
-		lifterData->m_engineMotor = CreateEngineMotor(controller, lifterData->m_engineJoint);
+		dModelNode* const engineBone = CreateEngineNode(controller);
+		//lifterData->m_engineJoint = (dCustomDoubleHinge*)engineBone->GetParentJoint();
+		lifterData->m_engineJoint = (dCustomDoubleHinge*) FindJoint(controller->GetBody(), engineBone->GetBody());
+		dAssert(lifterData->m_engineJoint->IsType(dCustomDoubleHinge::GetType()));
+		lifterData->m_engineMotor = CreateEngineMotor(lifterData->m_engineJoint);
 
 		// set power parameter for a simple DC engine
 		lifterData->m_maxEngineSpeed = 20.0f;
@@ -853,9 +846,8 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 		// walk down the model hierarchy an add all the components 
 		int stackIndex = 0;
+		dModelNode* parentBones[32];
 		DemoEntity* childEntities[32];
-		dCustomTransformController::dSkeletonBone* parentBones[32];
-
 		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
 			parentBones[stackIndex] = controller;
 			childEntities[stackIndex] = child;
@@ -866,7 +858,7 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 		while (stackIndex) {
 			stackIndex--;
 			DemoEntity* const entity = childEntities[stackIndex];
-			dCustomTransformController::dSkeletonBone* parentBone = parentBones[stackIndex];
+			dModelNode* parentBone = parentBones[stackIndex];
 
 			const char* const name = entity->GetName().GetStr();
 			for (int i = 0; i < bodyPartsCount; i++) {
@@ -875,10 +867,10 @@ class ServoVehicleManagerManager: public dCustomTransformManager
 
 					// connect this body part to its parent with a vehicle joint
 					NewtonBody* const parentBody = parentBone->GetBody();
-					ConnectBodyPart(controller, parentBody, bone, definition[i].m_articulationName, cycleLinks);
+					ConnectBodyPart(lifterData, parentBody, bone, definition[i].m_articulationName, cycleLinks);
 
 					dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
-					parentBone = controller->AddBone(bone, bindMatrix, parentBone);
+					parentBone = new dModelNode(bone, bindMatrix, parentBone);
 					break;
 				}
 			}
@@ -957,12 +949,11 @@ void ServoJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_y += 0.5f;
 	
 	// load a the mesh of the articulate vehicle
-	dCustomTransformController* const forklift = vehicleManager->CreateForklift(matrix, "forklift.ngd", sizeof(inverseKinematicsRidParts) / sizeof (inverseKinematicsRidParts[0]), inverseKinematicsRidParts);
-	forklift;
-
-dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
-#if 0
+	dModelRootNode* const forklift = vehicleManager->CreateForklift(matrix, "forklift.ngd", sizeof(inverseKinematicsRidParts) / sizeof (inverseKinematicsRidParts[0]), inverseKinematicsRidParts);
 	inputManager->AddPlayer(forklift);
+
+	dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
+#if 0
 
 	// place heavy load to show reproduce black bird dream problems
 	matrix.m_posit.m_x += 2.0f;	

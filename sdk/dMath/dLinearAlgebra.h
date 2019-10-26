@@ -103,6 +103,7 @@ class dComplementaritySolver
 		dFloat m_coordenateAccel;
 		dFloat m_jointLowFriction;
 		dFloat m_jointHighFriction;
+		dBilateralJoint* m_frictionCallback;
 		int m_normalIndex;
 	};
 
@@ -114,31 +115,10 @@ class dComplementaritySolver
 		dFloat m_jointLowFrictionCoef[D_MAX_PRAM_INFO_SIZE];
 		dFloat m_jointHighFrictionCoef[D_MAX_PRAM_INFO_SIZE];
 		int m_normalIndex[D_MAX_PRAM_INFO_SIZE];
+		dBilateralJoint* m_frictionCallback[D_MAX_PRAM_INFO_SIZE];
 		dFloat m_timestep;
 		dFloat m_timestepInv;
 		int m_count;
-	};
-
-	class dPointDerivativeParam
-	{
-		public:
-		dPointDerivativeParam()
-			:m_r0(0.0f)
-			,m_posit0(0.0f)
-			,m_veloc0(0.0f)
-			,m_r1(0.0f)
-			,m_posit1(0.0f)
-			,m_veloc1(0.0f)
-		{
-		}
-
-		dVector m_r0;
-		dVector m_posit0;
-		dVector m_veloc0;
-
-		dVector m_r1;
-		dVector m_posit1;
-		dVector m_veloc1;
 	};
 
 	class dJointAccelerationDecriptor
@@ -168,19 +148,19 @@ class dComplementaritySolver
 		virtual ~dBilateralJoint(){}
 
 		virtual void Init (dBodyState* const state0, dBodyState* const state1);
-
-		//protected:
 		virtual void JacobianDerivative (dParamInfo* const constraintParams) = 0; 
 		virtual void UpdateSolverForces (const dJacobianPair* const jacobians) const = 0; 
 		virtual void JointAccelerations (dJointAccelerationDecriptor* const accelParam);
+		virtual void SpecialSolverFrictionCallback(const dFloat* const force, dFloat* const lowFriction, dFloat* const highFriction) const {}
 
-		void InitPointParam (dPointDerivativeParam& param, const dVector& pivot) const;
 		void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir, dFloat jointAngle);
 		void AddLinearRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir);
-		//void AddAngularRowJacobian (dParamInfo* const constraintParams, const dVector& dir0, const dVector& dir1, dFloat ratio);
-		void CalculatePointDerivative (dParamInfo* const constraintParams, const dVector& dir, const dPointDerivativeParam& param);
+		void AddContactRowJacobian (dParamInfo* const constraintParams, const dVector& pivot, const dVector& dir, dFloat restitution);
 
-		dFloat CalculateRowZeroAccelaration (dParamInfo* const constraintParams) const;
+		dFloat GetRowAccelaration(dParamInfo* const constraintParams) const;
+		void SetRowAccelaration(dParamInfo* const constraintParams, dFloat accel);
+
+		//dFloat CalculateRowZeroAccelaration (dParamInfo* const constraintParams) const;
 		dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
 
 		dFloat m_motorAcceleration[D_MAX_PRAM_INFO_SIZE];

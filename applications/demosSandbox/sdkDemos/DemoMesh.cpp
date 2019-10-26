@@ -614,44 +614,88 @@ void DemoMesh::SpliteSegment(dListNode* const node, int maxIndexCount)
 				rightCount += 3;
 			}
 		}
-		dAssert (leftCount);
-		dAssert (rightCount);
 
-		dListNode* const leftNode = Append();
-		dListNode* const rightNode = Append();
-		DemoSubMesh* const leftSubMesh = &leftNode->GetInfo();
-		DemoSubMesh* const rightSubMesh = &rightNode->GetInfo();
-		leftSubMesh->AllocIndexData (leftCount);
-		rightSubMesh->AllocIndexData (rightCount);
+		if (leftCount && rightCount) {
+			dListNode* const leftNode = Append();
+			dListNode* const rightNode = Append();
+			DemoSubMesh* const leftSubMesh = &leftNode->GetInfo();
+			DemoSubMesh* const rightSubMesh = &rightNode->GetInfo();
+			leftSubMesh->AllocIndexData (leftCount);
+			rightSubMesh->AllocIndexData (rightCount);
 
-		leftSubMesh->m_textureHandle = AddTextureRef (segment.m_textureHandle);
-		rightSubMesh->m_textureHandle = AddTextureRef (segment.m_textureHandle);
-		leftSubMesh->m_textureName = segment.m_textureName;
-		rightSubMesh->m_textureName = segment.m_textureName;
+			leftSubMesh->m_textureHandle = AddTextureRef (segment.m_textureHandle);
+			rightSubMesh->m_textureHandle = AddTextureRef (segment.m_textureHandle);
+			leftSubMesh->m_textureName = segment.m_textureName;
+			rightSubMesh->m_textureName = segment.m_textureName;
 
-		leftCount = 0;
-		rightCount = 0;
-		for (int i = 0; i < segment.m_indexCount; i += 3) {
-			bool isleft = true;
-			for (int j = 0; j < 3; j ++) {
-				int vertexIndex = segment.m_indexes[i + j];
-				isleft &= (m_vertex[vertexIndex * 3 + index] < spliteDist);
+			leftCount = 0;
+			rightCount = 0;
+			for (int i = 0; i < segment.m_indexCount; i += 3) {
+				bool isleft = true;
+				for (int j = 0; j < 3; j ++) {
+					int vertexIndex = segment.m_indexes[i + j];
+					isleft &= (m_vertex[vertexIndex * 3 + index] < spliteDist);
+				}
+				if (isleft) {
+					leftSubMesh->m_indexes[leftCount + 0] = segment.m_indexes[i + 0];
+					leftSubMesh->m_indexes[leftCount + 1] = segment.m_indexes[i + 1];
+					leftSubMesh->m_indexes[leftCount + 2] = segment.m_indexes[i + 2];
+					leftCount += 3;
+				} else {
+					rightSubMesh->m_indexes[rightCount + 0] = segment.m_indexes[i + 0];
+					rightSubMesh->m_indexes[rightCount + 1] = segment.m_indexes[i + 1];
+					rightSubMesh->m_indexes[rightCount + 2] = segment.m_indexes[i + 2];
+					rightCount += 3;
+				}
 			}
-			if (isleft) {
-				leftSubMesh->m_indexes[leftCount + 0] = segment.m_indexes[i + 0];
-				leftSubMesh->m_indexes[leftCount + 1] = segment.m_indexes[i + 1];
-				leftSubMesh->m_indexes[leftCount + 2] = segment.m_indexes[i + 2];
-				leftCount += 3;
-			} else {
-				rightSubMesh->m_indexes[rightCount + 0] = segment.m_indexes[i + 0];
-				rightSubMesh->m_indexes[rightCount + 1] = segment.m_indexes[i + 1];
-				rightSubMesh->m_indexes[rightCount + 2] = segment.m_indexes[i + 2];
-				rightCount += 3;
+			SpliteSegment(leftNode, maxIndexCount);
+			SpliteSegment(rightNode, maxIndexCount);
+
+		} else {
+
+			leftCount = 0;
+			rightCount = 0;
+			for (int i = 0; i < segment.m_indexCount; i += 3) {
+				if (i / 3 & 1) {
+					leftCount += 3;
+				}
+				else {
+					rightCount += 3;
+				}
 			}
+
+			dListNode* const leftNode = Append();
+			dListNode* const rightNode = Append();
+			DemoSubMesh* const leftSubMesh = &leftNode->GetInfo();
+			DemoSubMesh* const rightSubMesh = &rightNode->GetInfo();
+			leftSubMesh->AllocIndexData(leftCount);
+			rightSubMesh->AllocIndexData(rightCount);
+
+			leftSubMesh->m_textureHandle = AddTextureRef(segment.m_textureHandle);
+			rightSubMesh->m_textureHandle = AddTextureRef(segment.m_textureHandle);
+			leftSubMesh->m_textureName = segment.m_textureName;
+			rightSubMesh->m_textureName = segment.m_textureName;
+
+			leftCount = 0;
+			rightCount = 0;
+			for (int i = 0; i < segment.m_indexCount; i += 3) {
+				if (i / 3 & 1) {
+					leftSubMesh->m_indexes[leftCount + 0] = segment.m_indexes[i + 0];
+					leftSubMesh->m_indexes[leftCount + 1] = segment.m_indexes[i + 1];
+					leftSubMesh->m_indexes[leftCount + 2] = segment.m_indexes[i + 2];
+					leftCount += 3;
+				} else {
+					rightSubMesh->m_indexes[rightCount + 0] = segment.m_indexes[i + 0];
+					rightSubMesh->m_indexes[rightCount + 1] = segment.m_indexes[i + 1];
+					rightSubMesh->m_indexes[rightCount + 2] = segment.m_indexes[i + 2];
+					rightCount += 3;
+				}
+			}
+			SpliteSegment(leftNode, maxIndexCount);
+			SpliteSegment(rightNode, maxIndexCount);
 		}
 
-		SpliteSegment(leftNode, maxIndexCount);
-		SpliteSegment(rightNode, maxIndexCount);
+
 		Remove(node);
 	}
 }
@@ -1075,10 +1119,6 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 	}
 	m_mesh->ResetOptimization();
 
-
-	glUseProgram(m_shader);
-	int matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
-
 	int count = CalculateMatrixPalette(&bindMatrix[0]);
 	GLfloat* const glMatrixPallete = dAlloca (GLfloat, 16 * count);
 	ConvertToGlMatrix(count, &bindMatrix[0], glMatrixPallete);
@@ -1088,6 +1128,8 @@ DemoSkinMesh::DemoSkinMesh(dScene* const scene, DemoEntity* const owner, dScene:
 //glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &xxx0);
 //glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_VECTORS, &xxx1);
 
+	glUseProgram(m_shader);
+	int matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
 	glUniformMatrix4fv(matrixPalette, count, GL_FALSE, glMatrixPallete);
 	dAssert (glGetError() == GL_NO_ERROR);
 

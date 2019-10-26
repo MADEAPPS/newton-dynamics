@@ -23,16 +23,12 @@
 
 #define PARALLET_RAYS_COUNT 1000
 
-class dRayCastRecord: public dCustomControllerBase
+class dRayCastRecord
 {
 	public:
 	dRayCastRecord()
 		:m_p0(0.0f)
 		,m_p1(0.0f)
-	{
-	}
-
-	void PreUpdate(dFloat timestep, int threadIndex)
 	{
 	}
 
@@ -45,7 +41,7 @@ class dRayCastRecord: public dCustomControllerBase
 		return paramPtr[0];
 	}
 
-	void PostUpdate(dFloat timestep, int threadIndex)
+	void Update(dFloat timestep, int threadIndex)
 	{
 		DemoEntity* const targetEnt = (DemoEntity*) NewtonBodyGetUserData (m_target);
 		const dMatrix& matrix = targetEnt->GetRenderMatrix(); 
@@ -58,22 +54,16 @@ class dRayCastRecord: public dCustomControllerBase
 		m_p1 = m_p0 + (matrix.m_posit - m_p0).Scale (parameter);
 	}
 
-	void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
-	{
-		dAssert(0);
-	}
-
-
 	dVector m_p0;
 	dVector m_p1;
 	NewtonBody* m_target;
 };
 
-
+class dRayCasterManager;
 class LineOfSightRayCastEntity: public DemoEntity
 {
 	public:
-	LineOfSightRayCastEntity (DemoEntityManager* const scene, dCustomControllerManager<dRayCastRecord>* casterManager)
+	LineOfSightRayCastEntity (DemoEntityManager* const scene, dRayCasterManager* const casterManager)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_casterManager(casterManager)
 	{
@@ -84,44 +74,17 @@ class LineOfSightRayCastEntity: public DemoEntity
 	{
 	}
 
-	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
-	{
-		glDisable (GL_LIGHTING);
-		glDisable(GL_TEXTURE_2D);
+	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const;
 
-	
-		glColor3f(0.0f, 0.5f, 0.5f);
-		glBegin(GL_LINES);
-		for (dCustomControllerManager<dRayCastRecord>::dListNode* node = m_casterManager->GetFirst(); node; node = node->GetNext()) {
-			dRayCastRecord* const ray = &node->GetInfo();
-			glVertex3f(GLfloat(ray->m_p0.m_x), GLfloat(ray->m_p0.m_y), GLfloat(ray->m_p0.m_z));
-			glVertex3f(GLfloat(ray->m_p1.m_x), GLfloat(ray->m_p1.m_y), GLfloat(ray->m_p1.m_z));
-		}
-		glEnd();
-
-
-		glColor3f(1.0f, 0.0f, 0.0f);
-		glPointSize(6.0f);
-		glBegin(GL_POINTS);
-		for (dCustomControllerManager<dRayCastRecord>::dListNode* node = m_casterManager->GetFirst(); node; node = node->GetNext()) {
-			dRayCastRecord* const ray = &node->GetInfo();
-			glVertex3f(GLfloat(ray->m_p1.m_x), GLfloat(ray->m_p1.m_y), GLfloat(ray->m_p1.m_z));
-		}
-		glEnd();
-		glPointSize(1.0f);
-
-		glColor3f(1.0f, 1.0f, 1.0f);
-	}
-
-	dCustomControllerManager<dRayCastRecord>* m_casterManager; 
+	dRayCasterManager* m_casterManager;
 };
 
-
-class dRayCasterManager: public dCustomControllerManager<dRayCastRecord> 
+class dRayCasterManager: public dCustomParallelListener
 {
 	public:
 	dRayCasterManager(DemoEntityManager* const scene, NewtonBody* const skipLevelMesh)
-		:dCustomControllerManager<dRayCastRecord>(scene->GetNewton(), "dRayCasterManager")
+		:dCustomParallelListener(scene->GetNewton(), "dRayCasterManager")
+		,m_list()
 	{
 		// make 16 casting center
 		dVector location[16];
@@ -142,7 +105,7 @@ class dRayCasterManager: public dCustomControllerManager<dRayCastRecord>
 			while (!body || (body == skipLevelMesh)) {
 				if (!body) {
 					body = NewtonWorldGetFirstBody(world);
-				}else if (body == skipLevelMesh) {
+				} else if (body == skipLevelMesh) {
 					body = NewtonWorldGetNextBody(world, body);
 				}
 			}
@@ -161,16 +124,69 @@ class dRayCasterManager: public dCustomControllerManager<dRayCastRecord>
 
 	dRayCastRecord* CreateCaster (const dVector& origin, NewtonBody* const targetBody)
 	{
-		dRayCastRecord* const caster = (dRayCastRecord*) CreateController();
+		dRayCastRecord* const caster = &m_list.Append()->GetInfo();
 		caster->m_p0 = origin;
 		caster->m_p1 = dVector (0.0f, 0.0f, 0.0f, 0.0f);
 		caster->m_target = targetBody;
 		return caster;
 	}
 
-	virtual void Debug () const {};
+	virtual void Debug () const 
+	{
+	}
 
+	void PostUpdate(dFloat timestep, int threadID)
+	{
+		NewtonWorld* const world = GetWorld();
+		const int threadCount = NewtonGetThreadsCount(world);
+
+		dList<dRayCastRecord>::dListNode* node = m_list.GetFirst();
+		for (int i = 0; i < threadID; i++) {
+			node = node ? node->GetNext() : NULL;
+		}
+
+		if (node) {
+			do {
+				dRayCastRecord& record = node->GetInfo();
+				record.Update(timestep, threadID);
+				for (int i = 0; i < threadCount; i++) {
+					node = node ? node->GetNext() : NULL;
+				}
+			} while (node);
+		}
+	}
+
+	dList<dRayCastRecord> m_list;
 };
+
+
+void LineOfSightRayCastEntity::Render(dFloat timeStep, DemoEntityManager* const scene) const
+{
+	glDisable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+
+	glColor3f(0.0f, 0.5f, 0.5f);
+	glBegin(GL_LINES);
+	for (dList<dRayCastRecord>::dListNode* node = m_casterManager->m_list.GetFirst(); node; node = node->GetNext()) {
+		dRayCastRecord* const ray = &node->GetInfo();
+		glVertex3f(GLfloat(ray->m_p0.m_x), GLfloat(ray->m_p0.m_y), GLfloat(ray->m_p0.m_z));
+		glVertex3f(GLfloat(ray->m_p1.m_x), GLfloat(ray->m_p1.m_y), GLfloat(ray->m_p1.m_z));
+	}
+	glEnd();
+
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glPointSize(6.0f);
+	glBegin(GL_POINTS);
+	for (dList<dRayCastRecord>::dListNode* node = m_casterManager->m_list.GetFirst(); node; node = node->GetNext()) {
+		dRayCastRecord* const ray = &node->GetInfo();
+		glVertex3f(GLfloat(ray->m_p1.m_x), GLfloat(ray->m_p1.m_y), GLfloat(ray->m_p1.m_z));
+	}
+	glEnd();
+	glPointSize(1.0f);
+
+	glColor3f(1.0f, 1.0f, 1.0f);
+}
+
 
 
 void MultiRayCast (DemoEntityManager* const scene)

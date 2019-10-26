@@ -10,42 +10,120 @@
 */
 
 #include "dStdafxVehicle.h"
+#include "dVehicle.h"
+#include "dVehicleNode.h"
 #include "dVehicleManager.h"
 
 dVehicleManager::dVehicleManager(NewtonWorld* const world)
-	:dCustomControllerManager<dVehicleChassis>(world, D_VEHICLE_MANAGER_NAME)
+	:dCustomParallelListener(world, D_VEHICLE_MANAGER_NAME)
+	,m_list()
 {
 }
 
 dVehicleManager::~dVehicleManager()
 {
+	while (m_list.GetCount()) {
+		RemoveAndDeleteRoot(m_list.GetFirst()->GetInfo());
+	}
 }
 
-dVehicleChassis* dVehicleManager::CreateSingleBodyVehicle(NewtonBody* const body, const dMatrix& vehicleFrame, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+void dVehicleManager::AddRoot(dVehicle* const root)
 {
-	dVehicleChassis* const vehicle = CreateController();
-	vehicle->Init(body, vehicleFrame, forceAndTorque, gravityMag);
-	return vehicle;
+	dAssert(!root->m_manager);
+	dAssert(!root->m_managerNode);
+	root->m_managerNode = m_list.Append(root);
+	root->m_manager = this;
 }
 
-dVehicleChassis* dVehicleManager::CreateSingleBodyVehicle(NewtonCollision* const chassisShape, const dMatrix& vehicleFrame, dFloat mass, NewtonApplyForceAndTorque forceAndTorque, dFloat gravityMag)
+void dVehicleManager::RemoveRoot(dVehicle* const root)
 {
-	dVehicleChassis* const vehicle = CreateController();
-	vehicle->Init(chassisShape, mass, vehicleFrame, forceAndTorque, gravityMag);
-	return vehicle;
+	if (root->m_managerNode) {
+		dList<dVehicle*>::dListNode* const node = (dList<dVehicle*>::dListNode*) root->m_managerNode;
+		root->m_managerNode = NULL;
+		root->m_manager = NULL;
+		m_list.Remove(node);
+	}
 }
 
-void dVehicleManager::DestroyController(dVehicleChassis* const vehicle)
+void dVehicleManager::RemoveAndDeleteRoot(dVehicle* const root)
 {
-	vehicle->Cleanup();
-	dCustomControllerManager<dVehicleChassis>::DestroyController(vehicle);
+	RemoveRoot(root);
+	delete root;
 }
 
 void dVehicleManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 {
-	for (dCustomControllerManager<dVehicleChassis>::dListNode* vehicleNode = GetFirst(); vehicleNode; vehicleNode = vehicleNode->GetNext()) {
-		dVehicleChassis* const vehicle = &vehicleNode->GetInfo();
+	for (dList<dVehicle*>::dListNode* vehicleNode = m_list.GetFirst(); vehicleNode; vehicleNode = vehicleNode->GetNext()) {
+		dVehicle* const vehicle = vehicleNode->GetInfo();
+		OnDebug(vehicle, debugContext);
 		vehicle->Debug(debugContext);
+	}
+}
+
+void dVehicleManager::PostUpdate(dFloat timestep, int threadID)
+{
+	D_TRACKTIME();
+	NewtonWorld* const world = GetWorld();
+	const int threadCount = NewtonGetThreadsCount(world);
+
+	dList<dVehicle*>::dListNode* node = m_list.GetFirst();
+	for (int i = 0; i < threadID; i++) {
+		node = node ? node->GetNext() : NULL;
+	}
+
+	if (node) {
+		do {
+			dVehicle* const vehicle = node->GetInfo();
+			OnPostUpdate(vehicle, timestep);
+			for (int i = 0; i < threadCount; i++) {
+				node = node ? node->GetNext() : NULL;
+			}
+		} while (node);
+	}
+}
+
+void dVehicleManager::PreUpdate(dFloat timestep, int threadID)
+{
+	D_TRACKTIME();
+	NewtonWorld* const world = GetWorld();
+	const int threadCount = NewtonGetThreadsCount(world);
+
+	dList<dVehicle*>::dListNode* node = m_list.GetFirst();
+	for (int i = 0; i < threadID; i++) {
+		node = node ? node->GetNext() : NULL;
+	}
+
+	if (node) {
+		do {
+			dVehicle* const vehicle = node->GetInfo();
+			OnPreUpdate(vehicle, timestep);
+			vehicle->PreUpdate(timestep);
+			for (int i = 0; i < threadCount; i++) {
+				node = node ? node->GetNext() : NULL;
+			}
+		} while (node);
+	}
+}
+
+void dVehicleManager::PostStep(dFloat timestep, int threadID)
+{
+	D_TRACKTIME();
+	NewtonWorld* const world = GetWorld();
+	const int threadCount = NewtonGetThreadsCount(world);
+
+	dList<dVehicle*>::dListNode* node = m_list.GetFirst();
+	for (int i = 0; i < threadID; i++) {
+		node = node ? node->GetNext() : NULL;
+	}
+
+	if (node) {
+		do {
+			dVehicle* const vehicle = node->GetInfo();
+			OnUpdateTransform(vehicle);
+			for (int i = 0; i < threadCount; i++) {
+				node = node ? node->GetNext() : NULL;
+			}
+		} while (node);
 	}
 }
 

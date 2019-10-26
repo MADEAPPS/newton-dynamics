@@ -551,7 +551,7 @@ DG_INLINE void* dgInterlockedExchange(void** const ptr, void* value)
 			return (void*)_InterlockedExchange((long*) ptr, dgInt32(value));
 		#endif
 	#elif (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
-		return InterlockedExchange((long*)ptr, value);
+		return (void*)InterlockedExchange((long*)ptr, value);
 	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
 		//__sync_synchronize();
 		return (void*)__sync_lock_test_and_set((int32_t*)ptr, value);

@@ -35,19 +35,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\dCustomJoints\dCustomListener.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomSixdof.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomAlloc.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\dCustomTireSpringDG.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\dCustomTransformManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomBallAndSocket.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\dCustomControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomCorkScrew.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomDryRollingFriction.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomFixDistance.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomGear.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomHinge.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomHingeActuator.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\dCustomInputManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomJoint.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomJointLibraryStdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -73,23 +70,19 @@
     <ClCompile Include="..\..\dCustomJoints\dCustomDoubleHinge.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomDoubleHingeActuator.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomUpVector.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\dCustomVehicleControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomWheel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\dCustomJoints\dCustomListener.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomSixdof.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomAlloc.h" />
-    <ClInclude Include="..\..\dCustomJoints\dCustomTireSpringDG.h" />
-    <ClInclude Include="..\..\dCustomJoints\dCustomTransformManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomBallAndSocket.h" />
-    <ClInclude Include="..\..\dCustomJoints\dCustomControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomCorkScrew.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomDryRollingFriction.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomFixDistance.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomGear.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomHinge.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomHingeActuator.h" />
-    <ClInclude Include="..\..\dCustomJoints\dCustomInputManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomJoint.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomJointLibraryStdAfx.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomKinematicController.h" />
@@ -106,7 +99,6 @@
     <ClInclude Include="..\..\dCustomJoints\dCustomDoubleHinge.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomDoubleHingeActuator.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomUpVector.h" />
-    <ClInclude Include="..\..\dCustomJoints\dCustomVehicleControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomWheel.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -135,9 +135,8 @@ void dgWorldPluginList::LoadLinuxPlugins(const char* const plugInPath)
 				}
 			}
 		}
+		closedir(directory);
 	}
-
-	closedir(directory);
 #endif
 }
 

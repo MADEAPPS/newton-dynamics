@@ -261,7 +261,7 @@ class dHexapodManager: public dModelManager
 			bodyCount++;
 			const dModelChildrenList& children = root->GetChildren();
 			for (dModelChildrenList::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
-				stackBuffer[stack] = node->GetInfo().GetData();
+				stackBuffer[stack] = node->GetInfo();
 				stack++;
 			}
 		}
@@ -396,9 +396,9 @@ class dHexapodManager: public dModelManager
 		effectorMatrix.m_posit = armPivot.m_posit;
 		effectorMatrix.m_posit.m_y -= armSize;
 		dCustomKinematicController* const effector = new dCustomKinematicController(armHingeNode->GetBody(), effectorMatrix * matrix, parent);
-		effector->SetAsLinear();
 		effector->SetSolverModel(1);
 		//effector->SetAsThreedof();
+		effector->SetControlMode(dCustomKinematicController::m_linear);
 		effector->SetMaxLinearFriction(HEXAPOD_MASS * 9.8f * 10.0f);
 
 		return effector;

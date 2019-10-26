@@ -148,7 +148,6 @@ typedef long long unsigned64;
 #include <dCustomPathFollow.h>
 #include <dCustomDoubleHinge.h>
 #include <dCustomFixDistance.h>
-#include <dCustomTireSpringDG.h>
 #include <dCustomRackAndPinion.h>
 #include <dCustomHingeActuator.h>
 #include <dCustomBallAndSocket.h>
@@ -156,27 +155,25 @@ typedef long long unsigned64;
 #include <dCustomSlidingContact.h>
 #include <dCustomDoubleHingeActuator.h>
 
-#include <dCustomInputManager.h>
 #include <dCustomTriggerManager.h>
-#include <dCustomTransformManager.h>
-#include <dCustomControllerManager.h>
 #include <dCustomKinematicController.h>
 #include <dCustomPlayerControllerManager.h>
-#include <dCustomPlayerControllerManager.h>
-#include <dCustomVehicleControllerManager.h>
 
 #include <dModelStdAfx.h>
+#include <dModelNode.h>
 #include <dModelManager.h>
+#include <dModelRootNode.h>
 #include <dModelAnimTree.h>
 #include <dModelAnimTreePose.h>
 #include <dModelAnimTreePoseBlender.h>
 
-
 #include <dStdafxVehicle.h>
-#include <dVehicleChassis.h>
+#include <dVehicleNode.h>
+#include <dVehicleTire.h>
+#include <dVehicleEngine.h>
 #include <dVehicleManager.h>
-#include <dVehicleInterface.h>
-#include <dVehicleDashControl.h>
+#include <dVehicleMultiBody.h>
+#include <dVehicleDifferential.h>
 
 #include <dSceneStdafx.h>
 #include <dScene.h>

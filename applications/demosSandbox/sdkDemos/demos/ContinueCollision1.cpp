@@ -20,12 +20,10 @@
 #include "DemoMesh.h"
 #include "DemoEntityManager.h"
 #include "DemoCamera.h"
+#include "DebugDisplay.h"
 #include "PhysicsUtils.h"
 #include "HeightFieldPrimitive.h"
-#include "dCustomInputManager.h"
-#include "DebugDisplay.h"
 #include "dHighResolutionTimer.h"
-
 
 static dVector GetLookAtDirction(DemoEntityManager* const scene)
 {
@@ -84,12 +82,12 @@ static void FireNewtonCcdBox(NewtonWorld* world, const dVector & postion, const 
 }
 
 // we recommend using and input manage to control input for all games
-class CCDInputManager : public dCustomInputManager
+class CCDInputManager: public dCustomListener
 {
 	public:
 	CCDInputManager(DemoEntityManager* const scene)
-		:dCustomInputManager(scene->GetNewton())
-		, m_scene(scene)
+		:dCustomListener(scene->GetNewton(), "D_LISTENER")
+		,m_scene(scene)
 	{
 		scene->Set2DDisplayRenderFunction (DrawHelpMenu, NULL, this);
 	}

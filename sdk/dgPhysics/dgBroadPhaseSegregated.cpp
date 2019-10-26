@@ -508,12 +508,12 @@ dgInt32 dgBroadPhaseSegregated::Collide(dgCollisionInstance* const shape, const 
 				overlaped[stack] = dgOverlapTest(root->m_left->m_minBox, root->m_left->m_maxBox, boxP0, boxP1);
 				stack ++;
 			}
-			if (root->m_left) {
+			if (root->m_right) {
 				stackPool[stack] = root->m_right;
 				overlaped[stack] = dgOverlapTest(root->m_right->m_minBox, root->m_right->m_maxBox, boxP0, boxP1);
 				stack++;
 			}
-			totalCount = dgBroadPhase::Collide(stackPool, overlaped, 1, boxP0, boxP1, shape, matrix, prefilter, userData, info, maxContacts, threadIndex);
+			totalCount = dgBroadPhase::Collide(stackPool, overlaped, stack, boxP0, boxP1, shape, matrix, prefilter, userData, info, maxContacts, threadIndex);
 		}
 	}
 

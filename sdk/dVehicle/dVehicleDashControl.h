@@ -15,81 +15,122 @@
 
 #include "dStdafxVehicle.h"
 
-class dVehicleChassis;
-class dVehicleTireInterface;
+class dVehicleTire;
+class dVehicleEngine;
+class dVehicleMultiBody;
 
-class dVehicleDashControl: public dCustomAlloc
+class dVehicleDashControl
 {
 	public:
-	DVEHICLE_API dVehicleDashControl(dVehicleChassis* const vehicle);
-	DVEHICLE_API virtual ~dVehicleDashControl();
+	dVehicleDashControl()
+		:m_vehicle(NULL)
+		,m_param(0.0f)
+		,m_paramMemory(0.0f)
+		,m_timer(60)
+	{
+	}
 
-	DVEHICLE_API void SetParam(dFloat param);
-	DVEHICLE_API dFloat GetParam() const{return m_param;}
+	virtual ~dVehicleDashControl()
+	{
+	}
 
-	DVEHICLE_API bool ParamChanged() const;
+	void Init(dVehicleMultiBody* const vehicle)
+	{
+		m_vehicle = vehicle;
+	}
+
+	void SetParam(dFloat param)
+	{
+		m_paramMemory = m_param;
+		m_param = param;
+	}
+
+
+	dFloat GetParam() const
+	{
+		return m_param;
+	}
+
+	bool ParamChanged() const
+	{
+		m_timer--;
+		if (dAbs(m_paramMemory - m_param) > 1.e-3f) {
+			m_timer = 30;
+		}
+		return m_timer > 0;
+	}
+
 	virtual void Update(dFloat timestep) = 0;
 
 	protected:
-	dVehicleChassis* m_vehicle;
+	dVehicleMultiBody* m_vehicle;
 	dFloat m_param;
 	dFloat m_paramMemory;
 	mutable dFloat m_timer;
 };
 
-class dVehicleEngineControl: public dVehicleDashControl 
+class dVehicleTireControl: public dVehicleDashControl
 {
-	public:
-	DVEHICLE_API dVehicleEngineControl(dVehicleChassis* const vehicle);
-	DVEHICLE_API void SetEngine (dVehicleEngineInterface* const engine);
-
-	void SetGear (int gear);
-	void SetClutch (dFloat clutch);
-	dVehicleEngineInterface* GetEngine() const {return m_engine;}
-
-	virtual void Update(dFloat timestep);
-
-	private:
-	dVehicleEngineInterface* m_engine;
-};
-
-class dVehicleTireControl: public dVehicleDashControl 
-{
-	public:
-	DVEHICLE_API dVehicleTireControl(dVehicleChassis* const vehicle);
-	DVEHICLE_API virtual ~dVehicleTireControl();
-
-	DVEHICLE_API void AddTire(dVehicleTireInterface* const tire);
-	
 	protected:
-	dList<dVehicleTireInterface*> m_tires;
+	dVehicleTireControl()
+		:m_tires()
+		,m_isSleeping(false)
+	{
+	}
+
+	public:
+	void AddTire(dVehicleTire* const tire)
+	{
+		m_tires.Append(tire);
+	}
+
+	protected:
+	dList<dVehicleTire*> m_tires;
 	bool m_isSleeping;
+	friend class dVehicleMultiBody;
 };
 
-class dVehicleSteeringControl: public dVehicleTireControl 
+class dVehicleSteeringControl: public dVehicleTireControl
 {
-	public:
-	dVehicleSteeringControl(dVehicleChassis* const vehicle);
-
 	protected:
 	virtual void Update(dFloat timestep);
-	friend class dVehicleChassis;
+	friend class dVehicleMultiBody;
 };
-
 
 class dVehicleBrakeControl: public dVehicleTireControl
 {
 	public:
-	dVehicleBrakeControl(dVehicleChassis* const vehicle);
+	dVehicleBrakeControl()
+	{
+	}
 
-	DVEHICLE_API dFloat GetBrakeTorque () const;
-	DVEHICLE_API void SetBrakeTorque (dFloat torque);
+	dFloat GetBrakeTorque() const
+	{
+		return m_maxTorque;
+	}
+
+	void SetBrakeTorque(dFloat torque)
+	{
+		m_maxTorque = dAbs(torque);
+	}
 
 	protected:
 	virtual void Update(dFloat timestep);
-
 	dFloat m_maxTorque;
-	friend class dVehicleChassis;
+	friend class dVehicleMultiBody;
+};
+
+class dVehicleEngineControl: public dVehicleDashControl 
+{
+	public:
+	dVehicleEngine* GetEngine() const {return m_engine;}
+	void SetEngine (dVehicleEngine* const engine) {m_engine = engine;}
+	void SetGear (int gear);
+	void SetClutch (dFloat clutch);
+	virtual void Update(dFloat timestep);
+
+	private:
+	dVehicleEngine* m_engine;
 };
 
 

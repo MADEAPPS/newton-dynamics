@@ -122,7 +122,8 @@ extern "C" {
 	{
 		void* m_userData;
 		int m_userId;
-		int m_userFlags;
+		int m_userFlags0;
+		int m_userFlags1;
 		dFloat m_userParam[8];
 	} NewtonCollisionMaterial;
 
@@ -535,11 +536,12 @@ extern "C" {
 	NEWTON_API void* NewtonWorldAddListener (const NewtonWorld* const newtonWorld, const char* const nameId, void* const listenerUserData);
 	NEWTON_API void* NewtonWorldGetListener (const NewtonWorld* const newtonWorld, const char* const nameId);
 
-	NEWTON_API void NewtonWorldListenerSetDestructorCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldDestroyListenerCallback destroy);
-	NEWTON_API void NewtonWorldListenerSetPreUpdateCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldUpdateListenerCallback update);
-	NEWTON_API void NewtonWorldListenerSetPostUpdateCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldUpdateListenerCallback update);
-	NEWTON_API void NewtonWorldListenerSetDebugCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldListenerDebugCallback debugCallback);
-	NEWTON_API void NewtonWorldListenerSetBodyDestroyCallback(const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldListenerBodyDestroyCallback bodyDestroyCallback);
+	NEWTON_API void NewtonWorldListenerSetDebugCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldListenerDebugCallback callback);
+	NEWTON_API void NewtonWorldListenerSetPostStepCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldUpdateListenerCallback callback);
+	NEWTON_API void NewtonWorldListenerSetPreUpdateCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldUpdateListenerCallback callback);
+	NEWTON_API void NewtonWorldListenerSetPostUpdateCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldUpdateListenerCallback callback);
+	NEWTON_API void NewtonWorldListenerSetDestructorCallback (const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldDestroyListenerCallback callback);
+	NEWTON_API void NewtonWorldListenerSetBodyDestroyCallback(const NewtonWorld* const newtonWorld, void* const listener, NewtonWorldListenerBodyDestroyCallback callback);
 	NEWTON_API void NewtonWorldListenerDebug(const NewtonWorld* const newtonWorld, void* const context);
 	NEWTON_API void* NewtonWorldGetListenerUserData(const NewtonWorld* const newtonWorld, void* const listener);
 	NEWTON_API NewtonWorldListenerBodyDestroyCallback NewtonWorldListenerGetBodyDestroyCallback (const NewtonWorld* const newtonWorld, void* const listener);

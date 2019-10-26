@@ -25,7 +25,7 @@
 #define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
 #define ARTICULATED_VEHICLE_CAMERA_DISTANCE			13.0f
 
-
+#if 0
 struct ARTICULATED_VEHICLE_DEFINITION
 {
 	enum SHAPES_ID
@@ -134,11 +134,11 @@ class ArticulatedEntityModel: public DemoEntity
 	InputRecord m_inputs;
 };
 
-class ArticulatedVehicleManagerManager: public dCustomTransformManager
+class ArticulatedVehicleManagerManager: public dModelManager
 {
 	public:
 	ArticulatedVehicleManagerManager (DemoEntityManager* const scene)
-		:dCustomTransformManager (scene->GetNewton())
+		:dModelManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
 		int material = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
@@ -223,9 +223,11 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 			NewtonContactJointResetIntraJointCollision(contactJoint);
 		}
 
-		int filter0 = material0.m_userId & material1.m_userFlags;
-		int filter1 = material1.m_userId & material0.m_userFlags;
-		return ((filter0 + filter1) == mask) ? 1 : 0;
+		dAssert(0);
+		return 1;
+		//int filter0 = material0.m_userId & material1.m_userFlags;
+		//int filter1 = material1.m_userId & material0.m_userFlags;
+		//return ((filter0 + filter1) == mask) ? 1 : 0;
 	}
 
 	static int CompoundSubCollisionAABBOverlap (const NewtonJoint* const contact, dFloat timestep, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
@@ -239,10 +241,12 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		NewtonCollisionGetMaterial(collision0, &material0);
 		NewtonCollisionGetMaterial(collision1, &material1);
 
-		int mask = material0.m_userId | material1.m_userId;
-		int filter0 = material0.m_userId & material1.m_userFlags;
-		int filter1 = material1.m_userId & material0.m_userFlags;
-		return ((filter0 + filter1) == mask) ? 1 : 0;
+		dAssert(0);
+		return 0;
+		//int mask = material0.m_userId | material1.m_userId;
+		//int filter0 = material0.m_userId & material1.m_userFlags;
+		//int filter1 = material1.m_userId & material0.m_userFlags;
+		//return ((filter0 + filter1) == mask) ? 1 : 0;
 	}
 	
 	static void OnContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
@@ -421,8 +425,9 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 		// set collision filter
 		NewtonCollisionMaterial material;
 		NewtonCollisionGetMaterial(shape, &material);
-		material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m___bodyPart;
-		material.m_userFlags = ARTICULATED_VEHICLE_DEFINITION::m___bodyPart + ARTICULATED_VEHICLE_DEFINITION::m___woodSlab + ARTICULATED_VEHICLE_DEFINITION::m___terrain;
+		dAssert(0);
+		//material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m___bodyPart;
+		//material.m_userFlags = ARTICULATED_VEHICLE_DEFINITION::m___bodyPart + ARTICULATED_VEHICLE_DEFINITION::m___woodSlab + ARTICULATED_VEHICLE_DEFINITION::m___terrain;
 		NewtonCollisionSetMaterial(shape, &material);
 
 		// calculate the bone matrix
@@ -576,14 +581,16 @@ class ArticulatedVehicleManagerManager: public dCustomTransformManager
 
 		NewtonCollisionMaterial innerMaterial;
 		NewtonCollisionGetMaterial(innerRing, &innerMaterial);
-		innerMaterial.m_userId = ARTICULATED_VEHICLE_DEFINITION::m___tireInnerRing;
-		innerMaterial.m_userFlags = ARTICULATED_VEHICLE_DEFINITION::m___linkPart;
+		dAssert(0);
+		//innerMaterial.m_userId = ARTICULATED_VEHICLE_DEFINITION::m___tireInnerRing;
+		//innerMaterial.m_userFlags = ARTICULATED_VEHICLE_DEFINITION::m___linkPart;
 		NewtonCollisionSetMaterial(innerRing, &innerMaterial);
 
 		NewtonCollisionMaterial outerMaterial;
 		NewtonCollisionGetMaterial(outerRing, &outerMaterial);
-		outerMaterial.m_userId = ARTICULATED_VEHICLE_DEFINITION::m___tirePart;
-		outerMaterial.m_userFlags = ARTICULATED_VEHICLE_DEFINITION::m___terrain + ARTICULATED_VEHICLE_DEFINITION::m___woodSlab;
+		dAssert(0);
+		//outerMaterial.m_userId = ARTICULATED_VEHICLE_DEFINITION::m___tirePart;
+		//outerMaterial.m_userFlags = ARTICULATED_VEHICLE_DEFINITION::m___terrain + ARTICULATED_VEHICLE_DEFINITION::m___woodSlab;
 		NewtonCollisionSetMaterial(outerRing, &outerMaterial);
 
 		NewtonCollisionSetMaterial(tireShape, &outerMaterial);
@@ -1280,11 +1287,11 @@ return NULL;
 };
 
 // we recommend using and input manage to control input for all games
-class AriculatedJointInputManager: public dCustomInputManager
+class AriculatedJointInputManager: public dCustomListener
 {
 	public:
 	AriculatedJointInputManager (DemoEntityManager* const scene)
-		:dCustomInputManager(scene->GetNewton())
+		:dCustomListener(scene->GetNewton(), "D_LISTENER")
 		,m_scene(scene)
 		,m_cameraMode(true)
 		,m_changeVehicle(true)
@@ -1437,7 +1444,7 @@ class AriculatedJointInputManager: public dCustomInputManager
 	dFloat32 m_gripperRoll; 
 	dFloat32 m_gripperPitch; 
 };
-
+#endif
 
 void ArticulatedJoints (DemoEntityManager* const scene)
 {

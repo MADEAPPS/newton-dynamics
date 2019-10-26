@@ -42,7 +42,6 @@
     <ClCompile Include="..\..\dNewton\dNewtonBody.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonCollision.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonDynamicBody.cpp" />
-    <ClCompile Include="..\..\dNewton\dNewtonInputManager.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonJoint.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonKinematicBody.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonMaterial.cpp" />
@@ -51,9 +50,7 @@
     <ClCompile Include="..\..\dNewton\dNewtonRayCast.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonScopeBuffer.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonTransformLerp.cpp" />
-    <ClCompile Include="..\..\dNewton\dNewtonTransformManager.cpp" />
     <ClCompile Include="..\..\dNewton\dNewtonTriggerManager.cpp" />
-    <ClCompile Include="..\..\dNewton\dNewtonVehicleManager.cpp" />
     <ClCompile Include="..\..\dNewton\dStdAfxNewton.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
@@ -73,7 +70,6 @@
     <ClInclude Include="..\..\dNewton\dNewtonBody.h" />
     <ClInclude Include="..\..\dNewton\dNewtonCollision.h" />
     <ClInclude Include="..\..\dNewton\dNewtonDynamicBody.h" />
-    <ClInclude Include="..\..\dNewton\dNewtonInputManager.h" />
     <ClInclude Include="..\..\dNewton\dNewtonJoint.h" />
     <ClInclude Include="..\..\dNewton\dNewtonKinematicBody.h" />
     <ClInclude Include="..\..\dNewton\dNewtonMaterial.h" />
@@ -82,9 +78,7 @@
     <ClInclude Include="..\..\dNewton\dNewtonRayCast.h" />
     <ClInclude Include="..\..\dNewton\dNewtonScopeBuffer.h" />
     <ClInclude Include="..\..\dNewton\dNewtonTransformLerp.h" />
-    <ClInclude Include="..\..\dNewton\dNewtonTransformManager.h" />
     <ClInclude Include="..\..\dNewton\dNewtonTriggerManager.h" />
-    <ClInclude Include="..\..\dNewton\dNewtonVehicleManager.h" />
     <ClInclude Include="..\..\dNewton\dStdAfxNewton.h" />
   </ItemGroup>
   <ItemGroup>

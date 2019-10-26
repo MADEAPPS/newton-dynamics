@@ -14,10 +14,11 @@
 #define __D_MODEL_MANAGER_H__
 
 #include "dModelStdAfx.h"
-#include "dModelRootNode.h"
 
 #define D_MODEL_MANAGER	"__dModelManager__"
 
+class dModelNode;
+class dModelRootNode;
 
 class dModelManager: public dCustomParallelListener
 {
@@ -26,6 +27,8 @@ class dModelManager: public dCustomParallelListener
 	virtual ~dModelManager();
 
 	void AddRoot(dModelRootNode* const root);
+	void RemoveRoot(dModelRootNode* const root);
+	void RemoveAndDeleteRoot(dModelRootNode* const root);
 
 	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const {};
 	virtual void OnPostUpdate(dModelRootNode* const model, dFloat timestep) const {};
@@ -33,6 +36,7 @@ class dModelManager: public dCustomParallelListener
 	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext) {}
 
 	protected:
+	void PostStep(dFloat timestep, int threadID);
 	void PreUpdate(dFloat timestep, int threadID);
 	void PostUpdate(dFloat timestep, int threadID);
 
@@ -40,7 +44,7 @@ class dModelManager: public dCustomParallelListener
 	void UpdateLocalTranforms(dModelRootNode* const model) const;
 	void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
 	
-	dList<dPointer<dModelRootNode>> m_controllerList;
+	dList<dModelRootNode*> m_modelList;
 };
 
 

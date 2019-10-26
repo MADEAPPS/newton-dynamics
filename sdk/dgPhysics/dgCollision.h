@@ -89,7 +89,8 @@ class dgCollisionInfo
 
 		void* m_userData;
 		dgInt32 m_userId;
-		dgInt32 m_userFlags;
+		dgUnsigned32 m_userFlags0;
+		dgUnsigned32 m_userFlags1;
 		dgFloat32 m_userParam[8];
 	};
 

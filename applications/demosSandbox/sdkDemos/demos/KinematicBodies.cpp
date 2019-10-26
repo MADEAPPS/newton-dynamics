@@ -18,7 +18,7 @@
 #include "PhysicsUtils.h"
 #include "dCustomListener.h"
 
-class KinematiocListener: public dCustomListener
+class KinematicListener: public dCustomListener
 {
 	struct KinematicPlatform
 	{
@@ -32,7 +32,7 @@ class KinematiocListener: public dCustomListener
 	};
 
 	public:
-	KinematiocListener(DemoEntityManager* const scene)
+	KinematicListener(DemoEntityManager* const scene)
 		:dCustomListener(scene->GetNewton(), "Kinematic demo")
 		,m_platformList()
 		,m_lru(0)
@@ -53,7 +53,7 @@ class KinematiocListener: public dCustomListener
 		m_redBox->OptimizeForRender();
 	}
 	
-	~KinematiocListener()
+	~KinematicListener()
 	{
 		m_redBox->Release();
 		m_whiteBox->Release();
@@ -204,7 +204,7 @@ void KinematicBodies (DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 
 	dVector origin(-10.0f, 5.0f, 0.0f, 1.0f);
-	KinematiocListener* const kinematicListener = new KinematiocListener(scene);
+	KinematicListener* const kinematicListener = new KinematicListener(scene);
 
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit = origin;

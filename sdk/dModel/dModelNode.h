@@ -16,11 +16,11 @@
 #include "dModelStdAfx.h"
 
 class dModelNode;
-class dModelChildrenList: public dList<dPointer<dModelNode>>
+class dModelChildrenList: public dList<dModelNode*>
 {
 	public:
 	dModelChildrenList()
-		:dList<dPointer<dModelNode>>()
+		:dList<dModelNode*>()
 	{
 	}
 
@@ -42,16 +42,17 @@ class dModelNode: public dCustomAlloc
 	void SetUserData(void* const data) { m_userData = data; }
 
 	const dModelNode* GetRoot() const;
-	dCustomJoint* GetParentJoint() const;
+	dCustomJoint* GetJoint() const { return m_joint; }
 	const dModelNode* GetParent() const {return m_parent;}
 	dModelChildrenList& GetChildren() {return m_children;}
 	const dModelChildrenList& GetChildren() const {return m_children;}
 
 	protected:
 	dMatrix m_bindMatrix;
+	void* m_userData;
 	NewtonBody* m_body;
 	dModelNode* m_parent;
-	void* m_userData;
+	dCustomJoint* m_joint;
 	dModelChildrenList m_children;
 
 	friend class dModelManager;

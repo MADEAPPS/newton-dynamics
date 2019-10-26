@@ -201,7 +201,7 @@
     <ClCompile Include="..\..\sdkDemos\demos\NewtonCradle.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\BalancingRagdoll.cpp">
+    <ClCompile Include="..\..\sdkDemos\demos\BalancingCharacter.cpp">
       <Filter>demos</Filter>
     </ClCompile>
   </ItemGroup>

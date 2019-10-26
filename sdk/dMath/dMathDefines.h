@@ -227,7 +227,6 @@ void dSort (T* const array, int elements, int (*compare) (const T* const  A, con
 #endif
 }
 
-
 // return dot product
 template<class T>
 T dDotProduct(int size, const T* const A, const T* const B)
@@ -238,7 +237,6 @@ T dDotProduct(int size, const T* const A, const T* const B)
 	}
 	return val;
 }
-
 
 template<class T>
 void dMatrixTimeVector(int size, const T* const matrix, const T* const v, T* const out)
@@ -326,15 +324,15 @@ void dCholeskySolve(int size, int n, const T* const choleskyMatrix, T* const x)
 }
 
 template<class T>
-bool dCholeskyFactorization(int size, int block, T* const matrix)
+bool dCholeskyFactorization(int size, int stride, T* const matrix)
 {
-	for (int i = 0; i < block; i++) {
+	for (int i = 0; i < size; i++) {
 		T* const rowN = &matrix[size * i];
 
-		int stride = 0;
+		int rowStart = 0;
 		for (int j = 0; j <= i; j++) {
 			T s(0.0f);
-			T* const rowJ = &matrix[stride];
+			T* const rowJ = &matrix[rowStart];
 			for (int k = 0; k < j; k++) {
 				s += rowN[k] * rowJ[k];
 			}
@@ -348,16 +346,23 @@ bool dCholeskyFactorization(int size, int block, T* const matrix)
 			} else {
 				rowN[j] = ((T(1.0f) / rowJ[j]) * (rowN[j] - s));
 			}
-			stride += size;
+			rowStart += stride;
 		}
 	}
 	return true;
 }
 
 template<class T>
-bool dCholeskyFactorization(int size, T* const matrix)
+bool dTestPSDmatrix(int size, int stride, const T* const matrix)
 {
-	return dCholeskyFactorization(size, size, matrix);
+	T* const copy = dAlloca(T, size * size);
+	int row = 0;
+	for (int i = 0; i < size; i ++)
+	{
+		memcpy (&copy[i * size], &matrix[row], size * sizeof (T));
+		row += stride;
+	}
+	return dCholeskyFactorization(size, size, copy);
 }
 
 template<class T>

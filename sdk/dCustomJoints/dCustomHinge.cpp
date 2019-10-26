@@ -151,7 +151,7 @@ void dCustomHinge::Debug(dDebugDisplay* const debugDisplay) const
 
 	if (m_options.m_option0) {
 
-		const int subdiv = 12;
+		const int subdiv = 8;
 		dVector arch[subdiv + 1];
 		const dFloat radius = debugDisplay->m_debugScale;
 
@@ -194,30 +194,51 @@ void dCustomHinge::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix&
 {
 	m_limitReached = true;
 	if ((m_minAngle > -1.e-4f) && (m_maxAngle < 1.e-4f)) {
-		//dFloat angle = CalculateAngle (matrix1.m_up, matrix0.m_up, matrix1.m_front);
-		dFloat angle = m_curJointAngle.GetAngle();
+		const dFloat angle = m_curJointAngle.GetAngle();
 		NewtonUserJointAddAngularRow(m_joint, -angle, &matrix1.m_front[0]);
 		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
 	} else {
-		dFloat angle = m_curJointAngle.GetAngle() + m_jointOmega * timestep;
-		if (angle < m_minAngle) {
+		dFloat restoringOmega = 0.25f;
+		const dFloat step = dMax (dAbs (m_jointOmega * timestep), dFloat(3.0f * dDegreeToRad));
+		const dFloat angle = m_curJointAngle.GetAngle();
+		if (angle <= m_minAngle) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+			const dFloat invtimestep = 1.0f / timestep;
+			const dFloat error0 = angle - m_minAngle;
+			const dFloat error1 = error0 + restoringOmega * timestep;
+			if (error1 > 0.0f) {
+				restoringOmega = -error0 * invtimestep;
+			}
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + restoringOmega * invtimestep;
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
-
-			const dFloat invtimestep = 1.0f / timestep;
-			const dFloat speed = 0.5f * (m_minAngle - m_curJointAngle.GetAngle()) * invtimestep;
-			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
-			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-		} else if (angle > m_maxAngle) {
+		} else if (angle >= m_maxAngle) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+			const dFloat invtimestep = 1.0f / timestep;
+			const dFloat error0 = angle - m_maxAngle;
+			const dFloat error1 = error0 - restoringOmega * timestep;
+			if (error1 < 0.0f) {
+				restoringOmega = error0 * invtimestep;
+			}
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) - restoringOmega / timestep;
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
-
-			const dFloat invtimestep = 1.0f / timestep;
-			const dFloat speed = 0.5f * (m_maxAngle - m_curJointAngle.GetAngle()) * invtimestep;
-			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
+		} else if ((angle - step) <= m_minAngle) {
+			//dTrace(("%f %f\n", angle, step));
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
+		} else if ((angle + step) >= m_maxAngle) {
+			//dTrace(("%f %f\n", angle, step));
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
 		} else if (m_friction != 0.0f) {
 			m_limitReached = false;
 			NewtonUserJointAddAngularRow(m_joint, 0, &matrix0.m_front[0]);
@@ -261,8 +282,8 @@ void dCustomHinge::SubmitConstraintLimitSpringDamper(const dMatrix& matrix0, con
 
 void dCustomHinge::SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-	const dFloat angleError = GetMaxAngleError();
 	// two rows to restrict rotation around around the parent coordinate system
+	const dFloat angleError = GetMaxAngleError();
 	dFloat angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_up[0]);
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);

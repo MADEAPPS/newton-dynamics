@@ -15,30 +15,70 @@
 
 #include "dStdafxVehicle.h"
 
-class dVehicleInterface;
-class dKinematicLoopJoint;
-class dVehicleTireInterface;
+class dVehicleNode;
+class dVehicleTire;
+class dVehicleEngine;
+class dVehicleMultiBody;
+class dVehicleLoopJoint;
+class dVehicleDifferential;
 
+class dVehicleNodeChildrenList: public dList<dVehicleNode*>
+{
+	public:
+	dVehicleNodeChildrenList()
+		:dList<dVehicleNode*>()
+	{
+	}
 
-//class dVehicleNode: public dAnimAcyclicJoint
-class dVehicleNode
+	~dVehicleNodeChildrenList()
+	{
+	}
+};
+
+class dVehicleNode: public dCustomAlloc
 {
 	public:
 	DVEHICLE_API dVehicleNode(dVehicleNode* const parent);
 	DVEHICLE_API virtual ~dVehicleNode();
 	
 	DVEHICLE_API virtual void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
+	
+	virtual dVehicleTire* GetAsTire() const { return NULL; }
+	virtual dVehicleEngine* GetAsEngine() const { return NULL; }
+	virtual dVehicleDifferential* GetAsDifferential() const { return NULL; }
+	virtual dVehicleMultiBody* GetAsVehicleMultiBody() const { return NULL; }
+	virtual dComplementaritySolver::dBilateralJoint* GetJoint() { return NULL; }
+		
+	void* GetUserData() const {return m_usedData;}
+	void SetUserData(void* const userData) {m_usedData = userData;}
 
-	virtual dVehicleInterface* GetAsVehicle() const { return NULL; }
-	virtual dVehicleTireInterface* GetAsTire() const { return NULL; }
+	dVehicleNode* GetParent() const {return m_parent;}
+	dVehicleNodeChildrenList& GetChildrenList() { return m_children; }
+	const dVehicleNodeChildrenList& GetChildrenList() const { return m_children; }
+
+	dComplementaritySolver::dBodyState& GetProxyBody() { return m_proxyBody; }
+
+	int GetIndex() const {return m_index;}
 
 	protected:
-	virtual void RigidBodyToStates();
+	virtual void ApplyExternalForce();
 	virtual void Integrate(dFloat timestep);
-	virtual void StatesToRigidBody(dFloat timestep);
+	virtual void CalculateFreeDof();
+
+	virtual int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
+	virtual const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+
 	void CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 
+	dComplementaritySolver::dBodyState m_proxyBody;
+	void* m_usedData;
+	dVehicleNode* m_parent;
+	dVehicleNodeChildrenList m_children;
+	int m_index;
+
 	friend class dVehicleSolver;
+	friend class dVehicleManager;
+	friend class dVehicleMultiBody;
 };
 
 

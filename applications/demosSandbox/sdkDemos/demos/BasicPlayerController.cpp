@@ -22,16 +22,18 @@
 
 #define PLAYER_MASS						80.0f
 #define PLAYER_WALK_SPEED				8.0f
-#define PLAYER_JUMP_SPEED				3.0f
+#define PLAYER_JUMP_SPEED				5.0f
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
-
 
 class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 {
 	public:
 	BasicPlayerControllerManager (NewtonWorld* const world)
 		:dCustomPlayerControllerManager (world)
+		,m_croudMesh(NULL)
+		,m_standingMesh(NULL)
 		,m_player(NULL)
+		,m_crowchKey(false)
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
 
@@ -41,6 +43,12 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 
 	~BasicPlayerControllerManager ()
 	{
+		if (m_croudMesh) {
+			m_croudMesh->Release();
+		}
+		if (m_standingMesh) {
+			m_standingMesh->Release();
+		}
 	}
 
 	void SetAsPlayer(dCustomPlayerController* const controller)
@@ -56,6 +64,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		scene->Print(color, "walk backward:           S");
 		scene->Print(color, "strafe right:            D");
 		scene->Print(color, "strafe left:             A");
+		scene->Print(color, "crouch:				  C");
 		scene->Print(color, "jump:                    Space");
 		//scene->Print(color, "toggle camera mode:      C");
 		//scene->Print(color, "hide help:               H");
@@ -98,13 +107,19 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		NewtonBody* const body = controller->GetBody();
 
 		// create the visual mesh from the player collision shape
-		NewtonCollision* const collision = NewtonBodyGetCollision(body);
-		DemoMesh* const geometry = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		if (!m_croudMesh) {
+			NewtonCollision* const collision = NewtonBodyGetCollision(body);
+			controller->ToggleCrouch();
+			m_croudMesh = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
+			controller->ToggleCrouch();
+			m_standingMesh = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		}
+
+		// make standing and crouch meshes
 		DemoEntity* const playerEntity = new DemoEntity(location, NULL);
 		scene->Append(playerEntity);
-		playerEntity->SetMesh(geometry, dGetIdentityMatrix());
-		geometry->Release();
+		playerEntity->SetMesh(m_standingMesh, dGetIdentityMatrix());
 
 		// set the user data
 		NewtonBodySetUserData(body, playerEntity);
@@ -145,7 +160,18 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 			dFloat forwarSpeed = (int(scene->GetKeyState('W')) - int(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
 			dFloat strafeSpeed = (int(scene->GetKeyState('D')) - int(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
 
-			//if (scene->GetKeyState(' ') && !controller->IsAirBorn ()) {
+			bool crowchKey = scene->GetKeyState('C') ? true : false;
+			if (m_crowchKey.UpdateTrigger(crowchKey))
+			{
+				controller->ToggleCrouch();
+				DemoEntity* const playerEntity = (DemoEntity*)NewtonBodyGetUserData(controller->GetBody());
+				if (controller->IsCrouched()) {
+					playerEntity->SetMesh(m_croudMesh, dGetIdentityMatrix());
+				} else {
+					playerEntity->SetMesh(m_standingMesh, dGetIdentityMatrix());
+				}
+			}
+
 			if (scene->GetKeyState(' ') && controller->IsOnFloor ()) {
 				dVector jumpImpule(controller->GetFrame().RotateVector(dVector(PLAYER_JUMP_SPEED * controller->GetMass(), 0.0f, 0.0f, 0.0f)));
 				dVector totalImpulse(controller->GetImpulse() + jumpImpule);
@@ -222,7 +248,10 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		ApplyInputs (controller);
 	}
 
+	DemoMesh* m_croudMesh;
+	DemoMesh* m_standingMesh;
 	dCustomPlayerController* m_player;
+	DemoEntityManager::ButtonKey m_crowchKey;
 };
 
 
@@ -354,6 +383,7 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	NewtonWorld* const world = scene->GetNewton();
 	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "playerarena.ngd", true);
+//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 
 	// create a character controller manager
 	BasicPlayerControllerManager* const playerManager = new BasicPlayerControllerManager (world);
@@ -366,11 +396,41 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 20.0f);
 	location.m_posit.m_y += 1.0f;
-	dCustomPlayerController*  const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	dCustomPlayerController* const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 	playerManager->SetAsPlayer(player);
 
-//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+	// add second player for testing
+	location.m_posit.m_x += 4.0f;
+	location.m_posit.m_z += 1.0f;
+	location.m_posit.m_y += 5.0f;
+	dCustomPlayerController* const player1 = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	location.m_posit.m_z += 3.0f;
+	dCustomPlayerController* const player2 = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	player1;
+	player2;
+
+	// show player special effects
+	if (0)
+	{
+		//tilt player transform
+		dMatrix playerMatrix;
+		NewtonCollisionGetMatrix(NewtonBodyGetCollision(player1->GetBody()), &playerMatrix[0][0]);
+		playerMatrix = dYawMatrix(20.0f * dDegreeToRad) * playerMatrix;
+		NewtonCollisionSetMatrix(NewtonBodyGetCollision(player1->GetBody()), &playerMatrix[0][0]);
+
+		// make play flat of ground
+		player2->ToggleCrouch();
+		dFloat scaleX, scaleY, scaleZ;
+		NewtonCollisionGetScale (NewtonBodyGetCollision(player2->GetBody()), &scaleX, &scaleY, &scaleZ);
+		scaleZ *= 3.5f;										  
+		NewtonCollisionSetScale (NewtonBodyGetCollision(player2->GetBody()), scaleX, scaleY, scaleZ);
+	}
+
+	//playerManager->DestroyController (player1);
 	location.m_posit.m_x += 5.0f;
+
+	int count = 1;
+	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
 
 	// add some objects to interact with
 	dVector merryPosit (FindFloor (scene->GetNewton(), location.m_posit + dVector(-5.0f, 0.0f, 15.0f, 0.0f), 20.0f));
@@ -379,15 +439,25 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	// add a hanging bridge
 	CreateBridge(scene, playgroundBody);
 
-	int count = 1;
-	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-	AddPrimitiveArray(scene, 30.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
+	// add heavy weight box
+	AddPrimitiveArray(scene, 200.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
 
-	location.m_posit.m_x -= 10.0f;
+	// add medium weight box
+	location.m_posit.m_z -= 4.0f;
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector(2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
+	
+	// add light weight box
+	location.m_posit.m_z -= 4.0f;
+	AddPrimitiveArray(scene, 30.0f, location.m_posit, dVector(2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
+
+	// add a thin box to step on
+	location.m_posit.m_x -= 5.0f;
 	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 0.5f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
 
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
 }
+
+
 
