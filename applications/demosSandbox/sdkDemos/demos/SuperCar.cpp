@@ -233,7 +233,7 @@ class SuperCarEntity: public DemoEntity
 		chassisMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 		// create a default vehicle 
-		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, definition.m_vehicleMass, PhysicsApplyGravityForce, DEMO_GRAVITY);
+		m_controller = manager->CreateSportCar (chassisCollision, chassisMatrix, definition.m_vehicleMass, PhysicsApplyGravityForce, DEMO_GRAVITY);
 
 		// get body from player
 		NewtonBody* const body = m_controller->GetBody();

@@ -14,7 +14,7 @@
 #include "dVehicleTire.h"
 #include "dVehicleMultiBody.h"
 
-#define D_FREE_ROLLING_TIRE_TORQUE 30.0f
+#define D_FREE_ROLLING_TIRE_TORQUE 10.0f
 
 dVehicleTire::dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info)
 	:dVehicleNode(chassis)
@@ -192,7 +192,7 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 
 	if (bodyArray.m_count > bodyArray.m_staticCount) {
 		// for now ignore tire collision with dynamics bodies,
-		dAssert (0);
+		dTrace (("%s Fix Dynamics collision shit\n", __FUNCTION__));
 	}
 
 	if (contactCount > 1) {

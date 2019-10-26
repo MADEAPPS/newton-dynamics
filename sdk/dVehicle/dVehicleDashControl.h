@@ -123,6 +123,11 @@ class dVehicleBrakeControl: public dVehicleTireControl
 class dVehicleEngineControl: public dVehicleDashControl 
 {
 	public:
+	dVehicleEngineControl()
+		:m_engine(NULL)
+	{
+	}
+
 	dVehicleEngine* GetEngine() const {return m_engine;}
 	void SetEngine (dVehicleEngine* const engine) {m_engine = engine;}
 	void SetGear (int gear);

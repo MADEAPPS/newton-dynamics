@@ -227,11 +227,9 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 	void UpdateCamera(dFloat timestep)
 	{
-//		SuperCarEntity* player = m_player;
-//		if (!player) {
-//			dCustomVehicleController* const controller = &GetLast()->GetInfo();
-//			player = (SuperCarEntity*)NewtonBodyGetUserData(controller->GetBody());
-//		}
+		if (!m_player) {
+			return;
+		}
 
 		DemoEntity* const player = (DemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
@@ -357,7 +355,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		return body;
 	}
 
-	dVehicle* CreateVehicle(const dMatrix& location, const DemoEntity* const entity)
+	dVehicle* CreateSportCar(const dMatrix& location, const DemoEntity* const entity)
 	{
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
@@ -477,6 +475,130 @@ class SingleBodyVehicleManager: public dVehicleManager
 		vehicle->Finalize();
 
 		return vehicle;
+	}
+
+	dVehicle* CreateOffRoadCar(const dMatrix& location, const DemoEntity* const entity)
+	{
+		NewtonWorld* const world = GetWorld();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		DemoEntity* const vehicleEntity = (DemoEntity*)entity->CreateClone();
+		scene->Append(vehicleEntity);
+
+		// set entity world location
+		vehicleEntity->ResetMatrix(*scene, location);
+
+		// create the vehicle controller
+		dMatrix chassisMatrix;
+#if 1
+		chassisMatrix.m_front = dVector(1.0f, 0.0f, 0.0f, 0.0f);			// this is the vehicle direction of travel
+#else
+		chassisMatrix.m_front = dVector(0.0f, 0.0f, 1.0f, 0.0f);			// this is the vehicle direction of travel
+#endif
+		chassisMatrix.m_up = dVector(0.0f, 1.0f, 0.0f, 0.0f);			// this is the downward vehicle direction
+		chassisMatrix.m_right = chassisMatrix.m_front.CrossProduct(chassisMatrix.m_up);	// this is in the side vehicle direction (the plane of the wheels)
+		chassisMatrix.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+
+		// create a single body vehicle 
+		NewtonBody* const chassisBody = CreateChassisBody(VIPER_CHASSIS_MASS, vehicleEntity);
+
+		// make the vehicle a little over steering by shitting the com to the front
+		dVector com(0.0f);
+		NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
+		com += chassisMatrix.m_front.Scale(0.3f);
+		com += chassisMatrix.m_up.Scale(-0.2f);
+		NewtonBodySetCentreOfMass(chassisBody, &com[0]);
+
+		// set the player matrix 
+		NewtonBodySetMatrix(chassisBody, &location[0][0]);
+
+		dVehicleMultiBody* const vehicle = new dVehicleMultiBody(chassisBody, chassisMatrix, DEMO_GRAVITY);
+		AddRoot(vehicle);
+
+		// save entity as use data
+		vehicle->SetUserData(vehicleEntity);
+/*
+		// save the vehicle chassis with the vehicle visual for update children matrices 
+		//VehicleUserData* const renderCallback = new VehicleUserData(vehicle);
+		//vehicleEntity->SetUserData(renderCallback);
+
+		//for (int i = 0; i < int((sizeof(m_gearMap) / sizeof(m_gearMap[0]))); i++) {
+		//	m_gearMap[i] = i;
+		//}
+
+		// add Tires
+		dFloat width;
+		dFloat radio;
+		CalculateTireDimensions("fl_tire", width, radio, world, vehicleEntity);
+		dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, VIPER_CHASSIS_MASS);
+		dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", width, radio, VIPER_CHASSIS_MASS);
+
+		CalculateTireDimensions("rl_tire", width, radio, world, vehicleEntity);
+		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, VIPER_CHASSIS_MASS);
+		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", width, radio, VIPER_CHASSIS_MASS);
+
+		// add vehicle steering control 
+		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
+		steeringControl->AddTire(frontLeft);
+		steeringControl->AddTire(frontRight);
+		steeringControl->SetParam(1.0f);
+
+		// add vehicle hand brake control 
+		dVehicleBrakeControl* const handBrakeControl = vehicle->GetHandBrakeControl();
+		handBrakeControl->SetBrakeTorque(3000.0f);
+		handBrakeControl->AddTire(rearLeft);
+		handBrakeControl->AddTire(rearRight);
+
+		// add vehicle brake control 
+		dVehicleBrakeControl* const brakeControl = vehicle->GetBrakeControl();
+		brakeControl->SetBrakeTorque(1000.0f);
+		brakeControl->AddTire(frontLeft);
+		brakeControl->AddTire(frontRight);
+		brakeControl->AddTire(rearLeft);
+		brakeControl->AddTire(rearRight);
+
+		// add a differential 
+		dVehicleDifferential* const differential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, rearLeft, rearRight);
+
+		// add and internal combustion engine
+		dEngineInfo engineInfo;
+		engineInfo.m_mass = VIPER_ENGINE_MASS;
+		engineInfo.m_armatureRadius = VIPER_ENGINE_RADIUS;
+		engineInfo.m_idleTorque = 200.0f;			// IDLE_TORQUE
+		engineInfo.m_rpmAtIdleTorque = 450.0f;		// IDLE_TORQUE_RPM
+		engineInfo.m_peakTorque = 500.0f;			// PEAK_TORQUE
+		engineInfo.m_rpmAtPeakTorque = 3000.0f;		// PEAK_TORQUE_RPM
+		engineInfo.m_peakHorsePower = 400.0f;		// PEAK_HP
+		engineInfo.m_rpmAtPeakHorsePower = 5200.0f;	// PEAK_HP_RPM
+		engineInfo.m_rpmAtRedLine = 6000.0f;		// REDLINE_TORQUE_RPM
+
+		engineInfo.m_crownGear = 4.0f;
+		engineInfo.m_clutchTorque = 600.0f;
+
+		engineInfo.m_topSpeedInMetersPerSeconds = 100.0f;
+
+		engineInfo.m_gearRatios[dEngineInfo::m_reverseGear] = -2.90f;	// reverse
+		engineInfo.m_gearRatios[dEngineInfo::m_neutralGear] = 0.0f;     // neutral
+		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 0] = 2.66f;  // GEAR_1
+		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 1] = 1.78f;	// GEAR_2
+		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 2] = 1.30f;	// GEAR_3
+		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 3] = 1.00f;	// GEAR_4
+		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 4] = 0.74f;	// GEAR_5
+		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 5] = 0.50f;	// GEAR_6
+		engineInfo.m_gearsCount = 8;
+
+
+		// Set Engine and engine control
+		dVehicleEngine* const engine = vehicle->AddEngine(engineInfo, differential);
+		dVehicleEngineControl* const engineControl = vehicle->GetEngineControl();
+		engineControl->SetEngine(engine);
+
+		// do not forget to call finalize after all components are added or after any change is made to the vehicle
+		vehicle->Finalize();
+
+		return vehicle;
+*/
+return NULL;
 	}
 
 	void UpdateDriverInput(dVehicle* const vehicle, dFloat timestep) 
@@ -610,6 +732,7 @@ static void AddBackground(DemoEntityManager* const scene)
 
 	dMatrix location(dGetIdentityMatrix());
 	location.m_posit.m_x += 20.0f;
+	location.m_posit.m_y -= 0.2f;
 	location.m_posit.m_z -= 20.0f;
 	NewtonBodySetMatrix(terrain, &location[0][0]);
 	terrainEntity->SetMatrixUsafe(dQuaternion(location), location.m_posit);
@@ -630,18 +753,19 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 0.5f;
 
+	// create a vehicle manager
 	NewtonWorld* const world = scene->GetNewton();
-
-	// create a vehicle controller manager
-	dPointer<DemoEntity> viperModel (DemoEntity::LoadNGD_mesh("viper.ngd", scene->GetNewton(), scene->GetShaderCache()));
 	SingleBodyVehicleManager* const manager = new SingleBodyVehicleManager(world);
 
-	// load 
-	dVehicle* const player = manager->CreateVehicle(location, viperModel.GetData());
-	
-	// set this vehicle as the player
-	manager->SetAsPlayer(player);
+	// create a sport car
+	dPointer<DemoEntity> viperModel (DemoEntity::LoadNGD_mesh("viper.ngd", scene->GetNewton(), scene->GetShaderCache()));
+//	dVehicle* const player = manager->CreateSportCar(location, viperModel.GetData());
+//	manager->SetAsPlayer(player);
 
+	// create an monster Truck
+	location.m_posit.m_z += 4.0f;
+	dPointer<DemoEntity> monsterTruck (DemoEntity::LoadNGD_mesh("monsterTruck.ngd", scene->GetNewton(), scene->GetShaderCache()));
+	manager->CreateOffRoadCar(location, monsterTruck.GetData());
 
 	int count = 10;
 	count = 0;
@@ -649,7 +773,7 @@ void SingleBodyCar(DemoEntityManager* const scene)
 		for (int j = 0; j < count; j++) {
 			dMatrix offset(location);
 			offset.m_posit += dVector (j * 4.0f + 4.0f, 0.0f, i * 4.0f, 0.0f);
-			manager->CreateVehicle(offset, viperModel.GetData());
+			manager->CreateSportCar(offset, viperModel.GetData());
 		}
 	}
 
