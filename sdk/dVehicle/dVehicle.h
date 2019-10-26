@@ -19,6 +19,7 @@
 
 class dTireInfo;
 class dEngineInfo;
+class dVehicleManager;
 
 class dVehicle: public dVehicleNode
 {
