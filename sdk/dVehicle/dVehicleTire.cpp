@@ -14,6 +14,8 @@
 #include "dVehicleTire.h"
 #include "dVehicleMultiBody.h"
 
+#define D_FREE_ROLLING_TIRE_TORQUE 30.0f
+
 dVehicleTire::dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info)
 	:dVehicleNode(chassis)
 	,dBilateralJoint()
@@ -390,7 +392,7 @@ void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 		int index = constraintParams->m_count;
 		AddAngularRowJacobian(constraintParams, tireMatrix.m_front, 0.0f);
 
-		const dFloat brake = m_contactCount ? m_brakeTorque : 50.0f;
+		const dFloat brake = m_contactCount ? m_brakeTorque : D_FREE_ROLLING_TIRE_TORQUE;
 		constraintParams->m_jointLowFrictionCoef[index] = -brake;
 		constraintParams->m_jointHighFrictionCoef[index] = brake;
 	}
