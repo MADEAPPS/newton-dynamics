@@ -89,17 +89,8 @@ void dVehicleTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext,
 	debugContext->SetColor(dVector(1.0f, 0.0f, 0.0f, 1.0f));
 	dVector p3(origin + m_lateralDir.Scale(scale * m_tireModel.m_lateralForce));
 
-if (tire->GetIndex() == 3) {
-	dVector veloc(tire->GetProxyBody().GetVelocity());
-	//veloc = veloc - m_lateralDir.Scale(veloc.DotProduct3(tireMatrix.m_up));
-	float xxxx = veloc.DotProduct3(m_longitudinalDir);
-	float yyyy = veloc.DotProduct3(m_lateralDir);
-	dTrace(("tire beta =%f\n", dAtan2(yyyy, xxxx) * dRadToDegree));
-}
-
 	debugContext->DrawLine(origin, p3);
 }
-
 
 void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
@@ -165,7 +156,7 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 	dFloat invden = 1.0f / (1.0f + u);
 
 if (tire->GetIndex() == 3) {
-dTrace(("index=%d u=%4.3f v=%4.3f\n", tire->GetIndex(), u, v));
+//dTrace(("index=%d u=%4.3f v=%4.3f\n", tire->GetIndex(), u, v));
 }
 
 	m_tireModel.m_lateralSlip = v * invden;

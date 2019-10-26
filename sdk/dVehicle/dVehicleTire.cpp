@@ -288,6 +288,14 @@ void dVehicleTire::ApplyExternalForce()
 
 	m_proxyBody.SetTorque(dVector(0.0f));
 	m_proxyBody.SetForce(chassisNode->GetGravity().Scale(m_proxyBody.GetMass()));
+
+if (m_index == 3) {
+	dVector veloc(m_proxyBody.GetVelocity());
+	float xxxx = veloc.DotProduct3(tireMatrix.m_up);
+	float yyyy = veloc.DotProduct3(tireMatrix.m_front);
+	dTrace(("tireBeta =%f\n", dAtan2(yyyy, xxxx) * dRadToDegree));
+}
+
 }
 
 void dVehicleTire::CalculateFreeDof()
