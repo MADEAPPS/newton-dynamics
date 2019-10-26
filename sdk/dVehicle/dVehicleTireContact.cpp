@@ -82,18 +82,20 @@ void dVehicleTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext,
 	scale *= 1.0f;
 	// show tire longitudinal force
 	debugContext->SetColor(dVector(0.0f, 1.0f, 0.0f, 1.0f));
-	//dVector p2(origin + m_longitudinalDir.Scale(scale * m_jointFeebackForce[1]));
 	dVector p2(origin + m_longitudinalDir.Scale(scale * m_tireModel.m_longitunalForce));
 	debugContext->DrawLine(origin, p2);
 
 	// show tire lateral force
 	debugContext->SetColor(dVector(1.0f, 0.0f, 0.0f, 1.0f));
-	//dVector p3(origin + m_lateralDir.Scale(scale * m_jointFeebackForce[2]));
 	dVector p3(origin + m_lateralDir.Scale(scale * m_tireModel.m_lateralForce));
 
-//if (tire->GetIndex() == 3) {
-//dTrace(("%f %f %f\n", m_tireModel.m_tireLoad, m_tireModel.m_longitunalForce, m_tireModel.m_lateralForce));
-//}
+if (tire->GetIndex() == 3) {
+	dVector veloc(tire->GetProxyBody().GetVelocity());
+	//veloc = veloc - m_lateralDir.Scale(veloc.DotProduct3(tireMatrix.m_up));
+	float xxxx = veloc.DotProduct3(m_longitudinalDir);
+	float yyyy = veloc.DotProduct3(m_lateralDir);
+	dTrace(("tire beta =%f\n", dAtan2(yyyy, xxxx) * dRadToDegree));
+}
 
 	debugContext->DrawLine(origin, p3);
 }
@@ -152,7 +154,6 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 
 		const dVector relVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
 		dFloat lateralSpeed = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
-		//dFloat longitudinalSpeed = dAbs(m_longitudinalDir.DotProduct3(relVeloc)) + 0.01f;
 		m_tireModel.m_lateralSlip = lateralSpeed / (dAbs (m_tireModel.m_lateralSlip) + 1.0e-3f);
 	}
 
@@ -162,6 +163,10 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 	dFloat v = dAbs(m_tireModel.m_lateralSlip);
 	dFloat u = dAbs(m_tireModel.m_longitudinalSlip);
 	dFloat invden = 1.0f / (1.0f + u);
+
+if (tire->GetIndex() == 3) {
+dTrace(("index=%d u=%4.3f v=%4.3f\n", tire->GetIndex(), u, v));
+}
 
 	m_tireModel.m_lateralSlip = v * invden;
 	m_tireModel.m_longitudinalSlip = u * invden;

@@ -548,16 +548,16 @@ axisCount = 0;
 		driverInput.m_clutchPedal = 0.0f;
 
 #if 0
-	#if 1
+	#if 0
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
-			fwrite(&driverInput, sizeof(dVehicleChassis::dDriverInput), 1, file);
+			fwrite(&driverInput, sizeof(dVehicleMultiBody::dDriverInput), 1, file);
 			fflush(file);
 		}
 	#else 
 		static FILE* file = fopen("log.bin", "rb");
 		if (file) {
-			fread(&driverInput, sizeof(dVehicleChassis::dDriverInput), 1, file);
+			fread(&driverInput, sizeof(dVehicleMultiBody::dDriverInput), 1, file);
 		}
 	#endif
 #endif

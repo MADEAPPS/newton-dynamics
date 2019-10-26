@@ -103,6 +103,7 @@ const void dVehicleMultiBody::Debug(dCustomJoint::dDebugDisplay* const debugCont
 	// draw velocity
 	dVector veloc(m_proxyBody.GetVelocity());
 	veloc = veloc - matrix.m_up.Scale(veloc.DotProduct3(matrix.m_up));
+
 	dFloat mag = dSqrt(veloc.DotProduct3(veloc));
 	veloc = veloc.Scale(dLog(mag) / (mag + 0.1f));
 
@@ -382,11 +383,12 @@ void dVehicleMultiBody::ApplyExternalForce()
 
 	dVehicleNode::ApplyExternalForce();
 
-//vector = dVector(0.0f);
-//m_proxyBody.SetForce(vector);
-//m_proxyBody.SetTorque(vector);
-//NewtonBodySetForce(m_newtonBody, &vector[0]);
-//NewtonBodySetTorque(m_newtonBody, &vector[0]);
+dVector veloc(m_proxyBody.GetVelocity());
+veloc = veloc - matrix.m_up.Scale(veloc.DotProduct3(matrix.m_up));
+float xxxx = veloc.DotProduct3(matrix.m_front);
+float yyyy = veloc.DotProduct3(matrix.m_right);
+dTrace(("beta =%f\n", dAtan2(yyyy, xxxx) * dRadToDegree));
+
 }
 
 void dVehicleMultiBody::CalculateSuspensionForces(dFloat timestep)

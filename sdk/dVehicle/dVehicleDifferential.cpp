@@ -120,11 +120,11 @@ void dVehicleDifferential::JacobianDerivative(dComplementaritySolver::dParamInfo
 
 	dFloat slipDiffOmega = 0.5f * dMax(dFloat (5.0f), dAbs(omegax));
 	if (omegay > slipDiffOmega) {
-		dTrace(("+ "));
+//		dTrace(("+ "));
 	} else if (omegay < -slipDiffOmega) {
-		dTrace(("- "));
+//		dTrace(("- "));
 	}
-dTrace(("wx=%f wy=%f\n", omegax, omegay));
+//dTrace(("wx=%f wy=%f\n", omegax, omegay));
 
 }
 
