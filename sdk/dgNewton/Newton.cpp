@@ -25,7 +25,7 @@
 
 
 #ifdef _NEWTON_BUILD_DLL
-	#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+	#if (defined (__MINGW32__) || defined (__MINGW64__))
 		int main(int argc, char* argv[])
 		{
 			return 0;

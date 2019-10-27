@@ -48,7 +48,7 @@
 	#define dTrace(x)
 #endif
 
-#if ( defined (_MSC_VER) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER) )
+#if ( defined (_MSC_VER) || defined (__MINGW32__) || defined (__MINGW64__) )
 	#include <crtdbg.h>
 	#define dAssert(x) _ASSERTE(x)
 #else 
