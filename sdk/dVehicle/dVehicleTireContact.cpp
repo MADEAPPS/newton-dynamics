@@ -107,7 +107,14 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		AddContactRowJacobian(constraintParams, m_point, m_normal, 0.0f);
 		constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
 		constraintParams->m_frictionCallback[index] = this;
-		constraintParams->m_jointAccel[index] += D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS * m_penetration * constraintParams->m_timestepInv;
+		if (m_isPatchContact) {
+			dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
+			jacobian1.m_linear = dVector(0.0f);
+			jacobian1.m_angular = dVector(0.0f);
+			constraintParams->m_jointAccel[index] += D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS * m_penetration * constraintParams->m_timestepInv;
+		} else {
+			constraintParams->m_jointAccel[index] += D_TIRE_PENETRATION_RECOVERING_SPEED * m_penetration * constraintParams->m_timestepInv;
+		}
 	}
 
 	{
