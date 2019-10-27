@@ -778,7 +778,32 @@ static void AddBackground(DemoEntityManager* const scene)
 	terrainEntity->SetMatrixUsafe(dQuaternion(location), location.m_posit);
 	terrainEntity->SetMatrixUsafe(dQuaternion(location), location.m_posit);
 #endif
-	//AddPrimitiveArray (scene, 0.0f, dVector (0.0f, 0.0f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f), 1, 1, 0, _BOX_PRIMITIVE, 0, dGetIdentityMatrix());
+
+#if 0
+	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
+
+	location.m_posit.m_x = 2.0f;
+	location.m_posit.m_y = 1.0f;
+	location.m_posit.m_z = 0.0f;
+
+	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
+
+	int count = 1;
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
+
+/*
+	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+*/		
+#endif
+
 }
 
 void SingleBodyCar(DemoEntityManager* const scene)
@@ -817,41 +842,6 @@ void SingleBodyCar(DemoEntityManager* const scene)
 			manager->CreateSportCar(offset, viperModel.GetData());
 		}
 	}
-
-#if 0
-/*
-	DemoEntity* const vehicleEntity = (DemoEntity*)NewtonBodyGetUserData(player->GetBody());
-	dMatrix camMatrix (vehicleEntity->GetNextMatrix());
-	//	scene->SetCameraMouseLock (true);
-
-	//	dVector location (origin);
-	//	location.m_x += 20.0f;
-	//	location.m_z += 20.0f;
-//	location.m_posit.m_z += 4.0f;
-
-//	int count = 1;
-	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
-//	int defaultMaterialID = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-
-	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
-	//AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-
-	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-
-	//	NewtonSerializeToFile (scene->GetNewton(), "C:/Users/Julio/Desktop/newton-dynamics/applications/media/xxxxx.bin");
-*/		
-
-//	camMatrix.m_posit.m_x -= 5.0f;
-//	scene->SetCameraMatrix(camMatrix, camMatrix.m_posit);
-#endif
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);

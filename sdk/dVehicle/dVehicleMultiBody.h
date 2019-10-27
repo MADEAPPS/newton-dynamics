@@ -31,13 +31,11 @@ class dCollectCollidingBodies
 	dCollectCollidingBodies(NewtonBody* const me)
 		:m_exclude(me)
 		,m_count(0)
-//		,m_staticCount(0)
 	{
 	}
 
 	NewtonBody* m_exclude;
 	int m_count;
-//	int m_staticCount;
 	NewtonBody* m_array[16];
 };
 

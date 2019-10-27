@@ -209,7 +209,6 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 			&attributeA, &attributeB, 0);
 
 		if (count && (normal.DotProduct3(tireMatrix.m_right) <= D_TIRE_CONTACT_PATCH_CONE)) {
-			penetration = dMin (penetration, D_TIRE_MAX_ELASTIC_DEFORMATION);
 			dVector longitudinalDir(normal.CrossProduct(tireMatrix.m_front));
 			if (longitudinalDir.DotProduct3(longitudinalDir) < 0.1f) {
 				longitudinalDir = normal.CrossProduct(tireMatrix.m_up.CrossProduct(normal));
@@ -219,6 +218,8 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 			normal.m_w = 0.0f;
 			contact.m_w = 1.0f;
 			longitudinalDir = longitudinalDir.Normalize();
+			penetration = dMin (penetration, D_TIRE_MAX_ELASTIC_DEFORMATION);
+			penetration = 0.0f;
 			m_contactsJoints[contactCount].SetContact(contact, normal, longitudinalDir, penetration, friction, false);
 			contactCount++;
 		}

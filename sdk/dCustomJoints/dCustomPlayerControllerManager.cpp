@@ -403,108 +403,6 @@ void dCustomPlayerController::SetFrame(const dMatrix& frame)
 	NewtonCollisionSetMatrix(capsule, &newMatrix[0][0]);
 }
 
-
-//#define USE_OLD_STEP_ALGORITHM
-
-#ifdef USE_OLD_STEP_ALGORITHM
-void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& contactSolver)
-{
-	dMatrix matrix;
-	dVector saveVeloc(0.0f);
-
-	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
-	NewtonBodyGetVelocity(m_kinematicBody, &saveVeloc[0]);
-
-	dMatrix coodinateMatrix (m_localFrame * matrix);
-
-	// clip player velocity along the high contacts
-	bool applyStep = false; 
-	dImpulseSolver impulseSolver(this);
-
-	dFloat scaleSpeedFactor = 2.0f;
-	dFloat fowardSpeed = m_forwardSpeed * scaleSpeedFactor;
-	dFloat lateralSpeed = m_lateralSpeed * scaleSpeedFactor;
-	dFloat maxSpeed = dMax(dAbs(fowardSpeed), dAbs(lateralSpeed));
-	dFloat stepFriction = 1.0f + m_mass * maxSpeed;
-	
-	int index = impulseSolver.AddLinearRow(coodinateMatrix[0], impulseSolver.m_zero, 0.0f, 0.0f, 1.0e12f);
-	impulseSolver.AddLinearRow(coodinateMatrix[1], impulseSolver.m_zero, -m_forwardSpeed, -stepFriction, stepFriction, index);
-	impulseSolver.AddLinearRow(coodinateMatrix[2], impulseSolver.m_zero, m_lateralSpeed, -stepFriction, stepFriction, index);
-	dVector veloc (saveVeloc + impulseSolver.CalculateImpulse().Scale(m_invMass));
-
-	for (int j = 0; !applyStep && (j < 4); j ++) {
-		SetVelocity(veloc);
-		NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
-		NewtonBodyIntegrateVelocity(m_kinematicBody, timestep);
-
-		applyStep = true;
-		contactSolver.CalculateContacts();
-		if (contactSolver.m_contactCount) {
-			dMatrix stepMatrix;
-			NewtonBodyGetMatrix(m_kinematicBody, &stepMatrix[0][0]);
-			int highContactCount = contactSolver.m_contactCount;
-			for (int i = contactSolver.m_contactCount - 1; i >= 0; i--) {
-				NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
-				dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], dFloat(0.0f));
-				dVector localPointpoint(m_localFrame.UntransformVector(stepMatrix.UntransformVector(point)));
-				if (localPointpoint.m_x <= m_stepHeight) {
-					highContactCount --;
-					contactSolver.m_contactBuffer[i] = contactSolver.m_contactBuffer[highContactCount];
-				}
-			}
-			if (highContactCount) {
-				dVector com;
-				NewtonBodyGetCentreOfMass(m_kinematicBody, &com[0]);
-				com = stepMatrix.TransformVector(com);
-
-				impulseSolver.Reset(this);
-				for (int i = 0; i < highContactCount; i++) {
-					NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
-					dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], dFloat(0.0f));
-					dVector normal(contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat(0.0f));
-					impulseSolver.AddContactRow(&contact, normal, point - com, 0.0f, 0.0f, 1.0e12f);
-				}
-
-				applyStep = false;
-				impulseSolver.AddAngularRows();
-				veloc += impulseSolver.CalculateImpulse().Scale(m_invMass);
-			}
-		}
-	}
-
-	if (applyStep) {
-		contactSolver.CalculateContacts();
-		if (contactSolver.m_contactCount) {
-			dMatrix stepMatrix;
-			NewtonBodyGetMatrix(m_kinematicBody, &stepMatrix[0][0]);
-
-			dFloat maxHigh = 0.0f;
-			for (int i = 0; i < contactSolver.m_contactCount; i++) {
-				NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
-				dVector point(contact.m_point[0], contact.m_point[1], contact.m_point[2], dFloat(0.0f));
-				point = m_localFrame.UntransformVector(stepMatrix.UntransformVector(point));
-				if ((point.m_x < m_stepHeight) && (point.m_x > m_contactPatch)) {
-					dVector normal(contact.m_normal[0], contact.m_normal[1], contact.m_normal[2], dFloat(0.0f));
-					dFloat relSpeed = normal.DotProduct3(veloc);
-					if (relSpeed < dFloat(-1.0e-2f)) {
-						maxHigh = dMax(point.m_x, maxHigh);
-					}
-				}
-			}
-
-			if (maxHigh > 0.0f) {
-				dVector step(stepMatrix.RotateVector(m_localFrame.RotateVector(dVector(maxHigh, dFloat(0.0f), dFloat(0.0f), dFloat(0.0f)))));
-				matrix.m_posit += step;
-			}
-		}
-	}
-
-	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
-	SetVelocity(saveVeloc);
-}
-
-#else
-
 void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& contactSolver)
 {
 	dMatrix matrix;
@@ -659,7 +557,6 @@ void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& conta
 	SetVelocity(saveVeloc);
 	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
 }
-#endif
 
 dCustomPlayerController::dCollisionState dCustomPlayerController::TestPredictCollision(const dContactSolver& contactSolver, const dVector& veloc) const
 {

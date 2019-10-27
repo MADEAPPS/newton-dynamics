@@ -277,51 +277,12 @@ void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mous
 
 	} else {
 		if (mousePickState) {
-			//dFloat x = dFloat (m_mousePosX);
-			//dFloat y = dFloat (m_mousePosY);
-			//dVector p0 (m_camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
-			//dVector p1 (m_camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 			m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);
 
-			#ifdef USE_PICK_BODY_BY_FORCE
-			#else 
-				if (m_pickJoint) {
-					// using Dave Gravel method of setting the min and Max friction base of mouse speed.
-					#if 0
-					// my math is very bad here
-					// it is only some tests...
-					// it is surely better to use the mouse move speed and not the object vel speed....
+			if (m_pickJoint) {
+				m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
+			}
 
-					dFloat Ixx;
-					dFloat Iyy;
-					dFloat Izz;
-					dFloat mass;
-					NewtonBodyGetMass(m_targetPicked, &mass, &Ixx, &Iyy, &Izz);
-
-					dVector svel;
-					NewtonBodyGetVelocity(m_targetPicked, &svel[0]);
-
-					float speed = dSqrt(svel.m_x * svel.m_x + svel.m_y * svel.m_y + svel.m_z * svel.m_z);
-
-					dFloat angularFritionAccel = (((5.0f*timestep*120.0f) + (5.0f + speed))*2.0f);
-					dFloat linearFrictionAccel = angularFritionAccel * dAbs(dMax(-9.81f, 5.0f));
-					dFloat inertia = dMax(Izz, dMax(Ixx, Iyy));
-
-					if (speed >= 5.0f) {
-						angularFritionAccel = (((5.0f*timestep*120.0f) + speed)*6.0f);
-						linearFrictionAccel = angularFritionAccel * dAbs(dMax(-9.81f, 5.0f));
-					} else {
-						if (angularFritionAccel > 5.0f) angularFritionAccel = 5.0f;
-					}
-
-					m_pickJoint->SetMaxLinearFriction((mass*10.0f) * linearFrictionAccel);
-					m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
-
-					#endif		
-
-					m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
-				}
-			#endif
 		} else {
 			if (m_pickJoint) {
 				delete m_pickJoint;
