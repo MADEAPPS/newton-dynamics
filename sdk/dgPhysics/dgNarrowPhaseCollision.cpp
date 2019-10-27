@@ -1784,8 +1784,8 @@ dgInt32 dgWorld::CollideContinue (
 		if (count > maxContacts) {
 			count = PruneContacts (count, contacts, contactJoint.GetPruningTolerance(), maxContacts);
 		}
-
 		count = dgMin(count, maxContacts);
+
 		if (pair.m_flipContacts) {
  			for (dgInt32 i = 0; i < count; i++) {
 				dgVector step ((collideBodyA.m_veloc - collideBodyB.m_veloc).Scale (pair.m_timestep));
@@ -1862,6 +1862,10 @@ dgInt32 dgWorld::Collide (
 	CalculateContacts (&pair, threadIndex, false, false);
 
 	count = pair.m_contactCount;
+	if (count > maxContacts) {
+		count = PruneContacts(count, contacts, contactJoint.GetPruningTolerance(), maxContacts);
+	}
+	count = dgMin(count, maxContacts);
 
 	dgFloat32 swapContactScale = (contactJoint.GetBody0() != &collideBodyA) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f);
 	for (dgInt32 i = 0; i < count; i ++) {

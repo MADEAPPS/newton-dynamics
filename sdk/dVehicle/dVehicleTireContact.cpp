@@ -40,7 +40,7 @@ void dVehicleTireContact::ResetContact()
 	m_isActive = false;
 }
 
-void dVehicleTireContact::SetContact(const dVector& posit, const dVector& normal, const dVector& longitudinalDir, dFloat penetration, dFloat staticFriction)
+void dVehicleTireContact::SetContact(const dVector& posit, const dVector& normal, const dVector& longitudinalDir, dFloat penetration, dFloat staticFriction, bool isPatch)
 {
 	m_point = posit;
 	m_normal = normal;
@@ -48,6 +48,7 @@ void dVehicleTireContact::SetContact(const dVector& posit, const dVector& normal
 	m_lateralDir = m_longitudinalDir.CrossProduct(m_normal);
 
 	m_isActive = true;
+	m_isPatchContact = isPatch;
 	m_staticFriction = staticFriction;
 	m_penetration = dClamp(penetration, dFloat(-D_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
 }

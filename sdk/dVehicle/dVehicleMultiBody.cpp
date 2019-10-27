@@ -492,6 +492,7 @@ int dVehicleMultiBody::OnAABBOverlap(const NewtonBody * const body, void* const 
 {
 	dCollectCollidingBodies* const bodyList = (dCollectCollidingBodies*)context;
 	if (body != bodyList->m_exclude) {
+/*
 		dFloat mass;
 		dFloat Ixx;
 		dFloat Iyy;
@@ -505,8 +506,9 @@ int dVehicleMultiBody::OnAABBOverlap(const NewtonBody * const body, void* const 
 			bodyList->m_array[0] = (NewtonBody*)body;
 			bodyList->m_staticCount++;
 		}
+*/
+		bodyList->m_array[bodyList->m_count] = (NewtonBody*)body;
 		bodyList->m_count++;
-
 		dAssert(bodyList->m_count < sizeof(bodyList->m_array) / sizeof(bodyList->m_array[1]));
 	}
 	return 1;

@@ -16,9 +16,9 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleLoopJoint.h"
 
-#define D_TIRE_MAX_LATERAL_SLIP				(0.175f)
-#define D_TIRE_MAX_ELASTIC_DEFORMATION		(0.05f)
-#define D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS (10.0f / D_TIRE_MAX_ELASTIC_DEFORMATION)
+#define D_TIRE_MAX_LATERAL_SLIP				dFloat ((0.175f)
+#define D_TIRE_MAX_ELASTIC_DEFORMATION		dFloat (0.05f)
+#define D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS dFloat (10.0f / D_TIRE_MAX_ELASTIC_DEFORMATION)
 
 class dVehicleTireContact: public dVehicleLoopJoint
 {
@@ -43,7 +43,7 @@ class dVehicleTireContact: public dVehicleLoopJoint
 	dVehicleTireContact();
 	void ResetContact();
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const;
-	void SetContact(const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat staticFriction);
+	void SetContact(const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat staticFriction, bool isPatch);
 
 	private:
 	int GetMaxDof() const { return 3; }
@@ -59,6 +59,7 @@ class dVehicleTireContact: public dVehicleLoopJoint
 	dFloat m_penetration;
 	dFloat m_staticFriction;
 	mutable dTireModel m_tireModel;
+	bool m_isPatchContact;
 
 	friend class dVehicleTire;
 };
