@@ -14,7 +14,8 @@
 #include "dVehicleTire.h"
 #include "dVehicleMultiBody.h"
 
-#define D_FREE_ROLLING_TIRE_TORQUE 10.0f
+#define D_FREE_ROLLING_TORQUE_COEF	0.5f 
+#define D_LOAD_ROLLING_TORQUE_COEF	0.01f 
 
 dVehicleTire::dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info)
 	:dVehicleNode(chassis)
@@ -166,7 +167,7 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 				&attributeA, &attributeB, 0);
 
 			if (count) {
-				// calculate tire penetration
+				// calculate tireState penetration
 				dFloat dist = (param - impactParam) * m_info.m_suspensionLength;
 				if (dist > -D_TIRE_MAX_ELASTIC_DEFORMATION) {
 
@@ -191,7 +192,7 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 	}
 
 	if (bodyArray.m_count > bodyArray.m_staticCount) {
-		// for now ignore tire collision with dynamics bodies,
+		// for now ignore tireState collision with dynamics bodies,
 		dTrace (("%s Fix Dynamics collision shit\n", __FUNCTION__));
 	}
 
@@ -255,7 +256,7 @@ const void dVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 	dVehicleMultiBody* const chassis = GetParent()->GetAsVehicleMultiBody();
 	dAssert (chassis);
 
-	// render tire matrix
+	// render tireState matrix
 	dComplementaritySolver::dBodyState* const chassisBody = &chassis->GetProxyBody();
 	//dMatrix hubTireMatrix(GetHardpointMatrix(m_position * m_invSuspensionLength) * chassisBody->GetMatrix());
 	//debugContext->DrawFrame(hubTireMatrix, 1.0f);
@@ -299,7 +300,6 @@ if (m_index == 3) {
 	dTrace(("tireBeta =%f\n", dAtan2(yyyy, xxxx) * dRadToDegree));
 }
 */
-
 }
 
 void dVehicleTire::CalculateFreeDof()
@@ -351,8 +351,8 @@ void dVehicleTire::UpdateSolverForces(const dComplementaritySolver::dJacobianPai
 
 void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-	dComplementaritySolver::dBodyState* const tire = m_state0;
-	const dMatrix& tireMatrix = tire->GetMatrix();
+	dComplementaritySolver::dBodyState* const tireState = m_state0;
+	const dMatrix& tireMatrix = tireState->GetMatrix();
 
 	// lateral force
 	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_front);
@@ -388,13 +388,33 @@ void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 		constraintParams->m_jointHighFrictionCoef[index] = 0.0f;
 	}
 	
-	if ((m_brakeTorque > 1.0e-3f) || !m_contactCount)  {
+/*
+	if (m_brakeTorque > 1.0e-3f)  {
 		int index = constraintParams->m_count;
 		AddAngularRowJacobian(constraintParams, tireMatrix.m_front, 0.0f);
 
-		const dFloat brake = m_contactCount ? m_brakeTorque : D_FREE_ROLLING_TIRE_TORQUE;
+		//const dFloat brake = m_contactCount ? m_brakeTorque : D_FREE_ROLLING_TIRE_TORQUE;
+		const dFloat brake = D_FREE_ROLLING_TIRE_TORQUE;
 		constraintParams->m_jointLowFrictionCoef[index] = -brake;
 		constraintParams->m_jointHighFrictionCoef[index] = brake;
 	}
+*/
+
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	tireState->GetInertia (Ixx, Iyy, Izz);
+	dFloat rollingFriction = dMax (m_brakeTorque, Ixx * D_FREE_ROLLING_TORQUE_COEF);
+	for (int i = 0; i < sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1; i++) {
+		if (m_contactsJoints[i].IsActive()) {
+			rollingFriction = dMax (rollingFriction, m_contactsJoints[i].m_tireModel.m_tireLoad * D_LOAD_ROLLING_TORQUE_COEF);
+		}
+	}
+
+	int index = constraintParams->m_count;
+	AddAngularRowJacobian(constraintParams, tireMatrix.m_front, 0.0f);
+	constraintParams->m_jointLowFrictionCoef[index] = -rollingFriction;
+	constraintParams->m_jointHighFrictionCoef[index] = rollingFriction;
+
 	m_brakeTorque = 0.0f;
 }

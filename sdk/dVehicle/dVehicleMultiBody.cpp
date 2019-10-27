@@ -548,6 +548,22 @@ void dVehicleMultiBody::CalculateFreeDof()
 	dVector torque(m_proxyBody.GetTorque());
 	NewtonBodySetForce(m_newtonBody, &force[0]);
 	NewtonBodySetTorque(m_newtonBody, &torque[0]);
+
+/*
+	bool isSleeping = NewtonBodyGetSleepState(m_newtonBody) ? true : false;
+	if (isSleeping) {
+		bool awakeBody = m_proxyBody.GetVelocity().DotProduct3(m_proxyBody.GetVelocity()) > 1.0e-5f ? true : false;
+		awakeBody = awakeBody || (m_proxyBody.GetOmega().DotProduct3(m_proxyBody.GetOmega()) > 1.0e-5f ? true : false);
+		if (!awakeBody) {
+//			dAssert (0);
+		}
+
+		if (awakeBody) {
+			NewtonBodySetSleepState(m_newtonBody, 0);
+		}
+	}
+*/
+	NewtonBodySetSleepState(m_newtonBody, 0);
 }
 
 void dVehicleMultiBody::PreUpdate(dFloat timestep)

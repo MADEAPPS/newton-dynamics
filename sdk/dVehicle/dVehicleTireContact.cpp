@@ -100,9 +100,6 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 	const dVector& omega1 = m_state1->GetOmega();
 	const dVehicleTire* const tire = GetOwner0()->GetAsTire();
 
-static int xxx;
-xxx ++;
-
 	{
 		// normal constraint
 		int index = constraintParams->m_count;
@@ -128,7 +125,7 @@ xxx ++;
 		linearSpeed = dAbs(linearSpeed);
 
 		m_tireModel.m_lateralSlip = linearSpeed;
-		m_tireModel.m_longitudinalSlip = 0.0f;
+		m_tireModel.m_longitudinalSlip = 0.1f;
 		if ((omegaSpeed > 0.2f) || (linearSpeed > 0.2f)) {
 			if (relSpeed < 0.0f) {
 				dFloat speedDen = dMax(linearSpeed, dFloat(0.01f));
@@ -188,11 +185,10 @@ void dVehicleTireContact::SpecialSolverFrictionCallback(const dFloat* const load
 
 	if (g < (0.1f * load[0])) {
 		// low speed just apply static friction 
-		lowFriction[1] = -load[0] * m_staticFriction;
-		highFriction[1] = load[0] * m_staticFriction;
-
-		lowFriction[2] = -load[0] * m_staticFriction;
-		highFriction[2] = load[0] * m_staticFriction;
+		lowFriction[1] = -f;
+		highFriction[1] = f;
+		lowFriction[2] = -f;
+		highFriction[2] = f;
 	} else {
 		// apply brush tire model
 
