@@ -132,7 +132,7 @@ dgThread::~dgThread ()
 
 void dgThread::SetName()
 {
-#ifdef WIN32
+#if defined(_MSC_VER)
 	// a hideous way to set the thread name, bu this is how Microsoft does it
 	const DWORD MS_VC_EXCEPTION = 0x406D1388;
 	#pragma pack(push,8)  

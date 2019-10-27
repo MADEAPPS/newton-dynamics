@@ -28,7 +28,7 @@
 
 dgUnsigned64 dgGetTimeInMicrosenconds()
 {
-#ifdef _MSC_VER
+#if (defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__))
 	static LARGE_INTEGER frequency;
 	static LARGE_INTEGER baseCount;
 	if (!frequency.QuadPart) {
