@@ -1325,42 +1325,6 @@ void ExportScene (NewtonWorld* const world, const char* const name)
 	testScene.Serialize (fileName);
 }
 
-void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& pointOnBodyInGlobalSpace, const dVector& targetPositionInGlobalSpace, dFloat timestep)
-{
-	dFloat mass;
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-	const dFloat stiffness = 0.33f;
-	const dFloat damping = -0.05f;
-
-	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-
-	// calculate the desired impulse
-	dVector posit(targetPositionInGlobalSpace - pointOnBodyInGlobalSpace);
-	dVector impulse(posit.Scale(stiffness * mass));
-
-	// apply linear impulse
-	NewtonBodyApplyImpulseArray(body, 1, sizeof (dVector), &impulse[0], &pointOnBodyInGlobalSpace[0], timestep);
-
-	// apply linear and angular damping
-	dMatrix inertia;
-	dVector linearMomentum(0.0f);
-	dVector angularMomentum(0.0f);
-
-	NewtonBodyGetOmega(body, &angularMomentum[0]);
-	NewtonBodyGetVelocity(body, &linearMomentum[0]);
-
-
-	NewtonBodyGetInertiaMatrix(body, &inertia[0][0]);
-
-	angularMomentum = inertia.RotateVector(angularMomentum);
-	angularMomentum = angularMomentum.Scale(damping);
-	linearMomentum = linearMomentum.Scale(mass * damping);
-
-	NewtonBodyApplyImpulsePair(body, &linearMomentum[0], &angularMomentum[0], timestep);
-}
-
 NewtonBody* MousePickBody (NewtonWorld* const nWorld, const dVector& origin, const dVector& end, dFloat& paramterOut, dVector& positionOut, dVector& normalOut)
 {
 	dMousePickClass rayCast;

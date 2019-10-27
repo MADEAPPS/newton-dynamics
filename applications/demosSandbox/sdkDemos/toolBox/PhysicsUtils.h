@@ -97,7 +97,6 @@ NewtonBody* AddFloorBox(DemoEntityManager* const scene, const dVector& origin, c
 NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const levelName, bool optimized);
 
 NewtonBody* MousePickBody (NewtonWorld* const nWorld, const dVector& origin, const dVector& end, dFloat& paramter, dVector& positionOut, dVector& normalOut);
-void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& pointOnBodyInGlobalSpace, const dVector& targetPositionInGlobalScale, dFloat timestep);
 
 void LoadLumberYardMesh(DemoEntityManager* const scene, const dVector& location, int shapeid);
 

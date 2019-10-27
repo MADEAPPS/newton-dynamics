@@ -23,9 +23,6 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-//#define USE_PICK_BODY_BY_FORCE
-
-
 class DemoCameraPickBodyJoint: public dCustomKinematicController
 {
 	public:
@@ -242,10 +239,6 @@ void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mous
 			dVector posit;
 			dVector normal;
 
-			//dFloat x = dFloat (m_mousePosX);
-			//dFloat y = dFloat (m_mousePosY);
-			//dVector p0 (m_camera->ScreenToWorld(dVector (x, y, 0.0f, 0.0f)));
-			//dVector p1 (m_camera->ScreenToWorld(dVector (x, y, 1.0f, 0.0f)));
 			NewtonBody* const body = MousePickBody (scene->GetNewton(), p0, p1, param, posit, normal);
 			if (body) {
 				dMatrix matrix;
@@ -255,38 +248,30 @@ void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mous
 				dTrace (("body Id: %d\n", NewtonBodyGetID(m_targetPicked)));
 
 				m_pickedBodyParam = param;
-				#ifdef USE_PICK_BODY_BY_FORCE
-					// save point local to the body matrix
-					m_pickedBodyLocalAtachmentPoint = matrix.UntransformVector (posit);
-
-					// convert normal to local space
-					m_pickedBodyLocalAtachmentNormal = matrix.UnrotateVector(normal);
-				#else
-					if(m_pickJoint) {
-						delete m_pickJoint;
-						m_pickJoint = NULL;
-					}
+				if(m_pickJoint) {
+					delete m_pickJoint;
+					m_pickJoint = NULL;
+				}
 					
-					dFloat Ixx;
-					dFloat Iyy;
-					dFloat Izz;
-					dFloat mass;
-					NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+				dFloat Ixx;
+				dFloat Iyy;
+				dFloat Izz;
+				dFloat mass;
+				NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 
-					// change this to make the grabbing stronger or weaker
-					//const dFloat gfactor = 500.0f;
-					const dFloat angularFritionAccel = 10.0f;
-					const dFloat linearFrictionAccel = 400.0f * dMax (dAbs (DEMO_GRAVITY), dFloat(10.0f));
-					const dFloat inertia = dMax (Izz, dMax (Ixx, Iyy));
+				// change this to make the grabbing stronger or weaker
+				//const dFloat angularFritionAccel = 10.0f;
+				const dFloat angularFritionAccel = 5.0f;
+				const dFloat linearFrictionAccel = 400.0f * dMax (dAbs (DEMO_GRAVITY), dFloat(10.0f));
+				const dFloat inertia = dMax (Izz, dMax (Ixx, Iyy));
 
-					m_pickJoint = new DemoCameraPickBodyJoint (body, posit, this);
-					// set this to 1 for full matrix control
-					//m_pickJoint->SetPickMode (2);
-					m_pickJoint->SetControlMode(dCustomKinematicController::m_linearPlusAngularFriction);
+				m_pickJoint = new DemoCameraPickBodyJoint (body, posit, this);
+				// set this to 1 for full matrix control
+				//m_pickJoint->SetPickMode (2);
+				m_pickJoint->SetControlMode(dCustomKinematicController::m_linearPlusAngularFriction);
 
-					m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
-					m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
-				#endif
+				m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
+				m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
 			}
 		}
 
@@ -299,10 +284,6 @@ void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mous
 			m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);
 
 			#ifdef USE_PICK_BODY_BY_FORCE
-			dMatrix matrix;
-			NewtonBodyGetMatrix (m_targetPicked, &matrix[0][0]);
-			dVector point (matrix.TransformVector(m_pickedBodyLocalAtachmentPoint));
-			CalculatePickForceAndTorque (m_targetPicked, point, m_pickedBodyTargetPosition, timestep);
 			#else 
 				if (m_pickJoint) {
 					// using Dave Gravel method of setting the min and Max friction base of mouse speed.

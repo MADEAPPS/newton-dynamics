@@ -799,8 +799,8 @@ void SingleBodyCar(DemoEntityManager* const scene)
 
 	// create a sport car
 	dPointer<DemoEntity> viperModel (DemoEntity::LoadNGD_mesh("viper.ngd", scene->GetNewton(), scene->GetShaderCache()));
-	dVehicle* const player = manager->CreateSportCar(location, viperModel.GetData());
-	manager->SetAsPlayer(player);
+//	dVehicle* const player = manager->CreateSportCar(location, viperModel.GetData());
+//	manager->SetAsPlayer(player);
 
 	// create an monster Truck
 	location.m_posit.m_z += 3.0f;
