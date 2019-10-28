@@ -222,8 +222,7 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 			normal.m_w = 0.0f;
 			contact.m_w = 1.0f;
 			longitudinalDir = longitudinalDir.Normalize();
-			penetration = dMin (penetration, D_TIRE_MAX_ELASTIC_DEFORMATION);
-
+			dAssert (penetration >= 0.0f);
 			dVehicleCollidingNode* const collidingNode = chassisNode->FindCollideNode(this, bodyArray.m_array[i]);
 			m_contactsJoints[contactCount].SetOwners(this, collidingNode);
 
@@ -326,8 +325,8 @@ void dVehicleTire::Integrate(dFloat timestep)
 						   contact->m_lateralDir.Scale (-contact->m_tireModel.m_lateralForce));
 			dVector torque (r.CrossProduct(force));
 
-			NewtonBodyAddForce(contact->m_collidingNode->m_body, &force[0]);
-			NewtonBodyAddTorque(contact->m_collidingNode->m_body, &torque[0]);
+			//NewtonBodyAddForce(contact->m_collidingNode->m_body, &force[0]);
+			//NewtonBodyAddTorque(contact->m_collidingNode->m_body, &torque[0]);
 		}
 	}
 }
@@ -368,7 +367,7 @@ void dVehicleTire::CalculateFreeDof()
 	dVector chassisOmega(chassisBody->GetOmega());
 	dVector relativeOmega(tireOmega - chassisOmega);
 	m_omega = tireMatrix.m_front.DotProduct3(relativeOmega);
-	dAssert(tireMatrix.m_front.DotProduct3(chassisMatrix.m_front) > 0.999f);
+	dAssert(tireMatrix.m_front.DotProduct3(chassisMatrix.m_front) > 0.998f);
 
 	dFloat cosAngle = tireMatrix.m_right.DotProduct3(chassisMatrix.m_right);
 	dFloat sinAngle = chassisMatrix.m_front.DotProduct3(chassisMatrix.m_right.CrossProduct(tireMatrix.m_right));

@@ -151,6 +151,8 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		dFloat lateralSpeed = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 		dAssert ((m_tireModel.m_lateralSlip + 1.0e-3f) > 0.0f);
 		m_tireModel.m_lateralSlip = lateralSpeed / (m_tireModel.m_lateralSlip + 1.0e-3f);
+		// clamp lateral slip to a max of +- 45 degree (witch is still too high, but reasonable)
+		m_tireModel.m_lateralSlip = dClamp (m_tireModel.m_lateralSlip, dFloat (-1.0f), dFloat(1.0f));
 	}
 
 
@@ -175,32 +177,42 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 
 void dVehicleTireContact::SpecialSolverFrictionCallback(const dFloat* const load, dFloat* const lowFriction, dFloat* const highFriction) const
 {
-	dFloat f = dMax(m_staticFriction * load[0], dFloat(1.0f));
-	dFloat g = m_tireModel.m_gammaStiffness;
+	dAssert (load[0] >= 0.0f);
+	dFloat f = m_staticFriction * load[0];
 
-	dVehicleTire* const tire = GetOwner0()->GetAsTire();
-	const dTireInfo& tireInfo = tire->GetInfo();
-	m_tireModel.m_tireLoad = load[0];
-	m_tireModel.m_alingMoment = 0.0f;
-	m_tireModel.m_lateralForce = load[2];
-	m_tireModel.m_longitunalForce = load[1];
+	if (f > 10.0f) {
+		dFloat g = m_tireModel.m_gammaStiffness;
 
-	// apply brush tire model
-	dFloat r = g / f;
-	if (g < (3.0f * f)) {
-		f = g * (1.0f - (1.0f / 3.0f) * r + (1.0f / 27.0f) * r * r);
+		dVehicleTire* const tire = GetOwner0()->GetAsTire();
+		const dTireInfo& tireInfo = tire->GetInfo();
+		m_tireModel.m_tireLoad = load[0];
+		m_tireModel.m_alingMoment = 0.0f;
+		m_tireModel.m_lateralForce = load[2];
+		m_tireModel.m_longitunalForce = load[1];
+
+		// apply brush tire model
+		dFloat r = g / f;
+		if (g < (3.0f * f)) {
+			f = g * (1.0f - (1.0f / 3.0f) * r + (1.0f / 27.0f) * r * r);
+		}
+		r = f / (g + 1.0e-3f);
+
+		dFloat y = tireInfo.m_corneringStiffness * m_tireModel.m_lateralSlip;
+		dFloat x = tireInfo.m_longitudinalStiffness * m_tireModel.m_longitudinalSlip;
+
+		dAssert(x >= 0.0f);
+		dAssert(y >= 0.0f);
+
+		lowFriction[1] = -x * r;
+		highFriction[1] = x * r;
+
+		lowFriction[2] = -y * r;
+		highFriction[2] = y * r;
+	} else {
+		lowFriction[1] = -f;
+		highFriction[1] = f;
+
+		lowFriction[2] = -f;
+		highFriction[2] = f;
 	}
-	r = f / (g + 1.0e-3f);
-
-	dFloat y = tireInfo.m_corneringStiffness * m_tireModel.m_lateralSlip;
-	dFloat x = tireInfo.m_longitudinalStiffness * m_tireModel.m_longitudinalSlip;
-
-	dAssert(x >= 0.0f);
-	dAssert(y >= 0.0f);
-
-	lowFriction[1] = -x * r;
-	highFriction[1] = x * r;
-
-	lowFriction[2] = -y * r;
-	highFriction[2] = y * r;
 }

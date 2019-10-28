@@ -781,18 +781,18 @@ static void AddBackground(DemoEntityManager* const scene)
 #if 1
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
-	location.m_posit.m_x = 0.0f;
-	location.m_posit.m_y = 0.2f;
-	location.m_posit.m_z = 2.0f;
+	location.m_posit.m_x = 2.0f;
+	location.m_posit.m_y = 1.5f;
+	location.m_posit.m_z = 1.65f;
 
-	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
+	dVector size (1.0f, 3.0f, 1.0f, 0.0f);
 	int count = 1;
-	//AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 200.0f, 0.0f);
+//	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 200.0f, 0.0f);
 
 
-	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
+	size = dVector(1.0f, 0.5f, 4.0f, 0.0f);
 	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, 0, shapeOffsetMatrix);
-	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
+	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
 	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, 0, shapeOffsetMatrix);
 	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, 0, shapeOffsetMatrix);
 	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, 0, shapeOffsetMatrix);
