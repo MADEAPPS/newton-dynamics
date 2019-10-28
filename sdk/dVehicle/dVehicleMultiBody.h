@@ -18,6 +18,7 @@
 #include "dVehicleNode.h"
 #include "dVehicleSolver.h"
 #include "dVehicleDashControl.h"
+#include "dVehicleCollidingNode.h"
 
 class dTireInfo;
 class dEngineInfo;
@@ -67,16 +68,19 @@ class dVehicleMultiBody: public dVehicle, public dVehicleSolver
 	virtual int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 	virtual void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep);
 
+	dVehicleCollidingNode* FindCollideNode(dVehicleNode* const node0, NewtonBody* const body);
+
 	void PreUpdate(dFloat timestep);
 	//void PostUpdate(dFloat timestep);
 
 	static int OnAABBOverlap(const NewtonBody * const body, void* const me);
 
-	dVehicleNode m_groundProxyBody;
+	dArray<dVehicleCollidingNode> m_collidingNodes;
 	dVehicleBrakeControl m_brakeControl;
 	dVehicleEngineControl m_engineControl;
 	dVehicleBrakeControl m_handBrakeControl;
 	dVehicleSteeringControl m_steeringControl;
+	int m_collidingIndex;
 
 	friend class dVehicleTire;
 	friend class dVehicleSolver;

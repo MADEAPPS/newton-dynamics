@@ -20,7 +20,8 @@
 dVehicleMultiBody::dVehicleMultiBody(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
 	:dVehicle(body, localFrame, gravityMag)
 	,dVehicleSolver()
-	,m_groundProxyBody(NULL)
+	,m_collidingNodes(8)
+	,m_collidingIndex(0)
 {
 	m_brakeControl.Init(this);
 	m_engineControl.Init(this);
@@ -96,8 +97,6 @@ void dVehicleMultiBody::Finalize()
 
 const void dVehicleMultiBody::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
-	dVehicleNode::Debug(debugContext);
-
 	const dMatrix& matrix = m_proxyBody.GetMatrix();
 
 	// draw velocity
@@ -124,6 +123,8 @@ const void dVehicleMultiBody::Debug(dCustomJoint::dDebugDisplay* const debugCont
 		dVector p3(p0 - gravityDir.Scale(2.0f));
 		debugContext->DrawLine(p0, p3);
 	}
+
+	dVehicleNode::Debug(debugContext);
 }
 
 void dVehicleMultiBody::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep)
@@ -360,8 +361,9 @@ void dVehicleMultiBody::ApplyExternalForce()
 	dMatrix matrix;
 	dVector vector(0.0f);
 
-	m_groundProxyBody.m_proxyBody.SetForce(vector);
-	m_groundProxyBody.m_proxyBody.SetTorque(vector);
+	m_collidingIndex = 0;
+//	m_groundProxyBody.m_proxyBody.SetForce(vector);
+//	m_groundProxyBody.m_proxyBody.SetTorque(vector);
 
 	// get data from engine rigid body and copied to the vehicle chassis body
 	NewtonBodyGetMatrix(m_newtonBody, &matrix[0][0]);
@@ -488,25 +490,82 @@ void dVehicleMultiBody::CalculateSuspensionForces(dFloat timestep)
 	m_proxyBody.SetTorque(m_proxyBody.GetTorque() + chassisTorque);
 }
 
+dVehicleCollidingNode* dVehicleMultiBody::FindCollideNode(dVehicleNode* const node0, NewtonBody* const body)
+{
+/*
+	dFloat invMass;
+	dFloat invIxx;
+	dFloat invIyy;
+	dFloat invIzz;
+	NewtonBodyGetInvMass(body, &invMass, &invIxx, &invIyy, &invIzz);
+	NewtonBody* const dynamicBody = invMass > 0.0f ? body : NULL;
+*/
+	NewtonBody* const dynamicBody = body;
+
+	for (int i = 0; i < m_collidingIndex; i ++) {
+		dVehicleCollidingNode* const node1 = &m_collidingNodes[i];
+		if (node1->m_body == dynamicBody) {
+			return node1;
+		}
+	}
+
+	dVehicleCollidingNode* const node1 = &m_collidingNodes[m_collidingIndex];
+	node1->m_body = dynamicBody;
+	node1->m_index = m_collidingIndex + dVehicleSolver::m_nodeCount;
+	dVehicleSolver::m_nodesOrder[node1->m_index] = node1;
+
+	dVector vector(0.0f);
+	dMatrix matrix(dGetIdentityMatrix());
+	dComplementaritySolver::dBodyState& proxyBody = node1->GetProxyBody();
+	if (dynamicBody) {
+		dFloat Mass;
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+
+		NewtonBodyGetMass(dynamicBody, &Mass, &Ixx, &Iyy, &Izz);
+		proxyBody.SetMass(Mass);
+		proxyBody.SetInertia(Ixx, Iyy, Izz);
+
+		NewtonBodyGetCentreOfMass(dynamicBody, &matrix.m_posit[0]);
+		matrix.m_posit.m_w = 1.0f;
+		proxyBody.SetLocalMatrix(matrix);
+
+		NewtonBodyGetMatrix(dynamicBody, &matrix[0][0]);
+		proxyBody.SetMatrix(matrix);
+
+		NewtonBodyGetVelocity(m_newtonBody, &vector[0]);
+		proxyBody.SetVeloc(vector);
+
+		NewtonBodyGetOmega(m_newtonBody, &vector[0]);
+		proxyBody.SetOmega(vector);
+
+		NewtonBodyGetForce(m_newtonBody, &vector[0]);
+		proxyBody.SetForce(vector);
+
+		NewtonBodyGetTorque(m_newtonBody, &vector[0]);
+		proxyBody.SetTorque(vector);
+	} else {
+		proxyBody.SetMass(0.0f);
+		proxyBody.SetInertia(0.0f, 0.0f, 0.0f);
+		proxyBody.SetLocalMatrix(matrix);
+		proxyBody.SetMatrix(matrix);
+		proxyBody.SetVeloc(vector);
+		proxyBody.SetOmega(vector);
+		proxyBody.SetForce(vector);
+		proxyBody.SetTorque(vector);
+	}
+	proxyBody.UpdateInertia();
+
+	m_collidingIndex ++;
+	dAssert (m_collidingIndex <= 8);
+	return node1;
+}
+
 int dVehicleMultiBody::OnAABBOverlap(const NewtonBody * const body, void* const context)
 {
 	dCollectCollidingBodies* const bodyList = (dCollectCollidingBodies*)context;
 	if (body != bodyList->m_exclude) {
-/*
-		dFloat mass;
-		dFloat Ixx;
-		dFloat Iyy;
-		dFloat Izz;
-		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-		bodyList->m_array[bodyList->m_count] = (NewtonBody*)body;
-		if (mass == 0.0f) {
-			for (int i = bodyList->m_count; i > 0; i--) {
-				bodyList->m_array[i] = bodyList->m_array[i - 1];
-			}
-			bodyList->m_array[0] = (NewtonBody*)body;
-			bodyList->m_staticCount++;
-		}
-*/
 		bodyList->m_array[bodyList->m_count] = (NewtonBody*)body;
 		bodyList->m_count++;
 		dAssert(bodyList->m_count < sizeof(bodyList->m_array) / sizeof(bodyList->m_array[1]));

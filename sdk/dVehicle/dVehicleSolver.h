@@ -67,7 +67,8 @@ class dVehicleSolver
 	void dGaussSeidelLcpSor(const int size, dFloat* const x, const dFloat* const b, const int* const normalIndex, 
 							dFloat* const low, dFloat* const high, dComplementaritySolver::dBilateralJoint** const frictionCallback) const;
 
-	dVehicleNode** m_nodesOrder;
+//	dVehicleNode** m_nodesOrder;
+	dArray<dVehicleNode*> m_nodesOrder;
 	int* m_matrixRowsIndex;
 	dNodePair* m_pairs;
 	dFloat* m_deltaForce;
@@ -84,6 +85,8 @@ class dVehicleSolver
 	int m_loopRowCount;
 	int m_loopJointCount;
 	int m_auxiliaryRowCount;
+
+	friend class dVehicleMultiBody;
 };
 
 #endif 

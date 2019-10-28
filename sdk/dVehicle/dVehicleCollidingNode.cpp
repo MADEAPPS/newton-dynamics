@@ -9,22 +9,15 @@
 * freely
 */
 
+
 #include "dStdafxVehicle.h"
-#include "dVehicleNode.h"
-#include "dVehicleLoopJoint.h"
+#include "dVehicleCollidingNode.h"
 
-dVehicleLoopJoint::dVehicleLoopJoint()
-	:dComplementaritySolver::dBilateralJoint()
-	,m_owner0(NULL)
-	,m_owner1(NULL)
-	,m_isActive(false)
+dVehicleCollidingNode::dVehicleCollidingNode()
+	:dVehicleNode(NULL)
 {
 }
 
-void dVehicleLoopJoint::SetOwners(dVehicleNode* const owner0, dVehicleNode* const owner1)
+dVehicleCollidingNode::~dVehicleCollidingNode()
 {
-	m_owner0 = owner0;
-	m_owner1 = owner1;
-	Init(&m_owner0->GetProxyBody(), &m_owner1->GetProxyBody());
 }
-

@@ -68,7 +68,6 @@ class dTireInfo
 	dFloat m_longitudinalStiffness;
 	dFloat m_frictionCoefficient;
 	//dFloat m_aligningMomentTrail;
-	//int m_hasFender;
 	//dSuspensionType m_suspentionType;
 };
 
@@ -109,7 +108,7 @@ class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilater
 
 	dMatrix m_matrix;
 	dMatrix m_bindingRotation;
-	dVehicleNode m_dynamicContactBodyNode;
+//	dVehicleNode m_dynamicContactBodyNode;
 	dVehicleTireContact m_contactsJoints[3];
 	dTireInfo m_info;
 	NewtonCollision* m_tireShape;

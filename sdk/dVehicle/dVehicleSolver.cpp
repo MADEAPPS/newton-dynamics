@@ -49,10 +49,10 @@ class dVehicleSolver::dBodyJointMatrixDataPair
 };
 
 dVehicleSolver::dVehicleSolver()
+	:m_nodesOrder(8)
 {
 	m_data = NULL;
 	m_pairs = NULL;
-	m_nodesOrder = NULL;
 	m_loopJoints = NULL;
 	m_deltaForce = NULL;
 	m_leftHandSide = NULL;
@@ -71,9 +71,6 @@ dVehicleSolver::dVehicleSolver()
 
 dVehicleSolver::~dVehicleSolver()
 {
-	if (m_nodesOrder) {
-		delete[] m_nodesOrder; 
-	}
 }
 
 int dVehicleSolver::CalculateNodeCount () const
@@ -118,19 +115,15 @@ void dVehicleSolver::Finalize()
 		return ;
 	}
 
-	if (m_nodesOrder) {
-		delete m_nodesOrder;
-	}
-
 	m_nodeCount = CalculateNodeCount ();
 	m_maxNodeCount = m_nodeCount * 2 + 8;
-	m_nodesOrder = new dVehicleNode*[m_maxNodeCount * sizeof (dVehicleNode*)];
+//	m_nodesOrder = new dVehicleNode*[m_maxNodeCount * sizeof (dVehicleNode*)];
 
 	int index = 0;
 	SortGraph(rootNode, index);
-	dAssert(index == m_nodeCount);
-	rootNode->m_groundProxyBody.m_index = index;
-	m_nodesOrder[index] = &rootNode->m_groundProxyBody;
+//	dAssert(index == m_nodeCount);
+//	rootNode->m_groundProxyBody.m_index = index;
+//	m_nodesOrder[index] = &rootNode->m_groundProxyBody;
 }
 
 void dVehicleSolver::CalculateInertiaMatrix(dVehicleNode* const node) const
@@ -565,7 +558,7 @@ void dVehicleSolver::InitMassMatrix()
 	int rowCount = 0;
 	int auxiliaryRowCount = 0;
 
-	dAssert (m_nodesOrder);
+//	dAssert (m_nodesOrder);
 	for (int i = 0; i < m_nodeCount - 1; i++) {
 		dVehicleNode* const node = m_nodesOrder[i];
 		Factorize(node);

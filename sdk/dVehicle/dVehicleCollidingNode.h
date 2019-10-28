@@ -9,22 +9,27 @@
 * freely
 */
 
+
+#ifndef __D_VEHICLE_COLLIDING_NODE_H__
+#define __D_VEHICLE_COLLIDING_NODE_H__
+
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
-#include "dVehicleLoopJoint.h"
 
-dVehicleLoopJoint::dVehicleLoopJoint()
-	:dComplementaritySolver::dBilateralJoint()
-	,m_owner0(NULL)
-	,m_owner1(NULL)
-	,m_isActive(false)
-{
-}
+class dVehicleMultiBody;
 
-void dVehicleLoopJoint::SetOwners(dVehicleNode* const owner0, dVehicleNode* const owner1)
+class dVehicleCollidingNode: public dVehicleNode
 {
-	m_owner0 = owner0;
-	m_owner1 = owner1;
-	Init(&m_owner0->GetProxyBody(), &m_owner1->GetProxyBody());
-}
+	public:
+	dVehicleCollidingNode();
+	~dVehicleCollidingNode();
+
+	private:
+	NewtonBody* m_body;
+	friend class dVehicleTire;
+	friend class dVehicleMultiBody;
+};
+
+
+#endif 
 

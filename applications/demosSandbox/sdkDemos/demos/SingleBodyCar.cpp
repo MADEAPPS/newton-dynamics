@@ -322,7 +322,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 		tireInfo.m_longitudinalStiffness = data.m_longitudinalStiffness * dAbs(vehicleMass * DEMO_GRAVITY);
 
 		//tireInfo.m_aligningMomentTrail = definition.m_tireAligningMomemtTrail;
-		//tireInfo.m_hasFender = definition.m_wheelHasCollisionFenders;
 		//tireInfo.m_suspentionType = definition.m_tireSuspensionType;
 
 		dVehicleTire* const tire = vehicle->AddTire(tireMatrix, tireInfo);
@@ -779,29 +778,27 @@ static void AddBackground(DemoEntityManager* const scene)
 	terrainEntity->SetMatrixUsafe(dQuaternion(location), location.m_posit);
 #endif
 
-#if 0
+#if 1
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
-	location.m_posit.m_x = 2.0f;
-	location.m_posit.m_y = 1.0f;
-	location.m_posit.m_z = 0.0f;
+	location.m_posit.m_x = 0.0f;
+	location.m_posit.m_y = 0.2f;
+	location.m_posit.m_z = 2.0f;
 
 	dVector size (3.0f, 0.125f, 3.0f, 0.0f);
-
 	int count = 1;
-	AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
+	//AddPrimitiveArray(scene, 100.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 200.0f, 0.0f);
 
-/*
+
 	size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-*/		
+	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, 0, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
+	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, 0, shapeOffsetMatrix);
+	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, 0, shapeOffsetMatrix);
+	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, 0, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, 0, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, 0, shapeOffsetMatrix);
+	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, 0, shapeOffsetMatrix);
 #endif
 
 }

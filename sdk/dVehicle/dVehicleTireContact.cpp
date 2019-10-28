@@ -21,29 +21,24 @@ dVehicleTireContact::dVehicleTireContact()
 	,m_normal(0.0f)
 	,m_lateralDir(0.0f)
 	,m_longitudinalDir(0.0f)
+	,m_collidingNode(NULL)
 	,m_penetration(0.0f)
 	,m_staticFriction(1.0f)
 	,m_tireModel()
+	,m_isPatchContact(false)
 {
-	m_jointFeebackForce[0] = 0.0f;
-	m_jointFeebackForce[1] = 0.0f;
-	m_jointFeebackForce[2] = 0.0f;
 }
 
 void dVehicleTireContact::ResetContact()
 {
-	if (m_isActive == false) {
-		m_jointFeebackForce[0] = 0.0f;
-		m_jointFeebackForce[1] = 0.0f;
-		m_jointFeebackForce[2] = 0.0f;
-	}
 	m_isActive = false;
 }
 
-void dVehicleTireContact::SetContact(const dVector& posit, const dVector& normal, const dVector& longitudinalDir, dFloat penetration, dFloat staticFriction, bool isPatch)
+void dVehicleTireContact::SetContact(dVehicleCollidingNode* const node, const dVector& posit, const dVector& normal, const dVector& longitudinalDir, dFloat penetration, dFloat staticFriction, bool isPatch)
 {
 	m_point = posit;
 	m_normal = normal;
+	m_collidingNode = node;
 	m_longitudinalDir = longitudinalDir;
 	m_lateralDir = m_longitudinalDir.CrossProduct(m_normal);
 
@@ -76,7 +71,6 @@ void dVehicleTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext,
 
 	// show tire load
 	debugContext->SetColor(dVector(0.0f, 0.0f, 1.0f, 1.0f));
-	//dVector p1(origin + m_normal.Scale(scale * m_jointFeebackForce[0]));
 	dVector p1(origin + m_normal.Scale(scale * m_tireModel.m_tireLoad));
 	debugContext->DrawLine(origin, p1);
 
@@ -191,31 +185,22 @@ void dVehicleTireContact::SpecialSolverFrictionCallback(const dFloat* const load
 	m_tireModel.m_lateralForce = load[2];
 	m_tireModel.m_longitunalForce = load[1];
 
-	if (g < (0.1f * load[0])) {
-		// low speed just apply static friction 
-		lowFriction[1] = -f;
-		highFriction[1] = f;
-		lowFriction[2] = -f;
-		highFriction[2] = f;
-	} else {
-		// apply brush tire model
-
-		dFloat r = g / f;
-		if (g < (3.0f * f)) {
-			f = g * (1.0f - (1.0f / 3.0f) * r + (1.0f / 27.0f) * r * r);
-		}
-		r = f / (g + 1.0e-3f);
-
-		dFloat y = tireInfo.m_corneringStiffness * m_tireModel.m_lateralSlip;
-		dFloat x = tireInfo.m_longitudinalStiffness * m_tireModel.m_longitudinalSlip;
-
-		dAssert(x >= 0.0f);
-		dAssert(y >= 0.0f);
-
-		lowFriction[1] = -x * r;
-		highFriction[1] = x * r;
-
-		lowFriction[2] = -y * r;
-		highFriction[2] = y * r;
+	// apply brush tire model
+	dFloat r = g / f;
+	if (g < (3.0f * f)) {
+		f = g * (1.0f - (1.0f / 3.0f) * r + (1.0f / 27.0f) * r * r);
 	}
+	r = f / (g + 1.0e-3f);
+
+	dFloat y = tireInfo.m_corneringStiffness * m_tireModel.m_lateralSlip;
+	dFloat x = tireInfo.m_longitudinalStiffness * m_tireModel.m_longitudinalSlip;
+
+	dAssert(x >= 0.0f);
+	dAssert(y >= 0.0f);
+
+	lowFriction[1] = -x * r;
+	highFriction[1] = x * r;
+
+	lowFriction[2] = -y * r;
+	highFriction[2] = y * r;
 }
