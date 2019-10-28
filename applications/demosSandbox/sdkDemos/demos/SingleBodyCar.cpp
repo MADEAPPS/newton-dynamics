@@ -577,7 +577,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, VIPER_CHASSIS_MASS, monsterTruckTire);
 		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", width, radio, VIPER_CHASSIS_MASS, monsterTruckTire);
 
-/*
 		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
 		steeringControl->AddTire(frontLeft);
@@ -597,7 +596,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		brakeControl->AddTire(frontRight);
 		brakeControl->AddTire(rearLeft);
 		brakeControl->AddTire(rearRight);
-
+/*
 		// add a differential 
 		dVehicleDifferential* const differential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, rearLeft, rearRight);
 

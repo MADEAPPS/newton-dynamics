@@ -534,16 +534,16 @@ dVehicleCollidingNode* dVehicleMultiBody::FindCollideNode(dVehicleNode* const no
 		NewtonBodyGetMatrix(dynamicBody, &matrix[0][0]);
 		proxyBody.SetMatrix(matrix);
 
-		NewtonBodyGetVelocity(m_newtonBody, &vector[0]);
+		NewtonBodyGetVelocity(dynamicBody, &vector[0]);
 		proxyBody.SetVeloc(vector);
 
-		NewtonBodyGetOmega(m_newtonBody, &vector[0]);
+		NewtonBodyGetOmega(dynamicBody, &vector[0]);
 		proxyBody.SetOmega(vector);
 
-		NewtonBodyGetForce(m_newtonBody, &vector[0]);
+		NewtonBodyGetForce(dynamicBody, &vector[0]);
 		proxyBody.SetForce(vector);
 
-		NewtonBodyGetTorque(m_newtonBody, &vector[0]);
+		NewtonBodyGetTorque(dynamicBody, &vector[0]);
 		proxyBody.SetTorque(vector);
 	} else {
 		proxyBody.SetMass(0.0f);
