@@ -80,7 +80,6 @@ void DemoCameraManager::SetCameraMatrix(DemoEntityManager* const scene, const dQ
 	m_pitch = m_camera->GetPichAngle();
 }
 
-
 void DemoCameraManager::FixUpdate (const NewtonWorld* const world, dFloat timestep)
 {
 	// update the camera;
@@ -163,7 +162,7 @@ void DemoCameraManager::FixUpdate (const NewtonWorld* const world, dFloat timest
 	};
 	dReplay replay;
 
-	#if 1
+	#if 0
 		replay.m_p0 = p0;
 		replay.m_p1 = p1;
 		replay.m_mouseState = mouseState ? 1 : 0;
@@ -193,7 +192,6 @@ void DemoCameraManager::SetCameraMouseLock (bool loockState)
 	m_mouseLockState = loockState;
 }
 
-
 void DemoCameraManager::RenderPickedTarget () const
 {
 	if (m_targetPicked) {
@@ -205,7 +203,6 @@ void DemoCameraManager::RenderPickedTarget () const
 		ShowMousePicking (p0, p1);
 	}
 }
-
 
 void DemoCameraManager::InterpolateMatrices (DemoEntityManager* const scene, dFloat param)
 {
@@ -228,7 +225,6 @@ void DemoCameraManager::OnBodyDestroy (NewtonBody* const body)
 	m_targetPicked = NULL;
 	m_bodyDestructor = NULL;
 }
-
 
 void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mousePickState, const dVector& p0, const dVector& p1, dFloat timestep) 
 {
@@ -266,8 +262,6 @@ void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mous
 				const dFloat inertia = dMax (Izz, dMax (Ixx, Iyy));
 
 				m_pickJoint = new DemoCameraPickBodyJoint (body, posit, this);
-				// set this to 1 for full matrix control
-				//m_pickJoint->SetPickMode (2);
 				m_pickJoint->SetControlMode(dCustomKinematicController::m_linearPlusAngularFriction);
 
 				m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
