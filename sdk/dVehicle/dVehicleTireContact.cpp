@@ -107,7 +107,12 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 			jacobian1.m_angular = dVector(0.0f);
 			constraintParams->m_jointAccel[index] += D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS * m_penetration * constraintParams->m_timestepInv;
 		} else {
-			constraintParams->m_jointAccel[index] += D_TIRE_PENETRATION_RECOVERING_SPEED * m_penetration * constraintParams->m_timestepInv;
+			dFloat recoverAccel = D_TIRE_PENETRATION_RECOVERING_SPEED * D_TIRE_MAX_ELASTIC_DEFORMATION * constraintParams->m_timestepInv;
+			if (constraintParams->m_jointAccel[index] > -recoverAccel) {
+				constraintParams->m_jointAccel[index] += D_TIRE_PENETRATION_RECOVERING_SPEED * m_penetration * constraintParams->m_timestepInv;
+			} else {
+				constraintParams->m_jointAccel[index] = 0.0f;
+			}
 		}
 	}
 

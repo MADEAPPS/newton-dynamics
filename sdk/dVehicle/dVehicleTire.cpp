@@ -154,6 +154,12 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 	dFloat penetration(0.0f);
 	dFloat param = 1.0f - m_position * m_invSuspensionLength;
 
+//static int xxx;
+//xxx++;
+//dTrace(("%d\n", xxx));
+//if ((xxx > 11050) && m_index == 0)
+//xxx *= 1;
+
 	for (int i = 0; i < bodyArray.m_count; i ++) {
 		dMatrix matrixB;
 		dLong attributeA;
@@ -344,15 +350,6 @@ void dVehicleTire::ApplyExternalForce()
 
 	m_proxyBody.SetTorque(dVector(0.0f));
 	m_proxyBody.SetForce(chassisNode->GetGravity().Scale(m_proxyBody.GetMass()));
-
-/*
-if (m_index == 3) {
-	dVector veloc(m_proxyBody.GetVelocity());
-	float xxxx = dAbs (veloc.DotProduct3(tireMatrix.m_up)) + 0.01f;
-	float yyyy = veloc.DotProduct3(tireMatrix.m_front);
-	dTrace(("tireBeta =%f\n", dAtan2(yyyy, xxxx) * dRadToDegree));
-}
-*/
 }
 
 void dVehicleTire::CalculateFreeDof()

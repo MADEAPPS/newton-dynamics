@@ -492,15 +492,15 @@ void dVehicleMultiBody::CalculateSuspensionForces(dFloat timestep)
 
 dVehicleCollidingNode* dVehicleMultiBody::FindCollideNode(dVehicleNode* const node0, NewtonBody* const body)
 {
-/*
-	dFloat invMass;
-	dFloat invIxx;
-	dFloat invIyy;
-	dFloat invIzz;
-	NewtonBodyGetInvMass(body, &invMass, &invIxx, &invIyy, &invIzz);
-	NewtonBody* const dynamicBody = invMass > 0.0f ? body : NULL;
-*/
-	NewtonBody* const dynamicBody = body;
+	NewtonBody* dynamicBody = body;
+	if (dynamicBody) {
+		dFloat invMass;
+		dFloat invIxx;
+		dFloat invIyy;
+		dFloat invIzz;
+		NewtonBodyGetInvMass(body, &invMass, &invIxx, &invIyy, &invIzz);
+		dynamicBody = invMass > 0.0f ? body : NULL;
+	}
 
 	for (int i = 0; i < m_collidingIndex; i ++) {
 		dVehicleCollidingNode* const node1 = &m_collidingNodes[i];
