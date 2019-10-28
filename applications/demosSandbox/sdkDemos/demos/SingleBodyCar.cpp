@@ -596,9 +596,12 @@ class SingleBodyVehicleManager: public dVehicleManager
 		brakeControl->AddTire(frontRight);
 		brakeControl->AddTire(rearLeft);
 		brakeControl->AddTire(rearRight);
-/*
+
 		// add a differential 
-		dVehicleDifferential* const differential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, rearLeft, rearRight);
+		//dVehicleDifferential* const frontDifferential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, frontLeft, frontRight);
+		//dVehicleDifferential* const rearDifferential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, rearLeft, rearRight);
+		//dVehicleDifferential* const differential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, frontDifferential, rearDifferential);
+		dVehicleDifferential* const differential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, frontLeft, frontRight);
 
 		// add and internal combustion engine
 		dEngineInfo engineInfo;
@@ -627,12 +630,11 @@ class SingleBodyVehicleManager: public dVehicleManager
 		engineInfo.m_gearRatios[dEngineInfo::m_firstGear + 5] = 0.50f;	// GEAR_6
 		engineInfo.m_gearsCount = 8;
 
-
 		// Set Engine and engine control
 		dVehicleEngine* const engine = vehicle->AddEngine(engineInfo, differential);
 		dVehicleEngineControl* const engineControl = vehicle->GetEngineControl();
 		engineControl->SetEngine(engine);
-*/
+
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		vehicle->Finalize();
 
@@ -777,7 +779,7 @@ static void AddBackground(DemoEntityManager* const scene)
 	terrainEntity->SetMatrixUsafe(dQuaternion(location), location.m_posit);
 #endif
 
-#if 1
+#if 0
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	location.m_posit.m_x = 2.5f;
@@ -824,7 +826,8 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	location.m_posit.m_z += 3.0f;
 	location.m_posit.m_y += 1.0f;
 	dPointer<DemoEntity> monsterTruck (DemoEntity::LoadNGD_mesh("monsterTruck.ngd", scene->GetNewton(), scene->GetShaderCache()));
-	manager->CreateOffRoadCar(location, monsterTruck.GetData());
+	dVehicle* const player = manager->CreateOffRoadCar(location, monsterTruck.GetData());
+	manager->SetAsPlayer(player);
 
 	int count = 10;
 	count = 0;

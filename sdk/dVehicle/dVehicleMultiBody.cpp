@@ -330,6 +330,12 @@ dVehicleDifferential* dVehicleMultiBody::AddDifferential(dFloat mass, dFloat rad
 	return differential;
 }
 
+dVehicleDifferential* dVehicleMultiBody::AddDifferential(dFloat mass, dFloat radius, dVehicleDifferential* const differential0, dVehicleDifferential* const differential1)
+{
+	dVehicleDifferential* const differential = new dVehicleDifferential(this, mass, radius, differential0, differential1);
+	return differential;
+}
+
 dVehicleEngine* dVehicleMultiBody::AddEngine(const dEngineInfo& engineInfo, dVehicleDifferential* const differential)
 {
 	dVehicleEngine* const engine = new dVehicleEngine(this, engineInfo, differential);

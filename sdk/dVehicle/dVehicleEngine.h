@@ -114,6 +114,7 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 			,m_crowndGear(6.0f)
 			,m_clutchTorque(1.0e20f)
 		{
+			m_isActive = true;
 		}
 
 		void SetGearRatio(dFloat ratio)

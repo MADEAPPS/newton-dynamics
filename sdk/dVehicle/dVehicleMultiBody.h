@@ -53,6 +53,7 @@ class dVehicleMultiBody: public dVehicle, public dVehicleSolver
 	DVEHICLE_API dVehicleTire* AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
 	DVEHICLE_API dVehicleEngine* AddEngine(const dEngineInfo& engineInfo, dVehicleDifferential* const differential);
 	DVEHICLE_API dVehicleDifferential* AddDifferential(dFloat mass, dFloat radius, dVehicleTire* const leftTire, dVehicleTire* const rightTire);
+	DVEHICLE_API dVehicleDifferential* AddDifferential(dFloat mass, dFloat radius, dVehicleDifferential* const differential0, dVehicleDifferential* const differential1);
 
 	DVEHICLE_API dVehicleBrakeControl* GetBrakeControl();
 	DVEHICLE_API dVehicleEngineControl* GetEngineControl();

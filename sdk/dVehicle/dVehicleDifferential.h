@@ -28,6 +28,7 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 			:dVehicleLoopJoint()
 			,m_diffSign(1.0f)
 		{
+			m_isActive = true;
 		}
 
 		private:
