@@ -68,12 +68,6 @@ dVehicleTire::dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& loca
 	m_proxyBody.SetMass(m_info.m_mass);
 	m_proxyBody.SetInertia(inertia.m_x, inertia.m_y, inertia.m_z);
 	m_proxyBody.UpdateInertia();
-	
-//	for (int i = 0 ; i < sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1; i ++) {
-//		dAssert (0);
-//		m_contactsJoints[i].SetOwners (this, &chassis->m_groundProxyBody);
-//	}
-//	m_contactsJoints[sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1].SetOwners(this, &m_dynamicContactBodyNode);
 }
 
 dVehicleTire::~dVehicleTire()
@@ -228,7 +222,6 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 			normal.m_w = 0.0f;
 			contact.m_w = 1.0f;
 			longitudinalDir = longitudinalDir.Normalize();
-			dAssert (penetration >= 0.0f);
 			dVehicleCollidingNode* const collidingNode = chassisNode->FindCollideNode(this, bodyArray.m_array[i]);
 			m_contactsJoints[contactCount].SetOwners(this, collidingNode);
 
@@ -331,8 +324,8 @@ void dVehicleTire::Integrate(dFloat timestep)
 						   contact->m_lateralDir.Scale (-contact->m_tireModel.m_lateralForce));
 			dVector torque (r.CrossProduct(force));
 
-			//NewtonBodyAddForce(contact->m_collidingNode->m_body, &force[0]);
-			//NewtonBodyAddTorque(contact->m_collidingNode->m_body, &torque[0]);
+			NewtonBodyAddForce(contact->m_collidingNode->m_body, &force[0]);
+			NewtonBodyAddTorque(contact->m_collidingNode->m_body, &torque[0]);
 		}
 	}
 }
