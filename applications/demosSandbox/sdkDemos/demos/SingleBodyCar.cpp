@@ -785,20 +785,16 @@ static void AddBackground(DemoEntityManager* const scene)
 	location.m_posit.m_z = 1.6f;
 
 	dVector size(1.0f, 0.5f, 1.0f, 0.0f);
-	int count = 1;
-//	AddPrimitiveArray(scene, 0.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 200.0f, 0.0f);
-	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 200.0f, 0.0f);
+	int count = 4;
 
-	//count = 4;
-	//size = dVector(1.0f, 0.5f, 1.0f, 0.0f);
-	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, 0, shapeOffsetMatrix);
-	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
-	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, 0, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, 0, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, 0, shapeOffsetMatrix);
 	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, 0, shapeOffsetMatrix);
 	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, 0, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, 0, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, 0, shapeOffsetMatrix);
-	//	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, 0, shapeOffsetMatrix);
+	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, 0, shapeOffsetMatrix);
+	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, 0, shapeOffsetMatrix);
+	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, 0, shapeOffsetMatrix);
 #endif
 
 }
