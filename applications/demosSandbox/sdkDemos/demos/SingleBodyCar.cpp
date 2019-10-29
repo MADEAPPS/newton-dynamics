@@ -29,7 +29,6 @@ struct TIRE_DATA
 	dFloat m_pivotOffset;
 	dFloat m_steerRate;
 	dFloat m_frictionCoefficient;
-//	dFloat m_maxSteeringAngle;
 	dFloat m_suspensionLength;
 	dFloat m_dampingRatio;
 	dFloat m_springStiffness;
@@ -51,7 +50,6 @@ static TIRE_DATA viperTire
 	0.01f,				//m_pivotOffset;
 	0.5f,				//m_steerRate;
 	1.0f,				//m_frictionCoefficient
-//	35.0f,				//m_maxSteeringAngle
 	0.22f,				//m_suspensionLength
 	15.0f,				//m_dampingRatio
 	8.0f,				//m_springStiffness
@@ -72,11 +70,10 @@ static TIRE_DATA monsterTruckTire
 	MONSTER_TRUCK_TIRE_MASS,	//m_mass;
 	0.01f,						//m_pivotOffset;
 	0.5f,						//m_steerRate;
-	1.0f,						//m_frictionCoefficient
-//	-35.0f,						//m_maxSteeringAngle
+	1.4f,						//m_frictionCoefficient
 	0.5f,						//m_suspensionLength
-	15.0f,						//m_dampingRatio
-	8.0f,						//m_springStiffness
+	10.0f,						//m_dampingRatio
+	6.0f,						//m_springStiffness
 	20.0f,						//m_corneringStiffness
 	2.0f,						//m_longitudinalStiffness
 };
