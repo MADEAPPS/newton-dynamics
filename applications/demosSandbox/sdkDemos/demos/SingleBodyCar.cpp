@@ -29,7 +29,7 @@ struct TIRE_DATA
 	dFloat m_pivotOffset;
 	dFloat m_steerRate;
 	dFloat m_frictionCoefficient;
-	dFloat m_maxSteeringAngle;
+//	dFloat m_maxSteeringAngle;
 	dFloat m_suspensionLength;
 	dFloat m_dampingRatio;
 	dFloat m_springStiffness;
@@ -51,7 +51,7 @@ static TIRE_DATA viperTire
 	0.01f,				//m_pivotOffset;
 	0.5f,				//m_steerRate;
 	1.0f,				//m_frictionCoefficient
-	35.0f,				//m_maxSteeringAngle
+//	35.0f,				//m_maxSteeringAngle
 	0.22f,				//m_suspensionLength
 	15.0f,				//m_dampingRatio
 	8.0f,				//m_springStiffness
@@ -61,7 +61,7 @@ static TIRE_DATA viperTire
 
 
 #define MONSTER_TRUCK_CHASSIS_MASS	1200.0f
-#define MONSTER_TRUCK_TIRE_MASS		30.0f
+#define MONSTER_TRUCK_TIRE_MASS		100.0f
 #define MONSTER_TRUCK_DIFF_MASS		30.0f
 #define MONSTER_TRUCK_ENGINE_MASS	40.0f
 #define MONSTER_TRUCK_DIFF_RADIUS	0.25f
@@ -73,7 +73,7 @@ static TIRE_DATA monsterTruckTire
 	0.01f,						//m_pivotOffset;
 	0.5f,						//m_steerRate;
 	1.0f,						//m_frictionCoefficient
-	35.0f,						//m_maxSteeringAngle
+//	-35.0f,						//m_maxSteeringAngle
 	0.5f,						//m_suspensionLength
 	15.0f,						//m_dampingRatio
 	8.0f,						//m_springStiffness
@@ -303,7 +303,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		camera->SetNextMatrix(*scene, camMatrix, camOrigin);
 	}
 
-	dVehicleTire* AddTire(dVehicleMultiBody* const vehicle, const char* const tireName, dFloat width, dFloat radius, dFloat vehicleMass, const TIRE_DATA& data)
+	dVehicleTire* AddTire(dVehicleMultiBody* const vehicle, const char* const tireName, dFloat steeringAngle, dFloat width, dFloat radius, dFloat vehicleMass, const TIRE_DATA& data)
 	{
 		DemoEntity* const entity = (DemoEntity*)vehicle->GetUserData();
 		DemoEntity* const tirePart = entity->Find(tireName);
@@ -323,7 +323,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		tireInfo.m_pivotOffset = data.m_pivotOffset;
 		tireInfo.m_steerRate = data.m_steerRate * dPi;
 		tireInfo.m_frictionCoefficient = data.m_frictionCoefficient;
-		tireInfo.m_maxSteeringAngle = data.m_maxSteeringAngle * dDegreeToRad;
+		tireInfo.m_maxSteeringAngle = steeringAngle * dDegreeToRad;
 		tireInfo.m_suspensionLength = data.m_suspensionLength;
 		tireInfo.m_dampingRatio = data.m_dampingRatio * vehicleMass;
 		tireInfo.m_springStiffness = data.m_springStiffness * dAbs(vehicleMass * DEMO_GRAVITY / tireInfo.m_suspensionLength);
@@ -457,12 +457,12 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions ("fl_tire", width, radio, world, vehicleEntity);
-		dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, VIPER_CHASSIS_MASS, viperTire);
-		dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", width, radio, VIPER_CHASSIS_MASS, viperTire);
+		dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", 35.0f, width, radio, VIPER_CHASSIS_MASS, viperTire);
+		dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", 35.0f, width, radio, VIPER_CHASSIS_MASS, viperTire);
 
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
-		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, VIPER_CHASSIS_MASS, viperTire);
-		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", width, radio, VIPER_CHASSIS_MASS, viperTire);
+		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", 0.0f, width, radio, VIPER_CHASSIS_MASS, viperTire);
+		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", 0.0f, width, radio, VIPER_CHASSIS_MASS, viperTire);
 
 		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
@@ -579,17 +579,19 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions("fl_tire", width, radio, world, vehicleEntity);
-		dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
-		dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
+		dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", 30.0f, width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
+		dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", 30.0f, width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
 
 		CalculateTireDimensions("rl_tire", width, radio, world, vehicleEntity);
-		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
-		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
+		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", -10.0f, width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
+		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", -10.0f, width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
 
 		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
 		steeringControl->AddTire(frontLeft);
 		steeringControl->AddTire(frontRight);
+		//steeringControl->AddTire(rearLeft);
+		//steeringControl->AddTire(rearRight);
 		steeringControl->SetParam(1.0f);
 
 		// add vehicle hand brake control 
@@ -597,7 +599,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		handBrakeControl->SetBrakeTorque(3000.0f);
 		handBrakeControl->AddTire(rearLeft);
 		handBrakeControl->AddTire(rearRight);
-
+		
 		// add vehicle brake control 
 		dVehicleBrakeControl* const brakeControl = vehicle->GetBrakeControl();
 		brakeControl->SetBrakeTorque(1000.0f);
@@ -788,7 +790,7 @@ static void AddBackground(DemoEntityManager* const scene)
 	terrainEntity->SetMatrixUsafe(dQuaternion(location), location.m_posit);
 #endif
 
-#if 0
+#if 1
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	location.m_posit.m_x = 2.5f;
