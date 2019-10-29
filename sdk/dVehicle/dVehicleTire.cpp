@@ -310,7 +310,7 @@ void dVehicleTire::Integrate(dFloat timestep)
 	m_proxyBody.IntegrateForce(timestep, m_proxyBody.GetForce(), m_proxyBody.GetTorque());
 	m_proxyBody.IntegrateVelocity(timestep);
 	for (int i = 0; i < m_contactCount; i ++) {
-		const dVehicleTireContact* const const contact = &m_contactsJoints[i];
+		const dVehicleTireContact* const contact = &m_contactsJoints[i];
 		if (contact->m_isActive && contact->m_collidingNode->m_body) {
 			dMatrix matrix;
 			dVector com;
