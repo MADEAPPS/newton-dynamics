@@ -41,7 +41,7 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	};
 
 	public:
-	DVEHICLE_API dVehicleDifferential(dVehicleMultiBody* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode);
+	DVEHICLE_API dVehicleDifferential(dVehicleMultiBody* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode, const dMatrix& axelMatrix = dGetIdentityMatrix());
 	DVEHICLE_API virtual ~dVehicleDifferential();
 	
 	protected:
@@ -58,6 +58,7 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const;
 
 	dMatrix m_localAxis;
+	dMatrix m_axelMatrix;
 	dTireAxleJoint m_leftAxle;
 	dTireAxleJoint m_rightAxle;
 	dVehicleNode* m_leftNode;

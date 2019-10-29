@@ -332,7 +332,7 @@ dVehicleDifferential* dVehicleMultiBody::AddDifferential(dFloat mass, dFloat rad
 
 dVehicleDifferential* dVehicleMultiBody::AddDifferential(dFloat mass, dFloat radius, dVehicleDifferential* const differential0, dVehicleDifferential* const differential1)
 {
-	dVehicleDifferential* const differential = new dVehicleDifferential(this, mass, radius, differential0, differential1);
+	dVehicleDifferential* const differential = new dVehicleDifferential(this, mass, radius, differential0, differential1, dYawMatrix (90.0f * dDegreeToRad));
 	return differential;
 }
 

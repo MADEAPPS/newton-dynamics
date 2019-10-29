@@ -14,10 +14,11 @@
 #include "dVehicleDifferential.h"
 
 
-dVehicleDifferential::dVehicleDifferential(dVehicleMultiBody* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode)
+dVehicleDifferential::dVehicleDifferential(dVehicleMultiBody* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode, const dMatrix& axelMatrix)
 	:dVehicleNode(chassis)
 	,dBilateralJoint()
 	,m_localAxis(dYawMatrix (-90.0f * dDegreeToRad))
+	,m_axelMatrix(axelMatrix)
 	,m_leftAxle()
 	,m_rightAxle()
 	,m_leftNode(leftNode)
@@ -137,9 +138,9 @@ void dVehicleDifferential::dTireAxleJoint::JacobianDerivative(dComplementaritySo
 {
 	dVehicleDifferential* const differential = GetOwner1()->GetAsDifferential();
 	dAssert (differential);
-
+	
+	dMatrix tireMatrix (differential->m_axelMatrix * m_state0->GetMatrix());
 	dMatrix diffMatrix (differential->m_localAxis * m_state1->GetMatrix());
-	const dMatrix& tireMatrix = m_state0->GetMatrix();
 
 	AddAngularRowJacobian(constraintParams, tireMatrix.m_front, 0.0f);
 

@@ -23,14 +23,7 @@
 #define VEHICLE_THIRD_PERSON_VIEW_DIST		7.0f
 #define VEHICLE_THIRD_PERSON_VIEW_FILTER	0.125f
 
-#define VIPER_CHASSIS_MASS	1200.0f
-#define VIPER_TIRE_MASS		30.0f
-#define VIPER_DIFF_MASS		30.0f
-#define VIPER_ENGINE_MASS	40.0f
-#define VIPER_DIFF_RADIUS	0.25f
-#define VIPER_ENGINE_RADIUS 0.25f
-
-struct TIRE_DATA 
+struct TIRE_DATA
 {
 	dFloat m_mass;
 	dFloat m_pivotOffset;
@@ -44,32 +37,48 @@ struct TIRE_DATA
 	dFloat m_longitudinalStiffness;
 };
 
+
+#define VIPER_CHASSIS_MASS	1200.0f
+#define VIPER_TIRE_MASS		30.0f
+#define VIPER_DIFF_MASS		30.0f
+#define VIPER_ENGINE_MASS	40.0f
+#define VIPER_DIFF_RADIUS	0.25f
+#define VIPER_ENGINE_RADIUS 0.25f
+
 static TIRE_DATA viperTire 
 {
-	30.0f,   //m_mass;
-	0.01f,	 //m_pivotOffset;
-	0.5f,	 //m_steerRate;
-	1.0f,	 //m_frictionCoefficient
-	35.0f,	 //m_maxSteeringAngle
-	0.22f,	 //m_suspensionLength
-	15.0f,	 //m_dampingRatio
-	8.0f,	 //m_springStiffness
-	20.0f,	 //m_corneringStiffness
-	2.0f,	 //m_longitudinalStiffness
+	VIPER_TIRE_MASS,	//m_mass;
+	0.01f,				//m_pivotOffset;
+	0.5f,				//m_steerRate;
+	1.0f,				//m_frictionCoefficient
+	35.0f,				//m_maxSteeringAngle
+	0.22f,				//m_suspensionLength
+	15.0f,				//m_dampingRatio
+	8.0f,				//m_springStiffness
+	20.0f,				//m_corneringStiffness
+	2.0f,				//m_longitudinalStiffness
 };
+
+
+#define MONSTER_TRUCK_CHASSIS_MASS	1200.0f
+#define MONSTER_TRUCK_TIRE_MASS		30.0f
+#define MONSTER_TRUCK_DIFF_MASS		30.0f
+#define MONSTER_TRUCK_ENGINE_MASS	40.0f
+#define MONSTER_TRUCK_DIFF_RADIUS	0.25f
+#define MONSTER_TRUCK_ENGINE_RADIUS 0.25f
 
 static TIRE_DATA monsterTruckTire
 {
-	30.0f,   //m_mass;
-	0.01f,	 //m_pivotOffset;
-	0.5f,	 //m_steerRate;
-	1.0f,	 //m_frictionCoefficient
-	35.0f,	 //m_maxSteeringAngle
-	0.5f,	 //m_suspensionLength
-	15.0f,	 //m_dampingRatio
-	8.0f,	 //m_springStiffness
-	20.0f,	 //m_corneringStiffness
-	2.0f,	 //m_longitudinalStiffness
+	MONSTER_TRUCK_TIRE_MASS,	//m_mass;
+	0.01f,						//m_pivotOffset;
+	0.5f,						//m_steerRate;
+	1.0f,						//m_frictionCoefficient
+	35.0f,						//m_maxSteeringAngle
+	0.5f,						//m_suspensionLength
+	15.0f,						//m_dampingRatio
+	8.0f,						//m_springStiffness
+	20.0f,						//m_corneringStiffness
+	2.0f,						//m_longitudinalStiffness
 };
 
 
@@ -540,7 +549,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		chassisMatrix.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
 
 		// create a single body vehicle 
-		NewtonBody* const chassisBody = CreateChassisBody(VIPER_CHASSIS_MASS, vehicleEntity);
+		NewtonBody* const chassisBody = CreateChassisBody(MONSTER_TRUCK_CHASSIS_MASS, vehicleEntity);
 
 		// make the vehicle a little over steering by shitting the com to the front
 		dVector com(0.0f);
@@ -570,12 +579,12 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions("fl_tire", width, radio, world, vehicleEntity);
-		dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, VIPER_CHASSIS_MASS, monsterTruckTire);
-		dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", width, radio, VIPER_CHASSIS_MASS, monsterTruckTire);
+		dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
+		dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
 
 		CalculateTireDimensions("rl_tire", width, radio, world, vehicleEntity);
-		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, VIPER_CHASSIS_MASS, monsterTruckTire);
-		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", width, radio, VIPER_CHASSIS_MASS, monsterTruckTire);
+		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
+		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
 
 		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
@@ -598,15 +607,15 @@ class SingleBodyVehicleManager: public dVehicleManager
 		brakeControl->AddTire(rearRight);
 
 		// add a differential 
-		//dVehicleDifferential* const frontDifferential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, frontLeft, frontRight);
-		//dVehicleDifferential* const rearDifferential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, rearLeft, rearRight);
-		//dVehicleDifferential* const differential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, frontDifferential, rearDifferential);
-		dVehicleDifferential* const differential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, frontLeft, frontRight);
+		dVehicleDifferential* const frontDifferential = vehicle->AddDifferential(MONSTER_TRUCK_DIFF_MASS, MONSTER_TRUCK_DIFF_RADIUS, frontLeft, frontRight);
+		dVehicleDifferential* const rearDifferential = vehicle->AddDifferential(MONSTER_TRUCK_DIFF_MASS, MONSTER_TRUCK_DIFF_RADIUS, rearLeft, rearRight);
+		dVehicleDifferential* const differential = vehicle->AddDifferential(MONSTER_TRUCK_DIFF_MASS, MONSTER_TRUCK_DIFF_RADIUS, frontDifferential, rearDifferential);
+		//dVehicleDifferential* const differential = vehicle->AddDifferential(MONSTER_TRUCK_DIFF_MASS, MONSTER_TRUCK_DIFF_RADIUS, frontLeft, frontRight);
 
 		// add and internal combustion engine
 		dEngineInfo engineInfo;
-		engineInfo.m_mass = VIPER_ENGINE_MASS;
-		engineInfo.m_armatureRadius = VIPER_ENGINE_RADIUS;
+		engineInfo.m_mass = MONSTER_TRUCK_ENGINE_MASS;
+		engineInfo.m_armatureRadius = MONSTER_TRUCK_ENGINE_RADIUS;
 		engineInfo.m_idleTorque = 200.0f;			// IDLE_TORQUE
 		engineInfo.m_rpmAtIdleTorque = 450.0f;		// IDLE_TORQUE_RPM
 		engineInfo.m_peakTorque = 500.0f;			// PEAK_TORQUE
