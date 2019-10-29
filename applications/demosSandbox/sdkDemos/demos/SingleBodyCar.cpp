@@ -545,8 +545,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// make the vehicle a little over steering by shitting the com to the front
 		dVector com(0.0f);
 		NewtonBodyGetCentreOfMass(chassisBody, &com[0]);
-		com += chassisMatrix.m_front.Scale(0.3f);
-		com += chassisMatrix.m_up.Scale(-0.2f);
+		com += chassisMatrix.m_front.Scale(-0.0f);
+		com += chassisMatrix.m_up.Scale(-0.5f);
 		NewtonBodySetCentreOfMass(chassisBody, &com[0]);
 
 		// set the player matrix 
