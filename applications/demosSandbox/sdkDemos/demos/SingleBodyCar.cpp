@@ -70,7 +70,7 @@ static TIRE_DATA monsterTruckTire
 	MONSTER_TRUCK_TIRE_MASS,	//m_mass;
 	0.01f,						//m_pivotOffset;
 	0.5f,						//m_steerRate;
-	1.4f,						//m_frictionCoefficient
+	1.35f,						//m_frictionCoefficient
 	0.5f,						//m_suspensionLength
 	10.0f,						//m_dampingRatio
 	6.0f,						//m_springStiffness

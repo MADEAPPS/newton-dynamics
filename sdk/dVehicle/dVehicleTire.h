@@ -50,11 +50,10 @@ class dTireInfo
 		m_dampingRatio = 15.0f * vehicleMass;
 		m_springStiffness = dAbs(vehicleMass * 9.8f * 8.0f / m_suspensionLength);
 
-		m_corneringStiffness = dAbs(vehicleMass * gravity * 1.0f);
+		m_corneringStiffness = dAbs(vehicleMass * gravity * 10.0f);
 		m_longitudinalStiffness = dAbs(vehicleMass * gravity * 1.0f);
 	}
 
-	//dVector m_location;
 	dFloat m_mass;
 	dFloat m_radio;
 	dFloat m_width;
@@ -108,7 +107,6 @@ class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilater
 
 	dMatrix m_matrix;
 	dMatrix m_bindingRotation;
-//	dVehicleNode m_dynamicContactBodyNode;
 	dVehicleTireContact m_contactsJoints[3];
 	dTireInfo m_info;
 	NewtonCollision* m_tireShape;
