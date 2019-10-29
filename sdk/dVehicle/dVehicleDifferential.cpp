@@ -17,7 +17,7 @@
 dVehicleDifferential::dVehicleDifferential(dVehicleMultiBody* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode)
 	:dVehicleNode(chassis)
 	,dBilateralJoint()
-	,m_localAxis(dYawMatrix (90.0f * dDegreeToRad))
+	,m_localAxis(dYawMatrix (-90.0f * dDegreeToRad))
 	,m_leftAxle()
 	,m_rightAxle()
 	,m_leftNode(leftNode)
@@ -34,11 +34,11 @@ dVehicleDifferential::dVehicleDifferential(dVehicleMultiBody* const chassis, dFl
 	m_proxyBody.UpdateInertia();
 
 	// set the tire joint
-	m_leftAxle.SetOwners(this, m_leftNode);
-	m_rightAxle.SetOwners(this, m_rightNode);
+	m_leftAxle.SetOwners(m_leftNode, this);
+	m_rightAxle.SetOwners(m_rightNode, this);
 
-	m_leftAxle.Init(&m_proxyBody, &m_leftNode->GetProxyBody());
-	m_rightAxle.Init(&m_proxyBody, &m_rightNode->GetProxyBody());
+	m_leftAxle.Init(&m_leftNode->GetProxyBody(), &m_proxyBody);
+	m_rightAxle.Init(&m_rightNode->GetProxyBody(), &m_proxyBody);
 
 	m_leftAxle.m_diffSign = -1.0f;
 	m_rightAxle.m_diffSign = 1.0f;
@@ -135,18 +135,18 @@ void dVehicleDifferential::JacobianDerivative(dComplementaritySolver::dParamInfo
 
 void dVehicleDifferential::dTireAxleJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-	dVehicleDifferential* const differential = GetOwner0()->GetAsDifferential();
+	dVehicleDifferential* const differential = GetOwner1()->GetAsDifferential();
 	dAssert (differential);
 
-	dMatrix diffMatrix (differential->m_localAxis * m_state0->GetMatrix());
-	const dMatrix& tireMatrix = m_state1->GetMatrix();
+	dMatrix diffMatrix (differential->m_localAxis * m_state1->GetMatrix());
+	const dMatrix& tireMatrix = m_state0->GetMatrix();
 
 	AddAngularRowJacobian(constraintParams, tireMatrix.m_front, 0.0f);
 
 	dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_J01;
 	dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_J10;
 
-	jacobian0.m_angular = diffMatrix.m_front + diffMatrix.m_up.Scale(m_diffSign);
+	jacobian1.m_angular = diffMatrix.m_front + diffMatrix.m_up.Scale(m_diffSign);
 
 	const dVector& omega0 = m_state0->GetOmega();
 	const dVector& omega1 = m_state1->GetOmega();
