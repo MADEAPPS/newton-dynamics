@@ -651,14 +651,13 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 	void UpdateDriverInput(dVehicle* const vehicle, dFloat timestep) 
 	{
-//		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
+		if (vehicle != m_player) {
+			return;
+		}
 
 		NewtonBody* const body = vehicle->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-
-		//dEngineController* const engine = vehicle->GetEngine();
-		//int gear = engine ? engine->GetGear() : 0;
 
 		dVehicleMultiBody::dDriverInput driverInput;
 
@@ -774,7 +773,7 @@ static void AddBackground(DemoEntityManager* const scene)
 	CreateLevelMesh(scene, "flatPlane.ngd", 1);
 
 	//CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
-#if 1
+#if 0
 	NewtonBody* const terrain = CreateHeightFieldTerrain(scene, 7, 1.0f, 1.0f, 0.1f, 10.0f, -15.0f);
 	DemoEntity* const terrainEntity = (DemoEntity*)NewtonBodyGetUserData(terrain);
 
@@ -787,7 +786,7 @@ static void AddBackground(DemoEntityManager* const scene)
 	terrainEntity->SetMatrixUsafe(dQuaternion(location), location.m_posit);
 #endif
 
-#if 1
+#if 0
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	location.m_posit.m_x = 2.5f;
@@ -827,23 +826,24 @@ void SingleBodyCar(DemoEntityManager* const scene)
 
 	// create a sport car
 	dPointer<DemoEntity> viperModel (DemoEntity::LoadNGD_mesh("viper.ngd", scene->GetNewton(), scene->GetShaderCache()));
-//	dVehicle* const player = manager->CreateSportCar(location, viperModel.GetData());
-//	manager->SetAsPlayer(player);
+//	dVehicle* const player0 = manager->CreateSportCar(location, viperModel.GetData());
+//	manager->SetAsPlayer(player0);
 
 	// create an monster Truck
 	location.m_posit.m_z += 3.0f;
 	location.m_posit.m_y += 1.0f;
 	dPointer<DemoEntity> monsterTruck (DemoEntity::LoadNGD_mesh("monsterTruck.ngd", scene->GetNewton(), scene->GetShaderCache()));
-	dVehicle* const player = manager->CreateOffRoadCar(location, monsterTruck.GetData());
-	manager->SetAsPlayer(player);
+	dVehicle* const player1 = manager->CreateOffRoadCar(location, monsterTruck.GetData());
+	manager->SetAsPlayer(player1);
 
 	int count = 10;
 	count = 0;
 	for (int i = 0; i < count; i++) {
 		for (int j = 0; j < count; j++) {
 			dMatrix offset(location);
-			offset.m_posit += dVector (j * 4.0f + 4.0f, 0.0f, i * 4.0f, 0.0f);
-			manager->CreateSportCar(offset, viperModel.GetData());
+			offset.m_posit += dVector (j * 5.0f + 4.0f, 0.0f, i * 5.0f, 0.0f);
+			//manager->CreateSportCar(offset, viperModel.GetData());
+			manager->CreateOffRoadCar(offset, monsterTruck.GetData());
 		}
 	}
 
