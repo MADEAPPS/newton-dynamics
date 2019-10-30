@@ -17,7 +17,8 @@
 
 #define D_FREE_ROLLING_TORQUE_COEF	dFloat (0.5f) 
 #define D_LOAD_ROLLING_TORQUE_COEF	dFloat (0.01f) 
-#define D_TIRE_CONTACT_PATCH_CONE	dFloat (0.8f) 
+//#define D_TIRE_CONTACT_PATCH_CONE	dFloat (0.8f) 
+#define D_TIRE_CONTACT_PATCH_CONE	dFloat (0.5f) 
 
 dVehicleTire::dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info)
 	:dVehicleNode(chassis)
@@ -142,34 +143,35 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 	dVector veloc0 (tireMatrix.m_right.Scale (-m_info.m_suspensionLength));
 	dVector tmp (0.0f);
 
-	dVector contact(0.0f);
-	dVector normal(0.0f);
-	dFloat penetration(0.0f);
+	dFloat points[2][3];
+	dFloat normals[2][3];
+	dFloat penetrations[2];
 	dFloat param = 1.0f - m_position * m_invSuspensionLength;
 
 	for (int i = 0; (i < bodyArray.m_count) && (contactCount < sizeof(m_contactsJoints) / sizeof(m_contactsJoints[0])); i ++) {
 		dMatrix matrixB;
-		dLong attributeA;
-		dLong attributeB;
+		dLong attributeA[2];
+		dLong attributeB[2];
 		dFloat impactParam;
 
 		NewtonBodyGetMatrix(bodyArray.m_array[i], &matrixB[0][0]);
 		NewtonCollision* const otherShape = NewtonBodyGetCollision (bodyArray.m_array[i]);
 
-		int count = NewtonCollisionCollideContinue(world, 1, 1.0f,
+		int count = NewtonCollisionCollideContinue(world, 2, 1.0f,
 			m_tireShape, &tireMatrix[0][0], &veloc0[0], &tmp[0],
 			otherShape, &matrixB[0][0], &tmp[0], &tmp[0],
-			&impactParam, &contact[0], &normal[0], &penetration,
-			&attributeA, &attributeB, 0);
+			&impactParam, &points[0][0], &normals[0][0], penetrations,
+			attributeA, attributeB, 0);
 
-		if (count) {
+		for (int j = 0; j < count; j ++) {
 			// calculate tire contact patch collision
-			if (normal.DotProduct3(tireMatrix.m_right) > D_TIRE_CONTACT_PATCH_CONE) {
+			dVector normal (normals[j][0], normals[j][1], normals[j][2], dFloat (0.0f));
+			dFloat projection = dAbs (normal.DotProduct3(tireMatrix.m_front));
+//			if (normal.DotProduct3(tireMatrix.m_right) > D_TIRE_CONTACT_PATCH_CONE) {
+			if (projection < D_TIRE_CONTACT_PATCH_CONE) {
 				dFloat dist = (param - impactParam) * m_info.m_suspensionLength;
 				if (dist > -D_TIRE_MAX_ELASTIC_DEFORMATION) {
-
-					normal.m_w = 0.0f;
-					penetration = normal.DotProduct3(tireMatrix.m_right.Scale(dist));
+					dFloat penetration = normal.DotProduct3(tireMatrix.m_right.Scale(dist));
 
 					dVector longitudinalDir (normal.CrossProduct(tireMatrix.m_front));
 					if (longitudinalDir.DotProduct3(longitudinalDir) < 0.1f) {
@@ -178,11 +180,11 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 					}
 					longitudinalDir = longitudinalDir.Normalize();
 
+					dVector contact (points[j][0], points[j][1], points[j][2], dFloat (1.0f));
 					contact -= tireMatrix.m_up.Scale (dist);
-					contact.m_w = 1.0f;
 
-					//dVehicleCollidingNode* const collidingNode = chassisNode->FindCollideNode(this, bodyArray.m_array[i]);
-					dVehicleCollidingNode* const collidingNode = chassisNode->FindCollideNode(this, NULL);
+					dVehicleCollidingNode* const collidingNode = chassisNode->FindCollideNode(this, bodyArray.m_array[i]);
+					//dVehicleCollidingNode* const collidingNode = chassisNode->FindCollideNode(this, NULL);
 					m_contactsJoints[contactCount].SetOwners (this, collidingNode);
 
 					m_contactsJoints[contactCount].SetContact(collidingNode, contact, normal, longitudinalDir, penetration, friction, true);
@@ -193,35 +195,41 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 		}
 	}
 	
+
 	tireMatrix = GetHardpointMatrix(m_position * m_invSuspensionLength) * chassisMatrix;
 	for (int i = 0; (i < bodyArray.m_count) && (contactCount < sizeof(m_contactsJoints) / sizeof(m_contactsJoints[0])); i++) {
 		// calculate tire contact collision with rigid bodies
 		dMatrix matrixB;
-		dLong attributeA;
-		dLong attributeB;
+		dLong attributeA[2];
+		dLong attributeB[2];
 
 		NewtonBodyGetMatrix(bodyArray.m_array[i], &matrixB[0][0]);
 		NewtonCollision* const otherShape = NewtonBodyGetCollision(bodyArray.m_array[i]);
 
 		int count = NewtonCollisionCollide(world, 1, m_tireShape, &tireMatrix[0][0], otherShape, &matrixB[0][0],
-			&contact[0], &normal[0], &penetration, &attributeA, &attributeB, 0);
+										  &points[0][0], &normals[0][0], penetrations, attributeA, attributeB, 0);
+count = 0;
+		for (int j = 0; j < count; j ++) {
+			dVector normal (normals[j][0], normals[j][1], normals[j][2], dFloat (0.0f));
+			dFloat projection = dAbs (normal.DotProduct3(tireMatrix.m_front));
+			//if (normal.DotProduct3(tireMatrix.m_right) <= D_TIRE_CONTACT_PATCH_CONE) {
+			if (projection > D_TIRE_CONTACT_PATCH_CONE) {
+				dVector longitudinalDir(normal.CrossProduct(tireMatrix.m_front));
+				if (longitudinalDir.DotProduct3(longitudinalDir) < 0.1f) {
+					longitudinalDir = normal.CrossProduct(tireMatrix.m_up.CrossProduct(normal));
+					dAssert(longitudinalDir.DotProduct3(longitudinalDir) > 0.1f);
+				}
 
-		if (count && (normal.DotProduct3(tireMatrix.m_right) <= D_TIRE_CONTACT_PATCH_CONE)) {
-			dVector longitudinalDir(normal.CrossProduct(tireMatrix.m_front));
-			if (longitudinalDir.DotProduct3(longitudinalDir) < 0.1f) {
-				longitudinalDir = normal.CrossProduct(tireMatrix.m_up.CrossProduct(normal));
-				dAssert(longitudinalDir.DotProduct3(longitudinalDir) > 0.1f);
+
+				longitudinalDir = longitudinalDir.Normalize();
+				dVehicleCollidingNode* const collidingNode = chassisNode->FindCollideNode(this, bodyArray.m_array[i]);
+				m_contactsJoints[contactCount].SetOwners(this, collidingNode);
+
+				dVector contact (points[j][0], points[j][1], points[j][2], dFloat (1.0f));
+				m_contactsJoints[contactCount].SetContact(collidingNode, contact, normal, longitudinalDir, penetrations[j], friction, false);
+				contactCount++;
+				dAssert(contactCount <= sizeof(m_contactsJoints) / sizeof(m_contactsJoints[0]));
 			}
-
-			normal.m_w = 0.0f;
-			contact.m_w = 1.0f;
-			longitudinalDir = longitudinalDir.Normalize();
-			dVehicleCollidingNode* const collidingNode = chassisNode->FindCollideNode(this, bodyArray.m_array[i]);
-			m_contactsJoints[contactCount].SetOwners(this, collidingNode);
-
-			m_contactsJoints[contactCount].SetContact(collidingNode, contact, normal, longitudinalDir, penetration, friction, false);
-			contactCount++;
-			dAssert(contactCount <= sizeof(m_contactsJoints) / sizeof(m_contactsJoints[0]));
 		}
 	}
 
@@ -230,9 +238,9 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 		const dVector& n = m_contactsJoints[i].m_normal;
 		for (int j = contactCount - 1; j > i; j --) {
 			dFloat val = dAbs (n.DotProduct3(m_contactsJoints[j].m_normal));
-			if (val > 0.99f) {
-				m_contactsJoints[j] = m_contactsJoints[contactCount - 1];
-				contactCount --;
+			if (val > 0.996f) {
+//				m_contactsJoints[j] = m_contactsJoints[contactCount - 1];
+//				contactCount --;
 			}
 		}
 	}
@@ -284,10 +292,6 @@ const void dVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 
 	// render tireState matrix
 	dComplementaritySolver::dBodyState* const chassisBody = &chassis->GetProxyBody();
-	//dMatrix hubTireMatrix(GetHardpointMatrix(m_position * m_invSuspensionLength) * chassisBody->GetMatrix());
-	//debugContext->DrawFrame(hubTireMatrix, 1.0f);
-	//debugContext->DrawFrame(tireMatrix, 1.0f);
-
 	dVector weight (chassis->GetGravity().Scale(chassisBody->GetMass()));
 	dFloat scale (1.0f / dSqrt (weight.DotProduct3(weight)));
 	for (int i = 0; i < sizeof (m_contactsJoints)/sizeof (m_contactsJoints[0]); i ++) {

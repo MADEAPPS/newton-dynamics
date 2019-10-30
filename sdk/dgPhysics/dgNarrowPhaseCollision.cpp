@@ -1733,9 +1733,6 @@ dgInt32 dgWorld::CollideContinue (
 	dgCollisionInstance collisionA(*collisionSrcA, collisionSrcA->GetChildShape());
 	dgCollisionInstance collisionB(*collisionSrcB, collisionSrcB->GetChildShape());
 
-//	collisionA.SetCollisionMode(true);
-//	collisionB.SetCollisionMode(true);
-
 	dgContactPoint contacts[DG_MAX_CONTATCS];
 
 	dgInt32 count = 0;

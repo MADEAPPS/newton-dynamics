@@ -165,7 +165,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 	static void RenderUI(DemoEntityManager* const scene, void* const context)
 	{
 		SingleBodyVehicleManager* const me = (SingleBodyVehicleManager*)context;
-		me->RenderUI(scene);
+//		me->RenderUI(scene);
 	}
 
 	void DrawGage(GLuint gage, GLuint needle, dFloat param, dFloat origin_x, dFloat origin_y, dFloat size, dFloat minAngle, dFloat maxAngle) const
@@ -830,7 +830,8 @@ void SingleBodyCar(DemoEntityManager* const scene)
 //	manager->SetAsPlayer(player0);
 
 	// create an monster Truck
-	location.m_posit.m_z += 3.0f;
+	location.m_posit.m_x += 20.0f;
+	location.m_posit.m_z += 12.0f;
 	location.m_posit.m_y += 1.0f;
 	dPointer<DemoEntity> monsterTruck (DemoEntity::LoadNGD_mesh("monsterTruck.ngd", scene->GetNewton(), scene->GetShaderCache()));
 	dVehicle* const player1 = manager->CreateOffRoadCar(location, monsterTruck.GetData());
