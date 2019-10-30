@@ -205,9 +205,9 @@ xxxx ++;
 					m_contactsJoints[contactCount].SetContact(collidingNode, contact, normal, longitudinalDir, penetration, friction, true);
 					contactCount ++;
 					dAssert(contactCount <= sizeof(m_contactsJoints) / sizeof(m_contactsJoints[0]));
-
-if ((m_index == 0) && xxxx > 1300)
-dTrace (("x(%f) p(%f %f %f) n(%f %f %f)\n", penetrations[j], contact[0], contact[1], contact[2], normal[0], normal[1], normal[2]));
+if ((m_index == 0) && xxxx > 1300) {
+dTrace(("x(%f) p(%f %f %f) n(%f %f %f)\n", penetrations[j], contact[0], contact[1], contact[2], normal[0], normal[1], normal[2]));
+}
 				}
 			}
 		}
@@ -316,7 +316,9 @@ const void dVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 	for (int i = 0; i < sizeof (m_contactsJoints)/sizeof (m_contactsJoints[0]); i ++) {
 		const dVehicleTireContact* const contact = &m_contactsJoints[i];
 		if (contact->IsActive()) {
-			contact->Debug(debugContext, scale);
+//			contact->Debug(debugContext, scale);
+			debugContext->SetColor(dVector(1.0f, 0.0f, 0.0f, 1.0f));
+			debugContext->DrawPoint(contact->m_point, 8.0f);
 		}
 	}
 }

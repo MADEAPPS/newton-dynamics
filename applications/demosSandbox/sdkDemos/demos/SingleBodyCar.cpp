@@ -315,7 +315,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// add the tire to the vehicle
 		dTireInfo tireInfo;
 		tireInfo.m_mass = data.m_mass;
-		tireInfo.m_radio = radius;
+		tireInfo.m_radio = radius * 1.25f;
 		tireInfo.m_width = width;
 		tireInfo.m_pivotOffset = data.m_pivotOffset;
 		tireInfo.m_steerRate = data.m_steerRate * dPi;
