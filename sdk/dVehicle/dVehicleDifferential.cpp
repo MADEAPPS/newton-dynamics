@@ -25,6 +25,7 @@ dVehicleDifferential::dVehicleDifferential(dVehicleMultiBody* const chassis, dFl
 	,m_rightNode(rightNode)
 	,m_diffOmega(0.0f)
 	,m_shaftOmega(0.0f)
+	,m_mode(m_slipLocked)
 {
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 
@@ -57,9 +58,19 @@ const void dVehicleDifferential::Debug(dCustomJoint::dDebugDisplay* const debugC
 
 int dVehicleDifferential::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 {
-	jointArray[0] = &m_leftAxle;
-	jointArray[1] = &m_rightAxle;
-	return 2;
+	switch (m_mode)
+	{
+		case m_rightLocked:
+			jointArray[0] = &m_rightAxle;
+			return 1;
+		case m_leftLocked:
+			jointArray[0] = &m_leftAxle;
+			return 1;
+		default:	
+			jointArray[0] = &m_leftAxle;
+			jointArray[1] = &m_rightAxle;
+			return 2;
+	}
 }
 
 void dVehicleDifferential::CalculateFreeDof()

@@ -21,6 +21,14 @@ class dVehicleMultiBody;
 
 class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::dBilateralJoint
 {
+	enum dOperationMode
+	{
+		m_unlocked,
+		m_slipLocked,
+		m_rightLocked,
+		m_leftLocked,
+	};
+
 	class dTireAxleJoint: public dVehicleLoopJoint
 	{
 		public:
@@ -43,6 +51,9 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	public:
 	DVEHICLE_API dVehicleDifferential(dVehicleMultiBody* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode, const dMatrix& axelMatrix = dGetIdentityMatrix());
 	DVEHICLE_API virtual ~dVehicleDifferential();
+
+	dOperationMode GetMode() const { return m_mode; }
+	void SetMode(dOperationMode mode) { m_mode = mode; }
 	
 	protected:
 	void CalculateFreeDof();
@@ -65,6 +76,7 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	dVehicleNode* m_rightNode;
 	dFloat m_diffOmega;
 	dFloat m_shaftOmega;
+	dOperationMode m_mode;
 
 	friend class dVehicleMultiBody;
 };
