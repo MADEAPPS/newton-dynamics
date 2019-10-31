@@ -770,10 +770,10 @@ axisCount = 0;
 
 static void AddBackground(DemoEntityManager* const scene)
 {
-	CreateLevelMesh(scene, "flatPlane.ngd", 1);
+//	CreateLevelMesh(scene, "flatPlane.ngd", 1);
 
-	//CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
-#if 1
+	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
+#if 0
 	NewtonBody* const terrain = CreateHeightFieldTerrain(scene, 7, 1.0f, 1.0f, 0.1f, 10.0f, -15.0f);
 	DemoEntity* const terrainEntity = (DemoEntity*)NewtonBodyGetUserData(terrain);
 
@@ -816,7 +816,7 @@ void SingleBodyCar(DemoEntityManager* const scene)
 
 	dMatrix location (dGetIdentityMatrix());
 	location.m_posit = dVector (0.0f, 10.0f, 0.0f, 1.0f);
-
+	location.m_posit.m_y += 10.0f;
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 0.5f;
 
@@ -832,7 +832,10 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	// create an monster Truck
 	location.m_posit.m_x += 20.0f;
 	location.m_posit.m_z += 12.0f;
-	location.m_posit.m_y += 1.0f;
+	location.m_posit.m_y += 10.0f;
+	location.m_posit = FindFloor(scene->GetNewton(), location.m_posit, 100.0f);
+	location.m_posit.m_y += 2.0f;
+
 	dPointer<DemoEntity> monsterTruck (DemoEntity::LoadNGD_mesh("monsterTruck.ngd", scene->GetNewton(), scene->GetShaderCache()));
 	dVehicle* const player1 = manager->CreateOffRoadCar(location, monsterTruck.GetData());
 	manager->SetAsPlayer(player1);
