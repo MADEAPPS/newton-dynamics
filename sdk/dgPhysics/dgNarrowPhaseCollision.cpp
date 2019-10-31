@@ -1778,6 +1778,7 @@ dgInt32 dgWorld::CollideContinue (
 
 	count = pair.m_contactCount;
 	if (count) {
+		dgAssert(count <= 1);
 		if (count > maxContacts) {
 			count = PruneContacts (count, contacts, contactJoint.GetPruningTolerance(), maxContacts);
 		}
