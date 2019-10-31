@@ -1762,7 +1762,11 @@ dgInt32 dgWorld::CollideContinue (
 	material.m_penetration = dgFloat32 (0.0f);
 
 	dgContact contactJoint (this, &material, &collideBodyB, &collideBodyA);
-//	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
+
+//static int xxx;
+//xxx++;
+//if (xxx == 2584)
+//xxx *= 1;
 
 	dgBroadPhase::dgPair pair;
 	pair.m_contact = &contactJoint;

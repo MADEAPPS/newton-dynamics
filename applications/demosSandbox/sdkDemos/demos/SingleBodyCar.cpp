@@ -716,7 +716,7 @@ axisCount = 0;
 
 		driverInput.m_clutchPedal = 0.0f;
 
-#if 1
+#if 0
 	#if 0
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
