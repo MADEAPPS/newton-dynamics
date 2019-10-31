@@ -3244,15 +3244,6 @@ void NewtonHeightFieldSetUserRayCastCallback (const NewtonCollision* const heigh
 	}
 }
 
-void NewtonHeightFieldSetHorizontalDisplacement (const NewtonCollision* const heightField, const unsigned short* const horizontalMap, dFloat scale)
-{
-	dgCollisionInstance* const collision = (dgCollisionInstance*)heightField;
-	if (collision->IsType(dgCollision::dgCollisionHeightField_RTTI)) {
-		dgCollisionHeightField* const shape = (dgCollisionHeightField*)collision->GetChildShape();
-		shape->SetHorizontalDisplacement (horizontalMap, dgFloat32 (scale));
-	}
-}
-
 /*!
   Prepare a *TreeCollision* to begin to accept the polygons that comprise the collision mesh.
 
