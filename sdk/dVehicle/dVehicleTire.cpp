@@ -157,7 +157,7 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 	dFloat penetrations[2];
 	dFloat param = 1.0f - m_position * m_invSuspensionLength;
 
-if ((m_index == 0) && xxxx >= 835) {
+if ((m_index == 0) && xxxx >= 4883) {
 xxxx*=1;
 }
 
@@ -368,7 +368,7 @@ void dVehicleTire::ApplyExternalForce()
 if (m_index == 0)
 xxxx ++;
 
-if ((m_index == 0) && xxxx > 800) {
+if ((m_index == 0) && xxxx >= 4883) {
 dTrace (("%d ", xxxx));
 }
 
