@@ -18,7 +18,7 @@
 #define D_FREE_ROLLING_TORQUE_COEF	dFloat (0.5f) 
 #define D_LOAD_ROLLING_TORQUE_COEF	dFloat (0.01f) 
 
-#define USE_TIRE_SMALL_PATCH
+//#define USE_TIRE_SMALL_PATCH
 #ifdef USE_TIRE_SMALL_PATCH
 #define D_TIRE_CONTACT_PATCH_CONE	dFloat (0.8f) 
 #else
