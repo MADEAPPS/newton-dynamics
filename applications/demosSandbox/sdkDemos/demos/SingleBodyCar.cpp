@@ -717,7 +717,7 @@ axisCount = 0;
 
 		driverInput.m_clutchPedal = 0.0f;
 
-#if 1
+#if 0
 	#if 1
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
@@ -772,8 +772,9 @@ axisCount = 0;
 static void AddBackground(DemoEntityManager* const scene)
 {
 //	CreateLevelMesh(scene, "flatPlane.ngd", 1);
-	CreateLevelMesh (scene, "playerarena.ngd", true);
+//	CreateLevelMesh (scene, "playerarena.ngd", true);
 //	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
+	CreateHeightFieldTerrain(scene, 7, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 #if 0
 	NewtonBody* const terrain = CreateHeightFieldTerrain(scene, 7, 1.0f, 1.0f, 0.1f, 10.0f, -15.0f);
 	DemoEntity* const terrainEntity = (DemoEntity*)NewtonBodyGetUserData(terrain);
