@@ -17,8 +17,16 @@
 
 #define D_FREE_ROLLING_TORQUE_COEF	dFloat (0.5f) 
 #define D_LOAD_ROLLING_TORQUE_COEF	dFloat (0.01f) 
+
+#define USE_TIRE_SMALL_PATCH
+#ifdef USE_TIRE_SMALL_PATCH
 #define D_TIRE_CONTACT_PATCH_CONE	dFloat (0.8f) 
-//#define D_TIRE_CONTACT_PATCH_CONE	dFloat (0.5f) 
+#else
+#define D_TIRE_CONTACT_PATCH_CONE	dFloat (0.5f) 
+#endif
+
+
+static int xxxx;
 
 dVehicleTire::dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info)
 	:dVehicleNode(chassis)
@@ -149,17 +157,9 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 	dFloat penetrations[2];
 	dFloat param = 1.0f - m_position * m_invSuspensionLength;
 
-static int xxxx;
-
-if (xxxx > 1400)
-xxxx *=1;
-
-if (m_index == 0){
-dTrace (("%d\n", xxxx));
-xxxx ++;
+if ((m_index == 0) && xxxx >= 835) {
+xxxx*=1;
 }
-
-
 
 	for (int i = 0; (i < bodyArray.m_count) && (contactCount < sizeof(m_contactsJoints) / sizeof(m_contactsJoints[0])); i ++) {
 		dMatrix matrixB;
@@ -179,10 +179,13 @@ xxxx ++;
 		for (int j = 0; j < count; j ++) {
 			// calculate tire contact patch collision
 			dVector normal (normals[j][0], normals[j][1], normals[j][2], dFloat (0.0f));
-			//dFloat projection = dAbs (normal.DotProduct3(tireMatrix.m_front));
-			//if (projection < D_TIRE_CONTACT_PATCH_CONE) {
+			#ifdef USE_TIRE_SMALL_PATCH
 			dFloat projection = normal.DotProduct3(tireMatrix.m_right);
 			if (projection > D_TIRE_CONTACT_PATCH_CONE) {
+			#else
+			dFloat projection = dAbs (normal.DotProduct3(tireMatrix.m_front));
+			if (projection < D_TIRE_CONTACT_PATCH_CONE) {
+			#endif
 		
 				dFloat dist = (param - impactParam) * m_info.m_suspensionLength;
 				if (dist > -D_TIRE_MAX_ELASTIC_DEFORMATION) {
@@ -205,8 +208,8 @@ xxxx ++;
 					m_contactsJoints[contactCount].SetContact(collidingNode, contact, normal, longitudinalDir, penetration, friction, true);
 					contactCount ++;
 					dAssert(contactCount <= sizeof(m_contactsJoints) / sizeof(m_contactsJoints[0]));
-if ((m_index == 0) && xxxx > 1300) {
-dTrace(("x(%f) p(%f %f %f) n(%f %f %f)\n", penetrations[j], contact[0], contact[1], contact[2], normal[0], normal[1], normal[2]));
+if ((m_index == 0) && xxxx > 800) {
+dTrace(("x(%f) p(%f %f %f) n(%f %f %f) ", penetrations[j], contact[0], contact[1], contact[2], normal[0], normal[1], normal[2]));
 }
 				}
 			}
@@ -229,10 +232,13 @@ dTrace(("x(%f) p(%f %f %f) n(%f %f %f)\n", penetrations[j], contact[0], contact[
 
 		for (int j = 0; j < count; j ++) {
 			dVector normal (normals[j][0], normals[j][1], normals[j][2], dFloat (0.0f));
-			//dFloat projection = dAbs (normal.DotProduct3(tireMatrix.m_front));
-			//if (projection > D_TIRE_CONTACT_PATCH_CONE) {
+			#ifdef USE_TIRE_SMALL_PATCH
 			dFloat projection = normal.DotProduct3(tireMatrix.m_right);
 			if (projection < D_TIRE_CONTACT_PATCH_CONE) {
+			#else
+			dFloat projection = dAbs (normal.DotProduct3(tireMatrix.m_front));
+			if (projection > D_TIRE_CONTACT_PATCH_CONE) {
+			#endif
 				dVector longitudinalDir(normal.CrossProduct(tireMatrix.m_front));
 				if (longitudinalDir.DotProduct3(longitudinalDir) < 0.1f) {
 					longitudinalDir = normal.CrossProduct(tireMatrix.m_up.CrossProduct(normal));
@@ -326,6 +332,13 @@ const void dVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 void dVehicleTire::Integrate(dFloat timestep)
 {
 	m_proxyBody.IntegrateForce(timestep, m_proxyBody.GetForce(), m_proxyBody.GetTorque());
+
+if ((m_index == 0) && xxxx > 800) {
+dMatrix matrix (m_proxyBody.GetMatrix());
+dFloat s = m_proxyBody.GetVelocity().DotProduct3(matrix.m_right);
+dTrace (("v(%f)\n", s));
+}
+
 	m_proxyBody.IntegrateVelocity(timestep);
 	for (int i = 0; i < m_contactCount; i ++) {
 		const dVehicleTireContact* const contact = &m_contactsJoints[i];
@@ -350,6 +363,14 @@ void dVehicleTire::Integrate(dFloat timestep)
 
 void dVehicleTire::ApplyExternalForce()
 {
+
+if (m_index == 0)
+xxxx ++;
+
+if ((m_index == 0) && xxxx > 800) {
+dTrace (("%d ", xxxx));
+}
+
 	dVehicleMultiBody* const chassisNode = GetParent()->GetAsVehicleMultiBody();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 
