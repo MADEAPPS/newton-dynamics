@@ -615,7 +615,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dEngineInfo engineInfo;
 		engineInfo.m_mass = MONSTER_TRUCK_ENGINE_MASS;
 		engineInfo.m_armatureRadius = MONSTER_TRUCK_ENGINE_RADIUS;
-		engineInfo.m_idleTorque = 200.0f;			// IDLE_TORQUE
+		//engineInfo.m_idleTorque = 200.0f;			// IDLE_TORQUE
+		engineInfo.m_idleTorque = 300.0f;			// IDLE_TORQUE
 		engineInfo.m_rpmAtIdleTorque = 450.0f;		// IDLE_TORQUE_RPM
 		engineInfo.m_peakTorque = 500.0f;			// PEAK_TORQUE
 		engineInfo.m_rpmAtPeakTorque = 3000.0f;		// PEAK_TORQUE_RPM

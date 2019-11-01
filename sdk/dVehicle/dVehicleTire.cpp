@@ -324,7 +324,8 @@ const void dVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 		if (contact->IsActive()) {
 //			contact->Debug(debugContext, scale);
 			debugContext->SetColor(dVector(1.0f, 0.0f, 0.0f, 1.0f));
-			debugContext->DrawPoint(contact->m_point, 8.0f);
+			debugContext->DrawPoint(contact->m_point, 4.0f);
+			debugContext->DrawLine(contact->m_point, contact->m_point + contact->m_normal.Scale (2.0f));
 		}
 	}
 }
