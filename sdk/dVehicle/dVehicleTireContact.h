@@ -16,9 +16,8 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleLoopJoint.h"
 
-#define D_TIRE_MAX_LATERAL_SLIP				dFloat ((0.175f)
+#define D_TIRE_MAX_LATERAL_SLIP				dFloat (0.175f)
 #define D_TIRE_MAX_ELASTIC_DEFORMATION		dFloat (0.05f)
-#define D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS dFloat (10.0f / D_TIRE_MAX_ELASTIC_DEFORMATION)
 #define D_TIRE_PENETRATION_RECOVERING_SPEED	dFloat (10.0f)
 
 class dVehicleCollidingNode;
@@ -63,7 +62,6 @@ class dVehicleTireContact: public dVehicleLoopJoint
 	dFloat m_penetration;
 	dFloat m_staticFriction;
 	mutable dTireModel m_tireModel;
-	bool m_isPatchContact;
 
 	friend class dVehicleTire;
 };

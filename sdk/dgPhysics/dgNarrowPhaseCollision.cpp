@@ -1762,11 +1762,7 @@ dgInt32 dgWorld::CollideContinue (
 	material.m_penetration = dgFloat32 (0.0f);
 
 	dgContact contactJoint (this, &material, &collideBodyB, &collideBodyA);
-
-static int xxx;
-xxx++;
-if (xxx == 3573)
-xxx *= 1;
+//	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
 
 	dgBroadPhase::dgPair pair;
 	pair.m_contact = &contactJoint;
@@ -1781,8 +1777,6 @@ xxx *= 1;
 	}
 
 	count = pair.m_contactCount;
-//dgAssert (count <= 1);
-
 	if (count) {
 		if (count > maxContacts) {
 			count = PruneContacts (count, contacts, contactJoint.GetPruningTolerance(), maxContacts);
@@ -2380,9 +2374,6 @@ dgInt32 dgWorld::CalculateConvexToNonConvexContactsContinue(dgCollisionParamProx
 
 	dgFloat32 timeNormalizer = proxy.m_timestep;
 	dgFloat32 epsilon = dgFloat32(-1.0e-3f) * proxy.m_timestep;
-
-static int xxxx;
-xxxx ++;
 
 	for (dgInt32 i = 0; (i < data.m_faceCount) && (proxy.m_timestep >= (data.m_hitDistance[i] * timeNormalizer)); i++) {
 		dgInt32 address = data.m_faceIndexStart[i];

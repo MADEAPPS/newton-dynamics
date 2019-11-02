@@ -315,7 +315,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// add the tire to the vehicle
 		dTireInfo tireInfo;
 		tireInfo.m_mass = data.m_mass;
-		tireInfo.m_radio = radius * 1.25f;
+		//tireInfo.m_radio = radius * 1.25f;
+		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
 		tireInfo.m_pivotOffset = data.m_pivotOffset;
 		tireInfo.m_steerRate = data.m_steerRate * dPi;
@@ -616,11 +617,12 @@ class SingleBodyVehicleManager: public dVehicleManager
 		engineInfo.m_mass = MONSTER_TRUCK_ENGINE_MASS;
 		engineInfo.m_armatureRadius = MONSTER_TRUCK_ENGINE_RADIUS;
 		//engineInfo.m_idleTorque = 200.0f;			// IDLE_TORQUE
-		engineInfo.m_idleTorque = 300.0f;			// IDLE_TORQUE
+		engineInfo.m_idleTorque = 300.0f * 1.5f;			// IDLE_TORQUE
+		engineInfo.m_peakTorque = 500.0f * 1.5f;			// PEAK_TORQUE
+		engineInfo.m_peakHorsePower = 400.0f * 1.5f;		// PEAK_HP
+
 		engineInfo.m_rpmAtIdleTorque = 450.0f;		// IDLE_TORQUE_RPM
-		engineInfo.m_peakTorque = 500.0f;			// PEAK_TORQUE
 		engineInfo.m_rpmAtPeakTorque = 3000.0f;		// PEAK_TORQUE_RPM
-		engineInfo.m_peakHorsePower = 400.0f;		// PEAK_HP
 		engineInfo.m_rpmAtPeakHorsePower = 5200.0f;	// PEAK_HP_RPM
 		engineInfo.m_rpmAtRedLine = 6000.0f;		// REDLINE_TORQUE_RPM
 
@@ -772,10 +774,10 @@ axisCount = 0;
 static void AddBackground(DemoEntityManager* const scene)
 {
 //	CreateLevelMesh(scene, "flatPlane.ngd", 1);
-//	CreateLevelMesh (scene, "playerarena.ngd", true);
+	CreateLevelMesh (scene, "playerarena.ngd", true);
 //	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
-	CreateHeightFieldTerrain(scene, 7, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
-#if 0
+//	CreateHeightFieldTerrain(scene, 7, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
+#if 1
 	NewtonBody* const terrain = CreateHeightFieldTerrain(scene, 7, 1.0f, 1.0f, 0.1f, 10.0f, -15.0f);
 	DemoEntity* const terrainEntity = (DemoEntity*)NewtonBodyGetUserData(terrain);
 
@@ -832,13 +834,13 @@ void SingleBodyCar(DemoEntityManager* const scene)
 //	manager->SetAsPlayer(player0);
 
 	// create an monster Truck
-//	location.m_posit.m_x += 20.0f;
-//	location.m_posit.m_z += 12.0f;
-//	location.m_posit.m_y += 10.0f;
+	location.m_posit.m_x += 20.0f;
+	location.m_posit.m_y += 10.0f;
+	location.m_posit.m_z += 12.0f;
 
-	location.m_posit.m_x = 38.0f;
-	location.m_posit.m_y = 10.0f;
-	location.m_posit.m_z = -25.0f;
+	//location.m_posit.m_x = 38.0f;
+	//location.m_posit.m_y = 10.0f;
+	//location.m_posit.m_z = -25.0f;
 
 	location.m_posit = FindFloor(scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 2.0f;

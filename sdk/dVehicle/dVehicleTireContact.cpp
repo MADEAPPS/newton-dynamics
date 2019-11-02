@@ -15,6 +15,8 @@
 #include "dVehicleMultiBody.h"
 #include "dVehicleTireContact.h"
 
+#define D_TIRE_CONTACT_PATCH_CONE	dFloat (0.8f) 
+
 dVehicleTireContact::dVehicleTireContact()
 	:dVehicleLoopJoint()
 	,m_point(0.0f)
@@ -25,7 +27,6 @@ dVehicleTireContact::dVehicleTireContact()
 	,m_penetration(0.0f)
 	,m_staticFriction(1.0f)
 	,m_tireModel()
-	,m_isPatchContact(false)
 {
 }
 
@@ -43,9 +44,9 @@ void dVehicleTireContact::SetContact(dVehicleCollidingNode* const node, const dV
 	m_lateralDir = m_longitudinalDir.CrossProduct(m_normal);
 
 	m_isActive = true;
-	m_isPatchContact = isPatch;
 	m_staticFriction = staticFriction;
-	m_penetration = dClamp(penetration, dFloat(-D_TIRE_MAX_ELASTIC_DEFORMATION), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
+	m_penetration = dClamp(penetration, dFloat(0.0f), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
+	m_penetration = penetration;
 }
 
 void dVehicleTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const
@@ -101,20 +102,19 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		AddContactRowJacobian(constraintParams, m_point, m_normal, 0.0f);
 		constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
 		constraintParams->m_frictionCallback[index] = this;
-		if (m_isPatchContact) {
+
+		const dMatrix& tireMatrix = m_state0->GetMatrix();
+		if (tireMatrix.m_right.DotProduct3(m_normal) > D_TIRE_CONTACT_PATCH_CONE) {
 			dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
 			jacobian1.m_linear = dVector(0.0f);
 			jacobian1.m_angular = dVector(0.0f);
-if (tire->GetIndex() == 0)
-dTrace(("accel %f %f %f\n", constraintParams->m_jointAccel[index], D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS * m_penetration * constraintParams->m_timestepInv, m_penetration));
-			constraintParams->m_jointAccel[index] += D_TIRE_MAX_ELASTIC_NORMAL_STIFFNESS * m_penetration * constraintParams->m_timestepInv;
+		}
+
+		dFloat recoverAccel = D_TIRE_PENETRATION_RECOVERING_SPEED * D_TIRE_MAX_ELASTIC_DEFORMATION * constraintParams->m_timestepInv;
+		if (constraintParams->m_jointAccel[index] > -recoverAccel) {
+			constraintParams->m_jointAccel[index] += D_TIRE_PENETRATION_RECOVERING_SPEED * m_penetration * constraintParams->m_timestepInv;
 		} else {
-			dFloat recoverAccel = D_TIRE_PENETRATION_RECOVERING_SPEED * D_TIRE_MAX_ELASTIC_DEFORMATION * constraintParams->m_timestepInv;
-			if (constraintParams->m_jointAccel[index] > -recoverAccel) {
-				constraintParams->m_jointAccel[index] += D_TIRE_PENETRATION_RECOVERING_SPEED * m_penetration * constraintParams->m_timestepInv;
-			} else {
-				constraintParams->m_jointAccel[index] = 0.0f;
-			}
+			constraintParams->m_jointAccel[index] = 0.0f;
 		}
 	}
 
@@ -153,7 +153,6 @@ dTrace(("accel %f %f %f\n", constraintParams->m_jointAccel[index], D_TIRE_MAX_EL
 		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
 		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
 
-		//const dVector relVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
 		const dVector relVeloc(veloc0 * jacobian0.m_linear + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
 		dFloat lateralSpeed = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 		dAssert ((m_tireModel.m_lateralSlip + 1.0e-3f) > 0.0f);
@@ -168,10 +167,6 @@ dTrace(("accel %f %f %f\n", constraintParams->m_jointAccel[index], D_TIRE_MAX_EL
 	dFloat v = dAbs(m_tireModel.m_lateralSlip);
 	dFloat u = dAbs(m_tireModel.m_longitudinalSlip);
 	dFloat invden = 1.0f / (1.0f + u);
-
-//if (tire->GetIndex() == 3) {
-//dTrace(("index=%d u=%4.3f v=%4.3f\n", tire->GetIndex(), u, v));
-//}
 
 	m_tireModel.m_lateralSlip = v * invden;
 	m_tireModel.m_longitudinalSlip = u * invden;
