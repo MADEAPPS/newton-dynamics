@@ -139,13 +139,8 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 	NewtonWorld* const world = NewtonBodyGetWorld(chassisNode->GetBody());
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 
-
-	const dMatrix& chassisMatrix = chassisBody->GetMatrix();
-
 	dMatrix matrixB;
-//	dMatrix tireMatrix (GetHardpointMatrix (1.0f) * chassisMatrix);
-	dMatrix tireMatrix (GetHardpointMatrix(m_position * m_invSuspensionLength) * chassisMatrix);
-//	dVector veloc0 (tireMatrix.m_right.Scale (-m_info.m_suspensionLength));
+	dMatrix tireMatrix (GetHardpointMatrix(m_position * m_invSuspensionLength) * chassisBody->GetMatrix());
 	
 	const int maxContactCount = sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]);
 	dFloat points[maxContactCount][3];
@@ -183,19 +178,22 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 		}
 	}
 
-/*
 	// filter contact that are too close 
 	for (int i = 0; i < contactCount - 1; i ++) {
 		const dVector& n = m_contactsJoints[i].m_normal;
 		for (int j = contactCount - 1; j > i; j --) {
 			dFloat val = dAbs (n.DotProduct3(m_contactsJoints[j].m_normal));
 			if (val > 0.996f) {
-				m_contactsJoints[j] = m_contactsJoints[contactCount - 1];
-				contactCount --;
+				dVector error (m_contactsJoints[j].m_point - m_contactsJoints[i].m_point);
+				val = error.DotProduct3(error);
+				if (val < 1.0e-2f) {
+					m_contactsJoints[j] = m_contactsJoints[contactCount - 1];
+					contactCount --;
+				}
 			}
 		}
 	}
-*/
+
 	m_contactCount = contactCount; 
 }
 
@@ -274,10 +272,16 @@ void dVehicleTire::Integrate(dFloat timestep)
 			dVector force (contact->m_normal.Scale (-contact->m_tireModel.m_tireLoad) +
 						   contact->m_longitudinalDir.Scale (-contact->m_tireModel.m_longitunalForce) + 
 						   contact->m_lateralDir.Scale (-contact->m_tireModel.m_lateralForce));
+
+			if (contact->m_isContactPatch) {
+				force = force.Scale (1.0f/40.0f);
+			}
+
 			dVector torque (r.CrossProduct(force));
 
 			NewtonBodyAddForce(contact->m_collidingNode->m_body, &force[0]);
 			NewtonBodyAddTorque(contact->m_collidingNode->m_body, &torque[0]);
+			
 		}
 	}
 }

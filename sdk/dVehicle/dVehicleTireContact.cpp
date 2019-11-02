@@ -27,6 +27,7 @@ dVehicleTireContact::dVehicleTireContact()
 	,m_penetration(0.0f)
 	,m_staticFriction(1.0f)
 	,m_tireModel()
+	,m_isContactPatch(false)
 {
 }
 
@@ -44,6 +45,7 @@ void dVehicleTireContact::SetContact(dVehicleCollidingNode* const node, const dV
 	m_lateralDir = m_longitudinalDir.CrossProduct(m_normal);
 
 	m_isActive = true;
+	m_isContactPatch = false;
 	m_staticFriction = staticFriction;
 	m_penetration = dClamp(penetration, dFloat(0.0f), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
 	m_penetration = penetration;
@@ -95,7 +97,9 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 	const dVector& veloc1 = m_state1->GetVelocity();
 	const dVector& omega1 = m_state1->GetOmega();
 	const dVehicleTire* const tire = GetOwner0()->GetAsTire();
+	dVector zero (0.0f);
 
+	m_isContactPatch = false;
 	{
 		// normal constraint
 		int index = constraintParams->m_count;
@@ -103,18 +107,19 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
 		constraintParams->m_frictionCallback[index] = this;
 
-		const dMatrix& tireMatrix = m_state0->GetMatrix();
-		if (tireMatrix.m_right.DotProduct3(m_normal) > D_TIRE_CONTACT_PATCH_CONE) {
-			dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
-			jacobian1.m_linear = dVector(0.0f);
-			jacobian1.m_angular = dVector(0.0f);
-		}
-
 		dFloat recoverAccel = D_TIRE_PENETRATION_RECOVERING_SPEED * D_TIRE_MAX_ELASTIC_DEFORMATION * constraintParams->m_timestepInv;
 		if (constraintParams->m_jointAccel[index] > -recoverAccel) {
 			constraintParams->m_jointAccel[index] += D_TIRE_PENETRATION_RECOVERING_SPEED * m_penetration * constraintParams->m_timestepInv;
 		} else {
 			constraintParams->m_jointAccel[index] = 0.0f;
+		}
+
+		const dMatrix& tireMatrix = m_state0->GetMatrix();
+		if (tireMatrix.m_right.DotProduct3(m_normal) > D_TIRE_CONTACT_PATCH_CONE) {
+			dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
+			jacobian1.m_linear = zero;
+			jacobian1.m_angular = zero;
+			m_isContactPatch = true;
 		}
 	}
 
@@ -144,6 +149,12 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 				m_tireModel.m_longitudinalSlip = dClamp(dAbs(relSpeed / speedDen), dFloat(0.0f), dFloat(4.0f));
 			}
 		}
+
+		if (m_isContactPatch) {
+			dComplementaritySolver::dJacobian &jacobian2 = constraintParams->m_jacobians[index].m_jacobian_J10;
+			jacobian2.m_linear = zero;
+			jacobian2.m_angular = zero;
+		}
 	}
 
 	{
@@ -159,6 +170,12 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		m_tireModel.m_lateralSlip = lateralSpeed / (m_tireModel.m_lateralSlip + 1.0e-3f);
 		// clamp lateral slip to a max of +- 45 degree (witch is still too high, but reasonable)
 		m_tireModel.m_lateralSlip = dClamp (m_tireModel.m_lateralSlip, dFloat (-1.0f), dFloat(1.0f));
+
+		if (m_isContactPatch) {
+			dComplementaritySolver::dJacobian &jacobian2 = constraintParams->m_jacobians[index].m_jacobian_J10;
+			jacobian2.m_linear = zero;
+			jacobian2.m_angular = zero;
+		}
 	}
 
 

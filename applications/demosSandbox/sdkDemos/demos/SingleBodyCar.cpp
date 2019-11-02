@@ -82,46 +82,6 @@ static TIRE_DATA monsterTruckTire
 class SingleBodyVehicleManager: public dVehicleManager
 {
 	public:
-#if 0
-	class VehicleUserData: public DemoEntity::UserData
-	{
-		public:
-		VehicleUserData(dVehicleChassis* const vehicle)
-			:DemoEntity::UserData()
-			,m_vehicleChassis(vehicle)
-		{
-			memset(m_gearMap, 0, sizeof (m_gearMap));
-		}
-
-		void OnRender(dFloat timestep) const
-		{
-		}
-
-/*
-		void OnTransformCallback(DemoEntityManager& world) const
-		{
-			// calculate tire Matrices
-			dVehicleInterface* const vehicle = m_vehicleChassis->GetVehicle();
-			dMatrix chassisMatrixInv(vehicle->GetMatrix().Inverse());
-
-			const dList<dAnimAcyclicJoint*>& children = vehicle->GetChildren();
-			for (dList<dAnimAcyclicJoint*>::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
-				dVehicleTireInterface* const tire = ((dVehicleNode*)node->GetInfo())->GetAsTire();
-				if (tire) {
-					DemoEntity* const tireMesh = (DemoEntity*)tire->GetUserData();
-					dMatrix tireMatrix(tire->GetGlobalMatrix() * chassisMatrixInv);
-					dQuaternion rotation(tireMatrix);
-					tireMesh->SetMatrixUsafe(rotation, tireMatrix.m_posit);
-				}
-			}
-		}
-*/
-
-		dVehicleChassis* m_vehicleChassis;
-		int m_gearMap[10];
-	};
-#endif
-
 	SingleBodyVehicleManager(NewtonWorld* const world)
 		:dVehicleManager(world)
 		,m_player(NULL)
@@ -165,7 +125,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 	static void RenderUI(DemoEntityManager* const scene, void* const context)
 	{
 		SingleBodyVehicleManager* const me = (SingleBodyVehicleManager*)context;
-//		me->RenderUI(scene);
+		me->RenderUI(scene);
 	}
 
 	void DrawGage(GLuint gage, GLuint needle, dFloat param, dFloat origin_x, dFloat origin_y, dFloat size, dFloat minAngle, dFloat maxAngle) const
@@ -315,7 +275,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// add the tire to the vehicle
 		dTireInfo tireInfo;
 		tireInfo.m_mass = data.m_mass;
-		//tireInfo.m_radio = radius * 1.25f;
 		tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
 		tireInfo.m_pivotOffset = data.m_pivotOffset;
@@ -616,7 +575,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dEngineInfo engineInfo;
 		engineInfo.m_mass = MONSTER_TRUCK_ENGINE_MASS;
 		engineInfo.m_armatureRadius = MONSTER_TRUCK_ENGINE_RADIUS;
-		//engineInfo.m_idleTorque = 200.0f;			// IDLE_TORQUE
 		engineInfo.m_idleTorque = 300.0f * 1.5f;			// IDLE_TORQUE
 		engineInfo.m_peakTorque = 500.0f * 1.5f;			// PEAK_TORQUE
 		engineInfo.m_peakHorsePower = 400.0f * 1.5f;		// PEAK_HP
@@ -771,13 +729,104 @@ axisCount = 0;
 };
 
 
+static void CreateBridge(DemoEntityManager* const scene, NewtonBody* const playgroundBody)
+{
+	dVector p0(1.35f, 8.35f, -28.1f, 0.0f);
+	dVector p1(1.35f, 8.40f, 28.9f, 0.0f);
+	dVector p2(1.35f, 6.0f, 0.0, 0.0f);
+
+	dFloat y[3];
+	dFloat splineMatrix[3][3];
+
+	y[0] = p0.m_y;
+	splineMatrix[0][0] = p0.m_z * p0.m_z;
+	splineMatrix[0][1] = p0.m_z;
+	splineMatrix[0][2] = 1.0f;
+
+	y[1] = p1.m_y;
+	splineMatrix[1][0] = p1.m_z * p1.m_z;
+	splineMatrix[1][1] = p1.m_z;
+	splineMatrix[1][2] = 1.0f;
+
+	y[2] = p2.m_y;
+	splineMatrix[2][0] = p2.m_z * p2.m_z;
+	splineMatrix[2][1] = p2.m_z;
+	splineMatrix[2][2] = 1.0f;
+
+	dSolveGaussian(3, &splineMatrix[0][0], y);
+
+	dFloat plankLentgh = 3.0f;
+	NewtonWorld* const world = scene->GetNewton();
+	dVector size(8.0f, 0.5f, plankLentgh, 0.0f);
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
+	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+
+	int count = 0;
+	dFloat mass = 50.0f;
+	dFloat lenght = 0.0f;
+	dFloat step = 1.0e-3f;
+	dFloat y0 = y[0] * p0.m_z * p0.m_z + y[1] * p0.m_z + y[2];
+
+	dVector q0(p0);
+	NewtonBody* array[256];
+	for (dFloat z = p0.m_z + step; z < p1.m_z; z += step) {
+		dFloat y1 = y[0] * z * z + y[1] * z + y[2];
+		dFloat y10 = y1 - y0;
+		lenght += dSqrt(step * step + y10 * y10);
+		if (lenght >= plankLentgh) {
+			dVector q1(p0.m_x, y1, z, 0.0f);
+
+			dMatrix matrix(dGetIdentityMatrix());
+			matrix.m_posit = (q1 + q0).Scale(0.5f);
+			matrix.m_posit.m_w = 1.0f;
+
+			dVector right(q1 - q0);
+			matrix.m_right = right.Normalize();
+			matrix.m_up = matrix.m_right.CrossProduct(matrix.m_front);
+
+			array[count] = CreateSimpleSolid(scene, geometry, mass, matrix, collision, 0);
+
+			q0 = q1;
+			lenght = 0.0f;
+			count++;
+		}
+
+		y0 = y1;
+	}
+
+	dMatrix matrix;
+	NewtonBodyGetMatrix(array[0], &matrix[0][0]);
+	matrix.m_posit = matrix.m_posit + matrix.m_up.Scale(size.m_y * 0.5f) - matrix.m_right.Scale(size.m_z * 0.5f);
+	dCustomHinge* hinge = new dCustomHinge(matrix, array[0], playgroundBody);
+	hinge->SetAsSpringDamper(true, 0.9f, 0.0f, 20.0f);
+
+	for (int i = 1; i < count; i++) {
+		dMatrix matrix;
+		NewtonBodyGetMatrix(array[i], &matrix[0][0]);
+		matrix.m_posit = matrix.m_posit + matrix.m_up.Scale(size.m_y * 0.5f) - matrix.m_right.Scale(size.m_z * 0.5f);
+		dCustomHinge* const hinge = new dCustomHinge(matrix, array[i - 1], array[i]);
+		hinge->SetAsSpringDamper(true, 0.9f, 0.0f, 20.0f);
+	}
+
+	NewtonBodyGetMatrix(array[count - 1], &matrix[0][0]);
+	matrix.m_posit = matrix.m_posit + matrix.m_up.Scale(size.m_y * 0.5f) + matrix.m_right.Scale(size.m_z * 0.5f);
+	hinge = new dCustomHinge(matrix, array[count - 1], playgroundBody);
+	hinge->SetAsSpringDamper(true, 0.9f, 0.0f, 20.0f);
+
+
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+}
+
 static void AddBackground(DemoEntityManager* const scene)
 {
-//	CreateLevelMesh(scene, "flatPlane.ngd", 1);
-	CreateLevelMesh (scene, "playerarena.ngd", true);
+
+	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "playerarena.ngd", true);
 //	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 //	CreateHeightFieldTerrain(scene, 7, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 #if 1
+	CreateBridge(scene, playgroundBody);
+
 	NewtonBody* const terrain = CreateHeightFieldTerrain(scene, 7, 1.0f, 1.0f, 0.1f, 15.0f, -10.0f);
 	DemoEntity* const terrainEntity = (DemoEntity*)NewtonBodyGetUserData(terrain);
 
@@ -834,13 +883,13 @@ void SingleBodyCar(DemoEntityManager* const scene)
 //	manager->SetAsPlayer(player0);
 
 	// create an monster Truck
-	location.m_posit.m_x += 20.0f;
-	location.m_posit.m_y += 10.0f;
-	location.m_posit.m_z += 12.0f;
+	location.m_posit.m_x = 1.0f;
+	location.m_posit.m_y = 10.0f;
+	location.m_posit.m_z = 16.0f;
 
-	//location.m_posit.m_x = 38.0f;
-	//location.m_posit.m_y = 10.0f;
-	//location.m_posit.m_z = -25.0f;
+	location.m_posit.m_x = 20.0f;
+	location.m_posit.m_z = 12.0f;
+	location.m_posit.m_y = 10.0f;
 
 	location.m_posit = FindFloor(scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 2.0f;

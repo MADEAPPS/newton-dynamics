@@ -62,6 +62,7 @@ class dVehicleTireContact: public dVehicleLoopJoint
 	dFloat m_penetration;
 	dFloat m_staticFriction;
 	mutable dTireModel m_tireModel;
+	bool m_isContactPatch;
 
 	friend class dVehicleTire;
 };
