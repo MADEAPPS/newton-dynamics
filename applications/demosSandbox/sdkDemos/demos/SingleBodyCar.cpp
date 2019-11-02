@@ -778,13 +778,13 @@ static void AddBackground(DemoEntityManager* const scene)
 //	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 //	CreateHeightFieldTerrain(scene, 7, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 #if 1
-	NewtonBody* const terrain = CreateHeightFieldTerrain(scene, 7, 1.0f, 1.0f, 0.1f, 10.0f, -15.0f);
+	NewtonBody* const terrain = CreateHeightFieldTerrain(scene, 7, 1.0f, 1.0f, 0.1f, 15.0f, -10.0f);
 	DemoEntity* const terrainEntity = (DemoEntity*)NewtonBodyGetUserData(terrain);
 
 	dMatrix location(dGetIdentityMatrix());
-	location.m_posit.m_x += 20.0f;
+	location.m_posit.m_x = 0.0f;
 	location.m_posit.m_y -= 0.2f;
-	location.m_posit.m_z -= 20.0f;
+	location.m_posit.m_z = -50.0f;
 	NewtonBodySetMatrix(terrain, &location[0][0]);
 	terrainEntity->SetMatrixUsafe(dQuaternion(location), location.m_posit);
 	terrainEntity->SetMatrixUsafe(dQuaternion(location), location.m_posit);
