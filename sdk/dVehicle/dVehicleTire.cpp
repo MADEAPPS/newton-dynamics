@@ -154,7 +154,7 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 	dLong attributeA[maxContactCount];
 	dLong attributeB[maxContactCount];
 		
-	for (int i = 0; (i < bodyArray.m_count) && (contactCount < sizeof(m_contactsJoints) / sizeof(m_contactsJoints[0])); i++) {
+	for (int i = 0; (i < bodyArray.m_count) && (contactCount < maxContactCount); i++) {
 		// calculate tire contact collision with rigid bodies
 
 		NewtonBodyGetMatrix(bodyArray.m_array[i], &matrixB[0][0]);
@@ -164,7 +164,7 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 										   otherShape, &matrixB[0][0],
 										   &points[0][0], &normals[0][0], penetrations, attributeA, attributeB, 0);
 
-		for (int j = 0; j < count; j ++) {
+		for (int j = 0; (j < count) && (contactCount < maxContactCount); j ++) {
 			dVector normal (normals[j][0], normals[j][1], normals[j][2], dFloat (0.0f));
 			dVector longitudinalDir(normal.CrossProduct(tireMatrix.m_front));
 			if (longitudinalDir.DotProduct3(longitudinalDir) < 0.1f) {
