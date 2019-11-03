@@ -71,17 +71,16 @@
 //#define DEFAULT_SCENE	35		// basic rag doll
 //#define DEFAULT_SCENE	36		// balancing character
 //#define DEFAULT_SCENE	37		// dynamic rag doll
-//#define DEFAULT_SCENE	38		// basic Car
-#define DEFAULT_SCENE	39		// single body vehicle
-//#define DEFAULT_SCENE	40		// super Car
-//#define DEFAULT_SCENE	41		// heavy vehicles
-//#define DEFAULT_SCENE	42		// basic player controller
-//#define DEFAULT_SCENE	43		// animated player controller
-//#define DEFAULT_SCENE	44		// advanced player controller
-//#define DEFAULT_SCENE	45		// cloth patch			
-//#define DEFAULT_SCENE	46		// soft bodies	
-//#define DEFAULT_SCENE	47		// joe's joint test
-//#define DEFAULT_SCENE	48		// Misho's Hinge Test
+#define DEFAULT_SCENE	38		// single body vehicle
+//#define DEFAULT_SCENE	39		// super Car
+//#define DEFAULT_SCENE	40		// heavy vehicles
+//#define DEFAULT_SCENE	41		// basic player controller
+//#define DEFAULT_SCENE	42		// animated player controller
+//#define DEFAULT_SCENE	43		// advanced player controller
+//#define DEFAULT_SCENE	44		// cloth patch			
+//#define DEFAULT_SCENE	45		// soft bodies	
+//#define DEFAULT_SCENE	46		// joe's joint test
+//#define DEFAULT_SCENE	47		// Misho's Hinge Test
 						 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
@@ -113,7 +112,6 @@ void SimpleConvexFracturing (DemoEntityManager* const scene);
 void StructuredConvexFracturing (DemoEntityManager* const scene);
 void UsingNewtonMeshTool (DemoEntityManager* const scene);
 void MultiRayCast (DemoEntityManager* const scene);
-void BasicCar (DemoEntityManager* const scene);
 void SingleBodyCar(DemoEntityManager* const scene);
 void SuperCar (DemoEntityManager* const scene);
 void MilitaryTransport (DemoEntityManager* const scene);
@@ -176,7 +174,6 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
 	{"Balancing character", "demonstrate dynamic character", BalancingCharacter},
 	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagdoll},
-	{"Basic car", "show how to set up a vehicle controller", BasicCar},
 	{"Single body car", "show a generalized coordinate system body", SingleBodyCar },
 	{"Super car", "implement a hight performance sport car", SuperCar},
 	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},

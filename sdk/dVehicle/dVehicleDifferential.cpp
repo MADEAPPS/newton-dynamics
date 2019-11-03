@@ -27,6 +27,8 @@ dVehicleDifferential::dVehicleDifferential(dVehicleMultiBody* const chassis, dFl
 	,m_shaftOmega(0.0f)
 	,m_mode(m_slipLocked)
 {
+m_mode = m_unlocked;
+
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 
 	dFloat inertia = (2.0f / 5.0f) * mass * radius * radius;
@@ -126,22 +128,24 @@ void dVehicleDifferential::JacobianDerivative(dComplementaritySolver::dParamInfo
 	// angular constraints	
 	AddAngularRowJacobian(constraintParams, matrix.m_right, 0.0f);
 
-	const dVector& omega = m_state0->GetOmega();
-	dFloat omegax = matrix.m_front.DotProduct3(omega);
-	dFloat omegay = matrix.m_up.DotProduct3(omega);
+	if (m_mode != m_unlocked) {
+		const dVector& omega = m_state0->GetOmega();
+		dFloat omegax = matrix.m_front.DotProduct3(omega);
+		dFloat omegay = matrix.m_up.DotProduct3(omega);
 
-	dFloat slipDiffOmega = dMax(dFloat (8.0f), 0.5f * dAbs(omegax));
-	if (omegay > slipDiffOmega) {
-		int index = constraintParams->m_count;
-		AddAngularRowJacobian(constraintParams, matrix.m_up, 0.0f);
-		constraintParams->m_jointAccel[index] -= slipDiffOmega * constraintParams->m_timestepInv;
-		constraintParams->m_jointHighFrictionCoef[index] = 0.0f;
+		dFloat slipDiffOmega = dMax(dFloat (8.0f), 0.5f * dAbs(omegax));
+		if (omegay > slipDiffOmega) {
+			int index = constraintParams->m_count;
+			AddAngularRowJacobian(constraintParams, matrix.m_up, 0.0f);
+			constraintParams->m_jointAccel[index] -= slipDiffOmega * constraintParams->m_timestepInv;
+			constraintParams->m_jointHighFrictionCoef[index] = 0.0f;
 
-	} else if (omegay < -slipDiffOmega) {
-		int index = constraintParams->m_count;
-		AddAngularRowJacobian(constraintParams, matrix.m_up, 0.0f);
-		constraintParams->m_jointAccel[index] -= -slipDiffOmega * constraintParams->m_timestepInv;
-		constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
+		} else if (omegay < -slipDiffOmega) {
+			int index = constraintParams->m_count;
+			AddAngularRowJacobian(constraintParams, matrix.m_up, 0.0f);
+			constraintParams->m_jointAccel[index] -= -slipDiffOmega * constraintParams->m_timestepInv;
+			constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
+		}
 	}
 }
 

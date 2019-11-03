@@ -89,9 +89,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
-		
-		//scene->Set2DDisplayRenderFunction(RenderHelpMenu, RenderUI, this);
-		scene->Set2DDisplayRenderFunction(NULL, RenderUI, this);
+		scene->Set2DDisplayRenderFunction(RenderHelpMenu, RenderUI, this);
 		
 		//// load 2d display assets
 		m_gears = LoadTexture("gears_font.tga");
@@ -118,8 +116,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
 	{
-		//SingleBodyVehicleManager* const me = (SingleBodyVehicleManager*)context;
-		//me->DrawHelp(scene);
+		SingleBodyVehicleManager* const me = (SingleBodyVehicleManager*)context;
+		me->DrawHelp(scene);
 	}
 
 	static void RenderUI(DemoEntityManager* const scene, void* const context)
@@ -195,6 +193,23 @@ class SingleBodyVehicleManager: public dVehicleManager
 		glEnd();
 
 		glPopMatrix();
+	}
+
+	void DrawHelp(DemoEntityManager* const scene) const
+	{
+		//		if (m_player->m_helpKey.GetPushButtonState()) 
+		{
+			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+			scene->Print(color, "Vehicle driving keyboard control");
+			scene->Print(color, "key switch          : 'I'");
+			scene->Print(color, "accelerator         : 'W'");
+			scene->Print(color, "reverse             : 'S'");
+			scene->Print(color, "turn left           : 'A'");
+			scene->Print(color, "turn right          : 'D'");
+			scene->Print(color, "engage clutch       : 'K'");
+			scene->Print(color, "hand brakes         : 'space'");
+			scene->Print(color, "hide help           : 'H'");
+		}
 	}
 
 	void RenderUI(DemoEntityManager* const scene)

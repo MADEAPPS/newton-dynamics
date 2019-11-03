@@ -21,9 +21,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\ArticulatedJoints.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\BasicFriction.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -172,9 +169,6 @@
       <Filter>demos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\MishosRocketTest.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\BasicMultibodyVehicle.cpp">
       <Filter>demos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\SingleBodyCar.cpp">

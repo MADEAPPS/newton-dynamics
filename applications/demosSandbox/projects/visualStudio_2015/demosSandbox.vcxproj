@@ -47,7 +47,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ArticulatedJoints.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BalancingCharacter.cpp" />
-    <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicFriction.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicRagdoll.cpp" />
