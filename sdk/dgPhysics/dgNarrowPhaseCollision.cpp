@@ -1982,7 +1982,6 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 	contactJoint->m_closestDistance = dgFloat32(1.0e10f);
 	contactJoint->m_separationDistance = dgFloat32(0.0f);
 
-//	if (!(collision0->GetConvexVertexCount() && collision1->GetConvexVertexCount() && proxy.m_instance0->GetCollisionMode() && proxy.m_instance1->GetCollisionMode())) {
 	if (!(collision0->GetConvexVertexCount() && collision1->GetConvexVertexCount())) {
 		return count;
 	}
@@ -2217,7 +2216,6 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 
 	dgInt32 count = 0;
 	dgInt32 maxContacts = proxy.m_maxContacts;
-//	dgInt32 maxReduceLimit = maxContacts >> 2;
 	dgInt32 maxReduceLimit = maxContacts - 16;
 	dgInt32 countleft = maxContacts;
 

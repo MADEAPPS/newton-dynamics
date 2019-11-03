@@ -340,12 +340,10 @@ dgVector dgCollisionChamferCylinder::SupportVertex (const dgVector& dir, dgInt32
 
 	dgFloat32 x = dir.GetScalar();
 	if (dgAbs (x) > dgFloat32 (0.9999f)) {
-		//return dgVector ((x > dgFloat32 (0.0f)) ? m_height : - m_height, dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
 		return dgVector (dgSign (x) * m_height, m_radius, dgFloat32 (0.0f), dgFloat32 (0.0f)); 
 	}
 
 	dgVector sideDir (m_yzMask & dir);
-	//sideDir = sideDir * sideDir.InvMagSqrt();
 	sideDir = sideDir.Normalize();
 	return sideDir.Scale(m_radius) + dir.Scale (m_height);
 }

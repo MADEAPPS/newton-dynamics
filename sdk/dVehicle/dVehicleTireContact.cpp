@@ -47,8 +47,8 @@ void dVehicleTireContact::SetContact(dVehicleCollidingNode* const node, const dV
 	m_isActive = true;
 	m_isContactPatch = false;
 	m_staticFriction = staticFriction;
-	m_penetration = dClamp(penetration, dFloat(0.0f), dFloat(D_TIRE_MAX_ELASTIC_DEFORMATION));
-	m_penetration = penetration;
+	dAssert (penetration >= -1.0e-3f);
+	m_penetration = dMax (penetration, dFloat (0.0f));
 }
 
 void dVehicleTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const
@@ -107,11 +107,12 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
 		constraintParams->m_frictionCallback[index] = this;
 
-		dFloat recoverAccel = D_TIRE_PENETRATION_RECOVERING_SPEED * D_TIRE_MAX_ELASTIC_DEFORMATION * constraintParams->m_timestepInv;
-		if (constraintParams->m_jointAccel[index] > -recoverAccel) {
-			constraintParams->m_jointAccel[index] += D_TIRE_PENETRATION_RECOVERING_SPEED * m_penetration * constraintParams->m_timestepInv;
+		if (m_penetration > (2.0f * D_TIRE_MAX_ELASTIC_DEFORMATION)) {
+			dFloat recoverAccel = D_TIRE_PENETRATION_RECOVERING_SPEED * D_TIRE_MAX_ELASTIC_DEFORMATION * constraintParams->m_timestepInv;
+			constraintParams->m_jointAccel[index] += recoverAccel;
 		} else {
-			constraintParams->m_jointAccel[index] = 0.0f;
+			dFloat recoverAccel = D_TIRE_PENETRATION_RECOVERING_SPEED * m_penetration * constraintParams->m_timestepInv;
+			constraintParams->m_jointAccel[index] += D_TIRE_PENETRATION_RECOVERING_SPEED * m_penetration * constraintParams->m_timestepInv;
 		}
 
 		const dMatrix& tireMatrix = m_state0->GetMatrix();

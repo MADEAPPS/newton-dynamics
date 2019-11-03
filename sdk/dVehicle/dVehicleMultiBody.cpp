@@ -44,12 +44,8 @@ dVehicleMultiBody::dVehicleMultiBody(NewtonBody* const body, const dMatrix& loca
 	SetAerodynamicsDownforceCoefficient(0.5f, 0.4f, 1.0f);
 	*/
 
-	dVector tmp;
-	//dComplementaritySolver::dBodyState* const chassisBody = GetProxyBody();
-	//m_groundNode.SetWorld(m_world);
-	//m_groundNode.SetLoopNode(true);
-
 	// set the inertia matrix;
+	dVector tmp;
 	NewtonBodyGetMass(m_newtonBody, &tmp.m_w, &tmp.m_x, &tmp.m_y, &tmp.m_z);
 	m_proxyBody.SetMass(tmp.m_w);
 	m_proxyBody.SetInertia(tmp.m_x, tmp.m_y, tmp.m_z);
@@ -368,8 +364,6 @@ void dVehicleMultiBody::ApplyExternalForce()
 	dVector vector(0.0f);
 
 	m_collidingIndex = 0;
-//	m_groundProxyBody.m_proxyBody.SetForce(vector);
-//	m_groundProxyBody.m_proxyBody.SetTorque(vector);
 
 	// get data from engine rigid body and copied to the vehicle chassis body
 	NewtonBodyGetMatrix(m_newtonBody, &matrix[0][0]);
@@ -647,7 +641,6 @@ void dVehicleMultiBody::PreUpdate(dFloat timestep)
 	dVehicleSolver::Update(timestep);
 	Integrate(timestep);
 	CalculateFreeDof();
-
 #if 0
 	FILE* file_xxx = fopen("xxxxx.csv", "wb");
 	fprintf(file_xxx, "tireforce\n");

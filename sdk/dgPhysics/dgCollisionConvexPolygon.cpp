@@ -659,7 +659,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 	dgAssert(proxy.m_instance1->IsType(dgCollision::dgCollisionConvexPolygon_RTTI));
 	dgAssert (proxy.m_instance1->GetGlobalMatrix().TestIdentity());
 
-	//const dgCollisionInstance* const polygonInstance = proxy.m_instance1;
 	dgAssert(this == proxy.m_instance1->GetChildShape());
 	dgAssert(m_count);
 	dgAssert(m_count < dgInt32(sizeof (m_localPoly) / sizeof (m_localPoly[0])));

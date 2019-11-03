@@ -86,6 +86,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		:dVehicleManager(world)
 		,m_player(NULL)
 		,m_externalView(true)
+		,m_differentialMode(0)
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
@@ -197,19 +198,25 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 	void DrawHelp(DemoEntityManager* const scene) const
 	{
-		//		if (m_player->m_helpKey.GetPushButtonState()) 
-		{
-			dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-			scene->Print(color, "Vehicle driving keyboard control");
-			scene->Print(color, "key switch          : 'I'");
-			scene->Print(color, "accelerator         : 'W'");
-			scene->Print(color, "reverse             : 'S'");
-			scene->Print(color, "turn left           : 'A'");
-			scene->Print(color, "turn right          : 'D'");
-			scene->Print(color, "engage clutch       : 'K'");
-			scene->Print(color, "hand brakes         : 'space'");
-			scene->Print(color, "hide help           : 'H'");
-		}
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print(color, "Vehicle driving keyboard control");
+		//scene->Print(color, "key switch          : 'i'");
+		scene->Print(color, "accelerator         : 'w'");
+		scene->Print(color, "reverse             : 's'");
+		scene->Print(color, "turn left           : 'a'");
+		scene->Print(color, "turn right          : 'd'");
+		//scene->Print(color, "engage clutch       : 'k'");
+		scene->Print(color, "hand brakes         : 'space'");
+
+		ImGui::Separator();
+		scene->Print(color, "differential type");
+		ImGui::RadioButton("awd",	&m_differentialMode, 0);
+		ImGui::RadioButton("free",	&m_differentialMode, 1);
+		ImGui::RadioButton("fwd",	&m_differentialMode, 2); 
+		ImGui::RadioButton("rwd",	&m_differentialMode, 3); 
+
+		ImGui::Separator();
+		scene->Print(color, "hide help           : 'h'");
 	}
 
 	void RenderUI(DemoEntityManager* const scene)
@@ -290,8 +297,9 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// add the tire to the vehicle
 		dTireInfo tireInfo;
 		tireInfo.m_mass = data.m_mass;
-		tireInfo.m_radio = radius * 1.25f;
-		//tireInfo.m_radio = radius;
+		tireInfo.m_radio = radius;
+		// for debugging
+		//tireInfo.m_radio *= 1.25f; 
 		tireInfo.m_width = width;
 		tireInfo.m_pivotOffset = data.m_pivotOffset;
 		tireInfo.m_steerRate = data.m_steerRate * dPi;
@@ -694,7 +702,7 @@ axisCount = 0;
 		driverInput.m_clutchPedal = 0.0f;
 
 #if 0
-	#if 1
+	#if 0
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
 			fwrite(&driverInput, sizeof(dVehicleMultiBody::dDriverInput), 1, file);
@@ -741,6 +749,7 @@ axisCount = 0;
 	GLuint m_redNeedle;
 	GLuint m_tachometer;
 	GLuint m_greenNeedle;
+	mutable int m_differentialMode;
 	bool m_externalView;
 };
 
@@ -838,7 +847,7 @@ static void AddBackground(DemoEntityManager* const scene)
 {
 
 //	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "playerarena.ngd", true);
-	CreateHeightFieldTerrain (scene, 8, 0.25f, 1.0f, 0.25f, 0.0f, 0.0f);
+	CreateHeightFieldTerrain (scene, 9, 0.25f, 1.0f, 0.25f, 0.0f, 0.0f);
 //	CreateHeightFieldTerrain(scene, 7, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 #if 0
 	CreateBridge(scene, playgroundBody);

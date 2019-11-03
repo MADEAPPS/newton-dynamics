@@ -39,7 +39,7 @@ dVehicleTire::dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& loca
 	NewtonBody* const chassisBody = chassis->GetBody();
 	NewtonWorld* const world = NewtonBodyGetWorld(chassis->GetBody());
 
-#if 0
+#if 1
 	// tire shaped more like real tires with rim and carcase, harder in collision
 	m_tireShape = NewtonCreateChamferCylinder(world, 0.75f, 0.5f, 0, NULL);
 	NewtonCollisionSetScale(m_tireShape, 2.0f * m_info.m_width, m_info.m_radio, m_info.m_radio);
@@ -155,7 +155,7 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 	dFloat penetrations[maxContactCount];
 	dLong attributeA[maxContactCount];
 	dLong attributeB[maxContactCount];
-		
+
 	for (int i = 0; (i < bodyArray.m_count) && (contactCount < maxContactCount); i++) {
 		// calculate tire contact collision with rigid bodies
 
@@ -186,17 +186,17 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 	}
 
 	// filter contact that are too close 
-	for (int i = 0; i < contactCount - 1; i ++) {
-		const dVector& n = m_contactsJoints[i].m_normal;
-		for (int j = contactCount - 1; j > i; j --) {
-			dFloat val = dAbs (n.DotProduct3(m_contactsJoints[j].m_normal));
-			if (val > 0.996f) {
-				dVector error (m_contactsJoints[j].m_point - m_contactsJoints[i].m_point);
-				val = error.DotProduct3(error);
-				if (val < 1.0e-2f) {
-					m_contactsJoints[j] = m_contactsJoints[contactCount - 1];
-					contactCount --;
+	for (int i = contactCount - 1; i >= 0; i --) {
+		const dVector& p = m_contactsJoints[i].m_point;
+		for (int j = i - 1; j >= 0; j --) {
+			const dVector error (m_contactsJoints[j].m_point - p);
+			dFloat error2 = error.DotProduct3(error);
+			if (error2 < 1.0e-2f) {			
+				if (m_contactsJoints[i].m_penetration > m_contactsJoints[j].m_penetration) {
+					m_contactsJoints[j] = m_contactsJoints[i];
 				}
+				contactCount --;
+				break;
 			}
 		}
 	}
@@ -249,7 +249,7 @@ const void dVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 	// render tireState matrix
 	dComplementaritySolver::dBodyState* const chassisBody = &chassis->GetProxyBody();
 	dVector weight (chassis->GetGravity().Scale(chassisBody->GetMass()));
-	dFloat scale (1.0f / dSqrt (weight.DotProduct3(weight)));
+//	dFloat scale (1.0f / dSqrt (weight.DotProduct3(weight)));
 	for (int i = 0; i < sizeof (m_contactsJoints)/sizeof (m_contactsJoints[0]); i ++) {
 		const dVehicleTireContact* const contact = &m_contactsJoints[i];
 		if (contact->IsActive()) {
