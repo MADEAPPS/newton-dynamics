@@ -39,13 +39,16 @@ dVehicleTire::dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& loca
 	NewtonBody* const chassisBody = chassis->GetBody();
 	NewtonWorld* const world = NewtonBodyGetWorld(chassis->GetBody());
 
-#if 1
+#if 0
+	// tire shaped more like real tires with rim and carcase, harder in collision
 	m_tireShape = NewtonCreateChamferCylinder(world, 0.75f, 0.5f, 0, NULL);
 	NewtonCollisionSetScale(m_tireShape, 2.0f * m_info.m_width, m_info.m_radio, m_info.m_radio);
-#elif 0
+#elif 1
+	// tire shape like real tires with rim and carcase, harder in collision
 	m_tireShape = NewtonCreateChamferCylinder(world, 0.5f, 1.0f, 0, NULL);
 	NewtonCollisionSetScale(m_tireShape, m_info.m_width, m_info.m_radio, m_info.m_radio);
 #else
+	// tire is a simple chamfered cylinder, faster collision
 	m_tireShape = NewtonCreateChamferCylinder(world, m_info.m_width*0.25f, m_info.m_radio*1.5f, 0, NULL);
 #endif
 
