@@ -290,7 +290,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// add the tire to the vehicle
 		dTireInfo tireInfo;
 		tireInfo.m_mass = data.m_mass;
-		tireInfo.m_radio = radius;
+		tireInfo.m_radio = radius * 1.25f;
+		//tireInfo.m_radio = radius;
 		tireInfo.m_width = width;
 		tireInfo.m_pivotOffset = data.m_pivotOffset;
 		tireInfo.m_steerRate = data.m_steerRate * dPi;
@@ -836,10 +837,10 @@ static void CreateBridge(DemoEntityManager* const scene, NewtonBody* const playg
 static void AddBackground(DemoEntityManager* const scene)
 {
 
-	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "playerarena.ngd", true);
-//	CreateHeightFieldTerrain (scene, 10, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
+//	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "playerarena.ngd", true);
+	CreateHeightFieldTerrain (scene, 8, 0.25f, 1.0f, 0.25f, 0.0f, 0.0f);
 //	CreateHeightFieldTerrain(scene, 7, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
-#if 1
+#if 0
 	CreateBridge(scene, playgroundBody);
 
 	NewtonBody* const terrain = CreateHeightFieldTerrain(scene, 7, 1.0f, 1.0f, 0.1f, 15.0f, -10.0f);

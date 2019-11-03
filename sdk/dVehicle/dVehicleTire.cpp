@@ -39,11 +39,15 @@ dVehicleTire::dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& loca
 	NewtonBody* const chassisBody = chassis->GetBody();
 	NewtonWorld* const world = NewtonBodyGetWorld(chassis->GetBody());
 
-//	m_tireShape = NewtonCreateChamferCylinder(world, 0.5f, 1.0f, 0, NULL);
-//	NewtonCollisionSetScale(m_tireShape, m_info.m_width, m_info.m_radio, m_info.m_radio);
+#if 1
 	m_tireShape = NewtonCreateChamferCylinder(world, 0.75f, 0.5f, 0, NULL);
 	NewtonCollisionSetScale(m_tireShape, 2.0f * m_info.m_width, m_info.m_radio, m_info.m_radio);
-//	m_tireShape = NewtonCreateChamferCylinder(world, m_info.m_width*0.25f, m_info.m_radio*1.5f, 0, NULL);
+#elif 0
+	m_tireShape = NewtonCreateChamferCylinder(world, 0.5f, 1.0f, 0, NULL);
+	NewtonCollisionSetScale(m_tireShape, m_info.m_width, m_info.m_radio, m_info.m_radio);
+#else
+	m_tireShape = NewtonCreateChamferCylinder(world, m_info.m_width*0.25f, m_info.m_radio*1.5f, 0, NULL);
+#endif
 
 	dMatrix chassisMatrix;
 	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
