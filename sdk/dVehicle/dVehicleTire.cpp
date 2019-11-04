@@ -290,7 +290,7 @@ void dVehicleTire::Integrate(dFloat timestep)
 
 			dVector r (contact->m_point - matrix.TransformVector(com));
 
-#if 0
+#if 1
 			dVector force (contact->m_normal.Scale (-contact->m_tireModel.m_tireLoad) +
 						   contact->m_longitudinalDir.Scale (-contact->m_tireModel.m_longitunalForce) + 
 						   contact->m_lateralDir.Scale (-contact->m_tireModel.m_lateralForce));

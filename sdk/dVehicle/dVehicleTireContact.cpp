@@ -117,14 +117,11 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		//}
 
 		dFloat penetration = dMin (m_penetration, D_TIRE_MAX_ELASTIC_DEFORMATION);
-		if (m_collidingNode->GetNewtonBody()) {
-			penetration *= 0.0f;
-		}
 		dFloat recoverAccel = D_TIRE_PENETRATION_RECOVERING_SPEED * penetration * constraintParams->m_timestepInv;
 		constraintParams->m_jointAccel[index] += recoverAccel;
 
 		const dMatrix& tireMatrix = m_state0->GetMatrix();
-		if (tireMatrix.m_right.DotProduct3(m_normal) > D_TIRE_CONTACT_PATCH_CONE) {
+		if (m_collidingNode->GetNewtonBody() && (tireMatrix.m_right.DotProduct3(m_normal) > D_TIRE_CONTACT_PATCH_CONE)) {
 			dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
 			jacobian1.m_linear = zero;
 			jacobian1.m_angular = zero;
@@ -208,15 +205,21 @@ void dVehicleTireContact::SpecialSolverFrictionCallback(const dFloat* const load
 	dAssert (load[0] >= 0.0f);
 	dFloat f = m_staticFriction * load[0];
 
-	if (f > 10.0f) {
-		dFloat g = m_tireModel.m_gammaStiffness;
+	m_tireModel.m_tireLoad = load[0];
+	m_tireModel.m_alingMoment = 0.0f;
+	m_tireModel.m_longitunalForce = load[1];
+	m_tireModel.m_lateralForce = load[2];
 
+	lowFriction[1] = -f;
+	highFriction[1] = f;
+	lowFriction[2] = -f;
+	highFriction[2] = f;
+
+	if (f > 10.0f) {
 		dVehicleTire* const tire = GetOwner0()->GetAsTire();
 		const dTireInfo& tireInfo = tire->GetInfo();
-		m_tireModel.m_tireLoad = load[0];
-		m_tireModel.m_alingMoment = 0.0f;
-		m_tireModel.m_lateralForce = load[2];
-		m_tireModel.m_longitunalForce = load[1];
+
+		dFloat g = m_tireModel.m_gammaStiffness;
 
 		// apply brush tire model
 		dFloat r = g / f;
@@ -236,11 +239,5 @@ void dVehicleTireContact::SpecialSolverFrictionCallback(const dFloat* const load
 
 		lowFriction[2] = -y * r;
 		highFriction[2] = y * r;
-	} else {
-		lowFriction[1] = -f;
-		highFriction[1] = f;
-
-		lowFriction[2] = -f;
-		highFriction[2] = f;
 	}
 }
