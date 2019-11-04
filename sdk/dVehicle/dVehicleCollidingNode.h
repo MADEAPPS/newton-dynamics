@@ -23,6 +23,7 @@ class dVehicleCollidingNode: public dVehicleNode
 	public:
 	dVehicleCollidingNode();
 	~dVehicleCollidingNode();
+	NewtonBody* GetNewtonBody() const { return m_body;}
 
 	private:
 	NewtonBody* m_body;

@@ -302,7 +302,6 @@ void dVehicleTire::Integrate(dFloat timestep)
 
 			NewtonBodyAddForce(contact->m_collidingNode->m_body, &force[0]);
 			NewtonBodyAddTorque(contact->m_collidingNode->m_body, &torque[0]);
-			
 		}
 	}
 }

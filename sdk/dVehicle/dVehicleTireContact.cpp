@@ -117,6 +117,9 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		//}
 
 		dFloat penetration = dMin (m_penetration, D_TIRE_MAX_ELASTIC_DEFORMATION);
+		if (m_collidingNode->GetNewtonBody()) {
+			penetration *= 0.0f;
+		}
 		dFloat recoverAccel = D_TIRE_PENETRATION_RECOVERING_SPEED * penetration * constraintParams->m_timestepInv;
 		constraintParams->m_jointAccel[index] += recoverAccel;
 
