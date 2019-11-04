@@ -304,7 +304,7 @@ dTrace(("a(%f %f %f) n(%f %f %f)\n",
 dTrace(("a(%f %f %f) n(%f %f %f)\n", 
 	force1[0] * 0.1f, force1[1] * 0.1f, force1[2] * 0.1f,
 	contact->m_longitudinalDir[0], contact->m_longitudinalDir[1], contact->m_longitudinalDir[2]));
-dTrace(("a(%f %f %f) n(%f %f %f)\n\n", 
+dTrace(("a(%f %f %f) n(%f %f %f)\n", 
 	force2[0] * 0.1f, force2[1] * 0.1f, force2[2] * 0.1f,
 	contact->m_lateralDir[0], contact->m_lateralDir[1], contact->m_lateralDir[2]));
 #endif
