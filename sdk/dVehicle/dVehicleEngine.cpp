@@ -76,6 +76,7 @@ dVehicleEngine::dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineIn
 	,m_omega(0.0f)
 	,m_throttle(0.0f)
 	,m_throttleSpeed(1.e1f)
+	,m_differentialMode(differential->GetMode())
 {
 	InitEngineTorqueCurve();
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
@@ -145,6 +146,14 @@ void dVehicleEngine::SetThrottle (dFloat throttle, dFloat timestep)
 		step *= 0.25f;
 	}
 	m_throttle = dClamp(m_throttle + step, dFloat(0.0f), dFloat(1.0f));
+}
+
+void dVehicleEngine::SetDifferentialMode(int differentialMode) 
+{
+	if (differentialMode != m_differentialMode) {
+		m_differentialMode = differentialMode;
+		m_differential->SetMode(m_differentialMode);
+	}
 }
 
 #if 0

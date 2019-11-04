@@ -35,7 +35,7 @@ class dVehicle: public dVehicleNode
 			,m_handBrakeValue(0.0f)
 			,m_gear(0)
 			,m_ignitionKey(0)
-			,m_lockDifferential(0)
+			,m_differentialMode(0)
 			,m_manualTransmission(0)
 		{
 		}
@@ -47,7 +47,7 @@ class dVehicle: public dVehicleNode
 		dFloat m_handBrakeValue;
 		int m_gear;
 		int m_ignitionKey;
-		int m_lockDifferential;
+		int m_differentialMode;
 		int m_manualTransmission;
 	};
 

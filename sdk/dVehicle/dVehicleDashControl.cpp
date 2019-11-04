@@ -61,6 +61,13 @@ void dVehicleEngineControl::Update(dFloat timestep)
 	}
 }
 
+void dVehicleEngineControl::SetDifferential (int mode)
+{
+	if (m_engine) {
+		m_engine->SetDifferentialMode(mode);
+	}
+}
+
 void dVehicleEngineControl::SetGear (int gear)
 {
 	if (m_engine) {

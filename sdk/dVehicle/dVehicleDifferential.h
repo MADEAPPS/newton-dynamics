@@ -52,8 +52,8 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	DVEHICLE_API dVehicleDifferential(dVehicleMultiBody* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode, const dMatrix& axelMatrix = dGetIdentityMatrix());
 	DVEHICLE_API virtual ~dVehicleDifferential();
 
-	dOperationMode GetMode() const { return m_mode; }
-	void SetMode(dOperationMode mode) { m_mode = mode; }
+	DVEHICLE_API int GetMode() const;
+	DVEHICLE_API void SetMode(int mode);
 	
 	protected:
 	void CalculateFreeDof();

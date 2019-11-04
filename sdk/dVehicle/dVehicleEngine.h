@@ -149,11 +149,16 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	DVEHICLE_API dFloat GetSpeed() const;
 	dFloat GetTopSpeed() const {return m_info.m_topSpeedInMetersPerSeconds;}
 
+
 	virtual dFloat GetRpm() const;
 	virtual dFloat GetRedLineRpm() const;
 	//void SetGear (int gear);
 	//void SetClutch (dFloat clutch);
-	void SetThrottle (dFloat throttle, dFloat timestep);
+
+	DVEHICLE_API void SetThrottle (dFloat throttle, dFloat timestep);
+
+	int GetDifferentialMode() const {return m_differentialMode;}
+	DVEHICLE_API void SetDifferentialMode(int differentialMode);
 
 	protected:
 	void CalculateFreeDof();
@@ -177,6 +182,7 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	dFloat m_omega;
 	dFloat m_throttle;
 	dFloat m_throttleSpeed;
+	int m_differentialMode;
 
 	friend class dVehicleMultiBody;
 };

@@ -212,8 +212,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		scene->Print(color, "differential type");
 		ImGui::RadioButton("awd",	&m_differentialMode, 0);
 		ImGui::RadioButton("free",	&m_differentialMode, 1);
-		ImGui::RadioButton("fwd",	&m_differentialMode, 2); 
-		ImGui::RadioButton("rwd",	&m_differentialMode, 3); 
+		ImGui::RadioButton("rwd",	&m_differentialMode, 2); 
+		ImGui::RadioButton("fwd",	&m_differentialMode, 3); 
 
 		ImGui::Separator();
 		scene->Print(color, "hide help           : 'h'");
@@ -453,7 +453,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 		// add vehicle hand brake control 
 		dVehicleBrakeControl* const handBrakeControl = vehicle->GetHandBrakeControl();
-		handBrakeControl->SetBrakeTorque(3000.0f);
+		handBrakeControl->SetBrakeTorque(2000.0f);
 		handBrakeControl->AddTire(rearLeft);
 		handBrakeControl->AddTire(rearRight);
 
@@ -577,7 +577,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 		// add vehicle hand brake control 
 		dVehicleBrakeControl* const handBrakeControl = vehicle->GetHandBrakeControl();
-		handBrakeControl->SetBrakeTorque(3000.0f);
+		handBrakeControl->SetBrakeTorque(2000.0f);
 		handBrakeControl->AddTire(rearLeft);
 		handBrakeControl->AddTire(rearRight);
 		
@@ -698,6 +698,8 @@ axisCount = 0;
 			//driverInput.m_gear = gear;
 			//driverInput.m_lockDifferential = m_engineDifferentialLock.UpdatePushButton(scene, 'L');
 		}
+
+		driverInput.m_differentialMode = m_differentialMode;
 
 		driverInput.m_clutchPedal = 0.0f;
 

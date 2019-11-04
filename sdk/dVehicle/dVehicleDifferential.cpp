@@ -27,8 +27,6 @@ dVehicleDifferential::dVehicleDifferential(dVehicleMultiBody* const chassis, dFl
 	,m_shaftOmega(0.0f)
 	,m_mode(m_slipLocked)
 {
-//m_mode = m_unlocked;
-
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 
 	dFloat inertia = (2.0f / 5.0f) * mass * radius * radius;
@@ -50,6 +48,16 @@ dVehicleDifferential::dVehicleDifferential(dVehicleMultiBody* const chassis, dFl
 
 dVehicleDifferential::~dVehicleDifferential()
 {
+}
+
+int dVehicleDifferential::GetMode() const 
+{ 
+	return m_mode; 
+}
+
+void dVehicleDifferential::SetMode(int mode) 
+{ 
+	m_mode = dOperationMode (mode); 
 }
 
 const void dVehicleDifferential::Debug(dCustomJoint::dDebugDisplay* const debugContext) const

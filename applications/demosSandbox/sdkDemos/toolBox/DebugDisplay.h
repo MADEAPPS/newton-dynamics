@@ -63,11 +63,11 @@ class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
 	{
 		glEnd();
 
-		glPointSize(thinckness);
+		glPointSize(GLfloat(thinckness));
 		glBegin(GL_POINTS);
 		glVertex3f(GLfloat(point.m_x), GLfloat(point.m_y), GLfloat(point.m_z));
 		glEnd();
-		glPointSize(1.0f);
+		glPointSize(GLfloat(1.0f));
 
 		glBegin(GL_LINES);
 	}
