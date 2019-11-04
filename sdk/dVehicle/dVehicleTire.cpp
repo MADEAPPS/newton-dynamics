@@ -207,8 +207,8 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 				const dVector error (m_contactsJoints[j].m_point - p);
 				dFloat error2 = error.DotProduct3(error);
 				if (error2 < 3.0e-2f) {			
-					m_contactsJoints[j] = m_contactsJoints[i];
-					contactCount --;
+//					m_contactsJoints[j] = m_contactsJoints[i];
+//					contactCount --;
 					break;
 				}
 			}
@@ -290,16 +290,29 @@ void dVehicleTire::Integrate(dFloat timestep)
 
 			dVector r (contact->m_point - matrix.TransformVector(com));
 
+#if 0
 			dVector force (contact->m_normal.Scale (-contact->m_tireModel.m_tireLoad) +
 						   contact->m_longitudinalDir.Scale (-contact->m_tireModel.m_longitunalForce) + 
 						   contact->m_lateralDir.Scale (-contact->m_tireModel.m_lateralForce));
-
+#else
+dVector force(contact->m_normal.Scale(-contact->m_tireModel.m_tireLoad));
+dVector force1(contact->m_longitudinalDir.Scale(-contact->m_tireModel.m_longitunalForce));
+dVector force2(contact->m_lateralDir.Scale(-contact->m_tireModel.m_lateralForce));
+dTrace(("a(%f %f %f) n(%f %f %f)\n", 
+	force[0] * 0.1f, force[1] * 0.1f, force[2] * 0.1f,
+	contact->m_normal[0], contact->m_normal[1], contact->m_normal[2]));
+dTrace(("a(%f %f %f) n(%f %f %f)\n", 
+	force1[0] * 0.1f, force1[1] * 0.1f, force1[2] * 0.1f,
+	contact->m_longitudinalDir[0], contact->m_longitudinalDir[1], contact->m_longitudinalDir[2]));
+dTrace(("a(%f %f %f) n(%f %f %f)\n\n", 
+	force2[0] * 0.1f, force2[1] * 0.1f, force2[2] * 0.1f,
+	contact->m_lateralDir[0], contact->m_lateralDir[1], contact->m_lateralDir[2]));
+#endif
 			if (contact->m_isContactPatch) {
 				force = force.Scale (1.0f/40.0f);
 			}
 
 			dVector torque (r.CrossProduct(force));
-
 			NewtonBodyAddForce(contact->m_collidingNode->m_body, &force[0]);
 			NewtonBodyAddTorque(contact->m_collidingNode->m_body, &torque[0]);
 		}
