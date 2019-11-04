@@ -873,14 +873,19 @@ static void AddBackground(DemoEntityManager* const scene)
 	location.m_posit.m_y = 1.5f;
 	location.m_posit.m_z = 1.6f;
 
-	dVector size(4.0f, 0.25f, 1.0f, 0.0f);
+	
 //	dVector size(1.0f, 1.0f, 1.0f, 0.0f);
 	int count = 4;
 
 	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _SPHERE_PRIMITIVE, 0, shapeOffsetMatrix);
+	dVector size = dVector (4.0f, 0.25f, 1.0f, 0.0f);
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
+
+	size = dVector (1.0f, 1.0f, 1.0f, 0.0f);
+	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, 0, shapeOffsetMatrix);
+
+	size = dVector(4.0f, 0.2f, 3.0f, 0.0f);
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
-	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CAPSULE_PRIMITIVE, 0, shapeOffsetMatrix);
 	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CYLINDER_PRIMITIVE, 0, shapeOffsetMatrix);
 	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, 0, shapeOffsetMatrix);
 	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 5.0f, _CONE_PRIMITIVE, 0, shapeOffsetMatrix);
