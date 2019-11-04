@@ -847,7 +847,7 @@ static void AddBackground(DemoEntityManager* const scene)
 {
 
 //	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "playerarena.ngd", true);
-	CreateHeightFieldTerrain (scene, 9, 0.25f, 1.0f, 0.25f, 0.0f, 0.0f);
+	CreateHeightFieldTerrain (scene, 10, 4.0f, 1.0f, 0.25f, -10.0f, 15.0f);
 //	CreateHeightFieldTerrain(scene, 7, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 #if 0
 	CreateBridge(scene, playgroundBody);
