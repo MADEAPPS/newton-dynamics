@@ -185,23 +185,37 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 		}
 	}
 
-	// filter contact that are too close 
-	for (int i = contactCount - 1; i >= 0; i --) {
-		const dVector& p = m_contactsJoints[i].m_point;
-		for (int j = i - 1; j >= 0; j --) {
-			const dVector error (m_contactsJoints[j].m_point - p);
-			dFloat error2 = error.DotProduct3(error);
-			if (error2 < 1.0e-2f) {			
-				if (m_contactsJoints[i].m_penetration > m_contactsJoints[j].m_penetration) {
-					m_contactsJoints[j] = m_contactsJoints[i];
+	if (contactCount > 1) {
+		// filter contact that are too close 
+		dFloat angle[maxContactCount];
+		for (int i = 0; i < contactCount; i ++) {
+			angle[i] = tireMatrix.m_right.DotProduct3(m_contactsJoints[i].m_normal);
+		}
+
+		for (int i = 0; i < contactCount - 1; i ++) {
+			for (int j = contactCount - 1; j > i; j --) {
+				if (angle[j - 1] > angle[j]) {
+					dSwap (angle[j - 1], angle[j]);
+					dSwap (m_contactsJoints[j - 1], m_contactsJoints[j]); 
 				}
-				contactCount --;
-				break;
 			}
 		}
-	}
 
-	m_contactCount = contactCount; 
+		for (int i = contactCount - 1; i > 0; i --) {
+			const dVector& p = m_contactsJoints[i].m_point;
+			for (int j = i - 1; j >= 0; j --) {
+				const dVector error (m_contactsJoints[j].m_point - p);
+				dFloat error2 = error.DotProduct3(error);
+				if (error2 < 3.0e-2f) {			
+					m_contactsJoints[j] = m_contactsJoints[i];
+					contactCount --;
+					break;
+				}
+			}
+		}
+
+		m_contactCount = contactCount; 
+	}
 }
 
 dMatrix dVehicleTire::GetHardpointMatrix(dFloat param) const
