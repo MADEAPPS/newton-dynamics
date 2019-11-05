@@ -207,8 +207,8 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 				const dVector error (m_contactsJoints[j].m_point - p);
 				dFloat error2 = error.DotProduct3(error);
 				if (error2 < 3.0e-2f) {			
-//					m_contactsJoints[j] = m_contactsJoints[i];
-//					contactCount --;
+					m_contactsJoints[j] = m_contactsJoints[i];
+					contactCount --;
 					break;
 				}
 			}

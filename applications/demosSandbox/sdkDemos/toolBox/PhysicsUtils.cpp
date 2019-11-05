@@ -1286,9 +1286,8 @@ NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const n
 	for (DemoEntityManager::dListNode* node = scene->GetLast(); node; node = node->GetPrev()) {
 		DemoEntity* const ent = node->GetInfo();
 		DemoMesh* const mesh = (DemoMesh*) ent->GetMesh();
-		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
-
 		if (mesh) {
+			dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 			const dString& namePtr = mesh->GetName();
 			if (namePtr == "levelGeometry_mesh") {
 				levelBody = CreateLevelMeshBody (world, ent, optimized);
