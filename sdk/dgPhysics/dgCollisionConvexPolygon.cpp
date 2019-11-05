@@ -667,11 +667,17 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	const dgCollisionInstance* const hull = proxy.m_instance0;
 
+	dgAssert(m_normal.m_w == dgFloat32(0.0f));
+	const dgFloat32 shapeSide = m_normal.DotProduct(hullMatrix.m_posit - m_localPoly[0]).GetScalar();
+	if (shapeSide < dgFloat32(0.0f)) {
+		dgTrace(("normal face away (%f %f %f)\n", m_normal[0], m_normal[1], m_normal[2]));
+		return 0;
+	}
+
 	dgVector normalInHull(hullMatrix.UnrotateVector(m_normal));
 	dgVector pointInHull(hull->SupportVertex(normalInHull.Scale(dgFloat32(-1.0f))));
 	dgVector p0(hullMatrix.TransformVector(pointInHull));
-
-	dgAssert (m_normal.m_w == dgFloat32 (0.0f));
+	
 	dgFloat32 penetration = m_normal.DotProduct(m_localPoly[0] - p0).GetScalar() + proxy.m_skinThickness;
 	if (penetration < dgFloat32(-1.0e-5f)) {
 		return 0;

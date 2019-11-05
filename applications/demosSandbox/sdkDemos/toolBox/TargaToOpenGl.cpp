@@ -171,7 +171,7 @@ GLuint LoadTexture(const char* const filename)
 		// Read in the bits
 		// Check for read error. This should catch RLE or other 
 		// weird formats that I don't want to recognize
-		int readret = fread(pBits, lImageSize, 1, pFile);
+		int readret = int (fread(pBits, lImageSize, 1, pFile));
 		if(readret != 1)  {
 			fclose(pFile);
 			delete[] pBits;
