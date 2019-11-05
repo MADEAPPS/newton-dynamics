@@ -730,6 +730,7 @@ axisCount = 0;
 		
 		NewtonBodyGetMatrix(vehicle->GetBody(), &matrix[0][0]);
 		model->SetMatrix(*scene, dQuaternion (matrix), matrix.m_posit);
+//dTrace(("%f %f %f\n", matrix.m_posit.m_x, matrix.m_posit.m_y, matrix.m_posit.m_z));
 
 		dMatrix chassisMatrixInv(matrix.Inverse());
 		const dList<dVehicleNode*>& children = vehicle->GetChildrenList();
@@ -847,7 +848,7 @@ static void CreateBridge(DemoEntityManager* const scene, NewtonBody* const playg
 
 static void AddBackground(DemoEntityManager* const scene)
 {
-	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "track.ngd", true);
+	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "track.ngd", false);
 //	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "playerarena.ngd", true);
 //	CreateHeightFieldTerrain (scene, 10, 4.0f, 1.0f, 0.25f, -10.0f, 15.0f);
 //	CreateHeightFieldTerrain(scene, 7, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
@@ -919,6 +920,9 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	location.m_posit.m_x = 0.0f;
 	location.m_posit.m_y = 10.0f;
 	location.m_posit.m_z = 0.0f;
+
+	location.m_posit.m_x = 140.0f;
+	location.m_posit.m_z = -47.0f;
 
 	location.m_posit = FindFloor(scene->GetNewton(), location.m_posit, 100.0f);
 	location.m_posit.m_y += 1.5f;
