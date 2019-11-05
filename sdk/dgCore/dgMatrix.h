@@ -188,7 +188,6 @@ DG_INLINE dgVector dgMatrix::RotateVector (const dgVector &v) const
 
 DG_INLINE dgVector dgMatrix::UnrotateVector (const dgVector &v) const
 {
-	//return Transpose().RotateVector(v);
 	return dgVector ((m_front * v).AddHorizontal().GetScalar(), (m_up * v).AddHorizontal().GetScalar(), (m_right * v).AddHorizontal().GetScalar(), dgFloat32 (0.0f));
 }
 

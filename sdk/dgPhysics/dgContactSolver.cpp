@@ -76,8 +76,6 @@ dgContactSolver::dgContactSolver(dgCollisionParamProxy* const proxy)
 {
 }
 
-// for ray Cast
-
 DG_INLINE void dgContactSolver::SupportVertex(const dgVector& dir0, dgInt32 vertexIndex)
 {
 	dgAssert(dir0.m_w == dgFloat32(0.0f));
