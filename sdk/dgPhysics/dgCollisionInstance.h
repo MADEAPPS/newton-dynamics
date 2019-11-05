@@ -374,22 +374,20 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir) const
 		case m_nonUniform:
 		{
 			// support((p * S), n) = S * support (p, n * transp(S)) 
-			dgVector dir1 (m_scale * dir);
-			//dir1 = dir1 * dir1.InvMagSqrt();
-			dir1 = dir1.Normalize();
+			dgVector dir1 ((m_scale * dir).Normalize());
 			return m_scale * m_childShape->SupportVertex (dir1, NULL);
 		}
 
 		case m_global:
 		default:	
 		{
-			dgVector dir1 (m_aligmentMatrix.UnrotateVector(m_scale * dir));
-			//dir1 = dir1 * dir1.InvMagSqrt();
-			dir1 = dir1.Normalize();
+			dgVector dir1 (m_aligmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
 			return m_scale * m_aligmentMatrix.TransformVector (m_childShape->SupportVertex (dir1, NULL));
 		}
 	}
 }
+
+//#define USED_SHAPE_DIRECTRIC
 
 DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
 {
@@ -407,22 +405,21 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecial (const dgVector& di
 			return m_scale * m_childShape->SupportVertexSpecial(dir, m_skinThickness, vertexIndex);
 		}
 
-		default:
-			return SupportVertex(dir);
-/*
+#ifdef USED_SHAPE_DIRECTRIC
 		case m_nonUniform:
 		{
 			// support((p * S), n) = S * support (p, n * transp(S)) 
-			dgVector dir1(m_scale * dir);
-			dir1 = dir1 * (dir1.InvMagSqrt());
-			return m_scale * m_childShape->SupportVertexSpecial(dir1, vertexIndex);
+			dgVector dir1((m_scale * dir).Normalize());
+			return m_scale * m_childShape->SupportVertexSpecial(dir1, m_skinThickness, vertexIndex);
 		}
+#endif
 
-		case m_global:
+		default:
+			return SupportVertex(dir);
+/*
 		default:
 		{
-			dgVector dir1(m_aligmentMatrix.UnrotateVector(m_scale * dir));
-			dir1 = dir1 * (dir1.InvMagSqrt());
+			dgVector dir1(m_aligmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
 			return m_scale * m_aligmentMatrix.TransformVector(m_childShape->SupportVertexSpecial(dir1, vertexIndex));
 		}
 */
@@ -444,9 +441,7 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecialProjectPoint (const 
 			return m_scale * m_childShape->SupportVertexSpecialProjectPoint(point * m_invScale, dir);
 		}
 
-		default:
-			return point;
-/*
+#ifdef USED_SHAPE_DIRECTRIC
 		case m_nonUniform:
 		{
 			// support((p * S), n) = S * support (p/S, n * transp(S)) 
@@ -454,7 +449,11 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecialProjectPoint (const 
 			dir1 = dir1 * (dir1.InvMagSqrt());
 			return m_scale * m_childShape->SupportVertexSpecialProjectPoint(point * m_invScale, dir1);
 		}
+#endif
 
+		default:
+			return point;
+/*
 		case m_global:
 		default:
 		{
