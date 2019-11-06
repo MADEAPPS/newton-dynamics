@@ -387,8 +387,6 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir) const
 	}
 }
 
-//#define USED_SHAPE_DIRECTRIC
-
 DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecial (const dgVector& dir, dgInt32* const vertexIndex) const
 {
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
@@ -405,18 +403,17 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecial (const dgVector& di
 			return m_scale * m_childShape->SupportVertexSpecial(dir, m_skinThickness, vertexIndex);
 		}
 
-#ifdef USED_SHAPE_DIRECTRIC
+		default:
+			return SupportVertex(dir);
+
+/*
 		case m_nonUniform:
 		{
-			// support((p * S), n) = S * support (p, n * transp(S)) 
+			// support((p * S), n) = S * support (p, n * transp(S))
 			dgVector dir1((m_scale * dir).Normalize());
 			return m_scale * m_childShape->SupportVertexSpecial(dir1, m_skinThickness, vertexIndex);
 		}
-#endif
 
-		default:
-			return SupportVertex(dir);
-/*
 		default:
 		{
 			dgVector dir1(m_aligmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
@@ -441,24 +438,21 @@ DG_INLINE dgVector dgCollisionInstance::SupportVertexSpecialProjectPoint (const 
 			return m_scale * m_childShape->SupportVertexSpecialProjectPoint(point * m_invScale, dir);
 		}
 
-#ifdef USED_SHAPE_DIRECTRIC
+		default:
+			return point;
+
+/*
 		case m_nonUniform:
 		{
 			// support((p * S), n) = S * support (p/S, n * transp(S)) 
-			dgVector dir1(m_scale * dir);
-			dir1 = dir1 * (dir1.InvMagSqrt());
+			dgVector dir1((m_scale * dir).Normalize());
 			return m_scale * m_childShape->SupportVertexSpecialProjectPoint(point * m_invScale, dir1);
 		}
-#endif
 
-		default:
-			return point;
-/*
 		case m_global:
 		default:
 		{
-			dgVector dir1(m_aligmentMatrix.UnrotateVector(m_scale * dir));
-			dir1 = dir1 * (dir1.InvMagSqrt());
+			dgVector dir1(m_aligmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
 			return m_scale * m_aligmentMatrix.TransformVector(m_childShape->SupportVertexSpecialProjectPoint(m_aligmentMatrix.UntransformVector(point * m_invScale), dir1));
 		}
 */
