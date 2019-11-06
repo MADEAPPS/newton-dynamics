@@ -181,7 +181,6 @@ int dVehicleEngine::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 {
 	jointArray[0] = &m_gearBox;
 	return 1;
-//	return 0;
 }
 
 void dVehicleEngine::CalculateFreeDof()

@@ -124,9 +124,9 @@ int dVehicleTire::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 {
 	int count = 0;
 	for (int i = 0; i < sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]); i ++) {
-		dVehicleLoopJoint* const loop = &m_contactsJoints[i];
-		if (loop->IsActive ()) {
-			jointArray[count] = loop;
+		dVehicleLoopJoint* const contact = &m_contactsJoints[i];
+		if (contact->IsActive ()) {
+			jointArray[count] = contact;
 			count ++;
 		}
 	}
