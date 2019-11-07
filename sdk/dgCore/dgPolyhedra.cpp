@@ -253,7 +253,7 @@ void dgPolyhedra::SaveOFF(const char* const fileName, const dgFloat64* const ver
 				edge->m_mark = mark;
 				edge = edge->m_twin->m_next;
 			} while (edge != vertex);
-			dgInt32 index = dgInt32 (edge->m_userData) * strideInBytes;
+			dgInt32 index = edge->m_incidentVertex * strideInBytes;
 
 			const dgFloat64* const p = (dgFloat64*)&points[index];
 			dgBigVector point(p[0], p[1], p[2], dgFloat64(0.0f));
