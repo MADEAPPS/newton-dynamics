@@ -207,7 +207,8 @@ void dgPolyhedra::SaveOFF(const char* const fileName, const dgFloat64* const ver
 {
 	FILE* const file = fopen(fileName, "wb");
 
-	fprintf(file, "OFF\n");
+	fprintf(file, "ply\n");
+	fprintf(file, "format ascii 1.0\n");
 
 	dgPolyhedra copy(*this);
 
@@ -241,7 +242,13 @@ void dgPolyhedra::SaveOFF(const char* const fileName, const dgFloat64* const ver
 		}
 	}
 
-	fprintf(file, "%d %d 0\n", vertexCount, faceCount);
+	fprintf(file, "element vertex %d\n", vertexCount);
+	fprintf(file, "property float x\n");
+	fprintf(file, "property float y\n");
+	fprintf(file, "property float z\n");
+	fprintf(file, "element face %d\n", faceCount);
+	fprintf(file, "property list uchar int vertex_index\n");
+	fprintf(file, "end_header\n");
 
 	mark = copy.IncLRU();
 	const dgInt8* const points = (dgInt8*)vertexArray;
@@ -2691,8 +2698,8 @@ void dgPolyhedra::RemoveInteriorEdges (dgPolyhedra& buildConvex, const dgFloat64
 			MarkAdjacentCoplanarFaces(flatFace, edge, vertex, strideInBytes);
 			if (flatFace.GetCount()) {
 				flatFace.RefineTriangulation(vertex, stride);
-//if (flatFace.GetCount() > 200)
-//flatFace.SaveOFF("xxxxx.off", vertex, stride * sizeof(dgFloat64));
+if (flatFace.GetCount() > 200)
+flatFace.SaveOFF("xxxxx.ply", vertex, stride * sizeof(dgFloat64));
 
 				RemoveOuterColinearEdges(flatFace, vertex, stride);
 				RemoveInteriorColinearEdges(flatFace, vertex, stride);
