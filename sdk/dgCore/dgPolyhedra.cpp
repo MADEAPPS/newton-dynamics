@@ -1530,74 +1530,29 @@ void dgPolyhedra::RemoveOuterColinearEdges (dgPolyhedra& flatFace, const dgFloat
 	for (iter.Begin(); iter; iter ++) {
 		dgEdge* const edge = &(*iter);
 		if ((edge->m_incidentFace < 0) && (edge->m_mark != mark)) {
+			dgTree<dgEdge*, dgInt32> filter(flatFace.GetAllocator());
 			dgEdge* ptr = edge;
+			bool isDisjoint = true; 
 			do {
+				isDisjoint = isDisjoint && (filter.Insert(ptr, ptr->m_incidentVertex) ? true : false);
 				ptr->m_mark = mark;
 				ptr = ptr->m_next;
 			} while (ptr != edge);
-			edgePerimeters[perimeterCount] = edge;
-			perimeterCount ++;
-			dgAssert (perimeterCount < dgInt32 (sizeof (edgePerimeters) / sizeof (edgePerimeters[0])));
+			if (isDisjoint) {
+				edgePerimeters[perimeterCount] = edge;
+				perimeterCount++;
+				dgAssert(perimeterCount < dgInt32(sizeof(edgePerimeters) / sizeof(edgePerimeters[0])));
+			} else {
+				dgEdge* ptr = edge;
+				dgExpandTraceMessage("warning!! selt intersecting face: ");
+				do {
+					dgExpandTraceMessage("%d ", ptr->m_incidentVertex);
+					ptr = ptr->m_next;
+				} while (ptr != edge);
+				dgExpandTraceMessage("\n");
+			}
 		}
 	}
-
-/*
-static int xxx;
-xxx++;
-if (xxx == 2834)
-xxx *= 1;
-*/
-
-	for (dgInt32 i = 0; i < perimeterCount; i ++) {
-		dgTree<dgEdge*, dgInt32> filter (flatFace.GetAllocator());
-		dgEdge* const edge = edgePerimeters[i];
-		dgEdge* ptr = edge;
-		do {
-			dgTree<dgEdge*, dgInt32>::dgTreeNode* const node = filter.Find(ptr->m_incidentVertex);
-			if (node) {
-return;
-				dgEdge* const newLoop = node->GetInfo();
-
-dgEdge* ptr1 = ptr;
-do {
-	dgExpandTraceMessage("%d ", ptr1->m_incidentVertex);
-	ptr1 = ptr1->m_next;
-} while (ptr1 != ptr);
-dgExpandTraceMessage("\n");
-
-
-				ptr->m_prev->m_next = newLoop;
-				newLoop->m_prev->m_next = ptr;
-
-				ptr->m_prev = newLoop->m_prev;
-				newLoop->m_prev = ptr->m_prev;
-
-ptr1 = ptr;
-do {
-	dgExpandTraceMessage("%d ", ptr1->m_incidentVertex);
-	ptr1 = ptr1->m_next;
-} while (ptr1 != ptr);
-dgExpandTraceMessage("\n");
-
-dgEdge* ptr2 = newLoop;
-do {
-	dgExpandTraceMessage("%d ", ptr2->m_incidentVertex);
-	ptr2 = ptr2->m_next;
-} while (ptr2 != newLoop);
-dgExpandTraceMessage("\n");
-
-				edgePerimeters[perimeterCount] = newLoop;
-				perimeterCount++;
-			}
-			filter.Insert(ptr, ptr->m_incidentVertex);
-			ptr = ptr->m_next;
-		} while (ptr != edge);
-	}
-
-
-//if (xxx == 2834)
-//xxx *= 1;
-//static int xxxxxx;
 
 	for (dgInt32 i = 0; i < perimeterCount; i ++) {
 		dgEdge* edge = edgePerimeters[i];
@@ -1615,9 +1570,13 @@ dgExpandTraceMessage("\n");
 			dgFloat64 dot = e1.DotProduct3(e0);
 			if (dot > dgFloat32 (dgFloat32 (0.9999f))) {
 
-//xxxxxx ++;
 				for (dgEdge* interiorEdge = ptr->m_next->m_twin->m_next; interiorEdge != ptr->m_twin; interiorEdge = ptr->m_next->m_twin->m_next) {
-					flatFace.DeleteEdge (interiorEdge);
+					dgAssert((interiorEdge->m_incidentFace > 0) && (interiorEdge->m_twin->m_incidentFace > 0));
+					if ((interiorEdge->m_incidentFace > 0) && (interiorEdge->m_twin->m_incidentFace > 0)) {
+						flatFace.DeleteEdge(interiorEdge);
+					} else {
+						return;
+					}
 				} 
 
 				if (ptr->m_twin->m_next->m_next->m_next == ptr->m_twin) {
