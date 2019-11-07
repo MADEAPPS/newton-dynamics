@@ -1578,57 +1578,6 @@ dgAssert (0);
 */
 };
 
-
-void dgMeshEffect::SaveOFF (const char* const fileName) const
-{
-	FILE* const file = fopen (fileName, "wb");
-
-	fprintf (file, "OFF\n");
-
-	dgInt32 faceCount = 0;
-	dgTree<dgEdge*, dgEdge*>filter(GetAllocator());
-	Iterator iter (*this);
-	for (iter.Begin(); iter; iter ++) {
-		dgEdge* const face = &iter.GetNode()->GetInfo();
-		if (!filter.Find(face) && (face->m_incidentFace > 0)) {
-			faceCount ++;
-			dgEdge* edge = face; 
-			do {
-				filter.Insert(edge, edge);
-				edge = edge->m_next;
-			} while (edge != face);
-		}
-	}
-	fprintf (file, "%d %d 0\n", m_points.m_vertex.m_count, faceCount);
-
-	for (dgInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
-		fprintf (file, "%f %f %f\n", m_points.m_vertex[i].m_x, m_points.m_vertex[i].m_y, m_points.m_vertex[i].m_z);
-	}
-
-	filter.RemoveAll();
-	for (iter.Begin(); iter; iter ++) {
-		dgEdge* const face = &iter.GetNode()->GetInfo();
-		if (!filter.Find(face) && (face->m_incidentFace > 0)) {
-			dgInt32 indices[1024];
-			dgInt32 vertexCount = 0;
-			dgEdge* edge = face; 
-			do {
-				indices[vertexCount] = edge->m_incidentVertex;
-				vertexCount ++;
-				filter.Insert(edge, edge);
-				edge = edge->m_next;
-			} while (edge != face);
-
-			fprintf (file, "%d", vertexCount);
-			for (dgInt32 j = 0; j < vertexCount; j ++) {
-				fprintf (file, " %d", indices[j]);
-			}
-			fprintf (file, "\n");
-		}
-	}
-	fclose (file);
-}
-
 void dgMeshEffect::FlipWinding()
 {
 	dgInt32	index[DG_MESH_EFFECT_POINT_SPLITED];

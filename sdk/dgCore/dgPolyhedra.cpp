@@ -203,6 +203,87 @@ dgPolyhedra::~dgPolyhedra ()
 {
 }
 
+void dgPolyhedra::SaveOFF(const char* const fileName, const dgFloat64* const vertexArray, dgInt32 strideInBytes) const
+{
+	FILE* const file = fopen(fileName, "wb");
+
+	fprintf(file, "OFF\n");
+
+	dgPolyhedra copy(*this);
+
+	dgInt32 faceCount = 0;
+	Iterator iter(copy);
+	int mark = copy.IncLRU();
+	for (iter.Begin(); iter; iter++) {
+		dgEdge* const face = &iter.GetNode()->GetInfo();
+		if ((face->m_mark < mark) && (face->m_incidentFace > 0)) {
+			faceCount++;
+			dgEdge* edge = face;
+			do {
+				edge->m_mark = mark;
+				edge = edge->m_next;
+			} while (edge != face);
+		}
+	}
+
+	mark = copy.IncLRU();
+	dgInt32 vertexCount = 0;
+	for (iter.Begin(); iter; iter++) {
+		dgEdge* const vertex = &iter.GetNode()->GetInfo();
+		if (vertex->m_mark < mark) {
+			dgEdge* edge = vertex;
+			do {
+				edge->m_userData = vertexCount;
+				edge->m_mark = mark;
+				edge = edge->m_twin->m_next;
+			} while (edge != vertex);
+			vertexCount++;
+		}
+	}
+
+	fprintf(file, "%d %d 0\n", vertexCount, faceCount);
+
+	mark = copy.IncLRU();
+	const dgInt8* const points = (dgInt8*)vertexArray;
+	for (iter.Begin(); iter; iter++) {
+		dgEdge* const vertex = &iter.GetNode()->GetInfo();
+		if (vertex->m_mark < mark) {
+			dgEdge* edge = vertex;
+			do {
+				edge->m_mark = mark;
+				edge = edge->m_twin->m_next;
+			} while (edge != vertex);
+			dgInt32 index = dgInt32 (edge->m_userData) * strideInBytes;
+
+			const dgFloat64* const p = (dgFloat64*)points[index];
+			dgBigVector point(p[0], p[1], p[2], dgFloat64(0.0f));
+			fprintf(file, "%f %f %f\n", point.m_x, point.m_y, point.m_z);
+		}
+	}
+
+	mark = copy.IncLRU();
+	for (iter.Begin(); iter; iter++) {
+		dgInt32 indices[1024];
+		dgInt32 count = 0;
+		dgEdge* const face = &iter.GetNode()->GetInfo();
+		if ((face->m_mark < mark) && (face->m_incidentFace > 0)) {
+			dgEdge* edge = face;
+			do {
+				indices[count] = dgInt32 (edge->m_userData);
+				count++;
+				edge->m_mark = mark;
+				edge = edge->m_next;
+			} while (edge != face);
+
+			fprintf(file, "%d", vertexCount);
+			for (dgInt32 j = 0; j < vertexCount; j++) {
+				fprintf(file, " %d", indices[j]);
+			}
+			fprintf(file, "\n");
+		}
+	}
+	fclose(file);
+}
 
 dgInt32 dgPolyhedra::GetFaceCount() const
 {
@@ -228,8 +309,6 @@ dgInt32 dgPolyhedra::GetFaceCount() const
 	}
 	return count;
 }
-
-
 
 dgEdge* dgPolyhedra::AddFace ( dgInt32 count, const dgInt32* const index, const dgInt64* const userdata)
 {
@@ -325,7 +404,6 @@ dgEdge* dgPolyhedra::AddFace ( dgInt32 count, const dgInt32* const index, const 
 	return first->m_next;
 }
 
-
 bool dgPolyhedra::EndFace ()
 {
 	dgPolyhedra::Iterator iter (*this);
@@ -379,7 +457,6 @@ bool dgPolyhedra::EndFace ()
 
 	return true;
 }
-
 
 void dgPolyhedra::DeleteFace(dgEdge* const face)
 {
@@ -1543,13 +1620,14 @@ void dgPolyhedra::RemoveOuterColinearEdges (dgPolyhedra& flatFace, const dgFloat
 				perimeterCount++;
 				dgAssert(perimeterCount < dgInt32(sizeof(edgePerimeters) / sizeof(edgePerimeters[0])));
 			} else {
-				dgEdge* ptr = edge;
+				ptr = edge;
 				dgExpandTraceMessage("warning!! selt intersecting face: ");
 				do {
 					dgExpandTraceMessage("%d ", ptr->m_incidentVertex);
 					ptr = ptr->m_next;
 				} while (ptr != edge);
 				dgExpandTraceMessage("\n");
+				return;
 			}
 		}
 	}

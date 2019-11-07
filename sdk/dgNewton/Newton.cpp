@@ -7829,19 +7829,21 @@ void NewtonMeshSerialize (const NewtonMesh* const mesh, NewtonSerializeCallback 
 void NewtonMeshSaveOFF(const NewtonMesh* const mesh, const char* const filename)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-	meshEffect->SaveOFF(filename);
+	dgAssert(0);
+	//dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
+	//meshEffect->SaveOFF(filename);
 }
-
 
 NewtonMesh* NewtonMeshLoadOFF(const NewtonWorld* const newtonWorld, const char* const filename)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *) newtonWorld;
-	dgMemoryAllocator* const allocator = world->dgWorld::GetAllocator();
-	dgMeshEffect* const mesh = new (allocator) dgMeshEffect (allocator);
-	mesh->LoadOffMesh(filename);
-	return (NewtonMesh*) mesh;
+	//Newton* const world = (Newton *) newtonWorld;
+	//dgMemoryAllocator* const allocator = world->dgWorld::GetAllocator();
+	//dgMeshEffect* const mesh = new (allocator) dgMeshEffect (allocator);
+	//mesh->LoadOffMesh(filename);
+	//return (NewtonMesh*) mesh;
+	dgAssert(0);
+	return NULL;
 }
 
 NewtonMesh* NewtonMeshLoadTetrahedraMesh(const NewtonWorld* const newtonWorld, const char* const filename)
