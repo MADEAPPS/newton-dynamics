@@ -203,7 +203,7 @@ dgPolyhedra::~dgPolyhedra ()
 {
 }
 
-void dgPolyhedra::SaveOFF(const char* const fileName, const dgFloat64* const vertexArray, dgInt32 strideInBytes) const
+void dgPolyhedra::SavePLY(const char* const fileName, const dgFloat64* const vertexArray, dgInt32 strideInBytes) const
 {
 	FILE* const file = fopen(fileName, "wb");
 
@@ -2698,8 +2698,8 @@ void dgPolyhedra::RemoveInteriorEdges (dgPolyhedra& buildConvex, const dgFloat64
 			MarkAdjacentCoplanarFaces(flatFace, edge, vertex, strideInBytes);
 			if (flatFace.GetCount()) {
 				flatFace.RefineTriangulation(vertex, stride);
-if (flatFace.GetCount() > 200)
-flatFace.SaveOFF("xxxxx.ply", vertex, stride * sizeof(dgFloat64));
+//if (flatFace.GetCount() > 200)
+//flatFace.SaveOFF("xxxxx.ply", vertex, stride * sizeof(dgFloat64));
 
 				RemoveOuterColinearEdges(flatFace, vertex, stride);
 				RemoveInteriorColinearEdges(flatFace, vertex, stride);

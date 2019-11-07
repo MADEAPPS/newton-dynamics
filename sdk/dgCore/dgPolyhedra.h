@@ -148,7 +148,7 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	dgEdge* SpliteEdge (dgInt32 newIndex, dgEdge* const edge);
 	dgBigVector FaceNormal (const dgEdge* const face, const dgFloat64* const vertex, dgInt32 strideInBytes) const;
 
-	void SaveOFF(const char* const fileName, const dgFloat64* const vertex, dgInt32 strideInBytes) const;
+	void SavePLY(const char* const fileName, const dgFloat64* const vertex, dgInt32 strideInBytes) const;
 
 	void BeginConectedSurface() const;
 	bool GetConectedSurface (dgPolyhedra &polyhedra) const;
