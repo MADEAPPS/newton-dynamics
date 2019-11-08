@@ -1614,11 +1614,11 @@ void dgPolyhedra::RemoveOuterColinearEdges (dgPolyhedra& flatFace, const dgFloat
 	for (iter.Begin(); iter; iter ++) {
 		dgEdge* const edge = &(*iter);
 		if ((edge->m_incidentFace < 0) && (edge->m_mark != mark)) {
-			dgTree<dgEdge*, dgInt32> filter(flatFace.GetAllocator());
+			//dgTree<dgEdge*, dgInt32> filter(flatFace.GetAllocator());
 			dgEdge* ptr = edge;
 			bool isDisjoint = true; 
 			do {
-				isDisjoint = isDisjoint && (filter.Insert(ptr, ptr->m_incidentVertex) ? true : false);
+				//isDisjoint = isDisjoint && (filter.Insert(ptr, ptr->m_incidentVertex) ? true : false);
 				ptr->m_mark = mark;
 				ptr = ptr->m_next;
 			} while (ptr != edge);
@@ -1627,14 +1627,13 @@ void dgPolyhedra::RemoveOuterColinearEdges (dgPolyhedra& flatFace, const dgFloat
 				perimeterCount++;
 				dgAssert(perimeterCount < dgInt32(sizeof(edgePerimeters) / sizeof(edgePerimeters[0])));
 			} else {
-				ptr = edge;
-				dgExpandTraceMessage("warning!! selt intersecting face: ");
-				do {
-					dgExpandTraceMessage("%d ", ptr->m_incidentVertex);
-					ptr = ptr->m_next;
-				} while (ptr != edge);
-				dgExpandTraceMessage("\n");
-				return;
+				//ptr = edge;
+				//dgExpandTraceMessage("warning!! selt intersecting face: ");
+				//do {
+				//	dgExpandTraceMessage("%d ", ptr->m_incidentVertex);
+				//	ptr = ptr->m_next;
+				//} while (ptr != edge);
+				//dgExpandTraceMessage("\n");
 			}
 		}
 	}
