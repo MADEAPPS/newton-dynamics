@@ -2696,12 +2696,26 @@ void dgPolyhedra::RemoveInteriorEdges (dgPolyhedra& buildConvex, const dgFloat64
 			dgPolyhedra flatFace(GetAllocator());
 			MarkAdjacentCoplanarFaces(flatFace, edge, vertex, strideInBytes);
 			if (flatFace.GetCount()) {
+
+bool xxx = false;
+if (flatFace.GetCount() > 200)
+//xxx = true;
+xxx = false;
+if (xxx)
+flatFace.SavePLY("xxxxx0.ply", vertex, strideInBytes);
+
 				flatFace.RefineTriangulation(vertex, stride);
-//if (flatFace.GetCount() > 200)
-//flatFace.SaveOFF("xxxxx.ply", vertex, stride * sizeof(dgFloat64));
 
 				RemoveOuterColinearEdges(flatFace, vertex, stride);
 				RemoveInteriorColinearEdges(flatFace, vertex, stride);
+
+if (xxx) {
+	dgPolyhedra xxxx(flatFace.GetAllocator());
+	flatFace.Triangulate(vertex, stride * sizeof(dgFloat64), &xxxx);
+	flatFace.RefineTriangulation(vertex, stride);
+	flatFace.SavePLY("xxxxx3.ply", vertex, strideInBytes);
+}
+
 
 				dgInt32 diagonalCount = GetInteriorDiagonals(flatFace, diagonalsPool, sizeof(diagonalsPool) / sizeof(diagonalsPool[0]));
 				if (diagonalCount) {
@@ -2790,11 +2804,11 @@ void dgPolyhedra::RemoveInteriorEdges (dgPolyhedra& buildConvex, const dgFloat64
 							dgEdge* const diagonal = diagonalsPool[j];
 							flatFace.DeleteEdge(diagonal);
 						}
-					}
-					else {
+					} else {
 						for (dgInt32 j = 0; j < diagonalCount; j++) {
 							dgEdge* const diagonal = diagonalsPool[j];
 							if (!IsEssensialDiagonal(diagonal, normal, vertex, stride)) {
+							//if (xxx){
 								flatFace.DeleteEdge(diagonal);
 							}
 						}
@@ -2822,7 +2836,16 @@ void dgPolyhedra::RemoveInteriorEdges (dgPolyhedra& buildConvex, const dgFloat64
 						}
 					}
 				}
+
+if (xxx) {
+	dgPolyhedra xxxx(flatFace.GetAllocator());
+	flatFace.Triangulate(vertex, stride * sizeof(dgFloat64), &xxxx);
+	flatFace.RefineTriangulation(vertex, stride);
+	flatFace.SavePLY("xxxxx4.ply", vertex, strideInBytes);
+}
+
 			}
+
 			iter.Begin();
 		}
 	}
