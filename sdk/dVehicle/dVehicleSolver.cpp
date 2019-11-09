@@ -1107,8 +1107,8 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 		const dComplementaritySolver::dJacobianPair* const row = &m_leftHandSide[index];
 		const dComplementaritySolver::dJacobianColum* const rhs = &m_rightHandSide[index];
 
-		const int m0 = m_pairs[index].m_m0;
-		const int m1 = m_pairs[index].m_m1;
+		const int m0 = m_pairs[primaryIndex + i].m_m0;
+		const int m1 = m_pairs[primaryIndex + i].m_m1;
 
 		dComplementaritySolver::dBodyState* const state0 = &m_nodesOrder[m0]->GetProxyBody();
 		dComplementaritySolver::dBodyState* const state1 = &m_nodesOrder[m1]->GetProxyBody();
