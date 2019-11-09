@@ -552,7 +552,11 @@ DG_INLINE void* dgInterlockedExchange(void** const ptr, void* value)
 		#endif
 	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
 		//__sync_synchronize();
-		return (void*)__sync_lock_test_and_set((int32_t*)ptr, value);
+		#ifdef __x86_64__
+		return (void*)__sync_lock_test_and_set((dgInt64*) ptr, value);
+		#else
+		return (void*)__sync_lock_test_and_set((dgInt32*) ptr, value);
+		#endif
 	#else
 		#error "dgInterlockedExchange implementation required"
 	#endif
