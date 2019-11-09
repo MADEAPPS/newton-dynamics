@@ -62,6 +62,7 @@ dVehicleSolver::dVehicleSolver()
 	m_matrixRowsIndex = NULL;
 
 	m_rowCount = 0;
+	m_blockSize = 0;
 	m_nodeCount = 0;
 	m_maxNodeCount = 0;
 	m_loopRowCount = 0;
@@ -466,9 +467,11 @@ void dVehicleSolver::InitLoopMassMatrix()
 	dAssert(primaryIndex == primaryCount);
 	dAssert(auxiliaryIndex == m_auxiliaryRowCount + m_loopRowCount);
 
+	m_blockSize = 0;
 	for (int i = 1; i < auxiliaryIndex; i++) {
 		int j = i;
 		int tmpBoundRow = boundRow[j];
+		m_blockSize += tmpBoundRow;
 		dNodePair tmpPair(m_pairs[primaryCount + j]);
 		int tmpMatrixRowsIndex = m_matrixRowsIndex[primaryCount + j];
 		
@@ -683,7 +686,6 @@ void dVehicleSolver::CalculateJointAccel(dVectorPair* const accel) const
 		dAssert(i == node->m_index);
 
 		dVectorPair& a = accel[i];
-		//dAssert(node->GetProxyBody());
 		dAssert(node->GetJoint());
 
 		//a.m_body = zero;
@@ -869,10 +871,12 @@ void dVehicleSolver::UpdateForces(const dVectorPair* const force) const
 	}
 }
 
-void dVehicleSolver::dGaussSeidelLcpSor(const int size, dFloat* const x, const dFloat* const b, const int* const normalIndex, 
-										dFloat* const low, dFloat* const high, dComplementaritySolver::dBilateralJoint** const frictionCallback) const
+void dVehicleSolver::dGaussSeidelLcpSor(
+	const dFloat* const matrix, int stride, int size,
+	dFloat* const x, const dFloat* const b, 
+	const int* const normalIndex, dFloat* const low, dFloat* const high, 
+	dComplementaritySolver::dBilateralJoint** const frictionCallback) const
 {
-	const dFloat* const me = m_massMatrix11;
 	dFloat* const invDiag1 = dAlloca(dFloat, size);
 	dFloat* const u = dAlloca(dFloat, size + 1);
 	int* const index = dAlloca(int, size);
@@ -893,7 +897,7 @@ void dVehicleSolver::dGaussSeidelLcpSor(const int size, dFloat* const x, const d
 		const dFloat l = low[j] * val;
 		const dFloat h = high[j] * val;
 		u[j] = dClamp(u[j], l, h);
-		invDiag1[j] = dFloat(1.0f) / me[rowStart + j];
+		invDiag1[j] = dFloat(1.0f) / matrix[rowStart + j];
 		rowStart += size;
 	}
 
@@ -904,7 +908,7 @@ void dVehicleSolver::dGaussSeidelLcpSor(const int size, dFloat* const x, const d
 		int base = 0;
 		tolerance = dFloat(0.0f);
 		for (int j = 0; j < size; j++) {
-			const dFloat* const row = &me[base];
+			const dFloat* const row = &matrix[base];
 			dFloat r = b[j];
 			for (int k = 0; k < size; k++) {
 				r -= row[k] * u[k];
@@ -925,7 +929,7 @@ void dVehicleSolver::dGaussSeidelLcpSor(const int size, dFloat* const x, const d
 			if (frictionCallback[j]) {
 				frictionCallback[j]->SpecialSolverFrictionCallback(&u[j], &low[j], &high[j]);
 			}
-			base += size;
+			base += stride;
 		}
 	}
 
@@ -939,7 +943,7 @@ void dVehicleSolver::dGaussSeidelLcpSor(const int size, dFloat* const x, const d
 		passes++;
 #endif
 		for (int j = 0; j < size; j++) {
-			const dFloat* const row = &me[base];
+			const dFloat* const row = &matrix[base];
 			dFloat r = b[j];
 			for (int k = 0; k < size; k++) {
 				r -= row[k] * u[k];
@@ -962,7 +966,7 @@ void dVehicleSolver::dGaussSeidelLcpSor(const int size, dFloat* const x, const d
 			if (frictionCallback[j]) {
 				frictionCallback[j]->SpecialSolverFrictionCallback(&u[j], &low[j], &high[j]);
 			}
-			base += size;
+			base += stride;
 		}
 	}
 
@@ -970,6 +974,21 @@ dTrace(("error %f\n", tolerance));
 
 	for (int j = 0; j < size; j++) {
 		x[j] = u[j];
+	}
+}
+
+void dVehicleSolver::dGaussBlockedLcp(
+	const int size, int blockSize, dFloat* const x, const dFloat* const b, const int* const normalIndex,
+	dFloat* const low, dFloat* const high, dComplementaritySolver::dBilateralJoint** const frictionCallback) const
+{
+blockSize = 0;
+	if (blockSize) {
+		dGaussSeidelLcpSor(
+			&m_massMatrix11[size * blockSize + blockSize], size, size - blockSize, 
+			&x[blockSize], &b[blockSize], &normalIndex[blockSize], 
+			&low[blockSize], &high[blockSize], &frictionCallback[blockSize]);
+	} else {
+		dGaussSeidelLcpSor(m_massMatrix11, size, size, x, b, normalIndex, low, high, frictionCallback);
 	}
 }
 
@@ -1045,7 +1064,7 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 		b[i] -= r;
 	}
 
-	dGaussSeidelLcpSor(n, u, b, normalIndex, low, high, frictionCallback);
+	dGaussBlockedLcp(n, m_blockSize, u, b, normalIndex, low, high, frictionCallback);
 
 	dAssert(primaryIndex == (m_rowCount - m_auxiliaryRowCount));
 	for (int i = 0; i < n; i++) {
