@@ -1614,27 +1614,15 @@ void dgPolyhedra::RemoveOuterColinearEdges (dgPolyhedra& flatFace, const dgFloat
 	for (iter.Begin(); iter; iter ++) {
 		dgEdge* const edge = &(*iter);
 		if ((edge->m_incidentFace < 0) && (edge->m_mark != mark)) {
-			//dgTree<dgEdge*, dgInt32> filter(flatFace.GetAllocator());
 			dgEdge* ptr = edge;
-			bool isDisjoint = true; 
 			do {
-				//isDisjoint = isDisjoint && (filter.Insert(ptr, ptr->m_incidentVertex) ? true : false);
 				ptr->m_mark = mark;
 				ptr = ptr->m_next;
 			} while (ptr != edge);
-			if (isDisjoint) {
-				edgePerimeters[perimeterCount] = edge;
-				perimeterCount++;
-				dgAssert(perimeterCount < dgInt32(sizeof(edgePerimeters) / sizeof(edgePerimeters[0])));
-			} else {
-				//ptr = edge;
-				//dgExpandTraceMessage("warning!! selt intersecting face: ");
-				//do {
-				//	dgExpandTraceMessage("%d ", ptr->m_incidentVertex);
-				//	ptr = ptr->m_next;
-				//} while (ptr != edge);
-				//dgExpandTraceMessage("\n");
-			}
+
+			edgePerimeters[perimeterCount] = edge;
+			perimeterCount++;
+			dgAssert(perimeterCount < dgInt32(sizeof(edgePerimeters) / sizeof(edgePerimeters[0])));
 		}
 	}
 
@@ -2686,6 +2674,8 @@ void dgPolyhedra::RemoveInteriorEdges (dgPolyhedra& buildConvex, const dgFloat64
 
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat64));
 
+static int xxx;
+
 	buildConvex.BeginFace();
 	dgPolyhedra::Iterator iter(*this);
 	for (iter.Begin(); iter;) {
@@ -2697,25 +2687,19 @@ void dgPolyhedra::RemoveInteriorEdges (dgPolyhedra& buildConvex, const dgFloat64
 			MarkAdjacentCoplanarFaces(flatFace, edge, vertex, strideInBytes);
 			if (flatFace.GetCount()) {
 
-bool xxx = false;
-if (flatFace.GetCount() > 200)
-//xxx = true;
-xxx = false;
-if (xxx)
-flatFace.SavePLY("xxxxx0.ply", vertex, strideInBytes);
+xxx++;
+if (xxx == 0) {
+//	dgPolyhedra xxxx(flatFace.GetAllocator());
+//	flatFace.Triangulate(vertex, stride * sizeof(dgFloat64), &xxxx);
+//	flatFace.RefineTriangulation(vertex, stride);
+	flatFace.SavePLY("xxxxx0.ply", vertex, strideInBytes);
+}
+
 
 				flatFace.RefineTriangulation(vertex, stride);
 
 				RemoveOuterColinearEdges(flatFace, vertex, stride);
 				RemoveInteriorColinearEdges(flatFace, vertex, stride);
-
-if (xxx) {
-	dgPolyhedra xxxx(flatFace.GetAllocator());
-	flatFace.Triangulate(vertex, stride * sizeof(dgFloat64), &xxxx);
-	flatFace.RefineTriangulation(vertex, stride);
-	flatFace.SavePLY("xxxxx3.ply", vertex, strideInBytes);
-}
-
 
 				dgInt32 diagonalCount = GetInteriorDiagonals(flatFace, diagonalsPool, sizeof(diagonalsPool) / sizeof(diagonalsPool[0]));
 				if (diagonalCount) {
@@ -2836,14 +2820,6 @@ if (xxx) {
 						}
 					}
 				}
-
-if (xxx) {
-	dgPolyhedra xxxx(flatFace.GetAllocator());
-	flatFace.Triangulate(vertex, stride * sizeof(dgFloat64), &xxxx);
-	flatFace.RefineTriangulation(vertex, stride);
-	flatFace.SavePLY("xxxxx4.ply", vertex, strideInBytes);
-}
-
 			}
 
 			iter.Begin();
