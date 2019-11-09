@@ -566,7 +566,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		CalculateTireDimensions("rl_tire", width, radio, world, vehicleEntity);
 		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", -10.0f, width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
 		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", -10.0f, width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
-/*
+
 		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
 		steeringControl->AddTire(frontLeft);
@@ -626,8 +626,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// Set Engine and engine control
 		dVehicleEngine* const engine = vehicle->AddEngine(engineInfo, differential);
 		dVehicleEngineControl* const engineControl = vehicle->GetEngineControl();
-		engineControl->SetEngine(en gine);
-*/
+		engineControl->SetEngine(engine);
+
 		// do not forget to call finalize after all components are added or after any change is made to the vehicle
 		vehicle->Finalize();
 

@@ -178,14 +178,6 @@ class dgVector
 			   _mm_mul_ps (_mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 1, 0, 2)), _mm_shuffle_ps (B.m_type, B.m_type, PERMUTE_MASK(3, 0, 2, 1))));
 	}
 
-	// return dot product
-	//DG_INLINE dgFloat32 DotProduct3(const dgVector& A) const
-	//{
-	//	dgVector tmp(A & m_triplexMask);
-	//	dgAssert((m_w * tmp.m_w) == dgFloat32(0.0f));
-	//	return (*this * tmp).AddHorizontal().GetScalar();
-	//}
-
 	DG_INLINE dgVector DotProduct(const dgVector& A) const
 	{
 		return (*this * A).AddHorizontal();

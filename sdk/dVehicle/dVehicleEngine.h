@@ -112,7 +112,7 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 			:dVehicleLoopJoint()
 			,m_gearRatio(2.6f)
 			,m_crowndGear(6.0f)
-			,m_clutchTorque(1.0e20f)
+			,m_clutchTorque(D_COMPLEMENTARITY_MAX_FRICTION_BOUND)
 		{
 			m_isActive = true;
 		}
