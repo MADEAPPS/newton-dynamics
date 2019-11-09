@@ -107,15 +107,6 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
 		constraintParams->m_frictionCallback[index] = this;
 
-		//if (m_penetration > (2.0f * D_TIRE_MAX_ELASTIC_DEFORMATION)) {
-		//	dFloat recoverAccel = D_TIRE_PENETRATION_RECOVERING_SPEED * D_TIRE_MAX_ELASTIC_DEFORMATION * constraintParams->m_timestepInv;
-		//	constraintParams->m_jointAccel[index] += recoverAccel;
-		//} else {
-		//	dFloat penetration = dMin (m_penetration, D_TIRE_MAX_ELASTIC_DEFORMATION);
-		//	dFloat recoverAccel = D_TIRE_PENETRATION_RECOVERING_SPEED * penetration * constraintParams->m_timestepInv;
-		//	constraintParams->m_jointAccel[index] += recoverAccel;
-		//}
-
 		dFloat penetration = dMin (m_penetration, D_TIRE_MAX_ELASTIC_DEFORMATION);
 		dFloat recoverAccel = D_TIRE_PENETRATION_RECOVERING_SPEED * penetration * constraintParams->m_timestepInv;
 		constraintParams->m_jointAccel[index] += recoverAccel;
@@ -133,8 +124,8 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		// longitudinal force row
 		int index = constraintParams->m_count;
 		AddContactRowJacobian(constraintParams, m_point, m_longitudinalDir, 0.0f);
-		constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
-		constraintParams->m_jointHighFrictionCoef[index] = 0.0f;
+		constraintParams->m_jointLowFrictionCoef[index] = -1.0e5f;
+		constraintParams->m_jointHighFrictionCoef[index] = 1.0e5f;
 
 		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
 		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
@@ -170,8 +161,8 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		// lateral force row
 		int index = constraintParams->m_count;
 		AddContactRowJacobian(constraintParams, m_point, m_lateralDir, 0.0f);
-		constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
-		constraintParams->m_jointHighFrictionCoef[index] = 0.0f;
+		constraintParams->m_jointLowFrictionCoef[index] = -1.0e5f;
+		constraintParams->m_jointHighFrictionCoef[index] = 1.0e5f;
 
 		const dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
 		const dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;

@@ -66,7 +66,7 @@ class dVehicleSolver
 	void JointJacobianTimeSolutionBackward(dVehicleNode* const node, dVectorPair& force, const dVectorPair& parentForce) const;
 
 	void dVehicleSolver::dGaussBlockedLcp(
-		const int size, int blockSize, dFloat* const x, const dFloat* const b, const int* const normalIndex,
+		const int size, int blockSize, dFloat* const x, dFloat* const b, const int* const normalIndex,
 		dFloat* const low, dFloat* const high, dComplementaritySolver::dBilateralJoint** const frictionCallback) const;
 
 	void dGaussSeidelLcpSor(

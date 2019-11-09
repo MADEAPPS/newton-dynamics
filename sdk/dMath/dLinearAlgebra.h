@@ -143,6 +143,9 @@ class dComplementaritySolver
 			,m_count(0)
 			,m_dof(0)
 		{
+			memset(m_rowIsMotor, 0, sizeof (m_rowIsMotor));
+			memset(m_motorAcceleration, 0, sizeof (m_motorAcceleration));
+			memset(m_jointFeebackForce, 0, sizeof (m_jointFeebackForce));
 		}
 
 		virtual ~dBilateralJoint(){}

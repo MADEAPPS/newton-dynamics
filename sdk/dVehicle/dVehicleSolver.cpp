@@ -882,7 +882,8 @@ void dVehicleSolver::dGaussSeidelLcpSor(
 	int* const index = dAlloca(int, size);
 	
 	const dFloat sor = 1.15f;
-	const dFloat tol2 = 0.001f;
+//	const dFloat tol2 = 0.001f;
+	const dFloat tol2 = 0.01f;
 	const int maxIterCount = 30; 
 
 	u[size] = dFloat(1.0f);
@@ -898,7 +899,7 @@ void dVehicleSolver::dGaussSeidelLcpSor(
 		const dFloat h = high[j] * val;
 		u[j] = dClamp(u[j], l, h);
 		invDiag1[j] = dFloat(1.0f) / matrix[rowStart + j];
-		rowStart += size;
+		rowStart += stride;
 	}
 
 	dFloat tolerance = tol2 * 2.0f;
@@ -936,7 +937,8 @@ void dVehicleSolver::dGaussSeidelLcpSor(
 #ifdef _DEBUG 
 	int passes = 0;
 #endif
-	for (int i = 0; (i < maxIterCount) && (tolerance > tol2); i++) {
+	const dFloat tolSOR = 10.0f * tol2;
+	for (int i = 0; (i < maxIterCount) && (tolerance > tolSOR); i++) {
 		int base = 0;
 		tolerance = dFloat(0.0f);
 #ifdef _DEBUG 
@@ -970,7 +972,7 @@ void dVehicleSolver::dGaussSeidelLcpSor(
 		}
 	}
 
-dTrace(("error %f\n", tolerance));
+//dTrace(("error %f\n", tolerance));
 
 	for (int j = 0; j < size; j++) {
 		x[j] = u[j];
@@ -978,15 +980,54 @@ dTrace(("error %f\n", tolerance));
 }
 
 void dVehicleSolver::dGaussBlockedLcp(
-	const int size, int blockSize, dFloat* const x, const dFloat* const b, const int* const normalIndex,
+	const int size, int blockSize, dFloat* const x, dFloat* const b, const int* const normalIndex,
 	dFloat* const low, dFloat* const high, dComplementaritySolver::dBilateralJoint** const frictionCallback) const
 {
-blockSize = 0;
 	if (blockSize) {
+		dCholeskyFactorization(blockSize, size, m_massMatrix11);
+
+		memcpy(x, b, blockSize * sizeof (dFloat));
+		dCholeskySolve(blockSize, size, m_massMatrix11, x);
+
+		int base = blockSize * size;
+		for (int i = blockSize; i < size; i++) {
+			b[i] -= dDotProduct(blockSize, &m_massMatrix11[base], x);
+			base += size;
+		}
+		const int boundedSize = size - blockSize;
+		dFloat* const a10 = dAlloca(dFloat, boundedSize * blockSize);
+
+		for (int i = 0; i < boundedSize; i++) {
+			dFloat* const g = &a10[i * blockSize];
+			const dFloat* const row = &m_massMatrix11[(blockSize + i) * size];
+			for (int j = 0; j < blockSize; j++) {
+				g[j] = -row[j];
+			}
+			dCholeskySolve(blockSize, size, m_massMatrix11, g);
+			
+			const dFloat* const row2 = &m_massMatrix11[(blockSize + i) * size];
+			dFloat* const arow = &m_massMatrix11[(blockSize + i) * size + blockSize];
+			arow[i] = row2[blockSize + i] + dDotProduct(blockSize, g, row2);
+			for (int j = i + 1; j < boundedSize; j++) {
+				const dFloat* const row1 = &m_massMatrix11[(blockSize + j) * size];
+				dFloat elem = row1[blockSize + i] + dDotProduct(blockSize, g, row1);
+				arow[j] = elem;
+				m_massMatrix11[(blockSize + j) * size + blockSize + i] = elem;
+			}
+		}
+
 		dGaussSeidelLcpSor(
-			&m_massMatrix11[size * blockSize + blockSize], size, size - blockSize, 
-			&x[blockSize], &b[blockSize], &normalIndex[blockSize], 
+			&m_massMatrix11[blockSize * size + blockSize], size, boundedSize,
+			&x[blockSize], &b[blockSize], &normalIndex[blockSize],
 			&low[blockSize], &high[blockSize], &frictionCallback[blockSize]);
+
+		for (int i = 0; i < boundedSize; i++) {
+			const dFloat s = x[blockSize + i];
+			const dFloat* const g = &a10[i * blockSize];
+			for (int j = 0; j < blockSize; j++) {
+				x[j] += g[j] * s;
+			}
+		}
 	} else {
 		dGaussSeidelLcpSor(m_massMatrix11, size, size, x, b, normalIndex, low, high, frictionCallback);
 	}

@@ -311,7 +311,7 @@ void dComplementaritySolver::dBilateralJoint::Init(dBodyState* const state0, dBo
 	m_count = 0;
 	memset (m_rowIsMotor, 0, sizeof (m_rowIsMotor));
 	memset (m_motorAcceleration, 0, sizeof (m_motorAcceleration));
-	memset (m_jointFeebackForce, 0, sizeof (m_jointFeebackForce));
+	//memset (m_jointFeebackForce, 0, sizeof (m_jointFeebackForce));
 
 	m_state0 = state0;
 	m_state1 = state1;
