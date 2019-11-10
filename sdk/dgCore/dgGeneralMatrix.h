@@ -381,7 +381,6 @@ void dgSolveCholesky(dgInt32 size, T* const choleskyMatrix, T* const x)
 	dgSolveCholesky(size, size, choleskyMatrix, x);
 }
 
-
 template<class T>
 bool dgSolveGaussian(dgInt32 size, T* const matrix, T* const b)
 {

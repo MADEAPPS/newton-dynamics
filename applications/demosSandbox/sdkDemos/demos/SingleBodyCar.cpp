@@ -258,6 +258,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 	void UpdateCamera(dFloat timestep)
 	{
+return;
 		if (!m_player) {
 			return;
 		}
@@ -945,6 +946,7 @@ void SingleBodyCar(DemoEntityManager* const scene)
 
 	dQuaternion rot(dYawMatrix (90.0f * dDegreeToRad));
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
+//	dVector origin(location.m_posit);
 	scene->SetCameraMatrix(rot, origin);
 }
 

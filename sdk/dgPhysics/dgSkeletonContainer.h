@@ -89,8 +89,10 @@ class dgSkeletonContainer
 	dgFloat32* m_deltaForce;
 	dgFloat32* m_massMatrix11;
 	dgFloat32* m_massMatrix10;
+
 	dgRightHandSide* m_rightHandSide;
 	const dgLeftHandSide* m_leftHandSide;
+	dgInt32* m_frictionIndex;
 	dgInt32* m_matrixRowsIndex;
 	dgSkeletonList::dgListNode* m_listNode;
 	dgArray<dgConstraint*> m_loopingJoints;
