@@ -28,9 +28,6 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgBilateralConstraint.h"
 
-
-static int xxx;
-
 class dgSkeletonContainer::dgNodePair
 {
 	public:
@@ -719,7 +716,7 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 
 	dgAssert(primaryIndex == primaryCount);
 	dgAssert(auxiliaryIndex == m_auxiliaryRowCount);
-
+/*
 	for (int i = 1; i < auxiliaryIndex; i++) {
 		int j = i;
 		int tmpBoundRow = boundRow[j];
@@ -736,7 +733,7 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 		m_pairs[primaryCount + j] = tmpPair;
 		m_matrixRowsIndex[primaryCount + j] = tmpMatrixRowsIndex;
 	}
-
+*/
 	memset(m_massMatrix10, 0, primaryCount * m_auxiliaryRowCount * sizeof(dgFloat32));
 	memset(m_massMatrix11, 0, m_auxiliaryRowCount * m_auxiliaryRowCount * sizeof(dgFloat32));
 
@@ -819,16 +816,7 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 	//	dgCholeskyApplyRegularizer(m_auxiliaryRowCount, m_auxiliaryRowCount, m_massMatrix11, diagDamp);
 	//}
 	dgAssert (dgTestPSDmatrix(m_auxiliaryRowCount, m_auxiliaryRowCount, m_massMatrix11));
-/*	
-xxx++;
-dgTrace(("%d\n", xxx));
-if (xxx > 210)
-{
-xxx *= 1;
-}else{
-m_blockSize = 0;
-}
-*/
+
 m_blockSize = 0;
 
 	if (m_blockSize) {
@@ -1065,9 +1053,6 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 
 void dgSkeletonContainer::SolveBlockLcp(dgInt32 size, dgInt32 blockSize, const dgFloat32* const x0, dgFloat32* const x, dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
 {
-if (xxx > 800)
-xxx *=1;
-
 	if (blockSize) {
 		dgSolveCholesky(blockSize, size, m_massMatrix11, x, b);
 		if (blockSize != size) {
