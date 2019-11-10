@@ -28,6 +28,9 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgBilateralConstraint.h"
 
+
+static int xxx;
+
 class dgSkeletonContainer::dgNodePair
 {
 	public:
@@ -156,7 +159,6 @@ class dgSkeletonContainer::dgNode
 		}
 	}
 
-	//DG_INLINE dgInt32 Factorize(const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, const dgRightHandSide* const rightHandSide, dgSpatialMatrix* const bodyMassArray, dgSpatialMatrix* const jointMassArray)
 	dgInt32 Factorize(const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, const dgRightHandSide* const rightHandSide, dgSpatialMatrix* const bodyMassArray, dgSpatialMatrix* const jointMassArray)
 	{
 		CalculateInertiaMatrix(bodyMassArray);
@@ -817,8 +819,18 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 	//	dgCholeskyApplyRegularizer(m_auxiliaryRowCount, m_auxiliaryRowCount, m_massMatrix11, diagDamp);
 	//}
 	dgAssert (dgTestPSDmatrix(m_auxiliaryRowCount, m_auxiliaryRowCount, m_massMatrix11));
-	
+/*	
+xxx++;
+dgTrace(("%d\n", xxx));
+if (xxx > 210)
+{
+xxx *= 1;
+}else{
 m_blockSize = 0;
+}
+*/
+m_blockSize = 0;
+
 	if (m_blockSize) {
 		dgCholeskyFactorization(m_blockSize, m_auxiliaryRowCount, m_massMatrix11);
 
@@ -843,6 +855,8 @@ m_blockSize = 0;
 				m_massMatrix11[(m_blockSize + j) * m_auxiliaryRowCount + m_blockSize + i] = elem;
 			}
 		}
+
+		dgAssert (dgTestPSDmatrix(m_blockSize, m_auxiliaryRowCount, &m_massMatrix11[m_auxiliaryRowCount * m_blockSize + m_blockSize]));
 
 		for (dgInt32 i = 0; i < boundedSize; i++) {
 			const dgFloat32* const g = &a10[i * m_blockSize];
@@ -1049,8 +1063,11 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 	}
 }
 
-void dgSkeletonContainer::SolveBlockLcp(dgInt32 size, dgInt32 blockSize, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
+void dgSkeletonContainer::SolveBlockLcp(dgInt32 size, dgInt32 blockSize, const dgFloat32* const x0, dgFloat32* const x, dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
 {
+if (xxx > 800)
+xxx *=1;
+
 	if (blockSize) {
 		dgSolveCholesky(blockSize, size, m_massMatrix11, x, b);
 		if (blockSize != size) {
@@ -1076,7 +1093,7 @@ void dgSkeletonContainer::SolveBlockLcp(dgInt32 size, dgInt32 blockSize, const d
 			}
 		}
 	} else {
-		SolveLcp(size, size, matrix, x0, x, b, low, high, normalIndex);
+		SolveLcp(size, size, m_massMatrix11, x0, x, b, low, high, normalIndex);
 	}
 }
 
@@ -1200,7 +1217,7 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 	}
 
 	//SolveLcp(m_auxiliaryRowCount, m_blockSize, m_massMatrix11, u0, u, b, low, high, normalIndex);
-	SolveBlockLcp(m_auxiliaryRowCount, m_blockSize, m_massMatrix11, u0, u, b, low, high, normalIndex);
+	SolveBlockLcp(m_auxiliaryRowCount, m_blockSize, u0, u, b, low, high, normalIndex);
 
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		const dgFloat32 s = u[i];
