@@ -1322,7 +1322,7 @@ void StandardJoints (DemoEntityManager* const scene)
 #if 1
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 //	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
-	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
+//	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
 //	AddBallAndSockectWithFriction (scene, dVector (-20.0f, 0.0f, -10.0f));
 //	AddFixDistance(scene, dVector(-20.0f, 0.0f, -5.0f));
 //	AddHinge (scene, dVector (-20.0f, 0.0f, 0.0f));
@@ -1336,7 +1336,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddGear (scene, dVector (-20.0f, 0.0f, 22.0f));
 //	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 //	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 29.0f));
-//	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
+	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 #endif
     // place camera into position
     dMatrix camMatrix (dGetIdentityMatrix());

@@ -416,6 +416,7 @@ void dVehicleSolver::InitLoopMassMatrix()
 	const int primaryCount = m_rowCount - m_auxiliaryRowCount;
 	const int nodeCount = m_nodeCount - 1;
 
+	m_blockSize = 0;
 	int* const boundRow = dAlloca(int, m_auxiliaryRowCount + m_loopRowCount);
 	for (int i = 0; i < nodeCount; i++) {
 		dVehicleNode* const node = m_nodesOrder[i];
@@ -442,6 +443,7 @@ void dVehicleSolver::InitLoopMassMatrix()
 			m_pairs[auxiliaryIndex + primaryCount].m_m0 = m0;
 			m_pairs[auxiliaryIndex + primaryCount].m_m1 = m1;
 			boundRow[auxiliaryIndex] = (rhs->m_jointLowFriction <= dFloat(-D_MAX_FRICTION_BOUND)) && (rhs->m_jointHighFriction >= dFloat(D_MAX_FRICTION_BOUND)) ? 1 : 0;
+			m_blockSize += boundRow[auxiliaryIndex];
 			m_matrixRowsIndex[auxiliaryIndex + primaryCount] = first + index;
 			auxiliaryIndex++;
 		}
@@ -459,6 +461,7 @@ void dVehicleSolver::InitLoopMassMatrix()
 			m_pairs[primaryCount + auxiliaryIndex].m_m0 = m0;
 			m_pairs[primaryCount + auxiliaryIndex].m_m1 = m1;
 			boundRow[auxiliaryIndex] = (rhs->m_jointLowFriction <= dFloat(-D_MAX_FRICTION_BOUND)) && (rhs->m_jointHighFriction >= dFloat(D_MAX_FRICTION_BOUND)) ? 1 : 0;
+			m_blockSize += boundRow[auxiliaryIndex];
 			m_matrixRowsIndex[primaryCount + auxiliaryIndex] = first + i;
 			auxiliaryIndex++;
 		}
@@ -466,12 +469,9 @@ void dVehicleSolver::InitLoopMassMatrix()
 
 	dAssert(primaryIndex == primaryCount);
 	dAssert(auxiliaryIndex == m_auxiliaryRowCount + m_loopRowCount);
-
-	m_blockSize = 0;
 	for (int i = 1; i < auxiliaryIndex; i++) {
 		int j = i;
 		int tmpBoundRow = boundRow[j];
-		m_blockSize += tmpBoundRow;
 		dNodePair tmpPair(m_pairs[primaryCount + j]);
 		int tmpMatrixRowsIndex = m_matrixRowsIndex[primaryCount + j];
 		
@@ -985,7 +985,6 @@ void dVehicleSolver::dGaussBlockedLcp(
 {
 	if (blockSize) {
 		dCholeskyFactorization(blockSize, size, m_massMatrix11);
-
 		memcpy(x, b, blockSize * sizeof (dFloat));
 		dCholeskySolve(blockSize, size, m_massMatrix11, x);
 

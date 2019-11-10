@@ -874,7 +874,7 @@ void dgInverseDynamics::InitMassMatrix(const dgJointInfo* const jointInfoArray, 
 			}
 		}
 
-		dgCholeskyApplyRegularizer(m_auxiliaryRowCount, m_massMatrix11, diagDamp);
+		dgCholeskyApplyRegularizer(m_auxiliaryRowCount, m_auxiliaryRowCount, m_massMatrix11, diagDamp);
 	}
 }
 
