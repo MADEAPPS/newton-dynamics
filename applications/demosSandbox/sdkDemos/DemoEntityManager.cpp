@@ -63,7 +63,7 @@
 //#define DEFAULT_SCENE	27		// simple convex fracturing 
 //#define DEFAULT_SCENE	28		// structured convex fracturing 
 //#define DEFAULT_SCENE	29		// multi ray casting using the threading Job scheduler
-//#define DEFAULT_SCENE	30		// standard joints
+#define DEFAULT_SCENE	30		// standard joints
 //#define DEFAULT_SCENE	31		// servo joints
 //#define DEFAULT_SCENE	32		// articulated joints
 //#define DEFAULT_SCENE	33		// six axis manipulator
@@ -71,7 +71,7 @@
 //#define DEFAULT_SCENE	35		// basic rag doll
 //#define DEFAULT_SCENE	36		// balancing character
 //#define DEFAULT_SCENE	37		// dynamic rag doll
-#define DEFAULT_SCENE	38		// single body vehicle
+//#define DEFAULT_SCENE	38		// single body vehicle
 //#define DEFAULT_SCENE	39		// super Car
 //#define DEFAULT_SCENE	40		// heavy vehicles
 //#define DEFAULT_SCENE	41		// basic player controller

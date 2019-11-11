@@ -652,49 +652,56 @@ void dgSkeletonContainer::FactorizeMatrix(dgInt32 size, dgInt32 stride, dgFloat3
 	dgCholeskyFactorization(size, stride, matrix);
 
 #else
-	size = 3;
-	stride = 3;
-	dgFloat32 l0[3][3];
-	dgFloat32 d[3][3];
-	dgFloat32 lt[3][3];
+/*
+	size = 4;
+	stride = 4;
+	dgFloat32 l0[4][4];
+	dgFloat32 d[4][4];
+	dgFloat32 lt[4][4];
 
-	l0[0][0] = 1.0; l0[0][1] = 0.0; l0[0][2] = 0.0;
-	l0[1][0] = 3.0; l0[1][1] = 1.0; l0[1][2] = 0.0;
-	l0[2][0] = 2.0; l0[2][1] = -3.0; l0[2][2] = 1.0;
-
-	for (int i = 0; i < 3; i ++) {
-		for (int j = 0; j < 3; j ++) {
+	l0[0][0] = 1.0; l0[0][1] =  0.0; l0[0][2] = 0.0; l0[0][3] = 0.0;
+	l0[1][0] = 3.0; l0[1][1] =  1.0; l0[1][2] = 0.0; l0[1][3] = 0.0;
+	l0[2][0] = 2.0; l0[2][1] = -3.0; l0[2][2] = 1.0; l0[2][3] = 0.0;
+	l0[3][0] = -5.0; l0[3][1] =  6.0; l0[3][2] = 8.0; l0[3][3] = 1.0;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j ++) {
 			lt[i][j] = l0[j][i];
 		}
 	}
 
-	d[0][0] = 2.0; d[0][1] = 0.0; d[0][2] = 0.0;
-	d[1][0] = 0.0; d[1][1] = 3.0; d[1][2] = 0.0;
-	d[2][0] = 0.0; d[2][1] = 0.0; d[2][2] = 5.0;
+	d[0][0] = 7.0; d[0][1] = 0.0; d[0][2] = 0.0; d[0][3] = 0.0;
+	d[1][0] = 0.0; d[1][1] = 3.0; d[1][2] = 0.0; d[1][3] = 0.0;
+	d[2][0] = 0.0; d[2][1] = 0.0; d[2][2] = 5.0; d[2][3] = 0.0;
+	d[3][0] = 0.0; d[3][1] = 0.0; d[3][2] = 0.0; d[3][3] = 8.0;
 
-	matrix[0] = 10; matrix[1] = 3; matrix[2] = 2;
-	matrix[3] = 3; matrix[4] = 5; matrix[5] = 4;
-	matrix[6] = 2; matrix[7] = 4; matrix[8] = 2;
-
-	dgFloat32 tmp[3][3];
-	dgMatrixTimeMatrix(3, &l0[0][0], &d[0][0], &tmp[0][0]);
-	dgMatrixTimeMatrix(3, &tmp[0][0], &lt[0][0], matrix);
-
+	dgFloat32 tmp[4][4];
+	dgFloat32 matrix1[4][4];
+	dgMatrixTimeMatrix(4, &l0[0][0], &d[0][0], &tmp[0][0]);
+	dgMatrixTimeMatrix(4, &tmp[0][0], &lt[0][0], &matrix1[0][0]);
+	dgFloat32* matrix = &matrix1[0][0];
+*/
+	int start0 = 0;
 	for (dgInt32 j = 0; j < size; j++) {
-		dgFloat32* const rowN = &matrix[stride * j];
+		dgFloat32* const rowN = &matrix[start0];
 		dgFloat32 aii = rowN[j];
 		dgAssert(dgAbs(aii) > dgFloat32(0.0f));
 		dgFloat32 den = dgFloat32(1.0f) / aii;
+
+		int start1 = start0 + stride;
 		for (dgInt32 i = j + 1; i < size; i++) {
-			dgFloat32* const rowM = &matrix[stride * i];
+			dgFloat32* const rowM = &matrix[start1];
 			dgFloat32 scale = -rowM[j] * den;
 			for (int k = j + 1; k < size; k++) {
 				rowM[k] += scale * rowN[k];
 			}
+			start1 += stride;
 		}
+
+		rowN[j] = den;
 		for (dgInt32 i = j + 1; i < size; i++) {
 			rowN[i] *= den;
 		}
+		start0 += stride;
 	}
 #endif
 }
@@ -704,7 +711,44 @@ void dgSkeletonContainer::FactorizeMatrixSolve (dgInt32 size, dgInt32 stride, co
 #ifdef USE_CHOLESKY
 	dgSolveCholesky(size, stride, matrix, x, b);
 #else
-	dgAssert (0);
+
+/*
+	int start = (size - 1) * stride;
+	for (dgInt32 j = size - 1; j >= 0; j--) {
+		const dgFloat32* const rowN = &matrix[start];
+		dgFloat32 acc = b[j];
+		x[]
+		for (dgInt32 i = j; i < size; i++) {
+		}
+
+		
+	}
+*/
+
+	x[0] = b[0];
+	for (dgInt32 i = 1; i < size; i++) {
+		dgFloat32 acc = b[i];
+		//const dgFloat32* const row = &matrix[rowStart];
+		for (dgInt32 j = 0; j < i; j++) {
+			//acc = acc + row[j] * x[j];
+			acc = acc - matrix[stride * j + i] * x[j];
+		}
+		x[i] = acc;
+	}
+
+	dgInt32 rowStart = stride;
+	for (dgInt32 i = size - 1; i >= 0; i--) {
+		dgFloat32 acc = x[i];
+		const dgFloat32* const row = &matrix[rowStart];
+		for (dgInt32 j = i + 1; j < size; j++) {
+			//acc = acc + choleskyMatrix[stride * j + i] * x[j];
+			acc = acc - row[j] * x[j];
+		}
+		//x[i] = (x[i] - acc) / choleskyMatrix[stride * i + i];
+
+		rowStart -= stride;
+	}
+
 #endif
 }
 
