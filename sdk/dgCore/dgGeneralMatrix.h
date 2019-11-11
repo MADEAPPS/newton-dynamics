@@ -326,24 +326,6 @@ bool dgCholeskyFactorization(dgInt32 size, dgInt32 stride, T* const psdMatrix)
 }
 
 template<class T>
-bool dgCholeskyFactorizationInvertDiagonal(dgInt32 size, dgInt32 stride, T* const psdMatrix)
-{
-	bool state = true;
-	T* const invDiagonal = dgAlloca(T, size);
-	for (dgInt32 i = 0; (i < size) && state; i++) {
-		state = state && dgCholeskyFactorizationAddRow(size, stride, i, psdMatrix, invDiagonal);
-	}
-	if (state) {
-		dgInt32 base = 0;
-		for (dgInt32 i = 0; i < size; i++) {
-			psdMatrix[base + i] = invDiagonal[i];
-			base += stride;
-		}
-	}
-	return state;
-}
-
-template<class T>
 bool dgTestPSDmatrix(dgInt32 size, dgInt32 stride, T* const matrix)
 {
 	T* const copy = dgAlloca(T, size * size);
@@ -394,30 +376,6 @@ DG_INLINE void dgSolveCholesky(dgInt32 size, dgInt32 stride, const T* const chol
 		x[i] = (x[i] - acc) / choleskyMatrix[stride * i + i];
 	}
 }
-
-template<class T>
-DG_INLINE void dgSolveCholeskyInvertDiagonal(dgInt32 size, dgInt32 stride, const T* const choleskyMatrix, T* const x, const T* const b)
-{
-	dgInt32 rowStart = 0;
-	for (dgInt32 i = 0; i < size; i++) {
-		T acc(0.0f);
-		const T* const row = &choleskyMatrix[rowStart];
-		for (dgInt32 j = 0; j < i; j++) {
-			acc = acc + row[j] * x[j];
-		}
-		x[i] = (b[i] - acc) * row[i];
-		rowStart += stride;
-	}
-
-	for (dgInt32 i = size - 1; i >= 0; i--) {
-		T acc = 0.0f;
-		for (dgInt32 j = i + 1; j < size; j++) {
-			acc = acc + choleskyMatrix[stride * j + i] * x[j];
-		}
-		x[i] = (x[i] - acc) * choleskyMatrix[stride * i + i];
-	}
-}
-
 
 template<class T>
 void dgSolveCholesky(dgInt32 size, T* const choleskyMatrix, T* const x)
