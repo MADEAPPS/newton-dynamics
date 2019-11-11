@@ -258,7 +258,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 	void UpdateCamera(dFloat timestep)
 	{
-return;
+//return;
 		if (!m_player) {
 			return;
 		}

@@ -326,6 +326,7 @@ void dCholeskySolve(int size, int stride, const T* const choleskyMatrix, T* cons
 template<class T>
 bool dCholeskyFactorization(int size, int stride, T* const matrix)
 {
+	T* const invDiagonal = dAlloca(T, size);
 	for (int i = 0; i < size; i++) {
 		T* const rowN = &matrix[stride * i];
 
@@ -343,8 +344,10 @@ bool dCholeskyFactorization(int size, int stride, T* const matrix)
 					return false;
 				}
 				rowN[i] = T(sqrt(diag));
+				invDiagonal[i] = T (1.0f) / rowN[i];
 			} else {
-				rowN[j] = ((T(1.0f) / rowJ[j]) * (rowN[j] - s));
+				//rowN[j] = ((T(1.0f) / rowJ[j]) * (rowN[j] - s));
+				rowN[j] = invDiagonal[j] * (rowN[j] - s);
 			}
 			rowStart += stride;
 		}
