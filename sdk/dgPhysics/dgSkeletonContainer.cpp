@@ -642,6 +642,72 @@ DG_INLINE void dgSkeletonContainer::CalculateLoopMassMatrixCoefficients(dgFloat3
 	}
 }
 
+// Cholesky can not be used when the matrix loses the PSD status because of roundoff of a stiff system
+#define USE_CHOLESKY
+
+void dgSkeletonContainer::FactorizeMatrix(dgInt32 size, dgInt32 stride, dgFloat32* const matrix) const
+{
+#ifdef USE_CHOLESKY
+	dgAssert (dgTestPSDmatrix(size, stride, matrix));
+	dgCholeskyFactorization(size, stride, matrix);
+
+#else
+	size = 3;
+	stride = 3;
+	dgFloat32 l0[3][3];
+	dgFloat32 d[3][3];
+	dgFloat32 lt[3][3];
+
+	l0[0][0] = 1.0; l0[0][1] = 0.0; l0[0][2] = 0.0;
+	l0[1][0] = 3.0; l0[1][1] = 1.0; l0[1][2] = 0.0;
+	l0[2][0] = 2.0; l0[2][1] = -3.0; l0[2][2] = 1.0;
+
+	for (int i = 0; i < 3; i ++) {
+		for (int j = 0; j < 3; j ++) {
+			lt[i][j] = l0[j][i];
+		}
+	}
+
+	d[0][0] = 2.0; d[0][1] = 0.0; d[0][2] = 0.0;
+	d[1][0] = 0.0; d[1][1] = 3.0; d[1][2] = 0.0;
+	d[2][0] = 0.0; d[2][1] = 0.0; d[2][2] = 5.0;
+
+	matrix[0] = 10; matrix[1] = 3; matrix[2] = 2;
+	matrix[3] = 3; matrix[4] = 5; matrix[5] = 4;
+	matrix[6] = 2; matrix[7] = 4; matrix[8] = 2;
+
+	dgFloat32 tmp[3][3];
+	dgMatrixTimeMatrix(3, &l0[0][0], &d[0][0], &tmp[0][0]);
+	dgMatrixTimeMatrix(3, &tmp[0][0], &lt[0][0], matrix);
+
+	for (dgInt32 j = 0; j < size; j++) {
+		dgFloat32* const rowN = &matrix[stride * j];
+		dgFloat32 aii = rowN[j];
+		dgAssert(dgAbs(aii) > dgFloat32(0.0f));
+		dgFloat32 den = dgFloat32(1.0f) / aii;
+		for (dgInt32 i = j + 1; i < size; i++) {
+			dgFloat32* const rowM = &matrix[stride * i];
+			dgFloat32 scale = -rowM[j] * den;
+			for (int k = j + 1; k < size; k++) {
+				rowM[k] += scale * rowN[k];
+			}
+		}
+		for (dgInt32 i = j + 1; i < size; i++) {
+			rowN[i] *= den;
+		}
+	}
+#endif
+}
+
+void dgSkeletonContainer::FactorizeMatrixSolve (dgInt32 size, dgInt32 stride, const dgFloat32* const matrix, dgFloat32* const x, const dgFloat32* const b) const
+{
+#ifdef USE_CHOLESKY
+	dgSolveCholesky(size, stride, matrix, x, b);
+#else
+	dgAssert (0);
+#endif
+}
+
 void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoArray)
 {
 	const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
@@ -806,8 +872,7 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 			dgInt32 index = indexList[k];
 			diagonal += matrixRow10[index] * deltaForcePtr[index];
 		}
-		//matrixRow11[i] = dgMax(diagonal, diagDamp[i]);
-		matrixRow11[i] = diagonal + diagDamp[i];
+		matrixRow11[i] = dgMax(diagonal, diagDamp[i]);
 
 		for (dgInt32 j = i + 1; j < m_auxiliaryRowCount; j++) {
 			dgFloat32 offDiagonal = matrixRow11[j];
@@ -824,11 +889,12 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 	//if (m_auxiliaryRowCount < 256) {	
 	//	dgCholeskyApplyRegularizer(m_auxiliaryRowCount, m_auxiliaryRowCount, m_massMatrix11, diagDamp);
 	//}
-	dgAssert (dgTestPSDmatrix(m_auxiliaryRowCount, m_auxiliaryRowCount, m_massMatrix11));
+	//dgAssert (dgTestPSDmatrix(m_auxiliaryRowCount, m_auxiliaryRowCount, m_massMatrix11));
 
 //m_blockSize = 0;
 	if (m_blockSize) {
-		dgCholeskyFactorization(m_blockSize, m_auxiliaryRowCount, m_massMatrix11);
+		//dgCholeskyFactorization(m_blockSize, m_auxiliaryRowCount, m_massMatrix11);
+		FactorizeMatrix(m_blockSize, m_auxiliaryRowCount, m_massMatrix11);
 
 		const int boundedSize = m_auxiliaryRowCount - m_blockSize;
 		dgFloat32* const a10 = dgAlloca(dgFloat32, boundedSize * m_blockSize);
@@ -839,7 +905,7 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 			for (int j = 0; j < m_blockSize; j++) {
 				g[j] = -row[j];
 			}
-			dgSolveCholesky(m_blockSize, m_auxiliaryRowCount, m_massMatrix11, g, g);
+			FactorizeMatrixSolve(m_blockSize, m_auxiliaryRowCount, m_massMatrix11, g, g);
 
 			const dgFloat32* const row2 = &m_massMatrix11[(m_blockSize + i) * m_auxiliaryRowCount];
 			dgFloat32* const arow = &m_massMatrix11[(m_blockSize + i) * m_auxiliaryRowCount + m_blockSize];
@@ -1082,7 +1148,7 @@ dgSolvePartitionDantzigLCP(size, xxxxxxxx, x3, b, (dgFloat32*)low, (dgFloat32*)h
 }
 */
 	if (blockSize) {
-		dgSolveCholesky(blockSize, size, m_massMatrix11, x, b);
+		FactorizeMatrixSolve(blockSize, size, m_massMatrix11, x, b);
 		if (blockSize != size) {
 
 			dgInt32 base = blockSize * size;

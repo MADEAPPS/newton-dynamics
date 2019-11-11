@@ -264,17 +264,17 @@ void dgMatrixTimeVector(dgInt32 size, const T* const matrix, const T* const v, T
 template<class T>
 void dgMatrixTimeMatrix(dgInt32 size, const T* const matrixA, const T* const matrixB, T* const out)
 {
-	dgCheckAligment16(out);
-	dgCheckAligment16(matrixA);
-	dgCheckAligment16(matrixB);
+	//dgCheckAligment16(out);
+	//dgCheckAligment16(matrixA);
+	//dgCheckAligment16(matrixB);
 	for (dgInt32 i = 0; i < size; i++) {
 		const T* const rowA = &matrixA[i * size];
-		dgCheckAligment16(rowA);
+		//dgCheckAligment16(rowA);
 		T* const rowOut = &out[i * size];
 		for (dgInt32 j = 0; j < size; j++) {
 			T acc = T(0.0f);
 			for (dgInt32 k = 0; k < size; k++) {
-				acc += rowA[k] * matrixB[j * size + k];
+				acc += rowA[k] * matrixB[k * size + j];
 			}
 			rowOut[j] = acc;
 		}
