@@ -825,7 +825,7 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 	//}
 	dgAssert (dgTestPSDmatrix(m_auxiliaryRowCount, m_auxiliaryRowCount, m_massMatrix11));
 
-m_blockSize = 0;
+//m_blockSize = 0;
 	if (m_blockSize) {
 		//dgCholeskyFactorization(m_blockSize, m_auxiliaryRowCount, m_massMatrix11);
 		dgCholeskyFactorizationInvertDiagonal(m_blockSize, m_auxiliaryRowCount, m_massMatrix11);
