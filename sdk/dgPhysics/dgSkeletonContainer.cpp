@@ -827,7 +827,8 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 
 m_blockSize = 0;
 	if (m_blockSize) {
-		dgCholeskyFactorization(m_blockSize, m_auxiliaryRowCount, m_massMatrix11);
+		//dgCholeskyFactorization(m_blockSize, m_auxiliaryRowCount, m_massMatrix11);
+		dgCholeskyFactorizationInvertDiagonal(m_blockSize, m_auxiliaryRowCount, m_massMatrix11);
 
 		const int boundedSize = m_auxiliaryRowCount - m_blockSize;
 		dgFloat32* const a10 = dgAlloca(dgFloat32, boundedSize * m_blockSize);
@@ -838,7 +839,8 @@ m_blockSize = 0;
 			for (int j = 0; j < m_blockSize; j++) {
 				g[j] = -row[j];
 			}
-			dgSolveCholesky(m_blockSize, m_auxiliaryRowCount, m_massMatrix11, g, g);
+			//dgSolveCholesky(m_blockSize, m_auxiliaryRowCount, m_massMatrix11, g, g);
+			dgSolveCholeskyInvertDiagonal(m_blockSize, m_auxiliaryRowCount, m_massMatrix11, g, g);
 
 			const dgFloat32* const row2 = &m_massMatrix11[(m_blockSize + i) * m_auxiliaryRowCount];
 			dgFloat32* const arow = &m_massMatrix11[(m_blockSize + i) * m_auxiliaryRowCount + m_blockSize];
@@ -1081,7 +1083,8 @@ dgSolvePartitionDantzigLCP(size, xxxxxxxx, x3, b, (dgFloat32*)low, (dgFloat32*)h
 }
 */
 	if (blockSize) {
-		dgSolveCholesky(blockSize, size, m_massMatrix11, x, b);
+		//dgSolveCholesky(blockSize, size, m_massMatrix11, x, b);
+		dgSolveCholeskyInvertDiagonal(blockSize, size, m_massMatrix11, x, b);
 		if (blockSize != size) {
 
 			dgInt32 base = blockSize * size;
