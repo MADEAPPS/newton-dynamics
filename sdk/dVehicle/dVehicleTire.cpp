@@ -283,33 +283,29 @@ void dVehicleTire::Integrate(dFloat timestep)
 	for (int i = 0; i < m_contactCount; i ++) {
 		const dVehicleTireContact* const contact = &m_contactsJoints[i];
 		if (contact->m_isActive && contact->m_collidingNode->m_body) {
+
 			dMatrix matrix;
 			dVector com;
 			NewtonBodyGetMatrix(contact->m_collidingNode->m_body, &matrix[0][0]);
 			NewtonBodyGetCentreOfMass(contact->m_collidingNode->m_body, &com[0]);
 
 			dVector r (contact->m_point - matrix.TransformVector(com));
-
-#if 1
 			dVector force (contact->m_normal.Scale (-contact->m_tireModel.m_tireLoad) +
 						   contact->m_longitudinalDir.Scale (-contact->m_tireModel.m_longitunalForce) + 
 						   contact->m_lateralDir.Scale (-contact->m_tireModel.m_lateralForce));
-#else
-dVector force(contact->m_normal.Scale(-contact->m_tireModel.m_tireLoad));
-dVector force1(contact->m_longitudinalDir.Scale(-contact->m_tireModel.m_longitunalForce));
-dVector force2(contact->m_lateralDir.Scale(-contact->m_tireModel.m_lateralForce));
-dTrace(("a(%f %f %f) n(%f %f %f)\n", 
-	force[0] * 0.1f, force[1] * 0.1f, force[2] * 0.1f,
-	contact->m_normal[0], contact->m_normal[1], contact->m_normal[2]));
-dTrace(("a(%f %f %f) n(%f %f %f)\n", 
-	force1[0] * 0.1f, force1[1] * 0.1f, force1[2] * 0.1f,
-	contact->m_longitudinalDir[0], contact->m_longitudinalDir[1], contact->m_longitudinalDir[2]));
-dTrace(("a(%f %f %f) n(%f %f %f)\n", 
-	force2[0] * 0.1f, force2[1] * 0.1f, force2[2] * 0.1f,
-	contact->m_lateralDir[0], contact->m_lateralDir[1], contact->m_lateralDir[2]));
-#endif
 			if (contact->m_isContactPatch) {
-				force = force.Scale (1.0f/40.0f);
+				dFloat invMass;
+				dFloat invIxx;
+				dFloat invIyy;
+				dFloat invIzz;
+				NewtonBodyGetInvMass(contact->m_collidingNode->m_body, &invMass, &invIxx, &invIyy, &invIzz);
+				dAssert (invMass > 0.0f);
+				dVector accel (force.Scale (invMass));
+				dFloat mag2 = accel.DotProduct3(accel);
+				const dFloat maxAccel = 100.0f;
+				if (mag2 > maxAccel * maxAccel) {
+					force = accel.Scale (maxAccel / (invMass * dSqrt (mag2)));
+				}
 			}
 
 			dVector torque (r.CrossProduct(force));
