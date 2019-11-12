@@ -1516,7 +1516,6 @@ void dgPolyhedra::OptimizeTriangulation (const dgFloat64* const vertex, dgInt32 
 	SwapInfo(buildConvex);
 }
 
-
 void dgPolyhedra::Triangulate (const dgFloat64* const vertex, dgInt32 strideInBytes, dgPolyhedra* const leftOver)
 {
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat64));
@@ -1604,6 +1603,11 @@ void dgPolyhedra::Triangulate (const dgFloat64* const vertex, dgInt32 strideInBy
 	}
 }
 
+bool dgPolyhedra::IsFaceConvex(dgEdge* const face, const dgFloat64* const pool, dgInt32 strideInBytes) const
+{
+	return true;
+}
+
 void dgPolyhedra::RemoveOuterColinearEdges (dgPolyhedra& flatFace, const dgFloat64* const vertex, dgInt32 stride)
 {
 	dgEdge* edgePerimeters[DG_LOCAL_BUFFER_SIZE];
@@ -1673,6 +1677,10 @@ void dgPolyhedra::RemoveOuterColinearEdges (dgPolyhedra& flatFace, const dgFloat
 						edge->m_twin->m_prev = edge;
 						flatFace.DeleteEdge (edge);								
 						flatFace.ChangeEdgeIncidentVertex (ptr->m_twin, ptr->m_next->m_incidentVertex);
+
+						if (!flatFace.IsFaceConvex(edge, vertex, stride * sizeof(dgFloat64))) {
+							dgAssert(0);
+						}
 
 						e1 = e0;
 						p1 = p2;
@@ -2466,7 +2474,6 @@ dgEdge* dgPolyhedra::BestEdgePolygonizeFace(const dgBigVector& normal, dgEdge* c
 	return e0;
 }
 
-
 bool dgPolyhedra::PolygonizeFace(dgEdge* const face, const dgFloat64* const pool, dgInt32 strideInBytes)
 {
 	dgPolyhedra flatFace(GetAllocator());
@@ -2488,7 +2495,6 @@ bool dgPolyhedra::PolygonizeFace(dgEdge* const face, const dgFloat64* const pool
 		dgAssert(count <= DG_LOCAL_BUFFER_SIZE);
 		edge = edge->m_next;
 	} while (edge != face);
-
 
 	dgInt32 i0 = count - 1;
 	for(dgInt32 i = 0; i < count; i ++) {
@@ -2674,8 +2680,6 @@ void dgPolyhedra::RemoveInteriorEdges (dgPolyhedra& buildConvex, const dgFloat64
 
 	dgInt32 stride = dgInt32 (strideInBytes / sizeof (dgFloat64));
 
-static int xxx;
-
 	buildConvex.BeginFace();
 	dgPolyhedra::Iterator iter(*this);
 	for (iter.Begin(); iter;) {
@@ -2687,17 +2691,15 @@ static int xxx;
 			MarkAdjacentCoplanarFaces(flatFace, edge, vertex, strideInBytes);
 			if (flatFace.GetCount()) {
 
-xxx++;
-if (xxx == 0) {
+//xxx++;
+//if (xxx == 0) {
 //	dgPolyhedra xxxx(flatFace.GetAllocator());
 //	flatFace.Triangulate(vertex, stride * sizeof(dgFloat64), &xxxx);
 //	flatFace.RefineTriangulation(vertex, stride);
-	flatFace.SavePLY("xxxxx0.ply", vertex, strideInBytes);
-}
-
+//	flatFace.SavePLY("xxxxx0.ply", vertex, strideInBytes);
+//}
 
 				flatFace.RefineTriangulation(vertex, stride);
-
 				RemoveOuterColinearEdges(flatFace, vertex, stride);
 				RemoveInteriorColinearEdges(flatFace, vertex, stride);
 
@@ -2792,7 +2794,6 @@ if (xxx == 0) {
 						for (dgInt32 j = 0; j < diagonalCount; j++) {
 							dgEdge* const diagonal = diagonalsPool[j];
 							if (!IsEssensialDiagonal(diagonal, normal, vertex, stride)) {
-							//if (xxx){
 								flatFace.DeleteEdge(diagonal);
 							}
 						}
