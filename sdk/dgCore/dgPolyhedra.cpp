@@ -645,8 +645,6 @@ dgEdge* dgPolyhedra::SpliteEdge (dgInt32 newIndex,	dgEdge* const edge)
 	return edge0;
 }
 
-
-
 bool dgPolyhedra::FlipEdge (dgEdge* const edge)
 {
 	//	dgTreeNode *node;
@@ -1092,8 +1090,6 @@ dgEdge* dgPolyhedra::FindEarTip (dgEdge* const face, const dgFloat64* const pool
 
 	return ear;
 }
-
-
 
 dgEdge* dgPolyhedra::TriangulateFace (dgEdge* const faceIn, const dgFloat64* const pool, dgInt32 stride, dgDownHeap<dgEdge*, dgFloat64>& heap, dgBigVector* const faceNormalOut)
 {
@@ -1603,8 +1599,31 @@ void dgPolyhedra::Triangulate (const dgFloat64* const vertex, dgInt32 strideInBy
 	}
 }
 
-bool dgPolyhedra::IsFaceConvex(dgEdge* const face, const dgFloat64* const pool, dgInt32 strideInBytes) const
+bool dgPolyhedra::IsFaceConvex(dgEdge* const face, const dgFloat64* const vertex, dgInt32 strideInBytes) const
 {
+	if (face->m_next->m_next->m_next == face) {
+		return true;
+	}
+	dgBigVector normal(FaceNormal(face, vertex, strideInBytes));
+	normal.m_w = dgFloat32(0.0f);
+
+	dgInt32 stride = strideInBytes / sizeof(dgFloat64);
+	dgEdge* ptr = face;
+	do {
+		dgBigVector p0(&vertex[ptr->m_incidentVertex * stride]);
+		dgBigVector p1(&vertex[ptr->m_prev->m_incidentVertex * stride]);
+		dgBigVector p2(&vertex[ptr->m_next->m_incidentVertex * stride]);
+		dgBigVector e0(p1 - p0);
+		dgBigVector e1(p2 - p1);
+		dgBigVector cornerNormal(e1.CrossProduct(e0));
+		dgFloat64 project(normal.DotProduct(cornerNormal).GetScalar());
+		if (project < dgFloat32(0.0f)) {
+			return false;
+		}
+
+		ptr = ptr->m_next;
+	} while (ptr != face);
+	
 	return true;
 }
 
@@ -1678,8 +1697,12 @@ void dgPolyhedra::RemoveOuterColinearEdges (dgPolyhedra& flatFace, const dgFloat
 						flatFace.DeleteEdge (edge);								
 						flatFace.ChangeEdgeIncidentVertex (ptr->m_twin, ptr->m_next->m_incidentVertex);
 
-						if (!flatFace.IsFaceConvex(edge, vertex, stride * sizeof(dgFloat64))) {
-							dgAssert(0);
+						if (!flatFace.IsFaceConvex(ptr->m_twin, vertex, stride * sizeof(dgFloat64))) {
+							// temporary hack fix until I have tome for a more elegane solution;
+							dgTrace(("fix this hack\n"));
+							char memPool[10000];
+							dgDownHeap<dgEdge*, dgFloat64> heap(&memPool[0], 10000);
+							flatFace.TriangulateFace(ptr->m_twin, vertex, stride, heap, NULL);
 						}
 
 						e1 = e0;
