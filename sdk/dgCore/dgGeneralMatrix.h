@@ -248,14 +248,9 @@ class dgOldSolverNetwon_1_5
 template<class T>
 void dgMatrixTimeVector(dgInt32 size, const T* const matrix, const T* const v, T* const out)
 {
-	dgCheckAligment16(v);
-	dgCheckAligment16(out);
-	dgCheckAligment16(matrix);
 	dgInt32 stride = 0;
 	for (dgInt32 i = 0; i < size; i++) {
-		//dgGetRow(const T* const matrix, dgInt32 size, dgInt32 index)
 		const T* const row = &matrix[stride];
-		dgCheckAligment16(row);
 		out[i] = dgDotProduct(size, row, v);
 		stride += size;
 	}
@@ -264,12 +259,8 @@ void dgMatrixTimeVector(dgInt32 size, const T* const matrix, const T* const v, T
 template<class T>
 void dgMatrixTimeMatrix(dgInt32 size, const T* const matrixA, const T* const matrixB, T* const out)
 {
-	//dgCheckAligment16(out);
-	//dgCheckAligment16(matrixA);
-	//dgCheckAligment16(matrixB);
 	for (dgInt32 i = 0; i < size; i++) {
 		const T* const rowA = &matrixA[i * size];
-		//dgCheckAligment16(rowA);
 		T* const rowOut = &out[i * size];
 		for (dgInt32 j = 0; j < size; j++) {
 			T acc = T(0.0f);
@@ -338,7 +329,7 @@ bool dgTestPSDmatrix(dgInt32 size, dgInt32 stride, T* const matrix)
 }
 
 template<class T>
-void dgCholeskyApplyRegularizer (dgInt32 size, dgInt32 stride, T* const psdMatrix, T* const regulalizer)
+void dgCholeskyApplyRegularizer (dgInt32 size, dgInt32 stride, T* const psdMatrix, T* const regularizer)
 {
 	bool isPsdMatrix = false;
 	dgFloat32* const lowerTriangule = dgAlloca(dgFloat32, stride * stride);
@@ -347,8 +338,8 @@ void dgCholeskyApplyRegularizer (dgInt32 size, dgInt32 stride, T* const psdMatri
 		isPsdMatrix = dgCholeskyFactorization(size, stride, lowerTriangule);
 		if (!isPsdMatrix) {
 			for (dgInt32 i = 0; i < size; i++) {
-				regulalizer[i] *= dgFloat32(4.0f);
-				psdMatrix[i * stride + i] += regulalizer[i];
+				regularizer[i] *= dgFloat32(4.0f);
+				psdMatrix[i * stride + i] += regularizer[i];
 			}
 		}
 	} while (!isPsdMatrix);
@@ -439,11 +430,8 @@ void dgEigenValues(const dgInt32 size, const dgInt32 stride, const T* const symm
 {
 	T* const offDiag = dgAlloca(T, size);
 	T* const matrix = dgAlloca(T, size * stride);
-	dgCheckAligment16(offDiag);
-	dgCheckAligment16(matrix);
 
 	memcpy(matrix, symmetricMatrix, sizeof(T) * size * stride);
-
 	for (dgInt32 i = size - 1; i > 0; i--) {
 		T h(0.0f);
 		T* const rowI = &matrix[i * stride];
@@ -601,7 +589,6 @@ void dgGaussSeidelLcpSor(const dgInt32 size, const T* const matrix, T* const x, 
 {
 	const T* const me = matrix;
 	T* const invDiag1 = dgAlloca(T, size);
-	dgCheckAligment16(invDiag1);
 
 	dgInt32 stride = 0;
 	for (dgInt32 i = 0; i < size; i++) {
@@ -822,20 +809,6 @@ void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T* const x,
 	T* const delta_x = dgAlloca(T, size);
 	T* const lowerTriangularMatrix = dgAlloca(T, size * size);
 	dgInt16* const permute = dgAlloca(dgInt16, size);
-
-	dgCheckAligment16(x);
-	dgCheckAligment16(b);
-	dgCheckAligment16(x0);
-	dgCheckAligment16(r0);
-	dgCheckAligment16(low);
-	dgCheckAligment16(high);
-	dgCheckAligment16(tmp0);
-	dgCheckAligment16(tmp1);
-	dgCheckAligment16(delta_r);
-	dgCheckAligment16(delta_x);
-	dgCheckAligment16(permute);
-	dgCheckAligment16(symmetricMatrixPSD);
-	dgCheckAligment16(lowerTriangularMatrix);
 
 	for (dgInt32 i = 0; i < size; i++) {
 		permute[i] = dgInt16(i);
@@ -1096,7 +1069,6 @@ template <class T>
 bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD , T* const x, T* const b, T* const low, T* const high)
 {
 	dgInt16* const permute = dgAlloca(dgInt16, size);
-	dgCheckAligment16(permute);
 
 	for (dgInt32 i = 0; i < size; i++) {
 		x[i] = b[i];
@@ -1149,13 +1121,6 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD , T* c
 		T* const u = dgAlloca(T, boundedSize);
 		T* const a11 = dgAlloca(T, boundedSize * boundedSize);
 		T* const a10 = dgAlloca(T, boundedSize * unboundedSize);
-
-		dgCheckAligment16(l);
-		dgCheckAligment16(h);
-		dgCheckAligment16(c);
-		dgCheckAligment16(u);
-		dgCheckAligment16(a10);
-		dgCheckAligment16(a11);
 
 		for (dgInt32 i = 0; i < boundedSize; i++) {
 			T* const g = &a10[i * unboundedSize];
