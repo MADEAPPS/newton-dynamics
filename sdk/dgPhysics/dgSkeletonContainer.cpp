@@ -643,14 +643,40 @@ DG_INLINE void dgSkeletonContainer::CalculateLoopMassMatrixCoefficients(dgFloat3
 }
 
 // Cholesky can not be used when the matrix loses the PSD status because of roundoff of a stiff system
-//#define USE_CHOLESKY
+#define USE_CHOLESKY
 
 void dgSkeletonContainer::FactorizeMatrix(dgInt32 size, dgInt32 stride, dgFloat32* const matrix, dgFloat32* const diagDamp) const
 {
 #ifdef USE_CHOLESKY
-	dgCholeskyApplyRegularizer(size, stride, matrix, diagDamp);
-	dgAssert (dgTestPSDmatrix(size, stride, matrix));
-	dgCholeskyFactorization(size, stride, matrix);
+	//dgCholeskyApplyRegularizer(size, stride, matrix, diagDamp);
+	//dgAssert (dgTestPSDmatrix(size, stride, matrix));
+	//dgCholeskyFactorization(size, stride, matrix);
+
+	bool isPsdMatrix = false;
+	dgFloat32* const backupMatrix = dgAlloca(dgFloat32, size * stride);
+	do {
+		dgInt32 srcLine = 0;
+		dgInt32 dstLine = 0;
+		for (dgInt32 i = 0; i < size; i++) {
+			memcpy(&backupMatrix[dstLine], &matrix[srcLine], size * sizeof(dgFloat32));
+			srcLine += size;
+			dstLine += stride;
+		}
+		isPsdMatrix = dgCholeskyFactorization(size, stride, matrix);
+		if (!isPsdMatrix) {
+			dgInt32 srcLine = 0;
+			dgInt32 dstLine = 0;
+			for (dgInt32 i = 0; i < size; i++) {
+				memcpy(&matrix[dstLine], &backupMatrix[srcLine], size * sizeof(dgFloat32));
+				diagDamp[i] *= dgFloat32(4.0f);
+				matrix[dstLine + i] += diagDamp[i];
+				dstLine += size;
+				srcLine += stride;
+			}
+		}
+	} while (!isPsdMatrix);
+
+
 #else
 /*
 	size = 4;
