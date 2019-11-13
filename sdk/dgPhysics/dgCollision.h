@@ -273,6 +273,9 @@ class dgCollision
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void SerializeLow(dgSerialize callback, void* const userData) const;
 
+	virtual void CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const {dgAssert (0);}
+
+
 	virtual dgInt32 GetConvexVertexCount() const; 
 
 	const dgCollision* AddRef () const;

@@ -130,6 +130,8 @@ class dgCollisionInstance
 	dgFloat32 GetSkinThickness() const;
 	void SetSkinThickness(dgFloat32 thickness);
 
+	void CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const;
+
 	dgMatrix m_globalMatrix;
 	dgMatrix m_localMatrix;
 	dgMatrix m_aligmentMatrix;
@@ -204,7 +206,6 @@ DG_INLINE const dgCollision* dgCollisionInstance::GetChildShape() const
 	return m_childShape;
 }
 
-
 DG_INLINE void dgCollisionInstance::SetWorld (dgWorld* const world)
 {
 	m_world = world;
@@ -220,14 +221,12 @@ DG_INLINE void dgCollisionInstance::SetChildShape (dgCollision* const shape)
 	m_childShape = shape;
 }
 
-
 DG_INLINE void dgCollisionInstance::GetCollisionInfo(dgCollisionInfo* const info) const
 {
 	info->m_offsetMatrix = m_localMatrix;
 	info->m_collisionMaterial = m_material;
 	m_childShape->GetCollisionInfo(info);
 }
-
 
 DG_INLINE const dgVector& dgCollisionInstance::GetScale () const
 {
@@ -238,7 +237,6 @@ DG_INLINE const dgVector& dgCollisionInstance::GetInvScale () const
 {
 	return m_invScale;
 }
-
 
 DG_INLINE const dgMatrix& dgCollisionInstance::GetLocalMatrix () const
 {
@@ -260,7 +258,6 @@ DG_INLINE void dgCollisionInstance::SetGlobalMatrix (const dgMatrix& matrix)
 	m_globalMatrix = matrix;
 }
 
-
 DG_INLINE dgMemoryAllocator* dgCollisionInstance::GetAllocator() const
 {
 	return m_childShape->GetAllocator();
@@ -270,7 +267,6 @@ DG_INLINE dgFloat32 dgCollisionInstance::GetVolume () const
 {
 	return m_childShape->GetVolume() * m_scale.m_x * m_scale.m_y * m_scale.m_z;
 }
-
 
 DG_INLINE bool dgCollisionInstance::GetCollisionMode() const
 {
@@ -354,7 +350,6 @@ DG_INLINE dgFloat32 dgCollisionInstance::GetBoxMaxRadius () const
 {
 	return m_childShape->GetBoxMaxRadius() * m_maxScale.m_x;
 } 
-
 
 DG_INLINE dgVector dgCollisionInstance::SupportVertex(const dgVector& dir) const
 {

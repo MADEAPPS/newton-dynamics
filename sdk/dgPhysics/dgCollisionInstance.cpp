@@ -546,7 +546,6 @@ void dgCollisionInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVect
 	dgAssert (p1.m_w == dgFloat32 (0.0f));
 }
 
-
 dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const
 {
 	if (!preFilter || preFilter(body, this, userData)) {
@@ -631,4 +630,8 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 	return dgFloat32 (1.2f);
 }
 
+void dgCollisionInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const
+{
 
+	m_childShape->CalculateImplicitContacts(count, contactPoints);
+}

@@ -393,3 +393,9 @@ dgInt32 dgCollisionChamferCylinder::CalculatePlaneIntersection (const dgVector& 
 	}
 	return count;
 }
+
+
+void dgCollisionChamferCylinder::CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const
+{
+
+}
