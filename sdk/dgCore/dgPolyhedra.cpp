@@ -1627,6 +1627,42 @@ bool dgPolyhedra::IsFaceConvex(dgEdge* const face, const dgFloat64* const vertex
 	return true;
 }
 
+void dgPolyhedra::MakeFaceConvex(dgEdge* const face, const dgFloat64* const vertex, dgInt32 stride)
+{
+	dgBigVector normal(FaceNormal(face, vertex, stride * sizeof(dgFloat64)));
+	normal.m_w = dgFloat32(0.0f);
+
+//static int xxx;
+//xxx ++;
+//if (xxx == 277)
+//xxx *= 1;
+
+	dgEdge* startEdge = face;
+	bool isConvex = false;
+	while (!isConvex) {
+		isConvex = true;
+		dgEdge* ptr = startEdge;
+		do {
+			dgBigVector p0(&vertex[ptr->m_incidentVertex * stride]);
+			dgBigVector p1(&vertex[ptr->m_prev->m_incidentVertex * stride]);
+			dgBigVector p2(&vertex[ptr->m_next->m_incidentVertex * stride]);
+			dgBigVector e0(p1 - p0);
+			dgBigVector e1(p2 - p1);
+			dgBigVector cornerNormal(e1.CrossProduct(e0));
+			dgFloat64 project(normal.DotProduct(cornerNormal).GetScalar());
+			if (project < dgFloat32(0.0f)) {
+				isConvex = false;
+				startEdge = ptr;
+				ConnectVertex(ptr->m_prev->m_prev, ptr);
+				break;
+			}
+
+			ptr = ptr->m_next;
+		} while (ptr != startEdge);
+	}
+
+}
+
 void dgPolyhedra::RemoveOuterColinearEdges (dgPolyhedra& flatFace, const dgFloat64* const vertex, dgInt32 stride)
 {
 	dgEdge* edgePerimeters[DG_LOCAL_BUFFER_SIZE];
@@ -1697,13 +1733,27 @@ void dgPolyhedra::RemoveOuterColinearEdges (dgPolyhedra& flatFace, const dgFloat
 						flatFace.DeleteEdge (edge);								
 						flatFace.ChangeEdgeIncidentVertex (ptr->m_twin, ptr->m_next->m_incidentVertex);
 
-						if (!flatFace.IsFaceConvex(ptr->m_twin, vertex, stride * sizeof(dgFloat64))) {
+#if 0
+						if (ptr->m_twin->m_next->m_next->m_next != ptr->m_twin) {
+							flatFace.MakeFaceConvex(ptr->m_twin, vertex, stride);
+						}
+#else
+						if (!flatFace.IsFaceConvex(ptr->m_twin, vertex, stride * sizeof(dgFloat64))) 
+						{
 							// temporary hack fix until I have tome for a more elegane solution;
 							dgTrace(("fix this hack\n"));
 							char memPool[10000];
 							dgDownHeap<dgEdge*, dgFloat64> heap(&memPool[0], 10000);
 							flatFace.TriangulateFace(ptr->m_twin, vertex, stride, heap, NULL);
+							if (ptr->m_twin->m_next->m_next->m_next != ptr->m_twin) {
+								//dgTrace(("fix this hack\n"));
+								//char memPool[10000];
+								//dgDownHeap<dgEdge*, dgFloat64> heap(&memPool[0], 10000);
+								//flatFace.TriangulateFace(ptr->m_twin, vertex, stride, heap, NULL);
+								flatFace.MakeFaceConvex(ptr->m_twin, vertex, stride);
+							}
 						}
+#endif
 
 						e1 = e0;
 						p1 = p2;

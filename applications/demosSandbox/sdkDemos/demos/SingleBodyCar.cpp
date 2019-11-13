@@ -945,8 +945,8 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	}
 
 	dQuaternion rot(dYawMatrix (90.0f * dDegreeToRad));
-	dVector origin(location.m_posit);
-//	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
+//	dVector origin(location.m_posit);
+	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
 
