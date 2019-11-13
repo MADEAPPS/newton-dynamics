@@ -183,11 +183,13 @@ dgPolyhedra::dgPolyhedra (const dgPolyhedra &polyhedra)
 			} while (ptr != edge);
 
 			dgEdge* const face = AddFace (indexCount, index, (dgInt64*) user);
-			ptr = face;
-			do {
-				ptr->m_incidentFace = edge->m_incidentFace;
-				ptr = ptr->m_next;
-			} while (ptr != face);
+			if (face) {
+				ptr = face;
+				do {
+					ptr->m_incidentFace = edge->m_incidentFace;
+					ptr = ptr->m_next;
+				} while (ptr != face);
+			}
 		}
 	}
 	EndFace();
@@ -2712,10 +2714,10 @@ void dgPolyhedra::RemoveInteriorEdges (dgPolyhedra& buildConvex, const dgFloat64
 			dgPolyhedra flatFace(GetAllocator());
 			MarkAdjacentCoplanarFaces(flatFace, edge, vertex, strideInBytes);
 			if (flatFace.GetCount()) {
-
-				flatFace.RefineTriangulation(vertex, stride);
+				//flatFace.RefineTriangulation(vertex, stride);
 				RemoveOuterColinearEdges(flatFace, vertex, stride);
 				RemoveInteriorColinearEdges(flatFace, vertex, stride);
+				flatFace.RefineTriangulation(vertex, stride);
 
 				dgInt32 diagonalCount = GetInteriorDiagonals(flatFace, diagonalsPool, sizeof(diagonalsPool) / sizeof(diagonalsPool[0]));
 				if (diagonalCount) {
