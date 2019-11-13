@@ -88,6 +88,7 @@
     <ClCompile Include="..\..\sdkDemos\main.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\DebugDisplay.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.cpp" />
+    <ClCompile Include="..\..\sdkDemos\toolBox\dSoundManager.cpp" />
     <ClCompile Include="..\..\sdkDemos\toolBox\FileBrowser.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">NotUsing</PrecompiledHeader>
@@ -126,6 +127,7 @@
     <ClInclude Include="..\..\sdkDemos\DemoMesh.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.h" />
+    <ClInclude Include="..\..\sdkDemos\toolBox\dSoundManager.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\FileBrowser.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\HeightFieldPrimitive.h" />
     <ClInclude Include="..\..\sdkDemos\toolBox\OpenGlUtil.h" />
