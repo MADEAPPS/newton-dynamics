@@ -632,6 +632,50 @@ dgFloat32 dgCollisionInstance::RayCast (const dgVector& localP0, const dgVector&
 
 void dgCollisionInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const
 {
+	for (dgInt32 i = 0; i < count; i++) {
+		contactPoints[i].m_point = m_globalMatrix.UntransformVector(contactPoints[i].m_point);
+	}
 
-	m_childShape->CalculateImplicitContacts(count, contactPoints);
+	switch (m_scaleType)
+	{
+		case m_unit:
+		{
+			//return m_childShape->SupportVertex(dir, NULL);
+			//break;
+			break;
+		}
+		case m_uniform:
+		{
+			//return m_scale * m_childShape->SupportVertex(dir, NULL);
+			break;
+		}
+		case m_nonUniform:
+		{
+			// support((p * S), n) = S * support (p, n * transp(S)) 
+			//dgVector dir1((m_scale * dir).Normalize());
+			//return m_scale * m_childShape->SupportVertex(dir1, NULL);
+			for (dgInt32 i = 0; i < count; i++) {
+				contactPoints[i].m_point = contactPoints[i].m_point * m_invScale;
+			}
+			m_childShape->CalculateImplicitContacts(count, contactPoints);
+			for (dgInt32 i = 0; i < count; i++) {
+				contactPoints[i].m_point = contactPoints[i].m_point * m_scale;
+			}
+			break;
+		}
+
+		case m_global:
+		default:
+		{
+//			dgVector dir1(m_aligmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
+//			return m_scale * m_aligmentMatrix.TransformVector(m_childShape->SupportVertex(dir1, NULL));
+		}
+	}
+
+
+	for (dgInt32 i = 0; i < count; i++) {
+		contactPoints[i].m_point = m_globalMatrix.TransformVector(contactPoints[i].m_point);
+	}
+
+//	
 }
