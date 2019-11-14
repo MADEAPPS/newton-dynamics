@@ -877,13 +877,9 @@ void dVehicleSolver::dGaussSeidelLcpSor(
 	const int* const normalIndex, dFloat* const low, dFloat* const high, 
 	dComplementaritySolver::dBilateralJoint** const frictionCallback) const
 {
-	dFloat* const invDiag1 = dAlloca(dFloat, size);
+	dFloat* const invDiag = dAlloca(dFloat, size);
 	dFloat* const u = dAlloca(dFloat, size + 1);
 	int* const index = dAlloca(int, size);
-	
-	const dFloat sor = 1.15f;
-	const dFloat tol2 = 0.01f;
-	const int maxIterCount = 30; 
 
 	u[size] = dFloat(1.0f);
 	int rowStart = 0;
@@ -897,46 +893,17 @@ void dVehicleSolver::dGaussSeidelLcpSor(
 		const dFloat l = low[j] * val;
 		const dFloat h = high[j] * val;
 		u[j] = dClamp(u[j], l, h);
-		invDiag1[j] = dFloat(1.0f) / matrix[rowStart + j];
+		invDiag[j] = dFloat(1.0f) / matrix[rowStart + j];
 		rowStart += stride;
-	}
-
-	dFloat tolerance = tol2 * 2.0f;
-	const dFloat* const invDiag = invDiag1;
-	const int maxCount = dMax(8, size);
-	for (int i = 0; (i < maxCount) && (tolerance > tol2); i++) {
-		int base = 0;
-		tolerance = dFloat(0.0f);
-		for (int j = 0; j < size; j++) {
-			const dFloat* const row = &matrix[base];
-			dFloat r = b[j];
-			for (int k = 0; k < size; k++) {
-				r -= row[k] * u[k];
-			}
-			dFloat f = (r + row[j] * u[j]) * invDiag[j];
-
-			const dFloat val = u[index[j]];
-			const dFloat l = low[j] * val;
-			const dFloat h = high[j] * val;
-			if (f > h) {
-				u[j] = h;
-			} else if (f < l) {
-				u[j] = l;
-			} else {
-				tolerance += r * r;
-				u[j] = f;
-			}
-			if (frictionCallback[j]) {
-				frictionCallback[j]->SpecialSolverFrictionCallback(&u[j], &low[j], &high[j]);
-			}
-			base += stride;
-		}
 	}
 
 #ifdef _DEBUG 
 	int passes = 0;
 #endif
-	const dFloat tolSOR = 10.0f * tol2;
+	const dFloat sor = 1.15f;
+	const int maxIterCount = 30;
+	const dFloat tolSOR = 0.01f;
+	dFloat tolerance = 2.0f * tolSOR;
 	for (int i = 0; (i < maxIterCount) && (tolerance > tolSOR); i++) {
 		int base = 0;
 		tolerance = dFloat(0.0f);
@@ -949,9 +916,8 @@ void dVehicleSolver::dGaussSeidelLcpSor(
 			for (int k = 0; k < size; k++) {
 				r -= row[k] * u[k];
 			}
-			dFloat f = (r + row[j] * u[j]) * invDiag[j];
-			f = u[j] + (f - u[j]) * sor;
 
+			const dFloat f = u[j] + ((r + row[j] * u[j]) * invDiag[j] - u[j]) * sor;
 			const dFloat val = u[index[j]];
 			const dFloat l = low[j] * val;
 			const dFloat h = high[j] * val;
@@ -960,8 +926,8 @@ void dVehicleSolver::dGaussSeidelLcpSor(
 			} else if (f < l) {
 				u[j] = l;
 			} else {
-				tolerance += r * r;
 				u[j] = f;
+				tolerance += r * r;
 			}
 
 			if (frictionCallback[j]) {
@@ -971,7 +937,7 @@ void dVehicleSolver::dGaussSeidelLcpSor(
 		}
 	}
 
-//dTrace(("error %f\n", tolerance));
+//dTrace(("error %d %f\n", passes, tolerance));
 
 	for (int j = 0; j < size; j++) {
 		x[j] = u[j];
