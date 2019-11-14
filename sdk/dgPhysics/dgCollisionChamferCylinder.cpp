@@ -332,7 +332,6 @@ dgFloat32 dgCollisionChamferCylinder::RayCast(const dgVector& q0, const dgVector
 	return dgFloat32(1.2f);
 }
 
-
 dgVector dgCollisionChamferCylinder::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
 {
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
@@ -347,7 +346,6 @@ dgVector dgCollisionChamferCylinder::SupportVertex (const dgVector& dir, dgInt32
 	sideDir = sideDir.Normalize();
 	return sideDir.Scale(m_radius) + dir.Scale (m_height);
 }
-
 
 dgVector dgCollisionChamferCylinder::SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const
 {
@@ -369,7 +367,6 @@ dgVector dgCollisionChamferCylinder::SupportVertexSpecialProjectPoint (const dgV
 	dgAssert (dir.m_w == 0.0f);
 	return point + dir.Scale(m_height - DG_PENETRATION_TOL);
 }
-
 
 dgInt32 dgCollisionChamferCylinder::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
 {
@@ -397,5 +394,21 @@ dgInt32 dgCollisionChamferCylinder::CalculatePlaneIntersection (const dgVector& 
 
 void dgCollisionChamferCylinder::CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const
 {
-
+	for (dgInt32 i = 0; i < count; i ++) {
+		dgVector diskPoint (contactPoints[i].m_point);
+		diskPoint.m_x = dgFloat32 (0.0f);
+		diskPoint.m_w = dgFloat32 (0.0f);
+		dgFloat32 r2 = diskPoint.DotProduct(diskPoint).GetScalar();
+		if (r2 >= m_radius * m_radius) {
+			diskPoint = diskPoint.Normalize().Scale (m_radius);
+			dgVector normal (contactPoints[i].m_point - diskPoint);
+			normal = normal.Normalize();
+			contactPoints[i].m_point = diskPoint + normal.Scale (m_height);
+			contactPoints[i].m_normal = normal.Scale (-1.0f);
+		} else {
+			contactPoints[i].m_normal = dgVector::m_zero;
+			contactPoints[i].m_normal.m_x = dgSign(contactPoints[i].m_point.m_x);
+			contactPoints[i].m_point.m_x = dgSign(contactPoints[i].m_normal.m_x) * m_height;
+		}
+	}
 }

@@ -17,7 +17,6 @@
 #include "dVehicleManager.h"
 #include "dVehicleDifferential.h"
 
-//int xxxxx;
 
 dVehicleMultiBody::dVehicleMultiBody(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
 	:dVehicle(body, localFrame, gravityMag)
@@ -633,18 +632,15 @@ void dVehicleMultiBody::CalculateFreeDof()
 
 void dVehicleMultiBody::PreUpdate(dFloat timestep)
 {
-//xxxxx++;
-//dTrace(("%d\n", xxxxx));
-
 	m_manager->UpdateDriverInput(this, timestep);
 	m_brakeControl.Update(timestep);
 	m_handBrakeControl.Update(timestep);
 	m_steeringControl.Update(timestep);
 	m_engineControl.Update(timestep);
 
-if (NewtonBodyGetSleepState (m_newtonBody)) {
-	return ;
-}
+//if (NewtonBodyGetSleepState (m_newtonBody)) {
+//	return ;
+//}
 
 	ApplyExternalForce();
 	CalculateSuspensionForces(timestep);

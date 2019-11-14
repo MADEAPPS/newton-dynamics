@@ -676,7 +676,6 @@ void dgSkeletonContainer::FactorizeMatrix(dgInt32 size, dgInt32 stride, dgFloat3
 		}
 	} while (!isPsdMatrix);
 
-
 #else
 /*
 	size = 4;
