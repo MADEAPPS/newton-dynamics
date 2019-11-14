@@ -49,10 +49,10 @@ class dgCollisionChamferCylinder: public dgCollisionConvex
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 
 	static dgInt32 CalculateSignature (dgFloat32 radius, dgFloat32 height);
-	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const;
-	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const;
 
 	virtual void CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const;
+	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const;
+	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const;
 
 	private:
 	dgFloat32 m_height;

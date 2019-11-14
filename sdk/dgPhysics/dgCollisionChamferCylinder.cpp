@@ -391,20 +391,20 @@ dgInt32 dgCollisionChamferCylinder::CalculatePlaneIntersection (const dgVector& 
 	return count;
 }
 
-
 void dgCollisionChamferCylinder::CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const
 {
 	for (dgInt32 i = 0; i < count; i ++) {
 		dgVector diskPoint (contactPoints[i].m_point);
 		diskPoint.m_x = dgFloat32 (0.0f);
 		diskPoint.m_w = dgFloat32 (0.0f);
+		dgAssert(diskPoint.DotProduct(diskPoint).GetScalar() > dgFloat32(0.0f));
 		dgFloat32 r2 = diskPoint.DotProduct(diskPoint).GetScalar();
 		if (r2 >= m_radius * m_radius) {
 			diskPoint = diskPoint.Normalize().Scale (m_radius);
 			dgVector normal (contactPoints[i].m_point - diskPoint);
 			normal = normal.Normalize();
 			contactPoints[i].m_point = diskPoint + normal.Scale (m_height);
-			contactPoints[i].m_normal = normal.Scale (-1.0f);
+			contactPoints[i].m_normal = normal * dgVector::m_negOne;
 		} else {
 			contactPoints[i].m_normal = dgVector::m_zero;
 			contactPoints[i].m_normal.m_x = dgSign(contactPoints[i].m_point.m_x);

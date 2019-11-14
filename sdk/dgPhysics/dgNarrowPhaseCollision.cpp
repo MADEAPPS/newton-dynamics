@@ -2283,6 +2283,8 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 	if (count) {
 		switch (proxy.m_instance0->GetCollisionPrimityType())
 		{
+			case m_sphereCollision:
+			//case m_capsuleCollision:
 			case m_chamferCylinderCollision:
 				proxy.m_instance0->CalculateImplicitContacts(count, contactOut);
 				break;

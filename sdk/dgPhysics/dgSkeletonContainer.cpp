@@ -655,12 +655,14 @@ void dgSkeletonContainer::FactorizeMatrix(dgInt32 size, dgInt32 stride, dgFloat3
 	bool isPsdMatrix = false;
 	dgFloat32* const backupMatrix = dgAlloca(dgFloat32, size * stride);
 	do {
-		dgInt32 srcLine = 0;
-		dgInt32 dstLine = 0;
-		for (dgInt32 i = 0; i < size; i++) {
-			memcpy(&backupMatrix[dstLine], &matrix[srcLine], size * sizeof(dgFloat32));
-			srcLine += size;
-			dstLine += stride;
+		{
+			dgInt32 srcLine = 0;
+			dgInt32 dstLine = 0;
+			for (dgInt32 i = 0; i < size; i++) {
+				memcpy(&backupMatrix[dstLine], &matrix[srcLine], size * sizeof(dgFloat32));
+				srcLine += size;
+				dstLine += stride;
+			}
 		}
 		isPsdMatrix = dgCholeskyFactorization(size, stride, matrix);
 		if (!isPsdMatrix) {
