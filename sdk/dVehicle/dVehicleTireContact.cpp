@@ -15,7 +15,8 @@
 #include "dVehicleMultiBody.h"
 #include "dVehicleTireContact.h"
 
-#define D_TIRE_CONTACT_PATCH_CONE	dFloat (0.8f) 
+#define D_TIRE_CONTACT_PATCH_CONE		dFloat (0.8f) 
+#define D_TIRE_CONTACT_MAX_SIZE_SLIP	dFloat (0.15f) 
 
 dVehicleTireContact::dVehicleTireContact()
 	:dVehicleLoopJoint()
@@ -63,11 +64,12 @@ void dVehicleTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext,
 	const dMatrix& chassisMatrix = chassis->GetProxyBody().GetMatrix();
 
 	dVector localPosit(chassisMatrix.UntransformVector(tireMatrix.m_posit));
-	dVector origin(m_point + m_normal.Scale(1.0f / 32.0f));
+	//dVector origin(m_point + m_normal.Scale(1.0f / 32.0f));
+	dVector origin(tireMatrix.m_posit);
 	if (localPosit.m_z > 0.0f) {
-		origin += m_lateralDir.Scale(1.0f / 4.0f);
+		origin += m_lateralDir.Scale(tire->GetInfo().m_width * 0.5f * 1.25f);
 	} else {
-		origin -= m_lateralDir.Scale(1.0f / 4.0f);
+		origin -= m_lateralDir.Scale(tire->GetInfo().m_width * 0.5f * 1.25f);
 	}
 
 	scale *= 4.0f;
@@ -171,8 +173,8 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		dFloat lateralSpeed = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
 		dAssert ((m_tireModel.m_lateralSlip + 1.0e-3f) > 0.0f);
 		m_tireModel.m_lateralSlip = lateralSpeed / (m_tireModel.m_lateralSlip + 1.0e-3f);
-		// clamp lateral slip to a max of +- 45 degree (witch is still too high, but reasonable)
-		m_tireModel.m_lateralSlip = dClamp (m_tireModel.m_lateralSlip, dFloat (-1.0f), dFloat(1.0f));
+		// clamp lateral slip to a max of +- 10 degree
+		m_tireModel.m_lateralSlip = dClamp (m_tireModel.m_lateralSlip, -D_TIRE_CONTACT_MAX_SIZE_SLIP, D_TIRE_CONTACT_MAX_SIZE_SLIP);
 
 		if (m_isContactPatch) {
 			dComplementaritySolver::dJacobian &jacobian2 = constraintParams->m_jacobians[index].m_jacobian_J10;

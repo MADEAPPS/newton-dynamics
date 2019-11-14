@@ -263,14 +263,14 @@ const void dVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 	// render tireState matrix
 	dComplementaritySolver::dBodyState* const chassisBody = &chassis->GetProxyBody();
 	dVector weight (chassis->GetGravity().Scale(chassisBody->GetMass()));
-//	dFloat scale (1.0f / dSqrt (weight.DotProduct3(weight)));
+	dFloat scale (1.0f / dSqrt (weight.DotProduct3(weight)));
 	for (int i = 0; i < sizeof (m_contactsJoints)/sizeof (m_contactsJoints[0]); i ++) {
 		const dVehicleTireContact* const contact = &m_contactsJoints[i];
 		if (contact->IsActive()) {
-//			contact->Debug(debugContext, scale);
-			debugContext->SetColor(dVector(1.0f, 0.0f, 0.0f, 1.0f));
-			debugContext->DrawPoint(contact->m_point, 4.0f);
-			debugContext->DrawLine(contact->m_point, contact->m_point + contact->m_normal.Scale (2.0f));
+			contact->Debug(debugContext, scale);
+			//debugContext->SetColor(dVector(1.0f, 0.0f, 0.0f, 1.0f));
+			//debugContext->DrawPoint(contact->m_point, 4.0f);
+			//debugContext->DrawLine(contact->m_point, contact->m_point + contact->m_normal.Scale (2.0f));
 		}
 	}
 }
