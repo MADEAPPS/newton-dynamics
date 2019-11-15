@@ -156,6 +156,11 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 	dLong attributeA[maxContactCount];
 	dLong attributeB[maxContactCount];
 
+extern int xxxxxx;
+if (xxxxxx >= 547 && m_index == 3)
+xxxxxx *=1;
+
+
 	for (int i = 0; (i < bodyArray.m_count) && (contactCount < maxContactCount); i++) {
 		// calculate tire contact collision with rigid bodies
 

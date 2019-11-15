@@ -679,7 +679,9 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 	dgVector p0(hullMatrix.TransformVector(pointInHull));
 	
 	dgFloat32 penetration = m_normal.DotProduct(m_localPoly[0] - p0).GetScalar() + proxy.m_skinThickness;
-	if (penetration < dgFloat32(-1.0e-5f)) {
+
+	//if (penetration < dgFloat32(-1.0e-5f)) {
+	if (penetration < -(DG_PENETRATION_TOL * dgFloat32 (5.0f))) {
 		return 0;
 	}
 
