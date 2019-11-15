@@ -869,7 +869,7 @@ static void AddBackground(DemoEntityManager* const scene)
 	terrainEntity->SetMatrixUsafe(dQuaternion(location), location.m_posit);
 #endif
 
-#if 0
+#if 1
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	location.m_posit.m_x = 2.5f;
@@ -884,7 +884,7 @@ static void AddBackground(DemoEntityManager* const scene)
 	//size = dVector (4.0f, 0.25f, 1.0f, 0.0f);
 	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
 
-	size = dVector (0.75f, 1.0f, 0.75f, 0.0f);
+	size = dVector (0.75f, 1.0f, 0.90f, 0.0f);
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 6.0f, _CAPSULE_PRIMITIVE, 0, shapeOffsetMatrix);
 
 	size = dVector(4.0f, 0.2f, 3.0f, 0.0f);
