@@ -18,8 +18,6 @@
 #include "dVehicleDifferential.h"
 
 
-int xxxxxx = 0;
-
 dVehicleMultiBody::dVehicleMultiBody(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
 	:dVehicle(body, localFrame, gravityMag)
 	,dVehicleSolver()
@@ -644,10 +642,8 @@ void dVehicleMultiBody::PreUpdate(dFloat timestep)
 //	return ;
 //}
 
-xxxxxx ++;
-
 	ApplyExternalForce();
-	CalculateSuspensionForces(timestep);
+//	CalculateSuspensionForces(timestep);
 	CalculateTireContacts(timestep);
 	dVehicleSolver::Update(timestep);
 	Integrate(timestep);

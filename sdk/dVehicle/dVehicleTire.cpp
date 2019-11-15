@@ -156,11 +156,6 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 	dLong attributeA[maxContactCount];
 	dLong attributeB[maxContactCount];
 
-extern int xxxxxx;
-if (xxxxxx >= 547 && m_index == 3)
-xxxxxx *=1;
-
-
 	for (int i = 0; (i < bodyArray.m_count) && (contactCount < maxContactCount); i++) {
 		// calculate tire contact collision with rigid bodies
 
@@ -220,13 +215,6 @@ xxxxxx *=1;
 		}
 	}
 	m_contactCount = contactCount; 
-
-//	if (m_index == 3) {
-//		for (int i = 0; i < m_contactCount; i++) {
-//			const dVector& p = m_contactsJoints[i].m_point;
-//			dTrace(("%f %f %f\n", p.m_x, p.m_y, p.m_z));
-//		}
-//	}
 }
 
 dMatrix dVehicleTire::GetHardpointMatrix(dFloat param) const
@@ -290,20 +278,6 @@ void dVehicleTire::Integrate(dFloat timestep)
 {
 	m_proxyBody.IntegrateForce(timestep, m_proxyBody.GetForce(), m_proxyBody.GetTorque());
 	m_proxyBody.IntegrateVelocity(timestep);
-
-extern int xxxxxx;
-if (xxxxxx > 500 && m_index == 3) {
-	for (int i = 0; i < m_contactCount; i++) {
-		//const dVector& p = m_contactsJoints[i].m_point;
-		//const dVector& v = m_proxyBody.GetVelocity();
-		dVector a (m_proxyBody.GetForce().Scale (m_proxyBody.GetInvMass()));
-		if (dAbs (a.m_y) > 30.0f) {
-			xxxxxx *=1;
-		}
-		dTrace(("%d %f %f %f\n", xxxxxx, a.m_x, a.m_y, a.m_z));
-	}
-}
-
 
 	for (int i = 0; i < m_contactCount; i ++) {
 		const dVehicleTireContact* const contact = &m_contactsJoints[i];
