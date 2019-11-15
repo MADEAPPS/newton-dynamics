@@ -409,6 +409,8 @@ void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 		dFloat accel = GetRowAccelaration(constraintParams) - speed * constraintParams->m_timestepInv;
 		SetRowAccelaration(constraintParams, accel);
 		constraintParams->m_jointHighFrictionCoef[index] = 0.0f;
+	} else {
+		AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right);
 	}
 
 	dFloat Ixx;
