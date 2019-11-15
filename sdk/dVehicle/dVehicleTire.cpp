@@ -213,9 +213,15 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 				}
 			}
 		}
-
-		m_contactCount = contactCount; 
 	}
+	m_contactCount = contactCount; 
+
+//	if (m_index == 3) {
+//		for (int i = 0; i < m_contactCount; i++) {
+//			const dVector& p = m_contactsJoints[i].m_point;
+//			dTrace(("%f %f %f\n", p.m_x, p.m_y, p.m_z));
+//		}
+//	}
 }
 
 dMatrix dVehicleTire::GetHardpointMatrix(dFloat param) const
@@ -278,8 +284,22 @@ const void dVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 void dVehicleTire::Integrate(dFloat timestep)
 {
 	m_proxyBody.IntegrateForce(timestep, m_proxyBody.GetForce(), m_proxyBody.GetTorque());
-
 	m_proxyBody.IntegrateVelocity(timestep);
+
+extern int xxxxxx;
+if (xxxxxx > 500 && m_index == 3) {
+	for (int i = 0; i < m_contactCount; i++) {
+		//const dVector& p = m_contactsJoints[i].m_point;
+		//const dVector& v = m_proxyBody.GetVelocity();
+		dVector a (m_proxyBody.GetForce().Scale (m_proxyBody.GetInvMass()));
+		if (dAbs (a.m_y) > 30.0f) {
+			xxxxxx *=1;
+		}
+		dTrace(("%d %f %f %f\n", xxxxxx, a.m_x, a.m_y, a.m_z));
+	}
+}
+
+
 	for (int i = 0; i < m_contactCount; i ++) {
 		const dVehicleTireContact* const contact = &m_contactsJoints[i];
 		if (contact->m_isActive && contact->m_collidingNode->m_body) {

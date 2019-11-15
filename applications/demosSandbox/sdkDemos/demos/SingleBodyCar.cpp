@@ -850,8 +850,8 @@ static void CreateBridge(DemoEntityManager* const scene, NewtonBody* const playg
 static void AddBackground(DemoEntityManager* const scene)
 {
 //	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "track.ngd", true);
-	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "playerarena.ngd", true);
-//	CreateHeightFieldTerrain (scene, 10, 4.0f, 1.0f, 0.25f, -10.0f, 15.0f);
+//	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "playerarena.ngd", true);
+	CreateHeightFieldTerrain (scene, 10, 4.0f, 1.0f, 0.25f, -10.0f, 15.0f);
 //	CreateHeightFieldTerrain(scene, 7, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 
 	dMatrix location(dGetIdentityMatrix());
@@ -869,7 +869,7 @@ static void AddBackground(DemoEntityManager* const scene)
 	terrainEntity->SetMatrixUsafe(dQuaternion(location), location.m_posit);
 #endif
 
-#if 1
+#if 0
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
 
 	location.m_posit.m_x = 2.5f;
@@ -884,7 +884,7 @@ static void AddBackground(DemoEntityManager* const scene)
 	//size = dVector (4.0f, 0.25f, 1.0f, 0.0f);
 	//AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 6.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix);
 
-	size = dVector (0.75f, 1.0f, 0.90f, 0.0f);
+	size = dVector (0.6f, 1.0f, 0.9f, 0.0f);
 	AddPrimitiveArray(scene, 10.0f, location.m_posit, size, count, count, 6.0f, _CAPSULE_PRIMITIVE, 0, shapeOffsetMatrix);
 
 	size = dVector(4.0f, 0.2f, 3.0f, 0.0f);

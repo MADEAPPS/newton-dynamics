@@ -60,6 +60,7 @@ class dgCollisionCapsule: public dgCollisionConvex
 
 	dgVector m_p0;
 	dgVector m_p1;
+	dgVector m_normal;
 	dgVector m_transform;
 	dgFloat32 m_height;
 	dgFloat32 m_radio0;

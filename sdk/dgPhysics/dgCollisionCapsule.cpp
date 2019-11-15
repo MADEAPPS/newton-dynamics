@@ -71,18 +71,19 @@ void dgCollisionCapsule::Init (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 hei
 
 	m_p0 = dgVector (- m_height, m_radio0, dgFloat32 (0.0f), dgFloat32 (0.0f)); 
 	m_p1 = dgVector (  m_height, m_radio1, dgFloat32 (0.0f), dgFloat32 (0.0f)); 
+	m_normal = dgVector (dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f), dgFloat32 (0.0f)); 
 	dgVector side (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));
 
 	for (int i = 0; i < 16; i ++) {
 		dgVector p1p0 (m_p1 - m_p0);
-		dgVector dir(side.CrossProduct(p1p0));
-		dir = dir.Scale(dgFloat32 (1.0f) / dgSqrt(dir.DotProduct(dir).GetScalar()));
-		dgVector support0(dir.Scale(m_radio0));
-		dgVector support1(dir.Scale(m_radio1));
+		//dgVector dir(side.CrossProduct(p1p0));
+		m_normal = side.CrossProduct(p1p0).Normalize();
+		dgVector support0(m_normal.Scale(m_radio0));
+		dgVector support1(m_normal.Scale(m_radio1));
 		support0.m_x -= m_height;
 		support1.m_x += m_height;
-		dgFloat32 distance0 = support0.DotProduct(dir).GetScalar();
-		dgFloat32 distance1 = support1.DotProduct(dir).GetScalar();
+		dgFloat32 distance0 = support0.DotProduct(m_normal).GetScalar();
+		dgFloat32 distance1 = support1.DotProduct(m_normal).GetScalar();
 
 		if (distance1 > distance0) {
 			m_p1 = support1;
@@ -491,57 +492,41 @@ dgFloat32 dgCollisionCapsule::RayCast (const dgVector& r0, const dgVector& r1, d
 
 void dgCollisionCapsule::CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const
 {
-	if (dgAbs(m_radio0 - m_radio1) < dgFloat32(1.0e-4f)) {
-		for (dgInt32 i = 0; i < count; i++) {
-			if (contactPoints[i].m_point.m_x <= -m_height) {
-				dgVector normal(contactPoints[i].m_point);
-				normal.m_x += m_height;
-				dgAssert(normal.DotProduct(normal).GetScalar() > dgFloat32(0.0f));
-				normal = normal.Normalize();
-				contactPoints[i].m_normal = normal * dgVector::m_negOne;
-				contactPoints[i].m_point = normal.Scale(m_radio0);
-				contactPoints[i].m_point.m_x = -m_height;
-			} else if (contactPoints[i].m_point.m_x >= m_height) {
-				dgVector normal(contactPoints[i].m_point);
-				normal.m_x -= m_height;
-				dgAssert(normal.DotProduct(normal).GetScalar() > dgFloat32(0.0f));
-				normal = normal.Normalize();
-				contactPoints[i].m_normal = normal * dgVector::m_negOne;
-				contactPoints[i].m_point = normal.Scale(m_radio0);
-				contactPoints[i].m_point.m_x = m_height;
-			} else {
-				dgVector normal(contactPoints[i].m_point);
-				normal.m_x = dgFloat32(0.0f);
-				normal.m_w = dgFloat32(0.0f);
-				dgAssert(normal.DotProduct(normal).GetScalar() > dgFloat32(0.0f));
-				normal = normal.Normalize();
-				dgVector point(normal.Scale(m_radio0));
-				contactPoints[i].m_point.m_y = point.m_y;
-				contactPoints[i].m_point.m_z = point.m_z;
-				contactPoints[i].m_normal = normal * dgVector::m_negOne;
-			}
+	for (dgInt32 i = 0; i < count; i++) {
+		contactPoints[i].m_point = contactPoints[i].m_point * m_transform;
+		if (contactPoints[i].m_point.m_x <= m_p0.m_x) {
+			dgVector normal(contactPoints[i].m_point);
+			normal.m_x += m_height;
+			dgAssert(normal.DotProduct(normal).GetScalar() > dgFloat32(0.0f));
+			normal = normal.Normalize();
+			contactPoints[i].m_normal = normal * dgVector::m_negOne;
+			contactPoints[i].m_point = normal.Scale(m_radio0);
+			contactPoints[i].m_point.m_x = -m_height;
+		} else if (contactPoints[i].m_point.m_x >= m_p1.m_x) {
+			dgVector normal(contactPoints[i].m_point);
+			normal.m_x -= m_height;
+			dgAssert(normal.DotProduct(normal).GetScalar() > dgFloat32(0.0f));
+			normal = normal.Normalize();
+			contactPoints[i].m_normal = normal * dgVector::m_negOne;
+			contactPoints[i].m_point = normal.Scale(m_radio1);
+			contactPoints[i].m_point.m_x = m_height;
+		} else {
+			dgVector normal(contactPoints[i].m_point);
+			normal.m_x = dgFloat32(0.0f);
+			normal.m_w = dgFloat32(0.0f);
+			dgAssert(normal.DotProduct(normal).GetScalar() > dgFloat32(0.0f));
+			normal = normal.Normalize();
+
+			dgFloat32 h = m_p0.m_y + dgFloat32(0.5f) * (m_p1.m_y - m_p0.m_y) * contactPoints[i].m_point.m_x / m_height;
+			dgVector point(normal.Scale(h));
+			contactPoints[i].m_point.m_y = point.m_y;
+			contactPoints[i].m_point.m_z = point.m_z;
+
+			contactPoints[i].m_normal.m_x = -m_normal.m_x;
+			contactPoints[i].m_normal.m_y = -m_normal.m_y * normal.m_y;
+			contactPoints[i].m_normal.m_z = -m_normal.m_y * normal.m_z;
 		}
-	} else {
-		for (dgInt32 i = 0; i < count; i++) {
-			if (contactPoints[i].m_point.m_x <= m_p0.m_x) {
-				dgVector normal(contactPoints[i].m_point);
-				normal.m_x += m_height;
-				dgAssert(normal.DotProduct(normal).GetScalar() > dgFloat32(0.0f));
-				normal = normal.Normalize();
-				contactPoints[i].m_normal = normal * dgVector::m_negOne;
-				contactPoints[i].m_point = normal.Scale(m_radio0);
-				contactPoints[i].m_point.m_x = -m_height;
-			} else if (contactPoints[i].m_point.m_x >= m_p1.m_x) {
-				dgVector normal(contactPoints[i].m_point);
-				normal.m_x -= m_height;
-				dgAssert(normal.DotProduct(normal).GetScalar() > dgFloat32(0.0f));
-				normal = normal.Normalize();
-				contactPoints[i].m_normal = normal * dgVector::m_negOne;
-				contactPoints[i].m_point = normal.Scale(m_radio1);
-				contactPoints[i].m_point.m_x = m_height;
-			} else {
-				dgAssert(0);
-			}
-		}
+		contactPoints[i].m_point = contactPoints[i].m_point * m_transform;
+		contactPoints[i].m_normal = contactPoints[i].m_normal * m_transform;
 	}
 }
