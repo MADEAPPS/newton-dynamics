@@ -387,32 +387,54 @@ void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 	AddAngularRowJacobian(constraintParams, tireMatrix.m_up, 0.0f);
 	AddAngularRowJacobian(constraintParams, tireMatrix.m_right, 0.0f);
 
+	// add the suspension row
+	int index = constraintParams->m_count;
+	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right);
+	const dFloat visibleInvMass = CalculateMassMatrixDiagonal(constraintParams);
+
 	if (m_position < 0.0f) {
-		int index = constraintParams->m_count;
-		AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right);
-		dFloat speed = -0.1f;
-		dFloat step = 2.0f * speed * constraintParams->m_timestep;
-		if (m_position > step) {
-			speed = 0.25f * m_position * constraintParams->m_timestepInv;
-		}
-		dFloat accel = GetRowAccelaration(constraintParams) - speed * constraintParams->m_timestepInv;
-		SetRowAccelaration(constraintParams, accel);
-		constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
+
+		//dFloat speed = -0.1f;
+		//dFloat step = 2.0f * speed * constraintParams->m_timestep;
+		//if (m_position > step) {
+		//	speed = 0.25f * m_position * constraintParams->m_timestepInv;
+		//}
+		//dFloat accel = GetRowAccelaration(constraintParams) - speed * constraintParams->m_timestepInv;
+		//SetRowAccelaration(constraintParams, accel);
+		//constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
+
+		const dFloat ks = m_info.m_springStiffness * visibleInvMass;
+		dFloat accel = NewtonCalculateSpringDamperAcceleration(constraintParams->m_timestep, ks, m_position, 0.0f, m_speed);
+		constraintParams->m_jointAccel[index] += accel * 0.5f;
+		constraintParams->m_diagonalRegularizer[index] = m_info.m_suspensionRelaxation;
+
 	} else if (m_position >= m_info.m_suspensionLength) {
-		int index = constraintParams->m_count;
-		AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right);
-		dFloat speed = 0.1f;
-		dFloat step = 2.0f * speed * constraintParams->m_timestep;
-		if ((m_position - m_info.m_suspensionLength) > step) {
-			speed = 0.25f * (m_position - m_info.m_suspensionLength) * constraintParams->m_timestepInv;
-		}
-		dFloat accel = GetRowAccelaration(constraintParams) - speed * constraintParams->m_timestepInv;
-		SetRowAccelaration(constraintParams, accel);
-		constraintParams->m_jointHighFrictionCoef[index] = 0.0f;
+
+		//dFloat speed = 0.1f;
+		//dFloat step = 2.0f * speed * constraintParams->m_timestep;
+		//if ((m_position - m_info.m_suspensionLength) > step) {
+		//	speed = 0.25f * (m_position - m_info.m_suspensionLength) * constraintParams->m_timestepInv;
+		//}
+		//dFloat accel = GetRowAccelaration(constraintParams) - speed * constraintParams->m_timestepInv;
+		//SetRowAccelaration(constraintParams, accel);
+		//constraintParams->m_jointHighFrictionCoef[index] = 0.0f;
+
+		const dFloat ks = m_info.m_springStiffness * visibleInvMass;
+		dFloat accel = NewtonCalculateSpringDamperAcceleration(constraintParams->m_timestep, ks, m_position, 0.0f, m_speed);
+		constraintParams->m_jointAccel[index] += accel * 0.5f;
+		constraintParams->m_diagonalRegularizer[index] = m_info.m_suspensionRelaxation;
+
 	} else {
-		AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right);
+		const dFloat kv = m_info.m_dampingRatio * visibleInvMass;
+		const dFloat ks = m_info.m_springStiffness * visibleInvMass;
+
+		dFloat accel = NewtonCalculateSpringDamperAcceleration(constraintParams->m_timestep, ks, m_position, kv, m_speed);
+		constraintParams->m_jointAccel[index] = accel;
+		constraintParams->m_diagonalRegularizer[index] = m_info.m_suspensionRelaxation;
 	}
 
+
+	// calculate mas rolling friction torque, rolling, brake, or stability control
 	dFloat Ixx;
 	dFloat Iyy;
 	dFloat Izz;
@@ -424,7 +446,8 @@ void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 		}
 	}
 
-	int index = constraintParams->m_count;
+	// add a rolling friction row
+	index = constraintParams->m_count;
 	AddAngularRowJacobian(constraintParams, tireMatrix.m_front, 0.0f);
 	constraintParams->m_jointLowFrictionCoef[index] = -rollingFriction;
 	constraintParams->m_jointHighFrictionCoef[index] = rollingFriction;

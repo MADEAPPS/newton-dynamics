@@ -114,6 +114,7 @@ class dComplementaritySolver
 		dFloat m_jointAccel[D_MAX_PRAM_INFO_SIZE];
 		dFloat m_jointLowFrictionCoef[D_MAX_PRAM_INFO_SIZE];
 		dFloat m_jointHighFrictionCoef[D_MAX_PRAM_INFO_SIZE];
+		dFloat m_diagonalRegularizer[D_MAX_PRAM_INFO_SIZE];
 		int m_normalIndex[D_MAX_PRAM_INFO_SIZE];
 		dBilateralJoint* m_frictionCallback[D_MAX_PRAM_INFO_SIZE];
 		dFloat m_timestep;
@@ -163,7 +164,7 @@ class dComplementaritySolver
 		dFloat GetRowAccelaration(dParamInfo* const constraintParams) const;
 		void SetRowAccelaration(dParamInfo* const constraintParams, dFloat accel);
 
-		//dFloat CalculateRowZeroAccelaration (dParamInfo* const constraintParams) const;
+		dFloat CalculateMassMatrixDiagonal(dParamInfo* const constraintParams) const;
 		dFloat CalculateAngle (const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
 
 		dFloat m_motorAcceleration[D_MAX_PRAM_INFO_SIZE];

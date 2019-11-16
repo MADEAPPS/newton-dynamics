@@ -50,6 +50,7 @@ class dTireInfo
 		m_dampingRatio = 15.0f * vehicleMass;
 		m_springStiffness = dAbs(vehicleMass * 9.8f * 8.0f / m_suspensionLength);
 
+		m_suspensionRelaxation = 0.01f;
 		m_corneringStiffness = dAbs(vehicleMass * gravity * 10.0f);
 		m_longitudinalStiffness = dAbs(vehicleMass * gravity * 1.0f);
 	}
@@ -65,6 +66,7 @@ class dTireInfo
 	dFloat m_maxSteeringAngle;
 	dFloat m_corneringStiffness;
 	dFloat m_longitudinalStiffness;
+	dFloat m_suspensionRelaxation;
 	dFloat m_frictionCoefficient;
 	//dFloat m_aligningMomentTrail;
 	//dSuspensionType m_suspentionType;

@@ -4263,18 +4263,16 @@ void NewtonSetEulerAngle(const dFloat* const angles, dFloat* const matrix)
   the acceleration calculated by this function represent the mass, spring system of the form
   a = -ks * x - kd * v.
 */
-dFloat NewtonCalculateSpringDamperAcceleration(dFloat dt, dFloat ks, dFloat x, dFloat kd, dFloat s)
+dFloat NewtonCalculateSpringDamperAcceleration(dFloat dt, dFloat ks, dFloat x, dFloat kd, dFloat v)
 {
-//	accel = - (ks * x + kd * s);
-
 	TRACE_FUNCTION(__FUNCTION__);
+	//at = - (ks * x + kd * v);
 	//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 	dgFloat32 ksd = dt * ks;
-	dgFloat32 num = ks * x + kd * s + ksd * s;
+	dgFloat32 num = ks * x + kd * v + ksd * v;
 	dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;
 	dgAssert (den > 0.0f);
 	dFloat accel = - num / den;
-//	dgCheckFloat (accel);
 	return accel;
 }
 

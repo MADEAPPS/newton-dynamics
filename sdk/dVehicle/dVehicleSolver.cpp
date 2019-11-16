@@ -639,7 +639,7 @@ int dVehicleSolver::BuildJacobianMatrix(dFloat timestep, dComplementaritySolver:
 		dVector tmpDiag(J01MinvJ01linear + J10MinvJ10linear + J01MinvJ01angular + J10MinvJ10angular);
 
 		dFloat diag = tmpDiag.m_x + tmpDiag.m_y + tmpDiag.m_z;
-		col->m_diagDamp = diag * D_DIAG_DAMP;
+		col->m_diagDamp = diag * D_DIAG_DAMP + constraintParams.m_diagonalRegularizer[i];
 		col->m_coordenateAccel = constraintParams.m_jointAccel[i];
 		col->m_normalIndex = constraintParams.m_normalIndex[i];
 		col->m_frictionCallback = constraintParams.m_frictionCallback[i];
