@@ -65,10 +65,10 @@ class dVehicleMultiBody: public dVehicle, public dVehicleSolver
 	void ApplyExternalForce();
 	void Integrate(dFloat timestep);
 	void CalculateTireContacts(dFloat timestep);
-	void CalculateSuspensionForces(dFloat timestep);
 	virtual int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 	virtual void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep);
 
+	virtual bool CheckSleeping();
 	dVehicleCollidingNode* FindCollideNode(dVehicleNode* const node0, NewtonBody* const body);
 
 	void PreUpdate(dFloat timestep);
@@ -82,6 +82,7 @@ class dVehicleMultiBody: public dVehicle, public dVehicleSolver
 	dVehicleBrakeControl m_handBrakeControl;
 	dVehicleSteeringControl m_steeringControl;
 	int m_collidingIndex;
+	int m_sleepCounter;
 
 	friend class dVehicleTire;
 	friend class dVehicleSolver;

@@ -23,11 +23,17 @@ dVehicleMultiBody::dVehicleMultiBody(NewtonBody* const body, const dMatrix& loca
 	,dVehicleSolver()
 	,m_collidingNodes(8)
 	,m_collidingIndex(0)
+	,m_sleepCounter(0)
 {
 	m_brakeControl.Init(this);
 	m_engineControl.Init(this);
 	m_steeringControl.Init(this);
 	m_handBrakeControl.Init(this);
+
+	AddControl(&m_brakeControl);
+	AddControl(&m_engineControl);
+	AddControl(&m_steeringControl);
+	AddControl(&m_handBrakeControl);
 
 	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
 	dAssert(m_localFrame.TestOrthogonal());
@@ -398,100 +404,6 @@ xxx ++;
 	dVehicleNode::ApplyExternalForce();
 }
 
-void dVehicleMultiBody::CalculateSuspensionForces(dFloat timestep)
-{
-	const int maxSize = 64;
-	dComplementaritySolver::dJacobianPair m_jt[maxSize];
-	dComplementaritySolver::dJacobianPair m_jInvMass[maxSize];
-	dVehicleTire* tires[maxSize];
-	dFloat massMatrix[maxSize * maxSize];
-	dFloat accel[maxSize];
-	
-	const dMatrix& chassisMatrix = m_proxyBody.GetMatrix(); 
-	const dMatrix& chassisInvInertia = m_proxyBody.GetInvInertia();
-	dVector chassisOrigin (chassisMatrix.TransformVector (m_proxyBody.GetCOM()));
-	dFloat chassisInvMass = m_proxyBody.GetInvMass();
-
-	int tireCount = 0;
-	for (dVehicleNodeChildrenList::dListNode* node = m_children.GetFirst(); node; node = node->GetNext()) {
-		dVehicleTire* const tire = node->GetInfo()->GetAsTire();
-		if (tire) {
-			const dTireInfo& info = tire->m_info;
-			tires[tireCount] = tire;
-			dFloat x = tire->m_position;
-			dFloat v = tire->m_speed;
-			dFloat weight = 1.0f;
-/*
-			switch (tire->m_suspentionType)
-			{
-				case m_offroad:
-					weight = 0.9f;
-					break;
-				case m_confort:
-					weight = 1.0f;
-					break;
-				case m_race:
-					weight = 1.1f;
-					break;
-			}
-*/
-			dComplementaritySolver::dBodyState* const tireBody = &tire->GetProxyBody();
-
-			const dFloat invMass = tireBody->GetInvMass();
-			const dFloat kv = info.m_dampingRatio * invMass;
-			const dFloat ks = info.m_springStiffness * invMass;
-			accel[tireCount] = -NewtonCalculateSpringDamperAcceleration(timestep, ks * weight, x, kv, v);
-
-			const dMatrix& tireMatrix = tireBody->GetMatrix(); 
-			const dMatrix& tireInvInertia = tireBody->GetInvInertia();
-			dFloat tireInvMass = tireBody->GetInvMass();
-
-			m_jt[tireCount].m_jacobian_J01.m_linear = chassisMatrix.m_up.Scale(-1.0f);
-			m_jt[tireCount].m_jacobian_J01.m_angular = dVector(0.0f);
-			m_jt[tireCount].m_jacobian_J10.m_linear = chassisMatrix.m_up;
-			m_jt[tireCount].m_jacobian_J10.m_angular = (tireMatrix.m_posit - chassisOrigin).CrossProduct(chassisMatrix.m_up);
-
-			m_jInvMass[tireCount].m_jacobian_J01.m_linear = m_jt[tireCount].m_jacobian_J01.m_linear.Scale(tireInvMass);
-			m_jInvMass[tireCount].m_jacobian_J01.m_angular = tireInvInertia.RotateVector(m_jt[tireCount].m_jacobian_J01.m_angular);
-			m_jInvMass[tireCount].m_jacobian_J10.m_linear = m_jt[tireCount].m_jacobian_J10.m_linear.Scale(chassisInvMass);
-			m_jInvMass[tireCount].m_jacobian_J10.m_angular = chassisInvInertia.RotateVector(m_jt[tireCount].m_jacobian_J10.m_angular);
-
-			tireCount++;
-		}
-	}
-
-	for (int i = 0; i < tireCount; i++) {
-		dFloat* const row = &massMatrix[i * tireCount];
-
-		dFloat aii = m_jInvMass[i].m_jacobian_J01.m_linear.DotProduct3(m_jt[i].m_jacobian_J01.m_linear) + m_jInvMass[i].m_jacobian_J01.m_angular.DotProduct3(m_jt[i].m_jacobian_J01.m_angular) +
-					 m_jInvMass[i].m_jacobian_J10.m_linear.DotProduct3(m_jt[i].m_jacobian_J10.m_linear) + m_jInvMass[i].m_jacobian_J10.m_angular.DotProduct3(m_jt[i].m_jacobian_J10.m_angular);
-
-		row[i] = aii * 1.0001f;
-		for (int j = i + 1; j < tireCount; j++) {
-			dFloat aij = m_jInvMass[i].m_jacobian_J10.m_linear.DotProduct3(m_jt[j].m_jacobian_J10.m_linear) + m_jInvMass[i].m_jacobian_J10.m_angular.DotProduct3(m_jt[j].m_jacobian_J10.m_angular);
-			row[j] = aij;
-			massMatrix[j * tireCount + i] = aij;
-		}
-	}
-
-	dCholeskyFactorization(tireCount, tireCount, massMatrix);
-	dCholeskySolve(tireCount, tireCount, massMatrix, accel);
-
-	dVector chassisForce(0.0f);
-	dVector chassisTorque(0.0f);
-	for (int i = 0; i < tireCount; i++) {
-		dVehicleTire* const tire = tires[i];
-		dComplementaritySolver::dBodyState* const tireBody = &tire->GetProxyBody();
-
-		dVector tireForce(m_jt[i].m_jacobian_J01.m_linear.Scale(accel[i]));
-		tireBody->SetForce(tireBody->GetForce() + tireForce);
-		chassisForce += m_jt[i].m_jacobian_J10.m_linear.Scale(accel[i]);
-		chassisTorque += m_jt[i].m_jacobian_J10.m_angular.Scale(accel[i]);
-	}
-	m_proxyBody.SetForce(m_proxyBody.GetForce() + chassisForce);
-	m_proxyBody.SetTorque(m_proxyBody.GetTorque() + chassisTorque);
-}
-
 dVehicleCollidingNode* dVehicleMultiBody::FindCollideNode(dVehicleNode* const node0, NewtonBody* const body)
 {
 	NewtonBody* dynamicBody = body;
@@ -611,43 +523,62 @@ void dVehicleMultiBody::CalculateFreeDof()
 	dVector torque(m_proxyBody.GetTorque());
 	NewtonBodySetForce(m_newtonBody, &force[0]);
 	NewtonBodySetTorque(m_newtonBody, &torque[0]);
+}
 
-
-	bool isSleeping = NewtonBodyGetSleepState(m_newtonBody) ? true : false;
-	if (isSleeping) {
-/*
-		bool awakeBody = m_proxyBody.GetVelocity().DotProduct3(m_proxyBody.GetVelocity()) > 1.0e-5f ? true : false;
-		awakeBody = awakeBody || (m_proxyBody.GetOmega().DotProduct3(m_proxyBody.GetOmega()) > 1.0e-5f ? true : false);
-		if (!awakeBody) {
-//			dAssert (0);
+bool dVehicleMultiBody::CheckSleeping()
+{
+	for (int i = 0; i < m_controlerCount; i ++) {
+		if (m_control[i]->ParamChanged()) {
+			m_sleepCounter = 0;
+			return false;
 		}
-
-		if (awakeBody) {
-			NewtonBodySetSleepState(m_newtonBody, 0);
-		}
-*/
 	}
-//	NewtonBodySetSleepState(m_newtonBody, 0);
+
+	dVector vector(0.0f);
+	NewtonBodyGetVelocity(m_newtonBody, &vector[0]);
+	if (vector.DotProduct3(vector) < 1.0e-2f) {
+		NewtonBodyGetOmega(m_newtonBody, &vector[0]);
+		if (vector.DotProduct3(vector) < 1.0e-2f) {
+			NewtonBodyGetAcceleration(m_newtonBody, &vector[0]);
+			if (vector.DotProduct3(vector) < 1.0e-2f) {
+				NewtonBodyGetAlpha(m_newtonBody, &vector[0]);
+				if (vector.DotProduct3(vector) < 1.0e-2f) {
+					return true;
+				}
+			}
+		}
+	}
+	
+	m_sleepCounter = 0;
+	return false;
 }
 
 void dVehicleMultiBody::PreUpdate(dFloat timestep)
 {
 	m_manager->UpdateDriverInput(this, timestep);
-	m_brakeControl.Update(timestep);
-	m_handBrakeControl.Update(timestep);
-	m_steeringControl.Update(timestep);
-	m_engineControl.Update(timestep);
 
-//if (NewtonBodyGetSleepState (m_newtonBody)) {
-//	return ;
-//}
+	for (int i = 0; i < m_controlerCount; i ++) {
+		m_control[i]->Update(timestep);
+	}
 
+	if (CheckSleeping()) {
+		m_sleepCounter ++;	
+		if (m_sleepCounter > 60) {
+			dVector vector (0.0f);
+			NewtonBodySetForce(m_newtonBody, &vector[0]);
+			NewtonBodySetTorque(m_newtonBody, &vector[0]);
+			NewtonBodySetVelocityNoSleep(m_newtonBody, &vector[0]);
+			NewtonBodySetVelocityNoSleep(m_newtonBody, &vector[0]);
+			return;
+		}
+	}
+	
 	ApplyExternalForce();
-//	CalculateSuspensionForces(timestep);
 	CalculateTireContacts(timestep);
 	dVehicleSolver::Update(timestep);
 	Integrate(timestep);
 	CalculateFreeDof();
+
 #if 0
 	FILE* file_xxx = fopen("xxxxx.csv", "wb");
 	fprintf(file_xxx, "tireforce\n");
@@ -660,11 +591,6 @@ void dVehicleMultiBody::PreUpdate(dFloat timestep)
 	}
 	fclose(file_xxx);
 #endif
-
-
-//dVector vector(0.0f);
-//NewtonBodySetForce(m_newtonBody, &vector[0]);
-//NewtonBodySetTorque(m_newtonBody, &vector[0]);
 }
 
 

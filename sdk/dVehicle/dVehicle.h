@@ -15,11 +15,11 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
-#include "dVehicleDashControl.h"
 
 class dTireInfo;
 class dEngineInfo;
 class dVehicleManager;
+class dVehicleDashControl;
 
 class dVehicle: public dVehicleNode
 {
@@ -59,6 +59,11 @@ class dVehicle: public dVehicleNode
 	const dMatrix& GetLocalFrame() const { return m_localFrame; }
 	const dVector& GetGravity() const {return m_gravity;}
 
+	void AddControl (dVehicleDashControl* const control);
+	void RemoveControl (dVehicleDashControl* const control);
+	int GetControlCount() const {return m_controlerCount;}
+
+	virtual bool CheckSleeping() {return false;}
 	virtual void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep) {}
 
 	protected:
@@ -69,9 +74,11 @@ class dVehicle: public dVehicleNode
 	dVector m_gravity;
 	dVector m_obbSize;
 	dVector m_obbOrigin;
+	dArray<dVehicleDashControl*> m_control;
 	NewtonBody* m_newtonBody;
 	void* m_managerNode;
 	dVehicleManager* m_manager;
+	int m_controlerCount;
 
 	friend class dVehicleTire;
 	friend class dVehicleManager;
