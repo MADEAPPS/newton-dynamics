@@ -63,6 +63,7 @@ class dVehicleTireContact: public dVehicleLoopJoint
 	dFloat m_staticFriction;
 	mutable dTireModel m_tireModel;
 	bool m_isContactPatch;
+	bool m_isLowSpeed;
 
 	friend class dVehicleTire;
 };

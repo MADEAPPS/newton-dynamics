@@ -29,6 +29,7 @@ dVehicleTireContact::dVehicleTireContact()
 	,m_staticFriction(1.0f)
 	,m_tireModel()
 	,m_isContactPatch(false)
+	,m_isLowSpeed(false)
 {
 }
 
@@ -101,6 +102,7 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 	const dVehicleTire* const tire = GetOwner0()->GetAsTire();
 	dVector zero (0.0f);
 
+	m_isLowSpeed = false;
 	m_isContactPatch = false;
 	{
 		// normal constraint
@@ -139,6 +141,8 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 
 		omegaSpeed = dAbs(omegaSpeed);
 		linearSpeed = dAbs(linearSpeed);
+
+		m_isLowSpeed = (omegaSpeed < 1.0f);
 
 		m_tireModel.m_lateralSlip = linearSpeed;
 		m_tireModel.m_longitudinalSlip = 0.1f;
@@ -213,8 +217,8 @@ void dVehicleTireContact::SpecialSolverFrictionCallback(const dFloat* const load
 	highFriction[1] = f;
 	lowFriction[2] = -f;
 	highFriction[2] = f;
-
-	if (f > 10.0f) {
+	
+	if (!m_isLowSpeed &&  f > 10.0f) {
 		dVehicleTire* const tire = GetOwner0()->GetAsTire();
 		const dTireInfo& tireInfo = tire->GetInfo();
 
