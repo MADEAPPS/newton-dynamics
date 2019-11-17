@@ -348,11 +348,12 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 
 	rowStart = 0;
 	for (dgInt32 i = 0; i < clustersCount; i++) {
-		const dgBodyCluster& cluster = m_clusterData[i];
+		dgBodyCluster& cluster = m_clusterData[i];
 		dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster.m_bodyStart];
 		dgJointInfo* const jointSetArray = &augmentedJointArray[cluster.m_jointStart];
 		bodyArray[0].m_body = world->GetSentinelBody();
 
+		bool isContinueCollisionIsland = false;
 		if (cluster.m_jointCount) {
 			dgInt32 bodyIndex = 1;
 			for (dgInt32 j = 0; j < cluster.m_jointCount; j++) {
@@ -384,12 +385,22 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 					}
 					m1 = body1->m_index;
 				}
+
+				if (joint->GetId() == dgConstraint::m_contactConstraint) {
+					// check for CCD mode
+					if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
+						const dgContact* const contact = (dgContact*) joint;
+						bool isCCD = contact->StimateCCD (timestep);
+						isContinueCollisionIsland |= isCCD;
+					}
+				}
 				
 				jointInfo->m_m0 = m0;
 				jointInfo->m_m1 = m1;
 				jointInfo->m_pairStart = rowStart;
 				rowStart += jointInfo->m_pairCount; 
 			}
+			cluster.m_isContinueCollision = isContinueCollisionIsland;
 		} else {
 			dgAssert(cluster.m_bodyCount == 2);
 			bodyArray[1].m_body = jointSetArray[0].m_body;

@@ -58,13 +58,10 @@ dgFloat32 dgRayCastSphere (const dgVector& p0, const dgVector& p1, const dgVecto
 
 DG_INLINE dgInt32 dgOverlapTest (const dgVector& p0, const dgVector& p1, const dgVector& q0, const dgVector& q1)
 {
-//	dgVector val0 ((p0 < q1) & (p1 > q0));
-//	dgInt32 mask1 = val0.GetSignMask();
 	dgVector val((p0 - q1) * (p1 - q0));
 	dgInt32 mask = val.GetSignMask();
 	return ((mask & 0x07) == 0x07);
 }
-
 
 DG_INLINE dgInt32 dgBoxInclusionTest (const dgVector& p0, const dgVector& p1, const dgVector& q0, const dgVector& q1)
 {
@@ -78,7 +75,6 @@ DG_INLINE dgInt32 dgCompareBox (const dgVector& p0, const dgVector& p1, const dg
 	dgAssert(0);
 	return (p0.m_x != q0.m_x) || (p0.m_y != q0.m_y) || (p0.m_z != q0.m_z) || (p1.m_x != q1.m_x) || (p1.m_y != q1.m_y) || (p1.m_z != q1.m_z);
 }
-
 
 DG_INLINE void dgMovingAABB (dgVector& p0, dgVector& p1, const dgVector& veloc, const dgVector& omega, dgFloat32 timestep, dgFloat32 maxRadius, dgFloat32 minRadius)
 {
@@ -95,14 +91,9 @@ DG_INLINE void dgMovingAABB (dgVector& p0, dgVector& p1, const dgVector& veloc, 
 	dgVector r1 (p1 + angularStep);
 	dgVector q0 (r0 + linearStep);
 	dgVector q1 (r1 + linearStep);
-	//p0 = dgVector (dgMin (r0.m_x, q0.m_x), dgMin (r0.m_y, q0.m_y), dgMin (r0.m_z, q0.m_z), dgFloat32 (0.0f));
-	p0 = r0.GetMin (q0);
-	//p1 = dgVector (dgMax (r1.m_x, q1.m_x), dgMax (r1.m_y, q1.m_y), dgMax (r1.m_z, q1.m_z), dgFloat32 (0.0f));
-	p1 = r1.GetMax (q1);
-	p0.m_w = dgFloat32 (0.0f);
-	p1.m_w = dgFloat32 (0.0f);
+	p0 = r0.GetMin (q0) & dgVector::m_triplexMask;
+	p1 = r1.GetMax (q1) & dgVector::m_triplexMask;
 }
-
 
 DG_INLINE dgFloat32 BoxPenetration (const dgVector& minBox, const dgVector& maxBox)
 {

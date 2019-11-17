@@ -1182,15 +1182,6 @@ bool dgBroadPhase::TestOverlaping(const dgBody* const body0, const dgBody* const
 			}
 		} else {
 			ret = dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? 1 : 0;
-			//if (ret) {
-			//	dgVector size0;
-			//	dgVector size1;
-			//	dgVector origin0;
-			//	dgVector origin1;
-			//	instance0->CalcObb (origin0, size0);
-			//	instance1->CalcObb (origin1, size1);
-			//	ret = dgObbTest (origin0, size0, instance0->GetGlobalMatrix(), origin1, size1, instance1->GetGlobalMatrix());
-			//}
 		}
 	}
 	return ret;

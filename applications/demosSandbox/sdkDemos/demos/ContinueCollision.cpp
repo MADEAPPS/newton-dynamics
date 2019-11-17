@@ -57,8 +57,8 @@ void ContinuousCollision (DemoEntityManager* const scene)
 
 	location.m_x += 30.0f;
 	location.m_z += 2.0f;
-	int count = 8;
-//	int count = 1;
+//	int count = 8;
+	int count = 1;
 
 	// this is still a work in progress
 	dMatrix shapeOffsetMatrix (dGetIdentityMatrix());
