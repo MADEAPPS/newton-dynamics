@@ -1155,7 +1155,6 @@ dgDeadJoints::dgDeadJoints(dgMemoryAllocator* const allocator)
 void dgDeadJoints::DestroyJoint(dgConstraint* const joint)
 {
 	dgScopeSpinLock lock(&m_lock);
-	//Insert (joint, joint);
 	dgWorld& me = *((dgWorld*)this);
 	me.DestroyConstraint(joint);
 }
@@ -1181,6 +1180,14 @@ dgDeadBodies::dgDeadBodies(dgMemoryAllocator* const allocator)
 void dgDeadBodies::DestroyBody(dgBody* const body)
 {
 	dgScopeSpinLock lock(&m_lock);
+
+	if (body->m_destructor) {
+		body->m_destructor(*body);
+	}
+	body->SetDestructorCallback (NULL);
+	body->SetMatrixUpdateCallback (NULL);
+	body->SetExtForceAndTorqueCallback (NULL);
+
 	Insert (body, body);
 }
 
@@ -1208,9 +1215,9 @@ void dgDeadBodies::DestroyBodies(dgWorld& world)
 			dgTreeNode* const bodyNode = iter.GetNode();
 			dgBody* const body = bodyNode->GetInfo();
 
-			if (body->m_destructor) {
-				body->m_destructor(*body);
-			}
+			//if (body->m_destructor) {
+			//	body->m_destructor(*body);
+			//}
 
 			if (world.m_disableBodies.Find(body)) {
 				world.m_disableBodies.Remove(body);

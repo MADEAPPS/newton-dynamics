@@ -722,6 +722,12 @@ axisCount = 0;
 		vehicle->ApplyDriverInputs(driverInput, timestep);
 	}
 
+	void OnRemove(const dVehicle* const vehicle)
+	{
+		if (vehicle == m_player) {
+			m_player = NULL;
+		}
+	}
 
 	void OnUpdateTransform(const dVehicle* const vehicle) const 
 	{
