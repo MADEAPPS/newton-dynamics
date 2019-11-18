@@ -1657,7 +1657,7 @@ void dgBroadPhase::AttachNewContact(dgInt32 startCount)
 	dgAssert(SanityCheck());
 }
 
-void dgBroadPhase::DeleteDeadContact()
+void dgBroadPhase::DeleteDeadContact(dgFloat32 timestep)
 {
 	DG_TRACKTIME();
 	dgInt32 activeCount = 0;
@@ -1672,9 +1672,14 @@ void dgBroadPhase::DeleteDeadContact()
 			contactList.m_contactCount--;
 			contactArray[i] = contactList[contactList.m_contactCount];
 			delete contact;
-		} else if ((contact->m_isActive && contact->m_maxDOF) || (contact->m_body0->m_continueCollisionMode | contact->m_body1->m_continueCollisionMode) ){
+		} else if (contact->m_isActive && contact->m_maxDOF){
 			constraintArray[activeCount].m_joint = contact;
 			activeCount++;
+		} else if (contact->m_body0->m_continueCollisionMode | contact->m_body1->m_continueCollisionMode){
+			if (contact->EstimateCCD(timestep)) {
+				constraintArray[activeCount].m_joint = contact;
+				activeCount++;
+			}
 		}
 	}
 	dgAssert(SanityCheck());
@@ -1773,5 +1778,5 @@ void dgBroadPhase::UpdateContacts(dgFloat32 timestep)
 		//m_generatedBodies.RemoveAll();
 	}
 
-	DeleteDeadContact();
+	DeleteDeadContact(timestep);
 }

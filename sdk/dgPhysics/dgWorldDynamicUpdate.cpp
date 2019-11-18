@@ -393,7 +393,7 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 					// check for CCD mode
 					if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
 						const dgContact* const contact = (dgContact*) joint;
-						bool isCCD = contact->StimateCCD (timestep);
+						bool isCCD = contact->EstimateCCD (timestep);
 						ccdExtraRows = isCCD ? DG_CCD_EXTRA_CONTACT_COUNT : 0;
 						clusterIsContinuesCollision |= isCCD;
 					}

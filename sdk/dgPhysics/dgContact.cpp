@@ -177,7 +177,7 @@ void dgContact::CalculatePointDerivative (dgInt32 index, dgContraintDescritor& d
 	dgAssert(jacobian1.m_angular.m_w == dgFloat32(0.0f));
 }
 
-bool dgContact::StimateCCD (dgFloat32 timestep) const
+bool dgContact::EstimateCCD (dgFloat32 timestep) const
 {
 	dgAssert (m_body0->m_continueCollisionMode | m_body1->m_continueCollisionMode);
 	const dgVector& veloc0 = m_body0->m_veloc;

@@ -234,7 +234,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 
 	void SwapBodies();
 
-	bool StimateCCD (dgFloat32 timestep) const;
+	bool EstimateCCD (dgFloat32 timestep) const;
 
 	dgVector m_positAcc;
 	dgQuaternion m_rotationAcc;

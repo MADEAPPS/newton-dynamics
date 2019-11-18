@@ -892,7 +892,7 @@ void dgWorld::FlushCache()
 		dgContact* const contact = contactList[i];
 		contact->m_killContact = 1;
 	}
-	m_broadPhase->DeleteDeadContact();
+	m_broadPhase->DeleteDeadContact(0.0f);
 
 	// clean up memory in bradPhase
 	m_broadPhase->InvalidateCache ();
@@ -1210,7 +1210,7 @@ void dgDeadBodies::DestroyBodies(dgWorld& world)
 			}
 		}
 
-		world.m_broadPhase->DeleteDeadContact();
+		world.m_broadPhase->DeleteDeadContact(0.0f);
 		for (iter.Begin(); iter; iter++) {
 			dgTreeNode* const bodyNode = iter.GetNode();
 			dgBody* const body = bodyNode->GetInfo();
