@@ -1672,7 +1672,7 @@ void dgBroadPhase::DeleteDeadContact()
 			contactList.m_contactCount--;
 			contactArray[i] = contactList[contactList.m_contactCount];
 			delete contact;
-		} else if (contact->m_isActive && contact->m_maxDOF) {
+		} else if ((contact->m_isActive && contact->m_maxDOF) || (contact->m_body0->m_continueCollisionMode | contact->m_body1->m_continueCollisionMode) ){
 			constraintArray[activeCount].m_joint = contact;
 			activeCount++;
 		}

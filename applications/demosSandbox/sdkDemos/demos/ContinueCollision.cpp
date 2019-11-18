@@ -87,6 +87,8 @@ void ContinuousCollision (DemoEntityManager* const scene)
 		dFloat mass;
 		NewtonBodyGetMass(body, &mass, &Ix, &Iy, &Iz);
 		if (mass > 0.0f) {
+			dVector veloc (0.0f, -30.0f, 0.0f, 0.0f);
+			NewtonBodySetVelocity(body, &veloc[0]);
 			NewtonBodySetContinuousCollisionMode(body, 1);
 		}
 	}
@@ -94,6 +96,7 @@ void ContinuousCollision (DemoEntityManager* const scene)
 	dMatrix camMatrix(dRollMatrix(-20.0f * dDegreeToRad) * dYawMatrix(-45.0f * dDegreeToRad));
 	dQuaternion rot(camMatrix);
 	origin.m_y += 10.0f;
+	origin.m_z -= 10.0f;
 	scene->SetCameraMatrix(rot, origin);
 }
 

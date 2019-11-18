@@ -328,32 +328,34 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	dgParallelSort(*world, augmentedJointArray, augmentedJointCount, CompareJointInfos);
 	dgParallelSort(*world, m_clusterData, clustersCount, CompareClusterInfos);
 
-	dgInt32 rowStart = 0;
+//	dgInt32 rowStart = 0;
 	dgInt32 bodyStart = 0;
 	dgInt32 jointStart = 0;
 	dgInt32 softBodiesCount = 0;
 	for (dgInt32 i = 0; i < clustersCount; i++) {
 		dgBodyCluster& cluster = m_clusterData[i];
-		cluster.m_rowStart = rowStart;
+//		cluster.m_rowStart = rowStart;
 		cluster.m_bodyStart = bodyStart;
 		cluster.m_jointStart = jointStart;
 
-		rowStart += cluster.m_rowCount;
+//		rowStart += cluster.m_rowCount;
 		bodyStart += cluster.m_bodyCount;
 		softBodiesCount += cluster.m_hasSoftBodies;
 		jointStart += cluster.m_jointCount ? cluster.m_jointCount : 1;
 	}
-	m_solverMemory.Init(world, rowStart, bodyStart);
+//	m_solverMemory.Init(world, rowStart, bodyStart);
 	world->m_bodiesMemory.ResizeIfNecessary(bodyStart);
 
-	rowStart = 0;
+	dgInt32 rowStart = 0;
+	dgInt32 extraRowsAcc = 0;
 	for (dgInt32 i = 0; i < clustersCount; i++) {
 		dgBodyCluster& cluster = m_clusterData[i];
 		dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster.m_bodyStart];
 		dgJointInfo* const jointSetArray = &augmentedJointArray[cluster.m_jointStart];
 		bodyArray[0].m_body = world->GetSentinelBody();
 
-		bool isContinueCollisionIsland = false;
+		cluster.m_rowStart = rowStart;
+		bool clusterIsContinuesCollision = false;
 		if (cluster.m_jointCount) {
 			dgInt32 bodyIndex = 1;
 			for (dgInt32 j = 0; j < cluster.m_jointCount; j++) {
@@ -386,26 +388,33 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 					m1 = body1->m_index;
 				}
 
+				dgInt32 ccdExtraRows = 0;
 				if (joint->GetId() == dgConstraint::m_contactConstraint) {
 					// check for CCD mode
 					if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
 						const dgContact* const contact = (dgContact*) joint;
 						bool isCCD = contact->StimateCCD (timestep);
-						isContinueCollisionIsland |= isCCD;
+						ccdExtraRows = isCCD ? DG_CCD_EXTRA_CONTACT_COUNT : 0;
+						clusterIsContinuesCollision |= isCCD;
 					}
 				}
 				
 				jointInfo->m_m0 = m0;
 				jointInfo->m_m1 = m1;
 				jointInfo->m_pairStart = rowStart;
-				rowStart += jointInfo->m_pairCount; 
+				extraRowsAcc += ccdExtraRows;
+				rowStart += jointInfo->m_pairCount + ccdExtraRows; 
 			}
-			cluster.m_isContinueCollision = isContinueCollisionIsland;
+
+			cluster.m_rowCount += extraRowsAcc;
+			cluster.m_isContinueCollision = clusterIsContinuesCollision;
 		} else {
 			dgAssert(cluster.m_bodyCount == 2);
 			bodyArray[1].m_body = jointSetArray[0].m_body;
 		}
 	}
+
+	m_solverMemory.Init(world, rowStart, bodyStart);
 	
 	m_bodies = bodyStart;
 	m_joints = jointStart;
