@@ -1307,7 +1307,7 @@ void StandardJoints (DemoEntityManager* const scene)
     // later this will be done using LUA script
     dMatrix offsetMatrix (dGetIdentityMatrix());
 
-    CreateLevelMesh (scene, "flatPlane.ngd", 1);
+    CreateLevelMesh (scene, "flatPlane.ngd", true);
 
     dVector location (0.0f);
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);

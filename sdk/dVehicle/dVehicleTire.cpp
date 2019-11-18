@@ -393,32 +393,12 @@ void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 	const dFloat visibleInvMass = CalculateMassMatrixDiagonal(constraintParams);
 
 	if (m_position < 0.0f) {
-
-		//dFloat speed = -0.1f;
-		//dFloat step = 2.0f * speed * constraintParams->m_timestep;
-		//if (m_position > step) {
-		//	speed = 0.25f * m_position * constraintParams->m_timestepInv;
-		//}
-		//dFloat accel = GetRowAccelaration(constraintParams) - speed * constraintParams->m_timestepInv;
-		//SetRowAccelaration(constraintParams, accel);
-		//constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
-
 		const dFloat ks = m_info.m_springStiffness * visibleInvMass;
 		dFloat accel = NewtonCalculateSpringDamperAcceleration(constraintParams->m_timestep, ks, m_position, 0.0f, m_speed);
 		constraintParams->m_jointAccel[index] += accel * 0.5f;
 		constraintParams->m_diagonalRegularizer[index] = m_info.m_suspensionRelaxation;
 
 	} else if (m_position >= m_info.m_suspensionLength) {
-
-		//dFloat speed = 0.1f;
-		//dFloat step = 2.0f * speed * constraintParams->m_timestep;
-		//if ((m_position - m_info.m_suspensionLength) > step) {
-		//	speed = 0.25f * (m_position - m_info.m_suspensionLength) * constraintParams->m_timestepInv;
-		//}
-		//dFloat accel = GetRowAccelaration(constraintParams) - speed * constraintParams->m_timestepInv;
-		//SetRowAccelaration(constraintParams, accel);
-		//constraintParams->m_jointHighFrictionCoef[index] = 0.0f;
-
 		const dFloat ks = m_info.m_springStiffness * visibleInvMass;
 		dFloat accel = NewtonCalculateSpringDamperAcceleration(constraintParams->m_timestep, ks, m_position, 0.0f, m_speed);
 		constraintParams->m_jointAccel[index] += accel * 0.5f;

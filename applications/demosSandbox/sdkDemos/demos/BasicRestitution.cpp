@@ -70,7 +70,7 @@ void Restitution (DemoEntityManager* const scene)
 	NewtonMaterialSetCollisionCallback (world, defaultMaterialID, defaultMaterialID, NULL, UserContactRestitution); 
 
 
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
 
 	dVector location (0.0f, 0.0f, 0.0f, 0.0f);
 

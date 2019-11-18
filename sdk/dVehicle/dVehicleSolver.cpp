@@ -937,7 +937,7 @@ void dVehicleSolver::dGaussSeidelLcpSor(
 		}
 	}
 
-dTrace(("error %d %f\n", passes, tolerance));
+//dTrace(("error %d %f\n", passes, tolerance));
 
 	for (int j = 0; j < size; j++) {
 		x[j] = u[j];

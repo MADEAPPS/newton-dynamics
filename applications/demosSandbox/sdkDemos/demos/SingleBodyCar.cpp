@@ -600,9 +600,9 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dEngineInfo engineInfo;
 		engineInfo.m_mass = MONSTER_TRUCK_ENGINE_MASS;
 		engineInfo.m_armatureRadius = MONSTER_TRUCK_ENGINE_RADIUS;
-		engineInfo.m_idleTorque = 300.0f * 1.5f;			// IDLE_TORQUE
-		engineInfo.m_peakTorque = 500.0f * 1.5f;			// PEAK_TORQUE
-		engineInfo.m_peakHorsePower = 400.0f * 1.5f;		// PEAK_HP
+		engineInfo.m_idleTorque = 300.0f;			// IDLE_TORQUE
+		engineInfo.m_peakTorque = 500.0f;			// PEAK_TORQUE
+		engineInfo.m_peakHorsePower = 400.0f;		// PEAK_HP
 
 		engineInfo.m_rpmAtIdleTorque = 450.0f;		// IDLE_TORQUE_RPM
 		engineInfo.m_rpmAtPeakTorque = 3000.0f;		// PEAK_TORQUE_RPM
@@ -855,10 +855,11 @@ static void CreateBridge(DemoEntityManager* const scene, NewtonBody* const playg
 
 static void AddBackground(DemoEntityManager* const scene)
 {
+	CreateLevelMesh(scene, "flatPlane.ngd", true);
 //	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "track.ngd", true);
 //	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "playerarena.ngd", true);
 //	CreateHeightFieldTerrain (scene, 10, 4.0f, 1.0f, 0.25f, -10.0f, 15.0f);
-	CreateHeightFieldTerrain(scene, 7, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
+//	CreateHeightFieldTerrain(scene, 7, 8.0f, 5.0f, 0.2f, 200.0f, -50.0f);
 
 	dMatrix location(dGetIdentityMatrix());
 #if 0
@@ -922,8 +923,8 @@ void SingleBodyCar(DemoEntityManager* const scene)
 
 	// create a sport car
 	dPointer<DemoEntity> viperModel (DemoEntity::LoadNGD_mesh("viper.ngd", scene->GetNewton(), scene->GetShaderCache()));
-//	dVehicle* const player0 = manager->CreateSportCar(location, viperModel.GetData());
-//	manager->SetAsPlayer(player0);
+	dVehicle* const player0 = manager->CreateSportCar(location, viperModel.GetData());
+	manager->SetAsPlayer(player0);
 
 	// create an monster Truck
 	location.m_posit.m_x = 0.0f;
@@ -937,8 +938,8 @@ void SingleBodyCar(DemoEntityManager* const scene)
 	location.m_posit.m_y += 1.5f;
 
 	dPointer<DemoEntity> monsterTruck (DemoEntity::LoadNGD_mesh("monsterTruck.ngd", scene->GetNewton(), scene->GetShaderCache()));
-	dVehicle* const player1 = manager->CreateOffRoadCar(location, monsterTruck.GetData());
-	manager->SetAsPlayer(player1);
+//	dVehicle* const player1 = manager->CreateOffRoadCar(location, monsterTruck.GetData());
+//	manager->SetAsPlayer(player1);
 
 	int count = 10;
 	count = 0;

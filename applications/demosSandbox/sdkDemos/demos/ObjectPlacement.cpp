@@ -468,7 +468,7 @@ void ObjectPlacement (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 	// load the scene from a ngd file format
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
 
 //	AddStaticMesh (scene);
 

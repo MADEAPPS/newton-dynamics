@@ -54,7 +54,7 @@
 //#define DEFAULT_SCENE	18		// uniform Scaled Collision
 //#define DEFAULT_SCENE	19		// non uniform Scaled Collision
 //#define DEFAULT_SCENE	20		// scaled mesh collision
-#define DEFAULT_SCENE	21		// continuous collision
+//#define DEFAULT_SCENE	21		// continuous collision
 //#define DEFAULT_SCENE	22		// paper wall continuous collision
 //#define DEFAULT_SCENE	23		// puck slide continuous collision
 //#define DEFAULT_SCENE	24		// simple convex decomposition
@@ -71,7 +71,7 @@
 //#define DEFAULT_SCENE	35		// basic rag doll
 //#define DEFAULT_SCENE	36		// balancing character
 //#define DEFAULT_SCENE	37		// dynamic rag doll
-//#define DEFAULT_SCENE	38		// single body vehicle
+#define DEFAULT_SCENE	38		// single body vehicle
 //#define DEFAULT_SCENE	39		// super Car
 //#define DEFAULT_SCENE	40		// heavy vehicles
 //#define DEFAULT_SCENE	41		// basic player controller

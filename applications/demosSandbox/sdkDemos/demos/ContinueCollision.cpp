@@ -39,10 +39,9 @@ void ContinuousCollision (DemoEntityManager* const scene)
 	// load the skybox
 	scene->CreateSkyBox();
 
-
 	// load the mesh
 	//PlaceLargeFloorBox (scene);
-//	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+//	CreateLevelMesh (scene, "flatPlane.ngd", true);
 //	CreateLevelMesh (scene, "sponza.ngd", optimization);
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 1.5f, 0.2f, 200.0f, -50.0f);
 
