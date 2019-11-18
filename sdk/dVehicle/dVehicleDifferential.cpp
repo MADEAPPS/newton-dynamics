@@ -139,8 +139,8 @@ void dVehicleDifferential::JacobianDerivative(dComplementaritySolver::dParamInfo
 dTrace(("diff omega: %f ", m_state0->GetOmega().DotProduct3(matrix.m_up)));
 int index = constraintParams->m_count;
 AddAngularRowJacobian(constraintParams, matrix.m_up, 0.0f);
-constraintParams->m_jointHighFrictionCoef[index] = 100.0f;
-constraintParams->m_jointLowFrictionCoef[index] = -100.0f;
+constraintParams->m_jointHighFrictionCoef[index] = 10.0f;
+constraintParams->m_jointLowFrictionCoef[index] = -10.0f;
 
 /*
 	switch (m_mode)

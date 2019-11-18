@@ -16,7 +16,8 @@
 #include "dVehicleTireContact.h"
 
 #define D_TIRE_CONTACT_PATCH_CONE		dFloat (0.8f) 
-#define D_TIRE_CONTACT_MAX_SIZE_SLIP	dFloat (0.15f) 
+#define D_TIRE_CONTACT_MAX_SIDE_SLIP	dFloat (0.15f) 
+#define D_TIRE_CONTACT_MAX_LONG_SLIP	dFloat (10.0f) 
 
 dVehicleTireContact::dVehicleTireContact()
 	:dVehicleLoopJoint()
@@ -149,10 +150,10 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		if ((omegaSpeed > 0.2f) || (linearSpeed > 0.2f)) {
 			if (relSpeed < 0.0f) {
 				dFloat speedDen = dMax(linearSpeed, dFloat(0.01f));
-				m_tireModel.m_longitudinalSlip = dClamp(dAbs(relSpeed / speedDen), dFloat(0.0f), dFloat(20.0f));
+				m_tireModel.m_longitudinalSlip = dClamp(dAbs(relSpeed / speedDen), dFloat(0.0f), D_TIRE_CONTACT_MAX_LONG_SLIP);
 			} else {
 				dFloat speedDen = dMax(omegaSpeed, dFloat(0.01f));
-				m_tireModel.m_longitudinalSlip = dClamp(dAbs(relSpeed / speedDen), dFloat(0.0f), dFloat(4.0f));
+				m_tireModel.m_longitudinalSlip = dClamp(dAbs(relSpeed / speedDen), dFloat(0.0f), D_TIRE_CONTACT_MAX_LONG_SLIP);
 			}
 		}
 
@@ -178,7 +179,7 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		dAssert ((m_tireModel.m_lateralSlip + 1.0e-3f) > 0.0f);
 		m_tireModel.m_lateralSlip = lateralSpeed / (m_tireModel.m_lateralSlip + 1.0e-3f);
 		// clamp lateral slip to a max of +- 10 degree
-		m_tireModel.m_lateralSlip = dClamp (m_tireModel.m_lateralSlip, -D_TIRE_CONTACT_MAX_SIZE_SLIP, D_TIRE_CONTACT_MAX_SIZE_SLIP);
+		m_tireModel.m_lateralSlip = dClamp (m_tireModel.m_lateralSlip, -D_TIRE_CONTACT_MAX_SIDE_SLIP, D_TIRE_CONTACT_MAX_SIDE_SLIP);
 
 		if (m_isContactPatch) {
 			dComplementaritySolver::dJacobian &jacobian2 = constraintParams->m_jacobians[index].m_jacobian_J10;
@@ -192,7 +193,7 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 	dFloat u = dAbs(m_tireModel.m_longitudinalSlip);
 	dFloat invden = 1.0f / (1.0f + u);
 
-if (tire->GetIndex() >= 2)
+//if (tire->GetIndex() >= 2)
 dTrace(("%d uv(%f %f) ", tire->GetIndex(), u, v));
 
 	m_tireModel.m_lateralSlip = v * invden;
