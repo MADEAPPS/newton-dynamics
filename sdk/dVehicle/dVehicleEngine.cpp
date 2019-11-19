@@ -134,7 +134,6 @@ dFloat dVehicleEngine::GetRedLineRpm() const
 	return m_metricInfo.m_rpmAtRedLine * 9.549f;
 }
 
-
 void dVehicleEngine::SetGear(dEngineInfo::dGearRatioIndex gear)
 {
 //	m_gearTimer = 30;

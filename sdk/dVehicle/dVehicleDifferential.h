@@ -23,7 +23,7 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 {
 	enum dOperationMode
 	{
-		m_unlocked,
+		m_open,
 		m_slipLocked,
 		m_rightLocked,
 		m_leftLocked,
@@ -76,6 +76,7 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	dVehicleNode* m_rightNode;
 	dFloat m_diffOmega;
 	dFloat m_shaftOmega;
+	dFloat m_frictionLost;
 	dOperationMode m_mode;
 
 	friend class dVehicleMultiBody;
