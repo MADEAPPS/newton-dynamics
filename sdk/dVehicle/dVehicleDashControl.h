@@ -51,7 +51,7 @@ class dVehicleDashControl
 		return m_param;
 	}
 
-	bool ParamChanged() const
+	virtual bool ParamChanged() const
 	{
 		m_timer--;
 		if (dAbs(m_paramMemory - m_param) > 1.e-3f) {
@@ -135,6 +135,7 @@ class dVehicleEngineControl: public dVehicleDashControl
 	void SetDifferential (int mode);
 
 	virtual void Update(dFloat timestep);
+	virtual bool ParamChanged() const;
 
 	private:
 	dVehicleEngine* m_engine;

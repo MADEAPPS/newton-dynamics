@@ -84,3 +84,20 @@ void dVehicleEngineControl::SetClutch (dFloat clutch)
 //		m_engine->SetClutch(clutch);
 	}
 }
+
+bool dVehicleEngineControl::ParamChanged() const
+{
+	bool state = dVehicleDashControl::ParamChanged();
+	if (!state && m_engine) {
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		dComplementaritySolver::dBodyState& proxy = m_engine->GetProxyBody();
+		proxy.GetInertia (Ixx, Iyy, Izz);
+		dVector alpha (proxy.GetTorque().Scale (1.0f / Ixx));
+		dFloat alphaMag2 = alpha.DotProduct3(alpha);
+		state = alphaMag2 > 1.0f;
+	}
+	
+	return state;
+}
