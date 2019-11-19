@@ -57,6 +57,7 @@ void dVehicleBrakeControl::Update(dFloat timestep)
 void dVehicleEngineControl::Update(dFloat timestep)
 {
 	if (m_engine) {
+		m_engine->UpdateAutomaticGearBox(timestep);
 		m_engine->SetThrottle (m_param, timestep);
 	}
 }

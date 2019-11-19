@@ -77,6 +77,7 @@ dVehicleEngine::dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineIn
 	,m_throttle(0.0f)
 	,m_throttleSpeed(1.e1f)
 	,m_differentialMode(differential->GetMode())
+	,m_currentGear(dEngineInfo::m_neutralGear)
 {
 	InitEngineTorqueCurve();
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
@@ -133,6 +134,50 @@ dFloat dVehicleEngine::GetRedLineRpm() const
 	return m_metricInfo.m_rpmAtRedLine * 9.549f;
 }
 
+
+void dVehicleEngine::SetGear(dEngineInfo::dGearRatioIndex gear)
+{
+//	m_gearTimer = 30;
+	m_currentGear = dClamp(gear, dEngineInfo::m_reverseGear, dEngineInfo::dGearRatioIndex (m_info.m_gearsCount));
+	dFloat ratio = m_info.m_gearRatios[m_currentGear];
+	m_gearBox.SetGearRatio(ratio);
+}
+
+void dVehicleEngine::UpdateAutomaticGearBox(dFloat timestep)
+{
+//	m_info.m_gearsCount = 3;
+//	m_gearTimer--;
+//	if (m_gearTimer < 0) {
+		switch (m_currentGear) 
+		{
+			case dEngineInfo::m_neutralGear:
+			{
+				SetGear(dEngineInfo::m_neutralGear);
+				break;
+			}
+
+			case dEngineInfo::m_reverseGear:
+			{
+			   SetGear(dEngineInfo::m_reverseGear);
+			   break;
+			}
+
+			default:
+			{
+				if (m_omega > m_info.m_rpmAtPeakHorsePower) {
+					if (m_currentGear < (m_info.m_gearsCount - 1)) {
+						SetGear(dEngineInfo::dGearRatioIndex (m_currentGear + 1));
+					}
+				} else if (m_omega < m_info.m_rpmAtPeakTorque) {
+					if (m_currentGear > dEngineInfo::m_firstGear) {
+						SetGear(dEngineInfo::dGearRatioIndex (m_currentGear - 1));
+					}
+				}
+			}
+		}
+//	}
+}
+
 void dVehicleEngine::SetThrottle (dFloat throttle, dFloat timestep)
 {
 	m_throttle = dAbs (m_omega / m_metricInfo.m_rpmAtRedLine);
@@ -157,13 +202,6 @@ void dVehicleEngine::SetDifferentialMode(int differentialMode)
 }
 
 #if 0
-void dVehicleEngine::SetGear (int gear)
-{
-	gear = dClamp (gear, int (m_reverseGear), m_metricInfo.m_gearsCount);
-	dFloat ratio = m_metricInfo.m_gearRatios[gear];
-	m_gearBox.SetGearRatio(ratio);
-}
-
 void dVehicleEngine::SetClutch (dFloat clutch) 
 {
 	clutch = dClamp (clutch, dFloat (0.0f), dFloat (1.0f));
@@ -268,7 +306,6 @@ void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementarity
 
 		//dFloat gain = -1.0f;
 		dFloat gain = m_crowndGear * m_gearRatio;
-//gain *=-1.0f;
 		jacobian1.m_angular = jacobian1.m_angular.Scale(-gain);
 
 		const dVector& omega0 = m_state0->GetOmega();

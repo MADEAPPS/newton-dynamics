@@ -98,7 +98,6 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 		public:
 		dEngineMetricInfo(const dEngineInfo& info);
 		dFloat m_peakPowerTorque;
-		//dFloat m_crownGearRatio;
 
 		dFloat GetTorque (dFloat rpm) const;
 
@@ -138,7 +137,6 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 		dFloat m_clutchTorque;
 	};
 
-
 	public:
 	DVEHICLE_API dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineInfo& info, dVehicleDifferential* const differential);
 	DVEHICLE_API virtual ~dVehicleEngine();
@@ -149,11 +147,14 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	DVEHICLE_API dFloat GetSpeed() const;
 	dFloat GetTopSpeed() const {return m_info.m_topSpeedInMetersPerSeconds;}
 
-
-	virtual dFloat GetRpm() const;
-	virtual dFloat GetRedLineRpm() const;
-	//void SetGear (int gear);
+	DVEHICLE_API dFloat GetRpm() const;
+	DVEHICLE_API dFloat GetRedLineRpm() const;
 	//void SetClutch (dFloat clutch);
+	
+	DVEHICLE_API void SetGear (dEngineInfo::dGearRatioIndex gear);
+	DVEHICLE_API dEngineInfo::dGearRatioIndex GetGear () const {return m_currentGear;}
+
+	DVEHICLE_API void UpdateAutomaticGearBox(dFloat timestep);
 
 	DVEHICLE_API void SetThrottle (dFloat throttle, dFloat timestep);
 
@@ -183,6 +184,7 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	dFloat m_throttle;
 	dFloat m_throttleSpeed;
 	int m_differentialMode;
+	dEngineInfo::dGearRatioIndex m_currentGear;
 
 	friend class dVehicleMultiBody;
 };
