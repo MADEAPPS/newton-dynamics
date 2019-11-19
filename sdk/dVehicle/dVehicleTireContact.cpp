@@ -188,6 +188,11 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		}
 	}
 
+	if (m_isLowSpeed) {
+		m_tireModel.m_lateralSlip = 0.0f;
+		m_tireModel.m_longitudinalSlip = 0.0f;
+	}
+
 	const dTireInfo& tireInfo = tire->GetInfo();
 	dFloat v = dAbs(m_tireModel.m_lateralSlip);
 	dFloat u = dAbs(m_tireModel.m_longitudinalSlip);
