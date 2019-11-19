@@ -138,7 +138,7 @@ void dVehicleMultiBody::ApplyDriverInputs(const dDriverInput& driveInputs, dFloa
 	m_steeringControl.SetParam(driveInputs.m_steeringValue);
 	m_engineControl.SetParam(driveInputs.m_throttle);
 
-	m_engineControl.SetDifferential (driveInputs.m_differentialMode);
+m_engineControl.SetIgnition(driveInputs.m_ignitionKey);
 #if 0
 	if (m_engineControl) {
 		m_engineControl->SetClutch(driveInputs.m_clutchPedal);

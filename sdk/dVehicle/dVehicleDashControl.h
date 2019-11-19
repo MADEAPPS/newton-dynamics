@@ -133,6 +133,7 @@ class dVehicleEngineControl: public dVehicleDashControl
 	void SetGear (int gear);
 	void SetClutch (dFloat clutch);
 	void SetDifferential (int mode);
+	void SetIgnition(int mode);
 
 	virtual void Update(dFloat timestep);
 	virtual bool ParamChanged() const;

@@ -78,7 +78,11 @@ dVehicleEngine::dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineIn
 	,m_throttleSpeed(1.e1f)
 	,m_differentialMode(differential->GetMode())
 	,m_currentGear(dEngineInfo::m_neutralGear)
+	,m_ignitionKey0 (false)
+	,m_ignitionKey1(false)
 {
+//m_ignitionKey = true;
+
 	InitEngineTorqueCurve();
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 
@@ -177,8 +181,36 @@ void dVehicleEngine::UpdateAutomaticGearBox(dFloat timestep)
 //	}
 }
 
+bool dVehicleEngine::InputChanged() const
+{
+	if (m_ignitionKey0 != m_ignitionKey1) {
+		return true;
+	}
+
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	const dComplementaritySolver::dBodyState& proxy = GetProxyBody();
+	proxy.GetInertia(Ixx, Iyy, Izz);
+	dVector alpha(proxy.GetTorque().Scale(1.0f / Ixx));
+	dFloat alphaMag2 = alpha.DotProduct3(alpha);
+	return alphaMag2 > 1.0f;
+}
+
+void dVehicleEngine::SetIgnition(bool mode)
+{
+	m_ignitionKey1 = m_ignitionKey0;
+	m_ignitionKey0 = mode;
+}
+
 void dVehicleEngine::SetThrottle (dFloat throttle, dFloat timestep)
 {
+	if (m_ignitionKey0) {
+		throttle = dMax(throttle, m_metricInfo.m_rpmAtIdleTorque / m_metricInfo.m_rpmAtRedLine);
+	} else {
+		throttle = 0.0f;
+	}
+
 	m_throttle = dAbs (m_omega / m_metricInfo.m_rpmAtRedLine);
 	dFloat step = throttle - m_throttle;
 	dFloat maxStep = 2.0f * m_throttleSpeed * timestep;

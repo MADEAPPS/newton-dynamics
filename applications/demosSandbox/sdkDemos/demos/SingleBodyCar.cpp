@@ -87,6 +87,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		,m_player(NULL)
 		,m_externalView(true)
 		,m_differentialMode(0)
+		,m_engineKeySwitch(false)
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
@@ -200,7 +201,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 	{
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Vehicle driving keyboard control");
-		//scene->Print(color, "key switch          : 'i'");
+		scene->Print(color, "key switch          : 'i'");
 		scene->Print(color, "accelerator         : 'w'");
 		scene->Print(color, "reverse             : 's'");
 		scene->Print(color, "turn left           : 'a'");
@@ -692,8 +693,9 @@ axisCount = 0;
 			driverInput.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
 			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
 			driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
+			driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene->GetKeyState('I'));
+			//dTrace(("%d\n", m_engineKeySwitch.GetPushButtonState()));
 
-			//driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene->GetKeyState('I'));
 			////driverInput.m_manualTransmission = !m_automaticTransmission.UpdatePushButton (scene, 0x0d);
 			//gear += m_gearUpKey.UpdateTrigger(scene->GetKeyState('M')) - m_gearUpKey.UpdateTrigger(scene->GetKeyState('N'));
 			//driverInput.m_gear = gear;
@@ -760,9 +762,9 @@ axisCount = 0;
 	GLuint m_tachometer;
 	GLuint m_greenNeedle;
 	mutable int m_differentialMode;
+	DemoEntityManager::ButtonKey m_engineKeySwitch;
 	bool m_externalView;
 };
-
 
 static void CreateBridge(DemoEntityManager* const scene, NewtonBody* const playgroundBody)
 {
