@@ -153,7 +153,7 @@ m_metricInfo.m_gearsCount = 4;
 //	if (m_gearTimer < 0) {
 
 	dFloat omega = dAbs (m_omega);
-dTrace (("(gear: %d) (throttle: %f) (omega: %f %f %f) ", m_currentGear, m_throttle, omega, m_metricInfo.m_rpmAtPeakTorque, m_metricInfo.m_rpmAtPeakHorsePower));
+//dTrace (("(gear: %d) (throttle: %f) (omega: %f %f %f) ", m_currentGear, m_throttle, omega, m_metricInfo.m_rpmAtPeakTorque, m_metricInfo.m_rpmAtPeakHorsePower));
 SetGear(dEngineInfo::dGearRatioIndex(dEngineInfo::m_firstGear + 1));
 return;
 		
@@ -340,7 +340,7 @@ void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementarity
 
 		//dFloat gain = -1.0f;
 		dFloat gain = m_crowndGear * m_gearRatio;
-dTrace (("(gearGain %f) ", gain));
+//dTrace (("(gearGain %f) ", gain));
 if (gain < 11)
 gain = 5;
 
