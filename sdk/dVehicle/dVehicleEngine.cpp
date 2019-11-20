@@ -153,8 +153,9 @@ m_metricInfo.m_gearsCount = 4;
 //	if (m_gearTimer < 0) {
 
 	dFloat omega = dAbs (m_omega);
-
 dTrace (("(gear: %d) (throttle: %f) (omega: %f %f %f) ", m_currentGear, m_throttle, omega, m_metricInfo.m_rpmAtPeakTorque, m_metricInfo.m_rpmAtPeakHorsePower));
+SetGear(dEngineInfo::dGearRatioIndex(dEngineInfo::m_firstGear + 1));
+return;
 		
 		switch (m_currentGear) 
 		{
@@ -331,9 +332,6 @@ void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementarity
 
 		dAssert(GetOwner0()->GetAsEngine());
 		dVehicleEngine* const engineNode = GetOwner0()->GetAsEngine();
-
-		//dMatrix matrix0 (m_state0->GetMatrix());
-		//dMatrix matrix (engineNode->m_localAxis * m_state0->GetMatrix());
 		dVector gearBoxPin (m_state0->GetMatrix().RotateVector(engineNode->m_localAxis.m_front));
 		AddAngularRowJacobian(constraintParams, gearBoxPin, 0.0f);
 
