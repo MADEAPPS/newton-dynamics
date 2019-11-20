@@ -81,7 +81,7 @@ dVehicleEngine::dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineIn
 	,m_ignitionKey0 (false)
 	,m_ignitionKey1(false)
 {
-//m_ignitionKey = true;
+m_currentGear = dEngineInfo::m_firstGear;
 
 	InitEngineTorqueCurve();
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
