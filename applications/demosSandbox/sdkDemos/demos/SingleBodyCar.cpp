@@ -688,7 +688,7 @@ axisCount = 0;
 			//dTrace (("%d %d %d\n", gear, ignitionButton, m_engineKeySwitch.GetPushButtonState()));
 */
 		} else {
-			driverInput.m_throttle = scene->GetKeyState('W') ? 0.85f : 0.0f;
+			driverInput.m_throttle = scene->GetKeyState('W') ? 0.95f : 0.0f;
 			driverInput.m_clutchPedal = scene->GetKeyState('K') ? 0.0f : 1.0f;
 			driverInput.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
 			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
@@ -707,7 +707,7 @@ axisCount = 0;
 		driverInput.m_clutchPedal = 0.0f;
 
 #if 0
-	#if 0
+	#if 1
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
 			fwrite(&driverInput, sizeof(dVehicleMultiBody::dDriverInput), 1, file);
