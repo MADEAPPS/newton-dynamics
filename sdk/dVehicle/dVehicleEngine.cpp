@@ -141,16 +141,21 @@ dFloat dVehicleEngine::GetRedLineRpm() const
 void dVehicleEngine::SetGear(dEngineInfo::dGearRatioIndex gear)
 {
 //	m_gearTimer = 30;
-	m_currentGear = dClamp(gear, dEngineInfo::m_reverseGear, dEngineInfo::dGearRatioIndex (m_info.m_gearsCount));
-	dFloat ratio = m_info.m_gearRatios[m_currentGear];
+	m_currentGear = dClamp(gear, dEngineInfo::m_reverseGear, dEngineInfo::dGearRatioIndex (m_metricInfo.m_gearsCount));
+	dFloat ratio = m_metricInfo.m_gearRatios[m_currentGear];
 	m_gearBox.SetGearRatio(ratio);
 }
 
 void dVehicleEngine::UpdateAutomaticGearBox(dFloat timestep)
 {
-//	m_info.m_gearsCount = 3;
+m_metricInfo.m_gearsCount = 4;
 //	m_gearTimer--;
 //	if (m_gearTimer < 0) {
+
+	dFloat omega = dAbs (m_omega);
+
+dTrace (("(gear: %d) (throttle: %f) (omega: %f %f %f) ", m_currentGear, m_throttle, omega, m_metricInfo.m_rpmAtPeakTorque, m_metricInfo.m_rpmAtPeakHorsePower));
+		
 		switch (m_currentGear) 
 		{
 			case dEngineInfo::m_neutralGear:
@@ -167,11 +172,11 @@ void dVehicleEngine::UpdateAutomaticGearBox(dFloat timestep)
 
 			default:
 			{
-				if (m_omega > m_info.m_rpmAtPeakHorsePower) {
-					if (m_currentGear < (m_info.m_gearsCount - 1)) {
+				if (omega > m_metricInfo.m_rpmAtPeakHorsePower) {
+					if (m_currentGear < (m_metricInfo.m_gearsCount - 1)) {
 						SetGear(dEngineInfo::dGearRatioIndex (m_currentGear + 1));
 					}
-				} else if (m_omega < m_info.m_rpmAtPeakTorque) {
+				} else if (omega < m_metricInfo.m_rpmAtPeakTorque) {
 					if (m_currentGear > dEngineInfo::m_firstGear) {
 						SetGear(dEngineInfo::dGearRatioIndex (m_currentGear - 1));
 					}
@@ -337,6 +342,10 @@ void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementarity
 
 		//dFloat gain = -1.0f;
 		dFloat gain = m_crowndGear * m_gearRatio;
+dTrace (("(gearGain %f) ", gain));
+if (gain < 11)
+gain = 5;
+
 		jacobian1.m_angular = jacobian1.m_angular.Scale(-gain);
 
 		const dVector& omega0 = m_state0->GetOmega();
