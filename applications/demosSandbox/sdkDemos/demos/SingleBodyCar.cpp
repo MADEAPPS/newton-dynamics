@@ -310,8 +310,8 @@ class SingleBodyVehicleManager: public dVehicleManager
 		tireInfo.m_suspensionLength = data.m_suspensionLength;
 		tireInfo.m_dampingRatio = data.m_dampingRatio * vehicleMass;
 		tireInfo.m_springStiffness = data.m_springStiffness * dAbs(vehicleMass * DEMO_GRAVITY / tireInfo.m_suspensionLength);
-		tireInfo.m_corneringStiffness = data.m_corneringStiffness * dAbs(vehicleMass * DEMO_GRAVITY);
-		tireInfo.m_longitudinalStiffness = data.m_longitudinalStiffness * dAbs(vehicleMass * DEMO_GRAVITY);
+		tireInfo.m_corneringStiffness = data.m_corneringStiffness * dAbs(0.25f * vehicleMass * DEMO_GRAVITY);
+		tireInfo.m_longitudinalStiffness = data.m_longitudinalStiffness * dAbs(0.25f * vehicleMass * DEMO_GRAVITY);
 
 		//tireInfo.m_aligningMomentTrail = definition.m_tireAligningMomemtTrail;
 		//tireInfo.m_suspentionType = definition.m_tireSuspensionType;

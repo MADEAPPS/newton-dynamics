@@ -166,10 +166,10 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	DVEHICLE_API bool InputChanged() const;
 
 	protected:
-	void CalculateFreeDof();
 	void ApplyExternalForce();
 	void InitEngineTorqueCurve();
 	void Integrate(dFloat timestep);
+	void CalculateFreeDof(dFloat timestep);
 	int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 
 	dVehicleEngine* GetAsEngine() const { return (dVehicleEngine*)this;}

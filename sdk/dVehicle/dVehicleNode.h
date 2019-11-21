@@ -64,7 +64,7 @@ class dVehicleNode: public dCustomAlloc
 	protected:
 	virtual void ApplyExternalForce();
 	virtual void Integrate(dFloat timestep);
-	virtual void CalculateFreeDof();
+	virtual void CalculateFreeDof(dFloat timestep);
 
 	virtual int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 	virtual const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;

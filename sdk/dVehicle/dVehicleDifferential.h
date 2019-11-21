@@ -56,9 +56,9 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	DVEHICLE_API void SetMode(int mode);
 	
 	protected:
-	void CalculateFreeDof();
 	void ApplyExternalForce();
 	void Integrate(dFloat timestep);
+	void CalculateFreeDof(dFloat timestep);
 	int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 
 	dComplementaritySolver::dBilateralJoint* GetJoint() {return this;}

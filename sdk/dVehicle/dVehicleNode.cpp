@@ -92,11 +92,11 @@ void dVehicleNode::Integrate(dFloat timestep)
 	}
 }
 
-void dVehicleNode::CalculateFreeDof()
+void dVehicleNode::CalculateFreeDof(dFloat timestep)
 {
 	for (dVehicleNodeChildrenList::dListNode* child = m_children.GetFirst(); child; child = child->GetNext()) {
 		dVehicleNode* const node = child->GetInfo();
-		node->CalculateFreeDof();
+		node->CalculateFreeDof(timestep);
 	}
 }
 

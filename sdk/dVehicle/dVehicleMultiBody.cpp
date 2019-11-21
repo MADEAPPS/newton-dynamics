@@ -516,9 +516,9 @@ void dVehicleMultiBody::Integrate(dFloat timestep)
 	dVehicleNode::Integrate(timestep);
 }
 
-void dVehicleMultiBody::CalculateFreeDof()
+void dVehicleMultiBody::CalculateFreeDof(dFloat timestep)
 {
-	dVehicleNode::CalculateFreeDof();
+	dVehicleNode::CalculateFreeDof(timestep);
 
 	dVector force(m_proxyBody.GetForce());
 	dVector torque(m_proxyBody.GetTorque());
@@ -581,7 +581,7 @@ void dVehicleMultiBody::PreUpdate(dFloat timestep)
 	CalculateTireContacts(timestep);
 	dVehicleSolver::Update(timestep);
 	Integrate(timestep);
-	CalculateFreeDof();
+	CalculateFreeDof(timestep);
 
 #if 0
 	FILE* file_xxx = fopen("xxxxx.csv", "wb");

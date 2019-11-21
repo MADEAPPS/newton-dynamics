@@ -61,9 +61,9 @@ class dVehicleMultiBody: public dVehicle, public dVehicleSolver
 	DVEHICLE_API dVehicleSteeringControl* GetSteeringControl();
 
 	private:
-	void CalculateFreeDof();
 	void ApplyExternalForce();
 	void Integrate(dFloat timestep);
+	void CalculateFreeDof(dFloat timestep);
 	void CalculateTireContacts(dFloat timestep);
 	virtual int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 	virtual void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep);

@@ -16,7 +16,7 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleLoopJoint.h"
 
-#define D_TIRE_MAX_LATERAL_SLIP				dFloat (0.175f)
+#define D_TIRE_MAX_LATERAL_SLIP				dFloat (0.20f)
 #define D_TIRE_MAX_ELASTIC_DEFORMATION		dFloat (0.05f)
 #define D_TIRE_PENETRATION_RECOVERING_SPEED	dFloat (10.0f)
 

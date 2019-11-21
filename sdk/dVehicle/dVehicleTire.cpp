@@ -329,7 +329,7 @@ void dVehicleTire::ApplyExternalForce()
 	m_proxyBody.SetForce(chassisNode->GetGravity().Scale(m_proxyBody.GetMass()));
 }
 
-void dVehicleTire::CalculateFreeDof()
+void dVehicleTire::CalculateFreeDof(dFloat timestep)
 {
 	dVehicleMultiBody* const chassis = GetParent()->GetAsVehicleMultiBody();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassis->GetProxyBody();
@@ -340,12 +340,23 @@ void dVehicleTire::CalculateFreeDof()
 	dVector tireOmega(m_proxyBody.GetOmega());
 	dVector chassisOmega(chassisBody->GetOmega());
 	dVector relativeOmega(tireOmega - chassisOmega);
-	m_omega = tireMatrix.m_front.DotProduct3(relativeOmega);
+
+#if 0
+	dFloat m_omega = tireMatrix.m_front.DotProduct3(relativeOmega);
+//	dFloat omega1 = tireMatrix.m_front.DotProduct3(relativeOmega);
 	dAssert(tireMatrix.m_front.DotProduct3(chassisMatrix.m_front) > 0.998f);
 
 	dFloat cosAngle = tireMatrix.m_right.DotProduct3(chassisMatrix.m_right);
 	dFloat sinAngle = chassisMatrix.m_front.DotProduct3(chassisMatrix.m_right.CrossProduct(tireMatrix.m_right));
 	m_tireAngle += dAtan2(sinAngle, cosAngle);
+#else
+	// use verlet integration for tire angle
+	dFloat omega1 = tireMatrix.m_front.DotProduct3(relativeOmega);
+//dTrace(("%f\n", m_omega));
+	m_tireAngle += (m_omega + 0.5f * (omega1 - m_omega)) * timestep;
+	m_omega = omega1;
+#endif
+
 	while (m_tireAngle < 0.0f)
 	{
 		m_tireAngle += 2.0f * dPi;

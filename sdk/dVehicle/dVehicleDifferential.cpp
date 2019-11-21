@@ -84,7 +84,7 @@ int dVehicleDifferential::GetKinematicLoops(dVehicleLoopJoint** const jointArray
 	}
 }
 
-void dVehicleDifferential::CalculateFreeDof()
+void dVehicleDifferential::CalculateFreeDof(dFloat timestep)
 {
 	dVehicleMultiBody* const chassisNode = GetParent()->GetAsVehicleMultiBody();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();

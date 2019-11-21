@@ -259,7 +259,7 @@ int dVehicleEngine::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 	return 1;
 }
 
-void dVehicleEngine::CalculateFreeDof()
+void dVehicleEngine::CalculateFreeDof(dFloat timestep)
 {
 	dVehicleMultiBody* const chassisNode = GetParent()->GetAsVehicleMultiBody();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
@@ -342,8 +342,8 @@ void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementarity
 		//dFloat gain = -1.0f;
 		dFloat gain = m_crowndGear * m_gearRatio;
 //dTrace (("(gearGain %f) ", gain));
-//if (gain < 11)
-//gain = 5;
+if (gain < 11)
+gain *= 1;
 
 		jacobian1.m_angular = jacobian1.m_angular.Scale(-gain);
 
