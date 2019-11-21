@@ -30,7 +30,6 @@ dVehicleDifferential::dVehicleDifferential(dVehicleMultiBody* const chassis, dFl
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 
 	dFloat inertia = (2.0f / 5.0f) * mass * radius * radius;
-
 	m_frictionLost = inertia * (0.5f / dPi) * 60.0f;
 
 	m_proxyBody.SetMass(mass);

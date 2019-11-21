@@ -256,15 +256,16 @@ void dComplementaritySolver::dBodyState::IntegrateForce (dFloat timestep, const 
 
 void dComplementaritySolver::dBodyState::IntegrateVelocity (dFloat timestep)
 {
-	const dFloat D_MAX_ANGLE_STEP = dFloat (45.0f * dDegreeToRad);
-	const dFloat D_ANGULAR_TOL = dFloat (0.0125f * dDegreeToRad);
-
-	m_globalCentreOfMass += m_veloc.Scale (timestep); 
+	// this is the fucking bug cause the vehicle malfunction
+	const dFloat D_MAX_ANGLE_STEP = dFloat (90.0f * dDegreeToRad);
 	while ((m_omega.DotProduct3(m_omega) * timestep * timestep) > (D_MAX_ANGLE_STEP * D_MAX_ANGLE_STEP)) {
+		dAssert (0);
 		m_omega = m_omega.Scale (dFloat (0.8f));
 	}
 
 	// this is correct
+	const dFloat D_ANGULAR_TOL = dFloat (0.0125f * dDegreeToRad);
+	m_globalCentreOfMass += m_veloc.Scale (timestep); 
 	dFloat omegaMag2 = m_omega.DotProduct3(m_omega);
 	if (omegaMag2 > (D_ANGULAR_TOL * D_ANGULAR_TOL)) {
 		dFloat invOmegaMag = 1.0f / dSqrt (omegaMag2);

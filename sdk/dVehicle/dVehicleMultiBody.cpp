@@ -17,7 +17,7 @@
 #include "dVehicleManager.h"
 #include "dVehicleDifferential.h"
 
-static int xxxx;
+//static int xxxx;
 
 dVehicleMultiBody::dVehicleMultiBody(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
 	:dVehicle(body, localFrame, gravityMag)
@@ -574,8 +574,8 @@ void dVehicleMultiBody::PreUpdate(dFloat timestep)
 		}
 	}
 
-xxxx++;
-dTrace(("\nframe %d ", xxxx));
+//xxxx++;
+//dTrace(("\nframe %d ", xxxx));
 
 	ApplyExternalForce();
 	CalculateTireContacts(timestep);

@@ -125,9 +125,6 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 		}
 	}
 
-float xxx0 = 0;
-float xxx1 = 0;
-
 	{
 		// longitudinal force row
 		int index = constraintParams->m_count;
@@ -145,9 +142,6 @@ float xxx1 = 0;
 
 		omegaSpeed = dAbs(omegaSpeed);
 		linearSpeed = dAbs(linearSpeed);
-
-xxx0 = omegaSpeed;
-xxx1 = linearSpeed;
 
 		m_isLowSpeed = (omegaSpeed < 1.0f);
 
@@ -204,10 +198,8 @@ xxx1 = linearSpeed;
 	dFloat u = dAbs(m_tireModel.m_longitudinalSlip);
 	dFloat invden = 1.0f / (1.0f + u);
 
-if (tire->GetIndex() == 2) {
-//dTrace(("%d w=%f v=%f s=%f %f) ", tire->Get Index(), u, v));
-dTrace(("%d w=%f v=%f s=%f ", tire->GetIndex(), xxx0, xxx1, u, v));
-}
+if (tire->GetIndex() >= 2)
+dTrace(("%d uv(%f %f)\n", tire->GetIndex(), u, v));
 
 	m_tireModel.m_lateralSlip = v * invden;
 	m_tireModel.m_longitudinalSlip = u * invden;
