@@ -528,6 +528,8 @@ void dVehicleMultiBody::CalculateFreeDof(dFloat timestep)
 
 bool dVehicleMultiBody::CheckSleeping()
 {
+return false;
+
 	for (int i = 0; i < m_controlerCount; i ++) {
 		if (m_control[i]->ParamChanged()) {
 			m_sleepCounter = 0;

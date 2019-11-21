@@ -428,10 +428,6 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// save entity as use data
 		vehicle->SetUserData(vehicleEntity);
 
-		// save the vehicle chassis with the vehicle visual for update children matrices 
-		//VehicleUserData* const renderCallback = new VehicleUserData(vehicle);
-		//vehicleEntity->SetUserData(renderCallback);
-
 		//for (int i = 0; i < int((sizeof(m_gearMap) / sizeof(m_gearMap[0]))); i++) {
 		//	m_gearMap[i] = i;
 		//}
@@ -694,7 +690,7 @@ axisCount = 0;
 			driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
 			driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
 			driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene->GetKeyState('I'));
-			//dTrace(("%d\n", m_engineKeySwitch.GetPushButtonState()));
+			driverInput.m_ignitionKey = 1;
 
 			////driverInput.m_manualTransmission = !m_automaticTransmission.UpdatePushButton (scene, 0x0d);
 			//gear += m_gearUpKey.UpdateTrigger(scene->GetKeyState('M')) - m_gearUpKey.UpdateTrigger(scene->GetKeyState('N'));

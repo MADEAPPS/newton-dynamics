@@ -340,18 +340,16 @@ void dVehicleTire::CalculateFreeDof(dFloat timestep)
 	dVector tireOmega(m_proxyBody.GetOmega());
 	dVector chassisOmega(chassisBody->GetOmega());
 	dVector relativeOmega(tireOmega - chassisOmega);
-
-#if 0
-	dFloat m_omega = tireMatrix.m_front.DotProduct3(relativeOmega);
-//	dFloat omega1 = tireMatrix.m_front.DotProduct3(relativeOmega);
 	dAssert(tireMatrix.m_front.DotProduct3(chassisMatrix.m_front) > 0.998f);
 
-	dFloat cosAngle = tireMatrix.m_right.DotProduct3(chassisMatrix.m_right);
-	dFloat sinAngle = chassisMatrix.m_front.DotProduct3(chassisMatrix.m_right.CrossProduct(tireMatrix.m_right));
+#if 1
+	m_omega = tireMatrix.m_front.DotProduct3(relativeOmega);
+	const dFloat cosAngle = tireMatrix.m_right.DotProduct3(chassisMatrix.m_right);
+	const dFloat sinAngle = chassisMatrix.m_front.DotProduct3(chassisMatrix.m_right.CrossProduct(tireMatrix.m_right));
 	m_tireAngle += dAtan2(sinAngle, cosAngle);
 #else
 	// use verlet integration for tire angle
-	dFloat omega1 = tireMatrix.m_front.DotProduct3(relativeOmega);
+	const dFloat omega1 = tireMatrix.m_front.DotProduct3(relativeOmega);
 //dTrace(("%f\n", m_omega));
 	m_tireAngle += (m_omega + 0.5f * (omega1 - m_omega)) * timestep;
 	m_omega = omega1;

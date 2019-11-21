@@ -58,6 +58,7 @@ dFloat dVehicleEngine::dEngineMetricInfo::GetTorque (dFloat rpm) const
 			dFloat torque0 = m_torqueCurve[i - 1].m_torque;
 
 			dFloat torque = torque0 + (rpm - rpm0) * (torque1 - torque0) / (rpm1 - rpm0);
+torque = 100.0f;
 			return torque;
 		}
 	}
@@ -153,6 +154,18 @@ m_metricInfo.m_gearsCount = 4;
 //	if (m_gearTimer < 0) {
 
 	dFloat omega = dAbs (m_omega);
+static int xxxx;
+xxxx++;
+if (xxxx > 300)
+{
+SetGear(dEngineInfo::dGearRatioIndex(dEngineInfo::m_firstGear));
+return;
+}
+else
+{
+SetGear(dEngineInfo::dGearRatioIndex(dEngineInfo::m_neutralGear));
+return;
+}
 
 //dTrace (("(gear: %d) (throttle: %f) (omega: %f %f %f) ", m_currentGear, m_throttle, omega, m_metricInfo.m_rpmAtPeakTorque, m_metricInfo.m_rpmAtPeakHorsePower));
 //SetGear(dEngineInfo::dGearRatioIndex(dEngineInfo::m_firstGear + 1));
