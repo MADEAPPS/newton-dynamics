@@ -208,6 +208,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 		,m_waveSpeed(0.75f)
 		,m_wavePeriod (4.0f)
 		,m_waveAmplitud (0.25f)
+		,m_lock(0)
 	{
 	}
 
@@ -264,7 +265,8 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 
 	void OnDestroyBody(NewtonBody* const body)
 	{
-		// delete the visual entiry 
+		// delete the visual entity 
+		dCustomScopeLock lock (&m_lock);
 		DemoEntity* entiry = (DemoEntity*)NewtonBodyGetUserData (body);
 		DemoEntityManager* scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
 		scene->RemoveEntity(entiry);
@@ -305,6 +307,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 	dFloat m_waveSpeed;
 	dFloat m_wavePeriod;
 	dFloat m_waveAmplitud;
+	unsigned int m_lock;
 };
 
 
