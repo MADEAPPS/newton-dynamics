@@ -72,7 +72,7 @@ void dCustomTriggerManager::OnDestroyBody (NewtonBody* const body)
 		dCustomTriggerController::dTriggerManifest::dTreeNode* const passengerNode = controller.m_manifest.Find (body);
 		if (passengerNode) {
 			OnExit (&controller, body);
-//			dCustomScopeLock lock (&m_lock);
+			dCustomScopeLock lock (&m_lock____);
 			controller.m_manifest.Remove (passengerNode);
 		}
 	}

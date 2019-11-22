@@ -265,14 +265,14 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 
 	void OnDestroyBody(NewtonBody* const body)
 	{
+		// do the rest 
+		dCustomTriggerManager::OnDestroyBody(body);
+
 		// delete the visual entity 
 		dCustomScopeLock lock (&m_lock);
 		DemoEntity* entiry = (DemoEntity*)NewtonBodyGetUserData (body);
 		DemoEntityManager* scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
 		scene->RemoveEntity(entiry);
-
-		// do the rest 
-		dCustomTriggerManager::OnDestroyBody(body);
 	}
 
 	virtual void OnEnter(const dCustomTriggerController* const trigger, NewtonBody* const visitor) const
