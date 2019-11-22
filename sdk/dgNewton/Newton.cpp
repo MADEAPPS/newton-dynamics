@@ -2673,7 +2673,7 @@ NewtonCollision* NewtonFracturedCompoundPlaneClip (const NewtonCollision* const 
 		dgWorld* const world = (dgWorld*)collision->GetWorld();
 		dgCollisionCompoundFractured* const newCompound = compound->PlaneClip(dgVector (plane[0], plane[1], plane[2], plane[3]));
 		if (newCompound) {
-			dgCollisionInstance* const newCollision = world->CreateInstance (newCompound, collision->GetUserDataID(), dgGetIdentityMatrix());
+			dgCollisionInstance* const newCollision = world->CreateInstance (newCompound, int (collision->GetUserDataID()), dgGetIdentityMatrix());
 			newCompound->Release();
 			return (NewtonCollision*)newCollision;
 		}
@@ -3936,7 +3936,7 @@ int NewtonCollisionIsStaticShape (const NewtonCollision* const collision)
 
   See also: ::NewtonCollisionGetUserID, ::NewtonCreateBox, ::NewtonCreateSphere
 */
-void NewtonCollisionSetUserID(const NewtonCollision* const collision, unsigned id)
+void NewtonCollisionSetUserID(const NewtonCollision* const collision, dLong id)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
@@ -3954,7 +3954,7 @@ void NewtonCollisionSetUserID(const NewtonCollision* const collision, unsigned i
 
   See also: ::NewtonCreateBox, ::NewtonCreateSphere
 */
-unsigned NewtonCollisionGetUserID(const NewtonCollision* const collision)
+dLong NewtonCollisionGetUserID(const NewtonCollision* const collision)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;

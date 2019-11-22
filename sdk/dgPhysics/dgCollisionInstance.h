@@ -64,8 +64,8 @@ class dgCollisionInstance
 	void SetLocalMatrix (const dgMatrix& matrix);
 	void SetGlobalMatrix (const dgMatrix& matrix);
 
-	dgUnsigned32 GetUserDataID () const;
-	void SetUserDataID (dgUnsigned32 userData);
+	dgUnsigned64 GetUserDataID () const;
+	void SetUserDataID (dgUnsigned64 userData);
 
 	void* GetUserData () const;
 	void SetUserData (void* const userData);
@@ -301,12 +301,12 @@ DG_INLINE const dgCollisionInstance* dgCollisionInstance::GetParent () const
 	return m_parent;
 }
 
-DG_INLINE dgUnsigned32 dgCollisionInstance::GetUserDataID () const
+DG_INLINE dgUnsigned64 dgCollisionInstance::GetUserDataID () const
 {
 	return m_material.m_userId;
 }
 
-DG_INLINE void dgCollisionInstance::SetUserDataID (dgUnsigned32 userDataId)
+DG_INLINE void dgCollisionInstance::SetUserDataID (dgUnsigned64 userDataId)
 {
 	m_material.m_userId = userDataId;
 }

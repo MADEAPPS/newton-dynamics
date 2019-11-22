@@ -53,6 +53,7 @@ class dCustomParallelListener: public dCustomListener
 	virtual void PostStep(dFloat timestep, int threadID) {}
 	virtual void PreUpdate(dFloat timestep, int threadID) {}
 	virtual void PostUpdate(dFloat timestep, int threadID) {}
+	virtual void OnDestroyBody(NewtonBody* const body) {};
 
 	private:
 	static void ParallerListenPostStepCallback (NewtonWorld* const world, void* const userData, int threadIndex);

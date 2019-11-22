@@ -57,7 +57,8 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 
 			NewtonCollisionMaterial collisionMaterial;
 			NewtonCollisionGetMaterial (collision, &collisionMaterial);
-			collisionMaterial.m_userParam[0]= density;
+			collisionMaterial.m_userParam[0] = density;
+			collisionMaterial.m_userParam[1] = 0;
 			NewtonCollisionSetMaterial (collision, &collisionMaterial);
 		}
 
@@ -129,6 +130,13 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 					NewtonCollisionMaterial collisionMaterial;
 					NewtonCollisionGetMaterial(collision, &collisionMaterial);
 					const dFloat solidDentityFactor = collisionMaterial.m_userParam[0];
+
+					// test delete bodies inside trigger
+					collisionMaterial.m_userParam[1] += 1.0;
+					if (collisionMaterial.m_userParam[1] >= 60 * 10) {
+						NewtonDestroyBody (visitor);
+					}
+					NewtonCollisionSetMaterial (collision, &collisionMaterial);
 
 					// calculate the ratio of volumes an use it calculate a density equivalent
 					dFloat shapeVolume = NewtonConvexCollisionCalculateVolume (collision);
@@ -252,6 +260,17 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 		TriggerCallback* const userData = (TriggerCallback*) trigger->GetUserData();
 		delete userData;
 		dCustomTriggerManager::DestroyTrigger (trigger);
+	}
+
+	void OnDestroyBody(NewtonBody* const body)
+	{
+		// delete the visual entiry 
+		DemoEntity* entiry = (DemoEntity*)NewtonBodyGetUserData (body);
+		DemoEntityManager* scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+		scene->RemoveEntity(entiry);
+
+		// do the rest 
+		dCustomTriggerManager::OnDestroyBody(body);
 	}
 
 	virtual void OnEnter(const dCustomTriggerController* const trigger, NewtonBody* const visitor) const

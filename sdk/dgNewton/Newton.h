@@ -121,9 +121,9 @@ extern "C" {
 	typedef struct NewtonCollisionMaterial
 	{
 		void* m_userData;
-		int m_userId;
-		int m_userFlags0;
-		int m_userFlags1;
+		dLong m_userId;
+		dLong m_userFlags0;
+		dLong m_userFlags1;
 		dFloat m_userParam[8];
 	} NewtonCollisionMaterial;
 
@@ -807,8 +807,8 @@ extern "C" {
 	NEWTON_API void NewtonCollisionSetUserData (const NewtonCollision* const collision, void* const userData);
 	NEWTON_API void* NewtonCollisionGetUserData (const NewtonCollision* const collision);
 	
-	NEWTON_API void NewtonCollisionSetUserID (const NewtonCollision* const collision, unsigned id);
-	NEWTON_API unsigned NewtonCollisionGetUserID (const NewtonCollision* const collision);
+	NEWTON_API void NewtonCollisionSetUserID (const NewtonCollision* const collision, dLong id);
+	NEWTON_API dLong NewtonCollisionGetUserID (const NewtonCollision* const collision);
 
 	NEWTON_API void NewtonCollisionGetMaterial (const NewtonCollision* const collision, NewtonCollisionMaterial* const userData);
 	NEWTON_API void NewtonCollisionSetMaterial (const NewtonCollision* const collision, const NewtonCollisionMaterial* const userData);
