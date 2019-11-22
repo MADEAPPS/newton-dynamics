@@ -109,7 +109,7 @@ class dCustomTriggerManager: public dCustomParallelListener
 	dArray<dTriggerGuestPair> m_pairCache;
 	dFloat m_timestep;
 	int m_cacheCount;
-	unsigned m_lock____;
+	unsigned m_lock;
 	unsigned m_lru;
 };
 

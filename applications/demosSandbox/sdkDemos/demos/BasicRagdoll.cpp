@@ -88,8 +88,8 @@ class PassiveRagdollManager: public dModelManager
 			return 1;
 		}
 
-		int val0 = (collisionMaterial0.m_userFlags0 & collisionMaterial1.m_userFlags1);
-		int val1 = (collisionMaterial1.m_userFlags0 & collisionMaterial0.m_userFlags1);
+		dLong val0 = (collisionMaterial0.m_userFlags0 & collisionMaterial1.m_userFlags1);
+		dLong val1 = (collisionMaterial1.m_userFlags0 & collisionMaterial0.m_userFlags1);
 		return (val0 && val1) ? 1 : 0;
 	}
 

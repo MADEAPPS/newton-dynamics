@@ -79,7 +79,6 @@ void dCollisionNodeInfo::CalculateInertiaGeometry (dScene* const world, dVector&
 	centerOfMass = dVector (0.0f);
 }
 
-
 void dCollisionNodeInfo::SetShapeId (int id)
 {
 	m_shapeID = id;

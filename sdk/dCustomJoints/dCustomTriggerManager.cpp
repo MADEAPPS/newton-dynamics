@@ -23,7 +23,7 @@ dCustomTriggerManager::dCustomTriggerManager(NewtonWorld* const world)
 	,m_pairCache ()
 	,m_timestep(0.0f)
 	,m_cacheCount(0)
-	,m_lock____(0)
+	,m_lock(0)
 	,m_lru(0)
 {
 }
@@ -69,10 +69,10 @@ void dCustomTriggerManager::OnDestroyBody (NewtonBody* const body)
 {
 	for (dList<dCustomTriggerController>::dListNode* node = m_triggerList.GetFirst(); node; node = node->GetNext()) {
 		dCustomTriggerController& controller = node->GetInfo();
+		dCustomScopeLock lock(&m_lock);
 		dCustomTriggerController::dTriggerManifest::dTreeNode* const passengerNode = controller.m_manifest.Find (body);
 		if (passengerNode) {
 			OnExit (&controller, body);
-			dCustomScopeLock lock (&m_lock____);
 			controller.m_manifest.Remove (passengerNode);
 		}
 	}

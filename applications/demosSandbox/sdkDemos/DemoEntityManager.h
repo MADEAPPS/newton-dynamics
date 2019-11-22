@@ -221,6 +221,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 
 	unsigned m_profilerMode;
 	unsigned m_contactLock;
+	unsigned m_deleteLock;
 	dList<NewtonJoint*> m_contactList;
 
 	static SDKDemos m_demosSelection[];

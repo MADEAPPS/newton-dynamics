@@ -260,6 +260,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_showRaycastHit(false)
 	,m_profilerMode(0)
 	,m_contactLock(0)
+	,m_deleteLock(0)
 	,m_contactList()
 {
 	// Setup window
@@ -532,6 +533,7 @@ void DemoEntityManager::RemoveEntity (dListNode* const entNode)
 
 void DemoEntityManager::RemoveEntity (DemoEntity* const ent)
 {
+	dCustomScopeLock lock(&m_deleteLock);
 	for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) {
 		if (node->GetInfo() == ent) {
 			RemoveEntity (node);

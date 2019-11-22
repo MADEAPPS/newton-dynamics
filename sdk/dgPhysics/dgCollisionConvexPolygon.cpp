@@ -592,7 +592,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 			m_faceClipSize = proxy.m_instance0->m_childShape->GetBoxMaxRadius();
 		}
 
-		const dgInt32 hullId = proxy.m_instance0->GetUserDataID();
+		const dgInt64 hullId = proxy.m_instance0->GetUserDataID();
 		if (inside & !proxy.m_intersectionTestOnly) {
 			const dgMatrix& matrixInstance0 = proxy.m_instance0->m_globalMatrix;
 			dgVector normalInHull(matrixInstance0.UnrotateVector(m_normal.Scale(dgFloat32(-1.0f))));
@@ -733,7 +733,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
 	}
 
-	const dgInt32 hullId = hull->GetUserDataID();
+	const dgInt64 hullId = hull->GetUserDataID();
 	if (inside & !proxy.m_intersectionTestOnly) {
 		penetration = dgMax(dgFloat32(0.0f), penetration);
 		dgAssert(penetration >= dgFloat32(0.0f));

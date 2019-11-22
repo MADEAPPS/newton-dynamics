@@ -52,11 +52,10 @@ dCollisionTreeNodeInfo::dCollisionTreeNodeInfo(NewtonCollision* const tree)
 	dAssert (record.m_collisionType == SERIALIZE_ID_TREE);
 	SetName ("Tree collision");
 	SetTransform (offsetMatrix);
-	SetShapeId (record.m_collisionMaterial.m_userId);
+	SetShapeId (int (record.m_collisionMaterial.m_userId));
 
 	CalculateGeometryProperies (tree, m_geometricInertia, m_geometricCenterAndVolume); 
 }
-
 
 dCollisionTreeNodeInfo::~dCollisionTreeNodeInfo(void)
 {

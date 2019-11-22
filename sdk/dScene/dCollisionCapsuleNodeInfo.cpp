@@ -56,7 +56,7 @@ dCollisionCapsuleNodeInfo::dCollisionCapsuleNodeInfo(NewtonCollision* const cyli
 	m_height = record.m_capsule.m_height;
 
 	SetTransform (offsetMatrix);
-	SetShapeId (record.m_collisionMaterial.m_userId);
+	SetShapeId (int(record.m_collisionMaterial.m_userId));
 
 	CalculateGeometryProperies (cylinder, m_geometricInertia, m_geometricCenterAndVolume); 
 }
