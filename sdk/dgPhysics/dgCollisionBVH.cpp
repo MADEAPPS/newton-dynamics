@@ -88,13 +88,20 @@ void dgCollisionBVH::SetCollisionRayCastCallback (dgCollisionBVHUserRayCastCallb
 	m_userRayCastCallback = rayCastCallback;
 }
 
-
 void dgCollisionBVH::EndBuild(dgInt32 optimize)
 {
 	dgVector p0;
 	dgVector p1;
 
 	bool state = optimize ? true : false;
+
+#ifdef _DEBUG
+	if (state && (optimize >> 1)) {
+		char debugMesh[256];
+		sprintf (debugMesh, "debugMesh_%d.ply", optimize-1);
+		m_builder->SavePLY(debugMesh);
+	}
+#endif
 
 	m_builder->End(state);
 	Create (*m_builder, state);

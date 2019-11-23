@@ -1178,7 +1178,7 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* const world, DemoEntity* cons
 			}
 		}
 	}
-	NewtonTreeCollisionEndBuild(collision, optimize ? 1 : 0);
+	NewtonTreeCollisionEndBuild(collision, optimize ? 2 : 0);
 
 
 	// test Serialization
