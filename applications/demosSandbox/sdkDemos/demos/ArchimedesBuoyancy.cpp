@@ -21,9 +21,9 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 		{
 		}
 
-		virtual void OnEnter(NewtonBody* const visitor){}
-		virtual void OnInside(NewtonBody* const visitor){}
-		virtual void OnExit(NewtonBody* const visitor){}
+		virtual void OnEnter(NewtonBody* const visitor, dFloat timestep){}
+		virtual void OnInside(NewtonBody* const visitor, dFloat timestep){}
+		virtual void OnExit(NewtonBody* const visitor, dFloat timestep){}
 
 		virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext, const NewtonBody* const visitor) const {}
 
@@ -48,9 +48,9 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 			m_waterSufaceRestHeight = floor.m_y;
 		}
 
-		void OnEnter(NewtonBody* const visitor)
+		void OnEnter(NewtonBody* const visitor, dFloat timestep)
 		{
-			TriggerCallback::OnEnter(visitor);
+			TriggerCallback::OnEnter(visitor, timestep);
 			// make some random density, and store on the collision shape for more interesting effect. 
 			dFloat density = 1.1f + dGaussianRandom (0.4f);
 			NewtonCollision* const collision = NewtonBodyGetCollision(visitor);
@@ -99,14 +99,14 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 			return surfacePlane;
 		}
 
-		void OnInside(NewtonBody* const visitor)
+		void OnInside(NewtonBody* const visitor, dFloat timestep)
 		{
 			dFloat Ixx;
 			dFloat Iyy;
 			dFloat Izz;
 			dFloat mass;
 
-			TriggerCallback::OnInside(visitor);
+			TriggerCallback::OnInside(visitor, timestep);
 			NewtonBodyGetMass(visitor, &mass, &Ixx, &Iyy, &Izz);
 			if (mass > 0.0f) {
 				dMatrix matrix;
@@ -130,13 +130,6 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 					NewtonCollisionMaterial collisionMaterial;
 					NewtonCollisionGetMaterial(collision, &collisionMaterial);
 					const dFloat solidDentityFactor = collisionMaterial.m_userParam[0];
-
-					// test delete bodies inside trigger
-					collisionMaterial.m_userParam[1] += 1.0;
-					if (collisionMaterial.m_userParam[1] >= 60 * 10) {
-						NewtonDestroyBody (visitor);
-					}
-					NewtonCollisionSetMaterial (collision, &collisionMaterial);
 
 					// calculate the ratio of volumes an use it calculate a density equivalent
 					dFloat shapeVolume = NewtonConvexCollisionCalculateVolume (collision);
@@ -162,6 +155,15 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 					veloc = veloc.Scale(viscousDrag);
 					NewtonBodySetOmega(visitor, &omega[0]);
 					NewtonBodySetVelocity(visitor, &veloc[0]);
+
+
+					// test delete bodies inside trigger
+					collisionMaterial.m_userParam[1] += timestep;
+					NewtonCollisionSetMaterial(collision, &collisionMaterial);
+					if (collisionMaterial.m_userParam[1] >= 30.0f) {
+						// delete body after 2 minutes inside the pool
+						NewtonDestroyBody(visitor);
+					}
 				}
 			}
 		}
@@ -273,26 +275,26 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 		scene->RemoveEntity(entiry);
 	}
 
-	virtual void OnEnter(const dCustomTriggerController* const trigger, NewtonBody* const visitor) const
+	virtual void OnEnter(const dCustomTriggerController* const trigger, dFloat timestep, NewtonBody* const visitor) const
 	{
 		//dTrace(("enter\n"));
 		TriggerCallback* const callback = (TriggerCallback*) trigger->GetUserData();
-		callback->OnEnter(visitor);
+		callback->OnEnter(visitor, timestep);
 	}
 
-	virtual void OnExit(const dCustomTriggerController* const trigger, NewtonBody* const visitor) const 
+	virtual void OnExit(const dCustomTriggerController* const trigger, dFloat timestep, NewtonBody* const visitor) const 
 	{
 		//dTrace(("exit\n"));
 		TriggerCallback* const callback = (TriggerCallback*) trigger->GetUserData();
-		callback->OnExit(visitor);
+		callback->OnExit(visitor, timestep);
 	}
 		
-	virtual void WhileIn (const dCustomTriggerController* const trigger, NewtonBody* const visitor) const
+	virtual void WhileIn (const dCustomTriggerController* const trigger, dFloat timestep, NewtonBody* const visitor) const
 	{
 		// each trigger has it own callback for some effect 
 		//dTrace(("in pool\n"));
 		TriggerCallback* const callback = (TriggerCallback*) trigger->GetUserData();
-		callback->OnInside(visitor);
+		callback->OnInside(visitor, timestep);
 	}
 
 	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext, const dCustomTriggerController* const trigger, const NewtonBody* const visitor) const
@@ -352,6 +354,6 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene)
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CONE_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _CHAMFER_CYLINDER_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _REGULAR_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
-//	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
+	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _COMPOUND_CONVEX_CRUZ_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 	AddPrimitiveArray(scene, 10.0f, location, size, count, count, 5.0f, _RANDOM_CONVEX_HULL_PRIMITIVE, defaultMaterialID, shapeOffsetMatrix);
 }
