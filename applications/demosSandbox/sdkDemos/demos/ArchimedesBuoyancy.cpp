@@ -226,7 +226,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 
 static int xxx;
 xxx ++;
-if (xxx % 10 == 0){
+if (xxx % 30 == 0){
 NewtonWorld* world = GetWorld();
 int i = 0; 
 for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body))

@@ -1179,8 +1179,6 @@ dgDeadBodies::dgDeadBodies(dgMemoryAllocator* const allocator)
 
 void dgDeadBodies::DestroyBody(dgBody* const body)
 {
-	dgScopeSpinLock lock(&m_lock);
-
 	if (body->m_destructor) {
 		body->m_destructor(*body);
 	}
@@ -1188,36 +1186,37 @@ void dgDeadBodies::DestroyBody(dgBody* const body)
 	body->SetMatrixUpdateCallback (NULL);
 	body->SetExtForceAndTorqueCallback (NULL);
 
+	for (dgBodyMasterListRow::dgListNode* node = body->GetMasterList()->GetInfo().GetLast(); node; node = node->GetPrev()) {
+		dgConstraint* const joint = node->GetInfo().m_joint;
+		dgAssert(joint);
+		if (joint) {
+			if (joint->GetId() == dgConstraint::m_contactConstraint) {
+				dgContact* const contactJoint = (dgContact*)joint;
+				contactJoint->m_killContact = 1;
+			} else {
+				#ifdef _DEBUG
+					for (node = node->GetPrev(); node; node = node->GetPrev()) {
+						dgAssert (node->GetInfo().m_joint->GetId() != dgConstraint::m_contactConstraint);
+					}
+				#endif
+				break;
+			}
+		}
+	}
+
+	dgScopeSpinLock lock(&m_lock);
 	Insert (body, body);
 }
 
 void dgDeadBodies::DestroyBodies(dgWorld& world)
 {
-	dgScopeSpinLock lock(&m_lock);
+//	dgScopeSpinLock lock(&m_lock);
 	if (GetCount()) {
+		world.m_broadPhase->DeleteDeadContact(0.0f);
 		Iterator iter(*this);
 		for (iter.Begin(); iter; iter++) {
 			dgTreeNode* const bodyNode = iter.GetNode();
 			dgBody* const body = bodyNode->GetInfo();
-
-			for (dgBodyMasterListRow::dgListNode* node = body->GetMasterList()->GetInfo().GetFirst(); node; node = node->GetNext()) {
-				dgConstraint* const joint = node->GetInfo().m_joint;
-				dgAssert(joint);
-				if (joint && (joint->GetId() == dgConstraint::m_contactConstraint)) {
-					dgContact* const contactJoint = (dgContact*)joint;
-					contactJoint->m_killContact = 1;
-				}
-			}
-		}
-
-		world.m_broadPhase->DeleteDeadContact(0.0f);
-		for (iter.Begin(); iter; iter++) {
-			dgTreeNode* const bodyNode = iter.GetNode();
-			dgBody* const body = bodyNode->GetInfo();
-
-			//if (body->m_destructor) {
-			//	body->m_destructor(*body);
-			//}
 
 			if (world.m_disableBodies.Find(body)) {
 				world.m_disableBodies.Remove(body);
