@@ -1188,19 +1188,9 @@ void dgDeadBodies::DestroyBody(dgBody* const body)
 
 	for (dgBodyMasterListRow::dgListNode* node = body->GetMasterList()->GetInfo().GetLast(); node; node = node->GetPrev()) {
 		dgConstraint* const joint = node->GetInfo().m_joint;
-		dgAssert(joint);
-		if (joint) {
-			if (joint->GetId() == dgConstraint::m_contactConstraint) {
-				dgContact* const contactJoint = (dgContact*)joint;
-				contactJoint->m_killContact = 1;
-			} else {
-				#ifdef _DEBUG
-					for (node = node->GetPrev(); node; node = node->GetPrev()) {
-						dgAssert (node->GetInfo().m_joint->GetId() != dgConstraint::m_contactConstraint);
-					}
-				#endif
-				break;
-			}
+		if (joint && (joint->GetId() == dgConstraint::m_contactConstraint)) {
+			dgContact* const contactJoint = (dgContact*)joint;
+			contactJoint->m_killContact = 1;
 		}
 	}
 

@@ -18,9 +18,9 @@
 
 #define PHYSICS_WORLD_SCALE			50.0f											// conversion from meters to world units
 
-#define TABLE_WIDTH					(0.508f * PHYSICS_WORLD_SCALE)					// 20 inches
-#define TABLE_LENGTH				(5.08f * PHYSICS_WORLD_SCALE)					// 200 inches (16' 8")
-#define TABLE_HEIGHT				(0.0762f * PHYSICS_WORLD_SCALE)					// 3 inches
+//#define TABLE_WIDTH					(0.508f * PHYSICS_WORLD_SCALE)					// 20 inches
+//#define TABLE_LENGTH				(5.08f * PHYSICS_WORLD_SCALE)					// 200 inches (16' 8")
+//#define TABLE_HEIGHT				(0.0762f * PHYSICS_WORLD_SCALE)					// 3 inches
 
 #define WEIGHT_DIAMETER				(0.062f * PHYSICS_WORLD_SCALE)
 #define WEIGHT_RADIUS				(WEIGHT_DIAMETER * 0.5f)
@@ -32,21 +32,8 @@
 #define CAMERA_Y					(0.26f * PHYSICS_WORLD_SCALE)
 #define CAMERA_Z					(-3.0f * PHYSICS_WORLD_SCALE)
 
-// Material data
-enum eSBMaterials
-{
-	SBMaterial_WEIGHT,
-	SBMaterial_SURFACE,
 
-	SB_NUM_MATERIALS
-};
-
-
-static void	NewtonRigidBodySetForceCB(const NewtonBody* const body, dFloat timestep, int threadIndex);
-static void PhysicsNewton_CollisionPuckSurfaceCB(const NewtonJoint *pContactJoint,dFloat fTimeStep,int ThreadIndex);
-//static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, dFloat length);
-
-
+/*
 class PuckEntity: public DemoEntity
 {
 	public: 
@@ -162,6 +149,7 @@ void NewtonRigidBodySetForceCB(const NewtonBody* const body, dFloat timestep, in
 	NewtonBodySetForce(body, force);
 }
 
+
 static void PhysicsNewton_CollisionPuckSurfaceCB(const NewtonJoint *pContactJoint,dFloat fTimeStep,int ThreadIndex)
 {
 	dVector Position(0.0f);
@@ -193,72 +181,75 @@ static void PhysicsNewton_CollisionPuckSurfaceCB(const NewtonJoint *pContactJoin
 //		NewtonMaterialSetContactFrictionState (material, 0, 1);
 	}
 }
+*/
+
+
+static void AddGravityBodies (DemoEntityManager* const scene, NewtonBody* const floor)
+{
+	NewtonWorld* const world = scene->GetNewton();
+	dVector size(0.5f, 0.5f, 0.5f, 0.0f);
+
+	dMatrix location (dGetIdentityMatrix());
+
+	location.m_posit.m_y = 4.0f;
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
+	DemoMesh* const geometry = new DemoMesh("table", scene->GetShaderCache(), collision, "frowny.tga", "logo_php.tga", "smilli.tga");
+	for (int i = 0; i < 4; i ++) {
+		location.m_posit.m_z = -5.0f;
+		for (int j = 0; j < 4; j ++) {
+			NewtonBody* const box = CreateSimpleSolid(scene, geometry, 10.0f, location, collision, 0);
+
+			// constrain these object to motion on the plane only
+			dMatrix matrix; 
+			NewtonBodyGetMatrix (box, &matrix[0][0]);
+			new dCustomPlane (matrix.m_posit, matrix.m_front, box);
+
+			location.m_posit.m_z += 2.5f;
+		}
+		location.m_posit.m_y += 2.0f;
+	}
+
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+}
+
+static NewtonBody* CreateBackground (DemoEntityManager* const scene)
+{
+	NewtonWorld* const world = scene->GetNewton();
+	dVector tableSize(10.0f, 2.0f, 200.0f, 0.0f);
+
+	// create the shape and visual mesh as a common data to be re used
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), tableSize, _BOX_PRIMITIVE, 0);
+
+	DemoMesh* const geometry = new DemoMesh("table", scene->GetShaderCache(), collision, NULL, "wood_3.tga", NULL);
+
+	dMatrix matrix (dGetIdentityMatrix());
+	NewtonBody* const tableBody = CreateSimpleSolid(scene, geometry, 0.0f, matrix, collision, 0);
+
+	geometry->Release();
+	NewtonDestroyCollision (collision);
+
+	return tableBody;
+}
+
 
 // create physics scene
-void PuckSlide (DemoEntityManager* const scene)
+void FlatLandGame (DemoEntityManager* const scene)
 {
 	scene->CreateSkyBox();
 
-	NewtonWorld* const world = scene->GetNewton();
+//	NewtonWorld* const world = scene->GetNewton();
 
-	int	materialGroupIDs[SB_NUM_MATERIALS];
+	// make a floor for a 2d world
+	NewtonBody* const ground = CreateBackground (scene);
 
-	// Create groups
-	for (int i = 0; i < SB_NUM_MATERIALS; i++)
-	{
-		materialGroupIDs[i] = NewtonMaterialCreateGroupID(world);
-	}
-	
-	// Setup the material data
-	NewtonMaterialSetDefaultSoftness(world, materialGroupIDs[SBMaterial_WEIGHT], materialGroupIDs[SBMaterial_SURFACE], 0.15f);
-	NewtonMaterialSetDefaultElasticity(world, materialGroupIDs[SBMaterial_WEIGHT], materialGroupIDs[SBMaterial_SURFACE], 0.30f);
-	NewtonMaterialSetDefaultFriction(world, materialGroupIDs[SBMaterial_WEIGHT], materialGroupIDs[SBMaterial_SURFACE], 0.05f, 0.04f);
-
-
-	// setup callbacks for collisions between two material groups
-	NewtonMaterialSetCollisionCallback(world,materialGroupIDs[SBMaterial_WEIGHT],materialGroupIDs[SBMaterial_SURFACE],NULL,PhysicsNewton_CollisionPuckSurfaceCB);
-
-	///////
-	// Add table
-	{
-		dVector tableSize(TABLE_LENGTH, TABLE_HEIGHT, TABLE_WIDTH, 0.0f);
-
-		// create the shape and visual mesh as a common data to be re used
-		NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), tableSize, _BOX_PRIMITIVE, materialGroupIDs[SBMaterial_SURFACE]);
-
-		DemoMesh* const geometry = new DemoMesh("cylinder_1", scene->GetShaderCache(), collision, "wood_3.tga", "wood_3.tga", "wood_3.tga");
-
-		dMatrix matrix = dGetIdentityMatrix();
-		matrix.m_posit.m_x = 0.0f;
-		matrix.m_posit.m_z = 0.0f;
-		matrix.m_posit.m_y = 0.0f;
-		NewtonBody* const tableBody = CreateSimpleSolid (scene, geometry, 0.0, matrix, collision, materialGroupIDs[SBMaterial_SURFACE]);
-
-		// this is deprecated, use NewtonBodySetMassProperties
-		//NewtonBodySetMassMatrix(tableBody, 0.0f, 1.0f, 1.0f, 1.0f);
-		NewtonBodySetMassProperties(tableBody, 0.0f, NewtonBodyGetCollision(tableBody));
-
-		NewtonBodySetMaterialGroupID(tableBody, materialGroupIDs[SBMaterial_SURFACE]);
-
-		// it is not wise to se static body to continuous collision mode
-		//NewtonBodySetContinuousCollisionMode(tableBody, 1);
-
-		// do not forget to release the assets	
-		geometry->Release(); 
-
-		// the collision need to be destroy, the body is using an instance no a reference
-		NewtonDestroyCollision (collision);
-	}
-	///////
-
-	// Add puck
-	{
-		new PuckEntity (scene, materialGroupIDs[SBMaterial_WEIGHT]);
-	}
+	// add some object constrained to a move on the x plane
+	AddGravityBodies (scene, ground);
 
 	// place camera into position
-	dMatrix camMatrix (dPitchMatrix(20.0f * dDegreeToRad));
+	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
-	dVector origin (CAMERA_Z, CAMERA_Y, CAMERA_X, 0.0f);
-	scene->SetCameraMatrix(rot, origin);
+	camMatrix.m_posit.m_y = 10.0f;
+	camMatrix.m_posit.m_x = -30.0f;
+	scene->SetCameraMatrix(rot, camMatrix.m_posit);
 }

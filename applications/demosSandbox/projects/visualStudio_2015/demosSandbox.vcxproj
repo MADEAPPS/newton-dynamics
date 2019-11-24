@@ -59,6 +59,7 @@
     <ClCompile Include="..\..\sdkDemos\demos\ConvexApproximation.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ConvexCast.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\DynamicRagdoll.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\FlatLandGame.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\HeavyVehicles.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\HeighFieldCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\Hexapod.cpp" />
@@ -71,7 +72,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\NewtonCradle.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ObjectPlacement.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\PrimitiveCollision.cpp" />
-    <ClCompile Include="..\..\sdkDemos\demos\PuckSlide.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ScaledCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SceneCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ServoJoints.cpp" />

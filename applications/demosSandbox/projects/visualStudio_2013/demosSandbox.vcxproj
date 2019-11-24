@@ -71,7 +71,7 @@
     <ClCompile Include="..\..\sdkDemos\demos\MultiRayCasting.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\GyroscopyPrecession.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\PrimitiveCollision.cpp" />
-    <ClCompile Include="..\..\sdkDemos\demos\PuckSlide.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\FlatLandGame.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ScaledCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SceneCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ServoJoints.cpp" />

@@ -50,13 +50,13 @@
 //#define DEFAULT_SCENE	14		// infinite user plane collision
 //#define DEFAULT_SCENE	15		// user height field Collision
 //#define DEFAULT_SCENE	16		// compound Collision
-#define DEFAULT_SCENE	17		// simple Archimedes buoyancy
+//#define DEFAULT_SCENE	17		// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	18		// uniform Scaled Collision
 //#define DEFAULT_SCENE	19		// non uniform Scaled Collision
 //#define DEFAULT_SCENE	20		// scaled mesh collision
 //#define DEFAULT_SCENE	21		// continuous collision
 //#define DEFAULT_SCENE	22		// paper wall continuous collision
-//#define DEFAULT_SCENE	23		// puck slide continuous collision
+#define DEFAULT_SCENE	23		// Flatland Game
 //#define DEFAULT_SCENE	24		// simple convex decomposition
 //#define DEFAULT_SCENE	25		// scene Collision
 //#define DEFAULT_SCENE	26		// simple boolean operators 
@@ -102,7 +102,7 @@ void NonUniformScaledCollision (DemoEntityManager* const scene);
 void ScaledMeshCollision (DemoEntityManager* const scene);
 void ContinuousCollision (DemoEntityManager* const scene);
 void ContinuousCollision1 (DemoEntityManager* const scene);
-void PuckSlide (DemoEntityManager* const scene);
+void FlatLandGame (DemoEntityManager* const scene);
 void SceneCollision (DemoEntityManager* const scene);
 void CompoundCollision(DemoEntityManager* const scene);
 void AlchimedesBuoyancy(DemoEntityManager* const scene);
@@ -159,7 +159,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Scaled mesh collision", "demonstrate scaling mesh scaling collision", ScaledMeshCollision},
 	{"Continuous collision", "show continuous collision", ContinuousCollision },
 	{"Paper wall continuous collision", "show fast continuous collision", ContinuousCollision1 },
-	{"Puck slide", "show continuous collision", PuckSlide },
+	{"Flat Land Game", "show usage of tow dimension joints", FlatLandGame },
 	{"Simple convex decomposition", "demonstrate convex decomposition and compound collision", SimpleConvexApproximation},
 	{"Multi geometry collision", "show static mesh with the ability of moving internal parts", SceneCollision},
 	{"Simple boolean operations", "demonstrate simple boolean operations ", SimpleBooleanOperations},

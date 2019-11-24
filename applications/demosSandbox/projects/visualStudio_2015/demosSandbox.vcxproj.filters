@@ -99,9 +99,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\ScaledCollision.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\PuckSlide.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\PrimitiveCollision.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -200,6 +197,9 @@
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\toolBox\dSoundManager.cpp">
       <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\FlatLandGame.cpp">
+      <Filter>demos</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
