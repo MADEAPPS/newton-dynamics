@@ -753,6 +753,12 @@ void DemoEntityManager::ShowMainMenuBar()
 			if (ImGui::MenuItem("Deserialize", "")) {
 				mainMenu = 5;
 			}
+
+			ImGui::Separator();
+			if (ImGui::MenuItem("import ply file", "")) {
+				mainMenu = 6;
+			}
+
 			ImGui::Separator();
 			if (ImGui::MenuItem("Exit", "")) {
 				glfwSetWindowShouldClose (m_mainFrame, 1);
@@ -864,12 +870,6 @@ void DemoEntityManager::ShowMainMenuBar()
 				ApplyMenuOptions();
 				LoadScene (fileName);
 				ResetTimer();
-
-				//MakeViualMesh context(m_world);
-				//dScene testScene(m_world);
-				//testScene.Deserialize(fileName);
-				//dList<NewtonBody*> loadedBodies;
-				//testScene.SceneToNewtonWorld(m_world, loadedBodies);
 			}
 			break;
 		}
@@ -883,6 +883,16 @@ void DemoEntityManager::ShowMainMenuBar()
 				dScene testScene(m_world);
 				testScene.NewtonWorldToScene(m_world, &context);
 				testScene.Serialize(fileName);
+			}
+			break;
+		}
+
+		case 4:
+		{
+			m_currentScene = -1;
+			char fileName[1024];
+			if (dGetSaveFileNameSerialization(fileName, 1024)) {
+				SerializedPhysicScene(fileName);
 			}
 			break;
 		}
@@ -901,12 +911,16 @@ void DemoEntityManager::ShowMainMenuBar()
 			break;
 		}
 
-		case 4:
+		case 6:
 		{
+			// open Scene
 			m_currentScene = -1;
 			char fileName[1024];
-			if (dGetSaveFileNameSerialization(fileName, 1024)) {
-				SerializedPhysicScene(fileName);
+			Cleanup();
+			if (dGetOpenFileNamePLY(fileName, 1024)) {
+				ApplyMenuOptions();
+				ImportPLYfile(fileName);
+				ResetTimer();
 			}
 			break;
 		}
@@ -1153,6 +1167,12 @@ void DemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary& d
 		DemoMeshInterface* const mesh = iter.GetNode()->GetInfo();
 		mesh->Release();
 	}
+}
+
+void DemoEntityManager::ImportPLYfile (const char* const fileName)
+{
+	m_collisionDisplayMode = 2;
+	CreatePLYMesh (this, fileName, true);
 }
 
 void DemoEntityManager::LoadScene (const char* const fileName)

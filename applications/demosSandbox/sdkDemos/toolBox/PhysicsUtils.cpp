@@ -1178,8 +1178,8 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* const world, DemoEntity* cons
 			}
 		}
 	}
-	NewtonTreeCollisionEndBuild(collision, optimize ? 2 : 0);
-
+	//NewtonTreeCollisionEndBuild(collision, optimize ? 2 : 0);
+	NewtonTreeCollisionEndBuild(collision, optimize ? 1 : 0);
 
 	// test Serialization
 #if 0
@@ -1200,8 +1200,6 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* const world, DemoEntity* cons
 
 	return collision;
 }
-
-
 
 NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent, bool optimize)
 {
@@ -1251,7 +1249,6 @@ NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent
 	return level;
 }
 
-
 NewtonBody* AddFloorBox(DemoEntityManager* const scene, const dVector& origin, const dVector& size)
 {
 	// create the shape and visual mesh as a common data to be re used
@@ -1272,6 +1269,74 @@ NewtonBody* AddFloorBox(DemoEntityManager* const scene, const dVector& origin, c
 	geometry->Release();
 	NewtonDestroyCollision(collision);
 	return body;
+}
+
+NewtonBody* CreatePLYMesh (DemoEntityManager* const scene, const char* const fileName, bool optimized)
+{
+	FILE* const file = fopen(fileName, "rb");
+	if (!file) {
+		return NULL;
+	}
+
+	char buffer[265];
+
+	int faceCount;
+	int vertexCount;
+	fgets(buffer, sizeof (buffer), file);
+	fgets(buffer, sizeof (buffer), file);
+	fscanf(file, "%s %s %d\n", buffer, buffer, &vertexCount);
+	fgets(buffer, sizeof (buffer), file);
+	fgets(buffer, sizeof (buffer), file);
+	fgets(buffer, sizeof (buffer), file);
+	fscanf(file, "%s %s %d\n", buffer, buffer, &faceCount);
+	fgets(buffer, sizeof (buffer), file);
+	fgets(buffer, sizeof (buffer), file);
+
+	dArray<dVector> points(vertexCount);
+	for (int i = 0; i < vertexCount; i++) {
+		dFloat x;
+		dFloat y;
+		dFloat z;
+		fscanf(file, "%f %f %f\n", &x, &y, &z);
+		points[i] = dVector(x, y, z, dFloat(0.0f));
+	}
+
+	NewtonWorld* const world = scene->GetNewton();
+
+	// create the collision tree geometry
+	NewtonCollision* collision = NewtonCreateTreeCollision(world, 0);
+
+	// prepare to create collision geometry
+	NewtonTreeCollisionBeginBuild(collision);
+	for (int i = 0; i < faceCount; i++) {
+		int count;
+		dFloat face[32][3];
+		fscanf(file, "%d", &count);
+		for (int j = 0; j < count; j++) {
+			int index;
+			fscanf(file, "%d", &index);
+			face[j][0] = points[index][0];
+			face[j][1] = points[index][1];
+			face[j][2] = points[index][2];
+		}
+		fscanf(file, "\n");
+		NewtonTreeCollisionAddFace(collision, 3, &face[0][0], 3 * sizeof (dFloat), 0);
+	}
+	fclose(file);
+
+	NewtonTreeCollisionEndBuild(collision, 1);
+
+	// create the level rigid body
+	dMatrix matrix (dGetIdentityMatrix());
+	NewtonBody* const level = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
+	NewtonDestroyCollision(collision);
+
+	// save the pointer to the graphic object with the body.
+//	NewtonBodySetUserData(level, ent);
+
+	NewtonInvalidateCache(world);
+
+	return level;
 }
 
 NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const name, bool optimized)
