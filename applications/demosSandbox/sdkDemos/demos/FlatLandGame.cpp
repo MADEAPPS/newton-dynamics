@@ -69,7 +69,7 @@ static void AttachLimbBody (DemoEntityManager* const scene, const dVector& dir, 
 	dVector size(0.4f, 0.25f, 0.75f, 0.0f);
 
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-	DemoMesh* const geometry = new DemoMesh("box", scene->GetShaderCache(), collision, "frowny.tga", "logo_php.tga", "smilli.tga");
+	DemoMesh* const geometry = new DemoMesh("box", scene->GetShaderCache(), collision, "smilli.tga", "logo_php.tga", "frowny.tga");
 
 	dMatrix location;
 	NewtonBodyGetMatrix(parent, &location[0][0]);
@@ -97,7 +97,7 @@ static void AddRagdollBodies(DemoEntityManager* const scene, NewtonBody* const f
 	location.m_posit.m_y = 4.0f;
 
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-	DemoMesh* const geometry = new DemoMesh("box", scene->GetShaderCache(), collision, "frowny.tga", "logo_php.tga", "smilli.tga");
+	DemoMesh* const geometry = new DemoMesh("box", scene->GetShaderCache(), collision, "smilli.tga", "logo_php.tga", "frowny.tga");
 
 	location.m_posit.m_z = 5.0f;
 	for (int i = 0; i < 4; i++) {
@@ -129,7 +129,7 @@ static void AddGravityBodies (DemoEntityManager* const scene, NewtonBody* const 
 
 	location.m_posit.m_y = 4.0f;
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-	DemoMesh* const geometry = new DemoMesh("table", scene->GetShaderCache(), collision, "frowny.tga", "logo_php.tga", "smilli.tga");
+	DemoMesh* const geometry = new DemoMesh("table", scene->GetShaderCache(), collision, "smilli.tga", "logo_php.tga", "frowny.tga");
 	for (int i = 0; i < 4; i ++) {
 		location.m_posit.m_z = -5.0f;
 		for (int j = 0; j < 4; j ++) {
