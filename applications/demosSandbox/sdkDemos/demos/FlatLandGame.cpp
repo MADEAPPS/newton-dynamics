@@ -32,7 +32,7 @@ class Plane2dUpVector: public dCustomPlane
 		CalculateGlobalMatrix(matrix0, matrix1);
 
 		dFloat pitchAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
-		NewtonUserJointAddAngularRow(m_joint, -pitchAngle, &matrix1.m_front[0]);
+		NewtonUserJointAddAngularRow(m_joint, pitchAngle, &matrix1.m_front[0]);
 
 		// add rows to fix matrix body the the plane
 		dCustomPlane::SubmitConstraints(timestep, threadIndex);
