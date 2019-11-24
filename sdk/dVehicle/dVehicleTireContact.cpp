@@ -198,8 +198,9 @@ void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo*
 	dFloat u = dAbs(m_tireModel.m_longitudinalSlip);
 	dFloat invden = 1.0f / (1.0f + u);
 
-if (tire->GetIndex() >= 2)
+if (tire->GetIndex() >= 2){
 dTrace(("%d uv(%f %f)\n", tire->GetIndex(), u, v));
+}
 
 	m_tireModel.m_lateralSlip = v * invden;
 	m_tireModel.m_longitudinalSlip = u * invden;
