@@ -26,9 +26,10 @@ class Plane2dUpVector: public dCustomPlane
 
 	void SubmitConstraints (dFloat timestep, int threadIndex)
 	{
-		// add one row to prevent body from rotating on the plane of motion
 		dMatrix matrix0;
 		dMatrix matrix1;
+
+		// add one row to prevent body from rotating on the plane of motion
 		CalculateGlobalMatrix(matrix0, matrix1);
 
 		dFloat pitchAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
@@ -39,30 +40,79 @@ class Plane2dUpVector: public dCustomPlane
 	}
 };
 
-static void AddPlayerBodies (DemoEntityManager* const scene, NewtonBody* const floor)
-{
 
+class Plane2dHinge: public dCustomPlane
+{
+	public:
+	Plane2dHinge(const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent)
+		:dCustomPlane(pivot, normal, child, parent)
+	{
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+
+		// add two row to prevent the body from translation on the plane
+		CalculateGlobalMatrix(matrix0, matrix1);
+		SubmitLinearRows(0x06, matrix0, matrix1);
+
+		// add rows to fix matrix body the the plane
+		dCustomPlane::SubmitConstraints(timestep, threadIndex);
+	}
+};
+
+static void AttachLimbBody (DemoEntityManager* const scene, const dVector& dir, NewtonBody* const parent)
+{
 	NewtonWorld* const world = scene->GetNewton();
-	dVector size(1.0f, 1.0f, 1.0f, 0.0f);
+	dVector size(0.4f, 0.25f, 0.75f, 0.0f);
+
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
+	DemoMesh* const geometry = new DemoMesh("box", scene->GetShaderCache(), collision, "frowny.tga", "logo_php.tga", "smilli.tga");
+
+	dMatrix location;
+	NewtonBodyGetMatrix(parent, &location[0][0]);
+
+	location.m_posit += dir.Scale (0.5f);
+
+	// make a root body attached to the world
+	NewtonBody* const rootBody = CreateSimpleSolid(scene, geometry, 10.0f, location, collision, 0);
+
+	// constrain these object to motion on the plane only
+	location.m_posit -= dir.Scale (0.25f);
+	new Plane2dHinge(location.m_posit, location.m_front, rootBody, parent);
+
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+}
+
+static void AddRagdollBodies(DemoEntityManager* const scene, NewtonBody* const floor)
+{
+	NewtonWorld* const world = scene->GetNewton();
+	dVector size(0.5f, 0.75f, 0.5f, 0.0f);
 
 	dMatrix location(dGetIdentityMatrix());
 
 	location.m_posit.m_y = 4.0f;
 
-	dMatrix gitzmoMatrix (dRollMatrix(90.0f * dDegreeToRad));
-	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _CAPSULE_PRIMITIVE, 0);
-	NewtonCollisionSetMatrix(collision, &gitzmoMatrix[0][0]);
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
+	DemoMesh* const geometry = new DemoMesh("box", scene->GetShaderCache(), collision, "frowny.tga", "logo_php.tga", "smilli.tga");
 
-	DemoMesh* const geometry = new DemoMesh("table", scene->GetShaderCache(), collision, "frowny.tga", "logo_php.tga", "smilli.tga");
-
-	location.m_posit.m_z = 10.0f;
+	location.m_posit.m_z = 5.0f;
 	for (int i = 0; i < 4; i++) {
-		NewtonBody* const box = CreateSimpleSolid(scene, geometry, 10.0f, location, collision, 0);
+		// make a root body attached to the world
+		NewtonBody* const rootBody = CreateSimpleSolid(scene, geometry, 10.0f, location, collision, 0);
 
 		// constrain these object to motion on the plane only
 		dMatrix matrix;
-		NewtonBodyGetMatrix(box, &matrix[0][0]);
-		new Plane2dUpVector(matrix.m_posit, matrix.m_front, box);
+		NewtonBodyGetMatrix(rootBody, &matrix[0][0]);
+		new dCustomPlane(matrix.m_posit, matrix.m_front, rootBody);
+
+		// now make some limb body and attach them to the root body
+		AttachLimbBody (scene, matrix.m_right.Scale ( 1.0f), rootBody);
+		AttachLimbBody (scene, matrix.m_right.Scale (-1.0f), rootBody);
+
 		location.m_posit.m_z += 2.5f;
 	}
 
@@ -118,6 +168,35 @@ static NewtonBody* CreateBackground (DemoEntityManager* const scene)
 	return tableBody;
 }
 
+static void AddPlayerBodies(DemoEntityManager* const scene, NewtonBody* const floor)
+{
+	NewtonWorld* const world = scene->GetNewton();
+	dVector size(1.0f, 1.0f, 1.0f, 0.0f);
+
+	dMatrix location(dGetIdentityMatrix());
+
+	location.m_posit.m_y = 4.0f;
+
+	dMatrix gitzmoMatrix(dRollMatrix(90.0f * dDegreeToRad));
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _CAPSULE_PRIMITIVE, 0);
+	NewtonCollisionSetMatrix(collision, &gitzmoMatrix[0][0]);
+
+	DemoMesh* const geometry = new DemoMesh("table", scene->GetShaderCache(), collision, "frowny.tga", "logo_php.tga", "smilli.tga");
+
+	location.m_posit.m_z = 15.0f;
+	for (int i = 0; i < 4; i++) {
+		NewtonBody* const capsule = CreateSimpleSolid(scene, geometry, 10.0f, location, collision, 0);
+
+		// constrain these object to motion on the plane only
+		dMatrix matrix;
+		NewtonBodyGetMatrix(capsule, &matrix[0][0]);
+		new Plane2dUpVector(matrix.m_posit, matrix.m_front, capsule);
+		location.m_posit.m_z += 2.5f;
+	}
+
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+}
 
 // create physics scene
 void FlatLandGame (DemoEntityManager* const scene)
@@ -133,10 +212,14 @@ void FlatLandGame (DemoEntityManager* const scene)
 	// add players 
 	AddPlayerBodies (scene, ground);
 
+	// add pseudo Ragdoll
+	AddRagdollBodies(scene, ground);
+
 	// place camera into position
 	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
-	camMatrix.m_posit.m_y = 10.0f;
-	camMatrix.m_posit.m_x = -30.0f;
+	camMatrix.m_posit.m_y = 7.0f;
+	camMatrix.m_posit.m_x = -20.0f;
+	camMatrix.m_posit.m_z = 10.0f;
 	scene->SetCameraMatrix(rot, camMatrix.m_posit);
 }
