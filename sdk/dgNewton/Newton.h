@@ -120,11 +120,15 @@ extern "C" {
 
 	typedef struct NewtonCollisionMaterial
 	{
-		void* m_userData;
+		union {
+			void* m_userData;
+			dLong m_alignPad;
+		};
 		dLong m_userId;
-		dLong m_userFlags0;
-		dLong m_userFlags1;
-		dFloat m_userParam[8];
+		union {
+			dLong m_intData;
+			dFloat m_floatData;
+		} m_userParam[6];
 	} NewtonCollisionMaterial;
 
 	typedef struct NewtonBoxParam

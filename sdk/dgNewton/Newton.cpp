@@ -3980,13 +3980,9 @@ void NewtonCollisionSetMaterial (const NewtonCollision* const collision, const N
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
 	dgCollisionInfo::dgInstanceMaterial& data = instance->m_material;
-	data.m_userData = userData->m_userData;
+	data.m_alignPad = userData->m_alignPad;
 	data.m_userId = userData->m_userId;
-	data.m_userFlags0 = userData->m_userFlags0;
-	data.m_userFlags1 = userData->m_userFlags1;
-	for (dgInt32 i = 0; i < sizeof (data.m_userParam)/sizeof (data.m_userParam[0]); i++) {
-		data.m_userParam[i] = userData->m_userParam[i];
-	}
+	memcpy (data.m_userParam, userData->m_userParam, sizeof (data.m_userParam));
 	instance->SetMaterial (data);
 }
 
@@ -3994,14 +3990,10 @@ void NewtonCollisionGetMaterial (const NewtonCollision* const collision, NewtonC
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
-	const dgCollisionInfo::dgInstanceMaterial data(instance->GetMaterial());
-	userData->m_userData = data.m_userData;
+	const dgCollisionInfo::dgInstanceMaterial& data = instance->GetMaterial();
+	userData->m_alignPad = data.m_alignPad;
 	userData->m_userId = data.m_userId;
-	userData->m_userFlags0 = data.m_userFlags0;
-	userData->m_userFlags1 = data.m_userFlags1;
-	for (dgInt32 i = 0; i < sizeof(data.m_userParam) / sizeof(data.m_userParam[0]); i++) {
-		userData->m_userParam[i] = data.m_userParam[i];
-	}
+	memcpy (userData->m_userParam, data.m_userParam, sizeof (data.m_userParam));
 }
 
 void* NewtonCollisionGetSubCollisionHandle (const NewtonCollision* const collision)

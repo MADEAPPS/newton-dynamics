@@ -88,8 +88,8 @@ class PassiveRagdollManager: public dModelManager
 			return 1;
 		}
 
-		dLong val0 = (collisionMaterial0.m_userFlags0 & collisionMaterial1.m_userFlags1);
-		dLong val1 = (collisionMaterial1.m_userFlags0 & collisionMaterial0.m_userFlags1);
+		dLong val0 = (collisionMaterial0.m_userParam[0].m_intData & collisionMaterial1.m_userParam[1].m_intData);
+		dLong val1 = (collisionMaterial1.m_userParam[0].m_intData & collisionMaterial0.m_userParam[1].m_intData);
 		return (val0 && val1) ? 1 : 0;
 	}
 
@@ -252,8 +252,8 @@ class PassiveRagdollManager: public dModelManager
 		NewtonCollisionMaterial collisionMaterial;
 		NewtonCollisionGetMaterial(NewtonBodyGetCollision(rootBone), &collisionMaterial);
 		collisionMaterial.m_userData = rootBone;
-		collisionMaterial.m_userFlags0 = jointsDefinition[0].m_type;
-		collisionMaterial.m_userFlags1 = jointsDefinition[0].m_typeMask;
+		collisionMaterial.m_userParam[0].m_intData = jointsDefinition[0].m_type;
+		collisionMaterial.m_userParam[1].m_intData = jointsDefinition[0].m_typeMask;
 		NewtonCollisionSetMaterial(NewtonBodyGetCollision(rootBone), &collisionMaterial);
 
 		int stackIndex = 0;
@@ -293,8 +293,8 @@ class PassiveRagdollManager: public dModelManager
 					NewtonCollisionMaterial collisionMaterial;
 					NewtonCollisionGetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
 					collisionMaterial.m_userData = rootBone;
-					collisionMaterial.m_userFlags0 = jointsDefinition[i].m_type;
-					collisionMaterial.m_userFlags1 = jointsDefinition[i].m_typeMask;
+					collisionMaterial.m_userParam[0].m_intData = jointsDefinition[i].m_type;
+					collisionMaterial.m_userParam[1].m_intData = jointsDefinition[i].m_typeMask;
 					NewtonCollisionSetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
 					break;
 				}

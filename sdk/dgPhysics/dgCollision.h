@@ -87,11 +87,16 @@ class dgCollisionInfo
 			memset(this, 0, sizeof (dgInstanceMaterial));
 		}
 
-		void* m_userData;
+		union {
+			void* m_userData;
+			dgInt64 m_alignPad;
+		};
 		dgInt64 m_userId;
-		dgUnsigned64 m_userFlags0;
-		dgUnsigned64 m_userFlags1;
-		dgFloat32 m_userParam[8];
+
+		union {
+			dgUnsigned64 m_intData;
+			dgFloat32 m_floatData;
+		} m_userParam[6];
 	};
 
 	struct dgBoxData

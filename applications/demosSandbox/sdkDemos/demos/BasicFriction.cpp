@@ -48,7 +48,7 @@ static void UserContactFriction (const NewtonJoint* contactJoint, dFloat timeste
 	NewtonCollisionGetMaterial(collision0, &material0);
 	NewtonCollisionGetMaterial(collision1, &material1);
 	dAssert ((material0.m_userId == 1) || (material1.m_userId == 1));
-	dFloat frictionValue = dMax (material0.m_userParam[0], material1.m_userParam[0]);
+	dFloat frictionValue = dMax (material0.m_userParam[0].m_floatData, material1.m_userParam[0].m_floatData);
 
 	for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
 		NewtonMaterial* const material = NewtonContactGetMaterial (contact);
@@ -138,10 +138,10 @@ void Friction (DemoEntityManager* const scene)
 			material.m_userId = 1;
 
 			// save kinetic friction in param[0]
-			material.m_userParam[0] = coefficientOfFriction;
+			material.m_userParam[0].m_floatData = coefficientOfFriction;
 
 			// save static friction in param[1]
-			material.m_userParam[1] = coefficientOfFriction;
+			material.m_userParam[1].m_floatData = coefficientOfFriction;
 			NewtonCollisionSetMaterial(collision, &material);
 
 			index ++;
