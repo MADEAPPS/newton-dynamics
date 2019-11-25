@@ -1530,6 +1530,8 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 		dgBody* const body1 = contact->GetBody1();
 
 		if (!(contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium))) {
+			dgAssert(!contact->m_killContact);
+
 			bool isActive = contact->m_isActive;
 			if (ValidateContactCache(contact, deltaTime)) {
 				contact->m_broadphaseLru = m_lru;
