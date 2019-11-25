@@ -87,12 +87,11 @@ class dgCollisionInfo
 			memset(this, 0, sizeof (dgInstanceMaterial));
 		}
 
+		dgInt64 m_userId;
 		union {
 			void* m_userData;
-			dgInt64 m_alignPad;
+			dgUnsigned64 m_alignPad;
 		};
-		dgInt64 m_userId;
-
 		union {
 			dgUnsigned64 m_intData;
 			dgFloat32 m_floatData;

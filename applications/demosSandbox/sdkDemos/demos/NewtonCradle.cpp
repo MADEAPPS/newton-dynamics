@@ -41,7 +41,7 @@ static void UserContactRestitution (const NewtonJoint* contactJoint, dFloat time
 	NewtonCollisionGetMaterial(collision0, &material0);
 	NewtonCollisionGetMaterial(collision1, &material1);
 	dAssert((material0.m_userId == 1) || (material1.m_userId == 1));
-	dFloat restitution = dMax(material0.m_userParam[0].m_floatData, material1.m_userParam[0].m_floatData);
+	dFloat restitution = dMax(material0.m_userParam[0].m_float, material1.m_userParam[0].m_float);
 
 	for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
 		NewtonMaterial* const material = NewtonContactGetMaterial (contact);
@@ -56,7 +56,7 @@ static NewtonBody* CradleBall (DemoEntityManager* const scene, DemoMesh* const m
 	material.m_userId = 1;
 
 	// save restitution coefficient in param[0]
-	material.m_userParam[0].m_floatData = restCoef;
+	material.m_userParam[0].m_float = restCoef;
 	NewtonCollisionSetMaterial(collision, &material);
 
 	NewtonBody* const body = CreateSimpleSolid(scene, mesh, mass, matrix, collision, materialId);

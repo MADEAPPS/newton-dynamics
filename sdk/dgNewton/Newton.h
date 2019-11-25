@@ -118,17 +118,18 @@ extern "C" {
 	typedef struct NewtonFracturedCompoundMeshPart{} NewtonFracturedCompoundMeshPart;
 #endif
 
+	typedef union 
+	{
+		void* m_ptr;
+		dLong m_int;
+		dFloat m_float;
+	} NewtonMaterialData;
+
 	typedef struct NewtonCollisionMaterial
 	{
-		union {
-			void* m_userData;
-			dLong m_alignPad;
-		};
 		dLong m_userId;
-		union {
-			dLong m_intData;
-			dFloat m_floatData;
-		} m_userParam[6];
+		NewtonMaterialData m_userData;
+		NewtonMaterialData m_userParam[6];
 	} NewtonCollisionMaterial;
 
 	typedef struct NewtonBoxParam

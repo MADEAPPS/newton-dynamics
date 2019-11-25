@@ -3980,7 +3980,7 @@ void NewtonCollisionSetMaterial (const NewtonCollision* const collision, const N
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
 	dgCollisionInfo::dgInstanceMaterial& data = instance->m_material;
-	data.m_alignPad = userData->m_alignPad;
+	data.m_alignPad = userData->m_userData.m_int;
 	data.m_userId = userData->m_userId;
 	memcpy (data.m_userParam, userData->m_userParam, sizeof (data.m_userParam));
 	instance->SetMaterial (data);
@@ -3991,8 +3991,8 @@ void NewtonCollisionGetMaterial (const NewtonCollision* const collision, NewtonC
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
 	const dgCollisionInfo::dgInstanceMaterial& data = instance->GetMaterial();
-	userData->m_alignPad = data.m_alignPad;
 	userData->m_userId = data.m_userId;
+	userData->m_userData.m_int = data.m_alignPad;
 	memcpy (userData->m_userParam, data.m_userParam, sizeof (data.m_userParam));
 }
 

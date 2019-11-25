@@ -57,8 +57,8 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 
 			NewtonCollisionMaterial collisionMaterial;
 			NewtonCollisionGetMaterial (collision, &collisionMaterial);
-			collisionMaterial.m_userParam[0].m_floatData = density;
-			collisionMaterial.m_userParam[1].m_floatData = 0.0f;
+			collisionMaterial.m_userParam[0].m_float = density;
+			collisionMaterial.m_userParam[1].m_float = 0.0f;
 			NewtonCollisionSetMaterial (collision, &collisionMaterial);
 		}
 
@@ -129,7 +129,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 					// Get the body density form the collision material.
 					NewtonCollisionMaterial collisionMaterial;
 					NewtonCollisionGetMaterial(collision, &collisionMaterial);
-					const dFloat solidDentityFactor = collisionMaterial.m_userParam[0].m_floatData;
+					const dFloat solidDentityFactor = collisionMaterial.m_userParam[0].m_float;
 
 					// calculate the ratio of volumes an use it calculate a density equivalent
 					dFloat shapeVolume = NewtonConvexCollisionCalculateVolume (collision);
@@ -157,9 +157,9 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 					NewtonBodySetVelocity(visitor, &veloc[0]);
 
 					// test delete bodies inside trigger
-					collisionMaterial.m_userParam[1].m_floatData += timestep;
+					collisionMaterial.m_userParam[1].m_float += timestep;
 					NewtonCollisionSetMaterial(collision, &collisionMaterial);
-					if (collisionMaterial.m_userParam[1].m_floatData >= 30.0f) {
+					if (collisionMaterial.m_userParam[1].m_float >= 30.0f) {
 						// delete body after 2 minutes inside the pool
 						NewtonDestroyBody(visitor);
 					}
