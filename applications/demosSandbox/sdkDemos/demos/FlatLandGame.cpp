@@ -40,7 +40,6 @@ class Plane2dUpVector: public dCustomPlane
 	}
 };
 
-
 class Plane2dHinge: public dCustomPlane
 {
 	public:
@@ -81,7 +80,10 @@ static void AttachLimbBody (DemoEntityManager* const scene, const dVector& dir, 
 
 	// constrain these object to motion on the plane only
 	location.m_posit -= dir.Scale (0.25f);
-	new Plane2dHinge(location.m_posit, location.m_front, rootBody, parent);
+	//new Plane2dHinge(location.m_posit, location.m_front, rootBody, parent);
+	dCustomHinge* const hinge = new dCustomHinge(location, rootBody, parent);
+	hinge->EnableLimits(true);
+	hinge->SetLimits(-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
 
 	geometry->Release();
 	NewtonDestroyCollision(collision);
