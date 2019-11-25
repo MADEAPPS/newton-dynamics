@@ -275,7 +275,7 @@ class PassiveRagdollManager: public dModelManager
 			dModelNode* parentBone = parentBones[stackIndex];
 			DemoEntity* const entity = childEntities[stackIndex];
 			const char* const name = entity->GetName().GetStr();
-			dTrace(("name: %s\n", name));
+			//dTrace(("name: %s\n", name));
 			for (int i = 0; i < definitionCount; i++) {
 				if (!strcmp(jointsDefinition[i].m_boneName, name)) {
 					NewtonBody* const childBody = CreateBodyPart(entity);

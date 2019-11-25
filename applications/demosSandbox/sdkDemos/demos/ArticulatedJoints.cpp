@@ -134,6 +134,167 @@ class ArticulatedEntityModel: public DemoEntity
 	InputRecord m_inputs;
 };
 
+
+// we recommend using and input manage to control input for all games
+class AriculatedJointInputManager: public dCustomListener
+{
+	public:
+	AriculatedJointInputManager (DemoEntityManager* const scene)
+		:dCustomListener(scene->GetNewton(), "D_LISTENER")
+		,m_scene(scene)
+		,m_cameraMode(true)
+		,m_changeVehicle(true)
+		,m_playersCount(0)
+		,m_currentPlayer(0)
+		,m_gripper(0.0f)
+		,m_liftboom(0.0f) 
+		,m_slideboom(0.0f) 
+		,m_rotatebase(0.0f)
+		,m_gripperRoll(0.0f)
+		,m_gripperPitch(0.0f)
+	{
+		// plug a callback for 2d help display
+		memset (m_player, 0, sizeof (m_player));
+		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, NULL, this);
+		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
+	}
+
+	void OnBeginUpdate (dFloat timestepInSecunds)
+	{
+		dAssert(0);
+		/*
+		ArticulatedEntityModel::InputRecord inputs;
+		if (m_playersCount && m_player[m_currentPlayer % m_playersCount]) {
+			dCustomTransformController* const player = m_player[m_currentPlayer % m_playersCount];
+			ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) player->GetUserData();
+
+			inputs.m_steerValue = int (m_scene->GetKeyState ('D')) - int (m_scene->GetKeyState ('A'));
+			inputs.m_throttleValue = int (m_scene->GetKeyState ('W')) - int (m_scene->GetKeyState ('S'));
+
+			inputs.m_gripperValue = m_gripper;
+			inputs.m_slideValue = m_slideboom;
+			inputs.m_liftValue = m_liftboom * dDegreeToRad;
+			inputs.m_turnValue = m_rotatebase * dDegreeToRad;
+			inputs.m_gripperRollValue = m_gripperRoll * dDegreeToRad;
+			inputs.m_gripperPitchValue = m_gripperPitch * dDegreeToRad;
+
+			// check if we must activate the player
+			if (m_needsWakeUp ||
+				m_scene->GetKeyState ('A') || 
+				m_scene->GetKeyState ('D') ||
+				m_scene->GetKeyState ('W') ||
+				m_scene->GetKeyState ('S'))
+			{
+				NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetRoot()->m_body;
+				NewtonBodySetSleepState(body, false);
+			}
+
+#if 0
+	#if 0
+			static FILE* file = fopen ("log.bin", "wb");
+			if (file) {
+				fwrite (&inputs, sizeof (inputs), 1, file);
+				fflush(file);
+			}
+	#else 
+			static FILE* file = fopen ("log.bin", "rb");
+			if (file) {
+				fread (&inputs, sizeof (inputs), 1, file);
+			}
+	#endif
+#endif
+			vehicleModel->SetInput (inputs);
+		}
+*/
+	}
+
+	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
+	{
+		AriculatedJointInputManager* const me = (AriculatedJointInputManager*)context;
+		me->UpdateCamera(timestep);
+	}
+
+	void UpdateCamera (dFloat timestepInSecunds)
+	{
+		dAssert(0);
+		/*
+		if (m_playersCount && m_player[m_currentPlayer % m_playersCount]) {
+			DemoCamera* const camera = m_scene->GetCamera();
+			ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
+
+			if (m_changeVehicle.UpdateTrigger(m_scene->GetKeyState ('P'))) {
+				m_currentPlayer ++;
+			}
+		
+			dMatrix camMatrix(camera->GetNextMatrix());
+			dMatrix playerMatrix (vehicleModel->GetNextMatrix());
+
+			dVector frontDir (camMatrix[0]);
+			dVector camOrigin(0.0f); 
+			m_cameraMode.UpdatePushButton(m_scene->GetKeyState('C'));
+			if (m_cameraMode.GetPushButtonState()) {
+				camOrigin = playerMatrix.TransformVector( dVector(0.0f, ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f));
+				camOrigin -= frontDir.Scale(ARTICULATED_VEHICLE_CAMERA_DISTANCE);
+			} else {
+				camMatrix = camMatrix * playerMatrix;
+				camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
+			}
+
+			camera->SetNextMatrix (*m_scene, camMatrix, camOrigin);
+		}
+*/
+	}
+
+	void OnEndUpdate (dFloat timestepInSecunds)
+	{
+	}
+
+	void AddPlayer(dCustomTransformController* const player)
+	{
+		m_player[m_playersCount] = player;
+		m_playersCount ++;
+	}
+
+	void RenderPlayerHelp (DemoEntityManager* const scene)
+	{
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print (color, "Navigation Keys");
+		scene->Print (color, "drive forward:      W");
+		scene->Print (color, "drive backward:     S");
+		scene->Print (color, "turn right:         D");
+		scene->Print (color, "turn left:          A");
+
+		m_needsWakeUp = false;
+		m_needsWakeUp = ImGui::SliderFloat("Gripper", &m_gripper, -0.2f, 2.0f) || m_needsWakeUp;
+		m_needsWakeUp = ImGui::SliderFloat("Roll", &m_gripperRoll, -180.0f, 180.0f) || m_needsWakeUp;
+		m_needsWakeUp = ImGui::SliderFloat("Pitch", &m_gripperPitch, -180.0f, 180.0f) || m_needsWakeUp;
+		m_needsWakeUp = ImGui::SliderFloat("BoomSlide", &m_slideboom, 0.0f, 3.0f) || m_needsWakeUp;
+		m_needsWakeUp = ImGui::SliderFloat("BoomLift", &m_liftboom, -180.0f, 180.0f) || m_needsWakeUp;
+		m_needsWakeUp = ImGui::SliderFloat("RotateBase", &m_rotatebase, -180.0f, 180.0f) || m_needsWakeUp;
+	}				
+
+	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context)
+	{
+		AriculatedJointInputManager* const me = (AriculatedJointInputManager*) context;
+		me->RenderPlayerHelp (scene);
+	}
+
+	DemoEntityManager* m_scene;
+	dCustomTransformController* m_player[2];
+	DemoEntityManager::ButtonKey m_cameraMode;
+	DemoEntityManager::ButtonKey m_changeVehicle;
+	int m_playersCount;
+	int m_currentPlayer;
+	bool m_needsWakeUp;
+	dFloat32 m_gripper; 
+	dFloat32 m_liftboom; 
+	dFloat32 m_slideboom; 
+	dFloat32 m_rotatebase; 
+	dFloat32 m_gripperRoll; 
+	dFloat32 m_gripperPitch; 
+};
+#endif
+
 class ArticulatedVehicleManagerManager: public dModelManager
 {
 	public:
@@ -141,12 +302,13 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		:dModelManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
-		int material = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-		NewtonMaterialSetCallbackUserData (scene->GetNewton(), material, material, this);
-		NewtonMaterialSetCompoundCollisionCallback(scene->GetNewton(), material, material, CompoundSubCollisionAABBOverlap);
-		NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, material, OnBoneAABBOverlap, OnContactsProcess);
+		//int material = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+		//NewtonMaterialSetCallbackUserData (scene->GetNewton(), material, material, this);
+		//NewtonMaterialSetCompoundCollisionCallback(scene->GetNewton(), material, material, CompoundSubCollisionAABBOverlap);
+		//NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, material, OnBoneAABBOverlap, OnContactsProcess);
 	}
 
+#if 0
 	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 	{
 	}
@@ -1196,24 +1358,24 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		AddCraneLift(controller, baseBone);
 */
 	}
+#endif
 
-	dCustomTransformController* CreateRobot (const dMatrix& location, const DemoEntity* const model, int , ARTICULATED_VEHICLE_DEFINITION* const )
+	//dModelRootNode* CreateExcavator (const dMatrix& location, const DemoEntity* const model, int , ARTICULATED_VEHICLE_DEFINITION* const )
+	dModelRootNode* CreateExcavator (const char* const modelName, const dMatrix& location)
 	{
-		dAssert(0);
-		return NULL;
-#if 0		
 		NewtonWorld* const world = GetWorld();
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
 		// make a clone of the mesh 
-		ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)model->CreateClone();
+		DemoEntity* const vehicleModel = DemoEntity::LoadNGD_mesh (modelName, world, scene->GetShaderCache());		
 		scene->Append(vehicleModel);
-return NULL;
-		// plane the model at its location
+
+		// place the model at its location
 		dMatrix matrix (vehicleModel->GetCurrentMatrix());
 		matrix.m_posit = location.m_posit;
 		vehicleModel->ResetMatrix(*scene, matrix);
 
+#if 0
 		dCustomTransformController* const controller = CreateTransformController();
 		controller->SetUserData(vehicleModel);
 		controller->SetCalculateLocalTransforms (true);
@@ -1281,192 +1443,31 @@ return NULL;
 			}
 		}
 */
-		return controller;
 #endif
+		return NULL;
 	}
 };
 
-// we recommend using and input manage to control input for all games
-class AriculatedJointInputManager: public dCustomListener
-{
-	public:
-	AriculatedJointInputManager (DemoEntityManager* const scene)
-		:dCustomListener(scene->GetNewton(), "D_LISTENER")
-		,m_scene(scene)
-		,m_cameraMode(true)
-		,m_changeVehicle(true)
-		,m_playersCount(0)
-		,m_currentPlayer(0)
-		,m_gripper(0.0f)
-		,m_liftboom(0.0f) 
-		,m_slideboom(0.0f) 
-		,m_rotatebase(0.0f)
-		,m_gripperRoll(0.0f)
-		,m_gripperPitch(0.0f)
-	{
-		// plug a callback for 2d help display
-		memset (m_player, 0, sizeof (m_player));
-		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, NULL, this);
-		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
-	}
-
-	void OnBeginUpdate (dFloat timestepInSecunds)
-	{
-		dAssert(0);
-		/*
-		ArticulatedEntityModel::InputRecord inputs;
-		if (m_playersCount && m_player[m_currentPlayer % m_playersCount]) {
-			dCustomTransformController* const player = m_player[m_currentPlayer % m_playersCount];
-			ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) player->GetUserData();
-
-			inputs.m_steerValue = int (m_scene->GetKeyState ('D')) - int (m_scene->GetKeyState ('A'));
-			inputs.m_throttleValue = int (m_scene->GetKeyState ('W')) - int (m_scene->GetKeyState ('S'));
-
-			inputs.m_gripperValue = m_gripper;
-			inputs.m_slideValue = m_slideboom;
-			inputs.m_liftValue = m_liftboom * dDegreeToRad;
-			inputs.m_turnValue = m_rotatebase * dDegreeToRad;
-			inputs.m_gripperRollValue = m_gripperRoll * dDegreeToRad;
-			inputs.m_gripperPitchValue = m_gripperPitch * dDegreeToRad;
-
-			// check if we must activate the player
-			if (m_needsWakeUp ||
-				m_scene->GetKeyState ('A') || 
-				m_scene->GetKeyState ('D') ||
-				m_scene->GetKeyState ('W') ||
-				m_scene->GetKeyState ('S'))
-			{
-				NewtonBody* const body = m_player[m_currentPlayer % m_playersCount]->GetRoot()->m_body;
-				NewtonBodySetSleepState(body, false);
-			}
-
-#if 0
-	#if 0
-			static FILE* file = fopen ("log.bin", "wb");
-			if (file) {
-				fwrite (&inputs, sizeof (inputs), 1, file);
-				fflush(file);
-			}
-	#else 
-			static FILE* file = fopen ("log.bin", "rb");
-			if (file) {
-				fread (&inputs, sizeof (inputs), 1, file);
-			}
-	#endif
-#endif
-			vehicleModel->SetInput (inputs);
-		}
-*/
-	}
-
-	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
-	{
-		AriculatedJointInputManager* const me = (AriculatedJointInputManager*)context;
-		me->UpdateCamera(timestep);
-	}
-
-	void UpdateCamera (dFloat timestepInSecunds)
-	{
-		dAssert(0);
-		/*
-		if (m_playersCount && m_player[m_currentPlayer % m_playersCount]) {
-			DemoCamera* const camera = m_scene->GetCamera();
-			ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*) m_player[m_currentPlayer % m_playersCount]->GetUserData();
-
-			if (m_changeVehicle.UpdateTrigger(m_scene->GetKeyState ('P'))) {
-				m_currentPlayer ++;
-			}
-		
-			dMatrix camMatrix(camera->GetNextMatrix());
-			dMatrix playerMatrix (vehicleModel->GetNextMatrix());
-
-			dVector frontDir (camMatrix[0]);
-			dVector camOrigin(0.0f); 
-			m_cameraMode.UpdatePushButton(m_scene->GetKeyState('C'));
-			if (m_cameraMode.GetPushButtonState()) {
-				camOrigin = playerMatrix.TransformVector( dVector(0.0f, ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f));
-				camOrigin -= frontDir.Scale(ARTICULATED_VEHICLE_CAMERA_DISTANCE);
-			} else {
-				camMatrix = camMatrix * playerMatrix;
-				camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
-			}
-
-			camera->SetNextMatrix (*m_scene, camMatrix, camOrigin);
-		}
-*/
-	}
-
-	void OnEndUpdate (dFloat timestepInSecunds)
-	{
-	}
-
-	void AddPlayer(dCustomTransformController* const player)
-	{
-		m_player[m_playersCount] = player;
-		m_playersCount ++;
-	}
-
-	void RenderPlayerHelp (DemoEntityManager* const scene)
-	{
-		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print (color, "Navigation Keys");
-		scene->Print (color, "drive forward:      W");
-		scene->Print (color, "drive backward:     S");
-		scene->Print (color, "turn right:         D");
-		scene->Print (color, "turn left:          A");
-
-		m_needsWakeUp = false;
-		m_needsWakeUp = ImGui::SliderFloat("Gripper", &m_gripper, -0.2f, 2.0f) || m_needsWakeUp;
-		m_needsWakeUp = ImGui::SliderFloat("Roll", &m_gripperRoll, -180.0f, 180.0f) || m_needsWakeUp;
-		m_needsWakeUp = ImGui::SliderFloat("Pitch", &m_gripperPitch, -180.0f, 180.0f) || m_needsWakeUp;
-		m_needsWakeUp = ImGui::SliderFloat("BoomSlide", &m_slideboom, 0.0f, 3.0f) || m_needsWakeUp;
-		m_needsWakeUp = ImGui::SliderFloat("BoomLift", &m_liftboom, -180.0f, 180.0f) || m_needsWakeUp;
-		m_needsWakeUp = ImGui::SliderFloat("RotateBase", &m_rotatebase, -180.0f, 180.0f) || m_needsWakeUp;
-	}				
-
-	static void RenderPlayerHelp (DemoEntityManager* const scene, void* const context)
-	{
-		AriculatedJointInputManager* const me = (AriculatedJointInputManager*) context;
-		me->RenderPlayerHelp (scene);
-	}
-
-	DemoEntityManager* m_scene;
-	dCustomTransformController* m_player[2];
-	DemoEntityManager::ButtonKey m_cameraMode;
-	DemoEntityManager::ButtonKey m_changeVehicle;
-	int m_playersCount;
-	int m_currentPlayer;
-	bool m_needsWakeUp;
-	dFloat32 m_gripper; 
-	dFloat32 m_liftboom; 
-	dFloat32 m_slideboom; 
-	dFloat32 m_rotatebase; 
-	dFloat32 m_gripperRoll; 
-	dFloat32 m_gripperPitch; 
-};
-#endif
 
 void ArticulatedJoints (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
-return;
 
-#if 0
 	NewtonBody* const floor = CreateLevelMesh (scene, "flatPlane.ngd", true);
-	//CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
+	//NewtonBody* floor = CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 	NewtonCollision* const floorCollision = NewtonBodyGetCollision(floor);
 
 	// set collision filter mask
-	NewtonCollisionMaterial material;
-	NewtonCollisionGetMaterial(floorCollision, &material);
-	material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m___terrain;
-	material.m_userFlags = ARTICULATED_VEHICLE_DEFINITION::m___woodSlab + ARTICULATED_VEHICLE_DEFINITION::m___bodyPart + ARTICULATED_VEHICLE_DEFINITION::m___linkPart + ARTICULATED_VEHICLE_DEFINITION::m___tirePart;
-	NewtonCollisionSetMaterial(floorCollision, &material);
+	//NewtonCollisionMaterial material;
+	//NewtonCollisionGetMaterial(floorCollision, &material);
+	//material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m___terrain;
+	//material.m_userFlags = ARTICULATED_VEHICLE_DEFINITION::m___woodSlab + ARTICULATED_VEHICLE_DEFINITION::m___bodyPart + ARTICULATED_VEHICLE_DEFINITION::m___linkPart + ARTICULATED_VEHICLE_DEFINITION::m___tirePart;
+	//NewtonCollisionSetMaterial(floorCollision, &material);
 
 	// add an input Manage to manage the inputs and user interaction 
-	AriculatedJointInputManager* const inputManager = new AriculatedJointInputManager (scene);
+	//AriculatedJointInputManager* const inputManager = new AriculatedJointInputManager (scene);
+
 
 	//  create a skeletal transform controller for controlling rag doll
 	ArticulatedVehicleManagerManager* const vehicleManager = new ArticulatedVehicleManagerManager (scene);
@@ -1478,16 +1479,16 @@ return;
 	matrix.m_posit = FindFloor (world, origin, 100.0f);
 	matrix.m_posit.m_y += 1.5f;
 
-	DemoEntity* xxxx = DemoEntity::LoadNGD_mesh ("excavator.ngd", scene->GetNewton(), scene->GetShaderCache());
-	scene->Append(xxxx);
+	//DemoEntity* const model = DemoEntity::LoadNGD_mesh ("excavator.ngd", scene->GetNewton(), scene->GetShaderCache());
+	//scene->Append(xxxx);
+	//xxxx->ResetMatrix(*scene, matrix);
 
-	xxxx->ResetMatrix(*scene, matrix);
+//	ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)robotModel.CreateClone();
+//	scene->Append(vehicleModel);
+//	ArticulatedEntityModel robotModel(scene, "excavator.ngd");
+
+	dModelRootNode* const robot = vehicleManager->CreateExcavator ("excavator.ngd", matrix);
 /*
-	ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)robotModel.CreateClone();
-	scene->Append(vehicleModel);
-
-	ArticulatedEntityModel robotModel(scene, "excavator.ngd");
-	dCustomTransformController* const robot = vehicleManager->CreateRobot (matrix, &robotModel, 0, NULL);
 	inputManager->AddPlayer (robot);
 
 	matrix.m_posit.m_z += 4.0f;
@@ -1502,9 +1503,9 @@ return;
 //	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
 //	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
 */
+
 	origin.m_x -= 15.0f;
 	origin.m_y += 5.0f;
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), -30.0f * dDegreeToRad);  
 	scene->SetCameraMatrix(rot, origin);
-#endif
 }

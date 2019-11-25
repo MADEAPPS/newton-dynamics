@@ -408,7 +408,6 @@ double dString::ToFloat() const
 	return value;
 }
 
-
 dString& dString::operator= (const dString& src)
 {
 	if (m_capacity && m_string) {
@@ -425,7 +424,6 @@ dString& dString::operator= (const dString& src)
 	return *this;
 }
 
-
 int dString::CalculateSize (const char* const data) const
 {
 	int size = 0;
@@ -440,20 +438,17 @@ int dString::CalculateSize (const char* const data) const
 void dString::ToUpper()
 {
 	if (m_string) {
-		for (char * cp = m_string; *cp; ++cp)
-		{
+		for (char * cp = m_string; *cp; ++cp) {
 			if ((*cp >= 'a') && (*cp <= 'z') )
 				*cp += 'A' - 'a';
 		}
 	}
 }
 
-
 void dString::ToLower()
 {
 	if (m_string) {
-		for (char * cp = m_string; *cp; ++cp)
-		{
+		for (char * cp = m_string; *cp; ++cp) {
 			if ((*cp >= 'A') && (*cp <= 'Z') )
 				*cp += 'a' - 'A';
 		}

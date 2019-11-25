@@ -348,9 +348,10 @@ void DynamicRagdoll(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
+dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
+return;
 
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
-
 
 	dDynamicRagdollManager* const manager = new dDynamicRagdollManager(scene);
 	NewtonWorld* const world = scene->GetNewton();
