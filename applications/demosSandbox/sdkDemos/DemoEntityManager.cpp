@@ -50,7 +50,7 @@
 //#define DEFAULT_SCENE	14		// infinite user plane collision
 //#define DEFAULT_SCENE	15		// user height field Collision
 //#define DEFAULT_SCENE	16		// compound Collision
-#define DEFAULT_SCENE	17		// simple Archimedes buoyancy
+//#define DEFAULT_SCENE	17		// simple Archimedes buoyancy
 //#define DEFAULT_SCENE	18		// uniform Scaled Collision
 //#define DEFAULT_SCENE	19		// non uniform Scaled Collision
 //#define DEFAULT_SCENE	20		// scaled mesh collision
@@ -65,7 +65,7 @@
 //#define DEFAULT_SCENE	29		// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	30		// standard joints
 //#define DEFAULT_SCENE	31		// servo joints
-//#define DEFAULT_SCENE	32		// articulated joints
+#define DEFAULT_SCENE	32		// articulated joints
 //#define DEFAULT_SCENE	33		// six axis manipulator
 //#define DEFAULT_SCENE	34		// hexapod Robot
 //#define DEFAULT_SCENE	35		// basic rag doll
