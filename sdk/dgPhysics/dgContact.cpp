@@ -87,6 +87,9 @@ dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const materi
 	m_enableCollision = true;
 	m_constId = m_contactConstraint;
 
+	dgAssert (!body0->m_isdead);
+	dgAssert (!body1->m_isdead);
+
 	if (body0->m_invMass.m_w > dgFloat32(0.0f)) {
 		m_body0 = body0;
 		m_body1 = body1;
@@ -126,6 +129,10 @@ dgContact::dgContact(dgContact* const clone)
 	m_isActive = clone->m_isActive;
 	m_enableCollision = clone->m_enableCollision;
 	Merge (*clone);
+
+	dgAssert(!m_body0->m_isdead);
+	dgAssert(!m_body1->m_isdead);
+
 
 	if (m_body0->m_world->m_onCreateContact) {
 		dgAssert(clone->m_body0);

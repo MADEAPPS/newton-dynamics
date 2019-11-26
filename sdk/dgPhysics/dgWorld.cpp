@@ -1182,6 +1182,7 @@ void dgDeadBodies::DestroyBody(dgBody* const body)
 	if (body->m_destructor) {
 		body->m_destructor(*body);
 	}
+	body->m_isdead = 1;
 	body->SetDestructorCallback (NULL);
 	body->SetMatrixUpdateCallback (NULL);
 	body->SetExtForceAndTorqueCallback (NULL);

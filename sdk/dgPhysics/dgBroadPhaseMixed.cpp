@@ -351,18 +351,22 @@ void dgBroadPhaseMixed::FindCollidingPairs(dgBroadphaseSyncDescriptor* const des
 		while (node) {
 			dgBroadPhaseNode* const broadPhaseNode = node->GetInfo();
 			dgAssert(broadPhaseNode->IsLeafNode());
-			dgAssert(!broadPhaseNode->GetBody() || (broadPhaseNode->GetBody()->GetBroadPhase() == broadPhaseNode));
 
-			if (broadPhaseNode->IsAggregate()) {
-				((dgBroadPhaseAggregate*)broadPhaseNode)->SubmitSelfPairs(timestep, threadID);
-			}
+			dgBody* const body = broadPhaseNode->GetBody();
+			dgAssert(!body || (body->GetBroadPhase() == broadPhaseNode));
+			
+			if (!(body && body->m_isdead)) {
+				if (broadPhaseNode->IsAggregate()) {
+					((dgBroadPhaseAggregate*)broadPhaseNode)->SubmitSelfPairs(timestep, threadID);
+				}
 
-			for (dgBroadPhaseNode* ptr = broadPhaseNode; ptr->m_parent; ptr = ptr->m_parent) {
-				dgBroadPhaseTreeNode* const parent = (dgBroadPhaseTreeNode*)ptr->m_parent;
-				dgAssert(!parent->IsLeafNode());
-				dgBroadPhaseNode* const sibling = parent->m_right;
-				if (sibling != ptr) {
-					SubmitPairs(broadPhaseNode, sibling, timestep, 0, threadID);
+				for (dgBroadPhaseNode* ptr = broadPhaseNode; ptr->m_parent; ptr = ptr->m_parent) {
+					dgBroadPhaseTreeNode* const parent = (dgBroadPhaseTreeNode*)ptr->m_parent;
+					dgAssert(!parent->IsLeafNode());
+					dgBroadPhaseNode* const sibling = parent->m_right;
+					if (sibling != ptr) {
+						SubmitPairs(broadPhaseNode, sibling, timestep, 0, threadID);
+					}
 				}
 			}
 	

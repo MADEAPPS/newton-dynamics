@@ -1318,8 +1318,10 @@ void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNod
 				dgBody* const body1 = rootNode->GetBody();
 				if (body0) {
 					if (body1) {
-						if (test0 || (body1->GetInvMass().m_w != dgFloat32(0.0f))) {
-							AddPair(body0, body1, timestep, threadID);
+						if (!body1->m_isdead) {
+							if (test0 || (body1->GetInvMass().m_w != dgFloat32(0.0f))) {
+								AddPair(body0, body1, timestep, threadID);
+							}
 						}
 					} else {
 						dgAssert (rootNode->IsAggregate());
@@ -1330,7 +1332,9 @@ void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNod
 					dgAssert (leafNode->IsAggregate());
 					dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*) leafNode;
 					if (body1) {
-						aggregate->SummitPairs(body1, timestep, threadID);
+						if (!body1->m_isdead) {
+							aggregate->SummitPairs(body1, timestep, threadID);
+						}
 					} else {
 						dgAssert (rootNode->IsAggregate());
 						aggregate->SummitPairs((dgBroadPhaseAggregate*) rootNode, timestep, threadID);
@@ -1631,7 +1635,9 @@ bool dgBroadPhase::SanityCheck() const
 
 	const dgContactList& contactList = *m_world;
 	for (dgInt32 i = contactList.m_contactCount - 1; i >= 0; i--) {
-		dgAssert (filter.Insert(0, dgKey(contactList[i])));
+		dgContact* const contact = contactList[i];
+		dgAssert (!contact->m_killContact);
+		dgAssert (filter.Insert(0, dgKey(contact)));
 	}
 #endif
 	return true;
@@ -1656,7 +1662,6 @@ void dgBroadPhase::AttachNewContact(dgInt32 startCount)
 			delete contact;
 		}
 	}
-	dgAssert(SanityCheck());
 }
 
 void dgBroadPhase::DeleteDeadContact(dgFloat32 timestep)
