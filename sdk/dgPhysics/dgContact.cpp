@@ -133,7 +133,6 @@ dgContact::dgContact(dgContact* const clone)
 	dgAssert(!m_body0->m_isdead);
 	dgAssert(!m_body1->m_isdead);
 
-
 	if (m_body0->m_world->m_onCreateContact) {
 		dgAssert(clone->m_body0);
 		m_body0->m_world->m_onCreateContact(clone->m_body0->m_world, this);

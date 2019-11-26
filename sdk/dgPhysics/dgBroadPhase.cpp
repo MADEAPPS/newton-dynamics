@@ -1214,14 +1214,9 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 
 					dgInt32 isBody0Kinematic = body0->IsRTTIType(dgBody::m_kinematicBodyRTTI);
 					dgInt32 isBody1Kinematic = body1->IsRTTIType(dgBody::m_kinematicBodyRTTI);
-					//const dgInt32 kinematicTest = !(((isBody0Kinematic && body0->IsCollidable()) || (isBody1Kinematic && body1->IsCollidable())));
-					//const dgInt32 kinematicTest0 = !(isBody0Kinematic && isBody1Kinematic);
-					//const dgInt32 kinematicTest1 = kinematicTest0 && !((isBody0Kinematic && body0->IsCollidable()) || (isBody0Kinematic && body1->IsCollidable()));
-					//const dgInt32 collisionTest = kinematicTest1 && !(body0->m_equilibrium & body1->m_equilibrium);
 
-					//const dgInt32 kinematicTest = !((isBody0Kinematic && isBody1Kinematic) || ((isBody0Kinematic && body0->IsCollidable()) || (isBody0Kinematic && body1->IsCollidable())));
 					const dgInt32 kinematicTest = !((isBody0Kinematic && isBody1Kinematic) || ((isBody0Kinematic && body0->IsCollidable()) || (isBody1Kinematic && body1->IsCollidable())));
-					const dgInt32 collisionTest = kinematicTest && !(body0->m_equilibrium & body1->m_equilibrium);
+					const dgInt32 collisionTest = kinematicTest && !(body0->m_isdead | body1->m_isdead) && !(body0->m_equilibrium & body1->m_equilibrium);
 					if (collisionTest) {
 						const dgInt32 isSofBody0 = body0->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
 						const dgInt32 isSofBody1 = body1->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
@@ -1318,10 +1313,8 @@ void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNod
 				dgBody* const body1 = rootNode->GetBody();
 				if (body0) {
 					if (body1) {
-						if (!body1->m_isdead) {
-							if (test0 || (body1->GetInvMass().m_w != dgFloat32(0.0f))) {
-								AddPair(body0, body1, timestep, threadID);
-							}
+						if (test0 || (body1->GetInvMass().m_w != dgFloat32(0.0f))) {
+							AddPair(body0, body1, timestep, threadID);
 						}
 					} else {
 						dgAssert (rootNode->IsAggregate());
@@ -1332,9 +1325,7 @@ void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNod
 					dgAssert (leafNode->IsAggregate());
 					dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*) leafNode;
 					if (body1) {
-						if (!body1->m_isdead) {
-							aggregate->SummitPairs(body1, timestep, threadID);
-						}
+						aggregate->SummitPairs(body1, timestep, threadID);
 					} else {
 						dgAssert (rootNode->IsAggregate());
 						aggregate->SummitPairs((dgBroadPhaseAggregate*) rootNode, timestep, threadID);
