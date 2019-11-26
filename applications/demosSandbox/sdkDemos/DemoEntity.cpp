@@ -395,7 +395,7 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 			entity->m_matrix = matrix;
 			entity->SetNameID(sceneInfo->GetName());
 			const char* const name = entity->GetName().GetStr();
-			//if (strstr(name, "Sphere") || strstr(name, "Box") || strstr(name, "Capsule") || strstr(name, "ConvexHull")) {
+			//dTrace(("%s\n", name));
 			if (strstr(name, "Hidden") || strstr(name, "hidden")) {
 				entity->m_isVisible = false;
 				//dTrace(("%s %s\n", name, entity->GetParent()->GetName().GetStr()));
