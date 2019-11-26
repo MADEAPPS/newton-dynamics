@@ -565,6 +565,8 @@ extern "C" {
 	NEWTON_API int NewtonWorldGetBodyCount(const NewtonWorld* const newtonWorld);
 	NEWTON_API int NewtonWorldGetConstraintCount(const NewtonWorld* const newtonWorld);
 
+	NEWTON_API NewtonJoint* NewtonWorldFindJoint(const NewtonBody* const body0, const NewtonBody* const body1);
+
 	// **********************************************************************************************
 	//
 	// Simulation islands 

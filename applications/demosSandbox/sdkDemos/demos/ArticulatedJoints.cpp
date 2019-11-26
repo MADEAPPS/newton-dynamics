@@ -748,46 +748,6 @@ class ArticulatedVehicleManagerManager: public dModelManager
 */
 	}
 
-	dCustomJoint* LinkTires(dCustomTransformController::dSkeletonBone* const master, dCustomTransformController::dSkeletonBone* const slave, dCustomTransformController::dSkeletonBone* const root)
-	{
-		dAssert(0);
-		return NULL;
-/*
-		NewtonCollisionInfoRecord slaveTire;
-		NewtonCollisionInfoRecord masterTire;
-		{
-			// shape 0 is the inner ring
-			NewtonCollisionGetInfo(NewtonBodyGetCollision(slave->m_body), &slaveTire);
-			dAssert(slaveTire.m_collisionType == SERIALIZE_ID_COMPOUND);
-			NewtonCollision* const tire = NewtonBodyGetCollision(slave->m_body);
-			void* const node = NewtonCompoundCollisionGetNodeByIndex(tire, 0);
-			NewtonCollision* const innerRing = NewtonCompoundCollisionGetCollisionFromNode(tire, node);
-			NewtonCollisionGetInfo(innerRing, &slaveTire);
-		}
-
-		{
-			// shape 0 is the inner ring
-			NewtonCollisionGetInfo(NewtonBodyGetCollision(master->m_body), &masterTire);
-			dAssert(masterTire.m_collisionType == SERIALIZE_ID_COMPOUND);
-			NewtonCollision* const tire = NewtonBodyGetCollision(master->m_body);
-			void* const node = NewtonCompoundCollisionGetNodeByIndex(tire, 0);
-			NewtonCollision* const innerRing = NewtonCompoundCollisionGetCollisionFromNode(tire, node);
-			NewtonCollisionGetInfo(innerRing, &masterTire);
-		}
-
-		dAssert(masterTire.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
-		dAssert(slaveTire.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
-		dAssert(masterTire.m_collisionMaterial.m_userId == ARTICULATED_VEHICLE_DEFINITION::m___tireInnerRing);
-		dAssert(slaveTire.m_collisionMaterial.m_userId == ARTICULATED_VEHICLE_DEFINITION::m___tireInnerRing);
-
-		dFloat masterRadio = masterTire.m_chamferCylinder.m_height * 0.5f + masterTire.m_chamferCylinder.m_radio;
-		dFloat slaveRadio = slaveTire.m_chamferCylinder.m_height * 0.5f + slaveTire.m_chamferCylinder.m_radio;
-
-		dMatrix pinMatrix;
-		NewtonBodyGetMatrix(root->m_body, &pinMatrix[0][0]);
-		return new dCustomGear(slaveRadio / masterRadio, pinMatrix[2], pinMatrix[2].Scale(-1.0f), slave->m_body, master->m_body);
-*/
-	}
 		
 	class ConstantSpeedKnotInterpolant
 	{
@@ -1316,6 +1276,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		dMatrix hingeFrame(dYawMatrix(90.0f * dDegreeToRad) * matrix);
 
 		dCustomHinge* const tire = new dCustomHinge(hingeFrame, bone->GetBody(), parentBody);
+		//bone->S
 		//dCustomSlidingContact* const tire = new dCustomSlidingContact(hingeFrame, bone->m_body, parentBone->m_body);
 		//tire->EnableLimits(true);
 		//tire->SetLimits(0.0f, 0.0f);
@@ -1323,15 +1284,35 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		return bone;
 	}
 
+	dCustomJoint* LinkTires(dModelNode* const master, dModelNode* const slave)
+	{
+		NewtonCollisionInfoRecord slaveTire;
+		NewtonCollisionInfoRecord masterTire;
+
+		NewtonCollisionGetInfo(NewtonBodyGetCollision(slave->GetBody()), &slaveTire);
+		NewtonCollisionGetInfo(NewtonBodyGetCollision(master->GetBody()), &masterTire);
+
+		dAssert(masterTire.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
+		dAssert(slaveTire.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
+		dAssert(masterTire.m_collisionMaterial.m_userId == ARTICULATED_VEHICLE_DEFINITION::m_tirePart);
+		dAssert(slaveTire.m_collisionMaterial.m_userId == ARTICULATED_VEHICLE_DEFINITION::m_tirePart);
+
+		dFloat masterRadio = masterTire.m_chamferCylinder.m_height * 0.5f + masterTire.m_chamferCylinder.m_radio;
+		dFloat slaveRadio = slaveTire.m_chamferCylinder.m_height * 0.5f + slaveTire.m_chamferCylinder.m_radio;
+
+		dMatrix pinMatrix0;
+		dMatrix pinMatrix1;
+		const dCustomJoint* const joint = master->GetJoint();
+		joint->CalculateGlobalMatrix(pinMatrix0, pinMatrix1);
+		return new dCustomGear(slaveRadio / masterRadio, pinMatrix0[0], pinMatrix0[0].Scale(-1.0f), slave->GetBody(), master->GetBody());
+	}
+
 	void MakeLeftTrack(dModelRootNode* const controller)
 	{
-		//dCustomTransformController::dSkeletonBone* const chassisBone = controller->GetRoot();
-
-		dModelNode* const leftTire_7 = MakeRollerTire(controller, "leftFrontRoller");
 		dModelNode* const leftTire_0 = MakeRollerTire(controller, "leftGear");
+		dModelNode* const leftTire_7 = MakeRollerTire(controller, "leftFrontRoller");
+		LinkTires (leftTire_0, leftTire_7);
 /*
-		LinkTires (leftTire_0, leftTire_7, chassisBone);
-
 		MakeSupportTire("leftTireSuport_0", "suportTire", controller, chassisBone);
 		MakeSupportTire("leftTireSuport_1", "suportTire", controller, chassisBone);
 
@@ -1346,12 +1327,10 @@ class ArticulatedVehicleManagerManager: public dModelManager
 
 	void MakeRightTrack(dModelRootNode* const controller)
 	{
-		//dCustomTransformController::dSkeletonBone* const chassisBone = controller->GetRoot();
-		dModelNode* const rightTire_7 = MakeRollerTire(controller, "rightFrontRoller");
 		dModelNode* const rightTire_0 = MakeRollerTire(controller, "rightGear");
+		dModelNode* const rightTire_7 = MakeRollerTire(controller, "rightFrontRoller");
+		LinkTires (rightTire_0, rightTire_7);
 /*
-		LinkTires (rightTire_0, rightTire_7, chassisBone);
-
 		MakeSupportTire("rightTireSuport_0", "suportTire", controller, chassisBone);
 		MakeSupportTire("rightTireSuport_1", "suportTire", controller, chassisBone);
 

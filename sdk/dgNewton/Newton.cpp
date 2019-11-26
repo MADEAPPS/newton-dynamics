@@ -1218,6 +1218,16 @@ int NewtonWorldCollide (const NewtonWorld* const newtonWorld, const dFloat* cons
 	return world->GetBroadPhase()->Collide((dgCollisionInstance*)shape, dgMatrix(matrix), (OnRayPrecastAction)prefilter, userData, (dgConvexCastReturnInfo*)info, maxContactsCount, threadIndex);
 }
 
+NewtonJoint* NewtonWorldFindJoint(const NewtonBody* const body0, const NewtonBody* const body1)
+{
+	for (NewtonJoint* joint = NewtonBodyGetFirstJoint(body0); joint; joint = NewtonBodyGetNextJoint(body0, joint)) {
+		if (((body0 == NewtonJointGetBody0(joint)) && (body1 == NewtonJointGetBody1(joint))) ||
+			((body1 == NewtonJointGetBody0(joint)) && (body0 == NewtonJointGetBody1(joint)))) {
+			return joint;
+		}
+	}
+	return NULL;
+}
 
 /*!
   Retrieve body by index from island.
