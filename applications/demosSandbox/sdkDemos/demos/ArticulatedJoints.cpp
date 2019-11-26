@@ -708,46 +708,6 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		return bone;
 */
 	}
-
-	dCustomTransformController::dSkeletonBone* MakeSupportTire(const char* const entName, const char* const tireName, dCustomTransformController* const controller, dCustomTransformController::dSkeletonBone* const parentBone)
-	{
-		dAssert(0);
-		return NULL;
-/*
-		dFloat width;
-		dFloat radius;
-		NewtonBody* const parentBody = parentBone->m_body;
-		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
-		DemoEntity* const tireModel = parentModel->Find(entName);
-
-		GetTireDimensions(tireModel, radius, width);
-
-		dMatrix align(dRollMatrix(90.0f * dDegreeToRad));
-		NewtonCollision* const innerRing = NewtonCreateChamferCylinder(GetWorld(), radius, width, ARTICULATED_VEHICLE_DEFINITION::m___tireInnerRing, &align[0][0]);
-
-		NewtonCollisionMaterial innerMaterial;
-		NewtonCollisionGetMaterial(innerRing, &innerMaterial);
-		innerMaterial.m_userId = ARTICULATED_VEHICLE_DEFINITION::m___tireInnerRing;
-		innerMaterial.m_userFlags = ARTICULATED_VEHICLE_DEFINITION::m___linkPart;
-		NewtonCollisionSetMaterial(innerRing, &innerMaterial);
-
-		dCustomTransformController::dSkeletonBone* const bone = MakeTireBody(entName, tireName, controller, parentBone, innerRing);
-		NewtonDestroyCollision(innerRing);
-
-		// connect the tire the body with a hinge
-		dMatrix matrix;
-		NewtonBodyGetMatrix(bone->m_body, &matrix[0][0]);
-		//dMatrix hingeFrame (dRollMatrix(90.0f * dDegreeToRad) * matrix);
-		dMatrix hingeFrame(dRollMatrix(0.0f * dDegreeToRad) * matrix);
-
-		dCustomSlidingContact* const tire = new dCustomSlidingContact(hingeFrame, bone->m_body, parentBone->m_body);
-		tire->EnableLimits(true);
-		tire->SetLimits(0.0f, 0.0f);
-		tire->SetAsSpringDamper(false, 1.0f, 0.0f, 0.0f);
-		return bone;
-*/
-	}
-
 		
 	class ConstantSpeedKnotInterpolant
 	{
@@ -1312,17 +1272,13 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		dModelNode* const leftTire_0 = MakeRollerTire(controller, "leftGear");
 		dModelNode* const leftTire_7 = MakeRollerTire(controller, "leftFrontRoller");
 		LinkTires (leftTire_0, leftTire_7);
-/*
-		MakeSupportTire("leftTireSuport_0", "suportTire", controller, chassisBone);
-		MakeSupportTire("leftTireSuport_1", "suportTire", controller, chassisBone);
-
-		for (int i = 1; i < 7; i++) {
-		char name[64];
-		sprintf(name, "leftTire_%d", i);
-		dCustomTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
-		LinkTires (leftTire_0, childBone, chassisBone);
+		for (int i = 0; i < 3; i++) {
+			char name[64];
+			sprintf(name, "leftRoller%d", i);
+			dModelNode* const rollerTire = MakeRollerTire(controller, name);
+			LinkTires (leftTire_0, rollerTire);
 		}
-		*/
+		MakeRollerTire(controller, "leftSupportRoller");
 	}
 
 	void MakeRightTrack(dModelRootNode* const controller)
@@ -1330,17 +1286,13 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		dModelNode* const rightTire_0 = MakeRollerTire(controller, "rightGear");
 		dModelNode* const rightTire_7 = MakeRollerTire(controller, "rightFrontRoller");
 		LinkTires (rightTire_0, rightTire_7);
-/*
-		MakeSupportTire("rightTireSuport_0", "suportTire", controller, chassisBone);
-		MakeSupportTire("rightTireSuport_1", "suportTire", controller, chassisBone);
-
-		for (int i = 1; i < 7; i++) {
+		for (int i = 0; i < 3; i++) {
 			char name[64];
-			sprintf(name, "rightTire_%d", i);
-			dCustomTransformController::dSkeletonBone* const childBone = MakeSuspensionTire(name, "tire", controller, chassisBone);
-			LinkTires(rightTire_0, childBone, chassisBone);
+			sprintf(name, "rightRoller%d", i);
+			dModelNode* const rollerTire = MakeRollerTire(controller, name);
+			LinkTires(rightTire_0, rollerTire);
 		}
-		*/
+		MakeRollerTire(controller, "rightSupportRoller");
 	}
 
 	dModelRootNode* CreateExcavator (const char* const modelName, const dMatrix& location)
