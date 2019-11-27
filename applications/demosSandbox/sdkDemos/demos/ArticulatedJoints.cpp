@@ -1292,8 +1292,16 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		NewtonBodyGetMatrix(firstLinkBody, &planeMatrix[0][0]);
 		new dCustomPlane(planeMatrix.m_posit, planeMatrix.m_up, firstLinkBody, controller->GetBody());
 
+		dModelNode* linkNode0 = linkNode;
 		for (int i = 1; i < 2; i++) {
+			dMatrix hingeMatrix;
+			NewtonBody* const linkBody = MakeThreadLinkBody(controller, linkArray[i], linkCollision);
+			NewtonBodyGetMatrix(linkBody, &hingeMatrix[0][0]);
+			hingeMatrix = dYawMatrix(90.0f * dDegreeToRad) * hingeMatrix;
+			dCustomHinge* const hinge = new dCustomHinge(hingeMatrix, linkBody, linkNode0->GetBody());
 
+			//dModelNode* const linkNode1 = new dModelNode(linkBody, bindMatrix, linkNode0);
+			//linkNode0 = linkNode1;
 		}
 
 		NewtonDestroyCollision(linkCollision);
