@@ -1226,6 +1226,34 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		MakeRollerTire(controller, "rightSupportRoller");
 	}
 
+	NewtonBody* MakeThreadLinkBody(dModelNode* const parent, DemoEntity* const linkNode, NewtonCollision* const linkCollision)
+	{
+		NewtonBody* const parentBody = parent->GetBody();
+		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
+
+		// calculate the bone matrix
+		dMatrix matrix(linkNode->CalculateGlobalMatrix());
+
+		NewtonWorld* const world = GetWorld();
+
+		// create the rigid body that will make this bone
+		NewtonBody* const tireBody = NewtonCreateDynamicBody(world, linkCollision, &matrix[0][0]);
+
+		// get the collision from body
+		NewtonCollision* const collision = NewtonBodyGetCollision(tireBody);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		NewtonBodySetMassProperties(tireBody, 5.0f, collision);
+
+		// save the user data with the bone body (usually the visual geometry)
+		NewtonBodySetUserData(tireBody, linkNode);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		NewtonBodySetForceAndTorqueCallback(tireBody, PhysicsApplyGravityForce);
+
+		return tireBody;
+	}
+
 	void MakeThread(dModelRootNode* const controller, const char* const baseName)
 	{
 		/*
@@ -1250,9 +1278,26 @@ class ArticulatedVehicleManagerManager: public dModelManager
 				count++;
 			}
 		} while (link);
-		count *= 1;
-	}
+		
+		NewtonWorld* const world = GetWorld();
+		NewtonCollision* const linkCollision = linkArray[0]->CreateCollisionFromchildren(world);
+		
+		NewtonBody* const firstLinkBody = MakeThreadLinkBody(controller, linkArray[0], linkCollision);
 
+		//dMatrix bindMatrix(tireModel->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
+		dMatrix bindMatrix(dGetIdentityMatrix());
+		dModelNode* const linkNode = new dModelNode(firstLinkBody, bindMatrix, controller);
+
+		dMatrix planeMatrix;
+		NewtonBodyGetMatrix(firstLinkBody, &planeMatrix[0][0]);
+		new dCustomPlane(planeMatrix.m_posit, planeMatrix.m_up, firstLinkBody, controller->GetBody());
+
+		for (int i = 1; i < 2; i++) {
+
+		}
+
+		NewtonDestroyCollision(linkCollision);
+	}
 
 	dModelRootNode* CreateExcavator (const char* const modelName, const dMatrix& location)
 	{
@@ -1298,7 +1343,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		MakeLeftTrack (controller);
 		MakeRightTrack (controller);
 
-		MakeThread(controller, "leftThread");
+		//MakeThread(controller, "leftThread");
 		MakeThread(controller, "rightThread");
 
 #if 0
