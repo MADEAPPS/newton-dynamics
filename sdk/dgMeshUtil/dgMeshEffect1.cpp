@@ -3729,14 +3729,16 @@ void dgMeshEffect::RepairTJoints ()
 				
 				dgEdge* const collapsedEdge = CollapseEdge(edge);
 				if (collapsedEdge) {
-					dgAssert (0);
+					//dgAssert (0);
+					dgTrace(("remember to finish this!!: %s %s line:%d\n", __FILE__, __FUNCTION__, __LINE__));
 					dirty = true;
 					dgBigVector q (m_points.m_vertex[collapsedEdge->m_incidentVertex]);
 					dgEdge* ptr = collapsedEdge;
 					do {
 						if (ptr->m_incidentFace > 0) {
-							dgAssert (0);
+							//dgAssert (0);
 							//m_attrib[ptr->m_userData].m_vertex = q;
+							dgTrace(("remember to finish this!!: %s %s line:%d\n", __FILE__, __FUNCTION__, __LINE__));
 						}
 						ptr = ptr->m_twin->m_next;
 					} while (ptr != collapsedEdge);
