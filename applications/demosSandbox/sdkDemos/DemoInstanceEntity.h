@@ -24,7 +24,7 @@ class DemoInstanceEntity: public DemoEntity
 	//DemoInstanceEntity(DemoInstanceEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<DemoMeshInterface*, dScene::dTreeNode*>& meshCache, DemoInstanceEntityManager::EntityDictionary& entityDictionary, DemoInstanceEntity* const parent = NULL);
 	virtual ~DemoInstanceEntity(void);
 
-	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const;
+	virtual void Render(dFloat timeStep, DemoEntityManager* const scene, const dMatrix& matrix) const;
 
 };
 

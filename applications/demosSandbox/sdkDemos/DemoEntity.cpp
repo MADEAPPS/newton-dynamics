@@ -296,18 +296,31 @@ void DemoEntity::RenderBone() const
 	}
 }
 
-void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene) const
+void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene, const dMatrix& matrix) const
 {
+
+//	char space[256];
+//	int index = 0;
+//	for (const DemoEntity* node = this; node; node = node->GetParent()) {
+//		space[index] = ' ';
+//		index++;
+//	}
+//	space[index] = 0;
+//	dTrace(("%s%s\n", space, GetName().GetStr()));
+
+
 	// save the model matrix before changing it Matrix
-	glPushMatrix();
-
+//	glPushMatrix();
 	// Set The matrix for this entity Node
-	glMultMatrix(&m_matrix[0][0]);
+//	glMultMatrix(&m_matrix[0][0]);
 
-	// Render mesh if there is one 
+	dMatrix nodeMatrix (m_matrix * matrix);
 	if (m_isVisible && m_mesh) {
+		// Render mesh if there is one 
+		dMatrix modelMatrix (m_meshMatrix * nodeMatrix);
+
 		glPushMatrix();
-		glMultMatrix(&m_meshMatrix[0][0]);
+		glMultMatrix(&modelMatrix[0][0]);
 		m_mesh->Render (scene);
 		//m_mesh->RenderNormals ();
 		if (m_userData) {
@@ -317,14 +330,12 @@ void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene) const
 	}
 
 //	RenderBone();
-
 	for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
-		child->Render(timestep, scene);
+		child->Render(timestep, scene, nodeMatrix);
 	}
 
 	// restore the matrix before leaving
-	glPopMatrix();
-	
+//	glPopMatrix();
 }
 
 DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* const world, const ShaderPrograms& shaderCache)

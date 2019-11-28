@@ -126,7 +126,7 @@ void SkyBox::DrawMesh () const
 	glUseProgram(0);
 }
 
-void SkyBox::Render(dFloat timeStep, DemoEntityManager* const scene) const
+void SkyBox::Render(dFloat timeStep, DemoEntityManager* const scene, const dMatrix& matrix__) const
 {
 	dMatrix matrix;
 

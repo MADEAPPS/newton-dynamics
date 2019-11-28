@@ -1601,17 +1601,19 @@ void DemoEntityManager::RenderScene()
 	m_cameraManager->GetCamera()->SetViewMatrix(display_w, display_h);
 
 	// render all entities
+
+	dMatrix globalMatrix (dGetIdentityMatrix());
 	if (m_hideVisualMeshes) {
 		if (m_sky) {
 			glPushMatrix();	
-			m_sky->Render(timestep, this);
+			m_sky->Render(timestep, this, globalMatrix);
 			glPopMatrix();
 		}
 	} else {
 		for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) {
 			DemoEntity* const entity = node->GetInfo();
 			glPushMatrix();	
-			entity->Render(timestep, this);
+			entity->Render(timestep, this, globalMatrix);
 			glPopMatrix();
 		}
 	}

@@ -40,7 +40,7 @@ DemoCamera::~DemoCamera()
 {
 }
 
-void DemoCamera::Render(dFloat timeStep, DemoEntityManager* const scene) const
+void DemoCamera::Render(dFloat timeStep, DemoEntityManager* const scene, const dMatrix& matrix) const
 {
 }
 

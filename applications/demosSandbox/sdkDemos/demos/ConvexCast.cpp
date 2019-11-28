@@ -161,10 +161,10 @@ class StupidComplexOfConvexShapes: public DemoEntity
 		m_castingEntity->ResetMatrix(*scene, matrix);
 	}
 
-	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
+	virtual void Render(dFloat timeStep, DemoEntityManager* const scene, const dMatrix& matrix) const
 	{
-		DemoEntity::Render(timeStep, scene);
-		m_castingEntity->Render(timeStep, scene);
+		DemoEntity::Render(timeStep, scene, matrix);
+		m_castingEntity->Render(timeStep, scene, matrix);
 
 		// draw the last casting line
 		glDisable(GL_TEXTURE_2D);

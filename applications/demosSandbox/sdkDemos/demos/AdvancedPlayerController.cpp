@@ -159,7 +159,7 @@ class AdvancePlayerEntity: public DemoEntity
 		m_inputs = inputs;
 	}
 
-	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
+	virtual void Render(dFloat timeStep, DemoEntityManager* const scene, const dMatrix& matrix) const
 	{
 		if (m_inputs.m_cameraMode) {
 			// render only when external view mode
