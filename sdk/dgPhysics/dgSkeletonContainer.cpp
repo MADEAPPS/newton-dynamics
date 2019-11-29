@@ -642,16 +642,8 @@ DG_INLINE void dgSkeletonContainer::CalculateLoopMassMatrixCoefficients(dgFloat3
 	}
 }
 
-// Cholesky can not be used when the matrix loses the PSD status because of roundoff of a stiff system
-#define USE_CHOLESKY
-
 void dgSkeletonContainer::FactorizeMatrix(dgInt32 size, dgInt32 stride, dgFloat32* const matrix, dgFloat32* const diagDamp) const
 {
-#ifdef USE_CHOLESKY
-	//dgCholeskyApplyRegularizer(size, stride, matrix, diagDamp);
-	//dgAssert (dgTestPSDmatrix(size, stride, matrix));
-	//dgCholeskyFactorization(size, stride, matrix);
-
 	bool isPsdMatrix = false;
 	dgFloat32* const backupMatrix = dgAlloca(dgFloat32, size * stride);
 	do {
@@ -677,100 +669,6 @@ void dgSkeletonContainer::FactorizeMatrix(dgInt32 size, dgInt32 stride, dgFloat3
 			}
 		}
 	} while (!isPsdMatrix);
-
-#else
-/*
-	size = 4;
-	stride = 4;
-	dgFloat32 l0[4][4];
-	dgFloat32 d[4][4];
-	dgFloat32 lt[4][4];
-
-	l0[0][0] = 1.0; l0[0][1] =  0.0; l0[0][2] = 0.0; l0[0][3] = 0.0;
-	l0[1][0] = 3.0; l0[1][1] =  1.0; l0[1][2] = 0.0; l0[1][3] = 0.0;
-	l0[2][0] = 2.0; l0[2][1] = -3.0; l0[2][2] = 1.0; l0[2][3] = 0.0;
-	l0[3][0] = -5.0; l0[3][1] =  6.0; l0[3][2] = 8.0; l0[3][3] = 1.0;
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j ++) {
-			lt[i][j] = l0[j][i];
-		}
-	}
-
-	d[0][0] = 7.0; d[0][1] = 0.0; d[0][2] = 0.0; d[0][3] = 0.0;
-	d[1][0] = 0.0; d[1][1] = 3.0; d[1][2] = 0.0; d[1][3] = 0.0;
-	d[2][0] = 0.0; d[2][1] = 0.0; d[2][2] = 5.0; d[2][3] = 0.0;
-	d[3][0] = 0.0; d[3][1] = 0.0; d[3][2] = 0.0; d[3][3] = 8.0;
-
-	dgFloat32 tmp[4][4];
-	dgFloat32 matrix1[4][4];
-	dgMatrixTimeMatrix(4, &l0[0][0], &d[0][0], &tmp[0][0]);
-	dgMatrixTimeMatrix(4, &tmp[0][0], &lt[0][0], &matrix1[0][0]);
-	dgFloat32* matrix = &matrix1[0][0];
-
-	dgFloat32 b1[4];
-	dgFloat32 x1[4];
-	x1[0] = 1.0; x1[1] = 2.0; x1[2] = 3.0; x1[3] = 4.0;
-	dgMatrixTimeVector(4, matrix, x1, b1);
-*/
-	int start0 = 0;
-	for (dgInt32 j = 0; j < size; j++) {
-		dgFloat32* const rowN = &matrix[start0];
-		dgFloat32 aii = rowN[j];
-		dgAssert(dgAbs(aii) > dgFloat32(0.0f));
-		dgFloat32 den = dgFloat32(1.0f) / aii;
-
-		int start1 = start0 + stride;
-		for (dgInt32 i = j + 1; i < size; i++) {
-			dgFloat32* const rowM = &matrix[start1];
-			dgFloat32 scale = -rowM[j] * den;
-			for (int k = j + 1; k < size; k++) {
-				rowM[k] += scale * rowN[k];
-			}
-			start1 += stride;
-		}
-
-		rowN[j] = den;
-		for (dgInt32 i = j + 1; i < size; i++) {
-			rowN[i] *= den;
-		}
-		start0 += stride;
-	}
-
-//FactorizeMatrixSolve (4, 4, matrix, x1, b1);
-#endif
-}
-
-void dgSkeletonContainer::FactorizeMatrixSolve (dgInt32 size, dgInt32 stride, const dgFloat32* const matrix, dgFloat32* const x, const dgFloat32* const b) const
-{
-#ifdef USE_CHOLESKY
-	dgSolveCholesky(size, stride, matrix, x, b);
-#else
-	x[0] = b[0];
-	for (dgInt32 i = 1; i < size; i++) {
-		dgFloat32 acc = b[i];
-		for (dgInt32 j = 0; j < i; j++) {
-			acc = acc - matrix[stride * j + i] * x[j];
-		}
-		x[i] = acc;
-	}
-
-	dgInt32 rowStart = 0;
-	for (dgInt32 i = 0; i < size; i++) {
-		x[i] *= matrix[rowStart + i];
-		rowStart += stride;
-	}
-
-	rowStart = stride * (size - 2);
-	for (dgInt32 i = size - 2; i >= 0; i--) {
-		dgFloat32 acc = x[i];
-		const dgFloat32* const row = &matrix[rowStart];
-		for (dgInt32 j = i + 1; j < size; j++) {
-			acc = acc - row[j] * x[j];
-		}
-		x[i] = acc;
-		rowStart -= stride;
-	}
-#endif
 }
 
 void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoArray)
@@ -964,7 +862,7 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 			for (int j = 0; j < m_blockSize; j++) {
 				g[j] = -row[j];
 			}
-			FactorizeMatrixSolve(m_blockSize, m_auxiliaryRowCount, m_massMatrix11, g, g);
+			dgSolveCholesky(m_blockSize, m_auxiliaryRowCount, m_massMatrix11, g, g);
 
 			const dgFloat32* const row2 = &m_massMatrix11[(m_blockSize + i) * m_auxiliaryRowCount];
 			dgFloat32* const arow = &m_massMatrix11[(m_blockSize + i) * m_auxiliaryRowCount + m_blockSize];
@@ -1159,10 +1057,7 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 		tolerance = dgFloat32(0.0f);
 		for (dgInt32 i = 0; i < size; i++) {
 			const dgFloat32* const row = &matrix[base];
-			dgFloat32 r = b[i];
-			for (int j = 0; j < size; j++) {
-				r -= row[j] * x[j];
-			}
+			dgFloat32 r = b[i] - dgDotProduct(size, row, x);
 
 			const int index = normalIndex[i];
 			const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
@@ -1185,28 +1080,8 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 
 void dgSkeletonContainer::SolveBlockLcp(dgInt32 size, dgInt32 blockSize, const dgFloat32* const x0, dgFloat32* const x, dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
 {
-
-/*
-static int xxxxx;
-xxxxx++;
-
-if (xxxxx >= 361)
-xxxxx *=1;
-
-dgFloat32 x2[100];
-memcpy (x2, x, size * sizeof (dgFloat32));
-SolveLcp(size, size, matrix_xxxx, x0, x2, b, low, high, normalIndex);
-
-dgFloat32 x3[100];
-if (xxxxx >= 361){
-memcpy (x3, x, size * sizeof (dgFloat32));
-dgFloat32 xxxxxxxx[1000];
-memcpy (xxxxxxxx, matrix_xxxx, size * size * sizeof (dgFloat32));
-dgSolvePartitionDantzigLCP(size, xxxxxxxx, x3, b, (dgFloat32*)low, (dgFloat32*)high);
-}
-*/
 	if (blockSize) {
-		FactorizeMatrixSolve(blockSize, size, m_massMatrix11, x, b);
+		dgSolveCholesky(blockSize, size, m_massMatrix11, x, b);
 		if (blockSize != size) {
 
 			dgInt32 base = blockSize * size;

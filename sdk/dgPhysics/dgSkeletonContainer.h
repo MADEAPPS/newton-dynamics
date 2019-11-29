@@ -82,7 +82,6 @@ class dgSkeletonContainer
 	void SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const;
 	void SolveBlockLcp(dgInt32 size, dgInt32 blockSize, const dgFloat32* const x0, dgFloat32* const x, dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const;
 	void FactorizeMatrix(dgInt32 size, dgInt32 stride, dgFloat32* const matrix, dgFloat32* const diagDamp) const;
-	void FactorizeMatrixSolve (dgInt32 size, dgInt32 stride, const dgFloat32* const matrix, dgFloat32* const x, const dgFloat32* const b) const;
 
 	dgWorld* m_world;
 	dgNode* m_skeleton;
