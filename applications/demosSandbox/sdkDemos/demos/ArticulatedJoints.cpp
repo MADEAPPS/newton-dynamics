@@ -51,6 +51,7 @@ class dExcavatorModel: public dModelRootNode
 	{
 		MakeLeftTrack();
 		MakeRightTrack();
+		MakeCabinAndUpperBody ();
 	}
 
 	private:
@@ -276,7 +277,53 @@ class dExcavatorModel: public dModelRootNode
 		NewtonDestroyCollision(linkCollision);
 	}
 
+	void MakeCabinAndUpperBody ()
+	{
+		NewtonBody* const parentBody = GetBody();
+		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
+		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
+		DemoEntity* const bodyPart = parentModel->Find("EngineBody");
+		
+		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
+		dAssert(shape);
 
+		// set collision filter
+		//NewtonCollisionMaterial material;
+		//NewtonCollisionGetMaterial(shape, &material);
+		//material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		//material.m_userParam->m_int = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart + ARTICULATED_VEHICLE_DEFINITION::m_woodSlab + ARTICULATED_VEHICLE_DEFINITION::m_terrain;
+		//NewtonCollisionSetMaterial(shape, &material);
+
+		// calculate the bone matrix
+		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
+
+		// create the rigid body that will make this bone
+		NewtonBody* const body = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
+
+		// destroy the collision helper shape 
+		NewtonDestroyCollision(shape);
+
+		// get the collision from body
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		NewtonBodySetMassProperties(body, 400.0f, collision);
+
+		// save the user data with the bone body (usually the visual geometry)
+		NewtonBodySetUserData(body, bodyPart);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+
+		// connect the part to the main body with a hinge
+		dMatrix hingeFrame;
+		NewtonBodyGetMatrix(body, &hingeFrame[0][0]);
+		new dCustomHinge(hingeFrame, body, parentBody);
+
+		dMatrix bindMatrix(bodyPart->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
+		dModelNode* const bone = new dModelNode(body, bindMatrix, this);
+		//return bone;
+	}
 	
 
 };
