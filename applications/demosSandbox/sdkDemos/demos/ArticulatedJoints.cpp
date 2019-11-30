@@ -25,6 +25,8 @@
 #define ARTICULATED_VEHICLE_CAMERA_DISTANCE			13.0f
 
 
+#define EXCAVATOR_TREAD_THICKNESS	0.13f
+
 struct ARTICULATED_VEHICLE_DEFINITION
 {
 	enum SHAPES_ID
@@ -67,6 +69,45 @@ class dExcavatorModel: public dModelRootNode
 	{
 		for (int i = 0; i < m_tireCount; i ++) {
 			CalculateContact(&m_tireArray[i]);
+		}
+	}
+
+	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id)
+	{
+		dCustomJoint::dDebugDisplay* const debugContext = (dCustomJoint::dDebugDisplay*) userData;
+
+		int index = vertexCount - 1;
+		dVector p0(faceVertec[index * 3 + 0], faceVertec[index * 3 + 1], faceVertec[index * 3 + 2]);
+		for (int i = 0; i < vertexCount; i++) {
+			dVector p1(faceVertec[i * 3 + 0], faceVertec[i * 3 + 1], faceVertec[i * 3 + 2]);
+			debugContext->DrawLine(p0, p1);
+			p0 = p1;
+		}
+	}
+
+
+	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext) 
+	{
+		//debugContext->SetColor(dVector(0.0f, 0.4f, 0.7f, 1.0f));
+		debugContext->SetColor(dVector(0.7f, 0.4f, 0.0f, 1.0f));
+
+		for (int i = 0; i < m_tireCount; i ++) {
+			dMatrix matrix;
+			dVector scale;
+			NewtonCollision* const collision = NewtonBodyGetCollision(m_tireArray[i].m_tire);
+			NewtonBodyGetMatrix(m_tireArray[i].m_tire, &matrix[0][0]);
+			NewtonCollisionGetScale(collision, &scale.m_x, &scale.m_y, &scale.m_z);
+
+			NewtonCollisionInfoRecord collisionInfo;
+			NewtonCollisionGetInfo(collision, &collisionInfo);
+
+			const dVector threadThickness(EXCAVATOR_TREAD_THICKNESS, EXCAVATOR_TREAD_THICKNESS, EXCAVATOR_TREAD_THICKNESS, 0.0f);
+			dFloat r0 = collisionInfo.m_chamferCylinder.m_radio + collisionInfo.m_chamferCylinder.m_height * 0.5f;
+			dFloat r1 = r0 + threadThickness.m_x;
+			dFloat newScale = r1 / r0;
+			NewtonCollisionSetScale(collision, scale.m_x, newScale, newScale);
+			NewtonCollisionForEachPolygonDo(collision, &matrix[0][0], RenderDebugTire, debugContext);
+			NewtonCollisionSetScale(collision, scale.m_x, scale.m_y, scale.m_z);
 		}
 	}
 
@@ -132,7 +173,7 @@ class dExcavatorModel: public dModelRootNode
 		NewtonCollisionGetInfo (collision, &collisionInfo);
 		dAssert (collisionInfo.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
 
-		const dVector threadThickness (0.13f, 0.13f, 0.13f, 0.0f);
+		const dVector threadThickness (EXCAVATOR_TREAD_THICKNESS, EXCAVATOR_TREAD_THICKNESS, EXCAVATOR_TREAD_THICKNESS, 0.0f);
 		dFloat r0 = collisionInfo.m_chamferCylinder.m_radio + collisionInfo.m_chamferCylinder.m_height * 0.5f;
 		dFloat r1 = r0 + threadThickness.m_x;
 		dFloat newScale = r1 / r0;
@@ -145,12 +186,37 @@ class dExcavatorModel: public dModelRootNode
 		dCollidingBodies collidingBodies (this);
 		NewtonWorldForEachBodyInAABBDo(world, &p0.m_x, &p1.m_x, CollectBodiesOfInterest, &collidingBodies);
 
-		if (collidingBodies.m_staticCount) {
-			// if some static body is close to this tire, them calculate the contact with a thread link
-			dAssert (0);
+		// for each static body calculate the contact with a thread link
+		for (int i = 0; i < collidingBodies.m_staticCount; i ++) {
+			CalculateContact(matrix, collision, collidingBodies, collidingBodies.m_staticBodies[i]);
 		}
 
 		NewtonCollisionSetScale(collision, scale.m_x, scale.m_y, scale.m_z);
+	}
+
+	void CalculateContact(const dMatrix& tireMatrix, NewtonCollision* const tireShape, const dCollidingBodies& collidingBodies, const NewtonBody* const staticBody)
+	{
+		dMatrix staticMatrix;
+		NewtonBodyGetMatrix(staticBody, &staticMatrix[0][0]);
+		NewtonCollision* const staticShape = NewtonBodyGetCollision(staticBody);
+
+		NewtonWorld* const world = NewtonBodyGetWorld(staticBody);
+
+		const int maxContactCount = 2;
+		dFloat points[maxContactCount][3];
+		dFloat normals[maxContactCount][3];
+		dFloat penetrations[maxContactCount];
+		dLong attributeA[maxContactCount];
+		dLong attributeB[maxContactCount];
+
+		int count = NewtonCollisionCollide(world, 2,
+			tireShape, &tireMatrix[0][0],
+			staticShape, &staticMatrix[0][0],
+			&points[0][0], &normals[0][0], penetrations, attributeA, attributeB, 0);
+
+		if (count) {
+			dTrace (("TODO save this contact for later used\n"));
+		}
 	}
 
 	void GetTireDimensions(DemoEntity* const bodyPart, dFloat& radius, dFloat& width)
@@ -436,7 +502,7 @@ class dExcavatorModel: public dModelRootNode
 		new dCustomHinge(hingeFrame, body, parentBody);
 
 		dMatrix bindMatrix(bodyPart->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
-		dModelNode* const bone = new dModelNode(body, bindMatrix, this);
+		new dModelNode(body, bindMatrix, this);
 
 		m_bodyMap.Insert(body);
 		//return bone;
@@ -705,17 +771,13 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		:dModelManager (scene->GetNewton())
 	{
 		// create a material for early collision culling
-		//int material = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-		//NewtonMaterialSetCallbackUserData (scene->GetNewton(), material, material, this);
+		int material = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
+		NewtonMaterialSetCallbackUserData (scene->GetNewton(), material, material, this);
 		//NewtonMaterialSetCompoundCollisionCallback(scene->GetNewton(), material, material, CompoundSubCollisionAABBOverlap);
-		//NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, material, OnBoneAABBOverlap, OnContactsProcess);
+		NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, material, OnBoneAABBOverlap, OnContactsProcess);
 	}
 
 #if 0
-	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
-	{
-	}
-
 	virtual void OnPreUpdate (dCustomTransformController* const controller, dFloat timestep, int threadIndex) const
 	{
 		dAssert(0);
@@ -771,30 +833,6 @@ class ArticulatedVehicleManagerManager: public dModelManager
 */
 	}
 
-	static int OnBoneAABBOverlap (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
-	{
-		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
-		const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
-		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
-		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
-
-		NewtonCollisionMaterial material0;
-		NewtonCollisionMaterial material1;
-		NewtonCollisionGetMaterial(collision0, &material0);
-		NewtonCollisionGetMaterial(collision1, &material1);
-
-		int mask = material0.m_userId | material1.m_userId;
-		if (mask == (ARTICULATED_VEHICLE_DEFINITION::m___terrain + ARTICULATED_VEHICLE_DEFINITION::m___tirePart)) {
-			NewtonContactJointResetIntraJointCollision(contactJoint);
-		}
-
-		dAssert(0);
-		return 1;
-		//int filter0 = material0.m_userId & material1.m_userFlags;
-		//int filter1 = material1.m_userId & material0.m_userFlags;
-		//return ((filter0 + filter1) == mask) ? 1 : 0;
-	}
-
 	static int CompoundSubCollisionAABBOverlap (const NewtonJoint* const contact, dFloat timestep, const NewtonBody* const body0, const void* const collisionNode0, const NewtonBody* const body1, const void* const collisionNode1, int threadIndex)
 	{
 		dAssert(collisionNode0);
@@ -812,122 +850,6 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		//int filter0 = material0.m_userId & material1.m_userFlags;
 		//int filter1 = material1.m_userId & material0.m_userFlags;
 		//return ((filter0 + filter1) == mask) ? 1 : 0;
-	}
-	
-	static void OnContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
-	{
-		int countCount = 0;
-		void* contactList[32];
-
-		for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
-			contactList[countCount] = contact;
-			countCount++;
-		}
-
-		NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
-		NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
-
-		//void* userData0 = NewtonCollisionGetUserData(NewtonBodyGetCollision(body0));
-		//void* userData1 = NewtonCollisionGetUserData(NewtonBodyGetCollision(body1));
-
-		for (int i = 0; i < countCount; i ++) {
-			NewtonMaterial* const material = NewtonContactGetMaterial (contactList[i]);
-			NewtonCollision* const collision0 = NewtonMaterialGetBodyCollidingShape(material, body0);
-			NewtonCollision* const collision1 = NewtonMaterialGetBodyCollidingShape(material, body1);
-
-			ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID id0 = ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID(NewtonCollisionGetUserID(collision0));
-			ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID id1 = ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID(NewtonCollisionGetUserID(collision1));
-
-			switch (id0 | id1) 
-			{
-				case ARTICULATED_VEHICLE_DEFINITION::m___linkPart  | ARTICULATED_VEHICLE_DEFINITION::m___tireInnerRing:
-				{
-					dAssert(0);
-/*
-					dMatrix tireMatrix;
-					NewtonBody* tireBody = body0;
-					if (id1 == ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing) {
-						tireBody = body1;
-					}
-					NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
-					dVector tireAxis(tireMatrix.m_up);
-					for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
-						dVector posit;
-						dVector normal;
-						NewtonMaterial* const material = NewtonContactGetMaterial(contact);
-						NewtonMaterialGetContactPositionAndNormal (material, tireBody, &posit[0], &normal[0]);
-						dVector dir (normal.CrossProduct(tireAxis));
-						NewtonMaterialContactRotateTangentDirections(material, &dir[0]);
-						NewtonMaterialSetContactFrictionState (material, 0, 1);
-					}
-*/
-					break;
-				}
-			}
-		}
-
-
-//dAssert (0);
-/*
-		if (linkBody && !tireBody) {
-			// find the root body from the articulated structure 
-			NewtonCollision* const linkCollision = NewtonBodyGetCollision(linkBody);
-			const dCustomArticulatedTransformController::dSkeletonBone* const rootbone = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData(linkCollision);
-			dCustomArticulatedTransformController* const controller = rootbone->m_controller;
-			NewtonBody* const chassiBody = controller->GetBoneBody(rootbone);
-
-			int countCount = 0;
-			void* contactList[32];
-			for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
-				contactList[countCount] = contact;
-				countCount ++;
-			}
-
-			for (int i = 1; i < countCount; i++) {
-				NewtonContactJointRemoveContact(contactJoint, contactList[i]);
-			}
-
-			dMatrix tireMatrix;
-			dMatrix chassisMatrix;
-			NewtonBodyGetMatrix(linkBody, &tireMatrix[0][0]);
-			NewtonBodyGetMatrix(chassiBody, &chassisMatrix[0][0]);
-			dVector upDir(chassisMatrix.RotateVector(dVector(0.0f, 1.0f, 0.0f, 0.0f)));
-			dVector tireAxis(tireMatrix.RotateVector(dVector(1.0f, 0.0f, 0.0f, 0.0f)));
-			dVector contactDirection(upDir.CrossProduct(tireAxis));
-
-			NewtonMaterial* const material = NewtonContactGetMaterial(contactList[0]);
-			NewtonMaterialContactRotateTangentDirections(material, &contactDirection[0]);
-			NewtonMaterialSetContactFrictionCoef(material, 0.5f, 0.5f, 0);
-			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
-
-		} else if (tireBody) {
-
-			// find the root body from the articulated structure 
-			NewtonCollision* const tireCollsion = NewtonBodyGetCollision(tireBody);
-			const dCustomArticulatedTransformController::dSkeletonBone* const bone = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (tireCollsion);
-
-			dCustomArticulatedTransformController* const controller = bone->m_controller;
-			const dCustomArticulatedTransformController::dSkeletonBone* const rootbone = controller->GetParent(bone);
-			NewtonBody* const chassiBody = controller->GetBoneBody(rootbone);
-
-			// Get the root and tire matrices
-			dMatrix tireMatrix;
-			dMatrix chassisMatrix;
-			NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
-			NewtonBodyGetMatrix(chassiBody, &chassisMatrix[0][0]);
-
-			dVector upDir (chassisMatrix.RotateVector(dVector (0.0f, 1.0f, 0.0f, 0.0f)));
-			dVector tireAxis (tireMatrix.RotateVector(dVector (1.0f, 0.0f, 0.0f, 0.0f)));
-
-			dVector contactDirection (upDir.CrossProduct(tireAxis));
-			for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
-				NewtonMaterial* const material = NewtonContactGetMaterial (contact);
-				NewtonMaterialContactRotateTangentDirections (material, &contactDirection[0]);
-				NewtonMaterialSetContactFrictionCoef (material, 1.0f, 1.0f, 0);
-				NewtonMaterialSetContactFrictionCoef (material, 1.0f, 1.0f, 1);
-			}
-		}
-*/
 	}
 
 
@@ -1490,6 +1412,12 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		return controller;
 	}
 
+	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext) 
+	{
+		dExcavatorModel* const excavator = (dExcavatorModel*) model;
+		excavator->OnDebug(debugContext);
+	}
+
 	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const 
 	{
 		dExcavatorModel* const excavator = (dExcavatorModel*) model;
@@ -1506,6 +1434,159 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
 
+	static void OnContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
+	{
+#if 0
+		int countCount = 0;
+		void* contactList[32];
+
+		for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
+			contactList[countCount] = contact;
+			countCount++;
+		}
+
+		NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
+		NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
+
+		//void* userData0 = NewtonCollisionGetUserData(NewtonBodyGetCollision(body0));
+		//void* userData1 = NewtonCollisionGetUserData(NewtonBodyGetCollision(body1));
+
+		for (int i = 0; i < countCount; i ++) {
+			NewtonMaterial* const material = NewtonContactGetMaterial (contactList[i]);
+			NewtonCollision* const collision0 = NewtonMaterialGetBodyCollidingShape(material, body0);
+			NewtonCollision* const collision1 = NewtonMaterialGetBodyCollidingShape(material, body1);
+
+			ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID id0 = ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID(NewtonCollisionGetUserID(collision0));
+			ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID id1 = ARTICULATED_VEHICLE_DEFINITION::SHAPES_ID(NewtonCollisionGetUserID(collision1));
+
+			switch (id0 | id1) 
+			{
+				case ARTICULATED_VEHICLE_DEFINITION::m___linkPart  | ARTICULATED_VEHICLE_DEFINITION::m___tireInnerRing:
+				{
+					dAssert(0);
+/*
+					dMatrix tireMatrix;
+					NewtonBody* tireBody = body0;
+					if (id1 == ARTICULATED_VEHICLE_DEFINITION::m_tireInnerRing) {
+						tireBody = body1;
+					}
+					NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
+					dVector tireAxis(tireMatrix.m_up);
+					for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
+						dVector posit;
+						dVector normal;
+						NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+						NewtonMaterialGetContactPositionAndNormal (material, tireBody, &posit[0], &normal[0]);
+						dVector dir (normal.CrossProduct(tireAxis));
+						NewtonMaterialContactRotateTangentDirections(material, &dir[0]);
+						NewtonMaterialSetContactFrictionState (material, 0, 1);
+					}
+*/
+					break;
+				}
+			}
+		}
+
+
+//dAssert (0);
+/*
+		if (linkBody && !tireBody) {
+			// find the root body from the articulated structure 
+			NewtonCollision* const linkCollision = NewtonBodyGetCollision(linkBody);
+			const dCustomArticulatedTransformController::dSkeletonBone* const rootbone = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData(linkCollision);
+			dCustomArticulatedTransformController* const controller = rootbone->m_controller;
+			NewtonBody* const chassiBody = controller->GetBoneBody(rootbone);
+
+			int countCount = 0;
+			void* contactList[32];
+			for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
+				contactList[countCount] = contact;
+				countCount ++;
+			}
+
+			for (int i = 1; i < countCount; i++) {
+				NewtonContactJointRemoveContact(contactJoint, contactList[i]);
+			}
+
+			dMatrix tireMatrix;
+			dMatrix chassisMatrix;
+			NewtonBodyGetMatrix(linkBody, &tireMatrix[0][0]);
+			NewtonBodyGetMatrix(chassiBody, &chassisMatrix[0][0]);
+			dVector upDir(chassisMatrix.RotateVector(dVector(0.0f, 1.0f, 0.0f, 0.0f)));
+			dVector tireAxis(tireMatrix.RotateVector(dVector(1.0f, 0.0f, 0.0f, 0.0f)));
+			dVector contactDirection(upDir.CrossProduct(tireAxis));
+
+			NewtonMaterial* const material = NewtonContactGetMaterial(contactList[0]);
+			NewtonMaterialContactRotateTangentDirections(material, &contactDirection[0]);
+			NewtonMaterialSetContactFrictionCoef(material, 0.5f, 0.5f, 0);
+			NewtonMaterialSetContactFrictionCoef(material, 1.0f, 1.0f, 1);
+
+		} else if (tireBody) {
+
+			// find the root body from the articulated structure 
+			NewtonCollision* const tireCollsion = NewtonBodyGetCollision(tireBody);
+			const dCustomArticulatedTransformController::dSkeletonBone* const bone = (dCustomArticulatedTransformController::dSkeletonBone*)NewtonCollisionGetUserData (tireCollsion);
+
+			dCustomArticulatedTransformController* const controller = bone->m_controller;
+			const dCustomArticulatedTransformController::dSkeletonBone* const rootbone = controller->GetParent(bone);
+			NewtonBody* const chassiBody = controller->GetBoneBody(rootbone);
+
+			// Get the root and tire matrices
+			dMatrix tireMatrix;
+			dMatrix chassisMatrix;
+			NewtonBodyGetMatrix(tireBody, &tireMatrix[0][0]);
+			NewtonBodyGetMatrix(chassiBody, &chassisMatrix[0][0]);
+
+			dVector upDir (chassisMatrix.RotateVector(dVector (0.0f, 1.0f, 0.0f, 0.0f)));
+			dVector tireAxis (tireMatrix.RotateVector(dVector (1.0f, 0.0f, 0.0f, 0.0f)));
+
+			dVector contactDirection (upDir.CrossProduct(tireAxis));
+			for (void* contact = NewtonContactJointGetFirstContact (contactJoint); contact; contact = NewtonContactJointGetNextContact (contactJoint, contact)) {
+				NewtonMaterial* const material = NewtonContactGetMaterial (contact);
+				NewtonMaterialContactRotateTangentDirections (material, &contactDirection[0]);
+				NewtonMaterialSetContactFrictionCoef (material, 1.0f, 1.0f, 0);
+				NewtonMaterialSetContactFrictionCoef (material, 1.0f, 1.0f, 1);
+			}
+		}
+*/
+#endif
+	}
+
+	static int OnBoneAABBOverlap(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
+	{
+		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
+		const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
+		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
+		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
+
+		NewtonCollisionMaterial material0;
+		NewtonCollisionMaterial material1;
+		NewtonCollisionGetMaterial(collision0, &material0);
+		NewtonCollisionGetMaterial(collision1, &material1);
+
+		// for Terrain - thread link collision
+		const dLong mask = ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain;
+		const dLong linkTest = mask & (material0.m_userId | material1.m_userId);
+		if (linkTest == mask) {
+			dTrace (("TODO: Special thread collision\n"));
+			return 0;
+		}
+
+/*
+		int mask = material0.m_userId | material1.m_userId;
+		if (mask == (ARTICULATED_VEHICLE_DEFINITION::m___terrain + ARTICULATED_VEHICLE_DEFINITION::m___tirePart)) {
+			NewtonContactJointResetIntraJointCollision(contactJoint);
+		}
+
+		dAssert(0);
+		return 1;
+		//int filter0 = material0.m_userId & material1.m_userFlags;
+		//int filter1 = material1.m_userId & material0.m_userFlags;
+		//return ((filter0 + filter1) == mask) ? 1 : 0;
+*/
+		return 1;
+	}
+
 };
 
 void ArticulatedJoints (DemoEntityManager* const scene)
@@ -1518,11 +1599,11 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	NewtonCollision* const floorCollision = NewtonBodyGetCollision(floor);
 
 	// set collision filter mask
-	//NewtonCollisionMaterial material;
-	//NewtonCollisionGetMaterial(floorCollision, &material);
-	//material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m___terrain;
-	//material.m_userFlags = ARTICULATED_VEHICLE_DEFINITION::m___woodSlab + ARTICULATED_VEHICLE_DEFINITION::m___bodyPart + ARTICULATED_VEHICLE_DEFINITION::m___linkPart + ARTICULATED_VEHICLE_DEFINITION::m___tirePart;
-	//NewtonCollisionSetMaterial(floorCollision, &material);
+	NewtonCollisionMaterial material;
+	NewtonCollisionGetMaterial(floorCollision, &material);
+	material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_terrain;
+	material.m_userParam[0].m_int = -1;
+	NewtonCollisionSetMaterial(floorCollision, &material);
 
 	// add an input Manage to manage the inputs and user interaction 
 	//AriculatedJointInputManager* const inputManager = new AriculatedJointInputManager (scene);
