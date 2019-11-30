@@ -46,15 +46,81 @@ struct ARTICULATED_VEHICLE_DEFINITION
 class dExcavatorModel: public dModelRootNode
 {
 	public:
+	class dThreadContacts
+	{
+		public:
+		//dVector m_contactPoint[4];
+		//int m_contactCount;
+		//NewtonBody* m_link
+		NewtonBody* m_tire;
+	};
+
 	dExcavatorModel(NewtonBody* const rootBody)
 		:dModelRootNode(rootBody, dGetIdentityMatrix())
+		,m_tireCount(0)
 	{
+		m_bodyMap.Insert(rootBody);
+
 		MakeLeftTrack();
 		MakeRightTrack();
 		MakeCabinAndUpperBody ();
 	}
 
+	void CalculateTireContacts()
+	{
+		for (int i = 0; i < m_tireCount; i ++) {
+			CalculateContact(&m_tireArray[i]);
+		}
+	}
+
 	private:
+	class BodySet
+	{
+		public:
+		BodySet (dExcavatorModel* const me)
+			:m_excavator(me)
+			,m_threaLinkCount(0)
+		{
+		}
+
+		const NewtonBody* m_threaLinks[16];
+		dExcavatorModel* m_excavator;
+		int m_threaLinkCount;
+	};
+
+	static int TestBody (const NewtonBody* const body, void* const userData)
+	{
+		BodySet* const set = (BodySet*)userData;
+		if (set->m_excavator->m_bodyMap.Find(body)) {
+			return 1;
+		}
+
+		set->m_threaLinks[set->m_threaLinkCount] = body;
+		set->m_threaLinkCount ++;
+		dAssert (set->m_threaLinkCount < sizeof (set->m_threaLinks) / sizeof (set->m_threaLinks[0]));
+		return 1;
+	}
+
+	void CalculateContact(dThreadContacts* const tire)
+	{
+		dMatrix matrix;
+		dVector p0;
+		dVector p1;
+
+		NewtonWorld* const world = NewtonBodyGetWorld(tire->m_tire);
+		NewtonCollision* const collision = NewtonBodyGetCollision(tire->m_tire);
+		NewtonBodyGetMatrix(tire->m_tire, &matrix[0][0]);
+		
+		NewtonCollisionCalculateAABB (collision, &matrix[0][0], &p0[0], &p1[0]);
+		p0 -= dVector (0.15f, 0.15f, 0.15f, 0.0f);
+		p1 += dVector (0.15f, 0.15f, 0.15f, 0.0f);
+
+		//NewtonWorldForEachBodyInAABBDo(world, &p0.m_x, &p1.m_x, TestBody, &bodyList);
+
+		BodySet set (this);
+		NewtonWorldForEachBodyInAABBDo(world, &p0.m_x, &p1.m_x, TestBody, &set);
+	}
+
 	void GetTireDimensions(DemoEntity* const bodyPart, dFloat& radius, dFloat& width)
 	{
 		radius = 0.0f;
@@ -113,6 +179,9 @@ class dExcavatorModel: public dModelRootNode
 
 		dMatrix bindMatrix(tireModel->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
 		dModelNode* const bone = new dModelNode(tireBody, bindMatrix, this);
+
+		m_bodyMap.Insert(tireBody);
+
 		return bone;
 	}
 
@@ -162,11 +231,15 @@ class dExcavatorModel: public dModelRootNode
 	{
 		dModelNode* const leftTire_0 = MakeRollerTire("leftGear");
 		dModelNode* const leftTire_7 = MakeRollerTire("leftFrontRoller");
+		m_tireArray[m_tireCount++].m_tire = leftTire_0->GetBody();
+		m_tireArray[m_tireCount++].m_tire = leftTire_7->GetBody();
+
 		LinkTires (leftTire_0, leftTire_7);
 		for (int i = 0; i < 3; i++) {
 			char name[64];
 			sprintf(name, "leftRoller%d", i);
 			dModelNode* const rollerTire = MakeRollerTire(name);
+			m_tireArray[m_tireCount++].m_tire = rollerTire->GetBody();
 			LinkTires (leftTire_0, rollerTire);
 		}
 		MakeRollerTire("leftSupportRoller");
@@ -177,11 +250,15 @@ class dExcavatorModel: public dModelRootNode
 	{
 		dModelNode* const rightTire_0 = MakeRollerTire("rightGear");
 		dModelNode* const rightTire_7 = MakeRollerTire("rightFrontRoller");
+		m_tireArray[m_tireCount++].m_tire = rightTire_0->GetBody();
+		m_tireArray[m_tireCount++].m_tire = rightTire_7->GetBody();
+
 		LinkTires(rightTire_0, rightTire_7);
 		for (int i = 0; i < 3; i++) {
 			char name[64];
 			sprintf(name, "rightRoller%d", i);
 			dModelNode* const rollerTire = MakeRollerTire(name);
+			m_tireArray[m_tireCount++].m_tire = rollerTire->GetBody();
 			LinkTires(rightTire_0, rollerTire);
 		}
 		MakeRollerTire("rightSupportRoller");
@@ -322,10 +399,14 @@ class dExcavatorModel: public dModelRootNode
 
 		dMatrix bindMatrix(bodyPart->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
 		dModelNode* const bone = new dModelNode(body, bindMatrix, this);
+
+		m_bodyMap.Insert(body);
 		//return bone;
 	}
-	
 
+	dMap<NewtonBody*, const NewtonBody*> m_bodyMap;
+	dThreadContacts m_tireArray[16];
+	int m_tireCount;
 };
 
 #if 0
@@ -1373,6 +1454,12 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		return controller;
 	}
 
+	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const 
+	{
+		dExcavatorModel* const excavator = (dExcavatorModel*) model;
+		excavator->CalculateTireContacts();
+	}
+
 	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const
 	{
 		NewtonBody* const body = bone->GetBody();
@@ -1382,6 +1469,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		dQuaternion rot(localMatrix);
 		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
+
 };
 
 void ArticulatedJoints (DemoEntityManager* const scene)

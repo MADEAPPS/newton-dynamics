@@ -360,14 +360,10 @@ void SetShowMeshCollision (SceneManager& me, int mode)
 	}
 }
 
-
 void SetShowIslands (SceneManager& me, int mode)
 {
 	showIslans = mode;
 }
-
-
-//static void CalculateAABB (const NewtonBody* body, dVector& minP, dVector& maxP)
 
 int PhysicsIslandUpdate (const NewtonWorld* world, const void* islandHandle, int bodyCount)
 {
@@ -1050,7 +1046,6 @@ void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVect
 	geometry->Release(); 
 	NewtonDestroyCollision (collision);
 }
-
 
 void CalculateAABB (const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP)
 {
