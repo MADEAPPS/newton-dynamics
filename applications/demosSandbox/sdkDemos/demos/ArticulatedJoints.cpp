@@ -31,9 +31,9 @@ struct ARTICULATED_VEHICLE_DEFINITION
 	{
 		m_terrain			= 1<<0,
 		m_bodyPart			= 1<<1,
-		m_woodSlab			= 1<<2,
-		m_tirePart			= 1<<3,
-		//m___linkPart 		= 1<<3,
+		m_tirePart			= 1<<2,
+		m_linkPart 			= 1<<3,
+		//m_woodSlab			= 1<<2,
 		//m___tireInnerRing	= 1<<5,
 	};
 
@@ -49,9 +49,6 @@ class dExcavatorModel: public dModelRootNode
 	class dThreadContacts
 	{
 		public:
-		//dVector m_contactPoint[4];
-		//int m_contactCount;
-		//NewtonBody* m_link
 		NewtonBody* m_tire;
 	};
 
@@ -74,51 +71,86 @@ class dExcavatorModel: public dModelRootNode
 	}
 
 	private:
-	class BodySet
+	class dCollidingBodies
 	{
 		public:
-		BodySet (dExcavatorModel* const me)
+		dCollidingBodies (dExcavatorModel* const me)
 			:m_excavator(me)
+			,m_staticCount(0)
 			,m_threaLinkCount(0)
 		{
 		}
-
+		
 		const NewtonBody* m_threaLinks[16];
+		const NewtonBody* m_staticBodies[16];
 		dExcavatorModel* m_excavator;
+		int m_staticCount;
 		int m_threaLinkCount;
 	};
 
-	static int TestBody (const NewtonBody* const body, void* const userData)
+	static int CollectBodiesOfInterest (const NewtonBody* const body, void* const userData)
 	{
-		BodySet* const set = (BodySet*)userData;
-		if (set->m_excavator->m_bodyMap.Find(body)) {
-			return 1;
+		dFloat mass;
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		dCollidingBodies* const set = (dCollidingBodies*)userData;
+		if (!set->m_excavator->m_bodyMap.Find(body)) {
+			NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+			if (mass > 0.0f) {
+				const NewtonCollision* const collision = NewtonBodyGetCollision(body);
+				dLong id = NewtonCollisionGetUserID(collision);
+				if (id == ARTICULATED_VEHICLE_DEFINITION::m_linkPart) {
+					set->m_threaLinks[set->m_threaLinkCount] = body;
+					set->m_threaLinkCount ++;
+					dAssert (set->m_threaLinkCount < sizeof (set->m_threaLinks) / sizeof (set->m_threaLinks[0]));
+				}
+			} else {
+				set->m_staticBodies[set->m_staticCount] = body;
+				set->m_staticCount ++;
+				dAssert (set->m_staticCount < sizeof (set->m_staticBodies) / sizeof (set->m_staticBodies[0]));
+			}
 		}
-
-		set->m_threaLinks[set->m_threaLinkCount] = body;
-		set->m_threaLinkCount ++;
-		dAssert (set->m_threaLinkCount < sizeof (set->m_threaLinks) / sizeof (set->m_threaLinks[0]));
 		return 1;
 	}
 
 	void CalculateContact(dThreadContacts* const tire)
 	{
 		dMatrix matrix;
+		dVector scale;
 		dVector p0;
 		dVector p1;
 
+		// get the static bodies and thread link close to this scaled tire. 
 		NewtonWorld* const world = NewtonBodyGetWorld(tire->m_tire);
 		NewtonCollision* const collision = NewtonBodyGetCollision(tire->m_tire);
+
 		NewtonBodyGetMatrix(tire->m_tire, &matrix[0][0]);
+		NewtonCollisionGetScale(collision, &scale.m_x, &scale.m_y, &scale.m_z);
+
+		NewtonCollisionInfoRecord collisionInfo;
+		NewtonCollisionGetInfo (collision, &collisionInfo);
+		dAssert (collisionInfo.m_collisionType == SERIALIZE_ID_CHAMFERCYLINDER);
+
+		const dVector threadThickness (0.13f, 0.13f, 0.13f, 0.0f);
+		dFloat r0 = collisionInfo.m_chamferCylinder.m_radio + collisionInfo.m_chamferCylinder.m_height * 0.5f;
+		dFloat r1 = r0 + threadThickness.m_x;
+		dFloat newScale = r1 / r0;
+		NewtonCollisionSetScale(collision, scale.m_x, newScale, newScale);
 		
 		NewtonCollisionCalculateAABB (collision, &matrix[0][0], &p0[0], &p1[0]);
-		p0 -= dVector (0.15f, 0.15f, 0.15f, 0.0f);
-		p1 += dVector (0.15f, 0.15f, 0.15f, 0.0f);
+		p0 -= threadThickness;
+		p1 += threadThickness;
 
-		//NewtonWorldForEachBodyInAABBDo(world, &p0.m_x, &p1.m_x, TestBody, &bodyList);
+		dCollidingBodies collidingBodies (this);
+		NewtonWorldForEachBodyInAABBDo(world, &p0.m_x, &p1.m_x, CollectBodiesOfInterest, &collidingBodies);
 
-		BodySet set (this);
-		NewtonWorldForEachBodyInAABBDo(world, &p0.m_x, &p1.m_x, TestBody, &set);
+		if (collidingBodies.m_staticCount) {
+			// if some static body is close to this tire, them calculate the contact with a thread link
+			dAssert (0);
+		}
+
+		NewtonCollisionSetScale(collision, scale.m_x, scale.m_y, scale.m_z);
 	}
 
 	void GetTireDimensions(DemoEntity* const bodyPart, dFloat& radius, dFloat& width)
@@ -277,6 +309,12 @@ class dExcavatorModel: public dModelRootNode
 
 		// get the collision from body
 		NewtonCollision* const collision = NewtonBodyGetCollision(tireBody);
+
+		// set the material properties for each link
+		NewtonCollisionMaterial material;
+		NewtonCollisionGetMaterial(collision, &material);
+		material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_linkPart;
+		NewtonCollisionSetMaterial(collision, &material);
 
 		// calculate the moment of inertia and the relative center of mass of the solid
 		NewtonBodySetMassProperties(tireBody, 5.0f, collision);
@@ -1357,7 +1395,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		NewtonCollisionMaterial material;
 		NewtonCollisionGetMaterial(shape, &material);
 		material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
-		material.m_userParam->m_int = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart + ARTICULATED_VEHICLE_DEFINITION::m_woodSlab + ARTICULATED_VEHICLE_DEFINITION::m_terrain;
+//		material.m_userParam->m_int = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart + ARTICULATED_VEHICLE_DEFINITION::m_woodSlab + ARTICULATED_VEHICLE_DEFINITION::m_terrain;
 		NewtonCollisionSetMaterial(shape, &material);
 
 		// calculate the bone matrix
@@ -1382,8 +1420,6 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
 		return body;
 	}
-
-
 
 	dModelRootNode* CreateExcavator (const char* const modelName, const dMatrix& location)
 	{
