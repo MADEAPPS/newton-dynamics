@@ -1151,8 +1151,6 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 					 row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
 		b[i] = rhs->m_coordenateAccel - acc.AddHorizontal().GetScalar();
 
-		//normalIndex[i] = 0;
-//		normalIndex[i] = (rhs->m_normalForceIndex < 0) ? 0 : rhs->m_normalForceIndex - i;
 		normalIndex[i] = m_frictionIndex[primaryCount + i];
 		u0[i] = rhs->m_force;
 		low[i] = rhs->m_lowerBoundFrictionCoefficent;
@@ -1161,23 +1159,15 @@ void dgSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
-		dgFloat32 r = dgFloat32(0.0f);
-		for (dgInt32 j = 0; j < primaryCount; j++) {
-			r += matrixRow10[j] * f[j];
-		}
-		b[i] -= r;
+		b[i] -= dgDotProduct(primaryCount, matrixRow10, f);
 	}
 
-	//SolveLcp(m_auxiliaryRowCount, m_blockSize, m_massMatrix11, u0, u, b, low, high, normalIndex);
 	SolveBlockLcp(m_auxiliaryRowCount, m_blockSize, u0, u, b, low, high, normalIndex);
 
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		const dgFloat32 s = u[i];
 		f[primaryCount + i] = s;
-		const dgFloat32* const deltaForce = &m_deltaForce[i * primaryCount];
-		for (dgInt32 j = 0; j < primaryCount; j++) {
-			f[j] += deltaForce[j] * s;
-		}
+		dgMulAdd(primaryCount, f, f, &m_deltaForce[i * primaryCount], s);
 	}
 
 	for (dgInt32 i = 0; i < m_rowCount; i++) {

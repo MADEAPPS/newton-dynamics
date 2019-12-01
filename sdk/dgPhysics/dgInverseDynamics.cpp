@@ -1091,11 +1091,7 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalForc
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
 		u[i] = dgFloat32(0.0f);
-		dgFloat32 r = dgFloat32(0.0f);
-		for (dgInt32 j = 0; j < primaryCount; j++) {
-			r += matrixRow10[j] * f[j];
-		}
-		b[i] -= r;
+		b[i] -= dgDotProduct(primaryCount, matrixRow10, f);
 	}
 
 	//dgSolveDantzigLCP(m_auxiliaryRowCount, massMatrix11, u, b, low, high);
@@ -1104,10 +1100,7 @@ void dgInverseDynamics::CalculateCloseLoopsForces(dgJacobian* const externalForc
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		const dgFloat32 s = u[i];
 		f[primaryCount + i] = s;
-		const dgFloat32* const deltaForce = &m_deltaForce[i * primaryCount];
-		for (dgInt32 j = 0; j < primaryCount; j++) {
-			f[j] += deltaForce[j] * s;
-		}
+		dgMulAdd(primaryCount, f, f, &m_deltaForce[i * primaryCount], s);
 	}
 
 	const dgInt32 rowCount = m_rowCount - m_ikRowCount;

@@ -35,8 +35,7 @@ struct ARTICULATED_VEHICLE_DEFINITION
 		m_bodyPart			= 1<<1,
 		m_tirePart			= 1<<2,
 		m_linkPart 			= 1<<3,
-		//m_woodSlab			= 1<<2,
-		//m___tireInnerRing	= 1<<5,
+		m_propBody			= 1<<4,
 	};
 
 	char m_boneName[32];
@@ -51,18 +50,33 @@ class dExcavatorModel: public dModelRootNode
 	class dThreadContacts
 	{
 		public:
+		dVector m_point[2];
+		dVector m_normal[2];
 		NewtonBody* m_tire;
+		const NewtonBody* m_link[2];
+		dFloat m_penetration[2];
+		int m_count;
 	};
 
-	dExcavatorModel(NewtonBody* const rootBody)
+	dExcavatorModel(NewtonBody* const rootBody, int linkMaterilID)
 		:dModelRootNode(rootBody, dGetIdentityMatrix())
+		,m_bodyMap()
+		,m_shereCast (NewtonCreateSphere (NewtonBodyGetWorld(rootBody), 0.01f, 0, NULL))
 		,m_tireCount(0)
 	{
 		m_bodyMap.Insert(rootBody);
+		memset (m_tireArray, 0, sizeof (m_tireArray));
 
 		MakeLeftTrack();
 		MakeRightTrack();
+		//MakeThread("leftThread", linkMaterilID);
+		MakeThread("rightThread", linkMaterilID);
 		MakeCabinAndUpperBody ();
+	}
+
+	~dExcavatorModel()
+	{
+		NewtonDestroyCollision(m_shereCast);
 	}
 
 	void CalculateTireContacts()
@@ -85,10 +99,8 @@ class dExcavatorModel: public dModelRootNode
 		}
 	}
 
-
 	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext) 
 	{
-		//debugContext->SetColor(dVector(0.0f, 0.4f, 0.7f, 1.0f));
 		debugContext->SetColor(dVector(0.7f, 0.4f, 0.0f, 1.0f));
 
 		for (int i = 0; i < m_tireCount; i ++) {
@@ -109,6 +121,39 @@ class dExcavatorModel: public dModelRootNode
 			NewtonCollisionForEachPolygonDo(collision, &matrix[0][0], RenderDebugTire, debugContext);
 			NewtonCollisionSetScale(collision, scale.m_x, scale.m_y, scale.m_z);
 		}
+
+		debugContext->SetColor(dVector(1.0f, 0.0f, 0.0f, 1.0f));
+		for (int i = 0; i < m_tireCount; i ++) {
+			const dThreadContacts* const entry = &m_tireArray[i];
+			for (int j = 0; j < entry->m_count; j++) {
+				debugContext->DrawPoint(entry->m_point[j], 20.0f);
+			}
+		}
+	}
+
+	const dThreadContacts* FindTireEntry(const NewtonBody* const linkBody) const 
+	{
+		for (int i = 0; i < m_tireCount; i ++) {
+			const dThreadContacts* const entry = &m_tireArray[i];
+			for (int j = 0; j < entry->m_count; j ++) {
+				if (entry->m_link[j] == linkBody) {
+					return entry;
+				}
+			}
+		}
+		return NULL;
+	}
+
+	int OnBoneAABBOverlap(const NewtonJoint* const contactJoint) const
+	{
+		const NewtonBody* const linkBody = NewtonJointGetBody0(contactJoint);
+		return FindTireEntry(linkBody) ? 1 : 0;
+
+		//const NewtonBody* const staticBody = NewtonJointGetBody1(contactJoint);
+		//const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
+		//const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
+		//for (int i = 0; )
+		//return 0;
 	}
 
 	private:
@@ -122,8 +167,8 @@ class dExcavatorModel: public dModelRootNode
 		{
 		}
 		
-		const NewtonBody* m_threaLinks[16];
-		const NewtonBody* m_staticBodies[16];
+		const NewtonBody* m_threaLinks[24];
+		const NewtonBody* m_staticBodies[8];
 		dExcavatorModel* m_excavator;
 		int m_staticCount;
 		int m_threaLinkCount;
@@ -187,14 +232,15 @@ class dExcavatorModel: public dModelRootNode
 		NewtonWorldForEachBodyInAABBDo(world, &p0.m_x, &p1.m_x, CollectBodiesOfInterest, &collidingBodies);
 
 		// for each static body calculate the contact with a thread link
+		tire->m_count = 0;
 		for (int i = 0; i < collidingBodies.m_staticCount; i ++) {
-			CalculateContact(matrix, collision, collidingBodies, collidingBodies.m_staticBodies[i]);
+			CalculateContact(tire, matrix, collision, collidingBodies, collidingBodies.m_staticBodies[i]);
 		}
 
 		NewtonCollisionSetScale(collision, scale.m_x, scale.m_y, scale.m_z);
 	}
 
-	void CalculateContact(const dMatrix& tireMatrix, NewtonCollision* const tireShape, const dCollidingBodies& collidingBodies, const NewtonBody* const staticBody)
+	void CalculateContact(dThreadContacts* const tire, const dMatrix& tireMatrix, NewtonCollision* const tireShape, const dCollidingBodies& collidingBodies, const NewtonBody* const staticBody)
 	{
 		dMatrix staticMatrix;
 		NewtonBodyGetMatrix(staticBody, &staticMatrix[0][0]);
@@ -215,7 +261,32 @@ class dExcavatorModel: public dModelRootNode
 			&points[0][0], &normals[0][0], penetrations, attributeA, attributeB, 0);
 
 		if (count) {
-			dTrace (("TODO save this contact for later used\n"));
+			dVector zero (0.0f);
+			dVector targetPoint(points[0][0], points[0][1], points[0][2], dFloat(1.0f));
+			dVector targetNormal(normals[0][0], normals[0][1], normals[0][2], dFloat(0.0f));
+			dFloat targetPenetration = penetrations[0];
+			for (int i = 0; i < collidingBodies.m_threaLinkCount && (tire->m_count < 2); i ++) {
+				dMatrix linkMatrix;
+				dVector veloc (targetPoint - tireMatrix.m_posit);
+
+				NewtonCollision* const linkCollision = NewtonBodyGetCollision(collidingBodies.m_threaLinks[i]);
+				NewtonBodyGetMatrix (collidingBodies.m_threaLinks[i], &linkMatrix[0][0]);
+				dFloat timeOfImpact;
+				int collide = NewtonCollisionCollideContinue(
+					world, 1, 1.0f,
+					m_shereCast, &tireMatrix[0][0], &veloc[0], &zero[0],
+					linkCollision, &linkMatrix[0][0], &zero[0], &zero[0],
+					&timeOfImpact, &points[0][0], &normals[0][0], &penetrations[0],
+					&attributeA[0], &attributeB[0], 0);
+				if (collide) {
+					int index = tire->m_count;
+					tire->m_point[index] = targetPoint;
+					tire->m_normal[index] = targetNormal;
+					tire->m_penetration[index] = targetPenetration;
+					tire->m_link[index] = collidingBodies.m_threaLinks[i];
+					tire->m_count = index + 1;
+				}
+			}
 		}
 	}
 
@@ -263,8 +334,26 @@ class dExcavatorModel: public dModelRootNode
 		// create the rigid body that will make this bone
 		NewtonBody* const tireBody = NewtonCreateDynamicBody(world, tireCollision, &matrix[0][0]);
 
+		// assign the material ID
+		NewtonBodySetMaterialGroupID(tireBody, NewtonMaterialGetDefaultGroupID(world));
+
 		// get the collision from body
 		NewtonCollision* const collision = NewtonBodyGetCollision(tireBody);
+
+		// save the root node as the use data
+		NewtonCollisionSetUserData(collision, this);
+
+		// set the material properties for each link
+		NewtonCollisionMaterial material;
+		NewtonCollisionGetMaterial(collision, &material);
+		material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_tirePart;
+		material.m_userParam[0].m_int =
+			ARTICULATED_VEHICLE_DEFINITION::m_terrain |
+			ARTICULATED_VEHICLE_DEFINITION::m_bodyPart |
+			ARTICULATED_VEHICLE_DEFINITION::m_linkPart |
+			ARTICULATED_VEHICLE_DEFINITION::m_tirePart |
+			ARTICULATED_VEHICLE_DEFINITION::m_propBody;
+		NewtonCollisionSetMaterial(collision, &material);
 
 		// calculate the moment of inertia and the relative center of mass of the solid
 		NewtonBodySetMassProperties(tireBody, 30.0f, collision);
@@ -341,7 +430,6 @@ class dExcavatorModel: public dModelRootNode
 			LinkTires (leftTire_0, rollerTire);
 		}
 		MakeRollerTire("leftSupportRoller");
-		MakeThread("leftThread");
 	}
 
 	void MakeRightTrack()
@@ -360,10 +448,9 @@ class dExcavatorModel: public dModelRootNode
 			LinkTires(rightTire_0, rollerTire);
 		}
 		MakeRollerTire("rightSupportRoller");
-		MakeThread("rightThread");
 	}
 
-	NewtonBody* MakeThreadLinkBody(DemoEntity* const linkNode, NewtonCollision* const linkCollision)
+	NewtonBody* MakeThreadLinkBody(DemoEntity* const linkNode, NewtonCollision* const linkCollision, int linkMaterilID)
 	{
 		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
 
@@ -371,30 +458,42 @@ class dExcavatorModel: public dModelRootNode
 		dMatrix matrix(linkNode->CalculateGlobalMatrix());
 
 		// create the rigid body that will make this bone
-		NewtonBody* const tireBody = NewtonCreateDynamicBody(world, linkCollision, &matrix[0][0]);
+		NewtonBody* const linkBody = NewtonCreateDynamicBody(world, linkCollision, &matrix[0][0]);
+
+		// assign the material ID
+		NewtonBodySetMaterialGroupID(linkBody, linkMaterilID);
 
 		// get the collision from body
-		NewtonCollision* const collision = NewtonBodyGetCollision(tireBody);
+		NewtonCollision* const collision = NewtonBodyGetCollision(linkBody);
+
+		// save the root node as the use data
+		NewtonCollisionSetUserData(collision, this);
 
 		// set the material properties for each link
 		NewtonCollisionMaterial material;
 		NewtonCollisionGetMaterial(collision, &material);
 		material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_linkPart;
+		material.m_userParam[0].m_int = 
+									  ARTICULATED_VEHICLE_DEFINITION::m_terrain | 
+									  //ARTICULATED_VEHICLE_DEFINITION::m_bodyPart |
+									  //ARTICULATED_VEHICLE_DEFINITION::m_linkPart |
+									  ARTICULATED_VEHICLE_DEFINITION::m_tirePart |
+									  ARTICULATED_VEHICLE_DEFINITION::m_propBody;
 		NewtonCollisionSetMaterial(collision, &material);
 
 		// calculate the moment of inertia and the relative center of mass of the solid
-		NewtonBodySetMassProperties(tireBody, 5.0f, collision);
+		NewtonBodySetMassProperties(linkBody, 5.0f, collision);
 
 		// save the user data with the bone body (usually the visual geometry)
-		NewtonBodySetUserData(tireBody, linkNode);
+		NewtonBodySetUserData(linkBody, linkNode);
 
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
-		NewtonBodySetForceAndTorqueCallback(tireBody, PhysicsApplyGravityForce);
+		NewtonBodySetForceAndTorqueCallback(linkBody, PhysicsApplyGravityForce);
 
-		return tireBody;
+		return linkBody;
 	}
 
-	void MakeThread(const char* const baseName)
+	void MakeThread(const char* const baseName, int linkMaterilID)
 	{
 		NewtonBody* const parentBody = GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
@@ -426,7 +525,7 @@ class dExcavatorModel: public dModelRootNode
 		
 		NewtonCollision* const linkCollision = linkArray[0]->CreateCollisionFromchildren(world);
 
-		NewtonBody* const firstLinkBody = MakeThreadLinkBody(linkArray[0], linkCollision);
+		NewtonBody* const firstLinkBody = MakeThreadLinkBody(linkArray[0], linkCollision, linkMaterilID);
 
 		//dMatrix bindMatrix(linkArray[count]->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
 		dMatrix bindMatrix(dGetIdentityMatrix());
@@ -441,7 +540,7 @@ class dExcavatorModel: public dModelRootNode
 		dModelNode* linkNode0 = linkNode;
 		for (int i = 1; i < linksCount; i++) {
 			dMatrix hingeMatrix;
-			NewtonBody* const linkBody = MakeThreadLinkBody(linkArray[i], linkCollision);
+			NewtonBody* const linkBody = MakeThreadLinkBody(linkArray[i], linkCollision, linkMaterilID);
 			NewtonBodyGetMatrix(linkBody, &hingeMatrix[0][0]);
 			hingeMatrix = dRollMatrix(90.0f * dDegreeToRad) * hingeMatrix;
 			dCustomHinge* const hinge = new dCustomHinge(hingeMatrix, linkBody, linkNode0->GetBody());
@@ -472,7 +571,7 @@ class dExcavatorModel: public dModelRootNode
 		//NewtonCollisionMaterial material;
 		//NewtonCollisionGetMaterial(shape, &material);
 		//material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
-		//material.m_userParam->m_int = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart + ARTICULATED_VEHICLE_DEFINITION::m_woodSlab + ARTICULATED_VEHICLE_DEFINITION::m_terrain;
+		//material.m_userParam[0].m_int = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart + ARTICULATED_VEHICLE_DEFINITION::m_woodSlab + ARTICULATED_VEHICLE_DEFINITION::m_terrain;
 		//NewtonCollisionSetMaterial(shape, &material);
 
 		// calculate the bone matrix
@@ -481,11 +580,29 @@ class dExcavatorModel: public dModelRootNode
 		// create the rigid body that will make this bone
 		NewtonBody* const body = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
 
+		// assign the material ID
+		NewtonBodySetMaterialGroupID(body, NewtonMaterialGetDefaultGroupID(world));
+
 		// destroy the collision helper shape 
 		NewtonDestroyCollision(shape);
 
 		// get the collision from body
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+
+		// save the root node as the use data
+		NewtonCollisionSetUserData(collision, this);
+
+		// set the material properties for each link
+		NewtonCollisionMaterial material;
+		NewtonCollisionGetMaterial(collision, &material);
+		material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		material.m_userParam[0].m_int =
+			ARTICULATED_VEHICLE_DEFINITION::m_terrain |
+			ARTICULATED_VEHICLE_DEFINITION::m_bodyPart |
+			ARTICULATED_VEHICLE_DEFINITION::m_linkPart |
+			ARTICULATED_VEHICLE_DEFINITION::m_tirePart |
+			ARTICULATED_VEHICLE_DEFINITION::m_propBody;
+		NewtonCollisionSetMaterial(collision, &material);
 
 		// calculate the moment of inertia and the relative center of mass of the solid
 		NewtonBodySetMassProperties(body, 400.0f, collision);
@@ -510,6 +627,7 @@ class dExcavatorModel: public dModelRootNode
 
 	dMap<NewtonBody*, const NewtonBody*> m_bodyMap;
 	dThreadContacts m_tireArray[16];
+	NewtonCollision* m_shereCast;
 	int m_tireCount;
 };
 
@@ -767,14 +885,20 @@ class AriculatedJointInputManager: public dCustomListener
 class ArticulatedVehicleManagerManager: public dModelManager
 {
 	public:
-	ArticulatedVehicleManagerManager (DemoEntityManager* const scene)
+	ArticulatedVehicleManagerManager (DemoEntityManager* const scene, int threadMaterialID)
 		:dModelManager (scene->GetNewton())
+		,m_threadMaterialID(threadMaterialID)
 	{
 		// create a material for early collision culling
 		int material = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
 		NewtonMaterialSetCallbackUserData (scene->GetNewton(), material, material, this);
-		//NewtonMaterialSetCompoundCollisionCallback(scene->GetNewton(), material, material, CompoundSubCollisionAABBOverlap);
-		NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, material, OnBoneAABBOverlap, OnContactsProcess);
+		NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, material, StandardAABBOverlapTest, StandardContactsProcess);
+
+		NewtonMaterialSetCallbackUserData(scene->GetNewton(), material, threadMaterialID, this);
+		NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, threadMaterialID, StandardAABBOverlapTest, StandardContactsProcess);
+
+		NewtonMaterialSetCallbackUserData(scene->GetNewton(), threadMaterialID, threadMaterialID, this);
+		NewtonMaterialSetCollisionCallback (scene->GetNewton(), threadMaterialID, threadMaterialID, SpecialAABBOverlapTest, SpecialContactsProcess);
 	}
 
 #if 0
@@ -1313,24 +1437,37 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
 		dAssert(shape);
 
-		// set collision filter
-		NewtonCollisionMaterial material;
-		NewtonCollisionGetMaterial(shape, &material);
-		material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
-//		material.m_userParam->m_int = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart + ARTICULATED_VEHICLE_DEFINITION::m_woodSlab + ARTICULATED_VEHICLE_DEFINITION::m_terrain;
-		NewtonCollisionSetMaterial(shape, &material);
-
 		// calculate the bone matrix
 		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
 
 		// create the rigid body that will make this bone
 		NewtonBody* const body = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
 
+		// assign the material ID
+		NewtonBodySetMaterialGroupID(body, NewtonMaterialGetDefaultGroupID(world));
+
 		// destroy the collision helper shape 
 		NewtonDestroyCollision(shape);
 
 		// get the collision from body
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+
+		// save the root node as the use data
+		NewtonCollisionSetUserData(collision, this);
+
+		// set collision filter
+		// set the material properties for each link
+		NewtonCollisionMaterial material;
+		NewtonCollisionGetMaterial(collision, &material);
+		material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		material.m_userParam[0].m_int =
+			ARTICULATED_VEHICLE_DEFINITION::m_terrain |
+			ARTICULATED_VEHICLE_DEFINITION::m_bodyPart |
+			ARTICULATED_VEHICLE_DEFINITION::m_linkPart |
+			ARTICULATED_VEHICLE_DEFINITION::m_tirePart |
+			ARTICULATED_VEHICLE_DEFINITION::m_propBody;
+		NewtonCollisionSetMaterial(collision, &material);
+
 
 		// calculate the moment of inertia and the relative center of mass of the solid
 		NewtonBodySetMassProperties(body, mass, collision);
@@ -1359,7 +1496,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 
 		DemoEntity* const rootEntity = (DemoEntity*)vehicleModel->Find("base");
 		NewtonBody* const rootBody = CreateBodyPart(rootEntity, 4000.0f);
-		dExcavatorModel* const controller = new dExcavatorModel(rootBody);
+		dExcavatorModel* const controller = new dExcavatorModel(rootBody, m_threadMaterialID);
 
 		// the the model to calculate the local transformation
 		controller->SetTranformMode(true);
@@ -1434,8 +1571,9 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
 
-	static void OnContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
+	static void StandardContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 	{
+		//dAssert (0);
 #if 0
 		int countCount = 0;
 		void* contactList[32];
@@ -1552,47 +1690,68 @@ class ArticulatedVehicleManagerManager: public dModelManager
 #endif
 	}
 
-	static int OnBoneAABBOverlap(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
+	static int StandardAABBOverlapTest(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 	{
 		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
 		const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
 		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
 		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
 
+		if (NewtonCollisionGetUserData(collision0) != NewtonCollisionGetUserData(collision1)) {
+			return 1;
+		}
+
 		NewtonCollisionMaterial material0;
 		NewtonCollisionMaterial material1;
 		NewtonCollisionGetMaterial(collision0, &material0);
 		NewtonCollisionGetMaterial(collision1, &material1);
 
-		// for Terrain - thread link collision
-		const dLong mask = ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain;
-		const dLong linkTest = mask & (material0.m_userId | material1.m_userId);
-		if (linkTest == mask) {
-			dTrace (("TODO: Special thread collision\n"));
-			return 0;
-		}
-
-/*
-		int mask = material0.m_userId | material1.m_userId;
-		if (mask == (ARTICULATED_VEHICLE_DEFINITION::m___terrain + ARTICULATED_VEHICLE_DEFINITION::m___tirePart)) {
-			NewtonContactJointResetIntraJointCollision(contactJoint);
-		}
-
-		dAssert(0);
-		return 1;
-		//int filter0 = material0.m_userId & material1.m_userFlags;
-		//int filter1 = material1.m_userId & material0.m_userFlags;
-		//return ((filter0 + filter1) == mask) ? 1 : 0;
-*/
-		return 1;
+		//m_terrain = 1 << 0,
+		//m_bodyPart = 1 << 1,
+		//m_tirePart = 1 << 2,
+		//m_linkPart = 1 << 3,
+		//m_propBody = 1 << 4,
+	
+		const dLong mask0 = material0.m_userId & material1.m_userParam[0].m_int;
+		const dLong mask1 = material1.m_userId & material0.m_userParam[0].m_int;
+		return (mask0 && mask1) ? 1 : 0;
 	}
 
+	static int SpecialAABBOverlapTest(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
+	{
+		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
+		const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
+		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
+		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
+
+		dAssert (NewtonBodyGetMaterialGroupID(body0) == NewtonBodyGetMaterialGroupID(body1));
+		dAssert (NewtonBodyGetMaterialGroupID(body0) != NewtonMaterialGetDefaultGroupID(NewtonBodyGetWorld(body0)));
+		dAssert (NewtonBodyGetMaterialGroupID(body1) != NewtonMaterialGetDefaultGroupID(NewtonBodyGetWorld(body1)));
+		dAssert (NewtonCollisionGetUserID(collision0) & (ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain));
+		dAssert (NewtonCollisionGetUserID(collision1) & (ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain));
+
+		dExcavatorModel* const excavator = (dExcavatorModel*)NewtonCollisionGetUserData(collision0);
+		dAssert (excavator);
+		return excavator->OnBoneAABBOverlap(contactJoint);
+	}
+
+	static void SpecialContactsProcess(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
+	{
+
+		//dAssert(0);
+	}
+
+
+	int m_threadMaterialID;
 };
 
 void ArticulatedJoints (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
+
+//	int defaultId = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+	int specialThreadId = NewtonMaterialCreateGroupID(scene->GetNewton());
 
 	NewtonBody* const floor = CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//NewtonBody* floor = CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
@@ -1602,15 +1761,21 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	NewtonCollisionMaterial material;
 	NewtonCollisionGetMaterial(floorCollision, &material);
 	material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_terrain;
-	material.m_userParam[0].m_int = -1;
+	material.m_userParam[0].m_int =
+		//ARTICULATED_VEHICLE_DEFINITION::m_terrain |
+		ARTICULATED_VEHICLE_DEFINITION::m_bodyPart |
+		ARTICULATED_VEHICLE_DEFINITION::m_linkPart |
+		ARTICULATED_VEHICLE_DEFINITION::m_tirePart |
+		ARTICULATED_VEHICLE_DEFINITION::m_propBody;
+
 	NewtonCollisionSetMaterial(floorCollision, &material);
+	NewtonBodySetMaterialGroupID(floor, specialThreadId);
 
 	// add an input Manage to manage the inputs and user interaction 
 	//AriculatedJointInputManager* const inputManager = new AriculatedJointInputManager (scene);
 
-
 	//  create a skeletal transform controller for controlling rag doll
-	ArticulatedVehicleManagerManager* const vehicleManager = new ArticulatedVehicleManagerManager (scene);
+	ArticulatedVehicleManagerManager* const vehicleManager = new ArticulatedVehicleManagerManager (scene, specialThreadId);
 
 	NewtonWorld* const world = scene->GetNewton();
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
