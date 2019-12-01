@@ -382,7 +382,7 @@ void dgBroadPhase::ForEachBodyInAABB(const dgBroadPhaseNode** stackPool, dgInt32
 
 			dgBody* const body = rootNode->GetBody();
 			if (body) {
-				if (dgOverlapTest(body->m_minAABB, body->m_maxAABB, minBox, maxBox)) {
+				if (!body->m_isdead && dgOverlapTest(body->m_minAABB, body->m_maxAABB, minBox, maxBox)) {
 					if (!callback(body, userData)) {
 						break;
 					}
@@ -409,8 +409,6 @@ void dgBroadPhase::ForEachBodyInAABB(const dgBroadPhaseNode** stackPool, dgInt32
 		}
 	}
 }
-
-
 
 dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* const distance, dgInt32 stack, const dgVector& velocA, const dgVector& velocB, dgFastRayTest& ray,
 								 dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
@@ -443,7 +441,7 @@ dgInt32 dgBroadPhase::ConvexCast(const dgBroadPhaseNode** stackPool, dgFloat32* 
 
 			dgBody* const body = me->GetBody();
 			if (body) {
-				if (!PREFILTER_RAYCAST(prefilter, body, body->m_collision, userData)) {
+				if (!body->m_isdead && !PREFILTER_RAYCAST(prefilter, body, body->m_collision, userData)) {
 					dgInt32 count = m_world->CollideContinue(shape, matrix, velocA, velocB, body->m_collision, body->m_matrix, velocB, velocB, timeToImpact, points, normals, penetration, attributeA, attributeB, maxContacts, threadIndex);
 
 					if (timeToImpact < maxParam) {
@@ -555,7 +553,7 @@ dgInt32 dgBroadPhase::Collide(const dgBroadPhaseNode** stackPool, dgInt32* const
 
 			dgBody* const body = me->GetBody();
 			if (body) {
-				if (!PREFILTER_RAYCAST(prefilter, body, body->m_collision, userData)) {
+				if (!body->m_isdead && !PREFILTER_RAYCAST(prefilter, body, body->m_collision, userData)) {
 					dgInt32 count = m_world->Collide(shape, matrix, body->m_collision, body->m_matrix, points, normals, penetration, attributeA, attributeB, DG_CONVEX_CAST_POOLSIZE, threadIndex);
 
 					if (count) {
@@ -638,13 +636,15 @@ void dgBroadPhase::RayCast(const dgBroadPhaseNode** stackPool, dgFloat32* const 
 			dgAssert(me);
 			dgBody* const body = me->GetBody();
 			if (body) {
-				dgAssert(!me->GetLeft());
-				dgAssert(!me->GetRight());
-				dgFloat32 param = body->RayCast(line, filter, prefilter, userData, maxParam);
-				if (param < maxParam) {
-					maxParam = param;
-					if (maxParam < dgFloat32(1.0e-8f)) {
-						break;
+				if (!body->m_isdead) {
+					dgAssert(!me->GetLeft());
+					dgAssert(!me->GetRight());
+					dgFloat32 param = body->RayCast(line, filter, prefilter, userData, maxParam);
+					if (param < maxParam) {
+						maxParam = param;
+						if (maxParam < dgFloat32(1.0e-8f)) {
+							break;
+						}
 					}
 				}
 			} else if (me->IsAggregate()) {
@@ -717,7 +717,6 @@ void dgBroadPhase::CollisionChange (dgBody* const body, dgCollisionInstance* con
 
 void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 {
-	//if (m_rootNode && !m_rootNode->IsLeafNode() && body->m_masterNode) {
 	if (m_rootNode && body->m_masterNode) {
 		dgBroadPhaseBodyNode* const node = body->GetBroadPhase();
 		dgBody* const body1 = node->GetBody();
@@ -762,7 +761,6 @@ void dgBroadPhase::UpdateBody(dgBody* const body, dgInt32 threadIndex)
 		}
 	}
 }
-
 
 dgBroadPhaseNode* dgBroadPhase::BuildTopDown(dgBroadPhaseNode** const leafArray, dgInt32 firstBox, dgInt32 lastBox, dgFitnessList::dgListNode** const nextNode)
 {

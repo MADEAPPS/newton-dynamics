@@ -94,7 +94,6 @@ void dgBroadPhaseMixed::RayCast(const dgVector& l0, const dgVector& l1, OnRayCas
 	}
 }
 
-
 dgInt32 dgBroadPhaseMixed::ConvexCast(dgCollisionInstance* const shape, const dgMatrix& matrix, const dgVector& target, dgFloat32* const param, OnRayPrecastAction prefilter, void* const userData, dgConvexCastReturnInfo* const info, dgInt32 maxContacts, dgInt32 threadIndex) const
 {
 	dgInt32 totalCount = 0;
