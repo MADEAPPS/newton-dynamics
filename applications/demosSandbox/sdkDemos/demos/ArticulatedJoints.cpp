@@ -69,7 +69,7 @@ class dExcavatorModel: public dModelRootNode
 
 		MakeLeftTrack();
 		MakeRightTrack();
-		//MakeThread("leftThread", linkMaterilID);
+		MakeThread("leftThread", linkMaterilID);
 		MakeThread("rightThread", linkMaterilID);
 		MakeCabinAndUpperBody ();
 	}
@@ -148,12 +148,27 @@ class dExcavatorModel: public dModelRootNode
 	{
 		const NewtonBody* const linkBody = NewtonJointGetBody0(contactJoint);
 		return FindTireEntry(linkBody) ? 1 : 0;
+	}
 
-		//const NewtonBody* const staticBody = NewtonJointGetBody1(contactJoint);
-		//const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
-		//const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
-		//for (int i = 0; )
-		//return 0;
+	int SpecialGenerateLinkGroundContact (const NewtonMaterial* const material, const NewtonBody* const linkBody0, const NewtonBody* const staticBody, NewtonUserContactPoint* const contactBuffer)
+	{
+		const dThreadContacts* const linkBody = FindTireEntry(linkBody0);
+		int ret = 0;
+		if (linkBody && linkBody->m_count) {
+			contactBuffer->m_point[0] = linkBody->m_point[0].m_x;
+			contactBuffer->m_point[1] = linkBody->m_point[0].m_y;
+			contactBuffer->m_point[2] = linkBody->m_point[0].m_z;
+			contactBuffer->m_point[3] = 1.0f;
+			contactBuffer->m_normal[0] = linkBody->m_normal[0].m_x;
+			contactBuffer->m_normal[1] = linkBody->m_normal[0].m_y;
+			contactBuffer->m_normal[2] = linkBody->m_normal[0].m_z;
+			contactBuffer->m_normal[3] = 0.0f;
+			contactBuffer->m_penetration = linkBody->m_penetration[0];
+			contactBuffer->m_shapeId0 = 0;
+			contactBuffer->m_shapeId1 = 0;
+			ret = 1;
+		}
+		return ret;
 	}
 
 	private:
@@ -233,20 +248,26 @@ class dExcavatorModel: public dModelRootNode
 
 		// for each static body calculate the contact with a thread link
 		tire->m_count = 0;
+		dMatrix vehMatrix;
+		NewtonBodyGetMatrix(GetBody(), &vehMatrix[0][0]);
 		for (int i = 0; i < collidingBodies.m_staticCount; i ++) {
-			CalculateContact(tire, matrix, collision, collidingBodies, collidingBodies.m_staticBodies[i]);
+			CalculateContact(tire, vehMatrix.m_up, matrix, collision, collidingBodies, collidingBodies.m_staticBodies[i]);
 		}
 
 		NewtonCollisionSetScale(collision, scale.m_x, scale.m_y, scale.m_z);
 	}
 
-	void CalculateContact(dThreadContacts* const tire, const dMatrix& tireMatrix, NewtonCollision* const tireShape, const dCollidingBodies& collidingBodies, const NewtonBody* const staticBody)
+	bool CalculateContact(
+		const NewtonBody* const staticBody, const dMatrix& tireMatrix, NewtonCollision* const tireShape, const dVector& updir,
+		dVector& targetPoint, dVector& targetNormal, dFloat& targetPenetration)
 	{
 		dMatrix staticMatrix;
 		NewtonBodyGetMatrix(staticBody, &staticMatrix[0][0]);
 		NewtonCollision* const staticShape = NewtonBodyGetCollision(staticBody);
-
 		NewtonWorld* const world = NewtonBodyGetWorld(staticBody);
+		dVector zero(0.0f);
+		dVector veloc(updir.Scale(-0.7f));
+		dFloat timeOfImpact;
 
 		const int maxContactCount = 2;
 		dFloat points[maxContactCount][3];
@@ -255,36 +276,77 @@ class dExcavatorModel: public dModelRootNode
 		dLong attributeA[maxContactCount];
 		dLong attributeB[maxContactCount];
 
-		int count = NewtonCollisionCollide(world, 2,
-			tireShape, &tireMatrix[0][0],
-			staticShape, &staticMatrix[0][0],
-			&points[0][0], &normals[0][0], penetrations, attributeA, attributeB, 0);
+		int count = 0;
+		if (0) {
+			count = NewtonCollisionCollide(world, 1,
+						tireShape, &tireMatrix[0][0],
+						staticShape, &staticMatrix[0][0],
+						&points[0][0], &normals[0][0], penetrations, attributeA, attributeB, 0);
+		} else {
+			count = NewtonCollisionCollideContinue(world, 1, 1.0f,
+						m_shereCast, &tireMatrix[0][0], &veloc[0], &zero[0],
+						staticShape, &staticMatrix[0][0], &zero[0], &zero[0],
+						&timeOfImpact, &points[0][0], &normals[0][0], &penetrations[0],
+						&attributeA[0], &attributeB[0], 0);
+		}
 
 		if (count) {
+			targetPoint = dVector (points[0][0], points[0][1], points[0][2], dFloat(1.0f));
+			targetNormal = dVector (normals[0][0], normals[0][1], normals[0][2], dFloat(0.0f));
+			targetPenetration = penetrations[0];
+		}
+
+		return count ? true : false;
+	}
+
+	void CalculateContact(dThreadContacts* const tire, const dVector& updir, const dMatrix& tireMatrix, NewtonCollision* const tireShape, const dCollidingBodies& collidingBodies, const NewtonBody* const staticBody)
+	{
+		dVector targetPoint;
+		dVector targetNormal;
+		dFloat targetPenetration;
+		bool hasContact = CalculateContact(staticBody, tireMatrix, tireShape, updir, targetPoint, targetNormal, targetPenetration);
+
+		if (hasContact) {
+			dMatrix scanMatrix (dGetIdentityMatrix());
 			dVector zero (0.0f);
-			dVector targetPoint(points[0][0], points[0][1], points[0][2], dFloat(1.0f));
-			dVector targetNormal(normals[0][0], normals[0][1], normals[0][2], dFloat(0.0f));
-			dFloat targetPenetration = penetrations[0];
+
+			const int maxContactCount = 2;
+			dFloat points[maxContactCount][3];
+			dFloat normals[maxContactCount][3];
+			dFloat penetrations[maxContactCount];
+			dLong attributeA[maxContactCount];
+			dLong attributeB[maxContactCount];
+
+			scanMatrix.m_posit = targetPoint;
+			NewtonWorld* const world = NewtonBodyGetWorld(staticBody);
 			for (int i = 0; i < collidingBodies.m_threaLinkCount && (tire->m_count < 2); i ++) {
 				dMatrix linkMatrix;
-				dVector veloc (targetPoint - tireMatrix.m_posit);
+				//dVector veloc (targetPoint - tireMatrix.m_posit);
+				dVector dir (tireMatrix.m_posit - scanMatrix.m_posit);
+				dir = dir.Normalize();
+				dVector veloc (dir.Scale (0.7f));
+				dFloat timeOfImpact;
 
 				NewtonCollision* const linkCollision = NewtonBodyGetCollision(collidingBodies.m_threaLinks[i]);
 				NewtonBodyGetMatrix (collidingBodies.m_threaLinks[i], &linkMatrix[0][0]);
-				dFloat timeOfImpact;
+				
 				int collide = NewtonCollisionCollideContinue(
 					world, 1, 1.0f,
-					m_shereCast, &tireMatrix[0][0], &veloc[0], &zero[0],
+					m_shereCast, &scanMatrix[0][0], &veloc[0], &zero[0],
 					linkCollision, &linkMatrix[0][0], &zero[0], &zero[0],
 					&timeOfImpact, &points[0][0], &normals[0][0], &penetrations[0],
 					&attributeA[0], &attributeB[0], 0);
 				if (collide) {
-					int index = tire->m_count;
-					tire->m_point[index] = targetPoint;
-					tire->m_normal[index] = targetNormal;
-					tire->m_penetration[index] = targetPenetration;
-					tire->m_link[index] = collidingBodies.m_threaLinks[i];
-					tire->m_count = index + 1;
+					dVector p (points[0][0], points[0][1], points[0][2], dFloat (1.0f));
+					dFloat dist = dir.DotProduct3(p - targetPoint);
+					if (dist <= 0.0f) {
+						int index = tire->m_count;
+						tire->m_point[index] = targetPoint;
+						tire->m_normal[index] = targetNormal;
+						tire->m_penetration[index] = -dist;
+						tire->m_link[index] = collidingBodies.m_threaLinks[i];
+						tire->m_count = index + 1;
+					}
 				}
 			}
 		}
@@ -890,15 +952,17 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		,m_threadMaterialID(threadMaterialID)
 	{
 		// create a material for early collision culling
-		int material = NewtonMaterialGetDefaultGroupID (scene->GetNewton());
-		NewtonMaterialSetCallbackUserData (scene->GetNewton(), material, material, this);
-		NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, material, StandardAABBOverlapTest, StandardContactsProcess);
+		NewtonWorld* const world = scene->GetNewton();
+		int material = NewtonMaterialGetDefaultGroupID (world);
+		NewtonMaterialSetCallbackUserData (world, material, material, this);
+		NewtonMaterialSetCollisionCallback (world, material, material, StandardAABBOverlapTest, StandardContactsProcess);
 
-		NewtonMaterialSetCallbackUserData(scene->GetNewton(), material, threadMaterialID, this);
-		NewtonMaterialSetCollisionCallback (scene->GetNewton(), material, threadMaterialID, StandardAABBOverlapTest, StandardContactsProcess);
+		NewtonMaterialSetCallbackUserData(world, material, threadMaterialID, this);
+		NewtonMaterialSetCollisionCallback (world, material, threadMaterialID, StandardAABBOverlapTest, StandardContactsProcess);
 
-		NewtonMaterialSetCallbackUserData(scene->GetNewton(), threadMaterialID, threadMaterialID, this);
-		NewtonMaterialSetCollisionCallback (scene->GetNewton(), threadMaterialID, threadMaterialID, SpecialAABBOverlapTest, SpecialContactsProcess);
+		NewtonMaterialSetCallbackUserData(world, threadMaterialID, threadMaterialID, this);
+		NewtonMaterialSetCollisionCallback (world, threadMaterialID, threadMaterialID, SpecialAABBOverlapTest, SpecialContactsProcess);
+		NewtonMaterialSetContactGenerationCallback (world, threadMaterialID, threadMaterialID, SpecialGenerateLinkGroundContacts);
 	}
 
 #if 0
@@ -1735,12 +1799,17 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		return excavator->OnBoneAABBOverlap(contactJoint);
 	}
 
-	static void SpecialContactsProcess(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
+	static int SpecialGenerateLinkGroundContacts (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex)
 	{
-
-		//dAssert(0);
+		dExcavatorModel* const excavator = (dExcavatorModel*)NewtonCollisionGetUserData(collision0);
+		dAssert(excavator);
+		return excavator->SpecialGenerateLinkGroundContact (material, body0, body1, contactBuffer);
 	}
 
+	static void SpecialContactsProcess(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
+	{
+		//dAssert(0);
+	}
 
 	int m_threadMaterialID;
 };
@@ -1750,7 +1819,6 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-//	int defaultId = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
 	int specialThreadId = NewtonMaterialCreateGroupID(scene->GetNewton());
 
 	NewtonBody* const floor = CreateLevelMesh (scene, "flatPlane.ngd", true);
@@ -1792,7 +1860,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 //	scene->Append(vehicleModel);
 //	ArticulatedEntityModel robotModel(scene, "excavator.ngd");
 
-	dModelRootNode* const robot = vehicleManager->CreateExcavator ("excavator.ngd", matrix);
+	dModelRootNode* const excavator = vehicleManager->CreateExcavator ("excavator.ngd", matrix);
 /*
 	inputManager->AddPlayer (robot);
 
