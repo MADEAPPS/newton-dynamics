@@ -511,7 +511,6 @@ dgSetPrecisionDouble::~dgSetPrecisionDouble()
 	#endif
 }
 
-
 dgFloatExceptions::dgFloatExceptions(dgUnsigned32 mask)
 {
 	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
@@ -525,13 +524,9 @@ dgFloatExceptions::dgFloatExceptions(dgUnsigned32 mask)
 			fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
 		#endif
 	#else
-		
-		#if (defined(__arm__) || defined(__aarch64__))
-			// this is not ok for arm - call clearfp?
-		#else
-		_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-	#endif
-
+		#if (!defined(__arm__) && !defined(__aarch64__))
+			_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+		#endif
 	#endif
 
 //	float a (1.0f);

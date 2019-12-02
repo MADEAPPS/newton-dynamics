@@ -114,10 +114,7 @@
 
 	#include <unistd.h>
 	#include <assert.h>
-	
-	#if (defined(__arm__) || defined(__aarch64__)) // it was __ARMCC_VERSION before, it should be __ARM__ or aarch64, otherwise cross compiling in gcc fails.
-		
-	#else 
+	#if (!defined(__arm__) && !defined(__aarch64__)) // it was __ARMCC_VERSION before, it should be __ARM__ or aarch64, otherwise cross compiling in gcc fails.
 		extern "C" 
 		{ 
 			// for SSE3 and up
@@ -201,13 +198,8 @@
 #ifdef _DEBUG
 	#define DG_INLINE inline
 #else
-	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || (defined _MINGW_32_VER) || (defined _MINGW_64_VER))
-		#if ((defined _MINGW_32_VER) || (defined _MINGW_64_VER)) // mingw
-			// otherwise we get failures during inlining in dgInverseDynamics.cpp:114:12: error: inlining failed in call to always_inline
-			#define DG_INLINE inline
-		#else
+	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 			#define DG_INLINE __forceinline 
-		#endif
 	#else 
 		#define DG_INLINE	inline
 		//#define DG_INLINE	 __attribute__((always_inline))
