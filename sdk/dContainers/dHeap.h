@@ -26,7 +26,7 @@
 #include "dContainersStdAfx.h"
 #include "dContainersAlloc.h"
 
-#define D_CHECK_HEAP
+//#define D_CHECK_HEAP
 
 
 template <class OBJECT, class KEY>
