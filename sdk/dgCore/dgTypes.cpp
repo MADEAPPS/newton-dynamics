@@ -28,7 +28,8 @@
 
 dgUnsigned64 dgGetTimeInMicrosenconds()
 {
-#if (defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__))
+#if (defined (_MSC_VER) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+// #if (defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__))
 	static LARGE_INTEGER frequency;
 	static LARGE_INTEGER baseCount;
 	if (!frequency.QuadPart) {
@@ -524,7 +525,13 @@ dgFloatExceptions::dgFloatExceptions(dgUnsigned32 mask)
 			fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
 		#endif
 	#else
+		
+		#if (defined(__arm__) || defined(__aarch64__))
+			// this is not ok for arm - call clearfp?
+		#else
 		_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+	#endif
+
 	#endif
 
 //	float a (1.0f);
