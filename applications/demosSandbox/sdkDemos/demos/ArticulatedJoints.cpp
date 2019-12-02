@@ -61,7 +61,7 @@ class dExcavatorModel: public dModelRootNode
 	dExcavatorModel(NewtonBody* const rootBody, int linkMaterilID)
 		:dModelRootNode(rootBody, dGetIdentityMatrix())
 		,m_bodyMap()
-		,m_shereCast (NewtonCreateSphere (NewtonBodyGetWorld(rootBody), 0.01f, 0, NULL))
+		,m_shereCast (NewtonCreateSphere (NewtonBodyGetWorld(rootBody), 0.05f, 0, NULL))
 		,m_tireCount(0)
 	{
 		m_bodyMap.Insert(rootBody);
