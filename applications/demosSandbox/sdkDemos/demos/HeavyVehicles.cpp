@@ -1659,7 +1659,7 @@ void MilitaryTransport (DemoEntityManager* const scene)
 	scene->CreateSkyBox();
 
 #if 0
-//	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+//	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	CreateHeightFieldTerrain(scene, HEIGHTFIELD_DEFAULT_SIZE, HEIGHTFIELD_DEFAULT_CELLSIZE, 4.0f, 0.1f, 200.0f, -30.0f);
 
 //	dMatrix camMatrix (dRollMatrix(-20.0f * dDegreeToRad) * dYawMatrix(-45.0f * dDegreeToRad));

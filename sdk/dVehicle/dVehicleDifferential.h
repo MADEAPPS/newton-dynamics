@@ -21,6 +21,14 @@ class dVehicleMultiBody;
 
 class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::dBilateralJoint
 {
+	enum dOperationMode
+	{
+		m_open,
+		m_slipLocked,
+		m_rightLocked,
+		m_leftLocked,
+	};
+
 	class dTireAxleJoint: public dVehicleLoopJoint
 	{
 		public:
@@ -28,6 +36,7 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 			:dVehicleLoopJoint()
 			,m_diffSign(1.0f)
 		{
+			m_isActive = true;
 		}
 
 		private:
@@ -40,13 +49,16 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	};
 
 	public:
-	DVEHICLE_API dVehicleDifferential(dVehicleMultiBody* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode);
+	DVEHICLE_API dVehicleDifferential(dVehicleMultiBody* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode, const dMatrix& axelMatrix = dGetIdentityMatrix());
 	DVEHICLE_API virtual ~dVehicleDifferential();
+
+	DVEHICLE_API int GetMode() const;
+	DVEHICLE_API void SetMode(int mode);
 	
 	protected:
-	void CalculateFreeDof();
 	void ApplyExternalForce();
 	void Integrate(dFloat timestep);
+	void CalculateFreeDof(dFloat timestep);
 	int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 
 	dComplementaritySolver::dBilateralJoint* GetJoint() {return this;}
@@ -57,12 +69,15 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const;
 
 	dMatrix m_localAxis;
+	dMatrix m_axelMatrix;
 	dTireAxleJoint m_leftAxle;
 	dTireAxleJoint m_rightAxle;
 	dVehicleNode* m_leftNode;
 	dVehicleNode* m_rightNode;
 	dFloat m_diffOmega;
 	dFloat m_shaftOmega;
+	dFloat m_frictionLost;
+	dOperationMode m_mode;
 
 	friend class dVehicleMultiBody;
 };

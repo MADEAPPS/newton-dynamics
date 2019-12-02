@@ -78,9 +78,7 @@ class dgPolygonSoupDatabaseBuilder::dgFaceMap: public dgTree<dgFaceBucket, dgInt
 			polygonIndex += count;
 		}
 	}
-
 };
-
 
 class dgPolygonSoupDatabaseBuilder::dgPolySoupFilterAllocator: public dgPolyhedra
 {
@@ -172,11 +170,9 @@ dgPolygonSoupDatabaseBuilder::dgPolygonSoupDatabaseBuilder (const dgPolygonSoupD
 	}
 }
 
-
 dgPolygonSoupDatabaseBuilder::~dgPolygonSoupDatabaseBuilder ()
 {
 }
-
 
 void dgPolygonSoupDatabaseBuilder::Begin()
 {
@@ -187,6 +183,39 @@ void dgPolygonSoupDatabaseBuilder::Begin()
 	m_normalCount = 0;
 }
 
+void dgPolygonSoupDatabaseBuilder::SavePLY(const char* const fileName) const
+{
+	FILE* const file = fopen(fileName, "wb");
+
+	fprintf(file, "ply\n");
+	fprintf(file, "format ascii 1.0\n");
+
+	//dgInt32 faceCount = 0;
+	fprintf(file, "element vertex %d\n", m_vertexCount);
+	fprintf(file, "property float x\n");
+	fprintf(file, "property float y\n");
+	fprintf(file, "property float z\n");
+	fprintf(file, "element face %d\n", m_faceCount);
+	fprintf(file, "property list uchar int vertex_index\n");
+	fprintf(file, "end_header\n");
+
+	for (dgInt32 i = 0; i < m_vertexCount; i ++) {
+		const dgBigVector& point = m_vertexPoints[i];
+		fprintf(file, "%f %f %f\n", point.m_x, point.m_y, point.m_z);
+	}
+
+	dgInt32 index = 0;
+	for (dgInt32 i = 0; i < m_faceCount; i ++) {
+		dgInt32 count = m_faceVertexCount[i];
+		fprintf(file, "%d", count - 1);
+		for (dgInt32 j = 0; j < count - 1; j++) {
+			fprintf(file, " %d", m_vertexIndex[index + j]);
+		}
+		index += count;
+		fprintf(file, "\n");
+	}
+	fclose(file);
+}
 
 void dgPolygonSoupDatabaseBuilder::AddMesh (const dgFloat32* const vertex, dgInt32 vertexCount, dgInt32 strideInBytes, dgInt32 faceCount,	
 	const dgInt32* const faceArray, const dgInt32* const indexArray, const dgInt32* const faceMaterialId, const dgMatrix& worldMatrix) 
@@ -319,8 +348,6 @@ void dgPolygonSoupDatabaseBuilder::Finalize()
 	}
 }
 
-
-
 void dgPolygonSoupDatabaseBuilder::FinalizeAndOptimize()
 {
 	Finalize();
@@ -434,7 +461,6 @@ void dgPolygonSoupDatabaseBuilder::FinalizeAndOptimize()
 
 	Finalize();
 }
-
 
 void dgPolygonSoupDatabaseBuilder::OptimizeByIndividualFaces()
 {

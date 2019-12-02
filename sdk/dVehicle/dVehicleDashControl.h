@@ -51,7 +51,7 @@ class dVehicleDashControl
 		return m_param;
 	}
 
-	bool ParamChanged() const
+	virtual bool ParamChanged() const
 	{
 		m_timer--;
 		if (dAbs(m_paramMemory - m_param) > 1.e-3f) {
@@ -123,11 +123,20 @@ class dVehicleBrakeControl: public dVehicleTireControl
 class dVehicleEngineControl: public dVehicleDashControl 
 {
 	public:
+	dVehicleEngineControl()
+		:m_engine(NULL)
+	{
+	}
+
 	dVehicleEngine* GetEngine() const {return m_engine;}
 	void SetEngine (dVehicleEngine* const engine) {m_engine = engine;}
 	void SetGear (int gear);
 	void SetClutch (dFloat clutch);
+	void SetDifferential (int mode);
+	void SetIgnition(int mode);
+
 	virtual void Update(dFloat timestep);
+	virtual bool ParamChanged() const;
 
 	private:
 	dVehicleEngine* m_engine;

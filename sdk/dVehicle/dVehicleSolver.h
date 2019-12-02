@@ -64,10 +64,18 @@ class dVehicleSolver
 	void BodyJacobianTimeSolutionBackward(dVehicleNode* const node, dVectorPair& force) const;
 	void BodyJacobianTimeMassForward(dVehicleNode* const node, const dVectorPair& force, dVectorPair& parentForce) const;
 	void JointJacobianTimeSolutionBackward(dVehicleNode* const node, dVectorPair& force, const dVectorPair& parentForce) const;
-	void dGaussSeidelLcpSor(const int size, dFloat* const x, const dFloat* const b, const int* const normalIndex, 
-							dFloat* const low, dFloat* const high, dComplementaritySolver::dBilateralJoint** const frictionCallback) const;
 
-	dVehicleNode** m_nodesOrder;
+	void dGaussBlockedLcp(
+		const int size, int blockSize, dFloat* const x, dFloat* const b, const int* const normalIndex,
+		dFloat* const low, dFloat* const high, dComplementaritySolver::dBilateralJoint** const frictionCallback) const;
+
+	void dGaussSeidelLcpSor(
+		const dFloat* const matrix, int stride, int size,
+		dFloat* const x, const dFloat* const b, const int* const normalIndex, 
+		dFloat* const low, dFloat* const high, dComplementaritySolver::dBilateralJoint** const frictionCallback) const;
+
+
+	dArray<dVehicleNode*> m_nodesOrder;
 	int* m_matrixRowsIndex;
 	dNodePair* m_pairs;
 	dFloat* m_deltaForce;
@@ -80,10 +88,13 @@ class dVehicleSolver
 	
 	int m_rowCount;
 	int m_nodeCount;
+	int m_blockSize;
 	int m_maxNodeCount;
 	int m_loopRowCount;
 	int m_loopJointCount;
 	int m_auxiliaryRowCount;
+
+	friend class dVehicleMultiBody;
 };
 
 #endif 

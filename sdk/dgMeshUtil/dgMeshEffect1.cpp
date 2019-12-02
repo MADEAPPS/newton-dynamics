@@ -1578,57 +1578,6 @@ dgAssert (0);
 */
 };
 
-
-void dgMeshEffect::SaveOFF (const char* const fileName) const
-{
-	FILE* const file = fopen (fileName, "wb");
-
-	fprintf (file, "OFF\n");
-
-	dgInt32 faceCount = 0;
-	dgTree<dgEdge*, dgEdge*>filter(GetAllocator());
-	Iterator iter (*this);
-	for (iter.Begin(); iter; iter ++) {
-		dgEdge* const face = &iter.GetNode()->GetInfo();
-		if (!filter.Find(face) && (face->m_incidentFace > 0)) {
-			faceCount ++;
-			dgEdge* edge = face; 
-			do {
-				filter.Insert(edge, edge);
-				edge = edge->m_next;
-			} while (edge != face);
-		}
-	}
-	fprintf (file, "%d %d 0\n", m_points.m_vertex.m_count, faceCount);
-
-	for (dgInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
-		fprintf (file, "%f %f %f\n", m_points.m_vertex[i].m_x, m_points.m_vertex[i].m_y, m_points.m_vertex[i].m_z);
-	}
-
-	filter.RemoveAll();
-	for (iter.Begin(); iter; iter ++) {
-		dgEdge* const face = &iter.GetNode()->GetInfo();
-		if (!filter.Find(face) && (face->m_incidentFace > 0)) {
-			dgInt32 indices[1024];
-			dgInt32 vertexCount = 0;
-			dgEdge* edge = face; 
-			do {
-				indices[vertexCount] = edge->m_incidentVertex;
-				vertexCount ++;
-				filter.Insert(edge, edge);
-				edge = edge->m_next;
-			} while (edge != face);
-
-			fprintf (file, "%d", vertexCount);
-			for (dgInt32 j = 0; j < vertexCount; j ++) {
-				fprintf (file, " %d", indices[j]);
-			}
-			fprintf (file, "\n");
-		}
-	}
-	fclose (file);
-}
-
 void dgMeshEffect::FlipWinding()
 {
 	dgInt32	index[DG_MESH_EFFECT_POINT_SPLITED];
@@ -3780,14 +3729,16 @@ void dgMeshEffect::RepairTJoints ()
 				
 				dgEdge* const collapsedEdge = CollapseEdge(edge);
 				if (collapsedEdge) {
-					dgAssert (0);
+					//dgAssert (0);
+					dgTrace(("remember to finish this!!: %s %s line:%d\n", __FILE__, __FUNCTION__, __LINE__));
 					dirty = true;
 					dgBigVector q (m_points.m_vertex[collapsedEdge->m_incidentVertex]);
 					dgEdge* ptr = collapsedEdge;
 					do {
 						if (ptr->m_incidentFace > 0) {
-							dgAssert (0);
+							//dgAssert (0);
 							//m_attrib[ptr->m_userData].m_vertex = q;
+							dgTrace(("remember to finish this!!: %s %s line:%d\n", __FILE__, __FUNCTION__, __LINE__));
 						}
 						ptr = ptr->m_twin->m_next;
 					} while (ptr != collapsedEdge);

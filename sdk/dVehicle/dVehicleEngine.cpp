@@ -58,6 +58,7 @@ dFloat dVehicleEngine::dEngineMetricInfo::GetTorque (dFloat rpm) const
 			dFloat torque0 = m_torqueCurve[i - 1].m_torque;
 
 			dFloat torque = torque0 + (rpm - rpm0) * (torque1 - torque0) / (rpm1 - rpm0);
+torque = 10.0f;
 			return torque;
 		}
 	}
@@ -76,7 +77,13 @@ dVehicleEngine::dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineIn
 	,m_omega(0.0f)
 	,m_throttle(0.0f)
 	,m_throttleSpeed(1.e1f)
+	,m_differentialMode(differential->GetMode())
+	,m_currentGear(dEngineInfo::m_neutralGear)
+	,m_ignitionKey0 (false)
+	,m_ignitionKey1(false)
 {
+m_currentGear = dEngineInfo::m_firstGear;
+
 	InitEngineTorqueCurve();
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 
@@ -132,8 +139,98 @@ dFloat dVehicleEngine::GetRedLineRpm() const
 	return m_metricInfo.m_rpmAtRedLine * 9.549f;
 }
 
+void dVehicleEngine::SetGear(dEngineInfo::dGearRatioIndex gear)
+{
+//	m_gearTimer = 30;
+	m_currentGear = dClamp(gear, dEngineInfo::m_reverseGear, dEngineInfo::dGearRatioIndex (m_metricInfo.m_gearsCount));
+	dFloat ratio = m_metricInfo.m_gearRatios[m_currentGear];
+	m_gearBox.SetGearRatio(ratio);
+}
+
+void dVehicleEngine::UpdateAutomaticGearBox(dFloat timestep)
+{
+m_metricInfo.m_gearsCount = 4;
+//	m_gearTimer--;
+//	if (m_gearTimer < 0) {
+
+	dFloat omega = dAbs (m_omega);
+static int xxxx;
+xxxx++;
+if (xxxx > 1000)
+{
+SetGear(dEngineInfo::dGearRatioIndex(dEngineInfo::m_firstGear));
+return;
+}
+else
+{
+SetGear(dEngineInfo::dGearRatioIndex(dEngineInfo::m_neutralGear));
+return;
+}
+
+//dTrace (("(gear: %d) (throttle: %f) (omega: %f %f %f) ", m_currentGear, m_throttle, omega, m_metricInfo.m_rpmAtPeakTorque, m_metricInfo.m_rpmAtPeakHorsePower));
+//SetGear(dEngineInfo::dGearRatioIndex(dEngineInfo::m_firstGear + 1));
+//return;
+		
+		switch (m_currentGear) 
+		{
+			case dEngineInfo::m_neutralGear:
+			{
+				SetGear(dEngineInfo::m_neutralGear);
+				break;
+			}
+
+			case dEngineInfo::m_reverseGear:
+			{
+			   SetGear(dEngineInfo::m_reverseGear);
+			   break;
+			}
+
+			default:
+			{
+				if (omega > m_metricInfo.m_rpmAtPeakHorsePower) {
+					if (m_currentGear < (m_metricInfo.m_gearsCount - 1)) {
+						SetGear(dEngineInfo::dGearRatioIndex (m_currentGear + 1));
+					}
+				} else if (omega < m_metricInfo.m_rpmAtPeakTorque) {
+					if (m_currentGear > dEngineInfo::m_firstGear) {
+						SetGear(dEngineInfo::dGearRatioIndex (m_currentGear - 1));
+					}
+				}
+			}
+		}
+//	}
+}
+
+bool dVehicleEngine::InputChanged() const
+{
+	if (m_ignitionKey0 != m_ignitionKey1) {
+		return true;
+	}
+
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	const dComplementaritySolver::dBodyState& proxy = GetProxyBody();
+	proxy.GetInertia(Ixx, Iyy, Izz);
+	dVector alpha(proxy.GetTorque().Scale(1.0f / Ixx));
+	dFloat alphaMag2 = alpha.DotProduct3(alpha);
+	return alphaMag2 > 1.0f;
+}
+
+void dVehicleEngine::SetIgnition(bool mode)
+{
+	m_ignitionKey1 = m_ignitionKey0;
+	m_ignitionKey0 = mode;
+}
+
 void dVehicleEngine::SetThrottle (dFloat throttle, dFloat timestep)
 {
+	if (m_ignitionKey0) {
+		throttle = dMax(throttle, m_metricInfo.m_rpmAtIdleTorque / m_metricInfo.m_rpmAtRedLine);
+	} else {
+		throttle = 0.0f;
+	}
+
 	m_throttle = dAbs (m_omega / m_metricInfo.m_rpmAtRedLine);
 	dFloat step = throttle - m_throttle;
 	dFloat maxStep = 2.0f * m_throttleSpeed * timestep;
@@ -147,14 +244,15 @@ void dVehicleEngine::SetThrottle (dFloat throttle, dFloat timestep)
 	m_throttle = dClamp(m_throttle + step, dFloat(0.0f), dFloat(1.0f));
 }
 
-#if 0
-void dVehicleEngine::SetGear (int gear)
+void dVehicleEngine::SetDifferentialMode(int differentialMode) 
 {
-	gear = dClamp (gear, int (m_reverseGear), m_metricInfo.m_gearsCount);
-	dFloat ratio = m_metricInfo.m_gearRatios[gear];
-	m_gearBox.SetGearRatio(ratio);
+	if (differentialMode != m_differentialMode) {
+		m_differentialMode = differentialMode;
+		m_differential->SetMode(m_differentialMode);
+	}
 }
 
+#if 0
 void dVehicleEngine::SetClutch (dFloat clutch) 
 {
 	clutch = dClamp (clutch, dFloat (0.0f), dFloat (1.0f));
@@ -172,10 +270,9 @@ int dVehicleEngine::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 {
 	jointArray[0] = &m_gearBox;
 	return 1;
-//	return 0;
 }
 
-void dVehicleEngine::CalculateFreeDof()
+void dVehicleEngine::CalculateFreeDof(dFloat timestep)
 {
 	dVehicleMultiBody* const chassisNode = GetParent()->GetAsVehicleMultiBody();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
@@ -249,9 +346,6 @@ void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementarity
 
 		dAssert(GetOwner0()->GetAsEngine());
 		dVehicleEngine* const engineNode = GetOwner0()->GetAsEngine();
-
-		//dMatrix matrix0 (m_state0->GetMatrix());
-		//dMatrix matrix (engineNode->m_localAxis * m_state0->GetMatrix());
 		dVector gearBoxPin (m_state0->GetMatrix().RotateVector(engineNode->m_localAxis.m_front));
 		AddAngularRowJacobian(constraintParams, gearBoxPin, 0.0f);
 
@@ -260,7 +354,10 @@ void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementarity
 
 		//dFloat gain = -1.0f;
 		dFloat gain = m_crowndGear * m_gearRatio;
-//gain *=-1.0f;
+//dTrace (("(gearGain %f) ", gain));
+if (gain < 11)
+gain *= 1;
+
 		jacobian1.m_angular = jacobian1.m_angular.Scale(-gain);
 
 		const dVector& omega0 = m_state0->GetOmega();

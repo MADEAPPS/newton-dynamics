@@ -18,6 +18,7 @@
 #include "dVehicleNode.h"
 #include "dVehicleSolver.h"
 #include "dVehicleDashControl.h"
+#include "dVehicleCollidingNode.h"
 
 class dTireInfo;
 class dEngineInfo;
@@ -31,13 +32,11 @@ class dCollectCollidingBodies
 	dCollectCollidingBodies(NewtonBody* const me)
 		:m_exclude(me)
 		,m_count(0)
-		,m_staticCount(0)
 	{
 	}
 
 	NewtonBody* m_exclude;
 	int m_count;
-	int m_staticCount;
 	NewtonBody* m_array[16];
 };
 
@@ -54,6 +53,7 @@ class dVehicleMultiBody: public dVehicle, public dVehicleSolver
 	DVEHICLE_API dVehicleTire* AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
 	DVEHICLE_API dVehicleEngine* AddEngine(const dEngineInfo& engineInfo, dVehicleDifferential* const differential);
 	DVEHICLE_API dVehicleDifferential* AddDifferential(dFloat mass, dFloat radius, dVehicleTire* const leftTire, dVehicleTire* const rightTire);
+	DVEHICLE_API dVehicleDifferential* AddDifferential(dFloat mass, dFloat radius, dVehicleDifferential* const differential0, dVehicleDifferential* const differential1);
 
 	DVEHICLE_API dVehicleBrakeControl* GetBrakeControl();
 	DVEHICLE_API dVehicleEngineControl* GetEngineControl();
@@ -61,24 +61,28 @@ class dVehicleMultiBody: public dVehicle, public dVehicleSolver
 	DVEHICLE_API dVehicleSteeringControl* GetSteeringControl();
 
 	private:
-	void CalculateFreeDof();
 	void ApplyExternalForce();
 	void Integrate(dFloat timestep);
+	void CalculateFreeDof(dFloat timestep);
 	void CalculateTireContacts(dFloat timestep);
-	void CalculateSuspensionForces(dFloat timestep);
 	virtual int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 	virtual void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep);
+
+	virtual bool CheckSleeping();
+	dVehicleCollidingNode* FindCollideNode(dVehicleNode* const node0, NewtonBody* const body);
 
 	void PreUpdate(dFloat timestep);
 	//void PostUpdate(dFloat timestep);
 
 	static int OnAABBOverlap(const NewtonBody * const body, void* const me);
 
-	dVehicleNode m_groundProxyBody;
+	dArray<dVehicleCollidingNode> m_collidingNodes;
 	dVehicleBrakeControl m_brakeControl;
 	dVehicleEngineControl m_engineControl;
 	dVehicleBrakeControl m_handBrakeControl;
 	dVehicleSteeringControl m_steeringControl;
+	int m_collidingIndex;
+	int m_sleepCounter;
 
 	friend class dVehicleTire;
 	friend class dVehicleSolver;

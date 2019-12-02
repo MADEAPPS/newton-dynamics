@@ -98,7 +98,6 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 		public:
 		dEngineMetricInfo(const dEngineInfo& info);
 		dFloat m_peakPowerTorque;
-		//dFloat m_crownGearRatio;
 
 		dFloat GetTorque (dFloat rpm) const;
 
@@ -112,8 +111,9 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 			:dVehicleLoopJoint()
 			,m_gearRatio(2.6f)
 			,m_crowndGear(6.0f)
-			,m_clutchTorque(1.0e20f)
+			,m_clutchTorque(D_COMPLEMENTARITY_MAX_FRICTION_BOUND)
 		{
+			m_isActive = true;
 		}
 
 		void SetGearRatio(dFloat ratio)
@@ -137,7 +137,6 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 		dFloat m_clutchTorque;
 	};
 
-
 	public:
 	DVEHICLE_API dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineInfo& info, dVehicleDifferential* const differential);
 	DVEHICLE_API virtual ~dVehicleEngine();
@@ -148,17 +147,29 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	DVEHICLE_API dFloat GetSpeed() const;
 	dFloat GetTopSpeed() const {return m_info.m_topSpeedInMetersPerSeconds;}
 
-	virtual dFloat GetRpm() const;
-	virtual dFloat GetRedLineRpm() const;
-	//void SetGear (int gear);
+	DVEHICLE_API dFloat GetRpm() const;
+	DVEHICLE_API dFloat GetRedLineRpm() const;
 	//void SetClutch (dFloat clutch);
-	void SetThrottle (dFloat throttle, dFloat timestep);
+
+	DVEHICLE_API void SetIgnition(bool mode);
+	bool GetIgnition() const { return m_ignitionKey0; }
+	
+	DVEHICLE_API void SetGear (dEngineInfo::dGearRatioIndex gear);
+	DVEHICLE_API dEngineInfo::dGearRatioIndex GetGear () const {return m_currentGear;}
+
+	DVEHICLE_API void UpdateAutomaticGearBox(dFloat timestep);
+	DVEHICLE_API void SetThrottle (dFloat throttle, dFloat timestep);
+
+	int GetDifferentialMode() const {return m_differentialMode;}
+	DVEHICLE_API void SetDifferentialMode(int differentialMode);
+
+	DVEHICLE_API bool InputChanged() const;
 
 	protected:
-	void CalculateFreeDof();
 	void ApplyExternalForce();
 	void InitEngineTorqueCurve();
 	void Integrate(dFloat timestep);
+	void CalculateFreeDof(dFloat timestep);
 	int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 
 	dVehicleEngine* GetAsEngine() const { return (dVehicleEngine*)this;}
@@ -176,6 +187,10 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	dFloat m_omega;
 	dFloat m_throttle;
 	dFloat m_throttleSpeed;
+	int m_differentialMode;
+	dEngineInfo::dGearRatioIndex m_currentGear;
+	bool m_ignitionKey0;
+	bool m_ignitionKey1;
 
 	friend class dVehicleMultiBody;
 };

@@ -148,6 +148,8 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	dgEdge* SpliteEdge (dgInt32 newIndex, dgEdge* const edge);
 	dgBigVector FaceNormal (const dgEdge* const face, const dgFloat64* const vertex, dgInt32 strideInBytes) const;
 
+	void SavePLY(const char* const fileName, const dgFloat64* const vertex, dgInt32 strideInBytes) const;
+
 	void BeginConectedSurface() const;
 	bool GetConectedSurface (dgPolyhedra &polyhedra) const;
 	void EndConectedSurface() const;
@@ -159,9 +161,12 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	bool Optimize (const dgFloat64* const pool, dgInt32 strideInBytes, dgReportProgress normalizedProgress, void* const reportProgressUserData, dgFloat64 tol, dgInt32 maxFaceCount = 1<<28);
 	void Triangulate (const dgFloat64* const vertex, dgInt32 strideInBytes, dgPolyhedra* const leftOversOut);
 	void ConvexPartition (const dgFloat64* const vertex, dgInt32 strideInBytes, dgPolyhedra* const leftOversOut);
+	bool IsFaceConvex(dgEdge* const face, const dgFloat64* const pool, dgInt32 strideInBytes) const;
+
+	protected:
 	dgEdge* CollapseEdge(dgEdge* const edge);
-	bool PolygonizeFace (dgEdge* const face, const dgFloat64* const pool, dgInt32 stride);
-	bool TriangulateFace (dgEdge* const face, const dgFloat64* const pool, dgInt32 stride);
+	bool PolygonizeFace(dgEdge* const face, const dgFloat64* const pool, dgInt32 stride);
+	bool TriangulateFace(dgEdge* const face, const dgFloat64* const pool, dgInt32 stride);
 
 	private:
 	void RefineTriangulation (const dgFloat64* const vertex, dgInt32 stride);
@@ -171,6 +176,7 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	void MarkAdjacentCoplanarFaces (dgPolyhedra& polyhedraOut, dgEdge* const face, const dgFloat64* const pool, dgInt32 strideInBytes);
 	dgEdge* FindEarTip (dgEdge* const face, const dgFloat64* const pool, dgInt32 stride, dgDownHeap<dgEdge*, dgFloat64>& heap, const dgBigVector &normal) const;
 	dgEdge* TriangulateFace (dgEdge* const face, const dgFloat64* const pool, dgInt32 stride, dgDownHeap<dgEdge*, dgFloat64>& heap, dgBigVector* const faceNormalOut);
+	
 		
 	void RemoveHalfEdge (dgEdge* const edge);
 	dgEdge* OptimizeCollapseEdge (dgEdge* const edge);
@@ -188,13 +194,11 @@ class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>
 	static bool IsEssensialDiagonal (dgEdge* const diagonal, const dgBigVector& normal, const dgFloat64* const pool,  dgInt32 stride);
 	static bool IsEssensialPointDiagonal (dgEdge* const diagonal, const dgBigVector& normal, const dgFloat64* const pool, dgInt32 stride);
 	
-	
 	mutable dgInt32 m_baseMark;
 	mutable dgInt32 m_edgeMark;
 	mutable dgInt32 m_faceSecuence;
 	friend class dgPolyhedraDescriptor;
 };
-
 
 DG_INLINE dgEdge::dgEdge ()
 {
@@ -214,8 +218,6 @@ DG_INLINE dgEdge::dgEdge (dgInt32 vertex, dgInt32 face, dgUnsigned64 userdata)
 DG_INLINE dgEdge::~dgEdge ()
 {
 }
-
-
 
 DG_INLINE void dgPolyhedra::BeginFace ()
 {
@@ -291,13 +293,11 @@ DG_INLINE void dgPolyhedra::EndConectedSurface() const
 {
 }
 
-
 DG_INLINE dgPolyhedra::dgTreeNode* dgPolyhedra::FindEdgeNode (dgInt32 i0, dgInt32 i1) const
 {
 	dgPairKey key (i0, i1);
 	return Find (key.GetVal());
 }
-
 
 DG_INLINE dgEdge *dgPolyhedra::FindEdge (dgInt32 i0, dgInt32 i1) const
 {

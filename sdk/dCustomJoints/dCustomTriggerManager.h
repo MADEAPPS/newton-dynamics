@@ -79,9 +79,9 @@ class dCustomTriggerManager: public dCustomParallelListener
 	CUSTOM_JOINTS_API virtual dCustomTriggerController* CreateTrigger (const dMatrix& matrix, NewtonCollision* const convexShape, void* const userData);
 	CUSTOM_JOINTS_API virtual void DestroyTrigger (dCustomTriggerController* const trigger);
 
-	virtual void OnEnter (const dCustomTriggerController* const me, NewtonBody* const guess) const {}
-	virtual void OnExit (const dCustomTriggerController* const me, NewtonBody* const guess) const {}
-	virtual void WhileIn (const dCustomTriggerController* const me, NewtonBody* const guess) const {}
+	virtual void OnEnter (const dCustomTriggerController* const me, dFloat timestep, NewtonBody* const guess) const {}
+	virtual void OnExit (const dCustomTriggerController* const me, dFloat timestep, NewtonBody* const guess) const {}
+	virtual void WhileIn (const dCustomTriggerController* const me, dFloat timestep, NewtonBody* const guess) const {}
 
 	dList<dCustomTriggerController>& GetControllersList () {return m_triggerList;}
 	const dList<dCustomTriggerController>& GetControllersList () const {return m_triggerList;}
@@ -107,7 +107,6 @@ class dCustomTriggerManager: public dCustomParallelListener
 
 	dList<dCustomTriggerController> m_triggerList;
 	dArray<dTriggerGuestPair> m_pairCache;
-	dFloat m_timestep;
 	int m_cacheCount;
 	unsigned m_lock;
 	unsigned m_lru;

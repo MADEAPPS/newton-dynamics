@@ -50,7 +50,7 @@ dCollisionCompoundNodeInfo::dCollisionCompoundNodeInfo(NewtonCollision* const co
 	SetName ("compound collision");
 
 	SetTransform (offsetMatrix);
-	SetShapeId (record.m_collisionMaterial.m_userId);
+	SetShapeId (int(record.m_collisionMaterial.m_userId));
 
 	CalculateGeometryProperies (compound, m_geometricInertia, m_geometricCenterAndVolume); 
 }

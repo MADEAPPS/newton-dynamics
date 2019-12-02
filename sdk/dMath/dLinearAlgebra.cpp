@@ -256,15 +256,16 @@ void dComplementaritySolver::dBodyState::IntegrateForce (dFloat timestep, const 
 
 void dComplementaritySolver::dBodyState::IntegrateVelocity (dFloat timestep)
 {
-	const dFloat D_MAX_ANGLE_STEP = dFloat (45.0f * dDegreeToRad);
-	const dFloat D_ANGULAR_TOL = dFloat (0.0125f * dDegreeToRad);
-
-	m_globalCentreOfMass += m_veloc.Scale (timestep); 
+	// this is the fucking bug cause the vehicle malfunction
+	const dFloat D_MAX_ANGLE_STEP = dFloat (90.0f * dDegreeToRad);
 	while ((m_omega.DotProduct3(m_omega) * timestep * timestep) > (D_MAX_ANGLE_STEP * D_MAX_ANGLE_STEP)) {
+		dAssert (0);
 		m_omega = m_omega.Scale (dFloat (0.8f));
 	}
 
 	// this is correct
+	const dFloat D_ANGULAR_TOL = dFloat (0.0125f * dDegreeToRad);
+	m_globalCentreOfMass += m_veloc.Scale (timestep); 
 	dFloat omegaMag2 = m_omega.DotProduct3(m_omega);
 	if (omegaMag2 > (D_ANGULAR_TOL * D_ANGULAR_TOL)) {
 		dFloat invOmegaMag = 1.0f / dSqrt (omegaMag2);
@@ -311,7 +312,7 @@ void dComplementaritySolver::dBilateralJoint::Init(dBodyState* const state0, dBo
 	m_count = 0;
 	memset (m_rowIsMotor, 0, sizeof (m_rowIsMotor));
 	memset (m_motorAcceleration, 0, sizeof (m_motorAcceleration));
-	memset (m_jointFeebackForce, 0, sizeof (m_jointFeebackForce));
+	//memset (m_jointFeebackForce, 0, sizeof (m_jointFeebackForce));
 
 	m_state0 = state0;
 	m_state1 = state1;
@@ -344,6 +345,7 @@ void dComplementaritySolver::dBilateralJoint::AddContactRowJacobian (dParamInfo*
 
 	dAssert(relAccel.m_w == 0.0f);
 	constraintParams->m_frictionCallback[index] = NULL;
+	constraintParams->m_diagonalRegularizer[index] = 0.0f;
 	constraintParams->m_jointAccel[index] = -(relAccel.m_x + relAccel.m_y + relAccel.m_z);
 	constraintParams->m_jointLowFrictionCoef[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
 	constraintParams->m_jointHighFrictionCoef[index] = D_COMPLEMENTARITY_MAX_FRICTION_BOUND;
@@ -381,6 +383,7 @@ void dComplementaritySolver::dBilateralJoint::AddLinearRowJacobian(dParamInfo* c
 
 	dAssert(relAccel.m_w == 0.0f);
 	constraintParams->m_frictionCallback[index] = NULL;
+	constraintParams->m_diagonalRegularizer[index] = 0.0f;
 	constraintParams->m_jointAccel[index] = -(relAccel.m_x + relAccel.m_y + relAccel.m_z);
 	constraintParams->m_jointLowFrictionCoef[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
 	constraintParams->m_jointHighFrictionCoef[index] = D_COMPLEMENTARITY_MAX_FRICTION_BOUND;
@@ -407,6 +410,7 @@ void dComplementaritySolver::dBilateralJoint::AddAngularRowJacobian (dParamInfo*
 	const dVector alpha (omega.Scale (constraintParams->m_timestepInv));
 
 	constraintParams->m_frictionCallback[index] = NULL;
+	constraintParams->m_diagonalRegularizer[index] = 0.0f;
 	constraintParams->m_jointAccel[index] = -(alpha.m_x + alpha.m_y + alpha.m_z);
 	constraintParams->m_jointLowFrictionCoef[index] = D_COMPLEMENTARITY_MIN_FRICTION_BOUND;
 	constraintParams->m_jointHighFrictionCoef[index] = D_COMPLEMENTARITY_MAX_FRICTION_BOUND;
@@ -423,6 +427,68 @@ void dComplementaritySolver::dBilateralJoint::SetRowAccelaration(dParamInfo* con
 {
 	dAssert(constraintParams->m_count > 0);
 	constraintParams->m_jointAccel[constraintParams->m_count - 1] = accel;
+}
+
+dFloat dComplementaritySolver::dBilateralJoint::CalculateMassMatrixDiagonal(dParamInfo* const constraintParams) const
+{
+/*
+	dAssert(constraintParams->m_count > 0);
+	const int index = constraintParams->m_count - 1;
+	const dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
+	const dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
+
+	const dMatrix& invInertia0 = m_state0->m_invInertia;
+	const dMatrix& invInertia1 = m_state1->m_invInertia;
+
+	const dFloat invMass0 = m_state0->m_invMass;
+	const dFloat invMass1 = m_state1->m_invMass;
+
+	const dVector JMinvIM0linear(jacobian0.m_linear.Scale(invMass0));
+	const dVector JMinvIM1linear(jacobian1.m_linear.Scale(invMass1));
+	const dVector JMinvIM0angular = invInertia0.UnrotateVector(jacobian0.m_angular);
+	const dVector JMinvIM1angular = invInertia1.UnrotateVector(jacobian1.m_angular);
+	const dVector tmpDiag(JMinvIM0linear * jacobian0.m_linear + JMinvIM0angular * jacobian0.m_angular + 
+						  JMinvIM1linear * jacobian1.m_linear + JMinvIM1angular * jacobian1.m_angular);
+
+	dFloat invEffectiveMass = (tmpDiag[0] + tmpDiag[1] + tmpDiag[2]);
+	springConst *= invEffectiveMass;
+	damperConst *= invEffectiveMass;
+
+springConst *= 2.0f;
+damperConst *= 0.5f;
+
+	const dFloat timestep = constraintParams->m_timestep;
+
+	//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
+	dFloat accel = springConst * posit + damperConst * speed + timestep * springConst * speed;
+	// yes I know this is the correct implicit term, but made the behavior too soft, so I am fudging it 
+	//dFloat den = dFloat(1.0f) + timestep * kd + timestep * ksd;
+	//dFloat den = timestep * damperConst + timestep * ksd;
+	dFloat den = 0.25f * timestep * (timestep * springConst + damperConst);
+
+	constraintParams->m_jointAccel[index] = - accel;
+	constraintParams->m_diagonalRegularizer[index] = den;
+*/
+
+	dAssert(constraintParams->m_count > 0);
+	const int index = constraintParams->m_count - 1;
+	const dJacobian &jacobian0 = constraintParams->m_jacobians[index].m_jacobian_J01;
+	const dJacobian &jacobian1 = constraintParams->m_jacobians[index].m_jacobian_J10;
+
+	const dMatrix& invInertia0 = m_state0->m_invInertia;
+	const dMatrix& invInertia1 = m_state1->m_invInertia;
+
+	const dFloat invMass0 = m_state0->m_invMass;
+	const dFloat invMass1 = m_state1->m_invMass;
+
+	const dVector JMinvIM0linear(jacobian0.m_linear.Scale(invMass0));
+	const dVector JMinvIM1linear(jacobian1.m_linear.Scale(invMass1));
+	const dVector JMinvIM0angular = invInertia0.UnrotateVector(jacobian0.m_angular);
+	const dVector JMinvIM1angular = invInertia1.UnrotateVector(jacobian1.m_angular);
+	const dVector tmpDiag(JMinvIM0linear * jacobian0.m_linear + JMinvIM0angular * jacobian0.m_angular +
+						  JMinvIM1linear * jacobian1.m_linear + JMinvIM1angular * jacobian1.m_angular);
+
+	return tmpDiag[0] + tmpDiag[1] + tmpDiag[2];
 }
 
 /*

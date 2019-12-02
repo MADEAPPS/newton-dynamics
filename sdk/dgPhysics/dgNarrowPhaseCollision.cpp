@@ -1733,9 +1733,6 @@ dgInt32 dgWorld::CollideContinue (
 	dgCollisionInstance collisionA(*collisionSrcA, collisionSrcA->GetChildShape());
 	dgCollisionInstance collisionB(*collisionSrcB, collisionSrcB->GetChildShape());
 
-//	collisionA.SetCollisionMode(true);
-//	collisionB.SetCollisionMode(true);
-
 	dgContactPoint contacts[DG_MAX_CONTATCS];
 
 	dgInt32 count = 0;
@@ -1784,8 +1781,8 @@ dgInt32 dgWorld::CollideContinue (
 		if (count > maxContacts) {
 			count = PruneContacts (count, contacts, contactJoint.GetPruningTolerance(), maxContacts);
 		}
-
 		count = dgMin(count, maxContacts);
+
 		if (pair.m_flipContacts) {
  			for (dgInt32 i = 0; i < count; i++) {
 				dgVector step ((collideBodyA.m_veloc - collideBodyB.m_veloc).Scale (pair.m_timestep));
@@ -1862,6 +1859,10 @@ dgInt32 dgWorld::Collide (
 	CalculateContacts (&pair, threadIndex, false, false);
 
 	count = pair.m_contactCount;
+	if (count > maxContacts) {
+		count = PruneContacts(count, contacts, contactJoint.GetPruningTolerance(), maxContacts);
+	}
+	count = dgMin(count, maxContacts);
 
 	dgFloat32 swapContactScale = (contactJoint.GetBody0() != &collideBodyA) ? dgFloat32 (-1.0f) : dgFloat32 (1.0f);
 	for (dgInt32 i = 0; i < count; i ++) {
@@ -1981,7 +1982,6 @@ dgInt32 dgWorld::CalculateConvexToConvexContacts(dgCollisionParamProxy& proxy) c
 	contactJoint->m_closestDistance = dgFloat32(1.0e10f);
 	contactJoint->m_separationDistance = dgFloat32(0.0f);
 
-//	if (!(collision0->GetConvexVertexCount() && collision1->GetConvexVertexCount() && proxy.m_instance0->GetCollisionMode() && proxy.m_instance1->GetCollisionMode())) {
 	if (!(collision0->GetConvexVertexCount() && collision1->GetConvexVertexCount())) {
 		return count;
 	}
@@ -2216,7 +2216,6 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 
 	dgInt32 count = 0;
 	dgInt32 maxContacts = proxy.m_maxContacts;
-//	dgInt32 maxReduceLimit = maxContacts >> 2;
 	dgInt32 maxReduceLimit = maxContacts - 16;
 	dgInt32 countleft = maxContacts;
 
@@ -2281,33 +2280,47 @@ dgInt32 dgWorld::CalculatePolySoupToHullContactsDescrete (dgCollisionParamProxy&
 
 	contactJoint->m_closestDistance = closestDist;
 
-	bool contactsValid = true;
+	if (count) {
+		switch (proxy.m_instance0->GetCollisionPrimityType())
+		{
+			case m_sphereCollision:
+			case m_capsuleCollision:
+			case m_chamferCylinderCollision:
+				proxy.m_instance0->CalculateImplicitContacts(count, contactOut);
+				break;
 
-	for (dgInt32 i = 0; (i < count) && contactsValid; i++) {
-		const dgVector& normal = contactOut[i].m_normal;
-		for (dgInt32 j = i + 1; (j < count) && contactsValid; j++) {
-			const dgFloat32 project = (normal.DotProduct(contactOut[j].m_normal)).GetScalar();
-			contactsValid = contactsValid && (project > dgFloat32(-0.1f));
+			default:
+			{
+				bool contactsValid = true;
+
+				for (dgInt32 i = 0; (i < count) && contactsValid; i++) {
+					const dgVector& normal = contactOut[i].m_normal;
+					for (dgInt32 j = i + 1; (j < count) && contactsValid; j++) {
+						const dgFloat32 project = (normal.DotProduct(contactOut[j].m_normal)).GetScalar();
+						contactsValid = contactsValid && (project > dgFloat32(-0.1f));
+					}
+				}
+
+				if (!contactsValid) {
+					dgCollisionContactCloud contactCloud(GetAllocator(), count, contactOut);
+					dgCollisionInstance cloudInstance(*polySoupInstance, &contactCloud);
+					cloudInstance.m_globalMatrix = dgGetIdentityMatrix();
+					cloudInstance.SetScale(dgVector::m_one);
+					bool saveintersectionTestOnly = proxy.m_intersectionTestOnly;
+					proxy.m_instance1 = &cloudInstance;
+					proxy.m_intersectionTestOnly = true;
+					dgContactSolver contactSolver(&proxy);
+					contactSolver.CalculateConvexToConvexContacts();
+					dgVector normal(contactSolver.GetNormal() * dgVector::m_negOne);
+					for (dgInt32 i = 0; i < count; i++) {
+						contactOut[i].m_normal = normal;
+					}
+
+					proxy.m_intersectionTestOnly = saveintersectionTestOnly;
+					cloudInstance.m_material.m_userData = NULL;
+				}
+			}
 		}
-	}
-
-	if (!contactsValid) {
-		dgCollisionContactCloud contactCloud (GetAllocator(), count, contactOut);
-		dgCollisionInstance cloudInstance (*polySoupInstance, &contactCloud);
-		cloudInstance.m_globalMatrix = dgGetIdentityMatrix();
-		cloudInstance.SetScale(dgVector::m_one);
-		bool saveintersectionTestOnly = proxy.m_intersectionTestOnly;
-		proxy.m_instance1 = &cloudInstance;
-		proxy.m_intersectionTestOnly = true;
-		dgContactSolver contactSolver (&proxy);
-		contactSolver.CalculateConvexToConvexContacts();
-		dgVector normal (contactSolver.GetNormal() * dgVector::m_negOne);
-		for (dgInt32 i = 0; i < count; i ++) {
-			contactOut[i].m_normal = normal;
-		}
-
-		proxy.m_intersectionTestOnly = saveintersectionTestOnly;
-		cloudInstance.m_material.m_userData = NULL;
 	}
 
  	proxy.m_contacts = contactOut;

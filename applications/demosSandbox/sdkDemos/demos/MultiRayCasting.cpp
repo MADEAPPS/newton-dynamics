@@ -74,7 +74,7 @@ class LineOfSightRayCastEntity: public DemoEntity
 	{
 	}
 
-	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const;
+	virtual void Render(dFloat timeStep, DemoEntityManager* const scene, const dMatrix& matrix) const;
 
 	dRayCasterManager* m_casterManager;
 };
@@ -160,7 +160,7 @@ class dRayCasterManager: public dCustomParallelListener
 };
 
 
-void LineOfSightRayCastEntity::Render(dFloat timeStep, DemoEntityManager* const scene) const
+void LineOfSightRayCastEntity::Render(dFloat timeStep, DemoEntityManager* const scene, const dMatrix& matrix) const
 {
 	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);

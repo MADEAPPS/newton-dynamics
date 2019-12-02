@@ -574,10 +574,10 @@ dMatrix dMatrix::Inverse4x4 () const
 #ifdef _DEBUG
 	tmp = *this * inv;
 	for (int i = 0; i < 4; i++) {
-		dAssert(dAbs(tmp[i][i] - dFloat (1.0f)) < dFloat(1.0e-6f));
+		dAssert(dAbs(tmp[i][i] - dFloat (1.0f)) < dFloat(1.0e-4f));
 		for (int j = i + 1; j < 4; j++) {
-			dAssert(dAbs(tmp[i][j]) < dFloat(1.0e-6f));
-			dAssert(dAbs(tmp[j][i]) < dFloat(1.0e-6f));
+			dAssert(dAbs(tmp[i][j]) < dFloat(1.0e-4f));
+			dAssert(dAbs(tmp[j][i]) < dFloat(1.0e-4f));
 		}
 	}
 #endif

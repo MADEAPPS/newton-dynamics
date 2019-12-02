@@ -55,7 +55,7 @@ dCollisionConeNodeInfo::dCollisionConeNodeInfo(NewtonCollision* const cylinder)
 	m_height = record.m_cone.m_height;
 
 	SetTransform (offsetMatrix);
-	SetShapeId (record.m_collisionMaterial.m_userId);
+	SetShapeId (int(record.m_collisionMaterial.m_userId));
 
 	CalculateGeometryProperies (cylinder, m_geometricInertia, m_geometricCenterAndVolume); 
 }

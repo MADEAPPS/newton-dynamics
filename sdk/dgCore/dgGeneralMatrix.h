@@ -30,8 +30,7 @@
 
 #define DG_LCP_MAX_VALUE dgFloat32 (1.0e10f)
 
-
-bool dgCholeskyFactorization(dgInt32 size, dgFloat32* const psdMatrix, dgInt32 rowStride);
+//bool dgCholeskyFactorization(dgInt32 size, dgFloat32* const psdMatrix, dgInt32 rowStride);
 
 class dgSymmetricBiconjugateGradientSolve
 {
@@ -249,14 +248,9 @@ class dgOldSolverNetwon_1_5
 template<class T>
 void dgMatrixTimeVector(dgInt32 size, const T* const matrix, const T* const v, T* const out)
 {
-	dgCheckAligment16(v);
-	dgCheckAligment16(out);
-	dgCheckAligment16(matrix);
 	dgInt32 stride = 0;
 	for (dgInt32 i = 0; i < size; i++) {
-		//dgGetRow(const T* const matrix, dgInt32 size, dgInt32 index)
 		const T* const row = &matrix[stride];
-		dgCheckAligment16(row);
 		out[i] = dgDotProduct(size, row, v);
 		stride += size;
 	}
@@ -265,33 +259,28 @@ void dgMatrixTimeVector(dgInt32 size, const T* const matrix, const T* const v, T
 template<class T>
 void dgMatrixTimeMatrix(dgInt32 size, const T* const matrixA, const T* const matrixB, T* const out)
 {
-	dgCheckAligment16(out);
-	dgCheckAligment16(matrixA);
-	dgCheckAligment16(matrixB);
 	for (dgInt32 i = 0; i < size; i++) {
 		const T* const rowA = &matrixA[i * size];
-		dgCheckAligment16(rowA);
 		T* const rowOut = &out[i * size];
 		for (dgInt32 j = 0; j < size; j++) {
 			T acc = T(0.0f);
 			for (dgInt32 k = 0; k < size; k++) {
-				acc += rowA[k] * matrixB[j * size + k];
+				acc += rowA[k] * matrixB[k * size + j];
 			}
 			rowOut[j] = acc;
 		}
 	}
 }
 
-
 template<class T>
-DG_INLINE bool dgCholeskyFactorizationAddRow(dgInt32 size, dgInt32 n, T* const matrix)
+DG_INLINE bool dgCholeskyFactorizationAddRow(dgInt32 size, dgInt32 stride, dgInt32 n, T* const matrix, T* const invDiagonalOut)
 {
-	T* const rowN = &matrix[size * n];
+	T* const rowN = &matrix[stride * n];
 
-	dgInt32 stride = 0;
+	dgInt32 base = 0;
 	for (dgInt32 j = 0; j <= n; j++) {
 		T s(0.0f);
-		T* const rowJ = &matrix[stride];
+		T* const rowJ = &matrix[base];
 		for (dgInt32 k = 0; k < j; k++) {
 			s += rowN[k] * rowJ[k];
 		}
@@ -303,65 +292,79 @@ DG_INLINE bool dgCholeskyFactorizationAddRow(dgInt32 size, dgInt32 n, T* const m
 			}
 
 			rowN[n] = T(sqrt(diag));
+			invDiagonalOut[n] = T(1.0f) / rowN[n];
 		} else {
 			rowJ[n] = T(0.0f);
-			rowN[j] = (rowN[j] - s) / rowJ[j];
+			//rowN[j] = (rowN[j] - s) / rowJ[j];
+			rowN[j] = invDiagonalOut[j] * (rowN[j] - s);
 		}
 
-		stride += size;
+		base += stride;
 	}
+
 	return true;
 }
 
 template<class T>
-bool dgCholeskyFactorization(dgInt32 size, T* const psdMatrix)
+bool dgCholeskyFactorization(dgInt32 size, dgInt32 stride, T* const psdMatrix)
 {
 	bool state = true;
+	T* const invDiagonal = dgAlloca(T, size);
 	for (dgInt32 i = 0; (i < size) && state; i++) {
-		state = state && dgCholeskyFactorizationAddRow(size, i, psdMatrix);
+		state = state && dgCholeskyFactorizationAddRow(size, stride, i, psdMatrix, invDiagonal);
 	}
 	return state;
 }
 
 template<class T>
-void dgCholeskyApplyRegularizer (dgInt32 size, T* const psdMatrix, T* const regulalizer)
+bool dgTestPSDmatrix(dgInt32 size, dgInt32 stride, T* const matrix)
+{
+	T* const copy = dgAlloca(T, size * size);
+	int row = 0;
+	for (int i = 0; i < size; i++) {
+		memcpy(&copy[i * size], &matrix[row], size * sizeof (T));
+		row += stride;
+	}
+	return dgCholeskyFactorization(size, size, copy);
+}
+
+template<class T>
+void dgCholeskyApplyRegularizer (dgInt32 size, dgInt32 stride, T* const psdMatrix, T* const regularizer)
 {
 	bool isPsdMatrix = false;
-	dgFloat32* const lowerTriangule = dgAlloca(dgFloat32, size * size);
+	dgFloat32* const lowerTriangule = dgAlloca(dgFloat32, stride * stride);
 	do {
-		memcpy(lowerTriangule, psdMatrix, sizeof(dgFloat32) * size * size);
-		isPsdMatrix = dgCholeskyFactorization(size, lowerTriangule);
+		memcpy(lowerTriangule, psdMatrix, sizeof(dgFloat32) * stride * stride);
+		isPsdMatrix = dgCholeskyFactorization(size, stride, lowerTriangule);
 		if (!isPsdMatrix) {
 			for (dgInt32 i = 0; i < size; i++) {
-				regulalizer[i] *= dgFloat32(4.0f);
-				psdMatrix[i * size + i] += regulalizer[i];
+				regularizer[i] *= dgFloat32(4.0f);
+				psdMatrix[i * stride + i] += regularizer[i];
 			}
 		}
 	} while (!isPsdMatrix);
 }
 
-
 template<class T>
-DG_INLINE void dgSolveCholesky(dgInt32 size, dgInt32 n, const T* const choleskyMatrix, T* const x, const T* const b)
+DG_INLINE void dgSolveCholesky(dgInt32 size, dgInt32 stride, const T* const choleskyMatrix, T* const x, const T* const b)
 {
-	dgInt32 stride = 0;
-	for (dgInt32 i = 0; i < n; i++) {
+	dgInt32 rowStart = 0;
+	for (dgInt32 i = 0; i < size; i++) {
 		T acc(0.0f);
-		const T* const row = &choleskyMatrix[stride];
-		dgCheckAligment16(row);
+		const T* const row = &choleskyMatrix[rowStart];
 		for (dgInt32 j = 0; j < i; j++) {
 			acc = acc + row[j] * x[j];
 		}
 		x[i] = (b[i] - acc) / row[i];
-		stride += size;
+		rowStart += stride;
 	}
 
-	for (dgInt32 i = n - 1; i >= 0; i--) {
+	for (dgInt32 i = size - 1; i >= 0; i--) {
 		T acc = 0.0f;
-		for (dgInt32 j = i + 1; j < n; j++) {
-			acc = acc + choleskyMatrix[size * j + i] * x[j];
+		for (dgInt32 j = i + 1; j < size; j++) {
+			acc = acc + choleskyMatrix[stride * j + i] * x[j];
 		}
-		x[i] = (x[i] - acc) / choleskyMatrix[size * i + i];
+		x[i] = (x[i] - acc) / choleskyMatrix[stride * i + i];
 	}
 }
 
@@ -370,7 +373,6 @@ void dgSolveCholesky(dgInt32 size, T* const choleskyMatrix, T* const x)
 {
 	dgSolveCholesky(size, size, choleskyMatrix, x);
 }
-
 
 template<class T>
 bool dgSolveGaussian(dgInt32 size, T* const matrix, T* const b)
@@ -428,11 +430,8 @@ void dgEigenValues(const dgInt32 size, const dgInt32 stride, const T* const symm
 {
 	T* const offDiag = dgAlloca(T, size);
 	T* const matrix = dgAlloca(T, size * stride);
-	dgCheckAligment16(offDiag);
-	dgCheckAligment16(matrix);
 
 	memcpy(matrix, symmetricMatrix, sizeof(T) * size * stride);
-
 	for (dgInt32 i = size - 1; i > 0; i--) {
 		T h(0.0f);
 		T* const rowI = &matrix[i * stride];
@@ -590,7 +589,6 @@ void dgGaussSeidelLcpSor(const dgInt32 size, const T* const matrix, T* const x, 
 {
 	const T* const me = matrix;
 	T* const invDiag1 = dgAlloca(T, size);
-	dgCheckAligment16(invDiag1);
 
 	dgInt32 stride = 0;
 	for (dgInt32 i = 0; i < size; i++) {
@@ -811,20 +809,6 @@ void dgSolveDantzigLcpLow(dgInt32 size, T* const symmetricMatrixPSD, T* const x,
 	T* const delta_x = dgAlloca(T, size);
 	T* const lowerTriangularMatrix = dgAlloca(T, size * size);
 	dgInt16* const permute = dgAlloca(dgInt16, size);
-
-	dgCheckAligment16(x);
-	dgCheckAligment16(b);
-	dgCheckAligment16(x0);
-	dgCheckAligment16(r0);
-	dgCheckAligment16(low);
-	dgCheckAligment16(high);
-	dgCheckAligment16(tmp0);
-	dgCheckAligment16(tmp1);
-	dgCheckAligment16(delta_r);
-	dgCheckAligment16(delta_x);
-	dgCheckAligment16(permute);
-	dgCheckAligment16(symmetricMatrixPSD);
-	dgCheckAligment16(lowerTriangularMatrix);
 
 	for (dgInt32 i = 0; i < size; i++) {
 		permute[i] = dgInt16(i);
@@ -1085,7 +1069,6 @@ template <class T>
 bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD , T* const x, T* const b, T* const low, T* const high)
 {
 	dgInt16* const permute = dgAlloca(dgInt16, size);
-	dgCheckAligment16(permute);
 
 	for (dgInt32 i = 0; i < size; i++) {
 		x[i] = b[i];
@@ -1138,13 +1121,6 @@ bool dgSolvePartitionDantzigLCP(dgInt32 size, T* const symmetricMatrixPSD , T* c
 		T* const u = dgAlloca(T, boundedSize);
 		T* const a11 = dgAlloca(T, boundedSize * boundedSize);
 		T* const a10 = dgAlloca(T, boundedSize * unboundedSize);
-
-		dgCheckAligment16(l);
-		dgCheckAligment16(h);
-		dgCheckAligment16(c);
-		dgCheckAligment16(u);
-		dgCheckAligment16(a10);
-		dgCheckAligment16(a11);
 
 		for (dgInt32 i = 0; i < boundedSize; i++) {
 			T* const g = &a10[i * unboundedSize];

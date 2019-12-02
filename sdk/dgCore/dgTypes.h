@@ -89,7 +89,7 @@
 #include <ctype.h>
 //#include <atomic>
 
-#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+#if (defined (__MINGW32__) || defined (__MINGW64__))
 	#include <io.h> 
 	#include <direct.h> 
 	#include <malloc.h>
@@ -104,7 +104,7 @@
 	#include <pmmintrin.h>
 #endif
 
-#if (defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+#if (defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (__MINGW32__) || defined (__MINGW64__))
   /* CMake defines NDEBUG for _not_ debug builds. Therefore, set
      Newton's _DEBUG flag only when NDEBUG is not defined.
   */
@@ -312,8 +312,6 @@ typedef bool (dgApi *dgReportProgress) (dgFloat32 progressNormalzedPercent, void
 
 // assume this function returns memory aligned to 16 bytes
 #define dgAlloca(type, count) (type*) alloca (sizeof (type) * (count))
-#define dgCheckAligment16(x) dgAssert (!(dgUnsigned64 (x) & 0xf))
-//#define dgCheckAligment16(x) 
 
 DG_INLINE dgInt32 dgExp2 (dgInt32 x)
 {
@@ -519,7 +517,7 @@ DG_INLINE dgInt32 dgAtomicExchangeAndAdd (dgInt32* const addend, dgInt32 amount)
 {
 	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 		return _InterlockedExchangeAdd((long*)addend, long(amount));
-	#elif (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+	#elif (defined (__MINGW32__) || defined (__MINGW64__))
 		return InterlockedExchangeAdd((long*)addend, long(amount));
 	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER)|| defined ANDROID)
 		return __sync_fetch_and_add((int32_t*)addend, amount);
@@ -532,7 +530,7 @@ DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 {
 	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 		return _InterlockedExchange((long*) ptr, value);
-	#elif (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+	#elif (defined (__MINGW32__) || defined (__MINGW64__))
 		return InterlockedExchange((long*) ptr, value);
 	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
 		//__sync_synchronize();
@@ -544,17 +542,19 @@ DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 
 DG_INLINE void* dgInterlockedExchange(void** const ptr, void* value)
 {
-	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || defined (__MINGW32__) || defined (__MINGW64__))
 		#ifdef _M_X64 
 			return (void*)_InterlockedExchange64((dgInt64*)ptr, dgInt64 (value));
 		#else
 			return (void*)_InterlockedExchange((long*) ptr, dgInt32(value));
 		#endif
-	#elif (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
-		return (void*)InterlockedExchange((long*)ptr, value);
 	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
 		//__sync_synchronize();
-		return (void*)__sync_lock_test_and_set((int32_t*)ptr, value);
+		#ifdef __x86_64__
+			return (void*)__sync_lock_test_and_set((dgInt64*) ptr, value);
+		#else
+			return (void*)__sync_lock_test_and_set((dgInt32*) ptr, value);
+		#endif
 	#else
 		#error "dgInterlockedExchange implementation required"
 	#endif
@@ -565,7 +565,7 @@ DG_INLINE dgInt32 dgInterlockedTest(dgInt32* const ptr, dgInt32 value)
 {
 	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 		return _InterlockedCompareExchange((long*)ptr, value, value);
-	#elif (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+	#elif (defined (__MINGW32__) || defined (__MINGW64__))
 		return InterlockedCompareExchange((long*)ptr, value, value);
 	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
 		//__sync_synchronize();

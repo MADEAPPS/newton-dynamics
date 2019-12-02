@@ -21,9 +21,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\ArticulatedJoints.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\BasicCar.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\BasicFriction.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -102,9 +99,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\ScaledCollision.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\PuckSlide.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\PrimitiveCollision.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -177,9 +171,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\MishosRocketTest.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\BasicMultibodyVehicle.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\SingleBodyCar.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -202,6 +193,12 @@
       <Filter>demos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\BalancingCharacter.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\toolBox\dSoundManager.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\FlatLandGame.cpp">
       <Filter>demos</Filter>
     </ClCompile>
   </ItemGroup>
@@ -259,6 +256,9 @@
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoInstanceEntity.h">
       <Filter>mainLogic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\toolBox\dSoundManager.h">
+      <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

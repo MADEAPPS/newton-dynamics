@@ -50,11 +50,11 @@ class dTireInfo
 		m_dampingRatio = 15.0f * vehicleMass;
 		m_springStiffness = dAbs(vehicleMass * 9.8f * 8.0f / m_suspensionLength);
 
-		m_corneringStiffness = dAbs(vehicleMass * gravity * 1.0f);
+		m_suspensionRelaxation = 0.01f;
+		m_corneringStiffness = dAbs(vehicleMass * gravity * 10.0f);
 		m_longitudinalStiffness = dAbs(vehicleMass * gravity * 1.0f);
 	}
 
-	//dVector m_location;
 	dFloat m_mass;
 	dFloat m_radio;
 	dFloat m_width;
@@ -66,9 +66,9 @@ class dTireInfo
 	dFloat m_maxSteeringAngle;
 	dFloat m_corneringStiffness;
 	dFloat m_longitudinalStiffness;
+	dFloat m_suspensionRelaxation;
 	dFloat m_frictionCoefficient;
 	//dFloat m_aligningMomentTrail;
-	//int m_hasFender;
 	//dSuspensionType m_suspentionType;
 };
 
@@ -97,9 +97,9 @@ class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilater
 	void CalculateContacts(const dCollectCollidingBodies& bodyArray, dFloat timestep);
 
 	private: 
-	void CalculateFreeDof();
 	void ApplyExternalForce();
 	void Integrate(dFloat timestep);
+	void CalculateFreeDof(dFloat timestep);
 	dComplementaritySolver::dBilateralJoint* GetJoint() {return this;}
 	const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id);
@@ -109,7 +109,6 @@ class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilater
 
 	dMatrix m_matrix;
 	dMatrix m_bindingRotation;
-	dVehicleNode m_dynamicContactBodyNode;
 	dVehicleTireContact m_contactsJoints[3];
 	dTireInfo m_info;
 	NewtonCollision* m_tireShape;
@@ -120,6 +119,7 @@ class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilater
 	dFloat m_brakeTorque;
 	dFloat m_steeringAngle;
 	dFloat m_invSuspensionLength;
+	int m_contactCount;
 	friend class dVehicleMultiBody;
 };
 

@@ -316,7 +316,6 @@ class dgMeshEffect: public dgPolyhedra, public dgRefCounter
 	void Init();
 
 	void Trace () const;
-	void SaveOFF (const char* const fileName) const;
 
 	void ApplyTransform (const dgMatrix& matrix);
 	dgMatrix CalculateOOBB (dgBigVector& size) const;

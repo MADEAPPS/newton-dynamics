@@ -57,13 +57,14 @@ class dVehicleNode: public dCustomAlloc
 	const dVehicleNodeChildrenList& GetChildrenList() const { return m_children; }
 
 	dComplementaritySolver::dBodyState& GetProxyBody() { return m_proxyBody; }
+	const dComplementaritySolver::dBodyState& GetProxyBody() const { return m_proxyBody; }
 
 	int GetIndex() const {return m_index;}
 
 	protected:
 	virtual void ApplyExternalForce();
 	virtual void Integrate(dFloat timestep);
-	virtual void CalculateFreeDof();
+	virtual void CalculateFreeDof(dFloat timestep);
 
 	virtual int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 	virtual const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;

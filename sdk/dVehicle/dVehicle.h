@@ -15,11 +15,11 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
-#include "dVehicleDashControl.h"
 
 class dTireInfo;
 class dEngineInfo;
 class dVehicleManager;
+class dVehicleDashControl;
 
 class dVehicle: public dVehicleNode
 {
@@ -35,7 +35,7 @@ class dVehicle: public dVehicleNode
 			,m_handBrakeValue(0.0f)
 			,m_gear(0)
 			,m_ignitionKey(0)
-			,m_lockDifferential(0)
+			,m_differentialMode(0)
 			,m_manualTransmission(0)
 		{
 		}
@@ -47,7 +47,7 @@ class dVehicle: public dVehicleNode
 		dFloat m_handBrakeValue;
 		int m_gear;
 		int m_ignitionKey;
-		int m_lockDifferential;
+		int m_differentialMode;
 		int m_manualTransmission;
 	};
 
@@ -59,6 +59,11 @@ class dVehicle: public dVehicleNode
 	const dMatrix& GetLocalFrame() const { return m_localFrame; }
 	const dVector& GetGravity() const {return m_gravity;}
 
+	void AddControl (dVehicleDashControl* const control);
+	void RemoveControl (dVehicleDashControl* const control);
+	int GetControlCount() const {return m_controlerCount;}
+
+	virtual bool CheckSleeping() {return false;}
 	virtual void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep) {}
 
 	protected:
@@ -69,9 +74,11 @@ class dVehicle: public dVehicleNode
 	dVector m_gravity;
 	dVector m_obbSize;
 	dVector m_obbOrigin;
+	dArray<dVehicleDashControl*> m_control;
 	NewtonBody* m_newtonBody;
 	void* m_managerNode;
 	dVehicleManager* m_manager;
+	int m_controlerCount;
 
 	friend class dVehicleTire;
 	friend class dVehicleManager;

@@ -14,31 +14,34 @@
 #include "dVehicleDifferential.h"
 
 
-dVehicleDifferential::dVehicleDifferential(dVehicleMultiBody* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode)
+dVehicleDifferential::dVehicleDifferential(dVehicleMultiBody* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode, const dMatrix& axelMatrix)
 	:dVehicleNode(chassis)
 	,dBilateralJoint()
-	,m_localAxis(dYawMatrix (90.0f * dDegreeToRad))
+	,m_localAxis(dYawMatrix (-90.0f * dDegreeToRad))
+	,m_axelMatrix(axelMatrix)
 	,m_leftAxle()
 	,m_rightAxle()
 	,m_leftNode(leftNode)
 	,m_rightNode(rightNode)
 	,m_diffOmega(0.0f)
 	,m_shaftOmega(0.0f)
+	,m_mode(m_slipLocked)
 {
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 
 	dFloat inertia = (2.0f / 5.0f) * mass * radius * radius;
+	m_frictionLost = inertia * (0.5f / dPi) * 60.0f;
 
 	m_proxyBody.SetMass(mass);
 	m_proxyBody.SetInertia(inertia, inertia, inertia);
 	m_proxyBody.UpdateInertia();
 
 	// set the tire joint
-	m_leftAxle.SetOwners(this, m_leftNode);
-	m_rightAxle.SetOwners(this, m_rightNode);
+	m_leftAxle.SetOwners(m_leftNode, this);
+	m_rightAxle.SetOwners(m_rightNode, this);
 
-	m_leftAxle.Init(&m_proxyBody, &m_leftNode->GetProxyBody());
-	m_rightAxle.Init(&m_proxyBody, &m_rightNode->GetProxyBody());
+	m_leftAxle.Init(&m_leftNode->GetProxyBody(), &m_proxyBody);
+	m_rightAxle.Init(&m_rightNode->GetProxyBody(), &m_proxyBody);
 
 	m_leftAxle.m_diffSign = -1.0f;
 	m_rightAxle.m_diffSign = 1.0f;
@@ -46,6 +49,16 @@ dVehicleDifferential::dVehicleDifferential(dVehicleMultiBody* const chassis, dFl
 
 dVehicleDifferential::~dVehicleDifferential()
 {
+}
+
+int dVehicleDifferential::GetMode() const 
+{ 
+	return m_mode; 
+}
+
+void dVehicleDifferential::SetMode(int mode) 
+{ 
+	m_mode = dOperationMode (mode); 
 }
 
 const void dVehicleDifferential::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
@@ -56,12 +69,22 @@ const void dVehicleDifferential::Debug(dCustomJoint::dDebugDisplay* const debugC
 
 int dVehicleDifferential::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 {
-	jointArray[0] = &m_leftAxle;
-	jointArray[1] = &m_rightAxle;
-	return 2;
+	switch (m_mode)
+	{
+		case m_rightLocked:
+			jointArray[0] = &m_rightAxle;
+			return 1;
+		case m_leftLocked:
+			jointArray[0] = &m_leftAxle;
+			return 1;
+		default:	
+			jointArray[0] = &m_leftAxle;
+			jointArray[1] = &m_rightAxle;
+			return 2;
+	}
 }
 
-void dVehicleDifferential::CalculateFreeDof()
+void dVehicleDifferential::CalculateFreeDof(dFloat timestep)
 {
 	dVehicleMultiBody* const chassisNode = GetParent()->GetAsVehicleMultiBody();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
@@ -114,34 +137,67 @@ void dVehicleDifferential::JacobianDerivative(dComplementaritySolver::dParamInfo
 	// angular constraints	
 	AddAngularRowJacobian(constraintParams, matrix.m_right, 0.0f);
 
-	const dVector& omega = m_state0->GetOmega();
-	dFloat omegax = matrix.m_front.DotProduct3(omega);
-	dFloat omegay = matrix.m_up.DotProduct3(omega);
+	// issue differential row
+	int index = constraintParams->m_count;
+	AddAngularRowJacobian(constraintParams, matrix.m_up, 0.0f);
+	//dTrace(("diff omega: %f ", m_state0->GetOmega().DotProduct3(matrix.m_up)));
 
-	dFloat slipDiffOmega = 0.5f * dMax(dFloat (5.0f), dAbs(omegax));
-	if (omegay > slipDiffOmega) {
-//		dTrace(("+ "));
-	} else if (omegay < -slipDiffOmega) {
-//		dTrace(("- "));
+	switch (m_mode)
+	{
+		case m_open:
+		{
+			constraintParams->m_jointHighFrictionCoef[index] = m_frictionLost;
+			constraintParams->m_jointLowFrictionCoef[index] = -m_frictionLost;
+			break;
+		}
+
+		case m_slipLocked:
+		{
+			const dVector& omega = m_state0->GetOmega();
+			dFloat omegax = matrix.m_front.DotProduct3(omega);
+			dFloat omegay = matrix.m_up.DotProduct3(omega);
+			dFloat slipDiffOmega = dMax(dFloat(8.0f), 0.5f * dAbs(omegax));
+
+			if (omegay > slipDiffOmega) {
+				//int index = constraintParams->m_count;
+				//AddAngularRowJacobian(constraintParams, matrix.m_up, 0.0f);
+				constraintParams->m_jointAccel[index] -= slipDiffOmega * constraintParams->m_timestepInv;
+				constraintParams->m_jointHighFrictionCoef[index] = m_frictionLost;
+
+			} else if (omegay < -slipDiffOmega) {
+				//int index = constraintParams->m_count;
+				//AddAngularRowJacobian(constraintParams, matrix.m_up, 0.0f);
+				constraintParams->m_jointAccel[index] -= -slipDiffOmega * constraintParams->m_timestepInv;
+				constraintParams->m_jointLowFrictionCoef[index] = -m_frictionLost;
+			}
+			break;
+		}
+
+		//case m_leftLocked:
+		//case m_rightLocked:
+		//{
+		//	break;
+		//}
 	}
-//dTrace(("wx=%f wy=%f\n", omegax, omegay));
-
 }
 
 void dVehicleDifferential::dTireAxleJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-	dVehicleDifferential* const differential = GetOwner0()->GetAsDifferential();
+	dVehicleDifferential* const differential = GetOwner1()->GetAsDifferential();
 	dAssert (differential);
-
-	dMatrix diffMatrix (differential->m_localAxis * m_state0->GetMatrix());
-	const dMatrix& tireMatrix = m_state1->GetMatrix();
+	
+	dMatrix tireMatrix (differential->m_axelMatrix * m_state0->GetMatrix());
+	dMatrix diffMatrix (differential->m_localAxis * m_state1->GetMatrix());
 
 	AddAngularRowJacobian(constraintParams, tireMatrix.m_front, 0.0f);
 
 	dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_J01;
 	dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_J10;
 
-	jacobian0.m_angular = diffMatrix.m_front + diffMatrix.m_up.Scale(m_diffSign);
+	if ((differential->m_mode == dVehicleDifferential::m_open) ||
+		(differential->m_mode == dVehicleDifferential::m_slipLocked)) {
+		jacobian1.m_angular = diffMatrix.m_front + diffMatrix.m_up.Scale(m_diffSign);
+	}
 
 	const dVector& omega0 = m_state0->GetOmega();
 	const dVector& omega1 = m_state1->GetOmega();

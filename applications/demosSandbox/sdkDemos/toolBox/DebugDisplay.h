@@ -59,6 +59,19 @@ class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
 		glVertex3f(GLfloat (p1.m_x), GLfloat (p1.m_y), GLfloat (p1.m_z));
 	}
 
+	void DrawPoint(const dVector& point, dFloat thinckness = 1.0f)
+	{
+		glEnd();
+
+		glPointSize(GLfloat(thinckness));
+		glBegin(GL_POINTS);
+		glVertex3f(GLfloat(point.m_x), GLfloat(point.m_y), GLfloat(point.m_z));
+		glEnd();
+		glPointSize(GLfloat(1.0f));
+
+		glBegin(GL_LINES);
+	}
+
 	virtual void SetOrthRendering() 
 	{
 		glEnd();

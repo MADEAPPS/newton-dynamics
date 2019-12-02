@@ -79,8 +79,9 @@ class dgSkeletonContainer
 	void InitLoopMassMatrix (const dgJointInfo* const jointInfoArray);
 	dgInt8* CalculateBufferSizeInBytes (const dgJointInfo* const jointInfoArray);
 	void SolveAuxiliary (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const dgForcePair* const accel, dgForcePair* const force) const;
-	void SolveLcp(dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const;
-	void SolveLcp_new(dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const;
+	void SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const;
+	void SolveBlockLcp(dgInt32 size, dgInt32 blockSize, const dgFloat32* const x0, dgFloat32* const x, dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const;
+	void FactorizeMatrix(dgInt32 size, dgInt32 stride, dgFloat32* const matrix, dgFloat32* const diagDamp) const;
 
 	dgWorld* m_world;
 	dgNode* m_skeleton;
@@ -89,13 +90,16 @@ class dgSkeletonContainer
 	dgFloat32* m_deltaForce;
 	dgFloat32* m_massMatrix11;
 	dgFloat32* m_massMatrix10;
+
 	dgRightHandSide* m_rightHandSide;
 	const dgLeftHandSide* m_leftHandSide;
+	dgInt32* m_frictionIndex;
 	dgInt32* m_matrixRowsIndex;
 	dgSkeletonList::dgListNode* m_listNode;
 	dgArray<dgConstraint*> m_loopingJoints;
 	dgArray<dgInt8> m_auxiliaryMemoryBuffer;
 	dgInt32 m_lru;
+	dgInt32 m_blockSize;
 	dgInt16 m_nodeCount;
 	dgInt16 m_loopCount;
 	dgInt16 m_dynamicsLoopCount;

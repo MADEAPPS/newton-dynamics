@@ -13,13 +13,16 @@
 #include "dVehicleNode.h"
 #include "dVehicleTire.h"
 #include "dVehicleMultiBody.h"
+#include "dVehicleCollidingNode.h"
+
+#define D_FREE_ROLLING_TORQUE_COEF	dFloat (0.5f) 
+#define D_LOAD_ROLLING_TORQUE_COEF	dFloat (0.01f) 
 
 dVehicleTire::dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info)
 	:dVehicleNode(chassis)
 	,dBilateralJoint()
 	,m_matrix(dGetIdentityMatrix())
 	,m_bindingRotation(dGetIdentityMatrix())
-	,m_dynamicContactBodyNode(NULL)
 	,m_info(info)
 	,m_tireShape(NULL)
 	,m_omega(0.0f)
@@ -29,14 +32,25 @@ dVehicleTire::dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& loca
 	,m_brakeTorque(0.0f)
 	,m_steeringAngle(0.0f)
 	,m_invSuspensionLength(m_info.m_suspensionLength > 0.0f ? 1.0f / m_info.m_suspensionLength : 0.0f)
+	,m_contactCount(0)
 {
 	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 	
 	NewtonBody* const chassisBody = chassis->GetBody();
 	NewtonWorld* const world = NewtonBodyGetWorld(chassis->GetBody());
 
+#if 1
+	// tire shaped more like real tires with rim and carcase, much harder in collision since the carcase is thinner
+	m_tireShape = NewtonCreateChamferCylinder(world, 0.75f, 0.5f, 0, NULL);
+	NewtonCollisionSetScale(m_tireShape, 2.0f * m_info.m_width, m_info.m_radio, m_info.m_radio);
+#elif 1
+	// tire shape like real tires with rim and carcase, harder in collision
 	m_tireShape = NewtonCreateChamferCylinder(world, 0.5f, 1.0f, 0, NULL);
 	NewtonCollisionSetScale(m_tireShape, m_info.m_width, m_info.m_radio, m_info.m_radio);
+#else
+	// tire is a simple chamfered cylinder, faster collision
+	m_tireShape = NewtonCreateChamferCylinder(world, m_info.m_width*0.25f, m_info.m_radio*1.5f, 0, NULL);
+#endif
 
 	dMatrix chassisMatrix;
 	NewtonBodyGetMatrix(chassisBody, &chassisMatrix[0][0]);
@@ -62,14 +76,6 @@ dVehicleTire::dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& loca
 	m_proxyBody.SetMass(m_info.m_mass);
 	m_proxyBody.SetInertia(inertia.m_x, inertia.m_y, inertia.m_z);
 	m_proxyBody.UpdateInertia();
-	
-	for (int i = 0 ; i < sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1; i ++) {
-		m_contactsJoints[i].SetOwners (this, &chassis->m_groundProxyBody);
-	}
-	m_contactsJoints[sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1].SetOwners(this, &m_dynamicContactBodyNode);
-
-////m_brakeTorque = 100.0f;
-////m_omega = -20.0f;
 }
 
 dVehicleTire::~dVehicleTire()
@@ -118,9 +124,9 @@ int dVehicleTire::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 {
 	int count = 0;
 	for (int i = 0; i < sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]); i ++) {
-		dVehicleLoopJoint* const loop = &m_contactsJoints[i];
-		if (loop->IsActive ()) {
-			jointArray[count] = loop;
+		dVehicleLoopJoint* const contact = &m_contactsJoints[i];
+		if (contact->IsActive ()) {
+			jointArray[count] = contact;
 			count ++;
 		}
 	}
@@ -135,78 +141,80 @@ void dVehicleTire::CalculateContacts(const dCollectCollidingBodies& bodyArray, d
 
 	int contactCount = 0;
 	dFloat friction = m_info.m_frictionCoefficient;
-	if (bodyArray.m_staticCount) {
-		dVehicleMultiBody* const chassisNode = GetParent()->GetAsVehicleMultiBody();
-		NewtonWorld* const world = NewtonBodyGetWorld(chassisNode->GetBody());
-		dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 
-		const dMatrix& chassisMatrix = chassisBody->GetMatrix();
-		dMatrix tireMatrix (GetHardpointMatrix (1.0f) * chassisMatrix);
-		dVector veloc0 (tireMatrix.m_right.Scale (-m_info.m_suspensionLength));
-		dVector tmp (0.0f);
+	dVehicleMultiBody* const chassisNode = GetParent()->GetAsVehicleMultiBody();
+	NewtonWorld* const world = NewtonBodyGetWorld(chassisNode->GetBody());
+	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 
-		dVector contact(0.0f);
-		dVector normal(0.0f);
-		dFloat penetration(0.0f);
-		dFloat param = 1.0f - m_position * m_invSuspensionLength;
+	dMatrix matrixB;
+	dMatrix tireMatrix (GetHardpointMatrix(m_position * m_invSuspensionLength) * chassisBody->GetMatrix());
+	
+	const int maxContactCount = sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]);
+	dFloat points[maxContactCount][3];
+	dFloat normals[maxContactCount][3];
+	dFloat penetrations[maxContactCount];
+	dLong attributeA[maxContactCount];
+	dLong attributeB[maxContactCount];
 
-		for (int i = 0; i < bodyArray.m_staticCount; i ++) {
-			dMatrix matrixB;
-			dLong attributeA;
-			dLong attributeB;
-			dFloat impactParam;
+	for (int i = 0; (i < bodyArray.m_count) && (contactCount < maxContactCount); i++) {
+		// calculate tire contact collision with rigid bodies
 
-			NewtonBodyGetMatrix(bodyArray.m_array[i], &matrixB[0][0]);
-			NewtonCollision* const otherShape = NewtonBodyGetCollision (bodyArray.m_array[i]);
+		NewtonBodyGetMatrix(bodyArray.m_array[i], &matrixB[0][0]);
+		NewtonCollision* const otherShape = NewtonBodyGetCollision(bodyArray.m_array[i]);
+		int count = NewtonCollisionCollide(world, maxContactCount, 
+										   m_tireShape, &tireMatrix[0][0], 
+										   otherShape, &matrixB[0][0],
+										   &points[0][0], &normals[0][0], penetrations, attributeA, attributeB, 0);
 
-			int count = NewtonCollisionCollideContinue(world, 1, 1.0f,
-				m_tireShape, &tireMatrix[0][0], &veloc0[0], &tmp[0],
-				otherShape, &matrixB[0][0], &tmp[0], &tmp[0],
-				&impactParam, &contact[0], &normal[0], &penetration,
-				&attributeA, &attributeB, 0);
-
-			if (count) {
-				// calculate tire penetration
-				dFloat dist = (param - impactParam) * m_info.m_suspensionLength;
-				if (dist > -D_TIRE_MAX_ELASTIC_DEFORMATION) {
-
-					normal.m_w = 0.0f;
-					penetration = normal.DotProduct3(tireMatrix.m_right.Scale(dist));
-
-					dVector longitudinalDir (normal.CrossProduct(tireMatrix.m_front));
-					if (longitudinalDir.DotProduct3(longitudinalDir) < 0.1f) {
-						//lateralDir = normal.CrossProduct(tireMatrix.m_front.CrossProduct(normal));
-						longitudinalDir = normal.CrossProduct(tireMatrix.m_up.CrossProduct(normal));
-						dAssert(longitudinalDir.DotProduct3(longitudinalDir) > 0.1f);
-					}
-					longitudinalDir = longitudinalDir.Normalize();
-
-					contact -= tireMatrix.m_up.Scale (dist);
-					contact.m_w = 1.0f;
-					m_contactsJoints[contactCount].SetContact(contact, normal, longitudinalDir, penetration, friction, friction * 0.8f);
-					contactCount ++;
-				}
+		for (int j = 0; (j < count) && (contactCount < maxContactCount); j ++) {
+			dVector normal (normals[j][0], normals[j][1], normals[j][2], dFloat (0.0f));
+			dVector longitudinalDir(normal.CrossProduct(tireMatrix.m_front));
+			if (longitudinalDir.DotProduct3(longitudinalDir) < 0.1f) {
+				longitudinalDir = normal.CrossProduct(tireMatrix.m_up.CrossProduct(normal));
+				dAssert(longitudinalDir.DotProduct3(longitudinalDir) > 0.1f);
 			}
-		}
-	}
 
-	if (bodyArray.m_count > bodyArray.m_staticCount) {
-		// for now ignore tire collision with dynamics bodies,
-		dAssert (0);
+			longitudinalDir = longitudinalDir.Normalize();
+			dVehicleCollidingNode* const collidingNode = chassisNode->FindCollideNode(this, bodyArray.m_array[i]);
+			m_contactsJoints[contactCount].SetOwners(this, collidingNode);
+
+			dVector contact (points[j][0], points[j][1], points[j][2], dFloat (1.0f));
+			m_contactsJoints[contactCount].SetContact(collidingNode, contact, normal, longitudinalDir, penetrations[j], friction, false);
+			contactCount++;
+			dAssert(contactCount <= sizeof(m_contactsJoints) / sizeof(m_contactsJoints[0]));
+		}
 	}
 
 	if (contactCount > 1) {
+		// filter contact that are too close 
+		dFloat angle[maxContactCount];
+		for (int i = 0; i < contactCount; i ++) {
+			angle[i] = tireMatrix.m_right.DotProduct3(m_contactsJoints[i].m_normal);
+		}
+
 		for (int i = 0; i < contactCount - 1; i ++) {
-			const dVector& n = m_contactsJoints[i].m_normal;
 			for (int j = contactCount - 1; j > i; j --) {
-				dFloat val = dAbs (n.DotProduct3(m_contactsJoints[j].m_normal));
-				if (val > 0.99f) {
-					m_contactsJoints[j] = m_contactsJoints[contactCount - 1];
+				if (angle[j - 1] > angle[j]) {
+					dSwap (angle[j - 1], angle[j]);
+					dSwap (m_contactsJoints[j - 1], m_contactsJoints[j]); 
+				}
+			}
+		}
+
+		for (int i = contactCount - 1; i > 0; i --) {
+			const dVector& p = m_contactsJoints[i].m_point;
+			for (int j = i - 1; j >= 0; j --) {
+				const dVector error (m_contactsJoints[j].m_point - p);
+				dFloat error2 = error.DotProduct3(error);
+				if (error2 < 3.0e-2f) {			
+					m_contactsJoints[j] = m_contactsJoints[i];
 					contactCount --;
+					break;
 				}
 			}
 		}
 	}
+	m_contactCount = contactCount; 
 }
 
 dMatrix dVehicleTire::GetHardpointMatrix(dFloat param) const
@@ -244,8 +252,6 @@ void dVehicleTire::RenderDebugTire(void* userData, int vertexCount, const dFloat
 
 const void dVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
-	dVehicleNode::Debug(debugContext);
-
 	debugContext->SetColor(dVector(0.0f, 0.4f, 0.7f, 1.0f));
 	dMatrix tireMatrix(m_bindingRotation.Transpose() * GetGlobalMatrix());
 	NewtonCollisionForEachPolygonDo(m_tireShape, &tireMatrix[0][0], RenderDebugTire, debugContext);
@@ -253,18 +259,17 @@ const void dVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 	dVehicleMultiBody* const chassis = GetParent()->GetAsVehicleMultiBody();
 	dAssert (chassis);
 
-	// render tire matrix
+	// render tireState matrix
 	dComplementaritySolver::dBodyState* const chassisBody = &chassis->GetProxyBody();
-	//dMatrix hubTireMatrix(GetHardpointMatrix(m_position * m_invSuspensionLength) * chassisBody->GetMatrix());
-	//debugContext->DrawFrame(hubTireMatrix, 1.0f);
-	//debugContext->DrawFrame(tireMatrix, 1.0f);
-
 	dVector weight (chassis->GetGravity().Scale(chassisBody->GetMass()));
 	dFloat scale (1.0f / dSqrt (weight.DotProduct3(weight)));
 	for (int i = 0; i < sizeof (m_contactsJoints)/sizeof (m_contactsJoints[0]); i ++) {
 		const dVehicleTireContact* const contact = &m_contactsJoints[i];
 		if (contact->IsActive()) {
 			contact->Debug(debugContext, scale);
+			//debugContext->SetColor(dVector(1.0f, 0.0f, 0.0f, 1.0f));
+			//debugContext->DrawPoint(contact->m_point, 4.0f);
+			//debugContext->DrawLine(contact->m_point, contact->m_point + contact->m_normal.Scale (2.0f));
 		}
 	}
 }
@@ -273,6 +278,40 @@ void dVehicleTire::Integrate(dFloat timestep)
 {
 	m_proxyBody.IntegrateForce(timestep, m_proxyBody.GetForce(), m_proxyBody.GetTorque());
 	m_proxyBody.IntegrateVelocity(timestep);
+
+	for (int i = 0; i < m_contactCount; i ++) {
+		const dVehicleTireContact* const contact = &m_contactsJoints[i];
+		if (contact->m_isActive && contact->m_collidingNode->m_body) {
+
+			dMatrix matrix;
+			dVector com;
+			NewtonBodyGetMatrix(contact->m_collidingNode->m_body, &matrix[0][0]);
+			NewtonBodyGetCentreOfMass(contact->m_collidingNode->m_body, &com[0]);
+
+			dVector r (contact->m_point - matrix.TransformVector(com));
+			dVector force (contact->m_normal.Scale (-contact->m_tireModel.m_tireLoad) +
+						   contact->m_longitudinalDir.Scale (-contact->m_tireModel.m_longitunalForce) + 
+						   contact->m_lateralDir.Scale (-contact->m_tireModel.m_lateralForce));
+			if (contact->m_isContactPatch) {
+				dFloat invMass;
+				dFloat invIxx;
+				dFloat invIyy;
+				dFloat invIzz;
+				NewtonBodyGetInvMass(contact->m_collidingNode->m_body, &invMass, &invIxx, &invIyy, &invIzz);
+				dAssert (invMass > 0.0f);
+				dVector accel (force.Scale (invMass));
+				dFloat mag2 = accel.DotProduct3(accel);
+				const dFloat maxAccel = 100.0f;
+				if (mag2 > maxAccel * maxAccel) {
+					force = accel.Scale (maxAccel / (invMass * dSqrt (mag2)));
+				}
+			}
+
+			dVector torque (r.CrossProduct(force));
+			NewtonBodyAddForce(contact->m_collidingNode->m_body, &force[0]);
+			NewtonBodyAddTorque(contact->m_collidingNode->m_body, &torque[0]);
+		}
+	}
 }
 
 void dVehicleTire::ApplyExternalForce()
@@ -288,24 +327,12 @@ void dVehicleTire::ApplyExternalForce()
 
 	m_proxyBody.SetTorque(dVector(0.0f));
 	m_proxyBody.SetForce(chassisNode->GetGravity().Scale(m_proxyBody.GetMass()));
-
-if (m_index == 3) {
-	dVector veloc(m_proxyBody.GetVelocity());
-	float xxxx = veloc.DotProduct3(tireMatrix.m_up);
-	float yyyy = veloc.DotProduct3(tireMatrix.m_front);
-	dTrace(("tireBeta =%f\n", dAtan2(yyyy, xxxx) * dRadToDegree));
 }
 
-}
-
-void dVehicleTire::CalculateFreeDof()
+void dVehicleTire::CalculateFreeDof(dFloat timestep)
 {
 	dVehicleMultiBody* const chassis = GetParent()->GetAsVehicleMultiBody();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassis->GetProxyBody();
-
-	//const dMatrix chassisMatrix(chassisBody->GetMatrix());
-	//const dMatrix tireMatrix(GetHardpointMatrix(0.0f) * chassisBody->GetMatrix());
-	//const dMatrix tireMatrix(GetHardpointMatrix(0.0f) * chassisBody->GetMatrix());
 
 	dMatrix chassisMatrix(GetHardpointMatrix(0.0f) * chassisBody->GetMatrix());
 	dMatrix tireMatrix (m_proxyBody.GetMatrix());
@@ -313,34 +340,32 @@ void dVehicleTire::CalculateFreeDof()
 	dVector tireOmega(m_proxyBody.GetOmega());
 	dVector chassisOmega(chassisBody->GetOmega());
 	dVector relativeOmega(tireOmega - chassisOmega);
+	dAssert(tireMatrix.m_front.DotProduct3(chassisMatrix.m_front) > 0.998f);
+
+#if 1
 	m_omega = tireMatrix.m_front.DotProduct3(relativeOmega);
-	dAssert(tireMatrix.m_front.DotProduct3(chassisMatrix.m_front) > 0.999f);
-
-	// check if the tire is going to rest
-	//if (dAbs(m_omega) < 0.25f) {
-	//	dFloat alpha = tireMatrix.m_front.DotProduct3(m_proxyBody.GetTorque()) * m_proxyBody.GetInvInertia()[0][0];
-	//	if (alpha < 0.2f) {
-	//		m_omega = 0.0f;
-	//	}
-	//}
-
-	//m_tireAngle += m_omega * timestep;
-	dFloat cosAngle = tireMatrix.m_right.DotProduct3(chassisMatrix.m_right);
-	dFloat sinAngle = chassisMatrix.m_front.DotProduct3(chassisMatrix.m_right.CrossProduct(tireMatrix.m_right));
+	const dFloat cosAngle = tireMatrix.m_right.DotProduct3(chassisMatrix.m_right);
+	const dFloat sinAngle = chassisMatrix.m_front.DotProduct3(chassisMatrix.m_right.CrossProduct(tireMatrix.m_right));
 	m_tireAngle += dAtan2(sinAngle, cosAngle);
+#else
+	// use verlet integration for tire angle
+	const dFloat omega1 = tireMatrix.m_front.DotProduct3(relativeOmega);
+//dTrace(("%f\n", m_omega));
+	m_tireAngle += (m_omega + 0.5f * (omega1 - m_omega)) * timestep;
+	m_omega = omega1;
+#endif
+
 	while (m_tireAngle < 0.0f)
 	{
 		m_tireAngle += 2.0f * dPi;
 	}
 	m_tireAngle = dMod(m_tireAngle, dFloat(2.0f * dPi));
 
-
 	dVector tireVeloc(m_proxyBody.GetVelocity());
 	dVector chassisPointVeloc(chassisBody->CalculatePointVelocity(tireMatrix.m_posit));
 	dVector localVeloc(tireVeloc - chassisPointVeloc);
 	m_speed = tireMatrix.m_right.DotProduct3(localVeloc);
 
-	//m_position += m_speed * timestep;
 	m_position = chassisMatrix.m_right.DotProduct3(tireMatrix.m_posit - chassisMatrix.m_posit);
 	if (m_position <= -m_info.m_suspensionLength * 0.25f) {
 		m_speed = 0.0f;
@@ -358,11 +383,8 @@ void dVehicleTire::UpdateSolverForces(const dComplementaritySolver::dJacobianPai
 
 void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-	dComplementaritySolver::dBodyState* const tire = m_state0;
-//	dComplementaritySolver::dBodyState* const chassis = m_state1;
-
-//	const dVector& omega = chassis->GetOmega();
-	const dMatrix& tireMatrix = tire->GetMatrix();
+	dComplementaritySolver::dBodyState* const tireState = m_state0;
+	const dMatrix& tireMatrix = tireState->GetMatrix();
 
 	// lateral force
 	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_front);
@@ -374,42 +396,50 @@ void dVehicleTire::JacobianDerivative(dComplementaritySolver::dParamInfo* const 
 	AddAngularRowJacobian(constraintParams, tireMatrix.m_up, 0.0f);
 	AddAngularRowJacobian(constraintParams, tireMatrix.m_right, 0.0f);
 
-	// dry rolling friction (for now contact, but it should be a function of the tire angular velocity)
-	//int index = constraintParams->m_count;
-	//AddAngularRowJacobian(constraintParams, tire->m_matrix[0], 0.0f);
-	//constraintParams->m_jointLowFriction[index] = -chassis->m_dryRollingFrictionTorque;
-	//constraintParams->m_jointHighFriction[index] = chassis->m_dryRollingFrictionTorque;
+	// add the suspension row
+	int index = constraintParams->m_count;
+	AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right);
+	const dFloat visibleInvMass = CalculateMassMatrixDiagonal(constraintParams);
 
 	if (m_position < 0.0f) {
-		int index = constraintParams->m_count;
-		AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right);
-		dFloat speed = -0.1f;
-		dFloat step = 2.0f * speed * constraintParams->m_timestep;
-		if (m_position > step) {
-			speed = 0.25f * m_position * constraintParams->m_timestepInv;
-		}
-		dFloat accel = GetRowAccelaration(constraintParams) - speed * constraintParams->m_timestepInv;
-		SetRowAccelaration(constraintParams, accel);
-		constraintParams->m_jointLowFrictionCoef[index] = 0.0f;
+		const dFloat ks = m_info.m_springStiffness * visibleInvMass;
+		dFloat accel = NewtonCalculateSpringDamperAcceleration(constraintParams->m_timestep, ks, m_position, 0.0f, m_speed);
+		constraintParams->m_jointAccel[index] += accel * 0.5f;
+		constraintParams->m_diagonalRegularizer[index] = m_info.m_suspensionRelaxation;
+
 	} else if (m_position >= m_info.m_suspensionLength) {
-		int index = constraintParams->m_count;
-		AddLinearRowJacobian(constraintParams, tireMatrix.m_posit, tireMatrix.m_right);
-		dFloat speed = 0.1f;
-		dFloat step = 2.0f * speed * constraintParams->m_timestep;
-		if ((m_position - m_info.m_suspensionLength) > step) {
-			speed = 0.25f * (m_position - m_info.m_suspensionLength) * constraintParams->m_timestepInv;
+		const dFloat ks = m_info.m_springStiffness * visibleInvMass;
+		dFloat accel = NewtonCalculateSpringDamperAcceleration(constraintParams->m_timestep, ks, m_position, 0.0f, m_speed);
+		constraintParams->m_jointAccel[index] += accel * 0.5f;
+		constraintParams->m_diagonalRegularizer[index] = m_info.m_suspensionRelaxation;
+
+	} else {
+		const dFloat kv = m_info.m_dampingRatio * visibleInvMass;
+		const dFloat ks = m_info.m_springStiffness * visibleInvMass;
+
+		dFloat accel = NewtonCalculateSpringDamperAcceleration(constraintParams->m_timestep, ks, m_position, kv, m_speed);
+		constraintParams->m_jointAccel[index] = accel;
+		constraintParams->m_diagonalRegularizer[index] = m_info.m_suspensionRelaxation;
+	}
+
+
+	// calculate mas rolling friction torque, rolling, brake, or stability control
+	dFloat Ixx;
+	dFloat Iyy;
+	dFloat Izz;
+	tireState->GetInertia (Ixx, Iyy, Izz);
+	dFloat rollingFriction = dMax (m_brakeTorque, Ixx * D_FREE_ROLLING_TORQUE_COEF);
+	for (int i = 0; i < sizeof (m_contactsJoints) / sizeof (m_contactsJoints[0]) - 1; i++) {
+		if (m_contactsJoints[i].IsActive()) {
+			rollingFriction = dMax (rollingFriction, m_contactsJoints[i].m_tireModel.m_tireLoad * D_LOAD_ROLLING_TORQUE_COEF);
 		}
-		dFloat accel = GetRowAccelaration(constraintParams) - speed * constraintParams->m_timestepInv;
-		SetRowAccelaration(constraintParams, accel);
-		constraintParams->m_jointHighFrictionCoef[index] = 0.0f;
 	}
-	
-	//m_brakeTorque = 100.0f;
-	if (m_brakeTorque > 1.0e-3f) {
-		int index = constraintParams->m_count;
-		AddAngularRowJacobian(constraintParams, tireMatrix.m_front, 0.0f);
-		constraintParams->m_jointLowFrictionCoef[index] = -m_brakeTorque;
-		constraintParams->m_jointHighFrictionCoef[index] = m_brakeTorque;
-	}
+
+	// add a rolling friction row
+	index = constraintParams->m_count;
+	AddAngularRowJacobian(constraintParams, tireMatrix.m_front, 0.0f);
+	constraintParams->m_jointLowFrictionCoef[index] = -rollingFriction;
+	constraintParams->m_jointHighFrictionCoef[index] = rollingFriction;
+
 	m_brakeTorque = 0.0f;
 }

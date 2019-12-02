@@ -202,7 +202,7 @@ typedef long long unsigned64;
 #include <dAnimationRagdollRoot.h>
 #include <dAnimationModelManager.h>
 #include <dAnimationRagdollJoint.h>
-#include <dAnimationRagDollEffector.h>
+#include <dAnimationRagdollEffector.h>
 
 #include <dAnimationKeyframesSequence.h>
 

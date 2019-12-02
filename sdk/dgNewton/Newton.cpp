@@ -25,7 +25,7 @@
 
 
 #ifdef _NEWTON_BUILD_DLL
-	#if (defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
+	#if (defined (__MINGW32__) || defined (__MINGW64__))
 		int main(int argc, char* argv[])
 		{
 			return 0;
@@ -1218,6 +1218,16 @@ int NewtonWorldCollide (const NewtonWorld* const newtonWorld, const dFloat* cons
 	return world->GetBroadPhase()->Collide((dgCollisionInstance*)shape, dgMatrix(matrix), (OnRayPrecastAction)prefilter, userData, (dgConvexCastReturnInfo*)info, maxContactsCount, threadIndex);
 }
 
+NewtonJoint* NewtonWorldFindJoint(const NewtonBody* const body0, const NewtonBody* const body1)
+{
+	for (NewtonJoint* joint = NewtonBodyGetFirstJoint(body0); joint; joint = NewtonBodyGetNextJoint(body0, joint)) {
+		if (((body0 == NewtonJointGetBody0(joint)) && (body1 == NewtonJointGetBody1(joint))) ||
+			((body1 == NewtonJointGetBody0(joint)) && (body0 == NewtonJointGetBody1(joint)))) {
+			return joint;
+		}
+	}
+	return NULL;
+}
 
 /*!
   Retrieve body by index from island.
@@ -2673,7 +2683,7 @@ NewtonCollision* NewtonFracturedCompoundPlaneClip (const NewtonCollision* const 
 		dgWorld* const world = (dgWorld*)collision->GetWorld();
 		dgCollisionCompoundFractured* const newCompound = compound->PlaneClip(dgVector (plane[0], plane[1], plane[2], plane[3]));
 		if (newCompound) {
-			dgCollisionInstance* const newCollision = world->CreateInstance (newCompound, collision->GetUserDataID(), dgGetIdentityMatrix());
+			dgCollisionInstance* const newCollision = world->CreateInstance (newCompound, int (collision->GetUserDataID()), dgGetIdentityMatrix());
 			newCompound->Release();
 			return (NewtonCollision*)newCollision;
 		}
@@ -3241,15 +3251,6 @@ void NewtonHeightFieldSetUserRayCastCallback (const NewtonCollision* const heigh
 	if (collision->IsType (dgCollision::dgCollisionHeightField_RTTI)) {
 		dgCollisionHeightField* const shape = (dgCollisionHeightField*) collision->GetChildShape();
 		shape->SetCollisionRayCastCallback ((dgCollisionHeightFieldRayCastCallback) rayHitCallback);
-	}
-}
-
-void NewtonHeightFieldSetHorizontalDisplacement (const NewtonCollision* const heightField, const unsigned short* const horizontalMap, dFloat scale)
-{
-	dgCollisionInstance* const collision = (dgCollisionInstance*)heightField;
-	if (collision->IsType(dgCollision::dgCollisionHeightField_RTTI)) {
-		dgCollisionHeightField* const shape = (dgCollisionHeightField*)collision->GetChildShape();
-		shape->SetHorizontalDisplacement (horizontalMap, dgFloat32 (scale));
 	}
 }
 
@@ -3945,7 +3946,7 @@ int NewtonCollisionIsStaticShape (const NewtonCollision* const collision)
 
   See also: ::NewtonCollisionGetUserID, ::NewtonCreateBox, ::NewtonCreateSphere
 */
-void NewtonCollisionSetUserID(const NewtonCollision* const collision, unsigned id)
+void NewtonCollisionSetUserID(const NewtonCollision* const collision, dLong id)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
@@ -3963,7 +3964,7 @@ void NewtonCollisionSetUserID(const NewtonCollision* const collision, unsigned i
 
   See also: ::NewtonCreateBox, ::NewtonCreateSphere
 */
-unsigned NewtonCollisionGetUserID(const NewtonCollision* const collision)
+dLong NewtonCollisionGetUserID(const NewtonCollision* const collision)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
@@ -3989,13 +3990,9 @@ void NewtonCollisionSetMaterial (const NewtonCollision* const collision, const N
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
 	dgCollisionInfo::dgInstanceMaterial& data = instance->m_material;
-	data.m_userData = userData->m_userData;
+	data.m_alignPad = userData->m_userData.m_int;
 	data.m_userId = userData->m_userId;
-	data.m_userFlags0 = userData->m_userFlags0;
-	data.m_userFlags1 = userData->m_userFlags1;
-	for (dgInt32 i = 0; i < sizeof (data.m_userParam)/sizeof (data.m_userParam[0]); i++) {
-		data.m_userParam[i] = userData->m_userParam[i];
-	}
+	memcpy (data.m_userParam, userData->m_userParam, sizeof (data.m_userParam));
 	instance->SetMaterial (data);
 }
 
@@ -4003,14 +4000,10 @@ void NewtonCollisionGetMaterial (const NewtonCollision* const collision, NewtonC
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgCollisionInstance* const instance = (dgCollisionInstance*) collision;
-	const dgCollisionInfo::dgInstanceMaterial data(instance->GetMaterial());
-	userData->m_userData = data.m_userData;
+	const dgCollisionInfo::dgInstanceMaterial& data = instance->GetMaterial();
 	userData->m_userId = data.m_userId;
-	userData->m_userFlags0 = data.m_userFlags0;
-	userData->m_userFlags1 = data.m_userFlags1;
-	for (dgInt32 i = 0; i < sizeof(data.m_userParam) / sizeof(data.m_userParam[0]); i++) {
-		userData->m_userParam[i] = data.m_userParam[i];
-	}
+	userData->m_userData.m_int = data.m_alignPad;
+	memcpy (userData->m_userParam, data.m_userParam, sizeof (data.m_userParam));
 }
 
 void* NewtonCollisionGetSubCollisionHandle (const NewtonCollision* const collision)
@@ -4272,18 +4265,16 @@ void NewtonSetEulerAngle(const dFloat* const angles, dFloat* const matrix)
   the acceleration calculated by this function represent the mass, spring system of the form
   a = -ks * x - kd * v.
 */
-dFloat NewtonCalculateSpringDamperAcceleration(dFloat dt, dFloat ks, dFloat x, dFloat kd, dFloat s)
+dFloat NewtonCalculateSpringDamperAcceleration(dFloat dt, dFloat ks, dFloat x, dFloat kd, dFloat v)
 {
-//	accel = - (ks * x + kd * s);
-
 	TRACE_FUNCTION(__FUNCTION__);
+	//at = - (ks * x + kd * v);
 	//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
 	dgFloat32 ksd = dt * ks;
-	dgFloat32 num = ks * x + kd * s + ksd * s;
+	dgFloat32 num = ks * x + kd * v + ksd * v;
 	dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;
 	dgAssert (den > 0.0f);
 	dFloat accel = - num / den;
-//	dgCheckFloat (accel);
 	return accel;
 }
 
@@ -7838,19 +7829,21 @@ void NewtonMeshSerialize (const NewtonMesh* const mesh, NewtonSerializeCallback 
 void NewtonMeshSaveOFF(const NewtonMesh* const mesh, const char* const filename)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
-	meshEffect->SaveOFF(filename);
+	dgAssert(0);
+	//dgMeshEffect* const meshEffect = (dgMeshEffect*) mesh;
+	//meshEffect->SaveOFF(filename);
 }
-
 
 NewtonMesh* NewtonMeshLoadOFF(const NewtonWorld* const newtonWorld, const char* const filename)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *) newtonWorld;
-	dgMemoryAllocator* const allocator = world->dgWorld::GetAllocator();
-	dgMeshEffect* const mesh = new (allocator) dgMeshEffect (allocator);
-	mesh->LoadOffMesh(filename);
-	return (NewtonMesh*) mesh;
+	//Newton* const world = (Newton *) newtonWorld;
+	//dgMemoryAllocator* const allocator = world->dgWorld::GetAllocator();
+	//dgMeshEffect* const mesh = new (allocator) dgMeshEffect (allocator);
+	//mesh->LoadOffMesh(filename);
+	//return (NewtonMesh*) mesh;
+	dgAssert(0);
+	return NULL;
 }
 
 NewtonMesh* NewtonMeshLoadTetrahedraMesh(const NewtonWorld* const newtonWorld, const char* const filename)

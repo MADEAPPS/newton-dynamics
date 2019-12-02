@@ -69,10 +69,9 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 	dMatrix CalculateInterpolatedGlobalMatrix (const DemoEntity* const root = NULL) const;
 
 	void RenderBone() const;
-	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const;
+	virtual void Render(dFloat timeStep, DemoEntityManager* const scene, const dMatrix& matrix) const;
 	virtual void SimulationPreListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep){};
 	virtual void SimulationPostListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep){};
-
 
 	NewtonCollision* CreateCollisionFromchildren(NewtonWorld* const world) const;
 

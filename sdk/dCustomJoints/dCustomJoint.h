@@ -118,6 +118,7 @@ class dCustomJoint: public dCustomAlloc
 
 		virtual void SetColor(const dVector& color) = 0;
 		virtual void DrawLine(const dVector& p0, const dVector& p1) = 0;
+		virtual void DrawPoint(const dVector& p0, dFloat thinckness = 1.0f) = 0;
 		virtual void SetOrthRendering () {};
 		virtual void ResetOrthRendering () {};
 

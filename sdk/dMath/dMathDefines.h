@@ -48,7 +48,7 @@
 	#define dTrace(x)
 #endif
 
-#if ( defined (_MSC_VER) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER) )
+#if ( defined (_MSC_VER) || defined (__MINGW32__) || defined (__MINGW64__) )
 	#include <crtdbg.h>
 	#define dAssert(x) _ASSERTE(x)
 #else 
@@ -301,33 +301,34 @@ bool dSolveGaussian(int size, T* const matrix, T* const b)
 
 
 template<class T>
-void dCholeskySolve(int size, int n, const T* const choleskyMatrix, T* const x)
+void dCholeskySolve(int size, int stride, const T* const choleskyMatrix, T* const x)
 {
-	int stride = 0;
-	for (int i = 0; i < n; i++) {
+	int rowStart = 0;
+	for (int i = 0; i < size; i++) {
 		T acc(0.0f);
-		const T* const row = &choleskyMatrix[stride];
+		const T* const row = &choleskyMatrix[rowStart];
 		for (int j = 0; j < i; j++) {
 			acc = acc + row[j] * x[j];
 		}
 		x[i] = (x[i] - acc) / row[i];
-		stride += size;
+		rowStart += stride;
 	}
 
-	for (int i = n - 1; i >= 0; i--) {
+	for (int i = size - 1; i >= 0; i--) {
 		T acc = 0.0f;
-		for (int j = i + 1; j < n; j++) {
-			acc = acc + choleskyMatrix[size * j + i] * x[j];
+		for (int j = i + 1; j < size; j++) {
+			acc = acc + choleskyMatrix[stride * j + i] * x[j];
 		}
-		x[i] = (x[i] - acc) / choleskyMatrix[size * i + i];
+		x[i] = (x[i] - acc) / choleskyMatrix[stride * i + i];
 	}
 }
 
 template<class T>
 bool dCholeskyFactorization(int size, int stride, T* const matrix)
 {
+	T* const invDiagonal = dAlloca(T, size);
 	for (int i = 0; i < size; i++) {
-		T* const rowN = &matrix[size * i];
+		T* const rowN = &matrix[stride * i];
 
 		int rowStart = 0;
 		for (int j = 0; j <= i; j++) {
@@ -343,8 +344,10 @@ bool dCholeskyFactorization(int size, int stride, T* const matrix)
 					return false;
 				}
 				rowN[i] = T(sqrt(diag));
+				invDiagonal[i] = T (1.0f) / rowN[i];
 			} else {
-				rowN[j] = ((T(1.0f) / rowJ[j]) * (rowN[j] - s));
+				//rowN[j] = ((T(1.0f) / rowJ[j]) * (rowN[j] - s));
+				rowN[j] = invDiagonal[j] * (rowN[j] - s);
 			}
 			rowStart += stride;
 		}
@@ -854,7 +857,6 @@ void dGaussSeidelLcpSor(const int size, const int stride, const T* const matrix,
 	T tolerance(tol2 * 2.0f);
 	const T* const invDiag = invDiag1;
 	const int maxCount = dMax (8, size);
-//	for (int i = 0; (i < maxCount) && (tolerance > T(1.0e-8f)); i++) {
 	for (int i = 0; (i < maxCount) && (tolerance > tol2); i++) {
 		int base = 0;
 		tolerance = T(0.0f);

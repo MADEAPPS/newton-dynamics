@@ -19,7 +19,6 @@ dModelNode::dModelNode(NewtonBody* const modelBody, const dMatrix& bindMatrix, d
 	,m_userData(NULL)
 	,m_body(modelBody)
 	,m_parent(parent)
-	,m_joint(NULL)
 {
 	if (m_parent) {
 		m_parent->m_children.Append(this);
@@ -43,3 +42,11 @@ const dModelNode* dModelNode::GetRoot() const
 	return root;
 }
 
+const dCustomJoint* dModelNode::GetJoint() const
+{
+	if (m_parent) {
+		NewtonJoint* const joint = NewtonWorldFindJoint(GetBody(), m_parent->GetBody());
+		return joint ? (dCustomJoint*) NewtonJointGetUserData(joint) : NULL;
+	}
+	return NULL;
+}

@@ -1106,6 +1106,7 @@ int main(int argc, char** argv)
 		printf("[fbx_file_name] = fbx file name\n");
 		printf("-m = export mesh only\n");
 		printf("-a = export animation only\n");
+		return 0;
 	}
 
 	FbxScene* fbxScene = NULL;

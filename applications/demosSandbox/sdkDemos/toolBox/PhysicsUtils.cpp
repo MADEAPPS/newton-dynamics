@@ -360,14 +360,10 @@ void SetShowMeshCollision (SceneManager& me, int mode)
 	}
 }
 
-
 void SetShowIslands (SceneManager& me, int mode)
 {
 	showIslans = mode;
 }
-
-
-//static void CalculateAABB (const NewtonBody* body, dVector& minP, dVector& maxP)
 
 int PhysicsIslandUpdate (const NewtonWorld* world, const void* islandHandle, int bodyCount)
 {
@@ -1051,7 +1047,6 @@ void AddPrimitiveArray (DemoEntityManager* const scene, dFloat mass, const dVect
 	NewtonDestroyCollision (collision);
 }
 
-
 void CalculateAABB (const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP)
 {
 	for (int i = 0; i < 3; i ++) {
@@ -1178,8 +1173,8 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* const world, DemoEntity* cons
 			}
 		}
 	}
+	//NewtonTreeCollisionEndBuild(collision, optimize ? 2 : 0);
 	NewtonTreeCollisionEndBuild(collision, optimize ? 1 : 0);
-
 
 	// test Serialization
 #if 0
@@ -1200,8 +1195,6 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* const world, DemoEntity* cons
 
 	return collision;
 }
-
-
 
 NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent, bool optimize)
 {
@@ -1251,7 +1244,6 @@ NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, DemoEntity* const ent
 	return level;
 }
 
-
 NewtonBody* AddFloorBox(DemoEntityManager* const scene, const dVector& origin, const dVector& size)
 {
 	// create the shape and visual mesh as a common data to be re used
@@ -1274,6 +1266,74 @@ NewtonBody* AddFloorBox(DemoEntityManager* const scene, const dVector& origin, c
 	return body;
 }
 
+NewtonBody* CreatePLYMesh (DemoEntityManager* const scene, const char* const fileName, bool optimized)
+{
+	FILE* const file = fopen(fileName, "rb");
+	if (!file) {
+		return NULL;
+	}
+
+	char buffer[265];
+
+	int faceCount;
+	int vertexCount;
+	fgets(buffer, sizeof (buffer), file);
+	fgets(buffer, sizeof (buffer), file);
+	fscanf(file, "%s %s %d\n", buffer, buffer, &vertexCount);
+	fgets(buffer, sizeof (buffer), file);
+	fgets(buffer, sizeof (buffer), file);
+	fgets(buffer, sizeof (buffer), file);
+	fscanf(file, "%s %s %d\n", buffer, buffer, &faceCount);
+	fgets(buffer, sizeof (buffer), file);
+	fgets(buffer, sizeof (buffer), file);
+
+	dArray<dVector> points(vertexCount);
+	for (int i = 0; i < vertexCount; i++) {
+		dFloat x;
+		dFloat y;
+		dFloat z;
+		fscanf(file, "%f %f %f\n", &x, &y, &z);
+		points[i] = dVector(x, y, z, dFloat(0.0f));
+	}
+
+	NewtonWorld* const world = scene->GetNewton();
+
+	// create the collision tree geometry
+	NewtonCollision* collision = NewtonCreateTreeCollision(world, 0);
+
+	// prepare to create collision geometry
+	NewtonTreeCollisionBeginBuild(collision);
+	for (int i = 0; i < faceCount; i++) {
+		int count;
+		dFloat face[32][3];
+		fscanf(file, "%d", &count);
+		for (int j = 0; j < count; j++) {
+			int index;
+			fscanf(file, "%d", &index);
+			face[j][0] = points[index][0];
+			face[j][1] = points[index][1];
+			face[j][2] = points[index][2];
+		}
+		fscanf(file, "\n");
+		NewtonTreeCollisionAddFace(collision, 3, &face[0][0], 3 * sizeof (dFloat), 0);
+	}
+	fclose(file);
+
+	NewtonTreeCollisionEndBuild(collision, 1);
+
+	// create the level rigid body
+	dMatrix matrix (dGetIdentityMatrix());
+	NewtonBody* const level = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
+	NewtonDestroyCollision(collision);
+
+	// save the pointer to the graphic object with the body.
+//	NewtonBodySetUserData(level, ent);
+
+	NewtonInvalidateCache(world);
+
+	return level;
+}
+
 NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const name, bool optimized)
 {
 	// load the scene from a ngd file format
@@ -1286,9 +1346,8 @@ NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const n
 	for (DemoEntityManager::dListNode* node = scene->GetLast(); node; node = node->GetPrev()) {
 		DemoEntity* const ent = node->GetInfo();
 		DemoMesh* const mesh = (DemoMesh*) ent->GetMesh();
-		dAssert (mesh->IsType(DemoMesh::GetRttiType()));
-
 		if (mesh) {
+			dAssert (mesh->IsType(DemoMesh::GetRttiType()));
 			const dString& namePtr = mesh->GetName();
 			if (namePtr == "levelGeometry_mesh") {
 				levelBody = CreateLevelMeshBody (world, ent, optimized);
@@ -1323,42 +1382,6 @@ void ExportScene (NewtonWorld* const world, const char* const name)
 	dScene testScene (world);
 	testScene.NewtonWorldToScene (world, &context);
 	testScene.Serialize (fileName);
-}
-
-void CalculatePickForceAndTorque (const NewtonBody* const body, const dVector& pointOnBodyInGlobalSpace, const dVector& targetPositionInGlobalSpace, dFloat timestep)
-{
-	dFloat mass;
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-	const dFloat stiffness = 0.33f;
-	const dFloat damping = -0.05f;
-
-	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-
-	// calculate the desired impulse
-	dVector posit(targetPositionInGlobalSpace - pointOnBodyInGlobalSpace);
-	dVector impulse(posit.Scale(stiffness * mass));
-
-	// apply linear impulse
-	NewtonBodyApplyImpulseArray(body, 1, sizeof (dVector), &impulse[0], &pointOnBodyInGlobalSpace[0], timestep);
-
-	// apply linear and angular damping
-	dMatrix inertia;
-	dVector linearMomentum(0.0f);
-	dVector angularMomentum(0.0f);
-
-	NewtonBodyGetOmega(body, &angularMomentum[0]);
-	NewtonBodyGetVelocity(body, &linearMomentum[0]);
-
-
-	NewtonBodyGetInertiaMatrix(body, &inertia[0][0]);
-
-	angularMomentum = inertia.RotateVector(angularMomentum);
-	angularMomentum = angularMomentum.Scale(damping);
-	linearMomentum = linearMomentum.Scale(mass * damping);
-
-	NewtonBodyApplyImpulsePair(body, &linearMomentum[0], &angularMomentum[0], timestep);
 }
 
 NewtonBody* MousePickBody (NewtonWorld* const nWorld, const dVector& origin, const dVector& end, dFloat& paramterOut, dVector& positionOut, dVector& normalOut)
@@ -1440,6 +1463,9 @@ void LoadLumberYardMesh(DemoEntityManager* const scene, const dVector& location,
 
 dCustomJoint* FindJoint(const NewtonBody* const body0, const NewtonBody* const body1)
 {
+	NewtonJoint* const joint = NewtonWorldFindJoint(body0, body1);
+	return joint ? (dCustomJoint*)NewtonJointGetUserData(joint) : NULL;
+/*
 	for (NewtonJoint* joint = NewtonBodyGetFirstJoint(body0); joint; joint = NewtonBodyGetNextJoint(body0, joint)) {
 		dCustomJoint* const cJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
 		if (((body0 == cJoint->GetBody0()) && (body1 == cJoint->GetBody1())) ||
@@ -1449,6 +1475,7 @@ dCustomJoint* FindJoint(const NewtonBody* const body0, const NewtonBody* const b
 	}
 	dAssert(0);
 	return NULL;
+*/
 }
 
 

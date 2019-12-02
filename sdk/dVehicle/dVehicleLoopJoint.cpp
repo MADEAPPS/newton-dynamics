@@ -17,7 +17,7 @@ dVehicleLoopJoint::dVehicleLoopJoint()
 	:dComplementaritySolver::dBilateralJoint()
 	,m_owner0(NULL)
 	,m_owner1(NULL)
-	,m_isActive(true)
+	,m_isActive(false)
 {
 }
 

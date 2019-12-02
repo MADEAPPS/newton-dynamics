@@ -48,9 +48,9 @@ class dClosestDistanceRecord
 			NewtonDestroyCollision (m_castingShape);
 		}
 
-		virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
+		virtual void Render(dFloat timeStep, DemoEntityManager* const scene, const dMatrix& matrix) const
 		{
-			DemoEntity::Render(timeStep, scene);
+			DemoEntity::Render(timeStep, scene, matrix);
 
 			ShowMousePicking (m_contact0, m_contact1, dVector (1, 0, 0, 0), dVector (0, 1, 0, 0));
 			ShowMousePicking (m_contact1, m_contact0, dVector (1, 0, 0, 0), dVector (0, 1, 0, 0));
@@ -222,7 +222,7 @@ void ClosestDistance (DemoEntityManager* const scene)
 	NewtonWorld* const world = scene->GetNewton();
 	dMatrix offsetMatrix (dGetIdentityMatrix());
 
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
 
 	int materialID = NewtonMaterialGetDefaultGroupID (world);
 

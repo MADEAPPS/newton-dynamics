@@ -17,15 +17,24 @@
 #include "dVehicleManager.h"
 #include "dVehicleDifferential.h"
 
+//static int xxxx;
+
 dVehicleMultiBody::dVehicleMultiBody(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
 	:dVehicle(body, localFrame, gravityMag)
 	,dVehicleSolver()
-	,m_groundProxyBody(NULL)
+	,m_collidingNodes(8)
+	,m_collidingIndex(0)
+	,m_sleepCounter(0)
 {
 	m_brakeControl.Init(this);
 	m_engineControl.Init(this);
 	m_steeringControl.Init(this);
 	m_handBrakeControl.Init(this);
+
+	AddControl(&m_brakeControl);
+	AddControl(&m_engineControl);
+	AddControl(&m_steeringControl);
+	AddControl(&m_handBrakeControl);
 
 	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
 	dAssert(m_localFrame.TestOrthogonal());
@@ -43,12 +52,8 @@ dVehicleMultiBody::dVehicleMultiBody(NewtonBody* const body, const dMatrix& loca
 	SetAerodynamicsDownforceCoefficient(0.5f, 0.4f, 1.0f);
 	*/
 
-	dVector tmp;
-	//dComplementaritySolver::dBodyState* const chassisBody = GetProxyBody();
-	//m_groundNode.SetWorld(m_world);
-	//m_groundNode.SetLoopNode(true);
-
 	// set the inertia matrix;
+	dVector tmp;
 	NewtonBodyGetMass(m_newtonBody, &tmp.m_w, &tmp.m_x, &tmp.m_y, &tmp.m_z);
 	m_proxyBody.SetMass(tmp.m_w);
 	m_proxyBody.SetInertia(tmp.m_x, tmp.m_y, tmp.m_z);
@@ -96,8 +101,6 @@ void dVehicleMultiBody::Finalize()
 
 const void dVehicleMultiBody::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
-	dVehicleNode::Debug(debugContext);
-
 	const dMatrix& matrix = m_proxyBody.GetMatrix();
 
 	// draw velocity
@@ -124,6 +127,8 @@ const void dVehicleMultiBody::Debug(dCustomJoint::dDebugDisplay* const debugCont
 		dVector p3(p0 - gravityDir.Scale(2.0f));
 		debugContext->DrawLine(p0, p3);
 	}
+
+	dVehicleNode::Debug(debugContext);
 }
 
 void dVehicleMultiBody::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep)
@@ -133,6 +138,7 @@ void dVehicleMultiBody::ApplyDriverInputs(const dDriverInput& driveInputs, dFloa
 	m_steeringControl.SetParam(driveInputs.m_steeringValue);
 	m_engineControl.SetParam(driveInputs.m_throttle);
 
+m_engineControl.SetIgnition(driveInputs.m_ignitionKey);
 #if 0
 	if (m_engineControl) {
 		m_engineControl->SetClutch(driveInputs.m_clutchPedal);
@@ -329,6 +335,12 @@ dVehicleDifferential* dVehicleMultiBody::AddDifferential(dFloat mass, dFloat rad
 	return differential;
 }
 
+dVehicleDifferential* dVehicleMultiBody::AddDifferential(dFloat mass, dFloat radius, dVehicleDifferential* const differential0, dVehicleDifferential* const differential1)
+{
+	dVehicleDifferential* const differential = new dVehicleDifferential(this, mass, radius, differential0, differential1, dYawMatrix (90.0f * dDegreeToRad));
+	return differential;
+}
+
 dVehicleEngine* dVehicleMultiBody::AddEngine(const dEngineInfo& engineInfo, dVehicleDifferential* const differential)
 {
 	dVehicleEngine* const engine = new dVehicleEngine(this, engineInfo, differential);
@@ -360,8 +372,7 @@ void dVehicleMultiBody::ApplyExternalForce()
 	dMatrix matrix;
 	dVector vector(0.0f);
 
-	m_groundProxyBody.m_proxyBody.SetForce(vector);
-	m_groundProxyBody.m_proxyBody.SetTorque(vector);
+	m_collidingIndex = 0;
 
 	// get data from engine rigid body and copied to the vehicle chassis body
 	NewtonBodyGetMatrix(m_newtonBody, &matrix[0][0]);
@@ -381,128 +392,97 @@ void dVehicleMultiBody::ApplyExternalForce()
 	NewtonBodyGetTorque(m_newtonBody, &vector[0]);
 	m_proxyBody.SetTorque(vector);
 
+/*
+static int xxx;
 dVector veloc(m_proxyBody.GetVelocity());
 veloc = veloc - matrix.m_up.Scale(veloc.DotProduct3(matrix.m_up));
-float xxxx = veloc.DotProduct3(matrix.m_front);
+float xxxx = dAbs (veloc.DotProduct3(matrix.m_front)) + 0.01f;
 float yyyy = veloc.DotProduct3(matrix.m_right);
-dTrace(("chassisBeta =%f  ", dAtan2(yyyy, xxxx) * dRadToDegree));
+dTrace(("%d chassisBeta=%f  ", xxx, dAtan2(yyyy, xxxx) * dRadToDegree));
+xxx ++;
+*/
 
 	dVehicleNode::ApplyExternalForce();
 }
 
-void dVehicleMultiBody::CalculateSuspensionForces(dFloat timestep)
+dVehicleCollidingNode* dVehicleMultiBody::FindCollideNode(dVehicleNode* const node0, NewtonBody* const body)
 {
-	const int maxSize = 64;
-	dComplementaritySolver::dJacobianPair m_jt[maxSize];
-	dComplementaritySolver::dJacobianPair m_jInvMass[maxSize];
-	dVehicleTire* tires[maxSize];
-	dFloat massMatrix[maxSize * maxSize];
-	dFloat accel[maxSize];
-	
-	const dMatrix& chassisMatrix = m_proxyBody.GetMatrix(); 
-	const dMatrix& chassisInvInertia = m_proxyBody.GetInvInertia();
-	dVector chassisOrigin (chassisMatrix.TransformVector (m_proxyBody.GetCOM()));
-	dFloat chassisInvMass = m_proxyBody.GetInvMass();
+	NewtonBody* dynamicBody = body;
+	if (dynamicBody) {
+		dFloat invMass;
+		dFloat invIxx;
+		dFloat invIyy;
+		dFloat invIzz;
+		NewtonBodyGetInvMass(body, &invMass, &invIxx, &invIyy, &invIzz);
+		dynamicBody = invMass > 0.0f ? body : NULL;
+	}
 
-	int tireCount = 0;
-	for (dVehicleNodeChildrenList::dListNode* node = m_children.GetFirst(); node; node = node->GetNext()) {
-		dVehicleTire* const tire = node->GetInfo()->GetAsTire();
-		if (tire) {
-			const dTireInfo& info = tire->m_info;
-			tires[tireCount] = tire;
-			dFloat x = tire->m_position;
-			dFloat v = tire->m_speed;
-			dFloat weight = 1.0f;
-/*
-			switch (tire->m_suspentionType)
-			{
-				case m_offroad:
-					weight = 0.9f;
-					break;
-				case m_confort:
-					weight = 1.0f;
-					break;
-				case m_race:
-					weight = 1.1f;
-					break;
-			}
-*/
-			dComplementaritySolver::dBodyState* const tireBody = &tire->GetProxyBody();
-
-			const dFloat invMass = tireBody->GetInvMass();
-			const dFloat kv = info.m_dampingRatio * invMass;
-			const dFloat ks = info.m_springStiffness * invMass;
-			accel[tireCount] = -NewtonCalculateSpringDamperAcceleration(timestep, ks * weight, x, kv, v);
-
-			const dMatrix& tireMatrix = tireBody->GetMatrix(); 
-			const dMatrix& tireInvInertia = tireBody->GetInvInertia();
-			dFloat tireInvMass = tireBody->GetInvMass();
-
-			m_jt[tireCount].m_jacobian_J01.m_linear = chassisMatrix.m_up.Scale(-1.0f);
-			m_jt[tireCount].m_jacobian_J01.m_angular = dVector(0.0f);
-			m_jt[tireCount].m_jacobian_J10.m_linear = chassisMatrix.m_up;
-			m_jt[tireCount].m_jacobian_J10.m_angular = (tireMatrix.m_posit - chassisOrigin).CrossProduct(chassisMatrix.m_up);
-
-			m_jInvMass[tireCount].m_jacobian_J01.m_linear = m_jt[tireCount].m_jacobian_J01.m_linear.Scale(tireInvMass);
-			m_jInvMass[tireCount].m_jacobian_J01.m_angular = tireInvInertia.RotateVector(m_jt[tireCount].m_jacobian_J01.m_angular);
-			m_jInvMass[tireCount].m_jacobian_J10.m_linear = m_jt[tireCount].m_jacobian_J10.m_linear.Scale(chassisInvMass);
-			m_jInvMass[tireCount].m_jacobian_J10.m_angular = chassisInvInertia.RotateVector(m_jt[tireCount].m_jacobian_J10.m_angular);
-
-			tireCount++;
+	for (int i = 0; i < m_collidingIndex; i ++) {
+		dVehicleCollidingNode* const node1 = &m_collidingNodes[i];
+		if (node1->m_body == dynamicBody) {
+			return node1;
 		}
 	}
 
-	for (int i = 0; i < tireCount; i++) {
-		dFloat* const row = &massMatrix[i * tireCount];
+	dVehicleCollidingNode* const node1 = &m_collidingNodes[m_collidingIndex];
+	node1->m_body = dynamicBody;
+	node1->m_index = m_collidingIndex + dVehicleSolver::m_nodeCount;
+	dVehicleSolver::m_nodesOrder[node1->m_index] = node1;
 
-		dFloat aii = m_jInvMass[i].m_jacobian_J01.m_linear.DotProduct3(m_jt[i].m_jacobian_J01.m_linear) + m_jInvMass[i].m_jacobian_J01.m_angular.DotProduct3(m_jt[i].m_jacobian_J01.m_angular) +
-					 m_jInvMass[i].m_jacobian_J10.m_linear.DotProduct3(m_jt[i].m_jacobian_J10.m_linear) + m_jInvMass[i].m_jacobian_J10.m_angular.DotProduct3(m_jt[i].m_jacobian_J10.m_angular);
+	dVector vector(0.0f);
+	dMatrix matrix(dGetIdentityMatrix());
+	dComplementaritySolver::dBodyState& proxyBody = node1->GetProxyBody();
+	if (dynamicBody) {
+		dFloat Mass;
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
 
-		row[i] = aii * 1.0001f;
-		for (int j = i + 1; j < tireCount; j++) {
-			dFloat aij = m_jInvMass[i].m_jacobian_J10.m_linear.DotProduct3(m_jt[j].m_jacobian_J10.m_linear) + m_jInvMass[i].m_jacobian_J10.m_angular.DotProduct3(m_jt[j].m_jacobian_J10.m_angular);
-			row[j] = aij;
-			massMatrix[j * tireCount + i] = aij;
-		}
+		NewtonBodyGetMass(dynamicBody, &Mass, &Ixx, &Iyy, &Izz);
+		proxyBody.SetMass(Mass);
+		proxyBody.SetInertia(Ixx, Iyy, Izz);
+
+		NewtonBodyGetCentreOfMass(dynamicBody, &matrix.m_posit[0]);
+		matrix.m_posit.m_w = 1.0f;
+		proxyBody.SetLocalMatrix(matrix);
+
+		NewtonBodyGetMatrix(dynamicBody, &matrix[0][0]);
+		proxyBody.SetMatrix(matrix);
+
+		NewtonBodyGetVelocity(dynamicBody, &vector[0]);
+		proxyBody.SetVeloc(vector);
+
+		NewtonBodyGetOmega(dynamicBody, &vector[0]);
+		proxyBody.SetOmega(vector);
+
+		NewtonBodyGetForce(dynamicBody, &vector[0]);
+		proxyBody.SetForce(vector);
+
+		NewtonBodyGetTorque(dynamicBody, &vector[0]);
+		proxyBody.SetTorque(vector);
+	} else {
+		proxyBody.SetMass(0.0f);
+		proxyBody.SetInertia(0.0f, 0.0f, 0.0f);
+		proxyBody.SetLocalMatrix(matrix);
+		proxyBody.SetMatrix(matrix);
+		proxyBody.SetVeloc(vector);
+		proxyBody.SetOmega(vector);
+		proxyBody.SetForce(vector);
+		proxyBody.SetTorque(vector);
 	}
+	proxyBody.UpdateInertia();
 
-	dCholeskyFactorization(tireCount, tireCount, massMatrix);
-	dCholeskySolve(tireCount, tireCount, massMatrix, accel);
-
-	dVector chassisForce(0.0f);
-	dVector chassisTorque(0.0f);
-	for (int i = 0; i < tireCount; i++) {
-		dVehicleTire* const tire = tires[i];
-		dComplementaritySolver::dBodyState* const tireBody = &tire->GetProxyBody();
-
-		dVector tireForce(m_jt[i].m_jacobian_J01.m_linear.Scale(accel[i]));
-		tireBody->SetForce(tireBody->GetForce() + tireForce);
-		chassisForce += m_jt[i].m_jacobian_J10.m_linear.Scale(accel[i]);
-		chassisTorque += m_jt[i].m_jacobian_J10.m_angular.Scale(accel[i]);
-	}
-	m_proxyBody.SetForce(m_proxyBody.GetForce() + chassisForce);
-	m_proxyBody.SetTorque(m_proxyBody.GetTorque() + chassisTorque);
+	m_collidingIndex ++;
+	dAssert (m_collidingIndex <= 8);
+	return node1;
 }
 
 int dVehicleMultiBody::OnAABBOverlap(const NewtonBody * const body, void* const context)
 {
 	dCollectCollidingBodies* const bodyList = (dCollectCollidingBodies*)context;
 	if (body != bodyList->m_exclude) {
-		dFloat mass;
-		dFloat Ixx;
-		dFloat Iyy;
-		dFloat Izz;
-		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 		bodyList->m_array[bodyList->m_count] = (NewtonBody*)body;
-		if (mass == 0.0f) {
-			for (int i = bodyList->m_count; i > 0; i--) {
-				bodyList->m_array[i] = bodyList->m_array[i - 1];
-			}
-			bodyList->m_array[0] = (NewtonBody*)body;
-			bodyList->m_staticCount++;
-		}
 		bodyList->m_count++;
-
 		dAssert(bodyList->m_count < sizeof(bodyList->m_array) / sizeof(bodyList->m_array[1]));
 	}
 	return 1;
@@ -536,9 +516,9 @@ void dVehicleMultiBody::Integrate(dFloat timestep)
 	dVehicleNode::Integrate(timestep);
 }
 
-void dVehicleMultiBody::CalculateFreeDof()
+void dVehicleMultiBody::CalculateFreeDof(dFloat timestep)
 {
-	dVehicleNode::CalculateFreeDof();
+	dVehicleNode::CalculateFreeDof(timestep);
 
 	dVector force(m_proxyBody.GetForce());
 	dVector torque(m_proxyBody.GetTorque());
@@ -546,20 +526,64 @@ void dVehicleMultiBody::CalculateFreeDof()
 	NewtonBodySetTorque(m_newtonBody, &torque[0]);
 }
 
+bool dVehicleMultiBody::CheckSleeping()
+{
+return false;
+
+	for (int i = 0; i < m_controlerCount; i ++) {
+		if (m_control[i]->ParamChanged()) {
+			m_sleepCounter = 0;
+			return false;
+		}
+	}
+
+	dVector vector(0.0f);
+	NewtonBodyGetVelocity(m_newtonBody, &vector[0]);
+	if (vector.DotProduct3(vector) < 1.0e-2f) {
+		NewtonBodyGetOmega(m_newtonBody, &vector[0]);
+		if (vector.DotProduct3(vector) < 1.0e-2f) {
+			NewtonBodyGetAcceleration(m_newtonBody, &vector[0]);
+			if (vector.DotProduct3(vector) < 1.0e-2f) {
+				NewtonBodyGetAlpha(m_newtonBody, &vector[0]);
+				if (vector.DotProduct3(vector) < 1.0e-2f) {
+					return true;
+				}
+			}
+		}
+	}
+	
+	m_sleepCounter = 0;
+	return false;
+}
+
 void dVehicleMultiBody::PreUpdate(dFloat timestep)
 {
 	m_manager->UpdateDriverInput(this, timestep);
-	m_brakeControl.Update(timestep);
-	m_handBrakeControl.Update(timestep);
-	m_steeringControl.Update(timestep);
-	m_engineControl.Update(timestep);
+
+	for (int i = 0; i < m_controlerCount; i ++) {
+		m_control[i]->Update(timestep);
+	}
+
+	if (CheckSleeping()) {
+		m_sleepCounter ++;	
+		if (m_sleepCounter > 60) {
+			dVector vector (0.0f);
+			NewtonBodySetForce(m_newtonBody, &vector[0]);
+			NewtonBodySetTorque(m_newtonBody, &vector[0]);
+			NewtonBodySetVelocityNoSleep(m_newtonBody, &vector[0]);
+			NewtonBodySetVelocityNoSleep(m_newtonBody, &vector[0]);
+			return;
+		}
+	}
+
+//xxxx++;
+//dTrace(("\nframe %d ", xxxx));
 
 	ApplyExternalForce();
-	CalculateSuspensionForces(timestep);
 	CalculateTireContacts(timestep);
 	dVehicleSolver::Update(timestep);
 	Integrate(timestep);
-	CalculateFreeDof();
+	CalculateFreeDof(timestep);
 
 #if 0
 	FILE* file_xxx = fopen("xxxxx.csv", "wb");
@@ -573,11 +597,6 @@ void dVehicleMultiBody::PreUpdate(dFloat timestep)
 	}
 	fclose(file_xxx);
 #endif
-
-
-//dVector vector(0.0f);
-//NewtonBodySetForce(m_newtonBody, &vector[0]);
-//NewtonBodySetTorque(m_newtonBody, &vector[0]);
 }
 
 

@@ -233,7 +233,7 @@ class SuperCarEntity: public DemoEntity
 		chassisMatrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
 
 		// create a default vehicle 
-		m_controller = manager->CreateVehicle (chassisCollision, chassisMatrix, definition.m_vehicleMass, PhysicsApplyGravityForce, DEMO_GRAVITY);
+		m_controller = manager->CreateSportCar (chassisCollision, chassisMatrix, definition.m_vehicleMass, PhysicsApplyGravityForce, DEMO_GRAVITY);
 
 		// get body from player
 		NewtonBody* const body = m_controller->GetBody();
@@ -1041,7 +1041,7 @@ void SuperCar (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 #if 0
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 0);
 	//CreateLevelMesh (scene, "raceTrack2.ngd", 1);
 	//CreateLevelMesh (scene, "raceTrack1.ngd", 0);

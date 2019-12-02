@@ -1692,7 +1692,7 @@ void dgCollisionCompoundFractured::SpawnSingleChunk (dgBody* const myBody, const
 
 	chunkBody->SetOmega(omega);
 	chunkBody->SetVelocity(chunkVeloc);
-	chunkBody->SetGroupID(chunkCollision->GetUserDataID());
+	chunkBody->SetGroupID(int (chunkCollision->GetUserDataID()));
 
 	m_emitFracturedChunk(chunkBody, chunkNode, myInstance);
 
@@ -1737,7 +1737,7 @@ void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, cons
 	dgVector com (matrix.TransformVector(myBody->GetCentreOfMass()));
 
 	dgCollisionCompoundFractured* const childStructureCollision = new (GetAllocator()) dgCollisionCompoundFractured (*this, islanList);
-	dgCollisionInstance* const childStructureInstance = m_world->CreateInstance (childStructureCollision, parentInstance->GetUserDataID(), parentInstance->GetLocalMatrix()); 
+	dgCollisionInstance* const childStructureInstance = m_world->CreateInstance (childStructureCollision, int (parentInstance->GetUserDataID()), parentInstance->GetLocalMatrix()); 
 	childStructureCollision->m_myInstance = childStructureInstance;
 	childStructureCollision->Release();
 
@@ -1751,7 +1751,7 @@ void dgCollisionCompoundFractured::SpawnComplexChunk (dgBody* const myBody, cons
 
 	chunkBody->SetOmega(omega);
 	chunkBody->SetVelocity(chunkVeloc);
-	chunkBody->SetGroupID(childStructureInstance->GetUserDataID());
+	chunkBody->SetGroupID(int (childStructureInstance->GetUserDataID()));
 
 	m_emitFracturedCompound (chunkBody);
 	childStructureInstance->Release();

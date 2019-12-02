@@ -76,8 +76,6 @@ dgContactSolver::dgContactSolver(dgCollisionParamProxy* const proxy)
 {
 }
 
-// for ray Cast
-
 DG_INLINE void dgContactSolver::SupportVertex(const dgVector& dir0, dgInt32 vertexIndex)
 {
 	dgAssert(dir0.m_w == dgFloat32(0.0f));
@@ -259,13 +257,16 @@ dgInt32 dgContactSolver::CalculateClosestSimplex()
 		index = m_vertexIndex;
 	}
 
+	dgVector bestNormal (m_normal);
+
 	dgInt32 iter = 0;
 	dgInt32 cycling = 0;
 	dgFloat64 minDist = dgFloat32 (1.0e20f);
+	dgFloat64 bestNormalDist = dgFloat32 (1.0e20f);
 	do {
 		dgFloat64 dist = v.DotProduct(v).GetScalar();
 		if (dist < dgFloat32 (1.0e-9f)) {
-			// very deep penetration, resolve with generic minkowsky solver
+			// very deep penetration, resolve with generic Minkowsky solver
 			return -index; 
 		}
 
@@ -289,7 +290,12 @@ dgInt32 dgContactSolver::CalculateClosestSimplex()
 		const dgFloat64 dist1 = dir.DotProduct(wv).GetScalar();
 		if (dist1 < dgFloat64 (1.0e-3f)) {
 			m_normal = dir;
-			break;
+			return index;
+		}
+
+		if (dist1 < bestNormalDist) {
+			bestNormal = dir;
+			bestNormalDist = dist1;
 		}
 
 		index ++;
@@ -316,6 +322,7 @@ dgInt32 dgContactSolver::CalculateClosestSimplex()
 
 		iter ++;
 	} while (iter < DG_CONNICS_CONTATS_ITERATIONS); 
+	m_normal = bestNormal;
 	return (index < 4) ? index : -4;
 }
 

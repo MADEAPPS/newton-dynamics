@@ -223,7 +223,7 @@ void ScaledMeshCollision (DemoEntityManager* const scene)
 
 	// load the scene from a ngd file format
 	//AddFloorBox(scene, dVector (0.0f, -0.5f, 0.0f, 0.0f), dVector (100.0f, 1.0f, 100.0f, 0.0f));
-	CreateLevelMesh (scene, "flatPlane.ngd", 1);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateLevelMesh (scene, "sponza.ngd", 0);
 
 	//dMatrix camMatrix (dRollMatrix(-20.0f * dDegreeToRad) * dYawMatrix(-45.0f * dDegreeToRad));

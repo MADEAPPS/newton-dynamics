@@ -87,6 +87,9 @@ dgContact::dgContact(dgWorld* const world, const dgContactMaterial* const materi
 	m_enableCollision = true;
 	m_constId = m_contactConstraint;
 
+	dgAssert (!body0->m_isdead);
+	dgAssert (!body1->m_isdead);
+
 	if (body0->m_invMass.m_w > dgFloat32(0.0f)) {
 		m_body0 = body0;
 		m_body1 = body1;
@@ -126,6 +129,9 @@ dgContact::dgContact(dgContact* const clone)
 	m_isActive = clone->m_isActive;
 	m_enableCollision = clone->m_enableCollision;
 	Merge (*clone);
+
+	dgAssert(!m_body0->m_isdead);
+	dgAssert(!m_body1->m_isdead);
 
 	if (m_body0->m_world->m_onCreateContact) {
 		dgAssert(clone->m_body0);
@@ -175,6 +181,54 @@ void dgContact::CalculatePointDerivative (dgInt32 index, dgContraintDescritor& d
 	dgAssert(jacobian0.m_angular.m_w == dgFloat32(0.0f));
 	dgAssert(jacobian1.m_linear.m_w == dgFloat32(0.0f));
 	dgAssert(jacobian1.m_angular.m_w == dgFloat32(0.0f));
+}
+
+bool dgContact::EstimateCCD (dgFloat32 timestep) const
+{
+	dgAssert (m_body0->m_continueCollisionMode | m_body1->m_continueCollisionMode);
+	const dgVector& veloc0 = m_body0->m_veloc;
+	const dgVector& veloc1 = m_body1->m_veloc;
+	const dgVector& omega0 = m_body0->m_omega;
+	const dgVector& omega1 = m_body1->m_omega;
+	const dgVector& com0 = m_body0->m_globalCentreOfMass;
+	const dgVector& com1 = m_body1->m_globalCentreOfMass;
+	const dgCollisionInstance* const collision0 = m_body0->m_collision;
+	const dgCollisionInstance* const collision1 = m_body1->m_collision;
+	const dgFloat32 dist = dgMax(m_body0->m_collision->GetBoxMinRadius(), m_body1->m_collision->GetBoxMinRadius()) * dgFloat32(0.25f);
+
+	const dgVector relVeloc(veloc1 - veloc0);
+	const dgVector relOmega(omega1 - omega0);
+	const dgFloat32 relVelocMag2(relVeloc.DotProduct(relVeloc).GetScalar());
+	const dgFloat32 relOmegaMag2(relOmega.DotProduct(relOmega).GetScalar());
+
+	if ((relOmegaMag2 > dgFloat32(1.0f)) || ((relVelocMag2 * timestep * timestep) > (dist * dist))) {
+		dgWorld* const world = m_body0->GetWorld();
+		dgTriplex normals[16];
+		dgTriplex points[16];
+		dgInt64 attrib0[16];
+		dgInt64 attrib1[16];
+		dgFloat32 penetrations[16];
+		dgFloat32 timeToImpact = timestep;
+		const dgInt32 ccdContactCount = world->CollideContinue(
+			collision0, m_body0->m_matrix, veloc0, omega0, collision1, m_body1->m_matrix, veloc1, omega1,
+			timeToImpact, points, normals, penetrations, attrib0, attrib1, 6, 0);
+
+		for (dgInt32 j = 0; j < ccdContactCount; j++) {
+			dgVector point(&points[j].m_x);
+			dgVector normal(&normals[j].m_x);
+			point = point & dgVector::m_triplexMask;
+			normal = normal & dgVector::m_triplexMask;
+			dgVector vel0(veloc0 + omega0 * (point - com0));
+			dgVector vel1(veloc1 + omega1 * (point - com1));
+			dgVector vRel(vel1 - vel0);
+			dgFloat32 contactDistTravel = vRel.DotProduct(normal).GetScalar() * timestep;
+			if (contactDistTravel > dist) {
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 dgUnsigned32 dgContact::JacobianDerivative (dgContraintDescritor& params)

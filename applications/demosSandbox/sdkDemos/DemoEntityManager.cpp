@@ -56,7 +56,7 @@
 //#define DEFAULT_SCENE	20		// scaled mesh collision
 //#define DEFAULT_SCENE	21		// continuous collision
 //#define DEFAULT_SCENE	22		// paper wall continuous collision
-//#define DEFAULT_SCENE	23		// puck slide continuous collision
+//#define DEFAULT_SCENE	23		// Flatland Game
 //#define DEFAULT_SCENE	24		// simple convex decomposition
 //#define DEFAULT_SCENE	25		// scene Collision
 //#define DEFAULT_SCENE	26		// simple boolean operators 
@@ -65,23 +65,22 @@
 //#define DEFAULT_SCENE	29		// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	30		// standard joints
 //#define DEFAULT_SCENE	31		// servo joints
-//#define DEFAULT_SCENE	32		// articulated joints
+#define DEFAULT_SCENE	32		// articulated joints
 //#define DEFAULT_SCENE	33		// six axis manipulator
 //#define DEFAULT_SCENE	34		// hexapod Robot
 //#define DEFAULT_SCENE	35		// basic rag doll
 //#define DEFAULT_SCENE	36		// balancing character
 //#define DEFAULT_SCENE	37		// dynamic rag doll
-//#define DEFAULT_SCENE	38		// basic Car
-#define DEFAULT_SCENE	39		// single body vehicle
-//#define DEFAULT_SCENE	40		// super Car
-//#define DEFAULT_SCENE	41		// heavy vehicles
-//#define DEFAULT_SCENE	42		// basic player controller
-//#define DEFAULT_SCENE	43		// animated player controller
-//#define DEFAULT_SCENE	44		// advanced player controller
-//#define DEFAULT_SCENE	45		// cloth patch			
-//#define DEFAULT_SCENE	46		// soft bodies	
-//#define DEFAULT_SCENE	47		// joe's joint test
-//#define DEFAULT_SCENE	48		// Misho's Hinge Test
+//#define DEFAULT_SCENE	38		// single body vehicle
+//#define DEFAULT_SCENE	39		// super Car
+//#define DEFAULT_SCENE	40		// heavy vehicles
+//#define DEFAULT_SCENE	41		// basic player controller
+//#define DEFAULT_SCENE	42		// animated player controller
+//#define DEFAULT_SCENE	43		// advanced player controller
+//#define DEFAULT_SCENE	44		// cloth patch			
+//#define DEFAULT_SCENE	45		// soft bodies	
+//#define DEFAULT_SCENE	46		// joe's joint test
+//#define DEFAULT_SCENE	47		// Misho's Hinge Test
 						 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
@@ -103,7 +102,7 @@ void NonUniformScaledCollision (DemoEntityManager* const scene);
 void ScaledMeshCollision (DemoEntityManager* const scene);
 void ContinuousCollision (DemoEntityManager* const scene);
 void ContinuousCollision1 (DemoEntityManager* const scene);
-void PuckSlide (DemoEntityManager* const scene);
+void FlatLandGame (DemoEntityManager* const scene);
 void SceneCollision (DemoEntityManager* const scene);
 void CompoundCollision(DemoEntityManager* const scene);
 void AlchimedesBuoyancy(DemoEntityManager* const scene);
@@ -113,7 +112,6 @@ void SimpleConvexFracturing (DemoEntityManager* const scene);
 void StructuredConvexFracturing (DemoEntityManager* const scene);
 void UsingNewtonMeshTool (DemoEntityManager* const scene);
 void MultiRayCast (DemoEntityManager* const scene);
-void BasicCar (DemoEntityManager* const scene);
 void SingleBodyCar(DemoEntityManager* const scene);
 void SuperCar (DemoEntityManager* const scene);
 void MilitaryTransport (DemoEntityManager* const scene);
@@ -161,7 +159,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Scaled mesh collision", "demonstrate scaling mesh scaling collision", ScaledMeshCollision},
 	{"Continuous collision", "show continuous collision", ContinuousCollision },
 	{"Paper wall continuous collision", "show fast continuous collision", ContinuousCollision1 },
-	{"Puck slide", "show continuous collision", PuckSlide },
+	{"Flat Land Game", "show usage of tow dimension joints", FlatLandGame },
 	{"Simple convex decomposition", "demonstrate convex decomposition and compound collision", SimpleConvexApproximation},
 	{"Multi geometry collision", "show static mesh with the ability of moving internal parts", SceneCollision},
 	{"Simple boolean operations", "demonstrate simple boolean operations ", SimpleBooleanOperations},
@@ -176,7 +174,6 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
 	{"Balancing character", "demonstrate dynamic character", BalancingCharacter},
 	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagdoll},
-	{"Basic car", "show how to set up a vehicle controller", BasicCar},
 	{"Single body car", "show a generalized coordinate system body", SingleBodyCar },
 	{"Super car", "implement a hight performance sport car", SuperCar},
 	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
@@ -263,6 +260,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_showRaycastHit(false)
 	,m_profilerMode(0)
 	,m_contactLock(0)
+	,m_deleteLock(0)
 	,m_contactList()
 {
 	// Setup window
@@ -358,8 +356,8 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showNormalForces = true;
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
-	m_showListenersDebugInfo = true;
 //	m_collisionDisplayMode = 2;
+//	m_showListenersDebugInfo = true;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
 
@@ -535,6 +533,7 @@ void DemoEntityManager::RemoveEntity (dListNode* const entNode)
 
 void DemoEntityManager::RemoveEntity (DemoEntity* const ent)
 {
+	dCustomScopeLock lock(&m_deleteLock);
 	for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) {
 		if (node->GetInfo() == ent) {
 			RemoveEntity (node);
@@ -754,6 +753,12 @@ void DemoEntityManager::ShowMainMenuBar()
 			if (ImGui::MenuItem("Deserialize", "")) {
 				mainMenu = 5;
 			}
+
+			ImGui::Separator();
+			if (ImGui::MenuItem("import ply file", "")) {
+				mainMenu = 6;
+			}
+
 			ImGui::Separator();
 			if (ImGui::MenuItem("Exit", "")) {
 				glfwSetWindowShouldClose (m_mainFrame, 1);
@@ -865,12 +870,6 @@ void DemoEntityManager::ShowMainMenuBar()
 				ApplyMenuOptions();
 				LoadScene (fileName);
 				ResetTimer();
-
-				//MakeViualMesh context(m_world);
-				//dScene testScene(m_world);
-				//testScene.Deserialize(fileName);
-				//dList<NewtonBody*> loadedBodies;
-				//testScene.SceneToNewtonWorld(m_world, loadedBodies);
 			}
 			break;
 		}
@@ -884,6 +883,16 @@ void DemoEntityManager::ShowMainMenuBar()
 				dScene testScene(m_world);
 				testScene.NewtonWorldToScene(m_world, &context);
 				testScene.Serialize(fileName);
+			}
+			break;
+		}
+
+		case 4:
+		{
+			m_currentScene = -1;
+			char fileName[1024];
+			if (dGetSaveFileNameSerialization(fileName, 1024)) {
+				SerializedPhysicScene(fileName);
 			}
 			break;
 		}
@@ -902,12 +911,16 @@ void DemoEntityManager::ShowMainMenuBar()
 			break;
 		}
 
-		case 4:
+		case 6:
 		{
+			// open Scene
 			m_currentScene = -1;
 			char fileName[1024];
-			if (dGetSaveFileNameSerialization(fileName, 1024)) {
-				SerializedPhysicScene(fileName);
+			Cleanup();
+			if (dGetOpenFileNamePLY(fileName, 1024)) {
+				ApplyMenuOptions();
+				ImportPLYfile(fileName);
+				ResetTimer();
 			}
 			break;
 		}
@@ -1154,6 +1167,12 @@ void DemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary& d
 		DemoMeshInterface* const mesh = iter.GetNode()->GetInfo();
 		mesh->Release();
 	}
+}
+
+void DemoEntityManager::ImportPLYfile (const char* const fileName)
+{
+	m_collisionDisplayMode = 2;
+	CreatePLYMesh (this, fileName, true);
 }
 
 void DemoEntityManager::LoadScene (const char* const fileName)
@@ -1582,17 +1601,19 @@ void DemoEntityManager::RenderScene()
 	m_cameraManager->GetCamera()->SetViewMatrix(display_w, display_h);
 
 	// render all entities
+
+	dMatrix globalMatrix (dGetIdentityMatrix());
 	if (m_hideVisualMeshes) {
 		if (m_sky) {
 			glPushMatrix();	
-			m_sky->Render(timestep, this);
+			m_sky->Render(timestep, this, globalMatrix);
 			glPopMatrix();
 		}
 	} else {
 		for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) {
 			DemoEntity* const entity = node->GetInfo();
 			glPushMatrix();	
-			entity->Render(timestep, this);
+			entity->Render(timestep, this, globalMatrix);
 			glPopMatrix();
 		}
 	}

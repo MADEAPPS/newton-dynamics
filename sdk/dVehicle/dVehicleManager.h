@@ -32,6 +32,7 @@ class dVehicleManager: public dCustomParallelListener
 	DVEHICLE_API void RemoveAndDeleteRoot(dVehicle* const root);
 	DVEHICLE_API virtual void UpdateDriverInput(dVehicle* const vehicle, dFloat timestep) {}
 
+	virtual void OnRemove(const dVehicle* const vehicle) {}
 	virtual void OnUpdateTransform(const dVehicle* const vehicle) const {}
 	virtual void OnPreUpdate(dVehicle* const model, dFloat timestep) const {};
 	virtual void OnPostUpdate(dVehicle* const model, dFloat timestep) const {};
@@ -41,7 +42,10 @@ class dVehicleManager: public dCustomParallelListener
 	DVEHICLE_API void PostStep(dFloat timestep, int threadID);
 	DVEHICLE_API void PreUpdate(dFloat timestep, int threadID);
 	DVEHICLE_API void PostUpdate(dFloat timestep, int threadID);
+
+	DVEHICLE_API void OnDestroyBody(NewtonBody* const body);
 	DVEHICLE_API void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
+	
 
 	dList<dVehicle*> m_list;
 };

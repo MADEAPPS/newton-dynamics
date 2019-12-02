@@ -296,18 +296,31 @@ void DemoEntity::RenderBone() const
 	}
 }
 
-void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene) const
+void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene, const dMatrix& matrix) const
 {
+
+//	char space[256];
+//	int index = 0;
+//	for (const DemoEntity* node = this; node; node = node->GetParent()) {
+//		space[index] = ' ';
+//		index++;
+//	}
+//	space[index] = 0;
+//	dTrace(("%s%s\n", space, GetName().GetStr()));
+
+
 	// save the model matrix before changing it Matrix
-	glPushMatrix();
-
+//	glPushMatrix();
 	// Set The matrix for this entity Node
-	glMultMatrix(&m_matrix[0][0]);
+//	glMultMatrix(&m_matrix[0][0]);
 
-	// Render mesh if there is one 
+	dMatrix nodeMatrix (m_matrix * matrix);
 	if (m_isVisible && m_mesh) {
+		// Render mesh if there is one 
+		dMatrix modelMatrix (m_meshMatrix * nodeMatrix);
+
 		glPushMatrix();
-		glMultMatrix(&m_meshMatrix[0][0]);
+		glMultMatrix(&modelMatrix[0][0]);
 		m_mesh->Render (scene);
 		//m_mesh->RenderNormals ();
 		if (m_userData) {
@@ -317,14 +330,12 @@ void DemoEntity::Render(dFloat timestep, DemoEntityManager* const scene) const
 	}
 
 //	RenderBone();
-
 	for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
-		child->Render(timestep, scene);
+		child->Render(timestep, scene, nodeMatrix);
 	}
 
 	// restore the matrix before leaving
-	glPopMatrix();
-	
+//	glPopMatrix();
 }
 
 DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* const world, const ShaderPrograms& shaderCache)
@@ -395,8 +406,8 @@ DemoEntity* DemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* co
 			entity->m_matrix = matrix;
 			entity->SetNameID(sceneInfo->GetName());
 			const char* const name = entity->GetName().GetStr();
-			//if (strstr(name, "Sphere") || strstr(name, "Box") || strstr(name, "Capsule") || strstr(name, "ConvexHull")) {
-			if (strstr(name, "Hidden")) {
+			//dTrace(("%s\n", name));
+			if (strstr(name, "Hidden") || strstr(name, "hidden")) {
 				entity->m_isVisible = false;
 				//dTrace(("%s %s\n", name, entity->GetParent()->GetName().GetStr()));
 			}
@@ -477,9 +488,12 @@ NewtonCollision* DemoEntity::CreateCollisionFromchildren(NewtonWorld* const worl
 	
 	shapeArray[0] = NULL;
 	for (DemoEntity* child = GetChild(); child; child = child->GetSibling()) {
-		const char* const name = child->GetName().GetStr();
+		//const char* const name = child->GetName().GetStr();
+		dString tmpName(child->GetName());
+		tmpName.ToLower();
+		const char* const name = tmpName.GetStr();
 
-		if (strstr (name, "Sphere")) {
+		if (strstr (name, "sphere")) {
 			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
 			dFloat* const array = mesh->m_vertex;
@@ -494,7 +508,7 @@ NewtonCollision* DemoEntity::CreateCollisionFromchildren(NewtonWorld* const worl
 			shapeArray[count] = NewtonCreateSphere(world, extremes.m_x, 0, &matrix[0][0]);
 			count++;
 			dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
-		} else if (strstr (name, "Box")) {
+		} else if (strstr (name, "box")) {
 			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
 			// go over the vertex array and find and collect all vertices's weighted by this bone.
@@ -512,7 +526,7 @@ NewtonCollision* DemoEntity::CreateCollisionFromchildren(NewtonWorld* const worl
 			count++;
 			dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
 
-		} else if (strstr (name, "Capsule")) {
+		} else if (strstr (name, "capsule")) {
 			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
 			dFloat* const array = mesh->m_vertex;
@@ -529,7 +543,7 @@ NewtonCollision* DemoEntity::CreateCollisionFromchildren(NewtonWorld* const worl
 			shapeArray[count] = NewtonCreateCapsule(world, extremes.m_x, extremes.m_x, high, 0, &matrix[0][0]);
 			count++;
 			dAssert(count < sizeof(shapeArray)/ sizeof (shapeArray[0]));
-		} else if (strstr(name, "ConvexHull")) {
+		} else if (strstr(name, "convexhull")) {
 			DemoMesh* const mesh = (DemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(DemoMesh::GetRttiType()));
 			dFloat* const array = mesh->m_vertex;

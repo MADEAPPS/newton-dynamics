@@ -290,6 +290,7 @@ class dgBody
 			dgUnsigned32 m_collideWithLinkedBodies	: 1;
 			dgUnsigned32 m_transformIsDirty			: 1;
 			dgUnsigned32 m_gyroTorqueOn				: 1;
+			dgUnsigned32 m_isdead					: 1;
 		};
 	};
 

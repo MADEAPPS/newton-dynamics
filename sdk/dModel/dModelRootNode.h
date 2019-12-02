@@ -24,6 +24,7 @@ class dModelRootNode: public dModelNode
 	dModelRootNode(NewtonBody* const rootBody, const dMatrix& bindMatrix);
 	virtual ~dModelRootNode();
 
+	dModelManager* GetManager() const {return m_manager;}
 	void SetTranformMode(bool localTransform) {m_localTransformMode = localTransform;}
 
 	protected:

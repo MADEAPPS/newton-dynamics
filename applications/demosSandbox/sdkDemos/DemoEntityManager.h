@@ -102,6 +102,8 @@ class DemoEntityManager: public dList <DemoEntity*>
 	void RemoveEntity (DemoEntity* const ent);
 	void RemoveEntity (dListNode* const entNode);
 
+	void ImportPLYfile (const char* const name);
+
 	DemoCamera* GetCamera() const;
 	bool GetMousePosition (int& posX, int& posY) const;
 	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
@@ -221,6 +223,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 
 	unsigned m_profilerMode;
 	unsigned m_contactLock;
+	unsigned m_deleteLock;
 	dList<NewtonJoint*> m_contactList;
 
 	static SDKDemos m_demosSelection[];

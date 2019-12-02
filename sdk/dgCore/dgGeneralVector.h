@@ -59,6 +59,13 @@ DG_INLINE T dgDotProduct(dgInt32 size, const T* const A, const T* const B)
 	return val;
 }
 
+template<class T>
+DG_INLINE void dgMulAdd(dgInt32 size, T* const X, const T* const A, const T* const B, T C)
+{
+	for (dgInt32 i = 0; i < size; i++) {
+		X[i] = A[i] + B[i] * C;
+	}
+}
 
 
 #endif

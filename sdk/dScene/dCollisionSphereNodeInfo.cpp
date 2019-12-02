@@ -48,7 +48,7 @@ dCollisionSphereNodeInfo::dCollisionSphereNodeInfo(NewtonCollision* const  spher
 	SetName ("sphere collision");
 	m_radius = record.m_sphere.m_radio; 
 	SetTransform (offsetMatrix);
-	SetShapeId (record.m_collisionMaterial.m_userId);
+	SetShapeId (int (record.m_collisionMaterial.m_userId));
 
 	CalculateGeometryProperies (sphere, m_geometricInertia, m_geometricCenterAndVolume); 
 }

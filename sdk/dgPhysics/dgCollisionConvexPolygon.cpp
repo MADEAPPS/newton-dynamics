@@ -592,7 +592,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 			m_faceClipSize = proxy.m_instance0->m_childShape->GetBoxMaxRadius();
 		}
 
-		const dgInt32 hullId = proxy.m_instance0->GetUserDataID();
+		const dgInt64 hullId = proxy.m_instance0->GetUserDataID();
 		if (inside & !proxy.m_intersectionTestOnly) {
 			const dgMatrix& matrixInstance0 = proxy.m_instance0->m_globalMatrix;
 			dgVector normalInHull(matrixInstance0.UnrotateVector(m_normal.Scale(dgFloat32(-1.0f))));
@@ -659,7 +659,6 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 	dgAssert(proxy.m_instance1->IsType(dgCollision::dgCollisionConvexPolygon_RTTI));
 	dgAssert (proxy.m_instance1->GetGlobalMatrix().TestIdentity());
 
-	//const dgCollisionInstance* const polygonInstance = proxy.m_instance1;
 	dgAssert(this == proxy.m_instance1->GetChildShape());
 	dgAssert(m_count);
 	dgAssert(m_count < dgInt32(sizeof (m_localPoly) / sizeof (m_localPoly[0])));
@@ -668,13 +667,23 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 	dgContact* const contactJoint = proxy.m_contactJoint;
 	const dgCollisionInstance* const hull = proxy.m_instance0;
 
+	dgAssert(m_normal.m_w == dgFloat32(0.0f));
+	//const dgFloat32 shapeSide = m_normal.DotProduct(hullMatrix.m_posit - m_localPoly[0]).GetScalar();
+	const dgVector obbOrigin(hullMatrix.TransformVector(proxy.m_instance0->GetChildShape()->GetObbOrigin()));
+	const dgFloat32 shapeSide = m_normal.DotProduct(obbOrigin - m_localPoly[0]).GetScalar();
+	if (shapeSide < dgFloat32(0.0f)) {
+		//dgTrace(("normal face away (%f %f %f)\n", m_normal[0], m_normal[1], m_normal[2]));
+		return 0;
+	}
+
 	dgVector normalInHull(hullMatrix.UnrotateVector(m_normal));
 	dgVector pointInHull(hull->SupportVertex(normalInHull.Scale(dgFloat32(-1.0f))));
 	dgVector p0(hullMatrix.TransformVector(pointInHull));
-
-	dgAssert (m_normal.m_w == dgFloat32 (0.0f));
+	
 	dgFloat32 penetration = m_normal.DotProduct(m_localPoly[0] - p0).GetScalar() + proxy.m_skinThickness;
-	if (penetration < dgFloat32(-1.0e-5f)) {
+
+	//if (penetration < dgFloat32(-1.0e-5f)) {
+	if (penetration < -(DG_PENETRATION_TOL * dgFloat32 (5.0f))) {
 		return 0;
 	}
 
@@ -726,7 +735,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 		m_faceClipSize = hull->m_childShape->GetBoxMaxRadius();
 	}
 
-	const dgInt32 hullId = hull->GetUserDataID();
+	const dgInt64 hullId = hull->GetUserDataID();
 	if (inside & !proxy.m_intersectionTestOnly) {
 		penetration = dgMax(dgFloat32(0.0f), penetration);
 		dgAssert(penetration >= dgFloat32(0.0f));

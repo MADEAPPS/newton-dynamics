@@ -28,7 +28,7 @@ class SkyBox: public DemoEntity
 	SkyBox(GLuint shader);
 	~SkyBox();
 
-	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const;
+	virtual void Render(dFloat timeStep, DemoEntityManager* const scene, const dMatrix& matrix) const;
 
 	private:
 	void DrawMesh () const;

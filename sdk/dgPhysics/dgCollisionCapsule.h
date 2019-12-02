@@ -50,14 +50,17 @@ class dgCollisionCapsule: public dgCollisionConvex
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 
+	static dgInt32 CalculateSignature(dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height);
+
+	virtual void CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const;
+	virtual dgVector SupportVertexSpecialProjectPoint(const dgVector& point, const dgVector& dir) const;
 	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const;
-	virtual dgVector SupportVertexSpecialProjectPoint (const dgVector& point, const dgVector& dir) const;
-	static dgInt32 CalculateSignature (dgFloat32 radio0, dgFloat32 radio1, dgFloat32 height);
 
 	void TesselateTriangle(dgInt32 level, const dgVector& p0, const dgVector& p1, const dgVector& p2, dgInt32& count, dgVector* ouput) const;
 
 	dgVector m_p0;
 	dgVector m_p1;
+	dgVector m_normal;
 	dgVector m_transform;
 	dgFloat32 m_height;
 	dgFloat32 m_radio0;

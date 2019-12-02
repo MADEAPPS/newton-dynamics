@@ -87,11 +87,15 @@ class dgCollisionInfo
 			memset(this, 0, sizeof (dgInstanceMaterial));
 		}
 
-		void* m_userData;
-		dgInt32 m_userId;
-		dgUnsigned32 m_userFlags0;
-		dgUnsigned32 m_userFlags1;
-		dgFloat32 m_userParam[8];
+		dgInt64 m_userId;
+		union {
+			void* m_userData;
+			dgUnsigned64 m_alignPad;
+		};
+		union {
+			dgUnsigned64 m_intData;
+			dgFloat32 m_floatData;
+		} m_userParam[6];
 	};
 
 	struct dgBoxData
@@ -175,12 +179,8 @@ class dgCollisionInfo
 		dgFloat32 m_verticalScale;
 		dgFloat32 m_horizonalScale_x;
 		dgFloat32 m_horizonalScale_z;
-		dgFloat32 m_horizonalDisplacementScale_x;
-		dgFloat32 m_horizonalDisplacementScale_z;
 		void* m_elevation;
-		dgUnsigned16* m_horizotalDisplacement;
 		dgInt8* m_atributes;
-		
 	};
 
 	struct dgSceneData
@@ -209,9 +209,6 @@ class dgCollisionInfo
 		dgFloat32 m_paramArray[32];
 	};
 }DG_GCC_VECTOR_ALIGMENT;
-
-
-
 
 DG_MSC_VECTOR_ALIGMENT
 class dgCollision
@@ -279,6 +276,9 @@ class dgCollision
 
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void SerializeLow(dgSerialize callback, void* const userData) const;
+
+	virtual void CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const {dgAssert (0);}
+
 
 	virtual dgInt32 GetConvexVertexCount() const; 
 

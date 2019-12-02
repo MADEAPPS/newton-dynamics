@@ -241,8 +241,6 @@ void dgBody::UpdateWorlCollisionMatrix() const
 	m_collision->SetGlobalMatrix (m_collision->GetLocalMatrix() * m_matrix);
 }
 
-
-
 void dgBody::UpdateCollisionMatrix (dgFloat32 timestep, dgInt32 threadIndex)
 {
 	m_transformIsDirty = true;

@@ -38,6 +38,7 @@ void dVehicleManager::AddRoot(dVehicle* const root)
 void dVehicleManager::RemoveRoot(dVehicle* const root)
 {
 	if (root->m_managerNode) {
+		OnRemove (root);
 		dList<dVehicle*>::dListNode* const node = (dList<dVehicle*>::dListNode*) root->m_managerNode;
 		root->m_managerNode = NULL;
 		root->m_manager = NULL;
@@ -51,10 +52,21 @@ void dVehicleManager::RemoveAndDeleteRoot(dVehicle* const root)
 	delete root;
 }
 
+void dVehicleManager::OnDestroyBody(NewtonBody* const body)
+{
+	for (dList<dVehicle*>::dListNode* node = m_list.GetFirst(); node; node = node->GetNext()) {
+		dVehicle* const vehicle = node->GetInfo();
+		if (vehicle->m_newtonBody == body) {
+			RemoveAndDeleteRoot(vehicle);
+			break;
+		}
+	}
+}
+
 void dVehicleManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 {
-	for (dList<dVehicle*>::dListNode* vehicleNode = m_list.GetFirst(); vehicleNode; vehicleNode = vehicleNode->GetNext()) {
-		dVehicle* const vehicle = vehicleNode->GetInfo();
+	for (dList<dVehicle*>::dListNode* node = m_list.GetFirst(); node; node = node->GetNext()) {
+		dVehicle* const vehicle = node->GetInfo();
 		OnDebug(vehicle, debugContext);
 		vehicle->Debug(debugContext);
 	}

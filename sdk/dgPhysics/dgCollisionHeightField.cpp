@@ -62,14 +62,11 @@ dgCollisionHeightField::dgCollisionHeightField(
 	,m_width(width)
 	,m_height(height)
 	,m_diagonalMode (dgCollisionHeightFieldGridConstruction  (dgClamp (contructionMode, dgInt32 (m_normalDiagonals), dgInt32 (m_starInvertexDiagonals))))
-	,m_horizontalDisplacement(NULL)
 	,m_verticalScale(verticalScale)
 	,m_horizontalScale_x(horizontalScale_x)
 	,m_horizontalScaleInv_x (dgFloat32 (1.0f) / m_horizontalScale_x)
-	,m_horizontalDisplacementScale_x(dgFloat32 (1.0f))
 	,m_horizontalScale_z(horizontalScale_z)
 	,m_horizontalScaleInv_z(dgFloat32(1.0f) / m_horizontalScale_z)
-	,m_horizontalDisplacementScale_z(dgFloat32(1.0f))
 	,m_userRayCastCallback(NULL)
 	,m_elevationDataType(elevationDataType)
 {
@@ -259,16 +256,13 @@ dgCollisionHeightField::dgCollisionHeightField (dgWorld* const world, dgDeserial
 	dgInt32 elevationDataType;
 
 	m_userRayCastCallback = NULL;
-	m_horizontalDisplacement = NULL;
 	deserialization (userData, &m_width, sizeof (dgInt32));
 	deserialization (userData, &m_height, sizeof (dgInt32));
 	deserialization (userData, &m_diagonalMode, sizeof (dgInt32));
 	deserialization (userData, &elevationDataType, sizeof (dgInt32));
 	deserialization (userData, &m_verticalScale, sizeof (dgFloat32));
 	deserialization (userData, &m_horizontalScale_x, sizeof (dgFloat32));
-	deserialization (userData, &m_horizontalDisplacementScale_x, sizeof (dgFloat32));
 	deserialization (userData, &m_horizontalScale_z, sizeof (dgFloat32));
-	deserialization (userData, &m_horizontalDisplacementScale_z, sizeof (dgFloat32));
 	deserialization (userData, &m_minBox.m_x, sizeof (dgVector)); 
 	deserialization (userData, &m_maxBox.m_x, sizeof (dgVector)); 
 
@@ -296,13 +290,6 @@ dgCollisionHeightField::dgCollisionHeightField (dgWorld* const world, dgDeserial
 	}
 	deserialization (userData, m_atributeMap, attibutePaddedMapSize * sizeof (dgInt8));
 	deserialization (userData, m_diagonals, attibutePaddedMapSize * sizeof (dgInt8));
-
-	dgInt32 hasDisplacement = m_horizontalDisplacement ? 1 : 0;
-	deserialization (userData, &hasDisplacement, sizeof (hasDisplacement));
-	if (hasDisplacement) {
-		m_horizontalDisplacement = (dgUnsigned16*) dgMallocStack(m_width * m_height * sizeof (dgUnsigned16));
-		deserialization (userData, m_horizontalDisplacement, m_width * m_height * sizeof (dgUnsigned16));
-	}
 
 	m_horizontalScaleInv_x = dgFloat32 (1.0f) / m_horizontalScale_x;
 	m_horizontalScaleInv_z = dgFloat32 (1.0f) / m_horizontalScale_z;
@@ -337,10 +324,6 @@ dgCollisionHeightField::~dgCollisionHeightField(void)
 	dgFreeStack(m_elevationMap);
 	dgFreeStack(m_atributeMap);
 	dgFreeStack(m_diagonals);
-
-	if (m_horizontalDisplacement) {
-		dgFreeStack(m_horizontalDisplacement);
-	}
 }
 
 void dgCollisionHeightField::Serialize(dgSerialize callback, void* const userData) const
@@ -355,9 +338,7 @@ void dgCollisionHeightField::Serialize(dgSerialize callback, void* const userDat
 	callback (userData, &elevationDataType, sizeof (dgInt32));
 	callback (userData, &m_verticalScale, sizeof (dgFloat32));
 	callback (userData, &m_horizontalScale_x, sizeof (dgFloat32));
-	callback (userData, &m_horizontalDisplacementScale_x, sizeof (dgFloat32));
 	callback (userData, &m_horizontalScale_z, sizeof (dgFloat32));
-	callback (userData, &m_horizontalDisplacementScale_z, sizeof (dgFloat32));
 	callback (userData, &m_minBox.m_x, sizeof (dgVector)); 
 	callback (userData, &m_maxBox.m_x, sizeof (dgVector)); 
 
@@ -378,12 +359,6 @@ void dgCollisionHeightField::Serialize(dgSerialize callback, void* const userDat
 	dgInt32 attibutePaddedMapSize = (m_width * m_height + 4) & -4; 
 	callback (userData, m_atributeMap, attibutePaddedMapSize * sizeof (dgInt8));
 	callback (userData, m_diagonals, attibutePaddedMapSize * sizeof (dgInt8));
-	
-	dgInt32 hasDisplacement = m_horizontalDisplacement ? 1 : 0;
-	callback (userData, &hasDisplacement, sizeof (hasDisplacement));
-	if (hasDisplacement) {
-		callback (userData, m_horizontalDisplacement, m_width * m_height * sizeof (dgUnsigned16));
-	}
 }
 
 void dgCollisionHeightField::SetCollisionRayCastCallback (dgCollisionHeightFieldRayCastCallback rayCastCallback)
@@ -391,27 +366,11 @@ void dgCollisionHeightField::SetCollisionRayCastCallback (dgCollisionHeightField
 	m_userRayCastCallback = rayCastCallback;
 }
 
-void dgCollisionHeightField::SetHorizontalDisplacement (const dgUnsigned16* const displacemnet, dgFloat32 scale)
-{
-	if (m_horizontalDisplacement) {
-		dgFreeStack(m_horizontalDisplacement);
-		m_horizontalDisplacement = NULL;
-	}
-
-	m_horizontalDisplacementScale_x = scale;
-	if (displacemnet) {
-		m_horizontalDisplacement = (dgUnsigned16*)dgMallocStack(m_width * m_height * sizeof (dgUnsigned16));
-		memcpy (m_horizontalDisplacement, displacemnet, m_width * m_height * sizeof (dgUnsigned16));
-	}
-}
-
 void dgCollisionHeightField::AllocateVertex(dgWorld* const world, dgInt32 threadIndex) const
 {
 	m_instanceData->m_vertex[threadIndex].Resize (m_instanceData->m_vertex[threadIndex].GetElementsCapacity() * 2);
 	m_instanceData->m_vertexCount[threadIndex] = m_instanceData->m_vertex[threadIndex].GetElementsCapacity();
 }
-
-
 
 DG_INLINE void dgCollisionHeightField::CalculateMinExtend2d(const dgVector& p0, const dgVector& p1, dgVector& boxP0, dgVector& boxP1) const
 {
@@ -448,18 +407,9 @@ DG_INLINE void dgCollisionHeightField::CalculateMinExtend3d(const dgVector& p0, 
 
 	dgVector invScale(m_horizontalScaleInv_x, dgFloat32(0.0f), m_horizontalScaleInv_z, dgFloat32(0.0f));
 
-	//boxP0 = (((q0 * invScale).Floor() * scale        ) & m_yMask) + q0.AndNot(m_yMask);
-	//boxP1 = (((q1 * invScale).Floor() * scale + scale) & m_yMask) + q1.AndNot(m_yMask);
 	boxP0 = q0.Select((q0 * invScale).Floor() * scale, m_yMask);
 	boxP1 = q1.Select((q1 * invScale).Floor() * scale + scale, m_yMask);
 
-	if (m_horizontalDisplacement) {
-		boxP0 -= dgVector(m_horizontalScale_x, dgFloat32(0.0f), m_horizontalScale_z, dgFloat32(0.0f));
-		boxP1 += dgVector(m_horizontalScale_x, dgFloat32(0.0f), m_horizontalScale_z, dgFloat32(0.0f));
-	}
-
-	//dgVector minBox((m_minBox & m_yMask) + boxP0.AndNot(m_yMask));
-	//dgVector maxBox((m_maxBox & m_yMask) + boxP1.AndNot(m_yMask));
 	dgVector minBox(boxP0.Select(m_minBox, m_yMask));
 	dgVector maxBox(boxP1.Select(m_maxBox, m_yMask));
 
@@ -506,12 +456,9 @@ void dgCollisionHeightField::GetCollisionInfo(dgCollisionInfo* const info) const
 	data.m_height = m_height;
 	data.m_gridsDiagonals = m_diagonalMode;
 	data.m_elevationDataType = m_elevationDataType;
-	data.m_horizotalDisplacement = m_horizontalDisplacement;
 	data.m_verticalScale = m_verticalScale;
 	data.m_horizonalScale_x = m_horizontalScale_x;
 	data.m_horizonalScale_z = m_horizontalScale_z;
-	data.m_horizonalDisplacementScale_x = m_horizontalDisplacementScale_x;
-	data.m_horizonalDisplacementScale_z = m_horizontalDisplacementScale_z;
 	data.m_atributes = m_atributeMap;
 	data.m_elevation = m_elevationMap;
 }
@@ -798,18 +745,6 @@ void dgCollisionHeightField::DebugCollision (const dgMatrix& matrix, dgCollision
 			}
 		}
 
-		if (m_horizontalDisplacement) {
-			dgUnsigned16 val = m_horizontalDisplacement[base];
-			dgInt8 hor_x = val & 0xff;
-			dgInt8 hor_z = (val >> 8);
-			points[0 * 2 + 0] += dgVector(hor_x * m_horizontalDisplacementScale_x, dgFloat32(0.0f), hor_z * m_horizontalDisplacementScale_z, dgFloat32(0.0f));
-
-			val = m_horizontalDisplacement[base + m_width];
-			hor_x = val & 0xff;
-			hor_z = (val >> 8);
-			points[1 * 2 + 0] += dgVector(hor_x * m_horizontalDisplacementScale_x, dgFloat32(0.0f), hor_z * m_horizontalDisplacementScale_z, dgFloat32(0.0f));
-		}
-
 		points[0 * 2 + 0] = matrix.TransformVector(points[0 * 2 + 0]);
 		points[1 * 2 + 0] = matrix.TransformVector(points[1 * 2 + 0]);
 
@@ -832,18 +767,6 @@ void dgCollisionHeightField::DebugCollision (const dgMatrix& matrix, dgCollision
 					points[1 * 2 + 1] = dgVector ((x + 1) * m_horizontalScale_x, m_verticalScale * dgFloat32 (elevation[base + x + m_width + 1]), (z + 1) * m_horizontalScale_z, dgFloat32 (0.0f));
 					break;
 				}
-			}
-
-			if (m_horizontalDisplacement) {
-				dgUnsigned16 val = m_horizontalDisplacement[base + x + 1];
-				dgInt8 hor_x = val & 0xff;
-				dgInt8 hor_z = (val >> 8);
-				points[0 * 2 + 1] += dgVector(hor_x * m_horizontalDisplacementScale_x, dgFloat32(0.0f), hor_z * m_horizontalDisplacementScale_z, dgFloat32(0.0f));
-
-				val = m_horizontalDisplacement[base + m_width + x + 1];
-				hor_x = val & 0xff;
-				hor_z = (val >> 8);
-				points[1 * 2 + 1] += dgVector(hor_x * m_horizontalDisplacementScale_x, dgFloat32(0.0f), hor_z * m_horizontalDisplacementScale_z, dgFloat32(0.0f));
 			}
 
 			points[0 * 2 + 1] = matrix.TransformVector(points[0 * 2 + 1]);
@@ -956,23 +879,6 @@ void dgCollisionHeightField::GetLocalAABB (const dgVector& q0, const dgVector& q
 	boxP1.m_y = m_verticalScale * maxHeight;
 }
 
-void dgCollisionHeightField::AddDisplacement (dgVector* const vertex, dgInt32 x0, dgInt32 x1, dgInt32 z0, dgInt32 z1) const
-{
-	const dgUnsigned16* const displacement = m_horizontalDisplacement;
-	dgInt32 vertexIndex = 0;
-	dgInt32 base = z0 * m_width;
-	for (dgInt32 z = z0; z <= z1; z++) {
-		for (dgInt32 x = x0; x <= x1; x++) {
-			dgUnsigned16 val = displacement[base + x];
-			dgInt8 hor_x = val & 0xff; 
-			dgInt8 hor_z = (val >> 8); 
-			vertex[vertexIndex] += dgVector(hor_x * m_horizontalDisplacementScale_x, dgFloat32 (0.0f), hor_z * m_horizontalDisplacementScale_x, dgFloat32(0.0f));
-			vertexIndex++;
-		}
-		base += m_width;
-	}
-}
-
 void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) const
 {
 	dgVector boxP0;
@@ -1050,9 +956,6 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 					}
 					base += m_width;
 				}
-				if (m_horizontalDisplacement) {
-					AddDisplacement (vertex, x0, x1, z0, z1);
-				}
 				break;
 			}
 
@@ -1067,9 +970,6 @@ void dgCollisionHeightField::GetCollidingFaces (dgPolygonMeshDesc* const data) c
 						dgAssert (vertexIndex <= m_instanceData->m_vertexCount[data->m_threadNumber]); 
 					}
 					base += m_width;
-				}
-				if (m_horizontalDisplacement) {
-					AddDisplacement(vertex, x0, x1, z0, z1);
 				}
 				break;
 			}

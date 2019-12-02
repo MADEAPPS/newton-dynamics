@@ -84,12 +84,12 @@ class PassiveRagdollManager: public dModelManager
 		NewtonCollisionMaterial collisionMaterial1;
 		NewtonCollisionGetMaterial(collision0, &collisionMaterial0);
 		NewtonCollisionGetMaterial(collision1, &collisionMaterial1);
-		if (collisionMaterial0.m_userData != collisionMaterial1.m_userData) {
+		if (collisionMaterial0.m_userData.m_ptr != collisionMaterial1.m_userData.m_ptr) {
 			return 1;
 		}
 
-		int val0 = (collisionMaterial0.m_userFlags0 & collisionMaterial1.m_userFlags1);
-		int val1 = (collisionMaterial1.m_userFlags0 & collisionMaterial0.m_userFlags1);
+		dLong val0 = (collisionMaterial0.m_userParam[0].m_int & collisionMaterial1.m_userParam[1].m_int);
+		dLong val1 = (collisionMaterial1.m_userParam[0].m_int & collisionMaterial0.m_userParam[1].m_int);
 		return (val0 && val1) ? 1 : 0;
 	}
 
@@ -251,9 +251,9 @@ class PassiveRagdollManager: public dModelManager
 
 		NewtonCollisionMaterial collisionMaterial;
 		NewtonCollisionGetMaterial(NewtonBodyGetCollision(rootBone), &collisionMaterial);
-		collisionMaterial.m_userData = rootBone;
-		collisionMaterial.m_userFlags0 = jointsDefinition[0].m_type;
-		collisionMaterial.m_userFlags1 = jointsDefinition[0].m_typeMask;
+		collisionMaterial.m_userData.m_ptr = rootBone;
+		collisionMaterial.m_userParam[0].m_int = jointsDefinition[0].m_type;
+		collisionMaterial.m_userParam[1].m_int = jointsDefinition[0].m_typeMask;
 		NewtonCollisionSetMaterial(NewtonBodyGetCollision(rootBone), &collisionMaterial);
 
 		int stackIndex = 0;
@@ -275,7 +275,7 @@ class PassiveRagdollManager: public dModelManager
 			dModelNode* parentBone = parentBones[stackIndex];
 			DemoEntity* const entity = childEntities[stackIndex];
 			const char* const name = entity->GetName().GetStr();
-			dTrace(("name: %s\n", name));
+			//dTrace(("name: %s\n", name));
 			for (int i = 0; i < definitionCount; i++) {
 				if (!strcmp(jointsDefinition[i].m_boneName, name)) {
 					NewtonBody* const childBody = CreateBodyPart(entity);
@@ -292,9 +292,9 @@ class PassiveRagdollManager: public dModelManager
 					// save the controller as the collision user data, for collision culling
 					NewtonCollisionMaterial collisionMaterial;
 					NewtonCollisionGetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
-					collisionMaterial.m_userData = rootBone;
-					collisionMaterial.m_userFlags0 = jointsDefinition[i].m_type;
-					collisionMaterial.m_userFlags1 = jointsDefinition[i].m_typeMask;
+					collisionMaterial.m_userData.m_ptr = rootBone;
+					collisionMaterial.m_userParam[0].m_int = jointsDefinition[i].m_type;
+					collisionMaterial.m_userParam[1].m_int = jointsDefinition[i].m_typeMask;
 					NewtonCollisionSetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
 					break;
 				}

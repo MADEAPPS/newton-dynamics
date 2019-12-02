@@ -57,7 +57,15 @@ void dVehicleBrakeControl::Update(dFloat timestep)
 void dVehicleEngineControl::Update(dFloat timestep)
 {
 	if (m_engine) {
+		m_engine->UpdateAutomaticGearBox(timestep);
 		m_engine->SetThrottle (m_param, timestep);
+	}
+}
+
+void dVehicleEngineControl::SetDifferential (int mode)
+{
+	if (m_engine) {
+		m_engine->SetDifferentialMode(mode);
 	}
 }
 
@@ -75,4 +83,20 @@ void dVehicleEngineControl::SetClutch (dFloat clutch)
 		dAssert(0);
 //		m_engine->SetClutch(clutch);
 	}
+}
+
+void dVehicleEngineControl::SetIgnition(int mode)
+{
+	if (m_engine) {
+		m_engine->SetIgnition(mode ? true : false);
+	}
+}
+
+bool dVehicleEngineControl::ParamChanged() const
+{
+	bool state = dVehicleDashControl::ParamChanged();
+	if (!state && m_engine) {
+		state = m_engine->InputChanged();
+	}
+	return state;
 }

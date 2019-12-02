@@ -315,3 +315,13 @@ dgVector dgCollisionSphere::SupportVertexSpecialProjectPoint (const dgVector& po
 	return dir.Scale (m_radius - DG_PENETRATION_TOL);
 }
 
+void dgCollisionSphere::CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const
+{
+	for (dgInt32 i = 0; i < count; i++) {
+		dgVector normal(contactPoints[i].m_point & dgVector::m_triplexMask);
+		dgAssert(normal.DotProduct(normal).GetScalar() > dgFloat32(0.0f));
+		normal = normal.Normalize();
+		contactPoints[i].m_normal = normal * dgVector::m_negOne;
+		contactPoints[i].m_point = normal.Scale(m_radius);
+	}
+}

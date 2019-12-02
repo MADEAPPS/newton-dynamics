@@ -74,7 +74,7 @@ class ComplexScene: public DemoEntity
 		}
 	}
 
-	virtual void Render(dFloat timeStep, DemoEntityManager* const scene) const
+	virtual void Render(dFloat timeStep, DemoEntityManager* const scene, const dMatrix& matrixIn) const
 	{
 		// save the model matrix before changing it Matrix
 		glPushMatrix();
