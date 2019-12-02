@@ -126,7 +126,7 @@ class dExcavatorModel: public dModelRootNode
 		for (int i = 0; i < m_tireCount; i ++) {
 			const dThreadContacts* const entry = &m_tireArray[i];
 			for (int j = 0; j < entry->m_count; j++) {
-				debugContext->DrawPoint(entry->m_point[j], 20.0f);
+				debugContext->DrawPoint(entry->m_point[j], 10.0f);
 			}
 		}
 	}
@@ -316,20 +316,19 @@ class dExcavatorModel: public dModelRootNode
 			dFloat penetrations[maxContactCount];
 			dLong attributeA[maxContactCount];
 			dLong attributeB[maxContactCount];
-
-			scanMatrix.m_posit = targetPoint;
+			
 			NewtonWorld* const world = NewtonBodyGetWorld(staticBody);
+			dVector dir(tireMatrix.m_posit - targetPoint);
+			dir = dir.Normalize();
+			dVector veloc(dir.Scale(1.0f));
+			scanMatrix.m_posit = targetPoint - dir.Scale (0.5f);
+
 			for (int i = 0; i < collidingBodies.m_threaLinkCount && (tire->m_count < 2); i ++) {
 				dMatrix linkMatrix;
-				//dVector veloc (targetPoint - tireMatrix.m_posit);
-				dVector dir (tireMatrix.m_posit - scanMatrix.m_posit);
-				dir = dir.Normalize();
-				dVector veloc (dir.Scale (0.7f));
 				dFloat timeOfImpact;
-
 				NewtonCollision* const linkCollision = NewtonBodyGetCollision(collidingBodies.m_threaLinks[i]);
 				NewtonBodyGetMatrix (collidingBodies.m_threaLinks[i], &linkMatrix[0][0]);
-				
+			
 				int collide = NewtonCollisionCollideContinue(
 					world, 1, 1.0f,
 					m_shereCast, &scanMatrix[0][0], &veloc[0], &zero[0],
@@ -482,8 +481,9 @@ class dExcavatorModel: public dModelRootNode
 		dModelNode* const leftTire_7 = MakeRollerTire("leftFrontRoller");
 		m_tireArray[m_tireCount++].m_tire = leftTire_0->GetBody();
 		m_tireArray[m_tireCount++].m_tire = leftTire_7->GetBody();
-
 		LinkTires (leftTire_0, leftTire_7);
+		MakeRollerTire("leftSupportRoller");
+
 		for (int i = 0; i < 3; i++) {
 			char name[64];
 			sprintf(name, "leftRoller%d", i);
@@ -491,7 +491,6 @@ class dExcavatorModel: public dModelRootNode
 			m_tireArray[m_tireCount++].m_tire = rollerTire->GetBody();
 			LinkTires (leftTire_0, rollerTire);
 		}
-		MakeRollerTire("leftSupportRoller");
 	}
 
 	void MakeRightTrack()
@@ -500,8 +499,9 @@ class dExcavatorModel: public dModelRootNode
 		dModelNode* const rightTire_7 = MakeRollerTire("rightFrontRoller");
 		m_tireArray[m_tireCount++].m_tire = rightTire_0->GetBody();
 		m_tireArray[m_tireCount++].m_tire = rightTire_7->GetBody();
-
 		LinkTires(rightTire_0, rightTire_7);
+		MakeRollerTire("rightSupportRoller");
+
 		for (int i = 0; i < 3; i++) {
 			char name[64];
 			sprintf(name, "rightRoller%d", i);
@@ -509,7 +509,6 @@ class dExcavatorModel: public dModelRootNode
 			m_tireArray[m_tireCount++].m_tire = rollerTire->GetBody();
 			LinkTires(rightTire_0, rollerTire);
 		}
-		MakeRollerTire("rightSupportRoller");
 	}
 
 	NewtonBody* MakeThreadLinkBody(DemoEntity* const linkNode, NewtonCollision* const linkCollision, int linkMaterilID)
