@@ -695,20 +695,20 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		:dModelManager (scene->GetNewton())
 		,m_threadMaterialID(threadMaterialID)
 	{
-/*
+
 		// create a material for early collision culling
 		NewtonWorld* const world = scene->GetNewton();
 		int material = NewtonMaterialGetDefaultGroupID (world);
+
 		NewtonMaterialSetCallbackUserData (world, material, material, this);
-		NewtonMaterialSetCollisionCallback (world, material, material, StandardAABBOverlapTest, StandardContactsProcess);
+		NewtonMaterialSetCollisionCallback (world, material, material, StandardAABBOverlapTest, NULL);
 
 		NewtonMaterialSetCallbackUserData(world, material, threadMaterialID, this);
-		NewtonMaterialSetCollisionCallback (world, material, threadMaterialID, StandardAABBOverlapTest, StandardContactsProcess);
+		NewtonMaterialSetCollisionCallback (world, material, threadMaterialID, StandardAABBOverlapTest, NULL);
 
 		NewtonMaterialSetCallbackUserData(world, threadMaterialID, threadMaterialID, this);
-		NewtonMaterialSetCollisionCallback (world, threadMaterialID, threadMaterialID, SpecialAABBOverlapTest, SpecialContactsProcess);
-		NewtonMaterialSetContactGenerationCallback (world, threadMaterialID, threadMaterialID, SpecialGenerateLinkGroundContacts);
-*/
+		NewtonMaterialSetCollisionCallback (world, threadMaterialID, threadMaterialID, StandardAABBOverlapTest, NULL);
+		NewtonMaterialSetContactGenerationCallback (world, threadMaterialID, threadMaterialID, ThreadStaticContactsGeneration);
 	}
 
 	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, dFloat mass)
@@ -851,11 +851,6 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
 
-/*
-	static void StandardContactsProcess (const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
-	{
-	}
-
 	static int StandardAABBOverlapTest(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 	{
 		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
@@ -872,7 +867,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		NewtonCollisionGetMaterial(collision0, &material0);
 		NewtonCollisionGetMaterial(collision1, &material1);
 
-		//m_terrain = 1 << 0,
+		//m_terrain	 = 1 << 0,
 		//m_bodyPart = 1 << 1,
 		//m_tirePart = 1 << 2,
 		//m_linkPart = 1 << 3,
@@ -883,36 +878,25 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		return (mask0 && mask1) ? 1 : 0;
 	}
 
-	static int SpecialAABBOverlapTest(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
+	static int ThreadStaticContactsGeneration (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex)
 	{
-		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
-		const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
-		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
+		//const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
 		//const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
+		dAssert(NewtonBodyGetMaterialGroupID(body0) == NewtonBodyGetMaterialGroupID(body1));
+		dAssert(NewtonBodyGetMaterialGroupID(body0) != NewtonMaterialGetDefaultGroupID(NewtonBodyGetWorld(body0)));
+		dAssert(NewtonBodyGetMaterialGroupID(body1) != NewtonMaterialGetDefaultGroupID(NewtonBodyGetWorld(body1)));
 
-		dAssert (NewtonBodyGetMaterialGroupID(body0) == NewtonBodyGetMaterialGroupID(body1));
-		dAssert (NewtonBodyGetMaterialGroupID(body0) != NewtonMaterialGetDefaultGroupID(NewtonBodyGetWorld(body0)));
-		dAssert (NewtonBodyGetMaterialGroupID(body1) != NewtonMaterialGetDefaultGroupID(NewtonBodyGetWorld(body1)));
-		dAssert (NewtonCollisionGetUserID(collision0) & (ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain));
-		dAssert (NewtonCollisionGetUserID(collision1) & (ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain));
+		dAssert(NewtonCollisionGetUserID(collision0) == ARTICULATED_VEHICLE_DEFINITION::m_linkPart);
+		dAssert(NewtonCollisionGetUserID(collision1) == ARTICULATED_VEHICLE_DEFINITION::m_terrain);
+		//dAssert (NewtonCollisionGetUserID(collision1) & (ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain));
 
-		dExcavatorModel* const excavator = (dExcavatorModel*)NewtonCollisionGetUserData(collision0);
-		dAssert (excavator);
-		return excavator->OnBoneAABBOverlap(contactJoint);
+		//dExcavatorModel* const excavator = (dExcavatorModel*)NewtonCollisionGetUserData(collision0);
+		//dAssert (excavator);
+		//return excavator->OnBoneAABBOverlap(contactJoint);
+
+		return 0;
 	}
 
-	static int SpecialGenerateLinkGroundContacts (const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex)
-	{
-		dExcavatorModel* const excavator = (dExcavatorModel*)NewtonCollisionGetUserData(collision0);
-		dAssert(excavator);
-		return excavator->SpecialGenerateLinkGroundContact (material, body0, body1, contactBuffer);
-	}
-
-	static void SpecialContactsProcess(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
-	{
-		//dAssert(0);
-	}
-*/
 	int m_threadMaterialID;
 };
 
