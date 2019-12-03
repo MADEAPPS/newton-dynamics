@@ -65,13 +65,12 @@ class dgSkeletonContainer
 	
 	private:
 	bool SanityCheck(const dgForcePair* const force, const dgForcePair* const accel) const;
-	DG_INLINE void CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const;
+	DG_INLINE void CalculateLoopMassMatrixCoefficients(dgFloat32* const diagDamp);
+	DG_INLINE void CalculateForce(dgForcePair* const force, const dgForcePair* const accel) const;
 	DG_INLINE void SolveBackward(dgForcePair* const force, const dgForcePair* const accel) const;
 	DG_INLINE void SolveForward(dgForcePair* const force, const dgForcePair* const accel, dgInt32 startNode = 0) const;
 	DG_INLINE void UpdateForces(dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const dgForcePair* const force) const;
 	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgForcePair* const accel) const;
-
-	DG_INLINE void CalculateLoopMassMatrixCoefficients(dgFloat32* const diagDamp);
 
 	dgNode* FindNode(dgDynamicBody* const node) const;
 	void SortGraph(dgNode* const root, dgInt32& index);
