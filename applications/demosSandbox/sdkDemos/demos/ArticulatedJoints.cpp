@@ -61,7 +61,7 @@ class dExcavatorModel: public dModelRootNode
 	dExcavatorModel(NewtonBody* const rootBody, int linkMaterilID)
 		:dModelRootNode(rootBody, dGetIdentityMatrix())
 		,m_bodyMap()
-		,m_shereCast (NewtonCreateSphere (NewtonBodyGetWorld(rootBody), 0.05f, 0, NULL))
+		,m_shereCast (NewtonCreateSphere (NewtonBodyGetWorld(rootBody), 0.20f, 0, NULL))
 		,m_tireCount(0)
 	{
 		m_bodyMap.Insert(rootBody);
@@ -79,32 +79,41 @@ class dExcavatorModel: public dModelRootNode
 		NewtonDestroyCollision(m_shereCast);
 	}
 
+	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
+	{
+		
+
+		int stack = 1;
+		dModelNode* pool[32];
+		pool[0] = this;
+		while (stack) {
+			stack--;
+			dModelNode* const node = pool[stack];
+			NewtonBody* const body = node->GetBody();
+			dAssert(body);
+			NewtonCollision* const collision = NewtonBodyGetCollision(body);
+			dLong id = NewtonCollisionGetUserID(collision);
+			if (id == ARTICULATED_VEHICLE_DEFINITION::m_linkPart) {
+				dMatrix matrix;
+				dVector com;
+				NewtonBodyGetCentreOfMass(body, &com[0]);
+				NewtonBodyGetMatrix(body, &matrix[0][0]);
+				matrix.m_posit = matrix.TransformVector(com);
+				matrix.m_posit -= matrix.m_front.Scale (0.12f);
+
+				debugContext->DrawFrame(matrix);
+				debugContext->SetColor(dVector(0.7f, 0.4f, 0.0f, 1.0f));
+				NewtonCollisionForEachPolygonDo(m_shereCast, &matrix[0][0], RenderDebugTire, debugContext);
+			}
+
+			for (dModelChildrenList::dListNode* ptrNode = node->GetChildren().GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
+				pool[stack] = ptrNode->GetInfo();
+				stack++;
+			}
+		}
+
 /*
-	void CalculateTireContacts()
-	{
-		for (int i = 0; i < m_tireCount; i ++) {
-			CalculateContact(&m_tireArray[i]);
-		}
-	}
-
-	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id)
-	{
-		dCustomJoint::dDebugDisplay* const debugContext = (dCustomJoint::dDebugDisplay*) userData;
-
-		int index = vertexCount - 1;
-		dVector p0(faceVertec[index * 3 + 0], faceVertec[index * 3 + 1], faceVertec[index * 3 + 2]);
-		for (int i = 0; i < vertexCount; i++) {
-			dVector p1(faceVertec[i * 3 + 0], faceVertec[i * 3 + 1], faceVertec[i * 3 + 2]);
-			debugContext->DrawLine(p0, p1);
-			p0 = p1;
-		}
-	}
-
-	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext) 
-	{
-		debugContext->SetColor(dVector(0.7f, 0.4f, 0.0f, 1.0f));
-
-		for (int i = 0; i < m_tireCount; i ++) {
+		for (int i = 0; i < m_tireCount; i++) {
 			dMatrix matrix;
 			dVector scale;
 			NewtonCollision* const collision = NewtonBodyGetCollision(m_tireArray[i].m_tire);
@@ -124,11 +133,21 @@ class dExcavatorModel: public dModelRootNode
 		}
 
 		debugContext->SetColor(dVector(1.0f, 0.0f, 0.0f, 1.0f));
-		for (int i = 0; i < m_tireCount; i ++) {
+		for (int i = 0; i < m_tireCount; i++) {
 			const dThreadContacts* const entry = &m_tireArray[i];
 			for (int j = 0; j < entry->m_count; j++) {
 				debugContext->DrawPoint(entry->m_point[j], 10.0f);
 			}
+		}
+*/
+	}
+
+
+/*
+	void CalculateTireContacts()
+	{
+		for (int i = 0; i < m_tireCount; i ++) {
+			CalculateContact(&m_tireArray[i]);
 		}
 	}
 
@@ -173,6 +192,20 @@ class dExcavatorModel: public dModelRootNode
 	}
 */
 	private:
+
+	static void RenderDebugTire(void* userData, int vertexCount, const dFloat* const faceVertec, int id)
+	{
+		dCustomJoint::dDebugDisplay* const debugContext = (dCustomJoint::dDebugDisplay*) userData;
+
+		int index = vertexCount - 1;
+		dVector p0(faceVertec[index * 3 + 0], faceVertec[index * 3 + 1], faceVertec[index * 3 + 2]);
+		for (int i = 0; i < vertexCount; i++) {
+			dVector p1(faceVertec[i * 3 + 0], faceVertec[i * 3 + 1], faceVertec[i * 3 + 2]);
+			debugContext->DrawLine(p0, p1);
+			p0 = p1;
+		}
+	}
+
 /*
 	class dCollidingBodies
 	{
@@ -831,8 +864,8 @@ class ArticulatedVehicleManagerManager: public dModelManager
 
 	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext) 
 	{
-		//dExcavatorModel* const excavator = (dExcavatorModel*) model;
-		//excavator->OnDebug(debugContext);
+		dExcavatorModel* const excavator = (dExcavatorModel*) model;
+		excavator->OnDebug(debugContext);
 	}
 
 	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const 
