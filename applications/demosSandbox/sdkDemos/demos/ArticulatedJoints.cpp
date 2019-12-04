@@ -754,21 +754,31 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 //	ArticulatedEntityModel robotModel(scene, "excavator.ngd");
 
 	dModelRootNode* const excavator = vehicleManager->CreateExcavator ("excavator.ngd", matrix);
-/*
-	inputManager->AddPlayer (robot);
 
-	matrix.m_posit.m_z += 4.0f;
+//	inputManager->AddPlayer (robot);
+	matrix.m_posit.m_z += 30.0f;
+	matrix.m_posit.m_x += 10.0f;
 
 	// add some object to play with
-//	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
-//	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
-//	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
-//	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
-//	LoadLumberYardMesh(scene, dVector(14.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
-//	LoadLumberYardMesh(scene, dVector(14.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
-//	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
-//	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_woodSlab);
-*/
+	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+	LoadLumberYardMesh(scene, dVector(14.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+	LoadLumberYardMesh(scene, dVector(14.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+
+	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+		if (NewtonCollisionGetUserID(collision) == ARTICULATED_VEHICLE_DEFINITION::m_propBody) {
+			NewtonCollisionMaterial material;
+			NewtonCollisionGetMaterial(collision, &material);
+			material.m_userParam[0].m_int = -1;
+			NewtonCollisionSetMaterial(collision, &material);
+		}
+	}
+
 
 	origin.m_x -= 15.0f;
 	origin.m_y += 5.0f;
