@@ -72,6 +72,22 @@ class dExcavatorModel: public dModelRootNode
 		MakeThread("leftThread", linkMaterilID);
 		MakeThread("rightThread", linkMaterilID);
 		MakeCabinAndUpperBody ();
+
+
+		// add engine
+		//dCustomTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
+		//vehicleModel->m_engineJoint = (dCustomDoubleHinge*) engineBone->FindJoint();
+		//vehicleModel->m_engineMotor = CreateEngineMotor(controller, vehicleModel->m_engineJoint);
+		//
+		//// set power parameter for a simple DC engine
+		//vehicleModel->m_maxTurmVelocity = 10.0f;
+		//vehicleModel->m_maxEngineSpeed = 30.0f;
+		//vehicleModel->m_engineMotor->SetTorque(2000.0f);
+		//vehicleModel->m_engineMotor->SetTorque1(2500.0f);
+		//
+		//// set the steering torque 
+		//vehicleModel->m_engineJoint->SetFriction(500.0f);
+		//AddCraneBase (controller);
 	}
 
 	~dExcavatorModel()
@@ -595,20 +611,6 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		// add the model to the manager
 		AddRoot(controller);
 
-		// add engine
-		//dCustomTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
-		//vehicleModel->m_engineJoint = (dCustomDoubleHinge*) engineBone->FindJoint();
-		//vehicleModel->m_engineMotor = CreateEngineMotor(controller, vehicleModel->m_engineJoint);
-		//
-		//// set power parameter for a simple DC engine
-		//vehicleModel->m_maxTurmVelocity = 10.0f;
-		//vehicleModel->m_maxEngineSpeed = 30.0f;
-		//vehicleModel->m_engineMotor->SetTorque(2000.0f);
-		//vehicleModel->m_engineMotor->SetTorque1(2500.0f);
-		//
-		//// set the steering torque 
-		//vehicleModel->m_engineJoint->SetFriction(500.0f);
-		//AddCraneBase (controller);
 
 #if 0
 	/*
@@ -760,14 +762,14 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_x += 10.0f;
 
 	// add some object to play with
-	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
-	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
-	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
-	LoadLumberYardMesh (scene, dVector(10.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
-	LoadLumberYardMesh(scene, dVector(14.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
-	LoadLumberYardMesh(scene, dVector(14.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
-	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
-	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(14.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(14.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
 
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
