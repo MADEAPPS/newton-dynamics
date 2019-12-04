@@ -346,7 +346,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showUI = false;
 //	m_showAABB = false;
 //	m_showContactPoints = true;
-//	m_hideVisualMeshes = true;
+	m_hideVisualMeshes = true;
 //	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
@@ -356,7 +356,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showNormalForces = true;
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
-//	m_collisionDisplayMode = 2;
+	m_collisionDisplayMode = 2;
 //	m_showListenersDebugInfo = true;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;

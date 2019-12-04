@@ -44,6 +44,24 @@ struct ARTICULATED_VEHICLE_DEFINITION
 	char m_articulationName[32];
 };
 
+class dExcavatorEngine: public dCustomDoubleHinge
+{
+	public:
+	dExcavatorEngine(const dMatrix& pinAndPivotFrame, NewtonBody* const engine, NewtonBody* const chassis)
+		:dCustomDoubleHinge(pinAndPivotFrame, engine, chassis)
+	{
+		EnableLimits(false);
+		EnableLimits1(false);
+	}
+
+	void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+	{
+		dCustomDoubleHinge::SubmitAngularRow(matrix0, matrix1, timestep);
+
+		// apply mortor and turn rate here.
+	}
+};
+
 class dExcavatorModel: public dModelRootNode
 {
 	public:
@@ -60,34 +78,15 @@ class dExcavatorModel: public dModelRootNode
 
 	dExcavatorModel(NewtonBody* const rootBody, int linkMaterilID)
 		:dModelRootNode(rootBody, dGetIdentityMatrix())
-		,m_bodyMap()
 		,m_shereCast (NewtonCreateSphere (NewtonBodyGetWorld(rootBody), 0.20f, 0, NULL))
-		,m_tireCount(0)
 	{
-		m_bodyMap.Insert(rootBody);
-		memset (m_tireArray, 0, sizeof (m_tireArray));
-
 		MakeLeftTrack();
 		MakeRightTrack();
-		MakeThread("leftThread", linkMaterilID);
-		MakeThread("rightThread", linkMaterilID);
-		MakeCabinAndUpperBody ();
-
-
-		// add engine
-		//dCustomTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
-		//vehicleModel->m_engineJoint = (dCustomDoubleHinge*) engineBone->FindJoint();
-		//vehicleModel->m_engineMotor = CreateEngineMotor(controller, vehicleModel->m_engineJoint);
-		//
-		//// set power parameter for a simple DC engine
-		//vehicleModel->m_maxTurmVelocity = 10.0f;
-		//vehicleModel->m_maxEngineSpeed = 30.0f;
-		//vehicleModel->m_engineMotor->SetTorque(2000.0f);
-		//vehicleModel->m_engineMotor->SetTorque1(2500.0f);
-		//
-		//// set the steering torque 
-		//vehicleModel->m_engineJoint->SetFriction(500.0f);
-		//AddCraneBase (controller);
+		//MakeThread("leftThread", linkMaterilID);
+		//MakeThread("rightThread", linkMaterilID);
+	
+		AddLocomotion();
+		//MakeCabinAndUpperBody();
 	}
 
 	~dExcavatorModel()
@@ -257,9 +256,6 @@ class dExcavatorModel: public dModelRootNode
 
 		dMatrix bindMatrix(tireModel->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
 		dModelNode* const bone = new dModelNode(tireBody, bindMatrix, this);
-
-		m_bodyMap.Insert(tireBody);
-
 		return bone;
 	}
 
@@ -309,8 +305,6 @@ class dExcavatorModel: public dModelRootNode
 	{
 		dModelNode* const leftTire_0 = MakeRollerTire("leftGear");
 		dModelNode* const leftTire_7 = MakeRollerTire("leftFrontRoller");
-		m_tireArray[m_tireCount++].m_tire = leftTire_0->GetBody();
-		m_tireArray[m_tireCount++].m_tire = leftTire_7->GetBody();
 		LinkTires (leftTire_0, leftTire_7);
 		MakeRollerTire("leftSupportRoller");
 
@@ -318,7 +312,6 @@ class dExcavatorModel: public dModelRootNode
 			char name[64];
 			sprintf(name, "leftRoller%d", i);
 			dModelNode* const rollerTire = MakeRollerTire(name);
-			m_tireArray[m_tireCount++].m_tire = rollerTire->GetBody();
 			LinkTires (leftTire_0, rollerTire);
 		}
 	}
@@ -327,8 +320,6 @@ class dExcavatorModel: public dModelRootNode
 	{
 		dModelNode* const rightTire_0 = MakeRollerTire("rightGear");
 		dModelNode* const rightTire_7 = MakeRollerTire("rightFrontRoller");
-		m_tireArray[m_tireCount++].m_tire = rightTire_0->GetBody();
-		m_tireArray[m_tireCount++].m_tire = rightTire_7->GetBody();
 		LinkTires(rightTire_0, rightTire_7);
 		MakeRollerTire("rightSupportRoller");
 
@@ -336,7 +327,6 @@ class dExcavatorModel: public dModelRootNode
 			char name[64];
 			sprintf(name, "rightRoller%d", i);
 			dModelNode* const rollerTire = MakeRollerTire(name);
-			m_tireArray[m_tireCount++].m_tire = rollerTire->GetBody();
 			LinkTires(rightTire_0, rollerTire);
 		}
 	}
@@ -504,15 +494,71 @@ class dExcavatorModel: public dModelRootNode
 
 		dMatrix bindMatrix(bodyPart->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
 		new dModelNode(body, bindMatrix, this);
-
-		m_bodyMap.Insert(body);
-		//return bone;
 	}
 
-	dMap<NewtonBody*, const NewtonBody*> m_bodyMap;
-	dThreadContacts m_tireArray[16];
+	void AddLocomotion()
+	{
+		NewtonBody* const chassis = GetBody();
+		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
+		NewtonCollision* const shape = NewtonCreateCylinder (world, 0.125f, 0.125f, 0.75f, 0, NULL);
+
+		// create the rigid body that will make this bone
+		dMatrix engineMatrix;
+		NewtonBodyGetMatrix(chassis, &engineMatrix[0][0]);
+		engineMatrix = dRollMatrix(0.5f * dPi) * engineMatrix;
+		engineMatrix.m_posit.m_y += 1.0f;
+
+		// make a non collidable engine body
+		NewtonBody* const engineBody = NewtonCreateDynamicBody(world, shape, &engineMatrix[0][0]);
+
+		// destroy the collision helper shape
+		NewtonDestroyCollision(shape);
+
+		// get the collision from body
+		NewtonCollision* const collision = NewtonBodyGetCollision(engineBody);
+		NewtonCollisionSetMode (collision, 0);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		dFloat mass = 50.0f;
+		dFloat radius = 1.0f;
+		dFloat Inertia = 2.0f * mass * radius * radius / 5.0f;
+		NewtonBodySetMassMatrix (engineBody, mass, Inertia, Inertia, Inertia);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		NewtonBodySetForceAndTorqueCallback(engineBody, PhysicsApplyGravityForce);
+
+		// connect engine to chassis with a hinge
+		dMatrix engineAxis;
+		engineAxis.m_front = engineMatrix.m_front;
+		engineAxis.m_up = engineMatrix.m_right;
+		engineAxis.m_right = engineAxis.m_front.CrossProduct(engineAxis.m_up);
+		engineAxis.m_posit = engineMatrix.m_posit;
+
+		// add the engine joint 
+		m_engineJoint = new dExcavatorEngine(engineAxis, engineBody, chassis);
+
+		// connect egine to chassis.
+		dMatrix bindMatrix(dGetIdentityMatrix());
+		new dModelNode(engineBody, bindMatrix, this);
+
+/*
+	//dCustomTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
+	//vehicleModel->m_engineJoint = (dCustomDoubleHinge*) engineBone->FindJoint();
+	//vehicleModel->m_engineMotor = CreateEngineMotor(controller, vehicleModel->m_engineJoint);
+	//
+	//// set power parameter for a simple DC engine
+	//vehicleModel->m_maxTurmVelocity = 10.0f;
+	//vehicleModel->m_maxEngineSpeed = 30.0f;
+	//vehicleModel->m_engineMotor->SetTorque(2000.0f);
+	//vehicleModel->m_engineMotor->SetTorque1(2500.0f);
+	//
+	//// set the steering torque
+	//vehicleModel->m_engineJoint->SetFriction(500.0f);
+	//AddCraneBase (controller);
+*/
+	}
 	NewtonCollision* m_shereCast;
-	int m_tireCount;
+	dExcavatorEngine* m_engineJoint;
 };
 
 class ArticulatedVehicleManagerManager: public dModelManager
@@ -658,10 +704,12 @@ class ArticulatedVehicleManagerManager: public dModelManager
 	{
 		NewtonBody* const body = bone->GetBody();
 		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(body);
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
+		if (ent) {
+			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 
-		dQuaternion rot(localMatrix);
-		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
+			dQuaternion rot(localMatrix);
+			ent->SetMatrix(*scene, rot, localMatrix.m_posit);
+		}
 	}
 
 	static int StandardAABBOverlapTest(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
@@ -774,6 +822,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
 		if (NewtonCollisionGetUserID(collision) == ARTICULATED_VEHICLE_DEFINITION::m_propBody) {
+			NewtonBodySetGyroscopicTorque(body, 1);
 			NewtonCollisionMaterial material;
 			NewtonCollisionGetMaterial(collision, &material);
 			material.m_userParam[0].m_int = -1;
