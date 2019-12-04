@@ -1199,6 +1199,7 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 			if (isCollidable) {
 				dgUnsigned32 group0_ID = dgUnsigned32 (body0->m_bodyGroupId);
 				dgUnsigned32 group1_ID = dgUnsigned32 (body1->m_bodyGroupId);
+
 				if (group1_ID < group0_ID) {
 					dgSwap (group0_ID, group1_ID);
 				}

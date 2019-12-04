@@ -23,11 +23,22 @@ if (MSVC)
 endif(MSVC)
 
 if (UNIX OR MINGW)
-	if(NEWTON_BUILD_SHARED_LIBS)
+
+	if(NEWTON_GENERATE_DLL STREQUAL "ON")
+		message (${projectName} - STATIC LIBRARY)
+		add_library(${projectName} STATIC ${CPP_SOURCE})
+	else()
+		
+		if(NEWTON_BUILD_SHARED_LIBS STREQUAL "ON")
+		   message (${projectName} - SHARED LIBRARY)
 	   add_library(${projectName} SHARED ${CPP_SOURCE})
-	else(NEWTON_BUILD_SHARED_LIBS)
+		else()
+		   message (${projectName} - STATIC LIBRARY)
 	   add_library(${projectName} STATIC ${CPP_SOURCE})
-	endif(NEWTON_BUILD_SHARED_LIBS)
+		endif()
+		
+	endif()
+	
 endif(UNIX OR MINGW)
 
 if (MSVC)

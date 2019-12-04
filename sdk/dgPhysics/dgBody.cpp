@@ -309,8 +309,11 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	const dgFloat32 err = dgFloat32(90.0f * dgDegreeToRad);
 	const dgFloat32 err2 = err * err;
 	const dgFloat32 step2 = omegaMag2 * timestep * timestep;
-	if (step2 > err2) {
-		dgTrace (("warning bodies %d w(%f %f %f) with very high angular velocity, may be unstable\n", m_uniqueID, m_omega.m_x, m_omega.m_y, m_omega.m_z));
+	const dgFloat32 speed2 = m_veloc.DotProduct(m_veloc).GetScalar() * timestep * timestep;;
+	if ((step2 > err2) || (speed2 > 100.0f)) {
+		dgTrace (("warning bodies %d v(%f %f %f) w(%f %f %f) with very high velocity or angular velocity, may be unstable\n", m_uniqueID, 
+				   m_omega.m_x, m_omega.m_y, m_omega.m_z, m_veloc.m_x, m_veloc.m_y, m_veloc.m_z));
+		//dgAssert(0);
 	}
 #endif
 

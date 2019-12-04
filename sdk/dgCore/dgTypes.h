@@ -114,7 +114,7 @@
 
 	#include <unistd.h>
 	#include <assert.h>
-	#ifndef __ARMCC_VERSION
+	#if (!defined(__arm__) && !defined(__aarch64__)) // it was __ARMCC_VERSION before, it should be __ARM__ or aarch64, otherwise cross compiling in gcc fails.
 		extern "C" 
 		{ 
 			// for SSE3 and up
@@ -197,9 +197,9 @@
 
 #ifdef _DEBUG
 	#define DG_INLINE inline
-#else 
+#else
 	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-		#define DG_INLINE __forceinline 
+			#define DG_INLINE __forceinline 
 	#else 
 		#define DG_INLINE	inline
 		//#define DG_INLINE	 __attribute__((always_inline))

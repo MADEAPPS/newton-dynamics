@@ -28,6 +28,8 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgBilateralConstraint.h"
 
+
+
 class dgSkeletonContainer::dgNodePair
 {
 	public:
@@ -773,7 +775,6 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 
 	memset(m_massMatrix10, 0, primaryCount * m_auxiliaryRowCount * sizeof(dgFloat32));
 	memset(m_massMatrix11, 0, m_auxiliaryRowCount * m_auxiliaryRowCount * sizeof(dgFloat32));
-
 	CalculateLoopMassMatrixCoefficients(diagDamp);
 
 	const dgSpatialVector zero (dgSpatialVector::m_zero);
@@ -821,7 +822,6 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 	dgInt16* const indexList = dgAlloca(dgInt16, primaryCount);
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		const dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
-		const dgFloat32* const deltaForcePtr = &m_deltaForce[i * primaryCount];
 		dgFloat32* const matrixRow11 = &m_massMatrix11[i * m_auxiliaryRowCount];
 
 		dgInt32 indexCount = 0;
@@ -830,14 +830,7 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 			indexCount += (matrixRow10[k] != dgFloat32(0.0f)) ? 1 : 0;
 		}
 
-		dgFloat32 diagonal = matrixRow11[i];
-		for (dgInt32 k = 0; k < indexCount; k++) {
-			dgInt32 index = indexList[k];
-			diagonal += matrixRow10[index] * deltaForcePtr[index];
-		}
-		matrixRow11[i] = dgMax(diagonal, diagDamp[i]);
-
-		for (dgInt32 j = i + 1; j < m_auxiliaryRowCount; j++) {
+		for (dgInt32 j = i; j < m_auxiliaryRowCount; j++) {
 			dgFloat32 offDiagonal = matrixRow11[j];
 			const dgFloat32* const row10 = &m_deltaForce[j * primaryCount];
 			for (dgInt32 k = 0; k < indexCount; k++) {
@@ -847,6 +840,8 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 			matrixRow11[j] = offDiagonal;
 			m_massMatrix11[j * m_auxiliaryRowCount + i] = offDiagonal;
 		}
+
+		matrixRow11[i] = dgMax(matrixRow11[i], diagDamp[i]);
 	}
 
 //m_blockSize = 0;

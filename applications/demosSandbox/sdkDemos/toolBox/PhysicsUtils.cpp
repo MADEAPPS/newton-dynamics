@@ -1411,7 +1411,7 @@ void LoadLumberYardMesh(DemoEntityManager* const scene, const dVector& location,
 	dTree<NewtonCollision*, DemoMesh*> filter;
 	NewtonWorld* const world = scene->GetNewton();
 
-	dFloat density = 15.0f;
+	dFloat density = 1000.0f;
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
 	for (DemoEntity* child = entity->GetFirst(); child; child = child->GetNext()) {
