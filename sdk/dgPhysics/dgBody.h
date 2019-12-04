@@ -319,6 +319,8 @@ class dgBody
 	friend class dgConstraint;
 	friend class dgDeadBodies;
 	friend class dgBroadPhase;
+	friend class dgBroadPhaseMixed;
+	friend class dgBroadPhaseSegregated;
 	friend class dgCollisionBVH;
 	friend class dgBroadPhaseNode;
 	friend class dgBodyMasterList;
