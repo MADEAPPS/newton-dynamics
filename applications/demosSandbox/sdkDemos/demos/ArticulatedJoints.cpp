@@ -21,7 +21,7 @@
 #include "HeightFieldPrimitive.h"
 
 #define ARTICULATED_VEHICLE_CAMERA_EYEPOINT			1.5f
-#define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
+#define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	4.0f
 #define ARTICULATED_VEHICLE_CAMERA_DISTANCE			13.0f
 
 
@@ -44,11 +44,20 @@ struct ARTICULATED_VEHICLE_DEFINITION
 	char m_articulationName[32];
 };
 
+class dExcavatorControls
+{
+	public:
+	dFloat m_throttle;
+};
+
+
 class dExcavatorEngine: public dCustomDoubleHinge
 {
 	public:
+
 	dExcavatorEngine(const dMatrix& pinAndPivotFrame, NewtonBody* const engine, NewtonBody* const chassis)
 		:dCustomDoubleHinge(pinAndPivotFrame, engine, chassis)
+		,m_throttle(0.0f)
 	{
 		EnableLimits(false);
 		EnableLimits1(false);
@@ -58,8 +67,15 @@ class dExcavatorEngine: public dCustomDoubleHinge
 	{
 		dCustomDoubleHinge::SubmitAngularRow(matrix0, matrix1, timestep);
 
-		// apply mortor and turn rate here.
+		const dVector& frontDir = matrix0.m_up;
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &frontDir[0]);
+		dFloat accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) - m_throttle / timestep;
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -400.0f);
+		NewtonUserJointSetRowMaximumFriction(m_joint, 400.0f);
 	}
+
+	dFloat m_throttle;
 };
 
 class dExcavatorModel: public dModelRootNode
@@ -80,18 +96,26 @@ class dExcavatorModel: public dModelRootNode
 		:dModelRootNode(rootBody, dGetIdentityMatrix())
 		,m_shereCast (NewtonCreateSphere (NewtonBodyGetWorld(rootBody), 0.20f, 0, NULL))
 	{
-		MakeLeftTrack();
-		MakeRightTrack();
+		dModelNode* const engineNode = AddLocomotion();
+
+		MakeLeftTrack(engineNode);
+		MakeRightTrack(engineNode);
 		//MakeThread("leftThread", linkMaterilID);
 		//MakeThread("rightThread", linkMaterilID);
-	
-		AddLocomotion();
 		//MakeCabinAndUpperBody();
 	}
 
 	~dExcavatorModel()
 	{
 		NewtonDestroyCollision(m_shereCast);
+	}
+
+	void ApplyControls(const dExcavatorControls& control)
+	{
+		if (m_engineJoint->m_throttle) {
+			NewtonBodySetSleepState(GetBody(), 0);
+		}
+		m_engineJoint->m_throttle = control.m_throttle * 10.0f;
 	}
 
 	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
@@ -301,7 +325,7 @@ class dExcavatorModel: public dModelRootNode
 		return new dCustomGear(slaveRadio / masterRadio, pinMatrix0[0], pinMatrix0[0].Scale(-1.0f), slave->GetBody(), master->GetBody());
 	}
 
-	void MakeLeftTrack()
+	void MakeLeftTrack(dModelNode* const engineNode)
 	{
 		dModelNode* const leftTire_0 = MakeRollerTire("leftGear");
 		dModelNode* const leftTire_7 = MakeRollerTire("leftFrontRoller");
@@ -314,9 +338,24 @@ class dExcavatorModel: public dModelRootNode
 			dModelNode* const rollerTire = MakeRollerTire(name);
 			LinkTires (leftTire_0, rollerTire);
 		}
+
+		/*
+		// link traction tire to the engine using a differential gear
+		dMatrix engineMatrix;
+		dMatrix chassisMatrix;
+
+		NewtonBody* const tire = bone->m_body;
+		NewtonBody* const engine = vehicleModel->m_engineJoint->GetBody0();
+		NewtonBody* const chassis = vehicleModel->m_engineJoint->GetBody1();
+		vehicleModel->m_engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
+
+		dFloat sign = dSign(engineMatrix.m_up.DotProduct3(tireHingeMatrix.m_posit - engineMatrix.m_posit));
+		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, engineMatrix.m_front.Scale(sign), chassisMatrix.m_up, tire, engine, chassis);
+		return bone;
+		*/
 	}
 
-	void MakeRightTrack()
+	void MakeRightTrack(dModelNode* const engineNode)
 	{
 		dModelNode* const rightTire_0 = MakeRollerTire("rightGear");
 		dModelNode* const rightTire_7 = MakeRollerTire("rightFrontRoller");
@@ -496,7 +535,7 @@ class dExcavatorModel: public dModelRootNode
 		new dModelNode(body, bindMatrix, this);
 	}
 
-	void AddLocomotion()
+	dModelNode* AddLocomotion()
 	{
 		NewtonBody* const chassis = GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
@@ -539,8 +578,7 @@ class dExcavatorModel: public dModelRootNode
 
 		// connect egine to chassis.
 		dMatrix bindMatrix(dGetIdentityMatrix());
-		new dModelNode(engineBody, bindMatrix, this);
-
+		dModelNode* const engineNode = new dModelNode(engineBody, bindMatrix, this);
 /*
 	//dCustomTransformController::dSkeletonBone* const engineBone = CreateEngineNode(controller, chassisBone);
 	//vehicleModel->m_engineJoint = (dCustomDoubleHinge*) engineBone->FindJoint();
@@ -556,7 +594,10 @@ class dExcavatorModel: public dModelRootNode
 	//vehicleModel->m_engineJoint->SetFriction(500.0f);
 	//AddCraneBase (controller);
 */
+		return engineNode;
 	}
+
+
 	NewtonCollision* m_shereCast;
 	dExcavatorEngine* m_engineJoint;
 };
@@ -568,6 +609,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		:dModelManager (scene->GetNewton())
 		,m_threadMaterialID(threadMaterialID)
 	{
+		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 
 		// create a material for early collision culling
 		NewtonWorld* const world = scene->GetNewton();
@@ -583,6 +625,39 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		NewtonMaterialSetCollisionCallback (world, threadMaterialID, threadMaterialID, StandardAABBOverlapTest, NULL);
 		NewtonMaterialSetContactGenerationCallback (world, threadMaterialID, threadMaterialID, ThreadStaticContactsGeneration);
 	}
+
+	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
+	{
+		ArticulatedVehicleManagerManager* const me = (ArticulatedVehicleManagerManager*)context;
+		me->UpdateCamera(timestep);
+	}
+
+	void UpdateCamera(dFloat timestep)
+	{
+		//return;
+		if (!m_player) {
+			return;
+		}
+
+		DemoEntity* const player = (DemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+		DemoCamera* const camera = scene->GetCamera();
+		dMatrix camMatrix(camera->GetNextMatrix());
+		dMatrix playerMatrix(player->GetNextMatrix());
+
+		dVector frontDir(camMatrix[0]);
+		dVector camOrigin(0.0f);
+		if (1) {
+			camOrigin = playerMatrix.m_posit + dVector(0.0f, ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f);
+			camOrigin -= frontDir.Scale(ARTICULATED_VEHICLE_CAMERA_DISTANCE);
+		} else {
+			dAssert(0);
+			//           camMatrix = camMatrix * playerMatrix;
+			//           camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
+		}
+		camera->SetNextMatrix(*scene, camMatrix, camOrigin);
+	}
+
 
 	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, dFloat mass)
 	{
@@ -685,6 +760,8 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		}
 */
 #endif
+
+		m_player = controller;
 		return controller;
 	}
 
@@ -696,8 +773,21 @@ class ArticulatedVehicleManagerManager: public dModelManager
 
 	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const 
 	{
-		//dExcavatorModel* const excavator = (dExcavatorModel*) model;
-		//excavator->CalculateTireContacts();
+		dExcavatorModel* const excavator = (dExcavatorModel*) model;
+
+		NewtonWorld* const world = NewtonBodyGetWorld(excavator->GetBody());
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		dExcavatorControls controls;
+		controls.m_throttle = scene->GetKeyState('W') ? 1.0f : (scene->GetKeyState('S') ? -1.0f : 0.0f);
+		//driverInput.m_clutchPedal = scene->GetKeyState('K') ? 0.0f : 1.0f;
+		//driverInput.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
+		//driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
+		//driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
+		//driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene->GetKeyState('I'));
+		//driverInput.m_ignitionKey = 1;
+
+		excavator->ApplyControls(controls);
 	}
 
 	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const
@@ -754,6 +844,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		return excavator->CollideLink(material, body0, body1, contactBuffer);
 	}
 
+	dExcavatorModel* m_player;
 	int m_threadMaterialID;
 };
 
