@@ -308,8 +308,9 @@ void dCustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex
 dCustomDifferentialGear::dCustomDifferentialGear(dFloat gearRatio, const dVector& diffPin, const dVector& inputPin, const dVector& axleOutPin, NewtonBody* const diffBody, NewtonBody* const axleOutBody)
 	:dCustomGear(1, diffBody, axleOutBody)
 {
-	dAssert(diffPin.DotProduct3(diffPin) < 1.0e-5f);
+	dAssert(diffPin.DotProduct3(inputPin) < 1.0e-5f);
 
+	m_gearRatio = gearRatio;
 	dMatrix dommyMatrix;
 	// calculate the local matrix for body body1  
 	dMatrix pinAndPivot0;
@@ -322,9 +323,6 @@ dCustomDifferentialGear::dCustomDifferentialGear(dFloat gearRatio, const dVector
 	// calculate the local matrix for body body0
 	dMatrix pinAndPivot1(dGrammSchmidt(axleOutPin));
 	CalculateLocalMatrix(pinAndPivot1, dommyMatrix, m_localMatrix1);
-
-//	m_gearRatio = gearRatio;
-m_gearRatio = 1.0f;
 }
 
 void dCustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex)

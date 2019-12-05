@@ -20,15 +20,17 @@
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
 
-//#define ARTICULATED_VEHICLE_CAMERA_EYEPOINT			1.5f
 #define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD		3.0f
 #define ARTICULATED_VEHICLE_CAMERA_DISTANCE				11.0f
 #define EXCAVATOR_TREAD_THICKNESS						0.13f
 
-#define EXCAVATOR_ENGINE_RPM							10.0f
-#define EXCAVATOR_STEERING_RPM							 5.0f
-#define EXCAVATOR_ENGINE_TORQUE							20000.0f
-#define EXCAVATOR_STEERING_TORQUE						20000.0f
+#define EXCAVATOR_GEAR_GAIN								5.0f
+#define EXCAVATOR_ENGINE_RPM							40.0f
+#define EXCAVATOR_STEERING_RPM							25.0f
+#define EXCAVATOR_ENGINE_TORQUE							5000.0f
+#define EXCAVATOR_STEERING_TORQUE						5000.0f
+
+#define EXCAVATOR_SIMULATE_TRACKS
 
 struct ARTICULATED_VEHICLE_DEFINITION
 {
@@ -69,6 +71,16 @@ class dExcavatorEngine: public dCustomDoubleHinge
 	{
 		EnableLimits(false);
 		EnableLimits1(false);
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dMatrix matrix1;
+		NewtonBodyGetMatrix(m_body1, &matrix1[0][0]);
+
+		dMatrix matrix0 (GetMatrix0().Inverse() * GetMatrix1() * matrix1);
+		NewtonBodySetMatrixNoSleep(m_body0, &matrix0[0][0]);
+		dCustomDoubleHinge::SubmitConstraints(timestep, threadIndex);
 	}
 
 	void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
@@ -112,12 +124,14 @@ class dExcavatorModel: public dModelRootNode
 		,m_shereCast (NewtonCreateSphere (NewtonBodyGetWorld(rootBody), 0.20f, 0, NULL))
 	{
 		AddLocomotion();
+		MakeCabinAndUpperBody();
 
 		MakeLeftTrack();
 		MakeRightTrack();
+#ifdef EXCAVATOR_SIMULATE_TRACKS
 		MakeThread("leftThread", linkMaterilID);
 		MakeThread("rightThread", linkMaterilID);
-		MakeCabinAndUpperBody();
+#endif		
 
 		//AddCraneBase (controller);
 	}
@@ -363,12 +377,11 @@ class dExcavatorModel: public dModelRootNode
 
 		NewtonBody* const tire = leftTire_0->GetBody();
 		NewtonBody* const engine = m_engineJoint->GetBody0();
-		//NewtonBody* const chassis = m_engineJoint->GetBody1();
 		m_engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
 
 		dMatrix tireMatrix;
 		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
-		new dCustomDifferentialGear(1.0f, engineMatrix.m_front.Scale (-1.0f), engineMatrix.m_up, tireMatrix.m_right.Scale(1.0f), engine, tire);
+		new dCustomDifferentialGear(EXCAVATOR_GEAR_GAIN, engineMatrix.m_front.Scale (-1.0f), engineMatrix.m_up, tireMatrix.m_right.Scale(1.0f), engine, tire);
 	}
 
 	void MakeRightTrack()
@@ -391,12 +404,11 @@ class dExcavatorModel: public dModelRootNode
 
 		NewtonBody* const tire = rightTire_0->GetBody();
 		NewtonBody* const engine = m_engineJoint->GetBody0();
-		//NewtonBody* const chassis = m_engineJoint->GetBody1();
 		m_engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
 
 		dMatrix tireMatrix;
 		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
-		new dCustomDifferentialGear(1.0f, engineMatrix.m_front.Scale (1.0f), engineMatrix.m_up, tireMatrix.m_right.Scale(-1.0f), engine, tire);
+		new dCustomDifferentialGear(EXCAVATOR_GEAR_GAIN, engineMatrix.m_front.Scale (1.0f), engineMatrix.m_up, tireMatrix.m_right.Scale(-1.0f), engine, tire);
 	}
 
 	NewtonBody* MakeThreadLinkBody(DemoEntity* const linkNode, NewtonCollision* const linkCollision, int linkMaterilID)
