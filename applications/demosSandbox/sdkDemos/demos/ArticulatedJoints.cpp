@@ -25,7 +25,10 @@
 #define ARTICULATED_VEHICLE_CAMERA_DISTANCE				11.0f
 #define EXCAVATOR_TREAD_THICKNESS						0.13f
 
-#define EXCAVATOR_ENGINE_TORQUE							4000.0f
+#define EXCAVATOR_ENGINE_RPM							10.0f
+#define EXCAVATOR_STEERING_RPM							 5.0f
+#define EXCAVATOR_ENGINE_TORQUE							20000.0f
+#define EXCAVATOR_STEERING_TORQUE						20000.0f
 
 struct ARTICULATED_VEHICLE_DEFINITION
 {
@@ -47,7 +50,12 @@ struct ARTICULATED_VEHICLE_DEFINITION
 class dExcavatorControls
 {
 	public:
+	dExcavatorControls()
+	{
+		memset (this, 0, sizeof (dExcavatorControls));
+	}
 	dFloat m_throttle;
+	dFloat m_steeringValue;
 };
 
 
@@ -57,7 +65,7 @@ class dExcavatorEngine: public dCustomDoubleHinge
 
 	dExcavatorEngine(const dMatrix& pinAndPivotFrame, NewtonBody* const engine, NewtonBody* const chassis)
 		:dCustomDoubleHinge(pinAndPivotFrame, engine, chassis)
-		,m_throttle(0.0f)
+		,m_control()
 	{
 		EnableLimits(false);
 		EnableLimits1(false);
@@ -67,15 +75,22 @@ class dExcavatorEngine: public dCustomDoubleHinge
 	{
 		dCustomDoubleHinge::SubmitAngularRow(matrix0, matrix1, timestep);
 
-		const dVector& frontDir = matrix0.m_up;
-		NewtonUserJointAddAngularRow(m_joint, 0.0f, &frontDir[0]);
-		dFloat accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) - m_throttle / timestep;
+		const dVector& tractionDir = matrix0.m_up;
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &tractionDir[0]);
+		dFloat accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) - EXCAVATOR_ENGINE_RPM * m_control.m_throttle / timestep;
 		NewtonUserJointSetRowAcceleration(m_joint, accel);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -EXCAVATOR_ENGINE_TORQUE);
 		NewtonUserJointSetRowMaximumFriction(m_joint, EXCAVATOR_ENGINE_TORQUE);
+
+		const dVector& steeringDir = matrix0.m_front;
+		NewtonUserJointAddAngularRow(m_joint, 0.0f, &steeringDir[0]);
+		accel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) - EXCAVATOR_STEERING_RPM * m_control.m_steeringValue / timestep;
+		NewtonUserJointSetRowAcceleration(m_joint, accel);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -EXCAVATOR_STEERING_TORQUE);
+		NewtonUserJointSetRowMaximumFriction(m_joint, EXCAVATOR_STEERING_TORQUE);
 	}
 
-	dFloat m_throttle;
+	dExcavatorControls m_control;
 };
 
 class dExcavatorModel: public dModelRootNode
@@ -114,10 +129,11 @@ class dExcavatorModel: public dModelRootNode
 
 	void ApplyControls(const dExcavatorControls& control)
 	{
-		if (m_engineJoint->m_throttle) {
+		if (m_engineJoint->m_control.m_throttle || 
+			m_engineJoint->m_control.m_steeringValue) {
 			NewtonBodySetSleepState(GetBody(), 0);
 		}
-		m_engineJoint->m_throttle = control.m_throttle * 30.0f;
+		m_engineJoint->m_control = control;
 	}
 
 	virtual void OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
@@ -352,10 +368,7 @@ class dExcavatorModel: public dModelRootNode
 
 		dMatrix tireMatrix;
 		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
-
-//		dFloat sign = dSign(engineMatrix.m_up.DotProduct3(tireHingeMatrix.m_posit - engineMatrix.m_posit));
-//		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, engineMatrix.m_front.Scale(sign), chassisMatrix.m_up, tire, engine, chassis);
-		new dCustomGear(5.0f, tireMatrix.m_right.Scale(1.0f), engineMatrix.m_up, tire, engine);
+		new dCustomDifferentialGear(1.0f, engineMatrix.m_front.Scale (-1.0f), engineMatrix.m_up, tireMatrix.m_right.Scale(1.0f), engine, tire);
 	}
 
 	void MakeRightTrack()
@@ -383,10 +396,7 @@ class dExcavatorModel: public dModelRootNode
 
 		dMatrix tireMatrix;
 		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
-
-		//dFloat sign = dSign(engineMatrix.m_up.DotProduct3(tireHingeMatrix.m_posit - engineMatrix.m_posit));
-		//new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up, engineMatrix.m_front.Scale(sign), chassisMatrix.m_up, tire, engine, chassis);
-		new dCustomGear(5.0f, tireMatrix.m_right.Scale(-1.0f) , engineMatrix.m_up, tire, engine);
+		new dCustomDifferentialGear(1.0f, engineMatrix.m_front.Scale (1.0f), engineMatrix.m_up, tireMatrix.m_right.Scale(-1.0f), engine, tire);
 	}
 
 	NewtonBody* MakeThreadLinkBody(DemoEntity* const linkNode, NewtonCollision* const linkCollision, int linkMaterilID)
@@ -781,9 +791,10 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
 		dExcavatorControls controls;
-		controls.m_throttle = scene->GetKeyState('W') ? 1.0f : (scene->GetKeyState('S') ? -1.0f : 0.0f);
+		controls.m_throttle = (dFloat(scene->GetKeyState('W')) - dFloat(scene->GetKeyState('S')));
+		controls.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
 		//driverInput.m_clutchPedal = scene->GetKeyState('K') ? 0.0f : 1.0f;
-		//driverInput.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
+		
 		//driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
 		//driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
 		//driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene->GetKeyState('I'));

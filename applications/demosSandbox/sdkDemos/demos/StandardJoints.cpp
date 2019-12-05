@@ -879,10 +879,11 @@ static void AddDifferential(DemoEntityManager* const scene, const dVector& origi
 	NewtonBodyGetMatrix(box0, &referenceMatrix[0][0]);
 
 	// connect right differential
-	new dCustomDifferentialGear(2.0f, matrix1.m_front, matrix3.m_front, referenceMatrix.m_up, box1, box3, box0);
+	dAssert (0);
+//	new dCustomDifferentialGear(2.0f, matrix1.m_front, matrix3.m_front, referenceMatrix.m_up, box1, box3, box0);
 
 	// connect left differential
-	new dCustomDifferentialGear(2.0f, matrix2.m_front, matrix3.m_front, referenceMatrix.m_up.Scale (-1.0f), box2, box3, box0);
+//	new dCustomDifferentialGear(2.0f, matrix2.m_front, matrix3.m_front, referenceMatrix.m_up.Scale (-1.0f), box2, box3, box0);
 
 	dVector damp(0.0f);
 	dVector omega(10.0f, 10.0f, 0.0f, 0.0f);

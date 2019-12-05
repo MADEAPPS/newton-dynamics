@@ -686,8 +686,9 @@ class ServoVehicleManagerManager: public dModelManager
 		NewtonBody* const engine = lifterData->m_engineJoint->GetBody0();
 		lifterData->m_engineJoint->CalculateGlobalMatrix(engineMatrix, chassisMatrix);
 
-		dFloat sign = dSign(engineMatrix.m_up.DotProduct3(tireHingeMatrix.m_posit - engineMatrix.m_posit));
-		new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up.Scale(-1.0f), engineMatrix.m_front.Scale(sign), chassisMatrix.m_up, tire, engine, chassis);
+		dAssert (0);
+		//dFloat sign = dSign(engineMatrix.m_up.DotProduct3(tireHingeMatrix.m_posit - engineMatrix.m_posit));
+		//new dCustomDifferentialGear(5.0f, tireHingeMatrix.m_up.Scale(-1.0f), engineMatrix.m_front.Scale(sign), chassisMatrix.m_up, tire, engine, chassis);
 
 		return wheel;
 	}
