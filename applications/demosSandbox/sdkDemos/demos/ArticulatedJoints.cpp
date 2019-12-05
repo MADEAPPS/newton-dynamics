@@ -521,7 +521,7 @@ class dExcavatorModel: public dModelRootNode
 		NewtonBody* const parentBody = parentNode->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
 		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
-		DemoEntity* const bodyPart = parentModel->Find("EngineBody");
+		DemoEntity* const bodyPart = parentModel->Find(name);
 
 		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
 		dAssert(shape);
@@ -570,64 +570,29 @@ class dExcavatorModel: public dModelRootNode
 
 	void MakeCabinAndUpperBody ()
 	{
+		// add cabin and engine upper body
 		NewtonBody* const parentBody = GetBody();
-		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
-		DemoEntity* const bodyPart = parentModel->Find("EngineBody");
-
-#if 0	
-		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
-		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
-		dAssert(shape);
-
-		// calculate the bone matrix
-		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
-
-		// create the rigid body that will make this bone
-		NewtonBody* const body = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
-
-		// assign the material ID
-		NewtonBodySetMaterialGroupID(body, NewtonMaterialGetDefaultGroupID(world));
-
-		// destroy the collision helper shape 
-		NewtonDestroyCollision(shape);
-
-		// get the collision from body
-		NewtonCollision* const collision = NewtonBodyGetCollision(body);
-
-		// save the root node as the use data
-		NewtonCollisionSetUserData(collision, this);
-
-		// set the material properties for each link
-		NewtonCollisionMaterial material;
-		NewtonCollisionGetMaterial(collision, &material);
-		material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
-		material.m_userParam[0].m_int =
-			ARTICULATED_VEHICLE_DEFINITION::m_terrain |
-			ARTICULATED_VEHICLE_DEFINITION::m_bodyPart |
-			ARTICULATED_VEHICLE_DEFINITION::m_linkPart |
-			ARTICULATED_VEHICLE_DEFINITION::m_tirePart |
-			ARTICULATED_VEHICLE_DEFINITION::m_propBody;
-		NewtonCollisionSetMaterial(collision, &material);
-
-		// calculate the moment of inertia and the relative center of mass of the solid
-		NewtonBodySetMassProperties(body, 400.0f, collision);
-
-		// save the user data with the bone body (usually the visual geometry)
-		NewtonBodySetUserData(body, bodyPart);
-
-		// set the bod part force and torque call back to the gravity force, skip the transform callback
-		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
-#else
-		NewtonBody* const body = MakeBodyPart(this, "EngineBody", 400.0f);
-#endif
+		//DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
+		//DemoEntity* const bodyPart = parentModel->Find("EngineBody");
+		NewtonBody* const cabinBody = MakeBodyPart(this, "EngineBody", 400.0f);
 
 		// connect the part to the main body with a hinge
 		dMatrix hingeFrame;
-		NewtonBodyGetMatrix(body, &hingeFrame[0][0]);
-		new dCustomHinge(hingeFrame, body, parentBody);
+		NewtonBodyGetMatrix(cabinBody, &hingeFrame[0][0]);
+		new dCustomHinge(hingeFrame, cabinBody, parentBody);
 
-		dMatrix bindMatrix(bodyPart->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
-		dModelNode* const cabinNode = new dModelNode(body, bindMatrix, this);
+		//dMatrix bindMatrix(bodyPart->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
+		dMatrix bindMatrix(dGetIdentityMatrix());
+		dModelNode* const cabinNode = new dModelNode(cabinBody, bindMatrix, this);
+
+		// add boom
+		NewtonBody* const boomBody = MakeBodyPart(cabinNode, "Boom", 200.0f);
+		NewtonBodyGetMatrix(boomBody, &hingeFrame[0][0]);
+		hingeFrame = dYawMatrix(90.0f * dDegreeToRad) * hingeFrame;
+		new dCustomHinge(hingeFrame, boomBody, cabinBody);
+		dModelNode* const boomNode = new dModelNode(boomBody, bindMatrix, cabinNode);
+
+
 	}
 
 	void AddLocomotion()
