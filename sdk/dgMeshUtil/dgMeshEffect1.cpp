@@ -3768,9 +3768,9 @@ void dgMeshEffect::RepairTJoints ()
 	DeleteDegenerateFaces(&m_points.m_vertex[0].m_x, sizeof (dgBigVector), dgFloat64 (1.0e-7f));
 	dgAssert (Sanity ());
 
-
 	// delete straight line edges
 	dirty = true;
+//	dirty = false;
 	while (dirty) {
 		dgFloat64 tol = dgFloat64(1.0 - 1.0e-8);
 		dgFloat64 tol2 = tol * tol;
@@ -3889,7 +3889,8 @@ void dgMeshEffect::RepairTJoints ()
 						}
 					} else if (FindEdge(edge->m_incidentVertex, edge->m_next->m_next->m_incidentVertex)) {
 						dgEdge* const openEdge = edge;
-						dgAssert (openEdge->m_incidentFace <= 0);
+						//dgAssert (openEdge->m_incidentFace <= 0);
+						dgTrace(("remember to finish this!!: %s %s line:%d\n", __FILE__, __FUNCTION__, __LINE__));
 						dgEdge* const nextEdge = openEdge->m_next;
 						dgEdge* const deletedEdge = openEdge->m_prev;
 						if (deletedEdge == openEdge->m_next->m_next) {
@@ -3898,7 +3899,8 @@ void dgMeshEffect::RepairTJoints ()
 								iter1 ++;
 							}
 
-							dgAssert (deletedEdge->m_twin->m_incidentFace > 0);
+							//dgAssert (deletedEdge->m_twin->m_incidentFace > 0);
+							dgTrace(("remember to finish this!!: %s %s line:%d\n", __FILE__, __FUNCTION__, __LINE__));
 							openEdge->m_incidentFace = deletedEdge->m_twin->m_incidentFace;
 							openEdge->m_next->m_incidentFace = deletedEdge->m_twin->m_incidentFace;
 
