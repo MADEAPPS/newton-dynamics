@@ -670,18 +670,10 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		dMatrix playerMatrix(player->GetNextMatrix());
 
 		dVector frontDir(camMatrix[0]);
-		dVector camOrigin(0.0f);
-		if (1) {
-			camOrigin = playerMatrix.m_posit + dVector(0.0f, ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f);
-			camOrigin -= frontDir.Scale(ARTICULATED_VEHICLE_CAMERA_DISTANCE);
-		} else {
-			dAssert(0);
-			//           camMatrix = camMatrix * playerMatrix;
-			//           camOrigin = playerMatrix.TransformVector(dVector(-0.8f, ARTICULATED_VEHICLE_CAMERA_EYEPOINT, 0.0f, 0.0f));
-		}
+		dVector camOrigin (playerMatrix.m_posit + dVector(0.0f, ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f));
+		camOrigin -= frontDir.Scale(ARTICULATED_VEHICLE_CAMERA_DISTANCE);
 		camera->SetNextMatrix(*scene, camMatrix, camOrigin);
 	}
-
 
 	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, dFloat mass)
 	{
@@ -720,7 +712,6 @@ class ArticulatedVehicleManagerManager: public dModelManager
 			ARTICULATED_VEHICLE_DEFINITION::m_propBody;
 		NewtonCollisionSetMaterial(collision, &material);
 
-
 		// calculate the moment of inertia and the relative center of mass of the solid
 		NewtonBodySetMassProperties(body, mass, collision);
 
@@ -756,35 +747,6 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		// add the model to the manager
 		AddRoot(controller);
 
-
-#if 0
-	/*
-
-		dCustomTransformController::dSkeletonBone* stackPool[32];
-		stackPool[0] = chassisBone;
-		int stack = 1;
-		while (stack) {
-			stack --;
-			dCustomTransformController::dSkeletonBone* const bone = stackPool[stack];
-			NewtonBody* const body = bone->m_body;
-			NewtonCollision* const collision = NewtonBodyGetCollision(body);
-
-			NewtonCollisionSetUserData (collision, controller);
-			if (NewtonCollisionGetType(collision) == SERIALIZE_ID_COMPOUND) {
-				for (void* node = NewtonCompoundCollisionGetFirstNode(collision); node; node = NewtonCompoundCollisionGetNextNode(collision, node)) {
-					NewtonCollision* const subShape = NewtonCompoundCollisionGetCollisionFromNode (collision, node);
-					NewtonCollisionSetUserData (subShape, controller);
-				}
-			}
-
-			for (dCustomTransformController::dSkeletonBone::dListNode* node = bone->GetFirst(); node; node = node->GetNext()) {
-				stackPool[stack] = &node->GetInfo(); 
-				stack ++;
-			}
-		}
-*/
-#endif
-
 		m_player = controller;
 		return controller;
 	}
@@ -805,12 +767,6 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		dExcavatorControls controls;
 		controls.m_throttle = (dFloat(scene->GetKeyState('W')) - dFloat(scene->GetKeyState('S')));
 		controls.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
-		//driverInput.m_clutchPedal = scene->GetKeyState('K') ? 0.0f : 1.0f;
-		
-		//driverInput.m_brakePedal = scene->GetKeyState('S') ? 1.0f : 0.0f;
-		//driverInput.m_handBrakeValue = scene->GetKeyState(' ') ? 1.0f : 0.0f;
-		//driverInput.m_ignitionKey = m_engineKeySwitch.UpdatePushButton(scene->GetKeyState('I'));
-		//driverInput.m_ignitionKey = 1;
 
 		excavator->ApplyControls(controls);
 	}
@@ -862,7 +818,6 @@ class ArticulatedVehicleManagerManager: public dModelManager
 
 		dAssert(NewtonCollisionGetUserID(collision0) == ARTICULATED_VEHICLE_DEFINITION::m_linkPart);
 		dAssert(NewtonCollisionGetUserID(collision1) == ARTICULATED_VEHICLE_DEFINITION::m_terrain);
-		//dAssert (NewtonCollisionGetUserID(collision1) & (ARTICULATED_VEHICLE_DEFINITION::m_linkPart | ARTICULATED_VEHICLE_DEFINITION::m_terrain));
 
 		dExcavatorModel* const excavator = (dExcavatorModel*)NewtonCollisionGetUserData(collision0);
 		dAssert (excavator);
@@ -898,9 +853,6 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	NewtonCollisionSetMaterial(floorCollision, &material);
 	NewtonBodySetMaterialGroupID(floor, specialThreadId);
 
-	// add an input Manage to manage the inputs and user interaction 
-	//AriculatedJointInputManager* const inputManager = new AriculatedJointInputManager (scene);
-
 	//  create a skeletal transform controller for controlling rag doll
 	ArticulatedVehicleManagerManager* const vehicleManager = new ArticulatedVehicleManagerManager (scene, specialThreadId);
 
@@ -911,17 +863,9 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit = FindFloor (world, origin, 100.0f);
 	matrix.m_posit.m_y += 1.5f;
 
-	//DemoEntity* const model = DemoEntity::LoadNGD_mesh ("excavator.ngd", scene->GetNewton(), scene->GetShaderCache());
-	//scene->Append(xxxx);
-	//xxxx->ResetMatrix(*scene, matrix);
+	//dModelRootNode* const excavator = vehicleManager->CreateExcavator ("excavator.ngd", matrix);
+	vehicleManager->CreateExcavator("excavator.ngd", matrix);
 
-//	ArticulatedEntityModel* const vehicleModel = (ArticulatedEntityModel*)robotModel.CreateClone();
-//	scene->Append(vehicleModel);
-//	ArticulatedEntityModel robotModel(scene, "excavator.ngd");
-
-	dModelRootNode* const excavator = vehicleManager->CreateExcavator ("excavator.ngd", matrix);
-
-//	inputManager->AddPlayer (robot);
 	matrix.m_posit.m_z += 30.0f;
 	matrix.m_posit.m_x += 10.0f;
 
@@ -945,7 +889,6 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 			NewtonCollisionSetMaterial(collision, &material);
 		}
 	}
-
 
 	origin.m_x -= 15.0f;
 	origin.m_y += 5.0f;
