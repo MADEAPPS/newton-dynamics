@@ -592,6 +592,13 @@ class dExcavatorModel: public dModelRootNode
 		new dCustomHinge(hingeFrame, boomBody, cabinBody);
 		dModelNode* const boomNode = new dModelNode(boomBody, bindMatrix, cabinNode);
 
+		// add Arm
+		NewtonBody* const armBody = MakeBodyPart(cabinNode, "arm02", 150.0f);
+		NewtonBodyGetMatrix(armBody, &hingeFrame[0][0]);
+		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
+		new dCustomHinge(hingeFrame, armBody, boomBody);
+		dModelNode* const armNode = new dModelNode(armBody, bindMatrix, boomNode);
+
 
 	}
 
