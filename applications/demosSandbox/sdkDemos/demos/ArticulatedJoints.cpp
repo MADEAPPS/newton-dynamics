@@ -30,7 +30,7 @@
 #define EXCAVATOR_ENGINE_TORQUE							5000.0f
 #define EXCAVATOR_STEERING_TORQUE						5000.0f
 
-#define EXCAVATOR_SIMULATE_TRACKS
+//#define EXCAVATOR_SIMULATE_TRACKS
 
 struct ARTICULATED_VEHICLE_DEFINITION
 {
@@ -132,8 +132,6 @@ class dExcavatorModel: public dModelRootNode
 		MakeThread("leftThread", linkMaterilID);
 		MakeThread("rightThread", linkMaterilID);
 #endif		
-
-		//AddCraneBase (controller);
 	}
 
 	~dExcavatorModel()
@@ -518,13 +516,13 @@ class dExcavatorModel: public dModelRootNode
 		NewtonDestroyCollision(linkCollision);
 	}
 
-	void MakeCabinAndUpperBody ()
+	NewtonBody* MakeBodyPart(dModelNode* const parentNode, const char* const name, dFloat mass)
 	{
-		NewtonBody* const parentBody = GetBody();
+		NewtonBody* const parentBody = parentNode->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
 		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
 		DemoEntity* const bodyPart = parentModel->Find("EngineBody");
-		
+
 		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
 		dAssert(shape);
 
@@ -567,13 +565,69 @@ class dExcavatorModel: public dModelRootNode
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
 		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
 
+		return body;
+	}
+
+	void MakeCabinAndUpperBody ()
+	{
+		NewtonBody* const parentBody = GetBody();
+		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
+		DemoEntity* const bodyPart = parentModel->Find("EngineBody");
+
+#if 0	
+		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
+		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
+		dAssert(shape);
+
+		// calculate the bone matrix
+		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
+
+		// create the rigid body that will make this bone
+		NewtonBody* const body = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
+
+		// assign the material ID
+		NewtonBodySetMaterialGroupID(body, NewtonMaterialGetDefaultGroupID(world));
+
+		// destroy the collision helper shape 
+		NewtonDestroyCollision(shape);
+
+		// get the collision from body
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+
+		// save the root node as the use data
+		NewtonCollisionSetUserData(collision, this);
+
+		// set the material properties for each link
+		NewtonCollisionMaterial material;
+		NewtonCollisionGetMaterial(collision, &material);
+		material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		material.m_userParam[0].m_int =
+			ARTICULATED_VEHICLE_DEFINITION::m_terrain |
+			ARTICULATED_VEHICLE_DEFINITION::m_bodyPart |
+			ARTICULATED_VEHICLE_DEFINITION::m_linkPart |
+			ARTICULATED_VEHICLE_DEFINITION::m_tirePart |
+			ARTICULATED_VEHICLE_DEFINITION::m_propBody;
+		NewtonCollisionSetMaterial(collision, &material);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		NewtonBodySetMassProperties(body, 400.0f, collision);
+
+		// save the user data with the bone body (usually the visual geometry)
+		NewtonBodySetUserData(body, bodyPart);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+#else
+		NewtonBody* const body = MakeBodyPart(this, "EngineBody", 400.0f);
+#endif
+
 		// connect the part to the main body with a hinge
 		dMatrix hingeFrame;
 		NewtonBodyGetMatrix(body, &hingeFrame[0][0]);
 		new dCustomHinge(hingeFrame, body, parentBody);
 
 		dMatrix bindMatrix(bodyPart->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
-		new dModelNode(body, bindMatrix, this);
+		dModelNode* const cabinNode = new dModelNode(body, bindMatrix, this);
 	}
 
 	void AddLocomotion()
@@ -870,14 +924,14 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_x += 10.0f;
 
 	// add some object to play with
-	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
-	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
-	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
-	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
-	LoadLumberYardMesh(scene, dVector(14.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
-	LoadLumberYardMesh(scene, dVector(14.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
-	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
-	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(14.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(14.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+//	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
 
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
