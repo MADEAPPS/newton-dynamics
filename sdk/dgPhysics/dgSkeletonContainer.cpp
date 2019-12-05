@@ -859,15 +859,14 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 			}
 			dgSolveCholesky(m_blockSize, m_auxiliaryRowCount, m_massMatrix11, g, g);
 
-			const dgFloat32* const row2 = &m_massMatrix11[(m_blockSize + i) * m_auxiliaryRowCount];
 			dgFloat32* const arow = &m_massMatrix11[(m_blockSize + i) * m_auxiliaryRowCount + m_blockSize];
-			arow[i] = row2[m_blockSize + i] + dgDotProduct(m_blockSize, g, row2);
-			for (int j = i + 1; j < boundedSize; j++) {
+			for (int j = i; j < boundedSize; j++) {
 				const dgFloat32* const row1 = &m_massMatrix11[(m_blockSize + j) * m_auxiliaryRowCount];
 				dgFloat32 elem = row1[m_blockSize + i] + dgDotProduct(m_blockSize, g, row1);
 				arow[j] = elem;
 				m_massMatrix11[(m_blockSize + j) * m_auxiliaryRowCount + m_blockSize + i] = elem;
 			}
+			arow[i] += diagDamp[m_blockSize + i];
 		}
 
 		dgAssert (dgTestPSDmatrix(boundedSize, m_auxiliaryRowCount, &m_massMatrix11[m_auxiliaryRowCount * m_blockSize + m_blockSize]));
