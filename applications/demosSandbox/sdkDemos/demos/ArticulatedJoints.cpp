@@ -574,7 +574,7 @@ class dExcavatorModel: public dModelRootNode
 	{
 		// add cabin and engine upper body
 		NewtonBody* const parentBody = GetBody();
-		NewtonBody* const cabinBody = MakeBodyPart(this, "EngineBody", 400.0f);
+		NewtonBody* const cabinBody = MakeBodyPart(this, "EngineBody", 600.0f);
 
 		// connect the part to the main body with a hinge
 		dMatrix hingeFrame;
@@ -603,14 +603,14 @@ class dExcavatorModel: public dModelRootNode
 		new dCustomHinge(hingeFrame, armBody, boomBody);
 		dModelNode* const armNode = new dModelNode(armBody, bindMatrix, boomNode);
 
-		// add buckect
+		// add bucket
 		NewtonBody* const bucketBody = MakeBodyPart(armNode, "bucket", 50.0f);
 		NewtonBodyGetMatrix(bucketBody, &hingeFrame[0][0]);
 		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
 		new dCustomHinge(hingeFrame, bucketBody, armBody);
 		new dModelNode(bucketBody, bindMatrix, armNode);
 
-		// create effectot to control buckect
+		// create effector to control bucket
 		NewtonBody* const effectorReferenceBody = GetBody();
 		m_effector = new dCustomKinematicController(armBody, hingeFrame, effectorReferenceBody);
 		m_effector->SetSolverModel(1);
@@ -630,7 +630,7 @@ class dExcavatorModel: public dModelRootNode
 		engineMatrix = dRollMatrix(0.5f * dPi) * engineMatrix;
 		engineMatrix.m_posit.m_y += 1.0f;
 
-		// make a non collidable engine body
+		// make a non collideble engine body
 		NewtonBody* const engineBody = NewtonCreateDynamicBody(world, shape, &engineMatrix[0][0]);
 
 		// destroy the collision helper shape
@@ -677,6 +677,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		,m_threadMaterialID(threadMaterialID)
 	{
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
+		scene->Set2DDisplayRenderFunction(RenderPlayerHelp, NULL, this);
 
 		// create a material for early collision culling
 		NewtonWorld* const world = scene->GetNewton();
@@ -697,6 +698,22 @@ class ArticulatedVehicleManagerManager: public dModelManager
 	{
 		ArticulatedVehicleManagerManager* const me = (ArticulatedVehicleManagerManager*)context;
 		me->UpdateCamera(timestep);
+	}
+
+	static void RenderPlayerHelp(DemoEntityManager* const scene, void* const context)
+	{
+		ArticulatedVehicleManagerManager* const me = (ArticulatedVehicleManagerManager*)context;
+		me->RenderPlayerHelp(scene);
+	}
+
+	void RenderPlayerHelp(DemoEntityManager* const scene)
+	{
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print(color, "Navigation Keys");
+		scene->Print(color, "drive forward:      w");
+		scene->Print(color, "drive backward:     s");
+		scene->Print(color, "turn right:         d");
+		scene->Print(color, "turn left:          a");
 	}
 
 	void UpdateCamera(dFloat timestep)
