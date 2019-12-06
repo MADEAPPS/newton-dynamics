@@ -575,7 +575,7 @@ class dExcavatorModel: public dModelRootNode
 	{
 		// add cabin and engine upper body
 		NewtonBody* const parentBody = GetBody();
-		NewtonBody* const cabinBody = MakeBodyPart(this, "EngineBody", 600.0f);
+		NewtonBody* const cabinBody = MakeBodyPart(this, "EngineBody", 400.0f);
 
 		// connect the part to the main body with a hinge
 		dMatrix hingeFrame;
