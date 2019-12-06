@@ -80,7 +80,6 @@ class dgBodyMasterList: public dgList<dgBodyMasterListRow>
 	public:
 	dgTree<int, dgBody*> m_disableBodies;
 	dgUnsigned32 m_constraintCount;
-	dgInt32 m_criticalSectionLock;
 };
 
 #endif

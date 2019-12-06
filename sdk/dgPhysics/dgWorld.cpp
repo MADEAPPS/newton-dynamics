@@ -457,10 +457,11 @@ void dgWorld::RemoveAllGroupID()
 	m_defualtBodyGroupID = CreateBodyGroupID();
 }
 
-
 void dgWorld::InitBody (dgBody* const body, dgCollisionInstance* const collision, const dgMatrix& matrix)
 {
 	dgAssert (collision);
+	dgDeadBodies& deadBodyList = *this;
+	dgScopeSpinLock lock(&deadBodyList.m_lock);
 
 	m_bodiesUniqueID ++;
 	body->m_world = this;
@@ -470,10 +471,9 @@ void dgWorld::InitBody (dgBody* const body, dgCollisionInstance* const collision
 
 	dgBodyMasterList::AddBody(body);
 
+	body->SetLinearDamping(dgFloat32(0.1045f));
 	body->SetCentreOfMass (dgVector (dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (0.0f), dgFloat32 (1.0f))); 
-	body->SetLinearDamping (dgFloat32 (0.1045f)) ;
 	body->SetAngularDamping (dgVector (dgFloat32 (0.1045f), dgFloat32 (0.1045f), dgFloat32 (0.1045f), dgFloat32 (0.0f)));
-
 	body->AttachCollision(collision);
 	body->m_bodyGroupId = dgInt32 (m_defualtBodyGroupID);
 
@@ -543,7 +543,6 @@ dgDynamicBody* dgWorld::CreateDynamicBodyAsymetric(dgCollisionInstance* const co
 	InitBody(body, collision, matrix);
 	return body;
 }
-
 
 dgKinematicBody* dgWorld::CreateKinematicBody (dgCollisionInstance* const collision, const dgMatrix& matrix)
 {

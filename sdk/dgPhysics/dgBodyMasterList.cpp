@@ -127,7 +127,6 @@ dgBodyMasterList::dgBodyMasterList (dgMemoryAllocator* const allocator)
 	:dgList<dgBodyMasterListRow>(allocator)
 	,m_disableBodies(allocator)
 	,m_constraintCount (0)
-	,m_criticalSectionLock(0)
 {
 }
 
@@ -137,7 +136,6 @@ dgBodyMasterList::~dgBodyMasterList(void)
 
 void dgBodyMasterList::AddBody (dgBody* const body)
 {
-	dgScopeSpinLock lock(&m_criticalSectionLock);
 	dgListNode* const node = Append();
 	body->m_masterNode = node;
 	node->GetInfo().SetAllocator (body->GetWorld()->GetAllocator());
@@ -150,7 +148,6 @@ void dgBodyMasterList::AddBody (dgBody* const body)
 
 void dgBodyMasterList::RemoveBody (dgBody* const body)
 {
-	dgScopeSpinLock lock(&m_criticalSectionLock);
 	dgListNode* const node = body->m_masterNode;
 	dgAssert (node);
 	
@@ -310,9 +307,7 @@ DG_INLINE dgUnsigned32 dgBodyMasterList::MakeSortMask(const dgBody* const body) 
 
 void dgBodyMasterList::SortMasterList()
 {
-	dgScopeSpinLock lock(&m_criticalSectionLock);
 	GetFirst()->GetInfo().SortList();
-
 	for (dgListNode* node = GetFirst()->GetNext(); node; ) { 
 		node->GetInfo().SortList();
 		dgBody* const body1 = node->GetInfo().GetBody();
