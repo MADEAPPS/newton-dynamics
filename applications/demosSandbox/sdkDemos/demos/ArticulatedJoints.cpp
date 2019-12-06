@@ -574,14 +574,16 @@ class dExcavatorModel: public dModelRootNode
 	{
 		// add cabin and engine upper body
 		NewtonBody* const parentBody = GetBody();
-		//DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
-		//DemoEntity* const bodyPart = parentModel->Find("EngineBody");
 		NewtonBody* const cabinBody = MakeBodyPart(this, "EngineBody", 400.0f);
 
 		// connect the part to the main body with a hinge
 		dMatrix hingeFrame;
 		NewtonBodyGetMatrix(cabinBody, &hingeFrame[0][0]);
 		new dCustomHinge(hingeFrame, cabinBody, parentBody);
+
+		// set the center of mass of engine
+		dVector com(hingeFrame.UnrotateVector(dVector(-2.0f, 0.0f, 0.0f, 0.0f)));
+		NewtonBodySetCentreOfMass(cabinBody, &com[0]);
 
 		//dMatrix bindMatrix(bodyPart->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
 		dMatrix bindMatrix(dGetIdentityMatrix());
