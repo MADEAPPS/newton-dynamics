@@ -319,14 +319,13 @@ class dgBody
 	friend class dgConstraint;
 	friend class dgDeadBodies;
 	friend class dgBroadPhase;
-	friend class dgBroadPhaseMixed;
-	friend class dgBroadPhaseSegregated;
 	friend class dgCollisionBVH;
 	friend class dgBroadPhaseNode;
 	friend class dgBodyMasterList;
 	friend class dgCollisionScene;
 	friend class dgCollisionConvex;
 	friend class dgInverseDynamics;
+	friend class dgBroadPhaseMixed;
 	friend class dgCollisionCompound;
 	friend class dgCollisionUserMesh;
 	friend class dgBodyMasterListRow;
@@ -335,6 +334,7 @@ class dgBody
 	friend class dgBroadPhaseBodyNode;
 	friend class dgBilateralConstraint;
 	friend class dgBroadPhaseAggregate;
+	friend class dgBroadPhaseSegregated;
 	friend class dgCollisionConvexPolygon;
 	friend class dgCollidingPairCollector;
 	friend class dgCollisionLumpedMassParticles;

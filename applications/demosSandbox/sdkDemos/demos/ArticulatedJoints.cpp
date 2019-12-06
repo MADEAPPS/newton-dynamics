@@ -16,6 +16,7 @@
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
 #include "DemoEntityManager.h"
+#include "dWoodFracture.h"
 
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
@@ -559,7 +560,7 @@ class dExcavatorModel: public dModelRootNode
 		NewtonCollisionSetMaterial(collision, &material);
 
 		// calculate the moment of inertia and the relative center of mass of the solid
-		NewtonBodySetMassProperties(body, 400.0f, collision);
+		NewtonBodySetMassProperties(body, mass, collision);
 
 		// save the user data with the bone body (usually the visual geometry)
 		NewtonBodySetUserData(body, bodyPart);
@@ -590,21 +591,21 @@ class dExcavatorModel: public dModelRootNode
 		dModelNode* const cabinNode = new dModelNode(cabinBody, bindMatrix, this);
 
 		// add boom
-		NewtonBody* const boomBody = MakeBodyPart(cabinNode, "Boom", 100.0f);
+		NewtonBody* const boomBody = MakeBodyPart(cabinNode, "Boom", 50.0f);
 		NewtonBodyGetMatrix(boomBody, &hingeFrame[0][0]);
 		hingeFrame = dYawMatrix(90.0f * dDegreeToRad) * hingeFrame;
 		new dCustomHinge(hingeFrame, boomBody, cabinBody);
 		dModelNode* const boomNode = new dModelNode(boomBody, bindMatrix, cabinNode);
 
 		// add Arm
-		NewtonBody* const armBody = MakeBodyPart(cabinNode, "arm02", 100.0f);
+		NewtonBody* const armBody = MakeBodyPart(cabinNode, "arm02", 50.0f);
 		NewtonBodyGetMatrix(armBody, &hingeFrame[0][0]);
 		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
 		new dCustomHinge(hingeFrame, armBody, boomBody);
 		dModelNode* const armNode = new dModelNode(armBody, bindMatrix, boomNode);
 
 		// add bucket
-		NewtonBody* const bucketBody = MakeBodyPart(armNode, "bucket", 50.0f);
+		NewtonBody* const bucketBody = MakeBodyPart(armNode, "bucket", 40.0f);
 		NewtonBodyGetMatrix(bucketBody, &hingeFrame[0][0]);
 		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
 		new dCustomHinge(hingeFrame, bucketBody, armBody);
@@ -938,6 +939,10 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 //	LoadLumberYardMesh(scene, dVector(14.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
 //	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
 //	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
+
+	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+	WoodVoronoidEffect::AddFracturedWoodPrimitive(scene, 10.0f, dVector(6.0f, 5.0f, 0.0f, 0.0f), dVector(0.3f, 3.0f, 0.3f, 0.0f), 6, 6, 0.5f, ARTICULATED_VEHICLE_DEFINITION::m_propBody, defaultMaterialID, shapeOffsetMatrix);
 
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);

@@ -201,6 +201,9 @@
     <ClCompile Include="..\..\sdkDemos\demos\FlatLandGame.cpp">
       <Filter>demos</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\toolBox\dWoodFracture.cpp">
+      <Filter>utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\sdkDemos\toolBox\DebugDisplay.h">
@@ -258,6 +261,9 @@
       <Filter>mainLogic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\toolBox\dSoundManager.h">
+      <Filter>utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\sdkDemos\toolBox\dWoodFracture.h">
       <Filter>utils</Filter>
     </ClInclude>
   </ItemGroup>
