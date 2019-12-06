@@ -122,6 +122,8 @@ class dExcavatorModel: public dModelRootNode
 	dExcavatorModel(NewtonBody* const rootBody, int linkMaterilID)
 		:dModelRootNode(rootBody, dGetIdentityMatrix())
 		,m_shereCast (NewtonCreateSphere (NewtonBodyGetWorld(rootBody), 0.20f, 0, NULL))
+		,m_engineJoint(NULL)
+		,m_effector(NULL)
 	{
 		AddLocomotion();
 		MakeCabinAndUpperBody();
@@ -586,27 +588,32 @@ class dExcavatorModel: public dModelRootNode
 		dModelNode* const cabinNode = new dModelNode(cabinBody, bindMatrix, this);
 
 		// add boom
-		NewtonBody* const boomBody = MakeBodyPart(cabinNode, "Boom", 200.0f);
+		NewtonBody* const boomBody = MakeBodyPart(cabinNode, "Boom", 100.0f);
 		NewtonBodyGetMatrix(boomBody, &hingeFrame[0][0]);
 		hingeFrame = dYawMatrix(90.0f * dDegreeToRad) * hingeFrame;
 		new dCustomHinge(hingeFrame, boomBody, cabinBody);
 		dModelNode* const boomNode = new dModelNode(boomBody, bindMatrix, cabinNode);
 
 		// add Arm
-		NewtonBody* const armBody = MakeBodyPart(cabinNode, "arm02", 150.0f);
+		NewtonBody* const armBody = MakeBodyPart(cabinNode, "arm02", 100.0f);
 		NewtonBodyGetMatrix(armBody, &hingeFrame[0][0]);
 		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
 		new dCustomHinge(hingeFrame, armBody, boomBody);
 		dModelNode* const armNode = new dModelNode(armBody, bindMatrix, boomNode);
 
 		// add buckect
-		NewtonBody* const bucketBody = MakeBodyPart(armNode, "bucket", 100.0f);
+		NewtonBody* const bucketBody = MakeBodyPart(armNode, "bucket", 50.0f);
 		NewtonBodyGetMatrix(bucketBody, &hingeFrame[0][0]);
 		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
 		new dCustomHinge(hingeFrame, bucketBody, armBody);
-		dModelNode* const bucketNode = new dModelNode(bucketBody, bindMatrix, armNode);
+		new dModelNode(bucketBody, bindMatrix, armNode);
 
-
+		// create effectot to control buckect
+		NewtonBody* const effectorReferenceBody = GetBody();
+		m_effector = new dCustomKinematicController(armBody, hingeFrame, effectorReferenceBody);
+		m_effector->SetSolverModel(1);
+		m_effector->SetControlMode(dCustomKinematicController::m_linear);
+		m_effector->SetMaxLinearFriction(2000.0f * 9.8f * 50.0f);
 	}
 
 	void AddLocomotion()
@@ -657,6 +664,7 @@ class dExcavatorModel: public dModelRootNode
 
 	NewtonCollision* m_shereCast;
 	dExcavatorEngine* m_engineJoint;
+	dCustomKinematicController* m_effector;
 };
 
 class ArticulatedVehicleManagerManager: public dModelManager
