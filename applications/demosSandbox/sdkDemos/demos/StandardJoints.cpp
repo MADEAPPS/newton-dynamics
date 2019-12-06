@@ -835,7 +835,6 @@ static void AddGearAndRack (DemoEntityManager* const scene, const dVector& origi
 	NewtonCollisionAggregateAddBody(aggregate, body2);
 }
 
-
 static void AddDifferential(DemoEntityManager* const scene, const dVector& origin)
 {
 	dVector size(1.0f, 1.0f, 1.0f);
@@ -875,18 +874,14 @@ static void AddDifferential(DemoEntityManager* const scene, const dVector& origi
 	NewtonBodyGetMatrix(box3, &matrix3[0][0]);
 	new dCustomDoubleHinge(matrix3, box3, box0);
 
-	dMatrix referenceMatrix;
-	NewtonBodyGetMatrix(box0, &referenceMatrix[0][0]);
-
 	// connect right differential
-	dAssert (0);
-//	new dCustomDifferentialGear(2.0f, matrix1.m_front, matrix3.m_front, referenceMatrix.m_up, box1, box3, box0);
+	new dCustomDifferentialGear(2.0f, matrix3.m_up.Scale(1.0f), matrix3.m_front, matrix1.m_front, box3, box1);
 
 	// connect left differential
-//	new dCustomDifferentialGear(2.0f, matrix2.m_front, matrix3.m_front, referenceMatrix.m_up.Scale (-1.0f), box2, box3, box0);
+	new dCustomDifferentialGear(2.0f, matrix3.m_up.Scale(-1.0f), matrix3.m_front, matrix2.m_front, box3, box2);
 
 	dVector damp(0.0f);
-	dVector omega(10.0f, 10.0f, 0.0f, 0.0f);
+	dVector omega(5.0f, 2.0f, 0.0f, 0.0f);
 	NewtonBodySetOmega(box3, &omega[0]);
 	NewtonBodySetAngularDamping(box1, &damp[0]);
 	NewtonBodySetAngularDamping(box2, &damp[0]);
@@ -1318,6 +1313,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddSliderBug(scene, dVector(-20.0f, 0.0f, 17.0f));
 //	AddDoubleHinge(scene, dVector(-20.0f, 0.0f, 17.0f));
 //	AddPathFollow(scene, dVector(20.0f, 0.0f, 0.0f));
+//	AddDifferential(scene, dVector(-20.0f, 0.0f, 33.0f));
 
 #if 1
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
@@ -1336,6 +1332,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddGear (scene, dVector (-20.0f, 0.0f, 22.0f));
 	AddPulley (scene, dVector (-20.0f, 0.0f, 25.0f));
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 29.0f));
+	AddDifferential(scene, dVector(-20.0f, 0.0f, 35.0f));
 	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 #endif
     // place camera into position
