@@ -40,8 +40,6 @@ dgBodyMasterListRow::~dgBodyMasterListRow()
 
 DG_INLINE dgBodyMasterListRow::dgListNode* dgBodyMasterListRow::AddContactJoint (dgContact* const joint, dgBody* const body)
 {
-	//no need for lock since this is called from the main thread only
-	//dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
 	dgListNode* const node = Addtop();
 	node->GetInfo().m_joint = joint;
 	node->GetInfo().m_bodyNode = body;
@@ -72,7 +70,6 @@ void dgBodyMasterListRow::RemoveAllJoints ()
 void dgBodyMasterListRow::RemoveContactJoint (dgListNode* const link)
 {
 	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
-	
 	m_body->m_world->GlobalLock();
 	Remove(link);
 	m_body->m_world->GlobalUnlock();
@@ -81,7 +78,6 @@ void dgBodyMasterListRow::RemoveContactJoint (dgListNode* const link)
 void dgBodyMasterListRow::RemoveBilateralJoint (dgListNode* const link)
 {
 	dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
-	
 	m_body->m_world->GlobalLock();
 	Remove(link);
 	m_body->m_world->GlobalUnlock();
@@ -89,8 +85,6 @@ void dgBodyMasterListRow::RemoveBilateralJoint (dgListNode* const link)
 
 DG_INLINE dgBilateralConstraint* dgBodyMasterListRow::FindBilateralJoint (const dgBody* const otherBody) const
 {
-	//no need for lock since this is called from the main thread only
-	//dgScopeSpinLock lock(&m_body->m_criticalSectionLock);
 	for (dgBodyMasterListRow::dgListNode* link = GetLast(); link && (link->GetInfo().m_joint->GetId() != dgConstraint::m_contactConstraint); link = link->GetPrev()) {
 		if (link->GetInfo().m_bodyNode == otherBody) {
 			dgAssert (link->GetInfo().m_joint->IsBilateral());
@@ -133,6 +127,7 @@ dgBodyMasterList::dgBodyMasterList (dgMemoryAllocator* const allocator)
 	:dgList<dgBodyMasterListRow>(allocator)
 	,m_disableBodies(allocator)
 	,m_constraintCount (0)
+	,m_criticalSectionLock(0)
 {
 }
 
@@ -142,6 +137,7 @@ dgBodyMasterList::~dgBodyMasterList(void)
 
 void dgBodyMasterList::AddBody (dgBody* const body)
 {
+	dgScopeSpinLock lock(&m_criticalSectionLock);
 	dgListNode* const node = Append();
 	body->m_masterNode = node;
 	node->GetInfo().SetAllocator (body->GetWorld()->GetAllocator());
@@ -154,6 +150,7 @@ void dgBodyMasterList::AddBody (dgBody* const body)
 
 void dgBodyMasterList::RemoveBody (dgBody* const body)
 {
+	dgScopeSpinLock lock(&m_criticalSectionLock);
 	dgListNode* const node = body->m_masterNode;
 	dgAssert (node);
 	
@@ -313,6 +310,7 @@ DG_INLINE dgUnsigned32 dgBodyMasterList::MakeSortMask(const dgBody* const body) 
 
 void dgBodyMasterList::SortMasterList()
 {
+	dgScopeSpinLock lock(&m_criticalSectionLock);
 	GetFirst()->GetInfo().SortList();
 
 	for (dgListNode* node = GetFirst()->GetNext(); node; ) { 
