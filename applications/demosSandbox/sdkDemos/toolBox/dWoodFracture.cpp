@@ -331,8 +331,8 @@ WoodVoronoidEffect::WoodVoronoidEffect(NewtonWorld* const world, NewtonMesh* con
 	int count = 0;
 	// pepper the inside of the BBox box of the mesh with random points
 	while (count < NUMBER_OF_INTERNAL_PARTS) {
-		dFloat x = 0.0f;//dGaussianRandom(size.m_x);
-		dFloat y = 0.0f;//dGaussianRandom(size.m_y);
+		dFloat x = dGaussianRandom(size.m_x);
+		dFloat y = dGaussianRandom(size.m_y);
 		dFloat z = dGaussianRandom(size.m_z);
 		if ((x <= size.m_x) && (x >= -size.m_x) && (y <= size.m_y) && (y >= -size.m_y) && (z <= size.m_z) && (z >= -size.m_z)) {
 			points[count] = dVector(x, y, z);

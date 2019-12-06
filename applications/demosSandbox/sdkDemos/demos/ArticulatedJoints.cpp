@@ -675,6 +675,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 	public:
 	ArticulatedVehicleManagerManager (DemoEntityManager* const scene, int threadMaterialID)
 		:dModelManager (scene->GetNewton())
+		,m_player(NULL)
 		,m_threadMaterialID(threadMaterialID)
 	{
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
@@ -925,7 +926,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_y += 1.5f;
 
 	//dModelRootNode* const excavator = vehicleManager->CreateExcavator ("excavator.ngd", matrix);
-	vehicleManager->CreateExcavator("excavator.ngd", matrix);
+//	vehicleManager->CreateExcavator("excavator.ngd", matrix);
 
 	matrix.m_posit.m_z += 30.0f;
 	matrix.m_posit.m_x += 10.0f;
@@ -942,7 +943,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 
 	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
-	WoodVoronoidEffect::AddFracturedWoodPrimitive(scene, 10.0f, dVector(6.0f, 5.0f, 0.0f, 0.0f), dVector(0.3f, 3.0f, 0.3f, 0.0f), 6, 6, 0.5f, ARTICULATED_VEHICLE_DEFINITION::m_propBody, defaultMaterialID, shapeOffsetMatrix);
+	WoodVoronoidEffect::AddFracturedWoodPrimitive(scene, 10.0f, dVector(6.0f, 5.0f, 0.0f, 0.0f), dVector(0.3f, 3.0f, 0.3f, 0.0f), 12, 12, 0.5f, ARTICULATED_VEHICLE_DEFINITION::m_propBody, defaultMaterialID, shapeOffsetMatrix);
 
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);
