@@ -448,6 +448,7 @@ void dgList<T>::InsertAfter (dgListNode* const root, dgListNode* const node)
 	dgAssert (root);
 	if (node != root) {
 		if (root->m_next != node) {
+			dgAssert(SanityCheck());
 			if (node == m_first) {
 				m_first = node->m_next;
 			}
@@ -482,6 +483,7 @@ void dgList<T>::InsertBefore (dgListNode* const root, dgListNode* const node)
 	dgAssert (root);
 	if (node != root) {
 		if (root->m_prev != node) {
+			dgAssert(SanityCheck());
 			if (node == m_last) {
 				m_last = node->m_prev;
 			}
