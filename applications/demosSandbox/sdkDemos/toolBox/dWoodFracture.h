@@ -21,7 +21,7 @@ public:
 	WoodFractureAtom();
 	//
 	dVector m_centerOfMass;
-	dVector m_momentOfInirtia;
+	dVector m_momentOfInertia;
 	DemoMesh* m_mesh;
 	NewtonCollision* m_collision;
 	dFloat m_massFraction;
@@ -48,24 +48,13 @@ public:
 	~SimpleWoodFracturedEffectEntity();
 	//
 	void SimulationPostListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep);
-	static void AddFracturedWoodEntity(DemoEntityManager* const scene, DemoMesh* const visualMesh, NewtonCollision* const collision, const WoodFractureEffect& fractureEffect, const dVector& location);
+	static void AddFracturedWoodEntity(DemoEntityManager* const scene, dFloat massDensity, DemoMesh* const visualMesh, NewtonCollision* const collision, const WoodFractureEffect& fractureEffect, const dVector& location);
 	//
 	int m_delay;
 	WoodFractureEffect m_effect;
 	NewtonBody* m_myBody;
 	dFloat m_myMassInverse;
 	//static unsigned m_lock;
-};
-//unsigned SimpleFracturedEffectEntity::m_lock;
-
-/////////////////////////////////////////
-
-class WoodDelaunayEffect : public WoodFractureEffect
-{
-public:
-	WoodDelaunayEffect(NewtonWorld* const world, NewtonMesh* const mesh, int interiorMaterial);
-	//
-	static void AddFracturedWoodPrimitive(DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, PrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix);
 };
 
 //////////////////////////////////////
@@ -75,7 +64,7 @@ class WoodVoronoidEffect : public WoodFractureEffect
 public:
 	WoodVoronoidEffect(NewtonWorld* const world, NewtonMesh* const mesh, int interiorMaterial);
 	//
-	static void AddFracturedWoodPrimitive(DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, int stype, int materialID, const dMatrix& shapeOffsetMatrix);
+	static void AddFracturedWoodPrimitive(DemoEntityManager* const scene, dFloat density, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, int stype, int materialID, const dMatrix& shapeOffsetMatrix);
 };
 
 
