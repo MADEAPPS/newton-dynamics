@@ -38,7 +38,6 @@
     <ClCompile Include="..\..\sdkDemos\DemoCamera.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoCameraManager.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoEntity.cpp" />
-    <ClCompile Include="..\..\sdkDemos\DemoEntityListener.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoEntityManager.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoInstanceEntity.cpp" />
     <ClCompile Include="..\..\sdkDemos\DemoMesh.cpp" />
@@ -121,7 +120,6 @@
     <ClInclude Include="..\..\sdkDemos\DemoCamera.h" />
     <ClInclude Include="..\..\sdkDemos\DemoCameraManager.h" />
     <ClInclude Include="..\..\sdkDemos\DemoEntity.h" />
-    <ClInclude Include="..\..\sdkDemos\DemoEntityListener.h" />
     <ClInclude Include="..\..\sdkDemos\DemoEntityManager.h" />
     <ClInclude Include="..\..\sdkDemos\DemoInstanceEntity.h" />
     <ClInclude Include="..\..\sdkDemos\DemoMesh.h" />

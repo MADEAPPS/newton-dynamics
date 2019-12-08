@@ -132,9 +132,6 @@
     <ClCompile Include="..\..\sdkDemos\DemoEntity.cpp">
       <Filter>mainLogic</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\DemoEntityListener.cpp">
-      <Filter>mainLogic</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\DemoEntityManager.cpp">
       <Filter>mainLogic</Filter>
     </ClCompile>
@@ -234,9 +231,6 @@
       <Filter>mainLogic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoEntity.h">
-      <Filter>mainLogic</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\sdkDemos\DemoEntityListener.h">
       <Filter>mainLogic</Filter>
     </ClInclude>
     <ClInclude Include="..\..\sdkDemos\DemoEntityManager.h">

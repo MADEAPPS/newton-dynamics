@@ -16,8 +16,6 @@
 #include "dWoodFracture.h"
 
 #define D_WOODFRACTURE_LISTENER "woodFractureListener"
-
-#define INITIAL_DELAY							1000
 #define BREAK_IMPACT_IN_METERS_PER_SECONDS		8.0f
 
 class dWoodFractureListener: public dCustomParallelListener
@@ -71,25 +69,12 @@ class dWoodFractureListener: public dCustomParallelListener
 
 			int count = 8;
 			for (int i = 0; i < count; i ++) {
-				dFloat x = dGaussianRandom(size.m_y * 0.1f);
+				dFloat x = dGaussianRandom(size.m_x * 0.1f);
 				dFloat y = dGaussianRandom(size.m_y * 0.1f);
 				dFloat z = dGaussianRandom(size.m_y * 0.1f);
-				points[count] += dVector(x, y, z);
+				points[i] += dVector(x, y, z);
 			}
 
-/*
-			int count = 0;
-			// pepper the inside of the BBox box of the mesh with random points
-			while (count < NUMBER_OF_INTERNAL_PARTS) {
-				dFloat x = dGaussianRandom(size.m_x);
-				dFloat y = dGaussianRandom(size.m_y);
-				dFloat z = dGaussianRandom(size.m_z);
-				if ((x <= size.m_x) && (x >= -size.m_x) && (y <= size.m_y) && (y >= -size.m_y) && (z <= size.m_z) && (z >= -size.m_z)) {
-					points[count] = dVector(x, y, z);
-					count++;
-				}
-			}
-*/
 			// add the bounding box as a safeguard area
 			points[count + 0] = dVector(size.m_x, size.m_y, size.m_z, 0.0f);
 			points[count + 1] = dVector(size.m_x, size.m_y, -size.m_z, 0.0f);
@@ -215,7 +200,7 @@ class dWoodFractureListener: public dCustomParallelListener
 				matrix.m_posit.m_x = x;
 				matrix.m_posit.m_z = z;
 				dVector floor(FindFloor(world, dVector(matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
-				matrix.m_posit.m_y = floor.m_y + 1.0f;
+				matrix.m_posit.m_y = floor.m_y + 0.5f;
 				dFloat mass = density * NewtonConvexCollisionCalculateVolume(collision);
 				NewtonBody* const body = CreateSimpleSolid (scene, visualMesh, mass, matrix, collision, materialID);
 				WoodVoronoidEffect& newEffect = m_effectList.Append (fracture)->GetInfo();
@@ -404,7 +389,6 @@ void AddFracturedWoodPrimitive(
 	const dVector& origin, const dVector& size,
 	int xCount, int zCount, dFloat spacing, int stype, int materialID, const dMatrix& shapeOffsetMatrix)
 {
-
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();
 

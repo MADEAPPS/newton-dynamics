@@ -70,12 +70,8 @@ class DemoEntity: public dHierarchy<DemoEntity>, virtual public dClassInfo
 
 	void RenderBone() const;
 	virtual void Render(dFloat timeStep, DemoEntityManager* const scene, const dMatrix& matrix) const;
-	virtual void SimulationPreListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep){};
-	virtual void SimulationPostListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep){};
-
 	NewtonCollision* CreateCollisionFromchildren(NewtonWorld* const world) const;
 
-	virtual void MessageHandler (NewtonBody* const sender, int message, void* const data) {}
 	static void TransformCallback(const NewtonBody* body, const dFloat* matrix, int threadIndex);
 
 	protected:

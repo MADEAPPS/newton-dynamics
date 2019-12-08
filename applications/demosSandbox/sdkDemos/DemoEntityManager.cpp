@@ -21,7 +21,6 @@
 #include "ShaderPrograms.h"
 #include "DemoEntityManager.h"
 #include "DemoCameraManager.h"
-#include "DemoEntityListener.h"
 #include "DemoCameraManager.h"
 #include "dHighResolutionTimer.h"
 
@@ -580,8 +579,6 @@ void DemoEntityManager::Cleanup ()
 	// set joint serialization call back
 	dCustomJoint::Initalize(m_world);
 
-	// add all physics pre and post listeners
-	new DemoEntityListener (this);
 
 	// add the camera manager
 	m_cameraManager = new DemoCameraManager(this);
@@ -594,7 +591,7 @@ void DemoEntityManager::Cleanup ()
 	// set the number of sub steps
 	NewtonSetNumberOfSubsteps (m_world, MAX_PHYSICS_SUB_STEPS);
 
-	// register contact creation destrution callbacks
+	// register contact creation destruction callbacks
 	NewtonWorldSetCreateDestroyContactCallback(m_world, OnCreateContact, OnDestroyContact);
 
 	// load all available plug ins
