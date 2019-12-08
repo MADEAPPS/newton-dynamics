@@ -145,6 +145,49 @@ void dgCollisionConvexHull::BuildHull (dgInt32 count, dgInt32 strideInBytes, dgF
 	Create (count, strideInBytes, vertexArray, tolerance);
 }
 
+void dgCollisionConvexHull::MassProperties ()
+{
+	dgFloat32 volume = dgCollisionConvex::CalculateMassProperties(dgGetIdentityMatrix(), m_inertia, m_crossInertia, m_centerOfMass);
+	if (volume < dgFloat32 (1.0e-6f)) {
+		volume = dgFloat32 (1.0e-6f);
+	}
+	dgFloat32 invVolume = dgFloat32(1.0f) / volume;
+	m_inertia = m_inertia.Scale(invVolume);
+	m_crossInertia = m_crossInertia.Scale(invVolume);
+	m_centerOfMass = m_centerOfMass.Scale(invVolume);
+	m_centerOfMass.m_w = volume;
+
+
+	dgMatrix inertia(dgGetIdentityMatrix());
+	inertia[0][0] = m_inertia[0];
+	inertia[1][1] = m_inertia[1];
+	inertia[2][2] = m_inertia[2];
+	inertia[0][1] = m_crossInertia[2];
+	inertia[1][0] = m_crossInertia[2];
+	inertia[0][2] = m_crossInertia[1];
+	inertia[2][0] = m_crossInertia[1];
+	inertia[1][2] = m_crossInertia[0];
+	inertia[2][1] = m_crossInertia[0];
+
+	dgVector origin(m_centerOfMass);
+	dgFloat32 originMag2 = origin.DotProduct(origin & dgVector::m_triplexMask).GetScalar();
+
+	dgMatrix Covariance(origin, origin);
+	dgMatrix parallel(dgGetIdentityMatrix());
+	for (dgInt32 i = 0; i < 3; i++) {
+		parallel[i][i] = originMag2;
+		inertia[i] -= (parallel[i] - Covariance[i]);
+		dgAssert(inertia[i][i] > dgFloat32(0.0f));
+	}
+
+	m_inertia[0] = inertia[0][0];
+	m_inertia[1] = inertia[1][1];
+	m_inertia[2] = inertia[2][2];
+	m_crossInertia[0] = inertia[2][1];
+	m_crossInertia[1] = inertia[2][0];
+	m_crossInertia[2] = inertia[1][0];
+}
+
 dgInt32 dgCollisionConvexHull::GetFaceIndices (dgInt32 index, dgInt32* const indices) const
 {
 	dgInt32 count = 0;

@@ -555,12 +555,13 @@ void dgBody::SetMassProperties (dgFloat32 mass, const dgCollisionInstance* const
 
 	dgVector origin (inertia.m_posit);
 	for (dgInt32 i = 0; i < 3; i ++) {
-		inertia[i][i] = (inertia[i][i] + origin[i] * origin[i]) * mass;
-		for (dgInt32 j = i + 1; j < 3; j ++) {
-			dgFloat32 crossIJ = origin[i] * origin[j];
-			inertia[i][j] = (inertia[i][j] + crossIJ) * mass;
-			inertia[j][i] = (inertia[j][i] + crossIJ) * mass;
-		}
+		inertia[i] = inertia[i].Scale (mass);
+		//inertia[i][i] = (inertia[i][i] + origin[i] * origin[i]) * mass;
+		//for (dgInt32 j = i + 1; j < 3; j ++) {
+		//	dgFloat32 crossIJ = origin[i] * origin[j];
+		//	inertia[i][j] = (inertia[i][j] + crossIJ) * mass;
+		//	inertia[j][i] = (inertia[j][i] + crossIJ) * mass;
+		//}
 	}
 
 	// although the engine fully supports asymmetric inertia, I will ignore cross inertia for now

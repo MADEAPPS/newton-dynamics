@@ -108,10 +108,10 @@ void dgCollisionConvex::SetVolumeAndCG ()
 		}
 	}
 
-	dgVector origin;
-	dgVector inertia;
-	dgVector crossInertia;
-	dgFloat32 volume = localData.MassProperties (origin, inertia, crossInertia);
+	dgVector origin___;
+	dgVector inertia___;
+	dgVector crossInertia___;
+	dgFloat32 volume = localData.MassProperties (origin___, inertia___, crossInertia___);
 	m_simplexVolume = volume;
 
 	// calculate the origin of the bound box of this primitive
@@ -125,8 +125,7 @@ void dgCollisionConvex::SetVolumeAndCG ()
 		dir[i] = dgFloat32 (1.0f);
 		p1[i] = SupportVertex(dir, NULL)[i];
 	}
-//	p0[3] = dgFloat32 (0.0f);
-//	p1[3] = dgFloat32 (0.0f);
+
 	dgAssert (p0.m_w == dgFloat32 (0.0f));
 	dgAssert (p1.m_w == dgFloat32 (0.0f));
 	m_boxSize = (p1 - p0) * dgVector::m_half; 
@@ -136,7 +135,6 @@ void dgCollisionConvex::SetVolumeAndCG ()
 
 	MassProperties ();
 }
-
 
 bool dgCollisionConvex::SanityCheck (dgPolyhedra& hull) const
 {
@@ -245,12 +243,12 @@ void dgCollisionConvex::MassProperties ()
 	dgCollision::MassProperties ();
 }
 
-dgMatrix dgCollisionConvex::CalculateInertiaAndCenterOfMass (const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const
+dgMatrix dgCollisionConvex::CalculateInertiaAndCenterOfMass (const dgMatrix& alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const
 {
 	if ((dgAbs (localScale.m_x - localScale.m_y) < dgFloat32 (1.0e-5f)) && (dgAbs (localScale.m_x - localScale.m_z) < dgFloat32 (1.0e-5f))) {
-		dgAssert (m_alignMatrix[0][0] == dgFloat32(1.0f));
-		dgAssert (m_alignMatrix[1][1] == dgFloat32(1.0f));
-		dgAssert (m_alignMatrix[2][2] == dgFloat32(1.0f));
+		dgAssert (alignMatrix[0][0] == dgFloat32(1.0f));
+		dgAssert (alignMatrix[1][1] == dgFloat32(1.0f));
+		dgAssert (alignMatrix[2][2] == dgFloat32(1.0f));
 
 		// using general central theorem, is much faster and more accurate;
 		//IImatrix = IIorigin + mass * [(displacemnet % displacemnet) * identityMatrix - transpose(displacement) * displacement)];
@@ -285,6 +283,7 @@ dgMatrix dgCollisionConvex::CalculateInertiaAndCenterOfMass (const dgMatrix& m_a
 		return inertia;
 	} else {
 		// for non uniform scale we need to the general divergence theorem
+		dgAssert (0);
 		dgVector inertiaII;
 		dgVector crossInertia;
 		dgVector centerOfMass;
@@ -292,7 +291,7 @@ dgMatrix dgCollisionConvex::CalculateInertiaAndCenterOfMass (const dgMatrix& m_a
 		scaledMatrix[0] = scaledMatrix[0].Scale(localScale.m_x);
 		scaledMatrix[1] = scaledMatrix[1].Scale(localScale.m_y);
 		scaledMatrix[2] = scaledMatrix[2].Scale(localScale.m_z);
-		scaledMatrix = m_alignMatrix * scaledMatrix;
+		scaledMatrix = alignMatrix * scaledMatrix;
 
 		dgFloat32 volume = CalculateMassProperties (scaledMatrix, inertiaII, crossInertia, centerOfMass);
 		if (volume < DG_MAX_MIN_VOLUME) {

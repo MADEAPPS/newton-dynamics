@@ -266,13 +266,11 @@ void dgCollisionCone::MassProperties ()
 	dgFloat32 inertiaxx = dgFloat32 (3.0f / 10.0f) * m_radius * m_radius;
 	dgFloat32 inertiayyzz = (dgFloat32 (3.0f / 20.0f) * m_radius * m_radius + dgFloat32 (3.0f / 20.0f) * m_height * m_height);
 
-//	dgCollisionConvex::MassProperties ();
 	m_inertia[0] = inertiaxx;
 	m_inertia[1] = inertiayyzz;
 	m_inertia[2] = inertiayyzz;
 	m_centerOfMass.m_w = volume;
 }
-
 
 dgInt32 dgCollisionCone::CalculatePlaneIntersection (const dgVector& normal, const dgVector& origin, dgVector* const contactsOut) const
 {
