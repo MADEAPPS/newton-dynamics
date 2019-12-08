@@ -18,9 +18,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\ArticulatedJoints.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\BasicFriction.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -43,9 +40,6 @@
       <Filter>demos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\ContinueCollision.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\ContinueCollision1.cpp">
       <Filter>demos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\ConvexApproximation.cpp">
@@ -203,6 +197,9 @@
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\toolBox\dWoodFracture.cpp">
       <Filter>utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\ConstructionVehicle.cpp">
+      <Filter>demos</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

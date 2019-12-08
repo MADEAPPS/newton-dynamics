@@ -45,7 +45,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\AdvancedPlayerController.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\AnimatedPlayer.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ArchimedesBuoyancy.cpp" />
-    <ClCompile Include="..\..\sdkDemos\demos\ArticulatedJoints.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BalancingCharacter.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicFriction.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\BasicPlayerController.cpp" />
@@ -54,8 +53,8 @@
     <ClCompile Include="..\..\sdkDemos\demos\BasicStacking.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ClosestDistance.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\CompoundCollision.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\ConstructionVehicle.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ContinueCollision.cpp" />
-    <ClCompile Include="..\..\sdkDemos\demos\ContinueCollision1.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ConvexApproximation.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ConvexCast.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\DynamicRagdoll.cpp" />

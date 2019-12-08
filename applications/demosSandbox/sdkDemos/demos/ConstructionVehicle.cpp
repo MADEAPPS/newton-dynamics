@@ -59,6 +59,9 @@ class dExcavatorControls
 	}
 	dFloat m_throttle;
 	dFloat m_steeringValue;
+	dFloat m_bucket_x;
+	dFloat m_bucket_y;
+	int m_cabinSpeed;
 };
 
 
@@ -122,9 +125,11 @@ class dExcavatorModel: public dModelRootNode
 
 	dExcavatorModel(NewtonBody* const rootBody, int linkMaterilID)
 		:dModelRootNode(rootBody, dGetIdentityMatrix())
+		,m_effectorMatrix(dGetIdentityMatrix())
 		,m_shereCast (NewtonCreateSphere (NewtonBodyGetWorld(rootBody), 0.20f, 0, NULL))
 		,m_engineJoint(NULL)
 		,m_effector(NULL)
+		,m_cabinAngle(0.0f)
 	{
 		AddLocomotion();
 		MakeCabinAndUpperBody();
@@ -142,11 +147,27 @@ class dExcavatorModel: public dModelRootNode
 		NewtonDestroyCollision(m_shereCast);
 	}
 
-	void ApplyControls(const dExcavatorControls& control)
+	void ApplyControls(const dExcavatorControls& control, dFloat timestep)
 	{
 		if (m_engineJoint->m_control.m_throttle || 
-			m_engineJoint->m_control.m_steeringValue) {
+			m_engineJoint->m_control.m_steeringValue ||
+			(m_engineJoint->m_control.m_bucket_x != control.m_bucket_x) ||
+			(m_engineJoint->m_control.m_bucket_y != control.m_bucket_y) ||
+			m_engineJoint->m_control.m_cabinSpeed) {
 			NewtonBodySetSleepState(GetBody(), 0);
+
+			dMatrix cabinMatrix (m_effectorMatrix);
+
+			cabinMatrix.m_posit.m_x += m_engineJoint->m_control.m_bucket_x * 0.5f;
+			cabinMatrix.m_posit.m_y += m_engineJoint->m_control.m_bucket_y * 0.5f;
+
+			dFloat speed = -10.0f * m_engineJoint->m_control.m_cabinSpeed * dDegreeToRad;
+			m_cabinAngle = dMod ( dFloat(m_cabinAngle + speed * timestep), dFloat(2.0f * dPi));
+			dMatrix rotation = dYawMatrix(m_cabinAngle);
+			
+			cabinMatrix.m_posit = rotation.RotateVector(cabinMatrix.m_posit);
+			cabinMatrix.m_posit.m_w = 1.0f;
+			m_effector->SetTargetMatrix (cabinMatrix);
 		}
 		m_engineJoint->m_control = control;
 	}
@@ -617,6 +638,7 @@ class dExcavatorModel: public dModelRootNode
 		m_effector->SetSolverModel(1);
 		m_effector->SetControlMode(dCustomKinematicController::m_linear);
 		m_effector->SetMaxLinearFriction(2000.0f * 9.8f * 50.0f);
+		m_effectorMatrix = m_effector->GetTargetMatrix ();
 	}
 
 	void AddLocomotion()
@@ -665,9 +687,11 @@ class dExcavatorModel: public dModelRootNode
 		new dModelNode(engineBody, bindMatrix, this);
 	}
 
+	dMatrix m_effectorMatrix;
 	NewtonCollision* m_shereCast;
 	dExcavatorEngine* m_engineJoint;
 	dCustomKinematicController* m_effector;
+	dFloat m_cabinAngle;
 };
 
 class ArticulatedVehicleManagerManager: public dModelManager
@@ -677,6 +701,9 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		:dModelManager (scene->GetNewton())
 		,m_player(NULL)
 		,m_threadMaterialID(threadMaterialID)
+		,m_cabinSpeed(0)
+		,m_bucket_x(0.0f)
+		,m_bucket_y(0.0f)
 	{
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 		scene->Set2DDisplayRenderFunction(RenderPlayerHelp, NULL, this);
@@ -716,6 +743,11 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		scene->Print(color, "drive backward:     s");
 		scene->Print(color, "turn right:         d");
 		scene->Print(color, "turn left:          a");
+
+		scene->Print(color, "bucket controls");
+		ImGui::SliderInt("cabin rotation", &m_cabinSpeed, -3, 3);
+		ImGui::SliderFloat("bucket X", &m_bucket_x, -2.0f, 4.0f);
+		ImGui::SliderFloat("bucket Y", &m_bucket_y, -6.0f, 6.0f);
 	}
 
 	void UpdateCamera(dFloat timestep)
@@ -829,8 +861,11 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		dExcavatorControls controls;
 		controls.m_throttle = (dFloat(scene->GetKeyState('W')) - dFloat(scene->GetKeyState('S')));
 		controls.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
+		controls.m_cabinSpeed = m_cabinSpeed;
+		controls.m_bucket_x = m_bucket_x;
+		controls.m_bucket_y = m_bucket_y;
 
-		excavator->ApplyControls(controls);
+		excavator->ApplyControls(controls, timestep);
 	}
 
 	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const
@@ -888,9 +923,12 @@ class ArticulatedVehicleManagerManager: public dModelManager
 
 	dExcavatorModel* m_player;
 	int m_threadMaterialID;
+	int m_cabinSpeed;
+	dFloat m_bucket_x;
+	dFloat m_bucket_y;
 };
 
-void ArticulatedJoints (DemoEntityManager* const scene)
+void ConstructionVehicle (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
@@ -930,6 +968,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 	matrix.m_posit.m_y =   0.0f;
 	matrix.m_posit.m_z +=  0.0f;
 	// add some object to play with
+#if 1
 	LoadLumberYardMesh(scene, matrix.m_posit + dVector(6.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
 	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
 	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
@@ -949,6 +988,7 @@ void ArticulatedJoints (DemoEntityManager* const scene)
 
 	AddFracturedWoodPrimitive(scene, 1000.0f, matrix.m_posit, dVector(0.3f, 3.0f, 0.3f, 0.0f), 
 		woodX, woodZ, 0.5f, ARTICULATED_VEHICLE_DEFINITION::m_propBody, defaultMaterialID, shapeOffsetMatrix);
+#endif
 
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		NewtonCollision* const collision = NewtonBodyGetCollision(body);

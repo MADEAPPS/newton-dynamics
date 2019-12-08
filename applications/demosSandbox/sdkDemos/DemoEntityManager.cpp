@@ -55,32 +55,31 @@
 //#define DEFAULT_SCENE	19		// non uniform Scaled Collision
 //#define DEFAULT_SCENE	20		// scaled mesh collision
 //#define DEFAULT_SCENE	21		// continuous collision
-//#define DEFAULT_SCENE	22		// paper wall continuous collision
-//#define DEFAULT_SCENE	23		// Flatland Game
-//#define DEFAULT_SCENE	24		// simple convex decomposition
-//#define DEFAULT_SCENE	25		// scene Collision
-//#define DEFAULT_SCENE	26		// simple boolean operators 
-//#define DEFAULT_SCENE	27		// simple convex fracturing 
-//#define DEFAULT_SCENE	28		// structured convex fracturing 
-//#define DEFAULT_SCENE	29		// multi ray casting using the threading Job scheduler
-//#define DEFAULT_SCENE	30		// standard joints
-//#define DEFAULT_SCENE	31		// servo joints
-#define DEFAULT_SCENE	32		// articulated joints
-//#define DEFAULT_SCENE	33		// six axis manipulator
-//#define DEFAULT_SCENE	34		// hexapod Robot
-//#define DEFAULT_SCENE	35		// basic rag doll
-//#define DEFAULT_SCENE	36		// balancing character
-//#define DEFAULT_SCENE	37		// dynamic rag doll
-//#define DEFAULT_SCENE	38		// single body vehicle
-//#define DEFAULT_SCENE	39		// super Car
-//#define DEFAULT_SCENE	40		// heavy vehicles
-//#define DEFAULT_SCENE	41		// basic player controller
-//#define DEFAULT_SCENE	42		// animated player controller
-//#define DEFAULT_SCENE	43		// advanced player controller
-//#define DEFAULT_SCENE	44		// cloth patch			
-//#define DEFAULT_SCENE	45		// soft bodies	
-//#define DEFAULT_SCENE	46		// joe's joint test
-//#define DEFAULT_SCENE	47		// Misho's Hinge Test
+//#define DEFAULT_SCENE	22		// Flatland Game
+//#define DEFAULT_SCENE	23		// simple convex decomposition
+//#define DEFAULT_SCENE	24		// scene Collision
+//#define DEFAULT_SCENE	25		// simple boolean operators 
+//#define DEFAULT_SCENE	26		// simple convex fracturing 
+//#define DEFAULT_SCENE	27		// structured convex fracturing 
+//#define DEFAULT_SCENE	28		// multi ray casting using the threading Job scheduler
+//#define DEFAULT_SCENE	29		// standard joints
+//#define DEFAULT_SCENE	30		// servo joints
+#define DEFAULT_SCENE	31		// articulated joints
+//#define DEFAULT_SCENE	32		// six axis manipulator
+//#define DEFAULT_SCENE	33		// hexapod Robot
+//#define DEFAULT_SCENE	34		// basic rag doll
+//#define DEFAULT_SCENE	35		// balancing character
+//#define DEFAULT_SCENE	36		// dynamic rag doll
+//#define DEFAULT_SCENE	37		// single body vehicle
+//#define DEFAULT_SCENE	38		// super Car
+//#define DEFAULT_SCENE	39		// heavy vehicles
+//#define DEFAULT_SCENE	40		// basic player controller
+//#define DEFAULT_SCENE	41		// animated player controller
+//#define DEFAULT_SCENE	42		// advanced player controller
+//#define DEFAULT_SCENE	43		// cloth patch			
+//#define DEFAULT_SCENE	44		// soft bodies	
+//#define DEFAULT_SCENE	45		// joe's joint test
+//#define DEFAULT_SCENE	46		// Misho's Hinge Test
 						 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
@@ -101,7 +100,6 @@ void UniformScaledCollision (DemoEntityManager* const scene);
 void NonUniformScaledCollision (DemoEntityManager* const scene);
 void ScaledMeshCollision (DemoEntityManager* const scene);
 void ContinuousCollision (DemoEntityManager* const scene);
-void ContinuousCollision1 (DemoEntityManager* const scene);
 void FlatLandGame (DemoEntityManager* const scene);
 void SceneCollision (DemoEntityManager* const scene);
 void CompoundCollision(DemoEntityManager* const scene);
@@ -125,7 +123,7 @@ void PassiveRagdoll (DemoEntityManager* const scene);
 void BalancingCharacter (DemoEntityManager* const scene);
 void DynamicRagdoll (DemoEntityManager* const scene);
 void ServoJoints (DemoEntityManager* const scene);
-void ArticulatedJoints (DemoEntityManager* const scene);
+void ConstructionVehicle (DemoEntityManager* const scene);
 void StandardJoints (DemoEntityManager* const scene);
 void SixAxisManipulators(DemoEntityManager* const scene);
 void Hexapod(DemoEntityManager* const scene);
@@ -158,7 +156,6 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Non uniform scaled collision shape", "demonstrate scaling shape", NonUniformScaledCollision},
 	{"Scaled mesh collision", "demonstrate scaling mesh scaling collision", ScaledMeshCollision},
 	{"Continuous collision", "show continuous collision", ContinuousCollision },
-	{"Paper wall continuous collision", "show fast continuous collision", ContinuousCollision1 },
 	{"Flat Land Game", "show usage of tow dimension joints", FlatLandGame },
 	{"Simple convex decomposition", "demonstrate convex decomposition and compound collision", SimpleConvexApproximation},
 	{"Multi geometry collision", "show static mesh with the ability of moving internal parts", SceneCollision},
@@ -168,7 +165,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Parallel ray cast", "using the threading Job scheduler", MultiRayCast},
 	{"Standard Joints", "show some of the common joints", StandardJoints},
 	{"Servo actuators joints", "demonstrate complex array of bodies interconnect by joints", ServoJoints},
-	{"Articulated robotic joints", "demonstrate complex array of bodies interconnect by joints", ArticulatedJoints},
+	{"Articulated robotic joints", "demonstrate complex array of bodies interconnect by joints", ConstructionVehicle},
 	{"Six axis manipulator", "show using inverse dynamics to control robots", SixAxisManipulators },
 	{"Hexapod walker", "show using inverse dynamics to control robots", Hexapod },
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
