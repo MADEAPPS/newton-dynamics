@@ -108,10 +108,10 @@ void dgCollisionConvex::SetVolumeAndCG ()
 		}
 	}
 
-	dgVector origin___;
-	dgVector inertia___;
-	dgVector crossInertia___;
-	dgFloat32 volume = localData.MassProperties (origin___, inertia___, crossInertia___);
+	dgVector origin;
+	dgVector inertia;
+	dgVector crossInertia;
+	dgFloat32 volume = localData.MassProperties (origin, inertia, crossInertia);
 	m_simplexVolume = volume;
 
 	// calculate the origin of the bound box of this primitive
@@ -283,7 +283,6 @@ dgMatrix dgCollisionConvex::CalculateInertiaAndCenterOfMass (const dgMatrix& ali
 		return inertia;
 	} else {
 		// for non uniform scale we need to the general divergence theorem
-		dgAssert (0);
 		dgVector inertiaII;
 		dgVector crossInertia;
 		dgVector centerOfMass;

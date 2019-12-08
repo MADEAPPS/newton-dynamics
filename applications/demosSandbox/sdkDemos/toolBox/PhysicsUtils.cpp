@@ -956,27 +956,6 @@ NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dF
 	//create the rigid body
 	NewtonBody* const rigidBody = generalInertia ? NewtonCreateAsymetricDynamicBody (world, collision, &matrix[0][0]) : NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
 
-/*
-dVector xxxx[8] = {
-	dVector(0.0f, 0.5f, 0.5f, 0.0f),
-	dVector(0.0f, 0.5f, -0.5f, 0.0f),
-	dVector(0.0f, -0.5f, 0.5f, 0.0f),
-	dVector(0.0f, -0.5f, -0.5f, 0.0f),
-	dVector(1.0f, 0.5f, 0.5f, 0.0f),
-	dVector(1.0f, 0.5f, -0.5f, 0.0f),
-	dVector(1.0f, -0.5f, 0.5f, 0.0f),
-	dVector(1.0f, -0.5f, -0.5f, 0.0f),
-};
-
-dMatrix ssss(dGetIdentityMatrix());
-ssss.m_posit.m_x = 0.5f;
-NewtonCollision* box = NewtonCreateBox(world, 1.0f, 1.0f, 1.0f, 0, &ssss[0][0]);
-NewtonCollision* hull = NewtonCreateConvexHull(world, 8, &xxxx[0][0], sizeof (dVector), 0.0f, 0, NULL);
-NewtonBodySetMassProperties(rigidBody, 1.0f, box);
-NewtonBodySetMassProperties(rigidBody, 1.0f, hull);
-*/
-
-
 	// use a more convenient function for setting mass and inertia matrix
 	NewtonBodySetMassProperties (rigidBody, mass, collision);
 

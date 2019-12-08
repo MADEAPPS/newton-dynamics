@@ -781,7 +781,6 @@ dgFloat32 dgCollisionCompound::CalculateMassProperties (const dgMatrix& offset, 
 
 dgMatrix dgCollisionCompound::CalculateInertiaAndCenterOfMass (const dgMatrix& m_alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const
 {
-dgAssert (0);
 	dgVector inertiaII;
 	dgVector crossInertia;
 	dgVector centerOfMass;
