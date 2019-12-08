@@ -1285,11 +1285,11 @@ NewtonBody* CreatePLYMesh (DemoEntityManager* const scene, const char* const fil
 
 	dArray<dVector> points(vertexCount);
 	for (int i = 0; i < vertexCount; i++) {
-		dFloat x;
-		dFloat y;
-		dFloat z;
+		dFloat32 x;
+		dFloat32 y;
+		dFloat32 z;
 		fscanf(file, "%f %f %f\n", &x, &y, &z);
-		points[i] = dVector(x, y, z, dFloat(0.0f));
+		points[i] = dVector(x, y, z, dFloat32(0.0f));
 	}
 
 	NewtonWorld* const world = scene->GetNewton();

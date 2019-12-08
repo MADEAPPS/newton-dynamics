@@ -924,8 +924,8 @@ class ArticulatedVehicleManagerManager: public dModelManager
 	dExcavatorModel* m_player;
 	int m_threadMaterialID;
 	int m_cabinSpeed;
-	dFloat m_bucket_x;
-	dFloat m_bucket_y;
+	dFloat32 m_bucket_x;
+	dFloat32 m_bucket_y;
 };
 
 void ConstructionVehicle (DemoEntityManager* const scene)
