@@ -468,6 +468,12 @@ bool DemoEntityManager::IsControlKeyDown () const
 	return state;
 }
 
+bool DemoEntityManager::GetCaptured() const
+{
+	ImGuiIO& io = ImGui::GetIO();
+	return io.WantCaptureMouse;
+}
+
 bool DemoEntityManager::GetMouseKeyState (int button) const
 {
 	ImGuiIO& io = ImGui::GetIO();

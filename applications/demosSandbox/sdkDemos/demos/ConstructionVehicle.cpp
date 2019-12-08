@@ -61,6 +61,7 @@ class dExcavatorControls
 	dFloat m_steeringValue;
 	dFloat m_bucket_x;
 	dFloat m_bucket_y;
+	dFloat m_bucket_angle;
 	int m_cabinSpeed;
 };
 
@@ -128,8 +129,10 @@ class dExcavatorModel: public dModelRootNode
 		,m_effectorMatrix(dGetIdentityMatrix())
 		,m_shereCast (NewtonCreateSphere (NewtonBodyGetWorld(rootBody), 0.20f, 0, NULL))
 		,m_engineJoint(NULL)
+		,m_bucketJoint(NULL)
 		,m_effector(NULL)
 		,m_cabinAngle(0.0f)
+		,m_bucketAngle(0.0f)
 	{
 		AddLocomotion();
 		MakeCabinAndUpperBody();
@@ -153,11 +156,14 @@ class dExcavatorModel: public dModelRootNode
 			m_engineJoint->m_control.m_steeringValue ||
 			(m_engineJoint->m_control.m_bucket_x != control.m_bucket_x) ||
 			(m_engineJoint->m_control.m_bucket_y != control.m_bucket_y) ||
+			(m_engineJoint->m_control.m_bucket_angle != control.m_bucket_angle) ||
 			m_engineJoint->m_control.m_cabinSpeed) {
+
 			NewtonBodySetSleepState(GetBody(), 0);
 
-			dMatrix cabinMatrix (m_effectorMatrix);
+			m_bucketJoint->SetTargetAngle(control.m_bucket_angle * dDegreeToRad);
 
+			dMatrix cabinMatrix (m_effectorMatrix);
 			cabinMatrix.m_posit.m_x += m_engineJoint->m_control.m_bucket_x * 0.5f;
 			cabinMatrix.m_posit.m_y += m_engineJoint->m_control.m_bucket_y * 0.5f;
 
@@ -168,6 +174,7 @@ class dExcavatorModel: public dModelRootNode
 			cabinMatrix.m_posit = rotation.RotateVector(cabinMatrix.m_posit);
 			cabinMatrix.m_posit.m_w = 1.0f;
 			m_effector->SetTargetMatrix (cabinMatrix);
+	
 		}
 		m_engineJoint->m_control = control;
 	}
@@ -629,7 +636,8 @@ class dExcavatorModel: public dModelRootNode
 		NewtonBody* const bucketBody = MakeBodyPart(armNode, "bucket", 40.0f);
 		NewtonBodyGetMatrix(bucketBody, &hingeFrame[0][0]);
 		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
-		new dCustomHinge(hingeFrame, bucketBody, armBody);
+		m_bucketJoint = new dCustomHingeActuator(hingeFrame, bucketBody, armBody);
+		m_bucketJoint->SetAngularRate(0.5f);
 		new dModelNode(bucketBody, bindMatrix, armNode);
 
 		// create effector to control bucket
@@ -690,8 +698,10 @@ class dExcavatorModel: public dModelRootNode
 	dMatrix m_effectorMatrix;
 	NewtonCollision* m_shereCast;
 	dExcavatorEngine* m_engineJoint;
+	dCustomHingeActuator* m_bucketJoint;
 	dCustomKinematicController* m_effector;
 	dFloat m_cabinAngle;
+	dFloat m_bucketAngle;
 };
 
 class ArticulatedVehicleManagerManager: public dModelManager
@@ -704,6 +714,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		,m_cabinSpeed(0)
 		,m_bucket_x(0.0f)
 		,m_bucket_y(0.0f)
+		,m_bucket_angle(0.0f)
 	{
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 		scene->Set2DDisplayRenderFunction(RenderPlayerHelp, NULL, this);
@@ -746,8 +757,9 @@ class ArticulatedVehicleManagerManager: public dModelManager
 
 		scene->Print(color, "bucket controls");
 		ImGui::SliderInt("cabin rotation", &m_cabinSpeed, -3, 3);
-		ImGui::SliderFloat("bucket X", &m_bucket_x, -2.0f, 4.0f);
-		ImGui::SliderFloat("bucket Y", &m_bucket_y, -6.0f, 6.0f);
+		ImGui::SliderFloat("bucket x", &m_bucket_x, -2.0f, 4.0f);
+		ImGui::SliderFloat("bucket y", &m_bucket_y, -6.0f, 6.0f);
+		ImGui::SliderFloat("bucket angle", &m_bucket_angle, -60.0f, 130.0f);
 	}
 
 	void UpdateCamera(dFloat timestep)
@@ -864,6 +876,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		controls.m_cabinSpeed = m_cabinSpeed;
 		controls.m_bucket_x = m_bucket_x;
 		controls.m_bucket_y = m_bucket_y;
+		controls.m_bucket_angle = m_bucket_angle;
 
 		excavator->ApplyControls(controls, timestep);
 	}
@@ -926,6 +939,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 	int m_cabinSpeed;
 	dFloat32 m_bucket_x;
 	dFloat32 m_bucket_y;
+	dFloat32 m_bucket_angle;
 };
 
 void ConstructionVehicle (DemoEntityManager* const scene)
@@ -968,6 +982,7 @@ void ConstructionVehicle (DemoEntityManager* const scene)
 	matrix.m_posit.m_y =   0.0f;
 	matrix.m_posit.m_z +=  0.0f;
 	// add some object to play with
+
 #if 1
 	LoadLumberYardMesh(scene, matrix.m_posit + dVector(6.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
 	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);

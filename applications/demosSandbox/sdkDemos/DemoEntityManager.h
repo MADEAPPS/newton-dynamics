@@ -129,6 +129,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	static void OnCreateContact(const NewtonWorld* const world, NewtonJoint* const contact);
 	static void OnDestroyContact(const NewtonWorld* const world, NewtonJoint* const contact);
 
+	bool GetCaptured () const;
 	bool GetMouseKeyState (int button ) const;
 	int Print (const dVector& color, const char *fmt, ... ) const;
 	int GetDebugDisplay() const;
