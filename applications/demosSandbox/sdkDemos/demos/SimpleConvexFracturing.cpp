@@ -16,7 +16,7 @@
 #include "DemoEntityManager.h"
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
-
+/*
 #define INITIAL_DELAY							1000
 #define NUMBER_OF_INTERNAL_PARTS				10
 
@@ -464,14 +464,14 @@ class VoronoidEffect: public FractureEffect
 		NewtonDestroyCollision(collision);
 	}
 };
-
-
+*/
 
 void SimpleConvexFracturing(DemoEntityManager* const scene)
 {
 	// load the skybox
 	scene->CreateSkyBox();
-
+dAssert (0);
+/*
 	// load the scene from a ngd file format
 	CreateLevelMesh(scene, "flatPlane.ngd", false);
 
@@ -499,6 +499,7 @@ void SimpleConvexFracturing(DemoEntityManager* const scene)
 	dQuaternion rot;
 	dVector origin(-15.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
+*/
 }
 
 

@@ -40,8 +40,7 @@ static void BuildTower(DemoEntityManager* const scene, dFloat spacing, dFloat se
 	//
 	if (separspace == 0.0f) {
 		spacingbetween = 1.0f;
-	}
-	else {
+	} else {
 		spacingbetween = separspace;
 	}
 	rayon = spacing * towerboxcount;

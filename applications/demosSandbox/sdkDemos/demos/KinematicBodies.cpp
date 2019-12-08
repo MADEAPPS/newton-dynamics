@@ -23,7 +23,6 @@ class KinematicListener: public dCustomListener
 	struct KinematicPlatform
 	{
 		dVector m_omega;
-//		dVector m_veloc;
 		dVector m_origin;
 		NewtonBody* m_plaform;
 		dFloat m_speed;

@@ -134,7 +134,6 @@ class dgDeadJoints: public dgTree<dgConstraint*, void* >
 	void DestroyJoint(dgConstraint* const joint);
 	private:
 	dgInt32 m_lock;
-	friend class dgWorld;
 };
 
 class dgDeadBodies: public dgTree<dgBody*, void* >
@@ -146,7 +145,6 @@ class dgDeadBodies: public dgTree<dgBody*, void* >
 
 	private:
 	dgInt32 m_lock;
-	friend class dgWorld;
 };
 
 typedef void (*OnPostUpdateCallback) (const dgWorld* const world, dgFloat32 timestep);

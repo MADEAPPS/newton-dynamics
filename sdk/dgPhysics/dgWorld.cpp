@@ -460,8 +460,6 @@ void dgWorld::RemoveAllGroupID()
 void dgWorld::InitBody (dgBody* const body, dgCollisionInstance* const collision, const dgMatrix& matrix)
 {
 	dgAssert (collision);
-	dgDeadBodies& deadBodyList = *this;
-	dgScopeSpinLock lock(&deadBodyList.m_lock);
 
 	m_bodiesUniqueID ++;
 	body->m_world = this;

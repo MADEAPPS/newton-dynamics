@@ -57,6 +57,7 @@ DemoSubMesh::DemoSubMesh ()
 	,m_diffuse(0.8f, 0.8f, 0.8f, 1.0f)
 	,m_specular(1.0f, 1.0f, 1.0f, 1.0f)
 	,m_textureName()
+	,m_opacity(1.0f)
 	,m_shiness(100.0f)
 	,m_indexCount(0)
 	,m_indexes(NULL)
@@ -222,12 +223,6 @@ DemoMesh::DemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode,
 			segment->SetOpacity(material->GetOpacity());
 
 			if (segment->m_textureHandle) {
-				
-			//if (segment->m_opacity > 0.999f) {
-			//	segment->m_shader = shaderCache.m_diffuseEffect;
-			//} else {
-			//	segment->m_shader = shaderCache.m_diffuseEffect;
-			//}
 				segment->m_shader = shaderCache.m_diffuseEffect;
 			} else {
 				segment->m_shader = shaderCache.m_diffuseNoTextureEffect;
@@ -275,6 +270,7 @@ DemoMesh::DemoMesh(NewtonMesh* const mesh, const ShaderPrograms& shaderCache)
 		DemoSubMesh* const segment = AddSubMesh();
 
 		segment->m_shiness = 1.0f;
+		segment->m_opacity = 1.0f;
 		segment->m_ambient = dVector (0.8f, 0.8f, 0.8f, 1.0f);
 		segment->m_diffuse = dVector (0.8f, 0.8f, 0.8f, 1.0f);
 		segment->m_specular = dVector (0.0f, 0.0f, 0.0f, 1.0f);

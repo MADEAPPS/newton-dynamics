@@ -10,62 +10,6 @@
 #include "DemoCamera.h"
 #include "PhysicsUtils.h"
 
-#define INITIAL_DELAY							1000
-#define NUMBER_OF_INTERNAL_PARTS				3
-
-#define BREAK_IMPACT_IN_METERS_PER_SECONDS		8.0f
-
-class WoodFractureAtom
-{
-public:
-	WoodFractureAtom();
-	//
-	dVector m_centerOfMass;
-	dVector m_momentOfInertia;
-	DemoMesh* m_mesh;
-	NewtonCollision* m_collision;
-	dFloat m_massFraction;
-};
-
-//////////////////////////////////////
-
-class WoodFractureEffect : public dList<WoodFractureAtom>
-{
-public:
-	WoodFractureEffect(NewtonWorld* const world);
-	WoodFractureEffect(const WoodFractureEffect& list);
-	virtual ~WoodFractureEffect();
-	//
-	NewtonWorld* m_world;
-};
-
-/////////////////////////////////////
-
-class SimpleWoodFracturedEffectEntity : public DemoEntity
-{
-public:
-	SimpleWoodFracturedEffectEntity(DemoMesh* const mesh, const WoodFractureEffect& columnDebris);
-	~SimpleWoodFracturedEffectEntity();
-	//
-	void SimulationPostListener(DemoEntityManager* const scene, DemoEntityManager::dListNode* const mynode, dFloat timeStep);
-	static void AddFracturedWoodEntity(DemoEntityManager* const scene, dFloat massDensity, DemoMesh* const visualMesh, NewtonCollision* const collision, const WoodFractureEffect& fractureEffect, const dVector& location);
-	//
-	int m_delay;
-	WoodFractureEffect m_effect;
-	NewtonBody* m_myBody;
-	dFloat m_myMassInverse;
-	//static unsigned m_lock;
-};
-
-//////////////////////////////////////
-
-class WoodVoronoidEffect : public WoodFractureEffect
-{
-public:
-	WoodVoronoidEffect(NewtonWorld* const world, NewtonMesh* const mesh, int interiorMaterial);
-	//
-	static void AddFracturedWoodPrimitive(DemoEntityManager* const scene, dFloat density, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, int stype, int materialID, const dMatrix& shapeOffsetMatrix);
-};
-
+void AddFracturedWoodPrimitive(DemoEntityManager* const scene, dFloat density, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, int stype, int materialID, const dMatrix& shapeOffsetMatrix);
 
 #endif
