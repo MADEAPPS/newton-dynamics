@@ -155,7 +155,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 					veloc = veloc.Scale(viscousDrag);
 					NewtonBodySetOmega(visitor, &omega[0]);
 					NewtonBodySetVelocity(visitor, &veloc[0]);
-
+/*
 					// test delete bodies inside trigger
 					collisionMaterial.m_userParam[1].m_float += timestep;
 					NewtonCollisionSetMaterial(collision, &collisionMaterial);
@@ -163,6 +163,7 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 						// delete body after 2 minutes inside the pool
 						NewtonDestroyBody(visitor);
 					}
+*/
 				}
 			}
 		}
@@ -222,23 +223,6 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 		m_faceAngle = dMod(m_faceAngle + m_waveSpeed * timestep, dFloat (2.0f * dPi));
 
 		dCustomTriggerManager::PreUpdate(timestep);
-
-static int xxx;
-xxx ++;
-if (xxx % 30 == 0){
-NewtonWorld* world = GetWorld();
-int i = 0; 
-for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body))
-{
-	i ++;
-	if (i == 10) {
-		NewtonDestroyBody(body);
-		break;
-	}
-}
-}
-
-
 	}
 
 	void CreateBuoyancyTrigger (const dMatrix& matrix, NewtonCollision* const convexShape)
