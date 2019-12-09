@@ -16,7 +16,8 @@
 #include "dWoodFracture.h"
 
 #define D_WOODFRACTURE_LISTENER "woodFractureListener"
-#define BREAK_IMPACT_IN_METERS_PER_SECONDS		8.0f
+//#define BREAK_IMPACT_IN_METERS_PER_SECONDS		8.0f
+#define BREAK_IMPACT_IN_METERS_PER_SECONDS      10.0f
 
 class dWoodFractureListener: public dCustomParallelListener
 {
@@ -262,9 +263,24 @@ class dWoodFractureListener: public dCustomParallelListener
 		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(effect.m_body); joint; joint = NewtonBodyGetNextContactJoint(effect.m_body, joint)) {
 			for (void* contact = NewtonContactJointGetFirstContact(joint); contact; contact = NewtonContactJointGetNextContact(joint, contact)) {
 				dVector contactForce;
-				NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+				const NewtonCollision* const coll0 = NewtonContactGetCollision0(contact);
+				const NewtonCollision* const coll1 = NewtonContactGetCollision1(contact);
+				const NewtonMaterial* const material = NewtonContactGetMaterial(contact);
 				dFloat impulseImpact = NewtonMaterialGetContactMaxNormalImpact(material);
-				if (impulseImpact > breakImpact) {
+
+				if (NewtonCollisionGetUserID(coll0) == 4) {
+					// m_tirePart
+					if (impulseImpact > breakImpact) {
+						breakImpact = impulseImpact * 20.0f;
+					}
+					
+				} else if (NewtonCollisionGetUserID(coll1) == 8) {
+					// m_linkPart
+					if (impulseImpact > breakImpact) {
+						breakImpact = impulseImpact * 20.0f;
+					}
+				} else if (impulseImpact > breakImpact) {
+					// all othe types
 					breakImpact = impulseImpact;
 				}
 			}

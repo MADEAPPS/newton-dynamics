@@ -1002,8 +1002,8 @@ void ConstructionVehicle (DemoEntityManager* const scene)
 	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
 
-	int woodX = 12;
-	int woodZ = 12;
+	int woodX = 8;
+	int woodZ = 8;
 	matrix.m_posit.m_z += 10.0f;
 	matrix.m_posit.m_x -= 5.0f;
 
