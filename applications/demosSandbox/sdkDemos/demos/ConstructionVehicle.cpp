@@ -725,13 +725,19 @@ class ArticulatedVehicleManagerManager: public dModelManager
 
 		NewtonMaterialSetCallbackUserData (world, material, material, this);
 		NewtonMaterialSetCollisionCallback (world, material, material, StandardAABBOverlapTest, NULL);
+		NewtonMaterialSetDefaultElasticity(world, material, material, 0.1f);
+		NewtonMaterialSetDefaultFriction(world, material, material, 0.9f, 0.9f);
 
 		NewtonMaterialSetCallbackUserData(world, material, threadMaterialID, this);
 		NewtonMaterialSetCollisionCallback (world, material, threadMaterialID, StandardAABBOverlapTest, NULL);
+		NewtonMaterialSetDefaultElasticity(world, material, threadMaterialID, 0.1f);
+		NewtonMaterialSetDefaultFriction(world, material, threadMaterialID, 0.9f, 0.9f);
 
 		NewtonMaterialSetCallbackUserData(world, threadMaterialID, threadMaterialID, this);
 		NewtonMaterialSetCollisionCallback (world, threadMaterialID, threadMaterialID, StandardAABBOverlapTest, NULL);
 		NewtonMaterialSetContactGenerationCallback (world, threadMaterialID, threadMaterialID, ThreadStaticContactsGeneration);
+		NewtonMaterialSetDefaultElasticity(world, threadMaterialID, threadMaterialID, 0.1f);
+		NewtonMaterialSetDefaultFriction(world, threadMaterialID, threadMaterialID, 0.9f, 0.9f);
 	}
 
 	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
