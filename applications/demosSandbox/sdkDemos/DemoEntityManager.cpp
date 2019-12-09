@@ -222,6 +222,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_microsecunds(0)
 	,m_tranparentHeap()
 	,m_currentScene(DEFAULT_SCENE)
+	,m_lastCurrentScene(DEFAULT_SCENE)
 	,m_framesCount(0)
 	,m_physicsFramesCount(0)
 	,m_currentPlugin(0)
@@ -352,7 +353,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showNormalForces = true;
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
-//	m_collisionDisplayMode = 2;
+	m_collisionDisplayMode = 2;
 //	m_showListenersDebugInfo = true;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
@@ -929,17 +930,23 @@ void DemoEntityManager::ShowMainMenuBar()
 		{
 			// load a demo 
 			if (m_currentScene != -1) {
-				char newTitle[256];
-				Cleanup();
-				m_demosSelection[m_currentScene].m_launchDemoCallback(this);
-				sprintf (newTitle, "Newton Game Dynamics 3.14 demo: %s", m_demosSelection[m_currentScene].m_name);
-				glfwSetWindowTitle(m_mainFrame, newTitle);
-				ApplyMenuOptions();
-				ResetTimer();
+				LoadDemo(m_currentScene);
+				m_lastCurrentScene = m_currentScene;
 				m_currentScene = -1;
 			}
 		}
 	}
+}
+
+void DemoEntityManager::LoadDemo(int menu)
+{
+	char newTitle[256];
+	Cleanup();
+	m_demosSelection[menu].m_launchDemoCallback(this);
+	sprintf(newTitle, "Newton Game Dynamics 3.14 demo: %s", m_demosSelection[menu].m_name);
+	glfwSetWindowTitle(m_mainFrame, newTitle);
+	ApplyMenuOptions();
+	ResetTimer();
 }
 
 void DemoEntityManager::ErrorCallback(int error, const char* description)
@@ -1004,13 +1011,17 @@ void DemoEntityManager::KeyCallback(GLFWwindow* const window, int key, int, int 
 	io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 	
 	static int prevKey;
+	DemoEntityManager* const manager = (DemoEntityManager*)glfwGetWindowUserPointer(window);
 	if ((key == GLFW_KEY_F10) && (key != prevKey)) {
-		DemoEntityManager* const manager = (DemoEntityManager*)glfwGetWindowUserPointer(window);
 		manager->ToggleProfiler();
 	}
 
 	if (key == GLFW_KEY_ESCAPE) {
 		glfwSetWindowShouldClose (window, 1);
+	}
+
+	if (key == GLFW_KEY_F1) {
+		manager->LoadDemo(manager->m_lastCurrentScene);
 	}
 
 	prevKey = io.KeysDown[key] ? key : 0;

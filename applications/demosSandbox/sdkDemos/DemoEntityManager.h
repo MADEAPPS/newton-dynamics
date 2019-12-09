@@ -168,6 +168,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	static void PostUpdateCallback(const NewtonWorld* const world, dFloat timestep);
 
 	void ApplyMenuOptions();
+	void LoadDemo(int menu);
 	
 	GLFWwindow* m_mainFrame;
 	int	m_defaultFont;
@@ -187,6 +188,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	TransparentHeap m_tranparentHeap;
 
 	int m_currentScene;
+	int m_lastCurrentScene;
 	int m_framesCount;
 	int m_physicsFramesCount;
 	int m_currentPlugin;
