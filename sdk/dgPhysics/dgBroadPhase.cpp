@@ -1051,7 +1051,6 @@ DG_INLINE bool dgBroadPhase::ValidateContactCache(dgContact* const contact, cons
 	dgBody* const body0 = contact->GetBody0();
 	dgBody* const body1 = contact->GetBody1();
 	if (!contact->m_material->m_contactGeneration) {
-//		dgVector deltaTime(timestep);
 		dgVector positStep(timestep * (body0->m_veloc - body1->m_veloc));
 		positStep = ((positStep.DotProduct(positStep)) > m_velocTol) & positStep;
 		contact->m_positAcc += positStep;

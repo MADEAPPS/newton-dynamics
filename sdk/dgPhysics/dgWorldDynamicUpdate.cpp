@@ -559,15 +559,7 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster->m_bodyStart + 1];
 
 	dgInt32 count = cluster->m_bodyCount - 1;
-	//if (count <= 2) {
 	if (count <= DG_SMALL_ISLAND_COUNT) {
-		//dgInt32 equilibrium = bodyArray[0].m_body->m_equilibrium;
-		//if (count == 2) {
-		//	equilibrium &= bodyArray[1].m_body->m_equilibrium;
-		//}
-		//if (!equilibrium) {
-		//	velocityDragCoeff = dgFloat32(0.9999f);
-		//}
 		velocityDragCoeff = dgFloat32(0.9999f);
 	}
 
@@ -578,6 +570,7 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 
 	const dgFloat32 speedFreeze = world->m_freezeSpeed2;
 	const dgFloat32 accelFreeze = world->m_freezeAccel2 * ((count <= DG_SMALL_ISLAND_COUNT) ? dgFloat32(0.01f) : dgFloat32(1.0f));
+	//const dgFloat32 accelFreeze = world->m_freezeAccel2 * ((count <= DG_SMALL_ISLAND_COUNT) ? dgFloat32(0.0025f) : dgFloat32(1.0f));
 	dgVector velocDragVect(velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, dgFloat32(0.0f));
 
 	bool stackSleeping = true;
@@ -657,6 +650,10 @@ void dgWorldDynamicUpdate::IntegrateVelocity(const dgBodyCluster* const cluster,
 				if (count < DG_SMALL_ISLAND_COUNT) {
 					// delay small islands for about 10 seconds
 					sleepCounter >>= 8; 
+					for (dgInt32 i = 0; i < count; i++) {
+						dgBody* const body = bodyArray[i].m_body;
+						body->m_equilibrium = 0;
+					}
 				}
 				dgInt32 timeScaleSleepCount = dgInt32(dgFloat32(60.0f) * sleepCounter * timestep);
 

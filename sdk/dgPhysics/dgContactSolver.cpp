@@ -30,7 +30,6 @@
 #include "dgCollisionConvexHull.h"
 #include "dgCollisionConvexPolygon.h"
 
-
 dgVector dgContactSolver::m_hullDirs[] =
 {
 	dgVector(dgFloat32(0.577350f), dgFloat32(-0.577350f), dgFloat32(0.577350f), dgFloat32(0.0f)),
@@ -1376,7 +1375,6 @@ dgInt32 dgContactSolver::CalculateConvexToConvexContacts ()
 
 	return count;
 }
-
 
 dgInt32 dgContactSolver::CalculateContacts(const dgVector& point0, const dgVector& point1, const dgVector& normal)
 {

@@ -135,14 +135,11 @@ static void AddGravityBodies (DemoEntityManager* const scene, NewtonBody* const 
 	for (int i = 0; i < 4; i ++) {
 		location.m_posit.m_z = -5.0f;
 		for (int j = 0; j < 4; j ++) {
-if (j==2)
-{
 			NewtonBody* const box = CreateSimpleSolid(scene, geometry, 10.0f, location, collision, 0);
 			// constrain these object to motion on the plane only
 			dMatrix matrix; 
 			NewtonBodyGetMatrix (box, &matrix[0][0]);
 			new dCustomPlane (matrix.m_posit, matrix.m_front, box);
-}
 			location.m_posit.m_z += 2.5f;
 		}
 		location.m_posit.m_y += 2.0f;
@@ -213,10 +210,10 @@ void FlatLandGame (DemoEntityManager* const scene)
 	AddGravityBodies (scene, ground);
 
 	// add players 
-//	AddPlayerBodies (scene, ground);
+	AddPlayerBodies (scene, ground);
 
 	// add pseudo Rag doll
-//	AddRagdollBodies(scene, ground);
+	AddRagdollBodies(scene, ground);
 
 	// place camera into position
 	dMatrix camMatrix (dGetIdentityMatrix());
@@ -224,10 +221,6 @@ void FlatLandGame (DemoEntityManager* const scene)
 	camMatrix.m_posit.m_y = 7.0f;
 	camMatrix.m_posit.m_x = -20.0f;
 	camMatrix.m_posit.m_z = 10.0f;
-
-camMatrix.m_posit.m_y = 2.0f;
-camMatrix.m_posit.m_x = -5.0f;
-camMatrix.m_posit.m_z = 0.0f;
 
 	scene->SetCameraMatrix(rot, camMatrix.m_posit);
 }
