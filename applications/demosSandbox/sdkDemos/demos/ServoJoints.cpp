@@ -19,7 +19,7 @@
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
 
-
+#if 0
 #define SERVO_VEHICLE_CAMERA_EYEPOINT			1.5f
 #define SERVO_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
 #define SERVO_VEHICLE_CAMERA_DISTANCE			8.0f
@@ -924,17 +924,21 @@ static void MakeHeavyLoad (DemoEntityManager* const scene, const dMatrix& locati
 	mesh->Release();
 	NewtonDestroyCollision(collision);
 }
+#endif
+
 
 void ServoJoints (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
+dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
 
 	NewtonBody* const floor = CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
-	NewtonCollision* const floorCollision = NewtonBodyGetCollision(floor);
-	NewtonCollisionSetUserID(floorCollision, SERVO_VEHICLE_DEFINITION::m_terrain);
+	//NewtonCollision* const floorCollision = NewtonBodyGetCollision(floor);
+	//NewtonCollisionSetUserID(floorCollision, SERVO_VEHICLE_DEFINITION::m_terrain);
 
+/*
 	NewtonWorld* const world = scene->GetNewton();
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
 
@@ -952,11 +956,10 @@ void ServoJoints (DemoEntityManager* const scene)
 	// load a the mesh of the articulate vehicle
 	dModelRootNode* const forklift = vehicleManager->CreateForklift(matrix, "forklift.ngd", sizeof(inverseKinematicsRidParts) / sizeof (inverseKinematicsRidParts[0]), inverseKinematicsRidParts);
 	inputManager->AddPlayer(forklift);
+*/
 
-	dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
 #if 0
-
-	// place heavy load to show reproduce black bird dream problems
+ place heavy load to show reproduce black bird dream problems
 	matrix.m_posit.m_x += 2.0f;	
 	matrix.m_posit.m_z -= 2.0f;	
 //	MakeHeavyLoad (scene, matrix);
@@ -969,11 +972,11 @@ void ServoJoints (DemoEntityManager* const scene)
 //	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
 //	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 6.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
 #endif	
-	origin.m_x += 0.0f;
-	origin.m_y += 2.0f;
-	origin.m_z += 6.0f;
-	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), 90.0f * dDegreeToRad);  
-	scene->SetCameraMatrix(rot, origin);
+//	origin.m_x += 0.0f;
+//	origin.m_y += 2.0f;
+//	origin.m_z += 6.0f;
+//	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), 90.0f * dDegreeToRad);  
+//	scene->SetCameraMatrix(rot, origin);
 }
 
 
