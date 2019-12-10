@@ -54,7 +54,7 @@
 //#define DEFAULT_SCENE	19		// non uniform Scaled Collision
 //#define DEFAULT_SCENE	20		// scaled mesh collision
 //#define DEFAULT_SCENE	21		// continuous collision
-//#define DEFAULT_SCENE	22		// Flatland Game
+#define DEFAULT_SCENE	22		// Flatland Game
 //#define DEFAULT_SCENE	23		// simple convex decomposition
 //#define DEFAULT_SCENE	24		// scene Collision
 //#define DEFAULT_SCENE	25		// simple boolean operators 
@@ -63,7 +63,7 @@
 //#define DEFAULT_SCENE	28		// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	29		// standard joints
 //#define DEFAULT_SCENE	30		// servo joints
-#define DEFAULT_SCENE	31		// construction vehicle
+//#define DEFAULT_SCENE	31		// construction vehicle
 //#define DEFAULT_SCENE	32		// six axis manipulator
 //#define DEFAULT_SCENE	33		// hexapod Robot
 //#define DEFAULT_SCENE	34		// basic rag doll
