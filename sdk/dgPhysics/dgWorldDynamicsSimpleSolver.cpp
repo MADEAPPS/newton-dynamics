@@ -811,7 +811,13 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 							dgVector p;
 							dgVector q;
 							dgVector normal;
-							timeToImpact = dgMin (timeToImpact, world->CalculateTimeToImpact (contact, timeToImpact, threadID, p, q, normal, dgFloat32 (-1.0f / 256.0f)));
+							dgVector vrel(body0->m_veloc - body1->m_veloc);
+							dgFloat32 speed2 = vrel.DotProduct(vrel).GetScalar();
+							if (speed2 < dgFloat32(1.0e-2f)) {
+								timeToImpact = dgFloat32(0.0f);
+							} else {
+								timeToImpact = dgMin(timeToImpact, world->CalculateTimeToImpact(contact, timeToImpact, threadID, p, q, normal, dgFloat32(-1.0f / 256.0f)));
+							}
 						}
 					}
 				}
