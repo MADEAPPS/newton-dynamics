@@ -161,7 +161,7 @@ void dgBallConstraint::SetPivotPoint(const dgVector &pivot)
 	dgAssert (m_body1);
 	const dgMatrix& matrix = m_body0->GetMatrix();
 
-	dgVector pin (pivot - matrix.m_posit); 
+	dgVector pin (dgVector::m_triplexMask & (pivot - matrix.m_posit)); 
 	dgAssert (pin.m_w == dgFloat32 (0.0f));
 	if (pin.DotProduct(pin).GetScalar() < dgFloat32 (1.0e-3f)) {
 		pin = matrix.m_front;
@@ -252,7 +252,7 @@ dgUnsigned32 dgBallConstraint::JacobianDerivative (dgContraintDescritor& params)
 	CalculatePointDerivative (2, params, dir2, pointData, &m_jointForce[2]); 
 	dgInt32 ret = 3;
 
-	dgAssert (0);
+//	dgAssert (0);
 /*
 	dgFloat32 relVelocErr;
 	dgFloat32 penetrationErr;
