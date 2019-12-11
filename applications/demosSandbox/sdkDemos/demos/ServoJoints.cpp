@@ -927,17 +927,280 @@ static void MakeHeavyLoad (DemoEntityManager* const scene, const dMatrix& locati
 #endif
 
 
+class ServoVehicleManagerManager: public dModelManager
+{
+	public:
+	ServoVehicleManagerManager(DemoEntityManager* const scene, int threadMaterialID)
+		:dModelManager(scene->GetNewton())
+		//,m_player(NULL)
+		//,m_threadMaterialID(threadMaterialID)
+		//,m_cabinSpeed(0)
+		//,m_bucket_x(0.0f)
+		//,m_bucket_y(0.0f)
+		//,m_bucket_angle(0.0f)
+	{
+/*
+		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
+		scene->Set2DDisplayRenderFunction(RenderPlayerHelp, NULL, this);
+
+		// create a material for early collision culling
+		NewtonWorld* const world = scene->GetNewton();
+		int material = NewtonMaterialGetDefaultGroupID(world);
+
+		NewtonMaterialSetCallbackUserData(world, material, material, this);
+		NewtonMaterialSetCollisionCallback(world, material, material, StandardAABBOverlapTest, NULL);
+		NewtonMaterialSetDefaultElasticity(world, material, material, 0.1f);
+		NewtonMaterialSetDefaultFriction(world, material, material, 0.9f, 0.9f);
+
+		NewtonMaterialSetCallbackUserData(world, material, threadMaterialID, this);
+		NewtonMaterialSetCollisionCallback(world, material, threadMaterialID, StandardAABBOverlapTest, NULL);
+		NewtonMaterialSetDefaultElasticity(world, material, threadMaterialID, 0.1f);
+		NewtonMaterialSetDefaultFriction(world, material, threadMaterialID, 0.9f, 0.9f);
+
+		NewtonMaterialSetCallbackUserData(world, threadMaterialID, threadMaterialID, this);
+		NewtonMaterialSetCollisionCallback(world, threadMaterialID, threadMaterialID, StandardAABBOverlapTest, NULL);
+		NewtonMaterialSetContactGenerationCallback(world, threadMaterialID, threadMaterialID, ThreadStaticContactsGeneration);
+		NewtonMaterialSetDefaultElasticity(world, threadMaterialID, threadMaterialID, 0.1f);
+		NewtonMaterialSetDefaultFriction(world, threadMaterialID, threadMaterialID, 0.9f, 0.9f);
+*/
+	}
+
+	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
+	{
+		ServoVehicleManagerManager* const me = (ServoVehicleManagerManager*)context;
+		me->UpdateCamera(timestep);
+	}
+
+	static void RenderPlayerHelp(DemoEntityManager* const scene, void* const context)
+	{
+		ServoVehicleManagerManager* const me = (ServoVehicleManagerManager*)context;
+		me->RenderPlayerHelp(scene);
+	}
+
+	void RenderPlayerHelp(DemoEntityManager* const scene)
+	{
+/*
+		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
+		scene->Print(color, "Navigation Keys");
+		scene->Print(color, "drive forward:      w");
+		scene->Print(color, "drive backward:     s");
+		scene->Print(color, "turn right:         d");
+		scene->Print(color, "turn left:          a");
+
+		scene->Print(color, "bucket controls");
+		ImGui::SliderInt("cabin rotation", &m_cabinSpeed, -3, 3);
+		ImGui::SliderFloat("bucket x", &m_bucket_x, -2.0f, 4.0f);
+		ImGui::SliderFloat("bucket y", &m_bucket_y, -6.0f, 6.0f);
+		ImGui::SliderFloat("bucket angle", &m_bucket_angle, -60.0f, 130.0f);
+*/
+	}
+
+	void UpdateCamera(dFloat timestep)
+	{
+		//return;
+		//if (!m_player) {
+		//	return;
+		//}
+/*
+		DemoEntity* const player = (DemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+		DemoCamera* const camera = scene->GetCamera();
+		dMatrix camMatrix(camera->GetNextMatrix());
+		dMatrix playerMatrix(player->GetNextMatrix());
+
+		dVector frontDir(camMatrix[0]);
+		dVector camOrigin(playerMatrix.m_posit + dVector(0.0f, ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD, 0.0f, 0.0f));
+		camOrigin -= frontDir.Scale(ARTICULATED_VEHICLE_CAMERA_DISTANCE);
+		camera->SetNextMatrix(*scene, camMatrix, camOrigin);
+*/
+	}
+/*
+	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, dFloat mass)
+	{
+		NewtonWorld* const world = GetWorld();
+		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
+		dAssert(shape);
+
+		// calculate the bone matrix
+		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
+
+		// create the rigid body that will make this bone
+		NewtonBody* const body = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
+
+		// assign the material ID
+		NewtonBodySetMaterialGroupID(body, NewtonMaterialGetDefaultGroupID(world));
+
+		// destroy the collision helper shape 
+		NewtonDestroyCollision(shape);
+
+		// get the collision from body
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+
+		// save the root node as the use data
+		NewtonCollisionSetUserData(collision, this);
+
+		// set collision filter
+		// set the material properties for each link
+		NewtonCollisionMaterial material;
+		NewtonCollisionGetMaterial(collision, &material);
+		material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		material.m_userParam[0].m_int =
+			ARTICULATED_VEHICLE_DEFINITION::m_terrain |
+			ARTICULATED_VEHICLE_DEFINITION::m_bodyPart |
+			ARTICULATED_VEHICLE_DEFINITION::m_linkPart |
+			ARTICULATED_VEHICLE_DEFINITION::m_tirePart |
+			ARTICULATED_VEHICLE_DEFINITION::m_propBody;
+		NewtonCollisionSetMaterial(collision, &material);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		NewtonBodySetMassProperties(body, mass, collision);
+
+		// save the user data with the bone body (usually the visual geometry)
+		NewtonBodySetUserData(body, bodyPart);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+		return body;
+	}
+*/
+
+	dModelRootNode* CreateExcavator(const char* const modelName, const dMatrix& location)
+	{
+
+		NewtonWorld* const world = GetWorld();
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		// make a clone of the mesh 
+		DemoEntity* const vehicleModel = DemoEntity::LoadNGD_mesh(modelName, world, scene->GetShaderCache());
+		scene->Append(vehicleModel);
+/*
+		// place the model at its location
+		dMatrix matrix(vehicleModel->GetCurrentMatrix());
+		matrix.m_posit = location.m_posit;
+		vehicleModel->ResetMatrix(*scene, matrix);
+
+		DemoEntity* const rootEntity = (DemoEntity*)vehicleModel->Find("base");
+		NewtonBody* const rootBody = CreateBodyPart(rootEntity, 4000.0f);
+		dExcavatorModel* const controller = new dExcavatorModel(rootBody, m_threadMaterialID);
+
+		// the the model to calculate the local transformation
+		controller->SetTranformMode(true);
+
+		// add the model to the manager
+		AddRoot(controller);
+
+		m_player = controller;
+		return controller;
+*/
+		return NULL;
+	}
+
+/*
+	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext)
+	{
+		dExcavatorModel* const excavator = (dExcavatorModel*)model;
+		excavator->OnDebug(debugContext);
+	}
+
+	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const
+	{
+		dExcavatorModel* const excavator = (dExcavatorModel*)model;
+
+		NewtonWorld* const world = NewtonBodyGetWorld(excavator->GetBody());
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		dExcavatorControls controls;
+		controls.m_throttle = (dFloat(scene->GetKeyState('W')) - dFloat(scene->GetKeyState('S')));
+		controls.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
+		controls.m_cabinSpeed = m_cabinSpeed;
+		controls.m_bucket_x = m_bucket_x;
+		controls.m_bucket_y = m_bucket_y;
+		controls.m_bucket_angle = m_bucket_angle;
+
+		excavator->ApplyControls(controls, timestep);
+	}
+
+	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const
+	{
+		NewtonBody* const body = bone->GetBody();
+		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(body);
+		if (ent) {
+			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
+
+			dQuaternion rot(localMatrix);
+			ent->SetMatrix(*scene, rot, localMatrix.m_posit);
+		}
+	}
+
+	static int StandardAABBOverlapTest(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
+	{
+		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
+		const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
+		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
+		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
+
+		if (NewtonCollisionGetUserData(collision0) != NewtonCollisionGetUserData(collision1)) {
+			return 1;
+		}
+
+		NewtonCollisionMaterial material0;
+		NewtonCollisionMaterial material1;
+		NewtonCollisionGetMaterial(collision0, &material0);
+		NewtonCollisionGetMaterial(collision1, &material1);
+
+		//m_terrain	 = 1 << 0,
+		//m_bodyPart = 1 << 1,
+		//m_tirePart = 1 << 2,
+		//m_linkPart = 1 << 3,
+		//m_propBody = 1 << 4,
+
+		const dLong mask0 = material0.m_userId & material1.m_userParam[0].m_int;
+		const dLong mask1 = material1.m_userId & material0.m_userParam[0].m_int;
+		return (mask0 && mask1) ? 1 : 0;
+	}
+
+	static int ThreadStaticContactsGeneration(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex)
+	{
+		dAssert(NewtonBodyGetMaterialGroupID(body0) == NewtonBodyGetMaterialGroupID(body1));
+		dAssert(NewtonBodyGetMaterialGroupID(body0) != NewtonMaterialGetDefaultGroupID(NewtonBodyGetWorld(body0)));
+		dAssert(NewtonBodyGetMaterialGroupID(body1) != NewtonMaterialGetDefaultGroupID(NewtonBodyGetWorld(body1)));
+
+		dAssert(NewtonCollisionGetUserID(collision0) == ARTICULATED_VEHICLE_DEFINITION::m_linkPart);
+		dAssert(NewtonCollisionGetUserID(collision1) == ARTICULATED_VEHICLE_DEFINITION::m_terrain);
+
+		dExcavatorModel* const excavator = (dExcavatorModel*)NewtonCollisionGetUserData(collision0);
+		dAssert(excavator);
+		return excavator->CollideLink(material, body0, body1, contactBuffer);
+	}
+
+	dExcavatorModel* m_player;
+	int m_threadMaterialID;
+	int m_cabinSpeed;
+	dFloat32 m_bucket_x;
+	dFloat32 m_bucket_y;
+	dFloat32 m_bucket_angle;
+*/
+};
+
 void ServoJoints (DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
-dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
 
 	NewtonBody* const floor = CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 	//NewtonCollision* const floorCollision = NewtonBodyGetCollision(floor);
 	//NewtonCollisionSetUserID(floorCollision, SERVO_VEHICLE_DEFINITION::m_terrain);
 
+	ServoVehicleManagerManager* const vehicleManager = new ServoVehicleManagerManager (scene, 0);
+
+	NewtonWorld* const world = scene->GetNewton();
+	dVector origin(FindFloor(world, dVector(-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
+
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = FindFloor(world, origin, 100.0f);
+	matrix.m_posit.m_y += 1.5f;
+	vehicleManager->CreateExcavator("tractor.ngd", matrix);
 /*
 	NewtonWorld* const world = scene->GetNewton();
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
@@ -958,25 +1221,25 @@ dTrace(("sorry demo %s temporarilly disabled\n", __FUNCTION__));
 	inputManager->AddPlayer(forklift);
 */
 
-#if 0
- place heavy load to show reproduce black bird dream problems
+#if 1
+	//place heavy load to show reproduce black bird dream problems
 	matrix.m_posit.m_x += 2.0f;	
 	matrix.m_posit.m_z -= 2.0f;	
 //	MakeHeavyLoad (scene, matrix);
 
 	// add some object to play with
-//	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-//	LoadLumberYardMesh (scene, dVector(5.0f, 0.0f, 6.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-//	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f, -4.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-//	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f,  2.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-//	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 0.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
-//	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 6.0f, 0.0f), SERVO_VEHICLE_DEFINITION::m_landPart);
+	LoadLumberYardMesh(scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), 0);
+//	LoadLumberYardMesh(scene, dVector(5.0f, 0.0f, 6.0f, 0.0f), 0);
+//	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f, -4.0f, 0.0f), 0);
+//	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f,  2.0f, 0.0f), 0);
+//	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 0.0f, 0.0f), 0);
+//	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 6.0f, 0.0f), 0);
 #endif	
-//	origin.m_x += 0.0f;
-//	origin.m_y += 2.0f;
-//	origin.m_z += 6.0f;
-//	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), 90.0f * dDegreeToRad);  
-//	scene->SetCameraMatrix(rot, origin);
+	origin.m_x -= 2.0f;
+	origin.m_y += 4.0f;
+	//origin.m_z = 6.0f;
+	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), 0.0f * dDegreeToRad);  
+	scene->SetCameraMatrix(rot, origin);
 }
 
 
