@@ -935,32 +935,11 @@ class dTractorModel: public dModelRootNode
 	{
 		MakeChassis(world, modelName, location);
 
+		MakeDriveTrain();
 		AddTires ();
 	}
 
 	private:
-	
-	void MakeChassis (NewtonWorld* const world, const char* const modelName, const dMatrix& location)
-	{
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-
-		// make a clone of the mesh 
-		DemoEntity* const vehicleModel = DemoEntity::LoadNGD_mesh(modelName, world, scene->GetShaderCache());
-		scene->Append(vehicleModel);
-
-		dMatrix matrix(vehicleModel->GetCurrentMatrix());
-		matrix.m_posit = location.m_posit;
-		vehicleModel->ResetMatrix(*scene, matrix);
-
-		DemoEntity* const rootEntity = (DemoEntity*)vehicleModel->Find("MainBody");
-		m_body = CreateBodyPart(world, rootEntity, 4000.0f);
-	}
-
-	void AddTires()
-	{
-		//rr_tire, rl_tire, front_axel, fr_tire, fl_tire
-	}
-
 	NewtonBody* CreateBodyPart(NewtonWorld* const world, DemoEntity* const bodyPart, dFloat mass)
 	{
 		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
@@ -1006,6 +985,52 @@ class dTractorModel: public dModelRootNode
 		// set the bod part force and torque call back to the gravity force, skip the transform callback
 		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
 		return body;
+	}
+
+	void MakeChassis(NewtonWorld* const world, const char* const modelName, const dMatrix& location)
+	{
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		// make a clone of the mesh 
+		DemoEntity* const vehicleModel = DemoEntity::LoadNGD_mesh(modelName, world, scene->GetShaderCache());
+		scene->Append(vehicleModel);
+
+		dMatrix matrix(vehicleModel->GetCurrentMatrix());
+		matrix.m_posit = location.m_posit;
+		vehicleModel->ResetMatrix(*scene, matrix);
+
+		DemoEntity* const rootEntity = (DemoEntity*)vehicleModel->Find("MainBody");
+		m_body = CreateBodyPart(world, rootEntity, 4000.0f);
+	}
+
+	void AddTires()
+	{
+
+	}
+
+	void MakeDriveTrain()
+	{
+		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
+		//rr_tire, rl_tire, front_axel, fr_tire, fl_tire
+		// add front_axel 
+		NewtonBody* const chassisBody = GetBody();
+		DemoEntity* const chassisEntity = (DemoEntity*)NewtonBodyGetUserData(chassisBody);
+		DemoEntity* const axelEntity = chassisEntity->Find("front_axel");
+		NewtonBody* const fronAxelBody = CreateBodyPart(world, axelEntity, 100.0f);
+
+		// connect the part to the main body with a hinge
+		dMatrix hingeFrame;
+		NewtonBodyGetMatrix(fronAxelBody, &hingeFrame[0][0]);
+		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
+		dCustomHinge* const hinge = new dCustomHinge(hingeFrame, fronAxelBody, chassisBody);
+		hinge->EnableLimits(true);
+		hinge->SetLimits(-20.0f * dDegreeToRad, 20.0f * dDegreeToRad);
+
+		//dMatrix bindMatrix(bodyPart->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
+		dMatrix bindMatrix(dGetIdentityMatrix());
+		dModelNode* const axelNode = new dModelNode(fronAxelBody, bindMatrix, this);
+
+
 	}
 };
 
