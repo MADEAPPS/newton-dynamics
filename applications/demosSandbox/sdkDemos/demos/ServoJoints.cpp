@@ -19,6 +19,57 @@
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
 
+/*
+class dPulleyBallSocket : public dCustomJoint
+{
+	public:
+	dPulleyBallSocket(dFloat gearRatio, const dMatrix& pinAndPivotFrame, NewtonBody* const body0, NewtonBody* const body1)
+		:dCustomJoint(3, body0, body1)
+		,m_gearRatio(gearRatio)
+	{
+		CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+	}
+
+	protected:
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+		for (int i = 0; i < 3; i++) {
+			//dVector dir0 (matrix0.m_front.Scale(m_gearRatio));
+			//dVector dir1 (matrix1.m_front);
+			NewtonUserJointAddLinearRow(m_joint, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix1[0][0]);
+
+			dFloat jacobian0[6];
+			dFloat jacobian1[6];
+
+			NewtonUserJointGetRowJacobian(m_joint, &jacobian0[0], &jacobian0[3], &jacobian1[0], &jacobian1[3]);
+
+			jacobian0[0] *= m_gearRatio;
+			jacobian0[1] *= m_gearRatio;
+			jacobian0[2] *= m_gearRatio;
+			jacobian0[3] *= m_gearRatio;
+			jacobian0[4] *= m_gearRatio;
+			jacobian0[5] *= m_gearRatio;
+
+			//NewtonBodyGetOmega(m_body0, &omega0[0]);
+			//NewtonBodyGetOmega(m_body1, &omega1[0]);
+			//
+			//dFloat w0 = omega0.DotProduct3(dir0);
+			//dFloat w1 = omega1.DotProduct3(dir1);
+			//dFloat relOmega = w0 + w1;
+			//dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
+			//dFloat relAccel = -0.5f * relOmega * invTimestep;
+			//NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
+			//NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+		}
+	}
+
+	dFloat m_gearRatio;
+};
+*/
+
 #if 0
 #define SERVO_VEHICLE_CAMERA_EYEPOINT			1.5f
 #define SERVO_VEHICLE_CAMERA_HIGH_ABOVE_HEAD	2.0f
