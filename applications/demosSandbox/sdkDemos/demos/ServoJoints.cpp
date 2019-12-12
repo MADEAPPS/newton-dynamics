@@ -927,12 +927,95 @@ static void MakeHeavyLoad (DemoEntityManager* const scene, const dMatrix& locati
 #endif
 
 
+class dTractorModel: public dModelRootNode
+{
+	public:
+	dTractorModel(NewtonWorld* const world, const char* const modelName, const dMatrix& location)
+		:dModelRootNode(NULL, dGetIdentityMatrix())
+	{
+		MakeChassis(world, modelName, location);
+
+		AddTires ();
+	}
+
+	private:
+	
+	void MakeChassis (NewtonWorld* const world, const char* const modelName, const dMatrix& location)
+	{
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		// make a clone of the mesh 
+		DemoEntity* const vehicleModel = DemoEntity::LoadNGD_mesh(modelName, world, scene->GetShaderCache());
+		scene->Append(vehicleModel);
+
+		dMatrix matrix(vehicleModel->GetCurrentMatrix());
+		matrix.m_posit = location.m_posit;
+		vehicleModel->ResetMatrix(*scene, matrix);
+
+		DemoEntity* const rootEntity = (DemoEntity*)vehicleModel->Find("MainBody");
+		m_body = CreateBodyPart(world, rootEntity, 4000.0f);
+	}
+
+	void AddTires()
+	{
+		//rr_tire, rl_tire, front_axel, fr_tire, fl_tire
+	}
+
+	NewtonBody* CreateBodyPart(NewtonWorld* const world, DemoEntity* const bodyPart, dFloat mass)
+	{
+		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
+		dAssert(shape);
+
+		// calculate the bone matrix
+		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
+
+		// create the rigid body that will make this bone
+		NewtonBody* const body = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
+
+		// assign the material ID
+		NewtonBodySetMaterialGroupID(body, NewtonMaterialGetDefaultGroupID(world));
+
+		// destroy the collision helper shape 
+		NewtonDestroyCollision(shape);
+
+		// get the collision from body
+		NewtonCollision* const collision = NewtonBodyGetCollision(body);
+
+		// save the root node as the use data
+		NewtonCollisionSetUserData(collision, this);
+
+		// set collision filter
+		// set the material properties for each link
+		//NewtonCollisionMaterial material;
+		//NewtonCollisionGetMaterial(collision, &material);
+		//material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
+		//material.m_userParam[0].m_int =
+		//	ARTICULATED_VEHICLE_DEFINITION::m_terrain |
+		//	ARTICULATED_VEHICLE_DEFINITION::m_bodyPart |
+		//	ARTICULATED_VEHICLE_DEFINITION::m_linkPart |
+		//	ARTICULATED_VEHICLE_DEFINITION::m_tirePart |
+		//	ARTICULATED_VEHICLE_DEFINITION::m_propBody;
+		//NewtonCollisionSetMaterial(collision, &material);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		NewtonBodySetMassProperties(body, mass, collision);
+
+		// save the user data with the bone body (usually the visual geometry)
+		NewtonBodySetUserData(body, bodyPart);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
+		return body;
+	}
+};
+
+
 class ServoVehicleManagerManager: public dModelManager
 {
 	public:
 	ServoVehicleManagerManager(DemoEntityManager* const scene, int threadMaterialID)
 		:dModelManager(scene->GetNewton())
-		//,m_player(NULL)
+		,m_player(NULL)
 		//,m_threadMaterialID(threadMaterialID)
 		//,m_cabinSpeed(0)
 		//,m_bucket_x(0.0f)
@@ -1014,85 +1097,19 @@ class ServoVehicleManagerManager: public dModelManager
 		camera->SetNextMatrix(*scene, camMatrix, camOrigin);
 */
 	}
-/*
-	NewtonBody* CreateBodyPart(DemoEntity* const bodyPart, dFloat mass)
+
+	dModelRootNode* CreateTractor(const char* const modelName, const dMatrix& location)
 	{
-		NewtonWorld* const world = GetWorld();
-		NewtonCollision* const shape = bodyPart->CreateCollisionFromchildren(world);
-		dAssert(shape);
-
-		// calculate the bone matrix
-		dMatrix matrix(bodyPart->CalculateGlobalMatrix());
-
-		// create the rigid body that will make this bone
-		NewtonBody* const body = NewtonCreateDynamicBody(world, shape, &matrix[0][0]);
-
-		// assign the material ID
-		NewtonBodySetMaterialGroupID(body, NewtonMaterialGetDefaultGroupID(world));
-
-		// destroy the collision helper shape 
-		NewtonDestroyCollision(shape);
-
-		// get the collision from body
-		NewtonCollision* const collision = NewtonBodyGetCollision(body);
-
-		// save the root node as the use data
-		NewtonCollisionSetUserData(collision, this);
-
-		// set collision filter
-		// set the material properties for each link
-		NewtonCollisionMaterial material;
-		NewtonCollisionGetMaterial(collision, &material);
-		material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
-		material.m_userParam[0].m_int =
-			ARTICULATED_VEHICLE_DEFINITION::m_terrain |
-			ARTICULATED_VEHICLE_DEFINITION::m_bodyPart |
-			ARTICULATED_VEHICLE_DEFINITION::m_linkPart |
-			ARTICULATED_VEHICLE_DEFINITION::m_tirePart |
-			ARTICULATED_VEHICLE_DEFINITION::m_propBody;
-		NewtonCollisionSetMaterial(collision, &material);
-
-		// calculate the moment of inertia and the relative center of mass of the solid
-		NewtonBodySetMassProperties(body, mass, collision);
-
-		// save the user data with the bone body (usually the visual geometry)
-		NewtonBodySetUserData(body, bodyPart);
-
-		// set the bod part force and torque call back to the gravity force, skip the transform callback
-		NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
-		return body;
-	}
-*/
-
-	dModelRootNode* CreateExcavator(const char* const modelName, const dMatrix& location)
-	{
-
-		NewtonWorld* const world = GetWorld();
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-
-		// make a clone of the mesh 
-		DemoEntity* const vehicleModel = DemoEntity::LoadNGD_mesh(modelName, world, scene->GetShaderCache());
-		scene->Append(vehicleModel);
-/*
-		// place the model at its location
-		dMatrix matrix(vehicleModel->GetCurrentMatrix());
-		matrix.m_posit = location.m_posit;
-		vehicleModel->ResetMatrix(*scene, matrix);
-
-		DemoEntity* const rootEntity = (DemoEntity*)vehicleModel->Find("base");
-		NewtonBody* const rootBody = CreateBodyPart(rootEntity, 4000.0f);
-		dExcavatorModel* const controller = new dExcavatorModel(rootBody, m_threadMaterialID);
+		dTractorModel* const tractor = new dTractorModel(GetWorld(), modelName, location);
 
 		// the the model to calculate the local transformation
-		controller->SetTranformMode(true);
+		tractor->SetTranformMode(true);
 
 		// add the model to the manager
-		AddRoot(controller);
+		AddRoot(tractor);
 
-		m_player = controller;
-		return controller;
-*/
-		return NULL;
+		m_player = tractor;
+		return tractor;
 	}
 
 /*
@@ -1118,18 +1135,6 @@ class ServoVehicleManagerManager: public dModelManager
 		controls.m_bucket_angle = m_bucket_angle;
 
 		excavator->ApplyControls(controls, timestep);
-	}
-
-	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const
-	{
-		NewtonBody* const body = bone->GetBody();
-		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(body);
-		if (ent) {
-			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
-
-			dQuaternion rot(localMatrix);
-			ent->SetMatrix(*scene, rot, localMatrix.m_posit);
-		}
 	}
 
 	static int StandardAABBOverlapTest(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
@@ -1173,13 +1178,27 @@ class ServoVehicleManagerManager: public dModelManager
 		return excavator->CollideLink(material, body0, body1, contactBuffer);
 	}
 
-	dExcavatorModel* m_player;
+	
 	int m_threadMaterialID;
 	int m_cabinSpeed;
 	dFloat32 m_bucket_x;
 	dFloat32 m_bucket_y;
 	dFloat32 m_bucket_angle;
 */
+
+	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const
+	{
+		NewtonBody* const body = bone->GetBody();
+		DemoEntity* const ent = (DemoEntity*)NewtonBodyGetUserData(body);
+		if (ent) {
+			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
+
+			dQuaternion rot(localMatrix);
+			ent->SetMatrix(*scene, rot, localMatrix.m_posit);
+		}
+	}
+
+	dTractorModel* m_player;
 };
 
 void ServoJoints (DemoEntityManager* const scene)
@@ -1200,7 +1219,7 @@ void ServoJoints (DemoEntityManager* const scene)
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = FindFloor(world, origin, 100.0f);
 	matrix.m_posit.m_y += 1.5f;
-	vehicleManager->CreateExcavator("tractor.ngd", matrix);
+	vehicleManager->CreateTractor("tractor.ngd", matrix);
 /*
 	NewtonWorld* const world = scene->GetNewton();
 	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
@@ -1228,14 +1247,14 @@ void ServoJoints (DemoEntityManager* const scene)
 //	MakeHeavyLoad (scene, matrix);
 
 	// add some object to play with
-	LoadLumberYardMesh(scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), 0);
+//	LoadLumberYardMesh(scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), 0);
 //	LoadLumberYardMesh(scene, dVector(5.0f, 0.0f, 6.0f, 0.0f), 0);
 //	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f, -4.0f, 0.0f), 0);
 //	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f,  2.0f, 0.0f), 0);
 //	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 0.0f, 0.0f), 0);
 //	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 6.0f, 0.0f), 0);
 #endif	
-	origin.m_x -= 2.0f;
+	origin.m_x -= 10.0f;
 	origin.m_y += 4.0f;
 	//origin.m_z = 6.0f;
 	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), 0.0f * dDegreeToRad);  
