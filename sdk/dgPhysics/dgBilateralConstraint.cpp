@@ -198,7 +198,6 @@ void dgBilateralConstraint::SetMotorAcceleration (dgInt32 index, dgFloat32 accel
 	desc.m_penetrationStiffness[index] = acceleration; 
 }
 
-
 void dgBilateralConstraint::SetJacobianDerivative (dgInt32 index, dgContraintDescritor& desc, const dgFloat32* const jacobianA, const dgFloat32* const jacobianB, dgForceImpactPair* const jointForce)
 {
 	dgJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0; 

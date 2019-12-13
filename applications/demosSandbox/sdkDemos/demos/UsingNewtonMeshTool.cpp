@@ -18,6 +18,82 @@
 #include "PhysicsUtils.h"
 
 
+// experiment with pulley ball socket for  JernejL
+class dPulleyBallSocket: public dCustomJoint
+{
+	public:
+	dPulleyBallSocket(dFloat gearRatio, const dMatrix& pinAndPivotFrame, NewtonBody* const body0, NewtonBody* const body1)
+		:dCustomJoint(3, body0, body1)
+		, m_gearRatio(gearRatio)
+	{
+		CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+	}
+
+	protected:
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+		dVector com0(0.0f);
+		dVector com1(0.0f);
+
+		NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
+		NewtonBodyGetMatrix(m_body1, &matrix1[0][0]);
+		NewtonBodyGetCentreOfMass(m_body0, &com0[0]);
+		NewtonBodyGetCentreOfMass(m_body1, &com1[0]);
+
+		com0.m_w = 1.0f;
+		com1.m_w = 1.0f;
+		com0 = matrix0.TransformVector(com0);
+		com1 = matrix1.TransformVector(com1);
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		dVector r0(com0 - matrix0.m_posit);
+		dVector r1(com1 - matrix1.m_posit);
+
+		dVector omega0;
+		dVector omega1;
+		dVector veloc0;
+		dVector veloc1;
+		NewtonBodyGetOmega(m_body0, &omega0[0]);
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+		NewtonBodyGetVelocity(m_body0, &veloc0[0]);
+		NewtonBodyGetVelocity(m_body1, &veloc1[0]);
+
+		for (int i = 0; i < 3; i++) {
+			dVector dir0(matrix0[i].Scale(m_gearRatio));
+			dVector dir1(matrix1[i].Scale(-1.0f));
+			dVector r0CrossDir0(r0.CrossProduct(dir0));
+			dVector r1CrossDir1(r1.CrossProduct(dir1));
+
+			dFloat jacobian0[6];
+			dFloat jacobian1[6];
+
+			jacobian0[0] = dir0[0];
+			jacobian0[1] = dir0[1];
+			jacobian0[2] = dir0[2];
+			jacobian0[3] = r0CrossDir0[0];
+			jacobian0[4] = r0CrossDir0[1];
+			jacobian0[5] = r0CrossDir0[2];
+
+			jacobian1[0] = dir1[0];
+			jacobian1[1] = dir1[1];
+			jacobian1[2] = dir1[2];
+			jacobian1[3] = r1CrossDir1[0];
+			jacobian1[4] = r1CrossDir1[1];
+			jacobian1[5] = r1CrossDir1[2];
+			dVector speed(dir0 * veloc0 + r0CrossDir0 * omega0 + dir1 * veloc1 + r1CrossDir1 * omega1);
+			dFloat relAlpha = -0.25f * (speed.m_x + speed.m_y + speed.m_z) / timestep;
+
+			NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
+			NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
+		}
+	}
+
+	dFloat m_gearRatio;
+};
+
+
 // the vertex array, vertices's has for values, x, y, z, w
 // w is use as a id to have multiple copy of the same very, like for example mesh that share more than two edges.
 // in most case w can be set to 0.0
