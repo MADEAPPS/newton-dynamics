@@ -30,6 +30,15 @@ class dPulleyBallSocket: public dCustomJoint
 	}
 
 	protected:
+	void Debug(dDebugDisplay* const debugDisplay) const 
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+		debugDisplay->DrawFrame(matrix0);
+		debugDisplay->DrawFrame(matrix1);
+	}
+
 	void SubmitConstraints(dFloat timestep, int threadIndex)
 	{
 		dMatrix matrix0;
@@ -48,8 +57,9 @@ class dPulleyBallSocket: public dCustomJoint
 		com1 = matrix1.TransformVector(com1);
 		CalculateGlobalMatrix(matrix0, matrix1);
 
-		dVector r0(com0 - matrix0.m_posit);
-		dVector r1(com1 - matrix1.m_posit);
+		dVector r0(matrix0.m_posit - com0);
+		dVector r1(matrix1.m_posit - com1);
+		dVector error(matrix1.m_posit - matrix0.m_posit);
 
 		dVector omega0;
 		dVector omega1;
@@ -61,8 +71,9 @@ class dPulleyBallSocket: public dCustomJoint
 		NewtonBodyGetVelocity(m_body1, &veloc1[0]);
 
 		for (int i = 0; i < 3; i++) {
-			dVector dir0(matrix0[i].Scale(m_gearRatio));
+			dVector dir0(matrix1[i].Scale(m_gearRatio));
 			dVector dir1(matrix1[i].Scale(-1.0f));
+	
 			dVector r0CrossDir0(r0.CrossProduct(dir0));
 			dVector r1CrossDir1(r1.CrossProduct(dir1));
 
@@ -82,11 +93,13 @@ class dPulleyBallSocket: public dCustomJoint
 			jacobian1[3] = r1CrossDir1[0];
 			jacobian1[4] = r1CrossDir1[1];
 			jacobian1[5] = r1CrossDir1[2];
-			dVector speed(dir0 * veloc0 + r0CrossDir0 * omega0 + dir1 * veloc1 + r1CrossDir1 * omega1);
-			dFloat relAlpha = -0.25f * (speed.m_x + speed.m_y + speed.m_z) / timestep;
 
 			NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
-			NewtonUserJointSetRowAcceleration(m_joint, relAlpha);
+
+			dVector speed(dir0 * veloc0 + r0CrossDir0 * omega0 + dir1 * veloc1 + r1CrossDir1 * omega1);
+			dFloat stopAccel = -0.25f * (speed.m_x + speed.m_y + speed.m_z);
+			dFloat postError = 0.1f * dClamp (matrix1[i].DotProduct3(error), dFloat (-0.25f), dFloat(0.25f));
+			NewtonUserJointSetRowAcceleration(m_joint, (stopAccel + postError / timestep) / timestep);
 		}
 	}
 
@@ -294,10 +307,14 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	NewtonSetContactMergeTolerance (scene->GetNewton(), 1.0e-3f);
 
 	// make a box using low lever NetwonMesh
-	CreateSimpleBox_NewtonMesh (scene, dVector (0.0f, 2.0f, -2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
+	NewtonBody* const body0 = CreateSimpleBox_NewtonMesh (scene, dVector (0.0f, 2.0f, -2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
 
 	// make a box using the dNetwonMesh Class
-	CreateSimpledBox_dNetwonMesh (scene, dVector (4.0f, 2.0f, 2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
+	NewtonBody* const body1 = CreateSimpledBox_dNetwonMesh (scene, dVector (0.0f, 2.0f, 2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
+
+	dMatrix pinAndPivotFrame(dGetIdentityMatrix());
+	pinAndPivotFrame.m_posit = dVector(0.0f, 2.5f, 0.0f, 1.0f);
+	new dPulleyBallSocket(1.0f, pinAndPivotFrame, body0, body1);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
