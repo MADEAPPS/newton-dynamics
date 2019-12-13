@@ -963,19 +963,6 @@ class dTractorModel: public dModelRootNode
 		// save the root node as the use data
 		NewtonCollisionSetUserData(collision, this);
 
-		// set collision filter
-		// set the material properties for each link
-		//NewtonCollisionMaterial material;
-		//NewtonCollisionGetMaterial(collision, &material);
-		//material.m_userId = ARTICULATED_VEHICLE_DEFINITION::m_bodyPart;
-		//material.m_userParam[0].m_int =
-		//	ARTICULATED_VEHICLE_DEFINITION::m_terrain |
-		//	ARTICULATED_VEHICLE_DEFINITION::m_bodyPart |
-		//	ARTICULATED_VEHICLE_DEFINITION::m_linkPart |
-		//	ARTICULATED_VEHICLE_DEFINITION::m_tirePart |
-		//	ARTICULATED_VEHICLE_DEFINITION::m_propBody;
-		//NewtonCollisionSetMaterial(collision, &material);
-
 		// calculate the moment of inertia and the relative center of mass of the solid
 		NewtonBodySetMassProperties(body, mass, collision);
 
@@ -1015,9 +1002,9 @@ class dTractorModel: public dModelRootNode
 		dFloat* const array = mesh->m_vertex;
 		for (int i = 0; i < mesh->m_vertexCount; i++) {
 			dVector p(matrix.TransformVector(dVector(array[i * 3 + 0], array[i * 3 + 1], array[i * 3 + 2], 1.0f)));
-			maxWidth = dMax(p.m_z, maxWidth);
-			minWidth = dMin(p.m_z, minWidth);
-			radius = dMax(p.m_x, radius);
+			maxWidth = dMax(p.m_x, maxWidth);
+			minWidth = dMin(p.m_x, minWidth);
+			radius = dMax(p.m_y, radius);
 		}
 		width = maxWidth - minWidth;
 		radius -= width * 0.5f;
@@ -1028,15 +1015,16 @@ class dTractorModel: public dModelRootNode
 		dFloat width;
 		dFloat radius;
 		GetTireDimensions(tireModel, radius, width);
-		dMatrix align(dYawMatrix(90.0f * dDegreeToRad));
+		//dMatrix align(dYawMatrix(90.0f * dDegreeToRad));
+		dMatrix align(dGetIdentityMatrix());
 		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
 		NewtonCollision* const tireShape = NewtonCreateChamferCylinder(world, radius, width, 0, &align[0][0]);
 		return tireShape;
 	}
 
-	dModelNode* MakeTireBody(const char* const entName, NewtonCollision* const tireCollision, dFloat mass)
+	dModelNode* MakeTireBody(const char* const entName, NewtonCollision* const tireCollision, dFloat mass, dModelNode* const parentNode)
 	{
-		NewtonBody* const parentBody = GetBody();
+		NewtonBody* const parentBody = parentNode->GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
 		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
 		DemoEntity* const tireModel = parentModel->Find(entName);
@@ -1066,33 +1054,31 @@ class dTractorModel: public dModelRootNode
 		NewtonBodySetForceAndTorqueCallback(tireBody, PhysicsApplyGravityForce);
 
 		dMatrix bindMatrix(tireModel->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
-		dModelNode* const bone = new dModelNode(tireBody, bindMatrix, this);
+		dModelNode* const bone = new dModelNode(tireBody, bindMatrix, parentNode);
 		return bone;
 	}
 
-	dModelNode* MakeRollerTire(const char* const entName, dFloat mass)
+	dModelNode* MakeTire(const char* const entName, dFloat mass, dModelNode* const parentNode)
 	{
-		NewtonBody* const parentBody = GetBody();
+		NewtonBody* const parentBody = parentNode->GetBody();
 		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
 		DemoEntity* const tireModel = parentModel->Find(entName);
 
 		NewtonCollision* const tireCollision = MakeTireShape(tireModel);
-		dModelNode* const bone = MakeTireBody(entName, tireCollision, mass);
+		dModelNode* const bone = MakeTireBody(entName, tireCollision, mass, parentNode);
 		NewtonDestroyCollision(tireCollision);
 
 		// connect the tire the body with a hinge
 		dMatrix matrix;
 		NewtonBodyGetMatrix(bone->GetBody(), &matrix[0][0]);
-		dMatrix hingeFrame(dYawMatrix(90.0f * dDegreeToRad) * matrix);
-
-		new dCustomHinge(hingeFrame, bone->GetBody(), parentBody);
+		new dCustomHinge(matrix, bone->GetBody(), parentBody);
 		return bone;
 	}
 
-	void MakeDriveTrain()
+	dModelNode* MakeFronAxel()
 	{
 		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
-		//rr_tire, rl_tire, front_axel, fr_tire, fl_tire
+
 		// add front_axel 
 		NewtonBody* const chassisBody = GetBody();
 		DemoEntity* const chassisEntity = (DemoEntity*)NewtonBodyGetUserData(chassisBody);
@@ -1109,9 +1095,18 @@ class dTractorModel: public dModelRootNode
 
 		//dMatrix bindMatrix(bodyPart->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
 		dMatrix bindMatrix(dGetIdentityMatrix());
-		dModelNode* const axelNode = new dModelNode(fronAxelBody, bindMatrix, this);
+		return new dModelNode(fronAxelBody, bindMatrix, this);
+	}
 
+	void MakeDriveTrain()
+	{
+		//rr_tire, rl_tire, front_axel, fr_tire, fl_tire
+		dModelNode* const axelNode = MakeFronAxel();
+		dModelNode* const frontLeftTire = MakeTire("fl_tire", 50.0f, axelNode);
+		dModelNode* const frontRightTire = MakeTire("fr_tire", 50.0f, axelNode);
 
+		dModelNode* const rearLeftTire = MakeTire("rl_tire", 100.0f, this);
+		dModelNode* const rearRightTire = MakeTire("rr_tire", 100.0f, this);
 	}
 };
 
@@ -1353,7 +1348,7 @@ void ServoJoints (DemoEntityManager* const scene)
 //	MakeHeavyLoad (scene, matrix);
 
 	// add some object to play with
-//	LoadLumberYardMesh(scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), 0);
+	LoadLumberYardMesh(scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), 0);
 //	LoadLumberYardMesh(scene, dVector(5.0f, 0.0f, 6.0f, 0.0f), 0);
 //	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f, -4.0f, 0.0f), 0);
 //	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f,  2.0f, 0.0f), 0);

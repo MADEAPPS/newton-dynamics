@@ -32,7 +32,7 @@
 #define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-#define DEFAULT_SCENE	0		// using NewtonMesh tool
+//#define DEFAULT_SCENE	0		// using NewtonMesh tool
 //#define DEFAULT_SCENE	1		// coefficients of friction
 //#define DEFAULT_SCENE	2		// coefficients of restitution
 //#define DEFAULT_SCENE	3		// newton cradle
@@ -62,7 +62,7 @@
 //#define DEFAULT_SCENE	27		// structured convex fracturing 
 //#define DEFAULT_SCENE	28		// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	29		// standard joints
-//#define DEFAULT_SCENE	30		// servo joints
+#define DEFAULT_SCENE	30		// servo joints
 //#define DEFAULT_SCENE	31		// construction vehicle
 //#define DEFAULT_SCENE	32		// six axis manipulator
 //#define DEFAULT_SCENE	33		// hexapod Robot
