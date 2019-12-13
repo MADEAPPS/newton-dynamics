@@ -22,9 +22,9 @@
 class dPulleyBallSocket: public dCustomJoint
 {
 	public:
-	dPulleyBallSocket(dFloat gearRatio, const dMatrix& pinAndPivotFrame, NewtonBody* const body0, NewtonBody* const body1)
-		:dCustomJoint(3, body0, body1)
-		, m_gearRatio(gearRatio)
+	dPulleyBallSocket(dFloat gearRatio, const dMatrix& pinAndPivotFrame, NewtonBody* const heavyBody, NewtonBody* const lightBody)
+		:dCustomJoint(3, heavyBody, lightBody)
+		,m_gearRatio(gearRatio)
 	{
 		CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 	}
