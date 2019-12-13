@@ -1429,9 +1429,10 @@ void NewtonMaterialSetDefaultFriction(const NewtonWorld* const newtonWorld, int 
 
 	if (material) {
 		if (staticFriction >= dgFloat32 (1.0e-2f)) {
-			dFloat stat = dgClamp (staticFriction, dFloat(0.01f), dFloat(2.0f));
-			dFloat kine = dgClamp (kineticFriction, dFloat(0.01f), dFloat(2.0f));
-			stat = dgMax (stat, kine);
+			dFloat stat0 = dgClamp (staticFriction, dFloat(0.01f), dFloat(2.0f));
+			dFloat kine0 = dgClamp (kineticFriction, dFloat(0.01f), dFloat(2.0f));
+			dFloat stat = dgMax (stat0, kine0);
+			dFloat kine = dgMin (stat0, kine0);
 			material->m_staticFriction0 = stat;
 			material->m_staticFriction1 = stat;
 			material->m_dynamicFriction0 = kine;
