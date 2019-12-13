@@ -937,7 +937,6 @@ class dTractorModel: public dModelRootNode
 		MakeChassis(world, modelName, location);
 
 		MakeDriveTrain();
-		AddTires ();
 	}
 
 	private:
@@ -1004,9 +1003,90 @@ class dTractorModel: public dModelRootNode
 		m_body = CreateBodyPart(world, rootEntity, 4000.0f);
 	}
 
-	void AddTires()
+	void GetTireDimensions(DemoEntity* const bodyPart, dFloat& radius, dFloat& width)
 	{
+		radius = 0.0f;
+		dFloat maxWidth = 0.0f;
+		dFloat minWidth = 0.0f;
 
+		DemoMesh* const mesh = (DemoMesh*)bodyPart->GetMesh();
+		dAssert(mesh->IsType(DemoMesh::GetRttiType()));
+		const dMatrix& matrix = bodyPart->GetMeshMatrix();
+		dFloat* const array = mesh->m_vertex;
+		for (int i = 0; i < mesh->m_vertexCount; i++) {
+			dVector p(matrix.TransformVector(dVector(array[i * 3 + 0], array[i * 3 + 1], array[i * 3 + 2], 1.0f)));
+			maxWidth = dMax(p.m_z, maxWidth);
+			minWidth = dMin(p.m_z, minWidth);
+			radius = dMax(p.m_x, radius);
+		}
+		width = maxWidth - minWidth;
+		radius -= width * 0.5f;
+	}
+
+	NewtonCollision* const MakeTireShape(DemoEntity* const tireModel)
+	{
+		dFloat width;
+		dFloat radius;
+		GetTireDimensions(tireModel, radius, width);
+		dMatrix align(dYawMatrix(90.0f * dDegreeToRad));
+		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
+		NewtonCollision* const tireShape = NewtonCreateChamferCylinder(world, radius, width, 0, &align[0][0]);
+		return tireShape;
+	}
+
+	dModelNode* MakeTireBody(const char* const entName, NewtonCollision* const tireCollision, dFloat mass)
+	{
+		NewtonBody* const parentBody = GetBody();
+		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
+		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
+		DemoEntity* const tireModel = parentModel->Find(entName);
+
+		// calculate the bone matrix
+		dMatrix matrix(tireModel->CalculateGlobalMatrix());
+
+		// create the rigid body that will make this bone
+		NewtonBody* const tireBody = NewtonCreateDynamicBody(world, tireCollision, &matrix[0][0]);
+
+		// assign the material ID
+		NewtonBodySetMaterialGroupID(tireBody, NewtonMaterialGetDefaultGroupID(world));
+
+		// get the collision from body
+		NewtonCollision* const collision = NewtonBodyGetCollision(tireBody);
+
+		// save the root node as the use data
+		NewtonCollisionSetUserData(collision, this);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		NewtonBodySetMassProperties(tireBody, mass, collision);
+
+		// save the user data with the bone body (usually the visual geometry)
+		NewtonBodySetUserData(tireBody, tireModel);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		NewtonBodySetForceAndTorqueCallback(tireBody, PhysicsApplyGravityForce);
+
+		dMatrix bindMatrix(tireModel->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
+		dModelNode* const bone = new dModelNode(tireBody, bindMatrix, this);
+		return bone;
+	}
+
+	dModelNode* MakeRollerTire(const char* const entName, dFloat mass)
+	{
+		NewtonBody* const parentBody = GetBody();
+		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
+		DemoEntity* const tireModel = parentModel->Find(entName);
+
+		NewtonCollision* const tireCollision = MakeTireShape(tireModel);
+		dModelNode* const bone = MakeTireBody(entName, tireCollision, mass);
+		NewtonDestroyCollision(tireCollision);
+
+		// connect the tire the body with a hinge
+		dMatrix matrix;
+		NewtonBodyGetMatrix(bone->GetBody(), &matrix[0][0]);
+		dMatrix hingeFrame(dYawMatrix(90.0f * dDegreeToRad) * matrix);
+
+		new dCustomHinge(hingeFrame, bone->GetBody(), parentBody);
+		return bone;
 	}
 
 	void MakeDriveTrain()
@@ -1025,7 +1105,7 @@ class dTractorModel: public dModelRootNode
 		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
 		dCustomHinge* const hinge = new dCustomHinge(hingeFrame, fronAxelBody, chassisBody);
 		hinge->EnableLimits(true);
-		hinge->SetLimits(-20.0f * dDegreeToRad, 20.0f * dDegreeToRad);
+		hinge->SetLimits(-15.0f * dDegreeToRad, 15.0f * dDegreeToRad);
 
 		//dMatrix bindMatrix(bodyPart->GetParent()->CalculateGlobalMatrix(parentModel).Inverse());
 		dMatrix bindMatrix(dGetIdentityMatrix());

@@ -286,7 +286,7 @@ class dExcavatorModel: public dModelRootNode
 		radius -= width * 0.5f;
 	}
 
-	NewtonCollision* const MakeDoubleRingTireShape(DemoEntity* const tireModel)
+	NewtonCollision* const MakeTireShape(DemoEntity* const tireModel)
 	{
 		dFloat width;
 		dFloat radius;
@@ -351,7 +351,7 @@ class dExcavatorModel: public dModelRootNode
 		DemoEntity* const parentModel = (DemoEntity*)NewtonBodyGetUserData(parentBody);
 		DemoEntity* const tireModel = parentModel->Find(entName);
 
-		NewtonCollision* const tireCollision = MakeDoubleRingTireShape(tireModel);
+		NewtonCollision* const tireCollision = MakeTireShape(tireModel);
 		dModelNode* const bone = MakeTireBody(entName, tireCollision);
 		NewtonDestroyCollision(tireCollision);
 
