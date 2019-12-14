@@ -990,6 +990,11 @@ class dTractorModel: public dModelRootNode
 
 		DemoEntity* const rootEntity = (DemoEntity*)vehicleModel->Find("MainBody");
 		m_body = CreateBodyPart(world, rootEntity, 4000.0f);
+
+		dVector com;
+		NewtonBodyGetCentreOfMass(m_body, &com[0]);
+		com.m_y -= 0.5f;
+		NewtonBodySetCentreOfMass(m_body, &com[0]);
 	}
 
 	void GetTireDimensions(DemoEntity* const bodyPart, dFloat& radius, dFloat& width)

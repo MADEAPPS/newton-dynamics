@@ -1437,10 +1437,8 @@ void NewtonMaterialSetDefaultFriction(const NewtonWorld* const newtonWorld, int 
 			material->m_staticFriction1 = stat;
 			material->m_dynamicFriction0 = kine;
 			material->m_dynamicFriction1 = kine;
+			material->m_flags |= dgContactMaterial::m_friction0Enable | dgContactMaterial::m_friction1Enable;
 		} else {
-
-			//material->m_friction0Enable = false;
-			//material->m_friction1Enable = false;
 			material->m_flags &= ~(dgContactMaterial::m_friction0Enable | dgContactMaterial::m_friction1Enable);
 		}
 	}
