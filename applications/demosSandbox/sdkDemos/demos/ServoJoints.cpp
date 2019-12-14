@@ -933,6 +933,8 @@ class dTractorModel: public dModelRootNode
 	public:
 	dTractorModel(NewtonWorld* const world, const char* const modelName, const dMatrix& location)
 		:dModelRootNode(NULL, dGetIdentityMatrix())
+		,m_diff0(NULL)
+		,m_diff1(NULL)
 	{
 		MakeChassis(world, modelName, location);
 
@@ -1098,6 +1100,52 @@ class dTractorModel: public dModelRootNode
 		return new dModelNode(fronAxelBody, bindMatrix, this);
 	}
 
+	dModelNode* MakeDifferential(dModelNode* const leftTire, dModelNode* const reftTire)
+	{
+		NewtonBody* const chassis = GetBody();
+		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
+		NewtonCollision* const shape = NewtonCreateCylinder(world, 0.125f, 0.125f, 0.75f, 0, NULL);
+
+		// create the rigid body that will make this bone
+		dMatrix engineMatrix;
+		NewtonBodyGetMatrix(chassis, &engineMatrix[0][0]);
+		engineMatrix = dRollMatrix(0.5f * dPi) * engineMatrix;
+		engineMatrix.m_posit.m_y += 1.0f;
+
+		// make a non collideble engine body
+		NewtonBody* const diffBody = NewtonCreateDynamicBody(world, shape, &engineMatrix[0][0]);
+
+		// destroy the collision helper shape
+		NewtonDestroyCollision(shape);
+
+		// get the collision from body
+		NewtonCollision* const collision = NewtonBodyGetCollision(diffBody);
+		NewtonCollisionSetMode(collision, 0);
+
+		// calculate the moment of inertia and the relative center of mass of the solid
+		dFloat mass = 50.0f;
+		dFloat radius = 1.0f;
+		dFloat Inertia = 2.0f * mass * radius * radius / 5.0f;
+		NewtonBodySetMassMatrix(diffBody, mass, Inertia, Inertia, Inertia);
+
+		// set the bod part force and torque call back to the gravity force, skip the transform callback
+		NewtonBodySetForceAndTorqueCallback(diffBody, PhysicsApplyGravityForce);
+
+		// connect engine to chassis with a hinge
+		dMatrix engineAxis;
+		engineAxis.m_front = engineMatrix.m_front;
+		engineAxis.m_up = engineMatrix.m_right;
+		engineAxis.m_right = engineAxis.m_front.CrossProduct(engineAxis.m_up);
+		engineAxis.m_posit = engineMatrix.m_posit;
+
+		// add the engine joint 
+		new dCustomDoubleHinge(engineAxis, diffBody, chassis);
+
+		// connect engine to chassis.
+		dMatrix bindMatrix(dGetIdentityMatrix());
+		return new dModelNode(diffBody, bindMatrix, this);
+	}
+
 	void MakeDriveTrain()
 	{
 		//rr_tire, rl_tire, front_axel, fr_tire, fl_tire
@@ -1107,7 +1155,16 @@ class dTractorModel: public dModelRootNode
 
 		dModelNode* const rearLeftTire = MakeTire("rl_tire", 100.0f, this);
 		dModelNode* const rearRightTire = MakeTire("rr_tire", 100.0f, this);
+
+		dModelNode* const rearDifferential = MakeDifferential(rearLeftTire, rearRightTire);
+		dModelNode* const frontDifferential = MakeDifferential(frontLeftTire, frontRightTire);
+
+		m_diff0 = rearDifferential;
+		m_diff1 = frontDifferential;
 	}
+
+	dModelNode* m_diff0;
+	dModelNode* m_diff1;
 };
 
 
@@ -1310,7 +1367,6 @@ void ServoJoints (DemoEntityManager* const scene)
 	NewtonBody* const floor = CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 	//NewtonCollision* const floorCollision = NewtonBodyGetCollision(floor);
-	//NewtonCollisionSetUserID(floorCollision, SERVO_VEHICLE_DEFINITION::m_terrain);
 
 	ServoVehicleManagerManager* const vehicleManager = new ServoVehicleManagerManager (scene, 0);
 
@@ -1348,7 +1404,7 @@ void ServoJoints (DemoEntityManager* const scene)
 //	MakeHeavyLoad (scene, matrix);
 
 	// add some object to play with
-	LoadLumberYardMesh(scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), 0);
+//	LoadLumberYardMesh(scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), 0);
 //	LoadLumberYardMesh(scene, dVector(5.0f, 0.0f, 6.0f, 0.0f), 0);
 //	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f, -4.0f, 0.0f), 0);
 //	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f,  2.0f, 0.0f), 0);
