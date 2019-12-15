@@ -65,7 +65,6 @@ class dExcavatorControls
 	int m_cabinSpeed;
 };
 
-
 class dExcavatorEngine: public dCustomDoubleHinge
 {
 	public:
@@ -175,7 +174,6 @@ class dExcavatorModel: public dModelRootNode
 			cabinMatrix.m_posit = rotation.RotateVector(cabinMatrix.m_posit);
 			cabinMatrix.m_posit.m_w = 1.0f;
 			m_effector->SetTargetMatrix (cabinMatrix);
-	
 		}
 		m_engineJoint->m_control = control;
 	}
@@ -411,7 +409,7 @@ class dExcavatorModel: public dModelRootNode
 
 		dMatrix tireMatrix;
 		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
-		new dCustomDifferentialGear(EXCAVATOR_GEAR_GAIN, engineMatrix.m_front.Scale (-1.0f), engineMatrix.m_up, tireMatrix.m_right.Scale(1.0f), engine, tire);
+		new dCustomDifferentialGear___(EXCAVATOR_GEAR_GAIN, engineMatrix.m_front.Scale (-1.0f), engineMatrix.m_up, tireMatrix.m_right.Scale(1.0f), engine, tire);
 	}
 
 	void MakeRightTrack()
@@ -438,7 +436,7 @@ class dExcavatorModel: public dModelRootNode
 
 		dMatrix tireMatrix;
 		NewtonBodyGetMatrix(tire, &tireMatrix[0][0]);
-		new dCustomDifferentialGear(EXCAVATOR_GEAR_GAIN, engineMatrix.m_front.Scale (1.0f), engineMatrix.m_up, tireMatrix.m_right.Scale(-1.0f), engine, tire);
+		new dCustomDifferentialGear___(EXCAVATOR_GEAR_GAIN, engineMatrix.m_front.Scale (1.0f), engineMatrix.m_up, tireMatrix.m_right.Scale(-1.0f), engine, tire);
 	}
 
 	NewtonBody* MakeThreadLinkBody(DemoEntity* const linkNode, NewtonCollision* const linkCollision, int linkMaterilID)

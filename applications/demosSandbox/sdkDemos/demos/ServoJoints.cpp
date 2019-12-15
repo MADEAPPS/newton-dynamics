@@ -928,36 +928,61 @@ static void MakeHeavyLoad (DemoEntityManager* const scene, const dMatrix& locati
 #endif
 
 
+class dTractorControls
+{
+	public:
+	dTractorControls()
+	{
+		memset(this, 0, sizeof (dTractorControls));
+	}
+//	dFloat m_throttle;
+	dFloat m_steeringValue;
+//	dFloat m_bucket_x;
+//	dFloat m_bucket_y;
+//	dFloat m_bucket_angle;
+//	int m_cabinSpeed;
+};
+
+
 class dTractorModel: public dModelRootNode
 {
 	public:
 	dTractorModel(NewtonWorld* const world, const char* const modelName, const dMatrix& location)
 		:dModelRootNode(NULL, dGetIdentityMatrix())
-		,m_diff0(NULL)
-		,m_diff1(NULL)
+		,m_engine(NULL)
+		,m_leftWheel(NULL)
+		,m_rightWheel(NULL)
 	{
 		MakeChassis(world, modelName, location);
 
 		MakeDriveTrain();
 	}
 
-	void ApplyControl (dFloat timestep)
+	void ApplyControl (const dTractorControls& controls, dFloat timestep)
 	{
-		ResetDiffMatrix (m_diff0);
-		ResetDiffMatrix (m_diff1);
+			NewtonBodySetSleepState(GetBody(), 0);
+
+			m_leftWheel->SetTargetAngle1(m_controls.m_steeringValue * 25.0f * dDegreeToRad);
+			m_rightWheel->SetTargetAngle1(-m_controls.m_steeringValue * 25.0f * dDegreeToRad);
+			
+			//m_bucketJoint->SetTargetAngle(control.m_bucket_angle * dDegreeToRad);
+			//
+			//dMatrix cabinMatrix(m_effectorMatrix);
+			//cabinMatrix.m_posit.m_x += m_engineJoint->m_control.m_bucket_x * 0.5f;
+			//cabinMatrix.m_posit.m_y += m_engineJoint->m_control.m_bucket_y * 0.5f;
+			//
+			//dFloat speed = -10.0f * m_engineJoint->m_control.m_cabinSpeed * dDegreeToRad;
+			//m_cabinAngle = dMod(dFloat(m_cabinAngle + speed * timestep), dFloat(2.0f * dPi));
+			//dMatrix rotation = dYawMatrix(m_cabinAngle);
+			//
+			//cabinMatrix.m_posit = rotation.RotateVector(cabinMatrix.m_posit);
+			//cabinMatrix.m_posit.m_w = 1.0f;
+			//m_effector->SetTargetMatrix(cabinMatrix);
+
+		m_controls = controls;
 	}
 
 	private:
-	void ResetDiffMatrix (dModelNode* const diff) const
-	{
-		dMatrix matrix1;
-		dMatrix localMatrix0 (diff->GetJoint()->GetMatrix0());
-		dMatrix localMatrix1 (diff->GetJoint()->GetMatrix1());
-		NewtonBodyGetMatrix(diff->GetParent()->GetBody(), &matrix1[0][0]);
-
-		dMatrix matrix0(localMatrix0.Inverse() * localMatrix1 * matrix1);
-		NewtonBodySetMatrixNoSleep(diff->GetBody(), &matrix0[0][0]);
-	}
 
 	NewtonBody* CreateBodyPart(NewtonWorld* const world, DemoEntity* const bodyPart, dFloat mass)
 	{
@@ -1039,7 +1064,6 @@ class dTractorModel: public dModelRootNode
 		dFloat width;
 		dFloat radius;
 		GetTireDimensions(tireModel, radius, width);
-		//dMatrix align(dYawMatrix(90.0f * dDegreeToRad));
 		dMatrix align(dGetIdentityMatrix());
 		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
 		NewtonCollision* const tireShape = NewtonCreateChamferCylinder(world, radius, width, 0, &align[0][0]);
@@ -1092,10 +1116,6 @@ class dTractorModel: public dModelRootNode
 		dModelNode* const bone = MakeTireBody(entName, tireCollision, mass, parentNode);
 		NewtonDestroyCollision(tireCollision);
 
-		// connect the tire the body with a hinge
-		dMatrix matrix;
-		NewtonBodyGetMatrix(bone->GetBody(), &matrix[0][0]);
-		new dCustomHinge(matrix, bone->GetBody(), parentBody);
 		return bone;
 	}
 
@@ -1122,7 +1142,7 @@ class dTractorModel: public dModelRootNode
 		return new dModelNode(fronAxelBody, bindMatrix, this);
 	}
 
-	dModelNode* MakeDifferential(dModelNode* const leftTire, dModelNode* const reftTire)
+	dModelNode* MakeDifferential(dModelNode* const leftWheel, dModelNode* const rightWheel)
 	{
 		NewtonBody* const chassis = GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
@@ -1161,7 +1181,16 @@ class dTractorModel: public dModelRootNode
 		engineAxis.m_posit = engineMatrix.m_posit;
 
 		// add the engine joint 
-		new dCustomDoubleHinge(engineAxis, diffBody, chassis);
+		dCustomDoubleHinge* const diff = new dCustomDoubleHinge(engineAxis, diffBody, chassis);
+
+		dMatrix matrix;
+		dMatrix leftWheelMatrix;
+		dMatrix rightWheelMatrix;
+		leftWheel->GetJoint()->CalculateGlobalMatrix(leftWheelMatrix, matrix);
+		new dCustomDifferentialGear(1.0f, leftWheelMatrix.m_front, leftWheel->GetBody(), 1.0f, diff);
+
+		rightWheel->GetJoint()->CalculateGlobalMatrix(rightWheelMatrix, matrix);
+		new dCustomDifferentialGear(1.0f, rightWheelMatrix.m_front, rightWheel->GetBody(), -1.0f, diff);
 
 		// connect engine to chassis.
 		dMatrix bindMatrix(dGetIdentityMatrix());
@@ -1171,53 +1200,50 @@ class dTractorModel: public dModelRootNode
 	dModelNode* MakeRearAxel ()
 	{
 		dMatrix matrix;
-		dMatrix diffMatrix;
-		dMatrix leftWheelMatrix;
-		dMatrix rightWheelMatrix;
-
 		dModelNode* const leftWheel = MakeTire("rl_tire", 100.0f, this);
-		dModelNode* const rearWheel = MakeTire("rr_tire", 100.0f, this);
-		dModelNode* const differential = MakeDifferential(leftWheel, rearWheel);
+		NewtonBodyGetMatrix(leftWheel->GetBody(), &matrix[0][0]);
+		new dCustomHinge(matrix, leftWheel->GetBody(), leftWheel->GetParent()->GetBody());
 
-		differential->GetJoint()->CalculateGlobalMatrix(diffMatrix, matrix);
-		rearWheel->GetJoint()->CalculateGlobalMatrix(rightWheelMatrix, matrix);
-		new dCustomDifferentialGear(1.0f, diffMatrix.m_front.Scale(1.0f), diffMatrix.m_up, rightWheelMatrix.m_front, differential->GetBody(), leftWheel->GetBody());
+		dModelNode* const rightWheel = MakeTire("rr_tire", 100.0f, this);
+		NewtonBodyGetMatrix(rightWheel->GetBody(), &matrix[0][0]);
+		new dCustomHinge(matrix, rightWheel->GetBody(), rightWheel->GetParent()->GetBody());
 
-		leftWheel->GetJoint()->CalculateGlobalMatrix(leftWheelMatrix, matrix);
-		new dCustomDifferentialGear(1.0f, diffMatrix.m_front.Scale(-1.0f), diffMatrix.m_up, rightWheelMatrix.m_front, differential->GetBody(), rearWheel->GetBody());
+		dModelNode* const differential = MakeDifferential(leftWheel, rightWheel);
 		return differential;
 	}
 
 	dModelNode* MakeFrontAxel()
 	{
 		dMatrix matrix;
-		dMatrix diffMatrix;
-		dMatrix leftWheelMatrix;
-		dMatrix rightWheelMatrix;
-
 		dModelNode* const axelNode = MakeFronAxel();
+
 		dModelNode* const leftWheel = MakeTire("fl_tire", 50.0f, axelNode);
-		dModelNode* const rearWheel = MakeTire("fr_tire", 50.0f, axelNode);
-		dModelNode* const differential = MakeDifferential(leftWheel, rearWheel);
+		NewtonBodyGetMatrix(leftWheel->GetBody(), &matrix[0][0]);
+		m_leftWheel = new dCustomDoubleHingeActuator(matrix, leftWheel->GetBody(), leftWheel->GetParent()->GetBody());
+		m_leftWheel->EnabledAxis0(false);
+		m_leftWheel->SetAngularRate1(2.0f);
 
-		differential->GetJoint()->CalculateGlobalMatrix(diffMatrix, matrix);
-		rearWheel->GetJoint()->CalculateGlobalMatrix(rightWheelMatrix, matrix);
-		new dCustomDifferentialGear(1.0f, diffMatrix.m_front.Scale(1.0f), diffMatrix.m_up, rightWheelMatrix.m_front, differential->GetBody(), leftWheel->GetBody());
+		dModelNode* const rightWheel = MakeTire("fr_tire", 50.0f, axelNode);
+		NewtonBodyGetMatrix(rightWheel->GetBody(), &matrix[0][0]);
+		m_rightWheel = new dCustomDoubleHingeActuator(matrix, rightWheel->GetBody(), rightWheel->GetParent()->GetBody());
+		m_rightWheel->EnabledAxis0(false);
+		m_rightWheel->SetAngularRate1(2.0f);
 
-		leftWheel->GetJoint()->CalculateGlobalMatrix(leftWheelMatrix, matrix);
-		new dCustomDifferentialGear(1.0f, diffMatrix.m_front.Scale(-1.0f), diffMatrix.m_up, rightWheelMatrix.m_front, differential->GetBody(), rearWheel->GetBody());
+		dModelNode* const differential = MakeDifferential(leftWheel, rightWheel);
 		return differential;
 	}
 
 	void MakeDriveTrain()
 	{
 		//rr_tire, rl_tire, front_axel, fr_tire, fl_tire
-		m_diff0 = MakeRearAxel ();
-		m_diff1 = MakeFrontAxel();
+		dModelNode* const diff0 = MakeRearAxel();
+		dModelNode* const diff1 = MakeFrontAxel();
 	}
 
-	dModelNode* m_diff0;
-	dModelNode* m_diff1;
+	dModelNode* m_engine;
+	dCustomDoubleHingeActuator* m_leftWheel;
+	dCustomDoubleHingeActuator* m_rightWheel;
+	dTractorControls m_controls;
 };
 
 
@@ -1273,14 +1299,14 @@ class ServoVehicleManagerManager: public dModelManager
 
 	void RenderPlayerHelp(DemoEntityManager* const scene)
 	{
-/*
+
 		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
 		scene->Print(color, "Navigation Keys");
-		scene->Print(color, "drive forward:      w");
-		scene->Print(color, "drive backward:     s");
+//		scene->Print(color, "drive forward:      w");
+//		scene->Print(color, "drive backward:     s");
 		scene->Print(color, "turn right:         d");
 		scene->Print(color, "turn left:          a");
-
+/*
 		scene->Print(color, "bucket controls");
 		ImGui::SliderInt("cabin rotation", &m_cabinSpeed, -3, 3);
 		ImGui::SliderFloat("bucket x", &m_bucket_x, -2.0f, 4.0f);
@@ -1382,7 +1408,19 @@ class ServoVehicleManagerManager: public dModelManager
 	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const
 	{
 		dTractorModel* const tractor = (dTractorModel*)model;
-		tractor->ApplyControl(timestep);
+
+		NewtonWorld* const world = NewtonBodyGetWorld(tractor->GetBody());
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		dTractorControls controls;
+		//controls.m_throttle = (dFloat(scene->GetKeyState('W')) - dFloat(scene->GetKeyState('S')));
+		controls.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
+		//controls.m_cabinSpeed = m_cabinSpeed;
+		//controls.m_bucket_x = m_bucket_x;
+		//controls.m_bucket_y = m_bucket_y;
+		//controls.m_bucket_angle = m_bucket_angle;
+
+		tractor->ApplyControl(controls, timestep);
 	}
 
 	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const

@@ -59,16 +59,32 @@ class dCustomGearAndSlide: public dCustomGear
 };
 
 
+class dCustomDifferentialGear___: public dCustomGear
+{
+	public:
+	CUSTOM_JOINTS_API dCustomDifferentialGear___(dFloat gearRatio, const dVector& diffPin, const dVector& parentPin, const dVector& childPin, NewtonBody* const diffBody, NewtonBody* const axleOutBody);
+
+	protected:
+	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
+
+	DECLARE_CUSTOM_JOINT(dCustomDifferentialGear___, dCustomGear)
+};
+
+
+class dCustomDoubleHinge;
 class dCustomDifferentialGear: public dCustomGear
 {
 	public:
-	CUSTOM_JOINTS_API dCustomDifferentialGear(dFloat gearRatio, const dVector& diffPin, const dVector& parentPin, const dVector& childPin, NewtonBody* const diffBody, NewtonBody* const axleOutBody);
+	CUSTOM_JOINTS_API dCustomDifferentialGear(dFloat gearRatio, const dVector& axlePin, NewtonBody* const axleBody, dFloat diffSign, dCustomDoubleHinge* const diff);
 
 	protected:
-	//CUSTOM_JOINTS_API virtual void Deserialize(NewtonDeserializeCallback callback, void* const userData);
-	//CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
+	CUSTOM_JOINTS_API virtual void Deserialize(NewtonDeserializeCallback callback, void* const userData);
+	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints(dFloat timestep, int threadIndex);
 
+	dVector m_axlePin;
+	dCustomDoubleHinge* m_differentialJoint;
+	dFloat m_diffSign;
 	DECLARE_CUSTOM_JOINT(dCustomDifferentialGear, dCustomGear)
 };
 

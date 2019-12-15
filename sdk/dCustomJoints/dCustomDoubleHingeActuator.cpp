@@ -25,6 +25,8 @@ dCustomDoubleHingeActuator::dCustomDoubleHingeActuator(const dMatrix& pinAndPivo
 	,m_angularRate1(0.0f)
 	,m_maxTorque0(D_CUSTOM_LARGE_VALUE)
 	,m_maxTorque1(D_CUSTOM_LARGE_VALUE)
+	,m_axis0Enable(true)
+	,m_axis1Enable(true)
 {
 	m_friction = 0.0f;
 	EnableMotor(false, 0.0f);
@@ -66,6 +68,26 @@ void dCustomDoubleHingeActuator::Serialize(NewtonSerializeCallback callback, voi
 	callback(userData, &m_angularRate1, sizeof(dFloat));
 	callback(userData, &m_maxTorque0, sizeof(dFloat));
 	callback(userData, &m_maxTorque1, sizeof(dFloat));
+}
+
+bool dCustomDoubleHingeActuator::GetEnabledAxis0() const
+{
+	return m_axis0Enable;
+}
+
+void dCustomDoubleHingeActuator::EnabledAxis0(bool state)
+{
+	m_axis0Enable = state;
+}
+
+bool dCustomDoubleHingeActuator::GetEnabledAxis1() const
+{
+	return m_axis1Enable;
+}
+
+void dCustomDoubleHingeActuator::EnabledAxis1(bool state)
+{
+	m_axis0Enable = state;
 }
 
 dFloat dCustomDoubleHingeActuator::GetTargetAngle1() const
@@ -203,7 +225,8 @@ void dCustomDoubleHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const 
 	dCustomDoubleHinge::SubmitAngularRow(matrix0, matrix1, timestep);
 
 	dFloat invTimeStep = 1.0f / timestep;
-	{
+
+	if (m_axis0Enable) {
 		dAssert(m_motorSpeed >= 0.0f);
 		const dFloat angle = m_curJointAngle.GetAngle();
 		const dFloat targetAngle = m_targetAngle0.GetAngle();
@@ -229,7 +252,7 @@ void dCustomDoubleHingeActuator::SubmitAngularRow(const dMatrix& matrix0, const 
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	}
 
-	{
+	if (m_axis1Enable) {
 		dAssert(m_motorSpeed >= 0.0f);
 		const dFloat angle = m_curJointAngle1.GetAngle();
 		const dFloat targetAngle = m_targetAngle1.GetAngle();

@@ -12,9 +12,11 @@
 
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomGear.h"
+#include "dCustomDoubleHinge.h"
 
 IMPLEMENT_CUSTOM_JOINT(dCustomGear);
 IMPLEMENT_CUSTOM_JOINT(dCustomGearAndSlide);
+IMPLEMENT_CUSTOM_JOINT(dCustomDifferentialGear___);
 IMPLEMENT_CUSTOM_JOINT(dCustomDifferentialGear);
 
 //////////////////////////////////////////////////////////////////////
@@ -216,7 +218,8 @@ void dCustomGearAndSlide::SubmitConstraints (dFloat timestep, int threadIndex)
 	dCustomGear::SubmitConstraints (timestep, threadIndex);
 }
 
-dCustomDifferentialGear::dCustomDifferentialGear(dFloat gearRatio, const dVector& diffPin, const dVector& inputPin, const dVector& axleOutPin, NewtonBody* const diffBody, NewtonBody* const axleOutBody)
+
+dCustomDifferentialGear___::dCustomDifferentialGear___(dFloat gearRatio, const dVector& diffPin, const dVector& inputPin, const dVector& axleOutPin, NewtonBody* const diffBody, NewtonBody* const axleOutBody)
 	:dCustomGear(1, diffBody, axleOutBody)
 {
 	dAssert(diffPin.DotProduct3(inputPin) < 1.0e-5f);
@@ -236,7 +239,7 @@ dCustomDifferentialGear::dCustomDifferentialGear(dFloat gearRatio, const dVector
 	CalculateLocalMatrix(pinAndPivot1, dommyMatrix, m_localMatrix1);
 }
 
-void dCustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex)
+void dCustomDifferentialGear___::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -273,6 +276,90 @@ void dCustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex
 	dFloat w1 = omega1.DotProduct3(dir1);
 	dFloat relOmega = w0 + w1;
 	dFloat invTimestep = (timestep > 0.0f) ? 1.0f / timestep : 1.0f;
+	dFloat relAccel = -0.5f * relOmega * invTimestep;
+	NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
+	NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+}
+
+
+
+dCustomDifferentialGear::dCustomDifferentialGear(dFloat gearRatio, const dVector& axlePin, NewtonBody* const axleBody, dFloat diffSign, dCustomDoubleHinge* const diff)
+	:dCustomGear(gearRatio, axlePin, axlePin, axleBody, diff->GetBody0())
+	,m_differentialJoint(diff)
+	,m_diffSign(dSign (diffSign))
+{
+	dMatrix axleBodyMatrix;
+	NewtonBodyGetMatrix(axleBody, &axleBodyMatrix[0][0]);
+	m_axlePin = axleBodyMatrix.UnrotateVector(axlePin);
+
+	// set as kinematic loop
+	//SetSolverModel(1);
+}
+
+void dCustomDifferentialGear::Deserialize (NewtonDeserializeCallback callback, void* const userData)
+{
+	// remember to get referenceBody from the world 
+	dAssert (0);
+//	int refeBodyID;
+//	callback(userData, &m_referencePin, sizeof(dVector));
+//	callback(userData, &refeBodyID, sizeof(int));
+//	NewtonWorld* const world = NewtonBodyGetWorld(GetBody0());
+//	m_referenceBody = NewtonFindSerializedBody(world, refeBodyID);
+
+	// set as kinematic loop
+//	SetSolverModel(1);
+}
+
+void dCustomDifferentialGear::Serialize(NewtonSerializeCallback callback, void* const userData) const
+{
+	dAssert (0);
+//	dCustomGear::Serialize(callback, userData);
+//	int refeBodyID = NewtonBodyGetSerializedID(m_referenceBody);
+//	callback(userData, &m_referencePin, sizeof(dVector));
+//	callback(userData, &refeBodyID, sizeof(int));
+}
+
+
+void dCustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex)
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	
+	dVector omega0(0.0f);
+	dVector omega1(0.0f);
+	dFloat jacobian0[6];
+	dFloat jacobian1[6];
+
+	m_differentialJoint->CalculateGlobalMatrix(matrix0, matrix1);
+	dAssert (matrix0.m_front.DotProduct3(matrix1.m_up) < 1.0e-1f);
+	//dVector diffPin ((matrix0.m_front + matrix1.m_up.Scale (m_diffSign)).Scale (m_gearRatio));
+	dVector diffPin ((matrix1.m_up + matrix0.m_front.Scale (m_diffSign)).Scale (m_gearRatio));
+
+	NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
+	dVector axlePin (matrix0.RotateVector(m_axlePin));
+
+	jacobian0[0] = 0.0f;
+	jacobian0[1] = 0.0f;
+	jacobian0[2] = 0.0f;
+	jacobian0[3] = axlePin.m_x;
+	jacobian0[4] = axlePin.m_y;
+	jacobian0[5] = axlePin.m_z;
+
+	jacobian1[0] = 0.0f;
+	jacobian1[1] = 0.0f;
+	jacobian1[2] = 0.0f;
+	jacobian1[3] = diffPin.m_x;
+	jacobian1[4] = diffPin.m_y;
+	jacobian1[5] = diffPin.m_z;
+
+	NewtonBodyGetOmega(m_body0, &omega0[0]);
+	NewtonBodyGetOmega(m_body1, &omega1[0]);
+
+	dFloat w0 = omega0.DotProduct3(axlePin);
+	dFloat w1 = omega1.DotProduct3(diffPin);
+
+	dFloat relOmega = w0 + w1;
+	dFloat invTimestep = 1.0f / timestep;
 	dFloat relAccel = -0.5f * relOmega * invTimestep;
 	NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
 	NewtonUserJointSetRowAcceleration(m_joint, relAccel);

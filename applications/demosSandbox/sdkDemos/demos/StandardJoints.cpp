@@ -857,6 +857,11 @@ static void AddDifferential(DemoEntityManager* const scene, const dVector& origi
 	NewtonBodySetMatrix(box2, &matrix[0][0]);
 	((DemoEntity*)NewtonBodyGetUserData(box2))->ResetMatrix(*scene, matrix);
 
+	NewtonBodyGetMatrix(box3, &matrix[0][0]);
+	matrix = dYawMatrix(dPi * 0.5f) * matrix;
+	NewtonBodySetMatrix(box3, &matrix[0][0]);
+	((DemoEntity*)NewtonBodyGetUserData(box3))->ResetMatrix(*scene, matrix);
+
 	// connect right tire
 	dMatrix matrix1;
 	NewtonBodyGetMatrix(box1, &matrix1[0][0]);
@@ -872,16 +877,16 @@ static void AddDifferential(DemoEntityManager* const scene, const dVector& origi
 	// make the gear system
 	dMatrix matrix3;
 	NewtonBodyGetMatrix(box3, &matrix3[0][0]);
-	new dCustomDoubleHinge(matrix3, box3, box0);
+	dCustomDoubleHinge* const diff = new dCustomDoubleHinge(matrix3, box3, box0);
 
 	// connect right differential
-	new dCustomDifferentialGear(2.0f, matrix3.m_up.Scale(1.0f), matrix3.m_front, matrix1.m_front, box3, box1);
+	new dCustomDifferentialGear(2.0f, matrix1.m_front, box1, 1.0f, diff);
 
 	// connect left differential
-	new dCustomDifferentialGear(2.0f, matrix3.m_up.Scale(-1.0f), matrix3.m_front, matrix2.m_front, box3, box2);
+	new dCustomDifferentialGear(2.0f, matrix2.m_front, box2, -1.0f, diff);
 
 	dVector damp(0.0f);
-	dVector omega(5.0f, 2.0f, 0.0f, 0.0f);
+	dVector omega(0.0f, 2.0f, 0.0f, 0.0f);
 	NewtonBodySetOmega(box3, &omega[0]);
 	NewtonBodySetAngularDamping(box1, &damp[0]);
 	NewtonBodySetAngularDamping(box2, &damp[0]);
@@ -1339,9 +1344,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dMatrix camMatrix (dGetIdentityMatrix());
     dQuaternion rot (camMatrix);
 	dVector origin (-50.0f, 7.0f, 0.0f, 0.0f);
-//	dVector origin(-30.0f, 7.0f, 20.0f, 0.0f);
-//	dVector origin(-30.0f, 2.0f, 20.0f, 0.0f);
-//	dVector origin(-30.0f, 2.0f, -15.0f, 0.0f);
+//	dVector origin (-30.0f, 7.0f, 30.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 }
 

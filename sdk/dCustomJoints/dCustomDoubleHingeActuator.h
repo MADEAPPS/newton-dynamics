@@ -26,6 +26,12 @@ class dCustomDoubleHingeActuator: public dCustomDoubleHinge
 	CUSTOM_JOINTS_API dCustomDoubleHingeActuator (const dMatrix& pinAndPivotFrame, dFloat angularRate0, dFloat minAngle0, dFloat maxAngle0, dFloat angularRate1, dFloat minAngle1, dFloat maxAngle1, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomDoubleHingeActuator();
 
+	CUSTOM_JOINTS_API bool GetEnabledAxis0() const;
+	CUSTOM_JOINTS_API void EnabledAxis0(bool state);
+
+	CUSTOM_JOINTS_API bool GetEnabledAxis1() const;
+	CUSTOM_JOINTS_API void EnabledAxis1(bool state);
+
 	CUSTOM_JOINTS_API dFloat GetActuatorAngle0() const;
 	CUSTOM_JOINTS_API dFloat GetActuatorAngle1() const;
 
@@ -69,6 +75,9 @@ class dCustomDoubleHingeActuator: public dCustomDoubleHinge
 	dFloat m_angularRate1;
 	dFloat m_maxTorque0;
 	dFloat m_maxTorque1;
+
+	bool m_axis0Enable;
+	bool m_axis1Enable;
 
 	DECLARE_CUSTOM_JOINT(dCustomDoubleHingeActuator, dCustomDoubleHinge)
 };
