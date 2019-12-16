@@ -69,13 +69,14 @@ class dTractorEngine: public dCustomDoubleHinge
 		NewtonBodyGetOmega(m_body0, &omega0[0]);
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 
-		dFloat targetOmega = m_alpha * 10.0f;
+m_alpha = 1.0f;
+		dFloat targetOmega = m_alpha * 20.0f;
 		dFloat alpha = (targetOmega - tractionDir.DotProduct3(omega0 - omega1)) / timestep;
 		alpha = dClamp (alpha, dFloat (-500.0f), dFloat (500.0f));
 dTrace (("%f\n", alpha));
 		NewtonUserJointSetRowAcceleration(m_joint, alpha);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -1000.0f);
-		NewtonUserJointSetRowMaximumFriction(m_joint, 1000.0f);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -4000.0f);
+		NewtonUserJointSetRowMaximumFriction(m_joint, 4000.0f);
 	}
 
 	dFloat m_alpha;
@@ -306,14 +307,14 @@ engineMatrix.m_posit.m_y += 1.0f;
 		// add the engine joint 
 		dCustomDoubleHinge* const diff = new dCustomDoubleHinge(engineAxis, diffBody, chassis);
 
-//		dMatrix matrix;
-//		dMatrix leftWheelMatrix;
-//		dMatrix rightWheelMatrix;
-//		leftWheel->GetJoint()->CalculateGlobalMatrix(leftWheelMatrix, matrix);
-//		new dCustomDifferentialGear(1.0f, leftWheelMatrix.m_front, leftWheel->GetBody(), 1.0f, diff);
-//
-//		rightWheel->GetJoint()->CalculateGlobalMatrix(rightWheelMatrix, matrix);
-//		new dCustomDifferentialGear(1.0f, rightWheelMatrix.m_front, rightWheel->GetBody(), -1.0f, diff);
+		dMatrix matrix;
+		dMatrix leftWheelMatrix;
+		leftWheel->GetJoint()->CalculateGlobalMatrix(leftWheelMatrix, matrix);
+		new dCustomDifferentialGear(1.0f, leftWheelMatrix.m_front, leftWheel->GetBody(), 1.0f, diff);
+
+		dMatrix rightWheelMatrix;
+		rightWheel->GetJoint()->CalculateGlobalMatrix(rightWheelMatrix, matrix);
+		new dCustomDifferentialGear(1.0f, rightWheelMatrix.m_front, rightWheel->GetBody(), -1.0f, diff);
 
 		// connect engine to chassis.
 		dMatrix bindMatrix(dGetIdentityMatrix());
@@ -359,8 +360,8 @@ engineMatrix.m_posit.m_y += 1.0f;
 	void MakeDriveTrain()
 	{
 		//rr_tire, rl_tire, front_axel, fr_tire, fl_tire
-		dModelNode* const diff0 = MakeRearAxle();
-		dModelNode* const diff1 = MakeFrontAxle();
+		dModelNode* const rearDiff = MakeRearAxle();
+		dModelNode* const fronfDiff = MakeFrontAxle();
 
 		NewtonBody* const chassis = GetBody();
 		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
@@ -405,13 +406,13 @@ engineMatrix.m_posit.m_y += 2.0f;
 		new dModelNode(engineBody, bindMatrix, this);
 
 		dMatrix matrix;
-		dMatrix leftWheelMatrix;
-		dMatrix rightWheelMatrix;
-		diff0->GetJoint()->CalculateGlobalMatrix(leftWheelMatrix,  matrix);
-		new dCustomDifferentialGear(5.0f, leftWheelMatrix.m_up, diff0->GetBody(), 1.0f, m_engine);
+		dMatrix rearDiffMatrix;
+		rearDiff->GetJoint()->CalculateGlobalMatrix(rearDiffMatrix,  matrix);
+		new dCustomDifferentialGear(5.0f, rearDiffMatrix.m_up, rearDiff->GetBody(), 1.0f, m_engine);
 
-		diff1->GetJoint()->CalculateGlobalMatrix(rightWheelMatrix, matrix);
-		new dCustomDifferentialGear(5.0f, rightWheelMatrix.m_up, diff1->GetBody(), -1.0f, m_engine);
+		dMatrix frontDiffMatrix;
+		fronfDiff->GetJoint()->CalculateGlobalMatrix(frontDiffMatrix, matrix);
+		new dCustomDifferentialGear(5.0f, frontDiffMatrix.m_up, fronfDiff->GetBody(), -1.0f, m_engine);
 	}
 
 	dTractorEngine* m_engine;
