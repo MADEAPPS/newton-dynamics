@@ -332,11 +332,11 @@ void dCustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex
 
 	m_differentialJoint->CalculateGlobalMatrix(matrix0, matrix1);
 	dAssert (matrix0.m_front.DotProduct3(matrix1.m_up) < 1.0e-1f);
-	//dVector diffPin ((matrix0.m_front + matrix1.m_up.Scale (m_diffSign)).Scale (m_gearRatio));
-	dVector diffPin ((matrix1.m_up + matrix0.m_front.Scale (m_diffSign)).Scale (m_gearRatio));
+//	dVector diffPin ((matrix1.m_up + matrix0.m_front.Scale (m_diffSign)));
+	dVector diffPin (matrix1.m_up);
 
 	NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
-	dVector axlePin (matrix0.RotateVector(m_axlePin));
+	dVector axlePin (matrix0.RotateVector(m_axlePin.Scale (m_gearRatio)));
 
 	jacobian0[0] = 0.0f;
 	jacobian0[1] = 0.0f;
