@@ -320,6 +320,13 @@ void dCustomDifferentialGear::Serialize(NewtonSerializeCallback callback, void* 
 }
 
 
+dVector dCustomDifferentialGear::CalculateAxlePin(const dVector& localPin) const
+{
+	dMatrix matrix;
+	NewtonBodyGetMatrix(m_body0, &matrix[0][0]);
+	return matrix.RotateVector(localPin);
+}
+
 void dCustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -332,9 +339,7 @@ void dCustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex
 
 	m_differentialJoint->CalculateGlobalMatrix(matrix0, matrix1);
 	dVector diffPin ((matrix1.m_up + matrix1.m_front.Scale (m_diffSign)));
-
-	NewtonBodyGetMatrix(m_body0, &matrix0[0][0]);
-	dVector axlePin (matrix0.RotateVector(m_axlePin.Scale (m_gearRatio)));
+	dVector axlePin (CalculateAxlePin(m_axlePin).Scale (m_gearRatio));
 
 	jacobian0[0] = 0.0f;
 	jacobian0[1] = 0.0f;
@@ -355,10 +360,6 @@ void dCustomDifferentialGear::SubmitConstraints(dFloat timestep, int threadIndex
 
 	dFloat w0 = omega0.DotProduct3(axlePin);
 	dFloat w1 = omega1.DotProduct3(diffPin);
-
-dTrace (("%d %d %d %d %f %f %f\n", 
-	NewtonBodyGetID(m_differentialJoint->GetBody0()), NewtonBodyGetID(m_differentialJoint->GetBody1()), 
-	NewtonBodyGetID(m_body0), NewtonBodyGetID(m_body1), axlePin.m_x, axlePin.m_y, axlePin.m_z));
 
 	dFloat relOmega = w0 + w1;
 	dFloat invTimestep = 1.0f / timestep;

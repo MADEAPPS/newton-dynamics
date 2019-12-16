@@ -76,6 +76,7 @@ class dCustomDifferentialGear: public dCustomGear
 {
 	public:
 	CUSTOM_JOINTS_API dCustomDifferentialGear(dFloat gearRatio, const dVector& axlePin, NewtonBody* const axleBody, dFloat diffSign, dCustomDoubleHinge* const diff);
+	CUSTOM_JOINTS_API virtual dVector CalculateAxlePin(const dVector& localPin) const;
 
 	protected:
 	CUSTOM_JOINTS_API virtual void Deserialize(NewtonDeserializeCallback callback, void* const userData);

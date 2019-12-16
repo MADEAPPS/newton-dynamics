@@ -35,6 +35,32 @@ class dTractorControls
 //	int m_cabinSpeed;
 };
 
+class dDoubleDifferentialGear: public dCustomDifferentialGear
+{
+	public:
+	dDoubleDifferentialGear(dFloat gearRatio, dCustomDoubleHinge* const childDiff, dFloat diffSign, dCustomDoubleHinge* const diff)
+		:dCustomDifferentialGear(gearRatio, dVector(1.0f, 0.0f, 0.0f, 0.0f), childDiff->GetBody0(), diffSign, diff)
+		,m_axleGear(childDiff)
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+		dMatrix axleBodyMatrix;
+
+		dAssert(m_axleGear->IsType(dCustomDoubleHinge::GetType()));
+		childDiff->CalculateGlobalMatrix(matrix0, matrix1);
+		NewtonBodyGetMatrix(m_axleGear->GetBody1(), &axleBodyMatrix[0][0]);
+		m_axlePin = axleBodyMatrix.UnrotateVector(matrix1.m_up);
+	}
+
+	dVector CalculateAxlePin(const dVector& localPin) const
+	{
+		dMatrix axleBodyMatrix;
+		NewtonBodyGetMatrix(m_axleGear->GetBody1(), &axleBodyMatrix[0][0]);
+		return axleBodyMatrix.RotateVector(localPin);
+	}
+
+	dCustomDoubleHinge* m_axleGear;
+};
 
 class dTractorEngine: public dCustomDoubleHinge
 {
@@ -69,11 +95,10 @@ class dTractorEngine: public dCustomDoubleHinge
 		NewtonBodyGetOmega(m_body0, &omega0[0]);
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
 
-m_alpha = 1.0f;
-		dFloat targetOmega = m_alpha * 20.0f;
+		dFloat targetOmega = m_alpha * 40.0f;
 		dFloat alpha = (targetOmega - tractionDir.DotProduct3(omega0 - omega1)) / timestep;
 		alpha = dClamp (alpha, dFloat (-500.0f), dFloat (500.0f));
-dTrace (("%f\n", alpha));
+
 		NewtonUserJointSetRowAcceleration(m_joint, alpha);
 		NewtonUserJointSetRowMinimumFriction(m_joint, -4000.0f);
 		NewtonUserJointSetRowMaximumFriction(m_joint, 4000.0f);
@@ -273,13 +298,13 @@ class dTractorModel: public dModelRootNode
 		NewtonCollision* const shape = NewtonCreateCylinder(world, 0.125f, 0.125f, 0.75f, 0, NULL);
 
 		// create the rigid body that will make this bone
-		dMatrix engineMatrix;
-		NewtonBodyGetMatrix(chassis, &engineMatrix[0][0]);
-		engineMatrix = dRollMatrix(0.5f * dPi) * engineMatrix;
-engineMatrix.m_posit.m_y += 1.0f;
+		dMatrix diffMatrix;
+		NewtonBodyGetMatrix(chassis, &diffMatrix[0][0]);
+		diffMatrix = dRollMatrix(0.5f * dPi) * diffMatrix;
+//diffMatrix.m_posit.m_y += 1.0f;
 
 		// make a non collideble engine body
-		NewtonBody* const diffBody = NewtonCreateDynamicBody(world, shape, &engineMatrix[0][0]);
+		NewtonBody* const diffBody = NewtonCreateDynamicBody(world, shape, &diffMatrix[0][0]);
 
 		// destroy the collision helper shape
 		NewtonDestroyCollision(shape);
@@ -298,14 +323,14 @@ engineMatrix.m_posit.m_y += 1.0f;
 		NewtonBodySetForceAndTorqueCallback(diffBody, PhysicsApplyGravityForce);
 
 		// connect engine to chassis with a hinge
-		dMatrix engineAxis;
-		engineAxis.m_front = engineMatrix.m_front;
-		engineAxis.m_up = engineMatrix.m_right;
-		engineAxis.m_right = engineAxis.m_front.CrossProduct(engineAxis.m_up);
-		engineAxis.m_posit = engineMatrix.m_posit;
+		dMatrix diffAxis;
+		diffAxis.m_front = diffMatrix.m_front;
+		diffAxis.m_up = diffMatrix.m_right;
+		diffAxis.m_right = diffAxis.m_front.CrossProduct(diffAxis.m_up);
+		diffAxis.m_posit = diffMatrix.m_posit;
 
 		// add the engine joint 
-		dCustomDoubleHinge* const diff = new dCustomDoubleHinge(engineAxis, diffBody, chassis);
+		dCustomDoubleHinge* const diff = new dCustomDoubleHinge(diffAxis, diffBody, chassis);
 
 		dMatrix matrix;
 		dMatrix leftWheelMatrix;
@@ -332,8 +357,7 @@ engineMatrix.m_posit.m_y += 1.0f;
 		NewtonBodyGetMatrix(rightWheel->GetBody(), &matrix[0][0]);
 		new dCustomHinge(matrix, rightWheel->GetBody(), rightWheel->GetParent()->GetBody());
 
-		dModelNode* const differential = MakeDifferential(leftWheel, rightWheel);
-		return differential;
+		return MakeDifferential(leftWheel, rightWheel);
 	}
 
 	dModelNode* MakeFrontAxle()
@@ -353,8 +377,7 @@ engineMatrix.m_posit.m_y += 1.0f;
 		m_rightWheel->EnabledAxis0(false);
 		m_rightWheel->SetAngularRate1(2.0f);
 
-		dModelNode* const differential = MakeDifferential(leftWheel, rightWheel);
-		return differential;
+		return MakeDifferential(leftWheel, rightWheel);
 	}
 
 	void MakeDriveTrain()
@@ -371,7 +394,7 @@ engineMatrix.m_posit.m_y += 1.0f;
 		dMatrix engineMatrix;
 		NewtonBodyGetMatrix(chassis, &engineMatrix[0][0]);
 		engineMatrix = dRollMatrix(0.5f * dPi) * engineMatrix;
-engineMatrix.m_posit.m_y += 2.0f;
+//engineMatrix.m_posit.m_y += 2.0f;
 
 		NewtonBody* const engineBody = NewtonCreateDynamicBody(world, shape, &engineMatrix[0][0]);
 
@@ -405,14 +428,14 @@ engineMatrix.m_posit.m_y += 2.0f;
 		dMatrix bindMatrix(dGetIdentityMatrix());
 		new dModelNode(engineBody, bindMatrix, this);
 
-		dMatrix matrix;
-		dMatrix rearDiffMatrix;
-		rearDiff->GetJoint()->CalculateGlobalMatrix(rearDiffMatrix,  matrix);
-		new dCustomDifferentialGear(5.0f, rearDiffMatrix.m_up, rearDiff->GetBody(), 1.0f, m_engine);
+		//dMatrix matrix;
+		//dMatrix rearDiffMatrix;
+		//rearDiff->GetJoint()->CalculateGlobalMatrix(rearDiffMatrix,  matrix);
+		new dDoubleDifferentialGear(5.0f, (dCustomDoubleHinge*)rearDiff->GetJoint(), 1.0f, m_engine);
 
-		dMatrix frontDiffMatrix;
-		fronfDiff->GetJoint()->CalculateGlobalMatrix(frontDiffMatrix, matrix);
-		new dCustomDifferentialGear(5.0f, frontDiffMatrix.m_up, fronfDiff->GetBody(), -1.0f, m_engine);
+		//dMatrix frontDiffMatrix;
+		//fronfDiff->GetJoint()->CalculateGlobalMatrix(frontDiffMatrix, matrix);
+		new dDoubleDifferentialGear(5.0f, (dCustomDoubleHinge*)fronfDiff->GetJoint(), -1.0f, m_engine);
 	}
 
 	dTractorEngine* m_engine;
