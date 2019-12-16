@@ -307,14 +307,14 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	NewtonSetContactMergeTolerance (scene->GetNewton(), 1.0e-3f);
 
 	// make a box using low lever NetwonMesh
-	NewtonBody* const body0 = CreateSimpleBox_NewtonMesh (scene, dVector (0.0f, 2.0f, -2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
+	NewtonBody* const body0 = CreateSimpleBox_NewtonMesh (scene, dVector (0.0f, 2.0f, -2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 2500.0f);
 
 	// make a box using the dNetwonMesh Class
-	NewtonBody* const body1 = CreateSimpledBox_dNetwonMesh (scene, dVector (0.0f, 2.0f, 2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 1.0f);
+	NewtonBody* const body1 = CreateSimpledBox_dNetwonMesh (scene, dVector (0.0f, 2.0f, 2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 500.0f);
 
 	dMatrix pinAndPivotFrame(dGetIdentityMatrix());
 	pinAndPivotFrame.m_posit = dVector(0.0f, 2.5f, 0.0f, 1.0f);
-	new dPulleyBallSocket(1.0f, pinAndPivotFrame, body0, body1);
+	new dPulleyBallSocket(5.0f, pinAndPivotFrame, body0, body1);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
