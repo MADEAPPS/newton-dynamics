@@ -853,7 +853,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		dExcavatorModel* const controller = new dExcavatorModel(GetWorld(), modelName, location, m_threadMaterialID);
 
 		// the the model to calculate the local transformation
-		controller->SetTranformMode(true);
+		controller->SetTransformMode(true);
 
 		// add the model to the manager
 		AddRoot(controller);

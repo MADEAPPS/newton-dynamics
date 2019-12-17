@@ -930,7 +930,7 @@ class dBalancingCharacterManager: public dModelManager
 		AddRoot(model);
 
 		// the the model to calculate the local transformation
-		model->SetTranformMode(true);
+		model->SetTransformMode(true);
 
 		// save the controller as the collision user data, for collision culling
 		//NewtonCollisionSetUserData(NewtonBodyGetCollision(rootBone), controller);

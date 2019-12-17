@@ -338,7 +338,7 @@ class dSixAxisManager: public dModelManager
 		AddRoot(robot);
 
 		// the the model to calculate the local transformation
-		robot->SetTranformMode(true);
+		robot->SetTransformMode(true);
 
 		int stackIndex = 0;
 		DemoEntity* childEntities[32];

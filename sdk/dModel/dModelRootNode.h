@@ -25,7 +25,7 @@ class dModelRootNode: public dModelNode
 	virtual ~dModelRootNode();
 
 	dModelManager* GetManager() const {return m_manager;}
-	void SetTranformMode(bool localTransform) {m_localTransformMode = localTransform;}
+	void SetTransformMode(bool localTransform) {m_localTransformMode = localTransform;}
 
 	protected:
 	dModelManager* m_manager;

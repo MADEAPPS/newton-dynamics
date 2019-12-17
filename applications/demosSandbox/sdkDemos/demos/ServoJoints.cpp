@@ -521,7 +521,7 @@ class ServoVehicleManagerManager: public dModelManager
 		dTractorModel* const tractor = new dTractorModel(GetWorld(), modelName, location);
 
 		// the the model to calculate the local transformation
-		tractor->SetTranformMode(true);
+		tractor->SetTransformMode(true);
 
 		// add the model to the manager
 		AddRoot(tractor);

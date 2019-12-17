@@ -247,7 +247,7 @@ class PassiveRagdollManager: public dModelManager
 		AddRoot(controller);
 
 		//controller->SetCalculateLocalTransforms(true);
-		controller->SetTranformMode(true);
+		controller->SetTransformMode(true);
 
 		NewtonCollisionMaterial collisionMaterial;
 		NewtonCollisionGetMaterial(NewtonBodyGetCollision(rootBone), &collisionMaterial);
