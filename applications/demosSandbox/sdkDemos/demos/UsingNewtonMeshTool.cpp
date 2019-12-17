@@ -59,7 +59,7 @@ class dPulleyBallSocket: public dCustomJoint
 
 		dVector r0(matrix0.m_posit - com0);
 		dVector r1(matrix1.m_posit - com1);
-		dVector error(matrix1.m_posit - matrix0.m_posit);
+//		dVector error(matrix1.m_posit - matrix0.m_posit);
 
 		dVector omega0;
 		dVector omega1;
@@ -71,7 +71,7 @@ class dPulleyBallSocket: public dCustomJoint
 		NewtonBodyGetVelocity(m_body1, &veloc1[0]);
 
 		for (int i = 0; i < 3; i++) {
-			dVector dir0(matrix1[i].Scale(m_gearRatio));
+			dVector dir0(matrix1[i]);
 			dVector dir1(matrix1[i].Scale(-1.0f));
 	
 			dVector r0CrossDir0(r0.CrossProduct(dir0));
@@ -80,12 +80,12 @@ class dPulleyBallSocket: public dCustomJoint
 			dFloat jacobian0[6];
 			dFloat jacobian1[6];
 
-			jacobian0[0] = dir0[0];
-			jacobian0[1] = dir0[1];
-			jacobian0[2] = dir0[2];
-			jacobian0[3] = r0CrossDir0[0];
-			jacobian0[4] = r0CrossDir0[1];
-			jacobian0[5] = r0CrossDir0[2];
+			jacobian0[0] = dir0[0] * m_gearRatio;
+			jacobian0[1] = dir0[1] * m_gearRatio;
+			jacobian0[2] = dir0[2] * m_gearRatio;
+			jacobian0[3] = r0CrossDir0[0] * m_gearRatio;
+			jacobian0[4] = r0CrossDir0[1] * m_gearRatio;
+			jacobian0[5] = r0CrossDir0[2] * m_gearRatio;
 
 			jacobian1[0] = dir1[0];
 			jacobian1[1] = dir1[1];
@@ -94,12 +94,13 @@ class dPulleyBallSocket: public dCustomJoint
 			jacobian1[4] = r1CrossDir1[1];
 			jacobian1[5] = r1CrossDir1[2];
 
-			NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
-
 			dVector speed(dir0 * veloc0 + r0CrossDir0 * omega0 + dir1 * veloc1 + r1CrossDir1 * omega1);
-			dFloat stopAccel = -0.25f * (speed.m_x + speed.m_y + speed.m_z);
-			dFloat postError = 0.1f * dClamp (matrix1[i].DotProduct3(error), dFloat (-0.25f), dFloat(0.25f));
-			NewtonUserJointSetRowAcceleration(m_joint, (stopAccel + postError / timestep) / timestep);
+			dVector step(dir0 * matrix0.m_posit + dir1 * matrix1.m_posit);
+			dFloat v = 0.25f * (speed.m_x + speed.m_y + speed.m_z);
+			dFloat s = 0.1f * dClamp(step.m_x + step.m_y + step.m_z, dFloat(-0.25f), dFloat(0.25f));
+
+			NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
+			NewtonUserJointSetRowAcceleration(m_joint, -(v + s / timestep) / timestep);
 		}
 	}
 

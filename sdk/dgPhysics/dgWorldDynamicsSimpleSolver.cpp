@@ -72,8 +72,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 		const dgFloat32 mass1 = body1->GetMass().m_w;
 		if (mass0 > (DG_DIAGONAL_PRECONDITIONER * mass1)) {
 			jointInfo->m_preconditioner0 = mass0 / (mass1 * DG_DIAGONAL_PRECONDITIONER);
-		}
-		else if (mass1 > (DG_DIAGONAL_PRECONDITIONER * mass0)) {
+		} else if (mass1 > (DG_DIAGONAL_PRECONDITIONER * mass0)) {
 			jointInfo->m_preconditioner1 = mass1 / (mass0 * DG_DIAGONAL_PRECONDITIONER);
 		}
 	}
@@ -111,7 +110,6 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 		dgAssert(rhs->m_jointFeebackForce);
 		const dgFloat32 force = rhs->m_jointFeebackForce->m_force * forceImpulseScale;
 		rhs->m_force = isBilateral ? dgClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
-		//rhs->m_force = 0.0f;
 		rhs->m_maxImpact = dgFloat32(0.0f);
 
 		dgVector jMinvM0linear(preconditioner0 * row->m_JMinv.m_jacobianM0.m_linear);
@@ -127,7 +125,6 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 		dgAssert(diag > dgFloat32(0.0f));
 		rhs->m_diagDamp = diag * rhs->m_stiffness;
 		diag *= (dgFloat32(1.0f) + rhs->m_stiffness);
-		//		rhs->m_jinvMJt = diag;
 		rhs->m_invJinvMJt = dgFloat32(1.0f) / diag;
 
 		dgAssert(dgCheckFloat(rhs->m_force));
