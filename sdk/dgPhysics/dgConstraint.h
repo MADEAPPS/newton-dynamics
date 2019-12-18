@@ -110,7 +110,6 @@ class dgJointAccelerationDecriptor
 	const dgLeftHandSide* m_leftHandSide;
 };
 
-
 DG_MSC_VECTOR_ALIGMENT
 class dgContraintDescritor
 {
@@ -168,6 +167,9 @@ class dgConstraint
 	virtual void ResetMaxDOF();
 	virtual dgFloat32 GetImpulseContactSpeed() const;
 	virtual void SetImpulseContactSpeed(dgFloat32 speed);
+
+	virtual dgFloat32 GetMassScaleBody0 () const;
+	virtual dgFloat32 GetMassScaleBody1 () const;
 	
 	void SetUserData (void *userData);
 	void SetCollidable (bool state);

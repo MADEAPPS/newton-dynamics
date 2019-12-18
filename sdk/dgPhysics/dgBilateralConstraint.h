@@ -57,6 +57,9 @@ class dgBilateralConstraint: public dgConstraint
 	virtual dgInt32 GetSolverModel() const;
 	virtual void SetSolverModel(dgInt32 model);
 
+	virtual dgFloat32 GetMassScaleBody0() const;
+	virtual dgFloat32 GetMassScaleBody1() const;
+
 	virtual void ResetInverseDynamics();
 
 	void CalculateMatrixOffset (const dgVector& pivot, const dgVector& dir, dgMatrix& matrix0, dgMatrix& matrix1) const;
@@ -83,6 +86,8 @@ class dgBilateralConstraint: public dgConstraint
 	dgFloat32 m_motorAcceleration[DG_BILATERAL_CONTRAINT_DOF];
 	dgFloat32 m_inverseDynamicsAcceleration[DG_BILATERAL_CONTRAINT_DOF];
 	dgFloat32 m_stiffness;
+	dgFloat32 m_massScaleBody0;
+	dgFloat32 m_massScaleBody1;
 	OnConstraintDestroy m_destructor;
 	dgBilateralConstraintList::dgListNode* m_jointNode;
 	dgInt8	  m_rowIsMotor;

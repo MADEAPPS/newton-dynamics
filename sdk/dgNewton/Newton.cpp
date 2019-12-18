@@ -7179,7 +7179,7 @@ void NewtonUserJointSetSolverModel(const NewtonJoint* const joint, int model)
 }
 
 /*!
-Get the solver algorthm use to calculation the constraint forces.
+Get the solver algorithm use to calculation the constraint forces.
 @param *joint pointer to the joint.
 
 See also: NewtonUserJointGetSolverModel
@@ -7191,7 +7191,12 @@ int NewtonUserJointGetSolverModel(const NewtonJoint* const joint)
 	return contraint->GetSolverModel();
 }
 
-
+void NewtonUserJointMassScale(const NewtonJoint* const joint, dFloat scaleBody0, dFloat scaleBody1)
+{
+	NewtonUserJoint* const contraint = (NewtonUserJoint*)joint;
+	dgAssert (contraint->IsBilateral());
+	contraint->SetMassScale(scaleBody0, scaleBody1);
+}
 
 /*!
   Add a linear restricted degree of freedom.

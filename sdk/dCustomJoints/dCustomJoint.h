@@ -311,6 +311,8 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API void SetStiffness (dFloat stiffness);
 
 	CUSTOM_JOINTS_API void SetSolverModel(int model);
+	CUSTOM_JOINTS_API void SetBodyMassScale(dFloat scaleBody0, dFloat scaleBody1);
+
 	CUSTOM_JOINTS_API int GetSolverModel() const;
 	CUSTOM_JOINTS_API void SetUserDestructorCallback(dJointUserDestructorCallback callback) { m_userDestructor = callback; }
 

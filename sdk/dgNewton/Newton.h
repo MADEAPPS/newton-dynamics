@@ -1196,6 +1196,8 @@ extern "C" {
 	NEWTON_API NewtonJoint* NewtonConstraintCreateUserJoint (const NewtonWorld* const newtonWorld, int maxDOF, NewtonUserBilateralCallback callback, const NewtonBody* const childBody, const NewtonBody* const parentBody) ; 
 	NEWTON_API int NewtonUserJointGetSolverModel(const NewtonJoint* const joint);
 	NEWTON_API void NewtonUserJointSetSolverModel(const NewtonJoint* const joint, int model);
+	NEWTON_API void NewtonUserJointMassScale(const NewtonJoint* const joint, dFloat scaleBody0, dFloat scaleBody1);
+
 	NEWTON_API void NewtonUserJointSetFeedbackCollectorCallback (const NewtonJoint* const joint, NewtonUserBilateralCallback getFeedback);
 	NEWTON_API void NewtonUserJointAddLinearRow (const NewtonJoint* const joint, const dFloat* const pivot0, const dFloat* const pivot1, const dFloat* const dir);
 	NEWTON_API void NewtonUserJointAddAngularRow (const NewtonJoint* const joint, dFloat relativeAngle, const dFloat* const dir);

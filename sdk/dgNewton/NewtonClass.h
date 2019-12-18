@@ -78,6 +78,8 @@ class NewtonUserJoint: public dgUserConstraint
 
 	dgInt32 SubmitImmediateModeConstraint(NewtonImmediateModeConstraint* const descriptor, dFloat timestep);
 
+	void SetMassScale (dgFloat32 scale0, dgFloat32 scale1);
+
 	protected:
 	NewtonUserJoint(NewtonUserBilateralCallback callback, dgBody* const body);
 

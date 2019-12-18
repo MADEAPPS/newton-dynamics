@@ -80,6 +80,13 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 	if (joint->IsSkeletonLoop() || joint->IsSkeleton() || (body0->GetSkeleton() && body1->GetSkeleton())) {
 		jointInfo->m_preconditioner0 = dgFloat32(1.0f);
 		jointInfo->m_preconditioner1 = dgFloat32(1.0f);
+	} else {
+		const dgFloat32 scale0 = joint->GetMassScaleBody0();
+		const dgFloat32 scale1 = joint->GetMassScaleBody1();
+		if ((scale0 != dgFloat32 (1.0f)) || (scale1 != dgFloat32 (1.0f))) {
+			jointInfo->m_preconditioner0 = scale0;
+			jointInfo->m_preconditioner1 = scale1;
+		}
 	}
 
 	dgJacobian forceAcc0;

@@ -38,8 +38,8 @@ dgUserConstraint::dgUserConstraint(dgWorld* const world, dgBody* const body0, dg
 	m_userData = NULL;
 	m_destructor = NULL;
 	if (world) {
-	world->AttachConstraint(this, body0, body1);
-}
+		world->AttachConstraint(this, body0, body1);
+	}
 }
 
 dgUserConstraint::~dgUserConstraint()

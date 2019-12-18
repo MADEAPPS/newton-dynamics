@@ -191,6 +191,11 @@ int dCustomJoint::GetSolverModel() const
 	return NewtonUserJointGetSolverModel(m_joint);
 }
 
+void dCustomJoint::SetBodyMassScale(dFloat scaleBody0, dFloat scaleBody1)
+{
+	NewtonUserJointMassScale(m_joint, scaleBody0, scaleBody1);
+}
+
 void dCustomJoint::Destructor (const NewtonJoint* me)
 {
 	// get the pointer to the joint class

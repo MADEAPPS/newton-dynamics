@@ -1280,7 +1280,13 @@ void dgWorld::UpdateSkeletons()
 				dgAssert(constraint);
 				dgAssert((constraint->m_body0 == srcBody) || (constraint->m_body1 == srcBody));
 				dgAssert((constraint->m_body0 == cell->m_bodyNode) || (constraint->m_body1 == cell->m_bodyNode));
-				if (constraint->IsBilateral() && (constraint->m_solverModel < 2) && (constraint->m_dynamicsLru != lru)) {
+				bool test = constraint->IsBilateral();
+				test = test && (constraint->m_solverModel < 2);
+				test = test && (constraint->m_dynamicsLru != lru);
+				test = test && (constraint->GetMassScaleBody0() == dgFloat32 (1.0f));
+				test = test && (constraint->GetMassScaleBody1() == dgFloat32 (1.0f));
+				//if (constraint->IsBilateral() && (constraint->m_solverModel < 2) && (constraint->m_dynamicsLru != lru)) {
+				if (test) {
 					constraint->m_dynamicsLru = lru;
 					jointList[jointCount] = (dgBilateralConstraint*)constraint;
 					jointCount++;

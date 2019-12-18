@@ -39,6 +39,15 @@ void dgConstraint::SetUserData (void *userData)
 	m_userData = userData;
 }
 
+dgFloat32 dgConstraint::GetMassScaleBody0() const
+{
+	return dgFloat32(1.0f);
+}
+
+dgFloat32 dgConstraint::GetMassScaleBody1() const
+{
+	return dgFloat32(1.0f);
+}
 
 void dgConstraint::InitPointParam (dgPointParam& param, dgFloat32 stiffness, const dgVector& p0Global, const dgVector& p1Global) const
 {

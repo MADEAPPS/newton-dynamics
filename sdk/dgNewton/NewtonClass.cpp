@@ -92,6 +92,15 @@ NewtonUserJoint::~NewtonUserJoint ()
 	}
 }
 
+void NewtonUserJoint::SetMassScale (dgFloat32 scale0, dgFloat32 scale1)
+{
+	m_massScaleBody0 = scale0;
+	m_massScaleBody1 = scale1;
+
+	dgWorld* const world = m_body0->GetWorld();
+	dgSkeletonList& skelManager = *world;
+	skelManager.m_skelListIsDirty = true;
+}
 
 dgUnsigned32 NewtonUserJoint::JacobianDerivative (dgContraintDescritor& params)
 {

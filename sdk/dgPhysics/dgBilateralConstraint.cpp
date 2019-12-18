@@ -46,6 +46,9 @@ dgBilateralConstraint::dgBilateralConstraint ()
 	m_solverModel = 0;
 	m_rowIsIk = 0;
 	m_rowIsMotor = 0;
+	m_stiffness = dgFloat32 (1.0f);
+	m_massScaleBody0 = dgFloat32 (1.0f);
+	m_massScaleBody1 = dgFloat32 (1.0f);
 
 	SetStiffness (dgFloat32 (1.0f));
 
@@ -85,6 +88,16 @@ void dgBilateralConstraint::ResetInverseDynamics()
 dgInt32 dgBilateralConstraint::GetSolverModel() const
 {
 	return m_solverModel;
+}
+
+dgFloat32 dgBilateralConstraint::GetMassScaleBody0() const
+{
+	return m_massScaleBody0;
+}
+
+dgFloat32 dgBilateralConstraint::GetMassScaleBody1() const
+{
+	return m_massScaleBody1;
 }
 
 void dgBilateralConstraint::SetSolverModel(dgInt32 model)
