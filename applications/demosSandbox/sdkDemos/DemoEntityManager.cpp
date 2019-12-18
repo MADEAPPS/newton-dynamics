@@ -54,31 +54,26 @@
 //#define DEFAULT_SCENE	19		// non uniform Scaled Collision
 //#define DEFAULT_SCENE	20		// scaled mesh collision
 //#define DEFAULT_SCENE	21		// continuous collision
-//#define DEFAULT_SCENE	22		// Flatland Game
-//#define DEFAULT_SCENE	23		// simple convex decomposition
-//#define DEFAULT_SCENE	24		// scene Collision
-//#define DEFAULT_SCENE	25		// simple boolean operators 
-//#define DEFAULT_SCENE	26		// simple convex fracturing 
-//#define DEFAULT_SCENE	27		// structured convex fracturing 
-//#define DEFAULT_SCENE	28		// multi ray casting using the threading Job scheduler
-//#define DEFAULT_SCENE	29		// standard joints
-//#define DEFAULT_SCENE	30		// servo joints
-//#define DEFAULT_SCENE	31		// construction vehicle
-//#define DEFAULT_SCENE	32		// six axis manipulator
-//#define DEFAULT_SCENE	33		// hexapod Robot
-//#define DEFAULT_SCENE	34		// basic rag doll
-//#define DEFAULT_SCENE	35		// balancing character
-//#define DEFAULT_SCENE	36		// dynamic rag doll
-//#define DEFAULT_SCENE	37		// single body vehicle
-//#define DEFAULT_SCENE	38		// super Car
-//#define DEFAULT_SCENE	39		// heavy vehicles
-//#define DEFAULT_SCENE	40		// basic player controller
-//#define DEFAULT_SCENE	41		// animated player controller
-//#define DEFAULT_SCENE	42		// advanced player controller
-//#define DEFAULT_SCENE	43		// cloth patch			
-//#define DEFAULT_SCENE	44		// soft bodies	
-//#define DEFAULT_SCENE	45		// joe's joint test
-//#define DEFAULT_SCENE	46		// Misho's Hinge Test
+//#define DEFAULT_SCENE	22		// flatland Game
+//#define DEFAULT_SCENE	23		// scene Collision
+//#define DEFAULT_SCENE	24		// simple convex fracturing 
+//#define DEFAULT_SCENE	25		// multi ray casting using the threading Job scheduler
+//#define DEFAULT_SCENE	26		// standard joints
+//#define DEFAULT_SCENE	27		// servo joints
+//#define DEFAULT_SCENE	28		// construction vehicle
+//#define DEFAULT_SCENE	29		// six axis manipulator
+//#define DEFAULT_SCENE	30		// hexapod Robot
+//#define DEFAULT_SCENE	31		// basic rag doll
+//#define DEFAULT_SCENE	32		// balancing character
+//#define DEFAULT_SCENE	33		// dynamic rag doll
+//#define DEFAULT_SCENE	34		// single body vehicle
+//#define DEFAULT_SCENE	35		// super Car
+//#define DEFAULT_SCENE	36		// heavy vehicles
+//#define DEFAULT_SCENE	37		// basic player controller
+//#define DEFAULT_SCENE	38		// animated player controller
+//#define DEFAULT_SCENE	39		// advanced player controller
+//#define DEFAULT_SCENE	40		// cloth patch			
+//#define DEFAULT_SCENE	41		// soft bodies	
 						 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
@@ -103,10 +98,7 @@ void FlatLandGame (DemoEntityManager* const scene);
 void SceneCollision (DemoEntityManager* const scene);
 void CompoundCollision(DemoEntityManager* const scene);
 void AlchimedesBuoyancy(DemoEntityManager* const scene);
-void SimpleConvexApproximation(DemoEntityManager* const scene);
-void SimpleBooleanOperations(DemoEntityManager* const scene);
 void SimpleConvexFracturing (DemoEntityManager* const scene);
-void StructuredConvexFracturing (DemoEntityManager* const scene);
 void UsingNewtonMeshTool (DemoEntityManager* const scene);
 void MultiRayCast (DemoEntityManager* const scene);
 void SingleBodyCar(DemoEntityManager* const scene);
@@ -126,10 +118,6 @@ void ConstructionVehicle (DemoEntityManager* const scene);
 void StandardJoints (DemoEntityManager* const scene);
 void SixAxisManipulators(DemoEntityManager* const scene);
 void Hexapod(DemoEntityManager* const scene);
-void JoesJointTest (DemoEntityManager* const scene);
-//void MishosRocketTest(DemoEntityManager* const scene);
-void MishosHingeTest(DemoEntityManager* const scene);
-
 
 DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] = 
 {
@@ -156,11 +144,8 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Scaled mesh collision", "demonstrate scaling mesh scaling collision", ScaledMeshCollision},
 	{"Continuous collision", "show continuous collision", ContinuousCollision },
 	{"Flat Land Game", "show usage of tow dimension joints", FlatLandGame },
-	{"Simple convex decomposition", "demonstrate convex decomposition and compound collision", SimpleConvexApproximation},
 	{"Multi geometry collision", "show static mesh with the ability of moving internal parts", SceneCollision},
-	{"Simple boolean operations", "demonstrate simple boolean operations ", SimpleBooleanOperations},
 	{"Simple convex fracture", "demonstrate simple fracture destruction using Voronoi partition", SimpleConvexFracturing},
-	{"Structured convex fracture", "demonstrate structured fracture destruction using Voronoi partition", StructuredConvexFracturing},
 	{"Parallel ray cast", "using the threading Job scheduler", MultiRayCast},
 	{"Standard Joints", "show some of the common joints", StandardJoints},
 	{"Servo actuators joints", "demonstrate complex array of bodies interconnect by joints", ServoJoints},
@@ -178,8 +163,6 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Advanced player controller", "demonstrate player interacting with other objects", AdvancedPlayerController},
 	{"Simple cloth Patch", "show simple cloth patch", ClothPatch},
 	{"Simple soft Body", "show simple soft body", SoftBodies},
-	{"Joes joint test", "", JoesJointTest},
-	{"Misho's Hinge Test", "", MishosHingeTest },
 };
 
 
