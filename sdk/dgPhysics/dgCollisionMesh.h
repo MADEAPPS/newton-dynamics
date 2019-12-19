@@ -64,8 +64,10 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 	{
 		const dgMatrix& soupMatrix = m_polySoupInstance->GetGlobalMatrix();
 		m_boxDistanceTravelInMeshSpace = m_polySoupInstance->GetInvScale() * soupMatrix.UnrotateVector(distanceInGlobalSpace * m_convexInstance->GetInvScale());
+		if (m_boxDistanceTravelInMeshSpace.DotProduct(m_boxDistanceTravelInMeshSpace).GetScalar() < dgFloat32 (5.0e-3f)) {
+			m_doContinuesCollisionTest = false;
+		}
 	}
-
 
 	DG_INLINE dgInt32 GetFaceIndexCount(dgInt32 indexCount) const
 	{
