@@ -30,7 +30,6 @@
 #include "dgCollisionCone.h"
 #include "dgCollisionScene.h"
 #include "dgCollisionSphere.h"
-#include "dgInverseDynamics.h"
 #include "dgBroadPhaseMixed.h"
 #include "dgCollisionCapsule.h"
 #include "dgCollisionInstance.h"
@@ -210,7 +209,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,dgBodyMaterialList(allocator)
 	,dgBodyCollisionList(allocator)
 	,dgSkeletonList(allocator)
-	,dgInverseDynamicsList(allocator)
 	,dgContactList(allocator) 
 	,dgBilateralConstraintList(allocator)
 	,dgWorldDynamicUpdate(allocator)
@@ -359,12 +357,6 @@ void dgWorld::DestroyAllBodies()
 	dgBodyMasterList& me = *this;
 
 	Sync();
-
-	dgInverseDynamicsList& ikList = *this;
-	for (dgInverseDynamicsList::dgListNode* ptr = ikList.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		delete ptr->GetInfo();
-	}
-	ikList.RemoveAll();
 
 	dgSkeletonList& skelList = *this;
 	dgSkeletonList::Iterator iter(skelList);
@@ -1123,24 +1115,6 @@ dgBroadPhaseAggregate* dgWorld::CreateAggreGate() const
 void dgWorld::DestroyAggregate(dgBroadPhaseAggregate* const aggregate) const
 {
 	m_broadPhase->DestroyAggregate((dgBroadPhaseAggregate*) aggregate);
-}
-
-dgInverseDynamics* dgWorld::CreateInverseDynamics()
-{
-	dgInverseDynamicsList& list = *this;
-	dgInverseDynamics* const ik = new (m_allocator) dgInverseDynamics(this);
-	ik->m_reference = list.Append (ik);
-	return ik;
-}
-
-void dgWorld::DestroyInverseDynamics(dgInverseDynamics* const inverseDynamics)
-{
-	if (inverseDynamics->m_reference) {
-		dgInverseDynamicsList& ikList = *this;
-		ikList.Remove (inverseDynamics->m_reference);
-		inverseDynamics->m_reference = NULL;
-	}
-	delete inverseDynamics;
 }
 
 dgDeadJoints::dgDeadJoints(dgMemoryAllocator* const allocator)

@@ -47,7 +47,6 @@ class dgCollisionPoint;
 class dgUserConstraint;
 class dgBallConstraint;
 class dgHingeConstraint;
-class dgInverseDynamics;
 class dgUserMeshCreation;
 class dgSlidingConstraint;
 class dgCollisionInstance;
@@ -89,16 +88,6 @@ class dgSkeletonList: public dgList<dgSkeletonContainer*>
 	dgInt32 m_lruMarker;
 	bool m_skelListIsDirty;
 };
-
-class dgInverseDynamicsList: public dgList<dgInverseDynamics*>
-{
-	public:
-	dgInverseDynamicsList(dgMemoryAllocator* const allocator)
-		:dgList<dgInverseDynamics*>(allocator)
-	{
-	}
-};
-
 
 class dgWorld;
 class dgCollisionInstance;
@@ -155,7 +144,6 @@ class dgWorld
 	,public dgBodyMaterialList
 	,public dgBodyCollisionList
 	,public dgSkeletonList
-	,public dgInverseDynamicsList
 	,public dgContactList 
 	,public dgBilateralConstraintList
 	,public dgWorldDynamicUpdate
@@ -346,9 +334,6 @@ class dgWorld
 
 	dgBroadPhaseAggregate* CreateAggreGate() const; 
 	void DestroyAggregate(dgBroadPhaseAggregate* const aggregate) const; 
-
-	dgInverseDynamics* CreateInverseDynamics();
-	void DestroyInverseDynamics(dgInverseDynamics* const inverseDynamics);
 
 	void SetCollisionInstanceConstructorDestructor (OnCollisionInstanceDuplicate constructor, OnCollisionInstanceDestroy destructor);
 

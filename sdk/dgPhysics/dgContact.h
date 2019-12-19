@@ -217,7 +217,6 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	DG_CLASS_ALLOCATOR(allocator)
 
 	virtual void ResetMaxDOF();
-	virtual void ResetInverseDynamics();
 	virtual dgFloat32 GetImpulseContactSpeed() const;
 	virtual void SetImpulseContactSpeed(dgFloat32 speed);
 	virtual void GetInfo (dgConstraintInfo* const info) const;
@@ -326,10 +325,6 @@ DG_INLINE dgFloat32 dgContact::GetClosestDistance() const
 DG_INLINE void dgContact::ResetMaxDOF()
 {
 	m_maxDOF = 0;
-}
-
-DG_INLINE void dgContact::ResetInverseDynamics()
-{
 }
 
 DG_INLINE dgFloat32 dgContact::GetPruningTolerance() const

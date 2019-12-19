@@ -202,7 +202,6 @@ class dgConstraint
 	dgConstraint();
 	virtual ~dgConstraint();
 
-	virtual void ResetInverseDynamics() = 0;
 	virtual dgUnsigned32 JacobianDerivative (dgContraintDescritor& params) = 0; 
 	
 	void SetUpdateFeedbackFunction (ConstraintsForceFeeback function);
@@ -232,7 +231,6 @@ class dgConstraint
 	friend class dgWorld;
 	friend class dgJacobianMemory;
 	friend class dgBodyMasterList;
-	friend class dgInverseDynamics;
 	friend class dgSkeletonContainer;
 	friend class dgWorldDynamicUpdate;
 	friend class dgParallelBodySolver;

@@ -79,7 +79,6 @@
     <ClCompile Include="..\..\dgPhysics\dgCorkscrewConstraint.cpp" />
     <ClCompile Include="..\..\dgPhysics\dgDynamicBody.cpp" />
     <ClCompile Include="..\..\dgPhysics\dgHingeConstraint.cpp" />
-    <ClCompile Include="..\..\dgPhysics\dgInverseDynamics.cpp" />
     <ClCompile Include="..\..\dgPhysics\dgKinematicBody.cpp" />
     <ClCompile Include="..\..\dgPhysics\dgNarrowPhaseCollision.cpp" />
     <ClCompile Include="..\..\dgPhysics\dgSkeletonContainer.cpp" />
@@ -142,7 +141,6 @@
     <ClInclude Include="..\..\dgPhysics\dgCorkscrewConstraint.h" />
     <ClInclude Include="..\..\dgPhysics\dgDynamicBody.h" />
     <ClInclude Include="..\..\dgPhysics\dgHingeConstraint.h" />
-    <ClInclude Include="..\..\dgPhysics\dgInverseDynamics.h" />
     <ClInclude Include="..\..\dgPhysics\dgKinematicBody.h" />
     <ClInclude Include="..\..\dgPhysics\dgPhysics.h" />
     <ClInclude Include="..\..\dgPhysics\dgPhysicsStdafx.h" />

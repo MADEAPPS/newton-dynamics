@@ -546,8 +546,7 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 		rhs->m_normalForceIndex = constraintParam.m_forceBounds[i].m_normalIndex;
 		rowCount++;
 	}
-//  we separate left and right hand side not to align row to near multiple of 4
-	constraint->ResetInverseDynamics();
+
 	return rowCount;
 }
 

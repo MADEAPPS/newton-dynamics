@@ -224,7 +224,6 @@ class dgBody
 	virtual dgConstraint* GetNextJoint(dgConstraint* const joint) const;
 	virtual dgConstraint* GetFirstContact() const;
 	virtual dgConstraint* GetNextContact(dgConstraint* const joint) const;
-	virtual dgVector CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgFloat32 timestep) const;
 	virtual dgSkeletonContainer* GetSkeleton() const;
 
 	void SetMatrixOriginAndRotation(const dgMatrix& matrix);
@@ -324,7 +323,6 @@ class dgBody
 	friend class dgBodyMasterList;
 	friend class dgCollisionScene;
 	friend class dgCollisionConvex;
-	friend class dgInverseDynamics;
 	friend class dgBroadPhaseMixed;
 	friend class dgCollisionCompound;
 	friend class dgCollisionUserMesh;

@@ -44,7 +44,6 @@ dgBilateralConstraint::dgBilateralConstraint ()
 	m_isBilateral = true;
 	m_isActive = true;
 	m_solverModel = 0;
-	m_rowIsIk = 0;
 	m_rowIsMotor = 0;
 	m_stiffness = dgFloat32 (1.0f);
 	m_massScaleBody0 = dgFloat32 (1.0f);
@@ -54,7 +53,6 @@ dgBilateralConstraint::dgBilateralConstraint ()
 
 	memset (m_jointForce, 0, sizeof (m_jointForce));
 	memset (m_motorAcceleration, 0, sizeof (m_motorAcceleration));
-	memset (m_inverseDynamicsAcceleration, 0, sizeof (m_inverseDynamicsAcceleration));
 }
 
 dgBilateralConstraint::~dgBilateralConstraint ()
@@ -77,12 +75,6 @@ void dgBilateralConstraint::AppendToJointList()
 	
 	dgBilateralConstraintList* const jointList = m_body0->m_world;
 	m_jointNode = jointList->Addtop(this);
-}
-
-
-void dgBilateralConstraint::ResetInverseDynamics()
-{
-	m_rowIsIk = 0;
 }
 
 dgInt32 dgBilateralConstraint::GetSolverModel() const
@@ -281,13 +273,6 @@ void dgBilateralConstraint::SetSpringDamperAcceleration (dgInt32 index, dgContra
 dgFloat32 dgBilateralConstraint::CalculateMotorAcceleration (dgInt32 index, dgContraintDescritor& desc) const
 {
 	return desc.m_zeroRowAcceleration[index];
-}
-
-dgFloat32 dgBilateralConstraint::GetInverseDynamicAcceleration(dgInt32 index) const
-{
-	dgAssert (index >= 0);
-	dgAssert (index < DG_BILATERAL_CONTRAINT_DOF);
-	return m_inverseDynamicsAcceleration[index];
 }
 
 void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& dir,	dgFloat32 stiffness, dgFloat32 jointAngle, dgForceImpactPair* const jointForce)

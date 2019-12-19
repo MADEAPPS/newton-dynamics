@@ -68,9 +68,7 @@ class NewtonUserJoint: public dgUserConstraint
 	void SetLowerFriction (dgFloat32 friction);
 	void SetRowStiffness (dgFloat32 stiffness);
 	void SetAcceleration (dgFloat32 acceleration);
-	void SetAsInverseDynamicsRow();
 	dgFloat32 GetAcceleration () const;
-//	dgFloat32 GetInverseDynamicsAcceleration() const;
 	dgFloat32 CalculateZeroMotorAcceleration() const;
 	
 	void SetSpringDamperAcceleration (dgFloat32 rowStiffness, dgFloat32 springK, dgFloat32 springD);
@@ -89,17 +87,6 @@ class NewtonUserJoint: public dgUserConstraint
 	dgForceImpactPair* m_forceArray;
 	dgContraintDescritor* m_param;
 	dgInt32 m_rows;
-};
-
-
-class NewtonUserJointInverseDynamicsEffector : public NewtonUserJoint
-{
-	public:
-	NewtonUserJointInverseDynamicsEffector (dgInverseDynamics* const invDynSolver, dgInverseDynamics::dgNode* const invDynNode, NewtonUserBilateralCallback callback);
-	~NewtonUserJointInverseDynamicsEffector();
-
-	private:
-	dgInverseDynamics* m_invDynSolver;
 };
 
 #endif

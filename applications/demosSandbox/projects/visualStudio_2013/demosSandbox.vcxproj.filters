@@ -42,9 +42,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\ContinueCollision.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\ConvexApproximation.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\ConvexCast.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -81,9 +78,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\SimpleConvexFracturing.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\SimpleBooleans.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\SceneCollision.cpp">
       <Filter>demos</Filter>
     </ClCompile>
@@ -94,9 +88,6 @@
       <Filter>demos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\SuperCar.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\StructuredConvexFracturing.cpp">
       <Filter>demos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\StandardJoints.cpp">
@@ -151,12 +142,6 @@
       <Filter>demos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\ServoJoints.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\JoesJointTest.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\MishosRocketTest.cpp">
       <Filter>demos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\SingleBodyCar.cpp">

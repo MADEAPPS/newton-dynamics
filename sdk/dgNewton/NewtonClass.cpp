@@ -193,36 +193,6 @@ void NewtonUserJoint::SetAcceleration (dgFloat32 acceleration)
 	}
 }
 
-/*
-dgFloat32 NewtonUserJoint::GetInverseDynamicsAcceleration() const
-{
-	dgInt32 index = m_rows - 1;
-	dgFloat32 accel = dgFloat32(0.0f);
-	if ((index >= 0) && (index < dgInt32(m_maxDOF))) {
-		m_param->m_forceBounds[index].m_isIkRow = 1;
-		accel = GetInverseDynamicAcceleration(index);
-	}
-	return accel;
-}
-*/
-
-void NewtonUserJoint::SetAsInverseDynamicsRow()
-{
-	dgInt32 index = m_rows - 1;
-	if ((index >= 0) && (index < dgInt32(m_maxDOF))) {
-
-		dgFloat32 accel;
-		if (m_rowIsIk & (1 << index)) {
-			accel = GetInverseDynamicAcceleration(index);
-//dgTrace (("%f\n", accel));
-		} else {
-			accel = GetAcceleration();
-		}
-		SetMotorAcceleration(index, accel, *m_param);
-		m_rowIsIk |= (1 << index);
-	}
-}
-
 dgFloat32 NewtonUserJoint::CalculateZeroMotorAcceleration() const
 {
 	dgInt32 index = m_rows - 1;
@@ -345,18 +315,4 @@ dgInt32 NewtonUserJoint::SubmitImmediateModeConstraint(NewtonImmediateModeConstr
 	}
 
 	return m_rows;
-}
-
-
-
-NewtonUserJointInverseDynamicsEffector::NewtonUserJointInverseDynamicsEffector(dgInverseDynamics* const invDynSolver, dgInverseDynamics::dgNode* const invDynNode, NewtonUserBilateralCallback callback)
-	:NewtonUserJoint(callback, invDynSolver->GetBody(invDynNode))
-	,m_invDynSolver(invDynSolver)
-{
-	m_invDynSolver->AddEffector (this);
-}
-
-NewtonUserJointInverseDynamicsEffector::~NewtonUserJointInverseDynamicsEffector()
-{
-	m_invDynSolver->RemoveLoopJoint (this);
 }

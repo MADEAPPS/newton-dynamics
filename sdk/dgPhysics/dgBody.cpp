@@ -332,22 +332,6 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	dgAssert (m_matrix.TestOrthogonal());
 }
 
-dgVector dgBody::CalculateInverseDynamicForce (const dgVector& desiredVeloc, dgFloat32 timestep) const
-{
-	dgAssert (0);
-	return dgVector();
-/*
-	dgFloat32 massAccel = m_mass.m_w / timestep;
-	if (m_world->m_solverMode){
-		if (m_masterNode->GetInfo().GetCount() >= 2){
-			massAccel *= (dgFloat32 (2.0f) * dgFloat32 (LINEAR_SOLVER_SUB_STEPS) / dgFloat32 (LINEAR_SOLVER_SUB_STEPS + 1));
-		} 
-	}
-	return (desiredVeloc - m_veloc).Scale (massAccel);
-*/
-}
-
-
 dgConstraint* dgBody::GetFirstJoint() const
 {
 	if (m_masterNode) {

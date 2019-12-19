@@ -60,8 +60,6 @@ class dgBilateralConstraint: public dgConstraint
 	virtual dgFloat32 GetMassScaleBody0() const;
 	virtual dgFloat32 GetMassScaleBody1() const;
 
-	virtual void ResetInverseDynamics();
-
 	void CalculateMatrixOffset (const dgVector& pivot, const dgVector& dir, dgMatrix& matrix0, dgMatrix& matrix1) const;
 	void SetPivotAndPinDir(const dgVector &pivot, const dgVector &pinDirection, dgMatrix& matrix0, dgMatrix& matrix1) const;
 	void SetPivotAndPinDir(const dgVector& pivot, const dgVector& pinDirection0, const dgVector& pinDirection1, dgMatrix& matrix0, dgMatrix& matrix1) const;
@@ -69,7 +67,6 @@ class dgBilateralConstraint: public dgConstraint
 
 	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params); 
 
-	dgFloat32 GetInverseDynamicAcceleration (dgInt32 index) const;
 	dgFloat32 GetRowAcceleration (dgInt32 index, dgContraintDescritor& desc) const;
 	dgFloat32 CalculateMotorAcceleration (dgInt32 index, dgContraintDescritor& desc) const;
 	void SetMotorAcceleration (dgInt32 index, dgFloat32 acceleration, dgContraintDescritor& desc);
@@ -84,17 +81,14 @@ class dgBilateralConstraint: public dgConstraint
 	dgVector m_r1[DG_BILATERAL_CONTRAINT_DOF];
 	dgForceImpactPair m_jointForce[DG_BILATERAL_CONTRAINT_DOF];
 	dgFloat32 m_motorAcceleration[DG_BILATERAL_CONTRAINT_DOF];
-	dgFloat32 m_inverseDynamicsAcceleration[DG_BILATERAL_CONTRAINT_DOF];
 	dgFloat32 m_stiffness;
 	dgFloat32 m_massScaleBody0;
 	dgFloat32 m_massScaleBody1;
 	OnConstraintDestroy m_destructor;
 	dgBilateralConstraintList::dgListNode* m_jointNode;
 	dgInt8	  m_rowIsMotor;
-	dgInt8	  m_rowIsIk;
 
 	friend class dgBodyMasterList;
-	friend class dgInverseDynamics;
 	friend class dgWorldDynamicUpdate;
 };
 

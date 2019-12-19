@@ -5011,38 +5011,6 @@ void NewtonBodyGetForce(const NewtonBody* const bodyPtr, dFloat* const vectorPtr
 	vectorPtr[2] = vector.m_z;
 }
 
-
-/*!
-  Calculate the next force that net to be applied to the body to archive the desired velocity in the current time step.
-
-  @param *bodyPtr pointer to the body.
-  @param timestep time step that the force will be applyed.
-  @param *desiredVeloc pointer to an array of 3 floats containing the desired velocity.
-  @param *forceOut pointer to an array of 3 floats to hold the calculated net force.
-
-  this function can be useful when creating object for game play.
-
-  this treat the body as a point mass and is uses the solver to calculates the net force that need to be applied to the body
-  such that is reach the desired velocity in the net time step.
-  In general the force should be calculated by the expression f = M * (dsiredVeloc - bodyVeloc) / timestep
-  however due to algorithmic optimization and limitations if such equation is used then the solver will generate a different desired velocity.
-
-  @return Nothing.
-
-  See also: ::NewtonBodySetForce, ::NewtonBodyAddForce, ::NewtonBodyGetForce
-*/
-void NewtonBodyCalculateInverseDynamicsForce(const NewtonBody* const bodyPtr, dFloat timestep, const dFloat* const desiredVeloc, dFloat* const forceOut)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgBody* const body = (dgBody *)bodyPtr;
-	dgVector veloc (desiredVeloc[0], desiredVeloc[1], desiredVeloc[2], dgFloat32 (0.0f));
-	dgVector force (body->CalculateInverseDynamicForce (veloc, timestep));
-	forceOut[0] = force[0];
-	forceOut[1] = force[1];
-	forceOut[2] = force[2];
-
-}
-
 /*!
   Set the net torque applied to a rigid body.
 
@@ -5279,110 +5247,6 @@ int NewtonJointIsActive(const NewtonJoint* const jointPtr)
 	TRACE_FUNCTION(__FUNCTION__);
 	dgConstraint* const joint = (dgConstraint*) jointPtr;
 	return joint->IsActive() ? 1 : 0;
-}
-
-
-NewtonInverseDynamics* NewtonCreateInverseDynamics(const NewtonWorld* const newtonWorld)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	Newton* const world = (Newton *)newtonWorld;
-	return (NewtonInverseDynamics*)world->CreateInverseDynamics();
-}
-
-void NewtonInverseDynamicsDestroy(NewtonInverseDynamics* const inverseDynamics)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgInverseDynamics* const ik = (dgInverseDynamics*) inverseDynamics;
-	Newton* const world = (Newton*)ik->GetWorld();
-	world->DestroyInverseDynamics(ik);
-}
-
-NewtonJoint* NewtonInverseDynamicsCreateEffector(NewtonInverseDynamics* const inverseDynamics, void* const ikNode, NewtonUserBilateralCallback callback)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
-
-	Newton* const world = (Newton *)ik->GetWorld();
-	dgInverseDynamics::dgNode* const node = (dgInverseDynamics::dgNode*) ikNode;
-	return (NewtonJoint*) new (world->dgWorld::GetAllocator()) NewtonUserJointInverseDynamicsEffector(ik, node, callback);
-}
-
-void NewtonInverseDynamicsDestroyEffector(NewtonJoint* const effector)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgAssert(0);
-}
-
-
-void NewtonInverseDynamicsEndBuild (NewtonInverseDynamics* const inverseDynamics)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
-	ik->Finalize();
-}
-
-void NewtonInverseDynamicsUpdate (NewtonInverseDynamics* const inverseDynamics, dFloat timestep, int threadIndex)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
-	ik->Update(timestep, threadIndex);
-}
-
-void* NewtonInverseDynamicsGetRoot(NewtonInverseDynamics* const inverseDynamics)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
-	return ik->GetRoot();
-}
-
-
-NewtonBody* NewtonInverseDynamicsGetBody(NewtonInverseDynamics* const inverseDynamics, void* const node)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
-	return (NewtonBody*) ik->GetBody((dgInverseDynamics::dgNode*) node);
-}
-
-NewtonJoint* NewtonInverseDynamicsGetJoint(NewtonInverseDynamics* const inverseDynamics, void* const node)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
-	return (NewtonJoint*) ik->GetJoint((dgInverseDynamics::dgNode*) node);
-}
-
-void* NewtonInverseDynamicsAddRoot(NewtonInverseDynamics* const inverseDynamics, NewtonBody* const root)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgInverseDynamics* const ik = (dgInverseDynamics*) inverseDynamics;
-	return ik->AddRoot((dgDynamicBody*)root);
-}
-
-void* NewtonInverseDynamicsAddChildNode(NewtonInverseDynamics* const inverseDynamics, void* const parentNode, NewtonJoint* const joint)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgInverseDynamics* const ik = (dgInverseDynamics*) inverseDynamics;
-	return ik->AddChild((dgBilateralConstraint*)joint, (dgInverseDynamics::dgNode*) parentNode);
-}
-
-void* NewtonInverseDynamicsGetFirstChildNode(NewtonInverseDynamics* const inverseDynamics, void* const parentNode)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
-	return ik->GetFirstChild ((dgInverseDynamics::dgNode*) parentNode);
-}
-
-void* NewtonInverseDynamicsGetNextChildNode(NewtonInverseDynamics* const inverseDynamics, void* const node)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
-	return ik->GetNextSiblingChild((dgInverseDynamics::dgNode*) node);
-}
-
-bool NewtonInverseDynamicsAddLoopJoint(NewtonInverseDynamics* const inverseDynamics, NewtonJoint* const joint)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	dgInverseDynamics* const ik = (dgInverseDynamics*)inverseDynamics;
-	return ik->AddLoopJoint((dgBilateralConstraint*)joint);
 }
 
 /*!
@@ -7380,22 +7244,6 @@ void NewtonUserJointGetRowJacobian(const NewtonJoint* const joint, dFloat* const
 		linear1[i] = jacobian1.m_linear[i];
 		angular1[i] = jacobian1.m_angular[i];
 	}
-}
-
-/*
-dFloat NewtonUserJointGetRowInverseDynamicsAcceleration (const NewtonJoint* const joint)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	NewtonUserJoint* const userJoint = (NewtonUserJoint*)joint;
-	return userJoint->GetInverseDynamicsAcceleration();
-}
-*/
-
-void NewtonUserJointSetRowAsInverseDynamics (const NewtonJoint* const joint)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	NewtonUserJoint* const userJoint = (NewtonUserJoint*)joint;
-	userJoint->SetAsInverseDynamicsRow();
 }
 
 dFloat NewtonUserJointCalculateRowZeroAcceleration (const NewtonJoint* const joint)
