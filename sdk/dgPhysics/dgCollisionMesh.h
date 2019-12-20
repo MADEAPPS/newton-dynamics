@@ -64,7 +64,7 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 	{
 		const dgMatrix& soupMatrix = m_polySoupInstance->GetGlobalMatrix();
 		m_boxDistanceTravelInMeshSpace = m_polySoupInstance->GetInvScale() * soupMatrix.UnrotateVector(distanceInGlobalSpace * m_convexInstance->GetInvScale());
-		if (m_boxDistanceTravelInMeshSpace.DotProduct(m_boxDistanceTravelInMeshSpace).GetScalar() < dgFloat32 (5.0e-3f)) {
+		if (m_boxDistanceTravelInMeshSpace.DotProduct(m_boxDistanceTravelInMeshSpace).GetScalar() < dgFloat32 (1.0e-2f)) {
 			m_doContinuesCollisionTest = false;
 		}
 	}
