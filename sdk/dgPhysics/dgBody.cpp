@@ -734,7 +734,6 @@ void dgBody::SetSleepState(bool state)
 		for (dgConstraint* contact = GetFirstContact(); contact; contact = GetNextContact(contact)) {
 			dgAssert(contact->GetId() == dgConstraint::m_contactConstraint);
 			dgContact* const contactJoint = (dgContact*)contact;
-			dgAssert(contactJoint->m_isActive);
 			contactJoint->m_positAcc = dgVector(dgFloat32(10.0f));
 		}
 	}

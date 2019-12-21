@@ -660,6 +660,11 @@ void dgWorldDynamicUpdate::ResolveClusterForces(dgBodyCluster* const cluster, dg
 	dgWorld* const world = (dgWorld*) this;
 	dgJointInfo* const constraintArray = &world->m_jointsMemory[cluster->m_jointStart];
 
+static int xxx;
+xxx ++;
+if (xxx == 8841)
+xxx *=1;
+
 	if (!cluster->m_isContinueCollision) {
 		if (activeJoint >= 1) {
 			BuildJacobianMatrix(cluster, threadID, timestep);

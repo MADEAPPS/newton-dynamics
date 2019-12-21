@@ -277,9 +277,14 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 	dgFloat32 timestep = pair->m_timestep;
 	dgFloat32 closestDist = dgFloat32 (1.0e10f);
 	dgFloat32 separatingDist = dgFloat32 (1.0e10f);
-	if (proxy.m_continueCollision && (baseLinearSpeed > dgFloat32 (1.0e-6f))) {
-		dgAssert (0);
-	} else {
+//	if (proxy.m_continueCollision && (baseLinearSpeed > dgFloat32 (1.0e-6f))) {
+//		dgAssert (0);
+//	} else {
+if (proxy.m_continueCollision && (baseLinearSpeed > dgFloat32 (1.0e-6f))) {
+dgTrace (("Warning scene continue collision not implemented, using descrete collision instead\n"));
+}
+
+
 		while (stack) {
 			stack --;
 			const dgNodeBase* const me = stackPool[stack][0];
@@ -382,7 +387,7 @@ void dgCollisionScene::CollideCompoundPair (dgBroadPhase::dgPair* const pair, dg
 			}
 		}
 		separatingDist = dgMin (separatingDist, data.m_separatingDistance);
-	}
+//	}
 	contactJoint->m_closestDistance = closestDist;
 	contactJoint->m_separationDistance = separatingDist;
 }

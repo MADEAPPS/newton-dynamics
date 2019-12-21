@@ -228,8 +228,6 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 		body1->m_resting = resting | (invMass1 == dgFloat32(0.0f));
 
 		if ((invMass0 > dgFloat32 (0.0f)) && (invMass1 > dgFloat32 (0.0f))) {
-			//dgAssert (body0->IsRTTIType(dgBody::m_dynamicBodyRTTI | dgBody::m_dynamicBodyAsymatric));
-			//dgAssert (body1->IsRTTIType(dgBody::m_dynamicBodyRTTI | dgBody::m_dynamicBodyAsymatric));
 			world->UnionSet(joint);
 		} else if (invMass1 == dgFloat32 (0.0f)) {
 			dgBody* const root = world->FindRootAndSplit(body0);
@@ -328,22 +326,18 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	dgParallelSort(*world, augmentedJointArray, augmentedJointCount, CompareJointInfos);
 	dgParallelSort(*world, m_clusterData, clustersCount, CompareClusterInfos);
 
-//	dgInt32 rowStart = 0;
 	dgInt32 bodyStart = 0;
 	dgInt32 jointStart = 0;
 	dgInt32 softBodiesCount = 0;
 	for (dgInt32 i = 0; i < clustersCount; i++) {
 		dgBodyCluster& cluster = m_clusterData[i];
-//		cluster.m_rowStart = rowStart;
 		cluster.m_bodyStart = bodyStart;
 		cluster.m_jointStart = jointStart;
 
-//		rowStart += cluster.m_rowCount;
 		bodyStart += cluster.m_bodyCount;
 		softBodiesCount += cluster.m_hasSoftBodies;
 		jointStart += cluster.m_jointCount ? cluster.m_jointCount : 1;
 	}
-//	m_solverMemory.Init(world, rowStart, bodyStart);
 	world->m_bodiesMemory.ResizeIfNecessary(bodyStart);
 
 	dgInt32 rowStart = 0;
@@ -408,6 +402,10 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 
 			cluster.m_rowCount += extraRowsAcc;
 			cluster.m_isContinueCollision = clusterIsContinuesCollision;
+			if (clusterIsContinuesCollision && cluster.m_rowCount < DG_CONSTRAINT_MAX_ROWS) {
+				cluster.m_rowCount = DG_CONSTRAINT_MAX_ROWS;
+			}
+
 		} else {
 			dgAssert(cluster.m_bodyCount == 2);
 			bodyArray[1].m_body = jointSetArray[0].m_body;
