@@ -436,7 +436,7 @@ class dTractorModel: public dModelRootNode
 	}
 
 
-	void MakeHydrolic (dModelNode* const node, const char* const name0, const char* const name1, const char* const effectorName1)
+	void MakeHydraulic (dModelNode* const node, const char* const name0, const char* const name1, const char* const effectorName1)
 	{
 		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
 
@@ -487,8 +487,8 @@ class dTractorModel: public dModelRootNode
 		dMatrix bindMatrix(dGetIdentityMatrix());
 		dModelNode* const armNode = new dModelNode(fronAxelBody, bindMatrix, this);
 
-		MakeHydrolic (armNode, "armHydraulicPiston_left", "armHydraulic_left", "attachement_left");
-		MakeHydrolic (armNode, "armHydraulicPiston_right", "armHydraulic_right", "attachement_right");
+		MakeHydraulic (armNode, "armHydraulicPiston_left", "armHydraulic_left", "attachement_left");
+		MakeHydraulic (armNode, "armHydraulicPiston_right", "armHydraulic_right", "attachement_right");
 	}
 
 	dTractorEngine* m_engine;
