@@ -19,6 +19,8 @@
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
 
+#define D_TRACTOR_CAMERA_DIST 10.0f
+
 
 class dTractorControls
 {
@@ -29,6 +31,7 @@ class dTractorControls
 	}
 	dFloat m_throttle;
 	dFloat m_steeringValue;
+	dFloat m_frontBucketAngle;
 //	dFloat m_bucket_x;
 //	dFloat m_bucket_y;
 //	dFloat m_bucket_angle;
@@ -115,21 +118,23 @@ class dTractorModel: public dModelRootNode
 		,m_engine(NULL)
 		,m_leftWheel(NULL)
 		,m_rightWheel(NULL)
+		,m_frontBuckect(NULL)
 	{
 		MakeChassis(world, modelName, location);
-
 		MakeDriveTrain();
+		MakeFrontBucket();
 	}
 
 	void ApplyControl (const dTractorControls& controls, dFloat timestep)
 	{
 		NewtonBodySetSleepState(GetBody(), 0);
 
+		m_controls = controls;
+
 		m_engine->m_alpha = controls.m_throttle;
 		m_leftWheel->SetTargetAngle1(m_controls.m_steeringValue * 25.0f * dDegreeToRad);
 		m_rightWheel->SetTargetAngle1(-m_controls.m_steeringValue * 25.0f * dDegreeToRad);
-
-		m_controls = controls;
+		m_frontBuckect->SetTargetAngle(m_controls.m_frontBucketAngle * dDegreeToRad);
 	}
 
 	private:
@@ -301,7 +306,6 @@ class dTractorModel: public dModelRootNode
 		dMatrix diffMatrix;
 		NewtonBodyGetMatrix(chassis, &diffMatrix[0][0]);
 		diffMatrix = dRollMatrix(0.5f * dPi) * diffMatrix;
-//diffMatrix.m_posit.m_y += 1.0f;
 
 		// make a non collideble engine body
 		NewtonBody* const diffBody = NewtonCreateDynamicBody(world, shape, &diffMatrix[0][0]);
@@ -394,7 +398,6 @@ class dTractorModel: public dModelRootNode
 		dMatrix engineMatrix;
 		NewtonBodyGetMatrix(chassis, &engineMatrix[0][0]);
 		engineMatrix = dRollMatrix(0.5f * dPi) * engineMatrix;
-//engineMatrix.m_posit.m_y += 2.0f;
 
 		NewtonBody* const engineBody = NewtonCreateDynamicBody(world, shape, &engineMatrix[0][0]);
 
@@ -428,19 +431,70 @@ class dTractorModel: public dModelRootNode
 		dMatrix bindMatrix(dGetIdentityMatrix());
 		new dModelNode(engineBody, bindMatrix, this);
 
-		//dMatrix matrix;
-		//dMatrix rearDiffMatrix;
-		//rearDiff->GetJoint()->CalculateGlobalMatrix(rearDiffMatrix,  matrix);
 		new dDoubleDifferentialGear(5.0f, (dCustomDoubleHinge*)rearDiff->GetJoint(), 1.0f, m_engine);
-
-		//dMatrix frontDiffMatrix;
-		//fronfDiff->GetJoint()->CalculateGlobalMatrix(frontDiffMatrix, matrix);
 		new dDoubleDifferentialGear(5.0f, (dCustomDoubleHinge*)fronfDiff->GetJoint(), -1.0f, m_engine);
+	}
+
+
+	void MakeHydrolic (dModelNode* const node, const char* const name0, const char* const name1, const char* const effectorName1)
+	{
+		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
+
+		dModelNode* const parentNode = node->GetParent();
+		NewtonBody* const parentBody = parentNode->GetBody();
+		DemoEntity* const parentEntity = (DemoEntity*)NewtonBodyGetUserData(parentBody);
+		DemoEntity* const hydrolicEntity0 = parentEntity->Find(name0);
+		NewtonBody* const hydrolicBody0 = CreateBodyPart(world, hydrolicEntity0, 10.0f);
+
+		dMatrix hingeFrame;
+		NewtonBodyGetMatrix(hydrolicBody0, &hingeFrame[0][0]);
+		new dCustomHinge(hingeFrame, hydrolicBody0, parentBody);
+
+		dMatrix bindMatrix(dGetIdentityMatrix());
+		dModelNode* const node0 = new dModelNode(hydrolicBody0, bindMatrix, parentNode);
+
+		DemoEntity* const hydrolicEntity1 = hydrolicEntity0->Find(name1);
+		NewtonBody* const hydrolicBody1 = CreateBodyPart(world, hydrolicEntity1, 10.0f);
+
+		NewtonBodyGetMatrix(hydrolicBody1, &hingeFrame[0][0]);
+		new dCustomSlider(hingeFrame, hydrolicBody1, hydrolicBody0);
+		dModelNode* const node1 = new dModelNode(hydrolicBody1, bindMatrix, node0);
+
+		DemoEntity* const effectorEntity = hydrolicEntity0->Find(effectorName1);
+		dMatrix matrix(effectorEntity->CalculateGlobalMatrix());
+		dCustomSixdof* const attachment = new dCustomSixdof(matrix, node1->GetBody(), node->GetBody());
+		attachment->DisableAxisX();
+		attachment->DisableRotationX();
+		attachment->DisableRotationY();
+		attachment->DisableRotationZ();
+	}
+
+	void MakeFrontBucket()
+	{
+		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
+
+		NewtonBody* const chassisBody = GetBody();
+		DemoEntity* const chassisEntity = (DemoEntity*)NewtonBodyGetUserData(chassisBody);
+		DemoEntity* const axelEntity = chassisEntity->Find("arms");
+		NewtonBody* const fronAxelBody = CreateBodyPart(world, axelEntity, 100.0f);
+
+		// connect the part to the main body with a hinge
+		dMatrix hingeFrame;
+		NewtonBodyGetMatrix(fronAxelBody, &hingeFrame[0][0]);
+		m_frontBuckect = new dCustomHingeActuator(hingeFrame, fronAxelBody, chassisBody);
+		m_frontBuckect->SetAngularRate(0.5f);
+
+		dMatrix bindMatrix(dGetIdentityMatrix());
+		dModelNode* const armNode = new dModelNode(fronAxelBody, bindMatrix, this);
+
+		MakeHydrolic (armNode, "armHydraulicPiston_left", "armHydraulic_left", "attachement_left");
+		MakeHydrolic (armNode, "armHydraulicPiston_right", "armHydraulic_right", "attachement_right");
 	}
 
 	dTractorEngine* m_engine;
 	dCustomDoubleHingeActuator* m_leftWheel;
 	dCustomDoubleHingeActuator* m_rightWheel;
+	dCustomHingeActuator* m_frontBuckect;
 	dTractorControls m_controls;
 };
 
@@ -451,11 +505,7 @@ class ServoVehicleManagerManager: public dModelManager
 	ServoVehicleManagerManager(DemoEntityManager* const scene, int threadMaterialID)
 		:dModelManager(scene->GetNewton())
 		,m_player(NULL)
-		//,m_threadMaterialID(threadMaterialID)
-		//,m_cabinSpeed(0)
-		//,m_bucket_x(0.0f)
-		//,m_bucket_y(0.0f)
-		//,m_bucket_angle(0.0f)
+		,m_frontBucketAngle(0.0f)
 	{
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 		scene->Set2DDisplayRenderFunction(RenderPlayerHelp, NULL, this);
@@ -489,13 +539,11 @@ class ServoVehicleManagerManager: public dModelManager
 		scene->Print(color, "drive backward:     s");
 		scene->Print(color, "turn right:         d");
 		scene->Print(color, "turn left:          a");
-/*
-		scene->Print(color, "bucket controls");
-		ImGui::SliderInt("cabin rotation", &m_cabinSpeed, -3, 3);
-		ImGui::SliderFloat("bucket x", &m_bucket_x, -2.0f, 4.0f);
-		ImGui::SliderFloat("bucket y", &m_bucket_y, -6.0f, 6.0f);
-		ImGui::SliderFloat("bucket angle", &m_bucket_angle, -60.0f, 130.0f);
-*/
+
+		scene->Print(color, "front bucket controls");
+		ImGui::SliderFloat("front arm angle", &m_frontBucketAngle, 0.0f, 60.0f);
+		//ImGui::SliderFloat("bucket y", &m_bucket_y, -6.0f, 6.0f);
+		//ImGui::SliderFloat("bucket angle", &m_bucket_angle, -60.0f, 130.0f);
 	}
 
 	void UpdateCamera(dFloat timestep)
@@ -512,7 +560,7 @@ class ServoVehicleManagerManager: public dModelManager
 
 		dVector frontDir(camMatrix[0]);
 		dVector camOrigin(playerMatrix.m_posit + dVector(0.0f, 2.0f, 0.0f, 0.0f));
-		camOrigin -= frontDir.Scale(7.0f);
+		camOrigin -= frontDir.Scale(D_TRACTOR_CAMERA_DIST);
 		camera->SetNextMatrix(*scene, camMatrix, camOrigin);
 	}
 
@@ -536,54 +584,6 @@ class ServoVehicleManagerManager: public dModelManager
 		dExcavatorModel* const excavator = (dExcavatorModel*)model;
 		excavator->OnDebug(debugContext);
 	}
-
-	static int StandardAABBOverlapTest(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
-	{
-		const NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
-		const NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
-		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
-		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
-
-		if (NewtonCollisionGetUserData(collision0) != NewtonCollisionGetUserData(collision1)) {
-			return 1;
-		}
-
-		NewtonCollisionMaterial material0;
-		NewtonCollisionMaterial material1;
-		NewtonCollisionGetMaterial(collision0, &material0);
-		NewtonCollisionGetMaterial(collision1, &material1);
-
-		//m_terrain	 = 1 << 0,
-		//m_bodyPart = 1 << 1,
-		//m_tirePart = 1 << 2,
-		//m_linkPart = 1 << 3,
-		//m_propBody = 1 << 4,
-
-		const dLong mask0 = material0.m_userId & material1.m_userParam[0].m_int;
-		const dLong mask1 = material1.m_userId & material0.m_userParam[0].m_int;
-		return (mask0 && mask1) ? 1 : 0;
-	}
-
-	static int ThreadStaticContactsGeneration(const NewtonMaterial* const material, const NewtonBody* const body0, const NewtonCollision* const collision0, const NewtonBody* const body1, const NewtonCollision* const collision1, NewtonUserContactPoint* const contactBuffer, int maxCount, int threadIndex)
-	{
-		dAssert(NewtonBodyGetMaterialGroupID(body0) == NewtonBodyGetMaterialGroupID(body1));
-		dAssert(NewtonBodyGetMaterialGroupID(body0) != NewtonMaterialGetDefaultGroupID(NewtonBodyGetWorld(body0)));
-		dAssert(NewtonBodyGetMaterialGroupID(body1) != NewtonMaterialGetDefaultGroupID(NewtonBodyGetWorld(body1)));
-
-		dAssert(NewtonCollisionGetUserID(collision0) == ARTICULATED_VEHICLE_DEFINITION::m_linkPart);
-		dAssert(NewtonCollisionGetUserID(collision1) == ARTICULATED_VEHICLE_DEFINITION::m_terrain);
-
-		dExcavatorModel* const excavator = (dExcavatorModel*)NewtonCollisionGetUserData(collision0);
-		dAssert(excavator);
-		return excavator->CollideLink(material, body0, body1, contactBuffer);
-	}
-
-	
-	int m_threadMaterialID;
-	int m_cabinSpeed;
-	dFloat32 m_bucket_x;
-	dFloat32 m_bucket_y;
-	dFloat32 m_bucket_angle;
 */
 
 	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const
@@ -596,6 +596,7 @@ class ServoVehicleManagerManager: public dModelManager
 		dTractorControls controls;
 		controls.m_throttle = (dFloat(scene->GetKeyState('W')) - dFloat(scene->GetKeyState('S')));
 		controls.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
+		controls.m_frontBucketAngle = m_frontBucketAngle;
 		//controls.m_cabinSpeed = m_cabinSpeed;
 		//controls.m_bucket_x = m_bucket_x;
 		//controls.m_bucket_y = m_bucket_y;
@@ -617,6 +618,7 @@ class ServoVehicleManagerManager: public dModelManager
 	}
 
 	dTractorModel* m_player;
+	dFloat32 m_frontBucketAngle;
 };
 
 void ServoJoints (DemoEntityManager* const scene)
@@ -624,7 +626,8 @@ void ServoJoints (DemoEntityManager* const scene)
 	// load the sky box
 	scene->CreateSkyBox();
 
-	NewtonBody* const floor = CreateLevelMesh (scene, "flatPlane.ngd", true);
+	//NewtonBody* const floor = CreateLevelMesh (scene, "flatPlane.ngd", true);
+	CreateLevelMesh (scene, "flatPlane.ngd", true);
 	//CreateHeightFieldTerrain (scene, 9, 8.0f, 1.5f, 0.2f, 200.0f, -50.0f);
 	//NewtonCollision* const floorCollision = NewtonBodyGetCollision(floor);
 
@@ -674,7 +677,7 @@ void ServoJoints (DemoEntityManager* const scene)
 	origin.m_x -= 10.0f;
 	origin.m_y += 4.0f;
 	//origin.m_z = 6.0f;
-	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), 0.0f * dDegreeToRad);  
+	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), 90.0f * dDegreeToRad);  
 	scene->SetCameraMatrix(rot, origin);
 }
 

@@ -71,38 +71,32 @@ void dCustomSixdof::Serialize (NewtonSerializeCallback callback, void* const use
 
 void dCustomSixdof::DisableAxisX()
 {
-	dAssert(0);
-//	m_xAxis = 0;
+	m_options.m_option0 = 0;
 }
 
 void dCustomSixdof::DisableAxisY()
 {
-	dAssert(0);
-//	m_yAxis = 0;
+	m_options.m_option1 = 0;
 }
 
 void dCustomSixdof::DisableAxisZ()
 {
-	dAssert(0);
-//	m_zAxis = 0;
+	m_options.m_option2 = 0;
 }
 
 void dCustomSixdof::DisableRotationX()
 {
-	dAssert(0);
-//	m_pitchAxis = 0;
+	m_options.m_option3 = 0;
 }
 
 void dCustomSixdof::DisableRotationY()
 {
-	dAssert(0);
-//	m_yawAxis = 0;
+	m_options.m_option4 = 0;
 }
 
 void dCustomSixdof::DisableRotationZ()
 {
-	dAssert(0);
-//	m_rollAxis = 0;
+	m_options.m_option5 = 0;
 }
 
 void dCustomSixdof::SetLinearLimits (const dVector& minLinearLimits, const dVector& maxLinearLimits)
@@ -307,7 +301,8 @@ void dCustomSixdof::SubmitConstraints (dFloat timestep, int threadIndex)
 	const dVector dp(p0 - p1);
 	const dVector veloc(veloc0 - veloc1);
 	for (int i = 0; i < 3; i ++) {
-		if (m_options.m_value & (1 << (i + 3))) {
+		//if (m_options.m_value & (1 << (i + 3))) {
+		if (m_options.m_value & (1 << i)) {
 			if ((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f)) {
 				NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
 				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
