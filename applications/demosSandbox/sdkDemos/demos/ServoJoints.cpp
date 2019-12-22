@@ -497,6 +497,9 @@ class dTractorModel: public dModelRootNode
 		dModelNode* const buckectNode = MakeActuator(armNode, "frontBucket", 100.0f);
 		m_frontBucket = (dCustomHingeActuator*)buckectNode->GetJoint();
 		m_frontBucket->SetAngularRate(4.0f);
+
+		MakeHydraulic (buckectNode, "frontBucketHydraulic001", "frontBucketHydraulicPiston001", "attachment_frontBucket001");
+		MakeHydraulic (buckectNode, "frontBucketHydraulic002", "frontBucketHydraulicPiston002", "attachment_frontBucket002");
 	}
 
 	dTractorEngine* m_engine;
