@@ -188,7 +188,7 @@ class dTractorModel: public dModelRootNode
 
 		dVector com;
 		NewtonBodyGetCentreOfMass(m_body, &com[0]);
-		com.m_y -= 0.5f;
+		com.m_y -= 0.75f;
 		NewtonBodySetCentreOfMass(m_body, &com[0]);
 	}
 
@@ -677,12 +677,12 @@ void ServoJoints (DemoEntityManager* const scene)
 //	MakeHeavyLoad (scene, matrix);
 
 	// add some object to play with
-//	LoadLumberYardMesh(scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), 0);
-//	LoadLumberYardMesh(scene, dVector(5.0f, 0.0f, 6.0f, 0.0f), 0);
-//	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f, -4.0f, 0.0f), 0);
-//	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f,  2.0f, 0.0f), 0);
-//	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 0.0f, 0.0f), 0);
-//	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 6.0f, 0.0f), 0);
+	LoadLumberYardMesh(scene, dVector(5.0f, 0.0f, 0.0f, 0.0f), 0);
+	LoadLumberYardMesh(scene, dVector(5.0f, 0.0f, 6.0f, 0.0f), 0);
+	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f, -4.0f, 0.0f), 0);
+	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f,  2.0f, 0.0f), 0);
+	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 0.0f, 0.0f), 0);
+	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 6.0f, 0.0f), 0);
 #endif	
 	origin.m_x -= 10.0f;
 	origin.m_y += 4.0f;
