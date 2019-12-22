@@ -31,11 +31,8 @@ class dTractorControls
 	}
 	dFloat m_throttle;
 	dFloat m_steeringValue;
+	dFloat m_frontArmAngle;
 	dFloat m_frontBucketAngle;
-//	dFloat m_bucket_x;
-//	dFloat m_bucket_y;
-//	dFloat m_bucket_angle;
-//	int m_cabinSpeed;
 };
 
 class dDoubleDifferentialGear: public dCustomDifferentialGear
@@ -118,7 +115,8 @@ class dTractorModel: public dModelRootNode
 		,m_engine(NULL)
 		,m_leftWheel(NULL)
 		,m_rightWheel(NULL)
-		,m_frontBuckect(NULL)
+		,m_frontArm(NULL)
+		,m_frontBucket(NULL)
 	{
 		MakeChassis(world, modelName, location);
 		MakeDriveTrain();
@@ -134,7 +132,8 @@ class dTractorModel: public dModelRootNode
 		m_engine->m_alpha = controls.m_throttle;
 		m_leftWheel->SetTargetAngle1(m_controls.m_steeringValue * 25.0f * dDegreeToRad);
 		m_rightWheel->SetTargetAngle1(-m_controls.m_steeringValue * 25.0f * dDegreeToRad);
-		m_frontBuckect->SetTargetAngle(m_controls.m_frontBucketAngle * dDegreeToRad);
+		m_frontArm->SetTargetAngle(m_controls.m_frontArmAngle * dDegreeToRad);
+		m_frontBucket->SetTargetAngle(m_controls.m_frontBucketAngle * dDegreeToRad);
 	}
 
 	private:
@@ -435,7 +434,6 @@ class dTractorModel: public dModelRootNode
 		new dDoubleDifferentialGear(5.0f, (dCustomDoubleHinge*)fronfDiff->GetJoint(), -1.0f, m_engine);
 	}
 
-
 	void MakeHydraulic (dModelNode* const node, const char* const name0, const char* const name1, const char* const effectorName1)
 	{
 		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
@@ -468,33 +466,44 @@ class dTractorModel: public dModelRootNode
 		attachment->DisableRotationY();
 		attachment->DisableRotationZ();
 	}
-
-	void MakeFrontBucket()
+	
+	dModelNode* MakeActuator(dModelNode* const parent, const char* const name, dFloat mass)
 	{
 		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
 
-		NewtonBody* const chassisBody = GetBody();
-		DemoEntity* const chassisEntity = (DemoEntity*)NewtonBodyGetUserData(chassisBody);
-		DemoEntity* const axelEntity = chassisEntity->Find("arms");
-		NewtonBody* const fronAxelBody = CreateBodyPart(world, axelEntity, 100.0f);
+		NewtonBody* const armBody = parent->GetBody();
+		DemoEntity* const armEntity = (DemoEntity*)NewtonBodyGetUserData(armBody);
+		DemoEntity* const bucketEntity = armEntity->Find(name);
+		NewtonBody* const bucketBody = CreateBodyPart(world, bucketEntity, 100.0f);
 
 		// connect the part to the main body with a hinge
 		dMatrix hingeFrame;
-		NewtonBodyGetMatrix(fronAxelBody, &hingeFrame[0][0]);
-		m_frontBuckect = new dCustomHingeActuator(hingeFrame, fronAxelBody, chassisBody);
-		m_frontBuckect->SetAngularRate(0.5f);
+		NewtonBodyGetMatrix(bucketBody, &hingeFrame[0][0]);
+		dCustomHingeActuator* const actuator = new dCustomHingeActuator(hingeFrame, bucketBody, armBody);
+		actuator->SetAngularRate(0.5f);
 
 		dMatrix bindMatrix(dGetIdentityMatrix());
-		dModelNode* const armNode = new dModelNode(fronAxelBody, bindMatrix, this);
+		return new dModelNode(bucketBody, bindMatrix, parent);
+	}
+
+	void MakeFrontBucket()
+	{
+		dModelNode* const armNode = MakeActuator(this, "arms", 100.0f);
+		m_frontArm = (dCustomHingeActuator*)armNode->GetJoint();
 
 		MakeHydraulic (armNode, "armHydraulicPiston_left", "armHydraulic_left", "attachement_left");
 		MakeHydraulic (armNode, "armHydraulicPiston_right", "armHydraulic_right", "attachement_right");
+
+		dModelNode* const buckectNode = MakeActuator(armNode, "frontBucket", 100.0f);
+		m_frontBucket = (dCustomHingeActuator*)buckectNode->GetJoint();
+		m_frontBucket->SetAngularRate(4.0f);
 	}
 
 	dTractorEngine* m_engine;
 	dCustomDoubleHingeActuator* m_leftWheel;
 	dCustomDoubleHingeActuator* m_rightWheel;
-	dCustomHingeActuator* m_frontBuckect;
+	dCustomHingeActuator* m_frontArm;
+	dCustomHingeActuator* m_frontBucket;
 	dTractorControls m_controls;
 };
 
@@ -505,6 +514,7 @@ class ServoVehicleManagerManager: public dModelManager
 	ServoVehicleManagerManager(DemoEntityManager* const scene, int threadMaterialID)
 		:dModelManager(scene->GetNewton())
 		,m_player(NULL)
+		,m_frontArmAngle(0.0f)
 		,m_frontBucketAngle(0.0f)
 	{
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
@@ -541,9 +551,8 @@ class ServoVehicleManagerManager: public dModelManager
 		scene->Print(color, "turn left:          a");
 
 		scene->Print(color, "front bucket controls");
-		ImGui::SliderFloat("front arm angle", &m_frontBucketAngle, 0.0f, 60.0f);
-		//ImGui::SliderFloat("bucket y", &m_bucket_y, -6.0f, 6.0f);
-		//ImGui::SliderFloat("bucket angle", &m_bucket_angle, -60.0f, 130.0f);
+		ImGui::SliderFloat("front arm angle", &m_frontArmAngle, 0.0f, 60.0f);
+		ImGui::SliderFloat("front bucket angle", &m_frontBucketAngle, 0.0f, 130.0f);
 	}
 
 	void UpdateCamera(dFloat timestep)
@@ -596,11 +605,8 @@ class ServoVehicleManagerManager: public dModelManager
 		dTractorControls controls;
 		controls.m_throttle = (dFloat(scene->GetKeyState('W')) - dFloat(scene->GetKeyState('S')));
 		controls.m_steeringValue = (dFloat(scene->GetKeyState('A')) - dFloat(scene->GetKeyState('D')));
+		controls.m_frontArmAngle = m_frontArmAngle;
 		controls.m_frontBucketAngle = m_frontBucketAngle;
-		//controls.m_cabinSpeed = m_cabinSpeed;
-		//controls.m_bucket_x = m_bucket_x;
-		//controls.m_bucket_y = m_bucket_y;
-		//controls.m_bucket_angle = m_bucket_angle;
 
 		tractor->ApplyControl(controls, timestep);
 	}
@@ -618,6 +624,7 @@ class ServoVehicleManagerManager: public dModelManager
 	}
 
 	dTractorModel* m_player;
+	dFloat32 m_frontArmAngle;
 	dFloat32 m_frontBucketAngle;
 };
 
