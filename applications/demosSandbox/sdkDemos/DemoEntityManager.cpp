@@ -59,21 +59,20 @@
 //#define DEFAULT_SCENE	24		// simple convex fracturing 
 //#define DEFAULT_SCENE	25		// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	26		// standard joints
-#define DEFAULT_SCENE	27		// servo joints
-//#define DEFAULT_SCENE	28		// construction vehicle
+//#define DEFAULT_SCENE	27		// servo joints
+#define DEFAULT_SCENE	28		// construction vehicle
 //#define DEFAULT_SCENE	29		// six axis manipulator
 //#define DEFAULT_SCENE	30		// hexapod Robot
 //#define DEFAULT_SCENE	31		// basic rag doll
 //#define DEFAULT_SCENE	32		// balancing character
-//#define DEFAULT_SCENE	33		// dynamic rag doll
-//#define DEFAULT_SCENE	34		// single body vehicle
-//#define DEFAULT_SCENE	35		// super Car
-//#define DEFAULT_SCENE	36		// heavy vehicles
-//#define DEFAULT_SCENE	37		// basic player controller
-//#define DEFAULT_SCENE	38		// animated player controller
-//#define DEFAULT_SCENE	39		// advanced player controller
-//#define DEFAULT_SCENE	40		// cloth patch			
-//#define DEFAULT_SCENE	41		// soft bodies	
+//#define DEFAULT_SCENE	33		// single body vehicle
+//#define DEFAULT_SCENE	34		// super Car
+//#define DEFAULT_SCENE	35		// heavy vehicles
+//#define DEFAULT_SCENE	36		// basic player controller
+//#define DEFAULT_SCENE	37		// animated player controller
+//#define DEFAULT_SCENE	38		// advanced player controller
+//#define DEFAULT_SCENE	39		// cloth patch			
+//#define DEFAULT_SCENE	40		// soft bodies	
 						 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
@@ -112,7 +111,6 @@ void UserPlaneCollision (DemoEntityManager* const scene);
 void UserHeightFieldCollision (DemoEntityManager* const scene);
 void PassiveRagdoll (DemoEntityManager* const scene);
 void BalancingCharacter (DemoEntityManager* const scene);
-void DynamicRagdoll (DemoEntityManager* const scene);
 void ServoJoints (DemoEntityManager* const scene);
 void ConstructionVehicle (DemoEntityManager* const scene);
 void StandardJoints (DemoEntityManager* const scene);
@@ -154,7 +152,6 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Hexapod walker", "show using inverse dynamics to control robots", Hexapod },
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
 	{"Balancing character", "demonstrate dynamic character", BalancingCharacter},
-	{"Dynamic rag doll", "demonstrate dynamic rag doll", DynamicRagdoll},
 	{"Single body car", "show a generalized coordinate system body", SingleBodyCar },
 	{"Super car", "implement a hight performance sport car", SuperCar},
 	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
@@ -330,7 +327,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
-//	m_workerThreads = 4;
+	m_workerThreads = 4;
 //	m_solverSubSteps = 2;
 //	m_showRaycastHit = true;
 //	m_showNormalForces = true;

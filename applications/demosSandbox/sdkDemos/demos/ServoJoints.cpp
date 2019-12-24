@@ -13,10 +13,11 @@
 #include "SkyBox.h"
 #include "DemoMesh.h"
 #include "DemoCamera.h"
+#include "DebugDisplay.h"
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
+#include "dWoodFracture.h"
 #include "DemoEntityManager.h"
-#include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
 
 #define D_TRACTOR_CAMERA_DIST 10.0f
@@ -72,15 +73,6 @@ class dTractorEngine: public dCustomDoubleHinge
 	{
 		EnableLimits(false);
 		EnableLimits1(false);
-	}
-
-	void SubmitConstraints(dFloat timestep, int threadIndex)
-	{
-		//dMatrix matrix1;
-		//NewtonBodyGetMatrix(m_body1, &matrix1[0][0]);
-		//dMatrix matrix0(GetMatrix0().Inverse() * GetMatrix1() * matrix1);
-		//NewtonBodySetMatrixNoSleep(m_body0, &matrix0[0][0]);
-		dCustomDoubleHinge::SubmitConstraints(timestep, threadIndex);
 	}
 
 	void SubmitAngularRow(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
@@ -528,7 +520,7 @@ class ServoVehicleManagerManager: public dModelManager
 		int material = NewtonMaterialGetDefaultGroupID(world);
 
 		NewtonMaterialSetCallbackUserData(world, material, material, this);
-		NewtonMaterialSetDefaultElasticity(world, material, material, 0.1f);
+		NewtonMaterialSetDefaultElasticity(world, material, material, 0.0f);
 		NewtonMaterialSetDefaultFriction(world, material, material, 0.9f, 0.9f);
 	}
 
@@ -590,14 +582,6 @@ class ServoVehicleManagerManager: public dModelManager
 		return tractor;
 	}
 
-/*
-	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext)
-	{
-		dExcavatorModel* const excavator = (dExcavatorModel*)model;
-		excavator->OnDebug(debugContext);
-	}
-*/
-
 	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const
 	{
 		dTractorModel* const tractor = (dTractorModel*)model;
@@ -650,25 +634,6 @@ void ServoJoints (DemoEntityManager* const scene)
 	matrix.m_posit = FindFloor(world, origin, 100.0f);
 	matrix.m_posit.m_y += 1.5f;
 	vehicleManager->CreateTractor("tractor.ngd", matrix);
-/*
-	NewtonWorld* const world = scene->GetNewton();
-	dVector origin (FindFloor (world, dVector (-10.0f, 50.0f, 0.0f, 1.0f), 2.0f * 50.0f));
-
-	// add an input Manage to manage the inputs and user interaction 
-	ServoInputManager* const inputManager = new ServoInputManager (scene);
-	inputManager;
-
-	//  create a skeletal transform controller for controlling rag doll
-	ServoVehicleManagerManager* const vehicleManager = new ServoVehicleManagerManager (scene);
-
-	dMatrix matrix (dGetIdentityMatrix());
-	matrix.m_posit = FindFloor (world, origin, 100.0f);
-	matrix.m_posit.m_y += 0.5f;
-	
-	// load a the mesh of the articulate vehicle
-	dModelRootNode* const forklift = vehicleManager->CreateForklift(matrix, "forklift.ngd", sizeof(inverseKinematicsRidParts) / sizeof (inverseKinematicsRidParts[0]), inverseKinematicsRidParts);
-	inputManager->AddPlayer(forklift);
-*/
 
 #if 1
 	//place heavy load to show reproduce black bird dream problems
@@ -683,11 +648,19 @@ void ServoJoints (DemoEntityManager* const scene)
 	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f,  2.0f, 0.0f), 0);
 	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 0.0f, 0.0f), 0);
 	LoadLumberYardMesh(scene, dVector(15.0f, 0.0f, 6.0f, 0.0f), 0);
+
+	int woodX = 8;
+	int woodZ = 8;
+	matrix.m_posit.m_z += 10.0f;
+	matrix.m_posit.m_x -= 5.0f;
+	AddFracturedWoodPrimitive(scene, 1000.0f, matrix.m_posit, dVector(0.3f, 3.0f, 0.3f, 0.0f),
+		woodX, woodZ, 0.5f, 0, 0, dGetIdentityMatrix());
+
 #endif	
 	origin.m_x -= 10.0f;
 	origin.m_y += 4.0f;
 	//origin.m_z = 6.0f;
-	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), 90.0f * dDegreeToRad);  
+	dQuaternion rot (dVector (0.0f, 1.0f, 0.0f, 0.0f), 0.0f * dDegreeToRad);  
 	scene->SetCameraMatrix(rot, origin);
 }
 

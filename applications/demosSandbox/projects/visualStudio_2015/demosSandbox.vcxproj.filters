@@ -51,9 +51,6 @@
     <ClCompile Include="..\..\sdkDemos\toolBox\dHighResolutionTimer.cpp">
       <Filter>utils</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\DynamicRagdoll.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\HeavyVehicles.cpp">
       <Filter>demos</Filter>
     </ClCompile>

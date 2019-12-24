@@ -13,12 +13,11 @@
 #include "SkyBox.h"
 #include "DemoMesh.h"
 #include "DemoCamera.h"
+#include "DebugDisplay.h"
 #include "PhysicsUtils.h"
 #include "TargaToOpenGl.h"
-#include "DemoEntityManager.h"
 #include "dWoodFracture.h"
-
-#include "DebugDisplay.h"
+#include "DemoEntityManager.h"
 #include "HeightFieldPrimitive.h"
 
 #define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD		3.0f
@@ -786,18 +785,18 @@ class ArticulatedVehicleManagerManager: public dModelManager
 
 		NewtonMaterialSetCallbackUserData (world, material, material, this);
 		NewtonMaterialSetCollisionCallback (world, material, material, StandardAABBOverlapTest, NULL);
-		NewtonMaterialSetDefaultElasticity(world, material, material, 0.1f);
+		NewtonMaterialSetDefaultElasticity(world, material, material, 0.0f);
 		NewtonMaterialSetDefaultFriction(world, material, material, 0.9f, 0.9f);
 
 		NewtonMaterialSetCallbackUserData(world, material, threadMaterialID, this);
 		NewtonMaterialSetCollisionCallback (world, material, threadMaterialID, StandardAABBOverlapTest, NULL);
-		NewtonMaterialSetDefaultElasticity(world, material, threadMaterialID, 0.1f);
+		NewtonMaterialSetDefaultElasticity(world, material, threadMaterialID, 0.0f);
 		NewtonMaterialSetDefaultFriction(world, material, threadMaterialID, 0.9f, 0.9f);
 
 		NewtonMaterialSetCallbackUserData(world, threadMaterialID, threadMaterialID, this);
 		NewtonMaterialSetCollisionCallback (world, threadMaterialID, threadMaterialID, StandardAABBOverlapTest, NULL);
 		NewtonMaterialSetContactGenerationCallback (world, threadMaterialID, threadMaterialID, ThreadStaticContactsGeneration);
-		NewtonMaterialSetDefaultElasticity(world, threadMaterialID, threadMaterialID, 0.1f);
+		NewtonMaterialSetDefaultElasticity(world, threadMaterialID, threadMaterialID, 0.0f);
 		NewtonMaterialSetDefaultFriction(world, threadMaterialID, threadMaterialID, 0.9f, 0.9f);
 	}
 
