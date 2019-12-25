@@ -165,9 +165,6 @@
     <ClCompile Include="..\..\sdkDemos\demos\NewtonCradle.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\BalancingCharacter.cpp">
-      <Filter>demos</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\toolBox\dSoundManager.cpp">
       <Filter>utils</Filter>
     </ClCompile>
@@ -178,6 +175,9 @@
       <Filter>utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\ConstructionVehicle.cpp">
+      <Filter>demos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\BalancingBiped.cpp">
       <Filter>demos</Filter>
     </ClCompile>
   </ItemGroup>

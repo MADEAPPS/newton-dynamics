@@ -19,7 +19,7 @@
 #include "DebugDisplay.h"
 #include "HeightFieldPrimitive.h"
 
-
+#if 0
 class dBalancingCharacterBoneDefinition
 {
 	public:
@@ -96,7 +96,7 @@ class dBalacingCharacterEffector: public dCustomKinematicController
 		SetSolverModel(1);
 		SetControlMode(dCustomKinematicController::m_linearAndTwist);
 		SetMaxAngularFriction(modelMass * 100.0f);
-		SetMaxLinearFriction(modelMass * 9.8f * 10.0f);
+		SetMaxLinearFriction(modelMass * dAbs (DEMO_GRAVITY) * 1.0f);
 		dVector euler0;
 		dVector euler1;
 		m_origin.GetEulerAngles(euler0, euler1);
@@ -105,7 +105,6 @@ class dBalacingCharacterEffector: public dCustomKinematicController
 		m_roll = euler0.m_z;
 	}
 
-	//void SetMatrix (dFloat x, dFloat y, dFloat z, dFloat pitch, dFloat yaw, dFloat roll)
 	void SetMatrix(dFloat x, dFloat y, dFloat z, dFloat pitch)
 	{
 		dMatrix matrix (dPitchMatrix(m_pitch + pitch) * dYawMatrix(m_yaw) * dRollMatrix(m_roll));
@@ -674,7 +673,6 @@ class dBalancingCharacterManager: public dModelManager
 	public:
 	dBalancingCharacterManager(DemoEntityManager* const scene)
 		:dModelManager(scene->GetNewton())
-		//,m_currentController(NULL)
 	{
 		m_pitch = 0.0f;
 		m_posit_x = 0.0f;
@@ -1041,25 +1039,113 @@ class dBalancingCharacterManager: public dModelManager
 	dFloat32 m_posit_y;
 	dFloat32 m_posit_z;
 };
+#endif
 
-void BalancingCharacter(DemoEntityManager* const scene)
+
+class dBalancingBiped: public dModelRootNode
+{
+	public:
+	dBalancingBiped(NewtonWorld* const world, const dMatrix& location)
+		:dModelRootNode(NULL, dGetIdentityMatrix())
+	{
+		MakeHip(world, location);
+		AddUpperBody (world);
+	}
+
+
+	private:
+	void MakeHip(NewtonWorld* const world, const dMatrix& location)
+	{
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+
+		dVector size (0.25f, 0.2f, 0.25f, 0.0f);
+		NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, _CAPSULE_PRIMITIVE, 0);
+		DemoMesh* const geometry = new DemoMesh("hip", scene->GetShaderCache(), collision, "marble.tga", "marble.tga", "marble.tga");
+	
+		m_body = CreateSimpleSolid (scene, geometry, 100.0f, location, collision, 0);
+
+		geometry->Release();
+		NewtonDestroyCollision(collision);
+	}
+
+	void AddUpperBody(NewtonWorld* const world)
+	{
+		dMatrix matrix;
+		NewtonBodyGetMatrix (m_body, &matrix[0][0]);
+
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+		dVector size(0.3f, 0.4f, 0.2f, 0.0f);
+		NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
+		DemoMesh* const geometry = new DemoMesh("torso", scene->GetShaderCache(), collision, "marble.tga", "marble.tga", "marble.tga");
+
+		dFloat hipRadius = 0.25f * 0.5f;
+		dMatrix location (matrix);
+		location.m_posit += matrix.m_up.Scale (hipRadius + size.m_y * 0.5f);
+		NewtonBody* const torso = CreateSimpleSolid(scene, geometry, 100.0f, location, collision, 0);
+
+		geometry->Release();
+		NewtonDestroyCollision(collision);
+
+		dMatrix jointMatrix (matrix);
+		jointMatrix.m_posit += matrix.m_up.Scale (hipRadius);
+		dCustomHinge* const fixJoint = new dCustomHinge(jointMatrix, torso, GetBody());
+		fixJoint->EnableLimits(true);
+		fixJoint->SetLimits(0.0f, 0.0f);
+
+		dModelNode* const torsoBone = new dModelNode(torso, dGetIdentityMatrix(), this);
+	}
+
+};
+
+class dBalancingBipedManager: public dModelManager
+{
+	public:
+	dBalancingBipedManager(DemoEntityManager* const scene)
+		:dModelManager(scene->GetNewton())
+	{
+		//scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
+		//scene->Set2DDisplayRenderFunction(RenderPlayerHelp, NULL, this);
+
+		// create a material for early collision culling
+		NewtonWorld* const world = scene->GetNewton();
+		int material = NewtonMaterialGetDefaultGroupID(world);
+
+		NewtonMaterialSetCallbackUserData(world, material, material, this);
+		NewtonMaterialSetDefaultElasticity(world, material, material, 0.0f);
+		NewtonMaterialSetDefaultFriction(world, material, material, 0.9f, 0.9f);
+	}
+
+	dBalancingBiped* CreateBiped (const dMatrix& location)
+	{
+		dBalancingBiped* const biped = new dBalancingBiped(GetWorld(), location);
+		AddRoot (biped);
+		return biped;
+	}
+
+	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& globalMatrix) const
+	{
+		// this function is no called because the the model is hierarchical 
+		// but all body part are in global space, therefore the normal rigidbody Transform and force callback
+		// set the transform after each update.
+	}
+	
+};
+
+
+void BalancingBiped(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
 
 	CreateLevelMesh(scene, "flatPlane.ngd", true);
 
-	dBalancingCharacterManager* const manager = new dBalancingCharacterManager(scene);
-	NewtonWorld* const world = scene->GetNewton();
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(world);
-	NewtonMaterialSetDefaultFriction(world, defaultMaterialID, defaultMaterialID, 1.0f, 1.0f);
-	NewtonMaterialSetDefaultElasticity(world, defaultMaterialID, defaultMaterialID, 0.0f);
+	dBalancingBipedManager* const manager = new dBalancingBipedManager(scene);
 
-	dMatrix origin (dYawMatrix(-90.0f * dDegreeToRad));
+	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
 	origin.m_posit.m_y += 1.0f;
-	manager->CreateKinematicModel(tred, origin);
+	manager->CreateBiped(origin);
 
-	origin.m_posit.m_x = -8.0f;
+	origin.m_posit.m_x = -2.0f;
 	origin.m_posit.m_y = 1.0f;
 	origin.m_posit.m_z = 0.0f;
 	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);

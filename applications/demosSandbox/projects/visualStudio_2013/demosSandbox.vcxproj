@@ -54,7 +54,7 @@
     <ClCompile Include="..\..\sdkDemos\demos\CompoundCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ContinueCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ConvexCast.cpp" />
-    <ClCompile Include="..\..\sdkDemos\demos\BalancingCharacter.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\BalancingBiped.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\HeavyVehicles.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\HeighFieldCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\Hexapod.cpp" />
