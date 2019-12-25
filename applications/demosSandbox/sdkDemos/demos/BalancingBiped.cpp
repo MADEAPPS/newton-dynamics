@@ -1050,6 +1050,9 @@ class dBalancingBiped: public dModelRootNode
 	{
 		MakeHip(world, location);
 		AddUpperBody (world);
+		AddLeg (world, 0.15f);
+		AddLeg (world, -0.15f);
+		
 	}
 
 
@@ -1081,20 +1084,45 @@ class dBalancingBiped: public dModelRootNode
 		dFloat hipRadius = 0.25f * 0.5f;
 		dMatrix location (matrix);
 		location.m_posit += matrix.m_up.Scale (hipRadius + size.m_y * 0.5f);
-		NewtonBody* const torso = CreateSimpleSolid(scene, geometry, 100.0f, location, collision, 0);
+		NewtonBody* const torsoBody = CreateSimpleSolid(scene, geometry, 100.0f, location, collision, 0);
 
 		geometry->Release();
 		NewtonDestroyCollision(collision);
 
 		dMatrix jointMatrix (matrix);
 		jointMatrix.m_posit += matrix.m_up.Scale (hipRadius);
-		dCustomHinge* const fixJoint = new dCustomHinge(jointMatrix, torso, GetBody());
+		dCustomHinge* const fixJoint = new dCustomHinge(jointMatrix, torsoBody, GetBody());
 		fixJoint->EnableLimits(true);
 		fixJoint->SetLimits(0.0f, 0.0f);
-
-		dModelNode* const torsoBone = new dModelNode(torso, dGetIdentityMatrix(), this);
+		new dModelNode(torsoBody, dGetIdentityMatrix(), this);
 	}
 
+	void AddLeg(NewtonWorld* const world, dFloat dist)
+	{
+		dMatrix matrix;
+		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
+
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+		dVector size (0.2f, 0.4f, 0.2f, 0.0f);
+		NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _CAPSULE_PRIMITIVE, 0);
+		DemoMesh* const geometry = new DemoMesh("leg", scene->GetShaderCache(), collision, "marble.tga", "marble.tga", "marble.tga");
+
+		dMatrix location(matrix);
+		location.m_posit += matrix.m_front.Scale(dist);
+		location.m_posit -= matrix.m_up.Scale (size.m_y - size.m_x * 0.5f);
+		location = dRollMatrix (90.0f * dDegreeToRad) * location;
+		NewtonBody* const legBody = CreateSimpleSolid(scene, geometry, 25.0f, location, collision, 0);
+
+		geometry->Release();
+		NewtonDestroyCollision(collision);
+
+		dMatrix jointMatrix(location);
+		jointMatrix.m_posit += location.m_front.Scale(size.m_y * 0.5f + 0.2f * 0.5f);
+		new dCustomBallAndSocket(jointMatrix, legBody, GetBody());
+
+		dModelNode* const legBone = new dModelNode(legBody, dGetIdentityMatrix(), this);
+
+	}
 };
 
 class dBalancingBipedManager: public dModelManager
