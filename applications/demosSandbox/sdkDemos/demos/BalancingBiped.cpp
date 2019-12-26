@@ -1060,7 +1060,7 @@ class dBalacingCharacterEffector: public dCustomKinematicController
 
 		dFloat gravity = 10.0f;
 		SetMaxAngularFriction(modelMass * 100.0f * gravity);
-		SetMaxLinearFriction(modelMass * gravity * 1.5f);
+		SetMaxLinearFriction(modelMass * gravity * 1.2f);
 
 		dVector euler0;
 		dVector euler1;
