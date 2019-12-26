@@ -32,6 +32,8 @@ class dModelChildrenList: public dList<dModelNode*>
 class dModelNode: public dCustomAlloc
 {
 	public:
+	typedef void (dModelNode::*Callback) (const dModelNode* const node, void* const context) const;
+
 	dModelNode(NewtonBody* const modelBody, const dMatrix& bindMatrix, dModelNode* const parent);
 	virtual ~dModelNode();
 
@@ -48,6 +50,8 @@ class dModelNode: public dCustomAlloc
 	const dModelNode* GetParent() const {return m_parent;}
 	dModelChildrenList& GetChildren() {return m_children;}
 	const dModelChildrenList& GetChildren() const {return m_children;}
+
+	void ForEachNode (Callback callback, void* const context) const;
 
 	protected:
 	dMatrix m_bindMatrix;

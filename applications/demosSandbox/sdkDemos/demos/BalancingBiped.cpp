@@ -1055,10 +1055,48 @@ class dBalancingBiped: public dModelRootNode
 		AddUpperBody (world);
 		AddLeg (world, 0.15f);
 		AddLeg (world, -0.15f);
+
+		// normalize weight to 90 kilogram (about a normal human)
+		NormalizeWeight (90.0f);
+	}
+	
+	private:
+	void NormalizeWeight (dFloat mass)
+	{
+		dFloat totalMass = 0.0f;
+		ForEachNode((dModelNode::Callback)&dBalancingBiped::NormalizeMassCallback, &totalMass);
+
+		dFloat normalizeMassScale = mass / totalMass;
+		ForEachNode((dModelNode::Callback)&dBalancingBiped::ApplyNormalizeMassCallback, &normalizeMassScale);
 	}
 
+	void NormalizeMassCallback (const dModelNode* const node, void* const context) const
+	{
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		dFloat mass;
+		dFloat* const totalMass = (dFloat*) context;
+		NewtonBodyGetMass(node->GetBody(), &mass, &Ixx, &Iyy, &Izz);
+		*totalMass += mass;
+	}
 
-	private:
+	void ApplyNormalizeMassCallback (const dModelNode* const node, void* const context) const
+	{
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		dFloat mass;
+		dFloat scale = *((dFloat*) context);
+		NewtonBodyGetMass(node->GetBody(), &mass, &Ixx, &Iyy, &Izz);
+
+		mass *= scale;
+		Ixx *= scale;
+		Iyy *= scale;
+		Izz *= scale;
+		NewtonBodySetMassMatrix(node->GetBody(), mass, Ixx, Iyy, Izz);
+	}
+
 	void MakeHip(NewtonWorld* const world, const dMatrix& location)
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);

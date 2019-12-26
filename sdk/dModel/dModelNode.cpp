@@ -50,3 +50,21 @@ const dCustomJoint* dModelNode::GetJoint() const
 	}
 	return NULL;
 }
+
+void dModelNode::ForEachNode (Callback callback, void* const context) const
+{
+	const dModelNode* stackPool[128];
+
+	int stack = 1;
+	stackPool[0] = this;
+	while (stack) {
+		stack--;
+		const dModelNode* const bone = stackPool[stack];
+		(this->*callback) (bone, context);
+
+		for (dModelChildrenList::dListNode* ptrNode = bone->m_children.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
+			stackPool[stack] = ptrNode->GetInfo();
+			stack++;
+		}
+	}
+}
