@@ -1042,8 +1042,46 @@ class dBalancingCharacterManager: public dModelManager
 #endif
 
 //#define D_BIPED_TEXTURE_NAME "marble.tga"
-#define D_BIPED_TEXTURE_NAME "metal_30.tga"
+#define D_BIPED_MASS			80.0f
+#define D_BIPED_TEXTURE_NAME	"metal_30.tga"
 
+class dBalacingCharacterEffector: public dCustomKinematicController
+{
+	public:
+	dBalacingCharacterEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace, dFloat modelMass)
+		:dCustomKinematicController(body, attachmentMatrixInGlobalSpace, referenceBody)
+		,m_origin(GetTargetMatrix())
+	{
+		// set the joint as exact solver
+		SetSolverModel(1);
+		//SetControlMode(dCustomKinematicController::m_linearAndTwist);
+		//SetControlMode(dCustomKinematicController::m_linear);
+		SetControlMode(dCustomKinematicController::m_full6dof);
+
+		dFloat gravity = 10.0f;
+		SetMaxAngularFriction(modelMass * 100.0f * gravity);
+		SetMaxLinearFriction(modelMass * gravity * 1.5f);
+
+		dVector euler0;
+		dVector euler1;
+		m_origin.GetEulerAngles(euler0, euler1);
+		m_pitch = euler0.m_x;
+		m_yaw = euler0.m_y;
+		m_roll = euler0.m_z;
+	}
+
+	void SetMatrix(dFloat x, dFloat y, dFloat z, dFloat pitch)
+	{
+		dMatrix matrix(dPitchMatrix(m_pitch + pitch) * dYawMatrix(m_yaw) * dRollMatrix(m_roll));
+		matrix.m_posit = m_origin.TransformVector(dVector(x, y, z, dFloat(1.0f)));
+		SetTargetMatrix(matrix);
+	}
+
+	dMatrix m_origin;
+	dFloat m_pitch;
+	dFloat m_yaw;
+	dFloat m_roll;
+};
 
 class dBalancingBiped: public dModelRootNode
 {
@@ -1053,11 +1091,14 @@ class dBalancingBiped: public dModelRootNode
 	{
 		MakeHip(world, location);
 		AddUpperBody (world);
-		AddLeg (world, 0.15f);
-		AddLeg (world, -0.15f);
+		m_leftFoot = AddLeg (world, 0.15f);
+		m_rightFoot = AddLeg (world, -0.15f);
 
 		// normalize weight to 90 kilogram (about a normal human)
-		NormalizeWeight (90.0f);
+		NormalizeWeight (D_BIPED_MASS);
+
+//NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
+
 	}
 	
 	private:
@@ -1137,7 +1178,7 @@ class dBalancingBiped: public dModelRootNode
 		new dModelNode(torsoBody, dGetIdentityMatrix(), this);
 	}
 
-	void AddLeg(NewtonWorld* const world, dFloat dist)
+	dBalacingCharacterEffector* AddLeg(NewtonWorld* const world, dFloat dist)
 	{
 		dMatrix matrix;
 		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
@@ -1153,18 +1194,37 @@ class dBalancingBiped: public dModelRootNode
 		location.m_posit += matrix.m_front.Scale(dist);
 		location.m_posit -= matrix.m_up.Scale (size.m_y - size.m_x * 0.5f);
 		location = dRollMatrix (90.0f * dDegreeToRad) * location;
-		NewtonBody* const legBody = CreateSimpleSolid(scene, geometry, 25.0f, location, collision, 0);
+
+		// flex the leg 10 degree to the front.
+		dMatrix tiltLegMatrix (dPitchMatrix(-10.0f * dDegreeToRad));
+		// get hip pivot point
+		dVector jointPivot (location.m_posit + location.m_front.Scale(size.m_y * 0.5f + 0.2f * 0.5f));
+		tiltLegMatrix.m_posit = jointPivot - tiltLegMatrix.RotateVector(jointPivot);
+		location = location * tiltLegMatrix;
+		NewtonBody* const legBody = CreateSimpleSolid(scene, geometry, 20.0f, location, collision, 0);
+
+		// create leg-hip joint
 		dMatrix jointMatrix(location);
-		jointMatrix.m_posit += location.m_front.Scale(size.m_y * 0.5f + 0.2f * 0.5f);
+		jointMatrix.m_posit = jointPivot;
 		new dCustomBallAndSocket(jointMatrix, legBody, GetBody());
 		dModelNode* const legBone = new dModelNode(legBody, dGetIdentityMatrix(), this);
 
 		// create shin body and visual entity
 		location.m_posit -= location.m_front.Scale (size.m_y + size.m_x * 0.5f);
-		NewtonBody* const shinBody = CreateSimpleSolid(scene, geometry, 20.0f, location, collision, 0);
+
+		// flex shin 20 degrees backward
+		dMatrix tiltShinMatrix (dPitchMatrix(20.0f * dDegreeToRad));
+		// get the knee pivot
+		dVector kneePivot (location.m_posit + location.m_front.Scale(size.m_y * 0.5f + size.m_x * 0.25f));
+		tiltShinMatrix.m_posit = kneePivot - tiltShinMatrix.RotateVector(kneePivot);
+		location = location * tiltShinMatrix;
+		NewtonBody* const shinBody = CreateSimpleSolid(scene, geometry, 15.0f, location, collision, 0);
+
+		// get the knee pivot matrix
 		jointMatrix = location;
-		jointMatrix.m_posit += location.m_front.Scale(size.m_y * 0.5f + size.m_x * 0.25f);
-		jointMatrix = dRollMatrix(90.0f * dDegreeToRad) * jointMatrix;
+		jointMatrix = dRollMatrix (90.0f * dDegreeToRad) * jointMatrix;
+		jointMatrix.m_posit = kneePivot;
+		// create knee joint
 		new dCustomHinge(jointMatrix, shinBody, legBody);
 		dModelNode* const shinBone = new dModelNode(shinBody, dGetIdentityMatrix(), legBone);
 
@@ -1172,6 +1232,7 @@ class dBalancingBiped: public dModelRootNode
 		geometry->Release();
 		NewtonDestroyCollision(collision);
 
+#if 1
 		// create a box to represent the foot
 		dVector footSize (0.07f, 0.15f, 0.25f, 0.0f);
 		NewtonCollision* const footCollision = CreateConvexCollision(world, dGetIdentityMatrix(), footSize, _BOX_PRIMITIVE, 0);
@@ -1180,12 +1241,17 @@ class dBalancingBiped: public dModelRootNode
 		// create foot body and visual entity
 		location.m_posit -= location.m_front.Scale(size.m_y * 0.5f + size.m_x * 0.5f);
 		location.m_posit += location.m_right.Scale(footSize.m_z * 0.25f);
-		NewtonBody* const footBody = CreateSimpleSolid(scene, footGeometry, 5.0f, location, footCollision, 0);
+
+		// get he ankle pivot
+		dVector anklePivot (location.m_posit - location.m_right.Scale(footSize.m_z * 0.25f) + location.m_front.Scale(footSize.m_x * 0.5f));
+		// flex the foot 10 degrees forward
+		dMatrix tiltAnkleMatrix (dPitchMatrix(-10.0f * dDegreeToRad));
+		tiltAnkleMatrix.m_posit = anklePivot - tiltAnkleMatrix.RotateVector(anklePivot);
+		location = location * tiltAnkleMatrix;
+		NewtonBody* const footBody = CreateSimpleSolid(scene, footGeometry, 10.0f, location, footCollision, 0);
+
 		jointMatrix = location;
-		jointMatrix.m_posit -= location.m_right.Scale(footSize.m_z * 0.25f);
-		jointMatrix.m_posit += location.m_front.Scale(footSize.m_x * 0.5f);
-		jointMatrix = dRollMatrix(90.0f * dDegreeToRad) * jointMatrix;
-		jointMatrix = dPitchMatrix(90.0f * dDegreeToRad) * jointMatrix;
+		jointMatrix.m_posit = anklePivot;
 		new dCustomDoubleHinge(jointMatrix, footBody, shinBody);
 		dModelNode* const footAnkleBone = new dModelNode(footBody, dGetIdentityMatrix(), shinBone);
 
@@ -1194,9 +1260,35 @@ class dBalancingBiped: public dModelRootNode
 		NewtonDestroyCollision(footCollision);
 
 		// save ankle matrix as the effector pivot 
-		dMatrix m_pivotMatrix (jointMatrix);
+		dMatrix pivotMatrix(jointMatrix);
+		return new dBalacingCharacterEffector(footAnkleBone->GetBody(), m_body, pivotMatrix, D_BIPED_MASS);
+#else
 
+		// create a box to represent the foot
+		dVector footSize(0.07f, 0.15f, 0.25f, 0.0f);
+
+		// create foot body and visual entity
+		location.m_posit -= location.m_front.Scale(size.m_y * 0.5f + size.m_x * 0.5f);
+		location.m_posit += location.m_right.Scale(footSize.m_z * 0.25f);
+		dVector anklePivot(location.m_posit - location.m_right.Scale(footSize.m_z * 0.25f) + location.m_front.Scale(footSize.m_x * 0.5f));
+		dMatrix tiltAnkleMatrix(dPitchMatrix(-10.0f * dDegreeToRad));
+		tiltAnkleMatrix.m_posit = anklePivot - tiltAnkleMatrix.RotateVector(anklePivot);
+		location = location * tiltAnkleMatrix;
+
+		jointMatrix = location;
+		jointMatrix.m_posit = anklePivot;
+//		jointMatrix = dRollMatrix(90.0f * dDegreeToRad) * jointMatrix;
+//		jointMatrix = dPitchMatrix(90.0f * dDegreeToRad) * jointMatrix;
+
+		// save ankle matrix as the effector pivot 
+		dMatrix pivotMatrix(jointMatrix);
+		return new dBalacingCharacterEffector(shinBone->GetBody(), m_body, pivotMatrix, D_BIPED_MASS);
+//		return NULL;
+#endif
 	}
+
+	dBalacingCharacterEffector* m_leftFoot;
+	dBalacingCharacterEffector* m_rightFoot;
 };
 
 class dBalancingBipedManager: public dModelManager
@@ -1235,7 +1327,6 @@ class dBalancingBipedManager: public dModelManager
 	{
 
 	}
-	
 };
 
 
@@ -1249,7 +1340,7 @@ void BalancingBiped(DemoEntityManager* const scene)
 	dBalancingBipedManager* const manager = new dBalancingBipedManager(scene);
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
-	origin.m_posit.m_y += 1.5f;
+	origin.m_posit.m_y += 1.2f;
 	manager->CreateBiped(origin);
 
 	origin.m_posit.m_x = -2.5f;
