@@ -1088,6 +1088,8 @@ class dBalancingBiped: public dModelRootNode
 	public:
 	dBalancingBiped(NewtonWorld* const world, const dMatrix& location)
 		:dModelRootNode(NULL, dGetIdentityMatrix())
+		,m_leftFoot(NULL)
+		,m_rightFoot(NULL)
 	{
 		MakeHip(world, location);
 		AddUpperBody (world);
@@ -1098,7 +1100,16 @@ class dBalancingBiped: public dModelRootNode
 		NormalizeWeight (D_BIPED_MASS);
 
 //NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
+	}
 
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext) 
+	{
+		if (m_leftFoot) {
+			m_leftFoot->Debug(debugContext);
+		}
+		if (m_rightFoot) {
+			m_rightFoot->Debug(debugContext);
+		}
 	}
 	
 	private:
@@ -1232,7 +1243,6 @@ class dBalancingBiped: public dModelRootNode
 		geometry->Release();
 		NewtonDestroyCollision(collision);
 
-#if 1
 		// create a box to represent the foot
 		dVector footSize (0.07f, 0.15f, 0.25f, 0.0f);
 		NewtonCollision* const footCollision = CreateConvexCollision(world, dGetIdentityMatrix(), footSize, _BOX_PRIMITIVE, 0);
@@ -1252,6 +1262,10 @@ class dBalancingBiped: public dModelRootNode
 
 		jointMatrix = location;
 		jointMatrix.m_posit = anklePivot;
+		dMatrix effectorMatrix(jointMatrix);
+
+		jointMatrix = dRollMatrix(90.0f * dDegreeToRad) * jointMatrix;
+		jointMatrix = dPitchMatrix(90.0f * dDegreeToRad) * jointMatrix;
 		new dCustomDoubleHinge(jointMatrix, footBody, shinBody);
 		dModelNode* const footAnkleBone = new dModelNode(footBody, dGetIdentityMatrix(), shinBone);
 
@@ -1260,31 +1274,7 @@ class dBalancingBiped: public dModelRootNode
 		NewtonDestroyCollision(footCollision);
 
 		// save ankle matrix as the effector pivot 
-		dMatrix pivotMatrix(jointMatrix);
-		return new dBalacingCharacterEffector(footAnkleBone->GetBody(), m_body, pivotMatrix, D_BIPED_MASS);
-#else
-
-		// create a box to represent the foot
-		dVector footSize(0.07f, 0.15f, 0.25f, 0.0f);
-
-		// create foot body and visual entity
-		location.m_posit -= location.m_front.Scale(size.m_y * 0.5f + size.m_x * 0.5f);
-		location.m_posit += location.m_right.Scale(footSize.m_z * 0.25f);
-		dVector anklePivot(location.m_posit - location.m_right.Scale(footSize.m_z * 0.25f) + location.m_front.Scale(footSize.m_x * 0.5f));
-		dMatrix tiltAnkleMatrix(dPitchMatrix(-10.0f * dDegreeToRad));
-		tiltAnkleMatrix.m_posit = anklePivot - tiltAnkleMatrix.RotateVector(anklePivot);
-		location = location * tiltAnkleMatrix;
-
-		jointMatrix = location;
-		jointMatrix.m_posit = anklePivot;
-//		jointMatrix = dRollMatrix(90.0f * dDegreeToRad) * jointMatrix;
-//		jointMatrix = dPitchMatrix(90.0f * dDegreeToRad) * jointMatrix;
-
-		// save ankle matrix as the effector pivot 
-		dMatrix pivotMatrix(jointMatrix);
-		return new dBalacingCharacterEffector(shinBone->GetBody(), m_body, pivotMatrix, D_BIPED_MASS);
-//		return NULL;
-#endif
+		return new dBalacingCharacterEffector(footAnkleBone->GetBody(), m_body, effectorMatrix, D_BIPED_MASS);
 	}
 
 	dBalacingCharacterEffector* m_leftFoot;
@@ -1323,9 +1313,14 @@ class dBalancingBipedManager: public dModelManager
 		// set the transform after each update.
 	}
 
+	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext)
+	{
+		dBalancingBiped* const biped = (dBalancingBiped*)model;
+		biped->Debug (debugContext);
+	}
+
 	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const
 	{
-
 	}
 };
 
