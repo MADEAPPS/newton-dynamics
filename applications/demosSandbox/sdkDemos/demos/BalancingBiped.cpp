@@ -1088,6 +1088,8 @@ class dBalancingBiped: public dModelRootNode
 	public:
 	dBalancingBiped(NewtonWorld* const world, const dMatrix& location)
 		:dModelRootNode(NULL, dGetIdentityMatrix())
+		,m_com(0.0f)
+		,m_comVeloc(0.0f)
 		,m_leftFoot(NULL)
 		,m_rightFoot(NULL)
 	{
@@ -1110,9 +1112,32 @@ class dBalancingBiped: public dModelRootNode
 		if (m_rightFoot) {
 			m_rightFoot->Debug(debugContext);
 		}
+
+		// draw biped center of mass
+		dMatrix matrix;
+		NewtonBodyGetMatrix(GetBody(), &matrix[0][0]);
+		matrix.m_posit = m_com;
+	
+		debugContext->DrawFrame(matrix);
+		debugContext->DrawPoint(matrix.m_posit);
+	}
+
+	void Update(dFloat timestep)
+	{
+		CaculateComAndVelocity();
+
 	}
 	
 	private:
+	void CaculateComAndVelocity()
+	{
+		m_com = dVector (0.0f);
+		m_comVeloc = dVector (0.0f);
+		ForEachNode((dModelNode::Callback)&dBalancingBiped::CaculateComAndVelocity, NULL);
+		m_com = m_com.Scale (1.0f / D_BIPED_MASS);
+		m_comVeloc = m_comVeloc.Scale (1.0f / D_BIPED_MASS);
+	}
+
 	void NormalizeWeight (dFloat mass)
 	{
 		dFloat totalMass = 0.0f;
@@ -1120,6 +1145,27 @@ class dBalancingBiped: public dModelRootNode
 
 		dFloat normalizeMassScale = mass / totalMass;
 		ForEachNode((dModelNode::Callback)&dBalancingBiped::ApplyNormalizeMassCallback, &normalizeMassScale);
+	}
+
+	void CaculateComAndVelocity(const dModelNode* const node, void* const context)
+	{
+		dMatrix matrix;
+		dVector com (0.0f);
+		dVector veloc (0.0f);
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		dFloat mass;
+		NewtonBody* const body = node->GetBody();
+
+		NewtonBodyGetVelocity(body, &veloc[0]);
+		NewtonBodyGetCentreOfMass(body, &com[0]);
+		NewtonBodyGetMatrix(body, &matrix[0][0]);
+		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+		
+		com.m_w = 1.0f;
+		m_comVeloc += veloc.Scale (mass);
+		m_com += matrix.TransformVector(com).Scale(mass);
 	}
 
 	void NormalizeMassCallback (const dModelNode* const node, void* const context) const
@@ -1280,6 +1326,8 @@ class dBalancingBiped: public dModelRootNode
 		return new dBalacingCharacterEffector(footAnkleBone->GetBody(), m_body, effectorMatrix, D_BIPED_MASS);
 	}
 
+	dVector m_com;
+	dVector m_comVeloc;
 	dBalacingCharacterEffector* m_leftFoot;
 	dBalacingCharacterEffector* m_rightFoot;
 };
@@ -1324,6 +1372,8 @@ class dBalancingBipedManager: public dModelManager
 
 	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const
 	{
+		dBalancingBiped* const biped = (dBalancingBiped*)model;
+		biped->Update(timestep);
 	}
 };
 

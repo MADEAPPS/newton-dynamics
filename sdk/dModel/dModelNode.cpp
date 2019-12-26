@@ -51,7 +51,7 @@ const dCustomJoint* dModelNode::GetJoint() const
 	return NULL;
 }
 
-void dModelNode::ForEachNode (Callback callback, void* const context) const
+void dModelNode::ForEachNode (Callback callback, void* const context)
 {
 	const dModelNode* stackPool[128];
 
