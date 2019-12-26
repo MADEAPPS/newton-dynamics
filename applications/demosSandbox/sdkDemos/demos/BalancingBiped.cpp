@@ -1041,6 +1041,9 @@ class dBalancingCharacterManager: public dModelManager
 };
 #endif
 
+//#define D_BIPED_TEXTURE_NAME "marble.tga"
+#define D_BIPED_TEXTURE_NAME "metal_30.tga"
+
 
 class dBalancingBiped: public dModelRootNode
 {
@@ -1062,7 +1065,7 @@ class dBalancingBiped: public dModelRootNode
 
 		dVector size (0.25f, 0.2f, 0.25f, 0.0f);
 		NewtonCollision* const collision = CreateConvexCollision (world, dGetIdentityMatrix(), size, _CAPSULE_PRIMITIVE, 0);
-		DemoMesh* const geometry = new DemoMesh("hip", scene->GetShaderCache(), collision, "marble.tga", "marble.tga", "marble.tga");
+		DemoMesh* const geometry = new DemoMesh("hip", scene->GetShaderCache(), collision, D_BIPED_TEXTURE_NAME, D_BIPED_TEXTURE_NAME, D_BIPED_TEXTURE_NAME);
 	
 		m_body = CreateSimpleSolid (scene, geometry, 100.0f, location, collision, 0);
 
@@ -1078,7 +1081,7 @@ class dBalancingBiped: public dModelRootNode
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 		dVector size(0.3f, 0.4f, 0.2f, 0.0f);
 		NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-		DemoMesh* const geometry = new DemoMesh("torso", scene->GetShaderCache(), collision, "marble.tga", "marble.tga", "marble.tga");
+		DemoMesh* const geometry = new DemoMesh("torso", scene->GetShaderCache(), collision, D_BIPED_TEXTURE_NAME, D_BIPED_TEXTURE_NAME, D_BIPED_TEXTURE_NAME);
 
 		dFloat hipRadius = 0.25f * 0.5f;
 		dMatrix location (matrix);
@@ -1101,35 +1104,59 @@ class dBalancingBiped: public dModelRootNode
 		dMatrix matrix;
 		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
 
+		// create capsule collision and mesh
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 		dVector size (0.15f, 0.4f, 0.15f, 0.0f);
 		NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _CAPSULE_PRIMITIVE, 0);
-		DemoMesh* const geometry = new DemoMesh("leg", scene->GetShaderCache(), collision, "marble.tga", "marble.tga", "marble.tga");
+		DemoMesh* const geometry = new DemoMesh("leg", scene->GetShaderCache(), collision, D_BIPED_TEXTURE_NAME, D_BIPED_TEXTURE_NAME, D_BIPED_TEXTURE_NAME);
 
+		// create upper leg body and visual entity
 		dMatrix location(matrix);
 		location.m_posit += matrix.m_front.Scale(dist);
 		location.m_posit -= matrix.m_up.Scale (size.m_y - size.m_x * 0.5f);
 		location = dRollMatrix (90.0f * dDegreeToRad) * location;
 		NewtonBody* const legBody = CreateSimpleSolid(scene, geometry, 25.0f, location, collision, 0);
-
 		dMatrix jointMatrix(location);
 		jointMatrix.m_posit += location.m_front.Scale(size.m_y * 0.5f + 0.2f * 0.5f);
 		new dCustomBallAndSocket(jointMatrix, legBody, GetBody());
 		dModelNode* const legBone = new dModelNode(legBody, dGetIdentityMatrix(), this);
 
+		// create shin body and visual entity
 		location.m_posit -= location.m_front.Scale (size.m_y + size.m_x * 0.5f);
-		NewtonBody* const shinBody = CreateSimpleSolid(scene, geometry, 25.0f, location, collision, 0);
-
+		NewtonBody* const shinBody = CreateSimpleSolid(scene, geometry, 20.0f, location, collision, 0);
 		jointMatrix = location;
 		jointMatrix.m_posit += location.m_front.Scale(size.m_y * 0.5f + size.m_x * 0.25f);
 		jointMatrix = dRollMatrix(90.0f * dDegreeToRad) * jointMatrix;
 		new dCustomHinge(jointMatrix, shinBody, legBody);
 		dModelNode* const shinBone = new dModelNode(shinBody, dGetIdentityMatrix(), legBone);
 
+		// release collision and visual mesh
 		geometry->Release();
 		NewtonDestroyCollision(collision);
 
+		// create a box to represent the foot
+		dVector footSize (0.07f, 0.15f, 0.25f, 0.0f);
+		NewtonCollision* const footCollision = CreateConvexCollision(world, dGetIdentityMatrix(), footSize, _BOX_PRIMITIVE, 0);
+		DemoMesh* const footGeometry = new DemoMesh("foot", scene->GetShaderCache(), collision, D_BIPED_TEXTURE_NAME, D_BIPED_TEXTURE_NAME, D_BIPED_TEXTURE_NAME);
 
+		// create foot body and visual entity
+		location.m_posit -= location.m_front.Scale(size.m_y * 0.5f + size.m_x * 0.5f);
+		location.m_posit += location.m_right.Scale(footSize.m_z * 0.25f);
+		NewtonBody* const footBody = CreateSimpleSolid(scene, footGeometry, 5.0f, location, footCollision, 0);
+		jointMatrix = location;
+		jointMatrix.m_posit -= location.m_right.Scale(footSize.m_z * 0.25f);
+		jointMatrix.m_posit += location.m_front.Scale(footSize.m_x * 0.5f);
+		jointMatrix = dRollMatrix(90.0f * dDegreeToRad) * jointMatrix;
+		jointMatrix = dPitchMatrix(90.0f * dDegreeToRad) * jointMatrix;
+		new dCustomDoubleHinge(jointMatrix, footBody, shinBody);
+		dModelNode* const footAnkleBone = new dModelNode(footBody, dGetIdentityMatrix(), shinBone);
+
+		// release collision and visual mesh
+		footGeometry->Release();
+		NewtonDestroyCollision(footCollision);
+
+		// save ankle matrix as the effector pivot 
+		dMatrix m_pivotMatrix (jointMatrix);
 
 	}
 };
@@ -1162,8 +1189,13 @@ class dBalancingBipedManager: public dModelManager
 	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& globalMatrix) const
 	{
 		// this function is no called because the the model is hierarchical 
-		// but all body part are in global space, therefore the normal rigidbody Transform and force callback
+		// but all body parts are in global space, therefore the normal rigid body transform callback
 		// set the transform after each update.
+	}
+
+	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const
+	{
+
 	}
 	
 };
@@ -1182,8 +1214,10 @@ void BalancingBiped(DemoEntityManager* const scene)
 	origin.m_posit.m_y += 1.5f;
 	manager->CreateBiped(origin);
 
-	origin.m_posit.m_x = -2.0f;
-	origin.m_posit.m_y = 1.0f;
-	origin.m_posit.m_z = 0.0f;
-	scene->SetCameraMatrix(dGetIdentityMatrix(), origin.m_posit);
+	origin.m_posit.m_x = -2.5f;
+	origin.m_posit.m_y = 1.5f;
+	origin.m_posit.m_z = 2.0f;
+	origin = dYawMatrix(45.0f * dDegreeToRad) * origin;
+	dQuaternion rot (origin);
+	scene->SetCameraMatrix(rot, origin.m_posit);
 }
