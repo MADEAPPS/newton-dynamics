@@ -1236,7 +1236,9 @@ class dBalancingBiped: public dModelRootNode
 		jointMatrix = dRollMatrix (90.0f * dDegreeToRad) * jointMatrix;
 		jointMatrix.m_posit = kneePivot;
 		// create knee joint
-		new dCustomHinge(jointMatrix, shinBody, legBody);
+		dCustomHinge* const kneeHinge = new dCustomHinge(jointMatrix, shinBody, legBody);
+		kneeHinge->EnableLimits(true);
+		kneeHinge->SetLimits(-120.0f * dDegreeToRad, 10.0f * dDegreeToRad);
 		dModelNode* const shinBone = new dModelNode(shinBody, dGetIdentityMatrix(), legBone);
 
 		// release collision and visual mesh
@@ -1274,6 +1276,7 @@ class dBalancingBiped: public dModelRootNode
 		NewtonDestroyCollision(footCollision);
 
 		// save ankle matrix as the effector pivot 
+		//return 0;
 		return new dBalacingCharacterEffector(footAnkleBone->GetBody(), m_body, effectorMatrix, D_BIPED_MASS);
 	}
 
