@@ -1052,7 +1052,6 @@ class dBalancingBiped: public dModelRootNode
 		AddUpperBody (world);
 		AddLeg (world, 0.15f);
 		AddLeg (world, -0.15f);
-		
 	}
 
 
@@ -1103,7 +1102,7 @@ class dBalancingBiped: public dModelRootNode
 		NewtonBodyGetMatrix(m_body, &matrix[0][0]);
 
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-		dVector size (0.2f, 0.4f, 0.2f, 0.0f);
+		dVector size (0.15f, 0.4f, 0.15f, 0.0f);
 		NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _CAPSULE_PRIMITIVE, 0);
 		DemoMesh* const geometry = new DemoMesh("leg", scene->GetShaderCache(), collision, "marble.tga", "marble.tga", "marble.tga");
 
@@ -1113,14 +1112,24 @@ class dBalancingBiped: public dModelRootNode
 		location = dRollMatrix (90.0f * dDegreeToRad) * location;
 		NewtonBody* const legBody = CreateSimpleSolid(scene, geometry, 25.0f, location, collision, 0);
 
-		geometry->Release();
-		NewtonDestroyCollision(collision);
-
 		dMatrix jointMatrix(location);
 		jointMatrix.m_posit += location.m_front.Scale(size.m_y * 0.5f + 0.2f * 0.5f);
 		new dCustomBallAndSocket(jointMatrix, legBody, GetBody());
-
 		dModelNode* const legBone = new dModelNode(legBody, dGetIdentityMatrix(), this);
+
+		location.m_posit -= location.m_front.Scale (size.m_y + size.m_x * 0.5f);
+		NewtonBody* const shinBody = CreateSimpleSolid(scene, geometry, 25.0f, location, collision, 0);
+
+		jointMatrix = location;
+		jointMatrix.m_posit += location.m_front.Scale(size.m_y * 0.5f + size.m_x * 0.25f);
+		jointMatrix = dRollMatrix(90.0f * dDegreeToRad) * jointMatrix;
+		new dCustomHinge(jointMatrix, shinBody, legBody);
+		dModelNode* const shinBone = new dModelNode(shinBody, dGetIdentityMatrix(), legBone);
+
+		geometry->Release();
+		NewtonDestroyCollision(collision);
+
+
 
 	}
 };
@@ -1170,7 +1179,7 @@ void BalancingBiped(DemoEntityManager* const scene)
 	dBalancingBipedManager* const manager = new dBalancingBipedManager(scene);
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
-	origin.m_posit.m_y += 1.0f;
+	origin.m_posit.m_y += 1.5f;
 	manager->CreateBiped(origin);
 
 	origin.m_posit.m_x = -2.0f;
