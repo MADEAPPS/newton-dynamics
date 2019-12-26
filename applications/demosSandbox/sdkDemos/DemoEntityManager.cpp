@@ -322,7 +322,7 @@ DemoEntityManager::DemoEntityManager ()
 	// initialized the physics world for the new scene
 //	m_showUI = false;
 //	m_showAABB = false;
-//	m_showContactPoints = true;
+
 //	m_hideVisualMeshes = true;
 //	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
@@ -331,6 +331,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_solverSubSteps = 2;
 //	m_showRaycastHit = true;
 	m_showNormalForces = true;
+	m_showContactPoints = true;
 //	m_showCenterOfMass = false;
 //	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
