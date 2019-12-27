@@ -586,48 +586,6 @@ dMatrix dMatrix::Inverse4x4 () const
 }
 
 
-#if 0
-class XXXX 
-{
-public:
-	XXXX ()
-	{
-		dMatrix s;
-		dFloat m = 2.0f;
-		for (int i = 0; i < 3; i ++) {
-			for (int j = 0; j < 3; j ++) {
-				s[i][j] = m; 
-				m += (i + 1) + j;
-			}
-		}
-		s.m_posit = dVector (1, 2, 3, 1);
-		dMatrix matrix;
-		dVector scale;
-		dMatrix stretch;
-		s.PolarDecomposition (matrix, scale, stretch);
-		dMatrix s1 (matrix, scale, stretch);
-
-		dMatrix xxx (dPitchMatrix(30.0f * dDegreeToRad) * dRollMatrix(30.0f * dDegreeToRad));
-		dMatrix xxxx (GetIdentityMatrix());
-		xxx[0] = xxx[0].Scale (-1.0f);
-		dFloat mmm = (xxx[0] * xxx[1]) % xxx[2];
-		xxxx[0][0] = 3.0f;
-		xxxx[1][1] = 3.0f;
-		xxxx[2][2] = 4.0f;
-
-		dMatrix xxx2 (xxx * xxxx);
-		mmm = (xxx2[0] * xxx2[1]) % xxx2[2];
-		xxx2.PolarDecomposition (matrix, scale, stretch);
-
-		s1 = dMatrix (matrix, scale, stretch);
-		s1 = dMatrix (matrix, scale, stretch);
-
-	}
-};
-XXXX xxx;
-#endif
-
-
 static inline void ROT(dMatrix &a, int i, int j, int k, int l, dFloat s, dFloat tau) 
 {
 	dFloat g;
@@ -642,7 +600,6 @@ static inline void ROT(dMatrix &a, int i, int j, int k, int l, dFloat s, dFloat 
 // Jacobian method for computing the eigenvectors of a symmetric matrix
 dMatrix dMatrix::JacobiDiagonalization (dVector &eigenValues, const dMatrix& initialMatrix) const
 {
-
 	dMatrix mat(*this);
 	dMatrix eigenVectors(initialMatrix);
 	dFloat thresh;
@@ -811,10 +768,7 @@ void dMatrix::PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMat
 	pureRotation[2] = pureRotation[2].Scale (invdet2);
 
 	const dMatrix& me = *this;
-//	dFloat sign = ((((*this)[0] * (*this)[1]).DotProduct((*this)[2])) > 0.0f) ? 1.0f : -1.0f;
-//	dFloat sign1 = (me[0].CrossProduct(me[1])).DotProduct3(me[2]) > 0.0f ? 1.0f : -1.0f;
 	dFloat sign = me[2].DotProduct3 (me[0].CrossProduct(me[1])) > 0.0f ? 1.0f : -1.0f;
-//	dFloat det = (pureRotation[0].CrossProduct(pureRotation[1])).DotProduct3(pureRotation[2]);
 	dFloat det = pureRotation[2].DotProduct3 (pureRotation[0].CrossProduct(pureRotation[1]));
 	if (dAbs (det - 1.0f) < 1.e-5f){
 		// this is a pure scale * rotation * translation

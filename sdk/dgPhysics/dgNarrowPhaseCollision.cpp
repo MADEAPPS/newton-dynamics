@@ -555,7 +555,7 @@ static inline dgInt32 CompareContact (const dgContactPoint* const contactA, cons
 }
 
 
-DG_INLINE dgInt32 dgWorld::PruneSupport(int count, const dgVector& dir, const dgVector* points) const
+DG_INLINE dgInt32 dgWorld::PruneSupport(dgInt32 count, const dgVector& dir, const dgVector* points) const
 {
 	dgInt32 index = 0;
 	dgFloat32 maxVal = dgFloat32(-1.0e20f);
@@ -571,13 +571,13 @@ DG_INLINE dgInt32 dgWorld::PruneSupport(int count, const dgVector& dir, const dg
 
 dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contactArray, int maxCount, dgFloat32 tol) const
 {
-	class dgConveFaceNode
+	class dgConvexFaceNode
 	{
 		public:
 		dgVector m_point2d;
 		dgContactPoint m_contact;
-		dgConveFaceNode* m_next;
-		dgConveFaceNode* m_prev;
+		dgConvexFaceNode* m_next;
+		dgConvexFaceNode* m_prev;
 		dgInt32 m_mask;
 	};
 
@@ -586,7 +586,7 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 		public:
 		dgVector m_p0;
 		dgVector m_p1;
-		dgConveFaceNode* m_edgeP0;
+		dgConvexFaceNode* m_edgeP0;
 	};
 
 	dgVector xyMask(dgVector::m_xMask | dgVector::m_yMask);
@@ -594,7 +594,7 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 	dgVector array[DG_MAX_CONTATCS];
 	dgHullStackSegment stack[DG_MAX_CONTATCS];
 
-	dgConveFaceNode convexHull[32];
+	dgConvexFaceNode convexHull[32];
 	dgContactPoint buffer[32];
 
 	// it is a big mistake to set contact to deepest penetration because si cause unwanted pops.
@@ -675,14 +675,14 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 	}
 	dgAssert (hullCount < sizeof (convexHull)/sizeof (convexHull[0]));
 
-	dgUpHeap<dgConveFaceNode*, dgFloat32> sortHeap(array, sizeof (array));
-	dgConveFaceNode* hullPoint = &convexHull[0];
+	dgUpHeap<dgConvexFaceNode*, dgFloat32> sortHeap(array, sizeof (array));
+	dgConvexFaceNode* hullPoint = &convexHull[0];
 
 	bool hasLinearCombination = true;
 	while (hasLinearCombination) {
 		sortHeap.Flush();
 		hasLinearCombination = false;
-		dgConveFaceNode* ptr = hullPoint;
+		dgConvexFaceNode* ptr = hullPoint;
 		dgVector e0 (ptr->m_next->m_point2d - ptr->m_point2d);
 		do {
 			dgVector e1(ptr->m_next->m_next->m_point2d - ptr->m_next->m_point2d);
@@ -694,7 +694,7 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 		} while (ptr != hullPoint);
 
 		while (sortHeap.GetCount() && (sortHeap.Value() * dgFloat32 (16.0f) < totalArea)) {
-			dgConveFaceNode* const corner = sortHeap[0];
+			dgConvexFaceNode* const corner = sortHeap[0];
 			if (corner->m_mask && corner->m_prev->m_mask) {
 				if (hullPoint == corner) {
 					hullPoint = corner->m_prev;
@@ -711,7 +711,7 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 	
 	while (hullCount > maxCount) {
 		sortHeap.Flush();
-		dgConveFaceNode* ptr = hullPoint;
+		dgConvexFaceNode* ptr = hullPoint;
 		dgVector e0(ptr->m_next->m_point2d - ptr->m_point2d);
 		do {
 			dgVector e1(ptr->m_next->m_next->m_point2d - ptr->m_next->m_point2d);
@@ -723,7 +723,7 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 		} while (ptr != hullPoint);
 
 		while (sortHeap.GetCount() && (hullCount > maxCount)) {
-			dgConveFaceNode* const corner = sortHeap[0];
+			dgConvexFaceNode* const corner = sortHeap[0];
 			if (corner->m_mask && corner->m_prev->m_mask) {
 				if (hullPoint == corner) {
 					hullPoint = corner->m_prev;
@@ -739,7 +739,7 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 	}
 
 	hullCount = 0;
-	dgConveFaceNode* ptr = hullPoint;
+	dgConvexFaceNode* ptr = hullPoint;
 	do {
 		contactArray[hullCount] = ptr->m_contact;
 		//contactArray[hullCount].m_normal = averageNormal;
@@ -1130,7 +1130,7 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactArra
 	for (dgInt32 i = 0; i < count; i++) {
 		origin += contactArray[i].m_point;
 	}
-	dgVector scale (dgFloat32(1.0) / count);
+	dgVector scale (dgFloat32(1.0f) / count);
 	origin = origin * scale;
 	origin.m_w = dgFloat32 (1.0f);
 

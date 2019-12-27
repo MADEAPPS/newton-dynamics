@@ -452,7 +452,7 @@ class dgWorld
 
 	dgInt32 Prune3dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contact, int maxCount, dgFloat32 distTol) const;
 	dgInt32 Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contact, int maxCount, dgFloat32 distTol) const;
-	DG_INLINE dgInt32 PruneSupport(int count, const dgVector& dir, const dgVector* points) const;
+	DG_INLINE dgInt32 PruneSupport(dgInt32 count, const dgVector& dir, const dgVector* points) const;
 
 	DG_INLINE dgBody* FindRoot(dgBody* const body) const;
 	DG_INLINE dgBody* FindRootAndSplit(dgBody* const body) const;

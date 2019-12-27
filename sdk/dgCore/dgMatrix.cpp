@@ -474,14 +474,14 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 dgVector dgMatrix::EigenVectors ()
 {
 #if 0
-	// still have teh same problem I had in teh pass, becaually QR algorith is really bad 
-	// at converging for matroces with very dioffrent eiegen values. 
-	// the solution is to use RD with double shift. 
+	// still have the same problem I had in the pass, because QR algorithm is really bad 
+	// at converging matrices with very different eigenvalue. 
+	// the solution is to use RD with double shift which I do not feel like implementing. 
 	dgMatrix eigenValues (*this);
 	dgMatrix& eigenVectors = *this;
 	eigenVectors = dgGetIdentityMatrix();
 	if (dgAbs(eigenValues.m_front.m_z) > dgFloat32(1.0e-6f)) {
-		// calcualte initial guess by convert to tridiagonal matrix using householder
+		// calculate initial guess by convert to tridiagonal matrix using householder
 		dgVector u(eigenValues.m_front);
 		u.m_x = dgFloat32(0.0f);
 		u.m_y -= dgSqrt(u.DotProduct(u).GetScalar());

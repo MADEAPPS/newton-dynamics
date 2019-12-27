@@ -65,5 +65,9 @@
 //#include <dCustomBallAndSocket.h>
 #include <dCustomKinematicController.h>
 
+// some utilities functions
+int Calculate2dConvexHullProjection(int count, dVector* const points);
+
+
 
 #endif

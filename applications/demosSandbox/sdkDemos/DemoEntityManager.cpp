@@ -334,7 +334,7 @@ DemoEntityManager::DemoEntityManager ()
 	m_showNormalForces = true;
 	m_showContactPoints = true;
 //	m_showJointDebugInfo = true;
-	m_collisionDisplayMode = 2;
+//	m_collisionDisplayMode = 2;
 	m_showListenersDebugInfo = true;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;
