@@ -520,7 +520,7 @@ void BalancingBiped(DemoEntityManager* const scene)
 	dBalancingBipedManager* const manager = new dBalancingBipedManager(scene);
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
-	origin.m_posit.m_y += 1.1f;
+	origin.m_posit.m_y += 1.2f;
 	manager->CreateBiped(origin);
 
 	origin.m_posit.m_x = -2.5f;
