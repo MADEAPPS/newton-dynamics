@@ -91,9 +91,33 @@ class dBalancingBiped: public dModelRootNode
 
 		virtual bool Update (dFloat timestep)
 		{
-			//int count = m_biped->CalculateSupportPolygon();
-			m_biped->CalculateSupportPolygon();
+			if (m_biped->CalculateSupportPolygon()) {
+				dFloat heigh = m_biped->m_localGravityDir.DotProduct3(m_biped->m_localSuportCenter);
+				dVector step (m_biped->m_localSuportCenter - m_biped->m_localGravityDir.Scale (heigh));
+				//dVector veloc (m_biped->m_localComVeloc - m_biped->m_localGravityDir.Scale (m_biped->m_localComVeloc.DotProduct3(m_biped->m_localGravityDir)));
+				dFloat dist2 = step.DotProduct3(step);
+				const dFloat maxStep = 0.05f;
+				if (dist2 > (maxStep * maxStep)) {
+					step = step.Normalize().Scale (maxStep);
+				}
+		
+				SetEffectorPosition(m_biped->m_leftFoot, step);
+				SetEffectorPosition(m_biped->m_rightFoot, step);
+			}
 			return true;
+		}
+
+		void SetEffectorPosition(dBalacingCharacterEffector* const effector, const dVector& step) const
+		{
+			dMatrix bodyMatrix;
+			dMatrix effectorMatrix(effector->GetTargetMatrix());
+			NewtonBodyGetMatrix (effector->GetBody1(), &bodyMatrix[0][0]);
+			dVector xxx (bodyMatrix.TransformVector(effectorMatrix.m_posit));
+			dVector localPosition (m_biped->m_comFrame.UntransformVector (bodyMatrix.TransformVector(effectorMatrix.m_posit)));
+			localPosition -= step.Scale (0.01f);
+			dVector position (bodyMatrix.UntransformVector(m_biped->m_comFrame.TransformVector(localPosition)));
+			effectorMatrix.m_posit = position;
+			effector->SetTargetMatrix(effectorMatrix);
 		}
 	};
 
@@ -101,7 +125,7 @@ class dBalancingBiped: public dModelRootNode
 		:dModelRootNode(NULL, dGetIdentityMatrix())
 		,m_comFrame(coordinateSystem)
 		,m_localComFrame(coordinateSystem)
-		,m_localGravity(0.0f)
+		,m_localGravityDir(0.0f)
 		,m_localComVeloc(0.0f)
 		,m_localSuportCenter(0.0f)
 		,m_leftFoot(NULL)
@@ -141,7 +165,7 @@ class dBalancingBiped: public dModelRootNode
 				i0 = i;
 			}
 			dVector center(m_localSuportCenter);
-			center.m_y += 0.02;
+			center.m_y += 0.02f;
 			center = m_comFrame.TransformVector(center);
 			debugContext->DrawPoint(center, 4.0f);
 		}
@@ -184,13 +208,11 @@ class dBalancingBiped: public dModelRootNode
 		return count;
 	}
 
-	int CalculateSupportPolygon ()
+	bool CalculateSupportPolygon ()
 	{
 		if (m_polygonIsValid) {
-			return 0; 
+			return m_supportPolygonPoints ? true : false; 
 		}
-		m_polygonIsValid = true;
-		m_supportPolygonPoints = 0;
 
 		int count = 0;
 		count += GetContactPoints (m_leftFoot->GetBody0(), &m_supportPolygon[count]);
@@ -205,8 +227,9 @@ class dBalancingBiped: public dModelRootNode
 			m_localSuportCenter = center.Scale (1.0f / count);
 		}
 
+		m_polygonIsValid = true;
 		m_supportPolygonPoints = count;
-		return count;
+		return m_supportPolygonPoints ? true : false;
 	}
 
 	void CaculateComAndVelocity()
@@ -225,7 +248,7 @@ class dBalancingBiped: public dModelRootNode
 		m_comFrame.m_posit.m_w = 1.0f;
 		m_localComFrame.m_posit = matrix.UntransformVector(m_comFrame.m_posit);
 		m_localComVeloc = m_comFrame.UnrotateVector(m_localComVeloc.Scale (1.0f / D_BIPED_MASS));
-		m_localGravity = m_comFrame.UnrotateVector(dVector (0.0f, -1.0f, 0.0f, 0.0f));
+		m_localGravityDir = m_comFrame.UnrotateVector(dVector (0.0f, 1.0f, 0.0f, 0.0f));
 	}
 
 	void NormalizeWeight (dFloat mass)
@@ -427,7 +450,7 @@ class dBalancingBiped: public dModelRootNode
 
 	dMatrix m_comFrame;
 	dMatrix m_localComFrame;
-	dVector m_localGravity;
+	dVector m_localGravityDir;
 	dVector m_localComVeloc;
 	dVector m_localSuportCenter;
 	dVector m_supportPolygon[32];
@@ -497,7 +520,7 @@ void BalancingBiped(DemoEntityManager* const scene)
 	dBalancingBipedManager* const manager = new dBalancingBipedManager(scene);
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
-	origin.m_posit.m_y += 1.2f;
+	origin.m_posit.m_y += 1.1f;
 	manager->CreateBiped(origin);
 
 	origin.m_posit.m_x = -2.5f;
