@@ -16,10 +16,10 @@
 #include "DemoMesh.h"
 #include "toolBox/OpenGlUtil.h"
 
-class Plane2dUpVector: public dCustomPlane
+class dPlane2dUpVector: public dCustomPlane
 {
 	public:
-	Plane2dUpVector (const dVector& pivot, const dVector& normal, NewtonBody* const child)
+	dPlane2dUpVector (const dVector& pivot, const dVector& normal, NewtonBody* const child)
 		:dCustomPlane (pivot, normal, child)
 	{
 	}
@@ -40,27 +40,6 @@ class Plane2dUpVector: public dCustomPlane
 	}
 };
 
-class Plane2dHinge: public dCustomPlane
-{
-	public:
-	Plane2dHinge(const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent)
-		:dCustomPlane(pivot, normal, child, parent)
-	{
-	}
-
-	void SubmitConstraints(dFloat timestep, int threadIndex)
-	{
-		dMatrix matrix0;
-		dMatrix matrix1;
-
-		// add two row to prevent the body from translation on the plane
-		CalculateGlobalMatrix(matrix0, matrix1);
-		SubmitLinearRows(0x06, matrix0, matrix1);
-
-		// add rows to fix matrix body the the plane
-		dCustomPlane::SubmitConstraints(timestep, threadIndex);
-	}
-};
 
 static void AttachLimbBody (DemoEntityManager* const scene, const dVector& dir, NewtonBody* const parent)
 {
@@ -80,7 +59,6 @@ static void AttachLimbBody (DemoEntityManager* const scene, const dVector& dir, 
 
 	// constrain these object to motion on the plane only
 	location.m_posit -= dir.Scale (0.25f);
-	//new Plane2dHinge(location.m_posit, location.m_front, rootBody, parent);
 	dCustomHinge* const hinge = new dCustomHinge(location, rootBody, parent);
 	hinge->EnableLimits(true);
 	hinge->SetLimits(-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
@@ -190,7 +168,7 @@ static void AddPlayerBodies(DemoEntityManager* const scene, NewtonBody* const fl
 		// constrain these object to motion on the plane only
 		dMatrix matrix;
 		NewtonBodyGetMatrix(capsule, &matrix[0][0]);
-		new Plane2dUpVector(matrix.m_posit, matrix.m_front, capsule);
+		new dPlane2dUpVector(matrix.m_posit, matrix.m_front, capsule);
 		location.m_posit.m_z += 2.5f;
 	}
 
