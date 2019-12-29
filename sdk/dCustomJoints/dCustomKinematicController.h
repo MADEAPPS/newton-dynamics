@@ -69,9 +69,7 @@ class dCustomKinematicController: public dCustomJoint
 	dFloat m_angularFrictionCoefficient;
 	dFloat m_maxSpeed;
 	dFloat m_maxOmega;
-//	char m_pickingMode;
 	char m_autoSleepState;
-	//char m_controlAngularDof;
 	dControlModes m_controlMode;
 
 	DECLARE_CUSTOM_JOINT(dCustomKinematicController, dCustomJoint)

@@ -55,6 +55,28 @@ class dBalacingCharacterEffector: public dCustomKinematicController
 		SetTargetMatrix(matrix);
 	}
 
+	bool HasGroundContact() const
+	{
+		NewtonBody* const body = GetBody0();
+		for (NewtonJoint* contactJoint = NewtonBodyGetFirstContactJoint(body); contactJoint; contactJoint = NewtonBodyGetNextContactJoint(body, contactJoint)) {
+			if (NewtonJointIsActive(contactJoint)) {
+				return NewtonContactJointGetFirstContact(contactJoint) ? true : false;
+			}
+		}
+		return false;
+	}
+
+	dVector GetFootComInGlobalSpace () const
+	{
+		dMatrix matrix;
+		dVector com;
+
+		NewtonBody* const body = GetBody0();
+		NewtonBodyGetMatrix (body, &matrix[0][0]);
+		NewtonBodyGetCentreOfMass (body, &com[0]);
+		return matrix.TransformVector(com);
+	}
+
 	dMatrix m_origin;
 	dFloat m_pitch;
 	dFloat m_yaw;
@@ -92,6 +114,7 @@ class dBalancingBiped: public dModelRootNode
 
 		virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 		{
+#if 1
 			dVector supportPolygon[32];
 			dVector supportPolygonCenter;
 
@@ -110,38 +133,50 @@ class dBalancingBiped: public dModelRootNode
 					debugContext->DrawLine(p0, p1);
 					i0 = i;
 				}
+
+				dFloat heigh = m_biped->m_localGravityDir.DotProduct3(supportPolygonCenter);
 				supportPolygonCenter = m_biped->m_comFrame.TransformVector(supportPolygonCenter);
 				supportPolygonCenter.m_y += 0.02f;
-				debugContext->DrawPoint(supportPolygonCenter, 4.0f);
+				debugContext->DrawPoint(supportPolygonCenter, 2.0f);
+
+				dVector centerOfGravity(m_biped->m_comFrame.TransformVector(dVector(0.0f, heigh, 0.0f, 1.0f)));
+				centerOfGravity.m_y += 0.02;
+				debugContext->SetColor(dVector(0.0f, 1.0f, 0.0f, 0.0f));
+				debugContext->DrawPoint(centerOfGravity, 2.0f);
 			}
+#else
+			dVector p0(m_biped->m_leftFoot->GetFootComInGlobalSpace());
+			dVector p1(m_biped->m_rightFoot->GetFootComInGlobalSpace());
+			dVector supportPolygonCenter((p0 + p1).Scale(0.5f));
+			debugContext->DrawLine(p0, p1);
+			debugContext->DrawPoint(supportPolygonCenter, 4.0f);
+#endif
 		}
 
 		virtual bool Update (dFloat timestep)
 		{
+			// calculate support polygon in the local space of the biped.
 			dVector supportPolygon[32];
 			dVector supportPolygonCenter;
-
-			// calculate support polygon in the local space of the biped.
 			int count = m_biped->CalculateSupportPolygon(supportPolygonCenter, supportPolygon, sizeof (supportPolygon) / sizeof (supportPolygon[0]));
 			if (!count) {
 				return false;
 			}
 
 			dFloat heigh = m_biped->m_localGravityDir.DotProduct3(supportPolygonCenter);
-			dVector step (supportPolygonCenter - m_biped->m_localGravityDir.Scale (heigh));
+			dVector step(supportPolygonCenter - m_biped->m_localGravityDir.Scale(heigh));
 			dFloat dist2 = step.DotProduct3(step);
 			const dFloat maxStep = 5.0e-4f;
 			if (dist2 > (maxStep * maxStep)) {
-				step = step.Normalize().Scale (maxStep);
+				step = step.Normalize().Scale(maxStep);
 			}
-		
+
 			if (m_biped->m_leftFoot) {
 				SetEffectorPosition(m_biped->m_leftFoot, step);
 			}
 			if (m_biped->m_rightFoot) {
 				SetEffectorPosition(m_biped->m_rightFoot, step);
 			}
-
 			return true;
 		}
 
@@ -528,7 +563,7 @@ void BalancingBiped(DemoEntityManager* const scene)
 	dBalancingBipedManager* const manager = new dBalancingBipedManager(scene);
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
-	origin.m_posit.m_y += 1.1f;
+	origin.m_posit.m_y += 1.08f;
 	manager->CreateBiped(origin);
 
 	origin.m_posit.m_x = -2.5f;
