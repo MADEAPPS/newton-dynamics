@@ -377,7 +377,7 @@ class dBalancingBiped: public dModelRootNode
 
 		// create capsule collision and mesh
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
-		dVector size (0.15f, 0.4f, 0.15f, 0.0f);
+		dVector size (0.15f, 0.35f, 0.15f, 0.0f);
 		NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _CAPSULE_PRIMITIVE, 0);
 		DemoMesh* const geometry = new DemoMesh("leg", scene->GetShaderCache(), collision, D_BIPED_TEXTURE_NAME, D_BIPED_TEXTURE_NAME, D_BIPED_TEXTURE_NAME);
 
@@ -465,14 +465,9 @@ class dBalancingBiped: public dModelRootNode
 	dMatrix m_localComFrame;
 	dVector m_localComVeloc;
 	dVector m_localGravityDir;
-	//dVector m_localSuportCenter;
-	//dVector m_supportPolygon[32];
 	dBalacingCharacterEffector* m_leftFoot;
 	dBalacingCharacterEffector* m_rightFoot;
 	dBalanceController m_balanceController;
-
-	//int m_supportPolygonPoints;
-	//bool m_polygonIsValid;
 };
 
 
