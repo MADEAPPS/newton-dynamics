@@ -429,7 +429,6 @@ class dgWorld
 	
 	void PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex);	
 	void ProcessContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex);
-	void ProcessCachedContacts (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex) const;
 
 	void ConvexContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;
 	void CompoundContacts (dgBroadPhase::dgPair* const pair, dgCollisionParamProxy& proxy) const;

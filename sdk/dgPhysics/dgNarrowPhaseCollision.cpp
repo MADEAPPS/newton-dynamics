@@ -447,13 +447,9 @@ dgInt32 dgWorld::ClosestPoint(const dgCollisionInstance* const collisionSrcA, co
 	collideBodyB.m_collision = &collisionB;
 	collisionB.SetGlobalMatrix (collisionB.GetLocalMatrix() * matrixB);
 
-
 	dgContactMaterial material;
 	material.m_penetration = dgFloat32 (0.0f);
-
 	dgContact contactJoint (this, &material, &collideBodyB, &collideBodyA);
-//	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
-
 	dgCollisionParamProxy proxy(&contactJoint, contacts, threadIndex, false, false);
 
 	proxy.m_body0 = &collideBodyA;
@@ -516,9 +512,7 @@ bool dgWorld::IntersectionTest (const dgCollisionInstance* const collisionSrcA, 
 
 	dgContactMaterial material; 
 	material.m_penetration = dgFloat32 (0.0f);
-
 	dgContact contactJoint (this, &material, &collideBodyB, &collideBodyA);
-//	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
 
 	dgBroadPhase::dgPair pair;
 	pair.m_contactCount = 0;
@@ -602,7 +596,6 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 	//dgFloat32 maxPenetration = dgFloat32(0.0f);
 	for (dgInt32 i = 0; i < count; i++) {
 		array[i] = matrix.UntransformVector(contactArray[i].m_point) & xyMask;
-	//	maxPenetration = dgMax (maxPenetration, contactArray[i].m_penetration);
 	}
 
 	dgInt32 i0 = PruneSupport(count, dgCollisionContactCloud::m_pruneSupportX, array);
@@ -742,8 +735,6 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 	dgConvexFaceNode* ptr = hullPoint;
 	do {
 		contactArray[hullCount] = ptr->m_contact;
-		//contactArray[hullCount].m_normal = averageNormal;
-		//contactArray[hullCount].m_penetration = maxPenetration;
 		hullCount ++;
 		ptr = ptr->m_next;
 	} while (ptr != hullPoint);
@@ -1251,51 +1242,6 @@ dgInt32 dgWorld::PruneContactsByRank(dgInt32 count, dgCollisionParamProxy& proxy
 	return maxCount;
 }
 
-
-void dgWorld::ProcessCachedContacts (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex) const
-{
-	dgAssert (contact);
-	dgAssert (contact->m_body0);
-	dgAssert (contact->m_body1);
-	dgAssert (contact->m_material);
-	dgAssert (contact->m_body0 != contact->m_body1);
-
-	dgList<dgContactMaterial>& list = *contact;
-	const dgContactMaterial* const material = contact->m_material;
-
-	dgList<dgContactMaterial>::dgListNode* nextContactNode;
-	for (dgList<dgContactMaterial>::dgListNode *contactNode = list.GetFirst(); contactNode; contactNode = nextContactNode) {
-		nextContactNode = contactNode->GetNext();
-		dgContactMaterial& contactMaterial = contactNode->GetInfo();
-
-		dgAssert (dgCheckFloat(contactMaterial.m_point.m_x));
-		dgAssert (dgCheckFloat(contactMaterial.m_point.m_y));
-		dgAssert (dgCheckFloat(contactMaterial.m_point.m_z));
-		dgAssert (contactMaterial.m_body0);
-		dgAssert (contactMaterial.m_body1);
-		dgAssert (contactMaterial.m_collision0);
-		dgAssert (contactMaterial.m_collision1);
-		dgAssert (contactMaterial.m_body0 == contact->m_body0);
-		dgAssert (contactMaterial.m_body1 == contact->m_body1);
-		//dgAssert (contactMaterial.m_userId != 0xffffffff);
-
-		contactMaterial.m_softness = material->m_softness;
-		contactMaterial.m_restitution = material->m_restitution;
-		contactMaterial.m_staticFriction0 = material->m_staticFriction0;
-		contactMaterial.m_staticFriction1 = material->m_staticFriction1;
-		contactMaterial.m_dynamicFriction0 = material->m_dynamicFriction0;
-		contactMaterial.m_dynamicFriction1 = material->m_dynamicFriction1;
-
-		contactMaterial.m_flags = dgContactMaterial::m_collisionEnable | (material->m_flags & (dgContactMaterial::m_friction0Enable | dgContactMaterial::m_friction1Enable));
-		contactMaterial.m_userData = material->m_userData;
-	}
-
-	contact->m_maxDOF = dgUnsigned32 (3 * contact->GetCount());
-	if (material->m_processContactPoint) {
-		material->m_processContactPoint(*contact, timestep, threadIndex);
-	}
-}
-
 void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex)
 {
 	dgContact* const contact = pair->m_contact;
@@ -1362,10 +1308,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 	}
 
 	dgFloat32 maxImpulse = dgFloat32 (-1.0f);
-//	dgFloat32 breakImpulse0 = dgFloat32 (0.0f);
-//	dgFloat32 breakImpulse1 = dgFloat32 (0.0f);
 	for (dgInt32 i = 0; i < contactCount; i ++) {
-
 		dgList<dgContactMaterial>::dgListNode* contactNode = NULL;
 		dgFloat32 min = dgFloat32 (1.0e20f);
 		dgInt32 index = -1;
@@ -1421,12 +1364,6 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 
 		dgAssert (dgAbs(contactMaterial->m_normal.DotProduct(contactMaterial->m_normal).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-1f));
 
-		//contactMaterial.m_collisionEnable = true;
-		//contactMaterial.m_friction0Enable = material->m_friction0Enable;
-		//contactMaterial.m_friction1Enable = material->m_friction1Enable;
-		//contactMaterial.m_override0Accel = false;
-		//contactMaterial.m_override1Accel = false;
-		//contactMaterial.m_overrideNormalAccel = false;
 		contactMaterial->m_flags = dgContactMaterial::m_collisionEnable | (material->m_flags & (dgContactMaterial::m_friction0Enable | dgContactMaterial::m_friction1Enable));
 		contactMaterial->m_userData = material->m_userData;
 
@@ -1456,8 +1393,6 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 			dgFloat32 impulse = relReloc.DotProduct(contactMaterial->m_normal).GetScalar();
 			if (dgAbs (impulse) > maxImpulse) {
 				maxImpulse = dgAbs (impulse); 
-//				breakImpulse0 = contactMaterial->m_collision0->GetBreakImpulse();
-//				breakImpulse1 = contactMaterial->m_collision1->GetBreakImpulse();
 			}
 			
 			dgVector tangentDir (relReloc - contactMaterial->m_normal.Scale (impulse));
@@ -1484,9 +1419,6 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		dgAssert (contactMaterial->m_dir0.m_w == dgFloat32 (0.0f));
 		dgAssert (contactMaterial->m_dir0.m_w == dgFloat32 (0.0f));
 		dgAssert (contactMaterial->m_normal.m_w == dgFloat32 (0.0f));
-		//contactMaterial->m_normal.m_w = dgFloat32 (0.0f);
-		//contactMaterial->m_dir0.m_w = dgFloat32 (0.0f); 
-		//contactMaterial->m_dir1.m_w = dgFloat32 (0.0f); 
 	}
 
 	if (count) {
@@ -1760,9 +1692,7 @@ dgInt32 dgWorld::CollideContinue (
 
 	dgContactMaterial material;
 	material.m_penetration = dgFloat32 (0.0f);
-
 	dgContact contactJoint (this, &material, &collideBodyB, &collideBodyA);
-//	contactJoint.SetBodies (&collideBodyA, &collideBodyB);
 
 	dgBroadPhase::dgPair pair;
 	pair.m_contact = &contactJoint;

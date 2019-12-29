@@ -487,24 +487,20 @@ void dgWorldDynamicUpdate::CalculateImpulseVeloc(dgJointImpulseInfo* const joint
 
 	const dgInt32 count = jointInfo->m_pairCount;
 	for (dgInt32 k = 0; k < count; k++) {
-		//dgAssert(rightHandSide[k].m_restitution >= dgFloat32(0.0f));
-		//if (rightHandSide[k].m_restitution >= dgFloat32(0.0f)) 
-		{
-			const dgRightHandSide* const rhs = &rightHandSide[k];
-			const dgLeftHandSide* const row = &leftHandSide[k];
-			const dgJacobian &jacobian0 = row->m_Jt.m_jacobianM0;
-			const dgJacobian &jacobian1 = row->m_Jt.m_jacobianM1;
+		const dgRightHandSide* const rhs = &rightHandSide[k];
+		const dgLeftHandSide* const row = &leftHandSide[k];
+		const dgJacobian &jacobian0 = row->m_Jt.m_jacobianM0;
+		const dgJacobian &jacobian1 = row->m_Jt.m_jacobianM1;
 
-			dgVector relVeloc(jacobian0.m_linear * bodyVeloc0 + jacobian0.m_angular * bodyOmega0 + jacobian1.m_linear * bodyVeloc1 + jacobian1.m_angular * bodyOmega1);
-			dgFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
-			if (rhs->m_normalForceIndex == DG_INDEPENDENT_ROW) {
-				dgAssert(rhs->m_restitution >= 0.0f);
-				dgAssert(rhs->m_restitution <= 2.0f);
-				dgFloat32 restitution = (vRel <= dgFloat32(0.0f)) ? (dgFloat32(1.0f) + rhs->m_restitution) : dgFloat32(1.0f);
-				vRel = vRel * restitution;
-			}
-			contactVeloc[k] = - vRel;
+		dgVector relVeloc(jacobian0.m_linear * bodyVeloc0 + jacobian0.m_angular * bodyOmega0 + jacobian1.m_linear * bodyVeloc1 + jacobian1.m_angular * bodyOmega1);
+		dgFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
+		if (rhs->m_normalForceIndex == DG_INDEPENDENT_ROW) {
+			dgAssert(rhs->m_restitution >= 0.0f);
+			dgAssert(rhs->m_restitution <= 2.0f);
+			dgFloat32 restitution = (vRel <= dgFloat32(0.0f)) ? (dgFloat32(1.0f) + rhs->m_restitution) : dgFloat32(1.0f);
+			vRel = vRel * restitution;
 		}
+		contactVeloc[k] = - vRel;
 	}
 }
 

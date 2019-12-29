@@ -272,15 +272,10 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	dgFloat32 restitutionCoefficient = contact.m_restitution;
 	dgFloat32 relVeloc = -(normalJacobian0.m_linear * veloc0 + normalJacobian0.m_angular * omega0 + normalJacobian1.m_linear * veloc1 + normalJacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 	dgFloat32 penetration = dgClamp (contact.m_penetration - DG_RESTING_CONTACT_PENETRATION, dgFloat32(0.0f), dgFloat32(0.5f));
-//restitutionCoefficient = 0.0f;
-//penetration = 0.0f;
 
 	dgFloat32 penetrationStiffness = MAX_PENETRATION_STIFFNESS * contact.m_softness;
 	dgFloat32 penetrationVeloc = penetration * penetrationStiffness;
 	dgAssert (dgAbs (penetrationVeloc - MAX_PENETRATION_STIFFNESS * contact.m_softness * penetration) < dgFloat32 (1.0e-6f));
-	//if (relVelocErr > REST_RELATIVE_VELOCITY) {
-	//	relVelocErr *= (restitutionCoefficient + dgFloat32 (1.0f));
-	//}
 	dgFloat32 restitutionVelocity = (relVeloc > REST_RELATIVE_VELOCITY) ? relVeloc * restitutionCoefficient : dgFloat32 (0.0f);
 	m_impulseSpeed = dgMax (m_impulseSpeed, restitutionVelocity);
 
@@ -293,7 +288,6 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	params.m_jointStiffness[normalIndex] = dgFloat32 (0.0f);
 
 	const dgFloat32 relGyro = (normalJacobian0.m_angular * m_body0->m_gyroAlpha + normalJacobian1.m_angular * m_body1->m_gyroAlpha).AddHorizontal().GetScalar();
-	//params.m_jointAccel[normalIndex] = relGyro + (relVelocErr + penetrationVeloc) * impulseOrForceScale;
 	relVeloc += dgMax (restitutionVelocity, penetrationVeloc);
 	params.m_jointAccel[normalIndex] = relGyro + relVeloc * impulseOrForceScale;
 	if (contact.m_flags & dgContactMaterial::m_overrideNormalAccel) {
@@ -431,11 +425,9 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 				}
 
 				vRel = vRel * restitution + penetrationVeloc;
-				//vRel = dgMin (MAX_SEPARATING_SPEED, vRel);
 			}
 
 			const dgFloat32 relGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
-			//dgFloat32 relGyro = dgFloat32 (0.0f);
 			rhs->m_coordenateAccel = relGyro + aRel - vRel * invTimestep;
 		}
 	}

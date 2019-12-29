@@ -151,7 +151,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Six axis manipulator", "show using inverse dynamics to control robots", SixAxisManipulators },
 	{"Hexapod walker", "show using inverse dynamics to control robots", Hexapod },
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
-	{"Balancing biped", "demonstrate self balancing rag doll biped", BalancingBiped},
+	{"Balancing  (WIP)", "demonstrate self balancing rag doll biped", BalancingBiped},
 	{"Single body car", "show a generalized coordinate system body", SingleBodyCar },
 	{"Super car", "implement a hight performance sport car", SuperCar},
 	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
@@ -332,7 +332,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showRaycastHit = true;
 //	m_showCenterOfMass = false;
 	m_showNormalForces = true;
-	m_showContactPoints = true;
+//	m_showContactPoints = true;
 //	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
 	m_showListenersDebugInfo = true;

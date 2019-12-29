@@ -94,9 +94,8 @@ class dBalancingBiped: public dModelRootNode
 			if (m_biped->CalculateSupportPolygon()) {
 				dFloat heigh = m_biped->m_localGravityDir.DotProduct3(m_biped->m_localSuportCenter);
 				dVector step (m_biped->m_localSuportCenter - m_biped->m_localGravityDir.Scale (heigh));
-				//dVector veloc (m_biped->m_localComVeloc - m_biped->m_localGravityDir.Scale (m_biped->m_localComVeloc.DotProduct3(m_biped->m_localGravityDir)));
 				dFloat dist2 = step.DotProduct3(step);
-				const dFloat maxStep = 0.05f;
+				const dFloat maxStep = 5.0e-4f;
 				if (dist2 > (maxStep * maxStep)) {
 					step = step.Normalize().Scale (maxStep);
 				}
@@ -112,9 +111,8 @@ class dBalancingBiped: public dModelRootNode
 			dMatrix bodyMatrix;
 			dMatrix effectorMatrix(effector->GetTargetMatrix());
 			NewtonBodyGetMatrix (effector->GetBody1(), &bodyMatrix[0][0]);
-			dVector xxx (bodyMatrix.TransformVector(effectorMatrix.m_posit));
 			dVector localPosition (m_biped->m_comFrame.UntransformVector (bodyMatrix.TransformVector(effectorMatrix.m_posit)));
-			localPosition -= step.Scale (0.01f);
+			localPosition -= step;
 			dVector position (bodyMatrix.UntransformVector(m_biped->m_comFrame.TransformVector(localPosition)));
 			effectorMatrix.m_posit = position;
 			effector->SetTargetMatrix(effectorMatrix);

@@ -1397,8 +1397,6 @@ void NewtonMaterialSetSurfaceThickness(const NewtonWorld* const newtonWorld, int
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
 	dgContactMaterial* const material = world->GetMaterial (dgUnsigned32 (id0), dgUnsigned32 (id1));
-
-	//material->m_skinThickness = dgMin (dgMax (thickness, dgFloat32 (0.0)), DG_MAX_COLLISION_AABB_PADDING * dgFloat32 (0.5f));
 	material->m_skinThickness = dgClamp (thickness, dgFloat32 (0.0f), DG_MAX_COLLISION_AABB_PADDING * dgFloat32 (0.5f));
 }
 
@@ -1464,9 +1462,8 @@ void NewtonMaterialSetDefaultElasticity(const NewtonWorld* const newtonWorld, in
 	Newton* const world = (Newton *)newtonWorld;
 	dgContactMaterial* const material = world->GetMaterial (dgUnsigned32 (id0), dgUnsigned32 (id1));
 
-	material->m_restitution = dgClamp (elasticCoef, dFloat(0.01f), dFloat(2.0f));
+	material->m_restitution = dgClamp (elasticCoef, dFloat(0.0f), dFloat(2.0f));
 }
-
 
 
 /*!
@@ -1979,7 +1976,7 @@ void NewtonMaterialSetContactElasticity(const NewtonMaterial* const materialHand
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
-	material->m_restitution = dgClamp (restitution, dFloat(0.01f), dFloat(2.0f));
+	material->m_restitution = dgClamp (restitution, dFloat(0.0f), dFloat(2.0f));
 }
 
 
