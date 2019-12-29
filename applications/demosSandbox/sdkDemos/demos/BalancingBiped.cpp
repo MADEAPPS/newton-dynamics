@@ -100,8 +100,12 @@ class dBalancingBiped: public dModelRootNode
 					step = step.Normalize().Scale (maxStep);
 				}
 		
-				SetEffectorPosition(m_biped->m_leftFoot, step);
-				SetEffectorPosition(m_biped->m_rightFoot, step);
+				if (m_biped->m_leftFoot) {
+					SetEffectorPosition(m_biped->m_leftFoot, step);
+				}
+				if (m_biped->m_rightFoot) {
+					SetEffectorPosition(m_biped->m_rightFoot, step);
+				}
 			}
 			return true;
 		}
@@ -134,7 +138,7 @@ class dBalancingBiped: public dModelRootNode
 	{
 		MakeHip(world, location);
 		AddUpperBody (world);
-		m_leftFoot = AddLeg (world, 0.15f);
+//		m_leftFoot = AddLeg (world, 0.15f);
 		m_rightFoot = AddLeg (world, -0.15f);
 
 		// normalize weight to 90 kilogram (about a normal human)
@@ -213,8 +217,12 @@ class dBalancingBiped: public dModelRootNode
 		}
 
 		int count = 0;
-		count += GetContactPoints (m_leftFoot->GetBody0(), &m_supportPolygon[count]);
-		count += GetContactPoints (m_rightFoot->GetBody0(), &m_supportPolygon[count]);
+		if (m_leftFoot) {
+			count += GetContactPoints (m_leftFoot->GetBody0(), &m_supportPolygon[count]);
+		}
+		if (m_rightFoot) {
+			count += GetContactPoints (m_rightFoot->GetBody0(), &m_supportPolygon[count]);
+		}
 		if (count) {
 			count = Calculate2dConvexHullProjection (count, m_supportPolygon);
 			dVector center (0.0f);
@@ -518,7 +526,7 @@ void BalancingBiped(DemoEntityManager* const scene)
 	dBalancingBipedManager* const manager = new dBalancingBipedManager(scene);
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
-	origin.m_posit.m_y += 1.2f;
+	origin.m_posit.m_y += 1.05f;
 	manager->CreateBiped(origin);
 
 	origin.m_posit.m_x = -2.5f;
