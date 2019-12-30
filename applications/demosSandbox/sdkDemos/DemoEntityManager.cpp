@@ -54,7 +54,7 @@
 //#define DEFAULT_SCENE	19		// non uniform Scaled Collision
 //#define DEFAULT_SCENE	20		// scaled mesh collision
 //#define DEFAULT_SCENE	21		// continuous collision
-#define DEFAULT_SCENE	22		// flatland Game
+//#define DEFAULT_SCENE	22		// flatland Game
 //#define DEFAULT_SCENE	23		// scene Collision
 //#define DEFAULT_SCENE	24		// simple convex fracturing 
 //#define DEFAULT_SCENE	25		// multi ray casting using the threading Job scheduler
@@ -64,7 +64,7 @@
 //#define DEFAULT_SCENE	29		// six axis manipulator
 //#define DEFAULT_SCENE	30		// hexapod Robot
 //#define DEFAULT_SCENE	31		// basic rag doll
-//#define DEFAULT_SCENE	32		// balancing biped
+#define DEFAULT_SCENE	32		// balancing biped
 //#define DEFAULT_SCENE	33		// single body vehicle
 //#define DEFAULT_SCENE	34		// super Car
 //#define DEFAULT_SCENE	35		// heavy vehicles
@@ -334,7 +334,7 @@ DemoEntityManager::DemoEntityManager ()
 	m_showNormalForces = true;
 //	m_showContactPoints = true;
 //	m_showJointDebugInfo = true;
-//	m_collisionDisplayMode = 2;
+	m_collisionDisplayMode = 2;
 	m_showListenersDebugInfo = true;
 //	m_asynchronousPhysicsUpdate = true;
 	m_solveLargeIslandInParallel = true;

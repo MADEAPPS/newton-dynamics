@@ -249,7 +249,8 @@ bool dgCollisionCompound::dgNodeBase::BoxTest (const dgOOBBTestData& data) const
 {
 	dgFloat32 separatingDistance = data.UpdateSeparatingDistance (data.m_aabbP0, data.m_aabbP1, m_p0, m_p1);
 	if (dgOverlapTest (data.m_aabbP0, data.m_aabbP1, m_p0, m_p1)) {
-		dgAssert (separatingDistance > dgFloat32 (1000.0f));
+		// this assert is in fact a bug
+		//dgAssert (separatingDistance > dgFloat32 (1000.0f));
 		dgVector origin (data.m_matrix.UntransformVector(m_origin));
 		dgVector size (data.m_absMatrix.UnrotateVector(m_size));
 		dgVector p0 (origin - size);

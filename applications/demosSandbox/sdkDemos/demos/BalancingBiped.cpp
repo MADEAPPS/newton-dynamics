@@ -114,7 +114,6 @@ class dBalancingBiped: public dModelRootNode
 
 		virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) 
 		{
-#if 1
 			dVector supportPolygon[32];
 			dVector supportPolygonCenter;
 
@@ -144,13 +143,6 @@ class dBalancingBiped: public dModelRootNode
 				debugContext->SetColor(dVector(0.0f, 1.0f, 0.0f, 0.0f));
 				debugContext->DrawPoint(centerOfGravity, 2.0f);
 			}
-#else
-			dVector p0(m_biped->m_leftFoot->GetFootComInGlobalSpace());
-			dVector p1(m_biped->m_rightFoot->GetFootComInGlobalSpace());
-			dVector supportPolygonCenter((p0 + p1).Scale(0.5f));
-			debugContext->DrawLine(p0, p1);
-			debugContext->DrawPoint(supportPolygonCenter, 4.0f);
-#endif
 		}
 
 		virtual bool Update (dFloat timestep)
@@ -405,6 +397,42 @@ class dBalancingBiped: public dModelRootNode
 		new dModelNode(torsoBody, dGetIdentityMatrix(), this);
 	}
 
+	void CreateThreePointContactFootCollision (NewtonBody* const footBody) const
+	{
+		NewtonWorld* const world = NewtonBodyGetWorld(footBody);
+		//NewtonCollision* const boxCollision = NewtonBodyGetCollision(footBody);
+
+		NewtonCollision* const sphereCollision = NewtonCreateSphere(world, 0.05f, 0, NULL);
+
+		dMatrix subShapeLocation (dGetIdentityMatrix());
+		NewtonCollision* const threePointCollision = NewtonCreateCompoundCollision(world, 0);
+		NewtonCompoundCollisionBeginAddRemove (threePointCollision);	
+
+			subShapeLocation.m_posit.m_z = 0.12f;
+			subShapeLocation.m_posit.m_x = 0.015f;
+			NewtonCollisionSetMatrix(sphereCollision, &subShapeLocation[0][0]);
+			NewtonCompoundCollisionAddSubCollision (threePointCollision, sphereCollision);	
+
+			subShapeLocation.m_posit.m_z = -0.12f;
+			subShapeLocation.m_posit.m_x = 0.015f;
+			subShapeLocation.m_posit.m_y = 0.06f;
+			NewtonCollisionSetMatrix(sphereCollision, &subShapeLocation[0][0]);
+			NewtonCompoundCollisionAddSubCollision(threePointCollision, sphereCollision);
+			
+			subShapeLocation.m_posit.m_z = -0.12f;
+			subShapeLocation.m_posit.m_x = 0.015f;
+			subShapeLocation.m_posit.m_y = -0.06f;
+			NewtonCollisionSetMatrix(sphereCollision, &subShapeLocation[0][0]);
+			NewtonCompoundCollisionAddSubCollision(threePointCollision, sphereCollision);			
+
+		NewtonCompoundCollisionEndAddRemove (threePointCollision);	
+	
+		NewtonBodySetCollision(footBody, threePointCollision);
+
+		NewtonDestroyCollision(sphereCollision);
+		NewtonDestroyCollision(threePointCollision);
+	}
+
 	dBalacingCharacterEffector* AddLeg(NewtonWorld* const world, dFloat dist)
 	{
 		dMatrix matrix;
@@ -477,6 +505,7 @@ class dBalancingBiped: public dModelRootNode
 		tiltAnkleMatrix.m_posit = anklePivot - tiltAnkleMatrix.RotateVector(anklePivot);
 		location = location * tiltAnkleMatrix;
 		NewtonBody* const footBody = CreateSimpleSolid(scene, footGeometry, 10.0f, location, footCollision, 0);
+		CreateThreePointContactFootCollision (footBody);
 
 		jointMatrix = location;
 		jointMatrix.m_posit = anklePivot;
