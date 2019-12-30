@@ -25,6 +25,7 @@ IMPLEMENT_CUSTOM_JOINT(dCustomPlane);
 
 dCustomPlane::dCustomPlane (const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomJoint(5, child, parent)
+	,m_enableControlRotation(false)
 {
 	dMatrix pinAndPivotFrame(dGrammSchmidt(normal));
 	pinAndPivotFrame.m_posit = pivot;
@@ -35,11 +36,16 @@ dCustomPlane::dCustomPlane (const dVector& pivot, const dVector& normal, NewtonB
 
 void dCustomPlane::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
+	int state;
+	callback(userData, &state, sizeof(state));
+	m_enableControlRotation ? true : false;
 }
 
 void dCustomPlane::Serialize(NewtonSerializeCallback callback, void* const userData) const
 {
 	dCustomJoint::Serialize(callback, userData);
+	int state = m_enableControlRotation ? 1 : 0;
+	callback(userData, &state, sizeof(state));
 }
 
 
@@ -69,9 +75,11 @@ void dCustomPlane::SubmitConstraints (dFloat timestep, int threadIndex)
 	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 
 	// construct an orthogonal coordinate system with these two vectors
-	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
-	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	if (m_enableControlRotation) {
+		NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up), &matrix1.m_up[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right), &matrix1.m_right[0]);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	}
 }
 

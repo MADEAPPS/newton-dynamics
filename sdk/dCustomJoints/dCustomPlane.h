@@ -27,11 +27,15 @@ class dCustomPlane: public dCustomJoint
 	CUSTOM_JOINTS_API dCustomPlane (const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomPlane();
 
+	void EnableRotattion (bool state) {m_enableControlRotation = state;}
+	bool GetEnableRotattion () const {return m_enableControlRotation;}
+
 	protected:
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
 	CUSTOM_JOINTS_API virtual void Serialize(NewtonSerializeCallback callback, void* const userData) const;
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 	
+	bool m_enableControlRotation;
 	DECLARE_CUSTOM_JOINT(dCustomPlane, dCustomJoint)
 	//DECLARE_CUSTOM_JOINT_EXPORT_IMPORT(PINT_JOINTS_API, Plane3DOF, dCustom6dof);
 };

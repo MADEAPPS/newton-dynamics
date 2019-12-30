@@ -22,6 +22,7 @@ class dPlane2dUpVector: public dCustomPlane
 	dPlane2dUpVector (const dVector& pivot, const dVector& normal, NewtonBody* const child)
 		:dCustomPlane (pivot, normal, child)
 	{
+		EnableRotattion(false);
 	}
 
 	void SubmitConstraints (dFloat timestep, int threadIndex)
@@ -29,17 +30,17 @@ class dPlane2dUpVector: public dCustomPlane
 		dMatrix matrix0;
 		dMatrix matrix1;
 
+		// add rows to fix matrix body the the plane
+		dCustomPlane::SubmitConstraints(timestep, threadIndex);
+
 		// add one row to prevent body from rotating on the plane of motion
 		CalculateGlobalMatrix(matrix0, matrix1);
 
-		dFloat pitchAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
-		NewtonUserJointAddAngularRow(m_joint, pitchAngle, &matrix1.m_front[0]);
-
-		// add rows to fix matrix body the the plane
-		dCustomPlane::SubmitConstraints(timestep, threadIndex);
+		//dFloat pitchAngle = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
+		NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), &matrix1.m_front[0]);
+		NewtonUserJointAddAngularRow(m_joint, CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), &matrix1.m_right[0]);
 	}
 };
-
 
 static void AttachLimbBody (DemoEntityManager* const scene, const dVector& dir, NewtonBody* const parent)
 {

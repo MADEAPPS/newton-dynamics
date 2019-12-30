@@ -140,7 +140,7 @@ class dBalancingBiped: public dModelRootNode
 				debugContext->DrawPoint(supportPolygonCenter, 2.0f);
 
 				dVector centerOfGravity(m_biped->m_comFrame.TransformVector(dVector(0.0f, heigh, 0.0f, 1.0f)));
-				centerOfGravity.m_y += 0.02;
+				centerOfGravity.m_y += 0.02f;
 				debugContext->SetColor(dVector(0.0f, 1.0f, 0.0f, 0.0f));
 				debugContext->DrawPoint(centerOfGravity, 2.0f);
 			}
