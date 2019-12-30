@@ -25,7 +25,7 @@ IMPLEMENT_CUSTOM_JOINT(dCustomPlane);
 
 dCustomPlane::dCustomPlane (const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomJoint(5, child, parent)
-	,m_enableControlRotation(false)
+	,m_enableControlRotation(true)
 {
 	dMatrix pinAndPivotFrame(dGrammSchmidt(normal));
 	pinAndPivotFrame.m_posit = pivot;

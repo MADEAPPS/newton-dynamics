@@ -22,7 +22,7 @@ class dPlane2dUpVector: public dCustomPlane
 	dPlane2dUpVector (const dVector& pivot, const dVector& normal, NewtonBody* const child)
 		:dCustomPlane (pivot, normal, child)
 	{
-		EnableRotattion(false);
+		EnableControlRotation(false);
 	}
 
 	void SubmitConstraints (dFloat timestep, int threadIndex)

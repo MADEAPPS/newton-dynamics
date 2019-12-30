@@ -27,8 +27,8 @@ class dCustomPlane: public dCustomJoint
 	CUSTOM_JOINTS_API dCustomPlane (const dVector& pivot, const dVector& normal, NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomPlane();
 
-	void EnableRotattion (bool state) {m_enableControlRotation = state;}
-	bool GetEnableRotattion () const {return m_enableControlRotation;}
+	void EnableControlRotation (bool state) {m_enableControlRotation = state;}
+	bool GetEnableControlRotation () const {return m_enableControlRotation;}
 
 	protected:
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData); 
