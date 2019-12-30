@@ -147,6 +147,34 @@ static NewtonBody* CreateBackground (DemoEntityManager* const scene)
 	return tableBody;
 }
 
+// demonstration how to set velocity directly 
+static void SetBodyAngularVelocity (const NewtonBody* const body, const dVector& desiredOmega, dFloat timestep)
+{
+	dMatrix bodyInertia;
+	dVector bodyOmega(0.0f);
+
+	// get body internal data
+	NewtonBodyGetOmega(body, &bodyOmega[0]);
+	NewtonBodyGetInertiaMatrix(body, &bodyInertia[0][0]);
+	
+	// calculate angular velocity error 
+	dVector omegaError (desiredOmega - bodyOmega);
+
+	// calculate impulse
+	dVector angularImpulse (bodyInertia.RotateVector(omegaError));
+
+	// apply impulse to achieve desired omega
+	dVector linearImpulse (0.0f);
+	NewtonBodyApplyImpulsePair (body, &linearImpulse[0], &angularImpulse[0], timestep);
+}
+
+static void SpecialForceAndTorque (const NewtonBody* body, dFloat timestep, int threadIndex)
+{
+	dVector omega (0, 5.0f, 0.0f, 0.0f);
+	SetBodyAngularVelocity (body, omega, timestep);
+	PhysicsApplyGravityForce (body, timestep, threadIndex);
+}
+
 static void AddPlayerBodies(DemoEntityManager* const scene, NewtonBody* const floor)
 {
 	NewtonWorld* const world = scene->GetNewton();
@@ -165,6 +193,9 @@ static void AddPlayerBodies(DemoEntityManager* const scene, NewtonBody* const fl
 	location.m_posit.m_z = 15.0f;
 	for (int i = 0; i < 4; i++) {
 		NewtonBody* const capsule = CreateSimpleSolid(scene, geometry, 10.0f, location, collision, 0);
+		if (i == 1) {
+			NewtonBodySetForceAndTorqueCallback(capsule, SpecialForceAndTorque);
+		}
 
 		// constrain these object to motion on the plane only
 		dMatrix matrix;
