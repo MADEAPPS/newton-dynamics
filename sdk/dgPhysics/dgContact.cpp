@@ -29,8 +29,7 @@
 #define REST_RELATIVE_VELOCITY			dgFloat32 (1.0e-3f)
 #define MAX_DYNAMIC_FRICTION_SPEED		dgFloat32 (0.3f)
 #define MAX_PENETRATION_STIFFNESS		dgFloat32 (50.0f)
-//#define MAX_SEPARATING_SPEED			dgFloat32 (4.0f)
-
+#define DG_DIAGONAL_REGULARIZER			dgFloat32 (1.0e-3f)
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -285,7 +284,10 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 	params.m_forceBounds[normalIndex].m_low = dgFloat32 (0.0f);
 	params.m_forceBounds[normalIndex].m_normalIndex = DG_INDEPENDENT_ROW;
 	params.m_forceBounds[normalIndex].m_jointForce = (dgForceImpactPair*) &contact.m_normal_Force;
-	params.m_jointStiffness[normalIndex] = dgFloat32 (0.0f);
+	params.m_diagonalRegularizer[normalIndex] = DG_DIAGONAL_REGULARIZER;
+
+// hack soft contact 
+//params.m_diagonalRegularizer[normalIndex] = 0.05f;
 
 	const dgFloat32 relGyro = (normalJacobian0.m_angular * m_body0->m_gyroAlpha + normalJacobian1.m_angular * m_body1->m_gyroAlpha).AddHorizontal().GetScalar();
 	relVeloc += dgMax (restitutionVelocity, penetrationVeloc);
@@ -307,7 +309,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		dgFloat32 relVelocErr = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 
 		params.m_forceBounds[jacobIndex].m_normalIndex = dgInt16 ((contact.m_flags & dgContactMaterial::m_override0Friction) ? DG_INDEPENDENT_ROW : normalIndex);
-		params.m_jointStiffness[jacobIndex] = dgFloat32 (0.0f);
+		params.m_diagonalRegularizer[jacobIndex] = DG_DIAGONAL_REGULARIZER;
 
 		params.m_restitution[jacobIndex] = dgFloat32(0.0f);
 		params.m_penetration[jacobIndex] = dgFloat32(0.0f);
@@ -344,7 +346,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		dgFloat32 relVelocErr = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 
 		params.m_forceBounds[jacobIndex].m_normalIndex = dgInt16 ((contact.m_flags & dgContactMaterial::m_override1Friction) ? DG_INDEPENDENT_ROW : normalIndex);
-		params.m_jointStiffness[jacobIndex] = dgFloat32(0.0f);
+		params.m_diagonalRegularizer[jacobIndex] = DG_DIAGONAL_REGULARIZER;
 		
 		params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
 		params.m_penetration[jacobIndex] = dgFloat32 (0.0f);

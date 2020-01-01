@@ -480,8 +480,8 @@ DG_INLINE void dgSolver::BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLef
 			
 		dgFloat32 diag = tmpDiag.AddHorizontal();
 		dgAssert(diag > dgFloat32(0.0f));
-		rhs->m_diagDamp = diag * rhs->m_stiffness;
-		diag *= (dgFloat32(1.0f) + rhs->m_stiffness);
+		rhs->m_diagDamp = diag * rhs->m_diagonalRegularizer;
+		diag *= (dgFloat32(1.0f) + rhs->m_diagonalRegularizer);
 		rhs->m_invJinvMJt = dgFloat32(1.0f) / diag;
 
 		dgSoaFloat f0(rhs->m_force * preconditioner0);

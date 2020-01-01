@@ -112,24 +112,37 @@ void dCustomSlidingContact::SubmitConstraintSpringDamper(const dMatrix& matrix0,
 
 void dCustomSlidingContact::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
-	dFloat angle = m_curJointAngle.GetAngle() + m_angularOmega * timestep;
+	//dFloat angle = m_curJointAngle.GetAngle() + m_angularOmega * timestep;
+	dFloat angle = m_curJointAngle.GetAngle();
 	if (angle < m_minAngle) {
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
 		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+		NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
 
+		dFloat restoringOmega = 0.25f;
 		const dFloat invtimestep = 1.0f / timestep;
-		const dFloat speed = 0.5f * (m_minAngle - m_curJointAngle.GetAngle()) * invtimestep;
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
+		angle = m_curJointAngle.GetAngle();
+		const dFloat error0 = angle - m_minAngle;
+		const dFloat error1 = error0 + restoringOmega * timestep;
+		if (error1 > 0.0f) {
+			restoringOmega = -error0 * invtimestep;
+		}
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + restoringOmega * invtimestep;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+
 	} else if (angle > m_maxAngle) {
 		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
 		NewtonUserJointSetRowStiffness(m_joint, 1.0f);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+		NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
 
+		dFloat restoringOmega = 0.25f;
 		const dFloat invtimestep = 1.0f / timestep;
-		const dFloat speed = 0.5f * (m_maxAngle - m_curJointAngle.GetAngle()) * invtimestep;
-		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
+		const dFloat error0 = angle - m_maxAngle;
+		const dFloat error1 = error0 - restoringOmega * timestep;
+		if (error1 < 0.0f) {
+			restoringOmega = error0 * invtimestep;
+		}
+		const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) - restoringOmega / timestep;
 		NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
 	} else if (m_angularFriction != 0.0f) {

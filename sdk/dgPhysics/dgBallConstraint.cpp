@@ -31,17 +31,11 @@
 dgBallConstraint::dgBallConstraint ()
 	:dgBilateralConstraint() 
 {
-	
-//	dgBallConstraint* constraint;
-
-//	dgBallConstraintArray& array = * world;
-//	constraint = array.GetElement();
 	dgAssert ((((dgUnsigned64) &m_localMatrix0) & 15) == 0);
 	
 	m_localMatrix0 = dgGetIdentityMatrix();
 	m_localMatrix1 = dgGetIdentityMatrix();
 
-	//constraint->SetStiffness (dgFloat32 (0.5f));
 	m_maxDOF = 6;
 	m_jointUserCallback = NULL;
 	m_constId = m_ballConstraint;
@@ -53,41 +47,10 @@ dgBallConstraint::~dgBallConstraint ()
 {
 }
 
-/*
-dgBallConstraint* dgBallConstraint::Create(dgWorld* world)
-{
-	dgBallConstraint* constraint;
-
-
-	dgBallConstraintArray& array = * world;
-	constraint = array.GetElement();
-	dgAssert ((((dgUnsigned64) &constraint->m_localMatrix0) & 15) == 0);
-
-	constraint->Init();
-
-//	constraint->SetStiffness (dgFloat32 (0.5f));
-	constraint->m_maxDOF = 6;
-	constraint->m_jointUserCallback = NULL;
-	constraint->m_constId = dgBallConstraintId;
-	constraint->m_ballLimits = 0;
-	constraint->m_angles = dgVector (dgFloat32 (0.0f));
-	return constraint;
-}
-
-
-void dgBallConstraint::Remove(dgWorld* world)
-{
-	dgBallConstraintArray& array = *world;
-	dgBilateralConstraint::Remove (world);
-	array.RemoveElement (this);
-}
-*/
-
 void dgBallConstraint::SetJointParameterCallback (dgBallJointFriction callback)
 {
 	m_jointUserCallback = callback;
 }
-
 
 dgVector dgBallConstraint::GetJointAngle ()const
 {
@@ -246,7 +209,7 @@ dgUnsigned32 dgBallConstraint::JacobianDerivative (dgContraintDescritor& params)
 
 
 	dgPointParam pointData;
-    InitPointParam (pointData, m_stiffness, p0, p1);
+    InitPointParam (pointData, m_defualtDiagonalRegularizer, p0, p1);
 	CalculatePointDerivative (0, params, dir0, pointData, &m_jointForce[0]); 
 	CalculatePointDerivative (1, params, dir1, pointData, &m_jointForce[1]); 
 	CalculatePointDerivative (2, params, dir2, pointData, &m_jointForce[2]); 
@@ -259,7 +222,7 @@ dgUnsigned32 dgBallConstraint::JacobianDerivative (dgContraintDescritor& params)
 	if (m_twistLimit) {
 		if (angle.m_x > m_twistAngle) {
 			dgVector q0 (matrix0.m_posit + matrix0.m_up.Scale(MIN_JOINT_PIN_LENGTH));
-			InitPointParam (pointData, m_stiffness, q0, q0);
+			InitPointParam (pointData, m_defualtDiagonalRegularizer, q0, q0);
 
 			const dgVector& dir = matrix0.m_right;
 			CalculatePointDerivative (ret, params, dir, pointData, &m_jointForce[ret]); 
@@ -280,7 +243,7 @@ dgUnsigned32 dgBallConstraint::JacobianDerivative (dgContraintDescritor& params)
 			ret ++;
 		} else if (angle.m_x < - m_twistAngle) {
 			dgVector q0 (matrix0.m_posit + matrix0.m_up.Scale(MIN_JOINT_PIN_LENGTH));
-			InitPointParam (pointData, m_stiffness, q0, q0);
+			InitPointParam (pointData, m_defualtDiagonalRegularizer, q0, q0);
 			//dgVector dir (matrix0.m_right.Scale (-dgFloat32 (1.0f)));
 			dgVector dir (matrix0.m_right * dgVector::m_negOne);
 			CalculatePointDerivative (ret, params, dir, pointData, &m_jointForce[ret]); 
@@ -308,7 +271,7 @@ dgUnsigned32 dgBallConstraint::JacobianDerivative (dgContraintDescritor& params)
 		coneCos = matrix0.m_front.DotProduct(matrix1.m_front).GetScalar();
 		if (coneCos < m_coneAngleCos) {
 			dgVector q0 (matrix0.m_posit + matrix0.m_front.Scale(MIN_JOINT_PIN_LENGTH));
-			InitPointParam (pointData, m_stiffness, q0, q0);
+			InitPointParam (pointData, m_defualtDiagonalRegularizer, q0, q0);
 
 			dgVector tangentDir (matrix0.m_front.CrossProduct(matrix1.m_front));
 			tangentDir = tangentDir.Normalize());

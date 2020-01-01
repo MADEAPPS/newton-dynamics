@@ -7276,7 +7276,6 @@ void NewtonUserJointSetRowSpringDamperAcceleration(const NewtonJoint* const join
 	userJoint->SetSpringDamperAcceleration (rowStiffness, spring, damper);
 }
 
-
 /*!
   Set the maximum percentage of the constraint force that will be applied to the constraint row.
 
@@ -7293,7 +7292,7 @@ void NewtonUserJointSetRowStiffness(const NewtonJoint* const joint, dFloat stiff
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	NewtonUserJoint* const userJoint = (NewtonUserJoint*) joint;
-	userJoint->SetRowStiffness (stiffness);
+	userJoint->SetRowStiffness (dgFloat32 (1.0f) - stiffness);
 }
 
 /*!
@@ -7329,14 +7328,6 @@ void NewtonUserJointSetFeedbackCollectorCallback(const NewtonJoint* const joint,
 	NewtonUserJoint* const userJoint = (NewtonUserJoint*) joint;
 	return userJoint->SetUpdateFeedbackFunction (getFeedback);
 }
-
-int NewtonUserJointSubmitImmediateModeConstraint(const NewtonJoint* const joint, NewtonImmediateModeConstraint* const descriptor, dFloat timestep)
-{
-	TRACE_FUNCTION(__FUNCTION__);
-	NewtonUserJoint* const userJoint = (NewtonUserJoint*)joint;
-	return userJoint->SubmitImmediateModeConstraint(descriptor, timestep);
-}
-
 
 
 /*! @} */ // end of JointUser
@@ -7509,7 +7500,7 @@ void NewtonJointSetStiffness(const NewtonJoint* const joint, dFloat stiffness)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgConstraint* const contraint = (dgConstraint*) joint;
-	contraint->SetStiffness(stiffness);
+	contraint->SetStiffness(dgFloat32 (1.0f) - stiffness);
 }
 
 /*!
@@ -7537,7 +7528,7 @@ dFloat NewtonJointGetStiffness(const NewtonJoint* const joint)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgConstraint* const contraint = (dgConstraint*) joint;
-	return contraint->GetStiffness();
+	return dgFloat32 (1.0f) - contraint->GetStiffness();
 }
 
 /*!

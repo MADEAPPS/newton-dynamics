@@ -1307,6 +1307,9 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		dgAssert (dgAbs(controlNormal.DotProduct(controlDir0.CrossProduct(controlDir1)).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	}
 
+if (body0->m_uniqueID == 7)
+dgTrace (("frame:%d  body:%d\n", GetFrameNumber(), body0->m_uniqueID));
+
 	dgFloat32 maxImpulse = dgFloat32 (-1.0f);
 	for (dgInt32 i = 0; i < contactCount; i ++) {
 		dgList<dgContactMaterial>::dgListNode* contactNode = NULL;
@@ -1345,6 +1348,11 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		dgAssert (contactArray[i].m_collision1);
 		dgAssert (contactArray[i].m_body0 == body0);
 		dgAssert (contactArray[i].m_body1 == body1);
+
+if (body0->m_uniqueID == 7)
+dgTrace(("penetration(%f) point(%f %f %f)\n",
+contactArray[i].m_penetration,
+contactArray[i].m_point.m_x, contactArray[i].m_point.m_y, contactArray[i].m_point.m_z));
 
 		contactMaterial->m_point = contactArray[i].m_point;
 		contactMaterial->m_normal = contactArray[i].m_normal;
@@ -1433,22 +1441,6 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 	if (material->m_processContactPoint) {
 		material->m_processContactPoint(*contact, pair->m_timestep, threadIndex);
 	}
-
-/*
-	if (maxImpulse > dgFloat32 (1.0f)) {
-		maxImpulse /= (body0->m_invMass.m_w + body1->m_invMass.m_w) ;
-		if ((maxImpulse > breakImpulse0) || (maxImpulse > breakImpulse1)) {
-			GetLock(threadIndex);
-			if (maxImpulse > breakImpulse0) {
-				AddToBreakQueue (contact, body0, maxImpulse);
-			}
-			if (maxImpulse > breakImpulse1) {
-				AddToBreakQueue (contact, body1, maxImpulse);
-			}
-			ReleaseLock();
-		}
-	}
-*/
 }
 
 void dgWorld::ProcessContacts (dgBroadPhase::dgPair* const pair, dgInt32 threadIndex)

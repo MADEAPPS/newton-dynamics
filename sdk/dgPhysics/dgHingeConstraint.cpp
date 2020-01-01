@@ -162,8 +162,8 @@ dgUnsigned32 dgHingeConstraint::JacobianDerivative (dgContraintDescritor& params
 
 	dgPointParam pointDataP;
 	dgPointParam pointDataQ;
-	InitPointParam (pointDataP, m_stiffness, p0, p1);
-	InitPointParam (pointDataQ, m_stiffness, q0, q1);
+	InitPointParam (pointDataP, m_defualtDiagonalRegularizer, p0, p1);
+	InitPointParam (pointDataQ, m_defualtDiagonalRegularizer, q0, q1);
 
 	CalculatePointDerivative (0, params, dir0, pointDataP, &m_jointForce[0]); 
 	CalculatePointDerivative (1, params, dir1, pointDataP, &m_jointForce[1]); 
@@ -186,7 +186,7 @@ dgUnsigned32 dgHingeConstraint::JacobianDerivative (dgContraintDescritor& params
 				params.m_forceBounds[5].m_normalIndex = DG_INDEPENDENT_ROW;
 			}
 
-			CalculateAngularDerivative (5, params, dir0, m_stiffness, dgFloat32 (0.0f), &m_jointForce[5]);
+			CalculateAngularDerivative (5, params, dir0, m_defualtDiagonalRegularizer, dgFloat32 (0.0f), &m_jointForce[5]);
 			SetMotorAcceleration (5, axisParam.m_accel, params);
 			ret = 6;
 		}

@@ -38,10 +38,7 @@ dgUpVectorConstraint::dgUpVectorConstraint ()
 	m_localMatrix0 = dgGetIdentityMatrix();
 	m_localMatrix1 = dgGetIdentityMatrix();
 
-//	dgUpVectorConstraintArray& array = * world;
-//	constraint = array.GetElement();
-
-	SetStiffness (dgFloat32 (0.995f));
+	SetStiffness (dgFloat32 (0.0f));
 	m_maxDOF = 2;
 	m_constId = m_upVectorConstraint;
 	m_callBack = NULL;
@@ -50,36 +47,6 @@ dgUpVectorConstraint::dgUpVectorConstraint ()
 dgUpVectorConstraint::~dgUpVectorConstraint ()
 {
 }
-
-/*
-dgUpVectorConstraint* dgUpVectorConstraint::Create(dgWorld* world)
-{
-	dgUpVectorConstraint* constraint;
-//	constraint = dgUpVectorConstraintArray::GetPool().GetElement();
-
-	dgUpVectorConstraintArray& array = * world;
-	constraint = array.GetElement();
-
-	dgAssert ((((dgUnsigned64) &constraint->m_localMatrix0) & 15) == 0);
-
-	constraint->Init ();
-
-
-	constraint->SetStiffness (dgFloat32 (0.995f));
-	constraint->m_maxDOF = 2;
-	constraint->m_constId = dgUpVectorConstraintId;
-	constraint->m_callBack = NULL;
-	return constraint;
-}
-
-void dgUpVectorConstraint::Remove(dgWorld* world)
-{
-	dgUpVectorConstraintArray& array = * world;
-	dgBilateralConstraint::Remove (world);
-//	dgUpVectorConstraintArray::GetPool().RemoveElement (this);
-	array.RemoveElement (this);
-}
-*/
 
 void dgUpVectorConstraint::InitPinDir (const dgVector& pin)
 {
@@ -122,14 +89,14 @@ dgUnsigned32 dgUpVectorConstraint::JacobianDerivative (dgContraintDescritor& par
 		mag = dgSqrt (mag);
 		lateralDir = lateralDir.Scale (dgFloat32 (1.0f) / mag);
 		dgFloat32 angle = dgAsin (mag);
-		CalculateAngularDerivative (0, params, lateralDir, m_stiffness, angle, &m_jointForce[0]);
+		CalculateAngularDerivative (0, params, lateralDir, m_defualtDiagonalRegularizer, angle, &m_jointForce[0]);
 
 		dgVector frontDir (lateralDir.CrossProduct(matrix1.m_front));
-		CalculateAngularDerivative (1, params, frontDir, m_stiffness, dgFloat32 (0.0f), &m_jointForce[1]);
+		CalculateAngularDerivative (1, params, frontDir, m_defualtDiagonalRegularizer, dgFloat32 (0.0f), &m_jointForce[1]);
 		ret = 2;
 	} else {
-		CalculateAngularDerivative (0, params, matrix0.m_up, m_stiffness, 0.0, &m_jointForce[0]);
-		CalculateAngularDerivative (1, params, matrix0.m_right, m_stiffness, dgFloat32 (0.0f), &m_jointForce[1]);
+		CalculateAngularDerivative (0, params, matrix0.m_up, m_defualtDiagonalRegularizer, 0.0, &m_jointForce[0]);
+		CalculateAngularDerivative (1, params, matrix0.m_right, m_defualtDiagonalRegularizer, dgFloat32 (0.0f), &m_jointForce[1]);
 		ret = 2;
 	}
 	return dgUnsigned32 (ret);

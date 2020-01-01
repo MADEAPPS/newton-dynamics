@@ -223,8 +223,8 @@ dgUnsigned32 dgCorkscrewConstraint::JacobianDerivative (dgContraintDescritor& pa
 
 	dgPointParam pointDataP;
 	dgPointParam pointDataQ;
-	InitPointParam (pointDataP, m_stiffness, p0, p1);
-	InitPointParam (pointDataQ, m_stiffness, q0, q1);
+	InitPointParam (pointDataP, m_defualtDiagonalRegularizer, p0, p1);
+	InitPointParam (pointDataQ, m_defualtDiagonalRegularizer, q0, q1);
 
 	CalculatePointDerivative (0, params, dir1, pointDataP, &m_jointForce[0]); 
 	CalculatePointDerivative (1, params, dir2, pointDataP, &m_jointForce[1]); 
@@ -269,11 +269,7 @@ dgUnsigned32 dgCorkscrewConstraint::JacobianDerivative (dgContraintDescritor& pa
 				params.m_forceBounds[ret].m_normalIndex = DG_INDEPENDENT_ROW;
 			}
 
-//			dgVector p (p0 +  dir1);
-//			dgPointParam pointData;
-//			InitPointParam (pointData, m_stiffness, p, p);
-//			CalculatePointDerivative (ret, params, dir2, pointData, &m_jointForce[ret]); 
-			CalculateAngularDerivative (ret, params, matrix0.m_front, m_stiffness, dgFloat32 (0.0f), &m_jointForce[ret]);
+			CalculateAngularDerivative (ret, params, matrix0.m_front, m_defualtDiagonalRegularizer, dgFloat32 (0.0f), &m_jointForce[ret]);
 			SetMotorAcceleration (ret, axisParam[1].m_accel, params);
 			ret ++;
 		}

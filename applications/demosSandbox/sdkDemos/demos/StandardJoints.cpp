@@ -629,7 +629,7 @@ static void AddHingeSpringDamper (DemoEntityManager* const scene, const dVector&
 
 	// set limit on second axis
 	hinge->SetLimits (-120.0f * dDegreeToRad, 120.0f * dDegreeToRad);
-	hinge->SetAsSpringDamper(true, 0.9f, 300.0f, 1.0f);
+	hinge->SetAsSpringDamper(true, 0.8f, 300.0f, 1.0f);
 }
 
 
@@ -1319,6 +1319,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddDoubleHinge(scene, dVector(-20.0f, 0.0f, 17.0f));
 //	AddPathFollow(scene, dVector(20.0f, 0.0f, 0.0f));
 //	AddDifferential(scene, dVector(-20.0f, 0.0f, 33.0f));
+//	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
 
 #if 1
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));

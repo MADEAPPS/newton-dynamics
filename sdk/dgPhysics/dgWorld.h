@@ -295,20 +295,13 @@ class dgWorld
 	void DestroyBody(dgBody* const body);
 	void DestroyAllBodies ();
 
-//	void AddToBreakQueue (const dgContact* const contactJoint, dgBody* const body, dgFloat32 maxForce);
-
-    // modify the velocity and angular velocity of a body in such a way 
-	// that the velocity of pointPosit is increase by pointDeltaVeloc 
-	// pointVeloc and pointPosit are in world space
-//	void AddBodyImpulse (dgBody* body, const dgVector& pointDeltaVeloc, const dgVector& pointPosit);
-//	void ApplyImpulseArray (dgBody* body, dgInt32 count, dgInt32 strideInBytes, const dgFloat32* const impulseArray, const dgFloat32* const pointArray);
-
 	// apply the transform matrix to the body and recurse trough all bodies attached to this body with a 
 	// bilateral joint contact joint are ignored.
 	void BodySetMatrix (dgBody* const body, const dgMatrix& matrix);
 	
 	dgInt32 GetBodiesCount() const;
 	dgInt32 GetConstraintsCount() const;
+	dgUnsigned32 GetFrameNumber() const;
 
     dgCollisionInstance* CreateInstance (const dgCollision* const child, dgInt32 shapeID, const dgMatrix& offsetMatrix);
 
@@ -402,8 +395,6 @@ class dgWorld
 	dgFloat32 GetContactMergeTolerance() const;
 	void SetContactMergeTolerance(dgFloat32 tolerenace);
 
-//	void Sync ();
-
 	void SetSubsteps (dgInt32 subSteps);
 	dgInt32 GetSubsteps () const;
 	
@@ -467,6 +458,7 @@ class dgWorld
 	static dgInt32 CompareJointByInvMass (const dgBilateralConstraint* const jointA, const dgBilateralConstraint* const jointB, void* notUsed);
 
 	dgUnsigned32 m_numberOfSubsteps;
+	dgUnsigned32 m_frameNumber;
 	dgUnsigned32 m_dynamicsLru;
 	dgUnsigned32 m_inUpdate;
 	dgUnsigned32 m_solverIterations;
@@ -494,7 +486,6 @@ class dgWorld
 
 	void* m_userData;
 	dgMemoryAllocator* m_allocator;
-
 	
 	OnClusterUpdate m_onClusterUpdate;
 	OnCreateContact m_onCreateContact;
@@ -649,5 +640,9 @@ DG_INLINE void dgWorld::UnionSet(const dgConstraint* const joint) const
 	root0->m_disjointInfo.m_rowCount += joint->m_maxDOF;
 }
 
+DG_INLINE dgUnsigned32 dgWorld::GetFrameNumber() const
+{
+	return m_frameNumber;
+}
 
 #endif

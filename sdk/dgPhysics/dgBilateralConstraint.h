@@ -81,9 +81,9 @@ class dgBilateralConstraint: public dgConstraint
 	dgVector m_r1[DG_BILATERAL_CONTRAINT_DOF];
 	dgForceImpactPair m_jointForce[DG_BILATERAL_CONTRAINT_DOF];
 	dgFloat32 m_motorAcceleration[DG_BILATERAL_CONTRAINT_DOF];
-	dgFloat32 m_stiffness;
 	dgFloat32 m_massScaleBody0;
 	dgFloat32 m_massScaleBody1;
+	dgFloat32 m_defualtDiagonalRegularizer;
 	OnConstraintDestroy m_destructor;
 	dgBilateralConstraintList::dgListNode* m_jointNode;
 	dgInt8	  m_rowIsMotor;

@@ -463,8 +463,8 @@ DG_INLINE void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const join
 		dgWorkGroupFloat tmpDiag((weight0 * JMinvM0 * JtM0).MulAdd(weight1, JMinvM1 * JtM1));
 		dgFloat32 diag = tmpDiag.AddHorizontal();
 		dgAssert(diag > dgFloat32(0.0f));
-		rhs->m_diagDamp = diag * rhs->m_stiffness;
-		diag *= (dgFloat32(1.0f) + rhs->m_stiffness);
+		rhs->m_diagDamp = diag * rhs->m_diagonalRegularizer;
+		diag *= (dgFloat32(1.0f) + rhs->m_diagonalRegularizer);
 		rhs->m_invJinvMJt = dgFloat32(1.0f) / diag;
 
 		dgWorkGroupFloat f0(rhs->m_force * preconditioner0);

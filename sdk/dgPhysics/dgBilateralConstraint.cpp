@@ -45,11 +45,10 @@ dgBilateralConstraint::dgBilateralConstraint ()
 	m_isActive = true;
 	m_solverModel = 0;
 	m_rowIsMotor = 0;
-	m_stiffness = dgFloat32 (1.0f);
 	m_massScaleBody0 = dgFloat32 (1.0f);
 	m_massScaleBody1 = dgFloat32 (1.0f);
-
-	SetStiffness (dgFloat32 (1.0f));
+	m_defualtDiagonalRegularizer = dgFloat32 (0.0f);
+	SetStiffness (dgFloat32 (0.0f));
 
 	memset (m_jointForce, 0, sizeof (m_jointForce));
 	memset (m_motorAcceleration, 0, sizeof (m_motorAcceleration));
@@ -99,12 +98,12 @@ void dgBilateralConstraint::SetSolverModel(dgInt32 model)
 
 dgFloat32 dgBilateralConstraint::GetStiffness() const
 {
-	return m_stiffness;
+	return m_defualtDiagonalRegularizer;
 }
 
 void dgBilateralConstraint::SetStiffness(dgFloat32 stiffness)
 {
-	m_stiffness = dgClamp (stiffness, dgFloat32(0.0f), dgFloat32(1.0f));
+	m_defualtDiagonalRegularizer = dgClamp (stiffness, dgFloat32(0.0f), dgFloat32(1.0f));
 }
 
 void dgBilateralConstraint::SetDestructorCallback (OnConstraintDestroy destructor)
@@ -235,7 +234,7 @@ void dgBilateralConstraint::SetJacobianDerivative (dgInt32 index, dgContraintDes
 	desc.m_jointAccel[index] = dgFloat32 (0.0f);
 	desc.m_penetration[index] = dgFloat32 (0.0f);
 	desc.m_penetrationStiffness[index] = dgFloat32 (0.0f);
-	desc.m_jointStiffness[index] = dgFloat32 (1.0f);
+	desc.m_diagonalRegularizer[index] = m_defualtDiagonalRegularizer;
 	desc.m_forceBounds[index].m_jointForce = jointForce;
 }
 
@@ -264,8 +263,7 @@ void dgBilateralConstraint::SetSpringDamperAcceleration (dgInt32 index, dgContra
 		dgFloat32 num = ks * relPosit + kd * relVeloc + ksd * relVeloc;
 		dgFloat32 den = dt * kd + dt * ksd;
 		dgFloat32 accel = num / (dgFloat32 (1.0f) + den);
-		rowStiffness = dgClamp(rowStiffness, dgFloat32(0.0f), dgFloat32(1.0f));
-		desc.m_jointStiffness[index] = dgFloat32(1.0f) - rowStiffness / DG_PSD_DAMP_TOL;
+		desc.m_diagonalRegularizer[index] = rowStiffness;
 		SetMotorAcceleration (index, accel, desc);
 	}
 }
@@ -321,7 +319,7 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 		dgFloat32 alphaError = num / den;
 		
 		desc.m_penetration[index] = jointAngle;
-		desc.m_jointStiffness[index] = stiffness;
+		desc.m_diagonalRegularizer[index] = stiffness;
 		desc.m_jointAccel[index] = alphaError + relGyro;
 		desc.m_penetrationStiffness[index] = alphaError + relGyro;
 		desc.m_restitution[index] = dgFloat32(0.0f);
@@ -331,7 +329,7 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 	} else {
 		desc.m_penetration[index] = dgFloat32 (0.0f);
 		desc.m_restitution[index] = dgFloat32 (0.0f);
-		desc.m_jointStiffness[index] = stiffness;
+		desc.m_diagonalRegularizer[index] = stiffness;
 		desc.m_jointAccel[index] = relOmega;
 		desc.m_penetrationStiffness[index] = relOmega;;
 		desc.m_zeroRowAcceleration[index]  = dgFloat32 (0.0f);
@@ -392,7 +390,7 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 
 		const dgFloat32 relAccel = accelError + relCentr + relGyro;
 		desc.m_penetration[index] = relPosit;
-		desc.m_jointStiffness[index] = param.m_stiffness;
+		desc.m_diagonalRegularizer[index] = param.m_defualtDiagonalRegularizer;
 		desc.m_jointAccel[index] = relAccel;
 		desc.m_penetrationStiffness[index] = relAccel;
 		desc.m_restitution[index] = dgFloat32 (0.0f);
@@ -407,7 +405,7 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		const dgFloat32 relVeloc = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 
 		desc.m_penetration[index] = dgFloat32 (0.0f);
-		desc.m_jointStiffness[index] = param.m_stiffness;
+		desc.m_diagonalRegularizer[index] = param.m_defualtDiagonalRegularizer;
 		desc.m_jointAccel[index] = relVeloc;
 		desc.m_penetrationStiffness[index] = relVeloc;
 		desc.m_restitution[index] = dgFloat32 (0.0f);

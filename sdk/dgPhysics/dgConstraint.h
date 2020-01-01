@@ -117,9 +117,9 @@ class dgContraintDescritor
 	dgJacobianPair m_jacobian[DG_CONSTRAINT_MAX_ROWS];
 	dgBilateralBounds m_forceBounds[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_jointAccel[DG_CONSTRAINT_MAX_ROWS];
-	dgFloat32 m_jointStiffness[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_restitution[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_penetration[DG_CONSTRAINT_MAX_ROWS];
+	dgFloat32 m_diagonalRegularizer[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_penetrationStiffness[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_zeroRowAcceleration[DG_CONSTRAINT_MAX_ROWS];
 	dgWorld* m_world;
@@ -195,7 +195,7 @@ class dgConstraint
 		dgVector m_r1;
 		dgVector m_posit0;
 		dgVector m_posit1;
-		dgFloat32 m_stiffness;
+		dgFloat32 m_defualtDiagonalRegularizer;
 	};
 
 	protected:

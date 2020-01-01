@@ -573,7 +573,8 @@ DG_INLINE void dgSkeletonContainer::CalculateLoopMassMatrixCoefficients(dgFloat3
 		// I know I am doubling the matrix regularizer, but this makes the solution more robust.
 		dgFloat32 diagonal = element.GetScalar() + rhs_i->m_diagDamp;
 		matrixRow11[i] = diagonal + rhs_i->m_diagDamp;
-		diagDamp[i] = matrixRow11[i] * (DG_PSD_DAMP_TOL * dgFloat32(4.0f));
+		//diagDamp[i] = matrixRow11[i] * (DG_PSD_DAMP_TOL * dgFloat32(4.0f));
+		diagDamp[i] = matrixRow11[i] * dgFloat32 (4.0e-3f);
 
 		const dgInt32 m0_i = m_pairs[primaryCount + i].m_m0;
 		const dgInt32 m1_i = m_pairs[primaryCount + i].m_m1;

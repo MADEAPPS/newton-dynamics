@@ -359,7 +359,6 @@ void dAnimationJointSolver::CalculateLoopMassMatrixCoefficients()
 		dFloat diagonal = element.m_x + element.m_y + element.m_z + rhs_i->m_diagDamp;
 
 		matrixRow11[i] = diagonal + rhs_i->m_diagDamp;
-		//diagDamp[i] = matrixRow11[i] * (DG_PSD_DAMP_TOL * dFloat(4.0f));
 		for (int j = i + 1; j < auxiliaryRowCount; j++) {
 			const int jj = m_matrixRowsIndex[primaryCount + j];
 			const dComplementaritySolver::dJacobianPair* const row_j = &m_leftHandSide[jj];

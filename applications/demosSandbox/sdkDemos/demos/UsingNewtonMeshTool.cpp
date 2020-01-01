@@ -218,9 +218,11 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 
 	// make a box using low lever NetwonMesh
 	NewtonBody* const body0 = CreateSimpleBox_NewtonMesh (scene, dVector (0.0f, 2.0f, -2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 2500.0f);
+	body0;
 
 	// make a box using the dNetwonMesh Class
 	NewtonBody* const body1 = CreateSimpledBox_dNetwonMesh (scene, dVector (0.0f, 2.0f, 2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 500.0f);
+	body1;
 
 	dMatrix pinAndPivotFrame(dGetIdentityMatrix());
 	pinAndPivotFrame.m_posit = dVector(0.0f, 2.5f, 0.0f, 1.0f);

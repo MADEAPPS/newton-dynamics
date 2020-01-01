@@ -285,7 +285,6 @@ void RenderRayCastHit(NewtonWorld* const world)
 	}
 }
 
-
 void RenderNormalForces (NewtonWorld* const world)
 {
 	glDisable (GL_LIGHTING);
@@ -294,7 +293,7 @@ void RenderNormalForces (NewtonWorld* const world)
 	glColor3f(0.0f, 0.5f, 1.0f);
 	glBegin(GL_LINES);
 
-	dFloat length = 1.0f / 50.0f;
+	dFloat length = 1.0f / 200.0f;
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		RenderBodyContactsForces (body, length);
 	}

@@ -130,8 +130,8 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 		dgAssert(tmpDiag.m_w == dgFloat32(0.0f));
 		dgFloat32 diag = (tmpDiag.AddHorizontal()).GetScalar();
 		dgAssert(diag > dgFloat32(0.0f));
-		rhs->m_diagDamp = diag * rhs->m_stiffness;
-		diag *= (dgFloat32(1.0f) + rhs->m_stiffness);
+		rhs->m_diagDamp = diag * rhs->m_diagonalRegularizer;
+		diag *= (dgFloat32(1.0f) + rhs->m_diagonalRegularizer);
 		rhs->m_invJinvMJt = dgFloat32(1.0f) / diag;
 
 		dgAssert(dgCheckFloat(rhs->m_force));
@@ -1139,7 +1139,7 @@ dgFloat32 dgWorldDynamicUpdate::CalculateJointForce(const dgJointInfo* const joi
 			angularM0 = angularM0.MulAdd(row->m_Jt.m_jacobianM0.m_angular, deltaforce0);
 			linearM1 = linearM1.MulAdd(row->m_Jt.m_jacobianM1.m_linear, deltaforce1);
 			angularM1 = angularM1.MulAdd(row->m_Jt.m_jacobianM1.m_angular, deltaforce1);
-		}
+ 		}
 
 		dgVector maxAccel(accNorm);
 		const dgFloat32 tol = dgFloat32(0.5f);

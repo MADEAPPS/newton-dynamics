@@ -1184,8 +1184,6 @@ extern "C" {
 	NEWTON_API void NewtonUserJointGetGeneralRow (const NewtonJoint* const joint, int index, dFloat* const jacobian0, dFloat* const jacobian1);
 	NEWTON_API dFloat NewtonUserJointGetRowForce (const NewtonJoint* const joint, int row);
 
-	NEWTON_API int NewtonUserJointSubmitImmediateModeConstraint (const NewtonJoint* const joint, NewtonImmediateModeConstraint* const descriptor, dFloat timestep);
-
 	// **********************************************************************************************
 	//
 	// Mesh joint functions

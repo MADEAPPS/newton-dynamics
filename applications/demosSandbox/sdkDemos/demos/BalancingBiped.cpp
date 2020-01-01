@@ -143,6 +143,17 @@ class dBalancingBiped: public dModelRootNode
 				debugContext->SetColor(dVector(0.0f, 1.0f, 0.0f, 0.0f));
 				debugContext->DrawPoint(centerOfGravity, 2.0f);
 			}
+
+			//if (m_biped->m_leftFoot) {
+			//	dMatrix matrix;
+			//	NewtonBodyGetMatrix(m_biped->m_leftFoot->GetBody0(), &matrix[0][0]);
+			//	debugContext->DrawFrame(matrix);
+			//}
+			//if (m_biped->m_rightFoot) {
+			//	dMatrix matrix;
+			//	NewtonBodyGetMatrix(m_biped->m_rightFoot->GetBody0(), &matrix[0][0]);
+			//	debugContext->DrawFrame(matrix);
+			//}
 		}
 
 		virtual bool Update (dFloat timestep)
@@ -158,16 +169,21 @@ class dBalancingBiped: public dModelRootNode
 			dFloat heigh = m_biped->m_localGravityDir.DotProduct3(supportPolygonCenter);
 			dVector step(supportPolygonCenter - m_biped->m_localGravityDir.Scale(heigh));
 			dFloat dist2 = step.DotProduct3(step);
-			const dFloat maxStep = 5.0e-4f;
-			if (dist2 > (maxStep * maxStep)) {
+			const dFloat maxStep = 1.0e-3f;
+			const dFloat maxStep2 = maxStep * maxStep;
+			if (dist2 > maxStep2) {
 				step = step.Normalize().Scale(maxStep);
 			}
+			step = step.Scale (0.3f);
 
-			if (m_biped->m_leftFoot) {
-				SetEffectorPosition(m_biped->m_leftFoot, step);
-			}
-			if (m_biped->m_rightFoot) {
-				SetEffectorPosition(m_biped->m_rightFoot, step);
+			dFloat err2 = step.DotProduct3(step);
+			if (err2 > maxStep2* 0.01f) {
+				if (m_biped->m_leftFoot) {
+					SetEffectorPosition(m_biped->m_leftFoot, step);
+				}
+				if (m_biped->m_rightFoot) {
+					SetEffectorPosition(m_biped->m_rightFoot, step);
+				}
 			}
 			return true;
 		}
@@ -225,6 +241,9 @@ class dBalancingBiped: public dModelRootNode
 
 	void Update(dFloat timestep)
 	{
+static int xxx;
+//dTrace (("frame number: %d\n", xxx));
+xxx ++;
 		// initialize data
 		CaculateComAndVelocity();
 		m_balanceController.Update(timestep);
@@ -408,20 +427,42 @@ class dBalancingBiped: public dModelRootNode
 		NewtonCollision* const threePointCollision = NewtonCreateCompoundCollision(world, 0);
 		NewtonCompoundCollisionBeginAddRemove (threePointCollision);	
 
-			subShapeLocation.m_posit.m_z = 0.12f;
-			subShapeLocation.m_posit.m_x = 0.015f;
+			dFloat height = 0.012f;
+			dFloat widthSeparation = 0.05f;
+			dFloat frontSeparation = 0.11f;
+
+			#if 1
+			// tree points contacts
+			subShapeLocation.m_posit.m_z = frontSeparation;
+			subShapeLocation.m_posit.m_x = height;
+			subShapeLocation.m_posit.m_y = 0.0f;
 			NewtonCollisionSetMatrix(sphereCollision, &subShapeLocation[0][0]);
 			NewtonCompoundCollisionAddSubCollision (threePointCollision, sphereCollision);	
 
-			subShapeLocation.m_posit.m_z = -0.12f;
-			subShapeLocation.m_posit.m_x = 0.015f;
-			subShapeLocation.m_posit.m_y = 0.06f;
+			#else
+			// four points contacts
+			subShapeLocation.m_posit.m_z = frontSeparation;
+			subShapeLocation.m_posit.m_x = height;
+			subShapeLocation.m_posit.m_y = widthSeparation;
+			NewtonCollisionSetMatrix(sphereCollision, &subShapeLocation[0][0]);
+			NewtonCompoundCollisionAddSubCollision(threePointCollision, sphereCollision);
+
+			subShapeLocation.m_posit.m_z = frontSeparation;
+			subShapeLocation.m_posit.m_x = height;
+			subShapeLocation.m_posit.m_y = -widthSeparation;
+			NewtonCollisionSetMatrix(sphereCollision, &subShapeLocation[0][0]);
+			NewtonCompoundCollisionAddSubCollision(threePointCollision, sphereCollision);
+			#endif
+
+			subShapeLocation.m_posit.m_z = -frontSeparation;
+			subShapeLocation.m_posit.m_x = height;
+			subShapeLocation.m_posit.m_y = widthSeparation;
 			NewtonCollisionSetMatrix(sphereCollision, &subShapeLocation[0][0]);
 			NewtonCompoundCollisionAddSubCollision(threePointCollision, sphereCollision);
 			
-			subShapeLocation.m_posit.m_z = -0.12f;
-			subShapeLocation.m_posit.m_x = 0.015f;
-			subShapeLocation.m_posit.m_y = -0.06f;
+			subShapeLocation.m_posit.m_z = -frontSeparation;
+			subShapeLocation.m_posit.m_x = height;
+			subShapeLocation.m_posit.m_y = -widthSeparation;
 			NewtonCollisionSetMatrix(sphereCollision, &subShapeLocation[0][0]);
 			NewtonCompoundCollisionAddSubCollision(threePointCollision, sphereCollision);			
 

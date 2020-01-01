@@ -33,7 +33,6 @@
 #define	DG_SMALL_ISLAND_COUNT				32
 
 #define	DG_FREEZZING_VELOCITY_DRAG			dgFloat32 (0.9f)
-#define	DG_PSD_DAMP_TOL						dgFloat32 (1.0e-3f)
 #define	DG_SOLVER_MAX_ERROR					(DG_FREEZE_MAG * dgFloat32 (0.5f))
 
 #define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
@@ -206,13 +205,11 @@ class dgRightHandSide
 	dgFloat32 m_deltaAccel;
 	dgFloat32 m_restitution;
 
-	dgFloat32 m_stiffness;
 	dgFloat32 m_maxImpact;
 	dgFloat32 m_penetration;
+	dgFloat32 m_diagonalRegularizer;
 	dgFloat32 m_penetrationStiffness;
 
-	//dgFloat32 m_gyroAccel;
-	//dgFloat32 m_jinvMJt;
 	dgForceImpactPair* m_jointFeebackForce;
 	dgInt32 m_normalForceIndex;
 } DG_GCC_VECTOR_ALIGMENT;

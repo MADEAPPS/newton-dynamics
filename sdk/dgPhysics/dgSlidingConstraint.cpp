@@ -166,9 +166,9 @@ dgUnsigned32 dgSlidingConstraint::JacobianDerivative (dgContraintDescritor& para
 	dgPointParam pointDataP;
 	dgPointParam pointDataQ;
 	dgPointParam pointDataR;
-	InitPointParam (pointDataP, m_stiffness, p0, p1);
-	InitPointParam (pointDataQ, m_stiffness, q0, q1);
-	InitPointParam (pointDataR, m_stiffness, r0, r1);
+	InitPointParam (pointDataP, m_defualtDiagonalRegularizer, p0, p1);
+	InitPointParam (pointDataQ, m_defualtDiagonalRegularizer, q0, q1);
+	InitPointParam (pointDataR, m_defualtDiagonalRegularizer, r0, r1);
 
 	CalculatePointDerivative (0, params, dir1, pointDataP, &m_jointForce[0]); 
 	CalculatePointDerivative (1, params, dir2, pointDataP, &m_jointForce[1]); 

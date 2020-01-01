@@ -323,6 +323,7 @@ void dAnimationRagdollJoint::RigidBodyToStates()
 void dAnimationRagdollJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	dAssert(0);
+/*
 	m_rowAccel = dVector (0.0f);
 	NewtonImmediateModeConstraint descriptor;
 
@@ -358,6 +359,7 @@ void dAnimationRagdollJoint::JacobianDerivative(dComplementaritySolver::dParamIn
 	m_dof = fixdof;
 	m_count = fixdof;
 	constraintParams->m_count = fixdof;
+*/
 }
 
 void dAnimationRagdollJoint::UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const

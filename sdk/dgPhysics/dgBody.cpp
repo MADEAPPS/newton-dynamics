@@ -311,7 +311,7 @@ void dgBody::IntegrateVelocity (dgFloat32 timestep)
 	const dgFloat32 step2 = omegaMag2 * timestep * timestep;
 	const dgFloat32 speed2 = m_veloc.DotProduct(m_veloc).GetScalar() * timestep * timestep;;
 	if ((step2 > err2) || (speed2 > 100.0f)) {
-		dgTrace (("warning bodies %d v(%f %f %f) w(%f %f %f) with very high velocity or angular velocity, may be unstable\n", m_uniqueID, 
+		dgTrace (("warning bodies %d w(%f %f %f) v(%f %f %f) with very high velocity or angular velocity, may be unstable\n", m_uniqueID, 
 				   m_omega.m_x, m_omega.m_y, m_omega.m_z, m_veloc.m_x, m_veloc.m_y, m_veloc.m_z));
 		//dgAssert(0);
 	}
@@ -565,19 +565,11 @@ dgMatrix dgBody::CalculateLocalInertiaMatrix () const
 
 dgMatrix dgBody::CalculateInertiaMatrix () const
 {
-#if 0
-	dgMatrix tmp (m_matrix.Transpose4X4());
-	dgVector mass (m_mass & dgVector::m_triplexMask);
-	tmp[0] = tmp[0] * mass;
-	tmp[1] = tmp[1] * mass;
-	tmp[2] = tmp[2] * mass;
-	return dgMatrix (m_matrix.RotateVector(tmp[0]), m_matrix.RotateVector(tmp[1]), m_matrix.RotateVector(tmp[2]), dgVector::m_wOne);
-#else
 	const dgVector Ixx(m_mass[0]);
 	const dgVector Iyy(m_mass[1]);
 	const dgVector Izz(m_mass[2]);
 	return dgMatrix (m_matrix.m_front.Scale(m_matrix.m_front[0]) * Ixx +
-					 m_matrix.m_up.Scale(m_matrix.m_up[0])		  * Iyy +
+					 m_matrix.m_up.Scale(m_matrix.m_up[0])		 * Iyy +
 					 m_matrix.m_right.Scale(m_matrix.m_right[0]) * Izz,
 
 					 m_matrix.m_front.Scale(m_matrix.m_front[1]) * Ixx +
@@ -588,18 +580,10 @@ dgMatrix dgBody::CalculateInertiaMatrix () const
 					 m_matrix.m_up.Scale(m_matrix.m_up[2])       * Iyy +
 					 m_matrix.m_right.Scale(m_matrix.m_right[2]) * Izz,
 					 dgVector::m_wOne);
-#endif
 }
 
 dgMatrix dgBody::CalculateInvInertiaMatrix () const
 {
-#if 0
-	dgMatrix tmp (m_matrix.Transpose4X4());
-	tmp[0] = tmp[0] * m_invMass;
-	tmp[1] = tmp[1] * m_invMass;
-	tmp[2] = tmp[2] * m_invMass;
-	return dgMatrix (m_matrix.RotateVector(tmp[0]), m_matrix.RotateVector(tmp[1]), m_matrix.RotateVector(tmp[2]), dgVector::m_wOne);
-#else
 	const dgVector invIxx(m_invMass[0]);
 	const dgVector invIyy(m_invMass[1]);
 	const dgVector invIzz(m_invMass[2]);
@@ -615,7 +599,6 @@ dgMatrix dgBody::CalculateInvInertiaMatrix () const
 					m_matrix.m_up.Scale(m_matrix.m_up[2])		* invIyy +
 					m_matrix.m_right.Scale(m_matrix.m_right[2]) * invIzz,
 					dgVector::m_wOne);
-#endif
 }
 
 void dgBody::InvalidateCache ()

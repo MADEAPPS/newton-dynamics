@@ -259,20 +259,18 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	m_onDeserializeJointCallback = NULL;	
 
 	m_inUpdate = 0;
-	m_bodyGroupID = 0;
-	m_lastExecutionTime = 0;
-	
-	m_defualtBodyGroupID = CreateBodyGroupID();
-	m_genericLRUMark = 0;
 	m_clusterLRU = 0;
-
-	m_useParallelSolver = 1;
-
-	m_solverIterations = DG_DEFAULT_SOLVER_ITERATION_COUNT;
+	m_bodyGroupID = 0;
+	m_frameNumber = 0;
 	m_dynamicsLru = 0;
-	m_numberOfSubsteps = 1;
-		
+	m_genericLRUMark = 0;
 	m_bodiesUniqueID = 0;
+	m_numberOfSubsteps = 1;
+	m_useParallelSolver = 1;
+	m_lastExecutionTime = 0;
+	m_defualtBodyGroupID = CreateBodyGroupID();
+	m_solverIterations = DG_DEFAULT_SOLVER_ITERATION_COUNT;
+	
 	m_frictiomTheshold = dgFloat32 (0.25f);
 
 	m_userData = NULL;
@@ -898,6 +896,7 @@ void dgWorld::StepDynamics (dgFloat32 timestep)
 	dgAssert (GetThreadCount() >= 1);
 
 	m_inUpdate ++;
+	m_frameNumber ++;
 
 	D_TRACKTIME();
 	UpdateSkeletons();
