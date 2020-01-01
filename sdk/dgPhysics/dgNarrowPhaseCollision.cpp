@@ -1307,8 +1307,8 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		dgAssert (dgAbs(controlNormal.DotProduct(controlDir0.CrossProduct(controlDir1)).GetScalar() - dgFloat32 (1.0f)) < dgFloat32 (1.0e-3f));
 	}
 
-if (body0->m_uniqueID == 7)
-dgTrace (("frame:%d  body:%d\n", GetFrameNumber(), body0->m_uniqueID));
+//if (body0->m_uniqueID == 7)
+//dgTrace (("frame:%d  body:%d\n", GetFrameNumber(), body0->m_uniqueID));
 
 	dgFloat32 maxImpulse = dgFloat32 (-1.0f);
 	for (dgInt32 i = 0; i < contactCount; i ++) {
@@ -1349,10 +1349,10 @@ dgTrace (("frame:%d  body:%d\n", GetFrameNumber(), body0->m_uniqueID));
 		dgAssert (contactArray[i].m_body0 == body0);
 		dgAssert (contactArray[i].m_body1 == body1);
 
-if (body0->m_uniqueID == 7)
-dgTrace(("penetration(%f) point(%f %f %f)\n",
-contactArray[i].m_penetration,
-contactArray[i].m_point.m_x, contactArray[i].m_point.m_y, contactArray[i].m_point.m_z));
+//if (body0->m_uniqueID == 7)
+//dgTrace(("penetration(%f) point(%f %f %f)\n",
+//contactArray[i].m_penetration,
+//contactArray[i].m_point.m_x, contactArray[i].m_point.m_y, contactArray[i].m_point.m_z));
 
 		contactMaterial->m_point = contactArray[i].m_point;
 		contactMaterial->m_normal = contactArray[i].m_normal;
