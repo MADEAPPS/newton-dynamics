@@ -592,6 +592,7 @@ class dBalancingBipedManager: public dModelManager
 		NewtonMaterialSetCallbackUserData(world, material, material, this);
 		NewtonMaterialSetDefaultElasticity(world, material, material, 0.0f);
 		NewtonMaterialSetDefaultFriction(world, material, material, 0.9f, 0.9f);
+		NewtonMaterialSetCollisionCallback(world, material, material, NULL, HandleSoftContacts);
 	}
 
 	dBalancingBiped* CreateBiped (const dMatrix& location)
@@ -619,6 +620,26 @@ class dBalancingBipedManager: public dModelManager
 	{
 		dBalancingBiped* const biped = (dBalancingBiped*)model;
 		biped->Update(timestep);
+	}
+
+	static void HandleSoftContacts(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
+	{
+		// iterate over all contact point checking is a sphere shape belong to the Biped, 
+		// if so declare this a soft contact 
+		dAssert (NewtonJointIsActive(contactJoint));
+		NewtonBody* const body0 = NewtonJointGetBody0(contactJoint);
+		NewtonBody* const body1 = NewtonJointGetBody1(contactJoint);
+		for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
+			NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+
+			NewtonCollision* const shape0 = NewtonMaterialGetBodyCollidingShape (material, body0);
+			NewtonCollision* const shape1 = NewtonMaterialGetBodyCollidingShape (material, body1);
+			// this check is too simplistic but will do for this demo. 
+			// a better set up should use the Collision Material to stores application info
+			if ((NewtonCollisionGetType(shape0) == SERIALIZE_ID_SPHERE) || (NewtonCollisionGetType(shape1) == SERIALIZE_ID_SPHERE)) {
+				NewtonMaterialSetAsSoftContact (material, 0.05f, 100.0f, 5.0f);
+			}
+		}
 	}
 };
 

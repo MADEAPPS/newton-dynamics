@@ -125,14 +125,15 @@ class dgContactMaterial: public dgContactPoint
 {
 	public:
 	enum {
-		m_collisionEnable = 1<<0,
-		m_friction0Enable = 1<<1,
-		m_friction1Enable = 1<<2,
-		m_override0Accel  = 1<<3,
-		m_override1Accel  = 1<<4,
-		m_override0Friction = 1<<5,
-		m_override1Friction = 1<<6,
-		m_overrideNormalAccel = 1<<7,
+		m_isSoftContact	  = 1<<0,
+		m_collisionEnable = 1<<1,
+		m_friction0Enable = 1<<2,
+		m_friction1Enable = 1<<3,
+		m_override0Accel  = 1<<4,
+		m_override1Accel  = 1<<5,
+		m_override0Friction = 1<<6,
+		m_override1Friction = 1<<7,
+		m_overrideNormalAccel = 1<<8,
 	};
 
 	DG_MSC_VECTOR_ALIGMENT 
@@ -147,7 +148,6 @@ class dgContactMaterial: public dgContactPoint
 		dgUnsigned32 m_unused[3];
 	} DG_GCC_VECTOR_ALIGMENT;
 
-
 	typedef bool (dgApi *OnAABBOverlap) (dgContact& contactJoint, dgFloat32 timestep, dgInt32 threadIndex);
 	typedef void (dgApi *OnContactCallback) (dgContact& contactJoint, dgFloat32 timestep, dgInt32 threadIndex);
 	typedef bool (dgApi *OnCompoundCollisionPrefilter) (dgContact& contactJoint, dgFloat32 timestep, const dgBody* bodyA, const void* collisionNodeA, const dgBody* bodyB, const void* collisionNodeB, dgInt32 threadIndex);
@@ -159,6 +159,7 @@ class dgContactMaterial: public dgContactPoint
 	void SetCollisionGenerationCallback (OnContactGeneration contactGeneration); 
 	void SetCollisionCallback (OnAABBOverlap abbOvelap, OnContactCallback callback); 
 	void SetCompoundCollisionCallback (OnCompoundCollisionPrefilter abbCompounndOvelap); 
+	void SetAsSoftContact (dgFloat32 regularizer, dgFloat32 springCoef, dgFloat32 damperCoef);
 
 	dgVector m_dir0;
 	dgVector m_dir1;
@@ -233,6 +234,9 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 
 	bool EstimateCCD (dgFloat32 timestep) const;
 
+	void CalculateSoftContact(dgContraintDescritor& params, const dgContactMaterial& contact, dgInt32 normalIndex);
+	void CalculateHardContact(dgContraintDescritor& params, const dgContactMaterial& contact, dgInt32 normalIndex);
+
 	dgVector m_positAcc;
 	dgQuaternion m_rotationAcc;
 	dgVector m_separtingVector;
@@ -291,6 +295,23 @@ DG_INLINE void dgContactMaterial::SetUserData (void* const userData)
 	m_userData = userData;
 }
 
+DG_INLINE void dgContactMaterial::SetAsSoftContact(dgFloat32 regularizer, dgFloat32 springCoef, dgFloat32 damperCoef)
+{
+	dgAssert(regularizer >= 0.0f);
+	dgAssert(regularizer <= 1.0f);
+	dgAssert(springCoef >= 0.0f);
+	dgAssert(damperCoef >= 0.0f);
+
+	// re purpose some of the variable to store parameter for soft contact
+	m_flags |= m_isSoftContact;
+	m_softness = regularizer;
+}
+
+DG_INLINE const dgContactMaterial* dgContact::GetMaterial() const
+{
+	return m_material;
+}
+
 DG_INLINE bool dgContact::IsDeformable() const 
 {
 	return false;
@@ -298,11 +319,6 @@ DG_INLINE bool dgContact::IsDeformable() const
 
 DG_INLINE void dgContact::SetDestructorCallback (OnConstraintDestroy destructor)
 {
-}
-
-DG_INLINE const dgContactMaterial* dgContact::GetMaterial() const
-{
-	return m_material;
 }
 
 DG_INLINE void dgContact::SetTimeOfImpact(dgFloat32 timetoImpact)

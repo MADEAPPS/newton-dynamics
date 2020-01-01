@@ -1362,14 +1362,12 @@ void NewtonMaterialSetDefaultCollidable(const NewtonWorld* const newtonWorld, in
 	TRACE_FUNCTION(__FUNCTION__);
 	Newton* const world = (Newton *)newtonWorld;
 	dgContactMaterial* const material = world->GetMaterial (dgUnsigned32 (id0), dgUnsigned32 (id1));
-//	material->m_collisionEnable = state ? true : false;
 	if (state) {
 		material->m_flags |= dgContactMaterial::m_collisionEnable;
 	} else {
 		material->m_flags &= ~dgContactMaterial::m_collisionEnable;
 	}
 }
-
 
 /*!
   Set an imaginary thickness between the collision geometry of two colliding bodies whose physics
@@ -1435,7 +1433,7 @@ void NewtonMaterialSetDefaultFriction(const NewtonWorld* const newtonWorld, int 
 			material->m_staticFriction1 = stat;
 			material->m_dynamicFriction0 = kine;
 			material->m_dynamicFriction1 = kine;
-			material->m_flags |= dgContactMaterial::m_friction0Enable | dgContactMaterial::m_friction1Enable;
+			material->m_flags |= (dgContactMaterial::m_friction0Enable | dgContactMaterial::m_friction1Enable);
 		} else {
 			material->m_flags &= ~(dgContactMaterial::m_friction0Enable | dgContactMaterial::m_friction1Enable);
 		}
@@ -2073,6 +2071,13 @@ void NewtonMaterialSetContactNormalAcceleration(const NewtonMaterial* const mate
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
 	material->m_normal_Force.m_force = accel;
 	material->m_flags |= dgContactMaterial::m_overrideNormalAccel;
+}
+
+void NewtonMaterialSetAsSoftContact (const NewtonMaterial* const materialHandle, dFloat relaxation, dFloat springCoef, dFloat damperCoef)
+{
+	TRACE_FUNCTION(__FUNCTION__);
+	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
+	material->SetAsSoftContact (relaxation, springCoef, damperCoef);
 }
 
 /*!

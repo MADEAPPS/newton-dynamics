@@ -104,49 +104,6 @@ bool GetLastHit (dVector& posit, dVector& normal)
 	return dMousePickClass::GetLastHit(posit, normal);
 }
 
-dFloat ForceBodyAccelerationMichio (NewtonBody* const body)
-{
-	dVector reactionforce (0.0f);
-	// calcualte accelration generate by all contacts
-	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(body); joint; joint = NewtonBodyGetNextContactJoint(body, joint)) {
-		if (NewtonJointIsActive(joint)) {
-			for (void* contact = NewtonContactJointGetFirstContact(joint); contact; contact = NewtonContactJointGetNextContact(joint, contact)) {
-				dVector contactForce(0.0f);
-				NewtonMaterial* const material = NewtonContactGetMaterial(contact);
-				NewtonMaterialGetContactForce(material, body, &contactForce[0]);
-				reactionforce += contactForce;
-			}
-		}
-	}
-
-	dMatrix matrix;
-	dVector accel;
-	dVector veloc;
-
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-	dFloat mass;
-	NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-	NewtonBodyGetAcceleration(body, &accel[0]);
-	accel -= reactionforce.Scale (1.0f/mass);
-
-
-	//calculate centripetal acceleration here.
-	NewtonBodyGetMatrix(body, &matrix[0][0]);
-	dVector radius(matrix.m_posit.Scale(-1.0f));
-	radius.m_w = 0.0f;
-	dFloat radiusMag = dSqrt(radius.DotProduct3(radius));
-	dVector radiusDir (radius.Normalize());
-	
-	NewtonBodyGetVelocity(body, &veloc[0]);
-	veloc += radiusDir.Scale(veloc.DotProduct3(radiusDir));
-
-	dVector centripetalAccel(veloc.DotProduct3(veloc) / radiusMag);
-	accel += centripetalAccel;
-	return dSqrt (accel.DotProduct3(accel));
-}
-
 dVector ForceBetweenBody (NewtonBody* const body0, NewtonBody* const body1)
 {
 	dVector reactionforce (0.0f);
@@ -400,7 +357,6 @@ int PhysicsIslandUpdate (const NewtonWorld* world, const void* islandHandle, int
 	//	g_activeBodies += bodyCount;
 	return 1;
 }
-
 
 void GenericContactProcess (const NewtonJoint* contactJoint, dFloat timestep, int threadIndex)
 {
@@ -1461,39 +1417,6 @@ dCustomJoint* FindJoint(const NewtonBody* const body0, const NewtonBody* const b
 {
 	NewtonJoint* const joint = NewtonWorldFindJoint(body0, body1);
 	return joint ? (dCustomJoint*)NewtonJointGetUserData(joint) : NULL;
-/*
-	for (NewtonJoint* joint = NewtonBodyGetFirstJoint(body0); joint; joint = NewtonBodyGetNextJoint(body0, joint)) {
-		dCustomJoint* const cJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
-		if (((body0 == cJoint->GetBody0()) && (body1 == cJoint->GetBody1())) ||
-			((body0 == cJoint->GetBody1()) && (body1 == cJoint->GetBody0()))) {
-			return cJoint;
-		}
-	}
-	dAssert(0);
-	return NULL;
-*/
 }
 
 
-void SetKinematicPose(NewtonBody* const body, const dMatrix& matrix1, dFloat timestep)
-{
-	dMatrix matrix0;
-	const dFloat OneOverDt = 1.0f / timestep;
-	NewtonBodyGetMatrix(body, &matrix0[0][0]);
-
-	dQuaternion q0(matrix0);
-	dQuaternion q1(matrix1);
-
-	dVector omega(q0.CalcAverageOmega(q1, OneOverDt));
-//	const dFloat maxOmega = 10.0f;
-//	dFloat mag2 = omega.DotProduct3(omega);
-//	if (mag2 > maxOmega) {
-//		omega = omega.Normalize().Scale(maxOmega);
-//	}
-
-	dVector veloc ((matrix1.m_posit - matrix0.m_posit).Scale (OneOverDt));
-
-	NewtonBodySetVelocity(body, &veloc[0]);
-	NewtonBodySetOmega(body, &omega[0]);
-	NewtonBodyIntegrateVelocity(body, timestep);
-}

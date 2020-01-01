@@ -617,13 +617,14 @@ extern "C" {
 	NEWTON_API dFloat NewtonMaterialGetContactMaxNormalImpact (const NewtonMaterial* const material);
 	NEWTON_API dFloat NewtonMaterialGetContactMaxTangentImpact (const NewtonMaterial* const material, int index);
 	NEWTON_API dFloat NewtonMaterialGetContactPenetration (const NewtonMaterial* const material);
+	NEWTON_API void NewtonMaterialSetAsSoftContact (const NewtonMaterial* const material, dFloat relaxation, dFloat springCoef, dFloat damperCoef);
 		
 	NEWTON_API void NewtonMaterialSetContactSoftness (const NewtonMaterial* const material, dFloat softness);
 	NEWTON_API void NewtonMaterialSetContactThickness (const NewtonMaterial* const material, dFloat thickness);
 	NEWTON_API void NewtonMaterialSetContactElasticity (const NewtonMaterial* const material, dFloat restitution);
 	NEWTON_API void NewtonMaterialSetContactFrictionState (const NewtonMaterial* const material, int state, int index);
 	NEWTON_API void NewtonMaterialSetContactFrictionCoef (const NewtonMaterial* const material, dFloat staticFrictionCoef, dFloat kineticFrictionCoef, int index);
-	
+		
 	NEWTON_API void NewtonMaterialSetContactNormalAcceleration (const NewtonMaterial* const material, dFloat accel);
 	NEWTON_API void NewtonMaterialSetContactNormalDirection (const NewtonMaterial* const material, const dFloat* const directionVector);
 	NEWTON_API void NewtonMaterialSetContactPosition (const NewtonMaterial* const material, const dFloat* const position);

@@ -211,7 +211,8 @@ class dgRightHandSide
 	dgFloat32 m_penetrationStiffness;
 
 	dgForceImpactPair* m_jointFeebackForce;
-	dgInt32 m_normalForceIndex;
+	dgInt16 m_normalForceIndex;
+	dgInt16 m_flags;
 } DG_GCC_VECTOR_ALIGMENT;
 
 class dgJacobianMemory

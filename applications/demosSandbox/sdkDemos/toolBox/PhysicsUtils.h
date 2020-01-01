@@ -96,16 +96,9 @@ NewtonBody* CreateInstancedSolid(DemoEntityManager* const scene, DemoEntity* con
 
 NewtonBody* AddFloorBox(DemoEntityManager* const scene, const dVector& origin, const dVector& size);
 NewtonBody* CreateLevelMesh (DemoEntityManager* const scene, const char* const levelName, bool optimized);
-
 NewtonBody* MousePickBody (NewtonWorld* const nWorld, const dVector& origin, const dVector& end, dFloat& paramter, dVector& positionOut, dVector& normalOut);
 
 void LoadLumberYardMesh(DemoEntityManager* const scene, const dVector& location, int shapeid);
-
 //void SerializationWorld (const char* const name, NewtonWorld* const world);
-
-void SetKinematicPose(NewtonBody* const body, const dMatrix& matrix1, dFloat timestep);
-
-
-dFloat ForceBodyAccelerationMichio (NewtonBody* const body);
 
 #endif

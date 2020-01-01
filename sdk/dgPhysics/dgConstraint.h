@@ -122,6 +122,7 @@ class dgContraintDescritor
 	dgFloat32 m_diagonalRegularizer[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_penetrationStiffness[DG_CONSTRAINT_MAX_ROWS];
 	dgFloat32 m_zeroRowAcceleration[DG_CONSTRAINT_MAX_ROWS];
+	dgInt8	m_flags[DG_CONSTRAINT_MAX_ROWS];
 	dgWorld* m_world;
 	dgInt32 m_threadIndex;
 	dgFloat32 m_timestep;

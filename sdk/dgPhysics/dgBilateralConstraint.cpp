@@ -197,6 +197,7 @@ dgFloat32 dgBilateralConstraint::GetRowAcceleration (dgInt32 index, dgContraintD
 void dgBilateralConstraint::SetMotorAcceleration (dgInt32 index, dgFloat32 acceleration, dgContraintDescritor& desc)
 {
 	m_rowIsMotor |= (1 << index);
+	desc.m_flags[index] = 0;
 	m_motorAcceleration[index] = acceleration;
 	desc.m_jointAccel[index] = acceleration;
 	desc.m_penetrationStiffness[index] = acceleration; 
@@ -230,6 +231,7 @@ void dgBilateralConstraint::SetJacobianDerivative (dgInt32 index, dgContraintDes
 	m_rowIsMotor |= (1 << index);
 	m_motorAcceleration[index] = dgFloat32 (0.0f);
 
+	desc.m_flags[index] = 0;
 	desc.m_restitution[index] = dgFloat32 (0.0f);
 	desc.m_jointAccel[index] = dgFloat32 (0.0f);
 	desc.m_penetration[index] = dgFloat32 (0.0f);
@@ -318,6 +320,7 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 		dgFloat32 den = dgFloat32 (1.0f) + dt * kd + dt * ksd;
 		dgFloat32 alphaError = num / den;
 		
+		desc.m_flags[index] = 0;
 		desc.m_penetration[index] = jointAngle;
 		desc.m_diagonalRegularizer[index] = stiffness;
 		desc.m_jointAccel[index] = alphaError + relGyro;
@@ -327,6 +330,7 @@ void dgBilateralConstraint::CalculateAngularDerivative (dgInt32 index, dgContrai
 		desc.m_zeroRowAcceleration[index] = relOmega * desc.m_invTimestep + relGyro;
 
 	} else {
+		desc.m_flags[index] = 0;
 		desc.m_penetration[index] = dgFloat32 (0.0f);
 		desc.m_restitution[index] = dgFloat32 (0.0f);
 		desc.m_diagonalRegularizer[index] = stiffness;
@@ -389,6 +393,7 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		const dgFloat32 accelError = num / den;
 
 		const dgFloat32 relAccel = accelError + relCentr + relGyro;
+		desc.m_flags[index] = 0;
 		desc.m_penetration[index] = relPosit;
 		desc.m_diagonalRegularizer[index] = param.m_defualtDiagonalRegularizer;
 		desc.m_jointAccel[index] = relAccel;
@@ -404,6 +409,7 @@ void dgBilateralConstraint::CalculatePointDerivative (dgInt32 index, dgContraint
 		const dgVector& omega1 = m_body1->m_omega;
 		const dgFloat32 relVeloc = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 
+		desc.m_flags[index] = 0;
 		desc.m_penetration[index] = dgFloat32 (0.0f);
 		desc.m_diagonalRegularizer[index] = param.m_defualtDiagonalRegularizer;
 		desc.m_jointAccel[index] = relVeloc;
