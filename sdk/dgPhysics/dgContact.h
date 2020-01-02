@@ -156,22 +156,22 @@ class dgContactMaterial: public dgContactPoint
 	dgContactMaterial();
 	void* GetUserData () const; 
 	void SetUserData (void* const userData); 
+	void SetAsSoftContact (dgFloat32 regularizer);
 	void SetCollisionGenerationCallback (OnContactGeneration contactGeneration); 
 	void SetCollisionCallback (OnAABBOverlap abbOvelap, OnContactCallback callback); 
 	void SetCompoundCollisionCallback (OnCompoundCollisionPrefilter abbCompounndOvelap); 
-	void SetAsSoftContact (dgFloat32 regularizer, dgFloat32 springCoef, dgFloat32 damperCoef);
 
 	dgVector m_dir0;
 	dgVector m_dir1;
 	dgForceImpactPair m_normal_Force;
 	dgForceImpactPair m_dir0_Force;
 	dgForceImpactPair m_dir1_Force;
-	dgFloat32 m_softness;
 	dgFloat32 m_restitution;
 	dgFloat32 m_staticFriction0;
 	dgFloat32 m_staticFriction1;
 	dgFloat32 m_dynamicFriction0;
 	dgFloat32 m_dynamicFriction1;
+	dgFloat32 m_softness;
 	dgFloat32 m_skinThickness;
 	dgInt32 m_flags;
 
@@ -231,11 +231,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	void CalculatePointDerivative (dgInt32 index, dgContraintDescritor& desc, const dgVector& dir, const dgPointParam& param) const;
 
 	void SwapBodies();
-
 	bool EstimateCCD (dgFloat32 timestep) const;
-
-	void CalculateSoftContact(dgContraintDescritor& params, const dgContactMaterial& contact, dgInt32 normalIndex);
-	void CalculateHardContact(dgContraintDescritor& params, const dgContactMaterial& contact, dgInt32 normalIndex);
 
 	dgVector m_positAcc;
 	dgQuaternion m_rotationAcc;
@@ -295,16 +291,13 @@ DG_INLINE void dgContactMaterial::SetUserData (void* const userData)
 	m_userData = userData;
 }
 
-DG_INLINE void dgContactMaterial::SetAsSoftContact(dgFloat32 regularizer, dgFloat32 springCoef, dgFloat32 damperCoef)
+DG_INLINE void dgContactMaterial::SetAsSoftContact(dgFloat32 regularizer)
 {
-	dgAssert(regularizer >= 0.0f);
-	dgAssert(regularizer <= 1.0f);
-	dgAssert(springCoef >= 0.0f);
-	dgAssert(damperCoef >= 0.0f);
-
+	dgAssert(regularizer >= dgFloat32 (0.0f));
+	dgAssert(regularizer <= dgFloat32 (1.0f));
 	// re purpose some of the variable to store parameter for soft contact
 	m_flags |= m_isSoftContact;
-	m_softness = regularizer;
+	m_skinThickness = regularizer;
 }
 
 DG_INLINE const dgContactMaterial* dgContact::GetMaterial() const

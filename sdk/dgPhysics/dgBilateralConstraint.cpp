@@ -429,14 +429,9 @@ void dgBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* con
 	const dgVector& gyroAlpha0 = m_body0->m_gyroAlpha;
 	const dgVector& gyroAlpha1 = m_body1->m_gyroAlpha;
 
-// remember the impulse branch 
-//dgAssert (params->m_timeStep > dgFloat32 (0.0f));
-
 	dgRightHandSide* const rhs = params->m_rightHandSide;
 	const dgLeftHandSide* const row = params->m_leftHandSide;
 	if (params->m_timeStep > dgFloat32 (0.0f)) {
-		//const dgFloat32 ks = DG_POS_DAMP * dgFloat32 (0.25f);
-		//const dgFloat32 kd = DG_VEL_DAMP * dgFloat32 (4.0f);
 		const dgFloat32 ks = DG_POS_DAMP * dgFloat32 (0.5f);
 		const dgFloat32 kd = DG_VEL_DAMP * dgFloat32 (4.0f);
 		const dgFloat32 dt = params->m_timeStep;

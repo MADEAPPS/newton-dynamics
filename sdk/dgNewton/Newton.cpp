@@ -2073,11 +2073,11 @@ void NewtonMaterialSetContactNormalAcceleration(const NewtonMaterial* const mate
 	material->m_flags |= dgContactMaterial::m_overrideNormalAccel;
 }
 
-void NewtonMaterialSetAsSoftContact (const NewtonMaterial* const materialHandle, dFloat relaxation, dFloat springCoef, dFloat damperCoef)
+void NewtonMaterialSetAsSoftContact (const NewtonMaterial* const materialHandle, dFloat relaxation)
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
-	material->SetAsSoftContact (relaxation, springCoef, damperCoef);
+	material->SetAsSoftContact (relaxation);
 }
 
 /*!

@@ -1364,6 +1364,7 @@ void dgWorld::PopulateContacts (dgBroadPhase::dgPair* const pair, dgInt32 thread
 		contactMaterial->m_shapeId0 = contactArray[i].m_shapeId0;
 		contactMaterial->m_shapeId1 = contactArray[i].m_shapeId1;
 		contactMaterial->m_softness = material->m_softness;
+		contactMaterial->m_skinThickness = material->m_skinThickness;
 		contactMaterial->m_restitution = material->m_restitution;
 		contactMaterial->m_staticFriction0 = material->m_staticFriction0;
 		contactMaterial->m_staticFriction1 = material->m_staticFriction1;

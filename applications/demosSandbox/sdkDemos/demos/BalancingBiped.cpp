@@ -637,7 +637,7 @@ class dBalancingBipedManager: public dModelManager
 			// this check is too simplistic but will do for this demo. 
 			// a better set up should use the Collision Material to stores application info
 			if ((NewtonCollisionGetType(shape0) == SERIALIZE_ID_SPHERE) || (NewtonCollisionGetType(shape1) == SERIALIZE_ID_SPHERE)) {
-				NewtonMaterialSetAsSoftContact (material, 0.05f, 100.0f, 5.0f);
+				NewtonMaterialSetAsSoftContact(material, 0.03f);
 			}
 		}
 	}

@@ -527,7 +527,6 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 		row->m_Jt = constraintParam.m_jacobian[i];
 		rhs->m_diagDamp = dgFloat32(0.0f);
 		rhs->m_diagonalRegularizer = dgClamp (constraintParam.m_diagonalRegularizer[i], dgFloat32(1.0e-5f), dgFloat32(1.0f));
-//		dgAssert (rhs->m_diagonalRegularizer < dgFloat32 (0.5f));
 		rhs->m_coordenateAccel = constraintParam.m_jointAccel[i];
 		rhs->m_restitution = constraintParam.m_restitution[i];
 		rhs->m_penetration = constraintParam.m_penetration[i];
@@ -535,11 +534,9 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 		rhs->m_lowerBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_low;
 		rhs->m_upperBoundFrictionCoefficent = constraintParam.m_forceBounds[i].m_upper;
 		rhs->m_jointFeebackForce = constraintParam.m_forceBounds[i].m_jointForce;
-		dgAssert (!(constraintParam.m_flags[i] & ~dgUnsigned32 (dgContactMaterial::m_isSoftContact)));
-		rhs->m_flags = constraintParam.m_flags[i];
 
 		dgAssert (constraintParam.m_forceBounds[i].m_normalIndex >= -1);
-		rhs->m_normalForceIndex = dgInt16 (constraintParam.m_forceBounds[i].m_normalIndex);
+		rhs->m_normalForceIndex = constraintParam.m_forceBounds[i].m_normalIndex;
 		rowCount++;
 	}
 

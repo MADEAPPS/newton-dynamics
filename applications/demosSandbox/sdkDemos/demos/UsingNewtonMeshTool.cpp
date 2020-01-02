@@ -206,6 +206,16 @@ static NewtonBody* CreateSimpledBox_dNetwonMesh(DemoEntityManager* const scene, 
 }
 
 
+// test soft contacts
+static void TestSoftContacts(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
+{
+	dAssert(NewtonJointIsActive(contactJoint));
+	for (void* contact = NewtonContactJointGetFirstContact(contactJoint); contact; contact = NewtonContactJointGetNextContact(contactJoint, contact)) {
+		NewtonMaterial* const material = NewtonContactGetMaterial(contact);
+		NewtonMaterialSetAsSoftContact(material, 0.5f);
+	}
+}
+
 void UsingNewtonMeshTool (DemoEntityManager* const scene)
 {
 	// load the skybox
@@ -215,6 +225,10 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 
 	NewtonSetContactMergeTolerance (scene->GetNewton(), 1.0e-3f);
+
+	// test soft contacts
+//	NewtonMaterialSetCollisionCallback(scene->GetNewton(), 0, 0, NULL, TestSoftContacts);
+//	AddPrimitiveArray (scene, 1.0f, dVector (0.0f, 1.0f, -2.0f), dVector (1.0f, 1.0f, 1.0f), 1, 1, 0.1f, _SPHERE_PRIMITIVE, 0, dGetIdentityMatrix(), 0.0f, 0.0f);
 
 	// make a box using low lever NetwonMesh
 	NewtonBody* const body0 = CreateSimpleBox_NewtonMesh (scene, dVector (0.0f, 2.0f, -2.0f), dVector (1.0f, 0.5f, 2.0f, 0.0f), 2500.0f);
@@ -233,6 +247,4 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 	dQuaternion rot;
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
-
-//	ExportScene (scene->GetNewton(), "test1.ngd");
 }
