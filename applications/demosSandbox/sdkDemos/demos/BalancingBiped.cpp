@@ -49,6 +49,22 @@ class dEffectorController
 	virtual ~dEffectorController(){}
 	virtual bool Update(dFloat timestep) = 0;
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) {}
+
+	protected:
+	dBalancingBiped* m_biped;
+};
+
+class dBehaviorState
+{
+	public:
+	dBehaviorState(dBalancingBiped* const biped): m_biped(biped){}
+	virtual ~dBehaviorState(){}
+
+	virtual void Enter(dFloat timestep) {};
+	virtual void Exit(dFloat timestep) {};
+	virtual bool Update(dFloat timestep) = 0;
+
+	protected:
 	dBalancingBiped* m_biped;
 };
 
@@ -63,6 +79,18 @@ class dBalanceController: public dEffectorController
 	private:
 	void SetEffectorPosition(dBalacingCharacterEffector* const effector, const dVector& step) const;
 };
+
+class dIdleState: public dBehaviorState
+{
+	dIdleState(dBalancingBiped* const biped):dBehaviorState(biped) {}
+	virtual ~dIdleState() {}
+
+	virtual bool Update(dFloat timestep)
+	{
+		dAssert (0);
+	}
+};
+
 
 class dBalancingBiped: public dModelRootNode
 {
@@ -93,9 +121,12 @@ class dBalancingBiped: public dModelRootNode
 	friend class dBalanceController;
 };
 
+
+
 // ********************************
 // implementation
 // ********************************
+
 dBalacingCharacterEffector::dBalacingCharacterEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace, dFloat modelMass)
 	:dCustomKinematicController(body, attachmentMatrixInGlobalSpace, referenceBody)
 	,m_origin(GetTargetMatrix())
