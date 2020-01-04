@@ -22,7 +22,6 @@
 #ifndef _DG_SOLVER_H_
 #define _DG_SOLVER_H_
 
-
 #include "dgPhysicsStdafx.h"
 #include <immintrin.h>
 
@@ -139,9 +138,6 @@
 			__m256d tmp0(_mm256_add_pd(m_low, m_high));
 			__m256d tmp1(_mm256_hadd_pd(tmp0, tmp0));
 			__m256d tmp2(_mm256_add_pd(tmp1, _mm256_permute2f128_pd(tmp1, tmp1, 1)));
-			//dgSoaFloat ret;
-			//_mm256_storeu_pd (ret.m_f, tmp2);
-			//return ret.m_f[0];
 			return *((dgFloat32*)&tmp2);
 		}
 
@@ -274,9 +270,6 @@
 			__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
 			__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
 			__m256 tmp2(_mm256_hadd_ps(tmp1, tmp1));
-			//dgSoaFloat ret;
-			//_mm256_store_ps(ret.m_f, tmp2);
-			//return ret.m_f[0];
 			return *((dgFloat32*)&tmp2);
 		}
 

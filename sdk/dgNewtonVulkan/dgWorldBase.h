@@ -39,6 +39,7 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 
 	virtual const char* GetId() const;
 	virtual dgInt32 GetScore() const;
+	virtual void FlushRegisters() const;
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
 
 	public:

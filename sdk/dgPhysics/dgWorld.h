@@ -397,6 +397,7 @@ class dgWorld
 
 	void SetSubsteps (dgInt32 subSteps);
 	dgInt32 GetSubsteps () const;
+	void FlushRegisters() const;
 	
 	private:
 	class dgAdressDistPair
@@ -643,6 +644,11 @@ DG_INLINE void dgWorld::UnionSet(const dgConstraint* const joint) const
 DG_INLINE dgUnsigned32 dgWorld::GetFrameNumber() const
 {
 	return m_frameNumber;
+}
+
+DG_INLINE void dgWorld::FlushRegisters() const
+{
+	dgWorldPluginList::FlushRegisters();
 }
 
 #endif

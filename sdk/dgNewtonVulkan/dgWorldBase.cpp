@@ -36,6 +36,7 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 
 	static dgWorldBase module(world, allocator);
 	module.m_score = 10;
+module.m_score = 0;
 	//module.InitDevice(instance, &vkAllocators);
 	dgVulkanContext& context = module.GetContext();
 	context.InitDevice(instance);
@@ -71,6 +72,12 @@ dgInt32 dgWorldBase::GetScore() const
 {
 	return m_score;
 }
+
+void dgWorldBase::FlushRegisters() const
+{
+	dgSoaFloat::FlushRegisters();
+}
+
 
 void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {

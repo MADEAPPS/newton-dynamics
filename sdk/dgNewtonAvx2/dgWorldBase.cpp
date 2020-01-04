@@ -111,6 +111,11 @@ dgInt32 dgWorldBase::GetScore() const
 	return m_score;
 }
 
+void dgWorldBase::FlushRegisters() const
+{
+	dgSoaFloat::FlushRegisters();
+}
+
 void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
 	dgSolver::CalculateJointForces(cluster, bodyArray, jointArray, timestep);

@@ -22,24 +22,17 @@
 #ifndef __DG_PROFILER_H__
 #define __DG_PROFILER_H__
 
-// uncomment out _DG_USE_PROFILER to enable detail profile captures
-// alternatively the end application can use a command line option to enable this define
-//#define _DG_USE_PROFILER
+// to make a profile build use Use CMAKE to create a profile configuration
+// or make a configuration that define macro D_PROFILER
 
 #ifdef D_PROFILER
 	#include <dProfiler.h>
-
 	#define D_TRACKTIME() dProfilerZoneScoped(__FUNCTION__)
 	#define D_SET_TRACK_NAME(trackName) dProfilerSetTrackName(trackName)
+	#define DG_TRACKTIME() D_TRACKTIME()
 #else
 	#define D_TRACKTIME() 
 	#define D_SET_TRACK_NAME(trackName)
-#endif
-
-	
-#ifdef _DG_USE_PROFILER
-	#define DG_TRACKTIME() D_TRACKTIME()
-#else
 	#define DG_TRACKTIME()
 #endif
 

@@ -31,11 +31,19 @@ class dgBodyCluster;
 class dgWorldPlugin
 {
 	public:
-	dgWorldPlugin(dgWorld* const world, dgMemoryAllocator* const allocator);
-	virtual ~dgWorldPlugin();
+	dgWorldPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
+		:m_world(world)
+		,m_allocator(allocator)
+	{
+	}
+
+	virtual ~dgWorldPlugin()
+	{
+	}
 
 	virtual const char* GetId() const = 0;
 	virtual dgInt32 GetScore() const = 0;
+	virtual void FlushRegisters() const = 0;
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep) = 0;
 
 	protected:
@@ -80,6 +88,14 @@ class dgWorldPluginList: public dgList<dgWorldPluginModulePair>
 	const char* GetPluginId(dgListNode* const plugin);
 	void SelectPlugin(dgListNode* const plugin);
 
+	void FlushRegisters() const
+	{
+		if (m_currentPlugin) {
+			dgWorldPlugin* const plugin = m_currentPlugin->GetInfo().m_plugin;
+			plugin->FlushRegisters();
+		}
+	}
+
 	private:
 	void LoadVisualStudioPlugins(const char* const path);
 	void LoadLinuxPlugins(const char* const path);
@@ -89,15 +105,6 @@ class dgWorldPluginList: public dgList<dgWorldPluginModulePair>
 };
 
 
-inline dgWorldPlugin::dgWorldPlugin(dgWorld* const world, dgMemoryAllocator* const allocator)
-	:m_world(world)
-	,m_allocator(allocator)
-{
-}
-
-inline dgWorldPlugin::~dgWorldPlugin()
-{
-}
 
 
 #endif
