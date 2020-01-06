@@ -1116,7 +1116,7 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 {
 	D_TRACKTIME();
 
-#if 0
+#if 1
 	// sequential Sidle iteration
 	const dgFloat32 sor = dgFloat32(1.125f);
 	const dgFloat32 tol2 = dgFloat32(0.25f);
