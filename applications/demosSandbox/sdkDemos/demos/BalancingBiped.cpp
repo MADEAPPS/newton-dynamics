@@ -63,6 +63,7 @@ class dBehaviorState
 	virtual void Enter(dFloat timestep) {};
 	virtual void Exit(dFloat timestep) {};
 	virtual bool Update(dFloat timestep) = 0;
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) { dAssert(0);}
 
 	protected:
 	dBalancingBiped* m_biped;
@@ -82,15 +83,71 @@ class dBalanceController: public dEffectorController
 
 class dIdleState: public dBehaviorState
 {
-	dIdleState(dBalancingBiped* const biped):dBehaviorState(biped) {}
+	public:
+	dIdleState(dBalancingBiped* const biped)
+		:dBehaviorState(biped)
+		,m_balanceController(biped)
+	{}
 	virtual ~dIdleState() {}
 
 	virtual bool Update(dFloat timestep)
 	{
-		dAssert (0);
+		return m_balanceController.Update(timestep);
 	}
+
+	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext)
+	{
+		m_balanceController.Debug(debugContext);
+	}
+
+	dBalanceController m_balanceController;
 };
 
+class dBalanceStateMachine
+{
+	public:
+	dBalanceStateMachine()
+		:m_currentState(NULL)
+		,m_states()
+		,m_statesCount(0)
+	{
+	}
+
+	~dBalanceStateMachine()
+	{
+		for (int i = 0; i < m_statesCount; i++)
+		{
+			delete m_states[i];
+		}
+	}
+
+	void Debug(dCustomJoint::dDebugDisplay* const debugContext)
+	{
+		m_currentState->Debug(debugContext);
+	}
+
+	void SetCurrent(dBehaviorState* const state)
+	{
+		m_currentState = state;
+	}
+
+	void AddState(dBehaviorState* const state)
+	{
+		m_states[m_statesCount] = state;
+		m_statesCount++;
+	}
+
+	void Update(dFloat timestep) 
+	{
+		if (m_currentState) {
+			m_currentState->Update(timestep);
+		}
+	}
+
+	dBehaviorState* m_currentState;
+	dArray<dBehaviorState*> m_states;
+	int m_statesCount;
+};
 
 class dBalancingBiped: public dModelRootNode
 {
@@ -117,7 +174,8 @@ class dBalancingBiped: public dModelRootNode
 	dVector m_localGravityDir;
 	dBalacingCharacterEffector* m_leftFoot;
 	dBalacingCharacterEffector* m_rightFoot;
-	dBalanceController m_balanceController;
+
+	dBalanceStateMachine m_stateMachine;
 	friend class dBalanceController;
 };
 
@@ -179,8 +237,6 @@ dVector dBalacingCharacterEffector::GetFootComInGlobalSpace() const
 }
 
 
-
-
 dBalancingBiped::dBalancingBiped(NewtonWorld* const world, const dMatrix& coordinateSystem, const dMatrix& location)
 	:dModelRootNode(NULL, dGetIdentityMatrix())
 	,m_comFrame(coordinateSystem)
@@ -189,7 +245,7 @@ dBalancingBiped::dBalancingBiped(NewtonWorld* const world, const dMatrix& coordi
 	,m_localGravityDir(0.0f)
 	,m_leftFoot(NULL)
 	,m_rightFoot(NULL)
-	,m_balanceController(this)
+	,m_stateMachine()
 {
 	MakeHip(world, location);
 	AddUpperBody(world);
@@ -198,6 +254,11 @@ dBalancingBiped::dBalancingBiped(NewtonWorld* const world, const dMatrix& coordi
 
 	// normalize weight to 90 kilogram (about a normal human)
 	NormalizeWeight(D_BIPED_MASS);
+
+	dIdleState* const idle = new dIdleState(this);
+	m_stateMachine.AddState(idle);
+
+	m_stateMachine.SetCurrent(idle);
 
 	//NewtonBodySetMassMatrix(GetBody(), 0.0f, 0.0f, 0.0f, 0.0f);
 }
@@ -208,8 +269,8 @@ void dBalancingBiped::Debug(dCustomJoint::dDebugDisplay* const debugContext)
 	dMatrix matrix;
 	NewtonBodyGetMatrix(GetBody(), &matrix[0][0]);
 	debugContext->DrawFrame(m_comFrame);
-	m_balanceController.Debug(debugContext);
 
+	m_stateMachine.Debug(debugContext);
 	//if (m_leftFoot) {
 	//	m_leftFoot->Debug(debugContext);
 	//}
@@ -225,9 +286,9 @@ void dBalancingBiped::Update(dFloat timestep)
 	xxx++;
 	// initialize data
 	CaculateComAndVelocity();
-	m_balanceController.Update(timestep);
+	m_stateMachine.Update(timestep);
+//	m_balanceController.Update(timestep);
 }
-
 
 int dBalancingBiped::GetContactPoints(NewtonBody* const body, dVector* const points) const
 {
