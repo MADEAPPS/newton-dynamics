@@ -1154,13 +1154,13 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 
 			dgFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
 			if (f > h) {
-				x[i] = h;
+				f = h;
 			} else if (f < l) {
-				x[i] = l;
+				f = l;
 			} else {
-				x[i] = f;
 				tolerance += r * r;
 			}
+			x[i] = f;
 			base += stride;
 		}
 	}
@@ -1173,8 +1173,6 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 	dgFloat32* const invDiag1 = dgAlloca(dgFloat32, size);
 	dgFloat32* const residual = dgAlloca(dgFloat32, size);
 
-{
-D_TRACKTIME();
 	dgInt32 rowStart = 0;
 	for (dgInt32 i = 0; i < size; i++) {
 		const int index = normalIndex[i];
@@ -1192,8 +1190,6 @@ D_TRACKTIME();
 		residual[i] = b[i] - dgDotProduct(size, row, x);
 		base += stride;
 	}
-}
-dgInt32 base = 0;
 
 	dgInt32 iterCount = 0;
 	dgFloat32 tolerance(tol2 * dgFloat32(2.0f));
