@@ -1115,6 +1115,9 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
 {
 	D_TRACKTIME();
+
+#if 0
+	// sequential Sidle iteration
 	const dgFloat32 sor = dgFloat32(1.125f);
 	const dgFloat32 tol2 = dgFloat32(0.25f);
 	const dgInt32 maxIterCount = 64;
@@ -1145,7 +1148,7 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 			dgFloat32 r = b[i] - dgDotProduct(size, row, x);
 
 			const int index = normalIndex[i];
-			const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
+			const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : dgFloat32 (1.0f);
 			const dgFloat32 l = low[i] * coefficient - x0[i];
 			const dgFloat32 h = high[i] * coefficient - x0[i];
 
@@ -1161,6 +1164,68 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 			base += stride;
 		}
 	}
+#else
+	// ready for parallelization
+	const dgFloat32 sor = dgFloat32(1.125f);
+	const dgFloat32 tol2 = dgFloat32(0.25f);
+	const dgInt32 maxIterCount = 64;
+
+	dgFloat32* const invDiag1 = dgAlloca(dgFloat32, size);
+	dgFloat32* const residual = dgAlloca(dgFloat32, size);
+
+	int rowStart = 0;
+	for (dgInt32 i = 0; i < size; i++) {
+		const int index = normalIndex[i];
+		const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
+		const dgFloat32 l = low[i] * coefficient - x0[i];
+		const dgFloat32 h = high[i] * coefficient - x0[i];;
+		x[i] = dgClamp(dgFloat32 (0.0f), l, h);
+		invDiag1[i] = dgFloat32(1.0f) / matrix[rowStart + i];
+		rowStart += stride;
+	}
+
+	dgInt32 base = 0;
+	for (dgInt32 i = 0; i < size; i++) {
+		const dgFloat32* const row = &matrix[base];
+		residual[i] = b[i] - dgDotProduct(size, row, x);
+		base += stride;
+	}
+
+	dgInt32 iterCount = 0;
+	dgFloat32 tolerance(tol2 * dgFloat32(2.0f));
+	const dgFloat32* const invDiag = invDiag1;
+	for (dgInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); k++) {
+		base = 0;
+		iterCount++;
+		tolerance = dgFloat32(0.0f);
+		for (dgInt32 i = 0; i < size; i++) {
+			const dgFloat32 r = residual[i];
+			const int index = normalIndex[i];
+			const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : dgFloat32 (1.0f);
+			const dgFloat32 l = low[i] * coefficient - x0[i];
+			const dgFloat32 h = high[i] * coefficient - x0[i];
+
+			const dgFloat32* const row = &matrix[base];
+			dgFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
+			if (f > h) {
+				f = h;
+			} else if (f < l) {
+				f = l;
+			} else {
+				tolerance += r * r;
+			}
+			const dgFloat32 dx = f - x[i];
+			x[i] = f;
+
+			if (dgAbs (dx) > dgFloat32 (1.0e-6f)) {
+				for (dgInt32 j = 0; j < size; j++) {
+					residual[j] -= row[j] * dx;
+				}
+			}
+			base += stride;
+		}
+	}
+#endif
 }
 
 void dgSkeletonContainer::SolveBlockLcp(dgInt32 size, dgInt32 blockSize, const dgFloat32* const x0, dgFloat32* const x, dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
