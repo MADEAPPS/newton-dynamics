@@ -869,7 +869,7 @@ void dgParallelBodySolver::InitSkeletons()
 {
 	if (m_skeletonCount) {
 		const dgInt32 threadCounts = m_world->GetThreadCount();
-		if (m_skeletonCount > threadCounts) {
+		if (m_skeletonCount >= threadCounts) {
 			for (dgInt32 i = 0; i < threadCounts; i++) {
 				m_world->QueueJob(InitSkeletonsKernel, this, NULL, "dgSolver::InitSkeletonsKernel");
 			}

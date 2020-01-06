@@ -1116,7 +1116,7 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 {
 	D_TRACKTIME();
 
-#if 1
+#if 0
 	// sequential Sidle iteration
 	const dgFloat32 sor = dgFloat32(1.125f);
 	const dgFloat32 tol2 = dgFloat32(0.25f);
@@ -1130,7 +1130,7 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 		const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
 		const dgFloat32 l = low[i] * coefficient - x0[i];
 		const dgFloat32 h = high[i] * coefficient - x0[i];;
-		x[i] = dgClamp(dgFloat32 (0.0f), l, h);
+		x[i] = dgClamp(dgFloat32(0.0f), l, h);
 		invDiag1[i] = dgFloat32(1.0f) / matrix[rowStart + i];
 		rowStart += stride;
 	}
@@ -1148,7 +1148,7 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 			dgFloat32 r = b[i] - dgDotProduct(size, row, x);
 
 			const int index = normalIndex[i];
-			const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : dgFloat32 (1.0f);
+			const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : dgFloat32(1.0f);
 			const dgFloat32 l = low[i] * coefficient - x0[i];
 			const dgFloat32 h = high[i] * coefficient - x0[i];
 
@@ -1173,13 +1173,15 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 	dgFloat32* const invDiag1 = dgAlloca(dgFloat32, size);
 	dgFloat32* const residual = dgAlloca(dgFloat32, size);
 
-	int rowStart = 0;
+{
+D_TRACKTIME();
+	dgInt32 rowStart = 0;
 	for (dgInt32 i = 0; i < size; i++) {
 		const int index = normalIndex[i];
 		const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
 		const dgFloat32 l = low[i] * coefficient - x0[i];
 		const dgFloat32 h = high[i] * coefficient - x0[i];;
-		x[i] = dgClamp(dgFloat32 (0.0f), l, h);
+		x[i] = dgClamp(dgFloat32(0.0f), l, h);
 		invDiag1[i] = dgFloat32(1.0f) / matrix[rowStart + i];
 		rowStart += stride;
 	}
@@ -1190,6 +1192,8 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 		residual[i] = b[i] - dgDotProduct(size, row, x);
 		base += stride;
 	}
+}
+dgInt32 base = 0;
 
 	dgInt32 iterCount = 0;
 	dgFloat32 tolerance(tol2 * dgFloat32(2.0f));
