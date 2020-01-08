@@ -33,7 +33,7 @@ class dModelManager: public dCustomParallelListener
 //	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const {};
 //	virtual void OnPostUpdate(dModelRootNode* const model, dFloat timestep) const {};
 	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep, int threadID) const {}
-	virtual void OnPostUpdate(dModelRootNode* const model, dFloat timestep, int threadID) const { dAssert (0);}
+	virtual void OnPostUpdate(dModelRootNode* const model, dFloat timestep, int threadID) const {}
 	virtual void OnUpdateTransform(const dModelNode* const bone, const dMatrix& localMatrix) const {}
 	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext) {}
 
