@@ -462,7 +462,7 @@ class dHexapodManager: public dModelManager
 		debugContext->SetScale(scale);
 	}
 
-	virtual void OnPreUpdate(dModelRootNode* const root, dFloat timestep) const
+	virtual void OnPreUpdate(dModelRootNode* const root, dFloat timestep, int threadID) const
 	{
 		if (root == m_currentController) {
 			m_currentController->ApplyControls(timestep, m_speed, m_posit_x, m_posit_y, m_roll, m_yaw, m_pitch);

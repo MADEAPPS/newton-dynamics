@@ -582,7 +582,7 @@ class ServoVehicleManagerManager: public dModelManager
 		return tractor;
 	}
 
-	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const
+	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep, int threadID) const
 	{
 		dTractorModel* const tractor = (dTractorModel*)model;
 

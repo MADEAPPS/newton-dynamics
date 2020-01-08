@@ -867,7 +867,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		excavator->OnDebug(debugContext);
 	}
 
-	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const 
+	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep, int threadID) const 
 	{
 		dExcavatorModel* const excavator = (dExcavatorModel*) model;
 

@@ -737,7 +737,7 @@ class dBalancingBipedManager: public dModelManager
 		biped->Debug (debugContext);
 	}
 
-	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const
+	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep, int threadID) const
 	{
 		dBalancingBiped* const biped = (dBalancingBiped*)model;
 		biped->Update(timestep);

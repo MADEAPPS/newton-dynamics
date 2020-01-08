@@ -99,7 +99,8 @@ void dModelManager::PreUpdate(dFloat timestep, int threadID)
 	if (node) {
 		do {
 			dModelRootNode* const model = node->GetInfo();
-			OnPreUpdate(model, timestep);
+			OnPreUpdate(model, timestep, threadID);
+//			OnPreUpdate(model, timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
 			}
@@ -121,7 +122,8 @@ void dModelManager::PostUpdate(dFloat timestep, int threadID)
 	if (node) {
 		do {
 			dModelRootNode* const model = node->GetInfo();
-			OnPostUpdate(model, timestep);
+			OnPostUpdate(model, timestep, threadID);
+//			OnPostUpdate(model, timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
 			}

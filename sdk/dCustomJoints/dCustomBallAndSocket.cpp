@@ -275,7 +275,7 @@ void dCustomBallAndSocket::SubmitAngularAxisCartisianApproximation(const dMatrix
 	if (m_options.m_option2) {
 		// two rows to restrict rotation around around the parent coordinate system
 		dFloat coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct3(matrix0.m_front), dFloat(-1.0f), dFloat(1.0f)));
-		if (coneAngle > m_maxConeAngle) {
+		//if (coneAngle > m_maxConeAngle) {
 			const dFloat angleError = GetMaxAngleError();
 			dFloat angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 			NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_up[0]);
@@ -292,7 +292,7 @@ void dCustomBallAndSocket::SubmitAngularAxisCartisianApproximation(const dMatrix
 				const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle1 / (timestep * timestep);
 				NewtonUserJointSetRowAcceleration(m_joint, alpha);
 			}
-		}
+		//}
 	}
 
 	if (m_options.m_option0) {

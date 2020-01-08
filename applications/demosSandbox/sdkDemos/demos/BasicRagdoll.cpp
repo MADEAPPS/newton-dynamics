@@ -69,7 +69,7 @@ class PassiveRagdollManager: public dModelManager
 	{
 	}
 
-	virtual void OnPreUpdate(dModelRootNode* const root, dFloat timestep) const
+	virtual void OnPreUpdate(dModelRootNode* const root, dFloat timestep, int threadID) const
 	{
 	}
 

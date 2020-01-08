@@ -415,7 +415,7 @@ class dSixAxisManager: public dModelManager
 		ent->SetMatrix(*scene, rot, localMatrix.m_posit);
 	}
 
-	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep) const 
+	virtual void OnPreUpdate(dModelRootNode* const model, dFloat timestep, int threadID) const 
 	{
 		if (model == m_currentController) {
 			m_currentController->UpdateEffectors (m_gripperPosit, m_azimuth, m_posit_x, m_posit_y, 
