@@ -158,8 +158,6 @@
 				__m256i m_lowInt;
 				__m256i m_highInt;
 			};
-			//dgInt64 m_i[DG_SOA_WORD_GROUP_SIZE];
-			//dgFloat32 m_f[DG_SOA_WORD_GROUP_SIZE];
 		};
 	} DG_GCC_AVX_ALIGMENT;
 
@@ -270,6 +268,7 @@
 			__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
 			__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
 			__m256 tmp2(_mm256_hadd_ps(tmp1, tmp1));
+			//int xxx = _mm256_cvtsi256_si32 (tmp2);
 			return *((dgFloat32*)&tmp2);
 		}
 

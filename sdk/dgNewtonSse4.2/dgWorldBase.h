@@ -42,6 +42,7 @@ class dgWorldBase: public dgWorldPlugin, public dgSolver
 	virtual dgInt32 GetScore() const;
 	virtual void FlushRegisters() const {}
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
+	virtual void SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const;
 
 	int m_score;
 	char m_hardwareDeviceName[64];

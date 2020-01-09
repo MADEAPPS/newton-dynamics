@@ -119,3 +119,107 @@ void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo*
 {
 	dgSolver::CalculateJointForces(cluster, bodyArray, jointArray, timestep);
 }
+
+
+static DG_INLINE dgFloat32 ScalarGetMax(dgFloat32 a, dgFloat32 b)
+{
+#ifdef _NEWTON_USE_DOUBLE
+	return  _mm_cvtsd_f64(_mm_max_sd(_mm_set_sd(a), _mm_set_sd(b)));
+#else
+	return  _mm_cvtss_f32(_mm_max_ss(_mm_set_ss(a), _mm_set_ss(b)));
+#endif
+}
+
+static DG_INLINE dgFloat32 ScalarGetMin(dgFloat32 a, dgFloat32 b)
+{
+#ifdef _NEWTON_USE_DOUBLE
+	return  _mm_cvtsd_f64(_mm_min_sd(_mm_set_sd(a), _mm_set_sd(b)));
+#else
+	return  _mm_cvtss_f32(_mm_min_ss(_mm_set_ss(a), _mm_set_ss(b)));
+#endif
+}
+
+static DG_INLINE dgFloat32 ScalarPredicateResidual(dgFloat32 r, dgFloat32 f, dgFloat32 max, dgFloat32 min)
+{
+#ifdef _NEWTON_USE_DOUBLE
+	__m128d f1(_mm_set_sd(f));
+	__m128d mask0(_mm_cmplt_sd(f1, _mm_set_sd(max)));
+	__m128d mask1(_mm_cmpgt_sd(f1, _mm_set_sd(min)));
+	return _mm_cvtsd_f64(_mm_and_pd(_mm_and_pd(_mm_set_sd(r), mask0), mask1));
+#else
+	__m128 mask0(_mm_cmplt_ss(_mm_set_ss(f), _mm_set_ss(max)));
+	__m128 mask1(_mm_cmpgt_ss(_mm_set_ss(f), _mm_set_ss(min)));
+	return _mm_cvtss_f32(_mm_and_ps(_mm_and_ps(_mm_set_ss(r), mask0), mask1));
+#endif
+}
+
+static DG_INLINE dgFloat32 MoveConditional(dgInt32 mask, dgFloat32 a, dgFloat32 b)
+{
+	dgAssert(mask <= 0);
+#ifdef _NEWTON_USE_DOUBLE
+	dgInt64 mask1 = dgInt64(mask) >> 63;
+	return  _mm_cvtsd_f64(_mm_xor_pd(_mm_set_sd(b), _mm_and_pd(_mm_set_sd(*(dgFloat64*)&mask1), _mm_xor_pd(_mm_set_sd(b), _mm_set_sd(a)))));
+#else
+	dgInt32 mask1 = mask >> 31;
+	return  _mm_cvtss_f32(_mm_xor_ps(_mm_set_ss(b), _mm_and_ps(_mm_set_ss(*(dgFloat32*)&mask1), _mm_xor_ps(_mm_set_ss(b), _mm_set_ss(a)))));
+#endif
+}
+
+void dgWorldBase::SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
+{
+	const dgFloat32 sor = dgFloat32(1.125f);
+	const dgFloat32 tol2 = dgFloat32(0.25f);
+	dgFloat32* const invDiag1 = dgAlloca(dgFloat32, size);
+	dgFloat32* const residual = dgAlloca(dgFloat32, size);
+
+	dgInt32 rowStart = 0;
+	const dgInt32 maxIterCount = 64;
+	for (dgInt32 i = 0; i < size; i++) {
+		const int index = normalIndex[i];
+		const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
+		const dgFloat32 l = low[i] * coefficient - x0[i];
+		const dgFloat32 h = high[i] * coefficient - x0[i];;
+		//x[i] = dgClamp(dgFloat32(0.0f), l, h);
+		x[i] = ScalarGetMax(ScalarGetMin(dgFloat32(0.0f), h), l);
+		invDiag1[i] = dgFloat32(1.0f) / matrix[rowStart + i];
+		rowStart += stride;
+	}
+
+	dgInt32 base = 0;
+	for (dgInt32 i = 0; i < size; i++) {
+		const dgFloat32* const row = &matrix[base];
+		residual[i] = b[i] - dgDotProduct(size, row, x);
+		base += stride;
+	}
+
+	dgInt32 iterCount = 0;
+	dgFloat32 tolerance(tol2 * dgFloat32(2.0f));
+	const dgFloat32* const invDiag = invDiag1;
+	for (dgInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); k++) {
+		base = 0;
+		iterCount++;
+		tolerance = dgFloat32(0.0f);
+		for (dgInt32 i = 0; i < size; i++) {
+			const dgFloat32 r = residual[i];
+			const int index = normalIndex[i];
+			const dgFloat32 coefficient = MoveConditional(index, x[i + index] + x0[i + index], dgFloat32(1.0f));
+			const dgFloat32 l = low[i] * coefficient - x0[i];
+			const dgFloat32 h = high[i] * coefficient - x0[i];
+
+			const dgFloat32* const row = &matrix[base];
+			dgFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
+			tolerance += r * ScalarPredicateResidual(r, f, h, l);
+			f = ScalarGetMax(ScalarGetMin(f, h), l);
+			const dgFloat32 dx = f - x[i];
+			x[i] = f;
+
+			if (dgAbs(dx) > dgFloat32(1.0e-6f)) {
+				for (dgInt32 j = 0; j < size; j++) {
+					residual[j] -= row[j] * dx;
+				}
+			}
+			base += stride;
+		}
+	}
+	dgSoaFloat::FlushRegisters();
+}

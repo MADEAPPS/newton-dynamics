@@ -45,6 +45,7 @@ class dgWorldPlugin
 	virtual dgInt32 GetScore() const = 0;
 	virtual void FlushRegisters() const = 0;
 	virtual void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep) = 0;
+	virtual void SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const = 0;
 
 	protected:
 	dgWorld* m_world;
