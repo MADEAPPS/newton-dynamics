@@ -162,7 +162,6 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Simple soft Body", "show simple soft body", SoftBodies},
 };
 
-
 DemoEntityManager::ButtonKey::ButtonKey (bool state)
 	:m_state(state)
 	,m_memory0(false)

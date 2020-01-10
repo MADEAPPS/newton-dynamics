@@ -21,7 +21,7 @@
 #include "HeightFieldPrimitive.h"
 
 #define ARTICULATED_VEHICLE_CAMERA_HIGH_ABOVE_HEAD		3.0f
-#define ARTICULATED_VEHICLE_CAMERA_DISTANCE				11.0f
+#define ARTICULATED_VEHICLE_CAMERA_DISTANCE				12.0f
 #define EXCAVATOR_TREAD_THICKNESS						0.13f
 
 #define EXCAVATOR_GEAR_GAIN								5.0f
@@ -847,7 +847,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		camera->SetNextMatrix(*scene, camMatrix, camOrigin);
 	}
 
-	dModelRootNode* CreateExcavator (const char* const modelName, const dMatrix& location)
+	dExcavatorModel* CreateExcavator (const char* const modelName, const dMatrix& location)
 	{
 		dExcavatorModel* const controller = new dExcavatorModel(GetWorld(), modelName, location, m_threadMaterialID);
 
@@ -857,7 +857,6 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		// add the model to the manager
 		AddRoot(controller);
 
-		m_player = controller;
 		return controller;
 	}
 
@@ -905,6 +904,12 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
 
 		if (NewtonCollisionGetUserData(collision0) != NewtonCollisionGetUserData(collision1)) {
+			const dLong mask0 = NewtonCollisionGetUserID(collision0);
+			const dLong mask1 = NewtonCollisionGetUserID(collision1);
+			if ((mask0 == ARTICULATED_VEHICLE_DEFINITION::m_linkPart) &&
+				(mask1 == ARTICULATED_VEHICLE_DEFINITION::m_linkPart)) {
+				return 0;
+			}
 			return 1;
 		}
 
@@ -980,22 +985,32 @@ void ConstructionVehicle (DemoEntityManager* const scene)
 	dMatrix matrix (dGetIdentityMatrix());
 	matrix.m_posit = FindFloor (world, origin, 100.0f);
 	matrix.m_posit.m_y += 1.5f;
-	vehicleManager->CreateExcavator("excavator.ngd", matrix);
-
-	matrix.m_posit.m_z -= 10.0f;
-	vehicleManager->CreateExcavator("excavator.ngd", matrix);
-
-	matrix.m_posit.m_z -= 10.0f;
-	vehicleManager->CreateExcavator("excavator.ngd", matrix);
-
-	matrix.m_posit.m_z -= 20.0f;
-
-	matrix.m_posit.m_x += 10.0f;
-	matrix.m_posit.m_y =   0.0f;
-	matrix.m_posit.m_z +=  0.0f;
-	// add some object to play with
+	vehicleManager->m_player = vehicleManager->CreateExcavator("excavator.ngd", matrix);
 
 #if 1
+	// stress test parallel solver
+	dFloat separation = 8.0f;
+	matrix.m_posit.m_z += separation;
+	vehicleManager->CreateExcavator("excavator.ngd", matrix);
+	matrix.m_posit.m_z -= separation;
+
+	matrix.m_posit.m_z -= separation;
+	vehicleManager->CreateExcavator("excavator.ngd", matrix);
+	matrix.m_posit.m_z += separation;
+#endif
+
+#if 1
+	// add some destructive logs.
+	int woodX = 8;
+	int woodZ = 8;
+	matrix.m_posit.m_x += 10.0f;
+	AddFracturedWoodPrimitive(
+		scene, 1000.0f, matrix.m_posit, dVector(0.3f, 3.0f, 0.3f, 0.0f),
+		woodX, woodZ, 0.5f, ARTICULATED_VEHICLE_DEFINITION::m_propBody,
+		NewtonMaterialGetDefaultGroupID(scene->GetNewton()), dGetIdentityMatrix());
+
+	// add some object to play with
+	matrix.m_posit.m_x += 5.0f;
 	LoadLumberYardMesh(scene, matrix.m_posit + dVector(6.0f, 0.0f, 0.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
 	LoadLumberYardMesh(scene, dVector(6.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
 	LoadLumberYardMesh(scene, dVector(10.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
@@ -1004,17 +1019,6 @@ void ConstructionVehicle (DemoEntityManager* const scene)
 	LoadLumberYardMesh(scene, dVector(14.0f, 0.0f, 10.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
 	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f, -5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
 	LoadLumberYardMesh(scene, dVector(18.0f, 0.0f,  5.0f, 0.0f), ARTICULATED_VEHICLE_DEFINITION::m_propBody);
-
-	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
-
-	int woodX = 8;
-	int woodZ = 8;
-	matrix.m_posit.m_z += 10.0f;
-	matrix.m_posit.m_x -= 5.0f;
-
-	AddFracturedWoodPrimitive(scene, 1000.0f, matrix.m_posit, dVector(0.3f, 3.0f, 0.3f, 0.0f), 
-		woodX, woodZ, 0.5f, ARTICULATED_VEHICLE_DEFINITION::m_propBody, defaultMaterialID, shapeOffsetMatrix);
 #endif
 
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
