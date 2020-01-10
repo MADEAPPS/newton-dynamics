@@ -180,7 +180,6 @@ void dgWorldBase::SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* c
 		const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
 		const dgFloat32 l = low[i] * coefficient - x0[i];
 		const dgFloat32 h = high[i] * coefficient - x0[i];;
-		//x[i] = dgClamp(dgFloat32(0.0f), l, h);
 		x[i] = ScalarGetMax(ScalarGetMin(dgFloat32(0.0f), h), l);
 		invDiag1[i] = dgFloat32(1.0f) / matrix[rowStart + i];
 		rowStart += stride;
@@ -196,6 +195,7 @@ void dgWorldBase::SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* c
 	dgInt32 iterCount = 0;
 	dgFloat32 tolerance(tol2 * dgFloat32(2.0f));
 	const dgFloat32* const invDiag = invDiag1;
+
 	for (dgInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); k++) {
 		base = 0;
 		iterCount++;
@@ -208,12 +208,18 @@ void dgWorldBase::SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* c
 			const dgFloat32 h = high[i] * coefficient - x0[i];
 
 			const dgFloat32* const row = &matrix[base];
+#if 0
 			dgFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
 			tolerance += r * ScalarPredicateResidual(r, f, h, l);
 			f = ScalarGetMax(ScalarGetMin(f, h), l);
 			const dgFloat32 dx = f - x[i];
+#else
+			const dgFloat32 f = ScalarGetMax(ScalarGetMin(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, h), l);
+			const dgFloat32 dx = f - x[i];
+			const dgFloat32 dr = dx * row[i];
+			tolerance += dr * dr;
+#endif 
 			x[i] = f;
-
 			if (dgAbs(dx) > dgFloat32(1.0e-6f)) {
 				for (dgInt32 j = 0; j < size; j++) {
 					residual[j] -= row[j] * dx;

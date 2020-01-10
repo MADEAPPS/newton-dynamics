@@ -1112,7 +1112,8 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
 {
 	D_TRACKTIME();
-	if (m_world->GetCurrentPlugin()) {
+//	if (m_world->GetCurrentPlugin()) {
+	if (0) {
 		dgWorldPlugin* const plugin = m_world->GetCurrentPlugin()->GetInfo().m_plugin;
 		plugin->SolveDenseLcp(stride, size, matrix, x0, x, b, low, high, normalIndex);
 	} else {
@@ -1206,6 +1207,7 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 				const dgFloat32 h = high[i] * coefficient - x0[i];
 
 				const dgFloat32* const row = &matrix[base];
+#if 0
 				dgFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
 				if (f > h) {
 					f = h;
@@ -1215,8 +1217,13 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 					tolerance += r * r;
 				}
 				const dgFloat32 dx = f - x[i];
+#else
+				const dgFloat32 f = dgClamp(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, l, h);
+				const dgFloat32 dx = f - x[i];
+				const dgFloat32 dr = dx * row[i];
+				tolerance += dr * dr;
+#endif
 				x[i] = f;
-
 				if (dgAbs (dx) > dgFloat32 (1.0e-6f)) {
 					for (dgInt32 j = 0; j < size; j++) {
 						residual[j] -= row[j] * dx;
