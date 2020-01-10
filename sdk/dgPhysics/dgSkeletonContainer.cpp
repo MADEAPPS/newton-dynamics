@@ -1014,7 +1014,6 @@ DG_INLINE void dgSkeletonContainer::SolveForward(dgForcePair* const force, const
 	m_nodesOrder[m_nodeCount - 1]->BodyDiagInvTimeSolution(force[m_nodeCount - 1]);
 }
 
-
 DG_INLINE void dgSkeletonContainer::SolveBackward(dgForcePair* const force, const dgForcePair* const accel) const
 {
 	for (dgInt32 i = m_nodeCount - 2; i >= 0; i--) {
@@ -1025,7 +1024,6 @@ DG_INLINE void dgSkeletonContainer::SolveBackward(dgForcePair* const force, cons
 		node->BodyJacobianTimeSolutionBackward(f);
 	}
 }
-
 
 DG_INLINE void dgSkeletonContainer::CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const
 {
@@ -1118,7 +1116,7 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 		dgWorldPlugin* const plugin = m_world->GetCurrentPlugin()->GetInfo().m_plugin;
 		plugin->SolveDenseLcp(stride, size, matrix, x0, x, b, low, high, normalIndex);
 	} else {
-#if 1
+#if 0
 		// sequential Sidle iteration
 		const dgFloat32 sor = dgFloat32(1.125f);
 		const dgFloat32 tol2 = dgFloat32(0.25f);

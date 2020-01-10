@@ -430,7 +430,6 @@ dgInt32 dgWorldDynamicUpdate::CompareBodyJacobianPair(const dgBodyJacobianPair* 
 	return 0;
 }
 
-
 dgBody* dgWorldDynamicUpdate::GetClusterBody(const void* const clusterPtr, dgInt32 index) const
 {
 	const dgClusterCallbackStruct* const cluster = (dgClusterCallbackStruct*)clusterPtr;

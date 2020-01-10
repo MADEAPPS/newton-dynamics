@@ -982,6 +982,14 @@ void ConstructionVehicle (DemoEntityManager* const scene)
 	matrix.m_posit.m_y += 1.5f;
 	vehicleManager->CreateExcavator("excavator.ngd", matrix);
 
+	matrix.m_posit.m_z -= 10.0f;
+	vehicleManager->CreateExcavator("excavator.ngd", matrix);
+
+	matrix.m_posit.m_z -= 10.0f;
+	vehicleManager->CreateExcavator("excavator.ngd", matrix);
+
+	matrix.m_posit.m_z -= 20.0f;
+
 	matrix.m_posit.m_x += 10.0f;
 	matrix.m_posit.m_y =   0.0f;
 	matrix.m_posit.m_z +=  0.0f;
