@@ -958,10 +958,7 @@ class dgSpatialVector
 	{
 		dgSpatialVector tmp(*this * v);
 		__m128d tmp2(_mm_add_pd(tmp.m_d0, _mm_add_pd(tmp.m_d1, tmp.m_d2)));
-		__m128d dot(_mm_hadd_pd(tmp2, tmp2));
-		dgFloat64 ret;
-		_mm_store_sd(&ret, dot);
-		return ret;
+		return _mm_cvtsd_f64(_mm_hadd_pd(tmp2, tmp2));
 	}
 
 	DG_INLINE dgSpatialVector Scale(dgFloat64 s) const

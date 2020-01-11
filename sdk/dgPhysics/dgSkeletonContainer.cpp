@@ -1113,7 +1113,6 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 {
 	D_TRACKTIME();
 	if (m_world->GetCurrentPlugin()) {
-//	if (0) {
 		dgWorldPlugin* const plugin = m_world->GetCurrentPlugin()->GetInfo().m_plugin;
 		plugin->SolveDenseLcp(stride, size, matrix, x0, x, b, low, high, normalIndex);
 	} else {

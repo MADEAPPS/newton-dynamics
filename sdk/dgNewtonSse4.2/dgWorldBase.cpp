@@ -106,39 +106,6 @@ void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo*
 	dgSolver::CalculateJointForces(cluster, bodyArray, jointArray, timestep);
 }
 
-
-static DG_INLINE dgFloat32 ScalarGetMax(dgFloat32 a, dgFloat32 b)
-{
-#ifdef _NEWTON_USE_DOUBLE
-	return  _mm_cvtsd_f64(_mm_max_sd(_mm_set_sd(a), _mm_set_sd(b)));
-#else
-	return  _mm_cvtss_f32(_mm_max_ss(_mm_set_ss(a), _mm_set_ss(b)));
-#endif
-}
-
-static DG_INLINE dgFloat32 ScalarGetMin(dgFloat32 a, dgFloat32 b)
-{
-#ifdef _NEWTON_USE_DOUBLE
-	return  _mm_cvtsd_f64(_mm_min_sd(_mm_set_sd(a), _mm_set_sd(b)));
-#else
-	return  _mm_cvtss_f32(_mm_min_ss(_mm_set_ss(a), _mm_set_ss(b)));
-#endif
-}
-
-static DG_INLINE dgFloat32 ScalarPredicateResidual(dgFloat32 r, dgFloat32 f, dgFloat32 max, dgFloat32 min)
-{
-#ifdef _NEWTON_USE_DOUBLE
-	__m128d f1(_mm_set_sd(f));
-	__m128d mask0(_mm_cmplt_sd(f1, _mm_set_sd(max)));
-	__m128d mask1(_mm_cmpgt_sd(f1, _mm_set_sd(min)));
-	return _mm_cvtsd_f64(_mm_and_pd(_mm_and_pd(_mm_set_sd(r), mask0), mask1));
-#else
-	__m128 mask0(_mm_cmplt_ss(_mm_set_ss(f), _mm_set_ss(max)));
-	__m128 mask1(_mm_cmpgt_ss(_mm_set_ss(f), _mm_set_ss(min)));
-	return _mm_cvtss_f32(_mm_and_ps(_mm_and_ps(_mm_set_ss(r), mask0), mask1));
-#endif
-}
-
 static DG_INLINE dgFloat32 MoveConditional(dgInt32 mask, dgFloat32 a, dgFloat32 b)
 {
 	dgAssert(mask <= 0);
@@ -160,13 +127,13 @@ void dgWorldBase::SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* c
 
 	dgInt32 rowStart = 0;
 	const dgInt32 maxIterCount = 64;
+	const dgFloat32 one = dgFloat32(1.0f);
 	for (dgInt32 i = 0; i < size; i++) {
 		const int index = normalIndex[i];
-		const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
+		const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : one;
 		const dgFloat32 l = low[i] * coefficient - x0[i];
 		const dgFloat32 h = high[i] * coefficient - x0[i];;
-		//x[i] = dgClamp(dgFloat32(0.0f), l, h);
-		x[i] = ScalarGetMax(ScalarGetMin(dgFloat32(0.0f), h), l);
+		x[i] = dgClamp(dgFloat32(0.0f), l, h);
 		invDiag1[i] = dgFloat32(1.0f) / matrix[rowStart + i];
 		rowStart += stride;
 	}
@@ -188,17 +155,19 @@ void dgWorldBase::SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* c
 		for (dgInt32 i = 0; i < size; i++) {
 			const dgFloat32 r = residual[i];
 			const int index = normalIndex[i];
+			//const dgFloat32 x1 = x[i + index] + x0[i + index];
+			//const dgFloat32 coefficient = index ? x1 : one;
 			const dgFloat32 coefficient = MoveConditional(index, x[i + index] + x0[i + index], dgFloat32(1.0f));
 			const dgFloat32 l = low[i] * coefficient - x0[i];
 			const dgFloat32 h = high[i] * coefficient - x0[i];
 
 			const dgFloat32* const row = &matrix[base];
-			dgFloat32 f = x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor;
-			tolerance += r * ScalarPredicateResidual(r, f, h, l);
-			f = ScalarGetMax(ScalarGetMin(f, h), l);
+			const dgFloat32 f = dgClamp(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, l, h);
 			const dgFloat32 dx = f - x[i];
-			x[i] = f;
+			const dgFloat32 dr = dx * row[i];
+			tolerance += dr * dr;
 
+			x[i] = f;
 			if (dgAbs(dx) > dgFloat32(1.0e-6f)) {
 				for (dgInt32 j = 0; j < size; j++) {
 					residual[j] -= row[j] * dx;
@@ -209,3 +178,4 @@ void dgWorldBase::SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* c
 	}
 	dgSoaFloat::FlushRegisters();
 }
+
