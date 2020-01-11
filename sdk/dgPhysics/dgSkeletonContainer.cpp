@@ -1112,8 +1112,8 @@ DG_INLINE void dgSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
 {
 	D_TRACKTIME();
-//	if (m_world->GetCurrentPlugin()) {
-	if (0) {
+	if (m_world->GetCurrentPlugin()) {
+//	if (0) {
 		dgWorldPlugin* const plugin = m_world->GetCurrentPlugin()->GetInfo().m_plugin;
 		plugin->SolveDenseLcp(stride, size, matrix, x0, x, b, low, high, normalIndex);
 	} else {
@@ -1195,6 +1195,7 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 		dgInt32 iterCount = 0;
 		dgFloat32 tolerance(tol2 * dgFloat32(2.0f));
 		const dgFloat32* const invDiag = invDiag1;
+		const dgFloat32 one = dgFloat32(1.0f);
 		for (dgInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); k++) {
 			base = 0;
 			iterCount++;
@@ -1202,7 +1203,7 @@ void dgSkeletonContainer::SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32
 			for (dgInt32 i = 0; i < size; i++) {
 				const dgFloat32 r = residual[i];
 				const int index = normalIndex[i];
-				const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : dgFloat32 (1.0f);
+				const dgFloat32 coefficient = index ? x[i + index] + x0[i + index] : one;
 				const dgFloat32 l = low[i] * coefficient - x0[i];
 				const dgFloat32 h = high[i] * coefficient - x0[i];
 

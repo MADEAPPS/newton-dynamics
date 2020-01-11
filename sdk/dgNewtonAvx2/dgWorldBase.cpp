@@ -121,7 +121,7 @@ void dgWorldBase::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo*
 	dgSolver::CalculateJointForces(cluster, bodyArray, jointArray, timestep);
 }
 
-
+/*
 static DG_INLINE dgFloat32 ScalarGetMax(dgFloat32 a, dgFloat32 b)
 {
 #ifdef _NEWTON_USE_DOUBLE
@@ -153,6 +153,7 @@ static DG_INLINE dgFloat32 ScalarPredicateResidual(dgFloat32 r, dgFloat32 f, dgF
 	return _mm_cvtss_f32(_mm_and_ps(_mm_and_ps(_mm_set_ss(r), mask0), mask1));
 #endif
 }
+*/
 
 static DG_INLINE dgFloat32 MoveConditional(dgInt32 mask, dgFloat32 a, dgFloat32 b)
 {
@@ -175,12 +176,14 @@ void dgWorldBase::SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* c
 
 	dgInt32 rowStart = 0;
 	const dgInt32 maxIterCount = 64;
+	const dgFloat32 one = dgFloat32(1.0f);
 	for (dgInt32 i = 0; i < size; i++) {
 		const int index = normalIndex[i];
-		const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : 1.0f;
+		const dgFloat32 coefficient = index ? (x[i + index] + x0[i + index]) : one;
 		const dgFloat32 l = low[i] * coefficient - x0[i];
 		const dgFloat32 h = high[i] * coefficient - x0[i];;
-		x[i] = ScalarGetMax(ScalarGetMin(dgFloat32(0.0f), h), l);
+		//x[i] = ScalarGetMax(ScalarGetMin(dgFloat32(0.0f), h), l);
+		x[i] = dgClamp(dgFloat32 (0.0f), l, h);
 		invDiag1[i] = dgFloat32(1.0f) / matrix[rowStart + i];
 		rowStart += stride;
 	}
@@ -195,7 +198,6 @@ void dgWorldBase::SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* c
 	dgInt32 iterCount = 0;
 	dgFloat32 tolerance(tol2 * dgFloat32(2.0f));
 	const dgFloat32* const invDiag = invDiag1;
-
 	for (dgInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); k++) {
 		base = 0;
 		iterCount++;
@@ -203,6 +205,8 @@ void dgWorldBase::SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* c
 		for (dgInt32 i = 0; i < size; i++) {
 			const dgFloat32 r = residual[i];
 			const int index = normalIndex[i];
+			//const dgFloat32 x1 = x[i + index] + x0[i + index];
+			//const dgFloat32 coefficient = index ? x1 : one;
 			const dgFloat32 coefficient = MoveConditional(index, x[i + index] + x0[i + index], dgFloat32(1.0f));
 			const dgFloat32 l = low[i] * coefficient - x0[i];
 			const dgFloat32 h = high[i] * coefficient - x0[i];
@@ -214,7 +218,8 @@ void dgWorldBase::SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* c
 			f = ScalarGetMax(ScalarGetMin(f, h), l);
 			const dgFloat32 dx = f - x[i];
 #else
-			const dgFloat32 f = ScalarGetMax(ScalarGetMin(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, h), l);
+			//const dgFloat32 f = ScalarGetMax(ScalarGetMin(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, h), l);
+			const dgFloat32 f = dgClamp(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, l, h);
 			const dgFloat32 dx = f - x[i];
 			const dgFloat32 dr = dx * row[i];
 			tolerance += dr * dr;
