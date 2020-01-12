@@ -757,29 +757,6 @@ void dgSkeletonContainer::RebuildMassMatrix(const dgInt32 start, const dgInt32 s
 	}
 }
 
-void dgSkeletonContainer::ReConditionMassMatrix(const dgInt32 start, const dgInt32 step, const dgFloat32* const diagDamp, dgFloat32* const a10) const
-{
-	DG_TRACKTIME();
-	const int boundedSize = m_auxiliaryRowCount - m_blockSize;
-	for (dgInt32 i = start; i < boundedSize; i+= step) {
-		dgFloat32* const g = &a10[i * m_blockSize];
-		const dgFloat32* const row = &m_massMatrix11[(m_blockSize + i) * m_auxiliaryRowCount];
-		for (int j = 0; j < m_blockSize; j++) {
-			g[j] = -row[j];
-		}
-		dgSolveCholesky(m_blockSize, m_auxiliaryRowCount, m_massMatrix11, g, g);
-
-		dgFloat32* const arow = &m_massMatrix11[(m_blockSize + i) * m_auxiliaryRowCount + m_blockSize];
-		for (int j = i; j < boundedSize; j++) {
-			const dgFloat32* const row1 = &m_massMatrix11[(m_blockSize + j) * m_auxiliaryRowCount];
-			dgFloat32 elem = row1[m_blockSize + i] + dgDotProduct(m_blockSize, g, row1);
-			arow[j] = elem;
-			m_massMatrix11[(m_blockSize + j) * m_auxiliaryRowCount + m_blockSize + i] = elem;
-		}
-		arow[i] += diagDamp[m_blockSize + i];
-	}
-}
-
 void dgSkeletonContainer::CalculateLoopMassMatrixCoefficients_Kernel(void* const context, void* const worldContext, dgInt32 threadID)
 {
 	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)worldContext;
@@ -795,17 +772,6 @@ void dgSkeletonContainer::ConditionMassMatrix_Kernel(void* const context, void* 
 	skeleton->m_world->FlushRegisters();
 	const dgInt32 count = skeleton->m_world->GetThreadCount();
 	skeleton->ConditionMassMatrix(threadID, count);
-}
-
-void dgSkeletonContainer::ReConditionMassMatrix_Kernel(void* const context, void* const worldContext, dgInt32 threadID)
-{
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)worldContext;
-	dgFloat32** const pointers = (dgFloat32**)context;
-	const dgFloat32* const diagDamp = pointers[0];
-	dgFloat32* const matrix = pointers[1];
-	skeleton->m_world->FlushRegisters();
-	const dgInt32 count = skeleton->m_world->GetThreadCount();
-	skeleton->ReConditionMassMatrix(threadID, count, diagDamp, matrix);
 }
 
 void dgSkeletonContainer::RebuildMassMatrix_Kernel(void* const context, void* const worldContext, dgInt32 threadID)
@@ -863,8 +829,9 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 			m_pairs[auxiliaryIndex + primaryCount].m_m1 = m1;
 			m_frictionIndex[auxiliaryIndex + primaryCount] = 0;
 			m_matrixRowsIndex[auxiliaryIndex + primaryCount] = first + index;
-			boundRow[auxiliaryIndex] = (rhs->m_lowerBoundFrictionCoefficent <= dgFloat32(-DG_LCP_MAX_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= dgFloat32(DG_LCP_MAX_VALUE)) ? 1 : 0;
-			m_blockSize += boundRow[auxiliaryIndex];
+			const dgInt32 boundIndex = (rhs->m_lowerBoundFrictionCoefficent <= dgFloat32(-DG_LCP_MAX_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= dgFloat32(DG_LCP_MAX_VALUE)) ? 1 : 0;
+			boundRow[auxiliaryIndex] = boundIndex;
+			m_blockSize += boundIndex;
 			auxiliaryIndex++;
 		}
 	}
@@ -886,8 +853,9 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 			m_pairs[auxiliaryIndex + primaryCount].m_m1 = m1;
 			m_frictionIndex[auxiliaryIndex + primaryCount] = (rhs->m_normalForceIndex < 0) ? 0 : rhs->m_normalForceIndex - i;
 			m_matrixRowsIndex[auxiliaryIndex + primaryCount] = first + i;
-			boundRow[auxiliaryIndex] = (rhs->m_lowerBoundFrictionCoefficent <= dgFloat32(-DG_LCP_MAX_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= dgFloat32(DG_LCP_MAX_VALUE)) ? 1 : 0;
-			m_blockSize += boundRow[auxiliaryIndex];
+			const dgInt32 boundIndex = (rhs->m_lowerBoundFrictionCoefficent <= dgFloat32(-DG_LCP_MAX_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= dgFloat32(DG_LCP_MAX_VALUE)) ? 1 : 0;
+			boundRow[auxiliaryIndex] = boundIndex;
+			m_blockSize += boundIndex;
 			auxiliaryIndex++;
 		}
 	}
@@ -942,33 +910,60 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 
 	if (m_blockSize) {
 		FactorizeMatrix(m_blockSize, m_auxiliaryRowCount, m_massMatrix11, diagDamp);
-
 		const int boundedSize = m_auxiliaryRowCount - m_blockSize;
-		dgFloat32* const a10 = dgAlloca(dgFloat32, boundedSize * m_blockSize);
-
-		if (parallel) {
-			const dgInt32 threadCounts = m_world->GetThreadCount();
-			dgFloat32* array[2];
-			array[0] = diagDamp;
-			array[1] = a10;
-			for (dgInt32 i = 0; i < threadCounts; i++) {
-				m_world->QueueJob(ReConditionMassMatrix_Kernel, array, this, "dgSkeletonContainer::ReConditionMassMatrix_Kernel");
+		dgFloat32* const acc = dgAlloca(dgFloat32, m_auxiliaryRowCount);
+		dgInt32 rowStart = 0;
+		for (dgInt32 i = 0; i < m_blockSize; i++) {
+			memset(acc, 0, boundedSize * sizeof (dgFloat32));
+			const dgFloat32* const row = &m_massMatrix11[rowStart];
+			for (dgInt32 j = 0; j < i; j++) {
+				const dgFloat32 s = row[j];
+				const dgFloat32* const x = &m_massMatrix11[j * m_auxiliaryRowCount + m_blockSize];
+				for (dgInt32 k = 0; k < boundedSize; k++) {
+					acc[k] += s * x[k];
+				}
 			}
-			m_world->SynchronizationBarrier();
 
-		} else {
-			ReConditionMassMatrix(0, 1, diagDamp, a10);
+			dgFloat32* const x = &m_massMatrix11[rowStart + m_blockSize];
+			const dgFloat32 den = -dgFloat32(1.0f) / row[i];
+			for (dgInt32 j = 0; j < boundedSize; j++) {
+				x[j] = (x[j] + acc[j]) * den;
+			}
+			rowStart += m_auxiliaryRowCount;
 		}
-		dgAssert (dgTestPSDmatrix(boundedSize, m_auxiliaryRowCount, &m_massMatrix11[m_auxiliaryRowCount * m_blockSize + m_blockSize]));
+
+		for (dgInt32 i = m_blockSize - 1; i >= 0; i--) {
+			memset(acc, 0, boundedSize * sizeof (dgFloat32));
+			for (dgInt32 j = i + 1; j < m_blockSize; j++) {
+				const dgFloat32 s = m_massMatrix11[j * m_auxiliaryRowCount + i];
+				const dgFloat32* const x = &m_massMatrix11[j * m_auxiliaryRowCount + m_blockSize];
+				for (dgInt32 k = 0; k < boundedSize; k++) {
+					acc[k] += s * x[k];
+				}
+			}
+
+			dgFloat32* const x = &m_massMatrix11[i * m_auxiliaryRowCount + m_blockSize];
+			const dgFloat32 den = dgFloat32(1.0f) / m_massMatrix11[i * m_auxiliaryRowCount + i];
+			for (dgInt32 j = 0; j < boundedSize; j++) {
+				x[j] = (x[j] - acc[j]) * den;
+			}
+		}
 
 		for (dgInt32 i = 0; i < boundedSize; i++) {
-			const dgFloat32* const g = &a10[i * m_blockSize];
-			dgInt32 base = m_blockSize + i;
 			for (int j = 0; j < m_blockSize; j++) {
-				m_massMatrix11[base] = g[j];
-				base += m_auxiliaryRowCount;
+				acc[j] = m_massMatrix11[j * m_auxiliaryRowCount + m_blockSize + i];
 			}
+
+			dgFloat32* const arow = &m_massMatrix11[(m_blockSize + i) * m_auxiliaryRowCount + m_blockSize];
+			for (int j = i; j < boundedSize; j++) {
+				const dgFloat32* const row1 = &m_massMatrix11[(m_blockSize + j) * m_auxiliaryRowCount];
+				dgFloat32 elem = row1[m_blockSize + i] + dgDotProduct(m_blockSize, acc, row1);
+				arow[j] = elem;
+				m_massMatrix11[(m_blockSize + j) * m_auxiliaryRowCount + m_blockSize + i] = elem;
+			}
+			arow[i] += diagDamp[m_blockSize + i];
 		}
+		dgAssert (dgTestPSDmatrix(m_auxiliaryRowCount - m_blockSize, m_auxiliaryRowCount, &m_massMatrix11[m_auxiliaryRowCount * m_blockSize + m_blockSize]));
 	}
 }
 

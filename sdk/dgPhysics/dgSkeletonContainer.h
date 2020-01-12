@@ -68,7 +68,6 @@ class dgSkeletonContainer
 	void ConditionMassMatrix(const dgInt32 start, const dgInt32 step) const;
 	void RebuildMassMatrix(const dgInt32 start, const dgInt32 step, const dgFloat32* const diagDamp) const;
 	void CalculateLoopMassMatrixCoefficients(const dgInt32 start, const dgInt32 step, dgFloat32* const diagDamp);
-	void ReConditionMassMatrix(const dgInt32 start, const dgInt32 step, const dgFloat32* const diagDamp, dgFloat32* const matrix) const;
 	
 	DG_INLINE void CalculateForce(dgForcePair* const force, const dgForcePair* const accel) const;
 	DG_INLINE void SolveBackward(dgForcePair* const force, const dgForcePair* const accel) const;
@@ -88,7 +87,6 @@ class dgSkeletonContainer
 
 	static void RebuildMassMatrix_Kernel(void* const context, void* const worldContext, dgInt32 threadID);
 	static void ConditionMassMatrix_Kernel(void* const context, void* const worldContext, dgInt32 threadID);
-	static void ReConditionMassMatrix_Kernel(void* const context, void* const worldContext, dgInt32 threadID);
 	static void CalculateLoopMassMatrixCoefficients_Kernel (void* const context, void* const worldContext, dgInt32 threadID);
 
 	dgWorld* m_world;
