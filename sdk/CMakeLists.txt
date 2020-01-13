@@ -41,26 +41,21 @@ if (NEWTON_WITH_SSE4_PLUGIN)
 	add_subdirectory(dgNewtonSse4.2)
 endif()
 
-    if (NEWTON_ARM64 STREQUAL "ON")
-	
-	# -marm perhaps?
-	
-    elseif(NEWTON_ARM32 STREQUAL "ON")
-	
-	# -marm perhaps?
-	
-    else()
-	
-	if (NEWTON_WITH_AVX_PLUGIN)
+if (NEWTON_WITH_AVX_PLUGIN)
 	add_subdirectory(dgNewtonAvx)
-	endif()
+endif()
 	
-	if (NEWTON_WITH_AVX2_PLUGIN)
-		add_subdirectory(dgNewtonAvx2)
-	endif()
+if (NEWTON_WITH_AVX2_PLUGIN)
+	add_subdirectory(dgNewtonAvx2)
+endif()
 	
-    endif()
+if (NEWTON_WITH_GPU_PLUGIN)
+#	add_subdirectory(dgNewtonVulkan)
+endif()
 
-if (NEWTON_WITH_DX12_PLUGIN)
-	add_subdirectory(dgNewtonDx12)
+if (NEWTON_ARM64 STREQUAL "ON")
+	# -marm perhaps?
+elseif(NEWTON_ARM32 STREQUAL "ON")
+	# -marm perhaps?
+else()
 endif()

@@ -52,11 +52,9 @@
 // For more detail on the derivation of the Runge Kutta coefficients you can go to:  
 // http://pathfinder.scar.utoronto.ca/~dyer/csca57/book_P/node51.html
 
-
 class dgBody;
 class dgDynamicBody;
 class dgWorldDynamicUpdateSyncDescriptor;
-
 
 class dgClusterCallbackStruct
 {

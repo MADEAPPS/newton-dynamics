@@ -405,6 +405,14 @@ DG_MSC_AVX_ALIGMENT
 class dgSolver: public dgParallelBodySolver
 {
 	public:
+	class dgRowPair
+	{
+		public:
+		dgInt32 m_m0;
+		dgInt32 m_m1;
+		dgInt32 m_index;
+	};
+
 	dgSolver(dgWorld* const world, dgMemoryAllocator* const allocator);
 	~dgSolver();
 	void CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep);
@@ -461,6 +469,7 @@ class dgSolver: public dgParallelBodySolver
 	//	DG_INLINE dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgJacobian* const internalForces) const;
 	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgJacobian* const internalForces) const;
 
+	DG_INLINE void MatrixTimeVector(dgFloat32* const out, const dgFloat32* const in, dgJacobian* const intermediate , const dgFloat32* const diagDamp) const;
 	dgSoaFloat m_soaOne;
 	dgSoaFloat m_soaZero;
 	dgVector m_zero;
@@ -470,6 +479,9 @@ class dgSolver: public dgParallelBodySolver
 
 	dgVulkanContext m_context;
 	dgGpuBody m_gpuBodyArray;
+
+	dgRowPair* m_bilateralPairs;
+	dgInt32 m_bilateralRowsCount;
 } DG_GCC_AVX_ALIGMENT;
 
 #endif

@@ -867,22 +867,20 @@ void dgParallelBodySolver::UpdateSkeletonsKernel(void* const context, void* cons
 
 void dgParallelBodySolver::InitSkeletons()
 {
-	if (m_skeletonCount) {
-		const dgInt32 threadCounts = m_world->GetThreadCount();
-		if (m_skeletonCount > dgMin(threadCounts, 2)) {
-			for (dgInt32 i = 0; i < threadCounts; i++) {
-				m_world->QueueJob(InitSkeletonsKernel, this, NULL, "dgSolver::InitSkeletonsKernel");
-			}
-			m_world->SynchronizationBarrier();
-		} else {
-			dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
-			const dgLeftHandSide* const leftHandSide = &m_world->GetSolverMemory().m_leftHandSizeBuffer[0];
-			dgSkeletonContainer** const skeletonArray = &m_skeletonArray[0];
-			bool parallel = m_world->GetThreadCount() > 1;
-			for (dgInt32 i = 0; i < m_skeletonCount; i++) {
-				dgSkeletonContainer* const skeleton = skeletonArray[i];
-				skeleton->InitMassMatrix(m_jointArray, leftHandSide, rightHandSide, parallel);
-			}
+	const dgInt32 threadCounts = m_world->GetThreadCount();
+	if (m_skeletonCount > dgMin(threadCounts, 2)) {
+		for (dgInt32 i = 0; i < threadCounts; i++) {
+			m_world->QueueJob(InitSkeletonsKernel, this, NULL, "dgSolver::InitSkeletonsKernel");
+		}
+		m_world->SynchronizationBarrier();
+	} else {
+		dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
+		const dgLeftHandSide* const leftHandSide = &m_world->GetSolverMemory().m_leftHandSizeBuffer[0];
+		dgSkeletonContainer** const skeletonArray = &m_skeletonArray[0];
+		bool parallel = m_world->GetThreadCount() > 1;
+		for (dgInt32 i = 0; i < m_skeletonCount; i++) {
+			dgSkeletonContainer* const skeleton = skeletonArray[i];
+			skeleton->InitMassMatrix(m_jointArray, leftHandSide, rightHandSide, parallel);
 		}
 	}
 }
@@ -1350,7 +1348,9 @@ void dgParallelBodySolver::CalculateForces()
 	m_firstPassCoef = dgFloat32(0.0f);
 	const dgInt32 threadCounts = m_world->GetThreadCount();
 
-	InitSkeletons();
+	if (m_skeletonCount) {
+		InitSkeletons();
+	}
 	for (dgInt32 step = 0; step < 4; step++) {
 		CalculateJointsAcceleration();
 		dgFloat32 accNorm = DG_SOLVER_MAX_ERROR * dgFloat32(2.0f);
@@ -1361,7 +1361,9 @@ void dgParallelBodySolver::CalculateForces()
 				accNorm = dgMax(accNorm, m_accelNorm[i]);
 			}
 		}
-		UpdateSkeletons();
+		if (m_skeletonCount) {
+			UpdateSkeletons();
+		}
 		IntegrateBodiesVelocity();
 	}
 

@@ -23,7 +23,7 @@ option("NEWTON_STATIC_RUNTIME_LIBRARIES" "use windows static libraries" ON)
 option("NEWTON_WITH_SSE4_PLUGIN" "adding sse4 parallel solver (forces shared libs)" OFF)
 option("NEWTON_WITH_AVX_PLUGIN" "adding avx parallel solver (forces shared libs)" ON)
 option("NEWTON_WITH_AVX2_PLUGIN" "adding avx2 parallel solver (forces shared libs)" OFF)
-#option("NEWTON_WITH_DX12_PLUGIN" "adding direct compute 12 parallel solver" OFF)
+#option("NEWTON_WITH_GPU_PLUGIN" "adding gpu parallel solver, vulkan sdk" OFF)
 option("NEWTON_BUILD_SHARED_LIBS" "build shared library" ON)
 option("NEWTON_BUILD_CORE_ONLY" "build the core newton library only" OFF)
 
