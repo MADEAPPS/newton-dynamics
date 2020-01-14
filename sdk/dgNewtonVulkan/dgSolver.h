@@ -419,7 +419,6 @@ class dgSolver: public dgParallelBodySolver
 	private:
 	void InitWeights();
 	void InitBodyArray();
-	void InitSkeletons();
 	void CalculateForces();
 	void UpdateSkeletons();
 	void InitJacobianMatrix();
@@ -431,7 +430,6 @@ class dgSolver: public dgParallelBodySolver
 	void CalculateBodiesAcceleration();
 	
 	void InitBodyArray(dgInt32 threadID);
-	void InitSkeletons(dgInt32 threadID);
 	void UpdateSkeletons(dgInt32 threadID);
 	void InitJacobianMatrix(dgInt32 threadID);
 	void UpdateForceFeedback(dgInt32 threadID);
@@ -444,7 +442,6 @@ class dgSolver: public dgParallelBodySolver
 	void CalculateBodiesAcceleration(dgInt32 threadID);
 
 	static void InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID);
-	static void InitSkeletonsKernel(void* const context, void* const, dgInt32 threadID);
 	static void UpdateSkeletonsKernel(void* const context, void* const, dgInt32 threadID);
 	static void InitJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID);
 	static void UpdateForceFeedbackKernel(void* const context, void* const, dgInt32 threadID);

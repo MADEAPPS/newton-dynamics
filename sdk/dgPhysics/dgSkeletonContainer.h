@@ -61,7 +61,7 @@ class dgSkeletonContainer
 	void SetLru(dgInt32 lru) { m_lru = lru; }
 
 	virtual void CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces);
-	virtual void InitMassMatrix (const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, bool parallel = false);
+	virtual void InitMassMatrix (const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide);
 	
 	private:
 	bool SanityCheck(const dgForcePair* const force, const dgForcePair* const accel) const;
@@ -78,16 +78,12 @@ class dgSkeletonContainer
 	dgNode* FindNode(dgDynamicBody* const node) const;
 	void SortGraph(dgNode* const root, dgInt32& index);
 		
-	void InitLoopMassMatrix (const dgJointInfo* const jointInfoArray, bool parallel);
+	void InitLoopMassMatrix (const dgJointInfo* const jointInfoArray);
 	dgInt8* CalculateBufferSizeInBytes (const dgJointInfo* const jointInfoArray);
 	void SolveAuxiliary (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const dgForcePair* const accel, dgForcePair* const force) const;
 	void SolveLcp(dgInt32 stride, dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const;
 	void SolveBlockLcp(dgInt32 size, dgInt32 blockSize, const dgFloat32* const x0, dgFloat32* const x, dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const;
 	void FactorizeMatrix(dgInt32 size, dgInt32 stride, dgFloat32* const matrix, dgFloat32* const diagDamp) const;
-
-	static void RebuildMassMatrix_Kernel(void* const context, void* const worldContext, dgInt32 threadID);
-	static void ConditionMassMatrix_Kernel(void* const context, void* const worldContext, dgInt32 threadID);
-	static void CalculateLoopMassMatrixCoefficients_Kernel (void* const context, void* const worldContext, dgInt32 threadID);
 
 	dgWorld* m_world;
 	dgNode* m_skeleton;

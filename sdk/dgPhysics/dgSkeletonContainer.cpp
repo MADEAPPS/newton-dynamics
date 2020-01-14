@@ -757,33 +757,7 @@ void dgSkeletonContainer::RebuildMassMatrix(const dgInt32 start, const dgInt32 s
 	}
 }
 
-void dgSkeletonContainer::CalculateLoopMassMatrixCoefficients_Kernel(void* const context, void* const worldContext, dgInt32 threadID)
-{
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)worldContext;
-	dgFloat32* const diagDamp = (dgFloat32*)context;
-	skeleton->m_world->FlushRegisters();
-	const dgInt32 count = skeleton->m_world->GetThreadCount();
-	skeleton->CalculateLoopMassMatrixCoefficients(threadID, count, diagDamp);
-}
-
-void dgSkeletonContainer::ConditionMassMatrix_Kernel(void* const context, void* const worldContext, dgInt32 threadID)
-{
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)worldContext;
-	skeleton->m_world->FlushRegisters();
-	const dgInt32 count = skeleton->m_world->GetThreadCount();
-	skeleton->ConditionMassMatrix(threadID, count);
-}
-
-void dgSkeletonContainer::RebuildMassMatrix_Kernel(void* const context, void* const worldContext, dgInt32 threadID)
-{
-	dgSkeletonContainer* const skeleton = (dgSkeletonContainer*)worldContext;
-	dgFloat32* const diagDamp = (dgFloat32*)context;
-	skeleton->m_world->FlushRegisters();
-	const dgInt32 count = skeleton->m_world->GetThreadCount();
-	skeleton->RebuildMassMatrix(threadID, count, diagDamp);
-}
-
-void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoArray, bool parallel)
+void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoArray)
 {
 	const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
 	dgInt8* const memoryBuffer = CalculateBufferSizeInBytes(jointInfoArray);
@@ -885,28 +859,10 @@ void dgSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 
 	memset(m_massMatrix10, 0, primaryCount * m_auxiliaryRowCount * sizeof(dgFloat32));
 	memset(m_massMatrix11, 0, m_auxiliaryRowCount * m_auxiliaryRowCount * sizeof(dgFloat32));
-	if (parallel) {
-		const dgInt32 threadCounts = m_world->GetThreadCount();
-		for (dgInt32 i = 0; i < threadCounts; i++) {
-			m_world->QueueJob(CalculateLoopMassMatrixCoefficients_Kernel, diagDamp, this, "dgSkeletonContainer::CalculateLoopMassMatrixCoefficients_Kernel");
-		}
-		m_world->SynchronizationBarrier();
 
-		for (dgInt32 i = 0; i < threadCounts; i++) {
-			m_world->QueueJob(ConditionMassMatrix_Kernel, NULL, this, "dgSkeletonContainer::ConditionMassMatrix_Kernel");
-		}
-		m_world->SynchronizationBarrier();
-
-		for (dgInt32 i = 0; i < threadCounts; i++) {
-			m_world->QueueJob(RebuildMassMatrix_Kernel, diagDamp, this, "dgSkeletonContainer::RebuildMassMatrix_Kernel");
-		}
-		m_world->SynchronizationBarrier();
-
-	} else {
-		CalculateLoopMassMatrixCoefficients(0, 1, diagDamp);
-		ConditionMassMatrix (0, 1);
-		RebuildMassMatrix(0, 1, diagDamp);
-	}
+	CalculateLoopMassMatrixCoefficients(0, 1, diagDamp);
+	ConditionMassMatrix (0, 1);
+	RebuildMassMatrix(0, 1, diagDamp);
 
 	if (m_blockSize) {
 		FactorizeMatrix(m_blockSize, m_auxiliaryRowCount, m_massMatrix11, diagDamp);
@@ -1371,7 +1327,7 @@ dgInt8* dgSkeletonContainer::CalculateBufferSizeInBytes (const dgJointInfo* cons
 	return &m_auxiliaryMemoryBuffer[0];
 }
 
-void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, bool parallel)
+void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide)
 {
 	D_TRACKTIME();
 	dgInt32 rowCount = 0;
@@ -1405,7 +1361,7 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 	m_auxiliaryRowCount += m_loopRowCount;
 
 	if (m_auxiliaryRowCount) {
-		InitLoopMassMatrix(jointInfoArray, parallel);
+		InitLoopMassMatrix(jointInfoArray);
 	}
 }
 
