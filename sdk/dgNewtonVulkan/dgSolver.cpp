@@ -608,7 +608,6 @@ void dgSolver::CalculateJointsAccelerationKernel(void* const context, void* cons
 
 void dgSolver::CalculateJointsForceKernel(void* const context, void* const, dgInt32 threadID)
 {
-	D_TRACKTIME();
 	dgSolver* const me = (dgSolver*)context;
 	me->CalculateJointsForce(threadID);
 }
