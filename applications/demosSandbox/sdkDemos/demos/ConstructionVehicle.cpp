@@ -903,6 +903,12 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
 		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
 
+#if 1
+		// disable self exact solver contact collision 
+		NewtonContactJointResetIntraJointCollision(contactJoint);
+		NewtonContactJointResetSelftJointCollision(contactJoint);
+#endif
+
 		if (NewtonCollisionGetUserData(collision0) != NewtonCollisionGetUserData(collision1)) {
 			const dLong mask0 = NewtonCollisionGetUserID(collision0);
 			const dLong mask1 = NewtonCollisionGetUserID(collision1);
