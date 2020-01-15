@@ -62,11 +62,12 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 	m_reg[1] = info.m_edx;
 	m_reg[2] = info.m_ecx;
 	module.m_score = _stricmp(m_vendor, "GenuineIntel") ? 3 : 4;
+module.m_score = 1000;
 
 #ifdef _DEBUG
 	sprintf(module.m_hardwareDeviceName, "Newton avx2_d");
 #else
-	sprintf(module.m_hardwareDeviceName, "Newton avx2");
+	sprintf(module.m_hardwareDeviceName, "Newton Reference GPU");
 #endif
 	return &module;
 #elif __linux__

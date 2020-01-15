@@ -542,7 +542,11 @@ void dgSolver::CalculateJointsForceKernel(void* const context, void* const, dgIn
 {
 	D_TRACKTIME();
 	dgSolver* const me = (dgSolver*)context;
+#ifdef _SINGLE_JOB_FORCE_UPDATE
+	me->CalculateJointsForceSingleJob(threadID);
+#else
 	me->CalculateJointsForce(threadID);
+#endif
 }
 
 void dgSolver::IntegrateBodiesVelocityKernel(void* const context, void* const worldContext, dgInt32 threadID)
@@ -604,6 +608,20 @@ void dgSolver::CalculateBodiesAcceleration()
 
 void dgSolver::CalculateJointsForce()
 {
+#ifdef _SINGLE_JOB_FORCE_UPDATE
+	m_sync = 0;
+	m_globalAccel = dgFloat32(100.0f);
+	m_lastThread = m_world->GetThreadCount() - 1;
+	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+	const dgInt32 threadCounts = m_world->GetThreadCount();
+	dgJacobian* const tempInternalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[bodyCount];
+	memset(tempInternalForces, 0, bodyCount * sizeof(dgJacobian));
+	for (dgInt32 i = 0; i < threadCounts; i++) {
+		m_world->QueueJob(CalculateJointsForceKernel, this, NULL, "dgSolver::CalculateJointsForce");
+	}
+	m_world->SynchronizationBarrier();
+
+#else
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
 	dgJacobian* const internalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[0];
 	dgJacobian* const tempInternalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[bodyCount];
@@ -622,6 +640,7 @@ void dgSolver::CalculateJointsForce()
 			accNorm = dgMax(accNorm, m_accelNorm[i]);
 		}
 	}
+#endif
 }
 
 void dgSolver::IntegrateBodiesVelocity()
@@ -957,6 +976,45 @@ void dgSolver::CalculateJointsForce(dgInt32 threadID)
 
 	m_accelNorm[threadID] = accNorm;
 }
+
+#ifdef _SINGLE_JOB_FORCE_UPDATE
+void dgSolver::SyncThreads (dgInt32* const lock)
+{
+	const dgInt32 threadCounts = m_world->GetThreadCount();
+	if (threadCounts > 1) {
+		dgAtomicExchangeAndAdd(&m_sync, 1);
+		while (dgAtomicExchangeAndAdd(&m_sync, 0) % threadCounts) {
+			dgThreadYield();
+		}
+	}
+}
+
+void dgSolver::CalculateJointsForceSingleJob(dgInt32 threadID)
+{
+	const dgInt32 bodyCount = m_cluster->m_bodyCount;
+	dgJacobian* const internalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[0];
+	dgJacobian* const tempInternalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[bodyCount];
+	const dgInt32 passes = m_solverPasses;
+	const dgInt32 threadCounts = m_world->GetThreadCount();
+
+	for (dgInt32 k = 0; (k < passes) && (m_globalAccel > DG_SOLVER_MAX_ERROR); k++) {
+		CalculateJointsForce(threadID);
+
+		dgInt32 lastThread = dgAtomicExchangeAndAdd(&m_lastThread, -1);
+		if (lastThread == 0) {
+			memcpy(internalForces, tempInternalForces, bodyCount * sizeof(dgJacobian));
+			memset(tempInternalForces, 0, bodyCount * sizeof(dgJacobian));
+			dgFloat32 accNorm = dgFloat32 (0.0f);
+			for (dgInt32 i = 0; i < threadCounts; i++) {
+				accNorm = dgMax(accNorm, m_accelNorm[i]);
+			}
+			m_globalAccel = accNorm;
+			m_lastThread = threadCounts - 1;
+		}
+		SyncThreads (&m_sync);
+	}
+}
+#endif
 
 void dgSolver::UpdateRowAcceleration(dgInt32 threadID)
 {
