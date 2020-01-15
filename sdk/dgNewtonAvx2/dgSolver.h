@@ -27,6 +27,8 @@
 
 #define DG_SOA_WORD_GROUP_SIZE	8 
 
+//#define _SINGLE_JOB_FORCE_UPDATE
+
 #ifdef _NEWTON_USE_DOUBLE
 	DG_MSC_AVX_ALIGMENT
 	class dgSoaFloat
@@ -344,9 +346,9 @@ class dgSolver: public dgParallelBodySolver
 	void InitJacobianMatrix();
 	void UpdateForceFeedback();
 	void CalculateJointsForce();
+	void CalculateJointsAccel();
 	void IntegrateBodiesVelocity();
 	void UpdateKinematicFeedback();
-	void CalculateJointsAcceleration();
 	void CalculateBodiesAcceleration();
 	
 	void InitBodyArray(dgInt32 threadID);
@@ -389,6 +391,14 @@ class dgSolver: public dgParallelBodySolver
 	dgVector m_zero;
 	dgVector m_negOne;
 	dgArray<dgSoaMatrixElement> m_massMatrix;
+
+#ifdef _SINGLE_JOB_FORCE_UPDATE
+	void SyncThreads (dgInt32* const lock);
+	void CalculateJointsForceSingleJob(dgInt32 threadID);
+	dgFloat32 m_globalAccel;
+	dgInt32 m_sync;
+	dgInt32 m_lastThread;
+#endif
 } DG_GCC_AVX_ALIGMENT;
 
 

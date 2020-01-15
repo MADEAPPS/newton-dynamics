@@ -798,18 +798,27 @@ void dgParallelBodySolver::IntegrateBodiesVelocity()
 void dgParallelBodySolver::CalculateJointsForce()
 {
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
-	dgJacobian* const internalForces = &m_world->m_solverMemory.m_internalForcesBuffer[0];
-	dgJacobian* const tempInternalForces = &m_world->m_solverMemory.m_internalForcesBuffer[bodyCount];
+	dgJacobian* const internalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[0];
+	dgJacobian* const tempInternalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[bodyCount];
+	const dgInt32 passes = m_solverPasses;
+	const dgInt32 threadCounts = m_world->GetThreadCount();
 
-	memset(tempInternalForces, 0, bodyCount * sizeof(dgJacobian));
-	for (dgInt32 i = 0; i < m_threadCounts; i++) {
-		m_world->QueueJob(CalculateJointsForceKernel, this, NULL, "dgParallelBodySolver::CalculateJointsForce");
+	dgFloat32 accNorm = DG_SOLVER_MAX_ERROR * dgFloat32(2.0f);
+	for (dgInt32 k = 0; (k < passes) && (accNorm > DG_SOLVER_MAX_ERROR); k++) {
+		memset(tempInternalForces, 0, bodyCount * sizeof(dgJacobian));
+		for (dgInt32 i = 0; i < threadCounts; i++) {
+			m_world->QueueJob(CalculateJointsForceKernel, this, NULL, "dgSolver::CalculateJointsForce");
+		}
+		m_world->SynchronizationBarrier();
+		memcpy(internalForces, tempInternalForces, bodyCount * sizeof(dgJacobian));
+		for (dgInt32 i = 0; i < threadCounts; i++) {
+			accNorm = dgMax(accNorm, m_accelNorm[i]);
+		}
 	}
-	m_world->SynchronizationBarrier();
-	memcpy(internalForces, tempInternalForces, bodyCount * sizeof(dgJacobian));
 }
 
-void dgParallelBodySolver::CalculateJointsAcceleration()
+
+void dgParallelBodySolver::CalculateJointsAccel()
 {
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
 		m_world->QueueJob(CalculateJointsAccelerationKernel, this, NULL, "dgParallelBodySolver::CalculateJointsAcceleration");
@@ -1333,23 +1342,13 @@ void dgParallelBodySolver::CalculateJointsForce(dgInt32 threadID)
 
 void dgParallelBodySolver::CalculateForces()
 {
-	const dgInt32 passes = m_solverPasses;
 	m_firstPassCoef = dgFloat32(0.0f);
-	const dgInt32 threadCounts = m_world->GetThreadCount();
-
 	if (m_skeletonCount) {
 		InitSkeletons();
 	}
 	for (dgInt32 step = 0; step < 4; step++) {
-		CalculateJointsAcceleration();
-		dgFloat32 accNorm = DG_SOLVER_MAX_ERROR * dgFloat32(2.0f);
-		for (dgInt32 k = 0; (k < passes) && (accNorm > DG_SOLVER_MAX_ERROR); k++) {
-			CalculateJointsForce();
-			accNorm = dgFloat32(0.0f);
-			for (dgInt32 i = 0; i < threadCounts; i++) {
-				accNorm = dgMax(accNorm, m_accelNorm[i]);
-			}
-		}
+		CalculateJointsAccel();
+		CalculateJointsForce();
 		if (m_skeletonCount) {
 			UpdateSkeletons();
 		}

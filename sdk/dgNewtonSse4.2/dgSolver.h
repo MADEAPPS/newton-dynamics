@@ -229,10 +229,10 @@ class dgSolver: public dgParallelBodySolver
 	void UpdateSkeletons();
 	void InitJacobianMatrix();
 	void UpdateForceFeedback();
+	void CalculateJointsAccel();
 	void CalculateJointsForce();
 	void IntegrateBodiesVelocity();
 	void UpdateKinematicFeedback();
-	void CalculateJointsAcceleration();
 	void CalculateBodiesAcceleration();
 	
 	void InitBodyArray(dgInt32 threadID);

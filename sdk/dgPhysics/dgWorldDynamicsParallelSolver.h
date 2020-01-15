@@ -219,9 +219,9 @@ class dgParallelBodySolver
 	void InitJacobianMatrix();
 	void UpdateForceFeedback();
 	void CalculateJointsForce();
+	void CalculateJointsAccel();
 	void IntegrateBodiesVelocity();
 	void UpdateKinematicFeedback();
-	void CalculateJointsAcceleration();
 	void CalculateBodiesAcceleration();
 	
 	void InitBodyArray(dgInt32 threadID);
