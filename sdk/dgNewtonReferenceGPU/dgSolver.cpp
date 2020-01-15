@@ -1013,6 +1013,7 @@ void dgSolver::CalculateJointsForceSingleJob(dgInt32 threadID)
 		}
 		SyncThreads (&m_sync);
 	}
+m_lastThread *= 1;
 }
 #endif
 
