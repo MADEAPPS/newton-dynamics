@@ -1136,63 +1136,31 @@ void dgSolver::UpdateKinematicFeedback(dgInt32 threadID)
 void dgSolver::UpdateSkeletonsKernel(void* const context, void* const, dgInt32 threadID)
 {
 	D_TRACKTIME();
-	dgSolver* const me = (dgSolver*)context;
-	me->UpdateSkeletons(threadID);
-}
-
-void dgSolver::InitSkeletonsKernel(void* const context, void* const, dgInt32 threadID)
-{
-	D_TRACKTIME();
-	dgSolver* const me = (dgSolver*)context;
-	me->InitSkeletons(threadID);
-}
-
-void dgSolver::InitSkeletons()
-{
-	const dgInt32 threadCounts = m_world->GetThreadCount();
-	for (dgInt32 i = 0; i < threadCounts; i++) {
-		m_world->QueueJob(InitSkeletonsKernel, this, NULL, "dgSolver::InitSkeletonsKernel");
-	}
-	m_world->SynchronizationBarrier();
+//	dgSolver* const me = (dgSolver*)context;
+//	me->UpdateSkeletons(threadID);
 }
 
 void dgSolver::UpdateSkeletons()
 {
-	const dgInt32 threadCounts = m_world->GetThreadCount();
-	for (dgInt32 i = 0; i < threadCounts; i++) {
-		m_world->QueueJob(UpdateSkeletonsKernel, this, NULL, "dgSolver::UpdateSkeletons");
-	}
-	m_world->SynchronizationBarrier();
-}
-
-void dgSolver::InitSkeletons(dgInt32 threadID)
-{
-	dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
-	const dgLeftHandSide* const leftHandSide = &m_world->GetSolverMemory().m_leftHandSizeBuffer[0];
-
-	const dgInt32 count = m_skeletonCount;
-	const dgInt32 threadCounts = m_world->GetThreadCount();
-	dgSkeletonContainer** const skeletonArray = &m_skeletonArray[0];
-
-	dgSoaFloat::FlushRegisters();
-	for (dgInt32 i = threadID; i < count; i += threadCounts) {
-		dgSkeletonContainer* const skeleton = skeletonArray[i];
-		skeleton->InitMassMatrix(m_jointArray, leftHandSide, rightHandSide);
-	}
+//	const dgInt32 threadCounts = m_world->GetThreadCount();
+//	for (dgInt32 i = 0; i < threadCounts; i++) {
+//		m_world->QueueJob(UpdateSkeletonsKernel, this, NULL, "dgSolver::UpdateSkeletons");
+//	}
+//	m_world->SynchronizationBarrier();
 }
 
 void dgSolver::UpdateSkeletons(dgInt32 threadID)
 {
-	const dgInt32 count = m_skeletonCount;
-	const dgInt32 threadCounts = m_world->GetThreadCount();
-	dgSkeletonContainer** const skeletonArray = &m_skeletonArray[0];
-	dgJacobian* const internalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[0];
-
-	dgSoaFloat::FlushRegisters();
-	for (dgInt32 i = threadID; i < count; i += threadCounts) {
-		dgSkeletonContainer* const skeleton = skeletonArray[i];
-		skeleton->CalculateJointForce(m_jointArray, m_bodyArray, internalForces);
-	}
+//	const dgInt32 count = m_skeletonCount;
+//	const dgInt32 threadCounts = m_world->GetThreadCount();
+//	dgSkeletonContainer** const skeletonArray = &m_skeletonArray[0];
+//	dgJacobian* const internalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[0];
+//
+//	dgSoaFloat::FlushRegisters();
+//	for (dgInt32 i = threadID; i < count; i += threadCounts) {
+//		dgSkeletonContainer* const skeleton = skeletonArray[i];
+//		skeleton->CalculateJointForce(m_jointArray, m_bodyArray, internalForces);
+//	}
 }
 
 void dgSolver::CalculateForces()
@@ -1200,9 +1168,6 @@ void dgSolver::CalculateForces()
 	DG_TRACKTIME();
 	m_firstPassCoef = dgFloat32(0.0f);
 
-	if (m_skeletonCount) {
-		InitSkeletons();
-	}
 	for (dgInt32 step = 0; step < 4; step++) {
 		CalculateJointsAccel();
 		CalculateJointsForce();

@@ -65,7 +65,7 @@ dgWorldPlugin* GetPlugin(dgWorld* const world, dgMemoryAllocator* const allocato
 module.m_score = 1000;
 
 #ifdef _DEBUG
-	sprintf(module.m_hardwareDeviceName, "Newton avx2_d");
+	sprintf(module.m_hardwareDeviceName, "Newton Reference GPU_d");
 #else
 	sprintf(module.m_hardwareDeviceName, "Newton Reference GPU");
 #endif
