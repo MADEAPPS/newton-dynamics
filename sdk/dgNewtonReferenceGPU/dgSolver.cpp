@@ -1170,7 +1170,7 @@ void dgSolver::UpdateSkeletonsKernel(void* const context, void* const, dgInt32 t
 {
 	D_TRACKTIME();
 	dgSolver* const me = (dgSolver*)context;
-//	me->UpdateSkeletons(threadID);
+	me->UpdateSkeletons(threadID);
 }
 
 void dgSolver::UpdateSkeletons()
@@ -1236,7 +1236,7 @@ DG_INLINE void dgSolver::MatrixTimeVector(dgFloat32* const out, const dgFloat32*
 void dgSolver::UpdateSkeletons(dgInt32 threadID)
 {
 	D_TRACKTIME();
-	//	dgJacobian* const internalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[0];
+	dgJacobian* const internalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[0];
 	const dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
 	//	const dgLeftHandSide* const leftHandSide = &m_world->GetSolverMemory().m_leftHandSizeBuffer[0];
 
@@ -1269,10 +1269,10 @@ void dgSolver::UpdateSkeletons(dgInt32 threadID)
 	//	dgInt32 iter = 0;
 	dgFloat32 tolerance = dgFloat32(0.25f);
 	//	for (dgInt32 j = 0; (j < m_bilateralRowsCount) && (error2 > tolerance); j++) {
-	for (dgInt32 j = 0; j < 1; j++) {
-		MatrixTimeVector(q0, p0, intermediate, damp);
+	for (dgInt32 j = 0; j < 10; j++) {
 		dgFloat32 num = dgFloat32(0.0f);
 		dgFloat32 den = dgFloat32(1.0e-12f);
+		MatrixTimeVector(q0, p0, intermediate, damp);
 		for (dgInt32 i = 0; i < m_bilateralRowsCount; i++) {
 			num += r0[i] * z0[i];
 			den += p0[i] * q0[i];
@@ -1286,7 +1286,7 @@ void dgSolver::UpdateSkeletons(dgInt32 threadID)
 			x0[i] += p0[i] * alpha;
 			error2 += r0[i] * r0[i];
 		}
-		if (error2 > tolerance) {
+		if (error2 < tolerance) {
 			break;
 		}
 
