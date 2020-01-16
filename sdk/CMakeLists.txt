@@ -48,6 +48,10 @@ endif()
 if (NEWTON_WITH_AVX2_PLUGIN)
 	add_subdirectory(dgNewtonAvx2)
 endif()
+
+if (NEWTON_WITH_REFERENCE_GPU_PLUGIN)
+	add_subdirectory(dgNewtonReferenceGPU)
+endif()
 	
 if (NEWTON_WITH_GPU_PLUGIN)
 #	add_subdirectory(dgNewtonVulkan)

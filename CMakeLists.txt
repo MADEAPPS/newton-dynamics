@@ -23,6 +23,7 @@ option("NEWTON_STATIC_RUNTIME_LIBRARIES" "use windows static libraries" ON)
 option("NEWTON_WITH_SSE4_PLUGIN" "adding sse4 parallel solver (forces shared libs)" OFF)
 option("NEWTON_WITH_AVX_PLUGIN" "adding avx parallel solver (forces shared libs)" ON)
 option("NEWTON_WITH_AVX2_PLUGIN" "adding avx2 parallel solver (forces shared libs)" OFF)
+option("NEWTON_WITH_REFERENCE_GPU_PLUGIN" "adding gpu reference solver, gpu solve using avx2" ON)
 #option("NEWTON_WITH_GPU_PLUGIN" "adding gpu parallel solver, vulkan sdk" OFF)
 option("NEWTON_BUILD_SHARED_LIBS" "build shared library" ON)
 option("NEWTON_BUILD_CORE_ONLY" "build the core newton library only" OFF)
@@ -216,7 +217,6 @@ if (UNIX)
 	set(NEWTON_GENERATE_DLL OFF CACHE BOOL "" FORCE)
     endif()
 
-
     set(NEWTON_STATIC_RUNTIME_LIBRARIES OFF CACHE BOOL "" FORCE)
     set(NEWTON_BUILD_PROFILER OFF CACHE BOOL "" FORCE)
 
@@ -281,10 +281,10 @@ if(NEWTON_BUILD_SANDBOX_DEMOS STREQUAL "ON")
   #set(NEWTON_BUILD_CORE_ONLY OFF)
 endif()
 
-if(NEWTON_WITH_SSE4_PLUGIN OR NEWTON_WITH_AVX_PLUGIN OR NEWTON_WITH_AVX2_PLUGIN)
-  # If building any of the plugins, then switch to shared libraries.
-  set(NEWTON_BUILD_SHARED_LIBS ON)
-endif()
+#if(NEWTON_WITH_SSE4_PLUGIN OR NEWTON_WITH_AVX_PLUGIN OR NEWTON_WITH_AVX2_PLUGIN)
+# If building any of the plugins, then switch to shared libraries.
+# set(NEWTON_BUILD_SHARED_LIBS ON)
+#endif()
 
 if(NEWTON_BUILD_PROFILER)
 	#add_definitions(-D_DG_USE_PROFILER)
