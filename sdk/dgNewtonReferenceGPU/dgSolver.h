@@ -332,6 +332,14 @@ class dgSoaMatrixElement
 DG_MSC_AVX_ALIGMENT
 class dgSolver: public dgParallelBodySolver
 {
+	class dgRowPair
+	{
+		public:
+		dgInt32 m_m0;
+		dgInt32 m_m1;
+		dgInt32 m_index;
+	};
+
 	public:
 	dgSolver(dgWorld* const world, dgMemoryAllocator* const allocator);
 	~dgSolver();
@@ -361,6 +369,7 @@ class dgSolver: public dgParallelBodySolver
 	void UpdateKinematicFeedback(dgInt32 threadID);
 	void CalculateJointsAcceleration(dgInt32 threadID);
 	void CalculateBodiesAcceleration(dgInt32 threadID);
+	void CalculateJointsForceSingleJob(dgInt32 threadID);
 
 	static void InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID);
 	static void UpdateSkeletonsKernel(void* const context, void* const, dgInt32 threadID);
@@ -381,7 +390,11 @@ class dgSolver: public dgParallelBodySolver
 	DG_INLINE void TransposeRow (dgSoaMatrixElement* const row, const dgJointInfo* const jointInfoArray, dgInt32 index);
 	DG_INLINE void BuildJacobianMatrix(dgJointInfo* const jointInfo, dgLeftHandSide* const leftHandSide, dgRightHandSide* const righHandSide, dgJacobian* const internalForces);
 	//	DG_INLINE dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgJacobian* const internalForces) const;
+
+	DG_INLINE void MatrixTimeVector(dgFloat32* const out, const dgFloat32* const in, dgJacobian* const intermediate , const dgFloat32* const diagDamp) const;
 	dgFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, dgSoaMatrixElement* const massMatrix, const dgJacobian* const internalForces) const;
+
+	void SyncThreads(dgInt32* const lock);
 
 	dgSoaFloat m_soaOne;
 	dgSoaFloat m_soaZero;
@@ -389,13 +402,11 @@ class dgSolver: public dgParallelBodySolver
 	dgVector m_negOne;
 	dgArray<dgSoaMatrixElement> m_massMatrix;
 
-#ifdef _SINGLE_JOB_FORCE_UPDATE
-	void SyncThreads (dgInt32* const lock);
-	void CalculateJointsForceSingleJob(dgInt32 threadID);
-	dgInt32 m_sync;
+	dgRowPair* m_bilateralPairs;
 	dgInt32 m_sync0;
 	dgInt32 m_sync1;
-#endif
+	dgInt32 m_bilateralRowsCount;
+
 } DG_GCC_AVX_ALIGMENT;
 
 
