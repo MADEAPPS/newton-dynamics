@@ -27,7 +27,7 @@
 
 #define DG_SOA_WORD_GROUP_SIZE	8 
 
-//#define _SINGLE_JOB_FORCE_UPDATE
+#define _SINGLE_JOB_FORCE_UPDATE
 
 #ifdef _NEWTON_USE_DOUBLE
 	DG_MSC_AVX_ALIGMENT
@@ -392,9 +392,9 @@ class dgSolver: public dgParallelBodySolver
 #ifdef _SINGLE_JOB_FORCE_UPDATE
 	void SyncThreads (dgInt32* const lock);
 	void CalculateJointsForceSingleJob(dgInt32 threadID);
-	dgFloat32 m_globalAccel;
 	dgInt32 m_sync;
-	dgInt32 m_lastThread;
+	dgInt32 m_sync0;
+	dgInt32 m_sync1;
 #endif
 } DG_GCC_AVX_ALIGMENT;
 

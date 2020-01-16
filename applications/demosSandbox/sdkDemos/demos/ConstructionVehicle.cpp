@@ -993,7 +993,7 @@ void ConstructionVehicle (DemoEntityManager* const scene)
 	matrix.m_posit.m_y += 1.5f;
 	vehicleManager->m_player = vehicleManager->CreateExcavator("excavator.ngd", matrix);
 
-#if 1
+#if 0
 	// stress test parallel solver
 	dFloat separation = 8.0f;
 	matrix.m_posit.m_z += separation;
@@ -1005,7 +1005,7 @@ void ConstructionVehicle (DemoEntityManager* const scene)
 	matrix.m_posit.m_z += separation;
 #endif
 
-#if 1
+#if 0
 	// add some destructive logs.
 	int woodX = 8;
 	int woodZ = 8;

@@ -609,9 +609,8 @@ void dgSolver::CalculateBodiesAcceleration()
 void dgSolver::CalculateJointsForce()
 {
 #ifdef _SINGLE_JOB_FORCE_UPDATE
-	m_sync = 0;
-	m_globalAccel = dgFloat32(100.0f);
-	m_lastThread = m_world->GetThreadCount() - 1;
+	m_sync0 = 0;
+	m_sync1 = 0;
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
 	const dgInt32 threadCounts = m_world->GetThreadCount();
 	dgJacobian* const tempInternalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[bodyCount];
@@ -982,8 +981,8 @@ void dgSolver::SyncThreads (dgInt32* const lock)
 {
 	const dgInt32 threadCounts = m_world->GetThreadCount();
 	if (threadCounts > 1) {
-		dgAtomicExchangeAndAdd(&m_sync, 1);
-		while (dgAtomicExchangeAndAdd(&m_sync, 0) % threadCounts) {
+		dgAtomicExchangeAndAdd(lock, 1);
+		while (dgAtomicExchangeAndAdd(lock, 0) % threadCounts) {
 			dgThreadYield();
 		}
 	}
@@ -997,23 +996,23 @@ void dgSolver::CalculateJointsForceSingleJob(dgInt32 threadID)
 	const dgInt32 passes = m_solverPasses;
 	const dgInt32 threadCounts = m_world->GetThreadCount();
 
-	for (dgInt32 k = 0; (k < passes) && (m_globalAccel > DG_SOLVER_MAX_ERROR); k++) {
+	dgFloat32 globalAccel = dgFloat32 (100.0f);
+	for (dgInt32 k = 0; (k < passes) && (globalAccel > DG_SOLVER_MAX_ERROR); k++) {
 		CalculateJointsForce(threadID);
 
-		dgInt32 lastThread = dgAtomicExchangeAndAdd(&m_lastThread, -1);
-		if (lastThread == 0) {
+		SyncThreads (&m_sync0);
+		if (threadID == 0) {
 			memcpy(internalForces, tempInternalForces, bodyCount * sizeof(dgJacobian));
 			memset(tempInternalForces, 0, bodyCount * sizeof(dgJacobian));
-			dgFloat32 accNorm = dgFloat32 (0.0f);
-			for (dgInt32 i = 0; i < threadCounts; i++) {
-				accNorm = dgMax(accNorm, m_accelNorm[i]);
-			}
-			m_globalAccel = accNorm;
-			m_lastThread = threadCounts - 1;
 		}
-		SyncThreads (&m_sync);
+		globalAccel = dgFloat32(0.0f);
+		for (dgInt32 i = 0; i < threadCounts; i++) {
+			globalAccel = dgMax(globalAccel, m_accelNorm[i]);
+		}
+
+		SyncThreads (&m_sync1);
 	}
-m_lastThread *= 1;
+
 }
 #endif
 
