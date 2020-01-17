@@ -1232,6 +1232,43 @@ DG_INLINE void dgSolver::MatrixTimeVector(dgFloat32* const out, const dgFloat32*
 	}
 }
 
+class xxxxx: public dgSymmetricBiconjugateGradientSolve<dgFloat32>
+{
+	public:
+	xxxxx(int stride, dgFloat32* matrix)
+	{
+		dgFloat32 x[3];
+		dgFloat32 b[3];
+
+		A = matrix;
+		x[0] = 3.0f;
+		x[1] = 2.0f;
+		x[2] = 1.0f;
+		dgMatrixTimeVector(3, A, x, b);
+		x[0] = 0.0f;
+		x[1] = 0.0f;
+		x[2] = 0.0f;
+
+		Solve(3, 1.0e-6, x, b);
+
+	}
+
+	void MatrixTimeVector(dgFloat32* const out, const dgFloat32* const v) const
+	{
+		dgMatrixTimeVector(3, A, v, out);
+	}
+
+	virtual bool InversePrecoditionerTimeVector(dgFloat32* const out, const dgFloat32* const v) const
+	{
+		for (dgInt32 i = 0; i < 3; i++) {
+			out[i] = v[i] / A[3 * i + i];
+		}
+
+		return true;
+	}
+
+	dgFloat32* A;
+};
 
 void dgSolver::UpdateSkeletons(dgInt32 threadID)
 {
@@ -1254,14 +1291,22 @@ void dgSolver::UpdateSkeletons(dgInt32 threadID)
 		const dgRowPair* const pair = &m_bilateralPairs[i];
 		const dgRightHandSide* const rhs = &rightHandSide[pair->m_index];
 		const dgLeftHandSide* const row = &leftHandSide[pair->m_index];
+
+		const dgVector diag(
+			row->m_JMinv.m_jacobianM0.m_linear * row->m_JMinv.m_jacobianM0.m_linear +
+			row->m_JMinv.m_jacobianM0.m_angular * row->m_JMinv.m_jacobianM0.m_angular +
+			row->m_JMinv.m_jacobianM1.m_linear * row->m_JMinv.m_jacobianM1.m_linear +
+			row->m_JMinv.m_jacobianM1.m_angular * row->m_JMinv.m_jacobianM1.m_angular);
+		damp[i] = diag.AddHorizontal().GetScalar() * 1.0e-6f;
+		invM[i] = dgFloat32 (1.0f) / (diag.AddHorizontal().GetScalar() + damp[i]);
+
 		const dgVector accel(
 			row->m_JMinv.m_jacobianM0.m_linear * internalForces[pair->m_m0].m_linear +
 			row->m_JMinv.m_jacobianM0.m_angular * internalForces[pair->m_m0].m_angular +
 			row->m_JMinv.m_jacobianM1.m_linear * internalForces[pair->m_m1].m_linear +
 			row->m_JMinv.m_jacobianM1.m_angular * internalForces[pair->m_m1].m_angular);
 		x0[i] = rhs->m_force;
-		damp[i] = rhs->m_diagDamp;
-		invM[i] = rhs->m_invJinvMJt;
+		x0[i] = 0.0f;
 		b[i] = rhs->m_coordenateAccel - accel.AddHorizontal().GetScalar() - damp[i] * x0[i];
 	}
 
@@ -1273,41 +1318,36 @@ void dgSolver::UpdateSkeletons(dgInt32 threadID)
 	}
 
 	//	dgInt32 iter = 0;
-	dgFloat32 tolerance = dgFloat32(0.25f);
-	//	for (dgInt32 j = 0; (j < m_bilateralRowsCount) && (error2 > tolerance); j++) {
+	dgFloat32 tol2 = dgFloat32(0.25f) * dgFloat32(0.25f);
+	const dgInt32 iterCount = dgMin (m_bilateralRowsCount, 64);
+	//	for (dgInt32 j = 0; j < m_bilateralRowsCount; j++) {
 	for (dgInt32 j = 0; j < 10; j++) {
 		dgFloat32 num = dgFloat32(0.0f);
 		dgFloat32 den = dgFloat32(1.0e-12f);
 		MatrixTimeVector(q0, p0, intermediate, damp);
+
+		dgFloat32 error2 = dgFloat32(0.0f);
 		for (dgInt32 i = 0; i < m_bilateralRowsCount; i++) {
 			num += r0[i] * z0[i];
 			den += p0[i] * q0[i];
+			error2 += r0[i] * r0[i];
+		}
+		if (error2 < tol2) {
+			break;
 		}
 		dgAssert(den >= dgFloat32(0.0f));
-
 		dgFloat32 alpha = num / den;
-		dgFloat32 error2 = dgFloat32(0.0f);
+		dgFloat32 num1 = dgFloat32(0.0f);
 		for (dgInt32 i = 0; i < m_bilateralRowsCount; i++) {
 			r0[i] -= q0[i] * alpha;
 			x0[i] += p0[i] * alpha;
-			error2 += r0[i] * r0[i];
-		}
-		if (error2 < tolerance) {
-			break;
-		}
-
-		for (dgInt32 i = 0; i < m_bilateralRowsCount; i++) {
 			z0[i] = invM[i] * r0[i];
-		}
-
-		dgFloat32 num1 = dgFloat32(0.0f);
-		for (dgInt32 i = 0; i < m_bilateralRowsCount; i++) {
 			num1 += z0[i] * r0[i];
 		}
 
 		dgFloat32 beta = num1 / num;
 		for (dgInt32 i = 0; i < m_bilateralRowsCount; i++) {
-			p0[i] += z0[i] + beta * p0[i];
+			p0[i] = z0[i] + beta * p0[i];
 		}
 	}
 }

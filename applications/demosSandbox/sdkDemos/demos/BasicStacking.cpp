@@ -225,10 +225,10 @@ static void SphereStack(DemoEntityManager* const scene, dFloat mass, const dVect
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
 		NewtonBody* body1 = CreateSimpleSolid(scene, geometry, mass, baseMatrix, collision, defaultMaterialID);
 		dCustomBallAndSocket* joint = new  dCustomBallAndSocket(baseMatrix, body0, body1);
-		joint->EnableTwist(true);
-		joint->EnableCone(true);
-		joint->SetConeLimits(0.0f);
-		joint->SetTwistLimits(0.0f, 0.0f);
+//		joint->EnableTwist(true);
+//		joint->EnableCone(true);
+//		joint->SetConeLimits(0.0f);
+//		joint->SetTwistLimits(0.0f, 0.0f);
 		body0 = body1;
 	}
 #endif
@@ -412,7 +412,7 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 	}
 
 //	high = 20;
-high = 2;
+high = 3;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
 			SphereStack(scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, -6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);

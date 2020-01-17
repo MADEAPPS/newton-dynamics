@@ -51,7 +51,7 @@
 #endif
 
 
-class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve
+class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve<dgFloat64>
 {
 	public:
 	dgTriangleAnglesToUV (dgMeshEffect* const mesh, dgInt32 material, dgReportProgress progressReportCallback, void* const userData, const dgFloat64* const pinnedPoint, dgFloat64* const triangleAnglesVector = NULL)
@@ -843,7 +843,7 @@ class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve
 	bool m_allocated;
 };
 
-class dgAngleBasedFlatteningMapping: public dgSymmetricBiconjugateGradientSolve
+class dgAngleBasedFlatteningMapping: public dgSymmetricBiconjugateGradientSolve<dgFloat64>
 {
 	public: 
 	dgAngleBasedFlatteningMapping (dgMeshEffect* const mesh, dgInt32 material, dgReportProgress progressReportCallback, void* const userData)

@@ -30,24 +30,106 @@
 
 #define DG_LCP_MAX_VALUE dgFloat32 (1.0e10f)
 
-//bool dgCholeskyFactorization(dgInt32 size, dgFloat32* const psdMatrix, dgInt32 rowStride);
 
+template<class T>
 class dgSymmetricBiconjugateGradientSolve
 {
 	public:
-	dgSymmetricBiconjugateGradientSolve();
-	virtual ~dgSymmetricBiconjugateGradientSolve();
+	dgSymmetricBiconjugateGradientSolve(){}
+	~dgSymmetricBiconjugateGradientSolve(){}
 
-	dgFloat64 Solve(dgInt32 size, dgFloat64 tolerance, dgFloat64* const x, const dgFloat64* const b) const;
+	T Solve(dgInt32 size, T tolerance, T* const x, const T* const b) const
+	{
+		//dgStack<T> bufferR0(size);
+		//dgStack<T> bufferP0(size);
+		//dgStack<T> matrixTimesP0(size);
+		//dgStack<T> bufferConditionerInverseTimesR0(size);
+
+		T* bufferR0 = dgAlloca(T, size);
+		T* bufferP0 = dgAlloca(T, size);
+		T* matrixTimesP0 = dgAlloca(T, size);
+		T* bufferConditionerInverseTimesR0 = dgAlloca(T, size);
+
+		T* const r0 = &bufferR0[0];
+		T* const p0 = &bufferP0[0];
+		T* const MinvR0 = &bufferConditionerInverseTimesR0[0];
+		T* const matrixP0 = &matrixTimesP0[0];
+
+		MatrixTimeVector(matrixP0, x);
+		Sub(size, r0, b, matrixP0);
+		bool continueExecution = InversePrecoditionerTimeVector(p0, r0);
+
+		dgInt32 iter = 0;
+		T num = DotProduct(size, r0, p0);
+		T error2 = num;
+		for (dgInt32 j = 0; (j < size) && (error2 > tolerance) && continueExecution; j++) {
+
+			MatrixTimeVector(matrixP0, p0);
+			T den = DotProduct(size, p0, matrixP0);
+
+			dgAssert(fabs(den) > T(0.0f));
+			T alpha = num / den;
+
+			ScaleAdd(size, x, x, alpha, p0);
+			if ((j % 50) != 49) {
+				ScaleAdd(size, r0, r0, -alpha, matrixP0);
+			}
+			else {
+				MatrixTimeVector(matrixP0, x);
+				Sub(size, r0, b, matrixP0);
+			}
+
+			//dgUnsigned64 xxx0 = dgGetTimeInMicrosenconds();
+			continueExecution = InversePrecoditionerTimeVector(MinvR0, r0);
+			//xxx0 = dgGetTimeInMicrosenconds() - xxx0;
+			//dgTrace (("%d\n", dgUnsigned64 (xxx0)));
+
+
+			T num1 = DotProduct(size, r0, MinvR0);
+			T beta = num1 / num;
+			ScaleAdd(size, p0, MinvR0, beta, p0);
+			num = DotProduct(size, r0, MinvR0);
+			iter++;
+			error2 = num;
+			if (j > 10) {
+				error2 = T(0.0f);
+				for (dgInt32 i = 0; i < size; i++) {
+					error2 = dgMax(error2, r0[i] * r0[i]);
+				}
+			}
+		}
+
+		dgAssert(iter <= size);
+		return num;
+	}
 
 	protected:
-	virtual void MatrixTimeVector(dgFloat64* const out, const dgFloat64* const v) const = 0;
-	virtual bool InversePrecoditionerTimeVector(dgFloat64* const out, const dgFloat64* const v) const = 0;
+	virtual void MatrixTimeVector(T* const out, const T* const v) const = 0;
+	virtual bool InversePrecoditionerTimeVector(T* const out, const T* const v) const = 0;
 	
 	private:
-	dgFloat64 DotProduct(dgInt32 size, const dgFloat64* const b, const dgFloat64* const c) const;
-	void ScaleAdd(dgInt32 size, dgFloat64* const a, const dgFloat64* const b, dgFloat64 scale, const dgFloat64* const c) const;
-	void Sub(dgInt32 size, dgFloat64* const a, const dgFloat64* const b, const dgFloat64* const c) const;
+	T DotProduct(dgInt32 size, const T* const b, const T* const c) const
+	{
+		T product = T(0.0f);
+		for (dgInt32 i = 0; i < size; i++) {
+			product += b[i] * c[i];
+		}
+		return product;
+	}
+
+	void Sub(dgInt32 size, T* const a, const T* const b, const T* const c) const
+	{
+		for (dgInt32 i = 0; i < size; i++) {
+			a[i] = b[i] - c[i];
+		}
+	}
+
+	void ScaleAdd(dgInt32 size, T* const a, const T* const b, T scale, const T* const c) const
+	{
+		for (dgInt32 i = 0; i < size; i++) {
+			a[i] = b[i] + scale * c[i];
+		}
+	}
 };
 
 
