@@ -1223,7 +1223,7 @@ DG_INLINE void dgSolver::MatrixTimeVector(dgFloat32* const out, const dgFloat32*
 	for (dgInt32 i = 0; i < m_bilateralRowsCount; i++) {
 		const dgRowPair* const pair = &m_bilateralPairs[i];
 		const dgLeftHandSide* const row = &leftHandSide[pair->m_index];
-		dgVector accel(
+		const dgVector accel(
 			row->m_JMinv.m_jacobianM0.m_linear * intermediate[pair->m_m0].m_linear +
 			row->m_JMinv.m_jacobianM0.m_angular * intermediate[pair->m_m0].m_angular +
 			row->m_JMinv.m_jacobianM1.m_linear * intermediate[pair->m_m1].m_linear +
@@ -1238,7 +1238,7 @@ void dgSolver::UpdateSkeletons(dgInt32 threadID)
 	D_TRACKTIME();
 	dgJacobian* const internalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[0];
 	const dgRightHandSide* const rightHandSide = &m_world->GetSolverMemory().m_righHandSizeBuffer[0];
-	//	const dgLeftHandSide* const leftHandSide = &m_world->GetSolverMemory().m_leftHandSizeBuffer[0];
+	const dgLeftHandSide* const leftHandSide = &m_world->GetSolverMemory().m_leftHandSizeBuffer[0];
 
 	dgFloat32* const z0 = dgAlloca(dgFloat32, m_bilateralRowsCount);
 	dgFloat32* const r0 = dgAlloca(dgFloat32, m_bilateralRowsCount);
@@ -1253,10 +1253,16 @@ void dgSolver::UpdateSkeletons(dgInt32 threadID)
 	for (dgInt32 i = 0; i < m_bilateralRowsCount; i++) {
 		const dgRowPair* const pair = &m_bilateralPairs[i];
 		const dgRightHandSide* const rhs = &rightHandSide[pair->m_index];
+		const dgLeftHandSide* const row = &leftHandSide[pair->m_index];
+		const dgVector accel(
+			row->m_JMinv.m_jacobianM0.m_linear * internalForces[pair->m_m0].m_linear +
+			row->m_JMinv.m_jacobianM0.m_angular * internalForces[pair->m_m0].m_angular +
+			row->m_JMinv.m_jacobianM1.m_linear * internalForces[pair->m_m1].m_linear +
+			row->m_JMinv.m_jacobianM1.m_angular * internalForces[pair->m_m1].m_angular);
 		x0[i] = rhs->m_force;
-		b[i] = rhs->m_coordenateAccel;
-		invM[i] = rhs->m_invJinvMJt;
 		damp[i] = rhs->m_diagDamp;
+		invM[i] = rhs->m_invJinvMJt;
+		b[i] = rhs->m_coordenateAccel - accel.AddHorizontal().GetScalar() - damp[i] * x0[i];
 	}
 
 	MatrixTimeVector(q0, x0, intermediate, damp);
