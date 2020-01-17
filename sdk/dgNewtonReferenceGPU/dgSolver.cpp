@@ -1305,23 +1305,23 @@ void dgSolver::UpdateSkeletons(dgInt32 threadID)
 			row->m_JMinv.m_jacobianM0.m_angular * internalForces[pair->m_m0].m_angular +
 			row->m_JMinv.m_jacobianM1.m_linear * internalForces[pair->m_m1].m_linear +
 			row->m_JMinv.m_jacobianM1.m_angular * internalForces[pair->m_m1].m_angular);
-		x0[i] = rhs->m_force;
+		//x0[i] = rhs->m_force;
 		x0[i] = 0.0f;
 		b[i] = rhs->m_coordenateAccel - accel.AddHorizontal().GetScalar() - damp[i] * x0[i];
 	}
 
-	MatrixTimeVector(q0, x0, intermediate, damp);
-	for (dgInt32 i = 0; i < m_bilateralRowsCount; i++) {
-		r0[i] = b[i] - q0[i];
-		z0[i] = r0[i] * invM[i];
-		p0[i] = z0[i];
-	}
-
-	//	dgInt32 iter = 0;
 	dgFloat32 tol2 = dgFloat32(0.25f) * dgFloat32(0.25f);
 	const dgInt32 iterCount = dgMin (m_bilateralRowsCount, 64);
-	//	for (dgInt32 j = 0; j < m_bilateralRowsCount; j++) {
-	for (dgInt32 j = 0; j < 10; j++) {
+	for (dgInt32 j = 0; j < iterCount; j++) {
+		if (!(j & 31)) {
+			MatrixTimeVector(q0, x0, intermediate, damp);
+			for (dgInt32 i = 0; i < m_bilateralRowsCount; i++) {
+				r0[i] = b[i] - q0[i];
+				z0[i] = r0[i] * invM[i];
+				p0[i] = z0[i];
+			}
+		}
+
 		dgFloat32 num = dgFloat32(0.0f);
 		dgFloat32 den = dgFloat32(1.0e-12f);
 		MatrixTimeVector(q0, p0, intermediate, damp);
@@ -1341,7 +1341,7 @@ void dgSolver::UpdateSkeletons(dgInt32 threadID)
 		for (dgInt32 i = 0; i < m_bilateralRowsCount; i++) {
 			r0[i] -= q0[i] * alpha;
 			x0[i] += p0[i] * alpha;
-			z0[i] = invM[i] * r0[i];
+			z0[i] = r0[i] * invM[i];
 			num1 += z0[i] * r0[i];
 		}
 
