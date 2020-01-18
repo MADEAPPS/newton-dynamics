@@ -822,7 +822,13 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dgFloat64>
 	void LagrangeOptimization()
 	{
 		CalculateGradientVectorAndHessianMatrix ();
-		SolveAlloc(2 * m_mesh->GetVertexCount(), dgABF_UV_TOL2, m_uvArray, m_gradients);
+		dgStack<dgFloat64> r0(2 * m_mesh->GetVertexCount());
+		dgStack<dgFloat64> z0(2 * m_mesh->GetVertexCount());
+		dgStack<dgFloat64> p0(2 * m_mesh->GetVertexCount());
+		dgStack<dgFloat64> q0(2 * m_mesh->GetVertexCount());
+		SetBuffers(&r0[0], &z0[0], &p0[0], &q0[0]);
+		Solve(2 * m_mesh->GetVertexCount(), dgABF_UV_TOL2, m_uvArray, m_gradients);
+		SetBuffers(NULL, NULL, NULL, NULL);
 	}
 
 	dgArray<dgInt32> m_hessianCoLumnIndex;
@@ -1412,15 +1418,21 @@ dgAssert (0);
 		m_continueExecution = true;
 
 /*
+		dgStack<dgFloat64> r0(2 * m_mesh->GetVertexCount());
+		dgStack<dgFloat64> z0(2 * m_mesh->GetVertexCount());
+		dgStack<dgFloat64> p0(2 * m_mesh->GetVertexCount());
+		dgStack<dgFloat64> q0(2 * m_mesh->GetVertexCount());
+		SetBuffers(&r0[0], &z0[0], &p0[0], &q0[0]);
 		dgFloat64 gradientNorm = CalculateGradientVector ();
 		for (dgInt32 iter = 0; (iter < dgABF_MAX_ITERATIONS) && (gradientNorm > dgABF_TOL2) && m_continueExecution; iter++) {
 			m_progressDen = m_progressNum + m_totalVariablesCount;
-			SolveAlloc(m_totalVariablesCount, dgABF_LINEAR_SOLVER_TOL, m_deltaVariables, m_gradients);
+			Solve(m_totalVariablesCount, dgABF_LINEAR_SOLVER_TOL, m_deltaVariables, m_gradients);
 			for (dgInt32 i = 0; i < m_totalVariablesCount; i ++) {
 				m_variables[i] += m_deltaVariables[i];
 			}
 			gradientNorm = CalculateGradientVector ();
 		}
+		SetBuffers(NULL, NULL, NULL, NULL);
 */
 
 #ifdef _DEBUG

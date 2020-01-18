@@ -35,25 +35,38 @@ template<class T>
 class dgSymmetricConjugateGradientSolver
 {
 	public:
-	dgSymmetricConjugateGradientSolver(){}
+	dgSymmetricConjugateGradientSolver() 
+	{
+		SetBuffers(NULL, NULL, NULL, NULL);
+	}
+	dgSymmetricConjugateGradientSolver(T* const r0, T* const z0, T* const p0, T* const q0)
+	{
+		SetBuffers(r0, z0, p0, q0);
+	}
 	~dgSymmetricConjugateGradientSolver(){}
 
-	T Solve(dgInt32 size, T tolerance, T* const x, const T* const b) const
+	void SetBuffers(T* const r0, T* const z0, T* const p0, T* const q0)
 	{
-		T* const r0 = dgAlloca(T, size);
-		T* const z0 = dgAlloca(T, size);
-		T* const p0 = dgAlloca(T, size);
-		T* const q0 = dgAlloca(T, size);
-		return Solve(size, tolerance, x, b, r0, z0, p0, q0);
+		m_r0 = r0;
+		m_z0 = z0;
+		m_p0 = p0;
+		m_q0 = q0;
 	}
 
-	T SolveAlloc(dgInt32 size, T tolerance, T* const x, const T* const b) const
+	T Solve(dgInt32 size, T tolerance, T* const x, const T* const b)
 	{
-		dgStack<T> r0(size);
-		dgStack<T> z0(size);
-		dgStack<T> p0(size);
-		dgStack<T> q0(size);
-		return Solve(size, tolerance, x, b, &r0[0], &z0[0], &p0[0], &q0[0]);
+		if (m_r0) {
+			return Solve(size, tolerance, x, b, m_r0, m_z0, m_p0, m_q0);
+		} else {
+			T* const r0 = dgAlloca(T, size);
+			T* const z0 = dgAlloca(T, size);
+			T* const p0 = dgAlloca(T, size);
+			T* const q0 = dgAlloca(T, size);
+			SetBuffers(r0, z0, p0, q0);
+			T error = Solve(size, tolerance, x, b, m_r0, m_z0, m_p0, m_q0);
+			SetBuffers(NULL, NULL, NULL, NULL);
+			return error;
+		}
 	}
 
 	protected:
@@ -134,6 +147,11 @@ class dgSymmetricConjugateGradientSolver
 			a[i] = b[i] + scale * c[i];
 		}
 	}
+
+	T* m_r0;
+	T* m_z0; 
+	T* m_p0; 
+	T* m_q0;
 };
 
 
