@@ -65,9 +65,9 @@ class dgSkeletonContainer
 	
 	private:
 	bool SanityCheck(const dgForcePair* const force, const dgForcePair* const accel) const;
-	void ConditionMassMatrix(const dgInt32 start, const dgInt32 step) const;
-	void RebuildMassMatrix(const dgInt32 start, const dgInt32 step, const dgFloat32* const diagDamp) const;
-	void CalculateLoopMassMatrixCoefficients(const dgInt32 start, const dgInt32 step, dgFloat32* const diagDamp);
+	void ConditionMassMatrix() const;
+	void RebuildMassMatrix(const dgFloat32* const diagDamp) const;
+	void CalculateLoopMassMatrixCoefficients(dgFloat32* const diagDamp);
 	
 	DG_INLINE void CalculateForce(dgForcePair* const force, const dgForcePair* const accel) const;
 	DG_INLINE void SolveBackward(dgForcePair* const force, const dgForcePair* const accel) const;
