@@ -32,24 +32,39 @@
 
 
 template<class T>
-class dgSymmetricBiconjugateGradientSolve
+class dgSymmetricConjugateGradientSolver
 {
 	public:
-	dgSymmetricBiconjugateGradientSolve(){}
-	~dgSymmetricBiconjugateGradientSolve(){}
+	dgSymmetricConjugateGradientSolver(){}
+	~dgSymmetricConjugateGradientSolver(){}
 
 	T Solve(dgInt32 size, T tolerance, T* const x, const T* const b) const
 	{
-		//dgStack<T> bufferR0(size);
-		//dgStack<T> bufferP0(size);
-		//dgStack<T> matrixTimesP0(size);
-		//dgStack<T> bufferConditionerInverseTimesR0(size);
+		T* const r0 = dgAlloca(T, size);
+		T* const z0 = dgAlloca(T, size);
+		T* const p0 = dgAlloca(T, size);
+		T* const q0 = dgAlloca(T, size);
+		return Solve(size, tolerance, x, b, r0, z0, p0, q0);
+	}
 
-		T* bufferR0 = dgAlloca(T, size);
-		T* bufferP0 = dgAlloca(T, size);
-		T* matrixTimesP0 = dgAlloca(T, size);
-		T* bufferConditionerInverseTimesR0 = dgAlloca(T, size);
+	T SolveAlloc(dgInt32 size, T tolerance, T* const x, const T* const b) const
+	{
+		dgStack<T> r0(size);
+		dgStack<T> z0(size);
+		dgStack<T> p0(size);
+		dgStack<T> q0(size);
+		return Solve(size, tolerance, x, b, &r0[0], &z0[0], &p0[0], &q0[0]);
+	}
 
+	protected:
+	virtual void MatrixTimeVector(T* const out, const T* const v) const = 0;
+	virtual bool InversePrecoditionerTimeVector(T* const out, const T* const v) const = 0;
+	
+	private:
+	T Solve(dgInt32 size, T tolerance, T* const x, const T* const b,
+		T* const bufferR0, T* const bufferP0, 
+		T* const matrixTimesP0, T* const bufferConditionerInverseTimesR0) const
+	{
 		T* const r0 = &bufferR0[0];
 		T* const p0 = &bufferP0[0];
 		T* const MinvR0 = &bufferConditionerInverseTimesR0[0];
@@ -73,17 +88,12 @@ class dgSymmetricBiconjugateGradientSolve
 			ScaleAdd(size, x, x, alpha, p0);
 			if ((j % 50) != 49) {
 				ScaleAdd(size, r0, r0, -alpha, matrixP0);
-			}
-			else {
+			} else {
 				MatrixTimeVector(matrixP0, x);
 				Sub(size, r0, b, matrixP0);
 			}
 
-			//dgUnsigned64 xxx0 = dgGetTimeInMicrosenconds();
 			continueExecution = InversePrecoditionerTimeVector(MinvR0, r0);
-			//xxx0 = dgGetTimeInMicrosenconds() - xxx0;
-			//dgTrace (("%d\n", dgUnsigned64 (xxx0)));
-
 
 			T num1 = DotProduct(size, r0, MinvR0);
 			T beta = num1 / num;
@@ -98,16 +108,10 @@ class dgSymmetricBiconjugateGradientSolve
 				}
 			}
 		}
-
 		dgAssert(iter <= size);
 		return num;
 	}
 
-	protected:
-	virtual void MatrixTimeVector(T* const out, const T* const v) const = 0;
-	virtual bool InversePrecoditionerTimeVector(T* const out, const T* const v) const = 0;
-	
-	private:
 	T DotProduct(dgInt32 size, const T* const b, const T* const c) const
 	{
 		T product = T(0.0f);

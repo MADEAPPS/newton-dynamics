@@ -51,7 +51,7 @@
 #endif
 
 
-class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve<dgFloat64>
+class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dgFloat64>
 {
 	public:
 	dgTriangleAnglesToUV (dgMeshEffect* const mesh, dgInt32 material, dgReportProgress progressReportCallback, void* const userData, const dgFloat64* const pinnedPoint, dgFloat64* const triangleAnglesVector = NULL)
@@ -822,7 +822,7 @@ class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve<dgFloat64
 	void LagrangeOptimization()
 	{
 		CalculateGradientVectorAndHessianMatrix ();
-		Solve(2 * m_mesh->GetVertexCount(), dgABF_UV_TOL2, m_uvArray, m_gradients);
+		SolveAlloc(2 * m_mesh->GetVertexCount(), dgABF_UV_TOL2, m_uvArray, m_gradients);
 	}
 
 	dgArray<dgInt32> m_hessianCoLumnIndex;
@@ -843,7 +843,7 @@ class dgTriangleAnglesToUV: public dgSymmetricBiconjugateGradientSolve<dgFloat64
 	bool m_allocated;
 };
 
-class dgAngleBasedFlatteningMapping: public dgSymmetricBiconjugateGradientSolve<dgFloat64>
+class dgAngleBasedFlatteningMapping: public dgSymmetricConjugateGradientSolver<dgFloat64>
 {
 	public: 
 	dgAngleBasedFlatteningMapping (dgMeshEffect* const mesh, dgInt32 material, dgReportProgress progressReportCallback, void* const userData)
@@ -1415,7 +1415,7 @@ dgAssert (0);
 		dgFloat64 gradientNorm = CalculateGradientVector ();
 		for (dgInt32 iter = 0; (iter < dgABF_MAX_ITERATIONS) && (gradientNorm > dgABF_TOL2) && m_continueExecution; iter++) {
 			m_progressDen = m_progressNum + m_totalVariablesCount;
-			Solve(m_totalVariablesCount, dgABF_LINEAR_SOLVER_TOL, m_deltaVariables, m_gradients);
+			SolveAlloc(m_totalVariablesCount, dgABF_LINEAR_SOLVER_TOL, m_deltaVariables, m_gradients);
 			for (dgInt32 i = 0; i < m_totalVariablesCount; i ++) {
 				m_variables[i] += m_deltaVariables[i];
 			}
