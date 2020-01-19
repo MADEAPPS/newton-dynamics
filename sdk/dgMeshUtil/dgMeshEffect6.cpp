@@ -788,17 +788,14 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dgFloat64>
 		DG_DEBUG_UV (("\n"));
 	}
 
-
-	bool InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const
+	void InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const
 	{
 		const dgInt32 count = m_mesh->GetVertexCount();
 		for (dgInt32 i = 0; i < count; i ++) {
 			out[2 * i + 0] = m_pinnedPoints[i] * v[i * 2 + 0] / m_diagonal[2 * i + 0];
 			out[2 * i + 1] = m_pinnedPoints[i] * v[i * 2 + 1] / m_diagonal[2 * i + 1];
 		}
-		return true;
 	}
-
 
 	void MatrixTimeVector (dgFloat64* const out, const dgFloat64* const v) const
 	{
@@ -1381,7 +1378,7 @@ dgAssert (0);
 		}
 	}
 
-	bool InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const
+	void InversePrecoditionerTimeVector (dgFloat64* const out, const dgFloat64* const v) const
 	{
 		for (dgInt32 i = 0; i < m_anglesCount; i ++) {
 			out[i] = v[i] / m_weight[i];
@@ -1401,7 +1398,6 @@ dgAssert (0);
 				m_continueExecution = m_progressReportCallback (dgMin (dgFloat32 (m_progressNum) / m_progressDen, dgFloat32 (1.0f)), m_progressReportUserData);
 			}
 		}
-		return m_continueExecution;
 	}
 
 	void LagrangeOptimization()

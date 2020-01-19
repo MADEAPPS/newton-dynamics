@@ -134,6 +134,8 @@ class dgContactMaterial: public dgContactPoint
 		m_override0Friction = 1<<6,
 		m_override1Friction = 1<<7,
 		m_overrideNormalAccel = 1<<8,
+		m_resetSkeletonSelfCollision = 1<<9,
+		m_resetSkeletonIntraCollision = 1<<10,
 	};
 
 	DG_MSC_VECTOR_ALIGMENT 

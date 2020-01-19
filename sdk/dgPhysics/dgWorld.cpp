@@ -197,8 +197,43 @@ static void TestAStart()
 		path.m_map[y][x] = '_';
 	}
 }
-*/
 
+
+class TestGradient: public dgSymmetricConjugateGradientSolver<dgFloat32>
+{
+	public:
+	TestGradient()
+		:dgSymmetricConjugateGradientSolver()
+	{
+		dgFloat32 xxx[4];
+		dgFloat32 b[4];
+		xxx[0] = 1.0f; xxx[1] = 2.0f; xxx[2] = 3.0f;; xxx[3] = 4.0f;
+		dgCovarianceMatrix(4, &A[0][0], xxx, xxx);
+		A[0][0] = 10.0f; A[1][1] = 10.0f; A[2][2] = 10.0f;
+		dgAssert(dgTestPSDmatrix(4, 4, &A[0][0]));
+		dgMatrixTimeVector(4, &A[0][0], xxx, b);
+
+		dgFloat32 x[4];
+		x[0] = 0.0f; x[1] = 0.0f; x[2] = 0.0f;; x[3] = 0.0f;
+		Solve(4, 1.0e-6f, x, b);
+	}
+
+	virtual void MatrixTimeVector(dgFloat32* const out, const dgFloat32* const v) const
+	{
+		dgMatrixTimeVector(4, &A[0][0], v, out);
+	}
+
+	virtual void InversePrecoditionerTimeVector(dgFloat32* const out, const dgFloat32* const v) const
+	{
+		for (int i = 0; i < 4; i++) {
+			out[i] = v[i] / A[i][i];
+		}
+	}
+
+
+	dgFloat32 A[4][4];
+};
+*/
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -237,6 +272,7 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 {
 	//TestAStart();
 	//TestSort();
+	//TestGradient();
 
 	dgMutexThread* const myThread = this;
 	SetParentThread (myThread);

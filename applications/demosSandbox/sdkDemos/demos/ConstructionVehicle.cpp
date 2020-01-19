@@ -798,6 +798,18 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		NewtonMaterialSetContactGenerationCallback (world, threadMaterialID, threadMaterialID, ThreadStaticContactsGeneration);
 		NewtonMaterialSetDefaultElasticity(world, threadMaterialID, threadMaterialID, 0.0f);
 		NewtonMaterialSetDefaultFriction(world, threadMaterialID, threadMaterialID, 0.9f, 0.9f);
+
+#if 1
+		NewtonMaterialJointResetIntraJointCollision(world, material, material);
+		NewtonMaterialJointResetSelftJointCollision(world, material, material);
+
+		NewtonMaterialJointResetIntraJointCollision(world, material, threadMaterialID);
+		NewtonMaterialJointResetSelftJointCollision(world, material, threadMaterialID);
+
+		NewtonMaterialJointResetIntraJointCollision(world, threadMaterialID, threadMaterialID);
+		NewtonMaterialJointResetSelftJointCollision(world, threadMaterialID, threadMaterialID);
+#endif
+
 	}
 
 	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
@@ -903,11 +915,9 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		const NewtonCollision* const collision0 = NewtonBodyGetCollision(body0);
 		const NewtonCollision* const collision1 = NewtonBodyGetCollision(body1);
 
-#if 1
 		// disable self exact solver contact collision 
-		NewtonContactJointResetIntraJointCollision(contactJoint);
-		NewtonContactJointResetSelftJointCollision(contactJoint);
-#endif
+		//NewtonContactJointResetIntraJointCollision(contactJoint);
+		//NewtonContactJointResetSelftJointCollision(contactJoint);
 
 		if (NewtonCollisionGetUserData(collision0) != NewtonCollisionGetUserData(collision1)) {
 			const dLong mask0 = NewtonCollisionGetUserID(collision0);

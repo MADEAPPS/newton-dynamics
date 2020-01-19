@@ -31,130 +31,6 @@
 #define DG_LCP_MAX_VALUE dgFloat32 (1.0e10f)
 
 
-template<class T>
-class dgSymmetricConjugateGradientSolver
-{
-	public:
-	dgSymmetricConjugateGradientSolver() 
-	{
-		SetBuffers(NULL, NULL, NULL, NULL);
-	}
-	dgSymmetricConjugateGradientSolver(T* const r0, T* const z0, T* const p0, T* const q0)
-	{
-		SetBuffers(r0, z0, p0, q0);
-	}
-	~dgSymmetricConjugateGradientSolver(){}
-
-	void SetBuffers(T* const r0, T* const z0, T* const p0, T* const q0)
-	{
-		m_r0 = r0;
-		m_z0 = z0;
-		m_p0 = p0;
-		m_q0 = q0;
-	}
-
-	T Solve(dgInt32 size, T tolerance, T* const x, const T* const b)
-	{
-		if (m_r0) {
-			return Solve(size, tolerance, x, b, m_r0, m_z0, m_p0, m_q0);
-		} else {
-			T* const r0 = dgAlloca(T, size);
-			T* const z0 = dgAlloca(T, size);
-			T* const p0 = dgAlloca(T, size);
-			T* const q0 = dgAlloca(T, size);
-			SetBuffers(r0, z0, p0, q0);
-			T error = Solve(size, tolerance, x, b, m_r0, m_z0, m_p0, m_q0);
-			SetBuffers(NULL, NULL, NULL, NULL);
-			return error;
-		}
-	}
-
-	protected:
-	virtual void MatrixTimeVector(T* const out, const T* const v) const = 0;
-	virtual bool InversePrecoditionerTimeVector(T* const out, const T* const v) const = 0;
-	
-	private:
-	T Solve(dgInt32 size, T tolerance, T* const x, const T* const b,
-		T* const bufferR0, T* const bufferP0, 
-		T* const matrixTimesP0, T* const bufferConditionerInverseTimesR0) const
-	{
-		T* const r0 = &bufferR0[0];
-		T* const p0 = &bufferP0[0];
-		T* const MinvR0 = &bufferConditionerInverseTimesR0[0];
-		T* const matrixP0 = &matrixTimesP0[0];
-
-		MatrixTimeVector(matrixP0, x);
-		Sub(size, r0, b, matrixP0);
-		bool continueExecution = InversePrecoditionerTimeVector(p0, r0);
-
-		dgInt32 iter = 0;
-		T num = DotProduct(size, r0, p0);
-		T error2 = num;
-		for (dgInt32 j = 0; (j < size) && (error2 > tolerance) && continueExecution; j++) {
-
-			MatrixTimeVector(matrixP0, p0);
-			T den = DotProduct(size, p0, matrixP0);
-
-			dgAssert(fabs(den) > T(0.0f));
-			T alpha = num / den;
-
-			ScaleAdd(size, x, x, alpha, p0);
-			if ((j % 50) != 49) {
-				ScaleAdd(size, r0, r0, -alpha, matrixP0);
-			} else {
-				MatrixTimeVector(matrixP0, x);
-				Sub(size, r0, b, matrixP0);
-			}
-
-			continueExecution = InversePrecoditionerTimeVector(MinvR0, r0);
-
-			T num1 = DotProduct(size, r0, MinvR0);
-			T beta = num1 / num;
-			ScaleAdd(size, p0, MinvR0, beta, p0);
-			num = DotProduct(size, r0, MinvR0);
-			iter++;
-			error2 = num;
-			if (j > 10) {
-				error2 = T(0.0f);
-				for (dgInt32 i = 0; i < size; i++) {
-					error2 = dgMax(error2, r0[i] * r0[i]);
-				}
-			}
-		}
-		dgAssert(iter <= size);
-		return num;
-	}
-
-	T DotProduct(dgInt32 size, const T* const b, const T* const c) const
-	{
-		T product = T(0.0f);
-		for (dgInt32 i = 0; i < size; i++) {
-			product += b[i] * c[i];
-		}
-		return product;
-	}
-
-	void Sub(dgInt32 size, T* const a, const T* const b, const T* const c) const
-	{
-		for (dgInt32 i = 0; i < size; i++) {
-			a[i] = b[i] - c[i];
-		}
-	}
-
-	void ScaleAdd(dgInt32 size, T* const a, const T* const b, T scale, const T* const c) const
-	{
-		for (dgInt32 i = 0; i < size; i++) {
-			a[i] = b[i] + scale * c[i];
-		}
-	}
-
-	T* m_r0;
-	T* m_z0; 
-	T* m_p0; 
-	T* m_q0;
-};
-
-
 template<dgInt32 maxRows>
 class dgOldSolverNetwon_1_5
 {
@@ -349,6 +225,129 @@ class dgOldSolverNetwon_1_5
 	dgInt32 m_size;
 };
 
+
+template<class T>
+class dgSymmetricConjugateGradientSolver
+{
+	public:
+	dgSymmetricConjugateGradientSolver();
+	dgSymmetricConjugateGradientSolver(T* const r0, T* const z0, T* const p0, T* const q0);
+	~dgSymmetricConjugateGradientSolver();
+
+	void SetBuffers(T* const r0, T* const z0, T* const p0, T* const q0);
+	T Solve(dgInt32 size, T tolerance, T* const x, const T* const b);
+
+	protected:
+	virtual void MatrixTimeVector(T* const out, const T* const v) const = 0;
+	virtual void InversePrecoditionerTimeVector(T* const out, const T* const v) const = 0;
+
+	private:
+	T SolveInternal(dgInt32 size, T tolerance, T* const x, const T* const b) const;
+	//T DotProduct(dgInt32 size, const T* const b, const T* const c) const;
+	//void Sub(dgInt32 size, T* const a, const T* const b, const T* const c) const;
+	//void ScaleAdd(dgInt32 size, T* const a, const T* const b, T scale, const T* const c) const;
+
+	T* m_r0;
+	T* m_z0;
+	T* m_p0;
+	T* m_q0;
+};
+
+
+template<class T>
+dgSymmetricConjugateGradientSolver<T>::dgSymmetricConjugateGradientSolver()
+{
+	SetBuffers(NULL, NULL, NULL, NULL);
+}
+
+template<class T>
+dgSymmetricConjugateGradientSolver<T>::dgSymmetricConjugateGradientSolver(T* const r0, T* const z0, T* const p0, T* const q0)
+{
+	SetBuffers(r0, z0, p0, q0);
+}
+
+template<class T>
+dgSymmetricConjugateGradientSolver<T>::~dgSymmetricConjugateGradientSolver() 
+{
+}
+
+template<class T>
+void dgSymmetricConjugateGradientSolver<T>::SetBuffers(T* const r0, T* const z0, T* const p0, T* const q0)
+{
+	m_r0 = r0;
+	m_z0 = z0;
+	m_p0 = p0;
+	m_q0 = q0;
+}
+
+template<class T>
+T dgSymmetricConjugateGradientSolver<T>::Solve(dgInt32 size, T tolerance, T* const x, const T* const b)
+{
+	if (m_r0) {
+		return SolveInternal(size, tolerance, x, b);
+	} else {
+		T* const r0 = dgAlloca(T, size);
+		T* const z0 = dgAlloca(T, size);
+		T* const p0 = dgAlloca(T, size);
+		T* const q0 = dgAlloca(T, size);
+		SetBuffers(r0, z0, p0, q0);
+		T error = SolveInternal(size, tolerance, x, b);
+		SetBuffers(NULL, NULL, NULL, NULL);
+		return error;
+	}
+}
+
+template<class T>
+T dgSymmetricConjugateGradientSolver<T>::SolveInternal(dgInt32 size, T tolerance, T* const x, const T* const b) const
+{
+	MatrixTimeVector(m_z0, x);
+	dgSub(size, m_r0, b, m_z0);
+	InversePrecoditionerTimeVector(m_p0, m_r0);
+
+	dgInt32 iter = 0;
+	T num = dgDotProduct(size, m_r0, m_p0);
+	T error2 = num;
+	for (dgInt32 j = 0; (j < size) && (error2 > tolerance); j++) {
+
+		MatrixTimeVector(m_z0, m_p0);
+		T den = dgDotProduct(size, m_p0, m_z0);
+
+		dgAssert(fabs(den) > T(0.0f));
+		T alpha = num / den;
+
+		dgMulAdd(size, x, x, m_p0, alpha);
+		if ((j % 50) != 49) {
+			dgMulAdd(size, m_r0, m_r0, m_z0, -alpha);
+		} else {
+			MatrixTimeVector(m_z0, x);
+			dgSub(size, m_r0, b, m_z0);
+		}
+
+		InversePrecoditionerTimeVector(m_q0, m_r0);
+
+		T num1 = dgDotProduct(size, m_r0, m_q0);
+		T beta = num1 / num;
+		dgMulAdd(size, m_p0, m_q0, m_p0, beta);
+		num = dgDotProduct(size, m_r0, m_q0);
+		iter++;
+		error2 = num;
+		if (j > 10) {
+			error2 = T(0.0f);
+			for (dgInt32 i = 0; i < size; i++) {
+				error2 = dgMax(error2, m_r0[i] * m_r0[i]);
+			}
+		}
+	}
+	dgAssert(iter <= size);
+	return num;
+}
+
+
+//*************************************************************
+//
+// generic linear algebra functions
+//
+//*************************************************************
 template<class T>
 void dgMatrixTimeVector(dgInt32 size, const T* const matrix, const T* const v, T* const out)
 {
@@ -373,6 +372,20 @@ void dgMatrixTimeMatrix(dgInt32 size, const T* const matrixA, const T* const mat
 			}
 			rowOut[j] = acc;
 		}
+	}
+}
+
+template<class T>
+void dgCovarianceMatrix(dgInt32 size, T* const matrix, const T* const vectorA, const T* const vectorB)
+{
+	dgInt32 stride = 0;
+	for (dgInt32 i = 0; i < size; i++) {
+		T* const row = &matrix[stride];
+		T scale (vectorA[i]);
+		for (dgInt32 j = 0; j < size; j++) {
+			row[j] = scale * vectorA[j];
+		}
+		stride += size;
 	}
 }
 
