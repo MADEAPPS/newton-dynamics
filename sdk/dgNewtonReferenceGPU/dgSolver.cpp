@@ -1126,7 +1126,7 @@ void dgSolver::InitSkeletons(dgInt32 threadID)
 	dgSoaFloat::FlushRegisters();
 	for (dgInt32 i = threadID; i < count; i += threadCounts) {
 		dgSkeletonContainer* const skeleton = skeletonArray[i];
-		skeleton->InitMassMatrix(m_jointArray, leftHandSide, rightHandSide);
+		skeleton->InitMassMatrix(m_jointArray, leftHandSide, rightHandSide, false);
 	}
 }
 

@@ -61,7 +61,7 @@ class dgSkeletonContainer
 	void SetLru(dgInt32 lru) { m_lru = lru; }
 
 	virtual void CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces);
-	virtual void InitMassMatrix (const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide);
+	virtual void InitMassMatrix (const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, bool m_consideredCloseLoop = true);
 	
 	private:
 	bool SanityCheck(const dgForcePair* const force, const dgForcePair* const accel) const;
@@ -70,7 +70,7 @@ class dgSkeletonContainer
 	void CalculateLoopMassMatrixCoefficients(dgFloat32* const diagDamp);
 	
 	DG_INLINE void CalculateForce(dgForcePair* const force, const dgForcePair* const accel) const;
-	DG_INLINE void SolveBackward(dgForcePair* const force, const dgForcePair* const accel) const;
+	DG_INLINE void SolveBackward(dgForcePair* const force) const;
 	DG_INLINE void SolveForward(dgForcePair* const force, const dgForcePair* const accel, dgInt32 startNode = 0) const;
 	DG_INLINE void UpdateForces(dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const dgForcePair* const force) const;
 	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, dgForcePair* const accel) const;
@@ -108,6 +108,7 @@ class dgSkeletonContainer
 	dgInt16 m_rowCount;
 	dgInt16 m_loopRowCount;
 	dgInt16 m_auxiliaryRowCount;
+	dgInt16 m_consideredCloseLoop;
 
 	friend class dgWorld;
 	friend class dgParallelBodySolver;

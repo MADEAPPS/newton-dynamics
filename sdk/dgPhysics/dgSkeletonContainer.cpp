@@ -394,6 +394,7 @@ dgSkeletonContainer::dgSkeletonContainer(dgWorld* const world, dgDynamicBody* co
 	,m_rowCount(0)
 	,m_loopRowCount(0)
 	,m_auxiliaryRowCount(0)
+	,m_consideredCloseLoop(1)
 {
 	if (rootBody->GetInvMass().m_w != dgFloat32 (0.0f)) {
 		rootBody->SetSkeleton(this);
@@ -674,16 +675,14 @@ void dgSkeletonContainer::CalculateLoopMassMatrixCoefficients(dgFloat32* const d
 	}
 }
 
-#if 1
 void dgSkeletonContainer::ConditionMassMatrix () const
 {
 	DG_TRACKTIME();
 	dgForcePair* const forcePair = dgAlloca(dgForcePair, m_nodeCount);
-	dgForcePair* const accelPair = dgAlloca(dgForcePair, m_nodeCount);
-
+//	dgForcePair* const accelPair = dgAlloca(dgForcePair, m_nodeCount);
 	const dgSpatialVector zero(dgSpatialVector::m_zero);
-	accelPair[m_nodeCount - 1].m_body = zero;
-	accelPair[m_nodeCount - 1].m_joint = zero;
+//	accelPair[m_nodeCount - 1].m_body = zero;
+//	accelPair[m_nodeCount - 1].m_joint = zero;
 
 	const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i ++) {
@@ -693,8 +692,10 @@ void dgSkeletonContainer::ConditionMassMatrix () const
 		for (dgInt32 j = 0; j < m_nodeCount - 1; j++) {
 			const dgNode* const node = m_nodesOrder[j];
 			const dgInt32 index = node->m_index;
-			accelPair[index].m_body = zero;
-			dgSpatialVector& a = accelPair[index].m_joint;
+			//accelPair[index].m_body = zero;
+			//dgSpatialVector& a = accelPair[index].m_joint;
+			forcePair[index].m_body = zero;
+			dgSpatialVector& a = forcePair[index].m_joint;
 
 			const int count = node->m_dof;
 			for (dgInt32 k = 0; k < count; k++) {
@@ -707,8 +708,11 @@ void dgSkeletonContainer::ConditionMassMatrix () const
 
 		startjoint = (startjoint == m_nodeCount) ? 0 : startjoint;
 		dgAssert(startjoint < m_nodeCount);
-		SolveForward(forcePair, accelPair, startjoint);
-		SolveBackward(forcePair, forcePair);
+		//SolveForward(forcePair, accelPair, startjoint);
+		forcePair[m_nodeCount - 1].m_body = zero;
+		forcePair[m_nodeCount - 1].m_joint = zero;
+		SolveForward(forcePair, forcePair, startjoint);
+		SolveBackward(forcePair);
 
 		dgInt32 entry1 = 0;
 		dgFloat32* const deltaForcePtr = &m_deltaForce[i * primaryCount];
@@ -724,56 +728,6 @@ void dgSkeletonContainer::ConditionMassMatrix () const
 		}
 	}
 }
-
-#else
-
-void dgSkeletonContainer::ConditionMassMatrix() const
-{
-	dgForcePair* const forcePair = dgAlloca(dgForcePair, m_nodeCount);
-
-	const dgSpatialVector zero(dgSpatialVector::m_zero);
-
-	forcePair[m_nodeCount - 1].m_body = zero;
-	forcePair[m_nodeCount - 1].m_joint = zero;
-
-	const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
-	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
-		dgInt32 entry0 = 0;
-		const dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
-
-		for (dgInt32 j = 0; j < m_nodeCount - 1; j++) {
-			const dgNode* const node = m_nodesOrder[j];
-			const dgInt32 index = node->m_index;
-			forcePair[index].m_body = zero;
-			dgSpatialVector& a = forcePair[index].m_joint;
-
-			const int count = node->m_dof;
-			for (dgInt32 k = 0; k < count; k++) {
-				const dgFloat32 value = matrixRow10[entry0];
-				a[k] = value;
-				entry0++;
-			}
-		}
-
-		SolveForward(forcePair, forcePair);
-		SolveBackward(forcePair, forcePair);
-
-		dgInt32 entry1 = 0;
-		dgFloat32* const deltaForcePtr = &m_deltaForce[i * primaryCount];
-		for (dgInt32 j = 0; j < m_nodeCount - 1; j++) {
-			const dgNode* const node = m_nodesOrder[j];
-			const dgInt32 index = node->m_index;
-			const dgSpatialVector& f = forcePair[index].m_joint;
-			const int count = node->m_dof;
-			for (dgInt32 k = 0; k < count; k++) {
-				deltaForcePtr[entry1] = dgFloat32(f[k]);
-				entry1++;
-			}
-		}
-	}
-}
-
-#endif
 
 void dgSkeletonContainer::RebuildMassMatrix(const dgFloat32* const diagDamp) const
 {
@@ -1013,7 +967,7 @@ DG_INLINE void dgSkeletonContainer::SolveForward(dgForcePair* const force, const
 	m_nodesOrder[m_nodeCount - 1]->BodyDiagInvTimeSolution(force[m_nodeCount - 1]);
 }
 
-DG_INLINE void dgSkeletonContainer::SolveBackward(dgForcePair* const force, const dgForcePair* const accel) const
+DG_INLINE void dgSkeletonContainer::SolveBackward(dgForcePair* const force) const
 {
 	for (dgInt32 i = m_nodeCount - 2; i >= 0; i--) {
 		dgNode* const node = m_nodesOrder[i];
@@ -1027,7 +981,7 @@ DG_INLINE void dgSkeletonContainer::SolveBackward(dgForcePair* const force, cons
 DG_INLINE void dgSkeletonContainer::CalculateForce (dgForcePair* const force, const dgForcePair* const accel) const
 {
 	SolveForward(force, accel);
-	SolveBackward(force, accel);
+	SolveBackward(force);
 }
 
 DG_INLINE void dgSkeletonContainer::UpdateForces (dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const dgForcePair* const force) const
@@ -1375,13 +1329,14 @@ dgInt8* dgSkeletonContainer::CalculateBufferSizeInBytes (const dgJointInfo* cons
 	return &m_auxiliaryMemoryBuffer[0];
 }
 
-void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide)
+void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, bool consideredCloseLoop)
 {
 	D_TRACKTIME();
 	dgInt32 rowCount = 0;
 	dgInt32 auxiliaryCount = 0;
 	m_leftHandSide = leftHandSide;
 	m_rightHandSide = rightHandSide;
+	m_consideredCloseLoop = consideredCloseLoop ? 1 : 0;
 
 	dgSpatialMatrix* const bodyMassArray = dgAlloca (dgSpatialMatrix, m_nodeCount);
 	dgSpatialMatrix* const jointMassArray = dgAlloca (dgSpatialMatrix, m_nodeCount);
@@ -1408,7 +1363,7 @@ void dgSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray
 	m_rowCount += m_loopRowCount;
 	m_auxiliaryRowCount += m_loopRowCount;
 
-	if (m_auxiliaryRowCount) {
+	if (m_auxiliaryRowCount && m_consideredCloseLoop) {
 		InitLoopMassMatrix(jointInfoArray);
 	}
 }
@@ -1421,7 +1376,7 @@ void dgSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray,
 
 	CalculateJointAccel(jointInfoArray, internalForces, accel);
 	CalculateForce(force, accel);
-	if (m_auxiliaryRowCount) {
+	if (m_auxiliaryRowCount && m_consideredCloseLoop) {
 		SolveAuxiliary (jointInfoArray, internalForces, accel, force);
 	} else {
 		UpdateForces(jointInfoArray, internalForces, force);
