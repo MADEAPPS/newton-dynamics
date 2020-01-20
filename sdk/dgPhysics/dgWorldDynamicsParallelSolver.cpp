@@ -75,6 +75,7 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 
 void dgWorldDynamicUpdate::IntegrateClustersParallelKernel(void* const context, void* const worldPtr, dgInt32 threadID)
 {
+	DG_TRACKTIME();
 	dgWorld* const world = (dgWorld*)worldPtr;
 	dgParallelClusterArray* const clusterArray = (dgParallelClusterArray*)context;
 	world->IntegrateInslandParallel(clusterArray, threadID);
@@ -82,6 +83,7 @@ void dgWorldDynamicUpdate::IntegrateClustersParallelKernel(void* const context, 
 
 void dgWorldDynamicUpdate::IntegrateInslandParallel(dgParallelClusterArray* const clusterArray, dgInt32 threadID)
 {
+	DG_TRACKTIME();
 	dgWorld* const world = (dgWorld*) this;
 	dgFloat32 timestep = clusterArray->m_timestep;
 	const dgInt32 clustersCount = clusterArray->m_clustersCount;
@@ -216,12 +218,14 @@ void dgParallelBodySolver::InitBodyArray()
 
 void dgParallelBodySolver::InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME();
 	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
 	me->InitBodyArray(threadID);
 }
 
 void dgParallelBodySolver::InitJacobianMatrixKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME();
 	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
 	me->InitJacobianMatrix(threadID);
 }
@@ -234,42 +238,49 @@ void dgParallelBodySolver::CalculateJointsForceKernel(void* const context, void*
 
 void dgParallelBodySolver::CalculateJointsAccelerationKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME();
 	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
 	me->CalculateJointsAcceleration(threadID);
 }
 
 void dgParallelBodySolver::IntegrateBodiesVelocityKernel(void* const context, void* const worldContext, dgInt32 threadID)
 {
+	DG_TRACKTIME();
 	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
 	me->IntegrateBodiesVelocity(threadID);
 }
 
 void dgParallelBodySolver::CalculateBodiesAccelerationKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME();
 	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
 	me->CalculateBodiesAcceleration(threadID);
 }
 
 void dgParallelBodySolver::UpdateForceFeedbackKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME();
 	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
 	me->UpdateForceFeedback(threadID);
 }
 
 void dgParallelBodySolver::UpdateKinematicFeedbackKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME();
 	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
 	me->UpdateKinematicFeedback(threadID);
 }
 
 void dgParallelBodySolver::TransposeMassMatrixKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME();
 	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
 	me->TransposeMassMatrix(threadID);
 }
 
 void dgParallelBodySolver::UpdateRowAccelerationKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME();
 	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
 	me->UpdateRowAcceleration(threadID);
 }
@@ -789,6 +800,7 @@ void dgParallelBodySolver::IntegrateBodiesVelocity(dgInt32 threadID)
 
 void dgParallelBodySolver::IntegrateBodiesVelocity()
 {
+	DG_TRACKTIME();
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
 		m_world->QueueJob(IntegrateBodiesVelocityKernel, this, NULL, "dgParallelBodySolver::IntegrateBodiesVelocity");
 	}
@@ -797,6 +809,7 @@ void dgParallelBodySolver::IntegrateBodiesVelocity()
 
 void dgParallelBodySolver::CalculateJointsForce()
 {
+	DG_TRACKTIME();
 	const dgInt32 bodyCount = m_cluster->m_bodyCount;
 	dgJacobian* const internalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[0];
 	dgJacobian* const tempInternalForces = &m_world->GetSolverMemory().m_internalForcesBuffer[bodyCount];
@@ -817,9 +830,9 @@ void dgParallelBodySolver::CalculateJointsForce()
 	}
 }
 
-
 void dgParallelBodySolver::CalculateJointsAccel()
 {
+	DG_TRACKTIME();
 	for (dgInt32 i = 0; i < m_threadCounts; i++) {
 		m_world->QueueJob(CalculateJointsAccelerationKernel, this, NULL, "dgParallelBodySolver::CalculateJointsAcceleration");
 	}
@@ -864,18 +877,21 @@ void dgParallelBodySolver::UpdateSkeletons(dgInt32 threadID)
 
 void dgParallelBodySolver::InitSkeletonsKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME();
 	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
 	me->InitSkeletons(threadID);
 }
 
 void dgParallelBodySolver::UpdateSkeletonsKernel(void* const context, void* const, dgInt32 threadID)
 {
+	DG_TRACKTIME();
 	dgParallelBodySolver* const me = (dgParallelBodySolver*)context;
 	me->UpdateSkeletons(threadID);
 }
 
 void dgParallelBodySolver::InitSkeletons()
 {
+	DG_TRACKTIME();
 	const dgInt32 threadCounts = m_world->GetThreadCount();
 	for (dgInt32 i = 0; i < threadCounts; i++) {
 		m_world->QueueJob(InitSkeletonsKernel, this, NULL, "dgSolver::InitSkeletonsKernel");
@@ -885,6 +901,7 @@ void dgParallelBodySolver::InitSkeletons()
 
 void dgParallelBodySolver::UpdateSkeletons()
 {
+	DG_TRACKTIME();
 	const dgInt32 threadCounts = m_world->GetThreadCount();
 	for (dgInt32 i = 0; i < threadCounts; i++) {
 		m_world->QueueJob(UpdateSkeletonsKernel, this, NULL, "dgParallelBodySolver::UpdateSkeletons");
@@ -1370,6 +1387,7 @@ void dgParallelBodySolver::CalculateForces()
 
 void dgParallelBodySolver::CalculateJointForces(const dgBodyCluster& cluster, dgBodyInfo* const bodyArray, dgJointInfo* const jointArray, dgFloat32 timestep)
 {
+	DG_TRACKTIME();
 	m_cluster = &cluster;
 	m_bodyArray = bodyArray;
 	m_jointArray = jointArray;

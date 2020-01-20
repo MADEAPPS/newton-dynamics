@@ -592,18 +592,15 @@ void dgSkeletonContainer::CalculateLoopMassMatrixCoefficients(dgFloat32* const d
 		const dgInt32 ii = m_matrixRowsIndex[primaryCount + index];
 		const dgLeftHandSide* const row_i = &m_leftHandSide[ii];
 		const dgRightHandSide* const rhs_i = &m_rightHandSide[ii];
-		dgFloat32* const matrixRow11 = &m_massMatrix11[m_auxiliaryRowCount * index];
-
-		dgJacobian JMinvM0(row_i->m_JMinv.m_jacobianM0);
-		dgJacobian JMinvM1(row_i->m_JMinv.m_jacobianM1);
-
-		dgVector element(
+		const dgJacobian JMinvM0(row_i->m_JMinv.m_jacobianM0);
+		const dgJacobian JMinvM1(row_i->m_JMinv.m_jacobianM1);
+		const dgVector element(
 			JMinvM0.m_linear * row_i->m_Jt.m_jacobianM0.m_linear + JMinvM0.m_angular * row_i->m_Jt.m_jacobianM0.m_angular +
 			JMinvM1.m_linear * row_i->m_Jt.m_jacobianM1.m_linear + JMinvM1.m_angular * row_i->m_Jt.m_jacobianM1.m_angular);
-		element = element.AddHorizontal();
-
+		
 		// I know I am doubling the matrix regularizer, but this makes the solution more robust.
-		dgFloat32 diagonal = element.GetScalar() + rhs_i->m_diagDamp;
+		dgFloat32* const matrixRow11 = &m_massMatrix11[m_auxiliaryRowCount * index];
+		dgFloat32 diagonal = element.AddHorizontal().GetScalar() + rhs_i->m_diagDamp;
 		matrixRow11[index] = diagonal + rhs_i->m_diagDamp;
 		//diagDamp[index] = matrixRow11[index] * (DG_PSD_DAMP_TOL * dgFloat32(4.0f));
 		diagDamp[index] = matrixRow11[index] * dgFloat32(4.0e-3f);
