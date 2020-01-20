@@ -799,7 +799,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		NewtonMaterialSetDefaultElasticity(world, threadMaterialID, threadMaterialID, 0.0f);
 		NewtonMaterialSetDefaultFriction(world, threadMaterialID, threadMaterialID, 0.9f, 0.9f);
 
-#if 0
+#if 1
 		NewtonMaterialJointResetIntraJointCollision(world, material, material);
 		NewtonMaterialJointResetSelftJointCollision(world, material, material);
 

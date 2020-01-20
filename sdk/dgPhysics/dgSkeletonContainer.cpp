@@ -674,6 +674,7 @@ void dgSkeletonContainer::CalculateLoopMassMatrixCoefficients(dgFloat32* const d
 	}
 }
 
+#if 1
 void dgSkeletonContainer::ConditionMassMatrix () const
 {
 	DG_TRACKTIME();
@@ -686,7 +687,7 @@ void dgSkeletonContainer::ConditionMassMatrix () const
 
 	const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
 	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i ++) {
-		dgInt32 entry = 0;
+		dgInt32 entry0 = 0;
 		dgInt32 startjoint = m_nodeCount;
 		const dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
 		for (dgInt32 j = 0; j < m_nodeCount - 1; j++) {
@@ -697,19 +698,19 @@ void dgSkeletonContainer::ConditionMassMatrix () const
 
 			const int count = node->m_dof;
 			for (dgInt32 k = 0; k < count; k++) {
-				const dgFloat32 value = matrixRow10[entry];
+				const dgFloat32 value = matrixRow10[entry0];
 				a[k] = value;
 				startjoint = (value == 0.0f) ? startjoint : dgMin(startjoint, index);
-				entry++;
+				entry0++;
 			}
 		}
 
-		entry = 0;
 		startjoint = (startjoint == m_nodeCount) ? 0 : startjoint;
 		dgAssert(startjoint < m_nodeCount);
 		SolveForward(forcePair, accelPair, startjoint);
 		SolveBackward(forcePair, forcePair);
 
+		dgInt32 entry1 = 0;
 		dgFloat32* const deltaForcePtr = &m_deltaForce[i * primaryCount];
 		for (dgInt32 j = 0; j < m_nodeCount - 1; j++) {
 			const dgNode* const node = m_nodesOrder[j];
@@ -717,12 +718,62 @@ void dgSkeletonContainer::ConditionMassMatrix () const
 			const dgSpatialVector& f = forcePair[index].m_joint;
 			const int count = node->m_dof;
 			for (dgInt32 k = 0; k < count; k++) {
-				deltaForcePtr[entry] = dgFloat32(f[k]);
-				entry++;
+				deltaForcePtr[entry1] = dgFloat32(f[k]);
+				entry1++;
 			}
 		}
 	}
 }
+
+#else
+
+void dgSkeletonContainer::ConditionMassMatrix() const
+{
+	dgForcePair* const forcePair = dgAlloca(dgForcePair, m_nodeCount);
+
+	const dgSpatialVector zero(dgSpatialVector::m_zero);
+
+	forcePair[m_nodeCount - 1].m_body = zero;
+	forcePair[m_nodeCount - 1].m_joint = zero;
+
+	const dgInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
+	for (dgInt32 i = 0; i < m_auxiliaryRowCount; i++) {
+		dgInt32 entry0 = 0;
+		const dgFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
+
+		for (dgInt32 j = 0; j < m_nodeCount - 1; j++) {
+			const dgNode* const node = m_nodesOrder[j];
+			const dgInt32 index = node->m_index;
+			forcePair[index].m_body = zero;
+			dgSpatialVector& a = forcePair[index].m_joint;
+
+			const int count = node->m_dof;
+			for (dgInt32 k = 0; k < count; k++) {
+				const dgFloat32 value = matrixRow10[entry0];
+				a[k] = value;
+				entry0++;
+			}
+		}
+
+		SolveForward(forcePair, forcePair);
+		SolveBackward(forcePair, forcePair);
+
+		dgInt32 entry1 = 0;
+		dgFloat32* const deltaForcePtr = &m_deltaForce[i * primaryCount];
+		for (dgInt32 j = 0; j < m_nodeCount - 1; j++) {
+			const dgNode* const node = m_nodesOrder[j];
+			const dgInt32 index = node->m_index;
+			const dgSpatialVector& f = forcePair[index].m_joint;
+			const int count = node->m_dof;
+			for (dgInt32 k = 0; k < count; k++) {
+				deltaForcePtr[entry1] = dgFloat32(f[k]);
+				entry1++;
+			}
+		}
+	}
+}
+
+#endif
 
 void dgSkeletonContainer::RebuildMassMatrix(const dgFloat32* const diagDamp) const
 {
