@@ -214,7 +214,7 @@ static void SphereStack(DemoEntityManager* const scene, dFloat mass, const dVect
 	// create the shape and visual mesh as a common data to be re used
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), blockBoxSize, _SPHERE_PRIMITIVE, defaultMaterialID);
 	DemoMesh* const geometry = new DemoMesh("sphere", scene->GetShaderCache(), collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
-#if 0
+#if 1
 	for (int i = 0; i < count; i++) {
 		CreateSimpleSolid(scene, geometry, mass, baseMatrix, collision, defaultMaterialID);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);

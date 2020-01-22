@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\dVehicle\dStdafxVehicle.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicle.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleManager.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleNode.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleSolver.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleDashControl.cpp">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleDifferential.cpp">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleEngine.cpp">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleLoopJoint.cpp">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleMultiBody.cpp">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleTire.cpp">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleTireContact.cpp">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\dVehicle\dStdafxVehicle.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicle.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleManager.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleNode.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleSolver.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleDashControl.h">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleDifferential.h">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleEngine.h">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleLoopJoint.h">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleMultiBody.h">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleTire.h">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleTireContact.h">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="dVehicleMultiBody">
+      <UniqueIdentifier>{1a95c935-d866-4831-8ddf-1aa036c6e1ed}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
