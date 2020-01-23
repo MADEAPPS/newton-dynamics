@@ -14,8 +14,8 @@ set (projectName "dgPhysics")
 message (${projectName})
 
 # low level core
-file(GLOB CPP_SOURCE *.cpp ../dgMeshUtil/*.cpp)
 file(GLOB HEADERS *.h ../dgMeshUtil/*.h)
+file(GLOB CPP_SOURCE *.cpp ../dgMeshUtil/*.cpp)
 
 if (MSVC)
        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /fp:fast")

@@ -6,6 +6,9 @@
     <ClCompile Include="..\..\dVehicle\dVehicleManager.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleNode.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleSolver.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleCollidingNode.cpp">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleDashControl.cpp">
       <Filter>dVehicleMultiBody</Filter>
     </ClCompile>
@@ -27,8 +30,8 @@
     <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleTireContact.cpp">
       <Filter>dVehicleMultiBody</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleCollidingNode.cpp">
-      <Filter>dVehicleMultiBody</Filter>
+    <ClCompile Include="..\..\dVehicle\dPlayerController\dCustomPlayerControllerManager.cpp">
+      <Filter>dPlayerController</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -37,6 +40,9 @@
     <ClInclude Include="..\..\dVehicle\dVehicleManager.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleNode.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleSolver.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleCollidingNode.h">
+      <Filter>dVehicleMultiBody</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleDashControl.h">
       <Filter>dVehicleMultiBody</Filter>
     </ClInclude>
@@ -58,13 +64,16 @@
     <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleTireContact.h">
       <Filter>dVehicleMultiBody</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleCollidingNode.h">
-      <Filter>dVehicleMultiBody</Filter>
+    <ClInclude Include="..\..\dVehicle\dPlayerController\dCustomPlayerControllerManager.h">
+      <Filter>dPlayerController</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="dVehicleMultiBody">
-      <UniqueIdentifier>{1a95c935-d866-4831-8ddf-1aa036c6e1ed}</UniqueIdentifier>
+      <UniqueIdentifier>{2289711f-6f0e-4217-a066-b527ffe20d7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dPlayerController">
+      <UniqueIdentifier>{d56368ba-621e-4af0-a753-faf1d2290da0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

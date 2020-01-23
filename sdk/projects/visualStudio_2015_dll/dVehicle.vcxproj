@@ -52,6 +52,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\dVehicle\dPlayerController\dCustomPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dVehicle\dStdafxVehicle.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -63,32 +64,33 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\dVehicle\dVehicle.cpp" />
-    <ClCompile Include="..\..\dVehicle\dVehicleCollidingNode.cpp" />
-    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody.cpp" />
-    <ClCompile Include="..\..\dVehicle\dVehicleDashControl.cpp" />
-    <ClCompile Include="..\..\dVehicle\dVehicleDifferential.cpp" />
-    <ClCompile Include="..\..\dVehicle\dVehicleEngine.cpp" />
-    <ClCompile Include="..\..\dVehicle\dVehicleLoopJoint.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleManager.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleCollidingNode.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleDashControl.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleDifferential.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleEngine.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleLoopJoint.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleMultiBody.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleTire.cpp" />
+    <ClCompile Include="..\..\dVehicle\dVehicleMultiBody\dVehicleTireContact.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleNode.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleSolver.cpp" />
-    <ClCompile Include="..\..\dVehicle\dVehicleTire.cpp" />
-    <ClCompile Include="..\..\dVehicle\dVehicleTireContact.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\dVehicle\dPlayerController\dCustomPlayerControllerManager.h" />
     <ClInclude Include="..\..\dVehicle\dStdafxVehicle.h" />
     <ClInclude Include="..\..\dVehicle\dVehicle.h" />
-    <ClInclude Include="..\..\dVehicle\dVehicleCollidingNode.h" />
-    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody.h" />
-    <ClInclude Include="..\..\dVehicle\dVehicleDashControl.h" />
-    <ClInclude Include="..\..\dVehicle\dVehicleDifferential.h" />
-    <ClInclude Include="..\..\dVehicle\dVehicleEngine.h" />
-    <ClInclude Include="..\..\dVehicle\dVehicleLoopJoint.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleManager.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleCollidingNode.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleDashControl.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleDifferential.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleEngine.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleLoopJoint.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleMultiBody.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleTire.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleMultiBody\dVehicleTireContact.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleNode.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleSolver.h" />
-    <ClInclude Include="..\..\dVehicle\dVehicleTire.h" />
-    <ClInclude Include="..\..\dVehicle\dVehicleTireContact.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A78EB61C-CCC7-491E-B32D-7A31B76A73D3}</ProjectGuid>
@@ -226,7 +228,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_DLL;_DVEHICLE_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;../../dVehicle;../../dVehicle/dVehicleMultiBody;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dStdafxVehicle.h</PrecompiledHeaderFile>
@@ -244,7 +246,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_DVEHICLE_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;../../dVehicle;../../dVehicle/dVehicleMultiBody;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dStdafxVehicle.h</PrecompiledHeaderFile>
@@ -262,7 +264,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_CUSTOM_JOINTS_DLL;_DVEHICLE_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;../../dVehicle;../../dVehicle/dVehicleMultiBody;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dStdafxVehicle.h</PrecompiledHeaderFile>
@@ -280,7 +282,7 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_DVEHICLE_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;_NEWTON_USE_DOUBLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;../../dVehicle;../../dVehicle/dVehicleMultiBody;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dStdafxVehicle.h</PrecompiledHeaderFile>
@@ -300,7 +302,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_DVEHICLE_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;../../dVehicle;../../dVehicle/dVehicleMultiBody;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dStdafxVehicle.h</PrecompiledHeaderFile>
@@ -322,7 +324,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_DVEHICLE_BUILD_DLL;_NEWTON_USE_DOUBLE;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;../../dVehicle;../../dVehicle/dVehicleMultiBody;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dStdafxVehicle.h</PrecompiledHeaderFile>
@@ -344,7 +346,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_DVEHICLE_BUILD_DLL;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;../../dVehicle;../../dVehicle/dVehicleMultiBody;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dStdafxVehicle.h</PrecompiledHeaderFile>
@@ -366,7 +368,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;_DCONTAINERS_DLL;_DVEHICLE_BUILD_DLL;_NEWTON_USE_DOUBLE;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../;../../dMath;../../dgNewton;../../dContainers;../../dAnimation;../../dCustomJoints;../../dVehicle;../../dVehicle/dVehicleMultiBody;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PrecompiledHeaderOutputFile>$(OutDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeaderFile>dStdafxVehicle.h</PrecompiledHeaderFile>

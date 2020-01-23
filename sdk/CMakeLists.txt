@@ -10,8 +10,13 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
-include_directories(dgMeshUtil/)
-include_directories(dCustomJoints/)
+include_directories(dModel)
+include_directories(dVehicle)
+include_directories(dgMeshUtil)
+include_directories(dCustomJoints)
+include_directories(dVehicle/dPlayerController)
+include_directories(dVehicle/dVehicleMultiBody)
+
 
 add_subdirectory(dgCore)
 add_subdirectory(dgNewton)

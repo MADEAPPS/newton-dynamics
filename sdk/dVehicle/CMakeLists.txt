@@ -13,9 +13,14 @@ cmake_minimum_required(VERSION 3.4.0)
 set (projectName "dVehicle")
 message (${projectName})
 
-# low level core
-file(GLOB CPP_SOURCE *.cpp)
+
 file(GLOB HEADERS *.h)
+# low level core
+file(GLOB CPP_SOURCE 
+	*.cpp 
+	dPlayerController/*.cpp
+	dVehicleMultiBody/*.cpp
+)
 
 if(NEWTON_BUILD_SHARED_LIBS)
     if(MSVC)

@@ -13,6 +13,9 @@
 // NewtonCustomJoint.cpp: implementation of the NewtonCustomJoint class.
 //
 //////////////////////////////////////////////////////////////////////
+
+#include "dStdafxVehicle.h"
+#if 0
 #include "dCustomJointLibraryStdAfx.h"
 #include "dCustomJoint.h"
 #include "dCustomPlayerControllerManager.h"
@@ -823,3 +826,4 @@ void dCustomPlayerController::PreUpdate(dFloat timestep)
 
 	UpdatePlayerStatus(contactSolver);
 }
+#endif
