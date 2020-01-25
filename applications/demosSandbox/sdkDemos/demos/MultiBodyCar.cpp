@@ -903,7 +903,7 @@ static void AddBackground(DemoEntityManager* const scene)
 
 }
 
-void SingleBodyCar(DemoEntityManager* const scene)
+void MultibodyBodyCar(DemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();

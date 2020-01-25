@@ -100,7 +100,7 @@ void AlchimedesBuoyancy(DemoEntityManager* const scene);
 void SimpleConvexFracturing (DemoEntityManager* const scene);
 void UsingNewtonMeshTool (DemoEntityManager* const scene);
 void MultiRayCast (DemoEntityManager* const scene);
-void SingleBodyCar(DemoEntityManager* const scene);
+void MultibodyBodyCar(DemoEntityManager* const scene);
 void SuperCar (DemoEntityManager* const scene);
 void MilitaryTransport (DemoEntityManager* const scene);
 void BasicPlayerController (DemoEntityManager* const scene);
@@ -152,7 +152,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Hexapod walker", "show using inverse dynamics to control robots", Hexapod },
 	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
 	{"Balancing  (WIP)", "demonstrate self balancing rag doll biped", BalancingBiped},
-	{"Single body car", "show a generalized coordinate system body", SingleBodyCar },
+	{"Single body car", "show a generalized coordinate system body", MultibodyBodyCar },
 	{"Super car", "implement a hight performance sport car", SuperCar},
 	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
 	{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},

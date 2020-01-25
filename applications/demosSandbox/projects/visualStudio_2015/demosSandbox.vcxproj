@@ -70,7 +70,7 @@
     <ClCompile Include="..\..\sdkDemos\demos\SceneCollision.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\ServoJoints.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SimpleConvexFracturing.cpp" />
-    <ClCompile Include="..\..\sdkDemos\demos\SingleBodyCar.cpp" />
+    <ClCompile Include="..\..\sdkDemos\demos\MultibodyCar.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SixAxisManipulators.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\SoftBodies.cpp" />
     <ClCompile Include="..\..\sdkDemos\demos\StandardJoints.cpp" />

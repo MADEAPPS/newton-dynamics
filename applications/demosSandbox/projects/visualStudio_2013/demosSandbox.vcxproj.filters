@@ -141,7 +141,7 @@
     <ClCompile Include="..\..\sdkDemos\demos\ServoJoints.cpp">
       <Filter>demos</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\sdkDemos\demos\SingleBodyCar.cpp">
+    <ClCompile Include="..\..\sdkDemos\demos\MultibodyCar.cpp">
       <Filter>demos</Filter>
     </ClCompile>
     <ClCompile Include="..\..\sdkDemos\demos\AnimatedPlayer.cpp">
