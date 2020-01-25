@@ -58,7 +58,7 @@ dFloat dMultiBodyVehicleEngine::dEngineMetricInfo::GetTorque (dFloat rpm) const
 			dFloat torque0 = m_torqueCurve[i - 1].m_torque;
 
 			dFloat torque = torque0 + (rpm - rpm0) * (torque1 - torque0) / (rpm1 - rpm0);
-torque = 10.0f;
+torque = 100.0f;
 			return torque;
 		}
 	}
