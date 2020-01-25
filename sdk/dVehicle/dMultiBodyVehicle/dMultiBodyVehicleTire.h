@@ -15,9 +15,9 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
-#include "dVehicleTireContact.h"
+#include "dMultiBodyVehicleTireContact.h"
 
-class dVehicleMultiBody;
+class dMultiBodyVehicle;
 class dCollectCollidingBodies;
 
 class dTireInfo
@@ -72,13 +72,13 @@ class dTireInfo
 	//dSuspensionType m_suspentionType;
 };
 
-class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilateralJoint
+class dMultiBodyVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilateralJoint
 {
 	public:
-	DVEHICLE_API dVehicleTire(dVehicleMultiBody* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info);
-	DVEHICLE_API virtual ~dVehicleTire();
+	DVEHICLE_API dMultiBodyVehicleTire(dMultiBodyVehicle* const chassis, const dMatrix& locationInGlobalSpace, const dTireInfo& info);
+	DVEHICLE_API virtual ~dMultiBodyVehicleTire();
 
-	virtual dVehicleTire* GetAsTire() const { return (dVehicleTire*)this; }
+	virtual dMultiBodyVehicleTire* GetAsTire() const { return (dMultiBodyVehicleTire*)this; }
 	DVEHICLE_API dMatrix GetLocalMatrix () const;
 	DVEHICLE_API virtual dMatrix GetGlobalMatrix () const;
 	DVEHICLE_API virtual NewtonCollision* GetCollisionShape() const;
@@ -109,7 +109,7 @@ class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilater
 
 	dMatrix m_matrix;
 	dMatrix m_bindingRotation;
-	dVehicleTireContact m_contactsJoints[3];
+	dMultiBodyVehicleTireContact m_contactsJoints[3];
 	dTireInfo m_info;
 	NewtonCollision* m_tireShape;
 	dFloat m_omega;
@@ -120,7 +120,7 @@ class dVehicleTire: public dVehicleNode, public dComplementaritySolver::dBilater
 	dFloat m_steeringAngle;
 	dFloat m_invSuspensionLength;
 	int m_contactCount;
-	friend class dVehicleMultiBody;
+	friend class dMultiBodyVehicle;
 };
 
 

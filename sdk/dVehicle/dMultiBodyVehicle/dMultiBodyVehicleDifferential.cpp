@@ -10,11 +10,11 @@
 */
 
 #include "dStdafxVehicle.h"
-#include "dVehicleMultiBody.h"
-#include "dVehicleDifferential.h"
+#include "dMultiBodyVehicle.h"
+#include "dMultiBodyVehicleDifferential.h"
 
 
-dVehicleDifferential::dVehicleDifferential(dVehicleMultiBody* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode, const dMatrix& axelMatrix)
+dMultiBodyVehicleDifferential::dMultiBodyVehicleDifferential(dMultiBodyVehicle* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode, const dMatrix& axelMatrix)
 	:dVehicleNode(chassis)
 	,dBilateralJoint()
 	,m_localAxis(dYawMatrix (-90.0f * dDegreeToRad))
@@ -47,27 +47,27 @@ dVehicleDifferential::dVehicleDifferential(dVehicleMultiBody* const chassis, dFl
 	m_rightAxle.m_diffSign = 1.0f;
 }
 
-dVehicleDifferential::~dVehicleDifferential()
+dMultiBodyVehicleDifferential::~dMultiBodyVehicleDifferential()
 {
 }
 
-int dVehicleDifferential::GetMode() const 
+int dMultiBodyVehicleDifferential::GetMode() const 
 { 
 	return m_mode; 
 }
 
-void dVehicleDifferential::SetMode(int mode) 
+void dMultiBodyVehicleDifferential::SetMode(int mode) 
 { 
 	m_mode = dOperationMode (mode); 
 }
 
-const void dVehicleDifferential::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+const void dMultiBodyVehicleDifferential::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
 //	dAssert(0);
 //	dVehicleDifferentialInterface::Debug(debugContext);
 }
 
-int dVehicleDifferential::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
+int dMultiBodyVehicleDifferential::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 {
 	switch (m_mode)
 	{
@@ -84,9 +84,9 @@ int dVehicleDifferential::GetKinematicLoops(dVehicleLoopJoint** const jointArray
 	}
 }
 
-void dVehicleDifferential::CalculateFreeDof(dFloat timestep)
+void dMultiBodyVehicleDifferential::CalculateFreeDof(dFloat timestep)
 {
-	dVehicleMultiBody* const chassisNode = GetParent()->GetAsVehicleMultiBody();
+	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsVehicleMultiBody();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 	const dMatrix chassisMatrix(m_localAxis * chassisBody->GetMatrix());
 
@@ -97,14 +97,14 @@ void dVehicleDifferential::CalculateFreeDof(dFloat timestep)
 	m_shaftOmega = chassisMatrix.m_front.DotProduct3(relativeOmega);
 }
 
-void dVehicleDifferential::Integrate(dFloat timestep)
+void dMultiBodyVehicleDifferential::Integrate(dFloat timestep)
 {
 	m_proxyBody.IntegrateForce(timestep, m_proxyBody.GetForce(), m_proxyBody.GetTorque());
 }
 
-void dVehicleDifferential::ApplyExternalForce()
+void dMultiBodyVehicleDifferential::ApplyExternalForce()
 {
-	dVehicleMultiBody* const chassisNode = GetParent()->GetAsVehicleMultiBody();
+	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsVehicleMultiBody();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 	
 	dMatrix matrix (chassisBody->GetMatrix());
@@ -119,12 +119,12 @@ void dVehicleDifferential::ApplyExternalForce()
 	m_proxyBody.SetForce(chassisNode->GetGravity().Scale(m_proxyBody.GetMass()));
 }
 
-void dVehicleDifferential::UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
+void dMultiBodyVehicleDifferential::UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
 {
 	dAssert (0);
 }
 
-void dVehicleDifferential::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+void dMultiBodyVehicleDifferential::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	dComplementaritySolver::dBodyState* const diffBody = m_state0;
 	dMatrix matrix (m_localAxis * diffBody->GetMatrix());
@@ -181,9 +181,9 @@ void dVehicleDifferential::JacobianDerivative(dComplementaritySolver::dParamInfo
 	}
 }
 
-void dVehicleDifferential::dTireAxleJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+void dMultiBodyVehicleDifferential::dTireAxleJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
-	dVehicleDifferential* const differential = GetOwner1()->GetAsDifferential();
+	dMultiBodyVehicleDifferential* const differential = GetOwner1()->GetAsDifferential();
 	dAssert (differential);
 	
 	dMatrix tireMatrix (differential->m_axelMatrix * m_state0->GetMatrix());
@@ -194,8 +194,8 @@ void dVehicleDifferential::dTireAxleJoint::JacobianDerivative(dComplementaritySo
 	dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_J01;
 	dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_J10;
 
-	if ((differential->m_mode == dVehicleDifferential::m_open) ||
-		(differential->m_mode == dVehicleDifferential::m_slipLocked)) {
+	if ((differential->m_mode == dMultiBodyVehicleDifferential::m_open) ||
+		(differential->m_mode == dMultiBodyVehicleDifferential::m_slipLocked)) {
 		jacobian1.m_angular = diffMatrix.m_front + diffMatrix.m_up.Scale(m_diffSign);
 	}
 

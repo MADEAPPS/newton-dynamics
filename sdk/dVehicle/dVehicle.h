@@ -19,7 +19,7 @@
 class dTireInfo;
 class dEngineInfo;
 class dVehicleManager;
-class dVehicleDashControl;
+class dMultiBodyVehicleDashControl;
 
 class dVehicle: public dVehicleNode
 {
@@ -59,8 +59,8 @@ class dVehicle: public dVehicleNode
 	const dMatrix& GetLocalFrame() const { return m_localFrame; }
 	const dVector& GetGravity() const {return m_gravity;}
 
-	void AddControl (dVehicleDashControl* const control);
-	void RemoveControl (dVehicleDashControl* const control);
+	void AddControl (dMultiBodyVehicleDashControl* const control);
+	void RemoveControl (dMultiBodyVehicleDashControl* const control);
 	int GetControlCount() const {return m_controlerCount;}
 
 	virtual bool CheckSleeping() {return false;}
@@ -74,13 +74,13 @@ class dVehicle: public dVehicleNode
 	dVector m_gravity;
 	dVector m_obbSize;
 	dVector m_obbOrigin;
-	dArray<dVehicleDashControl*> m_control;
+	dArray<dMultiBodyVehicleDashControl*> m_control;
 	NewtonBody* m_newtonBody;
 	void* m_managerNode;
 	dVehicleManager* m_manager;
 	int m_controlerCount;
 
-	friend class dVehicleTire;
+	friend class dMultiBodyVehicleTire;
 	friend class dVehicleManager;
 };
 

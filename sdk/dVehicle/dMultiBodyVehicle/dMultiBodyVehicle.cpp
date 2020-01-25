@@ -11,15 +11,15 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
-#include "dVehicleTire.h"
-#include "dVehicleEngine.h"
-#include "dVehicleMultiBody.h"
+#include "dMultiBodyVehicleTire.h"
+#include "dMultiBodyVehicleEngine.h"
+#include "dMultiBodyVehicle.h"
 #include "dVehicleManager.h"
-#include "dVehicleDifferential.h"
+#include "dMultiBodyVehicleDifferential.h"
 
 //static int xxxx;
 
-dVehicleMultiBody::dVehicleMultiBody(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
+dMultiBodyVehicle::dMultiBodyVehicle(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
 	:dVehicle(body, localFrame, gravityMag)
 	,dVehicleSolver()
 	,m_collidingNodes(8)
@@ -64,14 +64,14 @@ dVehicleMultiBody::dVehicleMultiBody(NewtonBody* const body, const dMatrix& loca
 	m_proxyBody.SetLocalMatrix(matrix);
 }
 
-dVehicleMultiBody::~dVehicleMultiBody()
+dMultiBodyVehicle::~dMultiBodyVehicle()
 {
 	if (m_managerNode) {
 		m_manager->RemoveRoot(this);
 	}
 }
 
-void dVehicleMultiBody::Finalize()
+void dMultiBodyVehicle::Finalize()
 {
 	dVector minP;
 	dVector maxP;
@@ -79,7 +79,7 @@ void dVehicleMultiBody::Finalize()
 	CalculateAABB(collision, dGetIdentityMatrix(), minP, maxP);
 
 	for (dVehicleNodeChildrenList::dListNode* node = m_children.GetFirst(); node; node = node->GetNext()) {
-		dVehicleTire* const tire = node->GetInfo()->GetAsTire();
+		dMultiBodyVehicleTire* const tire = node->GetInfo()->GetAsTire();
 		if (tire) {
 			dVector tireMinP;
 			dVector tireMaxP;
@@ -99,7 +99,7 @@ void dVehicleMultiBody::Finalize()
 	dVehicleSolver::Finalize();
 }
 
-const void dVehicleMultiBody::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+const void dMultiBodyVehicle::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
 	const dMatrix& matrix = m_proxyBody.GetMatrix();
 
@@ -131,7 +131,7 @@ const void dVehicleMultiBody::Debug(dCustomJoint::dDebugDisplay* const debugCont
 	dVehicleNode::Debug(debugContext);
 }
 
-void dVehicleMultiBody::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep)
+void dMultiBodyVehicle::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep)
 {
 	m_brakeControl.SetParam(driveInputs.m_brakePedal);
 	m_handBrakeControl.SetParam(driveInputs.m_handBrakeValue);
@@ -318,56 +318,56 @@ m_engineControl.SetIgnition(driveInputs.m_ignitionKey);
 #endif
 }
 
-int dVehicleMultiBody::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
+int dMultiBodyVehicle::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 {
 	return dVehicleNode::GetKinematicLoops(jointArray);
 }
 
-dVehicleTire* dVehicleMultiBody::AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo)
+dMultiBodyVehicleTire* dMultiBodyVehicle::AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo)
 {
-	dVehicleTire* const tire = new dVehicleTire(this, locationInGlobalSpace, tireInfo);
+	dMultiBodyVehicleTire* const tire = new dMultiBodyVehicleTire(this, locationInGlobalSpace, tireInfo);
 	return tire;
 }
 
-dVehicleDifferential* dVehicleMultiBody::AddDifferential(dFloat mass, dFloat radius, dVehicleTire* const leftTire, dVehicleTire* const rightTire)
+dMultiBodyVehicleDifferential* dMultiBodyVehicle::AddDifferential(dFloat mass, dFloat radius, dMultiBodyVehicleTire* const leftTire, dMultiBodyVehicleTire* const rightTire)
 {
-	dVehicleDifferential* const differential = new dVehicleDifferential(this, mass, radius, leftTire, rightTire);
+	dMultiBodyVehicleDifferential* const differential = new dMultiBodyVehicleDifferential(this, mass, radius, leftTire, rightTire);
 	return differential;
 }
 
-dVehicleDifferential* dVehicleMultiBody::AddDifferential(dFloat mass, dFloat radius, dVehicleDifferential* const differential0, dVehicleDifferential* const differential1)
+dMultiBodyVehicleDifferential* dMultiBodyVehicle::AddDifferential(dFloat mass, dFloat radius, dMultiBodyVehicleDifferential* const differential0, dMultiBodyVehicleDifferential* const differential1)
 {
-	dVehicleDifferential* const differential = new dVehicleDifferential(this, mass, radius, differential0, differential1, dYawMatrix (90.0f * dDegreeToRad));
+	dMultiBodyVehicleDifferential* const differential = new dMultiBodyVehicleDifferential(this, mass, radius, differential0, differential1, dYawMatrix (90.0f * dDegreeToRad));
 	return differential;
 }
 
-dVehicleEngine* dVehicleMultiBody::AddEngine(const dEngineInfo& engineInfo, dVehicleDifferential* const differential)
+dMultiBodyVehicleEngine* dMultiBodyVehicle::AddEngine(const dEngineInfo& engineInfo, dMultiBodyVehicleDifferential* const differential)
 {
-	dVehicleEngine* const engine = new dVehicleEngine(this, engineInfo, differential);
+	dMultiBodyVehicleEngine* const engine = new dMultiBodyVehicleEngine(this, engineInfo, differential);
 	return engine;
 }
 
-dVehicleEngineControl* dVehicleMultiBody::GetEngineControl()
+dVehicleEngineControl* dMultiBodyVehicle::GetEngineControl()
 {
 	return &m_engineControl;
 }
 
-dVehicleSteeringControl* dVehicleMultiBody::GetSteeringControl()
+dVehicleSteeringControl* dMultiBodyVehicle::GetSteeringControl()
 {
 	return &m_steeringControl;
 }
 
-dVehicleBrakeControl* dVehicleMultiBody::GetBrakeControl()
+dVehicleBrakeControl* dMultiBodyVehicle::GetBrakeControl()
 {
 	return &m_brakeControl;
 }
 
-dVehicleBrakeControl* dVehicleMultiBody::GetHandBrakeControl()
+dVehicleBrakeControl* dMultiBodyVehicle::GetHandBrakeControl()
 {
 	return &m_handBrakeControl;
 }
 
-void dVehicleMultiBody::ApplyExternalForce()
+void dMultiBodyVehicle::ApplyExternalForce()
 {
 	dMatrix matrix;
 	dVector vector(0.0f);
@@ -405,7 +405,7 @@ xxx ++;
 	dVehicleNode::ApplyExternalForce();
 }
 
-dVehicleCollidingNode* dVehicleMultiBody::FindCollideNode(dVehicleNode* const node0, NewtonBody* const body)
+dMultiBodyVehicleCollisionNode* dMultiBodyVehicle::FindCollideNode(dVehicleNode* const node0, NewtonBody* const body)
 {
 	NewtonBody* dynamicBody = body;
 	if (dynamicBody) {
@@ -418,13 +418,13 @@ dVehicleCollidingNode* dVehicleMultiBody::FindCollideNode(dVehicleNode* const no
 	}
 
 	for (int i = 0; i < m_collidingIndex; i ++) {
-		dVehicleCollidingNode* const node1 = &m_collidingNodes[i];
+		dMultiBodyVehicleCollisionNode* const node1 = &m_collidingNodes[i];
 		if (node1->m_body == dynamicBody) {
 			return node1;
 		}
 	}
 
-	dVehicleCollidingNode* const node1 = &m_collidingNodes[m_collidingIndex];
+	dMultiBodyVehicleCollisionNode* const node1 = &m_collidingNodes[m_collidingIndex];
 	node1->m_body = dynamicBody;
 	node1->m_index = m_collidingIndex + dVehicleSolver::m_nodeCount;
 	dVehicleSolver::m_nodesOrder[node1->m_index] = node1;
@@ -477,7 +477,7 @@ dVehicleCollidingNode* dVehicleMultiBody::FindCollideNode(dVehicleNode* const no
 	return node1;
 }
 
-int dVehicleMultiBody::OnAABBOverlap(const NewtonBody * const body, void* const context)
+int dMultiBodyVehicle::OnAABBOverlap(const NewtonBody * const body, void* const context)
 {
 	dCollectCollidingBodies* const bodyList = (dCollectCollidingBodies*)context;
 	if (body != bodyList->m_exclude) {
@@ -488,7 +488,7 @@ int dVehicleMultiBody::OnAABBOverlap(const NewtonBody * const body, void* const 
 	return 1;
 }
 
-void dVehicleMultiBody::CalculateTireContacts(dFloat timestep)
+void dMultiBodyVehicle::CalculateTireContacts(dFloat timestep)
 {
 	const dMatrix& matrix = m_proxyBody.GetMatrix();
 	dVector origin(matrix.TransformVector(m_obbOrigin));
@@ -502,21 +502,21 @@ void dVehicleMultiBody::CalculateTireContacts(dFloat timestep)
 	NewtonWorldForEachBodyInAABBDo(world, &p0.m_x, &p1.m_x, OnAABBOverlap, &bodyList);
 	
 	for (dVehicleNodeChildrenList::dListNode* node = m_children.GetFirst(); node; node = node->GetNext()) {
-		dVehicleTire* const tire = node->GetInfo()->GetAsTire();
+		dMultiBodyVehicleTire* const tire = node->GetInfo()->GetAsTire();
 		if (tire) {
 			tire->CalculateContacts(bodyList, timestep);
 		}
 	}
 }
 
-void dVehicleMultiBody::Integrate(dFloat timestep)
+void dMultiBodyVehicle::Integrate(dFloat timestep)
 {
 	m_proxyBody.IntegrateForce(timestep, m_proxyBody.GetForce(), m_proxyBody.GetTorque());
 	m_proxyBody.IntegrateVelocity(timestep);
 	dVehicleNode::Integrate(timestep);
 }
 
-void dVehicleMultiBody::CalculateFreeDof(dFloat timestep)
+void dMultiBodyVehicle::CalculateFreeDof(dFloat timestep)
 {
 	dVehicleNode::CalculateFreeDof(timestep);
 
@@ -526,7 +526,7 @@ void dVehicleMultiBody::CalculateFreeDof(dFloat timestep)
 	NewtonBodySetTorque(m_newtonBody, &torque[0]);
 }
 
-bool dVehicleMultiBody::CheckSleeping()
+bool dMultiBodyVehicle::CheckSleeping()
 {
 return false;
 
@@ -556,7 +556,7 @@ return false;
 	return false;
 }
 
-void dVehicleMultiBody::PreUpdate(dFloat timestep)
+void dMultiBodyVehicle::PreUpdate(dFloat timestep)
 {
 	m_manager->UpdateDriverInput(this, timestep);
 

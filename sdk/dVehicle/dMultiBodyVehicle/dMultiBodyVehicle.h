@@ -17,14 +17,14 @@
 #include "dVehicle.h"
 #include "dVehicleNode.h"
 #include "dVehicleSolver.h"
-#include "dVehicleDashControl.h"
-#include "dVehicleCollidingNode.h"
+#include "dMultiBodyVehicleDashControl.h"
+#include "dMultiBodyVehicleCollisionNode.h"
 
 class dTireInfo;
 class dEngineInfo;
-class dVehicleTire;
 class dVehicleLoopJoint;
-class dVehicleDifferential;
+class dMultiBodyVehicleTire;
+class dMultiBodyVehicleDifferential;
 
 class dCollectCollidingBodies
 {
@@ -40,20 +40,20 @@ class dCollectCollidingBodies
 	NewtonBody* m_array[16];
 };
 
-class dVehicleMultiBody: public dVehicle, public dVehicleSolver
+class dMultiBodyVehicle: public dVehicle, public dVehicleSolver
 {
 	public:
-	DVEHICLE_API dVehicleMultiBody (NewtonBody* const rootBody, const dMatrix& localFrame, dFloat gravityMag);
-	DVEHICLE_API ~dVehicleMultiBody();
+	DVEHICLE_API dMultiBodyVehicle (NewtonBody* const rootBody, const dMatrix& localFrame, dFloat gravityMag);
+	DVEHICLE_API ~dMultiBodyVehicle();
 
-	dVehicleMultiBody* GetAsVehicleMultiBody() const { return (dVehicleMultiBody*)this; }
+	dMultiBodyVehicle* GetAsVehicleMultiBody() const { return (dMultiBodyVehicle*)this; }
 
 	DVEHICLE_API void Finalize();
 	DVEHICLE_API const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
-	DVEHICLE_API dVehicleTire* AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
-	DVEHICLE_API dVehicleEngine* AddEngine(const dEngineInfo& engineInfo, dVehicleDifferential* const differential);
-	DVEHICLE_API dVehicleDifferential* AddDifferential(dFloat mass, dFloat radius, dVehicleTire* const leftTire, dVehicleTire* const rightTire);
-	DVEHICLE_API dVehicleDifferential* AddDifferential(dFloat mass, dFloat radius, dVehicleDifferential* const differential0, dVehicleDifferential* const differential1);
+	DVEHICLE_API dMultiBodyVehicleTire* AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
+	DVEHICLE_API dMultiBodyVehicleEngine* AddEngine(const dEngineInfo& engineInfo, dMultiBodyVehicleDifferential* const differential);
+	DVEHICLE_API dMultiBodyVehicleDifferential* AddDifferential(dFloat mass, dFloat radius, dMultiBodyVehicleTire* const leftTire, dMultiBodyVehicleTire* const rightTire);
+	DVEHICLE_API dMultiBodyVehicleDifferential* AddDifferential(dFloat mass, dFloat radius, dMultiBodyVehicleDifferential* const differential0, dMultiBodyVehicleDifferential* const differential1);
 
 	DVEHICLE_API dVehicleBrakeControl* GetBrakeControl();
 	DVEHICLE_API dVehicleEngineControl* GetEngineControl();
@@ -69,14 +69,14 @@ class dVehicleMultiBody: public dVehicle, public dVehicleSolver
 	virtual void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep);
 
 	virtual bool CheckSleeping();
-	dVehicleCollidingNode* FindCollideNode(dVehicleNode* const node0, NewtonBody* const body);
+	dMultiBodyVehicleCollisionNode* FindCollideNode(dVehicleNode* const node0, NewtonBody* const body);
 
 	void PreUpdate(dFloat timestep);
 	//void PostUpdate(dFloat timestep);
 
 	static int OnAABBOverlap(const NewtonBody * const body, void* const me);
 
-	dArray<dVehicleCollidingNode> m_collidingNodes;
+	dArray<dMultiBodyVehicleCollisionNode> m_collidingNodes;
 	dVehicleBrakeControl m_brakeControl;
 	dVehicleEngineControl m_engineControl;
 	dVehicleBrakeControl m_handBrakeControl;
@@ -84,7 +84,7 @@ class dVehicleMultiBody: public dVehicle, public dVehicleSolver
 	int m_collidingIndex;
 	int m_sleepCounter;
 
-	friend class dVehicleTire;
+	friend class dMultiBodyVehicleTire;
 	friend class dVehicleSolver;
 	friend class dVehicleManager;
 };

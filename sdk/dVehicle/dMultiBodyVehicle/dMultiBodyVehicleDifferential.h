@@ -17,9 +17,9 @@
 #include "dVehicleNode.h"
 #include "dVehicleLoopJoint.h"
 
-class dVehicleMultiBody;
+class dMultiBodyVehicle;
 
-class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::dBilateralJoint
+class dMultiBodyVehicleDifferential: public dVehicleNode, public dComplementaritySolver::dBilateralJoint
 {
 	enum dOperationMode
 	{
@@ -45,12 +45,12 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 		void UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const { dAssert(0); }
 
 		dFloat m_diffSign;
-		friend class dVehicleDifferential;
+		friend class dMultiBodyVehicleDifferential;
 	};
 
 	public:
-	DVEHICLE_API dVehicleDifferential(dVehicleMultiBody* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode, const dMatrix& axelMatrix = dGetIdentityMatrix());
-	DVEHICLE_API virtual ~dVehicleDifferential();
+	DVEHICLE_API dMultiBodyVehicleDifferential(dMultiBodyVehicle* const chassis, dFloat mass, dFloat radius, dVehicleNode* const leftNode, dVehicleNode* const rightNode, const dMatrix& axelMatrix = dGetIdentityMatrix());
+	DVEHICLE_API virtual ~dMultiBodyVehicleDifferential();
 
 	DVEHICLE_API int GetMode() const;
 	DVEHICLE_API void SetMode(int mode);
@@ -62,7 +62,7 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 
 	dComplementaritySolver::dBilateralJoint* GetJoint() {return this;}
-	dVehicleDifferential* GetAsDifferential() const { return (dVehicleDifferential*)this; }
+	dMultiBodyVehicleDifferential* GetAsDifferential() const { return (dMultiBodyVehicleDifferential*)this; }
 	
 	const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	void JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams);
@@ -79,7 +79,7 @@ class dVehicleDifferential: public dVehicleNode, public dComplementaritySolver::
 	dFloat m_frictionLost;
 	dOperationMode m_mode;
 
-	friend class dVehicleMultiBody;
+	friend class dMultiBodyVehicle;
 };
 
 

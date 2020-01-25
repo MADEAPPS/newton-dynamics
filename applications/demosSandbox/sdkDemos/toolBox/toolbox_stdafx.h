@@ -169,11 +169,11 @@ typedef long long unsigned64;
 
 #include <dStdafxVehicle.h>
 #include <dVehicleNode.h>
-#include <dVehicleTire.h>
-#include <dVehicleEngine.h>
 #include <dVehicleManager.h>
-#include <dVehicleMultiBody.h>
-#include <dVehicleDifferential.h>
+#include <dMultiBodyVehicle.h>
+#include <dMultiBodyVehicleDifferential.h>
+#include <dMultiBodyVehicleTire.h>
+#include <dMultiBodyVehicleEngine.h>
 
 #include <dSceneStdafx.h>
 #include <dScene.h>

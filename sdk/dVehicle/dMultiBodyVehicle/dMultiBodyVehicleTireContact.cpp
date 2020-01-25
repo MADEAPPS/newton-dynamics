@@ -11,15 +11,15 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
-#include "dVehicleTire.h"
-#include "dVehicleMultiBody.h"
-#include "dVehicleTireContact.h"
+#include "dMultiBodyVehicle.h"
+#include "dMultiBodyVehicleTire.h"
+#include "dMultiBodyVehicleTireContact.h"
 
 #define D_TIRE_CONTACT_PATCH_CONE		dFloat (0.8f) 
 #define D_TIRE_CONTACT_MAX_SIDE_SLIP	dFloat (0.15f) 
 #define D_TIRE_CONTACT_MAX_LONG_SLIP	dFloat (10.0f) 
 
-dVehicleTireContact::dVehicleTireContact()
+dMultiBodyVehicleTireContact::dMultiBodyVehicleTireContact()
 	:dVehicleLoopJoint()
 	,m_point(0.0f)
 	,m_normal(0.0f)
@@ -34,12 +34,12 @@ dVehicleTireContact::dVehicleTireContact()
 {
 }
 
-void dVehicleTireContact::ResetContact()
+void dMultiBodyVehicleTireContact::ResetContact()
 {
 	m_isActive = false;
 }
 
-void dVehicleTireContact::SetContact(dVehicleCollidingNode* const node, const dVector& posit, const dVector& normal, const dVector& longitudinalDir, dFloat penetration, dFloat staticFriction, bool isPatch)
+void dMultiBodyVehicleTireContact::SetContact(dMultiBodyVehicleCollisionNode* const node, const dVector& posit, const dVector& normal, const dVector& longitudinalDir, dFloat penetration, dFloat staticFriction, bool isPatch)
 {
 	m_point = posit;
 	m_normal = normal;
@@ -54,10 +54,10 @@ void dVehicleTireContact::SetContact(dVehicleCollidingNode* const node, const dV
 	m_penetration = dMax (penetration, dFloat (0.0f));
 }
 
-void dVehicleTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const
+void dMultiBodyVehicleTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const
 {
-	dVehicleTire* const tire = GetOwner0()->GetAsTire();
-	dVehicleMultiBody* const chassis = GetOwner0()->GetParent()->GetAsVehicleMultiBody();
+	dMultiBodyVehicleTire* const tire = GetOwner0()->GetAsTire();
+	dMultiBodyVehicle* const chassis = GetOwner0()->GetParent()->GetAsVehicleMultiBody();
 
 	dAssert(tire);
 	dAssert(chassis);
@@ -94,13 +94,13 @@ void dVehicleTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext,
 	debugContext->DrawLine(origin, p3);
 }
 
-void dVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+void dMultiBodyVehicleTireContact::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	const dVector& veloc0 = m_state0->GetVelocity();
 	const dVector& omega0 = m_state0->GetOmega();
 	const dVector& veloc1 = m_state1->GetVelocity();
 	const dVector& omega1 = m_state1->GetOmega();
-	const dVehicleTire* const tire = GetOwner0()->GetAsTire();
+	const dMultiBodyVehicleTire* const tire = GetOwner0()->GetAsTire();
 	dVector zero (0.0f);
 
 	m_isLowSpeed = false;
@@ -211,7 +211,7 @@ dTrace(("%d uv(%f %f)\n", tire->GetIndex(), u, v));
 	m_dof = constraintParams->m_count;
 }
 
-void dVehicleTireContact::SpecialSolverFrictionCallback(const dFloat* const load, dFloat* const lowFriction, dFloat* const highFriction) const
+void dMultiBodyVehicleTireContact::SpecialSolverFrictionCallback(const dFloat* const load, dFloat* const lowFriction, dFloat* const highFriction) const
 {
 	dAssert (load[0] >= 0.0f);
 	dFloat f = m_staticFriction * load[0];
@@ -227,7 +227,7 @@ void dVehicleTireContact::SpecialSolverFrictionCallback(const dFloat* const load
 	highFriction[2] = f;
 	
 	if (!m_isLowSpeed &&  f > 10.0f) {
-		dVehicleTire* const tire = GetOwner0()->GetAsTire();
+		dMultiBodyVehicleTire* const tire = GetOwner0()->GetAsTire();
 		const dTireInfo& tireInfo = tire->GetInfo();
 
 		dFloat g = m_tireModel.m_gammaStiffness;

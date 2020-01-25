@@ -17,8 +17,8 @@
 #include "dVehicleNode.h"
 #include "dVehicleLoopJoint.h"
 
-class dVehicleMultiBody;
-class dVehicleDifferential;
+class dMultiBodyVehicle;
+class dMultiBodyVehicleDifferential;
 
 class dEngineInfo
 {
@@ -77,7 +77,7 @@ class dEngineInfo
 	int m_gearsCount;
 };
 
-class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilateralJoint
+class dMultiBodyVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilateralJoint
 {
 	class dEngineTorqueNode
 	{
@@ -138,8 +138,8 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	};
 
 	public:
-	DVEHICLE_API dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineInfo& info, dVehicleDifferential* const differential);
-	DVEHICLE_API virtual ~dVehicleEngine();
+	DVEHICLE_API dMultiBodyVehicleEngine(dMultiBodyVehicle* const chassis, const dEngineInfo& info, dMultiBodyVehicleDifferential* const differential);
+	DVEHICLE_API virtual ~dMultiBodyVehicleEngine();
 
 	DVEHICLE_API void SetInfo(const dEngineInfo& info);
 	const dEngineInfo& GetInfo() const { return m_info; }
@@ -172,7 +172,7 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	void CalculateFreeDof(dFloat timestep);
 	int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
 
-	dVehicleEngine* GetAsEngine() const { return (dVehicleEngine*)this;}
+	dMultiBodyVehicleEngine* GetAsEngine() const { return (dMultiBodyVehicleEngine*)this;}
 	dComplementaritySolver::dBilateralJoint* GetJoint() { return this; }
 
 	const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
@@ -183,7 +183,7 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	dEngineInfo m_info;
 	dEngineMetricInfo m_metricInfo;
 	dGearBoxAndClutchJoint m_gearBox;
-	dVehicleDifferential* m_differential;
+	dMultiBodyVehicleDifferential* m_differential;
 	dFloat m_omega;
 	dFloat m_throttle;
 	dFloat m_throttleSpeed;
@@ -192,7 +192,7 @@ class dVehicleEngine: public dVehicleNode, public dComplementaritySolver::dBilat
 	bool m_ignitionKey0;
 	bool m_ignitionKey1;
 
-	friend class dVehicleMultiBody;
+	friend class dMultiBodyVehicle;
 };
 
 

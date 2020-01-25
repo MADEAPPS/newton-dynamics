@@ -224,7 +224,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 	{
 		// set to transparent color
 		if (m_player) {
-			dVehicleEngine* const engine = m_player->GetEngineControl() ? m_player->GetEngineControl()->GetEngine() : NULL;
+			dMultiBodyVehicleEngine* const engine = m_player->GetEngineControl() ? m_player->GetEngineControl()->GetEngine() : NULL;
 			
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			dFloat gageSize = 200.0f;
@@ -284,7 +284,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		camera->SetNextMatrix(*scene, camMatrix, camOrigin);
 	}
 
-	dVehicleTire* AddTire(dVehicleMultiBody* const vehicle, const char* const tireName, dFloat steeringAngle, dFloat width, dFloat radius, dFloat vehicleMass, const TIRE_DATA& data)
+	dMultiBodyVehicleTire* AddTire(dMultiBodyVehicle* const vehicle, const char* const tireName, dFloat steeringAngle, dFloat width, dFloat radius, dFloat vehicleMass, const TIRE_DATA& data)
 	{
 		DemoEntity* const entity = (DemoEntity*)vehicle->GetUserData();
 		DemoEntity* const tirePart = entity->Find(tireName);
@@ -316,7 +316,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		//tireInfo.m_aligningMomentTrail = definition.m_tireAligningMomemtTrail;
 		//tireInfo.m_suspentionType = definition.m_tireSuspensionType;
 
-		dVehicleTire* const tire = vehicle->AddTire(tireMatrix, tireInfo);
+		dMultiBodyVehicleTire* const tire = vehicle->AddTire(tireMatrix, tireInfo);
 		tire->SetUserData(tirePart);
 		return tire;
 	}
@@ -422,7 +422,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// set the player matrix 
 		NewtonBodySetMatrix(chassisBody, &location[0][0]);
 
-		dVehicleMultiBody* const vehicle = new dVehicleMultiBody (chassisBody, chassisMatrix, DEMO_GRAVITY);
+		dMultiBodyVehicle* const vehicle = new dMultiBodyVehicle (chassisBody, chassisMatrix, DEMO_GRAVITY);
 		AddRoot(vehicle);
 
 		// save entity as use data
@@ -436,12 +436,12 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions ("fl_tire", width, radio, world, vehicleEntity);
-		dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", 35.0f, width, radio, VIPER_CHASSIS_MASS, viperTire);
-		dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", 35.0f, width, radio, VIPER_CHASSIS_MASS, viperTire);
+		dMultiBodyVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", 35.0f, width, radio, VIPER_CHASSIS_MASS, viperTire);
+		dMultiBodyVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", 35.0f, width, radio, VIPER_CHASSIS_MASS, viperTire);
 
 		CalculateTireDimensions ("rl_tire", width, radio, world, vehicleEntity);
-		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", 0.0f, width, radio, VIPER_CHASSIS_MASS, viperTire);
-		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", 0.0f, width, radio, VIPER_CHASSIS_MASS, viperTire);
+		dMultiBodyVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", 0.0f, width, radio, VIPER_CHASSIS_MASS, viperTire);
+		dMultiBodyVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", 0.0f, width, radio, VIPER_CHASSIS_MASS, viperTire);
 
 		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
@@ -464,7 +464,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		brakeControl->AddTire(rearRight);
 
 		// add a differential 
-		dVehicleDifferential* const differential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, rearLeft, rearRight);
+		dMultiBodyVehicleDifferential* const differential = vehicle->AddDifferential(VIPER_DIFF_MASS, VIPER_DIFF_RADIUS, rearLeft, rearRight);
 
 		// add and internal combustion engine
 		dEngineInfo engineInfo;
@@ -495,7 +495,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 
 
 		// Set Engine and engine control
-		dVehicleEngine* const engine = vehicle->AddEngine(engineInfo, differential);
+		dMultiBodyVehicleEngine* const engine = vehicle->AddEngine(engineInfo, differential);
 		dVehicleEngineControl* const engineControl = vehicle->GetEngineControl();
 		engineControl->SetEngine(engine);
 
@@ -540,7 +540,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		// set the player matrix 
 		NewtonBodySetMatrix(chassisBody, &location[0][0]);
 
-		dVehicleMultiBody* const vehicle = new dVehicleMultiBody(chassisBody, chassisMatrix, DEMO_GRAVITY);
+		dMultiBodyVehicle* const vehicle = new dMultiBodyVehicle(chassisBody, chassisMatrix, DEMO_GRAVITY);
 		AddRoot(vehicle);
 
 		// save entity as use data
@@ -558,12 +558,12 @@ class SingleBodyVehicleManager: public dVehicleManager
 		dFloat width;
 		dFloat radio;
 		CalculateTireDimensions("fl_tire", width, radio, world, vehicleEntity);
-		dVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", 30.0f, width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
-		dVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", 30.0f, width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
+		dMultiBodyVehicleTire* const frontLeft = AddTire(vehicle, "fl_tire", 30.0f, width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
+		dMultiBodyVehicleTire* const frontRight = AddTire(vehicle, "fr_tire", 30.0f, width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
 
 		CalculateTireDimensions("rl_tire", width, radio, world, vehicleEntity);
-		dVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", -10.0f, width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
-		dVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", -10.0f, width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
+		dMultiBodyVehicleTire* const rearLeft = AddTire(vehicle, "rl_tire", -10.0f, width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
+		dMultiBodyVehicleTire* const rearRight = AddTire(vehicle, "rr_tire", -10.0f, width, radio, MONSTER_TRUCK_CHASSIS_MASS, monsterTruckTire);
 
 		// add vehicle steering control 
 		dVehicleSteeringControl* const steeringControl = vehicle->GetSteeringControl();
@@ -588,10 +588,10 @@ class SingleBodyVehicleManager: public dVehicleManager
 		brakeControl->AddTire(rearRight);
 
 		// add a differential 
-		dVehicleDifferential* const frontDifferential = vehicle->AddDifferential(MONSTER_TRUCK_DIFF_MASS, MONSTER_TRUCK_DIFF_RADIUS, frontLeft, frontRight);
-		dVehicleDifferential* const rearDifferential = vehicle->AddDifferential(MONSTER_TRUCK_DIFF_MASS, MONSTER_TRUCK_DIFF_RADIUS, rearLeft, rearRight);
-		dVehicleDifferential* const differential = vehicle->AddDifferential(MONSTER_TRUCK_DIFF_MASS, MONSTER_TRUCK_DIFF_RADIUS, frontDifferential, rearDifferential);
-		//dVehicleDifferential* const differential = vehicle->AddDifferential(MONSTER_TRUCK_DIFF_MASS, MONSTER_TRUCK_DIFF_RADIUS, frontLeft, frontRight);
+		dMultiBodyVehicleDifferential* const frontDifferential = vehicle->AddDifferential(MONSTER_TRUCK_DIFF_MASS, MONSTER_TRUCK_DIFF_RADIUS, frontLeft, frontRight);
+		dMultiBodyVehicleDifferential* const rearDifferential = vehicle->AddDifferential(MONSTER_TRUCK_DIFF_MASS, MONSTER_TRUCK_DIFF_RADIUS, rearLeft, rearRight);
+		dMultiBodyVehicleDifferential* const differential = vehicle->AddDifferential(MONSTER_TRUCK_DIFF_MASS, MONSTER_TRUCK_DIFF_RADIUS, frontDifferential, rearDifferential);
+		//dMultiBodyVehicleDifferential* const differential = vehicle->AddDifferential(MONSTER_TRUCK_DIFF_MASS, MONSTER_TRUCK_DIFF_RADIUS, frontLeft, frontRight);
 
 		// add and internal combustion engine
 		dEngineInfo engineInfo;
@@ -622,7 +622,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		engineInfo.m_gearsCount = 8;
 
 		// Set Engine and engine control
-		dVehicleEngine* const engine = vehicle->AddEngine(engineInfo, differential);
+		dMultiBodyVehicleEngine* const engine = vehicle->AddEngine(engineInfo, differential);
 		dVehicleEngineControl* const engineControl = vehicle->GetEngineControl();
 		engineControl->SetEngine(engine);
 
@@ -642,7 +642,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		NewtonWorld* const world = NewtonBodyGetWorld(body);
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 
-		dVehicleMultiBody::dDriverInput driverInput;
+		dMultiBodyVehicle::dDriverInput driverInput;
 
 		dFloat axis[32];
 		int axisCount = scene->GetJoystickAxis(axis);
@@ -740,7 +740,7 @@ axisCount = 0;
 		dMatrix chassisMatrixInv(matrix.Inverse());
 		const dList<dVehicleNode*>& children = vehicle->GetChildrenList();
 		for (dList<dVehicleNode*>::dListNode* node = children.GetFirst(); node; node = node->GetNext()) {
-			dVehicleTire* const tire = node->GetInfo()->GetAsTire();
+			dMultiBodyVehicleTire* const tire = node->GetInfo()->GetAsTire();
 			if (tire) {
 				DemoEntity* const tireMesh = (DemoEntity*)tire->GetUserData();
 				//dMatrix tireMatrix(tire->GetGlobalMatrix() * chassisMatrixInv);
@@ -751,7 +751,7 @@ axisCount = 0;
 		}
 	}
 
-	dVehicleMultiBody* m_player;
+	dMultiBodyVehicle* m_player;
 	GLuint m_gears;
 	GLuint m_odometer;
 	GLuint m_redNeedle;

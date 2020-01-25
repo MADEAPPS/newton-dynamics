@@ -12,10 +12,10 @@
 #include "dStdafxVehicle.h"
 #include "dVehicle.h"
 #include "dVehicleNode.h"
-#include "dVehicleTire.h"
-#include "dVehicleEngine.h"
 #include "dVehicleManager.h"
-#include "dVehicleDifferential.h"
+#include "dMultiBodyVehicleTire.h"
+#include "dMultiBodyVehicleEngine.h"
+#include "dMultiBodyVehicleDifferential.h"
 
 dVehicle::dVehicle(NewtonBody* const body, const dMatrix& localFrame, dFloat gravityMag)
 	:dVehicleNode(NULL)
@@ -52,13 +52,13 @@ dVehicle::~dVehicle()
 }
 
 
-void dVehicle::AddControl(dVehicleDashControl* const control)
+void dVehicle::AddControl(dMultiBodyVehicleDashControl* const control)
 {
 	m_control[m_controlerCount] = control;
 	m_controlerCount ++;
 }
 
-void dVehicle::RemoveControl(dVehicleDashControl* const control)
+void dVehicle::RemoveControl(dMultiBodyVehicleDashControl* const control)
 {
 	for (int i = 0; i < m_controlerCount; i ++) {
 		if (control == m_control[m_controlerCount]) {

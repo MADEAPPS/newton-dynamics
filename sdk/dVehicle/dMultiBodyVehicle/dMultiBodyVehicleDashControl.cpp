@@ -11,9 +11,9 @@
 
 
 #include "dStdafxVehicle.h"
-#include "dVehicleTire.h"
-#include "dVehicleEngine.h"
-#include "dVehicleDashControl.h"
+#include "dMultiBodyVehicleTire.h"
+#include "dMultiBodyVehicleEngine.h"
+#include "dMultiBodyVehicleDashControl.h"
 
 // ****************************************************************************
 //
@@ -21,8 +21,8 @@
 void dVehicleSteeringControl::Update(dFloat timestep)
 {
 	m_isSleeping = true;
-	for (dList<dVehicleTire*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
-		dVehicleTire* const tire = node->GetInfo();
+	for (dList<dMultiBodyVehicleTire*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
+		dMultiBodyVehicleTire* const tire = node->GetInfo();
 		const dTireInfo& info = tire->GetInfo();
 
 		dFloat angle = tire->GetSteeringAngle();
@@ -47,8 +47,8 @@ void dVehicleSteeringControl::Update(dFloat timestep)
 void dVehicleBrakeControl::Update(dFloat timestep)
 {
 	m_isSleeping = true;
-	for (dList<dVehicleTire*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
-		dVehicleTire* const tire = node->GetInfo();
+	for (dList<dMultiBodyVehicleTire*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext()) {
+		dMultiBodyVehicleTire* const tire = node->GetInfo();
 		dFloat torque = dMax(m_maxTorque * m_param, tire->GetBrakeTorque());
 		tire->SetBrakeTorque(torque);
 	}
@@ -94,7 +94,7 @@ void dVehicleEngineControl::SetIgnition(int mode)
 
 bool dVehicleEngineControl::ParamChanged() const
 {
-	bool state = dVehicleDashControl::ParamChanged();
+	bool state = dMultiBodyVehicleDashControl::ParamChanged();
 	if (!state && m_engine) {
 		state = m_engine->InputChanged();
 	}

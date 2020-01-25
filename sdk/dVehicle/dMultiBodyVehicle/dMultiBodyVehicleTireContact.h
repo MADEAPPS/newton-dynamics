@@ -20,9 +20,9 @@
 #define D_TIRE_MAX_ELASTIC_DEFORMATION		dFloat (0.05f)
 #define D_TIRE_PENETRATION_RECOVERING_SPEED	dFloat (10.0f)
 
-class dVehicleCollidingNode;
+class dMultiBodyVehicleCollisionNode;
 
-class dVehicleTireContact: public dVehicleLoopJoint
+class dMultiBodyVehicleTireContact: public dVehicleLoopJoint
 {
 	public:
 	class dTireModel
@@ -42,10 +42,10 @@ class dVehicleTireContact: public dVehicleLoopJoint
 		dFloat m_gammaStiffness;
 	};
 
-	dVehicleTireContact();
+	dMultiBodyVehicleTireContact();
 	void ResetContact();
 	void Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const;
-	void SetContact(dVehicleCollidingNode* const node, const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat staticFriction, bool isPatch);
+	void SetContact(dMultiBodyVehicleCollisionNode* const node, const dVector& posit, const dVector& normal, const dVector& lateralDir, dFloat penetration, dFloat staticFriction, bool isPatch);
 
 	private:
 	int GetMaxDof() const { return 3; }
@@ -58,14 +58,14 @@ class dVehicleTireContact: public dVehicleLoopJoint
 	dVector m_normal;
 	dVector m_lateralDir;
 	dVector m_longitudinalDir;
-	dVehicleCollidingNode* m_collidingNode;
+	dMultiBodyVehicleCollisionNode* m_collidingNode;
 	dFloat m_penetration;
 	dFloat m_staticFriction;
 	mutable dTireModel m_tireModel;
 	bool m_isContactPatch;
 	bool m_isLowSpeed;
 
-	friend class dVehicleTire;
+	friend class dMultiBodyVehicleTire;
 };
 
 #endif 

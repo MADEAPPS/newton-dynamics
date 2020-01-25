@@ -16,19 +16,19 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
 
-class dVehicleMultiBody;
+class dMultiBodyVehicle;
 
-class dVehicleCollidingNode: public dVehicleNode
+class dMultiBodyVehicleCollisionNode: public dVehicleNode
 {
 	public:
-	dVehicleCollidingNode();
-	~dVehicleCollidingNode();
+	dMultiBodyVehicleCollisionNode();
+	~dMultiBodyVehicleCollisionNode();
 	NewtonBody* GetNewtonBody() const { return m_body;}
 
 	private:
 	NewtonBody* m_body;
-	friend class dVehicleTire;
-	friend class dVehicleMultiBody;
+	friend class dMultiBodyVehicleTire;
+	friend class dMultiBodyVehicle;
 };
 
 

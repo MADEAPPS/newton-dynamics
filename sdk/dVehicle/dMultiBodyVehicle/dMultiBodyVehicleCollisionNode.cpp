@@ -11,13 +11,13 @@
 
 
 #include "dStdafxVehicle.h"
-#include "dVehicleCollidingNode.h"
+#include "dMultiBodyVehicleCollisionNode.h"
 
-dVehicleCollidingNode::dVehicleCollidingNode()
+dMultiBodyVehicleCollisionNode::dMultiBodyVehicleCollisionNode()
 	:dVehicleNode(NULL)
 {
 }
 
-dVehicleCollidingNode::~dVehicleCollidingNode()
+dMultiBodyVehicleCollisionNode::~dMultiBodyVehicleCollisionNode()
 {
 }

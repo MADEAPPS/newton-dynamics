@@ -12,7 +12,7 @@
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
 #include "dVehicleSolver.h"
-#include "dVehicleMultiBody.h"
+#include "dMultiBodyVehicle.h"
 #include "dVehicleLoopJoint.h"
 
 #define D_DIAG_DAMP				dFloat(1.0e-6f)
@@ -81,7 +81,7 @@ int dVehicleSolver::CalculateNodeCount () const
 	int stack = 1;
 	dVehicleNode* pool[256];
 
-	pool[0] = (dVehicleMultiBody*)this;
+	pool[0] = (dMultiBodyVehicle*)this;
 	while (stack) {
 		stack --;
 		count ++;
@@ -111,7 +111,7 @@ void dVehicleSolver::SortGraph(dVehicleNode* const root, int& index)
 
 void dVehicleSolver::Finalize()
 {
-	dVehicleMultiBody* const rootNode = (dVehicleMultiBody*)this;
+	dMultiBodyVehicle* const rootNode = (dMultiBodyVehicle*)this;
 	if (!rootNode->m_children.GetCount()) {
 		return ;
 	}
@@ -1125,7 +1125,7 @@ void dVehicleSolver::SolveAuxiliary(dVectorPair* const force, const dVectorPair*
 
 void dVehicleSolver::Update(dFloat timestep)
 {
-	dVehicleMultiBody* const rootNode = (dVehicleMultiBody*)this;
+	dMultiBodyVehicle* const rootNode = (dMultiBodyVehicle*)this;
 	if (!(rootNode->m_children.GetCount())) {
 		return;
 	}

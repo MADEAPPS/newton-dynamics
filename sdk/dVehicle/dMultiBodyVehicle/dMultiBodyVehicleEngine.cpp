@@ -10,11 +10,11 @@
 */
 
 #include "dStdafxVehicle.h"
-#include "dVehicleEngine.h"
-#include "dVehicleMultiBody.h"
-#include "dVehicleDifferential.h"
+#include "dMultiBodyVehicle.h"
+#include "dMultiBodyVehicleEngine.h"
+#include "dMultiBodyVehicleDifferential.h"
 
-dVehicleEngine::dEngineMetricInfo::dEngineMetricInfo(const dEngineInfo& info)
+dMultiBodyVehicleEngine::dEngineMetricInfo::dEngineMetricInfo(const dEngineInfo& info)
 	:dEngineInfo(info)
 {
 	const dFloat horsePowerToWatts = 735.5f;
@@ -43,7 +43,7 @@ dVehicleEngine::dEngineMetricInfo::dEngineMetricInfo(const dEngineInfo& info)
 	dAssert((m_peakTorque * m_rpmAtPeakTorque) < m_peakHorsePower);
 }
 
-dFloat dVehicleEngine::dEngineMetricInfo::GetTorque (dFloat rpm) const
+dFloat dMultiBodyVehicleEngine::dEngineMetricInfo::GetTorque (dFloat rpm) const
 {
 	dAssert(rpm >= -0.1f);
 	const int maxIndex = sizeof (m_torqueCurve) / sizeof (m_torqueCurve[0]);
@@ -66,7 +66,7 @@ torque = 10.0f;
 	return m_torqueCurve[maxIndex - 1].m_torque;
 }
 
-dVehicleEngine::dVehicleEngine(dVehicleMultiBody* const chassis, const dEngineInfo& info, dVehicleDifferential* const differential)
+dMultiBodyVehicleEngine::dMultiBodyVehicleEngine(dMultiBodyVehicle* const chassis, const dEngineInfo& info, dMultiBodyVehicleDifferential* const differential)
 	:dVehicleNode(chassis)
 	,dBilateralJoint()
 	,m_localAxis(dYawMatrix(-90.0f * dDegreeToRad))
@@ -96,17 +96,17 @@ m_currentGear = dEngineInfo::m_firstGear;
 	m_gearBox.Init(&m_proxyBody, &m_differential->GetProxyBody());
 }
 
-dVehicleEngine::~dVehicleEngine()
+dMultiBodyVehicleEngine::~dMultiBodyVehicleEngine()
 {
 }
 
-void dVehicleEngine::SetInfo(const dEngineInfo& info)
+void dMultiBodyVehicleEngine::SetInfo(const dEngineInfo& info)
 {
 	m_info = info;
 	InitEngineTorqueCurve();
 }
 
-dFloat dVehicleEngine::GetSpeed() const
+dFloat dMultiBodyVehicleEngine::GetSpeed() const
 {
 	dMatrix matrix;
 	dVector veloc(0.0f);
@@ -118,7 +118,7 @@ dFloat dVehicleEngine::GetSpeed() const
 	return veloc.DotProduct3(matrix.m_front);
 }
 
-void dVehicleEngine::InitEngineTorqueCurve()
+void dMultiBodyVehicleEngine::InitEngineTorqueCurve()
 {
 	m_metricInfo = dEngineMetricInfo(m_info);
 
@@ -129,17 +129,17 @@ void dVehicleEngine::InitEngineTorqueCurve()
 	m_metricInfo.m_torqueCurve[4] = dEngineTorqueNode(m_metricInfo.m_rpmAtRedLine, m_metricInfo.m_idleTorque);
 }
 
-dFloat dVehicleEngine::GetRpm() const
+dFloat dMultiBodyVehicleEngine::GetRpm() const
 {
 	return -m_omega * 9.549f;
 }
 
-dFloat dVehicleEngine::GetRedLineRpm() const
+dFloat dMultiBodyVehicleEngine::GetRedLineRpm() const
 {
 	return m_metricInfo.m_rpmAtRedLine * 9.549f;
 }
 
-void dVehicleEngine::SetGear(dEngineInfo::dGearRatioIndex gear)
+void dMultiBodyVehicleEngine::SetGear(dEngineInfo::dGearRatioIndex gear)
 {
 //	m_gearTimer = 30;
 	m_currentGear = dClamp(gear, dEngineInfo::m_reverseGear, dEngineInfo::dGearRatioIndex (m_metricInfo.m_gearsCount));
@@ -147,7 +147,7 @@ void dVehicleEngine::SetGear(dEngineInfo::dGearRatioIndex gear)
 	m_gearBox.SetGearRatio(ratio);
 }
 
-void dVehicleEngine::UpdateAutomaticGearBox(dFloat timestep)
+void dMultiBodyVehicleEngine::UpdateAutomaticGearBox(dFloat timestep)
 {
 m_metricInfo.m_gearsCount = 4;
 //	m_gearTimer--;
@@ -201,7 +201,7 @@ return;
 //	}
 }
 
-bool dVehicleEngine::InputChanged() const
+bool dMultiBodyVehicleEngine::InputChanged() const
 {
 	if (m_ignitionKey0 != m_ignitionKey1) {
 		return true;
@@ -217,13 +217,13 @@ bool dVehicleEngine::InputChanged() const
 	return alphaMag2 > 1.0f;
 }
 
-void dVehicleEngine::SetIgnition(bool mode)
+void dMultiBodyVehicleEngine::SetIgnition(bool mode)
 {
 	m_ignitionKey1 = m_ignitionKey0;
 	m_ignitionKey0 = mode;
 }
 
-void dVehicleEngine::SetThrottle (dFloat throttle, dFloat timestep)
+void dMultiBodyVehicleEngine::SetThrottle (dFloat throttle, dFloat timestep)
 {
 	if (m_ignitionKey0) {
 		throttle = dMax(throttle, m_metricInfo.m_rpmAtIdleTorque / m_metricInfo.m_rpmAtRedLine);
@@ -244,7 +244,7 @@ void dVehicleEngine::SetThrottle (dFloat throttle, dFloat timestep)
 	m_throttle = dClamp(m_throttle + step, dFloat(0.0f), dFloat(1.0f));
 }
 
-void dVehicleEngine::SetDifferentialMode(int differentialMode) 
+void dMultiBodyVehicleEngine::SetDifferentialMode(int differentialMode) 
 {
 	if (differentialMode != m_differentialMode) {
 		m_differentialMode = differentialMode;
@@ -260,21 +260,21 @@ void dVehicleEngine::SetClutch (dFloat clutch)
 }
 #endif
 
-const void dVehicleEngine::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+const void dMultiBodyVehicleEngine::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
 {
 //	dAssert(0);
 //	dVehicleEngineInterface::Debug(debugContext);
 }
 
-int dVehicleEngine::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
+int dMultiBodyVehicleEngine::GetKinematicLoops(dVehicleLoopJoint** const jointArray)
 {
 	jointArray[0] = &m_gearBox;
 	return 1;
 }
 
-void dVehicleEngine::CalculateFreeDof(dFloat timestep)
+void dMultiBodyVehicleEngine::CalculateFreeDof(dFloat timestep)
 {
-	dVehicleMultiBody* const chassisNode = GetParent()->GetAsVehicleMultiBody();
+	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsVehicleMultiBody();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 	const dMatrix chassisMatrix(m_localAxis * chassisBody->GetMatrix());
 
@@ -284,14 +284,14 @@ void dVehicleEngine::CalculateFreeDof(dFloat timestep)
 	m_omega = chassisMatrix.m_front.DotProduct3(relativeOmega);
 }
 
-void dVehicleEngine::Integrate(dFloat timestep)
+void dMultiBodyVehicleEngine::Integrate(dFloat timestep)
 {
 	m_proxyBody.IntegrateForce(timestep, m_proxyBody.GetForce(), m_proxyBody.GetTorque());
 }
 
-void dVehicleEngine::ApplyExternalForce()
+void dMultiBodyVehicleEngine::ApplyExternalForce()
 {
-	dVehicleMultiBody* const chassisNode = GetParent()->GetAsVehicleMultiBody();
+	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsVehicleMultiBody();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 
 	dMatrix matrix(chassisBody->GetMatrix());
@@ -305,12 +305,12 @@ void dVehicleEngine::ApplyExternalForce()
 	m_proxyBody.SetForce(chassisNode->GetGravity().Scale(m_proxyBody.GetMass()));
 }
 
-void dVehicleEngine::UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
+void dMultiBodyVehicleEngine::UpdateSolverForces(const dComplementaritySolver::dJacobianPair* const jacobians) const
 {
 	dAssert(0);
 }
 
-void dVehicleEngine::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+void dMultiBodyVehicleEngine::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	dComplementaritySolver::dBodyState* const engine = m_state0;
 	dMatrix matrix(m_localAxis * engine->GetMatrix());
@@ -337,7 +337,7 @@ void dVehicleEngine::JacobianDerivative(dComplementaritySolver::dParamInfo* cons
 //dTrace (("rpm %f   torque %f\n", rpm, torque));
 }
 
-void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
+void dMultiBodyVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementaritySolver::dParamInfo* const constraintParams)
 {
 	m_dof = 0;
 	m_count = 0;
@@ -345,7 +345,7 @@ void dVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComplementarity
 	if (dAbs(m_gearRatio) > 1.0e-3f) {
 
 		dAssert(GetOwner0()->GetAsEngine());
-		dVehicleEngine* const engineNode = GetOwner0()->GetAsEngine();
+		dMultiBodyVehicleEngine* const engineNode = GetOwner0()->GetAsEngine();
 		dVector gearBoxPin (m_state0->GetMatrix().RotateVector(engineNode->m_localAxis.m_front));
 		AddAngularRowJacobian(constraintParams, gearBoxPin, 0.0f);
 

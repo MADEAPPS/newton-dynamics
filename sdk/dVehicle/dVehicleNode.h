@@ -16,11 +16,11 @@
 #include "dStdafxVehicle.h"
 
 class dVehicleNode;
-class dVehicleTire;
-class dVehicleEngine;
-class dVehicleMultiBody;
+class dMultiBodyVehicleTire;
+class dMultiBodyVehicleEngine;
+class dMultiBodyVehicle;
 class dVehicleLoopJoint;
-class dVehicleDifferential;
+class dMultiBodyVehicleDifferential;
 
 class dVehicleNodeChildrenList: public dList<dVehicleNode*>
 {
@@ -43,10 +43,10 @@ class dVehicleNode: public dCustomAlloc
 	
 	DVEHICLE_API virtual void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	
-	virtual dVehicleTire* GetAsTire() const { return NULL; }
-	virtual dVehicleEngine* GetAsEngine() const { return NULL; }
-	virtual dVehicleDifferential* GetAsDifferential() const { return NULL; }
-	virtual dVehicleMultiBody* GetAsVehicleMultiBody() const { return NULL; }
+	virtual dMultiBodyVehicleTire* GetAsTire() const { return NULL; }
+	virtual dMultiBodyVehicleEngine* GetAsEngine() const { return NULL; }
+	virtual dMultiBodyVehicleDifferential* GetAsDifferential() const { return NULL; }
+	virtual dMultiBodyVehicle* GetAsVehicleMultiBody() const { return NULL; }
 	virtual dComplementaritySolver::dBilateralJoint* GetJoint() { return NULL; }
 		
 	void* GetUserData() const {return m_usedData;}
@@ -79,7 +79,7 @@ class dVehicleNode: public dCustomAlloc
 
 	friend class dVehicleSolver;
 	friend class dVehicleManager;
-	friend class dVehicleMultiBody;
+	friend class dMultiBodyVehicle;
 };
 
 

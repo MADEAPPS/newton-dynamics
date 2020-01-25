@@ -16,7 +16,7 @@
 #include "dStdafxVehicle.h"
 
 class dVehicleNode;
-class dVehicleMultiBody;
+class dMultiBodyVehicle;
 class dVehicleLoopJoint;
 
 class dVehicleSolver
@@ -94,7 +94,7 @@ class dVehicleSolver
 	int m_loopJointCount;
 	int m_auxiliaryRowCount;
 
-	friend class dVehicleMultiBody;
+	friend class dMultiBodyVehicle;
 };
 
 #endif 

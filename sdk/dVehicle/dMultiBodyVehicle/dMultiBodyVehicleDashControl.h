@@ -15,14 +15,14 @@
 
 #include "dStdafxVehicle.h"
 
-class dVehicleTire;
-class dVehicleEngine;
-class dVehicleMultiBody;
+class dMultiBodyVehicleTire;
+class dMultiBodyVehicleEngine;
+class dMultiBodyVehicle;
 
-class dVehicleDashControl
+class dMultiBodyVehicleDashControl
 {
 	public:
-	dVehicleDashControl()
+	dMultiBodyVehicleDashControl()
 		:m_vehicle(NULL)
 		,m_param(0.0f)
 		,m_paramMemory(0.0f)
@@ -30,11 +30,11 @@ class dVehicleDashControl
 	{
 	}
 
-	virtual ~dVehicleDashControl()
+	virtual ~dMultiBodyVehicleDashControl()
 	{
 	}
 
-	void Init(dVehicleMultiBody* const vehicle)
+	void Init(dMultiBodyVehicle* const vehicle)
 	{
 		m_vehicle = vehicle;
 	}
@@ -63,13 +63,13 @@ class dVehicleDashControl
 	virtual void Update(dFloat timestep) = 0;
 
 	protected:
-	dVehicleMultiBody* m_vehicle;
+	dMultiBodyVehicle* m_vehicle;
 	dFloat m_param;
 	dFloat m_paramMemory;
 	mutable dFloat m_timer;
 };
 
-class dVehicleTireControl: public dVehicleDashControl
+class dVehicleTireControl: public dMultiBodyVehicleDashControl
 {
 	protected:
 	dVehicleTireControl()
@@ -79,22 +79,22 @@ class dVehicleTireControl: public dVehicleDashControl
 	}
 
 	public:
-	void AddTire(dVehicleTire* const tire)
+	void AddTire(dMultiBodyVehicleTire* const tire)
 	{
 		m_tires.Append(tire);
 	}
 
 	protected:
-	dList<dVehicleTire*> m_tires;
+	dList<dMultiBodyVehicleTire*> m_tires;
 	bool m_isSleeping;
-	friend class dVehicleMultiBody;
+	friend class dMultiBodyVehicle;
 };
 
 class dVehicleSteeringControl: public dVehicleTireControl
 {
 	protected:
 	virtual void Update(dFloat timestep);
-	friend class dVehicleMultiBody;
+	friend class dMultiBodyVehicle;
 };
 
 class dVehicleBrakeControl: public dVehicleTireControl
@@ -117,10 +117,10 @@ class dVehicleBrakeControl: public dVehicleTireControl
 	protected:
 	virtual void Update(dFloat timestep);
 	dFloat m_maxTorque;
-	friend class dVehicleMultiBody;
+	friend class dMultiBodyVehicle;
 };
 
-class dVehicleEngineControl: public dVehicleDashControl 
+class dVehicleEngineControl: public dMultiBodyVehicleDashControl 
 {
 	public:
 	dVehicleEngineControl()
@@ -128,8 +128,8 @@ class dVehicleEngineControl: public dVehicleDashControl
 	{
 	}
 
-	dVehicleEngine* GetEngine() const {return m_engine;}
-	void SetEngine (dVehicleEngine* const engine) {m_engine = engine;}
+	dMultiBodyVehicleEngine* GetEngine() const {return m_engine;}
+	void SetEngine (dMultiBodyVehicleEngine* const engine) {m_engine = engine;}
 	void SetGear (int gear);
 	void SetClutch (dFloat clutch);
 	void SetDifferential (int mode);
@@ -139,7 +139,7 @@ class dVehicleEngineControl: public dVehicleDashControl
 	virtual bool ParamChanged() const;
 
 	private:
-	dVehicleEngine* m_engine;
+	dMultiBodyVehicleEngine* m_engine;
 };
 
 
