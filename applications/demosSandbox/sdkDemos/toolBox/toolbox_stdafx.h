@@ -157,7 +157,7 @@ typedef long long unsigned64;
 
 #include <dCustomTriggerManager.h>
 #include <dCustomKinematicController.h>
-#include <dCustomPlayerControllerManager.h>
+
 
 #include <dModelStdAfx.h>
 #include <dModelNode.h>
@@ -171,9 +171,11 @@ typedef long long unsigned64;
 #include <dVehicleNode.h>
 #include <dVehicleManager.h>
 #include <dMultiBodyVehicle.h>
-#include <dMultiBodyVehicleDifferential.h>
 #include <dMultiBodyVehicleTire.h>
 #include <dMultiBodyVehicleEngine.h>
+#include <dMultiBodyVehicleDifferential.h>
+
+#include <dPlayerControllerManager.h>
 
 #include <dSceneStdafx.h>
 #include <dScene.h>

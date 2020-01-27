@@ -555,11 +555,11 @@ for (int i = 0; i < 10; i ++) {
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 
 
-class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
+class AnimatedPlayerControllerManager: public dPlayerControllerManager
 {
 	public:
 	AnimatedPlayerControllerManager(NewtonWorld* const world)
-		:dCustomPlayerControllerManager(world)
+		:dPlayerControllerManager(world)
 		, m_player(NULL)
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
@@ -581,7 +581,7 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 		}
 	}
 
-	void SetAsPlayer(dCustomPlayerController* const controller)
+	void SetAsPlayer(dPlayerController* const controller)
 	{
 		m_player = controller;
 	}
@@ -694,7 +694,7 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 		return cachedAnimNode->GetInfo();
 	}
 	
-	dCustomPlayerController* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
+	dPlayerController* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
 	{
 		// get the scene 
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
@@ -710,7 +710,7 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 		localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
 		// make a play controller with default values.
-		dCustomPlayerController* const controller = CreateController(location, localAxis, mass, radius, height, 0.4f);
+		dPlayerController* const controller = CreateController(location, localAxis, mass, radius, height, 0.4f);
 
 		// get body from player, and set some parameter
 		NewtonBody* const body = controller->GetBody();
@@ -754,7 +754,7 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 		}
 	}
 
-	void ApplyInputs(dCustomPlayerController* const controller)
+	void ApplyInputs(dPlayerController* const controller)
 	{
 		if (controller == m_player) {
 			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
@@ -776,7 +776,7 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 		}
 	}
 
-	bool ProccessContact(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
+	bool ProccessContact(dPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
 	{
 		/*
 		if (normal.m_y < 0.9f) {
@@ -789,7 +789,7 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 		return true;
 	}
 
-	dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
+	dFloat ContactFriction(dPlayerController* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
 	{
 		if (normal.m_y < 0.9f) {
 			// steep slope are friction less
@@ -817,7 +817,7 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 	}
 
 	// apply gravity 
-	virtual void ApplyMove(dCustomPlayerController* const controller, dFloat timestep)
+	virtual void ApplyMove(dPlayerController* const controller, dFloat timestep)
 	{
 		// calculate the gravity contribution to the velocity
 		dVector gravityImpulse(0.0f, DEMO_GRAVITY * controller->GetMass() * timestep, 0.0f, 0.0f);
@@ -828,7 +828,7 @@ class AnimatedPlayerControllerManager: public dCustomPlayerControllerManager
 		ApplyInputs(controller);
 	}
 
-	dCustomPlayerController* m_player;
+	dPlayerController* m_player;
 	dTree<dAnimationKeyframesSequence*, dString> m_animCache;
 };
 
@@ -975,7 +975,7 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 
 	location.m_posit = FindFloor(scene->GetNewton(), location.m_posit, 20.0f);
 	location.m_posit.m_y += 1.0f;
-	dCustomPlayerController*  const player = playerManager->CreatePlayer(location, 1.8f, 0.3f, 100.0f);
+	dPlayerController*  const player = playerManager->CreatePlayer(location, 1.8f, 0.3f, 100.0f);
 	playerManager->SetAsPlayer(player);
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());

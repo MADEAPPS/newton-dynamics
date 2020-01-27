@@ -101,7 +101,7 @@ class AdvancePlayerEntity: public DemoEntity
 		int m_cameraMode;
 	};
 
-	AdvancePlayerEntity (DemoEntityManager* const scene, dCustomPlayerControllerManager* const manager, dFloat radius, dFloat height, const dMatrix& location)
+	AdvancePlayerEntity (DemoEntityManager* const scene, dPlayerControllerManager* const manager, dFloat radius, dFloat height, const dMatrix& location)
 		:DemoEntity (dGetIdentityMatrix(), NULL)
 		,m_inputs()
 		,m_currentTrigger(NULL)
@@ -151,7 +151,7 @@ class AdvancePlayerEntity: public DemoEntity
 	{
 		// destroy the player controller and its rigid body
 		dAssert(0);
-//		((dCustomPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
+//		((dPlayerControllerManager*)m_controller->GetManager())->DestroyController(m_controller);
 	}
 
 	void SetInput (const InputRecord& inputs)
@@ -205,11 +205,11 @@ class AdvancePlayerEntity: public DemoEntity
 	PlaformEntityEntity* m_currentPlatform;
 };
 
-class AdvancePlayerControllerManager: public dCustomPlayerControllerManager
+class AdvancePlayerControllerManager: public dPlayerControllerManager
 {
 	public:
 	AdvancePlayerControllerManager (NewtonWorld* const world)
-		:dCustomPlayerControllerManager (world)
+		:dPlayerControllerManager (world)
 	{
 	}
 
@@ -259,7 +259,7 @@ class AdvancePlayerControllerManager: public dCustomPlayerControllerManager
 				newCount --;
 			}
 		}
-//		count = dCustomPlayerControllerManager::ProcessContacts (controller, contacts, newCount); 
+//		count = dPlayerControllerManager::ProcessContacts (controller, contacts, newCount); 
 		return count;
 	}
 };
@@ -1199,11 +1199,11 @@ void AdvancedPlayerController (DemoEntityManager* const scene)
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 
 
-class AdvancedPlayerControllerManager : public dCustomPlayerControllerManager
+class AdvancedPlayerControllerManager : public dPlayerControllerManager
 {
 	public:
 		AdvancedPlayerControllerManager(NewtonWorld* const world)
-		:dCustomPlayerControllerManager(world)
+		:dPlayerControllerManager(world)
 		, m_player(NULL)
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
@@ -1216,7 +1216,7 @@ class AdvancedPlayerControllerManager : public dCustomPlayerControllerManager
 	{
 	}
 
-	void SetAsPlayer(dCustomPlayerController* const controller)
+	void SetAsPlayer(dPlayerController* const controller)
 	{
 		m_player = controller;
 	}
@@ -1247,7 +1247,7 @@ class AdvancedPlayerControllerManager : public dCustomPlayerControllerManager
 		me->SetCamera();
 	}
 
-	dCustomPlayerController* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
+	dPlayerController* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
 	{
 		// get the scene 
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
@@ -1263,7 +1263,7 @@ class AdvancedPlayerControllerManager : public dCustomPlayerControllerManager
 		localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
 		// make a play controller with default values.
-		dCustomPlayerController* const controller = CreateController(location, localAxis, mass, radius, height, height / 3.0f);
+		dPlayerController* const controller = CreateController(location, localAxis, mass, radius, height, height / 3.0f);
 
 		// get body from player, and set some parameter
 		NewtonBody* const body = controller->GetBody();
@@ -1313,7 +1313,7 @@ class AdvancedPlayerControllerManager : public dCustomPlayerControllerManager
 		}
 	}
 
-	void ApplyInputs(dCustomPlayerController* const controller)
+	void ApplyInputs(dPlayerController* const controller)
 	{
 		if (controller == m_player) {
 			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
@@ -1335,7 +1335,7 @@ class AdvancedPlayerControllerManager : public dCustomPlayerControllerManager
 		}
 	}
 
-	bool ProccessContact(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
+	bool ProccessContact(dPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
 	{
 		/*
 		if (normal.m_y < 0.9f) {
@@ -1348,7 +1348,7 @@ class AdvancedPlayerControllerManager : public dCustomPlayerControllerManager
 		return true;
 	}
 
-	dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
+	dFloat ContactFriction(dPlayerController* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
 	{
 		// clip steep slope contacts
 		if (normal.m_y < 0.9f) {
@@ -1361,7 +1361,7 @@ class AdvancedPlayerControllerManager : public dCustomPlayerControllerManager
 	}
 
 	// apply gravity 
-	virtual void ApplyMove(dCustomPlayerController* const controller, dFloat timestep)
+	virtual void ApplyMove(dPlayerController* const controller, dFloat timestep)
 	{
 		// calculate the gravity contribution to the velocity
 		dVector gravityImpulse(0.0f, DEMO_GRAVITY * controller->GetMass() * timestep, 0.0f, 0.0f);
@@ -1372,7 +1372,7 @@ class AdvancedPlayerControllerManager : public dCustomPlayerControllerManager
 		ApplyInputs(controller);
 	}
 
-	dCustomPlayerController* m_player;
+	dPlayerController* m_player;
 };
 
 
@@ -1400,7 +1400,7 @@ void AdvancedPlayerController(DemoEntityManager* const scene)
 
 	location.m_posit = FindFloor(scene->GetNewton(), location.m_posit, 20.0f);
 	location.m_posit.m_y += 1.0f;
-	dCustomPlayerController*  const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	dPlayerController*  const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 	playerManager->SetAsPlayer(player);
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());

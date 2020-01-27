@@ -23,10 +23,10 @@
 #define D_MAX_ROWS					(3 * D_MAX_CONTACTS) 
 #define D_MAX_COLLISION_PENETRATION	dFloat (5.0e-3f)
 
-class dCustomPlayerController::dContactSolver
+class dPlayerController::dContactSolver
 {
 	public: 
-	dContactSolver(dCustomPlayerController* const controller)
+	dContactSolver(dPlayerController* const controller)
 		:m_controller(controller)
 		,m_contactCount(0)
 	{
@@ -44,7 +44,7 @@ class dCustomPlayerController::dContactSolver
 
 	static unsigned PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
 	{
-		dCustomPlayerController* const controller = (dCustomPlayerController*)userData;
+		dPlayerController* const controller = (dPlayerController*)userData;
 		if (controller->GetBody() == body) {
 			return false;
 		}
@@ -52,14 +52,14 @@ class dCustomPlayerController::dContactSolver
 	}
 
 	NewtonWorldConvexCastReturnInfo m_contactBuffer[D_MAX_ROWS];
-	dCustomPlayerController* m_controller;
+	dPlayerController* m_controller;
 	int m_contactCount;
 };
 
-class dCustomPlayerController::dImpulseSolver 
+class dPlayerController::dImpulseSolver 
 {
 	public: 
-	dImpulseSolver (dCustomPlayerController* const controller)
+	dImpulseSolver (dPlayerController* const controller)
 		:m_zero(0.0f)
 	{
 		m_mass = controller->m_mass;
@@ -68,7 +68,7 @@ class dCustomPlayerController::dImpulseSolver
 		Reset(controller);
 	}
 
-	void Reset (dCustomPlayerController* const controller)
+	void Reset (dPlayerController* const controller)
 	{
 		m_rowCount = 0;
 		NewtonBodyGetVelocity(controller->m_kinematicBody, &m_veloc[0]);
@@ -266,14 +266,14 @@ void dCustomPlayerControllerManager::PreUpdate(dFloat timestep, int threadID)
 	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 
-	dList<dCustomPlayerController>::dListNode* node = m_playerList.GetFirst();
+	dList<dPlayerController>::dListNode* node = m_playerList.GetFirst();
 	for (int i = 0; i < threadID; i++) {
 		node = node ? node->GetNext() : NULL;
 	}
 
 	if (node) {
 		do {
-			dCustomPlayerController* const controller = &node->GetInfo();
+			dPlayerController* const controller = &node->GetInfo();
 			controller->PreUpdate(timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
@@ -283,7 +283,7 @@ void dCustomPlayerControllerManager::PreUpdate(dFloat timestep, int threadID)
 }
 
 
-dCustomPlayerController::dCustomPlayerController()
+dPlayerController::dPlayerController()
 	:m_localFrame(dGetIdentityMatrix())
 	,m_impulse(0.0f)
 	,m_mass(0.0f)
@@ -305,19 +305,19 @@ dCustomPlayerController::dCustomPlayerController()
 {
 }
 
-dCustomPlayerController::~dCustomPlayerController()
+dPlayerController::~dPlayerController()
 {
 	NewtonDestroyBody(m_kinematicBody);
 }
 
-dCustomPlayerController* dCustomPlayerControllerManager::CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
+dPlayerController* dCustomPlayerControllerManager::CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
 {
 	NewtonWorld* const world = GetWorld();
 	dMatrix shapeMatrix(localAxis);
 	shapeMatrix.m_posit = shapeMatrix.m_front.Scale (height * 0.5f);
 	shapeMatrix.m_posit.m_w = 1.0f;
 
-	dCustomPlayerController& controller = m_playerList.Append()->GetInfo();
+	dPlayerController& controller = m_playerList.Append()->GetInfo();
 
 	controller.m_height = height;
 	controller.m_weistScale = 3.0f;
@@ -349,14 +349,14 @@ dCustomPlayerController* dCustomPlayerControllerManager::CreateController(const 
 	return &controller;
 }
 
-void dCustomPlayerControllerManager::DestroyController(dCustomPlayerController* const player)
+void dCustomPlayerControllerManager::DestroyController(dPlayerController* const player)
 {
-	dList<dCustomPlayerController>::dListNode* const node = m_playerList.GetNodeFromInfo(*player);
+	dList<dPlayerController>::dListNode* const node = m_playerList.GetNodeFromInfo(*player);
 	dAssert(node);
 	m_playerList.Remove(node);
 }
 
-void dCustomPlayerController::ToggleCrouch ()
+void dPlayerController::ToggleCrouch ()
 {
 	dMatrix matrix;
 	m_isCrouched = !m_isCrouched;
@@ -374,20 +374,20 @@ void dCustomPlayerController::ToggleCrouch ()
 	NewtonCollisionSetMatrix(shape, &matrix[0][0]);
 }
 
-dVector dCustomPlayerController::GetVelocity() const
+dVector dPlayerController::GetVelocity() const
 { 
 	dVector veloc(0.0);
 	NewtonBodyGetVelocity(m_kinematicBody, &veloc[0]);
 	return veloc; 
 }
 
-void dCustomPlayerController::SetVelocity(const dVector& veloc) 
+void dPlayerController::SetVelocity(const dVector& veloc) 
 { 
 	dAssert(veloc.DotProduct3(veloc) < 10000.0f);
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 }
 
-void dCustomPlayerController::SetFrame(const dMatrix& frame)
+void dPlayerController::SetFrame(const dMatrix& frame)
 {
 	dAssert (frame.TestOrthogonal());
 	m_localFrame = frame;
@@ -403,7 +403,7 @@ void dCustomPlayerController::SetFrame(const dMatrix& frame)
 	NewtonCollisionSetMatrix(capsule, &newMatrix[0][0]);
 }
 
-void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& contactSolver)
+void dPlayerController::ResolveStep(dFloat timestep, dContactSolver& contactSolver)
 {
 	dMatrix matrix;
 	dVector zero(0.0f);
@@ -558,7 +558,7 @@ void dCustomPlayerController::ResolveStep(dFloat timestep, dContactSolver& conta
 	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
 }
 
-dCustomPlayerController::dCollisionState dCustomPlayerController::TestPredictCollision(const dContactSolver& contactSolver, const dVector& veloc) const
+dPlayerController::dCollisionState dPlayerController::TestPredictCollision(const dContactSolver& contactSolver, const dVector& veloc) const
 {
 	for (int i = 0; i < contactSolver.m_contactCount; i++) {
 		const NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
@@ -577,7 +577,7 @@ dCustomPlayerController::dCollisionState dCustomPlayerController::TestPredictCol
 	return m_freeMovement;
 }
 
-dFloat dCustomPlayerController::PredictTimestep(dFloat timestep, dContactSolver& contactSolver)
+dFloat dPlayerController::PredictTimestep(dFloat timestep, dContactSolver& contactSolver)
 {
 	dMatrix matrix;
 	dVector veloc(0.0f);
@@ -630,7 +630,7 @@ dFloat dCustomPlayerController::PredictTimestep(dFloat timestep, dContactSolver&
 	return timestep;
 }
 
-void dCustomPlayerController::ResolveInterpenetrations(dContactSolver& contactSolver, dImpulseSolver& impulseSolver)
+void dPlayerController::ResolveInterpenetrations(dContactSolver& contactSolver, dImpulseSolver& impulseSolver)
 {
 	dVector zero (0.0f);
 	dVector savedVeloc (0.0f);
@@ -677,7 +677,7 @@ void dCustomPlayerController::ResolveInterpenetrations(dContactSolver& contactSo
 	SetVelocity(savedVeloc);
 }
 
-void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver, dFloat timestep)
+void dPlayerController::ResolveCollision(dContactSolver& contactSolver, dFloat timestep)
 {
 	dMatrix matrix;
 	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
@@ -745,7 +745,7 @@ void dCustomPlayerController::ResolveCollision(dContactSolver& contactSolver, dF
 	SetVelocity(veloc);
 }
 
-void dCustomPlayerController::UpdatePlayerStatus(dContactSolver& contactSolver)
+void dPlayerController::UpdatePlayerStatus(dContactSolver& contactSolver)
 {
 	dMatrix matrix;
 	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
@@ -769,7 +769,7 @@ void dCustomPlayerController::UpdatePlayerStatus(dContactSolver& contactSolver)
 	}
 }
 
-void dCustomPlayerController::PreUpdate(dFloat timestep)
+void dPlayerController::PreUpdate(dFloat timestep)
 {
 	dContactSolver contactSolver (this);
 

@@ -58,7 +58,6 @@ dFloat dMultiBodyVehicleEngine::dEngineMetricInfo::GetTorque (dFloat rpm) const
 			dFloat torque0 = m_torqueCurve[i - 1].m_torque;
 
 			dFloat torque = torque0 + (rpm - rpm0) * (torque1 - torque0) / (rpm1 - rpm0);
-torque = 100.0f;
 			return torque;
 		}
 	}
@@ -156,7 +155,7 @@ m_metricInfo.m_gearsCount = 4;
 	dFloat omega = dAbs (m_omega);
 static int xxxx;
 xxxx++;
-if (xxxx > 1000)
+if (xxxx > 200)
 {
 SetGear(dEngineInfo::dGearRatioIndex(dEngineInfo::m_firstGear));
 return;
@@ -355,8 +354,8 @@ void dMultiBodyVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComple
 		//dFloat gain = -1.0f;
 		dFloat gain = m_crowndGear * m_gearRatio;
 //dTrace (("(gearGain %f) ", gain));
-if (gain < 11)
-gain *= 1;
+//if (gain < 11)
+gain = 1;
 
 		jacobian1.m_angular = jacobian1.m_angular.Scale(-gain);
 

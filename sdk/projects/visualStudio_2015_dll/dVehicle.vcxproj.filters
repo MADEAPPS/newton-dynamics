@@ -30,7 +30,7 @@
     <ClCompile Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTireContact.cpp">
       <Filter>dMultiBodyVehicle</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dVehicle\dPlayerController\dCustomPlayerControllerManager.cpp">
+    <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerManager.cpp">
       <Filter>dPlayerController</Filter>
     </ClCompile>
   </ItemGroup>
@@ -64,7 +64,7 @@
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTireContact.h">
       <Filter>dMultiBodyVehicle</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dVehicle\dPlayerController\dCustomPlayerControllerManager.h">
+    <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerManager.h">
       <Filter>dPlayerController</Filter>
     </ClInclude>
   </ItemGroup>

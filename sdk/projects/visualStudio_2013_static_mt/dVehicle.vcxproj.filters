@@ -12,9 +12,6 @@
     <ClCompile Include="..\..\dVehicle\dVehicleLoopJoint.cpp">
       <Filter>dMultiBodyVehicle</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dVehicle\dPlayerController\dCustomPlayerControllerManager.cpp">
-      <Filter>dPlayerController</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicle.cpp">
       <Filter>dMultiBodyVehicle</Filter>
     </ClCompile>
@@ -33,6 +30,9 @@
     <ClCompile Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleDashControl.cpp">
       <Filter>dMultiBodyVehicle</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerManager.cpp">
+      <Filter>dPlayerController</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dVehicle\dStdafxVehicle.h" />
@@ -45,9 +45,6 @@
     </ClInclude>
     <ClInclude Include="..\..\dVehicle\dVehicleLoopJoint.h">
       <Filter>dMultiBodyVehicle</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dVehicle\dPlayerController\dCustomPlayerControllerManager.h">
-      <Filter>dPlayerController</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicle.h">
       <Filter>dMultiBodyVehicle</Filter>
@@ -66,6 +63,9 @@
     </ClInclude>
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleDashControl.h">
       <Filter>dMultiBodyVehicle</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerManager.h">
+      <Filter>dPlayerController</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

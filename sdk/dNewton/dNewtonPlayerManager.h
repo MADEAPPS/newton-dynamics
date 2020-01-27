@@ -41,7 +41,7 @@ class dNewtonPlayerManager: public dCustomPlayerControllerManager
 		CNEWTON_API void SetPlayerVelocity (dFloat forwardSpeed, dFloat lateralSpeed, dFloat verticalSpeed, dFloat headingAngle, const dFloat* const gravity, dFloat timestep);
 
 		private:
-		dCustomPlayerController* m_controller;
+		dPlayerController* m_controller;
 
 		friend class dNewtonPlayerManager;
 	};
@@ -52,7 +52,7 @@ class dNewtonPlayerManager: public dCustomPlayerControllerManager
 	CNEWTON_API dNewtonPlayer* GetFirstPlayer() const;
 	CNEWTON_API dNewtonPlayer* GetNextPlayer(const dNewtonPlayer* const player) const;
 
-	CNEWTON_API virtual void ApplyMove (dCustomPlayerController* const controller, dFloat timestep);
+	CNEWTON_API virtual void ApplyMove (dPlayerController* const controller, dFloat timestep);
 };
 
 

@@ -60,7 +60,6 @@
     <ClCompile Include="..\..\dCustomJoints\dCustomMotor.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomPathFollow.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomPlane.cpp" />
-    <ClCompile Include="..\..\dCustomJoints\dCustomPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomPulley.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomRackAndPinion.cpp" />
     <ClCompile Include="..\..\dCustomJoints\dCustomSlider.cpp" />
@@ -89,7 +88,6 @@
     <ClInclude Include="..\..\dCustomJoints\dCustomMotor.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomPathFollow.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomPlane.h" />
-    <ClInclude Include="..\..\dCustomJoints\dCustomPlayerControllerManager.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomPulley.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomRackAndPinion.h" />
     <ClInclude Include="..\..\dCustomJoints\dCustomSlider.h" />

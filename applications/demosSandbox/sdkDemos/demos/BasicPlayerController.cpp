@@ -25,11 +25,11 @@
 #define PLAYER_JUMP_SPEED				5.0f
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 
-class BasicPlayerControllerManager: public dCustomPlayerControllerManager
+class BasicPlayerControllerManager: public dPlayerControllerManager
 {
 	public:
 	BasicPlayerControllerManager (NewtonWorld* const world)
-		:dCustomPlayerControllerManager (world)
+		:dPlayerControllerManager (world)
 		,m_croudMesh(NULL)
 		,m_standingMesh(NULL)
 		,m_player(NULL)
@@ -51,7 +51,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		}
 	}
 
-	void SetAsPlayer(dCustomPlayerController* const controller)
+	void SetAsPlayer(dPlayerController* const controller)
 	{
 		m_player = controller;
 	}
@@ -82,7 +82,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		me->SetCamera();
 	}
 
-	dCustomPlayerController* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
+	dPlayerController* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
 	{
 		// get the scene 
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
@@ -98,7 +98,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
 		// make a play controller with default values.
-		dCustomPlayerController* const controller = CreateController(location, localAxis, mass, radius, height, height / 3.0f);
+		dPlayerController* const controller = CreateController(location, localAxis, mass, radius, height, height / 3.0f);
 
 		// Test Local Matrix manipulations
 		//controller->SetFrame(dRollMatrix(60.0f * dDegreeToRad) * controller->GetFrame());
@@ -153,7 +153,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		}
 	}
 
-	void ApplyInputs (dCustomPlayerController* const controller)
+	void ApplyInputs (dPlayerController* const controller)
 	{
 		if (controller == m_player) {
 			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
@@ -193,7 +193,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		}
 	}
 
-	bool ProccessContact(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
+	bool ProccessContact(dPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
 	{
 /*
 		if (normal.m_y < 0.9f) {
@@ -206,7 +206,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 		return true;
 	}
 
-	dFloat ContactFriction(dCustomPlayerController* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
+	dFloat ContactFriction(dPlayerController* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
 	{ 
 		if (normal.m_y < 0.9f) {
 			// steep slope are friction less
@@ -236,7 +236,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 	}
 	
 	// apply gravity 
-	virtual void ApplyMove (dCustomPlayerController* const controller, dFloat timestep)
+	virtual void ApplyMove (dPlayerController* const controller, dFloat timestep)
 	{
 		// calculate the gravity contribution to the velocity
 		dFloat g = 2.0f * DEMO_GRAVITY;
@@ -250,7 +250,7 @@ class BasicPlayerControllerManager: public dCustomPlayerControllerManager
 
 	DemoMesh* m_croudMesh;
 	DemoMesh* m_standingMesh;
-	dCustomPlayerController* m_player;
+	dPlayerController* m_player;
 	DemoEntityManager::ButtonKey m_crowchKey;
 };
 
@@ -396,16 +396,16 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 20.0f);
 	location.m_posit.m_y += 1.0f;
-	dCustomPlayerController* const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	dPlayerController* const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 	playerManager->SetAsPlayer(player);
 
 	// add second player for testing
 	location.m_posit.m_x += 4.0f;
 	location.m_posit.m_z += 1.0f;
 	location.m_posit.m_y += 5.0f;
-	dCustomPlayerController* const player1 = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	dPlayerController* const player1 = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 	location.m_posit.m_z += 3.0f;
-	dCustomPlayerController* const player2 = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	dPlayerController* const player2 = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 	player1;
 	player2;
 
