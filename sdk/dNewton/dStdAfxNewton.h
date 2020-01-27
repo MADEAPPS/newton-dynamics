@@ -76,6 +76,6 @@
 #include <dCustomSliderActuator.h>
 #include <dCustomTriggerManager.h>
 #include <dCustomDoubleHingeActuator.h>
-#include <dCustomPlayerControllerManager.h>
+
 
 #endif

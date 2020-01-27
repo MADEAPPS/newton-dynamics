@@ -26,6 +26,7 @@
 #include "dStdAfxNewton.h"
 #include "dNewtonKinematicBody.h"
 
+#if 0
 class dNewtonPlayerManager: public dCustomPlayerControllerManager
 {
 	public:
@@ -54,8 +55,5 @@ class dNewtonPlayerManager: public dCustomPlayerControllerManager
 
 	CNEWTON_API virtual void ApplyMove (dPlayerController* const controller, dFloat timestep);
 };
-
-
-
-
+#endif
 #endif

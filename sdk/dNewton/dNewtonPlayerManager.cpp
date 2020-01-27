@@ -25,7 +25,7 @@
 #include "dNewtonCollision.h"
 #include "dNewtonPlayerManager.h"
 
-
+#if 0
 dNewtonPlayerManager::dNewtonPlayerManager (dNewton* const world)
 	:dCustomPlayerControllerManager (world->GetNewton())
 {
@@ -144,3 +144,5 @@ dFloat dNewtonPlayerManager::dNewtonPlayer::GetPlayerHigh() const
 	return 0;
 //	return m_controller->GetHigh();
 }
+
+#endif
