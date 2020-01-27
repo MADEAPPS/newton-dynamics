@@ -355,7 +355,7 @@ void dMultiBodyVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComple
 		dFloat gain = m_crowndGear * m_gearRatio;
 //dTrace (("(gearGain %f) ", gain));
 //if (gain < 11)
-gain = 1;
+gain = 4;
 
 		jacobian1.m_angular = jacobian1.m_angular.Scale(-gain);
 
