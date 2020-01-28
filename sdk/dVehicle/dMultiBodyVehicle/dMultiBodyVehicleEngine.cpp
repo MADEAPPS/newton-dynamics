@@ -146,6 +146,7 @@ void dMultiBodyVehicleEngine::SetGear(dEngineInfo::dGearRatioIndex gear)
 	m_gearBox.SetGearRatio(ratio);
 }
 
+static int xxxx;
 void dMultiBodyVehicleEngine::UpdateAutomaticGearBox(dFloat timestep)
 {
 m_metricInfo.m_gearsCount = 4;
@@ -153,7 +154,6 @@ m_metricInfo.m_gearsCount = 4;
 //	if (m_gearTimer < 0) {
 
 	dFloat omega = dAbs (m_omega);
-static int xxxx;
 xxxx++;
 if (xxxx > 200)
 {
@@ -285,6 +285,7 @@ void dMultiBodyVehicleEngine::CalculateFreeDof(dFloat timestep)
 
 void dMultiBodyVehicleEngine::Integrate(dFloat timestep)
 {
+dTrace(("%d %f %f %f\n", xxxx, m_proxyBody.GetTorque().m_x, m_proxyBody.GetTorque().m_y, m_proxyBody.GetTorque().m_z));
 	m_proxyBody.IntegrateForce(timestep, m_proxyBody.GetForce(), m_proxyBody.GetTorque());
 }
 
@@ -355,7 +356,7 @@ void dMultiBodyVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComple
 		dFloat gain = m_crowndGear * m_gearRatio;
 //dTrace (("(gearGain %f) ", gain));
 //if (gain < 11)
-gain = 4;
+//gain = 4;
 
 		jacobian1.m_angular = jacobian1.m_angular.Scale(-gain);
 
