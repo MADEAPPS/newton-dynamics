@@ -34,8 +34,7 @@ include_directories(../../sdk/dContainers/)
 include_directories(../../sdk/dCustomJoints/)
 include_directories(../../sdk/thirdParty/tinyxml/)
 include_directories(../../sdk/dVehicle/dPlayerController)
-include_directories(../../sdk/dVehicle/dVehicleMultiBody)
-
+include_directories(../../sdk/dVehicle/dMultiBodyVehicle)
 
 if (NEWTON_BUILD_PROFILER)
 	include_directories(../../sdk/dProfiler/dProfiler/)

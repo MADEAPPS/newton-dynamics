@@ -33,15 +33,15 @@ class dPlayerController
 	class dPlayerControllerImpulseSolver;
 
 	public:
-	CUSTOM_JOINTS_API dPlayerController();
-	CUSTOM_JOINTS_API ~dPlayerController();
+	DVEHICLE_API dPlayerController();
+	DVEHICLE_API ~dPlayerController();
 
 	void* GetUserData () const {return m_userData;}
 	NewtonBody* GetBody() {return m_kinematicBody;}
 	void SetUserData(void* const userData) {m_userData = userData;}
 	dPlayerControllerManager* GetManager() const {return m_manager;}
 
-	CUSTOM_JOINTS_API void ToggleCrouch ();
+	DVEHICLE_API void ToggleCrouch ();
 
 	bool IsCrouched () const {return m_isCrouched;}
 	bool IsAirBorn () const {return m_isAirbone;}
@@ -61,10 +61,10 @@ class dPlayerController
 	void SetHeadingAngle(dFloat angle) {m_headingAngle = dClamp (angle, dFloat (-dPi), dFloat (dPi));}
 
 	dMatrix GetFrame() const { return m_localFrame; }
-	CUSTOM_JOINTS_API void SetFrame(const dMatrix& frame);
+	DVEHICLE_API void SetFrame(const dMatrix& frame);
 
-	CUSTOM_JOINTS_API dVector GetVelocity() const;
-	CUSTOM_JOINTS_API void SetVelocity(const dVector& veloc);
+	DVEHICLE_API dVector GetVelocity() const;
+	DVEHICLE_API void SetVelocity(const dVector& veloc);
 
 	private:
 	enum dCollisionState
@@ -106,11 +106,11 @@ class dPlayerController
 class dPlayerControllerManager: public dCustomParallelListener
 {
 	public:
-	CUSTOM_JOINTS_API dPlayerControllerManager(NewtonWorld* const world);
-	CUSTOM_JOINTS_API ~dPlayerControllerManager();
+	DVEHICLE_API dPlayerControllerManager(NewtonWorld* const world);
+	DVEHICLE_API ~dPlayerControllerManager();
 
-	CUSTOM_JOINTS_API virtual dPlayerController* CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight);
-	CUSTOM_JOINTS_API virtual void DestroyController(dPlayerController* const player);
+	DVEHICLE_API virtual dPlayerController* CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight);
+	DVEHICLE_API virtual void DestroyController(dPlayerController* const player);
 
 	virtual void ApplyMove(dPlayerController* const controller, dFloat timestep) = 0;
 	virtual bool ProccessContact(dPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const { return true; }
@@ -118,7 +118,7 @@ class dPlayerControllerManager: public dCustomParallelListener
 
 	protected:
 	virtual void PostUpdate(dFloat timestep) {}
-	CUSTOM_JOINTS_API virtual void PreUpdate(dFloat timestep, int threadID);
+	DVEHICLE_API virtual void PreUpdate(dFloat timestep, int threadID);
 
 	private:
 	dList<dPlayerController> m_playerList;
