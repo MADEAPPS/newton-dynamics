@@ -111,6 +111,7 @@ class dMultiBodyVehicleEngine: public dVehicleNode, public dComplementaritySolve
 			:dVehicleLoopJoint()
 			,m_gearRatio(2.6f)
 			,m_crowndGear(1.0f)
+			,m_biasOmega(0.0f)
 			,m_clutchTorque(D_COMPLEMENTARITY_MAX_FRICTION_BOUND)
 		{
 			m_isActive = true;
@@ -134,7 +135,9 @@ class dMultiBodyVehicleEngine: public dVehicleNode, public dComplementaritySolve
 
 		dFloat m_gearRatio;
 		dFloat m_crowndGear;
+		dFloat m_biasOmega;
 		dFloat m_clutchTorque;
+		friend class dMultiBodyVehicleEngine;
 	};
 
 	public:

@@ -126,6 +126,8 @@ void dMultiBodyVehicleEngine::InitEngineTorqueCurve()
 	m_metricInfo.m_torqueCurve[2] = dEngineTorqueNode(m_metricInfo.m_rpmAtPeakTorque, m_metricInfo.m_peakTorque);
 	m_metricInfo.m_torqueCurve[3] = dEngineTorqueNode(m_metricInfo.m_rpmAtPeakHorsePower, m_metricInfo.m_peakPowerTorque);
 	m_metricInfo.m_torqueCurve[4] = dEngineTorqueNode(m_metricInfo.m_rpmAtRedLine, m_metricInfo.m_idleTorque);
+
+	m_gearBox.m_biasOmega = m_metricInfo.m_rpmAtIdleTorque * 0.5f;
 }
 
 dFloat dMultiBodyVehicleEngine::GetRpm() const
@@ -352,19 +354,17 @@ void dMultiBodyVehicleEngine::dGearBoxAndClutchJoint::JacobianDerivative(dComple
 		dComplementaritySolver::dJacobian &jacobian0 = constraintParams->m_jacobians[0].m_jacobian_J01;
 		dComplementaritySolver::dJacobian &jacobian1 = constraintParams->m_jacobians[0].m_jacobian_J10;
 
-		//dFloat gain = -1.0f;
 		dFloat gain = m_crowndGear * m_gearRatio;
-//dTrace (("(gearGain %f) ", gain));
-//if (gain < 11)
-//gain = 4;
-
 		jacobian1.m_angular = jacobian1.m_angular.Scale(-gain);
 
 		const dVector& omega0 = m_state0->GetOmega();
 		const dVector& omega1 = m_state1->GetOmega();
-
-		const dVector relVeloc(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-		dFloat w = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
+		const dVector wv0(omega0 * jacobian0.m_angular);
+		const dVector wv1(omega1 * jacobian1.m_angular);
+		const dFloat w0 = dMin (wv0.m_x + wv0.m_y + wv0.m_z + m_biasOmega, dFloat (0.0f));
+		const dFloat w1 = wv1.m_x + wv1.m_y + wv1.m_z;
+dTrace(("(%f %f) ", w0, w1));
+		const dFloat w = (w0 + w1) * 0.3f;
 
 		constraintParams->m_jointAccel[0] = -w * constraintParams->m_timestepInv;
 		constraintParams->m_jointLowFrictionCoef[0] = -m_clutchTorque;
