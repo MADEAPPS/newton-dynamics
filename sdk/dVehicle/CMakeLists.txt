@@ -16,9 +16,17 @@ message (${projectName})
 include_directories(dPlayerController)
 include_directories(dMultiBodyVehicle)
 
-file(GLOB HEADERS *.h)
-# low level core
-file(GLOB CPP_SOURCE *.cpp dPlayerController/*.cpp dMultiBodyVehicle/*.cpp)
+#source and header files
+file(GLOB CPP_SOURCE 
+	*.h 
+	*.cpp 
+	dPlayerController/*.h 
+	dPlayerController/*.cpp 
+	dMultiBodyVehicle/*.h
+	dMultiBodyVehicle/*.cpp
+)
+#source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" PREFIX source/ FILES ${CPP_SOURCE})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 if(NEWTON_BUILD_SHARED_LIBS)
     if(MSVC)

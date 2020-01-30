@@ -13,9 +13,18 @@ cmake_minimum_required(VERSION 3.4.0)
 set (projectName "demosSandbox")
 message (${projectName})
 
- # low level core
-file(GLOB CPP_SOURCE sdkDemos/*.cpp sdkDemos/toolBox/*.cpp sdkDemos/demos/*.cpp)
-file(GLOB HEADERS sdkDemos/*.h sdkDemos/toolBox/*.h sdkDemos/demos/*.h)
+# source and header files
+file(GLOB CPP_SOURCE 
+	sdkDemos/*.h
+	sdkDemos/*.cpp
+	sdkDemos/demos/*.h
+	sdkDemos/demos/*.cpp
+	sdkDemos/toolBox/*.h
+	sdkDemos/toolBox/*.cpp 
+)
+
+#source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" PREFIX source/ FILES ${CPP_SOURCE})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 include_directories(sdkDemos/)
 include_directories(sdkDemos/demos/)

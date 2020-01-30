@@ -13,9 +13,8 @@ cmake_minimum_required(VERSION 3.4.0)
 set (projectName "newton")
 message (${projectName})
 
-# low level core
-file(GLOB CPP_SOURCE *.cpp)
-file(GLOB HEADERS *.h)
+#source and header files
+file(GLOB CPP_SOURCE *.h *.cpp)
 
 if(NEWTON_BUILD_SHARED_LIBS)
     if(MSVC)

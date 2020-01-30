@@ -13,9 +13,10 @@ cmake_minimum_required(VERSION 3.4.0)
 set (projectName "dgCore")
 message (${projectName})
 
-# low level core
-file(GLOB CPP_SOURCE *.cpp)
-file(GLOB HEADERS *.h)
+# source and header files
+file(GLOB CPP_SOURCE *.h *.cpp)
+
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 if (UNIX OR MINGW)
 	
