@@ -634,7 +634,7 @@ class dExcavatorModel: public dModelRootNode
 		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
 		m_bucketJoint = new dCustomHingeActuator(hingeFrame, bucketBody, armBody);
 		m_bucketJoint->SetAngularRate(0.5f);
-		new dModelNode(bucketBody, bindMatrix, armNode);
+		dModelNode* const buckectNode = new dModelNode(bucketBody, bindMatrix, armNode);
 
 		// create effector to control bucket
 		NewtonBody* const effectorReferenceBody = GetBody();
@@ -643,6 +643,38 @@ class dExcavatorModel: public dModelRootNode
 		m_effector->SetControlMode(dCustomKinematicController::m_linear);
 		m_effector->SetMaxLinearFriction(2000.0f * 9.8f * 50.0f);
 		m_effectorMatrix = m_effector->GetTargetMatrix ();
+
+		// add the four linkage bar to control the bucket
+		AddForLinkageBars(armNode, buckectNode);
+	}
+
+	void AddForLinkageBars(dModelNode* const armNode, dModelNode* const buckectNode)
+	{
+		dMatrix hingeFrame;
+		NewtonBody* const bar1 = MakeBodyPart(armNode, "barLinkage1", 5.0f);
+		NewtonBodyGetMatrix(bar1, &hingeFrame[0][0]);
+		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
+		new dCustomHinge(hingeFrame, bar1, armNode->GetBody());
+		dMatrix bindMatrix(dGetIdentityMatrix());
+		dModelNode* const bar1Node = new dModelNode(bar1, bindMatrix, armNode);
+
+		NewtonBody* const bar2 = MakeBodyPart(bar1Node, "barLinkage2", 5.0f);
+		NewtonBodyGetMatrix(bar2, &hingeFrame[0][0]);
+		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
+		new dCustomHinge(hingeFrame, bar2, bar1Node->GetBody());
+		dModelNode* const bar2Node = new dModelNode(bar2, bindMatrix, bar1Node);
+
+		// connect the second bar to the bucket attachment 
+		DemoEntity* const bucketModel = (DemoEntity*)NewtonBodyGetUserData(buckectNode->GetBody());
+		DemoEntity* const attachmenPoint = bucketModel->Find("barLinkageAttachment");
+		
+		dMatrix attachmentMatrix(attachmenPoint->CalculateGlobalMatrix());
+		attachmentMatrix = dRollMatrix(90.0f * dDegreeToRad) * attachmentMatrix;
+		dCustomSixdof* const attachment = new dCustomSixdof(attachmentMatrix, bar2Node->GetBody(), buckectNode->GetBody());
+		attachment->DisableAxisX();
+		attachment->DisableRotationX();
+		attachment->DisableRotationY();
+		attachment->DisableRotationZ();
 	}
 
 	void AddLocomotion()
@@ -837,7 +869,7 @@ class ArticulatedVehicleManagerManager: public dModelManager
 		ImGui::SliderInt("cabin rotation", &m_cabinSpeed, -3, 3);
 		ImGui::SliderFloat("bucket x", &m_bucket_x, -2.0f, 4.0f);
 		ImGui::SliderFloat("bucket y", &m_bucket_y, -6.0f, 6.0f);
-		ImGui::SliderFloat("bucket angle", &m_bucket_angle, -60.0f, 130.0f);
+		ImGui::SliderFloat("bucket angle", &m_bucket_angle, -40.0f, 120.0f);
 	}
 
 	void UpdateCamera(dFloat timestep)
@@ -1003,7 +1035,7 @@ void ConstructionVehicle (DemoEntityManager* const scene)
 	matrix.m_posit.m_y += 1.5f;
 	vehicleManager->m_player = vehicleManager->CreateExcavator("excavator.ngd", matrix);
 
-#if 1
+#if 0
 	// stress test parallel solver
 	dFloat separation = 8.0f;
 	matrix.m_posit.m_z += separation;
@@ -1015,7 +1047,7 @@ void ConstructionVehicle (DemoEntityManager* const scene)
 	matrix.m_posit.m_z += separation;
 #endif
 
-#if 1
+#if 0
 	// add some destructive logs.
 	int woodX = 8;
 	int woodZ = 8;
