@@ -633,13 +633,14 @@ class dExcavatorModel: public dModelRootNode
 		NewtonBodyGetMatrix(bucketBody, &hingeFrame[0][0]);
 		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
 		m_bucketJoint = new dCustomHingeActuator(hingeFrame, bucketBody, armBody);
-		m_bucketJoint->SetAngularRate(0.75f);
+		m_bucketJoint->SetAngularRate(1.25f);
 		dModelNode* const buckectNode = new dModelNode(bucketBody, bindMatrix, armNode);
 
 		// create effector to control bucket
 		NewtonBody* const effectorReferenceBody = GetBody();
 		m_effector = new dCustomKinematicController(armBody, hingeFrame, effectorReferenceBody);
 		m_effector->SetSolverModel(1);
+		m_effector->SetMaxSpeed(15.0f);
 		m_effector->SetControlMode(dCustomKinematicController::m_linear);
 		m_effector->SetMaxLinearFriction(2000.0f * 9.8f * 50.0f);
 		m_effectorMatrix = m_effector->GetTargetMatrix ();
