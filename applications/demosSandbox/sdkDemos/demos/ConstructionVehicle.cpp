@@ -633,7 +633,7 @@ class dExcavatorModel: public dModelRootNode
 		NewtonBodyGetMatrix(bucketBody, &hingeFrame[0][0]);
 		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
 		m_bucketJoint = new dCustomHingeActuator(hingeFrame, bucketBody, armBody);
-		m_bucketJoint->SetAngularRate(0.5f);
+		m_bucketJoint->SetAngularRate(0.75f);
 		dModelNode* const buckectNode = new dModelNode(bucketBody, bindMatrix, armNode);
 
 		// create effector to control bucket
