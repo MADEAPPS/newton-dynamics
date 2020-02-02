@@ -350,7 +350,7 @@ void dCustomBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 		}
 	}
 
-	if (m_options.m_option2) {
+	if (m_options.m_option0) {
 		dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
 		dFloat pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 		SubmitTwistAngle(matrix0.m_front, pitchAngle, timestep);

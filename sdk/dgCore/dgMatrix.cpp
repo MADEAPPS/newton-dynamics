@@ -268,8 +268,8 @@ dgMatrix dgMatrix::Inverse4x4 () const
 	for (dgInt32 i = 0; i < 4; i++) {
 		dgAssert(dgAbs(tmp[i][i] - dgFloat32(1.0f)) < dgFloat32(1.0e-6f));
 		for (dgInt32 j = i + 1; j < 4; j++) {
-			dgAssert(dgAbs(tmp[i][j]) < dgFloat32(1.0e-6f));
-			dgAssert(dgAbs(tmp[j][i]) < dgFloat32(1.0e-6f));
+			dgAssert(dgAbs(tmp[i][j]) < dgFloat32(1.0e-5f));
+			dgAssert(dgAbs(tmp[j][i]) < dgFloat32(1.0e-5f));
 		}
 	}
 #endif
