@@ -37,7 +37,7 @@ class dSixAxisJointDefinition
 		dFloat m_maxLimit;
 	};
 
-	char* m_boneName;
+	const char* m_boneName;
 	jointType m_type;
 	dJointLimit m_jointLimits;
 	dFloat m_massFraction;
