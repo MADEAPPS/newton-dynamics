@@ -651,6 +651,7 @@ class dExcavatorModel: public dModelRootNode
 
 	void AddForLinkageBars(dModelNode* const armNode, dModelNode* const buckectNode)
 	{
+#if 0
 		dMatrix hingeFrame;
 		NewtonBody* const bar1 = MakeBodyPart(armNode, "barLinkage1", 5.0f);
 		NewtonBodyGetMatrix(bar1, &hingeFrame[0][0]);
@@ -676,6 +677,60 @@ class dExcavatorModel: public dModelRootNode
 		attachment->DisableRotationX();
 		attachment->DisableRotationY();
 		attachment->DisableRotationZ();
+
+#else
+
+		dMatrix hingeFrame;
+		NewtonBody* const bar1 = MakeBodyPart(armNode, "barLinkage1", 5.0f);
+		NewtonBodyGetMatrix(bar1, &hingeFrame[0][0]);
+		hingeFrame = dRollMatrix(-90.0f * dDegreeToRad) * hingeFrame;
+		dCustomDoubleHinge* const pivot = new dCustomDoubleHinge(hingeFrame, bar1, armNode->GetBody());
+		dMatrix bindMatrix(dGetIdentityMatrix());
+		dModelNode* const bar1Node = new dModelNode(bar1, bindMatrix, armNode);
+
+		NewtonBody* const bar2 = MakeBodyPart(bar1Node, "barLinkage2", 5.0f);
+		NewtonBodyGetMatrix(bar2, &hingeFrame[0][0]);
+		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
+		new dCustomHinge(hingeFrame, bar2, bar1Node->GetBody());
+		dModelNode* const bar2Node = new dModelNode(bar2, bindMatrix, bar1Node);
+
+		// connect the second bar to the bucket attachment 
+		DemoEntity* const bucketModel = (DemoEntity*)NewtonBodyGetUserData(buckectNode->GetBody());
+		DemoEntity* const attachmenPoint = bucketModel->Find("barLinkageAttachment");
+		dMatrix attachmentMatrix(attachmenPoint->CalculateGlobalMatrix());
+		attachmentMatrix = dRollMatrix(90.0f * dDegreeToRad) * attachmentMatrix;
+		dCustomSixdof* const attachment = new dCustomSixdof(attachmentMatrix, bar2Node->GetBody(), buckectNode->GetBody());
+		attachment->DisableRotationX();
+		attachment->DisableRotationY();
+		attachment->DisableRotationZ();
+
+/*
+		//hydraulic01
+		NewtonBody* const hydrawlic = MakeBodyPart(armNode, "hydraulic01", 5.0f);
+		NewtonBodyGetMatrix(hydrawlic, &hingeFrame[0][0]);
+		hingeFrame = dRollMatrix(90.0f * dDegreeToRad) * hingeFrame;
+		new dCustomHinge(hingeFrame, hydrawlic, armNode->GetBody());
+		dModelNode* const hydrawlicNode = new dModelNode(hydrawlic, bindMatrix, armNode);
+
+		//hydraulicBoom
+		NewtonBody* const hydraulicBoom = MakeBodyPart(hydrawlicNode, "hydraulicBoom", 5.0f);
+		NewtonBodyGetMatrix(hydraulicBoom, &hingeFrame[0][0]);
+		new dCustomSlider(hingeFrame, hydraulicBoom, hydrawlic);
+		dModelNode* const hydraulicBoomNode = new dModelNode(hydraulicBoom, bindMatrix, hydrawlicNode);
+
+		DemoEntity* const hydrawlicAttachmentMode = (DemoEntity*)NewtonBodyGetUserData(bar2);
+		DemoEntity* const hydrawlicAttachmenPoint = hydrawlicAttachmentMode->Find("barLinkage2");
+		dMatrix hydrawlicAttachmentMatrix(hydrawlicAttachmenPoint->CalculateGlobalMatrix());
+		hydrawlicAttachmentMatrix = dRollMatrix(90.0f * dDegreeToRad) * hydrawlicAttachmentMatrix;
+		dCustomSixdof* const hydrawlicAttachment = new dCustomSixdof(attachmentMatrix, bar2Node->GetBody(), hydraulicBoomNode->GetBody());
+		hydrawlicAttachment->SetSolverModel(2);
+		hydrawlicAttachment->DisableAxisX();
+		hydrawlicAttachment->DisableRotationX();
+		hydrawlicAttachment->DisableRotationY();
+		hydrawlicAttachment->DisableRotationZ();
+*/
+#endif
+
 	}
 
 	void AddLocomotion()
