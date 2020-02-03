@@ -31,7 +31,7 @@
 #define DG_STACK_DEPTH 512
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgAABBPolygonSoup::dgNodeBuilder: public dgAABBPolygonSoup::dgNode
 {
 	public:
@@ -132,7 +132,7 @@ class dgAABBPolygonSoup::dgNodeBuilder: public dgAABBPolygonSoup::dgNode
 	dgInt32 m_faceIndex;
 	dgInt32 m_indexCount;
 	const dgInt32* m_faceIndices;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
 

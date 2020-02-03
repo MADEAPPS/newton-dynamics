@@ -37,29 +37,29 @@ class dgSkeletonContainer::dgNodePair
 	dgInt32 m_m1;
 };
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgSkeletonContainer::dgForcePair
 {
 	public:
 	dgSpatialVector m_joint;
 	dgSpatialVector m_body;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
-DG_MSC_VECTOR_ALIGMENT 
+DG_MSC_VECTOR_ALIGNMENT 
 class dgSkeletonContainer::dgMatriData
 {
 	public:
 	dgSpatialMatrix m_jt;
 	dgSpatialMatrix m_invMass;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
-DG_MSC_VECTOR_ALIGMENT 
+DG_MSC_VECTOR_ALIGNMENT 
 class dgSkeletonContainer::dgBodyJointMatrixDataPair
 {
 	public:
 	dgMatriData m_body;
 	dgMatriData m_joint;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
 class dgSkeletonContainer::dgNode

@@ -27,7 +27,7 @@
 
 #define DG_CONVEX_POLYGON_MAX_VERTEX_COUNT	64
 
-DG_MSC_VECTOR_ALIGMENT 
+DG_MSC_VECTOR_ALIGNMENT 
 class dgCollisionConvexPolygon: public dgCollisionConvex	
 {
 	public:
@@ -74,6 +74,6 @@ class dgCollisionConvexPolygon: public dgCollisionConvex
 	const dgFloat32* m_vertex;
 	const dgInt32* m_vertexIndex;
 	const dgInt32* m_adjacentFaceEdgeNormalIndex;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 #endif

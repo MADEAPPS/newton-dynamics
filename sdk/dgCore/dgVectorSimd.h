@@ -34,7 +34,7 @@ class dgBigVector;
 // 4 x 1 single precision SSE vector class declaration
 //
 // *****************************************************************************************
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgVector
 {
 	#define PERMUTE_MASK(w, z, y, x)		_MM_SHUFFLE (w, z, y, x)
@@ -440,7 +440,7 @@ class dgVector
 	static dgVector m_epsilon;
 	static dgVector m_signMask;
 	static dgVector m_triplexMask;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 #endif
 
 
@@ -449,7 +449,7 @@ class dgVector
 // 4 x 1 double precision SSE2 vector class declaration
 //
 // *****************************************************************************************
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgBigVector
 {
 	#define PERMUT_MASK_DOUBLE(y, x)	_MM_SHUFFLE2 (y, x)
@@ -881,10 +881,10 @@ class dgBigVector
 	static dgBigVector m_epsilon;
 	static dgBigVector m_signMask;
 	static dgBigVector m_triplexMask;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgSpatialVector
 {
 	public:
@@ -971,7 +971,7 @@ class dgSpatialVector
 	__m128d m_d1;
 	__m128d m_d2;
 	static dgSpatialVector m_zero;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 #endif
 #endif

@@ -119,7 +119,7 @@ DG_INLINE dgFloat32 dgBoxDistanceToOrigin2 (const dgVector& minBox, const dgVect
 }
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgFastRayTest
 {
 	public:
@@ -224,10 +224,10 @@ class dgFastRayTest
 	dgVector m_maxT;
 	dgVector m_unitDir;
 	dgVector m_isParallel;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
-DG_MSC_VECTOR_ALIGMENT 
+DG_MSC_VECTOR_ALIGNMENT 
 class dgFastAABBInfo: public dgObb
 {
 	public:
@@ -387,7 +387,7 @@ class dgFastAABBInfo: public dgObb
 	friend class dgAABBPolygonSoup;
 	friend class dgCollisionUserMesh;
 	friend class dgCollisionHeightField;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
 #endif

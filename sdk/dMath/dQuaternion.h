@@ -15,7 +15,7 @@
 #include "dVector.h"
 class dMatrix;
 
-D_MSC_VECTOR_ALIGMENT
+D_MSC_VECTOR_ALIGNMENT
 class dQuaternion
 {
 	public:

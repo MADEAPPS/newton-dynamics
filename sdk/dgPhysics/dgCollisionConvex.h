@@ -29,7 +29,7 @@
 #define D_MIN_CONVEX_SHAPE_SIZE			dgFloat32 (1.0f/128.0f)
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgCollisionConvex: public dgCollision
 {
 	public:
@@ -103,7 +103,7 @@ class dgCollisionConvex: public dgCollision
 	friend class dgMinkowskiConv;
 	friend class dgCollisionCompound;
 	friend class dgCollisionConvexModifier;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
 

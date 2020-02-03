@@ -51,7 +51,7 @@ class dgConvexCastReturnInfo
 };
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgBroadPhaseNode
 {
 	public:
@@ -126,7 +126,7 @@ class dgBroadPhaseNode
 
 	static dgVector m_broadPhaseScale;
 	static dgVector m_broadInvPhaseScale;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
 class dgBroadPhaseBodyNode: public dgBroadPhaseNode
@@ -222,7 +222,7 @@ class dgBroadPhaseTreeNode: public dgBroadPhaseNode
 	dgBroadPhaseNode* m_left;
 	dgBroadPhaseNode* m_right;
 	dgList<dgBroadPhaseTreeNode*>::dgListNode* m_fitnessNode;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 #define DG_CONTACT_CACHE_LINE_SIZE 4
 

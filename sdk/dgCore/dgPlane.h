@@ -30,7 +30,7 @@
 	#define dgPlane dgBigPlane
 #else 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgPlane: public dgVector
 {
 	public:
@@ -42,12 +42,12 @@ class dgPlane: public dgVector
 	dgPlane Scale (dgFloat32 s) const;
 	dgFloat32 Evalue (const dgFloat32* const point) const;
 	dgFloat32 Evalue (const dgVector &point) const;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 #endif
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgBigPlane: public dgBigVector
 {
 	public:
@@ -59,7 +59,7 @@ class dgBigPlane: public dgBigVector
 	dgBigPlane Scale (dgFloat64 s) const;
 	dgFloat64 Evalue (const dgFloat64* const point) const;
 	dgFloat64 Evalue (const dgBigVector &point) const;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
 

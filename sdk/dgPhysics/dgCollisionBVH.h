@@ -32,7 +32,7 @@ typedef dgFloat32 (*dgCollisionBVHUserRayCastCallback) (const dgBody* const body
 class dgCollisionBVH: public dgCollisionMesh, public dgAABBPolygonSoup
 {
 	public:
-	DG_MSC_VECTOR_ALIGMENT 
+	DG_MSC_VECTOR_ALIGNMENT 
 	class dgBVHRay: public dgFastRayTest 
 	{
 		public:
@@ -48,7 +48,7 @@ class dgCollisionBVH: public dgCollisionMesh, public dgAABBPolygonSoup
 		void* m_userData;
 		const dgBody* m_myBody;
 		const dgCollisionBVH* m_me;
-	} DG_GCC_VECTOR_ALIGMENT;
+	} DG_GCC_VECTOR_ALIGNMENT;
 
 	dgCollisionBVH(dgWorld* const world);
 	dgCollisionBVH (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);

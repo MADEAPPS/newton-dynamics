@@ -51,7 +51,7 @@
 #include "dgCollisionIncompressibleParticles.h"
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgCollisionContactCloud: public dgCollisionConvex
 {
 	public:
@@ -126,7 +126,7 @@ class dgCollisionContactCloud: public dgCollisionConvex
 	static dgVector m_pruneUpDir;
 	static dgVector m_pruneSupportX;
 
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 dgVector dgCollisionContactCloud::m_pruneUpDir(dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f));
 dgVector dgCollisionContactCloud::m_pruneSupportX(dgFloat32(1.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f));

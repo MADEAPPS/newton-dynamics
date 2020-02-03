@@ -75,7 +75,7 @@ enum dgCollisionID
 };
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgCollisionInfo
 {
 	public:
@@ -208,9 +208,9 @@ class dgCollisionInfo
 		dgSceneData m_sceneCollision;
 		dgFloat32 m_paramArray[32];
 	};
-}DG_GCC_VECTOR_ALIGMENT;
+}DG_GCC_VECTOR_ALIGNMENT;
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgCollision
 {
 	public:
@@ -318,7 +318,7 @@ class dgCollision
 	friend class dgMinkowskiConv;
 	friend class dgCollisionInstance;
 	friend class dgCollisionCompound;
-}DG_GCC_VECTOR_ALIGMENT;
+}DG_GCC_VECTOR_ALIGNMENT;
 
 DG_INLINE dgCollisionID dgCollision::GetCollisionPrimityType () const
 {

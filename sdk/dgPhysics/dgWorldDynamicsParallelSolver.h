@@ -31,7 +31,7 @@ class dgSkeletonContainer;
 
 #define DG_WORK_GROUP_SIZE	8 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgWorkGroupFloat
 {
 	public:
@@ -150,35 +150,35 @@ class dgWorkGroupFloat
 
 	dgVector m_low;
 	dgVector m_high;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgWorkGroupVector3
 {
 	public:
 	dgWorkGroupFloat m_x;
 	dgWorkGroupFloat m_y;
 	dgWorkGroupFloat m_z;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgWorkGroupVector6
 {
 	public:
 	dgWorkGroupVector3 m_linear;
 	dgWorkGroupVector3 m_angular;
-} DG_GCC_AVX_ALIGMENT;
+} DG_GCC_AVX_ALIGNMENT;
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgSolverSoaJacobianPair
 {
 	public:
 	dgWorkGroupVector6 m_jacobianM0;
 	dgWorkGroupVector6 m_jacobianM1;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgSolverSoaElement
 {
 	public:
@@ -192,7 +192,7 @@ class dgSolverSoaElement
 	dgWorkGroupFloat m_normalForceIndex;
 	dgWorkGroupFloat m_lowerBoundFrictionCoefficent;
 	dgWorkGroupFloat m_upperBoundFrictionCoefficent;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 class dgParallelBodySolver
 {

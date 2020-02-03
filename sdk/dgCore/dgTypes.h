@@ -211,19 +211,19 @@
 #define DG_VECTOR_AVX2_SIZE		32
 
 #if defined(_MSC_VER)
-	#define	DG_GCC_VECTOR_ALIGMENT
-	#define	DG_MSC_VECTOR_ALIGMENT    __declspec(align(DG_VECTOR_SIMD_SIZE))
+	#define	DG_GCC_VECTOR_ALIGNMENT
+	#define	DG_MSC_VECTOR_ALIGNMENT    __declspec(align(DG_VECTOR_SIMD_SIZE))
 #else
-	#define	DG_GCC_VECTOR_ALIGMENT    __attribute__ ((aligned (DG_VECTOR_SIMD_SIZE)))
-	#define	DG_MSC_VECTOR_ALIGMENT
+	#define	DG_GCC_VECTOR_ALIGNMENT    __attribute__ ((aligned (DG_VECTOR_SIMD_SIZE)))
+	#define	DG_MSC_VECTOR_ALIGNMENT
 #endif
 
 #if defined(_MSC_VER)
-	#define	DG_GCC_AVX_ALIGMENT
-	#define	DG_MSC_AVX_ALIGMENT       __declspec(align(DG_VECTOR_AVX2_SIZE))
+	#define	DG_GCC_AVX_ALIGNMENT
+	#define	DG_MSC_AVX_ALIGNMENT       __declspec(align(DG_VECTOR_AVX2_SIZE))
 #else
-	#define	DG_GCC_AVX_ALIGMENT       __attribute__ ((aligned (DG_VECTOR_AVX2_SIZE)))
-	#define	DG_MSC_AVX_ALIGMENT
+	#define	DG_GCC_AVX_ALIGNMENT       __attribute__ ((aligned (DG_VECTOR_AVX2_SIZE)))
+	#define	DG_MSC_AVX_ALIGNMENT
 #endif
 
 

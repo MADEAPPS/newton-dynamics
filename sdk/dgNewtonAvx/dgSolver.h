@@ -30,7 +30,7 @@
 #define DG_SOA_WORD_GROUP_SIZE	8 
 
 #ifdef _NEWTON_USE_DOUBLE
-	DG_MSC_AVX_ALIGMENT
+	DG_MSC_AVX_ALIGNMENT
 	class dgSoaFloat
 	{
 		public:
@@ -157,11 +157,11 @@
 
 		__m256d m_low;
 		__m256d m_high;
-	} DG_GCC_AVX_ALIGMENT;
+	} DG_GCC_AVX_ALIGNMENT;
 
 #else 
 
-	DG_MSC_AVX_ALIGMENT
+	DG_MSC_AVX_ALIGNMENT
 	class dgSoaFloat
 	{
 		public:
@@ -284,36 +284,36 @@
 		}
 
 		__m256 m_type;
-	} DG_GCC_AVX_ALIGMENT;
+	} DG_GCC_AVX_ALIGNMENT;
 #endif
 
-DG_MSC_AVX_ALIGMENT
+DG_MSC_AVX_ALIGNMENT
 class dgSoaVector3
 {
 	public:
 	dgSoaFloat m_x;
 	dgSoaFloat m_y;
 	dgSoaFloat m_z;
-} DG_GCC_AVX_ALIGMENT;
+} DG_GCC_AVX_ALIGNMENT;
 
 
-DG_MSC_AVX_ALIGMENT
+DG_MSC_AVX_ALIGNMENT
 class dgSoaVector6
 {
 	public:
 	dgSoaVector3 m_linear;
 	dgSoaVector3 m_angular;
-} DG_GCC_AVX_ALIGMENT;
+} DG_GCC_AVX_ALIGNMENT;
 
-DG_MSC_AVX_ALIGMENT
+DG_MSC_AVX_ALIGNMENT
 class dgSoaJacobianPair
 {
 	public:
 	dgSoaVector6 m_jacobianM0;
 	dgSoaVector6 m_jacobianM1;
-} DG_GCC_AVX_ALIGMENT;
+} DG_GCC_AVX_ALIGNMENT;
 
-DG_MSC_AVX_ALIGMENT
+DG_MSC_AVX_ALIGNMENT
 class dgSoaMatrixElement
 {
 	public:
@@ -327,9 +327,9 @@ class dgSoaMatrixElement
 	dgSoaFloat m_normalForceIndex;
 	dgSoaFloat m_lowerBoundFrictionCoefficent;
 	dgSoaFloat m_upperBoundFrictionCoefficent;
-} DG_GCC_AVX_ALIGMENT;
+} DG_GCC_AVX_ALIGNMENT;
 
-DG_MSC_AVX_ALIGMENT
+DG_MSC_AVX_ALIGNMENT
 class dgSolver: public dgParallelBodySolver
 {
 	public:
@@ -390,7 +390,7 @@ class dgSolver: public dgParallelBodySolver
 	dgVector m_zero;
 	dgVector m_negOne;
 	dgArray<dgSoaMatrixElement> m_massMatrix;
-} DG_GCC_AVX_ALIGMENT;
+} DG_GCC_AVX_ALIGNMENT;
 
 
 #endif
