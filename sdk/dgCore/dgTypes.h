@@ -198,7 +198,7 @@
 #ifdef _DEBUG
 	#define DG_INLINE inline
 #else
-	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+	#if defined(_MSC_VER)
 			#define DG_INLINE __forceinline 
 	#else 
 		#define DG_INLINE	inline
@@ -210,20 +210,20 @@
 #define DG_VECTOR_SIMD_SIZE		16
 #define DG_VECTOR_AVX2_SIZE		32
 
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#define	DG_GCC_VECTOR_ALIGMENT	
-	#define	DG_MSC_VECTOR_ALIGMENT			__declspec(align(DG_VECTOR_SIMD_SIZE))
+#if defined(_MSC_VER)
+	#define	DG_GCC_VECTOR_ALIGMENT
+	#define	DG_MSC_VECTOR_ALIGMENT    __declspec(align(DG_VECTOR_SIMD_SIZE))
 #else
-	#define	DG_GCC_VECTOR_ALIGMENT			__attribute__ ((aligned (DG_VECTOR_SIMD_SIZE)))
-	#define	DG_MSC_VECTOR_ALIGMENT			
+	#define	DG_GCC_VECTOR_ALIGMENT    __attribute__ ((aligned (DG_VECTOR_SIMD_SIZE)))
+	#define	DG_MSC_VECTOR_ALIGMENT
 #endif
 
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#define	DG_GCC_AVX_ALIGMENT	
-	#define	DG_MSC_AVX_ALIGMENT			__declspec(align(DG_VECTOR_AVX2_SIZE))
+#if defined(_MSC_VER)
+	#define	DG_GCC_AVX_ALIGMENT
+	#define	DG_MSC_AVX_ALIGMENT       __declspec(align(DG_VECTOR_AVX2_SIZE))
 #else
-	#define	DG_GCC_AVX_ALIGMENT			__attribute__ ((aligned (DG_VECTOR_AVX2_SIZE)))
-	#define	DG_MSC_AVX_ALIGMENT			
+	#define	DG_GCC_AVX_ALIGMENT       __attribute__ ((aligned (DG_VECTOR_AVX2_SIZE)))
+	#define	DG_MSC_AVX_ALIGMENT
 #endif
 
 
