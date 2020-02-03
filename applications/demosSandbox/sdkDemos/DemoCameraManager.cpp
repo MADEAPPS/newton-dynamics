@@ -126,9 +126,9 @@ void DemoCameraManager::FixUpdate (const NewtonWorld* const world, dFloat timest
 
 		if ((ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0))) {
 			if (mouseSpeedX > 0) {
-				m_yaw = dMod(m_yaw + m_yawRate, 2.0f * dPi);
+				m_yaw = dMod(m_yaw + m_yawRate, dFloat(2.0f * dPi));
 			} else if (mouseSpeedX < 0){
-				m_yaw = dMod(m_yaw - m_yawRate, 2.0f * dPi);
+				m_yaw = dMod(m_yaw - m_yawRate, dFloat (2.0f * dPi));
 			}
 
 			if (mouseSpeedY > 0) {

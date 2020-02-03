@@ -79,7 +79,6 @@
 #define	dCiel(x)	dFloat (ceil (dFloat(x))) 
 #define	dFloor(x)	dFloat (floor (dFloat(x))) 
 #define	dLog(x)		dFloat (log (dFloat(x))) 
-#define	dMod(x,y)	dFloat (fmod (dFloat(x), dFloat(y))) 
 #define	dPow(x,y)	dFloat (pow (dFloat(x), dFloat(y))) 
 
 #define dSin(x)		dFloat (sin (dFloat(x)))
@@ -156,6 +155,12 @@ template <class T>
 T dClamp(T val, T min, T max)
 {
 	return dMax (min, dMin (max, val));
+}
+
+template <class T>
+T dMod(T val, T mod)
+{
+	return fmod (T(val), T(mod));
 }
 
 template <class T> 

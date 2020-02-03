@@ -300,7 +300,7 @@ dBigVector dBezierSpline::CurveDerivative (dFloat64 u, int index) const
 
 int dBezierSpline::CurveAllDerivatives (dFloat64 u, dBigVector* const derivatives) const
 {
-	u = dMod (u, 1.0f);
+	u = dMod (u, dFloat64(1.0f));
 	dFloat64 basicsFuncDerivatives[D_BEZIER_LOCAL_BUFFER_SIZE];
 	int span = GetSpan(u);
 	BasicsFunctionsDerivatives (u, span, basicsFuncDerivatives);
@@ -477,22 +477,51 @@ dFloat64 dBezierSpline::CalculateLength (dFloat64 tol) const
 	return length;
 }
 
+dFloat64 dBezierSpline::FindClosestKnot___ (dBigVector& closestPoint, const dBigVector& point) const
+{
+	dFloat64 bestU = 0.0f;
+	dFloat64 distance2 = 1.0e10f;
+	int subdivitionSteps = 200;
+	dBigVector closestControlPoint(m_controlPoints[0]);
+	dFloat64 scale = 1.0f / subdivitionSteps;
+	for (int span = m_degree; span < (m_knotsCount - m_degree - 1); span++) {
+		dFloat64 param = 0.0f;
+		for (int i = 0; i < subdivitionSteps; i++) {
+			dFloat64 u = m_knotVector[span] + (m_knotVector[span + 1] - m_knotVector[span]) * param;
+			param += scale;
+			dBigVector p(CurvePoint(u, span));
+			dBigVector dp(p - point);
+			dFloat64 dist2 = dp.DotProduct3(dp);
+			if (dist2 < distance2) {
+				bestU = u;
+				distance2 = dist2;
+				closestControlPoint = p;
+			}
+		}
+	}
+
+	closestPoint = closestControlPoint;
+	return bestU;
+}
 
 dFloat64 dBezierSpline::FindClosestKnot (dBigVector& closestPoint, const dBigVector& point, int subdivitionSteps) const
 {
+#if 0
+	return FindClosestKnot___(closestPoint, point);
+#else
 	int startSpan = m_degree;
 	dFloat64 bestU = 0.0f;
 	dFloat64 distance2 = 1.0e10f;
-	dBigVector closestControlPoint (m_controlPoints[0]);
-	subdivitionSteps = dMax (subdivitionSteps, 1);
+	dBigVector closestControlPoint(m_controlPoints[0]);
+	subdivitionSteps = dMax(subdivitionSteps, 1);
 	dFloat64 scale = 1.0f / subdivitionSteps;
-	for (int span = m_degree; span < (m_knotsCount - m_degree - 1); span ++) {
+	for (int span = m_degree; span < (m_knotsCount - m_degree - 1); span++) {
 		dFloat64 param = 0.0f;
-		for (int i = 0; i < subdivitionSteps; i ++) {
+		for (int i = 0; i < subdivitionSteps; i++) {
 			dFloat64 u = m_knotVector[span] + (m_knotVector[span + 1] - m_knotVector[span]) * param;
 			param += scale;
-			dBigVector p (CurvePoint (u, span));
-			dBigVector dp (p - point);
+			dBigVector p(CurvePoint(u, span));
+			dBigVector dp(p - point);
 			dFloat64 dist2 = dp.DotProduct3(dp);
 			if (dist2 < distance2) {
 				bestU = u;
@@ -507,38 +536,32 @@ dFloat64 dBezierSpline::FindClosestKnot (dBigVector& closestPoint, const dBigVec
 	dFloat64 u0 = bestU;
 
 	bool stop = false;
-	for (int i = 0; (i < 20) && !stop; i ++) {
-		CurveAllDerivatives (u0, derivatives);
+	for (int i = 0; (i < 20) && !stop; i++) {
+		CurveAllDerivatives(u0, derivatives);
 
-		dBigVector dist (closestControlPoint - point);
+		dBigVector dist(closestControlPoint - point);
 		dFloat64 num = derivatives[1].DotProduct3(dist);
 		dFloat64 den = derivatives[2].DotProduct3(dist) + derivatives[1].DotProduct3(derivatives[1]);
-//		if (dAbs (den) < 1.0e-6f)
-//			__debugbreak();
-		
-		dFloat64 u1 = dClamp(u0 - num / den, dFloat64(0.0), dFloat64 (1.0));
+		dFloat64 u1 = dClamp(u0 - num / den, dFloat64(0.0), dFloat64(1.0));
 		if (u1 < m_knotVector[startSpan]) {
-			startSpan --;
-			dAssert (startSpan >= 0);
+			startSpan--;
+			dAssert(startSpan >= 0);
 		} else if (u1 >= m_knotVector[startSpan + 1]) {
-			startSpan ++;
-			dAssert (startSpan < (m_knotsCount - m_degree));
-		} 
+			startSpan++;
+			dAssert(startSpan < (m_knotsCount - m_degree));
+		}
 
-		dAssert (startSpan >= m_degree);
-		dAssert (startSpan <= (m_knotsCount - m_degree - 1));
-		closestControlPoint = CurvePoint (u1, startSpan);
-		//dFloat64 xxx0 = num * num;
-		//dFloat64 xxx1 = dist % dist;
-		//dFloat64 xxx2 = derivatives[1] % derivatives[1];
-		//dFloat64 xxx3 = xxx1 * xxx2 * 1.0e-10;
+		dAssert(startSpan >= m_degree);
+		dAssert(startSpan <= (m_knotsCount - m_degree - 1));
+		closestControlPoint = CurvePoint(u1, startSpan);
 
-		stop |= (dAbs (u1 - u0) < 1.0e-10) || (num * num < ((dist.DotProduct3(dist)) * (derivatives[1].DotProduct3(derivatives[1])) * 1.0e-10));
+		stop |= (dAbs(u1 - u0) < 1.0e-10) || (num * num < ((dist.DotProduct3(dist)) * (derivatives[1].DotProduct3(derivatives[1])) * 1.0e-10));
 		u0 = u1;
 	}
 
 	closestPoint = closestControlPoint;
 	return u0;
+#endif
 }
 
 void dBezierSpline::InsertKnot (dFloat64 u)

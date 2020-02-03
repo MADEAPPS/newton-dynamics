@@ -916,8 +916,6 @@ class MyPathFollow: public dCustomPathFollow
 		dFloat64 knot = spline.FindClosestKnot (point, p, 4);
 		dBigVector tangent (spline.CurveDerivative (knot));
 		tangent = tangent.Scale (1.0 / dSqrt (tangent.DotProduct3(tangent)));
-
-//		positOut = matrix.TransformVector (dVector (point.m_x, point.m_y, point.m_z));
 		positOut = matrix.TransformVector (point);
 		tangentOut = tangent;
 	}
@@ -1317,11 +1315,11 @@ void StandardJoints (DemoEntityManager* const scene)
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 //	AddSliderBug(scene, dVector(-20.0f, 0.0f, 17.0f));
 //	AddDoubleHinge(scene, dVector(-20.0f, 0.0f, 17.0f));
-//	AddPathFollow(scene, dVector(20.0f, 0.0f, 0.0f));
+	AddPathFollow(scene, dVector(20.0f, 0.0f, 0.0f));
 //	AddDifferential(scene, dVector(-20.0f, 0.0f, 33.0f));
 //	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
 
-#if 1
+#if 0
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
