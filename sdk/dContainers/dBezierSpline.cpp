@@ -630,40 +630,8 @@ bool dBezierSpline::RemoveKnot (dFloat64 u, dFloat64 tol)
 	return removableFlag;
 }
 
-
-
-dFloat64 dBezierSpline::FindClosestKnot___(dBigVector& closestPoint, const dBigVector& point) const
-{
-	dFloat64 bestU = 0.0f;
-	dFloat64 distance2 = 1.0e10f;
-	int subdivitionSteps = 200;
-	dBigVector closestControlPoint(m_controlPoints[0]);
-	dFloat64 scale = 1.0f / subdivitionSteps;
-	for (int span = m_degree; span < (m_knotsCount - m_degree - 1); span++) {
-		dFloat64 param = 0.0f;
-		for (int i = 0; i < subdivitionSteps; i++) {
-			dFloat64 u = m_knotVector[span] + (m_knotVector[span + 1] - m_knotVector[span]) * param;
-			param += scale;
-			dBigVector p(CurvePoint(u, span));
-			dBigVector dp(p - point);
-			dFloat64 dist2 = dp.DotProduct3(dp);
-			if (dist2 < distance2) {
-				bestU = u;
-				distance2 = dist2;
-				closestControlPoint = p;
-			}
-		}
-	}
-
-	closestPoint = closestControlPoint;
-	return bestU;
-}
-
 dFloat64 dBezierSpline::FindClosestKnot(dBigVector& closestPoint, const dBigVector& point, int subdivitionSteps) const
 {
-#if 0
-	return FindClosestKnot___(closestPoint, point);
-#else
 	int startSpan = m_degree;
 	dFloat64 bestU = 0.0f;
 	dFloat64 distance2 = 1.0e10f;
@@ -687,6 +655,15 @@ dFloat64 dBezierSpline::FindClosestKnot(dBigVector& closestPoint, const dBigVect
 		}
 	}
 
+	dBigVector p(CurvePoint(0.999f));
+	dBigVector dp(p - point);
+	dFloat64 dist2 = dp.DotProduct3(dp);
+	if (dist2 < distance2) {
+		bestU = dFloat64(0.999f);
+		startSpan = m_knotsCount - m_degree - 2;
+		closestControlPoint = p;
+	}
+
 	dBigVector derivatives[32];
 	dFloat64 u0 = bestU;
 
@@ -701,8 +678,7 @@ dFloat64 dBezierSpline::FindClosestKnot(dBigVector& closestPoint, const dBigVect
 		if (u1 < m_knotVector[startSpan]) {
 			startSpan--;
 			dAssert(startSpan >= 0);
-		}
-		else if (u1 >= m_knotVector[startSpan + 1]) {
+		} else if (u1 >= m_knotVector[startSpan + 1]) {
 			startSpan++;
 			dAssert(startSpan < (m_knotsCount - m_degree));
 		}
@@ -717,5 +693,4 @@ dFloat64 dBezierSpline::FindClosestKnot(dBigVector& closestPoint, const dBigVect
 
 	closestPoint = closestControlPoint;
 	return u0;
-#endif
 }

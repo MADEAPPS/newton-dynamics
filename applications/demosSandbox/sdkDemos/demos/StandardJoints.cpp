@@ -911,27 +911,27 @@ class MyPathFollow: public dCustomPathFollow
 		dMatrix matrix;
 		NewtonBodyGetMatrix(GetBody1(), &matrix[0][0]);
 
-static int xxx;
-xxx++;
+//static int xxx;
+//xxx++;
 
 		dVector p(matrix.UntransformVector(location));
 		dBigVector point;
 		dFloat64 knot = spline.FindClosestKnot (point, p, 4);
-
+/*
 dBigVector p0(spline.CurvePoint(0.0f));
 dBigVector p1(spline.CurvePoint(0.01f));
 dBigVector p2(spline.CurvePoint(0.99f));
-
 dBigVector q0;
 dBigVector q1;
 dBigVector q2;
-dFloat64 knot0 = spline.FindClosestKnot(q0, p0, 4);
-dFloat64 knot1 = spline.FindClosestKnot(q1, p1, 4);
 dFloat64 knot2 = spline.FindClosestKnot(q2, p2, 4);
-dTrace(("%f (%f %f %f) (%f %f %f)\n", knot0, p0[0], p0[1], p0[2], q0[0], q0[1], q0[2]));
-dTrace(("%f (%f %f %f) (%f %f %f)\n", knot1, p1[0], p1[1], p1[2], q1[0], q1[1], q1[2]));
 dTrace(("%f (%f %f %f) (%f %f %f)\n", knot2, p2[0], p2[1], p2[2], q2[0], q2[1], q2[2]));
+//dFloat64 knot0 = spline.FindClosestKnot(q0, p0, 4);
+//dFloat64 knot1 = spline.FindClosestKnot(q1, p1, 4);
+//dTrace(("%f (%f %f %f) (%f %f %f)\n", knot0, p0[0], p0[1], p0[2], q0[0], q0[1], q0[2]));
+//dTrace(("%f (%f %f %f) (%f %f %f)\n", knot1, p1[0], p1[1], p1[2], q1[0], q1[1], q1[2]));
 //dTrace(("%d %f (%f %f %f)\n", xxx, knot, p[0], p[1], p[2]));
+*/
 
 		dBigVector tangent (spline.CurveDerivative (knot));
 		tangent = tangent.Scale (1.0 / dSqrt (tangent.DotProduct3(tangent)));
@@ -971,7 +971,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 	mesh->SetRenderResolution(500);
 	mesh->Release();
 	
-	const int count = 1;
+	const int count = 32;
 	NewtonBody* bodies[count];
 
 	dBigVector point0;

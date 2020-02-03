@@ -160,7 +160,7 @@ T dClamp(T val, T min, T max)
 template <class T>
 T dMod(T val, T mod)
 {
-	return fmod (T(val), T(mod));
+	return T (fmod (T(val), T(mod)));
 }
 
 template <class T> 
