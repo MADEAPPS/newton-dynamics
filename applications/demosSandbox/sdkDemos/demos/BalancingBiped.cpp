@@ -45,7 +45,7 @@ class dBalacingCharacterEffector: public dCustomKinematicController
 class dEffectorController
 {
 	public:
-	dEffectorController::dEffectorController(dBalancingBiped* const biped): m_biped(biped){}
+	dEffectorController(dBalancingBiped* const biped): m_biped(biped){}
 	virtual ~dEffectorController(){}
 	virtual bool Update(dFloat timestep) = 0;
 	virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) {}
