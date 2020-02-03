@@ -102,7 +102,7 @@
 #endif
 
 
-#define	D_MSC_VECTOR_ALIGMENT
+#define	D_MSC_VECTOR_ALIGNMENT
 
 enum dEulerAngleOrder
 {

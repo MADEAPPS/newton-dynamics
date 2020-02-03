@@ -180,16 +180,16 @@ class dgQueue
 	T* m_pool;
 };
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgLeftHandSide
 {
 	public:
 	dgJacobianPair m_Jt;
 	dgJacobianPair m_JMinv;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgRightHandSide
 {
 	public:
@@ -210,7 +210,7 @@ class dgRightHandSide
 
 	dgForceImpactPair* m_jointFeebackForce;
 	dgInt32 m_normalForceIndex;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 class dgJacobianMemory
 {

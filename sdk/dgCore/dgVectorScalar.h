@@ -34,7 +34,7 @@
 #else
 
 class dgBigVector;
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgVector
 {
 	public:
@@ -469,11 +469,11 @@ class dgVector
 	static dgVector m_epsilon;
 	static dgVector m_signMask;
 	static dgVector m_triplexMask;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 #endif
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgBigVector
 {
 	public:
@@ -903,10 +903,10 @@ class dgBigVector
 	static dgBigVector m_epsilon;
 	static dgBigVector m_signMask;
 	static dgBigVector m_triplexMask;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgSpatialVector
 {
 	public:
@@ -988,7 +988,7 @@ class dgSpatialVector
 
 	dgFloat64 m_d[6];
 	static dgSpatialVector m_zero;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 #endif
 #endif

@@ -66,7 +66,7 @@ class dgContactList: public dgArray<dgContact*>
 	dgInt32 m_activeContactCount;
 };
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgCollisionParamProxy
 {	
 	public:
@@ -101,10 +101,10 @@ class dgCollisionParamProxy
 	bool m_continueCollision;
 	bool m_intersectionTestOnly;
 
-}DG_GCC_VECTOR_ALIGMENT;
+}DG_GCC_VECTOR_ALIGNMENT;
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgContactPoint
 {
 	public:
@@ -117,10 +117,10 @@ class dgContactPoint
 	dgInt64 m_shapeId0;
 	dgInt64 m_shapeId1;
 	dgFloat32 m_penetration;
-}DG_GCC_VECTOR_ALIGMENT;
+}DG_GCC_VECTOR_ALIGNMENT;
 
 
-DG_MSC_VECTOR_ALIGMENT 
+DG_MSC_VECTOR_ALIGNMENT 
 class dgContactMaterial: public dgContactPoint
 {
 	public:
@@ -138,7 +138,7 @@ class dgContactMaterial: public dgContactPoint
 		m_resetSkeletonIntraCollision = 1<<10,
 	};
 
-	DG_MSC_VECTOR_ALIGMENT 
+	DG_MSC_VECTOR_ALIGNMENT 
 	class dgUserContactPoint
 	{
 		public:
@@ -148,7 +148,7 @@ class dgContactMaterial: public dgContactPoint
 		dgUnsigned64 m_shapeId1;
 		dgFloat32 m_penetration;
 		dgUnsigned32 m_unused[3];
-	} DG_GCC_VECTOR_ALIGMENT;
+	} DG_GCC_VECTOR_ALIGNMENT;
 
 	typedef bool (dgApi *OnAABBOverlap) (dgContact& contactJoint, dgFloat32 timestep, dgInt32 threadIndex);
 	typedef void (dgApi *OnContactCallback) (dgContact& contactJoint, dgFloat32 timestep, dgInt32 threadIndex);
@@ -193,10 +193,10 @@ class dgContactMaterial: public dgContactPoint
 	friend class dgCollidingPairCollector;
 	friend class dgBroadPhaseMaterialCallbackWorkerThread;
 	
-}DG_GCC_VECTOR_ALIGMENT;
+}DG_GCC_VECTOR_ALIGNMENT;
 
 
-DG_MSC_VECTOR_ALIGMENT 
+DG_MSC_VECTOR_ALIGNMENT 
 class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 {
 	public:
@@ -265,7 +265,7 @@ class dgContact: public dgConstraint, public dgList<dgContactMaterial>
 	friend class dgCollisionConvexPolygon;
 	friend class dgCollidingPairCollector;
 	
-}DG_GCC_VECTOR_ALIGMENT;
+}DG_GCC_VECTOR_ALIGNMENT;
 
 DG_INLINE void dgContactMaterial::SetCollisionCallback (OnAABBOverlap aabbOverlap, OnContactCallback contact) 
 {

@@ -41,7 +41,7 @@
 
 class dgSkeletonContainer;
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgDynamicBody : public dgBody 
 {
 	public:
@@ -118,10 +118,10 @@ class dgDynamicBody : public dgBody
 	friend class dgCollisionDeformableMesh;
 	friend class dgCollisionDeformableSolidMesh;
 	friend class dgCollisionMassSpringDamperSystem;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgDynamicBodyAsymetric: public dgDynamicBody
 {
 	public:
@@ -137,7 +137,7 @@ class dgDynamicBodyAsymetric: public dgDynamicBody
 	virtual void IntegrateOpenLoopExternalForce(dgFloat32 timestep);
 
 	dgMatrix m_principalAxis;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
 

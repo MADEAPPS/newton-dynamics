@@ -37,7 +37,7 @@ typedef void (*dgCollisionMeshCollisionCallback) (const dgBody* const bodyWithTr
 												  dgInt32 vertexCount, const dgFloat32* const vertex, dgInt32 vertexStrideInBytes); 
 
 
-DG_MSC_VECTOR_ALIGMENT 
+DG_MSC_VECTOR_ALIGNMENT 
 class dgPolygonMeshDesc: public dgFastAABBInfo
 {
 	public:
@@ -127,9 +127,9 @@ class dgPolygonMeshDesc: public dgFastAABBInfo
 	bool m_doContinuesCollisionTest;
 	dgInt32 m_globalFaceVertexIndex[DG_MAX_COLLIDING_INDICES];
 	dgMesh m_meshData;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
-DG_MSC_VECTOR_ALIGMENT 
+DG_MSC_VECTOR_ALIGNMENT 
 class dgCollisionMeshRayHitDesc
 {
 	public:
@@ -145,7 +145,7 @@ class dgCollisionMeshRayHitDesc
 	void*  m_userData;
 	void*  m_altenateUserData;
 	dgMatrix m_matrix;
-}DG_GCC_VECTOR_ALIGMENT;
+}DG_GCC_VECTOR_ALIGNMENT;
 
 
 
@@ -153,7 +153,7 @@ class dgCollisionMesh: public dgCollision
 {
 	public:
 
-	DG_MSC_VECTOR_ALIGMENT 
+	DG_MSC_VECTOR_ALIGNMENT 
 	class dgMeshVertexListIndexList
 	{
 		public:
@@ -164,7 +164,7 @@ class dgCollisionMesh: public dgCollision
 		dgInt32 m_maxIndexCount;
 		dgInt32 m_vertexCount;
 		dgInt32 m_vertexStrideInBytes;
-	}DG_GCC_VECTOR_ALIGMENT;
+	}DG_GCC_VECTOR_ALIGNMENT;
 
 
 	dgCollisionMesh (dgWorld* const world, dgCollisionID type);

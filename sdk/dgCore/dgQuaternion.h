@@ -27,7 +27,7 @@
 class dgVector;
 class dgMatrix;
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgQuaternion
 {
 	public:
@@ -55,7 +55,7 @@ class dgQuaternion
 	dgFloat32 m_y;
 	dgFloat32 m_z;
 	dgFloat32 m_w;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
 DG_INLINE dgQuaternion::dgQuaternion()

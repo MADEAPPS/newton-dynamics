@@ -41,7 +41,7 @@ class dgVertexCollapseVertexMetric;
 typedef dgInt64 dgEdgeKey;
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgEdge
 {
 	public:
@@ -56,7 +56,7 @@ class dgEdge
 	dgEdge* m_prev;
 	dgEdge* m_twin;
 	dgInt32 m_mark;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
 class dgPolyhedra: public dgTree <dgEdge, dgEdgeKey>

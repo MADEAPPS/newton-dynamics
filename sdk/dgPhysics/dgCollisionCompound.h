@@ -51,7 +51,7 @@ class dgCollisionCompound: public dgCollision
 		void AddNode (dgNodeBase* const node, dgInt32 index, const dgCollisionInstance* const parent); 
 	};
 
-	DG_MSC_VECTOR_ALIGMENT
+	DG_MSC_VECTOR_ALIGNMENT
 	class dgOOBBTestData
 	{
 		public:
@@ -76,10 +76,10 @@ class dgCollisionCompound: public dgCollision
 		dgVector m_extendsMaxX[3];
 		mutable dgFloat32 m_separatingDistance;
 		static dgVector m_maxDist;
-	} DG_GCC_VECTOR_ALIGMENT;
+	} DG_GCC_VECTOR_ALIGNMENT;
 
 
-	DG_MSC_VECTOR_ALIGMENT
+	DG_MSC_VECTOR_ALIGNMENT
 	class dgNodeBase
 	{
 		public:
@@ -119,7 +119,7 @@ class dgCollisionCompound: public dgCollision
 		dgNodeBase* m_parent;
 		dgCollisionInstance* m_shape;
 		dgTreeArray::dgTreeNode* m_myNode; 
-	} DG_GCC_VECTOR_ALIGMENT;
+	} DG_GCC_VECTOR_ALIGNMENT;
 
 	protected:
 	class dgNodePairs

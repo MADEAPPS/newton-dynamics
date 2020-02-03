@@ -26,7 +26,7 @@
 #include "dgBody.h"
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgKinematicBody: public dgBody 
 {
 	public:
@@ -63,7 +63,7 @@ class dgKinematicBody: public dgBody
 	friend class dgWorld;
 	friend class dgBroadPhase;
 	friend class dgWorldDynamicUpdate;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
 

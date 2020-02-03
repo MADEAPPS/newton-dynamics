@@ -138,7 +138,7 @@ class dgDeadBodies: public dgTree<dgBody*, void* >
 
 typedef void (*OnPostUpdateCallback) (const dgWorld* const world, dgFloat32 timestep);
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgWorld
 	:public dgBodyMasterList
 	,public dgBodyMaterialList
@@ -547,7 +547,7 @@ class dgWorld
 	
 	friend class dgBroadPhaseMaterialCallbackWorkerThread;
 	friend class dgBroadPhaseCalculateContactsWorkerThread;
-} DG_GCC_VECTOR_ALIGMENT ;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
 inline dgMemoryAllocator* dgWorld::GetAllocator() const

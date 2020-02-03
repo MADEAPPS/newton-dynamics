@@ -36,7 +36,7 @@ const dgMatrix& dgGetZeroMatrix ();
 const dgMatrix& dgGetIdentityMatrix();
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgMatrix
 {
 	public:
@@ -103,7 +103,7 @@ class dgMatrix
 
 	static dgMatrix m_zeroMatrix;
 	static dgMatrix m_identityMatrix;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
 
@@ -322,7 +322,7 @@ DG_INLINE dgMatrix dgRollMatrix(dgFloat32 ang)
 
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgSpatialMatrix
 {
 	public:
@@ -373,7 +373,7 @@ class dgSpatialMatrix
 	}
 
 	dgSpatialVector m_rows[6];
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
 #endif

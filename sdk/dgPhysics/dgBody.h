@@ -44,17 +44,17 @@ class dgBroadPhaseAggregate;
 
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 struct dgLineBox
 {
 	dgVector m_l0;
 	dgVector m_l1;
 	dgVector m_boxL0;
 	dgVector m_boxL1;
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
-DG_MSC_VECTOR_ALIGMENT
+DG_MSC_VECTOR_ALIGNMENT
 class dgBody  
 {
 	public:
@@ -337,7 +337,7 @@ class dgBody
 	friend class dgCollidingPairCollector;
 	friend class dgCollisionLumpedMassParticles;
 
-} DG_GCC_VECTOR_ALIGMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 // *****************************************************************************
 // 
