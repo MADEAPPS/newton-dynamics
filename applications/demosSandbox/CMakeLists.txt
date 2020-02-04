@@ -80,9 +80,8 @@ if(MSVC OR MINGW)
     endif()
 endif()
 
-if (UNIX)
+if(UNIX)
     target_link_libraries (${projectName} GL GLU dl X11 pthread)
-
     set (source "${CMAKE_SOURCE_DIR}/applications/media")
     set (destination "${PROJECT_BINARY_DIR}/applications/media")
     add_custom_command(
@@ -90,13 +89,11 @@ if (UNIX)
         COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination}
         DEPENDS ${destination}
         COMMENT "symbolic link resources folder from ${source} => ${destination}")
-endif(UNIX)
+endif()
 
-message (${CMAKE_CONFIGURATION_TYPES})
+if(MINGW)
+    file(COPY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications")
+endif()
 
-if (MSVC)
-    file(GLOB media ../media/*.*)
-    file(GLOB shaders ../media/shaders/*.*)
-    install(FILES ${media} DESTINATION "${PROJECT_BINARY_DIR}/applications/media")
-    install(FILES ${shaders} DESTINATION "${PROJECT_BINARY_DIR}/applications/media/shaders")
-endif(MSVC)
+install(DIRECTORY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications/media")
+install(TARGETS ${projectName} DESTINATION "${PROJECT_BINARY_DIR}/applications/")
