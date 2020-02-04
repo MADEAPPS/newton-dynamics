@@ -78,7 +78,7 @@ if(MSVC OR MINGW)
 		set_source_files_properties(sdkDemos/toolBox/toolbox_stdafx.cpp PROPERTIES COMPILE_FLAGS "/Yctoolbox_stdafx.h")
 		set_source_files_properties(sdkDemos/toolBox/FileBrowser.cpp PROPERTIES COMPILE_FLAGS "/Y-")
     endif()
-endif(MSVC)
+endif()
 
 if (UNIX)
     target_link_libraries (${projectName} GL GLU dl X11 pthread)
