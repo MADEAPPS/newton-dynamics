@@ -51,7 +51,7 @@ endif ()
 
 include_directories(../../sdk/thirdParty/glfw/)
 include_directories(../../sdk/thirdParty/imgui/)
-include_directories(../../sdk/thirdParty/glfw/include/glfw/)
+include_directories(../../sdk/thirdParty/glfw/include/)
 include_directories(../../sdk/thirdParty/glatter/include/glatter/)
 add_executable(${projectName} ${CPP_SOURCE})
 
@@ -60,7 +60,7 @@ if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dProfiler)
 endif ()
 
-if(MSVC)
+if(MSVC OR MINGW)
     if(NEWTON_BUILD_SHARED_LIBS)
         add_definitions(-D_DSCENE_DLL)
         add_definitions(-D_DCONTAINERS_DLL)

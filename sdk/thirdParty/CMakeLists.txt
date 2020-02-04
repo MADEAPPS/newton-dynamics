@@ -13,9 +13,9 @@ cmake_minimum_required(VERSION 3.4.0)
 add_subdirectory(tinyxml)
 
 if (NEWTON_BUILD_SANDBOX_DEMOS)
-    if (MSVC)
+	if (MSVC OR MINGW)
         add_subdirectory(glfw)
-    endif(MSVC)
+	endif(MSVC OR MINGW)
 
     add_subdirectory(imgui)
 	add_subdirectory(glatter)

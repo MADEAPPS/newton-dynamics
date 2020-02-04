@@ -62,7 +62,7 @@ dFloat dGaussianRandom (dFloat amp)
 // Windows user assets path
 void dGetWorkingFileName (const char* const name, char* const outPathName)
 {
-	#if defined (_MSC_VER)
+	#if defined(_WIN32)
 		char appPath [256];
 		GetModuleFileNameA(NULL, appPath, sizeof (appPath));
 		strlwr (appPath);
@@ -70,7 +70,6 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 		char* const end = strstr (appPath, "applications");
 		end [0] = 0;
 		sprintf (outPathName, "%sapplications/media/%s", appPath, name);
-
 	#elif defined(_MACOSX_VER)
         char tmp[2048];
 		CFURLRef appURL (CFBundleCopyBundleURL(CFBundleGetMainBundle()));
@@ -84,9 +83,7 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 		// Clean up 
 		CFRelease( appURL ); 
 		CFRelease( filePath );
-	
-	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64))
-
+	#elif defined(__linux__)
 		char id[2048];
 		char appPath[2048];
 
@@ -97,7 +94,6 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 		char* const end = strstr (appPath, "applications");
 		*end = 0;
 		sprintf (outPathName, "%sapplications/media/%s", appPath, name);
-
 	#else
 		#error  "error: need to implement \"dGetWorkingFileName\" here for this platform"
 	#endif
