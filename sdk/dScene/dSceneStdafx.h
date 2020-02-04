@@ -120,9 +120,17 @@ class TiXmlElement;
 
 #ifdef _DSCENE_DLL
 	#ifdef _DSCENE_EXPORTS
-		#define DSCENE_API __declspec (dllexport)
+		#if defined(_WIN32)
+			#define DSCENE_API __declspec (dllexport)
+		#else
+			#define DSCENE_API __attribute__((visibility("default")))
+		#endif
 	#else
-		#define DSCENE_API __declspec (dllimport)
+		#if defined(_WIN32)
+			#define DSCENE_API __declspec (dllimport)
+		#else
+			#define DSCENE_API
+		#endif
 	#endif
 #else
 	#define DSCENE_API
