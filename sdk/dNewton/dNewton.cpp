@@ -257,24 +257,19 @@ void dNewton::ResetTimer()
 
 dLong dNewton::GetTimeInMicrosenconds() const 
 {
-	#ifdef _MSC_VER
+	#ifdef _WIN32
 		LARGE_INTEGER count;
 		QueryPerformanceCounter (&count);
 		count.QuadPart -= m_baseCount;
 		dLong ticks = count.QuadPart * LONGLONG (1000000) / m_frequency;
 		return ticks;
-	#endif
-
-	//#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
-	#ifdef __linux__
+	#elif defined(__linux__)
 		dAssert (0);
         //timespec ts;
 		//clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
 		//return unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - m_baseCount;
 		return 0;
-	#endif
-
-	#ifdef _MACOSX_VER
+	#elif defined(_MACOSX_VER)
 		timeval tp;
 		gettimeofday(&tp, NULL);
 		//unsigned64 microsecunds =  unsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;

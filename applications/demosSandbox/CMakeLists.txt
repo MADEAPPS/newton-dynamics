@@ -51,7 +51,7 @@ endif ()
 
 include_directories(../../sdk/thirdParty/glfw/)
 include_directories(../../sdk/thirdParty/imgui/)
-include_directories(../../sdk/thirdParty/glfw/include/glfw/)
+include_directories(../../sdk/thirdParty/glfw/include/)
 include_directories(../../sdk/thirdParty/glatter/include/glatter/)
 add_executable(${projectName} ${CPP_SOURCE})
 
@@ -60,7 +60,7 @@ if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dProfiler)
 endif ()
 
-if(MSVC)
+if(MSVC OR MINGW)
     if(NEWTON_BUILD_SHARED_LIBS)
         add_definitions(-D_DSCENE_DLL)
         add_definitions(-D_DCONTAINERS_DLL)
@@ -78,11 +78,10 @@ if(MSVC)
 		set_source_files_properties(sdkDemos/toolBox/toolbox_stdafx.cpp PROPERTIES COMPILE_FLAGS "/Yctoolbox_stdafx.h")
 		set_source_files_properties(sdkDemos/toolBox/FileBrowser.cpp PROPERTIES COMPILE_FLAGS "/Y-")
     endif()
-endif(MSVC)
+endif()
 
-if (UNIX)
+if(UNIX)
     target_link_libraries (${projectName} GL GLU dl X11 pthread)
-
     set (source "${CMAKE_SOURCE_DIR}/applications/media")
     set (destination "${PROJECT_BINARY_DIR}/applications/media")
     add_custom_command(
@@ -90,13 +89,11 @@ if (UNIX)
         COMMAND ${CMAKE_COMMAND} -E create_symlink ${source} ${destination}
         DEPENDS ${destination}
         COMMENT "symbolic link resources folder from ${source} => ${destination}")
-endif(UNIX)
+endif()
 
-message (${CMAKE_CONFIGURATION_TYPES})
+if(MINGW)
+    file(COPY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications")
+endif()
 
-if (MSVC)
-    file(GLOB media ../media/*.*)
-    file(GLOB shaders ../media/shaders/*.*)
-    install(FILES ${media} DESTINATION "${PROJECT_BINARY_DIR}/applications/media")
-    install(FILES ${shaders} DESTINATION "${PROJECT_BINARY_DIR}/applications/media/shaders")
-endif(MSVC)
+install(DIRECTORY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications/media")
+install(TARGETS ${projectName} DESTINATION "${PROJECT_BINARY_DIR}/applications/")

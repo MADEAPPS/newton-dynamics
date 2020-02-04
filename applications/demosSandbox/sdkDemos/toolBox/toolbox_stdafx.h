@@ -48,7 +48,7 @@ typedef long long unsigned64;
 //#define USE_TEST_ALL_FACE_USER_RAYCAST_CALLBACK
 
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 	#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 
 	#undef APIENTRY
@@ -56,7 +56,7 @@ typedef long long unsigned64;
 	#define GLFW_EXPOSE_NATIVE_WGL
 
 	#include <windows.h>
-	#include <Commctrl.h>
+	#include <commctrl.h>
 	#include <stdio.h>
 	#include <stdlib.h>
 	#include <malloc.h>
@@ -69,8 +69,8 @@ typedef long long unsigned64;
 	#include <GL/glu.h>
 	#include <GL/gl.h>
 	#include <imgui.h>
-	#include <glfw3.h>
-	#include <glfw3native.h>
+	#include <GLFW/glfw3.h>
+	#include <GLFW/glfw3native.h>
 #endif
 	
 #if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
