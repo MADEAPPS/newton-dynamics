@@ -80,7 +80,8 @@ void dLineNodeInfo::DrawWireFrame(dSceneRender* const render, dScene* const scen
 {
 	dAssert (myNode == scene->Find(GetNodeID()));
 	dAssert (scene->GetInfoFromNode(myNode) == this);
-
+dAssert(0);
+/*
 	//	int displayList = render->GetCachedFlatShadedDisplayList(m_mesh);
 	//	dAssert (displayList > 0);
 	if (m_curve.GetControlPointArray()) {
@@ -106,6 +107,7 @@ void dLineNodeInfo::DrawWireFrame(dSceneRender* const render, dScene* const scen
 
 		render->SetColor(savedColor);
 	}
+*/
 }
 
 void dLineNodeInfo::DrawFlatShaded(dSceneRender* const render, dScene* const scene, dScene::dTreeNode* const myNode) const
@@ -201,7 +203,7 @@ void dLineNodeInfo::Serialize (TiXmlElement* const rootNode)
 	bezierCurve->SetAttribute("degree", m_curve.GetDegree());
 
 	int pointCount = m_curve.GetControlPointCount();
-	const dBigVector* const controlPoints = m_curve.GetControlPointArray();
+	const dArray<dBigVector>& controlPoints = m_curve.GetControlPointArray();
 	int bufferSizeInBytes = pointCount * sizeof (dVector) * 3;
 	char* const buffer = new char[bufferSizeInBytes];
 	dFloatArrayToString (&controlPoints[0][0], pointCount * sizeof (dBigVector) / sizeof (dFloat64), buffer, bufferSizeInBytes);
@@ -212,10 +214,10 @@ void dLineNodeInfo::Serialize (TiXmlElement* const rootNode)
 	ctrlPoints->SetAttribute("floats", buffer);
 
 	int knotCount = m_curve.GetKnotCount();
-	const dFloat64* const knotPoints = m_curve.GetKnotArray();
+	const dArray<dFloat64>& knotPoints = m_curve.GetKnotArray();
 	int buffer1SizeInBytes = knotCount * sizeof (dFloat64) * 3;
 	char* const buffer1 = new char[buffer1SizeInBytes];
-	dFloatArrayToString (knotPoints, knotCount, buffer1, buffer1SizeInBytes);
+	dFloatArrayToString (&knotPoints[0], knotCount, buffer1, buffer1SizeInBytes);
 
 	TiXmlElement* const knotVector = new TiXmlElement ("knotVector");
 	bezierCurve->LinkEndChild (knotVector);

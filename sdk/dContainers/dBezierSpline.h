@@ -10,6 +10,7 @@
 */
 
 #include "dContainersStdAfx.h"
+#include "dArray.h"
 #include "dContainersAlloc.h"
 
 #ifndef __D_BEZIER_SPLINE_H__
@@ -43,14 +44,18 @@ class dBezierSpline: public dContainersAlloc
 	DCONTAINERS_API bool RemoveKnot (dFloat64 u, dFloat64 tol);
 
 	DCONTAINERS_API int GetControlPointCount() const;
-	DCONTAINERS_API dBigVector* GetControlPointArray();
-	DCONTAINERS_API const dBigVector* GetControlPointArray() const;
+	//DCONTAINERS_API dBigVector* GetControlPointArray();
+	//DCONTAINERS_API const dBigVector* GetControlPointArray() const;
+	DCONTAINERS_API dArray<dBigVector>& GetControlPointArray();
+	DCONTAINERS_API const dArray<dBigVector>& GetControlPointArray() const;
+
 	DCONTAINERS_API dBigVector GetControlPoint(int i) const;
 	DCONTAINERS_API void SetControlPoint(int i, const dBigVector& point);
 	
 	DCONTAINERS_API int GetKnotCount() const;
-	DCONTAINERS_API dFloat64* GetKnotArray();
-	DCONTAINERS_API const dFloat64* GetKnotArray() const;
+	DCONTAINERS_API dArray<dFloat64>& GetKnotArray();
+	DCONTAINERS_API const dArray<dFloat64>& GetKnotArray() const;
+
 	DCONTAINERS_API dFloat64 GetKnot(int i) const;
 	DCONTAINERS_API dFloat64 FindClosestKnot (dBigVector& closestPointOnCurve, const dBigVector& point, int subdivitionSteps = 2) const;
 
@@ -65,8 +70,8 @@ class dBezierSpline: public dContainersAlloc
 	void BasicsFunctions (dFloat64 u, int span, dFloat64* const functionOut) const;
 	void BasicsFunctionsDerivatives (dFloat64 u, int span, dFloat64* const derivatyivesOut) const;
 	
-	dFloat64* m_knotVector;
-	dBigVector* m_controlPoints; 
+	dArray<dFloat64> m_knotVector;
+	dArray<dBigVector> m_controlPoints;
 
 	int m_degree;
 	int m_knotsCount;
