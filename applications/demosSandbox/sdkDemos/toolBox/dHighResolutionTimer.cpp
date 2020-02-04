@@ -22,7 +22,7 @@ const dFloat TICKS2SEC = 1.0e-6f;
 static unsigned64 m_prevTime = 0;
 
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 	static LARGE_INTEGER frequency;
 	static LARGE_INTEGER baseCount;
 #else 
@@ -33,20 +33,15 @@ static unsigned64 m_prevTime = 0;
 
 void dResetTimer()
 {
-	#ifdef _MSC_VER
+	#if defined(_WIN32)
 		QueryPerformanceFrequency(&frequency);
 		QueryPerformanceCounter (&baseCount);
-
-	#endif
-
-	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
+	#elif defined(__linux__)
 		timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
 		//baseCount = ts.tv_nsec / 1000;
 		baseCount = unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
-	#endif
-
-	#ifdef _MACOSX_VER
+	#elif defined(_MACOSX_VER)
 		timeval tp;
 		gettimeofday(&tp, NULL);
 		unsigned64 microsecunds =  unsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
@@ -57,25 +52,18 @@ void dResetTimer()
 
 unsigned64 dGetTimeInMicrosenconds()
 {
-#ifdef _MSC_VER
+	#if defined(_WIN32)
 		LARGE_INTEGER count;
 		QueryPerformanceCounter (&count);
 		count.QuadPart -= baseCount.QuadPart;
 		unsigned64 ticks = unsigned64 (count.QuadPart * LONGLONG (1000000) / frequency.QuadPart);
 		return ticks;
-
-	#endif
-
-	#if (defined (_POSIX_VER) || defined (_POSIX_VER_64))
+	#elif defined(__linux__)
 		timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
 		//return unsigned64 (ts.tv_nsec / 1000) - baseCount;
-		
 		return unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - baseCount;
-	#endif
-
-
-	#ifdef _MACOSX_VER
+	#elif defined(_MACOSX_VER)
 		timeval tp;
 		gettimeofday(&tp, NULL);
 		unsigned64 microsecunds =  unsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
