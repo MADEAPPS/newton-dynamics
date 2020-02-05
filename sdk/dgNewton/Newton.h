@@ -205,10 +205,7 @@ extern "C" {
 		dFloat m_verticalScale;
 		dFloat m_horizonalScale_x;
 		dFloat m_horizonalScale_z;
-		dFloat m_horizonalDisplacementScale_x;
-		dFloat m_horizonalDisplacementScale_z;
 		void* m_vertialElevation;
-		short* m_horizotalDisplacement;
 		char* m_atributes;
 	} NewtonHeightFieldCollisionParam;
 
