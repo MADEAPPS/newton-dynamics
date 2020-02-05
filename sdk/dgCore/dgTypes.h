@@ -144,6 +144,9 @@
 // uncomment this for Scalar floating point 
 // alternatively the end application can use a command line option to enable this define
 //#define DG_SCALAR_VECTOR_CLASS
+#if defined(__ANDROID__)
+#define DG_SCALAR_VECTOR_CLASS
+#endif
 
 // by default newton run on a separate thread and 
 // optionally concurrent with the calling thread,
@@ -542,18 +545,21 @@ DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 
 DG_INLINE void* dgInterlockedExchange(void** const ptr, void* value)
 {
-	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || defined (__MINGW32__) || defined (__MINGW64__))
+	#if defined(_WIN32)
 		#ifdef _M_X64 
 			return (void*)_InterlockedExchange64((dgInt64*)ptr, dgInt64 (value));
 		#else
 			return (void*)_InterlockedExchange((long*) ptr, dgInt32(value));
 		#endif
-	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
-		//__sync_synchronize();
-		#ifdef __x86_64__
-			return (void*)__sync_lock_test_and_set((dgInt64*) ptr, value);
+	#elif defined(__linux__) || defined(_MACOSX_VER)
+		#if defined(__ANDROID__)
+			return __sync_lock_test_and_set(ptr, value);
 		#else
-			return (void*)__sync_lock_test_and_set((dgInt32*) ptr, value);
+			#ifdef __x86_64__
+				return (void*)__sync_lock_test_and_set((dgInt64*) ptr, value);
+			#else
+				return (void*)__sync_lock_test_and_set((dgInt32*) ptr, value);
+			#endif
 		#endif
 	#else
 		#error "dgInterlockedExchange implementation required"

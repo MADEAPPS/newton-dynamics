@@ -29,9 +29,17 @@
 
 #ifdef _DCONTAINERS_DLL
 	#ifdef _DCONTAINERS_EXPORT
-		#define DCONTAINERS_API __declspec (dllexport)
+		#if defined(_WIN32)
+			#define DCONTAINERS_API __declspec (dllexport)
+		#else
+			#define DCONTAINERS_API __attribute__((visibility("default")))
+		#endif
 	#else
-		#define DCONTAINERS_API __declspec (dllimport)
+		#if defined(_WIN32)
+			#define DCONTAINERS_API __declspec (dllimport)
+		#else
+			#define DCONTAINERS_API
+		#endif
 	#endif
 #else
 	#define DCONTAINERS_API
