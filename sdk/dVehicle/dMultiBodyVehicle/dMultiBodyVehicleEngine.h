@@ -158,7 +158,7 @@ class dMultiBodyVehicleEngine: public dVehicleNode, public dComplementaritySolve
 	bool GetIgnition() const { return m_ignitionKey0; }
 	
 	DVEHICLE_API void SetGear (dEngineInfo::dGearRatioIndex gear);
-	DVEHICLE_API dEngineInfo::dGearRatioIndex GetGear () const {return m_currentGear;}
+	dEngineInfo::dGearRatioIndex GetGear () const {return m_currentGear;}
 
 	DVEHICLE_API void UpdateAutomaticGearBox(dFloat timestep);
 	DVEHICLE_API void SetThrottle (dFloat throttle, dFloat timestep);

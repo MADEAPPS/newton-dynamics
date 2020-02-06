@@ -31,7 +31,7 @@ else(NEWTON_BUILD_SHARED_LIBS)
     add_library(${projectName} STATIC ${CPP_SOURCE})
 endif(NEWTON_BUILD_SHARED_LIBS)
 
-target_include_directories(${projectName} PUBLIC . ../dMath)
+target_include_directories(${projectName} PUBLIC . ../dMath ../dgCore)
 if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dProfiler)
 endif()

@@ -29,7 +29,7 @@
 
 #ifdef _NEWTON_STATIC_LIB
 	#define NEWTON_API
-#else 
+#else
     #ifdef _NEWTON_BUILD_DLL
         #ifdef _WIN32
             #define NEWTON_API __declspec (dllexport)

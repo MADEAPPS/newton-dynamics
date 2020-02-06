@@ -138,7 +138,7 @@ class dScene: public dSceneGraph, public dRefCounter
 	DSCENE_API virtual dTreeNode* FindChildByType(dTreeNode* const parentNode, dCRCTYPE type) const;
 	DSCENE_API virtual dTreeNode* FindParentByType(dTreeNode* const child, dCRCTYPE type) const;
 
-	DSCENE_API virtual NewtonWorld* GetNewtonWorld() const {return m_newton;}
+	virtual NewtonWorld* GetNewtonWorld() const {return m_newton;}
 
 	DSCENE_API virtual void DeleteNode (dTreeNode* const node);
 	DSCENE_API virtual void MergeScene (dScene* const scene);
