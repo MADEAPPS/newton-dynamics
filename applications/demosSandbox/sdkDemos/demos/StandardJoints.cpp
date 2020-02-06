@@ -911,28 +911,9 @@ class MyPathFollow: public dCustomPathFollow
 		dMatrix matrix;
 		NewtonBodyGetMatrix(GetBody1(), &matrix[0][0]);
 
-//static int xxx;
-//xxx++;
-
 		dVector p(matrix.UntransformVector(location));
 		dBigVector point;
 		dFloat64 knot = spline.FindClosestKnot (point, p, 4);
-/*
-dBigVector p0(spline.CurvePoint(0.0f));
-dBigVector p1(spline.CurvePoint(0.01f));
-dBigVector p2(spline.CurvePoint(0.99f));
-dBigVector q0;
-dBigVector q1;
-dBigVector q2;
-dFloat64 knot2 = spline.FindClosestKnot(q2, p2, 4);
-dTrace(("%f (%f %f %f) (%f %f %f)\n", knot2, p2[0], p2[1], p2[2], q2[0], q2[1], q2[2]));
-//dFloat64 knot0 = spline.FindClosestKnot(q0, p0, 4);
-//dFloat64 knot1 = spline.FindClosestKnot(q1, p1, 4);
-//dTrace(("%f (%f %f %f) (%f %f %f)\n", knot0, p0[0], p0[1], p0[2], q0[0], q0[1], q0[2]));
-//dTrace(("%f (%f %f %f) (%f %f %f)\n", knot1, p1[0], p1[1], p1[2], q1[0], q1[1], q1[2]));
-//dTrace(("%d %f (%f %f %f)\n", xxx, knot, p[0], p[1], p[2]));
-*/
-
 		dBigVector tangent (spline.CurveDerivative (knot));
 		tangent = tangent.Scale (1.0 / dSqrt (tangent.DotProduct3(tangent)));
 		positOut = matrix.TransformVector (point);
@@ -1325,8 +1306,39 @@ void StandardJoints (DemoEntityManager* const scene)
 
     CreateLevelMesh (scene, "flatPlane.ngd", true);
 
-    dVector location (0.0f);
-    dVector size (1.5f, 2.0f, 2.0f, 0.0f);
+	// Dave add kinematic body.
+    dVector location (dVector(0.0f, 5.0f, 0.0f, 1.0f));
+    dVector size (1.0f, 1.0f, 1.0f, 0.0f);
+	//
+	NewtonWorld* const world = scene->GetNewton();
+	int materialID = NewtonMaterialGetDefaultGroupID(world);
+	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
+	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
+	dFloat mass = 1.0f;
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = location;
+	matrix.m_posit.m_w = 1.0f;
+	//
+	//
+	DemoEntity* const entity = new DemoEntity(matrix, NULL);
+	scene->Append(entity);
+	if (geometry) {
+		entity->SetMesh(geometry, dGetIdentityMatrix());
+	}
+	//
+	//NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, matrix, collision, materialID);
+	NewtonBody* const rigidBody = NewtonCreateKinematicBody(world, collision, &matrix[0][0]);
+	// assign the wood id
+	NewtonBodySetMaterialGroupID(rigidBody, materialID);
+	// save the pointer to the graphic object with the body.
+	NewtonBodySetUserData(rigidBody, entity);
+	// set a destructor for this rigid body
+	NewtonBodySetDestructorCallback(rigidBody, PhysicsBodyDestructor);
+	// set the transform call back function
+	NewtonBodySetTransformCallback(rigidBody, DemoEntity::TransformCallback);
+	geometry->Release();
+	NewtonDestroyCollision(collision);
+	//
 
 //	joints still with problems
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));

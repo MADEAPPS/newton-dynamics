@@ -48,8 +48,8 @@ class dMousePickClass
 			// you can use this to filter sub collision shapes.  
 			dAssert (NewtonCollisionGetSubCollisionHandle (collision));
 		}
-
-		return (NewtonBodyGetType(body) == NEWTON_DYNAMIC_BODY) ? 1 : 0;
+        // Dave add (NewtonBodyGetType(body) == NEWTON_KINEMATIC_BODY)
+		return (NewtonBodyGetType(body) == NEWTON_DYNAMIC_BODY) || (NewtonBodyGetType(body) == NEWTON_KINEMATIC_BODY) ? 1 : 0;
 	}
 
 	static bool GetLastHit (dVector& posit, dVector& normal) 
