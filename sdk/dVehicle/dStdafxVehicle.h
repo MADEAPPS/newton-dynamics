@@ -25,33 +25,19 @@
 
 
 #ifdef _DVEHICLE_STATIC_LIB
-	#define DVEHICLE_API
-#else 
-	#ifdef _DVEHICLE_BUILD_DLL
-        #ifdef WIN32
-            #define DVEHICLE_API __declspec (dllexport)
-        #elif defined(__GNUC__)
-            #define DVEHICLE_API __attribute__((visibility("default")))
-        #endif
-	#else
-        #ifdef WIN32
-            #define DVEHICLE_API __declspec (dllimport)
-        #else
-            #define DVEHICLE_API
-        #endif
-	#endif
+	#define DVEHICLE_API DG_LIBRARY_STATIC
+#elif defined(_DVEHICLE_BUILD_DLL)
+	#define DVEHICLE_API DG_LIBRARY_EXPORT
+#else
+	#define DVEHICLE_API DG_LIBRARY_IMPORT
 #endif
 
 
-#ifdef _MSC_VER
+#ifdef _WIN32
 	#ifndef WIN32_LEAN_AND_MEAN
 		#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 	#endif
 	#include <windows.h>
-	#include <crtdbg.h>
-#endif
-
-#if ( defined (__MINGW32__) || defined (__MINGW64__) )
 	#include <crtdbg.h>
 #endif
 

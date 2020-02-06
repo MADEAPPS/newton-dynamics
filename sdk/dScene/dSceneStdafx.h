@@ -120,12 +120,12 @@ class TiXmlElement;
 
 #ifdef _DSCENE_DLL
 	#ifdef _DSCENE_EXPORTS
-		#define DSCENE_API __declspec (dllexport)
+		#define DSCENE_API DG_LIBRARY_EXPORT
 	#else
-		#define DSCENE_API __declspec (dllimport)
+		#define DSCENE_API DG_LIBRARY_IMPORT
 	#endif
 #else
-	#define DSCENE_API
+	#define DSCENE_API DG_LIBRARY_STATIC
 #endif
 
 

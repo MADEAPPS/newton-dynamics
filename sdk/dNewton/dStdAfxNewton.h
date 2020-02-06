@@ -25,21 +25,11 @@
 
 
 #ifdef _CNEWTON_STATIC_LIB
-	#define CNEWTON_API
-#else 
-	#ifdef _CNEWTON_BUILD_DLL
-        #ifdef _WIN32
-            #define CNEWTON_API __declspec (dllexport)
-        #else
-            #define CNEWTON_API __attribute__((visibility("default")))
-        #endif
-	#else
-        #ifdef _WIN32
-            #define CNEWTON_API __declspec (dllimport)
-        #else
-            #define CNEWTON_API
-        #endif
-	#endif
+	#define CNEWTON_API DG_LIBRARY_STATIC
+#elif defined(_CNEWTON_BUILD_DLL)
+	#define CNEWTON_API DG_LIBRARY_EXPORT
+#else
+	#define CNEWTON_API DG_LIBRARY_IMPORT
 #endif
 
 

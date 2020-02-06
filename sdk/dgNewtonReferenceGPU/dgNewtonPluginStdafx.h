@@ -32,17 +32,9 @@
 #include <dgPhysics.h>
 
 #ifdef NEWTONCPU_EXPORTS
-	#ifdef _WIN32
-		#define NEWTONCPU_API __declspec (dllexport)
-	#else
-		#define NEWTONCPU_API __attribute__ ((visibility("default")))
-	#endif
+	#define NEWTONCPU_API DG_LIBRARY_EXPORT
 #else
-	#ifdef _WIN32
-		#define NEWTONCPU_API __declspec (dllimport)
-	#else
-		#define NEWTONCPU_API
-	#endif
+	#define NEWTONCPU_API DG_LIBRARY_IMPORT
 #endif
 
 #pragma warning (disable: 4100) //unreferenced formal parameter

@@ -27,28 +27,13 @@ if (MSVC)
        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast")
 endif(MSVC)
 
-if (UNIX OR MINGW)
-
-	if(NEWTON_GENERATE_DLL STREQUAL "ON")
-		message (${projectName} - STATIC LIBRARY)
-		add_library(${projectName} STATIC ${CPP_SOURCE})
-	else()
-		
-		if(NEWTON_BUILD_SHARED_LIBS STREQUAL "ON")
-		   message (${projectName} - SHARED LIBRARY)
-	   add_library(${projectName} SHARED ${CPP_SOURCE})
-		else()
-		   message (${projectName} - STATIC LIBRARY)
-	   add_library(${projectName} STATIC ${CPP_SOURCE})
-		endif()
-		
-	endif()
-	
-endif(UNIX OR MINGW)
+if(NEWTON_BUILD_SHARED_LIBS)
+	add_library(${projectName} SHARED ${CPP_SOURCE})
+else()
+	add_library(${projectName} STATIC ${CPP_SOURCE})
+endif()
 
 if (MSVC)
-   add_library(${projectName} STATIC ${CPP_SOURCE})
-
    if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
 	   set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudgPhysicsStdafx.h")
       set_source_files_properties(dgWorld.cpp PROPERTIES COMPILE_FLAGS "/YcdgPhysicsStdafx.h")

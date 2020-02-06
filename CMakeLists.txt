@@ -68,6 +68,9 @@ endif(APPLE)
 
 #check for UNIX
 if(UNIX)
+	if(NOT NEWTON_BUILD_SHARED_LIBS)
+		add_compile_options(-fPIC)
+	endif()
 	if (BUILD_64)
 		add_definitions(-D_POSIX_VER_64)
 	else (BUILD_64)

@@ -22,7 +22,6 @@
 #ifndef _D_CUSTOM_ALLOC_H_
 #define _D_CUSTOM_ALLOC_H_
 
-
 #include <dgTypes.h>
 
 #ifdef _CUSTOM_JOINTS_STATIC_LIB
