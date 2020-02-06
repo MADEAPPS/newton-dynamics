@@ -232,7 +232,8 @@ void dgBody::SetMatrixNoSleep(const dgMatrix& matrix)
 
 void dgBody::SetMatrixResetSleep(const dgMatrix& matrix)
 {
-	m_sleeping = false;
+	m_sleeping = 0;
+	m_equilibrium = 0;
 	SetMatrix(matrix);
 }
 
