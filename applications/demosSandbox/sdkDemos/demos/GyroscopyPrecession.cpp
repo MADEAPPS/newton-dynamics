@@ -385,7 +385,7 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 //	FrisbeePreccesion(scene, dVector(0.0f, 3.0f, -10.0f, 1.0f), 10.0f, 1.0f, 15.0f);
 //
 //	// intermediate Axis Theorem
-//	DzhanibekovEffect(scene, dVector(0.0f, 3.0f,  0.0f, 1.0f), dVector (0.01f, 0.01f, 10.0f), 0.25f, 2.0f);
+	DzhanibekovEffect(scene, dVector(0.0f, 3.0f,  0.0f, 1.0f), dVector (0.01f, 0.01f, 10.0f), 0.25f, 2.0f);
 //	DzhanibekovEffect(scene, dVector(0.0f, 3.0f,  2.0f, 1.0f), dVector (0.01f, 0.01f,-15.0f), 0.25f, 2.0f);
 //
 //	//the effect only happens is there is a residual angular velocity on the other two axis
@@ -399,12 +399,11 @@ void GyroscopyPrecession(DemoEntityManager* const scene)
 //	RattleBack(scene, dVector(-2.0f, 0.5f, - 6.0, 1.0f), 2.0f, 1.0f);
 //	RattleBack(scene, dVector(-2.0f, 0.5f, - 9.0, 1.0f), -2.0f, 1.0f);
 
-	TestGyroContacts(scene, dVector(-4.0f, 1.5f, -5.0, 1.0f), 1);
-	TestGyroContacts(scene, dVector(-4.0f, 1.5f, -2.0, 1.0f), 0);
+//	TestGyroContacts(scene, dVector(-4.0f, 1.5f, -5.0, 1.0f), 1);
+//	TestGyroContacts(scene, dVector(-4.0f, 1.5f, -2.0, 1.0f), 0);
 
 	// place a toy tops
 	int topsCount = 4;
-topsCount = 1;
 	//const dFloat spacing = 3.0f;
 	for (int i = 0; i < topsCount; i++) {
 		for (int j = 0; j < topsCount; j++) {
