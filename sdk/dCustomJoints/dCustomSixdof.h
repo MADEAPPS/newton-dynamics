@@ -58,9 +58,9 @@ class dCustomSixdof: public dCustomJoint
 	CUSTOM_JOINTS_API void GetRollLimits(dFloat& minAngle, dFloat& maxAngle) const;
 	CUSTOM_JOINTS_API void GetPitchLimits(dFloat& minAngle, dFloat& maxAngle) const;
 
-	/*CUSTOM_JOINTS_API*/ dFloat GetYaw() const { return m_yaw.m_currentAngle.GetAngle();}
-	/*CUSTOM_JOINTS_API*/ dFloat GetRoll() const { return m_roll.m_currentAngle.GetAngle();}
-	/*CUSTOM_JOINTS_API*/ dFloat GetPitch() const { return m_pitch.m_currentAngle.GetAngle();}
+	dFloat GetYaw() const { return m_yaw.m_currentAngle.GetAngle();}
+	dFloat GetRoll() const { return m_roll.m_currentAngle.GetAngle();}
+	dFloat GetPitch() const { return m_pitch.m_currentAngle.GetAngle();}
 
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 

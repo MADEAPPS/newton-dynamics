@@ -142,7 +142,7 @@ class dCustomJoint: public dCustomAlloc
 		CUSTOM_JOINTS_API dSerializeMetaData(const char* const name);
 		CUSTOM_JOINTS_API virtual void SerializeJoint (dCustomJoint* const joint, NewtonSerializeCallback callback, void* const userData);
 		CUSTOM_JOINTS_API virtual dCustomJoint* DeserializeJoint (NewtonBody* const body0, NewtonBody* const body1, NewtonDeserializeCallback callback, void* const userData);
-		/*CUSTOM_JOINTS_API*/ virtual bool IsType (dCRCTYPE type) const {return false;}
+		virtual bool IsType (dCRCTYPE type) const {return false;}
 	};
 
 	class dSerializeMetaDataDictionary
@@ -279,7 +279,7 @@ class dCustomJoint: public dCustomAlloc
 
 	CUSTOM_JOINTS_API static void Initalize(NewtonWorld* const world);
 
-	/*CUSTOM_JOINTS_API*/ virtual void Debug(dDebugDisplay* const debugDisplay) const {}
+	virtual void Debug(dDebugDisplay* const debugDisplay) const {}
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const;
 	CUSTOM_JOINTS_API virtual void Deserialize (NewtonDeserializeCallback callback, void* const userData);
 	
@@ -304,8 +304,8 @@ class dCustomJoint: public dCustomAlloc
 	// these member function are only used by the C interface or for hooking callback to customize a particular 
 	// joint without deriving a new one
 	// note: this is not a extension of a virtual function, DO NOT CALL the base class SubmitConstraints!! 
-	/*CUSTOM_JOINTS_API*/ void SetUserData (void* userData) {m_userData = userData;}
-	/*CUSTOM_JOINTS_API*/ void* GetUserData () const {return m_userData;}
+	void SetUserData (void* userData) {m_userData = userData;}
+	void* GetUserData () const {return m_userData;}
 
 	CUSTOM_JOINTS_API dFloat GetStiffness () const;
 	CUSTOM_JOINTS_API void SetStiffness (dFloat stiffness);
@@ -314,7 +314,7 @@ class dCustomJoint: public dCustomAlloc
 	CUSTOM_JOINTS_API void SetBodyMassScale(dFloat scaleBody0, dFloat scaleBody1);
 
 	CUSTOM_JOINTS_API int GetSolverModel() const;
-	/*CUSTOM_JOINTS_API*/ void SetUserDestructorCallback(dJointUserDestructorCallback callback) { m_userDestructor = callback; }
+	void SetUserDestructorCallback(dJointUserDestructorCallback callback) { m_userDestructor = callback; }
 
 	CUSTOM_JOINTS_API void SetJointForceCalculation(bool mode);
 	CUSTOM_JOINTS_API const dVector& GetForce0() const;

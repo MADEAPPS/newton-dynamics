@@ -100,8 +100,7 @@ class dgCollisionParamProxy
 	dgInt32 m_maxContacts;
 	bool m_continueCollision;
 	bool m_intersectionTestOnly;
-
-}DG_GCC_VECTOR_ALIGNMENT;
+} DG_GCC_VECTOR_ALIGNMENT;
 
 
 DG_MSC_VECTOR_ALIGNMENT

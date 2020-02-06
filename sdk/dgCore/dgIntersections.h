@@ -118,7 +118,6 @@ DG_INLINE dgFloat32 dgBoxDistanceToOrigin2 (const dgVector& minBox, const dgVect
 	return dist.DotProduct(dist).GetScalar();
 }
 
-
 DG_MSC_VECTOR_ALIGNMENT
 class dgFastRayTest
 {
