@@ -91,7 +91,7 @@ if(UNIX)
         COMMENT "symbolic link resources folder from ${source} => ${destination}")
 endif()
 
-if(MINGW)
+if(WIN32)
     file(COPY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications")
 endif()
 
