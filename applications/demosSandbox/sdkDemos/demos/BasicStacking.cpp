@@ -352,8 +352,11 @@ baseMatrix.m_posit.m_y -= 0.1f;
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
 	}
 #else
+	int material = NewtonMaterialGetDefaultGroupID(world);
+	NewtonMaterialSetDefaultElasticity(world, material, material, 0.0f);
+
 	dArray<NewtonBody*> array;
-	baseMatrix.m_posit.m_y += 0.5f;
+	baseMatrix.m_posit.m_y += 1.0f;
 	for (int i = 0; i < count; i++) {
 		array[i] = CreateSimpleSolid(scene, geometry, mass, baseMatrix, collision, defaultMaterialID);
 		//baseMatrix = dYawMatrix(20.0f * dDegreeToRad) * baseMatrix;
