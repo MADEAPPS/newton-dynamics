@@ -20,6 +20,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+IMPLEMENT_CUSTOM_JOINT(dCustomPathFollow);
 
 dCustomPathFollow::dCustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomJoint(6, child, parent)

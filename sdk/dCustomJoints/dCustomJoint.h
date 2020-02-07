@@ -178,7 +178,7 @@ class dCustomJoint: public dCustomAlloc
 				}
 			}
 
-			for (int i = i0; (i < m_count) && (m_buffer[i].m_key <= key); i++) {
+			for (int i = i0; (i < m_count) && (m_buffer[i].m_key >= key); i++) {
 				if (m_buffer[i].m_key == key) {
 					return (dTreeNode*)&m_buffer[i];
 				}

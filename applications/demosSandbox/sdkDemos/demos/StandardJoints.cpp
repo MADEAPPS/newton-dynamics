@@ -1374,6 +1374,8 @@ void StandardJoints (DemoEntityManager* const scene)
 	dVector origin (-50.0f, 7.0f, 0.0f, 0.0f);
 //	dVector origin (-30.0f, 7.0f, 30.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
+
+//	NewtonSerializeToFile(world, "xxx.bin", NULL, NULL);
 }
 
 
