@@ -380,7 +380,7 @@ baseMatrix.m_posit.m_y -= 0.1f;
 	dFloat Iyy;
 	dFloat Izz;
 	dFloat mass1;
-	dFloat scale = 100.0f;
+	dFloat scale = 1000.0f;
 	NewtonBodyGetMass(array[count - 1], &mass1, &Ixx, &Iyy, &Izz);
 	NewtonBodySetMassMatrix(array[count - 1], mass1 * scale, Ixx * scale, Iyy * scale, Izz * scale);
 #endif
