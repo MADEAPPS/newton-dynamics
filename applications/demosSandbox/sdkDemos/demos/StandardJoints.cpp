@@ -953,6 +953,7 @@ static void AddPathFollow (DemoEntityManager* const scene, const dVector& origin
 	mesh->Release();
 	
 	const int count = 32;
+//	const int count = 1;
 	NewtonBody* bodies[count];
 
 	dBigVector point0;
@@ -1313,11 +1314,12 @@ void StandardJoints (DemoEntityManager* const scene)
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 //	AddSliderBug(scene, dVector(-20.0f, 0.0f, 17.0f));
 //	AddDoubleHinge(scene, dVector(-20.0f, 0.0f, 17.0f));
-	AddPathFollow(scene, dVector(20.0f, 0.0f, 0.0f));
+//	AddPathFollow(scene, dVector(20.0f, 0.0f, 0.0f));
 //	AddDifferential(scene, dVector(-20.0f, 0.0f, 33.0f));
 //	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
+//	AddHinge(scene, dVector(-20.0f, 0.0f, 0.0f));
 
-#if 0
+#if 1
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 	AddDistance (scene, dVector (-20.0f, 0.0f, -20.0f));
 	AddLimitedBallAndSocket (scene, dVector (-20.0f, 0.0f, -15.0f));
@@ -1344,7 +1346,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	dVector origin (-30.0f, 7.0f, 30.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 
-	NewtonSerializeToFile(scene->GetNewton(), "xxx.bin", NULL, NULL);
+//	NewtonSerializeToFile(scene->GetNewton(), "xxx.bin", NULL, NULL);
 }
 
 

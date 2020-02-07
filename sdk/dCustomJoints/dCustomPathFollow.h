@@ -26,9 +26,17 @@ class dCustomPathFollow: public dCustomJoint
 	CUSTOM_JOINTS_API dCustomPathFollow (const dMatrix& pinAndPivotFrame, NewtonBody* const body, NewtonBody* const parentPath);
 	CUSTOM_JOINTS_API virtual ~dCustomPathFollow();
 
-	virtual void GetPointAndTangentAtLocation(const dVector& location, dVector& positOut, dVector& tangentOut) const { dAssert(0);}
+	virtual void GetPointAndTangentAtLocation(const dVector& location, dVector& positOut, dVector& tangentOut) const 
+	{ 
+		positOut = location;
+		tangentOut = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+	}
 
 	protected:
+	void Deserialize(NewtonDeserializeCallback callback, void* const userData)
+	{
+	}
+
 	CUSTOM_JOINTS_API virtual void SubmitConstraints (dFloat timestep, int threadIndex);
 
 	DECLARE_CUSTOM_JOINT(dCustomPathFollow, dCustomJoint)
