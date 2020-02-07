@@ -236,8 +236,7 @@ void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mous
 			dVector normal;
 
 			NewtonBody* const body = MousePickBody (scene->GetNewton(), p0, p1, param, posit, normal);
-			// Dave add (NewtonBodyGetType(body) == NEWTON_DYNAMIC_BODY) check
-			if ((body) && (NewtonBodyGetType(body) == NEWTON_DYNAMIC_BODY)) {
+			if (body) {
 				dMatrix matrix;
 				m_targetPicked = body;
 				NewtonBodyGetMatrix(m_targetPicked, &matrix[0][0]);
@@ -268,57 +267,22 @@ void DemoCameraManager::UpdatePickBody(DemoEntityManager* const scene, bool mous
 				m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
 				m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
 			}
-			else 
-			// Dave add (NewtonBodyGetType(body) == NEWTON_KINEMATIC_BODY) check
-			if ((body) && (NewtonBodyGetType(body) == NEWTON_KINEMATIC_BODY)) {
-				m_targetPicked = body;
-				dTrace(("body Id: %d\n", NewtonBodyGetID(m_targetPicked)));
-			}
 		}
 
-	} 
-	//
-	if (m_targetPicked) {
-		// Dave add (NewtonBodyGetType(body) == NEWTON_DYNAMIC_BODY) check
-		if (NewtonBodyGetType(m_targetPicked) == NEWTON_DYNAMIC_BODY) {
-			if (mousePickState) {
-				m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale(m_pickedBodyParam);
+	} else {
+		if (mousePickState) {
+			m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);
 
-				if (m_pickJoint) {
-					m_pickJoint->SetTargetPosit(m_pickedBodyTargetPosition);
-				}
+			if (m_pickJoint) {
+				m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
+			}
 
+		} else {
+			if (m_pickJoint) {
+				delete m_pickJoint;
 			}
-			else {
-				if (m_pickJoint) {
-					delete m_pickJoint;
-				}
-				ResetPickBody();
-			}
-		} else
-		  // Dave add (NewtonBodyGetType(body) == NEWTON_KINEMATIC_BODY) check
-		  if (NewtonBodyGetType(m_targetPicked) == NEWTON_KINEMATIC_BODY) {
-		    if (mousePickState) {
-		      // Dave add (NewtonBodyGetType(body) == NEWTON_KINEMATIC_BODY) check and mouse mouve pos.
-			  dMatrix matrix;
-			  NewtonBodyGetMatrix(m_targetPicked, &matrix[0][0]);
-			  m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale(/*m_pickedBodyParam*/0.01f);
-			  m_pickedBodyTargetPosition.m_w = 1.0f;
-			  matrix.m_posit = m_pickedBodyTargetPosition;
-			  //Dave  Don't work
-		      //NewtonBodySetMatrix(m_targetPicked, &matrix[0][0]);
-			  //Dave Work
-			  NewtonBodySetMatrixRecursive(m_targetPicked, &matrix[0][0]);
-			}
-			else {
-				// Dave not supposed to happen, just in case..
-				if (m_pickJoint) {
-					delete m_pickJoint;
-				}
-				//
-				ResetPickBody();
-			}
-		  }
+			ResetPickBody();
+		}
 	}
 
 	m_prevMouseState = mousePickState;

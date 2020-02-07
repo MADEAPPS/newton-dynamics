@@ -71,8 +71,6 @@ dCustomJoint::dCustomJoint (NewtonBody* const body0, NewtonBody* const body1, Ne
 	,m_autoDestroy(0)
 {
 	int solverModel;
-	Init(m_maxDof, body0, body1);
-
 	callback (userData, &m_localMatrix0, sizeof (m_localMatrix0));
 	callback (userData, &m_localMatrix1, sizeof (m_localMatrix1));
 	callback (userData, &m_maxDof, sizeof (m_maxDof));

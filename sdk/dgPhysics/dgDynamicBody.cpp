@@ -142,7 +142,6 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 	,m_skeleton(NULL)
 	,m_applyExtForces(NULL)
 {
-	dgInt32 val;
 	m_type = m_dynamicBody;
 	m_rtti |= m_dynamicBodyRTTI;
 
@@ -150,7 +149,6 @@ dgDynamicBody::dgDynamicBody (dgWorld* const world, const dgTree<const dgCollisi
 	serializeCallback (userData, &m_mass, sizeof (m_mass));
 	serializeCallback (userData, &m_invMass, sizeof (m_invMass));
 	serializeCallback (userData, &m_dampCoef, sizeof (m_dampCoef));
-	serializeCallback(userData, &val, sizeof (dgInt32));
 }
 
 dgDynamicBody::~dgDynamicBody()

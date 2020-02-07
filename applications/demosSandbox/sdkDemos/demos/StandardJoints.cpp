@@ -1306,39 +1306,8 @@ void StandardJoints (DemoEntityManager* const scene)
 
     CreateLevelMesh (scene, "flatPlane.ngd", true);
 
-	// Dave add kinematic body.
-    dVector location (dVector(0.0f, 5.0f, 0.0f, 1.0f));
-    dVector size (1.0f, 1.0f, 1.0f, 0.0f);
-	//
-	NewtonWorld* const world = scene->GetNewton();
-	int materialID = NewtonMaterialGetDefaultGroupID(world);
-	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
-	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
-	dFloat mass = 1.0f;
-	dMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit = location;
-	matrix.m_posit.m_w = 1.0f;
-	//
-	//
-	DemoEntity* const entity = new DemoEntity(matrix, NULL);
-	scene->Append(entity);
-	if (geometry) {
-		entity->SetMesh(geometry, dGetIdentityMatrix());
-	}
-	//
-	//NewtonBody* const body = CreateSimpleSolid(scene, geometry, mass, matrix, collision, materialID);
-	NewtonBody* const rigidBody = NewtonCreateKinematicBody(world, collision, &matrix[0][0]);
-	// assign the wood id
-	NewtonBodySetMaterialGroupID(rigidBody, materialID);
-	// save the pointer to the graphic object with the body.
-	NewtonBodySetUserData(rigidBody, entity);
-	// set a destructor for this rigid body
-	NewtonBodySetDestructorCallback(rigidBody, PhysicsBodyDestructor);
-	// set the transform call back function
-	NewtonBodySetTransformCallback(rigidBody, DemoEntity::TransformCallback);
-	geometry->Release();
-	NewtonDestroyCollision(collision);
-	//
+    dVector location (0.0f);
+    dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
 //	joints still with problems
 //	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
@@ -1375,7 +1344,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	dVector origin (-30.0f, 7.0f, 30.0f, 0.0f);
     scene->SetCameraMatrix(rot, origin);
 
-//	NewtonSerializeToFile(world, "xxx.bin", NULL, NULL);
+	NewtonSerializeToFile(scene->GetNewton(), "xxx.bin", NULL, NULL);
 }
 
 

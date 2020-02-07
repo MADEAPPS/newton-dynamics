@@ -1566,7 +1566,8 @@ void dgWorld::OnSerializeToFile(void* const fileHandle, const void* const buffer
 void dgWorld::OnDeserializeFromFile(void* const fileHandle, void* const buffer, dgInt32 size)
 {
 	dgAssert((size & 0x03) == 0);
-	size_t bytes = fread(buffer, size, 1, (FILE*)fileHandle);
+	FILE* const file = (FILE*)fileHandle;
+	size_t bytes = fread(buffer, size, 1, file);
 	bytes=0;
 }
 

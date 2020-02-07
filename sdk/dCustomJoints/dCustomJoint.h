@@ -42,7 +42,7 @@ typedef void (*dJointUserDestructorCallback) (const dCustomJoint* const me);
 	className(NewtonBody* const child, NewtonBody* const parent, NewtonDeserializeCallback callback, void* const userData)	\
 		:baseClass(child, parent, callback, userData)																		\
 	{																														\
-		dAssert (0);																								\
+		Deserialize(callback, userData);																					\
 	}																														\
 	virtual dCRCTYPE GetSerializeKey() const { return m_metaData_##className.m_key_##className;}							\
 	static dCRCTYPE GetType () { return m_metaData_##className.m_key_##className; }										    \
