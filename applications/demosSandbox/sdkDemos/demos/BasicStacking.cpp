@@ -204,7 +204,6 @@ static void SphereStack(DemoEntityManager* const scene, dFloat mass, const dVect
 	dFloat startElevation = 100.0f;
 	dVector floor(FindFloor(world, dVector(baseMatrix.m_posit.m_x, startElevation, baseMatrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
 	baseMatrix.m_posit.m_y = floor.m_y + blockBoxSize.m_y * 0.5f;
-//baseMatrix.m_posit.m_y -= 0.1f;
 
 	// create a material to control collision with this objects
 	int defaultMaterialID;
@@ -226,7 +225,6 @@ static void SphereStack(DemoEntityManager* const scene, dFloat mass, const dVect
 	baseMatrix.m_posit.m_y += 1.0f;
 	for (int i = 0; i < count; i++) {
 		array[i] = CreateSimpleSolid(scene, geometry, mass, baseMatrix, collision, defaultMaterialID);
-		//baseMatrix = dYawMatrix(20.0f * dDegreeToRad) * baseMatrix;
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
 	}
 
