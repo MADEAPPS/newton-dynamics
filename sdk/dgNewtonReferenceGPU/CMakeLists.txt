@@ -28,6 +28,8 @@ add_definitions(-DNEWTONCPU_EXPORTS)
 add_library(${projectName} SHARED ${source})
 
 target_include_directories(${projectName} PUBLIC ../dgCore ../dgPhysics)
+target_link_libraries(${projectName} PRIVATE dgPhysics)
+
 if (NEWTON_BUILD_PROFILER)
 		target_link_libraries (${projectName} dProfiler)
 endif ()

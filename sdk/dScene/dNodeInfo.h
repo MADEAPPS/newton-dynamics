@@ -30,19 +30,19 @@ class dSceneRender;
 
 #define D_DEFINE_CLASS_NODE_ESSENCIALS(className,baseClass,exportType)		\
 	dAddRtti(baseClass,exportType);											\
-	exportType virtual dNodeInfo* MakeCopy () const							\
+	virtual dNodeInfo* MakeCopy () const									\
 	{																		\
 		return new className(*this);										\
 	}																		\
-	exportType virtual dNodeInfo* MetaFunction(dScene* const world) const	\
+	virtual dNodeInfo* MetaFunction(dScene* const world) const				\
 	{																		\
 		return new className(world);										\
 	}																		\
-	exportType static const char* BaseClassName ()							\
+	static const char* BaseClassName ()										\
 	{																		\
 		return #baseClass;													\
 	}																		\
-	exportType static const className& GetSingleton()						\
+	static const className& GetSingleton()									\
 	{																		\
 		className dommyRegister;											\
 		return m_singletonClass;											\
@@ -51,7 +51,7 @@ class dSceneRender;
 
 
 #define D_DEFINE_CLASS_NODE(className,baseClass,exportType)			\
-	exportType virtual const char* GetClassName () const			\
+	virtual const char* GetClassName () const						\
 	{																\
 		return #className;											\
 	}																\

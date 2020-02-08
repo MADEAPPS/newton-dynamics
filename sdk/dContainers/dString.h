@@ -75,7 +75,7 @@ class dString: public dContainersAlloc
 	int Compare (const char* const str0, const char* const str1) const;
 	void CopyData (char* const dst, const char* const src, int size) const;
 
-	int Find (const char* const subString, int stringSize, int from, int lenght) const;
+	DCONTAINERS_API int Find (const char* const subString, int stringSize, int from, int lenght) const;
 
 
 	protected:

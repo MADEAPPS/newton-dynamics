@@ -229,6 +229,15 @@
 	#define	DG_MSC_AVX_ALIGNMENT
 #endif
 
+#if defined(_MSC_VER)
+	#define DG_LIBRARY_EXPORT __declspec(dllexport)
+	#define DG_LIBRARY_IMPORT __declspec(dllimport)
+	#define DG_LIBRARY_STATIC
+#else
+	#define DG_LIBRARY_EXPORT __attribute__((visibility("default")))
+	#define DG_LIBRARY_IMPORT __attribute__((visibility("default")))
+	#define DG_LIBRARY_STATIC
+#endif
 
 
 #if ((defined (_WIN_32_VER) || defined (_WIN_64_VER)) && (_MSC_VER  >= 1600))

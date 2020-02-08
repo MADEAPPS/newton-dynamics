@@ -47,6 +47,9 @@ if (NEWTON_WITH_SSE4_PLUGIN)
 endif()
 
 if (NEWTON_WITH_AVX_PLUGIN)
+	if(ANDROID)
+		message(FATAL_ERROR "NEWTON_WITH_AVX_PLUGIN and ANDROID are not compatible")
+	endif()
 	add_subdirectory(dgNewtonAvx)
 endif()
 	
@@ -55,16 +58,12 @@ if (NEWTON_WITH_AVX2_PLUGIN)
 endif()
 
 if (NEWTON_WITH_REFERENCE_GPU_PLUGIN)
+	if(ANDROID)
+		message(FATAL_ERROR "NEWTON_WITH_REFERENCE_GPU_PLUGIN and ANDROID are not compatible")
+	endif()
 	add_subdirectory(dgNewtonReferenceGPU)
 endif()
 	
 if (NEWTON_WITH_GPU_PLUGIN)
 #	add_subdirectory(dgNewtonVulkan)
-endif()
-
-if (NEWTON_ARM64 STREQUAL "ON")
-	# -marm perhaps?
-elseif(NEWTON_ARM32 STREQUAL "ON")
-	# -marm perhaps?
-else()
 endif()

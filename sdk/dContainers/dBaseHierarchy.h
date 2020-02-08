@@ -40,7 +40,7 @@ class dBaseHierarchy: public dContainersAlloc
 
 	DCONTAINERS_API long long GetNameID() const;
 	DCONTAINERS_API const dString& GetName() const;
-	DCONTAINERS_API void SetNameID(const char* const name);
+	void SetNameID(const char* const name);
 	
 	protected:
 	DCONTAINERS_API dBaseHierarchy ();

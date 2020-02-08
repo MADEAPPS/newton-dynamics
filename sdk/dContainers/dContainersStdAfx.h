@@ -26,23 +26,16 @@
 #include <dVector.h>
 #include <dMatrix.h>
 
+#include <dgTypes.h>
 
 #ifdef _DCONTAINERS_DLL
 	#ifdef _DCONTAINERS_EXPORT
-		#if defined(_WIN32)
-			#define DCONTAINERS_API __declspec (dllexport)
-		#else
-			#define DCONTAINERS_API __attribute__((visibility("default")))
-		#endif
+		#define DCONTAINERS_API DG_LIBRARY_EXPORT
 	#else
-		#if defined(_WIN32)
-			#define DCONTAINERS_API __declspec (dllimport)
-		#else
-			#define DCONTAINERS_API
-		#endif
+		#define DCONTAINERS_API DG_LIBRARY_IMPORT
 	#endif
 #else
-	#define DCONTAINERS_API
+	#define DCONTAINERS_API DG_LIBRARY_STATIC
 #endif
 
 

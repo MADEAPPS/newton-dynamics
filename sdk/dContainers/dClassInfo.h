@@ -22,7 +22,7 @@ class dClassInfo: public dRefCounter
 	dClassInfo(void)
 	{
 	}
-	virtual DCONTAINERS_API  ~dClassInfo()
+	virtual ~dClassInfo()
 	{
 	}
 

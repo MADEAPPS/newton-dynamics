@@ -26,23 +26,14 @@
 #define NEWTON_MAJOR_VERSION 3 
 #define NEWTON_MINOR_VERSION 15 
 
+#include <dgTypes.h>
 
 #ifdef _NEWTON_STATIC_LIB
-	#define NEWTON_API
-#else 
-    #ifdef _NEWTON_BUILD_DLL
-        #ifdef _WIN32
-            #define NEWTON_API __declspec (dllexport)
-        #else
-            #define NEWTON_API __attribute__((visibility("default")))
-        #endif
-	#else
-        #ifdef _WIN32
-            #define NEWTON_API __declspec (dllimport)
-        #else
-            #define NEWTON_API
-        #endif
-    #endif
+	#define NEWTON_API DG_LIBRARY_STATIC
+#elif defined(_NEWTON_BUILD_DLL)
+	#define NEWTON_API DG_LIBRARY_EXPORT
+#else
+	#define NEWTON_API DG_LIBRARY_IMPORT
 #endif
 
 

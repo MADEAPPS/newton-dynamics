@@ -18,31 +18,21 @@ file(GLOB CPP_SOURCE *.h *.cpp)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
-if (UNIX OR MINGW)
-	
-	if(NEWTON_GENERATE_DLL STREQUAL "ON")
-		message (${projectName} - STATIC LIBRARY)
+if(NEWTON_BUILD_SHARED_LIBS STREQUAL "ON")
+	if(MSVC)
 		add_library(${projectName} STATIC ${CPP_SOURCE})
 	else()
-		
-		if(NEWTON_BUILD_SHARED_LIBS STREQUAL "ON")
-		   message (${projectName} - SHARED LIBRARY)
-	   add_library(${projectName} SHARED ${CPP_SOURCE})
-		else()
-		   message (${projectName} - STATIC LIBRARY)
-	   add_library(${projectName} STATIC ${CPP_SOURCE})
-		endif()
-		
+		add_library(${projectName} SHARED ${CPP_SOURCE})
 	endif()
-endif(UNIX OR MINGW)
+else()
+	add_library(${projectName} STATIC ${CPP_SOURCE})
+endif()
 
 if (MSVC)
-      add_library(${projectName} STATIC ${CPP_SOURCE})
-
-      if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
-         set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudgStdAfx.h")
-         set_source_files_properties(dgTypes.cpp PROPERTIES COMPILE_FLAGS "/YcdgStdAfx.h")
-      endif()
+	if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
+		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudgStdAfx.h")
+		set_source_files_properties(dgTypes.cpp PROPERTIES COMPILE_FLAGS "/YcdgStdAfx.h")
+	endif()
 endif(MSVC)
 
 target_include_directories(${projectName} PUBLIC .)
