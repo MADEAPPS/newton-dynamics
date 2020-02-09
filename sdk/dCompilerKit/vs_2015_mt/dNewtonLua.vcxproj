@@ -114,7 +114,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile>dNewtonLuaStdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>./;../../dMath;../../dContainers;../dVirtualMachine;../dIntermediateLanguage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;../../dgCore;../../dMath;../../dContainers;../dVirtualMachine;../dIntermediateLanguage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -133,7 +133,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile>dNewtonLuaStdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>./;../../dMath;../../dContainers;../dVirtualMachine;../dIntermediateLanguage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;../../dgCore;../../dMath;../../dContainers;../dVirtualMachine;../dIntermediateLanguage;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
