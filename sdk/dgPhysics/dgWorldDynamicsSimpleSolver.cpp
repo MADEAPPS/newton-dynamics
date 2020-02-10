@@ -118,6 +118,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 
 		const dgFloat32 force = rhs->m_jointFeebackForce->GetInitiailGuess() * forceImpulseScale;
 		//const dgFloat32 force = rhs->m_jointFeebackForce->m_force____ * forceImpulseScale;
+
 		rhs->m_force = isBilateral ? dgClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
 		rhs->m_maxImpact = dgFloat32(0.0f);
 
