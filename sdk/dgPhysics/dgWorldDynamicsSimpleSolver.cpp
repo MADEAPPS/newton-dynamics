@@ -115,9 +115,9 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 		rhs->m_deltaAccel = extenalAcceleration * forceImpulseScale;
 		rhs->m_coordenateAccel += extenalAcceleration * forceImpulseScale;
 		dgAssert(rhs->m_jointFeebackForce);
-		const dgFloat32 force = rhs->m_jointFeebackForce->m_force * forceImpulseScale;
+
+		const dgFloat32 force = rhs->m_jointFeebackForce->GetInitiailGuess() * forceImpulseScale;
 		rhs->m_force = isBilateral ? dgClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
-//rhs->m_force = 0.0f;
 		rhs->m_maxImpact = dgFloat32(0.0f);
 
 		dgVector jMinvM0linear(preconditioner0 * row->m_JMinv.m_jacobianM0.m_linear);
@@ -1379,10 +1379,11 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			for (dgInt32 j = 0; j < count; j++) {
 				dgRightHandSide* const rhs = &rightHandSide[j + first];
 				dgAssert(dgCheckFloat(rhs->m_force));
-				//rhs->m_jointFeebackForce->m_force = rhs->m_force;
-				dgFloat32 xxx = rhs->m_jointFeebackForce->m_force + 0.25f * (rhs->m_force - rhs->m_jointFeebackForce->m_force);
-				rhs->m_jointFeebackForce->m_force = xxx;
+				rhs->m_jointFeebackForce->m_force____ = rhs->m_force;
+				//dgFloat32 xxx = rhs->m_jointFeebackForce->m_force + 0.125f * (rhs->m_force - rhs->m_jointFeebackForce->m_force);
+				//rhs->m_jointFeebackForce->m_force = xxx;
 				rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * timestepRK;
+				rhs->m_jointFeebackForce->Push(rhs->m_force);
 			}
 			hasJointFeeback |= (constraint->m_updaFeedbackCallback ? 1 : 0);
 		}

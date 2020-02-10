@@ -63,12 +63,44 @@ class dgJointCallbackParam
 	dgFloat32 m_timestep;
 };
 
-
 class dgForceImpactPair
 {
 	public:
-	dgFloat32 m_force;
+	void Clear()
+	{
+		m_force____ = dgFloat32 (0.0f);
+		m_impact = dgFloat32(0.0f);
+		for (dgInt32 i = 0; i < sizeof(m_initialGuess) / sizeof(m_initialGuess[0]); i++) {
+			m_initialGuess[i] = dgFloat32(0.0f);
+		}
+	}
+
+	void Push(dgFloat32 val)
+	{
+		for (dgInt32 i = 1; i < sizeof(m_initialGuess) / sizeof(m_initialGuess[0]); i++) {
+			m_initialGuess[i - 1] = m_initialGuess[i];
+		}
+		m_initialGuess[sizeof(m_initialGuess) / sizeof(m_initialGuess[0]) - 1] = val;
+	}
+
+	dgFloat32 GetInitiailGuess() const
+	{
+		dgFloat32 value = dgFloat32(0.0f);
+		dgFloat32 smallest = dgFloat32(0.0f);
+		for (dgInt32 i = 0; i < sizeof(m_initialGuess) / sizeof(m_initialGuess[0]); i++)
+		{
+			dgFloat32 mag = dgAbs(m_initialGuess[i]);
+			if (mag < smallest) {
+				smallest = mag;
+				value = m_initialGuess[i];
+			}
+		}
+		return value;
+	}
+
+	dgFloat32 m_force____;
 	dgFloat32 m_impact;
+	dgFloat32 m_initialGuess[4];
 };
 
 class dgBilateralBounds

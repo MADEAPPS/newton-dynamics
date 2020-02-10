@@ -464,8 +464,9 @@ DG_INLINE void dgParallelBodySolver::BuildJacobianMatrix(dgJointInfo* const join
 		rhs->m_deltaAccel = extenalAcceleration * forceImpulseScale;
 		rhs->m_coordenateAccel += extenalAcceleration * forceImpulseScale;
 		dgAssert(rhs->m_jointFeebackForce);
-		const dgFloat32 force = rhs->m_jointFeebackForce->m_force * forceImpulseScale;
-		rhs->m_force = isBilateral ? dgClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
+		dgAssert(0);
+		//const dgFloat32 force = rhs->m_jointFeebackForce->m_force * forceImpulseScale;
+		//rhs->m_force = isBilateral ? dgClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
 		rhs->m_maxImpact = dgFloat32(0.0f);
 
 		const dgWorkGroupFloat& JtM0 = (dgWorkGroupFloat&)lhs->m_Jt.m_jacobianM0;
@@ -746,7 +747,8 @@ void dgParallelBodySolver::UpdateForceFeedback(dgInt32 threadID)
 		for (dgInt32 j = 0; j < count; j++) {
 			const dgRightHandSide* const rhs = &rightHandSide[j + first];
 			dgAssert(dgCheckFloat(rhs->m_force));
-			rhs->m_jointFeebackForce->m_force = rhs->m_force;
+			dgAssert(0);
+			//rhs->m_jointFeebackForce->m_force = rhs->m_force;
 			rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * m_timestepRK;
 		}
 		hasJointFeeback |= (constraint->m_updaFeedbackCallback ? 1 : 0);
