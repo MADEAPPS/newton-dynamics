@@ -906,6 +906,7 @@ void DemoEntityManager::ShowMainMenuBar()
 		{
 			// load a demo 
 			if (m_currentScene != -1) {
+//				DeserializedPhysicScene("C:/Users/julio/Downloads/newtonCrashLarge.bin");
 				LoadDemo(m_currentScene);
 				m_lastCurrentScene = m_currentScene;
 				m_currentScene = -1;

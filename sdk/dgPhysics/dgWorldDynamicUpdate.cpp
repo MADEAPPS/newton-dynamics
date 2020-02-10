@@ -341,7 +341,7 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 	world->m_bodiesMemory.ResizeIfNecessary(bodyStart);
 
 	dgInt32 rowStart = 0;
-	dgInt32 extraRowsAcc = 0;
+
 	for (dgInt32 i = 0; i < clustersCount; i++) {
 		dgBodyCluster& cluster = m_clusterData[i];
 		dgBodyInfo* const bodyArray = &world->m_bodiesMemory[cluster.m_bodyStart];
@@ -349,7 +349,7 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 		bodyArray[0].m_body = world->GetSentinelBody();
 
 		cluster.m_rowStart = rowStart;
-		bool clusterIsContinuesCollision = false;
+		bool clusterIsContinueCollision = false;
 		if (cluster.m_jointCount) {
 			dgInt32 bodyIndex = 1;
 			for (dgInt32 j = 0; j < cluster.m_jointCount; j++) {
@@ -382,28 +382,26 @@ void dgWorldDynamicUpdate::BuildClusters(dgFloat32 timestep)
 					m1 = body1->m_index;
 				}
 
-				dgInt32 ccdExtraRows = 0;
 				if (joint->GetId() == dgConstraint::m_contactConstraint) {
 					// check for CCD mode
 					if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
 						const dgContact* const contact = (dgContact*) joint;
-						bool isCCD = contact->EstimateCCD (timestep);
-						ccdExtraRows = isCCD ? DG_CCD_EXTRA_CONTACT_COUNT : 0;
-						clusterIsContinuesCollision |= isCCD;
+						clusterIsContinueCollision |= contact->EstimateCCD (timestep);
 					}
 				}
 				
 				jointInfo->m_m0 = m0;
 				jointInfo->m_m1 = m1;
 				jointInfo->m_pairStart = rowStart;
-				extraRowsAcc += ccdExtraRows;
-				rowStart += jointInfo->m_pairCount + ccdExtraRows; 
+				rowStart += jointInfo->m_pairCount; 
 			}
 
-			cluster.m_rowCount += extraRowsAcc;
-			cluster.m_isContinueCollision = clusterIsContinuesCollision;
-			if (clusterIsContinuesCollision && cluster.m_rowCount < DG_CONSTRAINT_MAX_ROWS) {
-				cluster.m_rowCount = DG_CONSTRAINT_MAX_ROWS;
+			cluster.m_isContinueCollision = clusterIsContinueCollision;
+			if (cluster.m_isContinueCollision) {
+				cluster.m_rowCount += DG_CCD_EXTRA_CONTACT_COUNT * cluster.m_jointCount / 2;
+				if (cluster.m_rowCount < DG_CONSTRAINT_MAX_ROWS) {
+					cluster.m_rowCount = DG_CONSTRAINT_MAX_ROWS;
+				}
 			}
 
 		} else {
@@ -449,10 +447,11 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesKernel (void* const con
 	dgInt32 count = descriptor->m_clusterCount;
 	dgBodyCluster* const clusters = &world->m_clusterData[descriptor->m_firstCluster];
 
-//if (m_uniqueID == 3)
-static int xxx;
-dgTrace(("\nframe %d\n", xxx));
-xxx++;
+//static int xxx;
+//xxx++;
+//if (xxx >= 59)
+//xxx *=1;
+//dgTrace(("\nframe %d\n", xxx));
 
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1)) {
 		dgBodyCluster* const cluster = &clusters[i]; 

@@ -110,7 +110,7 @@ dgVector dgCollisionConvexPolygon::SupportVertex (const dgVector& dir, dgInt32* 
 bool dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 dist, const dgCollisionInstance* const parentMesh)
 {
 	dgPlane planes[4];
-	dgVector points[DG_CONVEX_POLYGON_MAX_VERTEX_COUNT];
+	dgVector points[128];
 
 	dgClippedFaceEdge clippedFace [2 * sizeof (m_localPoly) / sizeof (m_localPoly[0]) + 8];
 
@@ -193,6 +193,7 @@ bool dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 					indexCount ++;
 					edgeCount += 2;
 					ptr = newEdge;
+					dgAssert (indexCount < sizeof (points)/sizeof (points[0]));
 				}
 			} else {
 				if ((test1 > tol) && (test0 * test1) < dgFloat32 (0.0f)) {
@@ -225,6 +226,7 @@ bool dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 					edgeCount += 2;
 
 					ptr = newEdge;
+					dgAssert (indexCount < sizeof (points)/sizeof (points[0]));
 				}
 			}
 
@@ -273,6 +275,7 @@ bool dgCollisionConvexPolygon::BeamClipping (const dgVector& origin, dgFloat32 d
 		m_localPoly[count] = points[ptr->m_incidentVertex];
 		count ++;
 		ptr = ptr->m_next;
+		dgAssert (m_count < DG_CONVEX_POLYGON_MAX_VERTEX_COUNT);
 	} while (ptr != first);
 
 	m_count = count;
@@ -739,7 +742,7 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullDescrete(const dgW
 	if (inside & !proxy.m_intersectionTestOnly) {
 		penetration = dgMax(dgFloat32(0.0f), penetration);
 		dgAssert(penetration >= dgFloat32(0.0f));
-		dgVector contactPoints[64];
+		dgVector contactPoints[128];
 		dgVector point(pointInHull + normalInHull.Scale(penetration - DG_PENETRATION_TOL));
 
 		count = hull->CalculatePlaneIntersection(normalInHull.Scale(dgFloat32(-1.0f)), point, contactPoints);

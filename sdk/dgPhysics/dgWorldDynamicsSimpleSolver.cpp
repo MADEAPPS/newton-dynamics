@@ -117,6 +117,7 @@ void dgWorldDynamicUpdate::BuildJacobianMatrix(const dgBodyInfo* const bodyInfoA
 		dgAssert(rhs->m_jointFeebackForce);
 		const dgFloat32 force = rhs->m_jointFeebackForce->m_force * forceImpulseScale;
 		rhs->m_force = isBilateral ? dgClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
+//rhs->m_force = 0.0f;
 		rhs->m_maxImpact = dgFloat32(0.0f);
 
 		dgVector jMinvM0linear(preconditioner0 * row->m_JMinv.m_jacobianM0.m_linear);
@@ -1375,8 +1376,28 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForces(const dgBodyCluster* c
 			const dgInt32 first = jointInfo->m_pairStart;
 			const dgInt32 count = jointInfo->m_pairCount;
 
+			const dgInt32 m0 = jointInfo->m_m0;
+			const dgInt32 m1 = jointInfo->m_m1;
+			const dgDynamicBody* const body0 = (dgDynamicBody*)bodyArray[m0].m_body;
+			const dgDynamicBody* const body1 = (dgDynamicBody*)bodyArray[m1].m_body;
+
+			const dgVector force0(body0->m_accel.Scale(body0->m_mass.m_w) - body0->m_externalForce - internalForces[m0].m_linear);
+			const dgVector force1(body1->m_accel.Scale(body1->m_mass.m_w) - body1->m_externalForce - internalForces[m1].m_linear);
+
 			for (dgInt32 j = 0; j < count; j++) {
 				dgRightHandSide* const rhs = &rightHandSide[j + first];
+				const dgLeftHandSide* const row = &leftHandSide[j + first];
+
+				dgVector a(row->m_JMinv.m_jacobianM0.m_linear * force0);
+				//a = a.MulAdd(row->m_JMinv.m_jacobianM0.m_angular, angularM0);
+				a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_linear, force1);
+				//a = a.MulAdd(row->m_JMinv.m_jacobianM1.m_angular, angularM1);
+				const dgFloat32 accel (a.AddHorizontal().GetScalar());
+
+				if (dgAbs (accel) > 10.0f) {
+//					rhs->m_force = 0.0f;
+				}
+
 				dgAssert(dgCheckFloat(rhs->m_force));
 				rhs->m_jointFeebackForce->m_force = rhs->m_force;
 				rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * timestepRK;

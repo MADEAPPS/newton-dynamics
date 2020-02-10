@@ -707,7 +707,7 @@ dgInt32 dgContactSolver::CalculateIntersectingPlane(dgInt32 count)
 				m_vertexIndex++;
 				dgAssert(m_vertexIndex < sizeof (m_hullDiff) / sizeof (m_hullDiff[0]));
 
-				dgAssert(SanityCheck());
+				//dgAssert(SanityCheck());
 			}
 		} else {
 			DeleteFace(faceNode);

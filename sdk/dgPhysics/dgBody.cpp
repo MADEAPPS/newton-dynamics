@@ -303,7 +303,7 @@ dgFloat32 dgBody::RayCast (const dgLineBox& line, OnRayCastAction filter, OnRayP
 void dgBody::IntegrateVelocity (dgFloat32 timestep)
 {
 //if (m_uniqueID == 3)
-dgTrace(("%d v(%f %f %f)\n", m_uniqueID, m_veloc.m_x, m_veloc.m_y, m_veloc.m_z));
+//dgTrace(("%d v(%f %f %f)\n", m_uniqueID, m_veloc.m_x, m_veloc.m_y, m_veloc.m_z));
 
 	dgAssert (m_veloc.m_w == dgFloat32 (0.0f));
 	dgAssert (m_omega.m_w == dgFloat32 (0.0f));
