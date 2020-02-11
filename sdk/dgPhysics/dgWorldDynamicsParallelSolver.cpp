@@ -58,8 +58,7 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[m_bodies];
 	dgJointInfo* const jointArray = &world->m_jointsMemory[m_joints];
 
-//	if (world->GetCurrentPlugin()) {
-	if (0) {
+	if (world->GetCurrentPlugin()) {
 		dgWorldPlugin* const plugin = world->GetCurrentPlugin()->GetInfo().m_plugin;
 		plugin->CalculateJointForces(cluster, bodyArray, jointArray, timestep);
 	} else {
@@ -749,9 +748,9 @@ void dgParallelBodySolver::UpdateForceFeedback(dgInt32 threadID)
 		for (dgInt32 j = 0; j < count; j++) {
 			const dgRightHandSide* const rhs = &rightHandSide[j + first];
 			dgAssert(dgCheckFloat(rhs->m_force));
+			rhs->m_jointFeebackForce->Push(rhs->m_force);
 			rhs->m_jointFeebackForce->m_force____ = rhs->m_force;
 			rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * m_timestepRK;
-			rhs->m_jointFeebackForce->Push(rhs->m_force);
 		}
 		hasJointFeeback |= (constraint->m_updaFeedbackCallback ? 1 : 0);
 	}
