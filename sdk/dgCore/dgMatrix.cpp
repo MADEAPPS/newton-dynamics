@@ -146,8 +146,6 @@ dgMatrix dgMatrix::operator* (const dgMatrix &B) const
 					 B.m_front * m_posit.BroadcastX() + B.m_up * m_posit.BroadcastY() + B.m_right * m_posit.BroadcastZ() + B.m_posit * m_posit.BroadcastW()); 
 }
 
-
-
 void dgMatrix::TransformTriplex (dgFloat32* const dst, dgInt32 dstStrideInBytes, const dgFloat32* const src, dgInt32 srcStrideInBytes, dgInt32 count) const
 {
 	dgInt32 dstStride = dgInt32 (dstStrideInBytes /sizeof (dgFloat32));
