@@ -68,7 +68,7 @@ class dgForceImpactPair
 	public:
 	void Clear()
 	{
-		m_force____ = dgFloat32 (0.0f);
+		m_force = dgFloat32 (0.0f);
 		m_impact = dgFloat32(0.0f);
 		for (dgInt32 i = 0; i < sizeof(m_initialGuess) / sizeof(m_initialGuess[0]); i++) {
 			m_initialGuess[i] = dgFloat32(0.0f);
@@ -98,7 +98,7 @@ class dgForceImpactPair
 		return value;
 	}
 
-	dgFloat32 m_force____;
+	dgFloat32 m_force;
 	dgFloat32 m_impact;
 	dgFloat32 m_initialGuess[4];
 };

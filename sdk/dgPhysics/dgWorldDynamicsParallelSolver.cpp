@@ -749,7 +749,7 @@ void dgParallelBodySolver::UpdateForceFeedback(dgInt32 threadID)
 			const dgRightHandSide* const rhs = &rightHandSide[j + first];
 			dgAssert(dgCheckFloat(rhs->m_force));
 			rhs->m_jointFeebackForce->Push(rhs->m_force);
-			rhs->m_jointFeebackForce->m_force____ = rhs->m_force;
+			rhs->m_jointFeebackForce->m_force = rhs->m_force;
 			rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * m_timestepRK;
 		}
 		hasJointFeeback |= (constraint->m_updaFeedbackCallback ? 1 : 0);

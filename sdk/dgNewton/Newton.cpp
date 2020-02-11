@@ -1843,7 +1843,7 @@ void NewtonMaterialGetContactForce(const NewtonMaterial* const materialHandle, c
 	TRACE_FUNCTION(__FUNCTION__);
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
 
-	dgVector force (material->m_normal.Scale(material->m_normal_Force.m_force____) + material->m_dir0.Scale (material->m_dir0_Force.m_force____) + material->m_dir1.Scale (material->m_dir1_Force.m_force____));
+	dgVector force (material->m_normal.Scale(material->m_normal_Force.m_force) + material->m_dir0.Scale (material->m_dir0_Force.m_force) + material->m_dir1.Scale (material->m_dir1_Force.m_force));
 
 	forcePtr[0] = force.m_x;
 	forcePtr[1] = force.m_y;
@@ -2085,7 +2085,7 @@ void NewtonMaterialSetContactNormalAcceleration(const NewtonMaterial* const mate
 {
 	TRACE_FUNCTION(__FUNCTION__);
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
-	material->m_normal_Force.m_force____ = accel;
+	material->m_normal_Force.m_force = accel;
 	material->m_flags |= dgContactMaterial::m_overrideNormalAccel;
 }
 
@@ -2114,10 +2114,10 @@ void NewtonMaterialSetContactTangentAcceleration(const NewtonMaterial* const mat
 	TRACE_FUNCTION(__FUNCTION__);
 	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
 	if (index) {
-		material->m_dir1_Force.m_force____ = accel;
+		material->m_dir1_Force.m_force = accel;
 		material->m_flags |= dgContactMaterial::m_override1Accel;
 	} else {
-		material->m_dir0_Force.m_force____ = accel;
+		material->m_dir0_Force.m_force = accel;
 		material->m_flags |= dgContactMaterial::m_override0Accel;
 	}
 }

@@ -182,6 +182,7 @@ void dgContact::CalculatePointDerivative (dgInt32 index, dgContraintDescritor& d
 
 bool dgContact::EstimateCCD (dgFloat32 timestep) const
 {
+//return false;
 	dgTrace (("function %s on file %s is too slow, fix it\n", __FILE__, __FUNCTION__));
 	dgAssert (m_body0->m_continueCollisionMode | m_body1->m_continueCollisionMode);
 	const dgVector& veloc0 = m_body0->m_veloc;
@@ -328,7 +329,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 
 	params.m_jointAccel[normalIndex] = relGyro + relSpeed * impulseOrForceScale;
 	if (contact.m_flags & dgContactMaterial::m_overrideNormalAccel) {
-		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force____;
+		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
 #endif
 
@@ -354,7 +355,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		if (contact.m_flags & dgContactMaterial::m_override0Accel) {
 			// note: using restitution been negative to indicate that the acceleration was override
 			params.m_restitution[jacobIndex] = dgFloat32 (-1.0f);
-			params.m_jointAccel[jacobIndex] = contact.m_dir0_Force.m_force____;
+			params.m_jointAccel[jacobIndex] = contact.m_dir0_Force.m_force;
 		} else {
 			const dgFloat32 relFrictionGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 			params.m_restitution[jacobIndex] = dgFloat32 (0.0f);
@@ -390,7 +391,7 @@ void dgContact::JacobianContactDerivative (dgContraintDescritor& params, const d
 		if (contact.m_flags & dgContactMaterial::m_override1Accel) {
 			// note: using restitution been negative to indicate that the acceleration was override
 			params.m_restitution[jacobIndex] = dgFloat32 (-1.0f);
-			params.m_jointAccel[jacobIndex] = contact.m_dir1_Force.m_force____;
+			params.m_jointAccel[jacobIndex] = contact.m_dir1_Force.m_force;
 		} else {
 			const dgFloat32 relFrictionGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 			params.m_restitution[jacobIndex] = dgFloat32 (0.0f);

@@ -264,7 +264,7 @@ dgFloat32 NewtonUserJoint::GetRowForce (dgInt32 row) const
 {
 	dgFloat32 force = 0.0f;
 	if ((row >= 0) && (row < dgInt32 (m_maxDOF))) {
-		force = m_forceArray[row].m_force____; 
+		force = m_forceArray[row].m_force; 
 	}
 	return force;
 }
