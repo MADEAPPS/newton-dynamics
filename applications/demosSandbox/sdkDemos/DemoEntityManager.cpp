@@ -781,7 +781,7 @@ void DemoEntityManager::ShowMainMenuBar()
 
 			//ImGui::Text("iterative solver passes %d", m_solverPasses);
 			ImGui::SliderInt_DoubleSpace("solver sub steps", &m_solverSubSteps, 2, 8);
-			ImGui::SliderInt_DoubleSpace("iterative solver passes", &m_solverPasses, 4, 20);
+			ImGui::SliderInt_DoubleSpace("iterative solver passes", &m_solverPasses, 4, 64);
 
 			//ImGui::Text("worker threads %d", m_workerThreads);
 			ImGui::SliderInt_DoubleSpace("worker threads", &m_workerThreads, 1, 20);

@@ -96,8 +96,6 @@ class dgCollisionConvex: public dgCollision
 	dgUnsigned16 m_edgeCount;
 	dgUnsigned16 m_vertexCount;
 	
-	public:	
-
 	friend class dgWorld;
 	friend class dgBroadPhase;
 	friend class dgMinkowskiConv;
