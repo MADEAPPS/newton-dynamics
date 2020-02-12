@@ -978,7 +978,6 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddDifferential(scene, dVector(-20.0f, 0.0f, 33.0f));
 //	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
 //	AddHinge(scene, dVector(-20.0f, 0.0f, 0.0f));
-
 	AddFlexyPipe(scene, dVector(-20.0f, 0.0f, 0.0f));
 
 #if 0
@@ -1000,6 +999,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 29.0f));
 	AddDifferential(scene, dVector(-20.0f, 0.0f, 35.0f));
 	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
+	AddFlexyPipe(scene, dVector(0.0f, 0.0f, 5.0f));
 #endif
 
     // place camera into position
