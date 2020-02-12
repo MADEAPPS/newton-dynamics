@@ -32,6 +32,7 @@ dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame, Newt
 	,m_maxConeAngle(D_BALL_AND_SOCKED_MAX_CONE_ANGLE)
 	,m_coneFriction(0.0f)
 	,m_twistFriction(0.0f)
+	,m_coneStiffness(1.0f)
 {
 	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
@@ -44,6 +45,7 @@ dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame0, con
 	,m_maxConeAngle(D_BALL_AND_SOCKED_MAX_CONE_ANGLE)
 	,m_coneFriction(0.0f)
 	,m_twistFriction(0.0f)
+	,m_coneStiffness(1.0f)
 {
 	dMatrix	dummy;
 	CalculateLocalMatrix(pinAndPivotFrame0, m_localMatrix0, dummy);
@@ -62,6 +64,7 @@ void dCustomBallAndSocket::Deserialize(NewtonDeserializeCallback callback, void*
 	callback(userData, &m_maxConeAngle, sizeof(dFloat));
 	callback(userData, &m_coneFriction, sizeof(dFloat));
 	callback(userData, &m_twistFriction, sizeof(dFloat));
+	callback(userData, &m_coneStiffness, sizeof(dFloat));
 }
 
 void dCustomBallAndSocket::Serialize(NewtonSerializeCallback callback, void* const userData) const
@@ -74,6 +77,7 @@ void dCustomBallAndSocket::Serialize(NewtonSerializeCallback callback, void* con
 	callback(userData, &m_maxConeAngle, sizeof(dFloat));
 	callback(userData, &m_coneFriction, sizeof(dFloat));
 	callback(userData, &m_twistFriction, sizeof(dFloat));
+	callback(userData, &m_coneStiffness, sizeof(dFloat));
 }
 
 void dCustomBallAndSocket::EnableTwist(bool state)
@@ -128,6 +132,15 @@ dFloat dCustomBallAndSocket::GetConeFriction(dFloat frictionTorque) const
 	return m_coneFriction;
 }
 
+void dCustomBallAndSocket::SetConeStiffness(dFloat coneStiffness)
+{
+	m_coneStiffness = coneStiffness;
+}
+
+dFloat dCustomBallAndSocket::GetConeStiffness(dFloat frictionTorque) const
+{
+	return m_coneStiffness;
+}
 
 void dCustomBallAndSocket::SetTwistSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
 {
@@ -278,7 +291,8 @@ void dCustomBallAndSocket::SubmitAngularAxisCartisianApproximation(const dMatrix
 		const dFloat angleError = GetMaxAngleError();
 		dFloat angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 		NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_up[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowStiffness(m_joint, m_coneStiffness);
 		if (dAbs(angle0) > angleError) {
 			const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle0 / (timestep * timestep);
 			NewtonUserJointSetRowAcceleration(m_joint, alpha);
@@ -286,7 +300,8 @@ void dCustomBallAndSocket::SubmitAngularAxisCartisianApproximation(const dMatrix
 
 		dFloat angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 		NewtonUserJointAddAngularRow(m_joint, angle1, &matrix1.m_right[0]);
-		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		NewtonUserJointSetRowStiffness(m_joint, m_coneStiffness);
 		if (dAbs(angle1) > angleError) {
 			const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle1 / (timestep * timestep);
 			NewtonUserJointSetRowAcceleration(m_joint, alpha);
@@ -320,7 +335,8 @@ void dCustomBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 			}
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) - restoringOmega / timestep;
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowStiffness(m_joint, m_coneStiffness);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
 
 			dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
@@ -330,7 +346,8 @@ void dCustomBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowStiffness(m_joint, m_coneStiffness);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
 
 			dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
@@ -339,7 +356,8 @@ void dCustomBallAndSocket::SubmitAngularAxis(const dMatrix& matrix0, const dMatr
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			NewtonUserJointSetRowStiffness(m_joint, m_coneStiffness);
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_coneFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_coneFriction);
 

@@ -952,6 +952,7 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 		joint->EnableTwist(true);
 		joint->SetTwistLimits(0.0f, 0.0f);
 		joint->EnableCone(true);
+		joint->SetConeStiffness(0.998f);
 	}
 }
 
