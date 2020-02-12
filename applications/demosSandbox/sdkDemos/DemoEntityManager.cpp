@@ -60,11 +60,11 @@
 //#define DEFAULT_SCENE	25		// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	26		// standard joints
 //#define DEFAULT_SCENE	27		// servo joints
-#define DEFAULT_SCENE	28		// construction vehicle
+//#define DEFAULT_SCENE	28		// construction vehicle
 //#define DEFAULT_SCENE	29		// six axis manipulator
 //#define DEFAULT_SCENE	30		// hexapod Robot
 //#define DEFAULT_SCENE	31		// basic rag doll
-//#define DEFAULT_SCENE	32		// balancing biped
+#define DEFAULT_SCENE	32		// balancing biped
 //#define DEFAULT_SCENE	33		// multi body body vehicle
 //#define DEFAULT_SCENE	34		// super Car
 //#define DEFAULT_SCENE	35		// heavy vehicles
@@ -323,15 +323,15 @@ DemoEntityManager::DemoEntityManager ()
 //	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
-	m_workerThreads = 8;
+//	m_workerThreads = 8;
 //	m_solverSubSteps = 2;
 //	m_showRaycastHit = true;
 //	m_showCenterOfMass = false;
 //	m_showNormalForces = true;
 //	m_showContactPoints = true;
-//	m_showJointDebugInfo = true;
+	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
-//	m_showListenersDebugInfo = true;
+	m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
 
 	Cleanup();
@@ -1641,7 +1641,7 @@ void DemoEntityManager::RenderScene()
 
 	if (m_showJointDebugInfo) {
 		dJointDebugDisplay jointDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
-		jointDebugRender.SetScale(0.5f);
+		jointDebugRender.SetScale(0.2f);
 
 		RenderJointsDebugInfo(m_world, &jointDebugRender);
 	}

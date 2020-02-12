@@ -594,7 +594,10 @@ dBalacingCharacterEffector* dBalancingBiped::AddLeg(NewtonWorld* const world, dF
 
 	jointMatrix = dRollMatrix(90.0f * dDegreeToRad) * jointMatrix;
 	jointMatrix = dPitchMatrix(90.0f * dDegreeToRad) * jointMatrix;
-	new dCustomDoubleHinge(jointMatrix, footBody, shinBody);
+	dCustomDoubleHinge* const heelJoint = new dCustomDoubleHinge(jointMatrix, footBody, shinBody);
+	heelJoint->EnableLimits(true);
+	heelJoint->EnableLimits1(true);
+
 	dModelNode* const footAnkleBone = new dModelNode(footBody, dGetIdentityMatrix(), shinBone);
 
 	// release collision and visual mesh
@@ -745,6 +748,7 @@ class dBalancingBipedManager: public dModelManager
 
 	static void HandleSoftContacts(const NewtonJoint* const contactJoint, dFloat timestep, int threadIndex)
 	{
+/*
 		// iterate over all contact point checking is a sphere shape belong to the Biped, 
 		// if so declare this a soft contact 
 		dAssert (NewtonJointIsActive(contactJoint));
@@ -761,6 +765,7 @@ class dBalancingBipedManager: public dModelManager
 				NewtonMaterialSetAsSoftContact(material, 0.03f);
 			}
 		}
+*/
 	}
 };
 
@@ -775,7 +780,7 @@ void BalancingBiped(DemoEntityManager* const scene)
 	dBalancingBipedManager* const manager = new dBalancingBipedManager(scene);
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
-	origin.m_posit.m_y += 1.08f;
+	origin.m_posit.m_y += 1.15f;
 	manager->CreateBiped(origin);
 
 	origin.m_posit.m_x = -2.5f;
