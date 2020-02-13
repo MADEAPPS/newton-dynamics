@@ -459,8 +459,10 @@ void dBalancingBiped::AddUpperBody(NewtonWorld* const world)
 void dBalancingBiped::CreateDescreteContactFootCollision(NewtonBody* const footBody) const
 {
 	NewtonWorld* const world = NewtonBodyGetWorld(footBody);
-	//NewtonCollision* const boxCollision = NewtonBodyGetCollision(footBody);
-
+//#if 1
+//	NewtonCollision* const boxCollision = NewtonBodyGetCollision(footBody);
+//	NewtonBodySetCollision(footBody, boxCollision);
+#if 1
 	NewtonCollision* const sphereCollision = NewtonCreateSphere(world, 0.05f, 0, NULL);
 
 	dMatrix subShapeLocation(dGetIdentityMatrix());
@@ -512,6 +514,7 @@ void dBalancingBiped::CreateDescreteContactFootCollision(NewtonBody* const footB
 
 	NewtonDestroyCollision(sphereCollision);
 	NewtonDestroyCollision(threePointCollision);
+#endif
 }
 
 dBalacingCharacterEffector* dBalancingBiped::AddLeg(NewtonWorld* const world, dFloat dist)
