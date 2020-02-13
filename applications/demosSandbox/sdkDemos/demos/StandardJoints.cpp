@@ -951,8 +951,10 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 		dCustomBallAndSocket* const joint = new dCustomBallAndSocket(matrix, bodies[i - 1], bodies[i]);
 		joint->EnableTwist(true);
 		joint->SetTwistLimits(0.0f, 0.0f);
+		joint->SetTwistFriction(1.0e20f);
 		joint->EnableCone(true);
 		joint->SetConeLimits(0.0f);
+		joint->SetConeFriction(1.0e20f);
 		joint->SetConeStiffness(0.995f);
 	}
 }
