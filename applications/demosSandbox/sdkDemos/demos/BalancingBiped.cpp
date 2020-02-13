@@ -31,15 +31,18 @@ class dBalancingBiped;
 class dBalacingCharacterEffector: public dCustomKinematicController
 {
 	public:
-	dBalacingCharacterEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace, dFloat modelMass);
+	dBalacingCharacterEffector(dModelNode* const footAnkleBone, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace, dFloat modelMass);
 	void SetMatrix(dFloat x, dFloat y, dFloat z, dFloat pitch);
 	bool HasGroundContact() const;
 	dVector GetFootComInGlobalSpace () const;
+
+	NewtonBody* GetFootBody() const { return m_footBone->GetBody();}
 
 	dMatrix m_origin;
 	dFloat m_pitch;
 	dFloat m_yaw;
 	dFloat m_roll;
+	dModelNode* const m_footBone;
 };
 
 class dEffectorController
@@ -185,9 +188,10 @@ class dBalancingBiped: public dModelRootNode
 // implementation
 // ********************************
 
-dBalacingCharacterEffector::dBalacingCharacterEffector(NewtonBody* const body, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace, dFloat modelMass)
-	:dCustomKinematicController(body, attachmentMatrixInGlobalSpace, referenceBody)
+dBalacingCharacterEffector::dBalacingCharacterEffector(dModelNode* const footAnkleBone, NewtonBody* const referenceBody, const dMatrix& attachmentMatrixInGlobalSpace, dFloat modelMass)
+	:dCustomKinematicController(footAnkleBone->GetParent()->GetBody(), attachmentMatrixInGlobalSpace, referenceBody)
 	,m_origin(GetTargetMatrix())
+	,m_footBone(footAnkleBone)
 {
 	// set the joint as exact solver
 	SetSolverModel(1);
@@ -312,10 +316,10 @@ int dBalancingBiped::CalculateSupportPolygon(dVector& center, dVector* const sup
 {
 	int count = 0;
 	if (m_leftFoot) {
-		count += GetContactPoints(m_leftFoot->GetBody0(), &supporPolygonOut[count]);
+		count += GetContactPoints(m_leftFoot->GetFootBody(), &supporPolygonOut[count]);
 	}
 	if (m_rightFoot) {
-		count += GetContactPoints(m_rightFoot->GetBody0(), &supporPolygonOut[count]);
+		count += GetContactPoints(m_rightFoot->GetFootBody(), &supporPolygonOut[count]);
 	}
 	dAssert(count <= maxPoints);
 
@@ -459,10 +463,6 @@ void dBalancingBiped::AddUpperBody(NewtonWorld* const world)
 void dBalancingBiped::CreateDescreteContactFootCollision(NewtonBody* const footBody) const
 {
 	NewtonWorld* const world = NewtonBodyGetWorld(footBody);
-//#if 1
-//	NewtonCollision* const boxCollision = NewtonBodyGetCollision(footBody);
-//	NewtonBodySetCollision(footBody, boxCollision);
-#if 1
 	NewtonCollision* const sphereCollision = NewtonCreateSphere(world, 0.05f, 0, NULL);
 
 	dMatrix subShapeLocation(dGetIdentityMatrix());
@@ -514,7 +514,6 @@ void dBalancingBiped::CreateDescreteContactFootCollision(NewtonBody* const footB
 
 	NewtonDestroyCollision(sphereCollision);
 	NewtonDestroyCollision(threePointCollision);
-#endif
 }
 
 dBalacingCharacterEffector* dBalancingBiped::AddLeg(NewtonWorld* const world, dFloat dist)
@@ -589,7 +588,7 @@ dBalacingCharacterEffector* dBalancingBiped::AddLeg(NewtonWorld* const world, dF
 	tiltAnkleMatrix.m_posit = anklePivot - tiltAnkleMatrix.RotateVector(anklePivot);
 	location = location * tiltAnkleMatrix;
 	NewtonBody* const footBody = CreateSimpleSolid(scene, footGeometry, 10.0f, location, footCollision, 0);
-	CreateDescreteContactFootCollision(footBody);
+	//CreateDescreteContactFootCollision(footBody);
 
 	jointMatrix = location;
 	jointMatrix.m_posit = anklePivot;
@@ -600,8 +599,10 @@ dBalacingCharacterEffector* dBalancingBiped::AddLeg(NewtonWorld* const world, dF
 	dCustomDoubleHinge* const heelJoint = new dCustomDoubleHinge(jointMatrix, footBody, shinBody);
 	heelJoint->EnableLimits(true);
 	heelJoint->EnableLimits1(true);
-	heelJoint->SetFriction(20.0f);
-	heelJoint->SetFriction1(20.0f);
+
+dFloat xxx = 100.0f;
+	heelJoint->SetFriction(xxx);
+	heelJoint->SetFriction1(xxx);
 
 	dModelNode* const footAnkleBone = new dModelNode(footBody, dGetIdentityMatrix(), shinBone);
 
@@ -610,8 +611,7 @@ dBalacingCharacterEffector* dBalancingBiped::AddLeg(NewtonWorld* const world, dF
 	NewtonDestroyCollision(footCollision);
 
 	// save ankle matrix as the effector pivot 
-	//return new dBalacingCharacterEffector(footAnkleBone->GetBody(), m_body, effectorMatrix, D_BIPED_MASS);
-	return new dBalacingCharacterEffector(footAnkleBone->GetParent()->GetBody(), m_body, effectorMatrix, D_BIPED_MASS);
+	return new dBalacingCharacterEffector(footAnkleBone, m_body, effectorMatrix, D_BIPED_MASS);
 }
 
 
@@ -785,7 +785,7 @@ void BalancingBiped(DemoEntityManager* const scene)
 	dBalancingBipedManager* const manager = new dBalancingBipedManager(scene);
 
 	dMatrix origin (dYawMatrix(0.0f * dDegreeToRad));
-	origin.m_posit.m_y += 1.15f;
+	origin.m_posit.m_y += 1.05f;
 	manager->CreateBiped(origin);
 
 	origin.m_posit.m_x = -2.5f;
