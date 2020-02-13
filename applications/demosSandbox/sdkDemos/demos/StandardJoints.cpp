@@ -946,13 +946,14 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 		dMatrix matrix1;
 		NewtonBodyGetMatrix(bodies[i - 1], &matrix0[0][0]);
 		NewtonBodyGetMatrix(bodies[i], &matrix1[0][0]);
-		matrix0.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale(0.5f);
-
-		dCustomBallAndSocket* const joint = new dCustomBallAndSocket(matrix0, bodies[i - 1], bodies[i]);
+		dMatrix matrix(dGrammSchmidt(matrix1.m_posit - matrix0.m_posit));
+		matrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale(0.5f);
+		dCustomBallAndSocket* const joint = new dCustomBallAndSocket(matrix, bodies[i - 1], bodies[i]);
 		joint->EnableTwist(true);
 		joint->SetTwistLimits(0.0f, 0.0f);
 		joint->EnableCone(true);
-		joint->SetConeStiffness(0.998f);
+		joint->SetConeLimits(0.0f);
+		joint->SetConeStiffness(0.995f);
 	}
 }
 
