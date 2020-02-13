@@ -597,6 +597,8 @@ dBalacingCharacterEffector* dBalancingBiped::AddLeg(NewtonWorld* const world, dF
 	dCustomDoubleHinge* const heelJoint = new dCustomDoubleHinge(jointMatrix, footBody, shinBody);
 	heelJoint->EnableLimits(true);
 	heelJoint->EnableLimits1(true);
+	heelJoint->SetFriction(20.0f);
+	heelJoint->SetFriction1(20.0f);
 
 	dModelNode* const footAnkleBone = new dModelNode(footBody, dGetIdentityMatrix(), shinBone);
 
