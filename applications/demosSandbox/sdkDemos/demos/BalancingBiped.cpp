@@ -588,7 +588,7 @@ dBalacingCharacterEffector* dBalancingBiped::AddLeg(NewtonWorld* const world, dF
 	tiltAnkleMatrix.m_posit = anklePivot - tiltAnkleMatrix.RotateVector(anklePivot);
 	location = location * tiltAnkleMatrix;
 	NewtonBody* const footBody = CreateSimpleSolid(scene, footGeometry, 10.0f, location, footCollision, 0);
-	//CreateDescreteContactFootCollision(footBody);
+	CreateDescreteContactFootCollision(footBody);
 
 	jointMatrix = location;
 	jointMatrix.m_posit = anklePivot;
