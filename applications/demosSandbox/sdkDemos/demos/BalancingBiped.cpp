@@ -191,9 +191,9 @@ dBalacingCharacterEffector::dBalacingCharacterEffector(NewtonBody* const body, N
 {
 	// set the joint as exact solver
 	SetSolverModel(1);
-	//SetControlMode(dCustomKinematicController::m_linearAndTwist);
+	SetControlMode(dCustomKinematicController::m_linearAndTwist);
 	//SetControlMode(dCustomKinematicController::m_linear);
-	SetControlMode(dCustomKinematicController::m_full6dof);
+	//SetControlMode(dCustomKinematicController::m_full6dof);
 
 	dFloat gravity = 10.0f;
 	SetMaxAngularFriction(modelMass * 100.0f * gravity);
@@ -471,7 +471,7 @@ void dBalancingBiped::CreateDescreteContactFootCollision(NewtonBody* const footB
 	dFloat widthSeparation = 0.05f;
 	dFloat frontSeparation = 0.11f;
 
-#if 0
+#if 1
 	// tree points contacts
 	subShapeLocation.m_posit.m_z = frontSeparation;
 	subShapeLocation.m_posit.m_x = height;
@@ -605,8 +605,8 @@ dBalacingCharacterEffector* dBalancingBiped::AddLeg(NewtonWorld* const world, dF
 	NewtonDestroyCollision(footCollision);
 
 	// save ankle matrix as the effector pivot 
-	//return 0;
-	return new dBalacingCharacterEffector(footAnkleBone->GetBody(), m_body, effectorMatrix, D_BIPED_MASS);
+	//return new dBalacingCharacterEffector(footAnkleBone->GetBody(), m_body, effectorMatrix, D_BIPED_MASS);
+	return new dBalacingCharacterEffector(footAnkleBone->GetParent()->GetBody(), m_body, effectorMatrix, D_BIPED_MASS);
 }
 
 
@@ -642,16 +642,18 @@ void dBalanceController::Debug(dCustomJoint::dDebugDisplay* const debugContext)
 		debugContext->DrawPoint(centerOfGravity, 2.0f);
 	}
 
-	//if (m_biped->m_leftFoot) {
-	//	dMatrix matrix;
-	//	NewtonBodyGetMatrix(m_biped->m_leftFoot->GetBody0(), &matrix[0][0]);
-	//	debugContext->DrawFrame(matrix);
-	//}
-	//if (m_biped->m_rightFoot) {
-	//	dMatrix matrix;
-	//	NewtonBodyGetMatrix(m_biped->m_rightFoot->GetBody0(), &matrix[0][0]);
-	//	debugContext->DrawFrame(matrix);
-	//}
+	if (m_biped->m_leftFoot) {
+		//dMatrix matrix;
+		//NewtonBodyGetMatrix(m_biped->m_leftFoot->GetBody0(), &matrix[0][0]);
+		//debugContext->DrawFrame(matrix);
+		m_biped->m_leftFoot->Debug(debugContext);
+	}
+	if (m_biped->m_rightFoot) {
+		//dMatrix matrix;
+		//NewtonBodyGetMatrix(m_biped->m_rightFoot->GetBody0(), &matrix[0][0]);
+		//debugContext->DrawFrame(matrix);
+		m_biped->m_rightFoot->Debug(debugContext);
+	}
 }
 
 bool dBalanceController::Update(dFloat timestep)
@@ -697,8 +699,6 @@ void dBalanceController::SetEffectorPosition(dBalacingCharacterEffector* const e
 	effectorMatrix.m_posit = position;
 	effector->SetTargetMatrix(effectorMatrix);
 }
-
-
 
 class dBalancingBipedManager: public dModelManager
 {
