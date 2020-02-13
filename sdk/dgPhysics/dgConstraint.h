@@ -86,7 +86,7 @@ class dgForceImpactPair
 	dgFloat32 GetInitiailGuess() const
 	{
 		dgFloat32 value = dgFloat32(0.0f);
-		dgFloat32 smallest = dgFloat32(1.0e10f);
+		dgFloat32 smallest = dgFloat32(1.0e15f);
 		for (dgInt32 i = 0; i < sizeof(m_initialGuess) / sizeof(m_initialGuess[0]); i++)
 		{
 			dgFloat32 mag = dgAbs(m_initialGuess[i]);

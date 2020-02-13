@@ -31,7 +31,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define DG_CONVEX_VERTEX_CHUNK_SIZE	4
+#define DG_CONVEX_VERTEX_BOX_CELL_SIZE	(1<<3)
+#define DG_CONVEX_VERTEX_SPLITE_SIZE	(DG_CONVEX_VERTEX_BOX_CELL_SIZE * 3)
 
 DG_MSC_VECTOR_ALIGNMENT
 class dgCollisionConvexHull::dgConvexBox
@@ -578,7 +579,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 	m_faceArray = (dgConvexSimplexEdge **) m_allocator->Malloc(dgInt32 (m_faceCount * sizeof(dgConvexSimplexEdge *)));
 	memcpy (m_faceArray, &faceArray[0], m_faceCount * sizeof(dgConvexSimplexEdge *));
 	
-	if (vertexCount > DG_CONVEX_VERTEX_CHUNK_SIZE) {
+	if (vertexCount > DG_CONVEX_VERTEX_SPLITE_SIZE) {
 		// create a face structure for support vertex
 		dgStack<dgConvexBox> boxTree (vertexCount);
 		dgTree<dgVector,dgInt32> sortTree(GetAllocator());
@@ -609,7 +610,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 			stack --;
 			dgInt32 boxIndex = stackBoxPool[stack];
 			dgConvexBox& box = boxTree[boxIndex];
-			if (box.m_vertexCount > DG_CONVEX_VERTEX_CHUNK_SIZE) {
+			if (box.m_vertexCount > DG_CONVEX_VERTEX_BOX_CELL_SIZE) {
 				dgVector median (dgFloat32 (0.0f));
 				dgVector varian (dgFloat32 (0.0f));
 				for (dgInt32 i = 0; i < box.m_vertexCount; i ++) {
@@ -796,7 +797,7 @@ dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* con
 	dgAssert (dir.m_w == dgFloat32 (0.0f));
 	dgInt32 index = -1;
 	dgVector maxProj (dgFloat32 (-1.0e20f)); 
-	if (m_vertexCount > DG_CONVEX_VERTEX_CHUNK_SIZE) {
+	if (m_vertexCount > DG_CONVEX_VERTEX_SPLITE_SIZE) {
 		dgFloat32 distPool[32];
 		const dgConvexBox* stackPool[32];
 
