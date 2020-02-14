@@ -19,16 +19,16 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#if !defined(AFX_DGCOLLISIONCONVEXHULL_H__AS235640FER_H)
-#define AFX_DGCOLLISIONCONVEXHULL_H__AS235640FER_H
+#ifndef __DG_COLLISIONCONVEXHULL_H__
+#define __DG_COLLISIONCONVEXHULL_H__
 
 #include "dgCollisionConvex.h"
-
 
 class dgCollisionConvexHull: public dgCollisionConvex  
 {
 	public:
 	class dgConvexBox;
+	class dgSOAVectorArray;
 
 	dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned32 signature);
 	dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgInt32 count, dgInt32 strideInBytes, dgFloat32 tolerance, const dgFloat32* const vertexArray);
@@ -57,14 +57,14 @@ class dgCollisionConvexHull: public dgCollisionConvex
 
 	void MassProperties ();
 	virtual const dgConvexSimplexEdge** GetVertexToEdgeMapping() const {return m_vertexToEdgeMapping;}
-
-//	virtual dgFloat32 RayCast (const dgVector& localQ0, const dgVector& localP1, dgContactPoint& contactOut, const dgBody* const body, void* const userData) const;
-
-	dgInt32 m_faceCount;
-	dgInt32 m_supportTreeCount;
-	dgConvexSimplexEdge** m_faceArray;
-	const dgConvexSimplexEdge** m_vertexToEdgeMapping;
+	
 	dgConvexBox* m_supportTree;
+	dgConvexSimplexEdge** m_faceArray;
+	dgSOAVectorArray* m_soaVertexArray;
+	const dgConvexSimplexEdge** m_vertexToEdgeMapping;
+	dgInt32 m_faceCount;
+	dgInt32 m_soaVertexCount;
+	dgInt32 m_supportTreeCount;
 
 	friend class dgWorld;
 	friend class dgCollisionConvex;

@@ -35,6 +35,16 @@
 #define DG_CONVEX_VERTEX_SPLITE_SIZE	(DG_CONVEX_VERTEX_BOX_CELL_SIZE * 3)
 
 DG_MSC_VECTOR_ALIGNMENT
+class dgCollisionConvexHull::dgSOAVectorArray
+{
+	public:
+	dgVector m_x[DG_CONVEX_VERTEX_SPLITE_SIZE/4];
+	dgVector m_y[DG_CONVEX_VERTEX_SPLITE_SIZE/4];
+	dgVector m_z[DG_CONVEX_VERTEX_SPLITE_SIZE/4];
+	dgVector m_index[DG_CONVEX_VERTEX_SPLITE_SIZE/4];
+} DG_GCC_VECTOR_ALIGNMENT;
+
+DG_MSC_VECTOR_ALIGNMENT
 class dgCollisionConvexHull::dgConvexBox
 {
 	public:
@@ -47,11 +57,13 @@ class dgCollisionConvexHull::dgConvexBox
 
 dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned32 signature)
 	:dgCollisionConvex(allocator, signature, m_convexHullCollision)
-	,m_faceCount (0)
-	,m_supportTreeCount (0)
-	,m_faceArray (NULL)
+	,m_supportTree(NULL)
+	,m_faceArray(NULL)
+	,m_soaVertexArray(NULL)
 	,m_vertexToEdgeMapping(NULL)
-	,m_supportTree (NULL)
+	,m_faceCount(0)
+	,m_soaVertexCount(0)
+	,m_supportTreeCount(0)
 {
 	m_edgeCount = 0;
 	m_vertexCount = 0;
@@ -62,11 +74,13 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator,
 
 dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dgInt32 count, dgInt32 strideInBytes, dgFloat32 tolerance, const dgFloat32* const vertexArray)
 	:dgCollisionConvex(allocator, signature, m_convexHullCollision)
-	,m_faceCount (0)
-	,m_supportTreeCount (0)
-	,m_faceArray (NULL)
+	,m_supportTree(NULL)
+	,m_faceArray(NULL)
+	,m_soaVertexArray(NULL)
 	,m_vertexToEdgeMapping(NULL)
-	,m_supportTree (NULL)
+	,m_faceCount(0)
+	,m_soaVertexCount(0)
+	,m_supportTreeCount(0)
 {
 	m_edgeCount = 0;
 	m_vertexCount = 0;
@@ -77,34 +91,42 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgMemoryAllocator* const allocator,
 	BuildHull (count, strideInBytes, tolerance, vertexArray);
 }
 
-dgCollisionConvexHull::dgCollisionConvexHull(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
-	:dgCollisionConvex (world, deserialization, userData, revisionNumber)
-	,m_faceCount (0)
-	,m_supportTreeCount (0)
-	,m_faceArray (NULL)
+dgCollisionConvexHull::dgCollisionConvexHull(dgWorld* const world, dgDeserialize callback, void* const userData, dgInt32 revisionNumber)
+	:dgCollisionConvex (world, callback, userData, revisionNumber)
+	,m_supportTree(NULL)
+	,m_faceArray(NULL)
+	,m_soaVertexArray(NULL)
 	,m_vertexToEdgeMapping(NULL)
-	,m_supportTree (NULL)
+	,m_faceCount(0)
+	,m_soaVertexCount(0)
+	,m_supportTreeCount(0)
 {
 	m_rtti |= dgCollisionConvexHull_RTTI;
-	deserialization (userData, &m_vertexCount, sizeof (dgInt32));
-	deserialization (userData, &m_vertexCount, sizeof (dgInt32));
-	deserialization (userData, &m_faceCount, sizeof (dgInt32));
-	deserialization (userData, &m_edgeCount, sizeof (dgInt32));
-	deserialization (userData, &m_supportTreeCount, sizeof (dgInt32));
+	callback (userData, &m_vertexCount, sizeof (dgInt32));
+	callback (userData, &m_faceCount, sizeof (dgInt32));
+	callback (userData, &m_edgeCount, sizeof (dgInt32));
+
+	callback (userData, &m_soaVertexCount, sizeof (dgInt32));
+	callback (userData, &m_supportTreeCount, sizeof (dgInt32));
 	
 	m_vertex = (dgVector*) m_allocator->Malloc (dgInt32 (m_vertexCount * sizeof (dgVector)));
 	m_simplex = (dgConvexSimplexEdge*) m_allocator->Malloc (dgInt32 (m_edgeCount * sizeof (dgConvexSimplexEdge)));
 	m_faceArray = (dgConvexSimplexEdge **) m_allocator->Malloc(dgInt32 (m_faceCount * sizeof(dgConvexSimplexEdge *)));
 	m_vertexToEdgeMapping = (const dgConvexSimplexEdge **) m_allocator->Malloc(dgInt32 (m_vertexCount * sizeof(dgConvexSimplexEdge *)));
+
 	if (m_supportTreeCount) {
 		m_supportTree = (dgConvexBox *) m_allocator->Malloc(dgInt32 (m_supportTreeCount * sizeof(dgConvexBox)));
-		deserialization (userData, m_supportTree, m_supportTreeCount * sizeof(dgConvexBox));
+		callback (userData, m_supportTree, m_supportTreeCount * sizeof(dgConvexBox));
 	}
-	deserialization (userData, m_vertex, m_vertexCount * sizeof (dgVector));
+
+	if (m_soaVertexCount) {
+		m_soaVertexArray = (dgSOAVectorArray*) m_allocator->Malloc(sizeof(dgSOAVectorArray));
+		callback(userData, m_soaVertexArray, sizeof(dgSOAVectorArray));
+	}
 
 	for (dgInt32 i = 0; i < m_edgeCount; i ++) {
 		dgInt32 serialization[4];
-		deserialization (userData, serialization, sizeof (serialization));
+		callback (userData, serialization, sizeof (serialization));
 
 		m_simplex[i].m_vertex = serialization[0];
 		m_simplex[i].m_twin = m_simplex + serialization[1];
@@ -114,13 +136,13 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgWorld* const world, dgDeserialize
 
 	for (dgInt32 i = 0; i < m_faceCount; i ++) {
 		dgInt32 faceOffset;
-		deserialization (userData, &faceOffset, sizeof (dgInt32));
+		callback (userData, &faceOffset, sizeof (dgInt32));
 		m_faceArray[i] = m_simplex + faceOffset; 
 	}
 
 	for (dgInt32 i = 0; i < m_vertexCount; i ++) {
 		dgInt32 faceOffset;
-		deserialization (userData, &faceOffset, sizeof (dgInt32));
+		callback (userData, &faceOffset, sizeof (dgInt32));
 		m_vertexToEdgeMapping[i] = m_simplex + faceOffset; 
 	}
 
@@ -136,8 +158,13 @@ dgCollisionConvexHull::~dgCollisionConvexHull()
 	if (m_faceArray) {
 		m_allocator->Free(m_faceArray);
 	}
+
 	if (m_supportTree) {
 		m_allocator->Free(m_supportTree);
+	}
+
+	if (m_soaVertexArray) {
+		m_allocator->Free(m_soaVertexArray);
 	}
 }
 
@@ -581,7 +608,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 	
 	if (vertexCount > DG_CONVEX_VERTEX_SPLITE_SIZE) {
 		// create a face structure for support vertex
-		dgStack<dgConvexBox> boxTree (vertexCount);
+			dgStack<dgConvexBox> boxTree (vertexCount);
 		dgTree<dgVector,dgInt32> sortTree(GetAllocator());
 		dgStack<dgTree<dgVector,dgInt32>::dgTreeNode*> vertexNodeList(vertexCount);
 
@@ -725,6 +752,34 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 			dgInt32 index = dgInt32 (node->GetInfo().m_w);
 			ptr->m_vertex = dgInt16 (index);
 		}
+	} else {
+		m_soaVertexArray = (dgSOAVectorArray*) m_allocator->Malloc(sizeof(dgSOAVectorArray));
+
+		m_soaVertexCount = ((m_vertexCount + 7) & -8) / 8;
+		dgVector array[DG_CONVEX_VERTEX_SPLITE_SIZE];
+		for (dgInt32 i = 0; i < m_vertexCount; i ++) {
+			array[i] = m_vertex[i];
+		}
+
+		for (dgInt32 i = m_vertexCount; i < DG_CONVEX_VERTEX_SPLITE_SIZE; i ++) {
+			array[i] = array[0];
+		}
+
+		dgVector step (dgFloat32 (4.0f));
+		dgVector index (dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (2.0f), dgFloat32 (3.0f));
+		for (dgInt32 i = 0; i < DG_CONVEX_VERTEX_SPLITE_SIZE; i += 4) {
+			dgVector temp;
+			dgInt32 j = i / 4;
+			dgVector::Transpose4x4 (m_soaVertexArray->m_x[j], m_soaVertexArray->m_y[j], m_soaVertexArray->m_z[j], temp, 
+									m_vertex[i+0], m_vertex[i+1], m_vertex[i+2], m_vertex[i+3]);
+			m_soaVertexArray->m_index[j] = index;
+			index += step;
+		}
+
+		dgFloat32* const indexPtr = &m_soaVertexArray->m_index[0][0];
+		for (dgInt32 i = m_vertexCount; i < DG_CONVEX_VERTEX_SPLITE_SIZE; i++) {
+			indexPtr[i] = dgFloat32 (0.0f);
+		}
 	}
 
 	for (dgInt32 i = 0; i < m_edgeCount; i ++) {
@@ -770,16 +825,12 @@ void dgCollisionConvexHull::SetCollisionBBox (const dgVector& p0__, const dgVect
 
 void dgCollisionConvexHull::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
-//	dgTriplex tmp[1024 * 4];
-//	matrix.TransformTriplex (&tmp[0].m_x, sizeof (dgTriplex), &m_vertex[0].m_x, sizeof (dgVector), m_vertexCount);
-
 	dgTriplex vertex[256];
 	for (dgInt32 i = 0; i < m_faceCount; i ++) {
 		dgConvexSimplexEdge* const face = m_faceArray[i];
 		dgConvexSimplexEdge* ptr = face;
 		dgInt32 count = 0;
 		do {
-			//vertex[count] = tmp[ptr->m_vertex];
 			vertex[count].m_x = m_vertex[ptr->m_vertex].m_x;
 			vertex[count].m_y = m_vertex[ptr->m_vertex].m_y;
 			vertex[count].m_z = m_vertex[ptr->m_vertex].m_z;
@@ -792,118 +843,6 @@ void dgCollisionConvexHull::DebugCollision (const dgMatrix& matrix, dgCollision:
 	}
 }
 
-dgVector dgCollisionConvexHull::SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const
-{
-	dgAssert (dir.m_w == dgFloat32 (0.0f));
-	dgInt32 index = -1;
-	dgVector maxProj (dgFloat32 (-1.0e20f)); 
-	if (m_vertexCount > DG_CONVEX_VERTEX_SPLITE_SIZE) {
-		dgFloat32 distPool[32];
-		const dgConvexBox* stackPool[32];
-
-		dgInt32 ix = (dir[0] > dgFloat64 (0.0f)) ? 1 : 0;
-		dgInt32 iy = (dir[1] > dgFloat64 (0.0f)) ? 1 : 0;
-		dgInt32 iz = (dir[2] > dgFloat64 (0.0f)) ? 1 : 0;
-
-		const dgConvexBox& leftBox = m_supportTree[m_supportTree[0].m_leftBox];
-		const dgConvexBox& rightBox = m_supportTree[m_supportTree[0].m_rightBox];
-		
-		dgVector leftP (leftBox.m_box[ix][0], leftBox.m_box[iy][1], leftBox.m_box[iz][2], dgFloat32 (0.0f));
-		dgVector rightP (rightBox.m_box[ix][0], rightBox.m_box[iy][1], rightBox.m_box[iz][2], dgFloat32 (0.0f));
-
-		dgFloat32 leftDist = leftP.DotProduct(dir).m_x;
-		dgFloat32 rightDist = rightP.DotProduct(dir).m_x;
-		if (rightDist >= leftDist) {
-			distPool[0] = leftDist;
-			stackPool[0] = &leftBox; 
-
-			distPool[1] = rightDist;
-			stackPool[1] = &rightBox; 
-		} else {
-			distPool[0] = rightDist;
-			stackPool[0] = &rightBox; 
-
-			distPool[1] = leftDist;
-			stackPool[1] = &leftBox; 
-		}
-		
-		dgInt32 stack = 2;
-		
-		while (stack) {
-			stack--;
-			dgFloat32 dist = distPool[stack];
-			if (dist > maxProj.m_x) {
-				const dgConvexBox& box = *stackPool[stack];
-
-				if (box.m_leftBox > 0) {
-					dgAssert (box.m_rightBox > 0);
-					const dgConvexBox& leftBox1 = m_supportTree[box.m_leftBox];
-					const dgConvexBox& rightBox1 = m_supportTree[box.m_rightBox];
-
-					dgVector leftBoxP (leftBox1.m_box[ix][0], leftBox1.m_box[iy][1], leftBox1.m_box[iz][2], dgFloat32 (0.0f));
-					dgVector rightBoxP (rightBox1.m_box[ix][0], rightBox1.m_box[iy][1], rightBox1.m_box[iz][2], dgFloat32 (0.0f));
-
-					dgFloat32 leftBoxDist = leftBoxP.DotProduct(dir).m_x;
-					dgFloat32 rightBoxDist = rightBoxP.DotProduct(dir).m_x;
-					if (rightBoxDist >= leftBoxDist) {
-						distPool[stack] = leftBoxDist;
-						stackPool[stack] = &leftBox1; 
-						stack ++;
-						dgAssert (stack < sizeof (distPool)/sizeof (distPool[0]));
-
-						distPool[stack] = rightBoxDist;
-						stackPool[stack] = &rightBox1; 
-						stack ++;
-						dgAssert (stack < sizeof (distPool)/sizeof (distPool[0]));
-
-					} else {
-						distPool[stack] = rightBoxDist;
-						stackPool[stack] = &rightBox1; 
-						stack ++;
-						dgAssert (stack < sizeof (distPool)/sizeof (distPool[0]));
-
-						distPool[stack] = leftBoxDist;
-						stackPool[stack] = &leftBox1; 
-						stack ++;
-						dgAssert (stack < sizeof (distPool)/sizeof (distPool[0]));
-					}
-				} else {
-					for (dgInt32 i = 0; i < box.m_vertexCount; i ++) {
-						const dgVector& p = m_vertex[box.m_vertexStart + i];
-						dgAssert (p.m_x >= box.m_box[0].m_x);
-						dgAssert (p.m_x <= box.m_box[1].m_x);
-						dgAssert (p.m_y >= box.m_box[0].m_y);
-						dgAssert (p.m_y <= box.m_box[1].m_y);
-						dgAssert (p.m_z >= box.m_box[0].m_z);
-						dgAssert (p.m_z <= box.m_box[1].m_z);
-						dgVector projectionDist (p.DotProduct(dir));
-						dgVector mask (projectionDist > maxProj);
-						dgInt32 intMask = *((dgInt32*) &mask.m_x);
-						index = ((box.m_vertexStart + i) & intMask) | (index & ~intMask);
-						maxProj = maxProj.GetMax(projectionDist);
-					}
-				}
-			}
-		}
-	} else {
-		for (dgInt32 i = 0; i < m_vertexCount; i ++) {
-			const dgVector& p = m_vertex[i];
-			dgVector dist (p.DotProduct(dir));
-			dgVector mask (dist > maxProj);
-			dgInt32 intMask = *((dgInt32*) &mask.m_x);
-			index = (i & intMask) | (index & ~intMask);
-			maxProj = maxProj.GetMax(dist);
-		}
-	}
-
-	if (vertexIndex) {
-		*vertexIndex = index;
-	}
-	dgAssert (index != -1);
-	return m_vertex[index];
-}
-
-
 void dgCollisionConvexHull::GetCollisionInfo(dgCollisionInfo* const info) const
 {
 	dgCollisionConvex::GetCollisionInfo(info);
@@ -912,7 +851,6 @@ void dgCollisionConvexHull::GetCollisionInfo(dgCollisionInfo* const info) const
 	info->m_convexHull.m_strideInBytes = sizeof (dgVector);
 	info->m_convexHull.m_faceCount = m_faceCount;
 	info->m_convexHull.m_vertex = &m_vertex[0];
-
 }
 
 void dgCollisionConvexHull::Serialize(dgSerialize callback, void* const userData) const
@@ -920,15 +858,18 @@ void dgCollisionConvexHull::Serialize(dgSerialize callback, void* const userData
 	SerializeLow(callback, userData);
 
 	callback (userData, &m_vertexCount, sizeof (dgInt32));
-	callback (userData, &m_vertexCount, sizeof (dgInt32));
 	callback (userData, &m_faceCount, sizeof (dgInt32));
 	callback (userData, &m_edgeCount, sizeof (dgInt32));
+	callback (userData, &m_soaVertexCount, sizeof (dgInt32));
 	callback (userData, &m_supportTreeCount, sizeof (dgInt32));
 	
 	if (m_supportTreeCount) {
 		callback (userData, m_supportTree, m_supportTreeCount * sizeof(dgConvexBox));
 	}
-	callback (userData, m_vertex, m_vertexCount * sizeof (dgVector));
+	
+	if (m_soaVertexCount) {
+		callback (userData, m_soaVertexArray, sizeof(dgSOAVectorArray));
+	}
 
 	for (dgInt32 i = 0; i < m_edgeCount; i ++) {
 		dgInt32 serialization[4];
@@ -952,6 +893,146 @@ void dgCollisionConvexHull::Serialize(dgSerialize callback, void* const userData
 	}
 }
 
+dgVector dgCollisionConvexHull::SupportVertex(const dgVector& dir, dgInt32* const vertexIndex) const
+{
+	dgAssert(dir.m_w == dgFloat32(0.0f));
+	dgInt32 index = -1;
+	dgVector maxProj(dgFloat32(-1.0e20f));
+	if (m_vertexCount > DG_CONVEX_VERTEX_SPLITE_SIZE) {
+		dgFloat32 distPool[32];
+		const dgConvexBox* stackPool[32];
 
+		dgInt32 ix = (dir[0] > dgFloat64(0.0f)) ? 1 : 0;
+		dgInt32 iy = (dir[1] > dgFloat64(0.0f)) ? 1 : 0;
+		dgInt32 iz = (dir[2] > dgFloat64(0.0f)) ? 1 : 0;
+
+		const dgConvexBox& leftBox = m_supportTree[m_supportTree[0].m_leftBox];
+		const dgConvexBox& rightBox = m_supportTree[m_supportTree[0].m_rightBox];
+
+		dgVector leftP(leftBox.m_box[ix][0], leftBox.m_box[iy][1], leftBox.m_box[iz][2], dgFloat32(0.0f));
+		dgVector rightP(rightBox.m_box[ix][0], rightBox.m_box[iy][1], rightBox.m_box[iz][2], dgFloat32(0.0f));
+
+		dgFloat32 leftDist = leftP.DotProduct(dir).GetScalar();
+		dgFloat32 rightDist = rightP.DotProduct(dir).GetScalar();
+		if (rightDist >= leftDist) {
+			distPool[0] = leftDist;
+			stackPool[0] = &leftBox;
+
+			distPool[1] = rightDist;
+			stackPool[1] = &rightBox;
+		} else {
+			distPool[0] = rightDist;
+			stackPool[0] = &rightBox;
+
+			distPool[1] = leftDist;
+			stackPool[1] = &leftBox;
+		}
+
+		dgInt32 stack = 2;
+
+		while (stack) {
+			stack--;
+			dgFloat32 dist = distPool[stack];
+			if (dist > maxProj.m_x) {
+				const dgConvexBox& box = *stackPool[stack];
+
+				if (box.m_leftBox > 0) {
+					dgAssert(box.m_rightBox > 0);
+					const dgConvexBox& leftBox1 = m_supportTree[box.m_leftBox];
+					const dgConvexBox& rightBox1 = m_supportTree[box.m_rightBox];
+
+					dgVector leftBoxP(leftBox1.m_box[ix][0], leftBox1.m_box[iy][1], leftBox1.m_box[iz][2], dgFloat32(0.0f));
+					dgVector rightBoxP(rightBox1.m_box[ix][0], rightBox1.m_box[iy][1], rightBox1.m_box[iz][2], dgFloat32(0.0f));
+
+					dgFloat32 leftBoxDist = leftBoxP.DotProduct(dir).GetScalar();
+					dgFloat32 rightBoxDist = rightBoxP.DotProduct(dir).GetScalar();
+					if (rightBoxDist >= leftBoxDist) {
+						distPool[stack] = leftBoxDist;
+						stackPool[stack] = &leftBox1;
+						stack++;
+						dgAssert(stack < sizeof (distPool) / sizeof (distPool[0]));
+
+						distPool[stack] = rightBoxDist;
+						stackPool[stack] = &rightBox1;
+						stack++;
+						dgAssert(stack < sizeof (distPool) / sizeof (distPool[0]));
+
+					} else {
+						distPool[stack] = rightBoxDist;
+						stackPool[stack] = &rightBox1;
+						stack++;
+						dgAssert(stack < sizeof (distPool) / sizeof (distPool[0]));
+
+						distPool[stack] = leftBoxDist;
+						stackPool[stack] = &leftBox1;
+						stack++;
+						dgAssert(stack < sizeof (distPool) / sizeof (distPool[0]));
+					}
+				} else {
+					for (dgInt32 i = 0; i < box.m_vertexCount; i++) {
+						const dgVector& p = m_vertex[box.m_vertexStart + i];
+						dgAssert(p.m_x >= box.m_box[0].m_x);
+						dgAssert(p.m_x <= box.m_box[1].m_x);
+						dgAssert(p.m_y >= box.m_box[0].m_y);
+						dgAssert(p.m_y <= box.m_box[1].m_y);
+						dgAssert(p.m_z >= box.m_box[0].m_z);
+						dgAssert(p.m_z <= box.m_box[1].m_z);
+						dgVector projectionDist(p.DotProduct(dir));
+						dgVector mask(projectionDist > maxProj);
+						dgInt32 intMask = *((dgInt32*)&mask.m_x);
+						index = ((box.m_vertexStart + i) & intMask) | (index & ~intMask);
+						maxProj = maxProj.GetMax(projectionDist);
+					}
+				}
+			}
+		}
+	} else {
+#if 0
+		for (dgInt32 i = 0; i < m_vertexCount; i++) {
+			const dgVector& p = m_vertex[i];
+			dgVector dist(p.DotProduct(dir));
+			dgVector mask(dist > maxProj);
+			dgInt32 intMask = *((dgInt32*)&mask.m_x);
+			index = (i & intMask) | (index & ~intMask);
+			maxProj = maxProj.GetMax(dist);
+		}
+#else
+		const dgVector x(dir.m_x);
+		const dgVector y(dir.m_y);
+		const dgVector z(dir.m_z);
+		dgVector support (dgFloat32 (-1.0f));
+		for (dgInt32 i = 0; i < m_soaVertexCount; i++) {
+			dgVector dot (m_soaVertexArray->m_x[i * 2 + 0] * x + 
+						  m_soaVertexArray->m_y[i * 2 + 0] * y + 
+						  m_soaVertexArray->m_z[i * 2 + 0] * z);
+			support = support.Select (m_soaVertexArray->m_index[i * 2 + 0], dot > maxProj);
+			maxProj = maxProj.GetMax(dot);
+
+			dot = m_soaVertexArray->m_x[i * 2 + 1] * x +
+				  m_soaVertexArray->m_y[i * 2 + 1] * y +
+				  m_soaVertexArray->m_z[i * 2 + 1] * z;
+			support = support.Select(m_soaVertexArray->m_index[i * 2 + 1], dot > maxProj);
+			maxProj = maxProj.GetMax(dot);
+		}
+		 
+		dgVector dot (maxProj.ShiftRight().ShiftRight());
+		dgVector support1 (support.ShiftRight().ShiftRight());
+		support = support.Select(support1, dot > maxProj);
+		maxProj = maxProj.GetMax(dot);
+
+		dot = dgVector (maxProj.ShiftRight());
+		support1 = dgVector (support.ShiftRight());
+		support = support.Select(support1, dot > maxProj);
+
+		index = dgInt32 (support.GetScalar()); 
+#endif
+	}
+
+	if (vertexIndex) {
+		*vertexIndex = index;
+	}
+	dgAssert(index != -1);
+	return m_vertex[index];
+}
 
 

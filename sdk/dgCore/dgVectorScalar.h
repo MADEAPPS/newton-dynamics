@@ -409,6 +409,11 @@ class dgVector
 		return (((a[0] & 0x80000000) ? 1 : 0) | ((a[1] & 0x80000000) ? 2 : 0) | ((a[2] & 0x80000000) ? 4 : 0) | ((a[3] & 0x80000000) ? 8 : 0));
 	} 
 
+	DG_INLINE dgVector ShiftRight() const
+	{
+		return dgBigVector (m_w, m_x, m_y, m_z); 
+	}
+
 	DG_INLINE dgVector ShiftTripleRight () const
 	{
 		return dgVector (m_z, m_x, m_y, m_w); 
@@ -839,6 +844,11 @@ class dgBigVector
 		const dgInt64* const a = (dgInt64*)&m_x;
 		return (((a[0]>>63) ? 1 : 0) | ((a[1]>>63) ? 2 : 0) | ((a[2]>>63) ? 4 : 0) | ((a[3]>>63) ? 8 : 0));
 	} 
+
+	DG_INLINE dgVector ShiftRight() const
+	{
+		return dgBigVector (m_w, m_x, m_y, m_z); 
+	}
 
 	DG_INLINE dgBigVector ShiftTripleRight () const
 	{

@@ -368,6 +368,11 @@ class dgVector
 		return _mm_movemask_ps(m_type);
 	} 
 
+	DG_INLINE dgVector ShiftRight() const
+	{
+		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(2, 1, 0, 3));
+	}
+
 	DG_INLINE dgVector ShiftTripleRight () const
 	{
 		return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(3, 1, 0, 2));
@@ -592,11 +597,6 @@ class dgBigVector
 	// return cross product
 	DG_INLINE dgBigVector CrossProduct(const dgBigVector& B) const
 	{
-		//dgBigVector tmp0(ShiftTripleLeft());
-		//dgBigVector tmp1(B.ShiftTripleRight());
-		//dgBigVector tmp2(ShiftTripleRight());
-		//dgBigVector tmp3(B.ShiftTripleLeft());
-		//return tmp0 * tmp1 - tmp2 * tmp3;
 		return dgBigVector(m_y * B.m_z - m_z * B.m_y, m_z * B.m_x - m_x * B.m_z, m_x * B.m_y - m_y * B.m_x, m_w);
 	}
 
@@ -739,6 +739,14 @@ class dgBigVector
 		//return  _mm_or_ps (_mm_and_ps (mask.m_type, data.m_type), _mm_andnot_ps(mask.m_type, m_type));
 		return  dgBigVector(_mm_xor_pd(m_typeLow, _mm_and_pd(mask.m_typeLow, _mm_xor_pd(m_typeLow, data.m_typeLow))),
 							_mm_xor_pd(m_typeHigh, _mm_and_pd(mask.m_typeHigh, _mm_xor_pd(m_typeHigh, data.m_typeHigh))));
+	}
+
+	DG_INLINE dgBigVector ShiftRight() const
+	{
+		//return _mm_shuffle_ps(m_type, m_type, PERMUTE_MASK(2, 1, 0, 3));
+		dgAssert (0);
+		return dgBigVector (m_z, m_x, m_y, m_w); 
+		//return dgBigVector(_mm_shuffle_pd(m_typeHigh, m_typeLow, PERMUT_MASK_DOUBLE(0, 0)), _mm_shuffle_pd(m_typeLow, m_typeHigh, PERMUT_MASK_DOUBLE(1, 1)));
 	}
 
 	DG_INLINE dgBigVector ShiftTripleRight() const

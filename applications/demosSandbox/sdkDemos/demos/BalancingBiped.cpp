@@ -42,7 +42,7 @@ class dBalacingCharacterEffector: public dCustomKinematicController
 	dFloat m_pitch;
 	dFloat m_yaw;
 	dFloat m_roll;
-	dModelNode* const m_footBone;
+	dModelNode* m_footBone;
 };
 
 class dEffectorController

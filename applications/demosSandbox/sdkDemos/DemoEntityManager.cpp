@@ -50,7 +50,7 @@
 //#define DEFAULT_SCENE	15		// user height field Collision
 //#define DEFAULT_SCENE	16		// compound Collision
 //#define DEFAULT_SCENE	17		// simple Archimedes buoyancy
-//#define DEFAULT_SCENE	18		// uniform Scaled Collision
+#define DEFAULT_SCENE	18		// uniform Scaled Collision
 //#define DEFAULT_SCENE	19		// non uniform Scaled Collision
 //#define DEFAULT_SCENE	20		// scaled mesh collision
 //#define DEFAULT_SCENE	21		// continuous collision
@@ -64,7 +64,7 @@
 //#define DEFAULT_SCENE	29		// six axis manipulator
 //#define DEFAULT_SCENE	30		// hexapod Robot
 //#define DEFAULT_SCENE	31		// basic rag doll
-#define DEFAULT_SCENE	32		// balancing biped
+//#define DEFAULT_SCENE	32		// balancing biped
 //#define DEFAULT_SCENE	33		// multi body body vehicle
 //#define DEFAULT_SCENE	34		// super Car
 //#define DEFAULT_SCENE	35		// heavy vehicles
