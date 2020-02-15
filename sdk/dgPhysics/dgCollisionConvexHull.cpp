@@ -1008,18 +1008,18 @@ dgVector dgCollisionConvexHull::SupportVertex(const dgVector& dir, dgInt32* cons
 		const dgVector x(dir.m_x);
 		const dgVector y(dir.m_y);
 		const dgVector z(dir.m_z);
-		dgVector support (dgFloat32 (-1.0f));
-		for (dgInt32 i = 0; i < m_soaVertexCount; i++) {
-			dgVector dot (m_soaVertexArray->m_x[i * 2 + 0] * x + 
-						  m_soaVertexArray->m_y[i * 2 + 0] * y + 
-						  m_soaVertexArray->m_z[i * 2 + 0] * z);
-			support = support.Select (m_soaVertexArray->m_index[i * 2 + 0], dot > maxProj);
+		dgVector support (dgVector::m_negOne);
+		for (dgInt32 i = 0; i < m_soaVertexCount; i+=2) {
+			dgVector dot (m_soaVertexArray->m_x[i] * x + 
+						  m_soaVertexArray->m_y[i] * y + 
+						  m_soaVertexArray->m_z[i] * z);
+			support = support.Select (m_soaVertexArray->m_index[i], dot > maxProj);
 			maxProj = maxProj.GetMax(dot);
 
-			dot = m_soaVertexArray->m_x[i * 2 + 1] * x +
-				  m_soaVertexArray->m_y[i * 2 + 1] * y +
-				  m_soaVertexArray->m_z[i * 2 + 1] * z;
-			support = support.Select(m_soaVertexArray->m_index[i * 2 + 1], dot > maxProj);
+			dot = m_soaVertexArray->m_x[i + 1] * x +
+				  m_soaVertexArray->m_y[i + 1] * y +
+				  m_soaVertexArray->m_z[i + 1] * z;
+			support = support.Select(m_soaVertexArray->m_index[i + 1], dot > maxProj);
 			maxProj = maxProj.GetMax(dot);
 		}
 		 
