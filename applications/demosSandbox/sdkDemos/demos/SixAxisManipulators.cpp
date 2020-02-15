@@ -155,7 +155,7 @@ class dSixAxisManager: public dModelManager
 		,m_gripper_yaw(0.0f)
 		,m_gripper_roll(0.0f)
 	{
-		scene->Set2DDisplayRenderFunction(RenderHelpMenu, NULL, this);
+		scene->Set2DDisplayRenderFunction(RenderHelpMenu, RenderUI, this);
 	}
 
 	~dSixAxisManager()
@@ -180,6 +180,109 @@ class dSixAxisManager: public dModelManager
 		ImGui::SliderFloat("pitch", &me->m_gripper_pitch, -180.0f, 180.0f);
 		ImGui::SliderFloat("yaw", &me->m_gripper_yaw, -80.0f, 130.0f);
 		ImGui::SliderFloat("roll", &me->m_gripper_roll, -180.0f, 180.0f);
+	}
+
+	static void RenderUI(DemoEntityManager* const scene, void* const context)
+	{
+		dSixAxisManager* const me = (dSixAxisManager*)context;
+		me->RenderUI(scene);
+	}
+
+	void RenderUI(DemoEntityManager* const scene)
+	{
+		TestSpline();
+	}
+
+	void TestSpline() const
+	{
+		static dBezierSpline spline;
+		if (spline.GetControlPointCount() == 0) {
+			dFloat64 knots[] = { 0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f };
+			dBigVector control[] =
+			{
+				dBigVector(200.0f, 200.0f, 0.0f, 1.0f),
+				dBigVector(150.0f, 250.0f, 0.0f, 1.0f),
+				dBigVector(250.0f, 300.0f, 0.0f, 1.0f),
+				dBigVector(350.0f, 250.0f, 0.0f, 1.0f),
+				dBigVector(250.0f, 150.0f, 0.0f, 1.0f),
+				dBigVector(200.0f, 200.0f, 0.0f, 1.0f),
+			};
+
+			spline.CreateFromKnotVectorAndControlPoints(3, sizeof (knots) / sizeof (knots[0]), knots, control);
+			dFloat64 u = (knots[1] + knots[2]) * 0.5f;
+			spline.InsertKnot(u);
+			spline.InsertKnot(u);
+			spline.InsertKnot(u);
+			spline.InsertKnot(u);
+			spline.InsertKnot(u);
+			spline.RemoveKnot(u, 1.0e-3f);
+			//spline.RemoveKnot (u, 1.0e-3f);
+		}
+
+		glDisable(GL_LIGHTING);
+//		glDisable(GL_TEXTURE_2D);
+
+		const int segments = 20;
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glBegin(GL_LINES);
+		dBigVector p0(spline.CurvePoint(0.0f));
+		for (int i = 1; i <= segments; i++) {
+			dBigVector p1(spline.CurvePoint(dFloat(i) / segments));
+			glVertex3f(dFloat32 (p0.m_x), dFloat32 (p0.m_y), dFloat32 (p0.m_z));
+			glVertex3f(dFloat32 (p1.m_x), dFloat32 (p1.m_y), dFloat32 (p1.m_z));
+			p0 = p1;
+		}
+		glEnd();
+
+		glColor3f(0.0f, 1.0f, 1.0f);
+		glPointSize(4.0f);
+		glBegin(GL_POINTS);
+		//dArray<dBigVector>& controlPoints = spline.GetControlPointArray();
+		for (int i = 0; i < spline.GetControlPointCount(); i++) {
+			dBigVector p(spline.GetControlPoint(i));
+			glVertex3f(dFloat32 (p.m_x), dFloat32 (p.m_y), dFloat32 (p.m_z));
+		}
+		glEnd();
+
+		// recreate the spline from sample points at equally spaced distance 
+		int pointCount = 4;
+		dBigVector points[5];
+		points[0] = spline.CurvePoint(0.0f / 3.0f) + dBigVector(300.0f, 0.0f, 0.0f, 0.0f);
+		points[1] = spline.CurvePoint(1.0f / 3.0f) + dBigVector(300.0f, 0.0f, 0.0f, 0.0f);
+		points[2] = spline.CurvePoint(2.0f / 3.0f) + dBigVector(300.0f, 0.0f, 0.0f, 0.0f);
+		points[3] = spline.CurvePoint(3.0f / 3.0f) + dBigVector(300.0f, 0.0f, 0.0f, 0.0f);
+
+		dBigVector derivP0(spline.CurveDerivative(0.0f));
+		dBigVector derivP1(spline.CurveDerivative(1.0f));
+
+		static dBezierSpline spline1;
+		spline1.GlobalCubicInterpolation(pointCount, points, derivP0, derivP1);
+
+		glColor3f(1.0f, 1.0f, 1.0f);
+		glBegin(GL_LINES);
+		p0 = spline1.CurvePoint(0.0f);
+		for (int i = 1; i <= segments; i++) {
+			dFloat64 u = dFloat(i) / segments;
+			dBigVector p1(spline1.CurvePoint(u));
+			glVertex3f(dFloat32 (p0.m_x), dFloat32 (p0.m_y), dFloat32 (p0.m_z));
+			glVertex3f(dFloat32 (p1.m_x), dFloat32 (p1.m_y), dFloat32 (p1.m_z));
+			p0 = p1;
+		}
+		glEnd();
+
+		glPointSize(4.0f);
+		glBegin(GL_POINTS);
+		glColor3f(0.0f, 1.0f, 1.0f);
+		for (int i = 0; i < spline.GetControlPointCount(); i++) {
+			dBigVector p(spline1.GetControlPoint(i));
+			glVertex3f(dFloat32 (p.m_x), dFloat32 (p.m_y), dFloat32 (p.m_z));
+		}
+
+		glColor3f(1.0f, 0.0f, 0.0f);
+		for (int i = 0; i < pointCount; i++) {
+			glVertex3f(dFloat32 (points[i].m_x), dFloat32 (points[i].m_y), dFloat32 (points[i].m_z));
+		}
+		glEnd();
 	}
 
 	static void ClampAngularVelocity(const NewtonBody* body, dFloat timestep, int threadIndex)

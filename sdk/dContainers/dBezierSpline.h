@@ -44,8 +44,6 @@ class dBezierSpline: public dContainersAlloc
 	DCONTAINERS_API bool RemoveKnot (dFloat64 u, dFloat64 tol);
 
 	DCONTAINERS_API int GetControlPointCount() const;
-	//DCONTAINERS_API dBigVector* GetControlPointArray();
-	//DCONTAINERS_API const dBigVector* GetControlPointArray() const;
 	DCONTAINERS_API dArray<dBigVector>& GetControlPointArray();
 	DCONTAINERS_API const dArray<dBigVector>& GetControlPointArray() const;
 

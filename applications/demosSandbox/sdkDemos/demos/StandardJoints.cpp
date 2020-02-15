@@ -924,10 +924,10 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 	int count = 50;
 	NewtonWorld* const world = scene->GetNewton();
 
-	dVector size(0.25f, 0.5f, 0.25f);
+	dVector capsuleSize(0.25f, 0.5f, 0.25f);
 	dMatrix aligment(dYawMatrix(90.0f * dDegreeToRad));
-	NewtonCollision* const capsuleShape = CreateConvexCollision(world, &aligment[0][0], size, _CAPSULE_PRIMITIVE, 0);
-	DemoMesh* const geometry = new DemoMesh("primitive", scene->GetShaderCache(), capsuleShape, "smilli.tga", "smilli.tga", "smilli.tga");
+	NewtonCollision* const capsuleShape = CreateConvexCollision(world, &aligment[0][0], capsuleSize, _CAPSULE_PRIMITIVE, 0);
+	DemoMesh* const capsuleGeometry = new DemoMesh("primitive", scene->GetShaderCache(), capsuleShape, "smilli.tga", "smilli.tga", "smilli.tga");
 
 	dFloat mass = 1.0f;
 	dMatrix matrix(dGetIdentityMatrix());
@@ -935,10 +935,10 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 	matrix.m_posit.m_y += 1.0f;
 	matrix.m_posit.m_w = 1.0f;
 	for (int i = 0; i < count; i++) {
-		bodies[i] = CreateSimpleSolid(scene, geometry, mass, matrix, capsuleShape, 0);
-		matrix.m_posit.m_z += size.m_y;
+		bodies[i] = CreateSimpleSolid(scene, capsuleGeometry, mass, matrix, capsuleShape, 0);
+		matrix.m_posit.m_z += capsuleSize.m_y;
 	}
-	geometry->Release();
+	capsuleGeometry->Release();
 	NewtonDestroyCollision(capsuleShape);
 
 	for (int i = 1; i < count; i++) {
@@ -946,9 +946,9 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 		dMatrix matrix1;
 		NewtonBodyGetMatrix(bodies[i - 1], &matrix0[0][0]);
 		NewtonBodyGetMatrix(bodies[i], &matrix1[0][0]);
-		dMatrix matrix(dGrammSchmidt(matrix1.m_posit - matrix0.m_posit));
-		matrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale(0.5f);
-		dCustomBallAndSocket* const joint = new dCustomBallAndSocket(matrix, bodies[i - 1], bodies[i]);
+		dMatrix jointMatrix(dGrammSchmidt(matrix1.m_posit - matrix0.m_posit));
+		jointMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale(0.5f);
+		dCustomBallAndSocket* const joint = new dCustomBallAndSocket(jointMatrix, bodies[i - 1], bodies[i]);
 		joint->EnableTwist(true);
 		joint->SetTwistLimits(0.0f, 0.0f);
 		joint->SetTwistFriction(1.0e20f);
@@ -957,6 +957,40 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 		joint->SetConeFriction(1.0e20f);
 		joint->SetConeStiffness(0.995f);
 	}
+
+	// add a cylinder to add as a controller handle 
+
+	dMatrix matrix0;
+	dMatrix matrix1;
+	NewtonBodyGetMatrix(bodies[0], &matrix0[0][0]);
+	NewtonBodyGetMatrix(bodies[1], &matrix1[0][0]);
+
+	dMatrix handleMatrix (matrix0);
+	handleMatrix.m_posit -= (matrix1.m_posit - matrix0.m_posit);
+
+	dVector cylinderSize(0.5f, 0.75f, 0.5f);
+	NewtonCollision* const cylinderShape = CreateConvexCollision(world, &aligment[0][0], cylinderSize, _CYLINDER_PRIMITIVE, 0);
+	DemoMesh* const cylinderGeometry = new DemoMesh("primitive", scene->GetShaderCache(), cylinderShape, "smilli.tga", "smilli.tga", "smilli.tga");
+
+	NewtonBody* const cylinderHandle = CreateSimpleSolid(scene, cylinderGeometry, mass * 30.0f, handleMatrix, cylinderShape, 0);
+
+	// connect the pipe to the handle
+	dVector dir(matrix1.m_posit - matrix0.m_posit);
+	dMatrix jointMatrix(dGrammSchmidt(dir));
+	jointMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f) - dir;
+
+	dCustomBallAndSocket* const joint = new dCustomBallAndSocket(jointMatrix, bodies[0], cylinderHandle);
+	joint->EnableTwist(true);
+	joint->SetTwistLimits(0.0f, 0.0f);
+	joint->SetTwistFriction(1.0e20f);
+	joint->EnableCone(true);
+	joint->SetConeLimits(0.0f);
+	joint->SetConeFriction(1.0e20f);
+	joint->SetConeStiffness(0.995f);
+
+	cylinderGeometry->Release();
+	NewtonDestroyCollision(cylinderShape);
+
 }
 
 void StandardJoints (DemoEntityManager* const scene)
@@ -981,6 +1015,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddDifferential(scene, dVector(-20.0f, 0.0f, 33.0f));
 //	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
 //	AddHinge(scene, dVector(-20.0f, 0.0f, 0.0f));
+//	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
 	AddFlexyPipe(scene, dVector(-20.0f, 0.0f, 0.0f));
 
 #if 0
