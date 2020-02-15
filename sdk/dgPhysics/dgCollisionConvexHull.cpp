@@ -102,26 +102,27 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgWorld* const world, dgDeserialize
 	,m_supportTreeCount(0)
 {
 	m_rtti |= dgCollisionConvexHull_RTTI;
-	callback (userData, &m_vertexCount, sizeof (dgInt32));
-	callback (userData, &m_faceCount, sizeof (dgInt32));
-	callback (userData, &m_edgeCount, sizeof (dgInt32));
 
-	callback (userData, &m_soaVertexCount, sizeof (dgInt32));
-	callback (userData, &m_supportTreeCount, sizeof (dgInt32));
+	dgInt32 edgeCount;
+	dgInt32 vertexCount;
+	callback(userData, &vertexCount, sizeof(dgInt32));
+	callback(userData, &edgeCount, sizeof(dgInt32));
+	callback(userData, &m_faceCount, sizeof(dgInt32));
+	callback(userData, &m_supportTreeCount, sizeof(dgInt32));
+
+	m_edgeCount = dgUnsigned16(edgeCount);
+	m_vertexCount = dgUnsigned16 (vertexCount);
 	
 	m_vertex = (dgVector*) m_allocator->Malloc (dgInt32 (m_vertexCount * sizeof (dgVector)));
 	m_simplex = (dgConvexSimplexEdge*) m_allocator->Malloc (dgInt32 (m_edgeCount * sizeof (dgConvexSimplexEdge)));
 	m_faceArray = (dgConvexSimplexEdge **) m_allocator->Malloc(dgInt32 (m_faceCount * sizeof(dgConvexSimplexEdge *)));
 	m_vertexToEdgeMapping = (const dgConvexSimplexEdge **) m_allocator->Malloc(dgInt32 (m_vertexCount * sizeof(dgConvexSimplexEdge *)));
 
+	callback(userData, m_vertex, m_vertexCount * sizeof(dgVector));
+
 	if (m_supportTreeCount) {
 		m_supportTree = (dgConvexBox *) m_allocator->Malloc(dgInt32 (m_supportTreeCount * sizeof(dgConvexBox)));
 		callback (userData, m_supportTree, m_supportTreeCount * sizeof(dgConvexBox));
-	}
-
-	if (m_soaVertexCount) {
-		m_soaVertexArray = (dgSOAVectorArray*) m_allocator->Malloc(sizeof(dgSOAVectorArray));
-		callback(userData, m_soaVertexArray, sizeof(dgSOAVectorArray));
 	}
 
 	for (dgInt32 i = 0; i < m_edgeCount; i ++) {
@@ -146,6 +147,10 @@ dgCollisionConvexHull::dgCollisionConvexHull(dgWorld* const world, dgDeserialize
 		m_vertexToEdgeMapping[i] = m_simplex + faceOffset; 
 	}
 
+	if (vertexCount <= DG_CONVEX_VERTEX_SPLITE_SIZE) {
+		CreateSOAdata();
+	}
+
 	SetVolumeAndCG ();
 }
 
@@ -165,6 +170,45 @@ dgCollisionConvexHull::~dgCollisionConvexHull()
 
 	if (m_soaVertexArray) {
 		m_allocator->Free(m_soaVertexArray);
+	}
+}
+
+void dgCollisionConvexHull::Serialize(dgSerialize callback, void* const userData) const
+{
+	SerializeLow(callback, userData);
+
+	dgInt32 edgeCount = m_edgeCount;
+	dgInt32 vertexCount = m_vertexCount;
+	callback(userData, &vertexCount, sizeof(dgInt32));
+	callback(userData, &edgeCount, sizeof(dgInt32));
+	callback(userData, &m_faceCount, sizeof(dgInt32));
+	callback(userData, &m_supportTreeCount, sizeof(dgInt32));
+
+	callback(userData, m_vertex, m_vertexCount * sizeof(dgVector));
+
+	if (m_supportTreeCount) {
+		callback(userData, m_supportTree, m_supportTreeCount * sizeof(dgConvexBox));
+	}
+
+	for (dgInt32 i = 0; i < m_edgeCount; i++) {
+		dgInt32 serialization[4];
+		serialization[0] = m_simplex[i].m_vertex;
+		serialization[1] = dgInt32(m_simplex[i].m_twin - m_simplex);
+		serialization[2] = dgInt32(m_simplex[i].m_next - m_simplex);
+		serialization[3] = dgInt32(m_simplex[i].m_prev - m_simplex);
+		callback(userData, serialization, sizeof(serialization));
+	}
+
+	for (dgInt32 i = 0; i < m_faceCount; i++) {
+		dgInt32 faceOffset;
+		faceOffset = dgInt32(m_faceArray[i] - m_simplex);
+		callback(userData, &faceOffset, sizeof(dgInt32));
+	}
+
+	for (dgInt32 i = 0; i < m_vertexCount; i++) {
+		dgInt32 faceOffset;
+		faceOffset = dgInt32(m_vertexToEdgeMapping[i] - m_simplex);
+		callback(userData, &faceOffset, sizeof(dgInt32));
 	}
 }
 
@@ -753,33 +797,7 @@ bool dgCollisionConvexHull::Create (dgInt32 count, dgInt32 strideInBytes, const 
 			ptr->m_vertex = dgInt16 (index);
 		}
 	} else {
-		m_soaVertexArray = (dgSOAVectorArray*) m_allocator->Malloc(sizeof(dgSOAVectorArray));
-
-		m_soaVertexCount = ((m_vertexCount + 7) & -8) / 8;
-		dgVector array[DG_CONVEX_VERTEX_SPLITE_SIZE];
-		for (dgInt32 i = 0; i < m_vertexCount; i ++) {
-			array[i] = m_vertex[i];
-		}
-
-		for (dgInt32 i = m_vertexCount; i < DG_CONVEX_VERTEX_SPLITE_SIZE; i ++) {
-			array[i] = array[0];
-		}
-
-		dgVector step (dgFloat32 (4.0f));
-		dgVector index (dgFloat32 (0.0f), dgFloat32 (1.0f), dgFloat32 (2.0f), dgFloat32 (3.0f));
-		for (dgInt32 i = 0; i < DG_CONVEX_VERTEX_SPLITE_SIZE; i += 4) {
-			dgVector temp;
-			dgInt32 j = i / 4;
-			dgVector::Transpose4x4 (m_soaVertexArray->m_x[j], m_soaVertexArray->m_y[j], m_soaVertexArray->m_z[j], temp, 
-									m_vertex[i+0], m_vertex[i+1], m_vertex[i+2], m_vertex[i+3]);
-			m_soaVertexArray->m_index[j] = index;
-			index += step;
-		}
-
-		dgFloat32* const indexPtr = &m_soaVertexArray->m_index[0][0];
-		for (dgInt32 i = m_vertexCount; i < DG_CONVEX_VERTEX_SPLITE_SIZE; i++) {
-			indexPtr[i] = dgFloat32 (0.0f);
-		}
+		CreateSOAdata();
 	}
 
 	for (dgInt32 i = 0; i < m_edgeCount; i ++) {
@@ -806,7 +824,6 @@ dgInt32 dgCollisionConvexHull::CalculateSignature (dgInt32 vertexCount, const dg
 	}
 	return Quantize(&buffer[0], buffer.GetSizeInBytes());
 }
-
 
 dgInt32 dgCollisionConvexHull::CalculateSignature () const
 {
@@ -853,43 +870,34 @@ void dgCollisionConvexHull::GetCollisionInfo(dgCollisionInfo* const info) const
 	info->m_convexHull.m_vertex = &m_vertex[0];
 }
 
-void dgCollisionConvexHull::Serialize(dgSerialize callback, void* const userData) const
+void dgCollisionConvexHull::CreateSOAdata()
 {
-	SerializeLow(callback, userData);
+	m_soaVertexArray = (dgSOAVectorArray*)m_allocator->Malloc(sizeof(dgSOAVectorArray));
 
-	callback (userData, &m_vertexCount, sizeof (dgInt32));
-	callback (userData, &m_faceCount, sizeof (dgInt32));
-	callback (userData, &m_edgeCount, sizeof (dgInt32));
-	callback (userData, &m_soaVertexCount, sizeof (dgInt32));
-	callback (userData, &m_supportTreeCount, sizeof (dgInt32));
-	
-	if (m_supportTreeCount) {
-		callback (userData, m_supportTree, m_supportTreeCount * sizeof(dgConvexBox));
-	}
-	
-	if (m_soaVertexCount) {
-		callback (userData, m_soaVertexArray, sizeof(dgSOAVectorArray));
+	m_soaVertexCount = ((m_vertexCount + 7) & -8) / 8;
+	dgVector array[DG_CONVEX_VERTEX_SPLITE_SIZE];
+	for (dgInt32 i = 0; i < m_vertexCount; i++) {
+		array[i] = m_vertex[i];
 	}
 
-	for (dgInt32 i = 0; i < m_edgeCount; i ++) {
-		dgInt32 serialization[4];
-		serialization[0] = m_simplex[i].m_vertex;
-		serialization[1] = dgInt32 (m_simplex[i].m_twin - m_simplex);
-		serialization[2] = dgInt32 (m_simplex[i].m_next - m_simplex);
-		serialization[3] = dgInt32 (m_simplex[i].m_prev - m_simplex);
-		callback (userData, serialization, sizeof (serialization));
+	for (dgInt32 i = m_vertexCount; i < DG_CONVEX_VERTEX_SPLITE_SIZE; i++) {
+		array[i] = array[0];
 	}
 
-	for (dgInt32 i = 0; i < m_faceCount; i ++) {
-		dgInt32 faceOffset;
-		faceOffset = dgInt32 (m_faceArray[i] - m_simplex); 
-		callback (userData, &faceOffset, sizeof (dgInt32));
+	dgVector step(dgFloat32(4.0f));
+	dgVector index(dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(2.0f), dgFloat32(3.0f));
+	for (dgInt32 i = 0; i < DG_CONVEX_VERTEX_SPLITE_SIZE; i += 4) {
+		dgVector temp;
+		dgInt32 j = i / 4;
+		dgVector::Transpose4x4(m_soaVertexArray->m_x[j], m_soaVertexArray->m_y[j], m_soaVertexArray->m_z[j], temp,
+			m_vertex[i + 0], m_vertex[i + 1], m_vertex[i + 2], m_vertex[i + 3]);
+		m_soaVertexArray->m_index[j] = index;
+		index += step;
 	}
 
-	for (dgInt32 i = 0; i < m_vertexCount; i ++) {
-		dgInt32 faceOffset;
-		faceOffset = dgInt32 (m_vertexToEdgeMapping[i] - m_simplex); 
-		callback (userData, &faceOffset, sizeof (dgInt32));
+	dgFloat32* const indexPtr = &m_soaVertexArray->m_index[0][0];
+	for (dgInt32 i = m_vertexCount; i < DG_CONVEX_VERTEX_SPLITE_SIZE; i++) {
+		indexPtr[i] = dgFloat32(0.0f);
 	}
 }
 

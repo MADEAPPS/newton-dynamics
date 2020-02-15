@@ -57,6 +57,8 @@ class dgCollisionConvexHull: public dgCollisionConvex
 
 	void MassProperties ();
 	virtual const dgConvexSimplexEdge** GetVertexToEdgeMapping() const {return m_vertexToEdgeMapping;}
+
+	void CreateSOAdata();
 	
 	dgConvexBox* m_supportTree;
 	dgConvexSimplexEdge** m_faceArray;
