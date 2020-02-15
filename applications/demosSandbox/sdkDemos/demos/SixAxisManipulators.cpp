@@ -139,6 +139,7 @@ class dSixAxisRobot: public dModelRootNode
 	dFloat32 m_pitch;
 	dFloat32 m_yaw;
 	dFloat32 m_roll;
+	DemoEntity* m_splineCurve;
 };
 
 class dSixAxisManager: public dModelManager
@@ -190,7 +191,7 @@ class dSixAxisManager: public dModelManager
 
 	void RenderUI(DemoEntityManager* const scene)
 	{
-		TestSpline();
+		//TestSpline();
 	}
 
 	void TestSpline() const
@@ -498,6 +499,33 @@ class dSixAxisManager: public dModelManager
 
 		m_currentController = robot;
 		robot->SetPivotMatrix();
+
+		// add a spline path for the robot to track
+		dMatrix pathMatrix(origin);
+		pathMatrix = dYawMatrix(90.0f * dDegreeToRad) * pathMatrix;
+		pathMatrix.m_posit.m_y += 0.8f;
+		pathMatrix.m_posit.m_x += 1.75f;
+		
+		DemoEntity* const splineCurve = new DemoEntity(pathMatrix, NULL);
+		scene->Append(splineCurve);
+
+		dFloat64 knots[] = { 0.0f, 1.0f / 3.0f, 2.0f / 3.0f, 1.0f };
+		dBigVector control[] =
+		{
+			dBigVector(0.0f, 0.0f, 0.0f, 1.0f),
+			dBigVector(-0.5f, 0.5f, 0.0f, 1.0f),
+			dBigVector(0.5f, 1.0f, 0.0f, 1.0f),
+			dBigVector(1.5f, 0.5f, 0.0f, 1.0f),
+			dBigVector(0.5f, -0.5f, 0.0f, 1.0f),
+			dBigVector(0.0f, 0.0f, 0.0f, 1.0f),
+		};
+		dBezierSpline spline;
+		spline.CreateFromKnotVectorAndControlPoints(3, sizeof(knots) / sizeof(knots[0]), knots, control);
+		DemoBezierCurve* const curveMesh = new DemoBezierCurve(spline);
+		curveMesh->SetVisible(true);
+
+		splineCurve->SetMesh(curveMesh, dGetIdentityMatrix());
+		curveMesh->Release();
 	}
 
 	virtual void OnDebug(dModelRootNode* const model, dCustomJoint::dDebugDisplay* const debugContext) 

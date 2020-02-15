@@ -170,23 +170,24 @@ void dgWorldBase::SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* c
 		tolerance = dgFloat32(0.0f);
 		for (dgInt32 i = 0; i < size; i++) {
 			const dgFloat32 r = residual[i];
-			const int index = normalIndex[i];
-			//const dgFloat32 x1 = x[i + index] + x0[i + index];
-			//const dgFloat32 coefficient = index ? x1 : one;
-			const dgFloat32 coefficient = MoveConditional(index, x[i + index] + x0[i + index], dgFloat32(1.0f));
-			const dgFloat32 l = low[i] * coefficient - x0[i];
-			const dgFloat32 h = high[i] * coefficient - x0[i];
+			//if (r * r > dgFloat32(1.0e-6f)) 
+			{
+				const int index = normalIndex[i];
+				const dgFloat32 coefficient = MoveConditional(index, x[i + index] + x0[i + index], dgFloat32(1.0f));
+				const dgFloat32 l = low[i] * coefficient - x0[i];
+				const dgFloat32 h = high[i] * coefficient - x0[i];
 
-			const dgFloat32* const row = &matrix[base];
-			const dgFloat32 f = dgClamp(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, l, h);
-			const dgFloat32 dx = f - x[i];
-			const dgFloat32 dr = dx * row[i];
-			tolerance += dr * dr;
+				const dgFloat32* const row = &matrix[base];
+				const dgFloat32 f = dgClamp(x[i] + ((r + row[i] * x[i]) * invDiag[i] - x[i]) * sor, l, h);
+				const dgFloat32 dx = f - x[i];
+				const dgFloat32 dr = dx * row[i];
+				tolerance += dr * dr;
 
-			x[i] = f;
-			if (dgAbs(dx) > dgFloat32(1.0e-6f)) {
-				for (dgInt32 j = 0; j < size; j++) {
-					residual[j] -= row[j] * dx;
+				x[i] = f;
+				if (dgAbs(dx) > dgFloat32(1.0e-6f)) {
+					for (dgInt32 j = 0; j < size; j++) {
+						residual[j] -= row[j] * dx;
+					}
 				}
 			}
 			base += stride;
