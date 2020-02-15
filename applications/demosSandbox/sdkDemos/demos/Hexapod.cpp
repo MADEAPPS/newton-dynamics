@@ -78,7 +78,7 @@ class dModelAnimTreePoseWalkSequence: public dModelAnimTreePose
 		m_acc = dMod(m_acc + timestep, m_period);
 		dFloat param = m_acc / m_period;
 		dBigVector left(m_cycle.CurvePoint(param));
-		dBigVector right(m_cycle.CurvePoint(dMod(param + 0.5f, 1.0f)));
+		dBigVector right(m_cycle.CurvePoint(dMod(param + 0.5f, dFloat(1.0f))));
 
 		dFloat high[2];
 		dFloat stride[2];
