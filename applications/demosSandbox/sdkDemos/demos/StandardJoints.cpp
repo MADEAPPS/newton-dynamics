@@ -924,6 +924,7 @@ class dFlexyPipeHandle: public dCustomJoint
 		:dCustomJoint(6, body, NULL)
 	{
 		SetSolverModel(3);
+		m_angularFriction = 200.0f;
 		m_linearFriction = 3000.0f;
 	}
 
@@ -940,9 +941,21 @@ class dFlexyPipeHandle: public dCustomJoint
 			NewtonUserJointSetRowMinimumFriction(m_joint, -m_linearFriction);
 			NewtonUserJointSetRowMaximumFriction(m_joint, m_linearFriction);
 		}
+
+		// because this is a velocity base dry friction, we can use a small angule appriximation 
+		for (int i = 0; i < 3; i++) {
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix[i][0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+		}
 	}
 
 	dFloat m_linearFriction;
+	dFloat m_angularFriction;
 };
 
 void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
