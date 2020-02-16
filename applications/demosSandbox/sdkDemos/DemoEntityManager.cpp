@@ -61,12 +61,12 @@
 //#define DEFAULT_SCENE	26		// standard joints
 //#define DEFAULT_SCENE	27		// servo joints
 //#define DEFAULT_SCENE	28		// construction vehicle
-#define DEFAULT_SCENE	29		// six axis manipulator
+//#define DEFAULT_SCENE	29		// six axis manipulator
 //#define DEFAULT_SCENE	30		// hexapod Robot
 //#define DEFAULT_SCENE	31		// basic rag doll
 //#define DEFAULT_SCENE	32		// balancing biped
 //#define DEFAULT_SCENE	33		// multi body body vehicle
-//#define DEFAULT_SCENE	34		// super Car
+#define DEFAULT_SCENE	34		// super Car
 //#define DEFAULT_SCENE	35		// heavy vehicles
 //#define DEFAULT_SCENE	36		// basic player controller
 //#define DEFAULT_SCENE	37		// animated player controller
@@ -1272,7 +1272,7 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const
 	dTree <DemoMeshInterface*, const void*>* const cache = (dTree <DemoMeshInterface*, const void*>*)bodyUserData;
 	dTree <DemoMeshInterface*, const void*>::dTreeNode* node = cache->Find(NewtonCollisionDataPointer (collision));
 	if (!node) {
-		DemoMeshInterface* mesh = new DemoMesh(bodyIndentification, scene->m_shadeCache, collision, NULL, NULL, NULL);
+		DemoMeshInterface* mesh = new DemoMesh(bodyIndentification, scene->m_shadeCache, collision, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga");
 		node = cache->Insert(mesh, NewtonCollisionDataPointer (collision));
 	} else {
 		node->GetInfo()->AddRef();
