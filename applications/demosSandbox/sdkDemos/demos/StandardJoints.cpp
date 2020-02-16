@@ -917,6 +917,34 @@ static void AddDifferential(DemoEntityManager* const scene, const dVector& origi
 	NewtonBodySetAngularDamping(box3, &damp[0]);
 }
 
+class dFlexyPipeHandle: public dCustomJoint
+{
+	public:
+	dFlexyPipeHandle(NewtonBody* const body)
+		:dCustomJoint(6, body, NULL)
+	{
+		SetSolverModel(3);
+		m_linearFriction = 3000.0f;
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dMatrix matrix;
+		NewtonBodyGetMatrix(m_body0, &matrix[0][0]);
+		for (int i = 0; i < 3; i++) {
+			NewtonUserJointAddLinearRow(m_joint, &matrix.m_posit[0], &matrix.m_posit[0], &matrix[i][0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_linearFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_linearFriction);
+		}
+	}
+
+	dFloat m_linearFriction;
+};
+
 void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 {
 	dArray<NewtonBody*> bodies;
@@ -990,6 +1018,9 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 
 	cylinderGeometry->Release();
 	NewtonDestroyCollision(cylinderShape);
+
+	// attach the nadle to the world
+	dFlexyPipeHandle*const  worldAttachement = new dFlexyPipeHandle(cylinderHandle);
 
 }
 
