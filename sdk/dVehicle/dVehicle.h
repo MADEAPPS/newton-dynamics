@@ -55,6 +55,8 @@ class dVehicle: public dVehicleNode
 	DVEHICLE_API ~dVehicle();
 
 	NewtonBody* GetBody() const { return m_newtonBody; }
+	dVehicleManager* GetManager() const {return m_manager;}
+
 	dVehicle* GetAsVehicle() const { return (dVehicle*)this; }
 	const dMatrix& GetLocalFrame() const { return m_localFrame; }
 	const dVector& GetGravity() const {return m_gravity;}
