@@ -17,9 +17,105 @@
 #include "DemoMesh.h"
 #include "OpenGlUtil.h"
 
+class dFlexyPipeHandle: public dCustomJoint
+{
+	public:
+	dFlexyPipeHandle(NewtonBody* const body, const dVector& pin)
+		:dCustomJoint(6, body, NULL)
+	{
+		m_localMatrix0 = dGrammSchmidt(pin);
+	
+
+		SetSolverModel(3);
+		m_angularFriction = 200.0f;
+		m_linearFriction = 3000.0f;
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dMatrix matrix;
+		NewtonBodyGetMatrix(m_body0, &matrix[0][0]);
+		matrix = GetMatrix0() * matrix;
+
+		for (int i = 0; i < 3; i++) {
+			NewtonUserJointAddLinearRow(m_joint, &matrix.m_posit[0], &matrix.m_posit[0], &matrix[i][0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_linearFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_linearFriction);
+		}
+
+		// because this is a velocity base dry friction, we can use a small angule appriximation 
+		for (int i = 0; i < 3; i++) {
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix[i][0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+
+			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
+			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
+		}
+
+		TestControls(timestep);
+	}
+
+	void TestControls(dFloat timestep)
+	{
+		NewtonWorld* const world = NewtonBodyGetWorld(m_body0);
+		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+
+		dFloat speed = 2.0f * (scene->GetKeyState('O') - scene->GetKeyState('P'));
+
+		if (speed) {
+			dMatrix matrix;
+			NewtonBodyGetMatrix(m_body0, &matrix[0][0]);
+			matrix = GetMatrix0() * matrix;
+
+			dVector veloc(matrix[0].Scale(speed));
+			SetVelocity(veloc, timestep);
+		}
+	}
+
+
+	void SetVelocity(const dVector& veloc, dFloat timestep) 
+	{
+		dVector bodyVeloc(0.0f);
+		dFloat Ixx;
+		dFloat Iyy;
+		dFloat Izz;
+		dFloat mass;
+
+		// Get body mass
+		NewtonBodyGetMass(m_body0, &mass, &Ixx, &Iyy, &Izz);
+
+		// get body internal data
+		NewtonBodyGetVelocity(m_body0, &bodyVeloc[0]);
+
+		// calculate angular velocity error 
+		dVector velocError(veloc - bodyVeloc);
+		dFloat vMag2 = velocError.DotProduct3(velocError);
+		if (vMag2 > dFloat (1.0e-4f)) {
+			dVector dir (veloc.Normalize());
+
+			// calculate impulse
+			dVector linearImpulse(velocError.Scale (mass) + dir.Scale (m_linearFriction*timestep));
+			//dVector linearImpulse(velocError.Scale (mass));
+
+			// apply impulse to achieve desired omega
+			dVector angularImpulse(0.0f);
+			NewtonBodyApplyImpulsePair(m_body0, &linearImpulse[0], &angularImpulse[0], timestep);
+		}
+	}
+
+	dFloat m_linearFriction;
+	dFloat m_angularFriction;
+};
+
 class MyPathFollow : public dCustomPathFollow
 {
-public:
+	public:
 	MyPathFollow(const dMatrix& pinAndPivotFrame, NewtonBody* const body, NewtonBody* const pathBody)
 		:dCustomPathFollow(pinAndPivotFrame, body, pathBody)
 	{
@@ -917,46 +1013,7 @@ static void AddDifferential(DemoEntityManager* const scene, const dVector& origi
 	NewtonBodySetAngularDamping(box3, &damp[0]);
 }
 
-class dFlexyPipeHandle: public dCustomJoint
-{
-	public:
-	dFlexyPipeHandle(NewtonBody* const body)
-		:dCustomJoint(6, body, NULL)
-	{
-		SetSolverModel(3);
-		m_angularFriction = 200.0f;
-		m_linearFriction = 3000.0f;
-	}
 
-	void SubmitConstraints(dFloat timestep, int threadIndex)
-	{
-		dMatrix matrix;
-		NewtonBodyGetMatrix(m_body0, &matrix[0][0]);
-		for (int i = 0; i < 3; i++) {
-			NewtonUserJointAddLinearRow(m_joint, &matrix.m_posit[0], &matrix.m_posit[0], &matrix[i][0]);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
-			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
-			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_linearFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_linearFriction);
-		}
-
-		// because this is a velocity base dry friction, we can use a small angule appriximation 
-		for (int i = 0; i < 3; i++) {
-			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix[i][0]);
-			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
-			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
-			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -m_angularFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, m_angularFriction);
-		}
-	}
-
-	dFloat m_linearFriction;
-	dFloat m_angularFriction;
-};
 
 void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 {
@@ -1032,9 +1089,8 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 	cylinderGeometry->Release();
 	NewtonDestroyCollision(cylinderShape);
 
-	// attach the nadle to the world
-	dFlexyPipeHandle*const  worldAttachement = new dFlexyPipeHandle(cylinderHandle);
-
+	// attach the handle to the world
+	new dFlexyPipeHandle(cylinderHandle, dir);
 }
 
 void StandardJoints (DemoEntityManager* const scene)
