@@ -1240,7 +1240,7 @@ void SuperCar (DemoEntityManager* const scene)
 	vhMatrix.m_posit = FindFloor(scene->GetNewton(), vhMatrix.m_posit, 100.0f);
 	vhMatrix.m_posit.m_y += 2.5f;
 	//
-	// Vehicle Contruction:
+	// Vehicle Construction:
 	viper = manager->CreateVehicleRayCast("viper.ngd", false, vhMatrix, vhMass);
 	viper->SetRayCastMode(rctConvex);
 	//
@@ -1259,7 +1259,7 @@ void SuperCar (DemoEntityManager* const scene)
 	vhMass = 1600.0f;
 	vhCenterMass = dVector(0.0f, -0.45f, 0.0f, 0.0f);
 	vhMatrix.m_posit.m_x += 5.0f;
-	// Vehicle Contruction:
+	// Vehicle Construction:
 	truck = manager->CreateVehicleRayCast("monstertruck.ngd", true, vhMatrix, vhMass);
 	truck->SetRayCastMode(rctConvex);
 	//

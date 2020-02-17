@@ -65,15 +65,24 @@ class dFlexyPipeHandle: public dCustomJoint
 		NewtonWorld* const world = NewtonBodyGetWorld(m_body0);
 		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
 
-		dFloat speed = 2.0f * (scene->GetKeyState('O') - scene->GetKeyState('P'));
-
-		if (speed) {
+		dFloat linearSpeed = 2.0f * (scene->GetKeyState('O') - scene->GetKeyState('P'));
+		if (linearSpeed) {
 			dMatrix matrix;
 			NewtonBodyGetMatrix(m_body0, &matrix[0][0]);
 			matrix = GetMatrix0() * matrix;
 
-			dVector veloc(matrix[0].Scale(speed));
+			dVector veloc(matrix[0].Scale(linearSpeed));
 			SetVelocity(veloc, timestep);
+		}
+
+		dFloat angularSpeed = 6.0f * (scene->GetKeyState('K') - scene->GetKeyState('L'));
+		if (angularSpeed) {
+			dMatrix matrix;
+			NewtonBodyGetMatrix(m_body0, &matrix[0][0]);
+			matrix = GetMatrix0() * matrix;
+
+			dVector omega(matrix[0].Scale(angularSpeed));
+			SetOmega(omega, timestep);
 		}
 	}
 
@@ -96,14 +105,39 @@ class dFlexyPipeHandle: public dCustomJoint
 		dVector velocError(veloc - bodyVeloc);
 		dFloat vMag2 = velocError.DotProduct3(velocError);
 		if (vMag2 > dFloat (1.0e-4f)) {
-			dVector dir (veloc.Normalize());
+			dVector dir (velocError.Normalize());
 
 			// calculate impulse
-			dVector linearImpulse(velocError.Scale (mass) + dir.Scale (m_linearFriction*timestep));
+			dVector linearImpulse(velocError.Scale (mass) + dir.Scale (m_linearFriction * timestep));
 			//dVector linearImpulse(velocError.Scale (mass));
 
 			// apply impulse to achieve desired velocity
 			dVector angularImpulse(0.0f);
+			NewtonBodyApplyImpulsePair(m_body0, &linearImpulse[0], &angularImpulse[0], timestep);
+		}
+	}
+
+	void SetOmega(const dVector& omega, dFloat timestep)
+	{
+		dMatrix bodyInertia;
+		dVector bodyOmega(0.0f);
+
+		// get body internal data
+		NewtonBodyGetOmega(m_body0, &bodyOmega[0]);
+		NewtonBodyGetInertiaMatrix(m_body0, &bodyInertia[0][0]);
+
+		// calculate angular velocity error 
+		dVector omegaError(omega - bodyOmega);
+
+		dFloat wMag2 = omegaError.DotProduct3(omegaError);
+		if (wMag2 > dFloat (1.0e-4f)) {
+			dVector dir (omegaError.Normalize());
+
+			// calculate impulse
+			dVector angularImpulse(bodyInertia.RotateVector(omegaError) + dir.Scale (m_angularFriction * timestep));
+
+			// apply impulse to achieve desired omega
+			dVector linearImpulse(0.0f);
 			NewtonBodyApplyImpulsePair(m_body0, &linearImpulse[0], &angularImpulse[0], timestep);
 		}
 	}
