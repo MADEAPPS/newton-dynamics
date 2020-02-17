@@ -685,6 +685,7 @@ class dExcavatorModel: public dModelRootNode
 		NewtonBodyGetMatrix(bar1, &hingeFrame[0][0]);
 		hingeFrame = dRollMatrix(-90.0f * dDegreeToRad) * hingeFrame;
 		dCustomDoubleHinge* const pivot = new dCustomDoubleHinge(hingeFrame, bar1, armNode->GetBody());
+		pivot;
 		dMatrix bindMatrix(dGetIdentityMatrix());
 		dModelNode* const bar1Node = new dModelNode(bar1, bindMatrix, armNode);
 
