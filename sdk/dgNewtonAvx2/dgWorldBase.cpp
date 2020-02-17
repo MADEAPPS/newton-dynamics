@@ -137,6 +137,7 @@ static DG_INLINE dgFloat32 MoveConditional(dgInt32 mask, dgFloat32 a, dgFloat32 
 void dgWorldBase::SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* const matrix, const dgFloat32* const x0, dgFloat32* const x, const dgFloat32* const b, const dgFloat32* const low, const dgFloat32* const high, const dgInt32* const normalIndex) const
 {
 	const dgFloat32 sor = dgFloat32(1.125f);
+	//const dgFloat32 sor = dgFloat32(1.0f);
 	const dgFloat32 tol2 = dgFloat32(0.25f);
 	dgFloat32* const invDiag1 = dgAlloca(dgFloat32, size);
 	dgFloat32* const residual = dgAlloca(dgFloat32, size);
@@ -164,13 +165,18 @@ void dgWorldBase::SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* c
 	dgInt32 iterCount = 0;
 	dgFloat32 tolerance(tol2 * dgFloat32(2.0f));
 	const dgFloat32* const invDiag = invDiag1;
+
+	const dgFloat32 accelTol = dgFloat32 (0.005f);
+	const dgFloat32 accelTol2 = accelTol * accelTol;
+	accelTol2;
+//int xxxx = 0;
 	for (dgInt32 k = 0; (k < maxIterCount) && (tolerance > tol2); k++) {
 		base = 0;
 		iterCount++;
 		tolerance = dgFloat32(0.0f);
 		for (dgInt32 i = 0; i < size; i++) {
 			const dgFloat32 r = residual[i];
-			//if (r * r > dgFloat32(1.0e-6f)) 
+			//if (r * r > accelTol2) 
 			{
 				const int index = normalIndex[i];
 				const dgFloat32 coefficient = MoveConditional(index, x[i + index] + x0[i + index], dgFloat32(1.0f));
@@ -190,6 +196,8 @@ void dgWorldBase::SolveDenseLcp(dgInt32 stride, dgInt32 size, const dgFloat32* c
 					}
 				}
 			}
+
+			//xxxx += r * r > accelTol2 ? 0 : 1; 
 			base += stride;
 		}
 	}

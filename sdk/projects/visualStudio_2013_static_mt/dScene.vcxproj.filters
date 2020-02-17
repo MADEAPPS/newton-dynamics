@@ -43,7 +43,6 @@
     <ClCompile Include="..\..\thirdParty\tinyxml\tinyxmlparser.cpp">
       <Filter>tinyxml</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dScene\dAnimationLayers.cpp" />
     <ClCompile Include="..\..\dScene\dAnimationTake.cpp" />
     <ClCompile Include="..\..\dScene\dAnimationTrack.cpp" />
     <ClCompile Include="..\..\dScene\dGeometryNodeSkinClusterInfo.cpp" />
@@ -85,7 +84,6 @@
     <ClInclude Include="..\..\thirdParty\tinyxml\tinyxml.h">
       <Filter>tinyxml</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dScene\dAnimationLayers.h" />
     <ClInclude Include="..\..\dScene\dAnimationTake.h" />
     <ClInclude Include="..\..\dScene\dAnimationTrack.h" />
     <ClInclude Include="..\..\dScene\dGeometryNodeSkinClusterInfo.h" />

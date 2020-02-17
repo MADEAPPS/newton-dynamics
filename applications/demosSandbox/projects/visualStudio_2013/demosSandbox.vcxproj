@@ -318,6 +318,7 @@
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dgCore;../../../../sdk/dScene;../../../../sdk/dModel;../../../../sdk/dVehicle;../../../../sdk/dProfiler;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dVehicle/dPlayerController;../../../../sdk/dVehicle/dMultiBodyVehicle;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -337,6 +338,7 @@
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dgCore;../../../../sdk/dScene;../../../../sdk/dModel;../../../../sdk/dVehicle;../../../../sdk/dProfiler;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dVehicle/dPlayerController;../../../../sdk/dVehicle/dMultiBodyVehicle;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -356,6 +358,7 @@
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dgCore;../../../../sdk/dScene;../../../../sdk/dModel;../../../../sdk/dVehicle;../../../../sdk/dProfiler;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dVehicle/dPlayerController;../../../../sdk/dVehicle/dMultiBodyVehicle;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -375,6 +378,7 @@
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dgCore;../../../../sdk/dScene;../../../../sdk/dModel;../../../../sdk/dVehicle;../../../../sdk/dProfiler;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dVehicle/dPlayerController;../../../../sdk/dVehicle/dMultiBodyVehicle;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -396,6 +400,7 @@
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dgCore;../../../../sdk/dScene;../../../../sdk/dModel;../../../../sdk/dVehicle;../../../../sdk/dProfiler;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dVehicle/dPlayerController;../../../../sdk/dVehicle/dMultiBodyVehicle;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -419,6 +424,7 @@
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dgCore;../../../../sdk/dScene;../../../../sdk/dModel;../../../../sdk/dVehicle;../../../../sdk/dProfiler;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dVehicle/dPlayerController;../../../../sdk/dVehicle/dMultiBodyVehicle;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -442,6 +448,7 @@
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dgCore;../../../../sdk/dScene;../../../../sdk/dModel;../../../../sdk/dVehicle;../../../../sdk/dProfiler;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dVehicle/dPlayerController;../../../../sdk/dVehicle/dMultiBodyVehicle;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -465,6 +472,7 @@
       <AdditionalIncludeDirectories>../../sdkDemos;../../sdkDemos/toolBox;../../../../sdk;../../../../sdk/dMath;../../../../sdk/dgCore;../../../../sdk/dScene;../../../../sdk/dModel;../../../../sdk/dVehicle;../../../../sdk/dProfiler;../../../../sdk/dNewton;../../../../sdk/dgNewton;../../../../sdk/dAnimation;../../../../sdk/dContainers;../../../../sdk/dCustomJoints;../../../../sdk/dVehicle/dPlayerController;../../../../sdk/dVehicle/dMultiBodyVehicle;../../../../sdk/thirdParty/imgui;../../../../sdk/thirdParty/glfw/src;../../../../sdk/thirdParty/glfw/include;../../../../sdk/thirdParty/glatter/include/glatter</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>toolbox_stdafx.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

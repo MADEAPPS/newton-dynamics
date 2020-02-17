@@ -24,7 +24,6 @@ class dFlexyPipeHandle: public dCustomJoint
 		:dCustomJoint(6, body, NULL)
 	{
 		m_localMatrix0 = dGrammSchmidt(pin);
-	
 
 		SetSolverModel(3);
 		m_angularFriction = 200.0f;
@@ -103,7 +102,7 @@ class dFlexyPipeHandle: public dCustomJoint
 			dVector linearImpulse(velocError.Scale (mass) + dir.Scale (m_linearFriction*timestep));
 			//dVector linearImpulse(velocError.Scale (mass));
 
-			// apply impulse to achieve desired omega
+			// apply impulse to achieve desired velocity
 			dVector angularImpulse(0.0f);
 			NewtonBodyApplyImpulsePair(m_body0, &linearImpulse[0], &angularImpulse[0], timestep);
 		}
