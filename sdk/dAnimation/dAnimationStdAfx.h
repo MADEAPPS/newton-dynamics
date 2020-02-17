@@ -58,11 +58,7 @@
 #include <dArray.h>
 #include <dClassInfo.h>
 #include <dRefCounter.h>
-//#include <dBaseHierarchy.h>
+#include <dBaseHierarchy.h>
 
-#include <dCustomJoint.h>
-#include <dCustomListener.h>
-//#include <dCustomHinge.h>
-#include <dCustomBallAndSocket.h>
 
 #endif

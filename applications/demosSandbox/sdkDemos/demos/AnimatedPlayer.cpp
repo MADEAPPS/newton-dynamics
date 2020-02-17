@@ -731,7 +731,14 @@ class AnimatedPlayerControllerManager: public dPlayerControllerManager
 		//controller->SetFriction(2.0f);
 		//controller->SetFriction(1.0f);
 
+		LoadAnimationBlendTree(controller);
+
 		return controller;
+	}
+
+	void LoadAnimationBlendTree(dPlayerController* const controller)
+	{
+		//dAnimTakeData* const walkCycle = LoadAnimation(controller, "whiteman_idle.ngd");
 	}
 
 	void SetCamera()

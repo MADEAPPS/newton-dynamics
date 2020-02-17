@@ -11,8 +11,6 @@
 
 #ifndef __D_ANIMATION_KEYFRAMES_SEQUENCE_h__
 #define __D_ANIMATION_KEYFRAMES_SEQUENCE_h__
-//#include "dAnimPose.h"
-//#include "dAnimIKBlendNode.h"
 
 class dAnimPose;
 

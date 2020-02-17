@@ -36,14 +36,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dAnimation\dAnimationKeyframesSequence.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationRagdollEffector.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationJoint.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationJointRoot.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationJointSolver.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationLoopJoint.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationModelManager.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationRagdollJoint.cpp" />
-    <ClCompile Include="..\..\dAnimation\dAnimationRagdollRoot.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationStdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
@@ -57,14 +49,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dAnimation\dAnimationKeyframesSequence.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationRagdollEffector.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationJoint.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationJointRoot.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationJointSolver.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationLoopJoint.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationModelManager.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationRagdollJoint.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationRagdollRoot.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationStdAfx.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
