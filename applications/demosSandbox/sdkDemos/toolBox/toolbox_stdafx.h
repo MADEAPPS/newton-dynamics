@@ -200,7 +200,7 @@ typedef long long unsigned64;
 
 #include <dAnimationStdAfx.h>
 #include <dAnimationPose.h>
-#include <dAnimationKeyframesSequence.h>
+#include <dAnimationKeyframesTrack.h>
 
 /*
 #include <dAnimIKManager.h>

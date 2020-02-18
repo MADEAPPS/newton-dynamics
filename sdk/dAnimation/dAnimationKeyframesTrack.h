@@ -9,10 +9,8 @@
 * freely
 */
 
-#ifndef __D_ANIMATION_KEYFRAMES_SEQUENCE_h__
-#define __D_ANIMATION_KEYFRAMES_SEQUENCE_h__
-
-class dAnimationPose;
+#ifndef __D_ANIMATION_KEYFRAMES_TRACK_h__
+#define __D_ANIMATION_KEYFRAMES_TRACK_h__
 
 class dAnimimationKeyFramesTrack
 {
@@ -91,38 +89,5 @@ class dAnimimationKeyFramesTrack
 	dAnimTakeArray<dPositionKey> m_position;
 	dAnimTakeArray<dRotationKey> m_rotation;
 };
-
-class dAnimationKeyframesSequence: public dRefCounter
-{
-	public:
-	dAnimationKeyframesSequence();
-	~dAnimationKeyframesSequence();
-
-	dFloat GetPeriod() const { return m_period; }
-	void SetPeriod(dFloat period) { m_period = period;}
-
-	dList<dAnimimationKeyFramesTrack>& GetTracks() { return m_tracks; }
-	
-	void CalculatePose(dAnimationPose& output, dFloat t) const;
-	
-	dList<dAnimimationKeyFramesTrack> m_tracks;
-	dFloat m_period;
-};
-
-/*
-class dAnimIKBlendNodeTake: public dAnimIKBlendNode
-{
-	public:
-	dAnimIKBlendNodeTake(dAnimIKController* const character, dAnimationKeyframesSequence* const takeData);
-	virtual ~dAnimIKBlendNodeTake();
-
-	virtual void Evaluate(dAnimationPose& output, dFloat timestep);
-
-	void SetFrame(dFloat t);
-
-	dFloat m_time;
-	dAnimationKeyframesSequence* m_takeData;
-};
-*/
 
 #endif

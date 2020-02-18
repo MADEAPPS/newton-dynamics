@@ -568,17 +568,19 @@ class AnimatedPlayerControllerManager: public dPlayerControllerManager
 		scene->Set2DDisplayRenderFunction(RenderPlayerHelp, NULL, this);
 
 		// load the animation sequences.
-		GetAnimationSequence("whiteman_idle.ngd");
-		GetAnimationSequence("whiteman_walk.ngd");
+		//GetAnimationSequence("whiteman_idle.ngd");
+		//GetAnimationSequence("whiteman_walk.ngd");
 	}
 
 	~AnimatedPlayerControllerManager()
 	{
+		/*
 		while (m_animCache) {
-			dAnimationKeyframesSequence* const data = m_animCache.GetRoot()->GetInfo();
-			data->Release();
-			m_animCache.Remove(m_animCache.GetRoot());
+			//dAnimationKeyframesSequence* const data = m_animCache.GetRoot()->GetInfo();
+			//data->Release();
+			//m_animCache.Remove(m_animCache.GetRoot());
 		}
+	*/
 	}
 
 	void SetAsPlayer(dPlayerController* const controller)
@@ -613,6 +615,7 @@ class AnimatedPlayerControllerManager: public dPlayerControllerManager
 	}
 
 	//dAnimTakeData* LoadAnimation(dAnimIKController* const controller, const char* const animName)
+/*
 	dAnimationKeyframesSequence* GetAnimationSequence(const char* const animName)
 	{
 		dTree<dAnimationKeyframesSequence*, dString>::dTreeNode* cachedAnimNode = m_animCache.Find(animName);
@@ -693,6 +696,7 @@ class AnimatedPlayerControllerManager: public dPlayerControllerManager
 		dAssert(cachedAnimNode);
 		return cachedAnimNode->GetInfo();
 	}
+*/
 	
 	dPlayerController* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
 	{
@@ -836,7 +840,7 @@ class AnimatedPlayerControllerManager: public dPlayerControllerManager
 	}
 
 	dPlayerController* m_player;
-	dTree<dAnimationKeyframesSequence*, dString> m_animCache;
+//	dTree<dAnimationKeyframesSequence*, dString> m_animCache;
 };
 
 

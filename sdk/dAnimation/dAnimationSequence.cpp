@@ -13,61 +13,27 @@
 #include "dAnimationPose.h"
 #include "dAnimationSequence.h"
 
-const void dAnimationSequence::dAnimationSequenceTrack::InterpolatePosition(dFloat t, dVector& posit) const
-{
-	if (m_position.GetSize()) {
-		int base = m_position.GetIndex(t);
-		const dFloat t0 = m_position[base].m_time;
-		const dFloat t1 = m_position[base + 1].m_time;
-		const dFloat param = (t - t0) / (t1 - t0 + dFloat(1.0e-6f));
-		const dVector& p0 = m_position[base].m_posit;
-		const dVector& p1 = m_position[base + 1].m_posit;
-		posit = p0 + (p1 - p0).Scale(param);
-	}
-}
-
-const void dAnimationSequence::dAnimationSequenceTrack::InterpolateRotation(dFloat t, dQuaternion& rotation) const
-{
-	if (m_rotation.GetSize()) {
-		int base = m_rotation.GetIndex(t);
-		const dFloat t0 = m_rotation[base].m_time;
-		const dFloat t1 = m_rotation[base + 1].m_time;
-		const dFloat param = (t - t0) / (t1 - t0 + dFloat (1.0e-6f));
-		const dQuaternion& rot0 = m_rotation[base].m_rotation;
-		const dQuaternion& rot1 = m_rotation[base + 1].m_rotation;
-		rotation = rot0.Slerp(rot1, param);
-	}
-}
-
-dAnimationSequence::dAnimationSequence(int tracksCount)
-	:dRefCounter()
-	,m_tracks()
+dAnimationSequence::dAnimationSequence()
+	:m_tracks()
 	,m_period(1.0f)
 {
-	for (int i = 0; i < tracksCount; i ++) {
-		m_tracks.Append();
-	}
 }
 
 dAnimationSequence::~dAnimationSequence()
 {
 }
 
-dAnimationSequence::dAnimationSequenceTrack::dAnimationSequenceTrack()
-	:m_position()
-	,m_rotation()
+dAnimimationKeyFramesTrack* dAnimationSequence::AddTrack()
 {
-}
-
-dAnimationSequence::dAnimationSequenceTrack::~dAnimationSequenceTrack()
-{
+	dList<dAnimimationKeyFramesTrack>::dListNode* const node = m_tracks.Append();
+	return &node->GetInfo();
 }
 
 void dAnimationSequence::CalculatePose(dAnimationPose& output, dFloat t) const
 {
 	dAnimationPose::dListNode* destNode = output.GetFirst()->GetNext();
-	for (dList<dAnimationSequenceTrack>::dListNode* srcNode = m_tracks.GetFirst()->GetNext(); srcNode; srcNode = srcNode->GetNext()) {
-		const dAnimationSequenceTrack& track = srcNode->GetInfo();
+	for (dList<dAnimimationKeyFramesTrack>::dListNode* srcNode = m_tracks.GetFirst()->GetNext(); srcNode; srcNode = srcNode->GetNext()) {
+		const dAnimimationKeyFramesTrack& track = srcNode->GetInfo();
 		dAnimKeyframe& keyFrame = destNode->GetInfo();
 		track.InterpolatePosition(t, keyFrame.m_posit);
 		track.InterpolateRotation(t, keyFrame.m_rotation);
@@ -161,3 +127,8 @@ dAnimTakeData* dAnimTakeData::LoadAnimation(const dScene& scene, const char* con
 	return NULL;
 }
 #endif
+
+void dAnimationSequence::Save(const char* const fileName)
+{
+
+}
