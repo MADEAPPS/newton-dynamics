@@ -42,7 +42,6 @@
 #include <Newton.h>
 #include <dStdAfxMath.h>
 #include <dContainersStdAfx.h>
-#include <dCustomJointLibraryStdAfx.h>
 
 #include <dMathDefines.h>
 #include <dVector.h>
@@ -59,6 +58,5 @@
 #include <dClassInfo.h>
 #include <dRefCounter.h>
 #include <dBaseHierarchy.h>
-
 
 #endif

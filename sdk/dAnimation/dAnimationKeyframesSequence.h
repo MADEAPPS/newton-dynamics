@@ -12,7 +12,7 @@
 #ifndef __D_ANIMATION_KEYFRAMES_SEQUENCE_h__
 #define __D_ANIMATION_KEYFRAMES_SEQUENCE_h__
 
-class dAnimPose;
+class dAnimationPose;
 
 class dAnimimationKeyFramesTrack
 {
@@ -95,7 +95,6 @@ class dAnimimationKeyFramesTrack
 class dAnimationKeyframesSequence: public dRefCounter
 {
 	public:
-	//dAnimationKeyframesSequence(int tracksCount);
 	dAnimationKeyframesSequence();
 	~dAnimationKeyframesSequence();
 
@@ -104,7 +103,7 @@ class dAnimationKeyframesSequence: public dRefCounter
 
 	dList<dAnimimationKeyFramesTrack>& GetTracks() { return m_tracks; }
 	
-	void CalculatePose(dAnimPose& output, dFloat t) const;
+	void CalculatePose(dAnimationPose& output, dFloat t) const;
 	
 	dList<dAnimimationKeyFramesTrack> m_tracks;
 	dFloat m_period;
@@ -117,7 +116,7 @@ class dAnimIKBlendNodeTake: public dAnimIKBlendNode
 	dAnimIKBlendNodeTake(dAnimIKController* const character, dAnimationKeyframesSequence* const takeData);
 	virtual ~dAnimIKBlendNodeTake();
 
-	virtual void Evaluate(dAnimPose& output, dFloat timestep);
+	virtual void Evaluate(dAnimationPose& output, dFloat timestep);
 
 	void SetFrame(dFloat t);
 

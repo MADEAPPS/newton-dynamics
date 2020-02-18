@@ -35,6 +35,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\dAnimation\dAnimationPose.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationSequence.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationKeyframesSequence.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationStdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -48,6 +50,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\dAnimation\dAnimationPose.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationKeyframesSequence.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationStdAfx.h" />
   </ItemGroup>
