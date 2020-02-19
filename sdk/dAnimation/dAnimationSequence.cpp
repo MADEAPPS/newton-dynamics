@@ -130,5 +130,15 @@ dAnimTakeData* dAnimTakeData::LoadAnimation(const dScene& scene, const char* con
 
 void dAnimationSequence::Save(const char* const fileName)
 {
+	FILE* const file = fopen(fileName, "wb");
+	if (file) {
+		fprintf(file, "period %f\n", m_period);
+		fprintf(file, "tracksCount %d\n", m_tracks.GetCount());
+		for (dList<dAnimimationKeyFramesTrack>::dListNode* trackNode = m_tracks.GetFirst(); trackNode; trackNode = trackNode->GetNext()) {
+			dAnimimationKeyFramesTrack& track = trackNode->GetInfo();
+			track.Save(file);
+		}
+		fclose(file);
+	}
 
 }

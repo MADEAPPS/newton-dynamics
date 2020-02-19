@@ -30,10 +30,10 @@ class dAnimimationKeyFramesTrack
 	};
 
 	template<class OBJECT>
-	class dAnimTakeArray: public dArray<OBJECT>
+	class dAnimimationKeyFramesArray: public dArray<OBJECT>
 	{
 		public:
-		dAnimTakeArray()
+		dAnimimationKeyFramesArray()
 			:dArray<OBJECT>()
 		{
 		}
@@ -85,9 +85,10 @@ class dAnimimationKeyFramesTrack
 	const void InterpolatePosition(dFloat t, dVector &positOut) const;
 	const void InterpolateRotation(dFloat t, dQuaternion& rotationOut) const;
 
+	void Save(FILE* const file) const;
 	dString m_name;
-	dAnimTakeArray<dPositionKey> m_position;
-	dAnimTakeArray<dRotationKey> m_rotation;
+	dAnimimationKeyFramesArray<dPositionKey> m_position;
+	dAnimimationKeyFramesArray<dRotationKey> m_rotation;
 };
 
 #endif

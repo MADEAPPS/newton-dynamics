@@ -47,6 +47,9 @@
 #include <dGeometryNodeModifierInfo.h>
 #include <dGeometryNodeSkinClusterInfo.h>
 
-
+#include <dAnimationStdAfx.h>
+#include <dAnimationPose.h>
+#include <dAnimationSequence.h>
+#include <dAnimationKeyframesTrack.h>
 
 

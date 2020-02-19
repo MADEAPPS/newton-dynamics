@@ -38,3 +38,20 @@ const void dAnimimationKeyFramesTrack::InterpolateRotation(dFloat t, dQuaternion
 		rotation = rot0.Slerp(rot1, param);
 	}
 }
+
+void dAnimimationKeyFramesTrack::Save(FILE* const file) const
+{
+	fprintf(file, "\ttrackName: %s\n", m_name.GetStr());
+	
+	fprintf(file, "\t\tpositions (t, x, y, z): %d\n", m_position.GetSize());
+	for (int i = 0; i < m_position.GetSize(); i++) {
+		fprintf(file, "\t\t\t%f %f %f %f\n", m_position[i].m_time, m_position[i].m_posit.m_x, m_position[i].m_posit.m_y, m_position[i].m_posit.m_z);
+	}
+
+	fprintf(file, "\t\trotation (t, qx, qy, qz, qw): %d\n", m_rotation.GetSize());
+	for (int i = 0; i < m_rotation.GetSize(); i++) {
+		dQuaternion q(m_rotation[i].m_rotation);
+		fprintf(file, "\t\t\t%f %f %f %f %f\n", m_rotation[i].m_time, q.m_x, q.m_y, q.m_z, q.m_w);
+	}
+
+}

@@ -82,7 +82,9 @@ class LocalMaterialMap: public dTree<dScene::dTreeNode*, int>
 };
 
 static int g_materialId = 0;
+static void RemoveReflexionMatrices(dScene* const ngdScene);
 static int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene);
+static void ExportAnimation(const char* const filename, const dScene& ngdScene);
 static bool LoadScene(FbxManager* pManager, FbxDocument* pScene, const char* const pFilename);
 static void LoadHierarchy(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap);
 static bool ConvertToNgd(dScene* const ngdScene, FbxScene* const fbxScene, bool importMesh, bool importAnimations);
@@ -92,10 +94,8 @@ static void ImportMaterials(FbxScene* const fbxScene, dScene* const ngdScene, Fb
 static void ImportSkinModifier(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap, FbxNode* const fbxMeshNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache);
 static void ImportTexture(FbxScene* const fbxScene, dScene* const ngdScene, FbxProperty pProperty, dScene::dTreeNode* const materialNode, GlobalTextureMap& textureCache);
 static void ImportSkeleton(dScene* const ngdScene, FbxScene* const fbxScene, FbxNode* const fbxNode, dScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials, int boneId);
-//static void PrepareSkeleton(FbxScene* const fbxScene);
 static dFloat CalculateAnimationPeriod(FbxScene* const fbxScene, FbxAnimLayer* const animLayer);
 static void ImportAnimations(dScene* const ngdScene, FbxScene* const fbxScene, GlobalNodeMap& nodeMap);
-static void RemoveReflexionMatrices(dScene* const ngdScene);
 
 
 int InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene)
@@ -1129,13 +1129,23 @@ int main(int argc, char** argv)
 	dScene* const ngdScene = new dScene(newton);
 
 	if (ConvertToNgd(ngdScene, fbxScene, importMesh, importAnimations)) {
-		char name[1024];
-		strcpy(name, argv[1]);
-		_strlwr(name);
-		char* ptr = strstr(name, ".fbx");
-		ptr[0] = 0;
-		strcat(name, ".ngd");
-		ngdScene->Serialize(name);
+		if (importAnimations) {
+			char name[1024];
+			strcpy(name, argv[1]);
+			_strlwr(name);
+			char* ptr = strstr(name, ".fbx");
+			ptr[0] = 0;
+			strcat(name, ".anm");
+			ExportAnimation(name, *ngdScene);
+		} else {
+			char name[1024];
+			strcpy(name, argv[1]);
+			_strlwr(name);
+			char* ptr = strstr(name, ".fbx");
+			ptr[0] = 0;
+			strcat(name, ".ngd");
+			ngdScene->Serialize(name);
+		}
 	}
 
 	delete ngdScene;
@@ -1146,4 +1156,58 @@ int main(int argc, char** argv)
 	return 0;
 }
 
+void ExportAnimation(const char* const filename, const dScene& scene)
+{
+	dScene::dTreeNode* const animTakeNode = scene.FindChildByType(scene.GetRootNode(), dAnimationTake::GetRttiType());
+	if (animTakeNode) {
+		dAnimationSequence sequence;
+		dAnimationTake* const animTake = (dAnimationTake*)scene.GetInfoFromNode(animTakeNode);
+		sequence.SetPeriod(animTake->GetPeriod());
 
+		for (void* link = scene.GetFirstChildLink(animTakeNode); link; link = scene.GetNextChildLink(animTakeNode, link)) {
+			dScene::dTreeNode* const node = scene.GetNodeFromLink(link);
+			dAnimationTrack* const srcTrack = (dAnimationTrack*)scene.GetInfoFromNode(node);
+			if (srcTrack->IsType(dAnimationTrack::GetRttiType())) {
+				dAnimimationKeyFramesTrack* const track = sequence.AddTrack();
+				track->SetName(srcTrack->GetName());
+
+				//dAnimTakeData::dAnimTakeTrack* const dstTrack = ptrNode->GetInfo();
+				const dList<dAnimationTrack::dCurveValue>& rotations = srcTrack->GetRotations();
+
+				track->m_rotation.Resize(rotations.GetCount());
+				int index = 0;
+				for (dList<dAnimationTrack::dCurveValue>::dListNode* node = rotations.GetFirst(); node; node = node->GetNext()) {
+					dAnimationTrack::dCurveValue keyFrame(node->GetInfo());
+
+					dMatrix matrix(dPitchMatrix(keyFrame.m_x) * dYawMatrix(keyFrame.m_y) * dRollMatrix(keyFrame.m_z));
+					dQuaternion rot(matrix);
+					track->m_rotation[index].m_rotation = rot;
+					track->m_rotation[index].m_time = keyFrame.m_time;
+					index++;
+				}
+
+				for (int i = 0; i < rotations.GetCount() - 1; i++) {
+					dFloat dot = track->m_rotation[i].m_rotation.DotProduct(track->m_rotation[i + 1].m_rotation);
+					if (dot < 0.0f) {
+						track->m_rotation[i + 1].m_rotation.m_x *= -1.0f;
+						track->m_rotation[i + 1].m_rotation.m_y *= -1.0f;
+						track->m_rotation[i + 1].m_rotation.m_z *= -1.0f;
+						track->m_rotation[i + 1].m_rotation.m_w *= -1.0f;
+					}
+				}
+
+				const dList<dAnimationTrack::dCurveValue>& positions = srcTrack->GetPositions();
+				track->m_position.Resize(positions.GetCount());
+				index = 0;
+				for (dList<dAnimationTrack::dCurveValue>::dListNode* node = positions.GetFirst(); node; node = node->GetNext()) {
+					dAnimationTrack::dCurveValue keyFrame(node->GetInfo());
+					track->m_position[index].m_posit = dVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, dFloat(1.0f));
+					track->m_position[index].m_time = keyFrame.m_time;
+					index++;
+				}
+			}
+		}
+
+		sequence.Save(filename);
+	}
+}

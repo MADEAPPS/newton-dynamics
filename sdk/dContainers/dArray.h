@@ -13,7 +13,7 @@
 #define __D_ARRAY__
 
 template<class T>
-class dArray
+class dArray: public dContainersAlloc
 {
 	public:
 	dArray();
@@ -40,7 +40,8 @@ dArray<T>::dArray()
 
 template<class T>
 dArray<T>::dArray(int size)
-	:m_capacity(0)
+	:dContainersAlloc()
+	,m_capacity(0)
 	,m_data(NULL)
 {
 	Resize(size);
