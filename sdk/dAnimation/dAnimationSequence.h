@@ -14,7 +14,7 @@
 
 #include "dAnimationKeyframesTrack.h"
 
-class dAnimationSequence
+class dAnimationSequence: public dContainersAlloc
 {
 	public:
 	dAnimationSequence();

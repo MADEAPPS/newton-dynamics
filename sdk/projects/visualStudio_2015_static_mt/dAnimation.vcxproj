@@ -37,6 +37,8 @@
   <ItemGroup>
     <ClCompile Include="..\..\dAnimation\dAnimationPose.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationSequence.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationBlendTreeNode.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationSequencePlayer.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationKeyframesTrack.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationStdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -51,8 +53,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dAnimation\dAnimationPose.h" />
-    <ClInclude Include="..\..\dAnimation\dAnimationKeyframesTrack.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationSequence.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationBlendTreeNode.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationKeyframesTrack.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationSequencePlayer.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationStdAfx.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

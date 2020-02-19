@@ -58,5 +58,6 @@
 #include <dClassInfo.h>
 #include <dRefCounter.h>
 #include <dBaseHierarchy.h>
+#include <dContainersAlloc.h>
 
 #endif
