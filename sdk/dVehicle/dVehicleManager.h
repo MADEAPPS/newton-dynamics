@@ -16,7 +16,7 @@
 #include "dStdafxVehicle.h"
 
 
-#define D_VEHICLE_MANAGER_NAME			"__VehicleManager__"
+#define D_VEHICLE_MANAGER_NAME "__VehicleManager__"
 
 class dVehicle;
 class dVehicleNode;
@@ -24,7 +24,7 @@ class dVehicleNode;
 class dVehicleManager: public dCustomParallelListener
 {
 	public:
-	DVEHICLE_API dVehicleManager(NewtonWorld* const world);
+	DVEHICLE_API dVehicleManager(NewtonWorld* const world, const char* const managerName = D_VEHICLE_MANAGER_NAME);
 	DVEHICLE_API virtual ~dVehicleManager();
 
 	DVEHICLE_API void AddRoot(dVehicle* const root);

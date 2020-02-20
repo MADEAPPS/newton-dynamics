@@ -14,8 +14,8 @@
 #include "dVehicleNode.h"
 #include "dVehicleManager.h"
 
-dVehicleManager::dVehicleManager(NewtonWorld* const world)
-	:dCustomParallelListener(world, D_VEHICLE_MANAGER_NAME)
+dVehicleManager::dVehicleManager(NewtonWorld* const world, const char* const managerName)
+	:dCustomParallelListener(world, managerName)
 	,m_list()
 {
 }
