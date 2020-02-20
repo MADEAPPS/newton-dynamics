@@ -560,7 +560,8 @@ class AnimatedPlayerControllerManager: public dPlayerControllerManager
 	public:
 	AnimatedPlayerControllerManager(NewtonWorld* const world)
 		:dPlayerControllerManager(world)
-		, m_player(NULL)
+		,m_player(NULL)
+		,m_animCache()
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
 
@@ -743,6 +744,17 @@ class AnimatedPlayerControllerManager: public dPlayerControllerManager
 	void LoadAnimationBlendTree(dPlayerController* const controller)
 	{
 		//dAnimTakeData* const walkCycle = LoadAnimation(controller, "whiteman_idle.ngd");
+		dAnimationSequence* const idleSequence = LoadAnimation("whiteman_idle.ngd");
+	}
+
+	dAnimationSequence* LoadAnimation(const char* const name)
+	{
+		dTree<dAnimationSequence, dString>::dTreeNode* node = m_animCache.Find(name);
+		if (!node) {
+			node = m_animCache.Insert(name);
+			node->GetInfo().Load(name);
+		}
+		return &node->GetInfo();
 	}
 
 	void SetCamera()
@@ -840,7 +852,7 @@ class AnimatedPlayerControllerManager: public dPlayerControllerManager
 	}
 
 	dPlayerController* m_player;
-//	dTree<dAnimationKeyframesSequence*, dString> m_animCache;
+	dTree<dAnimationSequence, dString> m_animCache;
 };
 
 

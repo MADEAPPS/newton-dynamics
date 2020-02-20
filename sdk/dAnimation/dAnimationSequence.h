@@ -20,9 +20,9 @@ class dAnimationSequence: public dContainersAlloc
 	dAnimationSequence();
 	~dAnimationSequence();
 
-//	static dAnimationSequence* LoadAnimation(const dScene& scene, const char* const animName);
 	dAnimimationKeyFramesTrack* AddTrack();
 
+	void Load(const char* const fileName);
 	void Save(const char* const fileName);
 
 	dFloat GetPeriod() const { return m_period; }
