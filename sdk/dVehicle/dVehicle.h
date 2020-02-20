@@ -24,33 +24,6 @@ class dMultiBodyVehicleDashControl;
 class dVehicle: public dVehicleNode
 {
 	public:
-	class dDriverInput
-	{
-		public:
-		dDriverInput()
-			:m_throttle(0.0f)
-			,m_brakePedal(0.0f)
-			,m_clutchPedal(0.0f)
-			,m_steeringValue(0.0f)
-			,m_handBrakeValue(0.0f)
-			,m_gear(0)
-			,m_ignitionKey(0)
-			,m_differentialMode(0)
-			,m_manualTransmission(0)
-		{
-		}
-
-		dFloat m_throttle;
-		dFloat m_brakePedal;
-		dFloat m_clutchPedal;
-		dFloat m_steeringValue;
-		dFloat m_handBrakeValue;
-		int m_gear;
-		int m_ignitionKey;
-		int m_differentialMode;
-		int m_manualTransmission;
-	};
-
 	DVEHICLE_API dVehicle (NewtonBody* const rootBody, const dMatrix& localFrame, dFloat gravityMag);
 	DVEHICLE_API ~dVehicle();
 
@@ -60,13 +33,7 @@ class dVehicle: public dVehicleNode
 	dVehicle* GetAsVehicle() const { return (dVehicle*)this; }
 	const dMatrix& GetLocalFrame() const { return m_localFrame; }
 	const dVector& GetGravity() const {return m_gravity;}
-
-	void AddControl (dMultiBodyVehicleDashControl* const control);
-	void RemoveControl (dMultiBodyVehicleDashControl* const control);
-	int GetControlCount() const {return m_controlerCount;}
-
 	virtual bool CheckSleeping() {return false;}
-	virtual void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep) {}
 
 	protected:
 	virtual void PreUpdate(dFloat timestep) {};
@@ -76,11 +43,10 @@ class dVehicle: public dVehicleNode
 	dVector m_gravity;
 	dVector m_obbSize;
 	dVector m_obbOrigin;
-	dArray<dMultiBodyVehicleDashControl*> m_control;
+
 	NewtonBody* m_newtonBody;
 	void* m_managerNode;
 	dVehicleManager* m_manager;
-	int m_controlerCount;
 
 	friend class dMultiBodyVehicleTire;
 	friend class dVehicleManager;

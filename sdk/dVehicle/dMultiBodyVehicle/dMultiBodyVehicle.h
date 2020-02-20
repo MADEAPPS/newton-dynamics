@@ -26,6 +26,7 @@ class dVehicleLoopJoint;
 class dMultiBodyVehicleTire;
 class dMultiBodyVehicleDifferential;
 
+
 class dCollectCollidingBodies
 {
 	public:
@@ -43,10 +44,35 @@ class dCollectCollidingBodies
 class dMultiBodyVehicle: public dVehicle, public dVehicleSolver
 {
 	public:
+	class dDriverInput
+	{
+		public:
+		dDriverInput()
+			:m_throttle(0.0f)
+			, m_brakePedal(0.0f)
+			, m_clutchPedal(0.0f)
+			, m_steeringValue(0.0f)
+			, m_handBrakeValue(0.0f)
+			, m_gear(0)
+			, m_ignitionKey(0)
+			, m_differentialMode(0)
+			, m_manualTransmission(0)
+		{
+		}
+
+		dFloat m_throttle;
+		dFloat m_brakePedal;
+		dFloat m_clutchPedal;
+		dFloat m_steeringValue;
+		dFloat m_handBrakeValue;
+		int m_gear;
+		int m_ignitionKey;
+		int m_differentialMode;
+		int m_manualTransmission;
+	};
+
 	DVEHICLE_API dMultiBodyVehicle (NewtonBody* const rootBody, const dMatrix& localFrame, dFloat gravityMag);
 	DVEHICLE_API ~dMultiBodyVehicle();
-
-	dMultiBodyVehicle* GetAsVehicleMultiBody() const { return (dMultiBodyVehicle*)this; }
 
 	DVEHICLE_API void Finalize();
 	DVEHICLE_API const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
@@ -60,13 +86,15 @@ class dMultiBodyVehicle: public dVehicle, public dVehicleSolver
 	DVEHICLE_API dVehicleBrakeControl* GetHandBrakeControl();
 	DVEHICLE_API dVehicleSteeringControl* GetSteeringControl();
 
+	dMultiBodyVehicle* GetAsVehicleMultiBody() const { return (dMultiBodyVehicle*)this; }
+	DVEHICLE_API virtual void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep);
+
 	private:
 	void ApplyExternalForce();
 	void Integrate(dFloat timestep);
 	void CalculateFreeDof(dFloat timestep);
 	void CalculateTireContacts(dFloat timestep);
 	virtual int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
-	virtual void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep);
 
 	virtual bool CheckSleeping();
 	dMultiBodyVehicleCollisionNode* FindCollideNode(dVehicleNode* const node0, NewtonBody* const body);

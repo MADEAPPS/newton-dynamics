@@ -716,8 +716,6 @@ axisCount = 0;
 		}
 	#endif
 #endif
-
-		vehicle->ApplyDriverInputs(driverInput, timestep);
 	}
 
 	void OnRemove(const dVehicle* const vehicle)

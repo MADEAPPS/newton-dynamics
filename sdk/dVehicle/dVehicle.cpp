@@ -23,11 +23,9 @@ dVehicle::dVehicle(NewtonBody* const body, const dMatrix& localFrame, dFloat gra
 	,m_gravity(0.0f, -dAbs(gravityMag), 0.0f, 0.0f)
 	,m_obbSize(0.0f)
 	,m_obbOrigin(0.0f)
-	,m_control(4)
 	,m_newtonBody(body)
 	,m_managerNode(NULL)
 	,m_manager(NULL)
-	,m_controlerCount(0)
 {
 	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
 	dAssert(m_localFrame.TestOrthogonal());
@@ -51,21 +49,3 @@ dVehicle::~dVehicle()
 	}
 }
 
-
-void dVehicle::AddControl(dMultiBodyVehicleDashControl* const control)
-{
-	m_control[m_controlerCount] = control;
-	m_controlerCount ++;
-}
-
-void dVehicle::RemoveControl(dMultiBodyVehicleDashControl* const control)
-{
-	for (int i = 0; i < m_controlerCount; i ++) {
-		if (control == m_control[m_controlerCount]) {
-			for (int j = i + 1; i < m_controlerCount; i ++) {
-				m_control[j - 1] = m_control[j];
-			}
-		}
-		return;
-	}
-}

@@ -31,10 +31,10 @@ dMultiBodyVehicle::dMultiBodyVehicle(NewtonBody* const body, const dMatrix& loca
 	m_steeringControl.Init(this);
 	m_handBrakeControl.Init(this);
 
-	AddControl(&m_brakeControl);
-	AddControl(&m_engineControl);
-	AddControl(&m_steeringControl);
-	AddControl(&m_handBrakeControl);
+	//AddControl(&m_brakeControl);
+	//AddControl(&m_engineControl);
+	//AddControl(&m_steeringControl);
+	//AddControl(&m_handBrakeControl);
 
 	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
 	dAssert(m_localFrame.TestOrthogonal());
@@ -130,6 +130,26 @@ const void dMultiBodyVehicle::Debug(dCustomJoint::dDebugDisplay* const debugCont
 
 	dVehicleNode::Debug(debugContext);
 }
+
+/*
+void dVehicle::AddControl(dMultiBodyVehicleDashControl* const control)
+{
+	m_control[m_controlerCount] = control;
+	m_controlerCount++;
+}
+
+void dVehicle::RemoveControl(dMultiBodyVehicleDashControl* const control)
+{
+	for (int i = 0; i < m_controlerCount; i++) {
+		if (control == m_control[m_controlerCount]) {
+			for (int j = i + 1; i < m_controlerCount; i++) {
+				m_control[j - 1] = m_control[j];
+			}
+		}
+		return;
+	}
+}
+*/
 
 void dMultiBodyVehicle::ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep)
 {
@@ -530,12 +550,13 @@ bool dMultiBodyVehicle::CheckSleeping()
 {
 return false;
 
-	for (int i = 0; i < m_controlerCount; i ++) {
-		if (m_control[i]->ParamChanged()) {
-			m_sleepCounter = 0;
-			return false;
-		}
-	}
+	dAssert(0);
+	//for (int i = 0; i < m_controlerCount; i ++) {
+	//	if (m_control[i]->ParamChanged()) {
+	//		m_sleepCounter = 0;
+	//		return false;
+	//	}
+	//}
 
 	dVector vector(0.0f);
 	NewtonBodyGetVelocity(m_newtonBody, &vector[0]);
@@ -558,11 +579,13 @@ return false;
 
 void dMultiBodyVehicle::PreUpdate(dFloat timestep)
 {
-	m_manager->UpdateDriverInput(this, timestep);
+	dAssert(0);
+//	m_manager->UpdateDriverInput(this, timestep);
 
-	for (int i = 0; i < m_controlerCount; i ++) {
-		m_control[i]->Update(timestep);
-	}
+	dAssert(0);
+	//for (int i = 0; i < m_controlerCount; i ++) {
+	//	m_control[i]->Update(timestep);
+	//}
 
 	if (CheckSleeping()) {
 		m_sleepCounter ++;	
