@@ -53,5 +53,40 @@ void dAnimimationKeyFramesTrack::Save(FILE* const file) const
 		dQuaternion q(m_rotation[i].m_rotation);
 		fprintf(file, "\t\t\t%f %f %f %f %f\n", m_rotation[i].m_time, q.m_x, q.m_y, q.m_z, q.m_w);
 	}
+}
 
+void dAnimimationKeyFramesTrack::Load(FILE* const file)
+{
+	char name[1024];
+
+	fscanf(file, "trackName: %s\n", name);
+	m_name = name;
+
+	int positions;
+	fscanf(file, "positions (t, x, y, z): %d\n", &positions);
+	m_position.Resize(positions);
+	for (int i = 0; i < positions; i++) {
+		dFloat32 x;
+		dFloat32 y;
+		dFloat32 z;
+		dFloat32 t;
+		fscanf(file, "%f %f %f %f\n", &t, &x, &y, &z);
+		m_position[i].m_time = t;
+		m_position[i].m_posit = dVector(dFloat(x), dFloat(y), dFloat(z), dFloat(0.0f));
+	}
+
+	int rotations;
+	fscanf(file, "rotation (t, qx, qy, qz, qw): %d\n", &rotations);
+	m_rotation.Resize(positions);
+	for (int i = 0; i < rotations; i++) {
+		dFloat32 x;
+		dFloat32 y;
+		dFloat32 z;
+		dFloat32 w;
+		dFloat32 t;
+
+		fscanf(file, "%f %f %f %f %f\n", &t, &x, &y, &z, &w);
+		m_rotation[i].m_time = t;
+		m_rotation[i].m_rotation = dQuaternion (x, y, z, w);
+	}
 }

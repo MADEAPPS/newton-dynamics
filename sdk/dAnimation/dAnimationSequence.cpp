@@ -45,7 +45,19 @@ void dAnimationSequence::CalculatePose(dAnimationPose& output, dFloat t) const
 
 void dAnimationSequence::Load(const char* const fileName)
 {
-
+	m_tracks.RemoveAll();
+	m_period = 0;
+	FILE* const file = fopen(fileName, "rb");
+	if (file) {
+		int tracksCount;
+		fscanf(file, "period %f\n", &m_period);
+		fscanf(file, "tracksCount %d\n", &tracksCount);
+		for (int i = 0; i < tracksCount; i++) {
+			dAnimimationKeyFramesTrack* const track = AddTrack();
+			track->Load(file);
+		}
+		fclose(file);
+	}
 }
 
 void dAnimationSequence::Save(const char* const fileName)

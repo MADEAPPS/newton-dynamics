@@ -45,7 +45,6 @@ class dVehicleManager: public dCustomParallelListener
 
 	DVEHICLE_API void OnDestroyBody(NewtonBody* const body);
 	DVEHICLE_API void OnDebug(dCustomJoint::dDebugDisplay* const debugContext);
-	
 
 	dList<dVehicle*> m_list;
 };

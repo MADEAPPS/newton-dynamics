@@ -554,6 +554,24 @@ for (int i = 0; i < 10; i ++) {
 //#define PLAYER_JUMP_SPEED				5.8f
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 
+class dAnimationCache: public dTree<dAnimationSequence, dString>
+{
+	public:
+	dAnimationCache()
+	{
+		LoadAnimation("whiteman_idle.anm");
+		LoadAnimation("whiteman_walk.anm");
+	}
+
+	private:
+	void LoadAnimation(const char* const name)
+	{
+		char fileName[1024];
+		dGetWorkingFileName(name, fileName);
+		dTree<dAnimationSequence, dString>::dTreeNode* node = Insert(name);
+		node->GetInfo().Load(fileName);
+	}
+};
 
 class AnimatedPlayerControllerManager: public dPlayerControllerManager
 {
@@ -561,27 +579,16 @@ class AnimatedPlayerControllerManager: public dPlayerControllerManager
 	AnimatedPlayerControllerManager(NewtonWorld* const world)
 		:dPlayerControllerManager(world)
 		,m_player(NULL)
-		,m_animCache()
+		,m_animationCache()
 	{
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
 
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 		scene->Set2DDisplayRenderFunction(RenderPlayerHelp, NULL, this);
-
-		// load the animation sequences.
-		//GetAnimationSequence("whiteman_idle.ngd");
-		//GetAnimationSequence("whiteman_walk.ngd");
 	}
 
 	~AnimatedPlayerControllerManager()
 	{
-		/*
-		while (m_animCache) {
-			//dAnimationKeyframesSequence* const data = m_animCache.GetRoot()->GetInfo();
-			//data->Release();
-			//m_animCache.Remove(m_animCache.GetRoot());
-		}
-	*/
 	}
 
 	void SetAsPlayer(dPlayerController* const controller)
@@ -615,7 +622,6 @@ class AnimatedPlayerControllerManager: public dPlayerControllerManager
 		me->SetCamera();
 	}
 
-	//dAnimTakeData* LoadAnimation(dAnimIKController* const controller, const char* const animName)
 /*
 	dAnimationKeyframesSequence* GetAnimationSequence(const char* const animName)
 	{
@@ -744,17 +750,7 @@ class AnimatedPlayerControllerManager: public dPlayerControllerManager
 	void LoadAnimationBlendTree(dPlayerController* const controller)
 	{
 		//dAnimTakeData* const walkCycle = LoadAnimation(controller, "whiteman_idle.ngd");
-		dAnimationSequence* const idleSequence = LoadAnimation("whiteman_idle.ngd");
-	}
-
-	dAnimationSequence* LoadAnimation(const char* const name)
-	{
-		dTree<dAnimationSequence, dString>::dTreeNode* node = m_animCache.Find(name);
-		if (!node) {
-			node = m_animCache.Insert(name);
-			node->GetInfo().Load(name);
-		}
-		return &node->GetInfo();
+		//dAnimationSequence* const idleSequence = LoadAnimation("whiteman_idle.ngd");
 	}
 
 	void SetCamera()
@@ -852,7 +848,7 @@ class AnimatedPlayerControllerManager: public dPlayerControllerManager
 	}
 
 	dPlayerController* m_player;
-	dTree<dAnimationSequence, dString> m_animCache;
+	dAnimationCache m_animationCache;
 };
 
 

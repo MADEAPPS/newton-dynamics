@@ -85,6 +85,7 @@ class dAnimimationKeyFramesTrack
 	const void InterpolatePosition(dFloat t, dVector &positOut) const;
 	const void InterpolateRotation(dFloat t, dQuaternion& rotationOut) const;
 
+	void Load(FILE* const file);
 	void Save(FILE* const file) const;
 	dString m_name;
 	dAnimimationKeyFramesArray<dPositionKey> m_position;

@@ -16,10 +16,10 @@
 #include "dStdafxVehicle.h"
 
 class dVehicleNode;
-class dMultiBodyVehicleTire;
-class dMultiBodyVehicleEngine;
 class dMultiBodyVehicle;
 class dVehicleLoopJoint;
+class dMultiBodyVehicleTire;
+class dMultiBodyVehicleEngine;
 class dMultiBodyVehicleDifferential;
 
 class dVehicleNodeChildrenList: public dList<dVehicleNode*>
