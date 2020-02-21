@@ -262,6 +262,19 @@ class dBasicPlayerController: public dPlayerController
 		:dPlayerController(world, location, localAxis, mass, radius, height, stepHeight)
 	{
 	}
+
+	virtual void ApplyMove(dFloat timestep)
+	{
+		// calculate the gravity contribution to the velocity
+		dFloat g = 2.0f * DEMO_GRAVITY;
+		dVector gravity(GetLocalFrame().RotateVector(dVector(g, 0.0f, 0.0f, 0.0f)));
+		dVector totalImpulse(GetImpulse() + gravity.Scale(GetMass() * timestep));
+		SetImpulse(totalImpulse);
+
+		// apply play movement
+		//GetManager()
+		//ApplyInputs(this);
+	}
 };
 
 class dBasicPlayerControllerManager: public dVehicleManager
@@ -337,6 +350,46 @@ class dBasicPlayerControllerManager: public dVehicleManager
 			camOrigin -= frontDir.Scale(PLAYER_THIRD_PERSON_VIEW_DIST);
 
 			camera->SetNextMatrix(*scene, camMatrix, camOrigin);
+		}
+	}
+
+	void ApplyInputs(dPlayerController* const controller)
+	{
+		if (controller == m_player) {
+			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+			dFloat forwarSpeed = (int(scene->GetKeyState('W')) - int(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
+			dFloat strafeSpeed = (int(scene->GetKeyState('D')) - int(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
+
+			bool crowchKey = scene->GetKeyState('C') ? true : false;
+			if (m_crowchKey.UpdateTrigger(crowchKey))
+			{
+				controller->ToggleCrouch();
+				DemoEntity* const playerEntity = (DemoEntity*)NewtonBodyGetUserData(controller->GetBody());
+				if (controller->IsCrouched()) {
+					playerEntity->SetMesh(m_crouchMesh, dGetIdentityMatrix());
+				} else {
+					playerEntity->SetMesh(m_standingMesh, dGetIdentityMatrix());
+				}
+			}
+
+			if (scene->GetKeyState(' ') && controller->IsOnFloor()) {
+				dVector jumpImpule(controller->GetLocalFrame().RotateVector(dVector(PLAYER_JUMP_SPEED * controller->GetMass(), 0.0f, 0.0f, 0.0f)));
+				dVector totalImpulse(controller->GetImpulse() + jumpImpule);
+				controller->SetImpulse(totalImpulse);
+			}
+
+			if (forwarSpeed && strafeSpeed) {
+				dFloat invMag = PLAYER_WALK_SPEED / dSqrt(forwarSpeed * forwarSpeed + strafeSpeed * strafeSpeed);
+				forwarSpeed *= invMag;
+				strafeSpeed *= invMag;
+			}
+
+			DemoCamera* const camera = scene->GetCamera();
+			dMatrix camMatrix(camera->GetNextMatrix());
+
+			controller->SetForwardSpeed(forwarSpeed);
+			controller->SetLateralSpeed(strafeSpeed);
+			controller->SetHeadingAngle(camera->GetYawAngle());
 		}
 	}
 

@@ -36,29 +36,31 @@ class dPlayerController: public dVehicle
 //	dPlayerControllerManager* GetManager() const {return m_manager;}
 
 	DVEHICLE_API void ToggleCrouch ();
-//
-//	bool IsCrouched () const {return m_isCrouched;}
-//	bool IsAirBorn () const {return m_isAirbone;}
-//	bool IsOnFloor () const {return m_isOnFloor;}
-//	const dFloat GetMass() const { return m_mass;}
-//
-//	const dVector& GetImpulse() { return m_impulse; }
-//	void SetImpulse(const dVector& impulse) { m_impulse = impulse;}
-//
-//	dFloat GetForwardSpeed() const { return -m_forwardSpeed; }
-//	void SetForwardSpeed(dFloat speed) {m_forwardSpeed = -speed; }
-//
-//	dFloat GetLateralSpeed() const { return -m_lateralSpeed; }
-//	void SetLateralSpeed(dFloat speed) { m_lateralSpeed = -speed; }
-//
-//	dFloat GetHeadingAngle() const { return m_headingAngle; }
-//	void SetHeadingAngle(dFloat angle) {m_headingAngle = dClamp (angle, dFloat (-dPi), dFloat (dPi));}
-//
+
+	virtual void ApplyMove(dFloat timestep) {}
+
+	bool IsCrouched () const {return m_isCrouched;}
+	bool IsAirBorn () const {return m_isAirbone;}
+	bool IsOnFloor () const {return m_isOnFloor;}
+	const dFloat GetMass() const { return m_mass;}
+
+	const dVector& GetImpulse() { return m_impulse; }
+	void SetImpulse(const dVector& impulse) { m_impulse = impulse;}
+
+	dFloat GetForwardSpeed() const { return -m_forwardSpeed; }
+	void SetForwardSpeed(dFloat speed) {m_forwardSpeed = -speed; }
+
+	dFloat GetLateralSpeed() const { return -m_lateralSpeed; }
+	void SetLateralSpeed(dFloat speed) { m_lateralSpeed = -speed; }
+
+	dFloat GetHeadingAngle() const { return m_headingAngle; }
+	void SetHeadingAngle(dFloat angle) {m_headingAngle = dClamp (angle, dFloat (-dPi), dFloat (dPi));}
+
 //	dMatrix GetFrame() const { return m_localFrame; }
 //	DVEHICLE_API void SetFrame(const dMatrix& frame);
-//
-//	DVEHICLE_API dVector GetVelocity() const;
-//	DVEHICLE_API void SetVelocity(const dVector& veloc);
+
+	DVEHICLE_API dVector GetVelocity() const;
+	DVEHICLE_API void SetVelocity(const dVector& veloc);
 //
 //	private:
 //	enum dCollisionState

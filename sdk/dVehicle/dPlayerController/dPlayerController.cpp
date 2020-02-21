@@ -89,6 +89,19 @@ void dPlayerController::ToggleCrouch()
 	NewtonCollisionSetMatrix(shape, &matrix[0][0]);
 }
 
+dVector dPlayerController::GetVelocity() const
+{
+	dVector veloc(0.0f);
+	NewtonBodyGetVelocity(m_newtonBody, &veloc[0]);
+	return veloc;
+}
+
+void dPlayerController::SetVelocity(const dVector& veloc)
+{
+	dAssert(veloc.DotProduct3(veloc) < 10000.0f);
+	NewtonBodySetVelocity(m_newtonBody, &veloc[0]);
+}
+
 void dPlayerController::PreUpdate(dFloat timestep)
 {
 	dPlayerControllerContactSolver contactSolver(this);
@@ -96,9 +109,8 @@ void dPlayerController::PreUpdate(dFloat timestep)
 	dFloat timeLeft = timestep;
 	const dFloat timeEpsilon = timestep * (1.0f / 16.0f);
 
-#if 0
 	m_impulse = dVector(0.0f);
-	m_manager->ApplyMove(this, timestep);
+	ApplyMove(timestep);
 
 #if 0
 	#if 0
@@ -121,13 +133,14 @@ void dPlayerController::PreUpdate(dFloat timestep)
 
 	// set player orientation
 	dMatrix matrix(dYawMatrix(GetHeadingAngle()));
-	NewtonBodyGetPosition(m_kinematicBody, &matrix.m_posit[0]);
-	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
+	NewtonBodyGetPosition(m_newtonBody, &matrix.m_posit[0]);
+	NewtonBodySetMatrix(m_newtonBody, &matrix[0][0]);
 
 	// set play desired velocity
 	dVector veloc(GetVelocity() + m_impulse.Scale(m_invMass));
 	SetVelocity(veloc);
 
+#if 0
 	// determine if player has to step over obstacles lower than step hight
 	ResolveStep(timestep, contactSolver);
 
@@ -138,7 +151,7 @@ void dPlayerController::PreUpdate(dFloat timestep)
 		}
 
 		dFloat predicetdTime = PredictTimestep(timeLeft, contactSolver);
-		NewtonBodyIntegrateVelocity(m_kinematicBody, predicetdTime);
+		NewtonBodyIntegrateVelocity(m_newtonBody, predicetdTime);
 		timeLeft -= predicetdTime;
 	}
 
