@@ -279,6 +279,16 @@ class dBasicPlayerControllerManager: public dVehicleManager
 		scene->Set2DDisplayRenderFunction(RenderPlayerHelp, NULL, this);
 	}
 
+	~dBasicPlayerControllerManager()
+	{
+		if (m_crouchMesh) {
+			m_crouchMesh->Release();
+		}
+		if (m_standingMesh) {
+			m_standingMesh->Release();
+		}
+	}
+	
 	static void RenderPlayerHelp(DemoEntityManager* const scene, void* const context)
 	{
 		dBasicPlayerControllerManager* const me = (dBasicPlayerControllerManager*)context;
