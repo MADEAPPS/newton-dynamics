@@ -30,7 +30,7 @@ class BasicPlayerControllerManagerOld: public dPlayerControllerManager
 	public:
 	BasicPlayerControllerManagerOld (NewtonWorld* const world)
 		:dPlayerControllerManager (world)
-		,m_croudMesh(NULL)
+		,m_crouchMesh(NULL)
 		,m_standingMesh(NULL)
 		,m_player(NULL)
 		,m_crowchKey(false)
@@ -43,8 +43,8 @@ class BasicPlayerControllerManagerOld: public dPlayerControllerManager
 
 	~BasicPlayerControllerManagerOld ()
 	{
-		if (m_croudMesh) {
-			m_croudMesh->Release();
+		if (m_crouchMesh) {
+			m_crouchMesh->Release();
 		}
 		if (m_standingMesh) {
 			m_standingMesh->Release();
@@ -107,10 +107,10 @@ class BasicPlayerControllerManagerOld: public dPlayerControllerManager
 		NewtonBody* const body = controller->GetBody();
 
 		// create the visual mesh from the player collision shape
-		if (!m_croudMesh) {
+		if (!m_crouchMesh) {
 			NewtonCollision* const collision = NewtonBodyGetCollision(body);
 			controller->ToggleCrouch();
-			m_croudMesh = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
+			m_crouchMesh = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 			controller->ToggleCrouch();
 			m_standingMesh = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
@@ -166,7 +166,7 @@ class BasicPlayerControllerManagerOld: public dPlayerControllerManager
 				controller->ToggleCrouch();
 				DemoEntity* const playerEntity = (DemoEntity*)NewtonBodyGetUserData(controller->GetBody());
 				if (controller->IsCrouched()) {
-					playerEntity->SetMesh(m_croudMesh, dGetIdentityMatrix());
+					playerEntity->SetMesh(m_crouchMesh, dGetIdentityMatrix());
 				} else {
 					playerEntity->SetMesh(m_standingMesh, dGetIdentityMatrix());
 				}
@@ -248,7 +248,7 @@ class BasicPlayerControllerManagerOld: public dPlayerControllerManager
 		ApplyInputs (controller);
 	}
 
-	DemoMesh* m_croudMesh;
+	DemoMesh* m_crouchMesh;
 	DemoMesh* m_standingMesh;
 	dPlayerControllerOld* m_player;
 	DemoEntityManager::ButtonKey m_crowchKey;
@@ -269,7 +269,7 @@ class dBasicPlayerControllerManager: public dVehicleManager
 	public:
 	dBasicPlayerControllerManager(NewtonWorld* const world)
 		:dVehicleManager(world)
-		,m_croudMesh(NULL)
+		,m_crouchMesh(NULL)
 		,m_standingMesh(NULL)
 		,m_player(NULL)
 		,m_crowchKey(false)
@@ -350,40 +350,40 @@ class dBasicPlayerControllerManager: public dVehicleManager
 		dBasicPlayerController* const controller = new dBasicPlayerController(world, location, localAxis, mass, radius, height, height / 3.0f);
 		AddRoot(controller);
 
-//		// Test Local Matrix manipulations
-//		//controller->SetFrame(dRollMatrix(60.0f * dDegreeToRad) * controller->GetFrame());
-//
-//		// get body from player, and set some parameter
-//		NewtonBody* const body = controller->GetBody();
-//
-//		// create the visual mesh from the player collision shape
-//		if (!m_croudMesh) {
-//			NewtonCollision* const collision = NewtonBodyGetCollision(body);
-//			controller->ToggleCrouch();
-//			m_croudMesh = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
-//
-//			controller->ToggleCrouch();
-//			m_standingMesh = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
-//		}
-//
-//		// make standing and crouch meshes
-//		DemoEntity* const playerEntity = new DemoEntity(location, NULL);
-//		scene->Append(playerEntity);
-//		playerEntity->SetMesh(m_standingMesh, dGetIdentityMatrix());
-//
-//		// set the user data
-//		NewtonBodySetUserData(body, playerEntity);
-//
-//		// set the transform callback
-//		NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
-//
-//		// save player model with the controller
-//		controller->SetUserData(playerEntity);
+		// Test Local Matrix manipulations
+		//controller->SetFrame(dRollMatrix(60.0f * dDegreeToRad) * controller->GetFrame());
+
+		// get body from player, and set some parameter
+		NewtonBody* const body = controller->GetBody();
+
+		// create the visual mesh from the player collision shape
+		if (!m_crouchMesh) {
+			NewtonCollision* const collision = NewtonBodyGetCollision(body);
+			controller->ToggleCrouch();
+			m_crouchMesh = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
+			
+			controller->ToggleCrouch();
+			m_standingMesh = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
+		}
+
+		// make standing and crouch meshes
+		DemoEntity* const playerEntity = new DemoEntity(location, NULL);
+		scene->Append(playerEntity);
+		playerEntity->SetMesh(m_standingMesh, dGetIdentityMatrix());
+
+		// set the user data
+		NewtonBodySetUserData(body, playerEntity);
+
+		// set the transform callback
+		NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
+
+		// save player model with the controller
+		controller->SetUserData(playerEntity);
 
 		return controller;
 	}
 
-	DemoMesh* m_croudMesh;
+	DemoMesh* m_crouchMesh;
 	DemoMesh* m_standingMesh;
 	dPlayerController* m_player;
 	DemoEntityManager::ButtonKey m_crowchKey;

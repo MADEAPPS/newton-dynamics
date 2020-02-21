@@ -22,7 +22,6 @@
 
 dPlayerController::dPlayerController(NewtonWorld* const world, const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
 	:dVehicle(NULL, localAxis, 10.0f)
-//	,m_localFrame(dGetIdentityMatrix())
 	,m_impulse(0.0f)
 	,m_mass(mass)
 	,m_invMass(1.0f / mass)
@@ -35,7 +34,6 @@ dPlayerController::dPlayerController(NewtonWorld* const world, const dMatrix& lo
 	,m_weistScale(3.0f)
 	,m_crouchScale(0.5f)
 	,m_userData(NULL)
-	,m_kinematicBody(NULL)
 	,m_isAirbone(false)
 	,m_isOnFloor(false)
 	,m_isCrouched(false)
@@ -49,14 +47,14 @@ dPlayerController::dPlayerController(NewtonWorld* const world, const dMatrix& lo
 	NewtonCollisionSetScale(bodyCapsule, 1.0f, m_weistScale, m_weistScale);
 
 	// create the kinematic body
-	m_kinematicBody = NewtonCreateKinematicBody(world, bodyCapsule, &location[0][0]);
+	m_newtonBody = NewtonCreateKinematicBody(world, bodyCapsule, &location[0][0]);
 
 	// players must have weight, otherwise they are infinitely strong when they collide
-	NewtonCollision* const shape = NewtonBodyGetCollision(m_kinematicBody);
-	NewtonBodySetMassProperties(m_kinematicBody, mass, shape);
+	NewtonCollision* const shape = NewtonBodyGetCollision(m_newtonBody);
+	NewtonBodySetMassProperties(m_newtonBody, mass, shape);
 
 	// make the body collide with other dynamics bodies, by default
-	NewtonBodySetCollidable(m_kinematicBody, 1);
+	NewtonBodySetCollidable(m_newtonBody, 1);
 	NewtonDestroyCollision(bodyCapsule);
 
 	shapeMatrix.m_posit = dVector(0.0f, dFloat(0.0f), dFloat(0.0f), 1.0f);
@@ -70,6 +68,24 @@ dPlayerController::~dPlayerController()
 	if (m_managerNode) {
 		m_manager->RemoveRoot(this);
 	}
+}
+
+void dPlayerController::ToggleCrouch()
+{
+	dMatrix matrix;
+	m_isCrouched = !m_isCrouched;
+
+	NewtonCollision* const shape = NewtonBodyGetCollision(m_newtonBody);
+	NewtonCollisionGetMatrix(shape, &matrix[0][0]);
+	if (m_isCrouched) {
+		matrix.m_posit = matrix.m_front.Scale(m_height * m_crouchScale * 0.5f);
+		NewtonCollisionSetScale(shape, m_crouchScale, m_weistScale, m_weistScale);
+	} else {
+		matrix.m_posit = matrix.m_front.Scale(m_height * 0.5f);
+		NewtonCollisionSetScale(shape, dFloat(1.0f), m_weistScale, m_weistScale);
+	}
+	matrix.m_posit.m_w = 1.0f;
+	NewtonCollisionSetMatrix(shape, &matrix[0][0]);
 }
 
 void dPlayerController::PreUpdate(dFloat timestep)
