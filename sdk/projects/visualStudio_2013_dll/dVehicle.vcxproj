@@ -61,6 +61,7 @@
     <ClCompile Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTireContact.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerController.cpp" />
+    <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerContactSolver.cpp" />
     <ClCompile Include="..\..\dVehicle\dStdafxVehicle.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -85,14 +86,15 @@
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleEngine.h" />
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTire.h" />
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTireContact.h" />
-    <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerManager.h" />
-    <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerController.cpp" />
+    <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerController.h" />
+    <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerContactSolver.h" />
     <ClInclude Include="..\..\dVehicle\dStdafxVehicle.h" />
     <ClInclude Include="..\..\dVehicle\dVehicle.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleLoopJoint.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleManager.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleNode.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleSolver.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleSolverContactSolver.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A78EB61C-CCC7-491E-B32D-7A31B76A73D3}</ProjectGuid>

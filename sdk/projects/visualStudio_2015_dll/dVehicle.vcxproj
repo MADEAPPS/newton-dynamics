@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerController.cpp" />
+    <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerContactSolver.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dVehicle\dStdafxVehicle.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
@@ -79,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerController.h" />
+    <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerContactSolver.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerManager.h" />
     <ClInclude Include="..\..\dVehicle\dStdafxVehicle.h" />
     <ClInclude Include="..\..\dVehicle\dVehicle.h" />

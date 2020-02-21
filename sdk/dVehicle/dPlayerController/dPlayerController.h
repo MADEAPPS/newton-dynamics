@@ -23,7 +23,7 @@
 
 class dPlayerController: public dVehicle
 {
-//	class dPlayerControllerContactSolver;
+
 //	class dPlayerControllerImpulseSolver;
 
 	public:
@@ -76,11 +76,14 @@ class dPlayerController: public dVehicle
 //	void ResolveInterpenetrations(dPlayerControllerContactSolver& contactSolver, dPlayerControllerImpulseSolver& impulseSolver);
 //	dCollisionState TestPredictCollision(const dPlayerControllerContactSolver& contactSolver, const dVector& veloc) const;
 
+	protected:
+	DVEHICLE_API void PreUpdate(dFloat timestep);
+
+	void PostUpdate(dFloat timestep)
+	{
+	}
+
 	private:
-	void PreUpdate(dFloat timestep);
-	void PostUpdate(dFloat timestep);
-
-
 	dVector m_impulse;
 	dFloat m_mass;
 	dFloat m_invMass;

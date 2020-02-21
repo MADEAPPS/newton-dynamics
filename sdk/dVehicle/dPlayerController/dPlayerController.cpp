@@ -19,6 +19,7 @@
 #include "dVehicleNode.h"
 #include "dVehicleManager.h"
 #include "dPlayerController.h"
+#include "dPlayerControllerContactSolver.h"
 
 dPlayerController::dPlayerController(NewtonWorld* const world, const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
 	:dVehicle(NULL, localAxis, 10.0f)
@@ -90,11 +91,58 @@ void dPlayerController::ToggleCrouch()
 
 void dPlayerController::PreUpdate(dFloat timestep)
 {
-	//dAssert (0);
-	dTrace (("implemet this\n"));
+	dPlayerControllerContactSolver contactSolver(this);
+
+	dFloat timeLeft = timestep;
+	const dFloat timeEpsilon = timestep * (1.0f / 16.0f);
+
+#if 0
+	m_impulse = dVector(0.0f);
+	m_manager->ApplyMove(this, timestep);
+
+#if 0
+	#if 0
+		static FILE* file = fopen("log.bin", "wb");
+		if (file) {
+			fwrite(&m_headingAngle, sizeof(m_headingAngle), 1, file);
+			fwrite(&m_forwardSpeed, sizeof(m_forwardSpeed), 1, file);
+			fwrite(&m_lateralSpeed, sizeof(m_lateralSpeed), 1, file);
+			fflush(file);
+		}
+	#else 
+		static FILE* file = fopen("log.bin", "rb");
+		if (file) {
+			fread(&m_headingAngle, sizeof(m_headingAngle), 1, file);
+			fread(&m_forwardSpeed, sizeof(m_forwardSpeed), 1, file);
+			fread(&m_lateralSpeed, sizeof(m_lateralSpeed), 1, file);
+		}
+	#endif
+#endif
+
+	// set player orientation
+	dMatrix matrix(dYawMatrix(GetHeadingAngle()));
+	NewtonBodyGetPosition(m_kinematicBody, &matrix.m_posit[0]);
+	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
+
+	// set play desired velocity
+	dVector veloc(GetVelocity() + m_impulse.Scale(m_invMass));
+	SetVelocity(veloc);
+
+	// determine if player has to step over obstacles lower than step hight
+	ResolveStep(timestep, contactSolver);
+
+	// advance player until it hit a collision point, until there is not more time left
+	for (int i = 0; (i < D_DESCRETE_MOTION_STEPS) && (timeLeft > timeEpsilon); i++) {
+		if (timeLeft > timeEpsilon) {
+			ResolveCollision(contactSolver, timestep);
+		}
+
+		dFloat predicetdTime = PredictTimestep(timeLeft, contactSolver);
+		NewtonBodyIntegrateVelocity(m_kinematicBody, predicetdTime);
+		timeLeft -= predicetdTime;
+	}
+
+	UpdatePlayerStatus(contactSolver);
+#endif
 }
 
-void dPlayerController::PostUpdate(dFloat timestep)
-{
-	dTrace (("implemet this\n"));
-}
