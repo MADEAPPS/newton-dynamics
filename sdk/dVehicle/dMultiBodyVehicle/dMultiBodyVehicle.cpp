@@ -26,6 +26,26 @@ dMultiBodyVehicle::dMultiBodyVehicle(NewtonBody* const body, const dMatrix& loca
 	,m_collidingIndex(0)
 	,m_sleepCounter(0)
 {
+	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+	dAssert(m_localFrame.TestOrthogonal());
+
+	// set linear and angular drag to zero
+	dVector drag(0.0f);
+	NewtonBodySetLinearDamping(m_newtonBody, 0.0f);
+	NewtonBodySetAngularDamping(m_newtonBody, &drag[0]);
+
+	// set the inertia matrix;
+	dMatrix matrix(dGetIdentityMatrix());
+	NewtonBodyGetCentreOfMass(m_newtonBody, &matrix.m_posit[0]);
+	matrix.m_posit.m_w = 1.0f;
+	m_proxyBody.SetLocalMatrix(matrix);
+
+	// set the inertia matrix;
+	dVector tmp;
+	NewtonBodyGetMass(m_newtonBody, &tmp.m_w, &tmp.m_x, &tmp.m_y, &tmp.m_z);
+	m_proxyBody.SetMass(tmp.m_w);
+	m_proxyBody.SetInertia(tmp.m_x, tmp.m_y, tmp.m_z);
+
 	m_brakeControl.Init(this);
 	m_engineControl.Init(this);
 	m_steeringControl.Init(this);
@@ -36,13 +56,6 @@ dMultiBodyVehicle::dMultiBodyVehicle(NewtonBody* const body, const dMatrix& loca
 	//AddControl(&m_steeringControl);
 	//AddControl(&m_handBrakeControl);
 
-	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
-	dAssert(m_localFrame.TestOrthogonal());
-
-	// set linear and angular drag to zero
-	dVector drag(0.0f);
-	NewtonBodySetLinearDamping(m_newtonBody, 0.0f);
-	NewtonBodySetAngularDamping(m_newtonBody, &drag[0]);
 
 	/*
 	m_aerodynamicsDownForce0 = 0.0f;
@@ -51,17 +64,6 @@ dMultiBodyVehicle::dMultiBodyVehicle(NewtonBody* const body, const dMatrix& loca
 	m_aerodynamicsDownForceCoefficient = 0.0f;
 	SetAerodynamicsDownforceCoefficient(0.5f, 0.4f, 1.0f);
 	*/
-
-	// set the inertia matrix;
-	dVector tmp;
-	NewtonBodyGetMass(m_newtonBody, &tmp.m_w, &tmp.m_x, &tmp.m_y, &tmp.m_z);
-	m_proxyBody.SetMass(tmp.m_w);
-	m_proxyBody.SetInertia(tmp.m_x, tmp.m_y, tmp.m_z);
-
-	dMatrix matrix(dGetIdentityMatrix());
-	NewtonBodyGetCentreOfMass(m_newtonBody, &matrix.m_posit[0]);
-	matrix.m_posit.m_w = 1.0f;
-	m_proxyBody.SetLocalMatrix(matrix);
 }
 
 dMultiBodyVehicle::~dMultiBodyVehicle()

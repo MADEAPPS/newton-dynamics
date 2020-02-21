@@ -14,25 +14,23 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#ifndef D_CUSTOM_PLAYER_CONTROLLER_MANAGER_H_
-#define D_CUSTOM_PLAYER_CONTROLLER_MANAGER_H_
+#ifndef D_CUSTOM_PLAYER_CONTROLLER_H_
+#define D_CUSTOM_PLAYER_CONTROLLER_H_
+
+#include "dStdafxVehicle.h"
+#include "dVehicle.h"
 
 
-#define PLAYER_PLUGIN_NAME				"__playerManager__"
-#define PLAYER_CONTROLLER_MAX_CONTACTS	32
-#define PLAYER_MIN_RESTRAINING_DISTANCE	1.0e-2f
-
-class dPlayerControllerManager;
-
-class dPlayerControllerOld
+class dPlayerController: public dVehicle
 {
-	class dPlayerControllerContactSolver;
-	class dPlayerControllerImpulseSolver;
+//	class dPlayerControllerContactSolver;
+//	class dPlayerControllerImpulseSolver;
 
 	public:
-	DVEHICLE_API dPlayerControllerOld();
-	DVEHICLE_API ~dPlayerControllerOld();
+	DVEHICLE_API dPlayerController(NewtonWorld* const world, const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight);
+	DVEHICLE_API ~dPlayerController();
 
+/*
 	void* GetUserData () const {return m_userData;}
 	NewtonBody* GetBody() {return m_kinematicBody;}
 	void SetUserData(void* const userData) {m_userData = userData;}
@@ -79,7 +77,13 @@ class dPlayerControllerOld
 	void ResolveInterpenetrations(dPlayerControllerContactSolver& contactSolver, dPlayerControllerImpulseSolver& impulseSolver);
 	dCollisionState TestPredictCollision(const dPlayerControllerContactSolver& contactSolver, const dVector& veloc) const;
 
-	dMatrix m_localFrame;
+//	dMatrix m_localFrame;
+*/
+	private:
+	void PreUpdate(dFloat timestep);
+	void PostUpdate(dFloat timestep);
+
+
 	dVector m_impulse;
 	dFloat m_mass;
 	dFloat m_invMass;
@@ -93,34 +97,14 @@ class dPlayerControllerOld
 	dFloat m_crouchScale;
 	void* m_userData;
 	NewtonBody* m_kinematicBody;
-	dPlayerControllerManager* m_manager;
 	bool m_isAirbone;
 	bool m_isOnFloor;
 	bool m_isCrouched;
-	friend class dPlayerControllerManager;
+	friend class dVehicleManager;
+//	friend class dPlayerControllerManager;
+
 };
 
-class dPlayerControllerManager: public dCustomParallelListener
-{
-	public:
-	DVEHICLE_API dPlayerControllerManager(NewtonWorld* const world);
-	DVEHICLE_API ~dPlayerControllerManager();
-
-	DVEHICLE_API virtual dPlayerControllerOld* CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight);
-	DVEHICLE_API virtual void DestroyController(dPlayerControllerOld* const player);
-
-	virtual void ApplyMove(dPlayerControllerOld* const controller, dFloat timestep) = 0;
-	virtual bool ProccessContact(dPlayerControllerOld* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const { return true; }
-	virtual dFloat ContactFriction(dPlayerControllerOld* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const {return 2.0f;}
-
-	protected:
-	virtual void PostUpdate(dFloat timestep) {}
-	DVEHICLE_API virtual void PreUpdate(dFloat timestep, int threadID);
-
-	private:
-	dList<dPlayerControllerOld> m_playerList;
-	friend class dPlayerControllerOld;
-};
 
 #endif 
 

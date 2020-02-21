@@ -25,10 +25,10 @@
 #define D_MAX_ROWS					(3 * D_MAX_CONTACTS) 
 #define D_MAX_COLLISION_PENETRATION	dFloat (5.0e-3f)
 
-class dPlayerController::dPlayerControllerContactSolver
+class dPlayerControllerOld::dPlayerControllerContactSolver
 {
 	public: 
-	dPlayerControllerContactSolver(dPlayerController* const controller)
+	dPlayerControllerContactSolver(dPlayerControllerOld* const controller)
 		:m_controller(controller)
 		,m_contactCount(0)
 	{
@@ -46,7 +46,7 @@ class dPlayerController::dPlayerControllerContactSolver
 
 	static unsigned PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
 	{
-		dPlayerController* const controller = (dPlayerController*)userData;
+		dPlayerControllerOld* const controller = (dPlayerControllerOld*)userData;
 		if (controller->GetBody() == body) {
 			return false;
 		}
@@ -54,14 +54,14 @@ class dPlayerController::dPlayerControllerContactSolver
 	}
 
 	NewtonWorldConvexCastReturnInfo m_contactBuffer[D_MAX_ROWS];
-	dPlayerController* m_controller;
+	dPlayerControllerOld* m_controller;
 	int m_contactCount;
 };
 
-class dPlayerController::dPlayerControllerImpulseSolver 
+class dPlayerControllerOld::dPlayerControllerImpulseSolver 
 {
 	public: 
-	dPlayerControllerImpulseSolver (dPlayerController* const controller)
+	dPlayerControllerImpulseSolver (dPlayerControllerOld* const controller)
 		:m_zero(0.0f)
 	{
 		m_mass = controller->m_mass;
@@ -70,7 +70,7 @@ class dPlayerController::dPlayerControllerImpulseSolver
 		Reset(controller);
 	}
 
-	void Reset (dPlayerController* const controller)
+	void Reset (dPlayerControllerOld* const controller)
 	{
 		m_rowCount = 0;
 		NewtonBodyGetVelocity(controller->m_kinematicBody, &m_veloc[0]);
@@ -268,14 +268,14 @@ void dPlayerControllerManager::PreUpdate(dFloat timestep, int threadID)
 	NewtonWorld* const world = GetWorld();
 	const int threadCount = NewtonGetThreadsCount(world);
 
-	dList<dPlayerController>::dListNode* node = m_playerList.GetFirst();
+	dList<dPlayerControllerOld>::dListNode* node = m_playerList.GetFirst();
 	for (int i = 0; i < threadID; i++) {
 		node = node ? node->GetNext() : NULL;
 	}
 
 	if (node) {
 		do {
-			dPlayerController* const controller = &node->GetInfo();
+			dPlayerControllerOld* const controller = &node->GetInfo();
 			controller->PreUpdate(timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
@@ -285,7 +285,7 @@ void dPlayerControllerManager::PreUpdate(dFloat timestep, int threadID)
 }
 
 
-dPlayerController::dPlayerController()
+dPlayerControllerOld::dPlayerControllerOld()
 	:m_localFrame(dGetIdentityMatrix())
 	,m_impulse(0.0f)
 	,m_mass(0.0f)
@@ -307,19 +307,19 @@ dPlayerController::dPlayerController()
 {
 }
 
-dPlayerController::~dPlayerController()
+dPlayerControllerOld::~dPlayerControllerOld()
 {
 	NewtonDestroyBody(m_kinematicBody);
 }
 
-dPlayerController* dPlayerControllerManager::CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
+dPlayerControllerOld* dPlayerControllerManager::CreateController(const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
 {
 	NewtonWorld* const world = GetWorld();
 	dMatrix shapeMatrix(localAxis);
 	shapeMatrix.m_posit = shapeMatrix.m_front.Scale (height * 0.5f);
 	shapeMatrix.m_posit.m_w = 1.0f;
 
-	dPlayerController& controller = m_playerList.Append()->GetInfo();
+	dPlayerControllerOld& controller = m_playerList.Append()->GetInfo();
 
 	controller.m_height = height;
 	controller.m_weistScale = 3.0f;
@@ -351,14 +351,14 @@ dPlayerController* dPlayerControllerManager::CreateController(const dMatrix& loc
 	return &controller;
 }
 
-void dPlayerControllerManager::DestroyController(dPlayerController* const player)
+void dPlayerControllerManager::DestroyController(dPlayerControllerOld* const player)
 {
-	dList<dPlayerController>::dListNode* const node = m_playerList.GetNodeFromInfo(*player);
+	dList<dPlayerControllerOld>::dListNode* const node = m_playerList.GetNodeFromInfo(*player);
 	dAssert(node);
 	m_playerList.Remove(node);
 }
 
-void dPlayerController::ToggleCrouch ()
+void dPlayerControllerOld::ToggleCrouch ()
 {
 	dMatrix matrix;
 	m_isCrouched = !m_isCrouched;
@@ -376,20 +376,20 @@ void dPlayerController::ToggleCrouch ()
 	NewtonCollisionSetMatrix(shape, &matrix[0][0]);
 }
 
-dVector dPlayerController::GetVelocity() const
+dVector dPlayerControllerOld::GetVelocity() const
 { 
 	dVector veloc(0.0);
 	NewtonBodyGetVelocity(m_kinematicBody, &veloc[0]);
 	return veloc; 
 }
 
-void dPlayerController::SetVelocity(const dVector& veloc) 
+void dPlayerControllerOld::SetVelocity(const dVector& veloc) 
 { 
 	dAssert(veloc.DotProduct3(veloc) < 10000.0f);
 	NewtonBodySetVelocity(m_kinematicBody, &veloc[0]);
 }
 
-void dPlayerController::SetFrame(const dMatrix& frame)
+void dPlayerControllerOld::SetFrame(const dMatrix& frame)
 {
 	dAssert (frame.TestOrthogonal());
 	m_localFrame = frame;
@@ -405,7 +405,7 @@ void dPlayerController::SetFrame(const dMatrix& frame)
 	NewtonCollisionSetMatrix(capsule, &newMatrix[0][0]);
 }
 
-void dPlayerController::ResolveStep(dFloat timestep, dPlayerControllerContactSolver& contactSolver)
+void dPlayerControllerOld::ResolveStep(dFloat timestep, dPlayerControllerContactSolver& contactSolver)
 {
 	dMatrix matrix;
 	dVector zero(0.0f);
@@ -560,7 +560,7 @@ void dPlayerController::ResolveStep(dFloat timestep, dPlayerControllerContactSol
 	NewtonBodySetMatrix(m_kinematicBody, &matrix[0][0]);
 }
 
-dPlayerController::dCollisionState dPlayerController::TestPredictCollision(const dPlayerControllerContactSolver& contactSolver, const dVector& veloc) const
+dPlayerControllerOld::dCollisionState dPlayerControllerOld::TestPredictCollision(const dPlayerControllerContactSolver& contactSolver, const dVector& veloc) const
 {
 	for (int i = 0; i < contactSolver.m_contactCount; i++) {
 		const NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
@@ -579,7 +579,7 @@ dPlayerController::dCollisionState dPlayerController::TestPredictCollision(const
 	return m_freeMovement;
 }
 
-dFloat dPlayerController::PredictTimestep(dFloat timestep, dPlayerControllerContactSolver& contactSolver)
+dFloat dPlayerControllerOld::PredictTimestep(dFloat timestep, dPlayerControllerContactSolver& contactSolver)
 {
 	dMatrix matrix;
 	dVector veloc(0.0f);
@@ -632,7 +632,7 @@ dFloat dPlayerController::PredictTimestep(dFloat timestep, dPlayerControllerCont
 	return timestep;
 }
 
-void dPlayerController::ResolveInterpenetrations(dPlayerControllerContactSolver& contactSolver, dPlayerControllerImpulseSolver& impulseSolver)
+void dPlayerControllerOld::ResolveInterpenetrations(dPlayerControllerContactSolver& contactSolver, dPlayerControllerImpulseSolver& impulseSolver)
 {
 	dVector zero (0.0f);
 	dVector savedVeloc (0.0f);
@@ -679,7 +679,7 @@ void dPlayerController::ResolveInterpenetrations(dPlayerControllerContactSolver&
 	SetVelocity(savedVeloc);
 }
 
-void dPlayerController::ResolveCollision(dPlayerControllerContactSolver& contactSolver, dFloat timestep)
+void dPlayerControllerOld::ResolveCollision(dPlayerControllerContactSolver& contactSolver, dFloat timestep)
 {
 	dMatrix matrix;
 	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
@@ -747,7 +747,7 @@ void dPlayerController::ResolveCollision(dPlayerControllerContactSolver& contact
 	SetVelocity(veloc);
 }
 
-void dPlayerController::UpdatePlayerStatus(dPlayerControllerContactSolver& contactSolver)
+void dPlayerControllerOld::UpdatePlayerStatus(dPlayerControllerContactSolver& contactSolver)
 {
 	dMatrix matrix;
 	NewtonBodyGetMatrix(m_kinematicBody, &matrix[0][0]);
@@ -771,7 +771,7 @@ void dPlayerController::UpdatePlayerStatus(dPlayerControllerContactSolver& conta
 	}
 }
 
-void dPlayerController::PreUpdate(dFloat timestep)
+void dPlayerControllerOld::PreUpdate(dFloat timestep)
 {
 	dPlayerControllerContactSolver contactSolver (this);
 

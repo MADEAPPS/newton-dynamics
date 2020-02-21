@@ -79,10 +79,10 @@ static TIRE_DATA monsterTruckTire
 };
 
 
-class SingleBodyVehicleManager: public dVehicleManager
+class dMultiBodyVehicleManager: public dVehicleManager
 {
 	public:
-	SingleBodyVehicleManager(NewtonWorld* const world)
+	dMultiBodyVehicleManager(NewtonWorld* const world)
 		:dVehicleManager(world)
 		,m_player(NULL)
 		,m_externalView(true)
@@ -101,7 +101,7 @@ class SingleBodyVehicleManager: public dVehicleManager
 		m_greenNeedle = LoadTexture("needle_green.tga");
 	}
 
-	~SingleBodyVehicleManager()
+	~dMultiBodyVehicleManager()
 	{
 		ReleaseTexture (m_gears);
 		ReleaseTexture (m_odometer);
@@ -112,19 +112,19 @@ class SingleBodyVehicleManager: public dVehicleManager
 	
 	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
 	{
-		SingleBodyVehicleManager* const me = (SingleBodyVehicleManager*)context;
+		dMultiBodyVehicleManager* const me = (dMultiBodyVehicleManager*)context;
 		me->UpdateCamera(timestep);
 	}
 
 	static void RenderHelpMenu(DemoEntityManager* const scene, void* const context)
 	{
-		SingleBodyVehicleManager* const me = (SingleBodyVehicleManager*)context;
+		dMultiBodyVehicleManager* const me = (dMultiBodyVehicleManager*)context;
 		me->DrawHelp(scene);
 	}
 
 	static void RenderUI(DemoEntityManager* const scene, void* const context)
 	{
-		SingleBodyVehicleManager* const me = (SingleBodyVehicleManager*)context;
+		dMultiBodyVehicleManager* const me = (dMultiBodyVehicleManager*)context;
 		me->RenderUI(scene);
 	}
 
@@ -915,7 +915,7 @@ void MultibodyBodyCar(DemoEntityManager* const scene)
 
 	// create a vehicle manager
 	NewtonWorld* const world = scene->GetNewton();
-	SingleBodyVehicleManager* const manager = new SingleBodyVehicleManager(world);
+	dMultiBodyVehicleManager* const manager = new dMultiBodyVehicleManager(world);
 
 	// create a sport car
 	dPointer<DemoEntity> viperModel (DemoEntity::LoadNGD_mesh("viper.ngd", scene->GetNewton(), scene->GetShaderCache()));

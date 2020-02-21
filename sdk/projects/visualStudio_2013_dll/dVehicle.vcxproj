@@ -60,6 +60,7 @@
     <ClCompile Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTire.cpp" />
     <ClCompile Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTireContact.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerManager.cpp" />
+    <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerController.cpp" />
     <ClCompile Include="..\..\dVehicle\dStdafxVehicle.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -85,6 +86,7 @@
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTire.h" />
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTireContact.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerManager.h" />
+    <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerController.cpp" />
     <ClInclude Include="..\..\dVehicle\dStdafxVehicle.h" />
     <ClInclude Include="..\..\dVehicle\dVehicle.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleLoopJoint.h" />

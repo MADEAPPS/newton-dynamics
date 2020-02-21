@@ -29,17 +29,6 @@ dVehicle::dVehicle(NewtonBody* const body, const dMatrix& localFrame, dFloat gra
 {
 	m_localFrame.m_posit = dVector(0.0f, 0.0f, 0.0f, 1.0f);
 	dAssert(m_localFrame.TestOrthogonal());
-
-	// set linear and angular drag to zero
-	dVector drag(0.0f);
-	NewtonBodySetLinearDamping(m_newtonBody, 0.0f);
-	NewtonBodySetAngularDamping(m_newtonBody, &drag[0]);
-
-	// set the inertia matrix;
-	dMatrix matrix(dGetIdentityMatrix());
-	NewtonBodyGetCentreOfMass(m_newtonBody, &matrix.m_posit[0]);
-	matrix.m_posit.m_w = 1.0f;
-	m_proxyBody.SetLocalMatrix(matrix);
 }
 
 dVehicle::~dVehicle()

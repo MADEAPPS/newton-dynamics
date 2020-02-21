@@ -1199,6 +1199,7 @@ void AdvancedPlayerController (DemoEntityManager* const scene)
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 
 
+#if 0
 class AdvancedPlayerControllerManager : public dPlayerControllerManager
 {
 	public:
@@ -1216,7 +1217,7 @@ class AdvancedPlayerControllerManager : public dPlayerControllerManager
 	{
 	}
 
-	void SetAsPlayer(dPlayerController* const controller)
+	void SetAsPlayer(dPlayerControllerOld* const controller)
 	{
 		m_player = controller;
 	}
@@ -1247,7 +1248,7 @@ class AdvancedPlayerControllerManager : public dPlayerControllerManager
 		me->SetCamera();
 	}
 
-	dPlayerController* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
+	dPlayerControllerOld* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
 	{
 		// get the scene 
 		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
@@ -1263,7 +1264,7 @@ class AdvancedPlayerControllerManager : public dPlayerControllerManager
 		localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
 		// make a play controller with default values.
-		dPlayerController* const controller = CreateController(location, localAxis, mass, radius, height, height / 3.0f);
+		dPlayerControllerOld* const controller = CreateController(location, localAxis, mass, radius, height, height / 3.0f);
 
 		// get body from player, and set some parameter
 		NewtonBody* const body = controller->GetBody();
@@ -1313,7 +1314,7 @@ class AdvancedPlayerControllerManager : public dPlayerControllerManager
 		}
 	}
 
-	void ApplyInputs(dPlayerController* const controller)
+	void ApplyInputs(dPlayerControllerOld* const controller)
 	{
 		if (controller == m_player) {
 			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
@@ -1335,7 +1336,7 @@ class AdvancedPlayerControllerManager : public dPlayerControllerManager
 		}
 	}
 
-	bool ProccessContact(dPlayerController* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
+	bool ProccessContact(dPlayerControllerOld* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
 	{
 		/*
 		if (normal.m_y < 0.9f) {
@@ -1348,7 +1349,7 @@ class AdvancedPlayerControllerManager : public dPlayerControllerManager
 		return true;
 	}
 
-	dFloat ContactFriction(dPlayerController* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
+	dFloat ContactFriction(dPlayerControllerOld* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
 	{
 		// clip steep slope contacts
 		if (normal.m_y < 0.9f) {
@@ -1361,7 +1362,7 @@ class AdvancedPlayerControllerManager : public dPlayerControllerManager
 	}
 
 	// apply gravity 
-	virtual void ApplyMove(dPlayerController* const controller, dFloat timestep)
+	virtual void ApplyMove(dPlayerControllerOld* const controller, dFloat timestep)
 	{
 		// calculate the gravity contribution to the velocity
 		dVector gravityImpulse(0.0f, DEMO_GRAVITY * controller->GetMass() * timestep, 0.0f, 0.0f);
@@ -1372,12 +1373,14 @@ class AdvancedPlayerControllerManager : public dPlayerControllerManager
 		ApplyInputs(controller);
 	}
 
-	dPlayerController* m_player;
+	dPlayerControllerOld* m_player;
 };
-
+#endif
 
 void AdvancedPlayerController(DemoEntityManager* const scene)
 {
+	dAssert (0);
+/*
 	// load the sky box
 	scene->CreateSkyBox();
 
@@ -1400,7 +1403,7 @@ void AdvancedPlayerController(DemoEntityManager* const scene)
 
 	location.m_posit = FindFloor(scene->GetNewton(), location.m_posit, 20.0f);
 	location.m_posit.m_y += 1.0f;
-	dPlayerController*  const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	dPlayerControllerOld*  const player = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 	playerManager->SetAsPlayer(player);
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
@@ -1416,6 +1419,7 @@ void AdvancedPlayerController(DemoEntityManager* const scene)
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;
 	scene->SetCameraMatrix(rot, origin);
+*/
 }
 
 
