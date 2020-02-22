@@ -66,14 +66,12 @@ class dVehicleNode: public dCustomAlloc
 	int GetIndex() const {return m_index;}
 
 	protected:
-	virtual void ApplyExternalForce();
-	virtual void Integrate(dFloat timestep);
-	virtual void CalculateFreeDof(dFloat timestep);
-
-	virtual int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
-	virtual const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
-
-	void CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const;
+	DVEHICLE_API virtual void ApplyExternalForce();
+	DVEHICLE_API virtual void Integrate(dFloat timestep);
+	DVEHICLE_API virtual void CalculateFreeDof(dFloat timestep);
+	DVEHICLE_API virtual int GetKinematicLoops(dVehicleLoopJoint** const jointArray);
+	DVEHICLE_API virtual const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+	DVEHICLE_API void CalculateAABB(const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 
 	dComplementaritySolver::dBodyState m_proxyBody;
 	void* m_usedData;
