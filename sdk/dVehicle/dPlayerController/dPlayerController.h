@@ -20,12 +20,10 @@
 #include "dStdafxVehicle.h"
 #include "dVehicle.h"
 
+class dPlayerControllerContactSolver;
 
 class dPlayerController: public dVehicle
 {
-
-//	class dPlayerControllerImpulseSolver;
-
 	public:
 	DVEHICLE_API dPlayerController(NewtonWorld* const world, const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight);
 	DVEHICLE_API ~dPlayerController();
@@ -61,8 +59,8 @@ class dPlayerController: public dVehicle
 
 	DVEHICLE_API dVector GetVelocity() const;
 	DVEHICLE_API void SetVelocity(const dVector& veloc);
-//
-//	private:
+
+	private:
 //	enum dCollisionState
 //	{
 //		m_colliding,
@@ -72,7 +70,7 @@ class dPlayerController: public dVehicle
 //
 //	void PreUpdate(dFloat timestep);
 //	void UpdatePlayerStatus(dPlayerControllerContactSolver& contactSolver);
-//	void ResolveStep(dFloat timestep, dPlayerControllerContactSolver& contactSolver);
+	void ResolveStep(dFloat timestep, dPlayerControllerContactSolver& contactSolver);
 //	void ResolveCollision(dPlayerControllerContactSolver& contactSolver, dFloat timestep);
 //	dFloat PredictTimestep(dFloat timestep, dPlayerControllerContactSolver& contactSolver);
 //	void ResolveInterpenetrations(dPlayerControllerContactSolver& contactSolver, dPlayerControllerImpulseSolver& impulseSolver);
@@ -102,10 +100,8 @@ class dPlayerController: public dVehicle
 	bool m_isOnFloor;
 	bool m_isCrouched;
 	friend class dVehicleManager;
-//	friend class dPlayerControllerManager;
-
+	friend class dPlayerControllerImpulseSolver;
 };
-
 
 #endif 
 
