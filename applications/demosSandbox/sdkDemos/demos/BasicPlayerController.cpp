@@ -25,189 +25,26 @@
 #define PLAYER_JUMP_SPEED				5.0f
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 
-class BasicPlayerControllerManagerOld: public dPlayerControllerManager
+
+class dBasicPlayerController: public dPlayerController
 {
 	public:
-	BasicPlayerControllerManagerOld (NewtonWorld* const world)
-		:dPlayerControllerManager (world)
-		,m_crouchMesh(NULL)
-		,m_standingMesh(NULL)
-		,m_player(NULL)
-		,m_crowchKey(false)
+	dBasicPlayerController(NewtonWorld* const world, const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
+		:dPlayerController(world, location, localAxis, mass, radius, height, stepHeight)
 	{
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
-
-		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
-		scene->Set2DDisplayRenderFunction (RenderPlayerHelp, NULL, this);
 	}
 
-	~BasicPlayerControllerManagerOld ()
+	void ApplyMove(dFloat timestep)
 	{
-		if (m_crouchMesh) {
-			m_crouchMesh->Release();
-		}
-		if (m_standingMesh) {
-			m_standingMesh->Release();
-		}
+		// calculate the gravity contribution to the velocity
+		dFloat g = 2.0f * DEMO_GRAVITY;
+		dVector gravity(GetLocalFrame().RotateVector(dVector(g, 0.0f, 0.0f, 0.0f)));
+		dVector totalImpulse(GetImpulse() + gravity.Scale(GetMass() * timestep));
+		SetImpulse(totalImpulse);
 	}
 
-	void SetAsPlayer(dPlayerControllerOld* const controller)
+	dFloat ContactFrictionCallback(const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
 	{
-		m_player = controller;
-	}
-
-	void RenderPlayerHelp(DemoEntityManager* const scene) const
-	{
-		dVector color(1.0f, 1.0f, 0.0f, 0.0f);
-		scene->Print(color, "Navigation Keys");
-		scene->Print(color, "walk forward:            W");
-		scene->Print(color, "walk backward:           S");
-		scene->Print(color, "strafe right:            D");
-		scene->Print(color, "strafe left:             A");
-		scene->Print(color, "crouch:				  C");
-		scene->Print(color, "jump:                    Space");
-		//scene->Print(color, "toggle camera mode:      C");
-		//scene->Print(color, "hide help:               H");
-	}
-
-	static void RenderPlayerHelp(DemoEntityManager* const scene, void* const context)
-	{
-		BasicPlayerControllerManagerOld* const me = (BasicPlayerControllerManagerOld*)context;
-		me->RenderPlayerHelp(scene);
-	}
-
-	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
-	{
-		BasicPlayerControllerManagerOld* const me = (BasicPlayerControllerManagerOld*)context;
-		me->SetCamera();
-	}
-
-	dPlayerControllerOld* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
-	{
-		// get the scene 
-		DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(GetWorld());
-
-		// set the play coordinate system
-		dMatrix localAxis(dGetIdentityMatrix());
-
-		//up is first vector
-		localAxis[0] = dVector (0.0, 1.0f, 0.0f, 0.0f);
-		// up is the second vector
-		localAxis[1] = dVector (1.0, 0.0f, 0.0f, 0.0f);
-		// size if the cross product
-		localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
-
-		// make a play controller with default values.
-		dPlayerControllerOld* const controller = CreateController(location, localAxis, mass, radius, height, height / 3.0f);
-
-		// Test Local Matrix manipulations
-		//controller->SetFrame(dRollMatrix(60.0f * dDegreeToRad) * controller->GetFrame());
-
-		// get body from player, and set some parameter
-		NewtonBody* const body = controller->GetBody();
-
-		// create the visual mesh from the player collision shape
-		if (!m_crouchMesh) {
-			NewtonCollision* const collision = NewtonBodyGetCollision(body);
-			controller->ToggleCrouch();
-			m_crouchMesh = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
-
-			controller->ToggleCrouch();
-			m_standingMesh = new DemoMesh("player", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
-		}
-
-		// make standing and crouch meshes
-		DemoEntity* const playerEntity = new DemoEntity(location, NULL);
-		scene->Append(playerEntity);
-		playerEntity->SetMesh(m_standingMesh, dGetIdentityMatrix());
-
-		// set the user data
-		NewtonBodySetUserData(body, playerEntity);
-
-		// set the transform callback
-		NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
-
-		// save player model with the controller
-		controller->SetUserData(playerEntity);
-
-		return controller;
-	}
-
-	void SetCamera ()
-	{
-		if (m_player) {
-			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
-			DemoCamera* const camera = scene->GetCamera();
-			dMatrix camMatrix(camera->GetNextMatrix());
-
-			DemoEntity* player = (DemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
-			dMatrix playerMatrix(player->GetNextMatrix());
-
-			dFloat height = 2.0f;
-			dVector frontDir(camMatrix[0]);
-			dVector upDir(0.0f, 1.0f, 0.0f, 0.0f);
-			dVector camOrigin = playerMatrix.TransformVector(upDir.Scale(height));
-			camOrigin -= frontDir.Scale(PLAYER_THIRD_PERSON_VIEW_DIST);
-
-			camera->SetNextMatrix(*scene, camMatrix, camOrigin);
-		}
-	}
-
-	void ApplyInputs (dPlayerControllerOld* const controller)
-	{
-		if (controller == m_player) {
-			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
-			dFloat forwarSpeed = (int(scene->GetKeyState('W')) - int(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
-			dFloat strafeSpeed = (int(scene->GetKeyState('D')) - int(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
-
-			bool crowchKey = scene->GetKeyState('C') ? true : false;
-			if (m_crowchKey.UpdateTrigger(crowchKey))
-			{
-				controller->ToggleCrouch();
-				DemoEntity* const playerEntity = (DemoEntity*)NewtonBodyGetUserData(controller->GetBody());
-				if (controller->IsCrouched()) {
-					playerEntity->SetMesh(m_crouchMesh, dGetIdentityMatrix());
-				} else {
-					playerEntity->SetMesh(m_standingMesh, dGetIdentityMatrix());
-				}
-			}
-
-			if (scene->GetKeyState(' ') && controller->IsOnFloor ()) {
-				dVector jumpImpule(controller->GetFrame().RotateVector(dVector(PLAYER_JUMP_SPEED * controller->GetMass(), 0.0f, 0.0f, 0.0f)));
-				dVector totalImpulse(controller->GetImpulse() + jumpImpule);
-				controller->SetImpulse(totalImpulse);
-			}
-
-			if (forwarSpeed && strafeSpeed) {
-				dFloat invMag = PLAYER_WALK_SPEED / dSqrt(forwarSpeed * forwarSpeed + strafeSpeed * strafeSpeed);
-				forwarSpeed *= invMag;
-				strafeSpeed *= invMag;
-			}
-
-			DemoCamera* const camera = scene->GetCamera();
-			dMatrix camMatrix(camera->GetNextMatrix());
-
-			controller->SetForwardSpeed(forwarSpeed);
-			controller->SetLateralSpeed(strafeSpeed);
-			controller->SetHeadingAngle(camera->GetYawAngle());
-		}
-	}
-
-	bool ProccessContact(dPlayerControllerOld* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
-	{
-/*
-		if (normal.m_y < 0.9f) {
-			dMatrix matrix;
-			NewtonBodyGetMatrix(controller->GetBody(), &matrix[0][0]);
-			dFloat h = (position - matrix.m_posit).DotProduct3(matrix.m_up);
-			return (h >= m_stepHigh) ? true : false;
-		} 
-*/
-		return true;
-	}
-
-	dFloat ContactFriction(dPlayerControllerOld* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
-	{ 
 		if (normal.m_y < 0.9f) {
 			// steep slope are friction less
 			return 0.0f;
@@ -228,52 +65,11 @@ class BasicPlayerControllerManagerOld: public dPlayerControllerManager
 					// this the cement floor
 					return 4.0f;
 					//return 0.2f;
-				default: 
+				default:
 					// this is everything else
 					return 1.0f;
 			}
 		}
-	}
-	
-	// apply gravity 
-	virtual void ApplyMove (dPlayerControllerOld* const controller, dFloat timestep)
-	{
-		// calculate the gravity contribution to the velocity
-		dFloat g = 2.0f * DEMO_GRAVITY;
-		dVector gravity(controller->GetFrame().RotateVector(dVector(g, 0.0f, 0.0f, 0.0f)));
-		dVector totalImpulse(controller->GetImpulse() + gravity.Scale (controller->GetMass() * timestep));
-		controller->SetImpulse(totalImpulse);
-
-		// apply play movement
-		ApplyInputs (controller);
-	}
-
-	DemoMesh* m_crouchMesh;
-	DemoMesh* m_standingMesh;
-	dPlayerControllerOld* m_player;
-	DemoEntityManager::ButtonKey m_crowchKey;
-};
-
-
-class dBasicPlayerController: public dPlayerController
-{
-	public:
-	dBasicPlayerController(NewtonWorld* const world, const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
-		:dPlayerController(world, location, localAxis, mass, radius, height, stepHeight)
-	{
-	}
-
-	virtual void ApplyMove(dFloat timestep)
-	{
-		// calculate the gravity contribution to the velocity
-		dFloat g = 2.0f * DEMO_GRAVITY;
-		dVector gravity(GetLocalFrame().RotateVector(dVector(g, 0.0f, 0.0f, 0.0f)));
-		dVector totalImpulse(GetImpulse() + gravity.Scale(GetMass() * timestep));
-		SetImpulse(totalImpulse);
-
-		// apply play movement
-		//GetManager()
-		//ApplyInputs(this);
 	}
 };
 
@@ -324,8 +120,8 @@ class dBasicPlayerControllerManager: public dVehicleManager
 		scene->Print(color, "strafe left:             A");
 		scene->Print(color, "crouch:				  C");
 		scene->Print(color, "jump:                    Space");
-		//scene->Print(color, "toggle camera mode:      C");
-		//scene->Print(color, "hide help:               H");
+		//scene->Print(color, "toggle camera mode:    C");
+		//scene->Print(color, "hide help:             H");
 	}
 
 	void SetAsPlayer(dPlayerController* const controller)
@@ -353,8 +149,12 @@ class dBasicPlayerControllerManager: public dVehicleManager
 		}
 	}
 
-	void ApplyInputs(dPlayerController* const controller)
+	void ApplyInputs(dVehicle* const model, dFloat timestep)
 	{
+		dBasicPlayerController* controller = (dBasicPlayerController*)model->GetAsPlayerController();
+		dAssert(controller);
+		controller->ApplyMove(timestep);
+
 		if (controller == m_player) {
 			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
 			dFloat forwarSpeed = (int(scene->GetKeyState('W')) - int(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
@@ -452,7 +252,7 @@ class dBasicPlayerControllerManager: public dVehicleManager
 	DemoEntityManager::ButtonKey m_crowchKey;
 };
 
-/*
+
 static NewtonBody* CreateCylinder(DemoEntityManager* const scene, const dVector& location, dFloat mass, dFloat radius, dFloat height)
 {
 	NewtonWorld* const world = scene->GetNewton();
@@ -573,7 +373,7 @@ static void CreateBridge(DemoEntityManager* const scene, NewtonBody* const playg
 	geometry->Release();
 	NewtonDestroyCollision(collision);
 }
-*/
+
 
 void BasicPlayerController (DemoEntityManager* const scene)
 {
@@ -586,7 +386,6 @@ void BasicPlayerController (DemoEntityManager* const scene)
 
 	// create a character controller manager
 	dBasicPlayerControllerManager* const playerManager = new dBasicPlayerControllerManager(world);
-	BasicPlayerControllerManagerOld* const playerManagerOld = new BasicPlayerControllerManagerOld (world);
 
 	// add main player
 	dMatrix location (dGetIdentityMatrix());
@@ -597,14 +396,9 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit = FindFloor (scene->GetNewton(), location.m_posit, 20.0f);
 	location.m_posit.m_y += 1.0f;
 
-	location.m_posit.m_z += 2.0f;
+	//location.m_posit.m_z += 2.0f;
 	dBasicPlayerController* const player0 = playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 	playerManager->SetAsPlayer(player0);
-
-	location.m_posit.m_z -= 2.0f;
-	dPlayerControllerOld* const player = playerManagerOld->CreatePlayer(location, 1.9f, 0.5, 100.0f);
-	playerManagerOld->SetAsPlayer(player);
-
 
 	// add second player for testing
 //	location.m_posit.m_x += 4.0f;
@@ -636,30 +430,30 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	//playerManagerOld->DestroyController (player1);
 	location.m_posit.m_x += 5.0f;
 
-//	int count = 1;
-//	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
-//
-//	// add some objects to interact with
-//	dVector merryPosit (FindFloor (scene->GetNewton(), location.m_posit + dVector(-5.0f, 0.0f, 15.0f, 0.0f), 20.0f));
-//	AddMerryGoRound(scene, merryPosit);
-//
-//	// add a hanging bridge
-//	CreateBridge(scene, playgroundBody);
-//
-//	// add heavy weight box
-//	AddPrimitiveArray(scene, 200.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
-//
-//	// add medium weight box
-//	location.m_posit.m_z -= 4.0f;
-//	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector(2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
-//	
-//	// add light weight box
-//	location.m_posit.m_z -= 4.0f;
-//	AddPrimitiveArray(scene, 30.0f, location.m_posit, dVector(2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
-//
-//	// add a thin box to step on
-//	location.m_posit.m_x -= 5.0f;
-//	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 0.5f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
+	int count = 1;
+	dMatrix shapeOffsetMatrix(dGetIdentityMatrix());
+
+	// add some objects to interact with
+	dVector merryPosit (FindFloor (scene->GetNewton(), location.m_posit + dVector(-5.0f, 0.0f, 15.0f, 0.0f), 20.0f));
+	AddMerryGoRound(scene, merryPosit);
+
+	// add a hanging bridge
+	CreateBridge(scene, playgroundBody);
+
+	// add heavy weight box
+	AddPrimitiveArray(scene, 200.0f, location.m_posit, dVector (2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
+
+	// add medium weight box
+	location.m_posit.m_z -= 4.0f;
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector(2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
+	
+	// add light weight box
+	location.m_posit.m_z -= 4.0f;
+	AddPrimitiveArray(scene, 30.0f, location.m_posit, dVector(2.0f, 2.0f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
+
+	// add a thin box to step on
+	location.m_posit.m_x -= 5.0f;
+	AddPrimitiveArray(scene, 100.0f, location.m_posit, dVector (2.0f, 0.5f, 2.0f, 0.0f), count, count, 5.0f, _BOX_PRIMITIVE, 0, shapeOffsetMatrix, 10.0f);
 
 	dVector origin (-10.0f, 2.0f, 0.0f, 0.0f);
 	dQuaternion rot;

@@ -109,8 +109,8 @@ dFloat dMultiBodyVehicleEngine::GetSpeed() const
 {
 	dMatrix matrix;
 	dVector veloc(0.0f);
-	dAssert (GetParent()->GetAsVehicleMultiBody());
-	NewtonBody* const chassis = GetParent()->GetAsVehicleMultiBody()->GetBody();
+	dAssert (GetParent()->GetAsMultiBodyVehicle());
+	NewtonBody* const chassis = GetParent()->GetAsMultiBodyVehicle()->GetBody();
 
 	NewtonBodyGetMatrix(chassis, &matrix[0][0]);
 	NewtonBodyGetVelocity(chassis, &veloc[0]);
@@ -275,7 +275,7 @@ int dMultiBodyVehicleEngine::GetKinematicLoops(dVehicleLoopJoint** const jointAr
 
 void dMultiBodyVehicleEngine::CalculateFreeDof(dFloat timestep)
 {
-	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsVehicleMultiBody();
+	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsMultiBodyVehicle();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 	const dMatrix chassisMatrix(m_localAxis * chassisBody->GetMatrix());
 
@@ -293,7 +293,7 @@ dTrace(("%d %f %f %f\n", xxxx, m_proxyBody.GetTorque().m_x, m_proxyBody.GetTorqu
 
 void dMultiBodyVehicleEngine::ApplyExternalForce()
 {
-	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsVehicleMultiBody();
+	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsMultiBodyVehicle();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 
 	dMatrix matrix(chassisBody->GetMatrix());

@@ -57,7 +57,7 @@ void dMultiBodyVehicleTireContact::SetContact(dMultiBodyVehicleCollisionNode* co
 void dMultiBodyVehicleTireContact::Debug(dCustomJoint::dDebugDisplay* const debugContext, dFloat scale) const
 {
 	dMultiBodyVehicleTire* const tire = GetOwner0()->GetAsTire();
-	dMultiBodyVehicle* const chassis = GetOwner0()->GetParent()->GetAsVehicleMultiBody();
+	dMultiBodyVehicle* const chassis = GetOwner0()->GetParent()->GetAsMultiBodyVehicle();
 
 	dAssert(tire);
 	dAssert(chassis);

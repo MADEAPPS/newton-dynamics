@@ -20,6 +20,7 @@
 #include "dStdafxVehicle.h"
 #include "dVehicle.h"
 
+class dPlayerControllerImpulseSolver;
 class dPlayerControllerContactSolver;
 
 class dPlayerController: public dVehicle
@@ -28,14 +29,9 @@ class dPlayerController: public dVehicle
 	DVEHICLE_API dPlayerController(NewtonWorld* const world, const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight);
 	DVEHICLE_API ~dPlayerController();
 
-//	void* GetUserData () const {return m_userData;}
-//	NewtonBody* GetBody() {return m_kinematicBody;}
-//	void SetUserData(void* const userData) {m_userData = userData;}
-//	dPlayerControllerManager* GetManager() const {return m_manager;}
+	virtual dPlayerController* GetAsPlayerController() { return this; }
 
 	DVEHICLE_API void ToggleCrouch ();
-
-	virtual void ApplyMove(dFloat timestep) {}
 
 	bool IsCrouched () const {return m_isCrouched;}
 	bool IsAirBorn () const {return m_isAirbone;}
@@ -54,34 +50,34 @@ class dPlayerController: public dVehicle
 	dFloat GetHeadingAngle() const { return m_headingAngle; }
 	void SetHeadingAngle(dFloat angle) {m_headingAngle = dClamp (angle, dFloat (-dPi), dFloat (dPi));}
 
-//	dMatrix GetFrame() const { return m_localFrame; }
-//	DVEHICLE_API void SetFrame(const dMatrix& frame);
-
 	DVEHICLE_API dVector GetVelocity() const;
 	DVEHICLE_API void SetVelocity(const dVector& veloc);
 
 	private:
-//	enum dCollisionState
-//	{
-//		m_colliding,
-//		m_freeMovement,
-//		m_deepPenetration,
-//	};
-//
-//	void PreUpdate(dFloat timestep);
-//	void UpdatePlayerStatus(dPlayerControllerContactSolver& contactSolver);
+	enum dCollisionState
+	{
+		m_colliding,
+		m_freeMovement,
+		m_deepPenetration,
+	};
+
+	void UpdatePlayerStatus(dPlayerControllerContactSolver& contactSolver);
 	void ResolveStep(dFloat timestep, dPlayerControllerContactSolver& contactSolver);
-//	void ResolveCollision(dPlayerControllerContactSolver& contactSolver, dFloat timestep);
-//	dFloat PredictTimestep(dFloat timestep, dPlayerControllerContactSolver& contactSolver);
-//	void ResolveInterpenetrations(dPlayerControllerContactSolver& contactSolver, dPlayerControllerImpulseSolver& impulseSolver);
-//	dCollisionState TestPredictCollision(const dPlayerControllerContactSolver& contactSolver, const dVector& veloc) const;
+	void ResolveCollision(dPlayerControllerContactSolver& contactSolver, dFloat timestep);
+	dFloat PredictTimestep(dFloat timestep, dPlayerControllerContactSolver& contactSolver);
+	dCollisionState TestPredictCollision(const dPlayerControllerContactSolver& contactSolver, const dVector& veloc) const;
+	void ResolveInterpenetrations(dPlayerControllerContactSolver& contactSolver, dPlayerControllerImpulseSolver& impulseSolver);
 
 	protected:
-	DVEHICLE_API void PreUpdate(dFloat timestep);
-
+	virtual dFloat ContactFrictionCallback(const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const 
+	{ 
+		return 2.0f; 
+	}
 	void PostUpdate(dFloat timestep)
 	{
 	}
+
+	DVEHICLE_API void PreUpdate(dFloat timestep);
 
 	private:
 	dVector m_impulse;

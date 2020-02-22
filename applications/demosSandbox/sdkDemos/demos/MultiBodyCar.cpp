@@ -254,7 +254,7 @@ class dMultiBodyVehicleManager: public dVehicleManager
 		//if (engine) {
 		//	engine->SetIgnition(false);
 		//}
-		m_player = player->GetAsVehicleMultiBody();
+		m_player = player->GetAsMultiBodyVehicle();
 	}
 
 	void UpdateCamera(dFloat timestep)

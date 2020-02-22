@@ -86,7 +86,7 @@ int dMultiBodyVehicleDifferential::GetKinematicLoops(dVehicleLoopJoint** const j
 
 void dMultiBodyVehicleDifferential::CalculateFreeDof(dFloat timestep)
 {
-	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsVehicleMultiBody();
+	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsMultiBodyVehicle();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 	const dMatrix chassisMatrix(m_localAxis * chassisBody->GetMatrix());
 
@@ -104,7 +104,7 @@ void dMultiBodyVehicleDifferential::Integrate(dFloat timestep)
 
 void dMultiBodyVehicleDifferential::ApplyExternalForce()
 {
-	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsVehicleMultiBody();
+	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsMultiBodyVehicle();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 	
 	dMatrix matrix (chassisBody->GetMatrix());

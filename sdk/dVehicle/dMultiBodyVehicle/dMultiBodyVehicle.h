@@ -74,6 +74,8 @@ class dMultiBodyVehicle: public dVehicle, public dVehicleSolver
 	DVEHICLE_API dMultiBodyVehicle (NewtonBody* const rootBody, const dMatrix& localFrame, dFloat gravityMag);
 	DVEHICLE_API ~dMultiBodyVehicle();
 
+	virtual dMultiBodyVehicle* GetAsMultiBodyVehicle() { return this; }
+
 	DVEHICLE_API void Finalize();
 	DVEHICLE_API const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
 	DVEHICLE_API dMultiBodyVehicleTire* AddTire(const dMatrix& locationInGlobalSpace, const dTireInfo& tireInfo);
@@ -86,7 +88,6 @@ class dMultiBodyVehicle: public dVehicle, public dVehicleSolver
 	DVEHICLE_API dVehicleBrakeControl* GetHandBrakeControl();
 	DVEHICLE_API dVehicleSteeringControl* GetSteeringControl();
 
-	dMultiBodyVehicle* GetAsVehicleMultiBody() const { return (dMultiBodyVehicle*)this; }
 	DVEHICLE_API virtual void ApplyDriverInputs(const dDriverInput& driveInputs, dFloat timestep);
 
 	private:

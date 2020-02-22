@@ -142,7 +142,7 @@ void dMultiBodyVehicleTire::CalculateContacts(const dCollectCollidingBodies& bod
 	int contactCount = 0;
 	dFloat friction = m_info.m_frictionCoefficient;
 
-	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsVehicleMultiBody();
+	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsMultiBodyVehicle();
 	NewtonWorld* const world = NewtonBodyGetWorld(chassisNode->GetBody());
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 
@@ -232,7 +232,7 @@ dMatrix dMultiBodyVehicleTire::GetLocalMatrix() const
 dMatrix dMultiBodyVehicleTire::GetGlobalMatrix() const
 {
 	dMatrix newtonBodyMatrix;
-	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsVehicleMultiBody();
+	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsMultiBodyVehicle();
 	dAssert(chassisNode);
 	return GetLocalMatrix() * chassisNode->GetProxyBody().GetMatrix();
 }
@@ -256,7 +256,7 @@ const void dMultiBodyVehicleTire::Debug(dCustomJoint::dDebugDisplay* const debug
 	dMatrix tireMatrix(m_bindingRotation.Transpose() * GetGlobalMatrix());
 	NewtonCollisionForEachPolygonDo(m_tireShape, &tireMatrix[0][0], RenderDebugTire, debugContext);
 
-	dMultiBodyVehicle* const chassis = GetParent()->GetAsVehicleMultiBody();
+	dMultiBodyVehicle* const chassis = GetParent()->GetAsMultiBodyVehicle();
 	dAssert (chassis);
 
 	// render tireState matrix
@@ -316,7 +316,7 @@ void dMultiBodyVehicleTire::Integrate(dFloat timestep)
 
 void dMultiBodyVehicleTire::ApplyExternalForce()
 {
-	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsVehicleMultiBody();
+	dMultiBodyVehicle* const chassisNode = GetParent()->GetAsMultiBodyVehicle();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassisNode->GetProxyBody();
 
 	dMatrix tireMatrix(GetHardpointMatrix(m_position * m_invSuspensionLength) * chassisBody->GetMatrix());
@@ -331,7 +331,7 @@ void dMultiBodyVehicleTire::ApplyExternalForce()
 
 void dMultiBodyVehicleTire::CalculateFreeDof(dFloat timestep)
 {
-	dMultiBodyVehicle* const chassis = GetParent()->GetAsVehicleMultiBody();
+	dMultiBodyVehicle* const chassis = GetParent()->GetAsMultiBodyVehicle();
 	dComplementaritySolver::dBodyState* const chassisBody = &chassis->GetProxyBody();
 
 	dMatrix chassisMatrix(GetHardpointMatrix(0.0f) * chassisBody->GetMatrix());

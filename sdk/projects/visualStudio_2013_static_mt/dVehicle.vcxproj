@@ -37,7 +37,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerController.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerManager.cpp" />
-    <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerController.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerContactSolver.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerImpulseSolver.cpp" />
     <ClCompile Include="..\..\dVehicle\dStdafxVehicle.cpp">
@@ -67,7 +66,6 @@
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerController.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleSolverContactSolver.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerManager.h" />
-    <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerController.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerContactSolver.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerImpulseSolver.h" />
     <ClInclude Include="..\..\dVehicle\dStdafxVehicle.h" />

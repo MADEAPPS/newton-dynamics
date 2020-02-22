@@ -17,6 +17,8 @@
 
 class dVehicleNode;
 class dMultiBodyVehicle;
+class dPlayerController;
+class dMultiBodyVehicle;
 class dVehicleLoopJoint;
 class dMultiBodyVehicleTire;
 class dMultiBodyVehicleEngine;
@@ -43,10 +45,12 @@ class dVehicleNode: public dCustomAlloc
 	
 	DVEHICLE_API virtual void CalculateNodeAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	
-	virtual dMultiBodyVehicleTire* GetAsTire() const { return NULL; }
-	virtual dMultiBodyVehicleEngine* GetAsEngine() const { return NULL; }
-	virtual dMultiBodyVehicleDifferential* GetAsDifferential() const { return NULL; }
-	virtual dMultiBodyVehicle* GetAsVehicleMultiBody() const { return NULL; }
+	virtual dPlayerController* GetAsPlayerController() { return NULL; }
+	virtual dMultiBodyVehicle* GetAsMultiBodyVehicle() { return NULL; }
+
+	virtual dMultiBodyVehicleTire* GetAsTire() { return NULL; }
+	virtual dMultiBodyVehicleEngine* GetAsEngine() { return NULL; }
+	virtual dMultiBodyVehicleDifferential* GetAsDifferential() { return NULL; }
 	virtual dComplementaritySolver::dBilateralJoint* GetJoint() { return NULL; }
 		
 	void* GetUserData() const {return m_usedData;}
