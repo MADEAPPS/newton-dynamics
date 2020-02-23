@@ -23,7 +23,7 @@
 #define PLAYER_MASS						80.0f
 #define PLAYER_WALK_SPEED				1.8f
 #define PLAYER_JUMP_SPEED				5.8f
-#define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
+#define PLAYER_THIRD_PERSON_VIEW_DIST	6.0f
 
 class dAnimationCache: public dTree<dAnimationSequence, dString>
 {
