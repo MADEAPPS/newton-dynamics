@@ -13,33 +13,33 @@
 #include "dAnimationPose.h"
 
 dAnimationPose::dAnimationPose()
-	:dList<dAnimKeyframe>()
+	:dArray<dAnimKeyframe>()
 {
 }
 
 dAnimationPose::dAnimationPose(const dAnimationPose& source)
-	:dList<dAnimKeyframe>()
+	:dArray<dAnimKeyframe>()
 {
-	for (dListNode* node = source.GetFirst(); node; node = node->GetNext()) {
-		Append(node->GetInfo());
-	}
+//	for (dListNode* node = source.GetFirst(); node; node = node->GetNext()) {
+//		Append(node->GetInfo());
+//	}
 }
 
 void dAnimationPose::Clear() 
 { 
-	RemoveAll(); 
+//	RemoveAll(); 
 }
 
 void dAnimationPose::CopySource(const dAnimationPose& source)
 {
-	dListNode* destNode = GetFirst();
-	for (dListNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext()) {
-		const dAnimKeyframe& srcFrame = sourceNode->GetInfo();
-		dAnimKeyframe& dstFrame = destNode->GetInfo();
-		dAssert(srcFrame.m_userData == dstFrame.m_userData);
-		dstFrame.m_rotation = srcFrame.m_rotation;
-		dstFrame.m_posit = srcFrame.m_posit;
-		destNode = destNode->GetNext();
-	}
+//	dListNode* destNode = GetFirst();
+//	for (dListNode* sourceNode = source.GetFirst(); sourceNode; sourceNode = sourceNode->GetNext()) {
+//		const dAnimKeyframe& srcFrame = sourceNode->GetInfo();
+//		dAnimKeyframe& dstFrame = destNode->GetInfo();
+//		dAssert(srcFrame.m_userData == dstFrame.m_userData);
+//		dstFrame.m_rotation = srcFrame.m_rotation;
+//		dstFrame.m_posit = srcFrame.m_posit;
+//		destNode = destNode->GetNext();
+//	}
 }
 

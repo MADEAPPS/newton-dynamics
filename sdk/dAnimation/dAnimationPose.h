@@ -12,7 +12,6 @@
 #ifndef __D_ANIM_POSE_h__
 #define __D_ANIM_POSE_h__
 
-#include "dAnimationStdAfx.h"
 
 class dAnimKeyframe
 {
@@ -22,7 +21,7 @@ class dAnimKeyframe
 	void* m_userData;
 };
 
-class dAnimationPose: public dList<dAnimKeyframe>
+class dAnimationPose: public dArray<dAnimKeyframe>  
 {
 	public:
 	dAnimationPose();

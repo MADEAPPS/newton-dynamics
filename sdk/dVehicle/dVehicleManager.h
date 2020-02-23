@@ -33,8 +33,8 @@ class dVehicleManager: public dCustomParallelListener
 		
 	virtual void OnRemove(const dVehicle* const vehicle) {}
 	virtual void OnUpdateTransform(const dVehicle* const vehicle) const {}
-	virtual void OnPreUpdate(dVehicle* const model, dFloat timestep) const {};
-	virtual void OnPostUpdate(dVehicle* const model, dFloat timestep) const {};
+	//virtual void OnPreUpdate(dVehicle* const model, dFloat timestep) const {};
+	//virtual void OnPostUpdate(dVehicle* const model, dFloat timestep) const {};
 	virtual void OnDebug(dVehicle* const model, dCustomJoint::dDebugDisplay* const debugContext) {}
 
 	virtual void ApplyInputs(dVehicle* const model, dFloat timestep) {}

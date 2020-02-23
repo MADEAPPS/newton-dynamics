@@ -77,7 +77,7 @@ void dAnimimationKeyFramesTrack::Load(FILE* const file)
 
 	int rotations;
 	fscanf(file, "rotation (t, qx, qy, qz, qw): %d\n", &rotations);
-	m_rotation.Resize(positions);
+	m_rotation.Resize(rotations);
 	for (int i = 0; i < rotations; i++) {
 		dFloat32 x;
 		dFloat32 y;

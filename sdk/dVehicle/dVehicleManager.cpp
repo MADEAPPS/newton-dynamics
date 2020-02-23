@@ -86,7 +86,8 @@ void dVehicleManager::PostUpdate(dFloat timestep, int threadID)
 	if (node) {
 		do {
 			dVehicle* const vehicle = node->GetInfo();
-			OnPostUpdate(vehicle, timestep);
+			//OnPostUpdate(vehicle, timestep);
+			vehicle->PostUpdate(timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
 			}
@@ -108,7 +109,7 @@ void dVehicleManager::PreUpdate(dFloat timestep, int threadID)
 	if (node) {
 		do {
 			dVehicle* const vehicle = node->GetInfo();
-			OnPreUpdate(vehicle, timestep);
+			//OnPreUpdate(vehicle, timestep);
 			vehicle->PreUpdate(timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;

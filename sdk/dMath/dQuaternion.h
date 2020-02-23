@@ -21,7 +21,8 @@ class dQuaternion
 	public:
 	dQuaternion (); 
 	dQuaternion (const dMatrix& matrix);
-	dQuaternion (dFloat w, dFloat x, dFloat y, dFloat z); 
+	//dQuaternion (dFloat w, dFloat x, dFloat y, dFloat z); 
+	dQuaternion (dFloat x, dFloat y, dFloat z, dFloat w); 
 	dQuaternion (const dVector& unit_Axis, dFloat Angle = 0.0f);
 	
 	void Scale (dFloat scale); 
@@ -55,7 +56,7 @@ inline dQuaternion::dQuaternion ()
 {
 }
 
-inline dQuaternion::dQuaternion (dFloat w, dFloat x, dFloat y, dFloat z) 
+inline dQuaternion::dQuaternion (dFloat x, dFloat y, dFloat z, dFloat w) 
 	:m_x(x)
 	,m_y(y)
 	,m_z(z)
@@ -83,27 +84,26 @@ inline dFloat dQuaternion::DotProduct (const dQuaternion &q1) const
 
 inline dQuaternion dQuaternion::Inverse () const 
 {
-	return dQuaternion (m_w, -m_x, -m_y, -m_z);
+	return dQuaternion (-m_x, -m_y, -m_z, m_w);
 }
 
 inline dQuaternion dQuaternion::operator+ (const dQuaternion &q) const
 {
-	return dQuaternion (m_w + q.m_w, m_x + q.m_x, m_y + q.m_y, m_z + q.m_z);
+	return dQuaternion (m_x + q.m_x, m_y + q.m_y, m_z + q.m_z, m_w + q.m_w);
 }
 
 inline dQuaternion dQuaternion::operator- (const dQuaternion &B) const
 {
-	return dQuaternion (m_w - B.m_w, m_x - B.m_x, m_y - B.m_y, m_z - B.m_z);
+	return dQuaternion (m_x - B.m_x, m_y - B.m_y, m_z - B.m_z, m_w - B.m_w);
 }
 
 inline dQuaternion dQuaternion::operator* (const dQuaternion &q) const
 {
-	return dQuaternion (q.m_w * m_w - q.m_x * m_x - q.m_y * m_y - q.m_z * m_z, 
-				 		q.m_x * m_w + q.m_w * m_x - q.m_z * m_y + q.m_y * m_z, 
+	return dQuaternion (q.m_x * m_w + q.m_w * m_x - q.m_z * m_y + q.m_y * m_z, 
 						q.m_y * m_w + q.m_z * m_x + q.m_w * m_y - q.m_x * m_z, 
-						q.m_z * m_w - q.m_y * m_x + q.m_x * m_y + q.m_w * m_z); 
+						q.m_z * m_w - q.m_y * m_x + q.m_x * m_y + q.m_w * m_z, 
+						q.m_w * m_w - q.m_x * m_x - q.m_y * m_y - q.m_z * m_z); 
 }
-
 
 #endif 
 

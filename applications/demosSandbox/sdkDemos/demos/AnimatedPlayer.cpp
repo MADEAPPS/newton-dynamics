@@ -51,6 +51,7 @@ class dAnimatedPlayerController: public dPlayerController
 	dAnimatedPlayerController(DemoEntity* const playerEntity, const dAnimationCache& animationcache, NewtonWorld* const world, const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
 		:dPlayerController(world, location, localAxis, mass, radius, height, stepHeight)
 		,m_animBlendTree(NULL)
+		,m_poseCount(0)
 	{
 		// get body from player, and set some parameter
 		NewtonBody* const body = GetBody();
@@ -77,10 +78,19 @@ class dAnimatedPlayerController: public dPlayerController
 	void CreateAnimationBlendTree(const dAnimationCache& animationcache)
 	{
 		dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_idle.anm")->GetInfo();
+		// bind animation pose and tracks
+		int count = 0;
+		DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(GetBody());
+		const dList<dAnimimationKeyFramesTrack>& tracks = idleSequence->GetTracks();
+		for (dList<dAnimimationKeyFramesTrack>::dListNode* node = tracks.GetFirst(); node; node = node->GetNext()) {
+			dAnimimationKeyFramesTrack& track = node->GetInfo();
+			DemoEntity* const ent = entity->Find(track.GetName().GetStr());
+			m_output[count].m_userData = ent;
+			count++;
+		}
+		m_poseCount = count;
 
 		dAnimationSequencePlayer* const Idle = new dAnimationSequencePlayer(idleSequence);
-
-
 		m_animBlendTree = Idle;
 	}
 
@@ -99,7 +109,8 @@ class dAnimatedPlayerController: public dPlayerController
 			// steep slope are friction less
 			return 0.0f;
 		} else {
-			switch (contactId) {
+			switch (contactId) 
+			{
 				case 1:
 					// this the brick wall
 					return 0.5f;
@@ -116,7 +127,24 @@ class dAnimatedPlayerController: public dPlayerController
 		}
 	}
 
+	void PostUpdate(dFloat timestep)
+	{
+		// update the animation tree
+		m_animBlendTree->Evaluate(m_output, timestep);
+
+		for (int i = 1; i < m_poseCount; i ++) {
+			const dAnimKeyframe& keyFrame = m_output[i];
+			DemoEntity* const entity = (DemoEntity*)keyFrame.m_userData;
+
+			//dMatrix matrix (keyFrame.m_rotation, keyFrame.m_posit);
+			//entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
+			entity->SetMatrixUsafe(keyFrame.m_rotation, keyFrame.m_posit);
+		}
+	}
+
+	dAnimationPose m_output;
 	dAnimationBlendTreeNode* m_animBlendTree;
+	int m_poseCount;
 };
 
 

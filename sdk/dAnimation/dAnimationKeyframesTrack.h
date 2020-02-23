@@ -77,6 +77,11 @@ class dAnimimationKeyFramesTrack
 	{
 	}
 
+	const dString& GetName () const
+	{
+		return m_name;
+	}
+
 	void SetName (const dString& name)
 	{
 		m_name = name; 
@@ -87,6 +92,7 @@ class dAnimimationKeyFramesTrack
 
 	void Load(FILE* const file);
 	void Save(FILE* const file) const;
+
 	dString m_name;
 	dAnimimationKeyFramesArray<dPositionKey> m_position;
 	dAnimimationKeyFramesArray<dRotationKey> m_rotation;
