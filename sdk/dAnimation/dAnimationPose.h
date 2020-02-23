@@ -21,7 +21,7 @@ class dAnimKeyframe
 	void* m_userData;
 };
 
-class dAnimationPose: public dArray<dAnimKeyframe>  
+class dAnimationPose: public dArray<dAnimKeyframe>
 {
 	public:
 	dAnimationPose();
@@ -29,6 +29,23 @@ class dAnimationPose: public dArray<dAnimKeyframe>
 
 	void Clear();
 	void CopySource(const dAnimationPose& source);
+};
+
+class dAnimationLocalPose: public dAnimationPose
+{
+	public:
+	dAnimationLocalPose(dAnimKeyframe* const buffer)
+		:dAnimationPose()
+	{
+		m_capacity = 0x7fffffff;
+		m_data = buffer;
+	}
+
+	~dAnimationLocalPose()
+	{
+		m_capacity = 0;
+		m_data = NULL;
+	}
 };
 
 #endif

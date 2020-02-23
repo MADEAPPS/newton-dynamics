@@ -32,16 +32,15 @@ dAnimimationKeyFramesTrack* dAnimationSequence::AddTrack()
 void dAnimationSequence::CalculatePose(dAnimationPose& output, dFloat t) const
 {
 	int index = 0;
-//	dAnimationPose::dListNode* destNode = output.GetFirst()->GetNext();
+	dAnimKeyframe* const keyFrames = &output[0];
 	for (dList<dAnimimationKeyFramesTrack>::dListNode* srcNode = m_tracks.GetFirst(); srcNode; srcNode = srcNode->GetNext()) {
 		const dAnimimationKeyFramesTrack& track = srcNode->GetInfo();
-		//dAnimKeyframe& keyFrame = destNode->GetInfo();
-		dAnimKeyframe& keyFrame = output[index];
+		dAnimKeyframe& keyFrame = keyFrames[index];
 		track.InterpolatePosition(t, keyFrame.m_posit);
 		track.InterpolateRotation(t, keyFrame.m_rotation);
 		dAssert(keyFrame.m_rotation.DotProduct(keyFrame.m_rotation) > 0.999f);
 		dAssert(keyFrame.m_rotation.DotProduct(keyFrame.m_rotation) < 1.001f);
-		//destNode = destNode->GetNext();
+
 		index ++;
 	}
 }

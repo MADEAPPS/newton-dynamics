@@ -54,6 +54,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\dAnimation\dAnimationPose.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationSequence.h" />
+    <ClInclude Include="..\..\dAnimation\dAnimationTwoWayBlend.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationKeyframesTrack.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationBlendTreeNode.h" />
     <ClInclude Include="..\..\dAnimation\dAnimationSequencePlayer.h" />

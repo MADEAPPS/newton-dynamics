@@ -201,6 +201,7 @@ typedef long long unsigned64;
 #include <dAnimationStdAfx.h>
 #include <dAnimationPose.h>
 #include <dAnimationSequence.h>
+#include <dAnimationTwoWayBlend.h>
 #include <dAnimationBlendTreeNode.h>
 #include <dAnimationSequencePlayer.h>
 #include <dAnimationKeyframesTrack.h>

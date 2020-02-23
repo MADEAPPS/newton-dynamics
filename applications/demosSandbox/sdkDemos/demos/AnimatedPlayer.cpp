@@ -86,6 +86,8 @@ class dAnimatedPlayerController: public dPlayerController
 		int count = 0;
 		DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(GetBody());
 		const dList<dAnimimationKeyFramesTrack>& tracks = sequence->GetTracks();
+
+		m_output.Resize(tracks.GetCount());
 		for (dList<dAnimimationKeyFramesTrack>::dListNode* node = tracks.GetFirst(); node; node = node->GetNext()) {
 			dAnimimationKeyFramesTrack& track = node->GetInfo();
 			DemoEntity* const ent = entity->Find(track.GetName().GetStr());
@@ -93,16 +95,23 @@ class dAnimatedPlayerController: public dPlayerController
 			count++;
 		}
 		m_poseCount = count;
+		dAssert (m_poseCount == m_output.GetSize());
 	}
 
 	void CreateAnimationBlendTree(const dAnimationCache& animationcache)
 	{
 		//dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_idle.anm")->GetInfo();
-		dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_walk.anm")->GetInfo();
-		//dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_run.anm")->GetInfo();
+		dAnimationSequence* const walkSequence =(dAnimationSequence*) &animationcache.Find("whiteman_walk.anm")->GetInfo();
+		dAnimationSequence* const runSequence =(dAnimationSequence*) &animationcache.Find("whiteman_run.anm")->GetInfo();
 
-		dAnimationSequencePlayer* const Idle = new dAnimationSequencePlayer(idleSequence);
-		m_animBlendTree = Idle;
+		//dAnimationSequencePlayer* const Idle = new dAnimationSequencePlayer(idleSequence);
+		dAnimationSequencePlayer* const walk = new dAnimationSequencePlayer(walkSequence);
+		dAnimationSequencePlayer* const run = new dAnimationSequencePlayer(runSequence);
+
+		dAnimationTwoWayBlend* const walkRunBlend = new dAnimationTwoWayBlend (walk, run);
+		walkRunBlend->SetParam(0.0f);
+
+		m_animBlendTree = walkRunBlend;
 	}
 
 	void ApplyMove(dFloat timestep)

@@ -17,16 +17,8 @@ class dAnimationPose;
 class dAnimationBlendTreeNode: public dContainersAlloc
 {
 	public:
-
 	dAnimationBlendTreeNode(dAnimationBlendTreeNode* const child);
 	virtual ~dAnimationBlendTreeNode();
-
-	//virtual void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
-	//{
-	//	if (m_child) {
-	//		m_child->Debug(debugContext);
-	//	}
-	//}
 
 	virtual void Evaluate(dAnimationPose& output, dFloat timestep)
 	{
@@ -35,7 +27,6 @@ class dAnimationBlendTreeNode: public dContainersAlloc
 		}
 	}
 
-//	dAnimIDController* m_character;
 	dAnimationBlendTreeNode* m_child;
 };
 
