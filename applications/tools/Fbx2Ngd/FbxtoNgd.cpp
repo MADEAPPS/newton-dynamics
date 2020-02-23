@@ -377,82 +377,9 @@ void PopulateScene(dScene* const ngdScene, FbxScene* const fbxScene, bool import
 		ImportAnimations(ngdScene, fbxScene, nodeMap);
 	}
 }
-/*
-void PrepareSkeleton(FbxScene* const fbxScene)
-{
-	int stack = 1;
-	FbxNode* fbxNodes[32];
-	fbxNodes[0] = fbxScene->GetRootNode();
-
-	FbxAnimEvaluator* const evaluator = fbxScene->GetAnimationEvaluator();
-	evaluator->Reset();
-
-	while (stack) {
-		stack--;
-		FbxNode* const fbxNode = fbxNodes[stack];
-
-		fbxNode->SetPivotState(FbxNode::eSourcePivot, FbxNode::ePivotActive);
-		fbxNode->SetPivotState(FbxNode::eDestinationPivot, FbxNode::ePivotActive);
-
-		EFbxRotationOrder RotationOrder;
-		fbxNode->GetRotationOrder(FbxNode::eSourcePivot, RotationOrder);
-		fbxNode->SetRotationOrder(FbxNode::eDestinationPivot, RotationOrder);
-
-		dAssert(RotationOrder == FbxEuler::eEulerXYZ);
-		fbxNode->ConvertPivotAnimationRecursive(NULL, FbxNode::eDestinationPivot, FbxTime::GetFrameRate(fbxScene->GetGlobalSettings().GetTimeMode()), false);
-
-		for (int i = 0; i < fbxNode->GetChildCount(); i++) {
-			fbxNodes[stack] = fbxNode->GetChild(i);
-			stack++;
-		}
-	}
-}
-*/
 
 void RemoveReflexionMatrices(dScene* const ngdScene)
 {
-//	ngdScene->FreezeScale();
-/*
-	dList<dScene::dTreeNode*> nodeStack;
-	dList<dMatrix> matrixStack;
-
-	for (void* link = ngdScene->GetFirstChildLink(ngdScene->GetRootNode()); link; link = ngdScene->GetNextChildLink(ngdScene->GetRootNode(), link)) {
-		dScene::dTreeNode* const node = ngdScene->GetNodeFromLink(link);
-		dNodeInfo* const nodeInfo = ngdScene->GetInfoFromNode(node);
-		if (nodeInfo->IsType(dSceneNodeInfo::GetRttiType())) {
-			nodeStack.Append(node);
-			matrixStack.Append(dGetIdentityMatrix());
-		}
-	}
-
-	while (nodeStack.GetCount()) {
-		dScene::dTreeNode* const rootNode = nodeStack.GetLast()->GetInfo();
-		dMatrix parentMatrix(matrixStack.GetLast()->GetInfo());
-
-		nodeStack.Remove(nodeStack.GetLast());
-		matrixStack.Remove(matrixStack.GetLast());
-
-		dSceneNodeInfo* const sceneNodeInfo = (dSceneNodeInfo*)ngdScene->GetInfoFromNode(rootNode);
-		dAssert(sceneNodeInfo->IsType(dSceneNodeInfo::GetRttiType()));
-		dMatrix transform(sceneNodeInfo->GetTransform());
-
-		dFloat det = transform[0].DotProduct3(transform[1].CrossProduct(transform[2]));
-		if (det < 0.0f) {
-			dAssert(0);
-		}
-
-		for (void* link = ngdScene->GetFirstChildLink(rootNode); link; link = ngdScene->GetNextChildLink(rootNode, link)) {
-			dScene::dTreeNode* const node = ngdScene->GetNodeFromLink(link);
-			dNodeInfo* const nodeInfo = ngdScene->GetInfoFromNode(node);
-
-			if (nodeInfo->IsType(dSceneNodeInfo::GetRttiType())) {
-				nodeStack.Append(node);
-				matrixStack.Append(dGetIdentityMatrix());
-			}
-		}
-	}
-*/
-
 	dMatrix reflexionMatrix(dGetIdentityMatrix());
 	reflexionMatrix[2] = reflexionMatrix[2].Scale(-1.0f);
 	dScene::Iterator iter(*ngdScene);

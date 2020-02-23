@@ -32,6 +32,7 @@ class dAnimationCache: public dTree<dAnimationSequence, dString>
 	{
 		LoadAnimation("whiteman_idle.anm");
 		LoadAnimation("whiteman_walk.anm");
+		LoadAnimation("whiteman_run.anm");
 	}
 
 	private:
@@ -65,6 +66,9 @@ class dAnimatedPlayerController: public dPlayerController
 		// save player model with the controller
 		SetUserData(playerEntity);
 
+		// bind skeleton to animation blend tree, using idle sequnce
+		BindPose(animationcache);
+
 		CreateAnimationBlendTree(animationcache);
 	}
 
@@ -75,14 +79,13 @@ class dAnimatedPlayerController: public dPlayerController
 		}
 	}
 
-	void CreateAnimationBlendTree(const dAnimationCache& animationcache)
+	void BindPose(const dAnimationCache& animationcache)
 	{
-		//dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_idle.anm")->GetInfo();
-		dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_walk.anm")->GetInfo();
-		// bind animation pose and tracks
+		dAnimationSequence* const sequence =(dAnimationSequence*) &animationcache.Find("whiteman_idle.anm")->GetInfo();
+
 		int count = 0;
 		DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(GetBody());
-		const dList<dAnimimationKeyFramesTrack>& tracks = idleSequence->GetTracks();
+		const dList<dAnimimationKeyFramesTrack>& tracks = sequence->GetTracks();
 		for (dList<dAnimimationKeyFramesTrack>::dListNode* node = tracks.GetFirst(); node; node = node->GetNext()) {
 			dAnimimationKeyFramesTrack& track = node->GetInfo();
 			DemoEntity* const ent = entity->Find(track.GetName().GetStr());
@@ -90,6 +93,13 @@ class dAnimatedPlayerController: public dPlayerController
 			count++;
 		}
 		m_poseCount = count;
+	}
+
+	void CreateAnimationBlendTree(const dAnimationCache& animationcache)
+	{
+		//dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_idle.anm")->GetInfo();
+		dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_walk.anm")->GetInfo();
+		//dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_run.anm")->GetInfo();
 
 		dAnimationSequencePlayer* const Idle = new dAnimationSequencePlayer(idleSequence);
 		m_animBlendTree = Idle;
@@ -133,10 +143,12 @@ class dAnimatedPlayerController: public dPlayerController
 		// update the animation tree
 		m_animBlendTree->Evaluate(m_output, timestep);
 
-		for (int i = 1; i < m_poseCount; i ++) {
+		for (int i = 0; i < m_poseCount; i ++) {
+		//for (int i = 0; i < 9; i ++) {
 			const dAnimKeyframe& keyFrame = m_output[i];
 			DemoEntity* const entity = (DemoEntity*)keyFrame.m_userData;
 
+			//dTrace (("%s\n", entity->GetName().GetStr()));
 			//dMatrix matrix (keyFrame.m_rotation, keyFrame.m_posit);
 			//entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
 			entity->SetMatrixUsafe(keyFrame.m_rotation, keyFrame.m_posit);

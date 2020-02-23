@@ -44,9 +44,9 @@
         </dMeshNodeInfo>
         <dMaterialNodeInfo id="0">
             <dNodeInfo name="02 - Default" nodeID="6" editorFlags="0" />
-            <ambient textureId="9055176765842625830" color="0.588235 0.588235 0.588235 1" />
-            <diffuse textureId="9055176765842625830" color="0.588235 0.588235 0.588235 1" />
-            <specular textureId="9055176765842625830" color="0.9 0.9 0.9 1" />
+            <ambient textureId="-3102373678469349348" color="0.588235 0.588235 0.588235 1" />
+            <diffuse textureId="-3102373678469349348" color="0.588235 0.588235 0.588235 1" />
+            <specular textureId="-3102373678469349348" color="0.9 0.9 0.9 1" />
             <emissive textureId="-1" color="0 0 0 1" />
             <shininess float="2.000000" />
             <opacity float="1.000000" />
@@ -58,8 +58,8 @@
             <parentNodes count="1" indices="0" />
             <childrenNodes count="4" indices="8 10 12 14" />
         </dSceneCacheInfo>
-        <dTextureNodeInfo path="floor_.tga">
-            <dNodeInfo name="floor_.tga" nodeID="8" editorFlags="0" />
+        <dTextureNodeInfo path="marbleCheckBoard.tga">
+            <dNodeInfo name="marbleCheckBoard.tga" nodeID="8" editorFlags="0" />
             <parentNodes count="2" indices="7 6" />
         </dTextureNodeInfo>
         <dMaterialNodeInfo id="1">
