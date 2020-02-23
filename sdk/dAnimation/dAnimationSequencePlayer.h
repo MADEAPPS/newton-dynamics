@@ -21,7 +21,7 @@ class dAnimationSequence;
 class dAnimationSequencePlayer: public dAnimationBlendTreeNode
 {
 	public:
-	dAnimationSequencePlayer(dAnimationSequence* const takeData);
+	dAnimationSequencePlayer(dAnimationSequence* const sequence);
 	virtual ~dAnimationSequencePlayer();
 
 	virtual void Evaluate(dAnimationPose& output, dFloat timestep);

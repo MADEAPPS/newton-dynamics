@@ -15,9 +15,9 @@
 #include "dAnimationSequencePlayer.h"
 
 
-dAnimationSequencePlayer::dAnimationSequencePlayer(dAnimationSequence* const takeData)
+dAnimationSequencePlayer::dAnimationSequencePlayer(dAnimationSequence* const sequence)
 	:dAnimationBlendTreeNode(NULL)
-	,m_sequence(takeData)
+	,m_sequence(sequence)
 	,m_time(0.0f)
 {
 }

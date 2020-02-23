@@ -59,7 +59,6 @@
     <ClCompile Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleEngine.cpp" />
     <ClCompile Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTire.cpp" />
     <ClCompile Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTireContact.cpp" />
-    <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerController.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerContactSolver.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerImpulseSolver.cpp" />

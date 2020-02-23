@@ -37,7 +37,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerController.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerImpulseSolver.cpp" />
-    <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerManager.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerContactSolver.cpp" />
     <ClCompile Include="..\..\dVehicle\dStdafxVehicle.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
@@ -63,18 +62,17 @@
     <ClCompile Include="..\..\dVehicle\dVehicleSolver.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\dVehicle\dVehicle.h" />
+    <ClInclude Include="..\..\dVehicle\dStdafxVehicle.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleManager.h" />
+    <ClInclude Include="..\..\dVehicle\dVehicleLoopJoint.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerController.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerContactSolver.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerImpulseSolver.h" />
-    <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerManager.h" />
-    <ClInclude Include="..\..\dVehicle\dStdafxVehicle.h" />
-    <ClInclude Include="..\..\dVehicle\dVehicle.h" />
-    <ClInclude Include="..\..\dVehicle\dVehicleManager.h" />
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleCollisionNode.h" />
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleDashControl.h" />
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleDifferential.h" />
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleEngine.h" />
-    <ClInclude Include="..\..\dVehicle\dVehicleLoopJoint.h" />
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicle.h" />
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTire.h" />
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTireContact.h" />

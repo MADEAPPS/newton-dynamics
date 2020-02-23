@@ -22,7 +22,7 @@
 
 #define PLAYER_MASS						80.0f
 #define PLAYER_WALK_SPEED				1.8f
-//#define PLAYER_JUMP_SPEED				5.8f
+#define PLAYER_JUMP_SPEED				5.8f
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
 
 class dAnimationCache: public dTree<dAnimationSequence, dString>
@@ -44,27 +44,110 @@ class dAnimationCache: public dTree<dAnimationSequence, dString>
 	}
 };
 
-class AnimatedPlayerControllerManager: public dPlayerControllerManager
+
+class dAnimatedPlayerController: public dPlayerController
 {
 	public:
-	AnimatedPlayerControllerManager(NewtonWorld* const world)
-		:dPlayerControllerManager(world)
-		,m_player(NULL)
-		,m_animationCache()
+	dAnimatedPlayerController(DemoEntity* const playerEntity, const dAnimationCache& animationcache, NewtonWorld* const world, const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
+		:dPlayerController(world, location, localAxis, mass, radius, height, stepHeight)
+		,m_animBlendTree(NULL)
 	{
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+		// get body from player, and set some parameter
+		NewtonBody* const body = GetBody();
 
+		// set the user data
+		NewtonBodySetUserData(body, playerEntity);
+
+		// set the transform callback
+		NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
+
+		// save player model with the controller
+		SetUserData(playerEntity);
+
+		CreateAnimationBlendTree(animationcache);
+	}
+
+	~dAnimatedPlayerController()
+	{
+		if (m_animBlendTree) {
+			delete m_animBlendTree;
+		}
+	}
+
+	void CreateAnimationBlendTree(const dAnimationCache& animationcache)
+	{
+		dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_idle.anm")->GetInfo();
+
+		dAnimationSequencePlayer* const Idle = new dAnimationSequencePlayer(idleSequence);
+
+
+		m_animBlendTree = Idle;
+	}
+
+	void ApplyMove(dFloat timestep)
+	{
+		// calculate the gravity contribution to the velocity
+		dFloat g = 2.0f * DEMO_GRAVITY;
+		dVector gravity(GetLocalFrame().RotateVector(dVector(g, 0.0f, 0.0f, 0.0f)));
+		dVector totalImpulse(GetImpulse() + gravity.Scale(GetMass() * timestep));
+		SetImpulse(totalImpulse);
+	}
+
+	dFloat ContactFrictionCallback(const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
+	{
+		if (normal.m_y < 0.9f) {
+			// steep slope are friction less
+			return 0.0f;
+		} else {
+			switch (contactId) {
+				case 1:
+					// this the brick wall
+					return 0.5f;
+				case 2:
+					// this the wood floor
+					return 1.0f;
+				case 3:
+					// this the cement floor
+					return 2.0f;
+				default:
+					// this is everything else
+					return 1.0f;
+			}
+		}
+	}
+
+	dAnimationBlendTreeNode* m_animBlendTree;
+};
+
+
+class dAnimatedPlayerControllerManager: public dVehicleManager
+{
+	public:
+	dAnimatedPlayerControllerManager(NewtonWorld* const world)
+		:dVehicleManager(world)
+		,m_animationCache()
+		,m_player(NULL)
+		,m_crowchKey(false)
+	{
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
 		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 		scene->Set2DDisplayRenderFunction(RenderPlayerHelp, NULL, this);
 	}
 
-	~AnimatedPlayerControllerManager()
+	~dAnimatedPlayerControllerManager()
 	{
 	}
 
-	void SetAsPlayer(dPlayerControllerOld* const controller)
+	static void RenderPlayerHelp(DemoEntityManager* const scene, void* const context)
 	{
-		m_player = controller;
+		dAnimatedPlayerControllerManager* const me = (dAnimatedPlayerControllerManager*)context;
+		me->RenderPlayerHelp(scene);
+	}
+
+	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
+	{
+		dAnimatedPlayerControllerManager* const me = (dAnimatedPlayerControllerManager*)context;
+		me->SetCamera();
 	}
 
 	void RenderPlayerHelp(DemoEntityManager* const scene) const
@@ -75,153 +158,15 @@ class AnimatedPlayerControllerManager: public dPlayerControllerManager
 		scene->Print(color, "walk backward:           S");
 		scene->Print(color, "strafe right:            D");
 		scene->Print(color, "strafe left:             A");
-		//scene->Print(color, "toggle camera mode:      C");
-		//scene->Print(color, "jump:                    Space");
-		//scene->Print(color, "hide help:               H");
-		//scene->Print(color, "change player direction: Left mouse button");
+		scene->Print(color, "crouch:				  C");
+		scene->Print(color, "jump:                    Space");
+		//scene->Print(color, "toggle camera mode:    C");
+		//scene->Print(color, "hide help:             H");
 	}
 
-	static void RenderPlayerHelp(DemoEntityManager* const scene, void* const context)
+	void SetAsPlayer(dPlayerController* const controller)
 	{
-		AnimatedPlayerControllerManager* const me = (AnimatedPlayerControllerManager*)context;
-		me->RenderPlayerHelp(scene);
-	}
-
-	static void UpdateCameraCallback(DemoEntityManager* const manager, void* const context, dFloat timestep)
-	{
-		AnimatedPlayerControllerManager* const me = (AnimatedPlayerControllerManager*)context;
-		me->SetCamera();
-	}
-
-/*
-	dAnimationKeyframesSequence* GetAnimationSequence(const char* const animName)
-	{
-		dTree<dAnimationKeyframesSequence*, dString>::dTreeNode* cachedAnimNode = m_animCache.Find(animName);
-		if (!cachedAnimNode) {
-			dScene scene(GetWorld());
-			char pathName[2048];
-			dGetWorkingFileName(animName, pathName);
-			scene.Deserialize(pathName);
-
-			dScene::dTreeNode* const animTakeNode = scene.FindChildByType(scene.GetRootNode(), dAnimationTake::GetRttiType());
-			if (animTakeNode) {
-				//dTree<dAnimimationKeyFramesTrack*, dString> map;
-				//const dAnimPose& basePose = controller->GetBasePose();
-				//dAnimTakeData* const animdata = new dAnimTakeData(basePose.GetCount());
-				dAnimationKeyframesSequence* const animdata = new dAnimationKeyframesSequence();
-				dAnimationTake* const animTake = (dAnimationTake*)scene.GetInfoFromNode(animTakeNode);
-				animdata->SetPeriod(animTake->GetPeriod());
-
-				cachedAnimNode = m_animCache.Insert(animdata, animName);
-
-				//dList<dAnimimationKeyFramesTrack>& tracks = animdata->GetTracks();
-				//dList<dAnimimationKeyFramesTrack>::dListNode* ptr = tracks.GetFirst();
-				//dList<dAnimimationKeyFramesTrack>::dListNode* ptr = tracks.Append();
-				//for (dAnimPose::dListNode* ptrNode = basePose.GetFirst(); ptrNode; ptrNode = ptrNode->GetNext()) {
-				//	DemoEntity* const entity = (DemoEntity*)ptrNode->GetInfo().m_userData;
-				//	map.Insert(&ptr->GetInfo(), entity->GetName());
-				//	ptr = ptr->GetNext();
-				//}
-
-				dList<dAnimimationKeyFramesTrack>& tracks = animdata->GetTracks();
-				for (void* link = scene.GetFirstChildLink(animTakeNode); link; link = scene.GetNextChildLink(animTakeNode, link)) {
-					dScene::dTreeNode* const node = scene.GetNodeFromLink(link);
-					dAnimationTrack* const srcTrack = (dAnimationTrack*)scene.GetInfoFromNode(node);
-
-					if (srcTrack->IsType(dAnimationTrack::GetRttiType())) {
-						//dTree<dAnimimationKeyFramesTrack*, dString>::dTreeNode* const ptrNode = map.Find(srcTrack->GetName());
-						//dAssert(ptrNode);
-						//dAnimTakeData::dAnimTakeTrack* const dstTrack = ptrNode->GetInfo();
-						dAnimimationKeyFramesTrack* const dstTrack = &tracks.Append()->GetInfo();
-						dstTrack->SetName(srcTrack->GetName());
-
-						const dList<dAnimationTrack::dCurveValue>& rotations = srcTrack->GetRotations();
-						dstTrack->m_rotation.Resize(rotations.GetCount());
-						int index = 0;
-						for (dList<dAnimationTrack::dCurveValue>::dListNode* node = rotations.GetFirst(); node; node = node->GetNext()) {
-							dAnimationTrack::dCurveValue keyFrame(node->GetInfo());
-
-							dMatrix matrix(dPitchMatrix(keyFrame.m_x) * dYawMatrix(keyFrame.m_y) * dRollMatrix(keyFrame.m_z));
-							dQuaternion rot(matrix);
-							dstTrack->m_rotation[index].m_rotation = rot;
-							dstTrack->m_rotation[index].m_time = keyFrame.m_time;
-							index++;
-						}
-
-						for (int i = 0; i < rotations.GetCount() - 1; i++) {
-							dFloat dot = dstTrack->m_rotation[i].m_rotation.DotProduct(dstTrack->m_rotation[i + 1].m_rotation);
-							if (dot < 0.0f) {
-								dstTrack->m_rotation[i + 1].m_rotation.m_x *= -1.0f;
-								dstTrack->m_rotation[i + 1].m_rotation.m_y *= -1.0f;
-								dstTrack->m_rotation[i + 1].m_rotation.m_z *= -1.0f;
-								dstTrack->m_rotation[i + 1].m_rotation.m_w *= -1.0f;
-							}
-						}
-
-						const dList<dAnimationTrack::dCurveValue>& positions = srcTrack->GetPositions();
-						dstTrack->m_position.Resize(positions.GetCount());
-						index = 0;
-						for (dList<dAnimationTrack::dCurveValue>::dListNode* node = positions.GetFirst(); node; node = node->GetNext()) {
-							dAnimationTrack::dCurveValue keyFrame(node->GetInfo());
-							dstTrack->m_position[index].m_posit = dVector(keyFrame.m_x, keyFrame.m_y, keyFrame.m_z, dFloat(1.0f));
-							dstTrack->m_position[index].m_time = keyFrame.m_time;
-							index++;
-						}
-					}
-				}
-			}
-		}
-		dAssert(cachedAnimNode);
-		return cachedAnimNode->GetInfo();
-	}
-*/
-	
-	dPlayerControllerOld* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
-	{
-		// get the scene 
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
-
-		// set the play coordinate system
-		dMatrix localAxis(dGetIdentityMatrix());
-
-		//up is first vector
-		localAxis[0] = dVector(0.0, 1.0f, 0.0f, 0.0f);
-		// up is the second vector
-		localAxis[1] = dVector(1.0, 0.0f, 0.0f, 0.0f);
-		// size if the cross product
-		localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
-
-		// make a play controller with default values.
-		dPlayerControllerOld* const controller = CreateController(location, localAxis, mass, radius, height, 0.4f);
-
-		// get body from player, and set some parameter
-		NewtonBody* const body = controller->GetBody();
-		
-		DemoEntity* const playerEntity = DemoEntity::LoadNGD_mesh("whiteman.ngd", scene->GetNewton(), scene->GetShaderCache());
-		scene->Append(playerEntity);
-
-		// set the user data
-		NewtonBodySetUserData(body, playerEntity);
-
-		// set the transform callback
-		NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
-
-		// save player model with the controller
-		controller->SetUserData(playerEntity);
-
-		// set higher that 1.0f friction
-		//controller->SetFriction(2.0f);
-		//controller->SetFriction(1.0f);
-
-		LoadAnimationBlendTree(controller);
-
-		return controller;
-	}
-
-	void LoadAnimationBlendTree(dPlayerControllerOld* const controller)
-	{
-		//dAnimTakeData* const walkCycle = LoadAnimation(controller, "whiteman_idle.ngd");
-		//dAnimationSequence* const idleSequence = LoadAnimation("whiteman_idle.ngd");
+		m_player = controller;
 	}
 
 	void SetCamera()
@@ -244,12 +189,34 @@ class AnimatedPlayerControllerManager: public dPlayerControllerManager
 		}
 	}
 
-	void ApplyInputs(dPlayerControllerOld* const controller)
+	void ApplyInputs(dVehicle* const model, dFloat timestep)
 	{
+		dAnimatedPlayerController* controller = (dAnimatedPlayerController*)model->GetAsPlayerController();
+		dAssert(controller);
+		controller->ApplyMove(timestep);
+
 		if (controller == m_player) {
 			DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
 			dFloat forwarSpeed = (int(scene->GetKeyState('W')) - int(scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
 			dFloat strafeSpeed = (int(scene->GetKeyState('D')) - int(scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
+
+			bool crowchKey = scene->GetKeyState('C') ? true : false;
+			if (m_crowchKey.UpdateTrigger(crowchKey)) {
+				dAssert (0);
+				//controller->ToggleCrouch();
+				//DemoEntity* const playerEntity = (DemoEntity*)NewtonBodyGetUserData(controller->GetBody());
+				//if (controller->IsCrouched()) {
+				//	playerEntity->SetMesh(m_crouchMesh, dGetIdentityMatrix());
+				//} else {
+				//	playerEntity->SetMesh(m_standingMesh, dGetIdentityMatrix());
+				//}
+			}
+
+			if (scene->GetKeyState(' ') && controller->IsOnFloor()) {
+				dVector jumpImpule(controller->GetLocalFrame().RotateVector(dVector(PLAYER_JUMP_SPEED * controller->GetMass(), 0.0f, 0.0f, 0.0f)));
+				dVector totalImpulse(controller->GetImpulse() + jumpImpule);
+				controller->SetImpulse(totalImpulse);
+			}
 
 			if (forwarSpeed && strafeSpeed) {
 				dFloat invMag = PLAYER_WALK_SPEED / dSqrt(forwarSpeed * forwarSpeed + strafeSpeed * strafeSpeed);
@@ -266,62 +233,37 @@ class AnimatedPlayerControllerManager: public dPlayerControllerManager
 		}
 	}
 
-	bool ProccessContact(dPlayerControllerOld* const controller, const dVector& position, const dVector& normal, const NewtonBody* const otherbody) const
+	dAnimatedPlayerController* CreatePlayer(const dMatrix& location, dFloat height, dFloat radius, dFloat mass)
 	{
-		/*
-		if (normal.m_y < 0.9f) {
-		dMatrix matrix;
-		NewtonBodyGetMatrix(controller->GetBody(), &matrix[0][0]);
-		dFloat h = (position - matrix.m_posit).DotProduct3(matrix.m_up);
-		return (h >= m_stepHigh) ? true : false;
-		}
-		*/
-		return true;
+		// get the scene 
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+		NewtonWorld* const world = scene->GetNewton();
+
+		// set the play coordinate system
+		dMatrix localAxis(dGetIdentityMatrix());
+
+		//up is first vector
+		localAxis[0] = dVector(0.0, 1.0f, 0.0f, 0.0f);
+		// up is the second vector
+		localAxis[1] = dVector(1.0, 0.0f, 0.0f, 0.0f);
+		// size if the cross product
+		localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
+
+
+		DemoEntity* const playerEntity = DemoEntity::LoadNGD_mesh("whiteman.ngd", scene->GetNewton(), scene->GetShaderCache());
+		scene->Append(playerEntity);
+
+		// make a play controller with default values.
+		dAnimatedPlayerController* const controller = new dAnimatedPlayerController(playerEntity, m_animationCache, world, location, localAxis, mass, radius, height, height / 3.0f);
+		AddRoot(controller);
+
+		return controller;
 	}
 
-	dFloat ContactFriction(dPlayerControllerOld* const controller, const dVector& position, const dVector& normal, int contactId, const NewtonBody* const otherbody) const
-	{
-		if (normal.m_y < 0.9f) {
-			// steep slope are friction less
-			return 0.0f;
-		} else {
-			//NewtonCollision* const collision = NewtonBodyGetCollision(otherbody);
-			//int type = NewtonCollisionGetType (collision);
-			//if ((type == SERIALIZE_ID_TREE) || (type == SERIALIZE_ID_TREE)) {
-			//} else {
-			switch (contactId) {
-				case 1:
-					// this the brick wall
-					return 0.5f;
-				case 2:
-					// this the wood floor
-					return 1.0f;
-				case 3:
-					// this the cement floor
-					return 2.0f;
-				default:
-					// this is everything else
-					return 1.0f;
-			}
-		}
-	}
-
-	// apply gravity 
-	virtual void ApplyMove(dPlayerControllerOld* const controller, dFloat timestep)
-	{
-		// calculate the gravity contribution to the velocity
-		dVector gravityImpulse(0.0f, DEMO_GRAVITY * controller->GetMass() * timestep, 0.0f, 0.0f);
-		dVector totalImpulse(controller->GetImpulse() + gravityImpulse);
-		controller->SetImpulse(totalImpulse);
-
-		// apply play movement
-		ApplyInputs(controller);
-	}
-
-	dPlayerControllerOld* m_player;
 	dAnimationCache m_animationCache;
+	dPlayerController* m_player;
+	DemoEntityManager::ButtonKey m_crowchKey;
 };
-
 
 static NewtonBody* CreateCylinder(DemoEntityManager* const scene, const dVector& location, dFloat mass, dFloat radius, dFloat height)
 {
@@ -439,7 +381,6 @@ static void CreateBridge(DemoEntityManager* const scene, NewtonBody* const playg
 	hinge = new dCustomHinge(matrix, array[count - 1], playgroundBody);
 	hinge->SetAsSpringDamper(true, 0.9f, 0.0f, 20.0f);
 
-
 	geometry->Release();
 	NewtonDestroyCollision(collision);
 }
@@ -453,7 +394,7 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 	NewtonBody* const playgroundBody = CreateLevelMesh (scene, "playerarena.ngd", true);
 
 	// create a character controller manager
-	AnimatedPlayerControllerManager* const playerManager = new AnimatedPlayerControllerManager(world);
+	dAnimatedPlayerControllerManager* const playerManager = new dAnimatedPlayerControllerManager(world);
 
 	// add main player
 	dMatrix location(dGetIdentityMatrix());
@@ -465,7 +406,8 @@ void AnimatedPlayerController(DemoEntityManager* const scene)
 
 	location.m_posit = FindFloor(scene->GetNewton(), location.m_posit, 20.0f);
 	location.m_posit.m_y += 1.0f;
-	dPlayerControllerOld*  const player = playerManager->CreatePlayer(location, 1.8f, 0.3f, 100.0f);
+
+	dAnimatedPlayerController* const player = playerManager->CreatePlayer(location, 1.8f, 0.3f, 100.0f);
 	playerManager->SetAsPlayer(player);
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());

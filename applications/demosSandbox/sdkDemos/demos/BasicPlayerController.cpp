@@ -34,6 +34,10 @@ class dBasicPlayerController: public dPlayerController
 	{
 	}
 
+	~dBasicPlayerController()
+	{
+	}
+
 	void ApplyMove(dFloat timestep)
 	{
 		// calculate the gravity contribution to the velocity

@@ -170,13 +170,12 @@ typedef long long unsigned64;
 #include <dStdafxVehicle.h>
 #include <dVehicleNode.h>
 #include <dVehicleManager.h>
+#include <dPlayerController.h>
 #include <dMultiBodyVehicle.h>
 #include <dMultiBodyVehicleTire.h>
 #include <dMultiBodyVehicleEngine.h>
 #include <dMultiBodyVehicleDifferential.h>
 
-#include <dPlayerController.h>
-#include <dPlayerControllerManager.h>
 
 #include <dSceneStdafx.h>
 #include <dScene.h>
@@ -202,6 +201,8 @@ typedef long long unsigned64;
 #include <dAnimationStdAfx.h>
 #include <dAnimationPose.h>
 #include <dAnimationSequence.h>
+#include <dAnimationBlendTreeNode.h>
+#include <dAnimationSequencePlayer.h>
 #include <dAnimationKeyframesTrack.h>
 
 /*
