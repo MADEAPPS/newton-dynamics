@@ -77,7 +77,8 @@ class dAnimatedPlayerController: public dPlayerController
 
 	void CreateAnimationBlendTree(const dAnimationCache& animationcache)
 	{
-		dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_idle.anm")->GetInfo();
+		//dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_idle.anm")->GetInfo();
+		dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_walk.anm")->GetInfo();
 		// bind animation pose and tracks
 		int count = 0;
 		DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(GetBody());
