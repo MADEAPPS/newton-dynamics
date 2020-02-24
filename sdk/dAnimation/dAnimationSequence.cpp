@@ -47,6 +47,9 @@ void dAnimationSequence::CalculatePose(dAnimationPose& output, dFloat t) const
 
 void dAnimationSequence::Load(const char* const fileName)
 {
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+
 	m_tracks.RemoveAll();
 	m_period = 0;
 	FILE* const file = fopen(fileName, "rb");
@@ -60,6 +63,9 @@ void dAnimationSequence::Load(const char* const fileName)
 		}
 		fclose(file);
 	}
+
+	// restore locale settings
+	setlocale(LC_ALL, oldloc);
 }
 
 void dAnimationSequence::Save(const char* const fileName)

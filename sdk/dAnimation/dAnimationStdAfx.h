@@ -18,7 +18,7 @@
 #define __D_ANIMATION_STDAFX__
 
 #include <stdlib.h>
-
+#include <locale.h>
 
 #ifdef _MSC_VER
 	#ifndef WIN32_LEAN_AND_MEAN
