@@ -132,7 +132,7 @@ void dVehicleManager::PostStep(dFloat timestep, int threadID)
 	if (node) {
 		do {
 			dVehicle* const vehicle = node->GetInfo();
-			OnUpdateTransform(vehicle);
+			OnUpdateTransform(vehicle, timestep);
 			for (int i = 0; i < threadCount; i++) {
 				node = node ? node->GetNext() : NULL;
 			}

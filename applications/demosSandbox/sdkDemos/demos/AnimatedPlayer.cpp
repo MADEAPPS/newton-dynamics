@@ -108,7 +108,7 @@ class dAnimatedPlayerController: public dPlayerController
 		dAnimationSequencePlayer* const walk = new dAnimationSequencePlayer(walkSequence);
 		dAnimationSequencePlayer* const run = new dAnimationSequencePlayer(runSequence);
 
-		dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
+		//dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
 		dFloat scale1 = runSequence->GetPeriod() / walkSequence->GetPeriod();
 		dAnimationTwoWayBlend* const walkRunBlend = new dAnimationTwoWayBlend (walk, run);
 
@@ -151,20 +151,18 @@ class dAnimatedPlayerController: public dPlayerController
 		}
 	}
 
-	void PostUpdate(dFloat timestep)
+	//void PostUpdate(dFloat timestep)
+	void OnUpdateTransform(DemoEntityManager* const scene, dFloat timestep)
 	{
 		// update the animation tree
 		m_animBlendTree->Evaluate(m_output, timestep);
 
 		for (int i = 0; i < m_poseCount; i ++) {
-		//for (int i = 0; i < 9; i ++) {
 			const dAnimKeyframe& keyFrame = m_output[i];
 			DemoEntity* const entity = (DemoEntity*)keyFrame.m_userData;
 
 			//dTrace (("%s\n", entity->GetName().GetStr()));
-			//dMatrix matrix (keyFrame.m_rotation, keyFrame.m_posit);
-			//entity->SetMatrix(keyFrame.m_rotation, keyFrame.m_posit);
-			entity->SetMatrixUsafe(keyFrame.m_rotation, keyFrame.m_posit);
+			entity->SetMatrix(*scene, keyFrame.m_rotation, keyFrame.m_posit);
 		}
 	}
 
@@ -172,7 +170,6 @@ class dAnimatedPlayerController: public dPlayerController
 	dAnimationBlendTreeNode* m_animBlendTree;
 	int m_poseCount;
 };
-
 
 class dAnimatedPlayerControllerManager: public dVehicleManager
 {
@@ -312,6 +309,15 @@ class dAnimatedPlayerControllerManager: public dVehicleManager
 		AddRoot(controller);
 
 		return controller;
+	}
+
+	virtual void OnUpdateTransform(dVehicle* const model, dFloat timestep) const
+	{
+		dAnimatedPlayerController* controller = (dAnimatedPlayerController*)model->GetAsPlayerController();
+		dAssert(controller);
+
+		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+		controller->OnUpdateTransform(scene, timestep);
 	}
 
 	dAnimationCache m_animationCache;
