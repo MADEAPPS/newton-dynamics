@@ -108,8 +108,12 @@ class dAnimatedPlayerController: public dPlayerController
 		dAnimationSequencePlayer* const walk = new dAnimationSequencePlayer(walkSequence);
 		dAnimationSequencePlayer* const run = new dAnimationSequencePlayer(runSequence);
 
+		dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
+		dFloat scale1 = runSequence->GetPeriod() / walkSequence->GetPeriod();
 		dAnimationTwoWayBlend* const walkRunBlend = new dAnimationTwoWayBlend (walk, run);
-		walkRunBlend->SetParam(0.0f);
+
+		walkRunBlend->SetTimeDilation1(scale1);
+		walkRunBlend->SetParam(0.5f);
 
 		m_animBlendTree = walkRunBlend;
 	}

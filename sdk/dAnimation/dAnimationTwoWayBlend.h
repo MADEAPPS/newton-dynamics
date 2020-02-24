@@ -24,11 +24,23 @@ class dAnimationTwoWayBlend: public dAnimationBlendTreeNode
 	dFloat GetParam () const {return m_param;}
 	void SetParam (dFloat param) {m_param = param;}
 
+	void SetTimeDilation0 (dFloat dilation)
+	{
+		m_timeDilation0 = dilation;
+	}
+
+	void SetTimeDilation1(dFloat dilation)
+	{
+		m_timeDilation1 = dilation;
+	}
+
 	virtual void Evaluate(dAnimationPose& output, dFloat timestep);
 
 	protected:
 	dAnimationBlendTreeNode* m_node0;
 	dAnimationBlendTreeNode* m_node1;
+	dFloat m_timeDilation0;
+	dFloat m_timeDilation1;
 	dFloat m_param;
 };
 

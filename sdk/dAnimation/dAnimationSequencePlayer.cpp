@@ -26,15 +26,10 @@ dAnimationSequencePlayer::~dAnimationSequencePlayer()
 {
 }
 
-void dAnimationSequencePlayer::SetFrame(dFloat t)
-{
-	m_time = dMod(m_time + t, m_sequence->m_period);
-//m_time = m_sequence->m_period * 0.0f;
-}
 
 void dAnimationSequencePlayer::Evaluate(dAnimationPose& output, dFloat timestep)
 {
-	SetFrame(timestep);
+	AdvanceFrame(timestep);
 	m_sequence->CalculatePose(output, m_time);
 }
 

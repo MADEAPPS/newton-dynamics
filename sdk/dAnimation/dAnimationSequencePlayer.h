@@ -26,10 +26,29 @@ class dAnimationSequencePlayer: public dAnimationBlendTreeNode
 
 	virtual void Evaluate(dAnimationPose& output, dFloat timestep);
 
-	void SetFrame(dFloat t);
+	void SetFrame(dFloat timestep)
+	{
+		m_time = timestep;
+	}
 
-	dFloat m_time;
+	void AdvanceFrame(dFloat timestep)
+	{
+		SetFrame (dMod(m_time + timestep, m_sequence->m_period));
+	}
+
+	dFloat GetFrame() const 
+	{
+		return m_time;
+	}
+
+	dAnimationSequence* GetSequence()
+	{
+		return m_sequence;
+	}
+
+	private:
 	dAnimationSequence* m_sequence;
+	dFloat m_time;
 };
 
 

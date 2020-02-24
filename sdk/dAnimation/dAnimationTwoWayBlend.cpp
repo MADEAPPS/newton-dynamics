@@ -17,9 +17,10 @@ dAnimationTwoWayBlend::dAnimationTwoWayBlend(dAnimationBlendTreeNode* const node
 	:dAnimationBlendTreeNode(NULL)
 	,m_node0(node0)
 	,m_node1(node1)
+	,m_timeDilation0(1.0f)
+	,m_timeDilation1(1.0f)
 	,m_param(0.0f)
 {
-	m_param = 0.6f;
 }
 
 dAnimationTwoWayBlend::~dAnimationTwoWayBlend()
@@ -38,8 +39,8 @@ void dAnimationTwoWayBlend::Evaluate(dAnimationPose& output, dFloat timestep)
 		const int count = output.GetSize();
 		dAnimKeyframe* const buffer = dAlloca(dAnimKeyframe, count);
 		dAnimationLocalPose localPose(buffer);
-		m_node0->Evaluate(output, timestep);
-		m_node1->Evaluate(localPose, timestep);
+		m_node0->Evaluate(output, timestep * m_timeDilation0);
+		m_node1->Evaluate(localPose, timestep * m_timeDilation1);
 
 		dAnimKeyframe* const dst = &output[0];
 		const dAnimKeyframe* const src = &localPose[0];
