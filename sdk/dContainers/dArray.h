@@ -12,6 +12,8 @@
 #ifndef __D_ARRAY__
 #define __D_ARRAY__
 
+#include "dContainersAlloc.h"
+
 template<class T>
 class dArray: public dContainersAlloc
 {

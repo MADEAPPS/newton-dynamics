@@ -552,6 +552,7 @@ DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 	#endif
 }
 
+/*
 DG_INLINE void* dgInterlockedExchange(void** const ptr, void* value)
 {
 	#if defined(_WIN32)
@@ -565,16 +566,16 @@ DG_INLINE void* dgInterlockedExchange(void** const ptr, void* value)
 			return __sync_lock_test_and_set(ptr, value);
 		#else
 			#ifdef __x86_64__
-				return (void*)__sync_lock_test_and_set((dgInt64*) ptr, value);
+				return (void*)__sync_lock_test_and_set((dgInt64*) ptr, (dgInt64)value);
 			#else
-				return (void*)__sync_lock_test_and_set((dgInt32*) ptr, value);
+				return (void*)__sync_lock_test_and_set((dgInt32*) ptr, (dgInt32) value);
 			#endif
 		#endif
 	#else
 		#error "dgInterlockedExchange implementation required"
 	#endif
 }
-
+*/
 
 DG_INLINE dgInt32 dgInterlockedTest(dgInt32* const ptr, dgInt32 value)
 {
