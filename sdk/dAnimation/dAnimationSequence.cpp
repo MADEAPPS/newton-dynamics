@@ -70,6 +70,9 @@ void dAnimationSequence::Load(const char* const fileName)
 
 void dAnimationSequence::Save(const char* const fileName)
 {
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+
 	FILE* const file = fopen(fileName, "wb");
 	if (file) {
 		fprintf(file, "period %f\n", m_period);
@@ -80,4 +83,7 @@ void dAnimationSequence::Save(const char* const fileName)
 		}
 		fclose(file);
 	}
+
+	// restore locale settings
+	setlocale(LC_ALL, oldloc);
 }
