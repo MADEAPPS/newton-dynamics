@@ -471,95 +471,37 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 
 dgVector dgMatrix::EigenVectors ()
 {
-#if 0
-	// still have the same problem I had in the pass, because QR algorithm is really bad 
-	// at converging matrices with very different eigenvalue. 
-	// the solution is to use RD with double shift which I do not feel like implementing. 
-	dgMatrix eigenValues (*this);
-	dgMatrix& eigenVectors = *this;
-	eigenVectors = dgGetIdentityMatrix();
-	if (dgAbs(eigenValues.m_front.m_z) > dgFloat32(1.0e-6f)) {
-		// calculate initial guess by convert to tridiagonal matrix using householder
-		dgVector u(eigenValues.m_front);
-		u.m_x = dgFloat32(0.0f);
-		u.m_y -= dgSqrt(u.DotProduct(u).GetScalar());
-		dgAssert(dgAbs(u.m_y) > dgFloat32(1.0e-6f));
-		dgVector v(u.Scale(-dgFloat32(2.0f) / u.DotProduct(u).GetScalar()));
-
-		eigenVectors = dgMatrix(v, u);
-		eigenVectors[0][0] += dgFloat32(1.0f);
-		eigenVectors[1][1] += dgFloat32(1.0f);
-		eigenVectors[2][2] += dgFloat32(1.0f);
-		eigenValues = eigenVectors.Transpose() * eigenValues * eigenVectors;
-	}
-
-	eigenValues[0][2] = dgFloat32(0.0f);
-	eigenValues[2][0] = dgFloat32(0.0f);
-	for (dgInt32 i = 0; (i < 16) && ((m_front.m_y * m_front.m_y + m_front.m_z * m_front.m_z + m_up.m_z * m_up.m_z) > dgFloat32(1.0e-12f)); i++) {
-		dgMatrix householder(dgGetIdentityMatrix());
-		dgFloat32 mag2 = eigenValues.m_front.m_y * eigenValues.m_front.m_y + eigenValues.m_front.m_z * eigenValues.m_front.m_z;
-		if (mag2 > dgFloat32(1.0e-12f)) {
-			// convert to tridiagonal matrix using householder
-			dgVector u(eigenValues.m_front);
-			u.m_x -= dgSqrt(eigenValues.m_front.m_x * eigenValues.m_front.m_x + mag2);
-			dgAssert(dgAbs(u.m_x) > dgFloat32(1.0e-12f));
-			dgVector v(u.Scale(-dgFloat32(2.0f) / u.DotProduct(u).GetScalar()));
-
-			householder = dgMatrix(v, u);
-			householder[0][0] += dgFloat32(1.0f);
-			householder[1][1] += dgFloat32(1.0f);
-			householder[2][2] += dgFloat32(1.0f);
-			eigenValues = eigenValues * householder.Transpose();
-		}
-
-		if (dgAbs(eigenValues.m_up.m_z) > 1.0e-6f) {
-			dgVector u(eigenValues.m_up);
-			u.m_x = dgFloat32(0.0f);
-			u.m_y -= dgSqrt(u.DotProduct(u).GetScalar());
-			dgVector v(u.Scale(-dgFloat32(2.0f) / u.DotProduct(u).GetScalar()));
-
-			dgMatrix househoulder1(dgGetIdentityMatrix());
-			househoulder1.m_up.m_y += v.m_y * u.m_y;
-			househoulder1.m_up.m_z = v.m_y * u.m_z;
-			househoulder1.m_right.m_y = v.m_y * u.m_z;
-			househoulder1.m_right.m_z += v.m_z * u.m_z;
-			householder = househoulder1 * householder;
-			eigenValues = eigenValues * househoulder1.Transpose();
-		}
-		eigenVectors = householder * eigenVectors;
-		eigenValues = householder * eigenValues;
-	}
-
-	return dgVector(0.0f);
-
-#else
 	dgMatrix& mat = *this;
 	dgMatrix eigenVectors(dgGetIdentityMatrix());
+/*
 	if (dgAbs(m_front.m_z) > dgFloat32(1.0e-6f)) {
 		// calculate initial guess by convert to tridiagonal matrix using householder
 		dgVector u(m_front);
 		u.m_x = dgFloat32(0.0f);
-		u.m_y -= dgSqrt(u.DotProduct(u).GetScalar());
-		//dgAssert(dgAbs(u.m_y) > dgFloat32(1.0e-12f));
-		dgAssert(u.DotProduct(u).GetScalar() > dgFloat32(0.0f));
-		dgVector v(u.Scale(-dgFloat32(2.0f) / u.DotProduct(u).GetScalar()));
-
-		eigenVectors = dgMatrix(v, u);
-		eigenVectors[0][0] += dgFloat32(1.0f);
-		eigenVectors[1][1] += dgFloat32(1.0f);
-		eigenVectors[2][2] += dgFloat32(1.0f);
+		dgVector v(dgVector::m_zero);
+		v.m_y = dgSqrt(u.DotProduct(u).GetScalar());
+		dgVector w(u - v);
+		w = w.Normalize();
+		eigenVectors = dgMatrix(w, w);
+		dgMatrix ident(dgGetIdentityMatrix());
+		eigenVectors[0] = ident[0] - eigenVectors[0] * dgVector::m_two;
+		eigenVectors[1] = ident[1] - eigenVectors[1] * dgVector::m_two;
+		eigenVectors[2] = ident[2] - eigenVectors[2] * dgVector::m_two;
 		mat = eigenVectors.Transpose() * mat * eigenVectors;
 	}
-
 	mat[0][2] = dgFloat32(0.0f);
 	mat[2][0] = dgFloat32(0.0f);
+*/
 
+	// QR algorithm is really bad at converging matrices with very different eigenvalue. 
+	// the solution is to use RD with double shift which I do not feel like implementing. 
+	// using jabobi diagonalization instead
 	dgVector d (mat[0][0], mat[1][1], mat[2][2], dgFloat32 (0.0f)); 
 	dgVector b (d);
 	for (dgInt32 i = 0; i < 50; i++) {
 		dgFloat32 sm = mat[0][1] * mat[0][1] + mat[0][2] * mat[0][2] + mat[1][2] * mat[0][2];
 		if (sm < dgFloat32 (1.0e-12f)) {
-			// order the eigenvalue vectors	
+			// make sure the the eigen vectors are orthonormal
 			dgVector tmp (eigenVectors.m_front.CrossProduct(eigenVectors.m_up));
 			if (tmp.DotProduct(eigenVectors.m_right).GetScalar() < dgFloat32(0.0f)) {
 				eigenVectors.m_right = eigenVectors.m_right * dgVector::m_negOne;
@@ -637,7 +579,6 @@ dgVector dgMatrix::EigenVectors ()
 	//eigenValues = d;
 	*this = eigenVectors;
 	return d;
-#endif
 }
 
 dgSpatialMatrix dgSpatialMatrix::Inverse(dgInt32 rows) const
