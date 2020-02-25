@@ -37,7 +37,7 @@ void dAnimationTwoWayBlend::Evaluate(dAnimationPose& output, dFloat timestep)
 		m_node1->Evaluate(output, timestep);
 	} else {
 		const int count = output.GetSize();
-		dAnimKeyframe* const buffer = dAlloca(dAnimKeyframe, count);
+		dAnimKeyframe* const buffer = dAlloca(dAnimKeyframe, count + 32);
 		dAnimationLocalPose localPose(buffer);
 		m_node0->Evaluate(output, timestep * m_timeDilation0);
 		m_node1->Evaluate(localPose, timestep * m_timeDilation1);
