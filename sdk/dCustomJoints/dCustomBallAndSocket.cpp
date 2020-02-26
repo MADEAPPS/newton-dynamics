@@ -33,6 +33,10 @@ dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame, Newt
 	,m_coneFriction(0.0f)
 	,m_twistFriction(0.0f)
 	,m_coneStiffness(1.0f)
+	,m_twistSpring(0.0f)
+	,m_twistDamper(0.0f)
+	,m_coneSpring(0.0f)
+	,m_coneDamper(0.0f)
 {
 	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
@@ -46,6 +50,10 @@ dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame0, con
 	,m_coneFriction(0.0f)
 	,m_twistFriction(0.0f)
 	,m_coneStiffness(1.0f)
+	,m_twistSpring(0.0f)
+	,m_twistDamper(0.0f)
+	,m_coneSpring(0.0f)
+	,m_coneDamper(0.0f)
 {
 	dMatrix	dummy;
 	CalculateLocalMatrix(pinAndPivotFrame0, m_localMatrix0, dummy);
@@ -65,6 +73,10 @@ void dCustomBallAndSocket::Deserialize(NewtonDeserializeCallback callback, void*
 	callback(userData, &m_coneFriction, sizeof(dFloat));
 	callback(userData, &m_twistFriction, sizeof(dFloat));
 	callback(userData, &m_coneStiffness, sizeof(dFloat));
+	callback(userData, &m_twistSpring, sizeof(dFloat));
+	callback(userData, &m_twistDamper, sizeof(dFloat));
+	callback(userData, &m_coneSpring, sizeof(dFloat));
+	callback(userData, &m_coneDamper, sizeof(dFloat));
 }
 
 void dCustomBallAndSocket::Serialize(NewtonSerializeCallback callback, void* const userData) const
@@ -78,6 +90,10 @@ void dCustomBallAndSocket::Serialize(NewtonSerializeCallback callback, void* con
 	callback(userData, &m_coneFriction, sizeof(dFloat));
 	callback(userData, &m_twistFriction, sizeof(dFloat));
 	callback(userData, &m_coneStiffness, sizeof(dFloat));
+	callback(userData, &m_twistSpring, sizeof(dFloat));
+	callback(userData, &m_twistDamper, sizeof(dFloat));
+	callback(userData, &m_coneSpring, sizeof(dFloat));
+	callback(userData, &m_coneDamper, sizeof(dFloat));
 }
 
 void dCustomBallAndSocket::EnableTwist(bool state)
@@ -142,12 +158,18 @@ dFloat dCustomBallAndSocket::GetConeStiffness(dFloat frictionTorque) const
 	return m_coneStiffness;
 }
 
-void dCustomBallAndSocket::SetTwistSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
+void dCustomBallAndSocket::SetConeSpringDamper(bool state, dFloat spring, dFloat damper)
 {
-//	m_spring = spring;
-//	m_damper = damper;
-	m_options.m_option1 = state;
-//	m_springDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
+	m_coneSpring = dAbs(spring);
+	m_coneDamper = dAbs(damper);
+	m_options.m_option4 = state;
+}
+
+void dCustomBallAndSocket::SetTwistSpringDamper(bool state, dFloat spring, dFloat damper)
+{
+	m_twistSpring = dAbs(spring);
+	m_twistDamper = dAbs(damper);
+	m_options.m_option3 = state;
 }
 
 void dCustomBallAndSocket::Debug(dDebugDisplay* const debugDisplay) const
