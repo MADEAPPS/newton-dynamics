@@ -53,7 +53,6 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 	if (!(info.m_ecx & (1 << 28))) {
 		return FALSE;
 	}
-//	return TRUE;
-	return FALSE;
+	return TRUE;
 }
 #endif

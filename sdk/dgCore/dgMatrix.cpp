@@ -473,6 +473,27 @@ dgVector dgMatrix::EigenVectors ()
 	dgMatrix mat (*this);
 	dgMatrix eigenVectors(dgGetIdentityMatrix());
 
+/*
+	if (dgAbs(m_front.m_z) > dgFloat32(1.0e-6f)) {
+		// calculate initial guess by convert to tridiagonal matrix using householder
+		// but this fail seem is change the oder of the eigen value
+		dgVector u(m_front);
+		u.m_x = dgFloat32(0.0f);
+		dgVector v(dgVector::m_zero);
+		v.m_y = dgSqrt(u.DotProduct(u).GetScalar());
+		dgVector w(u - v);
+		w = w.Normalize();
+		eigenVectors = dgMatrix(w, w);
+		dgMatrix ident(dgGetIdentityMatrix());
+		eigenVectors[0] = ident[0] - eigenVectors[0] * dgVector::m_two;
+		eigenVectors[1] = ident[1] - eigenVectors[1] * dgVector::m_two;
+		eigenVectors[2] = ident[2] - eigenVectors[2] * dgVector::m_two;
+		mat = eigenVectors.Transpose() * mat * eigenVectors;
+	}
+	mat[0][2] = dgFloat32(0.0f);
+	mat[2][0] = dgFloat32(0.0f);
+*/
+
 	// QR algorithm is really bad at converging matrices with very different eigenvalue. 
 	// the solution is to use RD with double shift which I do not feel like implementing. 
 	// using Jacobi diagonalization instead
