@@ -468,44 +468,25 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 	transformMatrix.m_posit = m_posit;
 }
 
-
 dgVector dgMatrix::EigenVectors ()
 {
-	dgMatrix& mat = *this;
+	dgMatrix mat (*this);
 	dgMatrix eigenVectors(dgGetIdentityMatrix());
-/*
-	if (dgAbs(m_front.m_z) > dgFloat32(1.0e-6f)) {
-		// calculate initial guess by convert to tridiagonal matrix using householder
-		dgVector u(m_front);
-		u.m_x = dgFloat32(0.0f);
-		dgVector v(dgVector::m_zero);
-		v.m_y = dgSqrt(u.DotProduct(u).GetScalar());
-		dgVector w(u - v);
-		w = w.Normalize();
-		eigenVectors = dgMatrix(w, w);
-		dgMatrix ident(dgGetIdentityMatrix());
-		eigenVectors[0] = ident[0] - eigenVectors[0] * dgVector::m_two;
-		eigenVectors[1] = ident[1] - eigenVectors[1] * dgVector::m_two;
-		eigenVectors[2] = ident[2] - eigenVectors[2] * dgVector::m_two;
-		mat = eigenVectors.Transpose() * mat * eigenVectors;
-	}
-	mat[0][2] = dgFloat32(0.0f);
-	mat[2][0] = dgFloat32(0.0f);
-*/
 
 	// QR algorithm is really bad at converging matrices with very different eigenvalue. 
 	// the solution is to use RD with double shift which I do not feel like implementing. 
-	// using jabobi diagonalization instead
+	// using Jacobi diagonalization instead
 	dgVector d (mat[0][0], mat[1][1], mat[2][2], dgFloat32 (0.0f)); 
 	dgVector b (d);
 	for (dgInt32 i = 0; i < 50; i++) {
 		dgFloat32 sm = mat[0][1] * mat[0][1] + mat[0][2] * mat[0][2] + mat[1][2] * mat[0][2];
 		if (sm < dgFloat32 (1.0e-12f)) {
 			// make sure the the eigen vectors are orthonormal
-			dgVector tmp (eigenVectors.m_front.CrossProduct(eigenVectors.m_up));
-			if (tmp.DotProduct(eigenVectors.m_right).GetScalar() < dgFloat32(0.0f)) {
-				eigenVectors.m_right = eigenVectors.m_right * dgVector::m_negOne;
-			}
+			//dgVector tmp (eigenVectors.m_front.CrossProduct(eigenVectors.m_up));
+			//if (tmp.DotProduct(eigenVectors.m_right).GetScalar() < dgFloat32(0.0f)) {
+			//	eigenVectors.m_right = eigenVectors.m_right * dgVector::m_negOne;
+			//}
+			dgAssert (eigenVectors[0].DotProduct(eigenVectors[1].CrossProduct(eigenVectors[2])).GetScalar() > dgFloat32 (0.0f));
 			break;
 		}
 
@@ -576,8 +557,22 @@ dgVector dgMatrix::EigenVectors ()
 		d = b; 
 	}
 
-	//eigenValues = d;
-	*this = eigenVectors;
+	#ifdef _DEBUG
+		dgMatrix diag(dgGetIdentityMatrix());
+		diag[0][0] = d[0];
+		diag[1][1] = d[1];
+		diag[2][2] = d[2];
+		dgMatrix E(eigenVectors.Transpose());
+		dgMatrix matrix(E * diag * E.Transpose());
+		for (dgInt32 j = 0; j < 3; j++) {
+			for (dgInt32 k = 0; k < 3; k++) {
+				dgFloat32 error = (*this)[j][k] - matrix[j][k];
+				dgAssert((error * error) < dgFloat32(1.0e-4f));
+			}
+		}
+	#endif
+
+	*this = eigenVectors.Transpose();
 	return d;
 }
 

@@ -576,8 +576,8 @@ dMatrix dMatrix::Inverse4x4 () const
 	for (int i = 0; i < 4; i++) {
 		dAssert(dAbs(tmp[i][i] - dFloat (1.0f)) < dFloat(1.0e-4f));
 		for (int j = i + 1; j < 4; j++) {
-			dAssert(dAbs(tmp[i][j]) < dFloat(1.0e-4f));
-			dAssert(dAbs(tmp[j][i]) < dFloat(1.0e-4f));
+			dAssert(dAbs(tmp[i][j]) < dFloat(1.0e-3f));
+			dAssert(dAbs(tmp[j][i]) < dFloat(1.0e-3f));
 		}
 	}
 #endif
@@ -585,7 +585,7 @@ dMatrix dMatrix::Inverse4x4 () const
 	return inv;
 }
 
-
+/*
 static inline void ROT(dMatrix &a, int i, int j, int k, int l, dFloat s, dFloat tau) 
 {
 	dFloat g;
@@ -595,11 +595,12 @@ static inline void ROT(dMatrix &a, int i, int j, int k, int l, dFloat s, dFloat 
 	a[i][j] = g - s * (h + g * tau); 
 	a[k][l] = h + s * (g - h * tau);
 }
-
+*/
 // from numerical recipes in c
 // Jacobian method for computing the eigenvectors of a symmetric matrix
 dMatrix dMatrix::JacobiDiagonalization (dVector &eigenValues, const dMatrix& initialMatrix) const
 {
+/*
 	dMatrix mat(*this);
 	dMatrix eigenVectors(initialMatrix);
 	dFloat thresh;
@@ -745,6 +746,113 @@ dMatrix dMatrix::JacobiDiagonalization (dVector &eigenValues, const dMatrix& ini
 	dAssert (0);
 	eigenValues = dVector (d[0], d[1], d[2], dFloat (dFloat (0.0f)));
 	return dGetIdentityMatrix();
+*/
+
+	dMatrix mat(*this);
+	dMatrix eigenVectors(initialMatrix.Transpose());
+
+	// QR algorithm is really bad at converging matrices with very different eigenvalue. 
+	// the solution is to use RD with double shift which I do not feel like implementing. 
+	// using Jacobi diagonalization instead
+	dVector d(mat[0][0], mat[1][1], mat[2][2], dFloat(0.0f));
+	dVector b(d);
+	for (int i = 0; i < 50; i++) {
+		dFloat sm = mat[0][1] * mat[0][1] + mat[0][2] * mat[0][2] + mat[1][2] * mat[0][2];
+		if (sm < dFloat(1.0e-12f)) {
+			// make sure the the eigen vectors are orthonormal
+			//dVector tmp (eigenVectors.m_front.CrossProduct(eigenVectors.m_up));
+			//if (tmp.DotProduct(eigenVectors.m_right).GetScalar() < dFloat(0.0f)) {
+			//	eigenVectors.m_right = eigenVectors.m_right * dVector::m_negOne;
+			//}
+			dAssert(eigenVectors[0].DotProduct3(eigenVectors[1].CrossProduct(eigenVectors[2])) > dFloat(0.0f));
+			break;
+		}
+
+		dFloat thresh = dFloat(0.0f);
+		if (i < 3) {
+			thresh = (dFloat)(0.2f / 9.0f) * sm;
+		}
+
+		dVector z(0.0f);
+		for (int ip = 0; ip < 2; ip++) {
+			for (int iq = ip + 1; iq < 3; iq++) {
+				dFloat g = dFloat(100.0f) * dAbs(mat[ip][iq]);
+				if ((i > 3) && ((dAbs(d[ip]) + g) == dAbs(d[ip])) && ((dAbs(d[iq]) + g) == dAbs(d[iq]))) {
+					mat[ip][iq] = dFloat(0.0f);
+				}
+				else if (dAbs(mat[ip][iq]) > thresh) {
+
+					dFloat t;
+					dFloat h = d[iq] - d[ip];
+					if (dAbs(h) + g == dAbs(h)) {
+						t = mat[ip][iq] / h;
+					} else {
+						dFloat theta = dFloat(0.5f) * h / mat[ip][iq];
+						t = dFloat(1.0f) / (dAbs(theta) + dSqrt(dFloat(1.0f) + theta * theta));
+						if (theta < dFloat(0.0f)) {
+							t = -t;
+						}
+					}
+					dFloat c = dFloat(1.0f) / dSqrt(dFloat(1.0f) + t * t);
+					dFloat s = t * c;
+					dFloat tau = s / (dFloat(1.0f) + c);
+					h = t * mat[ip][iq];
+					z[ip] -= h;
+					z[iq] += h;
+					d[ip] -= h;
+					d[iq] += h;
+					mat[ip][iq] = dFloat(0.0f);
+
+					for (int j = 0; j <= ip - 1; j++) {
+						dFloat g0 = mat[j][ip];
+						dFloat h0 = mat[j][iq];
+						mat[j][ip] = g0 - s * (h0 + g0 * tau);
+						mat[j][iq] = h0 + s * (g0 - h0 * tau);
+					}
+					for (int j = ip + 1; j <= iq - 1; j++) {
+						dFloat g0 = mat[ip][j];
+						dFloat h0 = mat[j][iq];
+						mat[ip][j] = g0 - s * (h0 + g0 * tau);
+						mat[j][iq] = h0 + s * (g0 - h0 * tau);
+					}
+					for (int j = iq + 1; j < 3; j++) {
+						dFloat g0 = mat[ip][j];
+						dFloat h0 = mat[iq][j];
+						mat[ip][j] = g0 - s * (h0 + g0 * tau);
+						mat[iq][j] = h0 + s * (g0 - h0 * tau);
+					}
+
+					dVector sv(s);
+					dVector tauv(tau);
+					dVector gv(eigenVectors[ip]);
+					dVector hv(eigenVectors[iq]);
+					eigenVectors[ip] -= sv * (hv + gv * tauv);
+					eigenVectors[iq] += sv * (gv - hv * tauv);
+				}
+			}
+		}
+
+		b += z;
+		d = b;
+	}
+
+	#ifdef _DEBUG
+	dMatrix diag(dGetIdentityMatrix());
+	diag[0][0] = d[0];
+	diag[1][1] = d[1];
+	diag[2][2] = d[2];
+	dMatrix E(eigenVectors.Transpose());
+	dMatrix matrix(E * diag * E.Transpose());
+	for (int j = 0; j < 3; j++) {
+		for (int k = 0; k < 3; k++) {
+			dFloat error = (*this)[j][k] - matrix[j][k];
+			dAssert((error * error) < dFloat(1.0e-4f));
+		}
+	}
+	#endif
+
+	eigenValues = d;
+	return eigenVectors.Transpose();
 } 	
 
 //void dMatrix::PolarDecomposition (dMatrix& orthogonal, dMatrix& symetric) const
@@ -755,7 +863,6 @@ void dMatrix::PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMat
 
 	// calculate transpose (L) * L 
 	dMatrix LL ((*this) * Transpose());
-
 
 	// check is this si a pure uniformScale * rotation * translation
 	dFloat det2 = (LL[0][0] + LL[1][1] + LL[2][2]) * (1.0f / 3.0f);
@@ -825,7 +932,6 @@ dMatrix::dMatrix (const dMatrix& transformMatrix, const dVector& scale, const dM
 
 	*this = stretchAxis.Transpose() * scaledAxis * transformMatrix;
 }
-
 
 dSpatialMatrix dSpatialMatrix::Inverse(int rows) const
 {

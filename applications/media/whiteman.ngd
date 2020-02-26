@@ -51,7 +51,7 @@
             <transform position="0.0569271 -0.00488609 0.0756246 1" eulerAngles="-3.14098 0.0243681 3.13948 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="4" />
-            <childrenNodes count="4" indices="7 8 126 186" />
+            <childrenNodes count="4" indices="7 8 134 186" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="hidden_capsule_01" nodeID="7" editorFlags="0" />
@@ -67,7 +67,7 @@
             <transform position="-0.400874 1.49012e-09 -2.51682e-07 1" eulerAngles="0.00160177 0.0531044 0.0578857 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="6" />
-            <childrenNodes count="4" indices="9 10 134 188" />
+            <childrenNodes count="4" indices="9 10 129 188" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="hidden_capsule_08" nodeID="9" editorFlags="0" />
@@ -99,7 +99,7 @@
             <transform position="-0.154259 -4.76837e-09 -9.68491e-08 1" eulerAngles="0.00715668 0.0050441 -0.61395 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="10" />
-            <childrenNodes count="3" indices="13 133 178" />
+            <childrenNodes count="3" indices="13 130 178" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightToe_End" nodeID="13" editorFlags="0" />
@@ -114,7 +114,7 @@
             <transform position="0.0569269 -0.0030216 -0.0756245 1" eulerAngles="3.14088 -0.0265951 3.13777 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="4" />
-            <childrenNodes count="4" indices="15 16 127 185" />
+            <childrenNodes count="4" indices="15 16 128 185" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="hidden_capsule_03" nodeID="15" editorFlags="0" />
@@ -130,7 +130,7 @@
             <transform position="-0.400897 -2.98023e-10 -2.51696e-07 1" eulerAngles="-0.00167123 -0.0530793 0.0593727 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="14" />
-            <childrenNodes count="4" indices="17 18 132 191" />
+            <childrenNodes count="4" indices="17 18 125 191" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="hidden_capsule_10" nodeID="17" editorFlags="0" />
@@ -146,7 +146,7 @@
             <transform position="-0.36965 4.44089e-18 -2.36847e-07 1" eulerAngles="0.0159916 0.0462059 -1.03669 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="16" />
-            <childrenNodes count="4" indices="19 20 125 192" />
+            <childrenNodes count="4" indices="19 20 133 192" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="hidden_box_leftFoot" nodeID="19" editorFlags="0" />
@@ -154,7 +154,7 @@
             <transform position="-0.0859908 -0.00667131 0.0192047 1" eulerAngles="-3.12675 0.0481045 2.54437 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 0 -0.0401843 0 1" />
             <parentNodes count="1" indices="18" />
-            <childrenNodes count="1" indices="201" />
+            <childrenNodes count="1" indices="196" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftToeBase" nodeID="20" editorFlags="0" />
@@ -162,7 +162,7 @@
             <transform position="-0.155954 8.88178e-18 -9.79132e-08 1" eulerAngles="-0.00784005 -0.00543664 -0.606288 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="18" />
-            <childrenNodes count="3" indices="21 131 183" />
+            <childrenNodes count="3" indices="21 127 183" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftToe_End" nodeID="21" editorFlags="0" />
@@ -185,7 +185,7 @@
             <transform position="-0.0489028 0.00157278 -0.00469651 1" eulerAngles="-1.5708 1.37502e-07 1.53865 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 -9.96696e-15 -0.175943 1.58752e-08 1" />
             <parentNodes count="1" indices="22" />
-            <childrenNodes count="1" indices="196" />
+            <childrenNodes count="1" indices="198" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:Spine1" nodeID="24" editorFlags="0" />
@@ -201,7 +201,7 @@
             <transform position="-0.059237 0.00578703 -0.00469652 1" eulerAngles="-1.5708 1.37502e-07 1.53865 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1 0 0 0 0 1 0 0 0 0 1 0 -9.96696e-15 -0.175943 1.58752e-08 1" />
             <parentNodes count="1" indices="24" />
-            <childrenNodes count="1" indices="200" />
+            <childrenNodes count="1" indices="201" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:Spine2" nodeID="26" editorFlags="0" />
@@ -217,7 +217,7 @@
             <transform position="-0.044637 -0.00502336 -0.00469651 1" eulerAngles="-1.5708 1.37502e-07 1.53865 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="1.08708 0 0 0 0 1.08708 0 0 0 0 1.08708 0 -1.08348e-14 -0.191263 1.72575e-08 1" />
             <parentNodes count="1" indices="26" />
-            <childrenNodes count="1" indices="199" />
+            <childrenNodes count="1" indices="200" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightShoulder" nodeID="28" editorFlags="0" />
@@ -225,7 +225,7 @@
             <transform position="-0.135281 -0.00121155 0.0545738 1" eulerAngles="-1.6565 1.36585 3.0606 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="26" />
-            <childrenNodes count="3" indices="29 113 187" />
+            <childrenNodes count="3" indices="29 116 187" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightArm" nodeID="29" editorFlags="0" />
@@ -233,7 +233,7 @@
             <transform position="-0.114908 -1.52588e-07 -7.69113e-08 1" eulerAngles="0.0699178 -0.01435 -0.582378 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="28" />
-            <childrenNodes count="4" indices="30 31 105 179" />
+            <childrenNodes count="4" indices="30 31 111 179" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="hidden_capsule_07" nodeID="30" editorFlags="0" />
@@ -241,7 +241,7 @@
             <transform position="-0.127599 0.000173569 0.00762013 1" eulerAngles="-3.08184 0.0596224 1.573 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="-1 0 0 0 0 -1 0 0 0 0 1 0 -1.81675e-08 0.127826 -1.70321e-09 1" />
             <parentNodes count="1" indices="29" />
-            <childrenNodes count="1" indices="197" />
+            <childrenNodes count="1" indices="199" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightForeArm" nodeID="31" editorFlags="0" />
@@ -249,7 +249,7 @@
             <transform position="-0.234419 0 -1.47176e-07 1" eulerAngles="-0.00566111 -0.28085 -1.89805e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="29" />
-            <childrenNodes count="4" indices="32 33 112 165" />
+            <childrenNodes count="4" indices="32 33 107 165" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="hidden_capsule_02" nodeID="32" editorFlags="0" />
@@ -257,7 +257,7 @@
             <transform position="-0.124722 -0.0017585 -0.00363204 1" eulerAngles="-3.69703e-07 9.0943e-07 1.5708 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="-1 0 0 0 0 -1.18434 0 0 0 0 1 0 -5.1918e-08 0.15139 -2.04145e-08 1" />
             <parentNodes count="1" indices="31" />
-            <childrenNodes count="1" indices="198" />
+            <childrenNodes count="1" indices="197" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHand" nodeID="33" editorFlags="0" />
@@ -265,7 +265,7 @@
             <transform position="-0.252916 1.52588e-07 -1.49252e-07 1" eulerAngles="-0.0242077 -0.136915 -0.117289 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="31" />
-            <childrenNodes count="7" indices="34 38 42 46 50 103 161" />
+            <childrenNodes count="7" indices="34 38 42 46 50 117 161" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandPinky1" nodeID="34" editorFlags="0" />
@@ -273,7 +273,7 @@
             <transform position="-0.103385 -0.000506058 0.0296782 1" eulerAngles="-0.024479 -0.0831145 0.0142313 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="33" />
-            <childrenNodes count="3" indices="35 128 163" />
+            <childrenNodes count="3" indices="35 126 163" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandPinky2" nodeID="35" editorFlags="0" />
@@ -281,7 +281,7 @@
             <transform position="-0.0273485 7.6294e-08 -2.75784e-05 1" eulerAngles="5.7074e-06 -0.00214201 -1.19206e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="34" />
-            <childrenNodes count="3" indices="36 129 176" />
+            <childrenNodes count="3" indices="36 132 176" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandPinky3" nodeID="36" editorFlags="0" />
@@ -289,7 +289,7 @@
             <transform position="-0.0232521 0 2.61161e-05 1" eulerAngles="-2.88486e-05 0.00106445 5.95866e-08 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="35" />
-            <childrenNodes count="3" indices="37 130 177" />
+            <childrenNodes count="3" indices="37 124 177" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandPinky4" nodeID="37" editorFlags="0" />
@@ -320,7 +320,7 @@
             <transform position="-0.0290574 0 7.76374e-06 1" eulerAngles="-2.20547e-06 0.000121355 -8.34467e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="39" />
-            <childrenNodes count="3" indices="41 124 175" />
+            <childrenNodes count="3" indices="41 131 175" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandRing4" nodeID="41" editorFlags="0" />
@@ -335,7 +335,7 @@
             <transform position="-0.111245 -0.0015863 -0.00938322 1" eulerAngles="0.000279916 -0.0862813 0.0142555 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="33" />
-            <childrenNodes count="3" indices="43 119 168" />
+            <childrenNodes count="3" indices="43 110 168" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandMiddle2" nodeID="43" editorFlags="0" />
@@ -366,7 +366,7 @@
             <transform position="-0.113921 0.000481796 -0.0301374 1" eulerAngles="-0.0071529 -0.0865025 0.0142721 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="33" />
-            <childrenNodes count="3" indices="47 106 167" />
+            <childrenNodes count="3" indices="47 113 167" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandIndex2" nodeID="47" editorFlags="0" />
@@ -374,7 +374,7 @@
             <transform position="-0.0296055 -7.6294e-08 6.95234e-05 1" eulerAngles="0.000146553 0.00309778 -2.97105e-08 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="46" />
-            <childrenNodes count="3" indices="48 118 171" />
+            <childrenNodes count="3" indices="48 119 171" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandIndex3" nodeID="48" editorFlags="0" />
@@ -382,7 +382,7 @@
             <transform position="-0.0272692 1.42109e-16 -2.04067e-05 1" eulerAngles="-0.00018385 0.00126651 2.08501e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="47" />
-            <childrenNodes count="3" indices="49 117 173" />
+            <childrenNodes count="3" indices="49 109 173" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandIndex4" nodeID="49" editorFlags="0" />
@@ -397,7 +397,7 @@
             <transform position="-0.0415591 0.011587 -0.0187272 1" eulerAngles="0.204427 -0.453097 -0.521714 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="33" />
-            <childrenNodes count="3" indices="51 114 162" />
+            <childrenNodes count="3" indices="51 118 162" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandThumb2" nodeID="51" editorFlags="0" />
@@ -405,7 +405,7 @@
             <transform position="-0.0375178 0 -0.00285998 1" eulerAngles="-0.00807561 -0.0926696 0.000134189 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="50" />
-            <childrenNodes count="3" indices="52 115 164" />
+            <childrenNodes count="3" indices="52 112 164" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandThumb3" nodeID="52" editorFlags="0" />
@@ -413,7 +413,7 @@
             <transform position="-0.0340591 -1.52588e-07 0.000564745 1" eulerAngles="-0.00654902 -0.0567591 0.000479408 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="51" />
-            <childrenNodes count="3" indices="53 116 166" />
+            <childrenNodes count="3" indices="53 108 166" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandThumb4" nodeID="53" editorFlags="0" />
@@ -428,7 +428,7 @@
             <transform position="-0.135244 -7.01237e-05 -0.0545739 1" eulerAngles="1.57079 -1.36588 -3.14159 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="26" />
-            <childrenNodes count="3" indices="55 98 189" />
+            <childrenNodes count="3" indices="55 90 189" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftArm" nodeID="55" editorFlags="0" />
@@ -436,7 +436,7 @@
             <transform position="-0.114908 0 -6.97588e-08 1" eulerAngles="0.253005 -0.0185049 -0.668061 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="54" />
-            <childrenNodes count="4" indices="56 57 96 190" />
+            <childrenNodes count="4" indices="56 57 99 190" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="hidden_capsule_09" nodeID="56" editorFlags="0" />
@@ -452,7 +452,7 @@
             <transform position="-0.234381 -7.6294e-08 -1.47152e-07 1" eulerAngles="0.0063103 0.307946 -6.83859e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="55" />
-            <childrenNodes count="4" indices="58 59 99 144" />
+            <childrenNodes count="4" indices="58 59 94 144" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="hidden_capsule_00" nodeID="58" editorFlags="0" />
@@ -468,7 +468,7 @@
             <transform position="-0.250521 -0.00125267 0.0118003 1" eulerAngles="0.281242 -0.0671086 -0.0101831 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="57" />
-            <childrenNodes count="7" indices="60 64 68 72 76 94 141" />
+            <childrenNodes count="7" indices="60 64 68 72 76 100 141" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandPinky1" nodeID="60" editorFlags="0" />
@@ -476,7 +476,7 @@
             <transform position="-0.0994777 0.000348282 -0.0295218 1" eulerAngles="0.0077693 0.0829296 0.0251543 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="59" />
-            <childrenNodes count="3" indices="61 110 142" />
+            <childrenNodes count="3" indices="61 114 142" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandPinky2" nodeID="61" editorFlags="0" />
@@ -484,7 +484,7 @@
             <transform position="-0.0276689 -1.52588e-07 0.000115034 1" eulerAngles="0.000211091 0.00594211 1.7895e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="60" />
-            <childrenNodes count="3" indices="62 111 151" />
+            <childrenNodes count="3" indices="62 105 151" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandPinky3" nodeID="62" editorFlags="0" />
@@ -492,7 +492,7 @@
             <transform position="-0.0223964 1.52588e-07 -3.96106e-05 1" eulerAngles="-0.000205965 0.00206703 -3.8756e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="61" />
-            <childrenNodes count="3" indices="63 109 157" />
+            <childrenNodes count="3" indices="63 115 157" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandPinky4" nodeID="63" editorFlags="0" />
@@ -507,7 +507,7 @@
             <transform position="-0.104571 0.00055603 -0.00870353 1" eulerAngles="-0.00768788 0.0812425 0.025231 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="59" />
-            <childrenNodes count="3" indices="65 108 149" />
+            <childrenNodes count="3" indices="65 101 149" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandRing2" nodeID="65" editorFlags="0" />
@@ -515,7 +515,7 @@
             <transform position="-0.0309691 1.42109e-16 0.000181408 1" eulerAngles="0.000646692 0.00786912 1.40116e-06 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="64" />
-            <childrenNodes count="3" indices="66 104 155" />
+            <childrenNodes count="3" indices="66 103 155" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandRing3" nodeID="66" editorFlags="0" />
@@ -523,7 +523,7 @@
             <transform position="-0.0291414 0 -5.92224e-05 1" eulerAngles="-0.000384546 0.00268409 -2.29503e-06 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="65" />
-            <childrenNodes count="3" indices="67 107 156" />
+            <childrenNodes count="3" indices="67 102 156" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandRing4" nodeID="67" editorFlags="0" />
@@ -538,7 +538,7 @@
             <transform position="-0.103052 -0.00259636 0.0089998 1" eulerAngles="0.00262572 0.0862003 0.025184 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="59" />
-            <childrenNodes count="3" indices="69 93 148" />
+            <childrenNodes count="3" indices="69 98 148" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandMiddle2" nodeID="69" editorFlags="0" />
@@ -546,7 +546,7 @@
             <transform position="-0.0361153 0 3.17156e-05 1" eulerAngles="7.0631e-05 0.000947684 -5.06595e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="68" />
-            <childrenNodes count="3" indices="70 97 150" />
+            <childrenNodes count="3" indices="70 106 150" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandMiddle3" nodeID="70" editorFlags="0" />
@@ -554,7 +554,7 @@
             <transform position="-0.032512 -1.42109e-16 -2.30923e-06 1" eulerAngles="-8.43702e-05 0.000932366 2.08563e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="69" />
-            <childrenNodes count="3" indices="71 102 154" />
+            <childrenNodes count="3" indices="71 104 154" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandMiddle4" nodeID="71" editorFlags="0" />
@@ -569,7 +569,7 @@
             <transform position="-0.103986 0.000466614 0.0292252 1" eulerAngles="-0.000534969 0.0886304 0.0251849 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="59" />
-            <childrenNodes count="3" indices="73 90 147" />
+            <childrenNodes count="3" indices="73 91 147" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandIndex2" nodeID="73" editorFlags="0" />
@@ -577,7 +577,7 @@
             <transform position="-0.0291221 -7.62939e-08 -4.48791e-05 1" eulerAngles="-5.59974e-05 -0.00212252 -5.66281e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="72" />
-            <childrenNodes count="3" indices="74 91 152" />
+            <childrenNodes count="3" indices="74 93 152" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandIndex3" nodeID="74" editorFlags="0" />
@@ -585,7 +585,7 @@
             <transform position="-0.0277196 0 1.56991e-05 1" eulerAngles="3.08155e-05 -0.000649095 1.49031e-07 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="73" />
-            <childrenNodes count="3" indices="75 92 153" />
+            <childrenNodes count="3" indices="75 95 153" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandIndex4" nodeID="75" editorFlags="0" />
@@ -600,7 +600,7 @@
             <transform position="-0.0394733 0.016702 0.0181569 1" eulerAngles="-0.201356 0.515342 -0.509686 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="59" />
-            <childrenNodes count="3" indices="77 100 143" />
+            <childrenNodes count="3" indices="77 97 143" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandThumb2" nodeID="77" editorFlags="0" />
@@ -608,7 +608,7 @@
             <transform position="-0.037221 7.6294e-08 0.00115179 1" eulerAngles="0.00187374 0.0262477 -8.29418e-06 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="76" />
-            <childrenNodes count="3" indices="78 101 145" />
+            <childrenNodes count="3" indices="78 92 145" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandThumb3" nodeID="78" editorFlags="0" />
@@ -616,7 +616,7 @@
             <transform position="-0.0338814 0 0.000159052 1" eulerAngles="0.00226029 0.0503991 0.000103301 0" localScale="1 1 1 1" stretchAxis="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1" />
             <geometryTransform matrix="0.393701 0 0 0 0 0.393701 0 0 0 0 0.393701 0 0 0 0 1" />
             <parentNodes count="1" indices="77" />
-            <childrenNodes count="3" indices="79 95 146" />
+            <childrenNodes count="3" indices="79 96 146" />
         </dSceneNodeInfo>
         <dSceneNodeInfo>
             <dNodeInfo name="mixamorig:LeftHandThumb4" nodeID="79" editorFlags="0" />
@@ -687,154 +687,154 @@
             <parentNodes count="1" indices="82" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandIndex1" nodeID="90" editorFlags="0" />
+            <dNodeInfo name="mixamorig:LeftShoulder" nodeID="90" editorFlags="0" />
             <boneData boneIndex="6" length="1.000000" type="1" />
-            <parentNodes count="1" indices="72" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandIndex2" nodeID="91" editorFlags="0" />
-            <boneData boneIndex="7" length="1.000000" type="1" />
-            <parentNodes count="1" indices="73" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandIndex3" nodeID="92" editorFlags="0" />
-            <boneData boneIndex="8" length="1.000000" type="1" />
-            <parentNodes count="1" indices="74" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandMiddle1" nodeID="93" editorFlags="0" />
-            <boneData boneIndex="9" length="1.000000" type="1" />
-            <parentNodes count="1" indices="68" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHand" nodeID="94" editorFlags="0" />
-            <boneData boneIndex="10" length="1.000000" type="1" />
-            <parentNodes count="1" indices="59" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandThumb3" nodeID="95" editorFlags="0" />
-            <boneData boneIndex="11" length="1.000000" type="1" />
-            <parentNodes count="1" indices="78" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftArm" nodeID="96" editorFlags="0" />
-            <boneData boneIndex="12" length="1.000000" type="1" />
-            <parentNodes count="1" indices="55" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandMiddle2" nodeID="97" editorFlags="0" />
-            <boneData boneIndex="13" length="1.000000" type="1" />
-            <parentNodes count="1" indices="69" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftShoulder" nodeID="98" editorFlags="0" />
-            <boneData boneIndex="14" length="1.000000" type="1" />
             <parentNodes count="1" indices="54" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftForeArm" nodeID="99" editorFlags="0" />
-            <boneData boneIndex="15" length="1.000000" type="1" />
-            <parentNodes count="1" indices="57" />
+            <dNodeInfo name="mixamorig:LeftHandIndex1" nodeID="91" editorFlags="0" />
+            <boneData boneIndex="7" length="1.000000" type="1" />
+            <parentNodes count="1" indices="72" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandThumb1" nodeID="100" editorFlags="0" />
-            <boneData boneIndex="16" length="1.000000" type="1" />
-            <parentNodes count="1" indices="76" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandThumb2" nodeID="101" editorFlags="0" />
-            <boneData boneIndex="17" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:LeftHandThumb2" nodeID="92" editorFlags="0" />
+            <boneData boneIndex="8" length="1.000000" type="1" />
             <parentNodes count="1" indices="77" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandMiddle3" nodeID="102" editorFlags="0" />
-            <boneData boneIndex="18" length="1.000000" type="1" />
-            <parentNodes count="1" indices="70" />
+            <dNodeInfo name="mixamorig:LeftHandIndex2" nodeID="93" editorFlags="0" />
+            <boneData boneIndex="9" length="1.000000" type="1" />
+            <parentNodes count="1" indices="73" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHand" nodeID="103" editorFlags="0" />
-            <boneData boneIndex="19" length="1.000000" type="1" />
-            <parentNodes count="1" indices="33" />
+            <dNodeInfo name="mixamorig:LeftForeArm" nodeID="94" editorFlags="0" />
+            <boneData boneIndex="10" length="1.000000" type="1" />
+            <parentNodes count="1" indices="57" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandRing2" nodeID="104" editorFlags="0" />
-            <boneData boneIndex="20" length="1.000000" type="1" />
-            <parentNodes count="1" indices="65" />
+            <dNodeInfo name="mixamorig:LeftHandIndex3" nodeID="95" editorFlags="0" />
+            <boneData boneIndex="11" length="1.000000" type="1" />
+            <parentNodes count="1" indices="74" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightArm" nodeID="105" editorFlags="0" />
-            <boneData boneIndex="21" length="1.000000" type="1" />
-            <parentNodes count="1" indices="29" />
+            <dNodeInfo name="mixamorig:LeftHandThumb3" nodeID="96" editorFlags="0" />
+            <boneData boneIndex="12" length="1.000000" type="1" />
+            <parentNodes count="1" indices="78" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandIndex1" nodeID="106" editorFlags="0" />
-            <boneData boneIndex="22" length="1.000000" type="1" />
-            <parentNodes count="1" indices="46" />
+            <dNodeInfo name="mixamorig:LeftHandThumb1" nodeID="97" editorFlags="0" />
+            <boneData boneIndex="13" length="1.000000" type="1" />
+            <parentNodes count="1" indices="76" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandRing3" nodeID="107" editorFlags="0" />
-            <boneData boneIndex="23" length="1.000000" type="1" />
-            <parentNodes count="1" indices="66" />
+            <dNodeInfo name="mixamorig:LeftHandMiddle1" nodeID="98" editorFlags="0" />
+            <boneData boneIndex="14" length="1.000000" type="1" />
+            <parentNodes count="1" indices="68" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandRing1" nodeID="108" editorFlags="0" />
-            <boneData boneIndex="24" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:LeftArm" nodeID="99" editorFlags="0" />
+            <boneData boneIndex="15" length="1.000000" type="1" />
+            <parentNodes count="1" indices="55" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHand" nodeID="100" editorFlags="0" />
+            <boneData boneIndex="16" length="1.000000" type="1" />
+            <parentNodes count="1" indices="59" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandRing1" nodeID="101" editorFlags="0" />
+            <boneData boneIndex="17" length="1.000000" type="1" />
             <parentNodes count="1" indices="64" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandPinky3" nodeID="109" editorFlags="0" />
-            <boneData boneIndex="25" length="1.000000" type="1" />
-            <parentNodes count="1" indices="62" />
+            <dNodeInfo name="mixamorig:LeftHandRing3" nodeID="102" editorFlags="0" />
+            <boneData boneIndex="18" length="1.000000" type="1" />
+            <parentNodes count="1" indices="66" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandPinky1" nodeID="110" editorFlags="0" />
-            <boneData boneIndex="26" length="1.000000" type="1" />
-            <parentNodes count="1" indices="60" />
+            <dNodeInfo name="mixamorig:LeftHandRing2" nodeID="103" editorFlags="0" />
+            <boneData boneIndex="19" length="1.000000" type="1" />
+            <parentNodes count="1" indices="65" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftHandPinky2" nodeID="111" editorFlags="0" />
-            <boneData boneIndex="27" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:LeftHandMiddle3" nodeID="104" editorFlags="0" />
+            <boneData boneIndex="20" length="1.000000" type="1" />
+            <parentNodes count="1" indices="70" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandPinky2" nodeID="105" editorFlags="0" />
+            <boneData boneIndex="21" length="1.000000" type="1" />
             <parentNodes count="1" indices="61" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightForeArm" nodeID="112" editorFlags="0" />
-            <boneData boneIndex="28" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:LeftHandMiddle2" nodeID="106" editorFlags="0" />
+            <boneData boneIndex="22" length="1.000000" type="1" />
+            <parentNodes count="1" indices="69" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightForeArm" nodeID="107" editorFlags="0" />
+            <boneData boneIndex="23" length="1.000000" type="1" />
             <parentNodes count="1" indices="31" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightShoulder" nodeID="113" editorFlags="0" />
-            <boneData boneIndex="29" length="1.000000" type="1" />
-            <parentNodes count="1" indices="28" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandThumb1" nodeID="114" editorFlags="0" />
-            <boneData boneIndex="30" length="1.000000" type="1" />
-            <parentNodes count="1" indices="50" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandThumb2" nodeID="115" editorFlags="0" />
-            <boneData boneIndex="31" length="1.000000" type="1" />
-            <parentNodes count="1" indices="51" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandThumb3" nodeID="116" editorFlags="0" />
-            <boneData boneIndex="32" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:RightHandThumb3" nodeID="108" editorFlags="0" />
+            <boneData boneIndex="24" length="1.000000" type="1" />
             <parentNodes count="1" indices="52" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandIndex3" nodeID="117" editorFlags="0" />
-            <boneData boneIndex="33" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:RightHandIndex3" nodeID="109" editorFlags="0" />
+            <boneData boneIndex="25" length="1.000000" type="1" />
             <parentNodes count="1" indices="48" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandIndex2" nodeID="118" editorFlags="0" />
-            <boneData boneIndex="34" length="1.000000" type="1" />
-            <parentNodes count="1" indices="47" />
+            <dNodeInfo name="mixamorig:RightHandMiddle1" nodeID="110" editorFlags="0" />
+            <boneData boneIndex="26" length="1.000000" type="1" />
+            <parentNodes count="1" indices="42" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandMiddle1" nodeID="119" editorFlags="0" />
+            <dNodeInfo name="mixamorig:RightArm" nodeID="111" editorFlags="0" />
+            <boneData boneIndex="27" length="1.000000" type="1" />
+            <parentNodes count="1" indices="29" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandThumb2" nodeID="112" editorFlags="0" />
+            <boneData boneIndex="28" length="1.000000" type="1" />
+            <parentNodes count="1" indices="51" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandIndex1" nodeID="113" editorFlags="0" />
+            <boneData boneIndex="29" length="1.000000" type="1" />
+            <parentNodes count="1" indices="46" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandPinky1" nodeID="114" editorFlags="0" />
+            <boneData boneIndex="30" length="1.000000" type="1" />
+            <parentNodes count="1" indices="60" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftHandPinky3" nodeID="115" editorFlags="0" />
+            <boneData boneIndex="31" length="1.000000" type="1" />
+            <parentNodes count="1" indices="62" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightShoulder" nodeID="116" editorFlags="0" />
+            <boneData boneIndex="32" length="1.000000" type="1" />
+            <parentNodes count="1" indices="28" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHand" nodeID="117" editorFlags="0" />
+            <boneData boneIndex="33" length="1.000000" type="1" />
+            <parentNodes count="1" indices="33" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandThumb1" nodeID="118" editorFlags="0" />
+            <boneData boneIndex="34" length="1.000000" type="1" />
+            <parentNodes count="1" indices="50" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandIndex2" nodeID="119" editorFlags="0" />
             <boneData boneIndex="35" length="1.000000" type="1" />
-            <parentNodes count="1" indices="42" />
+            <parentNodes count="1" indices="47" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
             <dNodeInfo name="mixamorig:RightHandMiddle2" nodeID="120" editorFlags="0" />
@@ -857,59 +857,59 @@
             <parentNodes count="1" indices="39" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandRing3" nodeID="124" editorFlags="0" />
+            <dNodeInfo name="mixamorig:RightHandPinky3" nodeID="124" editorFlags="0" />
             <boneData boneIndex="40" length="1.000000" type="1" />
-            <parentNodes count="1" indices="40" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftFoot" nodeID="125" editorFlags="0" />
-            <boneData boneIndex="41" length="1.000000" type="1" />
-            <parentNodes count="1" indices="18" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightUpLeg" nodeID="126" editorFlags="0" />
-            <boneData boneIndex="42" length="1.000000" type="1" />
-            <parentNodes count="1" indices="6" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftUpLeg" nodeID="127" editorFlags="0" />
-            <boneData boneIndex="43" length="1.000000" type="1" />
-            <parentNodes count="1" indices="14" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandPinky1" nodeID="128" editorFlags="0" />
-            <boneData boneIndex="44" length="1.000000" type="1" />
-            <parentNodes count="1" indices="34" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandPinky2" nodeID="129" editorFlags="0" />
-            <boneData boneIndex="45" length="1.000000" type="1" />
-            <parentNodes count="1" indices="35" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightHandPinky3" nodeID="130" editorFlags="0" />
-            <boneData boneIndex="46" length="1.000000" type="1" />
             <parentNodes count="1" indices="36" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftToeBase" nodeID="131" editorFlags="0" />
-            <boneData boneIndex="47" length="1.000000" type="1" />
-            <parentNodes count="1" indices="20" />
-        </dBoneNodeInfo>
-        <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:LeftLeg" nodeID="132" editorFlags="0" />
-            <boneData boneIndex="48" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:LeftLeg" nodeID="125" editorFlags="0" />
+            <boneData boneIndex="41" length="1.000000" type="1" />
             <parentNodes count="1" indices="16" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightToeBase" nodeID="133" editorFlags="0" />
-            <boneData boneIndex="49" length="1.000000" type="1" />
+            <dNodeInfo name="mixamorig:RightHandPinky1" nodeID="126" editorFlags="0" />
+            <boneData boneIndex="42" length="1.000000" type="1" />
+            <parentNodes count="1" indices="34" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftToeBase" nodeID="127" editorFlags="0" />
+            <boneData boneIndex="43" length="1.000000" type="1" />
+            <parentNodes count="1" indices="20" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftUpLeg" nodeID="128" editorFlags="0" />
+            <boneData boneIndex="44" length="1.000000" type="1" />
+            <parentNodes count="1" indices="14" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightLeg" nodeID="129" editorFlags="0" />
+            <boneData boneIndex="45" length="1.000000" type="1" />
+            <parentNodes count="1" indices="8" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightToeBase" nodeID="130" editorFlags="0" />
+            <boneData boneIndex="46" length="1.000000" type="1" />
             <parentNodes count="1" indices="12" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
-            <dNodeInfo name="mixamorig:RightLeg" nodeID="134" editorFlags="0" />
+            <dNodeInfo name="mixamorig:RightHandRing3" nodeID="131" editorFlags="0" />
+            <boneData boneIndex="47" length="1.000000" type="1" />
+            <parentNodes count="1" indices="40" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightHandPinky2" nodeID="132" editorFlags="0" />
+            <boneData boneIndex="48" length="1.000000" type="1" />
+            <parentNodes count="1" indices="35" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:LeftFoot" nodeID="133" editorFlags="0" />
+            <boneData boneIndex="49" length="1.000000" type="1" />
+            <parentNodes count="1" indices="18" />
+        </dBoneNodeInfo>
+        <dBoneNodeInfo>
+            <dNodeInfo name="mixamorig:RightUpLeg" nodeID="134" editorFlags="0" />
             <boneData boneIndex="50" length="1.000000" type="1" />
-            <parentNodes count="1" indices="8" />
+            <parentNodes count="1" indices="6" />
         </dBoneNodeInfo>
         <dBoneNodeInfo>
             <dNodeInfo name="mixamorig:RightFoot" nodeID="135" editorFlags="0" />
@@ -1379,43 +1379,25 @@
         </dMeshNodeInfo>
         <dMeshNodeInfo>
             <dGeometryNodeInfo>
-                <dNodeInfo name="hidden_capsule_04_mesh" nodeID="196" editorFlags="0" />
+                <dNodeInfo name="hidden_box_leftFoot_mesh" nodeID="196" editorFlags="0" />
             </dGeometryNodeInfo>
-            <points controlPointBaseCount="146">
-                <position float4="146" floats="0 0.351886 0 0 1.86304e-08 0.347979 -0.0296742 0 -0.0148371 0.347979 -0.0256986 0 -0.0256986 0.347979 -0.0148371 0 -0.0296742 0.347979 -1.73333e-08 0 -0.0256986 0.347979 0.0148371 0 -0.0148371 0.347979 0.0256986 0 -2.31111e-08 0.347979 0.0296742 0 0.0148371 0.347979 0.0256986 0 0.0256986 0.347979 0.0148371 0 0.0296742 0.347979 3.24263e-08 0 0.0256986 0.347979 -0.0148371 0 0.0148371 0.347979 -0.0256986 0 3.59912e-08 0.336525 -0.0573261 0 -0.028663 0.336525 -0.0496459 0 -0.0496459 0.336525 -0.0286631 0 -0.0573261 0.336525 -3.34854e-08 0 -0.0496459 0.336525 0.028663 0 -0.0286631 0.336525 0.0496459 0 -4.46472e-08 0.336525 0.0573261 0 0.028663 0.336525 0.0496459 0 0.0496459 0.336525 0.0286631 0 0.0573261 0.336525 6.26429e-08 0 0.0496459 0.336525 -0.028663 0 0.0286631 0.336525 -0.0496459 0 5.08993e-08 0.318305 -0.0810714 0 -0.0405357 0.318305 -0.0702099 0 -0.0702099 0.318305 -0.0405357 0 -0.0810714 0.318305 -4.73556e-08 0 -0.0702099 0.318305 0.0405357 0 -0.0405357 0.318305 0.0702099 0 -6.31407e-08 0.318305 0.0810714 0 0.0405356 0.318305 0.0702099 0 0.0702098 0.318305 0.0405358 0 0.0810714 0.318305 8.85904e-08 0 0.0702099 0.318305 -0.0405356 0 0.0405358 0.318305 -0.0702098 0 6.23386e-08 0.294559 -0.0992918 0 -0.0496458 0.294559 -0.0859892 0 -0.0859892 0.294559 -0.0496459 0 -0.0992918 0.294559 -5.79985e-08 0 -0.0859892 0.294559 0.0496458 0 -0.0496459 0.294559 0.0859892 0 -7.73313e-08 0.294559 0.0992918 0 0.0496458 0.294559 0.0859892 0 0.0859891 0.294559 0.049646 0 0.0992918 0.294559 1.08501e-07 0 0.0859893 0.294559 -0.0496458 0 0.049646 0.294559 -0.0859891 0 6.95297e-08 0.266907 -0.110746 0 -0.0553727 0.266907 -0.0959085 0 -0.0959085 0.266907 -0.0553728 0 -0.110746 0.266907 -6.46889e-08 0 -0.0959085 0.266907 0.0553727 0 -0.0553729 0.266907 0.0959085 0 -8.62519e-08 0.266907 0.110746 0 0.0553727 0.266907 0.0959085 0 0.0959084 0.266907 0.0553729 0 0.110746 0.266907 1.21017e-07 0 0.0959086 0.266907 -0.0553727 0 0.0553729 0.266907 -0.0959084 0 7.19825e-08 0.237233 -0.114652 0 -0.0573261 0.237233 -0.0992918 0 -0.0992917 0.237233 -0.0573262 0 -0.114652 0.237233 -6.69709e-08 0 -0.0992918 0.237233 0.0573261 0 -0.0573262 0.237233 0.0992917 0 -8.92945e-08 0.237233 0.114652 0 0.057326 0.237233 0.0992918 0 0.0992917 0.237233 0.0573262 0 0.114652 0.237233 1.25286e-07 0 0.0992918 0.237233 -0.057326 0 0.0573263 0.237233 -0.0992917 0 7.19825e-08 0.114652 -0.114652 0 -0.0573261 0.114652 -0.0992918 0 -0.0992917 0.114652 -0.0573262 0 -0.114652 0.114652 -6.69709e-08 0 -0.0992918 0.114652 0.0573261 0 -0.0573262 0.114652 0.0992917 0 -8.92945e-08 0.114652 0.114652 0 0.057326 0.114652 0.0992918 0 0.0992917 0.114652 0.0573262 0 0.114652 0.114652 1.25286e-07 0 0.0992918 0.114652 -0.057326 0 0.0573263 0.114652 -0.0992917 0 6.95297e-08 0.0849781 -0.110746 0 -0.0553727 0.0849781 -0.0959085 0 -0.0959085 0.0849781 -0.0553728 0 -0.110746 0.0849781 -6.46889e-08 0 -0.0959085 0.0849781 0.0553727 0 -0.0553729 0.0849781 0.0959085 0 -8.62519e-08 0.0849781 0.110746 0 0.0553727 0.0849781 0.0959085 0 0.0959084 0.0849781 0.0553729 0 0.110746 0.0849781 1.21017e-07 0 0.0959086 0.0849781 -0.0553727 0 0.0553729 0.0849781 -0.0959084 0 6.23386e-08 0.0573261 -0.0992918 0 -0.0496458 0.0573261 -0.0859892 0 -0.0859892 0.0573261 -0.0496459 0 -0.0992918 0.0573261 -5.79985e-08 0 -0.0859892 0.0573261 0.0496458 0 -0.0496459 0.0573261 0.0859892 0 -7.73313e-08 0.0573261 0.0992918 0 0.0496458 0.0573261 0.0859892 0 0.0859891 0.0573261 0.049646 0 0.0992918 0.0573261 1.08501e-07 0 0.0859893 0.0573261 -0.0496458 0 0.049646 0.0573261 -0.0859891 0 5.08993e-08 0.0335809 -0.0810714 0 -0.0405357 0.0335809 -0.0702099 0 -0.0702099 0.0335809 -0.0405357 0 -0.0810714 0.0335809 -4.73556e-08 0 -0.0702099 0.0335809 0.0405357 0 -0.0405357 0.0335809 0.0702099 0 -6.31407e-08 0.0335809 0.0810714 0 0.0405356 0.0335809 0.0702099 0 0.0702098 0.0335809 0.0405358 0 0.0810714 0.0335809 8.85904e-08 0 0.0702099 0.0335809 -0.0405356 0 0.0405358 0.0335809 -0.0702098 0 3.59912e-08 0.0153605 -0.0573261 0 -0.028663 0.0153605 -0.0496459 0 -0.0496459 0.0153605 -0.0286631 0 -0.0573261 0.0153605 -3.34854e-08 0 -0.0496459 0.0153605 0.028663 0 -0.0286631 0.0153605 0.0496459 0 -4.46472e-08 0.0153605 0.0573261 0 0.028663 0.0153605 0.0496459 0 0.0496459 0.0153605 0.0286631 0 0.0573261 0.0153605 6.26429e-08 0 0.0496459 0.0153605 -0.028663 0 0.0286631 0.0153605 -0.0496459 0 1.86304e-08 0.00390669 -0.0296742 0 -0.0148371 0.00390669 -0.0256986 0 -0.0256986 0.00390669 -0.0148371 0 -0.0296742 0.00390669 -1.73333e-08 0 -0.0256986 0.00390669 0.0148371 0 -0.0148371 0.00390669 0.0256986 0 -2.31111e-08 0.00390669 0.0296742 0 0.0148371 0.00390669 0.0256986 0 0.0256986 0.00390669 0.0148371 0 0.0296742 0.00390669 3.24263e-08 0 0.0256986 0.00390669 -0.0148371 0 0.0148371 0.00390669 -0.0256986 0 0 0 0 0" />
-                <normal float3="146" floats="-0.997904 -0.0647106 -5.76786e-07 -0.997904 0.0647106 -5.85489e-07 -0.967311 -0.253594 -5.41728e-07 -0.967311 0.253594 -5.77041e-07 -0.871225 0.490884 -5.01939e-07 -0.871225 -0.490884 -4.94431e-07 -0.864211 -0.0647106 0.498951 -0.864211 0.0647106 0.498951 -0.86421 -0.0647106 -0.498952 -0.86421 0.0647106 -0.498952 -0.837716 -0.253594 0.483655 -0.837716 0.253594 0.483655 -0.837715 -0.253594 -0.483656 -0.837715 0.253594 -0.483656 -0.754503 0.490884 0.435612 -0.754503 -0.490884 0.435612 -0.754502 0.490884 -0.435613 -0.754502 -0.490884 -0.435613 -0.717601 -0.696454 -4.25795e-07 -0.717601 0.696454 -3.96109e-07 -0.621461 -0.696454 0.3588 -0.621461 0.696454 0.3588 -0.62146 0.696454 -0.358801 -0.62146 -0.696454 -0.358801 -0.51592 0.856637 -2.87282e-07 -0.51592 -0.856637 -3.05597e-07 -0.498953 0.0647106 0.86421 -0.498952 -0.0647106 0.86421 -0.498951 0.0647106 -0.864211 -0.498951 -0.0647106 -0.864211 -0.483656 -0.253594 0.837715 -0.483656 0.253594 0.837715 -0.483655 0.253594 -0.837716 -0.483655 -0.253594 -0.837716 -0.4468 0.856637 0.25796 -0.4468 -0.856637 0.25796 -0.4468 0.856637 -0.25796 -0.4468 -0.856636 -0.25796 -0.435613 0.490884 0.754502 -0.435613 -0.490884 0.754502 -0.435612 0.490884 -0.754503 -0.435612 -0.490884 -0.754503 -0.358801 0.696454 0.62146 -0.358801 -0.696454 0.62146 -0.3588 0.696454 -0.621461 -0.3588 -0.696454 -0.621461 -0.278868 -0.960329 -1.78099e-07 -0.278868 0.960329 -1.72669e-07 -0.25796 0.856636 0.4468 -0.25796 -0.856637 0.4468 -0.25796 -0.856637 -0.4468 -0.25796 0.856637 -0.4468 -0.241507 -0.960329 0.139434 -0.241507 0.960329 0.139434 -0.241507 -0.960329 -0.139434 -0.241507 0.960329 -0.139434 -0.139434 -0.960329 0.241507 -0.139434 0.960329 0.241507 -0.139434 -0.960329 -0.241507 -0.139434 0.960329 -0.241507 -7.60792e-07 -0.0647106 0.997904 -7.3344e-07 0.0647106 0.997904 -7.28383e-07 0.253594 0.967311 -6.9307e-07 -0.253594 0.967311 -6.77114e-07 0.490884 0.871225 -6.44581e-07 -0.490884 0.871225 -5.53197e-07 -0.696454 0.717601 -5.3217e-07 0.696454 0.717601 -3.86183e-07 -0.856637 0.51592 -3.80078e-07 0.856637 0.51592 -2.10678e-07 -0.960329 0.278868 -2.07662e-07 0.960329 0.278868 1.02623e-08 -1 -8.45129e-09 1.02623e-08 1 -1.20733e-08 2.11282e-07 0.960329 -0.278868 2.28778e-07 -0.960329 -0.278868 3.97172e-07 0.856637 -0.51592 4.14266e-07 -0.856637 -0.51592 5.49486e-07 0.696454 -0.717601 5.61855e-07 -0.696454 -0.717601 6.67104e-07 -0.490884 -0.871225 6.82119e-07 0.490884 -0.871225 7.48561e-07 -0.253594 -0.967311 7.73785e-07 0.253594 -0.967311 7.75711e-07 -0.0647106 -0.997904 7.80684e-07 0.0647106 -0.997904 0.139434 -0.960329 0.241507 0.139434 0.960329 0.241507 0.139434 -0.960329 -0.241507 0.139434 0.960329 -0.241507 0.241507 0.960329 0.139434 0.241507 -0.960329 0.139434 0.241507 -0.960329 -0.139434 0.241507 0.960329 -0.139434 0.25796 0.856637 0.4468 0.25796 -0.856637 0.4468 0.257961 -0.856637 -0.4468 0.257961 0.856637 -0.4468 0.278868 -0.960329 3.18673e-07 0.278868 0.960329 3.10226e-07 0.3588 -0.696454 0.621461 0.3588 0.696454 0.621461 0.358801 -0.696454 -0.62146 0.358801 0.696454 -0.62146 0.435612 -0.490884 0.754503 0.435612 0.490884 0.754503 0.435613 0.490884 -0.754502 0.435613 -0.490884 -0.754502 0.4468 -0.856637 0.257961 0.4468 0.856637 0.257961 0.4468 -0.856637 -0.25796 0.4468 0.856637 -0.25796 0.483655 -0.253594 0.837716 0.483655 0.253594 0.837716 0.483656 0.253594 -0.837715 0.483656 -0.253594 -0.837715 0.498951 -0.0647106 0.864211 0.498951 0.0647106 0.864211 0.498953 0.0647106 -0.86421 0.498953 -0.0647106 -0.86421 0.51592 -0.856637 5.68111e-07 0.51592 0.856637 5.65669e-07 0.62146 0.696454 0.358801 0.62146 -0.696454 0.358801 0.621461 -0.696454 -0.3588 0.621461 0.696454 -0.3588 0.717601 0.696454 7.67182e-07 0.717601 -0.696454 7.83262e-07 0.754502 0.490884 0.435613 0.754502 -0.490884 0.435613 0.754503 0.490884 -0.435611 0.754503 -0.490884 -0.435611 0.837715 -0.253594 0.483656 0.837715 0.253594 0.483656 0.837716 0.253594 -0.483654 0.837716 -0.253594 -0.483654 0.86421 -0.0647106 0.498953 0.86421 0.0647106 0.498953 0.864211 0.0647106 -0.498951 0.864211 -0.0647106 -0.498951 0.871225 0.490884 9.72409e-07 0.871225 -0.490884 9.49887e-07 0.967311 0.253594 1.06638e-06 0.967311 -0.253594 1.04872e-06 0.997904 -0.0647106 1.10394e-06 0.997904 0.0647106 1.07161e-06" />
-                <uv0 float2="97" floats="0 0.5 0 1 0 0 0.0170371 0.5 0.0669872 0.25 0.0669873 0.5 0.0669873 0.75 0.0817418 0.258519 0.0817418 0.741481 0.0833333 1 0.0833333 0 0.125 0.283494 0.125 0.716506 0.146447 0.5 0.166667 0 0.166667 1 0.193814 0.323223 0.193814 0.676777 0.25 0.0669874 0.25 0.933013 0.25 1 0.25 0 0.25 0.5 0.258518 0.0817419 0.258519 0.918258 0.283494 0.125 0.283494 0.375 0.283494 0.625 0.283494 0.875 0.323223 0.193814 0.323223 0.806186 0.333333 1 0.333333 0 0.37059 0.5 0.375 0.283494 0.375 0.716506 0.387928 0.435295 0.387928 0.564705 0.416667 1 0.416667 0 0.435295 0.387928 0.435295 0.612072 0.5 0.0669873 0.5 0.0170371 0.5 0 0.5 0.146447 0.5 0.25 0.5 0.37059 0.5 0.982963 0.5 0.75 0.5 0.5 0.5 0.853553 0.5 0.62941 0.5 0.933013 0.5 1 0.564705 0.387928 0.564705 0.612072 0.583333 1 0.583333 0 0.612072 0.435295 0.612072 0.564705 0.625 0.283494 0.625 0.716506 0.62941 0.5 0.666667 1 0.666667 0 0.676777 0.193814 0.676777 0.806186 0.716506 0.125 0.716506 0.375 0.716506 0.875 0.716506 0.625 0.741481 0.0817417 0.741481 0.918258 0.75 0.0669872 0.75 1 0.75 0.933013 0.75 0 0.75 0.5 0.806186 0.323223 0.806186 0.676777 0.833333 0 0.833333 1 0.853553 0.5 0.875 0.283493 0.875 0.716506 0.916667 0 0.916667 1 0.918258 0.258518 0.918258 0.741481 0.933013 0.25 0.933013 0.75 0.933013 0.5 0.982963 0.5 1 0.5 1 0 1 1" />
+            <points controlPointBaseCount="8">
+                <position float4="8" floats="0.127052 0 0.0609138 0 0.127053 0 -0.0609136 0 -0.127053 0 0.0609136 0 -0.127052 0 -0.0609138 0 0.127052 0.0803685 0.0609138 0 0.127053 0.0803685 -0.0609136 0 -0.127053 0.0803685 0.0609136 0 -0.127052 0.0803685 -0.0609138 0" />
+                <normal float3="6" floats="-1 0 -6.27833e-07 -6.27833e-07 0 1 0 -1 0 0 1 -0 6.27833e-07 0 -1 1 0 6.27833e-07" />
+                <uv0 float2="4" floats="0 0 0 1 1 0 1 1" />
             </points>
-            <polygons count="288" faceIndexCount="3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3">
-                <faceMaterial index="-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1" />
-                <position index="0 1 2 0 2 3 0 3 4 0 4 5 0 5 6 0 6 7 0 7 8 0 8 9 0 9 10 0 10 11 0 11 12 0 12 1 1 12 13 1 13 14 1 14 2 2 14 15 2 15 3 3 15 16 3 16 4 4 16 17 4 17 5 5 17 18 5 18 6 6 18 19 6 19 7 7 19 20 7 20 8 8 20 21 8 21 9 9 21 22 9 22 10 10 22 23 10 23 11 11 23 24 11 24 12 12 24 13 13 24 25 13 25 26 13 26 14 14 26 27 14 27 15 15 27 28 15 28 16 16 28 29 16 29 17 17 29 30 17 30 18 18 30 31 18 31 19 19 31 32 19 32 20 20 32 33 20 33 21 21 33 34 21 34 22 22 34 35 22 35 23 23 35 36 23 36 24 24 36 25 25 36 37 25 37 38 25 38 26 26 38 39 26 39 27 27 39 40 27 40 28 28 40 41 28 41 29 29 41 42 29 42 30 30 42 43 30 43 31 31 43 44 31 44 32 32 44 45 32 45 33 33 45 46 33 46 34 34 46 47 34 47 35 35 47 48 35 48 36 36 48 37 37 48 49 37 49 50 37 50 38 38 50 51 38 51 39 39 51 52 39 52 40 40 52 53 40 53 41 41 53 54 41 54 42 42 54 55 42 55 43 43 55 56 43 56 44 44 56 57 44 57 45 45 57 58 45 58 46 46 58 59 46 59 47 47 59 60 47 60 48 48 60 49 49 60 61 49 61 62 49 62 50 50 62 63 50 63 51 51 63 64 51 64 52 52 64 65 52 65 53 53 65 66 53 66 54 54 66 67 54 67 55 55 67 68 55 68 56 56 68 69 56 69 57 57 69 70 57 70 58 58 70 71 58 71 59 59 71 72 59 72 60 60 72 61 61 72 73 61 73 74 61 74 62 62 74 75 62 75 63 63 75 76 63 76 64 64 76 77 64 77 65 65 77 78 65 78 66 66 78 79 66 79 67 67 79 80 67 80 68 68 80 81 68 81 69 69 81 82 69 82 70 70 82 83 70 83 71 71 83 84 71 84 72 72 84 73 73 84 85 73 85 86 73 86 74 74 86 87 74 87 75 75 87 88 75 88 76 76 88 89 76 89 77 77 89 90 77 90 78 78 90 91 78 91 79 79 91 92 79 92 80 80 92 93 80 93 81 81 93 94 81 94 82 82 94 95 82 95 83 83 95 96 83 96 84 84 96 85 85 96 97 85 97 98 85 98 86 86 98 99 86 99 87 87 99 100 87 100 88 88 100 101 88 101 89 89 101 102 89 102 90 90 102 103 90 103 91 91 103 104 91 104 92 92 104 105 92 105 93 93 105 106 93 106 94 94 106 107 94 107 95 95 107 108 95 108 96 96 108 97 97 108 109 97 109 110 97 110 98 98 110 111 98 111 99 99 111 112 99 112 100 100 112 113 100 113 101 101 113 114 101 114 102 102 114 115 102 115 103 103 115 116 103 116 104 104 116 117 104 117 105 105 117 118 105 118 106 106 118 119 106 119 107 107 119 120 107 120 108 108 120 109 109 120 121 109 121 122 109 122 110 110 122 123 110 123 111 111 123 124 111 124 112 112 124 125 112 125 113 113 125 126 113 126 114 114 126 127 114 127 115 115 127 128 115 128 116 116 128 129 116 129 117 117 129 130 117 130 118 118 130 131 118 131 119 119 131 132 119 132 120 120 132 121 121 132 133 121 133 134 121 134 122 122 134 135 122 135 123 123 135 136 123 136 124 124 136 137 124 137 125 125 137 138 125 138 126 126 138 139 126 139 127 127 139 140 127 140 128 128 140 141 128 141 129 129 141 142 129 142 130 130 142 143 130 143 131 131 143 144 131 144 132 132 144 133 133 144 145 133 145 134 134 145 135 135 145 136 136 145 137 137 145 138 138 145 139 139 145 140 140 145 141 141 145 142 142 145 143 143 145 144" />
-                <normal index="73 74 59 73 59 55 73 55 47 73 47 53 73 53 57 73 57 71 73 71 87 73 87 90 73 90 99 73 99 93 73 93 89 73 89 74 74 89 76 74 76 51 74 51 59 59 51 36 59 36 55 55 36 24 55 24 47 47 24 34 47 34 53 53 34 48 53 48 57 57 48 69 57 69 71 71 69 94 71 94 87 87 94 109 87 109 90 90 109 121 90 121 99 99 121 111 99 111 93 93 111 97 93 97 89 89 97 76 76 97 78 76 78 44 76 44 51 51 44 22 51 22 36 36 22 19 36 19 24 24 19 21 24 21 34 34 21 42 34 42 48 48 42 67 48 67 69 69 67 101 69 101 94 94 101 122 94 122 109 109 122 126 109 126 121 121 126 125 121 125 111 111 125 103 111 103 97 97 103 78 78 103 81 78 81 40 78 40 44 44 40 16 44 16 22 22 16 4 22 4 19 19 4 14 19 14 21 21 14 38 21 38 42 42 38 64 42 64 67 67 64 105 67 105 101 101 105 128 101 128 122 122 128 140 122 140 126 126 140 130 126 130 125 125 130 106 125 106 103 103 106 81 81 106 83 81 83 32 81 32 40 40 32 13 40 13 16 16 13 3 16 3 4 4 3 11 4 11 14 14 11 31 14 31 38 38 31 62 38 62 64 64 62 113 64 113 105 105 113 133 105 133 128 128 133 142 128 142 140 140 142 134 140 134 130 130 134 114 130 114 106 106 114 83 83 114 85 83 85 28 83 28 32 32 28 9 32 9 13 13 9 1 13 1 3 3 1 7 3 7 11 11 7 26 11 26 31 31 26 61 31 61 62 62 61 117 62 117 113 113 117 137 113 137 133 133 137 145 133 145 142 142 145 138 142 138 134 134 138 118 134 118 114 114 118 85 85 118 84 85 84 29 85 29 28 28 29 8 28 8 9 9 8 0 9 0 1 1 0 6 1 6 7 7 6 27 7 27 26 26 27 60 26 60 61 61 60 116 61 116 117 117 116 136 117 136 137 137 136 144 137 144 145 145 144 139 145 139 138 138 139 119 138 119 118 118 119 84 84 119 82 84 82 33 84 33 29 29 33 12 29 12 8 8 12 2 8 2 0 0 2 10 0 10 6 6 10 30 6 30 27 27 30 63 27 63 60 60 63 112 60 112 116 116 112 132 116 132 136 136 132 143 136 143 144 144 143 135 144 135 139 139 135 115 139 115 119 119 115 82 82 115 80 82 80 41 82 41 33 33 41 17 33 17 12 12 17 5 12 5 2 2 5 15 2 15 10 10 15 39 10 39 30 30 39 65 30 65 63 63 65 104 63 104 112 112 104 129 112 129 132 132 129 141 132 141 143 143 141 131 143 131 135 135 131 107 135 107 115 115 107 80 80 107 79 80 79 45 80 45 41 41 45 23 41 23 17 17 23 18 17 18 5 5 18 20 5 20 15 15 20 43 15 43 39 39 43 66 39 66 65 65 66 100 65 100 104 104 100 123 104 123 129 129 123 127 129 127 141 141 127 124 141 124 131 131 124 102 131 102 107 107 102 79 79 102 77 79 77 50 79 50 45 45 50 37 45 37 23 23 37 25 23 25 18 18 25 35 18 35 20 20 35 49 20 49 43 43 49 68 43 68 66 66 68 95 66 95 100 100 95 108 100 108 123 123 108 120 123 120 127 127 120 110 127 110 124 124 110 96 124 96 102 102 96 77 77 96 75 77 75 58 77 58 50 50 58 54 50 54 37 37 54 46 37 46 25 25 46 52 25 52 35 35 52 56 35 56 49 49 56 70 49 70 68 68 70 86 68 86 95 95 86 91 95 91 108 108 91 98 108 98 120 120 98 92 120 92 110 110 92 88 110 88 96 96 88 75 75 88 72 75 72 58 58 72 54 54 72 46 46 72 52 52 72 56 56 72 70 70 72 86 86 72 91 91 72 98 98 72 92 92 72 88" />
-                <uv0 index="50 63 60 50 60 56 50 56 52 50 52 41 50 41 37 50 37 33 50 33 36 50 36 40 50 40 47 50 47 55 50 55 59 50 59 63 63 59 78 63 78 71 63 71 60 60 71 62 60 62 56 56 62 49 56 49 52 52 49 35 52 35 41 41 35 27 41 27 37 37 27 22 37 22 33 33 22 26 33 26 36 36 26 34 36 34 40 40 34 46 40 46 47 47 46 61 47 61 55 55 61 69 55 69 59 59 69 78 78 69 83 78 83 80 78 80 71 71 80 67 71 67 62 62 67 51 62 51 49 49 51 30 49 30 35 35 30 17 35 17 27 27 17 13 27 13 22 22 13 16 22 16 26 26 16 29 26 29 34 34 29 45 34 45 46 46 45 66 46 66 61 61 66 79 61 79 69 69 79 83 83 79 92 83 92 85 83 85 80 80 85 70 80 70 67 67 70 53 67 53 51 51 53 28 51 28 30 30 28 12 30 12 17 17 12 5 17 5 13 13 5 11 13 11 16 16 11 25 16 25 29 29 25 42 29 42 45 45 42 68 45 68 66 66 68 84 66 84 79 79 84 92 92 84 93 92 93 89 92 89 85 85 89 73 85 73 70 70 73 48 70 48 53 53 48 24 53 24 28 28 24 8 28 8 12 12 8 3 12 3 5 5 3 7 5 7 11 11 7 23 11 23 25 25 23 43 25 43 42 42 43 72 42 72 68 68 72 88 68 88 84 84 88 93 93 88 94 93 94 91 93 91 89 89 91 76 89 76 73 73 76 54 73 54 48 48 54 19 48 19 24 24 19 6 24 6 8 8 6 0 8 0 3 3 0 4 3 4 7 7 4 18 7 18 23 23 18 44 23 44 43 43 44 74 43 74 72 72 74 90 72 90 88 88 90 94 96 87 95 1 2 10 1 10 9 9 10 14 9 14 15 15 14 21 15 21 20 20 21 32 20 32 31 31 32 39 31 39 38 38 39 44 38 44 54 54 44 58 54 58 57 57 58 65 57 65 64 64 65 77 64 77 75 75 77 81 75 81 82 82 81 86 82 86 87 87 86 95 94 90 93 94 93 89 94 89 91 91 89 73 91 73 76 76 73 48 76 48 54 54 48 24 54 24 19 19 24 8 19 8 6 6 8 3 6 3 0 0 3 7 0 7 4 4 7 23 4 23 18 18 23 43 18 43 44 44 43 72 44 72 74 74 72 88 74 88 90 90 88 93 93 88 92 93 92 85 93 85 89 89 85 70 89 70 73 73 70 53 73 53 48 48 53 28 48 28 24 24 28 12 24 12 8 8 12 5 8 5 3 3 5 11 3 11 7 7 11 25 7 25 23 23 25 42 23 42 43 43 42 68 43 68 72 72 68 84 72 84 88 88 84 92 92 84 83 92 83 80 92 80 85 85 80 67 85 67 70 70 67 51 70 51 53 53 51 30 53 30 28 28 30 17 28 17 12 12 17 13 12 13 5 5 13 16 5 16 11 11 16 29 11 29 25 25 29 45 25 45 42 42 45 66 42 66 68 68 66 79 68 79 84 84 79 83 83 79 78 83 78 71 83 71 80 80 71 62 80 62 67 67 62 49 67 49 51 51 49 35 51 35 30 30 35 27 30 27 17 17 27 22 17 22 13 13 22 26 13 26 16 16 26 34 16 34 29 29 34 46 29 46 45 45 46 61 45 61 66 66 61 69 66 69 79 79 69 78 78 69 63 78 63 60 78 60 71 71 60 56 71 56 62 62 56 52 62 52 49 49 52 41 49 41 35 35 41 37 35 37 27 27 37 33 27 33 22 22 33 36 22 36 26 26 36 40 26 40 34 34 40 47 34 47 46 46 47 55 46 55 61 61 55 59 61 59 69 69 59 63 63 59 50 63 50 60 60 50 56 56 50 52 52 50 41 41 50 37 37 50 33 33 50 36 36 50 40 40 50 47 47 50 55 55 50 59" />
+            <polygons count="6" faceIndexCount="4 4 4 4 4 4">
+                <faceMaterial index="-1 -1 -1 -1 -1 -1" />
+                <position index="0 1 5 4 0 2 3 1 0 4 6 2 1 3 7 5 2 6 7 3 4 5 7 6" />
+                <normal index="5 5 5 5 2 2 2 2 1 1 1 1 4 4 4 4 0 0 0 0 3 3 3 3" />
+                <uv0 index="0 2 3 1 2 3 1 0 2 3 1 0 0 2 3 1 2 3 1 0 0 2 3 1" />
             </polygons>
-            <parentNodes count="2" indices="23 136" />
+            <parentNodes count="2" indices="19 136" />
             <childrenNodes count="1" indices="2" />
         </dMeshNodeInfo>
         <dMeshNodeInfo>
             <dGeometryNodeInfo>
-                <dNodeInfo name="hidden_capsule_07_mesh" nodeID="197" editorFlags="0" />
-            </dGeometryNodeInfo>
-            <points controlPointBaseCount="146">
-                <position float4="146" floats="0 0.255652 0 0 1.04373e-08 0.253464 0.0166243 0 -0.00831215 0.253464 0.0143971 0 -0.0143971 0.253464 0.00831216 0 -0.0166243 0.253464 9.71062e-09 0 -0.0143971 0.253464 -0.00831215 0 -0.00831217 0.253464 -0.0143971 0 -1.29475e-08 0.253464 -0.0166243 0 0.00831214 0.253464 -0.0143971 0 0.0143971 0.253464 -0.00831217 0 0.0166243 0.253464 -1.81661e-08 0 0.0143971 0.253464 0.00831214 0 0.00831218 0.253464 0.0143971 0 2.01633e-08 0.247047 0.0321157 0 -0.0160578 0.247047 0.027813 0 -0.027813 0.247047 0.0160579 0 -0.0321157 0.247047 1.87595e-08 0 -0.027813 0.247047 -0.0160578 0 -0.0160579 0.247047 -0.027813 0 -2.50126e-08 0.247047 -0.0321157 0 0.0160578 0.247047 -0.027813 0 0.027813 0.247047 -0.0160579 0 0.0321157 0.247047 -3.50943e-08 0 0.027813 0.247047 0.0160578 0 0.0160579 0.247047 0.027813 0 2.85152e-08 0.236839 0.0454185 0 -0.0227092 0.236839 0.0393336 0 -0.0393335 0.236839 0.0227093 0 -0.0454185 0.236839 2.65299e-08 0 -0.0393336 0.236839 -0.0227092 0 -0.0227093 0.236839 -0.0393335 0 -3.53732e-08 0.236839 -0.0454185 0 0.0227092 0.236839 -0.0393336 0 0.0393335 0.236839 -0.0227093 0 0.0454185 0.236839 -4.96308e-08 0 0.0393336 0.236839 0.0227092 0 0.0227093 0.236839 0.0393335 0 3.49239e-08 0.223537 0.055626 0 -0.027813 0.223537 0.0481736 0 -0.0481735 0.223537 0.027813 0 -0.055626 0.223537 3.24924e-08 0 -0.0481736 0.223537 -0.027813 0 -0.0278131 0.223537 -0.0481735 0 -4.33232e-08 0.223537 -0.055626 0 0.027813 0.223537 -0.0481736 0 0.0481735 0.223537 -0.0278131 0 0.055626 0.223537 -6.07851e-08 0 0.0481736 0.223537 0.027813 0 0.0278131 0.223537 0.0481735 0 3.89525e-08 0.208045 0.0620428 0 -0.0310214 0.208045 0.0537306 0 -0.0537306 0.208045 0.0310214 0 -0.0620428 0.208045 3.62405e-08 0 -0.0537306 0.208045 -0.0310214 0 -0.0310214 0.208045 -0.0537306 0 -4.83207e-08 0.208045 -0.0620428 0 0.0310213 0.208045 -0.0537307 0 0.0537306 0.208045 -0.0310214 0 0.0620428 0.208045 -6.7797e-08 0 0.0537307 0.208045 0.0310213 0 0.0310215 0.208045 0.0537306 0 4.03266e-08 0.191421 0.0642314 0 -0.0321157 0.191421 0.0556261 0 -0.055626 0.191421 0.0321157 0 -0.0642314 0.191421 3.7519e-08 0 -0.0556261 0.191421 -0.0321157 0 -0.0321157 0.191421 -0.055626 0 -5.00253e-08 0.191421 -0.0642314 0 0.0321157 0.191421 -0.0556261 0 0.055626 0.191421 -0.0321158 0 0.0642314 0.191421 -7.01886e-08 0 0.0556261 0.191421 0.0321156 0 0.0321158 0.191421 0.055626 0 4.03266e-08 0.0642314 0.0642314 0 -0.0321157 0.0642314 0.0556261 0 -0.055626 0.0642314 0.0321157 0 -0.0642314 0.0642314 3.7519e-08 0 -0.0556261 0.0642314 -0.0321157 0 -0.0321157 0.0642314 -0.055626 0 -5.00253e-08 0.0642314 -0.0642314 0 0.0321157 0.0642314 -0.0556261 0 0.055626 0.0642314 -0.0321158 0 0.0642314 0.0642314 -7.01886e-08 0 0.0556261 0.0642314 0.0321156 0 0.0321158 0.0642314 0.055626 0 3.89525e-08 0.0476071 0.0620428 0 -0.0310214 0.0476071 0.0537306 0 -0.0537306 0.0476071 0.0310214 0 -0.0620428 0.0476071 3.62405e-08 0 -0.0537306 0.0476071 -0.0310214 0 -0.0310214 0.0476071 -0.0537306 0 -4.83207e-08 0.0476071 -0.0620428 0 0.0310213 0.0476071 -0.0537307 0 0.0537306 0.0476071 -0.0310214 0 0.0620428 0.0476071 -6.7797e-08 0 0.0537307 0.0476071 0.0310213 0 0.0310215 0.0476071 0.0537306 0 3.49239e-08 0.0321157 0.055626 0 -0.027813 0.0321157 0.0481736 0 -0.0481735 0.0321157 0.027813 0 -0.055626 0.0321157 3.24924e-08 0 -0.0481736 0.0321157 -0.027813 0 -0.0278131 0.0321157 -0.0481735 0 -4.33232e-08 0.0321157 -0.055626 0 0.027813 0.0321157 -0.0481736 0 0.0481735 0.0321157 -0.0278131 0 0.055626 0.0321157 -6.07851e-08 0 0.0481736 0.0321157 0.027813 0 0.0278131 0.0321157 0.0481735 0 2.85152e-08 0.018813 0.0454185 0 -0.0227092 0.018813 0.0393336 0 -0.0393335 0.018813 0.0227093 0 -0.0454185 0.018813 2.65299e-08 0 -0.0393336 0.018813 -0.0227092 0 -0.0227093 0.018813 -0.0393335 0 -3.53732e-08 0.018813 -0.0454185 0 0.0227092 0.018813 -0.0393336 0 0.0393335 0.018813 -0.0227093 0 0.0454185 0.018813 -4.96308e-08 0 0.0393336 0.018813 0.0227092 0 0.0227093 0.018813 0.0393335 0 2.01633e-08 0.00860539 0.0321157 0 -0.0160578 0.00860539 0.027813 0 -0.027813 0.00860539 0.0160579 0 -0.0321157 0.00860539 1.87595e-08 0 -0.027813 0.00860539 -0.0160578 0 -0.0160579 0.00860539 -0.027813 0 -2.50126e-08 0.00860539 -0.0321157 0 0.0160578 0.00860539 -0.027813 0 0.027813 0.00860539 -0.0160579 0 0.0321157 0.00860539 -3.50943e-08 0 0.027813 0.00860539 0.0160578 0 0.0160579 0.00860539 0.027813 0 1.04373e-08 0.00218863 0.0166243 0 -0.00831215 0.00218863 0.0143971 0 -0.0143971 0.00218863 0.00831216 0 -0.0166243 0.00218863 9.71062e-09 0 -0.0143971 0.00218863 -0.00831215 0 -0.00831217 0.00218863 -0.0143971 0 -1.29475e-08 0.00218863 -0.0166243 0 0.00831214 0.00218863 -0.0143971 0 0.0143971 0.00218863 -0.00831217 0 0.0166243 0.00218863 -1.81661e-08 0 0.0143971 0.00218863 0.00831214 0 0.00831218 0.00218863 0.0143971 0 0 0 0 0" />
-                <normal float3="146" floats="-0.997904 -0.0647106 5.46947e-07 -0.997904 0.0647107 5.56893e-07 -0.967311 -0.253594 5.87131e-07 -0.967311 0.253594 5.82086e-07 -0.871225 -0.490884 5.04441e-07 -0.871225 0.490884 5.11949e-07 -0.864211 -0.0647106 -0.498951 -0.864211 0.0647106 -0.498952 -0.86421 -0.0647107 0.498953 -0.86421 0.0647107 0.498953 -0.837716 0.253594 -0.483655 -0.837716 -0.253594 -0.483655 -0.837715 -0.253594 0.483656 -0.837715 0.253594 0.483656 -0.754503 -0.490884 -0.435612 -0.754503 0.490884 -0.435612 -0.754503 0.490884 0.435613 -0.754502 -0.490884 0.435613 -0.717601 -0.696455 4.25795e-07 -0.717601 0.696455 3.98583e-07 -0.621461 -0.696455 -0.3588 -0.621461 0.696455 -0.3588 -0.62146 0.696455 0.358801 -0.62146 -0.696455 0.358801 -0.515921 -0.856636 2.83619e-07 -0.515921 0.856636 2.89724e-07 -0.498953 0.0647106 -0.86421 -0.498953 -0.0647106 -0.86421 -0.498951 0.0647106 0.864211 -0.498951 -0.0647106 0.864211 -0.483656 -0.253594 -0.837715 -0.483656 0.253594 -0.837715 -0.483655 0.253594 0.837716 -0.483655 -0.253594 0.837716 -0.4468 -0.856636 -0.25796 -0.4468 0.856636 -0.25796 -0.4468 0.856636 0.257961 -0.4468 -0.856636 0.257961 -0.435613 -0.490884 -0.754502 -0.435613 0.490884 -0.754503 -0.435612 -0.490884 0.754503 -0.435612 0.490884 0.754503 -0.358801 0.696455 -0.62146 -0.358801 -0.696455 -0.62146 -0.3588 0.696455 0.621461 -0.3588 -0.696455 0.621461 -0.278868 -0.960329 1.5095e-07 -0.278868 0.960329 1.56983e-07 -0.257961 -0.856636 -0.4468 -0.257961 0.856636 -0.4468 -0.25796 0.856636 0.4468 -0.25796 -0.856636 0.4468 -0.241507 -0.960329 -0.139434 -0.241507 0.960329 -0.139434 -0.241507 -0.960329 0.139434 -0.241507 0.960329 0.139434 -0.139434 -0.960329 -0.241507 -0.139434 0.960329 -0.241507 -0.139434 -0.960329 0.241507 -0.139434 0.960329 0.241507 -7.35926e-07 -0.0647106 -0.997904 -7.18293e-07 -0.253594 -0.967311 -7.03601e-07 0.0647106 -0.997904 -7.03159e-07 0.253594 -0.967311 -6.47084e-07 0.490884 -0.871225 -6.44581e-07 -0.490884 -0.871225 -5.18563e-07 -0.696455 -0.717601 -5.04957e-07 0.696455 -0.717601 -3.80078e-07 0.856636 -0.515921 -3.62373e-07 -0.856636 -0.515921 -2.20332e-07 -0.960329 -0.278868 -2.17315e-07 0.960329 -0.278868 -2.41465e-09 -1 1.0866e-08 -2.41465e-09 1 1.20733e-08 2.01629e-07 -0.960329 0.278868 2.13695e-07 0.960329 0.278868 3.92288e-07 0.856636 0.515921 3.97172e-07 -0.856636 0.515921 5.64329e-07 -0.696455 0.717601 5.64329e-07 0.696455 0.717601 6.67104e-07 -0.490884 0.871225 6.97134e-07 0.490884 0.871225 7.23338e-07 0.253594 0.967311 7.35926e-07 0.0647106 0.997904 7.38472e-07 -0.253594 0.967311 7.45872e-07 -0.0647106 0.997904 0.139434 -0.960329 -0.241507 0.139434 0.960329 -0.241507 0.139434 0.960329 0.241507 0.139434 -0.960329 0.241507 0.241507 -0.960329 -0.139434 0.241507 0.960329 -0.139434 0.241507 0.960329 0.139434 0.241507 -0.960329 0.139434 0.25796 -0.856636 -0.446801 0.25796 0.856636 -0.446801 0.257961 -0.856636 0.4468 0.257961 0.856636 0.4468 0.278868 0.960329 -3.17466e-07 0.278868 -0.960329 -3.25309e-07 0.3588 0.696455 -0.621461 0.3588 -0.696455 -0.621461 0.358801 -0.696455 0.62146 0.358801 0.696455 0.62146 0.435612 0.490884 -0.754503 0.435612 -0.490884 -0.754503 0.435613 0.490884 0.754502 0.435613 -0.490884 0.754502 0.4468 -0.856636 -0.257961 0.4468 0.856636 -0.257961 0.446801 0.856636 0.25796 0.446801 -0.856636 0.25796 0.483655 -0.253594 -0.837716 0.483655 0.253594 -0.837716 0.483656 0.253594 0.837715 0.483656 -0.253594 0.837715 0.498951 -0.0647106 -0.864211 0.498951 0.0647106 -0.864211 0.498953 0.0647106 0.86421 0.498953 -0.0647106 0.86421 0.515921 -0.856636 -5.62007e-07 0.515921 0.856636 -5.82764e-07 0.62146 0.696455 -0.358801 0.62146 -0.696455 -0.358801 0.621461 0.696455 0.3588 0.621461 -0.696455 0.3588 0.717601 -0.696455 -7.82025e-07 0.717601 0.696455 -7.96868e-07 0.754502 0.490884 -0.435613 0.754502 -0.490884 -0.435613 0.754503 0.490884 0.435611 0.754503 -0.490884 0.435611 0.837715 -0.253594 -0.483656 0.837715 0.253594 -0.483656 0.837716 -0.253594 0.483654 0.837716 0.253594 0.483654 0.86421 -0.0647106 -0.498953 0.86421 0.0647106 -0.498953 0.864211 -0.0647106 0.498951 0.864211 0.0647106 0.498951 0.871225 -0.490884 -9.52389e-07 0.871225 0.490884 -9.62399e-07 0.967311 0.253594 -1.08151e-06 0.967311 -0.253594 -1.08908e-06 0.997904 -0.0647106 -1.12383e-06 0.997904 0.0647106 -1.09524e-06" />
-                <uv0 float2="97" floats="0 0.5 0 1 0 0 0.0170371 0.5 0.0669873 0.25 0.0669873 0.5 0.0669873 0.75 0.0817418 0.258519 0.0817418 0.741481 0.0833333 1 0.0833333 0 0.125 0.283494 0.125 0.716506 0.146447 0.5 0.166667 0 0.166667 1 0.193814 0.323223 0.193814 0.676777 0.25 0.0669874 0.25 0.933013 0.25 1 0.25 0 0.25 0.5 0.258518 0.0817419 0.258519 0.918258 0.283494 0.125 0.283494 0.375 0.283494 0.625 0.283494 0.875 0.323223 0.193814 0.323223 0.806186 0.333333 1 0.333333 0 0.37059 0.5 0.375 0.283494 0.375 0.716506 0.387928 0.435295 0.387928 0.564705 0.416667 1 0.416667 0 0.435295 0.387928 0.435295 0.612072 0.5 0.0170371 0.5 0 0.5 0.0669873 0.5 0.146447 0.5 0.25 0.5 0.37059 0.5 0.982963 0.5 0.75 0.5 0.5 0.5 0.853553 0.5 0.629409 0.5 0.933013 0.5 1 0.564705 0.387928 0.564705 0.612072 0.583333 1 0.583333 0 0.612072 0.435295 0.612072 0.564705 0.625 0.283494 0.625 0.716506 0.629409 0.5 0.666667 1 0.666667 0 0.676777 0.193814 0.676777 0.806186 0.716506 0.125 0.716506 0.375 0.716506 0.875 0.716506 0.625 0.741481 0.0817417 0.741481 0.918258 0.75 0.0669872 0.75 0.933013 0.75 0.5 0.75 1 0.75 0 0.806186 0.323223 0.806186 0.676777 0.833333 0 0.833333 1 0.853553 0.5 0.875 0.283493 0.875 0.716506 0.916667 0 0.916667 1 0.918258 0.258518 0.918258 0.741481 0.933013 0.25 0.933013 0.75 0.933013 0.5 0.982963 0.5 1 0.5 1 0 1 1" />
-            </points>
-            <polygons count="288" faceIndexCount="3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3">
-                <faceMaterial index="-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1" />
-                <position index="0 1 12 0 2 1 0 3 2 0 4 3 0 5 4 0 6 5 0 7 6 0 8 7 0 9 8 0 10 9 0 11 10 0 12 11 1 2 14 1 13 12 1 14 13 2 3 15 2 15 14 3 4 16 3 16 15 4 5 17 4 17 16 5 6 18 5 18 17 6 7 19 6 19 18 7 8 20 7 20 19 8 9 21 8 21 20 9 10 22 9 22 21 10 11 23 10 23 22 11 12 24 11 24 23 12 13 24 13 14 26 13 25 24 13 26 25 14 15 27 14 27 26 15 16 28 15 28 27 16 17 29 16 29 28 17 18 30 17 30 29 18 19 31 18 31 30 19 20 32 19 32 31 20 21 33 20 33 32 21 22 34 21 34 33 22 23 35 22 35 34 23 24 36 23 36 35 24 25 36 25 26 38 25 37 36 25 38 37 26 27 39 26 39 38 27 28 40 27 40 39 28 29 41 28 41 40 29 30 42 29 42 41 30 31 43 30 43 42 31 32 44 31 44 43 32 33 45 32 45 44 33 34 46 33 46 45 34 35 47 34 47 46 35 36 48 35 48 47 36 37 48 37 38 50 37 49 48 37 50 49 38 39 51 38 51 50 39 40 52 39 52 51 40 41 53 40 53 52 41 42 54 41 54 53 42 43 55 42 55 54 43 44 56 43 56 55 44 45 57 44 57 56 45 46 58 45 58 57 46 47 59 46 59 58 47 48 60 47 60 59 48 49 60 49 50 62 49 61 60 49 62 61 50 51 63 50 63 62 51 52 64 51 64 63 52 53 65 52 65 64 53 54 66 53 66 65 54 55 67 54 67 66 55 56 68 55 68 67 56 57 69 56 69 68 57 58 70 57 70 69 58 59 71 58 71 70 59 60 72 59 72 71 60 61 72 61 62 74 61 73 72 61 74 73 62 63 75 62 75 74 63 64 76 63 76 75 64 65 77 64 77 76 65 66 78 65 78 77 66 67 79 66 79 78 67 68 80 67 80 79 68 69 81 68 81 80 69 70 82 69 82 81 70 71 83 70 83 82 71 72 84 71 84 83 72 73 84 73 74 86 73 85 84 73 86 85 74 75 87 74 87 86 75 76 88 75 88 87 76 77 89 76 89 88 77 78 90 77 90 89 78 79 91 78 91 90 79 80 92 79 92 91 80 81 93 80 93 92 81 82 94 81 94 93 82 83 95 82 95 94 83 84 96 83 96 95 84 85 96 85 86 98 85 97 96 85 98 97 86 87 99 86 99 98 87 88 100 87 100 99 88 89 101 88 101 100 89 90 102 89 102 101 90 91 103 90 103 102 91 92 104 91 104 103 92 93 105 92 105 104 93 94 106 93 106 105 94 95 107 94 107 106 95 96 108 95 108 107 96 97 108 97 98 110 97 109 108 97 110 109 98 99 111 98 111 110 99 100 112 99 112 111 100 101 113 100 113 112 101 102 114 101 114 113 102 103 115 102 115 114 103 104 116 103 116 115 104 105 117 104 117 116 105 106 118 105 118 117 106 107 119 106 119 118 107 108 120 107 120 119 108 109 120 109 110 122 109 121 120 109 122 121 110 111 123 110 123 122 111 112 124 111 124 123 112 113 125 112 125 124 113 114 126 113 126 125 114 115 127 114 127 126 115 116 128 115 128 127 116 117 129 116 129 128 117 118 130 117 130 129 118 119 131 118 131 130 119 120 132 119 132 131 120 121 132 121 122 134 121 133 132 121 134 133 122 123 135 122 135 134 123 124 136 123 136 135 124 125 137 124 137 136 125 126 138 125 138 137 126 127 139 126 139 138 127 128 140 127 140 139 128 129 141 128 141 140 129 130 142 129 142 141 130 131 143 130 143 142 131 132 144 131 144 143 132 133 144 133 134 145 133 145 144 134 135 145 135 136 145 136 137 145 137 138 145 138 139 145 139 140 145 140 141 145 141 142 145 142 143 145 143 144 145" />
-                <normal index="73 75 88 73 59 75 73 55 59 73 47 55 73 53 47 73 57 53 73 71 57 73 87 71 73 91 87 73 98 91 73 92 98 73 88 92 75 59 50 75 76 88 75 50 76 59 55 36 59 36 50 55 47 25 55 25 36 47 53 35 47 35 25 53 57 49 53 49 35 57 71 68 57 68 49 71 87 95 71 95 68 87 91 109 87 109 95 91 98 121 91 121 109 98 92 110 98 110 121 92 88 97 92 97 110 88 76 97 76 50 44 76 79 97 76 44 79 50 36 22 50 22 44 36 25 19 36 19 22 25 35 21 25 21 19 35 49 42 35 42 21 49 68 67 49 67 42 68 95 100 68 100 67 95 109 122 95 122 100 109 121 127 109 127 122 121 110 124 121 124 127 110 97 103 110 103 124 97 79 103 79 44 41 79 81 103 79 41 81 44 22 16 44 16 41 22 19 5 22 5 16 19 21 15 19 15 5 21 42 39 21 39 15 42 67 64 42 64 39 67 100 104 67 104 64 100 122 128 100 128 104 122 127 141 122 141 128 127 124 130 127 130 141 124 103 106 124 106 130 103 81 106 81 41 32 81 82 106 81 32 82 41 16 13 41 13 32 16 5 3 16 3 13 5 15 10 5 10 3 15 39 31 15 31 10 39 64 63 39 63 31 64 104 113 64 113 63 104 128 133 104 133 113 128 141 142 128 142 133 141 130 135 141 135 142 130 106 114 130 114 135 106 82 114 82 32 28 82 83 114 82 28 83 32 13 9 32 9 28 13 3 1 13 1 9 3 10 7 3 7 1 10 31 26 10 26 7 31 63 62 31 62 26 63 113 117 63 117 62 113 133 137 113 137 117 133 142 145 133 145 137 142 135 139 142 139 145 135 114 118 135 118 139 114 83 118 83 28 29 83 85 118 83 29 85 28 9 8 28 8 29 9 1 0 9 0 8 1 7 6 1 6 0 7 26 27 7 27 6 26 62 60 26 60 27 62 117 116 62 116 60 117 137 136 117 136 116 137 145 144 137 144 136 145 139 138 145 138 144 139 118 119 139 119 138 118 85 119 85 29 33 85 84 119 85 33 84 29 8 12 29 12 33 8 0 2 8 2 12 0 6 11 0 11 2 6 27 30 6 30 11 27 60 61 27 61 30 60 116 112 60 112 61 116 136 132 116 132 112 136 144 143 136 143 132 144 138 134 144 134 143 138 119 115 138 115 134 119 84 115 84 33 40 84 80 115 84 40 80 33 12 17 33 17 40 12 2 4 12 4 17 2 11 14 2 14 4 11 30 38 11 38 14 30 61 65 30 65 38 61 112 105 61 105 65 112 132 129 112 129 105 132 143 140 132 140 129 143 134 131 143 131 140 134 115 107 134 107 131 115 80 107 80 40 45 80 78 107 80 45 78 40 17 23 40 23 45 17 4 18 17 18 23 4 14 20 4 20 18 14 38 43 14 43 20 38 65 66 38 66 43 65 105 101 65 101 66 105 129 123 105 123 101 129 140 126 129 126 123 140 131 125 140 125 126 131 107 102 131 102 125 107 78 102 78 45 51 78 77 102 78 51 77 45 23 37 45 37 51 23 18 24 23 24 37 18 20 34 18 34 24 20 43 48 20 48 34 43 66 69 43 69 48 66 101 94 66 94 69 101 123 108 101 108 94 123 126 120 123 120 108 126 125 111 126 111 120 125 102 96 125 96 111 102 77 96 77 51 58 77 74 96 77 58 74 51 37 54 51 54 58 37 24 46 37 46 54 24 34 52 24 52 46 34 48 56 34 56 52 48 69 70 48 70 56 69 94 86 69 86 70 94 108 90 94 90 86 108 120 99 108 99 90 120 111 93 120 93 99 111 96 89 111 89 93 96 74 89 74 58 72 74 72 89 58 54 72 54 46 72 46 52 72 52 56 72 56 70 72 70 86 72 86 90 72 90 99 72 99 93 72 93 89 72" />
-                <uv0 index="50 63 59 50 60 63 50 56 60 50 52 56 50 41 52 50 37 41 50 33 37 50 36 33 50 40 36 50 47 40 50 55 47 50 59 55 63 60 71 63 76 59 63 71 76 60 56 62 60 62 71 56 52 49 56 49 62 52 41 35 52 35 49 41 37 27 41 27 35 37 33 22 37 22 27 33 36 26 33 26 22 36 40 34 36 34 26 40 47 46 40 46 34 47 55 61 47 61 46 55 59 69 55 69 61 59 76 69 76 71 80 76 83 69 76 80 83 71 62 67 71 67 80 62 49 51 62 51 67 49 35 30 49 30 51 35 27 17 35 17 30 27 22 13 27 13 17 22 26 16 22 16 13 26 34 29 26 29 16 34 46 45 34 45 29 46 61 66 46 66 45 61 69 79 61 79 66 69 83 79 83 80 85 83 92 79 83 85 92 80 67 70 80 70 85 67 51 53 67 53 70 51 30 28 51 28 53 30 17 12 30 12 28 17 13 5 17 5 12 13 16 11 13 11 5 16 29 25 16 25 11 29 45 44 29 44 25 45 66 68 45 68 44 66 79 84 66 84 68 79 92 84 92 85 89 92 93 84 92 89 93 85 70 73 85 73 89 70 53 48 70 48 73 53 28 24 53 24 48 28 12 8 28 8 24 12 5 3 12 3 8 5 11 7 5 7 3 11 25 23 11 23 7 25 44 42 25 42 23 44 68 72 44 72 42 68 84 88 68 88 72 84 93 88 93 89 91 93 94 88 93 91 94 89 73 75 89 75 91 73 48 54 73 54 75 48 24 19 48 19 54 24 8 6 24 6 19 8 3 0 8 0 6 3 7 4 3 4 0 7 23 18 7 18 4 23 42 43 23 43 18 42 72 74 42 74 43 72 88 90 72 90 74 88 94 90 1 9 10 96 95 87 1 10 2 9 15 14 9 14 10 15 20 21 15 21 14 20 31 32 20 32 21 31 38 39 31 39 32 38 54 43 38 43 39 54 57 58 54 58 43 57 64 65 57 65 58 64 77 78 64 78 65 77 82 81 77 81 78 82 87 86 82 86 81 87 95 86 94 91 89 94 93 90 94 89 93 91 75 73 91 73 89 75 54 48 75 48 73 54 19 24 54 24 48 19 6 8 19 8 24 6 0 3 6 3 8 0 4 7 0 7 3 4 18 23 4 23 7 18 43 42 18 42 23 43 74 72 43 72 42 74 90 88 74 88 72 90 93 88 93 89 85 93 92 88 93 85 92 89 73 70 89 70 85 73 48 53 73 53 70 48 24 28 48 28 53 24 8 12 24 12 28 8 3 5 8 5 12 3 7 11 3 11 5 7 23 25 7 25 11 23 42 44 23 44 25 42 72 68 42 68 44 72 88 84 72 84 68 88 92 84 92 85 80 92 83 84 92 80 83 85 70 67 85 67 80 70 53 51 70 51 67 53 28 30 53 30 51 28 12 17 28 17 30 12 5 13 12 13 17 5 11 16 5 16 13 11 25 29 11 29 16 25 44 45 25 45 29 44 68 66 44 66 45 68 84 79 68 79 66 84 83 79 83 80 71 83 76 79 83 71 76 80 67 62 80 62 71 67 51 49 67 49 62 51 30 35 51 35 49 30 17 27 30 27 35 17 13 22 17 22 27 13 16 26 13 26 22 16 29 34 16 34 26 29 45 46 29 46 34 45 66 61 45 61 46 66 79 69 66 69 61 79 76 69 76 71 60 76 63 69 76 60 63 71 62 56 71 56 60 62 49 52 62 52 56 49 35 41 49 41 52 35 27 37 35 37 41 27 22 33 27 33 37 22 26 36 22 36 33 26 34 40 26 40 36 34 46 47 34 47 40 46 61 55 46 55 47 61 69 59 61 59 55 69 63 59 63 60 50 63 50 59 60 56 50 56 52 50 52 41 50 41 37 50 37 33 50 33 36 50 36 40 50 40 47 50 47 55 50 55 59 50" />
-            </polygons>
-            <parentNodes count="2" indices="30 136" />
-            <childrenNodes count="1" indices="2" />
-        </dMeshNodeInfo>
-        <dMeshNodeInfo>
-            <dGeometryNodeInfo>
-                <dNodeInfo name="hidden_capsule_02_mesh" nodeID="198" editorFlags="0" />
+                <dNodeInfo name="hidden_capsule_02_mesh" nodeID="197" editorFlags="0" />
             </dGeometryNodeInfo>
             <points controlPointBaseCount="146">
                 <position float4="146" floats="0 0.255652 0 0 1.04373e-08 0.253464 0.0166243 0 -0.00831215 0.253464 0.0143971 0 -0.0143971 0.253464 0.00831216 0 -0.0166243 0.253464 9.71062e-09 0 -0.0143971 0.253464 -0.00831215 0 -0.00831217 0.253464 -0.0143971 0 -1.29475e-08 0.253464 -0.0166243 0 0.00831214 0.253464 -0.0143971 0 0.0143971 0.253464 -0.00831217 0 0.0166243 0.253464 -1.81661e-08 0 0.0143971 0.253464 0.00831214 0 0.00831218 0.253464 0.0143971 0 2.01633e-08 0.247047 0.0321157 0 -0.0160578 0.247047 0.027813 0 -0.027813 0.247047 0.0160579 0 -0.0321157 0.247047 1.87595e-08 0 -0.027813 0.247047 -0.0160578 0 -0.0160579 0.247047 -0.027813 0 -2.50126e-08 0.247047 -0.0321157 0 0.0160578 0.247047 -0.027813 0 0.027813 0.247047 -0.0160579 0 0.0321157 0.247047 -3.50943e-08 0 0.027813 0.247047 0.0160578 0 0.0160579 0.247047 0.027813 0 2.85152e-08 0.236839 0.0454185 0 -0.0227092 0.236839 0.0393336 0 -0.0393335 0.236839 0.0227093 0 -0.0454185 0.236839 2.65299e-08 0 -0.0393336 0.236839 -0.0227092 0 -0.0227093 0.236839 -0.0393335 0 -3.53732e-08 0.236839 -0.0454185 0 0.0227092 0.236839 -0.0393336 0 0.0393335 0.236839 -0.0227093 0 0.0454185 0.236839 -4.96308e-08 0 0.0393336 0.236839 0.0227092 0 0.0227093 0.236839 0.0393335 0 3.49239e-08 0.223537 0.055626 0 -0.027813 0.223537 0.0481736 0 -0.0481735 0.223537 0.027813 0 -0.055626 0.223537 3.24924e-08 0 -0.0481736 0.223537 -0.027813 0 -0.0278131 0.223537 -0.0481735 0 -4.33232e-08 0.223537 -0.055626 0 0.027813 0.223537 -0.0481736 0 0.0481735 0.223537 -0.0278131 0 0.055626 0.223537 -6.07851e-08 0 0.0481736 0.223537 0.027813 0 0.0278131 0.223537 0.0481735 0 3.89525e-08 0.208045 0.0620428 0 -0.0310214 0.208045 0.0537306 0 -0.0537306 0.208045 0.0310214 0 -0.0620428 0.208045 3.62405e-08 0 -0.0537306 0.208045 -0.0310214 0 -0.0310214 0.208045 -0.0537306 0 -4.83207e-08 0.208045 -0.0620428 0 0.0310213 0.208045 -0.0537307 0 0.0537306 0.208045 -0.0310214 0 0.0620428 0.208045 -6.7797e-08 0 0.0537307 0.208045 0.0310213 0 0.0310215 0.208045 0.0537306 0 4.03266e-08 0.191421 0.0642314 0 -0.0321157 0.191421 0.0556261 0 -0.055626 0.191421 0.0321157 0 -0.0642314 0.191421 3.7519e-08 0 -0.0556261 0.191421 -0.0321157 0 -0.0321157 0.191421 -0.055626 0 -5.00253e-08 0.191421 -0.0642314 0 0.0321157 0.191421 -0.0556261 0 0.055626 0.191421 -0.0321158 0 0.0642314 0.191421 -7.01886e-08 0 0.0556261 0.191421 0.0321156 0 0.0321158 0.191421 0.055626 0 4.03266e-08 0.0642314 0.0642314 0 -0.0321157 0.0642314 0.0556261 0 -0.055626 0.0642314 0.0321157 0 -0.0642314 0.0642314 3.7519e-08 0 -0.0556261 0.0642314 -0.0321157 0 -0.0321157 0.0642314 -0.055626 0 -5.00253e-08 0.0642314 -0.0642314 0 0.0321157 0.0642314 -0.0556261 0 0.055626 0.0642314 -0.0321158 0 0.0642314 0.0642314 -7.01886e-08 0 0.0556261 0.0642314 0.0321156 0 0.0321158 0.0642314 0.055626 0 3.89525e-08 0.0476071 0.0620428 0 -0.0310214 0.0476071 0.0537306 0 -0.0537306 0.0476071 0.0310214 0 -0.0620428 0.0476071 3.62405e-08 0 -0.0537306 0.0476071 -0.0310214 0 -0.0310214 0.0476071 -0.0537306 0 -4.83207e-08 0.0476071 -0.0620428 0 0.0310213 0.0476071 -0.0537307 0 0.0537306 0.0476071 -0.0310214 0 0.0620428 0.0476071 -6.7797e-08 0 0.0537307 0.0476071 0.0310213 0 0.0310215 0.0476071 0.0537306 0 3.49239e-08 0.0321157 0.055626 0 -0.027813 0.0321157 0.0481736 0 -0.0481735 0.0321157 0.027813 0 -0.055626 0.0321157 3.24924e-08 0 -0.0481736 0.0321157 -0.027813 0 -0.0278131 0.0321157 -0.0481735 0 -4.33232e-08 0.0321157 -0.055626 0 0.027813 0.0321157 -0.0481736 0 0.0481735 0.0321157 -0.0278131 0 0.055626 0.0321157 -6.07851e-08 0 0.0481736 0.0321157 0.027813 0 0.0278131 0.0321157 0.0481735 0 2.85152e-08 0.018813 0.0454185 0 -0.0227092 0.018813 0.0393336 0 -0.0393335 0.018813 0.0227093 0 -0.0454185 0.018813 2.65299e-08 0 -0.0393336 0.018813 -0.0227092 0 -0.0227093 0.018813 -0.0393335 0 -3.53732e-08 0.018813 -0.0454185 0 0.0227092 0.018813 -0.0393336 0 0.0393335 0.018813 -0.0227093 0 0.0454185 0.018813 -4.96308e-08 0 0.0393336 0.018813 0.0227092 0 0.0227093 0.018813 0.0393335 0 2.01633e-08 0.00860539 0.0321157 0 -0.0160578 0.00860539 0.027813 0 -0.027813 0.00860539 0.0160579 0 -0.0321157 0.00860539 1.87595e-08 0 -0.027813 0.00860539 -0.0160578 0 -0.0160579 0.00860539 -0.027813 0 -2.50126e-08 0.00860539 -0.0321157 0 0.0160578 0.00860539 -0.027813 0 0.027813 0.00860539 -0.0160579 0 0.0321157 0.00860539 -3.50943e-08 0 0.027813 0.00860539 0.0160578 0 0.0160579 0.00860539 0.027813 0 1.04373e-08 0.00218863 0.0166243 0 -0.00831215 0.00218863 0.0143971 0 -0.0143971 0.00218863 0.00831216 0 -0.0166243 0.00218863 9.71062e-09 0 -0.0143971 0.00218863 -0.00831215 0 -0.00831217 0.00218863 -0.0143971 0 -1.29475e-08 0.00218863 -0.0166243 0 0.00831214 0.00218863 -0.0143971 0 0.0143971 0.00218863 -0.00831217 0 0.0166243 0.00218863 -1.81661e-08 0 0.0143971 0.00218863 0.00831214 0 0.00831218 0.00218863 0.0143971 0 0 0 0 0" />
@@ -1433,7 +1415,43 @@
         </dMeshNodeInfo>
         <dMeshNodeInfo>
             <dGeometryNodeInfo>
-                <dNodeInfo name="hidden_capsule_11_mesh" nodeID="199" editorFlags="0" />
+                <dNodeInfo name="hidden_capsule_04_mesh" nodeID="198" editorFlags="0" />
+            </dGeometryNodeInfo>
+            <points controlPointBaseCount="146">
+                <position float4="146" floats="0 0.351886 0 0 1.86304e-08 0.347979 -0.0296742 0 -0.0148371 0.347979 -0.0256986 0 -0.0256986 0.347979 -0.0148371 0 -0.0296742 0.347979 -1.73333e-08 0 -0.0256986 0.347979 0.0148371 0 -0.0148371 0.347979 0.0256986 0 -2.31111e-08 0.347979 0.0296742 0 0.0148371 0.347979 0.0256986 0 0.0256986 0.347979 0.0148371 0 0.0296742 0.347979 3.24263e-08 0 0.0256986 0.347979 -0.0148371 0 0.0148371 0.347979 -0.0256986 0 3.59912e-08 0.336525 -0.0573261 0 -0.028663 0.336525 -0.0496459 0 -0.0496459 0.336525 -0.0286631 0 -0.0573261 0.336525 -3.34854e-08 0 -0.0496459 0.336525 0.028663 0 -0.0286631 0.336525 0.0496459 0 -4.46472e-08 0.336525 0.0573261 0 0.028663 0.336525 0.0496459 0 0.0496459 0.336525 0.0286631 0 0.0573261 0.336525 6.26429e-08 0 0.0496459 0.336525 -0.028663 0 0.0286631 0.336525 -0.0496459 0 5.08993e-08 0.318305 -0.0810714 0 -0.0405357 0.318305 -0.0702099 0 -0.0702099 0.318305 -0.0405357 0 -0.0810714 0.318305 -4.73556e-08 0 -0.0702099 0.318305 0.0405357 0 -0.0405357 0.318305 0.0702099 0 -6.31407e-08 0.318305 0.0810714 0 0.0405356 0.318305 0.0702099 0 0.0702098 0.318305 0.0405358 0 0.0810714 0.318305 8.85904e-08 0 0.0702099 0.318305 -0.0405356 0 0.0405358 0.318305 -0.0702098 0 6.23386e-08 0.294559 -0.0992918 0 -0.0496458 0.294559 -0.0859892 0 -0.0859892 0.294559 -0.0496459 0 -0.0992918 0.294559 -5.79985e-08 0 -0.0859892 0.294559 0.0496458 0 -0.0496459 0.294559 0.0859892 0 -7.73313e-08 0.294559 0.0992918 0 0.0496458 0.294559 0.0859892 0 0.0859891 0.294559 0.049646 0 0.0992918 0.294559 1.08501e-07 0 0.0859893 0.294559 -0.0496458 0 0.049646 0.294559 -0.0859891 0 6.95297e-08 0.266907 -0.110746 0 -0.0553727 0.266907 -0.0959085 0 -0.0959085 0.266907 -0.0553728 0 -0.110746 0.266907 -6.46889e-08 0 -0.0959085 0.266907 0.0553727 0 -0.0553729 0.266907 0.0959085 0 -8.62519e-08 0.266907 0.110746 0 0.0553727 0.266907 0.0959085 0 0.0959084 0.266907 0.0553729 0 0.110746 0.266907 1.21017e-07 0 0.0959086 0.266907 -0.0553727 0 0.0553729 0.266907 -0.0959084 0 7.19825e-08 0.237233 -0.114652 0 -0.0573261 0.237233 -0.0992918 0 -0.0992917 0.237233 -0.0573262 0 -0.114652 0.237233 -6.69709e-08 0 -0.0992918 0.237233 0.0573261 0 -0.0573262 0.237233 0.0992917 0 -8.92945e-08 0.237233 0.114652 0 0.057326 0.237233 0.0992918 0 0.0992917 0.237233 0.0573262 0 0.114652 0.237233 1.25286e-07 0 0.0992918 0.237233 -0.057326 0 0.0573263 0.237233 -0.0992917 0 7.19825e-08 0.114652 -0.114652 0 -0.0573261 0.114652 -0.0992918 0 -0.0992917 0.114652 -0.0573262 0 -0.114652 0.114652 -6.69709e-08 0 -0.0992918 0.114652 0.0573261 0 -0.0573262 0.114652 0.0992917 0 -8.92945e-08 0.114652 0.114652 0 0.057326 0.114652 0.0992918 0 0.0992917 0.114652 0.0573262 0 0.114652 0.114652 1.25286e-07 0 0.0992918 0.114652 -0.057326 0 0.0573263 0.114652 -0.0992917 0 6.95297e-08 0.0849781 -0.110746 0 -0.0553727 0.0849781 -0.0959085 0 -0.0959085 0.0849781 -0.0553728 0 -0.110746 0.0849781 -6.46889e-08 0 -0.0959085 0.0849781 0.0553727 0 -0.0553729 0.0849781 0.0959085 0 -8.62519e-08 0.0849781 0.110746 0 0.0553727 0.0849781 0.0959085 0 0.0959084 0.0849781 0.0553729 0 0.110746 0.0849781 1.21017e-07 0 0.0959086 0.0849781 -0.0553727 0 0.0553729 0.0849781 -0.0959084 0 6.23386e-08 0.0573261 -0.0992918 0 -0.0496458 0.0573261 -0.0859892 0 -0.0859892 0.0573261 -0.0496459 0 -0.0992918 0.0573261 -5.79985e-08 0 -0.0859892 0.0573261 0.0496458 0 -0.0496459 0.0573261 0.0859892 0 -7.73313e-08 0.0573261 0.0992918 0 0.0496458 0.0573261 0.0859892 0 0.0859891 0.0573261 0.049646 0 0.0992918 0.0573261 1.08501e-07 0 0.0859893 0.0573261 -0.0496458 0 0.049646 0.0573261 -0.0859891 0 5.08993e-08 0.0335809 -0.0810714 0 -0.0405357 0.0335809 -0.0702099 0 -0.0702099 0.0335809 -0.0405357 0 -0.0810714 0.0335809 -4.73556e-08 0 -0.0702099 0.0335809 0.0405357 0 -0.0405357 0.0335809 0.0702099 0 -6.31407e-08 0.0335809 0.0810714 0 0.0405356 0.0335809 0.0702099 0 0.0702098 0.0335809 0.0405358 0 0.0810714 0.0335809 8.85904e-08 0 0.0702099 0.0335809 -0.0405356 0 0.0405358 0.0335809 -0.0702098 0 3.59912e-08 0.0153605 -0.0573261 0 -0.028663 0.0153605 -0.0496459 0 -0.0496459 0.0153605 -0.0286631 0 -0.0573261 0.0153605 -3.34854e-08 0 -0.0496459 0.0153605 0.028663 0 -0.0286631 0.0153605 0.0496459 0 -4.46472e-08 0.0153605 0.0573261 0 0.028663 0.0153605 0.0496459 0 0.0496459 0.0153605 0.0286631 0 0.0573261 0.0153605 6.26429e-08 0 0.0496459 0.0153605 -0.028663 0 0.0286631 0.0153605 -0.0496459 0 1.86304e-08 0.00390669 -0.0296742 0 -0.0148371 0.00390669 -0.0256986 0 -0.0256986 0.00390669 -0.0148371 0 -0.0296742 0.00390669 -1.73333e-08 0 -0.0256986 0.00390669 0.0148371 0 -0.0148371 0.00390669 0.0256986 0 -2.31111e-08 0.00390669 0.0296742 0 0.0148371 0.00390669 0.0256986 0 0.0256986 0.00390669 0.0148371 0 0.0296742 0.00390669 3.24263e-08 0 0.0256986 0.00390669 -0.0148371 0 0.0148371 0.00390669 -0.0256986 0 0 0 0 0" />
+                <normal float3="146" floats="-0.997904 -0.0647106 -5.76786e-07 -0.997904 0.0647106 -5.85489e-07 -0.967311 -0.253594 -5.41728e-07 -0.967311 0.253594 -5.77041e-07 -0.871225 0.490884 -5.01939e-07 -0.871225 -0.490884 -4.94431e-07 -0.864211 -0.0647106 0.498951 -0.864211 0.0647106 0.498951 -0.86421 -0.0647106 -0.498952 -0.86421 0.0647106 -0.498952 -0.837716 -0.253594 0.483655 -0.837716 0.253594 0.483655 -0.837715 -0.253594 -0.483656 -0.837715 0.253594 -0.483656 -0.754503 0.490884 0.435612 -0.754503 -0.490884 0.435612 -0.754502 0.490884 -0.435613 -0.754502 -0.490884 -0.435613 -0.717601 -0.696454 -4.25795e-07 -0.717601 0.696454 -3.96109e-07 -0.621461 -0.696454 0.3588 -0.621461 0.696454 0.3588 -0.62146 0.696454 -0.358801 -0.62146 -0.696454 -0.358801 -0.51592 0.856637 -2.87282e-07 -0.51592 -0.856637 -3.05597e-07 -0.498953 0.0647106 0.86421 -0.498952 -0.0647106 0.86421 -0.498951 0.0647106 -0.864211 -0.498951 -0.0647106 -0.864211 -0.483656 -0.253594 0.837715 -0.483656 0.253594 0.837715 -0.483655 0.253594 -0.837716 -0.483655 -0.253594 -0.837716 -0.4468 0.856637 0.25796 -0.4468 -0.856637 0.25796 -0.4468 0.856637 -0.25796 -0.4468 -0.856636 -0.25796 -0.435613 0.490884 0.754502 -0.435613 -0.490884 0.754502 -0.435612 0.490884 -0.754503 -0.435612 -0.490884 -0.754503 -0.358801 0.696454 0.62146 -0.358801 -0.696454 0.62146 -0.3588 0.696454 -0.621461 -0.3588 -0.696454 -0.621461 -0.278868 -0.960329 -1.78099e-07 -0.278868 0.960329 -1.72669e-07 -0.25796 0.856636 0.4468 -0.25796 -0.856637 0.4468 -0.25796 -0.856637 -0.4468 -0.25796 0.856637 -0.4468 -0.241507 -0.960329 0.139434 -0.241507 0.960329 0.139434 -0.241507 -0.960329 -0.139434 -0.241507 0.960329 -0.139434 -0.139434 -0.960329 0.241507 -0.139434 0.960329 0.241507 -0.139434 -0.960329 -0.241507 -0.139434 0.960329 -0.241507 -7.60792e-07 -0.0647106 0.997904 -7.3344e-07 0.0647106 0.997904 -7.28383e-07 0.253594 0.967311 -6.9307e-07 -0.253594 0.967311 -6.77114e-07 0.490884 0.871225 -6.44581e-07 -0.490884 0.871225 -5.53197e-07 -0.696454 0.717601 -5.3217e-07 0.696454 0.717601 -3.86183e-07 -0.856637 0.51592 -3.80078e-07 0.856637 0.51592 -2.10678e-07 -0.960329 0.278868 -2.07662e-07 0.960329 0.278868 1.02623e-08 -1 -8.45129e-09 1.02623e-08 1 -1.20733e-08 2.11282e-07 0.960329 -0.278868 2.28778e-07 -0.960329 -0.278868 3.97172e-07 0.856637 -0.51592 4.14266e-07 -0.856637 -0.51592 5.49486e-07 0.696454 -0.717601 5.61855e-07 -0.696454 -0.717601 6.67104e-07 -0.490884 -0.871225 6.82119e-07 0.490884 -0.871225 7.48561e-07 -0.253594 -0.967311 7.73785e-07 0.253594 -0.967311 7.75711e-07 -0.0647106 -0.997904 7.80684e-07 0.0647106 -0.997904 0.139434 -0.960329 0.241507 0.139434 0.960329 0.241507 0.139434 -0.960329 -0.241507 0.139434 0.960329 -0.241507 0.241507 0.960329 0.139434 0.241507 -0.960329 0.139434 0.241507 -0.960329 -0.139434 0.241507 0.960329 -0.139434 0.25796 0.856637 0.4468 0.25796 -0.856637 0.4468 0.257961 -0.856637 -0.4468 0.257961 0.856637 -0.4468 0.278868 -0.960329 3.18673e-07 0.278868 0.960329 3.10226e-07 0.3588 -0.696454 0.621461 0.3588 0.696454 0.621461 0.358801 -0.696454 -0.62146 0.358801 0.696454 -0.62146 0.435612 -0.490884 0.754503 0.435612 0.490884 0.754503 0.435613 0.490884 -0.754502 0.435613 -0.490884 -0.754502 0.4468 -0.856637 0.257961 0.4468 0.856637 0.257961 0.4468 -0.856637 -0.25796 0.4468 0.856637 -0.25796 0.483655 -0.253594 0.837716 0.483655 0.253594 0.837716 0.483656 0.253594 -0.837715 0.483656 -0.253594 -0.837715 0.498951 -0.0647106 0.864211 0.498951 0.0647106 0.864211 0.498953 0.0647106 -0.86421 0.498953 -0.0647106 -0.86421 0.51592 -0.856637 5.68111e-07 0.51592 0.856637 5.65669e-07 0.62146 0.696454 0.358801 0.62146 -0.696454 0.358801 0.621461 -0.696454 -0.3588 0.621461 0.696454 -0.3588 0.717601 0.696454 7.67182e-07 0.717601 -0.696454 7.83262e-07 0.754502 0.490884 0.435613 0.754502 -0.490884 0.435613 0.754503 0.490884 -0.435611 0.754503 -0.490884 -0.435611 0.837715 -0.253594 0.483656 0.837715 0.253594 0.483656 0.837716 0.253594 -0.483654 0.837716 -0.253594 -0.483654 0.86421 -0.0647106 0.498953 0.86421 0.0647106 0.498953 0.864211 0.0647106 -0.498951 0.864211 -0.0647106 -0.498951 0.871225 0.490884 9.72409e-07 0.871225 -0.490884 9.49887e-07 0.967311 0.253594 1.06638e-06 0.967311 -0.253594 1.04872e-06 0.997904 -0.0647106 1.10394e-06 0.997904 0.0647106 1.07161e-06" />
+                <uv0 float2="97" floats="0 0.5 0 1 0 0 0.0170371 0.5 0.0669872 0.25 0.0669873 0.5 0.0669873 0.75 0.0817418 0.258519 0.0817418 0.741481 0.0833333 1 0.0833333 0 0.125 0.283494 0.125 0.716506 0.146447 0.5 0.166667 0 0.166667 1 0.193814 0.323223 0.193814 0.676777 0.25 0.0669874 0.25 0.933013 0.25 1 0.25 0 0.25 0.5 0.258518 0.0817419 0.258519 0.918258 0.283494 0.125 0.283494 0.375 0.283494 0.625 0.283494 0.875 0.323223 0.193814 0.323223 0.806186 0.333333 1 0.333333 0 0.37059 0.5 0.375 0.283494 0.375 0.716506 0.387928 0.435295 0.387928 0.564705 0.416667 1 0.416667 0 0.435295 0.387928 0.435295 0.612072 0.5 0.0669873 0.5 0.0170371 0.5 0 0.5 0.146447 0.5 0.25 0.5 0.37059 0.5 0.982963 0.5 0.75 0.5 0.5 0.5 0.853553 0.5 0.62941 0.5 0.933013 0.5 1 0.564705 0.387928 0.564705 0.612072 0.583333 1 0.583333 0 0.612072 0.435295 0.612072 0.564705 0.625 0.283494 0.625 0.716506 0.62941 0.5 0.666667 1 0.666667 0 0.676777 0.193814 0.676777 0.806186 0.716506 0.125 0.716506 0.375 0.716506 0.875 0.716506 0.625 0.741481 0.0817417 0.741481 0.918258 0.75 0.0669872 0.75 1 0.75 0.933013 0.75 0 0.75 0.5 0.806186 0.323223 0.806186 0.676777 0.833333 0 0.833333 1 0.853553 0.5 0.875 0.283493 0.875 0.716506 0.916667 0 0.916667 1 0.918258 0.258518 0.918258 0.741481 0.933013 0.25 0.933013 0.75 0.933013 0.5 0.982963 0.5 1 0.5 1 0 1 1" />
+            </points>
+            <polygons count="288" faceIndexCount="3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3">
+                <faceMaterial index="-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1" />
+                <position index="0 1 2 0 2 3 0 3 4 0 4 5 0 5 6 0 6 7 0 7 8 0 8 9 0 9 10 0 10 11 0 11 12 0 12 1 1 12 13 1 13 14 1 14 2 2 14 15 2 15 3 3 15 16 3 16 4 4 16 17 4 17 5 5 17 18 5 18 6 6 18 19 6 19 7 7 19 20 7 20 8 8 20 21 8 21 9 9 21 22 9 22 10 10 22 23 10 23 11 11 23 24 11 24 12 12 24 13 13 24 25 13 25 26 13 26 14 14 26 27 14 27 15 15 27 28 15 28 16 16 28 29 16 29 17 17 29 30 17 30 18 18 30 31 18 31 19 19 31 32 19 32 20 20 32 33 20 33 21 21 33 34 21 34 22 22 34 35 22 35 23 23 35 36 23 36 24 24 36 25 25 36 37 25 37 38 25 38 26 26 38 39 26 39 27 27 39 40 27 40 28 28 40 41 28 41 29 29 41 42 29 42 30 30 42 43 30 43 31 31 43 44 31 44 32 32 44 45 32 45 33 33 45 46 33 46 34 34 46 47 34 47 35 35 47 48 35 48 36 36 48 37 37 48 49 37 49 50 37 50 38 38 50 51 38 51 39 39 51 52 39 52 40 40 52 53 40 53 41 41 53 54 41 54 42 42 54 55 42 55 43 43 55 56 43 56 44 44 56 57 44 57 45 45 57 58 45 58 46 46 58 59 46 59 47 47 59 60 47 60 48 48 60 49 49 60 61 49 61 62 49 62 50 50 62 63 50 63 51 51 63 64 51 64 52 52 64 65 52 65 53 53 65 66 53 66 54 54 66 67 54 67 55 55 67 68 55 68 56 56 68 69 56 69 57 57 69 70 57 70 58 58 70 71 58 71 59 59 71 72 59 72 60 60 72 61 61 72 73 61 73 74 61 74 62 62 74 75 62 75 63 63 75 76 63 76 64 64 76 77 64 77 65 65 77 78 65 78 66 66 78 79 66 79 67 67 79 80 67 80 68 68 80 81 68 81 69 69 81 82 69 82 70 70 82 83 70 83 71 71 83 84 71 84 72 72 84 73 73 84 85 73 85 86 73 86 74 74 86 87 74 87 75 75 87 88 75 88 76 76 88 89 76 89 77 77 89 90 77 90 78 78 90 91 78 91 79 79 91 92 79 92 80 80 92 93 80 93 81 81 93 94 81 94 82 82 94 95 82 95 83 83 95 96 83 96 84 84 96 85 85 96 97 85 97 98 85 98 86 86 98 99 86 99 87 87 99 100 87 100 88 88 100 101 88 101 89 89 101 102 89 102 90 90 102 103 90 103 91 91 103 104 91 104 92 92 104 105 92 105 93 93 105 106 93 106 94 94 106 107 94 107 95 95 107 108 95 108 96 96 108 97 97 108 109 97 109 110 97 110 98 98 110 111 98 111 99 99 111 112 99 112 100 100 112 113 100 113 101 101 113 114 101 114 102 102 114 115 102 115 103 103 115 116 103 116 104 104 116 117 104 117 105 105 117 118 105 118 106 106 118 119 106 119 107 107 119 120 107 120 108 108 120 109 109 120 121 109 121 122 109 122 110 110 122 123 110 123 111 111 123 124 111 124 112 112 124 125 112 125 113 113 125 126 113 126 114 114 126 127 114 127 115 115 127 128 115 128 116 116 128 129 116 129 117 117 129 130 117 130 118 118 130 131 118 131 119 119 131 132 119 132 120 120 132 121 121 132 133 121 133 134 121 134 122 122 134 135 122 135 123 123 135 136 123 136 124 124 136 137 124 137 125 125 137 138 125 138 126 126 138 139 126 139 127 127 139 140 127 140 128 128 140 141 128 141 129 129 141 142 129 142 130 130 142 143 130 143 131 131 143 144 131 144 132 132 144 133 133 144 145 133 145 134 134 145 135 135 145 136 136 145 137 137 145 138 138 145 139 139 145 140 140 145 141 141 145 142 142 145 143 143 145 144" />
+                <normal index="73 74 59 73 59 55 73 55 47 73 47 53 73 53 57 73 57 71 73 71 87 73 87 90 73 90 99 73 99 93 73 93 89 73 89 74 74 89 76 74 76 51 74 51 59 59 51 36 59 36 55 55 36 24 55 24 47 47 24 34 47 34 53 53 34 48 53 48 57 57 48 69 57 69 71 71 69 94 71 94 87 87 94 109 87 109 90 90 109 121 90 121 99 99 121 111 99 111 93 93 111 97 93 97 89 89 97 76 76 97 78 76 78 44 76 44 51 51 44 22 51 22 36 36 22 19 36 19 24 24 19 21 24 21 34 34 21 42 34 42 48 48 42 67 48 67 69 69 67 101 69 101 94 94 101 122 94 122 109 109 122 126 109 126 121 121 126 125 121 125 111 111 125 103 111 103 97 97 103 78 78 103 81 78 81 40 78 40 44 44 40 16 44 16 22 22 16 4 22 4 19 19 4 14 19 14 21 21 14 38 21 38 42 42 38 64 42 64 67 67 64 105 67 105 101 101 105 128 101 128 122 122 128 140 122 140 126 126 140 130 126 130 125 125 130 106 125 106 103 103 106 81 81 106 83 81 83 32 81 32 40 40 32 13 40 13 16 16 13 3 16 3 4 4 3 11 4 11 14 14 11 31 14 31 38 38 31 62 38 62 64 64 62 113 64 113 105 105 113 133 105 133 128 128 133 142 128 142 140 140 142 134 140 134 130 130 134 114 130 114 106 106 114 83 83 114 85 83 85 28 83 28 32 32 28 9 32 9 13 13 9 1 13 1 3 3 1 7 3 7 11 11 7 26 11 26 31 31 26 61 31 61 62 62 61 117 62 117 113 113 117 137 113 137 133 133 137 145 133 145 142 142 145 138 142 138 134 134 138 118 134 118 114 114 118 85 85 118 84 85 84 29 85 29 28 28 29 8 28 8 9 9 8 0 9 0 1 1 0 6 1 6 7 7 6 27 7 27 26 26 27 60 26 60 61 61 60 116 61 116 117 117 116 136 117 136 137 137 136 144 137 144 145 145 144 139 145 139 138 138 139 119 138 119 118 118 119 84 84 119 82 84 82 33 84 33 29 29 33 12 29 12 8 8 12 2 8 2 0 0 2 10 0 10 6 6 10 30 6 30 27 27 30 63 27 63 60 60 63 112 60 112 116 116 112 132 116 132 136 136 132 143 136 143 144 144 143 135 144 135 139 139 135 115 139 115 119 119 115 82 82 115 80 82 80 41 82 41 33 33 41 17 33 17 12 12 17 5 12 5 2 2 5 15 2 15 10 10 15 39 10 39 30 30 39 65 30 65 63 63 65 104 63 104 112 112 104 129 112 129 132 132 129 141 132 141 143 143 141 131 143 131 135 135 131 107 135 107 115 115 107 80 80 107 79 80 79 45 80 45 41 41 45 23 41 23 17 17 23 18 17 18 5 5 18 20 5 20 15 15 20 43 15 43 39 39 43 66 39 66 65 65 66 100 65 100 104 104 100 123 104 123 129 129 123 127 129 127 141 141 127 124 141 124 131 131 124 102 131 102 107 107 102 79 79 102 77 79 77 50 79 50 45 45 50 37 45 37 23 23 37 25 23 25 18 18 25 35 18 35 20 20 35 49 20 49 43 43 49 68 43 68 66 66 68 95 66 95 100 100 95 108 100 108 123 123 108 120 123 120 127 127 120 110 127 110 124 124 110 96 124 96 102 102 96 77 77 96 75 77 75 58 77 58 50 50 58 54 50 54 37 37 54 46 37 46 25 25 46 52 25 52 35 35 52 56 35 56 49 49 56 70 49 70 68 68 70 86 68 86 95 95 86 91 95 91 108 108 91 98 108 98 120 120 98 92 120 92 110 110 92 88 110 88 96 96 88 75 75 88 72 75 72 58 58 72 54 54 72 46 46 72 52 52 72 56 56 72 70 70 72 86 86 72 91 91 72 98 98 72 92 92 72 88" />
+                <uv0 index="50 63 60 50 60 56 50 56 52 50 52 41 50 41 37 50 37 33 50 33 36 50 36 40 50 40 47 50 47 55 50 55 59 50 59 63 63 59 78 63 78 71 63 71 60 60 71 62 60 62 56 56 62 49 56 49 52 52 49 35 52 35 41 41 35 27 41 27 37 37 27 22 37 22 33 33 22 26 33 26 36 36 26 34 36 34 40 40 34 46 40 46 47 47 46 61 47 61 55 55 61 69 55 69 59 59 69 78 78 69 83 78 83 80 78 80 71 71 80 67 71 67 62 62 67 51 62 51 49 49 51 30 49 30 35 35 30 17 35 17 27 27 17 13 27 13 22 22 13 16 22 16 26 26 16 29 26 29 34 34 29 45 34 45 46 46 45 66 46 66 61 61 66 79 61 79 69 69 79 83 83 79 92 83 92 85 83 85 80 80 85 70 80 70 67 67 70 53 67 53 51 51 53 28 51 28 30 30 28 12 30 12 17 17 12 5 17 5 13 13 5 11 13 11 16 16 11 25 16 25 29 29 25 42 29 42 45 45 42 68 45 68 66 66 68 84 66 84 79 79 84 92 92 84 93 92 93 89 92 89 85 85 89 73 85 73 70 70 73 48 70 48 53 53 48 24 53 24 28 28 24 8 28 8 12 12 8 3 12 3 5 5 3 7 5 7 11 11 7 23 11 23 25 25 23 43 25 43 42 42 43 72 42 72 68 68 72 88 68 88 84 84 88 93 93 88 94 93 94 91 93 91 89 89 91 76 89 76 73 73 76 54 73 54 48 48 54 19 48 19 24 24 19 6 24 6 8 8 6 0 8 0 3 3 0 4 3 4 7 7 4 18 7 18 23 23 18 44 23 44 43 43 44 74 43 74 72 72 74 90 72 90 88 88 90 94 96 87 95 1 2 10 1 10 9 9 10 14 9 14 15 15 14 21 15 21 20 20 21 32 20 32 31 31 32 39 31 39 38 38 39 44 38 44 54 54 44 58 54 58 57 57 58 65 57 65 64 64 65 77 64 77 75 75 77 81 75 81 82 82 81 86 82 86 87 87 86 95 94 90 93 94 93 89 94 89 91 91 89 73 91 73 76 76 73 48 76 48 54 54 48 24 54 24 19 19 24 8 19 8 6 6 8 3 6 3 0 0 3 7 0 7 4 4 7 23 4 23 18 18 23 43 18 43 44 44 43 72 44 72 74 74 72 88 74 88 90 90 88 93 93 88 92 93 92 85 93 85 89 89 85 70 89 70 73 73 70 53 73 53 48 48 53 28 48 28 24 24 28 12 24 12 8 8 12 5 8 5 3 3 5 11 3 11 7 7 11 25 7 25 23 23 25 42 23 42 43 43 42 68 43 68 72 72 68 84 72 84 88 88 84 92 92 84 83 92 83 80 92 80 85 85 80 67 85 67 70 70 67 51 70 51 53 53 51 30 53 30 28 28 30 17 28 17 12 12 17 13 12 13 5 5 13 16 5 16 11 11 16 29 11 29 25 25 29 45 25 45 42 42 45 66 42 66 68 68 66 79 68 79 84 84 79 83 83 79 78 83 78 71 83 71 80 80 71 62 80 62 67 67 62 49 67 49 51 51 49 35 51 35 30 30 35 27 30 27 17 17 27 22 17 22 13 13 22 26 13 26 16 16 26 34 16 34 29 29 34 46 29 46 45 45 46 61 45 61 66 66 61 69 66 69 79 79 69 78 78 69 63 78 63 60 78 60 71 71 60 56 71 56 62 62 56 52 62 52 49 49 52 41 49 41 35 35 41 37 35 37 27 27 37 33 27 33 22 22 33 36 22 36 26 26 36 40 26 40 34 34 40 47 34 47 46 46 47 55 46 55 61 61 55 59 61 59 69 69 59 63 63 59 50 63 50 60 60 50 56 56 50 52 52 50 41 41 50 37 37 50 33 33 50 36 36 50 40 40 50 47 47 50 55 55 50 59" />
+            </polygons>
+            <parentNodes count="2" indices="23 136" />
+            <childrenNodes count="1" indices="2" />
+        </dMeshNodeInfo>
+        <dMeshNodeInfo>
+            <dGeometryNodeInfo>
+                <dNodeInfo name="hidden_capsule_07_mesh" nodeID="199" editorFlags="0" />
+            </dGeometryNodeInfo>
+            <points controlPointBaseCount="146">
+                <position float4="146" floats="0 0.255652 0 0 1.04373e-08 0.253464 0.0166243 0 -0.00831215 0.253464 0.0143971 0 -0.0143971 0.253464 0.00831216 0 -0.0166243 0.253464 9.71062e-09 0 -0.0143971 0.253464 -0.00831215 0 -0.00831217 0.253464 -0.0143971 0 -1.29475e-08 0.253464 -0.0166243 0 0.00831214 0.253464 -0.0143971 0 0.0143971 0.253464 -0.00831217 0 0.0166243 0.253464 -1.81661e-08 0 0.0143971 0.253464 0.00831214 0 0.00831218 0.253464 0.0143971 0 2.01633e-08 0.247047 0.0321157 0 -0.0160578 0.247047 0.027813 0 -0.027813 0.247047 0.0160579 0 -0.0321157 0.247047 1.87595e-08 0 -0.027813 0.247047 -0.0160578 0 -0.0160579 0.247047 -0.027813 0 -2.50126e-08 0.247047 -0.0321157 0 0.0160578 0.247047 -0.027813 0 0.027813 0.247047 -0.0160579 0 0.0321157 0.247047 -3.50943e-08 0 0.027813 0.247047 0.0160578 0 0.0160579 0.247047 0.027813 0 2.85152e-08 0.236839 0.0454185 0 -0.0227092 0.236839 0.0393336 0 -0.0393335 0.236839 0.0227093 0 -0.0454185 0.236839 2.65299e-08 0 -0.0393336 0.236839 -0.0227092 0 -0.0227093 0.236839 -0.0393335 0 -3.53732e-08 0.236839 -0.0454185 0 0.0227092 0.236839 -0.0393336 0 0.0393335 0.236839 -0.0227093 0 0.0454185 0.236839 -4.96308e-08 0 0.0393336 0.236839 0.0227092 0 0.0227093 0.236839 0.0393335 0 3.49239e-08 0.223537 0.055626 0 -0.027813 0.223537 0.0481736 0 -0.0481735 0.223537 0.027813 0 -0.055626 0.223537 3.24924e-08 0 -0.0481736 0.223537 -0.027813 0 -0.0278131 0.223537 -0.0481735 0 -4.33232e-08 0.223537 -0.055626 0 0.027813 0.223537 -0.0481736 0 0.0481735 0.223537 -0.0278131 0 0.055626 0.223537 -6.07851e-08 0 0.0481736 0.223537 0.027813 0 0.0278131 0.223537 0.0481735 0 3.89525e-08 0.208045 0.0620428 0 -0.0310214 0.208045 0.0537306 0 -0.0537306 0.208045 0.0310214 0 -0.0620428 0.208045 3.62405e-08 0 -0.0537306 0.208045 -0.0310214 0 -0.0310214 0.208045 -0.0537306 0 -4.83207e-08 0.208045 -0.0620428 0 0.0310213 0.208045 -0.0537307 0 0.0537306 0.208045 -0.0310214 0 0.0620428 0.208045 -6.7797e-08 0 0.0537307 0.208045 0.0310213 0 0.0310215 0.208045 0.0537306 0 4.03266e-08 0.191421 0.0642314 0 -0.0321157 0.191421 0.0556261 0 -0.055626 0.191421 0.0321157 0 -0.0642314 0.191421 3.7519e-08 0 -0.0556261 0.191421 -0.0321157 0 -0.0321157 0.191421 -0.055626 0 -5.00253e-08 0.191421 -0.0642314 0 0.0321157 0.191421 -0.0556261 0 0.055626 0.191421 -0.0321158 0 0.0642314 0.191421 -7.01886e-08 0 0.0556261 0.191421 0.0321156 0 0.0321158 0.191421 0.055626 0 4.03266e-08 0.0642314 0.0642314 0 -0.0321157 0.0642314 0.0556261 0 -0.055626 0.0642314 0.0321157 0 -0.0642314 0.0642314 3.7519e-08 0 -0.0556261 0.0642314 -0.0321157 0 -0.0321157 0.0642314 -0.055626 0 -5.00253e-08 0.0642314 -0.0642314 0 0.0321157 0.0642314 -0.0556261 0 0.055626 0.0642314 -0.0321158 0 0.0642314 0.0642314 -7.01886e-08 0 0.0556261 0.0642314 0.0321156 0 0.0321158 0.0642314 0.055626 0 3.89525e-08 0.0476071 0.0620428 0 -0.0310214 0.0476071 0.0537306 0 -0.0537306 0.0476071 0.0310214 0 -0.0620428 0.0476071 3.62405e-08 0 -0.0537306 0.0476071 -0.0310214 0 -0.0310214 0.0476071 -0.0537306 0 -4.83207e-08 0.0476071 -0.0620428 0 0.0310213 0.0476071 -0.0537307 0 0.0537306 0.0476071 -0.0310214 0 0.0620428 0.0476071 -6.7797e-08 0 0.0537307 0.0476071 0.0310213 0 0.0310215 0.0476071 0.0537306 0 3.49239e-08 0.0321157 0.055626 0 -0.027813 0.0321157 0.0481736 0 -0.0481735 0.0321157 0.027813 0 -0.055626 0.0321157 3.24924e-08 0 -0.0481736 0.0321157 -0.027813 0 -0.0278131 0.0321157 -0.0481735 0 -4.33232e-08 0.0321157 -0.055626 0 0.027813 0.0321157 -0.0481736 0 0.0481735 0.0321157 -0.0278131 0 0.055626 0.0321157 -6.07851e-08 0 0.0481736 0.0321157 0.027813 0 0.0278131 0.0321157 0.0481735 0 2.85152e-08 0.018813 0.0454185 0 -0.0227092 0.018813 0.0393336 0 -0.0393335 0.018813 0.0227093 0 -0.0454185 0.018813 2.65299e-08 0 -0.0393336 0.018813 -0.0227092 0 -0.0227093 0.018813 -0.0393335 0 -3.53732e-08 0.018813 -0.0454185 0 0.0227092 0.018813 -0.0393336 0 0.0393335 0.018813 -0.0227093 0 0.0454185 0.018813 -4.96308e-08 0 0.0393336 0.018813 0.0227092 0 0.0227093 0.018813 0.0393335 0 2.01633e-08 0.00860539 0.0321157 0 -0.0160578 0.00860539 0.027813 0 -0.027813 0.00860539 0.0160579 0 -0.0321157 0.00860539 1.87595e-08 0 -0.027813 0.00860539 -0.0160578 0 -0.0160579 0.00860539 -0.027813 0 -2.50126e-08 0.00860539 -0.0321157 0 0.0160578 0.00860539 -0.027813 0 0.027813 0.00860539 -0.0160579 0 0.0321157 0.00860539 -3.50943e-08 0 0.027813 0.00860539 0.0160578 0 0.0160579 0.00860539 0.027813 0 1.04373e-08 0.00218863 0.0166243 0 -0.00831215 0.00218863 0.0143971 0 -0.0143971 0.00218863 0.00831216 0 -0.0166243 0.00218863 9.71062e-09 0 -0.0143971 0.00218863 -0.00831215 0 -0.00831217 0.00218863 -0.0143971 0 -1.29475e-08 0.00218863 -0.0166243 0 0.00831214 0.00218863 -0.0143971 0 0.0143971 0.00218863 -0.00831217 0 0.0166243 0.00218863 -1.81661e-08 0 0.0143971 0.00218863 0.00831214 0 0.00831218 0.00218863 0.0143971 0 0 0 0 0" />
+                <normal float3="146" floats="-0.997904 -0.0647106 5.46947e-07 -0.997904 0.0647107 5.56893e-07 -0.967311 -0.253594 5.87131e-07 -0.967311 0.253594 5.82086e-07 -0.871225 -0.490884 5.04441e-07 -0.871225 0.490884 5.11949e-07 -0.864211 -0.0647106 -0.498951 -0.864211 0.0647106 -0.498952 -0.86421 -0.0647107 0.498953 -0.86421 0.0647107 0.498953 -0.837716 0.253594 -0.483655 -0.837716 -0.253594 -0.483655 -0.837715 -0.253594 0.483656 -0.837715 0.253594 0.483656 -0.754503 -0.490884 -0.435612 -0.754503 0.490884 -0.435612 -0.754503 0.490884 0.435613 -0.754502 -0.490884 0.435613 -0.717601 -0.696455 4.25795e-07 -0.717601 0.696455 3.98583e-07 -0.621461 -0.696455 -0.3588 -0.621461 0.696455 -0.3588 -0.62146 0.696455 0.358801 -0.62146 -0.696455 0.358801 -0.515921 -0.856636 2.83619e-07 -0.515921 0.856636 2.89724e-07 -0.498953 0.0647106 -0.86421 -0.498953 -0.0647106 -0.86421 -0.498951 0.0647106 0.864211 -0.498951 -0.0647106 0.864211 -0.483656 -0.253594 -0.837715 -0.483656 0.253594 -0.837715 -0.483655 0.253594 0.837716 -0.483655 -0.253594 0.837716 -0.4468 -0.856636 -0.25796 -0.4468 0.856636 -0.25796 -0.4468 0.856636 0.257961 -0.4468 -0.856636 0.257961 -0.435613 -0.490884 -0.754502 -0.435613 0.490884 -0.754503 -0.435612 -0.490884 0.754503 -0.435612 0.490884 0.754503 -0.358801 0.696455 -0.62146 -0.358801 -0.696455 -0.62146 -0.3588 0.696455 0.621461 -0.3588 -0.696455 0.621461 -0.278868 -0.960329 1.5095e-07 -0.278868 0.960329 1.56983e-07 -0.257961 -0.856636 -0.4468 -0.257961 0.856636 -0.4468 -0.25796 0.856636 0.4468 -0.25796 -0.856636 0.4468 -0.241507 -0.960329 -0.139434 -0.241507 0.960329 -0.139434 -0.241507 -0.960329 0.139434 -0.241507 0.960329 0.139434 -0.139434 -0.960329 -0.241507 -0.139434 0.960329 -0.241507 -0.139434 -0.960329 0.241507 -0.139434 0.960329 0.241507 -7.35926e-07 -0.0647106 -0.997904 -7.18293e-07 -0.253594 -0.967311 -7.03601e-07 0.0647106 -0.997904 -7.03159e-07 0.253594 -0.967311 -6.47084e-07 0.490884 -0.871225 -6.44581e-07 -0.490884 -0.871225 -5.18563e-07 -0.696455 -0.717601 -5.04957e-07 0.696455 -0.717601 -3.80078e-07 0.856636 -0.515921 -3.62373e-07 -0.856636 -0.515921 -2.20332e-07 -0.960329 -0.278868 -2.17315e-07 0.960329 -0.278868 -2.41465e-09 -1 1.0866e-08 -2.41465e-09 1 1.20733e-08 2.01629e-07 -0.960329 0.278868 2.13695e-07 0.960329 0.278868 3.92288e-07 0.856636 0.515921 3.97172e-07 -0.856636 0.515921 5.64329e-07 -0.696455 0.717601 5.64329e-07 0.696455 0.717601 6.67104e-07 -0.490884 0.871225 6.97134e-07 0.490884 0.871225 7.23338e-07 0.253594 0.967311 7.35926e-07 0.0647106 0.997904 7.38472e-07 -0.253594 0.967311 7.45872e-07 -0.0647106 0.997904 0.139434 -0.960329 -0.241507 0.139434 0.960329 -0.241507 0.139434 0.960329 0.241507 0.139434 -0.960329 0.241507 0.241507 -0.960329 -0.139434 0.241507 0.960329 -0.139434 0.241507 0.960329 0.139434 0.241507 -0.960329 0.139434 0.25796 -0.856636 -0.446801 0.25796 0.856636 -0.446801 0.257961 -0.856636 0.4468 0.257961 0.856636 0.4468 0.278868 0.960329 -3.17466e-07 0.278868 -0.960329 -3.25309e-07 0.3588 0.696455 -0.621461 0.3588 -0.696455 -0.621461 0.358801 -0.696455 0.62146 0.358801 0.696455 0.62146 0.435612 0.490884 -0.754503 0.435612 -0.490884 -0.754503 0.435613 0.490884 0.754502 0.435613 -0.490884 0.754502 0.4468 -0.856636 -0.257961 0.4468 0.856636 -0.257961 0.446801 0.856636 0.25796 0.446801 -0.856636 0.25796 0.483655 -0.253594 -0.837716 0.483655 0.253594 -0.837716 0.483656 0.253594 0.837715 0.483656 -0.253594 0.837715 0.498951 -0.0647106 -0.864211 0.498951 0.0647106 -0.864211 0.498953 0.0647106 0.86421 0.498953 -0.0647106 0.86421 0.515921 -0.856636 -5.62007e-07 0.515921 0.856636 -5.82764e-07 0.62146 0.696455 -0.358801 0.62146 -0.696455 -0.358801 0.621461 0.696455 0.3588 0.621461 -0.696455 0.3588 0.717601 -0.696455 -7.82025e-07 0.717601 0.696455 -7.96868e-07 0.754502 0.490884 -0.435613 0.754502 -0.490884 -0.435613 0.754503 0.490884 0.435611 0.754503 -0.490884 0.435611 0.837715 -0.253594 -0.483656 0.837715 0.253594 -0.483656 0.837716 -0.253594 0.483654 0.837716 0.253594 0.483654 0.86421 -0.0647106 -0.498953 0.86421 0.0647106 -0.498953 0.864211 -0.0647106 0.498951 0.864211 0.0647106 0.498951 0.871225 -0.490884 -9.52389e-07 0.871225 0.490884 -9.62399e-07 0.967311 0.253594 -1.08151e-06 0.967311 -0.253594 -1.08908e-06 0.997904 -0.0647106 -1.12383e-06 0.997904 0.0647106 -1.09524e-06" />
+                <uv0 float2="97" floats="0 0.5 0 1 0 0 0.0170371 0.5 0.0669873 0.25 0.0669873 0.5 0.0669873 0.75 0.0817418 0.258519 0.0817418 0.741481 0.0833333 1 0.0833333 0 0.125 0.283494 0.125 0.716506 0.146447 0.5 0.166667 0 0.166667 1 0.193814 0.323223 0.193814 0.676777 0.25 0.0669874 0.25 0.933013 0.25 1 0.25 0 0.25 0.5 0.258518 0.0817419 0.258519 0.918258 0.283494 0.125 0.283494 0.375 0.283494 0.625 0.283494 0.875 0.323223 0.193814 0.323223 0.806186 0.333333 1 0.333333 0 0.37059 0.5 0.375 0.283494 0.375 0.716506 0.387928 0.435295 0.387928 0.564705 0.416667 1 0.416667 0 0.435295 0.387928 0.435295 0.612072 0.5 0.0170371 0.5 0 0.5 0.0669873 0.5 0.146447 0.5 0.25 0.5 0.37059 0.5 0.982963 0.5 0.75 0.5 0.5 0.5 0.853553 0.5 0.629409 0.5 0.933013 0.5 1 0.564705 0.387928 0.564705 0.612072 0.583333 1 0.583333 0 0.612072 0.435295 0.612072 0.564705 0.625 0.283494 0.625 0.716506 0.629409 0.5 0.666667 1 0.666667 0 0.676777 0.193814 0.676777 0.806186 0.716506 0.125 0.716506 0.375 0.716506 0.875 0.716506 0.625 0.741481 0.0817417 0.741481 0.918258 0.75 0.0669872 0.75 0.933013 0.75 0.5 0.75 1 0.75 0 0.806186 0.323223 0.806186 0.676777 0.833333 0 0.833333 1 0.853553 0.5 0.875 0.283493 0.875 0.716506 0.916667 0 0.916667 1 0.918258 0.258518 0.918258 0.741481 0.933013 0.25 0.933013 0.75 0.933013 0.5 0.982963 0.5 1 0.5 1 0 1 1" />
+            </points>
+            <polygons count="288" faceIndexCount="3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3">
+                <faceMaterial index="-1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1" />
+                <position index="0 1 12 0 2 1 0 3 2 0 4 3 0 5 4 0 6 5 0 7 6 0 8 7 0 9 8 0 10 9 0 11 10 0 12 11 1 2 14 1 13 12 1 14 13 2 3 15 2 15 14 3 4 16 3 16 15 4 5 17 4 17 16 5 6 18 5 18 17 6 7 19 6 19 18 7 8 20 7 20 19 8 9 21 8 21 20 9 10 22 9 22 21 10 11 23 10 23 22 11 12 24 11 24 23 12 13 24 13 14 26 13 25 24 13 26 25 14 15 27 14 27 26 15 16 28 15 28 27 16 17 29 16 29 28 17 18 30 17 30 29 18 19 31 18 31 30 19 20 32 19 32 31 20 21 33 20 33 32 21 22 34 21 34 33 22 23 35 22 35 34 23 24 36 23 36 35 24 25 36 25 26 38 25 37 36 25 38 37 26 27 39 26 39 38 27 28 40 27 40 39 28 29 41 28 41 40 29 30 42 29 42 41 30 31 43 30 43 42 31 32 44 31 44 43 32 33 45 32 45 44 33 34 46 33 46 45 34 35 47 34 47 46 35 36 48 35 48 47 36 37 48 37 38 50 37 49 48 37 50 49 38 39 51 38 51 50 39 40 52 39 52 51 40 41 53 40 53 52 41 42 54 41 54 53 42 43 55 42 55 54 43 44 56 43 56 55 44 45 57 44 57 56 45 46 58 45 58 57 46 47 59 46 59 58 47 48 60 47 60 59 48 49 60 49 50 62 49 61 60 49 62 61 50 51 63 50 63 62 51 52 64 51 64 63 52 53 65 52 65 64 53 54 66 53 66 65 54 55 67 54 67 66 55 56 68 55 68 67 56 57 69 56 69 68 57 58 70 57 70 69 58 59 71 58 71 70 59 60 72 59 72 71 60 61 72 61 62 74 61 73 72 61 74 73 62 63 75 62 75 74 63 64 76 63 76 75 64 65 77 64 77 76 65 66 78 65 78 77 66 67 79 66 79 78 67 68 80 67 80 79 68 69 81 68 81 80 69 70 82 69 82 81 70 71 83 70 83 82 71 72 84 71 84 83 72 73 84 73 74 86 73 85 84 73 86 85 74 75 87 74 87 86 75 76 88 75 88 87 76 77 89 76 89 88 77 78 90 77 90 89 78 79 91 78 91 90 79 80 92 79 92 91 80 81 93 80 93 92 81 82 94 81 94 93 82 83 95 82 95 94 83 84 96 83 96 95 84 85 96 85 86 98 85 97 96 85 98 97 86 87 99 86 99 98 87 88 100 87 100 99 88 89 101 88 101 100 89 90 102 89 102 101 90 91 103 90 103 102 91 92 104 91 104 103 92 93 105 92 105 104 93 94 106 93 106 105 94 95 107 94 107 106 95 96 108 95 108 107 96 97 108 97 98 110 97 109 108 97 110 109 98 99 111 98 111 110 99 100 112 99 112 111 100 101 113 100 113 112 101 102 114 101 114 113 102 103 115 102 115 114 103 104 116 103 116 115 104 105 117 104 117 116 105 106 118 105 118 117 106 107 119 106 119 118 107 108 120 107 120 119 108 109 120 109 110 122 109 121 120 109 122 121 110 111 123 110 123 122 111 112 124 111 124 123 112 113 125 112 125 124 113 114 126 113 126 125 114 115 127 114 127 126 115 116 128 115 128 127 116 117 129 116 129 128 117 118 130 117 130 129 118 119 131 118 131 130 119 120 132 119 132 131 120 121 132 121 122 134 121 133 132 121 134 133 122 123 135 122 135 134 123 124 136 123 136 135 124 125 137 124 137 136 125 126 138 125 138 137 126 127 139 126 139 138 127 128 140 127 140 139 128 129 141 128 141 140 129 130 142 129 142 141 130 131 143 130 143 142 131 132 144 131 144 143 132 133 144 133 134 145 133 145 144 134 135 145 135 136 145 136 137 145 137 138 145 138 139 145 139 140 145 140 141 145 141 142 145 142 143 145 143 144 145" />
+                <normal index="73 75 88 73 59 75 73 55 59 73 47 55 73 53 47 73 57 53 73 71 57 73 87 71 73 91 87 73 98 91 73 92 98 73 88 92 75 59 50 75 76 88 75 50 76 59 55 36 59 36 50 55 47 25 55 25 36 47 53 35 47 35 25 53 57 49 53 49 35 57 71 68 57 68 49 71 87 95 71 95 68 87 91 109 87 109 95 91 98 121 91 121 109 98 92 110 98 110 121 92 88 97 92 97 110 88 76 97 76 50 44 76 79 97 76 44 79 50 36 22 50 22 44 36 25 19 36 19 22 25 35 21 25 21 19 35 49 42 35 42 21 49 68 67 49 67 42 68 95 100 68 100 67 95 109 122 95 122 100 109 121 127 109 127 122 121 110 124 121 124 127 110 97 103 110 103 124 97 79 103 79 44 41 79 81 103 79 41 81 44 22 16 44 16 41 22 19 5 22 5 16 19 21 15 19 15 5 21 42 39 21 39 15 42 67 64 42 64 39 67 100 104 67 104 64 100 122 128 100 128 104 122 127 141 122 141 128 127 124 130 127 130 141 124 103 106 124 106 130 103 81 106 81 41 32 81 82 106 81 32 82 41 16 13 41 13 32 16 5 3 16 3 13 5 15 10 5 10 3 15 39 31 15 31 10 39 64 63 39 63 31 64 104 113 64 113 63 104 128 133 104 133 113 128 141 142 128 142 133 141 130 135 141 135 142 130 106 114 130 114 135 106 82 114 82 32 28 82 83 114 82 28 83 32 13 9 32 9 28 13 3 1 13 1 9 3 10 7 3 7 1 10 31 26 10 26 7 31 63 62 31 62 26 63 113 117 63 117 62 113 133 137 113 137 117 133 142 145 133 145 137 142 135 139 142 139 145 135 114 118 135 118 139 114 83 118 83 28 29 83 85 118 83 29 85 28 9 8 28 8 29 9 1 0 9 0 8 1 7 6 1 6 0 7 26 27 7 27 6 26 62 60 26 60 27 62 117 116 62 116 60 117 137 136 117 136 116 137 145 144 137 144 136 145 139 138 145 138 144 139 118 119 139 119 138 118 85 119 85 29 33 85 84 119 85 33 84 29 8 12 29 12 33 8 0 2 8 2 12 0 6 11 0 11 2 6 27 30 6 30 11 27 60 61 27 61 30 60 116 112 60 112 61 116 136 132 116 132 112 136 144 143 136 143 132 144 138 134 144 134 143 138 119 115 138 115 134 119 84 115 84 33 40 84 80 115 84 40 80 33 12 17 33 17 40 12 2 4 12 4 17 2 11 14 2 14 4 11 30 38 11 38 14 30 61 65 30 65 38 61 112 105 61 105 65 112 132 129 112 129 105 132 143 140 132 140 129 143 134 131 143 131 140 134 115 107 134 107 131 115 80 107 80 40 45 80 78 107 80 45 78 40 17 23 40 23 45 17 4 18 17 18 23 4 14 20 4 20 18 14 38 43 14 43 20 38 65 66 38 66 43 65 105 101 65 101 66 105 129 123 105 123 101 129 140 126 129 126 123 140 131 125 140 125 126 131 107 102 131 102 125 107 78 102 78 45 51 78 77 102 78 51 77 45 23 37 45 37 51 23 18 24 23 24 37 18 20 34 18 34 24 20 43 48 20 48 34 43 66 69 43 69 48 66 101 94 66 94 69 101 123 108 101 108 94 123 126 120 123 120 108 126 125 111 126 111 120 125 102 96 125 96 111 102 77 96 77 51 58 77 74 96 77 58 74 51 37 54 51 54 58 37 24 46 37 46 54 24 34 52 24 52 46 34 48 56 34 56 52 48 69 70 48 70 56 69 94 86 69 86 70 94 108 90 94 90 86 108 120 99 108 99 90 120 111 93 120 93 99 111 96 89 111 89 93 96 74 89 74 58 72 74 72 89 58 54 72 54 46 72 46 52 72 52 56 72 56 70 72 70 86 72 86 90 72 90 99 72 99 93 72 93 89 72" />
+                <uv0 index="50 63 59 50 60 63 50 56 60 50 52 56 50 41 52 50 37 41 50 33 37 50 36 33 50 40 36 50 47 40 50 55 47 50 59 55 63 60 71 63 76 59 63 71 76 60 56 62 60 62 71 56 52 49 56 49 62 52 41 35 52 35 49 41 37 27 41 27 35 37 33 22 37 22 27 33 36 26 33 26 22 36 40 34 36 34 26 40 47 46 40 46 34 47 55 61 47 61 46 55 59 69 55 69 61 59 76 69 76 71 80 76 83 69 76 80 83 71 62 67 71 67 80 62 49 51 62 51 67 49 35 30 49 30 51 35 27 17 35 17 30 27 22 13 27 13 17 22 26 16 22 16 13 26 34 29 26 29 16 34 46 45 34 45 29 46 61 66 46 66 45 61 69 79 61 79 66 69 83 79 83 80 85 83 92 79 83 85 92 80 67 70 80 70 85 67 51 53 67 53 70 51 30 28 51 28 53 30 17 12 30 12 28 17 13 5 17 5 12 13 16 11 13 11 5 16 29 25 16 25 11 29 45 44 29 44 25 45 66 68 45 68 44 66 79 84 66 84 68 79 92 84 92 85 89 92 93 84 92 89 93 85 70 73 85 73 89 70 53 48 70 48 73 53 28 24 53 24 48 28 12 8 28 8 24 12 5 3 12 3 8 5 11 7 5 7 3 11 25 23 11 23 7 25 44 42 25 42 23 44 68 72 44 72 42 68 84 88 68 88 72 84 93 88 93 89 91 93 94 88 93 91 94 89 73 75 89 75 91 73 48 54 73 54 75 48 24 19 48 19 54 24 8 6 24 6 19 8 3 0 8 0 6 3 7 4 3 4 0 7 23 18 7 18 4 23 42 43 23 43 18 42 72 74 42 74 43 72 88 90 72 90 74 88 94 90 1 9 10 96 95 87 1 10 2 9 15 14 9 14 10 15 20 21 15 21 14 20 31 32 20 32 21 31 38 39 31 39 32 38 54 43 38 43 39 54 57 58 54 58 43 57 64 65 57 65 58 64 77 78 64 78 65 77 82 81 77 81 78 82 87 86 82 86 81 87 95 86 94 91 89 94 93 90 94 89 93 91 75 73 91 73 89 75 54 48 75 48 73 54 19 24 54 24 48 19 6 8 19 8 24 6 0 3 6 3 8 0 4 7 0 7 3 4 18 23 4 23 7 18 43 42 18 42 23 43 74 72 43 72 42 74 90 88 74 88 72 90 93 88 93 89 85 93 92 88 93 85 92 89 73 70 89 70 85 73 48 53 73 53 70 48 24 28 48 28 53 24 8 12 24 12 28 8 3 5 8 5 12 3 7 11 3 11 5 7 23 25 7 25 11 23 42 44 23 44 25 42 72 68 42 68 44 72 88 84 72 84 68 88 92 84 92 85 80 92 83 84 92 80 83 85 70 67 85 67 80 70 53 51 70 51 67 53 28 30 53 30 51 28 12 17 28 17 30 12 5 13 12 13 17 5 11 16 5 16 13 11 25 29 11 29 16 25 44 45 25 45 29 44 68 66 44 66 45 68 84 79 68 79 66 84 83 79 83 80 71 83 76 79 83 71 76 80 67 62 80 62 71 67 51 49 67 49 62 51 30 35 51 35 49 30 17 27 30 27 35 17 13 22 17 22 27 13 16 26 13 26 22 16 29 34 16 34 26 29 45 46 29 46 34 45 66 61 45 61 46 66 79 69 66 69 61 79 76 69 76 71 60 76 63 69 76 60 63 71 62 56 71 56 60 62 49 52 62 52 56 49 35 41 49 41 52 35 27 37 35 37 41 27 22 33 27 33 37 22 26 36 22 36 33 26 34 40 26 40 36 34 46 47 34 47 40 46 61 55 46 55 47 61 69 59 61 59 55 69 63 59 63 60 50 63 50 59 60 56 50 56 52 50 52 41 50 41 37 50 37 33 50 33 36 50 36 40 50 40 47 50 47 55 50 55 59 50" />
+            </polygons>
+            <parentNodes count="2" indices="30 136" />
+            <childrenNodes count="1" indices="2" />
+        </dMeshNodeInfo>
+        <dMeshNodeInfo>
+            <dGeometryNodeInfo>
+                <dNodeInfo name="hidden_capsule_11_mesh" nodeID="200" editorFlags="0" />
             </dGeometryNodeInfo>
             <points controlPointBaseCount="146">
                 <position float4="146" floats="0 0.351886 0 0 1.86304e-08 0.347979 -0.0296742 0 -0.0148371 0.347979 -0.0256986 0 -0.0256986 0.347979 -0.0148371 0 -0.0296742 0.347979 -1.73333e-08 0 -0.0256986 0.347979 0.0148371 0 -0.0148371 0.347979 0.0256986 0 -2.31111e-08 0.347979 0.0296742 0 0.0148371 0.347979 0.0256986 0 0.0256986 0.347979 0.0148371 0 0.0296742 0.347979 3.24263e-08 0 0.0256986 0.347979 -0.0148371 0 0.0148371 0.347979 -0.0256986 0 3.59912e-08 0.336525 -0.0573261 0 -0.028663 0.336525 -0.0496459 0 -0.0496459 0.336525 -0.0286631 0 -0.0573261 0.336525 -3.34854e-08 0 -0.0496459 0.336525 0.028663 0 -0.0286631 0.336525 0.0496459 0 -4.46472e-08 0.336525 0.0573261 0 0.028663 0.336525 0.0496459 0 0.0496459 0.336525 0.0286631 0 0.0573261 0.336525 6.26429e-08 0 0.0496459 0.336525 -0.028663 0 0.0286631 0.336525 -0.0496459 0 5.08993e-08 0.318305 -0.0810714 0 -0.0405357 0.318305 -0.0702099 0 -0.0702099 0.318305 -0.0405357 0 -0.0810714 0.318305 -4.73556e-08 0 -0.0702099 0.318305 0.0405357 0 -0.0405357 0.318305 0.0702099 0 -6.31407e-08 0.318305 0.0810714 0 0.0405356 0.318305 0.0702099 0 0.0702098 0.318305 0.0405358 0 0.0810714 0.318305 8.85904e-08 0 0.0702099 0.318305 -0.0405356 0 0.0405358 0.318305 -0.0702098 0 6.23386e-08 0.294559 -0.0992918 0 -0.0496458 0.294559 -0.0859892 0 -0.0859892 0.294559 -0.0496459 0 -0.0992918 0.294559 -5.79985e-08 0 -0.0859892 0.294559 0.0496458 0 -0.0496459 0.294559 0.0859892 0 -7.73313e-08 0.294559 0.0992918 0 0.0496458 0.294559 0.0859892 0 0.0859891 0.294559 0.049646 0 0.0992918 0.294559 1.08501e-07 0 0.0859893 0.294559 -0.0496458 0 0.049646 0.294559 -0.0859891 0 6.95297e-08 0.266907 -0.110746 0 -0.0553727 0.266907 -0.0959085 0 -0.0959085 0.266907 -0.0553728 0 -0.110746 0.266907 -6.46889e-08 0 -0.0959085 0.266907 0.0553727 0 -0.0553729 0.266907 0.0959085 0 -8.62519e-08 0.266907 0.110746 0 0.0553727 0.266907 0.0959085 0 0.0959084 0.266907 0.0553729 0 0.110746 0.266907 1.21017e-07 0 0.0959086 0.266907 -0.0553727 0 0.0553729 0.266907 -0.0959084 0 7.19825e-08 0.237233 -0.114652 0 -0.0573261 0.237233 -0.0992918 0 -0.0992917 0.237233 -0.0573262 0 -0.114652 0.237233 -6.69709e-08 0 -0.0992918 0.237233 0.0573261 0 -0.0573262 0.237233 0.0992917 0 -8.92945e-08 0.237233 0.114652 0 0.057326 0.237233 0.0992918 0 0.0992917 0.237233 0.0573262 0 0.114652 0.237233 1.25286e-07 0 0.0992918 0.237233 -0.057326 0 0.0573263 0.237233 -0.0992917 0 7.19825e-08 0.114652 -0.114652 0 -0.0573261 0.114652 -0.0992918 0 -0.0992917 0.114652 -0.0573262 0 -0.114652 0.114652 -6.69709e-08 0 -0.0992918 0.114652 0.0573261 0 -0.0573262 0.114652 0.0992917 0 -8.92945e-08 0.114652 0.114652 0 0.057326 0.114652 0.0992918 0 0.0992917 0.114652 0.0573262 0 0.114652 0.114652 1.25286e-07 0 0.0992918 0.114652 -0.057326 0 0.0573263 0.114652 -0.0992917 0 6.95297e-08 0.0849781 -0.110746 0 -0.0553727 0.0849781 -0.0959085 0 -0.0959085 0.0849781 -0.0553728 0 -0.110746 0.0849781 -6.46889e-08 0 -0.0959085 0.0849781 0.0553727 0 -0.0553729 0.0849781 0.0959085 0 -8.62519e-08 0.0849781 0.110746 0 0.0553727 0.0849781 0.0959085 0 0.0959084 0.0849781 0.0553729 0 0.110746 0.0849781 1.21017e-07 0 0.0959086 0.0849781 -0.0553727 0 0.0553729 0.0849781 -0.0959084 0 6.23386e-08 0.0573261 -0.0992918 0 -0.0496458 0.0573261 -0.0859892 0 -0.0859892 0.0573261 -0.0496459 0 -0.0992918 0.0573261 -5.79985e-08 0 -0.0859892 0.0573261 0.0496458 0 -0.0496459 0.0573261 0.0859892 0 -7.73313e-08 0.0573261 0.0992918 0 0.0496458 0.0573261 0.0859892 0 0.0859891 0.0573261 0.049646 0 0.0992918 0.0573261 1.08501e-07 0 0.0859893 0.0573261 -0.0496458 0 0.049646 0.0573261 -0.0859891 0 5.08993e-08 0.0335809 -0.0810714 0 -0.0405357 0.0335809 -0.0702099 0 -0.0702099 0.0335809 -0.0405357 0 -0.0810714 0.0335809 -4.73556e-08 0 -0.0702099 0.0335809 0.0405357 0 -0.0405357 0.0335809 0.0702099 0 -6.31407e-08 0.0335809 0.0810714 0 0.0405356 0.0335809 0.0702099 0 0.0702098 0.0335809 0.0405358 0 0.0810714 0.0335809 8.85904e-08 0 0.0702099 0.0335809 -0.0405356 0 0.0405358 0.0335809 -0.0702098 0 3.59912e-08 0.0153605 -0.0573261 0 -0.028663 0.0153605 -0.0496459 0 -0.0496459 0.0153605 -0.0286631 0 -0.0573261 0.0153605 -3.34854e-08 0 -0.0496459 0.0153605 0.028663 0 -0.0286631 0.0153605 0.0496459 0 -4.46472e-08 0.0153605 0.0573261 0 0.028663 0.0153605 0.0496459 0 0.0496459 0.0153605 0.0286631 0 0.0573261 0.0153605 6.26429e-08 0 0.0496459 0.0153605 -0.028663 0 0.0286631 0.0153605 -0.0496459 0 1.86304e-08 0.00390669 -0.0296742 0 -0.0148371 0.00390669 -0.0256986 0 -0.0256986 0.00390669 -0.0148371 0 -0.0296742 0.00390669 -1.73333e-08 0 -0.0256986 0.00390669 0.0148371 0 -0.0148371 0.00390669 0.0256986 0 -2.31111e-08 0.00390669 0.0296742 0 0.0148371 0.00390669 0.0256986 0 0.0256986 0.00390669 0.0148371 0 0.0296742 0.00390669 3.24263e-08 0 0.0256986 0.00390669 -0.0148371 0 0.0148371 0.00390669 -0.0256986 0 0 0 0 0" />
@@ -1451,7 +1469,7 @@
         </dMeshNodeInfo>
         <dMeshNodeInfo>
             <dGeometryNodeInfo>
-                <dNodeInfo name="hidden_capsule_05_mesh" nodeID="200" editorFlags="0" />
+                <dNodeInfo name="hidden_capsule_05_mesh" nodeID="201" editorFlags="0" />
             </dGeometryNodeInfo>
             <points controlPointBaseCount="146">
                 <position float4="146" floats="0 0.351886 0 0 1.86304e-08 0.347979 -0.0296742 0 -0.0148371 0.347979 -0.0256986 0 -0.0256986 0.347979 -0.0148371 0 -0.0296742 0.347979 -1.73333e-08 0 -0.0256986 0.347979 0.0148371 0 -0.0148371 0.347979 0.0256986 0 -2.31111e-08 0.347979 0.0296742 0 0.0148371 0.347979 0.0256986 0 0.0256986 0.347979 0.0148371 0 0.0296742 0.347979 3.24263e-08 0 0.0256986 0.347979 -0.0148371 0 0.0148371 0.347979 -0.0256986 0 3.59912e-08 0.336525 -0.0573261 0 -0.028663 0.336525 -0.0496459 0 -0.0496459 0.336525 -0.0286631 0 -0.0573261 0.336525 -3.34854e-08 0 -0.0496459 0.336525 0.028663 0 -0.0286631 0.336525 0.0496459 0 -4.46472e-08 0.336525 0.0573261 0 0.028663 0.336525 0.0496459 0 0.0496459 0.336525 0.0286631 0 0.0573261 0.336525 6.26429e-08 0 0.0496459 0.336525 -0.028663 0 0.0286631 0.336525 -0.0496459 0 5.08993e-08 0.318305 -0.0810714 0 -0.0405357 0.318305 -0.0702099 0 -0.0702099 0.318305 -0.0405357 0 -0.0810714 0.318305 -4.73556e-08 0 -0.0702099 0.318305 0.0405357 0 -0.0405357 0.318305 0.0702099 0 -6.31407e-08 0.318305 0.0810714 0 0.0405356 0.318305 0.0702099 0 0.0702098 0.318305 0.0405358 0 0.0810714 0.318305 8.85904e-08 0 0.0702099 0.318305 -0.0405356 0 0.0405358 0.318305 -0.0702098 0 6.23386e-08 0.294559 -0.0992918 0 -0.0496458 0.294559 -0.0859892 0 -0.0859892 0.294559 -0.0496459 0 -0.0992918 0.294559 -5.79985e-08 0 -0.0859892 0.294559 0.0496458 0 -0.0496459 0.294559 0.0859892 0 -7.73313e-08 0.294559 0.0992918 0 0.0496458 0.294559 0.0859892 0 0.0859891 0.294559 0.049646 0 0.0992918 0.294559 1.08501e-07 0 0.0859893 0.294559 -0.0496458 0 0.049646 0.294559 -0.0859891 0 6.95297e-08 0.266907 -0.110746 0 -0.0553727 0.266907 -0.0959085 0 -0.0959085 0.266907 -0.0553728 0 -0.110746 0.266907 -6.46889e-08 0 -0.0959085 0.266907 0.0553727 0 -0.0553729 0.266907 0.0959085 0 -8.62519e-08 0.266907 0.110746 0 0.0553727 0.266907 0.0959085 0 0.0959084 0.266907 0.0553729 0 0.110746 0.266907 1.21017e-07 0 0.0959086 0.266907 -0.0553727 0 0.0553729 0.266907 -0.0959084 0 7.19825e-08 0.237233 -0.114652 0 -0.0573261 0.237233 -0.0992918 0 -0.0992917 0.237233 -0.0573262 0 -0.114652 0.237233 -6.69709e-08 0 -0.0992918 0.237233 0.0573261 0 -0.0573262 0.237233 0.0992917 0 -8.92945e-08 0.237233 0.114652 0 0.057326 0.237233 0.0992918 0 0.0992917 0.237233 0.0573262 0 0.114652 0.237233 1.25286e-07 0 0.0992918 0.237233 -0.057326 0 0.0573263 0.237233 -0.0992917 0 7.19825e-08 0.114652 -0.114652 0 -0.0573261 0.114652 -0.0992918 0 -0.0992917 0.114652 -0.0573262 0 -0.114652 0.114652 -6.69709e-08 0 -0.0992918 0.114652 0.0573261 0 -0.0573262 0.114652 0.0992917 0 -8.92945e-08 0.114652 0.114652 0 0.057326 0.114652 0.0992918 0 0.0992917 0.114652 0.0573262 0 0.114652 0.114652 1.25286e-07 0 0.0992918 0.114652 -0.057326 0 0.0573263 0.114652 -0.0992917 0 6.95297e-08 0.0849781 -0.110746 0 -0.0553727 0.0849781 -0.0959085 0 -0.0959085 0.0849781 -0.0553728 0 -0.110746 0.0849781 -6.46889e-08 0 -0.0959085 0.0849781 0.0553727 0 -0.0553729 0.0849781 0.0959085 0 -8.62519e-08 0.0849781 0.110746 0 0.0553727 0.0849781 0.0959085 0 0.0959084 0.0849781 0.0553729 0 0.110746 0.0849781 1.21017e-07 0 0.0959086 0.0849781 -0.0553727 0 0.0553729 0.0849781 -0.0959084 0 6.23386e-08 0.0573261 -0.0992918 0 -0.0496458 0.0573261 -0.0859892 0 -0.0859892 0.0573261 -0.0496459 0 -0.0992918 0.0573261 -5.79985e-08 0 -0.0859892 0.0573261 0.0496458 0 -0.0496459 0.0573261 0.0859892 0 -7.73313e-08 0.0573261 0.0992918 0 0.0496458 0.0573261 0.0859892 0 0.0859891 0.0573261 0.049646 0 0.0992918 0.0573261 1.08501e-07 0 0.0859893 0.0573261 -0.0496458 0 0.049646 0.0573261 -0.0859891 0 5.08993e-08 0.0335809 -0.0810714 0 -0.0405357 0.0335809 -0.0702099 0 -0.0702099 0.0335809 -0.0405357 0 -0.0810714 0.0335809 -4.73556e-08 0 -0.0702099 0.0335809 0.0405357 0 -0.0405357 0.0335809 0.0702099 0 -6.31407e-08 0.0335809 0.0810714 0 0.0405356 0.0335809 0.0702099 0 0.0702098 0.0335809 0.0405358 0 0.0810714 0.0335809 8.85904e-08 0 0.0702099 0.0335809 -0.0405356 0 0.0405358 0.0335809 -0.0702098 0 3.59912e-08 0.0153605 -0.0573261 0 -0.028663 0.0153605 -0.0496459 0 -0.0496459 0.0153605 -0.0286631 0 -0.0573261 0.0153605 -3.34854e-08 0 -0.0496459 0.0153605 0.028663 0 -0.0286631 0.0153605 0.0496459 0 -4.46472e-08 0.0153605 0.0573261 0 0.028663 0.0153605 0.0496459 0 0.0496459 0.0153605 0.0286631 0 0.0573261 0.0153605 6.26429e-08 0 0.0496459 0.0153605 -0.028663 0 0.0286631 0.0153605 -0.0496459 0 1.86304e-08 0.00390669 -0.0296742 0 -0.0148371 0.00390669 -0.0256986 0 -0.0256986 0.00390669 -0.0148371 0 -0.0296742 0.00390669 -1.73333e-08 0 -0.0256986 0.00390669 0.0148371 0 -0.0148371 0.00390669 0.0256986 0 -2.31111e-08 0.00390669 0.0296742 0 0.0148371 0.00390669 0.0256986 0 0.0256986 0.00390669 0.0148371 0 0.0296742 0.00390669 3.24263e-08 0 0.0256986 0.00390669 -0.0148371 0 0.0148371 0.00390669 -0.0256986 0 0 0 0 0" />
@@ -1465,24 +1483,6 @@
                 <uv0 index="50 63 60 50 60 56 50 56 52 50 52 41 50 41 37 50 37 33 50 33 36 50 36 40 50 40 47 50 47 55 50 55 59 50 59 63 63 59 78 63 78 71 63 71 60 60 71 62 60 62 56 56 62 49 56 49 52 52 49 35 52 35 41 41 35 27 41 27 37 37 27 22 37 22 33 33 22 26 33 26 36 36 26 34 36 34 40 40 34 46 40 46 47 47 46 61 47 61 55 55 61 69 55 69 59 59 69 78 78 69 83 78 83 80 78 80 71 71 80 67 71 67 62 62 67 51 62 51 49 49 51 30 49 30 35 35 30 17 35 17 27 27 17 13 27 13 22 22 13 16 22 16 26 26 16 29 26 29 34 34 29 45 34 45 46 46 45 66 46 66 61 61 66 79 61 79 69 69 79 83 83 79 92 83 92 85 83 85 80 80 85 70 80 70 67 67 70 53 67 53 51 51 53 28 51 28 30 30 28 12 30 12 17 17 12 5 17 5 13 13 5 11 13 11 16 16 11 25 16 25 29 29 25 42 29 42 45 45 42 68 45 68 66 66 68 84 66 84 79 79 84 92 92 84 93 92 93 89 92 89 85 85 89 73 85 73 70 70 73 48 70 48 53 53 48 24 53 24 28 28 24 8 28 8 12 12 8 3 12 3 5 5 3 7 5 7 11 11 7 23 11 23 25 25 23 43 25 43 42 42 43 72 42 72 68 68 72 88 68 88 84 84 88 93 93 88 94 93 94 91 93 91 89 89 91 76 89 76 73 73 76 54 73 54 48 48 54 19 48 19 24 24 19 6 24 6 8 8 6 0 8 0 3 3 0 4 3 4 7 7 4 18 7 18 23 23 18 44 23 44 43 43 44 74 43 74 72 72 74 90 72 90 88 88 90 94 96 87 95 1 2 10 1 10 9 9 10 14 9 14 15 15 14 21 15 21 20 20 21 32 20 32 31 31 32 39 31 39 38 38 39 44 38 44 54 54 44 58 54 58 57 57 58 65 57 65 64 64 65 77 64 77 75 75 77 81 75 81 82 82 81 86 82 86 87 87 86 95 94 90 93 94 93 89 94 89 91 91 89 73 91 73 76 76 73 48 76 48 54 54 48 24 54 24 19 19 24 8 19 8 6 6 8 3 6 3 0 0 3 7 0 7 4 4 7 23 4 23 18 18 23 43 18 43 44 44 43 72 44 72 74 74 72 88 74 88 90 90 88 93 93 88 92 93 92 85 93 85 89 89 85 70 89 70 73 73 70 53 73 53 48 48 53 28 48 28 24 24 28 12 24 12 8 8 12 5 8 5 3 3 5 11 3 11 7 7 11 25 7 25 23 23 25 42 23 42 43 43 42 68 43 68 72 72 68 84 72 84 88 88 84 92 92 84 83 92 83 80 92 80 85 85 80 67 85 67 70 70 67 51 70 51 53 53 51 30 53 30 28 28 30 17 28 17 12 12 17 13 12 13 5 5 13 16 5 16 11 11 16 29 11 29 25 25 29 45 25 45 42 42 45 66 42 66 68 68 66 79 68 79 84 84 79 83 83 79 78 83 78 71 83 71 80 80 71 62 80 62 67 67 62 49 67 49 51 51 49 35 51 35 30 30 35 27 30 27 17 17 27 22 17 22 13 13 22 26 13 26 16 16 26 34 16 34 29 29 34 46 29 46 45 45 46 61 45 61 66 66 61 69 66 69 79 79 69 78 78 69 63 78 63 60 78 60 71 71 60 56 71 56 62 62 56 52 62 52 49 49 52 41 49 41 35 35 41 37 35 37 27 27 37 33 27 33 22 22 33 36 22 36 26 26 36 40 26 40 34 34 40 47 34 47 46 46 47 55 46 55 61 61 55 59 61 59 69 69 59 63 63 59 50 63 50 60 60 50 56 56 50 52 52 50 41 41 50 37 37 50 33 33 50 36 36 50 40 40 50 47 47 50 55 55 50 59" />
             </polygons>
             <parentNodes count="2" indices="25 136" />
-            <childrenNodes count="1" indices="2" />
-        </dMeshNodeInfo>
-        <dMeshNodeInfo>
-            <dGeometryNodeInfo>
-                <dNodeInfo name="hidden_box_leftFoot_mesh" nodeID="201" editorFlags="0" />
-            </dGeometryNodeInfo>
-            <points controlPointBaseCount="8">
-                <position float4="8" floats="0.127052 0 0.0609138 0 0.127053 0 -0.0609136 0 -0.127053 0 0.0609136 0 -0.127052 0 -0.0609138 0 0.127052 0.0803685 0.0609138 0 0.127053 0.0803685 -0.0609136 0 -0.127053 0.0803685 0.0609136 0 -0.127052 0.0803685 -0.0609138 0" />
-                <normal float3="6" floats="-1 0 -6.27833e-07 -6.27833e-07 0 1 0 -1 0 0 1 -0 6.27833e-07 0 -1 1 0 6.27833e-07" />
-                <uv0 float2="4" floats="0 0 0 1 1 0 1 1" />
-            </points>
-            <polygons count="6" faceIndexCount="4 4 4 4 4 4">
-                <faceMaterial index="-1 -1 -1 -1 -1 -1" />
-                <position index="0 1 5 4 0 2 3 1 0 4 6 2 1 3 7 5 2 6 7 3 4 5 7 6" />
-                <normal index="5 5 5 5 2 2 2 2 1 1 1 1 4 4 4 4 0 0 0 0 3 3 3 3" />
-                <uv0 index="0 2 3 1 2 3 1 0 2 3 1 0 0 2 3 1 2 3 1 0 0 2 3 1" />
-            </polygons>
-            <parentNodes count="2" indices="19 136" />
             <childrenNodes count="1" indices="2" />
         </dMeshNodeInfo>
         <dMeshNodeInfo>
