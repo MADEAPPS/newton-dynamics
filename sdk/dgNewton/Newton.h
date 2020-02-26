@@ -24,7 +24,7 @@
 
 
 #define NEWTON_MAJOR_VERSION 3 
-#define NEWTON_MINOR_VERSION 15 
+#define NEWTON_MINOR_VERSION 14 
 
 #include <dgTypes.h>
 
