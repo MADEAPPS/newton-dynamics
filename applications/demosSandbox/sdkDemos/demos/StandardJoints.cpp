@@ -152,7 +152,6 @@ class dFlexyPipeSpinner: public dCustomBallAndSocket
 		:dCustomBallAndSocket(pinAndPivotFrame, child, parent)
 	{
 		EnableTwist(false);
-
 		//EnableCone(false);
 		//EnableTwist(true);
 		//SetTwistLimits(0.0f, 0.0f);
@@ -160,7 +159,7 @@ class dFlexyPipeSpinner: public dCustomBallAndSocket
 		EnableCone(true);
 		SetConeLimits(0.0f);
 		SetConeFriction(1.0e20f);
-		SetConeStiffness(0.8f);
+		SetConeStiffness(0.6f);
 	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
@@ -1102,8 +1101,6 @@ static void AddDifferential(DemoEntityManager* const scene, const dVector& origi
 	NewtonBodySetAngularDamping(box3, &damp[0]);
 }
 
-
-
 void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 {
 	dArray<NewtonBody*> bodies;
@@ -1137,15 +1134,15 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 		NewtonBodyGetMatrix(bodies[i], &matrix1[0][0]);
 		dMatrix jointMatrix(dGrammSchmidt(matrix1.m_posit - matrix0.m_posit));
 		jointMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale(0.5f);
-		//new dFlexyPipeSpinner (jointMatrix, bodies[i - 1], bodies[i]);
-		dCustomBallAndSocket* const joint = new dCustomBallAndSocket(jointMatrix, bodies[i], bodies[i - 1]);
-		joint->EnableTwist(true);
-		joint->SetTwistLimits(0.0f, 0.0f);
-		joint->SetTwistFriction(1.0e20f);
-		joint->EnableCone(true);
-		joint->SetConeLimits(0.0f);
-		joint->SetConeFriction(1.0e20f);
-		joint->SetConeStiffness(0.995f);
+		new dFlexyPipeSpinner (jointMatrix, bodies[i], bodies[i - 1]);
+		//dCustomBallAndSocket* const joint = new dCustomBallAndSocket(jointMatrix, bodies[i], bodies[i - 1]);
+		//joint->EnableTwist(true);
+		//joint->SetTwistLimits(0.0f, 0.0f);
+		//joint->SetTwistFriction(1.0e20f);
+		//joint->EnableCone(true);
+		//joint->SetConeLimits(0.0f);
+		//joint->SetConeFriction(1.0e20f);
+		//joint->SetConeStiffness(0.995f);
 	}
 
 	// add a cylinder to add as a controller handle 
@@ -1175,7 +1172,7 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 	joint->EnableCone(true);
 	joint->SetConeLimits(0.0f);
 	joint->SetConeFriction(1.0e20f);
-	joint->SetConeStiffness(0.995f);
+	joint->SetConeStiffness(0.99f);
 
 	cylinderGeometry->Release();
 	NewtonDestroyCollision(cylinderShape);
