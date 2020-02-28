@@ -37,7 +37,6 @@ dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame, Newt
 	,m_twistDamper(0.0f)
 	,m_coneSpring(0.0f)
 	,m_coneDamper(0.0f)
-	,m_mask(0x07)
 {
 	CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
@@ -55,7 +54,6 @@ dCustomBallAndSocket::dCustomBallAndSocket(const dMatrix& pinAndPivotFrame0, con
 	,m_twistDamper(0.0f)
 	,m_coneSpring(0.0f)
 	,m_coneDamper(0.0f)
-	,m_mask(0x07)
 {
 	dMatrix	dummy;
 	CalculateLocalMatrix(pinAndPivotFrame0, m_localMatrix0, dummy);
@@ -79,7 +77,6 @@ void dCustomBallAndSocket::Deserialize(NewtonDeserializeCallback callback, void*
 	callback(userData, &m_twistDamper, sizeof(dFloat));
 	callback(userData, &m_coneSpring, sizeof(dFloat));
 	callback(userData, &m_coneDamper, sizeof(dFloat));
-	callback(userData, &m_mask, sizeof(int));
 }
 
 void dCustomBallAndSocket::Serialize(NewtonSerializeCallback callback, void* const userData) const
@@ -97,7 +94,6 @@ void dCustomBallAndSocket::Serialize(NewtonSerializeCallback callback, void* con
 	callback(userData, &m_twistDamper, sizeof(dFloat));
 	callback(userData, &m_coneSpring, sizeof(dFloat));
 	callback(userData, &m_coneDamper, sizeof(dFloat));
-	callback(userData, &m_mask, sizeof(int));
 }
 
 void dCustomBallAndSocket::EnableTwist(bool state)
@@ -408,7 +404,7 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
-	SubmitLinearRows(m_mask, matrix0, matrix1);
+	SubmitLinearRows(0x07, matrix0, matrix1);
 
 	dFloat cosAngleCos = matrix1.m_front.DotProduct3(matrix0.m_front);
 	if (cosAngleCos < dFloat(0.998f)) {
