@@ -753,11 +753,11 @@ dMatrix dMatrix::JacobiDiagonalization (dVector &eigenValues, const dMatrix& ini
 
 	// QR algorithm is really bad at converging matrices with very different eigenvalue. 
 	// the solution is to use RD with double shift which I do not feel like implementing. 
-	// using Jacobi diagonalization instead
+	// using Jacobi diagonalize instead
 	dVector d(mat[0][0], mat[1][1], mat[2][2], dFloat(0.0f));
 	dVector b(d);
 	for (int i = 0; i < 50; i++) {
-		dFloat sm = mat[0][1] * mat[0][1] + mat[0][2] * mat[0][2] + mat[1][2] * mat[0][2];
+		dFloat sm = mat[0][1] * mat[0][1] + mat[0][2] * mat[0][2] + mat[1][2] * mat[1][2];
 		if (sm < dFloat(1.0e-12f)) {
 			// make sure the the eigen vectors are orthonormal
 			//dVector tmp (eigenVectors.m_front.CrossProduct(eigenVectors.m_up));

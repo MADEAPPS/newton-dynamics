@@ -470,13 +470,13 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 
 dgVector dgMatrix::EigenVectors ()
 {
-	dgMatrix mat (*this);
+	dgMatrix matrix (*this);
 	dgMatrix eigenVectors(dgGetIdentityMatrix());
 
-/*
+#if 0
 	if (dgAbs(m_front.m_z) > dgFloat32(1.0e-6f)) {
 		// calculate initial guess by convert to tridiagonal matrix using householder
-		// but this fail seem is change the oder of the eigen value
+		// but this fail since it changes the oder of the Eigen values and Eigen vectors
 		dgVector u(m_front);
 		u.m_x = dgFloat32(0.0f);
 		dgVector v(dgVector::m_zero);
@@ -488,21 +488,21 @@ dgVector dgMatrix::EigenVectors ()
 		eigenVectors[0] = ident[0] - eigenVectors[0] * dgVector::m_two;
 		eigenVectors[1] = ident[1] - eigenVectors[1] * dgVector::m_two;
 		eigenVectors[2] = ident[2] - eigenVectors[2] * dgVector::m_two;
-		mat = eigenVectors.Transpose() * mat * eigenVectors;
+		matrix = eigenVectors * matrix * eigenVectors;
 	}
-	mat[0][2] = dgFloat32(0.0f);
-	mat[2][0] = dgFloat32(0.0f);
-*/
+	matrix[0][2] = dgFloat32(0.0f);
+	matrix[2][0] = dgFloat32(0.0f);
+#endif
 
 	// QR algorithm is really bad at converging matrices with very different eigenvalue. 
 	// the solution is to use RD with double shift which I do not feel like implementing. 
-	// using Jacobi diagonalization instead
-	dgVector d (mat[0][0], mat[1][1], mat[2][2], dgFloat32 (0.0f)); 
+	// using Jacobi diagonalize instead
+	dgVector d (matrix[0][0], matrix[1][1], matrix[2][2], dgFloat32 (0.0f)); 
 	dgVector b (d);
 	for (dgInt32 i = 0; i < 50; i++) {
-		dgFloat32 sm = mat[0][1] * mat[0][1] + mat[0][2] * mat[0][2] + mat[1][2] * mat[0][2];
+		dgFloat32 sm = matrix[0][1] * matrix[0][1] + matrix[0][2] * matrix[0][2] + matrix[1][2] * matrix[1][2];
 		if (sm < dgFloat32 (1.0e-12f)) {
-			// make sure the the eigen vectors are orthonormal
+			// make sure the the Eigen vectors are orthonormal
 			//dgVector tmp (eigenVectors.m_front.CrossProduct(eigenVectors.m_up));
 			//if (tmp.DotProduct(eigenVectors.m_right).GetScalar() < dgFloat32(0.0f)) {
 			//	eigenVectors.m_right = eigenVectors.m_right * dgVector::m_negOne;
@@ -517,19 +517,19 @@ dgVector dgMatrix::EigenVectors ()
 		}
 
 		dgVector z (dgVector::m_zero);
-		for (dgInt32 ip = 0; ip < 2; ip ++) {
-			for (dgInt32 iq = ip + 1; iq < 3; iq ++) {
-				dgFloat32 g = dgFloat32 (100.0f) * dgAbs(mat[ip][iq]);
-				if ((i > 3) && ((dgAbs(d[ip]) + g) == dgAbs(d[ip])) && ((dgAbs(d[iq]) + g) == dgAbs(d[iq]))) {
-					mat[ip][iq] = dgFloat32 (0.0f);
-				} else if (dgAbs(mat[ip][iq]) > thresh) {
+		for (dgInt32 j = 0; j < 2; j ++) {
+			for (dgInt32 k = j + 1; k < 3; k ++) {
+				dgFloat32 g = dgFloat32 (100.0f) * dgAbs(matrix[j][k]);
+				if ((i > 3) && ((dgAbs(d[j]) + g) == dgAbs(d[j])) && ((dgAbs(d[k]) + g) == dgAbs(d[k]))) {
+					matrix[j][k] = dgFloat32 (0.0f);
+				} else if (dgAbs(matrix[j][k]) > thresh) {
 
 					dgFloat32 t;
-					dgFloat32 h = d[iq] - d[ip];
+					dgFloat32 h = d[k] - d[j];
 					if (dgAbs(h) + g == dgAbs(h)) {
-						t = mat[ip][iq] / h;
+						t = matrix[j][k] / h;
 					} else {
-						dgFloat32 theta = dgFloat32 (0.5f) * h / mat[ip][iq];
+						dgFloat32 theta = dgFloat32 (0.5f) * h / matrix[j][k];
 						t = dgFloat32(1.0f) / (dgAbs(theta) + dgSqrt(dgFloat32(1.0f) + theta * theta));
 						if (theta < dgFloat32 (0.0f)) {
 							t = -t;
@@ -538,38 +538,38 @@ dgVector dgMatrix::EigenVectors ()
 					dgFloat32 c = dgRsqrt (dgFloat32 (1.0f) + t * t); 
 					dgFloat32 s = t * c; 
 					dgFloat32 tau = s / (dgFloat32(1.0f) + c); 
-					h = t * mat[ip][iq];
-					z[ip] -= h; 
-					z[iq] += h; 
-					d[ip] -= h; 
-					d[iq] += h;
-					mat[ip][iq] = dgFloat32(0.0f);
+					h = t * matrix[j][k];
+					z[j] -= h; 
+					z[k] += h; 
+					d[j] -= h; 
+					d[k] += h;
+					matrix[j][k] = dgFloat32(0.0f);
 
-					for (dgInt32 j = 0; j <= ip - 1; j ++) {
-						dgFloat32 g0 = mat[j][ip]; 
-						dgFloat32 h0 = mat[j][iq]; 
-						mat[j][ip] = g0 - s * (h0 + g0 * tau); 
-						mat[j][iq] = h0 + s * (g0 - h0 * tau);
+					for (dgInt32 n = 0; n <= j - 1; n ++) {
+						dgFloat32 g0 = matrix[n][j]; 
+						dgFloat32 h0 = matrix[n][k]; 
+						matrix[n][j] = g0 - s * (h0 + g0 * tau); 
+						matrix[n][k] = h0 + s * (g0 - h0 * tau);
 					}
-					for (dgInt32 j = ip + 1; j <= iq - 1; j ++) {
-						dgFloat32 g0 = mat[ip][j]; 
-						dgFloat32 h0 = mat[j][iq]; 
-						mat[ip][j] = g0 - s * (h0 + g0 * tau); 
-						mat[j][iq] = h0 + s * (g0 - h0 * tau);
+					for (dgInt32 n = j + 1; n <= k - 1; n ++) {
+						dgFloat32 g0 = matrix[j][n]; 
+						dgFloat32 h0 = matrix[n][k]; 
+						matrix[j][n] = g0 - s * (h0 + g0 * tau); 
+						matrix[n][k] = h0 + s * (g0 - h0 * tau);
 					}
-					for (dgInt32 j = iq + 1; j < 3; j ++) {
-						dgFloat32 g0 = mat[ip][j]; 
-						dgFloat32 h0 = mat[iq][j]; 
-						mat[ip][j] = g0 - s * (h0 + g0 * tau); 
-						mat[iq][j] = h0 + s * (g0 - h0 * tau);
+					for (dgInt32 n = k + 1; n < 3; n ++) {
+						dgFloat32 g0 = matrix[j][n]; 
+						dgFloat32 h0 = matrix[k][n]; 
+						matrix[j][n] = g0 - s * (h0 + g0 * tau); 
+						matrix[k][n] = h0 + s * (g0 - h0 * tau);
 					}
 
 					dgVector sv (s);
 					dgVector tauv (tau);
-					dgVector gv (eigenVectors[ip]);
-					dgVector hv (eigenVectors[iq]);
-					eigenVectors[ip] -= sv * (hv + gv * tauv); 
-					eigenVectors[iq] += sv * (gv - hv * tauv);
+					dgVector gv (eigenVectors[j]);
+					dgVector hv (eigenVectors[k]);
+					eigenVectors[j] -= sv * (hv + gv * tauv); 
+					eigenVectors[k] += sv * (gv - hv * tauv);
 				}
 			}
 		}
@@ -584,10 +584,11 @@ dgVector dgMatrix::EigenVectors ()
 		diag[1][1] = d[1];
 		diag[2][2] = d[2];
 		dgMatrix E(eigenVectors.Transpose());
-		dgMatrix matrix(E * diag * E.Transpose());
+		dgMatrix originalMatrix(*this);
+		dgMatrix tempMatrix(E * diag * E.Transpose());
 		for (dgInt32 j = 0; j < 3; j++) {
 			for (dgInt32 k = 0; k < 3; k++) {
-				dgFloat32 error = (*this)[j][k] - matrix[j][k];
+				dgFloat32 error = originalMatrix[j][k] - tempMatrix[j][k];
 				dgAssert((error * error) < dgFloat32(1.0e-4f));
 			}
 		}
