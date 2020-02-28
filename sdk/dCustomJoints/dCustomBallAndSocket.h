@@ -64,7 +64,7 @@ class dCustomBallAndSocket: public dCustomJoint
 	dFloat m_twistDamper;
 	dFloat m_coneSpring;
 	dFloat m_coneDamper;
-
+	int m_mask;
 
 	DECLARE_CUSTOM_JOINT(dCustomBallAndSocket, dCustomJoint)
 };

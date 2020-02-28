@@ -152,14 +152,15 @@ class dFlexyPipeSpinner: public dCustomBallAndSocket
 		:dCustomBallAndSocket(pinAndPivotFrame, child, parent)
 	{
 		EnableTwist(false);
-		EnableCone(false);
+
+		//EnableCone(false);
 		//EnableTwist(true);
 		//SetTwistLimits(0.0f, 0.0f);
 		//SetTwistFriction(1.0e20f);
-		//EnableCone(true);
-		//SetConeLimits(0.0f);
-		//SetConeFriction(1.0e20f);
-		//SetConeStiffness(0.995f);
+		EnableCone(true);
+		SetConeLimits(0.0f);
+		SetConeFriction(1.0e20f);
+		SetConeStiffness(0.8f);
 	}
 
 	void SubmitConstraints(dFloat timestep, int threadIndex)
@@ -198,16 +199,6 @@ class dFlexyPipeSpinner: public dCustomBallAndSocket
 		dFloat relAccel = -relOmega / timestep;
 		NewtonUserJointAddGeneralRow (m_joint, jacobian0, jacobian1);
 		NewtonUserJointSetRowAcceleration (m_joint, relAccel);
-	}
-};
-
-class dFlexyPipeTensor: public dCustomJoint
-{
-	public: 
-	dFlexyPipeTensor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
-		:dCustomJoint(3, child, parent)
-	{
-		CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 	}
 };
 
@@ -1138,6 +1129,7 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 	capsuleGeometry->Release();
 	NewtonDestroyCollision(capsuleShape);
 
+	// add the axial spinner joints
 	for (int i = 1; i < count; i++) {
 		dMatrix matrix0;
 		dMatrix matrix1;
@@ -1145,11 +1137,18 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 		NewtonBodyGetMatrix(bodies[i], &matrix1[0][0]);
 		dMatrix jointMatrix(dGrammSchmidt(matrix1.m_posit - matrix0.m_posit));
 		jointMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale(0.5f);
-		new dFlexyPipeSpinner (jointMatrix, bodies[i - 1], bodies[i]);
+		//new dFlexyPipeSpinner (jointMatrix, bodies[i - 1], bodies[i]);
+		dCustomBallAndSocket* const joint = new dCustomBallAndSocket(jointMatrix, bodies[i], bodies[i - 1]);
+		joint->EnableTwist(true);
+		joint->SetTwistLimits(0.0f, 0.0f);
+		joint->SetTwistFriction(1.0e20f);
+		joint->EnableCone(true);
+		joint->SetConeLimits(0.0f);
+		joint->SetConeFriction(1.0e20f);
+		joint->SetConeStiffness(0.995f);
 	}
 
 	// add a cylinder to add as a controller handle 
-
 	dMatrix matrix0;
 	dMatrix matrix1;
 	NewtonBodyGetMatrix(bodies[0], &matrix0[0][0]);
