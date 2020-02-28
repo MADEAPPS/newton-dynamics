@@ -86,7 +86,6 @@ class dFlexyPipeHandle: public dCustomJoint
 		}
 	}
 
-
 	void SetVelocity(const dVector& veloc, dFloat timestep) 
 	{
 		dVector bodyVeloc(0.0f);
@@ -144,6 +143,72 @@ class dFlexyPipeHandle: public dCustomJoint
 
 	dFloat m_linearFriction;
 	dFloat m_angularFriction;
+};
+
+class dFlexyPipeSpinner: public dCustomBallAndSocket
+{
+	public: 
+	dFlexyPipeSpinner (const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+		:dCustomBallAndSocket(pinAndPivotFrame, child, parent)
+	{
+		EnableTwist(false);
+		EnableCone(false);
+		//EnableTwist(true);
+		//SetTwistLimits(0.0f, 0.0f);
+		//SetTwistFriction(1.0e20f);
+		//EnableCone(true);
+		//SetConeLimits(0.0f);
+		//SetConeFriction(1.0e20f);
+		//SetConeStiffness(0.995f);
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		dFloat jacobian0[6];
+		dFloat jacobian1[6];
+
+		dVector pin0 (matrix0.m_front);
+		dVector pin1 (matrix1.m_front.Scale (-1.0f));
+
+		jacobian0[0] = 0.0f;
+		jacobian0[1] = 0.0f;
+		jacobian0[2] = 0.0f;
+		jacobian0[3] = pin0.m_x;
+		jacobian0[4] = pin0.m_y;
+		jacobian0[5] = pin0.m_z;
+
+		jacobian1[0] = 0.0f;
+		jacobian1[1] = 0.0f;
+		jacobian1[2] = 0.0f;
+		jacobian1[3] = pin1.m_x;
+		jacobian1[4] = pin1.m_y;
+		jacobian1[5] = pin1.m_z;
+
+		dVector omega0(0.0f);
+		dVector omega1(0.0f);
+		NewtonBodyGetOmega(m_body0, &omega0[0]);
+		NewtonBodyGetOmega(m_body1, &omega1[0]);
+		
+		dFloat relOmega = omega0.DotProduct3(pin0) + omega1.DotProduct3(pin1);
+		dFloat relAccel = -relOmega / timestep;
+		NewtonUserJointAddGeneralRow (m_joint, jacobian0, jacobian1);
+		NewtonUserJointSetRowAcceleration (m_joint, relAccel);
+	}
+};
+
+class dFlexyPipeTensor: public dCustomJoint
+{
+	public: 
+	dFlexyPipeTensor(const dMatrix& pinAndPivotFrame, NewtonBody* const child, NewtonBody* const parent)
+		:dCustomJoint(3, child, parent)
+	{
+		CalculateLocalMatrix(pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
+	}
 };
 
 class MyPathFollow : public dCustomPathFollow
@@ -1053,6 +1118,7 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 	dArray<NewtonBody*> bodies;
 
 	int count = 50;
+//	int count = 5;
 	NewtonWorld* const world = scene->GetNewton();
 
 	dVector capsuleSize(0.25f, 0.5f, 0.25f);
@@ -1079,14 +1145,7 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 		NewtonBodyGetMatrix(bodies[i], &matrix1[0][0]);
 		dMatrix jointMatrix(dGrammSchmidt(matrix1.m_posit - matrix0.m_posit));
 		jointMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale(0.5f);
-		dCustomBallAndSocket* const joint = new dCustomBallAndSocket(jointMatrix, bodies[i - 1], bodies[i]);
-		joint->EnableTwist(true);
-		joint->SetTwistLimits(0.0f, 0.0f);
-		joint->SetTwistFriction(1.0e20f);
-		joint->EnableCone(true);
-		joint->SetConeLimits(0.0f);
-		joint->SetConeFriction(1.0e20f);
-		joint->SetConeStiffness(0.995f);
+		new dFlexyPipeSpinner (jointMatrix, bodies[i - 1], bodies[i]);
 	}
 
 	// add a cylinder to add as a controller handle 

@@ -205,8 +205,6 @@ void dCustomMotor2::SubmitConstraints(dFloat timestep, int threadIndex)
 {
 	dMatrix matrix;
 	dVector omega(0.0f);
-	dFloat jacobian0[6];
-	dFloat jacobian1[6];
 
 	dCustomMotor::SubmitConstraints(timestep, threadIndex);
 
@@ -216,19 +214,21 @@ void dCustomMotor2::SubmitConstraints(dFloat timestep, int threadIndex)
 	// calculate the angular velocity for both bodies
 	dVector pin(matrix.RotateVector(m_localReferencePin1));
 
-	jacobian0[0] = 0.0f;
-	jacobian0[1] = 0.0f;
-	jacobian0[2] = 0.0f;
-	jacobian0[3] = pin.m_x;
-	jacobian0[4] = pin.m_y;
-	jacobian0[5] = pin.m_z;
-
-	jacobian1[0] = 0.0f;
-	jacobian1[1] = 0.0f;
-	jacobian1[2] = 0.0f;
-	jacobian1[3] = -pin.m_x;
-	jacobian1[4] = -pin.m_y;
-	jacobian1[5] = -pin.m_z;
+	//dFloat jacobian0[6];
+	//dFloat jacobian1[6];
+	//jacobian0[0] = 0.0f;
+	//jacobian0[1] = 0.0f;
+	//jacobian0[2] = 0.0f;
+	//jacobian0[3] = pin.m_x;
+	//jacobian0[4] = pin.m_y;
+	//jacobian0[5] = pin.m_z;
+	//
+	//jacobian1[0] = 0.0f;
+	//jacobian1[1] = 0.0f;
+	//jacobian1[2] = 0.0f;
+	//jacobian1[3] = -pin.m_x;
+	//jacobian1[4] = -pin.m_y;
+	//jacobian1[5] = -pin.m_z;
 
 	NewtonBodyGetOmega(m_body0, &omega[0]);
 	m_motorOmega1 = omega.DotProduct3(pin);
