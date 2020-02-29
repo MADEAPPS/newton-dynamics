@@ -1106,8 +1106,11 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 	dArray<NewtonBody*> bodies;
 
 	int count = 50;
-//	int count = 5;
 	NewtonWorld* const world = scene->GetNewton();
+
+	// set the friction low to emulate motion on some fluid 
+	int materialID = NewtonMaterialGetDefaultGroupID(world);
+	NewtonMaterialSetDefaultFriction(world, materialID, materialID, 0.2f, 0.2f);
 
 	dVector capsuleSize(0.25f, 0.5f, 0.25f);
 	dMatrix aligment(dYawMatrix(90.0f * dDegreeToRad));
@@ -1135,14 +1138,6 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 		dMatrix jointMatrix(dGrammSchmidt(matrix1.m_posit - matrix0.m_posit));
 		jointMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale(0.5f);
 		new dFlexyPipeSpinner (jointMatrix, bodies[i], bodies[i - 1]);
-		//dCustomBallAndSocket* const joint = new dCustomBallAndSocket(jointMatrix, bodies[i], bodies[i - 1]);
-		//joint->EnableTwist(true);
-		//joint->SetTwistLimits(0.0f, 0.0f);
-		//joint->SetTwistFriction(1.0e20f);
-		//joint->EnableCone(true);
-		//joint->SetConeLimits(0.0f);
-		//joint->SetConeFriction(1.0e20f);
-		//joint->SetConeStiffness(0.995f);
 	}
 
 	// add a cylinder to add as a controller handle 
@@ -1172,7 +1167,7 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 	joint->EnableCone(true);
 	joint->SetConeLimits(0.0f);
 	joint->SetConeFriction(1.0e20f);
-	joint->SetConeStiffness(0.99f);
+	joint->SetConeStiffness(0.95f);
 
 	cylinderGeometry->Release();
 	NewtonDestroyCollision(cylinderShape);
