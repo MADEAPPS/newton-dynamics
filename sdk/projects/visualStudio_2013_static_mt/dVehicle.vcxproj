@@ -35,19 +35,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerIKNode.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerController.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerContactSolver.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerImpulseSolver.cpp" />
-    <ClCompile Include="..\..\dVehicle\dStdafxVehicle.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="..\..\dVehicle\dVehicle.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleManager.cpp" />
     <ClCompile Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleCollisionNode.cpp" />
@@ -60,8 +51,19 @@
     <ClCompile Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTireContact.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleNode.cpp" />
     <ClCompile Include="..\..\dVehicle\dVehicleSolver.cpp" />
+    <ClCompile Include="..\..\dVehicle\dStdafxVehicle.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerIKNode.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerController.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleSolverContactSolver.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerContactSolver.h" />
