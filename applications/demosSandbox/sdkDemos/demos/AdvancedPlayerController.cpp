@@ -1510,6 +1510,39 @@ class dAdvancedPlayerAnimationCache : public dTree<dAnimationSequence, dString>
 class dAdvancedPlayerController : public dPlayerController
 {
 	public:
+	class dJointDefinition
+	{
+		public:
+		enum dCollsionMask
+		{
+			m_type0,
+			m_type1,
+			m_type2,
+			m_type3,
+		};
+
+		struct dJointLimit
+		{
+			dFloat m_minTwistAngle;
+			dFloat m_maxTwistAngle;
+			dFloat m_coneAngle;
+		};
+
+		struct dFrameMatrix
+		{
+			dFloat m_pitch;
+			dFloat m_yaw;
+			dFloat m_roll;
+		};
+
+		char m_boneName[32];
+		int m_type;
+		int m_typeMask;
+		dFloat m_friction;
+		dJointLimit m_jointLimits;
+		dFrameMatrix m_frameBasics;
+	};
+
 	dAdvancedPlayerController(DemoEntity* const playerEntity, const dAdvancedPlayerAnimationCache& animationcache, NewtonWorld* const world, const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
 		:dPlayerController(world, location, localAxis, mass, radius, height, stepHeight)
 		, m_animBlendTree(NULL)
@@ -1527,10 +1560,14 @@ class dAdvancedPlayerController : public dPlayerController
 		// save player model with the controller
 		SetUserData(playerEntity);
 
-		// bind skeleton to animation blend tree, using idle sequnce
-		BindPose(animationcache);
+		// bind skeleton to animation blend tree, using idle sequence
+		BindEntityAndToPose(animationcache);
 
+		// make the animation blend tree
 		CreateAnimationBlendTree(animationcache);
+
+		// create model skeleton to inverse kinematic pose modifications
+		CreateIKSkeleton();
 	}
 
 	~dAdvancedPlayerController()
@@ -1540,7 +1577,7 @@ class dAdvancedPlayerController : public dPlayerController
 		}
 	}
 
-	void BindPose(const dAdvancedPlayerAnimationCache& animationcache)
+	void BindEntityAndToPose(const dAdvancedPlayerAnimationCache& animationcache)
 	{
 		dAnimationSequence* const sequence = (dAnimationSequence*)&animationcache.Find("whiteman_idle.anm")->GetInfo();
 
@@ -1576,6 +1613,97 @@ class dAdvancedPlayerController : public dPlayerController
 		//walkRunBlend->SetParam(0.5f);
 		//m_animBlendTree = walkRunBlend;
 		m_animBlendTree = idle;
+	}
+
+	void CreateIKSkeleton()
+	{
+		static dJointDefinition jointsDefinition[] =
+		{
+			{ "mixamorig:Hips", 1, 16 },
+
+			{ "mixamorig:Spine", 2, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:Spine1", 4, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:Spine2", 8, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:Neck", 16, 31, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+
+			{ "mixamorig:LeftArm", 16, 27, 100.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:LeftForeArm", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+
+			//{ "mixamorig:RightArm", 16, 27, 100.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:RightForeArm", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
+
+			//{ "mixamorig:LeftUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:LeftLeg", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+			//
+			//{ "mixamorig:RightUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:RightLeg", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
+
+		};
+
+		DemoEntity* const rootEntity = (DemoEntity*)GetUserData();
+		dAssert(NewtonBodyGetUserData(GetBody()) == GetUserData());
+
+		int stackIndex = 0;
+		dVehicleNode* parentBones[32];
+		DemoEntity* childEntities[32];
+		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
+			parentBones[stackIndex] = this;
+			childEntities[stackIndex] = child;
+			stackIndex++;
+		}
+
+		int bodyCount = 0;
+		dVehicleNode* bodyArray[1024];
+
+		// walk model hierarchic adding all children designed as rigid body bones. 
+		const int definitionCount = sizeof (jointsDefinition) / sizeof (jointsDefinition[0]);
+		while (stackIndex) {
+			stackIndex--;
+			dVehicleNode* parentBone = parentBones[stackIndex];
+			DemoEntity* const entity = childEntities[stackIndex];
+			//const char* const name = entity->GetName().GetStr();
+			dTrace(("entity: %s ", entity->GetName().GetStr()));
+			for (int i = 0; i < definitionCount; i++) {
+				if (!strcmp(jointsDefinition[i].m_boneName, entity->GetName().GetStr())) {
+					//dVehicleNode* const childBody = CreateBodyPart(entity);
+
+					dTrace(("parent: %s   child: %s\n", entity->GetParent()->GetName().GetStr(), entity->GetName().GetStr()));
+					//bodyArray[bodyCount] = childBody;
+					//bodyCount++;
+
+					//			// connect this body part to its parent with a ragdoll joint
+					//			NewtonBody* const parentBody = parentBone->GetBody();
+					//			ConnectBodyParts(childBody, parentBody, jointsDefinition[i]);
+					//
+					//			dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
+					//			parentBone = new dModelNode(childBody, bindMatrix, parentBone);
+					//
+					//			// save the controller as the collision user data, for collision culling
+					//			NewtonCollisionMaterial collisionMaterial;
+					//			NewtonCollisionGetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
+					//			collisionMaterial.m_userData.m_ptr = rootBone;
+					//			collisionMaterial.m_userParam[0].m_int = jointsDefinition[i].m_type;
+					//			collisionMaterial.m_userParam[1].m_int = jointsDefinition[i].m_typeMask;
+					//			NewtonCollisionSetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
+
+					//parentBone = childBody;
+					break;
+				}
+			}
+
+			//for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
+			//	parentBones[stackIndex] = parentBone;
+			//	childEntities[stackIndex] = child;
+			//	stackIndex++;
+			//}
+		}
+
+		int xxx = 0;
+		//SetModelMass(100.0f, bodyCount, bodyArray);
+		//
+		//// transform the entire contraction to its location
+		//dMatrix worldMatrix(rootEntity->GetCurrentMatrix() * location);
+		//NewtonBodySetMatrixRecursive(rootBone, &worldMatrix[0][0]);
 	}
 
 	void ApplyMove(dFloat timestep)
