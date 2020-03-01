@@ -19,15 +19,20 @@
 
 #include "dStdafxVehicle.h"
 #include "dVehicleNode.h"
-/*
+
 
 class dPlayerIKNode: public dVehicleNode
 {
 	public:
-	DVEHICLE_API dPlayerIKNode(NewtonWorld* const world, const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight);
+	DVEHICLE_API dPlayerIKNode(dVehicleNode* const parent, void* const userData, const dMatrix& bindMatrix, NewtonCollision* const shape);
 	DVEHICLE_API ~dPlayerIKNode();
 
+	virtual dPlayerIKNode* GetAsPlayerIKNode() { return this; }
+
+	protected:
+	dMatrix m_bindMatrix;
+
 };
-*/
+
 #endif 
 

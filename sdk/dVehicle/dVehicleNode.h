@@ -16,6 +16,7 @@
 #include "dStdafxVehicle.h"
 
 class dVehicleNode;
+class dPlayerIKNode;
 class dMultiBodyVehicle;
 class dPlayerController;
 class dMultiBodyVehicle;
@@ -47,7 +48,8 @@ class dVehicleNode: public dCustomAlloc
 	
 	virtual dPlayerController* GetAsPlayerController() { return NULL; }
 	virtual dMultiBodyVehicle* GetAsMultiBodyVehicle() { return NULL; }
-
+	
+	virtual dPlayerIKNode* GetAsPlayerIKNode() { return NULL; }
 	virtual dMultiBodyVehicleTire* GetAsTire() { return NULL; }
 	virtual dMultiBodyVehicleEngine* GetAsEngine() { return NULL; }
 	virtual dMultiBodyVehicleDifferential* GetAsDifferential() { return NULL; }

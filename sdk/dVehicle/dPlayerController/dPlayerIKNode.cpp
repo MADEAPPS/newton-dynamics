@@ -16,3 +16,13 @@
 #include "dStdafxVehicle.h"
 #include "dPlayerIKNode.h"
 
+dPlayerIKNode::dPlayerIKNode(dVehicleNode* const parent, void* const userData, const dMatrix& bindMatrix, NewtonCollision* const shape)
+	:dVehicleNode(parent)
+	,m_bindMatrix(bindMatrix)
+{
+	SetUserData(userData);
+}
+
+dPlayerIKNode::~dPlayerIKNode()
+{
+}

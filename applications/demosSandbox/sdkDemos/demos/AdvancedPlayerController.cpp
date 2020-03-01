@@ -9,7 +9,6 @@
 * freely
 */
 
-
 #include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "PhysicsUtils.h"
@@ -1615,22 +1614,12 @@ class dAdvancedPlayerController : public dPlayerController
 		m_animBlendTree = idle;
 	}
 
+
 	void CreateIKSkeleton()
 	{
 		static dJointDefinition jointsDefinition[] =
 		{
 			{ "mixamorig:Hips", 1, 16 },
-
-			{ "mixamorig:Spine", 2, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-			{ "mixamorig:Spine1", 4, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-			{ "mixamorig:Spine2", 8, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-			//{ "mixamorig:Neck", 16, 31, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
-
-			{ "mixamorig:LeftArm", 16, 27, 100.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-			{ "mixamorig:LeftForeArm", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
-
-			//{ "mixamorig:RightArm", 16, 27, 100.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
-			//{ "mixamorig:RightForeArm", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
 
 			//{ "mixamorig:LeftUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 			//{ "mixamorig:LeftLeg", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
@@ -1638,6 +1627,16 @@ class dAdvancedPlayerController : public dPlayerController
 			//{ "mixamorig:RightUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 			//{ "mixamorig:RightLeg", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
 
+			//{ "mixamorig:Spine", 2, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:Spine1", 4, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:Spine2", 8, 16, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:Neck", 16, 31, 100.0f, { -15.0f, 15.0f, 30.0f }, { 0.0f, 0.0f, 180.0f } },
+
+			//{ "mixamorig:LeftArm", 16, 27, 100.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:LeftForeArm", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 0.0f, -90.0f } },
+
+			//{ "mixamorig:RightArm", 16, 27, 100.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:RightForeArm", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
 		};
 
 		DemoEntity* const rootEntity = (DemoEntity*)GetUserData();
@@ -1653,49 +1652,46 @@ class dAdvancedPlayerController : public dPlayerController
 		}
 
 		int bodyCount = 0;
-		dVehicleNode* bodyArray[1024];
+		dPlayerIKNode* bodyArray[1024];
 
 		// walk model hierarchic adding all children designed as rigid body bones. 
+		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
 		const int definitionCount = sizeof (jointsDefinition) / sizeof (jointsDefinition[0]);
 		while (stackIndex) {
 			stackIndex--;
 			dVehicleNode* parentBone = parentBones[stackIndex];
 			DemoEntity* const entity = childEntities[stackIndex];
 			//const char* const name = entity->GetName().GetStr();
-			dTrace(("entity: %s ", entity->GetName().GetStr()));
+			dTrace(("entity: %s\n", entity->GetName().GetStr()));
 			for (int i = 0; i < definitionCount; i++) {
-				if (!strcmp(jointsDefinition[i].m_boneName, entity->GetName().GetStr())) {
+				const dJointDefinition& definition = jointsDefinition[i];
+				if (!strcmp(definition.m_boneName, entity->GetName().GetStr())) {
 					//dVehicleNode* const childBody = CreateBodyPart(entity);
+					
+					NewtonCollision* const shape = entity->CreateCollisionFromchildren(world);
+					dAssert(shape);
 
-					dTrace(("parent: %s   child: %s\n", entity->GetParent()->GetName().GetStr(), entity->GetName().GetStr()));
-					//bodyArray[bodyCount] = childBody;
-					//bodyCount++;
+					DemoEntity* const parentEntity = (DemoEntity*) parentBone->GetUserData();
+					dTrace(("parent: %s   child: %s\n", parentEntity->GetName().GetStr(), entity->GetName().GetStr()));
+					//ConnectBodyParts(childBody, parentBody, jointsDefinition[i]);
+					
+					dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix(parentEntity).Inverse());
+					parentBone = new dPlayerIKNode(parentBone, entity, bindMatrix, shape);
 
-					//			// connect this body part to its parent with a ragdoll joint
-					//			NewtonBody* const parentBody = parentBone->GetBody();
-					//			ConnectBodyParts(childBody, parentBody, jointsDefinition[i]);
-					//
-					//			dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix((DemoEntity*)NewtonBodyGetUserData(parentBody)).Inverse());
-					//			parentBone = new dModelNode(childBody, bindMatrix, parentBone);
-					//
-					//			// save the controller as the collision user data, for collision culling
-					//			NewtonCollisionMaterial collisionMaterial;
-					//			NewtonCollisionGetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
-					//			collisionMaterial.m_userData.m_ptr = rootBone;
-					//			collisionMaterial.m_userParam[0].m_int = jointsDefinition[i].m_type;
-					//			collisionMaterial.m_userParam[1].m_int = jointsDefinition[i].m_typeMask;
-					//			NewtonCollisionSetMaterial(NewtonBodyGetCollision(childBody), &collisionMaterial);
+					NewtonDestroyCollision(shape);
 
-					//parentBone = childBody;
+					bodyArray[bodyCount] = parentBone->GetAsPlayerIKNode();
+					bodyCount++;
+
 					break;
 				}
 			}
 
-			//for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
-			//	parentBones[stackIndex] = parentBone;
-			//	childEntities[stackIndex] = child;
-			//	stackIndex++;
-			//}
+			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
+				parentBones[stackIndex] = parentBone;
+				childEntities[stackIndex] = child;
+				stackIndex++;
+			}
 		}
 
 		int xxx = 0;
