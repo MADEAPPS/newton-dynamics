@@ -18,7 +18,9 @@
 
 dPlayerIKNodeJoint::dPlayerIKNodeJoint(dPlayerIKNode* const parent, void* const userData, const dMatrix& bindMatrix, NewtonCollision* const shape)
 	:dPlayerIKNode(parent, userData, bindMatrix, shape)
+	,dBilateralJoint()
 {
+	Init(&m_proxyBody, &GetParent()->GetProxyBody());
 }
 
 dPlayerIKNodeJoint::~dPlayerIKNodeJoint()

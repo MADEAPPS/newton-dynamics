@@ -1621,7 +1621,7 @@ class dAdvancedPlayerController : public dPlayerController
 		{
 			{ "mixamorig:Hips", 1, 16 },
 
-			//{ "mixamorig:LeftUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+			{ "mixamorig:LeftUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 			//{ "mixamorig:LeftLeg", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
 			//
 			//{ "mixamorig:RightUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
@@ -1649,18 +1649,18 @@ class dAdvancedPlayerController : public dPlayerController
 		NewtonCollision* const shape = hipEntity->CreateCollisionFromchildren(world);
 		dAssert(shape);
 		dMatrix bindMatrix(hipEntity->GetParent()->CalculateGlobalMatrix(rootEntity).Inverse());
-		dPlayerIKNode* parentBone = new dPlayerIKNode(this, hipEntity, bindMatrix, shape);
+		dPlayerIKNode* const ikRooBone = new dPlayerIKNode(this, hipEntity, bindMatrix, shape);
 		NewtonDestroyCollision(shape);
 
 		int bodyCount = 1;
 		dPlayerIKNode* bodyArray[1024];
-		bodyArray[0] = parentBone;
+		bodyArray[0] = ikRooBone;
 
 		int stackIndex = 0;
 		dPlayerIKNode* parentBones[32];
 		DemoEntity* childEntities[32];
 		for (DemoEntity* child = hipEntity->GetChild(); child; child = child->GetSibling()) {
-			parentBones[stackIndex] = parentBone;
+			parentBones[stackIndex] = ikRooBone;
 			childEntities[stackIndex] = child;
 			stackIndex++;
 		}
@@ -1669,7 +1669,7 @@ class dAdvancedPlayerController : public dPlayerController
 		const int definitionCount = sizeof (jointsDefinition) / sizeof (jointsDefinition[0]);
 		while (stackIndex) {
 			stackIndex--;
-			parentBone = parentBones[stackIndex];
+			dPlayerIKNode* parentBone = parentBones[stackIndex];
 			DemoEntity* const entity = childEntities[stackIndex];
 			//const char* const name = entity->GetName().GetStr();
 			dTrace(("entity: %s\n", entity->GetName().GetStr()));

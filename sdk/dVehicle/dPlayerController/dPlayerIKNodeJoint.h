@@ -21,7 +21,7 @@
 #include "dPlayerIKNode.h"
 
 
-class dPlayerIKNodeJoint: public dPlayerIKNode
+class dPlayerIKNodeJoint: public dPlayerIKNode, public dComplementaritySolver::dBilateralJoint
 {
 	public:
 	DVEHICLE_API dPlayerIKNodeJoint(dPlayerIKNode* const parent, void* const userData, const dMatrix& bindMatrix, NewtonCollision* const shape);
