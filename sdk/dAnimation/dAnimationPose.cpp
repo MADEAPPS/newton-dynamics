@@ -20,9 +20,6 @@ dAnimationPose::dAnimationPose()
 dAnimationPose::dAnimationPose(const dAnimationPose& source)
 	:dArray<dAnimKeyframe>()
 {
-//	for (dListNode* node = source.GetFirst(); node; node = node->GetNext()) {
-//		Append(node->GetInfo());
-//	}
 }
 
 void dAnimationPose::Clear() 

@@ -61,3 +61,6 @@
 #include <dCustomJoint.h>
 #include <dCustomListener.h>
 
+#include <dAnimationStdAfx.h>
+#include <dAnimationPose.h>
+#include <dAnimationBlendTreeNode.h>

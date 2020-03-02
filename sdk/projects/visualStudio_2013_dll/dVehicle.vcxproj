@@ -60,8 +60,9 @@
     <ClCompile Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTire.cpp" />
     <ClCompile Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTireContact.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerIKNode.cpp" />
-    <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerIKNodeJoint.cpp" />
+    <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerIKPoseModifier.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerController.cpp" />
+    <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerIKNodeJoint.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerContactSolver.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerImpulseSolver.cpp" />
     <ClCompile Include="..\..\dVehicle\dStdafxVehicle.cpp">
@@ -89,7 +90,8 @@
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTire.h" />
     <ClInclude Include="..\..\dVehicle\dMultiBodyVehicle\dMultiBodyVehicleTireContact.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerIKNode.h" />
-    <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerIKNodeJoint.h" />
+    <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerIKPoseModifier.h" />
+    <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerController.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerController.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerContactSolver.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerImpulseSolver.h" />
