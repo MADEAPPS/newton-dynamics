@@ -1642,24 +1642,34 @@ class dAdvancedPlayerController : public dPlayerController
 		DemoEntity* const rootEntity = (DemoEntity*)GetUserData();
 		dAssert(NewtonBodyGetUserData(GetBody()) == GetUserData());
 
+		DemoEntity* const hipEntity = rootEntity->Find(jointsDefinition[0].m_boneName);
+		dAssert(hipEntity);
+
+		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
+		NewtonCollision* const shape = hipEntity->CreateCollisionFromchildren(world);
+		dAssert(shape);
+		dMatrix bindMatrix(hipEntity->GetParent()->CalculateGlobalMatrix(rootEntity).Inverse());
+		dPlayerIKNode* parentBone = new dPlayerIKNode(this, hipEntity, bindMatrix, shape);
+		NewtonDestroyCollision(shape);
+
+		int bodyCount = 1;
+		dPlayerIKNode* bodyArray[1024];
+		bodyArray[0] = parentBone;
+
 		int stackIndex = 0;
-		dVehicleNode* parentBones[32];
+		dPlayerIKNode* parentBones[32];
 		DemoEntity* childEntities[32];
-		for (DemoEntity* child = rootEntity->GetChild(); child; child = child->GetSibling()) {
-			parentBones[stackIndex] = this;
+		for (DemoEntity* child = hipEntity->GetChild(); child; child = child->GetSibling()) {
+			parentBones[stackIndex] = parentBone;
 			childEntities[stackIndex] = child;
 			stackIndex++;
 		}
 
-		int bodyCount = 0;
-		dPlayerIKNode* bodyArray[1024];
-
 		// walk model hierarchic adding all children designed as rigid body bones. 
-		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
 		const int definitionCount = sizeof (jointsDefinition) / sizeof (jointsDefinition[0]);
 		while (stackIndex) {
 			stackIndex--;
-			dVehicleNode* parentBone = parentBones[stackIndex];
+			parentBone = parentBones[stackIndex];
 			DemoEntity* const entity = childEntities[stackIndex];
 			//const char* const name = entity->GetName().GetStr();
 			dTrace(("entity: %s\n", entity->GetName().GetStr()));
@@ -1693,6 +1703,7 @@ class dAdvancedPlayerController : public dPlayerController
 				stackIndex++;
 			}
 		}
+
 
 		int xxx = 0;
 		//SetModelMass(100.0f, bodyCount, bodyArray);

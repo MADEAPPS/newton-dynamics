@@ -36,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dAnimation\dAnimationPose.cpp" />
+    <ClCompile Include="..\..\dAnimation\dAnimationTwoWayBlend.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationBlendTreeNode.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationSequence.cpp" />
     <ClCompile Include="..\..\dAnimation\dAnimationSequencePlayer.cpp" />

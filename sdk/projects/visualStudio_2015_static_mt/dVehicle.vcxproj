@@ -36,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerIKNode.cpp" />
+    <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerIKNodeJoint.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerController.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerImpulseSolver.cpp" />
     <ClCompile Include="..\..\dVehicle\dPlayerController\dPlayerControllerContactSolver.cpp" />
@@ -68,6 +69,7 @@
     <ClInclude Include="..\..\dVehicle\dVehicleManager.h" />
     <ClInclude Include="..\..\dVehicle\dVehicleLoopJoint.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerIKNode.h" />
+    <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerIKNodeJoint.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerController.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerContactSolver.h" />
     <ClInclude Include="..\..\dVehicle\dPlayerController\dPlayerControllerImpulseSolver.h" />
