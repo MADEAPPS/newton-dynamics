@@ -16,16 +16,34 @@
 #include "dStdafxVehicle.h"
 #include "dPlayerIKPoseModifier.h"
 
-/*
-dPlayerIKPoseModifier::dPlayerIKPoseModifier(dVehicleNode* const parent, void* const userData, const dMatrix& bindMatrix, NewtonCollision* const shape)
-	:dPlayerIKNode(parent, userData, bindMatrix, shape)
-	,dAnimationBlendTreeNode(NULL)
-{
 
+dPlayerIKPoseModifier::dPlayerIKPoseModifier(dAnimationBlendTreeNode* const input)
+	:dPlayerIKNode()
+	,dAnimationBlendTreeNode(input)
+{
 }
 
 dPlayerIKPoseModifier::~dPlayerIKPoseModifier()
 {
-
 }
-*/
+
+void* dPlayerIKPoseModifier::operator new (size_t size)
+{
+	return dPlayerIKNode::malloc(size);
+}
+
+void dPlayerIKPoseModifier::operator delete (void* ptr)
+{
+	dPlayerIKNode::free(ptr);
+}
+
+void dPlayerIKPoseModifier::Init (dVehicleNode* const parent, void* const userData, const dMatrix& bindMatrix, NewtonCollision* const shape)
+{
+	dAssert (0);
+}
+
+
+void dPlayerIKPoseModifier::Evaluate(dAnimationPose& output, dFloat timestep)
+{
+	m_input->Evaluate(output, timestep);
+}

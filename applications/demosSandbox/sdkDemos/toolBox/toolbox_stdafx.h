@@ -174,6 +174,7 @@ typedef long long unsigned64;
 #include <dPlayerController.h>
 #include <dMultiBodyVehicle.h>
 #include <dPlayerIKNodeJoint.h>
+#include <dPlayerIKPoseModifier.h>
 #include <dMultiBodyVehicleTire.h>
 #include <dMultiBodyVehicleEngine.h>
 #include <dMultiBodyVehicleDifferential.h>

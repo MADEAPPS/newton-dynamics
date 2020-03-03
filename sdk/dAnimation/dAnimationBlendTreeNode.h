@@ -17,17 +17,17 @@ class dAnimationPose;
 class dAnimationBlendTreeNode: public dContainersAlloc
 {
 	public:
-	dAnimationBlendTreeNode(dAnimationBlendTreeNode* const child);
+	dAnimationBlendTreeNode(dAnimationBlendTreeNode* const input);
 	virtual ~dAnimationBlendTreeNode();
 
 	virtual void Evaluate(dAnimationPose& output, dFloat timestep)
 	{
-		if (m_child) {
-			m_child->Evaluate(output, timestep);
+		if (m_input) {
+			m_input->Evaluate(output, timestep);
 		}
 	}
 
-	dAnimationBlendTreeNode* m_child;
+	dAnimationBlendTreeNode* m_input;
 };
 
 #endif

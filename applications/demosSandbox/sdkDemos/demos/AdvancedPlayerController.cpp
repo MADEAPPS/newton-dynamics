@@ -1506,9 +1506,9 @@ class dAdvancedPlayerAnimationCache : public dTree<dAnimationSequence, dString>
 	}
 };
 
-class dAdvancedPlayerController : public dPlayerController
+class dAdvancedPlayerPoseModifier: public dPlayerIKPoseModifier
 {
-	public:
+	public: 
 	class dJointDefinition
 	{
 		public:
@@ -1542,81 +1542,11 @@ class dAdvancedPlayerController : public dPlayerController
 		dFrameMatrix m_frameBasics;
 	};
 
-	dAdvancedPlayerController(DemoEntity* const playerEntity, const dAdvancedPlayerAnimationCache& animationcache, NewtonWorld* const world, const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
-		:dPlayerController(world, location, localAxis, mass, radius, height, stepHeight)
-		, m_animBlendTree(NULL)
-		, m_poseCount(0)
+	dAdvancedPlayerPoseModifier(dAnimationBlendTreeNode* const input, DemoEntity* const modelEntity)
+		:dPlayerIKPoseModifier(input)
 	{
-		// get body from player, and set some parameter
-		NewtonBody* const body = GetBody();
 
-		// set the user data
-		NewtonBodySetUserData(body, playerEntity);
-
-		// set the transform callback
-		NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
-
-		// save player model with the controller
-		SetUserData(playerEntity);
-
-		// bind skeleton to animation blend tree, using idle sequence
-		BindEntityAndToPose(animationcache);
-
-		// make the animation blend tree
-		CreateAnimationBlendTree(animationcache);
-
-		// create model skeleton to inverse kinematic pose modifications
-		CreateIKSkeleton();
-	}
-
-	~dAdvancedPlayerController()
-	{
-		if (m_animBlendTree) {
-			delete m_animBlendTree;
-		}
-	}
-
-	void BindEntityAndToPose(const dAdvancedPlayerAnimationCache& animationcache)
-	{
-		dAnimationSequence* const sequence = (dAnimationSequence*)&animationcache.Find("whiteman_idle.anm")->GetInfo();
-
-		int count = 0;
-		DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(GetBody());
-		const dList<dAnimimationKeyFramesTrack>& tracks = sequence->GetTracks();
-
-		m_output.Resize(tracks.GetCount());
-		for (dList<dAnimimationKeyFramesTrack>::dListNode* node = tracks.GetFirst(); node; node = node->GetNext()) {
-			dAnimimationKeyFramesTrack& track = node->GetInfo();
-			DemoEntity* const ent = entity->Find(track.GetName().GetStr());
-			m_output[count].m_userData = ent;
-			count++;
-		}
-		m_poseCount = count;
-		dAssert(m_poseCount == m_output.GetSize());
-	}
-
-	void CreateAnimationBlendTree(const dAdvancedPlayerAnimationCache& animationcache)
-	{
-		dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_idle.anm")->GetInfo();
-		//dAnimationSequence* const walkSequence = (dAnimationSequence*)&animationcache.Find("whiteman_walk.anm")->GetInfo();
-		//dAnimationSequence* const runSequence = (dAnimationSequence*)&animationcache.Find("whiteman_run.anm")->GetInfo();
-
-		dAnimationSequencePlayer* const idle = new dAnimationSequencePlayer(idleSequence);
-		//dAnimationSequencePlayer* const walk = new dAnimationSequencePlayer(walkSequence);
-		//dAnimationSequencePlayer* const run = new dAnimationSequencePlayer(runSequence);
-
-		//dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
-		//dFloat scale1 = runSequence->GetPeriod() / walkSequence->GetPeriod();
-		//dAnimationTwoWayBlend* const walkRunBlend = new dAnimationTwoWayBlend(walk, run);
-		//walkRunBlend->SetTimeDilation1(scale1);
-		//walkRunBlend->SetParam(0.5f);
-		//m_animBlendTree = walkRunBlend;
-		m_animBlendTree = idle;
-	}
-
-
-	void CreateIKSkeleton()
-	{
+//		dVehicleNode* const parent, void* const userData, const dMatrix& bindMatrix, NewtonCollision* const shape
 		static dJointDefinition jointsDefinition[] =
 		{
 			{ "mixamorig:Hips", 1, 16 },
@@ -1638,6 +1568,13 @@ class dAdvancedPlayerController : public dPlayerController
 			//{ "mixamorig:RightArm", 16, 27, 100.0f, { -45.0f, 45.0f, 80.0f }, { 0.0f, 0.0f, 180.0f } },
 			//{ "mixamorig:RightForeArm", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
 		};
+
+//		Init (parent, userData, bindMatrix, shape);
+	}
+
+/*
+	void CreateIKSkeleton()
+	{
 
 		DemoEntity* const rootEntity = (DemoEntity*)GetUserData();
 		dAssert(NewtonBodyGetUserData(GetBody()) == GetUserData());
@@ -1677,14 +1614,14 @@ class dAdvancedPlayerController : public dPlayerController
 				const dJointDefinition& definition = jointsDefinition[i];
 				if (!strcmp(definition.m_boneName, entity->GetName().GetStr())) {
 					//dVehicleNode* const childBody = CreateBodyPart(entity);
-					
+
 					NewtonCollision* const shape = entity->CreateCollisionFromchildren(world);
 					dAssert(shape);
 
-					DemoEntity* const parentEntity = (DemoEntity*) parentBone->GetUserData();
+					DemoEntity* const parentEntity = (DemoEntity*)parentBone->GetUserData();
 					dTrace(("parent: %s   child: %s\n", parentEntity->GetName().GetStr(), entity->GetName().GetStr()));
 					//ConnectBodyParts(childBody, parentBody, jointsDefinition[i]);
-					
+
 					dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix(parentEntity).Inverse());
 					parentBone = new dPlayerIKNode(parentBone, entity, bindMatrix, shape);
 
@@ -1712,6 +1649,84 @@ class dAdvancedPlayerController : public dPlayerController
 		//dMatrix worldMatrix(rootEntity->GetCurrentMatrix() * location);
 		//NewtonBodySetMatrixRecursive(rootBone, &worldMatrix[0][0]);
 	}
+*/
+};
+
+class dAdvancedPlayerController: public dPlayerController
+{
+	public:
+	dAdvancedPlayerController(DemoEntity* const playerEntity, const dAdvancedPlayerAnimationCache& animationcache, NewtonWorld* const world, const dMatrix& location, const dMatrix& localAxis, dFloat mass, dFloat radius, dFloat height, dFloat stepHeight)
+		:dPlayerController(world, location, localAxis, mass, radius, height, stepHeight)
+		,m_animBlendTree(NULL)
+		,m_poseCount(0)
+	{
+		// get body from player, and set some parameter
+		NewtonBody* const body = GetBody();
+
+		// set the user data
+		NewtonBodySetUserData(body, playerEntity);
+
+		// set the transform callback
+		NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
+
+		// save player model with the controller
+		SetUserData(playerEntity);
+
+		// bind skeleton to animation blend tree, using idle sequence
+		BindEntityAndToPose(animationcache);
+
+		// make the animation blend tree
+		CreateAnimationBlendTree(animationcache, playerEntity);
+	}
+
+	~dAdvancedPlayerController()
+	{
+		if (m_animBlendTree) {
+			delete m_animBlendTree;
+		}
+	}
+
+	void BindEntityAndToPose(const dAdvancedPlayerAnimationCache& animationcache)
+	{
+		dAnimationSequence* const sequence = (dAnimationSequence*)&animationcache.Find("whiteman_idle.anm")->GetInfo();
+
+		int count = 0;
+		DemoEntity* const entity = (DemoEntity*)NewtonBodyGetUserData(GetBody());
+		const dList<dAnimimationKeyFramesTrack>& tracks = sequence->GetTracks();
+
+		m_output.Resize(tracks.GetCount());
+		for (dList<dAnimimationKeyFramesTrack>::dListNode* node = tracks.GetFirst(); node; node = node->GetNext()) {
+			dAnimimationKeyFramesTrack& track = node->GetInfo();
+			DemoEntity* const ent = entity->Find(track.GetName().GetStr());
+			m_output[count].m_userData = ent;
+			count++;
+		}
+		m_poseCount = count;
+		dAssert(m_poseCount == m_output.GetSize());
+	}
+
+	void CreateAnimationBlendTree(const dAdvancedPlayerAnimationCache& animationcache, DemoEntity* const playerEntity)
+	{
+		dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_idle.anm")->GetInfo();
+		//dAnimationSequence* const walkSequence = (dAnimationSequence*)&animationcache.Find("whiteman_walk.anm")->GetInfo();
+		//dAnimationSequence* const runSequence = (dAnimationSequence*)&animationcache.Find("whiteman_run.anm")->GetInfo();
+
+		dAnimationSequencePlayer* const idle = new dAnimationSequencePlayer(idleSequence);
+		//dAnimationSequencePlayer* const walk = new dAnimationSequencePlayer(walkSequence);
+		//dAnimationSequencePlayer* const run = new dAnimationSequencePlayer(runSequence);
+
+		//dFloat scale0 = walkSequence->GetPeriod() / runSequence->GetPeriod();
+		//dFloat scale1 = runSequence->GetPeriod() / walkSequence->GetPeriod();
+		//dAnimationTwoWayBlend* const walkRunBlend = new dAnimationTwoWayBlend(walk, run);
+		//walkRunBlend->SetTimeDilation1(scale1);
+		//walkRunBlend->SetParam(0.5f);
+		//m_animBlendTree = walkRunBlend;
+
+		dAdvancedPlayerPoseModifier* const ikMidifier = new dAdvancedPlayerPoseModifier(idle, playerEntity);
+
+		m_animBlendTree = ikMidifier;
+	}
+
 
 	void ApplyMove(dFloat timestep)
 	{

@@ -24,6 +24,7 @@
 class dPlayerIKNode: public dVehicleNode
 {
 	public:
+	DVEHICLE_API dPlayerIKNode();
 	DVEHICLE_API dPlayerIKNode(dVehicleNode* const parent, void* const userData, const dMatrix& bindMatrix, NewtonCollision* const shape);
 	DVEHICLE_API ~dPlayerIKNode();
 

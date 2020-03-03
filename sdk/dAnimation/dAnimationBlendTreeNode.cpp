@@ -62,14 +62,14 @@ void dAnimationBlendTreeNode::dAnimationPose::SetTargetPose() const
 dAnimationBlendTreeNode::dAnimationBlendTreeNode(dAnimationBlendTreeNode* const child)
 	:dContainersAlloc()
 //	,m_character(character)
-	,m_child(child)
+	,m_input(child)
 {
 }
 
 dAnimationBlendTreeNode::~dAnimationBlendTreeNode()
 {
-	if (m_child) {
-		delete m_child;
+	if (m_input) {
+		delete m_input;
 	}
 }
 

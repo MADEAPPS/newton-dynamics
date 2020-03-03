@@ -55,12 +55,15 @@
 #endif
 
 
-void* dCustomAlloc::operator new (size_t size)
+
+//void* dCustomAlloc::operator new (size_t size)
+void* dCustomAlloc::malloc(size_t size)
 {
 	return NewtonAlloc(int (size));
 }
 
-void dCustomAlloc::operator delete (void* ptr)
+//void dCustomAlloc::operator delete (void* ptr)
+void dCustomAlloc::free(void* const ptr)
 {
 	NewtonFree(ptr);
 }

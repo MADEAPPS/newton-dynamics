@@ -53,8 +53,18 @@ class dCustomScopeLock
 class dCustomAlloc
 {
 	public:
-	CUSTOM_JOINTS_API void *operator new (size_t size);
-	CUSTOM_JOINTS_API void operator delete (void* ptr);
+	CUSTOM_JOINTS_API static void* malloc (size_t size);
+	CUSTOM_JOINTS_API static void free (void* const ptr);
+
+	void *operator new (size_t size)
+	{
+		return malloc (size);
+	}
+
+	void operator delete (void* ptr)
+	{
+		free (ptr);
+	}
 
 	dCustomAlloc()
 	{
