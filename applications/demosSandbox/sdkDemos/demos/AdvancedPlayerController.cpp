@@ -1542,8 +1542,8 @@ class dAdvancedPlayerPoseModifier: public dPlayerIKPoseModifier
 		dFrameMatrix m_frameBasics;
 	};
 
-	dAdvancedPlayerPoseModifier(dAnimationBlendTreeNode* const input, DemoEntity* const modelEntity)
-		:dPlayerIKPoseModifier(input)
+	dAdvancedPlayerPoseModifier(dPlayerController* const controller, dAnimationBlendTreeNode* const input)
+		:dPlayerIKPoseModifier(controller, input)
 	{
 
 //		dVehicleNode* const parent, void* const userData, const dMatrix& bindMatrix, NewtonCollision* const shape
@@ -1569,7 +1569,20 @@ class dAdvancedPlayerPoseModifier: public dPlayerIKPoseModifier
 			//{ "mixamorig:RightForeArm", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 00.0f, 90.0f } },
 		};
 
-//		Init (parent, userData, bindMatrix, shape);
+		DemoEntity* const rootEntity = (DemoEntity*)m_controller->GetUserData();
+		dAssert (rootEntity );
+
+		// get root node parameters: collision, node, binding matrix
+		DemoEntity* const hipEntity = rootEntity->Find(jointsDefinition[0].m_boneName);
+		dAssert(hipEntity);
+		NewtonWorld* const world = NewtonBodyGetWorld(m_controller->GetBody());
+		NewtonCollision* const shape = hipEntity->CreateCollisionFromchildren(world);
+		dAssert(shape);
+		dMatrix bindMatrix(hipEntity->GetParent()->CalculateGlobalMatrix(rootEntity).Inverse());
+
+		// initialize the root node
+		Init (hipEntity, bindMatrix, shape);
+		NewtonDestroyCollision(shape);
 	}
 
 /*
@@ -1722,9 +1735,9 @@ class dAdvancedPlayerController: public dPlayerController
 		//walkRunBlend->SetParam(0.5f);
 		//m_animBlendTree = walkRunBlend;
 
-		dAdvancedPlayerPoseModifier* const ikMidifier = new dAdvancedPlayerPoseModifier(idle, playerEntity);
+		dAdvancedPlayerPoseModifier* const poseModifier = new dAdvancedPlayerPoseModifier(this, idle);
 
-		m_animBlendTree = ikMidifier;
+		m_animBlendTree = poseModifier;
 	}
 
 

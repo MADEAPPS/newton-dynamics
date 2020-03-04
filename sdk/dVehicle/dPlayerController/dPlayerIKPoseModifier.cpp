@@ -17,9 +17,10 @@
 #include "dPlayerIKPoseModifier.h"
 
 
-dPlayerIKPoseModifier::dPlayerIKPoseModifier(dAnimationBlendTreeNode* const input)
+dPlayerIKPoseModifier::dPlayerIKPoseModifier(dPlayerController* const controller, dAnimationBlendTreeNode* const input)
 	:dPlayerIKNode()
 	,dAnimationBlendTreeNode(input)
+	,m_controller(controller)
 {
 }
 
@@ -37,9 +38,11 @@ void dPlayerIKPoseModifier::operator delete (void* ptr)
 	dPlayerIKNode::free(ptr);
 }
 
-void dPlayerIKPoseModifier::Init (dVehicleNode* const parent, void* const userData, const dMatrix& bindMatrix, NewtonCollision* const shape)
+void dPlayerIKPoseModifier::Init (void* const userData, const dMatrix& bindMatrix, NewtonCollision* const shape)
 {
-	dAssert (0);
+	m_bindMatrix = bindMatrix;
+	SetUserData(userData);
+	m_shape = NewtonCollisionCreateInstance(shape);
 }
 
 

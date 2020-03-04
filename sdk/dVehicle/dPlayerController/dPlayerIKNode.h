@@ -32,7 +32,7 @@ class dPlayerIKNode: public dVehicleNode
 
 	protected:
 	dMatrix m_bindMatrix;
-
+	NewtonCollision* m_shape;
 };
 
 #endif 
