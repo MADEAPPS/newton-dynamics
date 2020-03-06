@@ -14,8 +14,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 #include "dStdafxVehicle.h"
+#include "dPlayerController.h"
 #include "dPlayerIKPoseModifier.h"
-
 
 dPlayerIKPoseModifier::dPlayerIKPoseModifier(dPlayerController* const controller, dAnimationBlendTreeNode* const input)
 	:dPlayerIKNode()
@@ -45,6 +45,43 @@ void dPlayerIKPoseModifier::Init (void* const userData, const dMatrix& bindMatri
 	m_shape = NewtonCollisionCreateInstance(shape);
 }
 
+void dPlayerIKPoseModifier::Finalize()
+{
+	dPlayerIKNode* array[256];
+	
+	dFloat volume = 0.0f;
+	int nodeCount = GetNodeArray (array);
+	for (int i = 0; i < nodeCount; i ++) {
+		const dPlayerIKNode* const node = array[i];
+		volume += NewtonConvexCollisionCalculateVolume (node->m_shape);
+	}
+	dFloat density = m_controller->GetMass() / volume;
+
+
+}
+
+int dPlayerIKPoseModifier::GetNodeArray (dPlayerIKNode** const array) const
+{
+	dPlayerIKNode* stackMem[32];
+	stackMem[0] = (dPlayerIKNode*)this;
+	int stack = 1;
+
+	int count = 0;
+	while (stack) {
+		stack --;
+		dPlayerIKNode* const node = stackMem[stack];
+		array[count] = node;
+		count ++;
+
+		for (dVehicleNodeChildrenList::dListNode* childNode = node->GetChildrenList().GetFirst(); childNode; childNode = childNode->GetNext()) {
+			dPlayerIKNode* const child = childNode->GetInfo()->GetAsPlayerIKNode();
+			dAssert (child);
+			stackMem[stack] = child;
+			stack ++;
+		}
+	}
+	return count;
+}
 
 void dPlayerIKPoseModifier::Evaluate(dAnimationPose& output, dFloat timestep)
 {

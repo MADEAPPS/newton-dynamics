@@ -1583,6 +1583,62 @@ class dAdvancedPlayerPoseModifier: public dPlayerIKPoseModifier
 		// initialize the root node
 		Init (hipEntity, bindMatrix, shape);
 		NewtonDestroyCollision(shape);
+
+		int bodyCount = 1;
+		dPlayerIKNode* bodyArray[1024];
+		bodyArray[0] = this;
+
+		int stackIndex = 0;
+		DemoEntity* childEntities[128];
+		dPlayerIKNode* parentBones[128];
+		for (DemoEntity* child = hipEntity->GetChild(); child; child = child->GetSibling()) {
+			parentBones[stackIndex] = this;
+			childEntities[stackIndex] = child;
+			stackIndex++;
+		}
+
+		// walk model hierarchic adding all children designed as rigid body bones. 
+		const int definitionCount = sizeof (jointsDefinition) / sizeof (jointsDefinition[0]);
+		while (stackIndex) {
+			stackIndex--;
+			dPlayerIKNode* parentBone = parentBones[stackIndex];
+			DemoEntity* const entity = childEntities[stackIndex];
+			//const char* const name = entity->GetName().GetStr();
+			dTrace(("entity: %s\n", entity->GetName().GetStr()));
+			for (int i = 0; i < definitionCount; i++) {
+				const dJointDefinition& definition = jointsDefinition[i];
+				if (!strcmp(definition.m_boneName, entity->GetName().GetStr())) {
+					//dVehicleNode* const childBody = CreateBodyPart(entity);
+
+					NewtonCollision* const shape = entity->CreateCollisionFromchildren(world);
+					dAssert(shape);
+
+					DemoEntity* const parentEntity = (DemoEntity*)parentBone->GetUserData();
+					dTrace(("parent: %s   child: %s\n", parentEntity->GetName().GetStr(), entity->GetName().GetStr()));
+					//ConnectBodyParts(childBody, parentBody, jointsDefinition[i]);
+
+					dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix(parentEntity).Inverse());
+					parentBone = new dPlayerIKNode(parentBone, entity, bindMatrix, shape);
+
+					NewtonDestroyCollision(shape);
+
+					bodyArray[bodyCount] = parentBone->GetAsPlayerIKNode();
+					bodyCount++;
+
+					break;
+				}
+			}
+
+			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
+				parentBones[stackIndex] = parentBone;
+				childEntities[stackIndex] = child;
+				stackIndex++;
+			}
+		}
+
+		Finalize();		
+
+
 	}
 
 /*

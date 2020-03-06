@@ -27,7 +27,6 @@ dPlayerIKNode::dPlayerIKNode(dVehicleNode* const parent, void* const userData, c
 	:dVehicleNode(parent)
 	,m_bindMatrix(bindMatrix)
 {
-	dAssert (0);
 	SetUserData(userData);
 	m_shape = NewtonCollisionCreateInstance(shape);
 }

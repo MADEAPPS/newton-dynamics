@@ -30,6 +30,7 @@ class dPlayerIKPoseModifier: public dPlayerIKNode, public dAnimationBlendTreeNod
 	DVEHICLE_API virtual ~dPlayerIKPoseModifier();
 
 	DVEHICLE_API void Init (void* const userData, const dMatrix& bindMatrix, NewtonCollision* const shape);
+	DVEHICLE_API void Finalize();
 
 	DVEHICLE_API void *operator new (size_t size);
 	DVEHICLE_API void operator delete (void* ptr);
@@ -37,8 +38,11 @@ class dPlayerIKPoseModifier: public dPlayerIKNode, public dAnimationBlendTreeNod
 	protected: 
 	DVEHICLE_API virtual void Evaluate(dAnimationPose& output, dFloat timestep);
 
-	dPlayerController* m_controller; 
+	private:
+	int GetNodeArray (dPlayerIKNode** const array) const;
 
+	protected:
+	dPlayerController* m_controller; 
 };
 
 #endif 
