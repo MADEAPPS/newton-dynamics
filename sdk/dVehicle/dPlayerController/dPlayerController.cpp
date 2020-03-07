@@ -448,6 +448,10 @@ dFloat dPlayerController::PredictTimestep(dFloat timestep, dPlayerControllerCont
 	return timestep;
 }
 
+const void dPlayerController::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+}
+
 void dPlayerController::UpdatePlayerStatus(dPlayerControllerContactSolver& contactSolver)
 {
 	dMatrix matrix;

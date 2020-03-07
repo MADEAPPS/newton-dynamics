@@ -1545,13 +1545,11 @@ class dAdvancedPlayerPoseModifier: public dPlayerIKPoseModifier
 	dAdvancedPlayerPoseModifier(dPlayerController* const controller, dAnimationBlendTreeNode* const input)
 		:dPlayerIKPoseModifier(controller, input)
 	{
-
-//		dVehicleNode* const parent, void* const userData, const dMatrix& bindMatrix, NewtonCollision* const shape
 		static dJointDefinition jointsDefinition[] =
 		{
 			{ "mixamorig:Hips", 1, 16 },
 
-			{ "mixamorig:LeftUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
+			//{ "mixamorig:LeftUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
 			//{ "mixamorig:LeftLeg", 16, 31, 50.0f, { -140.0f, 10.0f, 0.0f }, { 0.0f, 90.0f, 90.0f } },
 			//
 			//{ "mixamorig:RightUpLeg", 16, 31, 100.0f, { -45.0f, 45.0f, 120.0f }, { 0.0f, 0.0f, 180.0f } },
@@ -1638,87 +1636,7 @@ class dAdvancedPlayerPoseModifier: public dPlayerIKPoseModifier
 
 		Finalize();		
 
-
 	}
-
-/*
-	void CreateIKSkeleton()
-	{
-
-		DemoEntity* const rootEntity = (DemoEntity*)GetUserData();
-		dAssert(NewtonBodyGetUserData(GetBody()) == GetUserData());
-
-		DemoEntity* const hipEntity = rootEntity->Find(jointsDefinition[0].m_boneName);
-		dAssert(hipEntity);
-
-		NewtonWorld* const world = NewtonBodyGetWorld(GetBody());
-		NewtonCollision* const shape = hipEntity->CreateCollisionFromchildren(world);
-		dAssert(shape);
-		dMatrix bindMatrix(hipEntity->GetParent()->CalculateGlobalMatrix(rootEntity).Inverse());
-		dPlayerIKNode* const ikRooBone = new dPlayerIKNode(this, hipEntity, bindMatrix, shape);
-		NewtonDestroyCollision(shape);
-
-		int bodyCount = 1;
-		dPlayerIKNode* bodyArray[1024];
-		bodyArray[0] = ikRooBone;
-
-		int stackIndex = 0;
-		dPlayerIKNode* parentBones[32];
-		DemoEntity* childEntities[32];
-		for (DemoEntity* child = hipEntity->GetChild(); child; child = child->GetSibling()) {
-			parentBones[stackIndex] = ikRooBone;
-			childEntities[stackIndex] = child;
-			stackIndex++;
-		}
-
-		// walk model hierarchic adding all children designed as rigid body bones. 
-		const int definitionCount = sizeof (jointsDefinition) / sizeof (jointsDefinition[0]);
-		while (stackIndex) {
-			stackIndex--;
-			dPlayerIKNode* parentBone = parentBones[stackIndex];
-			DemoEntity* const entity = childEntities[stackIndex];
-			//const char* const name = entity->GetName().GetStr();
-			dTrace(("entity: %s\n", entity->GetName().GetStr()));
-			for (int i = 0; i < definitionCount; i++) {
-				const dJointDefinition& definition = jointsDefinition[i];
-				if (!strcmp(definition.m_boneName, entity->GetName().GetStr())) {
-					//dVehicleNode* const childBody = CreateBodyPart(entity);
-
-					NewtonCollision* const shape = entity->CreateCollisionFromchildren(world);
-					dAssert(shape);
-
-					DemoEntity* const parentEntity = (DemoEntity*)parentBone->GetUserData();
-					dTrace(("parent: %s   child: %s\n", parentEntity->GetName().GetStr(), entity->GetName().GetStr()));
-					//ConnectBodyParts(childBody, parentBody, jointsDefinition[i]);
-
-					dMatrix bindMatrix(entity->GetParent()->CalculateGlobalMatrix(parentEntity).Inverse());
-					parentBone = new dPlayerIKNode(parentBone, entity, bindMatrix, shape);
-
-					NewtonDestroyCollision(shape);
-
-					bodyArray[bodyCount] = parentBone->GetAsPlayerIKNode();
-					bodyCount++;
-
-					break;
-				}
-			}
-
-			for (DemoEntity* child = entity->GetChild(); child; child = child->GetSibling()) {
-				parentBones[stackIndex] = parentBone;
-				childEntities[stackIndex] = child;
-				stackIndex++;
-			}
-		}
-
-
-		int xxx = 0;
-		//SetModelMass(100.0f, bodyCount, bodyArray);
-		//
-		//// transform the entire contraction to its location
-		//dMatrix worldMatrix(rootEntity->GetCurrentMatrix() * location);
-		//NewtonBodySetMatrixRecursive(rootBone, &worldMatrix[0][0]);
-	}
-*/
 };
 
 class dAdvancedPlayerController: public dPlayerController
@@ -1774,6 +1692,12 @@ class dAdvancedPlayerController: public dPlayerController
 		dAssert(m_poseCount == m_output.GetSize());
 	}
 
+	virtual const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+	{
+		dPlayerController::Debug(debugContext);
+		m_poseModifier->Debug(debugContext);
+	}
+
 	void CreateAnimationBlendTree(const dAdvancedPlayerAnimationCache& animationcache, DemoEntity* const playerEntity)
 	{
 		dAnimationSequence* const idleSequence =(dAnimationSequence*) &animationcache.Find("whiteman_idle.anm")->GetInfo();
@@ -1791,12 +1715,11 @@ class dAdvancedPlayerController: public dPlayerController
 		//walkRunBlend->SetParam(0.5f);
 		//m_animBlendTree = walkRunBlend;
 
-		dAdvancedPlayerPoseModifier* const poseModifier = new dAdvancedPlayerPoseModifier(this, idle);
+		m_poseModifier = new dAdvancedPlayerPoseModifier(this, idle);
 
-		m_animBlendTree = poseModifier;
+		m_animBlendTree = m_poseModifier;
 	}
-
-
+	
 	void ApplyMove(dFloat timestep)
 	{
 		// calculate the gravity contribution to the velocity
@@ -1848,6 +1771,7 @@ class dAdvancedPlayerController: public dPlayerController
 
 	dAnimationPose m_output;
 	dAnimationBlendTreeNode* m_animBlendTree;
+	dAdvancedPlayerPoseModifier* m_poseModifier; // not to be deleted
 	int m_poseCount;
 };
 

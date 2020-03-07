@@ -35,6 +35,8 @@ class dPlayerIKPoseModifier: public dPlayerIKNode, public dAnimationBlendTreeNod
 	DVEHICLE_API void *operator new (size_t size);
 	DVEHICLE_API void operator delete (void* ptr);
 
+	DVEHICLE_API virtual const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+
 	protected: 
 	DVEHICLE_API virtual void Evaluate(dAnimationPose& output, dFloat timestep);
 

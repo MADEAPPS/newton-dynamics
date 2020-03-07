@@ -37,3 +37,29 @@ dPlayerIKNode::~dPlayerIKNode()
 		NewtonDestroyCollision(m_shape);
 	}
 }
+
+
+void dPlayerIKNode::RenderDebugSkeleton(void* userData, int vertexCount, const dFloat* const faceVertec, int id)
+{
+	dCustomJoint::dDebugDisplay* const debugContext = (dCustomJoint::dDebugDisplay*) userData;
+
+	int index = vertexCount - 1;
+	dVector p0(faceVertec[index * 3 + 0], faceVertec[index * 3 + 1], faceVertec[index * 3 + 2]);
+	for (int i = 0; i < vertexCount; i++) {
+		dVector p1(faceVertec[i * 3 + 0], faceVertec[i * 3 + 1], faceVertec[i * 3 + 2]);
+		debugContext->DrawLine(p0, p1);
+		p0 = p1;
+	}
+}
+
+
+const void dPlayerIKNode::Debug(dCustomJoint::dDebugDisplay* const debugContext) const
+{
+	dVehicleNode::Debug(debugContext);
+	if (m_shape) {
+		debugContext->SetColor(dVector(0.0f, 0.4f, 0.7f, 1.0f));
+		//dMatrix tireMatrix(m_bindingRotation.Transpose() * GetGlobalMatrix());
+		dMatrix tireMatrix(dGetIdentityMatrix());
+		NewtonCollisionForEachPolygonDo(m_shape, &tireMatrix[0][0], RenderDebugSkeleton, debugContext);
+	}
+}

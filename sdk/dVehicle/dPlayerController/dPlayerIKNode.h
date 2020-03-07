@@ -31,6 +31,9 @@ class dPlayerIKNode: public dVehicleNode
 	virtual dPlayerIKNode* GetAsPlayerIKNode() { return this; }
 
 	protected:
+	const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+	static void RenderDebugSkeleton(void* userData, int vertexCount, const dFloat* const faceVertec, int id);
+
 	dMatrix m_bindMatrix;
 	NewtonCollision* m_shape;
 

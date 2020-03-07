@@ -331,7 +331,7 @@ DemoEntityManager::DemoEntityManager ()
 //	m_showContactPoints = true;
 //	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
-//	m_showListenersDebugInfo = true;
+	m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
 
 	Cleanup();

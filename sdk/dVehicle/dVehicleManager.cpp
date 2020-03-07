@@ -67,7 +67,7 @@ void dVehicleManager::OnDebug(dCustomJoint::dDebugDisplay* const debugContext)
 {
 	for (dList<dVehicle*>::dListNode* node = m_list.GetFirst(); node; node = node->GetNext()) {
 		dVehicle* const vehicle = node->GetInfo();
-		OnDebug(vehicle, debugContext);
+//		OnDebug(vehicle, debugContext);
 		vehicle->Debug(debugContext);
 	}
 }

@@ -77,6 +77,8 @@ class dPlayerController: public dVehicle
 	{
 	}
 
+	DVEHICLE_API virtual const void Debug(dCustomJoint::dDebugDisplay* const debugContext) const;
+
 	DVEHICLE_API void PreUpdate(dFloat timestep);
 
 	private:
