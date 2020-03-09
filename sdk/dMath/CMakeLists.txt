@@ -14,7 +14,7 @@ set (projectName "dMath")
 message (${projectName})
 
 # low level core
-file(GLOB CPP_SOURCE *.cpp)
+file(GLOB CPP_SOURCE *.h *.cpp)
 file(GLOB HEADERS *.h)
 
 if (UNIX OR MINGW)

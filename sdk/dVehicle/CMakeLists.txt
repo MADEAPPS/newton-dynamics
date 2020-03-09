@@ -25,6 +25,9 @@ file(GLOB CPP_SOURCE
 	dMultiBodyVehicle/*.h
 	dMultiBodyVehicle/*.cpp
 )
+
+file(GLOB HEADERS *.h dPlayerController/*.h dMultiBodyVehicle/*.h)
+
 #source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" PREFIX source/ FILES ${CPP_SOURCE})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
