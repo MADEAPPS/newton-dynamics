@@ -40,13 +40,6 @@ class dCustomSixdof: public dCustomJoint
 	CUSTOM_JOINTS_API dCustomSixdof (const dMatrix& pinAndPivotChildFrame, const dMatrix& pinAndPivotParentFrame,  NewtonBody* const child, NewtonBody* const parent = NULL);
 	CUSTOM_JOINTS_API virtual ~dCustomSixdof();
 
-	CUSTOM_JOINTS_API void DisableAxisX();
-	CUSTOM_JOINTS_API void DisableAxisY();
-	CUSTOM_JOINTS_API void DisableAxisZ();
-	CUSTOM_JOINTS_API void DisableRotationX();
-	CUSTOM_JOINTS_API void DisableRotationY();
-	CUSTOM_JOINTS_API void DisableRotationZ();
-
 	CUSTOM_JOINTS_API void GetLinearLimits (dVector& minLinearLimits, dVector& maxLinearLimits) const;
 	CUSTOM_JOINTS_API void SetLinearLimits (const dVector& minLinearLimits, const dVector& maxLinearLimits);
 
