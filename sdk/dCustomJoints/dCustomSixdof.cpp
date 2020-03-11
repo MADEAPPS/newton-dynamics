@@ -28,11 +28,10 @@ dCustomSixdof::dCustomSixdof (const dMatrix& pinAndPivotFrame, NewtonBody* const
 	,m_yaw()
 	,m_roll()
 {
-	m_options.m_value = 0x3f;
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
 }
 
-dCustomSixdof::dCustomSixdof (const dMatrix& pinAndPivotChildFrame, const dMatrix& pinAndPivotParentFrame,  NewtonBody* const child, NewtonBody* const parent)
+dCustomSixdof::dCustomSixdof (const dMatrix& pinAndPivotChildFrame, const dMatrix& pinAndPivotParentFrame, NewtonBody* const child, NewtonBody* const parent)
 	:dCustomJoint(6, child, parent)
 	,m_minLinearLimits(0.0f)
 	,m_maxLinearLimits(0.0f)
@@ -41,7 +40,6 @@ dCustomSixdof::dCustomSixdof (const dMatrix& pinAndPivotChildFrame, const dMatri
 	,m_roll()
 {
 	dMatrix dummy;
-	m_options.m_value = 0x3f;
 	CalculateLocalMatrix(pinAndPivotChildFrame, m_localMatrix0, dummy);
 	CalculateLocalMatrix(pinAndPivotParentFrame, dummy, m_localMatrix1);
 }
@@ -67,36 +65,6 @@ void dCustomSixdof::Serialize (NewtonSerializeCallback callback, void* const use
 	callback(userData, &m_yaw, sizeof(m_yaw));
 	callback(userData, &m_roll, sizeof(m_roll));
 	callback(userData, &m_pitch, sizeof(m_pitch));
-}
-
-void dCustomSixdof::DisableAxisX()
-{
-	m_options.m_option0 = 0;
-}
-
-void dCustomSixdof::DisableAxisY()
-{
-	m_options.m_option1 = 0;
-}
-
-void dCustomSixdof::DisableAxisZ()
-{
-	m_options.m_option2 = 0;
-}
-
-void dCustomSixdof::DisableRotationX()
-{
-	m_options.m_option3 = 0;
-}
-
-void dCustomSixdof::DisableRotationY()
-{
-	m_options.m_option4 = 0;
-}
-
-void dCustomSixdof::DisableRotationZ()
-{
-	m_options.m_option5 = 0;
 }
 
 void dCustomSixdof::SetLinearLimits (const dVector& minLinearLimits, const dVector& maxLinearLimits)
@@ -272,7 +240,6 @@ void dCustomSixdof::Debug(dDebugDisplay* const debugDisplay) const
 	}
 }
 
-
 void dCustomSixdof::SubmitConstraints (dFloat timestep, int threadIndex)
 {
 	dMatrix matrix0;
@@ -301,37 +268,35 @@ void dCustomSixdof::SubmitConstraints (dFloat timestep, int threadIndex)
 	const dVector dp(p0 - p1);
 	const dVector veloc(veloc0 - veloc1);
 	for (int i = 0; i < 3; i ++) {
-		//if (m_options.m_value & (1 << (i + 3))) {
-		if (m_options.m_value & (1 << i)) {
-			if ((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f)) {
-				NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
+		if ((m_minLinearLimits[i] == 0.0f) && (m_maxLinearLimits[i] == 0.0f)) {
+			NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1[i][0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		} else {
+			dFloat posit = dp.DotProduct3(matrix1[i]);
+			dFloat speed = veloc.DotProduct3(matrix1[i]);
+			dFloat x = posit + speed * timestep;
+			if (x < m_minLinearLimits[i]) {
+				NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
 				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			} else {
-				dFloat posit = dp.DotProduct3(matrix1[i]);
-				dFloat speed = veloc.DotProduct3(matrix1[i]);
-				dFloat x = posit + speed * timestep;
-				if (x < m_minLinearLimits[i]) {
-					NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
-					NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-					NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+				NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 
-					speed = 0.5f * (m_minLinearLimits[i] - posit) * invtimestep;
-					const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
-					NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
+				speed = 0.5f * (m_minLinearLimits[i] - posit) * invtimestep;
+				const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
+				NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 
-				} else if (x > m_maxLinearLimits[i]) {
-					NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
-					NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-					NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+			} else if (x > m_maxLinearLimits[i]) {
+				NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
+				NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 
-					speed = 0.5f * (m_maxLinearLimits[i] - posit) * invtimestep;
-					const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
-					NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
-				}
+				speed = 0.5f * (m_maxLinearLimits[i] - posit) * invtimestep;
+				const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + speed * invtimestep;
+				NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			}
 		}
 	}
 
+#if 0
 	// update joint angle
 	CalculateJointAngles(matrix0, matrix1);
 	const dVector omega(omega0 - omega1);
@@ -400,5 +365,6 @@ void dCustomSixdof::SubmitConstraints (dFloat timestep, int threadIndex)
 			}
 		}
 	}
+#endif
 }
 

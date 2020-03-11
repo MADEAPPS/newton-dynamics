@@ -679,7 +679,8 @@ class dExcavatorModel: public dModelRootNode
 		attachment->DisableRotationZ();
 
 #else
-
+		dAssert(0);
+/*
 		dMatrix hingeFrame;
 		NewtonBody* const bar1 = MakeBodyPart(armNode, "barLinkage1", 5.0f);
 		NewtonBodyGetMatrix(bar1, &hingeFrame[0][0]);
@@ -701,11 +702,11 @@ class dExcavatorModel: public dModelRootNode
 		dMatrix attachmentMatrix(attachmenPoint->CalculateGlobalMatrix());
 		attachmentMatrix = dRollMatrix(90.0f * dDegreeToRad) * attachmentMatrix;
 		dCustomSixdof* const attachment = new dCustomSixdof(attachmentMatrix, bar2Node->GetBody(), buckectNode->GetBody());
-		attachment->DisableRotationX();
-		attachment->DisableRotationY();
-		attachment->DisableRotationZ();
+		attachment->SetLinearLimits(dVector(-1000.0f), dVector(1000.0f));
+		//attachment->DisableRotationX();
+		//attachment->DisableRotationY();
+		//attachment->DisableRotationZ();
 
-/*
 		//hydraulic01
 		NewtonBody* const hydrawlic = MakeBodyPart(armNode, "hydraulic01", 5.0f);
 		NewtonBodyGetMatrix(hydrawlic, &hingeFrame[0][0]);

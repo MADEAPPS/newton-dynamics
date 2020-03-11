@@ -15,6 +15,8 @@ message (${projectName})
 
 #source and header files
 file(GLOB CPP_SOURCE *.h *.cpp)
+file(GLOB HEADERS *.h)
+
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 if(NEWTON_BUILD_SHARED_LIBS)

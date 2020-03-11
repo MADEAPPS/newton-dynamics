@@ -462,7 +462,6 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	dVector size (1.0f, 1.0f, 1.0f);
 	NewtonBody* const base = CreateBox(scene, origin + dVector (0.0f,  5.0f + size.m_y + 0.25f, 0.0f, 0.0f), size.Scale (0.2f));
 	NewtonBody* const box0 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
-	NewtonBody* const box1 = CreateCapule (scene, origin + dVector (0.0f,  5.0f- size.m_y * 2.0f, 0.0f, 0.0f), size);
 
 	const dFloat yawLimit = 120.0f * dDegreeToRad;
 	const dFloat rollLimit = 80.0f * dDegreeToRad;
@@ -483,13 +482,14 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	//joint0->DisableRotationX ();
 
 	// link the two boxes
-	dMatrix matrix1;
-	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
-	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
-	dCustomSixdof* const joint1 = new dCustomSixdof (pinMatrix, box1, box0);
-	joint1->SetYawLimits(-yawLimit, yawLimit);
-	joint1->SetRollLimits(-rollLimit, rollLimit);
-	joint1->SetPitchLimits(-pitchLimit, pitchLimit);
+//	dMatrix matrix1;
+//	NewtonBody* const box1 = CreateCapule(scene, origin + dVector(0.0f, 5.0f - size.m_y * 2.0f, 0.0f, 0.0f), size);
+//	NewtonBodyGetMatrix (box1, &matrix1[0][0]);
+//	pinMatrix.m_posit = (matrix0.m_posit + matrix1.m_posit).Scale (0.5f);
+//	dCustomSixdof* const joint1 = new dCustomSixdof (pinMatrix, box1, box0);
+//	joint1->SetYawLimits(-yawLimit, yawLimit);
+//	joint1->SetRollLimits(-rollLimit, rollLimit);
+//	joint1->SetPitchLimits(-pitchLimit, pitchLimit);
 	//joint1->DisableRotationX();
 }
 
@@ -1191,7 +1191,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
 //	joints still with problems
-//	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
+	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 //	AddSliderBug(scene, dVector(-20.0f, 0.0f, 17.0f));
 //	AddDoubleHinge(scene, dVector(-20.0f, 0.0f, 17.0f));
 //	AddPathFollow(scene, dVector(20.0f, 0.0f, 0.0f));
@@ -1199,7 +1199,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
 //	AddHinge(scene, dVector(-20.0f, 0.0f, 0.0f));
 //	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
-	AddFlexyPipe(scene, dVector(-20.0f, 0.0f, 0.0f));
+//	AddFlexyPipe(scene, dVector(-20.0f, 0.0f, 0.0f));
 
 #if 0
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
@@ -1220,7 +1220,7 @@ void StandardJoints (DemoEntityManager* const scene)
 	AddGearAndRack (scene, dVector (-20.0f, 0.0f, 29.0f));
 	AddDifferential(scene, dVector(-20.0f, 0.0f, 35.0f));
 	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
-	AddFlexyPipe(scene, dVector(0.0f, 0.0f, 5.0f));
+	//AddFlexyPipe(scene, dVector(-20.0f, 0.0f, 0.0f));
 #endif
 
     // place camera into position

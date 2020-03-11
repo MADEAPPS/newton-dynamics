@@ -15,6 +15,7 @@ message (${projectName})
 
 #source and header files
 file(GLOB CPP_SOURCE *.h *.cpp)
+file(GLOB HEADERS *.h)
 
 if(NEWTON_BUILD_SHARED_LIBS)
     add_definitions(-D_NEWTON_BUILD_DLL)
