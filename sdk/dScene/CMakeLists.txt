@@ -54,9 +54,9 @@ if (MSVC)
 	endif ()
 endif(MSVC)
 
-install(TARGETS ${projectName}
-       LIBRARY DESTINATION lib
-       ARCHIVE DESTINATION lib
-       RUNTIME DESTINATION bin)
+install(TARGETS ${projectName} 
+		LIBRARY DESTINATION lib
+		ARCHIVE DESTINATION lib
+		RUNTIME DESTINATION bin)
 
 install(FILES ${HEADERS} DESTINATION include/${projectName})

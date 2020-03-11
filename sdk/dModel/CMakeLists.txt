@@ -42,9 +42,9 @@ if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dProfiler)
 endif()
 
-install(TARGETS ${projectName}
-       LIBRARY DESTINATION lib
-       ARCHIVE DESTINATION lib
-       RUNTIME DESTINATION bin)
+install(TARGETS ${projectName} 
+		LIBRARY DESTINATION lib
+		ARCHIVE DESTINATION lib
+		RUNTIME DESTINATION bin)
 
 install(FILES ${HEADERS} DESTINATION include/${projectName})

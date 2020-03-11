@@ -47,10 +47,10 @@ endif(MSVC)
 target_include_directories(${projectName} PUBLIC . ../dgMeshUtil)
 target_link_libraries(${projectName} dgCore)
 
-install(TARGETS ${projectName}
-       LIBRARY DESTINATION lib
-       ARCHIVE DESTINATION lib
-       RUNTIME DESTINATION bin)
+install(TARGETS ${projectName} 
+		LIBRARY DESTINATION lib
+		ARCHIVE DESTINATION lib
+		RUNTIME DESTINATION bin)
 
 install(FILES ${HEADERS} DESTINATION include/${projectName})
 

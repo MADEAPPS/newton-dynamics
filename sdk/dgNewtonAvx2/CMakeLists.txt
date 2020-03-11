@@ -41,10 +41,10 @@ else()
 	target_compile_options(${projectName} PRIVATE -mavx2 -mfma)
 endif()
 
-install(TARGETS ${projectName}
-       LIBRARY DESTINATION lib
-       ARCHIVE DESTINATION lib
-       RUNTIME DESTINATION bin)
+install(TARGETS ${projectName} 
+		LIBRARY DESTINATION lib
+		ARCHIVE DESTINATION lib
+		RUNTIME DESTINATION bin)
 
 add_custom_command(
 	TARGET ${projectName} POST_BUILD
