@@ -152,10 +152,6 @@ class dFlexyPipeSpinner: public dCustomBallAndSocket
 		:dCustomBallAndSocket(pinAndPivotFrame, child, parent)
 	{
 		EnableTwist(false);
-		//EnableCone(false);
-		//EnableTwist(true);
-		//SetTwistLimits(0.0f, 0.0f);
-		//SetTwistFriction(1.0e20f);
 		EnableCone(true);
 		SetConeLimits(0.0f);
 		SetConeFriction(1.0e20f);
@@ -476,8 +472,8 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	pinMatrix.m_posit = matrix0.m_posit + dVector (0.0f, size.m_y, 0.0f, 0.0f);
 	dCustomSixdof* const joint0 = new dCustomSixdof (pinMatrix, box0, base);
 	joint0->SetYawLimits (-yawLimit, yawLimit);
-	joint0->SetPitchLimits(-pitchLimit, pitchLimit);
 	joint0->SetRollLimits(-rollLimit, rollLimit);
+	joint0->SetPitchLimits(-pitchLimit, pitchLimit);
 	//joint0->SetPitchLimits(-0, 0);
 	//joint0->DisableRotationX ();
 

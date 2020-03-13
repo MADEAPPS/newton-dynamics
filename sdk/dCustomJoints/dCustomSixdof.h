@@ -63,7 +63,10 @@ class dCustomSixdof: public dCustomJoint
 	CUSTOM_JOINTS_API virtual void Serialize (NewtonSerializeCallback callback, void* const userData) const;
 
 	private:
-	void CalculateJointAngles(const dMatrix& matrix0, const dMatrix& matrix1);
+	//void CalculateJointAngles(const dMatrix& matrix0, const dMatrix& matrix1);
+	void SubmitTwistAngle(const dVector& pin, dFloat angle, dFloat timestep);
+	void SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
+	void SubmitAngularAxisCartisianApproximation(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep);
 	
 	protected:
 	dVector m_minLinearLimits;
