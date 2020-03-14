@@ -233,7 +233,7 @@ class dgList
 	bool SanityCheck () const;
 
 	protected:
-	dgListNode* SafeAddtop(const T &element);
+//	dgListNode* SafeAddtop(const T &element);
 
 
 	// ***********************************************************
@@ -422,6 +422,7 @@ typename dgList<T>::dgListNode *dgList<T>::Addtop (const T &element)
 	return m_first;
 }
 
+/*
 template<class T>
 typename dgList<T>::dgListNode *dgList<T>::SafeAddtop(const T& element)
 {
@@ -440,7 +441,7 @@ typename dgList<T>::dgListNode *dgList<T>::SafeAddtop(const T& element)
 #endif
 	return node;
 }
-
+*/
 
 template<class T>
 void dgList<T>::InsertAfter (dgListNode* const root, dgListNode* const node)
