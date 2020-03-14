@@ -553,15 +553,14 @@ void DemoEntityManager::Cleanup ()
 	// create the newton world
 	m_world = NewtonCreate();
 
-	// set a post update callback which is call after all simulation and all listeners updates
-	NewtonSetPostUpdateCallback (m_world, PostUpdateCallback);
-
 	// link the work with this user data
 	NewtonWorldSetUserData(m_world, this);
 
+	// set a post update callback which is call after all simulation and all listeners updates
+	NewtonSetPostUpdateCallback (m_world, PostUpdateCallback);
+
 	// set joint serialization call back
 	dCustomJoint::Initalize(m_world);
-
 
 	// add the camera manager
 	m_cameraManager = new DemoCameraManager(this);
