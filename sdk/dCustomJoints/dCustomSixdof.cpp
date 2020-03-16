@@ -156,15 +156,14 @@ void dCustomSixdof::Debug(dDebugDisplay* const debugDisplay) const
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
 
-	dCustomJoint::Debug(debugDisplay);
+	debugDisplay->DrawFrame(matrix0);
+	debugDisplay->DrawFrame(matrix1);
 
 	const int subdiv = 12;
 	dVector arch[subdiv + 1];
 	const dFloat radius = debugDisplay->m_debugScale;
-
-	CalculateGlobalMatrix(matrix0, matrix1);
-
 	{
 		// show yaw angle limits
 		if ((m_yaw.m_maxAngle > 1.0e-3f) || (m_yaw.m_minAngle < -1.0e-3f)) {
@@ -378,7 +377,7 @@ void dCustomSixdof::SubmitTwistAngle(const dVector& pin, dFloat angle, dFloat ti
 {
 	const dFloat maxTwistAngle = m_pitch.m_maxAngle;
 	const dFloat minTwistAngle = m_pitch.m_minAngle;
-	const dFloat twistFriction = 0.0f;
+	const dFloat twistFriction___ = 0.0f;
 	if ((maxTwistAngle - minTwistAngle) < (2.0f * dDegreeToRad)) {
 		NewtonUserJointAddAngularRow(m_joint, -angle, &pin[0]);
 	} else {
@@ -395,7 +394,7 @@ void dCustomSixdof::SubmitTwistAngle(const dVector& pin, dFloat angle, dFloat ti
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + restoringOmega * invtimestep;
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -twistFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 		} else if (angle >= maxTwistAngle) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
 			const dFloat invtimestep = 1.0f / timestep;
@@ -407,26 +406,26 @@ void dCustomSixdof::SubmitTwistAngle(const dVector& pin, dFloat angle, dFloat ti
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint) - restoringOmega / timestep;
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMaximumFriction(m_joint, twistFriction);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		} else if ((angle - step) <= minTwistAngle) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -twistFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
 		} else if ((angle + step) >= maxTwistAngle) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMaximumFriction(m_joint, twistFriction);
-		} else if (twistFriction > 0.0f) {
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+		} else if (twistFriction___ > 0.0f) {
 			NewtonUserJointAddAngularRow(m_joint, 0.0f, &pin[0]);
 			const dFloat stopAccel = NewtonUserJointCalculateRowZeroAcceleration(m_joint);
 			NewtonUserJointSetRowAcceleration(m_joint, stopAccel);
 			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-			NewtonUserJointSetRowMinimumFriction(m_joint, -twistFriction);
-			NewtonUserJointSetRowMaximumFriction(m_joint, twistFriction);
+			NewtonUserJointSetRowMinimumFriction(m_joint, -twistFriction___);
+			NewtonUserJointSetRowMaximumFriction(m_joint, twistFriction___);
 		}
 	}
 }
@@ -436,31 +435,62 @@ void dCustomSixdof::SubmitAngularAxisCartisianApproximation(const dMatrix& matri
 	dFloat pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
 	SubmitTwistAngle(matrix0.m_front, pitchAngle, timestep);
 
-/*
-	if (m_options.m_option2) {
-		// two rows to restrict rotation around around the parent coordinate system
-		//dFloat coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct3(matrix0.m_front), dFloat(-1.0f), dFloat(1.0f)));
+	// two rows to restrict rotation around around the parent coordinate system
+	if ((m_yaw.m_minAngle == dgFloat32 (0.0f)) && (m_yaw.m_maxAngle == dgFloat32 (0.0f)) &&
+		(m_roll.m_minAngle == dgFloat32(0.0f)) && (m_roll.m_maxAngle == dgFloat32(0.0f))) {
 		const dFloat angleError = GetMaxAngleError();
-		dFloat angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+		const dFloat angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 		NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_up[0]);
-		//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowStiffness(m_joint, m_coneStiffness);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		if (dAbs(angle0) > angleError) {
-			const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle0 / (timestep * timestep);
-			NewtonUserJointSetRowAcceleration(m_joint, alpha);
+			const dFloat alpha0 = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle0 / (timestep * timestep);
+			NewtonUserJointSetRowAcceleration(m_joint, alpha0);
 		}
 
-		dFloat angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+		const dFloat angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 		NewtonUserJointAddAngularRow(m_joint, angle1, &matrix1.m_right[0]);
-		//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-		NewtonUserJointSetRowStiffness(m_joint, m_coneStiffness);
+		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 		if (dAbs(angle1) > angleError) {
-			const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle1 / (timestep * timestep);
+			const dFloat alpha1 = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angle1 / (timestep * timestep);
+			NewtonUserJointSetRowAcceleration(m_joint, alpha1);
+		}
+
+	} else {
+		
+		const dFloat angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+		if (angle0 >= m_yaw.m_maxAngle) {
+			NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_up[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			const dFloat angleError = angle0 - m_yaw.m_maxAngle;
+			const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angleError / (timestep * timestep);
 			NewtonUserJointSetRowAcceleration(m_joint, alpha);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		} else if (angle0 <= m_yaw.m_minAngle) {
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_up[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			const dFloat angleError = angle0 - m_yaw.m_minAngle;
+			const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angleError / (timestep * timestep);
+			NewtonUserJointSetRowAcceleration(m_joint, alpha);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);			
+		}
+
+		const dFloat angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+		if (angle1 >= m_roll.m_maxAngle) {
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_right[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			const dFloat angleError = angle1 - m_roll.m_maxAngle;
+			const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angleError / (timestep * timestep);
+			NewtonUserJointSetRowAcceleration(m_joint, alpha);
+			NewtonUserJointSetRowMinimumFriction(m_joint, 0.0f);
+		} else if (angle1 <= m_roll.m_minAngle) {
+			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1.m_right[0]);
+			NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+			const dFloat angleError = angle1 - m_roll.m_minAngle;
+			const dFloat alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat(0.25f) * angleError / (timestep * timestep);
+			NewtonUserJointSetRowAcceleration(m_joint, alpha);
+			NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
 		}
 	}
-*/
-
 }
 
 void dCustomSixdof::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)

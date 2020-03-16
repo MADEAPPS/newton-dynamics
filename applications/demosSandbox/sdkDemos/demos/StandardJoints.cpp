@@ -459,9 +459,15 @@ static void Add6DOF (DemoEntityManager* const scene, const dVector& origin)
 	NewtonBody* const base = CreateBox(scene, origin + dVector (0.0f,  5.0f + size.m_y + 0.25f, 0.0f, 0.0f), size.Scale (0.2f));
 	NewtonBody* const box0 = CreateCapule (scene, origin + dVector (0.0f,  5.0f, 0.0f, 0.0f), size);
 
-	const dFloat yawLimit = 120.0f * dDegreeToRad;
-	const dFloat rollLimit = 80.0f * dDegreeToRad;
-	const dFloat pitchLimit = 80.0f * dDegreeToRad;
+//	const dFloat yawLimit = 120.0f * dDegreeToRad;
+	const dFloat yawLimit = 3.0f * dDegreeToRad;
+//	const dFloat rollLimit = 80.0f * dDegreeToRad;
+	const dFloat rollLimit = 3.0f * dDegreeToRad;
+//	const dFloat pitchLimit = 80.0f * dDegreeToRad;
+
+//const dFloat yawLimit = 0.0f * dDegreeToRad;
+//const dFloat rollLimit = 0.0f * dDegreeToRad;
+const dFloat pitchLimit = 0.0f * dDegreeToRad;
 
 	NewtonBodySetMassMatrix(base, 0.0f, 0.0f, 0.0f, 0.0f);
 	dMatrix pinMatrix (dGrammSchmidt (dVector (0.0f, -1.0f, 0.0f, 0.0f)));
