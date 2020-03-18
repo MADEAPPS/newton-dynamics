@@ -504,6 +504,14 @@ void dCustomSixdof::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& mat
 	const dFloat pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
 	SubmitTwistAngle(matrix0.m_front, pitchAngle, timestep);
 
+	// calculate yaw and roll angle matrix;
+	//dMatrix yawRoll(matrix1 * coneRotation * matrix1.Inverse());
+	dMatrix yawRoll(pitchMatrix * matrix0 * matrix1.Inverse());
+//	dAssert(dAbs(yawRoll[1][2]) < dFloat(1.0e-1f));
+if (dAbs(yawRoll[1][2]) > 0.6f)
+dTrace(("error %f\n", yawRoll[1][2]));
+
+	dTrace(("error %f\n", yawRoll[1][2]));
 /*
 	if (m_options.m_option2) {
 		const dFloat step = dMax(dAbs(coneAngle * timestep), dFloat(5.0f * dDegreeToRad));
