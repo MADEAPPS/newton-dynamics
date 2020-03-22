@@ -519,6 +519,10 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 
 	dgVector relativeVelocity (body0->m_veloc - body1->m_veloc);
 	dgAssert (relativeVelocity.m_w == dgFloat32 (0.0f));
+	if (relativeVelocity.DotProduct(relativeVelocity).GetScalar() < dgFloat32 (1.0e-4f)) {
+		return 0;
+	}
+
 	dgFloat32 den = m_normal.DotProduct(relativeVelocity).GetScalar();
 	if (den > dgFloat32 (-1.0e-10f)) {
 		return 0;
