@@ -29,7 +29,6 @@
 dgUnsigned64 dgGetTimeInMicrosenconds()
 {
 #if (defined (_MSC_VER) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
-// #if (defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__))
 	static LARGE_INTEGER frequency;
 	static LARGE_INTEGER baseCount;
 	if (!frequency.QuadPart) {
@@ -43,7 +42,7 @@ dgUnsigned64 dgGetTimeInMicrosenconds()
 	dgUnsigned64 ticks = dgUnsigned64 (count.QuadPart * LONGLONG (1000000) / frequency.QuadPart);
 	return ticks;
 
-#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64))
+#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (ANDROID))
 
 	timespec ts;
 	static dgUnsigned64 baseCount = 0;

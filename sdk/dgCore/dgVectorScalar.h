@@ -411,7 +411,7 @@ class dgVector
 
 	DG_INLINE dgVector ShiftRight() const
 	{
-		return dgBigVector (m_w, m_x, m_y, m_z); 
+		return dgVector (m_w, m_x, m_y, m_z); 
 	}
 
 	DG_INLINE dgVector ShiftTripleRight () const

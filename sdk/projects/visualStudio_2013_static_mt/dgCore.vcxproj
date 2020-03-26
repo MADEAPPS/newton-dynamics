@@ -118,6 +118,7 @@
     <ClInclude Include="..\..\dgCore\dgTree.h" />
     <ClInclude Include="..\..\dgCore\dgTypes.h" />
     <ClInclude Include="..\..\dgCore\dgVector.h" />
+    <ClInclude Include="..\..\dgCore\dgVectorArmNeon.h" />
     <ClInclude Include="..\..\dgCore\dgVectorScalar.h" />
     <ClInclude Include="..\..\dgCore\dgVectorSimd.h" />
   </ItemGroup>

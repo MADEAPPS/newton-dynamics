@@ -621,7 +621,7 @@ void  PhysicsBodyDestructor (const NewtonBody* body)
 }
 
 // add force and torque to rigid body
-void  PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int threadIndex)
+void PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int threadIndex)
 {
 	dFloat Ixx;
 	dFloat Iyy;

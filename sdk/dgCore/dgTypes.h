@@ -144,9 +144,10 @@
 // uncomment this for Scalar floating point 
 // alternatively the end application can use a command line option to enable this define
 //#define DG_SCALAR_VECTOR_CLASS
-#if defined(__ANDROID__)
-#define DG_SCALAR_VECTOR_CLASS
-#endif
+
+// uncomment this for Scalar floating point 
+// alternatively the end application can use a command line option to enable this define
+//#define __ANDROID__
 
 // by default newton run on a separate thread and 
 // optionally concurrent with the calling thread,

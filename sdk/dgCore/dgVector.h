@@ -30,9 +30,11 @@
 #define dgCheckVector(x) (dgCheckFloat(x[0]) && dgCheckFloat(x[1]) && dgCheckFloat(x[2]) && dgCheckFloat(x[3]))
 
 #ifdef DG_SCALAR_VECTOR_CLASS
-#include "dgVectorScalar.h"
+	#include "dgVectorScalar.h"
+#elif defined(__ANDROID__)
+	#include "dgVectorArmNeon.h"
 #else
-#include "dgVectorSimd.h"
+	#include "dgVectorSimd.h"
 #endif
 
 template<class T>
@@ -46,10 +48,8 @@ class dgTemplateVector
 	}
 	
 	DG_INLINE dgTemplateVector (const T* const ptr)
-//		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w (T(0.0f))
 		:m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w (ptr[3])
 	{
-		dgAssert (0);
 		//dgAssert (dgCheckVector ((*this)));
 	}
 

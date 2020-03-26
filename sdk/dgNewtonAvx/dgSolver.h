@@ -144,9 +144,6 @@
 			__m256d tmp0(_mm256_add_pd(m_low, m_high));
 			__m256d tmp1(_mm256_hadd_pd(tmp0, tmp0));
 			__m256d tmp2(_mm256_add_pd(tmp1, _mm256_permute2f128_pd(tmp1, tmp1, 1)));
-			//dgSoaFloat ret;
-			//_mm256_storeu_pd(ret.m_f, tmp2);
-			//return ret.m_f[0];
 			return *((dgFloat32*)&tmp2);
 		}
 
@@ -169,18 +166,18 @@
 		{
 		}
 
+		DG_INLINE dgSoaFloat(const dgSoaFloat& copy)
+			: m_type(copy.m_type)
+		{
+		}
+
 		DG_INLINE dgSoaFloat(const dgFloat32 val)
 			:m_type(_mm256_set1_ps(val))
 		{
 		}
 
 		DG_INLINE dgSoaFloat(const __m256 type)
-			: m_type(type)
-		{
-		}
-
-		DG_INLINE dgSoaFloat(const dgSoaFloat& copy)
-			: m_type(copy.m_type)
+			:m_type(type)
 		{
 		}
 
@@ -198,7 +195,6 @@
 		{
 			dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
 			dgAssert(i >= 0);
-			//return m_f[i];
 			dgFloat32* const ptr = (dgFloat32*)&m_type;
 			return ptr[i];
 		}
@@ -272,9 +268,6 @@
 			__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
 			__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
 			__m256 tmp2(_mm256_hadd_ps(tmp1, tmp1));
-			//dgSoaFloat ret;
-			//_mm256_store_ps(ret.m_f, tmp2);
-			//return ret.m_f[0];
 			return *((dgFloat32*)&tmp2);
 		}
 

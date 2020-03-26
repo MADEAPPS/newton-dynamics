@@ -27,148 +27,258 @@
 #include <immintrin.h>
 
 
-#define DG_SOA_WORD_GROUP_SIZE	8 
 
-DG_MSC_AVX_ALIGNMENT
-class dgSoaFloat
-{
-	public:
-	DG_INLINE dgSoaFloat()
-	{
-	}
-
-	DG_INLINE dgSoaFloat(const dgSoaFloat& me)
-		:m_low(me.m_low)
-		,m_high(me.m_high)
-	{
-	}
-
-	DG_INLINE dgSoaFloat(const dgVector& v)
-		:m_low(v)
-		,m_high(v)
-	{
-	}
-
-	DG_INLINE dgSoaFloat(const dgVector& low, const dgVector& high)
-		:m_low(low)
-		,m_high(high)
-	{
-	}
-
-	DG_INLINE dgSoaFloat(const dgSoaFloat* const baseAddr, const dgSoaFloat& index)
-	{
-		const dgInt32* const indirectIndex = (dgInt32*)&index[0];
-		const dgFloat32* const src = &(*baseAddr)[0];
-		dgFloat32* const dst = &(*this)[0];
-		for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i++) {
-			dst[i] = src[indirectIndex[i]];
-		}
-	}
-
-	DG_INLINE dgFloat32& operator[] (dgInt32 i)
-	{
-		dgAssert(i >= 0);
-		dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
-		dgFloat32* const ptr = &m_low[0];
-		return ptr[i];
-	}
-
-	DG_INLINE const dgFloat32& operator[] (dgInt32 i) const
-	{
-		dgAssert(i >= 0);
-		dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
-		const dgFloat32* const ptr = &m_low[0];
-		return ptr[i];
-	}
-
-	DG_INLINE dgSoaFloat operator+ (const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(m_low + A.m_low, m_high + A.m_high);
-	}
-
-	DG_INLINE dgSoaFloat operator- (const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(m_low - A.m_low, m_high - A.m_high);
-	}
-
-	DG_INLINE dgSoaFloat operator* (const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(m_low * A.m_low, m_high * A.m_high);
-	}
 
 #ifdef _NEWTON_USE_DOUBLE
-	DG_INLINE dgSoaFloat MulAdd(const dgSoaFloat& A, const dgSoaFloat& B) const
-	{
-		//return dgSoaFloat(m_low.MulAdd(A.m_low, B.m_low), m_high.MulAdd(A.m_high, B.m_high));
-		return dgSoaFloat(dgVector(_mm_fmadd_pd(A.m_low.m_typeLow, B.m_low.m_typeLow, m_low.m_typeLow), _mm_fmadd_pd(A.m_low.m_typeHigh, B.m_low.m_typeHigh, m_low.m_typeHigh)),
-			dgVector(_mm_fmadd_pd(A.m_high.m_typeLow, B.m_high.m_typeLow, m_high.m_typeLow), _mm_fmadd_pd(A.m_high.m_typeHigh, B.m_high.m_typeHigh, m_high.m_typeHigh)));
-	}
+	#define DG_SOA_WORD_GROUP_SIZE	4 
 
-	DG_INLINE dgSoaFloat MulSub(const dgSoaFloat& A, const dgSoaFloat& B) const
+	DG_MSC_AVX_ALIGNMENT
+	class dgSoaFloat
 	{
-		//return dgSoaFloat(m_low.MulSub(A.m_low, B.m_low), m_high.MulSub(A.m_high, B.m_high));
-		return dgSoaFloat(dgVector (_mm_fnmadd_pd(A.m_low.m_typeLow, B.m_low.m_typeLow, m_low.m_typeLow), _mm_fnmadd_pd(A.m_low.m_typeHigh, B.m_low.m_typeHigh, m_low.m_typeHigh)),
-			dgVector (_mm_fnmadd_pd(A.m_high.m_typeLow, B.m_high.m_typeLow, m_high.m_typeLow), _mm_fnmadd_pd(A.m_high.m_typeHigh, B.m_high.m_typeHigh, m_high.m_typeHigh)));
-	}
+		public:
+		DG_INLINE dgSoaFloat()
+		{
+		}
+
+		DG_INLINE dgSoaFloat(const dgSoaFloat& me)
+			:m_low(me.m_low)
+			,m_high(me.m_high)
+		{
+		}
+
+		DG_INLINE dgSoaFloat(const dgFloat32 val)
+			:m_low(_mm_set1_pd(val))
+			,m_high(m_low)
+		{
+		}
+
+		DG_INLINE dgSoaFloat(const __m128d& low, const __m128d& high)
+			:m_low(low)
+			,m_high(high)
+		{
+		}
+
+		DG_INLINE dgSoaFloat(const dgSoaFloat* const baseAddr, const dgSoaFloat& index)
+		{
+			const dgInt32* const indirectIndex = (dgInt32*)&index[0];
+			const dgFloat32* const src = &(*baseAddr)[0];
+			dgFloat32* const dst = &(*this)[0];
+			for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i++) {
+				dst[i] = src[indirectIndex[i]];
+			}
+		}
+
+		DG_INLINE dgFloat32& operator[] (dgInt32 i)
+		{
+			dgAssert(i >= 0);
+			dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
+			dgFloat32* const ptr = (dgFloat32*)&m_low;
+			return ptr[i];
+		}
+
+		DG_INLINE const dgFloat32& operator[] (dgInt32 i) const
+		{
+			dgAssert(i >= 0);
+			dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
+			const dgFloat32* const ptr = (dgFloat32*)&m_low;
+			return ptr[i];
+		}
+
+		DG_INLINE dgSoaFloat operator+ (const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_add_pd(m_low, A.m_low), _mm_add_pd(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat operator- (const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_sub_pd(m_low, A.m_low), _mm_sub_pd(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat operator* (const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_mul_pd(m_low, A.m_low), _mm_mul_pd(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat MulAdd(const dgSoaFloat& A, const dgSoaFloat& B) const
+		{
+			return dgSoaFloat(_mm_fmadd_pd (A.m_low, B.m_low, m_low), _mm_fmadd_pd(A.m_high, B.m_high, m_high));
+		}
+
+		DG_INLINE dgSoaFloat MulSub(const dgSoaFloat& A, const dgSoaFloat& B) const
+		{
+			return dgSoaFloat(_mm_fnmadd_pd(A.m_low, B.m_low, m_low), _mm_fnmadd_pd(A.m_high, B.m_high, m_high));
+		}
+
+		DG_INLINE dgSoaFloat operator> (const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_cmpgt_pd(m_low, A.m_low), _mm_cmpgt_pd(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat operator< (const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_cmplt_pd(m_low, A.m_low), _mm_cmplt_pd(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat operator| (const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_or_pd(m_low, A.m_low), _mm_or_pd(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat operator& (const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_and_pd(m_low, A.m_low), _mm_and_pd(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat GetMin(const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_min_pd(m_low, A.m_low), _mm_min_pd(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat GetMax(const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_max_pd(m_low, A.m_low), _mm_max_pd(m_high, A.m_high));
+		}
+
+		DG_INLINE dgFloat32 AddHorizontal() const
+		{
+			__m128d tmp(_mm_add_pd(m_low, m_high));
+			return _mm_cvtsd_f64 (_mm_hadd_pd(tmp, tmp));
+		}
+
+		static DG_INLINE void FlushRegisters()
+		{
+		}
+
+		__m128d m_low;
+		__m128d m_high;
+	}DG_GCC_AVX_ALIGNMENT;
+
 #else
-	DG_INLINE dgSoaFloat MulAdd(const dgSoaFloat& A, const dgSoaFloat& B) const
-	{
-		return dgSoaFloat(_mm_fmadd_ps (A.m_low.m_type, B.m_low.m_type, m_low.m_type), _mm_fmadd_ps(A.m_high.m_type, B.m_high.m_type, m_high.m_type));
-	}
+	#define DG_SOA_WORD_GROUP_SIZE	8 
 
-	DG_INLINE dgSoaFloat MulSub(const dgSoaFloat& A, const dgSoaFloat& B) const
+	DG_MSC_AVX_ALIGNMENT
+	class dgSoaFloat
 	{
-		return dgSoaFloat(_mm_fnmadd_ps(A.m_low.m_type, B.m_low.m_type, m_low.m_type), _mm_fnmadd_ps(A.m_high.m_type, B.m_high.m_type, m_high.m_type));
-	}
+		public:
+		DG_INLINE dgSoaFloat()
+		{
+		}
+
+		DG_INLINE dgSoaFloat(const dgSoaFloat& me)
+			:m_low(me.m_low)
+			,m_high(me.m_high)
+		{
+		}
+
+		DG_INLINE dgSoaFloat(const dgFloat32 val)
+			:m_low(_mm_set_ps1(val))
+			,m_high(m_low)
+		{
+		}
+
+		DG_INLINE dgSoaFloat(const __m128& low, const __m128& high)
+			:m_low(low)
+			,m_high(high)
+		{
+		}
+
+		DG_INLINE dgSoaFloat(const dgSoaFloat* const baseAddr, const dgSoaFloat& index)
+		{
+			const dgInt32* const indirectIndex = (dgInt32*)&index[0];
+			const dgFloat32* const src = &(*baseAddr)[0];
+			dgFloat32* const dst = &(*this)[0];
+			for (dgInt32 i = 0; i < DG_SOA_WORD_GROUP_SIZE; i++) {
+				dst[i] = src[indirectIndex[i]];
+			}
+		}
+
+		DG_INLINE dgFloat32& operator[] (dgInt32 i)
+		{
+			dgAssert(i >= 0);
+			dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
+			dgFloat32* const ptr = (dgFloat32*)&m_low;
+			return ptr[i];
+		}
+
+		DG_INLINE const dgFloat32& operator[] (dgInt32 i) const
+		{
+			dgAssert(i >= 0);
+			dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
+			const dgFloat32* const ptr = (dgFloat32*)&m_low;
+			return ptr[i];
+		}
+
+		DG_INLINE dgSoaFloat operator+ (const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_add_ps(m_low, A.m_low), _mm_add_ps(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat operator- (const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_sub_ps(m_low, A.m_low), _mm_sub_ps(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat operator* (const dgSoaFloat& A) const
+		{
+			//return dgSoaFloat(m_low * A.m_low, m_high * A.m_high);
+			return dgSoaFloat(_mm_mul_ps(m_low, A.m_low), _mm_mul_ps(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat MulAdd(const dgSoaFloat& A, const dgSoaFloat& B) const
+		{
+			return dgSoaFloat(_mm_fmadd_ps (A.m_low, B.m_low, m_low), _mm_fmadd_ps(A.m_high, B.m_high, m_high));
+		}
+
+		DG_INLINE dgSoaFloat MulSub(const dgSoaFloat& A, const dgSoaFloat& B) const
+		{
+			return dgSoaFloat(_mm_fnmadd_ps(A.m_low, B.m_low, m_low), _mm_fnmadd_ps(A.m_high, B.m_high, m_high));
+		}
+
+		DG_INLINE dgSoaFloat operator> (const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_cmpgt_ps(m_low, A.m_low), _mm_cmpgt_ps(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat operator< (const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_cmplt_ps(m_low, A.m_low), _mm_cmplt_ps(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat operator| (const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_or_ps(m_low, A.m_low), _mm_or_ps(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat operator& (const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_and_ps(m_low, A.m_low), _mm_and_ps(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat GetMin(const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_min_ps(m_low, A.m_low), _mm_min_ps(m_high, A.m_high));
+		}
+
+		DG_INLINE dgSoaFloat GetMax(const dgSoaFloat& A) const
+		{
+			return dgSoaFloat(_mm_max_ps(m_low, A.m_low), _mm_max_ps(m_high, A.m_high));
+		}
+
+		DG_INLINE dgFloat32 AddHorizontal() const
+		{
+			__m128 tmp0(_mm_add_ps(m_low, m_high));
+			__m128 tmp1(_mm_hadd_ps(tmp0, tmp0));
+			return _mm_cvtss_f32 (_mm_hadd_ps(tmp1, tmp1));
+		}
+
+		static DG_INLINE void FlushRegisters()
+		{
+		}
+
+		__m128 m_low;
+		__m128 m_high;
+	}DG_GCC_AVX_ALIGNMENT;
 #endif
-
-	DG_INLINE dgSoaFloat operator> (const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(m_low > A.m_low, m_high > A.m_high);
-	}
-
-	DG_INLINE dgSoaFloat operator< (const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(m_low < A.m_low, m_high < A.m_high);
-	}
-
-	DG_INLINE dgSoaFloat operator| (const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(m_low | A.m_low, m_high | A.m_high);
-	}
-
-	DG_INLINE dgSoaFloat operator& (const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(m_low & A.m_low, m_high & A.m_high);
-	}
-
-	DG_INLINE dgSoaFloat GetMin(const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(m_low.GetMin(A.m_low), m_high.GetMin(A.m_high));
-	}
-
-	DG_INLINE dgSoaFloat GetMax(const dgSoaFloat& A) const
-	{
-		return dgSoaFloat(m_low.GetMax(A.m_low), m_high.GetMax(A.m_high));
-	}
-
-	DG_INLINE dgFloat32 AddHorizontal() const
-	{
-		return (m_low + m_high).AddHorizontal().GetScalar();
-	}
-
-	DG_INLINE dgFloat32 GetMax() const
-	{
-		return (m_low.GetMax(m_high)).GetMax();
-	}
-
-	static DG_INLINE void FlushRegisters()
-	{
-	}
-
-	dgVector m_low;
-	dgVector m_high;
-}DG_GCC_AVX_ALIGNMENT;
 
 
 DG_MSC_AVX_ALIGNMENT
