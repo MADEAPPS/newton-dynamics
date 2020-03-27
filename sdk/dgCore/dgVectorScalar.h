@@ -22,8 +22,6 @@
 #ifndef __dgVectorScalar__
 #define __dgVectorScalar__
 
-
-#ifdef DG_SCALAR_VECTOR_CLASS
 // *****************************************************************************************
 //
 // 4 x 1 single precision vector class declaration
@@ -1000,5 +998,5 @@ class dgSpatialVector
 	static dgSpatialVector m_zero;
 } DG_GCC_VECTOR_ALIGNMENT;
 
-#endif
+
 #endif

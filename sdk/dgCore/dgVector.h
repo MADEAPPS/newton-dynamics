@@ -31,7 +31,7 @@
 
 #ifdef DG_SCALAR_VECTOR_CLASS
 	#include "dgVectorScalar.h"
-#elif defined(__ANDROID__)
+#elif defined(__ANDROID__) || defined (_ARM_VER) 
 	#include "dgVectorArmNeon.h"
 #else
 	#include "dgVectorSimd.h"

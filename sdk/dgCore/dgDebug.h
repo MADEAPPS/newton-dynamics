@@ -35,7 +35,7 @@
 		vsprintf(text, fmt, v_args);
 		va_end(v_args);
 
-	#ifdef _WIN32 
+	#if defined (_WIN_32_VER) || defined (_WIN_64_VER)
 		OutputDebugStringA(text);
 	#else 
 		printf("%s\n", text);

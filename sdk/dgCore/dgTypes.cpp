@@ -20,11 +20,13 @@
 */
 
 #include "dgStdafx.h"
+
 #include "dgTypes.h"
 #include "dgDebug.h"
 #include "dgVector.h"
 #include "dgMemory.h"
 #include "dgStack.h"
+
 
 dgUnsigned64 dgGetTimeInMicrosenconds()
 {
@@ -493,6 +495,7 @@ dgInt32 dgDeserializeMarker(dgDeserialize serializeCallback, void* const userDat
 	return revision;
 }
 
+
 dgSetPrecisionDouble::dgSetPrecisionDouble()
 {
 	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
@@ -522,10 +525,11 @@ dgFloatExceptions::dgFloatExceptions(dgUnsigned32 mask)
 		#ifndef IOS
 			fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
 		#endif
-	#else
-		#if (!defined(__arm__) && !defined(__aarch64__))
-			_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-		#endif
+	#elif (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+		_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+	#elif defined (_ARM_VER)
+		//_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
+		#pragma message ("warning!!! do not forget to set flush to zero for arm cpus")
 	#endif
 
 //	float a (1.0f);

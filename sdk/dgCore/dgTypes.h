@@ -23,14 +23,20 @@
 #define __DGTYPES_H__
 
 #ifdef _MSC_VER 
-	#ifdef _M_X64
+	#ifdef _M_ARM
+		#ifndef _ARM_VER
+			#define _ARM_VER
+		#endif
+	#elif defined (_M_X64)
 		#ifndef _WIN_64_VER
 			#define _WIN_64_VER
 		#endif
-	#else 		
+	#elif defined (_M_IX86)
 		#ifndef _WIN_32_VER
 			#define _WIN_32_VER
 		#endif
+	#else 
+		#error target platform not defined
 	#endif
 
 	#if _MSC_VER >= 1400
@@ -38,14 +44,7 @@
 	#endif
 #endif
 
-
-#ifdef _MSC_VER 
-	#if !(defined (_WIN_32_VER) || defined (_WIN_64_VER))
-		#error "most define _WIN_32_VER or _WIN_64_VER for a correct CPU target"
-	#endif
-#endif
-
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+#if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || (defined (_MSC_VER ) && defined (_ARM_VER)) )
 	#pragma warning (disable: 4100) //unreferenced formal parameter
 	#pragma warning (disable: 4201) //nonstandard extension used : nameless struct/union
 	#pragma warning (disable: 4324) //structure was padded due to __declspec(align())
@@ -87,7 +86,6 @@
 #include <math.h>
 #include <float.h>
 #include <ctype.h>
-//#include <atomic>
 
 #if (defined (__MINGW32__) || defined (__MINGW64__))
 	#include <io.h> 
@@ -176,9 +174,11 @@
 #ifdef DG_DISABLE_ASSERT
 	#define dgAssert(x)
 #else 
-	#if defined (_WIN_32_VER) || defined (_WIN_64_VER)
+	#if defined (_WIN_32_VER) || defined (_WIN_64_VER) 
 		#define dgAssert(x) _ASSERTE(x)
-	#else 
+	#elif defined (_MSC_VER ) && defined (_ARM_VER) 
+		#define dgAssert(x) _ASSERTE(x)
+	#else
 		#ifdef _DEBUG
 			#define dgAssert(x) assert(x)
 		#else 
@@ -530,6 +530,8 @@ DG_INLINE dgInt32 dgAtomicExchangeAndAdd (dgInt32* const addend, dgInt32 amount)
 {
 	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 		return _InterlockedExchangeAdd((long*)addend, long(amount));
+	#elif defined (_MSC_VER ) && defined (_ARM_VER) 
+		return _InterlockedExchangeAdd((long*)addend, long(amount));
 	#elif (defined (__MINGW32__) || defined (__MINGW64__))
 		return InterlockedExchangeAdd((long*)addend, long(amount));
 	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER)|| defined ANDROID)
@@ -543,6 +545,8 @@ DG_INLINE dgInt32 dgInterlockedExchange(dgInt32* const ptr, dgInt32 value)
 {
 	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 		return _InterlockedExchange((long*) ptr, value);
+	#elif defined (_MSC_VER ) && defined (_ARM_VER) 
+		return _InterlockedExchange((long*)ptr, value);
 	#elif (defined (__MINGW32__) || defined (__MINGW64__))
 		return InterlockedExchange((long*) ptr, value);
 	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
@@ -581,6 +585,8 @@ DG_INLINE dgInt32 dgInterlockedTest(dgInt32* const ptr, dgInt32 value)
 {
 	#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 		return _InterlockedCompareExchange((long*)ptr, value, value);
+	#elif defined (_MSC_VER ) && defined (_ARM_VER) 
+		return _InterlockedCompareExchange((long*)ptr, value, value);
 	#elif (defined (__MINGW32__) || defined (__MINGW64__))
 		return InterlockedCompareExchange((long*)ptr, value, value);
 	#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) ||defined (_MACOSX_VER))
@@ -589,28 +595,6 @@ DG_INLINE dgInt32 dgInterlockedTest(dgInt32* const ptr, dgInt32 value)
 		#error "dgInterlockedTest implementation required"
 	#endif
 }
-
-/*
-class dgAtomic: protected std::atomic<dgInt32>
-{
-	public:
-	dgAtomic()
-		:std::atomic<dgInt32>()
-	{
-	}
-
-	DG_INLINE operator dgInt32() const 
-	{
-		const std::atomic<dgInt32>& me = *this;
-		return me;
-	}
-
-	DG_INLINE dgInt32 Exchange(dgInt32 value)
-	{
-		return exchange(value);
-	}
-};
-*/
 
 DG_INLINE void dgThreadYield()
 {
@@ -622,7 +606,8 @@ DG_INLINE void dgThreadYield()
 DG_INLINE void dgThreadPause()
 {
 #ifndef DG_USE_THREAD_EMULATION
-	#if defined (_WIN_32_VER) || defined (_WIN_64_VER) || defined (WIN32) || defined (i386_) || defined (x86_64_)
+	//#if defined (_WIN_32_VER) || defined (_WIN_64_VER) || defined (WIN32) || defined (i386_) || defined (x86_64_)
+	#if defined (_WIN_32_VER) || defined (_WIN_64_VER)
 		_mm_pause();
 	#else 
 		std::this_thread::yield();
