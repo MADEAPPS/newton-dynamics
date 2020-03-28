@@ -705,6 +705,7 @@ class dExcavatorModel: public dModelRootNode
 		attachment->ActiveRotationY(false);
 		attachment->ActiveRotationZ(false);
 
+/*
 		//hydraulic01
 		NewtonBody* const hydrawlic = MakeBodyPart(armNode, "hydraulic01", 5.0f);
 		NewtonBodyGetMatrix(hydrawlic, &hingeFrame[0][0]);
@@ -728,6 +729,7 @@ class dExcavatorModel: public dModelRootNode
 		attachment->ActiveRotationX(false);
 		attachment->ActiveRotationY(false);
 		attachment->ActiveRotationZ(false);
+*/
 #endif
 
 	}
