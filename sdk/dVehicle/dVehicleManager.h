@@ -32,7 +32,7 @@ class dVehicleManager: public dCustomParallelListener
 	DVEHICLE_API void RemoveAndDeleteRoot(dVehicle* const root);
 		
 	virtual void OnRemove(const dVehicle* const vehicle) {}
-	virtual void OnUpdateTransform(dVehicle* const vehicle, dFloat timestep) const { dAssert(0); }
+	virtual void OnUpdateTransform(dVehicle* const vehicle, dFloat timestep) const {}
 	virtual void OnDebug(dVehicle* const model, dCustomJoint::dDebugDisplay* const debugContext) {}
 
 	virtual void ApplyInputs(dVehicle* const model, dFloat timestep) {}

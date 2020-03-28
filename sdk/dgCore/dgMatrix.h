@@ -91,7 +91,7 @@ class dgMatrix
 	// these function can only be called when dgMatrix is a PDS matrix
 	//void EigenVectors ();
 	dgVector EigenVectors ();
-	void PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, dgMatrix& stretchAxis, const dgMatrix* initialStretchAxis = NULL) const;
+	void PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, dgMatrix& stretchAxis) const;
 
 	// constructor for polar composition
 	dgMatrix (const dgMatrix& transformMatrix, const dgVector& scale, const dgMatrix& stretchAxis);

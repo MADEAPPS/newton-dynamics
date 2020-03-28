@@ -58,7 +58,7 @@
 //#define DEFAULT_SCENE	23		// scene Collision
 //#define DEFAULT_SCENE	24		// simple convex fracturing 
 //#define DEFAULT_SCENE	25		// multi ray casting using the threading Job scheduler
-#define DEFAULT_SCENE	26		// standard joints
+//#define DEFAULT_SCENE	26		// standard joints
 //#define DEFAULT_SCENE	27		// servo joints
 //#define DEFAULT_SCENE	28		// construction vehicle
 //#define DEFAULT_SCENE	29		// six axis manipulator
@@ -68,7 +68,7 @@
 //#define DEFAULT_SCENE	33		// multi body body vehicle
 //#define DEFAULT_SCENE	34		// super Car
 //#define DEFAULT_SCENE	35		// heavy vehicles
-//#define DEFAULT_SCENE	36		// basic player controller
+#define DEFAULT_SCENE	36		// basic player controller
 //#define DEFAULT_SCENE	37		// animated player controller
 //#define DEFAULT_SCENE	38		// advanced player controller
 //#define DEFAULT_SCENE	39		// cloth patch			
@@ -323,13 +323,13 @@ DemoEntityManager::DemoEntityManager ()
 //	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
-//	m_workerThreads = 8;
+	m_workerThreads = 4;
 //	m_solverSubSteps = 2;
 //	m_showRaycastHit = true;
 //	m_showCenterOfMass = false;
 //	m_showNormalForces = true;
 //	m_showContactPoints = true;
-	m_showJointDebugInfo = true;
+//	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 2;
 //	m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;

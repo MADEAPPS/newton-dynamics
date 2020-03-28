@@ -437,7 +437,7 @@ void dgMatrix::CalcPitchYawRoll (dgVector& euler0, dgVector& euler1) const
 }
 
 
-void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, dgMatrix& stretchAxis, const dgMatrix* const initialStretchAxis) const
+void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, dgMatrix& stretchAxis) const
 {
 	// a polar decomposition decompose matrix A = O * S
 	// where S = sqrt (transpose (L) * L)
@@ -445,7 +445,6 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 	const dgMatrix& me = *this;
 	dgFloat32 sign = dgSign (me[2].DotProduct(me[0].CrossProduct(me[1])).GetScalar());
 	stretchAxis = me * Transpose();
-	//stretchAxis.EigenVectors (scale);
 	scale = stretchAxis.EigenVectors();
 
 	// I need to deal with by seeing of some of the Scale are duplicated
@@ -468,6 +467,98 @@ void dgMatrix::PolarDecomposition (dgMatrix& transformMatrix, dgVector& scale, d
 	transformMatrix.m_posit = m_posit;
 }
 
+#if 0
+dgVector dgMatrix::EigenVectors()
+{
+	dgMatrix& mat = *this;
+	dgMatrix eigenVectors(dgGetIdentityMatrix());
+
+	dgVector d(mat[0][0], mat[1][1], mat[2][2], dgFloat32(0.0f));
+	dgVector b(d);
+	for (dgInt32 i = 0; i < 50; i++) {
+		dgFloat32 sm = mat[0][1] * mat[0][1] + mat[0][2] * mat[0][2] + mat[1][2] * mat[1][2];
+		if (sm < dgFloat32(1.0e-12f)) {
+			// check the eigenvalue vectors	
+			//dgVector tmp(eigenVectors.m_front.CrossProduct(eigenVectors.m_up));
+			//if (tmp.DotProduct(eigenVectors.m_right).GetScalar() < dgFloat32(0.0f)) {
+			//	eigenVectors.m_right = eigenVectors.m_right * dgVector::m_negOne;
+			//}
+			dgAssert (eigenVectors[0].DotProduct(eigenVectors[1].CrossProduct(eigenVectors[2])).GetScalar() > dgFloat32 (0.0f));
+			break;
+		}
+
+		dgFloat32 thresh = dgFloat32(0.0f);
+		if (i < 3) {
+			thresh = (dgFloat32)(0.2f / 9.0f) * sm;
+		}
+
+		dgVector z(dgVector::m_zero);
+		for (dgInt32 ip = 0; ip < 2; ip++) {
+			for (dgInt32 iq = ip + 1; iq < 3; iq++) {
+				dgFloat32 g = dgFloat32(100.0f) * dgAbs(mat[ip][iq]);
+				if ((i > 3) && ((dgAbs(d[ip]) + g) == dgAbs(d[ip])) && ((dgAbs(d[iq]) + g) == dgAbs(d[iq]))) {
+					mat[ip][iq] = dgFloat32(0.0f);
+				} else if (dgAbs(mat[ip][iq]) > thresh) {
+
+					dgFloat32 t;
+					dgFloat32 h = d[iq] - d[ip];
+					if (dgAbs(h) + g == dgAbs(h)) {
+						t = mat[ip][iq] / h;
+					} else {
+						dgFloat32 theta = dgFloat32(0.5f) * h / mat[ip][iq];
+						t = dgFloat32(1.0f) / (dgAbs(theta) + dgSqrt(dgFloat32(1.0f) + theta * theta));
+						if (theta < dgFloat32(0.0f)) {
+							t = -t;
+						}
+					}
+					dgFloat32 c = dgRsqrt(dgFloat32(1.0f) + t * t);
+					dgFloat32 s = t * c;
+					dgFloat32 tau = s / (dgFloat32(1.0f) + c);
+					h = t * mat[ip][iq];
+					z[ip] -= h;
+					z[iq] += h;
+					d[ip] -= h;
+					d[iq] += h;
+					mat[ip][iq] = dgFloat32(0.0f);
+
+					for (dgInt32 j = 0; j <= ip - 1; j++) {
+						dgFloat32 g0 = mat[j][ip];
+						dgFloat32 h0 = mat[j][iq];
+						mat[j][ip] = g0 - s * (h0 + g0 * tau);
+						mat[j][iq] = h0 + s * (g0 - h0 * tau);
+					}
+					for (dgInt32 j = ip + 1; j <= iq - 1; j++) {
+						dgFloat32 g0 = mat[ip][j];
+						dgFloat32 h0 = mat[j][iq];
+						mat[ip][j] = g0 - s * (h0 + g0 * tau);
+						mat[j][iq] = h0 + s * (g0 - h0 * tau);
+					}
+					for (dgInt32 j = iq + 1; j < 3; j++) {
+						dgFloat32 g0 = mat[ip][j];
+						dgFloat32 h0 = mat[iq][j];
+						mat[ip][j] = g0 - s * (h0 + g0 * tau);
+						mat[iq][j] = h0 + s * (g0 - h0 * tau);
+					}
+
+					dgVector sv(s);
+					dgVector tauv(tau);
+					dgVector gv(eigenVectors[ip]);
+					dgVector hv(eigenVectors[iq]);
+					eigenVectors[ip] -= sv * (hv + gv * tauv);
+					eigenVectors[iq] += sv * (gv - hv * tauv);
+				}
+			}
+		}
+
+		b += z;
+		d = b;
+	}
+
+	*this = eigenVectors;
+	return d;
+}
+
+#else
 dgVector dgMatrix::EigenVectors ()
 {
 	dgMatrix matrix (*this);
@@ -594,9 +685,10 @@ dgVector dgMatrix::EigenVectors ()
 		}
 	#endif
 
-	*this = eigenVectors.Transpose();
+	*this = eigenVectors;
 	return d;
 }
+#endif
 
 dgSpatialMatrix dgSpatialMatrix::Inverse(dgInt32 rows) const
 {

@@ -453,12 +453,10 @@ class dTractorModel: public dModelRootNode
 		DemoEntity* const effectorEntity = hydrolicEntity0->Find(effectorName1);
 		dMatrix matrix(effectorEntity->CalculateGlobalMatrix());
 		dCustomSixdof* const attachment = new dCustomSixdof(matrix, node1->GetBody(), node->GetBody());
-		dAssert(0);
-		attachment->SetLinearLimits(dVector(-1000.0f, 0.0f, 0.0f, 0.0f), dVector(1000.0f, 0.0f, 0.0f, 0.0f));
-		//attachment->DisableAxisX();
-		//attachment->DisableRotationX();
-		//attachment->DisableRotationY();
-		//attachment->DisableRotationZ();
+		attachment->ActiveAxisX(false);
+		attachment->ActiveRotationX(false);
+		attachment->ActiveRotationY(false);
+		attachment->ActiveRotationZ(false);
 	}
 	
 	dModelNode* MakeActuator(dModelNode* const parent, const char* const name, dFloat mass)

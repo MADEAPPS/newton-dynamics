@@ -1107,6 +1107,8 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* const world, DemoEntity* cons
 				matID  = 2;
 			} else if (segment.m_textureName.Find("floor") != -1) {
 				matID = 3;
+			} else if (segment.m_textureName.Find("marble") != -1) {
+				matID = 3;
 			}
 
 

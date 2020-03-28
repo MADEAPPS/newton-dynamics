@@ -651,7 +651,7 @@ class dExcavatorModel: public dModelRootNode
 
 	void AddForLinkageBars(dModelNode* const armNode, dModelNode* const buckectNode)
 	{
-#if 0
+#if 1
 		dMatrix hingeFrame;
 		NewtonBody* const bar1 = MakeBodyPart(armNode, "barLinkage1", 5.0f);
 		NewtonBodyGetMatrix(bar1, &hingeFrame[0][0]);
@@ -673,14 +673,12 @@ class dExcavatorModel: public dModelRootNode
 		dMatrix attachmentMatrix(attachmenPoint->CalculateGlobalMatrix());
 		attachmentMatrix = dRollMatrix(90.0f * dDegreeToRad) * attachmentMatrix;
 		dCustomSixdof* const attachment = new dCustomSixdof(attachmentMatrix, bar2Node->GetBody(), buckectNode->GetBody());
-		attachment->DisableAxisX();
-		attachment->DisableRotationX();
-		attachment->DisableRotationY();
-		attachment->DisableRotationZ();
+		attachment->ActiveAxisX(false);
+		attachment->ActiveRotationX(false);
+		attachment->ActiveRotationY(false);
+		attachment->ActiveRotationZ(false);
 
 #else
-		dAssert(0);
-/*
 		dMatrix hingeFrame;
 		NewtonBody* const bar1 = MakeBodyPart(armNode, "barLinkage1", 5.0f);
 		NewtonBodyGetMatrix(bar1, &hingeFrame[0][0]);
@@ -702,10 +700,10 @@ class dExcavatorModel: public dModelRootNode
 		dMatrix attachmentMatrix(attachmenPoint->CalculateGlobalMatrix());
 		attachmentMatrix = dRollMatrix(90.0f * dDegreeToRad) * attachmentMatrix;
 		dCustomSixdof* const attachment = new dCustomSixdof(attachmentMatrix, bar2Node->GetBody(), buckectNode->GetBody());
-		attachment->SetLinearLimits(dVector(-1000.0f), dVector(1000.0f));
-		//attachment->DisableRotationX();
-		//attachment->DisableRotationY();
-		//attachment->DisableRotationZ();
+		attachment->ActiveAxisX(false);
+		attachment->ActiveRotationX(false);
+		attachment->ActiveRotationY(false);
+		attachment->ActiveRotationZ(false);
 
 		//hydraulic01
 		NewtonBody* const hydrawlic = MakeBodyPart(armNode, "hydraulic01", 5.0f);
@@ -726,11 +724,10 @@ class dExcavatorModel: public dModelRootNode
 		hydrawlicAttachmentMatrix = dRollMatrix(90.0f * dDegreeToRad) * hydrawlicAttachmentMatrix;
 		dCustomSixdof* const hydrawlicAttachment = new dCustomSixdof(attachmentMatrix, bar2Node->GetBody(), hydraulicBoomNode->GetBody());
 		hydrawlicAttachment->SetSolverModel(2);
-		hydrawlicAttachment->DisableAxisX();
-		hydrawlicAttachment->DisableRotationX();
-		hydrawlicAttachment->DisableRotationY();
-		hydrawlicAttachment->DisableRotationZ();
-*/
+		attachment->ActiveAxisX(false);
+		attachment->ActiveRotationX(false);
+		attachment->ActiveRotationY(false);
+		attachment->ActiveRotationZ(false);
 #endif
 
 	}

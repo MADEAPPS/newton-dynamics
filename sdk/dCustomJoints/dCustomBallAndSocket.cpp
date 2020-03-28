@@ -407,7 +407,7 @@ void dCustomBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 	SubmitLinearRows(0x07, matrix0, matrix1);
 
 	dFloat cosAngleCos = matrix1.m_front.DotProduct3(matrix0.m_front);
-	if (cosAngleCos < dFloat(0.998f)) {
+	if (cosAngleCos >= dFloat(0.998f)) {
 		// special case where the front axis are almost aligned
 		// solve by using Cartesian approximation
 		SubmitAngularAxisCartisianApproximation(matrix0, matrix1, timestep);
