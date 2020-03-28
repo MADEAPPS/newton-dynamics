@@ -60,7 +60,7 @@
 //#define DEFAULT_SCENE	25		// multi ray casting using the threading Job scheduler
 //#define DEFAULT_SCENE	26		// standard joints
 //#define DEFAULT_SCENE	27		// servo joints
-//#define DEFAULT_SCENE	28		// construction vehicle
+#define DEFAULT_SCENE	28		// construction vehicle
 //#define DEFAULT_SCENE	29		// six axis manipulator
 //#define DEFAULT_SCENE	30		// hexapod Robot
 //#define DEFAULT_SCENE	31		// basic rag doll
@@ -68,7 +68,7 @@
 //#define DEFAULT_SCENE	33		// multi body body vehicle
 //#define DEFAULT_SCENE	34		// super Car
 //#define DEFAULT_SCENE	35		// heavy vehicles
-#define DEFAULT_SCENE	36		// basic player controller
+//#define DEFAULT_SCENE	36		// basic player controller
 //#define DEFAULT_SCENE	37		// animated player controller
 //#define DEFAULT_SCENE	38		// advanced player controller
 //#define DEFAULT_SCENE	39		// cloth patch			
