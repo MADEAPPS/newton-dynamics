@@ -1692,10 +1692,8 @@ void* NewtonMaterialGetMaterialPairUserData(const NewtonMaterial* const material
 unsigned NewtonMaterialGetContactFaceAttribute(const NewtonMaterial* const materialHandle)
 {
 	TRACE_FUNCTION(__FUNCTION__);
-//	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
-dgAssert (0);
-//	return (unsigned) ((dgContactMaterial*) materialHandle->m_userId);
-return 0;
+	dgContactMaterial* const material = (dgContactMaterial*) materialHandle;
+	return (unsigned) (material->m_shapeId1);
 }
 
 

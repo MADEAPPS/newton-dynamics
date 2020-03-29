@@ -27,12 +27,6 @@
     <ClCompile Include="..\..\dgPhysics\dgBroadPhaseAggregate.cpp">
       <Filter>systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dgPhysics\dgBroadPhaseDefault.cpp">
-      <Filter>systems</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\dgPhysics\dgBroadPhasePersistent.cpp">
-      <Filter>systems</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dgPhysics\dgContactSolver.cpp">
       <Filter>systems</Filter>
     </ClCompile>
@@ -183,7 +177,13 @@
     <ClCompile Include="..\..\dgMeshUtil\dgMeshEffect6.cpp">
       <Filter>meshUtil</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dgPhysics\dgInverseDynamics.cpp">
+    <ClCompile Include="..\..\dgPhysics\dgBroadPhaseMixed.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dgPhysics\dgBroadPhaseSegregated.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dgPhysics\dgWorldPlugins.cpp">
       <Filter>systems</Filter>
     </ClCompile>
   </ItemGroup>
@@ -195,12 +195,6 @@
       <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dgPhysics\dgBroadPhaseAggregate.h">
-      <Filter>systems</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dgPhysics\dgBroadPhaseDefault.h">
-      <Filter>systems</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dgPhysics\dgBroadPhasePersistent.h">
       <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dgPhysics\dgContactSolver.h">
@@ -335,10 +329,16 @@
     <ClInclude Include="..\..\dgMeshUtil\dgMeshEffect.h">
       <Filter>meshUtil</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dgPhysics\dgInverseDynamics.h">
+    <ClInclude Include="..\..\dgPhysics\dgWorldDynamicsParallelSolver.h">
       <Filter>systems</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dgPhysics\dgWorldDynamicsParallelSolver.h">
+    <ClInclude Include="..\..\dgPhysics\dgBroadPhaseMixed.h">
+      <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dgPhysics\dgBroadPhaseSegregated.h">
+      <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dgPhysics\dgWorldPlugins.h">
       <Filter>systems</Filter>
     </ClInclude>
   </ItemGroup>

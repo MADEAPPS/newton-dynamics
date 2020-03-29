@@ -1134,7 +1134,8 @@ public:
 	}
 
 	DG_INLINE dgVector(const dgFloat32* const ptr)
-		: m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(ptr[3])
+		//: m_x(ptr[0]), m_y(ptr[1]), m_z(ptr[2]), m_w(ptr[3])
+		:m_type(vld1q_f32 (ptr))
 	{
 		dgAssert(dgCheckVector((*this)));
 	}
@@ -1250,13 +1251,13 @@ public:
 	{
 		//return *this + A * B;
 		//return vfmaq_f32(A.m_type, B.m_type, m_type);
-		return vmlaq_f32(A.m_type, B.m_type, m_type);
+		return vmlaq_f32(m_type, A.m_type, B.m_type);
 	}
 
 	DG_INLINE dgVector MulSub(const dgVector& A, const dgVector& B) const
 	{
 		//return *this - A * B;
-		return vmlsq_f32(A.m_type, B.m_type, m_type);
+		return vmlsq_f32(m_type, A.m_type, B.m_type);
 	}
 
 	DG_INLINE dgVector AddHorizontal() const
@@ -1372,8 +1373,6 @@ public:
 	DG_INLINE dgVector Normalize() const
 	{
 		dgAssert(m_w == dgFloat32(0.0f));
-		//return *this * dgVector (dgRsqrt (DotProduct(*this).m_x));
-		//return Scale (dgRsqrt (DotProduct(*this).GetScalar()));
 		const dgVector& me = *this;
 		return me * InvMagSqrt();
 	}
@@ -1544,10 +1543,6 @@ public:
 			dgInt32 m_iw;
 		};
 	};
-
-
-
-
 
 	static dgVector m_zero;
 	static dgVector m_one;

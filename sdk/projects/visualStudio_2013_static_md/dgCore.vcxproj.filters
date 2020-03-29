@@ -105,6 +105,9 @@
     <ClCompile Include="..\..\dgCore\dgThreadHive.cpp">
       <Filter>threading</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dgCore\dgPolygonSoupDatabase.cpp">
+      <Filter>geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dgCore\dgNode.h">

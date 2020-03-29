@@ -177,14 +177,15 @@
     <ClCompile Include="..\..\dgMeshUtil\dgMeshEffect6.cpp">
       <Filter>meshUtil</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dgPhysics\dgInverseDynamics.cpp">
-      <Filter>systems</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dgPhysics\dgWorldPlugins.cpp">
       <Filter>systems</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dgPhysics\dgBroadPhaseMixed.cpp" />
-    <ClCompile Include="..\..\dgPhysics\dgBroadPhaseSegregated.cpp" />
+    <ClCompile Include="..\..\dgPhysics\dgBroadPhaseMixed.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dgPhysics\dgBroadPhaseSegregated.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dgPhysics\dgBodyMasterList.h">
@@ -328,16 +329,17 @@
     <ClInclude Include="..\..\dgMeshUtil\dgMeshEffect.h">
       <Filter>meshUtil</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dgPhysics\dgInverseDynamics.h">
-      <Filter>systems</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\dgPhysics\dgWorldPlugins.h">
       <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dgPhysics\dgWorldDynamicsParallelSolver.h">
       <Filter>systems</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\dgPhysics\dgBroadPhaseMixed.h" />
-    <ClInclude Include="..\..\dgPhysics\dgBroadPhaseSegregated.h" />
+    <ClInclude Include="..\..\dgPhysics\dgBroadPhaseMixed.h">
+      <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dgPhysics\dgBroadPhaseSegregated.h">
+      <Filter>systems</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

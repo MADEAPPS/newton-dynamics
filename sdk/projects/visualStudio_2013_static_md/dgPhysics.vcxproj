@@ -99,6 +99,7 @@
     <ClCompile Include="..\..\dgPhysics\dgWorldDynamicsParallelSolver.cpp" />
     <ClCompile Include="..\..\dgPhysics\dgWorldDynamicsSimpleSolver.cpp" />
     <ClCompile Include="..\..\dgPhysics\dgWorldDynamicUpdate.cpp" />
+    <ClCompile Include="..\..\dgPhysics\dgWorldPlugins.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dgMeshUtil\dgMeshEffect.h" />
@@ -151,6 +152,7 @@
     <ClInclude Include="..\..\dgPhysics\dgWorld.h" />
     <ClInclude Include="..\..\dgPhysics\dgWorldDynamicsParallelSolver.h" />
     <ClInclude Include="..\..\dgPhysics\dgWorldDynamicUpdate.h" />
+    <ClInclude Include="..\..\dgPhysics\dgWorldPlugins.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{34AD435B-7662-49D5-AF13-5974FEC5F578}</ProjectGuid>
