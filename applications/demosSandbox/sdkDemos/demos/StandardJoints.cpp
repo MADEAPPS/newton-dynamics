@@ -152,24 +152,16 @@ class dFlexyPipeSpinner: public dCustomBallAndSocket
 		:dCustomBallAndSocket(pinAndPivotFrame, child, parent)
 	{
 		EnableTwist(false);
-		EnableCone(true);
-		SetConeLimits(0.0f);
-		SetConeFriction(1.0e20f);
-		SetConeStiffness(0.6f);
+		EnableCone(false);
 	}
 
-	void SubmitConstraints(dFloat timestep, int threadIndex)
+	void ApplyTwistAction (const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 	{
-		dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
-		dMatrix matrix0;
-		dMatrix matrix1;
-		CalculateGlobalMatrix(matrix0, matrix1);
-
 		dFloat jacobian0[6];
 		dFloat jacobian1[6];
 
-		dVector pin0 (matrix0.m_front);
-		dVector pin1 (matrix1.m_front.Scale (-1.0f));
+		dVector pin0(matrix0.m_front);
+		dVector pin1(matrix1.m_front.Scale(-1.0f));
 
 		jacobian0[0] = 0.0f;
 		jacobian0[1] = 0.0f;
@@ -189,11 +181,60 @@ class dFlexyPipeSpinner: public dCustomBallAndSocket
 		dVector omega1(0.0f);
 		NewtonBodyGetOmega(m_body0, &omega0[0]);
 		NewtonBodyGetOmega(m_body1, &omega1[0]);
-		
+
 		dFloat relOmega = omega0.DotProduct3(pin0) + omega1.DotProduct3(pin1);
 		dFloat relAccel = -relOmega / timestep;
-		NewtonUserJointAddGeneralRow (m_joint, jacobian0, jacobian1);
-		NewtonUserJointSetRowAcceleration (m_joint, relAccel);
+		NewtonUserJointAddGeneralRow(m_joint, jacobian0, jacobian1);
+		NewtonUserJointSetRowAcceleration(m_joint, relAccel);
+	}
+
+	void ApplyElasticConeAction(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
+	{
+		dFloat relaxation = 0.01f;
+		dFloat spring = 1000.0f;
+		dFloat damper = 50.0f;
+		dFloat maxConeAngle = 45.0f * dDegreeToRad;
+
+		dFloat cosAngleCos = matrix1.m_front.DotProduct3(matrix0.m_front);
+		if (cosAngleCos >= dFloat(0.998f)) {
+			// when angle is very small we use Cartesian approximation 
+			dFloat angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+			NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_up[0]);
+			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, relaxation, spring, damper);
+			
+			dFloat angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+			NewtonUserJointAddAngularRow(m_joint, angle1, &matrix1.m_right[0]);
+			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, relaxation, spring, damper);
+		} else {
+			// angle is large enough that we calculable the actual cone angle
+			dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
+			dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
+			lateralDir = lateralDir.Normalize();
+			dFloat coneAngle = dAcos(dClamp(matrix1.m_front.DotProduct3(matrix0.m_front), dFloat(-1.0f), dFloat(1.0f)));
+			dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+			
+			// flexible spring action happens alone the cone angle only
+			if (coneAngle > maxConeAngle) {
+				NewtonUserJointAddAngularRow(m_joint, maxConeAngle - coneAngle, &lateralDir[0]);
+				NewtonUserJointSetRowMaximumFriction(m_joint, 0.0f);
+
+			} else {
+				// apply spring damper action
+				NewtonUserJointAddAngularRow(m_joint, -coneAngle, &lateralDir[0]);
+				NewtonUserJointSetRowSpringDamperAcceleration(m_joint, relaxation, spring, damper);	
+			}
+		}
+	}
+
+	void SubmitConstraints(dFloat timestep, int threadIndex)
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+		dCustomBallAndSocket::SubmitConstraints(timestep, threadIndex);
+
+		CalculateGlobalMatrix(matrix0, matrix1);
+		ApplyTwistAction (matrix0, matrix1, timestep);
+		ApplyElasticConeAction(matrix0, matrix1, timestep);
 	}
 };
 
@@ -1109,6 +1150,7 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 	dArray<NewtonBody*> bodies;
 
 	int count = 50;
+//int count = 10;
 	NewtonWorld* const world = scene->GetNewton();
 
 	// set the friction low to emulate motion on some fluid 
@@ -1170,7 +1212,7 @@ void AddFlexyPipe(DemoEntityManager* const scene, const dVector& origin)
 	joint->EnableCone(true);
 	joint->SetConeLimits(0.0f);
 	joint->SetConeFriction(1.0e20f);
-	joint->SetConeStiffness(0.95f);
+	//joint->SetConeStiffness(0.95f);
 
 	cylinderGeometry->Release();
 	NewtonDestroyCollision(cylinderShape);
@@ -1194,7 +1236,7 @@ void StandardJoints (DemoEntityManager* const scene)
     dVector size (1.5f, 2.0f, 2.0f, 0.0f);
 
 //	joints still with problems
-	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
+//	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));
 //	AddSliderBug(scene, dVector(-20.0f, 0.0f, 17.0f));
 //	AddDoubleHinge(scene, dVector(-20.0f, 0.0f, 17.0f));
 //	AddPathFollow(scene, dVector(20.0f, 0.0f, 0.0f));
@@ -1202,7 +1244,7 @@ void StandardJoints (DemoEntityManager* const scene)
 //	AddHingeSpringDamper (scene, dVector (dVector (-20.0f, 0.0f, 5.0f)));
 //	AddHinge(scene, dVector(-20.0f, 0.0f, 0.0f));
 //	AddPathFollow (scene, dVector (20.0f, 0.0f, 0.0f));
-//	AddFlexyPipe(scene, dVector(-20.0f, 0.0f, 0.0f));
+	AddFlexyPipe(scene, dVector(-20.0f, 0.0f, 0.0f));
 
 #if 0
 	Add6DOF (scene, dVector (-20.0f, 0.0f, -25.0f));

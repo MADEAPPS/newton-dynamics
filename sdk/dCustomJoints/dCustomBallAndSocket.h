@@ -36,12 +36,6 @@ class dCustomBallAndSocket: public dCustomJoint
 	CUSTOM_JOINTS_API void SetConeFriction(dFloat frictionTorque);
 	CUSTOM_JOINTS_API dFloat GetConeFriction(dFloat frictionTorque) const;
 
-	CUSTOM_JOINTS_API void SetConeStiffness(dFloat coneStiffness);
-	CUSTOM_JOINTS_API dFloat GetConeStiffness(dFloat coneStiffness) const;
-
-	CUSTOM_JOINTS_API void SetConeSpringDamper(bool state, dFloat spring, dFloat damper);
-	CUSTOM_JOINTS_API void SetTwistSpringDamper(bool state, dFloat spring, dFloat damper);
-
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 	
 	protected:
@@ -59,11 +53,6 @@ class dCustomBallAndSocket: public dCustomJoint
 	dFloat m_maxConeAngle;
 	dFloat m_coneFriction;
 	dFloat m_twistFriction;
-	dFloat m_coneStiffness;
-	dFloat m_twistSpring;
-	dFloat m_twistDamper;
-	dFloat m_coneSpring;
-	dFloat m_coneDamper;
 
 	DECLARE_CUSTOM_JOINT(dCustomBallAndSocket, dCustomJoint)
 };

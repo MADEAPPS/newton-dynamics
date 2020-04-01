@@ -203,7 +203,6 @@
 		{
 			dgAssert(i < DG_SOA_WORD_GROUP_SIZE);
 			dgAssert(i >= 0);
-			//return m_f[i];
 			const dgFloat32* const ptr = (dgFloat32*)&m_type;
 			return ptr[i];
 		}

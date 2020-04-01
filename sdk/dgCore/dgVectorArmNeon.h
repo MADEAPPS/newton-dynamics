@@ -416,7 +416,6 @@ public:
     {
         float32x4_t sqrt_reciprocal = vrsqrteq_f32(m_type);
         return vrsqrtsq_f32(m_type * sqrt_reciprocal, sqrt_reciprocal) * sqrt_reciprocal;
-        
     }
     
     DG_INLINE dgVector Sqrt() const
@@ -424,7 +423,6 @@ public:
         float32x4_t sqrt_reciprocal = vrsqrteq_f32(m_type);
         float32x4_t tmp = vrsqrtsq_f32(m_type * sqrt_reciprocal, sqrt_reciprocal) * sqrt_reciprocal;
         return vec_mul(m_type, tmp);
-        
     }
     
     DG_INLINE dgVector Normalize () const
@@ -1379,10 +1377,7 @@ public:
 
 	dgVector Abs() const
 	{
-		return dgVector((m_x > dgFloat32(0.0f)) ? m_x : -m_x,
-			(m_y > dgFloat32(0.0f)) ? m_y : -m_y,
-			(m_z > dgFloat32(0.0f)) ? m_z : -m_z,
-			(m_w > dgFloat32(0.0f)) ? m_w : -m_w);
+		return vabsq_f32(m_type);
 	}
 
 	dgFloat32 GetMax() const
@@ -1392,90 +1387,59 @@ public:
 
 	dgVector GetMax(const dgVector& data) const
 	{
-		return dgVector((m_x > data.m_x) ? m_x : data.m_x,
-			(m_y > data.m_y) ? m_y : data.m_y,
-			(m_z > data.m_z) ? m_z : data.m_z,
-			(m_w > data.m_w) ? m_w : data.m_w);
+		return vmaxq_f32(m_type, data.m_type);
 	}
 
 	dgVector GetMin(const dgVector& data) const
 	{
-		return dgVector((m_x < data.m_x) ? m_x : data.m_x,
-			(m_y < data.m_y) ? m_y : data.m_y,
-			(m_z < data.m_z) ? m_z : data.m_z,
-			(m_w < data.m_w) ? m_w : data.m_w);
+		return vminq_f32(m_type, data.m_type);
 	}
-
 
 	// relational operators
 	DG_INLINE dgVector operator== (const dgVector& data) const
 	{
-		return dgVector((m_x == data.m_x) ? dgInt32(0xffffffff) : 0,
-			(m_y == data.m_y) ? dgInt32(0xffffffff) : 0,
-			(m_z == data.m_z) ? dgInt32(0xffffffff) : 0,
-			(m_w == data.m_w) ? dgInt32(0xffffffff) : 0);
+		return vceqq_f32(m_typeInt, data.m_typeInt);
 	}
 
 	DG_INLINE dgVector operator> (const dgVector& data) const
 	{
-		return dgVector((m_x > data.m_x) ? dgInt32(0xffffffff) : 0,
-			(m_y > data.m_y) ? dgInt32(0xffffffff) : 0,
-			(m_z > data.m_z) ? dgInt32(0xffffffff) : 0,
-			(m_w > data.m_w) ? dgInt32(0xffffffff) : 0);
+		return vcgtq_f32(m_typeInt, data.m_typeInt);
 	}
 
 	DG_INLINE dgVector operator< (const dgVector& data) const
 	{
-		return dgVector((m_x < data.m_x) ? dgInt32(0xffffffff) : 0,
-			(m_y < data.m_y) ? dgInt32(0xffffffff) : 0,
-			(m_z < data.m_z) ? dgInt32(0xffffffff) : 0,
-			(m_w < data.m_w) ? dgInt32(0xffffffff) : 0);
+		return vcltq_f32(m_typeInt, data.m_typeInt);
 	}
 
 	DG_INLINE dgVector operator>= (const dgVector& data) const
 	{
-		return dgVector((m_x >= data.m_x) ? dgInt32(0xffffffff) : 0,
-			(m_y >= data.m_y) ? dgInt32(0xffffffff) : 0,
-			(m_z >= data.m_z) ? dgInt32(0xffffffff) : 0,
-			(m_w >= data.m_w) ? dgInt32(0xffffffff) : 0);
+		return vcgeq_f32(m_typeInt, data.m_typeInt);
 	}
 
 	DG_INLINE dgVector operator<= (const dgVector& data) const
 	{
-		return dgVector((m_x <= data.m_x) ? dgInt32(0xffffffff) : 0,
-			(m_y <= data.m_y) ? dgInt32(0xffffffff) : 0,
-			(m_z <= data.m_z) ? dgInt32(0xffffffff) : 0,
-			(m_w <= data.m_w) ? dgInt32(0xffffffff) : 0);
+		return vcleq_f32(m_typeInt, data.m_typeInt);
 	}
-
 
 	// logical operations
 	DG_INLINE dgVector operator& (const dgVector& data) const
 	{
-		const dgInt32* const a = (dgInt32*)&m_x;
-		const dgInt32* const b = (dgInt32*)&data.m_x;
-		return dgVector(a[0] & b[0], a[1] & b[1], a[2] & b[2], a[3] & b[3]);
+		return vandq_u32(m_typeInt, data.m_typeInt);
 	}
 
 	DG_INLINE dgVector operator| (const dgVector& data) const
 	{
-		const dgInt32* const a = (dgInt32*)&m_x;
-		const dgInt32* const b = (dgInt32*)&data.m_x;
-		return dgVector(a[0] | b[0], a[1] | b[1], a[2] | b[2], a[3] | b[3]);
+		return vorrq_u32(m_typeInt, data.m_typeInt);
 	}
 
 	DG_INLINE dgVector operator^ (const dgVector& data) const
 	{
-		const dgInt32* const a = (dgInt32*)&m_x;
-		const dgInt32* const b = (dgInt32*)&data.m_x;
-		return dgVector(a[0] ^ b[0], a[1] ^ b[1], a[2] ^ b[2], a[3] ^ b[3]);
+		return veorq_u32(m_typeInt, data.m_typeInt);
 	}
 
 	DG_INLINE dgVector AndNot(const dgVector& data) const
 	{
-		const dgInt32* const a = (dgInt32*)&m_x;
-		const dgInt32* const b = (dgInt32*)&data.m_x;
-		return dgVector(a[0] & ~b[0], a[1] & ~b[1], a[2] & ~b[2], a[3] & ~b[3]);
+		return vbicq_u32(m_typeInt, data.m_typeInt);
 	}
 
 	DG_INLINE dgVector Select(const dgVector& data, const dgVector& mask) const
@@ -1512,15 +1476,14 @@ public:
 
 	DG_INLINE static void Transpose4x4(dgVector& dst0, dgVector& dst1, dgVector& dst2, dgVector& dst3, const dgVector& src0, const dgVector& src1, const dgVector& src2, const dgVector& src3)
 	{
-		dgVector tmp0(src0);
-		dgVector tmp1(src1);
-		dgVector tmp2(src2);
-		dgVector tmp3(src3);
-
-		dst0 = dgVector(tmp0.m_x, tmp1.m_x, tmp2.m_x, tmp3.m_x);
-		dst1 = dgVector(tmp0.m_y, tmp1.m_y, tmp2.m_y, tmp3.m_y);
-		dst2 = dgVector(tmp0.m_z, tmp1.m_z, tmp2.m_z, tmp3.m_z);
-		dst3 = dgVector(tmp0.m_w, tmp1.m_w, tmp2.m_w, tmp3.m_w);
+		float32x4x2_t vtrn1 = vzipq_f32(src0.m_type, src2.m_type);
+		float32x4x2_t vtrn2 = vzipq_f32(src1.m_type, src3.m_type);
+		float32x4x2_t res1 = vzipq_f32(vtrn1.val[0], vtrn2.val[0]);
+		float32x4x2_t res2 = vzipq_f32(vtrn1.val[1], vtrn2.val[1]);
+		dst0.m_type = res1.val[0];
+		dst1.m_type = res1.val[1];
+		dst2.m_type = res2.val[0];
+		dst3.m_type = res2.val[1];
 	}
 
 	DG_CLASS_ALLOCATOR(allocator)

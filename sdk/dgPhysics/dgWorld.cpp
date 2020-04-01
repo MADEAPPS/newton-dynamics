@@ -258,7 +258,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,m_pointCollision(NULL)
 	,m_userData(NULL)
 	,m_allocator (allocator)
-//	,m_mainThreadMutex()
 	,m_onPostUpdateCallback(NULL)
 	,m_listeners(allocator)
 	,m_perInstanceData(allocator)
@@ -268,7 +267,6 @@ dgWorld::dgWorld(dgMemoryAllocator* const allocator)
 	,m_solverJacobiansMemory (allocator, 64)
 	,m_solverRightHandSideMemory (allocator, 64)
 	,m_solverForceAccumulatorMemory (allocator, 64)
-//	,m_concurrentUpdate(false)
 {
 	//TestAStart();
 	//TestSort();

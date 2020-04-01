@@ -1239,7 +1239,6 @@ void dgBroadPhase::AddPair (dgBody* const body0, dgBody* const body1, const dgFl
 	}
 }
 
-
 void dgBroadPhase::FindGeneratedBodiesCollidingPairs(dgBroadphaseSyncDescriptor* const descriptor, dgInt32 threadID)
 {
 dgAssert (0);
@@ -1345,7 +1344,6 @@ void dgBroadPhase::SubmitPairs(dgBroadPhaseNode* const leafNode, dgBroadPhaseNod
 		}
 	}
 }
-
 
 void dgBroadPhase::ImproveNodeFitness(dgBroadPhaseTreeNode* const node, dgBroadPhaseNode** const root)
 {

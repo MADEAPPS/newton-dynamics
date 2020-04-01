@@ -249,8 +249,9 @@ class dgVector
 
 	dgFloat32 GetMax () const
 	{
-		__m128 tmp (_mm_max_ps (m_type, _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(1, 0, 3, 2))));
-		return dgVector (_mm_max_ps (tmp, _mm_shuffle_ps (tmp, tmp, PERMUTE_MASK(2, 3, 0, 1)))).GetScalar();
+		__m128 tmp (_mm_max_ps (m_type, _mm_shuffle_ps (m_type, m_type, PERMUTE_MASK(3, 2, 3, 2))));
+		//return dgVector (_mm_max_ps (tmp, _mm_shuffle_ps (tmp, tmp, PERMUTE_MASK(3, 2, 0, 1)))).GetScalar();
+		return _mm_cvtss_f32(_mm_max_ss (tmp, _mm_shuffle_ps(tmp, tmp, PERMUTE_MASK(3, 2, 0, 1))));
 	}
 
 	dgVector GetMax (const dgVector& data) const
@@ -287,7 +288,7 @@ class dgVector
 
 	DG_INLINE dgVector Sqrt () const
 	{
-		return dgVector (_mm_sqrt_ps(m_type));
+		return _mm_sqrt_ps(m_type);
 	}
 
 	DG_INLINE dgVector InvSqrt () const
