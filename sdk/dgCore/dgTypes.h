@@ -71,9 +71,9 @@
 	#pragma warning (push, 3) 
 		#include <windows.h>
 		#include <crtdbg.h>
-		#ifndef _DURANGO
-			#include <tlhelp32.h>
-		#endif
+		//#ifndef _DURANGO
+		//	#include <tlhelp32.h>
+		//#endif
 	#pragma warning (pop) 
 #endif
 
