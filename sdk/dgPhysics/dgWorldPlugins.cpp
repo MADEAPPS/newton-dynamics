@@ -44,8 +44,7 @@ dgWorldPluginList::~dgWorldPluginList()
 
 void dgWorldPluginList::LoadVisualStudioPlugins(const char* const plugInPath)
 {
-#ifdef DG_USE_PLUGINS
-	#if _MSC_VER > 1700
+#if defined(DG_USE_PLUGINS) && defined(_MSC_VER)
 	char rootPathInPath[2048];
 	sprintf(rootPathInPath, "%s/*.dll", plugInPath);
 
@@ -98,14 +97,12 @@ void dgWorldPluginList::LoadVisualStudioPlugins(const char* const plugInPath)
 
 		_findclose(handle);
 	}
-	#endif	
 #endif
 }
 
 void dgWorldPluginList::LoadLinuxPlugins(const char* const plugInPath)
 {
-#ifdef DG_USE_PLUGINS
-	#if __linux__
+#if defined(DG_USE_PLUGINS) && defined(__linux__)
 	char rootPathInPath[2048];
 	DIR* directory;
 	dirent* dirEntry;
@@ -142,7 +139,6 @@ void dgWorldPluginList::LoadLinuxPlugins(const char* const plugInPath)
 		}
 		closedir(directory);
 	}
-	#endif
 #endif
 }
 
@@ -158,7 +154,7 @@ void dgWorldPluginList::LoadPlugins(const char* const path)
 
 void dgWorldPluginList::UnloadPlugins()
 {
-#ifdef DG_USE_PLUGINS
+#if defined(DG_USE_PLUGINS)
 	#ifdef _MSC_VER
 		dgWorldPluginList& pluginsList = *this;
 		for (dgWorldPluginList::dgListNode* node = pluginsList.GetFirst(); node; node = node->GetNext()) {
