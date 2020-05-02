@@ -23,6 +23,7 @@
 #include "dgWorld.h"
 #include "dgWorldPlugins.h"
 
+
 #if __linux__
 #include <dlfcn.h>
 #include <dirent.h>
@@ -40,9 +41,11 @@ dgWorldPluginList::~dgWorldPluginList()
 {
 }
 
+
 void dgWorldPluginList::LoadVisualStudioPlugins(const char* const plugInPath)
 {
-#if _MSC_VER > 1700
+#ifdef DG_USE_PLUGINS
+	#if _MSC_VER > 1700
 	char rootPathInPath[2048];
 	sprintf(rootPathInPath, "%s/*.dll", plugInPath);
 
@@ -95,12 +98,14 @@ void dgWorldPluginList::LoadVisualStudioPlugins(const char* const plugInPath)
 
 		_findclose(handle);
 	}
-#endif	
+	#endif	
+#endif
 }
 
 void dgWorldPluginList::LoadLinuxPlugins(const char* const plugInPath)
 {
-#if __linux__
+#ifdef DG_USE_PLUGINS
+	#if __linux__
 	char rootPathInPath[2048];
 	DIR* directory;
 	dirent* dirEntry;
@@ -137,33 +142,36 @@ void dgWorldPluginList::LoadLinuxPlugins(const char* const plugInPath)
 		}
 		closedir(directory);
 	}
+	#endif
 #endif
 }
 
 void dgWorldPluginList::LoadPlugins(const char* const path)
 {
 	UnloadPlugins();
-#ifdef _MSC_VER
-	LoadVisualStudioPlugins(path);
-#elif __linux__
-	LoadLinuxPlugins(path);
-#endif
+	#ifdef _MSC_VER
+		LoadVisualStudioPlugins(path);
+	#elif __linux__
+		LoadLinuxPlugins(path);
+	#endif
 }
 
 void dgWorldPluginList::UnloadPlugins()
 {
-#ifdef _MSC_VER
-	dgWorldPluginList& pluginsList = *this;
-	for (dgWorldPluginList::dgListNode* node = pluginsList.GetFirst(); node; node = node->GetNext()) {
-		HMODULE module = (HMODULE)node->GetInfo().m_module;
-		FreeLibrary(module);
-	}
-#elif __linux__
-	dgWorldPluginList& pluginsList = *this;
-	for (dgWorldPluginList::dgListNode* node = pluginsList.GetFirst(); node; node = node->GetNext()) {
-		void* module = node->GetInfo().m_module;
-		dlclose(module);
-	}
+#ifdef DG_USE_PLUGINS
+	#ifdef _MSC_VER
+		dgWorldPluginList& pluginsList = *this;
+		for (dgWorldPluginList::dgListNode* node = pluginsList.GetFirst(); node; node = node->GetNext()) {
+			HMODULE module = (HMODULE)node->GetInfo().m_module;
+			FreeLibrary(module);
+		}
+	#elif __linux__
+		dgWorldPluginList& pluginsList = *this;
+		for (dgWorldPluginList::dgListNode* node = pluginsList.GetFirst(); node; node = node->GetNext()) {
+			void* module = node->GetInfo().m_module;
+			dlclose(module);
+		}
+	#endif
 #endif
 	m_currentPlugin = NULL;
 	m_preferedPlugin = NULL;

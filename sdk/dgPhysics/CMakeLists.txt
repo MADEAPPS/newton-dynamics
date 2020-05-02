@@ -13,6 +13,11 @@ cmake_minimum_required(VERSION 3.4.0)
 set (projectName "dgPhysics")
 message (${projectName})
 
+if(NEWTON_USE_PLUGIN_DLL)
+	add_definitions(-DDG_USE_PLUGINS)
+endif()
+
+
 #source and header files
 file(GLOB CPP_SOURCE 
 	*.h
