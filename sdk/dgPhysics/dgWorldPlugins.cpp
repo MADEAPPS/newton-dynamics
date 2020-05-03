@@ -52,11 +52,16 @@ void dgWorldPluginList::LoadVisualStudioPlugins(const char* const plugInPath)
 	dgWorld* const world = (dgWorld*) this;
 
 	// scan for all plugins in this folder
-	_finddata_t data;
-	intptr_t handle = _findfirst(rootPathInPath, &data);
-	if (handle != -1) {
+	//_finddata_t data;
+	//intptr_t handle = _findfirst(rootPathInPath, &data);
+
+	WIN32_FIND_DATAA data;
+	HANDLE handle = FindFirstFile(rootPathInPath, &data);
+
+	if (handle != INVALID_HANDLE_VALUE ) {
 		do {
-			sprintf(rootPathInPath, "%s/%s", plugInPath, data.name);
+			//sprintf(rootPathInPath, "%s/%s", plugInPath, data.name);
+			sprintf(rootPathInPath, "%s/%s", plugInPath, data.cFileName);
 			HMODULE module = LoadLibrary(rootPathInPath);
 
 			if (module) {
@@ -93,9 +98,11 @@ void dgWorldPluginList::LoadVisualStudioPlugins(const char* const plugInPath)
 				}
 			}
 
-		} while (_findnext(handle, &data) == 0);
+		//} while (_findnext(handle, &data) == 0);
+		 } while (FindNextFile(handle, &data));
 
-		_findclose(handle);
+		//_findclose(handle);
+		FindClose(handle);
 	}
 #endif
 }
