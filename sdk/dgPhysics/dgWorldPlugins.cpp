@@ -24,7 +24,7 @@
 #include "dgWorldPlugins.h"
 
 
-#if __linux__
+#if defined(DG_USE_PLUGINS) && defined(__linux__)
 #include <dlfcn.h>
 #include <dirent.h>
 #endif
