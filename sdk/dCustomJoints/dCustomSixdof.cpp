@@ -547,8 +547,9 @@ void dCustomSixdof::SubmitAngularAxis(const dMatrix& matrix0, const dMatrix& mat
 		//dMatrix yawRoll(matrix1 * coneRotation * matrix1.Inverse());
 		dMatrix yawRoll(pitchMatrix * matrix0 * matrix1.Inverse());
 	//	dAssert(dAbs(yawRoll[1][2]) < dFloat(1.0e-1f));
-	if (dAbs(yawRoll[1][2]) > 0.6f)
-	dTrace(("error %f\n", yawRoll[1][2]));
+	if (dAbs(yawRoll[1][2]) > 0.6f) {
+		dTrace(("error %f\n", yawRoll[1][2]));
+	}
 
 		dTrace(("error %f\n", yawRoll[1][2]));
 	/*
