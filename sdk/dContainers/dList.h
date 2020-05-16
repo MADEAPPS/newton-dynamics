@@ -200,6 +200,7 @@ class dList: public dContainersAlloc
 	dListNode* GetFirst() const;
 	dListNode* Append ();
 	dListNode* Append (const T &element);
+	dListNode* Append (dListNode* const node);
 	dListNode* Addtop ();
 	dListNode* Addtop (const T &element);
 	dListNode* AppendAfter (dListNode* const node);
@@ -212,6 +213,7 @@ class dList: public dContainersAlloc
 	dListNode* GetNodeFromInfo (T &m_info) const;
 	void Remove (dListNode* const node);
 	void Remove (const T &element);
+	void Unlink (dListNode* const node);
 	void RemoveAll ();
 	
 	// special routines
@@ -222,7 +224,8 @@ class dList: public dContainersAlloc
 	// member variables
 	// ***********************************************************
 	private:
-/*
+
+#if 0
 	bool Sanity() const
 	{
 		int count = 0;
@@ -230,8 +233,13 @@ class dList: public dContainersAlloc
 			count ++;
 		return count == m_count;
 	}
-*/
-	bool Sanity() const {return true;}
+#else
+	bool Sanity() const 
+	{
+		return true;
+	}
+#endif
+
 	dContainerFixSizeAllocator& GetAllocator()
 	{
 		static dContainerFixSizeAllocator* allocator = NULL;
@@ -286,6 +294,23 @@ typename dList<T, poolSize>::dListNode* dList<T, poolSize>::GetFirst() const
 template<class T, int poolSize>
 typename dList<T, poolSize>::dListNode* dList<T, poolSize>::GetLast() const
 {
+	return m_last;
+}
+
+template<class T, int poolSize>
+typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Append(dListNode* const node)
+{
+	dAssert (!node->m_next);
+	dAssert (!node->m_prev);
+	m_count++;
+	if (m_first == NULL) {
+		m_first = node;
+		m_last = m_first;
+	} else {
+		m_last->AddLast(node);
+		m_last = node;
+	}
+	dAssert(Sanity());
 	return m_last;
 }
 
@@ -455,6 +480,20 @@ void dList<T, poolSize>::Remove (dListNode* const node)
 	GetAllocator().Free (node);
 	dAssert (Sanity());
 }
+
+template<class T, int poolSize>
+void dList<T, poolSize>::Unlink (dListNode* const node)
+{
+	m_count --;
+	if (node == m_first) {
+		m_first = node->GetNext();
+	} else if (node == m_last) {
+		m_last = node->GetPrev();
+	}
+	node->Unlink();
+	dAssert (Sanity());
+}
+
 
 template<class T, int poolSize>
 void dList<T, poolSize>::RemoveAll ()

@@ -48,85 +48,65 @@ enum dParserCompiler::ActionType
 	dERROR
 };
 
-class dParserCompiler::dSymbolName
+
+dParserCompiler::dSymbolNameMap::dTreeNode* dParserCompiler::dSymbolNameMap::Insert(int val, dParserCompiler::dSymbolName key)
 {
-	class dDictionary : public dTree<int, dString>
-	{
-		public:
-		dDictionary()
-			:dTree<int, dString>()
-		{
-			m_empty = FindWord(dString(""));
-		}
-
-		dTreeNode* FindWord(const dString& word)
-		{
-			dDictionary::dTreeNode* node = Find(word);
-			if (!node) {
-				node = Insert(0, word);
-			}
-			return node;
-		}
-		dTreeNode* m_empty;
-	};
-
-	public:
-	dSymbolName()
-		:m_name(GetDictionary().m_empty)
-	{
+	if (m_cache.GetCount()) {
+		dTreeNode* const node = m_cache.Pop();
+		node->GetInfo() = val;
+		return dTree<int, dSymbolName>::Insert(node, key);
+	} else {
+		return dTree<int, dSymbolName>::Insert(val, key);
 	}
+}
 
-	dSymbolName(const char* const word)
-		:m_name(GetDictionary().FindWord(dString (word)))
-	{
+dParserCompiler::dSymbolNameMap::~dSymbolNameMap()
+{
+	while (GetRoot()) {
+		dTreeNode* const node = GetRoot();
+		Unlink(node);
+		m_cache.Push(node);
 	}
+}
 
-	dSymbolName(const dString& word)
-		:m_name(GetDictionary().FindWord(word))
-	{
+dParserCompiler::dCache<dParserCompiler::dSymbolNameMap::dTreeNode> dParserCompiler::dSymbolNameMap::m_cache;
+
+
+dParserCompiler::dItemList::dListNode* dParserCompiler::dItemList::Append()
+{
+	if (m_cache.GetCount()) {
+		dListNode* const node = m_cache.Pop();
+		return dList<dItem>::Append(node);
 	}
-
-	const dString& GetString() const
+	else 
 	{
-		dAssert(m_name);
-		return m_name->GetKey();
+		return dList<dItem>::Append();
 	}
+}
 
-	const char* GetStr() const
+dParserCompiler::dItemList::dListNode* dParserCompiler::dItemList::Append(const dItem &element)
+{
+	if (m_cache.GetCount()) {
+		dListNode* const node = m_cache.Pop();
+		node->GetInfo() = element;
+		return dList<dItem>::Append(node);
+	}
+	else 
 	{
-		return GetString().GetStr();
+		return dList<dItem>::Append(element);
 	}
+}
 
-	bool operator== (const dSymbolName& src) const
-	{
-		return m_name == src.m_name;
+dParserCompiler::dItemList::~dItemList()
+{
+	while (GetFirst()) {
+		dListNode* const node = GetFirst();
+		Unlink(node);
+		m_cache.Push(node);
 	}
+}
 
-	bool operator!= (const dSymbolName& src) const
-	{
-		return m_name != src.m_name;
-	}
-
-	bool operator< (const dSymbolName& src) const
-	{
-		return m_name < src.m_name;
-	}
-
-	bool operator> (const dSymbolName& src) const
-	{
-		return m_name > src.m_name;
-	}
-
-	private:
-	dDictionary& GetDictionary()
-	{
-		static dDictionary dictionary;
-		return dictionary;
-	}
-
-	const dDictionary::dTreeNode* m_name;
-};
-
+dParserCompiler::dCache<dParserCompiler::dItemList::dListNode> dParserCompiler::dItemList::m_cache;
 
 class dParserCompiler::dTokenInfo
 {
@@ -147,10 +127,9 @@ class dParserCompiler::dGotoEntry
 	dGotoEntry ()
 	{
 	}
-	short  m_token;
-	short  m_nextState;
+	int m_token;
+	int m_nextState;
 };
-
 
 class dParserCompiler::dActionEntry
 {
@@ -159,74 +138,12 @@ class dParserCompiler::dActionEntry
 	{
 	}
 
-	short m_token;
-	char m_errorRule;
-	char m_stateType;// 0 = shift, 1 = reduce, 2 = accept
-	short m_nextState;
-	short m_ruleSymbols;
-	short m_ruleIndex;
-};
-
-
-class dParserCompiler::dSymbol
-{
-	public:
-	dTokenType m_type;
-	dToken m_token;
-	dSymbolName m_name;
-	dString m_operatorPrecendeceOverrride;
-};
-
-
-class dParserCompiler::dRuleInfo: public dParserCompiler::dSymbol, public dList<dParserCompiler::dSymbol>
-{
-	public:
-	dRuleInfo()
-		:dSymbol()
-		,dList<dSymbol>()
-		,m_ruleId()
-		,m_ruleNumber(0)
-		,m_ruleReduced(false)
-		,m_shiftReduceErrorMark(false)
-		,m_semanticActionCode("")
-	{
-	}
-
-	dListNode* GetSymbolNodeByIndex (int index) const
-	{
-		int i = 0;
-		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			if (index == i) {
-				return node;
-			}
-			i ++;
-		}
-		return NULL;
-	}
-
-	dSymbolName m_ruleId;
-	int m_ruleNumber;
-	bool m_ruleReduced;
-	bool m_shiftReduceErrorMark;
-	dString m_semanticActionCode;
-};
-
-
-class dParserCompiler::dProductionRule: public dList<dParserCompiler::dRuleInfo>
-{
-	public:
-
-	dListNode* Find (dSymbolName name) const
-	{
-		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-			if (node->GetInfo().m_name == name) {
-				return node;
-			}
-		}
-
-		dAssert (0);
-		return NULL;
-	}
+	int m_token;
+	int m_errorRule;
+	int m_stateType;// 0 = shift, 1 = reduce, 2 = accept
+	int m_nextState;
+	int m_ruleSymbols;
+	int m_ruleIndex;
 };
 
 class dParserCompiler::dTransition
@@ -236,23 +153,6 @@ class dParserCompiler::dTransition
 	dSymbolName m_symbol;
 	dTokenType m_type;
 	dState* m_targetState;
-};
-
-class dParserCompiler::dItem
-{
-	public:
-	dItem ()
-		:m_indexMarker(0)
-		,m_lookAheadSymbol()
-		,m_lastOperatorSymbol ()
-		,m_ruleNode(NULL)
-	{
-	}
-
-	int m_indexMarker;
-	dSymbolName m_lookAheadSymbol;
-	dSymbolName m_lastOperatorSymbol;
-	dProductionRule::dListNode* m_ruleNode;
 };
 
 class dParserCompiler::dAction 
@@ -270,7 +170,6 @@ class dParserCompiler::dTokenStringPair
 	dToken m_token;
 	dString m_info;
 };
-
 
 class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 {
@@ -324,6 +223,15 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 		}
 	}
 
+	~dState()
+	{
+		while (GetFirst()) {
+			dListNode* const node = GetFirst();
+			Unlink(node);
+			m_cache.Push(node);
+		}
+	}
+
 	void AddItem (const dItem& item)
 	{
 		dState::dListNode* const node = Append(item);
@@ -360,7 +268,7 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 	void CalculateKey ()
 	{
 		int keylength = 0;
-		char key[1024 * 64];
+		char key[1024 * 128];
 		key[0] = 0;
 		for (dState::dListNode* itemNode = GetFirst(); itemNode; itemNode = itemNode->GetNext()) {
 			dItem& item = itemNode->GetInfo();
@@ -449,6 +357,21 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 		}
 	}
 
+	private:
+	dListNode* Append(const dItem &element)
+	{
+		if (m_cache.GetCount()) {
+			dListNode* const node = m_cache.Pop();
+			node->GetInfo() = element;
+			return dList<dItem>::Append(node);
+		} else {
+			return dList<dItem>::Append(element);
+		}
+	}
+
+	static dCache<dListNode> m_cache;
+
+	public:
 	dSymbolName m_key;
 	int m_number;
 	bool m_hasErroItem;
@@ -457,6 +380,8 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem>
 	dList<dTransition> m_transitions;
 	dTree<dList<dState::dListNode*>, dItemKey> m_itemMap;
 };
+
+dParserCompiler::dCache<dParserCompiler::dItemList::dListNode> dParserCompiler::dState::m_cache;
 
 class dParserCompiler::dOperatorsAssociation: public dList <dSymbolName>
 {
@@ -601,9 +526,6 @@ dString dParserCompiler::GetClassName(const char* const fileName) const
 	strtok (className, ".");
 	return dString (className);
 }
-
-
-
 
 void dParserCompiler::LoadTemplateFile(const char* const templateName, dString& templateOuput) const
 {
@@ -907,7 +829,8 @@ void dParserCompiler::CanonicalItemSets (
 	const dOperatorsPrecedence& operatorPrecedence,
 	const dString& fileName)
 {
-	dList<dItem> itemSet;
+//	dList<dItem> itemSet;
+	dItemList itemSet;
 	dList<dState*> stateList;
 	FILE* debugFile = NULL;
 
@@ -947,10 +870,16 @@ void dParserCompiler::CanonicalItemSets (
 
 	stateOuter->Trace(debugFile);
 
+static int xxxx0;
+static dState* xxxx1; 
+
 	// now for each state found 
 	int stateNumber = 1;
 	for (dList<dState*>::dListNode* node = stateList.GetFirst(); node; node = node->GetNext()) {
 		dState* const state = node->GetInfo();
+xxxx0 = stateNumber;
+xxxx1 = state;
+
 		dTree<dTokenInfo, dSymbolName>::Iterator iter (symbolList);
 		for (iter.Begin(); iter; iter ++) {
 			dSymbolName symbol (iter.GetKey());
@@ -994,7 +923,7 @@ void dParserCompiler::CanonicalItemSets (
 
 // Generate the closure for a Set of Item  
 dParserCompiler::dState* dParserCompiler::Closure (
-	const dList<dItem>& itemSet, 
+	const dItemList& itemSet, 
 	const dTree<dTokenInfo, dSymbolName>& symbolList,
 	const dTree<dList<void*>, dSymbolName>& ruleMap) const
 {
@@ -1027,9 +956,9 @@ dParserCompiler::dState* dParserCompiler::Closure (
 				for (dList<void*>::dListNode* node = matchingRulesList.GetFirst(); node; node = node->GetNext()) {
 					dProductionRule::dListNode* const ruleNode = (dProductionRule::dListNode*) node->GetInfo();
 					dAssert (ruleNode->GetInfo().m_name == sentenceSymbol.m_name);
-					dTree<int, dSymbolName> firstList;
+					dSymbolNameMap firstList;
 					First (firstSymbolList, symbolList, ruleMap, firstList);
-					dTree<int, dSymbolName>::Iterator firstIter (firstList);
+					dSymbolNameMap::Iterator firstIter (firstList);
 					for (firstIter.Begin(); firstIter; firstIter ++) {
 						dSymbolName symbol = firstIter.GetKey();
 						dState::dListNode* const itemNode = state->FindItem(ruleNode, 0, symbol);
@@ -1055,7 +984,7 @@ void dParserCompiler::First (
 	const dList<dSymbolName>& symbolSet,
 	const dTree<dTokenInfo, dSymbolName>& symbolList,
 	const dTree<dList<void*>, dSymbolName>& ruleMap,
-	dTree<int, dSymbolName>& firstSetOut) const
+	dSymbolNameMap& firstSetOut) const
 {
 	if (symbolSet.GetCount() > 1) {
 
@@ -1065,10 +994,10 @@ void dParserCompiler::First (
 			dSymbolName symbolOuter = node->GetInfo();
 			node = node->GetNext();
 
-			dTree<int, dSymbolName> tmpFirst;
-			dTree<int, dSymbolName> symbolListMark;
+			dSymbolNameMap tmpFirst;
+			dSymbolNameMap symbolListMark;
 			First (symbolOuter, symbolListMark, symbolList, ruleMap, tmpFirst);
-			dTree<int, dSymbolName>::Iterator iter (tmpFirst);
+			dSymbolNameMap::Iterator iter (tmpFirst);
 			deriveEmpty = false;  
 			for (iter.Begin(); iter; iter ++) {
 				dSymbolName symbol = iter.GetKey();
@@ -1086,17 +1015,17 @@ void dParserCompiler::First (
 
 	} else  {
 		dSymbolName symbol = symbolSet.GetFirst()->GetInfo();
-		dTree<int, dSymbolName> symbolListMark;
+		dSymbolNameMap symbolListMark;
 		First (symbol, symbolListMark, symbolList, ruleMap, firstSetOut);
 	}
 }
 
 void dParserCompiler::First (
 	dSymbolName symbolOuter,
-	dTree<int, dSymbolName>& symbolListMark,
+	dSymbolNameMap& symbolListMark,
 	const dTree<dTokenInfo, dSymbolName>& symbolList,
 	const dTree<dList<void*>, dSymbolName>& ruleMap,
-	dTree<int, dSymbolName>& firstSetOut) const
+	dSymbolNameMap& firstSetOut) const
 {
 	if (symbolListMark.Find(symbolOuter)) {
 		return;
@@ -1123,9 +1052,9 @@ void dParserCompiler::First (
 					const dSymbol& sentenceSymnol = sentenceSymbolNode->GetInfo();
 					if (!DoesSymbolDeriveEmpty (sentenceSymnol.m_name, ruleMap)) {
 						allDeriveEmpty = false;
-						dTree<int, dSymbolName> newFirstSetOut;
+						dSymbolNameMap newFirstSetOut;
 						First (sentenceSymnol.m_name, symbolListMark, symbolList, ruleMap, newFirstSetOut);
-						dTree<int, dSymbolName>::Iterator iter (newFirstSetOut);
+						dSymbolNameMap::Iterator iter (newFirstSetOut);
 						for (iter.Begin(); iter; iter ++) {
 							dSymbolName symbol = iter.GetKey();
 							dAssert (symbol.GetString() != "");
@@ -1172,7 +1101,8 @@ dParserCompiler::dState* dParserCompiler::Goto (
 	const dTree<dTokenInfo, dSymbolName>& symbolList,
 	const dTree<dList<void*>, dSymbolName>& ruleMap) const
 {
-	dList<dItem> itemSet;
+	//dList<dItem> itemSet;
+	dItemList itemSet;
 
 	// iterate over each item contained on state
 	for (dState::dListNode* node = state->GetFirst(); node; node = node->GetNext()) {
@@ -1340,8 +1270,8 @@ void dParserCompiler::GenerateParserCode (
 				entry.m_errorRule = state->m_hasErroItem ? 1 : 0;
 				entry.m_ruleIndex = 0;
 				entry.m_ruleSymbols = 0;
-				entry.m_nextState = short (action.m_nextState);
-				entry.m_token = short (symbolList.Find(actionSymbol)->GetInfo().m_tokenId);
+				entry.m_nextState = action.m_nextState;
+				entry.m_token = symbolList.Find(actionSymbol)->GetInfo().m_tokenId;
 
 				actionSort.Insert (entry, entry.m_token);
 
@@ -1357,10 +1287,10 @@ void dParserCompiler::GenerateParserCode (
 				dActionEntry entry;
 				entry.m_stateType = char (action.m_type);
 				entry.m_errorRule = 0; //state->m_hasErroItem ? 1 : 0;
-				entry.m_ruleIndex = short (reduceRule.m_ruleNumber);
-				entry.m_ruleSymbols = short (reduceRule.GetCount());
-				entry.m_nextState = short (symbolList.Find(reduceRule.m_name)->GetInfo().m_tokenId - lastTerminalTokenEnum);
-				entry.m_token = short (symbolList.Find(actionSymbol)->GetInfo().m_tokenId);
+				entry.m_ruleIndex = reduceRule.m_ruleNumber;
+				entry.m_ruleSymbols = reduceRule.GetCount();
+				entry.m_nextState = symbolList.Find(reduceRule.m_name)->GetInfo().m_tokenId - lastTerminalTokenEnum;
+				entry.m_token = symbolList.Find(actionSymbol)->GetInfo().m_tokenId;
 				actionSort.Insert (entry, entry.m_token);
 
 				if (!reduceRule.m_ruleReduced && (reduceRule.m_semanticActionCode != emptySematicAction)) {
@@ -1498,8 +1428,8 @@ void dParserCompiler::GenerateParserCode (
 			dState* const targetState = node->GetInfo();
 
 			dGotoEntry entry;
-			entry.m_nextState = short (targetState->m_number);
-			entry.m_token = short(iter1.GetKey());
+			entry.m_nextState = targetState->m_number;
+			entry.m_token = iter1.GetKey();
 
 			sprintf (text, "dGotoEntry (%d, %d), ", entry.m_token, entry.m_nextState);
 			nextGotoStateList += text;

@@ -22,7 +22,7 @@
 
 bool dRegisterInterferenceGraph::IsSpilledVariable (const dString& name) const
 {
-	static int spillSize = strlen (D_SPILL_REGISTER_SYMBOL);
+	static int spillSize = int (strlen (D_SPILL_REGISTER_SYMBOL));
 	return strncmp (name.GetStr(), D_SPILL_REGISTER_SYMBOL, spillSize) ? false : true;
 }
 

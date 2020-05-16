@@ -30,32 +30,30 @@ enum $(className)::ActionType
 class $(className)::dActionEntry
 {
 	public:
-	dActionEntry (short token, char errorItem, char stateType, short nextState, short ruleSymbols, short ruleIndex)
+	dActionEntry (int token, int errorItem, int stateType, int nextState, int ruleSymbols, int ruleIndex)
 		:m_token(token), m_errorRule(errorItem), m_stateType (stateType), m_nextState(nextState), m_ruleSymbols(ruleSymbols), m_ruleIndex(ruleIndex)
 	{
 	}
 
-	short m_token;
-	char m_errorRule;
-	char m_stateType;// 0 = shift, 1 = reduce, 2 = accept
-	short m_nextState;
-	short m_ruleSymbols;
-	short m_ruleIndex;
+	int m_token;
+	int m_errorRule;
+	int m_stateType;// 0 = shift, 1 = reduce, 2 = accept
+	int m_nextState;
+	int m_ruleSymbols;
+	int m_ruleIndex;
 };
 
 class $(className)::dGotoEntry
 {
 	public:
-	dGotoEntry (short token, short nextState)
+	dGotoEntry (int token, int nextState)
 		:m_token(token), m_nextState(nextState)
 	{
 	}
 
-	short  m_token;
-	short  m_nextState;
+	int  m_token;
+	int  m_nextState;
 };
-
-
 
 class $(className)::dStackPair
 {
@@ -72,7 +70,6 @@ class $(className)::dStackPair
 	dUserVariable m_value;
 };
 
-
 $(className)::$(className)()
 {
 }
@@ -80,7 +77,6 @@ $(className)::$(className)()
 $(className)::~$(className)()
 {
 }
-
 
 const $(className)::dActionEntry* $(className)::FindAction (const dActionEntry* const actionList, int count, dToken token) const
 {
@@ -105,7 +101,6 @@ const $(className)::dActionEntry* $(className)::FindAction (const dActionEntry* 
 			return& action;
 		}
 	}
-
 
 	return NULL;
 }
@@ -138,12 +133,10 @@ const $(className)::dGotoEntry* $(className)::FindGoto (const dGotoEntry* const 
 	return NULL;
 }
 
-
-
 const $(className)::dActionEntry* $(className)::GetNextAction (dList<dStackPair>& stack, dToken token, $(scannerClass)& scanner) const
 {
-	static short actionsCount[] = {$(actionsCount)};
-	static short actionsStart[] = {$(actionsStart)};
+	static int actionsCount[] = {$(actionsCount)};
+	static int actionsStart[] = {$(actionsStart)};
 	static dActionEntry actionTable[] = {$(actionTable)};
 
 	bool errorMode = false;
@@ -199,11 +192,10 @@ const $(className)::dActionEntry* $(className)::GetNextAction (dList<dStackPair>
 	return action;
 }
 
-
 bool $(className)::Parse($(scannerClass)& scanner)
 {
-	static short gotoCount[] = {$(gotoCount)};
-	static short gotoStart[] = {$(gotoStart)};
+	static int gotoCount[] = {$(gotoCount)};
+	static int gotoStart[] = {$(gotoStart)};
 	static dGotoEntry gotoTable[] = {$(gotoTable)};
 
 	dList<dStackPair> stack;
