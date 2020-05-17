@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 {
 	#ifdef _MSC_VER
 		_CrtSetDbgFlag( _CRTDBG_LEAK_CHECK_DF | _CRTDBG_ALLOC_MEM_DF);
-		_CrtSetBreakAlloc (634);
+		//_CrtSetBreakAlloc (634);
 	#endif
 
 	if (argc < 4) {

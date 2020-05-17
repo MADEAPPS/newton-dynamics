@@ -20,13 +20,11 @@
 */
 
 #include "dgStdafx.h"
-
 #include "dgTypes.h"
 #include "dgDebug.h"
 #include "dgVector.h"
 #include "dgMemory.h"
 #include "dgStack.h"
-
 
 dgUnsigned64 dgGetTimeInMicrosenconds()
 {
@@ -494,7 +492,6 @@ dgInt32 dgDeserializeMarker(dgDeserialize serializeCallback, void* const userDat
 	serializeCallback (userData, &revision, sizeof (revision));
 	return revision;
 }
-
 
 dgSetPrecisionDouble::dgSetPrecisionDouble()
 {
