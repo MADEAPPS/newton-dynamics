@@ -93,7 +93,7 @@ class dPlayerController: public dVehicle
 	dFloat m_height;
 	dFloat m_weistScale;
 	dFloat m_crouchScale;
-	void* m_userData;
+	//void* m_userData;
 	bool m_isAirbone;
 	bool m_isOnFloor;
 	bool m_isCrouched;

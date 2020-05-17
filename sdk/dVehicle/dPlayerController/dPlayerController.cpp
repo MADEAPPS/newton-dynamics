@@ -38,7 +38,7 @@ dPlayerController::dPlayerController(NewtonWorld* const world, const dMatrix& lo
 	,m_height(height)
 	,m_weistScale(3.0f)
 	,m_crouchScale(0.5f)
-	,m_userData(NULL)
+//	,m_userData(NULL)
 	,m_isAirbone(false)
 	,m_isOnFloor(false)
 	,m_isCrouched(false)
