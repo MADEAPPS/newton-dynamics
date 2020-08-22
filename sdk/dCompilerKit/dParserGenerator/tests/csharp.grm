@@ -12,7 +12,7 @@
 %{
 // Newton C sharp Scripting Language specification 1.0.0
 // loosely based on Appendix C of the C# Language Specification,
-// version 0.28 of 5/7/2001
+// version 1.0 of 5/7/2001
 
 //#include "dLSCstdafx.h"
 //#include "dLittleScriptParser.h"

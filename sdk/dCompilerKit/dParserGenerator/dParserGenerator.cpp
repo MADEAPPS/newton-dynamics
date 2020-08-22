@@ -17,11 +17,24 @@ bool CheckDependency(const char* const target, const char* const source)
 	return false;
 }
 
+#if defined(_DEBUG)
+int DebugMemory(int allocType, void *userData, size_t size,
+	int blockType, long requestNumber,
+	const unsigned char *filename, int lineNumber)
+{
+	//if (requestNumber == 654427) {
+	//	requestNumber *=1;
+	//}
+	return TRUE;
+}
+#endif
+
 int main(int argc, char* argv[])
 {
-	#ifdef _MSC_VER
+	#if defined(_DEBUG) && defined (_MSC_VER)
 		_CrtSetDbgFlag( _CRTDBG_LEAK_CHECK_DF | _CRTDBG_ALLOC_MEM_DF);
 		//_CrtSetBreakAlloc (634);
+		_CrtSetAllocHook(DebugMemory);
 	#endif
 
 	if (argc < 4) {
@@ -43,10 +56,20 @@ int main(int argc, char* argv[])
 			exit (0);
 		}
 
+		time_t mytime = time(NULL);
+		char * time_str = ctime(&mytime);
+		time_str[strlen(time_str) - 1] = '\0';
+		fprintf (stdout, "start time : %s\n", time_str);
+
 		dString buffer;
 		buffer.LoadFile(rules);
 		fclose (rules);
 		dParserCompiler parcel (buffer, outputFileName, scannerClassName);
+
+		mytime = time(NULL);
+		time_str = ctime(&mytime);
+		time_str[strlen(time_str) - 1] = '\0';
+		fprintf (stdout, "finish Time : %s\n", time_str);
 	}
 	return 0;
 }

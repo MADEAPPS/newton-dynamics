@@ -64,7 +64,7 @@ class dRedBackNode
 
 
 
-template<class OBJECT, class KEY, int poolSize = D_MAX_ENTRIES_IN_FREELIST>
+template<class OBJECT, class KEY, bool useFreeListAllocator = false, int poolSize = D_MAX_ENTRIES_IN_FREELIST>
 class dTree: public dContainersAlloc 
 {
 	public:
@@ -139,13 +139,13 @@ class dTree: public dContainersAlloc
 		private:
 		OBJECT m_info;
 		KEY m_key; 
-		friend class dTree<OBJECT, KEY>;
+		friend class dTree<OBJECT, KEY, useFreeListAllocator>;
 	};
 
 	class Iterator
 	{
 		public:
-		Iterator(const dTree<OBJECT,KEY> &me)
+		Iterator(const dTree<OBJECT,KEY,useFreeListAllocator> &me)
 		{
 			m_ptr = NULL;
 			m_tree = &me;
@@ -235,10 +235,10 @@ class dTree: public dContainersAlloc
 	dTreeNode* Minimum () const;
 	dTreeNode* Maximum () const;
 
-	dTreeNode* Find (KEY key) const;
-	dTreeNode* FindGreater (KEY key) const;
-	dTreeNode* FindGreaterEqual (KEY key) const;
-	dTreeNode* FindLessEqual (KEY key) const;
+	dTreeNode* Find (const KEY& key) const;
+	dTreeNode* FindGreater (const KEY& key) const;
+	dTreeNode* FindGreaterEqual (const KEY& key) const;
+	dTreeNode* FindLessEqual (const KEY& key) const;
 
 	dTreeNode* GetNodeFromInfo (OBJECT &info) const;
 
@@ -264,13 +264,20 @@ class dTree: public dContainersAlloc
 	// member variables
 	// ***********************************************************
 	private:
-	dContainerFixSizeAllocator& GetAllocator()
+	dContainerNodeAllocator& GetAllocator()
 	{
-		static dContainerFixSizeAllocator* allocator = NULL;
+		static dContainerNodeAllocator* allocator = NULL;
 		if (!allocator) {
-			allocator = dContainerFixSizeAllocator::Create (sizeof (dTree<OBJECT, KEY, poolSize>::dTreeNode), poolSize);
+			bool test = useFreeListAllocator;
+			if (test) {
+				static dContainerFreeListAllocator freeList(sizeof (dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode));
+				allocator = &freeList;
+			} else {
+				allocator = dContainerFixSizeAllocator::Create (sizeof (dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode), poolSize);
+			}
 		}
-		return *allocator;
+		return*allocator;
+
 	}
 
 
@@ -318,56 +325,52 @@ inline void dRedBackNode::SetInTreeFlag (bool flag)
 	m_inTree = flag;
 }
 
-
-
-template<class OBJECT, class KEY, int poolSize>
-dTree<OBJECT, KEY, poolSize>::dTree ()
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTree ()
 {
 	m_count	= 0;
 	m_head = NULL;
 	GetAllocator();
 }
 
-
-template<class OBJECT, class KEY, int poolSize>
-dTree<OBJECT, KEY, poolSize>::~dTree () 
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::~dTree () 
 {
 	RemoveAll();
 }
 
-
-template<class OBJECT, class KEY, int poolSize>
-dTree<OBJECT, KEY, poolSize>::operator int() const
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::operator int() const
 {
 	return m_head != NULL;
 }
 
-template<class OBJECT, class KEY, int poolSize>
-int dTree<OBJECT, KEY, poolSize>::GetCount() const
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+int dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::GetCount() const
 {
 	return m_count;
 }
 
-template<class OBJECT, class KEY, int poolSize>
-typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Minimum () const
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::Minimum () const
 {
 	return m_head ? (dTreeNode*) m_head->Minimum() : NULL;
 }
 
-template<class OBJECT, class KEY, int poolSize>
-typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Maximum () const
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::Maximum () const
 {
 	return m_head ? (dTreeNode*) m_head->Maximum() : NULL;
 }
 
-template<class OBJECT, class KEY, int poolSize>
-typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::GetRoot () const
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::GetRoot () const
 {
 	return m_head;
 }
 
-template<class OBJECT, class KEY, int poolSize>
-typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Find (KEY key) const
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::Find (const KEY& key) const
 {
 	if (m_head == NULL) {
 		return NULL;
@@ -388,8 +391,8 @@ typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::
 	return ptr;
 }
 
-template<class OBJECT, class KEY, int poolSize>
-typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::GetNodeFromInfo (OBJECT &info) const
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::GetNodeFromInfo (OBJECT &info) const
 {
 	dTreeNode* node = (dTreeNode*) &info;
 	int offset = ((char*) &node->m_info) - ((char *) node);
@@ -400,8 +403,8 @@ typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::
 	return (node->IsInTree ()) ? node : NULL;
 }
 
-template<class OBJECT, class KEY, int poolSize>
-typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::FindGreater (KEY key) const
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::FindGreater (const KEY& key) const
 {
 	if (m_head == NULL) {
 		return NULL;
@@ -432,8 +435,8 @@ typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::
 	return (dTreeNode*) prev; 
 }
 
-template<class OBJECT, class KEY, int poolSize>
-typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::FindGreaterEqual (KEY key) const
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::FindGreaterEqual (const KEY& key) const
 {
 	if (m_head == NULL) {
 		return NULL;
@@ -464,8 +467,8 @@ typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::
 	return (dTreeNode*) prev; 
 }
 
-template<class OBJECT, class KEY, int poolSize>
-typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::FindLessEqual (KEY key) const
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::FindLessEqual (const KEY& key) const
 {
 	if (m_head == NULL) {
 		return NULL;
@@ -497,8 +500,8 @@ typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::
 }
 
 
-template<class OBJECT, class KEY, int poolSize>
-typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Insert (KEY key)
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::Insert (KEY key)
 {
 	dTreeNode* parent = NULL;
 	dTreeNode* ptr = m_head;
@@ -533,8 +536,8 @@ typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::
 
 
 
-template<class OBJECT, class KEY, int poolSize>
-typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Insert (const OBJECT &element, KEY key, bool& elementWasInTree)
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::Insert (const OBJECT &element, KEY key, bool& elementWasInTree)
 {
 	dTreeNode* parent = NULL;
 	dTreeNode* ptr = m_head;
@@ -569,8 +572,8 @@ typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::
 	return ptr;
 }
 
-template<class OBJECT, class KEY, int poolSize>
-typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Insert (const OBJECT &element, KEY key)
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::Insert (const OBJECT &element, KEY key)
 {
 	bool foundState;
 	dTreeNode* node = Insert (element, key, foundState);
@@ -580,8 +583,8 @@ typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::
 	return node;
 }
 
-template<class OBJECT, class KEY, int poolSize>
-typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Insert (typename dTree<OBJECT, KEY, poolSize>::dTreeNode* const node, KEY key)
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::Insert (typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* const node, KEY key)
 {
 	int val = 0;
 	dTreeNode* ptr = m_head;
@@ -618,8 +621,8 @@ typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::
 	return ptr;
 }
 
-template<class OBJECT, class KEY, int poolSize>
-typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::Replace (OBJECT &element, KEY key)
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::Replace (OBJECT &element, KEY key)
 {
 	dTreeNode* parent = NULL;
 	dTreeNode* ptr = m_head;
@@ -652,8 +655,8 @@ typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::
 	return ptr;
 }
 
-template<class OBJECT, class KEY, int poolSize>
-typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::ReplaceKey (typename dTree<OBJECT, KEY, poolSize>::dTreeNode* node, KEY key)
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::ReplaceKey (typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* node, KEY key)
 {
 	Unlink(node);
 	dTreeNode* const ptr = Insert (node, key);
@@ -662,23 +665,23 @@ typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::
 	return ptr;
 }
 
-template<class OBJECT, class KEY, int poolSize>
-typename dTree<OBJECT, KEY, poolSize>::dTreeNode* dTree<OBJECT, KEY, poolSize>::ReplaceKey (KEY oldKey, KEY newKey)
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::ReplaceKey (KEY oldKey, KEY newKey)
 {
 	dTreeNode* const node = Find (oldKey);
 	return node ? ReplaceKey (node, newKey) : NULL;
 }
 
-template<class OBJECT, class KEY, int poolSize>
-void dTree<OBJECT, KEY, poolSize>::Unlink (typename dTree<OBJECT, KEY, poolSize>::dTreeNode* const node)
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+void dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::Unlink (typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* const node)
 {
 	m_count	--;
 	node->Unlink((dRedBackNode** )&m_head);
 }
 
 
-template<class OBJECT, class KEY, int poolSize>
-void dTree<OBJECT, KEY, poolSize>::Remove (typename dTree<OBJECT, KEY, poolSize>::dTreeNode* const node)
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+void dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::Remove (typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* const node)
 {
 	m_count	--;
 	node->Unlink ((dRedBackNode** )&m_head);
@@ -686,8 +689,8 @@ void dTree<OBJECT, KEY, poolSize>::Remove (typename dTree<OBJECT, KEY, poolSize>
 	GetAllocator().Free (node);
 }
 
-template<class OBJECT, class KEY, int poolSize>
-void dTree<OBJECT, KEY, poolSize>::Remove (KEY key) 
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+void dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::Remove (KEY key) 
 {
 	// find node in tree 
 	dTreeNode* const node = Find (key);
@@ -697,8 +700,8 @@ void dTree<OBJECT, KEY, poolSize>::Remove (KEY key)
 }
 
 
-template<class OBJECT, class KEY, int poolSize>
-void dTree<OBJECT, KEY, poolSize>::RemoveAllLow (dTreeNode* const root) 
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+void dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::RemoveAllLow (dTreeNode* const root) 
 {
 	if (root->m_left) {
 		RemoveAllLow((dTreeNode*)root->m_left);
@@ -712,8 +715,8 @@ void dTree<OBJECT, KEY, poolSize>::RemoveAllLow (dTreeNode* const root)
 }
 
 
-template<class OBJECT, class KEY, int poolSize>
-void dTree<OBJECT, KEY, poolSize>::RemoveAll () 
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+void dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::RemoveAll () 
 {
 	if (m_head) {
 		m_count	 = 0;
@@ -724,15 +727,15 @@ void dTree<OBJECT, KEY, poolSize>::RemoveAll ()
 	}
 }
 
-template<class OBJECT, class KEY, int poolSize>
-bool dTree<OBJECT, KEY, poolSize>::SanityCheck () const
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+bool dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::SanityCheck () const
 {
 	return SanityCheck (m_head, 0);
 }
 
 
-template<class OBJECT, class KEY, int poolSize>
-bool dTree<OBJECT, KEY, poolSize>::SanityCheck (typename dTree<OBJECT, KEY, poolSize>::dTreeNode* ptr, int height) const
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+bool dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::SanityCheck (typename dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::dTreeNode* ptr, int height) const
 {
 	if (!ptr) {
 		return true;
@@ -779,8 +782,8 @@ bool dTree<OBJECT, KEY, poolSize>::SanityCheck (typename dTree<OBJECT, KEY, pool
 	return true;
 }
 
-template<class OBJECT, class KEY, int poolSize>
-int dTree<OBJECT, KEY, poolSize>::CompareKeys (const KEY &key0, const KEY &key1) const
+template<class OBJECT, class KEY, bool useFreeListAllocator, int poolSize>
+int dTree<OBJECT, KEY, useFreeListAllocator, poolSize>::CompareKeys (const KEY &key0, const KEY &key1) const
 {
 	if (key1 < key0) {
 		return - 1;

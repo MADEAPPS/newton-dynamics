@@ -62,13 +62,11 @@
 
 void* dContainersAlloc::operator new (size_t size)
 {
-	//return ::new char[size];
 	return Alloc (size);
 }
 
 void dContainersAlloc::operator delete (void* ptr)
 {
-//	delete[] (char*) ptr;
 	Free(ptr);
 }
 
@@ -83,25 +81,19 @@ void dContainersAlloc::Free(void* const ptr)
 	delete[] (char*) ptr;
 }
 
-
-
-
-dContainerFixSizeAllocator::dContainerFixSizeAllocator(int size, int poolSize)
-	:m_freeListNode(NULL)
-	,m_size(size)
+dContainerFixSizeAllocator::dContainerFixSizeAllocator(int nodeSize, int poolSize)
+	:dContainerNodeAllocator(nodeSize)
 	,m_poolSize(poolSize)
 {
 	Prefetch ();
 }
-
 
 dContainerFixSizeAllocator::~dContainerFixSizeAllocator()
 {
 	Flush();
 }
 
-
-dContainerFixSizeAllocator* dContainerFixSizeAllocator::Create (int size, int poolSize)
+dContainerFixSizeAllocator* dContainerFixSizeAllocator::Create (int nodeSize, int poolSize)
 {
 	class AllocatorsFactory
 	{
@@ -123,21 +115,21 @@ dContainerFixSizeAllocator* dContainerFixSizeAllocator::Create (int size, int po
 			delete[] m_pool; 
 		}
 
-		dContainerFixSizeAllocator* FindCreate (int size, int poolSize)
+		dContainerFixSizeAllocator* FindCreate (int nodeSize, int poolSize)
 		{
 			int i0 = 0;
 			int i2 = m_count -1;
 			while ((i2 - i0) > 4) {
 				int i1 = (i0 + i2) >> 1;
-				if (size < m_pool[i1]->m_size) {
+				if (nodeSize < m_pool[i1]->m_nodeSize) {
 					i2 = i1;
 				} else {
 					i0 = i1;
 				}
 			}
 
-			for (int i = i0; (i < m_count) && (m_pool[i]->m_size <= size); i ++) {
-				if (m_pool[i]->m_size == size) {
+			for (int i = i0; (i < m_count) && (m_pool[i]->m_nodeSize <= nodeSize); i ++) {
+				if (m_pool[i]->m_nodeSize == nodeSize) {
 					return m_pool[i];
 				}
 			}
@@ -150,10 +142,10 @@ dContainerFixSizeAllocator* dContainerFixSizeAllocator::Create (int size, int po
 				m_pool = pool;
 			}
 
-			dContainerFixSizeAllocator* const allocator = new dContainerFixSizeAllocator(size, poolSize);
+			dContainerFixSizeAllocator* const allocator = new dContainerFixSizeAllocator(nodeSize, poolSize);
 
 			int entry = m_count;
-			for (; entry && (m_pool[entry - 1]->m_size > size); entry --) {
+			for (; entry && (m_pool[entry - 1]->m_nodeSize > nodeSize); entry --) {
 				m_pool[entry] = m_pool[entry - 1];
 			}
 			m_pool[entry] = allocator;
@@ -167,20 +159,18 @@ dContainerFixSizeAllocator* dContainerFixSizeAllocator::Create (int size, int po
 	};
 
 	static AllocatorsFactory factories;
-	return factories.FindCreate(size, poolSize);
+	return factories.FindCreate(nodeSize, poolSize);
 }
-
 
 void dContainerFixSizeAllocator::Prefetch ()
 {
 	for (int i = 0; i < m_poolSize; i ++) {
-		dFreeListNode* const data = (dFreeListNode*) dContainersAlloc::Alloc (m_size);
+		dFreeListNode* const data = (dFreeListNode*) dContainersAlloc::Alloc (m_nodeSize);
 		data->m_count = i + 1; 
 		data->m_next = m_freeListNode; 
 		m_freeListNode = data;
 	}
 }
-
 
 void dContainerFixSizeAllocator::Flush ()
 {
@@ -190,7 +180,6 @@ void dContainerFixSizeAllocator::Flush ()
 		dContainersAlloc::Free (ptr);
 	}
 }
-
 
 void* dContainerFixSizeAllocator::Alloc() 
 {
@@ -202,7 +191,6 @@ void* dContainerFixSizeAllocator::Alloc()
 	return data;
 }
 
-
 void dContainerFixSizeAllocator::Free(void* const ptr) 
 {
 	dFreeListNode* const data = (dFreeListNode*) ptr;
@@ -212,4 +200,37 @@ void dContainerFixSizeAllocator::Free(void* const ptr)
 	if (data->m_count >= 2 * m_poolSize) {
 		Flush();
 	}
+}
+
+void dContainerFreeListAllocator::Flush()
+{
+	while (m_freeListNode && m_count) {
+		m_count --;
+		dFreeListNode* const ptr = m_freeListNode;
+		m_freeListNode = m_freeListNode->m_next;
+		dContainersAlloc::Free(ptr);
+	}
+	dAssert (!m_freeListNode);
+}
+
+void* dContainerFreeListAllocator::Alloc()
+{
+	dFreeListNode* node = NULL;
+	if (m_freeListNode) {
+		dAssert (m_count);
+		m_count--;
+		node = m_freeListNode;
+		m_freeListNode = m_freeListNode->m_next;
+	} else {
+		node = (dFreeListNode*) dContainersAlloc::Alloc (m_nodeSize);
+	}
+	return node;
+}
+
+void dContainerFreeListAllocator::Free(void* const ptr)
+{
+	dFreeListNode* const data = (dFreeListNode*)ptr;
+	m_count ++;
+	data->m_next = m_freeListNode;
+	m_freeListNode = data;
 }

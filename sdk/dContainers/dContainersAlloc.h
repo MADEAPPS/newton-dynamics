@@ -35,7 +35,8 @@ class dContainersAlloc
 	{
 	}
 
-	virtual ~dContainersAlloc() 
+	//virtual ~dContainersAlloc() 
+	~dContainersAlloc() 
 	{
 	}
 
@@ -44,19 +45,24 @@ class dContainersAlloc
 };
 
 
-class dContainerFixSizeAllocator
+class dContainerNodeAllocator
 {
 	public:
-	static DCONTAINERS_API dContainerFixSizeAllocator* Create (int size, int poolSize);
-	DCONTAINERS_API ~dContainerFixSizeAllocator();
-	DCONTAINERS_API void* Alloc();
-	DCONTAINERS_API void Free(void* const ptr);
-//	DCONTAINERS_API bool IsAlive() const;
-	DCONTAINERS_API void Flush ();
+	dContainerNodeAllocator(int nodeSize)
+		:m_freeListNode(NULL)
+		,m_nodeSize(nodeSize)
+	{
+	}
 
-	private:
-	DCONTAINERS_API dContainerFixSizeAllocator(int size, int poolSize);
+	virtual ~DCONTAINERS_API dContainerNodeAllocator()
+	{
+	}
 
+	DCONTAINERS_API virtual void Flush () = 0;
+	DCONTAINERS_API virtual void* Alloc() = 0;
+	DCONTAINERS_API virtual void Free(void* const ptr) = 0;
+
+	protected:
 	class dFreeListNode
 	{
 		public:
@@ -64,10 +70,47 @@ class dContainerFixSizeAllocator
 		dFreeListNode* m_next;
 	};
 
-	DCONTAINERS_API void Prefetch ();
-
 	dFreeListNode* m_freeListNode;
-	int m_size;
+	int m_nodeSize;
+};
+
+
+class dContainerFreeListAllocator: public dContainerNodeAllocator
+{
+	public:
+	dContainerFreeListAllocator(int nodeSize)
+		:dContainerNodeAllocator(nodeSize)
+		,m_count(0)
+	{
+	}
+
+	virtual ~DCONTAINERS_API dContainerFreeListAllocator()
+	{
+		Flush();
+	}
+
+	DCONTAINERS_API virtual void Flush();
+	DCONTAINERS_API virtual void* Alloc();
+	DCONTAINERS_API virtual void Free(void* const ptr);
+
+	protected:
+	int m_count;
+};
+
+
+class dContainerFixSizeAllocator: public dContainerNodeAllocator
+{
+	public:
+	static DCONTAINERS_API dContainerFixSizeAllocator* Create (int nodeSize, int poolSize);
+	DCONTAINERS_API ~dContainerFixSizeAllocator();
+	DCONTAINERS_API void* Alloc();
+	DCONTAINERS_API void Free(void* const ptr);
+	DCONTAINERS_API void Flush ();
+
+	private:
+	dContainerFixSizeAllocator(int size, int poolSize);
+	void Prefetch ();
+
 	int m_poolSize;
 };
 

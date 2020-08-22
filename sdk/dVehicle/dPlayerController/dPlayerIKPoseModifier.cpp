@@ -55,7 +55,7 @@ void dPlayerIKPoseModifier::Finalize()
 		const dPlayerIKNode* const node = array[i];
 		volume += NewtonConvexCollisionCalculateVolume (node->m_shape);
 	}
-	dFloat density = m_controller->GetMass() / volume;
+//	dFloat density = m_controller->GetMass() / volume;
 }
 
 const void dPlayerIKPoseModifier::Debug(dCustomJoint::dDebugDisplay* const debugContext) const

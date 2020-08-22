@@ -53,6 +53,8 @@ class dString: public dContainersAlloc
 
 	DCONTAINERS_API void Replace (int start, int size, const char* const str, int strSize);
 	void Replace (int start, int size, const dString& str);
+
+	void Clear();
 	void Empty();
 
 	DCONTAINERS_API void ToUpper();
@@ -210,5 +212,6 @@ inline dString dString::SubString(int start, int size) const
 
 
 #endif
+
 
 

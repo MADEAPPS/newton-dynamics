@@ -154,8 +154,6 @@ class dString::dStringAllocator
 	#endif
 };
 
-//dString::dStringAllocator dString::m_allocator;
-
 dString::dString ()
 	:m_string(NULL)
 	,m_size(0)
@@ -219,8 +217,6 @@ dString::dString (const dString& src, const char* const concatenate, int concate
 	m_string[m_size] = 0;
 	m_capacity = m_size + 1;
 }
-
-
 
 dString::dString (char chr)
 	:m_string(NULL)
@@ -294,27 +290,30 @@ dString::dString (long long val)
 	m_capacity = m_size + 1;
 }
 
-
 dString::~dString ()
 {
-	Empty();
+	Clear();
 }
 
-void dString::Empty()
+void dString::Clear()
 {
 	if (m_capacity && m_string) {
-		FreeMem (m_string);
+		FreeMem(m_string);
 	}
 	m_size = 0;
 	m_capacity = 0;
 	m_string = NULL;
 }
 
+void dString::Empty()
+{
+	m_size = 0;
+	m_string[0] = 0;
+}
+
 void dString::LoadFile (FILE* const file)
 {
-	Empty();
-//	fseek (file, 0, SEEK_END);
-//	int size = ftell (file);
+	Clear();
 	int size = 0;
 	fseek (file, 0, SEEK_SET);
 	for (;!feof(file); size ++) {
@@ -329,21 +328,28 @@ void dString::LoadFile (FILE* const file)
 	m_capacity = m_size + 1;
 }
 
-
-
 void dString::operator+= (const char* const src)
 {
 	char* const oldData = m_string;
 	int size = CalculateSize (src);
-	m_string = AllocMem (m_size + size + 1);
-	memcpy (m_string, oldData, m_size);
-	memcpy (&m_string[m_size], src, size);
-	m_size = m_size + size;
-	m_string[m_size] = 0;
-	m_capacity = m_size + 1;
-	FreeMem(oldData);
+	if ((m_size + size + 1) > m_capacity) {
+		int newCapacity = dMax (m_capacity - 1, 1);
+		while (newCapacity < (m_size + size)) {
+			newCapacity *= 2;
+		}
+		m_string = AllocMem (newCapacity + 1);
+		memcpy (m_string, oldData, m_size);
+		memcpy (&m_string[m_size], src, size);
+		m_size = m_size + size;
+		m_string[m_size] = 0;
+		m_capacity = newCapacity + 1;
+		FreeMem(oldData);
+	} else {
+		memcpy (&m_string[m_size], src, size);
+		m_size = m_size + size;
+		m_string[m_size] = 0;
+	}
 }
-
 
 int dString::ToInteger() const
 {
@@ -531,7 +537,7 @@ void dString::Replace (int start, int size, const char* const str, int strSize)
 	memcpy (&m_string[start], str, strSize);
 	memcpy (&m_string[start + strSize], &oldData[start + size], m_size - (start + size));
 	m_size = m_size - size + strSize;
-	m_capacity = m_size - size + strSize + 1;
+	m_capacity = m_size + 1;
 	m_string[m_size] = 0;
 	FreeMem(oldData);
 }

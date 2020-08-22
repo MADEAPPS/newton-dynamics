@@ -18,7 +18,7 @@
 
 
 // a small double link list container similar to STL, 
-template<class T, int poolSize = D_MAX_ENTRIES_IN_FREELIST>
+template<class T, bool useFreeListAllocator = false, int poolSize = D_MAX_ENTRIES_IN_FREELIST>
 class dList: public dContainersAlloc
 {
 	public:
@@ -96,7 +96,6 @@ class dList: public dContainersAlloc
 			return m_info;
 		}
 
-
 		dListNode* GetNext() const
 		{
 			return m_next;
@@ -111,13 +110,13 @@ class dList: public dContainersAlloc
 		T m_info;
 		dListNode* m_next;
 		dListNode* m_prev;
-		friend class dList<T, poolSize>;
+		friend class dList<T, useFreeListAllocator, poolSize>;
 	};
 
 	class Iterator
 	{
 		public:
-		Iterator (const dList<T, poolSize> &me)
+		Iterator (const dList<T, useFreeListAllocator, poolSize> &me)
 		{
 			m_ptr = NULL;
 			m_list = (dList *)&me;
@@ -240,13 +239,19 @@ class dList: public dContainersAlloc
 	}
 #endif
 
-	dContainerFixSizeAllocator& GetAllocator()
+	dContainerNodeAllocator& GetAllocator()
 	{
-		static dContainerFixSizeAllocator* allocator = NULL;
+		static dContainerNodeAllocator* allocator = NULL;
 		if (!allocator) {
-			allocator = dContainerFixSizeAllocator::Create (sizeof (dList<T, poolSize>::dListNode), poolSize);
+			bool test = useFreeListAllocator;
+			if (test) {
+				static dContainerFreeListAllocator freeList(sizeof (dList<T, useFreeListAllocator, poolSize>::dListNode));
+				allocator = &freeList;
+			} else {
+				allocator = dContainerFixSizeAllocator::Create (sizeof (dList<T, useFreeListAllocator, poolSize>::dListNode), poolSize);
+			}
 		}
-		return *allocator;
+		return* allocator;
 	}
 
 	int m_count;
@@ -255,9 +260,8 @@ class dList: public dContainersAlloc
 	friend class dListNode;
 };
 
-
-template<class T, int poolSize>
-dList<T, poolSize>::dList ()
+template<class T, bool useFreeListAllocator, int poolSize>
+dList<T, useFreeListAllocator, poolSize>::dList ()
 {
 	m_count = 0;
 	m_first = NULL;
@@ -265,40 +269,38 @@ dList<T, poolSize>::dList ()
 	GetAllocator();
 }
 
-
-template<class T, int poolSize>
-dList<T, poolSize>::~dList () 
+template<class T, bool useFreeListAllocator, int poolSize>
+dList<T, useFreeListAllocator, poolSize>::~dList () 
 {
 	RemoveAll ();
 }
 
-
-template<class T, int poolSize>
-int dList<T, poolSize>::GetCount() const
+template<class T, bool useFreeListAllocator, int poolSize>
+int dList<T, useFreeListAllocator, poolSize>::GetCount() const
 {
 	return m_count;
 }
 
-template<class T, int poolSize>
-dList<T, poolSize>::operator int() const
+template<class T, bool useFreeListAllocator, int poolSize>
+dList<T, useFreeListAllocator, poolSize>::operator int() const
 {
 	return m_first != NULL;
 }
 
-template<class T, int poolSize>
-typename dList<T, poolSize>::dListNode* dList<T, poolSize>::GetFirst() const
+template<class T, bool useFreeListAllocator, int poolSize>
+typename dList<T, useFreeListAllocator, poolSize>::dListNode* dList<T, useFreeListAllocator, poolSize>::GetFirst() const
 {
 	return m_first;
 }
 
-template<class T, int poolSize>
-typename dList<T, poolSize>::dListNode* dList<T, poolSize>::GetLast() const
+template<class T, bool useFreeListAllocator, int poolSize>
+typename dList<T, useFreeListAllocator, poolSize>::dListNode* dList<T, useFreeListAllocator, poolSize>::GetLast() const
 {
 	return m_last;
 }
 
-template<class T, int poolSize>
-typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Append(dListNode* const node)
+template<class T, bool useFreeListAllocator, int poolSize>
+typename dList<T, useFreeListAllocator, poolSize>::dListNode* dList<T, useFreeListAllocator, poolSize>::Append(dListNode* const node)
 {
 	dAssert (!node->m_next);
 	dAssert (!node->m_prev);
@@ -314,8 +316,8 @@ typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Append(dListNode* co
 	return m_last;
 }
 
-template<class T, int poolSize>
-typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Append ()
+template<class T, bool useFreeListAllocator, int poolSize>
+typename dList<T, useFreeListAllocator, poolSize>::dListNode* dList<T, useFreeListAllocator, poolSize>::Append ()
 {
 	m_count	++;
 	if (m_first == NULL) {
@@ -328,16 +330,16 @@ typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Append ()
 	return m_last;
 }
 
-template<class T, int poolSize>
-typename dList<T, poolSize>::dListNode* dList<T, poolSize>::AppendAfter (dListNode* const node)
+template<class T, bool useFreeListAllocator, int poolSize>
+typename dList<T, useFreeListAllocator, poolSize>::dListNode* dList<T, useFreeListAllocator, poolSize>::AppendAfter (dListNode* const node)
 {
 	dListNode* const ptr = Append ();
 	InsertAfter (node, ptr);
 	return ptr;
 }
 
-template<class T, int poolSize>
-typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Append (const T &element)
+template<class T, bool useFreeListAllocator, int poolSize>
+typename dList<T, useFreeListAllocator, poolSize>::dListNode* dList<T, useFreeListAllocator, poolSize>::Append (const T &element)
 {
 	m_count	++;
 	if (m_first == NULL) {
@@ -350,8 +352,8 @@ typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Append (const T &ele
 	return m_last;
 }
 
-template<class T, int poolSize>
-typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Addtop ()
+template<class T, bool useFreeListAllocator, int poolSize>
+typename dList<T, useFreeListAllocator, poolSize>::dListNode* dList<T, useFreeListAllocator, poolSize>::Addtop ()
 {
 	m_count	++;
 	if (m_last == NULL) {
@@ -364,9 +366,8 @@ typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Addtop ()
 	return m_first;
 }
 
-
-template<class T, int poolSize>
-typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Addtop (const T &element)
+template<class T, bool useFreeListAllocator, int poolSize>
+typename dList<T, useFreeListAllocator, poolSize>::dListNode* dList<T, useFreeListAllocator, poolSize>::Addtop (const T &element)
 {
 	m_count	++;
 	if (m_last == NULL) {
@@ -379,8 +380,8 @@ typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Addtop (const T &ele
 	return m_first;
 }
 
-template<class T, int poolSize>
-void dList<T, poolSize>::InsertAfter (dListNode* const root, dListNode* const node)
+template<class T, bool useFreeListAllocator, int poolSize>
+void dList<T, useFreeListAllocator, poolSize>::InsertAfter (dListNode* const root, dListNode* const node)
 {
 	dAssert (root != node);
 	if (node == m_last) {
@@ -402,8 +403,8 @@ void dList<T, poolSize>::InsertAfter (dListNode* const root, dListNode* const no
 	dAssert (Sanity());
 }
 
-template<class T, int poolSize>
-void dList<T, poolSize>::RotateToEnd (dListNode* const node)
+template<class T, bool useFreeListAllocator, int poolSize>
+void dList<T, useFreeListAllocator, poolSize>::RotateToEnd (dListNode* const node)
 {
 	if (node != m_last) {
 		if (m_last != m_first) {
@@ -417,8 +418,8 @@ void dList<T, poolSize>::RotateToEnd (dListNode* const node)
 	}
 }
 
-template<class T, int poolSize>
-void dList<T, poolSize>::RotateToBegin (dListNode* const node)
+template<class T, bool useFreeListAllocator, int poolSize>
+void dList<T, useFreeListAllocator, poolSize>::RotateToBegin (dListNode* const node)
 {
 	if (node != m_first) {
 		if (m_last != m_first) {
@@ -432,9 +433,8 @@ void dList<T, poolSize>::RotateToBegin (dListNode* const node)
 	}
 }
 
-
-template<class T, int poolSize>
-typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Find (const T &element) const
+template<class T, bool useFreeListAllocator, int poolSize>
+typename dList<T, useFreeListAllocator, poolSize>::dListNode* dList<T, useFreeListAllocator, poolSize>::Find (const T &element) const
 {
 	dListNode* node;
 	for (node = m_first; node; node = node->GetNext()) {
@@ -446,8 +446,8 @@ typename dList<T, poolSize>::dListNode* dList<T, poolSize>::Find (const T &eleme
 }
 
 
-template<class T, int poolSize>
-typename dList<T, poolSize>::dListNode* dList<T, poolSize>::GetNodeFromInfo (T &info) const
+template<class T, bool useFreeListAllocator, int poolSize>
+typename dList<T, useFreeListAllocator, poolSize>::dListNode* dList<T, useFreeListAllocator, poolSize>::GetNodeFromInfo (T &info) const
 {
 	dListNode* const node = (dListNode*) &info;
 	long long offset = ((char*) &node->m_info) - ((char*)node);
@@ -456,9 +456,8 @@ typename dList<T, poolSize>::dListNode* dList<T, poolSize>::GetNodeFromInfo (T &
 	return retnode;
 }
 
-
-template<class T, int poolSize> 
-void dList<T, poolSize>::Remove (const T &element)
+template<class T, bool useFreeListAllocator, int poolSize> 
+void dList<T, useFreeListAllocator, poolSize>::Remove (const T &element)
 {
 	dListNode* const node = Find (element);
 	if (node) {
@@ -466,8 +465,8 @@ void dList<T, poolSize>::Remove (const T &element)
 	}
 }
 
-template<class T, int poolSize>
-void dList<T, poolSize>::Remove (dListNode* const node)
+template<class T, bool useFreeListAllocator, int poolSize>
+void dList<T, useFreeListAllocator, poolSize>::Remove (dListNode* const node)
 {
 	m_count --;
 	if (node == m_first) {
@@ -481,8 +480,8 @@ void dList<T, poolSize>::Remove (dListNode* const node)
 	dAssert (Sanity());
 }
 
-template<class T, int poolSize>
-void dList<T, poolSize>::Unlink (dListNode* const node)
+template<class T, bool useFreeListAllocator, int poolSize>
+void dList<T, useFreeListAllocator, poolSize>::Unlink (dListNode* const node)
 {
 	m_count --;
 	if (node == m_first) {
@@ -495,8 +494,8 @@ void dList<T, poolSize>::Unlink (dListNode* const node)
 }
 
 
-template<class T, int poolSize>
-void dList<T, poolSize>::RemoveAll ()
+template<class T, bool useFreeListAllocator, int poolSize>
+void dList<T, useFreeListAllocator, poolSize>::RemoveAll ()
 {
 	while (m_first) {
 		Remove(m_first);
@@ -504,8 +503,8 @@ void dList<T, poolSize>::RemoveAll ()
 	dAssert (!m_count);
 }
 
-template<class T, int poolSize>
-void dList<T, poolSize>::TranferDataToTarget (dList& target)
+template<class T, bool useFreeListAllocator, int poolSize>
+void dList<T, useFreeListAllocator, poolSize>::TranferDataToTarget (dList& target)
 {
 	dAssert (target.m_count == 0);
 	target.m_count = m_count;
