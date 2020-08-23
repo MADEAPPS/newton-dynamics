@@ -19,7 +19,10 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dgStdafx.h"
+#include "dCoreStdafx.h"
+#include "dTypes.h"
+
+#if 0
 #include "dgList.h"
 #include "dgDebug.h"
 #include "dgMemory.h"
@@ -777,5 +780,5 @@ dgMemoryAllocator::dgMemoryBeam* dgMemoryAllocator::FindBeam(dgInt32 size)
 	return NULL;
 }
 
-
+#endif
 #endif

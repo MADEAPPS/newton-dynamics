@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __DGTYPES_H__
-#define __DGTYPES_H__
+#ifndef __DTYPES_H__
+#define __DTYPES_H__
 
 #ifdef _MSC_VER 
 	#ifdef _M_ARM
@@ -45,21 +45,21 @@
 #endif
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || (defined (_MSC_VER ) && defined (_ARM_VER)) )
-	#pragma warning (disable: 4100) //unreferenced formal parameter
-	#pragma warning (disable: 4201) //nonstandard extension used : nameless struct/union
-	#pragma warning (disable: 4324) //structure was padded due to __declspec(align())
-	#pragma warning (disable: 4514) //unreferenced inline function has been removed
-	#pragma warning (disable: 4530) //C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
-	#pragma warning (disable: 4625) //copy constructor could not be generated because a base class copy constructor is inaccessible or deleted
-	#pragma warning (disable: 4626) //assignment operator could not be generated because a base class assignment operator is inaccessible or deleted
-	#pragma warning (disable: 4640) //construction of local static object is not thread-safe
-	#pragma warning (disable: 4820) //bytes padding added after data member
-	#pragma warning (disable: 4005) //'__useHeader': macro redefinition
+	//#pragma warning (disable: 4100) //unreferenced formal parameter
+	//#pragma warning (disable: 4201) //nonstandard extension used : nameless struct/union
+	//#pragma warning (disable: 4324) //structure was padded due to __declspec(align())
+	//#pragma warning (disable: 4514) //unreferenced inline function has been removed
+	//#pragma warning (disable: 4530) //C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
+	//#pragma warning (disable: 4625) //copy constructor could not be generated because a base class copy constructor is inaccessible or deleted
+	//#pragma warning (disable: 4626) //assignment operator could not be generated because a base class assignment operator is inaccessible or deleted
+	//#pragma warning (disable: 4640) //construction of local static object is not thread-safe
+	//#pragma warning (disable: 4820) //bytes padding added after data member
+	//#pragma warning (disable: 4005) //'__useHeader': macro redefinition
     
 	#include <io.h> 
+	#include <stdint.h>
 	#include <direct.h> 
 	#include <malloc.h>
-	#include <float.h>
 	#include <stdarg.h>
 	#include <process.h>
 
@@ -70,21 +70,22 @@
 	#pragma warning (push, 3) 
 		#include <windows.h>
 		#include <crtdbg.h>
-		//#ifndef _DURANGO
-		//	#include <tlhelp32.h>
-		//#endif
 	#pragma warning (pop) 
 #endif
 
 #include <new>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdarg.h>
+#include <mutex>
+#include <thread>
 #include <time.h>
 #include <math.h>
 #include <float.h>
 #include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
+#include <condition_variable>
+
 
 #if (defined (__MINGW32__) || defined (__MINGW64__))
 	#include <io.h> 
@@ -140,7 +141,7 @@
 
 // uncomment this for Scalar floating point 
 // alternatively the end application can use a command line option to enable this define
-//#define DG_SCALAR_VECTOR_CLASS
+//#define D_SCALAR_VECTOR_CLASS
 
 // uncomment this for Scalar floating point 
 // alternatively the end application can use a command line option to enable this define
@@ -149,237 +150,214 @@
 // by default newton run on a separate thread and 
 // optionally concurrent with the calling thread,
 // it also uses a thread job pool for multi core systems.
-// define DG_USE_THREAD_EMULATION on the command line for 
+// define D_USE_THREAD_EMULATION on the command line for 
 // platform that do not support hardware multi threading or 
 // if the and application want to control threading at the application level 
-//#define DG_USE_THREAD_EMULATION
+//#define D_USE_THREAD_EMULATION
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
 	#if _MSC_VER < 1700
-		#ifndef DG_USE_THREAD_EMULATION
-			#define DG_USE_THREAD_EMULATION
+		#ifndef D_USE_THREAD_EMULATION
+			#define D_USE_THREAD_EMULATION
 		#endif
 	#endif
-#endif
-
-#ifndef DG_USE_THREAD_EMULATION
-	#include <mutex>
-	#include <thread>
-	#include <condition_variable>
 #endif
 
 
 //************************************************************
-#ifdef DG_DISABLE_ASSERT
-	#define dgAssert(x)
+#ifdef D_DISABLE_ASSERT
+	#define dAssert(x)
 #else 
 	#if defined (_WIN_32_VER) || defined (_WIN_64_VER) 
-		#define dgAssert(x) _ASSERTE(x)
+		#define dAssert(x) _ASSERTE(x)
 	#elif defined (_MSC_VER ) && defined (_ARM_VER) 
-		#define dgAssert(x) _ASSERTE(x)
+		#define dAssert(x) _ASSERTE(x)
 	#else
 		#ifdef _DEBUG
-			#define dgAssert(x) assert(x)
+			#define dAssert(x) assert(x)
 		#else 
-			#define dgAssert(x)
+			#define dAssert(x)
 		#endif
 	#endif
 #endif
 
 
-#define	DG_MAX_THREADS_HIVE_COUNT		16
+#define	D_MAX_THREADS_HIVE_COUNT		16
 
 #ifdef _DEBUG
-//#define __ENABLE_DG_CONTAINERS_SANITY_CHECK 
+//#define __ENABLE_D_CONTAINERS_SANITY_CHECK 
 #endif
 
 
-#ifdef DLL_DECLSPEC
-#undef DLL_DECLSPEC
-#endif
-
 #ifdef _DEBUG
-	#define DG_INLINE inline
+	#define D_INLINE inline
 #else
 	#if defined(_MSC_VER)
-			#define DG_INLINE __forceinline 
+			#define D_INLINE __forceinline 
 	#else 
-		#define DG_INLINE	inline
-		//#define DG_INLINE	 __attribute__((always_inline))
+		#define D_INLINE	inline
+		//#define D_INLINE	 __attribute__((always_inline))
 	#endif
 #endif
 
-
-#define DG_VECTOR_SIMD_SIZE		16
-#define DG_VECTOR_AVX2_SIZE		32
+#define D_VECTOR_SIMD_SIZE		16
+#define D_VECTOR_AVX2_SIZE		32
 
 #if defined(_MSC_VER)
-	#define	DG_GCC_VECTOR_ALIGNMENT
-	#define	DG_MSC_VECTOR_ALIGNMENT    __declspec(align(DG_VECTOR_SIMD_SIZE))
+	#define	D_GCC_VECTOR_ALIGNMENT
+	#define	D_MSC_VECTOR_ALIGNMENT    __declspec(align(D_VECTOR_SIMD_SIZE))
 #else
-	#define	DG_GCC_VECTOR_ALIGNMENT    __attribute__ ((aligned (DG_VECTOR_SIMD_SIZE)))
-	#define	DG_MSC_VECTOR_ALIGNMENT
+	#define	D_GCC_VECTOR_ALIGNMENT    __attribute__ ((aligned (D_VECTOR_SIMD_SIZE)))
+	#define	D_MSC_VECTOR_ALIGNMENT
 #endif
 
 #if defined(_MSC_VER)
-	#define	DG_GCC_AVX_ALIGNMENT
-	#define	DG_MSC_AVX_ALIGNMENT       __declspec(align(DG_VECTOR_AVX2_SIZE))
+	#define	D_GCC_AVX_ALIGNMENT
+	#define	D_MSC_AVX_ALIGNMENT       __declspec(align(D_VECTOR_AVX2_SIZE))
 #else
-	#define	DG_GCC_AVX_ALIGNMENT       __attribute__ ((aligned (DG_VECTOR_AVX2_SIZE)))
-	#define	DG_MSC_AVX_ALIGNMENT
+	#define	D_GCC_AVX_ALIGNMENT       __attribute__ ((aligned (D_VECTOR_AVX2_SIZE)))
+	#define	D_MSC_AVX_ALIGNMENT
 #endif
 
-#if defined(_MSC_VER)
-	#define DG_LIBRARY_EXPORT __declspec(dllexport)
-	#define DG_LIBRARY_IMPORT __declspec(dllimport)
-	#define DG_LIBRARY_STATIC
-#else
-	#define DG_LIBRARY_EXPORT __attribute__((visibility("default")))
-	#define DG_LIBRARY_IMPORT __attribute__((visibility("default")))
-	#define DG_LIBRARY_STATIC
-#endif
+//#if defined(_MSC_VER)
+//	#define D_LIBRARY_EXPORT __declspec(dllexport)
+//	#define D_LIBRARY_IMPORT __declspec(dllimport)
+//	#define D_LIBRARY_STATIC
+//#else
+//	#define D_LIBRARY_EXPORT __attribute__((visibility("default")))
+//	#define D_LIBRARY_IMPORT __attribute__((visibility("default")))
+//	#define D_LIBRARY_STATIC
+//#endif
 
 
 #if ((defined (_WIN_32_VER) || defined (_WIN_64_VER)) && (_MSC_VER  >= 1600))
-	#include <stdint.h>
-	typedef int8_t dgInt8;
-	typedef uint8_t dgUnsigned8;
+	typedef int8_t dInt8;
+	typedef uint8_t dUnsigned8;
 
-	typedef int16_t dgInt16;
-	typedef uint16_t dgUnsigned16;
+	typedef int16_t dInt16;
+	typedef uint16_t dUnsigned16;
 
-	typedef int32_t dgInt32;
-	typedef uint32_t dgUnsigned32;
+	typedef int32_t dInt32;
+	typedef uint32_t dUnsigned32;
 
-	typedef int64_t dgInt64;
-	typedef uint64_t dgUnsigned64;
+	typedef int64_t dInt64;
+	typedef uint64_t dUnsigned64;
+
 #else
-	typedef char dgInt8;
-	typedef unsigned char dgUnsigned8;
 
-	typedef short dgInt16;
-	typedef unsigned short dgUnsigned16;
+	typedef char dInt8;
+	typedef unsigned char dUnsigned8;
 
-	typedef int dgInt32;
-	typedef unsigned dgUnsigned32;
-	typedef unsigned int dgUnsigned32;
+	typedef short dInt16;
+	typedef unsigned short dUnsigned16;
 
-	typedef long long dgInt64;
-	typedef unsigned long long dgUnsigned64;
-	typedef double dgFloat64;
+	typedef int dInt32;
+	typedef unsigned dUnsigned32;
+	typedef unsigned int dUnsigned32;
+
+	typedef long long dInt64;
+	typedef unsigned long long dUnsigned64;
+	typedef double dFloat64;
 #endif
 
 
-typedef double dgFloat64;
+typedef double dFloat64;
 
 #ifdef _NEWTON_USE_DOUBLE
-	typedef double dgFloat32;
+	typedef double dFloat32;
 #else
-	typedef float dgFloat32;
+	typedef float dFloat32;
 #endif
 
-
-class dgTriplex
+class dTriplex
 {
 	public:
-	dgFloat32 m_x;
-	dgFloat32 m_y;
-	dgFloat32 m_z;
+	dFloat32 m_x;
+	dFloat32 m_y;
+	dFloat32 m_z;
 };
 
-#define dgPi		 	dgFloat32 (3.141592f)
-#define dgPI2		 	dgFloat32 (dgPi * 2.0f)
-#define dgEXP		 	dgFloat32 (2.71828f)
-#define dgEpsilon	  	dgFloat32 (1.0e-5f)
-#define dgDegreeToRad  	dgFloat32 (dgPi / 180.0f)
-#define dgRadToDegree  	dgFloat32 (180.0f / dgPi)
+#define dPi		 		dFloat32 (3.141592f)
+#define dPI2		 	dFloat32 (dPi * 2.0f)
+#define dEXP		 	dFloat32 (2.71828f)
+#define dEpsilon	  	dFloat32 (1.0e-5f)
+#define dDegreeToRad	dFloat32 (dPi / 180.0f)
+#define dRadToDegree  	dFloat32 (180.0f / dPi)
 
-class dgBigVector;
+class dBigVector;
 #ifndef _NEWTON_USE_DOUBLE
-class dgVector;
+class dVector;
 #endif 
 
-
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#define dgApi __cdecl 	
-	#define dgStdApi __stdcall 	
+	#define dCheckFloat(x) (_finite(x) && !_isnan(x))
+//	#define dCheckFloat(x) 1
 #else
-	#define dgApi 	
-	#define dgStdApi
+	#define dCheckFloat(x) (isfinite(x) && !isnan(x))
+//		#define dCheckFloat(x) 1
 #endif
 
-
-
-#if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
-	#define dgCheckFloat(x) (_finite(x) && !_isnan(x))
-//	#define dgCheckFloat(x) 1
-#else
-	#define dgCheckFloat(x) (isfinite(x) && !isnan(x))
-//		#define dgCheckFloat(x) 1
-#endif
-
-typedef void (dgApi *dgDeserialize) (void* const userData, void* buffer, dgInt32 size);
-typedef void (dgApi *dgSerialize) (void* const userData, const void* const buffer, dgInt32 size);
-typedef bool (dgApi *dgReportProgress) (dgFloat32 progressNormalzedPercent, void* const userData);
+typedef void (*dDeserialize) (void* const userData, void* buffer, dInt32 size);
+typedef void (*dSerialize) (void* const userData, const void* const buffer, dInt32 size);
+typedef bool (*dReportProgress) (dFloat32 progressNormalzedPercent, void* const userData);
 
 // assume this function returns memory aligned to 16 bytes
-#define dgAlloca(type, count) (type*) alloca (sizeof (type) * (count))
+#define dAlloca(type, count) (type*) alloca (sizeof (type) * (count))
 
-DG_INLINE dgInt32 dgExp2 (dgInt32 x)
+D_INLINE dInt32 dExp2 (dInt32 x)
 {
-	dgInt32 exp;
+	dInt32 exp;
 	for (exp = -1; x; x >>= 1) {
 		exp ++;
 	}
 	return exp;
 }
 
-DG_INLINE dgInt32 dgBitReversal(dgInt32 v, dgInt32 base)
+D_INLINE dInt32 dBitReversal(dInt32 v, dInt32 base)
 {
-	dgInt32 x = 0;
-	dgInt32 power = dgExp2 (base) - 1;
+	dInt32 x = 0;
+	dInt32 power = dExp2 (base) - 1;
 	do {
 		x += (v & 1) << power;
 		v >>= 1;
 		power--;
 	} while (v);
-	dgAssert(x < base);
+	dAssert(x < base);
 	return x;
 }
 
-
 template <class T> 
-DG_INLINE T dgMin(T A, T B)
+D_INLINE T dMin(T A, T B)
 {
 	return (A < B) ? A : B; 
 }
 
 template <class T> 
-DG_INLINE T dgMax(T A, T B)
+D_INLINE T dMax(T A, T B)
 {
 	return (A > B) ? A : B; 
 }
 
 template <class T>
-DG_INLINE T dgMin(T A, T B, T C)
+D_INLINE T dMin(T A, T B, T C)
 {
-	return dgMin(dgMin (A, B), C);
+	return dMin(dMin (A, B), C);
 }
 
 template <class T>
-DG_INLINE T dgMax(T A, T B, T C)
+D_INLINE T dMax(T A, T B, T C)
 {
-	return dgMax(dgMax (A, B), C);
+	return dMax(dMax (A, B), C);
 }
 
 template <class T>
-DG_INLINE T dgClamp(T val, T min, T max)
+D_INLINE T dClamp(T val, T min, T max)
 {
-	return dgMax (min, dgMin (max, val));
+	return dMax (min, dMin (max, val));
 }
 
 template <class T> 
-DG_INLINE void dgSwap(T& A, T& B)
+D_INLINE void dSwap(T& A, T& B)
 {
 	T tmp (A);
 	A = B;
@@ -387,30 +365,30 @@ DG_INLINE void dgSwap(T& A, T& B)
 }	
 
 template <class T>
-DG_INLINE T dgAbs(T A)
+D_INLINE T dAbs(T A)
 {
 	// according to Intel this is better because is does not read after write
 	return (A >= T(0)) ? A : -A;
 }
 
 template <class T>
-DG_INLINE T dgSign(T A)
+D_INLINE T dSign(T A)
 {
 	return (A >= T(0)) ? T(1) : T(-1);
 }
 
 template <class T> 
-DG_INLINE bool dgAreEqual(T A, T B, T tol)
+D_INLINE bool dAreEqual(T A, T B, T tol)
 {
-	if ((dgAbs(A) < tol) && (dgAbs(B) < tol)) {
+	if ((dAbs(A) < tol) && (dAbs(B) < tol)) {
 		return true;
 	}
 /*
-	dgInt32 exp0;
-	dgFloat64 mantissa0 = frexp(dgFloat64 (A), &exp0);
+	dInt32 exp0;
+	dFloat64 mantissa0 = frexp(dFloat64 (A), &exp0);
 
-	dgInt32 exp1;
-	dgFloat64 mantissa1 = frexp(dgFloat64(B), &exp1);
+	dInt32 exp1;
+	dFloat64 mantissa1 = frexp(dFloat64(B), &exp1);
 
 	if ((exp0 < -12) && (exp1 < -12)) {
 		return true;
@@ -419,111 +397,108 @@ DG_INLINE bool dgAreEqual(T A, T B, T tol)
 	if (exp0 != exp1) {
 		return false;
 	}
-	return dgAbs(mantissa0 - mantissa1) < tol;
+	return dAbs(mantissa0 - mantissa1) < tol;
 */	
-	T den = dgMax(dgAbs(A), dgAbs(B)) + tol;
+	T den = dMax(dAbs(A), dAbs(B)) + tol;
 	A /= den;
 	B /= den;
-	return dgAbs(A - B) < tol;
+	return dAbs(A - B) < tol;
 }
 
 #ifdef _NEWTON_USE_DOUBLE
-	union dgFloatSign
+	union dFloatSign
 	{
 		struct {
-			dgInt32 m_dommy;
-			dgInt32 m_iVal;
+			dInt32 m_dommy;
+			dInt32 m_iVal;
 		} m_integer;
-		dgFloat64 m_fVal;
+		dFloat64 m_fVal;
 	};
 #else
-	union dgFloatSign
+	union dFloatSign
 	{
 		struct {
-			dgInt32 m_iVal;
+			dInt32 m_iVal;
 		} m_integer;
-		dgFloat32 m_fVal;
+		dFloat32 m_fVal;
 	};
 #endif
 
-union dgDoubleInt
+union dDoubleInt
 {
 	struct {
-		dgInt32 m_intL;
-		dgInt32 m_intH;
+		dInt32 m_intL;
+		dInt32 m_intH;
 	};
 	void* m_ptr;
-	dgInt64 m_int;
-	dgFloat64 m_float;
+	dInt64 m_int;
+	dFloat64 m_float;
 };
-
-
-void dgGetMinMax (dgBigVector &Min, dgBigVector &Max, const dgFloat64* const vArray, dgInt32 vCount, dgInt32 strideInBytes);
-dgInt32 dgVertexListToIndexList (dgFloat64* const vertexList, dgInt32 strideInBytes, dgInt32 compareCount,     dgInt32 vertexCount,         dgInt32* const indexListOut, dgFloat64 tolerance = dgEpsilon);
-dgInt32 dgVertexListToIndexList (dgFloat32* const vertexList, dgInt32 strideInBytes, dgInt32 floatSizeInBytes, dgInt32 unsignedSizeInBytes, dgInt32 vertexCount, dgInt32* const indexListOut, dgFloat32 tolerance = dgEpsilon);
 
 #define PointerToInt(x) ((size_t)x)
 #define IntToPointer(x) ((void*)(size_t(x)))
-
 
 #ifndef _MSC_VER 
 	#define _stricmp(x,y) strcasecmp(x,y)
 #endif
 
-#define dgSqrt(x)			dgFloat32 (sqrt(x))	
-#define dgSin(x)			dgFloat32 (sin(x))
-#define dgCos(x)			dgFloat32 (cos(x))
-#define dgAsin(x)			dgFloat32 (asin(x))
-#define dgAcos(x)			dgFloat32 (acos(x))
-#define dgLog(x)			dgFloat32 (log(x))
-#define dgCeil(x)			dgFloat32 (ceil(x))
-#define dgFloor(x)			dgFloat32 (floor(x))	
-#define dgPow(x,y)			dgFloat32 (pow(x,y))
-#define dgFmod(x,y)			dgFloat32 (fmod(x,y))
-#define dgAtan2(x,y)		dgFloat32 (atan2(x,y))
-#define dgRsqrt(x)			(dgFloat32 (1.0f) / dgSqrt(x))
-#define dgClearFP()			_clearfp() 
-#define dgControlFP(x,y)	_controlfp(x,y)
+#define dSqrt(x)		dFloat32 (sqrt(x))	
+#define dSin(x)			dFloat32 (sin(x))
+#define dCos(x)			dFloat32 (cos(x))
+#define dAsin(x)		dFloat32 (asin(x))
+#define dAcos(x)		dFloat32 (acos(x))
+#define dLog(x)			dFloat32 (log(x))
+#define dCeil(x)		dFloat32 (ceil(x))
+#define dFloor(x)		dFloat32 (floor(x))	
+#define dPow(x,y)		dFloat32 (pow(x,y))
+#define dFmod(x,y)		dFloat32 (fmod(x,y))
+#define dAtan2(x,y)		dFloat32 (atan2(x,y))
+#define dRsqrt(x)		(dFloat32 (1.0f) / dSqrt(x))
+#define dClearFP()		_clearfp() 
+#define dControlFP(x,y)	_controlfp(x,y)
 
-enum dgSerializeRevisionNumber
+enum dSerializeRevisionNumber
 {
 	m_firstRevision = 100,
 	// add new serialization revision number here
 	m_currentRevision 
 };
 
-dgUnsigned64 dgGetTimeInMicrosenconds();
-dgFloat64 dgRoundToFloat(dgFloat64 val);
-void dgSerializeMarker(dgSerialize serializeCallback, void* const userData);
-dgInt32 dgDeserializeMarker(dgDeserialize serializeCallback, void* const userData);
-
-class dgFloatExceptions
-{
-	public:
-	#ifdef _MSC_VER
-		#define DG_FLOAT_EXECTIONS_MASK	(EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)
-	#else 
-		#define DG_FLOAT_EXECTIONS_MASK	0
-	#endif
-
-	dgFloatExceptions(dgUnsigned32 mask = DG_FLOAT_EXECTIONS_MASK);
-	~dgFloatExceptions();
-
-	private:
-	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
-	dgUnsigned32 m_mask;
-#endif
-};
-
-class dgSetPrecisionDouble 
-{
-	public:
-	dgSetPrecisionDouble();
-	~dgSetPrecisionDouble();
-	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
-	dgInt32 m_mask; 
-	#endif
-};
+//void dGetMinMax (dBigVector &Min, dBigVector &Max, const dFloat64* const vArray, dInt32 vCount, dInt32 strideInBytes);
+//dInt32 dVertexListToIndexList (dFloat64* const vertexList, dInt32 strideInBytes, dInt32 compareCount,     dInt32 vertexCount,         dInt32* const indexListOut, dFloat64 tolerance = dEpsilon);
+//dInt32 dVertexListToIndexList (dFloat32* const vertexList, dInt32 strideInBytes, dInt32 floatSizeInBytes, dInt32 unsignedSizeInBytes, dInt32 vertexCount, dInt32* const indexListOut, dFloat32 tolerance = dEpsilon);
+//dUnsigned64 dGetTimeInMicrosenconds();
+//dFloat64 dRoundToFloat(dFloat64 val);
+//void dSerializeMarker(dSerialize serializeCallback, void* const userData);
+//dInt32 dDeserializeMarker(dDeserialize serializeCallback, void* const userData);
+//
+//class dFloatExceptions
+//{
+//	public:
+//	#ifdef _MSC_VER
+//		#define D_FLOAT_EXECTIONS_MASK	(EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)
+//	#else 
+//		#define D_FLOAT_EXECTIONS_MASK	0
+//	#endif
+//
+//	dFloatExceptions(dUnsigned32 mask = D_FLOAT_EXECTIONS_MASK);
+//	~dFloatExceptions();
+//
+//	private:
+//	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+//		dUnsigned32 m_mask;
+//	#endif
+//};
+//
+//class dSetPrecisionDouble 
+//{
+//	public:
+//	dSetPrecisionDouble();
+//	~dSetPrecisionDouble();
+//	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+//	dInt32 m_mask; 
+//	#endif
+//};
 
 
 #ifdef _MACOSX_VER
@@ -535,7 +510,7 @@ class dgSetPrecisionDouble
 	#define CLOCK_MONOTONIC 0
 #endif
 //clock_gettime is not implemented on OSX
-DG_INLINE int clock_gettime(int /*clk_id*/, struct timespec* t) {
+D_INLINE int clock_gettime(int /*clk_id*/, struct timespec* t) {
     struct timeval now;
     int rv = gettimeofday(&now, NULL);
     if (rv) return rv;
