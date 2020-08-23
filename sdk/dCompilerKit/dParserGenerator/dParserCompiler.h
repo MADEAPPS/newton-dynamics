@@ -28,6 +28,7 @@
 
 
 //#define D_WRITE_STATE_TRANSITION_GRAPH
+#define D_TRACE_STATE_TRANSITION_GRAPH
 
 class dParserLexical;
 

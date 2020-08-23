@@ -72,7 +72,8 @@ void dParserLexical::ReadBalancedExpression (char open, char close)
 void dParserLexical::GetLexString ()
 {
 	int length = m_index - m_startIndex;
-	m_tokenString = dString (&m_data[m_startIndex], length);
+	const char* const data = &m_data[m_startIndex];
+	m_tokenString = dString (data, length);
 	m_startIndex = m_index;
 }
 
@@ -213,7 +214,6 @@ int dParserLexical::NextToken ()
 			{
 				case 1:
 				{
-					
 					state = 0;
 					ch = NextChar();
 					break;

@@ -467,6 +467,39 @@ class dParserCompiler::dState: public dList<dParserCompiler::dItem, true>
 			}
 			fprintf(debugFile, "\n");
 		}
+
+#ifdef D_TRACE_STATE_TRANSITION_GRAPH
+		dTrace (("state %d:\n", m_number));
+		for (dState::dListNode* itemNode = GetFirst(); itemNode; itemNode = itemNode->GetNext()) {
+			dItem& item = itemNode->GetInfo();
+			dTrace (("%s -> ", item.m_ruleNode->GetInfo().m_name.GetStr()));
+
+			int index = 0;
+			bool hasIndex = false;
+			dRuleInfo::dListNode* node = item.m_ruleNode->GetInfo().GetFirst();
+			for (; node; node = node->GetNext()) {
+
+				if (index == item.m_indexMarker) {
+					dTrace ((". "));
+					hasIndex = true;
+					break;
+				}
+				const dSymbol& info = node->GetInfo();
+				dTrace (("%s ", info.m_name.GetStr()));
+				index++;
+			}
+
+			for (; node; node = node->GetNext()) {
+				const dSymbol& info = node->GetInfo();
+				dTrace (("%s ", info.m_name.GetStr()));
+			}
+			if (!hasIndex) {
+				dTrace ((". "));
+			}
+			dTrace ((":: %s\n", item.m_lookAheadSymbol.GetStr()));
+		}
+		dTrace (("\n"));
+#endif
 	}
 
 	dSymbolName m_key;
@@ -558,7 +591,6 @@ dParserCompiler::dParserCompiler(const dString& inputRules, const char* const ou
 	// convert the rules into a NFA.
 	dTree<dState*, dSymbolName, true> stateList;
 	CanonicalItemSets (stateList, ruleList, symbolList, operatorPrecedence, outputFileName);
-//	fclose (debugFile);
 
 	// create a LR(1) parsing table from the NFA graphs
 	const dSymbolName& startSymbol = ruleList.GetFirst()->GetInfo().m_name;
@@ -806,7 +838,7 @@ void dParserCompiler::ScanGrammarFile(
 	rule.m_ruleId = dString(tokenEnumeration);
 	rule.m_token = firstRule.m_token;
 	rule.m_type = NONTERMINAL;
-	rule.m_name = dSymbolName (dString (firstRule.m_name.GetStr()) + dString("__"));
+	rule.m_name = dSymbolName (dString (firstRule.m_name.GetStr()) + dString("_"));
 	symbolList.Insert(dTokenInfo (tokenEnumeration, rule.m_type, rule.m_name), rule.m_name);
 	tokenEnumeration ++;
 	
@@ -1025,6 +1057,8 @@ dParserCompiler::dState* dParserCompiler::Closure (
 	const dTree<dList<void*, true>, dSymbolName, true>& ruleMap) const
 {
 	dState* const state = new dState (itemSet);
+
+//state->Trace(NULL);
 	for (dState::dListNode* itemNodeOuter = state->GetFirst(); itemNodeOuter; itemNodeOuter = itemNodeOuter->GetNext()) {
 		dItem& item = itemNodeOuter->GetInfo();
 
