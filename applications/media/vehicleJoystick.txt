@@ -1,7 +1,0 @@
-steeringAxis: 0
-throttleAxis: 1
-clutchAxis:	  3
-ignitionButton: 1 
-handBrakeButton: 0 
-gearUpButton: 12
-gearDonwButton: 14
