@@ -1,0 +1,264 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{82B461DE-8921-4DA4-B6B9-FC34DF831F0F}</ProjectGuid>
+    <RootNamespace>dPluginCommons</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)/$(ProjectName)/$(Configuration)\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_DPLUGIN_COMMON_DLL_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dPluginStdAfx.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/*.*"  /F /Y /R
+xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/*.*"  /F /Y /R</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_DPLUGIN_COMMON_DLL_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dPluginStdAfx.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/*.*"  /F /Y /R
+xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/*.*"  /F /Y /R</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_DPLUGIN_COMMON_DLL_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dPluginStdAfx.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/*.*"  /F /Y /R
+xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/*.*"  /F /Y /R</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>../../dPluginCommons;../../../../../coreLibrary_300/source/newton;../../../../../packages;../../../../../packages/dMath;../../../../../packages/dScene;../../../../../packages/dAnimation;../../../../../packages/dContainers;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/include;../../../../../packages/thirdParty/wxWidgets/wxWidgets-2.9.4/lib/$(Platform);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;_DSCENE_DLL;_DCONTAINERS_DLL;_DPLUGIN_COMMON_DLL_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>dPluginStdAfx.h</PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;winmm.lib;wsock32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>
+      </LinkTimeCodeGeneration>
+      <ImportLibrary>$(OutDir)$(ProjectName).lib</ImportLibrary>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy  "$(OutDir)$(TargetName).dll" "../../../$(PlatformName)/*.*"  /F /Y /R
+xcopy  "$(OutDir)$(TargetName).pdb" "../../../$(PlatformName)/*.*"  /F /Y /R</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\dPluginCommons\dBodyPlugin.cpp" />
+    <ClCompile Include="..\..\dPluginCommons\dCollisionPlugin.cpp" />
+    <ClCompile Include="..\..\dPluginCommons\dExportPlugin.cpp" />
+    <ClCompile Include="..\..\dPluginCommons\dImportPlugin.cpp" />
+    <ClCompile Include="..\..\dPluginCommons\dModelPlugin.cpp" />
+    <ClCompile Include="..\..\dPluginCommons\dPluginCamera.cpp" />
+    <ClCompile Include="..\..\dPluginCommons\dPluginInterface.cpp" />
+    <ClCompile Include="..\..\dPluginCommons\dPluginMesh.cpp" />
+    <ClCompile Include="..\..\dPluginCommons\dPluginRecord.cpp" />
+    <ClCompile Include="..\..\dPluginCommons\dPluginRender.cpp" />
+    <ClCompile Include="..\..\dPluginCommons\dPluginScene.cpp" />
+    <ClCompile Include="..\..\dPluginCommons\dPluginStdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\dPluginCommons\dPluginTool.cpp" />
+    <ClCompile Include="..\..\dPluginCommons\dPluginUtils.cpp" />
+    <ClCompile Include="..\..\dPluginCommons\dUndoCurrentScene.cpp" />
+    <ClCompile Include="..\..\dPluginCommons\dUndoRedo.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\dPluginCommons\dBodyPlugin.h" />
+    <ClInclude Include="..\..\dPluginCommons\dCollisionPlugin.h" />
+    <ClInclude Include="..\..\dPluginCommons\dExportPlugin.h" />
+    <ClInclude Include="..\..\dPluginCommons\dImportPlugin.h" />
+    <ClInclude Include="..\..\dPluginCommons\dModelPlugin.h" />
+    <ClInclude Include="..\..\dPluginCommons\dPluginCamera.h" />
+    <ClInclude Include="..\..\dPluginCommons\dPluginInterface.h" />
+    <ClInclude Include="..\..\dPluginCommons\dPluginMesh.h" />
+    <ClInclude Include="..\..\dPluginCommons\dPluginRecord.h" />
+    <ClInclude Include="..\..\dPluginCommons\dPluginRender.h" />
+    <ClInclude Include="..\..\dPluginCommons\dPluginScene.h" />
+    <ClInclude Include="..\..\dPluginCommons\dPluginStdafx.h" />
+    <ClInclude Include="..\..\dPluginCommons\dPluginTool.h" />
+    <ClInclude Include="..\..\dPluginCommons\dPluginUtils.h" />
+    <ClInclude Include="..\..\dPluginCommons\dUndoCurrentScene.h" />
+    <ClInclude Include="..\..\dPluginCommons\dUndoRedo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\coreLibrary_300\projects\windows\project_vs2010_dll\newton.vcxproj">
+      <Project>{68d9962c-0ec7-445a-b0fd-f87b16d43901}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\packages\projects\visualStudio_2010_dll\dContainers.vcxproj">
+      <Project>{f67c4593-a914-4ddf-8cb5-c59a3ef3ece0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\packages\projects\visualStudio_2010_dll\dJointLibrary.vcxproj">
+      <Project>{721c99ce-4716-4146-9817-59bc2671b844}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\packages\projects\visualStudio_2010_dll\dMath.vcxproj">
+      <Project>{cbe9e751-e58b-46c1-b6b0-873670d0f981}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\packages\projects\visualStudio_2010_dll\dScene.vcxproj">
+      <Project>{b5eec82d-938f-44c9-89bb-4a058581750b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\wx_vc9_aui.vcxproj">
+      <Project>{a16d3832-0f42-57ce-8f48-50e06649ade8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\wx_vc9_base.vcxproj">
+      <Project>{3fcc50c2-81e9-5db2-b8d8-2129427568b1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\packages\thirdParty\wxWidgets\wxWidgets-2.9.4\build\msw_2010_dll\wx_vc9_core.vcxproj">
+      <Project>{6744dad8-9c70-574a-bff2-9f8dddb24a75}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
