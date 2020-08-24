@@ -667,12 +667,31 @@ class dNewton
 	D_NEWTON_API void Update(dFloat32 timestep);
 	D_NEWTON_API void Sync();
 
+	D_NEWTON_API dInt32 GetSubSteps() const;
 	D_NEWTON_API void SetSubSteps(dInt32 subSteps);
+
+	protected:
+	D_NEWTON_API virtual void SubstepUpdate(dFloat32 timestep);
+	D_NEWTON_API virtual void UpdateSkeletons(dFloat32 timestep);
+	D_NEWTON_API virtual void UpdateSleepState(dFloat32 timestep);
+	D_NEWTON_API virtual void ApplyExternalForces(dFloat32 timestep);
+	D_NEWTON_API virtual void UpdatePrelisteners(dFloat32 timestep);
+	D_NEWTON_API virtual void UpdatePostlisteners(dFloat32 timestep);
+	D_NEWTON_API virtual void UpdateBroadPhase(dFloat32 timestep);
+	D_NEWTON_API virtual void UpdateDynamics(dFloat32 timestep);
+	
+	D_NEWTON_API virtual void InternalUpdate(dFloat32 timestep);
+	D_NEWTON_API virtual void TransformUpdate(dFloat32 timestep);
+	D_NEWTON_API virtual void UpdateListenersPostTransform(dFloat32 timestep);
 
 	private:
 	virtual void ThreadFunction();
 
+	protected:
+
+	private:
 	dFloat32 m_timestep;
+	dInt32 m_subSteps;
 };
 
 #endif

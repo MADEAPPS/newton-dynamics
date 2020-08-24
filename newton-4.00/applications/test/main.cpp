@@ -23,7 +23,7 @@ int main (int argc, const char * argv[])
 
 	newton.SetSubSteps(2);
 
-	while (_getch() != 27)
+	for (int i = 0; i < 1000; i ++)
 	{
 		newton.Update(1.0f / 60.0f);
 		//newton.Sync();

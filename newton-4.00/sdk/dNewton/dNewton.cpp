@@ -1872,17 +1872,20 @@ dNewton::dNewton()
 	// start the engine thread;
 	Start();
 
+	m_subSteps = 1;
 	m_timestep = 0.0f;
 }
 
 dNewton::~dNewton()
 {
-	dAssert(0);
+	Sync();
+	Terminate();
+	join();
 }
 
 void dNewton::Update(dFloat32 timestep)
 {
-	// wait for previuos frame to complete
+	// wait for previous frame to complete
 	Sync();
 	Tick();
 	m_timestep = timestep;
@@ -1894,18 +1897,83 @@ void dNewton::Sync()
 	dSyncMutex::Sync();
 }
 
+dInt32 dNewton::GetSubSteps() const
+{
+	return m_subSteps;
+}
+
 void dNewton::SetSubSteps(dInt32 subSteps)
 {
-	subSteps = dClamp(subSteps, 1, 16);
+	m_subSteps = dClamp(subSteps, 1, 16);
 }
 
 void dNewton::ThreadFunction()
 {
  	while (!Wait())
 	{
-		Sleep(30000);
-
+		InternalUpdate(m_timestep);
 		Release();
 	}
-	dAssert(0);
+}
+
+void dNewton::InternalUpdate(dFloat32 fullTimestep)
+{
+	dFloat32 timestep = fullTimestep / m_subSteps;
+	for (dInt32 i = 0; i < m_subSteps; i++)
+	{
+		SubstepUpdate(timestep);
+	}
+
+	TransformUpdate(fullTimestep);
+	UpdateListenersPostTransform(fullTimestep);
+}
+
+void dNewton::TransformUpdate(dFloat32 timestep)
+{
+
+}
+
+void dNewton::SubstepUpdate(dFloat32 timestep)
+{
+	UpdateSkeletons(timestep);
+	ApplyExternalForces(timestep);
+	UpdatePrelisteners(timestep);
+	UpdateSleepState(timestep);
+	UpdateBroadPhase(timestep);
+	UpdateDynamics(timestep);
+	UpdatePostlisteners(timestep);
+}
+
+void dNewton::ApplyExternalForces(dFloat32 timestep)
+{
+
+}
+
+void dNewton::UpdatePrelisteners(dFloat32 timestep)
+{
+}
+
+void dNewton::UpdatePostlisteners(dFloat32 timestep)
+{
+}
+
+void dNewton::UpdateSleepState(dFloat32 timestep)
+{
+}
+
+void dNewton::UpdateBroadPhase(dFloat32 timestep)
+{
+}
+
+void dNewton::UpdateDynamics(dFloat32 timestep)
+{
+}
+
+void dNewton::UpdateSkeletons(dFloat32 timestep)
+{
+}
+
+void dNewton::UpdateListenersPostTransform(dFloat32 timestep)
+{
+
 }
