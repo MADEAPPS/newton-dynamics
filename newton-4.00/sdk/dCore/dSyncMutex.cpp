@@ -19,35 +19,39 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-//
 
-#ifndef _D_NEWTON_STDAFX_H__
-#define _D_NEWTON_STDAFX_H__
+#include "dCoreStdafx.h"
+#include "dSyncMutex.h"
 
-#include <dCoreStdafx.h>
-#include <dTypes.h>
-#include <dThread.h>
-#include <dMemory.h>
-#include <dSyncMutex.h>
-#include <dSemaphore.h>
-#include <dClassAlloc.h>
+dSyncMutex::dSyncMutex()
+	:m_mutex()
+	,m_condition()
+	,m_count(0)
+{
+}
 
-//#define DG_PROFILE_PHYSICS
+dSyncMutex::~dSyncMutex()
+{
+}
 
-#ifdef _D_NEWTON_DLL
-	#ifdef _D_NEWTON_EXPORT_DLL
-		#define DNEWTON_API DG_LIBRARY_EXPORT
-	#else
-		#define DNEWTON_API DG_LIBRARY_IMPORT
-	#endif
-#else
-	#define D_NEWTON_API 
-#endif
+void dSyncMutex::Sync()
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+	while (m_count > 0)
+	{
+		m_condition.wait(lock);
+	}
+}
 
+void dSyncMutex::Release()
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+	m_count = (m_count >= 0) ? m_count - 1 : 0;
+	m_condition.notify_one();
+}
 
-
-#endif 
-
+void dSyncMutex::Tick()
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+	m_count++;
+}

@@ -19,35 +19,33 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-//
 
-#ifndef _D_NEWTON_STDAFX_H__
-#define _D_NEWTON_STDAFX_H__
+#include "dCoreStdafx.h"
+#include "dThread.h"
 
-#include <dCoreStdafx.h>
-#include <dTypes.h>
-#include <dThread.h>
-#include <dMemory.h>
-#include <dSyncMutex.h>
-#include <dSemaphore.h>
-#include <dClassAlloc.h>
+dThread::dThread()
+	:std::mutex() 
+	,std::condition_variable()
+	,std::thread(&dThread::ThreadFunctionCallback, this)
+{
+}
 
-//#define DG_PROFILE_PHYSICS
+dThread::~dThread()
+{
+}
 
-#ifdef _D_NEWTON_DLL
-	#ifdef _D_NEWTON_EXPORT_DLL
-		#define DNEWTON_API DG_LIBRARY_EXPORT
-	#else
-		#define DNEWTON_API DG_LIBRARY_IMPORT
-	#endif
-#else
-	#define D_NEWTON_API 
-#endif
+void dThread::Start()
+{
+	std::unique_lock<std::mutex> lock(*this);
+	notify_one();  
+}
+
+void dThread::ThreadFunctionCallback()
+{
+	std::unique_lock<std::mutex> lock(*this);
+	wait(lock);
+   	ThreadFunction();
+}
 
 
-
-#endif 
 

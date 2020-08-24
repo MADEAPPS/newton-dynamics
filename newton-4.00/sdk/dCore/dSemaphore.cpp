@@ -19,35 +19,53 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-//
 
-#ifndef _D_NEWTON_STDAFX_H__
-#define _D_NEWTON_STDAFX_H__
+#include "dCoreStdafx.h"
+#include "dSemaphore.h"
 
-#include <dCoreStdafx.h>
-#include <dTypes.h>
-#include <dThread.h>
-#include <dMemory.h>
-#include <dSyncMutex.h>
-#include <dSemaphore.h>
-#include <dClassAlloc.h>
+dSemaphore::dSemaphore()
+	:m_mutex()
+	,m_condition()
+	,m_count(0)
+	,m_terminate(false)
+{
+}
 
-//#define DG_PROFILE_PHYSICS
+dSemaphore::~dSemaphore()
+{
+}
 
-#ifdef _D_NEWTON_DLL
-	#ifdef _D_NEWTON_EXPORT_DLL
-		#define DNEWTON_API DG_LIBRARY_EXPORT
-	#else
-		#define DNEWTON_API DG_LIBRARY_IMPORT
-	#endif
-#else
-	#define D_NEWTON_API 
-#endif
+int dSemaphore::GetCount()
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+	return m_count;
+}
+
+bool dSemaphore::Wait()
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+	while (m_count == 0)
+	{
+		m_condition.wait(lock);
+	}
+
+	m_count--;
+	return m_terminate.load();
+}
 
 
+void dSemaphore::Signal()
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+	m_count++;
+	m_condition.notify_one();
+}
 
-#endif 
+void dSemaphore::Terminate()
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+	m_count++;
+	m_terminate.store(true);
+	m_condition.notify_one();
+}
 

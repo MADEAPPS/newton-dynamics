@@ -26,7 +26,7 @@ int main (int argc, const char * argv[])
 	while (_getch() != 27)
 	{
 		newton.Update(1.0f / 60.0f);
-		newton.Sync();
+		//newton.Sync();
 	}
 
 	return 0;

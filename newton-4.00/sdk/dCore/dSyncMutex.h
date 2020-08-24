@@ -19,35 +19,25 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-//
+#ifndef _D_SYNC_MUTEX_H_
+#define _D_SYNC_MUTEX_H_
 
-#ifndef _D_NEWTON_STDAFX_H__
-#define _D_NEWTON_STDAFX_H__
+#include "dCoreStdafx.h"
 
-#include <dCoreStdafx.h>
-#include <dTypes.h>
-#include <dThread.h>
-#include <dMemory.h>
-#include <dSyncMutex.h>
-#include <dSemaphore.h>
-#include <dClassAlloc.h>
+class dSyncMutex
+{
+	public:
+	D_CORE_API dSyncMutex();
+	D_CORE_API ~dSyncMutex();
 
-//#define DG_PROFILE_PHYSICS
+	D_CORE_API void Tick();
+	D_CORE_API void Release();
+	D_CORE_API void Sync();
 
-#ifdef _D_NEWTON_DLL
-	#ifdef _D_NEWTON_EXPORT_DLL
-		#define DNEWTON_API DG_LIBRARY_EXPORT
-	#else
-		#define DNEWTON_API DG_LIBRARY_IMPORT
-	#endif
-#else
-	#define D_NEWTON_API 
+	private:
+	std::mutex m_mutex;
+	std::condition_variable m_condition;
+	int m_count;
+};
+
 #endif
-
-
-
-#endif 
-

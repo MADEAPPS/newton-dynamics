@@ -70,6 +70,7 @@
 
 #include <new>
 #include <mutex>
+#include <atomic>
 #include <thread>
 #include <time.h>
 #include <math.h>
@@ -79,6 +80,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+
 #include <condition_variable>
 
 

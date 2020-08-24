@@ -1865,8 +1865,14 @@ void dgWorld::SerializeJointArray(dgInt32 bodyCount, dgSerialize serializeCallba
 
 dNewton::dNewton()
 	:dClassAlloc()
+	,dSyncMutex()
+	,dSemaphore()
+	,dThread()
 {
-	dAssert(0);
+	// start the engine thread;
+	Start();
+
+	m_timestep = 0.0f;
 }
 
 dNewton::~dNewton()
@@ -1876,12 +1882,16 @@ dNewton::~dNewton()
 
 void dNewton::Update(dFloat32 timestep)
 {
-	dAssert(0);
+	// wait for previuos frame to complete
+	Sync();
+	Tick();
+	m_timestep = timestep;
+	Signal();
 }
 
 void dNewton::Sync()
 {
-	dAssert(0);
+	dSyncMutex::Sync();
 }
 
 void dNewton::SetSubSteps(dInt32 subSteps)
@@ -1889,3 +1899,13 @@ void dNewton::SetSubSteps(dInt32 subSteps)
 	subSteps = dClamp(subSteps, 1, 16);
 }
 
+void dNewton::ThreadFunction()
+{
+ 	while (!Wait())
+	{
+		Sleep(30000);
+
+		Release();
+	}
+	dAssert(0);
+}

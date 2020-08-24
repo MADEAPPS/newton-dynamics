@@ -654,7 +654,11 @@ DG_INLINE void dgWorld::FlushRegisters() const
 
 #endif
 
-class dNewton: public dClassAlloc
+class dNewton
+	:public dClassAlloc
+	,public dSyncMutex
+	,public dSemaphore
+	,public dThread
 {
 	public:
 	D_NEWTON_API dNewton();
@@ -664,6 +668,11 @@ class dNewton: public dClassAlloc
 	D_NEWTON_API void Sync();
 
 	D_NEWTON_API void SetSubSteps(dInt32 subSteps);
+
+	private:
+	virtual void ThreadFunction();
+
+	dFloat32 m_timestep;
 };
 
 #endif
