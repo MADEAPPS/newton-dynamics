@@ -22,8 +22,16 @@
 #ifndef __dgMemory__
 #define __dgMemory__
 
-#include "dgStdafx.h"
+#include "dCoreStdafx.h"
 
+typedef void* (*dMemAllocCallback) (size_t size);
+typedef void (*dMemFreeCallback) (void* const ptr);
+
+D_CORE_API void* dMalloc(size_t size);
+D_CORE_API void dFree(void* const ptr);
+D_CORE_API void dSetMemoryAllocators(dMemAllocCallback alloc, dMemFreeCallback free);
+
+#if 0
 class dgMemoryAllocator;
 
 #define DG_CLASS_ALLOCATOR_NEW(allocator)			DG_INLINE void* operator new (size_t size, dgMemoryAllocator* const allocator) { return dgMalloc(size, allocator);}
@@ -349,4 +357,4 @@ DG_INLINE void dgFreeStack(void* const ptr)
 #endif
 
 #endif
-
+#endif

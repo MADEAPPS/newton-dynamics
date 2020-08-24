@@ -21,6 +21,7 @@
 
 #include "dCoreStdafx.h"
 #include "dTypes.h"
+#include "dMemory.h"
 
 #if 0
 #include "dgList.h"
@@ -782,3 +783,22 @@ dgMemoryAllocator::dgMemoryBeam* dgMemoryAllocator::FindBeam(dgInt32 size)
 
 #endif
 #endif
+
+static dMemAllocCallback m_allocMemory = malloc;
+static dMemFreeCallback m_freeMemory = free;
+
+void* dMalloc(size_t size)
+{
+	return m_allocMemory(size);
+}
+
+void dFree(void* const ptr)
+{
+	m_freeMemory(ptr);
+}
+
+void dSetMemoryAllocators(dMemAllocCallback alloc, dMemFreeCallback free)
+{
+	m_allocMemory = alloc;
+	m_freeMemory = free;
+}
