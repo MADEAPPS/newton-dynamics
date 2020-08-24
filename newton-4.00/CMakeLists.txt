@@ -10,6 +10,7 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
+option("NEWTON_BUILD_TEST" "generate test project" "ON")
 option("NEWTON_BUILD_SANDBOX_DEMOS" "generates demos projects" "OFF")
 option("NEWTON_BUILD_PROFILER" "build profiler" OFF)
 option("NEWTON_BUILD_SINGLE_THREADED" "multi threaded" OFF)
@@ -21,7 +22,7 @@ option("NEWTON_WITH_SSE4_PLUGIN" "adding sse4 parallel solver (forces shared lib
 option("NEWTON_WITH_AVX_PLUGIN" "adding avx parallel solver (forces shared libs)" OFF)
 option("NEWTON_WITH_AVX2_PLUGIN" "adding avx2 parallel solver (forces shared libs)" OFF)
 option("NEWTON_WITH_REFERENCE_GPU_PLUGIN" "adding gpu reference solver, gpu solve using avx2" OFF)
-option("NEWTON_BUILD_SHARED_LIBS" "build shared library" ON)
+option("NEWTON_BUILD_SHARED_LIBS" "build shared library" OFF)
 option("NEWTON_BUILD_CORE_ONLY" "build the core newton library only" OFF)
 
 set(CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo Release)
@@ -46,6 +47,11 @@ endif()
 if(NEWTON_BUILD_SINGLE_THREADED)
 	add_definitions(-DDG_USE_THREAD_EMULATION)
 endif()
+
+if(NEWTON_BUILD_SHARED_LIBS)
+    add_definitions(-D_D_CORE_DLL)
+	add_definitions(-D_D_NEWTON_DLL)
+endif(NEWTON_BUILD_SHARED_LIBS)
 
 #If no build type set, Release as default
 if(NOT CMAKE_BUILD_TYPE)
@@ -100,7 +106,6 @@ if(UNIX)
 endif ()
 
 if (MSVC)
-
 	if (PTR_SIZE EQUAL 8)
 		set(CMAKE_INSTALL_PREFIX "win64sdk" CACHE PATH "..." FORCE)
 	else()
@@ -148,13 +153,14 @@ if (MSVC)
 	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELEASE})
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Zi /GS- /W4 /Ox /Oi /Ot /Ob2 /fp:fast")
 
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /wd4201")
-	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /wd4201")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /wd4201")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /wd4100 /wd4201")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /wd4100 /wd4201")
+	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /wd4100 /wd4201")
 
 	message("CMAKE_CXX_FLAGS_DEBUG is ${CMAKE_CXX_FLAGS_DEBUG}")
-	message("CMAKE_CXX_FLAGS_RELWITHDEBINFO is ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
 	message("CMAKE_CXX_FLAGS_RELEASE is ${CMAKE_CXX_FLAGS_RELEASE}")
+	message("CMAKE_CXX_FLAGS_RELWITHDEBINFO is ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+
 elseif(MINGW)
 	add_compile_options(-msse3)
 	if(CMAKE_CL_64)
@@ -186,38 +192,7 @@ if(NEWTON_BUILD_PROFILER)
 endif()
 
 add_subdirectory(sdk)
+add_subdirectory(applications)
 
-if (NEWTON_BUILD_SANDBOX_DEMOS STREQUAL "ON")
-	
-	message("BUILDING DEMOS.")
-	
-	add_subdirectory(applications/demosSandbox)
-	
-     if(UNIX)
-        find_package(glfw3 REQUIRED)
 
-        if(NOT_glfw3_FOUND)
-            message(WARNING "GLFW headers were not found. Disable NEWTON_BUILD_SANDBOX_DEMOS or install GLFW")
-        else(NOT_glfw3_FOUND)
-            message("Found GLFW library")
-        endif(NOT_glfw3_FOUND)
-        
-        find_package(OpenAL REQUIRED)
-
-        if(NOT_OpenAL_FOUND)
-            message(WARNING "OpenAL headers were not found. Disable NEWTON_BUILD_SANDBOX_DEMOS or install OpenAL")
-        else(NOT_OpenAL_FOUND)
-            message("Found OpenAL library")
-        endif(NOT_OpenAL_FOUND)
-        
-        find_package(OpenGL REQUIRED)
-        
-        if(NOT_OpenGL_FOUND)
-            message(WARNING "OpenGL headers were not found. Disable NEWTON_BUILD_SANDBOX_DEMOS or install OpenGL")
-        else(NOT_OpenGL_FOUND)
-            message("Found OpenGL library")
-        endif(NOT_OpenGL_FOUND)
-        
-      endif(UNIX)
-endif()
 

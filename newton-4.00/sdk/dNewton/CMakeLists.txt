@@ -10,17 +10,28 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
-set (projectName "dCore")
+set (projectName "dNewton")
 message (${projectName})
 
-# source and header files
+if(NEWTON_USE_PLUGIN_DLL)
+	add_definitions(-DDG_USE_PLUGINS)
+endif()
+
+#source and header files
 file(GLOB CPP_SOURCE *.h *.cpp)
-file(GLOB HEADERS *.h)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
-if(NEWTON_BUILD_SHARED_LIBS STREQUAL "ON")
-	add_definitions(-D_D_CORE_EXPORT_DLL)
+include_directories(../dCore/)
+
+
+if (MSVC)
+       set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /fp:fast")
+       set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast")
+endif(MSVC)
+
+if(NEWTON_BUILD_SHARED_LIBS)
+	add_definitions(-D_D_NEWTON_EXPORT_DLL)
 	if(MSVC)
 		add_library(${projectName} STATIC ${CPP_SOURCE})
 	else()
@@ -29,18 +40,16 @@ if(NEWTON_BUILD_SHARED_LIBS STREQUAL "ON")
 else()
 	add_library(${projectName} STATIC ${CPP_SOURCE})
 endif()
-    
+
 if (MSVC)
-	if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
-		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudCoreStdAfx.h")
-		set_source_files_properties(dCoreStdAfx.cpp PROPERTIES COMPILE_FLAGS "/YcdCoreStdAfx.h")
-	endif()
+   if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
+	  set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudNewtonStdafx.h")
+      set_source_files_properties(dNewtonStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcdNewtonStdafx.h")
+   endif()
 endif(MSVC)
 
-target_include_directories(${projectName} PUBLIC .)
-if (NEWTON_BUILD_PROFILER)
-    target_link_libraries (${projectName} dProfiler)
-endif()
+#target_include_directories(${projectName} PUBLIC . ../dgMeshUtil)
+target_link_libraries(${projectName} dCore)
 
 install(TARGETS ${projectName} 
 		LIBRARY DESTINATION lib
@@ -48,3 +57,4 @@ install(TARGETS ${projectName}
 		RUNTIME DESTINATION bin)
 
 install(FILES ${HEADERS} DESTINATION include/${projectName})
+

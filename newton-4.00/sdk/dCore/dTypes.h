@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __DTYPES_H__
-#define __DTYPES_H__
+#ifndef __D_TYPES_H__
+#define __D_TYPES_H__
 
 #ifdef _MSC_VER 
 	#ifdef _M_ARM
@@ -45,8 +45,7 @@
 #endif
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || (defined (_MSC_VER ) && defined (_ARM_VER)) )
-	//#pragma warning (disable: 4100) //unreferenced formal parameter
-	//#pragma warning (disable: 4201) //nonstandard extension used : nameless struct/union
+	//#pragma warning (disable: 4127)	//conditional expression is constant
 	//#pragma warning (disable: 4324) //structure was padded due to __declspec(align())
 	//#pragma warning (disable: 4514) //unreferenced inline function has been removed
 	//#pragma warning (disable: 4530) //C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
@@ -62,10 +61,6 @@
 	#include <malloc.h>
 	#include <stdarg.h>
 	#include <process.h>
-
-	#ifdef _DEBUG
-		#pragma warning (disable: 4127)	//conditional expression is constant
-	#endif
 
 	#pragma warning (push, 3) 
 		#include <windows.h>
@@ -219,16 +214,23 @@
 	#define	D_MSC_AVX_ALIGNMENT
 #endif
 
-//#if defined(_MSC_VER)
-//	#define D_LIBRARY_EXPORT __declspec(dllexport)
-//	#define D_LIBRARY_IMPORT __declspec(dllimport)
-//	#define D_LIBRARY_STATIC
-//#else
-//	#define D_LIBRARY_EXPORT __attribute__((visibility("default")))
-//	#define D_LIBRARY_IMPORT __attribute__((visibility("default")))
-//	#define D_LIBRARY_STATIC
-//#endif
+#if defined(_MSC_VER)
+	#define D_LIBRARY_EXPORT __declspec(dllexport)
+	#define D_LIBRARY_IMPORT __declspec(dllimport)
+#else
+	#define D_LIBRARY_EXPORT __attribute__((visibility("default")))
+	#define D_LIBRARY_IMPORT __attribute__((visibility("default")))
+#endif
 
+#ifdef _D_CORE_DLL
+	#ifdef _D_CORE_EXPORT_DLL
+		#define DCONTAINERS_API DG_LIBRARY_EXPORT
+	#else
+		#define DCONTAINERS_API DG_LIBRARY_IMPORT
+	#endif
+#else
+	#define D_CORE_API 
+#endif
 
 #if ((defined (_WIN_32_VER) || defined (_WIN_64_VER)) && (_MSC_VER  >= 1600))
 	typedef int8_t dInt8;
