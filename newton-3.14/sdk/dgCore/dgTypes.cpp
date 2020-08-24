@@ -19,10 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dCoreStdafx.h"
-#include "dTypes.h"
-
-#if 0
+#include "dgStdafx.h"
+#include "dgTypes.h"
 #include "dgDebug.h"
 #include "dgVector.h"
 #include "dgMemory.h"
@@ -545,4 +543,3 @@ dgFloatExceptions::~dgFloatExceptions()
 	#endif
 }
 
-#endif

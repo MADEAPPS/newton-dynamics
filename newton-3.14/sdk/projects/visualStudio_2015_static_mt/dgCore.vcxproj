@@ -64,7 +64,16 @@
     <ClCompile Include="..\..\dgCore\dgThread.cpp" />
     <ClCompile Include="..\..\dgCore\dgThreadHive.cpp" />
     <ClCompile Include="..\..\dgCore\dgTree.cpp" />
-    <ClCompile Include="..\..\dgCore\dTypes.cpp" />
+    <ClCompile Include="..\..\dgCore\dgTypes.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='debug_double|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='release_double|x64'">Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dgCore\dg.h" />
@@ -107,10 +116,10 @@
     <ClInclude Include="..\..\dgCore\dgThread.h" />
     <ClInclude Include="..\..\dgCore\dgThreadHive.h" />
     <ClInclude Include="..\..\dgCore\dgTree.h" />
+    <ClInclude Include="..\..\dgCore\dgTypes.h" />
     <ClInclude Include="..\..\dgCore\dgVector.h" />
     <ClInclude Include="..\..\dgCore\dgVectorScalar.h" />
     <ClInclude Include="..\..\dgCore\dgVectorSimd.h" />
-    <ClInclude Include="..\..\dgCore\dTypes.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{75A4A856-914E-4D41-A28D-23EAF8F8F9C9}</ProjectGuid>
