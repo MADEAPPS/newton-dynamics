@@ -16,7 +16,9 @@
 #include <conio.h>
 
 #include <dNewtonStdafx.h>
+#include <dBody.h>
 #include <dNewton.h>
+
 
 #endif
 

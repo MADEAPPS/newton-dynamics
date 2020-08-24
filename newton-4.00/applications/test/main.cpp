@@ -11,12 +11,6 @@
 
 #include "testStdafx.h"
 
-
-
-//#include "Newton.h"
-//#include "dVector.h"
-//#include "dMatrix.h"
-
 int main (int argc, const char * argv[]) 
 {
 	dNewton newton;

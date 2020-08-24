@@ -22,12 +22,13 @@
 #include "dNewtonStdafx.h"
 #include "dNewton.h"
 
-
 dNewton::dNewton()
 	:dClassAlloc()
 	,dSyncMutex()
 	,dThread()
 	,dThreadPool()
+	,m_bodyArray()
+	,m_bodyList()
 {
 	// start the engine thread;
 	SetName("newton main thread");
@@ -42,6 +43,17 @@ dNewton::~dNewton()
 	Sync();
 	Finish();
 }
+
+void dNewton::AddBody(dBody* const body)
+{
+	dAssert(0);
+}
+
+void dNewton::RemoveBody(dBody* const body)
+{
+	dAssert(0);
+}
+
 
 void dNewton::Update(dFloat32 timestep)
 {
@@ -92,6 +104,12 @@ void dNewton::ThreadFunction()
 
 void dNewton::InternalUpdate(dFloat32 fullTimestep)
 {
+	m_bodyArray.Clear();
+	for (dList<dBody*>::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
+	{
+		m_bodyArray.PushBack(node->GetInfo());
+	}
+
 	dFloat32 timestep = fullTimestep / m_subSteps;
 	for (dInt32 i = 0; i < m_subSteps; i++)
 	{

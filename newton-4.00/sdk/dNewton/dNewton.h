@@ -22,6 +22,8 @@
 #ifndef _D_NEWTON_H_
 #define _D_NEWTON_H_
 
+class dBody;
+
 class dNewton
 	:public dClassAlloc
 	,public dSyncMutex
@@ -43,6 +45,9 @@ class dNewton
 
 	D_NEWTON_API void DispatchJobs(dThreadPoolJob** const jobs);
 
+	D_NEWTON_API void AddBody(dBody* const body);
+	D_NEWTON_API void RemoveBody(dBody* const body);
+
 	protected:
 	D_NEWTON_API virtual void SubstepUpdate(dFloat32 timestep);
 	D_NEWTON_API virtual void UpdateSkeletons(dFloat32 timestep);
@@ -63,6 +68,8 @@ class dNewton
 	protected:
 
 	private:
+	dArray<dBody*> m_bodyArray;
+	dList<dBody*> m_bodyList;
 	dFloat32 m_timestep;
 	dInt32 m_subSteps;
 };

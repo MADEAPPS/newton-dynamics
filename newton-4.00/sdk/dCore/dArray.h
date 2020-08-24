@@ -52,6 +52,7 @@ class dArray
 	T& operator[] (dInt32 i);
 	const T& operator[] (dInt32 i) const;
 
+	void PushBack(T& element);
 	
 /*	
 	
@@ -157,6 +158,14 @@ T& dArray<T>::operator[] (dInt32 i)
 	return m_array[i];
 }
 
+template<class T>
+void dArray<T>::PushBack(T& element)
+{
+	dArray<T>& me = *this;
+	me[m_size] = element;
+	m_size++;
+}
+
 
 template<class T>
 dInt32 dArray<T>::GetCount() const
@@ -167,11 +176,6 @@ dInt32 dArray<T>::GetCount() const
 template<class T>
 void dArray<T>::Clear()
 {
-	for (dInt32 i = 0; i < m_size; i++)
-	{
-		//m_array[i]->~T();
-		operator delete(&m_array[i]);
-	}
 	m_size = 0;
 }
 
@@ -184,34 +188,36 @@ void dArray<T>::Reserve(dInt32 count)
 template<class T>
 void dArray<T>::Resize(dInt32 size)
 {
-	dAssert(0);
-/*
-	if (size >= m_maxSize) 
+	if (size >= m_capacity) 
 	{
-		size = dgMax(size, 16);
-		T* const newArray = (T*)m_allocator->MallocLow(dInt32(sizeof(T) * size), m_aligmentInBytes);
-		if (m_array) {
-			for (dInt32 i = 0; i < m_maxSize; i++) {
+		size = dMax(size, 16);
+		T* const newArray = (T*)dMalloc(dInt32(sizeof(T) * size));
+		if (m_array) 
+		{
+			for (dInt32 i = 0; i < m_capacity; i++)
+			{
 				newArray[i] = m_array[i];
 			}
-			m_allocator->FreeLow(m_array);
+			dFree(m_array);
 		}
 		m_array = newArray;
-		m_maxSize = size;
+		m_capacity = size;
 	}
-	else if (size < m_maxSize) {
-		size = dgMax(size, 16);
-		T* const newArray = (T*)m_allocator->MallocLow(dInt32(sizeof(T) * size), m_aligmentInBytes);
-		if (m_array) {
-			for (dInt32 i = 0; i < size; i++) {
+	else if (size < m_capacity) 
+	{
+		size = dMax(size, 16);
+		T* const newArray = (T*)dMalloc(dInt32(sizeof(T) * size));
+		if (m_array) 
+		{
+			for (dInt32 i = 0; i < size; i++) 
+			{
 				newArray[i] = m_array[i];
 			}
-			m_allocator->FreeLow(m_array);
+			dFree(m_array);
 		}
 		m_array = newArray;
-		m_maxSize = size;
+		m_capacity = size;
 	}
-*/
 }
 
 

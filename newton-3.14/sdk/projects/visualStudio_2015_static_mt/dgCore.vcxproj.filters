@@ -42,9 +42,6 @@
     <ClCompile Include="..\..\dgCore\dgMemory.cpp">
       <Filter>util</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\dgCore\dgTypes.cpp">
-      <Filter>util</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\dgCore\dgTree.cpp">
       <Filter>containers</Filter>
     </ClCompile>
@@ -111,6 +108,9 @@
     <ClCompile Include="..\..\dgCore\dgPolygonSoupDatabase.cpp">
       <Filter>geometry</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\dgCore\dTypes.cpp">
+      <Filter>util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dgCore\dgNode.h">
@@ -138,9 +138,6 @@
       <Filter>util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dgCore\dgStdafx.h">
-      <Filter>util</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\dgCore\dgTypes.h">
       <Filter>util</Filter>
     </ClInclude>
     <ClInclude Include="..\..\dgCore\dgArray.h">
@@ -244,6 +241,9 @@
     </ClInclude>
     <ClInclude Include="..\..\dgCore\dgSort.h">
       <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dgCore\dTypes.h">
+      <Filter>util</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
