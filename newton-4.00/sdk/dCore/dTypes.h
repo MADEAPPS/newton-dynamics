@@ -178,9 +178,6 @@
 	#endif
 #endif
 
-
-#define	D_MAX_THREADS_HIVE_COUNT		16
-
 #ifdef _DEBUG
 //#define __ENABLE_D_CONTAINERS_SANITY_CHECK 
 #endif

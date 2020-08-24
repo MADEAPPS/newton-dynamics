@@ -19,34 +19,62 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _D_THREAD_H_
-#define _D_THREAD_H_
+#ifndef _D_THREAD_POOL_H_
+#define _D_THREAD_POOL_H_
 
 #include "dCoreStdafx.h"
+#include "dArray.h"
+#include "dThread.h"
+#include "dSyncMutex.h"
 #include "dSemaphore.h"
 #include "dClassAlloc.h"
 
-class dThread
-	:public std::mutex
-	,public std::condition_variable
-	,public dSemaphore
-	,public std::thread
+#define	D_MAX_THREADS_COUNT	16
+
+class dThreadPoolJob
 {
 	public:
-	D_CORE_API dThread();
-	D_CORE_API virtual ~dThread();
+	dThreadPoolJob() {}
+	virtual ~dThreadPoolJob() {}
 
-	D_CORE_API void SetName(const char* const name);
-
-	D_CORE_API void Start();
-	D_CORE_API void Finish();
-
-	virtual void ThreadFunction() = 0;
+	virtual void Execute() = 0;
 
 	private:
-	void ThreadFunctionCallback();
+	dInt32 m_threadIndex;
+	friend class dThreadPool;
+};
 
-	char m_name[32];
+class dThreadPool
+{
+	class dWorkerThread: public dClassAlloc, public dThread
+	{
+		public:
+		D_CORE_API dWorkerThread();
+		D_CORE_API virtual ~dWorkerThread();
+
+		private:
+		void ExecuteJob(dThreadPoolJob* const job);
+		virtual void ThreadFunction();
+
+		dThreadPoolJob* m_job;
+		dThreadPool* m_owner;
+		dInt32 m_threadIndex;
+		friend class dThreadPool;
+	};
+
+	public:
+	D_CORE_API dThreadPool();
+	D_CORE_API virtual ~dThreadPool();
+
+	D_CORE_API dInt32 GetCount() const;
+	D_CORE_API void SetCount(dInt32 count);
+
+	D_CORE_API void ExecuteJobs(dThreadPoolJob** const jobs);
+
+	private:
+	dSyncMutex m_sync;
+	dWorkerThread* m_workers;
+	dInt32 m_count;
 };
 
 #endif

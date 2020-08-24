@@ -26,13 +26,48 @@
 dThread::dThread()
 	:std::mutex() 
 	,std::condition_variable()
+	,dSemaphore()
 	,std::thread(&dThread::ThreadFunctionCallback, this)
 {
+	m_name[0] = 0;
 }
 
 dThread::~dThread()
 {
 }
+
+void dThread::SetName(const char* const name)
+{
+	strncpy(m_name, name, sizeof(m_name) - 1);
+
+#if defined(_MSC_VER)
+	// a hideous way to set the thread name, bu this is how Microsoft does it
+	const DWORD MS_VC_EXCEPTION = 0x406D1388;
+	#pragma pack(push,8)  
+		struct THREADNAME_INFO
+		{
+			DWORD dwType; // Must be 0x1000.  
+			LPCSTR szName; // Pointer to name (in user addr space).  
+			DWORD dwThreadID; // Thread ID (-1=caller thread).  
+			DWORD dwFlags; // Reserved for future use, must be zero.  
+		};
+	#pragma pack(pop)  
+
+	THREADNAME_INFO info;
+	info.dwType = 0x1000;
+	info.szName = name;
+	info.dwThreadID = GetThreadId(std::thread::native_handle());
+	info.dwFlags = 0;
+	__try 
+	{
+		RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+	}
+#endif
+}
+
 
 void dThread::Start()
 {
@@ -40,11 +75,21 @@ void dThread::Start()
 	notify_one();  
 }
 
+void dThread::Finish()
+{
+	Terminate();
+	join();
+}
+
 void dThread::ThreadFunctionCallback()
 {
 	std::unique_lock<std::mutex> lock(*this);
 	wait(lock);
-   	ThreadFunction();
+   	
+	while (!Wait())
+	{
+		ThreadFunction();
+	}
 }
 
 

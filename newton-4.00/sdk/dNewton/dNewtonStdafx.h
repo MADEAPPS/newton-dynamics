@@ -34,6 +34,7 @@
 #include <dSyncMutex.h>
 #include <dSemaphore.h>
 #include <dClassAlloc.h>
+#include <dThreadPool.h>
 
 //#define DG_PROFILE_PHYSICS
 

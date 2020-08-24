@@ -21,9 +21,10 @@ int main (int argc, const char * argv[])
 {
 	dNewton newton;
 
+	newton.SetThreadCount(4);
 	newton.SetSubSteps(2);
 
-	for (int i = 0; i < 1000; i ++)
+	for (int i = 0; i < 10000; i ++)
 	{
 		newton.Update(1.0f / 60.0f);
 		//newton.Sync();
