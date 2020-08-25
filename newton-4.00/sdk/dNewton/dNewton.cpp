@@ -28,6 +28,7 @@ dNewton::dNewton()
 	,dSyncMutex()
 	,dThread()
 	,dThreadPool()
+	,m_gravity(dFloat32 (0.0f))
 	,m_bodyArray()
 	,m_bodyList()
 {
@@ -61,18 +62,14 @@ void dNewton::RemoveBody(dBody* const body)
 	body->SetNewtonNode(nullptr, nullptr);
 }
 
-dTriplex dNewton::GetGravity() const
+dVector dNewton::GetGravity() const
 {
-	dTriplex xxx;
-	xxx.m_x = 0.0f;
-	xxx.m_y = -9.0f;
-	xxx.m_z = 0.0f;
-	return xxx;
+	return m_gravity;
 }
 
-void dNewton::SetGravity(const dTriplex& gravity)
+void dNewton::SetGravity(const dVector& gravity)
 {
-
+	m_gravity = gravity & dVector::m_triplexMask;
 }
 
 void dNewton::Update(dFloat32 timestep)

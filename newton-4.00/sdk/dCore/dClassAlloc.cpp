@@ -23,7 +23,6 @@
 #include "dMemory.h"
 #include "dClassAlloc.h"
 
-
 #ifdef _D_CORE_DLL
 	void* operator new (size_t size)
 	{ 

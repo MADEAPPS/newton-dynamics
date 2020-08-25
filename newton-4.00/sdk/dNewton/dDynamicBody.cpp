@@ -117,5 +117,5 @@ dDynamicBody::~dDynamicBody()
 
 void dDynamicBody::ApplyExternalForces(dInt32 threadID, dFloat32 tiemstep)
 {
-	dTriplex xxx(GetNewton()->GetGravity());
+	dVector gravity(GetNewton()->GetGravity());
 }

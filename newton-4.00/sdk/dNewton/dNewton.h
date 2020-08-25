@@ -49,9 +49,8 @@ class dNewton
 	D_NEWTON_API void AddBody(dBody* const body);
 	D_NEWTON_API void RemoveBody(dBody* const body);
 
-	D_NEWTON_API dTriplex GetGravity() const;
-	D_NEWTON_API void SetGravity(const dTriplex& gravity);
-	
+	D_NEWTON_API dVector GetGravity() const;
+	D_NEWTON_API void SetGravity(const dVector& gravity);
 
 	protected:
 	D_NEWTON_API virtual void SubstepUpdate(dFloat32 timestep);
@@ -75,6 +74,7 @@ class dNewton
 	private:
 	void GetBodyArray();
 
+	dVector m_gravity;
 	dArray<dBody*> m_bodyArray;
 	dList<dBody*> m_bodyList;
 	dFloat32 m_timestep;

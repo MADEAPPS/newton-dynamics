@@ -30,12 +30,14 @@
 #include <dCoreStdafx.h>
 #include <dList.h>
 #include <dTypes.h>
+#include <dVector.h>
 #include <dThread.h>
 #include <dMemory.h>
 #include <dSyncMutex.h>
 #include <dSemaphore.h>
 #include <dClassAlloc.h>
 #include <dThreadPool.h>
+#include <dTemplateVector.h>
 
 //#define DG_PROFILE_PHYSICS
 

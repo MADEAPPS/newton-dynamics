@@ -25,12 +25,9 @@
 #include "dCoreStdafx.h"
 #include "dTypes.h"
 #include "dMemory.h"
-//#include "dgDebug.h"
-//#include "dgMemory.h"
-
 
 template<class T>
-class dList 
+class dList
 {
 	public:
 	class dListNode
@@ -348,7 +345,6 @@ typename dList<T>::dListNode *dList<T>::Addtop (dListNode* const node)
 	return m_first;
 }
 
-
 template<class T>
 typename dList<T>::dListNode *dList<T>::Addtop ()
 {
@@ -381,27 +377,6 @@ typename dList<T>::dListNode *dList<T>::Addtop (const T &element)
 #endif
 	return m_first;
 }
-
-/*
-template<class T>
-typename dList<T>::dListNode *dList<T>::SafeAddtop(const T& element)
-{
-	dAssert (m_last);
-	m_count++;
-
-	dListNode* const node = new dListNode(element, nullptr, nullptr);
-	dListNode* const first = (dListNode*) dgInterlockedExchange ((void**) &m_first, (void*) node);
-
-	node->m_next = first;
-	first->m_prev = node;
-	dAssert (m_last);
-
-#ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
-	dAssert(SanityCheck());
-#endif
-	return node;
-}
-*/
 
 template<class T>
 void dList<T>::InsertAfter (dListNode* const root, dListNode* const node)

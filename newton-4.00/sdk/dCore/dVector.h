@@ -19,37 +19,21 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _D_DYNAMIC_BODY_H_
-#define _D_DYNAMIC_BODY_H_
+#ifndef __D_VECTOR_H__
+#define __D_VECTOR_H__
 
-#include "dNewtonStdafx.h"
-#include "dBody.h"
+#include "dCoreStdafx.h"
+#include "dTypes.h"
+#include "dClassAlloc.h"
 
-//#define DG_MAX_SPEED_ATT	dgFloat32(0.02f)
-////#define DG_FREEZE_ACCEL	dgFloat32(0.1f)
-//#define DG_FREEZE_ACCEL		dgFloat32(1.0f)
-//#define DG_FREEZE_SPEED		dgFloat32(0.032f)
-//
-//#define DG_FREEZE_ACCEL2	(DG_FREEZE_ACCEL * DG_FREEZE_ACCEL)
-//#define DG_FREEZE_SPEED2	(DG_FREEZE_SPEED * DG_FREEZE_SPEED)
-//
-//#define DG_FREEZE_MAG		DG_FREEZE_ACCEL
-//#define DG_FREEZE_MAG2		(DG_FREEZE_MAG * DG_FREEZE_MAG)
-//
-//#define DG_ERR_TOLERANCE	dgFloat32(1.0e-2f)
-//#define DG_ERR_TOLERANCE2	(DG_ERR_TOLERANCE * DG_ERR_TOLERANCE)
-//
-//class dgSkeletonContainer;
+#define dCheckVector(x) (dCheckFloat(x[0]) && dCheckFloat(x[1]) && dCheckFloat(x[2]) && dCheckFloat(x[3]))
 
-class dDynamicBody: public dBody 
-{
-	public:
-	D_NEWTON_API dDynamicBody();
-	D_NEWTON_API virtual ~dDynamicBody ();
+#ifdef D_SCALAR_VECTOR_CLASS
+	#include "dVectorScalar.h"
+#elif defined(__ANDROID__) || defined (_ARM_VER) 
+	#include "dVectorArmNeon.h"
+#else
+	#include "dVectorSimd.h"
+#endif
 
-	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadID, dFloat32 tiemstep);
-};
-
-#endif 
-
-
+#endif
