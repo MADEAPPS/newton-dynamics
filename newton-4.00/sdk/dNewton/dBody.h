@@ -23,6 +23,7 @@
 #define _D_BODY_H_
 
 #include "dNewtonStdafx.h"
+#include "dShapeInstance.h"
 
 class dNewton;
 
@@ -33,6 +34,9 @@ class dBody: public dClassAlloc
 	D_NEWTON_API dBody();
 	D_NEWTON_API virtual ~dBody();
 
+	D_NEWTON_API const dShapeInstance& GetCollisionShape() const;
+	D_NEWTON_API void SetCollisionShape(const dShapeInstance& shapeInstance);
+
 	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadID, dFloat32 tiemstep) = 0;
 	dNewton* GetNewton() const;
 
@@ -40,6 +44,7 @@ class dBody: public dClassAlloc
 	dList<dBody*>::dListNode* GetNewtonNode() const;
 	void SetNewtonNode(dNewton* const newton, dList<dBody*>::dListNode* const node);
 
+	dShapeInstance m_shapeInstance;
 	dNewton* m_newton;
 	dList<dBody*>::dListNode* m_newtonNode;
 	friend class dNewton;

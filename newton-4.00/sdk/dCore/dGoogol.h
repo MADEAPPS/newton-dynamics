@@ -22,7 +22,6 @@
 #ifndef __dGoogol__
 #define __dGoogol__
 
-
 #include "dCoreStdafx.h"
 #include "dTypes.h"
 #include "dMemory.h"

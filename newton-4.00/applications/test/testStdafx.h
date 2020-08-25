@@ -17,9 +17,11 @@
 
 #include <dNewtonStdafx.h>
 #include <dBody.h>
+#include <dShape.h>
 #include <dNewton.h>
+#include <dShapeNull.h>
 #include <dDynamicBody.h>
-
+#include <dShapeInstance.h>
 
 #endif
 

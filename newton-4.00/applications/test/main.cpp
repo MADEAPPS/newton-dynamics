@@ -26,7 +26,7 @@ static void PhysicsFree(void* ptr)
 
 class CheckMemoryLeaks
 {
-public:
+	public:
 	CheckMemoryLeaks()
 	{
 		atexit(CheckMemoryLeaksCallback);
@@ -35,22 +35,35 @@ public:
 		// it should be called once, and the the call is optional 
 		dSetMemoryAllocators(PhysicsAlloc, PhysicsFree);
 
-#if defined(_DEBUG) && defined(_MSC_VER)
+	#if defined(_DEBUG) && defined(_MSC_VER)
 		// Track all memory leaks at the operating system level.
 		// make sure no Newton tool or utility leaves leaks behind.
 		_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_LEAK_CHECK_DF);
 		//_CrtSetBreakAlloc (318776);
-#endif
+	#endif
 	}
 
 	static void CheckMemoryLeaksCallback()
 	{
-#if defined(_DEBUG) && defined(_MSC_VER)
+		#if defined(_DEBUG) && defined(_MSC_VER)
 		_CrtDumpMemoryLeaks();
-#endif
+		#endif
 	}
 };
 static CheckMemoryLeaks checkLeaks;
+
+
+void CreateBodyList(dNewton& newton)
+{
+	dShapeInstance sphere(new dShapeNull());
+	for (int i = 0; i < 2000; i++)
+	{
+		dBody* const body = new dDynamicBody();
+
+		body->SetCollisionShape(sphere);
+		newton.AddBody(body);
+	}
+}
 
 int main (int argc, const char * argv[]) 
 {
@@ -59,11 +72,7 @@ int main (int argc, const char * argv[])
 	newton.SetThreadCount(4);
 	newton.SetSubSteps(2);
 
-	for (int i = 0; i < 2000; i++)
-	{
-		dBody* const body = new dDynamicBody();
-		newton.AddBody(body);
-	}
+	CreateBodyList(newton);
 
 	for (int i = 0; i < 10000; i ++)
 	{

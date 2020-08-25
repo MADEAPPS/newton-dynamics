@@ -21,13 +21,38 @@
 
 #include "dNewtonStdafx.h"
 #include "dBody.h"
+#include "dShapeNull.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
+
+class dDummyCollision: public dShapeNull
+{
+	public: 
+	dDummyCollision()
+		:dShapeNull()
+	{
+		m_refCount.fetch_add(1);
+	}
+
+	~dDummyCollision()
+	{
+		m_refCount.fetch_add(-1);
+	}
+
+	static dShapeNull* GetNullShape()
+	{
+		static dDummyCollision nullShape;
+		return &nullShape;
+	}
+};
+
+
 dBody::dBody()
-	:m_newton(nullptr)
+	:m_shapeInstance(dDummyCollision::GetNullShape())
+	,m_newton(nullptr)
 	,m_newtonNode(nullptr)
 {
 }
@@ -36,3 +61,12 @@ dBody::~dBody()
 {
 }
 
+const dShapeInstance& dBody::GetCollisionShape() const
+{
+	return m_shapeInstance;
+}
+
+void dBody::SetCollisionShape(const dShapeInstance& shapeInstance)
+{
+	m_shapeInstance = shapeInstance;
+}
