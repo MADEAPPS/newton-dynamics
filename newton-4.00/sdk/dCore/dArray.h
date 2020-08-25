@@ -42,10 +42,11 @@ class dArray
 	~dArray ();
 
 	dInt32 GetCount() const;
+	void SetCount(dInt32 count);
 
 	void Clear();
 	void Resize(dInt32 count);
-	void Reserve(dInt32 count);
+	void ResizeIfNecessary(dInt32 count);
 
 //	DG_CLASS_ALLOCATOR(allocator)
 	
@@ -53,17 +54,13 @@ class dArray
 	const T& operator[] (dInt32 i) const;
 
 	void PushBack(T& element);
-	
-/*	
-	
-	DG_INLINE void ResizeIfNecessary  (dInt32 index) const;
 
-	dInt32 GetElementSize() const;
-	dInt32 GetBytesCapacity () const;
-	dInt32 GetElementsCapacity () const; 
-	dgMemoryAllocator* GetAllocator() const;
-	void SetAllocator(dgMemoryAllocator* const allocator);
-*/
+	//dInt32 GetElementSize() const;
+	//dInt32 GetBytesCapacity () const;
+	//dInt32 GetElementsCapacity () const; 
+	//dgMemoryAllocator* GetAllocator() const;
+	//void SetAllocator(dgMemoryAllocator* const allocator);
+
 	protected:
 	T* m_array;
 
@@ -166,7 +163,6 @@ void dArray<T>::PushBack(T& element)
 	m_size++;
 }
 
-
 template<class T>
 dInt32 dArray<T>::GetCount() const
 {
@@ -174,15 +170,16 @@ dInt32 dArray<T>::GetCount() const
 }
 
 template<class T>
-void dArray<T>::Clear()
+void dArray<T>::SetCount(dInt32 count)
 {
-	m_size = 0;
+	ResizeIfNecessary(count);
+	m_size = count;
 }
 
 template<class T>
-void dArray<T>::Reserve(dInt32 count)
+void dArray<T>::Clear()
 {
-	dAssert(0);
+	m_size = 0;
 }
 
 template<class T>
@@ -220,6 +217,15 @@ void dArray<T>::Resize(dInt32 size)
 	}
 }
 
+template<class T>
+void dArray<T>::ResizeIfNecessary(dInt32 size)
+{
+	while (size >= m_capacity) 
+	{
+		Resize(m_capacity * 2);
+	}
+}
+
 
 /*
 template<class T>
@@ -252,15 +258,6 @@ void dArray<T>::SetAllocator(dgMemoryAllocator* const allocator)
 {
 	dgAssert (!m_allocator);
 	m_allocator = allocator;
-}
-
-
-template<class T>
-DG_INLINE void dArray<T>::ResizeIfNecessary  (dInt32 size) const
-{
-	while (size >= m_maxSize) {
-		Resize (m_maxSize * 2);
-	}
 }
 */
 

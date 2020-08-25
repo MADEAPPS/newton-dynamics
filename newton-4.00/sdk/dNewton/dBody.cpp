@@ -28,9 +28,10 @@
 //////////////////////////////////////////////////////////////////////
 
 dBody::dBody()
+	:m_newton(nullptr)
+	,m_newtonNode(nullptr)
 {
 }
-
 
 dBody::~dBody()
 {

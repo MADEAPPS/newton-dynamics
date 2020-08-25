@@ -36,6 +36,7 @@ class dThreadPoolJob
 	public:
 	dThreadPoolJob() {}
 	virtual ~dThreadPoolJob() {}
+	dInt32 GetThredID() const { return m_threadIndex; }
 
 	virtual void Execute() = 0;
 

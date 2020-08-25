@@ -68,6 +68,8 @@ class dNewton
 	protected:
 
 	private:
+	void GetBodyArray();
+
 	dArray<dBody*> m_bodyArray;
 	dList<dBody*> m_bodyList;
 	dFloat32 m_timestep;

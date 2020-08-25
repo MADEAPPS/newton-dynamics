@@ -20,6 +20,7 @@
 */
 
 #include "dNewtonStdafx.h"
+#include "dBody.h"
 #include "dNewton.h"
 
 dNewton::dNewton()
@@ -46,12 +47,18 @@ dNewton::~dNewton()
 
 void dNewton::AddBody(dBody* const body)
 {
-	dAssert(0);
+	dAssert((body->m_newton == nullptr) && (body->m_newtonNode == nullptr));
+
+	dList<dBody*>::dListNode* const node = m_bodyList.Append(body);
+	body->SetNewtonNode(this, node);
 }
 
 void dNewton::RemoveBody(dBody* const body)
 {
-	dAssert(0);
+	dAssert(body->m_newtonNode && (body->m_newton == this));
+
+	m_bodyList.Remove(body->m_newtonNode);
+	body->SetNewtonNode(nullptr, nullptr);
 }
 
 
@@ -104,12 +111,7 @@ void dNewton::ThreadFunction()
 
 void dNewton::InternalUpdate(dFloat32 fullTimestep)
 {
-	m_bodyArray.Clear();
-	for (dList<dBody*>::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
-	{
-		m_bodyArray.PushBack(node->GetInfo());
-	}
-
+	GetBodyArray();
 	dFloat32 timestep = fullTimestep / m_subSteps;
 	for (dInt32 i = 0; i < m_subSteps; i++)
 	{
@@ -118,6 +120,18 @@ void dNewton::InternalUpdate(dFloat32 fullTimestep)
 
 	TransformUpdate(fullTimestep);
 	UpdateListenersPostTransform(fullTimestep);
+}
+
+void dNewton::GetBodyArray()
+{
+	m_bodyArray.SetCount(m_bodyList.GetCount());
+	dBody** const bodyPtr = &m_bodyArray[0];
+	int index = 0;
+	for (dList<dBody*>::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
+	{
+		bodyPtr[index] = node->GetInfo();
+		index++;
+	}
 }
 
 void dNewton::TransformUpdate(dFloat32 timestep)
@@ -165,23 +179,34 @@ void dNewton::UpdateListenersPostTransform(dFloat32 timestep)
 
 void dNewton::ApplyExternalForces(dFloat32 timestep)
 {
-	class xxxxx : public dThreadPoolJob
+	class dApplyExternForlce: public dThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
-
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 count = m_me->m_bodyArray.GetCount();
+			dBody** const bodies = &m_me->m_bodyArray[0];
+			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
+			{
+				bodies[i]->ApplyExternalForces(threadIndex, m_timestep);
+			}
 		}
 
+		std::atomic<int>* m_it;
 		dNewton* m_me;
+		dFloat32 m_timestep;
 	};
 
-	xxxxx xxx[D_MAX_THREADS_COUNT];
-	dThreadPoolJob* xxxx[D_MAX_THREADS_COUNT];
+	std::atomic<int> it(0);
+	dApplyExternForlce extForceJob[D_MAX_THREADS_COUNT];
+	dThreadPoolJob* extForceJobPtr[D_MAX_THREADS_COUNT];
 	for (int i = 0; i < GetThreadCount(); i++)
 	{
-		xxx[i].m_me = this;
-		xxxx[i] = &xxx[i];
+		extForceJob[i].m_me = this;
+		extForceJob[i].m_it = &it;
+		extForceJob[i].m_timestep = timestep;
+		extForceJobPtr[i] = &extForceJob[i];
 	}
-	DispatchJobs(xxxx);
+	DispatchJobs(extForceJobPtr);
 }

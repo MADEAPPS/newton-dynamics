@@ -11,12 +11,68 @@
 
 #include "testStdafx.h"
 
+// memory allocation for Newton
+static void* PhysicsAlloc(size_t sizeInBytes)
+{
+	return new char[sizeInBytes];
+}
+
+// memory free use by the engine
+static void PhysicsFree(void* ptr)
+{
+	delete[](char*)ptr;
+}
+
+
+class CheckMemoryLeaks
+{
+public:
+	CheckMemoryLeaks()
+	{
+		atexit(CheckMemoryLeaksCallback);
+		// Set the memory allocation function before creation the newton world
+		// this is the only function that can be called before the creation of the newton world.
+		// it should be called once, and the the call is optional 
+		dSetMemoryAllocators(PhysicsAlloc, PhysicsFree);
+
+#if defined(_DEBUG) && defined(_MSC_VER)
+		// Track all memory leaks at the operating system level.
+		// make sure no Newton tool or utility leaves leaks behind.
+		_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_LEAK_CHECK_DF);
+		//_CrtSetBreakAlloc (318776);
+#endif
+	}
+
+	static void CheckMemoryLeaksCallback()
+	{
+#if defined(_DEBUG) && defined(_MSC_VER)
+		_CrtDumpMemoryLeaks();
+#endif
+	}
+};
+static CheckMemoryLeaks checkLeaks;
+
+class dMyBody: public dBody
+{
+	void ApplyExternalForces(dInt32 threadID, dFloat32 tiemstep)
+	{
+
+	}
+};
+
+
 int main (int argc, const char * argv[]) 
 {
 	dNewton newton;
 
 	newton.SetThreadCount(4);
 	newton.SetSubSteps(2);
+
+	for (int i = 0; i < 2000; i++)
+	{
+		dBody* const body = new dMyBody();
+		newton.AddBody(body);
+	}
 
 	for (int i = 0; i < 10000; i ++)
 	{

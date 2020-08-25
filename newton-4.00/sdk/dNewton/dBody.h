@@ -24,6 +24,8 @@
 
 #include "dNewtonStdafx.h"
 
+class dNewton;
+
 D_MSC_VECTOR_ALIGNMENT
 class dBody: public dClassAlloc  
 {
@@ -31,8 +33,35 @@ class dBody: public dClassAlloc
 	D_NEWTON_API dBody();
 	D_NEWTON_API virtual ~dBody();
 
+	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadID, dFloat32 tiemstep) = 0;
+	dNewton* GetNewton() const;
+
+	private:
+
+	dList<dBody*>::dListNode* GetNewtonNode() const;
+	void SetNewtonNode(dNewton* const newton, dList<dBody*>::dListNode* const node);
+
+	dNewton* m_newton;
+	dList<dBody*>::dListNode* m_newtonNode;
+	friend class dNewton;
 } D_GCC_VECTOR_ALIGNMENT;
 
+
+inline dNewton* dBody::GetNewton() const
+{
+	return m_newton;
+}
+
+inline void dBody::SetNewtonNode(dNewton* const newton, dList<dBody*>::dListNode* const node)
+{
+	m_newton = newton;
+	m_newtonNode = node;
+}
+
+inline dList<dBody*>::dListNode* dBody::GetNewtonNode() const
+{
+	return m_newtonNode;
+}
 
 #endif 
 
