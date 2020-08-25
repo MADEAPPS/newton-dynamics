@@ -70,6 +70,7 @@ int main (int argc, const char * argv[])
 
 	for (int i = 0; i < 2000; i++)
 	{
+		dMyBody body1;
 		dBody* const body = new dMyBody();
 		newton.AddBody(body);
 	}

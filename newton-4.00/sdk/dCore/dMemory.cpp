@@ -787,14 +787,37 @@ dgMemoryAllocator::dgMemoryBeam* dgMemoryAllocator::FindBeam(dgInt32 size)
 static dMemAllocCallback m_allocMemory = malloc;
 static dMemFreeCallback m_freeMemory = free;
 
+class dMemoryHeader
+{
+	public:
+	union
+	{
+		char m_padd[32];
+		struct
+		{
+			void* m_ptr;
+			dInt32 m_size;
+		};
+	};
+};
+
 void* dMalloc(size_t size)
 {
-	return m_allocMemory(size);
+	size += 2 * sizeof(dMemoryHeader) - 1;
+	void* const ptr = m_allocMemory(size);
+	dInt64 val = dUnsigned64(ptr) + sizeof(dMemoryHeader) - 1;
+	dInt64 mask = -dInt64(sizeof(dMemoryHeader));
+	val = val & mask;
+	dMemoryHeader* const ret = (dMemoryHeader*)val;
+	ret->m_size = size;
+	ret->m_ptr = ptr;
+	return &ret[1];
 }
 
 void dFree(void* const ptr)
 {
-	m_freeMemory(ptr);
+	dMemoryHeader* const ret = ((dMemoryHeader*)ptr) - 1;
+	m_freeMemory(ret->m_ptr);
 }
 
 void dSetMemoryAllocators(dMemAllocCallback alloc, dMemFreeCallback free)
