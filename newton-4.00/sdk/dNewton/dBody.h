@@ -37,7 +37,6 @@ class dBody: public dClassAlloc
 	dNewton* GetNewton() const;
 
 	private:
-
 	dList<dBody*>::dListNode* GetNewtonNode() const;
 	void SetNewtonNode(dNewton* const newton, dList<dBody*>::dListNode* const node);
 

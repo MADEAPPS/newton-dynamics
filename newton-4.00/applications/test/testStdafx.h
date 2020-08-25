@@ -18,6 +18,7 @@
 #include <dNewtonStdafx.h>
 #include <dBody.h>
 #include <dNewton.h>
+#include <dDynamicBody.h>
 
 
 #endif

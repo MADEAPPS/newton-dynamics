@@ -61,6 +61,19 @@ void dNewton::RemoveBody(dBody* const body)
 	body->SetNewtonNode(nullptr, nullptr);
 }
 
+dTriplex dNewton::GetGravity() const
+{
+	dTriplex xxx;
+	xxx.m_x = 0.0f;
+	xxx.m_y = -9.0f;
+	xxx.m_z = 0.0f;
+	return xxx;
+}
+
+void dNewton::SetGravity(const dTriplex& gravity)
+{
+
+}
 
 void dNewton::Update(dFloat32 timestep)
 {

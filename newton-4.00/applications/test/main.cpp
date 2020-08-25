@@ -52,15 +52,6 @@ public:
 };
 static CheckMemoryLeaks checkLeaks;
 
-class dMyBody: public dBody
-{
-	void ApplyExternalForces(dInt32 threadID, dFloat32 tiemstep)
-	{
-
-	}
-};
-
-
 int main (int argc, const char * argv[]) 
 {
 	dNewton newton;
@@ -70,8 +61,7 @@ int main (int argc, const char * argv[])
 
 	for (int i = 0; i < 2000; i++)
 	{
-		dMyBody body1;
-		dBody* const body = new dMyBody();
+		dBody* const body = new dDynamicBody();
 		newton.AddBody(body);
 	}
 
