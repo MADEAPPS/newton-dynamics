@@ -531,10 +531,3 @@ void dGoogol::Trace () const
 	dAssert(0);
 	//dTrace (("%f ", dFloat64 (*this)));
 }
-
-
-
-
-
-
-

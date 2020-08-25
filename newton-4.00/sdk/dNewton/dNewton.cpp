@@ -62,11 +62,6 @@ void dNewton::RemoveBody(dBody* const body)
 	body->SetNewtonNode(nullptr, nullptr);
 }
 
-dVector dNewton::GetGravity() const
-{
-	return m_gravity;
-}
-
 void dNewton::SetGravity(const dVector& gravity)
 {
 	m_gravity = gravity & dVector::m_triplexMask;

@@ -81,4 +81,10 @@ class dNewton
 	dInt32 m_subSteps;
 } D_GCC_VECTOR_ALIGNMENT;
 
+inline dVector dNewton::GetGravity() const
+{
+	return m_gravity;
+}
+
+
 #endif
