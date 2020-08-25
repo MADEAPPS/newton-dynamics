@@ -40,8 +40,6 @@ dgGoogol Determinant2x2 (const dgGoogol matrix[2][2])
 	return a00xa11 - a01xa10;
 }
 
-
-
 dgFloat64 Determinant3x3 (const dgFloat64 matrix[3][3], dgFloat64* const error)
 {
 	dgFloat64 sign = dgFloat64 (-1.0f);

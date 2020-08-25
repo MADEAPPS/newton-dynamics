@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __dVectorScalar__
-#define __dVectorScalar__
+#ifndef __D_VECTOR_SCALAR_H__
+#define __D_VECTOR_SCALAR_H__
 
 // *****************************************************************************************
 //

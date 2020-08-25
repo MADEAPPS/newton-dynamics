@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __dVectorArmNeon__
-#define __dVectorArmNeon__
+#ifndef __D_VECTOR_ARM_NEON_H__
+#define __D_VECTOR_ARM_NEON_H__
 
 #if 0
 // *****************************************************************************************

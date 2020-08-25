@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __dVectorSimd__
-#define __dVectorSimd__
+#ifndef __D_VECTOR_X86_SIMD_H__
+#define __D_VECTOR_X86_SIMD_H__
 
 #ifndef DG_SCALAR_VECTOR_CLASS
 

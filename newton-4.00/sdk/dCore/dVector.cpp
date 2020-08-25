@@ -22,6 +22,7 @@
 #include "dCoreStdafx.h"
 #include "dTypes.h"
 #include "dVector.h"
+#include "dMatrix.h"
 
 #ifndef _NEWTON_USE_DOUBLE
 
@@ -61,6 +62,14 @@ dBigVector dBigVector::m_wMask (dInt32 ( 0), dInt32 ( 0),	dInt32 ( 0), dInt32 (-
 dSpatialVector dSpatialVector::m_zero (dFloat32 (0.0f));
 
 
-#ifndef _NEWTON_USE_DOUBLE
-#endif
+dMatrix dMatrix::m_zeroMatrix(
+	dVector(dFloat32(0.0f)),
+	dVector(dFloat32(0.0f)),
+	dVector(dFloat32(0.0f)),
+	dVector(dFloat32(0.0f)));
 
+dMatrix dMatrix::m_identityMatrix(
+	dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)),
+	dVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f)),
+	dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f)),
+	dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f)));

@@ -19,48 +19,19 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-//
+#ifndef __D_SMALL_DETERMINANT_H__
+#define __D_SMALL_DETERMINANT_H__
 
-#ifndef _D_NEWTON_STDAFX_H__
-#define _D_NEWTON_STDAFX_H__
+#include "dCoreStdafx.h"
+#include "dTypes.h"
 
-#include <dCoreStdafx.h>
-#include <dList.h>
-#include <dTypes.h>
-#include <dPlane.h>
-#include <dVector.h>
-#include <dMatrix.h>
-#include <dThread.h>
-#include <dMemory.h>
-#include <dGoogol.h>
-#include <dSyncMutex.h>
-#include <dSemaphore.h>
-#include <dClassAlloc.h>
-#include <dThreadPool.h>
-#include <dQuaternion.h>
-#include <dSpatialMatrix.h>
-#include <dGeneralVector.h>
-#include <dGeneralMatrix.h>
-#include <dTemplateVector.h>
-#include <dContainersAlloc.h>
-#include <dSmallDeterminant.h>
+class dgGoogol;
+dFloat64 Determinant2x2 (const dFloat64 matrix[2][2], dFloat64* const error);
+dFloat64 Determinant3x3 (const dFloat64 matrix[3][3], dFloat64* const error);
+dFloat64 Determinant4x4 (const dFloat64 matrix[4][4], dFloat64* const error);
 
-//#define DG_PROFILE_PHYSICS
+dgGoogol Determinant2x2 (const dgGoogol matrix[2][2]);
+dgGoogol Determinant3x3 (const dgGoogol matrix[3][3]);
+dgGoogol Determinant4x4 (const dgGoogol matrix[4][4]);
 
-#ifdef _D_NEWTON_DLL
-	#ifdef _D_NEWTON_EXPORT_DLL
-		#define DNEWTON_API DG_LIBRARY_EXPORT
-	#else
-		#define DNEWTON_API DG_LIBRARY_IMPORT
-	#endif
-#else
-	#define D_NEWTON_API 
 #endif
-
-
-
-#endif 
-

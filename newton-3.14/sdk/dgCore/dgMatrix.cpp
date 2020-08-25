@@ -72,10 +72,6 @@ dgMatrix dgMatrix::m_identityMatrix (dgVector (dgFloat32(1.0f), dgFloat32(0.0f),
 									 dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f), dgFloat32(0.0f)),
 									 dgVector (dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(0.0f), dgFloat32(1.0f)));
 
-
-#ifndef _NEWTON_USE_DOUBLE
-#endif
-
 const dgMatrix& dgGetIdentityMatrix()
 {
 	return dgMatrix::m_identityMatrix;
