@@ -41,12 +41,20 @@ class dBody: public dClassAlloc
 	D_NEWTON_API const dShapeInstance& GetCollisionShape() const;
 	D_NEWTON_API void SetCollisionShape(const dShapeInstance& shapeInstance);
 
-	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadID, dFloat32 tiemstep) = 0;
 	dNewton* GetNewton() const;
+
+	dVector GetOmega() const;
+	void SetOmega(const dVector& veloc);
+
+	dVector GetVelocity() const;
+	void SetVelocity(const dVector& veloc);
 
 	protected:
 	dList<dBody*>::dListNode* GetNewtonNode() const;
 	void SetNewtonNode(dNewton* const newton, dList<dBody*>::dListNode* const node);
+
+	dVector m_veloc;
+	dVector m_omega;
 
 	dShapeInstance m_shapeInstance;
 	dNewton* m_newton;
@@ -70,6 +78,27 @@ inline dList<dBody*>::dListNode* dBody::GetNewtonNode() const
 {
 	return m_newtonNode;
 }
+
+inline dVector dBody::GetOmega() const
+{
+	return m_omega;
+}
+
+inline void dBody::SetOmega(const dVector& veloc)
+{
+	m_omega = veloc;
+}
+
+inline dVector dBody::GetVelocity() const
+{
+	return m_veloc;
+}
+
+inline void dBody::SetVelocity(const dVector& veloc)
+{
+	m_veloc = veloc;
+}
+
 
 #endif 
 

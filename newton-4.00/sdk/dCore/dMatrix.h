@@ -35,9 +35,8 @@
 class dMatrix;
 class dQuaternion;
 
-const dMatrix& dgGetZeroMatrix ();
-const dMatrix& dgGetIdentityMatrix();
-
+D_CORE_API const dMatrix& dGetZeroMatrix ();
+D_CORE_API const dMatrix& dGetIdentityMatrix();
 
 D_MSC_VECTOR_ALIGNMENT
 class dMatrix: public dClassAlloc
@@ -46,7 +45,7 @@ class dMatrix: public dClassAlloc
 	dMatrix ();
 	dMatrix (const dFloat32* const array);
 	dMatrix (const dVector &front, const dVector &up, const dVector &right, const dVector &posit);
-	dMatrix (const dQuaternion &rotation, const dVector &position);
+	D_CORE_API dMatrix (const dQuaternion &rotation, const dVector &position);
 
 	// create a orthonormal normal vector basis, front become m_front vector, and m_up and m_right are mutualiperpendicular to fron and to each other
 	dMatrix (const dVector &front);
@@ -58,7 +57,7 @@ class dMatrix: public dClassAlloc
 	const dVector& operator[] (dInt32 i) const;
 
 	dMatrix Inverse () const;
-	dMatrix Inverse4x4 () const;
+	D_CORE_API dMatrix Inverse4x4 () const;
 	dMatrix Transpose () const;
 	dMatrix Transpose4X4 () const;
 	dVector RotateVector (const dVector &v) const;
@@ -67,35 +66,38 @@ class dMatrix: public dClassAlloc
 	dVector UntransformVector (const dVector &v) const;
 	dPlane TransformPlane (const dPlane &localPlane) const;
 	dPlane UntransformPlane (const dPlane &globalPlane) const;
-	dVector SolveByGaussianElimination(const dVector &v) const;
-	void TransformBBox (const dVector& p0local, const dVector& p1local, dVector& p0, dVector& p1) const; 
+	D_CORE_API dVector SolveByGaussianElimination(const dVector &v) const;
+	D_CORE_API void TransformBBox (const dVector& p0local, const dVector& p1local, dVector& p0, dVector& p1) const;
 
-	void CalcPitchYawRoll (dVector& euler0, dVector& euler1) const;
-	void TransformTriplex (dFloat32* const dst, dInt32 dstStrideInBytes,
-						   const dFloat32* const src, dInt32 srcStrideInBytes, dInt32 count) const;
+	D_CORE_API void CalcPitchYawRoll (dVector& euler0, dVector& euler1) const;
+	D_CORE_API void TransformTriplex (
+		dFloat32* const dst, dInt32 dstStrideInBytes,
+		const dFloat32* const src, dInt32 srcStrideInBytes, dInt32 count) const;
 
 #ifndef _NEWTON_USE_DOUBLE
-	void TransformTriplex (dFloat64* const dst, dInt32 dstStrideInBytes,
-						   const dFloat64* const src, dInt32 srcStrideInBytes, dInt32 count) const;
+	D_CORE_API void TransformTriplex (
+		dFloat64* const dst, dInt32 dstStrideInBytes,
+		const dFloat64* const src, dInt32 srcStrideInBytes, dInt32 count) const;
 
-	void TransformTriplex (dFloat64* const dst, dInt32 dstStrideInBytes,
-						   const dFloat32* const src, dInt32 srcStrideInBytes, dInt32 count) const;
+	D_CORE_API void TransformTriplex (
+		dFloat64* const dst, dInt32 dstStrideInBytes,
+		const dFloat32* const src, dInt32 srcStrideInBytes, dInt32 count) const;
 #endif
 
 	bool TestIdentity() const;
 	bool TestSymetric3x3() const;
 	bool TestOrthogonal(dFloat32 tol = dFloat32 (1.0e-4f)) const;
 
-	dMatrix Multiply3X3 (const dMatrix &B) const;
-	dMatrix operator* (const dMatrix &B) const;
+	D_CORE_API dMatrix Multiply3X3 (const dMatrix &B) const;
+	D_CORE_API dMatrix operator* (const dMatrix &B) const;
 
 	// these function can only be called when dMatrix is a PDS matrix
 	//void EigenVectors ();
-	dVector EigenVectors ();
-	void PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMatrix& stretchAxis) const;
+	D_CORE_API dVector EigenVectors ();
+	D_CORE_API void PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMatrix& stretchAxis) const;
 
 	// constructor for polar composition
-	dMatrix (const dMatrix& transformMatrix, const dVector& scale, const dMatrix& stretchAxis);
+	D_CORE_API dMatrix (const dMatrix& transformMatrix, const dVector& scale, const dMatrix& stretchAxis);
 
 	dVector m_front;
 	dVector m_up;

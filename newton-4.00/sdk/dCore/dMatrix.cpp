@@ -25,12 +25,12 @@
 #include "dQuaternion.h"
 #include "dGeneralMatrix.h"
 
-const dMatrix& dgGetIdentityMatrix()
+const dMatrix& dGetIdentityMatrix()
 {
 	return dMatrix::m_identityMatrix;
 }
 
-const dMatrix& dgGetZeroMatrix ()
+const dMatrix& dGetZeroMatrix ()
 {
 	return dMatrix::m_zeroMatrix;
 }
@@ -170,7 +170,7 @@ void dMatrix::TransformBBox (const dVector& p0local, const dVector& p1local, dVe
 dMatrix dMatrix::Inverse4x4 () const
 {
 	dMatrix tmp (*this);
-	dMatrix inv (dgGetIdentityMatrix());
+	dMatrix inv (dGetIdentityMatrix());
 	for (dInt32 i = 0; i < 4; i++) 
 	{
 		dFloat32 pivot = dAbs(tmp[i][i]);
@@ -440,7 +440,7 @@ void dMatrix::PolarDecomposition (dMatrix& transformMatrix, dVector& scale, dMat
 dVector dMatrix::EigenVectors()
 {
 	dMatrix& mat = *this;
-	dMatrix eigenVectors(dgGetIdentityMatrix());
+	dMatrix eigenVectors(dGetIdentityMatrix());
 
 	dVector d(mat[0][0], mat[1][1], mat[2][2], dFloat32(0.0f));
 	dVector b(d);
@@ -531,7 +531,7 @@ dVector dMatrix::EigenVectors()
 dVector dMatrix::EigenVectors ()
 {
 	dMatrix matrix (*this);
-	dMatrix eigenVectors(dgGetIdentityMatrix());
+	dMatrix eigenVectors(dGetIdentityMatrix());
 
 #if 0
 	if (dAbs(m_front.m_z) > dFloat32(1.0e-6f)) {
@@ -544,7 +544,7 @@ dVector dMatrix::EigenVectors ()
 		dVector w(u - v);
 		w = w.Normalize();
 		eigenVectors = dMatrix(w, w);
-		dMatrix ident(dgGetIdentityMatrix());
+		dMatrix ident(dGetIdentityMatrix());
 		eigenVectors[0] = ident[0] - eigenVectors[0] * dVector::m_two;
 		eigenVectors[1] = ident[1] - eigenVectors[1] * dVector::m_two;
 		eigenVectors[2] = ident[2] - eigenVectors[2] * dVector::m_two;
@@ -653,7 +653,7 @@ dVector dMatrix::EigenVectors ()
 	}
 
 	#ifdef _DEBUG
-		dMatrix diag(dgGetIdentityMatrix());
+		dMatrix diag(dGetIdentityMatrix());
 		diag[0][0] = d[0];
 		diag[1][1] = d[1];
 		diag[2][2] = d[2];

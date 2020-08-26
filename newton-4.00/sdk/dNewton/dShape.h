@@ -162,7 +162,7 @@ class dShapeInfo
 		dInt32 m_childrenProxyCount;
 	};
 
-	dgMatrix m_offsetMatrix;
+	dMatrix m_offsetMatrix;
 	dgInstanceMaterial m_collisionMaterial;
 	dInt32 m_collisionType;
 	union 
@@ -236,21 +236,20 @@ class dShape: public dClassAlloc
 	virtual dInt32 CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const = 0;
 
 	virtual void SetCollisionBBox (const dVector& p0, const dVector& p1) = 0;
-	virtual void CalcAABB (const dgMatrix& matrix, dVector& p0, dVector& p1) const = 0;
+	virtual void CalcAABB (const dMatrix& matrix, dVector& p0, dVector& p1) const = 0;
 
-	virtual void DebugCollision  (const dgMatrix& matrix, dShape::OnDebugCollisionMeshCallback callback, void* const userData) const = 0;
+	virtual void DebugCollision  (const dMatrix& matrix, dShape::OnDebugCollisionMeshCallback callback, void* const userData) const = 0;
 	virtual dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const = 0;
 
 	virtual dFloat32 GetVolume () const = 0;
 	
 	virtual void MassProperties ();
-	virtual dFloat32 CalculateMassProperties (const dgMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const {dAssert (0); return 0;}
-	virtual dgMatrix CalculateInertiaAndCenterOfMass (const dgMatrix& m_alignMatrix, const dVector& localScale, const dgMatrix& matrix) const {dAssert (0); return dgGetZeroMatrix();}
+	virtual dFloat32 CalculateMassProperties (const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const {dAssert (0); return 0;}
 
 	virtual dFloat32 GetBoxMinRadius () const = 0; 
 	virtual dFloat32 GetBoxMaxRadius () const = 0; 
 	
-	virtual dVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dVector& globalPlane, const dShapeInstance& parentScale) const = 0;
+	virtual dVector CalculateVolumeIntegral (const dMatrix& globalMatrix, const dVector& globalPlane, const dShapeInstance& parentScale) const = 0;
 	virtual void Serialize(dgSerialize callback, void* const userData) const = 0;
 
 	virtual void GetCollisionInfo(dShapeInfo* const info) const;
@@ -273,16 +272,18 @@ class dShape: public dClassAlloc
 	dInt32 GetRefCount() const;
 	virtual dInt32 Release() const;
 
+	virtual dShape* GetAsShape() { return this; }
+	virtual dShapeBox* GetAsShapeBox() { return nullptr; }
+	virtual dShapeNull* GetAsShapeNull() { return nullptr; }
+	virtual dShapeConvex* GetAsShapeConvex() { return nullptr; }
+
+	virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
+
 	protected:
 	D_NEWTON_API dShape(dShapeID id);
 	D_NEWTON_API dShape (const dShape& source);
 //	D_NEWTON_API dShape (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revision);
 	D_NEWTON_API virtual ~dShape();
-
-	virtual dShape* GetAsShape() { return this; }
-	virtual dShapeBox* GetAsShapeBox() { return nullptr; }
-	virtual dShapeNull* GetAsShapeNull() { return nullptr; }
-	virtual dShapeConvex* GetAsShapeConvex() { return nullptr; }
 
 	//void SetSignature (dInt32 signature);
 	//virtual dInt32 CalculateSignature () const = 0;
@@ -307,62 +308,62 @@ class dShape: public dClassAlloc
 } D_GCC_VECTOR_ALIGNMENT;
 
 /*
-D_INLINE dShapeID dShape::GetCollisionPrimityType () const
+inline dShapeID dShape::GetCollisionPrimityType () const
 {
 	return m_collisionId;
 }
 
-D_INLINE dUnsigned32 dShape::GetSignature () const
+inline dUnsigned32 dShape::GetSignature () const
 {
 	return m_signature;
 }
 
-D_INLINE void dShape::SetSignature (dInt32 signature)
+inline void dShape::SetSignature (dInt32 signature)
 {
 	m_signature = dUnsigned32 (signature);
 }
 
-D_INLINE dgMemoryAllocator* dShape::GetAllocator() const
+inline dgMemoryAllocator* dShape::GetAllocator() const
 {
 	return m_allocator;
 }
 
 
-D_INLINE dFloat32 dShape::GetUmbraClipSize () const
+inline dFloat32 dShape::GetUmbraClipSize () const
 {
 //	return GetMax (GetBoxMaxRadius() * dFloat32 (2.0f) + dFloat32 (1.0f), dFloat32 (16.0f));
 	return dFloat32 (3.0f) * GetBoxMaxRadius();
 }
 
-D_INLINE dInt32 dShape::GetConvexVertexCount() const 
+inline dInt32 dShape::GetConvexVertexCount() const 
 { 
 	return 0;
 }
 
-D_INLINE dInt32 dShape::IsType (dgRTTI type) const 
+inline dInt32 dShape::IsType (dgRTTI type) const 
 {
 	return type & m_rtti;
 }
 
-D_INLINE dVector dShape::GetObbSize() const
+inline dVector dShape::GetObbSize() const
 {
 	return m_boxSize;
 }
 
-D_INLINE const dVector& dShape::GetObbOrigin() const
+inline const dVector& dShape::GetObbOrigin() const
 {
 	return m_boxOrigin;
 }
 */
 
 
-D_INLINE const dShape* dShape::AddRef() const
+inline const dShape* dShape::AddRef() const
 {
 	m_refCount.fetch_add(1);
 	return this;
 }
 
-D_INLINE dInt32 dShape::Release() const
+inline dInt32 dShape::Release() const
 {
 	dInt32 count = m_refCount.fetch_add(-1);
 	dAssert(count >= 1);
@@ -373,10 +374,17 @@ D_INLINE dInt32 dShape::Release() const
 	return count;
 }
 
-D_INLINE dInt32 dShape::GetRefCount() const
+inline dInt32 dShape::GetRefCount() const
 {
 	return m_refCount.load();
 }
+
+inline dMatrix dShape::CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const
+{
+	dAssert(0);
+	return dGetZeroMatrix();
+}
+
 
 #endif 
 

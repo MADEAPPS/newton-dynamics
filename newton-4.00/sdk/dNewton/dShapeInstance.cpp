@@ -48,22 +48,22 @@
 //////////////////////////////////////////////////////////////////////
 
 
-dgVector dShapeInstance::m_padding (DG_MAX_COLLISION_AABB_PADDING, DG_MAX_COLLISION_AABB_PADDING, DG_MAX_COLLISION_AABB_PADDING, dgFloat32 (0.0f));
+dgVector dShapeInstance::m_padding (DG_MAX_COLLISION_AABB_PADDING, DG_MAX_COLLISION_AABB_PADDING, DG_MAX_COLLISION_AABB_PADDING, dFloat32 (0.0f));
 
 
 dShapeInstance::dShapeInstance(const dgWorld* const world, const dgCollision* const childCollision, dgInt32 shapeID, const dgMatrix& matrix)
 	:m_globalMatrix(matrix)
 	,m_localMatrix (matrix)
-	,m_aligmentMatrix (dgGetIdentityMatrix())
-	,m_scale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
-	,m_invScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
-	,m_maxScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
+	,m_aligmentMatrix (dGetIdentityMatrix())
+	,m_scale(dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (0.0f))
+	,m_invScale(dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (0.0f))
+	,m_maxScale(dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (0.0f))
 	,m_material()
 	,m_world(world)
 	,m_childShape (childCollision)
 	,m_subCollisionHandle(NULL)
 	,m_parent(NULL)
-	,m_skinThickness(dgFloat32 (0.0f))
+	,m_skinThickness(dFloat32 (0.0f))
 	,m_collisionMode(1)
 	,m_refCount(1)
 	,m_scaleType(m_unit)
@@ -74,18 +74,18 @@ dShapeInstance::dShapeInstance(const dgWorld* const world, const dgCollision* co
 }
 
 dShapeInstance::dShapeInstance(const dgWorld* const constWorld, dgDeserialize serialize, void* const userData, dgInt32 revisionNumber)
-	:m_globalMatrix(dgGetIdentityMatrix())
-	,m_localMatrix (dgGetIdentityMatrix())
-	,m_aligmentMatrix (dgGetIdentityMatrix())
-	,m_scale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
-	,m_invScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
-	,m_maxScale(dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f))
+	:m_globalMatrix(dGetIdentityMatrix())
+	,m_localMatrix (dGetIdentityMatrix())
+	,m_aligmentMatrix (dGetIdentityMatrix())
+	,m_scale(dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (0.0f))
+	,m_invScale(dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (0.0f))
+	,m_maxScale(dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (0.0f))
 	,m_material()
 	,m_world(constWorld)
 	,m_childShape (NULL)
 	,m_subCollisionHandle(NULL)
 	,m_parent(NULL)
-	,m_skinThickness(dgFloat32 (0.0f))
+	,m_skinThickness(dFloat32 (0.0f))
 	,m_collisionMode(1)
 	,m_refCount(1)
 	,m_scaleType(m_unit)
@@ -276,41 +276,41 @@ void dShapeInstance::Serialize(dgSerialize serialize, void* const userData, bool
 
 void dShapeInstance::SetScale (const dgVector& scale)
 {
-	dgFloat32 scaleX = dgAbs (scale.m_x);
-	dgFloat32 scaleY = dgAbs (scale.m_y);
-	dgFloat32 scaleZ = dgAbs (scale.m_z);
-	dgAssert (scaleX > dgFloat32 (0.0f));
-	dgAssert (scaleY > dgFloat32 (0.0f));
-	dgAssert (scaleZ > dgFloat32 (0.0f));
+	dFloat32 scaleX = dgAbs (scale.m_x);
+	dFloat32 scaleY = dgAbs (scale.m_y);
+	dFloat32 scaleZ = dgAbs (scale.m_z);
+	dgAssert (scaleX > dFloat32 (0.0f));
+	dgAssert (scaleY > dFloat32 (0.0f));
+	dgAssert (scaleZ > dFloat32 (0.0f));
 
 	if (IsType(dgCollision::dgCollisionCompound_RTTI)) {
 		dgAssert (m_scaleType == m_unit);
 		dgCollisionCompound* const compound = (dgCollisionCompound*) m_childShape;
 		compound->ApplyScale(scale);
-	} else if ((dgAbs (scaleX - scaleY) < dgFloat32 (1.0e-4f)) && (dgAbs (scaleX - scaleZ) < dgFloat32 (1.0e-4f))) {
-		if ((dgAbs (scaleX - dgFloat32 (1.0f)) < dgFloat32 (1.0e-4f))) {
+	} else if ((dgAbs (scaleX - scaleY) < dFloat32 (1.0e-4f)) && (dgAbs (scaleX - scaleZ) < dFloat32 (1.0e-4f))) {
+		if ((dgAbs (scaleX - dFloat32 (1.0f)) < dFloat32 (1.0e-4f))) {
 			m_scaleType = m_unit;
-			m_scale	= dgVector (dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (1.0f), dgFloat32 (0.0f));	
+			m_scale	= dgVector (dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (0.0f));	
 			m_maxScale = m_scale;	
 			m_invScale = m_scale;
 		} else {
 			m_scaleType = m_uniform;
-			m_scale	= dgVector (scaleX, scaleX, scaleX, dgFloat32 (0.0f));	
+			m_scale	= dgVector (scaleX, scaleX, scaleX, dFloat32 (0.0f));	
 			m_maxScale = m_scale;	
-			m_invScale = dgVector (dgFloat32 (1.0f) / scaleX, dgFloat32 (1.0f) / scaleX, dgFloat32 (1.0f) / scaleX, dgFloat32 (0.0f));	
+			m_invScale = dgVector (dFloat32 (1.0f) / scaleX, dFloat32 (1.0f) / scaleX, dFloat32 (1.0f) / scaleX, dFloat32 (0.0f));	
 		}
 	} else {
 		m_scaleType = m_nonUniform;
 		m_maxScale = dgMax(scaleX, scaleY, scaleZ);
-		m_scale	= dgVector (scaleX, scaleY, scaleZ, dgFloat32 (0.0f));	
-		m_invScale = dgVector (dgFloat32 (1.0f) / scaleX, dgFloat32 (1.0f) / scaleY, dgFloat32 (1.0f) / scaleZ, dgFloat32 (0.0f));	
+		m_scale	= dgVector (scaleX, scaleY, scaleZ, dFloat32 (0.0f));	
+		m_invScale = dgVector (dFloat32 (1.0f) / scaleX, dFloat32 (1.0f) / scaleY, dFloat32 (1.0f) / scaleZ, dFloat32 (0.0f));	
 	}
 }
 
 void dShapeInstance::SetGlobalScale (const dgVector& scale)
 {
 	// calculate current matrix
-	dgMatrix matrix(dgGetIdentityMatrix());
+	dgMatrix matrix(dGetIdentityMatrix());
 	matrix[0][0] = m_scale.m_x;
 	matrix[1][1] = m_scale.m_y;
 	matrix[2][2] = m_scale.m_z;
@@ -318,16 +318,16 @@ void dShapeInstance::SetGlobalScale (const dgVector& scale)
 
 	// extract the original local matrix
 	dgMatrix transpose (matrix.Transpose());
-	dgVector globalScale (dgSqrt (transpose[0].DotProduct(transpose[0]).GetScalar()), dgSqrt (transpose[1].DotProduct(transpose[1]).GetScalar()), dgSqrt (transpose[2].DotProduct(transpose[2]).GetScalar()), dgFloat32 (1.0f));
-	dgVector invGlobalScale (dgFloat32 (1.0f) / globalScale.m_x, dgFloat32 (1.0f) / globalScale.m_y, dgFloat32 (1.0f) / globalScale.m_z, dgFloat32 (1.0f));
+	dgVector globalScale (dgSqrt (transpose[0].DotProduct(transpose[0]).GetScalar()), dgSqrt (transpose[1].DotProduct(transpose[1]).GetScalar()), dgSqrt (transpose[2].DotProduct(transpose[2]).GetScalar()), dFloat32 (1.0f));
+	dgVector invGlobalScale (dFloat32 (1.0f) / globalScale.m_x, dFloat32 (1.0f) / globalScale.m_y, dFloat32 (1.0f) / globalScale.m_z, dFloat32 (1.0f));
 	dgMatrix localMatrix (m_aligmentMatrix.Transpose() * m_localMatrix);
 	localMatrix.m_posit = matrix.m_posit * invGlobalScale;
-	dgAssert (localMatrix.m_posit.m_w == dgFloat32 (1.0f));
+	dgAssert (localMatrix.m_posit.m_w == dFloat32 (1.0f));
 
-	if ((dgAbs (scale[0] - scale[1]) < dgFloat32 (1.0e-4f)) && (dgAbs (scale[0] - scale[2]) < dgFloat32 (1.0e-4f))) {
+	if ((dgAbs (scale[0] - scale[1]) < dFloat32 (1.0e-4f)) && (dgAbs (scale[0] - scale[2]) < dFloat32 (1.0e-4f))) {
 		m_localMatrix = localMatrix;
 		m_localMatrix.m_posit = m_localMatrix.m_posit * scale | dgVector::m_wOne;
-		m_aligmentMatrix = dgGetIdentityMatrix();
+		m_aligmentMatrix = dGetIdentityMatrix();
 		SetScale (scale);
 	} else {
 		
@@ -336,7 +336,7 @@ void dShapeInstance::SetGlobalScale (const dgVector& scale)
 		localMatrix[1] = localMatrix[1] * scale;
 		localMatrix[2] = localMatrix[2] * scale;
 		localMatrix[3] = localMatrix[3] * scale;
-		localMatrix[3][3] = dgFloat32 (1.0f);
+		localMatrix[3][3] = dFloat32 (1.0f);
 
 		// decompose into to align * scale * local
 		localMatrix.PolarDecomposition (m_localMatrix, m_scale, m_aligmentMatrix);
@@ -347,7 +347,7 @@ void dShapeInstance::SetGlobalScale (const dgVector& scale)
 		dgAssert (m_localMatrix.TestOrthogonal());
 		dgAssert (m_aligmentMatrix.TestOrthogonal());
 
-//dgMatrix xxx1 (dgGetIdentityMatrix());
+//dgMatrix xxx1 (dGetIdentityMatrix());
 //xxx1[0][0] = m_scale.m_x;
 //xxx1[1][1] = m_scale.m_y;
 //xxx1[2][2] = m_scale.m_z;
@@ -355,13 +355,13 @@ void dShapeInstance::SetGlobalScale (const dgVector& scale)
 
 		bool isIdentity = true;
 		for (dgInt32 i = 0; i < 3; i ++) {
-			isIdentity &= dgAbs (m_aligmentMatrix[i][i] - dgFloat32 (1.0f)) < dgFloat32 (1.0e-5f);
-			isIdentity &= dgAbs (m_aligmentMatrix[3][i]) < dgFloat32 (1.0e-5f);
+			isIdentity &= dgAbs (m_aligmentMatrix[i][i] - dFloat32 (1.0f)) < dFloat32 (1.0e-5f);
+			isIdentity &= dgAbs (m_aligmentMatrix[3][i]) < dFloat32 (1.0e-5f);
 		}
 		m_scaleType = isIdentity ? m_nonUniform : m_global;
 
 		m_maxScale = dgMax(m_scale[0], m_scale[1], m_scale[2]);
-		m_invScale = dgVector (dgFloat32 (1.0f) / m_scale[0], dgFloat32 (1.0f) / m_scale[1], dgFloat32 (1.0f) / m_scale[2], dgFloat32 (0.0f));	
+		m_invScale = dgVector (dFloat32 (1.0f) / m_scale[0], dFloat32 (1.0f) / m_scale[1], dFloat32 (1.0f) / m_scale[2], dFloat32 (0.0f));	
 	}
 }
 
@@ -369,10 +369,10 @@ void dShapeInstance::SetGlobalScale (const dgVector& scale)
 void dShapeInstance::SetLocalMatrix (const dgMatrix& matrix)
 {
 	m_localMatrix = matrix;
-	m_localMatrix[0][3] = dgFloat32 (0.0f);
-	m_localMatrix[1][3] = dgFloat32 (0.0f);
-	m_localMatrix[2][3] = dgFloat32 (0.0f);
-	m_localMatrix[3][3] = dgFloat32 (1.0f);
+	m_localMatrix[0][3] = dFloat32 (0.0f);
+	m_localMatrix[1][3] = dFloat32 (0.0f);
+	m_localMatrix[2][3] = dFloat32 (0.0f);
+	m_localMatrix[3][3] = dFloat32 (1.0f);
 	dgAssert(m_localMatrix.TestOrthogonal());
 }
 
@@ -382,21 +382,10 @@ void dShapeInstance::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebu
 	m_childShape->DebugCollision (GetScaledTransform(matrix), callback, userData);
 }
 
-
-dgMatrix dShapeInstance::CalculateInertia () const
-{
-	if (IsType(dgCollision::dgCollisionMesh_RTTI)) {
-		return dgGetZeroMatrix();
-	} else {
-		return m_childShape->CalculateInertiaAndCenterOfMass (m_aligmentMatrix, m_scale, m_localMatrix);
-	}
-}
-
-
 dgInt32 dShapeInstance::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
 {
 	dgInt32 count = 0;
-	dgAssert(normal.m_w == dgFloat32 (0.0f));
+	dgAssert(normal.m_w == dFloat32 (0.0f));
 	switch (m_scaleType)
 	{
 		case m_unit:
@@ -482,18 +471,18 @@ void dShapeInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p
 		}
 	}
 
-	dgAssert (p0.m_w == dgFloat32 (0.0f));
-	dgAssert (p1.m_w == dgFloat32 (0.0f));
+	dgAssert (p0.m_w == dFloat32 (0.0f));
+	dgAssert (p1.m_w == dFloat32 (0.0f));
 }
 
-dgFloat32 dShapeInstance::RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const
+dFloat32 dShapeInstance::RayCast (const dgVector& localP0, const dgVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const
 {
 	if (!preFilter || preFilter(body, this, userData)) {
 		switch(m_scaleType)
 		{
 			case m_unit:
 			{
-				dgFloat32 t = m_childShape->RayCast (localP0, localP1, maxT, contactOut, body, userData, preFilter);
+				dFloat32 t = m_childShape->RayCast (localP0, localP1, maxT, contactOut, body, userData, preFilter);
 				if (t <= maxT) {
 					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
 						contactOut.m_shapeId0 = GetUserDataID();
@@ -511,7 +500,7 @@ dgFloat32 dShapeInstance::RayCast (const dgVector& localP0, const dgVector& loca
 			{
 				dgVector p0 (localP0 * m_invScale);
 				dgVector p1 (localP1 * m_invScale);
-				dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData, preFilter);
+				dFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData, preFilter);
 				if (t <= maxT) {
 					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
 						contactOut.m_shapeId0 = GetUserDataID();
@@ -529,7 +518,7 @@ dgFloat32 dShapeInstance::RayCast (const dgVector& localP0, const dgVector& loca
 			{
 				dgVector p0 (localP0 * m_invScale);
 				dgVector p1 (localP1 * m_invScale);
-				dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData, preFilter);
+				dFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData, preFilter);
 				if (t <= maxT) {
 					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
 						contactOut.m_shapeId0 = GetUserDataID();
@@ -550,7 +539,7 @@ dgFloat32 dShapeInstance::RayCast (const dgVector& localP0, const dgVector& loca
 			{
 				dgVector p0 (m_aligmentMatrix.UntransformVector (localP0 * m_invScale));
 				dgVector p1 (m_aligmentMatrix.UntransformVector (localP1 * m_invScale));
-				dgFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData, preFilter);
+				dFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData, preFilter);
 				if (t <= maxT) {
 					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
 						contactOut.m_shapeId0 = GetUserDataID();
@@ -567,7 +556,7 @@ dgFloat32 dShapeInstance::RayCast (const dgVector& localP0, const dgVector& loca
 			}
 		}
 	}
-	return dgFloat32 (1.2f);
+	return dFloat32 (1.2f);
 }
 
 void dShapeInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const
@@ -632,19 +621,21 @@ void dShapeInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* co
 
 dShapeInstance::dShapeInstance(dShape* const shape)
 	:dClassAlloc()
+	,m_globalMatrix(dGetIdentityMatrix())
+	,m_localMatrix(dGetIdentityMatrix())
+	,m_aligmentMatrix(dGetIdentityMatrix())
+	,m_scale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
+	,m_invScale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
+	,m_maxScale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
 	,m_shape(shape->AddRef())
-	//,m_globalMatrix(dgGetIdentityMatrix())
-	//,m_localMatrix(dgGetIdentityMatrix())
-	//,m_aligmentMatrix(dgGetIdentityMatrix())
-	//,m_scale(dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(0.0f))
-	//,m_invScale(dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(0.0f))
-	//,m_maxScale(dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(1.0f), dgFloat32(0.0f))
+	,m_ownerBody(nullptr)
+	
 	//,m_material()
 	//,m_world(NULL)
 	//,m_childShape(NULL)
 	//,m_subCollisionHandle(NULL)
 	//,m_parent(NULL)
-	//,m_skinThickness(dgFloat32(0.0f))
+	//,m_skinThickness(dFloat32(0.0f))
 	//,m_collisionMode(1)
 	//,m_refCount(1)
 	//,m_scaleType(m_unit)
@@ -654,7 +645,14 @@ dShapeInstance::dShapeInstance(dShape* const shape)
 
 dShapeInstance::dShapeInstance(const dShapeInstance& instance)
 	:dClassAlloc()
+	,m_globalMatrix(instance.m_globalMatrix)
+	,m_localMatrix(instance.m_localMatrix)
+	,m_aligmentMatrix(instance.m_aligmentMatrix)
+	,m_scale(instance.m_scale)
+	,m_invScale(instance.m_invScale)
+	,m_maxScale(instance.m_maxScale)
 	,m_shape(instance.m_shape->AddRef())
+	,m_ownerBody(instance.m_ownerBody)
 	//,m_globalMatrix(instance.m_globalMatrix)
 	//,m_localMatrix(instance.m_localMatrix)
 	//,m_aligmentMatrix(instance.m_aligmentMatrix)
@@ -674,7 +672,6 @@ dShapeInstance::dShapeInstance(const dShapeInstance& instance)
 {
 }
 
-
 dShapeInstance::~dShapeInstance()
 {
 //	if (m_world->m_onCollisionInstanceDestruction && m_isExternal) {
@@ -685,9 +682,30 @@ dShapeInstance::~dShapeInstance()
 	m_shape->Release();
 }
 
-dShapeInstance& dShapeInstance::operator=(const dShapeInstance& src)
+dShapeInstance& dShapeInstance::operator=(const dShapeInstance& instance)
 {
+	m_globalMatrix = instance.m_globalMatrix;
+	m_localMatrix = instance.m_localMatrix;
+	m_aligmentMatrix = instance.m_aligmentMatrix;
+	m_scale = instance.m_scale;
+	m_invScale = instance.m_invScale;
+	m_maxScale = instance.m_maxScale;
+
 	m_shape->Release();
-	m_shape = src.m_shape->AddRef();
+	m_shape = instance.m_shape->AddRef();
+	m_ownerBody = instance.m_ownerBody;
 	return *this;
+}
+
+dMatrix dShapeInstance::CalculateInertia() const
+{
+	dShape* const shape = (dShape*)m_shape;
+	if (shape->GetAsShapeNull() || !shape->GetAsShapeConvex()) 
+	{
+		return dGetZeroMatrix();
+	}
+	else 
+	{
+		return m_shape->CalculateInertiaAndCenterOfMass(m_aligmentMatrix, m_scale, m_localMatrix);
+	}
 }

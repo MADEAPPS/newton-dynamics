@@ -58,9 +58,11 @@ void CreateBodyList(dNewton& newton)
 	dShapeInstance box(new dShapeBox(1.0f, 1.0f, 1.0f));
 	for (int i = 0; i < 2000; i++)
 	{
-		dBody* const body = new dDynamicBody();
+		dDynamicBody* const body = new dDynamicBody();
 
 		body->SetCollisionShape(box);
+		body->SetMassMatrix(10.0f, box);
+
 		newton.AddBody(body);
 	}
 }

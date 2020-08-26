@@ -26,6 +26,9 @@
 
 #include "dShape.h"
 
+class dBody;
+
+D_MSC_VECTOR_ALIGNMENT
 class dShapeInstance: public dClassAlloc
 {
 	public:
@@ -47,6 +50,7 @@ class dShapeInstance: public dClassAlloc
 
 	const dShape* GetShape() const { return m_shape; }
 
+	D_NEWTON_API dMatrix CalculateInertia() const;
 #if 0
 	dShapeInstance* AddRef ();
 	dInt32 Release ();
@@ -110,8 +114,7 @@ class dShapeInstance: public dClassAlloc
 
 	dFloat32 GetBoxMinRadius () const; 
 	dFloat32 GetBoxMaxRadius () const; 
-
-	dMatrix CalculateInertia () const;
+	
 	dMatrix GetScaledTransform(const dMatrix& matrix) const;
 	void DebugCollision  (const dMatrix& matrix, dShape::OnDebugCollisionMeshCallback callback, void* const userData) const;
 
@@ -134,12 +137,7 @@ class dShapeInstance: public dClassAlloc
 
 	void CalculateImplicitContacts(dInt32 count, dgContactPoint* const contactPoints) const;
 
-	dMatrix m_globalMatrix;
-	dMatrix m_localMatrix;
-	dMatrix m_aligmentMatrix;
-	dVector m_scale;
-	dVector m_invScale;
-	dVector m_maxScale;
+	
 	dShapeInfo::dgInstanceMaterial m_material;
 	const dgWorld* m_world;
 	const dShape* m_childShape;
@@ -154,8 +152,16 @@ class dShapeInstance: public dClassAlloc
 	static dVector m_padding;
 #endif
 
+	dMatrix m_globalMatrix;
+	dMatrix m_localMatrix;
+	dMatrix m_aligmentMatrix;
+	dVector m_scale;
+	dVector m_invScale;
+	dVector m_maxScale;
+
 	const dShape* m_shape;
-};
+	const dBody* m_ownerBody;
+} D_GCC_VECTOR_ALIGNMENT;
 
 #if 0
 D_INLINE dShapeInstance::dShapeInstance(const dShapeInstance& meshInstance, const dShape* const shape)

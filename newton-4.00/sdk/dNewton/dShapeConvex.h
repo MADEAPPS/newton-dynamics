@@ -34,18 +34,9 @@ D_MSC_VECTOR_ALIGNMENT
 class dShapeConvex: public dShape
 {
 	public:
-/*
-	class dgConvexSimplexEdge
-	{
-		public:
-		dgConvexSimplexEdge* m_twin;
-		dgConvexSimplexEdge* m_next;
-		dgConvexSimplexEdge* m_prev;
-		dInt32 m_vertex;
-	};
-	
+/*	
 	virtual dInt32 GetConvexVertexCount() const { return m_vertexCount;}
-	virtual void CalcAABB (const dgMatrix& matrix, dVector& p0, dVector& p1) const;
+	virtual void CalcAABB (const dMatrix& matrix, dVector& p0, dVector& p1) const;
 	virtual dVector SupportVertex (const dVector& dir, dInt32* const vertexIndex) const;
 	virtual dInt32 CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 	virtual dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
@@ -53,16 +44,26 @@ class dShapeConvex: public dShape
 	bool IntesectionTest (dShapeParamProxy& proxy) const;
 */
 	protected:
+	class dConvexSimplexEdge
+	{
+		public:
+		dConvexSimplexEdge* m_twin;
+		dConvexSimplexEdge* m_next;
+		dConvexSimplexEdge* m_prev;
+		dInt32 m_vertex;
+	};
+
 	D_NEWTON_API dShapeConvex (dShapeID id);
 //	dShapeConvex (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
 	D_NEWTON_API ~dShapeConvex ();
 
 	virtual dShapeConvex* GetAsShapeConvex() { return this; }
 
+	D_NEWTON_API virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
 /*
 	virtual void SerializeLow(dgSerialize callback, void* const userData) const;
 
-	virtual dVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dVector& plane, const dShapeInstance& parentScale) const;
+	virtual dVector CalculateVolumeIntegral (const dMatrix& globalMatrix, const dVector& plane, const dShapeInstance& parentScale) const;
 	static void CalculateInertia (void *userData, int vertexCount, const dFloat32* const FaceArray, int faceId);
 
 	virtual dFloat32 GetVolume () const;
@@ -75,11 +76,10 @@ class dShapeConvex: public dShape
 	
 	void SetVolumeAndCG ();
 	bool SanityCheck (dgPolyhedra& hull) const;
-	virtual void DebugCollision  (const dgMatrix& matrix, dShape::OnDebugCollisionMeshCallback callback, void* const userData) const;
+	virtual void DebugCollision  (const dMatrix& matrix, dShape::OnDebugCollisionMeshCallback callback, void* const userData) const;
 
 	virtual void MassProperties ();
-	virtual dgMatrix CalculateInertiaAndCenterOfMass (const dgMatrix& m_alignMatrix, const dVector& localScale, const dgMatrix& matrix) const;
-	virtual dFloat32 CalculateMassProperties (const dgMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
+	virtual dFloat32 CalculateMassProperties (const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
 
 	bool SanityCheck(dInt32 count, const dVector& normal, dVector* const contactsOut) const;
 
@@ -87,19 +87,15 @@ class dShapeConvex: public dShape
 
 	virtual dVector SupportVertexSpecial (const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	virtual dVector SupportVertexSpecialProjectPoint (const dVector& point, const dVector& dir) const;
-	virtual const dgConvexSimplexEdge** GetVertexToEdgeMapping() const {return NULL;}
+	virtual const dConvexSimplexEdge** GetVertexToEdgeMapping() const {return NULL;}
 
-	dInt32 BuildCylinderCapPoly (dFloat32 radius, const dgMatrix& transform, dVector* const vertexOut) const;
+	dInt32 BuildCylinderCapPoly (dFloat32 radius, const dMatrix& transform, dVector* const vertexOut) const;
 	
-	dVector* m_vertex;
-	dgConvexSimplexEdge* m_simplex;
 	
 	dFloat32 m_boxMinRadius;
 	dFloat32 m_boxMaxRadius;
 	dFloat32 m_simplexVolume;
 	
-	dgUnsigned16 m_edgeCount;
-	dgUnsigned16 m_vertexCount;
 	
 	friend class dgWorld;
 	friend class dgBroadPhase;
@@ -107,6 +103,13 @@ class dShapeConvex: public dShape
 	friend class dShapeCompound;
 	friend class dShapeConvexModifier;
 */
+
+	dVector* m_vertex;
+	dConvexSimplexEdge* m_simplex;
+
+	dUnsigned16 m_edgeCount;
+	dUnsigned16 m_vertexCount;
+
 } D_GCC_VECTOR_ALIGNMENT;
 
 #endif 

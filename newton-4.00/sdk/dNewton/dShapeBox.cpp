@@ -22,21 +22,21 @@
 #include "dNewtonStdafx.h"
 #include "dShapeBox.h"
 
-#if 0
 dInt32 dShapeBox::m_initSimplex = 0;
-dShapeConvex::dgConvexSimplexEdge dShapeBox::m_edgeArray[24];
-dShapeConvex::dgConvexSimplexEdge* dShapeBox::m_edgeEdgeMap[12];
-dShapeConvex::dgConvexSimplexEdge* dShapeBox::m_vertexToEdgeMap[8];
-dInt32 dShapeBox::m_faces[][4] =
-{
-	{0, 1, 3, 2},
-	{0, 4, 5, 1},
-	{1, 5, 7, 3},
-	{0, 2, 6, 4},
-	{2, 3, 7, 6},
-	{4, 6, 7, 5},
-};
+dShapeConvex::dConvexSimplexEdge dShapeBox::m_edgeArray[24];
+//dShapeConvex::dConvexSimplexEdge* dShapeBox::m_edgeEdgeMap[12];
+//dShapeConvex::dConvexSimplexEdge* dShapeBox::m_vertexToEdgeMap[8];
+//dInt32 dShapeBox::m_faces[][4] =
+//{
+//	{0, 1, 3, 2},
+//	{0, 4, 5, 1},
+//	{1, 5, 7, 3},
+//	{0, 2, 6, 4},
+//	{2, 3, 7, 6},
+//	{4, 6, 7, 5},
+//};
 
+#if 0
 dVector dShapeBox::m_indexMark (dFloat32 (1.0f), dFloat32 (2.0f), dFloat32 (4.0f), dFloat32 (0.0f));
 dVector dShapeBox::m_penetrationTol (DG_PENETRATION_TOL, DG_PENETRATION_TOL, DG_PENETRATION_TOL, dFloat32 (0.0f));
 
@@ -218,9 +218,9 @@ void dShapeBox::Serialize(dgSerialize callback, void* const userData) const
 	callback (userData, &size, sizeof (dVector));
 }
 
-const dShapeConvex::dgConvexSimplexEdge** dShapeBox::GetVertexToEdgeMapping() const 
+const dShapeConvex::dConvexSimplexEdge** dShapeBox::GetVertexToEdgeMapping() const 
 {
-	return (const dgConvexSimplexEdge**)&m_vertexToEdgeMap[0];
+	return (const dConvexSimplexEdge**)&m_vertexToEdgeMap[0];
 }
 
 
@@ -230,7 +230,7 @@ dInt32 dShapeBox::CalculatePlaneIntersection (const dVector& normal, const dVect
 	dVector support[4];
 	dInt32 featureCount = 3;
 
-	const dgConvexSimplexEdge** const vertToEdgeMapping = GetVertexToEdgeMapping();
+	const dConvexSimplexEdge** const vertToEdgeMapping = GetVertexToEdgeMapping();
 	if (vertToEdgeMapping) {
 		dInt32 edgeIndex;
 		support[0] = SupportVertex (normal, &edgeIndex);
@@ -245,8 +245,8 @@ dInt32 dShapeBox::CalculatePlaneIntersection (const dVector& normal, const dVect
 				dPlane testPlane (normal, - (normal.DotProduct(support[0]).GetScalar()));
 
 				featureCount = 1;
-				const dgConvexSimplexEdge* const edge = vertToEdgeMapping[edgeIndex];
-				const dgConvexSimplexEdge* ptr = edge;
+				const dConvexSimplexEdge* const edge = vertToEdgeMapping[edgeIndex];
+				const dConvexSimplexEdge* ptr = edge;
 				do {
 					const dVector& p = m_vertex[ptr->m_twin->m_vertex];
 					dFloat32 test1 = testPlane.Evalue(p);
@@ -290,9 +290,9 @@ dInt32 dShapeBox::CalculatePlaneIntersection (const dVector& normal, const dVect
 				test[i] = plane.DotProduct(m_vertex[i] | dVector::m_wOne).m_x;
 			}
 
-			dgConvexSimplexEdge* edge = NULL;
+			dConvexSimplexEdge* edge = NULL;
 			for (dInt32 i = 0; i < dInt32 (sizeof (m_edgeEdgeMap) / sizeof (m_edgeEdgeMap[0])); i ++) {
-				dgConvexSimplexEdge* const ptr = m_edgeEdgeMap[i];
+				dConvexSimplexEdge* const ptr = m_edgeEdgeMap[i];
 				dFloat32 side0 = test[ptr->m_vertex];
 				dFloat32 side1 = test[ptr->m_twin->m_vertex];
 				if ((side0 * side1) < dFloat32 (0.0f)) {
@@ -307,8 +307,8 @@ dInt32 dShapeBox::CalculatePlaneIntersection (const dVector& normal, const dVect
 				}
 				dAssert (test[edge->m_vertex] > dFloat32 (0.0f));
 
-				dgConvexSimplexEdge* ptr = edge;
-				dgConvexSimplexEdge* firstEdge = NULL;
+				dConvexSimplexEdge* ptr = edge;
+				dConvexSimplexEdge* firstEdge = NULL;
 				dFloat32 side0 = test[edge->m_vertex];
 				do {
 					dAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dFloat32 (0.0f));
@@ -349,7 +349,7 @@ dInt32 dShapeBox::CalculatePlaneIntersection (const dVector& normal, const dVect
 						contactsOut[count] = m_vertex[ptr->m_vertex] - dp.Scale (t);
 						count ++;
 
-						dgConvexSimplexEdge* ptr1 = ptr->m_next;
+						dConvexSimplexEdge* ptr1 = ptr->m_next;
 						for (; ptr1 != ptr; ptr1 = ptr1->m_next) {
 							dInt32 index0 = ptr1->m_twin->m_vertex;
 							if (test[index0] >= dFloat32 (0.0f)) {
@@ -382,8 +382,8 @@ dShapeBox::dShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 
 dShapeBox::~dShapeBox()
 {
-//	dShapeConvex::m_simplex = NULL;
-//	dShapeConvex::m_vertex = NULL;
+	dShapeConvex::m_simplex = NULL;
+	dShapeConvex::m_vertex = NULL;
 }
 
 void dShapeBox::Init(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
@@ -397,7 +397,7 @@ void dShapeBox::Init(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 	m_size[1].m_y = -m_size[0].m_y;
 	m_size[1].m_z = -m_size[0].m_z;
 	m_size[1].m_w = dFloat32(0.0f);
-/*
+
 	m_edgeCount = 24;
 	m_vertexCount = 8;
 
@@ -413,69 +413,70 @@ void dShapeBox::Init(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 
 	dShapeConvex::m_vertex = m_vertex;
 	dShapeConvex::m_simplex = m_edgeArray;
-
-	if (!m_initSimplex) {
-		dgPolyhedra polyhedra(GetAllocator());
-		polyhedra.BeginFace();
-		for (dInt32 i = 0; i < 6; i++) {
-			polyhedra.AddFace(4, &m_faces[i][0]);
-		}
-		polyhedra.EndFace();
-
-		int index = 0;
-		dInt32 mark = polyhedra.IncLRU();;
-		dgPolyhedra::Iterator iter(polyhedra);
-		for (iter.Begin(); iter; iter++) {
-			dgEdge* const edge = &iter.GetNode()->GetInfo();
-			if (edge->m_mark != mark) {
-				dgEdge* ptr = edge;
-				do {
-					ptr->m_mark = mark;
-					ptr->m_userData = index;
-					index++;
-					ptr = ptr->m_twin->m_next;
-				} while (ptr != edge);
-			}
-		}
-		dAssert(index == 24);
-
-		polyhedra.IncLRU();
-		mark = polyhedra.IncLRU();
-		for (iter.Begin(); iter; iter++) {
-			dgEdge* const edge = &iter.GetNode()->GetInfo();
-			dgEdge *ptr = edge;
-			do {
-				ptr->m_mark = mark;
-				dgConvexSimplexEdge* const simplexPtr = &m_simplex[ptr->m_userData];
-				simplexPtr->m_vertex = ptr->m_incidentVertex;
-				simplexPtr->m_next = &m_simplex[ptr->m_next->m_userData];
-				simplexPtr->m_prev = &m_simplex[ptr->m_prev->m_userData];
-				simplexPtr->m_twin = &m_simplex[ptr->m_twin->m_userData];
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != edge);
-		}
-
-		for (iter.Begin(); iter; iter++) {
-			dgEdge* const edge = &iter.GetNode()->GetInfo();
-			m_vertexToEdgeMap[edge->m_incidentVertex] = &m_simplex[edge->m_userData];
-		}
-
-		dInt32 count = 0;
-		mark = polyhedra.IncLRU();
-		for (iter.Begin(); iter; iter++) {
-			dgEdge* const edge = &iter.GetNode()->GetInfo();
-			if (edge->m_mark != mark) {
-				edge->m_mark = mark;
-				edge->m_twin->m_mark = mark;
-				m_edgeEdgeMap[count] = &m_simplex[edge->m_userData];
-				count++;
-				dAssert(count <= 12);
-			}
-		}
-
-		m_initSimplex = 1;
+	
+	if (!m_initSimplex) 
+	{
+		dAssert(0);
+	//	dgPolyhedra polyhedra(GetAllocator());
+	//	polyhedra.BeginFace();
+	//	for (dInt32 i = 0; i < 6; i++) {
+	//		polyhedra.AddFace(4, &m_faces[i][0]);
+	//	}
+	//	polyhedra.EndFace();
+	//
+	//	int index = 0;
+	//	dInt32 mark = polyhedra.IncLRU();;
+	//	dgPolyhedra::Iterator iter(polyhedra);
+	//	for (iter.Begin(); iter; iter++) {
+	//		dgEdge* const edge = &iter.GetNode()->GetInfo();
+	//		if (edge->m_mark != mark) {
+	//			dgEdge* ptr = edge;
+	//			do {
+	//				ptr->m_mark = mark;
+	//				ptr->m_userData = index;
+	//				index++;
+	//				ptr = ptr->m_twin->m_next;
+	//			} while (ptr != edge);
+	//		}
+	//	}
+	//	dAssert(index == 24);
+	//
+	//	polyhedra.IncLRU();
+	//	mark = polyhedra.IncLRU();
+	//	for (iter.Begin(); iter; iter++) {
+	//		dgEdge* const edge = &iter.GetNode()->GetInfo();
+	//		dgEdge *ptr = edge;
+	//		do {
+	//			ptr->m_mark = mark;
+	//			dConvexSimplexEdge* const simplexPtr = &m_simplex[ptr->m_userData];
+	//			simplexPtr->m_vertex = ptr->m_incidentVertex;
+	//			simplexPtr->m_next = &m_simplex[ptr->m_next->m_userData];
+	//			simplexPtr->m_prev = &m_simplex[ptr->m_prev->m_userData];
+	//			simplexPtr->m_twin = &m_simplex[ptr->m_twin->m_userData];
+	//			ptr = ptr->m_twin->m_next;
+	//		} while (ptr != edge);
+	//	}
+	//
+	//	for (iter.Begin(); iter; iter++) {
+	//		dgEdge* const edge = &iter.GetNode()->GetInfo();
+	//		m_vertexToEdgeMap[edge->m_incidentVertex] = &m_simplex[edge->m_userData];
+	//	}
+	//
+	//	dInt32 count = 0;
+	//	mark = polyhedra.IncLRU();
+	//	for (iter.Begin(); iter; iter++) {
+	//		dgEdge* const edge = &iter.GetNode()->GetInfo();
+	//		if (edge->m_mark != mark) {
+	//			edge->m_mark = mark;
+	//			edge->m_twin->m_mark = mark;
+	//			m_edgeEdgeMap[count] = &m_simplex[edge->m_userData];
+	//			count++;
+	//			dAssert(count <= 12);
+	//		}
+	//	}
+	//
+	//	m_initSimplex = 1;
 	}
-
-	SetVolumeAndCG();
-*/
+	//
+	//SetVolumeAndCG();
 }

@@ -48,9 +48,73 @@ class dDynamicBody: public dBody
 	D_NEWTON_API dDynamicBody();
 	D_NEWTON_API virtual ~dDynamicBody ();
 	D_NEWTON_API virtual dDynamicBody* GetAsDynamicBody() { return this; }
-
 	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadID, dFloat32 timestep);
+
+	dVector GetMassMatrix() const;
+	void SetMassMatrix(const dVector& massMatrix);
+
+	void SetMassMatrix(dFloat32 mass, const dShapeInstance& shapeInstance);
+	void SetMassMatrix(dFloat32 Ixx, dFloat32 Iyy, dFloat32 Izz, dFloat32 mass);
+	void GetMassMatrix(dFloat32& Ixx, dFloat32& Iyy, dFloat32& Izz, dFloat32& mass);
+
+	private:
+	void SetMassMatrix(dFloat32 mass, const dMatrix& inertia);
+
+	protected:
+	dVector m_mass;
+	dVector m_invMass;
+	dVector m_externalForce;
+	dVector m_externalTorque;
+
 } D_GCC_VECTOR_ALIGNMENT;
+
+inline dVector dDynamicBody::GetMassMatrix() const
+{
+	return m_mass;
+}
+
+inline void dDynamicBody::GetMassMatrix(dFloat32& Ixx, dFloat32& Iyy, dFloat32& Izz, dFloat32& mass)
+{
+	Ixx = m_mass.m_x;
+	Iyy = m_mass.m_y;
+	Izz = m_mass.m_z;
+	mass = m_mass.m_w;
+}
+
+inline void dDynamicBody::SetMassMatrix(const dVector& massMatrix)
+{
+	dMatrix inertia(dGetZeroMatrix());
+	inertia[0][0] = massMatrix.m_x;
+	inertia[1][1] = massMatrix.m_y;
+	inertia[2][2] = massMatrix.m_z;
+	SetMassMatrix(massMatrix.m_w, inertia);
+}
+
+inline void dDynamicBody::SetMassMatrix(dFloat32 Ixx, dFloat32 Iyy, dFloat32 Izz, dFloat32 mass)
+{
+	SetMassMatrix(dVector(Ixx, Iyy, Izz, mass));
+}
+
+inline void dDynamicBody::SetMassMatrix(dFloat32 mass, const dShapeInstance& shapeInstance)
+{
+	dMatrix inertia(shapeInstance.CalculateInertia());
+
+	dVector origin(inertia.m_posit);
+	for (dInt32 i = 0; i < 3; i++) {
+		inertia[i] = inertia[i].Scale(mass);
+		//inertia[i][i] = (inertia[i][i] + origin[i] * origin[i]) * mass;
+		//for (dInt32 j = i + 1; j < 3; j ++) {
+		//	dgFloat32 crossIJ = origin[i] * origin[j];
+		//	inertia[i][j] = (inertia[i][j] + crossIJ) * mass;
+		//	inertia[j][i] = (inertia[j][i] + crossIJ) * mass;
+		//}
+	}
+
+	// although the engine fully supports asymmetric inertia, I will ignore cross inertia for now
+	dAssert(0);
+	//SetCentreOfMass(origin);
+	//SetMassMatrix(mass, inertia);
+}
 
 #endif 
 

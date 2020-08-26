@@ -43,7 +43,7 @@ class dShapeBox: public dShapeConvex
 	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
 	virtual dInt32 CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const;
-	virtual const dgConvexSimplexEdge** GetVertexToEdgeMapping() const;
+	virtual const dConvexSimplexEdge** GetVertexToEdgeMapping() const;
 	
 	virtual dInt32 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dVector& p0, const dVector& p1);
@@ -57,16 +57,16 @@ class dShapeBox: public dShapeConvex
 
 	dVector m_size[2];
 	dVector m_vertex[8];
-/*/
+
 	static dInt32 m_initSimplex;
-	static dInt32 m_faces[][4];
-	static dVector m_indexMark;
-	static dVector m_penetrationTol;
-	static dgConvexSimplexEdge m_edgeArray[];
-	static dgConvexSimplexEdge* m_edgeEdgeMap[];
-	static dgConvexSimplexEdge* m_vertexToEdgeMap[];
-	friend class dgWorld;
-*/
+	//static dInt32 m_faces[][4];
+	//static dVector m_indexMark;
+	//static dVector m_penetrationTol;
+	static dConvexSimplexEdge m_edgeArray[];
+	//static dConvexSimplexEdge* m_edgeEdgeMap[];
+	//static dConvexSimplexEdge* m_vertexToEdgeMap[];
+	//friend class dgWorld;
+
 } D_GCC_VECTOR_ALIGNMENT;
 
 #endif 

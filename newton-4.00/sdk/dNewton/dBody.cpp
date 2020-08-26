@@ -49,9 +49,10 @@ class dDummyCollision: public dShapeNull
 	}
 };
 
-
 dBody::dBody()
-	:m_shapeInstance(dDummyCollision::GetNullShape())
+	:m_veloc(dVector::m_zero)
+	,m_omega(dVector::m_zero)
+	,m_shapeInstance(dDummyCollision::GetNullShape())
 	,m_newton(nullptr)
 	,m_newtonNode(nullptr)
 {
