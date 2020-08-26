@@ -73,6 +73,7 @@ int main (int argc, const char * argv[])
 
 	newton.SetThreadCount(4);
 	newton.SetSubSteps(2);
+	newton.SetGravity(dVector(0.0f, -10.0f, 0.0f, 0.0f));
 
 	CreateBodyList(newton);
 
