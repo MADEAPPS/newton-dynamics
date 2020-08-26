@@ -55,12 +55,12 @@ static CheckMemoryLeaks checkLeaks;
 
 void CreateBodyList(dNewton& newton)
 {
-	dShapeInstance sphere(new dShapeNull());
+	dShapeInstance box(new dShapeBox(1.0f, 1.0f, 1.0f));
 	for (int i = 0; i < 2000; i++)
 	{
 		dBody* const body = new dDynamicBody();
 
-		body->SetCollisionShape(sphere);
+		body->SetCollisionShape(box);
 		newton.AddBody(body);
 	}
 }

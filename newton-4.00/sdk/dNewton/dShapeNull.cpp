@@ -19,19 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "dNewtonStdafx.h"
-#include "dBody.h"
-#include "dNewton.h"
 #include "dShapeNull.h"
-
-//#include "dgBody.h"
-//#include "dgContact.h"
-
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 #if 0
 dShapeNull::dShapeNull(dgMemoryAllocator* const allocator, dgUnsigned32 signature)
@@ -108,7 +97,7 @@ dVector dShapeNull::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const
 
 
 dShapeNull::dShapeNull()
-	:dShape(m_nullCollision)
+	:dShapeConvex(m_nullCollision)
 {
 	m_rtti |= dShapeNull_RTTI;
 	m_inertia = dVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f));

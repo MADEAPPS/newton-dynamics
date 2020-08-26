@@ -22,9 +22,9 @@
 #ifndef __D_SHAPE_NULL_H__ 
 #define __D_SHAPE_NULL_H__ 
 
-#include "dShape.h"
+#include "dShapeConvex.h"
 
-class dShapeNull: public dShape
+class dShapeNull: public dShapeConvex
 {
 	public:
 	D_NEWTON_API dShapeNull();

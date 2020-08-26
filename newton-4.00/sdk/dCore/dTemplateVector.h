@@ -123,12 +123,6 @@ class dTemplateVector: public dClassAlloc
 		return *this - A * B;
 	}
 
-	// return dot product
-	T DotProduct3 (const dTemplateVector<T>& A) const
-	{
-		return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
-	}
-
 	// return cross product
 	dTemplateVector<T> CrossProduct (const dTemplateVector<T>& B) const
 	{

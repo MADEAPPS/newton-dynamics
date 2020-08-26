@@ -293,12 +293,6 @@ public:
         return dVector (m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
     }
     
-    // return dot product
-    D_INLINE dFloat32 DotProduct3 (const dVector& A) const
-    {
-        return vec_hadd3(vec_mul(A.m_type, m_type)); // m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
-    }
-    
     // return cross product
     D_INLINE dVector CrossProduct (const dVector& B) const
     {
@@ -728,12 +722,6 @@ public:
 	D_INLINE dBigVector CompProduct3(const dBigVector& A) const
 	{
 		return dBigVector(m_x * A.m_x, m_y * A.m_y, m_z * A.m_z, A.m_w);
-	}
-
-	// return dot product
-	D_INLINE dFloat64 DotProduct3(const dBigVector& A) const
-	{
-		return  m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
 	}
 
 	// return cross product
@@ -1274,12 +1262,6 @@ class dVector: public dClassAlloc
 		return dVector(m_x * scale, m_y * scale, m_z * scale, m_w * scale);
 	}
 
-	// return dot product
-	D_INLINE dFloat32 DotProduct3(const dVector& A) const
-	{
-		return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
-	}
-
 	// return cross product
 	D_INLINE dVector CrossProduct(const dVector& B) const
 	{
@@ -1683,12 +1665,6 @@ class dBigVector: public dClassAlloc
 	D_INLINE dBigVector Scale(dFloat64 scale) const
 	{
 		return dBigVector(m_x * scale, m_y * scale, m_z * scale, m_w * scale);
-	}
-
-	// return dot product
-	D_INLINE dFloat64 DotProduct3(const dBigVector& A) const
-	{
-		return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
 	}
 
 	// return cross product

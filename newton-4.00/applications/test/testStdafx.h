@@ -19,7 +19,9 @@
 #include <dBody.h>
 #include <dShape.h>
 #include <dNewton.h>
+#include <dShapeBox.h>
 #include <dShapeNull.h>
+#include <dShapeConvex.h>
 #include <dDynamicBody.h>
 #include <dShapeInstance.h>
 

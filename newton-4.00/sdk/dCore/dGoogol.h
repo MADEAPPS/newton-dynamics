@@ -119,7 +119,7 @@ class dHugeVector: public dTemplateVector<dGoogol>
 	dGoogol EvaluePlane (const dHugeVector& point) const 
 	{
 		//return (point % (*this)) + m_w;
-		return DotProduct3(point) + m_w;
+		return DotProduct(point).GetScalar();
 	}
 
 #ifdef _DEBUG

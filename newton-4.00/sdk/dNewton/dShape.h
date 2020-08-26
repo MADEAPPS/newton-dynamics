@@ -189,7 +189,7 @@ enum dShapeID
 //	m_capsuleCollision,
 //	m_cylinderCollision,
 //	m_chamferCylinderCollision,
-//	m_boxCollision,
+	m_boxCollision,
 //	m_coneCollision,
 //	m_convexHullCollision,
 //	// this must be the last convex shape ID
@@ -209,7 +209,6 @@ enum dShapeID
 //	m_polygonCollision,
 //	m_lumpedMassCollision
 };
-
 
 D_MSC_VECTOR_ALIGNMENT
 class dShape: public dClassAlloc

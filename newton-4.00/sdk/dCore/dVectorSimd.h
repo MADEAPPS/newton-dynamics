@@ -797,11 +797,6 @@ class dBigVector : public dClassAlloc
 		dst3 = dBigVector(tmp0.m_w, tmp1.m_w, tmp2.m_w, tmp3.m_w);
 	}
 
-	D_INLINE dFloat64 DotProduct3(const dBigVector& A) const
-	{
-		return m_x * A.m_x + m_y * A.m_y + m_z * A.m_z;
-	}
-
 	// return dot 4d dot product
 	D_INLINE dBigVector DotProduct(const dBigVector &A) const
 	{
