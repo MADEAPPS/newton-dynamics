@@ -32,6 +32,7 @@ class dShapeNull: public dShapeConvex
 	//dShapeNull(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~dShapeNull() {}
 
+	virtual dShapeNull* GetAsShapeNull() { return this; }
 /*
 	protected:
 	virtual dgFloat32 GetVolume () const;

@@ -34,6 +34,10 @@
 //class dShapeConvexHull;
 //class dgPolygonSoupRayHitDesc;
 
+class dShapeBox;
+class dShapeNull;
+class dShapeConvex;
+
 #ifdef _DEBUG
 //	#define DG_DEBUG_AABB
 #endif
@@ -216,31 +220,6 @@ class dShape: public dClassAlloc
 	public:
 //	typedef void (dgApi *OnDebugCollisionMeshCallback) (void* userData, int vertexCount, const dFloat32* faceArray, int faceId);
 
-	enum dgRTTI 
-	{
-		dShapeNull_RTTI						= 1<<0,
-		dShapeBox_RTTI						= 1<<1,
-		dShapeCone_RTTI						= 1<<2,
-		dShapeSphere_RTTI					= 1<<3,
-		dShapeCapsule_RTTI					= 1<<4,
-		dShapeCylinder_RTTI					= 1<<5,
-		dShapeConvexHull_RTTI				= 1<<6,
-		dShapeChamferCylinder_RTTI 			= 1<<7,
-		dShapeConvexPolygon_RTTI			= 1<<8,
-		dShapeConvexShape_RTTI				= 1<<9,
-		dShapeCompound_RTTI					= 1<<10,
-		dShapeBVH_RTTI						= 1<<11,
-		dShapeMesh_RTTI						= 1<<12,
-		dShapeLumpedMass_RTTI				= 1<<13,
-		dShapeDeformableMesh_RTTI			= 1<<14,
-		dShapeDeformableSolidMesh_RTTI		= 1<<15,
-		dShapeMassSpringDamperSystem_RTTI	= 1<<16,
-		dShapeIncompressibleParticles_RTTI	= 1<<17,
-		dShapeUserMesh_RTTI					= 1<<18,
-		dShapeHeightField_RTTI				= 1<<19,
-		dShapeScene_RTTI					= 1<<20,
-		dShapeCompoundBreakable_RTTI		= 1<<21,
-	};													 
 /*	
 	static dUnsigned32 Quantize (dFloat32 value);
 	static dUnsigned32 Quantize(const void* const buffer, int size);
@@ -300,6 +279,11 @@ class dShape: public dClassAlloc
 //	D_NEWTON_API dShape (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revision);
 	D_NEWTON_API virtual ~dShape();
 
+	virtual dShape* GetAsShape() { return this; }
+	virtual dShapeBox* GetAsShapeBox() { return nullptr; }
+	virtual dShapeNull* GetAsShapeNull() { return nullptr; }
+	virtual dShapeConvex* GetAsShapeConvex() { return nullptr; }
+
 	//void SetSignature (dInt32 signature);
 	//virtual dInt32 CalculateSignature () const = 0;
 
@@ -308,7 +292,6 @@ class dShape: public dClassAlloc
 	//dVector m_centerOfMass;
 	//dVector m_boxSize;
 	//dVector m_boxOrigin;
-	dUnsigned32 m_rtti;
 	mutable std::atomic<dInt32> m_refCount;
 	//dUnsigned32 m_signature;
 	//dShapeID m_collisionId;

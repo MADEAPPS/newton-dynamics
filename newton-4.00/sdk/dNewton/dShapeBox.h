@@ -28,9 +28,11 @@ D_MSC_VECTOR_ALIGNMENT
 class dShapeBox: public dShapeConvex
 {
 	public:
-	dShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
+	D_NEWTON_API dShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
 	//dShapeBox(dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
 	virtual ~dShapeBox();
+
+	virtual dShapeBox* GetAsShapeBox() { return this; }
 
 	protected:
 	void Init (dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);

@@ -99,6 +99,5 @@ dVector dShapeNull::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const
 dShapeNull::dShapeNull()
 	:dShapeConvex(m_nullCollision)
 {
-	m_rtti |= dShapeNull_RTTI;
 	m_inertia = dVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f));
 }

@@ -41,14 +41,16 @@
 //
 //class dgSkeletonContainer;
 
+D_MSC_VECTOR_ALIGNMENT
 class dDynamicBody: public dBody 
 {
 	public:
 	D_NEWTON_API dDynamicBody();
 	D_NEWTON_API virtual ~dDynamicBody ();
+	D_NEWTON_API virtual dDynamicBody* GetAsDynamicBody() { return this; }
 
-	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadID, dFloat32 tiemstep);
-};
+	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadID, dFloat32 timestep);
+} D_GCC_VECTOR_ALIGNMENT;
 
 #endif 
 

@@ -921,7 +921,6 @@ dShapeConvex::dShapeConvex(dShapeID id)
 	//,m_edgeCount(0)
 	//,m_vertexCount(0)
 {
-	m_rtti |= dShapeConvexShape_RTTI;
 }
 
 dShapeConvex::~dShapeConvex()

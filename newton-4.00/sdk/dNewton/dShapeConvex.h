@@ -53,9 +53,12 @@ class dShapeConvex: public dShape
 	bool IntesectionTest (dShapeParamProxy& proxy) const;
 */
 	protected:
-	dShapeConvex (dShapeID id);
+	D_NEWTON_API dShapeConvex (dShapeID id);
 //	dShapeConvex (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
-	~dShapeConvex ();
+	D_NEWTON_API ~dShapeConvex ();
+
+	virtual dShapeConvex* GetAsShapeConvex() { return this; }
+
 /*
 	virtual void SerializeLow(dgSerialize callback, void* const userData) const;
 

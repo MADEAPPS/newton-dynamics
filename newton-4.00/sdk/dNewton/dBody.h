@@ -26,6 +26,7 @@
 #include "dShapeInstance.h"
 
 class dNewton;
+class dDynamicBody;
 
 D_MSC_VECTOR_ALIGNMENT
 class dBody: public dClassAlloc  
@@ -34,13 +35,16 @@ class dBody: public dClassAlloc
 	D_NEWTON_API dBody();
 	D_NEWTON_API virtual ~dBody();
 
+	D_NEWTON_API virtual dBody* GetAsBody() { return this;}
+	D_NEWTON_API virtual dDynamicBody* GetAsDynamicBody() { return nullptr; }
+
 	D_NEWTON_API const dShapeInstance& GetCollisionShape() const;
 	D_NEWTON_API void SetCollisionShape(const dShapeInstance& shapeInstance);
 
 	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadID, dFloat32 tiemstep) = 0;
 	dNewton* GetNewton() const;
 
-	private:
+	protected:
 	dList<dBody*>::dListNode* GetNewtonNode() const;
 	void SetNewtonNode(dNewton* const newton, dList<dBody*>::dListNode* const node);
 

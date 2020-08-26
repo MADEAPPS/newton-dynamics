@@ -22,6 +22,7 @@
 #include "dNewtonStdafx.h"
 #include "dBody.h"
 #include "dNewton.h"
+#include "dDynamicBody.h"
 
 dNewton::dNewton()
 	:dClassAlloc()
@@ -29,8 +30,8 @@ dNewton::dNewton()
 	,dThread()
 	,dThreadPool()
 	,m_gravity(dFloat32 (0.0f))
-	,m_bodyArray()
 	,m_bodyList()
+	,m_dynamicBodyArray()
 {
 	// start the engine thread;
 	SetName("newton main thread");
@@ -116,7 +117,7 @@ void dNewton::ThreadFunction()
 
 void dNewton::InternalUpdate(dFloat32 fullTimestep)
 {
-	GetBodyArray();
+	GetDynamicBodyArray();
 	dFloat32 timestep = fullTimestep / m_subSteps;
 	for (dInt32 i = 0; i < m_subSteps; i++)
 	{
@@ -127,15 +128,19 @@ void dNewton::InternalUpdate(dFloat32 fullTimestep)
 	UpdateListenersPostTransform(fullTimestep);
 }
 
-void dNewton::GetBodyArray()
+void dNewton::GetDynamicBodyArray()
 {
-	m_bodyArray.SetCount(m_bodyList.GetCount());
-	dBody** const bodyPtr = &m_bodyArray[0];
+	m_dynamicBodyArray.SetCount(m_bodyList.GetCount());
+	dDynamicBody** const bodyPtr = &m_dynamicBodyArray[0];
 	int index = 0;
 	for (dList<dBody*>::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
-		bodyPtr[index] = node->GetInfo();
-		index++;
+		dDynamicBody* const body = node->GetInfo()->GetAsDynamicBody();
+		if (body)
+		{
+			bodyPtr[index] = body;
+			index++;
+		}
 	}
 }
 
@@ -190,8 +195,8 @@ void dNewton::ApplyExternalForces(dFloat32 timestep)
 		virtual void Execute()
 		{
 			const dInt32 threadIndex = GetThredID();
-			const dInt32 count = m_me->m_bodyArray.GetCount();
-			dBody** const bodies = &m_me->m_bodyArray[0];
+			const dInt32 count = m_me->m_dynamicBodyArray.GetCount();
+			dDynamicBody** const bodies = &m_me->m_dynamicBodyArray[0];
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
 				bodies[i]->ApplyExternalForces(threadIndex, m_timestep);

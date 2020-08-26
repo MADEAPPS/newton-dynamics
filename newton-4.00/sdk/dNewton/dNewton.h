@@ -23,6 +23,7 @@
 #define _D_NEWTON_H_
 
 class dBody;
+class dDynamicBody;
 
 D_MSC_VECTOR_ALIGNMENT
 class dNewton
@@ -72,11 +73,11 @@ class dNewton
 	protected:
 
 	private:
-	void GetBodyArray();
+	void GetDynamicBodyArray();
 
 	dVector m_gravity;
-	dArray<dBody*> m_bodyArray;
 	dList<dBody*> m_bodyList;
+	dArray<dDynamicBody*> m_dynamicBodyArray;
 	dFloat32 m_timestep;
 	dInt32 m_subSteps;
 } D_GCC_VECTOR_ALIGNMENT;

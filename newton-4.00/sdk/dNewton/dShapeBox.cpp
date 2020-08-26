@@ -388,8 +388,6 @@ dShapeBox::~dShapeBox()
 
 void dShapeBox::Init(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 {
-	m_rtti |= dShapeBox_RTTI;
-
 	m_size[0].m_x = dMax(dAbs(size_x) * dFloat32(0.5f), D_MIN_CONVEX_SHAPE_SIZE);
 	m_size[0].m_y = dMax(dAbs(size_y) * dFloat32(0.5f), D_MIN_CONVEX_SHAPE_SIZE);
 	m_size[0].m_z = dMax(dAbs(size_z) * dFloat32(0.5f), D_MIN_CONVEX_SHAPE_SIZE);

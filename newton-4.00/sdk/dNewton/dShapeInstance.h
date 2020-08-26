@@ -43,8 +43,9 @@ class dShapeInstance: public dClassAlloc
 	//dShapeInstance(const dgWorld* const world, const dShape* const childCollision, dInt32 shapeID, const dMatrix& matrix);
 	//dShapeInstance(const dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
 	D_NEWTON_API ~dShapeInstance();
-
 	D_NEWTON_API dShapeInstance& operator=(const dShapeInstance& src);
+
+	const dShape* GetShape() const { return m_shape; }
 
 #if 0
 	dShapeInstance* AddRef ();
