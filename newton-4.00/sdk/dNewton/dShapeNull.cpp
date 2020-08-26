@@ -50,9 +50,6 @@ void dShapeNull::SetCollisionBBox (const dVector& p0, const dVector& p1)
 	dgAssert (0);
 }
 
-void dShapeNull::DebugCollision (const dgMatrix& matrixPtr, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
-{
-}
 
 dgInt32 dShapeNull::CalculateSignature () const
 {

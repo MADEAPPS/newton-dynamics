@@ -21,12 +21,12 @@
 
 #include "dNewtonStdafx.h"
 #include "dShapeNull.h"
+#include "dContactSolver.h"
 
 //#include "dgContact.h"
-//#include "dgContactSolver.h"
-//#include "dgCollisionMesh.h"
+//#include "dShapeMesh.h"
 //#include "dShapeConvex.h"
-//#include "dgCollisionInstance.h"
+//#include "dShapeInstance.h"
 //#include "dShapeConvexHull.h"
 //#include "dShapeConvexPolygon.h"
 
@@ -35,9 +35,9 @@
 
 #if 0
 dShapeConvex::dShapeConvex (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber)
-	:dgCollision (world, deserialization, userData, revisionNumber)
-	,m_vertex (NULL)
-	,m_simplex (NULL)
+	:dShape (world, deserialization, userData, revisionNumber)
+	,m_vertex (nullptr)
+	,m_simplex (nullptr)
 	,m_boxMinRadius (dFloat32 (0.0f))
 	,m_boxMaxRadius (dFloat32 (0.0f))
 	,m_simplexVolume (dFloat32 (0.0f))
@@ -51,61 +51,9 @@ dShapeConvex::dShapeConvex (dgWorld* const world, dgDeserialize deserialization,
 
 void dShapeConvex::SerializeLow(dgSerialize callback, void* const userData) const
 {
-	dgCollision::SerializeLow(callback, userData);
+	dShape::SerializeLow(callback, userData);
 }
 
-
-void dShapeConvex::SetVolumeAndCG ()
-{
-	dVector faceVertex[DG_MAX_EDGE_COUNT];
-	dgStack<dgInt8> edgeMarks (m_edgeCount);
-	memset (&edgeMarks[0], 0, sizeof (dgInt8) * m_edgeCount);
-
-	dgPolyhedraMassProperties localData;
-	for (dInt32 i = 0; i < m_edgeCount; i ++) {
-		dgConvexSimplexEdge* const face = &m_simplex[i];
-		if (!edgeMarks[i]) {
-			dgConvexSimplexEdge* edge = face;
-			dInt32 count = 0;
-			do {
-				dAssert ((edge - m_simplex) >= 0);
-				edgeMarks[dInt32 (edge - m_simplex)] = '1';
-				faceVertex[count] = m_vertex[edge->m_vertex];
-				count ++;
-				dAssert (count < dInt32 (sizeof (faceVertex) / sizeof (faceVertex[0])));
-				edge = edge->m_next;
-			} while (edge != face);
-			localData.AddCGFace (count, faceVertex);
-		}
-	}
-
-	dVector origin;
-	dVector inertia;
-	dVector crossInertia;
-	dFloat32 volume = localData.MassProperties (origin, inertia, crossInertia);
-	m_simplexVolume = volume;
-
-	// calculate the origin of the bound box of this primitive
-	dVector p0(dFloat32 (0.0f)); 
-	dVector p1(dFloat32 (0.0f)); 
-	for (dInt32 i = 0; i < 3; i ++) {
-		dVector dir (dFloat32 (0.0f)); 
-		dir[i] = dFloat32 (-1.0f);
-		p0[i] = SupportVertex(dir, NULL)[i];
-
-		dir[i] = dFloat32 (1.0f);
-		p1[i] = SupportVertex(dir, NULL)[i];
-	}
-
-	dAssert (p0.m_w == dFloat32 (0.0f));
-	dAssert (p1.m_w == dFloat32 (0.0f));
-	m_boxSize = (p1 - p0) * dVector::m_half; 
-	m_boxOrigin = (p1 + p0) * dVector::m_half; 
-	m_boxMinRadius = dgMin(m_boxSize.m_x, m_boxSize.m_y, m_boxSize.m_z);
-	m_boxMaxRadius = dgSqrt ((m_boxSize.DotProduct(m_boxSize)).GetScalar());
-
-	MassProperties ();
-}
 
 bool dShapeConvex::SanityCheck (dgPolyhedra& hull) const
 {
@@ -148,33 +96,6 @@ bool dShapeConvex::SanityCheck (dgPolyhedra& hull) const
 	return true;
 }
 
-void dShapeConvex::DebugCollision (const dMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
-{
-	dgInt8 mark[DG_MAX_EDGE_COUNT];
-	dVector tmp[DG_MAX_EDGE_COUNT];
-	dgTriplex vertex[DG_MAX_EDGE_COUNT];
-
-	matrix.TransformTriplex (&tmp[0].m_x, sizeof (dVector), &m_vertex[0].m_x, sizeof (dVector), m_vertexCount);
-
-	memset (mark, 0, sizeof (mark));
-	for (dInt32 i = 0; i < m_edgeCount; i ++) {
-		if (!mark[i]) {
-			dgConvexSimplexEdge* const face = &m_simplex[i];
-			dgConvexSimplexEdge* edge = face;
-			dInt32 count = 0;
-			do {
-				mark[edge - m_simplex] = '1';
-				dInt32 index = edge->m_vertex;
-				vertex[count].m_x = tmp[index].m_x;
-				vertex[count].m_y = tmp[index].m_y;
-				vertex[count].m_z = tmp[index].m_z;
-				count ++;
-				edge = edge->m_next;
-			} while (edge != face);
-			callback (userData, count, &vertex[0].m_x, 0);
-		}
-	}
-}
 
 void dShapeConvex::CalcAABB (const dMatrix& matrix, dVector& p0, dVector& p1) const
 {
@@ -183,35 +104,6 @@ void dShapeConvex::CalcAABB (const dMatrix& matrix, dVector& p0, dVector& p1) co
 
 	p0 = (origin - size) & dVector::m_triplexMask;
 	p1 = (origin + size) & dVector::m_triplexMask;
-}
-
-void dShapeConvex::CalculateInertia (void* userData, int indexCount, const dFloat32* const faceVertex, int faceId)
-{
-	dgPolyhedraMassProperties& localData = *((dgPolyhedraMassProperties*) userData);
-	localData.AddInertiaAndCrossFace(indexCount, faceVertex);
-}
-
-dFloat32 dShapeConvex::CalculateMassProperties (const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const
-{
-	dgPolyhedraMassProperties localData;
-	DebugCollision (offset, CalculateInertia, &localData);
-	return localData.MassProperties (centerOfMass, inertia, crossInertia);
-}
-
-void dShapeConvex::MassProperties ()
-{
-	dFloat32 volume = dShapeConvex::CalculateMassProperties (dGetIdentityMatrix(), m_inertia, m_crossInertia, m_centerOfMass);
-	if (volume < D_MAX_MIN_VOLUME) {
-		volume = D_MAX_MIN_VOLUME;
-	}
-	dFloat32 invVolume = dFloat32 (1.0f) / volume;
-	m_inertia = m_inertia.Scale (invVolume);
-	m_crossInertia = m_crossInertia.Scale (invVolume);
-	m_centerOfMass = m_centerOfMass.Scale (invVolume);
-	m_centerOfMass.m_w = volume;
-
-	// complete the calculation 
-	dgCollision::MassProperties ();
 }
 
 dMatrix dShapeConvex::CalculateInertiaAndCenterOfMass (const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const
@@ -303,23 +195,23 @@ dFloat32 dShapeConvex::GetBoxMaxRadius () const
 	return m_boxMaxRadius;
 } 
 
-dVector dShapeConvex::CalculateVolumeIntegral (const dMatrix& globalMatrix, const dVector& globalPlane, const dgCollisionInstance& parentScale) const
+dVector dShapeConvex::CalculateVolumeIntegral (const dMatrix& globalMatrix, const dVector& globalPlane, const dShapeInstance& parentScale) const
 {
 	dgPlane localPlane (globalMatrix.UntransformPlane (globalPlane));
 
 	const dVector& scale = parentScale.m_scale;
 	switch (parentScale.m_scaleType)
 	{
-		case dgCollisionInstance::m_unit:
+		case dShapeInstance::m_unit:
 			break;
 
-		case dgCollisionInstance::m_uniform:
+		case dShapeInstance::m_uniform:
 		{
 			localPlane.m_w *= parentScale.m_invScale.m_x;
 			break;
 		}
 
-		case dgCollisionInstance::m_nonUniform:
+		case dShapeInstance::m_nonUniform:
 		{
 			localPlane = localPlane * (scale | dVector::m_wOne);
 			dFloat32 mag2 = localPlane.DotProduct(localPlane & dVector::m_triplexMask).GetScalar();
@@ -348,9 +240,9 @@ dVector dShapeConvex::CalculateVolumeIntegral (const dMatrix& globalMatrix, cons
 
 dVector dShapeConvex::CalculateVolumeIntegral (const dgPlane& plane) const 
 {
-	dgInt8 mark[DG_MAX_EDGE_COUNT];
-	dFloat32 test[DG_MAX_EDGE_COUNT];
-	dVector faceVertex[DG_MAX_EDGE_COUNT];
+	dInt8 mark[D_MAX_EDGE_COUNT];
+	dFloat32 test[D_MAX_EDGE_COUNT];
+	dVector faceVertex[D_MAX_EDGE_COUNT];
 
 	dInt32 positive = 0;
 	dInt32 negative = 0;
@@ -373,15 +265,15 @@ dVector dShapeConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 		return m_centerOfMass;
 	}
 
-	dgPolyhedraMassProperties localData;
-	dgConvexSimplexEdge* capEdge = NULL;
+	dPolyhedraMassProperties localData;
+	dConvexSimplexEdge* capEdge = nullptr;
 
 	dVector cg (dVector::m_zero); 
 	memset (mark, 0, sizeof (mark));
 	for (dInt32 i = 0; i < m_edgeCount; i ++) {
 		if (!mark[i]) {
-			dgConvexSimplexEdge* const face = &m_simplex[i];
-			dgConvexSimplexEdge* edge = face;
+			dConvexSimplexEdge* const face = &m_simplex[i];
+			dConvexSimplexEdge* edge = face;
 			dInt32 count = 0;
 			dFloat32 size0 = test[edge->m_prev->m_vertex];
 			do {
@@ -423,8 +315,8 @@ dVector dShapeConvex::CalculateVolumeIntegral (const dgPlane& plane) const
 
 	if (capEdge) {
 		dInt32 count = 0;
-		dgConvexSimplexEdge* edge = capEdge;
-		dgConvexSimplexEdge* ptr = NULL;
+		dConvexSimplexEdge* edge = capEdge;
+		dConvexSimplexEdge* ptr = nullptr;
 		do {
 			dVector dp (m_vertex[edge->m_twin->m_vertex] - m_vertex[edge->m_vertex]);
 			dAssert (dp.m_w == dFloat32 (0.0f));
@@ -464,13 +356,13 @@ dVector dShapeConvex::SupportVertex (const dVector& dir, dInt32* const vertexInd
 
 	dgInt16 cache[16];
 	memset (cache, -1, sizeof (cache));
-	dgConvexSimplexEdge* edge = &m_simplex[0];
+	dConvexSimplexEdge* edge = &m_simplex[0];
 	
 	dInt32 index = edge->m_vertex;
 	dFloat32 side0 = m_vertex[index].DotProduct(dir).GetScalar();
 
 	cache [index & (sizeof (cache) / sizeof (cache[0]) - 1)] = dgInt16 (index);
-	dgConvexSimplexEdge* ptr = edge;
+	dConvexSimplexEdge* ptr = edge;
 	dInt32 maxCount = 128;
 	do {
 		dInt32 index1 = ptr->m_twin->m_vertex;
@@ -669,9 +561,9 @@ dVector dShapeConvex::SupportVertexSpecialProjectPoint (const dVector& point, co
 
 dFloat32 dShapeConvex::RayCast(const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
-	dgCollisionInstance instance(*body->GetCollision(), this);
+	dShapeInstance instance(*body->GetCollision(), this);
 	dgContactSolver rayCaster(&instance);
-	instance.m_material.m_userData = NULL;
+	instance.m_material.m_userData = nullptr;
 	return rayCaster.RayCast(localP0, localP1, maxT, contactOut);
 }
 
@@ -679,8 +571,8 @@ dInt32 dShapeConvex::CalculatePlaneIntersection (const dVector& normal, const dV
 {
 	dVector support[4];
 	dInt32 featureCount = 3;
-	const dgConvexSimplexEdge* edge = &m_simplex[0];
-	const dgConvexSimplexEdge** const vertToEdgeMapping = GetVertexToEdgeMapping();
+	const dConvexSimplexEdge* edge = &m_simplex[0];
+	const dConvexSimplexEdge** const vertToEdgeMapping = GetVertexToEdgeMapping();
 	dAssert (normal.m_w == dFloat32 (0.0f));
 	if (vertToEdgeMapping) {
 		dInt32 edgeIndex;
@@ -692,7 +584,7 @@ dInt32 dShapeConvex::CalculatePlaneIntersection (const dVector& normal, const dV
 		const dFloat32 tiltAngle = dFloat32 (0.087f);
 		const dFloat32 tiltAngle2 = tiltAngle * tiltAngle ;
 		dgPlane testPlane (normal, - (normal.DotProduct(support[0]).GetScalar()));
-		const dgConvexSimplexEdge* ptr = edge;
+		const dConvexSimplexEdge* ptr = edge;
 		do {
 			const dVector& p = m_vertex[ptr->m_twin->m_vertex];
 			dFloat32 test = testPlane.Evalue(p);
@@ -727,9 +619,9 @@ dInt32 dShapeConvex::CalculatePlaneIntersection (const dVector& normal, const dV
 		{
 			dFloat32 side0 = plane.Evalue(m_vertex[edge->m_vertex]);
 			dFloat32 side1 = side0;
-			const dgConvexSimplexEdge* firstEdge = NULL;
+			const dConvexSimplexEdge* firstEdge = nullptr;
 			if (side0 > dFloat32 (0.0f)) {
-				const dgConvexSimplexEdge* ptr = edge;
+				const dConvexSimplexEdge* ptr = edge;
 				do {
 					dAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dFloat32 (0.0f));
 					side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
@@ -761,7 +653,7 @@ dInt32 dShapeConvex::CalculatePlaneIntersection (const dVector& normal, const dV
 				}
 
 			} else if (side0 < dFloat32 (0.0f)) {
-				const dgConvexSimplexEdge* ptr = edge;
+				const dConvexSimplexEdge* ptr = edge;
 				do {
 					dAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dFloat32 (0.0f));
 					side1 = plane.Evalue (m_vertex[ptr->m_twin->m_vertex]);
@@ -801,7 +693,7 @@ dInt32 dShapeConvex::CalculatePlaneIntersection (const dVector& normal, const dV
 				dAssert (dAbs (side0 - plane.Evalue (m_vertex[firstEdge->m_vertex])) < dFloat32 (1.0e-5f));
 
 				dInt32 maxCount = 0;
-				const dgConvexSimplexEdge* ptr = firstEdge;
+				const dConvexSimplexEdge* ptr = firstEdge;
 				do {
 					if (side0 > dFloat32 (0.0f)) {
 						dAssert (plane.Evalue (m_vertex[ptr->m_vertex]) > dFloat32 (0.0f));
@@ -826,7 +718,7 @@ dInt32 dShapeConvex::CalculatePlaneIntersection (const dVector& normal, const dV
 						dAssert (t >= dFloat32 (-1.05f));
 						contactsOut[count] = m_vertex[ptr->m_vertex] - dp.Scale (t);
 
-						dgConvexSimplexEdge* ptr1 = ptr->m_next;
+						dConvexSimplexEdge* ptr1 = ptr->m_next;
 						for (; ptr1 != ptr; ptr1 = ptr1->m_next) {
 							dAssert (m_vertex[ptr->m_twin->m_vertex].m_w == dFloat32 (0.0f));
 							side0 = plane.Evalue (m_vertex[ptr1->m_twin->m_vertex]); 
@@ -838,7 +730,7 @@ dInt32 dShapeConvex::CalculatePlaneIntersection (const dVector& normal, const dV
 						ptr = ptr1->m_twin;
 					} else {
 						contactsOut[count] = m_vertex[ptr->m_vertex];
-						dgConvexSimplexEdge* ptr1 = ptr->m_next;
+						dConvexSimplexEdge* ptr1 = ptr->m_next;
 						for (; ptr1 != ptr; ptr1 = ptr1->m_next) {
 							dAssert (m_vertex[ptr1->m_twin->m_vertex].m_w == dFloat32 (0.0f));
 							side0 = plane.Evalue (m_vertex[ptr1->m_twin->m_vertex]); 
@@ -889,8 +781,8 @@ dInt32 dShapeConvex::BuildCylinderCapPoly (dFloat32 radius, const dMatrix& trans
 
 	for (int i = 8; i < 16; i ++) {
 		dFloat32 den = dgPi / i - 0.5f * dgSin (dgPI2 / i);
-		dFloat32 h1 = dgSqrt (a / den);
-		dFloat32 h2 = dgSqrt (a / den);
+		dFloat32 h1 = dSqrt (a / den);
+		dFloat32 h2 = dSqrt (a / den);
 	}
 */
 
@@ -912,11 +804,11 @@ dInt32 dShapeConvex::BuildCylinderCapPoly (dFloat32 radius, const dMatrix& trans
 
 dShapeConvex::dShapeConvex(dShapeID id)
 	:dShape(id)
-	,m_vertex(NULL)
-	,m_simplex(NULL)
-	//,m_boxMinRadius(dFloat32(0.0f))
-	//,m_boxMaxRadius(dFloat32(0.0f))
-	//,m_simplexVolume(dFloat32(0.0f))
+	,m_vertex(nullptr)
+	,m_simplex(nullptr)
+	,m_boxMinRadius(dFloat32(0.0f))
+	,m_boxMaxRadius(dFloat32(0.0f))
+	,m_simplexVolume(dFloat32(0.0f))
 	,m_edgeCount(0)
 	,m_vertexCount(0)
 {
@@ -935,18 +827,142 @@ dShapeConvex::~dShapeConvex()
 	}
 }
 
+void dShapeConvex::DebugShape(const dMatrix& matrix, dShapeDebugCallback& debugCallback) const
+{
+	dInt8 mark[D_MAX_EDGE_COUNT];
+	dVector tmp[D_MAX_EDGE_COUNT];
+	dVector vertex[D_MAX_EDGE_COUNT];
+
+	matrix.TransformTriplex(&tmp[0].m_x, sizeof(dVector), &m_vertex[0].m_x, sizeof(dVector), m_vertexCount);
+
+	memset(mark, 0, sizeof(mark));
+	for (dInt32 i = 0; i < m_edgeCount; i++) 
+	{
+		if (!mark[i]) 
+		{
+			dConvexSimplexEdge* const face = &m_simplex[i];
+			dConvexSimplexEdge* edge = face;
+			dInt32 count = 0;
+			do 
+			{
+				mark[edge - m_simplex] = '1';
+				dInt32 index = edge->m_vertex;
+				vertex[count] = tmp[index] & dVector::m_triplexMask;
+				count++;
+				edge = edge->m_next;
+			} while (edge != face);
+			debugCallback.DrawPolygon(count, vertex);
+		}
+	}
+}
+
+void dShapeConvex::SetVolumeAndCG()
+{
+	dVector faceVertex[D_MAX_EDGE_COUNT];
+	//dgStack<dInt8> edgeMarks(m_edgeCount);
+	dInt8* const edgeMarks = dAlloca(dInt8, m_edgeCount + 32);
+	memset(&edgeMarks[0], 0, sizeof(dInt8) * m_edgeCount);
+
+	dPolyhedraMassProperties localData;
+	for (dInt32 i = 0; i < m_edgeCount; i++) 
+	{
+		dConvexSimplexEdge* const face = &m_simplex[i];
+		if (!edgeMarks[i]) {
+			dConvexSimplexEdge* edge = face;
+			dInt32 count = 0;
+			do 
+			{
+				dAssert((edge - m_simplex) >= 0);
+				edgeMarks[dInt32(edge - m_simplex)] = '1';
+				faceVertex[count] = m_vertex[edge->m_vertex];
+				count++;
+				dAssert(count < dInt32(sizeof(faceVertex) / sizeof(faceVertex[0])));
+				edge = edge->m_next;
+			} while (edge != face);
+
+			localData.AddCGFace(count, faceVertex);
+		}
+	}
+
+	dVector origin;
+	dVector inertia;
+	dVector crossInertia;
+	dFloat32 volume = localData.MassProperties(origin, inertia, crossInertia);
+	m_simplexVolume = volume;
+
+	// calculate the origin of the bound box of this primitive
+	dVector p0(dFloat32(0.0f));
+	dVector p1(dFloat32(0.0f));
+	for (dInt32 i = 0; i < 3; i++) {
+		dVector dir(dFloat32(0.0f));
+		dir[i] = dFloat32(-1.0f);
+		p0[i] = SupportVertex(dir, nullptr)[i];
+
+		dir[i] = dFloat32(1.0f);
+		p1[i] = SupportVertex(dir, nullptr)[i];
+	}
+
+	dAssert(p0.m_w == dFloat32(0.0f));
+	dAssert(p1.m_w == dFloat32(0.0f));
+	m_boxSize = (p1 - p0) * dVector::m_half;
+	m_boxOrigin = (p1 + p0) * dVector::m_half;
+	m_boxMinRadius = dMin(m_boxSize.m_x, m_boxSize.m_y, m_boxSize.m_z);
+	m_boxMaxRadius = dSqrt((m_boxSize.DotProduct(m_boxSize)).GetScalar());
+
+	MassProperties();
+}
+
+void dShapeConvex::MassProperties()
+{
+	//dFloat32 volume = dShapeConvex::CalculateMassProperties(dGetIdentityMatrix(), m_inertia, m_crossInertia, m_centerOfMass);
+	dFloat32 volume = CalculateMassProperties(dGetIdentityMatrix(), m_inertia, m_crossInertia, m_centerOfMass);
+	if (volume < D_MAX_MIN_VOLUME) 
+	{
+		volume = D_MAX_MIN_VOLUME;
+	}
+	dFloat32 invVolume = dFloat32(1.0f) / volume;
+	m_inertia = m_inertia.Scale(invVolume);
+	m_crossInertia = m_crossInertia.Scale(invVolume);
+	m_centerOfMass = m_centerOfMass.Scale(invVolume);
+	m_centerOfMass.m_w = volume;
+	
+	// complete the calculation 
+	dShape::MassProperties();
+}
+
+dFloat32 dShapeConvex::CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const
+{
+	class dMassPropertiesCalculator : public dShapeDebugCallback
+	{
+		public:
+		dMassPropertiesCalculator(const dShapeConvex* const shape)
+			:m_localData()
+			,m_me(shape)
+		{
+		}
+
+		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray)
+		{
+			m_localData.AddInertiaAndCrossFace(vertexCount, faceArray);
+		}
+
+		dPolyhedraMassProperties m_localData;
+		const dShapeConvex* m_me;
+	};
+		
+	dMassPropertiesCalculator massPropretiesCalculator(this);
+		
+	DebugShape(offset, massPropretiesCalculator);
+	return massPropretiesCalculator.m_localData.MassProperties(centerOfMass, inertia, crossInertia);
+}
+
 dMatrix dShapeConvex::CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const
 {
 	if ((dAbs(localScale.m_x - localScale.m_y) < dFloat32(1.0e-5f)) && 
 		(dAbs(localScale.m_x - localScale.m_z) < dFloat32(1.0e-5f)) && 
 		(dAbs(localScale.m_y - localScale.m_z) < dFloat32(1.0e-5f)))
 	{
-	//	dAssert(alignMatrix[0][0] == dFloat32(1.0f));
-	//	dAssert(alignMatrix[1][1] == dFloat32(1.0f));
-	//	dAssert(alignMatrix[2][2] == dFloat32(1.0f));
 		dAssert(alignMatrix.TestIdentity());
-
-		dAssert(0);
 	
 		// using general central theorem, is much faster and more accurate;
 		//IImatrix = IIorigin + mass * [(displacemnet % displacemnet) * identityMatrix - transpose(displacement) * displacement)];
@@ -955,66 +971,64 @@ dMatrix dShapeConvex::CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix
 		inertia[0][0] = m_inertia[0] * mag2;
 		inertia[1][1] = m_inertia[1] * mag2;
 		inertia[2][2] = m_inertia[2] * mag2;
-	//	inertia[0][1] = m_crossInertia[2] * mag2;
-	//	inertia[1][0] = m_crossInertia[2] * mag2;
-	//	inertia[0][2] = m_crossInertia[1] * mag2;
-	//	inertia[2][0] = m_crossInertia[1] * mag2;
-	//	inertia[1][2] = m_crossInertia[0] * mag2;
-	//	inertia[2][1] = m_crossInertia[0] * mag2;
-	//	inertia = matrix.Inverse() * inertia * matrix;
-	//
-	//	dAssert(localScale.m_w == dFloat32(0.0f));
-	//	dVector origin(matrix.TransformVector(m_centerOfMass * localScale));
-	//
-	//	origin.m_w = dFloat32(0.0f);
-	//	dFloat32 originMag2 = origin.DotProduct(origin).GetScalar();
-	//	dMatrix Covariance(origin, origin);
-	//	dMatrix parallel(dGetIdentityMatrix());
-	//	for (dInt32 i = 0; i < 3; i++) 
-	//	{
-	//		parallel[i][i] = originMag2;
-	//		inertia[i] += (parallel[i] - Covariance[i]);
-	//		dAssert(inertia[i][i] > dFloat32(0.0f));
-	//	}
-	//
-	//	inertia.m_posit = origin;
-	//	inertia.m_posit.m_w = 1.0f;
+		inertia[0][1] = m_crossInertia[2] * mag2;
+		inertia[1][0] = m_crossInertia[2] * mag2;
+		inertia[0][2] = m_crossInertia[1] * mag2;
+		inertia[2][0] = m_crossInertia[1] * mag2;
+		inertia[1][2] = m_crossInertia[0] * mag2;
+		inertia[2][1] = m_crossInertia[0] * mag2;
+		inertia = matrix.Inverse() * inertia * matrix;
+	
+		dAssert(localScale.m_w == dFloat32(0.0f));
+		dVector origin(matrix.TransformVector(m_centerOfMass * localScale));
+	
+		origin.m_w = dFloat32(0.0f);
+		dFloat32 originMag2 = origin.DotProduct(origin).GetScalar();
+		dMatrix Covariance(origin, origin);
+		dMatrix parallel(dGetIdentityMatrix());
+		for (dInt32 i = 0; i < 3; i++) 
+		{
+			parallel[i][i] = originMag2;
+			inertia[i] += (parallel[i] - Covariance[i]);
+			dAssert(inertia[i][i] > dFloat32(0.0f));
+		}
+	
+		inertia.m_posit = origin;
+		inertia.m_posit.m_w = 1.0f;
 		return inertia;
 	}
 	else 
 	{
-		dAssert(0);
-		return dGetIdentityMatrix();
-	//	// for non uniform scale we need to the general divergence theorem
-	//	dVector inertiaII;
-	//	dVector crossInertia;
-	//	dVector centerOfMass;
-	//	dMatrix scaledMatrix(matrix);
-	//	scaledMatrix[0] = scaledMatrix[0].Scale(localScale.m_x);
-	//	scaledMatrix[1] = scaledMatrix[1].Scale(localScale.m_y);
-	//	scaledMatrix[2] = scaledMatrix[2].Scale(localScale.m_z);
-	//	scaledMatrix = alignMatrix * scaledMatrix;
-	//
-	//	dFloat32 volume = CalculateMassProperties(scaledMatrix, inertiaII, crossInertia, centerOfMass);
-	//	if (volume < D_MAX_MIN_VOLUME) {
-	//		volume = D_MAX_MIN_VOLUME;
-	//	}
-	//
-	//	dFloat32 invVolume = dFloat32(1.0f) / volume;
-	//	centerOfMass = centerOfMass.Scale(invVolume);
-	//	inertiaII = inertiaII.Scale(invVolume);
-	//	crossInertia = crossInertia.Scale(invVolume);
-	//	dMatrix inertia(dGetIdentityMatrix());
-	//	inertia[0][0] = inertiaII[0];
-	//	inertia[1][1] = inertiaII[1];
-	//	inertia[2][2] = inertiaII[2];
-	//	inertia[0][1] = crossInertia[2];
-	//	inertia[1][0] = crossInertia[2];
-	//	inertia[0][2] = crossInertia[1];
-	//	inertia[2][0] = crossInertia[1];
-	//	inertia[1][2] = crossInertia[0];
-	//	inertia[2][1] = crossInertia[0];
-	//	inertia[3] = centerOfMass;
-	//	return inertia;
+		// for non uniform scale we need to the general divergence theorem
+		dVector inertiaII;
+		dVector crossInertia;
+		dVector centerOfMass;
+		dMatrix scaledMatrix(matrix);
+		scaledMatrix[0] = scaledMatrix[0].Scale(localScale.m_x);
+		scaledMatrix[1] = scaledMatrix[1].Scale(localScale.m_y);
+		scaledMatrix[2] = scaledMatrix[2].Scale(localScale.m_z);
+		scaledMatrix = alignMatrix * scaledMatrix;
+	
+		dFloat32 volume = CalculateMassProperties(scaledMatrix, inertiaII, crossInertia, centerOfMass);
+		if (volume < D_MAX_MIN_VOLUME) {
+			volume = D_MAX_MIN_VOLUME;
+		}
+	
+		dFloat32 invVolume = dFloat32(1.0f) / volume;
+		centerOfMass = centerOfMass.Scale(invVolume);
+		inertiaII = inertiaII.Scale(invVolume);
+		crossInertia = crossInertia.Scale(invVolume);
+		dMatrix inertia(dGetIdentityMatrix());
+		inertia[0][0] = inertiaII[0];
+		inertia[1][1] = inertiaII[1];
+		inertia[2][2] = inertiaII[2];
+		inertia[0][1] = crossInertia[2];
+		inertia[1][0] = crossInertia[2];
+		inertia[0][2] = crossInertia[1];
+		inertia[2][0] = crossInertia[1];
+		inertia[1][2] = crossInertia[0];
+		inertia[2][1] = crossInertia[0];
+		inertia[3] = centerOfMass;
+		return inertia;
 	}
 }

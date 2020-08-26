@@ -41,6 +41,8 @@ class dBody: public dClassAlloc
 	D_NEWTON_API const dShapeInstance& GetCollisionShape() const;
 	D_NEWTON_API void SetCollisionShape(const dShapeInstance& shapeInstance);
 
+	D_NEWTON_API void SetCentreOfMass(const dVector& com);
+
 	dNewton* GetNewton() const;
 
 	dVector GetOmega() const;
@@ -53,8 +55,15 @@ class dBody: public dClassAlloc
 	dList<dBody*>::dListNode* GetNewtonNode() const;
 	void SetNewtonNode(dNewton* const newton, dList<dBody*>::dListNode* const node);
 
+	dMatrix m_matrix;
+	dMatrix m_invWorldInertiaMatrix;
+		
 	dVector m_veloc;
 	dVector m_omega;
+	dVector m_localCentreOfMass;
+	dVector m_globalCentreOfMass;
+
+	dQuaternion m_rotation;
 
 	dShapeInstance m_shapeInstance;
 	dNewton* m_newton;

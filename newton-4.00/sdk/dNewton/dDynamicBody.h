@@ -111,9 +111,8 @@ inline void dDynamicBody::SetMassMatrix(dFloat32 mass, const dShapeInstance& sha
 	}
 
 	// although the engine fully supports asymmetric inertia, I will ignore cross inertia for now
-	dAssert(0);
-	//SetCentreOfMass(origin);
-	//SetMassMatrix(mass, inertia);
+	SetCentreOfMass(origin);
+	SetMassMatrix(mass, inertia);
 }
 
 #endif 

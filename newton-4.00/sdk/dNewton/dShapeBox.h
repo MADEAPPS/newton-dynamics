@@ -35,11 +35,12 @@ class dShapeBox: public dShapeConvex
 	virtual dShapeBox* GetAsShapeBox() { return this; }
 
 	protected:
-	void Init (dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
+	D_NEWTON_API void Init (dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
+	D_NEWTON_API virtual void MassProperties();
+	D_NEWTON_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 /*
 	virtual void CalcAABB (const dgMatrix& matrix, dVector& p0, dVector& p1) const;
 	virtual dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
-	virtual dVector SupportVertex (const dVector& dir, dInt32* const vertexIndex) const;
 	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
 	virtual dInt32 CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const;
@@ -47,7 +48,7 @@ class dShapeBox: public dShapeConvex
 	
 	virtual dInt32 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dVector& p0, const dVector& p1);
-	virtual void MassProperties ();
+	
 
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
@@ -59,13 +60,12 @@ class dShapeBox: public dShapeConvex
 	dVector m_vertex[8];
 
 	static dInt32 m_initSimplex;
-	//static dInt32 m_faces[][4];
-	//static dVector m_indexMark;
+	static dInt32 m_faces[][4];
+	static dVector m_indexMark;
 	//static dVector m_penetrationTol;
 	static dConvexSimplexEdge m_edgeArray[];
-	//static dConvexSimplexEdge* m_edgeEdgeMap[];
-	//static dConvexSimplexEdge* m_vertexToEdgeMap[];
-	//friend class dgWorld;
+	static dConvexSimplexEdge* m_edgeEdgeMap[];
+	static dConvexSimplexEdge* m_vertexToEdgeMap[];
 
 } D_GCC_VECTOR_ALIGNMENT;
 

@@ -30,13 +30,14 @@
 //#include "dShape.h"
 
 
+dVector dShape::m_flushZero(dFloat32(1.0e-7f));
+
 #if 0
-dVector dShape::m_flushZero (dgFloat32 (1.0e-7f));
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-dShape::dShape (dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revision)
+dShape::dShape (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revision)
 	:m_inertia(dVector::m_zero)
 	,m_crossInertia(dVector::m_zero)
 	,m_centerOfMass(dVector::m_zero)
@@ -48,7 +49,7 @@ dShape::dShape (dgWorld* const world, dgDeserialize deserialization, void* const
 	,m_collisionId(dShapeID(0))
 	,m_allocator(world->GetAllocator())
 {
-	dgInt32 collisionId;
+	dInt32 collisionId;
 	deserialization (userData, &m_inertia, sizeof (m_inertia));
 	deserialization (userData, &m_crossInertia, sizeof (m_crossInertia));
 	deserialization (userData, &m_centerOfMass, sizeof (m_centerOfMass));
@@ -61,7 +62,7 @@ dShape::dShape (dgWorld* const world, dgDeserialize deserialization, void* const
 }
 
 
-dUnsigned32 dShape::Quantize(dgFloat32 value)
+dUnsigned32 dShape::Quantize(dFloat32 value)
 {
 	return dUnsigned32 (value * 1024.0f);
 }
@@ -72,42 +73,6 @@ dUnsigned32 dShape::Quantize(const void* const buffer, int size)
 	return crc;
 }
 
-void dShape::MassProperties ()
-{
-	// using general central theorem, to extract the Inertia relative to the center of mass 
-	//IImatrix = IIorigin + unitmass * [(displacemnet % displacemnet) * identityMatrix - transpose(displacement) * displacement)];
-	
-	dgMatrix inertia (dgGetIdentityMatrix());
-	inertia[0][0] = m_inertia[0];
-	inertia[1][1] = m_inertia[1];
-	inertia[2][2] = m_inertia[2];
-	inertia[0][1] = m_crossInertia[2];
-	inertia[1][0] = m_crossInertia[2];
-	inertia[0][2] = m_crossInertia[1];
-	inertia[2][0] = m_crossInertia[1];
-	inertia[1][2] = m_crossInertia[0];
-	inertia[2][1] = m_crossInertia[0];
-
-	dVector origin (m_centerOfMass);
-	dgFloat32 originMag2 = origin.DotProduct(origin & dVector::m_triplexMask).GetScalar();
-
-	dgMatrix Covariance (origin, origin);
-	dgMatrix parallel (dgGetIdentityMatrix());
-	for (dgInt32 i = 0; i < 3; i ++ ) {
-		parallel[i][i] = originMag2;
-		inertia[i] += (parallel[i] - Covariance[i]);
-		dgAssert (inertia[i][i] > dgFloat32 (0.0f));
-	}
-	
-	m_inertia[0] = inertia[0][0];
-	m_inertia[1] = inertia[1][1];
-	m_inertia[2] = inertia[2][2];
-	m_crossInertia[0] = inertia[2][1];
-	m_crossInertia[1] = inertia[2][0];
-	m_crossInertia[2] = inertia[1][0];
-}
-
-
 void dShape::GetCollisionInfo(dShapeInfo* const info) const
 {
 	info->m_collisionType = m_collisionId;
@@ -115,7 +80,7 @@ void dShape::GetCollisionInfo(dShapeInfo* const info) const
 
 void dShape::SerializeLow (dgSerialize callback, void* const userData) const
 {
-	dgInt32 collisionId = m_collisionId;
+	dInt32 collisionId = m_collisionId;
 	callback (userData, &m_inertia, sizeof (m_inertia));
 	callback (userData, &m_crossInertia, sizeof (m_crossInertia));
 	callback (userData, &m_centerOfMass, sizeof (m_centerOfMass));
@@ -131,10 +96,10 @@ void dShape::SerializeLow (dgSerialize callback, void* const userData) const
 dShape::dShape(dShapeID id)
 	:dClassAlloc()
 	,m_inertia(dVector::m_zero)
-//	,m_crossInertia(dVector::m_zero)
-//	,m_centerOfMass(dVector::m_zero)
-//	,m_boxSize(dVector::m_zero)
-//	,m_boxOrigin(dVector::m_zero)
+	,m_crossInertia(dVector::m_zero)
+	,m_centerOfMass(dVector::m_zero)
+	,m_boxSize(dVector::m_zero)
+	,m_boxOrigin(dVector::m_zero)
 	,m_refCount(0)
 //	,m_signature(signature)
 //	,m_collisionId(id)
@@ -145,10 +110,10 @@ dShape::dShape(dShapeID id)
 dShape::dShape(const dShape& source)
 	:dClassAlloc()
 	,m_inertia(source.m_inertia)
-	//,m_crossInertia(source.m_crossInertia)
-	//,m_centerOfMass(source.m_centerOfMass)
-	//,m_boxSize(source.m_boxSize)
-	//,m_boxOrigin(source.m_boxOrigin)
+	,m_crossInertia(source.m_crossInertia)
+	,m_centerOfMass(source.m_centerOfMass)
+	,m_boxSize(source.m_boxSize)
+	,m_boxOrigin(source.m_boxOrigin)
 	,m_refCount(0)
 	//,m_signature(source.m_signature)
 	//,m_collisionId(source.m_collisionId)
@@ -159,4 +124,39 @@ dShape::dShape(const dShape& source)
 dShape::~dShape()
 {
 	dAssert(m_refCount.load() == 0);
+}
+
+void dShape::MassProperties()
+{
+	// using general central theorem, to extract the Inertia relative to the center of mass 
+	//IImatrix = IIorigin + unitmass * [(displacemnet % displacemnet) * identityMatrix - transpose(displacement) * displacement)];
+
+	dMatrix inertia(dGetIdentityMatrix());
+	inertia[0][0] = m_inertia[0];
+	inertia[1][1] = m_inertia[1];
+	inertia[2][2] = m_inertia[2];
+	inertia[0][1] = m_crossInertia[2];
+	inertia[1][0] = m_crossInertia[2];
+	inertia[0][2] = m_crossInertia[1];
+	inertia[2][0] = m_crossInertia[1];
+	inertia[1][2] = m_crossInertia[0];
+	inertia[2][1] = m_crossInertia[0];
+
+	dVector origin(m_centerOfMass);
+	dFloat32 originMag2 = origin.DotProduct(origin & dVector::m_triplexMask).GetScalar();
+
+	dMatrix Covariance(origin, origin);
+	dMatrix parallel(dGetIdentityMatrix());
+	for (dInt32 i = 0; i < 3; i++) {
+		parallel[i][i] = originMag2;
+		inertia[i] += (parallel[i] - Covariance[i]);
+		dAssert(inertia[i][i] > dFloat32(0.0f));
+	}
+
+	m_inertia[0] = inertia[0][0];
+	m_inertia[1] = inertia[1][1];
+	m_inertia[2] = inertia[2][2];
+	m_crossInertia[0] = inertia[2][1];
+	m_crossInertia[1] = inertia[2][0];
+	m_crossInertia[2] = inertia[1][0];
 }

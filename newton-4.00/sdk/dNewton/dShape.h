@@ -37,6 +37,7 @@
 class dShapeBox;
 class dShapeNull;
 class dShapeConvex;
+class dShapeDebugCallback;
 
 #ifdef _DEBUG
 //	#define DG_DEBUG_AABB
@@ -229,7 +230,6 @@ class dShape: public dClassAlloc
 	dUnsigned32 GetSignature () const;
 	dShapeID GetCollisionPrimityType () const;
 
-	virtual dVector SupportVertex (const dVector& dir, dInt32* const vertexIndex) const = 0;
 	virtual dVector SupportVertexSpecialProjectPoint (const dVector& point, const dVector& dir) const = 0;
 	virtual dVector SupportVertexSpecial (const dVector& dir, dFloat32 skinSkinThickness, dInt32* const vertexIndex) const = 0;
 
@@ -237,15 +237,9 @@ class dShape: public dClassAlloc
 
 	virtual void SetCollisionBBox (const dVector& p0, const dVector& p1) = 0;
 	virtual void CalcAABB (const dMatrix& matrix, dVector& p0, dVector& p1) const = 0;
-
-	virtual void DebugCollision  (const dMatrix& matrix, dShape::OnDebugCollisionMeshCallback callback, void* const userData) const = 0;
 	virtual dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const = 0;
 
 	virtual dFloat32 GetVolume () const = 0;
-	
-	virtual void MassProperties ();
-	virtual dFloat32 CalculateMassProperties (const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const {dAssert (0); return 0;}
-
 	virtual dFloat32 GetBoxMinRadius () const = 0; 
 	virtual dFloat32 GetBoxMaxRadius () const = 0; 
 	
@@ -277,7 +271,13 @@ class dShape: public dClassAlloc
 	virtual dShapeNull* GetAsShapeNull() { return nullptr; }
 	virtual dShapeConvex* GetAsShapeConvex() { return nullptr; }
 
+	D_NEWTON_API virtual void MassProperties();
+
+	virtual void DebugShape(const dMatrix& matrix, dShapeDebugCallback& debugCallback) const = 0;
+	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const = 0;
+
 	virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
+	virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
 
 	protected:
 	D_NEWTON_API dShape(dShapeID id);
@@ -289,16 +289,14 @@ class dShape: public dClassAlloc
 	//virtual dInt32 CalculateSignature () const = 0;
 
 	dVector m_inertia;	
-	//dVector m_crossInertia;	
-	//dVector m_centerOfMass;
-	//dVector m_boxSize;
-	//dVector m_boxOrigin;
+	dVector m_crossInertia;	
+	dVector m_centerOfMass;
+	dVector m_boxSize;
+	dVector m_boxOrigin;
 	mutable std::atomic<dInt32> m_refCount;
-	//dUnsigned32 m_signature;
 	//dShapeID m_collisionId;
-	//dgMemoryAllocator* m_allocator;
-	//
-	//static dVector m_flushZero;
+	static dVector m_flushZero;
+
 	//friend class dgBody;
 	//friend class dgWorld;
 	//friend class dgMinkowskiConv;
@@ -377,6 +375,12 @@ inline dInt32 dShape::Release() const
 inline dInt32 dShape::GetRefCount() const
 {
 	return m_refCount.load();
+}
+
+inline dFloat32 dShape::CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const
+{ 
+	dAssert(0); 
+	return 0; 
 }
 
 inline dMatrix dShape::CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const

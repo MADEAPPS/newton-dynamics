@@ -27,6 +27,24 @@
 #include "dShape.h"
 
 class dBody;
+class dShapeInstance;
+
+class dShapeDebugCallback
+{
+	public: 
+	dShapeDebugCallback()
+		:m_instance(nullptr)
+	{
+	}
+
+	virtual ~dShapeDebugCallback()
+	{
+	}
+
+	void virtual DrawPolygon(dInt32 vertexCount, const dVector* const faceArray) = 0;
+
+	const dShapeInstance* m_instance;
+};
 
 D_MSC_VECTOR_ALIGNMENT
 class dShapeInstance: public dClassAlloc
@@ -48,7 +66,10 @@ class dShapeInstance: public dClassAlloc
 	D_NEWTON_API ~dShapeInstance();
 	D_NEWTON_API dShapeInstance& operator=(const dShapeInstance& src);
 
-	const dShape* GetShape() const { return m_shape; }
+	D_NEWTON_API void DebugShape(const dMatrix& matrix, dShapeDebugCallback& debugCallback) const;
+
+	const dShape* GetShape() const;
+	dMatrix GetScaledTransform(const dMatrix& matrix) const;
 
 	D_NEWTON_API dMatrix CalculateInertia() const;
 #if 0
@@ -115,8 +136,6 @@ class dShapeInstance: public dClassAlloc
 	dFloat32 GetBoxMinRadius () const; 
 	dFloat32 GetBoxMaxRadius () const; 
 	
-	dMatrix GetScaledTransform(const dMatrix& matrix) const;
-	void DebugCollision  (const dMatrix& matrix, dShape::OnDebugCollisionMeshCallback callback, void* const userData) const;
 
 	dVector SupportVertex (const dVector& dir) const;
 	dInt32 CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const;
@@ -528,14 +547,6 @@ D_INLINE dShapeInstance::dScaleType dShapeInstance::GetCombinedScaleType(dShapeI
 	return dgMax(m_scaleType, type);
 }
 
-D_INLINE dMatrix dShapeInstance::GetScaledTransform(const dMatrix& matrix) const
-{
-	dMatrix scaledMatrix(m_localMatrix * matrix);
-	scaledMatrix[0] = scaledMatrix[0].Scale(m_scale[0]);
-	scaledMatrix[1] = scaledMatrix[1].Scale(m_scale[1]);
-	scaledMatrix[2] = scaledMatrix[2].Scale(m_scale[2]);
-	return m_aligmentMatrix * scaledMatrix;
-}
 
 D_INLINE void dShapeInstance::CalcObb (dVector& origin, dVector& size) const
 {
@@ -595,6 +606,21 @@ D_INLINE dVector dShapeInstance::CalculateBuoyancyVolume(const dMatrix& matrix, 
 	return m_childShape->CalculateVolumeIntegral(m_localMatrix * matrix, fluidPlane, *this);
 }
 #endif
+
+D_INLINE const dShape* dShapeInstance::GetShape() const 
+{ 
+	return m_shape; 
+}
+
+D_INLINE dMatrix dShapeInstance::GetScaledTransform(const dMatrix& matrix) const
+{
+	dMatrix scaledMatrix(m_localMatrix * matrix);
+	scaledMatrix[0] = scaledMatrix[0].Scale(m_scale[0]);
+	scaledMatrix[1] = scaledMatrix[1].Scale(m_scale[1]);
+	scaledMatrix[2] = scaledMatrix[2].Scale(m_scale[2]);
+	return m_aligmentMatrix * scaledMatrix;
+}
+
 
 #endif 
 

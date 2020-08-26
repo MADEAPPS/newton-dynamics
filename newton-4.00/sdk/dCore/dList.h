@@ -115,13 +115,13 @@ class dList
 		T m_info;
 		dListNode *m_next;
 		dListNode *m_prev;
-		friend class dList<T>;
+		friend class dList<T, allocator>;
 	};
 
 	class Iterator
 	{
 		public:
-		Iterator (const dList<T> &me)
+		Iterator (const dList<T, allocator> &me)
 		{
 			m_ptr = nullptr;
 			m_list = (dList *)&me;
@@ -224,7 +224,7 @@ class dList
 	void Remove (const T &element);
 	void RemoveAll ();
 
-	void Merge (dList<T>& list);
+	void Merge (dList<T, allocator>& list);
 	void Unlink (dListNode* const node);
 	bool SanityCheck () const;
 
@@ -233,20 +233,19 @@ class dList
 	// member variables
 	// ***********************************************************
 	private:
-	dInt32 m_count;
 	dListNode* m_first;
 	dListNode* m_last;
+	dInt32 m_count;
 
 //	static dInt32 m_size;
 	friend class dListNode;
 };
 
-
 template<class T, class allocator = dContainersAlloc<T> >
 dList<T,allocator>::dList ()
-	:m_count(0)
-	,m_first(nullptr)
+	:m_first(nullptr)
 	,m_last(nullptr)
+	,m_count(0)
 {
 }
 
@@ -581,7 +580,7 @@ void dList<T,allocator>::Unlink (dListNode* const node)
 }
 
 template<class T, class allocator = dContainersAlloc<T> > 
-void dList<T,allocator>::Merge (dList<T>& list)
+void dList<T,allocator>::Merge (dList<T, allocator>& list)
 {
 	m_count += list.m_count;
 	if (list.m_first) 

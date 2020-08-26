@@ -33,6 +33,17 @@ class dShapeNull: public dShapeConvex
 	virtual ~dShapeNull() {}
 
 	virtual dShapeNull* GetAsShapeNull() { return this; }
+
+
+	dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
+	{
+		return dVector(dFloat32(0.0f));
+	}
+
+	virtual void DebugShape(const dMatrix& matrix, dShapeDebugCallback& debugCallback) const
+	{
+	}
+
 /*
 	protected:
 	virtual dgFloat32 GetVolume () const;
@@ -40,8 +51,6 @@ class dShapeNull: public dShapeConvex
 	
 	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
 	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const;
-
-	virtual void DebugCollision  (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 	
 	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane, const dgCollisionInstance& parentScale) const;
 	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;

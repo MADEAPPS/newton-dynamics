@@ -132,9 +132,6 @@ void dDynamicBody::ApplyExternalForces(dInt32 threadID, dFloat32 tiemstep)
 
 void dDynamicBody::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 {
-	//dFloat32 Ixx = inertia[0][0];
-	//dFloat32 Iyy = inertia[1][1];
-	//dFloat32 Izz = inertia[2][2];
 	mass = dAbs(mass);
 
 	//if (m_collision->IsType(dgCollision::dgCollisionMesh_RTTI) || m_collision->IsType(dgCollision::dgCollisionScene_RTTI)) {
@@ -178,35 +175,34 @@ void dDynamicBody::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 	}
 	else 
 	{
-		dAssert(0);
-		//Ixx = dAbs(Ixx);
-		//Iyy = dAbs(Iyy);
-		//Izz = dAbs(Izz);
-		//
-		//dFloat32 Ixx1 = dgClamp(Ixx, dFloat32(0.001f) * mass, dFloat32(1000.0f) * mass);
-		//dFloat32 Iyy1 = dgClamp(Iyy, dFloat32(0.001f) * mass, dFloat32(1000.0f) * mass);
-		//dFloat32 Izz1 = dgClamp(Izz, dFloat32(0.001f) * mass, dFloat32(1000.0f) * mass);
-		//
-		//dAssert(Ixx > dFloat32(0.0f));
-		//dAssert(Iyy > dFloat32(0.0f));
-		//dAssert(Izz > dFloat32(0.0f));
-		//
+		dFloat32 Ixx = dAbs(inertia[0][0]);
+		dFloat32 Iyy = dAbs(inertia[1][1]);
+		dFloat32 Izz = dAbs(inertia[2][2]);
+		
+		dFloat32 Ixx1 = dClamp(Ixx, dFloat32(0.001f) * mass, dFloat32(1000.0f) * mass);
+		dFloat32 Iyy1 = dClamp(Iyy, dFloat32(0.001f) * mass, dFloat32(1000.0f) * mass);
+		dFloat32 Izz1 = dClamp(Izz, dFloat32(0.001f) * mass, dFloat32(1000.0f) * mass);
+		
+		dAssert(Ixx > dFloat32(0.0f));
+		dAssert(Iyy > dFloat32(0.0f));
+		dAssert(Izz > dFloat32(0.0f));
+		
 		//if (m_masterNode) {
 		//	if (m_invMass.m_w == dFloat32(0.0f)) {
 		//		dgBodyMasterList& masterList(*m_world);
 		//		masterList.RotateToEnd(m_masterNode);
 		//	}
 		//}
-		//
-		//m_mass.m_x = Ixx1;
-		//m_mass.m_y = Iyy1;
-		//m_mass.m_z = Izz1;
-		//m_mass.m_w = mass;
-		//
-		//m_invMass.m_x = dFloat32(1.0f) / Ixx1;
-		//m_invMass.m_y = dFloat32(1.0f) / Iyy1;
-		//m_invMass.m_z = dFloat32(1.0f) / Izz1;
-		//m_invMass.m_w = dFloat32(1.0f) / mass;
+		
+		m_mass.m_x = Ixx1;
+		m_mass.m_y = Iyy1;
+		m_mass.m_z = Izz1;
+		m_mass.m_w = mass;
+		
+		m_invMass.m_x = dFloat32(1.0f) / Ixx1;
+		m_invMass.m_y = dFloat32(1.0f) / Iyy1;
+		m_invMass.m_z = dFloat32(1.0f) / Izz1;
+		m_invMass.m_w = dFloat32(1.0f) / mass;
 	}
 
 	//#ifdef _DEBUG

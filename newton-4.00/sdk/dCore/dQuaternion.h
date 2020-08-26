@@ -33,9 +33,9 @@ class dQuaternion: public dClassAlloc
 {
 	public:
 	dQuaternion (); 
-	dQuaternion (const dMatrix& matrix);
-	dQuaternion (dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3); 
-	dQuaternion (const dVector &unit_Axis, dFloat32 angle = dFloat32 (0.0f));
+	D_CORE_API dQuaternion (const dMatrix& matrix);
+	dQuaternion (dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3);
+	D_CORE_API dQuaternion (const dVector &unit_Axis, dFloat32 angle = dFloat32 (0.0f));
 
 //	dFloat32& operator[] (dgInt32 i);
 //	const dFloat32& operator[] (dgInt32 i) const;
@@ -43,10 +43,10 @@ class dQuaternion: public dClassAlloc
 	void Scale (dFloat32 scale); 
 	void Normalize (); 
 	dQuaternion Inverse () const; 
-	dQuaternion Slerp (const dQuaternion &q1, dFloat32 t) const;
+	D_CORE_API dQuaternion Slerp (const dQuaternion &q1, dFloat32 t) const;
 
 	dFloat32 DotProduct (const dQuaternion &QB) const;
-	dVector CalcAverageOmega (const dQuaternion &q1, dFloat32 invdt) const;
+	D_CORE_API dVector CalcAverageOmega (const dQuaternion &q1, dFloat32 invdt) const;
 
 	dQuaternion operator* (const dQuaternion &B) const;
 	dQuaternion operator+ (const dQuaternion &B) const; 

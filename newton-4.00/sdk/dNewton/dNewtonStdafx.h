@@ -29,13 +29,19 @@
 
 #include <dCoreStdafx.h>
 #include <dList.h>
+#include <dTree.h>
+#include <dHeap.h>
 #include <dTypes.h>
+#include <dArray.h>
+#include <dStack.h>
+#include <dDebug.h>
 #include <dPlane.h>
 #include <dVector.h>
 #include <dMatrix.h>
 #include <dThread.h>
 #include <dMemory.h>
 #include <dGoogol.h>
+#include <dPolyhedra.h>
 #include <dSyncMutex.h>
 #include <dSemaphore.h>
 #include <dClassAlloc.h>
@@ -47,6 +53,7 @@
 #include <dTemplateVector.h>
 #include <dContainersAlloc.h>
 #include <dSmallDeterminant.h>
+#include <dPolyhedraMassProperties.h>
 
 //#define DG_PROFILE_PHYSICS
 

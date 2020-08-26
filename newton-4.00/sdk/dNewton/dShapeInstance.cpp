@@ -376,12 +376,6 @@ void dShapeInstance::SetLocalMatrix (const dgMatrix& matrix)
 	dgAssert(m_localMatrix.TestOrthogonal());
 }
 
-
-void dShapeInstance::DebugCollision (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
-{
-	m_childShape->DebugCollision (GetScaledTransform(matrix), callback, userData);
-}
-
 dgInt32 dShapeInstance::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
 {
 	dgInt32 count = 0;
@@ -695,6 +689,12 @@ dShapeInstance& dShapeInstance::operator=(const dShapeInstance& instance)
 	m_shape = instance.m_shape->AddRef();
 	m_ownerBody = instance.m_ownerBody;
 	return *this;
+}
+
+void dShapeInstance::DebugShape(const dMatrix& matrix, dShapeDebugCallback& debugCallback) const
+{
+	debugCallback.m_instance = this;
+	m_shape->DebugShape(GetScaledTransform(matrix), debugCallback);
 }
 
 dMatrix dShapeInstance::CalculateInertia() const

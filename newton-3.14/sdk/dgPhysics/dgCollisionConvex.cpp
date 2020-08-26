@@ -245,10 +245,12 @@ void dgCollisionConvex::MassProperties ()
 
 dgMatrix dgCollisionConvex::CalculateInertiaAndCenterOfMass (const dgMatrix& alignMatrix, const dgVector& localScale, const dgMatrix& matrix) const
 {
-	if ((dgAbs (localScale.m_x - localScale.m_y) < dgFloat32 (1.0e-5f)) && (dgAbs (localScale.m_x - localScale.m_z) < dgFloat32 (1.0e-5f))) {
-		dgAssert (alignMatrix[0][0] == dgFloat32(1.0f));
-		dgAssert (alignMatrix[1][1] == dgFloat32(1.0f));
-		dgAssert (alignMatrix[2][2] == dgFloat32(1.0f));
+//	if ((dgAbs (localScale.m_x - localScale.m_y) < dgFloat32 (1.0e-5f)) && (dgAbs (localScale.m_x - localScale.m_z) < dgFloat32 (1.0e-5f))) {
+	if ((dgAbs(localScale.m_x - localScale.m_y) < dgFloat32(1.0e-5f)) &&
+		(dgAbs(localScale.m_x - localScale.m_z) < dgFloat32(1.0e-5f)) &&
+		(dgAbs(localScale.m_y - localScale.m_z) < dgFloat32(1.0e-5f))) {
+
+		dgAssert(alignMatrix.TestIdentity());
 
 		// using general central theorem, is much faster and more accurate;
 		//IImatrix = IIorigin + mass * [(displacemnet % displacemnet) * identityMatrix - transpose(displacement) * displacement)];

@@ -50,8 +50,13 @@ class dDummyCollision: public dShapeNull
 };
 
 dBody::dBody()
-	:m_veloc(dVector::m_zero)
+	:m_matrix(dGetIdentityMatrix())
+	,m_invWorldInertiaMatrix(dGetZeroMatrix())
+	,m_veloc(dVector::m_zero)
 	,m_omega(dVector::m_zero)
+	,m_localCentreOfMass(dVector::m_zero)
+	,m_globalCentreOfMass(dVector::m_zero)
+	,m_rotation()
 	,m_shapeInstance(dDummyCollision::GetNullShape())
 	,m_newton(nullptr)
 	,m_newtonNode(nullptr)
@@ -61,6 +66,16 @@ dBody::dBody()
 dBody::~dBody()
 {
 }
+
+void dBody::SetCentreOfMass(const dVector& com)
+{
+	m_localCentreOfMass.m_x = com.m_x;
+	m_localCentreOfMass.m_y = com.m_y;
+	m_localCentreOfMass.m_z = com.m_z;
+	m_localCentreOfMass.m_w = dFloat32(1.0f);
+	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
+}
+
 
 const dShapeInstance& dBody::GetCollisionShape() const
 {

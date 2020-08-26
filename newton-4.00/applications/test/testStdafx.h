@@ -23,6 +23,7 @@
 #include <dShapeNull.h>
 #include <dShapeConvex.h>
 #include <dDynamicBody.h>
+#include <dContactSolver.h>
 #include <dShapeInstance.h>
 
 #endif

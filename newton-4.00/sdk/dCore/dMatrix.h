@@ -25,12 +25,10 @@
 
 #include "dCoreStdafx.h"
 #include "dTypes.h"
+#include "dDebug.h"
 #include "dPlane.h"
 #include "dVector.h"
 #include "dClassAlloc.h"
-
-//#include "dDebug.h"
-//#include <math.h>
 
 class dMatrix;
 class dQuaternion;

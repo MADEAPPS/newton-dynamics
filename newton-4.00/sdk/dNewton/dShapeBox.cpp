@@ -24,20 +24,22 @@
 
 dInt32 dShapeBox::m_initSimplex = 0;
 dShapeConvex::dConvexSimplexEdge dShapeBox::m_edgeArray[24];
-//dShapeConvex::dConvexSimplexEdge* dShapeBox::m_edgeEdgeMap[12];
-//dShapeConvex::dConvexSimplexEdge* dShapeBox::m_vertexToEdgeMap[8];
-//dInt32 dShapeBox::m_faces[][4] =
-//{
-//	{0, 1, 3, 2},
-//	{0, 4, 5, 1},
-//	{1, 5, 7, 3},
-//	{0, 2, 6, 4},
-//	{2, 3, 7, 6},
-//	{4, 6, 7, 5},
-//};
+dShapeConvex::dConvexSimplexEdge* dShapeBox::m_edgeEdgeMap[12];
+dShapeConvex::dConvexSimplexEdge* dShapeBox::m_vertexToEdgeMap[8];
+dInt32 dShapeBox::m_faces[][4] =
+{
+	{0, 1, 3, 2},
+	{0, 4, 5, 1},
+	{1, 5, 7, 3},
+	{0, 2, 6, 4},
+	{2, 3, 7, 6},
+	{4, 6, 7, 5},
+};
+
+dVector dShapeBox::m_indexMark(dFloat32(1.0f), dFloat32(2.0f), dFloat32(4.0f), dFloat32(0.0f));
 
 #if 0
-dVector dShapeBox::m_indexMark (dFloat32 (1.0f), dFloat32 (2.0f), dFloat32 (4.0f), dFloat32 (0.0f));
+
 dVector dShapeBox::m_penetrationTol (DG_PENETRATION_TOL, DG_PENETRATION_TOL, DG_PENETRATION_TOL, dFloat32 (0.0f));
 
 dShapeBox::dShapeBox(dgMemoryAllocator* allocator, dgUnsigned32 signature, dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
@@ -86,21 +88,6 @@ dInt32 dShapeBox::CalculateSignature () const
 	return CalculateSignature(m_size[0].m_x, m_size[0].m_y, m_size[0].m_z);
 }
 
-dVector dShapeBox::SupportVertex (const dVector& dir0, dInt32* const vertexIndex) const
-{
-	dVector mask0(dir0.Abs() > m_flushZero);
-	dVector dir(dir0 & mask0);
-
-	dAssert (dAbs(dir.DotProduct(dir).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-3f));
-	dAssert (dir.m_w == dFloat32 (0.0f));
-	dVector mask(dir < dVector::m_zero);
-	if (vertexIndex) {
-		dVector index (m_indexMark * (mask & dVector::m_one));
-		index = (index.AddHorizontal()).GetInt();
-		*vertexIndex = dInt32 (index.m_ix);
-	}
-	return m_size[0].Select(m_size[1], mask);
-}
 
 dVector dShapeBox::SupportVertexSpecial(const dVector& dir0, dFloat32 skinThickness, dInt32* const vertexIndex) const
 {
@@ -190,17 +177,6 @@ dFloat32 dShapeBox::RayCast (const dVector& localP0, const dVector& localP1, dFl
 	return tmin;
 }
 
-void dShapeBox::MassProperties ()
-{
-	m_centerOfMass = dVector::m_zero;
-	m_crossInertia = dVector::m_zero;
-	dFloat32 volume = dFloat32 (8.0f) * m_size[0].m_x * m_size[0].m_y * m_size[0].m_z; 
-	m_inertia = dVector (dFloat32 (1.0f / 3.0f) * (m_size[0].m_y * m_size[0].m_y + m_size[0].m_z * m_size[0].m_z),
-						  dFloat32 (1.0f / 3.0f) * (m_size[0].m_x * m_size[0].m_x + m_size[0].m_z * m_size[0].m_z),
-						  dFloat32 (1.0f / 3.0f) * (m_size[0].m_x * m_size[0].m_x + m_size[0].m_y * m_size[0].m_y),
-						  dFloat32 (0.0f));
-	m_centerOfMass.m_w = volume;
-}
 
 void dShapeBox::GetCollisionInfo(dgCollisionInfo* const info) const
 {
@@ -222,8 +198,6 @@ const dShapeConvex::dConvexSimplexEdge** dShapeBox::GetVertexToEdgeMapping() con
 {
 	return (const dConvexSimplexEdge**)&m_vertexToEdgeMap[0];
 }
-
-
 
 dInt32 dShapeBox::CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const
 {
@@ -416,67 +390,101 @@ void dShapeBox::Init(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 	
 	if (!m_initSimplex) 
 	{
-		dAssert(0);
-	//	dgPolyhedra polyhedra(GetAllocator());
-	//	polyhedra.BeginFace();
-	//	for (dInt32 i = 0; i < 6; i++) {
-	//		polyhedra.AddFace(4, &m_faces[i][0]);
-	//	}
-	//	polyhedra.EndFace();
-	//
-	//	int index = 0;
-	//	dInt32 mark = polyhedra.IncLRU();;
-	//	dgPolyhedra::Iterator iter(polyhedra);
-	//	for (iter.Begin(); iter; iter++) {
-	//		dgEdge* const edge = &iter.GetNode()->GetInfo();
-	//		if (edge->m_mark != mark) {
-	//			dgEdge* ptr = edge;
-	//			do {
-	//				ptr->m_mark = mark;
-	//				ptr->m_userData = index;
-	//				index++;
-	//				ptr = ptr->m_twin->m_next;
-	//			} while (ptr != edge);
-	//		}
-	//	}
-	//	dAssert(index == 24);
-	//
-	//	polyhedra.IncLRU();
-	//	mark = polyhedra.IncLRU();
-	//	for (iter.Begin(); iter; iter++) {
-	//		dgEdge* const edge = &iter.GetNode()->GetInfo();
-	//		dgEdge *ptr = edge;
-	//		do {
-	//			ptr->m_mark = mark;
-	//			dConvexSimplexEdge* const simplexPtr = &m_simplex[ptr->m_userData];
-	//			simplexPtr->m_vertex = ptr->m_incidentVertex;
-	//			simplexPtr->m_next = &m_simplex[ptr->m_next->m_userData];
-	//			simplexPtr->m_prev = &m_simplex[ptr->m_prev->m_userData];
-	//			simplexPtr->m_twin = &m_simplex[ptr->m_twin->m_userData];
-	//			ptr = ptr->m_twin->m_next;
-	//		} while (ptr != edge);
-	//	}
-	//
-	//	for (iter.Begin(); iter; iter++) {
-	//		dgEdge* const edge = &iter.GetNode()->GetInfo();
-	//		m_vertexToEdgeMap[edge->m_incidentVertex] = &m_simplex[edge->m_userData];
-	//	}
-	//
-	//	dInt32 count = 0;
-	//	mark = polyhedra.IncLRU();
-	//	for (iter.Begin(); iter; iter++) {
-	//		dgEdge* const edge = &iter.GetNode()->GetInfo();
-	//		if (edge->m_mark != mark) {
-	//			edge->m_mark = mark;
-	//			edge->m_twin->m_mark = mark;
-	//			m_edgeEdgeMap[count] = &m_simplex[edge->m_userData];
-	//			count++;
-	//			dAssert(count <= 12);
-	//		}
-	//	}
-	//
-	//	m_initSimplex = 1;
+		dPolyhedra polyhedra;
+		polyhedra.BeginFace();
+		for (dInt32 i = 0; i < 6; i++) 
+		{
+			polyhedra.AddFace(4, &m_faces[i][0]);
+		}
+		polyhedra.EndFace();
+	
+		int index = 0;
+		dInt32 mark = polyhedra.IncLRU();;
+		dPolyhedra::Iterator iter(polyhedra);
+		for (iter.Begin(); iter; iter++) {
+			dEdge* const edge = &iter.GetNode()->GetInfo();
+			if (edge->m_mark != mark) {
+				dEdge* ptr = edge;
+				do {
+					ptr->m_mark = mark;
+					ptr->m_userData = index;
+					index++;
+					ptr = ptr->m_twin->m_next;
+				} while (ptr != edge);
+			}
+		}
+		dAssert(index == 24);
+	
+		polyhedra.IncLRU();
+		mark = polyhedra.IncLRU();
+		for (iter.Begin(); iter; iter++) 
+		{
+			dEdge* const edge = &iter.GetNode()->GetInfo();
+			dEdge *ptr = edge;
+			do 
+			{
+				ptr->m_mark = mark;
+				dConvexSimplexEdge* const simplexPtr = &m_simplex[ptr->m_userData];
+				simplexPtr->m_vertex = ptr->m_incidentVertex;
+				simplexPtr->m_next = &m_simplex[ptr->m_next->m_userData];
+				simplexPtr->m_prev = &m_simplex[ptr->m_prev->m_userData];
+				simplexPtr->m_twin = &m_simplex[ptr->m_twin->m_userData];
+				ptr = ptr->m_twin->m_next;
+			} while (ptr != edge);
+		}
+	
+		for (iter.Begin(); iter; iter++) 
+		{
+			dEdge* const edge = &iter.GetNode()->GetInfo();
+			m_vertexToEdgeMap[edge->m_incidentVertex] = &m_simplex[edge->m_userData];
+		}
+	
+		dInt32 count = 0;
+		mark = polyhedra.IncLRU();
+		for (iter.Begin(); iter; iter++) 
+		{
+			dEdge* const edge = &iter.GetNode()->GetInfo();
+			if (edge->m_mark != mark) 
+			{
+				edge->m_mark = mark;
+				edge->m_twin->m_mark = mark;
+				m_edgeEdgeMap[count] = &m_simplex[edge->m_userData];
+				count++;
+				dAssert(count <= 12);
+			}
+		}
+	
+		m_initSimplex = 1;
 	}
-	//
-	//SetVolumeAndCG();
+
+	SetVolumeAndCG();
+}
+
+void dShapeBox::MassProperties()
+{
+	m_centerOfMass = dVector::m_zero;
+	m_crossInertia = dVector::m_zero;
+	dFloat32 volume = dFloat32(8.0f) * m_size[0].m_x * m_size[0].m_y * m_size[0].m_z;
+	m_inertia = dVector(dFloat32(1.0f / 3.0f) * (m_size[0].m_y * m_size[0].m_y + m_size[0].m_z * m_size[0].m_z),
+						dFloat32(1.0f / 3.0f) * (m_size[0].m_x * m_size[0].m_x + m_size[0].m_z * m_size[0].m_z),
+						dFloat32(1.0f / 3.0f) * (m_size[0].m_x * m_size[0].m_x + m_size[0].m_y * m_size[0].m_y),
+						dFloat32(0.0f));
+	m_centerOfMass.m_w = volume;
+}
+
+
+dVector dShapeBox::SupportVertex(const dVector& dir0, dInt32* const vertexIndex) const
+{
+	dVector mask0(dir0.Abs() > m_flushZero);
+	dVector dir(dir0 & mask0);
+
+	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
+	dAssert(dir.m_w == dFloat32(0.0f));
+	dVector mask(dir < dVector::m_zero);
+	if (vertexIndex) {
+		dVector index(m_indexMark * (mask & dVector::m_one));
+		index = (index.AddHorizontal()).GetInt();
+		*vertexIndex = dInt32(index.m_ix);
+	}
+	return m_size[0].Select(m_size[1], mask);
 }

@@ -59,13 +59,17 @@ class dShapeConvex: public dShape
 
 	virtual dShapeConvex* GetAsShapeConvex() { return this; }
 
+	D_NEWTON_API void SetVolumeAndCG();
+	D_NEWTON_API virtual void MassProperties();
+	D_NEWTON_API virtual void DebugShape(const dMatrix& matrix, dShapeDebugCallback& debugCallback) const;
+	D_NEWTON_API virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
 	D_NEWTON_API virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
+	
+
 /*
 	virtual void SerializeLow(dgSerialize callback, void* const userData) const;
 
 	virtual dVector CalculateVolumeIntegral (const dMatrix& globalMatrix, const dVector& plane, const dShapeInstance& parentScale) const;
-	static void CalculateInertia (void *userData, int vertexCount, const dFloat32* const FaceArray, int faceId);
-
 	virtual dFloat32 GetVolume () const;
 
 	virtual dFloat32 GetBoxMinRadius () const; 
@@ -74,13 +78,7 @@ class dShapeConvex: public dShape
 	dInt32 RayCastClosestFace (dVector* tetrahedrum, const dVector& origin, dFloat32& pointDist) const;
 	dVector CalculateVolumeIntegral (const dgPlane& plane) const; 
 	
-	void SetVolumeAndCG ();
 	bool SanityCheck (dgPolyhedra& hull) const;
-	virtual void DebugCollision  (const dMatrix& matrix, dShape::OnDebugCollisionMeshCallback callback, void* const userData) const;
-
-	virtual void MassProperties ();
-	virtual dFloat32 CalculateMassProperties (const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
-
 	bool SanityCheck(dInt32 count, const dVector& normal, dVector* const contactsOut) const;
 
 	dInt32 RectifyConvexSlice (dInt32 count, const dVector& normal, dVector* const contactsOut) const;
@@ -90,11 +88,6 @@ class dShapeConvex: public dShape
 	virtual const dConvexSimplexEdge** GetVertexToEdgeMapping() const {return NULL;}
 
 	dInt32 BuildCylinderCapPoly (dFloat32 radius, const dMatrix& transform, dVector* const vertexOut) const;
-	
-	
-	dFloat32 m_boxMinRadius;
-	dFloat32 m_boxMaxRadius;
-	dFloat32 m_simplexVolume;
 	
 	
 	friend class dgWorld;
@@ -107,6 +100,9 @@ class dShapeConvex: public dShape
 	dVector* m_vertex;
 	dConvexSimplexEdge* m_simplex;
 
+	dFloat32 m_boxMinRadius;
+	dFloat32 m_boxMaxRadius;
+	dFloat32 m_simplexVolume;
 	dUnsigned16 m_edgeCount;
 	dUnsigned16 m_vertexCount;
 
