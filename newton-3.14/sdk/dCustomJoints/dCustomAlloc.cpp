@@ -43,7 +43,7 @@
 				#if defined(_DEBUG) && defined(_MSC_VER)
 				// Track all memory leaks at the operating system level.
 				// make sure no Newton tool or utility leaves leaks behind.
-				_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF|_CRTDBG_LEAK_CHECK_DF);
+				_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_REPORT_FLAG);
 				#endif
 
 			case DLL_THREAD_DETACH:

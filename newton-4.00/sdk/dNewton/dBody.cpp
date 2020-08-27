@@ -28,6 +28,8 @@
 //////////////////////////////////////////////////////////////////////
 
 
+dUnsigned32 dBody::m_uniqueIDCount = 0;
+
 class dDummyCollision: public dShapeNull
 {
 	public: 
@@ -60,8 +62,11 @@ dBody::dBody()
 	,m_notifyCallback(nullptr)
 	,m_shapeInstance(dDummyCollision::GetNullShape())
 	,m_newton(nullptr)
+	,m_broadPhaseNode(nullptr)
 	,m_newtonNode(nullptr)
+	,m_uniqueID(m_uniqueIDCount)
 {
+	m_uniqueIDCount++;
 }
 
 dBody::~dBody()
@@ -80,7 +85,6 @@ void dBody::SetCentreOfMass(const dVector& com)
 	m_localCentreOfMass.m_w = dFloat32(1.0f);
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
 }
-
 
 const dShapeInstance& dBody::GetCollisionShape() const
 {
@@ -108,7 +112,12 @@ dBodyNotify* dBody::GetNotifyCallback(dBodyNotify* const notify) const
 	return m_notifyCallback;
 }
 
-inline dNewton* dBody::GetNewton() const
+dInt32 dBody::GetId() const
+{
+	return m_uniqueID;
+}
+
+dNewton* dBody::GetNewton() const
 {
 	return m_newton;
 }
@@ -123,6 +132,18 @@ dList<dBody*>::dListNode* dBody::GetNewtonNode() const
 {
 	return m_newtonNode;
 }
+
+dBroadPhaseBodyNode* dBody::GetBroadPhaseNode() const
+{
+	return m_broadPhaseNode;
+}
+
+void dBody::SetBroadPhaseNode(dBroadPhaseBodyNode* const node)
+{
+	dAssert(m_broadPhaseNode == nullptr);
+	m_broadPhaseNode = node;
+}
+
 
 dVector dBody::GetOmega() const
 {

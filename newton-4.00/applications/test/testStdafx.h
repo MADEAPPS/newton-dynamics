@@ -26,6 +26,7 @@
 #include <dDynamicBody.h>
 #include <dContactSolver.h>
 #include <dShapeInstance.h>
+#include <dBroadPhaseNode.h>
 #include <dBroadPhaseMixed.h>
 
 #endif

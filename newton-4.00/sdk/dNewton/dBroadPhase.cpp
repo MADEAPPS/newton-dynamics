@@ -1788,3 +1788,13 @@ dBroadPhase::dBroadPhase(dNewton* const world)
 dBroadPhase::~dBroadPhase()
 {
 }
+
+void dBroadPhase::RemoveBody(dBody* const body)
+{
+
+}
+
+void dBroadPhase::Update(dFloat32 timestep)
+{
+	D_TRACKTIME();
+}

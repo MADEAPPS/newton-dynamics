@@ -22,6 +22,7 @@
 #include "dNewtonStdafx.h"
 #include "dBody.h"
 #include "dNewton.h"
+#include "dShapeNull.h"
 #include "dDynamicBody.h"
 #include "dBroadPhaseMixed.h"
 
@@ -48,6 +49,12 @@ dNewton::~dNewton()
 	Sync();
 	Finish();
 
+	while (m_bodyList.GetFirst())
+	{
+		dBody* const body = m_bodyList.GetFirst()->GetInfo();
+		RemoveBody(body);
+		delete body;
+	}
 
 	delete m_broadPhase;
 }
@@ -63,6 +70,11 @@ void dNewton::AddBody(dBody* const body)
 void dNewton::RemoveBody(dBody* const body)
 {
 	dAssert(body->m_newtonNode && (body->m_newton == this));
+
+	if (body->GetBroadPhaseNode())
+	{
+		m_broadPhase->RemoveBody(body);
+	}
 
 	m_bodyList.Remove(body->m_newtonNode);
 	body->SetNewtonNode(nullptr, nullptr);
@@ -117,6 +129,7 @@ void dNewton::ThreadFunction()
 
 void dNewton::InternalUpdate(dFloat32 fullTimestep)
 {
+	D_TRACKTIME();
 	GetDynamicBodyArray();
 	dFloat32 timestep = fullTimestep / m_subSteps;
 	for (dInt32 i = 0; i < m_subSteps; i++)
@@ -130,16 +143,31 @@ void dNewton::InternalUpdate(dFloat32 fullTimestep)
 
 void dNewton::GetDynamicBodyArray()
 {
+	D_TRACKTIME();
 	m_dynamicBodyArray.SetCount(m_bodyList.GetCount());
 	dDynamicBody** const bodyPtr = &m_dynamicBodyArray[0];
 	int index = 0;
 	for (dList<dBody*>::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
-		dDynamicBody* const body = node->GetInfo()->GetAsDynamicBody();
-		if (body)
+		dDynamicBody* const dynBody = node->GetInfo()->GetAsDynamicBody();
+		if (dynBody)
 		{
-			bodyPtr[index] = body;
+			bodyPtr[index] = dynBody;
 			index++;
+
+			const dShape* const shape = ((dShape*)dynBody->GetCollisionShape().GetShape())->GetAsShapeNull();
+			if (shape)
+			{
+				dAssert(0);
+				if (dynBody->GetBroadPhaseNode())
+				{
+					m_broadPhase->RemoveBody(dynBody);
+				}
+			} 
+			else if (!dynBody->GetBroadPhaseNode())
+			{
+				m_broadPhase->AddBody(dynBody);
+			}
 		}
 	}
 }
@@ -150,6 +178,7 @@ void dNewton::TransformUpdate(dFloat32 timestep)
 
 void dNewton::SubstepUpdate(dFloat32 timestep)
 {
+	D_TRACKTIME();
 	UpdateSkeletons(timestep);
 	ApplyExternalForces(timestep);
 	UpdatePrelisteners(timestep);
@@ -206,9 +235,10 @@ void dNewton::ApplyExternalForces(dFloat32 timestep)
 
 void dNewton::UpdateSleepState(dFloat32 timestep)
 {
-	D_TRACKTIME();
+//	D_TRACKTIME();
 }
 
 void dNewton::UpdateBroadPhase(dFloat32 timestep)
 {
+	m_broadPhase->Update(timestep);
 }

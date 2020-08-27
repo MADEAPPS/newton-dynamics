@@ -23,6 +23,7 @@
 #define __D_BROADPHASE_H__
 
 #include "dNewtonStdafx.h"
+#include "dBroadPhaseNode.h"
 //#include "dgBody.h"
 //#include "dgBodyMasterList.h"
 
@@ -602,10 +603,15 @@ D_MSC_VECTOR_ALIGNMENT
 class dBroadPhase: public dClassAlloc
 {
 	public:
-	virtual ~dBroadPhase();
+	D_NEWTON_API virtual ~dBroadPhase();
+
+	virtual void AddBody(dBody* const body) = 0;
+	D_NEWTON_API virtual void RemoveBody(dBody* const body);
+
+	D_NEWTON_API virtual void Update(dFloat32 timestep);
 
 	protected:
-	dBroadPhase(dNewton* const world);
+	D_NEWTON_API dBroadPhase(dNewton* const world);
 
 	dNewton* m_newton;
 } D_GCC_VECTOR_ALIGNMENT;

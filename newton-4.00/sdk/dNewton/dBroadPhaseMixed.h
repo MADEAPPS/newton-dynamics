@@ -67,8 +67,10 @@ D_MSC_VECTOR_ALIGNMENT
 class dBroadPhaseMixed : public dBroadPhase
 {
 	public:
-	dBroadPhaseMixed(dNewton* const world);
-	virtual ~dBroadPhaseMixed();
+		D_NEWTON_API dBroadPhaseMixed(dNewton* const world);
+	D_NEWTON_API virtual ~dBroadPhaseMixed();
+
+	D_NEWTON_API virtual void AddBody(dBody* const body);
 } D_GCC_VECTOR_ALIGNMENT;
 
 

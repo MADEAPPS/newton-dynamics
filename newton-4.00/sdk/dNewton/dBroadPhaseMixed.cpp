@@ -412,3 +412,8 @@ dBroadPhaseMixed::dBroadPhaseMixed(dNewton* const world)
 dBroadPhaseMixed::~dBroadPhaseMixed()
 {
 }
+
+void dBroadPhaseMixed::AddBody(dBody* const body)
+{
+
+}

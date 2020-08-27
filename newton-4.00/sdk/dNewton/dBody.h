@@ -27,6 +27,7 @@
 
 class dNewton;
 class dDynamicBody;
+class dBroadPhaseBodyNode;
 
 D_MSC_VECTOR_ALIGNMENT
 class dBodyNotify: public dClassAlloc
@@ -75,7 +76,8 @@ class dBody: public dClassAlloc
 	D_NEWTON_API void SetNotifyCallback(dBodyNotify* const notify);
 	D_NEWTON_API dBodyNotify* GetNotifyCallback(dBodyNotify* const notify) const;
 
-	dNewton* GetNewton() const;
+	D_NEWTON_API dInt32 GetId() const;
+	D_NEWTON_API dNewton* GetNewton() const;
 
 	D_NEWTON_API dVector GetOmega() const;
 	D_NEWTON_API void SetOmega(const dVector& veloc);
@@ -90,6 +92,9 @@ class dBody: public dClassAlloc
 	dList<dBody*>::dListNode* GetNewtonNode() const;
 	void SetNewtonNode(dNewton* const newton, dList<dBody*>::dListNode* const node);
 
+	dBroadPhaseBodyNode* GetBroadPhaseNode() const;
+	void SetBroadPhaseNode(dBroadPhaseBodyNode* const node);
+
 	dMatrix m_matrix;
 	dMatrix m_invWorldInertiaMatrix;
 	dShapeInstance m_shapeInstance;
@@ -101,7 +106,11 @@ class dBody: public dClassAlloc
 	dQuaternion m_rotation;
 	dBodyNotify* m_notifyCallback;
 	dNewton* m_newton;
+	dBroadPhaseBodyNode* m_broadPhaseNode;
 	dList<dBody*>::dListNode* m_newtonNode;
+
+	dUnsigned32 m_uniqueID;
+	static dUnsigned32 m_uniqueIDCount;
 	friend class dNewton;
 } D_GCC_VECTOR_ALIGNMENT;
 

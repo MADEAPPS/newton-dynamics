@@ -14,13 +14,23 @@
 // memory allocation for Newton
 static void* PhysicsAlloc(size_t sizeInBytes)
 {
-	return new char[sizeInBytes];
+	return malloc(sizeInBytes);
 }
 
 // memory free use by the engine
 static void PhysicsFree(void* ptr)
 {
-	delete[](char*)ptr;
+	free (ptr);
+}
+
+void *operator new (size_t size)
+{
+	return dMalloc(size);
+}
+
+void operator delete (void* ptr)
+{
+	dFree(ptr);
 }
 
 
@@ -29,18 +39,18 @@ class CheckMemoryLeaks
 	public:
 	CheckMemoryLeaks()
 	{
+		#if defined(_DEBUG) && defined(_MSC_VER)
+			// Track all memory leaks at the operating system level.
+			// make sure no Newton tool or utility leaves leaks behind.
+			_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_REPORT_FLAG);
+			//_CrtSetBreakAlloc (318776);
+		#endif
+
 		atexit(CheckMemoryLeaksCallback);
 		// Set the memory allocation function before creation the newton world
 		// this is the only function that can be called before the creation of the newton world.
 		// it should be called once, and the the call is optional 
 		dSetMemoryAllocators(PhysicsAlloc, PhysicsFree);
-
-	#if defined(_DEBUG) && defined(_MSC_VER)
-		// Track all memory leaks at the operating system level.
-		// make sure no Newton tool or utility leaves leaks behind.
-		_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_LEAK_CHECK_DF);
-		//_CrtSetBreakAlloc (318776);
-	#endif
 	}
 
 	static void CheckMemoryLeaksCallback()
@@ -99,12 +109,13 @@ void BuildPyramid(dNewton& world, dFloat32 mass, const dVector& origin, const dV
 	for (int j = 0; j < count; j++) 
 	{
 		matrix.m_posit.m_z = z0;
-		for (int i = 0; i < (count - j); i++) 
+		const dInt32 count1 = count - j;
+		for (int i = 0; i < count1; i++)
 		{
 			dDynamicBody* const body = new dDynamicBody();
 
 			body->SetNotifyCallback(new DemobodyNotify);
-
+			
 			body->SetMatrix(matrix);
 			body->SetCollisionShape(box);
 			body->SetMassMatrix(mass, box);
@@ -120,7 +131,6 @@ void BuildPyramid(dNewton& world, dFloat32 mass, const dVector& origin, const dV
 int main (int argc, const char * argv[]) 
 {
 	dNewton newton;
-
 	newton.SetSubSteps(2);
 	//newton.SetThreadCount(4);
 

@@ -569,7 +569,8 @@ void dList<T,allocator>::Unlink (dListNode* const node)
 	{
 		m_first = m_first->GetNext();
 	}
-	if (node == m_last) {
+	if (node == m_last) 
+	{
 		m_last = m_last->GetPrev();
 	}
 	node->Unlink();
