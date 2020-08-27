@@ -43,7 +43,6 @@ dQuaternion::dQuaternion (const dMatrix& matrix)
 		m_x = (matrix[1][2] - matrix[2][1]) * trace;
 		m_y = (matrix[2][0] - matrix[0][2]) * trace;
 		m_z = (matrix[0][1] - matrix[1][0]) * trace;
-
 	} 
 	else 
 	{

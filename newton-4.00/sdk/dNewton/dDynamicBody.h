@@ -48,7 +48,7 @@ class dDynamicBody: public dBody
 	D_NEWTON_API dDynamicBody();
 	D_NEWTON_API virtual ~dDynamicBody ();
 	D_NEWTON_API virtual dDynamicBody* GetAsDynamicBody() { return this; }
-	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadIndex, dFloat32 tiemstep);
+	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep);
 
 	dVector GetMassMatrix() const;
 	void SetMassMatrix(const dVector& massMatrix);
@@ -93,7 +93,6 @@ inline void dDynamicBody::SetTorque(const dVector& torque)
 {
 	m_externalTorque = torque;
 }
-
 
 inline dVector dDynamicBody::GetMassMatrix() const
 {

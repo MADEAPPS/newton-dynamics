@@ -55,7 +55,7 @@ static CheckMemoryLeaks checkLeaks;
 class DemobodyNotify: public dBodyNotify
 {
 	public:
-	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 tiemstep)
+	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
 	{
 		dDynamicBody* const body = m_body->GetAsDynamicBody();
 		dAssert(body);
@@ -64,6 +64,11 @@ class DemobodyNotify: public dBodyNotify
 		dVector force(dVector(0.0f, -10.0f, 0.0f, 0.0f).Scale (massMatrix.m_w));
 		body->SetForce(force);
 		body->SetTorque(dVector::m_zero);
+	}
+
+	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
+	{
+		dAssert(0);
 	}
 };
 
@@ -99,6 +104,8 @@ void BuildPyramid(dNewton& world, dFloat32 mass, const dVector& origin, const dV
 			dDynamicBody* const body = new dDynamicBody();
 
 			body->SetNotifyCallback(new DemobodyNotify);
+
+			body->SetMatrix(matrix);
 			body->SetCollisionShape(box);
 			body->SetMassMatrix(mass, box);
 

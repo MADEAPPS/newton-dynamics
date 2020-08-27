@@ -216,13 +216,13 @@ void dDynamicBody::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 #endif
 }
 
-void dDynamicBody::ApplyExternalForces(dInt32 threadIndex, dFloat32 tiemstep)
+void dDynamicBody::ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep)
 {
 	m_externalForce = dVector::m_zero;
 	m_externalTorque = dVector::m_zero;
 	if (m_notifyCallback)
 	{
-		m_notifyCallback->OnApplyExternalForce(threadIndex, tiemstep);
+		m_notifyCallback->OnApplyExternalForce(threadIndex, timestep);
 		if (m_invMass.m_w == dFloat32(0.0f)) 
 		{
 			m_externalForce = dVector::m_zero;

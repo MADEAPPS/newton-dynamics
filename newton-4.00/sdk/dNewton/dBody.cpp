@@ -107,3 +107,53 @@ dBodyNotify* dBody::GetNotifyCallback(dBodyNotify* const notify) const
 {
 	return m_notifyCallback;
 }
+
+inline dNewton* dBody::GetNewton() const
+{
+	return m_newton;
+}
+
+void dBody::SetNewtonNode(dNewton* const newton, dList<dBody*>::dListNode* const node)
+{
+	m_newton = newton;
+	m_newtonNode = node;
+}
+
+dList<dBody*>::dListNode* dBody::GetNewtonNode() const
+{
+	return m_newtonNode;
+}
+
+dVector dBody::GetOmega() const
+{
+	return m_omega;
+}
+
+void dBody::SetOmega(const dVector& veloc)
+{
+	m_omega = veloc;
+}
+
+dVector dBody::GetVelocity() const
+{
+	return m_veloc;
+}
+
+void dBody::SetVelocity(const dVector& veloc)
+{
+	m_veloc = veloc;
+}
+
+dMatrix dBody::GetMatrix() const
+{
+	return m_matrix;
+}
+
+void dBody::SetMatrix(const dMatrix& matrix)
+{
+	m_matrix = matrix;
+	dAssert(m_matrix.TestOrthogonal(dFloat32(1.0e-4f)));
+
+	m_rotation = dQuaternion(m_matrix);
+	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
+}

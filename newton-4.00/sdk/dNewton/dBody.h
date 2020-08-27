@@ -42,7 +42,11 @@ class dBodyNotify: public dClassAlloc
 	{
 	}
 
-	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 tiemstep)
+	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
+	{
+	}
+
+	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
 	{
 	}
 
@@ -73,11 +77,14 @@ class dBody: public dClassAlloc
 
 	dNewton* GetNewton() const;
 
-	dVector GetOmega() const;
-	void SetOmega(const dVector& veloc);
+	D_NEWTON_API dVector GetOmega() const;
+	D_NEWTON_API void SetOmega(const dVector& veloc);
 
-	dVector GetVelocity() const;
-	void SetVelocity(const dVector& veloc);
+	D_NEWTON_API dVector GetVelocity() const;
+	D_NEWTON_API void SetVelocity(const dVector& veloc);
+
+	D_NEWTON_API dMatrix GetMatrix() const;
+	D_NEWTON_API void SetMatrix(const dMatrix& matrix);
 
 	protected:
 	dList<dBody*>::dListNode* GetNewtonNode() const;
@@ -85,15 +92,13 @@ class dBody: public dClassAlloc
 
 	dMatrix m_matrix;
 	dMatrix m_invWorldInertiaMatrix;
+	dShapeInstance m_shapeInstance;
 		
 	dVector m_veloc;
 	dVector m_omega;
 	dVector m_localCentreOfMass;
 	dVector m_globalCentreOfMass;
-
 	dQuaternion m_rotation;
-
-	dShapeInstance m_shapeInstance;
 	dBodyNotify* m_notifyCallback;
 	dNewton* m_newton;
 	dList<dBody*>::dListNode* m_newtonNode;
@@ -101,41 +106,6 @@ class dBody: public dClassAlloc
 } D_GCC_VECTOR_ALIGNMENT;
 
 
-inline dNewton* dBody::GetNewton() const
-{
-	return m_newton;
-}
-
-inline void dBody::SetNewtonNode(dNewton* const newton, dList<dBody*>::dListNode* const node)
-{
-	m_newton = newton;
-	m_newtonNode = node;
-}
-
-inline dList<dBody*>::dListNode* dBody::GetNewtonNode() const
-{
-	return m_newtonNode;
-}
-
-inline dVector dBody::GetOmega() const
-{
-	return m_omega;
-}
-
-inline void dBody::SetOmega(const dVector& veloc)
-{
-	m_omega = veloc;
-}
-
-inline dVector dBody::GetVelocity() const
-{
-	return m_veloc;
-}
-
-inline void dBody::SetVelocity(const dVector& veloc)
-{
-	m_veloc = veloc;
-}
 
 
 #endif 
