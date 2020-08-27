@@ -216,11 +216,19 @@ void dDynamicBody::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 #endif
 }
 
-void dDynamicBody::ApplyExternalForces(dInt32 threadID, dFloat32 tiemstep)
+void dDynamicBody::ApplyExternalForces(dInt32 threadIndex, dFloat32 tiemstep)
 {
-	dVector gravity(GetNewton()->GetGravity());
-
-	dFloat32 mass = (m_invMass.m_w > dFloat32(0.0f)) ? m_mass.m_w : dFloat32(0.0f);
-	m_externalForce = gravity.Scale(mass);
+	m_externalForce = dVector::m_zero;
 	m_externalTorque = dVector::m_zero;
+	if (m_notifyCallback)
+	{
+		m_notifyCallback->OnApplyExternalForce(threadIndex, tiemstep);
+		if (m_invMass.m_w == dFloat32(0.0f)) 
+		{
+			m_externalForce = dVector::m_zero;
+			m_externalForce = dVector::m_zero;
+		}
+		m_externalForce = m_externalForce & dVector::m_triplexMask;
+		m_externalTorque = m_externalTorque & dVector::m_triplexMask;
+	}
 }

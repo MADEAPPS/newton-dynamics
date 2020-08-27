@@ -57,6 +57,7 @@ dBody::dBody()
 	,m_localCentreOfMass(dVector::m_zero)
 	,m_globalCentreOfMass(dVector::m_zero)
 	,m_rotation()
+	,m_notifyCallback(nullptr)
 	,m_shapeInstance(dDummyCollision::GetNullShape())
 	,m_newton(nullptr)
 	,m_newtonNode(nullptr)
@@ -65,6 +66,10 @@ dBody::dBody()
 
 dBody::~dBody()
 {
+	if (m_notifyCallback)
+	{
+		delete m_notifyCallback;
+	}
 }
 
 void dBody::SetCentreOfMass(const dVector& com)
@@ -85,4 +90,20 @@ const dShapeInstance& dBody::GetCollisionShape() const
 void dBody::SetCollisionShape(const dShapeInstance& shapeInstance)
 {
 	m_shapeInstance = shapeInstance;
+}
+
+void dBody::SetNotifyCallback(dBodyNotify* const notify)
+{
+	//dAssert(notify->m_body == nullptr);
+	if (m_notifyCallback)
+	{
+		delete m_notifyCallback;
+	}
+	m_notifyCallback = notify;
+	m_notifyCallback->m_body = this;
+}
+
+dBodyNotify* dBody::GetNotifyCallback(dBodyNotify* const notify) const
+{
+	return m_notifyCallback;
 }

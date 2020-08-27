@@ -52,18 +52,61 @@ class CheckMemoryLeaks
 };
 static CheckMemoryLeaks checkLeaks;
 
-
-void CreateBodyList(dNewton& newton)
+class DemobodyNotify: public dBodyNotify
 {
-	dShapeInstance box(new dShapeBox(1.0f, 1.0f, 1.0f));
-	for (int i = 0; i < 2000; i++)
+	public:
+	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 tiemstep)
 	{
-		dDynamicBody* const body = new dDynamicBody();
+		dDynamicBody* const body = m_body->GetAsDynamicBody();
+		dAssert(body);
 
-		body->SetCollisionShape(box);
-		body->SetMassMatrix(10.0f, box);
+		dVector massMatrix (body->GetMassMatrix());
+		dVector force(dVector(0.0f, -10.0f, 0.0f, 0.0f).Scale (massMatrix.m_w));
+		body->SetForce(force);
+		body->SetTorque(dVector::m_zero);
+	}
+};
 
-		newton.AddBody(body);
+void BuildPyramid(dNewton& world, dFloat32 mass, const dVector& origin, const dVector& size, int count)
+{
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	world.Sync();
+	dShapeInstance box(new dShapeBox(size.m_x, size.m_y, size.m_z));
+
+	dVector floor(0.0f);
+	matrix.m_posit.m_y = floor.m_y + size.m_y / 2.0f;
+
+	// get the dimension from shape itself
+	dVector minP(0.0f);
+	dVector maxP(0.0f);
+	box.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
+
+	dFloat32 stepz = maxP.m_z - minP.m_z + 0.03125f;
+	dFloat32 stepy = (maxP.m_y - minP.m_y) - 0.01f;
+		  
+	dFloat32 y0 = matrix.m_posit.m_y + stepy / 2.0f;
+	dFloat32 z0 = matrix.m_posit.m_z - stepz * count / 2;
+	
+	matrix.m_posit.m_y = y0;
+	for (int j = 0; j < count; j++) 
+	{
+		matrix.m_posit.m_z = z0;
+		for (int i = 0; i < (count - j); i++) 
+		{
+			dDynamicBody* const body = new dDynamicBody();
+
+			body->SetNotifyCallback(new DemobodyNotify);
+			body->SetCollisionShape(box);
+			body->SetMassMatrix(mass, box);
+
+			world.AddBody(body);
+			matrix.m_posit.m_z += stepz;
+		}
+		z0 += stepz * 0.5f;
+		matrix.m_posit.m_y += stepy;
 	}
 }
 
@@ -73,9 +116,11 @@ int main (int argc, const char * argv[])
 
 	newton.SetThreadCount(4);
 	newton.SetSubSteps(2);
-	newton.SetGravity(dVector(0.0f, -10.0f, 0.0f, 0.0f));
 
-	CreateBodyList(newton);
+	//CreateBodyList(newton);
+	dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
+	dVector origin(0.5f, 0.25f, 0.8f, 0.0f);
+	BuildPyramid(newton, 10.0f, origin, size, 20);
 
 	for (int i = 0; i < 10000; i ++)
 	{

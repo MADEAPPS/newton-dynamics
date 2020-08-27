@@ -29,7 +29,32 @@ class dNewton;
 class dDynamicBody;
 
 D_MSC_VECTOR_ALIGNMENT
-class dBody: public dClassAlloc  
+class dBodyNotify: public dClassAlloc
+{
+	public:  
+	dBodyNotify()
+		:dClassAlloc()
+		,m_body(nullptr)
+	{
+	}
+
+	virtual ~dBodyNotify()
+	{
+	}
+
+	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 tiemstep)
+	{
+	}
+
+	protected:
+	dBody* m_body;
+
+	friend class dBody;
+
+} D_GCC_VECTOR_ALIGNMENT;
+
+D_MSC_VECTOR_ALIGNMENT
+class dBody: public dClassAlloc
 {
 	public:
 	D_NEWTON_API dBody();
@@ -42,6 +67,9 @@ class dBody: public dClassAlloc
 	D_NEWTON_API void SetCollisionShape(const dShapeInstance& shapeInstance);
 
 	D_NEWTON_API void SetCentreOfMass(const dVector& com);
+
+	D_NEWTON_API void SetNotifyCallback(dBodyNotify* const notify);
+	D_NEWTON_API dBodyNotify* GetNotifyCallback(dBodyNotify* const notify) const;
 
 	dNewton* GetNewton() const;
 
@@ -66,6 +94,7 @@ class dBody: public dClassAlloc
 	dQuaternion m_rotation;
 
 	dShapeInstance m_shapeInstance;
+	dBodyNotify* m_notifyCallback;
 	dNewton* m_newton;
 	dList<dBody*>::dListNode* m_newtonNode;
 	friend class dNewton;

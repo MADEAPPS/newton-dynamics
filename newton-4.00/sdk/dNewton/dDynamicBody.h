@@ -48,7 +48,7 @@ class dDynamicBody: public dBody
 	D_NEWTON_API dDynamicBody();
 	D_NEWTON_API virtual ~dDynamicBody ();
 	D_NEWTON_API virtual dDynamicBody* GetAsDynamicBody() { return this; }
-	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadID, dFloat32 timestep);
+	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadIndex, dFloat32 tiemstep);
 
 	dVector GetMassMatrix() const;
 	void SetMassMatrix(const dVector& massMatrix);
@@ -56,6 +56,12 @@ class dDynamicBody: public dBody
 	void SetMassMatrix(dFloat32 mass, const dShapeInstance& shapeInstance);
 	void SetMassMatrix(dFloat32 Ixx, dFloat32 Iyy, dFloat32 Izz, dFloat32 mass);
 	void GetMassMatrix(dFloat32& Ixx, dFloat32& Iyy, dFloat32& Izz, dFloat32& mass);
+
+	dVector GetForce() const;
+	void SetForce(const dVector& force);
+	
+	dVector GetToque() const;
+	void SetTorque(const dVector& torque);
 
 	private:
 	void SetMassMatrix(dFloat32 mass, const dMatrix& inertia);
@@ -67,6 +73,27 @@ class dDynamicBody: public dBody
 	dVector m_externalTorque;
 
 } D_GCC_VECTOR_ALIGNMENT;
+
+inline dVector dDynamicBody::GetForce() const
+{
+	return m_externalForce;
+}
+
+inline void dDynamicBody::SetForce(const dVector& force)
+{
+	m_externalForce = force;
+}
+
+inline dVector dDynamicBody::GetToque() const
+{
+	return m_externalTorque;
+}
+
+inline void dDynamicBody::SetTorque(const dVector& torque)
+{
+	m_externalTorque = torque;
+}
+
 
 inline dVector dDynamicBody::GetMassMatrix() const
 {

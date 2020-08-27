@@ -48,7 +48,7 @@
 //////////////////////////////////////////////////////////////////////
 
 
-dgVector dShapeInstance::m_padding (DG_MAX_COLLISION_AABB_PADDING, DG_MAX_COLLISION_AABB_PADDING, DG_MAX_COLLISION_AABB_PADDING, dFloat32 (0.0f));
+dVector dShapeInstance::m_padding (DG_MAX_COLLISION_AABB_PADDING, DG_MAX_COLLISION_AABB_PADDING, DG_MAX_COLLISION_AABB_PADDING, dFloat32 (0.0f));
 
 
 dShapeInstance::dShapeInstance(const dgWorld* const world, const dgCollision* const childCollision, dgInt32 shapeID, const dgMatrix& matrix)
@@ -225,12 +225,12 @@ dShapeInstance::dShapeInstance(const dgWorld* const constWorld, dgDeserialize se
 
 //				case m_deformableMesh:
 //				{
-//					dgAssert (0);
+//					dAssert (0);
 //					return NULL;
 //				}
 
 				default:
-				dgAssert (0);
+				dAssert (0);
 			}
 		}
 		m_childShape = collision;
@@ -274,40 +274,40 @@ void dShapeInstance::Serialize(dgSerialize serialize, void* const userData, bool
 }
 
 
-void dShapeInstance::SetScale (const dgVector& scale)
+void dShapeInstance::SetScale (const dVector& scale)
 {
-	dFloat32 scaleX = dgAbs (scale.m_x);
-	dFloat32 scaleY = dgAbs (scale.m_y);
-	dFloat32 scaleZ = dgAbs (scale.m_z);
-	dgAssert (scaleX > dFloat32 (0.0f));
-	dgAssert (scaleY > dFloat32 (0.0f));
-	dgAssert (scaleZ > dFloat32 (0.0f));
+	dFloat32 scaleX = dAbs (scale.m_x);
+	dFloat32 scaleY = dAbs (scale.m_y);
+	dFloat32 scaleZ = dAbs (scale.m_z);
+	dAssert (scaleX > dFloat32 (0.0f));
+	dAssert (scaleY > dFloat32 (0.0f));
+	dAssert (scaleZ > dFloat32 (0.0f));
 
 	if (IsType(dgCollision::dgCollisionCompound_RTTI)) {
-		dgAssert (m_scaleType == m_unit);
+		dAssert (m_scaleType == m_unit);
 		dgCollisionCompound* const compound = (dgCollisionCompound*) m_childShape;
 		compound->ApplyScale(scale);
-	} else if ((dgAbs (scaleX - scaleY) < dFloat32 (1.0e-4f)) && (dgAbs (scaleX - scaleZ) < dFloat32 (1.0e-4f))) {
-		if ((dgAbs (scaleX - dFloat32 (1.0f)) < dFloat32 (1.0e-4f))) {
+	} else if ((dAbs (scaleX - scaleY) < dFloat32 (1.0e-4f)) && (dAbs (scaleX - scaleZ) < dFloat32 (1.0e-4f))) {
+		if ((dAbs (scaleX - dFloat32 (1.0f)) < dFloat32 (1.0e-4f))) {
 			m_scaleType = m_unit;
-			m_scale	= dgVector (dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (0.0f));	
+			m_scale	= dVector (dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (0.0f));	
 			m_maxScale = m_scale;	
 			m_invScale = m_scale;
 		} else {
 			m_scaleType = m_uniform;
-			m_scale	= dgVector (scaleX, scaleX, scaleX, dFloat32 (0.0f));	
+			m_scale	= dVector (scaleX, scaleX, scaleX, dFloat32 (0.0f));	
 			m_maxScale = m_scale;	
-			m_invScale = dgVector (dFloat32 (1.0f) / scaleX, dFloat32 (1.0f) / scaleX, dFloat32 (1.0f) / scaleX, dFloat32 (0.0f));	
+			m_invScale = dVector (dFloat32 (1.0f) / scaleX, dFloat32 (1.0f) / scaleX, dFloat32 (1.0f) / scaleX, dFloat32 (0.0f));	
 		}
 	} else {
 		m_scaleType = m_nonUniform;
 		m_maxScale = dgMax(scaleX, scaleY, scaleZ);
-		m_scale	= dgVector (scaleX, scaleY, scaleZ, dFloat32 (0.0f));	
-		m_invScale = dgVector (dFloat32 (1.0f) / scaleX, dFloat32 (1.0f) / scaleY, dFloat32 (1.0f) / scaleZ, dFloat32 (0.0f));	
+		m_scale	= dVector (scaleX, scaleY, scaleZ, dFloat32 (0.0f));	
+		m_invScale = dVector (dFloat32 (1.0f) / scaleX, dFloat32 (1.0f) / scaleY, dFloat32 (1.0f) / scaleZ, dFloat32 (0.0f));	
 	}
 }
 
-void dShapeInstance::SetGlobalScale (const dgVector& scale)
+void dShapeInstance::SetGlobalScale (const dVector& scale)
 {
 	// calculate current matrix
 	dgMatrix matrix(dGetIdentityMatrix());
@@ -318,15 +318,15 @@ void dShapeInstance::SetGlobalScale (const dgVector& scale)
 
 	// extract the original local matrix
 	dgMatrix transpose (matrix.Transpose());
-	dgVector globalScale (dgSqrt (transpose[0].DotProduct(transpose[0]).GetScalar()), dgSqrt (transpose[1].DotProduct(transpose[1]).GetScalar()), dgSqrt (transpose[2].DotProduct(transpose[2]).GetScalar()), dFloat32 (1.0f));
-	dgVector invGlobalScale (dFloat32 (1.0f) / globalScale.m_x, dFloat32 (1.0f) / globalScale.m_y, dFloat32 (1.0f) / globalScale.m_z, dFloat32 (1.0f));
+	dVector globalScale (dgSqrt (transpose[0].DotProduct(transpose[0]).GetScalar()), dgSqrt (transpose[1].DotProduct(transpose[1]).GetScalar()), dgSqrt (transpose[2].DotProduct(transpose[2]).GetScalar()), dFloat32 (1.0f));
+	dVector invGlobalScale (dFloat32 (1.0f) / globalScale.m_x, dFloat32 (1.0f) / globalScale.m_y, dFloat32 (1.0f) / globalScale.m_z, dFloat32 (1.0f));
 	dgMatrix localMatrix (m_aligmentMatrix.Transpose() * m_localMatrix);
 	localMatrix.m_posit = matrix.m_posit * invGlobalScale;
-	dgAssert (localMatrix.m_posit.m_w == dFloat32 (1.0f));
+	dAssert (localMatrix.m_posit.m_w == dFloat32 (1.0f));
 
-	if ((dgAbs (scale[0] - scale[1]) < dFloat32 (1.0e-4f)) && (dgAbs (scale[0] - scale[2]) < dFloat32 (1.0e-4f))) {
+	if ((dAbs (scale[0] - scale[1]) < dFloat32 (1.0e-4f)) && (dAbs (scale[0] - scale[2]) < dFloat32 (1.0e-4f))) {
 		m_localMatrix = localMatrix;
-		m_localMatrix.m_posit = m_localMatrix.m_posit * scale | dgVector::m_wOne;
+		m_localMatrix.m_posit = m_localMatrix.m_posit * scale | dVector::m_wOne;
 		m_aligmentMatrix = dGetIdentityMatrix();
 		SetScale (scale);
 	} else {
@@ -344,8 +344,8 @@ void dShapeInstance::SetGlobalScale (const dgVector& scale)
 		m_localMatrix = m_aligmentMatrix * m_localMatrix;
 		m_aligmentMatrix = m_aligmentMatrix.Transpose();
 
-		dgAssert (m_localMatrix.TestOrthogonal());
-		dgAssert (m_aligmentMatrix.TestOrthogonal());
+		dAssert (m_localMatrix.TestOrthogonal());
+		dAssert (m_aligmentMatrix.TestOrthogonal());
 
 //dgMatrix xxx1 (dGetIdentityMatrix());
 //xxx1[0][0] = m_scale.m_x;
@@ -355,13 +355,13 @@ void dShapeInstance::SetGlobalScale (const dgVector& scale)
 
 		bool isIdentity = true;
 		for (dgInt32 i = 0; i < 3; i ++) {
-			isIdentity &= dgAbs (m_aligmentMatrix[i][i] - dFloat32 (1.0f)) < dFloat32 (1.0e-5f);
-			isIdentity &= dgAbs (m_aligmentMatrix[3][i]) < dFloat32 (1.0e-5f);
+			isIdentity &= dAbs (m_aligmentMatrix[i][i] - dFloat32 (1.0f)) < dFloat32 (1.0e-5f);
+			isIdentity &= dAbs (m_aligmentMatrix[3][i]) < dFloat32 (1.0e-5f);
 		}
 		m_scaleType = isIdentity ? m_nonUniform : m_global;
 
 		m_maxScale = dgMax(m_scale[0], m_scale[1], m_scale[2]);
-		m_invScale = dgVector (dFloat32 (1.0f) / m_scale[0], dFloat32 (1.0f) / m_scale[1], dFloat32 (1.0f) / m_scale[2], dFloat32 (0.0f));	
+		m_invScale = dVector (dFloat32 (1.0f) / m_scale[0], dFloat32 (1.0f) / m_scale[1], dFloat32 (1.0f) / m_scale[2], dFloat32 (0.0f));	
 	}
 }
 
@@ -373,13 +373,13 @@ void dShapeInstance::SetLocalMatrix (const dgMatrix& matrix)
 	m_localMatrix[1][3] = dFloat32 (0.0f);
 	m_localMatrix[2][3] = dFloat32 (0.0f);
 	m_localMatrix[3][3] = dFloat32 (1.0f);
-	dgAssert(m_localMatrix.TestOrthogonal());
+	dAssert(m_localMatrix.TestOrthogonal());
 }
 
-dgInt32 dShapeInstance::CalculatePlaneIntersection (const dgVector& normal, const dgVector& point, dgVector* const contactsOut) const
+dgInt32 dShapeInstance::CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const
 {
 	dgInt32 count = 0;
-	dgAssert(normal.m_w == dFloat32 (0.0f));
+	dAssert(normal.m_w == dFloat32 (0.0f));
 	switch (m_scaleType)
 	{
 		case m_unit:
@@ -389,7 +389,7 @@ dgInt32 dShapeInstance::CalculatePlaneIntersection (const dgVector& normal, cons
 		}
 		case m_uniform:
 		{
-			dgVector point1 (m_invScale * point);
+			dVector point1 (m_invScale * point);
 			count = m_childShape->CalculatePlaneIntersection (normal, point1, contactsOut);
 			for (dgInt32 i = 0; i < count; i ++) {
 				contactsOut[i] = m_scale * contactsOut[i];
@@ -400,8 +400,8 @@ dgInt32 dShapeInstance::CalculatePlaneIntersection (const dgVector& normal, cons
 		case m_nonUniform:
 		{
 			// support((p * S), n) = S * support (p, n * transp(S)) 
-			dgVector point1 (m_invScale * point);
-			dgVector normal1 (m_scale * normal);
+			dVector point1 (m_invScale * point);
+			dVector normal1 (m_scale * normal);
 			normal1 = normal1.Normalize();
 			count = m_childShape->CalculatePlaneIntersection (normal1, point1, contactsOut);
 			for (dgInt32 i = 0; i < count; i ++) {
@@ -413,8 +413,8 @@ dgInt32 dShapeInstance::CalculatePlaneIntersection (const dgVector& normal, cons
 		case m_global:
 		default:
 		{
-			dgVector point1 (m_aligmentMatrix.UntransformVector (m_invScale * point));
-			dgVector normal1 (m_aligmentMatrix.UntransformVector (m_scale * normal));
+			dVector point1 (m_aligmentMatrix.UntransformVector (m_invScale * point));
+			dVector normal1 (m_aligmentMatrix.UntransformVector (m_scale * normal));
 			normal1 = normal1.Normalize();
 			count = m_childShape->CalculatePlaneIntersection (normal1, point1, contactsOut);
 			for (dgInt32 i = 0; i < count; i ++) {
@@ -426,50 +426,8 @@ dgInt32 dShapeInstance::CalculatePlaneIntersection (const dgVector& normal, cons
 }
 
 
-void dShapeInstance::CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const
-{
-	switch (m_scaleType)
-	{
-		case m_unit:
-		{
-			m_childShape->CalcAABB (matrix, p0, p1);
-			p0 -= m_padding;
-			p1 += m_padding;
-			break;
-		}
 
-		case m_uniform:
-		case m_nonUniform:
-		{
-			dgMatrix matrix1 (matrix);
-			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
-			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
-			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
-			m_childShape->CalcAABB (matrix1, p0, p1);
-			p0 -= m_padding;
-			p1 += m_padding;
-			break;
-		}
-
-		case m_global:
-		default:
-		{
-			dgMatrix matrix1 (matrix);
-			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
-			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
-			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
-			m_childShape->CalcAABB (m_aligmentMatrix * matrix1, p0, p1);
-			p0 -= m_padding;
-			p1 += m_padding;
-			break;
-		}
-	}
-
-	dgAssert (p0.m_w == dFloat32 (0.0f));
-	dgAssert (p1.m_w == dFloat32 (0.0f));
-}
-
-dFloat32 dShapeInstance::RayCast (const dgVector& localP0, const dgVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const
+dFloat32 dShapeInstance::RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const
 {
 	if (!preFilter || preFilter(body, this, userData)) {
 		switch(m_scaleType)
@@ -492,8 +450,8 @@ dFloat32 dShapeInstance::RayCast (const dgVector& localP0, const dgVector& local
 
 			case m_uniform:
 			{
-				dgVector p0 (localP0 * m_invScale);
-				dgVector p1 (localP1 * m_invScale);
+				dVector p0 (localP0 * m_invScale);
+				dVector p1 (localP1 * m_invScale);
 				dFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData, preFilter);
 				if (t <= maxT) {
 					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
@@ -510,14 +468,14 @@ dFloat32 dShapeInstance::RayCast (const dgVector& localP0, const dgVector& local
 
 			case m_nonUniform:
 			{
-				dgVector p0 (localP0 * m_invScale);
-				dgVector p1 (localP1 * m_invScale);
+				dVector p0 (localP0 * m_invScale);
+				dVector p1 (localP1 * m_invScale);
 				dFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData, preFilter);
 				if (t <= maxT) {
 					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
 						contactOut.m_shapeId0 = GetUserDataID();
 						contactOut.m_shapeId1 = GetUserDataID();
-						dgVector n (m_invScale * contactOut.m_normal);
+						dVector n (m_invScale * contactOut.m_normal);
 						contactOut.m_normal = n.Normalize();
 					}
 					if (!m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI)) {
@@ -531,14 +489,14 @@ dFloat32 dShapeInstance::RayCast (const dgVector& localP0, const dgVector& local
 			case m_global:
 			default:
 			{
-				dgVector p0 (m_aligmentMatrix.UntransformVector (localP0 * m_invScale));
-				dgVector p1 (m_aligmentMatrix.UntransformVector (localP1 * m_invScale));
+				dVector p0 (m_aligmentMatrix.UntransformVector (localP0 * m_invScale));
+				dVector p1 (m_aligmentMatrix.UntransformVector (localP1 * m_invScale));
 				dFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData, preFilter);
 				if (t <= maxT) {
 					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
 						contactOut.m_shapeId0 = GetUserDataID();
 						contactOut.m_shapeId1 = GetUserDataID();
-						dgVector n (m_aligmentMatrix.RotateVector(m_invScale * contactOut.m_normal));
+						dVector n (m_aligmentMatrix.RotateVector(m_invScale * contactOut.m_normal));
 						contactOut.m_normal = n.Normalize();
 					}
 					if (!(m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
@@ -632,7 +590,7 @@ dShapeInstance::dShapeInstance(dShape* const shape)
 	//,m_skinThickness(dFloat32(0.0f))
 	//,m_collisionMode(1)
 	//,m_refCount(1)
-	//,m_scaleType(m_unit)
+	,m_scaleType(m_unit)
 	//,m_isExternal(true)
 {
 }
@@ -695,6 +653,19 @@ void dShapeInstance::DebugShape(const dMatrix& matrix, dShapeDebugCallback& debu
 {
 	debugCallback.m_instance = this;
 	m_shape->DebugShape(GetScaledTransform(matrix), debugCallback);
+}
+
+void dShapeInstance::CalculateAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const
+{
+	for (int i = 0; i < 3; i++) 
+	{
+		dVector minSupport(matrix.TransformVector(SupportVertex(matrix[i].Scale(dFloat32(-1.0f)))));
+		minP[i] = minSupport[i];
+		dVector maxSupport (matrix.TransformVector(SupportVertex(matrix[i])));
+		maxP[i] = maxSupport[i];
+	}
+	minP = minP & dVector::m_triplexMask;
+	maxP = maxP & dVector::m_triplexMask;
 }
 
 dMatrix dShapeInstance::CalculateInertia() const

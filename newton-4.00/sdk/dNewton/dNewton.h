@@ -50,9 +50,6 @@ class dNewton
 	D_NEWTON_API void AddBody(dBody* const body);
 	D_NEWTON_API void RemoveBody(dBody* const body);
 
-	D_NEWTON_API dVector GetGravity() const;
-	D_NEWTON_API void SetGravity(const dVector& gravity);
-
 	protected:
 	D_NEWTON_API virtual void SubstepUpdate(dFloat32 timestep);
 	D_NEWTON_API virtual void UpdateSkeletons(dFloat32 timestep);
@@ -75,17 +72,11 @@ class dNewton
 	private:
 	void GetDynamicBodyArray();
 
-	dVector m_gravity;
 	dList<dBody*> m_bodyList;
 	dArray<dDynamicBody*> m_dynamicBodyArray;
 	dFloat32 m_timestep;
 	dInt32 m_subSteps;
 } D_GCC_VECTOR_ALIGNMENT;
-
-inline dVector dNewton::GetGravity() const
-{
-	return m_gravity;
-}
 
 
 #endif
