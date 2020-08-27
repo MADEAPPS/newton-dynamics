@@ -23,6 +23,7 @@
 #define _D_NEWTON_H_
 
 class dBody;
+class dBroadPhase;
 class dDynamicBody;
 
 D_MSC_VECTOR_ALIGNMENT
@@ -72,11 +73,33 @@ class dNewton
 	private:
 	void GetDynamicBodyArray();
 
+	template <class T>
+	void SubmitJobs(dFloat32 timestep);
+
 	dList<dBody*> m_bodyList;
 	dArray<dDynamicBody*> m_dynamicBodyArray;
+	dBroadPhase* m_broadPhase;
 	dFloat32 m_timestep;
 	dInt32 m_subSteps;
 } D_GCC_VECTOR_ALIGNMENT;
+
+template <class T>
+void dNewton::SubmitJobs(dFloat32 timestep)
+{
+	std::atomic<int> it(0);
+	T extJob[D_MAX_THREADS_COUNT];
+	dThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
+
+	const dInt32 threadCount = GetThreadCount();
+	for (int i = 0; i < threadCount; i++)
+	{
+		extJob[i].m_me = this;
+		extJob[i].m_it = &it;
+		extJob[i].m_timestep = timestep;
+		extJobPtr[i] = &extJob[i];
+	}
+	DispatchJobs(extJobPtr);
+}
 
 
 #endif

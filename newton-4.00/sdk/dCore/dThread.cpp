@@ -22,6 +22,7 @@
 
 #include "dCoreStdafx.h"
 #include "dThread.h"
+#include "dProfiler.h"
 
 dThread::dThread()
 	:std::mutex() 
@@ -29,7 +30,7 @@ dThread::dThread()
 	,dSemaphore()
 	,std::thread(&dThread::ThreadFunctionCallback, this)
 {
-	m_name[0] = 0;
+	strcpy (m_name, "thread");
 }
 
 dThread::~dThread()
@@ -85,6 +86,7 @@ void dThread::ThreadFunctionCallback()
 {
 	std::unique_lock<std::mutex> lock(*this);
 	wait(lock);
+	D_SET_TRACK_NAME(m_name);
    	
 	while (!Wait())
 	{

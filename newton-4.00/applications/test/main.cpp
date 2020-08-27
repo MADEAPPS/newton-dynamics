@@ -121,8 +121,8 @@ int main (int argc, const char * argv[])
 {
 	dNewton newton;
 
-	newton.SetThreadCount(4);
 	newton.SetSubSteps(2);
+	//newton.SetThreadCount(4);
 
 	//CreateBodyList(newton);
 	dVector size(0.5f, 0.25f, 0.8f, 0.0f); 

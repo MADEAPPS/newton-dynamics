@@ -41,6 +41,7 @@
 #include <dThread.h>
 #include <dMemory.h>
 #include <dGoogol.h>
+#include <dProfiler.h>
 #include <dPolyhedra.h>
 #include <dSyncMutex.h>
 #include <dSemaphore.h>

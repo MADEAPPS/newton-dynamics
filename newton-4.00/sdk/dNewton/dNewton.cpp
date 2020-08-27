@@ -23,6 +23,7 @@
 #include "dBody.h"
 #include "dNewton.h"
 #include "dDynamicBody.h"
+#include "dBroadPhaseMixed.h"
 
 dNewton::dNewton()
 	:dClassAlloc()
@@ -31,19 +32,24 @@ dNewton::dNewton()
 	,dThreadPool()
 	,m_bodyList()
 	,m_dynamicBodyArray()
+	,m_broadPhase(nullptr)
+	,m_timestep(dFloat32 (0.0f))
+	,m_subSteps(1)
 {
 	// start the engine thread;
 	SetName("newton main thread");
 	Start();
 
-	m_subSteps = 1;
-	m_timestep = 0.0f;
+	m_broadPhase = new dBroadPhaseMixed(this);
 }
 
 dNewton::~dNewton()
 {
 	Sync();
 	Finish();
+
+
+	delete m_broadPhase;
 }
 
 void dNewton::AddBody(dBody* const body)
@@ -147,7 +153,7 @@ void dNewton::SubstepUpdate(dFloat32 timestep)
 	UpdateSkeletons(timestep);
 	ApplyExternalForces(timestep);
 	UpdatePrelisteners(timestep);
-	UpdateSleepState(timestep);
+	//UpdateSleepState(timestep);
 	UpdateBroadPhase(timestep);
 	UpdateDynamics(timestep);
 	UpdatePostlisteners(timestep);
@@ -158,14 +164,6 @@ void dNewton::UpdatePrelisteners(dFloat32 timestep)
 }
 
 void dNewton::UpdatePostlisteners(dFloat32 timestep)
-{
-}
-
-void dNewton::UpdateSleepState(dFloat32 timestep)
-{
-}
-
-void dNewton::UpdateBroadPhase(dFloat32 timestep)
 {
 }
 
@@ -183,11 +181,13 @@ void dNewton::UpdateListenersPostTransform(dFloat32 timestep)
 
 void dNewton::ApplyExternalForces(dFloat32 timestep)
 {
-	class dApplyExternForlce: public dThreadPoolJob
+	D_TRACKTIME();
+	class dApplyExternalForces: public dThreadPoolJob
 	{
 		public:
 		virtual void Execute()
 		{
+			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 count = m_me->m_dynamicBodyArray.GetCount();
 			dDynamicBody** const bodies = &m_me->m_dynamicBodyArray[0];
@@ -201,16 +201,14 @@ void dNewton::ApplyExternalForces(dFloat32 timestep)
 		dNewton* m_me;
 		dFloat32 m_timestep;
 	};
+	SubmitJobs<dApplyExternalForces>(timestep);
+}
 
-	std::atomic<int> it(0);
-	dApplyExternForlce extForceJob[D_MAX_THREADS_COUNT];
-	dThreadPoolJob* extForceJobPtr[D_MAX_THREADS_COUNT];
-	for (int i = 0; i < GetThreadCount(); i++)
-	{
-		extForceJob[i].m_me = this;
-		extForceJob[i].m_it = &it;
-		extForceJob[i].m_timestep = timestep;
-		extForceJobPtr[i] = &extForceJob[i];
-	}
-	DispatchJobs(extForceJobPtr);
+void dNewton::UpdateSleepState(dFloat32 timestep)
+{
+	D_TRACKTIME();
+}
+
+void dNewton::UpdateBroadPhase(dFloat32 timestep)
+{
 }

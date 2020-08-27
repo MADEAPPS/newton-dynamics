@@ -21,10 +21,12 @@
 #include <dNewton.h>
 #include <dShapeBox.h>
 #include <dShapeNull.h>
+#include <dBroadPhase.h>
 #include <dShapeConvex.h>
 #include <dDynamicBody.h>
 #include <dContactSolver.h>
 #include <dShapeInstance.h>
+#include <dBroadPhaseMixed.h>
 
 #endif
 
