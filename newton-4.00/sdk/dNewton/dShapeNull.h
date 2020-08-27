@@ -44,20 +44,25 @@ class dShapeNull: public dShapeConvex
 	{
 	}
 
+	virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
+	{
+		p0 = dVector::m_zero;
+		p1 = dVector::m_zero;
+	}
+
 /*
 	protected:
 	virtual dgFloat32 GetVolume () const;
-	virtual void CalcAABB (const dgMatrix& matrix, dgVector& p0, dgVector& p1) const;
 	
-	virtual dgVector SupportVertex (const dgVector& dir, dgInt32* const vertexIndex) const;
-	virtual dgVector SupportVertexSpecial (const dgVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const;
+	virtual dVector SupportVertex (const dVector& dir, dgInt32* const vertexIndex) const;
+	virtual dVector SupportVertexSpecial (const dVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const;
 	
-	virtual dgVector CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dgVector& plane, const dgCollisionInstance& parentScale) const;
-	virtual dgFloat32 RayCast (const dgVector& localP0, const dgVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
+	virtual dVector CalculateVolumeIntegral (const dMatrix& globalMatrix, const dVector& plane, const dgCollisionInstance& parentScale) const;
+	virtual dgFloat32 RayCast (const dVector& localP0, const dVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
 
 	private:
 	virtual dgInt32 CalculateSignature () const;
-	virtual void SetCollisionBBox (const dgVector& p0, const dgVector& p1);
+	virtual void SetCollisionBBox (const dVector& p0, const dVector& p1);
 
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
 	friend class dgWorld;

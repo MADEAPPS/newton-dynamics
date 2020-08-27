@@ -92,6 +92,7 @@ class dBody: public dClassAlloc
 	dList<dBody*>::dListNode* GetNewtonNode() const;
 	void SetNewtonNode(dNewton* const newton, dList<dBody*>::dListNode* const node);
 
+	void UpdateCollisionMatrix();
 	dBroadPhaseBodyNode* GetBroadPhaseNode() const;
 	void SetBroadPhaseNode(dBroadPhaseBodyNode* const node);
 
@@ -103,6 +104,9 @@ class dBody: public dClassAlloc
 	dVector m_omega;
 	dVector m_localCentreOfMass;
 	dVector m_globalCentreOfMass;
+	dVector m_minAABB;
+	dVector m_maxAABB;
+
 	dQuaternion m_rotation;
 	dBodyNotify* m_notifyCallback;
 	dNewton* m_newton;
@@ -111,7 +115,10 @@ class dBody: public dClassAlloc
 
 	dUnsigned32 m_uniqueID;
 	static dUnsigned32 m_uniqueIDCount;
+
 	friend class dNewton;
+	friend class dBroadPhaseMixed;
+	friend class dBroadPhaseBodyNode;
 } D_GCC_VECTOR_ALIGNMENT;
 
 

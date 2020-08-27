@@ -46,11 +46,6 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-
-
-dVector dShapeInstance::m_padding (DG_MAX_COLLISION_AABB_PADDING, DG_MAX_COLLISION_AABB_PADDING, DG_MAX_COLLISION_AABB_PADDING, dFloat32 (0.0f));
-
-
 dShapeInstance::dShapeInstance(const dgWorld* const world, const dgCollision* const childCollision, dgInt32 shapeID, const dgMatrix& matrix)
 	:m_globalMatrix(matrix)
 	,m_localMatrix (matrix)
@@ -570,6 +565,8 @@ void dShapeInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* co
 }
 
 #endif
+
+dVector dShapeInstance::m_padding(D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, dFloat32(0.0f));
 
 dShapeInstance::dShapeInstance(dShape* const shape)
 	:dClassAlloc()

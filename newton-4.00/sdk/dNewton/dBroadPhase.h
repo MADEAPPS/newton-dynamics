@@ -470,13 +470,6 @@ class dBroadPhase: public dClassAlloc
 	//	return m_lru;
 	//}
 	//
-	//D_INLINE dFloat32 CalculateSurfaceArea(const dBroadPhaseNode* const node0, const dBroadPhaseNode* const node1, dVector& minBox, dVector& maxBox) const
-	//{
-	//	minBox = node0->m_minBox.GetMin(node1->m_minBox);
-	//	maxBox = node0->m_maxBox.GetMax(node1->m_maxBox);
-	//	dVector side0(maxBox - minBox);
-	//	return side0.DotProduct(side0.ShiftTripleRight()).GetScalar();
-	//}
 	//
 	//dgWorld* GetWorld() const { return m_world;}
 	//
@@ -515,8 +508,7 @@ class dBroadPhase: public dClassAlloc
 	//
 	//bool DoNeedUpdate(dgBodyMasterList::dListNode* const node) const;
 	//dFloat64 CalculateEntropy (dFitnessList& fitness, dBroadPhaseNode** const root);
-	//dBroadPhaseTreeNode* InsertNode (dBroadPhaseNode* const root, dBroadPhaseNode* const node);
-	//
+
 	//void RotateLeft(dBroadPhaseTreeNode* const node, dBroadPhaseNode** const root);
 	//void RotateRight(dBroadPhaseTreeNode* const node, dBroadPhaseNode** const root);
 	//void ImproveNodeFitness(dBroadPhaseTreeNode* const node, dBroadPhaseNode** const root);
@@ -606,14 +598,27 @@ class dBroadPhase: public dClassAlloc
 	D_NEWTON_API virtual ~dBroadPhase();
 
 	virtual void AddBody(dBody* const body) = 0;
-	D_NEWTON_API virtual void RemoveBody(dBody* const body);
+	virtual void RemoveBody(dBody* const body) = 0;
 
 	D_NEWTON_API virtual void Update(dFloat32 timestep);
 
+	dFloat32 CalculateSurfaceArea(const dBroadPhaseNode* const node0, const dBroadPhaseNode* const node1, dVector& minBox, dVector& maxBox) const;
+
 	protected:
 	D_NEWTON_API dBroadPhase(dNewton* const world);
+	D_NEWTON_API dBroadPhaseTreeNode* InsertNode (dBroadPhaseNode* const root, dBroadPhaseNode* const node);
 
 	dNewton* m_newton;
+	dBroadPhaseNode* m_rootNode;
 } D_GCC_VECTOR_ALIGNMENT;
+
+D_INLINE dFloat32 dBroadPhase::CalculateSurfaceArea(const dBroadPhaseNode* const node0, const dBroadPhaseNode* const node1, dVector& minBox, dVector& maxBox) const
+{
+	minBox = node0->m_minBox.GetMin(node1->m_minBox);
+	maxBox = node0->m_maxBox.GetMax(node1->m_maxBox);
+	dVector side0(maxBox - minBox);
+	return side0.DotProduct(side0.ShiftTripleRight()).GetScalar();
+}
+
 
 #endif

@@ -22,7 +22,7 @@
 #ifndef __D_SHAPE_INSTANCE_H__ 
 #define __D_SHAPE_INSTANCE_H__ 
 
-#define DG_MAX_SHAPE_AABB_PADDING dFloat32 (1.0f / 16.0f)
+#define D_MAX_SHAPE_AABB_PADDING dFloat32 (1.0f / 16.0f)
 
 #include "dShape.h"
 
@@ -74,6 +74,10 @@ class dShapeInstance: public dClassAlloc
 	dVector SupportVertex(const dVector& dir) const;
 	dMatrix GetScaledTransform(const dMatrix& matrix) const;
 	void CalculateFastAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
+
+	const dMatrix& GetLocalMatrix() const;
+	const dMatrix& GetGlobalMatrix() const;
+	void SetGlobalMatrix(const dMatrix& matrix);
 	
 
 #if 0
@@ -89,11 +93,8 @@ class dShapeInstance: public dClassAlloc
 	dScaleType GetScaleType() const;
 	dScaleType GetCombinedScaleType(dScaleType type) const;
 
-	const dMatrix& GetLocalMatrix () const;
-	const dMatrix& GetGlobalMatrix () const;
 	const dMatrix& GetAlignMatrix () const;
 	void SetLocalMatrix (const dMatrix& matrix);
-	void SetGlobalMatrix (const dMatrix& matrix);
 
 	dUnsigned64 GetUserDataID () const;
 	void SetUserDataID (dUnsigned64 userData);
@@ -167,8 +168,6 @@ class dShapeInstance: public dClassAlloc
 	dInt32 m_refCount;
 	
 	bool m_isExternal;
-
-	static dVector m_padding;
 #endif
 
 	dMatrix m_globalMatrix;
@@ -182,6 +181,8 @@ class dShapeInstance: public dClassAlloc
 	const dBody* m_ownerBody;
 
 	dScaleType m_scaleType;
+
+	static dVector m_padding;
 } D_GCC_VECTOR_ALIGNMENT;
 
 #if 0
@@ -271,25 +272,11 @@ D_INLINE const dVector& dShapeInstance::GetInvScale () const
 	return m_invScale;
 }
 
-D_INLINE const dMatrix& dShapeInstance::GetLocalMatrix () const
-{
-	return m_localMatrix;
-}
-
-D_INLINE const dMatrix& dShapeInstance::GetGlobalMatrix () const
-{
-	return m_globalMatrix;
-}
-
 D_INLINE const dMatrix& dShapeInstance::GetAlignMatrix () const
 {
 	return m_aligmentMatrix;
 }
 
-D_INLINE void dShapeInstance::SetGlobalMatrix (const dMatrix& matrix)
-{
-	m_globalMatrix = matrix;
-}
 
 D_INLINE dgMemoryAllocator* dShapeInstance::GetAllocator() const
 {
@@ -584,6 +571,21 @@ D_INLINE const dShape* dShapeInstance::GetShape() const
 	return m_shape; 
 }
 
+D_INLINE const dMatrix& dShapeInstance::GetLocalMatrix() const
+{
+	return m_localMatrix;
+}
+
+D_INLINE const dMatrix& dShapeInstance::GetGlobalMatrix() const
+{
+	return m_globalMatrix;
+}
+
+D_INLINE void dShapeInstance::SetGlobalMatrix(const dMatrix& matrix)
+{
+	m_globalMatrix = matrix;
+}
+
 D_INLINE dMatrix dShapeInstance::GetScaledTransform(const dMatrix& matrix) const
 {
 	dMatrix scaledMatrix(m_localMatrix * matrix);
@@ -595,8 +597,6 @@ D_INLINE dMatrix dShapeInstance::GetScaledTransform(const dMatrix& matrix) const
 
 D_INLINE void dShapeInstance::CalculateFastAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
 {
-	dAssert(0);
-/*
 	switch (m_scaleType)
 	{
 		case m_unit:
@@ -636,7 +636,6 @@ D_INLINE void dShapeInstance::CalculateFastAABB(const dMatrix& matrix, dVector& 
 
 	dAssert(p0.m_w == dFloat32(0.0f));
 	dAssert(p1.m_w == dFloat32(0.0f));
-*/
 }
 
 D_INLINE dVector dShapeInstance::SupportVertex(const dVector& dir) const

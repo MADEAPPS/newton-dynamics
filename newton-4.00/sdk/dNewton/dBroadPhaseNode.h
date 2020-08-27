@@ -24,15 +24,21 @@
 
 #include "dNewtonStdafx.h"
 
+class dBody;
+class dBroadPhaseBodyNode;
+class dBroadPhaseTreeNode;
+class dBroadPhaseAggregate;
+
 D_MSC_VECTOR_ALIGNMENT
-class dBroadPhaseNode
+class dBroadPhaseNode: public dClassAlloc
 {
 	public:
 	dBroadPhaseNode(dBroadPhaseNode* const parent)
-		//:m_minBox(dFloat32(-1.0e15f))
-		//,m_maxBox(dFloat32(1.0e15f))
-		//,m_parent(parent)
-		//,m_surfaceArea(dFloat32(1.0e20f))
+		:dClassAlloc()
+		,m_minBox(dFloat32(-1.0e15f))
+		,m_maxBox(dFloat32(1.0e15f))
+		,m_parent(parent)
+		,m_surfaceArea(dFloat32(1.0e20f))
 		//,m_criticalSectionLock(0)
 	{
 	}
@@ -40,6 +46,13 @@ class dBroadPhaseNode
 	virtual ~dBroadPhaseNode()
 	{
 	}
+
+	D_NEWTON_API void SetAABB(const dVector& minBox, const dVector& maxBox);
+
+	virtual dBroadPhaseNode* GetAsBroadPhaseNode() { return this; }
+	virtual dBroadPhaseBodyNode* GetAsBroadPhaseBodyNode() { return nullptr; }
+	virtual dBroadPhaseTreeNode* GetAsBroadPhaseTreeNode() { return nullptr; }
+	virtual dBroadPhaseAggregate* GetAsBroadPhaseAggregate() { return nullptr; }
 
 /*
 	virtual bool IsSegregatedRoot() const
@@ -57,30 +70,11 @@ class dBroadPhaseNode
 		return false;
 	}
 
-	void SetAABB(const dVector& minBox, const dVector& maxBox)
-	{
-		dAssert(minBox.m_x <= maxBox.m_x);
-		dAssert(minBox.m_y <= maxBox.m_y);
-		dAssert(minBox.m_z <= maxBox.m_z);
-
-		dVector p0(minBox * m_broadPhaseScale);
-		dVector p1(maxBox * m_broadPhaseScale + dVector::m_one);
-
-		m_minBox = p0.Floor() * m_broadInvPhaseScale;
-		m_maxBox = p1.Floor() * m_broadInvPhaseScale;
-
-		dAssert(m_minBox.m_w == dFloat32(0.0f));
-		dAssert(m_maxBox.m_w == dFloat32(0.0f));
-
-		dVector side0(m_maxBox - m_minBox);
-		m_surfaceArea = side0.DotProduct(side0.ShiftTripleRight()).m_x;
-	}
-
 	virtual dBody* GetBody() const
 	{
 		return nullptr;
 	}
-
+*/
 	virtual dBroadPhaseNode* GetLeft() const
 	{
 		return nullptr;
@@ -95,30 +89,20 @@ class dBroadPhaseNode
 	dVector m_maxBox;
 	dBroadPhaseNode* m_parent;
 	dFloat32 m_surfaceArea;
-	dInt32 m_criticalSectionLock;
+	//dInt32 m_criticalSectionLock;
 
-	static dVector m_broadPhaseScale;
-	static dVector m_broadInvPhaseScale;
-*/
+	static dVector m_aabbQuantization;
+	static dVector m_aabbInvQuantization;
 } D_GCC_VECTOR_ALIGNMENT;
 
 D_MSC_VECTOR_ALIGNMENT
 class dBroadPhaseBodyNode: public dBroadPhaseNode
 {
 	public:
-	dBroadPhaseBodyNode(dBody* const body)
-		:dBroadPhaseNode(nullptr)
-		//,m_body(body)
-		//,m_updateNode(nullptr)
-	{
-		//SetAABB(body->m_minAABB, body->m_maxAABB);
-		//m_body->SetBroadPhase(this);
-	}
+	D_NEWTON_API dBroadPhaseBodyNode(dBody* const body);
+	D_NEWTON_API virtual ~dBroadPhaseBodyNode();
 
-	virtual ~dBroadPhaseBodyNode()
-	{
-		//m_body->SetBroadPhase(nullptr);
-	}
+	virtual dBroadPhaseBodyNode* GetAsBroadPhaseBodyNode() { return this; }
 /*
 	virtual bool IsLeafNode() const
 	{
@@ -129,67 +113,32 @@ class dBroadPhaseBodyNode: public dBroadPhaseNode
 	{
 		return m_body;
 	}
-
-	dBody* m_body;
-	dList<dBroadPhaseNode*>::dListNode* m_updateNode;
 */
-}  D_GCC_VECTOR_ALIGNMENT;
+	dBody* m_body;
+	//dList<dBroadPhaseNode*>::dListNode* m_updateNode;
+} D_GCC_VECTOR_ALIGNMENT;
 
-#if 0
 class dBroadPhaseTreeNode: public dBroadPhaseNode
 {
 	public:
-	dBroadPhaseTreeNode()
-		:dBroadPhaseNode(nullptr)
-		,m_left(nullptr)
-		,m_right(nullptr)
-		,m_fitnessNode(nullptr)
-	{
-	}
+	//dBroadPhaseTreeNode()
+	//	:dBroadPhaseNode(nullptr)
+	//	,m_left(nullptr)
+	//	,m_right(nullptr)
+	//	,m_fitnessNode(nullptr)
+	//{
+	//}
+	
+	D_NEWTON_API dBroadPhaseTreeNode(dBroadPhaseNode* const sibling, dBroadPhaseNode* const myNode);
+	D_NEWTON_API virtual ~dBroadPhaseTreeNode();
 
-	dBroadPhaseTreeNode(dBroadPhaseNode* const sibling, dBroadPhaseNode* const myNode)
-		:dBroadPhaseNode(sibling->m_parent)
-		,m_left(sibling)
-		,m_right(myNode)
-		,m_fitnessNode(nullptr)
-	{
-		if (m_parent) {
-			dBroadPhaseTreeNode* const myParent = (dBroadPhaseTreeNode*)m_parent;
-			if (myParent->m_left == sibling) {
-				myParent->m_left = this;
-			} else {
-				dAssert(myParent->m_right == sibling);
-				myParent->m_right = this;
-			}
-		}
-
-		sibling->m_parent = this;
-		myNode->m_parent = this;
-
-		dBroadPhaseNode* const left = m_left;
-		dBroadPhaseNode* const right = m_right;
-
-		m_minBox = left->m_minBox.GetMin(right->m_minBox);
-		m_maxBox = left->m_maxBox.GetMax(right->m_maxBox);
-		dVector side0(m_maxBox - m_minBox);
-		m_surfaceArea = side0.DotProduct(side0.ShiftTripleRight()).m_x;
-	}
-
-	virtual ~dBroadPhaseTreeNode()
-	{
-		if (m_left) {
-			delete m_left;
-		}
-		if (m_right) {
-			delete m_right;
-		}
-	}
+	virtual dBroadPhaseTreeNode* GetAsBroadPhaseTreeNode() { return this; }
 	
 	virtual dBroadPhaseNode* GetLeft() const
 	{
 		return m_left;
 	}
-
+	
 	virtual dBroadPhaseNode* GetRight() const
 	{
 		return m_right;
@@ -199,6 +148,6 @@ class dBroadPhaseTreeNode: public dBroadPhaseNode
 	dBroadPhaseNode* m_right;
 	dList<dBroadPhaseTreeNode*>::dListNode* m_fitnessNode;
 } D_GCC_VECTOR_ALIGNMENT;
-#endif
+
 
 #endif

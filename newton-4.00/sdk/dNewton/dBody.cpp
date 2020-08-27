@@ -58,6 +58,8 @@ dBody::dBody()
 	,m_omega(dVector::m_zero)
 	,m_localCentreOfMass(dVector::m_zero)
 	,m_globalCentreOfMass(dVector::m_zero)
+	,m_minAABB(dVector::m_zero)
+	,m_maxAABB(dVector::m_zero)
 	,m_rotation()
 	,m_notifyCallback(nullptr)
 	,m_shapeInstance(dDummyCollision::GetNullShape())
@@ -140,10 +142,8 @@ dBroadPhaseBodyNode* dBody::GetBroadPhaseNode() const
 
 void dBody::SetBroadPhaseNode(dBroadPhaseBodyNode* const node)
 {
-	dAssert(m_broadPhaseNode == nullptr);
 	m_broadPhaseNode = node;
 }
-
 
 dVector dBody::GetOmega() const
 {
@@ -168,6 +168,12 @@ void dBody::SetVelocity(const dVector& veloc)
 dMatrix dBody::GetMatrix() const
 {
 	return m_matrix;
+}
+
+void dBody::UpdateCollisionMatrix()
+{
+	m_shapeInstance.SetGlobalMatrix(m_shapeInstance.GetLocalMatrix() * m_matrix);
+	m_shapeInstance.CalculateFastAABB(m_shapeInstance.GetGlobalMatrix(), m_minAABB, m_maxAABB);
 }
 
 void dBody::SetMatrix(const dMatrix& matrix)

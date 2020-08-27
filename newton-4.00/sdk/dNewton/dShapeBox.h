@@ -37,9 +37,10 @@ class dShapeBox: public dShapeConvex
 	protected:
 	D_NEWTON_API void Init (dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
 	D_NEWTON_API virtual void MassProperties();
+
+	D_NEWTON_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
 	D_NEWTON_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 /*
-	virtual void CalcAABB (const dgMatrix& matrix, dVector& p0, dVector& p1) const;
 	virtual dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
 	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;

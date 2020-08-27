@@ -119,14 +119,6 @@ dVector dShapeBox::SupportVertexSpecialProjectPoint(const dVector& point, const 
 	return point + dir.Scale (DG_PENETRATION_TOL);
 }
 
-void dShapeBox::CalcAABB (const dgMatrix& matrix, dVector &p0, dVector &p1) const
-{
-	dVector size (matrix[0].Abs().Scale(m_size[0].m_x) + matrix[1].Abs().Scale(m_size[0].m_y) + matrix[2].Abs().Scale(m_size[0].m_z));
-	p0 = (matrix[3] - size) & dVector::m_triplexMask;
-	p1 = (matrix[3] + size) & dVector::m_triplexMask;
-}
-
-
 dFloat32 dShapeBox::RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
 	dAssert (localP0.m_w == dFloat32 (0.0f));
@@ -470,6 +462,13 @@ void dShapeBox::MassProperties()
 						dFloat32(1.0f / 3.0f) * (m_size[0].m_x * m_size[0].m_x + m_size[0].m_y * m_size[0].m_y),
 						dFloat32(0.0f));
 	m_centerOfMass.m_w = volume;
+}
+
+void dShapeBox::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) const
+{
+	dVector size(matrix[0].Abs().Scale(m_size[0].m_x) + matrix[1].Abs().Scale(m_size[0].m_y) + matrix[2].Abs().Scale(m_size[0].m_z));
+	p0 = (matrix[3] - size) & dVector::m_triplexMask;
+	p1 = (matrix[3] + size) & dVector::m_triplexMask;
 }
 
 

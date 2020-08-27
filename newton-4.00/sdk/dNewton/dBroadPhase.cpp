@@ -189,47 +189,6 @@ void dBroadPhase::MoveNodes (dBroadPhase* const dst)
 	}
 }
 
-dBroadPhaseTreeNode* dBroadPhase::InsertNode(dBroadPhaseNode* const root, dBroadPhaseNode* const node)
-{
-	dVector p0;
-	dVector p1;
-
-	dBroadPhaseNode* sibling = root;
-	dFloat32 surfaceArea = CalculateSurfaceArea(node, sibling, p0, p1);
-	while (!sibling->IsLeafNode()) {
-
-		if (surfaceArea > sibling->m_surfaceArea) {
-			break;
-		}
-
-		sibling->m_minBox = p0;
-		sibling->m_maxBox = p1;
-		sibling->m_surfaceArea = surfaceArea;
-
-		dVector leftP0;
-		dVector leftP1;
-		dFloat32 leftSurfaceArea = CalculateSurfaceArea(node, sibling->GetLeft(), leftP0, leftP1);
-
-		dVector rightP0;
-		dVector rightP1;
-		dFloat32 rightSurfaceArea = CalculateSurfaceArea(node, sibling->GetRight(), rightP0, rightP1);
-
-		if (leftSurfaceArea < rightSurfaceArea) {
-			sibling = sibling->GetLeft();
-			p0 = leftP0;
-			p1 = leftP1;
-			surfaceArea = leftSurfaceArea;
-		} else {
-			sibling = sibling->GetRight();
-			p0 = rightP0;
-			p1 = rightP1;
-			surfaceArea = rightSurfaceArea;
-		}
-	}
-
-	dBroadPhaseTreeNode* const parent = new (m_world->GetAllocator()) dBroadPhaseTreeNode(sibling, node);
-	return parent;
-}
 
 void dBroadPhase::UpdateAggregateEntropyKernel(void* const context, void* const node, dgInt32 threadID)
 {
@@ -1782,6 +1741,7 @@ void dBroadPhase::UpdateContacts(dFloat32 timestep)
 dBroadPhase::dBroadPhase(dNewton* const world)
 	:dClassAlloc()
 	,m_newton(world)
+	,m_rootNode(nullptr)
 {
 }
 
@@ -1789,9 +1749,45 @@ dBroadPhase::~dBroadPhase()
 {
 }
 
-void dBroadPhase::RemoveBody(dBody* const body)
+dBroadPhaseTreeNode* dBroadPhase::InsertNode(dBroadPhaseNode* const root, dBroadPhaseNode* const node)
 {
+	dVector p0;
+	dVector p1;
 
+	dBroadPhaseNode* sibling = root;
+	dFloat32 surfaceArea = CalculateSurfaceArea(node, sibling, p0, p1);
+	while (!sibling->GetAsBroadPhaseBodyNode() && (surfaceArea >= sibling->m_surfaceArea))
+	{
+		sibling->m_minBox = p0;
+		sibling->m_maxBox = p1;
+		sibling->m_surfaceArea = surfaceArea;
+	
+		dVector leftP0;
+		dVector leftP1;
+		dFloat32 leftSurfaceArea = CalculateSurfaceArea(node, sibling->GetLeft(), leftP0, leftP1);
+		
+		dVector rightP0;
+		dVector rightP1;
+		dFloat32 rightSurfaceArea = CalculateSurfaceArea(node, sibling->GetRight(), rightP0, rightP1);
+	
+		if (leftSurfaceArea < rightSurfaceArea) 
+		{
+			p0 = leftP0;
+			p1 = leftP1;
+			sibling = sibling->GetLeft();
+			surfaceArea = leftSurfaceArea;
+		}
+		else 
+		{
+			p0 = rightP0;
+			p1 = rightP1;
+			sibling = sibling->GetRight();
+			surfaceArea = rightSurfaceArea;
+		}
+	}
+	
+	dBroadPhaseTreeNode* const parent = new dBroadPhaseTreeNode(sibling, node);
+	return parent;
 }
 
 void dBroadPhase::Update(dFloat32 timestep)

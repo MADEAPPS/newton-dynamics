@@ -33,7 +33,6 @@ void operator delete (void* ptr)
 	dFree(ptr);
 }
 
-
 class CheckMemoryLeaks
 {
 	public:
@@ -133,8 +132,7 @@ int main (int argc, const char * argv[])
 	dNewton newton;
 	newton.SetSubSteps(2);
 	//newton.SetThreadCount(4);
-
-	//CreateBodyList(newton);
+		
 	dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
 	dVector origin(0.5f, 0.25f, 0.8f, 0.0f);
 	BuildPyramid(newton, 10.0f, origin, size, 20);
