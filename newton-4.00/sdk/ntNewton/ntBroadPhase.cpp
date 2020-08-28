@@ -642,30 +642,27 @@ void ntBroadPhase::UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBody* con
 			//aggregate->m_isInEquilibrium = body1->m_equilibrium;
 		}
 
-		dAssert(0);
-//		if (!dgBoxInclusionTest(body1->m_minAABB, body1->m_maxAABB, node->m_minBox, node->m_maxBox)) 
-		if (1)
+		if (!dBoxInclusionTest(body->m_minAABB, body->m_maxAABB, node->m_minBox, node->m_maxBox)) 
 		{
 			dAssert(!node->GetAsBroadPhaseAggregate());
 			node->SetAABB(body->m_minAABB, body->m_maxAABB);
 
 			if (!m_rootNode->GetAsBroadPhaseBodyNode()) 
 			{
-				const ntBroadPhaseNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? NULL : m_rootNode;
+				const ntBroadPhaseNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
+				dAssert(root == nullptr);
 				for (ntBroadPhaseNode* parent = node->m_parent; parent != root; parent = parent->m_parent) 
 				{
-					dAssert(0);
-					//dgScopeSpinPause lock(&parent->m_criticalSectionLock);
+					dScopeSpinLock lock(parent->m_lock);
 					if (!parent->GetAsBroadPhaseAggregate()) 
 					{
 						dVector minBox;
 						dVector maxBox;
 						dFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
-						dAssert(0);
-						//if (dgBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox)) 
-						//{
-						//	break;
-						//}
+						if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox)) 
+						{
+							break;
+						}
 						parent->m_minBox = minBox;
 						parent->m_maxBox = maxBox;
 						parent->m_surfaceArea = area;

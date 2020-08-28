@@ -137,7 +137,7 @@ int main (int argc, const char * argv[])
 	dVector origin(0.5f, 0.25f, 0.8f, 0.0f);
 	BuildPyramid(world, 10.0f, origin, size, 20);
 
-	for (int i = 0; i < 10000; i ++)
+	for (int i = 0; i < 100000; i ++)
 	{
 		world.Update(1.0f / 60.0f);
 		//newton.Sync();

@@ -49,6 +49,7 @@
 #include <dClassAlloc.h>
 #include <dThreadPool.h>
 #include <dQuaternion.h>
+#include <dIntersections.h>
 #include <dSpatialMatrix.h>
 #include <dGeneralVector.h>
 #include <dGeneralMatrix.h>

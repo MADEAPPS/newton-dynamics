@@ -22,7 +22,6 @@
 #ifndef __D_MATRIX_H__
 #define __D_MATRIX_H__
 
-
 #include "dCoreStdafx.h"
 #include "dTypes.h"
 #include "dDebug.h"
@@ -37,7 +36,7 @@ D_CORE_API const dMatrix& dGetZeroMatrix ();
 D_CORE_API const dMatrix& dGetIdentityMatrix();
 
 D_MSC_VECTOR_ALIGNMENT
-class dMatrix: public dClassAlloc
+class dMatrix//: public dClassAlloc
 {
 	public:
 	dMatrix ();

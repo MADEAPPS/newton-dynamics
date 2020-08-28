@@ -38,8 +38,8 @@ class ntBroadPhaseNode: public dClassAlloc
 		,m_minBox(dFloat32(-1.0e15f))
 		,m_maxBox(dFloat32(1.0e15f))
 		,m_parent(parent)
+		,m_lock()
 		,m_surfaceArea(dFloat32(1.0e20f))
-		//,m_criticalSectionLock(0)
 	{
 	}
 
@@ -83,8 +83,8 @@ class ntBroadPhaseNode: public dClassAlloc
 	dVector m_minBox;
 	dVector m_maxBox;
 	ntBroadPhaseNode* m_parent;
+	dSpinLock m_lock;
 	dFloat32 m_surfaceArea;
-	//dInt32 m_criticalSectionLock;
 
 	static dVector m_aabbQuantization;
 	static dVector m_aabbInvQuantization;

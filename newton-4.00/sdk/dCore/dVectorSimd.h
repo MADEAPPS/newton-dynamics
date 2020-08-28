@@ -35,7 +35,8 @@ class dBigVector;
 //
 // *****************************************************************************************
 D_MSC_VECTOR_ALIGNMENT
-class dVector: public dClassAlloc
+//class dVector: public dClassAlloc
+class dVector
 {
 	#define PERMUTE_MASK(w, z, y, x) _MM_SHUFFLE (w, z, y, x)
 	public:

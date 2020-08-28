@@ -97,12 +97,12 @@ class dgGlobalAllocator: public dgMemoryAllocator, public dgList<dgMemoryAllocat
 		dgAssert (GetCount() == 0);
 	}
 
-	static void* dgApi __malloc__ (dgUnsigned32 size) 
+	static void* __malloc__ (dgUnsigned32 size) 
 	{
 		return malloc (size);
 	}
 
-	static void dgApi __free__ (void* const ptr, dgUnsigned32 size)
+	static void __free__ (void* const ptr, dgUnsigned32 size)
 	{
 		free (ptr);
 	}
@@ -377,13 +377,13 @@ dgInt32 dgMemoryAllocator::GetGlobalMemoryUsed ()
 // this by pases the pool allocation because this should only be used for very large memory blocks.
 // this was using virtual memory on windows but 
 // but because of many complaint I changed it to use malloc and free
-void* dgApi dgMallocStack (size_t size)
+void* dgMallocStack (size_t size)
 {
 	void * const ptr = dgGlobalAllocator::GetGlobalAllocator().MallocLow (dgInt32 (size));
 	return ptr;
 }
 
-void* dgApi dgMallocAligned (size_t size, dgInt32 align)
+void* dgMallocAligned (size_t size, dgInt32 align)
 {
 	void * const ptr = dgGlobalAllocator::GetGlobalAllocator().MallocLow (dgInt32 (size), align);
 	return ptr;
@@ -393,13 +393,13 @@ void* dgApi dgMallocAligned (size_t size, dgInt32 align)
 // this by pases the pool allocation because this should only be used for very large memory blocks.
 // this was using virtual memory on windows but 
 // but because of many complaint I changed it to use malloc and free
-void  dgApi dgFreeStack (void* const ptr)
+void  dgFreeStack (void* const ptr)
 {
 	dgGlobalAllocator::GetGlobalAllocator().FreeLow (ptr);
 }
 
 // general memory allocation for all data in the library
-void* dgApi dgMalloc (size_t size, dgMemoryAllocator* const allocator) 
+void* dgMalloc (size_t size, dgMemoryAllocator* const allocator) 
 {
 	void* ptr = NULL;
 	dgAssert (allocator);
@@ -411,7 +411,7 @@ void* dgApi dgMalloc (size_t size, dgMemoryAllocator* const allocator)
 }
 
 // general deletion allocation for all data in the library
-void dgApi dgFree (void* const ptr)
+void dgFree (void* const ptr)
 {
 	if (ptr) {
 		dgMemoryAllocator::dgMemoryInfo* const info = ((dgMemoryAllocator::dgMemoryInfo*) ptr) - 1;

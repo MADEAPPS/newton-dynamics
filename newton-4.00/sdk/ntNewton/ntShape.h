@@ -76,7 +76,7 @@ D_MSC_VECTOR_ALIGNMENT
 class ntShape: public dClassAlloc
 {
 	public:
-//	typedef void (dgApi *OnDebugCollisionMeshCallback) (void* userData, int vertexCount, const dFloat32* faceArray, int faceId);
+//	typedef void (*OnDebugCollisionMeshCallback) (void* userData, int vertexCount, const dFloat32* faceArray, int faceId);
 
 /*	
 	static dUnsigned32 Quantize (dFloat32 value);

@@ -54,19 +54,19 @@ class dgMemoryAllocator;
 	DG_CLASS_ALLOCATOR_DELETE_DUMMY					\
 	DG_CLASS_ALLOCATOR_DELETE_ARRAY_DUMMY
 
-typedef void* (dgApi *dgMemAlloc) (dgUnsigned32 size);
-typedef void (dgApi *dgMemFree) (void* const ptr, dgUnsigned32 size);
+typedef void* (*dgMemAlloc) (dgUnsigned32 size);
+typedef void (*dgMemFree) (void* const ptr, dgUnsigned32 size);
 
 #define DG_OLD_ALLOCATOR
 
 #ifdef DG_OLD_ALLOCATOR
 
-void* dgApi dgMalloc (size_t size, dgMemoryAllocator* const allocator);
-void  dgApi dgFree (void* const ptr);
+void* dgMalloc (size_t size, dgMemoryAllocator* const allocator);
+void  dgFree (void* const ptr);
 
-void* dgApi dgMallocStack (size_t size);
-void* dgApi dgMallocAligned (size_t size, dgInt32 alignmentInBytes);
-void  dgApi dgFreeStack (void* const ptr);
+void* dgMallocStack (size_t size);
+void* dgMallocAligned (size_t size, dgInt32 alignmentInBytes);
+void  dgFreeStack (void* const ptr);
 
 
 
@@ -215,8 +215,8 @@ class dgGlobalAllocator: public dgMemoryAllocatorBase
 	dgInt32 GetMemoryUsed() const { return m_memoryUsed; }
 
 	private:
-	static void* dgApi __malloc__(dgUnsigned32 size);
-	static void dgApi __free__(void* const ptr, dgUnsigned32 size);
+	static void* __malloc__(dgUnsigned32 size);
+	static void __free__(void* const ptr, dgUnsigned32 size);
 	
 	void* Malloc(dgInt32 size);
 	void Free(void* const ptr);
