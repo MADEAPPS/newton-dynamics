@@ -76,8 +76,10 @@ class dBroadPhaseMixed : public dBroadPhase
 	private:
 	void AddNode(dBroadPhaseNode* const newNode);
 	void RemoveNode(dBroadPhaseNode* const newNode);
-	
+	void BalanceBroadPhase();
 
+	dFloat64 m_treeEntropy;
+	dFitnessList m_fitness;
 
 } D_GCC_VECTOR_ALIGNMENT;
 

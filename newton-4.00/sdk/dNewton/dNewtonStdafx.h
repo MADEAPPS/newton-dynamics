@@ -31,6 +31,7 @@
 #include <dList.h>
 #include <dTree.h>
 #include <dHeap.h>
+#include <dSort.h>
 #include <dTypes.h>
 #include <dArray.h>
 #include <dStack.h>

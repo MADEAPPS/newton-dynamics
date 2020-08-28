@@ -34,6 +34,14 @@ class dNewton
 	,public dThreadPool
 {
 	public:
+	class dNewtonBaseJob: public dThreadPoolJob
+	{
+		public:
+		std::atomic<int>* m_it;
+		dNewton* m_newton;
+		dFloat32 m_timestep;
+	};
+
 	D_NEWTON_API dNewton();
 	D_NEWTON_API virtual ~dNewton();
 
@@ -65,13 +73,11 @@ class dNewton
 	D_NEWTON_API virtual void TransformUpdate(dFloat32 timestep);
 	D_NEWTON_API virtual void UpdateListenersPostTransform(dFloat32 timestep);
 
-	private:
-	virtual void ThreadFunction();
-
 	protected:
 
 	private:
-	void GetDynamicBodyArray();
+	virtual void ThreadFunction();
+	void BuildBodyArray();
 
 	template <class T>
 	void SubmitJobs(dFloat32 timestep);
@@ -81,6 +87,8 @@ class dNewton
 	dBroadPhase* m_broadPhase;
 	dFloat32 m_timestep;
 	dInt32 m_subSteps;
+
+	friend class dBroadPhase;
 } D_GCC_VECTOR_ALIGNMENT;
 
 template <class T>
@@ -93,8 +101,8 @@ void dNewton::SubmitJobs(dFloat32 timestep)
 	const dInt32 threadCount = GetThreadCount();
 	for (int i = 0; i < threadCount; i++)
 	{
-		extJob[i].m_me = this;
 		extJob[i].m_it = &it;
+		extJob[i].m_newton = this;
 		extJob[i].m_timestep = timestep;
 		extJobPtr[i] = &extJob[i];
 	}

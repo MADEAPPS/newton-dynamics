@@ -465,6 +465,49 @@ enum dSerializeRevisionNumber
 	m_currentRevision 
 };
 
+class dSpinLock
+{
+	public:
+	dSpinLock()
+		:m_lock(0)
+	{
+	}
+
+	void Lock()
+	{
+		while (m_lock.exchange(1)) 
+		{
+			std::this_thread::yield();
+		}
+	}
+
+	void Unlock()
+	{
+		m_lock.exchange(0);
+	}
+
+	private:
+	std::atomic<dUnsigned32> m_lock;
+};
+
+class dScopeSpinLock
+{
+	public:
+	dScopeSpinLock(dSpinLock& spinLock)
+		:m_spinLock(spinLock)
+	{
+		m_spinLock.Lock();
+	}
+
+	~dScopeSpinLock()
+	{
+		m_spinLock.Unlock();
+	}
+
+	dSpinLock& m_spinLock;
+};
+
+
 //void dGetMinMax (dBigVector &Min, dBigVector &Max, const dFloat64* const vArray, dInt32 vCount, dInt32 strideInBytes);
 //dInt32 dVertexListToIndexList (dFloat64* const vertexList, dInt32 strideInBytes, dInt32 compareCount,     dInt32 vertexCount,         dInt32* const indexListOut, dFloat64 tolerance = dEpsilon);
 //dInt32 dVertexListToIndexList (dFloat32* const vertexList, dInt32 strideInBytes, dInt32 floatSizeInBytes, dInt32 unsignedSizeInBytes, dInt32 vertexCount, dInt32* const indexListOut, dFloat32 tolerance = dEpsilon);

@@ -130,7 +130,7 @@ void dNewton::ThreadFunction()
 void dNewton::InternalUpdate(dFloat32 fullTimestep)
 {
 	D_TRACKTIME();
-	GetDynamicBodyArray();
+	BuildBodyArray();
 	dFloat32 timestep = fullTimestep / m_subSteps;
 	for (dInt32 i = 0; i < m_subSteps; i++)
 	{
@@ -141,7 +141,7 @@ void dNewton::InternalUpdate(dFloat32 fullTimestep)
 	UpdateListenersPostTransform(fullTimestep);
 }
 
-void dNewton::GetDynamicBodyArray()
+void dNewton::BuildBodyArray()
 {
 	D_TRACKTIME();
 	m_dynamicBodyArray.SetCount(m_bodyList.GetCount());
@@ -211,24 +211,20 @@ void dNewton::UpdateListenersPostTransform(dFloat32 timestep)
 void dNewton::ApplyExternalForces(dFloat32 timestep)
 {
 	D_TRACKTIME();
-	class dApplyExternalForces: public dThreadPoolJob
+	class dApplyExternalForces: public dNewtonBaseJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
-			const dInt32 count = m_me->m_dynamicBodyArray.GetCount();
-			dDynamicBody** const bodies = &m_me->m_dynamicBodyArray[0];
+			const dInt32 count = m_newton->m_dynamicBodyArray.GetCount();
+			dDynamicBody** const bodies = &m_newton->m_dynamicBodyArray[0];
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
 				bodies[i]->ApplyExternalForces(threadIndex, m_timestep);
 			}
 		}
-
-		std::atomic<int>* m_it;
-		dNewton* m_me;
-		dFloat32 m_timestep;
 	};
 	SubmitJobs<dApplyExternalForces>(timestep);
 }

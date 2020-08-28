@@ -60,21 +60,16 @@ class dBroadPhaseNode: public dClassAlloc
 		return false;
 	}
 
-	virtual bool IsLeafNode() const
-	{
-		return false;
-	}
-
 	virtual bool IsAggregate() const
 	{
 		return false;
 	}
-
+*/
 	virtual dBody* GetBody() const
 	{
 		return nullptr;
 	}
-*/
+
 	virtual dBroadPhaseNode* GetLeft() const
 	{
 		return nullptr;
@@ -103,17 +98,12 @@ class dBroadPhaseBodyNode: public dBroadPhaseNode
 	D_NEWTON_API virtual ~dBroadPhaseBodyNode();
 
 	virtual dBroadPhaseBodyNode* GetAsBroadPhaseBodyNode() { return this; }
-/*
-	virtual bool IsLeafNode() const
-	{
-		return true;
-	}
 
 	virtual dBody* GetBody() const
 	{
 		return m_body;
 	}
-*/
+
 	dBody* m_body;
 	//dList<dBroadPhaseNode*>::dListNode* m_updateNode;
 } D_GCC_VECTOR_ALIGNMENT;
