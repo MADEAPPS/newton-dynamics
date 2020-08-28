@@ -58,8 +58,8 @@ void dBroadPhaseNode::SetAABB(const dVector& minBox, const dVector& maxBox)
 	dAssert(m_minBox.m_w == dFloat32(0.0f));
 	dAssert(m_maxBox.m_w == dFloat32(0.0f));
 
-	dVector side0(m_maxBox - m_minBox);
-	m_surfaceArea = side0.DotProduct(side0.ShiftTripleRight()).GetScalar();
+	dVector size(m_maxBox - m_minBox);
+	m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();
 }
 
 dBroadPhaseTreeNode::dBroadPhaseTreeNode(dBroadPhaseNode* const sibling, dBroadPhaseNode* const myNode)

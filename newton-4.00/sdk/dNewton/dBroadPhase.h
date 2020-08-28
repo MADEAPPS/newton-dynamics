@@ -30,6 +30,8 @@ D_MSC_VECTOR_ALIGNMENT
 class dBroadPhase: public dClassAlloc
 {
 	protected:
+	class dSpliteInfo;
+
 	class dFitnessList: public dList <dBroadPhaseTreeNode*>
 	{
 		public:
@@ -55,12 +57,15 @@ class dBroadPhase: public dClassAlloc
 	virtual void BalanceBroadPhase() = 0;
 	void UpdateAabb(dInt32 threadIndex, dFloat32 timestep, dBody* const body);
 
-	
+
 	void RotateLeft(dBroadPhaseTreeNode* const node, dBroadPhaseNode** const root);
 	void RotateRight(dBroadPhaseTreeNode* const node, dBroadPhaseNode** const root);
-	dFloat64 CalculateEntropy(dFitnessList& fitness, dBroadPhaseNode** const root);
+	dFloat64 ReduceEntropy(dFitnessList& fitness, dBroadPhaseNode** const root);
 	void ImproveNodeFitness(dBroadPhaseTreeNode* const node, dBroadPhaseNode** const root);
 	static dInt32 CompareNodes(const dBroadPhaseNode* const nodeA, const dBroadPhaseNode* const nodeB, void* const);
+	dBroadPhaseNode* BuildTopDown(dBroadPhaseNode** const leafArray, dInt32 firstBox, dInt32 lastBox, dFitnessList::dListNode** const nextNode);
+	dBroadPhaseNode* BuildTopDownBig(dBroadPhaseNode** const leafArray, dInt32 firstBox, dInt32 lastBox, dFitnessList::dListNode** const nextNode);
+
 	protected:
 	D_NEWTON_API dBroadPhase(dNewton* const world);
 	D_NEWTON_API dBroadPhaseTreeNode* InsertNode (dBroadPhaseNode* const root, dBroadPhaseNode* const node);

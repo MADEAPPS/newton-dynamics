@@ -66,10 +66,11 @@ dBody::dBody()
 	,m_newton(nullptr)
 	,m_broadPhaseNode(nullptr)
 	,m_newtonNode(nullptr)
+	,m_broadPhaseAggregateNode(nullptr)
 	,m_flags(0)
 	,m_uniqueID(m_uniqueIDCount)
 {
-	m_equilibrium = false;
+	m_equilibrium = 0;
 	m_uniqueIDCount++;
 }
 
@@ -147,6 +148,16 @@ void dBody::SetBroadPhaseNode(dBroadPhaseBodyNode* const node)
 	m_broadPhaseNode = node;
 }
 
+dBroadPhaseAggregate* dBody::GetBroadPhaseAggregate() const
+{
+	return m_broadPhaseAggregateNode;
+}
+
+void dBody::SetBroadPhaseAggregate(dBroadPhaseAggregate* const node)
+{
+	m_broadPhaseAggregateNode = node;
+}
+
 dVector dBody::GetOmega() const
 {
 	return m_omega;
@@ -154,7 +165,7 @@ dVector dBody::GetOmega() const
 
 void dBody::SetOmega(const dVector& veloc)
 {
-	m_equilibrium = 1;
+	m_equilibrium = 0;
 	m_omega = veloc;
 }
 
@@ -165,7 +176,7 @@ dVector dBody::GetVelocity() const
 
 void dBody::SetVelocity(const dVector& veloc)
 {
-	m_equilibrium = 1;
+	m_equilibrium = 0;
 	m_veloc = veloc;
 }
 
@@ -182,7 +193,7 @@ void dBody::UpdateCollisionMatrix()
 
 void dBody::SetMatrix(const dMatrix& matrix)
 {
-	m_equilibrium = 1;
+	m_equilibrium = 0;
 	m_matrix = matrix;
 	dAssert(m_matrix.TestOrthogonal(dFloat32(1.0e-4f)));
 

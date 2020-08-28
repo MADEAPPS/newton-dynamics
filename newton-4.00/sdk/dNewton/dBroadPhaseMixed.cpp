@@ -144,12 +144,13 @@ void dBroadPhaseMixed::RemoveNode(dBroadPhaseNode* const node)
 			if (parent->m_fitnessNode) 
 			{
 				dBody* const body = node->GetBody();
-				//if (body && body->GetBroadPhaseAggregate()) 
-				//{
-				//	body->GetBroadPhaseAggregate()->m_fitnessList.Remove(parent->m_fitnessNode);
-				//	body->SetBroadPhaseAggregate(nullptr);
-				//}
-				//else 
+				if (body && body->GetBroadPhaseAggregate()) 
+				{
+					dAssert(0);
+					//body->GetBroadPhaseAggregate()->m_fitnessList.Remove(parent->m_fitnessNode);
+					//body->SetBroadPhaseAggregate(nullptr);
+				}
+				else 
 				{
 					m_fitness.Remove(parent->m_fitnessNode);
 				}

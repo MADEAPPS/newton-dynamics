@@ -28,6 +28,7 @@
 class dNewton;
 class dDynamicBody;
 class dBroadPhaseBodyNode;
+class dBroadPhaseAggregate;
 
 D_MSC_VECTOR_ALIGNMENT
 class dBodyNotify: public dClassAlloc
@@ -93,8 +94,12 @@ class dBody: public dClassAlloc
 	void SetNewtonNode(dNewton* const newton, dList<dBody*>::dListNode* const node);
 
 	void UpdateCollisionMatrix();
+
 	dBroadPhaseBodyNode* GetBroadPhaseNode() const;
 	void SetBroadPhaseNode(dBroadPhaseBodyNode* const node);
+
+	dBroadPhaseAggregate* GetBroadPhaseAggregate() const;
+	void SetBroadPhaseAggregate(dBroadPhaseAggregate* const node);
 
 	dMatrix m_matrix;
 	dMatrix m_invWorldInertiaMatrix;
@@ -112,6 +117,7 @@ class dBody: public dClassAlloc
 	dNewton* m_newton;
 	dBroadPhaseBodyNode* m_broadPhaseNode;
 	dList<dBody*>::dListNode* m_newtonNode;
+	dBroadPhaseAggregate* m_broadPhaseAggregateNode;
 
 	union
 	{
@@ -145,8 +151,6 @@ class dBody: public dClassAlloc
 	friend class dBroadPhaseMixed;
 	friend class dBroadPhaseBodyNode;
 } D_GCC_VECTOR_ALIGNMENT;
-
-
 
 
 #endif 
