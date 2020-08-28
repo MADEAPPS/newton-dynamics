@@ -129,17 +129,17 @@ void BuildPyramid(ntWorld& world, dFloat32 mass, const dVector& origin, const dV
 
 int main (int argc, const char * argv[]) 
 {
-	ntWorld newton;
-	newton.SetSubSteps(2);
+	ntWorld world;
+	world.SetSubSteps(2);
 	//newton.SetThreadCount(3);
 		
 	dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
 	dVector origin(0.5f, 0.25f, 0.8f, 0.0f);
-	BuildPyramid(newton, 10.0f, origin, size, 20);
+	BuildPyramid(world, 10.0f, origin, size, 20);
 
 	for (int i = 0; i < 10000; i ++)
 	{
-		newton.Update(1.0f / 60.0f);
+		world.Update(1.0f / 60.0f);
 		//newton.Sync();
 	}
 
