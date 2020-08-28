@@ -154,6 +154,7 @@ ntBroadPhase::ntBroadPhase(ntWorld* const world)
 	:dClassAlloc()
 	,m_newton(world)
 	,m_rootNode(nullptr)
+	,m_fullScan(true)
 {
 }
 
@@ -205,33 +206,10 @@ ntBroadPhaseTreeNode* ntBroadPhase::InsertNode(ntBroadPhaseNode* const root, ntB
 void ntBroadPhase::Update(dFloat32 timestep)
 {
 	D_TRACKTIME();
-
 	UpdateAabb(timestep);
 	BalanceBroadPhase();
+	FindCollidingPairs(timestep);
 }
-
-void ntBroadPhase::UpdateAabb(dFloat32 timestep)
-{
-	class dUpdateAabbJob: public ntWorld::dNewtonBaseJob
-	{
-		public:
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			const dInt32 threadIndex = GetThredID();
-			const dInt32 threadsCount = m_newton->GetThreadCount();
-			const dInt32 count = m_newton->m_dynamicBodyArray.GetCount();
-			ntDynamicBody** const bodies = &m_newton->m_dynamicBodyArray[0];
-			ntBroadPhase* const broadPhase = m_newton->m_broadPhase;
-			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
-			{
-				broadPhase->UpdateAabb(threadIndex, m_timestep, bodies[i]);
-			}
-		}
-	};
-	m_newton->SubmitJobs<dUpdateAabbJob>(timestep);
-}
-
 
 void ntBroadPhase::RotateLeft(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root)
 {
@@ -679,4 +657,246 @@ void ntBroadPhase::UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBody* con
 			}
 		}
 	}
+}
+
+void ntBroadPhase::SubmitPairs(ntBroadPhaseNode* const leafNode, ntBroadPhaseNode* const node, dFloat32 timestep)
+{
+	ntBroadPhaseNode* pool[D_BROADPHASE_MAX_STACK_DEPTH];
+	pool[0] = node;
+	dInt32 stack = 1;
+
+	ntDynamicBody* const body0 = leafNode->GetBody() ? leafNode->GetBody()->GetAsDynamicBody() : nullptr;
+	const dVector boxP0(body0 ? body0->m_minAABB : leafNode->m_minBox);
+	const dVector boxP1(body0 ? body0->m_maxAABB : leafNode->m_maxBox);
+	const bool test0 = body0 ? (body0->m_invMass.m_w != dFloat32(0.0f)) : true;
+
+	while (stack) 
+	{
+		stack--;
+		ntBroadPhaseNode* const rootNode = pool[stack];
+		if (dOverlapTest(rootNode->m_minBox, rootNode->m_maxBox, boxP0, boxP1)) 
+		{
+			if (rootNode->GetAsBroadPhaseBodyNode()) 
+			{
+				dAssert(!rootNode->GetRight());
+				dAssert(!rootNode->GetLeft());
+				ntDynamicBody* const body1 = rootNode->GetBody() ? rootNode->GetBody()->GetAsDynamicBody() : nullptr;
+				if (body0) 
+				{
+					if (body1) 
+					{
+						if (test0 || (body1->m_invMass.m_w != dFloat32(0.0f)))
+						{
+							AddPair(body0, body1, timestep);
+						}
+					}
+					else 
+					{
+						dAssert(0);
+						//dAssert(rootNode->GetAsBroadPhaseAggregate());
+						//dBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*)rootNode;
+						//aggregate->SummitPairs(body0, timestep, threadID);
+					}
+				}
+				else 
+				{
+					ntBroadPhaseAggregate* const aggregate = leafNode->GetAsBroadPhaseAggregate();
+					dAssert(aggregate);
+					if (body1) 
+					{
+						dAssert(0);
+						//aggregate->SummitPairs(body1, timestep, threadID);
+					}
+					else 
+					{
+						dAssert(0);
+						dAssert(rootNode->GetAsBroadPhaseAggregate());
+						//aggregate->SummitPairs((dgBroadPhaseAggregate*)rootNode, timestep, threadID);
+					}
+				}
+			}
+			else 
+			{
+				ntBroadPhaseTreeNode* const tmpNode = rootNode->GetAsBroadPhaseTreeNode();
+				dAssert(tmpNode->m_left);
+				dAssert(tmpNode->m_right);
+		
+				pool[stack] = tmpNode->m_left;
+				stack++;
+				dAssert(stack < dInt32(sizeof(pool) / sizeof(pool[0])));
+		
+				pool[stack] = tmpNode->m_right;
+				stack++;
+				dAssert(stack < dInt32(sizeof(pool) / sizeof(pool[0])));
+			}
+		}
+	}
+}
+
+bool ntBroadPhase::TestOverlaping(const ntBody* const body0, const ntBody* const body1, dFloat32 timestep) const
+{
+	//bool mass0 = (body0->m_invMass.m_w != dgFloat32(0.0f));
+	//bool mass1 = (body1->m_invMass.m_w != dgFloat32(0.0f));
+	//bool isDynamic0 = body0->IsRTTIType(dgBody::m_dynamicBodyRTTI) != 0;
+	//bool isDynamic1 = body1->IsRTTIType(dgBody::m_dynamicBodyRTTI) != 0;
+	//bool isKinematic0 = body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) != 0;
+	//bool isKinematic1 = body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) != 0;
+	//
+	//dAssert(!body0->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
+	//dAssert(!body1->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
+	//
+	//const dgBroadPhaseAggregate* const agreggate0 = body0->GetBroadPhaseAggregate();
+	//const dgBroadPhaseAggregate* const agreggate1 = body1->GetBroadPhaseAggregate();
+	//
+	//bool tier1 = true;
+	//bool tier2 = !(body0->m_sleeping & body1->m_sleeping);
+	//bool tier3 = (agreggate0 != agreggate1) || !agreggate0 || (agreggate0 && agreggate0->GetSelfCollision());
+	//bool tier4 = isDynamic0 & mass0;
+	//bool tier5 = isDynamic1 & mass1;
+	//bool tier6 = isKinematic0 & mass1;
+	//bool tier7 = isKinematic1 & mass0;
+	//bool ret = tier1 & tier2  & tier3 & (tier4 | tier5 | tier6 | tier7);
+	//
+	//if (ret) 
+	//{
+	//	const dgCollisionInstance* const instance0 = body0->GetCollision();
+	//	const dgCollisionInstance* const instance1 = body1->GetCollision();
+	//
+	//	if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
+	//		dVector velRelative(body1->GetVelocity() - body0->GetVelocity());
+	//		if (velRelative.DotProduct(velRelative).GetScalar() > dgFloat32(0.25f)) {
+	//			dVector box0_p0;
+	//			dVector box0_p1;
+	//			dVector box1_p0;
+	//			dVector box1_p1;
+	//
+	//			instance0->CalcAABB(instance0->GetGlobalMatrix(), box0_p0, box0_p1);
+	//			instance1->CalcAABB(instance1->GetGlobalMatrix(), box1_p0, box1_p1);
+	//
+	//			dVector boxp0(box0_p0 - box1_p1);
+	//			dVector boxp1(box0_p1 - box1_p0);
+	//			dgFastRayTest ray(dVector::m_zero, velRelative.Scale(timestep * dgFloat32(4.0f)));
+	//			dgFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
+	//			ret = (distance < dgFloat32(1.0f));
+	//		}
+	//		else {
+	//			ret = dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? 1 : 0;
+	//		}
+	//	}
+	//	else {
+	//		ret = dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? 1 : 0;
+	//	}
+	//}
+	//return ret;
+	return dOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? true : false;
+}
+
+
+void ntBroadPhase::AddPair(ntBody* const body0, ntBody* const body1, const dFloat32 timestep)
+{
+	dAssert(body0);
+	dAssert(body1);
+	const bool test = TestOverlaping(body0, body1, timestep);
+	if (test) 
+	{
+		dAssert(0);
+	//	dgContact* contact = m_contactCache.FindContactJoint(body0, body1);
+	//	if (!contact) {
+	//		const dgBilateralConstraint* const bilateral = m_world->FindBilateralJoint(body0, body1);
+	//		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
+	//
+	//		if (isCollidable) {
+	//			dgUnsigned32 group0_ID = dgUnsigned32(body0->m_bodyGroupId);
+	//			dgUnsigned32 group1_ID = dgUnsigned32(body1->m_bodyGroupId);
+	//
+	//			if (group1_ID < group0_ID) {
+	//				dgSwap(group0_ID, group1_ID);
+	//			}
+	//
+	//			dgUnsigned32 key = (group1_ID << 16) + group0_ID;
+	//			const dgBodyMaterialList* const materialList = m_world;
+	//			dAssert(materialList->Find(key));
+	//			const dgContactMaterial* const material = &materialList->Find(key)->GetInfo();
+	//
+	//			if (material->m_flags & dgContactMaterial::m_collisionEnable) {
+	//
+	//				dgInt32 isBody0Kinematic = body0->IsRTTIType(dgBody::m_kinematicBodyRTTI);
+	//				dgInt32 isBody1Kinematic = body1->IsRTTIType(dgBody::m_kinematicBodyRTTI);
+	//
+	//				const dgInt32 kinematicTest = !((isBody0Kinematic && isBody1Kinematic) || ((isBody0Kinematic && body0->IsCollidable()) || (isBody1Kinematic && body1->IsCollidable())));
+	//				const dgInt32 collisionTest = kinematicTest && !(body0->m_isdead | body1->m_isdead) && !(body0->m_equilibrium & body1->m_equilibrium);
+	//				if (collisionTest) {
+	//					const dgInt32 isSofBody0 = body0->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
+	//					const dgInt32 isSofBody1 = body1->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
+	//
+	//					if (isSofBody0 || isSofBody1) {
+	//						m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body0 = body0;
+	//						m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body1 = body1;
+	//						m_pendingSoftBodyPairsCount++;
+	//					}
+	//					else {
+	//						dgContactList& contactList = *m_world;
+	//						dgAtomicExchangeAndAdd(&contactList.m_contactCountReset, 1);
+	//						if (contactList.m_contactCount < contactList.GetElementsCapacity()) {
+	//							contact = new (m_world->m_allocator) dgContact(m_world, material, body0, body1);
+	//							dAssert(contact);
+	//							contactList.Push(contact);
+	//						}
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	}
+}
+
+void ntBroadPhase::UpdateAabb(dFloat32 timestep)
+{
+	D_TRACKTIME();
+	class ntUpdateAabbJob: public ntWorld::ntNewtonBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadsCount = m_newton->GetThreadCount();
+			const dInt32 count = m_newton->m_dynamicBodyArray.GetCount();
+			ntDynamicBody** const bodies = &m_newton->m_dynamicBodyArray[0];
+			ntBroadPhase* const broadPhase = m_newton->m_broadPhase;
+			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
+			{
+				broadPhase->UpdateAabb(threadIndex, m_timestep, bodies[i]);
+			}
+		}
+	};
+	m_newton->SubmitJobs<ntUpdateAabbJob>(timestep);
+}
+
+void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
+{
+	D_TRACKTIME();
+	class ntFindCollidindPairs: public ntWorld::ntNewtonBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadsCount = m_newton->GetThreadCount();
+			const dInt32 count = m_newton->m_dynamicBodyArray.GetCount();
+			ntDynamicBody** const bodies = &m_newton->m_dynamicBodyArray[0];
+			ntBroadPhase* const broadPhase = m_newton->m_broadPhase;
+			
+			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
+			{
+				broadPhase->FindCollidinPairs(threadIndex, m_timestep, bodies[i]);
+			}
+		}
+
+		bool m_fullScan;
+	};
+
+	m_fullScan = true;
+	m_newton->SubmitJobs<ntFindCollidindPairs>(timestep);
 }

@@ -72,6 +72,8 @@ class ntDynamicBody: public ntBody
 	dVector m_externalForce;
 	dVector m_externalTorque;
 
+	friend class ntBroadPhase;
+
 } D_GCC_VECTOR_ALIGNMENT;
 
 inline dVector ntDynamicBody::GetForce() const

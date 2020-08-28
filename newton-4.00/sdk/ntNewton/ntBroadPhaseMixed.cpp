@@ -203,5 +203,62 @@ void ntBroadPhaseMixed::RemoveBody(ntBody* const body)
 
 void ntBroadPhaseMixed::BalanceBroadPhase()
 {
+	D_TRACKTIME();
 	UpdateFitness(m_fitness, m_treeEntropy, &m_rootNode);
+}
+
+void ntBroadPhaseMixed::FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBody* const body)
+{
+	//dList<ntBroadPhaseNode*>::dListNode* node = body->GetBroadPhaseNode();
+	//const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
+	ntBroadPhaseNode* const leafNode = body->GetBroadPhaseNode();
+
+	if (m_fullScan) 
+	{
+		ntBroadPhaseAggregate* const aggregateNode = leafNode->GetAsBroadPhaseAggregate();
+		if (aggregateNode)
+		{
+			dAssert(0);
+			//aggregateNode->SubmitSelfPairs(timestep, threadID);
+		}
+		
+		for (ntBroadPhaseNode* ptr = leafNode; ptr->m_parent; ptr = ptr->m_parent) 
+		{
+			ntBroadPhaseTreeNode* const parent = ptr->m_parent->GetAsBroadPhaseTreeNode();
+			dAssert(!parent->GetAsBroadPhaseBodyNode());
+			ntBroadPhaseNode* const sibling = parent->m_right;
+			if (sibling != ptr) 
+			{
+				//SubmitPairs(bodyNode, sibling, timestep, 0, threadIndex);
+				SubmitPairs(leafNode, sibling, timestep);
+			}
+		}
+	}
+	else 
+	{
+		dAssert(0);
+		//const dgBodyInfo* const bodyArray = &m_world->m_bodiesMemory[0];
+		//const dgInt32 bodyCount = descriptor->m_atomicPendingBodiesCount;
+		//dgInt32* const atomicIndex = &descriptor->m_atomicIndex;
+		//
+		//for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+		//	ntBroadPhaseNode* const broadPhaseNode = bodyArray[i].m_body->GetBroadPhase();
+		//	dAssert(broadPhaseNode->ntBroadPhaseBodyNode());
+		//	dAssert(!broadPhaseNode->GetBody() || (broadPhaseNode->GetBody()->GetBroadPhase() == broadPhaseNode));
+		//
+		//	for (ntBroadPhaseNode* ptr = broadPhaseNode; ptr->m_parent; ptr = ptr->m_parent) {
+		//		ntBroadPhaseTreeNode* const parent = (ntBroadPhaseTreeNode*)ptr->m_parent;
+		//		if (!parent->IsAggregate()) {
+		//			dAssert(!parent->ntBroadPhaseBodyNode());
+		//			ntBroadPhaseNode* const rightSibling = parent->m_right;
+		//			if (rightSibling != ptr) {
+		//				SubmitPairs(broadPhaseNode, rightSibling, timestep, threadCount, threadID);
+		//			}
+		//			else {
+		//				SubmitPairs(broadPhaseNode, parent->m_left, timestep, threadCount, threadID);
+		//			}
+		//		}
+		//	}
+		//}
+	}
 }

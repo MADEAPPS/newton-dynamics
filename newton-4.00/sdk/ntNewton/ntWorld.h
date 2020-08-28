@@ -34,7 +34,7 @@ class ntWorld
 	,public dThreadPool
 {
 	public:
-	class dNewtonBaseJob: public dThreadPoolJob
+	class ntNewtonBaseJob: public dThreadPoolJob
 	{
 		public:
 		std::atomic<int>* m_it;

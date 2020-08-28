@@ -211,7 +211,7 @@ void ntWorld::UpdateListenersPostTransform(dFloat32 timestep)
 void ntWorld::ApplyExternalForces(dFloat32 timestep)
 {
 	D_TRACKTIME();
-	class dApplyExternalForces: public dNewtonBaseJob
+	class ntApplyExternalForces: public ntNewtonBaseJob
 	{
 		public:
 		virtual void Execute()
@@ -226,7 +226,7 @@ void ntWorld::ApplyExternalForces(dFloat32 timestep)
 			}
 		}
 	};
-	SubmitJobs<dApplyExternalForces>(timestep);
+	SubmitJobs<ntApplyExternalForces>(timestep);
 }
 
 void ntWorld::UpdateSleepState(dFloat32 timestep)

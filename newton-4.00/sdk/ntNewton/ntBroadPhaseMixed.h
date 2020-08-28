@@ -39,6 +39,7 @@ class ntBroadPhaseMixed : public ntBroadPhase
 	void AddNode(ntBroadPhaseNode* const newNode);
 	void RemoveNode(ntBroadPhaseNode* const newNode);
 	void BalanceBroadPhase();
+	void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBody* const body);
 
 	dFloat64 m_treeEntropy;
 	ntFitnessList m_fitness;

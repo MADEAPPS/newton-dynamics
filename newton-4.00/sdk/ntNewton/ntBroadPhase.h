@@ -24,6 +24,9 @@
 
 #include "ntStdafx.h"
 #include "ntBroadPhaseNode.h"
+
+#define D_BROADPHASE_MAX_STACK_DEPTH	256
+
 class ntWorld;
 
 D_MSC_VECTOR_ALIGNMENT
@@ -54,8 +57,11 @@ class ntBroadPhase: public dClassAlloc
 
 	private:
 	void UpdateAabb(dFloat32 timestep);
+	void FindCollidingPairs(dFloat32 timestep);
+
 	virtual void BalanceBroadPhase() = 0;
-	void UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBody* const body);
+	virtual void UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBody* const body);
+	virtual void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBody* const body) = 0;
 
 	void RotateLeft(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root);
 	void RotateRight(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root);
@@ -70,8 +76,14 @@ class ntBroadPhase: public dClassAlloc
 	D_NEWTON_API ntBroadPhaseTreeNode* InsertNode (ntBroadPhaseNode* const root, ntBroadPhaseNode* const node);
 	D_NEWTON_API void UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, ntBroadPhaseNode** const root);
 
+	//void SubmitPairs(ntBody* const body, ntBroadPhaseNode* const node, dFloat32 timestep, dInt32 threadCount, dInt32 threadID);
+	void AddPair(ntBody* const body0, ntBody* const body1, const dFloat32 timestep);
+	bool TestOverlaping(const ntBody* const body0, const ntBody* const body1, dFloat32 timestep) const;
+	void SubmitPairs(ntBroadPhaseNode* const leaftNode, ntBroadPhaseNode* const node, dFloat32 timestep);
+	
 	ntWorld* m_newton;
 	ntBroadPhaseNode* m_rootNode;
+	bool m_fullScan;
 } D_GCC_VECTOR_ALIGNMENT;
 
 D_INLINE dFloat32 ntBroadPhase::CalculateSurfaceArea(const ntBroadPhaseNode* const node0, const ntBroadPhaseNode* const node1, dVector& minBox, dVector& maxBox) const

@@ -57,9 +57,11 @@ dFloat32 dRayCastSphere (const dVector& p0, const dVector& p1, const dVector& or
 
 D_INLINE dInt32 dOverlapTest (const dVector& p0, const dVector& p1, const dVector& q0, const dVector& q1)
 {
-	dVector val((p0 - q1) * (p1 - q0));
-	dInt32 mask = val.GetSignMask();
-	return ((mask & 0x07) == 0x07);
+	dVector r0(p0 - q1);
+	dVector r1(p1 - q0);
+	dVector val(r0 * r1);
+	dInt32 mask = val.GetSignMask() & 0x07;
+	return (mask == 0x07);
 }
 
 D_INLINE dInt32 dBoxInclusionTest (const dVector& p0, const dVector& p1, const dVector& q0, const dVector& q1)
