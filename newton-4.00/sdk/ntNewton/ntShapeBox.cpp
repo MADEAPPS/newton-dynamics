@@ -19,14 +19,14 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dNewtonStdafx.h"
-#include "dShapeBox.h"
+#include "ntStdafx.h"
+#include "ntShapeBox.h"
 
-dInt32 dShapeBox::m_initSimplex = 0;
-dShapeConvex::dConvexSimplexEdge dShapeBox::m_edgeArray[24];
-dShapeConvex::dConvexSimplexEdge* dShapeBox::m_edgeEdgeMap[12];
-dShapeConvex::dConvexSimplexEdge* dShapeBox::m_vertexToEdgeMap[8];
-dInt32 dShapeBox::m_faces[][4] =
+dInt32 ntShapeBox::m_initSimplex = 0;
+ntShapeConvex::dConvexSimplexEdge ntShapeBox::m_edgeArray[24];
+ntShapeConvex::dConvexSimplexEdge* ntShapeBox::m_edgeEdgeMap[12];
+ntShapeConvex::dConvexSimplexEdge* ntShapeBox::m_vertexToEdgeMap[8];
+dInt32 ntShapeBox::m_faces[][4] =
 {
 	{0, 1, 3, 2},
 	{0, 4, 5, 1},
@@ -36,7 +36,7 @@ dInt32 dShapeBox::m_faces[][4] =
 	{4, 6, 7, 5},
 };
 
-dVector dShapeBox::m_indexMark(dFloat32(1.0f), dFloat32(2.0f), dFloat32(4.0f), dFloat32(0.0f));
+dVector ntShapeBox::m_indexMark(dFloat32(1.0f), dFloat32(2.0f), dFloat32(4.0f), dFloat32(0.0f));
 
 #if 0
 
@@ -340,19 +340,19 @@ dInt32 dShapeBox::CalculatePlaneIntersection (const dVector& normal, const dVect
 
 #endif
 
-dShapeBox::dShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
-	:dShapeConvex(m_boxCollision)
+ntShapeBox::ntShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
+	:ntShapeConvex(m_boxCollision)
 {
 	Init(size_x, size_y, size_z);
 }
 
-dShapeBox::~dShapeBox()
+ntShapeBox::~ntShapeBox()
 {
-	dShapeConvex::m_simplex = NULL;
-	dShapeConvex::m_vertex = NULL;
+	ntShapeConvex::m_simplex = NULL;
+	ntShapeConvex::m_vertex = NULL;
 }
 
-void dShapeBox::Init(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
+void ntShapeBox::Init(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 {
 	m_size[0].m_x = dMax(dAbs(size_x) * dFloat32(0.5f), D_MIN_CONVEX_SHAPE_SIZE);
 	m_size[0].m_y = dMax(dAbs(size_y) * dFloat32(0.5f), D_MIN_CONVEX_SHAPE_SIZE);
@@ -377,8 +377,8 @@ void dShapeBox::Init(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 	m_vertex[6] = dVector(m_size[0].m_x, -m_size[0].m_y, -m_size[0].m_z, dFloat32(0.0f));
 	m_vertex[7] = dVector(-m_size[0].m_x, -m_size[0].m_y, -m_size[0].m_z, dFloat32(0.0f));
 
-	dShapeConvex::m_vertex = m_vertex;
-	dShapeConvex::m_simplex = m_edgeArray;
+	ntShapeConvex::m_vertex = m_vertex;
+	ntShapeConvex::m_simplex = m_edgeArray;
 	
 	if (!m_initSimplex) 
 	{
@@ -452,7 +452,7 @@ void dShapeBox::Init(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 	SetVolumeAndCG();
 }
 
-void dShapeBox::MassProperties()
+void ntShapeBox::MassProperties()
 {
 	m_centerOfMass = dVector::m_zero;
 	m_crossInertia = dVector::m_zero;
@@ -464,7 +464,7 @@ void dShapeBox::MassProperties()
 	m_centerOfMass.m_w = volume;
 }
 
-void dShapeBox::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) const
+void ntShapeBox::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) const
 {
 	dVector size(matrix[0].Abs().Scale(m_size[0].m_x) + matrix[1].Abs().Scale(m_size[0].m_y) + matrix[2].Abs().Scale(m_size[0].m_z));
 	p0 = (matrix[3] - size) & dVector::m_triplexMask;
@@ -472,7 +472,7 @@ void dShapeBox::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) const
 }
 
 
-dVector dShapeBox::SupportVertex(const dVector& dir0, dInt32* const vertexIndex) const
+dVector ntShapeBox::SupportVertex(const dVector& dir0, dInt32* const vertexIndex) const
 {
 	dVector mask0(dir0.Abs() > m_flushZero);
 	dVector dir(dir0 & mask0);

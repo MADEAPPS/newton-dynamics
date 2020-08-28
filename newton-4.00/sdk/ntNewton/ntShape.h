@@ -34,157 +34,14 @@
 //class dShapeConvexHull;
 //class dgPolygonSoupRayHitDesc;
 
-class dShapeBox;
-class dShapeNull;
-class dShapeConvex;
-class dShapeDebugCallback;
+class ntShapeBox;
+class ntShapeNull;
+class ntShapeConvex;
+class ntShapeDebugCallback;
 
 #ifdef _DEBUG
 //	#define DG_DEBUG_AABB
 #endif
-
-//#define PREFILTER_RAYCAST(filter,body,collision,userData) (filter && !filter(body,collision,userData)) 
-//typedef dInt32(dgApi *OnBodiesInAABB) (dgBody* body, void* const userData);
-//typedef dUnsigned32(dgApi *OnRayPrecastAction) (const dgBody* const body, const dShapeInstance* const collision, void* const userData);
-//typedef dFloat32(dgApi *OnRayCastAction) (const dgBody* const body, const dShapeInstance* const collision, const dVector& contact, const dVector& normal, dgInt64 collisionID, void* const userData, dFloat32 intersetParam);
-
-
-/*
-D_MSC_VECTOR_ALIGNMENT
-class dShapeInfo
-{
-	public:
-	class dgInstanceMaterial
-	{
-		public:
-		dgInstanceMaterial()
-		{
-			memset(this, 0, sizeof (dgInstanceMaterial));
-		}
-
-		dgInt64 m_userId;
-		union {
-			void* m_userData;
-			dgUnsigned64 m_alignPad;
-		};
-		union {
-			dgUnsigned64 m_intData;
-			dFloat32 m_floatData;
-		} m_userParam[6];
-	};
-
-	struct dgBoxData
-	{
-		dFloat32 m_x;
-		dFloat32 m_y;
-		dFloat32 m_z;
-	} ;
-
-	struct dgSphereData
-	{
-		dFloat32 m_radius;
-	} ;
-
-	struct dgCylinderData
-	{
-		dFloat32 m_radio0;
-		dFloat32 m_radio1;
-		dFloat32 m_height;
-	};
-
-	struct dgCapsuleData
-	{
-		dFloat32 m_radio0;
-		dFloat32 m_radio1;
-		dFloat32 m_height;
-	};
-
-	struct dgConeData
-	{
-		dFloat32 m_r;
-		dFloat32 m_height;
-	};
-
-	struct dgChamferCylinderData
-	{
-		dFloat32 m_r;
-		dFloat32 m_height;
-	};
-
-	struct dgConvexHullData
-	{
-		dInt32 m_vertexCount;
-		dInt32 m_strideInBytes;
-		dInt32 m_faceCount;
-		dVector* m_vertex;
-	};
-
-	struct dgConvexModifierData
-	{
-		dShape* m_child;
-	};
-
-	struct dgCoumpountCollisionData
-	{
-		dInt32 m_chidrenCount;
-		//dShape** m_chidren;
-	};
-
-	struct dShapeBVHData
-	{
-		dInt32 m_vertexCount;
-		dInt32 m_indexCount;
-	};
-
-	struct dgDeformableMeshData
-	{
-		dInt32 m_vertexCount;
-		dInt32 m_triangleCount;
-		dInt32 m_vertexStrideInBytes;
-		dgUnsigned16* m_indexList;
-		dFloat32* m_vertexList;
-	};
-
-	struct dgHeightMapCollisionData
-	{
-		dInt32 m_width;
-		dInt32 m_height;
-		dInt32 m_gridsDiagonals;
-		dInt32 m_elevationDataType;		// 0 = 32 bit floats, 1 = unsigned 16 bit intergers
-		dFloat32 m_verticalScale;
-		dFloat32 m_horizonalScale_x;
-		dFloat32 m_horizonalScale_z;
-		void* m_elevation;
-		dgInt8* m_atributes;
-	};
-
-	struct dgSceneData
-	{
-		dInt32 m_childrenProxyCount;
-	};
-
-	dMatrix m_offsetMatrix;
-	dgInstanceMaterial m_collisionMaterial;
-	dInt32 m_collisionType;
-	union 
-	{
-		dgBoxData m_box;
-		dgConeData m_cone;
-		dgSphereData m_sphere;
-		dgCapsuleData m_capsule;
-		dgCylinderData m_cylinder;
-		dgChamferCylinderData m_chamferCylinder;
-		dgConvexHullData m_convexHull;
-		dgDeformableMeshData m_deformableMesh;
-		dgConvexModifierData m_convexModifierData;
-		dgCoumpountCollisionData m_compoundCollision;
-		dShapeBVHData m_bvhCollision;
-		dgHeightMapCollisionData m_heightFieldCollision;
-		dgSceneData m_sceneCollision;
-		dFloat32 m_paramArray[32];
-	};
-} D_GCC_VECTOR_ALIGNMENT;
-*/
 
 
 enum dShapeID
@@ -216,7 +73,7 @@ enum dShapeID
 };
 
 D_MSC_VECTOR_ALIGNMENT
-class dShape: public dClassAlloc
+class ntShape: public dClassAlloc
 {
 	public:
 //	typedef void (dgApi *OnDebugCollisionMeshCallback) (void* userData, int vertexCount, const dFloat32* faceArray, int faceId);
@@ -258,18 +115,18 @@ class dShape: public dClassAlloc
 	dgMemoryAllocator* GetAllocator() const;
 */
 
-	const dShape* AddRef() const;
+	const ntShape* AddRef() const;
 	dInt32 GetRefCount() const;
 	virtual dInt32 Release() const;
 
-	virtual dShape* GetAsShape() { return this; }
-	virtual dShapeBox* GetAsShapeBox() { return nullptr; }
-	virtual dShapeNull* GetAsShapeNull() { return nullptr; }
-	virtual dShapeConvex* GetAsShapeConvex() { return nullptr; }
+	virtual ntShape* GetAsShape() { return this; }
+	virtual ntShapeBox* GetAsShapeBox() { return nullptr; }
+	virtual ntShapeNull* GetAsShapeNull() { return nullptr; }
+	virtual ntShapeConvex* GetAsShapeConvex() { return nullptr; }
 
 	D_NEWTON_API virtual void MassProperties();
 
-	virtual void DebugShape(const dMatrix& matrix, dShapeDebugCallback& debugCallback) const = 0;
+	virtual void DebugShape(const dMatrix& matrix, ntShapeDebugCallback& debugCallback) const = 0;
 
 	virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const = 0;
 	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const = 0;
@@ -278,10 +135,10 @@ class dShape: public dClassAlloc
 	virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
 
 	protected:
-	D_NEWTON_API dShape(dShapeID id);
-	D_NEWTON_API dShape (const dShape& source);
+	D_NEWTON_API ntShape(dShapeID id);
+	D_NEWTON_API ntShape (const ntShape& source);
 //	D_NEWTON_API dShape (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revision);
-	D_NEWTON_API virtual ~dShape();
+	D_NEWTON_API virtual ~ntShape();
 
 	//void SetSignature (dInt32 signature);
 	//virtual dInt32 CalculateSignature () const = 0;
@@ -353,13 +210,13 @@ inline const dVector& dShape::GetObbOrigin() const
 */
 
 
-inline const dShape* dShape::AddRef() const
+inline const ntShape* ntShape::AddRef() const
 {
 	m_refCount.fetch_add(1);
 	return this;
 }
 
-inline dInt32 dShape::Release() const
+inline dInt32 ntShape::Release() const
 {
 	dInt32 count = m_refCount.fetch_add(-1);
 	dAssert(count >= 1);
@@ -370,18 +227,18 @@ inline dInt32 dShape::Release() const
 	return count;
 }
 
-inline dInt32 dShape::GetRefCount() const
+inline dInt32 ntShape::GetRefCount() const
 {
 	return m_refCount.load();
 }
 
-inline dFloat32 dShape::CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const
+inline dFloat32 ntShape::CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const
 { 
 	dAssert(0); 
 	return 0; 
 }
 
-inline dMatrix dShape::CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const
+inline dMatrix ntShape::CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const
 {
 	dAssert(0);
 	return dGetZeroMatrix();

@@ -22,25 +22,25 @@
 #ifndef _D_BODY_H_
 #define _D_BODY_H_
 
-#include "dNewtonStdafx.h"
-#include "dShapeInstance.h"
+#include "ntStdafx.h"
+#include "ntShapeInstance.h"
 
-class dNewton;
-class dDynamicBody;
-class dBroadPhaseBodyNode;
-class dBroadPhaseAggregate;
+class ntWorld;
+class ntDynamicBody;
+class ntBroadPhaseBodyNode;
+class ntBroadPhaseAggregate;
 
 D_MSC_VECTOR_ALIGNMENT
-class dBodyNotify: public dClassAlloc
+class ntBodyNotify: public dClassAlloc
 {
 	public:  
-	dBodyNotify()
+	ntBodyNotify()
 		:dClassAlloc()
 		,m_body(nullptr)
 	{
 	}
 
-	virtual ~dBodyNotify()
+	virtual ~ntBodyNotify()
 	{
 	}
 
@@ -53,32 +53,32 @@ class dBodyNotify: public dClassAlloc
 	}
 
 	protected:
-	dBody* m_body;
+	ntBody* m_body;
 
-	friend class dBody;
+	friend class ntBody;
 
 } D_GCC_VECTOR_ALIGNMENT;
 
 D_MSC_VECTOR_ALIGNMENT
-class dBody: public dClassAlloc
+class ntBody: public dClassAlloc
 {
 	public:
-	D_NEWTON_API dBody();
-	D_NEWTON_API virtual ~dBody();
+	D_NEWTON_API ntBody();
+	D_NEWTON_API virtual ~ntBody();
 
-	D_NEWTON_API virtual dBody* GetAsBody() { return this;}
-	D_NEWTON_API virtual dDynamicBody* GetAsDynamicBody() { return nullptr; }
+	D_NEWTON_API virtual ntBody* GetAsBody() { return this;}
+	D_NEWTON_API virtual ntDynamicBody* GetAsDynamicBody() { return nullptr; }
 
-	D_NEWTON_API const dShapeInstance& GetCollisionShape() const;
-	D_NEWTON_API void SetCollisionShape(const dShapeInstance& shapeInstance);
+	D_NEWTON_API const ntShapeInstance& GetCollisionShape() const;
+	D_NEWTON_API void SetCollisionShape(const ntShapeInstance& shapeInstance);
 
 	D_NEWTON_API void SetCentreOfMass(const dVector& com);
 
-	D_NEWTON_API void SetNotifyCallback(dBodyNotify* const notify);
-	D_NEWTON_API dBodyNotify* GetNotifyCallback(dBodyNotify* const notify) const;
+	D_NEWTON_API void SetNotifyCallback(ntBodyNotify* const notify);
+	D_NEWTON_API ntBodyNotify* GetNotifyCallback(ntBodyNotify* const notify) const;
 
 	D_NEWTON_API dInt32 GetId() const;
-	D_NEWTON_API dNewton* GetNewton() const;
+	D_NEWTON_API ntWorld* GetNewton() const;
 
 	D_NEWTON_API dVector GetOmega() const;
 	D_NEWTON_API void SetOmega(const dVector& veloc);
@@ -90,20 +90,20 @@ class dBody: public dClassAlloc
 	D_NEWTON_API void SetMatrix(const dMatrix& matrix);
 
 	protected:
-	dList<dBody*>::dListNode* GetNewtonNode() const;
-	void SetNewtonNode(dNewton* const newton, dList<dBody*>::dListNode* const node);
+	dList<ntBody*>::dListNode* GetNewtonNode() const;
+	void SetNewtonNode(ntWorld* const newton, dList<ntBody*>::dListNode* const node);
 
 	void UpdateCollisionMatrix();
 
-	dBroadPhaseBodyNode* GetBroadPhaseNode() const;
-	void SetBroadPhaseNode(dBroadPhaseBodyNode* const node);
+	ntBroadPhaseBodyNode* GetBroadPhaseNode() const;
+	void SetBroadPhaseNode(ntBroadPhaseBodyNode* const node);
 
-	dBroadPhaseAggregate* GetBroadPhaseAggregate() const;
-	void SetBroadPhaseAggregate(dBroadPhaseAggregate* const node);
+	ntBroadPhaseAggregate* GetBroadPhaseAggregate() const;
+	void SetBroadPhaseAggregate(ntBroadPhaseAggregate* const node);
 
 	dMatrix m_matrix;
 	dMatrix m_invWorldInertiaMatrix;
-	dShapeInstance m_shapeInstance;
+	ntShapeInstance m_shapeInstance;
 		
 	dVector m_veloc;
 	dVector m_omega;
@@ -113,11 +113,11 @@ class dBody: public dClassAlloc
 	dVector m_maxAABB;
 
 	dQuaternion m_rotation;
-	dBodyNotify* m_notifyCallback;
-	dNewton* m_newton;
-	dBroadPhaseBodyNode* m_broadPhaseNode;
-	dList<dBody*>::dListNode* m_newtonNode;
-	dBroadPhaseAggregate* m_broadPhaseAggregateNode;
+	ntBodyNotify* m_notifyCallback;
+	ntWorld* m_newton;
+	ntBroadPhaseBodyNode* m_broadPhaseNode;
+	dList<ntBody*>::dListNode* m_newtonNode;
+	ntBroadPhaseAggregate* m_broadPhaseAggregateNode;
 
 	union
 	{
@@ -146,10 +146,10 @@ class dBody: public dClassAlloc
 
 	static dUnsigned32 m_uniqueIDCount;
 
-	friend class dNewton;
-	friend class dBroadPhase;
-	friend class dBroadPhaseMixed;
-	friend class dBroadPhaseBodyNode;
+	friend class ntWorld;
+	friend class ntBroadPhase;
+	friend class ntBroadPhaseMixed;
+	friend class ntBroadPhaseBodyNode;
 } D_GCC_VECTOR_ALIGNMENT;
 
 

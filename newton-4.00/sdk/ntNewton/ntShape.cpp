@@ -19,10 +19,10 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dNewtonStdafx.h"
-#include "dBody.h"
-#include "dShape.h"
-#include "dNewton.h"
+#include "ntStdafx.h"
+#include "ntBody.h"
+#include "ntShape.h"
+#include "ntWorld.h"
 
 //#include "dgPhysicsStdafx.h"
 //#include "dgBody.h"
@@ -30,7 +30,7 @@
 //#include "dShape.h"
 
 
-dVector dShape::m_flushZero(dFloat32(1.0e-7f));
+dVector ntShape::m_flushZero(dFloat32(1.0e-7f));
 
 #if 0
 
@@ -93,7 +93,7 @@ void dShape::SerializeLow (dgSerialize callback, void* const userData) const
 #endif
 
 
-dShape::dShape(dShapeID id)
+ntShape::ntShape(dShapeID id)
 	:dClassAlloc()
 	,m_inertia(dVector::m_zero)
 	,m_crossInertia(dVector::m_zero)
@@ -107,7 +107,7 @@ dShape::dShape(dShapeID id)
 {
 }
 
-dShape::dShape(const dShape& source)
+ntShape::ntShape(const ntShape& source)
 	:dClassAlloc()
 	,m_inertia(source.m_inertia)
 	,m_crossInertia(source.m_crossInertia)
@@ -121,12 +121,12 @@ dShape::dShape(const dShape& source)
 {
 }
 
-dShape::~dShape()
+ntShape::~ntShape()
 {
 	dAssert(m_refCount.load() == 0);
 }
 
-void dShape::MassProperties()
+void ntShape::MassProperties()
 {
 	// using general central theorem, to extract the Inertia relative to the center of mass 
 	//IImatrix = IIorigin + unitmass * [(displacemnet % displacemnet) * identityMatrix - transpose(displacement) * displacement)];

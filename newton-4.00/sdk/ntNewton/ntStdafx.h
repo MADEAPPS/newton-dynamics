@@ -69,7 +69,5 @@
 	#define D_NEWTON_API 
 #endif
 
-
-
 #endif 
 

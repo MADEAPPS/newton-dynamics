@@ -19,39 +19,39 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dNewtonStdafx.h"
-#include "dBody.h"
-#include "dShapeNull.h"
+#include "ntStdafx.h"
+#include "ntBody.h"
+#include "ntShapeNull.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
 
-dUnsigned32 dBody::m_uniqueIDCount = 0;
+dUnsigned32 ntBody::m_uniqueIDCount = 0;
 
-class dDummyCollision: public dShapeNull
+class ntDummyCollision: public ntShapeNull
 {
 	public: 
-	dDummyCollision()
-		:dShapeNull()
+	ntDummyCollision()
+		:ntShapeNull()
 	{
 		m_refCount.fetch_add(1);
 	}
 
-	~dDummyCollision()
+	~ntDummyCollision()
 	{
 		m_refCount.fetch_add(-1);
 	}
 
-	static dShapeNull* GetNullShape()
+	static ntShapeNull* GetNullShape()
 	{
-		static dDummyCollision nullShape;
+		static ntDummyCollision nullShape;
 		return &nullShape;
 	}
 };
 
-dBody::dBody()
+ntBody::ntBody()
 	:m_matrix(dGetIdentityMatrix())
 	,m_invWorldInertiaMatrix(dGetZeroMatrix())
 	,m_veloc(dVector::m_zero)
@@ -62,7 +62,7 @@ dBody::dBody()
 	,m_maxAABB(dVector::m_zero)
 	,m_rotation()
 	,m_notifyCallback(nullptr)
-	,m_shapeInstance(dDummyCollision::GetNullShape())
+	,m_shapeInstance(ntDummyCollision::GetNullShape())
 	,m_newton(nullptr)
 	,m_broadPhaseNode(nullptr)
 	,m_newtonNode(nullptr)
@@ -74,7 +74,7 @@ dBody::dBody()
 	m_uniqueIDCount++;
 }
 
-dBody::~dBody()
+ntBody::~ntBody()
 {
 	if (m_notifyCallback)
 	{
@@ -82,7 +82,7 @@ dBody::~dBody()
 	}
 }
 
-void dBody::SetCentreOfMass(const dVector& com)
+void ntBody::SetCentreOfMass(const dVector& com)
 {
 	m_localCentreOfMass.m_x = com.m_x;
 	m_localCentreOfMass.m_y = com.m_y;
@@ -91,17 +91,17 @@ void dBody::SetCentreOfMass(const dVector& com)
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
 }
 
-const dShapeInstance& dBody::GetCollisionShape() const
+const ntShapeInstance& ntBody::GetCollisionShape() const
 {
 	return m_shapeInstance;
 }
 
-void dBody::SetCollisionShape(const dShapeInstance& shapeInstance)
+void ntBody::SetCollisionShape(const ntShapeInstance& shapeInstance)
 {
 	m_shapeInstance = shapeInstance;
 }
 
-void dBody::SetNotifyCallback(dBodyNotify* const notify)
+void ntBody::SetNotifyCallback(ntBodyNotify* const notify)
 {
 	//dAssert(notify->m_body == nullptr);
 	if (m_notifyCallback)
@@ -112,86 +112,86 @@ void dBody::SetNotifyCallback(dBodyNotify* const notify)
 	m_notifyCallback->m_body = this;
 }
 
-dBodyNotify* dBody::GetNotifyCallback(dBodyNotify* const notify) const
+ntBodyNotify* ntBody::GetNotifyCallback(ntBodyNotify* const notify) const
 {
 	return m_notifyCallback;
 }
 
-dInt32 dBody::GetId() const
+dInt32 ntBody::GetId() const
 {
 	return m_uniqueID;
 }
 
-dNewton* dBody::GetNewton() const
+ntWorld* ntBody::GetNewton() const
 {
 	return m_newton;
 }
 
-void dBody::SetNewtonNode(dNewton* const newton, dList<dBody*>::dListNode* const node)
+void ntBody::SetNewtonNode(ntWorld* const newton, dList<ntBody*>::dListNode* const node)
 {
 	m_newton = newton;
 	m_newtonNode = node;
 }
 
-dList<dBody*>::dListNode* dBody::GetNewtonNode() const
+dList<ntBody*>::dListNode* ntBody::GetNewtonNode() const
 {
 	return m_newtonNode;
 }
 
-dBroadPhaseBodyNode* dBody::GetBroadPhaseNode() const
+ntBroadPhaseBodyNode* ntBody::GetBroadPhaseNode() const
 {
 	return m_broadPhaseNode;
 }
 
-void dBody::SetBroadPhaseNode(dBroadPhaseBodyNode* const node)
+void ntBody::SetBroadPhaseNode(ntBroadPhaseBodyNode* const node)
 {
 	m_broadPhaseNode = node;
 }
 
-dBroadPhaseAggregate* dBody::GetBroadPhaseAggregate() const
+ntBroadPhaseAggregate* ntBody::GetBroadPhaseAggregate() const
 {
 	return m_broadPhaseAggregateNode;
 }
 
-void dBody::SetBroadPhaseAggregate(dBroadPhaseAggregate* const node)
+void ntBody::SetBroadPhaseAggregate(ntBroadPhaseAggregate* const node)
 {
 	m_broadPhaseAggregateNode = node;
 }
 
-dVector dBody::GetOmega() const
+dVector ntBody::GetOmega() const
 {
 	return m_omega;
 }
 
-void dBody::SetOmega(const dVector& veloc)
+void ntBody::SetOmega(const dVector& veloc)
 {
 	m_equilibrium = 0;
 	m_omega = veloc;
 }
 
-dVector dBody::GetVelocity() const
+dVector ntBody::GetVelocity() const
 {
 	return m_veloc;
 }
 
-void dBody::SetVelocity(const dVector& veloc)
+void ntBody::SetVelocity(const dVector& veloc)
 {
 	m_equilibrium = 0;
 	m_veloc = veloc;
 }
 
-dMatrix dBody::GetMatrix() const
+dMatrix ntBody::GetMatrix() const
 {
 	return m_matrix;
 }
 
-void dBody::UpdateCollisionMatrix()
+void ntBody::UpdateCollisionMatrix()
 {
 	m_shapeInstance.SetGlobalMatrix(m_shapeInstance.GetLocalMatrix() * m_matrix);
 	m_shapeInstance.CalculateFastAABB(m_shapeInstance.GetGlobalMatrix(), m_minAABB, m_maxAABB);
 }
 
-void dBody::SetMatrix(const dMatrix& matrix)
+void ntBody::SetMatrix(const dMatrix& matrix)
 {
 	m_equilibrium = 0;
 	m_matrix = matrix;

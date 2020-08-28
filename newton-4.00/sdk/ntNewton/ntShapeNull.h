@@ -22,17 +22,17 @@
 #ifndef __D_SHAPE_NULL_H__ 
 #define __D_SHAPE_NULL_H__ 
 
-#include "dShapeConvex.h"
+#include "ntShapeConvex.h"
 
-class dShapeNull: public dShapeConvex
+class ntShapeNull: public ntShapeConvex
 {
 	public:
-	D_NEWTON_API dShapeNull();
-	//dShapeNull(dUnsigned32 signature);
-	//dShapeNull(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
-	virtual ~dShapeNull() {}
+	D_NEWTON_API ntShapeNull();
+	//ntShapeNull(dUnsigned32 signature);
+	//ntShapeNull(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
+	virtual ~ntShapeNull() {}
 
-	virtual dShapeNull* GetAsShapeNull() { return this; }
+	virtual ntShapeNull* GetAsShapeNull() { return this; }
 
 
 	dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
@@ -40,7 +40,7 @@ class dShapeNull: public dShapeConvex
 		return dVector(dFloat32(0.0f));
 	}
 
-	virtual void DebugShape(const dMatrix& matrix, dShapeDebugCallback& debugCallback) const
+	virtual void DebugShape(const dMatrix& matrix, ntShapeDebugCallback& debugCallback) const
 	{
 	}
 

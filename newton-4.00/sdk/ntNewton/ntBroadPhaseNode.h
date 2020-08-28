@@ -22,18 +22,18 @@
 #ifndef __D_BROADPHASE_NODE_H__
 #define __D_BROADPHASE_NODE_H__
 
-#include "dNewtonStdafx.h"
+#include "ntStdafx.h"
 
-class dBody;
-class dBroadPhaseBodyNode;
-class dBroadPhaseTreeNode;
-class dBroadPhaseAggregate;
+class ntBody;
+class ntBroadPhaseBodyNode;
+class ntBroadPhaseTreeNode;
+class ntBroadPhaseAggregate;
 
 D_MSC_VECTOR_ALIGNMENT
-class dBroadPhaseNode: public dClassAlloc
+class ntBroadPhaseNode: public dClassAlloc
 {
 	public:
-	dBroadPhaseNode(dBroadPhaseNode* const parent)
+	ntBroadPhaseNode(ntBroadPhaseNode* const parent)
 		:dClassAlloc()
 		,m_minBox(dFloat32(-1.0e15f))
 		,m_maxBox(dFloat32(1.0e15f))
@@ -43,16 +43,16 @@ class dBroadPhaseNode: public dClassAlloc
 	{
 	}
 
-	virtual ~dBroadPhaseNode()
+	virtual ~ntBroadPhaseNode()
 	{
 	}
 
 	D_NEWTON_API void SetAABB(const dVector& minBox, const dVector& maxBox);
 
-	virtual dBroadPhaseNode* GetAsBroadPhaseNode() { return this; }
-	virtual dBroadPhaseBodyNode* GetAsBroadPhaseBodyNode() { return nullptr; }
-	virtual dBroadPhaseTreeNode* GetAsBroadPhaseTreeNode() { return nullptr; }
-	virtual dBroadPhaseAggregate* GetAsBroadPhaseAggregate() { return nullptr; }
+	virtual ntBroadPhaseNode* GetAsBroadPhaseNode() { return this; }
+	virtual ntBroadPhaseBodyNode* GetAsBroadPhaseBodyNode() { return nullptr; }
+	virtual ntBroadPhaseTreeNode* GetAsBroadPhaseTreeNode() { return nullptr; }
+	virtual ntBroadPhaseAggregate* GetAsBroadPhaseAggregate() { return nullptr; }
 
 /*
 	virtual bool IsSegregatedRoot() const
@@ -65,24 +65,24 @@ class dBroadPhaseNode: public dClassAlloc
 		return false;
 	}
 */
-	virtual dBody* GetBody() const
+	virtual ntBody* GetBody() const
 	{
 		return nullptr;
 	}
 
-	virtual dBroadPhaseNode* GetLeft() const
+	virtual ntBroadPhaseNode* GetLeft() const
 	{
 		return nullptr;
 	}
 
-	virtual dBroadPhaseNode* GetRight() const
+	virtual ntBroadPhaseNode* GetRight() const
 	{
 		return nullptr;
 	}
 
 	dVector m_minBox;
 	dVector m_maxBox;
-	dBroadPhaseNode* m_parent;
+	ntBroadPhaseNode* m_parent;
 	dFloat32 m_surfaceArea;
 	//dInt32 m_criticalSectionLock;
 
@@ -91,24 +91,24 @@ class dBroadPhaseNode: public dClassAlloc
 } D_GCC_VECTOR_ALIGNMENT;
 
 D_MSC_VECTOR_ALIGNMENT
-class dBroadPhaseBodyNode: public dBroadPhaseNode
+class ntBroadPhaseBodyNode: public ntBroadPhaseNode
 {
 	public:
-	D_NEWTON_API dBroadPhaseBodyNode(dBody* const body);
-	D_NEWTON_API virtual ~dBroadPhaseBodyNode();
+	D_NEWTON_API ntBroadPhaseBodyNode(ntBody* const body);
+	D_NEWTON_API virtual ~ntBroadPhaseBodyNode();
 
-	virtual dBroadPhaseBodyNode* GetAsBroadPhaseBodyNode() { return this; }
+	virtual ntBroadPhaseBodyNode* GetAsBroadPhaseBodyNode() { return this; }
 
-	virtual dBody* GetBody() const
+	virtual ntBody* GetBody() const
 	{
 		return m_body;
 	}
 
-	dBody* m_body;
+	ntBody* m_body;
 	//dList<dBroadPhaseNode*>::dListNode* m_updateNode;
 } D_GCC_VECTOR_ALIGNMENT;
 
-class dBroadPhaseTreeNode: public dBroadPhaseNode
+class ntBroadPhaseTreeNode: public ntBroadPhaseNode
 {
 	public:
 	//dBroadPhaseTreeNode()
@@ -119,24 +119,24 @@ class dBroadPhaseTreeNode: public dBroadPhaseNode
 	//{
 	//}
 	
-	D_NEWTON_API dBroadPhaseTreeNode(dBroadPhaseNode* const sibling, dBroadPhaseNode* const myNode);
-	D_NEWTON_API virtual ~dBroadPhaseTreeNode();
+	D_NEWTON_API ntBroadPhaseTreeNode(ntBroadPhaseNode* const sibling, ntBroadPhaseNode* const myNode);
+	D_NEWTON_API virtual ~ntBroadPhaseTreeNode();
 
-	virtual dBroadPhaseTreeNode* GetAsBroadPhaseTreeNode() { return this; }
+	virtual ntBroadPhaseTreeNode* GetAsBroadPhaseTreeNode() { return this; }
 	
-	virtual dBroadPhaseNode* GetLeft() const
+	virtual ntBroadPhaseNode* GetLeft() const
 	{
 		return m_left;
 	}
 	
-	virtual dBroadPhaseNode* GetRight() const
+	virtual ntBroadPhaseNode* GetRight() const
 	{
 		return m_right;
 	}
 
-	dBroadPhaseNode* m_left;
-	dBroadPhaseNode* m_right;
-	dList<dBroadPhaseTreeNode*>::dListNode* m_fitnessNode;
+	ntBroadPhaseNode* m_left;
+	ntBroadPhaseNode* m_right;
+	dList<ntBroadPhaseTreeNode*>::dListNode* m_fitnessNode;
 } D_GCC_VECTOR_ALIGNMENT;
 
 

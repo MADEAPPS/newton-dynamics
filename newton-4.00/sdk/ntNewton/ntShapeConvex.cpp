@@ -19,9 +19,9 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dNewtonStdafx.h"
-#include "dShapeNull.h"
-#include "dContactSolver.h"
+#include "ntStdafx.h"
+#include "ntShapeNull.h"
+#include "ntContactSolver.h"
 
 //#include "dgContact.h"
 //#include "dShapeMesh.h"
@@ -802,8 +802,8 @@ dInt32 dShapeConvex::BuildCylinderCapPoly (dFloat32 radius, const dMatrix& trans
 
 #endif
 
-dShapeConvex::dShapeConvex(dShapeID id)
-	:dShape(id)
+ntShapeConvex::ntShapeConvex(dShapeID id)
+	:ntShape(id)
 	,m_vertex(nullptr)
 	,m_simplex(nullptr)
 	,m_boxMinRadius(dFloat32(0.0f))
@@ -814,7 +814,7 @@ dShapeConvex::dShapeConvex(dShapeID id)
 {
 }
 
-dShapeConvex::~dShapeConvex()
+ntShapeConvex::~ntShapeConvex()
 {
 	if (m_vertex) 
 	{
@@ -827,7 +827,7 @@ dShapeConvex::~dShapeConvex()
 	}
 }
 
-void dShapeConvex::DebugShape(const dMatrix& matrix, dShapeDebugCallback& debugCallback) const
+void ntShapeConvex::DebugShape(const dMatrix& matrix, ntShapeDebugCallback& debugCallback) const
 {
 	dInt8 mark[D_MAX_EDGE_COUNT];
 	dVector tmp[D_MAX_EDGE_COUNT];
@@ -856,7 +856,7 @@ void dShapeConvex::DebugShape(const dMatrix& matrix, dShapeDebugCallback& debugC
 	}
 }
 
-void dShapeConvex::SetVolumeAndCG()
+void ntShapeConvex::SetVolumeAndCG()
 {
 	dVector faceVertex[D_MAX_EDGE_COUNT];
 	//dgStack<dInt8> edgeMarks(m_edgeCount);
@@ -912,7 +912,7 @@ void dShapeConvex::SetVolumeAndCG()
 	MassProperties();
 }
 
-void dShapeConvex::MassProperties()
+void ntShapeConvex::MassProperties()
 {
 	//dFloat32 volume = dShapeConvex::CalculateMassProperties(dGetIdentityMatrix(), m_inertia, m_crossInertia, m_centerOfMass);
 	dFloat32 volume = CalculateMassProperties(dGetIdentityMatrix(), m_inertia, m_crossInertia, m_centerOfMass);
@@ -927,15 +927,15 @@ void dShapeConvex::MassProperties()
 	m_centerOfMass.m_w = volume;
 	
 	// complete the calculation 
-	dShape::MassProperties();
+	ntShape::MassProperties();
 }
 
-dFloat32 dShapeConvex::CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const
+dFloat32 ntShapeConvex::CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const
 {
-	class dMassPropertiesCalculator : public dShapeDebugCallback
+	class dMassPropertiesCalculator : public ntShapeDebugCallback
 	{
 		public:
-		dMassPropertiesCalculator(const dShapeConvex* const shape)
+		dMassPropertiesCalculator(const ntShapeConvex* const shape)
 			:m_localData()
 			,m_me(shape)
 		{
@@ -947,7 +947,7 @@ dFloat32 dShapeConvex::CalculateMassProperties(const dMatrix& offset, dVector& i
 		}
 
 		dPolyhedraMassProperties m_localData;
-		const dShapeConvex* m_me;
+		const ntShapeConvex* m_me;
 	};
 		
 	dMassPropertiesCalculator massPropretiesCalculator(this);
@@ -956,7 +956,7 @@ dFloat32 dShapeConvex::CalculateMassProperties(const dMatrix& offset, dVector& i
 	return massPropretiesCalculator.m_localData.MassProperties(centerOfMass, inertia, crossInertia);
 }
 
-dMatrix dShapeConvex::CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const
+dMatrix ntShapeConvex::CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const
 {
 	if ((dAbs(localScale.m_x - localScale.m_y) < dFloat32(1.0e-5f)) && 
 		(dAbs(localScale.m_x - localScale.m_z) < dFloat32(1.0e-5f)) && 

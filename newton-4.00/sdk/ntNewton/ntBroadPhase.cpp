@@ -19,17 +19,17 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dNewtonStdafx.h"
-#include "dNewton.h"
-#include "dBody.h"
-#include "dBroadPhase.h"
-#include "dDynamicBody.h"
+#include "ntStdafx.h"
+#include "ntWorld.h"
+#include "ntBody.h"
+#include "ntBroadPhase.h"
+#include "ntDynamicBody.h"
 
 D_MSC_VECTOR_ALIGNMENT
-class dBroadPhase::dSpliteInfo
+class ntBroadPhase::ntSpliteInfo
 {
 	public:
-	dSpliteInfo(dBroadPhaseNode** const boxArray, dInt32 boxCount)
+	ntSpliteInfo(ntBroadPhaseNode** const boxArray, dInt32 boxCount)
 	{
 		dVector minP(dFloat32(1.0e15f));
 		dVector maxP(-dFloat32(1.0e15f));
@@ -39,7 +39,7 @@ class dBroadPhase::dSpliteInfo
 			m_axis = 1;
 			for (dInt32 i = 0; i < boxCount; i++)
 			{
-				dBroadPhaseNode* const node = boxArray[i];
+				ntBroadPhaseNode* const node = boxArray[i];
 				dAssert(node->GetAsBroadPhaseBodyNode());
 				minP = minP.GetMin(node->m_minBox);
 				maxP = maxP.GetMax(node->m_maxBox);
@@ -51,7 +51,7 @@ class dBroadPhase::dSpliteInfo
 			dVector varian(dVector::m_zero);
 			for (dInt32 i = 0; i < boxCount; i++)
 			{
-				dBroadPhaseNode* const node = boxArray[i];
+				ntBroadPhaseNode* const node = boxArray[i];
 				dAssert(node->GetAsBroadPhaseBodyNode());
 				minP = minP.GetMin(node->m_minBox);
 				maxP = maxP.GetMax(node->m_maxBox);
@@ -83,7 +83,7 @@ class dBroadPhase::dSpliteInfo
 			{
 				for (; i0 <= i1; i0++)
 				{
-					dBroadPhaseNode* const node = boxArray[i0];
+					ntBroadPhaseNode* const node = boxArray[i0];
 					dFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * dFloat32(0.5f);
 					if (val > test)
 					{
@@ -93,7 +93,7 @@ class dBroadPhase::dSpliteInfo
 
 				for (; i1 >= i0; i1--)
 				{
-					dBroadPhaseNode* const node = boxArray[i1];
+					ntBroadPhaseNode* const node = boxArray[i1];
 					dFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * dFloat32(0.5f);
 					if (val < test)
 					{
@@ -133,40 +133,40 @@ class dBroadPhase::dSpliteInfo
 	dInt32 m_axis;
 } D_GCC_VECTOR_ALIGNMENT;
 
-dBroadPhase::dFitnessList::dFitnessList()
-	:dList <dBroadPhaseTreeNode*>()
+ntBroadPhase::ntFitnessList::ntFitnessList()
+	:dList <ntBroadPhaseTreeNode*>()
 	,m_prevCost(dFloat32(0.0f))
 	,m_index(0)
 {
 }
 
-dFloat64 dBroadPhase::dFitnessList::TotalCost() const
+dFloat64 ntBroadPhase::ntFitnessList::TotalCost() const
 {
 	dFloat64 cost = dFloat32(0.0f);
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-		dBroadPhaseNode* const box = node->GetInfo();
+		ntBroadPhaseNode* const box = node->GetInfo();
 		cost += box->m_surfaceArea;
 	}
 	return cost;
 }
 	
-dBroadPhase::dBroadPhase(dNewton* const world)
+ntBroadPhase::ntBroadPhase(ntWorld* const world)
 	:dClassAlloc()
 	,m_newton(world)
 	,m_rootNode(nullptr)
 {
 }
 
-dBroadPhase::~dBroadPhase()
+ntBroadPhase::~ntBroadPhase()
 {
 }
 
-dBroadPhaseTreeNode* dBroadPhase::InsertNode(dBroadPhaseNode* const root, dBroadPhaseNode* const node)
+ntBroadPhaseTreeNode* ntBroadPhase::InsertNode(ntBroadPhaseNode* const root, ntBroadPhaseNode* const node)
 {
 	dVector p0;
 	dVector p1;
 
-	dBroadPhaseNode* sibling = root;
+	ntBroadPhaseNode* sibling = root;
 	dFloat32 surfaceArea = CalculateSurfaceArea(node, sibling, p0, p1);
 	while (!sibling->GetAsBroadPhaseBodyNode() && (surfaceArea >= sibling->m_surfaceArea))
 	{
@@ -198,11 +198,11 @@ dBroadPhaseTreeNode* dBroadPhase::InsertNode(dBroadPhaseNode* const root, dBroad
 		}
 	}
 	
-	dBroadPhaseTreeNode* const parent = new dBroadPhaseTreeNode(sibling, node);
+	ntBroadPhaseTreeNode* const parent = new ntBroadPhaseTreeNode(sibling, node);
 	return parent;
 }
 
-void dBroadPhase::Update(dFloat32 timestep)
+void ntBroadPhase::Update(dFloat32 timestep)
 {
 	D_TRACKTIME();
 
@@ -210,9 +210,9 @@ void dBroadPhase::Update(dFloat32 timestep)
 	BalanceBroadPhase();
 }
 
-void dBroadPhase::UpdateAabb(dFloat32 timestep)
+void ntBroadPhase::UpdateAabb(dFloat32 timestep)
 {
-	class dUpdateAabbJob: public dNewton::dNewtonBaseJob
+	class dUpdateAabbJob: public ntWorld::dNewtonBaseJob
 	{
 		public:
 		virtual void Execute()
@@ -221,8 +221,8 @@ void dBroadPhase::UpdateAabb(dFloat32 timestep)
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 threadsCount = m_newton->GetThreadCount();
 			const dInt32 count = m_newton->m_dynamicBodyArray.GetCount();
-			dDynamicBody** const bodies = &m_newton->m_dynamicBodyArray[0];
-			dBroadPhase* const broadPhase = m_newton->m_broadPhase;
+			ntDynamicBody** const bodies = &m_newton->m_dynamicBodyArray[0];
+			ntBroadPhase* const broadPhase = m_newton->m_broadPhase;
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
 				broadPhase->UpdateAabb(threadIndex, m_timestep, bodies[i]);
@@ -233,12 +233,12 @@ void dBroadPhase::UpdateAabb(dFloat32 timestep)
 }
 
 
-void dBroadPhase::RotateLeft(dBroadPhaseTreeNode* const node, dBroadPhaseNode** const root)
+void ntBroadPhase::RotateLeft(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root)
 {
 	dVector cost1P0;
 	dVector cost1P1;
 
-	dBroadPhaseTreeNode* const parent = (dBroadPhaseTreeNode*)node->m_parent;
+	ntBroadPhaseTreeNode* const parent = (ntBroadPhaseTreeNode*)node->m_parent;
 	dAssert(parent && !parent->GetAsBroadPhaseBodyNode());
 	dFloat32 cost1 = CalculateSurfaceArea(node->m_left, parent->m_left, cost1P0, cost1P1);
 
@@ -253,7 +253,7 @@ void dBroadPhase::RotateLeft(dBroadPhaseTreeNode* const node, dBroadPhaseNode** 
 		node->m_maxBox = parent->m_maxBox;
 		node->m_surfaceArea = parent->m_surfaceArea;
 
-		dBroadPhaseTreeNode* const grandParent = (dBroadPhaseTreeNode*)parent->m_parent;
+		ntBroadPhaseTreeNode* const grandParent = (ntBroadPhaseTreeNode*)parent->m_parent;
 		if (grandParent) {
 			if (grandParent->m_left == parent) 
 			{
@@ -286,7 +286,7 @@ void dBroadPhase::RotateLeft(dBroadPhaseTreeNode* const node, dBroadPhaseNode** 
 		node->m_maxBox = parent->m_maxBox;
 		node->m_surfaceArea = parent->m_surfaceArea;
 
-		dBroadPhaseTreeNode* const grandParent = (dBroadPhaseTreeNode*)parent->m_parent;
+		ntBroadPhaseTreeNode* const grandParent = (ntBroadPhaseTreeNode*)parent->m_parent;
 		if (grandParent) 
 		{
 			if (grandParent->m_left == parent) 
@@ -316,12 +316,12 @@ void dBroadPhase::RotateLeft(dBroadPhaseTreeNode* const node, dBroadPhaseNode** 
 	}
 }
 
-void dBroadPhase::RotateRight(dBroadPhaseTreeNode* const node, dBroadPhaseNode** const root)
+void ntBroadPhase::RotateRight(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root)
 {
 	dVector cost1P0;
 	dVector cost1P1;
 
-	dBroadPhaseTreeNode* const parent = (dBroadPhaseTreeNode*)node->m_parent;
+	ntBroadPhaseTreeNode* const parent = (ntBroadPhaseTreeNode*)node->m_parent;
 	dAssert(parent && !parent->GetAsBroadPhaseBodyNode());
 
 	dFloat32 cost1 = CalculateSurfaceArea(node->m_right, parent->m_right, cost1P0, cost1P1);
@@ -337,7 +337,7 @@ void dBroadPhase::RotateRight(dBroadPhaseTreeNode* const node, dBroadPhaseNode**
 		node->m_maxBox = parent->m_maxBox;
 		node->m_surfaceArea = parent->m_surfaceArea;
 
-		dBroadPhaseTreeNode* const grandParent = (dBroadPhaseTreeNode*)parent->m_parent;
+		ntBroadPhaseTreeNode* const grandParent = (ntBroadPhaseTreeNode*)parent->m_parent;
 		if (grandParent) 
 		{
 			dAssert(!grandParent->GetAsBroadPhaseBodyNode());
@@ -372,7 +372,7 @@ void dBroadPhase::RotateRight(dBroadPhaseTreeNode* const node, dBroadPhaseNode**
 		node->m_maxBox = parent->m_maxBox;
 		node->m_surfaceArea = parent->m_surfaceArea;
 
-		dBroadPhaseTreeNode* const grandParent = (dBroadPhaseTreeNode*)parent->m_parent;
+		ntBroadPhaseTreeNode* const grandParent = (ntBroadPhaseTreeNode*)parent->m_parent;
 		if (parent->m_parent) 
 		{
 			if (grandParent->m_left == parent) 
@@ -402,12 +402,12 @@ void dBroadPhase::RotateRight(dBroadPhaseTreeNode* const node, dBroadPhaseNode**
 	}
 }
 
-void dBroadPhase::ImproveNodeFitness(dBroadPhaseTreeNode* const node, dBroadPhaseNode** const root)
+void ntBroadPhase::ImproveNodeFitness(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root)
 {
 	dAssert(node->GetLeft());
 	dAssert(node->GetRight());
 
-	dBroadPhaseNode* const parent = node->m_parent;
+	ntBroadPhaseNode* const parent = node->m_parent;
 	if (parent && parent->m_parent) 
 	{
 		dAssert(!parent->GetAsBroadPhaseBodyNode());
@@ -423,12 +423,12 @@ void dBroadPhase::ImproveNodeFitness(dBroadPhaseTreeNode* const node, dBroadPhas
 	dAssert(!m_rootNode->m_parent);
 }
 
-dFloat64 dBroadPhase::ReduceEntropy(dFitnessList& fitness, dBroadPhaseNode** const root)
+dFloat64 ntBroadPhase::ReduceEntropy(ntFitnessList& fitness, ntBroadPhaseNode** const root)
 {
 	dFloat64 cost = dFloat32(0.0f);
 	if (fitness.GetCount() < 32) 
 	{
-		for (dFitnessList::dListNode* node = fitness.GetFirst(); node; node = node->GetNext()) 
+		for (ntFitnessList::dListNode* node = fitness.GetFirst(); node; node = node->GetNext()) 
 		{
 			ImproveNodeFitness(node->GetInfo(), root);
 		}
@@ -439,7 +439,7 @@ dFloat64 dBroadPhase::ReduceEntropy(dFitnessList& fitness, dBroadPhaseNode** con
 	{
 		const dInt32 mod = 16;
 		cost = fitness.m_prevCost;
-		dFitnessList::dListNode* node = fitness.GetFirst();
+		ntFitnessList::dListNode* node = fitness.GetFirst();
 		for (dInt32 i = 0; i < fitness.m_index; i++) 
 		{
 			node = node->GetNext();
@@ -464,7 +464,7 @@ dFloat64 dBroadPhase::ReduceEntropy(dFitnessList& fitness, dBroadPhaseNode** con
 	return cost;
 }
 
-dInt32 dBroadPhase::CompareNodes(const dBroadPhaseNode* const nodeA, const dBroadPhaseNode* const nodeB, void* const)
+dInt32 ntBroadPhase::CompareNodes(const ntBroadPhaseNode* const nodeA, const ntBroadPhaseNode* const nodeB, void* const)
 {
 	dFloat32 areaA = nodeA->m_surfaceArea;
 	dFloat32 areaB = nodeB->m_surfaceArea;
@@ -479,12 +479,12 @@ dInt32 dBroadPhase::CompareNodes(const dBroadPhaseNode* const nodeA, const dBroa
 	return 0;
 }
 
-void dBroadPhase::UpdateFitness(dFitnessList& fitness, dFloat64& oldEntropy, dBroadPhaseNode** const root)
+void ntBroadPhase::UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, ntBroadPhaseNode** const root)
 {
 	if (*root) 
 	{
 		D_TRACKTIME();
-		dBroadPhaseNode* const parent = (*root)->m_parent;
+		ntBroadPhaseNode* const parent = (*root)->m_parent;
 
 		(*root)->m_parent = nullptr;
 		dFloat64 entropy = ReduceEntropy(fitness, root);
@@ -495,15 +495,15 @@ void dBroadPhase::UpdateFitness(dFitnessList& fitness, dFloat64& oldEntropy, dBr
 			{
 				//m_world->m_solverJacobiansMemory.ResizeIfNecessary((fitness.GetCount() * 2 + 16) * sizeof(dBroadPhaseNode*));
 				//dBroadPhaseNode** const leafArray = (dBroadPhaseNode**)&m_world->m_solverJacobiansMemory[0];
-				dBroadPhaseNode** const leafArray = dAlloca(dBroadPhaseNode*, fitness.GetCount() * 2 + 16);
+				ntBroadPhaseNode** const leafArray = dAlloca(ntBroadPhaseNode*, fitness.GetCount() * 2 + 16);
 
 				dInt32 leafNodesCount = 0;
-				for (dFitnessList::dListNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) 
+				for (ntFitnessList::dListNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) 
 				{
-					dBroadPhaseNode* const node = nodePtr->GetInfo();
-					dBroadPhaseNode* const leftNode = node->GetLeft();
+					ntBroadPhaseNode* const node = nodePtr->GetInfo();
+					ntBroadPhaseNode* const leftNode = node->GetLeft();
 
-					dBody* const leftBody = leftNode->GetBody();
+					ntBody* const leftBody = leftNode->GetBody();
 					if (leftBody) 
 					{
 						node->SetAABB(leftBody->m_minAABB, leftBody->m_maxAABB);
@@ -517,8 +517,8 @@ void dBroadPhase::UpdateFitness(dFitnessList& fitness, dFloat64& oldEntropy, dBr
 						leafNodesCount++;
 					}
 
-					dBroadPhaseNode* const rightNode = node->GetRight();
-					dBody* const rightBody = rightNode->GetBody();
+					ntBroadPhaseNode* const rightNode = node->GetRight();
+					ntBody* const rightBody = rightNode->GetBody();
 					if (rightBody) 
 					{
 						rightNode->SetAABB(rightBody->m_minAABB, rightBody->m_maxAABB);
@@ -533,7 +533,7 @@ void dBroadPhase::UpdateFitness(dFitnessList& fitness, dFloat64& oldEntropy, dBr
 					}
 				}
 				
-				dFitnessList::dListNode* nodePtr = fitness.GetFirst();
+				ntFitnessList::dListNode* nodePtr = fitness.GetFirst();
 				dSortIndirect(leafArray, leafNodesCount, CompareNodes);
 				
 				*root = BuildTopDownBig(leafArray, 0, leafNodesCount - 1, &nodePtr);
@@ -547,7 +547,7 @@ void dBroadPhase::UpdateFitness(dFitnessList& fitness, dFloat64& oldEntropy, dBr
 	}
 }
 
-dBroadPhaseNode* dBroadPhase::BuildTopDown(dBroadPhaseNode** const leafArray, dInt32 firstBox, dInt32 lastBox, dFitnessList::dListNode** const nextNode)
+ntBroadPhaseNode* ntBroadPhase::BuildTopDown(ntBroadPhaseNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ntFitnessList::dListNode** const nextNode)
 {
 	dAssert(firstBox >= 0);
 	dAssert(lastBox >= 0);
@@ -558,9 +558,9 @@ dBroadPhaseNode* dBroadPhase::BuildTopDown(dBroadPhaseNode** const leafArray, dI
 	}
 	else 
 	{
-		dSpliteInfo info(&leafArray[firstBox], lastBox - firstBox + 1);
+		ntSpliteInfo info(&leafArray[firstBox], lastBox - firstBox + 1);
 
-		dBroadPhaseTreeNode* const parent = (*nextNode)->GetInfo();
+		ntBroadPhaseTreeNode* const parent = (*nextNode)->GetInfo();
 		parent->m_parent = nullptr;
 		*nextNode = (*nextNode)->GetNext();
 
@@ -575,7 +575,7 @@ dBroadPhaseNode* dBroadPhase::BuildTopDown(dBroadPhaseNode** const leafArray, dI
 	}
 }
 
-dBroadPhaseNode* dBroadPhase::BuildTopDownBig(dBroadPhaseNode** const leafArray, dInt32 firstBox, dInt32 lastBox, dFitnessList::dListNode** const nextNode)
+ntBroadPhaseNode* ntBroadPhase::BuildTopDownBig(ntBroadPhaseNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ntFitnessList::dListNode** const nextNode)
 {
 	if (lastBox == firstBox) 
 	{
@@ -584,12 +584,12 @@ dBroadPhaseNode* dBroadPhase::BuildTopDownBig(dBroadPhaseNode** const leafArray,
 
 	dInt32 midPoint = -1;
 	const dFloat32 scale = dFloat32(1.0f / 64.0f);
-	const dBroadPhaseNode* const node0 = leafArray[firstBox];
+	const ntBroadPhaseNode* const node0 = leafArray[firstBox];
 	const dInt32 count = lastBox - firstBox;
 	dFloat32 area0 = scale * node0->m_surfaceArea;
 	for (dInt32 i = 1; i <= count; i++) 
 	{
-		const dBroadPhaseNode* const node1 = leafArray[firstBox + i];
+		const ntBroadPhaseNode* const node1 = leafArray[firstBox + i];
 		dFloat32 area1 = node1->m_surfaceArea;
 		if (area0 > area1) 
 		{
@@ -604,7 +604,7 @@ dBroadPhaseNode* dBroadPhase::BuildTopDownBig(dBroadPhaseNode** const leafArray,
 	}
 	else 
 	{
-		dBroadPhaseTreeNode* const parent = (*nextNode)->GetInfo();
+		ntBroadPhaseTreeNode* const parent = (*nextNode)->GetInfo();
 
 		parent->m_parent = nullptr;
 		*nextNode = (*nextNode)->GetNext();
@@ -623,16 +623,16 @@ dBroadPhaseNode* dBroadPhase::BuildTopDownBig(dBroadPhaseNode** const leafArray,
 	}
 }
 
-void dBroadPhase::UpdateAabb(dInt32 threadIndex, dFloat32 timestep, dBody* const body)
+void ntBroadPhase::UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBody* const body)
 {
 	if (!body->m_equilibrium)
 	{
-		dBroadPhaseBodyNode* const node = body->GetBroadPhaseNode();
+		ntBroadPhaseBodyNode* const node = body->GetBroadPhaseNode();
 		body->UpdateCollisionMatrix();
 		
 		dAssert(!node->GetLeft());
 		dAssert(!node->GetRight());
-		dAssert(!((dShape*)body->GetCollisionShape().GetShape())->GetAsShapeNull());
+		dAssert(!((ntShape*)body->GetCollisionShape().GetShape())->GetAsShapeNull());
 
 		if (body->GetBroadPhaseAggregate()) 
 		{
@@ -651,8 +651,8 @@ void dBroadPhase::UpdateAabb(dInt32 threadIndex, dFloat32 timestep, dBody* const
 
 			if (!m_rootNode->GetAsBroadPhaseBodyNode()) 
 			{
-				const dBroadPhaseNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? NULL : m_rootNode;
-				for (dBroadPhaseNode* parent = node->m_parent; parent != root; parent = parent->m_parent) 
+				const ntBroadPhaseNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? NULL : m_rootNode;
+				for (ntBroadPhaseNode* parent = node->m_parent; parent != root; parent = parent->m_parent) 
 				{
 					dAssert(0);
 					//dgScopeSpinPause lock(&parent->m_criticalSectionLock);

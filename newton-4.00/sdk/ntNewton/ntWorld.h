@@ -22,12 +22,12 @@
 #ifndef _D_NEWTON_H_
 #define _D_NEWTON_H_
 
-class dBody;
-class dBroadPhase;
-class dDynamicBody;
+class ntBody;
+class ntBroadPhase;
+class ntDynamicBody;
 
 D_MSC_VECTOR_ALIGNMENT
-class dNewton
+class ntWorld
 	:public dClassAlloc
 	,public dSyncMutex
 	,public dThread
@@ -38,12 +38,12 @@ class dNewton
 	{
 		public:
 		std::atomic<int>* m_it;
-		dNewton* m_newton;
+		ntWorld* m_newton;
 		dFloat32 m_timestep;
 	};
 
-	D_NEWTON_API dNewton();
-	D_NEWTON_API virtual ~dNewton();
+	D_NEWTON_API ntWorld();
+	D_NEWTON_API virtual ~ntWorld();
 
 	D_NEWTON_API void Update(dFloat32 timestep);
 	D_NEWTON_API void Sync();
@@ -56,8 +56,8 @@ class dNewton
 
 	D_NEWTON_API void DispatchJobs(dThreadPoolJob** const jobs);
 
-	D_NEWTON_API void AddBody(dBody* const body);
-	D_NEWTON_API void RemoveBody(dBody* const body);
+	D_NEWTON_API void AddBody(ntBody* const body);
+	D_NEWTON_API void RemoveBody(ntBody* const body);
 
 	protected:
 	D_NEWTON_API virtual void SubstepUpdate(dFloat32 timestep);
@@ -82,17 +82,17 @@ class dNewton
 	template <class T>
 	void SubmitJobs(dFloat32 timestep);
 
-	dList<dBody*> m_bodyList;
-	dArray<dDynamicBody*> m_dynamicBodyArray;
-	dBroadPhase* m_broadPhase;
+	dList<ntBody*> m_bodyList;
+	dArray<ntDynamicBody*> m_dynamicBodyArray;
+	ntBroadPhase* m_broadPhase;
 	dFloat32 m_timestep;
 	dInt32 m_subSteps;
 
-	friend class dBroadPhase;
+	friend class ntBroadPhase;
 } D_GCC_VECTOR_ALIGNMENT;
 
 template <class T>
-void dNewton::SubmitJobs(dFloat32 timestep)
+void ntWorld::SubmitJobs(dFloat32 timestep)
 {
 	std::atomic<int> it(0);
 	T extJob[D_MAX_THREADS_COUNT];

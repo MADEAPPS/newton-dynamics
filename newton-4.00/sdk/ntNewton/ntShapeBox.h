@@ -22,17 +22,17 @@
 #ifndef __D_SHAPE_BOX_H__
 #define __D_SHAPE_BOX_H__
 
-#include "dShapeConvex.h"
+#include "ntShapeConvex.h"
 
 D_MSC_VECTOR_ALIGNMENT
-class dShapeBox: public dShapeConvex
+class ntShapeBox: public ntShapeConvex
 {
 	public:
-	D_NEWTON_API dShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
+	D_NEWTON_API ntShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
 	//dShapeBox(dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
-	virtual ~dShapeBox();
+	virtual ~ntShapeBox();
 
-	virtual dShapeBox* GetAsShapeBox() { return this; }
+	virtual ntShapeBox* GetAsShapeBox() { return this; }
 
 	protected:
 	D_NEWTON_API void Init (dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);

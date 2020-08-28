@@ -19,18 +19,18 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dNewtonStdafx.h"
-#include "dBody.h"
-#include "dBroadPhaseNode.h"
+#include "ntStdafx.h"
+#include "ntBody.h"
+#include "ntBroadPhaseNode.h"
 
 #define D_AABB_QUANTIZATION		dFloat32 (8.0f)
 #define D_AABB_INV_QUANTIZATION	(dFloat32 (1.0f) / D_AABB_QUANTIZATION)
 
-dVector dBroadPhaseNode::m_aabbQuantization(D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, dFloat32 (0.0f));
-dVector dBroadPhaseNode::m_aabbInvQuantization(D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, dFloat32(0.0f));
+dVector ntBroadPhaseNode::m_aabbQuantization(D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, dFloat32 (0.0f));
+dVector ntBroadPhaseNode::m_aabbInvQuantization(D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, dFloat32(0.0f));
 
-dBroadPhaseBodyNode::dBroadPhaseBodyNode(dBody* const body)
-	:dBroadPhaseNode(nullptr)
+ntBroadPhaseBodyNode::ntBroadPhaseBodyNode(ntBody* const body)
+	:ntBroadPhaseNode(nullptr)
 	,m_body(body)
 	//,m_updateNode(nullptr)
 {
@@ -38,12 +38,12 @@ dBroadPhaseBodyNode::dBroadPhaseBodyNode(dBody* const body)
 	m_body->SetBroadPhaseNode(this);
 }
 
-dBroadPhaseBodyNode::~dBroadPhaseBodyNode()
+ntBroadPhaseBodyNode::~ntBroadPhaseBodyNode()
 {
 	m_body->SetBroadPhaseNode(nullptr);
 }
 
-void dBroadPhaseNode::SetAABB(const dVector& minBox, const dVector& maxBox)
+void ntBroadPhaseNode::SetAABB(const dVector& minBox, const dVector& maxBox)
 {
 	dAssert(minBox.m_x <= maxBox.m_x);
 	dAssert(minBox.m_y <= maxBox.m_y);
@@ -62,15 +62,15 @@ void dBroadPhaseNode::SetAABB(const dVector& minBox, const dVector& maxBox)
 	m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();
 }
 
-dBroadPhaseTreeNode::dBroadPhaseTreeNode(dBroadPhaseNode* const sibling, dBroadPhaseNode* const myNode)
-	:dBroadPhaseNode(sibling->m_parent)
+ntBroadPhaseTreeNode::ntBroadPhaseTreeNode(ntBroadPhaseNode* const sibling, ntBroadPhaseNode* const myNode)
+	:ntBroadPhaseNode(sibling->m_parent)
 	,m_left(sibling)
 	,m_right(myNode)
 	,m_fitnessNode(nullptr)
 {
 	if (m_parent) 
 	{
-		dBroadPhaseTreeNode* const myParent = (dBroadPhaseTreeNode*)m_parent;
+		ntBroadPhaseTreeNode* const myParent = (ntBroadPhaseTreeNode*)m_parent;
 		if (myParent->m_left == sibling) 
 		{
 			myParent->m_left = this;
@@ -85,8 +85,8 @@ dBroadPhaseTreeNode::dBroadPhaseTreeNode(dBroadPhaseNode* const sibling, dBroadP
 	sibling->m_parent = this;
 	myNode->m_parent = this;
 
-	dBroadPhaseNode* const left = m_left;
-	dBroadPhaseNode* const right = m_right;
+	ntBroadPhaseNode* const left = m_left;
+	ntBroadPhaseNode* const right = m_right;
 
 	m_minBox = left->m_minBox.GetMin(right->m_minBox);
 	m_maxBox = left->m_maxBox.GetMax(right->m_maxBox);
@@ -94,7 +94,7 @@ dBroadPhaseTreeNode::dBroadPhaseTreeNode(dBroadPhaseNode* const sibling, dBroadP
 	m_surfaceArea = side0.DotProduct(side0.ShiftTripleRight()).m_x;
 }
 
-dBroadPhaseTreeNode::~dBroadPhaseTreeNode()
+ntBroadPhaseTreeNode::~ntBroadPhaseTreeNode()
 {
 	if (m_left) 
 	{

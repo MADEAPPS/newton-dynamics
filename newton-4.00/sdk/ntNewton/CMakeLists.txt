@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
-set (projectName "dNewton")
+set (projectName "ntNewton")
 message (${projectName})
 
 if(NEWTON_USE_PLUGIN_DLL)
@@ -43,8 +43,8 @@ endif()
 
 if (MSVC)
    if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
-	  set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudNewtonStdafx.h")
-      set_source_files_properties(dNewtonStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcdNewtonStdafx.h")
+	  set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YuntStdafx.h")
+      set_source_files_properties(ntStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcntStdafx.h")
    endif()
 endif(MSVC)
 

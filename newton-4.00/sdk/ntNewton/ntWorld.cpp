@@ -19,14 +19,14 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dNewtonStdafx.h"
-#include "dBody.h"
-#include "dNewton.h"
-#include "dShapeNull.h"
-#include "dDynamicBody.h"
-#include "dBroadPhaseMixed.h"
+#include "ntStdafx.h"
+#include "ntBody.h"
+#include "ntWorld.h"
+#include "ntShapeNull.h"
+#include "ntDynamicBody.h"
+#include "ntBroadPhaseMixed.h"
 
-dNewton::dNewton()
+ntWorld::ntWorld()
 	:dClassAlloc()
 	,dSyncMutex()
 	,dThread()
@@ -41,17 +41,17 @@ dNewton::dNewton()
 	SetName("newton main thread");
 	Start();
 
-	m_broadPhase = new dBroadPhaseMixed(this);
+	m_broadPhase = new ntBroadPhaseMixed(this);
 }
 
-dNewton::~dNewton()
+ntWorld::~ntWorld()
 {
 	Sync();
 	Finish();
 
 	while (m_bodyList.GetFirst())
 	{
-		dBody* const body = m_bodyList.GetFirst()->GetInfo();
+		ntBody* const body = m_bodyList.GetFirst()->GetInfo();
 		RemoveBody(body);
 		delete body;
 	}
@@ -59,15 +59,15 @@ dNewton::~dNewton()
 	delete m_broadPhase;
 }
 
-void dNewton::AddBody(dBody* const body)
+void ntWorld::AddBody(ntBody* const body)
 {
 	dAssert((body->m_newton == nullptr) && (body->m_newtonNode == nullptr));
 
-	dList<dBody*>::dListNode* const node = m_bodyList.Append(body);
+	dList<ntBody*>::dListNode* const node = m_bodyList.Append(body);
 	body->SetNewtonNode(this, node);
 }
 
-void dNewton::RemoveBody(dBody* const body)
+void ntWorld::RemoveBody(ntBody* const body)
 {
 	dAssert(body->m_newtonNode && (body->m_newton == this));
 
@@ -80,7 +80,7 @@ void dNewton::RemoveBody(dBody* const body)
 	body->SetNewtonNode(nullptr, nullptr);
 }
 
-void dNewton::Update(dFloat32 timestep)
+void ntWorld::Update(dFloat32 timestep)
 {
 	// wait for previous frame to complete
 	Sync();
@@ -89,45 +89,45 @@ void dNewton::Update(dFloat32 timestep)
 	Signal();
 }
 
-void dNewton::Sync()
+void ntWorld::Sync()
 {
 	dSyncMutex::Sync();
 }
 
-dInt32 dNewton::GetThreadCount() const
+dInt32 ntWorld::GetThreadCount() const
 {
 	const dThreadPool& pool = *this;
 	return pool.GetCount();
 }
 
-void dNewton::SetThreadCount(dInt32 count)
+void ntWorld::SetThreadCount(dInt32 count)
 {
 	dThreadPool& pool = *this;
 	return pool.SetCount(count);
 }
 
-void dNewton::DispatchJobs(dThreadPoolJob** const jobs)
+void ntWorld::DispatchJobs(dThreadPoolJob** const jobs)
 {
 	ExecuteJobs(jobs);
 }
 
-dInt32 dNewton::GetSubSteps() const
+dInt32 ntWorld::GetSubSteps() const
 {
 	return m_subSteps;
 }
 
-void dNewton::SetSubSteps(dInt32 subSteps)
+void ntWorld::SetSubSteps(dInt32 subSteps)
 {
 	m_subSteps = dClamp(subSteps, 1, 16);
 }
 
-void dNewton::ThreadFunction()
+void ntWorld::ThreadFunction()
 {
 	InternalUpdate(m_timestep);
 	Release();
 }
 
-void dNewton::InternalUpdate(dFloat32 fullTimestep)
+void ntWorld::InternalUpdate(dFloat32 fullTimestep)
 {
 	D_TRACKTIME();
 	BuildBodyArray();
@@ -141,21 +141,21 @@ void dNewton::InternalUpdate(dFloat32 fullTimestep)
 	UpdateListenersPostTransform(fullTimestep);
 }
 
-void dNewton::BuildBodyArray()
+void ntWorld::BuildBodyArray()
 {
 	D_TRACKTIME();
 	m_dynamicBodyArray.SetCount(m_bodyList.GetCount());
-	dDynamicBody** const bodyPtr = &m_dynamicBodyArray[0];
+	ntDynamicBody** const bodyPtr = &m_dynamicBodyArray[0];
 	int index = 0;
-	for (dList<dBody*>::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
+	for (dList<ntBody*>::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
-		dDynamicBody* const dynBody = node->GetInfo()->GetAsDynamicBody();
+		ntDynamicBody* const dynBody = node->GetInfo()->GetAsDynamicBody();
 		if (dynBody)
 		{
 			bodyPtr[index] = dynBody;
 			index++;
 
-			const dShape* const shape = ((dShape*)dynBody->GetCollisionShape().GetShape())->GetAsShapeNull();
+			const ntShape* const shape = ((ntShape*)dynBody->GetCollisionShape().GetShape())->GetAsShapeNull();
 			if (shape)
 			{
 				dAssert(0);
@@ -172,11 +172,11 @@ void dNewton::BuildBodyArray()
 	}
 }
 
-void dNewton::TransformUpdate(dFloat32 timestep)
+void ntWorld::TransformUpdate(dFloat32 timestep)
 {
 }
 
-void dNewton::SubstepUpdate(dFloat32 timestep)
+void ntWorld::SubstepUpdate(dFloat32 timestep)
 {
 	D_TRACKTIME();
 	UpdateSkeletons(timestep);
@@ -188,27 +188,27 @@ void dNewton::SubstepUpdate(dFloat32 timestep)
 	UpdatePostlisteners(timestep);
 }
 
-void dNewton::UpdatePrelisteners(dFloat32 timestep)
+void ntWorld::UpdatePrelisteners(dFloat32 timestep)
 {
 }
 
-void dNewton::UpdatePostlisteners(dFloat32 timestep)
+void ntWorld::UpdatePostlisteners(dFloat32 timestep)
 {
 }
 
-void dNewton::UpdateDynamics(dFloat32 timestep)
+void ntWorld::UpdateDynamics(dFloat32 timestep)
 {
 }
 
-void dNewton::UpdateSkeletons(dFloat32 timestep)
+void ntWorld::UpdateSkeletons(dFloat32 timestep)
 {
 }
 
-void dNewton::UpdateListenersPostTransform(dFloat32 timestep)
+void ntWorld::UpdateListenersPostTransform(dFloat32 timestep)
 {
 }
 
-void dNewton::ApplyExternalForces(dFloat32 timestep)
+void ntWorld::ApplyExternalForces(dFloat32 timestep)
 {
 	D_TRACKTIME();
 	class dApplyExternalForces: public dNewtonBaseJob
@@ -219,7 +219,7 @@ void dNewton::ApplyExternalForces(dFloat32 timestep)
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 count = m_newton->m_dynamicBodyArray.GetCount();
-			dDynamicBody** const bodies = &m_newton->m_dynamicBodyArray[0];
+			ntDynamicBody** const bodies = &m_newton->m_dynamicBodyArray[0];
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
 				bodies[i]->ApplyExternalForces(threadIndex, m_timestep);
@@ -229,12 +229,12 @@ void dNewton::ApplyExternalForces(dFloat32 timestep)
 	SubmitJobs<dApplyExternalForces>(timestep);
 }
 
-void dNewton::UpdateSleepState(dFloat32 timestep)
+void ntWorld::UpdateSleepState(dFloat32 timestep)
 {
 //	D_TRACKTIME();
 }
 
-void dNewton::UpdateBroadPhase(dFloat32 timestep)
+void ntWorld::UpdateBroadPhase(dFloat32 timestep)
 {
 	m_broadPhase->Update(timestep);
 }

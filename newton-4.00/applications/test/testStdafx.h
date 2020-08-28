@@ -15,19 +15,19 @@
 #include <stdio.h>
 #include <conio.h>
 
-#include <dNewtonStdafx.h>
-#include <dBody.h>
-#include <dShape.h>
-#include <dNewton.h>
-#include <dShapeBox.h>
-#include <dShapeNull.h>
-#include <dBroadPhase.h>
-#include <dShapeConvex.h>
-#include <dDynamicBody.h>
-#include <dContactSolver.h>
-#include <dShapeInstance.h>
-#include <dBroadPhaseNode.h>
-#include <dBroadPhaseMixed.h>
+#include <ntStdafx.h>
+#include <ntBody.h>
+#include <ntShape.h>
+#include <ntWorld.h>
+#include <ntShapeBox.h>
+#include <ntShapeNull.h>
+#include <ntBroadPhase.h>
+#include <ntShapeConvex.h>
+#include <ntDynamicBody.h>
+#include <ntContactSolver.h>
+#include <ntShapeInstance.h>
+#include <ntBroadPhaseNode.h>
+#include <ntBroadPhaseMixed.h>
 
 #endif
 

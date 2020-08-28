@@ -61,12 +61,12 @@ class CheckMemoryLeaks
 };
 static CheckMemoryLeaks checkLeaks;
 
-class DemobodyNotify: public dBodyNotify
+class DemobodyNotify: public ntBodyNotify
 {
 	public:
 	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
 	{
-		dDynamicBody* const body = m_body->GetAsDynamicBody();
+		ntDynamicBody* const body = m_body->GetAsDynamicBody();
 		dAssert(body);
 
 		dVector massMatrix (body->GetMassMatrix());
@@ -81,14 +81,14 @@ class DemobodyNotify: public dBodyNotify
 	}
 };
 
-void BuildPyramid(dNewton& world, dFloat32 mass, const dVector& origin, const dVector& size, int count)
+void BuildPyramid(ntWorld& world, dFloat32 mass, const dVector& origin, const dVector& size, int count)
 {
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
 	world.Sync();
-	dShapeInstance box(new dShapeBox(size.m_x, size.m_y, size.m_z));
+	ntShapeInstance box(new ntShapeBox(size.m_x, size.m_y, size.m_z));
 
 	dVector floor(0.0f);
 	matrix.m_posit.m_y = floor.m_y + size.m_y / 2.0f;
@@ -111,7 +111,7 @@ void BuildPyramid(dNewton& world, dFloat32 mass, const dVector& origin, const dV
 		const dInt32 count1 = count - j;
 		for (int i = 0; i < count1; i++)
 		{
-			dDynamicBody* const body = new dDynamicBody();
+			ntDynamicBody* const body = new ntDynamicBody();
 
 			body->SetNotifyCallback(new DemobodyNotify);
 			
@@ -129,7 +129,7 @@ void BuildPyramid(dNewton& world, dFloat32 mass, const dVector& origin, const dV
 
 int main (int argc, const char * argv[]) 
 {
-	dNewton newton;
+	ntWorld newton;
 	newton.SetSubSteps(2);
 	//newton.SetThreadCount(3);
 		

@@ -19,73 +19,73 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dNewtonStdafx.h"
-#include "dShapeNull.h"
+#include "ntStdafx.h"
+#include "ntShapeNull.h"
 
 #if 0
-dShapeNull::dShapeNull(dgMemoryAllocator* const allocator, dgUnsigned32 signature)
+ntShapeNull::ntShapeNull(dgMemoryAllocator* const allocator, dgUnsigned32 signature)
 	:dShape(allocator, signature, m_nullCollision) 
 {
-	m_rtti |= dShapeNull_RTTI;
+	m_rtti |= ntShapeNull_RTTI;
 	m_inertia = dVector (dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (0.0f));
 }
 
-dShapeNull::dShapeNull(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
+ntShapeNull::ntShapeNull(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
 	:dShape (world, deserialization, userData, revisionNumber)
 {
-	m_rtti |= dShapeNull_RTTI;
+	m_rtti |= ntShapeNull_RTTI;
 }
 
-void dShapeNull::Serialize(dgSerialize callback, void* const userData) const
+void ntShapeNull::Serialize(dgSerialize callback, void* const userData) const
 {
 	SerializeLow(callback, userData);
 }
 
-dShapeNull::~dShapeNull()
+ntShapeNull::~ntShapeNull()
 {
 }
 
-void dShapeNull::SetCollisionBBox (const dVector& p0, const dVector& p1)
+void ntShapeNull::SetCollisionBBox (const dVector& p0, const dVector& p1)
 {
 	dgAssert (0);
 }
 
 
-dgInt32 dShapeNull::CalculateSignature () const
+dgInt32 ntShapeNull::CalculateSignature () const
 {
 	return dgInt32 (GetSignature());
 }
 
-void dShapeNull::CalcAABB (const dgMatrix& matrix, dVector &p0, dVector &p1) const
+void ntShapeNull::CalcAABB (const dgMatrix& matrix, dVector &p0, dVector &p1) const
 {
 	p0 = matrix[3] & dVector::m_triplexMask;
 	p1 = matrix[3] & dVector::m_triplexMask;
 }
 
-dVector dShapeNull::SupportVertex (const dVector& dir, dgInt32* const vertexIndex) const
+dVector ntShapeNull::SupportVertex (const dVector& dir, dgInt32* const vertexIndex) const
 {
 	dgAssert (0);
 	return dVector::m_zero;
 }
 
-dVector dShapeNull::SupportVertexSpecial (const dVector& dir, dFloat32 skinThickness, dgInt32* const vertexIndex) const
+dVector ntShapeNull::SupportVertexSpecial (const dVector& dir, dFloat32 skinThickness, dgInt32* const vertexIndex) const
 {
 	dgAssert(0);
 	return dVector::m_zero;
 }
 
-dFloat32 dShapeNull::GetVolume () const
+dFloat32 ntShapeNull::GetVolume () const
 {
 	return dFloat32 (0.0f);
 }
 
-dFloat32 dShapeNull::RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
+dFloat32 ntShapeNull::RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
 	return dFloat32 (1.2f);
 }
 
 
-dVector dShapeNull::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dVector& plane, const dgCollisionInstance& parentScale) const
+dVector ntShapeNull::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dVector& plane, const dgCollisionInstance& parentScale) const
 {
 	dgAssert (0);
 	return dVector::m_zero;
@@ -93,8 +93,8 @@ dVector dShapeNull::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const
 #endif
 
 
-dShapeNull::dShapeNull()
-	:dShapeConvex(m_nullCollision)
+ntShapeNull::ntShapeNull()
+	:ntShapeConvex(m_nullCollision)
 {
 	m_inertia = dVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f));
 }

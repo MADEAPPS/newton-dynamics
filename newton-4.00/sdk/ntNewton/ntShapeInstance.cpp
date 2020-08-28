@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dNewtonStdafx.h"
-#include "dShapeInstance.h"
+#include "ntStdafx.h"
+#include "ntShapeInstance.h"
 
 #if 0
 #include "dgBody.h"
@@ -34,7 +34,7 @@
 #include "dgCollisionSphere.h"
 #include "dgCollisionCapsule.h"
 #include "dgCollisionCylinder.h"
-#include "dShapeInstance.h"
+#include "ntShapeInstance.h"
 #include "dgCollisionCompound.h"
 #include "dgCollisionHeightField.h"
 #include "dgCollisionConvexPolygon.h"
@@ -566,9 +566,9 @@ void dShapeInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* co
 
 #endif
 
-dVector dShapeInstance::m_padding(D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, dFloat32(0.0f));
+dVector ntShapeInstance::m_padding(D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, D_MAX_SHAPE_AABB_PADDING, dFloat32(0.0f));
 
-dShapeInstance::dShapeInstance(dShape* const shape)
+ntShapeInstance::ntShapeInstance(ntShape* const shape)
 	:dClassAlloc()
 	,m_globalMatrix(dGetIdentityMatrix())
 	,m_localMatrix(dGetIdentityMatrix())
@@ -592,7 +592,7 @@ dShapeInstance::dShapeInstance(dShape* const shape)
 {
 }
 
-dShapeInstance::dShapeInstance(const dShapeInstance& instance)
+ntShapeInstance::ntShapeInstance(const ntShapeInstance& instance)
 	:dClassAlloc()
 	,m_globalMatrix(instance.m_globalMatrix)
 	,m_localMatrix(instance.m_localMatrix)
@@ -621,7 +621,7 @@ dShapeInstance::dShapeInstance(const dShapeInstance& instance)
 {
 }
 
-dShapeInstance::~dShapeInstance()
+ntShapeInstance::~ntShapeInstance()
 {
 //	if (m_world->m_onCollisionInstanceDestruction && m_isExternal) {
 //		m_world->m_onCollisionInstanceDestruction(m_world, this);
@@ -631,7 +631,7 @@ dShapeInstance::~dShapeInstance()
 	m_shape->Release();
 }
 
-dShapeInstance& dShapeInstance::operator=(const dShapeInstance& instance)
+ntShapeInstance& ntShapeInstance::operator=(const ntShapeInstance& instance)
 {
 	m_globalMatrix = instance.m_globalMatrix;
 	m_localMatrix = instance.m_localMatrix;
@@ -646,13 +646,13 @@ dShapeInstance& dShapeInstance::operator=(const dShapeInstance& instance)
 	return *this;
 }
 
-void dShapeInstance::DebugShape(const dMatrix& matrix, dShapeDebugCallback& debugCallback) const
+void ntShapeInstance::DebugShape(const dMatrix& matrix, ntShapeDebugCallback& debugCallback) const
 {
 	debugCallback.m_instance = this;
 	m_shape->DebugShape(GetScaledTransform(matrix), debugCallback);
 }
 
-void dShapeInstance::CalculateAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const
+void ntShapeInstance::CalculateAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const
 {
 	for (int i = 0; i < 3; i++) 
 	{
@@ -665,9 +665,9 @@ void dShapeInstance::CalculateAABB(const dMatrix& matrix, dVector& minP, dVector
 	maxP = maxP & dVector::m_triplexMask;
 }
 
-dMatrix dShapeInstance::CalculateInertia() const
+dMatrix ntShapeInstance::CalculateInertia() const
 {
-	dShape* const shape = (dShape*)m_shape;
+	ntShape* const shape = (ntShape*)m_shape;
 	if (shape->GetAsShapeNull() || !shape->GetAsShapeConvex()) 
 	{
 		return dGetZeroMatrix();

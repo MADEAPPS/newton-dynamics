@@ -24,33 +24,33 @@
 
 #define D_MAX_SHAPE_AABB_PADDING dFloat32 (1.0f / 16.0f)
 
-#include "dShape.h"
+#include "ntShape.h"
 
-class dBody;
-class dShapeInstance;
+class ntBody;
+class ntShapeInstance;
 
-class dShapeDebugCallback
+class ntShapeDebugCallback
 {
 	public: 
-	dShapeDebugCallback()
+	ntShapeDebugCallback()
 		:m_instance(nullptr)
 	{
 	}
 
-	virtual ~dShapeDebugCallback()
+	virtual ~ntShapeDebugCallback()
 	{
 	}
 
 	void virtual DrawPolygon(dInt32 vertexCount, const dVector* const faceArray) = 0;
 
-	const dShapeInstance* m_instance;
+	const ntShapeInstance* m_instance;
 };
 
 D_MSC_VECTOR_ALIGNMENT
-class dShapeInstance: public dClassAlloc
+class ntShapeInstance: public dClassAlloc
 {
 	public:
-	enum dScaleType
+	enum ntScaleType
 	{
 		m_unit,
 		m_uniform,
@@ -58,19 +58,19 @@ class dShapeInstance: public dClassAlloc
 		m_global,
 	};
 
-	D_NEWTON_API dShapeInstance(dShape* const shape);
-	D_NEWTON_API dShapeInstance(const dShapeInstance& instance);
+	D_NEWTON_API ntShapeInstance(ntShape* const shape);
+	D_NEWTON_API ntShapeInstance(const ntShapeInstance& instance);
 	//dShapeInstance(const dShapeInstance& meshInstance, const dShape* const shape);
 	//dShapeInstance(const dgWorld* const world, const dShape* const childCollision, dInt32 shapeID, const dMatrix& matrix);
 	//dShapeInstance(const dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
-	D_NEWTON_API ~dShapeInstance();
-	D_NEWTON_API dShapeInstance& operator=(const dShapeInstance& src);
+	D_NEWTON_API ~ntShapeInstance();
+	D_NEWTON_API ntShapeInstance& operator=(const ntShapeInstance& src);
 
 	D_NEWTON_API dMatrix CalculateInertia() const;
 	D_NEWTON_API void CalculateAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
-	D_NEWTON_API void DebugShape(const dMatrix& matrix, dShapeDebugCallback& debugCallback) const;
+	D_NEWTON_API void DebugShape(const dMatrix& matrix, ntShapeDebugCallback& debugCallback) const;
 
-	const dShape* GetShape() const;
+	const ntShape* GetShape() const;
 	dVector SupportVertex(const dVector& dir) const;
 	dMatrix GetScaledTransform(const dMatrix& matrix) const;
 	void CalculateFastAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
@@ -177,10 +177,10 @@ class dShapeInstance: public dClassAlloc
 	dVector m_invScale;
 	dVector m_maxScale;
 
-	const dShape* m_shape;
-	const dBody* m_ownerBody;
+	const ntShape* m_shape;
+	const ntBody* m_ownerBody;
 
-	dScaleType m_scaleType;
+	ntScaleType m_scaleType;
 
 	static dVector m_padding;
 } D_GCC_VECTOR_ALIGNMENT;
@@ -407,7 +407,7 @@ D_INLINE dVector dShapeInstance::SupportVertexSpecial (const dVector& dir, dInt3
 	}
 }
 
-D_INLINE dVector dShapeInstance::SupportVertexSpecialProjectPoint (const dVector& point, const dVector& dir) const
+D_INLINE dVector ntShapeInstance::SupportVertexSpecialProjectPoint (const dVector& point, const dVector& dir) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-2f));
@@ -443,24 +443,24 @@ D_INLINE dVector dShapeInstance::SupportVertexSpecialProjectPoint (const dVector
 	}
 }
 
-D_INLINE void dShapeInstance::SetCollisionBBox (const dVector& p0, const dVector& p1)
+D_INLINE void ntShapeInstance::SetCollisionBBox (const dVector& p0, const dVector& p1)
 {
 	dAssert (0);
 }
 
-D_INLINE dInt32 dShapeInstance::CalculateSignature () const
+D_INLINE dInt32 ntShapeInstance::CalculateSignature () const
 {
 	dAssert (0);
 	return 0;
 }
 
-D_INLINE dInt32 dShapeInstance::GetConvexVertexCount() const 
+D_INLINE dInt32 ntShapeInstance::GetConvexVertexCount() const 
 { 
 	return m_shape->GetConvexVertexCount();
 }
 
 
-D_INLINE dVector dShapeInstance::GetBoxSize() const
+D_INLINE dVector ntShapeInstance::GetBoxSize() const
 {
 	switch (m_scaleType)
 	{
@@ -475,7 +475,7 @@ D_INLINE dVector dShapeInstance::GetBoxSize() const
 	}
 }
 
-D_INLINE dVector dShapeInstance::GetBoxOrigin() const
+D_INLINE dVector ntShapeInstance::GetBoxOrigin() const
 {
 	switch (m_scaleType)
 	{
@@ -490,24 +490,24 @@ D_INLINE dVector dShapeInstance::GetBoxOrigin() const
 	}
 }
 
-D_INLINE dFloat32 dShapeInstance::GetUmbraClipSize () const
+D_INLINE dFloat32 ntShapeInstance::GetUmbraClipSize () const
 {
 	return m_shape->GetUmbraClipSize() * m_maxScale.m_x;
 }
 
-D_INLINE dShapeInstance::dScaleType dShapeInstance::GetScaleType() const
+D_INLINE ntShapeInstance::ntScaleType ntShapeInstance::GetScaleType() const
 {
 	return m_scaleType;
 }
 
-D_INLINE dShapeInstance::dScaleType dShapeInstance::GetCombinedScaleType(dShapeInstance::dScaleType type) const
+D_INLINE ntShapeInstance::ntScaleType ntShapeInstance::GetCombinedScaleType(ntShapeInstance::ntScaleType type) const
 {
 	dAssert (0);
 	return dgMax(m_scaleType, type);
 }
 
 
-D_INLINE void dShapeInstance::CalcObb (dVector& origin, dVector& size) const
+D_INLINE void ntShapeInstance::CalcObb (dVector& origin, dVector& size) const
 {
 	size = m_shape->GetObbSize(); 
 	origin = m_shape->GetObbOrigin(); 
@@ -550,43 +550,43 @@ D_INLINE void dShapeInstance::CalcObb (dVector& origin, dVector& size) const
 	dAssert (origin.m_w == dFloat32 (0.0f));
 }
 
-D_INLINE dFloat32 dShapeInstance::GetSkinThickness() const
+D_INLINE dFloat32 ntShapeInstance::GetSkinThickness() const
 {
 	return m_skinThickness;
 }
 
-D_INLINE void dShapeInstance::SetSkinThickness(dFloat32 thickness)
+D_INLINE void ntShapeInstance::SetSkinThickness(dFloat32 thickness)
 {
 	m_skinThickness = dAbs (thickness);
 }
 
-D_INLINE dVector dShapeInstance::CalculateBuoyancyVolume(const dMatrix& matrix, const dVector& fluidPlane) const
+D_INLINE dVector ntShapeInstance::CalculateBuoyancyVolume(const dMatrix& matrix, const dVector& fluidPlane) const
 {
 	return m_shape->CalculateVolumeIntegral(m_localMatrix * matrix, fluidPlane, *this);
 }
 #endif
 
-D_INLINE const dShape* dShapeInstance::GetShape() const 
+D_INLINE const ntShape* ntShapeInstance::GetShape() const 
 { 
 	return m_shape; 
 }
 
-D_INLINE const dMatrix& dShapeInstance::GetLocalMatrix() const
+D_INLINE const dMatrix& ntShapeInstance::GetLocalMatrix() const
 {
 	return m_localMatrix;
 }
 
-D_INLINE const dMatrix& dShapeInstance::GetGlobalMatrix() const
+D_INLINE const dMatrix& ntShapeInstance::GetGlobalMatrix() const
 {
 	return m_globalMatrix;
 }
 
-D_INLINE void dShapeInstance::SetGlobalMatrix(const dMatrix& matrix)
+D_INLINE void ntShapeInstance::SetGlobalMatrix(const dMatrix& matrix)
 {
 	m_globalMatrix = matrix;
 }
 
-D_INLINE dMatrix dShapeInstance::GetScaledTransform(const dMatrix& matrix) const
+D_INLINE dMatrix ntShapeInstance::GetScaledTransform(const dMatrix& matrix) const
 {
 	dMatrix scaledMatrix(m_localMatrix * matrix);
 	scaledMatrix[0] = scaledMatrix[0].Scale(m_scale[0]);
@@ -595,7 +595,7 @@ D_INLINE dMatrix dShapeInstance::GetScaledTransform(const dMatrix& matrix) const
 	return m_aligmentMatrix * scaledMatrix;
 }
 
-D_INLINE void dShapeInstance::CalculateFastAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
+D_INLINE void ntShapeInstance::CalculateFastAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
 {
 	switch (m_scaleType)
 	{
@@ -638,7 +638,7 @@ D_INLINE void dShapeInstance::CalculateFastAABB(const dMatrix& matrix, dVector& 
 	dAssert(p1.m_w == dFloat32(0.0f));
 }
 
-D_INLINE dVector dShapeInstance::SupportVertex(const dVector& dir) const
+D_INLINE dVector ntShapeInstance::SupportVertex(const dVector& dir) const
 {
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-2f));

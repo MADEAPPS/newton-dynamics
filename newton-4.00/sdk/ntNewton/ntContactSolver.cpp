@@ -19,19 +19,10 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dNewtonStdafx.h"
-#include "dContactSolver.h"
-//#include "dgBody.h"
-//#include "dgWorld.h"
-//#include "dgContact.h"
-//#include "dContactSolver.h"
-//#include "dgCollisionMesh.h"
-//#include "dgCollisionConvex.h"
-//#include "dShapeInstance.h"
-//#include "dgCollisionConvexHull.h"
-//#include "dgCollisionConvexPolygon.h"
+#include "ntStdafx.h"
+#include "ntContactSolver.h"
 
-dVector dContactSolver::m_hullDirs[] =
+dVector ntContactSolver::m_hullDirs[] =
 {
 	dVector(dFloat32(0.577350f), dFloat32(-0.577350f), dFloat32(0.577350f), dFloat32(0.0f)),
 	dVector(dFloat32(-0.577350f), dFloat32(-0.577350f), dFloat32(-0.577350f), dFloat32(0.0f)),
@@ -49,7 +40,7 @@ dVector dContactSolver::m_hullDirs[] =
 	dVector(dFloat32(0.000000f), dFloat32(0.000000f), dFloat32(-1.000000f), dFloat32(0.0f)),
 };
 
-dInt32 dContactSolver::m_rayCastSimplex[4][4] =
+dInt32 ntContactSolver::m_rayCastSimplex[4][4] =
 {
 	{ 0, 1, 2, 3 },
 	{ 0, 2, 3, 1 },
@@ -57,8 +48,8 @@ dInt32 dContactSolver::m_rayCastSimplex[4][4] =
 	{ 1, 0, 3, 2 },
 };
 
-dContactSolver::dContactSolver(dShapeInstance* const instance)
-	:dDownHeap<dMinkFace*, dFloat32>(m_heapBuffer, sizeof (m_heapBuffer))
+ntContactSolver::ntContactSolver(ntShapeInstance* const instance)
+	:dDownHeap<ntMinkFace*, dFloat32>(m_heapBuffer, sizeof (m_heapBuffer))
 	,m_proxy (nullptr)
 	,m_instance0(instance)
 	,m_instance1(instance)
@@ -66,8 +57,8 @@ dContactSolver::dContactSolver(dShapeInstance* const instance)
 {
 }
 
-dContactSolver::dContactSolver(dCollisionParamProxy* const proxy)
-	:dDownHeap<dMinkFace*, dFloat32>(m_heapBuffer, sizeof (m_heapBuffer))
+ntContactSolver::ntContactSolver(dCollisionParamProxy* const proxy)
+	:dDownHeap<ntMinkFace*, dFloat32>(m_heapBuffer, sizeof (m_heapBuffer))
 	//,m_normal (proxy->m_contactJoint->m_separtingVector)
 	//,m_proxy (proxy)
 	//,m_instance0(proxy->m_instance0)
@@ -77,7 +68,7 @@ dContactSolver::dContactSolver(dCollisionParamProxy* const proxy)
 	dAssert(0);
 }
 
-D_INLINE void dContactSolver::SupportVertex(const dVector& dir0, dInt32 vertexIndex)
+D_INLINE void ntContactSolver::SupportVertex(const dVector& dir0, dInt32 vertexIndex)
 {
 	dAssert(0);
 	//dAssert(dir0.m_w == dFloat32(0.0f));
@@ -92,7 +83,7 @@ D_INLINE void dContactSolver::SupportVertex(const dVector& dir0, dInt32 vertexIn
 	//m_hullSum[vertexIndex] = p + q;
 }
 
-D_INLINE dBigVector dContactSolver::ReduceLine(dInt32& indexOut)
+D_INLINE dBigVector ntContactSolver::ReduceLine(dInt32& indexOut)
 {
 	const dBigVector p0(m_hullDiff[0]);
 	const dBigVector p1(m_hullDiff[1]);
@@ -121,7 +112,7 @@ D_INLINE dBigVector dContactSolver::ReduceLine(dInt32& indexOut)
 	return v;
 }
 
-D_INLINE dBigVector dContactSolver::ReduceTriangle (dInt32& indexOut)
+D_INLINE dBigVector ntContactSolver::ReduceTriangle (dInt32& indexOut)
 {
 	const dBigVector p0(m_hullDiff[0]);
 	const dBigVector p1(m_hullDiff[1]);
@@ -160,7 +151,7 @@ D_INLINE dBigVector dContactSolver::ReduceTriangle (dInt32& indexOut)
 	return dBigVector::m_zero;
 }
 
-D_INLINE dBigVector dContactSolver::ReduceTetrahedrum (dInt32& indexOut)
+D_INLINE dBigVector ntContactSolver::ReduceTetrahedrum (dInt32& indexOut)
 {
 	const dBigVector p0(m_hullDiff[0]);
 	const dBigVector p1(m_hullDiff[1]);
@@ -220,7 +211,7 @@ D_INLINE dBigVector dContactSolver::ReduceTetrahedrum (dInt32& indexOut)
 }
 
 //D_INLINE dInt32 dContactSolver::CalculateClosestSimplex ()
-dInt32 dContactSolver::CalculateClosestSimplex()
+dInt32 ntContactSolver::CalculateClosestSimplex()
 {
 	dAssert(0);
 	return 0;
@@ -328,9 +319,9 @@ dInt32 dContactSolver::CalculateClosestSimplex()
 	//return (index < 4) ? index : -4;
 }
 
-D_INLINE dMinkFace* dContactSolver::NewFace()
+D_INLINE ntMinkFace* ntContactSolver::NewFace()
 {
-	dMinkFace* face = (dMinkFace*)m_freeFace;
+	ntMinkFace* face = (ntMinkFace*)m_freeFace;
 	if (m_freeFace) {
 		m_freeFace = m_freeFace->m_next;
 	} else {
@@ -342,14 +333,14 @@ D_INLINE dMinkFace* dContactSolver::NewFace()
 	}
 
 #ifdef _DEBUG
-	memset(face, 0, sizeof (dMinkFace));
+	memset(face, 0, sizeof (ntMinkFace));
 #endif
 	return face;
 }
 
-D_INLINE dMinkFace* dContactSolver::AddFace(dInt32 v0, dInt32 v1, dInt32 v2)
+D_INLINE ntMinkFace* ntContactSolver::AddFace(dInt32 v0, dInt32 v1, dInt32 v2)
 {
-	dMinkFace* const face = NewFace();
+	ntMinkFace* const face = NewFace();
 	face->m_mark = 0;
 	face->m_vertex[0] = dInt16(v0);
 	face->m_vertex[1] = dInt16(v1);
@@ -357,7 +348,7 @@ D_INLINE dMinkFace* dContactSolver::AddFace(dInt32 v0, dInt32 v1, dInt32 v2)
 	return face;
 }
 
-D_INLINE void dContactSolver::DeleteFace(dMinkFace* const face)
+D_INLINE void ntContactSolver::DeleteFace(ntMinkFace* const face)
 {
 	dgFaceFreeList* const freeFace = (dgFaceFreeList*)face;
 	freeFace->m_next = m_freeFace;
@@ -365,7 +356,7 @@ D_INLINE void dContactSolver::DeleteFace(dMinkFace* const face)
 }
 
 
-D_INLINE void dContactSolver::PushFace(dMinkFace* const face)
+D_INLINE void ntContactSolver::PushFace(ntMinkFace* const face)
 {
 	dInt32 i0 = face->m_vertex[0];
 	dInt32 i1 = face->m_vertex[1];
@@ -376,14 +367,14 @@ D_INLINE void dContactSolver::PushFace(dMinkFace* const face)
 	face->m_alive = 1;
 	if (mag2 > dFloat32(1.0e-16f)) {
 		face->m_plane = plane.Scale(dRsqrt(mag2));
-		dMinkFace* face1 = face;
+		ntMinkFace* face1 = face;
 		Push(face1, face->m_plane.m_w);
 	} else {
 		face->m_plane = dPlane(dVector::m_zero);
 	}
 }
 
-dInt32 dContactSolver::CalculateIntersectingPlane(dInt32 count)
+dInt32 ntContactSolver::CalculateIntersectingPlane(dInt32 count)
 {
 	dAssert(0);
 	return 0;
@@ -538,10 +529,10 @@ dInt32 dContactSolver::CalculateIntersectingPlane(dInt32 count)
 	m_vertexIndex = 4;
 	m_freeFace = nullptr;
 
-	dMinkFace* const f0 = AddFace(0, 1, 2);
-	dMinkFace* const f1 = AddFace(0, 2, 3);
-	dMinkFace* const f2 = AddFace(2, 1, 3);
-	dMinkFace* const f3 = AddFace(1, 0, 3);
+	ntMinkFace* const f0 = AddFace(0, 1, 2);
+	ntMinkFace* const f1 = AddFace(0, 2, 3);
+	ntMinkFace* const f2 = AddFace(2, 1, 3);
+	ntMinkFace* const f3 = AddFace(1, 0, 3);
 
 	f0->m_twin[0] = f3;
 	f0->m_twin[1] = f2;
@@ -576,7 +567,7 @@ dInt32 dContactSolver::CalculateIntersectingPlane(dInt32 count)
 	const dFloat32 minTolerance = D_PENETRATION_TOL;
 
 	while (GetCount()) {
-		dMinkFace* const faceNode = (*this)[0];
+		ntMinkFace* const faceNode = (*this)[0];
 		Pop();
 
 		if (faceNode->m_alive) {
@@ -628,7 +619,7 @@ dInt32 dContactSolver::CalculateIntersectingPlane(dInt32 count)
 
 				while (stackIndex) {
 					stackIndex--;
-					dMinkFace* const face = m_faceStack[stackIndex];
+					ntMinkFace* const face = m_faceStack[stackIndex];
 
 					if (!face->m_mark && (face->m_plane.Evalue(p) > dFloat32(0.0f))) {
 #ifdef _DEBUG
@@ -643,7 +634,7 @@ dInt32 dContactSolver::CalculateIntersectingPlane(dInt32 count)
 						face->m_mark = 1;
 
 						for (dInt32 i = 0; i < 3; i++) {
-							dMinkFace* const twinFace = face->m_twin[i];
+							ntMinkFace* const twinFace = face->m_twin[i];
 							if (twinFace && !twinFace->m_mark) {
 								m_faceStack[stackIndex] = twinFace;
 								stackIndex++;
@@ -656,15 +647,15 @@ dInt32 dContactSolver::CalculateIntersectingPlane(dInt32 count)
 				//dAssert (SanityCheck());
 				dInt32 newCount = 0;
 				for (dInt32 i = 0; i < deletedCount; i++) {
-					dMinkFace* const face = m_deletedFaceList[i];
+					ntMinkFace* const face = m_deletedFaceList[i];
 					face->m_alive = 0;
 					dAssert(face->m_mark == 1);
 					dInt32 j0 = 2;
 					for (dInt32 j1 = 0; j1 < 3; j1++) {
-						dMinkFace* const twinFace = face->m_twin[j0];
+						ntMinkFace* const twinFace = face->m_twin[j0];
 						if (twinFace && !twinFace->m_mark) {
 							//dMinkFace* const newFace = AddFace(m_vertexIndex, face->m_vertex[j0], face->m_vertex[j1]);
-							dMinkFace* const newFace = NewFace();
+							ntMinkFace* const newFace = NewFace();
 							if (newFace) {
 								newFace->m_mark = 0;
 								newFace->m_vertex[0] = dInt16(m_vertexIndex);
@@ -690,13 +681,13 @@ dInt32 dContactSolver::CalculateIntersectingPlane(dInt32 count)
 
 				dInt32 i0 = newCount - 1;
 				for (dInt32 i1 = 0; i1 < newCount; i1++) {
-					dMinkFace* const faceA = m_coneFaceList[i0];
+					ntMinkFace* const faceA = m_coneFaceList[i0];
 					dAssert(faceA->m_mark == 0);
 
 					dInt32 j0 = newCount - 1;
 					for (dInt32 j1 = 0; j1 < newCount; j1++) {
 						if (i0 != j0) {
-							dMinkFace* const faceB = m_coneFaceList[j0];
+							ntMinkFace* const faceB = m_coneFaceList[j0];
 							dAssert(faceB->m_mark == 0);
 							if (faceA->m_vertex[2] == faceB->m_vertex[1]) {
 								faceA->m_twin[2] = faceB;
@@ -723,7 +714,7 @@ dInt32 dContactSolver::CalculateIntersectingPlane(dInt32 count)
 #endif
 }
 
-D_INLINE void dContactSolver::CalculateContactFromFeacture(dInt32 featureType)
+D_INLINE void ntContactSolver::CalculateContactFromFeacture(dInt32 featureType)
 {
 	dAssert(0);
 #if 0
@@ -830,13 +821,13 @@ D_INLINE void dContactSolver::CalculateContactFromFeacture(dInt32 featureType)
 #endif
 }
 
-bool dContactSolver::SanityCheck() const
+bool ntContactSolver::SanityCheck() const
 {
 	for (dInt32 i = 0; i < m_faceIndex; i++) {
-		const dMinkFace* const face = &m_facePool[i];
+		const ntMinkFace* const face = &m_facePool[i];
 		if (face->m_alive) {
 			for (dInt32 j = 0; j < 3; j++) {
-				dMinkFace* const twin = face->m_twin[j];
+				ntMinkFace* const twin = face->m_twin[j];
 				if (!twin) {
 					return false;
 				}
@@ -862,7 +853,7 @@ bool dContactSolver::SanityCheck() const
 }
 
 
-bool dContactSolver::CalculateClosestPoints()
+bool ntContactSolver::CalculateClosestPoints()
 {
 	dAssert(0);
 	return false;
@@ -887,7 +878,7 @@ bool dContactSolver::CalculateClosestPoints()
 #endif
 }
 
-dInt32 dContactSolver::ConvexPolygonToLineIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dVector* const mem) const
+dInt32 ntContactSolver::ConvexPolygonToLineIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dVector* const mem) const
 {
 	dInt32 count = 0;
 	dVector* output = mem;
@@ -978,7 +969,7 @@ dInt32 dContactSolver::ConvexPolygonToLineIntersection(const dVector& normal, dI
 	return count2;
 }
 
-dInt32 dContactSolver::ConvexPolygonsIntersection(const dVector& normal, dInt32 count0, dVector* const shape0, dInt32 count1, dVector* const shape1, dVector* const contactOut, dInt32 maxContacts) const
+dInt32 ntContactSolver::ConvexPolygonsIntersection(const dVector& normal, dInt32 count0, dVector* const shape0, dInt32 count1, dVector* const shape1, dVector* const contactOut, dInt32 maxContacts) const
 {
 	dInt32 count = 0;
 	if (count1 <= 2) {
@@ -1106,7 +1097,7 @@ dInt32 dContactSolver::ConvexPolygonsIntersection(const dVector& normal, dInt32 
 	return count;
 }
 
-dFloat32 dContactSolver::RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dContactPoint& contactOut)
+dFloat32 ntContactSolver::RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dContactPoint& contactOut)
 {
 	dAssert(0);
 	return 0;
@@ -1257,7 +1248,7 @@ dFloat32 dContactSolver::RayCast (const dVector& localP0, const dVector& localP1
 #endif
 }
 
-D_INLINE void dContactSolver::TranslateSimplex(const dVector& step)
+D_INLINE void ntContactSolver::TranslateSimplex(const dVector& step)
 {
 	m_instance1->m_globalMatrix.m_posit -= step;
 	for (dInt32 i = 0; i < m_vertexIndex; i++) {
@@ -1266,7 +1257,7 @@ D_INLINE void dContactSolver::TranslateSimplex(const dVector& step)
 	}
 }
 
-dInt32 dContactSolver::CalculateConvexCastContacts()
+dInt32 ntContactSolver::CalculateConvexCastContacts()
 {
 	dAssert(0);
 	return 0;
@@ -1353,7 +1344,7 @@ dInt32 dContactSolver::CalculateConvexCastContacts()
 #endif
 }
 
-dInt32 dContactSolver::CalculateConvexToConvexContacts ()
+dInt32 ntContactSolver::CalculateConvexToConvexContacts ()
 {
 	dAssert(0);
 	return 0;
@@ -1400,7 +1391,7 @@ dInt32 dContactSolver::CalculateConvexToConvexContacts ()
 #endif
 }
 
-dInt32 dContactSolver::CalculateContacts(const dVector& point0, const dVector& point1, const dVector& normal)
+dInt32 ntContactSolver::CalculateContacts(const dVector& point0, const dVector& point1, const dVector& normal)
 {
 	dAssert(0);
 	return 0;

@@ -22,8 +22,8 @@
 #ifndef _D_DYNAMIC_BODY_H_
 #define _D_DYNAMIC_BODY_H_
 
-#include "dNewtonStdafx.h"
-#include "dBody.h"
+#include "ntStdafx.h"
+#include "ntBody.h"
 
 //#define DG_MAX_SPEED_ATT	dgFloat32(0.02f)
 ////#define DG_FREEZE_ACCEL	dgFloat32(0.1f)
@@ -42,18 +42,18 @@
 //class dgSkeletonContainer;
 
 D_MSC_VECTOR_ALIGNMENT
-class dDynamicBody: public dBody 
+class ntDynamicBody: public ntBody 
 {
 	public:
-	D_NEWTON_API dDynamicBody();
-	D_NEWTON_API virtual ~dDynamicBody ();
-	D_NEWTON_API virtual dDynamicBody* GetAsDynamicBody() { return this; }
+	D_NEWTON_API ntDynamicBody();
+	D_NEWTON_API virtual ~ntDynamicBody ();
+	D_NEWTON_API virtual ntDynamicBody* GetAsDynamicBody() { return this; }
 	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep);
 
 	dVector GetMassMatrix() const;
 	void SetMassMatrix(const dVector& massMatrix);
 
-	void SetMassMatrix(dFloat32 mass, const dShapeInstance& shapeInstance);
+	void SetMassMatrix(dFloat32 mass, const ntShapeInstance& shapeInstance);
 	void SetMassMatrix(dFloat32 Ixx, dFloat32 Iyy, dFloat32 Izz, dFloat32 mass);
 	void GetMassMatrix(dFloat32& Ixx, dFloat32& Iyy, dFloat32& Izz, dFloat32& mass);
 
@@ -74,32 +74,32 @@ class dDynamicBody: public dBody
 
 } D_GCC_VECTOR_ALIGNMENT;
 
-inline dVector dDynamicBody::GetForce() const
+inline dVector ntDynamicBody::GetForce() const
 {
 	return m_externalForce;
 }
 
-inline void dDynamicBody::SetForce(const dVector& force)
+inline void ntDynamicBody::SetForce(const dVector& force)
 {
 	m_externalForce = force;
 }
 
-inline dVector dDynamicBody::GetToque() const
+inline dVector ntDynamicBody::GetToque() const
 {
 	return m_externalTorque;
 }
 
-inline void dDynamicBody::SetTorque(const dVector& torque)
+inline void ntDynamicBody::SetTorque(const dVector& torque)
 {
 	m_externalTorque = torque;
 }
 
-inline dVector dDynamicBody::GetMassMatrix() const
+inline dVector ntDynamicBody::GetMassMatrix() const
 {
 	return m_mass;
 }
 
-inline void dDynamicBody::GetMassMatrix(dFloat32& Ixx, dFloat32& Iyy, dFloat32& Izz, dFloat32& mass)
+inline void ntDynamicBody::GetMassMatrix(dFloat32& Ixx, dFloat32& Iyy, dFloat32& Izz, dFloat32& mass)
 {
 	Ixx = m_mass.m_x;
 	Iyy = m_mass.m_y;
@@ -107,7 +107,7 @@ inline void dDynamicBody::GetMassMatrix(dFloat32& Ixx, dFloat32& Iyy, dFloat32& 
 	mass = m_mass.m_w;
 }
 
-inline void dDynamicBody::SetMassMatrix(const dVector& massMatrix)
+inline void ntDynamicBody::SetMassMatrix(const dVector& massMatrix)
 {
 	dMatrix inertia(dGetZeroMatrix());
 	inertia[0][0] = massMatrix.m_x;
@@ -116,12 +116,12 @@ inline void dDynamicBody::SetMassMatrix(const dVector& massMatrix)
 	SetMassMatrix(massMatrix.m_w, inertia);
 }
 
-inline void dDynamicBody::SetMassMatrix(dFloat32 Ixx, dFloat32 Iyy, dFloat32 Izz, dFloat32 mass)
+inline void ntDynamicBody::SetMassMatrix(dFloat32 Ixx, dFloat32 Iyy, dFloat32 Izz, dFloat32 mass)
 {
 	SetMassMatrix(dVector(Ixx, Iyy, Izz, mass));
 }
 
-inline void dDynamicBody::SetMassMatrix(dFloat32 mass, const dShapeInstance& shapeInstance)
+inline void ntDynamicBody::SetMassMatrix(dFloat32 mass, const ntShapeInstance& shapeInstance)
 {
 	dMatrix inertia(shapeInstance.CalculateInertia());
 

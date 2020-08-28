@@ -22,19 +22,19 @@
 #ifndef __D_CONTACT_SOLVER_H__
 #define __D_CONTACT_SOLVER_H__
 
-#include "dNewtonStdafx.h"
-#include "dShape.h"
-#include "dShapeInstance.h"
+#include "ntStdafx.h"
+#include "ntShape.h"
+#include "ntShapeInstance.h"
 
 class dPlane;
 class dContactPoint;
 
 D_MSC_VECTOR_ALIGNMENT
-class dMinkFace
+class ntMinkFace
 {
 	public:
 	dPlane m_plane;
-	dMinkFace* m_twin[3];
+	ntMinkFace* m_twin[3];
 	dInt16 m_vertex[3];
 	dInt8 m_mark;
 	dInt8 m_alive;
@@ -53,11 +53,11 @@ class dMinkFace
 class dCollisionParamProxy;
 
 D_MSC_VECTOR_ALIGNMENT
-class dContactSolver: public dDownHeap<dMinkFace *, dFloat32>  
+class ntContactSolver: public dDownHeap<ntMinkFace *, dFloat32>  
 {
 	public: 
-	dContactSolver(dCollisionParamProxy* const proxy);
-	dContactSolver(dShapeInstance* const instance0);
+	ntContactSolver(dCollisionParamProxy* const proxy);
+	ntContactSolver(ntShapeInstance* const instance0);
 
 	bool CalculateClosestPoints();
 	dInt32 CalculateConvexCastContacts();
@@ -83,10 +83,10 @@ class dContactSolver: public dDownHeap<dMinkFace *, dFloat32>
 		dgFaceFreeList* m_next;
 	};
 
-	D_INLINE dMinkFace* NewFace();
-	D_INLINE void PushFace(dMinkFace* const face);
-	D_INLINE void DeleteFace(dMinkFace* const face);
-	D_INLINE dMinkFace* AddFace(dInt32 v0, dInt32 v1, dInt32 v2);
+	D_INLINE ntMinkFace* NewFace();
+	D_INLINE void PushFace(ntMinkFace* const face);
+	D_INLINE void DeleteFace(ntMinkFace* const face);
+	D_INLINE ntMinkFace* AddFace(dInt32 v0, dInt32 v1, dInt32 v2);
 	D_INLINE void SupportVertex(const dVector& dir, dInt32 vertexIndex);
 	
 	D_INLINE void TranslateSimplex(const dVector& step);
@@ -108,8 +108,8 @@ class dContactSolver: public dDownHeap<dMinkFace *, dFloat32>
 	dVector m_closestPoint0;
 	dVector m_closestPoint1;
 	dCollisionParamProxy* m_proxy;
-	dShapeInstance* m_instance0;
-	dShapeInstance* m_instance1;
+	ntShapeInstance* m_instance0;
+	ntShapeInstance* m_instance1;
 	
 	dgFaceFreeList* m_freeFace; 
 	dInt32 m_vertexIndex;
@@ -117,11 +117,11 @@ class dContactSolver: public dDownHeap<dMinkFace *, dFloat32>
 
 	dVector m_hullDiff[D_CONVEX_MINK_MAX_POINTS];
 	dVector m_hullSum[D_CONVEX_MINK_MAX_POINTS];
-	dMinkFace* m_faceStack[D_CONVEX_MINK_STACK_SIZE];
-	dMinkFace* m_coneFaceList[D_CONVEX_MINK_STACK_SIZE];
-	dMinkFace* m_deletedFaceList[D_CONVEX_MINK_STACK_SIZE];
-	dMinkFace m_facePool[D_CONVEX_MINK_MAX_FACES];
-	dInt8 m_heapBuffer[D_CONVEX_MINK_MAX_FACES * (sizeof (dFloat32) + sizeof (dMinkFace *))];
+	ntMinkFace* m_faceStack[D_CONVEX_MINK_STACK_SIZE];
+	ntMinkFace* m_coneFaceList[D_CONVEX_MINK_STACK_SIZE];
+	ntMinkFace* m_deletedFaceList[D_CONVEX_MINK_STACK_SIZE];
+	ntMinkFace m_facePool[D_CONVEX_MINK_MAX_FACES];
+	dInt8 m_heapBuffer[D_CONVEX_MINK_MAX_FACES * (sizeof (dFloat32) + sizeof (ntMinkFace *))];
 
 	static dVector m_hullDirs[14]; 
 	static dInt32 m_rayCastSimplex[4][4];

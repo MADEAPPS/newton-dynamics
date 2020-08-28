@@ -22,16 +22,16 @@
 #ifndef __D_SHAPE_CONVEX_H__
 #define __D_SHAPE_CONVEX_H__
 
-#include "dNewtonStdafx.h"
-#include "dBody.h"
-#include "dNewton.h"
+#include "ntStdafx.h"
+#include "ntBody.h"
+#include "ntWorld.h"
 
 #define D_CLIP_MAX_COUNT				512
 #define D_CLIP_MAX_POINT_COUNT			64
 #define D_MIN_CONVEX_SHAPE_SIZE			dFloat32 (1.0f/128.0f)
 
 D_MSC_VECTOR_ALIGNMENT
-class dShapeConvex: public dShape
+class ntShapeConvex: public ntShape
 {
 	public:
 /*	
@@ -53,15 +53,15 @@ class dShapeConvex: public dShape
 		dInt32 m_vertex;
 	};
 
-	D_NEWTON_API dShapeConvex (dShapeID id);
+	D_NEWTON_API ntShapeConvex (dShapeID id);
 //	dShapeConvex (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
-	D_NEWTON_API ~dShapeConvex ();
+	D_NEWTON_API ~ntShapeConvex ();
 
-	virtual dShapeConvex* GetAsShapeConvex() { return this; }
+	virtual ntShapeConvex* GetAsShapeConvex() { return this; }
 
 	D_NEWTON_API void SetVolumeAndCG();
 	D_NEWTON_API virtual void MassProperties();
-	D_NEWTON_API virtual void DebugShape(const dMatrix& matrix, dShapeDebugCallback& debugCallback) const;
+	D_NEWTON_API virtual void DebugShape(const dMatrix& matrix, ntShapeDebugCallback& debugCallback) const;
 	D_NEWTON_API virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
 	D_NEWTON_API virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
 	

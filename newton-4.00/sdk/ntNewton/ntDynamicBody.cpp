@@ -19,9 +19,9 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dNewtonStdafx.h"
-#include "dNewton.h"
-#include "dDynamicBody.h"
+#include "ntStdafx.h"
+#include "ntWorld.h"
+#include "ntDynamicBody.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -30,20 +30,20 @@
 #define D_MINIMUM_MASS	dFloat32(1.0e-5f)
 #define D_INFINITE_MASS	dFloat32(1.0e15f)
 
-//dgVector dDynamicBody::m_equilibriumError2 (DG_ERR_TOLERANCE2);
+//dgVector ntDynamicBody::m_equilibriumError2 (DG_ERR_TOLERANCE2);
 
 /*
 dDynamicBodyAsymetric::dDynamicBodyAsymetric()
-	:dDynamicBody()
+	:ntDynamicBody()
 	, m_principalAxis(dgGetIdentityMatrix())
 {
 	m_type = m_dynamicBody;
 	m_rtti |= m_dynamicBodyAsymentricRTTI;
-	dAssert(dgInt32(sizeof(dDynamicBody) & 0x0f) == 0);
+	dAssert(dgInt32(sizeof(ntDynamicBody) & 0x0f) == 0);
 }
 
 dDynamicBodyAsymetric::dDynamicBodyAsymetric(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber)
-	:dDynamicBody(world, collisionNode, serializeCallback, userData, revisionNumber)
+	:ntDynamicBody(world, collisionNode, serializeCallback, userData, revisionNumber)
 	, m_principalAxis(dgGetIdentityMatrix())
 {
 	m_type = m_dynamicBody;
@@ -53,7 +53,7 @@ dDynamicBodyAsymetric::dDynamicBodyAsymetric(dgWorld* const world, const dgTree<
 
 void dDynamicBodyAsymetric::Serialize(const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
 {
-	dDynamicBody::Serialize(collisionRemapId, serializeCallback, userData);
+	ntDynamicBody::Serialize(collisionRemapId, serializeCallback, userData);
 	serializeCallback(userData, &m_principalAxis, sizeof(m_principalAxis));
 }
 
@@ -105,12 +105,12 @@ dgMatrix dDynamicBodyAsymetric::CalculateInvInertiaMatrix() const
 
 void dDynamicBodyAsymetric::IntegrateOpenLoopExternalForce(dFloat32 timestep)
 {
-	dDynamicBody::IntegrateOpenLoopExternalForce(timestep);
+	ntDynamicBody::IntegrateOpenLoopExternalForce(timestep);
 }
 */
 
-dDynamicBody::dDynamicBody()
-	:dBody()
+ntDynamicBody::ntDynamicBody()
+	:ntBody()
 	,m_mass(dVector::m_zero)
 	,m_invMass(dVector::m_zero)
 	,m_externalForce(dVector::m_zero)
@@ -119,11 +119,11 @@ dDynamicBody::dDynamicBody()
 	SetMassMatrix(dVector::m_zero);
 }
 
-dDynamicBody::~dDynamicBody()
+ntDynamicBody::~ntDynamicBody()
 {
 }
 
-void dDynamicBody::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
+void ntDynamicBody::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 {
 	mass = dAbs(mass);
 
@@ -131,7 +131,7 @@ void dDynamicBody::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 	//	mass = DG_INFINITE_MASS * 2.0f;
 	//}
 
-	dShape* const shape = (dShape*)m_shapeInstance.GetShape();
+	ntShape* const shape = (ntShape*)m_shapeInstance.GetShape();
 	if ((mass < D_MINIMUM_MASS) || shape->GetAsShapeNull() || !shape->GetAsShapeConvex())
 	{
 		mass = D_INFINITE_MASS * 2.0f;
@@ -216,7 +216,7 @@ void dDynamicBody::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 #endif
 }
 
-void dDynamicBody::ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep)
+void ntDynamicBody::ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep)
 {
 	m_externalForce = dVector::m_zero;
 	m_externalTorque = dVector::m_zero;

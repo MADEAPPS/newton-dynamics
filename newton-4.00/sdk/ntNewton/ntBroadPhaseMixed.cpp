@@ -19,28 +19,28 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dNewtonStdafx.h"
-#include "dBody.h"
-#include "dNewton.h"
-#include "dBroadPhaseNode.h"
-#include "dBroadPhaseMixed.h"
+#include "ntStdafx.h"
+#include "ntBody.h"
+#include "ntWorld.h"
+#include "ntBroadPhaseNode.h"
+#include "ntBroadPhaseMixed.h"
 
-dBroadPhaseMixed::dBroadPhaseMixed(dNewton* const world)
-	:dBroadPhase(world)
+ntBroadPhaseMixed::ntBroadPhaseMixed(ntWorld* const world)
+	:ntBroadPhase(world)
 	,m_treeEntropy(dFloat32(0.0f))
 	,m_fitness()
 {
 }
 
-dBroadPhaseMixed::~dBroadPhaseMixed()
+ntBroadPhaseMixed::~ntBroadPhaseMixed()
 {
 }
 
-void dBroadPhaseMixed::AddNode(dBroadPhaseNode* const newNode)
+void ntBroadPhaseMixed::AddNode(ntBroadPhaseNode* const newNode)
 {
 	if (m_rootNode) 
 	{
-		dBroadPhaseTreeNode* const node = InsertNode(m_rootNode, newNode);
+		ntBroadPhaseTreeNode* const node = InsertNode(m_rootNode, newNode);
 		node->m_fitnessNode = m_fitness.Append(node);
 		if (!node->m_parent) 
 		{
@@ -53,16 +53,16 @@ void dBroadPhaseMixed::AddNode(dBroadPhaseNode* const newNode)
 	}
 }
 
-void dBroadPhaseMixed::RemoveNode(dBroadPhaseNode* const node)
+void ntBroadPhaseMixed::RemoveNode(ntBroadPhaseNode* const node)
 {
 	if (node->m_parent) 
 	{
 		if (!node->m_parent->GetAsBroadPhaseAggregate()) 
 		{
-			dBroadPhaseTreeNode* const parent = (dBroadPhaseTreeNode*)node->m_parent;
+			ntBroadPhaseTreeNode* const parent = (ntBroadPhaseTreeNode*)node->m_parent;
 			if (parent->m_parent) 
 			{
-				dBroadPhaseAggregate* const aggregate = parent->m_parent->GetAsBroadPhaseAggregate();
+				ntBroadPhaseAggregate* const aggregate = parent->m_parent->GetAsBroadPhaseAggregate();
 				if (aggregate)
 				{
 					dAssert(0);
@@ -86,7 +86,7 @@ void dBroadPhaseMixed::RemoveNode(dBroadPhaseNode* const node)
 				}
 				else 
 				{
-					dBroadPhaseTreeNode* const grandParent = (dBroadPhaseTreeNode*)parent->m_parent;
+					ntBroadPhaseTreeNode* const grandParent = (ntBroadPhaseTreeNode*)parent->m_parent;
 					if (grandParent->m_left == parent) 
 					{
 						if (parent->m_right == node) 
@@ -126,7 +126,7 @@ void dBroadPhaseMixed::RemoveNode(dBroadPhaseNode* const node)
 			else 
 			{
 				dAssert(!node->m_parent->GetAsBroadPhaseBodyNode());
-				dBroadPhaseTreeNode* const parent1 = node->m_parent->GetAsBroadPhaseTreeNode();
+				ntBroadPhaseTreeNode* const parent1 = node->m_parent->GetAsBroadPhaseTreeNode();
 				if (parent1->m_right == node) 
 				{
 					m_rootNode = parent1->m_left;
@@ -143,7 +143,7 @@ void dBroadPhaseMixed::RemoveNode(dBroadPhaseNode* const node)
 
 			if (parent->m_fitnessNode) 
 			{
-				dBody* const body = node->GetBody();
+				ntBody* const body = node->GetBody();
 				if (body && body->GetBroadPhaseAggregate()) 
 				{
 					dAssert(0);
@@ -180,17 +180,17 @@ void dBroadPhaseMixed::RemoveNode(dBroadPhaseNode* const node)
 }
 
 
-void dBroadPhaseMixed::AddBody(dBody* const body)
+void ntBroadPhaseMixed::AddBody(ntBody* const body)
 {
 	body->UpdateCollisionMatrix();
-	dBroadPhaseBodyNode* const bodyNode = new dBroadPhaseBodyNode(body);
+	ntBroadPhaseBodyNode* const bodyNode = new ntBroadPhaseBodyNode(body);
 //	bodyNode->m_updateNode = m_updateList.Append(bodyNode);
 	AddNode(bodyNode);
 }
 
-void dBroadPhaseMixed::RemoveBody(dBody* const body)
+void ntBroadPhaseMixed::RemoveBody(ntBody* const body)
 {
-	dBroadPhaseBodyNode* const node = body->GetBroadPhaseNode();
+	ntBroadPhaseBodyNode* const node = body->GetBroadPhaseNode();
 	if (node)
 	{
 		//if (node->m_updateNode) 
@@ -201,7 +201,7 @@ void dBroadPhaseMixed::RemoveBody(dBody* const body)
 	}
 }
 
-void dBroadPhaseMixed::BalanceBroadPhase()
+void ntBroadPhaseMixed::BalanceBroadPhase()
 {
 	UpdateFitness(m_fitness, m_treeEntropy, &m_rootNode);
 }
