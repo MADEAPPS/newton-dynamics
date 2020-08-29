@@ -23,7 +23,7 @@
 #include "ntBody.h"
 #include "ntWorld.h"
 #include "ntShapeNull.h"
-#include "ntDynamicBody.h"
+#include "ntBodyDynamic.h"
 #include "ntBroadPhaseMixed.h"
 
 ntWorld::ntWorld()
@@ -79,7 +79,7 @@ ntWorld::~ntWorld()
 	}
 	delete m_broadPhase;
 
-	ntDynamicBody::ReleaseMemory();
+	ntBodyDynamic::ReleaseMemory();
 }
 
 void ntWorld::AddBody(ntBody* const body)
@@ -171,7 +171,7 @@ void ntWorld::BuildBodyArray()
 	m_dynamicBodyArray.SetCount(m_bodyList.GetCount());
 	for (dList<ntBody*>::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
-		ntDynamicBody* const dynBody = node->GetInfo()->GetAsDynamicBody();
+		ntBodyDynamic* const dynBody = node->GetInfo()->GetAsDynamicBody();
 		if (dynBody)
 		{
 			m_dynamicBodyArray[index] = dynBody;
@@ -241,7 +241,7 @@ void ntWorld::ApplyExternalForces(dFloat32 timestep)
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 count = m_newton->m_dynamicBodyArray.GetCount();
-			ntDynamicBody** const bodies = &m_newton->m_dynamicBodyArray[0];
+			ntBodyDynamic** const bodies = &m_newton->m_dynamicBodyArray[0];
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
 				bodies[i]->ApplyExternalForces(threadIndex, m_timestep);

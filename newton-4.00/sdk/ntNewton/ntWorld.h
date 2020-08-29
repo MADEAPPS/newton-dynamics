@@ -24,7 +24,7 @@
 
 class ntBody;
 class ntBroadPhase;
-class ntDynamicBody;
+class ntBodyDynamic;
 
 D_MSC_VECTOR_ALIGNMENT
 class ntWorld
@@ -83,7 +83,7 @@ class ntWorld
 	void SubmitJobs(dFloat32 timestep);
 
 	dList<ntBody*> m_bodyList;
-	dArray<ntDynamicBody*> m_dynamicBodyArray;
+	dArray<ntBodyDynamic*> m_dynamicBodyArray;
 	ntBroadPhase* m_broadPhase;
 	dFloat32 m_timestep;
 	dInt32 m_subSteps;

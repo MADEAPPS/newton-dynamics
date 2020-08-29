@@ -22,7 +22,7 @@
 #include "ntStdafx.h"
 #include "ntWorld.h"
 #include "ntContact.h"
-#include "ntDynamicBody.h"
+#include "ntBodyDynamic.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -33,7 +33,7 @@
 
 //dgVector ntDynamicBody::m_equilibriumError2 (DG_ERR_TOLERANCE2);
 
-ntDynamicBody::ntDynamicBody()
+ntBodyDynamic::ntBodyDynamic()
 	:ntBody()
 	,m_mass(dVector::m_zero)
 	,m_invMass(dVector::m_zero)
@@ -45,33 +45,33 @@ ntDynamicBody::ntDynamicBody()
 	SetMassMatrix(dVector::m_zero);
 }
 
-ntDynamicBody::~ntDynamicBody()
+ntBodyDynamic::~ntBodyDynamic()
 {
 }
 
-void ntDynamicBody::ReleaseMemory()
+void ntBodyDynamic::ReleaseMemory()
 {
 	ntContactMap::FlushFreeList();
 }
 
-ntContact* ntDynamicBody::FindContact(const ntBody* const otherBody) const
+ntContact* ntBodyDynamic::FindContact(const ntBody* const otherBody) const
 {
 	return m_contactList.FindContact(this, otherBody);
 }
 
-D_NEWTON_API void ntDynamicBody::AttachContact(ntContact* const contact)
+D_NEWTON_API void ntBodyDynamic::AttachContact(ntContact* const contact)
 {
 	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
 	m_contactList.AttachContact(contact);
 }
 
-void ntDynamicBody::DetachContact(ntContact* const contact)
+void ntBodyDynamic::DetachContact(ntContact* const contact)
 {
 	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
 	m_contactList.DetachContact(contact);
 }
 
-void ntDynamicBody::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
+void ntBodyDynamic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 {
 	mass = dAbs(mass);
 
@@ -164,7 +164,7 @@ void ntDynamicBody::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 #endif
 }
 
-void ntDynamicBody::ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep)
+void ntBodyDynamic::ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep)
 {
 	m_externalForce = dVector::m_zero;
 	m_externalTorque = dVector::m_zero;

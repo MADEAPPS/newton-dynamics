@@ -66,7 +66,7 @@ class DemobodyNotify: public ntBodyNotify
 	public:
 	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
 	{
-		ntDynamicBody* const body = m_body->GetAsDynamicBody();
+		ntBodyDynamic* const body = m_body->GetAsDynamicBody();
 		dAssert(body);
 
 		dVector massMatrix (body->GetMassMatrix());
@@ -111,7 +111,7 @@ void BuildPyramid(ntWorld& world, dFloat32 mass, const dVector& origin, const dV
 		const dInt32 count1 = count - j;
 		for (int i = 0; i < count1; i++)
 		{
-			ntDynamicBody* const body = new ntDynamicBody();
+			ntBodyDynamic* const body = new ntBodyDynamic();
 
 			body->SetNotifyCallback(new DemobodyNotify);
 			
@@ -131,7 +131,7 @@ int main (int argc, const char * argv[])
 {
 	ntWorld world;
 	world.SetSubSteps(2);
-	//world.SetThreadCount(8);
+	world.SetThreadCount(8);
 		
 	dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
 	dVector origin(0.5f, 0.25f, 0.8f, 0.0f);

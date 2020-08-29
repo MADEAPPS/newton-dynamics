@@ -19,11 +19,13 @@
 #include <ntBody.h>
 #include <ntShape.h>
 #include <ntWorld.h>
+#include <ntContact.h>
 #include <ntShapeBox.h>
 #include <ntShapeNull.h>
+#include <ntConstraint.h>
 #include <ntBroadPhase.h>
 #include <ntShapeConvex.h>
-#include <ntDynamicBody.h>
+#include <ntBodyDynamic.h>
 #include <ntContactList.h>
 #include <ntContactSolver.h>
 #include <ntShapeInstance.h>

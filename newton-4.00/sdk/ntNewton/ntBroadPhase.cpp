@@ -23,7 +23,7 @@
 #include "ntWorld.h"
 #include "ntBody.h"
 #include "ntBroadPhase.h"
-#include "ntDynamicBody.h"
+#include "ntBodyDynamic.h"
 
 D_MSC_VECTOR_ALIGNMENT
 class ntBroadPhase::ntSpliteInfo
@@ -672,7 +672,7 @@ void ntBroadPhase::SubmitPairs(ntBroadPhaseNode* const leafNode, ntBroadPhaseNod
 	pool[0] = node;
 	dInt32 stack = 1;
 
-	ntDynamicBody* const body0 = leafNode->GetBody() ? leafNode->GetBody()->GetAsDynamicBody() : nullptr;
+	ntBodyDynamic* const body0 = leafNode->GetBody() ? leafNode->GetBody()->GetAsDynamicBody() : nullptr;
 	const dVector boxP0(body0 ? body0->m_minAABB : leafNode->m_minBox);
 	const dVector boxP1(body0 ? body0->m_maxAABB : leafNode->m_maxBox);
 	const bool test0 = body0 ? (body0->m_invMass.m_w != dFloat32(0.0f)) : true;
@@ -687,7 +687,7 @@ void ntBroadPhase::SubmitPairs(ntBroadPhaseNode* const leafNode, ntBroadPhaseNod
 			{
 				dAssert(!rootNode->GetRight());
 				dAssert(!rootNode->GetLeft());
-				ntDynamicBody* const body1 = rootNode->GetBody() ? rootNode->GetBody()->GetAsDynamicBody() : nullptr;
+				ntBodyDynamic* const body1 = rootNode->GetBody() ? rootNode->GetBody()->GetAsDynamicBody() : nullptr;
 				if (body0) 
 				{
 					if (body1) 
@@ -902,7 +902,7 @@ void ntBroadPhase::UpdateAabb(dFloat32 timestep)
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 threadsCount = m_newton->GetThreadCount();
 			const dInt32 count = m_newton->m_dynamicBodyArray.GetCount();
-			ntDynamicBody** const bodies = &m_newton->m_dynamicBodyArray[0];
+			ntBodyDynamic** const bodies = &m_newton->m_dynamicBodyArray[0];
 			ntBroadPhase* const broadPhase = m_newton->m_broadPhase;
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
@@ -925,7 +925,7 @@ void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 threadsCount = m_newton->GetThreadCount();
 			const dInt32 count = m_newton->m_dynamicBodyArray.GetCount();
-			ntDynamicBody** const bodies = &m_newton->m_dynamicBodyArray[0];
+			ntBodyDynamic** const bodies = &m_newton->m_dynamicBodyArray[0];
 			ntBroadPhase* const broadPhase = m_newton->m_broadPhase;
 			
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
