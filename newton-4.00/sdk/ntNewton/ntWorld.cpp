@@ -144,15 +144,14 @@ void ntWorld::InternalUpdate(dFloat32 fullTimestep)
 void ntWorld::BuildBodyArray()
 {
 	D_TRACKTIME();
-	m_dynamicBodyArray.SetCount(m_bodyList.GetCount());
-	ntDynamicBody** const bodyPtr = &m_dynamicBodyArray[0];
 	int index = 0;
+	m_dynamicBodyArray.SetCount(m_bodyList.GetCount());
 	for (dList<ntBody*>::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
 		ntDynamicBody* const dynBody = node->GetInfo()->GetAsDynamicBody();
 		if (dynBody)
 		{
-			bodyPtr[index] = dynBody;
+			m_dynamicBodyArray[index] = dynBody;
 			index++;
 
 			const ntShape* const shape = ((ntShape*)dynBody->GetCollisionShape().GetShape())->GetAsShapeNull();

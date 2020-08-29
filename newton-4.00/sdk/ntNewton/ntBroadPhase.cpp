@@ -872,7 +872,7 @@ void ntBroadPhase::AddPair(ntBody* const body0, ntBody* const body1, const dFloa
 				dInt32 index = m_scannedContactCount.fetch_add(1);
 				if (index < m_scannedContact.GetCapacity()) 
 				{
-					m_scannedContact.PushBack(contact);
+					m_scannedContact[index] = contact;
 				}
 				else
 				{
@@ -932,19 +932,23 @@ void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
 	};
 
 	m_fullScan = true;
-	m_scannedContact.Clear();
 	m_scannedContactExtra.Clear();
 	m_scannedContactCount.store(0);
+	m_scannedContact.SetCount(m_scannedContact.GetCapacity());
 	m_newton->SubmitJobs<ntFindCollidindPairs>(timestep);
 
 	const dInt32 extraCount = m_scannedContactExtra.GetCount();
 	if (extraCount)
 	{
-		ntContact** const srcPtr = &m_scannedContactExtra[0];
-		for (dInt32 i = 0; i < extraCount; i++)
-		{
-			m_scannedContact.PushBack(srcPtr[i]);
-		}
+		dInt32 index = m_scannedContact.GetCapacity();
+		m_scannedContact.SetCount(index + extraCount);
+		memcpy(&m_scannedContact[index], &m_scannedContactExtra[0], extraCount * sizeof(ntContact*));
+		m_scannedContactExtra.Clear();
 		m_scannedContactExtra.Resize(256);
+	}
+	else
+	{
+		dAssert(m_scannedContactCount.load() < m_scannedContact.GetCapacity());
+		m_scannedContact.SetCount(m_scannedContactCount.load());
 	}
 }

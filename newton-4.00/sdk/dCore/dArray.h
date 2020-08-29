@@ -40,24 +40,15 @@ class dArray
 
 	dInt32 GetCount() const;
 	void SetCount(dInt32 count);
-	dInt32 GetCapacity() const;
 
 	void Clear();
 	void Resize(dInt32 count);
-	void ResizeIfNecessary(dInt32 count);
-
-//	DG_CLASS_ALLOCATOR(allocator)
+	dInt32 GetCapacity() const;
 	
 	T& operator[] (dInt32 i);
 	const T& operator[] (dInt32 i) const;
 
 	void PushBack(T& element);
-
-	//dInt32 GetElementSize() const;
-	//dInt32 GetBytesCapacity () const;
-	//dInt32 GetElementsCapacity () const; 
-	//dgMemoryAllocator* GetAllocator() const;
-	//void SetAllocator(dgMemoryAllocator* const allocator);
 
 	protected:
 	T* m_array;
@@ -65,62 +56,15 @@ class dArray
 	private:
 	dInt32 m_size;
 	dInt32 m_capacity;
-//	dInt32 m_aligmentInBytes;
 };
 
 template<class T>
 dArray<T>::dArray()
-	:m_array(NULL)
+	:m_array(nullptr)
 	,m_size(0)
 	,m_capacity(0)
 {
 }
-
-/*
-template<class T>
-dArray<T>::dArray (dgMemoryAllocator* const allocator, dInt32 aligmentInBytes)
-	:m_array(NULL)
-	,m_maxSize(0)
-	,m_aligmentInBytes(aligmentInBytes)
-	,m_allocator(allocator)
-{
-	if (m_aligmentInBytes <= 0) {
-		m_aligmentInBytes = DG_MEMORY_GRANULARITY;
-	}
-	m_aligmentInBytes = 1 << dgExp2(m_aligmentInBytes);
-}
-
-template<class T>
-dArray<T>::dArray (const dArray& source, dInt32 itemsToCopy)
-	:m_array(NULL)
-	,m_maxSize(itemsToCopy)
-	,m_aligmentInBytes(source.m_aligmentInBytes)
-	,m_allocator(source.m_allocator)
-{
-	if (source.m_array) {
-		m_array = (T*) m_allocator->MallocLow (sizeof (T) * itemsToCopy, m_aligmentInBytes);
-		for (dInt32 i = 0; i < itemsToCopy; i++) {
-			m_array[i] = source.m_array[i];
-		}
-	}
-}
-template<class T>
-dArray<T>::dArray(const dArray& source)
-	:m_array(NULL)
-	,m_maxSize(source.m_maxSize)
-	,m_aligmentInBytes(source.m_aligmentInBytes)
-	,m_allocator(source.m_allocator)
-{
-	dgAssert(0);
-	// use dArray<T>::dArray(const dArray& source, dInt32 itemsToCopy)
-	if (source.m_array) {
-		m_array = (T*)m_allocator->MallocLow(sizeof(T) * m_maxSize, m_aligmentInBytes);
-		for (dInt32 i = 0; i < m_maxSize; i++) {
-			m_array[i] = source.m_array[i];
-		}
-	}
-}
-*/
 
 template<class T>
 dArray<T>::~dArray ()
@@ -135,11 +79,7 @@ template<class T>
 const T& dArray<T>::operator[] (dInt32 i) const
 {
 	dAssert(i >= 0);
-	while (i >= m_capacity) 
-	{
-		dAssert(0);
-		//Resize(i * 2);
-	}
+	dAssert(i < m_size);
 	return m_array[i];
 }
 
@@ -147,19 +87,21 @@ template<class T>
 T& dArray<T>::operator[] (dInt32 i)
 {
 	dAssert(i >= 0);
-	while (i >= m_capacity) 
-	{
-		Resize(i * 2);
-	}
+	dAssert(i < m_size);
 	return m_array[i];
 }
 
 template<class T>
 void dArray<T>::PushBack(T& element)
 {
-	dArray<T>& me = *this;
-	me[m_size] = element;
+	dAssert(m_size <= m_capacity);
+	if (m_size == m_capacity)
+	{
+		Resize(m_capacity * 2);
+	}
+	dInt32 index = m_size;
 	m_size++;
+	(*this)[index] = element;
 }
 
 template<class T>
@@ -171,8 +113,11 @@ dInt32 dArray<T>::GetCount() const
 template<class T>
 void dArray<T>::SetCount(dInt32 count)
 {
-	ResizeIfNecessary(count);
 	m_size = count;
+	while (m_size > m_capacity)
+	{
+		Resize(m_capacity * 2);
+	}
 }
 
 template<class T>
@@ -221,49 +166,6 @@ void dArray<T>::Resize(dInt32 size)
 		m_capacity = size;
 	}
 }
-
-template<class T>
-void dArray<T>::ResizeIfNecessary(dInt32 size)
-{
-	while (size >= m_capacity) 
-	{
-		Resize(m_capacity * 2);
-	}
-}
-
-/*
-template<class T>
-dInt32 dArray<T>::GetElementSize() const
-{
-	return sizeof (T);
-}
-
-template<class T>
-dInt32 dArray<T>::GetElementsCapacity () const
-{
-	return m_maxSize;
-}
-
-template<class T>
-dInt32 dArray<T>::GetBytesCapacity () const
-{
-	return  m_maxSize * GetElementSize();
-}
-
-
-template<class T>
-dgMemoryAllocator* dArray<T>::GetAllocator() const
-{
-	return m_allocator;
-}
-
-template<class T>
-void dArray<T>::SetAllocator(dgMemoryAllocator* const allocator)
-{
-	dgAssert (!m_allocator);
-	m_allocator = allocator;
-}
-*/
 
 #endif
 

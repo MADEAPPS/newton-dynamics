@@ -26,6 +26,7 @@
 
 #define D_CONTACT_CACHE_LINE_SIZE 4
 
+#if 0
 class ntContact;
 
 class ntCacheEntryTag
@@ -87,7 +88,7 @@ class ntContactCache: public dArray<ntContactCacheLine>
 	void Init()
 	{
 		m_count = 1 << 10;
-		ResizeIfNecessary(m_count);
+		Resize(m_count);
 		ntContactCacheLine* const cache = &(*this)[0];
 		memset(cache, 0, m_count * sizeof(ntContactCacheLine));
 	}
@@ -174,7 +175,7 @@ class ntContactCache: public dArray<ntContactCacheLine>
 	void Rehash()
 	{
 		const dInt32 newCount = m_count * 2;
-		ResizeIfNecessary(newCount);
+		Resize(newCount);
 		ntContactCacheLine* const cache0 = &(*this)[0];
 		ntContactCacheLine* const cache1 = &cache0[m_count];
 
@@ -208,5 +209,5 @@ class ntContactCache: public dArray<ntContactCacheLine>
 
 	dInt32 m_count;
 };
-
+#endif
 #endif
