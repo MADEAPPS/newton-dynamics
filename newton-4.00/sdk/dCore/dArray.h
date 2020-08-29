@@ -36,13 +36,11 @@ class dArray
 {
 	public:
 	dArray ();
-	//dArray (dgMemoryAllocator* const allocator, dInt32 aligmentInBytes = DG_MEMORY_GRANULARITY);
-	//dArray (const dArray& source, dInt32 itemsToCopy);
-	//dArray(const dArray& source);
 	~dArray ();
 
 	dInt32 GetCount() const;
 	void SetCount(dInt32 count);
+	dInt32 GetCapacity() const;
 
 	void Clear();
 	void Resize(dInt32 count);
@@ -137,9 +135,10 @@ template<class T>
 const T& dArray<T>::operator[] (dInt32 i) const
 {
 	dAssert(i >= 0);
-	while (i >= m_maxSize) 
+	while (i >= m_capacity) 
 	{
-		Resize(i * 2);
+		dAssert(0);
+		//Resize(i * 2);
 	}
 	return m_array[i];
 }
@@ -174,6 +173,12 @@ void dArray<T>::SetCount(dInt32 count)
 {
 	ResizeIfNecessary(count);
 	m_size = count;
+}
+
+template<class T>
+dInt32 dArray<T>::GetCapacity() const
+{
+	return m_capacity;
 }
 
 template<class T>
@@ -225,7 +230,6 @@ void dArray<T>::ResizeIfNecessary(dInt32 size)
 		Resize(m_capacity * 2);
 	}
 }
-
 
 /*
 template<class T>

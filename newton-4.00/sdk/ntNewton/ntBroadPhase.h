@@ -23,11 +23,14 @@
 #define __D_BROADPHASE_H__
 
 #include "ntStdafx.h"
+//#include "ntContactCache.h"
 #include "ntBroadPhaseNode.h"
 
 #define D_BROADPHASE_MAX_STACK_DEPTH	256
 
 class ntWorld;
+class ntContact;
+class ntBilateralJoint;
 
 D_MSC_VECTOR_ALIGNMENT
 class ntBroadPhase: public dClassAlloc
@@ -76,13 +79,20 @@ class ntBroadPhase: public dClassAlloc
 	D_NEWTON_API ntBroadPhaseTreeNode* InsertNode (ntBroadPhaseNode* const root, ntBroadPhaseNode* const node);
 	D_NEWTON_API void UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, ntBroadPhaseNode** const root);
 
-	//void SubmitPairs(ntBody* const body, ntBroadPhaseNode* const node, dFloat32 timestep, dInt32 threadCount, dInt32 threadID);
+	ntContact* FindContactJoint(ntBody* const body0, ntBody* const body1) const;
+	ntBilateralJoint* FindBilateralJoint(ntBody* const body0, ntBody* const body1) const;
+
 	void AddPair(ntBody* const body0, ntBody* const body1, const dFloat32 timestep);
 	bool TestOverlaping(const ntBody* const body0, const ntBody* const body1, dFloat32 timestep) const;
 	void SubmitPairs(ntBroadPhaseNode* const leaftNode, ntBroadPhaseNode* const node, dFloat32 timestep);
 	
 	ntWorld* m_newton;
 	ntBroadPhaseNode* m_rootNode;
+	//ntContactCache m_contactCache;
+	dSpinLock m_scannedContactLock;
+	dArray<ntContact*> m_scannedContact;
+	dArray<ntContact*> m_scannedContactExtra;
+	std::atomic<dInt32> m_scannedContactCount;
 	bool m_fullScan;
 } D_GCC_VECTOR_ALIGNMENT;
 

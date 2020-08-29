@@ -26,7 +26,9 @@
 #include "ntShapeInstance.h"
 
 class ntWorld;
+class ntContact;
 class ntDynamicBody;
+class ntBilateralJoint;
 class ntBroadPhaseBodyNode;
 class ntBroadPhaseAggregate;
 
@@ -66,8 +68,9 @@ class ntBody: public dClassAlloc
 	D_NEWTON_API ntBody();
 	D_NEWTON_API virtual ~ntBody();
 
-	D_NEWTON_API virtual ntBody* GetAsBody() { return this;}
-	D_NEWTON_API virtual ntDynamicBody* GetAsDynamicBody() { return nullptr; }
+	dUnsigned32 GetID() const { return m_uniqueID; }
+	virtual ntBody* GetAsBody() { return this;}
+	virtual ntDynamicBody* GetAsDynamicBody() { return nullptr; }
 
 	D_NEWTON_API const ntShapeInstance& GetCollisionShape() const;
 	D_NEWTON_API void SetCollisionShape(const ntShapeInstance& shapeInstance);
@@ -111,8 +114,10 @@ class ntBody: public dClassAlloc
 	dVector m_globalCentreOfMass;
 	dVector m_minAABB;
 	dVector m_maxAABB;
-
 	dQuaternion m_rotation;
+
+	dArray<ntBilateralJoint*> m_jointArray;
+	dTree<ntContact*, dUnsigned32> m_contactList;
 	ntBodyNotify* m_notifyCallback;
 	ntWorld* m_newton;
 	ntBroadPhaseBodyNode* m_broadPhaseNode;

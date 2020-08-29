@@ -25,6 +25,8 @@
 #include "ntBroadPhase.h"
 #include "ntDynamicBody.h"
 
+#define D_CONTACT_CACHE_LINE_SIZE 4
+
 D_MSC_VECTOR_ALIGNMENT
 class ntBroadPhase::ntSpliteInfo
 {
@@ -154,6 +156,10 @@ ntBroadPhase::ntBroadPhase(ntWorld* const world)
 	:dClassAlloc()
 	,m_newton(world)
 	,m_rootNode(nullptr)
+	,m_scannedContactLock()
+	,m_scannedContact()
+	,m_scannedContactExtra()
+	,m_scannedContactCount()
 	,m_fullScan(true)
 {
 }
@@ -737,10 +743,10 @@ bool ntBroadPhase::TestOverlaping(const ntBody* const body0, const ntBody* const
 {
 	//bool mass0 = (body0->m_invMass.m_w != dgFloat32(0.0f));
 	//bool mass1 = (body1->m_invMass.m_w != dgFloat32(0.0f));
-	//bool isDynamic0 = body0->IsRTTIType(dgBody::m_dynamicBodyRTTI) != 0;
-	//bool isDynamic1 = body1->IsRTTIType(dgBody::m_dynamicBodyRTTI) != 0;
-	//bool isKinematic0 = body0->IsRTTIType(dgBody::m_kinematicBodyRTTI) != 0;
-	//bool isKinematic1 = body1->IsRTTIType(dgBody::m_kinematicBodyRTTI) != 0;
+	//bool isDynamic0 = body0->IsRTTIType(ntBody::m_dynamicBodyRTTI) != 0;
+	//bool isDynamic1 = body1->IsRTTIType(ntBody::m_dynamicBodyRTTI) != 0;
+	//bool isKinematic0 = body0->IsRTTIType(ntBody::m_kinematicBodyRTTI) != 0;
+	//bool isKinematic1 = body1->IsRTTIType(ntBody::m_kinematicBodyRTTI) != 0;
 	//
 	//dAssert(!body0->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
 	//dAssert(!body1->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
@@ -791,6 +797,17 @@ bool ntBroadPhase::TestOverlaping(const ntBody* const body0, const ntBody* const
 	return dOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? true : false;
 }
 
+ntContact* ntBroadPhase::FindContactJoint(ntBody* const body0, ntBody* const body1) const
+{
+//	dAssert(0);
+	return nullptr;
+}
+
+ntBilateralJoint* ntBroadPhase::FindBilateralJoint(ntBody* const body0, ntBody* const body1) const
+{
+	dAssert(0);
+	return nullptr;
+}
 
 void ntBroadPhase::AddPair(ntBody* const body0, ntBody* const body1, const dFloat32 timestep)
 {
@@ -799,54 +816,71 @@ void ntBroadPhase::AddPair(ntBody* const body0, ntBody* const body1, const dFloa
 	const bool test = TestOverlaping(body0, body1, timestep);
 	if (test) 
 	{
-		dAssert(0);
-	//	dgContact* contact = m_contactCache.FindContactJoint(body0, body1);
-	//	if (!contact) {
-	//		const dgBilateralConstraint* const bilateral = m_world->FindBilateralJoint(body0, body1);
-	//		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
-	//
-	//		if (isCollidable) {
-	//			dgUnsigned32 group0_ID = dgUnsigned32(body0->m_bodyGroupId);
-	//			dgUnsigned32 group1_ID = dgUnsigned32(body1->m_bodyGroupId);
-	//
-	//			if (group1_ID < group0_ID) {
-	//				dgSwap(group0_ID, group1_ID);
-	//			}
-	//
-	//			dgUnsigned32 key = (group1_ID << 16) + group0_ID;
-	//			const dgBodyMaterialList* const materialList = m_world;
-	//			dAssert(materialList->Find(key));
-	//			const dgContactMaterial* const material = &materialList->Find(key)->GetInfo();
-	//
-	//			if (material->m_flags & dgContactMaterial::m_collisionEnable) {
-	//
-	//				dgInt32 isBody0Kinematic = body0->IsRTTIType(dgBody::m_kinematicBodyRTTI);
-	//				dgInt32 isBody1Kinematic = body1->IsRTTIType(dgBody::m_kinematicBodyRTTI);
-	//
-	//				const dgInt32 kinematicTest = !((isBody0Kinematic && isBody1Kinematic) || ((isBody0Kinematic && body0->IsCollidable()) || (isBody1Kinematic && body1->IsCollidable())));
-	//				const dgInt32 collisionTest = kinematicTest && !(body0->m_isdead | body1->m_isdead) && !(body0->m_equilibrium & body1->m_equilibrium);
-	//				if (collisionTest) {
-	//					const dgInt32 isSofBody0 = body0->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
-	//					const dgInt32 isSofBody1 = body1->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
-	//
-	//					if (isSofBody0 || isSofBody1) {
-	//						m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body0 = body0;
-	//						m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body1 = body1;
-	//						m_pendingSoftBodyPairsCount++;
-	//					}
-	//					else {
-	//						dgContactList& contactList = *m_world;
-	//						dgAtomicExchangeAndAdd(&contactList.m_contactCountReset, 1);
-	//						if (contactList.m_contactCount < contactList.GetElementsCapacity()) {
-	//							contact = new (m_world->m_allocator) dgContact(m_world, material, body0, body1);
-	//							dAssert(contact);
-	//							contactList.Push(contact);
-	//						}
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
+		//ntContact* contact = m_contactCache.FindContactJoint(body0, body1);
+		ntContact* contact = FindContactJoint(body0, body1);
+		if (!contact) 
+		{
+			//dAssert(0);
+			//const ntBilateralJoint* const bilateral = FindBilateralJoint(body0, body1);
+			//const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
+			const bool isCollidable = true;
+	
+			if (isCollidable) 
+			{
+				//dUnsigned32 group0_ID = dUnsigned32(body0->m_bodyGroupId);
+				//dUnsigned32 group1_ID = dUnsigned32(body1->m_bodyGroupId);
+				//if (group1_ID < group0_ID) {
+				//	dgSwap(group0_ID, group1_ID);
+				//}
+				//dUnsigned32 key = (group1_ID << 16) + group0_ID;
+				//const ntBodyMaterialList* const materialList = m_world;
+				//dAssert(materialList->Find(key));
+				//const ntContactMaterial* const material = &materialList->Find(key)->GetInfo();
+				//if (material->m_flags & ntContactMaterial::m_collisionEnable) 
+				//{
+				//	dInt32 isBody0Kinematic = body0->IsRTTIType(ntBody::m_kinematicBodyRTTI);
+				//	dInt32 isBody1Kinematic = body1->IsRTTIType(ntBody::m_kinematicBodyRTTI);
+				//
+				//	const dInt32 kinematicTest = !((isBody0Kinematic && isBody1Kinematic) || ((isBody0Kinematic && body0->IsCollidable()) || (isBody1Kinematic && body1->IsCollidable())));
+				//	const dInt32 collisionTest = kinematicTest && !(body0->m_isdead | body1->m_isdead) && !(body0->m_equilibrium & body1->m_equilibrium);
+				//	if (collisionTest) 
+				//	{
+				//		const dInt32 isSofBody0 = body0->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
+				//		const dInt32 isSofBody1 = body1->m_collision->IsType(dgCollision::dgCollisionLumpedMass_RTTI);
+				//
+				//		if (isSofBody0 || isSofBody1) 
+				//		{
+				//			m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body0 = body0;
+				//			m_pendingSoftBodyCollisions[m_pendingSoftBodyPairsCount].m_body1 = body1;
+				//			m_pendingSoftBodyPairsCount++;
+				//		}
+				//		else 
+				//		{
+				//			ntContactList& contactList = *m_world;
+				//			dgAtomicExchangeAndAdd(&contactList.m_contactCountReset, 1);
+				//			if (contactList.m_contactCount < contactList.GetElementsCapacity()) 
+				//			{
+				//				contact = new (m_world->m_allocator) ntContact(m_world, material, body0, body1);
+				//				dAssert(contact);
+				//				contactList.Push(contact);
+				//			}
+				//		}
+				//	}
+				//}
+
+				contact = (ntContact*)100;
+				dInt32 index = m_scannedContactCount.fetch_add(1);
+				if (index < m_scannedContact.GetCapacity()) 
+				{
+					m_scannedContact.PushBack(contact);
+				}
+				else
+				{
+					dScopeSpinLock lock(m_scannedContactLock);
+					m_scannedContactExtra.PushBack(contact);
+				}
+			}
+		}
 	}
 }
 
@@ -898,5 +932,19 @@ void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
 	};
 
 	m_fullScan = true;
+	m_scannedContact.Clear();
+	m_scannedContactExtra.Clear();
+	m_scannedContactCount.store(0);
 	m_newton->SubmitJobs<ntFindCollidindPairs>(timestep);
+
+	const dInt32 extraCount = m_scannedContactExtra.GetCount();
+	if (extraCount)
+	{
+		ntContact** const srcPtr = &m_scannedContactExtra[0];
+		for (dInt32 i = 0; i < extraCount; i++)
+		{
+			m_scannedContact.PushBack(srcPtr[i]);
+		}
+		m_scannedContactExtra.Resize(256);
+	}
 }
