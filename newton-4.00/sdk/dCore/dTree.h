@@ -263,6 +263,12 @@ class dTree
 
 	bool SanityCheck () const;
 
+	static void FlushFreeList()
+	{
+		allocator::FlushFreeList();
+	}
+
+
 	// ***********************************************************
 	// member variables
 	// ***********************************************************

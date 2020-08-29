@@ -21,6 +21,7 @@
 
 #include "ntStdafx.h"
 #include "ntWorld.h"
+#include "ntContact.h"
 #include "ntDynamicBody.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -32,95 +33,42 @@
 
 //dgVector ntDynamicBody::m_equilibriumError2 (DG_ERR_TOLERANCE2);
 
-/*
-dDynamicBodyAsymetric::dDynamicBodyAsymetric()
-	:ntDynamicBody()
-	, m_principalAxis(dgGetIdentityMatrix())
-{
-	m_type = m_dynamicBody;
-	m_rtti |= m_dynamicBodyAsymentricRTTI;
-	dAssert(dgInt32(sizeof(ntDynamicBody) & 0x0f) == 0);
-}
-
-dDynamicBodyAsymetric::dDynamicBodyAsymetric(dgWorld* const world, const dgTree<const dgCollision*, dgInt32>* const collisionNode, dgDeserialize serializeCallback, void* const userData, dgInt32 revisionNumber)
-	:ntDynamicBody(world, collisionNode, serializeCallback, userData, revisionNumber)
-	, m_principalAxis(dgGetIdentityMatrix())
-{
-	m_type = m_dynamicBody;
-	m_rtti |= m_dynamicBodyRTTI;
-	serializeCallback(userData, &m_principalAxis, sizeof(m_principalAxis));
-}
-
-void dDynamicBodyAsymetric::Serialize(const dgTree<dgInt32, const dgCollision*>& collisionRemapId, dgSerialize serializeCallback, void* const userData)
-{
-	ntDynamicBody::Serialize(collisionRemapId, serializeCallback, userData);
-	serializeCallback(userData, &m_principalAxis, sizeof(m_principalAxis));
-}
-
-
-void dDynamicBodyAsymetric::SetMassMatrix(dFloat32 mass, const dgMatrix& inertia)
-{
-	//dgVector II;
-	m_principalAxis = inertia;
-	dgVector II (m_principalAxis.EigenVectors());
-	dgMatrix massMatrix(dgGetIdentityMatrix());
-	massMatrix[0][0] = II[0];
-	massMatrix[1][1] = II[1];
-	massMatrix[2][2] = II[2];
-	dBody::SetMassMatrix(mass, massMatrix);
-}
-
-dgMatrix dDynamicBodyAsymetric::CalculateLocalInertiaMatrix() const
-{
-	dgMatrix matrix(m_principalAxis);
-	matrix.m_posit = dgVector::m_wOne;
-	dgMatrix diagonal(dgGetIdentityMatrix());
-	diagonal[0][0] = m_mass[0];
-	diagonal[1][1] = m_mass[1];
-	diagonal[2][2] = m_mass[2];
-	return matrix * diagonal * matrix.Inverse();
-}
-
-dgMatrix dDynamicBodyAsymetric::CalculateInertiaMatrix() const
-{
-	dgMatrix matrix(m_principalAxis * m_matrix);
-	matrix.m_posit = dgVector::m_wOne;
-	dgMatrix diagonal(dgGetIdentityMatrix());
-	diagonal[0][0] = m_mass[0];
-	diagonal[1][1] = m_mass[1];
-	diagonal[2][2] = m_mass[2];
-	return matrix * diagonal * matrix.Inverse();
-}
-
-dgMatrix dDynamicBodyAsymetric::CalculateInvInertiaMatrix() const
-{
-	dgMatrix matrix(m_principalAxis * m_matrix);
-	matrix.m_posit = dgVector::m_wOne;
-	dgMatrix diagonal(dgGetIdentityMatrix());
-	diagonal[0][0] = m_invMass[0];
-	diagonal[1][1] = m_invMass[1];
-	diagonal[2][2] = m_invMass[2];
-	return matrix * diagonal * matrix.Inverse();
-}
-
-void dDynamicBodyAsymetric::IntegrateOpenLoopExternalForce(dFloat32 timestep)
-{
-	ntDynamicBody::IntegrateOpenLoopExternalForce(timestep);
-}
-*/
-
 ntDynamicBody::ntDynamicBody()
 	:ntBody()
 	,m_mass(dVector::m_zero)
 	,m_invMass(dVector::m_zero)
 	,m_externalForce(dVector::m_zero)
 	,m_externalTorque(dVector::m_zero)
+	,m_jointArray()
+	,m_contactList()
 {
 	SetMassMatrix(dVector::m_zero);
 }
 
 ntDynamicBody::~ntDynamicBody()
 {
+}
+
+void ntDynamicBody::ReleaseMemory()
+{
+	ntContactMap::FlushFreeList();
+}
+
+ntContact* ntDynamicBody::FindContact(const ntBody* const otherBody) const
+{
+	return m_contactList.FindContact(this, otherBody);
+}
+
+D_NEWTON_API void ntDynamicBody::AttachContact(ntContact* const contact)
+{
+	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
+	m_contactList.AttachContact(contact);
+}
+
+void ntDynamicBody::DetachContact(ntContact* const contact)
+{
+	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
+	m_contactList.DetachContact(contact);
 }
 
 void ntDynamicBody::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)

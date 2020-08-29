@@ -54,6 +54,7 @@ class ntDummyCollision: public ntShapeNull
 ntBody::ntBody()
 	:m_matrix(dGetIdentityMatrix())
 	,m_invWorldInertiaMatrix(dGetZeroMatrix())
+	,m_shapeInstance(ntDummyCollision::GetNullShape())
 	,m_veloc(dVector::m_zero)
 	,m_omega(dVector::m_zero)
 	,m_localCentreOfMass(dVector::m_zero)
@@ -61,13 +62,10 @@ ntBody::ntBody()
 	,m_minAABB(dVector::m_zero)
 	,m_maxAABB(dVector::m_zero)
 	,m_rotation()
-	,m_jointArray()
-	,m_contactList()
+	,m_world(nullptr)
 	,m_notifyCallback(nullptr)
-	,m_shapeInstance(ntDummyCollision::GetNullShape())
-	,m_newton(nullptr)
 	,m_broadPhaseNode(nullptr)
-	,m_newtonNode(nullptr)
+	,m_worldNode(nullptr)
 	,m_broadPhaseAggregateNode(nullptr)
 	,m_flags(0)
 	,m_uniqueID(m_uniqueIDCount)
@@ -124,20 +122,20 @@ dInt32 ntBody::GetId() const
 	return m_uniqueID;
 }
 
-ntWorld* ntBody::GetNewton() const
+ntWorld* ntBody::GetWorld() const
 {
-	return m_newton;
+	return m_world;
 }
 
 void ntBody::SetNewtonNode(ntWorld* const newton, dList<ntBody*>::dListNode* const node)
 {
-	m_newton = newton;
-	m_newtonNode = node;
+	m_world = newton;
+	m_worldNode = node;
 }
 
 dList<ntBody*>::dListNode* ntBody::GetNewtonNode() const
 {
-	return m_newtonNode;
+	return m_worldNode;
 }
 
 ntBroadPhaseBodyNode* ntBody::GetBroadPhaseNode() const

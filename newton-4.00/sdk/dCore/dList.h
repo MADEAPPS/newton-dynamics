@@ -228,6 +228,11 @@ class dList
 	void Unlink (dListNode* const node);
 	bool SanityCheck () const;
 
+	static void FlushFreeList()
+	{
+		allocator::FlushFreeList();
+	}
+
 	protected:
 	// ***********************************************************
 	// member variables
@@ -662,6 +667,7 @@ bool dList<T,allocator>::SanityCheck () const
 	#endif
 	return true;
 }
+
 
 //template<class T, class allocator = dContainersAlloc<T> > dInt32 dList <T>::m_size = 0;
 

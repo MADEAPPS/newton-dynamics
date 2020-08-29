@@ -36,77 +36,75 @@ class dContainersAlloc: public dClassAlloc
 	~dContainersAlloc() 
 	{
 	}
+
+	static void FlushFreeList()
+	{
+	}
 };
 
-/*
-class dContainerNodeAllocator
+template<class T>
+class dContainersFreeListAlloc
 {
-	public:
-	dContainerNodeAllocator(int nodeSize)
-		:m_freeListNode(NULL)
-		,m_nodeSize(nodeSize)
-	{
-	}
-
-	virtual ~DCONTAINERS_API dContainerNodeAllocator()
-	{
-	}
-
-	DCONTAINERS_API virtual void Flush () = 0;
-	DCONTAINERS_API virtual void* Alloc() = 0;
-	DCONTAINERS_API virtual void Free(void* const ptr) = 0;
-
-	protected:
-	class dFreeListNode
+	class FreeList 
 	{
 		public:
-		int m_count;
-		dFreeListNode* m_next;
+		FreeList* m_next;
 	};
 
-	dFreeListNode* m_freeListNode;
-	int m_nodeSize;
-};
-
-
-class dContainerFreeListAllocator: public dContainerNodeAllocator
-{
 	public:
-	dContainerFreeListAllocator(int nodeSize)
-		:dContainerNodeAllocator(nodeSize)
-		,m_count(0)
+	dContainersFreeListAlloc()
 	{
 	}
 
-	virtual ~DCONTAINERS_API dContainerFreeListAllocator()
+	~dContainersFreeListAlloc()
 	{
-		Flush();
 	}
 
-	DCONTAINERS_API virtual void Flush();
-	DCONTAINERS_API virtual void* Alloc();
-	DCONTAINERS_API virtual void Free(void* const ptr);
+	void *operator new (size_t size)
+	{
+		FreeList** const freeList = GetFreeList();
+		if (*freeList) 
+		{
+			FreeList* const self = *freeList;
+			*freeList = self->m_next;
+			return self;
+		}
+		else
+		{
+			dAssert(size > 16);
+			return dMalloc(size);
+		}
+	}
 
-	protected:
-	int m_count;
-};
+	void operator delete (void* ptr)
+	{
+		FreeList** const freeList = GetFreeList();
+		FreeList* const self = (FreeList*)ptr;
+		self->m_next = *freeList;
+		*freeList = self;
+	}
 
-
-class dContainerFixSizeAllocator: public dContainerNodeAllocator
-{
-	public:
-	static DCONTAINERS_API dContainerFixSizeAllocator* Create (int nodeSize, int poolSize);
-	DCONTAINERS_API ~dContainerFixSizeAllocator();
-	DCONTAINERS_API void* Alloc();
-	DCONTAINERS_API void Free(void* const ptr);
-	DCONTAINERS_API void Flush ();
+	static void FlushFreeList()
+	{
+		FreeList** const freeList = GetFreeList();
+		FreeList* first = *freeList;
+		while (first)
+		{
+			FreeList* const self = first;
+			first = first->m_next;
+			dFree(self);
+		}
+		*freeList = nullptr;
+	}
 
 	private:
-	dContainerFixSizeAllocator(int size, int poolSize);
-	void Prefetch ();
-
-	int m_poolSize;
+	static FreeList** GetFreeList()
+	{
+		static FreeList* freeList = nullptr;
+		return &freeList;
+	}
 };
-*/
+
+
 
 #endif

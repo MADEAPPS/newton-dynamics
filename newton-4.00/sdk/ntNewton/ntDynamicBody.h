@@ -24,6 +24,7 @@
 
 #include "ntStdafx.h"
 #include "ntBody.h"
+#include "ntContact.h"
 
 //#define DG_MAX_SPEED_ATT	dgFloat32(0.02f)
 ////#define DG_FREEZE_ACCEL	dgFloat32(0.1f)
@@ -44,6 +45,83 @@
 D_MSC_VECTOR_ALIGNMENT
 class ntDynamicBody: public ntBody 
 {
+	class ntContactkey
+	{
+		public:
+		ntContactkey(dUnsigned32 tag0, dUnsigned32 tag1)
+			:m_tagLow(dMin(tag0, tag1))
+			,m_tagHigh(dMax(tag0, tag1))
+		{
+			dAssert(m_tagLow < m_tagHigh);
+		}
+
+		bool operator== (const ntContactkey& key) const
+		{
+			return m_tag == key.m_tag;
+		}
+
+		bool operator< (const ntContactkey& key) const
+		{
+			return m_tag < key.m_tag;
+		}
+
+		bool operator> (const ntContactkey& key) const
+		{
+			return m_tag > key.m_tag;
+		}
+
+		private:
+		union
+		{
+			dUnsigned64 m_tag;
+			struct
+			{
+				dUnsigned32 m_tagLow;
+				dUnsigned32 m_tagHigh;
+			};
+		};
+	};
+
+	class ntContactMap: public dTree<ntContact*, ntContactkey, dContainersFreeListAlloc<ntContact*>>
+	{
+		public:
+		ntContactMap()
+			:m_lock()
+		{
+		}
+
+		ntContact* FindContact(const ntBody* const body0, const ntBody* const body1) const
+		{
+			ntContactkey key(body0->GetID(), body1->GetID());
+			dScopeSpinLock lock(m_lock);
+			dTreeNode* const node = Find(key);
+			return node ? node->GetInfo() : nullptr;
+		}
+
+		void AttachContact(ntContact* const contact)
+		{
+			ntBody* const body0 = contact->GetBody0();
+			ntBody* const body1 = contact->GetBody1();
+			ntContactkey key(body0->GetID(), body1->GetID());
+			dScopeSpinLock lock(m_lock);
+			dAssert (!Find(key));
+			//dAssert(!(key == ntContactkey(208, 209)));
+			Insert(contact, key);
+		}
+
+		void DetachContact(ntContact* const contact)
+		{
+			ntBody* const body0 = contact->GetBody0();
+			ntBody* const body1 = contact->GetBody1();
+			ntContactkey key(body0->GetID(), body1->GetID());
+			dScopeSpinLock lock(m_lock);
+			dAssert(Find(key));
+			Remove(key);
+		}
+		
+		mutable dSpinLock m_lock;
+	};
+
 	public:
 	D_NEWTON_API ntDynamicBody();
 	D_NEWTON_API virtual ~ntDynamicBody ();
@@ -63,6 +141,13 @@ class ntDynamicBody: public ntBody
 	dVector GetToque() const;
 	void SetTorque(const dVector& torque);
 
+	dFloat32 GetInvMass() const;
+	D_NEWTON_API virtual void AttachContact(ntContact* const contact);
+	D_NEWTON_API virtual void DetachContact(ntContact* const contact);
+	D_NEWTON_API virtual ntContact* FindContact(const ntBody* const otherBody) const;
+
+	D_NEWTON_API static void ReleaseMemory();
+
 	private:
 	void SetMassMatrix(dFloat32 mass, const dMatrix& inertia);
 
@@ -71,6 +156,9 @@ class ntDynamicBody: public ntBody
 	dVector m_invMass;
 	dVector m_externalForce;
 	dVector m_externalTorque;
+
+	dArray<ntBilateralJoint*> m_jointArray;
+	ntContactMap m_contactList;
 
 	friend class ntBroadPhase;
 
@@ -94,6 +182,11 @@ inline dVector ntDynamicBody::GetToque() const
 inline void ntDynamicBody::SetTorque(const dVector& torque)
 {
 	m_externalTorque = torque;
+}
+
+inline dFloat32 ntDynamicBody::GetInvMass() const
+{ 
+	return m_invMass.m_w; 
 }
 
 inline dVector ntDynamicBody::GetMassMatrix() const

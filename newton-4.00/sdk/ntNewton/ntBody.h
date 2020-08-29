@@ -81,7 +81,7 @@ class ntBody: public dClassAlloc
 	D_NEWTON_API ntBodyNotify* GetNotifyCallback(ntBodyNotify* const notify) const;
 
 	D_NEWTON_API dInt32 GetId() const;
-	D_NEWTON_API ntWorld* GetNewton() const;
+	D_NEWTON_API ntWorld* GetWorld() const;
 
 	D_NEWTON_API dVector GetOmega() const;
 	D_NEWTON_API void SetOmega(const dVector& veloc);
@@ -91,6 +91,12 @@ class ntBody: public dClassAlloc
 
 	D_NEWTON_API dMatrix GetMatrix() const;
 	D_NEWTON_API void SetMatrix(const dMatrix& matrix);
+
+	virtual dFloat32 GetInvMass() const {return dFloat32 (0.0f);}
+
+	D_NEWTON_API virtual void AttachContact(ntContact* const contact) {}
+	D_NEWTON_API virtual void DetachContact(ntContact* const contact) {}
+	virtual ntContact* FindContact(const ntBody* const otherBody) const {return nullptr;}
 
 	protected:
 	dList<ntBody*>::dListNode* GetNewtonNode() const;
@@ -107,7 +113,6 @@ class ntBody: public dClassAlloc
 	dMatrix m_matrix;
 	dMatrix m_invWorldInertiaMatrix;
 	ntShapeInstance m_shapeInstance;
-		
 	dVector m_veloc;
 	dVector m_omega;
 	dVector m_localCentreOfMass;
@@ -116,12 +121,10 @@ class ntBody: public dClassAlloc
 	dVector m_maxAABB;
 	dQuaternion m_rotation;
 
-	dArray<ntBilateralJoint*> m_jointArray;
-	dTree<ntContact*, dUnsigned32> m_contactList;
+	ntWorld* m_world;
 	ntBodyNotify* m_notifyCallback;
-	ntWorld* m_newton;
 	ntBroadPhaseBodyNode* m_broadPhaseNode;
-	dList<ntBody*>::dListNode* m_newtonNode;
+	dList<ntBody*>::dListNode* m_worldNode;
 	ntBroadPhaseAggregate* m_broadPhaseAggregateNode;
 
 	union

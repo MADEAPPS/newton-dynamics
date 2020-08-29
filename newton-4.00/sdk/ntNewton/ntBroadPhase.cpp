@@ -25,8 +25,6 @@
 #include "ntBroadPhase.h"
 #include "ntDynamicBody.h"
 
-#define D_CONTACT_CACHE_LINE_SIZE 4
-
 D_MSC_VECTOR_ALIGNMENT
 class ntBroadPhase::ntSpliteInfo
 {
@@ -156,16 +154,19 @@ ntBroadPhase::ntBroadPhase(ntWorld* const world)
 	:dClassAlloc()
 	,m_newton(world)
 	,m_rootNode(nullptr)
-	,m_scannedContactLock()
-	,m_scannedContact()
-	,m_scannedContactExtra()
-	,m_scannedContactCount()
+	,m_contactList()
+	,m_contactCreator()
 	,m_fullScan(true)
 {
 }
 
 ntBroadPhase::~ntBroadPhase()
 {
+}
+
+void ntBroadPhase::Cleanup()
+{
+	m_contactList.DeleteAllContacts();
 }
 
 ntBroadPhaseTreeNode* ntBroadPhase::InsertNode(ntBroadPhaseNode* const root, ntBroadPhaseNode* const node)
@@ -797,16 +798,29 @@ bool ntBroadPhase::TestOverlaping(const ntBody* const body0, const ntBody* const
 	return dOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? true : false;
 }
 
-ntContact* ntBroadPhase::FindContactJoint(ntBody* const body0, ntBody* const body1) const
-{
-//	dAssert(0);
-	return nullptr;
-}
-
 ntBilateralJoint* ntBroadPhase::FindBilateralJoint(ntBody* const body0, ntBody* const body1) const
 {
 	dAssert(0);
 	return nullptr;
+}
+
+ntContact* ntBroadPhase::FindContactJoint(ntBody* const body0, ntBody* const body1) const
+{
+	//	dAssert(0);
+	dAssert((body0->GetInvMass() != dFloat32(0.0f)) || (body1->GetInvMass() != dFloat32(0.0f)));
+	if (body0->GetInvMass() != dFloat32(0.0f))
+	{
+		ntContact* const contact = body0->FindContact(body1);
+		dAssert(!contact || (body1->FindContact(body0) == contact));
+		return contact;
+	}
+	else
+	{
+		dAssert(0);
+		ntContact* const contact = body1->FindContact(body0);
+		dAssert(!contact || (body0->FindContact(body1) == contact));
+		return contact;
+	}
 }
 
 void ntBroadPhase::AddPair(ntBody* const body0, ntBody* const body1, const dFloat32 timestep)
@@ -868,17 +882,9 @@ void ntBroadPhase::AddPair(ntBody* const body0, ntBody* const body1, const dFloa
 				//	}
 				//}
 
-				contact = (ntContact*)100;
-				dInt32 index = m_scannedContactCount.fetch_add(1);
-				if (index < m_scannedContact.GetCapacity()) 
-				{
-					m_scannedContact[index] = contact;
-				}
-				else
-				{
-					dScopeSpinLock lock(m_scannedContactLock);
-					m_scannedContactExtra.PushBack(contact);
-				}
+				contact = m_contactCreator.GetContact(body0, body1);
+				dAssert(contact);
+				m_contactList.PushBack(contact);
 			}
 		}
 	}
@@ -932,23 +938,9 @@ void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
 	};
 
 	m_fullScan = true;
-	m_scannedContactExtra.Clear();
-	m_scannedContactCount.store(0);
-	m_scannedContact.SetCount(m_scannedContact.GetCapacity());
+	m_contactList.Reset();
+	m_contactCreator.Clear();
 	m_newton->SubmitJobs<ntFindCollidindPairs>(timestep);
 
-	const dInt32 extraCount = m_scannedContactExtra.GetCount();
-	if (extraCount)
-	{
-		dInt32 index = m_scannedContact.GetCapacity();
-		m_scannedContact.SetCount(index + extraCount);
-		memcpy(&m_scannedContact[index], &m_scannedContactExtra[0], extraCount * sizeof(ntContact*));
-		m_scannedContactExtra.Clear();
-		m_scannedContactExtra.Resize(256);
-	}
-	else
-	{
-		dAssert(m_scannedContactCount.load() < m_scannedContact.GetCapacity());
-		m_scannedContact.SetCount(m_scannedContactCount.load());
-	}
+	m_contactList.Update();
 }

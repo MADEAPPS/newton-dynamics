@@ -23,7 +23,7 @@
 #define __D_BROADPHASE_H__
 
 #include "ntStdafx.h"
-//#include "ntContactCache.h"
+#include "ntContactList.h"
 #include "ntBroadPhaseNode.h"
 
 #define D_BROADPHASE_MAX_STACK_DEPTH	256
@@ -37,7 +37,6 @@ class ntBroadPhase: public dClassAlloc
 {
 	protected:
 	class ntSpliteInfo;
-
 	class ntFitnessList: public dList <ntBroadPhaseTreeNode*>
 	{
 		public:
@@ -54,6 +53,7 @@ class ntBroadPhase: public dClassAlloc
 	virtual void AddBody(ntBody* const body) = 0;
 	virtual void RemoveBody(ntBody* const body) = 0;
 
+	D_NEWTON_API void Cleanup();
 	D_NEWTON_API virtual void Update(dFloat32 timestep);
 
 	dFloat32 CalculateSurfaceArea(const ntBroadPhaseNode* const node0, const ntBroadPhaseNode* const node1, dVector& minBox, dVector& maxBox) const;
@@ -88,11 +88,8 @@ class ntBroadPhase: public dClassAlloc
 	
 	ntWorld* m_newton;
 	ntBroadPhaseNode* m_rootNode;
-	//ntContactCache m_contactCache;
-	dSpinLock m_scannedContactLock;
-	dArray<ntContact*> m_scannedContact;
-	dArray<ntContact*> m_scannedContactExtra;
-	std::atomic<dInt32> m_scannedContactCount;
+	ntContactList m_contactList;
+	ntContactFreeList m_contactCreator;
 	bool m_fullScan;
 } D_GCC_VECTOR_ALIGNMENT;
 

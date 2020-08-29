@@ -40,8 +40,29 @@ ntWorld::ntWorld()
 	// start the engine thread;
 	SetName("newton main thread");
 	Start();
-
 	m_broadPhase = new ntBroadPhaseMixed(this);
+
+	//{
+	//	dList <int, dContainersFreeListAlloc<int>> xxx;
+	//	xxx.Append(1);
+	//	xxx.Append(2);
+	//	xxx.Append(3);
+	//}
+	//{
+	//	dList <dFloat32, dContainersFreeListAlloc<dFloat32>> xxx;
+	//	xxx.Append(1);
+	//	xxx.Append(2);
+	//	xxx.Append(3);
+	//}
+	//
+	//{
+	//	dList <int, dContainersFreeListAlloc<int>> xxx;
+	//	xxx.Append(1);
+	//	xxx.Append(2);
+	//	xxx.Append(3);
+	//}
+	//dList <int, dContainersFreeListAlloc<int>>::FlushFreeList();
+
 }
 
 ntWorld::~ntWorld()
@@ -49,19 +70,21 @@ ntWorld::~ntWorld()
 	Sync();
 	Finish();
 
+	m_broadPhase->Cleanup();
 	while (m_bodyList.GetFirst())
 	{
 		ntBody* const body = m_bodyList.GetFirst()->GetInfo();
 		RemoveBody(body);
 		delete body;
 	}
-
 	delete m_broadPhase;
+
+	ntDynamicBody::ReleaseMemory();
 }
 
 void ntWorld::AddBody(ntBody* const body)
 {
-	dAssert((body->m_newton == nullptr) && (body->m_newtonNode == nullptr));
+	dAssert((body->m_world == nullptr) && (body->m_worldNode == nullptr));
 
 	dList<ntBody*>::dListNode* const node = m_bodyList.Append(body);
 	body->SetNewtonNode(this, node);
@@ -69,14 +92,14 @@ void ntWorld::AddBody(ntBody* const body)
 
 void ntWorld::RemoveBody(ntBody* const body)
 {
-	dAssert(body->m_newtonNode && (body->m_newton == this));
+	dAssert(body->m_worldNode && (body->m_world == this));
 
 	if (body->GetBroadPhaseNode())
 	{
 		m_broadPhase->RemoveBody(body);
 	}
 
-	m_bodyList.Remove(body->m_newtonNode);
+	m_bodyList.Remove(body->m_worldNode);
 	body->SetNewtonNode(nullptr, nullptr);
 }
 

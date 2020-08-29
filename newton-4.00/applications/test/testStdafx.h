@@ -24,7 +24,7 @@
 #include <ntBroadPhase.h>
 #include <ntShapeConvex.h>
 #include <ntDynamicBody.h>
-#include <ntContactCache.h>
+#include <ntContactList.h>
 #include <ntContactSolver.h>
 #include <ntShapeInstance.h>
 #include <ntBroadPhaseNode.h>
