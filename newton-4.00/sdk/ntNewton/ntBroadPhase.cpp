@@ -155,7 +155,6 @@ ntBroadPhase::ntBroadPhase(ntWorld* const world)
 	,m_newton(world)
 	,m_rootNode(nullptr)
 	,m_contactList()
-	,m_contactCreator()
 	,m_fullScan(true)
 {
 }
@@ -882,9 +881,8 @@ void ntBroadPhase::AddPair(ntBody* const body0, ntBody* const body1, const dFloa
 				//	}
 				//}
 
-				contact = m_contactCreator.GetContact(body0, body1);
+				contact = m_contactList.CreateContact(body0, body1);
 				dAssert(contact);
-				m_contactList.PushBack(contact);
 			}
 		}
 	}
@@ -938,9 +936,18 @@ void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
 	};
 
 	m_fullScan = true;
-	m_contactList.Reset();
-	m_contactCreator.Clear();
 	m_newton->SubmitJobs<ntFindCollidindPairs>(timestep);
 
-	m_contactList.Update();
+	m_activeContacts.Clear();
+	for (ntContactList::dListNode* node = m_contactList.GetFirst(); node; node = node->GetNext())
+	{
+		ntContact* contact = &node->GetInfo();
+		if (!contact->m_isAttached)
+		{
+			contact->AttachToBodies();
+		}
+		m_activeContacts.PushBack(contact);
+	}
+
+	//m_contactList.Update();
 }

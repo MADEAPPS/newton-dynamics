@@ -502,7 +502,9 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 
 ntContact::ntContact(ntBody* const body0, ntBody* const body1)
 	:ntConstraint(body0, body1)
+	,m_linkNode(nullptr)
 	,m_active(false)
+	,m_isAttached(false)
 {
 }
 
@@ -512,12 +514,14 @@ ntContact::~ntContact()
 
 void ntContact::AttachToBodies()
 {
+	m_isAttached = true;
 	m_body0->AttachContact(this);
 	m_body1->AttachContact(this);
 }
 
 void ntContact::DetachFromBodies()
 {
+	m_isAttached = false;
 	m_body0->DetachContact(this);
 	m_body1->DetachContact(this);
 }

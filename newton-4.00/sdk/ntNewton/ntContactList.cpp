@@ -24,87 +24,27 @@
 #include "ntContact.h"
 #include "ntContactList.h"
 
+ntContact* ntContactList::CreateContact(ntBody* const body0, ntBody* const body1)
+{
+	ntContact temp(body0, body1);
+	dListNode* const node = Append(temp);
+	ntContact* const contact = &node->GetInfo();
+	contact->m_linkNode = node;
+
+	return contact;
+}
+
+void ntContactList::DeleteContact(ntContact* const contact)
+{
+	contact->DetachFromBodies();
+	Remove(contact->m_linkNode);
+}
 
 void ntContactList::DeleteAllContacts()
 {
-	ntContact** const contacts = &(*this)[0];
-	for (dInt32 i = GetCount() - 1; i >= 0; i--)
+	while (GetFirst())
 	{
-		ntContact* const contact = contacts[i];
-		contact->DetachFromBodies();
-		delete contact;
+		DeleteContact(&GetFirst()->GetInfo());
 	}
-
-	m_index.store(0);
-	Clear();
-	Resize(256);
+	FlushFreeList();
 }
-
-void ntContactList::Reset()
-{
-	m_activeCount = GetCount();
-	m_index.store(GetCount());
-	m_extraContacts.Clear();
-	SetCount(GetCapacity());
-}
-
-void ntContactList::Update()
-{
-	D_TRACKTIME();
-	const dInt32 extraCount = m_extraContacts.GetCount();
-	if (extraCount)
-	{
-		dInt32 index = GetCapacity();
-		SetCount(index + extraCount);
-		memcpy(&(*this)[index], &m_extraContacts[0], extraCount * sizeof(ntContact*));
-		m_extraContacts.Clear();
-		m_extraContacts.Resize(256);
-	}
-	else
-	{
-		dAssert(m_index.load() < GetCapacity());
-		SetCount(m_index.load());
-	}
-
-	ntContact** const contacts = &(*this)[0];
-	for (dInt32 i = GetCount() - 1; i >= m_activeCount ; i--)
-	{
-		contacts[i]->AttachToBodies();
-	}
-}
-
-void ntContactList::PushBack(ntContact* const contact)
-{
-	dInt32 index = m_index.fetch_add(1);
-	if (index < GetCapacity())
-	{
-		(*this)[index] = contact;
-	}
-	else
-	{
-		dScopeSpinLock lock(m_lock);
-		ntContact* contactPtr = contact;
-		m_extraContacts.PushBack(contactPtr);
-	}
-}
-
-ntContact* ntContactFreeList::GetContact(ntBody* const body0, ntBody* const body1)
-{
-	dInt32 index = m_index.fetch_add(-1) - 1;
-	if (index >= 0)
-	{
-		dAssert(0);
-		return nullptr;
-	}
-	else
-	{
-		return new ntContact(body0, body1);
-	}
-};
-
-void ntContactFreeList::RemoveContact(ntContact* const contact)
-{
-	dAssert(0);
-}
-
-

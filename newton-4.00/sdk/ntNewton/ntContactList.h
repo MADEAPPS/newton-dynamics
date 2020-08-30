@@ -23,42 +23,13 @@
 #define __D_CONTACT_CACHE_H__
 
 #include "ntStdafx.h"
+#include "ntContact.h"
 
-class ntContact;
-
-class ntContactFreeList: public dArray<ntContact*>
-{
-	public:
-	ntContactFreeList()
-		:dArray<ntContact*>()
-		,m_index(0)
-	{
-	}
-
-	~ntContactFreeList()
-	{
-	}
-
-	void Clear()
-	{
-		m_index.store(GetCount());
-	}
-
-	D_NEWTON_API ntContact* GetContact(ntBody* const body0, ntBody* const body1);
-	D_NEWTON_API void RemoveContact(ntContact* const contact);
-
-	std::atomic<dInt32> m_index;
-};
-
-class ntContactList: public dArray<ntContact*>
+class ntContactList: public dList<ntContact, dContainersFreeListAlloc<ntContact>>
 {
 	public:
 	ntContactList()
-		:dArray<ntContact*>()
-		,m_extraContacts()
-		,m_index(0)
-		,m_lock()
-		,m_activeCount(0)
+		:dList<ntContact, dContainersFreeListAlloc<ntContact>>()
 	{
 	}
 
@@ -66,15 +37,11 @@ class ntContactList: public dArray<ntContact*>
 	{
 	}
 
-	D_NEWTON_API void Reset();
-	D_NEWTON_API void Update();
-	D_NEWTON_API void PushBack(ntContact* const contact);
 	D_NEWTON_API void DeleteAllContacts();
+	D_NEWTON_API void DeleteContact(ntContact* const contact);
+	D_NEWTON_API ntContact* CreateContact(ntBody* const body0, ntBody* const body1);
 	
-	dArray<ntContact*> m_extraContacts;
-	std::atomic<dInt32> m_index;
-	dSpinLock m_lock;
-	std::atomic<dInt32> m_activeCount;
+	//dSpinLock m_lock;
 };
 
 

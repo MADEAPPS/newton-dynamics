@@ -89,7 +89,7 @@ class ntBroadPhase: public dClassAlloc
 	ntWorld* m_newton;
 	ntBroadPhaseNode* m_rootNode;
 	ntContactList m_contactList;
-	ntContactFreeList m_contactCreator;
+	dArray<ntContact*> m_activeContacts;
 	bool m_fullScan;
 } D_GCC_VECTOR_ALIGNMENT;
 
