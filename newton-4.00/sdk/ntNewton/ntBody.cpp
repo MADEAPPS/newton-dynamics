@@ -21,7 +21,9 @@
 
 #include "ntStdafx.h"
 #include "ntBody.h"
+#include "ntContact.h"
 #include "ntShapeNull.h"
+#include "ntRayCastCallback.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -127,9 +129,9 @@ ntWorld* ntBody::GetWorld() const
 	return m_world;
 }
 
-void ntBody::SetNewtonNode(ntWorld* const newton, dList<ntBody*>::dListNode* const node)
+void ntBody::SetWorldNode(ntWorld* const world, dList<ntBody*>::dListNode* const node)
 {
-	m_world = newton;
+	m_world = world;
 	m_worldNode = node;
 }
 
@@ -199,4 +201,42 @@ void ntBody::SetMatrix(const dMatrix& matrix)
 
 	m_rotation = dQuaternion(m_matrix);
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
+}
+
+dFloat32 ntBody::RayCast(ntRayCastCallback& callback, const dFastRayTest& ray, dFloat32 maxT) const
+{
+	dVector l0(ray.m_p0);
+	dVector l1(ray.m_p0 + ray.m_diff.Scale(dMin(maxT, dFloat32(1.0f))));
+
+	if (dRayBoxClip(l0, l1, m_minAABB, m_maxAABB))
+	{
+		const dMatrix& globalMatrix = m_shapeInstance.GetGlobalMatrix();
+		dVector localP0(globalMatrix.UntransformVector(l0));
+		dVector localP1(globalMatrix.UntransformVector(l1));
+		dVector p1p0(localP1 - localP0);
+		dAssert(p1p0.m_w == dFloat32(0.0f));
+		if (p1p0.DotProduct(p1p0).GetScalar() > dFloat32(1.0e-12f)) 
+		{
+			ntContactPoint contactOut;
+			dFloat32 t = m_shapeInstance.RayCast(callback, localP0, localP1, maxT, this, contactOut);
+			if (t < dFloat32(1.0f)) 
+			{
+				dAssert(localP0.m_w == dFloat32(0.0f));
+				dAssert(localP1.m_w == dFloat32(0.0f));
+				dVector p(globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale(t)));
+				t = ray.m_diff.DotProduct(p - ray.m_p0).GetScalar() / ray.m_diff.DotProduct(ray.m_diff).GetScalar();
+				if (t < maxT) 
+				{
+					dAssert(t >= dFloat32(0.0f));
+					dAssert(t <= dFloat32(1.0f));
+					contactOut.m_body0 = this;
+					contactOut.m_body1 = this;
+					contactOut.m_point = p;
+					contactOut.m_normal = globalMatrix.RotateVector(contactOut.m_normal);
+					maxT = callback.OnRayCastAction(contactOut, t);
+				}
+			}
+		}
+	}
+	return maxT;
 }

@@ -19,6 +19,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 #include "ntStdafx.h"
+#include "ntBody.h"
 #include "ntConstraint.h"
 
 #if 0
@@ -86,3 +87,30 @@ void ntConstraint::InitInfo (dgConstraintInfo* const info) const
 }
 #endif
 
+ntConstraint::ntConstraint(ntBody* const body0, ntBody* const body1)
+	:dClassAlloc()
+	, m_body0(body0)
+	, m_body1(body1)
+	//,m_userData(nullptr)
+	//,m_link0(nullptr)
+	//,m_link1(nullptr)
+	//,m_updaFeedbackCallback(nullptr)
+	//,m_clusterLRU(-1)
+	//,m_index(0)
+	//,m_impulseLru(0)
+	//,m_dynamicsLru(0)
+	//,m_maxDOF(6)
+	//,m_constId(m_unknownConstraint)
+	//,m_solverModel(2)
+	//,m_enableCollision(false)
+	//,m_isActive(false)
+	//,m_isBilateral(false)
+	//,m_graphTagged(false)
+	//,m_isInSkeleton(false)
+	//,m_isInSkeletonLoop(false)
+{
+	if (m_body0->GetInvMass() == dFloat32(0.0f))
+	{
+		dSwap(m_body1, m_body0);
+	}
+}

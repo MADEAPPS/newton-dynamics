@@ -25,6 +25,8 @@
 #include "ntStdafx.h"
 #include "ntBroadPhase.h"
 
+class ntRayCastCallback;
+
 D_MSC_VECTOR_ALIGNMENT
 class ntBroadPhaseMixed : public ntBroadPhase
 {
@@ -32,8 +34,10 @@ class ntBroadPhaseMixed : public ntBroadPhase
 	D_NEWTON_API ntBroadPhaseMixed(ntWorld* const world);
 	D_NEWTON_API virtual ~ntBroadPhaseMixed();
 
+	protected:
 	D_NEWTON_API virtual void AddBody(ntBody* const body);
 	D_NEWTON_API virtual void RemoveBody(ntBody* const body);
+	D_NEWTON_API virtual dFloat32 RayCast(ntRayCastCallback& callback, const dVector& p0, const dVector& p1) const;
 
 	private:
 	void AddNode(ntBroadPhaseNode* const newNode);

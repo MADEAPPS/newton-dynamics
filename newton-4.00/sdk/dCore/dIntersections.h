@@ -225,9 +225,9 @@ class dFastRayTest
 		return t0.GetScalar();
 	}
 
-	dVector m_p0;
-	dVector m_p1;
-	dVector m_diff;
+	const dVector m_p0;
+	const dVector m_p1;
+	const dVector m_diff;
 	dVector m_dpInv;
 	dVector m_minT;
 	dVector m_maxT;

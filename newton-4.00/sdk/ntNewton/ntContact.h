@@ -25,6 +25,25 @@
 #include "ntStdafx.h"
 #include "ntConstraint.h"
 
+class ntBody;
+class ntShapeInstance;
+
+D_MSC_VECTOR_ALIGNMENT
+class ntContactPoint
+{
+	public:
+	dVector m_point;
+	dVector m_normal;
+	const ntBody* m_body0;
+	const ntBody* m_body1;
+	const ntShapeInstance* m_collision0;
+	const ntShapeInstance* m_collision1;
+	//dInt64 m_shapeId0;
+	//dInt64 m_shapeId1;
+	//dFloat32 m_penetration;
+} D_GCC_VECTOR_ALIGNMENT;
+
+
 D_MSC_VECTOR_ALIGNMENT 
 //class ntContact: public ntConstraint, public dgList<dgContactMaterial>
 class ntContact: public ntConstraint
@@ -68,10 +87,10 @@ DG_INLINE void dgContactMaterial::SetUserData (void* const userData)
 	m_userData = userData;
 }
 
-DG_INLINE void dgContactMaterial::SetAsSoftContact(dgFloat32 regularizer)
+DG_INLINE void dgContactMaterial::SetAsSoftContact(dFloat32 regularizer)
 {
-	dgAssert(regularizer >= dgFloat32 (0.0f));
-	dgAssert(regularizer <= dgFloat32 (1.0f));
+	dgAssert(regularizer >= dFloat32 (0.0f));
+	dgAssert(regularizer <= dFloat32 (1.0f));
 	// re purpose some of the variable to store parameter for soft contact
 	m_flags |= m_isSoftContact;
 	m_skinThickness = regularizer;
@@ -91,17 +110,17 @@ DG_INLINE void ntContact::SetDestructorCallback (OnConstraintDestroy destructor)
 {
 }
 
-DG_INLINE void ntContact::SetTimeOfImpact(dgFloat32 timetoImpact)
+DG_INLINE void ntContact::SetTimeOfImpact(dFloat32 timetoImpact)
 {
 	m_timeOfImpact = timetoImpact;
 }
 
-DG_INLINE dgFloat32 ntContact::GetTimeOfImpact() const
+DG_INLINE dFloat32 ntContact::GetTimeOfImpact() const
 {
 	return m_timeOfImpact;
 }
 
-DG_INLINE dgFloat32 ntContact::GetClosestDistance() const
+DG_INLINE dFloat32 ntContact::GetClosestDistance() const
 {
     return m_closestDistance;
 }
@@ -111,12 +130,12 @@ DG_INLINE void ntContact::ResetMaxDOF()
 	m_maxDOF = 0;
 }
 
-DG_INLINE dgFloat32 ntContact::GetPruningTolerance() const
+DG_INLINE dFloat32 ntContact::GetPruningTolerance() const
 {
 	return m_contactPruningTolereance;
 }
 
-DG_INLINE void ntContact::SetPruningTolerance(dgFloat32 tolerance)
+DG_INLINE void ntContact::SetPruningTolerance(dFloat32 tolerance)
 {
 	m_contactPruningTolereance = dgAbs (tolerance);
 }
@@ -141,12 +160,12 @@ DG_INLINE bool ntContact::IsSkeletonSelftCollision() const
 	return m_skeletonSelftCollision;
 }
 
-DG_INLINE dgFloat32 ntContact::GetImpulseContactSpeed() const
+DG_INLINE dFloat32 ntContact::GetImpulseContactSpeed() const
 {
 	return m_impulseSpeed;
 }
 
-DG_INLINE void ntContact::SetImpulseContactSpeed(dgFloat32 speed)
+DG_INLINE void ntContact::SetImpulseContactSpeed(dFloat32 speed)
 {
 	m_impulseSpeed = speed;
 }

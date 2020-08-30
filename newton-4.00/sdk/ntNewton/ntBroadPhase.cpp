@@ -152,7 +152,7 @@ dFloat64 ntBroadPhase::ntFitnessList::TotalCost() const
 	
 ntBroadPhase::ntBroadPhase(ntWorld* const world)
 	:dClassAlloc()
-	,m_newton(world)
+	,m_world(world)
 	,m_rootNode(nullptr)
 	,m_contactList()
 	,m_fullScan(true)
@@ -166,6 +166,100 @@ ntBroadPhase::~ntBroadPhase()
 void ntBroadPhase::Cleanup()
 {
 	m_contactList.DeleteAllContacts();
+}
+
+dFloat32 ntBroadPhase::RayCast(ntRayCastCallback& callback, const ntBroadPhaseNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const
+{
+	dFloat32 maxParam = dFloat32(1.2f);
+	while (stack) 
+	{
+		stack--;
+		dFloat32 dist = distance[stack];
+		if (dist > maxParam) 
+		{
+			break;
+		}
+		else 
+		{
+			const ntBroadPhaseNode* const me = stackPool[stack];
+			dAssert(me);
+			ntBody* const body = me->GetBody();
+			if (body) 
+			{
+		//		if (!body->m_isdead) {
+				dAssert(!me->GetLeft());
+				dAssert(!me->GetRight());
+				dFloat32 param = body->RayCast(callback, ray, maxParam);
+				if (param < maxParam) 
+				{
+					maxParam = param;
+					if (maxParam < dFloat32(1.0e-8f)) 
+					{
+						break;
+					}
+				}
+			}
+			else if (((ntBroadPhaseNode*)me)->GetAsBroadPhaseAggregate())
+			{
+				dAssert(0);
+		//		dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*)me;
+		//		if (aggregate->m_root) {
+		//			const ntBroadPhaseNode* const child = aggregate->m_root;
+		//			dAssert(child);
+		//			dFloat32 dist1 = ray.BoxIntersect(child->m_minBox, child->m_maxBox);
+		//			if (dist1 < maxParam) {
+		//				dInt32 j = stack;
+		//				for (; j && (dist1 > distance[j - 1]); j--) {
+		//					stackPool[j] = stackPool[j - 1];
+		//					distance[j] = distance[j - 1];
+		//				}
+		//				stackPool[j] = child;
+		//				distance[j] = dist1;
+		//				stack++;
+		//				dAssert(stack < DG_BROADPHASE_MAX_STACK_DEPTH);
+		//			}
+		//		}
+			}
+			else 
+			{
+				const ntBroadPhaseNode* const left = me->GetLeft();
+				dAssert(left);
+				dFloat32 dist1 = ray.BoxIntersect(left->m_minBox, left->m_maxBox);
+				if (dist1 < maxParam) 
+				{
+					dInt32 j = stack;
+					for (; j && (dist1 > distance[j - 1]); j--) 
+					{
+						stackPool[j] = stackPool[j - 1];
+						distance[j] = distance[j - 1];
+					}
+					stackPool[j] = left;
+					distance[j] = dist1;
+					stack++;
+					dAssert(stack < D_BROADPHASE_MAX_STACK_DEPTH);
+				}
+		
+				const ntBroadPhaseNode* const right = me->GetRight();
+				dAssert(right);
+				dist1 = ray.BoxIntersect(right->m_minBox, right->m_maxBox);
+				if (dist1 < maxParam) 
+				{
+					dInt32 j = stack;
+					for (; j && (dist1 > distance[j - 1]); j--) 
+					{
+						stackPool[j] = stackPool[j - 1];
+						distance[j] = distance[j - 1];
+					}
+					stackPool[j] = right;
+					distance[j] = dist1;
+					stack++;
+					dAssert(stack < D_BROADPHASE_MAX_STACK_DEPTH);
+				}
+			}
+		}
+	}
+
+	return maxParam;
 }
 
 ntBroadPhaseTreeNode* ntBroadPhase::InsertNode(ntBroadPhaseNode* const root, ntBroadPhaseNode* const node)
@@ -742,8 +836,8 @@ void ntBroadPhase::SubmitPairs(ntBroadPhaseNode* const leafNode, ntBroadPhaseNod
 
 bool ntBroadPhase::TestOverlaping(const ntBody* const body0, const ntBody* const body1, dFloat32 timestep) const
 {
-	//bool mass0 = (body0->m_invMass.m_w != dgFloat32(0.0f));
-	//bool mass1 = (body1->m_invMass.m_w != dgFloat32(0.0f));
+	//bool mass0 = (body0->m_invMass.m_w != dFloat32(0.0f));
+	//bool mass1 = (body1->m_invMass.m_w != dFloat32(0.0f));
 	//bool isDynamic0 = body0->IsRTTIType(ntBody::m_dynamicBodyRTTI) != 0;
 	//bool isDynamic1 = body1->IsRTTIType(ntBody::m_dynamicBodyRTTI) != 0;
 	//bool isKinematic0 = body0->IsRTTIType(ntBody::m_kinematicBodyRTTI) != 0;
@@ -771,7 +865,7 @@ bool ntBroadPhase::TestOverlaping(const ntBody* const body0, const ntBody* const
 	//
 	//	if (body0->m_continueCollisionMode | body1->m_continueCollisionMode) {
 	//		dVector velRelative(body1->GetVelocity() - body0->GetVelocity());
-	//		if (velRelative.DotProduct(velRelative).GetScalar() > dgFloat32(0.25f)) {
+	//		if (velRelative.DotProduct(velRelative).GetScalar() > dFloat32(0.25f)) {
 	//			dVector box0_p0;
 	//			dVector box0_p1;
 	//			dVector box1_p0;
@@ -782,9 +876,9 @@ bool ntBroadPhase::TestOverlaping(const ntBody* const body0, const ntBody* const
 	//
 	//			dVector boxp0(box0_p0 - box1_p1);
 	//			dVector boxp1(box0_p1 - box1_p0);
-	//			dgFastRayTest ray(dVector::m_zero, velRelative.Scale(timestep * dgFloat32(4.0f)));
-	//			dgFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
-	//			ret = (distance < dgFloat32(1.0f));
+	//			dgFastRayTest ray(dVector::m_zero, velRelative.Scale(timestep * dFloat32(4.0f)));
+	//			dFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
+	//			ret = (distance < dFloat32(1.0f));
 	//		}
 	//		else {
 	//			ret = dgOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? 1 : 0;
@@ -914,17 +1008,17 @@ void ntBroadPhase::UpdateAabb(dFloat32 timestep)
 		{
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
-			const dInt32 threadsCount = m_newton->GetThreadCount();
-			const dInt32 count = m_newton->m_dynamicBodyArray.GetCount();
-			ntBodyDynamic** const bodies = &m_newton->m_dynamicBodyArray[0];
-			ntBroadPhase* const broadPhase = m_newton->m_broadPhase;
+			const dInt32 threadsCount = m_world->GetThreadCount();
+			const dInt32 count = m_world->m_dynamicBodyArray.GetCount();
+			ntBodyDynamic** const bodies = &m_world->m_dynamicBodyArray[0];
+			ntBroadPhase* const broadPhase = m_world->m_broadPhase;
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
 				broadPhase->UpdateAabb(threadIndex, m_timestep, bodies[i]);
 			}
 		}
 	};
-	m_newton->SubmitJobs<ntUpdateAabbJob>(timestep);
+	m_world->SubmitJobs<ntUpdateAabbJob>(timestep);
 }
 
 void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
@@ -937,10 +1031,10 @@ void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
 		{
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
-			const dInt32 threadsCount = m_newton->GetThreadCount();
-			const dInt32 count = m_newton->m_dynamicBodyArray.GetCount();
-			ntBodyDynamic** const bodies = &m_newton->m_dynamicBodyArray[0];
-			ntBroadPhase* const broadPhase = m_newton->m_broadPhase;
+			const dInt32 threadsCount = m_world->GetThreadCount();
+			const dInt32 count = m_world->m_dynamicBodyArray.GetCount();
+			ntBodyDynamic** const bodies = &m_world->m_dynamicBodyArray[0];
+			ntBroadPhase* const broadPhase = m_world->m_broadPhase;
 			
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
@@ -952,6 +1046,6 @@ void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
 	};
 
 	m_fullScan = true;
-	m_newton->SubmitJobs<ntFindCollidindPairs>(timestep);
+	m_world->SubmitJobs<ntFindCollidindPairs>(timestep);
 }
 

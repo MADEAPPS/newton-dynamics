@@ -31,6 +31,7 @@
 class ntWorld;
 class ntContact;
 class ntBilateralJoint;
+class ntRayCastCallback;
 
 D_MSC_VECTOR_ALIGNMENT
 class ntBroadPhase: public dClassAlloc
@@ -86,12 +87,17 @@ class ntBroadPhase: public dClassAlloc
 	void AddPair(ntBody* const body0, ntBody* const body1, const dFloat32 timestep);
 	bool TestOverlaping(const ntBody* const body0, const ntBody* const body1, dFloat32 timestep) const;
 	void SubmitPairs(ntBroadPhaseNode* const leaftNode, ntBroadPhaseNode* const node, dFloat32 timestep);
+
+	D_NEWTON_API virtual dFloat32 RayCast(ntRayCastCallback& callback, const dVector& p0, const dVector& p1) const = 0;
+	dFloat32 RayCast(ntRayCastCallback& callback, const ntBroadPhaseNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const;
 	
-	ntWorld* m_newton;
+	ntWorld* m_world;
 	ntBroadPhaseNode* m_rootNode;
 	ntContactList m_contactList;
 	dArray<ntContact*> m_activeContacts;
 	bool m_fullScan;
+
+	friend class ntRayCastCallback;
 } D_GCC_VECTOR_ALIGNMENT;
 
 D_INLINE dFloat32 ntBroadPhase::CalculateSurfaceArea(const ntBroadPhaseNode* const node0, const ntBroadPhaseNode* const node1, dVector& minBox, dVector& maxBox) const

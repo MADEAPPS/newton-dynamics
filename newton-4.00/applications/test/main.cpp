@@ -81,6 +81,33 @@ class DemobodyNotify: public ntBodyNotify
 	}
 };
 
+dVector FindFloor(const ntWorld& world, const dVector& origin, dFloat32 dist)
+{
+	// shot a vertical ray from a high altitude and collect the intersection parameter.
+	dVector p0(origin);
+	dVector p1(origin - dVector(0.0f, dAbs(dist), 0.0f, 0.0f));
+
+	ntRayCastCloasestHitCallback rayCaster(&world);
+	dFloat32 param = rayCaster.TraceRay(p0, p1);
+	return (param < 1.0f) ? rayCaster.m_contact.m_point : p0;
+}
+
+void BuildFloor(ntWorld& world)
+{
+	world.Sync();
+	ntShapeInstance box(new ntShapeBox(200.0f, 1.0f, 200.f));
+	ntBodyDynamic* const body = new ntBodyDynamic();
+
+	//body->SetNotifyCallback(new DemobodyNotify);
+
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit.m_y = -0.5f;
+
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(box);
+	world.AddBody(body);
+}
+
 void BuildPyramid(ntWorld& world, dFloat32 mass, const dVector& origin, const dVector& size, int count)
 {
 	dMatrix matrix(dGetIdentityMatrix());
@@ -90,7 +117,7 @@ void BuildPyramid(ntWorld& world, dFloat32 mass, const dVector& origin, const dV
 	world.Sync();
 	ntShapeInstance box(new ntShapeBox(size.m_x, size.m_y, size.m_z));
 
-	dVector floor(0.0f);
+	dVector floor(FindFloor(world, dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y + size.m_y / 2.0f;
 
 	// get the dimension from shape itself
@@ -131,10 +158,11 @@ int main (int argc, const char * argv[])
 {
 	ntWorld world;
 	world.SetSubSteps(2);
-	//world.SetThreadCount(8);
+	world.SetThreadCount(8);
 		
 	dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
 	dVector origin(0.5f, 0.25f, 0.8f, 0.0f);
+	BuildFloor(world);
 	BuildPyramid(world, 10.0f, origin, size, 20);
 
 	for (int i = 0; i < 10000; i ++)

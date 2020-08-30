@@ -20,6 +20,7 @@
 */
 
 #include "ntStdafx.h"
+#include "ntContact.h"
 #include "ntShapeBox.h"
 
 dInt32 ntShapeBox::m_initSimplex = 0;
@@ -184,4 +185,66 @@ dVector ntShapeBox::SupportVertex(const dVector& dir0, dInt32* const vertexIndex
 		*vertexIndex = dInt32(index.m_ix);
 	}
 	return m_size[0].Select(m_size[1], mask);
+}
+
+dFloat32 ntShapeBox::RayCast(ntRayCastCallback& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const
+{
+	dAssert(localP0.m_w == dFloat32(0.0f));
+	dAssert(localP1.m_w == dFloat32(0.0f));
+
+	dInt32 index = 0;
+	dFloat32 signDir = dFloat32(0.0f);
+	dFloat32 tmin = dFloat32(0.0f);
+	dFloat32 tmax = dFloat32(1.0f);
+	for (dInt32 i = 0; i < 3; i++) 
+	{
+		dFloat32 dp = localP1[i] - localP0[i];
+		if (dAbs(dp) < dFloat32(1.0e-8f)) 
+		{
+			if (localP0[i] <= m_size[1][i] || localP0[i] >= m_size[0][i]) 
+			{
+				return dFloat32(1.2f);
+			}
+		}
+		else 
+		{
+			dp = dFloat32(1.0f) / dp;
+			dFloat32 t1 = (m_size[1][i] - localP0[i]) * dp;
+			dFloat32 t2 = (m_size[0][i] - localP0[i]) * dp;
+
+			dFloat32 sign = dFloat32(-1.0f);
+			if (t1 > t2) 
+			{
+				sign = 1;
+				dSwap(t1, t2);
+			}
+			if (t1 > tmin) 
+			{
+				signDir = sign;
+				index = i;
+				tmin = t1;
+			}
+			if (t2 < tmax) 
+			{
+				tmax = t2;
+			}
+			if (tmin > tmax) 
+			{
+				return dFloat32(1.2f);
+			}
+		}
+	}
+
+	if (tmin > dFloat32(0.0f)) 
+	{
+		dAssert(tmin <= 1.0f);
+		contactOut.m_normal = dVector(dFloat32(0.0f));
+		contactOut.m_normal[index] = signDir;
+		//contactOut.m_userId = SetUserDataID();
+	}
+	else 
+	{
+		tmin = dFloat32(1.2f);
+	}
+	return tmin;
 }

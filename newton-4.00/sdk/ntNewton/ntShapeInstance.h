@@ -27,8 +27,9 @@
 #include "ntShape.h"
 
 class ntBody;
+class ntContactPoint;
 class ntShapeInstance;
-
+class ntRayCastCallback;
 class ntShapeDebugCallback
 {
 	public: 
@@ -69,6 +70,8 @@ class ntShapeInstance: public dClassAlloc
 	D_NEWTON_API dMatrix CalculateInertia() const;
 	D_NEWTON_API void CalculateAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	D_NEWTON_API void DebugShape(const dMatrix& matrix, ntShapeDebugCallback& debugCallback) const;
+
+	D_NEWTON_API dFloat32 RayCast(ntRayCastCallback& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const;
 
 	const ntShape* GetShape() const;
 	dVector SupportVertex(const dVector& dir) const;
@@ -135,7 +138,6 @@ class ntShapeInstance: public dClassAlloc
 	dShapeID GetCollisionPrimityType () const;
 
 	void CalcObb (dVector& origin, dVector& size) const;
-	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const;
 
 	dFloat32 GetBoxMinRadius () const; 
 	dFloat32 GetBoxMaxRadius () const; 

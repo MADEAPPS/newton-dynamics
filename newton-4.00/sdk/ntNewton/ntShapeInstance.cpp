@@ -20,7 +20,9 @@
 */
 
 #include "ntStdafx.h"
+#include "ntContact.h"
 #include "ntShapeInstance.h"
+#include "ntRayCastCallback.h"
 
 #if 0
 #include "dgBody.h"
@@ -46,7 +48,7 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-dShapeInstance::dShapeInstance(const dgWorld* const world, const dgCollision* const childCollision, dgInt32 shapeID, const dgMatrix& matrix)
+ntShapeInstance::ntShapeInstance(const dgWorld* const world, const dgCollision* const childCollision, dgInt32 shapeID, const dgMatrix& matrix)
 	:m_globalMatrix(matrix)
 	,m_localMatrix (matrix)
 	,m_aligmentMatrix (dGetIdentityMatrix())
@@ -55,7 +57,7 @@ dShapeInstance::dShapeInstance(const dgWorld* const world, const dgCollision* co
 	,m_maxScale(dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (0.0f))
 	,m_material()
 	,m_world(world)
-	,m_childShape (childCollision)
+	,m_shape (childCollision)
 	,m_subCollisionHandle(NULL)
 	,m_parent(NULL)
 	,m_skinThickness(dFloat32 (0.0f))
@@ -65,10 +67,10 @@ dShapeInstance::dShapeInstance(const dgWorld* const world, const dgCollision* co
 	,m_isExternal(true)
 {
 	m_material.m_userId = shapeID;
-	m_childShape->AddRef();
+	m_shape->AddRef();
 }
 
-dShapeInstance::dShapeInstance(const dgWorld* const constWorld, dgDeserialize serialize, void* const userData, dgInt32 revisionNumber)
+ntShapeInstance::ntShapeInstance(const dgWorld* const constWorld, dgDeserialize serialize, void* const userData, dgInt32 revisionNumber)
 	:m_globalMatrix(dGetIdentityMatrix())
 	,m_localMatrix (dGetIdentityMatrix())
 	,m_aligmentMatrix (dGetIdentityMatrix())
@@ -77,7 +79,7 @@ dShapeInstance::dShapeInstance(const dgWorld* const constWorld, dgDeserialize se
 	,m_maxScale(dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (0.0f))
 	,m_material()
 	,m_world(constWorld)
-	,m_childShape (NULL)
+	,m_shape (NULL)
 	,m_subCollisionHandle(NULL)
 	,m_parent(NULL)
 	,m_skinThickness(dFloat32 (0.0f))
@@ -228,25 +230,25 @@ dShapeInstance::dShapeInstance(const dgWorld* const constWorld, dgDeserialize se
 				dAssert (0);
 			}
 		}
-		m_childShape = collision;
+		m_shape = collision;
 	}
 	dgDeserializeMarker (serialize, userData);
 }
 
-dShapeInstance::~dShapeInstance()
+ntShapeInstance::~ntShapeInstance()
 {
 	if (m_world->m_onCollisionInstanceDestruction && m_isExternal) {
 		m_world->m_onCollisionInstanceDestruction (m_world, this);
 	}
 	dgWorld* const world = (dgWorld*)m_world;
-	world->ReleaseCollision(m_childShape);
+	world->ReleaseCollision(m_shape);
 }
 
-void dShapeInstance::Serialize(dgSerialize serialize, void* const userData, bool saveShape) const
+void ntShapeInstance::Serialize(dgSerialize serialize, void* const userData, bool saveShape) const
 {
 	dgInt32 save = saveShape ? 1 : 0;
-	dgInt32 primitiveType = m_childShape->GetCollisionPrimityType();
-	dgInt32 signature = m_childShape->GetSignature();
+	dgInt32 primitiveType = m_shape->GetCollisionPrimityType();
+	dgInt32 signature = m_shape->GetSignature();
 	dgInt32 scaleType = m_scaleType;
 
 	serialize (userData, &m_globalMatrix, sizeof (m_globalMatrix));
@@ -263,13 +265,13 @@ void dShapeInstance::Serialize(dgSerialize serialize, void* const userData, bool
 	serialize (userData, &signature, sizeof (signature));
 	serialize (userData, &save, sizeof (save));
 	if (saveShape) {
-		m_childShape->Serialize(serialize, userData);
+		m_shape->Serialize(serialize, userData);
 	}
 	dgSerializeMarker(serialize, userData);
 }
 
 
-void dShapeInstance::SetScale (const dVector& scale)
+void ntShapeInstance::SetScale (const dVector& scale)
 {
 	dFloat32 scaleX = dAbs (scale.m_x);
 	dFloat32 scaleY = dAbs (scale.m_y);
@@ -280,7 +282,7 @@ void dShapeInstance::SetScale (const dVector& scale)
 
 	if (IsType(dgCollision::dgCollisionCompound_RTTI)) {
 		dAssert (m_scaleType == m_unit);
-		dgCollisionCompound* const compound = (dgCollisionCompound*) m_childShape;
+		dgCollisionCompound* const compound = (dgCollisionCompound*) m_shape;
 		compound->ApplyScale(scale);
 	} else if ((dAbs (scaleX - scaleY) < dFloat32 (1.0e-4f)) && (dAbs (scaleX - scaleZ) < dFloat32 (1.0e-4f))) {
 		if ((dAbs (scaleX - dFloat32 (1.0f)) < dFloat32 (1.0e-4f))) {
@@ -302,7 +304,7 @@ void dShapeInstance::SetScale (const dVector& scale)
 	}
 }
 
-void dShapeInstance::SetGlobalScale (const dVector& scale)
+void ntShapeInstance::SetGlobalScale (const dVector& scale)
 {
 	// calculate current matrix
 	dgMatrix matrix(dGetIdentityMatrix());
@@ -361,7 +363,7 @@ void dShapeInstance::SetGlobalScale (const dVector& scale)
 }
 
 
-void dShapeInstance::SetLocalMatrix (const dgMatrix& matrix)
+void ntShapeInstance::SetLocalMatrix (const dgMatrix& matrix)
 {
 	m_localMatrix = matrix;
 	m_localMatrix[0][3] = dFloat32 (0.0f);
@@ -371,7 +373,7 @@ void dShapeInstance::SetLocalMatrix (const dgMatrix& matrix)
 	dAssert(m_localMatrix.TestOrthogonal());
 }
 
-dgInt32 dShapeInstance::CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const
+dgInt32 ntShapeInstance::CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const
 {
 	dgInt32 count = 0;
 	dAssert(normal.m_w == dFloat32 (0.0f));
@@ -379,13 +381,13 @@ dgInt32 dShapeInstance::CalculatePlaneIntersection (const dVector& normal, const
 	{
 		case m_unit:
 		{
-			count = m_childShape->CalculatePlaneIntersection (normal, point, contactsOut);
+			count = m_shape->CalculatePlaneIntersection (normal, point, contactsOut);
 			break;
 		}
 		case m_uniform:
 		{
 			dVector point1 (m_invScale * point);
-			count = m_childShape->CalculatePlaneIntersection (normal, point1, contactsOut);
+			count = m_shape->CalculatePlaneIntersection (normal, point1, contactsOut);
 			for (dgInt32 i = 0; i < count; i ++) {
 				contactsOut[i] = m_scale * contactsOut[i];
 			}
@@ -398,7 +400,7 @@ dgInt32 dShapeInstance::CalculatePlaneIntersection (const dVector& normal, const
 			dVector point1 (m_invScale * point);
 			dVector normal1 (m_scale * normal);
 			normal1 = normal1.Normalize();
-			count = m_childShape->CalculatePlaneIntersection (normal1, point1, contactsOut);
+			count = m_shape->CalculatePlaneIntersection (normal1, point1, contactsOut);
 			for (dgInt32 i = 0; i < count; i ++) {
 				contactsOut[i] = m_scale * contactsOut[i];
 			}
@@ -411,7 +413,7 @@ dgInt32 dShapeInstance::CalculatePlaneIntersection (const dVector& normal, const
 			dVector point1 (m_aligmentMatrix.UntransformVector (m_invScale * point));
 			dVector normal1 (m_aligmentMatrix.UntransformVector (m_scale * normal));
 			normal1 = normal1.Normalize();
-			count = m_childShape->CalculatePlaneIntersection (normal1, point1, contactsOut);
+			count = m_shape->CalculatePlaneIntersection (normal1, point1, contactsOut);
 			for (dgInt32 i = 0; i < count; i ++) {
 				contactsOut[i] = m_scale * m_aligmentMatrix.TransformVector(contactsOut[i]);
 			}
@@ -420,93 +422,7 @@ dgInt32 dShapeInstance::CalculatePlaneIntersection (const dVector& normal, const
 	return count;
 }
 
-
-
-dFloat32 dShapeInstance::RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, OnRayPrecastAction preFilter, const dgBody* const body, void* const userData) const
-{
-	if (!preFilter || preFilter(body, this, userData)) {
-		switch(m_scaleType)
-		{
-			case m_unit:
-			{
-				dFloat32 t = m_childShape->RayCast (localP0, localP1, maxT, contactOut, body, userData, preFilter);
-				if (t <= maxT) {
-					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
-						contactOut.m_shapeId0 = GetUserDataID();
-						contactOut.m_shapeId1 = GetUserDataID();
-					}
-					if (!m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI)) {
-						contactOut.m_collision0 = this;
-						contactOut.m_collision1 = this;
-					}
-				}
-				return t;
-			}
-
-			case m_uniform:
-			{
-				dVector p0 (localP0 * m_invScale);
-				dVector p1 (localP1 * m_invScale);
-				dFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData, preFilter);
-				if (t <= maxT) {
-					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
-						contactOut.m_shapeId0 = GetUserDataID();
-						contactOut.m_shapeId1 = GetUserDataID();
-					}
-					if (!m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI)) {
-						contactOut.m_collision0 = this;
-						contactOut.m_collision1 = this;
-					}
-				}
-				return t;
-			}
-
-			case m_nonUniform:
-			{
-				dVector p0 (localP0 * m_invScale);
-				dVector p1 (localP1 * m_invScale);
-				dFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData, preFilter);
-				if (t <= maxT) {
-					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
-						contactOut.m_shapeId0 = GetUserDataID();
-						contactOut.m_shapeId1 = GetUserDataID();
-						dVector n (m_invScale * contactOut.m_normal);
-						contactOut.m_normal = n.Normalize();
-					}
-					if (!m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI)) {
-						contactOut.m_collision0 = this;
-						contactOut.m_collision1 = this;
-					}
-				}
-				return t;
-			}
-
-			case m_global:
-			default:
-			{
-				dVector p0 (m_aligmentMatrix.UntransformVector (localP0 * m_invScale));
-				dVector p1 (m_aligmentMatrix.UntransformVector (localP1 * m_invScale));
-				dFloat32 t = m_childShape->RayCast (p0, p1, maxT, contactOut, body, userData, preFilter);
-				if (t <= maxT) {
-					if (!(m_childShape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
-						contactOut.m_shapeId0 = GetUserDataID();
-						contactOut.m_shapeId1 = GetUserDataID();
-						dVector n (m_aligmentMatrix.RotateVector(m_invScale * contactOut.m_normal));
-						contactOut.m_normal = n.Normalize();
-					}
-					if (!(m_childShape->IsType(dgCollision::dgCollisionCompound_RTTI))) {
-						contactOut.m_collision0 = this;
-						contactOut.m_collision1 = this;
-					}
-				}
-				return t;
-			}
-		}
-	}
-	return dFloat32 (1.2f);
-}
-
-void dShapeInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const
+void ntShapeInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const
 {
 	switch (m_scaleType)
 	{
@@ -515,7 +431,7 @@ void dShapeInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* co
 		   for (dgInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_globalMatrix.UntransformVector(contactPoints[i].m_point);
 			}
-			m_childShape->CalculateImplicitContacts(count, contactPoints);
+			m_shape->CalculateImplicitContacts(count, contactPoints);
 			for (dgInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_globalMatrix.TransformVector(contactPoints[i].m_point);
 				contactPoints[i].m_normal = m_globalMatrix.RotateVector(contactPoints[i].m_normal);
@@ -528,7 +444,7 @@ void dShapeInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* co
 			for (dgInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_invScale * m_globalMatrix.UntransformVector(contactPoints[i].m_point);
 			}
-			m_childShape->CalculateImplicitContacts(count, contactPoints);
+			m_shape->CalculateImplicitContacts(count, contactPoints);
 			for (dgInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_globalMatrix.TransformVector(contactPoints[i].m_point * m_scale);
 				contactPoints[i].m_normal = m_globalMatrix.RotateVector(contactPoints[i].m_normal);
@@ -541,7 +457,7 @@ void dShapeInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* co
 			for (dgInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_invScale * m_globalMatrix.UntransformVector(contactPoints[i].m_point);
 			}
-			m_childShape->CalculateImplicitContacts(count, contactPoints);
+			m_shape->CalculateImplicitContacts(count, contactPoints);
 			for (dgInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_globalMatrix.TransformVector(contactPoints[i].m_point * m_scale);
 				contactPoints[i].m_normal = m_globalMatrix.RotateVector(contactPoints[i].m_normal * m_invScale).Normalize();
@@ -555,7 +471,7 @@ void dShapeInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* co
 			for (dgInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_invScale * m_globalMatrix.UntransformVector(m_aligmentMatrix.UntransformVector(contactPoints[i].m_point));
 			}
-			m_childShape->CalculateImplicitContacts(count, contactPoints);
+			m_shape->CalculateImplicitContacts(count, contactPoints);
 			for (dgInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_globalMatrix.TransformVector(m_aligmentMatrix.TransformVector(contactPoints[i].m_point) * m_scale);
 				contactPoints[i].m_normal = m_globalMatrix.RotateVector(m_aligmentMatrix.RotateVector(contactPoints[i].m_normal) * m_invScale).Normalize();
@@ -581,7 +497,7 @@ ntShapeInstance::ntShapeInstance(ntShape* const shape)
 	
 	//,m_material()
 	//,m_world(NULL)
-	//,m_childShape(NULL)
+	//,m_shape(NULL)
 	//,m_subCollisionHandle(NULL)
 	//,m_parent(NULL)
 	//,m_skinThickness(dFloat32(0.0f))
@@ -610,7 +526,7 @@ ntShapeInstance::ntShapeInstance(const ntShapeInstance& instance)
 	//,m_maxScale(instance.m_maxScale)
 	//,m_material(instance.m_material)
 	//,m_world(instance.m_world)
-	//,m_childShape(instance.m_childShape)
+	//,m_shape(instance.m_shape)
 	//,m_subCollisionHandle(NULL)
 	//,m_parent(NULL)
 	//,m_skinThickness(instance.m_skinThickness)
@@ -627,7 +543,7 @@ ntShapeInstance::~ntShapeInstance()
 //		m_world->m_onCollisionInstanceDestruction(m_world, this);
 //	}
 //	dgWorld* const world = (dgWorld*)m_world;
-//	world->ReleaseCollision(m_childShape);
+//	world->ReleaseCollision(m_shape);
 	m_shape->Release();
 }
 
@@ -676,4 +592,109 @@ dMatrix ntShapeInstance::CalculateInertia() const
 	{
 		return m_shape->CalculateInertiaAndCenterOfMass(m_aligmentMatrix, m_scale, m_localMatrix);
 	}
+}
+
+dFloat32 ntShapeInstance::RayCast(ntRayCastCallback& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const
+{
+	dFloat32 t = dFloat32(1.2f);
+	if (callback.OnRayPrecastAction(body, this))
+	{
+		switch (m_scaleType)
+		{
+			case m_unit:
+			{
+				t = m_shape->RayCast(callback, localP0, localP1, maxT, body, contactOut);
+				if (t <= maxT) 
+				{
+					dAssert(((ntShape*)m_shape)->GetAsShapeBox());
+				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
+				//	{
+				//		contactOut.m_shapeId0 = GetUserDataID();
+				//		contactOut.m_shapeId1 = GetUserDataID();
+				//	}
+				//	if (!m_shape->IsType(dgCollision::dgCollisionCompound_RTTI)) 
+				//	{
+				//		contactOut.m_collision0 = this;
+				//		contactOut.m_collision1 = this;
+				//	}
+					contactOut.m_collision0 = this;
+					contactOut.m_collision1 = this;
+				}
+				break;
+			}
+
+			case m_uniform:
+			{
+				dAssert(0);
+				//dVector p0(localP0 * m_invScale);
+				//dVector p1(localP1 * m_invScale);
+				//dFloat32 t = m_shape->RayCast(p0, p1, maxT, contactOut, body, userData, preFilter);
+				//if (t <= maxT) 
+				//{
+				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
+				//	{
+				//		contactOut.m_shapeId0 = GetUserDataID();
+				//		contactOut.m_shapeId1 = GetUserDataID();
+				//	}
+				//	if (!m_shape->IsType(dgCollision::dgCollisionCompound_RTTI)) 
+				//	{
+				//		contactOut.m_collision0 = this;
+				//		contactOut.m_collision1 = this;
+				//	}
+				//}
+				break;
+			}
+
+			case m_nonUniform:
+			{
+				dAssert(0);
+				//dVector p0(localP0 * m_invScale);
+				//dVector p1(localP1 * m_invScale);
+				//dFloat32 t = m_shape->RayCast(p0, p1, maxT, contactOut, body, userData, preFilter);
+				//if (t <= maxT) 
+				//{
+				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
+				//	{
+				//		contactOut.m_shapeId0 = GetUserDataID();
+				//		contactOut.m_shapeId1 = GetUserDataID();
+				//		dVector n(m_invScale * contactOut.m_normal);
+				//		contactOut.m_normal = n.Normalize();
+				//	}
+				//	if (!m_shape->IsType(dgCollision::dgCollisionCompound_RTTI)) 
+				//	{
+				//		contactOut.m_collision0 = this;
+				//		contactOut.m_collision1 = this;
+				//	}
+				//}
+				break;
+			}
+
+			case m_global:
+			default:
+			{
+				dAssert(0);
+				//dVector p0(m_aligmentMatrix.UntransformVector(localP0 * m_invScale));
+				//dVector p1(m_aligmentMatrix.UntransformVector(localP1 * m_invScale));
+				//dFloat32 t = m_shape->RayCast(p0, p1, maxT, contactOut, body, userData, preFilter);
+				//if (t <= maxT) 
+				//{
+				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
+				//	{
+				//		contactOut.m_shapeId0 = GetUserDataID();
+				//		contactOut.m_shapeId1 = GetUserDataID();
+				//		dVector n(m_aligmentMatrix.RotateVector(m_invScale * contactOut.m_normal));
+				//		contactOut.m_normal = n.Normalize();
+				//	}
+				//	if (!(m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
+				//	{
+				//		contactOut.m_collision0 = this;
+				//		contactOut.m_collision1 = this;
+				//	}
+				//}
+				break;
+			}
+		}
+	}
+
+	return t;
 }

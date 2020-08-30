@@ -38,7 +38,7 @@ class ntWorld
 	{
 		public:
 		dAtomic<int>* m_it;
-		ntWorld* m_newton;
+		ntWorld* m_world;
 		dFloat32 m_timestep;
 	};
 
@@ -58,6 +58,8 @@ class ntWorld
 
 	D_NEWTON_API void AddBody(ntBody* const body);
 	D_NEWTON_API void RemoveBody(ntBody* const body);
+
+	D_NEWTON_API ntBroadPhase* GetBroadphase() const;
 
 	protected:
 	D_NEWTON_API virtual void SubstepUpdate(dFloat32 timestep);
@@ -102,7 +104,7 @@ void ntWorld::SubmitJobs(dFloat32 timestep)
 	for (int i = 0; i < threadCount; i++)
 	{
 		extJob[i].m_it = &it;
-		extJob[i].m_newton = this;
+		extJob[i].m_world = this;
 		extJob[i].m_timestep = timestep;
 		extJobPtr[i] = &extJob[i];
 	}

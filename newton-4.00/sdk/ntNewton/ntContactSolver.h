@@ -27,7 +27,7 @@
 #include "ntShapeInstance.h"
 
 class dPlane;
-class dContactPoint;
+//class ntContactPoint;
 
 D_MSC_VECTOR_ALIGNMENT
 class ntMinkFace
@@ -62,7 +62,7 @@ class ntContactSolver: public dDownHeap<ntMinkFace *, dFloat32>
 	bool CalculateClosestPoints();
 	dInt32 CalculateConvexCastContacts();
 	dInt32 CalculateConvexToConvexContacts();
-	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dContactPoint& contactOut);
+	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, ntContactPoint& contactOut);
 
 	const dVector& GetNormal() const {return m_normal;}
 	const dVector& GetPoint0() const {return m_closestPoint0;}

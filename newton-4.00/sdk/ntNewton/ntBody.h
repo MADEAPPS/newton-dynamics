@@ -29,6 +29,7 @@ class ntWorld;
 class ntContact;
 class ntBodyDynamic;
 class ntBilateralJoint;
+class ntRayCastCallback;
 class ntBroadPhaseBodyNode;
 class ntBroadPhaseAggregate;
 
@@ -98,9 +99,11 @@ class ntBody: public dClassAlloc
 	D_NEWTON_API virtual void DetachContact(ntContact* const contact) {}
 	virtual ntContact* FindContact(const ntBody* const otherBody) const {return nullptr;}
 
+	D_NEWTON_API dFloat32 RayCast(ntRayCastCallback& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
+
 	protected:
 	dList<ntBody*>::dListNode* GetNewtonNode() const;
-	void SetNewtonNode(ntWorld* const newton, dList<ntBody*>::dListNode* const node);
+	void SetWorldNode(ntWorld* const world, dList<ntBody*>::dListNode* const node);
 
 	void UpdateCollisionMatrix();
 

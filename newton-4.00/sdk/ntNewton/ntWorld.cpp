@@ -62,7 +62,6 @@ ntWorld::ntWorld()
 	//	xxx.Append(3);
 	//}
 	//dList <int, dContainersFreeListAlloc<int>>::FlushFreeList();
-
 }
 
 ntWorld::~ntWorld()
@@ -87,7 +86,14 @@ void ntWorld::AddBody(ntBody* const body)
 	dAssert((body->m_world == nullptr) && (body->m_worldNode == nullptr));
 
 	dList<ntBody*>::dListNode* const node = m_bodyList.Append(body);
-	body->SetNewtonNode(this, node);
+	body->SetWorldNode(this, node);
+
+	const ntShape* const shape = ((ntShape*)body->GetCollisionShape().GetShape())->GetAsShapeNull();
+	if (!shape)
+	{
+		dAssert(!body->GetBroadPhaseNode());
+		m_broadPhase->AddBody(body);
+	}
 }
 
 void ntWorld::RemoveBody(ntBody* const body)
@@ -100,7 +106,12 @@ void ntWorld::RemoveBody(ntBody* const body)
 	}
 
 	m_bodyList.Remove(body->m_worldNode);
-	body->SetNewtonNode(nullptr, nullptr);
+	body->SetWorldNode(nullptr, nullptr);
+}
+
+ntBroadPhase* ntWorld::GetBroadphase() const
+{
+	return m_broadPhase;
 }
 
 void ntWorld::Update(dFloat32 timestep)
@@ -185,7 +196,7 @@ void ntWorld::BuildBodyArray()
 				{
 					m_broadPhase->RemoveBody(dynBody);
 				}
-			} 
+			}
 			else if (!dynBody->GetBroadPhaseNode())
 			{
 				m_broadPhase->AddBody(dynBody);
@@ -240,8 +251,8 @@ void ntWorld::ApplyExternalForces(dFloat32 timestep)
 		{
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
-			const dInt32 count = m_newton->m_dynamicBodyArray.GetCount();
-			ntBodyDynamic** const bodies = &m_newton->m_dynamicBodyArray[0];
+			const dInt32 count = m_world->m_dynamicBodyArray.GetCount();
+			ntBodyDynamic** const bodies = &m_world->m_dynamicBodyArray[0];
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
 				bodies[i]->ApplyExternalForces(threadIndex, m_timestep);

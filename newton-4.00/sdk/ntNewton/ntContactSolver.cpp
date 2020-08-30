@@ -1097,7 +1097,7 @@ dInt32 ntContactSolver::ConvexPolygonsIntersection(const dVector& normal, dInt32
 	return count;
 }
 
-dFloat32 ntContactSolver::RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dContactPoint& contactOut)
+dFloat32 ntContactSolver::RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, ntContactPoint& contactOut)
 {
 	dAssert(0);
 	return 0;
@@ -1308,7 +1308,7 @@ dInt32 ntContactSolver::CalculateConvexCastContacts()
 					count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_normal);
 					if (count) {
 						count = dMin(m_proxy->m_maxContacts, count);
-						dContactPoint* const contactOut = m_proxy->m_contacts;
+						ntContactPoint* const contactOut = m_proxy->m_contacts;
 
 						for (int i = 0; i < count; i++) {
 							contactOut[i].m_point = m_hullDiff[i] + step;
@@ -1377,7 +1377,7 @@ dInt32 ntContactSolver::CalculateConvexToConvexContacts ()
 			penetration = -penetration;
 			m_proxy->m_normal = m_normal;
 			count = dMin(m_proxy->m_maxContacts, count);
-			dContactPoint* const contactOut = m_proxy->m_contacts;
+			ntContactPoint* const contactOut = m_proxy->m_contacts;
 
 			for (int i = 0; i < count; i ++) {
 				contactOut[i].m_point = m_hullDiff[i];

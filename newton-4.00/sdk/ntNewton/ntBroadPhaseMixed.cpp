@@ -179,7 +179,6 @@ void ntBroadPhaseMixed::RemoveNode(ntBroadPhaseNode* const node)
 	}
 }
 
-
 void ntBroadPhaseMixed::AddBody(ntBody* const body)
 {
 	body->UpdateCollisionMatrix();
@@ -209,8 +208,6 @@ void ntBroadPhaseMixed::BalanceBroadPhase()
 
 void ntBroadPhaseMixed::FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBody* const body)
 {
-	//dList<ntBroadPhaseNode*>::dListNode* node = body->GetBroadPhaseNode();
-	//const dgInt32 threadCount = descriptor->m_world->GetThreadCount();
 	ntBroadPhaseNode* const leafNode = body->GetBroadPhaseNode();
 
 	if (m_fullScan) 
@@ -261,4 +258,27 @@ void ntBroadPhaseMixed::FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep,
 		//	}
 		//}
 	}
+}
+
+dFloat32 ntBroadPhaseMixed::RayCast(ntRayCastCallback& callback, const dVector& p0, const dVector& p1) const
+{
+	dFloat32 param = dFloat32(1.2f);
+	if (m_rootNode) 
+	{
+		dVector segment(p1 - p0);
+		dAssert(segment.m_w == dFloat32(0.0f));
+		dFloat32 dist2 = segment.DotProduct(segment).GetScalar();
+		if (dist2 > dFloat32(1.0e-8f)) {
+
+			dFloat32 distance[D_BROADPHASE_MAX_STACK_DEPTH];
+			const ntBroadPhaseNode* stackPool[D_BROADPHASE_MAX_STACK_DEPTH];
+
+			dFastRayTest ray(p0, p1);
+
+			stackPool[0] = m_rootNode;
+			distance[0] = ray.BoxIntersect(m_rootNode->m_minBox, m_rootNode->m_maxBox);
+			param = ntBroadPhase::RayCast(callback, stackPool, distance, 1, ray);
+		}
+	}
+	return param;
 }

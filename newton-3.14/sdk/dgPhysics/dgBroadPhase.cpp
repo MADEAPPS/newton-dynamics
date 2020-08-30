@@ -618,14 +618,10 @@ void dgBroadPhase::RayCast(const dgBroadPhaseNode** stackPool, dgFloat32* const 
 	line.m_l0 = l0;
 	line.m_l1 = l1;
 	dgVector test(line.m_l0 <= line.m_l1);
-
-	dgFloat32 maxParam = dgFloat32 (1.2f);
-
-	//line.m_boxL0 = (line.m_l0 & test) | line.m_l1.AndNot(test);
-	//line.m_boxL1 = (line.m_l1 & test) | line.m_l0.AndNot(test);
 	line.m_boxL0 = line.m_l1.Select(line.m_l0, test);
 	line.m_boxL1 = line.m_l0.Select(line.m_l1, test);
 
+	dgFloat32 maxParam = dgFloat32(1.2f);
 	while (stack) {
 		stack--;
 		dgFloat32 dist = distance[stack];

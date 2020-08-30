@@ -30,6 +30,7 @@
 #include <ntContactSolver.h>
 #include <ntShapeInstance.h>
 #include <ntBroadPhaseNode.h>
+#include <ntRayCastCallback.h>
 #include <ntBroadPhaseMixed.h>
 
 #endif

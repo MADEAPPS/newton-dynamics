@@ -34,9 +34,12 @@
 //class dShapeConvexHull;
 //class dgPolygonSoupRayHitDesc;
 
+class ntBody;
 class ntShapeBox;
 class ntShapeNull;
 class ntShapeConvex;
+class ntContactPoint;
+class ntRayCastCallback;
 class ntShapeDebugCallback;
 
 #ifdef _DEBUG
@@ -91,11 +94,7 @@ class ntShape: public dClassAlloc
 	virtual dVector SupportVertexSpecial (const dVector& dir, dFloat32 skinSkinThickness, dInt32* const vertexIndex) const = 0;
 
 	virtual dInt32 CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const = 0;
-
 	virtual void SetCollisionBBox (const dVector& p0, const dVector& p1) = 0;
-	
-	virtual dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const = 0;
-
 	virtual dFloat32 GetVolume () const = 0;
 	virtual dFloat32 GetBoxMinRadius () const = 0; 
 	virtual dFloat32 GetBoxMaxRadius () const = 0; 
@@ -130,6 +129,7 @@ class ntShape: public dClassAlloc
 
 	virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const = 0;
 	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const = 0;
+	virtual dFloat32 RayCast(ntRayCastCallback& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const = 0;
 
 	virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
 	virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;

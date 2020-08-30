@@ -33,11 +33,15 @@ class ntShapeNull: public ntShapeConvex
 	virtual ~ntShapeNull() {}
 
 	virtual ntShapeNull* GetAsShapeNull() { return this; }
-
-
+	
 	dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
 	{
 		return dVector(dFloat32(0.0f));
+	}
+
+	virtual dFloat32 RayCast(ntRayCastCallback& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const
+	{
+		return dFloat32 (1.2f);
 	}
 
 	virtual void DebugShape(const dMatrix& matrix, ntShapeDebugCallback& debugCallback) const
