@@ -809,7 +809,7 @@ void* dMalloc(size_t size)
 	dInt64 mask = -dInt64(sizeof(dMemoryHeader));
 	val = val & mask;
 	dMemoryHeader* const ret = (dMemoryHeader*)val;
-	ret->m_size = size;
+	ret->m_size = dInt32 (size);
 	ret->m_ptr = ptr;
 	return &ret[1];
 }
