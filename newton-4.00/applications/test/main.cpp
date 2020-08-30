@@ -131,7 +131,7 @@ int main (int argc, const char * argv[])
 {
 	ntWorld world;
 	world.SetSubSteps(2);
-	world.SetThreadCount(8);
+	//world.SetThreadCount(8);
 		
 	dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
 	dVector origin(0.5f, 0.25f, 0.8f, 0.0f);

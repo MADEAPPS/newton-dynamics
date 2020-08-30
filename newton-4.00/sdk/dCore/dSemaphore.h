@@ -30,16 +30,18 @@ class dSemaphore
 	D_CORE_API dSemaphore();
 	D_CORE_API ~dSemaphore();
 
-	D_CORE_API int GetCount();
+	D_CORE_API dInt32 GetCount();
 	D_CORE_API void Signal();
 	D_CORE_API bool Wait();
 	D_CORE_API void Terminate();
 
+#ifndef D_USE_THREAD_EMULATION
 	private:
 	std::mutex m_mutex;
 	std::condition_variable m_condition;
-	int m_count;
-	std::atomic<bool> m_terminate;
+	dInt32 m_count;
+	dAtomic<bool> m_terminate;
+#endif
 };
 
 #endif

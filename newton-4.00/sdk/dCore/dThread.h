@@ -27,10 +27,12 @@
 #include "dClassAlloc.h"
 
 class dThread
-	:public std::mutex
+	:public dSemaphore
+#ifndef D_USE_THREAD_EMULATION
+	,public std::mutex
 	,public std::condition_variable
-	,public dSemaphore
 	,public std::thread
+#endif
 {
 	public:
 	D_CORE_API dThread();
@@ -40,6 +42,7 @@ class dThread
 
 	D_CORE_API void Start();
 	D_CORE_API void Finish();
+	D_CORE_API void Signal();
 
 	virtual void ThreadFunction() = 0;
 

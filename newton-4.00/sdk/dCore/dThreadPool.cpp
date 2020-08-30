@@ -19,7 +19,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "dCoreStdafx.h"
 #include "dThreadPool.h"
 
@@ -70,6 +69,9 @@ dInt32 dThreadPool::GetCount() const
 
 void dThreadPool::SetCount(dInt32 count)
 {
+#ifdef D_USE_THREAD_EMULATION	
+	count = 1;
+#endif
 	count = dClamp(count, 1, D_MAX_THREADS_COUNT) - 1;
 	if (count != m_count)
 	{

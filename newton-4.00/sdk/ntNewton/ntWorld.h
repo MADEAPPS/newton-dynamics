@@ -37,7 +37,7 @@ class ntWorld
 	class ntNewtonBaseJob: public dThreadPoolJob
 	{
 		public:
-		std::atomic<int>* m_it;
+		dAtomic<int>* m_it;
 		ntWorld* m_newton;
 		dFloat32 m_timestep;
 	};
@@ -94,7 +94,7 @@ class ntWorld
 template <class T>
 void ntWorld::SubmitJobs(dFloat32 timestep)
 {
-	std::atomic<int> it(0);
+	dAtomic<dInt32> it(0);
 	T extJob[D_MAX_THREADS_COUNT];
 	dThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
 

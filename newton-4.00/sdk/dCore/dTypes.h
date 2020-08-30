@@ -80,9 +80,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-
 #include <condition_variable>
-
 
 #if (defined (__MINGW32__) || defined (__MINGW64__))
 	#include <io.h> 
@@ -298,9 +296,9 @@ class dVector;
 //		#define dCheckFloat(x) 1
 #endif
 
-typedef void (*dDeserialize) (void* const userData, void* buffer, dInt32 size);
-typedef void (*dSerialize) (void* const userData, const void* const buffer, dInt32 size);
-typedef bool (*dReportProgress) (dFloat32 progressNormalzedPercent, void* const userData);
+//typedef void (*dDeserialize) (void* const userData, void* buffer, dInt32 size);
+//typedef void (*dSerialize) (void* const userData, const void* const buffer, dInt32 size);
+//typedef bool (*dReportProgress) (dFloat32 progressNormalzedPercent, void* const userData);
 
 // assume this function returns memory aligned to 16 bytes
 #define dAlloca(type, count) (type*) alloca (sizeof (type) * (count))
@@ -465,29 +463,86 @@ enum dSerializeRevisionNumber
 	m_currentRevision 
 };
 
+#ifdef D_USE_THREAD_EMULATION
+	template<class T>
+	class dAtomic
+	{
+		public:
+		dAtomic<T>(T val)
+			: m_val(val)
+		{
+		}
+
+		T load() const
+		{
+			return m_val;
+		}
+
+		void load(T val)
+		{
+			m_val = val;
+		}
+
+		void exchage(T val)
+		{
+			dSwap(val, m_val);
+			return val;
+		}
+
+		T fetch_add(T val)
+		{
+			//T ret = m_val;
+			m_val += val;
+			//return ret;
+			return m_val - val;
+		}
+
+		private:
+		T m_val;
+	};
+#else
+	template<class T>
+	class dAtomic: public std::atomic<T>
+	{
+		public: 
+		dAtomic<T>(T val)
+			:std::atomic<T>(val)
+		{
+		}
+	};
+#endif
+
 class dSpinLock
 {
 	public:
 	dSpinLock()
+#ifndef D_USE_THREAD_EMULATION	
 		:m_lock(0)
+#endif
 	{
 	}
 
 	void Lock()
 	{
+#ifndef D_USE_THREAD_EMULATION	
 		while (m_lock.exchange(1)) 
 		{
 			std::this_thread::yield();
 		}
+#endif
 	}
 
 	void Unlock()
 	{
+#ifndef D_USE_THREAD_EMULATION	
 		m_lock.exchange(0);
+#endif
 	}
 
+#ifndef D_USE_THREAD_EMULATION	
 	private:
-	std::atomic<dUnsigned32> m_lock;
+	dAtomic<dUnsigned32> m_lock;
+#endif
 };
 
 class dScopeSpinLock

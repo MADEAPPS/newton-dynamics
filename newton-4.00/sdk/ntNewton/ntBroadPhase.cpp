@@ -215,6 +215,7 @@ void ntBroadPhase::Update(dFloat32 timestep)
 	UpdateAabb(timestep);
 	BalanceBroadPhase();
 	FindCollidingPairs(timestep);
+	AttachNewContact();
 }
 
 void ntBroadPhase::RotateLeft(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root)
@@ -888,6 +889,21 @@ void ntBroadPhase::AddPair(ntBody* const body0, ntBody* const body1, const dFloa
 	}
 }
 
+void ntBroadPhase::AttachNewContact()
+{
+	D_TRACKTIME();
+	m_activeContacts.Clear();
+	for (ntContactList::dListNode* node = m_contactList.GetFirst(); node; node = node->GetNext())
+	{
+		ntContact* contact = &node->GetInfo();
+		if (!contact->m_isAttached)
+		{
+			contact->AttachToBodies();
+		}
+		m_activeContacts.PushBack(contact);
+	}
+}
+
 void ntBroadPhase::UpdateAabb(dFloat32 timestep)
 {
 	D_TRACKTIME();
@@ -937,17 +953,5 @@ void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
 
 	m_fullScan = true;
 	m_newton->SubmitJobs<ntFindCollidindPairs>(timestep);
-
-	m_activeContacts.Clear();
-	for (ntContactList::dListNode* node = m_contactList.GetFirst(); node; node = node->GetNext())
-	{
-		ntContact* contact = &node->GetInfo();
-		if (!contact->m_isAttached)
-		{
-			contact->AttachToBodies();
-		}
-		m_activeContacts.PushBack(contact);
-	}
-
-	//m_contactList.Update();
 }
+

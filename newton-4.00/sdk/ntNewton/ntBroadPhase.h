@@ -61,6 +61,7 @@ class ntBroadPhase: public dClassAlloc
 	private:
 	void UpdateAabb(dFloat32 timestep);
 	void FindCollidingPairs(dFloat32 timestep);
+	void AttachNewContact();
 
 	virtual void BalanceBroadPhase() = 0;
 	virtual void UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBody* const body);

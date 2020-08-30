@@ -24,9 +24,11 @@
 #include "dSyncMutex.h"
 
 dSyncMutex::dSyncMutex()
+#ifndef D_USE_THREAD_EMULATION
 	:m_mutex()
 	,m_condition()
 	,m_count(0)
+#endif
 {
 }
 
@@ -36,22 +38,28 @@ dSyncMutex::~dSyncMutex()
 
 void dSyncMutex::Sync()
 {
+#ifndef D_USE_THREAD_EMULATION
 	std::unique_lock<std::mutex> lock(m_mutex);
 	while (m_count > 0)
 	{
 		m_condition.wait(lock);
 	}
+#endif
 }
 
 void dSyncMutex::Release()
 {
+#ifndef D_USE_THREAD_EMULATION
 	std::unique_lock<std::mutex> lock(m_mutex);
 	m_count = (m_count >= 0) ? m_count - 1 : 0;
 	m_condition.notify_one();
+#endif
 }
 
 void dSyncMutex::Tick()
 {
+#ifndef D_USE_THREAD_EMULATION
 	std::unique_lock<std::mutex> lock(m_mutex);
 	m_count++;
+#endif
 }

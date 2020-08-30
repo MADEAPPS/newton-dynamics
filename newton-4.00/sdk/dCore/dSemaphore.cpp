@@ -24,10 +24,12 @@
 #include "dSemaphore.h"
 
 dSemaphore::dSemaphore()
+#ifndef D_USE_THREAD_EMULATION
 	:m_mutex()
 	,m_condition()
 	,m_count(0)
 	,m_terminate(false)
+#endif
 {
 }
 
@@ -35,14 +37,21 @@ dSemaphore::~dSemaphore()
 {
 }
 
-int dSemaphore::GetCount()
+dInt32 dSemaphore::GetCount()
 {
+#ifdef D_USE_THREAD_EMULATION
+	return 0;
+#else
 	std::unique_lock<std::mutex> lock(m_mutex);
 	return m_count;
+#endif
 }
 
 bool dSemaphore::Wait()
 {
+#ifdef D_USE_THREAD_EMULATION
+	return false;
+#else
 	std::unique_lock<std::mutex> lock(m_mutex);
 	while (m_count == 0)
 	{
@@ -51,21 +60,25 @@ bool dSemaphore::Wait()
 
 	m_count--;
 	return m_terminate.load();
+#endif
 }
-
 
 void dSemaphore::Signal()
 {
+#ifndef D_USE_THREAD_EMULATION
 	std::unique_lock<std::mutex> lock(m_mutex);
 	m_count++;
 	m_condition.notify_one();
+#endif
 }
 
 void dSemaphore::Terminate()
 {
+#ifndef D_USE_THREAD_EMULATION
 	std::unique_lock<std::mutex> lock(m_mutex);
 	m_count++;
 	m_terminate.store(true);
 	m_condition.notify_one();
+#endif
 }
 

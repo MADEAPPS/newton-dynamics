@@ -19,16 +19,17 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "dCoreStdafx.h"
 #include "dThread.h"
 #include "dProfiler.h"
 
 dThread::dThread()
+#ifndef D_USE_THREAD_EMULATION
 	:std::mutex() 
 	,std::condition_variable()
 	,dSemaphore()
 	,std::thread(&dThread::ThreadFunctionCallback, this)
+#endif
 {
 	strcpy (m_name, "thread");
 }
@@ -40,8 +41,7 @@ dThread::~dThread()
 void dThread::SetName(const char* const name)
 {
 	strncpy(m_name, name, sizeof(m_name) - 1);
-
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined (D_USE_THREAD_EMULATION)
 	// a hideous way to set the thread name, bu this is how Microsoft does it
 	const DWORD MS_VC_EXCEPTION = 0x406D1388;
 	#pragma pack(push,8)  
@@ -69,21 +69,34 @@ void dThread::SetName(const char* const name)
 #endif
 }
 
-
 void dThread::Start()
 {
+#ifndef D_USE_THREAD_EMULATION
 	std::unique_lock<std::mutex> lock(*this);
 	notify_one();  
+#endif
 }
 
 void dThread::Finish()
 {
+#ifndef D_USE_THREAD_EMULATION
 	Terminate();
 	join();
+#endif
+}
+
+void dThread::Signal()
+{
+#ifdef D_USE_THREAD_EMULATION
+	ThreadFunction();
+#else
+	dSemaphore::Signal();
+#endif
 }
 
 void dThread::ThreadFunctionCallback()
 {
+#ifndef D_USE_THREAD_EMULATION
 	std::unique_lock<std::mutex> lock(*this);
 	wait(lock);
 	D_SET_TRACK_NAME(m_name);
@@ -92,6 +105,7 @@ void dThread::ThreadFunctionCallback()
 	{
 		ThreadFunction();
 	}
+#endif
 }
 
 

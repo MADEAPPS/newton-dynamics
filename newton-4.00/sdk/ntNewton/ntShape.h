@@ -148,7 +148,7 @@ class ntShape: public dClassAlloc
 	dVector m_centerOfMass;
 	dVector m_boxSize;
 	dVector m_boxOrigin;
-	mutable std::atomic<dInt32> m_refCount;
+	mutable dAtomic<dInt32> m_refCount;
 	//dShapeID m_collisionId;
 	static dVector m_flushZero;
 

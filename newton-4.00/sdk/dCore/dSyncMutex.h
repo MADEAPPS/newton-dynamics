@@ -34,10 +34,12 @@ class dSyncMutex
 	D_CORE_API void Release();
 	D_CORE_API void Sync();
 
+#ifndef D_USE_THREAD_EMULATION	
 	private:
 	std::mutex m_mutex;
 	std::condition_variable m_condition;
 	int m_count;
+#endif
 };
 
 #endif
