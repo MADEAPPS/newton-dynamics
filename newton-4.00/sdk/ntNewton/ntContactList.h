@@ -30,6 +30,7 @@ class ntContactList: public dList<ntContact, dContainersFreeListAlloc<ntContact>
 	public:
 	ntContactList()
 		:dList<ntContact, dContainersFreeListAlloc<ntContact>>()
+		, m_lock()
 	{
 	}
 
@@ -41,7 +42,8 @@ class ntContactList: public dList<ntContact, dContainersFreeListAlloc<ntContact>
 	D_NEWTON_API void DeleteContact(ntContact* const contact);
 	D_NEWTON_API ntContact* CreateContact(ntBody* const body0, ntBody* const body1);
 	
-	//dSpinLock m_lock;
+	private:
+	dSpinLock m_lock;
 };
 
 

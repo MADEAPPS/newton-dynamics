@@ -27,10 +27,10 @@
 ntContact* ntContactList::CreateContact(ntBody* const body0, ntBody* const body1)
 {
 	ntContact temp(body0, body1);
+	dScopeSpinLock lock(m_lock);
 	dListNode* const node = Append(temp);
 	ntContact* const contact = &node->GetInfo();
 	contact->m_linkNode = node;
-
 	return contact;
 }
 
