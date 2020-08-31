@@ -54,10 +54,19 @@ class ntContact: public ntConstraint
 
 	D_NEWTON_API void AttachToBodies();
 	D_NEWTON_API void DetachFromBodies();
+
+	ntContact* GetAsContact() { return this; }
 	
+	dVector m_positAcc;
+	dQuaternion m_rotationAcc;
 	dList<ntContact, dContainersFreeListAlloc<ntContact>>::dListNode* m_linkNode;
+	dFloat32 m_timeOfImpact;
+	dFloat32 m_separationDistance;
+	dUnsigned32 m_maxDOF;
+	dUnsigned32 m_broadphaseLru;
 	bool m_active;
 	bool m_isAttached;
+	bool m_killContact;
 } D_GCC_VECTOR_ALIGNMENT;
 
 #if 0

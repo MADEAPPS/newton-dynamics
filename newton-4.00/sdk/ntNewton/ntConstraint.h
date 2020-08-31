@@ -25,6 +25,7 @@
 #include "ntStdafx.h"
 
 class ntBody;
+class ntContact;
 
 D_MSC_VECTOR_ALIGNMENT
 class ntConstraint: public dClassAlloc
@@ -34,6 +35,9 @@ class ntConstraint: public dClassAlloc
 
 	ntBody* GetBody0() const { return m_body0;}
 	ntBody* GetBody1() const { return m_body1;}
+
+	ntConstraint* GetAsConstraint() { return this; }
+	ntContact* GetAsContact() {return nullptr;}
 
 	protected:
 	ntConstraint(ntBody* const body0, ntBody* const body1);

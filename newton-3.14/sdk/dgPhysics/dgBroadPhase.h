@@ -525,7 +525,7 @@ class dgBroadPhase
 	void ImproveFitness(dgFitnessList& fitness, dgFloat64& oldEntropy, dgBroadPhaseNode** const root);
 
 	void CalculatePairContacts (dgPair* const pair, dgInt32 threadID);
-	void AddPair (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex);
+	void CalculateContacts(dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex);
 	void AddPair (dgBody* const body0, dgBody* const body1, dgFloat32 timestep, dgInt32 threadID);	
 
 	bool TestOverlaping(const dgBody* const body0, const dgBody* const body1, dgFloat32 timestep) const;

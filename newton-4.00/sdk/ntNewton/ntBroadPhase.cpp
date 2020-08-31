@@ -25,6 +25,16 @@
 #include "ntBroadPhase.h"
 #include "ntBodyDynamic.h"
 
+#define D_CONTACT_DELAY_FRAMES		4
+#define D_NARROW_PHASE_DIST		dFloat32 (0.2f)
+#define D_CONTACT_TRANSLATION_ERROR	dFloat32 (1.0e-3f)
+#define D_CONTACT_ANGULAR_ERROR		(dFloat32 (0.25f * dDegreeToRad))
+
+dVector ntBroadPhase::m_velocTol(dFloat32(1.0e-16f));
+dVector ntBroadPhase::m_angularContactError2(D_CONTACT_ANGULAR_ERROR * D_CONTACT_ANGULAR_ERROR);
+dVector ntBroadPhase::m_linearContactError2(D_CONTACT_TRANSLATION_ERROR * D_CONTACT_TRANSLATION_ERROR);
+
+
 D_MSC_VECTOR_ALIGNMENT
 class ntBroadPhase::ntSpliteInfo
 {
@@ -155,6 +165,7 @@ ntBroadPhase::ntBroadPhase(ntWorld* const world)
 	,m_world(world)
 	,m_rootNode(nullptr)
 	,m_contactList()
+	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_fullScan(true)
 {
 }
@@ -306,10 +317,12 @@ ntBroadPhaseTreeNode* ntBroadPhase::InsertNode(ntBroadPhaseNode* const root, ntB
 void ntBroadPhase::Update(dFloat32 timestep)
 {
 	D_TRACKTIME();
+	m_lru = m_lru + 1;
 	UpdateAabb(timestep);
 	BalanceBroadPhase();
 	FindCollidingPairs(timestep);
 	AttachNewContact();
+	CalculateContacts(timestep);
 }
 
 void ntBroadPhase::RotateLeft(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root)
@@ -760,6 +773,180 @@ void ntBroadPhase::UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBody* con
 	}
 }
 
+bool ntBroadPhase::ValidateContactCache(ntContact* const contact, const dVector& timestep) const
+{
+	dAssert(contact && (contact->GetAsConstraint()));
+
+	//dMatrix pitch(dPitchMatrix(30.0 * dRadToDegree));
+	//dMatrix yaw(dYawMatrix(60.0 * dRadToDegree));
+	//dMatrix roll(dRollMatrix(30.0 * dRadToDegree));
+	//dQuaternion q0(pitch);
+	//dQuaternion q1(yaw);
+	//dQuaternion q2(roll);
+	//dMatrix matrix0(pitch * yaw * roll);
+	//dMatrix matrix1(dMatrix(q0 * q1 * q2, dVector::m_wOne));
+	
+	ntBody* const body0 = contact->GetBody0();
+	ntBody* const body1 = contact->GetBody1();
+	//if (!contact->m_material->m_contactGeneration) 
+	if (1)
+	{
+		dVector positStep(timestep * (body0->m_veloc - body1->m_veloc));
+		positStep = ((positStep.DotProduct(positStep)) > m_velocTol) & positStep;
+		contact->m_positAcc += positStep;
+	
+		dVector positError2(contact->m_positAcc.DotProduct(contact->m_positAcc));
+		dVector positSign(dVector::m_negOne & (positError2 < m_linearContactError2));
+		//if ((positError2 < m_linearContactError2).GetSignMask()) 
+		if (positSign.GetSignMask())
+		{
+			dVector rotationStep(timestep * (body0->m_omega - body1->m_omega));
+			rotationStep = ((rotationStep.DotProduct(rotationStep)) > m_velocTol) & rotationStep;
+			contact->m_rotationAcc = contact->m_rotationAcc * dQuaternion(dFloat32(1.0f), rotationStep.m_x, rotationStep.m_y, rotationStep.m_z);
+	
+			dVector angle(contact->m_rotationAcc.m_x, contact->m_rotationAcc.m_y, contact->m_rotationAcc.m_z, dFloat32(0.0f));
+			dVector rotatError2(angle.DotProduct(angle));
+			dVector rotationSign(dVector::m_negOne & (rotatError2 < m_linearContactError2));
+			//if ((rotatError2 < m_angularContactError2).GetSignMask()) 
+			if (rotationSign.GetSignMask())
+			{
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+void ntBroadPhase::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact)
+{
+	//DG_TRACKTIME();
+	//dgWorld* const world = (dgWorld*)m_world;
+	//dgBody* const body0 = contact->m_body0;
+	//dgBody* const body1 = contact->m_body1;
+	//
+	//dgAssert(body0 != m_world->m_sentinelBody);
+	//dgAssert(body1 != m_world->m_sentinelBody);
+	//dgAssert(contact->GetId() == dgConstraint::m_contactConstraint);
+	//dgAssert(body0->GetWorld());
+	//dgAssert(body1->GetWorld());
+	//dgAssert(body0->GetWorld() == world);
+	//dgAssert(body1->GetWorld() == world);
+	//if (!(body0->m_collideWithLinkedBodies & body1->m_collideWithLinkedBodies)) {
+	//	if (world->AreBodyConnectedByJoints(body0, body1)) {
+	//		return;
+	//	}
+	//}
+	//
+	//const dgContactMaterial* const material = contact->m_material;
+	//if (material->m_flags & dgContactMaterial::m_collisionEnable) {
+	//	dgInt32 processContacts = 1;
+	//	if (material->m_aabbOverlap) {
+	//		processContacts = material->m_aabbOverlap(*contact, timestep, threadIndex);
+	//	}
+	//	if (processContacts) {
+	//		dgPair pair;
+	//		dgAssert(!body0->m_collision->IsType(dgCollision::dgCollisionNull_RTTI));
+	//		dgAssert(!body1->m_collision->IsType(dgCollision::dgCollisionNull_RTTI));
+	//
+	//		pair.m_contact = contact;
+	//		pair.m_timestep = timestep;
+	//		CalculatePairContacts(&pair, threadIndex);
+	//	}
+	//}
+}
+
+void ntBroadPhase::CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact)
+{
+	//dgContactList& contactList = *m_world;
+	//const dInt32 threadCount = m_world->GetThreadCount();
+	//const dInt32 contactCount = contactList.m_contactCount;
+	//ntContact** const contactArray = &contactList[0];
+
+	const dUnsigned32 lru = m_lru - D_CONTACT_DELAY_FRAMES;
+
+	dVector deltaTime(timestep);
+	ntBody* const body0 = contact->GetBody0();
+	ntBody* const body1 = contact->GetBody1();
+	
+	if (!(contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium))) 
+	{
+		dAssert(!contact->m_killContact);
+		bool active = contact->m_active;
+		if (ValidateContactCache(contact, deltaTime)) 
+		{
+			contact->m_broadphaseLru = m_lru;
+			contact->m_timeOfImpact = dFloat32(1.0e10f);
+		}
+		else 
+		{
+			contact->m_active = false;
+			contact->m_positAcc = dVector::m_zero;
+			contact->m_rotationAcc = dQuaternion();
+	
+			dFloat32 distance = contact->m_separationDistance;
+			if (distance >= D_NARROW_PHASE_DIST) 
+			{
+				dAssert(0);
+	//			const dVector veloc0(body0->GetVelocity());
+	//			const dVector veloc1(body1->GetVelocity());
+	//
+	//			const dVector veloc(veloc1 - veloc0);
+	//			const dVector omega0(body0->GetOmega());
+	//			const dVector omega1(body1->GetOmega());
+	//			const dgCollisionInstance* const collision0 = body0->GetCollision();
+	//			const dgCollisionInstance* const collision1 = body1->GetCollision();
+	//			const dVector scale(dFloat32(1.0f), dFloat32(3.5f) * collision0->GetBoxMaxRadius(), dFloat32(3.5f) * collision1->GetBoxMaxRadius(), dFloat32(0.0f));
+	//			const dVector velocMag2(veloc.DotProduct(veloc).GetScalar(), omega0.DotProduct(omega0).GetScalar(), omega1.DotProduct(omega1).GetScalar(), dFloat32(0.0f));
+	//			const dVector velocMag(velocMag2.GetMax(dVector::m_epsilon).InvSqrt() * velocMag2 * scale);
+	//			const dFloat32 speed = velocMag.AddHorizontal().GetScalar() + dFloat32(0.5f);
+	//
+	//			distance -= speed * timestep;
+	//			contact->m_separationDistance = distance;
+			}
+			if (distance < D_NARROW_PHASE_DIST) 
+			{
+				CalculateJointContacts(threadIndex, timestep, contact);
+				if (contact->m_maxDOF) 
+				{
+					contact->m_timeOfImpact = dFloat32(1.0e10f);
+				}
+				contact->m_broadphaseLru = m_lru;
+			}
+			else 
+			{
+				dAssert(0);
+	//			dAssert(contact->m_maxDOF == 0);
+	//			const dgBroadPhaseNode* const bodyNode0 = contact->GetBody0()->m_broadPhaseNode;
+	//			const dgBroadPhaseNode* const bodyNode1 = contact->GetBody1()->m_broadPhaseNode;
+	//			if (dgOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox)) {
+	//				contact->m_broadphaseLru = m_lru;
+	//			}
+	//			else if (contact->m_broadphaseLru < lru) {
+	//				contact->m_killContact = 1;
+	//			}
+			}
+		}
+	
+		if (active ^ contact->m_active) 
+		{
+			dAssert(0);
+	//		if (body0->GetInvMass().m_w) {
+	//			body0->m_equilibrium = false;
+	//		}
+	//		if (body1->GetInvMass().m_w) {
+	//			body1->m_equilibrium = false;
+	//		}
+		}
+	}
+	else 
+	{
+		dAssert(0);
+		//contact->m_broadphaseLru = m_lru;
+	}
+
+	contact->m_killContact = contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
+}
+
 void ntBroadPhase::SubmitPairs(ntBroadPhaseNode* const leafNode, ntBroadPhaseNode* const node, dFloat32 timestep)
 {
 	ntBroadPhaseNode* pool[D_BROADPHASE_MAX_STACK_DEPTH];
@@ -1009,9 +1196,11 @@ void ntBroadPhase::UpdateAabb(dFloat32 timestep)
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 threadsCount = m_world->GetThreadCount();
+			ntBroadPhase* const broadPhase = m_world->m_broadPhase;
+
 			const dInt32 count = m_world->m_dynamicBodyArray.GetCount();
 			ntBodyDynamic** const bodies = &m_world->m_dynamicBodyArray[0];
-			ntBroadPhase* const broadPhase = m_world->m_broadPhase;
+
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
 				broadPhase->UpdateAabb(threadIndex, m_timestep, bodies[i]);
@@ -1032,9 +1221,10 @@ void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 threadsCount = m_world->GetThreadCount();
+			ntBroadPhase* const broadPhase = m_world->m_broadPhase;
+
 			const dInt32 count = m_world->m_dynamicBodyArray.GetCount();
 			ntBodyDynamic** const bodies = &m_world->m_dynamicBodyArray[0];
-			ntBroadPhase* const broadPhase = m_world->m_broadPhase;
 			
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
@@ -1049,3 +1239,28 @@ void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
 	m_world->SubmitJobs<ntFindCollidindPairs>(timestep);
 }
 
+void ntBroadPhase::CalculateContacts(dFloat32 timestep)
+{
+	D_TRACKTIME();
+	class ntCalculateContacts: public ntWorld::ntNewtonBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadsCount = m_world->GetThreadCount();
+
+			ntBroadPhase* const broadPhase = m_world->m_broadPhase;
+			const dInt32 count = broadPhase->m_activeContacts.GetCount();
+			ntContact** const bodies = &broadPhase->m_activeContacts[0];
+
+			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
+			{
+				broadPhase->CalculateContacts(threadIndex, m_timestep, bodies[i]);
+			}
+		}
+	};
+
+	m_world->SubmitJobs<ntCalculateContacts>(timestep);
+}

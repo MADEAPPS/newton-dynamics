@@ -128,9 +128,9 @@ D_INLINE dQuaternion dQuaternion::operator- (const dQuaternion &q) const
 D_INLINE dQuaternion dQuaternion::operator* (const dQuaternion &q) const
 {
 	return dQuaternion (q.m_w * m_w - q.m_x * m_x - q.m_y * m_y - q.m_z * m_z, 
-				 		 q.m_x * m_w + q.m_w * m_x - q.m_z * m_y + q.m_y * m_z, 
-						 q.m_y * m_w + q.m_z * m_x + q.m_w * m_y - q.m_x * m_z, 
-						 q.m_z * m_w - q.m_y * m_x + q.m_x * m_y + q.m_w * m_z); 
+				 		q.m_x * m_w + q.m_w * m_x - q.m_z * m_y + q.m_y * m_z, 
+						q.m_y * m_w + q.m_z * m_x + q.m_w * m_y - q.m_x * m_z, 
+						q.m_z * m_w - q.m_y * m_x + q.m_x * m_y + q.m_w * m_z); 
 }
 
 #endif

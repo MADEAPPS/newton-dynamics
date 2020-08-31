@@ -60,13 +60,17 @@ class ntBroadPhase: public dClassAlloc
 	dFloat32 CalculateSurfaceArea(const ntBroadPhaseNode* const node0, const ntBroadPhaseNode* const node1, dVector& minBox, dVector& maxBox) const;
 
 	private:
+	void AttachNewContact();
 	void UpdateAabb(dFloat32 timestep);
 	void FindCollidingPairs(dFloat32 timestep);
-	void AttachNewContact();
+	void CalculateContacts(dFloat32 timestep);
+	bool ValidateContactCache(ntContact* const contact, const dVector& timestep) const;
 
 	virtual void BalanceBroadPhase() = 0;
 	virtual void UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBody* const body);
 	virtual void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBody* const body) = 0;
+	virtual void CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact);
+	void CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact);
 
 	void RotateLeft(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root);
 	void RotateRight(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root);
@@ -95,7 +99,12 @@ class ntBroadPhase: public dClassAlloc
 	ntBroadPhaseNode* m_rootNode;
 	ntContactList m_contactList;
 	dArray<ntContact*> m_activeContacts;
+	dUnsigned32 m_lru;
 	bool m_fullScan;
+
+	static dVector m_velocTol;
+	static dVector m_linearContactError2;
+	static dVector m_angularContactError2;
 
 	friend class ntRayCastCallback;
 } D_GCC_VECTOR_ALIGNMENT;

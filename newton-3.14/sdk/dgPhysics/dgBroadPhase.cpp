@@ -1052,14 +1052,18 @@ DG_INLINE bool dgBroadPhase::ValidateContactCache(dgContact* const contact, cons
 		contact->m_positAcc += positStep;
 
 		dgVector positError2(contact->m_positAcc.DotProduct(contact->m_positAcc));
-		if ((positError2 < m_linearContactError2).GetSignMask()) {
+		dgVector positSign(dgVector::m_negOne & (positError2 < m_linearContactError2));
+		//if ((positError2 < m_linearContactError2).GetSignMask()) {
+		if (positSign.GetSignMask()) {
 			dgVector rotationStep(timestep * (body0->m_omega - body1->m_omega));
 			rotationStep = ((rotationStep.DotProduct(rotationStep)) > m_velocTol) & rotationStep;
 			contact->m_rotationAcc = contact->m_rotationAcc * dgQuaternion(dgFloat32(1.0f), rotationStep.m_x, rotationStep.m_y, rotationStep.m_z);
 
 			dgVector angle(contact->m_rotationAcc.m_x, contact->m_rotationAcc.m_y, contact->m_rotationAcc.m_z, dgFloat32(0.0f));
 			dgVector rotatError2(angle.DotProduct(angle));
-			if ((rotatError2 < m_angularContactError2).GetSignMask()) {
+			dgVector rotationSign(dgVector::m_negOne & (rotatError2 < m_linearContactError2));
+			//if ((rotatError2 < m_angularContactError2).GetSignMask()) {
+			if (rotationSign.GetSignMask()) {
 				return true;
 			}
 		}
@@ -1088,7 +1092,7 @@ void dgBroadPhase::CalculatePairContacts (dgPair* const pair, dgInt32 threadID)
 	}
 }
 
-void dgBroadPhase::AddPair (dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex)
+void dgBroadPhase::CalculateContacts(dgContact* const contact, dgFloat32 timestep, dgInt32 threadIndex)
 {
 	//DG_TRACKTIME();
 	dgWorld* const world = (dgWorld*) m_world;
@@ -1547,7 +1551,7 @@ void dgBroadPhase::UpdateRigidBodyContacts(dgBroadphaseSyncDescriptor* const des
 					contact->m_separationDistance = distance;
 				}
 				if (distance < DG_NARROW_PHASE_DIST) {
-					AddPair(contact, timestep, threadID);
+					CalculateContacts(contact, timestep, threadID);
 					if (contact->m_maxDOF) {
 						contact->m_timeOfImpact = dgFloat32(1.0e10f);
 					}
