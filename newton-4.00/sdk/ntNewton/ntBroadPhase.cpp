@@ -820,23 +820,23 @@ bool ntBroadPhase::ValidateContactCache(ntContact* const contact, const dVector&
 void ntBroadPhase::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact)
 {
 	//DG_TRACKTIME();
-	//dgWorld* const world = (dgWorld*)m_world;
-	//dgBody* const body0 = contact->m_body0;
-	//dgBody* const body1 = contact->m_body1;
-	//
-	//dgAssert(body0 != m_world->m_sentinelBody);
-	//dgAssert(body1 != m_world->m_sentinelBody);
-	//dgAssert(contact->GetId() == dgConstraint::m_contactConstraint);
-	//dgAssert(body0->GetWorld());
-	//dgAssert(body1->GetWorld());
-	//dgAssert(body0->GetWorld() == world);
-	//dgAssert(body1->GetWorld() == world);
-	//if (!(body0->m_collideWithLinkedBodies & body1->m_collideWithLinkedBodies)) {
+	//ntWorld* const world = (ntWorld*)m_world;
+	ntBody* const body0 = contact->GetBody0();
+	ntBody* const body1 = contact->GetBody1();
+	
+	//dAssert(body0 != m_world->m_sentinelBody);
+	//dAssert(body1 != m_world->m_sentinelBody);
+	dAssert(body0->GetWorld() == m_world);
+	dAssert(body1->GetWorld() == m_world);
+	if (!(body0->m_collideWithLinkedBodies & body1->m_collideWithLinkedBodies)) 
+	{
+		dAssert(0);
 	//	if (world->AreBodyConnectedByJoints(body0, body1)) {
 	//		return;
 	//	}
-	//}
-	//
+	}
+	
+	dAssert(0);
 	//const dgContactMaterial* const material = contact->m_material;
 	//if (material->m_flags & dgContactMaterial::m_collisionEnable) {
 	//	dgInt32 processContacts = 1;
@@ -845,8 +845,8 @@ void ntBroadPhase::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep,
 	//	}
 	//	if (processContacts) {
 	//		dgPair pair;
-	//		dgAssert(!body0->m_collision->IsType(dgCollision::dgCollisionNull_RTTI));
-	//		dgAssert(!body1->m_collision->IsType(dgCollision::dgCollisionNull_RTTI));
+	//		dAssert(!body0->m_collision->IsType(dgCollision::dgCollisionNull_RTTI));
+	//		dAssert(!body1->m_collision->IsType(dgCollision::dgCollisionNull_RTTI));
 	//
 	//		pair.m_contact = contact;
 	//		pair.m_timestep = timestep;
@@ -857,11 +857,6 @@ void ntBroadPhase::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep,
 
 void ntBroadPhase::CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact)
 {
-	//dgContactList& contactList = *m_world;
-	//const dInt32 threadCount = m_world->GetThreadCount();
-	//const dInt32 contactCount = contactList.m_contactCount;
-	//ntContact** const contactArray = &contactList[0];
-
 	const dUnsigned32 lru = m_lru - D_CONTACT_DELAY_FRAMES;
 
 	dVector deltaTime(timestep);
