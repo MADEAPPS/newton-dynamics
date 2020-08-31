@@ -463,7 +463,8 @@ class dVector
 //
 // *****************************************************************************************
 D_MSC_VECTOR_ALIGNMENT
-class dBigVector : public dClassAlloc
+//class dBigVector: public dClassAlloc
+class dBigVector
 {
 	#define PERMUT_MASK_DOUBLE(y, x)	_MM_SHUFFLE2 (y, x)
 
@@ -893,7 +894,8 @@ class dBigVector : public dClassAlloc
 
 
 D_MSC_VECTOR_ALIGNMENT
-class dSpatialVector: public dClassAlloc
+//class dSpatialVector: public dClassAlloc
+class dSpatialVector
 {
 	public:
 	D_INLINE dSpatialVector()

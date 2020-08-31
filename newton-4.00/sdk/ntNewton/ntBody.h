@@ -146,7 +146,7 @@ class ntBody: public dClassAlloc
 			//dUnsigned32 m_equilibrium : 1;
 			//dUnsigned32 m_spawnnedFromCallback : 1;
 			//dUnsigned32 m_continueCollisionMode : 1;
-			//dUnsigned32 m_collideWithLinkedBodies : 1;
+			dUnsigned32 m_collideWithLinkedBodies : 1;
 			//dUnsigned32 m_transformIsDirty : 1;
 			//dUnsigned32 m_gyroTorqueOn : 1;
 			//dUnsigned32 m_isdead : 1;

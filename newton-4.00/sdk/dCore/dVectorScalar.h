@@ -33,7 +33,8 @@
 
 class dBigVector;
 D_MSC_VECTOR_ALIGNMENT
-class dVector: public dClassAlloc
+//class dVector: public dClassAlloc
+class dVector
 {
 	public:
 	D_INLINE dVector()
@@ -476,7 +477,8 @@ class dVector: public dClassAlloc
 #endif
 
 D_MSC_VECTOR_ALIGNMENT
-class dBigVector: public dClassAlloc
+//class dBigVector: public dClassAlloc
+class dBigVector
 {
 	public:
 	D_INLINE dBigVector()
@@ -909,7 +911,8 @@ class dBigVector: public dClassAlloc
 
 
 D_MSC_VECTOR_ALIGNMENT
-class dSpatialVector: public dClassAlloc
+//class dSpatialVector: public dClassAlloc
+class dSpatialVector
 {
 	public:
 	D_INLINE dSpatialVector()
