@@ -24,7 +24,7 @@
 #include "dVector.h"
 #include "dMatrix.h"
 
-#ifndef _NEWTON_USE_DOUBLE
+#ifndef D_NEWTON_USE_DOUBLE
 
 	dVector dVector::m_xMask(dInt32(-1), dInt32(0), dInt32(0), dInt32(0));
 	dVector dVector::m_yMask(dInt32(0), dInt32(-1), dInt32(0), dInt32(0));

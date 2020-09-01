@@ -29,7 +29,7 @@ class ntBroadPhaseBodyNode;
 class ntBroadPhaseTreeNode;
 class ntBroadPhaseAggregate;
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntBroadPhaseNode: public dClassAlloc
 {
 	public:
@@ -88,9 +88,9 @@ class ntBroadPhaseNode: public dClassAlloc
 
 	static dVector m_aabbQuantization;
 	static dVector m_aabbInvQuantization;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntBroadPhaseBodyNode: public ntBroadPhaseNode
 {
 	public:
@@ -106,7 +106,7 @@ class ntBroadPhaseBodyNode: public ntBroadPhaseNode
 
 	ntBody* m_body;
 	//dList<dBroadPhaseNode*>::dListNode* m_updateNode;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 class ntBroadPhaseTreeNode: public ntBroadPhaseNode
 {
@@ -137,7 +137,7 @@ class ntBroadPhaseTreeNode: public ntBroadPhaseNode
 	ntBroadPhaseNode* m_left;
 	ntBroadPhaseNode* m_right;
 	dList<ntBroadPhaseTreeNode*>::dListNode* m_fitnessNode;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 
 #endif

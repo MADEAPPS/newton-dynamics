@@ -42,7 +42,7 @@
 //
 //class dgSkeletonContainer;
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntBodyDynamic: public ntBody 
 {
 	class ntContactkey
@@ -162,7 +162,7 @@ class ntBodyDynamic: public ntBody
 
 	friend class ntBroadPhase;
 
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 inline dVector ntBodyDynamic::GetForce() const
 {

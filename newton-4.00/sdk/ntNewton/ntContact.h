@@ -28,7 +28,7 @@
 class ntBody;
 class ntShapeInstance;
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntContactPoint
 {
 	public:
@@ -41,10 +41,10 @@ class ntContactPoint
 	//dInt64 m_shapeId0;
 	//dInt64 m_shapeId1;
 	//dFloat32 m_penetration;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 
-D_MSC_VECTOR_ALIGNMENT 
+D_MSV_NEWTON_ALIGN_32 
 //class ntContact: public ntConstraint, public dgList<dgContactMaterial>
 class ntContact: public ntConstraint
 {
@@ -67,7 +67,7 @@ class ntContact: public ntConstraint
 	bool m_active;
 	bool m_isAttached;
 	bool m_killContact;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 #if 0
 DG_INLINE void dgContactMaterial::SetCollisionCallback (OnAABBOverlap aabbOverlap, OnContactCallback contact) 

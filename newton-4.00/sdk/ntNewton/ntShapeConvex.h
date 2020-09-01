@@ -30,7 +30,7 @@
 #define D_CLIP_MAX_POINT_COUNT			64
 #define D_MIN_CONVEX_SHAPE_SIZE			dFloat32 (1.0f/128.0f)
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntShapeConvex: public ntShape
 {
 	public:
@@ -106,7 +106,7 @@ class ntShapeConvex: public ntShape
 	dUnsigned16 m_edgeCount;
 	dUnsigned16 m_vertexCount;
 
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 #endif 
 

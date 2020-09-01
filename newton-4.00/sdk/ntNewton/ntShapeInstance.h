@@ -47,7 +47,7 @@ class ntShapeDebugCallback
 	const ntShapeInstance* m_instance;
 };
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntShapeInstance: public dClassAlloc
 {
 	public:
@@ -185,7 +185,7 @@ class ntShapeInstance: public dClassAlloc
 	ntScaleType m_scaleType;
 
 	static dVector m_padding;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 #if 0
 D_INLINE dShapeInstance::dShapeInstance(const dShapeInstance& meshInstance, const dShape* const shape)

@@ -119,7 +119,7 @@ D_INLINE dFloat32 dBoxDistanceToOrigin2 (const dVector& minBox, const dVector& m
 	return dist.DotProduct(dist).GetScalar();
 }
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class dFastRayTest
 {
 	public:
@@ -233,9 +233,9 @@ class dFastRayTest
 	dVector m_maxT;
 	dVector m_unitDir;
 	dVector m_isParallel;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
-//D_MSC_VECTOR_ALIGNMENT 
+//D_MSV_NEWTON_ALIGN_32 
 //class dFastAaabbInfo: public dgObb
 //{
 //	public:
@@ -395,7 +395,7 @@ class dFastRayTest
 //	friend class dgAABBPolygonSoup;
 //	friend class dgCollisionUserMesh;
 //	friend class dgCollisionHeightField;
-//} D_GCC_VECTOR_ALIGNMENT;
+//} D_GCC_NEWTON_ALIGN_32 ;
 
 #endif
 

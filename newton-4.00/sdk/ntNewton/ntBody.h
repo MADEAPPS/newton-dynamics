@@ -33,7 +33,7 @@ class ntRayCastCallback;
 class ntBroadPhaseBodyNode;
 class ntBroadPhaseAggregate;
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntBodyNotify: public dClassAlloc
 {
 	public:  
@@ -60,9 +60,9 @@ class ntBodyNotify: public dClassAlloc
 
 	friend class ntBody;
 
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32;
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntBody: public dClassAlloc
 {
 	public:
@@ -161,7 +161,7 @@ class ntBody: public dClassAlloc
 	friend class ntBroadPhase;
 	friend class ntBroadPhaseMixed;
 	friend class ntBroadPhaseBodyNode;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32;
 
 
 #endif 

@@ -894,7 +894,8 @@ void ntShapeConvex::SetVolumeAndCG()
 	dVector p0(dFloat32(0.0f));
 	dVector p1(dFloat32(0.0f));
 
-	for (dInt32 i = 0; i < 3; i++) {
+	for (dInt32 i = 0; i < 3; i++) 
+	{
 		dVector dir(dFloat32(0.0f));
 		dir[i] = dFloat32(-1.0f);
 		p0[i] = SupportVertex(dir, nullptr)[i];

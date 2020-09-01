@@ -41,7 +41,7 @@ class dVertexCollapseVertexMetric;
 
 typedef dInt64 dEdgeKey;
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class dEdge
 {
 	public:
@@ -56,7 +56,7 @@ class dEdge
 	dEdge* m_prev;
 	dEdge* m_twin;
 	dInt32 m_mark;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 class dPolyhedra: public dClassAlloc, public dTree <dEdge, dEdgeKey>
 {

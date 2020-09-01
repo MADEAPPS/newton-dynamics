@@ -28,8 +28,8 @@
 class dVector;
 class dMatrix;
 
-D_MSC_VECTOR_ALIGNMENT
-class dQuaternion: public dClassAlloc
+D_MSV_NEWTON_ALIGN_32
+class dQuaternion
 {
 	public:
 	dQuaternion (); 
@@ -56,8 +56,7 @@ class dQuaternion: public dClassAlloc
 	dFloat32 m_y;
 	dFloat32 m_z;
 	dFloat32 m_w;
-} D_GCC_VECTOR_ALIGNMENT;
-
+} D_GCC_NEWTON_ALIGN_32;
 
 D_INLINE dQuaternion::dQuaternion()
 	:m_x(dFloat32(0.0f))

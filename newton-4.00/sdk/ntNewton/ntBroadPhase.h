@@ -33,7 +33,7 @@ class ntContact;
 class ntBilateralJoint;
 class ntRayCastCallback;
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntBroadPhase: public dClassAlloc
 {
 	protected:
@@ -107,7 +107,7 @@ class ntBroadPhase: public dClassAlloc
 	static dVector m_angularContactError2;
 
 	friend class ntRayCastCallback;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 D_INLINE dFloat32 ntBroadPhase::CalculateSurfaceArea(const ntBroadPhaseNode* const node0, const ntBroadPhaseNode* const node1, dVector& minBox, dVector& maxBox) const
 {

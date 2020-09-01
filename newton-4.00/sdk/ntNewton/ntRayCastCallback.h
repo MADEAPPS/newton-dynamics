@@ -29,7 +29,7 @@
 #include "ntBroadPhase.h"
 #include "ntShapeInstance.h"
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntRayCastCallback
 {
 	public: 
@@ -56,9 +56,9 @@ class ntRayCastCallback
 
 	protected:
 	const ntWorld* m_world;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntRayCastCloasestHitCallback: public ntRayCastCallback
 {
 	public:
@@ -82,7 +82,7 @@ class ntRayCastCloasestHitCallback: public ntRayCastCallback
 
 	private:
 	dFloat32 m_param;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 
 #endif

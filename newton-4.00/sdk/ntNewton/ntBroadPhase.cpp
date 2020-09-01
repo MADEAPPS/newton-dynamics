@@ -35,7 +35,7 @@ dVector ntBroadPhase::m_angularContactError2(D_CONTACT_ANGULAR_ERROR * D_CONTACT
 dVector ntBroadPhase::m_linearContactError2(D_CONTACT_TRANSLATION_ERROR * D_CONTACT_TRANSLATION_ERROR);
 
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntBroadPhase::ntSpliteInfo
 {
 	public:
@@ -141,7 +141,7 @@ class ntBroadPhase::ntSpliteInfo
 	dVector m_p0;
 	dVector m_p1;
 	dInt32 m_axis;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 ntBroadPhase::ntFitnessList::ntFitnessList()
 	:dList <ntBroadPhaseTreeNode*>()

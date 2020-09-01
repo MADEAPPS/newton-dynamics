@@ -26,7 +26,7 @@ class ntBody;
 class ntBroadPhase;
 class ntBodyDynamic;
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntWorld
 	:public dClassAlloc
 	,public dSyncMutex
@@ -91,7 +91,7 @@ class ntWorld
 	dInt32 m_subSteps;
 
 	friend class ntBroadPhase;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 template <class T>
 void ntWorld::SubmitJobs(dFloat32 timestep)

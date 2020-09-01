@@ -27,7 +27,6 @@
 #include "dDebug.h"
 #include "dPlane.h"
 #include "dVector.h"
-#include "dClassAlloc.h"
 
 class dMatrix;
 class dQuaternion;
@@ -35,8 +34,8 @@ class dQuaternion;
 D_CORE_API const dMatrix& dGetZeroMatrix ();
 D_CORE_API const dMatrix& dGetIdentityMatrix();
 
-D_MSC_VECTOR_ALIGNMENT
-class dMatrix//: public dClassAlloc
+D_MSV_NEWTON_ALIGN_32
+class dMatrix
 {
 	public:
 	dMatrix ();
@@ -71,7 +70,7 @@ class dMatrix//: public dClassAlloc
 		dFloat32* const dst, dInt32 dstStrideInBytes,
 		const dFloat32* const src, dInt32 srcStrideInBytes, dInt32 count) const;
 
-#ifndef _NEWTON_USE_DOUBLE
+#ifndef D_NEWTON_USE_DOUBLE
 	D_CORE_API void TransformTriplex (
 		dFloat64* const dst, dInt32 dstStrideInBytes,
 		const dFloat64* const src, dInt32 srcStrideInBytes, dInt32 count) const;
@@ -103,7 +102,7 @@ class dMatrix//: public dClassAlloc
 
 	static dMatrix m_zeroMatrix;
 	static dMatrix m_identityMatrix;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 D_INLINE dMatrix::dMatrix ()
 {

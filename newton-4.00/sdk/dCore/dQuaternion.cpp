@@ -32,44 +32,45 @@ enum QUAT_INDEX
 };
 static QUAT_INDEX QIndex[] = { Y_INDEX, Z_INDEX, X_INDEX };
 
-dQuaternion::dQuaternion (const dMatrix& matrix)
+dQuaternion::dQuaternion(const dMatrix& matrix)
 {
 	dFloat32 trace = matrix[0][0] + matrix[1][1] + matrix[2][2];
-	if (trace > dFloat32(0.0f)) 
+	if (trace > dFloat32(0.0f))
 	{
-		trace = dSqrt (trace + dFloat32(1.0f));
-		m_w = dFloat32 (0.5f) * trace;
-		trace = dFloat32 (0.5f) / trace;
+		trace = dSqrt(trace + dFloat32(1.0f));
+		m_w = dFloat32(0.5f) * trace;
+		trace = dFloat32(0.5f) / trace;
 		m_x = (matrix[1][2] - matrix[2][1]) * trace;
 		m_y = (matrix[2][0] - matrix[0][2]) * trace;
 		m_z = (matrix[0][1] - matrix[1][0]) * trace;
-	} 
-	else 
+	}
+	else
 	{
 		QUAT_INDEX i = X_INDEX;
-		if (matrix[Y_INDEX][Y_INDEX] > matrix[X_INDEX][X_INDEX]) 
+		if (matrix[Y_INDEX][Y_INDEX] > matrix[X_INDEX][X_INDEX])
 		{
 			i = Y_INDEX;
 		}
-		if (matrix[Z_INDEX][Z_INDEX] > matrix[i][i]) 
+		if (matrix[Z_INDEX][Z_INDEX] > matrix[i][i])
 		{
 			i = Z_INDEX;
 		}
-		QUAT_INDEX j = QIndex [i];
-		QUAT_INDEX k = QIndex [j];
+		QUAT_INDEX j = QIndex[i];
+		QUAT_INDEX k = QIndex[j];
 
 		trace = dFloat32(1.0f) + matrix[i][i] - matrix[j][j] - matrix[k][k];
-		trace = dSqrt (trace);
+		trace = dSqrt(trace);
 
 		dFloat32* const ptr = &m_x;
-		ptr[i] = dFloat32 (0.5f) * trace;
-		trace  = dFloat32 (0.5f) / trace;
-		m_w   = (matrix[j][k] - matrix[k][j]) * trace;
+		ptr[i] = dFloat32(0.5f) * trace;
+		trace = dFloat32(0.5f) / trace;
+		m_w = (matrix[j][k] - matrix[k][j]) * trace;
 		ptr[j] = (matrix[i][j] + matrix[j][i]) * trace;
 		ptr[k] = (matrix[i][k] + matrix[k][i]) * trace;
 	}
 
 #ifdef _DEBUG
+
 	dMatrix tmp (*this, matrix.m_posit);
 	dMatrix unitMatrix (tmp * matrix.Inverse());
 	for (dInt32 i = 0; i < 4; i ++) 

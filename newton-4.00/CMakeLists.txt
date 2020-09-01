@@ -41,9 +41,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
 if(NEWTON_DOUBLE_PRECISION)
-	add_definitions(-D_NEWTON_USE_DOUBLE)
+	add_definitions(-DD_NEWTON_USE_DOUBLE)
 endif()
+
+if(NEWTON_ENABLE_AVX)
+	add_definitions(-DD_USE_VECTOR_AVX)
+endif()
+
 
 if(NEWTON_BUILD_SINGLE_THREADED)
 	add_definitions(-DD_USE_THREAD_EMULATION)

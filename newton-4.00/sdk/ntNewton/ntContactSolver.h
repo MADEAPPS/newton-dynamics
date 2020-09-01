@@ -29,7 +29,7 @@
 class dPlane;
 //class ntContactPoint;
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntMinkFace
 {
 	public:
@@ -38,7 +38,7 @@ class ntMinkFace
 	dInt16 m_vertex[3];
 	dInt8 m_mark;
 	dInt8 m_alive;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 #define D_SEPARATION_PLANES_ITERATIONS	8
 #define D_CONVEX_MINK_STACK_SIZE		64
@@ -52,7 +52,7 @@ class ntMinkFace
 
 class dCollisionParamProxy;
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntContactSolver: public dDownHeap<ntMinkFace *, dFloat32>  
 {
 	public: 
@@ -125,7 +125,7 @@ class ntContactSolver: public dDownHeap<ntMinkFace *, dFloat32>
 
 	static dVector m_hullDirs[14]; 
 	static dInt32 m_rayCastSimplex[4][4];
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 #endif 
 

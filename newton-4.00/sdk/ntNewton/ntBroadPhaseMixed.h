@@ -27,7 +27,7 @@
 
 class ntRayCastCallback;
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntBroadPhaseMixed : public ntBroadPhase
 {
 	public:
@@ -48,7 +48,7 @@ class ntBroadPhaseMixed : public ntBroadPhase
 	dFloat64 m_treeEntropy;
 	ntFitnessList m_fitness;
 
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 
 

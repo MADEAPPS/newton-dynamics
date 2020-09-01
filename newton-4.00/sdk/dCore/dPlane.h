@@ -26,11 +26,11 @@
 #include "dVector.h"
 
 
-#ifdef _NEWTON_USE_DOUBLE
+#ifdef D_NEWTON_USE_DOUBLE
 	#define dPlane dBigPlane
 #else 
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class dPlane: public dVector
 {
 	public:
@@ -42,11 +42,10 @@ class dPlane: public dVector
 	dPlane Scale (dFloat32 s) const;
 	dFloat32 Evalue (const dFloat32* const point) const;
 	dFloat32 Evalue (const dVector &point) const;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 #endif
 
-D_MSC_VECTOR_ALIGNMENT
 class dBigPlane: public dBigVector
 {
 	public:
@@ -58,11 +57,9 @@ class dBigPlane: public dBigVector
 	dBigPlane Scale (dFloat64 s) const;
 	dFloat64 Evalue (const dFloat64* const point) const;
 	dFloat64 Evalue (const dBigVector &point) const;
-} D_GCC_VECTOR_ALIGNMENT;
+};
 
-
-
-#ifndef _NEWTON_USE_DOUBLE
+#ifndef D_NEWTON_USE_DOUBLE
 
 D_INLINE dPlane::dPlane () 
 	:dVector () 

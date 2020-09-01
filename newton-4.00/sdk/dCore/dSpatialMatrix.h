@@ -26,9 +26,9 @@
 #include "dTypes.h"
 #include "dVector.h"
 
-
-D_MSC_VECTOR_ALIGNMENT
-class dSpatialMatrix: public dClassAlloc
+D_MSV_NEWTON_ALIGN_32
+//class dSpatialMatrix: public dClassAlloc
+class dSpatialMatrix
 {
 	public:
 	D_INLINE dSpatialMatrix()
@@ -81,8 +81,7 @@ class dSpatialMatrix: public dClassAlloc
 	}
 
 	dSpatialVector m_rows[6];
-} D_GCC_VECTOR_ALIGNMENT;
-
+} D_GCC_NEWTON_ALIGN_32 ;
 
 #endif
 

@@ -24,7 +24,7 @@
 
 #include "ntShapeConvex.h"
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntShapeBox: public ntShapeConvex
 {
 	public:
@@ -69,7 +69,7 @@ class ntShapeBox: public ntShapeConvex
 	static dConvexSimplexEdge* m_edgeEdgeMap[];
 	static dConvexSimplexEdge* m_vertexToEdgeMap[];
 
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 #endif 
 

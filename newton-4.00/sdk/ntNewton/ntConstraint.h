@@ -27,7 +27,7 @@
 class ntBody;
 class ntContact;
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntConstraint: public dClassAlloc
 {
 	public:
@@ -46,7 +46,7 @@ class ntConstraint: public dClassAlloc
 	ntBody* m_body1;
 	//void* m_userData;
 
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 #if 0
 

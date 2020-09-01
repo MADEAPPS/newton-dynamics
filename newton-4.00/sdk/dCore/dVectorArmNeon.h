@@ -28,7 +28,7 @@
 // 4 x 1 single precision vector class declaration
 //
 // *****************************************************************************************
-#ifdef _NEWTON_USE_DOUBLE
+#ifdef D_NEWTON_USE_DOUBLE
 #define dVector dBigVector
 #else
 
@@ -159,7 +159,7 @@ public:
         dAssert (dgCheckVector ((*this)));
     }
     
-#ifndef    _NEWTON_USE_DOUBLE
+#ifndef    D_NEWTON_USE_DOUBLE
     D_INLINE dVector(const dFloat64* const ptr)
     :m_x(dFloat32(ptr[0]))
     ,m_y(dFloat32(ptr[1]))
@@ -181,7 +181,7 @@ public:
     {
     }
     
-#ifndef  _NEWTON_USE_DOUBLE
+#ifndef  D_NEWTON_USE_DOUBLE
     D_INLINE dVector (const dBigVector& copy)
     :m_x(dFloat32 (((dFloat64*)&copy)[0]))
     ,m_y(dFloat32 (((dFloat64*)&copy)[1]))
@@ -590,7 +590,7 @@ public:
 	{
 	}
 
-#ifndef _NEWTON_USE_DOUBLE
+#ifndef D_NEWTON_USE_DOUBLE
 	D_INLINE dBigVector(const dVector& v)
 		: m_x(v.m_x), m_y(v.m_y), m_z(v.m_z), m_w(v.m_w)
 	{
@@ -1094,13 +1094,12 @@ public:
 // 4 x 1 single precision vector class declaration
 //
 // *****************************************************************************************
-#ifdef _NEWTON_USE_DOUBLE
+#ifdef D_NEWTON_USE_DOUBLE
 #define dVector dBigVector
 #else
 
 class dBigVector;
-D_MSC_VECTOR_ALIGNMENT
-//class dVector: public dClassAlloc
+D_MSV_NEWTON_ALIGN_32
 class dVector
 {
 	public:
@@ -1130,7 +1129,7 @@ class dVector
 		dAssert(dgCheckVector((*this)));
 	}
 
-#ifndef	_NEWTON_USE_DOUBLE
+#ifndef	D_NEWTON_USE_DOUBLE
 	D_INLINE dVector(const dFloat64* const ptr)
 		:m_x(dFloat32(ptr[0]))
 		,m_y(dFloat32(ptr[1]))
@@ -1151,7 +1150,7 @@ class dVector
 	{
 	}
 
-#ifndef  _NEWTON_USE_DOUBLE 
+#ifndef  D_NEWTON_USE_DOUBLE 
 	D_INLINE dVector(const dBigVector& copy)
 		:m_x(dFloat32(((dFloat64*)&copy)[0]))
 		,m_y(dFloat32(((dFloat64*)&copy)[1]))
@@ -1513,12 +1512,11 @@ class dVector
 	static dVector m_epsilon;
 	static dVector m_signMask;
 	static dVector m_triplexMask;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 #endif
 
-D_MSC_VECTOR_ALIGNMENT
-//class dBigVector: public dClassAlloc
+D_MSV_NEWTON_ALIGN_32
 class dBigVector
 {
 	public:
@@ -1536,7 +1534,7 @@ class dBigVector
 	{
 	}
 
-#ifndef _NEWTON_USE_DOUBLE
+#ifndef D_NEWTON_USE_DOUBLE
 	D_INLINE dBigVector(const dVector& v)
 		: m_x(v.m_x), m_y(v.m_y), m_z(v.m_z), m_w(v.m_w)
 	{
@@ -1949,10 +1947,9 @@ class dBigVector
 	static dBigVector m_epsilon;
 	static dBigVector m_signMask;
 	static dBigVector m_triplexMask;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
-D_MSC_VECTOR_ALIGNMENT
-//class dSpatialVector: public dClassAlloc
+D_MSV_NEWTON_ALIGN_32
 class dSpatialVector
 {
 	public:
@@ -2041,6 +2038,6 @@ class dSpatialVector
 
 	dFloat64 m_d[6];
 	static dSpatialVector m_zero;
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 #endif

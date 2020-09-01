@@ -112,7 +112,7 @@ void dMatrix::TransformTriplex (dFloat32* const dst, dInt32 dstStrideInBytes, co
 	}
 }
 
-#ifndef _NEWTON_USE_DOUBLE
+#ifndef D_NEWTON_USE_DOUBLE
 void dMatrix::TransformTriplex (dFloat64* const dst, dInt32 dstStrideInBytes, const dFloat64* const src, dInt32 srcStrideInBytes, dInt32 count) const
 {
 	dInt32 dstStride = dInt32 (dstStrideInBytes /sizeof (dFloat64));

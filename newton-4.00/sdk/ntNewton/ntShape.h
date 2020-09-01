@@ -75,7 +75,7 @@ enum dShapeID
 //	m_lumpedMassCollision
 };
 
-D_MSC_VECTOR_ALIGNMENT
+D_MSV_NEWTON_ALIGN_32
 class ntShape: public dClassAlloc
 {
 	public:
@@ -158,7 +158,7 @@ class ntShape: public dClassAlloc
 	//friend class dShapeInstance;
 	//friend class dShapeCompound;
 
-} D_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 /*
 inline dShapeID dShape::GetCollisionPrimityType () const

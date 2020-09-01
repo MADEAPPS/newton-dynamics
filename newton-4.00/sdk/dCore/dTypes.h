@@ -192,32 +192,37 @@
 	#endif
 #endif
 
-#define D_VECTOR_SIMD_SIZE		16
-#define D_VECTOR_AVX2_SIZE		32
+#if defined (D_USE_VECTOR_AVX)
+	#if defined(_MSC_VER)
+		#define	D_MSV_NEWTON_ALIGN_16    __declspec(align(16))
+		#define	D_GCC_NEWTON_ALIGN_16 	 
 
-#if defined(_MSC_VER)
-	#define	D_GCC_VECTOR_ALIGNMENT
-	#define	D_MSC_VECTOR_ALIGNMENT    __declspec(align(D_VECTOR_SIMD_SIZE))
+		#define	D_MSV_NEWTON_ALIGN_32    __declspec(align(32))
+		#define	D_GCC_NEWTON_ALIGN_32 	 
+	#else
+		#define	D_MSV_NEWTON_ALIGN_16
+		#define	D_GCC_NEWTON_ALIGN_16     __attribute__((aligned (16)))
+
+		#define	D_MSV_NEWTON_ALIGN_32
+		#define	D_GCC_NEWTON_ALIGN_32     __attribute__((aligned (32)))
+	#endif
+
 #else
-	#define	D_GCC_VECTOR_ALIGNMENT    __attribute__ ((aligned (D_VECTOR_SIMD_SIZE)))
-	#define	D_MSC_VECTOR_ALIGNMENT
+	#if defined(_MSC_VER)
+		#define	D_GCC_NEWTON_ALIGN_16 	 
+		#define	D_MSV_NEWTON_ALIGN_16    __declspec(align(16))
+	#else
+		#define	D_GCC_NEWTON_ALIGN_16     __attribute__((aligned (16)))
+		#define	D_MSV_NEWTON_ALIGN_16
+
+		#define	D_GCC_NEWTON_ALIGN_32     __attribute__((aligned (32)))
+		#define	D_MSV_NEWTON_ALIGN_32
+	#endif
+
+	#define	D_MSV_NEWTON_ALIGN_32 D_MSV_NEWTON_ALIGN_16   
+	#define	D_GCC_NEWTON_ALIGN_32 D_GCC_NEWTON_ALIGN_16	 
 #endif
 
-#if defined(_MSC_VER)
-	#define	D_GCC_AVX_ALIGNMENT
-	#define	D_MSC_AVX_ALIGNMENT       __declspec(align(D_VECTOR_AVX2_SIZE))
-#else
-	#define	D_GCC_AVX_ALIGNMENT       __attribute__ ((aligned (D_VECTOR_AVX2_SIZE)))
-	#define	D_MSC_AVX_ALIGNMENT
-#endif
-
-#if defined(_MSC_VER)
-	#define D_LIBRARY_EXPORT __declspec(dllexport)
-	#define D_LIBRARY_IMPORT __declspec(dllimport)
-#else
-	#define D_LIBRARY_EXPORT __attribute__((visibility("default")))
-	#define D_LIBRARY_IMPORT __attribute__((visibility("default")))
-#endif
 
 #ifdef _D_CORE_DLL
 	#ifdef _D_CORE_EXPORT_DLL
@@ -262,7 +267,7 @@
 
 typedef double dFloat64;
 
-#ifdef _NEWTON_USE_DOUBLE
+#ifdef D_NEWTON_USE_DOUBLE
 	typedef double dFloat32;
 #else
 	typedef float dFloat32;
@@ -284,7 +289,7 @@ class dTriplex
 #define dRadToDegree  	dFloat32 (180.0f / dPi)
 
 class dBigVector;
-#ifndef _NEWTON_USE_DOUBLE
+#ifndef D_NEWTON_USE_DOUBLE
 class dVector;
 #endif 
 
@@ -404,7 +409,7 @@ D_INLINE bool dAreEqual(T A, T B, T tol)
 	return dAbs(A - B) < tol;
 }
 
-#ifdef _NEWTON_USE_DOUBLE
+#ifdef D_NEWTON_USE_DOUBLE
 	union dFloatSign
 	{
 		struct {
