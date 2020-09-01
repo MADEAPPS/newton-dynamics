@@ -499,7 +499,6 @@ class dVector
 		D_INLINE dBigVector(const dFloat32* const ptr)
 			:m_type(_mm256_set_pd(ptr[3], ptr[2], ptr[1], ptr[0]))
 		{
-			dAssert(0);
 		}
 #else
 
@@ -662,10 +661,12 @@ class dVector
 
 		dFloat64 GetMax() const
 		{
-			dAssert(0);
-			return 0;
-			//__m256d tmp(_mm256_max_pd(m_type, _mm256_shuffle_pd(m_type, m_type, PERMUTE_MASK(3, 2, 3, 2))));
-			//return _mm_cvtss_f32(_mm256_max_ss(tmp, _mm_shuffle_ps(tmp, tmp, PERMUTE_MASK(3, 2, 0, 1))));
+			__m256d tmp0(_mm256_permute2f128_pd(m_type, m_type, 5));
+			__m256d tmp1(_mm256_max_pd(m_type, tmp0));
+			__m256d tmp2(_mm256_unpackhi_pd(tmp1, tmp1));
+			__m256d tmp3(_mm256_max_pd(tmp1, tmp2));
+			dBigVector tmp4(tmp3);
+			return tmp4.GetScalar();
 		}
 
 		dBigVector GetMax(const dBigVector& data) const
@@ -686,7 +687,6 @@ class dVector
 			//dInt64 z = _mm_cvtsd_si32(temp.m_typeHigh);
 			//dInt64 w = _mm_cvtsd_si32(_mm_shuffle_pd(temp.m_typeHigh, temp.m_typeHigh, PERMUT_MASK_DOUBLE(1, 1)));
 			//return dBigVector(_mm_set_pd(*(dFloat32*)&y, *(dFloat32*)&x), _mm_set_pd(*(dFloat32*)&w, *(dFloat32*)&z));
-			dAssert(0);
 			union 
 			{
 				__m128i tmp;
@@ -698,7 +698,6 @@ class dVector
 					dInt32 m_w;
 				};
 			};
-			dAssert(0);
 			tmp = _mm256_cvttpd_epi32(temp.m_type);
 			return dBigVector(m_x, m_y, m_z, m_w);
 		}
@@ -797,7 +796,6 @@ class dVector
 		D_INLINE dInt32 GetSignMask() const
 		{
 			//return _mm_movemask_pd(m_typeLow) | (_mm_movemask_pd(m_typeHigh) << 2);
-			dAssert(0);
 			return _mm256_movemask_pd(m_type);
 		}
 
