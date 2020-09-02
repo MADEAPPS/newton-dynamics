@@ -28,6 +28,7 @@ class ntBody;
 class ntWorld;
 class ntBroadPhase;
 class ntBodyDynamic;
+class ntBodyKinematic;
 class ntContactNotify;
 
 D_MSV_NEWTON_ALIGN_32
@@ -92,9 +93,11 @@ class ntWorld
 	void SubmitJobs(dFloat32 timestep);
 
 	dList<ntBody*> m_bodyList;
-	dArray<ntBodyDynamic*> m_dynamicBodyArray;
+	dArray<ntBodyKinematic*> m_tmpBodyArray;
+
 	ntBroadPhase* m_broadPhase;
 	ntContactNotify* m_contactNotifyCallback;
+
 	dFloat32 m_timestep;
 	dInt32 m_subSteps;
 

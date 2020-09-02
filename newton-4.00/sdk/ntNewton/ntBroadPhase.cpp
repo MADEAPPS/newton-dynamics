@@ -145,7 +145,7 @@ class ntBroadPhase::ntSpliteInfo
 } D_GCC_NEWTON_ALIGN_32 ;
 
 ntBroadPhase::ntFitnessList::ntFitnessList()
-	:dList <ntBroadPhaseTreeNode*>()
+	:dList <ntBroadPhaseTreeNode*, dContainersFreeListAlloc<ntBroadPhaseTreeNode*>>()
 	,m_prevCost(dFloat32(0.0f))
 	,m_index(0)
 {
@@ -180,6 +180,7 @@ ntBroadPhase::~ntBroadPhase()
 void ntBroadPhase::Cleanup()
 {
 	m_contactList.DeleteAllContacts();
+	ntContact::FlushFreeList();
 }
 
 dFloat32 ntBroadPhase::RayCast(ntRayCastNotify& callback, const ntBroadPhaseNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const
@@ -1200,8 +1201,8 @@ void ntBroadPhase::UpdateAabb(dFloat32 timestep)
 			const dInt32 threadsCount = m_world->GetThreadCount();
 			ntBroadPhase* const broadPhase = m_world->m_broadPhase;
 
-			const dInt32 count = m_world->m_dynamicBodyArray.GetCount();
-			ntBodyDynamic** const bodies = &m_world->m_dynamicBodyArray[0];
+			const dInt32 count = m_world->m_tmpBodyArray.GetCount();
+			ntBodyKinematic** const bodies = &m_world->m_tmpBodyArray[0];
 
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
@@ -1225,8 +1226,8 @@ void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
 			const dInt32 threadsCount = m_world->GetThreadCount();
 			ntBroadPhase* const broadPhase = m_world->m_broadPhase;
 
-			const dInt32 count = m_world->m_dynamicBodyArray.GetCount();
-			ntBodyDynamic** const bodies = &m_world->m_dynamicBodyArray[0];
+			const dInt32 count = m_world->m_tmpBodyArray.GetCount();
+			ntBodyKinematic** const bodies = &m_world->m_tmpBodyArray[0];
 			
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{

@@ -46,7 +46,7 @@ class ntContactPoint
 
 D_MSV_NEWTON_ALIGN_32 
 //class ntContact: public ntConstraint, public dgList<dgContactMaterial>
-class ntContact: public ntConstraint
+class ntContact: public ntConstraint, public dContainersFreeListAlloc<ntContact*>
 {
 	public:
 	D_NEWTON_API ntContact(ntBody* const body0, ntBody* const body1);

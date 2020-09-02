@@ -33,7 +33,7 @@ ntWorld::ntWorld()
 	,dThread()
 	,dThreadPool()
 	,m_bodyList()
-	,m_dynamicBodyArray()
+	,m_tmpBodyArray()
 	,m_broadPhase(nullptr)
 	,m_contactNotifyCallback(nullptr)
 	,m_timestep(dFloat32 (0.0f))
@@ -43,27 +43,6 @@ ntWorld::ntWorld()
 	SetName("newton main thread");
 	Start();
 	m_broadPhase = new ntBroadPhaseMixed(this);
-
-	//{
-	//	dList <int, dContainersFreeListAlloc<int>> xxx;
-	//	xxx.Append(1);
-	//	xxx.Append(2);
-	//	xxx.Append(3);
-	//}
-	//{
-	//	dList <dFloat32, dContainersFreeListAlloc<dFloat32>> xxx;
-	//	xxx.Append(1);
-	//	xxx.Append(2);
-	//	xxx.Append(3);
-	//}
-	//
-	//{
-	//	dList <int, dContainersFreeListAlloc<int>> xxx;
-	//	xxx.Append(1);
-	//	xxx.Append(2);
-	//	xxx.Append(3);
-	//}
-	//dList <int, dContainersFreeListAlloc<int>>::FlushFreeList();
 }
 
 ntWorld::~ntWorld()
@@ -182,13 +161,13 @@ void ntWorld::BuildBodyArray()
 {
 	D_TRACKTIME();
 	int index = 0;
-	m_dynamicBodyArray.SetCount(m_bodyList.GetCount());
+	m_tmpBodyArray.SetCount(m_bodyList.GetCount());
 	for (dList<ntBody*>::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
 		ntBodyDynamic* const dynBody = node->GetInfo()->GetAsBodyDynamic();
 		if (dynBody)
 		{
-			m_dynamicBodyArray[index] = dynBody;
+			m_tmpBodyArray[index] = dynBody;
 			index++;
 
 			const ntShape* const shape = ((ntShape*)dynBody->GetCollisionShape().GetShape())->GetAsShapeNull();
@@ -254,11 +233,17 @@ void ntWorld::ApplyExternalForces(dFloat32 timestep)
 		{
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
-			const dInt32 count = m_world->m_dynamicBodyArray.GetCount();
-			ntBodyDynamic** const bodies = &m_world->m_dynamicBodyArray[0];
+			const dInt32 count = m_world->m_tmpBodyArray.GetCount();
+
+			ntBodyKinematic** const bodies = &m_world->m_tmpBodyArray[0];
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
-				bodies[i]->ApplyExternalForces(threadIndex, m_timestep);
+				ntBodyDynamic* const body = bodies[i]->GetAsBodyDynamic();
+				if (body)
+				{
+					body->ApplyExternalForces(threadIndex, m_timestep);
+				}
+
 			}
 		}
 	};
@@ -287,5 +272,9 @@ void ntWorld::SetContactNotify(ntContactNotify* const notify)
 		delete m_contactNotifyCallback;
 	}
 	m_contactNotifyCallback = notify;
-	m_contactNotifyCallback->m_world = this;
+
+	if (m_contactNotifyCallback)
+	{
+		m_contactNotifyCallback->m_world = this;
+	}
 }

@@ -65,13 +65,13 @@ class dContainersFreeListAlloc
 		FreeList** const freeList = GetFreeList();
 		if (*freeList) 
 		{
+			m_size--;
 			FreeList* const self = *freeList;
 			*freeList = self->m_next;
 			return self;
 		}
 		else
 		{
-			dAssert(size > 16);
 			return dMalloc(size);
 		}
 	}
@@ -82,6 +82,7 @@ class dContainersFreeListAlloc
 		FreeList* const self = (FreeList*)ptr;
 		self->m_next = *freeList;
 		*freeList = self;
+		m_size++;
 	}
 
 	static void FlushFreeList()
@@ -94,6 +95,7 @@ class dContainersFreeListAlloc
 			first = first->m_next;
 			dFree(self);
 		}
+		m_size = 0;
 		*freeList = nullptr;
 	}
 
@@ -103,8 +105,11 @@ class dContainersFreeListAlloc
 		static FreeList* freeList = nullptr;
 		return &freeList;
 	}
+	static dUnsigned32 m_size;
 };
 
+template<class T>
+dUnsigned32 dContainersFreeListAlloc<T>::m_size = 0;
 
 
 #endif

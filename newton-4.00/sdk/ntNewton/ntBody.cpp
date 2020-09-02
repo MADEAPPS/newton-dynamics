@@ -113,7 +113,10 @@ void ntBody::SetNotifyCallback(ntBodyNotify* const notify)
 		delete m_notifyCallback;
 	}
 	m_notifyCallback = notify;
-	m_notifyCallback->m_body = this;
+	if (m_notifyCallback)
+	{
+		m_notifyCallback->m_body = this;
+	}
 }
 
 ntBodyNotify* ntBody::GetNotifyCallback(ntBodyNotify* const notify) const

@@ -502,6 +502,7 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 
 ntContact::ntContact(ntBody* const body0, ntBody* const body1)
 	:ntConstraint(body0, body1)
+	,dContainersFreeListAlloc<ntContact*>()
 	,m_positAcc(dFloat32(10.0f))
 	,m_rotationAcc()
 	,m_linkNode(nullptr)

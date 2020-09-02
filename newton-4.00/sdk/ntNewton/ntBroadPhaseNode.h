@@ -136,8 +136,8 @@ class ntBroadPhaseTreeNode: public ntBroadPhaseNode
 
 	ntBroadPhaseNode* m_left;
 	ntBroadPhaseNode* m_right;
-	dList<ntBroadPhaseTreeNode*>::dListNode* m_fitnessNode;
-} D_GCC_NEWTON_ALIGN_32 ;
+	dList<ntBroadPhaseTreeNode*, dContainersFreeListAlloc<ntBroadPhaseTreeNode*>>::dListNode* m_fitnessNode;
+} D_GCC_NEWTON_ALIGN_32;
 
 
 #endif

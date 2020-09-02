@@ -28,7 +28,7 @@ class ntBody;
 class ntContact;
 
 D_MSV_NEWTON_ALIGN_32
-class ntConstraint: public dClassAlloc
+class ntConstraint
 {
 	public:
 	virtual ~ntConstraint();

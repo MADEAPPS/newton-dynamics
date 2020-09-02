@@ -34,6 +34,7 @@ ntBroadPhaseMixed::ntBroadPhaseMixed(ntWorld* const world)
 
 ntBroadPhaseMixed::~ntBroadPhaseMixed()
 {
+	ntFitnessList::FlushFreeList();
 }
 
 void ntBroadPhaseMixed::AddNode(ntBroadPhaseNode* const newNode)

@@ -38,7 +38,7 @@ class ntBroadPhase: public dClassAlloc
 {
 	protected:
 	class ntSpliteInfo;
-	class ntFitnessList: public dList <ntBroadPhaseTreeNode*>
+	class ntFitnessList: public dList <ntBroadPhaseTreeNode*, dContainersFreeListAlloc<ntBroadPhaseTreeNode*>>
 	{
 		public:
 		ntFitnessList();
