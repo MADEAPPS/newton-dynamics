@@ -24,6 +24,7 @@
 #include "ntWorld.h"
 #include "ntShapeNull.h"
 #include "ntBodyDynamic.h"
+#include "ntContactNotify.h"
 #include "ntBroadPhaseMixed.h"
 
 ntWorld::ntWorld()
@@ -34,6 +35,7 @@ ntWorld::ntWorld()
 	,m_bodyList()
 	,m_dynamicBodyArray()
 	,m_broadPhase(nullptr)
+	,m_contactNotifyCallback(nullptr)
 	,m_timestep(dFloat32 (0.0f))
 	,m_subSteps(1)
 {
@@ -69,6 +71,7 @@ ntWorld::~ntWorld()
 	Sync();
 	Finish();
 
+	SetContactNotify(nullptr);
 	m_broadPhase->Cleanup();
 	while (m_bodyList.GetFirst())
 	{
@@ -270,4 +273,19 @@ void ntWorld::UpdateSleepState(dFloat32 timestep)
 void ntWorld::UpdateBroadPhase(dFloat32 timestep)
 {
 	m_broadPhase->Update(timestep);
+}
+
+ntContactNotify* ntWorld::GetContactNotify() const
+{
+	return m_contactNotifyCallback;
+}
+
+void ntWorld::SetContactNotify(ntContactNotify* const notify)
+{
+	if (m_contactNotifyCallback)
+	{
+		delete m_contactNotifyCallback;
+	}
+	m_contactNotifyCallback = notify;
+	m_contactNotifyCallback->m_world = this;
 }

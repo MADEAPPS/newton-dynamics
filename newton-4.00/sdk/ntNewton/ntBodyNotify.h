@@ -19,38 +19,39 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_BROADPHASE_DEFAULT_H__
-#define __D_BROADPHASE_DEFAULT_H__
+#ifndef __D_BODY_NOTIFY_H__
+#define __D_BODY_NOTIFY_H__
 
 #include "ntStdafx.h"
-#include "ntBroadPhase.h"
-
-class ntRayCastNotify;
 
 D_MSV_NEWTON_ALIGN_32
-class ntBroadPhaseMixed : public ntBroadPhase
+class ntBodyNotify: public dClassAlloc
 {
-	public:
-	D_NEWTON_API ntBroadPhaseMixed(ntWorld* const world);
-	D_NEWTON_API virtual ~ntBroadPhaseMixed();
+	public:  
+	ntBodyNotify()
+		:dClassAlloc()
+		,m_body(nullptr)
+	{
+	}
+
+	virtual ~ntBodyNotify()
+	{
+	}
+
+	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
+	{
+	}
+
+	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
+	{
+	}
 
 	protected:
-	D_NEWTON_API virtual void AddBody(ntBody* const body);
-	D_NEWTON_API virtual void RemoveBody(ntBody* const body);
-	D_NEWTON_API virtual dFloat32 RayCast(ntRayCastNotify& callback, const dVector& p0, const dVector& p1) const;
+	ntBody* m_body;
 
-	private:
-	void AddNode(ntBroadPhaseNode* const newNode);
-	void RemoveNode(ntBroadPhaseNode* const newNode);
-	void BalanceBroadPhase();
-	void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBody* const body);
+	friend class ntBody;
 
-	dFloat64 m_treeEntropy;
-	ntFitnessList m_fitness;
+} D_GCC_NEWTON_ALIGN_32;
 
-} D_GCC_NEWTON_ALIGN_32 ;
+#endif 
 
-
-
-
-#endif

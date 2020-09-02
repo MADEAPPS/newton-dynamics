@@ -32,7 +32,6 @@
 #else
 
 class dBigVector;
-D_MSV_NEWTON_ALIGN_32
 class dVector
 {
 	public:
@@ -475,7 +474,6 @@ class dVector
 
 #endif
 
-D_MSV_NEWTON_ALIGN_32
 class dBigVector
 {
 	public:
@@ -907,8 +905,6 @@ class dBigVector
 	static dBigVector m_triplexMask;
 } D_GCC_NEWTON_ALIGN_32;
 
-
-D_MSV_NEWTON_ALIGN_32
 class dSpatialVector
 {
 	public:

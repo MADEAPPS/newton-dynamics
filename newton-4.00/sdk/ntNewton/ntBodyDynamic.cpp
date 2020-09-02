@@ -22,6 +22,7 @@
 #include "ntStdafx.h"
 #include "ntWorld.h"
 #include "ntContact.h"
+#include "ntBodyNotify.h"
 #include "ntBodyDynamic.h"
 
 //////////////////////////////////////////////////////////////////////

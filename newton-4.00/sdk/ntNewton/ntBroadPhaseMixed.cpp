@@ -260,7 +260,7 @@ void ntBroadPhaseMixed::FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep,
 	}
 }
 
-dFloat32 ntBroadPhaseMixed::RayCast(ntRayCastCallback& callback, const dVector& p0, const dVector& p1) const
+dFloat32 ntBroadPhaseMixed::RayCast(ntRayCastNotify& callback, const dVector& p0, const dVector& p1) const
 {
 	dFloat32 param = dFloat32(1.2f);
 	if (m_rootNode) 

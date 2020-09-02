@@ -27,40 +27,12 @@
 
 class ntWorld;
 class ntContact;
+class ntBodyNotify;
 class ntBodyDynamic;
 class ntBilateralJoint;
-class ntRayCastCallback;
+class ntRayCastNotify;
 class ntBroadPhaseBodyNode;
 class ntBroadPhaseAggregate;
-
-D_MSV_NEWTON_ALIGN_32
-class ntBodyNotify: public dClassAlloc
-{
-	public:  
-	ntBodyNotify()
-		:dClassAlloc()
-		,m_body(nullptr)
-	{
-	}
-
-	virtual ~ntBodyNotify()
-	{
-	}
-
-	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
-	{
-	}
-
-	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
-	{
-	}
-
-	protected:
-	ntBody* m_body;
-
-	friend class ntBody;
-
-} D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
 class ntBody: public dClassAlloc
@@ -99,7 +71,7 @@ class ntBody: public dClassAlloc
 	D_NEWTON_API virtual void DetachContact(ntContact* const contact) {}
 	virtual ntContact* FindContact(const ntBody* const otherBody) const {return nullptr;}
 
-	D_NEWTON_API dFloat32 RayCast(ntRayCastCallback& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
+	D_NEWTON_API dFloat32 RayCast(ntRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
 
 	protected:
 	dList<ntBody*>::dListNode* GetNewtonNode() const;

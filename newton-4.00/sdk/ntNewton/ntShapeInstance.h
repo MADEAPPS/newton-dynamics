@@ -29,7 +29,7 @@
 class ntBody;
 class ntContactPoint;
 class ntShapeInstance;
-class ntRayCastCallback;
+class ntRayCastNotify;
 class ntShapeDebugCallback
 {
 	public: 
@@ -71,7 +71,7 @@ class ntShapeInstance: public dClassAlloc
 	D_NEWTON_API void CalculateAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	D_NEWTON_API void DebugShape(const dMatrix& matrix, ntShapeDebugCallback& debugCallback) const;
 
-	D_NEWTON_API dFloat32 RayCast(ntRayCastCallback& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const;
+	D_NEWTON_API dFloat32 RayCast(ntRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const;
 
 	const ntShape* GetShape() const;
 	dVector SupportVertex(const dVector& dir) const;

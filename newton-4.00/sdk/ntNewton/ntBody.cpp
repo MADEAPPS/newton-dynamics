@@ -23,7 +23,8 @@
 #include "ntBody.h"
 #include "ntContact.h"
 #include "ntShapeNull.h"
-#include "ntRayCastCallback.h"
+#include "ntBodyNotify.h"
+#include "ntRayCastNotify.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -204,7 +205,7 @@ void ntBody::SetMatrix(const dMatrix& matrix)
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
 }
 
-dFloat32 ntBody::RayCast(ntRayCastCallback& callback, const dFastRayTest& ray, dFloat32 maxT) const
+dFloat32 ntBody::RayCast(ntRayCastNotify& callback, const dFastRayTest& ray, dFloat32 maxT) const
 {
 	dVector l0(ray.m_p0);
 	dVector l1(ray.m_p0 + ray.m_diff.Scale(dMin(maxT, dFloat32(1.0f))));

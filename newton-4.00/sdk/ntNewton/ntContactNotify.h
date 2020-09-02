@@ -19,38 +19,35 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_BROADPHASE_DEFAULT_H__
-#define __D_BROADPHASE_DEFAULT_H__
+#ifndef __D_CONTACT_NOTIFY_H__
+#define __D_CONTACT_NOTIFY_H__
 
 #include "ntStdafx.h"
-#include "ntBroadPhase.h"
 
-class ntRayCastNotify;
+class ntContact;
 
 D_MSV_NEWTON_ALIGN_32
-class ntBroadPhaseMixed : public ntBroadPhase
+class ntContactNotify: public dClassAlloc
 {
 	public:
-	D_NEWTON_API ntBroadPhaseMixed(ntWorld* const world);
-	D_NEWTON_API virtual ~ntBroadPhaseMixed();
+	ntContactNotify()
+		:dClassAlloc()
+		,m_world (nullptr)
+	{
+	}
+
+	virtual ~ntContactNotify()
+	{
+	}
+
+	virtual bool OnAaabbOverlap(const ntContact* const contact, dFloat32 timestep)
+	{
+		return true;
+	}
 
 	protected:
-	D_NEWTON_API virtual void AddBody(ntBody* const body);
-	D_NEWTON_API virtual void RemoveBody(ntBody* const body);
-	D_NEWTON_API virtual dFloat32 RayCast(ntRayCastNotify& callback, const dVector& p0, const dVector& p1) const;
-
-	private:
-	void AddNode(ntBroadPhaseNode* const newNode);
-	void RemoveNode(ntBroadPhaseNode* const newNode);
-	void BalanceBroadPhase();
-	void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBody* const body);
-
-	dFloat64 m_treeEntropy;
-	ntFitnessList m_fitness;
-
-} D_GCC_NEWTON_ALIGN_32 ;
-
-
-
+	ntWorld* m_world;
+	friend class ntWorld;
+};
 
 #endif

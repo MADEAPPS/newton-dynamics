@@ -41,7 +41,6 @@ class dVertexCollapseVertexMetric;
 
 typedef dInt64 dEdgeKey;
 
-D_MSV_NEWTON_ALIGN_32
 class dEdge
 {
 	public:

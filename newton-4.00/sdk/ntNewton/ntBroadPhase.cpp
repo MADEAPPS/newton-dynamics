@@ -24,6 +24,7 @@
 #include "ntBody.h"
 #include "ntBroadPhase.h"
 #include "ntBodyDynamic.h"
+#include "ntContactNotify.h"
 
 #define D_CONTACT_DELAY_FRAMES		4
 #define D_NARROW_PHASE_DIST		dFloat32 (0.2f)
@@ -162,9 +163,11 @@ dFloat64 ntBroadPhase::ntFitnessList::TotalCost() const
 	
 ntBroadPhase::ntBroadPhase(ntWorld* const world)
 	:dClassAlloc()
+	,m_contactList()
+	,m_activeContacts()
 	,m_world(world)
 	,m_rootNode(nullptr)
-	,m_contactList()
+	,m_contactNotifyCallback(nullptr)
 	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_fullScan(true)
 {
@@ -179,7 +182,7 @@ void ntBroadPhase::Cleanup()
 	m_contactList.DeleteAllContacts();
 }
 
-dFloat32 ntBroadPhase::RayCast(ntRayCastCallback& callback, const ntBroadPhaseNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const
+dFloat32 ntBroadPhase::RayCast(ntRayCastNotify& callback, const ntBroadPhaseNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const
 {
 	dFloat32 maxParam = dFloat32(1.2f);
 	while (stack) 
@@ -318,6 +321,7 @@ void ntBroadPhase::Update(dFloat32 timestep)
 {
 	D_TRACKTIME();
 	m_lru = m_lru + 1;
+	m_contactNotifyCallback = m_world->GetContactNotify();
 	UpdateAabb(timestep);
 	BalanceBroadPhase();
 	FindCollidingPairs(timestep);
@@ -853,6 +857,10 @@ void ntBroadPhase::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep,
 	//		CalculatePairContacts(&pair, threadIndex);
 	//	}
 	//}
+	if (m_contactNotifyCallback)
+	{
+		bool processContacts = m_contactNotifyCallback->OnAaabbOverlap(contact, timestep);
+	}
 }
 
 void ntBroadPhase::CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact)

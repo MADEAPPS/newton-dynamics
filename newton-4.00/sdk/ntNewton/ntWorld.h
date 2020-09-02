@@ -19,12 +19,16 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _D_NEWTON_H_
-#define _D_NEWTON_H_
+#ifndef __D_WORLD_H__
+#define __D_WORLD_H__
+
+#include "ntStdafx.h"
 
 class ntBody;
+class ntWorld;
 class ntBroadPhase;
 class ntBodyDynamic;
+class ntContactNotify;
 
 D_MSV_NEWTON_ALIGN_32
 class ntWorld
@@ -61,6 +65,9 @@ class ntWorld
 
 	D_NEWTON_API ntBroadPhase* GetBroadphase() const;
 
+	D_NEWTON_API ntContactNotify* GetContactNotify() const;
+	D_NEWTON_API void SetContactNotify(ntContactNotify* const notify);
+
 	protected:
 	D_NEWTON_API virtual void SubstepUpdate(dFloat32 timestep);
 	D_NEWTON_API virtual void UpdateSkeletons(dFloat32 timestep);
@@ -87,6 +94,7 @@ class ntWorld
 	dList<ntBody*> m_bodyList;
 	dArray<ntBodyDynamic*> m_dynamicBodyArray;
 	ntBroadPhase* m_broadPhase;
+	ntContactNotify* m_contactNotifyCallback;
 	dFloat32 m_timestep;
 	dInt32 m_subSteps;
 

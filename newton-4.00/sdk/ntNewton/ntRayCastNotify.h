@@ -30,15 +30,15 @@
 #include "ntShapeInstance.h"
 
 D_MSV_NEWTON_ALIGN_32
-class ntRayCastCallback
+class ntRayCastNotify
 {
 	public: 
-	ntRayCastCallback(const ntWorld* const world)
+	ntRayCastNotify(const ntWorld* const world)
 		:m_world(world)
 	{
 	}
 
-	virtual ~ntRayCastCallback()
+	virtual ~ntRayCastNotify()
 	{
 	}
 
@@ -59,11 +59,11 @@ class ntRayCastCallback
 } D_GCC_NEWTON_ALIGN_32 ;
 
 D_MSV_NEWTON_ALIGN_32
-class ntRayCastCloasestHitCallback: public ntRayCastCallback
+class ntRayCastCloasestHitCallback: public ntRayCastNotify
 {
 	public:
 	ntRayCastCloasestHitCallback(const ntWorld* const world)
-		:ntRayCastCallback(world)
+		:ntRayCastNotify(world)
 		,m_param(dFloat32(1.2f))
 	{
 	}

@@ -28,7 +28,7 @@
 class dVector;
 class dMatrix;
 
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_ALIGN_16
 class dQuaternion
 {
 	public:

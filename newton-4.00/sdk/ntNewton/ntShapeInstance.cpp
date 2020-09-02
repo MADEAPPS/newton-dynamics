@@ -22,7 +22,7 @@
 #include "ntStdafx.h"
 #include "ntContact.h"
 #include "ntShapeInstance.h"
-#include "ntRayCastCallback.h"
+#include "ntRayCastNotify.h"
 
 #if 0
 #include "dgBody.h"
@@ -594,7 +594,7 @@ dMatrix ntShapeInstance::CalculateInertia() const
 	}
 }
 
-dFloat32 ntShapeInstance::RayCast(ntRayCastCallback& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const
+dFloat32 ntShapeInstance::RayCast(ntRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const
 {
 	dFloat32 t = dFloat32(1.2f);
 	if (callback.OnRayPrecastAction(body, this))

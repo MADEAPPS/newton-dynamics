@@ -23,6 +23,7 @@
 #include <ntShapeBox.h>
 #include <ntShapeNull.h>
 #include <ntConstraint.h>
+#include <ntBodyNotify.h>
 #include <ntBroadPhase.h>
 #include <ntShapeConvex.h>
 #include <ntBodyDynamic.h>
@@ -30,7 +31,8 @@
 #include <ntContactSolver.h>
 #include <ntShapeInstance.h>
 #include <ntBroadPhaseNode.h>
-#include <ntRayCastCallback.h>
+#include <ntRayCastNotify.h>
+#include <ntContactNotify.h>
 #include <ntBroadPhaseMixed.h>
 
 #endif

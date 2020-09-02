@@ -187,7 +187,7 @@ dVector ntShapeBox::SupportVertex(const dVector& dir0, dInt32* const vertexIndex
 	return m_size[0].Select(m_size[1], mask);
 }
 
-dFloat32 ntShapeBox::RayCast(ntRayCastCallback& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const
+dFloat32 ntShapeBox::RayCast(ntRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const
 {
 	dAssert(localP0.m_w == dFloat32(0.0f));
 	dAssert(localP1.m_w == dFloat32(0.0f));

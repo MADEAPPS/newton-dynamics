@@ -34,7 +34,7 @@ class dBigVector;
 // 4 x 1 single precision SSE vector class declaration
 //
 // *****************************************************************************************
-D_MSV_NEWTON_ALIGN_32
+D_MSV_NEWTON_ALIGN_16
 class dVector
 {
 	#define PERMUTE_MASK(w, z, y, x) _MM_SHUFFLE (w, z, y, x)

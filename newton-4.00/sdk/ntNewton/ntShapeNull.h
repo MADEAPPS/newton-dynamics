@@ -39,7 +39,7 @@ class ntShapeNull: public ntShapeConvex
 		return dVector(dFloat32(0.0f));
 	}
 
-	virtual dFloat32 RayCast(ntRayCastCallback& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const
+	virtual dFloat32 RayCast(ntRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const
 	{
 		return dFloat32 (1.2f);
 	}
