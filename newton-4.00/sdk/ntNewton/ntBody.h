@@ -29,8 +29,9 @@ class ntWorld;
 class ntContact;
 class ntBodyNotify;
 class ntBodyDynamic;
-class ntBilateralJoint;
+class ntBodyKinematic;
 class ntRayCastNotify;
+class ntBilateralJoint;
 class ntBroadPhaseBodyNode;
 class ntBroadPhaseAggregate;
 
@@ -42,8 +43,10 @@ class ntBody: public dClassAlloc
 	D_NEWTON_API virtual ~ntBody();
 
 	dUnsigned32 GetID() const { return m_uniqueID; }
+
 	virtual ntBody* GetAsBody() { return this;}
-	virtual ntBodyDynamic* GetAsDynamicBody() { return nullptr; }
+	virtual ntBodyDynamic* GetAsBodyDynamic() { return nullptr; }
+	virtual ntBodyKinematic* GetAsBodyKinematic() { return nullptr; }
 
 	D_NEWTON_API const ntShapeInstance& GetCollisionShape() const;
 	D_NEWTON_API void SetCollisionShape(const ntShapeInstance& shapeInstance);

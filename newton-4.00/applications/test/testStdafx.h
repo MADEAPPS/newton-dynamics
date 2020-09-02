@@ -28,6 +28,7 @@
 #include <ntShapeConvex.h>
 #include <ntBodyDynamic.h>
 #include <ntContactList.h>
+#include <ntBodyKinematic.h>
 #include <ntContactSolver.h>
 #include <ntShapeInstance.h>
 #include <ntBroadPhaseNode.h>

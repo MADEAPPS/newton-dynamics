@@ -21,7 +21,6 @@
 
 #include "ntStdafx.h"
 #include "ntWorld.h"
-#include "ntContact.h"
 #include "ntBodyNotify.h"
 #include "ntBodyDynamic.h"
 
@@ -29,140 +28,20 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-#define D_MINIMUM_MASS	dFloat32(1.0e-5f)
-#define D_INFINITE_MASS	dFloat32(1.0e15f)
 
 //dgVector ntDynamicBody::m_equilibriumError2 (DG_ERR_TOLERANCE2);
 
 ntBodyDynamic::ntBodyDynamic()
-	:ntBody()
-	,m_mass(dVector::m_zero)
-	,m_invMass(dVector::m_zero)
+	:ntBodyKinematic()
 	,m_externalForce(dVector::m_zero)
 	,m_externalTorque(dVector::m_zero)
 	,m_jointArray()
-	,m_contactList()
 {
 	SetMassMatrix(dVector::m_zero);
 }
 
 ntBodyDynamic::~ntBodyDynamic()
 {
-}
-
-void ntBodyDynamic::ReleaseMemory()
-{
-	ntContactMap::FlushFreeList();
-}
-
-ntContact* ntBodyDynamic::FindContact(const ntBody* const otherBody) const
-{
-	return m_contactList.FindContact(this, otherBody);
-}
-
-D_NEWTON_API void ntBodyDynamic::AttachContact(ntContact* const contact)
-{
-	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
-	m_contactList.AttachContact(contact);
-}
-
-void ntBodyDynamic::DetachContact(ntContact* const contact)
-{
-	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
-	m_contactList.DetachContact(contact);
-}
-
-void ntBodyDynamic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
-{
-	mass = dAbs(mass);
-
-	//if (m_collision->IsType(dgCollision::dgCollisionMesh_RTTI) || m_collision->IsType(dgCollision::dgCollisionScene_RTTI)) {
-	//	mass = DG_INFINITE_MASS * 2.0f;
-	//}
-
-	ntShape* const shape = (ntShape*)m_shapeInstance.GetShape();
-	if ((mass < D_MINIMUM_MASS) || shape->GetAsShapeNull() || !shape->GetAsShapeConvex())
-	{
-		mass = D_INFINITE_MASS * 2.0f;
-	}
-	
-	//if (m_collision->IsType(dgCollision::dgCollisionCompound_RTTI)) 
-	//{
-	//	const dgCollision* const childShape = m_collision->GetChildShape();
-	//	if ((childShape->m_inertia.m_x < dFloat32(1.0e-5f)) || (childShape->m_inertia.m_y < dFloat32(1.0e-5f)) || (childShape->m_inertia.m_z < dFloat32(1.0e-5f))) 
-	//	{
-	//		mass = DG_INFINITE_MASS * 2.0f;
-	//	}
-	//}
-	
-	//dAssert (m_masterNode);
-	//m_world->GetBroadPhase()->CheckStaticDynamic(this, mass);
-
-	if (mass >= D_INFINITE_MASS) 
-	{
-		//if (m_masterNode) {
-		//	if (m_invMass.m_w != dFloat32(0.0f)) {
-		//		dgBodyMasterList& masterList(*m_world);
-		//		if (masterList.GetFirst() != m_masterNode) {
-		//			masterList.InsertAfter(masterList.GetFirst(), m_masterNode);
-		//		}
-		//	}
-		//}
-		
-		m_mass.m_x = D_INFINITE_MASS;
-		m_mass.m_y = D_INFINITE_MASS;
-		m_mass.m_z = D_INFINITE_MASS;
-		m_mass.m_w = D_INFINITE_MASS;
-		m_invMass = dVector::m_zero;
-	}
-	else 
-	{
-		dFloat32 Ixx = dAbs(inertia[0][0]);
-		dFloat32 Iyy = dAbs(inertia[1][1]);
-		dFloat32 Izz = dAbs(inertia[2][2]);
-		
-		dFloat32 Ixx1 = dClamp(Ixx, dFloat32(0.001f) * mass, dFloat32(1000.0f) * mass);
-		dFloat32 Iyy1 = dClamp(Iyy, dFloat32(0.001f) * mass, dFloat32(1000.0f) * mass);
-		dFloat32 Izz1 = dClamp(Izz, dFloat32(0.001f) * mass, dFloat32(1000.0f) * mass);
-		
-		dAssert(Ixx > dFloat32(0.0f));
-		dAssert(Iyy > dFloat32(0.0f));
-		dAssert(Izz > dFloat32(0.0f));
-		
-		//if (m_masterNode) {
-		//	if (m_invMass.m_w == dFloat32(0.0f)) {
-		//		dgBodyMasterList& masterList(*m_world);
-		//		masterList.RotateToEnd(m_masterNode);
-		//	}
-		//}
-		
-		m_mass.m_x = Ixx1;
-		m_mass.m_y = Iyy1;
-		m_mass.m_z = Izz1;
-		m_mass.m_w = mass;
-		
-		m_invMass.m_x = dFloat32(1.0f) / Ixx1;
-		m_invMass.m_y = dFloat32(1.0f) / Iyy1;
-		m_invMass.m_z = dFloat32(1.0f) / Izz1;
-		m_invMass.m_w = dFloat32(1.0f) / mass;
-	}
-
-	//#ifdef _DEBUG
-#if 0
-	dgBodyMasterList& me = *m_world;
-	for (dgBodyMasterList::dgListNode* refNode = me.GetFirst(); refNode; refNode = refNode->GetNext()) {
-		dgBody* const body0 = refNode->GetInfo().GetBody();
-		dgVector invMass(body0->GetInvMass());
-		if (invMass.m_w != 0.0f) {
-			for (; refNode; refNode = refNode->GetNext()) {
-				dgBody* const body1 = refNode->GetInfo().GetBody();
-				dgVector invMass1(body1->GetInvMass());
-				dAssert(invMass1.m_w != 0.0f);
-			}
-			break;
-		}
-	}
-#endif
 }
 
 void ntBodyDynamic::ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep)

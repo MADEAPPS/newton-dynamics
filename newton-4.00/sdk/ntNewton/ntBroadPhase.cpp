@@ -840,7 +840,6 @@ void ntBroadPhase::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep,
 	//	}
 	}
 	
-	dAssert(0);
 	//const dgContactMaterial* const material = contact->m_material;
 	//if (material->m_flags & dgContactMaterial::m_collisionEnable) {
 	//	dgInt32 processContacts = 1;
@@ -956,7 +955,7 @@ void ntBroadPhase::SubmitPairs(ntBroadPhaseNode* const leafNode, ntBroadPhaseNod
 	pool[0] = node;
 	dInt32 stack = 1;
 
-	ntBodyDynamic* const body0 = leafNode->GetBody() ? leafNode->GetBody()->GetAsDynamicBody() : nullptr;
+	ntBodyDynamic* const body0 = leafNode->GetBody() ? leafNode->GetBody()->GetAsBodyDynamic() : nullptr;
 	const dVector boxP0(body0 ? body0->m_minAABB : leafNode->m_minBox);
 	const dVector boxP1(body0 ? body0->m_maxAABB : leafNode->m_maxBox);
 	const bool test0 = body0 ? (body0->m_invMass.m_w != dFloat32(0.0f)) : true;
@@ -971,7 +970,7 @@ void ntBroadPhase::SubmitPairs(ntBroadPhaseNode* const leafNode, ntBroadPhaseNod
 			{
 				dAssert(!rootNode->GetRight());
 				dAssert(!rootNode->GetLeft());
-				ntBodyDynamic* const body1 = rootNode->GetBody() ? rootNode->GetBody()->GetAsDynamicBody() : nullptr;
+				ntBodyDynamic* const body1 = rootNode->GetBody() ? rootNode->GetBody()->GetAsBodyDynamic() : nullptr;
 				if (body0) 
 				{
 					if (body1) 

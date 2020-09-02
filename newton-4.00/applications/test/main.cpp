@@ -66,7 +66,7 @@ class DemobodyNotify: public ntBodyNotify
 	public:
 	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
 	{
-		ntBodyDynamic* const body = m_body->GetAsDynamicBody();
+		ntBodyDynamic* const body = m_body->GetAsBodyDynamic();
 		dAssert(body);
 
 		dVector massMatrix (body->GetMassMatrix());

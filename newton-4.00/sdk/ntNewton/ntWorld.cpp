@@ -81,7 +81,7 @@ ntWorld::~ntWorld()
 	}
 	delete m_broadPhase;
 
-	ntBodyDynamic::ReleaseMemory();
+	ntBodyKinematic::ReleaseMemory();
 }
 
 void ntWorld::AddBody(ntBody* const body)
@@ -185,7 +185,7 @@ void ntWorld::BuildBodyArray()
 	m_dynamicBodyArray.SetCount(m_bodyList.GetCount());
 	for (dList<ntBody*>::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
-		ntBodyDynamic* const dynBody = node->GetInfo()->GetAsDynamicBody();
+		ntBodyDynamic* const dynBody = node->GetInfo()->GetAsBodyDynamic();
 		if (dynBody)
 		{
 			m_dynamicBodyArray[index] = dynBody;
