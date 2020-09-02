@@ -140,7 +140,7 @@ void ntBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 	//	mass = DG_INFINITE_MASS * 2.0f;
 	//}
 
-	ntShape* const shape = (ntShape*)m_shapeInstance.GetShape();
+	ntShape* const shape = m_shapeInstance.GetShape();
 	if ((mass < D_MINIMUM_MASS) || shape->GetAsShapeNull() || !shape->GetAsShapeConvex())
 	{
 		mass = D_INFINITE_MASS * 2.0f;

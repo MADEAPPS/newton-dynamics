@@ -43,6 +43,8 @@ ntWorld::ntWorld()
 	SetName("newton main thread");
 	Start();
 	m_broadPhase = new ntBroadPhaseMixed(this);
+	m_contactNotifyCallback = new ntContactNotify();
+	m_contactNotifyCallback->m_world = this;
 }
 
 ntWorld::~ntWorld()
@@ -50,7 +52,7 @@ ntWorld::~ntWorld()
 	Sync();
 	Finish();
 
-	SetContactNotify(nullptr);
+	delete m_contactNotifyCallback;
 	m_broadPhase->Cleanup();
 	while (m_bodyList.GetFirst())
 	{
@@ -70,7 +72,7 @@ void ntWorld::AddBody(ntBody* const body)
 	dList<ntBody*>::dListNode* const node = m_bodyList.Append(body);
 	body->SetWorldNode(this, node);
 
-	const ntShape* const shape = ((ntShape*)body->GetCollisionShape().GetShape())->GetAsShapeNull();
+	const ntShape* const shape = body->GetCollisionShape().GetShape()->GetAsShapeNull();
 	if (!shape)
 	{
 		dAssert(!body->GetBroadPhaseNode());
@@ -170,7 +172,7 @@ void ntWorld::BuildBodyArray()
 			m_tmpBodyArray[index] = dynBody;
 			index++;
 
-			const ntShape* const shape = ((ntShape*)dynBody->GetCollisionShape().GetShape())->GetAsShapeNull();
+			const ntShape* const shape = dynBody->GetCollisionShape().GetShape()->GetAsShapeNull();
 			if (shape)
 			{
 				dAssert(0);
@@ -267,14 +269,16 @@ ntContactNotify* ntWorld::GetContactNotify() const
 
 void ntWorld::SetContactNotify(ntContactNotify* const notify)
 {
-	if (m_contactNotifyCallback)
-	{
-		delete m_contactNotifyCallback;
-	}
-	m_contactNotifyCallback = notify;
+	dAssert(m_contactNotifyCallback);
+	delete m_contactNotifyCallback;
 
-	if (m_contactNotifyCallback)
+	if (notify)
 	{
-		m_contactNotifyCallback->m_world = this;
+		m_contactNotifyCallback = notify;
 	}
+	else
+	{
+		m_contactNotifyCallback = new ntContactNotify();
+	}
+	m_contactNotifyCallback->m_world = this;
 }

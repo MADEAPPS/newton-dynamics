@@ -729,7 +729,7 @@ void ntBroadPhase::UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBody* con
 		
 		dAssert(!node->GetLeft());
 		dAssert(!node->GetRight());
-		dAssert(!((ntShape*)body->GetCollisionShape().GetShape())->GetAsShapeNull());
+		dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
 
 		if (body->GetBroadPhaseAggregate()) 
 		{
@@ -822,6 +822,30 @@ bool ntBroadPhase::ValidateContactCache(ntContact* const contact, const dVector&
 	return false;
 }
 
+void ntBroadPhase::CalculatePairContacts(dInt32 threadIndex, ntPair* const pair) const
+{
+	ntContactPoint contacts[D_MAX_CONTATCS];
+
+	//pair->m_cacheIsValid = false;
+	pair->m_contactBuffer = contacts;
+	//m_world->CalculateContacts(pair, threadID, false, false);
+
+	//if (pair->m_contactCount) 
+	//{
+	//	dgAssert(pair->m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
+	//	m_world->ProcessContacts(pair, threadID);
+	//	KinematicBodyActivation(pair->m_contact);
+	//}
+	//else {
+	//	if (pair->m_cacheIsValid) {
+	//		KinematicBodyActivation(pair->m_contact);
+	//	}
+	//	else {
+	//		pair->m_contact->m_maxDOF = 0;
+	//	}
+	//}
+}
+
 void ntBroadPhase::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact)
 {
 	//DG_TRACKTIME();
@@ -860,6 +884,16 @@ void ntBroadPhase::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep,
 	if (m_contactNotifyCallback)
 	{
 		bool processContacts = m_contactNotifyCallback->OnAaabbOverlap(contact, timestep);
+		if (processContacts)
+		{
+			ntPair pair;
+			dAssert(!body0->GetCollisionShape().GetShape()->GetAsShapeNull());
+			dAssert(!body1->GetCollisionShape().GetShape()->GetAsShapeNull());
+			
+			pair.m_contact = contact;
+			pair.m_timestep = timestep;
+			CalculatePairContacts(threadIndex, &pair);
+		}
 	}
 }
 

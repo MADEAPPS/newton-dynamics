@@ -48,6 +48,18 @@ class ntBroadPhase: public dClassAlloc
 		dInt32 m_index;
 	};
 
+	class ntPair
+	{
+		public:
+		ntContact* m_contact;
+		ntContactPoint* m_contactBuffer;
+		dFloat32 m_timestep;
+		dInt32 m_contactCount;
+		//dInt32 m_cacheIsValid : 1;
+		//dInt32 m_flipContacts : 1;
+	};
+
+
 	public:
 	D_NEWTON_API virtual ~ntBroadPhase();
 
@@ -85,6 +97,7 @@ class ntBroadPhase: public dClassAlloc
 	D_NEWTON_API ntBroadPhaseTreeNode* InsertNode (ntBroadPhaseNode* const root, ntBroadPhaseNode* const node);
 	D_NEWTON_API void UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, ntBroadPhaseNode** const root);
 
+	void CalculatePairContacts(dInt32 threadIndex, ntPair* const pair) const;
 	ntContact* FindContactJoint(ntBody* const body0, ntBody* const body1) const;
 	ntBilateralJoint* FindBilateralJoint(ntBody* const body0, ntBody* const body1) const;
 

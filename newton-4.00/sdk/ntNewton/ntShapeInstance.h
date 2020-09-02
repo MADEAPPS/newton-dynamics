@@ -73,6 +73,7 @@ class ntShapeInstance: public dClassAlloc
 
 	D_NEWTON_API dFloat32 RayCast(ntRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const;
 
+	ntShape* GetShape();
 	const ntShape* GetShape() const;
 	dVector SupportVertex(const dVector& dir) const;
 	dMatrix GetScaledTransform(const dMatrix& matrix) const;
@@ -567,6 +568,11 @@ D_INLINE dVector ntShapeInstance::CalculateBuoyancyVolume(const dMatrix& matrix,
 	return m_shape->CalculateVolumeIntegral(m_localMatrix * matrix, fluidPlane, *this);
 }
 #endif
+
+D_INLINE ntShape* ntShapeInstance::GetShape()
+{
+	return (ntShape*)m_shape;
+}
 
 D_INLINE const ntShape* ntShapeInstance::GetShape() const 
 { 

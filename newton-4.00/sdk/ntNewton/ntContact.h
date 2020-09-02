@@ -28,6 +28,8 @@
 class ntBody;
 class ntShapeInstance;
 
+#define D_MAX_CONTATCS		128
+
 D_MSV_NEWTON_ALIGN_32
 class ntContactPoint
 {

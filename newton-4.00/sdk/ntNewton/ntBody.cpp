@@ -95,6 +95,12 @@ void ntBody::SetCentreOfMass(const dVector& com)
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
 }
 
+ntShapeInstance& ntBody::GetCollisionShape()
+{
+	//return *((ntShapeInstance*)&m_shapeInstance);
+	return (ntShapeInstance&)m_shapeInstance;
+}
+
 const ntShapeInstance& ntBody::GetCollisionShape() const
 {
 	return m_shapeInstance;

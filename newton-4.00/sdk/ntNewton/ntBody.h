@@ -48,6 +48,7 @@ class ntBody: public dClassAlloc
 	virtual ntBodyDynamic* GetAsBodyDynamic() { return nullptr; }
 	virtual ntBodyKinematic* GetAsBodyKinematic() { return nullptr; }
 
+	D_NEWTON_API ntShapeInstance& GetCollisionShape();
 	D_NEWTON_API const ntShapeInstance& GetCollisionShape() const;
 	D_NEWTON_API void SetCollisionShape(const ntShapeInstance& shapeInstance);
 
