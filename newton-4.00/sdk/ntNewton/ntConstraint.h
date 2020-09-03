@@ -33,8 +33,8 @@ class ntConstraint
 	public:
 	virtual ~ntConstraint();
 
-	virtual ntBody* GetBody0() const = 0;
-	virtual ntBody* GetBody1() const = 0;
+	//virtual ntBody* GetBody0() const = 0;
+	//virtual ntBody* GetBody1() const = 0;
 
 	ntConstraint* GetAsConstraint() { return this; }
 	ntContact* GetAsContact() {return nullptr;}

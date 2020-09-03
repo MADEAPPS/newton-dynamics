@@ -77,7 +77,9 @@ class ntShapeInstance: public dClassAlloc
 	const ntShape* GetShape() const;
 	dVector SupportVertex(const dVector& dir) const;
 	dMatrix GetScaledTransform(const dMatrix& matrix) const;
+	dVector SupportVertexSpecial(const dVector& dir, dInt32* const vertexIndex) const;
 	void CalculateFastAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
+
 
 	const dMatrix& GetLocalMatrix() const;
 	const dMatrix& GetGlobalMatrix() const;
@@ -150,8 +152,6 @@ class ntShapeInstance: public dClassAlloc
 
 	void Serialize(dgSerialize callback, void* const userData, bool saveShape = true) const;
 	dVector CalculateBuoyancyVolume (const dMatrix& matrix, const dVector& fluidPlane) const;
-	
-	dVector SupportVertexSpecial (const dVector& dir, dInt32* const vertexIndex) const;
 	dVector SupportVertexSpecialProjectPoint (const dVector& point, const dVector& dir) const;
 
 	dFloat32 GetSkinThickness() const;
@@ -165,7 +165,6 @@ class ntShapeInstance: public dClassAlloc
 	const dShape* m_shape;
 	const void* m_subCollisionHandle;
 	const dShapeInstance* m_parent;
-	dFloat32 m_skinThickness;
 	dInt32 m_collisionMode;
 	dInt32 m_refCount;
 	
@@ -181,7 +180,7 @@ class ntShapeInstance: public dClassAlloc
 
 	const ntShape* m_shape;
 	const ntBody* m_ownerBody;
-
+	dFloat32 m_skinThickness;
 	ntScaleType m_scaleType;
 
 	static dVector m_padding;
@@ -373,41 +372,6 @@ D_INLINE dFloat32 dShapeInstance::GetBoxMaxRadius () const
 } 
 
 
-D_INLINE dVector dShapeInstance::SupportVertexSpecial (const dVector& dir, dInt32* const vertexIndex) const
-{
-	dAssert (dir.m_w == dFloat32 (0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-2f));
-	dAssert(dir.m_w == dFloat32(0.0f));
-	switch (m_scaleType) 
-	{
-		case m_unit:
-		{
-		   return m_shape->SupportVertexSpecial(dir, m_skinThickness, vertexIndex);
-		}
-		case m_uniform:
-		{
-			return m_scale * m_shape->SupportVertexSpecial(dir, m_skinThickness, vertexIndex);
-		}
-
-		default:
-			return SupportVertex(dir);
-
-#if 0
-		case m_nonUniform:
-		{
-			// support((p * S), n) = S * support (p, n * transp(S))
-			dVector dir1((m_scale * dir).Normalize());
-			return m_scale * m_shape->SupportVertexSpecial(dir1, m_skinThickness, vertexIndex);
-		}
-
-		default:
-		{
-			dVector dir1(m_aligmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
-			return m_scale * m_aligmentMatrix.TransformVector(m_shape->SupportVertexSpecial(dir1, vertexIndex));
-		}
-#endif
-	}
-}
 
 D_INLINE dVector ntShapeInstance::SupportVertexSpecialProjectPoint (const dVector& point, const dVector& dir) const
 {
@@ -676,6 +640,26 @@ D_INLINE dVector ntShapeInstance::SupportVertex(const dVector& dir) const
 	}
 }
 
+D_INLINE dVector ntShapeInstance::SupportVertexSpecial(const dVector& dir, dInt32* const vertexIndex) const
+{
+	dAssert(dir.m_w == dFloat32(0.0f));
+	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-2f));
+	dAssert(dir.m_w == dFloat32(0.0f));
+	switch (m_scaleType)
+	{
+		case m_unit:
+		{
+			return m_shape->SupportVertexSpecial(dir, m_skinThickness, vertexIndex);
+		}
+		case m_uniform:
+		{
+			return m_scale * m_shape->SupportVertexSpecial(dir, m_skinThickness, vertexIndex);
+		}
+
+		default:
+			return SupportVertex(dir);
+	}
+}
 
 #endif 
 

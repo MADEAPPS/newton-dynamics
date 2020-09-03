@@ -73,9 +73,9 @@ class ntContactSolver: public dDownHeap<ntMinkFace *, dFloat32>
 	//ntContactSolver(dCollisionParamProxy* const proxy);
 	//ntContactSolver(ntShapeInstance* const instance0);
 
-	//bool CalculateClosestPoints();
+	
 	//dInt32 CalculateConvexCastContacts();
-	//dInt32 CalculateConvexToConvexContacts();
+	
 	//dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, ntContactPoint& contactOut);
 
 	//const dVector& GetNormal() const {return m_normal;}
@@ -86,7 +86,7 @@ class ntContactSolver: public dDownHeap<ntMinkFace *, dFloat32>
 
 	dInt32 ConvexContacts();
 	dInt32 CalculateConvexToConvexContacts();
-	dInt32 CalculatePairContacts(dInt32 threadIndex, ntContactPoint* const buffer, bool ccdMode, bool intersectionTestOnly);
+	dInt32 CalculatePairContacts(dInt32 threadIndex, ntContactPoint* const buffer);
 	
 	private:
 	class dgPerimenterEdge
@@ -107,33 +107,41 @@ class ntContactSolver: public dDownHeap<ntMinkFace *, dFloat32>
 	//D_INLINE void PushFace(ntMinkFace* const face);
 	//D_INLINE void DeleteFace(ntMinkFace* const face);
 	//D_INLINE ntMinkFace* AddFace(dInt32 v0, dInt32 v1, dInt32 v2);
-	//D_INLINE void SupportVertex(const dVector& dir, dInt32 vertexIndex);
+	
 	//
 	//D_INLINE void TranslateSimplex(const dVector& step);
 	//
 	//D_INLINE void CalculateContactFromFeacture(dInt32 featureType);
-	//D_INLINE dBigVector ReduceLine(dInt32& indexOut);
-	//D_INLINE dBigVector ReduceTriangle (dInt32& indexOut);
-	//D_INLINE dBigVector ReduceTetrahedrum (dInt32& indexOut);
 	//D_INLINE dgPerimenterEdge* OldReduceContacts(dgPerimenterEdge* poly, dInt32 maxCount) const;
 	//
 	//bool SanityCheck() const;
 	//dInt32 ConvexPolygonsIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dInt32 maxContacts) const;
 	//dInt32 ConvexPolygonToLineIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dVector* const mem) const;
 	//dInt32 CalculateContacts (const dVector& point0, const dVector& point1, const dVector& normal);
-	//dInt32 CalculateClosestSimplex ();
 	//dInt32 CalculateIntersectingPlane(dInt32 count);
+
+	dInt32 CalculateClosestSimplex();
+	bool CalculateClosestPoints();
+	dInt32 ConvexToConvexContacts();
+
+	D_INLINE dBigVector ReduceLine(dInt32& indexOut);
+	D_INLINE dBigVector ReduceTriangle (dInt32& indexOut);
+	D_INLINE dBigVector ReduceTetrahedrum (dInt32& indexOut);
+	D_INLINE void SupportVertex(const dVector& dir, dInt32 vertexIndex);
 
 	//dVector m_normal;
 	//dVector m_closestPoint0;
 	//dVector m_closestPoint1;
-
-
 	//dCollisionParamProxy* m_proxy;
 	//ntBodyKinematic* const body0;
 	//ntBodyKinematic* const body1;
 	ntShapeInstance m_instance0;
 	ntShapeInstance m_instance1;
+	dVector m_separatingVector;
+
+	dVector m_hullDiff[D_CONVEX_MINK_MAX_POINTS];
+	dVector m_hullSum[D_CONVEX_MINK_MAX_POINTS];
+
 	//ntContact* m_contact;
 	//dgFaceFreeList* m_freeFace; 
 
@@ -142,12 +150,11 @@ class ntContactSolver: public dDownHeap<ntMinkFace *, dFloat32>
 	dFloat32 m_separationDistance;
 
 	dInt32 m_maxCount;
-
-	//dInt32 m_vertexIndex;
+	dInt32 m_vertexIndex;
+	bool m_ccdMode;
+	bool m_intersectionTestOnly;
+	
 	//dInt32 m_faceIndex;
-	//
-	//dVector m_hullDiff[D_CONVEX_MINK_MAX_POINTS];
-	//dVector m_hullSum[D_CONVEX_MINK_MAX_POINTS];
 	//ntMinkFace* m_faceStack[D_CONVEX_MINK_STACK_SIZE];
 	//ntMinkFace* m_coneFaceList[D_CONVEX_MINK_STACK_SIZE];
 	//ntMinkFace* m_deletedFaceList[D_CONVEX_MINK_STACK_SIZE];

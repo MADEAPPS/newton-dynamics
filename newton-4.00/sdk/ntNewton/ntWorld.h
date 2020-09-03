@@ -31,6 +31,8 @@ class ntBodyDynamic;
 class ntBodyKinematic;
 class ntContactNotify;
 
+#define D_NEWTON_ENGINE_VERSION 400
+
 D_MSV_NEWTON_ALIGN_32
 class ntWorld
 	:public dClassAlloc
@@ -49,6 +51,11 @@ class ntWorld
 
 	D_NEWTON_API ntWorld();
 	D_NEWTON_API virtual ~ntWorld();
+
+	dInt32 GetEngineVersion() 
+	{
+		return D_NEWTON_ENGINE_VERSION;
+	}
 
 	D_NEWTON_API void Update(dFloat32 timestep);
 	D_NEWTON_API void Sync();

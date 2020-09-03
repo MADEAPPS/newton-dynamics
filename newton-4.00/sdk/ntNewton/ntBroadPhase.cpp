@@ -21,9 +21,9 @@
 
 #include "ntStdafx.h"
 #include "ntWorld.h"
-#include "ntBody.h"
 #include "ntBroadPhase.h"
-#include "ntBodyDynamic.h"
+//#include "ntBodyDynamic.h"
+#include "ntBodyKinematic.h"
 #include "ntContactNotify.h"
 #include "ntContactSolver.h"
 
@@ -198,7 +198,7 @@ dFloat32 ntBroadPhase::RayCast(ntRayCastNotify& callback, const ntBroadPhaseNode
 		{
 			const ntBroadPhaseNode* const me = stackPool[stack];
 			dAssert(me);
-			ntBody* const body = me->GetBody();
+			ntBodyKinematic* const body = me->GetBody();
 			if (body) 
 			{
 		//		if (!body->m_isdead) {
@@ -600,7 +600,7 @@ void ntBroadPhase::UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, n
 					ntBroadPhaseNode* const node = nodePtr->GetInfo();
 					ntBroadPhaseNode* const leftNode = node->GetLeft();
 
-					ntBody* const leftBody = leftNode->GetBody();
+					ntBodyKinematic* const leftBody = leftNode->GetBody();
 					if (leftBody) 
 					{
 						node->SetAABB(leftBody->m_minAABB, leftBody->m_maxAABB);
@@ -615,7 +615,7 @@ void ntBroadPhase::UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, n
 					}
 
 					ntBroadPhaseNode* const rightNode = node->GetRight();
-					ntBody* const rightBody = rightNode->GetBody();
+					ntBodyKinematic* const rightBody = rightNode->GetBody();
 					if (rightBody) 
 					{
 						rightNode->SetAABB(rightBody->m_minAABB, rightBody->m_maxAABB);
@@ -720,7 +720,7 @@ ntBroadPhaseNode* ntBroadPhase::BuildTopDownBig(ntBroadPhaseNode** const leafArr
 	}
 }
 
-void ntBroadPhase::UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBody* const body)
+void ntBroadPhase::UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBodyKinematic* const body)
 {
 	if (!body->m_equilibrium)
 	{
@@ -791,8 +791,8 @@ bool ntBroadPhase::ValidateContactCache(ntContact* const contact, const dVector&
 	//dMatrix matrix0(pitch * yaw * roll);
 	//dMatrix matrix1(dMatrix(q0 * q1 * q2, dVector::m_wOne));
 	
-	ntBody* const body0 = contact->GetBody0();
-	ntBody* const body1 = contact->GetBody1();
+	ntBodyKinematic* const body0 = contact->GetBody0();
+	ntBodyKinematic* const body1 = contact->GetBody1();
 	//if (!contact->m_material->m_contactGeneration) 
 	if (1)
 	{
@@ -853,8 +853,8 @@ void ntBroadPhase::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep,
 {
 	//DG_TRACKTIME();
 	//ntWorld* const world = (ntWorld*)m_world;
-	ntBody* const body0 = contact->GetBody0();
-	ntBody* const body1 = contact->GetBody1();
+	ntBodyKinematic* const body0 = contact->GetBody0();
+	ntBodyKinematic* const body1 = contact->GetBody1();
 	
 	//dAssert(body0 != m_world->m_sentinelBody);
 	//dAssert(body1 != m_world->m_sentinelBody);
@@ -896,10 +896,13 @@ void ntBroadPhase::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep,
 			//pair.m_contact = contact;
 			//pair.m_timestep = timestep;
 			ntContactSolver contactSolver(body0->GetCollisionShape(), body1->GetCollisionShape());
+			contactSolver.m_separatingVector = contact->m_separatingVector;
 			contactSolver.m_timestep = timestep;
+			contactSolver.m_ccdMode = false;
+			contactSolver.m_intersectionTestOnly = false;
 
-			ntContactPoint contacts[D_MAX_CONTATCS];
-			dInt32 count = contactSolver.CalculatePairContacts(threadIndex, contacts, false, false);
+			ntContactPoint contactBuffer[D_MAX_CONTATCS];
+			dInt32 count = contactSolver.CalculatePairContacts(threadIndex, contactBuffer);
 			dAssert(0);
 			count = 0;
 		}
@@ -911,8 +914,8 @@ void ntBroadPhase::CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ntCo
 	const dUnsigned32 lru = m_lru - D_CONTACT_DELAY_FRAMES;
 
 	dVector deltaTime(timestep);
-	ntBody* const body0 = contact->GetBody0();
-	ntBody* const body1 = contact->GetBody1();
+	ntBodyKinematic* const body0 = contact->GetBody0();
+	ntBodyKinematic* const body1 = contact->GetBody1();
 	
 	if (!(contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium))) 
 	{
@@ -999,7 +1002,8 @@ void ntBroadPhase::SubmitPairs(ntBroadPhaseNode* const leafNode, ntBroadPhaseNod
 	pool[0] = node;
 	dInt32 stack = 1;
 
-	ntBodyDynamic* const body0 = leafNode->GetBody() ? leafNode->GetBody()->GetAsBodyDynamic() : nullptr;
+	//ntBodyKinematic* const body0 = leafNode->GetBody() ? leafNode->GetBody()->GetAsBodyDynamic() : nullptr;
+	ntBodyKinematic* const body0 = leafNode->GetBody() ? leafNode->GetBody() : nullptr;
 	const dVector boxP0(body0 ? body0->m_minAABB : leafNode->m_minBox);
 	const dVector boxP1(body0 ? body0->m_maxAABB : leafNode->m_maxBox);
 	const bool test0 = body0 ? (body0->m_invMass.m_w != dFloat32(0.0f)) : true;
@@ -1014,7 +1018,8 @@ void ntBroadPhase::SubmitPairs(ntBroadPhaseNode* const leafNode, ntBroadPhaseNod
 			{
 				dAssert(!rootNode->GetRight());
 				dAssert(!rootNode->GetLeft());
-				ntBodyDynamic* const body1 = rootNode->GetBody() ? rootNode->GetBody()->GetAsBodyDynamic() : nullptr;
+				//ntBodyKinematic* const body1 = rootNode->GetBody() ? rootNode->GetBody()->GetAsBodyDynamic() : nullptr;
+				ntBodyKinematic* const body1 = rootNode->GetBody() ? rootNode->GetBody() : nullptr;
 				if (body0) 
 				{
 					if (body1) 
@@ -1067,14 +1072,14 @@ void ntBroadPhase::SubmitPairs(ntBroadPhaseNode* const leafNode, ntBroadPhaseNod
 	}
 }
 
-bool ntBroadPhase::TestOverlaping(const ntBody* const body0, const ntBody* const body1, dFloat32 timestep) const
+bool ntBroadPhase::TestOverlaping(const ntBodyKinematic* const body0, const ntBodyKinematic* const body1, dFloat32 timestep) const
 {
 	//bool mass0 = (body0->m_invMass.m_w != dFloat32(0.0f));
 	//bool mass1 = (body1->m_invMass.m_w != dFloat32(0.0f));
-	//bool isDynamic0 = body0->IsRTTIType(ntBody::m_dynamicBodyRTTI) != 0;
-	//bool isDynamic1 = body1->IsRTTIType(ntBody::m_dynamicBodyRTTI) != 0;
-	//bool isKinematic0 = body0->IsRTTIType(ntBody::m_kinematicBodyRTTI) != 0;
-	//bool isKinematic1 = body1->IsRTTIType(ntBody::m_kinematicBodyRTTI) != 0;
+	//bool isDynamic0 = body0->IsRTTIType(ntBodyKinematic::m_dynamicBodyRTTI) != 0;
+	//bool isDynamic1 = body1->IsRTTIType(ntBodyKinematic::m_dynamicBodyRTTI) != 0;
+	//bool isKinematic0 = body0->IsRTTIType(ntBodyKinematic::m_kinematicBodyRTTI) != 0;
+	//bool isKinematic1 = body1->IsRTTIType(ntBodyKinematic::m_kinematicBodyRTTI) != 0;
 	//
 	//dAssert(!body0->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
 	//dAssert(!body1->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
@@ -1131,7 +1136,7 @@ ntBilateralJoint* ntBroadPhase::FindBilateralJoint(ntBody* const body0, ntBody* 
 	return nullptr;
 }
 
-ntContact* ntBroadPhase::FindContactJoint(ntBody* const body0, ntBody* const body1) const
+ntContact* ntBroadPhase::FindContactJoint(ntBodyKinematic* const body0, ntBodyKinematic* const body1) const
 {
 	//	dAssert(0);
 	dAssert((body0->GetInvMass() != dFloat32(0.0f)) || (body1->GetInvMass() != dFloat32(0.0f)));
@@ -1150,7 +1155,7 @@ ntContact* ntBroadPhase::FindContactJoint(ntBody* const body0, ntBody* const bod
 	}
 }
 
-void ntBroadPhase::AddPair(ntBody* const body0, ntBody* const body1, const dFloat32 timestep)
+void ntBroadPhase::AddPair(ntBodyKinematic* const body0, ntBodyKinematic* const body1, const dFloat32 timestep)
 {
 	dAssert(body0);
 	dAssert(body1);

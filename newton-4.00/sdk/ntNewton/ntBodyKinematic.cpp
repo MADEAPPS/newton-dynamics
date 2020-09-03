@@ -21,10 +21,33 @@
 
 #include "ntStdafx.h"
 #include "ntContact.h"
+#include "ntShapeNull.h"
+#include "ntRayCastNotify.h"
 #include "ntBodyKinematic.h"
 
 #define D_MINIMUM_MASS	dFloat32(1.0e-5f)
 #define D_INFINITE_MASS	dFloat32(1.0e15f)
+
+class ntDummyCollision : public ntShapeNull
+{
+	public:
+	ntDummyCollision()
+		:ntShapeNull()
+	{
+		m_refCount.fetch_add(1);
+	}
+
+	~ntDummyCollision()
+	{
+		m_refCount.fetch_add(-1);
+	}
+
+	static ntShapeNull* GetNullShape()
+	{
+		static ntDummyCollision nullShape;
+		return &nullShape;
+	}
+};
 
 class ntBodyKinematic::ntContactkey
 {
@@ -100,14 +123,54 @@ void ntBodyKinematic::ntContactMap::DetachContact(ntContact* const contact)
 
 ntBodyKinematic::ntBodyKinematic()
 	:ntBody()
+	,m_shapeInstance(ntDummyCollision::GetNullShape())
 	,m_mass(dVector::m_zero)
 	,m_invMass(dVector::m_zero)
 	,m_contactList()
+	,m_broadPhaseNode(nullptr)
+	,m_broadPhaseAggregateNode(nullptr)
 {
+	m_shapeInstance.m_ownerBody = this;
 }
 
 ntBodyKinematic::~ntBodyKinematic()
 {
+}
+
+ntShapeInstance& ntBodyKinematic::GetCollisionShape()
+{
+	return (ntShapeInstance&)m_shapeInstance;
+}
+
+const ntShapeInstance& ntBodyKinematic::GetCollisionShape() const
+{
+	return m_shapeInstance;
+}
+
+void ntBodyKinematic::SetCollisionShape(const ntShapeInstance& shapeInstance)
+{
+	m_shapeInstance = shapeInstance;
+	m_shapeInstance.m_ownerBody = this;
+}
+
+ntBroadPhaseBodyNode* ntBodyKinematic::GetBroadPhaseNode() const
+{
+	return m_broadPhaseNode;
+}
+
+void ntBodyKinematic::SetBroadPhaseNode(ntBroadPhaseBodyNode* const node)
+{
+	m_broadPhaseNode = node;
+}
+
+ntBroadPhaseAggregate* ntBodyKinematic::GetBroadPhaseAggregate() const
+{
+	return m_broadPhaseAggregateNode;
+}
+
+void ntBodyKinematic::SetBroadPhaseAggregate(ntBroadPhaseAggregate* const node)
+{
+	m_broadPhaseAggregateNode = node;
 }
 
 void ntBodyKinematic::ReleaseMemory()
@@ -223,4 +286,48 @@ void ntBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 		}
 	}
 #endif
+}
+
+dFloat32 ntBodyKinematic::RayCast(ntRayCastNotify& callback, const dFastRayTest& ray, dFloat32 maxT) const
+{
+	dVector l0(ray.m_p0);
+	dVector l1(ray.m_p0 + ray.m_diff.Scale(dMin(maxT, dFloat32(1.0f))));
+
+	if (dRayBoxClip(l0, l1, m_minAABB, m_maxAABB))
+	{
+		const dMatrix& globalMatrix = m_shapeInstance.GetGlobalMatrix();
+		dVector localP0(globalMatrix.UntransformVector(l0));
+		dVector localP1(globalMatrix.UntransformVector(l1));
+		dVector p1p0(localP1 - localP0);
+		dAssert(p1p0.m_w == dFloat32(0.0f));
+		if (p1p0.DotProduct(p1p0).GetScalar() > dFloat32(1.0e-12f))
+		{
+			ntContactPoint contactOut;
+			dFloat32 t = m_shapeInstance.RayCast(callback, localP0, localP1, maxT, this, contactOut);
+			if (t < dFloat32(1.0f))
+			{
+				dAssert(localP0.m_w == dFloat32(0.0f));
+				dAssert(localP1.m_w == dFloat32(0.0f));
+				dVector p(globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale(t)));
+				t = ray.m_diff.DotProduct(p - ray.m_p0).GetScalar() / ray.m_diff.DotProduct(ray.m_diff).GetScalar();
+				if (t < maxT)
+				{
+					dAssert(t >= dFloat32(0.0f));
+					dAssert(t <= dFloat32(1.0f));
+					contactOut.m_body0 = this;
+					contactOut.m_body1 = this;
+					contactOut.m_point = p;
+					contactOut.m_normal = globalMatrix.RotateVector(contactOut.m_normal);
+					maxT = callback.OnRayCastAction(contactOut, t);
+				}
+			}
+		}
+	}
+	return maxT;
+}
+
+void ntBodyKinematic::UpdateCollisionMatrix()
+{
+	m_shapeInstance.SetGlobalMatrix(m_shapeInstance.GetLocalMatrix() * m_matrix);
+	m_shapeInstance.CalculateFastAABB(m_shapeInstance.GetGlobalMatrix(), m_minAABB, m_maxAABB);
 }

@@ -72,11 +72,15 @@ void ntWorld::AddBody(ntBody* const body)
 	dList<ntBody*>::dListNode* const node = m_bodyList.Append(body);
 	body->SetWorldNode(this, node);
 
-	const ntShape* const shape = body->GetCollisionShape().GetShape()->GetAsShapeNull();
-	if (!shape)
+	ntBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+	if (kinematicBody)
 	{
-		dAssert(!body->GetBroadPhaseNode());
-		m_broadPhase->AddBody(body);
+		const ntShape* const shape = kinematicBody->GetCollisionShape().GetShape()->GetAsShapeNull();
+		if (!shape)
+		{
+			dAssert(!kinematicBody->GetBroadPhaseNode());
+			m_broadPhase->AddBody(kinematicBody);
+		}
 	}
 }
 
@@ -84,9 +88,10 @@ void ntWorld::RemoveBody(ntBody* const body)
 {
 	dAssert(body->m_worldNode && (body->m_world == this));
 
-	if (body->GetBroadPhaseNode())
+	ntBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+	if (kinematicBody && kinematicBody->GetBroadPhaseNode())
 	{
-		m_broadPhase->RemoveBody(body);
+		m_broadPhase->RemoveBody(kinematicBody);
 	}
 
 	m_bodyList.Remove(body->m_worldNode);
@@ -166,7 +171,7 @@ void ntWorld::BuildBodyArray()
 	m_tmpBodyArray.SetCount(m_bodyList.GetCount());
 	for (dList<ntBody*>::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
-		ntBodyDynamic* const dynBody = node->GetInfo()->GetAsBodyDynamic();
+		ntBodyKinematic* const dynBody = node->GetInfo()->GetAsBodyDynamic();
 		if (dynBody)
 		{
 			m_tmpBodyArray[index] = dynBody;

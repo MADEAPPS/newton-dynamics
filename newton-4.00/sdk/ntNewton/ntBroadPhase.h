@@ -52,8 +52,8 @@ class ntBroadPhase: public dClassAlloc
 	public:
 	D_NEWTON_API virtual ~ntBroadPhase();
 
-	virtual void AddBody(ntBody* const body) = 0;
-	virtual void RemoveBody(ntBody* const body) = 0;
+	virtual void AddBody(ntBodyKinematic* const body) = 0;
+	virtual void RemoveBody(ntBodyKinematic* const body) = 0;
 
 	D_NEWTON_API void Cleanup();
 	D_NEWTON_API virtual void Update(dFloat32 timestep);
@@ -68,8 +68,8 @@ class ntBroadPhase: public dClassAlloc
 	bool ValidateContactCache(ntContact* const contact, const dVector& timestep) const;
 
 	virtual void BalanceBroadPhase() = 0;
-	virtual void UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBody* const body);
-	virtual void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBody* const body) = 0;
+	virtual void UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBodyKinematic* const body);
+	virtual void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBodyKinematic* const body) = 0;
 	virtual void CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact);
 	void CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact);
 
@@ -87,11 +87,11 @@ class ntBroadPhase: public dClassAlloc
 	D_NEWTON_API void UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, ntBroadPhaseNode** const root);
 
 	//void CalculatePairContacts(dInt32 threadIndex, ntPair* const pair) const;
-	ntContact* FindContactJoint(ntBody* const body0, ntBody* const body1) const;
+	ntContact* FindContactJoint(ntBodyKinematic* const body0, ntBodyKinematic* const body1) const;
 	ntBilateralJoint* FindBilateralJoint(ntBody* const body0, ntBody* const body1) const;
 
-	void AddPair(ntBody* const body0, ntBody* const body1, const dFloat32 timestep);
-	bool TestOverlaping(const ntBody* const body0, const ntBody* const body1, dFloat32 timestep) const;
+	void AddPair(ntBodyKinematic* const body0, ntBodyKinematic* const body1, const dFloat32 timestep);
+	bool TestOverlaping(const ntBodyKinematic* const body0, const ntBodyKinematic* const body1, dFloat32 timestep) const;
 	void SubmitPairs(ntBroadPhaseNode* const leaftNode, ntBroadPhaseNode* const node, dFloat32 timestep);
 
 	D_NEWTON_API virtual dFloat32 RayCast(ntRayCastNotify& callback, const dVector& p0, const dVector& p1) const = 0;

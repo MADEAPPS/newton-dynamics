@@ -128,12 +128,10 @@ void BuildPyramid(ntWorld& world, dFloat32 mass, const dVector& origin, const dV
 	dFloat32 stepz = maxP.m_z - minP.m_z + 0.03125f;
 	dFloat32 stepy = (maxP.m_y - minP.m_y) - 0.01f;
 		  
-	dFloat32 y0 = matrix.m_posit.m_y + stepy / 2.0f;
+	//dFloat32 y0 = matrix.m_posit.m_y + stepy / 2.0f;
 	dFloat32 z0 = matrix.m_posit.m_z - stepz * count / 2;
 
 count = 1;
-	count++;
-	matrix.m_posit.m_y = y0;
 	for (int j = 0; j < count; j++) 
 	{
 		matrix.m_posit.m_z = z0;

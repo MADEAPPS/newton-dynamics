@@ -24,7 +24,7 @@
 
 #include "ntStdafx.h"
 
-class ntBody;
+class ntBodyKinematic;
 class ntBroadPhaseBodyNode;
 class ntBroadPhaseTreeNode;
 class ntBroadPhaseAggregate;
@@ -65,7 +65,7 @@ class ntBroadPhaseNode: public dClassAlloc
 		return false;
 	}
 */
-	virtual ntBody* GetBody() const
+	virtual ntBodyKinematic* GetBody() const
 	{
 		return nullptr;
 	}
@@ -94,17 +94,17 @@ D_MSV_NEWTON_ALIGN_32
 class ntBroadPhaseBodyNode: public ntBroadPhaseNode
 {
 	public:
-	D_NEWTON_API ntBroadPhaseBodyNode(ntBody* const body);
+	D_NEWTON_API ntBroadPhaseBodyNode(ntBodyKinematic* const body);
 	D_NEWTON_API virtual ~ntBroadPhaseBodyNode();
 
 	virtual ntBroadPhaseBodyNode* GetAsBroadPhaseBodyNode() { return this; }
 
-	virtual ntBody* GetBody() const
+	virtual ntBodyKinematic* GetBody() const
 	{
 		return m_body;
 	}
 
-	ntBody* m_body;
+	ntBodyKinematic* m_body;
 	//dList<dBroadPhaseNode*>::dListNode* m_updateNode;
 } D_GCC_NEWTON_ALIGN_32 ;
 

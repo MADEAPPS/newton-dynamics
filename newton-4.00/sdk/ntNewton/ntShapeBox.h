@@ -40,10 +40,11 @@ class ntShapeBox: public ntShapeConvex
 
 	D_NEWTON_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
 	D_NEWTON_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
+	D_NEWTON_API virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	D_NEWTON_API virtual dFloat32 RayCast(ntRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const;
 
 /*
-	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
+	
 	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
 	virtual dInt32 CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 	virtual const dConvexSimplexEdge** GetVertexToEdgeMapping() const;
@@ -64,7 +65,7 @@ class ntShapeBox: public ntShapeConvex
 	static dInt32 m_initSimplex;
 	static dInt32 m_faces[][4];
 	static dVector m_indexMark;
-	//static dVector m_penetrationTol;
+	static dVector m_penetrationTol;
 	static dConvexSimplexEdge m_edgeArray[];
 	static dConvexSimplexEdge* m_edgeEdgeMap[];
 	static dConvexSimplexEdge* m_vertexToEdgeMap[];

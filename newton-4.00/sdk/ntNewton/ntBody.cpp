@@ -22,9 +22,7 @@
 #include "ntStdafx.h"
 #include "ntBody.h"
 #include "ntContact.h"
-#include "ntShapeNull.h"
 #include "ntBodyNotify.h"
-#include "ntRayCastNotify.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -33,31 +31,10 @@
 
 dUnsigned32 ntBody::m_uniqueIDCount = 0;
 
-class ntDummyCollision: public ntShapeNull
-{
-	public: 
-	ntDummyCollision()
-		:ntShapeNull()
-	{
-		m_refCount.fetch_add(1);
-	}
-
-	~ntDummyCollision()
-	{
-		m_refCount.fetch_add(-1);
-	}
-
-	static ntShapeNull* GetNullShape()
-	{
-		static ntDummyCollision nullShape;
-		return &nullShape;
-	}
-};
 
 ntBody::ntBody()
 	:m_matrix(dGetIdentityMatrix())
 	,m_invWorldInertiaMatrix(dGetZeroMatrix())
-	,m_shapeInstance(ntDummyCollision::GetNullShape())
 	,m_veloc(dVector::m_zero)
 	,m_omega(dVector::m_zero)
 	,m_localCentreOfMass(dVector::m_zero)
@@ -67,9 +44,7 @@ ntBody::ntBody()
 	,m_rotation()
 	,m_world(nullptr)
 	,m_notifyCallback(nullptr)
-	,m_broadPhaseNode(nullptr)
 	,m_worldNode(nullptr)
-	,m_broadPhaseAggregateNode(nullptr)
 	,m_flags(0)
 	,m_uniqueID(m_uniqueIDCount)
 {
@@ -95,21 +70,6 @@ void ntBody::SetCentreOfMass(const dVector& com)
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
 }
 
-ntShapeInstance& ntBody::GetCollisionShape()
-{
-	//return *((ntShapeInstance*)&m_shapeInstance);
-	return (ntShapeInstance&)m_shapeInstance;
-}
-
-const ntShapeInstance& ntBody::GetCollisionShape() const
-{
-	return m_shapeInstance;
-}
-
-void ntBody::SetCollisionShape(const ntShapeInstance& shapeInstance)
-{
-	m_shapeInstance = shapeInstance;
-}
 
 void ntBody::SetNotifyCallback(ntBodyNotify* const notify)
 {
@@ -151,26 +111,6 @@ dList<ntBody*>::dListNode* ntBody::GetNewtonNode() const
 	return m_worldNode;
 }
 
-ntBroadPhaseBodyNode* ntBody::GetBroadPhaseNode() const
-{
-	return m_broadPhaseNode;
-}
-
-void ntBody::SetBroadPhaseNode(ntBroadPhaseBodyNode* const node)
-{
-	m_broadPhaseNode = node;
-}
-
-ntBroadPhaseAggregate* ntBody::GetBroadPhaseAggregate() const
-{
-	return m_broadPhaseAggregateNode;
-}
-
-void ntBody::SetBroadPhaseAggregate(ntBroadPhaseAggregate* const node)
-{
-	m_broadPhaseAggregateNode = node;
-}
-
 dVector ntBody::GetOmega() const
 {
 	return m_omega;
@@ -198,12 +138,6 @@ dMatrix ntBody::GetMatrix() const
 	return m_matrix;
 }
 
-void ntBody::UpdateCollisionMatrix()
-{
-	m_shapeInstance.SetGlobalMatrix(m_shapeInstance.GetLocalMatrix() * m_matrix);
-	m_shapeInstance.CalculateFastAABB(m_shapeInstance.GetGlobalMatrix(), m_minAABB, m_maxAABB);
-}
-
 void ntBody::SetMatrix(const dMatrix& matrix)
 {
 	m_equilibrium = 0;
@@ -214,40 +148,3 @@ void ntBody::SetMatrix(const dMatrix& matrix)
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
 }
 
-dFloat32 ntBody::RayCast(ntRayCastNotify& callback, const dFastRayTest& ray, dFloat32 maxT) const
-{
-	dVector l0(ray.m_p0);
-	dVector l1(ray.m_p0 + ray.m_diff.Scale(dMin(maxT, dFloat32(1.0f))));
-
-	if (dRayBoxClip(l0, l1, m_minAABB, m_maxAABB))
-	{
-		const dMatrix& globalMatrix = m_shapeInstance.GetGlobalMatrix();
-		dVector localP0(globalMatrix.UntransformVector(l0));
-		dVector localP1(globalMatrix.UntransformVector(l1));
-		dVector p1p0(localP1 - localP0);
-		dAssert(p1p0.m_w == dFloat32(0.0f));
-		if (p1p0.DotProduct(p1p0).GetScalar() > dFloat32(1.0e-12f)) 
-		{
-			ntContactPoint contactOut;
-			dFloat32 t = m_shapeInstance.RayCast(callback, localP0, localP1, maxT, this, contactOut);
-			if (t < dFloat32(1.0f)) 
-			{
-				dAssert(localP0.m_w == dFloat32(0.0f));
-				dAssert(localP1.m_w == dFloat32(0.0f));
-				dVector p(globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale(t)));
-				t = ray.m_diff.DotProduct(p - ray.m_p0).GetScalar() / ray.m_diff.DotProduct(ray.m_diff).GetScalar();
-				if (t < maxT) 
-				{
-					dAssert(t >= dFloat32(0.0f));
-					dAssert(t <= dFloat32(1.0f));
-					contactOut.m_body0 = this;
-					contactOut.m_body1 = this;
-					contactOut.m_point = p;
-					contactOut.m_normal = globalMatrix.RotateVector(contactOut.m_normal);
-					maxT = callback.OnRayCastAction(contactOut, t);
-				}
-			}
-		}
-	}
-	return maxT;
-}

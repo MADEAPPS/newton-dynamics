@@ -65,6 +65,11 @@ class ntShapeConvex: public ntShape
 	D_NEWTON_API virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
 
 	virtual dInt32 GetConvexVertexCount() const { return m_vertexCount; }
+	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const
+	{
+		dAssert(0);
+		return SupportVertexSpecial(dir, skinThickness, vertexIndex);
+	}
 
 /*
 	virtual void SerializeLow(dgSerialize callback, void* const userData) const;
@@ -82,8 +87,6 @@ class ntShapeConvex: public ntShape
 	bool SanityCheck(dInt32 count, const dVector& normal, dVector* const contactsOut) const;
 
 	dInt32 RectifyConvexSlice (dInt32 count, const dVector& normal, dVector* const contactsOut) const;
-
-	virtual dVector SupportVertexSpecial (const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	virtual dVector SupportVertexSpecialProjectPoint (const dVector& point, const dVector& dir) const;
 	virtual const dConvexSimplexEdge** GetVertexToEdgeMapping() const {return NULL;}
 

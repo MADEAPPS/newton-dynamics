@@ -36,7 +36,12 @@ class ntShapeNull: public ntShapeConvex
 	
 	dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
 	{
-		return dVector(dFloat32(0.0f));
+		return dVector::m_zero;
+	}
+
+	dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const
+	{
+		return dVector::m_zero;
 	}
 
 	virtual dFloat32 RayCast(ntRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const
@@ -57,10 +62,7 @@ class ntShapeNull: public ntShapeConvex
 /*
 	protected:
 	virtual dgFloat32 GetVolume () const;
-	
 	virtual dVector SupportVertex (const dVector& dir, dgInt32* const vertexIndex) const;
-	virtual dVector SupportVertexSpecial (const dVector& dir, dgFloat32 skinThickness, dgInt32* const vertexIndex) const;
-	
 	virtual dVector CalculateVolumeIntegral (const dMatrix& globalMatrix, const dVector& plane, const dgCollisionInstance& parentScale) const;
 	virtual dgFloat32 RayCast (const dVector& localP0, const dVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
 

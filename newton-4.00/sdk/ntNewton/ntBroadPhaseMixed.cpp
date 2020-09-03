@@ -20,8 +20,8 @@
 */
 
 #include "ntStdafx.h"
-#include "ntBody.h"
 #include "ntWorld.h"
+#include "ntBodyKinematic.h"
 #include "ntBroadPhaseNode.h"
 #include "ntBroadPhaseMixed.h"
 
@@ -144,7 +144,7 @@ void ntBroadPhaseMixed::RemoveNode(ntBroadPhaseNode* const node)
 
 			if (parent->m_fitnessNode) 
 			{
-				ntBody* const body = node->GetBody();
+				ntBodyKinematic* const body = node->GetBody();
 				if (body && body->GetBroadPhaseAggregate()) 
 				{
 					dAssert(0);
@@ -180,15 +180,14 @@ void ntBroadPhaseMixed::RemoveNode(ntBroadPhaseNode* const node)
 	}
 }
 
-void ntBroadPhaseMixed::AddBody(ntBody* const body)
+void ntBroadPhaseMixed::AddBody(ntBodyKinematic* const body)
 {
 	body->UpdateCollisionMatrix();
 	ntBroadPhaseBodyNode* const bodyNode = new ntBroadPhaseBodyNode(body);
-//	bodyNode->m_updateNode = m_updateList.Append(bodyNode);
 	AddNode(bodyNode);
 }
 
-void ntBroadPhaseMixed::RemoveBody(ntBody* const body)
+void ntBroadPhaseMixed::RemoveBody(ntBodyKinematic* const body)
 {
 	ntBroadPhaseBodyNode* const node = body->GetBroadPhaseNode();
 	if (node)
@@ -207,7 +206,7 @@ void ntBroadPhaseMixed::BalanceBroadPhase()
 	UpdateFitness(m_fitness, m_treeEntropy, &m_rootNode);
 }
 
-void ntBroadPhaseMixed::FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBody* const body)
+void ntBroadPhaseMixed::FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBodyKinematic* const body)
 {
 	ntBroadPhaseNode* const leafNode = body->GetBroadPhaseNode();
 

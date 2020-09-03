@@ -23,6 +23,8 @@
 #include "ntContact.h"
 #include "ntBodyKinematic.h"
 
+dVector ntContact::m_initialSeparatingVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
+
 #if 0
 #include "dgBody.h"
 #include "dgWorld.h"
@@ -499,12 +501,12 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 
 #endif
 
-
-ntContact::ntContact(ntBody* const body0, ntBody* const body1)
+ntContact::ntContact(ntBodyKinematic* const body0, ntBodyKinematic* const body1)
 	:ntConstraint()
 	,dContainersFreeListAlloc<ntContact*>()
 	,m_positAcc(dFloat32(10.0f))
 	,m_rotationAcc()
+	,m_separatingVector(m_initialSeparatingVector)
 	,m_body0(body0->GetAsBodyKinematic())
 	,m_body1(body1->GetAsBodyKinematic())
 	,m_linkNode(nullptr)
@@ -518,22 +520,23 @@ ntContact::ntContact(ntBody* const body0, ntBody* const body1)
 {
 	dAssert(m_body0);
 	dAssert(m_body1);
-	if (m_body0->GetInvMass() == dFloat32(0.0f))
+	if (m_body1->GetInvMass() == dFloat32(0.0f))
 	{
 		dSwap(m_body1, m_body0);
 	}
+	dAssert(m_body1->GetInvMass() > dFloat32(0.0f));
 }
 
 ntContact::~ntContact()
 {
 }
 
-ntBody* ntContact::GetBody0() const
+ntBodyKinematic* ntContact::GetBody0() const
 { 
 	return m_body0; 
 }
 
-ntBody* ntContact::GetBody1() const
+ntBodyKinematic* ntContact::GetBody1() const
 { 
 	return m_body1; 
 }

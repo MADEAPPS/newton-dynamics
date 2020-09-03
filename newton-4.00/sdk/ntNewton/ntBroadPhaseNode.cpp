@@ -20,7 +20,7 @@
 */
 
 #include "ntStdafx.h"
-#include "ntBody.h"
+#include "ntBodyKinematic.h"
 #include "ntBroadPhaseNode.h"
 
 #define D_AABB_QUANTIZATION		dFloat32 (8.0f)
@@ -29,7 +29,7 @@
 dVector ntBroadPhaseNode::m_aabbQuantization(D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, dFloat32 (0.0f));
 dVector ntBroadPhaseNode::m_aabbInvQuantization(D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, dFloat32(0.0f));
 
-ntBroadPhaseBodyNode::ntBroadPhaseBodyNode(ntBody* const body)
+ntBroadPhaseBodyNode::ntBroadPhaseBodyNode(ntBodyKinematic* const body)
 	:ntBroadPhaseNode(nullptr)
 	,m_body(body)
 	//,m_updateNode(nullptr)

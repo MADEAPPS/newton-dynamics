@@ -19,32 +19,40 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CONTACT_CACHE_H__
-#define __D_CONTACT_CACHE_H__
+#ifndef __D_CORE_H__
+#define __D_CORE_H__
 
-#include "ntStdafx.h"
-#include "ntContact.h"
-
-class ntContactList: public dList<ntContact, dContainersFreeListAlloc<ntContact>>
-{
-	public:
-	ntContactList()
-		:dList<ntContact, dContainersFreeListAlloc<ntContact>>()
-		, m_lock()
-	{
-	}
-
-	~ntContactList()
-	{
-	}
-
-	D_NEWTON_API void DeleteAllContacts();
-	D_NEWTON_API void DeleteContact(ntContact* const contact);
-	D_NEWTON_API ntContact* CreateContact(ntBodyKinematic* const body0, ntBodyKinematic* const body1);
-	
-	private:
-	dSpinLock m_lock;
-};
+#include <dCoreStdafx.h>
+#include <dList.h>
+#include <dTree.h>
+#include <dHeap.h>
+#include <dSort.h>
+#include <dTypes.h>
+#include <dArray.h>
+#include <dStack.h>
+#include <dDebug.h>
+#include <dPlane.h>
+#include <dVector.h>
+#include <dMatrix.h>
+#include <dThread.h>
+#include <dMemory.h>
+#include <dGoogol.h>
+#include <dProfiler.h>
+#include <dPolyhedra.h>
+#include <dSyncMutex.h>
+#include <dSemaphore.h>
+#include <dClassAlloc.h>
+#include <dThreadPool.h>
+#include <dQuaternion.h>
+#include <dIntersections.h>
+#include <dSpatialMatrix.h>
+#include <dGeneralVector.h>
+#include <dGeneralMatrix.h>
+#include <dTemplateVector.h>
+#include <dContainersAlloc.h>
+#include <dSmallDeterminant.h>
+#include <dPolyhedraMassProperties.h>
 
 
 #endif
+

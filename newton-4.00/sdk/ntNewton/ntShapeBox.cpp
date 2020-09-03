@@ -22,6 +22,7 @@
 #include "ntStdafx.h"
 #include "ntContact.h"
 #include "ntShapeBox.h"
+#include "ntContactSolver.h"
 
 dInt32 ntShapeBox::m_initSimplex = 0;
 ntShapeConvex::dConvexSimplexEdge ntShapeBox::m_edgeArray[24];
@@ -38,6 +39,7 @@ dInt32 ntShapeBox::m_faces[][4] =
 };
 
 dVector ntShapeBox::m_indexMark(dFloat32(1.0f), dFloat32(2.0f), dFloat32(4.0f), dFloat32(0.0f));
+dVector ntShapeBox::m_penetrationTol(D_PENETRATION_TOL, D_PENETRATION_TOL, D_PENETRATION_TOL, dFloat32(0.0f));
 
 ntShapeBox::ntShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 	:ntShapeConvex(m_boxCollision)
@@ -186,6 +188,27 @@ dVector ntShapeBox::SupportVertex(const dVector& dir0, dInt32* const vertexIndex
 	}
 	return m_size[0].Select(m_size[1], mask);
 }
+
+dVector ntShapeBox::SupportVertexSpecial(const dVector& dir0, dFloat32 skinThickness, dInt32* const vertexIndex) const
+{
+	dVector mask0(dir0.Abs() > m_flushZero);
+	dVector dir(dir0 & mask0);
+	
+	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
+	dAssert(dir.m_w == dFloat32(0.0f));
+	dVector mask(dir < dVector::m_zero);
+	if (vertexIndex) 
+	{
+		dVector index(m_indexMark * (mask & dVector::m_one));
+		index = (index.AddHorizontal()).GetInt();
+		*vertexIndex = dInt32(index.m_ix);
+	}
+	
+	dVector size0(m_size[0] - m_penetrationTol);
+	dVector size1(m_size[1] + m_penetrationTol);
+	return size0.Select(size1, mask);
+}
+
 
 dFloat32 ntShapeBox::RayCast(ntRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ntBody* const body, ntContactPoint& contactOut) const
 {

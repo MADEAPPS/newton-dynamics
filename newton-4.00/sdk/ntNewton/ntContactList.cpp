@@ -20,11 +20,11 @@
 */
 
 #include "ntStdafx.h"
-#include "ntBody.h"
 #include "ntContact.h"
 #include "ntContactList.h"
+#include "ntBodyKinematic.h"
 
-ntContact* ntContactList::CreateContact(ntBody* const body0, ntBody* const body1)
+ntContact* ntContactList::CreateContact(ntBodyKinematic* const body0, ntBodyKinematic* const body1)
 {
 	ntContact temp(body0, body1);
 	dScopeSpinLock lock(m_lock);

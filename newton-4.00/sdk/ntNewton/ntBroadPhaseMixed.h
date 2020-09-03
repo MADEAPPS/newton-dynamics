@@ -35,15 +35,15 @@ class ntBroadPhaseMixed : public ntBroadPhase
 	D_NEWTON_API virtual ~ntBroadPhaseMixed();
 
 	protected:
-	D_NEWTON_API virtual void AddBody(ntBody* const body);
-	D_NEWTON_API virtual void RemoveBody(ntBody* const body);
+	D_NEWTON_API virtual void AddBody(ntBodyKinematic* const body);
+	D_NEWTON_API virtual void RemoveBody(ntBodyKinematic* const body);
 	D_NEWTON_API virtual dFloat32 RayCast(ntRayCastNotify& callback, const dVector& p0, const dVector& p1) const;
 
 	private:
 	void AddNode(ntBroadPhaseNode* const newNode);
 	void RemoveNode(ntBroadPhaseNode* const newNode);
 	void BalanceBroadPhase();
-	void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBody* const body);
+	void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBodyKinematic* const body);
 
 	dFloat64 m_treeEntropy;
 	ntFitnessList m_fitness;

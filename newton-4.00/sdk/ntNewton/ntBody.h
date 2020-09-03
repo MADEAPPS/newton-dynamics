@@ -48,9 +48,6 @@ class ntBody: public dClassAlloc
 	virtual ntBodyDynamic* GetAsBodyDynamic() { return nullptr; }
 	virtual ntBodyKinematic* GetAsBodyKinematic() { return nullptr; }
 
-	D_NEWTON_API ntShapeInstance& GetCollisionShape();
-	D_NEWTON_API const ntShapeInstance& GetCollisionShape() const;
-	D_NEWTON_API void SetCollisionShape(const ntShapeInstance& shapeInstance);
 
 	D_NEWTON_API void SetCentreOfMass(const dVector& com);
 
@@ -75,23 +72,14 @@ class ntBody: public dClassAlloc
 	D_NEWTON_API virtual void DetachContact(ntContact* const contact) {}
 	virtual ntContact* FindContact(const ntBody* const otherBody) const {return nullptr;}
 
-	D_NEWTON_API dFloat32 RayCast(ntRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
+	virtual dFloat32 RayCast(ntRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const = 0;
 
 	protected:
 	dList<ntBody*>::dListNode* GetNewtonNode() const;
 	void SetWorldNode(ntWorld* const world, dList<ntBody*>::dListNode* const node);
 
-	void UpdateCollisionMatrix();
-
-	ntBroadPhaseBodyNode* GetBroadPhaseNode() const;
-	void SetBroadPhaseNode(ntBroadPhaseBodyNode* const node);
-
-	ntBroadPhaseAggregate* GetBroadPhaseAggregate() const;
-	void SetBroadPhaseAggregate(ntBroadPhaseAggregate* const node);
-
 	dMatrix m_matrix;
 	dMatrix m_invWorldInertiaMatrix;
-	ntShapeInstance m_shapeInstance;
 	dVector m_veloc;
 	dVector m_omega;
 	dVector m_localCentreOfMass;
@@ -102,9 +90,7 @@ class ntBody: public dClassAlloc
 
 	ntWorld* m_world;
 	ntBodyNotify* m_notifyCallback;
-	ntBroadPhaseBodyNode* m_broadPhaseNode;
 	dList<ntBody*>::dListNode* m_worldNode;
-	ntBroadPhaseAggregate* m_broadPhaseAggregateNode;
 
 	union
 	{
@@ -134,9 +120,6 @@ class ntBody: public dClassAlloc
 	static dUnsigned32 m_uniqueIDCount;
 
 	friend class ntWorld;
-	friend class ntBroadPhase;
-	friend class ntBroadPhaseMixed;
-	friend class ntBroadPhaseBodyNode;
 } D_GCC_NEWTON_ALIGN_32;
 
 
