@@ -87,9 +87,9 @@ void ntConstraint::InitInfo (dgConstraintInfo* const info) const
 }
 #endif
 
-ntConstraint::ntConstraint(ntBody* const body0, ntBody* const body1)
-	:m_body0(body0)
-	,m_body1(body1)
+ntConstraint::ntConstraint()
+	//:m_body0(body0)
+	//,m_body1(body1)
 	//,m_userData(nullptr)
 	//,m_link0(nullptr)
 	//,m_link1(nullptr)
@@ -108,8 +108,4 @@ ntConstraint::ntConstraint(ntBody* const body0, ntBody* const body1)
 	//,m_isInSkeleton(false)
 	//,m_isInSkeletonLoop(false)
 {
-	if (m_body0->GetInvMass() == dFloat32(0.0f))
-	{
-		dSwap(m_body1, m_body0);
-	}
 }

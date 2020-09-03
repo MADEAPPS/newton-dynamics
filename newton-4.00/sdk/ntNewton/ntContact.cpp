@@ -20,8 +20,8 @@
 */
 
 #include "ntStdafx.h"
-#include "ntBody.h"
 #include "ntContact.h"
+#include "ntBodyKinematic.h"
 
 #if 0
 #include "dgBody.h"
@@ -501,10 +501,12 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 
 
 ntContact::ntContact(ntBody* const body0, ntBody* const body1)
-	:ntConstraint(body0, body1)
+	:ntConstraint()
 	,dContainersFreeListAlloc<ntContact*>()
 	,m_positAcc(dFloat32(10.0f))
 	,m_rotationAcc()
+	,m_body0(body0->GetAsBodyKinematic())
+	,m_body1(body1->GetAsBodyKinematic())
 	,m_linkNode(nullptr)
 	,m_timeOfImpact(dFloat32(1.0e10f))
 	,m_separationDistance(dFloat32(0.0f))
@@ -514,11 +516,28 @@ ntContact::ntContact(ntBody* const body0, ntBody* const body1)
 	,m_isAttached(false)
 	,m_killContact(false)
 {
+	dAssert(m_body0);
+	dAssert(m_body1);
+	if (m_body0->GetInvMass() == dFloat32(0.0f))
+	{
+		dSwap(m_body1, m_body0);
+	}
 }
 
 ntContact::~ntContact()
 {
 }
+
+ntBody* ntContact::GetBody0() const
+{ 
+	return m_body0; 
+}
+
+ntBody* ntContact::GetBody1() const
+{ 
+	return m_body1; 
+}
+
 
 void ntContact::AttachToBodies()
 {

@@ -82,7 +82,8 @@ class ntShapeInstance: public dClassAlloc
 	const dMatrix& GetLocalMatrix() const;
 	const dMatrix& GetGlobalMatrix() const;
 	void SetGlobalMatrix(const dMatrix& matrix);
-	
+
+	dInt32 GetConvexVertexCount() const;
 
 #if 0
 	dShapeInstance* AddRef ();
@@ -146,8 +147,6 @@ class ntShapeInstance: public dClassAlloc
 
 	dInt32 CalculateSignature () const;
 	void SetCollisionBBox (const dVector& p0, const dVector& p1);
-
-	dInt32 GetConvexVertexCount() const; 
 
 	void Serialize(dgSerialize callback, void* const userData, bool saveShape = true) const;
 	dVector CalculateBuoyancyVolume (const dMatrix& matrix, const dVector& fluidPlane) const;
@@ -457,12 +456,6 @@ D_INLINE dInt32 ntShapeInstance::CalculateSignature () const
 	return 0;
 }
 
-D_INLINE dInt32 ntShapeInstance::GetConvexVertexCount() const 
-{ 
-	return m_shape->GetConvexVertexCount();
-}
-
-
 D_INLINE dVector ntShapeInstance::GetBoxSize() const
 {
 	switch (m_scaleType)
@@ -583,6 +576,12 @@ D_INLINE const dMatrix& ntShapeInstance::GetLocalMatrix() const
 {
 	return m_localMatrix;
 }
+
+D_INLINE dInt32 ntShapeInstance::GetConvexVertexCount() const
+{
+	return m_shape->GetConvexVertexCount();
+}
+
 
 D_INLINE const dMatrix& ntShapeInstance::GetGlobalMatrix() const
 {

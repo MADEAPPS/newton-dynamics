@@ -106,7 +106,6 @@ class ntShape: public dClassAlloc
 	virtual void SerializeLow(dgSerialize callback, void* const userData) const;
 
 	virtual void CalculateImplicitContacts(dInt32 count, dgContactPoint* const contactPoints) const {dAssert (0);}
-	virtual dInt32 GetConvexVertexCount() const; 
 	const dVector& GetObbOrigin() const; 
 	virtual dVector GetObbSize() const; 
 
@@ -122,6 +121,8 @@ class ntShape: public dClassAlloc
 	virtual ntShapeBox* GetAsShapeBox() { return nullptr; }
 	virtual ntShapeNull* GetAsShapeNull() { return nullptr; }
 	virtual ntShapeConvex* GetAsShapeConvex() { return nullptr; }
+
+	virtual dInt32 GetConvexVertexCount() const;
 
 	D_NEWTON_API virtual void MassProperties();
 
@@ -188,11 +189,6 @@ inline dFloat32 dShape::GetUmbraClipSize () const
 	return dFloat32 (3.0f) * GetBoxMaxRadius();
 }
 
-inline dInt32 dShape::GetConvexVertexCount() const 
-{ 
-	return 0;
-}
-
 inline dInt32 dShape::IsType (dgRTTI type) const 
 {
 	return type & m_rtti;
@@ -209,6 +205,10 @@ inline const dVector& dShape::GetObbOrigin() const
 }
 */
 
+inline dInt32 ntShape::GetConvexVertexCount() const
+{
+	return 0;
+}
 
 inline const ntShape* ntShape::AddRef() const
 {

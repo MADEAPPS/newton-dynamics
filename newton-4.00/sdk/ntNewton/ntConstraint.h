@@ -33,19 +33,18 @@ class ntConstraint
 	public:
 	virtual ~ntConstraint();
 
-	ntBody* GetBody0() const { return m_body0;}
-	ntBody* GetBody1() const { return m_body1;}
+	virtual ntBody* GetBody0() const = 0;
+	virtual ntBody* GetBody1() const = 0;
 
 	ntConstraint* GetAsConstraint() { return this; }
 	ntContact* GetAsContact() {return nullptr;}
 
 	protected:
-	ntConstraint(ntBody* const body0, ntBody* const body1);
+	ntConstraint();
 	
-	ntBody* m_body0;
-	ntBody* m_body1;
+	//ntBody* m_body0;
+	//ntBody* m_body1;
 	//void* m_userData;
-
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #if 0

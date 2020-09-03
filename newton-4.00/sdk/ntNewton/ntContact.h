@@ -26,6 +26,7 @@
 #include "ntConstraint.h"
 
 class ntBody;
+class ntBodyKinematic;
 class ntShapeInstance;
 
 #define D_MAX_CONTATCS		128
@@ -54,6 +55,9 @@ class ntContact: public ntConstraint, public dContainersFreeListAlloc<ntContact*
 	D_NEWTON_API ntContact(ntBody* const body0, ntBody* const body1);
 	D_NEWTON_API virtual ~ntContact();
 
+	D_NEWTON_API virtual ntBody* GetBody0() const;
+	D_NEWTON_API virtual ntBody* GetBody1() const;
+
 	D_NEWTON_API void AttachToBodies();
 	D_NEWTON_API void DetachFromBodies();
 
@@ -61,6 +65,8 @@ class ntContact: public ntConstraint, public dContainersFreeListAlloc<ntContact*
 	
 	dVector m_positAcc;
 	dQuaternion m_rotationAcc;
+	ntBodyKinematic* m_body0;
+	ntBodyKinematic* m_body1;
 	dList<ntContact, dContainersFreeListAlloc<ntContact>>::dListNode* m_linkNode;
 	dFloat32 m_timeOfImpact;
 	dFloat32 m_separationDistance;

@@ -35,7 +35,6 @@ class ntShapeConvex: public ntShape
 {
 	public:
 /*	
-	virtual dInt32 GetConvexVertexCount() const { return m_vertexCount;}
 	virtual void CalcAABB (const dMatrix& matrix, dVector& p0, dVector& p1) const;
 	virtual dVector SupportVertex (const dVector& dir, dInt32* const vertexIndex) const;
 	virtual dInt32 CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const;
@@ -64,7 +63,8 @@ class ntShapeConvex: public ntShape
 	D_NEWTON_API virtual void DebugShape(const dMatrix& matrix, ntShapeDebugCallback& debugCallback) const;
 	D_NEWTON_API virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
 	D_NEWTON_API virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
-	
+
+	virtual dInt32 GetConvexVertexCount() const { return m_vertexCount; }
 
 /*
 	virtual void SerializeLow(dgSerialize callback, void* const userData) const;

@@ -25,6 +25,7 @@
 #include "ntBroadPhase.h"
 #include "ntBodyDynamic.h"
 #include "ntContactNotify.h"
+#include "ntContactSolver.h"
 
 #define D_CONTACT_DELAY_FRAMES		4
 #define D_NARROW_PHASE_DIST		dFloat32 (0.2f)
@@ -34,7 +35,6 @@
 dVector ntBroadPhase::m_velocTol(dFloat32(1.0e-16f));
 dVector ntBroadPhase::m_angularContactError2(D_CONTACT_ANGULAR_ERROR * D_CONTACT_ANGULAR_ERROR);
 dVector ntBroadPhase::m_linearContactError2(D_CONTACT_TRANSLATION_ERROR * D_CONTACT_TRANSLATION_ERROR);
-
 
 D_MSV_NEWTON_ALIGN_32
 class ntBroadPhase::ntSpliteInfo
@@ -822,12 +822,14 @@ bool ntBroadPhase::ValidateContactCache(ntContact* const contact, const dVector&
 	return false;
 }
 
+/*
 void ntBroadPhase::CalculatePairContacts(dInt32 threadIndex, ntPair* const pair) const
 {
 	ntContactPoint contacts[D_MAX_CONTATCS];
 
 	//pair->m_cacheIsValid = false;
-	pair->m_contactBuffer = contacts;
+	//pair->m_contactBuffer = contacts;
+	ntContactSolver contactSolver()
 	//m_world->CalculateContacts(pair, threadID, false, false);
 
 	//if (pair->m_contactCount) 
@@ -845,6 +847,7 @@ void ntBroadPhase::CalculatePairContacts(dInt32 threadIndex, ntPair* const pair)
 	//	}
 	//}
 }
+*/
 
 void ntBroadPhase::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact)
 {
@@ -886,13 +889,19 @@ void ntBroadPhase::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep,
 		bool processContacts = m_contactNotifyCallback->OnAaabbOverlap(contact, timestep);
 		if (processContacts)
 		{
-			ntPair pair;
+			//ntPair pair;
 			dAssert(!body0->GetCollisionShape().GetShape()->GetAsShapeNull());
 			dAssert(!body1->GetCollisionShape().GetShape()->GetAsShapeNull());
 			
-			pair.m_contact = contact;
-			pair.m_timestep = timestep;
-			CalculatePairContacts(threadIndex, &pair);
+			//pair.m_contact = contact;
+			//pair.m_timestep = timestep;
+			ntContactSolver contactSolver(body0->GetCollisionShape(), body1->GetCollisionShape());
+			contactSolver.m_timestep = timestep;
+
+			ntContactPoint contacts[D_MAX_CONTATCS];
+			dInt32 count = contactSolver.CalculatePairContacts(threadIndex, contacts, false, false);
+			dAssert(0);
+			count = 0;
 		}
 	}
 }
