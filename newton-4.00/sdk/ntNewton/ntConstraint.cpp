@@ -18,7 +18,7 @@
 * 
 * 3. This notice may not be removed or altered from any source distribution.
 */
-#include "ntStdafx.h"
+#include "ntNewtonStdafx.h"
 #include "ntBody.h"
 #include "ntConstraint.h"
 

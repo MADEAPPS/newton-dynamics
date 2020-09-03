@@ -43,8 +43,8 @@ endif()
 
 if (MSVC)
    if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
-	  set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YuntStdafx.h")
-      set_source_files_properties(ntStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcntStdafx.h")
+	  set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YuntNewtonStdafx.h")
+      set_source_files_properties(ntNewtonStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcntNewtonStdafx.h")
    endif()
 endif(MSVC)
 

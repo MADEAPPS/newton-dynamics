@@ -22,7 +22,7 @@
 #ifndef _D_DYNAMIC_BODY_H_
 #define _D_DYNAMIC_BODY_H_
 
-#include "ntStdafx.h"
+#include "ntNewtonStdafx.h"
 #include "ntContact.h"
 #include "ntBodyKinematic.h"
 

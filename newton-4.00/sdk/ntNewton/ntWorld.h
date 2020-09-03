@@ -22,7 +22,7 @@
 #ifndef __D_WORLD_H__
 #define __D_WORLD_H__
 
-#include "ntStdafx.h"
+#include "ntNewtonStdafx.h"
 
 class ntBody;
 class ntWorld;

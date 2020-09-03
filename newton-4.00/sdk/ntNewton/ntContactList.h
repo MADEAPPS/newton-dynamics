@@ -22,7 +22,7 @@
 #ifndef __D_CONTACT_CACHE_H__
 #define __D_CONTACT_CACHE_H__
 
-#include "ntStdafx.h"
+#include "ntNewtonStdafx.h"
 #include "ntContact.h"
 
 class ntContactList: public dList<ntContact, dContainersFreeListAlloc<ntContact>>

@@ -22,7 +22,7 @@
 #ifndef __D_BROADPHASE_H__
 #define __D_BROADPHASE_H__
 
-#include "ntStdafx.h"
+#include "ntNewtonStdafx.h"
 #include "ntContactList.h"
 #include "ntBroadPhaseNode.h"
 

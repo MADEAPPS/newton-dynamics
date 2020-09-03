@@ -22,7 +22,7 @@
 #ifndef __D_RAYCAST_H__
 #define __D_RAYCAST_H__
 
-#include "ntStdafx.h"
+#include "ntNewtonStdafx.h"
 #include "ntBody.h"
 #include "ntWorld.h"
 #include "ntContact.h"

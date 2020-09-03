@@ -22,7 +22,7 @@
 #ifndef __D_BODY_KINEMATIC_H__
 #define __D_BODY_KINEMATIC_H__
 
-#include "ntStdafx.h"
+#include "ntNewtonStdafx.h"
 #include "ntBody.h"
 
 D_MSV_NEWTON_ALIGN_32

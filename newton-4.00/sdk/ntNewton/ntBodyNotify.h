@@ -22,7 +22,7 @@
 #ifndef __D_BODY_NOTIFY_H__
 #define __D_BODY_NOTIFY_H__
 
-#include "ntStdafx.h"
+#include "ntNewtonStdafx.h"
 
 D_MSV_NEWTON_ALIGN_32
 class ntBodyNotify: public dClassAlloc

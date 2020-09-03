@@ -19,35 +19,35 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_CONTACT_NOTIFY_H__
-#define __D_CONTACT_NOTIFY_H__
+// stdafx.h : include file for standard system include files,
+//  or project specific include files that are used frequently, but
+//      are changed infrequently
+//
 
-#include "ntNewtonStdafx.h"
+#ifndef _D_NEWTON_H__
+#define _D_NEWTON_H__
 
-class ntContact;
+#include <dCore.h>
+#include <ntNewtonStdafx.h>
+#include <ntBody.h>
+#include <ntShape.h>
+#include <ntWorld.h>
+#include <ntContact.h>
+#include <ntShapeBox.h>
+#include <ntShapeNull.h>
+#include <ntConstraint.h>
+#include <ntBodyNotify.h>
+#include <ntBroadPhase.h>
+#include <ntShapeConvex.h>
+#include <ntBodyDynamic.h>
+#include <ntContactList.h>
+#include <ntBodyKinematic.h>
+#include <ntContactSolver.h>
+#include <ntShapeInstance.h>
+#include <ntBroadPhaseNode.h>
+#include <ntRayCastNotify.h>
+#include <ntContactNotify.h>
+#include <ntBroadPhaseMixed.h>
 
-D_MSV_NEWTON_ALIGN_32
-class ntContactNotify: public dClassAlloc
-{
-	public:
-	ntContactNotify()
-		:dClassAlloc()
-		,m_world (nullptr)
-	{
-	}
+#endif 
 
-	virtual ~ntContactNotify()
-	{
-	}
-
-	virtual bool OnAaabbOverlap(const ntContact* const contact, dFloat32 timestep)
-	{
-		return true;
-	}
-
-	protected:
-	ntWorld* m_world;
-	friend class ntWorld;
-};
-
-#endif

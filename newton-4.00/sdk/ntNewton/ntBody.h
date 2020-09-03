@@ -22,7 +22,7 @@
 #ifndef _D_BODY_H_
 #define _D_BODY_H_
 
-#include "ntStdafx.h"
+#include "ntNewtonStdafx.h"
 #include "ntShapeInstance.h"
 
 class ntWorld;

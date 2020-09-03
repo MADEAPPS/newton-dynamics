@@ -22,7 +22,7 @@
 #ifndef __D_BROADPHASE_DEFAULT_H__
 #define __D_BROADPHASE_DEFAULT_H__
 
-#include "ntStdafx.h"
+#include "ntNewtonStdafx.h"
 #include "ntBroadPhase.h"
 
 class ntRayCastNotify;

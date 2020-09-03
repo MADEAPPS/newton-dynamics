@@ -22,7 +22,7 @@
 #ifndef __D_CONTACT_SOLVER_H__
 #define __D_CONTACT_SOLVER_H__
 
-#include "ntStdafx.h"
+#include "ntNewtonStdafx.h"
 #include "ntShape.h"
 #include "ntShapeInstance.h"
 

@@ -14,27 +14,7 @@
 
 #include <stdio.h>
 #include <conio.h>
-
-#include <ntStdafx.h>
-#include <ntBody.h>
-#include <ntShape.h>
-#include <ntWorld.h>
-#include <ntContact.h>
-#include <ntShapeBox.h>
-#include <ntShapeNull.h>
-#include <ntConstraint.h>
-#include <ntBodyNotify.h>
-#include <ntBroadPhase.h>
-#include <ntShapeConvex.h>
-#include <ntBodyDynamic.h>
-#include <ntContactList.h>
-#include <ntBodyKinematic.h>
-#include <ntContactSolver.h>
-#include <ntShapeInstance.h>
-#include <ntBroadPhaseNode.h>
-#include <ntRayCastNotify.h>
-#include <ntContactNotify.h>
-#include <ntBroadPhaseMixed.h>
+#include <ntNewton.h>
 
 #endif
 

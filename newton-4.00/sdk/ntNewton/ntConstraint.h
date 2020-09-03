@@ -22,7 +22,7 @@
 #ifndef __D_CONSTRAINT_H__
 #define __D_CONSTRAINT_H__
 
-#include "ntStdafx.h"
+#include "ntNewtonStdafx.h"
 
 class ntBody;
 class ntContact;

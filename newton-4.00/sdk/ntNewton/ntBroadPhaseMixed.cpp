@@ -19,7 +19,7 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "ntStdafx.h"
+#include "ntNewtonStdafx.h"
 #include "ntWorld.h"
 #include "ntBodyKinematic.h"
 #include "ntBroadPhaseNode.h"

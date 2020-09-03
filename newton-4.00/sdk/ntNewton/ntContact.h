@@ -22,7 +22,7 @@
 #ifndef __DGCONTACT_H__
 #define __DGCONTACT_H__
 
-#include "ntStdafx.h"
+#include "ntNewtonStdafx.h"
 #include "ntConstraint.h"
 
 class ntBodyKinematic;
