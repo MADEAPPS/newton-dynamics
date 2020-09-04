@@ -42,7 +42,7 @@ class CheckMemoryLeaks
 			// Track all memory leaks at the operating system level.
 			// make sure no Newton tool or utility leaves leaks behind.
 			_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_REPORT_FLAG);
-			//_CrtSetBreakAlloc (3094);
+			//_CrtSetBreakAlloc (127);
 		#endif
 
 		atexit(CheckMemoryLeaksCallback);
@@ -167,7 +167,8 @@ int main (int argc, const char * argv[])
 
 	for (int i = 0; i < 10000; i ++)
 	{
-		world.Update(1.0f / 60.0f);
+		world.GetBroadphase()->Update(1.0f / 60.0f);
+		//world.Update(1.0f / 60.0f);
 		//newton.Sync();
 	}
 

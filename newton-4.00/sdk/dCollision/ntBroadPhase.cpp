@@ -160,37 +160,37 @@ dFloat64 ntBroadPhase::ntFitnessList::TotalCost() const
 	return cost;
 }
 	
-ntBroadPhase::ntBroadPhase(ndWorld* const world)
+ntBroadPhase::ntBroadPhase()
 	:dClassAlloc()
+	,dSyncMutex()
+	,dThread()
+	,dThreadPool()
 	,m_bodyList()
 	,m_contactList()
+	,m_tmpBodyArray()
 	,m_activeContacts()
-	,m_world(world)
 	,m_rootNode(nullptr)
 	,m_contactNotifyCallback(new ntContactNotify())
 	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_fullScan(true)
 {
+	SetName("newton main thread");
+	Start();
 	m_contactNotifyCallback->m_broadPhase = this;
 }
 
 ntBroadPhase::~ntBroadPhase()
 {
-	Cleanup();
+	Sync();
+	Finish();
 	delete m_contactNotifyCallback;
 }
 
-void ntBroadPhase::Cleanup()
+void ntBroadPhase::ThreadFunction()
 {
-	while (m_bodyList.GetFirst())
-	{
-		ntBodyKinematic* const body = m_bodyList.GetFirst()->GetInfo();
-		RemoveBody(body);
-		delete body;
-	}
-	m_contactList.DeleteAllContacts();
-	ntContact::FlushFreeList();
-	ntBodyKinematic::ReleaseMemory();
+	BuildBodyArray();
+	InternalUpdate(m_timestep);
+	Release();
 }
 
 ntContactNotify* ntBroadPhase::GetContactNotify() const
@@ -221,6 +221,7 @@ bool ntBroadPhase::AddBody(ntBodyKinematic* const body)
 	{
 		ntBodyList::dListNode* const node = m_bodyList.Append(body);
 		body->SetBroadPhase(this, node);
+		m_contactNotifyCallback->OnBodyAdded(body);
 		return true;
 	}
 	return false;
@@ -228,19 +229,51 @@ bool ntBroadPhase::AddBody(ntBodyKinematic* const body)
 
 bool ntBroadPhase::RemoveBody(ntBodyKinematic* const body)
 {
-	if ((body->m_broadPhase == nullptr) && (body->m_broadPhaseNode == nullptr))
+	if (body->m_broadPhase && body->m_broadPhaseNode)
 	{
-		//ntBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
-		dAssert(0);
-		//if (kinematicBody && kinematicBody->GetBroadPhaseNode())
-		//{
-		//	m_broadPhase->RemoveBody(kinematicBody);
-		//}
-		//
-		//m_bodyList.Remove(body->m_worldNode);
-		//body->SetWorldNode(nullptr, nullptr);
+		m_bodyList.Remove(body->m_broadPhaseNode);
+		body->SetBroadPhase(nullptr, nullptr);
+		m_contactNotifyCallback->OnBodyRemoved(body);
+		return true;
 	}
 	return false;
+}
+
+void ntBroadPhase::BuildBodyArray()
+{
+	D_TRACKTIME();
+
+	int index = 0;
+	m_tmpBodyArray.SetCount(m_bodyList.GetCount());
+	for (ntBodyList::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
+	{
+		ntBodyKinematic* const dynBody = node->GetInfo();
+		if (dynBody)
+		{
+			const ntShape* const shape = dynBody->GetCollisionShape().GetShape()->GetAsShapeNull();
+			if (shape)
+			{
+				dAssert(0);
+				if (dynBody->GetBroadPhaseBodyNode())
+				{
+					RemoveBody(dynBody);
+				}
+			}
+			else 
+			{
+				bool inScene = true;
+				if (!dynBody->GetBroadPhaseBodyNode())
+				{
+					inScene = AddBody(dynBody);
+				}
+				if (inScene)
+				{
+					m_tmpBodyArray[index] = dynBody;
+					index++;
+				}
+			}
+		}
+	}
 }
 
 dFloat32 ntBroadPhase::RayCast(ntRayCastNotify& callback, const ntBroadPhaseNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const
@@ -378,17 +411,30 @@ ntBroadPhaseTreeNode* ntBroadPhase::InsertNode(ntBroadPhaseNode* const root, ntB
 	return parent;
 }
 
-void ntBroadPhase::Update(dFloat32 timestep)
+void ntBroadPhase::InternalUpdate(dFloat32 timestep)
 {
 	D_TRACKTIME();
 	m_lru = m_lru + 1;
-	dAssert(0);
-//	m_contactNotifyCallback = m_world->GetContactNotify();
 	UpdateAabb(timestep);
 	BalanceBroadPhase();
 	FindCollidingPairs(timestep);
 	AttachNewContact();
 	CalculateContacts(timestep);
+}
+
+void ntBroadPhase::Update(dFloat32 timestep)
+{
+	//D_TRACKTIME();
+	//m_lru = m_lru + 1;
+	//UpdateAabb(timestep);
+	//BalanceBroadPhase();
+	//FindCollidingPairs(timestep);
+	//AttachNewContact();
+	//CalculateContacts(timestep);
+	Sync();
+	Tick();
+	m_timestep = timestep;
+	Signal();
 }
 
 void ntBroadPhase::RotateLeft(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root)
@@ -963,9 +1009,9 @@ void ntBroadPhase::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep,
 			contactSolver.m_intersectionTestOnly = false;
 
 			ntContactPoint contactBuffer[D_MAX_CONTATCS];
-			dInt32 count = contactSolver.CalculatePairContacts(threadIndex, contactBuffer);
-			dAssert(0);
-			count = 0;
+			//dInt32 count = contactSolver.CalculatePairContacts(threadIndex, contactBuffer);
+			//dAssert(0);
+			//count = 0;
 		}
 	}
 }
@@ -1300,82 +1346,77 @@ void ntBroadPhase::AttachNewContact()
 void ntBroadPhase::UpdateAabb(dFloat32 timestep)
 {
 	D_TRACKTIME();
-	dAssert(0);
-	//class ntUpdateAabbJob: public ntWorld::ntNewtonBaseJob
-	//{
-	//	public:
-	//	virtual void Execute()
-	//	{
-	//		D_TRACKTIME();
-	//		const dInt32 threadIndex = GetThredID();
-	//		const dInt32 threadsCount = m_world->GetThreadCount();
-	//		ntBroadPhase* const broadPhase = m_world->m_broadPhase;
-	//
-	//		const dInt32 count = m_world->m_tmpBodyArray.GetCount();
-	//		ntBodyKinematic** const bodies = &m_world->m_tmpBodyArray[0];
-	//
-	//		for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
-	//		{
-	//			broadPhase->UpdateAabb(threadIndex, m_timestep, bodies[i]);
-	//		}
-	//	}
-	//};
-	//m_world->SubmitJobs<ntUpdateAabbJob>(timestep);
+	class ntUpdateAabbJob: public ntBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadsCount = m_owner->GetThreadCount();
+			//ntBroadPhase* const broadPhase = m_owner;
+	
+			const dInt32 count = m_owner->m_tmpBodyArray.GetCount();
+			ntBodyKinematic** const bodies = &m_owner->m_tmpBodyArray[0];
+	
+			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
+			{
+				m_owner->UpdateAabb(threadIndex, m_timestep, bodies[i]);
+			}
+		}
+	};
+	SubmitJobs<ntUpdateAabbJob>(timestep);
 }
 
 void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
 {
 	D_TRACKTIME();
-	dAssert(0);
-	//class ntFindCollidindPairs: public ntWorld::ntNewtonBaseJob
-	//{
-	//	public:
-	//	virtual void Execute()
-	//	{
-	//		D_TRACKTIME();
-	//		const dInt32 threadIndex = GetThredID();
-	//		const dInt32 threadsCount = m_world->GetThreadCount();
-	//		ntBroadPhase* const broadPhase = m_world->m_broadPhase;
-	//
-	//		const dInt32 count = m_world->m_tmpBodyArray.GetCount();
-	//		ntBodyKinematic** const bodies = &m_world->m_tmpBodyArray[0];
-	//		
-	//		for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
-	//		{
-	//			broadPhase->FindCollidinPairs(threadIndex, m_timestep, bodies[i]);
-	//		}
-	//	}
-	//
-	//	bool m_fullScan;
-	//};
-	//
-	//m_fullScan = true;
-	//m_world->SubmitJobs<ntFindCollidindPairs>(timestep);
+	class ntFindCollidindPairs: public ntBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadsCount = m_owner->GetThreadCount();
+	
+			const dInt32 count = m_owner->m_tmpBodyArray.GetCount();
+			ntBodyKinematic** const bodies = &m_owner->m_tmpBodyArray[0];
+			
+			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
+			{
+				m_owner->FindCollidinPairs(threadIndex, m_timestep, bodies[i]);
+			}
+		}
+	
+		bool m_fullScan;
+	};
+	
+	m_fullScan = true;
+	SubmitJobs<ntFindCollidindPairs>(timestep);
 }
 
 void ntBroadPhase::CalculateContacts(dFloat32 timestep)
 {
 	D_TRACKTIME();
-	dAssert(0);
-	//class ntCalculateContacts: public ntWorld::ntNewtonBaseJob
-	//{
-	//	public:
-	//	virtual void Execute()
-	//	{
-	//		D_TRACKTIME();
-	//		const dInt32 threadIndex = GetThredID();
-	//		const dInt32 threadsCount = m_world->GetThreadCount();
-	//
-	//		ntBroadPhase* const broadPhase = m_world->m_broadPhase;
-	//		const dInt32 count = broadPhase->m_activeContacts.GetCount();
-	//		ntContact** const bodies = &broadPhase->m_activeContacts[0];
-	//
-	//		for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
-	//		{
-	//			broadPhase->CalculateContacts(threadIndex, m_timestep, bodies[i]);
-	//		}
-	//	}
-	//};
-	//
-	//m_world->SubmitJobs<ntCalculateContacts>(timestep);
+	class ntCalculateContacts: public ntBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadsCount = m_owner->GetThreadCount();
+
+			const dInt32 count = m_owner->m_activeContacts.GetCount();
+			ntContact** const bodies = &m_owner->m_activeContacts[0];
+	
+			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
+			{
+				m_owner->CalculateContacts(threadIndex, m_timestep, bodies[i]);
+			}
+		}
+	};
+	
+	SubmitJobs<ntCalculateContacts>(timestep);
 }

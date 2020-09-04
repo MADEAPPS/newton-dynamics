@@ -22,27 +22,41 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
+#include "ntBroadPhaseMixed.h"
+
+
+class ndWorld::ntWorldMixedBroadPhase: public ntBroadPhaseMixed
+{
+	public:
+	ntWorldMixedBroadPhase(ndWorld* const world)
+		:ntBroadPhaseMixed()
+		,m_world(world)
+	{
+	}
+
+	void ThreadFunction()
+	{
+		m_world->ThreadFunction();
+		ThreadFunction();
+	}
+
+	ndWorld* m_world;
+};
 
 ndWorld::ndWorld()
 	:dClassAlloc()
-	,dSyncMutex()
-	,dThread()
-	,dThreadPool()
-	,m_tmpBodyArray()
 	,m_broadPhase(nullptr)
 	,m_timestep(dFloat32 (0.0f))
 	,m_subSteps(1)
 {
 	// start the engine thread;
-	SetName("newton main thread");
-	Start();
-	m_broadPhase = new ntBroadPhaseMixed(this);
+	m_broadPhase = new ntBroadPhaseMixed();
+	//m_broadPhase = new ntWorldMixedBroadPhase(this);
 }
 
 ndWorld::~ndWorld()
 {
 	Sync();
-	Finish();
 	delete m_broadPhase;
 }
 
@@ -55,27 +69,39 @@ void ndWorld::Update(dFloat32 timestep)
 	Signal();
 }
 
-void ndWorld::Sync()
+void ndWorld::Signal()
 {
-	dSyncMutex::Sync();
+	m_broadPhase->Signal();
 }
 
-dInt32 ndWorld::GetThreadCount() const
+void ndWorld::Tick()
 {
-	const dThreadPool& pool = *this;
-	return pool.GetCount();
+	m_broadPhase->Tick();
 }
+
+void ndWorld::Sync()
+{
+	m_broadPhase->dSyncMutex::Sync();
+}
+
 
 void ndWorld::SetThreadCount(dInt32 count)
 {
-	dThreadPool& pool = *this;
-	return pool.SetCount(count);
+	dAssert(0);
+//	dThreadPool& pool = *this;
+//	return pool.SetCount(count);
 }
 
-void ndWorld::DispatchJobs(dThreadPoolJob** const jobs)
+void ndWorld::ThreadFunction()
 {
-	ExecuteJobs(jobs);
+	InternalUpdate(m_timestep);
 }
+
+//void ndWorld::DispatchJobs(dThreadPoolJob** const jobs)
+//{
+//	dAssert(0);
+////	ExecuteJobs(jobs);
+//}
 
 dInt32 ndWorld::GetSubSteps() const
 {
@@ -87,16 +113,15 @@ void ndWorld::SetSubSteps(dInt32 subSteps)
 	m_subSteps = dClamp(subSteps, 1, 16);
 }
 
-void ndWorld::ThreadFunction()
-{
-	InternalUpdate(m_timestep);
-	Release();
-}
+//void ndWorld::ThreadFunction()
+//{
+//	InternalUpdate(m_timestep);
+//	Release();
+//}
 
 void ndWorld::InternalUpdate(dFloat32 fullTimestep)
 {
 	D_TRACKTIME();
-	BuildBodyArray();
 	dFloat32 timestep = fullTimestep / m_subSteps;
 	for (dInt32 i = 0; i < m_subSteps; i++)
 	{
@@ -105,37 +130,6 @@ void ndWorld::InternalUpdate(dFloat32 fullTimestep)
 
 	TransformUpdate(fullTimestep);
 	UpdateListenersPostTransform(fullTimestep);
-}
-
-void ndWorld::BuildBodyArray()
-{
-	D_TRACKTIME();
-	dAssert(0);
-	//int index = 0;
-	//m_tmpBodyArray.SetCount(m_bodyList.GetCount());
-	//for (dList<ntBody*>::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
-	//{
-	//	ntBodyKinematic* const dynBody = node->GetInfo()->GetAsBodyDynamic();
-	//	if (dynBody)
-	//	{
-	//		m_tmpBodyArray[index] = dynBody;
-	//		index++;
-	//
-	//		const ntShape* const shape = dynBody->GetCollisionShape().GetShape()->GetAsShapeNull();
-	//		if (shape)
-	//		{
-	//			dAssert(0);
-	//			if (dynBody->GetBroadPhaseNode())
-	//			{
-	//				m_broadPhase->RemoveBody(dynBody);
-	//			}
-	//		}
-	//		else if (!dynBody->GetBroadPhaseNode())
-	//		{
-	//			m_broadPhase->AddBody(dynBody);
-	//		}
-	//	}
-	//}
 }
 
 void ndWorld::TransformUpdate(dFloat32 timestep)
@@ -177,28 +171,30 @@ void ndWorld::UpdateListenersPostTransform(dFloat32 timestep)
 void ndWorld::ApplyExternalForces(dFloat32 timestep)
 {
 	D_TRACKTIME();
-	class ntApplyExternalForces: public ntNewtonBaseJob
+	class ntApplyExternalForces: public ntBroadPhase::ntBaseJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const dInt32 threadIndex = GetThredID();
-			const dInt32 count = m_world->m_tmpBodyArray.GetCount();
-
-			ntBodyKinematic** const bodies = &m_world->m_tmpBodyArray[0];
-			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
-			{
-				ndBodyDynamic* const body = bodies[i]->GetAsBodyDynamic();
-				if (body)
-				{
-					body->ApplyExternalForces(threadIndex, m_timestep);
-				}
-
-			}
+			dAssert(0);
+			//const dInt32 threadIndex = GetThredID();
+			//const dInt32 count = m_world->m_tmpBodyArray.GetCount();
+			//
+			//ntBodyKinematic** const bodies = &m_world->m_tmpBodyArray[0];
+			//for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
+			//{
+			//	ndBodyDynamic* const body = bodies[i]->GetAsBodyDynamic();
+			//	if (body)
+			//	{
+			//		body->ApplyExternalForces(threadIndex, m_timestep);
+			//	}
+			//
+			//}
 		}
 	};
-	SubmitJobs<ntApplyExternalForces>(timestep);
+	dAssert(0);
+	//SubmitJobs<ntApplyExternalForces>(timestep);
 }
 
 void ndWorld::UpdateSleepState(dFloat32 timestep)

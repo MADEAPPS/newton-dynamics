@@ -40,6 +40,14 @@ class ntContactNotify: public dClassAlloc
 	{
 	}
 
+	void OnBodyAdded(ntBodyKinematic* const body) const
+	{
+	}
+
+	void OnBodyRemoved(ntBodyKinematic* const body) const
+	{
+	}
+
 	virtual bool OnAaabbOverlap(const ntContact* const contact, dFloat32 timestep)
 	{
 		return true;

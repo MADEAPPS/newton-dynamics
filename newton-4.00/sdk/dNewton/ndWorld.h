@@ -30,21 +30,10 @@ class ndBodyDynamic;
 #define D_NEWTON_ENGINE_VERSION 400
 
 D_MSV_NEWTON_ALIGN_32
-class ndWorld
-	:public dClassAlloc
-	,public dSyncMutex
-	,public dThread
-	,public dThreadPool
+class ndWorld: public dClassAlloc
 {
+	class ntWorldMixedBroadPhase;
 	public:
-	class ntNewtonBaseJob: public dThreadPoolJob
-	{
-		public:
-		dAtomic<int>* m_it;
-		ndWorld* m_world;
-		dFloat32 m_timestep;
-	};
-
 	D_NEWTON_API ndWorld();
 	D_NEWTON_API virtual ~ndWorld();
 
@@ -62,7 +51,7 @@ class ndWorld
 	D_NEWTON_API dInt32 GetSubSteps() const;
 	D_NEWTON_API void SetSubSteps(dInt32 subSteps);
 
-	D_NEWTON_API void DispatchJobs(dThreadPoolJob** const jobs);
+//	D_NEWTON_API void DispatchJobs(dThreadPoolJob** const jobs);
 
 	bool AddBody(ntBody* const body);
 	bool RemoveBody(ntBody* const body);
@@ -89,12 +78,9 @@ class ndWorld
 	protected:
 
 	private:
-	virtual void ThreadFunction();
-	void BuildBodyArray();
-
-	template <class T>
-	void SubmitJobs(dFloat32 timestep);
-	dArray<ntBodyKinematic*> m_tmpBodyArray;
+	void Tick();
+	void Signal();
+	void ThreadFunction();
 	ntBroadPhase* m_broadPhase;
 
 	dFloat32 m_timestep;
@@ -102,24 +88,6 @@ class ndWorld
 
 	friend class ntBroadPhase;
 } D_GCC_NEWTON_ALIGN_32 ;
-
-template <class T>
-void ndWorld::SubmitJobs(dFloat32 timestep)
-{
-	dAtomic<dInt32> it(0);
-	T extJob[D_MAX_THREADS_COUNT];
-	dThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
-
-	const dInt32 threadCount = GetThreadCount();
-	for (int i = 0; i < threadCount; i++)
-	{
-		extJob[i].m_it = &it;
-		extJob[i].m_world = this;
-		extJob[i].m_timestep = timestep;
-		extJobPtr[i] = &extJob[i];
-	}
-	DispatchJobs(extJobPtr);
-}
 
 inline ntBroadPhase* ndWorld::GetBroadphase() const
 {
@@ -154,6 +122,11 @@ inline bool ndWorld::RemoveBody(ntBody* const body)
 		return m_broadPhase->RemoveBody(kinematicBody);
 	}
 	return false;
+}
+
+inline dInt32 ndWorld::GetThreadCount() const
+{
+	return m_broadPhase->GetThreadCount();
 }
 
 

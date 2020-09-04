@@ -24,8 +24,8 @@
 #include "ntBroadPhaseNode.h"
 #include "ntBroadPhaseMixed.h"
 
-ntBroadPhaseMixed::ntBroadPhaseMixed(ndWorld* const world)
-	:ntBroadPhase(world)
+ntBroadPhaseMixed::ntBroadPhaseMixed()
+	:ntBroadPhase()
 	,m_treeEntropy(dFloat32(0.0f))
 	,m_fitness()
 {
@@ -33,7 +33,7 @@ ntBroadPhaseMixed::ntBroadPhaseMixed(ndWorld* const world)
 
 ntBroadPhaseMixed::~ntBroadPhaseMixed()
 {
-	ntFitnessList::FlushFreeList();
+	Cleanup();
 }
 
 void ntBroadPhaseMixed::AddNode(ntBroadPhaseNode* const newNode)
@@ -189,6 +189,21 @@ bool ntBroadPhaseMixed::AddBody(ntBodyKinematic* const body)
 		return true;
 	}
 	return false;
+}
+
+void ntBroadPhaseMixed::Cleanup()
+{
+	Sync();
+	m_contactList.DeleteAllContacts();
+	while (m_bodyList.GetFirst())
+	{
+		ntBodyKinematic* const body = m_bodyList.GetFirst()->GetInfo();
+		RemoveBody(body);
+		delete body;
+	}
+	ntContact::FlushFreeList();
+	ntFitnessList::FlushFreeList();
+	ntBodyKinematic::ReleaseMemory();
 }
 
 bool ntBroadPhaseMixed::RemoveBody(ntBodyKinematic* const body)

@@ -31,13 +31,14 @@ D_MSV_NEWTON_ALIGN_32
 class ntBroadPhaseMixed : public ntBroadPhase
 {
 	public:
-	ND_COLLISION_API ntBroadPhaseMixed(ndWorld* const world);
+	ND_COLLISION_API ntBroadPhaseMixed();
 	ND_COLLISION_API virtual ~ntBroadPhaseMixed();
 
 	protected:
 	ND_COLLISION_API virtual bool AddBody(ntBodyKinematic* const body);
 	ND_COLLISION_API virtual bool RemoveBody(ntBodyKinematic* const body);
 	ND_COLLISION_API virtual dFloat32 RayCast(ntRayCastNotify& callback, const dVector& p0, const dVector& p1) const;
+	ND_COLLISION_API virtual void Cleanup();
 
 	private:
 	void AddNode(ntBroadPhaseNode* const newNode);

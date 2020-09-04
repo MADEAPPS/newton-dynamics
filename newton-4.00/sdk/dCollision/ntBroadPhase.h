@@ -29,19 +29,30 @@
 #define D_BROADPHASE_MAX_STACK_DEPTH	256
 
 class ntPair;
-class ndWorld;
 class ntContact;
 class ntRayCastNotify;
 class ntContactNotify;
 class ntBilateralJoint;
 
 D_MSV_NEWTON_ALIGN_32
-class ntBroadPhase: public dClassAlloc
+class ntBroadPhase
+	:public dClassAlloc
+	,public dSyncMutex
+	,public dThread
+	,public dThreadPool
 {
+	public: 
+	class ntBaseJob: public dThreadPoolJob
+	{
+		public:
+		dAtomic<int>* m_it;
+		ntBroadPhase* m_owner;
+		dFloat32 m_timestep;
+	};
+
 	protected:
 	class ntBodyList: public dList<ntBodyKinematic*>
 	{
-		public:
 	};
 
 	class ntSpliteInfo;
@@ -58,11 +69,13 @@ class ntBroadPhase: public dClassAlloc
 	public:
 	ND_COLLISION_API virtual ~ntBroadPhase();
 
+	dInt32 GetThreadCount() const;
+
 	ND_COLLISION_API virtual bool AddBody(ntBodyKinematic* const body);
 	ND_COLLISION_API virtual bool RemoveBody(ntBodyKinematic* const body);
 
-	ND_COLLISION_API void Cleanup();
-	ND_COLLISION_API virtual void Update(dFloat32 timestep);
+	ND_COLLISION_API virtual void Cleanup() = 0;
+	ND_COLLISION_API void Update(dFloat32 timestep);
 
 	ND_COLLISION_API ntContactNotify* GetContactNotify() const;
 	ND_COLLISION_API void SetContactNotify(ntContactNotify* const notify);
@@ -89,10 +102,17 @@ class ntBroadPhase: public dClassAlloc
 	ntBroadPhaseNode* BuildTopDown(ntBroadPhaseNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ntFitnessList::dListNode** const nextNode);
 	ntBroadPhaseNode* BuildTopDownBig(ntBroadPhaseNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ntFitnessList::dListNode** const nextNode);
 
+	template <class T>
+	void SubmitJobs(dFloat32 timestep);
+
 	protected:
-	ND_COLLISION_API ntBroadPhase(ndWorld* const world);
-	ND_COLLISION_API ntBroadPhaseTreeNode* InsertNode (ntBroadPhaseNode* const root, ntBroadPhaseNode* const node);
-	ND_COLLISION_API void UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, ntBroadPhaseNode** const root);
+	ntBroadPhase();
+	virtual void ThreadFunction();
+	void BuildBodyArray();
+	void InternalUpdate(dFloat32 timestep);
+
+	ND_COLLISION_API ntBroadPhaseTreeNode* InsertNode(ntBroadPhaseNode* const root, ntBroadPhaseNode* const node);
+	void UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, ntBroadPhaseNode** const root);
 
 	//void CalculatePairContacts(dInt32 threadIndex, ntPair* const pair) const;
 	ntContact* FindContactJoint(ntBodyKinematic* const body0, ntBodyKinematic* const body1) const;
@@ -107,11 +127,12 @@ class ntBroadPhase: public dClassAlloc
 	
 	ntBodyList m_bodyList;
 	ntContactList m_contactList;
+	dArray<ntBodyKinematic*> m_tmpBodyArray;
 	dArray<ntContact*> m_activeContacts;
-	ndWorld* m_world;
 	ntBroadPhaseNode* m_rootNode;
 	ntContactNotify* m_contactNotifyCallback;
 	dUnsigned32 m_lru;
+	dFloat32 m_timestep;
 	bool m_fullScan;
 
 	static dVector m_velocTol;
@@ -120,6 +141,31 @@ class ntBroadPhase: public dClassAlloc
 
 	friend class ntRayCastNotify;
 } D_GCC_NEWTON_ALIGN_32 ;
+
+inline dInt32 ntBroadPhase::GetThreadCount() const
+{
+	const dThreadPool& pool = *this;
+	return pool.GetCount();
+}
+
+template <class T>
+void ntBroadPhase::SubmitJobs(dFloat32 timestep)
+{
+	dAtomic<dInt32> it(0);
+	T extJob[D_MAX_THREADS_COUNT];
+	dThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
+
+	const dInt32 threadCount = GetThreadCount();
+	for (int i = 0; i < threadCount; i++)
+	{
+		extJob[i].m_it = &it;
+		extJob[i].m_owner = this;
+		extJob[i].m_timestep = timestep;
+		extJobPtr[i] = &extJob[i];
+	}
+	//DispatchJobs(extJobPtr);
+	ExecuteJobs(extJobPtr);
+}
 
 D_INLINE dFloat32 ntBroadPhase::CalculateSurfaceArea(const ntBroadPhaseNode* const node0, const ntBroadPhaseNode* const node1, dVector& minBox, dVector& maxBox) const
 {
