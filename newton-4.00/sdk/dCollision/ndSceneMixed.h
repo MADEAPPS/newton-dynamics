@@ -19,35 +19,39 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-//
+#ifndef __D_BROADPHASE_DEFAULT_H__
+#define __D_BROADPHASE_DEFAULT_H__
 
-#ifndef _D_COLLISION_H__
-#define _D_COLLISION_H__
+#include "ndCollisionStdafx.h"
+#include "ndScene.h"
 
-#include <dCore.h>
-#include <ndCollisionStdafx.h>
-#include <ndBody.h>
-#include <ndScene.h>
-#include <ndShape.h>
-#include <ndContact.h>
-#include <ndShapeBox.h>
-#include <ndShapeNull.h>
-#include <ndSceneNode.h>
-#include <ndSceneMixed.h>
-#include <ndConstraint.h>
-#include <ndBodyNotify.h>
-#include <ndShapeConvex.h>
-#include <ndContactList.h>
-#include <ndBodyKinematic.h>
-#include <ndContactSolver.h>
-#include <ndShapeInstance.h>
+class ndRayCastNotify;
 
-#include <ndRayCastNotify.h>
-#include <ndContactNotify.h>
+D_MSV_NEWTON_ALIGN_32
+class ndSceneMixed : public ndScene
+{
+	public:
+	ND_COLLISION_API ndSceneMixed();
+	ND_COLLISION_API virtual ~ndSceneMixed();
+
+	protected:
+	ND_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
+	ND_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
+	ND_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& p0, const dVector& p1) const;
+	ND_COLLISION_API virtual void Cleanup();
+
+	private:
+	void AddNode(ndSceneNode* const newNode);
+	void RemoveNode(ndSceneNode* const newNode);
+	void BalanceBroadPhase();
+	void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body);
+
+	dFloat64 m_treeEntropy;
+	ndFitnessList m_fitness;
+
+} D_GCC_NEWTON_ALIGN_32 ;
 
 
-#endif 
 
+
+#endif

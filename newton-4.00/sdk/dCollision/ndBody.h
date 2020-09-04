@@ -22,61 +22,45 @@
 #ifndef _D_BODY_H_
 #define _D_BODY_H_
 
-#include "ntNewtonStdafx.h"
+#include "ndCollisionStdafx.h"
 #include "ndShapeInstance.h"
 
-class ntWorld;
-class ntContact;
-class ntBodyNotify;
-class ntBodyDynamic;
-class ntBodyKinematic;
-class ntRayCastNotify;
-class ntBilateralJoint;
-class ntBroadPhaseBodyNode;
-class ntBroadPhaseAggregate;
+class ndContact;
+class ndBodyNotify;
+class ndBodyDynamic;
+class ndBodyKinematic;
+class ndRayCastNotify;
+class ndBilateralJoint;
 
 D_MSV_NEWTON_ALIGN_32
-class ntBody: public dClassAlloc
+class ndBody: public dClassAlloc
 {
 	public:
-	D_NEWTON_API ntBody();
-	D_NEWTON_API virtual ~ntBody();
+	ND_COLLISION_API ndBody();
+	ND_COLLISION_API virtual ~ndBody();
 
-	dUnsigned32 GetID() const { return m_uniqueID; }
+	virtual ndBody* GetAsBody() { return this;}
+	virtual ndBodyDynamic* GetAsBodyDynamic() { return nullptr; }
+	virtual ndBodyKinematic* GetAsBodyKinematic() { return nullptr; }
 
-	virtual ntBody* GetAsBody() { return this;}
-	virtual ntBodyDynamic* GetAsBodyDynamic() { return nullptr; }
-	virtual ntBodyKinematic* GetAsBodyKinematic() { return nullptr; }
+	dUnsigned32 GetId() const;
+	virtual dFloat32 GetInvMass() const { return dFloat32(0.0f); }
+	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const = 0;
 
-
-	D_NEWTON_API void SetCentreOfMass(const dVector& com);
-
-	D_NEWTON_API void SetNotifyCallback(ntBodyNotify* const notify);
-	D_NEWTON_API ntBodyNotify* GetNotifyCallback(ntBodyNotify* const notify) const;
-
-	D_NEWTON_API dInt32 GetId() const;
-	D_NEWTON_API ntWorld* GetWorld() const;
-
-	D_NEWTON_API dVector GetOmega() const;
-	D_NEWTON_API void SetOmega(const dVector& veloc);
-
-	D_NEWTON_API dVector GetVelocity() const;
-	D_NEWTON_API void SetVelocity(const dVector& veloc);
-
-	D_NEWTON_API dMatrix GetMatrix() const;
-	D_NEWTON_API void SetMatrix(const dMatrix& matrix);
-
-	virtual dFloat32 GetInvMass() const {return dFloat32 (0.0f);}
-
-	D_NEWTON_API virtual void AttachContact(ntContact* const contact) {}
-	D_NEWTON_API virtual void DetachContact(ntContact* const contact) {}
-	virtual ntContact* FindContact(const ntBody* const otherBody) const {return nullptr;}
-
-	virtual dFloat32 RayCast(ntRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const = 0;
+	ND_COLLISION_API void SetCentreOfMass(const dVector& com);
+	ND_COLLISION_API void SetNotifyCallback(ndBodyNotify* const notify);
+	ND_COLLISION_API ndBodyNotify* GetNotifyCallback(ndBodyNotify* const notify) const;
+	ND_COLLISION_API dVector GetOmega() const;
+	ND_COLLISION_API void SetOmega(const dVector& veloc);
+	ND_COLLISION_API dVector GetVelocity() const;
+	ND_COLLISION_API void SetVelocity(const dVector& veloc);
+	ND_COLLISION_API dMatrix GetMatrix() const;
+	ND_COLLISION_API void SetMatrix(const dMatrix& matrix);
 
 	protected:
-	dList<ntBody*>::dListNode* GetNewtonNode() const;
-	void SetWorldNode(ntWorld* const world, dList<ntBody*>::dListNode* const node);
+	virtual void AttachContact(ndContact* const contact) {}
+	virtual void DetachContact(ndContact* const contact) {}
+	virtual ndContact* FindContact(const ndBody* const otherBody) const { return nullptr; }
 
 	dMatrix m_matrix;
 	dMatrix m_invWorldInertiaMatrix;
@@ -87,10 +71,7 @@ class ntBody: public dClassAlloc
 	dVector m_minAABB;
 	dVector m_maxAABB;
 	dQuaternion m_rotation;
-
-	ntWorld* m_world;
-	ntBodyNotify* m_notifyCallback;
-	dList<ntBody*>::dListNode* m_worldNode;
+	ndBodyNotify* m_notifyCallback;
 
 	union
 	{
@@ -116,12 +97,15 @@ class ntBody: public dClassAlloc
 	};
 
 	dUnsigned32 m_uniqueID;
-
 	static dUnsigned32 m_uniqueIDCount;
-
-	friend class ntWorld;
+	friend class ndScene;
 } D_GCC_NEWTON_ALIGN_32;
 
+
+inline dUnsigned32 ndBody::GetId() const
+{
+	return m_uniqueID;
+}
 
 #endif 
 

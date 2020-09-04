@@ -19,35 +19,32 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-//
+#include "ndCollisionStdafx.h"
+#include "ndContact.h"
+#include "ndContactList.h"
+#include "ndBodyKinematic.h"
 
-#ifndef _D_COLLISION_H__
-#define _D_COLLISION_H__
+ndContact* ndContactList::CreateContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
+{
+	ndContact temp(body0, body1);
+	dScopeSpinLock lock(m_lock);
+	dListNode* const node = Append(temp);
+	ndContact* const contact = &node->GetInfo();
+	contact->m_linkNode = node;
+	return contact;
+}
 
-#include <dCore.h>
-#include <ndCollisionStdafx.h>
-#include <ndBody.h>
-#include <ndScene.h>
-#include <ndShape.h>
-#include <ndContact.h>
-#include <ndShapeBox.h>
-#include <ndShapeNull.h>
-#include <ndSceneNode.h>
-#include <ndSceneMixed.h>
-#include <ndConstraint.h>
-#include <ndBodyNotify.h>
-#include <ndShapeConvex.h>
-#include <ndContactList.h>
-#include <ndBodyKinematic.h>
-#include <ndContactSolver.h>
-#include <ndShapeInstance.h>
+void ndContactList::DeleteContact(ndContact* const contact)
+{
+	contact->DetachFromBodies();
+	Remove(contact->m_linkNode);
+}
 
-#include <ndRayCastNotify.h>
-#include <ndContactNotify.h>
-
-
-#endif 
-
+void ndContactList::DeleteAllContacts()
+{
+	while (GetFirst())
+	{
+		DeleteContact(&GetFirst()->GetInfo());
+	}
+	FlushFreeList();
+}

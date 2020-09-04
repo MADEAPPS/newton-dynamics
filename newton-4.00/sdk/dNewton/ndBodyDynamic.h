@@ -41,7 +41,7 @@
 //class dgSkeletonContainer;
 
 D_MSV_NEWTON_ALIGN_32
-class ndBodyDynamic: public ntBodyKinematic
+class ndBodyDynamic: public ndBodyKinematic
 {
 	public:
 	D_NEWTON_API ndBodyDynamic();
@@ -62,7 +62,7 @@ class ndBodyDynamic: public ntBodyKinematic
 	protected:
 	dVector m_externalForce;
 	dVector m_externalTorque;
-	dArray<ntBilateralJoint*> m_jointArray;
+	dArray<ndBilateralJoint*> m_jointArray;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline dVector ndBodyDynamic::GetForce() const

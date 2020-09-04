@@ -31,7 +31,7 @@
 //dgVector ntDynamicBody::m_equilibriumError2 (DG_ERR_TOLERANCE2);
 
 ndBodyDynamic::ndBodyDynamic()
-	:ntBodyKinematic()
+	:ndBodyKinematic()
 	,m_externalForce(dVector::m_zero)
 	,m_externalTorque(dVector::m_zero)
 	,m_jointArray()

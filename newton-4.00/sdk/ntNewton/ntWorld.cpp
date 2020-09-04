@@ -24,7 +24,7 @@
 #include "ntWorld.h"
 #include "ntShapeNull.h"
 #include "ntBodyDynamic.h"
-#include "ntContactNotify.h"
+#include "ndContactNotify.h"
 #include "ntBroadPhaseMixed.h"
 
 ntWorld::ntWorld()

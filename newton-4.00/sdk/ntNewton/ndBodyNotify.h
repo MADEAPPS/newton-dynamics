@@ -19,35 +19,39 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-//
+#ifndef __D_BODY_NOTIFY_H__
+#define __D_BODY_NOTIFY_H__
 
-#ifndef _D_COLLISION_H__
-#define _D_COLLISION_H__
+#include "ntNewtonStdafx.h"
 
-#include <dCore.h>
-#include <ndCollisionStdafx.h>
-#include <ndBody.h>
-#include <ndScene.h>
-#include <ndShape.h>
-#include <ndContact.h>
-#include <ndShapeBox.h>
-#include <ndShapeNull.h>
-#include <ndSceneNode.h>
-#include <ndSceneMixed.h>
-#include <ndConstraint.h>
-#include <ndBodyNotify.h>
-#include <ndShapeConvex.h>
-#include <ndContactList.h>
-#include <ndBodyKinematic.h>
-#include <ndContactSolver.h>
-#include <ndShapeInstance.h>
+D_MSV_NEWTON_ALIGN_32
+class ndBodyNotify: public dClassAlloc
+{
+	public:  
+	ndBodyNotify()
+		:dClassAlloc()
+		,m_body(nullptr)
+	{
+	}
 
-#include <ndRayCastNotify.h>
-#include <ndContactNotify.h>
+	virtual ~ndBodyNotify()
+	{
+	}
 
+	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
+	{
+	}
+
+	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
+	{
+	}
+
+	protected:
+	ntBody* m_body;
+
+	friend class ntBody;
+
+} D_GCC_NEWTON_ALIGN_32;
 
 #endif 
 

@@ -22,20 +22,20 @@
 #ifndef __D_CONTACT_SOLVER_H__
 #define __D_CONTACT_SOLVER_H__
 
-#include "ntNewtonStdafx.h"
-#include "ntShape.h"
+#include "ndCollisionStdafx.h"
+#include "ndShape.h"
 #include "ndShapeInstance.h"
 
 class dPlane;
-class ntBodyKinematic;
-//class ntContactPoint;
+class ndBodyKinematic;
+//class ndContactPoint;
 
 D_MSV_NEWTON_ALIGN_32
-class ntMinkFace
+class ndMinkFace
 {
 	public:
 	dPlane m_plane;
-	ntMinkFace* m_twin[3];
+	ndMinkFace* m_twin[3];
 	dInt16 m_vertex[3];
 	dInt8 m_mark;
 	dInt8 m_alive;
@@ -51,32 +51,21 @@ class ntMinkFace
 #define D_MINK_VERTEX_ERR				dFloat32 (1.0e-3f)
 #define D_MINK_VERTEX_ERR2				(D_MINK_VERTEX_ERR * D_MINK_VERTEX_ERR)
 
-class ntContact;
+class ndContact;
 class dCollisionParamProxy;
 
-//class ntPair
-//{
-//	public:
-//	ntContact* m_contact;
-//	ntContactPoint* m_contactBuffer;
-//	dFloat32 m_timestep;
-//	dInt32 m_contactCount;
-//	//dInt32 m_cacheIsValid : 1;
-//	//dInt32 m_flipContacts : 1;
-//};
-
 D_MSV_NEWTON_ALIGN_32
-class ntContactSolver: public dDownHeap<ntMinkFace *, dFloat32>  
+class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>  
 {
 	public: 
-	ntContactSolver(const ntShapeInstance& instance0, const ntShapeInstance& instance1);
-	//ntContactSolver(dCollisionParamProxy* const proxy);
-	//ntContactSolver(ntShapeInstance* const instance0);
+	ndContactSolver(const ndShapeInstance& instance0, const ndShapeInstance& instance1);
+	//ndContactSolver(dCollisionParamProxy* const proxy);
+	//ndContactSolver(ndShapeInstance* const instance0);
 
 	
 	//dInt32 CalculateConvexCastContacts();
 	
-	//dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, ntContactPoint& contactOut);
+	//dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, ndContactPoint& contactOut);
 
 	//const dVector& GetNormal() const {return m_normal;}
 	//const dVector& GetPoint0() const {return m_closestPoint0;}
@@ -86,7 +75,7 @@ class ntContactSolver: public dDownHeap<ntMinkFace *, dFloat32>
 
 	dInt32 ConvexContacts();
 	dInt32 CalculateConvexToConvexContacts();
-	dInt32 CalculatePairContacts(dInt32 threadIndex, ntContactPoint* const buffer);
+	dInt32 CalculatePairContacts(dInt32 threadIndex, ndContactPoint* const buffer);
 	
 	private:
 	class dgPerimenterEdge
@@ -103,10 +92,10 @@ class ntContactSolver: public dDownHeap<ntMinkFace *, dFloat32>
 		dgFaceFreeList* m_next;
 	};
 
-	//D_INLINE ntMinkFace* NewFace();
-	//D_INLINE void PushFace(ntMinkFace* const face);
-	//D_INLINE void DeleteFace(ntMinkFace* const face);
-	//D_INLINE ntMinkFace* AddFace(dInt32 v0, dInt32 v1, dInt32 v2);
+	//D_INLINE ndMinkFace* NewFace();
+	//D_INLINE void PushFace(ndMinkFace* const face);
+	//D_INLINE void DeleteFace(ndMinkFace* const face);
+	//D_INLINE ndMinkFace* AddFace(dInt32 v0, dInt32 v1, dInt32 v2);
 	
 	//
 	//D_INLINE void TranslateSimplex(const dVector& step);
@@ -135,14 +124,14 @@ class ntContactSolver: public dDownHeap<ntMinkFace *, dFloat32>
 	//dCollisionParamProxy* m_proxy;
 	//ntBodyKinematic* const body0;
 	//ntBodyKinematic* const body1;
-	ntShapeInstance m_instance0;
-	ntShapeInstance m_instance1;
+	ndShapeInstance m_instance0;
+	ndShapeInstance m_instance1;
 	dVector m_separatingVector;
 
 	dVector m_hullDiff[D_CONVEX_MINK_MAX_POINTS];
 	dVector m_hullSum[D_CONVEX_MINK_MAX_POINTS];
 
-	//ntContact* m_contact;
+	//ndContact* m_contact;
 	//dgFaceFreeList* m_freeFace; 
 
 	dFloat32 m_timestep;
@@ -155,16 +144,16 @@ class ntContactSolver: public dDownHeap<ntMinkFace *, dFloat32>
 	bool m_intersectionTestOnly;
 	
 	//dInt32 m_faceIndex;
-	//ntMinkFace* m_faceStack[D_CONVEX_MINK_STACK_SIZE];
-	//ntMinkFace* m_coneFaceList[D_CONVEX_MINK_STACK_SIZE];
-	//ntMinkFace* m_deletedFaceList[D_CONVEX_MINK_STACK_SIZE];
-	//ntMinkFace m_facePool[D_CONVEX_MINK_MAX_FACES];
-	dInt8 m_heapBuffer[D_CONVEX_MINK_MAX_FACES * (sizeof (dFloat32) + sizeof (ntMinkFace *))];
+	//ndMinkFace* m_faceStack[D_CONVEX_MINK_STACK_SIZE];
+	//ndMinkFace* m_coneFaceList[D_CONVEX_MINK_STACK_SIZE];
+	//ndMinkFace* m_deletedFaceList[D_CONVEX_MINK_STACK_SIZE];
+	//ndMinkFace m_facePool[D_CONVEX_MINK_MAX_FACES];
+	dInt8 m_heapBuffer[D_CONVEX_MINK_MAX_FACES * (sizeof (dFloat32) + sizeof (ndMinkFace *))];
 
 	static dVector m_hullDirs[14]; 
 	static dInt32 m_rayCastSimplex[4][4];
 
-	friend class ntBroadPhase;
+	friend class ndScene;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #endif 

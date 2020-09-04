@@ -29,25 +29,25 @@
 
 #include <dCore.h>
 #include <ndNewtonStdafx.h>
-#include <ntBody.h>
-#include <ntShape.h>
+#include <ndBody.h>
+#include <ndShape.h>
 #include <ndWorld.h>
-#include <ntScene.h>
-#include <ntContact.h>
-#include <ntShapeBox.h>
-#include <ntShapeNull.h>
-#include <ntSceneNode.h>
-#include <ntConstraint.h>
-#include <ntBodyNotify.h>
-#include <ntSceneMixed.h>
-#include <ntShapeConvex.h>
+#include <ndScene.h>
+#include <ndContact.h>
+#include <ndShapeBox.h>
+#include <ndShapeNull.h>
+#include <ndSceneNode.h>
+#include <ndConstraint.h>
+#include <ndBodyNotify.h>
+#include <ndSceneMixed.h>
+#include <ndShapeConvex.h>
 #include <ndBodyDynamic.h>
-#include <ntContactList.h>
-#include <ntBodyKinematic.h>
-#include <ntContactSolver.h>
-#include <ntShapeInstance.h>
-#include <ntRayCastNotify.h>
-#include <ntContactNotify.h>
+#include <ndContactList.h>
+#include <ndBodyKinematic.h>
+#include <ndContactSolver.h>
+#include <ndShapeInstance.h>
+#include <ndRayCastNotify.h>
+#include <ndContactNotify.h>
 
 
 #endif 

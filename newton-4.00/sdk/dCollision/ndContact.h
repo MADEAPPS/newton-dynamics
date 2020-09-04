@@ -22,24 +22,24 @@
 #ifndef __DGCONTACT_H__
 #define __DGCONTACT_H__
 
-#include "ntNewtonStdafx.h"
+#include "ndCollisionStdafx.h"
 #include "ndConstraint.h"
 
-class ntBodyKinematic;
-class ntShapeInstance;
+class ndBodyKinematic;
+class ndShapeInstance;
 
 #define D_MAX_CONTATCS		128
 
 D_MSV_NEWTON_ALIGN_32
-class ntContactPoint
+class ndContactPoint
 {
 	public:
 	dVector m_point;
 	dVector m_normal;
-	const ntBodyKinematic* m_body0;
-	const ntBodyKinematic* m_body1;
-	const ntShapeInstance* m_collision0;
-	const ntShapeInstance* m_collision1;
+	const ndBodyKinematic* m_body0;
+	const ndBodyKinematic* m_body1;
+	const ndShapeInstance* m_collision0;
+	const ndShapeInstance* m_collision1;
 	//dInt64 m_shapeId0;
 	//dInt64 m_shapeId1;
 	//dFloat32 m_penetration;
@@ -47,28 +47,27 @@ class ntContactPoint
 
 
 D_MSV_NEWTON_ALIGN_32 
-//class ntContact: public ndConstraint, public dgList<dgContactMaterial>
-class ntContact: public ndConstraint, public dContainersFreeListAlloc<ntContact*>
+class ndContact: public ndConstraint, public dContainersFreeListAlloc<ndContact*>
 {
 	public:
-	D_NEWTON_API ntContact(ntBodyKinematic* const body0, ntBodyKinematic* const body1);
-	D_NEWTON_API virtual ~ntContact();
+	ND_COLLISION_API ndContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
+	ND_COLLISION_API virtual ~ndContact();
 
-	D_NEWTON_API virtual ntBodyKinematic* GetBody0() const;
-	D_NEWTON_API virtual ntBodyKinematic* GetBody1() const;
+	ND_COLLISION_API virtual ndBodyKinematic* GetBody0() const;
+	ND_COLLISION_API virtual ndBodyKinematic* GetBody1() const;
 
-	D_NEWTON_API void AttachToBodies();
-	D_NEWTON_API void DetachFromBodies();
+	ND_COLLISION_API void AttachToBodies();
+	ND_COLLISION_API void DetachFromBodies();
 
-	ntContact* GetAsContact() { return this; }
+	ndContact* GetAsContact() { return this; }
 	
 	private:
 	dVector m_positAcc;
 	dQuaternion m_rotationAcc;
 	dVector m_separatingVector;
-	ntBodyKinematic* m_body0;
-	ntBodyKinematic* m_body1;
-	dList<ntContact, dContainersFreeListAlloc<ntContact>>::dListNode* m_linkNode;
+	ndBodyKinematic* m_body0;
+	ndBodyKinematic* m_body1;
+	dList<ndContact, dContainersFreeListAlloc<ndContact>>::dListNode* m_linkNode;
 	dFloat32 m_timeOfImpact;
 	dFloat32 m_separationDistance;
 	dUnsigned32 m_maxDOF;
@@ -78,9 +77,9 @@ class ntContact: public ndConstraint, public dContainersFreeListAlloc<ntContact*
 	bool m_killContact;
 	static dVector m_initialSeparatingVector;
 
-	friend class ntBroadPhase;
-	friend class ntContactList;
-	friend class ntContactSolver;
+	friend class ndScene;
+	friend class ndContactList;
+	friend class ndContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #if 0

@@ -61,7 +61,7 @@ class CheckMemoryLeaks
 };
 static CheckMemoryLeaks checkLeaks;
 
-class DemobodyNotify: public ntBodyNotify
+class DemobodyNotify: public ndBodyNotify
 {
 	public:
 	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
@@ -87,7 +87,7 @@ dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist)
 	dVector p0(origin);
 	dVector p1(origin - dVector(0.0f, dAbs(dist), 0.0f, 0.0f));
 
-	ntRayCastCloasestHitCallback rayCaster(world.GetBroadphase());
+	ndRayCastCloasestHitCallback rayCaster(world.GetBroadphase());
 	dFloat32 param = rayCaster.TraceRay(p0, p1);
 	return (param < 1.0f) ? rayCaster.m_contact.m_point : p0;
 }
@@ -95,7 +95,7 @@ dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist)
 void BuildFloor(ndWorld& world)
 {
 	world.Sync();
-	ntShapeInstance box(new ntShapeBox(200.0f, 1.0f, 200.f));
+	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
 	ndBodyDynamic* const body = new ndBodyDynamic();
 
 	//body->SetNotifyCallback(new DemobodyNotify);
@@ -115,7 +115,7 @@ void BuildPyramid(ndWorld& world, dFloat32 mass, const dVector& origin, const dV
 	matrix.m_posit.m_w = 1.0f;
 
 	world.Sync();
-	ntShapeInstance box(new ntShapeBox(size.m_x, size.m_y, size.m_z));
+	ndShapeInstance box(new ndShapeBox(size.m_x, size.m_y, size.m_z));
 
 	dVector floor(FindFloor(world, dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y + size.m_y / 2.0f;

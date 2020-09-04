@@ -32,7 +32,7 @@ class ndBodyDynamic;
 D_MSV_NEWTON_ALIGN_32
 class ndWorld: public dClassAlloc
 {
-	class ntWorldMixedScene;
+	class ndWorldMixedScene;
 
 	public:
 	D_NEWTON_API ndWorld();
@@ -52,15 +52,13 @@ class ndWorld: public dClassAlloc
 	D_NEWTON_API dInt32 GetSubSteps() const;
 	D_NEWTON_API void SetSubSteps(dInt32 subSteps);
 
-//	D_NEWTON_API void DispatchJobs(dThreadPoolJob** const jobs);
+	bool AddBody(ndBody* const body);
+	bool RemoveBody(ndBody* const body);
 
-	bool AddBody(ntBody* const body);
-	bool RemoveBody(ntBody* const body);
+	ndScene* GetBroadphase() const;
 
-	ntScene* GetBroadphase() const;
-
-	ntContactNotify* GetContactNotify() const;
-	void SetContactNotify(ntContactNotify* const notify);
+	ndContactNotify* GetContactNotify() const;
+	void SetContactNotify(ndContactNotify* const notify);
 
 	protected:
 	D_NEWTON_API virtual void SubstepUpdate(dFloat32 timestep);
@@ -82,32 +80,32 @@ class ndWorld: public dClassAlloc
 	void Tick();
 	void Signal();
 	void ThreadFunction();
-	ntScene* m_broadPhase;
+	ndScene* m_broadPhase;
 
 	dFloat32 m_timestep;
 	dInt32 m_subSteps;
 
-	friend class ntScene;
+	friend class ndScene;
 } D_GCC_NEWTON_ALIGN_32 ;
 
-inline ntScene* ndWorld::GetBroadphase() const
+inline ndScene* ndWorld::GetBroadphase() const
 {
 	return m_broadPhase;
 }
 
-inline ntContactNotify* ndWorld::GetContactNotify() const
+inline ndContactNotify* ndWorld::GetContactNotify() const
 {
 	return m_broadPhase->GetContactNotify();
 }
 
-inline void ndWorld::SetContactNotify(ntContactNotify* const notify)
+inline void ndWorld::SetContactNotify(ndContactNotify* const notify)
 {
 	m_broadPhase->SetContactNotify(notify);
 }
 
-inline bool ndWorld::AddBody(ntBody* const body)
+inline bool ndWorld::AddBody(ndBody* const body)
 {
-	ntBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
 	if (kinematicBody)
 	{
 		return m_broadPhase->AddBody(kinematicBody);
@@ -115,9 +113,9 @@ inline bool ndWorld::AddBody(ntBody* const body)
 	return false;
 }
 
-inline bool ndWorld::RemoveBody(ntBody* const body)
+inline bool ndWorld::RemoveBody(ndBody* const body)
 {
-	ntBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
 	if (kinematicBody)
 	{
 		return m_broadPhase->RemoveBody(kinematicBody);
