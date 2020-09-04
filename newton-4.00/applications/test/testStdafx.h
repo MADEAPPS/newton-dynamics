@@ -14,7 +14,7 @@
 
 #include <stdio.h>
 #include <conio.h>
-#include <ntNewton.h>
+#include <ndNewton.h>
 
 #endif
 

@@ -18,10 +18,11 @@ cmake_minimum_required(VERSION 3.4.0)
 #include_directories(dVehicle/dVehicleMultiBody)
 
 add_subdirectory(dCore)
-add_subdirectory(ntNewton)
+add_subdirectory(dNewton)
+add_subdirectory(dCollision)
 
-#add_subdirectory(dgPhysics)
-#
+#add_subdirectory(ntNewton)
+
 #if(NOT NEWTON_BUILD_CORE_ONLY)
 #	add_subdirectory(dMath)
 #	add_subdirectory(dScene)

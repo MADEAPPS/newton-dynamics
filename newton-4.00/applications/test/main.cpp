@@ -66,7 +66,7 @@ class DemobodyNotify: public ntBodyNotify
 	public:
 	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
 	{
-		ntBodyDynamic* const body = m_body->GetAsBodyDynamic();
+		ndBodyDynamic* const body = m_body->GetAsBodyDynamic();
 		dAssert(body);
 
 		dVector massMatrix (body->GetMassMatrix());
@@ -81,22 +81,22 @@ class DemobodyNotify: public ntBodyNotify
 	}
 };
 
-dVector FindFloor(const ntWorld& world, const dVector& origin, dFloat32 dist)
+dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist)
 {
 	// shot a vertical ray from a high altitude and collect the intersection parameter.
 	dVector p0(origin);
 	dVector p1(origin - dVector(0.0f, dAbs(dist), 0.0f, 0.0f));
 
-	ntRayCastCloasestHitCallback rayCaster(&world);
+	ntRayCastCloasestHitCallback rayCaster(world.GetBroadphase());
 	dFloat32 param = rayCaster.TraceRay(p0, p1);
 	return (param < 1.0f) ? rayCaster.m_contact.m_point : p0;
 }
 
-void BuildFloor(ntWorld& world)
+void BuildFloor(ndWorld& world)
 {
 	world.Sync();
 	ntShapeInstance box(new ntShapeBox(200.0f, 1.0f, 200.f));
-	ntBodyDynamic* const body = new ntBodyDynamic();
+	ndBodyDynamic* const body = new ndBodyDynamic();
 
 	//body->SetNotifyCallback(new DemobodyNotify);
 
@@ -108,7 +108,7 @@ void BuildFloor(ntWorld& world)
 	world.AddBody(body);
 }
 
-void BuildPyramid(ntWorld& world, dFloat32 mass, const dVector& origin, const dVector& size, int count)
+void BuildPyramid(ndWorld& world, dFloat32 mass, const dVector& origin, const dVector& size, int count)
 {
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
@@ -138,7 +138,7 @@ count = 1;
 		const dInt32 count1 = count - j;
 		for (int i = 0; i < count1; i++)
 		{
-			ntBodyDynamic* const body = new ntBodyDynamic();
+			ndBodyDynamic* const body = new ndBodyDynamic();
 
 			body->SetNotifyCallback(new DemobodyNotify);
 			
@@ -156,7 +156,7 @@ count = 1;
 
 int main (int argc, const char * argv[]) 
 {
-	ntWorld world;
+	ndWorld world;
 	world.SetSubSteps(2);
 	//world.SetThreadCount(8);
 		

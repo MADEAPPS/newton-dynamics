@@ -45,16 +45,6 @@
 #endif
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER) || (defined (_MSC_VER ) && defined (_ARM_VER)) )
-	//#pragma warning (disable: 4127)	//conditional expression is constant
-	//#pragma warning (disable: 4324) //structure was padded due to __declspec(align())
-	//#pragma warning (disable: 4514) //unreferenced inline function has been removed
-	//#pragma warning (disable: 4530) //C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
-	//#pragma warning (disable: 4625) //copy constructor could not be generated because a base class copy constructor is inaccessible or deleted
-	//#pragma warning (disable: 4626) //assignment operator could not be generated because a base class assignment operator is inaccessible or deleted
-	//#pragma warning (disable: 4640) //construction of local static object is not thread-safe
-	//#pragma warning (disable: 4820) //bytes padding added after data member
-	//#pragma warning (disable: 4005) //'__useHeader': macro redefinition
-    
 	#include <io.h> 
 	#include <stdint.h>
 	#include <direct.h> 
@@ -98,9 +88,9 @@
 #endif
 
 #if (defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (__MINGW32__) || defined (__MINGW64__))
-  /* CMake defines NDEBUG for _not_ debug builds. Therefore, set
-     Newton's _DEBUG flag only when NDEBUG is not defined.
-  */
+  // CMake defines NDEBUG for _not_ debug builds. Therefore, set
+  // Newton's _DEBUG flag only when NDEBUG is not defined.
+
   #ifndef NDEBUG
     #define _DEBUG 1
   #endif
@@ -130,6 +120,8 @@
     #endif
 #endif
 
+//#define DG_PROFILE_PHYSICS
+
 // uncomment out D_PROFILER to enable profiler frame capture profiler traces
 // alternatively the end application can use a command line option to enable this define
 //#define D_PROFILER
@@ -158,7 +150,6 @@
 	#endif
 #endif
 
-
 //************************************************************
 #ifdef D_DISABLE_ASSERT
 	#define dAssert(x)
@@ -179,7 +170,6 @@
 #ifdef _DEBUG
 //#define __ENABLE_D_CONTAINERS_SANITY_CHECK 
 #endif
-
 
 #ifdef _DEBUG
 	#define D_INLINE inline
@@ -206,7 +196,6 @@
 		#define	D_MSV_NEWTON_ALIGN_32
 		#define	D_GCC_NEWTON_ALIGN_32     __attribute__((aligned (32)))
 	#endif
-
 #else
 	#if defined(_MSC_VER)
 		#define	D_GCC_NEWTON_ALIGN_16 	 
@@ -222,7 +211,6 @@
 	#define	D_MSV_NEWTON_ALIGN_32 D_MSV_NEWTON_ALIGN_16   
 	#define	D_GCC_NEWTON_ALIGN_32 D_GCC_NEWTON_ALIGN_16	 
 #endif
-
 
 #ifdef _D_CORE_DLL
 	#ifdef _D_CORE_EXPORT_DLL
@@ -246,9 +234,7 @@
 
 	typedef int64_t dInt64;
 	typedef uint64_t dUnsigned64;
-
 #else
-
 	typedef char dInt8;
 	typedef unsigned char dUnsigned8;
 
@@ -263,7 +249,6 @@
 	typedef unsigned long long dUnsigned64;
 	typedef double dFloat64;
 #endif
-
 
 typedef double dFloat64;
 
@@ -290,7 +275,7 @@ class dTriplex
 
 class dBigVector;
 #ifndef D_NEWTON_USE_DOUBLE
-class dVector;
+	class dVector;
 #endif 
 
 #if (defined (_WIN_32_VER) || defined (_WIN_64_VER))
@@ -311,7 +296,8 @@ class dVector;
 D_INLINE dInt32 dExp2 (dInt32 x)
 {
 	dInt32 exp;
-	for (exp = -1; x; x >>= 1) {
+	for (exp = -1; x; x >>= 1) 
+	{
 		exp ++;
 	}
 	return exp;

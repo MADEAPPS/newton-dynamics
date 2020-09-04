@@ -58,6 +58,7 @@ endif()
 if(NEWTON_BUILD_SHARED_LIBS)
     add_definitions(-D_D_CORE_DLL)
 	add_definitions(-D_D_NEWTON_DLL)
+	add_definitions(-D_D_COLLISION_DLL)
 endif(NEWTON_BUILD_SHARED_LIBS)
 
 #If no build type set, Release as default

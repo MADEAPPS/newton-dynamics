@@ -19,7 +19,8 @@ file(GLOB CPP_SOURCE *.h *.cpp)
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 include_directories(../../sdk/dCore/)
-include_directories(../../sdk/ntNewton/)
+include_directories(../../sdk/dNewton/)
+include_directories(../../sdk/dCollision/)
 
 if(MSVC)
 	set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEBUG") 
@@ -38,7 +39,7 @@ endif ()
 add_executable(${projectName} ${CPP_SOURCE})
 
 #target_link_libraries (${projectName} ntNewton dScene dModel dVehicle glfw imgui glatter)
-target_link_libraries (${projectName} dCore ntNewton)
+target_link_libraries (${projectName} dCore ndCollision ndNewton)
 
 #if (NEWTON_BUILD_PROFILER)
 #    target_link_libraries (${projectName} dProfiler)
