@@ -25,15 +25,15 @@
 #include "ndCollisionStdafx.h"
 
 class ntBodyKinematic;
-class ntBroadPhaseBodyNode;
-class ntBroadPhaseTreeNode;
-class ntBroadPhaseAggregate;
+class ntSceneBodyNode;
+class ntSceneTreeNode;
+class ntSceneAggregate;
 
 D_MSV_NEWTON_ALIGN_32
-class ntBroadPhaseNode: public dClassAlloc
+class ntSceneNode: public dClassAlloc
 {
 	public:
-	ntBroadPhaseNode(ntBroadPhaseNode* const parent)
+	ntSceneNode(ntSceneNode* const parent)
 		:dClassAlloc()
 		,m_minBox(dFloat32(-1.0e15f))
 		,m_maxBox(dFloat32(1.0e15f))
@@ -43,16 +43,16 @@ class ntBroadPhaseNode: public dClassAlloc
 	{
 	}
 
-	virtual ~ntBroadPhaseNode()
+	virtual ~ntSceneNode()
 	{
 	}
 
 	ND_COLLISION_API void SetAABB(const dVector& minBox, const dVector& maxBox);
 
-	virtual ntBroadPhaseNode* GetAsBroadPhaseNode() { return this; }
-	virtual ntBroadPhaseBodyNode* GetAsBroadPhaseBodyNode() { return nullptr; }
-	virtual ntBroadPhaseTreeNode* GetAsBroadPhaseTreeNode() { return nullptr; }
-	virtual ntBroadPhaseAggregate* GetAsBroadPhaseAggregate() { return nullptr; }
+	virtual ntSceneNode* GetAsBroadPhaseNode() { return this; }
+	virtual ntSceneBodyNode* GetAsBroadPhaseBodyNode() { return nullptr; }
+	virtual ntSceneTreeNode* GetAsBroadPhaseTreeNode() { return nullptr; }
+	virtual ntSceneAggregate* GetAsBroadPhaseAggregate() { return nullptr; }
 
 /*
 	virtual bool IsSegregatedRoot() const
@@ -70,19 +70,19 @@ class ntBroadPhaseNode: public dClassAlloc
 		return nullptr;
 	}
 
-	virtual ntBroadPhaseNode* GetLeft() const
+	virtual ntSceneNode* GetLeft() const
 	{
 		return nullptr;
 	}
 
-	virtual ntBroadPhaseNode* GetRight() const
+	virtual ntSceneNode* GetRight() const
 	{
 		return nullptr;
 	}
 
 	dVector m_minBox;
 	dVector m_maxBox;
-	ntBroadPhaseNode* m_parent;
+	ntSceneNode* m_parent;
 	dSpinLock m_lock;
 	dFloat32 m_surfaceArea;
 
@@ -91,13 +91,13 @@ class ntBroadPhaseNode: public dClassAlloc
 } D_GCC_NEWTON_ALIGN_32 ;
 
 D_MSV_NEWTON_ALIGN_32
-class ntBroadPhaseBodyNode: public ntBroadPhaseNode
+class ntSceneBodyNode: public ntSceneNode
 {
 	public:
-	ND_COLLISION_API ntBroadPhaseBodyNode(ntBodyKinematic* const body);
-	ND_COLLISION_API virtual ~ntBroadPhaseBodyNode();
+	ND_COLLISION_API ntSceneBodyNode(ntBodyKinematic* const body);
+	ND_COLLISION_API virtual ~ntSceneBodyNode();
 
-	virtual ntBroadPhaseBodyNode* GetAsBroadPhaseBodyNode() { return this; }
+	virtual ntSceneBodyNode* GetAsBroadPhaseBodyNode() { return this; }
 
 	virtual ntBodyKinematic* GetBody() const
 	{
@@ -108,35 +108,35 @@ class ntBroadPhaseBodyNode: public ntBroadPhaseNode
 	//dList<dBroadPhaseNode*>::dListNode* m_updateNode;
 } D_GCC_NEWTON_ALIGN_32 ;
 
-class ntBroadPhaseTreeNode: public ntBroadPhaseNode
+class ntSceneTreeNode: public ntSceneNode
 {
 	public:
-	//dBroadPhaseTreeNode()
-	//	:dBroadPhaseNode(nullptr)
+	//ntScenereeNode()
+	//	:ntSceneNode(nullptr)
 	//	,m_left(nullptr)
 	//	,m_right(nullptr)
 	//	,m_fitnessNode(nullptr)
 	//{
 	//}
 	
-	ND_COLLISION_API ntBroadPhaseTreeNode(ntBroadPhaseNode* const sibling, ntBroadPhaseNode* const myNode);
-	ND_COLLISION_API virtual ~ntBroadPhaseTreeNode();
+	ND_COLLISION_API ntSceneTreeNode(ntSceneNode* const sibling, ntSceneNode* const myNode);
+	ND_COLLISION_API virtual ~ntSceneTreeNode();
 
-	virtual ntBroadPhaseTreeNode* GetAsBroadPhaseTreeNode() { return this; }
+	virtual ntSceneTreeNode* GetAsBroadPhaseTreeNode() { return this; }
 	
-	virtual ntBroadPhaseNode* GetLeft() const
+	virtual ntSceneNode* GetLeft() const
 	{
 		return m_left;
 	}
 	
-	virtual ntBroadPhaseNode* GetRight() const
+	virtual ntSceneNode* GetRight() const
 	{
 		return m_right;
 	}
 
-	ntBroadPhaseNode* m_left;
-	ntBroadPhaseNode* m_right;
-	dList<ntBroadPhaseTreeNode*, dContainersFreeListAlloc<ntBroadPhaseTreeNode*>>::dListNode* m_fitnessNode;
+	ntSceneNode* m_left;
+	ntSceneNode* m_right;
+	dList<ntSceneTreeNode*, dContainersFreeListAlloc<ntSceneTreeNode*>>::dListNode* m_fitnessNode;
 } D_GCC_NEWTON_ALIGN_32;
 
 

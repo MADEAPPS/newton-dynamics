@@ -23,16 +23,16 @@
 #define __D_BROADPHASE_DEFAULT_H__
 
 #include "ndCollisionStdafx.h"
-#include "ntBroadPhase.h"
+#include "ntScene.h"
 
 class ntRayCastNotify;
 
 D_MSV_NEWTON_ALIGN_32
-class ntBroadPhaseMixed : public ntBroadPhase
+class ntSceneMixed : public ntScene
 {
 	public:
-	ND_COLLISION_API ntBroadPhaseMixed();
-	ND_COLLISION_API virtual ~ntBroadPhaseMixed();
+	ND_COLLISION_API ntSceneMixed();
+	ND_COLLISION_API virtual ~ntSceneMixed();
 
 	protected:
 	ND_COLLISION_API virtual bool AddBody(ntBodyKinematic* const body);
@@ -41,8 +41,8 @@ class ntBroadPhaseMixed : public ntBroadPhase
 	ND_COLLISION_API virtual void Cleanup();
 
 	private:
-	void AddNode(ntBroadPhaseNode* const newNode);
-	void RemoveNode(ntBroadPhaseNode* const newNode);
+	void AddNode(ntSceneNode* const newNode);
+	void RemoveNode(ntSceneNode* const newNode);
 	void BalanceBroadPhase();
 	void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBodyKinematic* const body);
 

@@ -25,14 +25,14 @@
 #include "ndCollisionStdafx.h"
 #include "ntBody.h"
 #include "ntContact.h"
-#include "ntBroadPhase.h"
+#include "ntScene.h"
 #include "ntShapeInstance.h"
 
 D_MSV_NEWTON_ALIGN_32
 class ntRayCastNotify
 {
 	public: 
-	ntRayCastNotify(const ntBroadPhase* const broadPhase)
+	ntRayCastNotify(const ntScene* const broadPhase)
 		:m_broadPhase(broadPhase)
 	{
 	}
@@ -54,14 +54,14 @@ class ntRayCastNotify
 	virtual dFloat32 OnRayCastAction(const ntContactPoint& contact, dFloat32 intersetParam) = 0;
 
 	protected:
-	const ntBroadPhase* m_broadPhase;
+	const ntScene* m_broadPhase;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 D_MSV_NEWTON_ALIGN_32
 class ntRayCastCloasestHitCallback: public ntRayCastNotify
 {
 	public:
-	ntRayCastCloasestHitCallback(const ntBroadPhase* const broadPhase)
+	ntRayCastCloasestHitCallback(const ntScene* const broadPhase)
 		:ntRayCastNotify(broadPhase)
 		,m_param(dFloat32(1.2f))
 	{

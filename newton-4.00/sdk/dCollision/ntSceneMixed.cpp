@@ -21,26 +21,26 @@
 
 #include "ndCollisionStdafx.h"
 #include "ntBodyKinematic.h"
-#include "ntBroadPhaseNode.h"
-#include "ntBroadPhaseMixed.h"
+#include "ntSceneNode.h"
+#include "ntSceneMixed.h"
 
-ntBroadPhaseMixed::ntBroadPhaseMixed()
-	:ntBroadPhase()
+ntSceneMixed::ntSceneMixed()
+	:ntScene()
 	,m_treeEntropy(dFloat32(0.0f))
 	,m_fitness()
 {
 }
 
-ntBroadPhaseMixed::~ntBroadPhaseMixed()
+ntSceneMixed::~ntSceneMixed()
 {
 	Cleanup();
 }
 
-void ntBroadPhaseMixed::AddNode(ntBroadPhaseNode* const newNode)
+void ntSceneMixed::AddNode(ntSceneNode* const newNode)
 {
 	if (m_rootNode) 
 	{
-		ntBroadPhaseTreeNode* const node = InsertNode(m_rootNode, newNode);
+		ntSceneTreeNode* const node = InsertNode(m_rootNode, newNode);
 		node->m_fitnessNode = m_fitness.Append(node);
 		if (!node->m_parent) 
 		{
@@ -53,16 +53,16 @@ void ntBroadPhaseMixed::AddNode(ntBroadPhaseNode* const newNode)
 	}
 }
 
-void ntBroadPhaseMixed::RemoveNode(ntBroadPhaseNode* const node)
+void ntSceneMixed::RemoveNode(ntSceneNode* const node)
 {
 	if (node->m_parent) 
 	{
 		if (!node->m_parent->GetAsBroadPhaseAggregate()) 
 		{
-			ntBroadPhaseTreeNode* const parent = (ntBroadPhaseTreeNode*)node->m_parent;
+			ntSceneTreeNode* const parent = (ntSceneTreeNode*)node->m_parent;
 			if (parent->m_parent) 
 			{
-				ntBroadPhaseAggregate* const aggregate = parent->m_parent->GetAsBroadPhaseAggregate();
+				ntSceneAggregate* const aggregate = parent->m_parent->GetAsBroadPhaseAggregate();
 				if (aggregate)
 				{
 					dAssert(0);
@@ -86,7 +86,7 @@ void ntBroadPhaseMixed::RemoveNode(ntBroadPhaseNode* const node)
 				}
 				else 
 				{
-					ntBroadPhaseTreeNode* const grandParent = (ntBroadPhaseTreeNode*)parent->m_parent;
+					ntSceneTreeNode* const grandParent = (ntSceneTreeNode*)parent->m_parent;
 					if (grandParent->m_left == parent) 
 					{
 						if (parent->m_right == node) 
@@ -126,7 +126,7 @@ void ntBroadPhaseMixed::RemoveNode(ntBroadPhaseNode* const node)
 			else 
 			{
 				dAssert(!node->m_parent->GetAsBroadPhaseBodyNode());
-				ntBroadPhaseTreeNode* const parent1 = node->m_parent->GetAsBroadPhaseTreeNode();
+				ntSceneTreeNode* const parent1 = node->m_parent->GetAsBroadPhaseTreeNode();
 				if (parent1->m_right == node) 
 				{
 					m_rootNode = parent1->m_left;
@@ -179,19 +179,19 @@ void ntBroadPhaseMixed::RemoveNode(ntBroadPhaseNode* const node)
 	}
 }
 
-bool ntBroadPhaseMixed::AddBody(ntBodyKinematic* const body)
+bool ntSceneMixed::AddBody(ntBodyKinematic* const body)
 {
-	if (ntBroadPhase::AddBody(body))
+	if (ntScene::AddBody(body))
 	{
 		body->UpdateCollisionMatrix();
-		ntBroadPhaseBodyNode* const bodyNode = new ntBroadPhaseBodyNode(body);
+		ntSceneBodyNode* const bodyNode = new ntSceneBodyNode(body);
 		AddNode(bodyNode);
 		return true;
 	}
 	return false;
 }
 
-void ntBroadPhaseMixed::Cleanup()
+void ntSceneMixed::Cleanup()
 {
 	Sync();
 	m_contactList.DeleteAllContacts();
@@ -206,40 +206,40 @@ void ntBroadPhaseMixed::Cleanup()
 	ntBodyKinematic::ReleaseMemory();
 }
 
-bool ntBroadPhaseMixed::RemoveBody(ntBodyKinematic* const body)
+bool ntSceneMixed::RemoveBody(ntBodyKinematic* const body)
 {
-	ntBroadPhaseBodyNode* const node = body->GetBroadPhaseBodyNode();
+	ntSceneBodyNode* const node = body->GetBroadPhaseBodyNode();
 	if (node)
 	{
 		RemoveNode(node);
 	}
-	return ntBroadPhase::RemoveBody(body);
+	return ntScene::RemoveBody(body);
 }
 
-void ntBroadPhaseMixed::BalanceBroadPhase()
+void ntSceneMixed::BalanceBroadPhase()
 {
 	D_TRACKTIME();
 	UpdateFitness(m_fitness, m_treeEntropy, &m_rootNode);
 }
 
-void ntBroadPhaseMixed::FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBodyKinematic* const body)
+void ntSceneMixed::FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ntBodyKinematic* const body)
 {
-	ntBroadPhaseNode* const leafNode = body->GetBroadPhaseBodyNode();
+	ntSceneNode* const leafNode = body->GetBroadPhaseBodyNode();
 
 	if (m_fullScan) 
 	{
-		ntBroadPhaseAggregate* const aggregateNode = leafNode->GetAsBroadPhaseAggregate();
+		ntSceneAggregate* const aggregateNode = leafNode->GetAsBroadPhaseAggregate();
 		if (aggregateNode)
 		{
 			dAssert(0);
 			//aggregateNode->SubmitSelfPairs(timestep, threadID);
 		}
 		
-		for (ntBroadPhaseNode* ptr = leafNode; ptr->m_parent; ptr = ptr->m_parent) 
+		for (ntSceneNode* ptr = leafNode; ptr->m_parent; ptr = ptr->m_parent) 
 		{
-			ntBroadPhaseTreeNode* const parent = ptr->m_parent->GetAsBroadPhaseTreeNode();
+			ntSceneTreeNode* const parent = ptr->m_parent->GetAsBroadPhaseTreeNode();
 			dAssert(!parent->GetAsBroadPhaseBodyNode());
-			ntBroadPhaseNode* const sibling = parent->m_right;
+			ntSceneNode* const sibling = parent->m_right;
 			if (sibling != ptr) 
 			{
 				//SubmitPairs(bodyNode, sibling, timestep, 0, threadIndex);
@@ -276,7 +276,7 @@ void ntBroadPhaseMixed::FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep,
 	}
 }
 
-dFloat32 ntBroadPhaseMixed::RayCast(ntRayCastNotify& callback, const dVector& p0, const dVector& p1) const
+dFloat32 ntSceneMixed::RayCast(ntRayCastNotify& callback, const dVector& p0, const dVector& p1) const
 {
 	dFloat32 param = dFloat32(1.2f);
 	if (m_rootNode) 
@@ -287,13 +287,13 @@ dFloat32 ntBroadPhaseMixed::RayCast(ntRayCastNotify& callback, const dVector& p0
 		if (dist2 > dFloat32(1.0e-8f)) {
 
 			dFloat32 distance[D_BROADPHASE_MAX_STACK_DEPTH];
-			const ntBroadPhaseNode* stackPool[D_BROADPHASE_MAX_STACK_DEPTH];
+			const ntSceneNode* stackPool[D_BROADPHASE_MAX_STACK_DEPTH];
 
 			dFastRayTest ray(p0, p1);
 
 			stackPool[0] = m_rootNode;
 			distance[0] = ray.BoxIntersect(m_rootNode->m_minBox, m_rootNode->m_maxBox);
-			param = ntBroadPhase::RayCast(callback, stackPool, distance, 1, ray);
+			param = ntScene::RayCast(callback, stackPool, distance, 1, ray);
 		}
 	}
 	return param;

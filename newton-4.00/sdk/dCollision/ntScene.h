@@ -24,7 +24,7 @@
 
 #include "ndCollisionStdafx.h"
 #include "ntContactList.h"
-#include "ntBroadPhaseNode.h"
+#include "ntSceneNode.h"
 
 #define D_BROADPHASE_MAX_STACK_DEPTH	256
 
@@ -35,7 +35,7 @@ class ntContactNotify;
 class ntBilateralJoint;
 
 D_MSV_NEWTON_ALIGN_32
-class ntBroadPhase
+class ntScene
 	:public dClassAlloc
 	,public dSyncMutex
 	,public dThread
@@ -46,7 +46,7 @@ class ntBroadPhase
 	{
 		public:
 		dAtomic<int>* m_it;
-		ntBroadPhase* m_owner;
+		ntScene* m_owner;
 		dFloat32 m_timestep;
 	};
 
@@ -56,7 +56,7 @@ class ntBroadPhase
 	};
 
 	class ntSpliteInfo;
-	class ntFitnessList: public dList <ntBroadPhaseTreeNode*, dContainersFreeListAlloc<ntBroadPhaseTreeNode*>>
+	class ntFitnessList: public dList <ntSceneTreeNode*, dContainersFreeListAlloc<ntSceneTreeNode*>>
 	{
 		public:
 		ntFitnessList();
@@ -67,7 +67,7 @@ class ntBroadPhase
 	};
 
 	public:
-	ND_COLLISION_API virtual ~ntBroadPhase();
+	ND_COLLISION_API virtual ~ntScene();
 
 	dInt32 GetThreadCount() const;
 
@@ -86,7 +86,7 @@ class ntBroadPhase
 	void FindCollidingPairs(dFloat32 timestep);
 	void CalculateContacts(dFloat32 timestep);
 	bool ValidateContactCache(ntContact* const contact, const dVector& timestep) const;
-	dFloat32 CalculateSurfaceArea(const ntBroadPhaseNode* const node0, const ntBroadPhaseNode* const node1, dVector& minBox, dVector& maxBox) const;
+	dFloat32 CalculateSurfaceArea(const ntSceneNode* const node0, const ntSceneNode* const node1, dVector& minBox, dVector& maxBox) const;
 
 	virtual void BalanceBroadPhase() = 0;
 	virtual void UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBodyKinematic* const body);
@@ -94,25 +94,25 @@ class ntBroadPhase
 	virtual void CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact);
 	void CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact);
 
-	void RotateLeft(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root);
-	void RotateRight(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root);
-	dFloat64 ReduceEntropy(ntFitnessList& fitness, ntBroadPhaseNode** const root);
-	void ImproveNodeFitness(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root);
-	static dInt32 CompareNodes(const ntBroadPhaseNode* const nodeA, const ntBroadPhaseNode* const nodeB, void* const);
-	ntBroadPhaseNode* BuildTopDown(ntBroadPhaseNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ntFitnessList::dListNode** const nextNode);
-	ntBroadPhaseNode* BuildTopDownBig(ntBroadPhaseNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ntFitnessList::dListNode** const nextNode);
+	void RotateLeft(ntSceneTreeNode* const node, ntSceneNode** const root);
+	void RotateRight(ntSceneTreeNode* const node, ntSceneNode** const root);
+	dFloat64 ReduceEntropy(ntFitnessList& fitness, ntSceneNode** const root);
+	void ImproveNodeFitness(ntSceneTreeNode* const node, ntSceneNode** const root);
+	static dInt32 CompareNodes(const ntSceneNode* const nodeA, const ntSceneNode* const nodeB, void* const);
+	ntSceneNode* BuildTopDown(ntSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ntFitnessList::dListNode** const nextNode);
+	ntSceneNode* BuildTopDownBig(ntSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ntFitnessList::dListNode** const nextNode);
 
 	template <class T>
 	void SubmitJobs(dFloat32 timestep);
 
 	protected:
-	ntBroadPhase();
+	ntScene();
 	virtual void ThreadFunction();
 	void BuildBodyArray();
 	void InternalUpdate(dFloat32 timestep);
 
-	ND_COLLISION_API ntBroadPhaseTreeNode* InsertNode(ntBroadPhaseNode* const root, ntBroadPhaseNode* const node);
-	void UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, ntBroadPhaseNode** const root);
+	ND_COLLISION_API ntSceneTreeNode* InsertNode(ntSceneNode* const root, ntSceneNode* const node);
+	void UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, ntSceneNode** const root);
 
 	//void CalculatePairContacts(dInt32 threadIndex, ntPair* const pair) const;
 	ntContact* FindContactJoint(ntBodyKinematic* const body0, ntBodyKinematic* const body1) const;
@@ -120,16 +120,16 @@ class ntBroadPhase
 
 	void AddPair(ntBodyKinematic* const body0, ntBodyKinematic* const body1, const dFloat32 timestep);
 	bool TestOverlaping(const ntBodyKinematic* const body0, const ntBodyKinematic* const body1, dFloat32 timestep) const;
-	void SubmitPairs(ntBroadPhaseNode* const leaftNode, ntBroadPhaseNode* const node, dFloat32 timestep);
+	void SubmitPairs(ntSceneNode* const leaftNode, ntSceneNode* const node, dFloat32 timestep);
 
 	ND_COLLISION_API virtual dFloat32 RayCast(ntRayCastNotify& callback, const dVector& p0, const dVector& p1) const = 0;
-	dFloat32 RayCast(ntRayCastNotify& callback, const ntBroadPhaseNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const;
+	dFloat32 RayCast(ntRayCastNotify& callback, const ntSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const;
 	
 	ntBodyList m_bodyList;
 	ntContactList m_contactList;
 	dArray<ntBodyKinematic*> m_tmpBodyArray;
 	dArray<ntContact*> m_activeContacts;
-	ntBroadPhaseNode* m_rootNode;
+	ntSceneNode* m_rootNode;
 	ntContactNotify* m_contactNotifyCallback;
 	dUnsigned32 m_lru;
 	dFloat32 m_timestep;
@@ -142,14 +142,14 @@ class ntBroadPhase
 	friend class ntRayCastNotify;
 } D_GCC_NEWTON_ALIGN_32 ;
 
-inline dInt32 ntBroadPhase::GetThreadCount() const
+inline dInt32 ntScene::GetThreadCount() const
 {
 	const dThreadPool& pool = *this;
 	return pool.GetCount();
 }
 
 template <class T>
-void ntBroadPhase::SubmitJobs(dFloat32 timestep)
+void ntScene::SubmitJobs(dFloat32 timestep)
 {
 	dAtomic<dInt32> it(0);
 	T extJob[D_MAX_THREADS_COUNT];
@@ -167,7 +167,7 @@ void ntBroadPhase::SubmitJobs(dFloat32 timestep)
 	ExecuteJobs(extJobPtr);
 }
 
-D_INLINE dFloat32 ntBroadPhase::CalculateSurfaceArea(const ntBroadPhaseNode* const node0, const ntBroadPhaseNode* const node1, dVector& minBox, dVector& maxBox) const
+D_INLINE dFloat32 ntScene::CalculateSurfaceArea(const ntSceneNode* const node0, const ntSceneNode* const node1, dVector& minBox, dVector& maxBox) const
 {
 	minBox = node0->m_minBox.GetMin(node1->m_minBox);
 	maxBox = node0->m_maxBox.GetMax(node1->m_maxBox);

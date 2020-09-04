@@ -21,7 +21,7 @@
 
 #include "ndCollisionStdafx.h"
 #include "ntShapeNull.h"
-#include "ntBroadPhase.h"
+#include "ntScene.h"
 #include "ntBodyKinematic.h"
 #include "ntContactNotify.h"
 #include "ntContactSolver.h"
@@ -31,15 +31,15 @@
 #define D_CONTACT_TRANSLATION_ERROR	dFloat32 (1.0e-3f)
 #define D_CONTACT_ANGULAR_ERROR		(dFloat32 (0.25f * dDegreeToRad))
 
-dVector ntBroadPhase::m_velocTol(dFloat32(1.0e-16f));
-dVector ntBroadPhase::m_angularContactError2(D_CONTACT_ANGULAR_ERROR * D_CONTACT_ANGULAR_ERROR);
-dVector ntBroadPhase::m_linearContactError2(D_CONTACT_TRANSLATION_ERROR * D_CONTACT_TRANSLATION_ERROR);
+dVector ntScene::m_velocTol(dFloat32(1.0e-16f));
+dVector ntScene::m_angularContactError2(D_CONTACT_ANGULAR_ERROR * D_CONTACT_ANGULAR_ERROR);
+dVector ntScene::m_linearContactError2(D_CONTACT_TRANSLATION_ERROR * D_CONTACT_TRANSLATION_ERROR);
 
 D_MSV_NEWTON_ALIGN_32
-class ntBroadPhase::ntSpliteInfo
+class ntScene::ntSpliteInfo
 {
 	public:
-	ntSpliteInfo(ntBroadPhaseNode** const boxArray, dInt32 boxCount)
+	ntSpliteInfo(ntSceneNode** const boxArray, dInt32 boxCount)
 	{
 		dVector minP(dFloat32(1.0e15f));
 		dVector maxP(-dFloat32(1.0e15f));
@@ -49,7 +49,7 @@ class ntBroadPhase::ntSpliteInfo
 			m_axis = 1;
 			for (dInt32 i = 0; i < boxCount; i++)
 			{
-				ntBroadPhaseNode* const node = boxArray[i];
+				ntSceneNode* const node = boxArray[i];
 				dAssert(node->GetAsBroadPhaseBodyNode());
 				minP = minP.GetMin(node->m_minBox);
 				maxP = maxP.GetMax(node->m_maxBox);
@@ -61,7 +61,7 @@ class ntBroadPhase::ntSpliteInfo
 			dVector varian(dVector::m_zero);
 			for (dInt32 i = 0; i < boxCount; i++)
 			{
-				ntBroadPhaseNode* const node = boxArray[i];
+				ntSceneNode* const node = boxArray[i];
 				dAssert(node->GetAsBroadPhaseBodyNode());
 				minP = minP.GetMin(node->m_minBox);
 				maxP = maxP.GetMax(node->m_maxBox);
@@ -93,7 +93,7 @@ class ntBroadPhase::ntSpliteInfo
 			{
 				for (; i0 <= i1; i0++)
 				{
-					ntBroadPhaseNode* const node = boxArray[i0];
+					ntSceneNode* const node = boxArray[i0];
 					dFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * dFloat32(0.5f);
 					if (val > test)
 					{
@@ -103,7 +103,7 @@ class ntBroadPhase::ntSpliteInfo
 
 				for (; i1 >= i0; i1--)
 				{
-					ntBroadPhaseNode* const node = boxArray[i1];
+					ntSceneNode* const node = boxArray[i1];
 					dFloat32 val = (node->m_minBox[index] + node->m_maxBox[index]) * dFloat32(0.5f);
 					if (val < test)
 					{
@@ -143,24 +143,24 @@ class ntBroadPhase::ntSpliteInfo
 	dInt32 m_axis;
 } D_GCC_NEWTON_ALIGN_32 ;
 
-ntBroadPhase::ntFitnessList::ntFitnessList()
-	:dList <ntBroadPhaseTreeNode*, dContainersFreeListAlloc<ntBroadPhaseTreeNode*>>()
+ntScene::ntFitnessList::ntFitnessList()
+	:dList <ntSceneTreeNode*, dContainersFreeListAlloc<ntSceneTreeNode*>>()
 	,m_prevCost(dFloat32(0.0f))
 	,m_index(0)
 {
 }
 
-dFloat64 ntBroadPhase::ntFitnessList::TotalCost() const
+dFloat64 ntScene::ntFitnessList::TotalCost() const
 {
 	dFloat64 cost = dFloat32(0.0f);
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
-		ntBroadPhaseNode* const box = node->GetInfo();
+		ntSceneNode* const box = node->GetInfo();
 		cost += box->m_surfaceArea;
 	}
 	return cost;
 }
 	
-ntBroadPhase::ntBroadPhase()
+ntScene::ntScene()
 	:dClassAlloc()
 	,dSyncMutex()
 	,dThread()
@@ -179,26 +179,26 @@ ntBroadPhase::ntBroadPhase()
 	m_contactNotifyCallback->m_broadPhase = this;
 }
 
-ntBroadPhase::~ntBroadPhase()
+ntScene::~ntScene()
 {
 	Sync();
 	Finish();
 	delete m_contactNotifyCallback;
 }
 
-void ntBroadPhase::ThreadFunction()
+void ntScene::ThreadFunction()
 {
 	BuildBodyArray();
 	InternalUpdate(m_timestep);
 	Release();
 }
 
-ntContactNotify* ntBroadPhase::GetContactNotify() const
+ntContactNotify* ntScene::GetContactNotify() const
 {
 	return m_contactNotifyCallback;
 }
 
-void ntBroadPhase::SetContactNotify(ntContactNotify* const notify)
+void ntScene::SetContactNotify(ntContactNotify* const notify)
 {
 	dAssert(0);
 	dAssert(m_contactNotifyCallback);
@@ -215,7 +215,7 @@ void ntBroadPhase::SetContactNotify(ntContactNotify* const notify)
 	m_contactNotifyCallback->m_broadPhase = this;
 }
 
-bool ntBroadPhase::AddBody(ntBodyKinematic* const body)
+bool ntScene::AddBody(ntBodyKinematic* const body)
 {
 	if ((body->m_broadPhase == nullptr) && (body->m_broadPhaseNode == nullptr))
 	{
@@ -227,7 +227,7 @@ bool ntBroadPhase::AddBody(ntBodyKinematic* const body)
 	return false;
 }
 
-bool ntBroadPhase::RemoveBody(ntBodyKinematic* const body)
+bool ntScene::RemoveBody(ntBodyKinematic* const body)
 {
 	if (body->m_broadPhase && body->m_broadPhaseNode)
 	{
@@ -239,7 +239,7 @@ bool ntBroadPhase::RemoveBody(ntBodyKinematic* const body)
 	return false;
 }
 
-void ntBroadPhase::BuildBodyArray()
+void ntScene::BuildBodyArray()
 {
 	D_TRACKTIME();
 
@@ -276,7 +276,7 @@ void ntBroadPhase::BuildBodyArray()
 	}
 }
 
-dFloat32 ntBroadPhase::RayCast(ntRayCastNotify& callback, const ntBroadPhaseNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const
+dFloat32 ntScene::RayCast(ntRayCastNotify& callback, const ntSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const
 {
 	dFloat32 maxParam = dFloat32(1.2f);
 	while (stack) 
@@ -289,7 +289,7 @@ dFloat32 ntBroadPhase::RayCast(ntRayCastNotify& callback, const ntBroadPhaseNode
 		}
 		else 
 		{
-			const ntBroadPhaseNode* const me = stackPool[stack];
+			const ntSceneNode* const me = stackPool[stack];
 			dAssert(me);
 			ntBodyKinematic* const body = me->GetBody();
 			if (body) 
@@ -307,7 +307,7 @@ dFloat32 ntBroadPhase::RayCast(ntRayCastNotify& callback, const ntBroadPhaseNode
 					}
 				}
 			}
-			else if (((ntBroadPhaseNode*)me)->GetAsBroadPhaseAggregate())
+			else if (((ntSceneNode*)me)->GetAsBroadPhaseAggregate())
 			{
 				dAssert(0);
 		//		dgBroadPhaseAggregate* const aggregate = (dgBroadPhaseAggregate*)me;
@@ -330,7 +330,7 @@ dFloat32 ntBroadPhase::RayCast(ntRayCastNotify& callback, const ntBroadPhaseNode
 			}
 			else 
 			{
-				const ntBroadPhaseNode* const left = me->GetLeft();
+				const ntSceneNode* const left = me->GetLeft();
 				dAssert(left);
 				dFloat32 dist1 = ray.BoxIntersect(left->m_minBox, left->m_maxBox);
 				if (dist1 < maxParam) 
@@ -347,7 +347,7 @@ dFloat32 ntBroadPhase::RayCast(ntRayCastNotify& callback, const ntBroadPhaseNode
 					dAssert(stack < D_BROADPHASE_MAX_STACK_DEPTH);
 				}
 		
-				const ntBroadPhaseNode* const right = me->GetRight();
+				const ntSceneNode* const right = me->GetRight();
 				dAssert(right);
 				dist1 = ray.BoxIntersect(right->m_minBox, right->m_maxBox);
 				if (dist1 < maxParam) 
@@ -370,12 +370,12 @@ dFloat32 ntBroadPhase::RayCast(ntRayCastNotify& callback, const ntBroadPhaseNode
 	return maxParam;
 }
 
-ntBroadPhaseTreeNode* ntBroadPhase::InsertNode(ntBroadPhaseNode* const root, ntBroadPhaseNode* const node)
+ntSceneTreeNode* ntScene::InsertNode(ntSceneNode* const root, ntSceneNode* const node)
 {
 	dVector p0;
 	dVector p1;
 
-	ntBroadPhaseNode* sibling = root;
+	ntSceneNode* sibling = root;
 	dFloat32 surfaceArea = CalculateSurfaceArea(node, sibling, p0, p1);
 	while (!sibling->GetAsBroadPhaseBodyNode() && (surfaceArea >= sibling->m_surfaceArea))
 	{
@@ -407,11 +407,11 @@ ntBroadPhaseTreeNode* ntBroadPhase::InsertNode(ntBroadPhaseNode* const root, ntB
 		}
 	}
 	
-	ntBroadPhaseTreeNode* const parent = new ntBroadPhaseTreeNode(sibling, node);
+	ntSceneTreeNode* const parent = new ntSceneTreeNode(sibling, node);
 	return parent;
 }
 
-void ntBroadPhase::InternalUpdate(dFloat32 timestep)
+void ntScene::InternalUpdate(dFloat32 timestep)
 {
 	D_TRACKTIME();
 	m_lru = m_lru + 1;
@@ -422,7 +422,7 @@ void ntBroadPhase::InternalUpdate(dFloat32 timestep)
 	CalculateContacts(timestep);
 }
 
-void ntBroadPhase::Update(dFloat32 timestep)
+void ntScene::Update(dFloat32 timestep)
 {
 	//D_TRACKTIME();
 	//m_lru = m_lru + 1;
@@ -437,12 +437,12 @@ void ntBroadPhase::Update(dFloat32 timestep)
 	Signal();
 }
 
-void ntBroadPhase::RotateLeft(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root)
+void ntScene::RotateLeft(ntSceneTreeNode* const node, ntSceneNode** const root)
 {
 	dVector cost1P0;
 	dVector cost1P1;
 
-	ntBroadPhaseTreeNode* const parent = (ntBroadPhaseTreeNode*)node->m_parent;
+	ntSceneTreeNode* const parent = (ntSceneTreeNode*)node->m_parent;
 	dAssert(parent && !parent->GetAsBroadPhaseBodyNode());
 	dFloat32 cost1 = CalculateSurfaceArea(node->m_left, parent->m_left, cost1P0, cost1P1);
 
@@ -457,7 +457,7 @@ void ntBroadPhase::RotateLeft(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode
 		node->m_maxBox = parent->m_maxBox;
 		node->m_surfaceArea = parent->m_surfaceArea;
 
-		ntBroadPhaseTreeNode* const grandParent = (ntBroadPhaseTreeNode*)parent->m_parent;
+		ntSceneTreeNode* const grandParent = (ntSceneTreeNode*)parent->m_parent;
 		if (grandParent) {
 			if (grandParent->m_left == parent) 
 			{
@@ -490,7 +490,7 @@ void ntBroadPhase::RotateLeft(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode
 		node->m_maxBox = parent->m_maxBox;
 		node->m_surfaceArea = parent->m_surfaceArea;
 
-		ntBroadPhaseTreeNode* const grandParent = (ntBroadPhaseTreeNode*)parent->m_parent;
+		ntSceneTreeNode* const grandParent = (ntSceneTreeNode*)parent->m_parent;
 		if (grandParent) 
 		{
 			if (grandParent->m_left == parent) 
@@ -520,12 +520,12 @@ void ntBroadPhase::RotateLeft(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode
 	}
 }
 
-void ntBroadPhase::RotateRight(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root)
+void ntScene::RotateRight(ntSceneTreeNode* const node, ntSceneNode** const root)
 {
 	dVector cost1P0;
 	dVector cost1P1;
 
-	ntBroadPhaseTreeNode* const parent = (ntBroadPhaseTreeNode*)node->m_parent;
+	ntSceneTreeNode* const parent = (ntSceneTreeNode*)node->m_parent;
 	dAssert(parent && !parent->GetAsBroadPhaseBodyNode());
 
 	dFloat32 cost1 = CalculateSurfaceArea(node->m_right, parent->m_right, cost1P0, cost1P1);
@@ -541,7 +541,7 @@ void ntBroadPhase::RotateRight(ntBroadPhaseTreeNode* const node, ntBroadPhaseNod
 		node->m_maxBox = parent->m_maxBox;
 		node->m_surfaceArea = parent->m_surfaceArea;
 
-		ntBroadPhaseTreeNode* const grandParent = (ntBroadPhaseTreeNode*)parent->m_parent;
+		ntSceneTreeNode* const grandParent = (ntSceneTreeNode*)parent->m_parent;
 		if (grandParent) 
 		{
 			dAssert(!grandParent->GetAsBroadPhaseBodyNode());
@@ -576,7 +576,7 @@ void ntBroadPhase::RotateRight(ntBroadPhaseTreeNode* const node, ntBroadPhaseNod
 		node->m_maxBox = parent->m_maxBox;
 		node->m_surfaceArea = parent->m_surfaceArea;
 
-		ntBroadPhaseTreeNode* const grandParent = (ntBroadPhaseTreeNode*)parent->m_parent;
+		ntSceneTreeNode* const grandParent = (ntSceneTreeNode*)parent->m_parent;
 		if (parent->m_parent) 
 		{
 			if (grandParent->m_left == parent) 
@@ -606,12 +606,12 @@ void ntBroadPhase::RotateRight(ntBroadPhaseTreeNode* const node, ntBroadPhaseNod
 	}
 }
 
-void ntBroadPhase::ImproveNodeFitness(ntBroadPhaseTreeNode* const node, ntBroadPhaseNode** const root)
+void ntScene::ImproveNodeFitness(ntSceneTreeNode* const node, ntSceneNode** const root)
 {
 	dAssert(node->GetLeft());
 	dAssert(node->GetRight());
 
-	ntBroadPhaseNode* const parent = node->m_parent;
+	ntSceneNode* const parent = node->m_parent;
 	if (parent && parent->m_parent) 
 	{
 		dAssert(!parent->GetAsBroadPhaseBodyNode());
@@ -627,7 +627,7 @@ void ntBroadPhase::ImproveNodeFitness(ntBroadPhaseTreeNode* const node, ntBroadP
 	dAssert(!m_rootNode->m_parent);
 }
 
-dFloat64 ntBroadPhase::ReduceEntropy(ntFitnessList& fitness, ntBroadPhaseNode** const root)
+dFloat64 ntScene::ReduceEntropy(ntFitnessList& fitness, ntSceneNode** const root)
 {
 	dFloat64 cost = dFloat32(0.0f);
 	if (fitness.GetCount() < 32) 
@@ -668,7 +668,7 @@ dFloat64 ntBroadPhase::ReduceEntropy(ntFitnessList& fitness, ntBroadPhaseNode** 
 	return cost;
 }
 
-dInt32 ntBroadPhase::CompareNodes(const ntBroadPhaseNode* const nodeA, const ntBroadPhaseNode* const nodeB, void* const)
+dInt32 ntScene::CompareNodes(const ntSceneNode* const nodeA, const ntSceneNode* const nodeB, void* const)
 {
 	dFloat32 areaA = nodeA->m_surfaceArea;
 	dFloat32 areaB = nodeB->m_surfaceArea;
@@ -683,12 +683,12 @@ dInt32 ntBroadPhase::CompareNodes(const ntBroadPhaseNode* const nodeA, const ntB
 	return 0;
 }
 
-void ntBroadPhase::UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, ntBroadPhaseNode** const root)
+void ntScene::UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, ntSceneNode** const root)
 {
 	if (*root) 
 	{
 		D_TRACKTIME();
-		ntBroadPhaseNode* const parent = (*root)->m_parent;
+		ntSceneNode* const parent = (*root)->m_parent;
 
 		(*root)->m_parent = nullptr;
 		dFloat64 entropy = ReduceEntropy(fitness, root);
@@ -699,13 +699,13 @@ void ntBroadPhase::UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, n
 			{
 				//m_world->m_solverJacobiansMemory.ResizeIfNecessary((fitness.GetCount() * 2 + 16) * sizeof(dBroadPhaseNode*));
 				//dBroadPhaseNode** const leafArray = (dBroadPhaseNode**)&m_world->m_solverJacobiansMemory[0];
-				ntBroadPhaseNode** const leafArray = dAlloca(ntBroadPhaseNode*, fitness.GetCount() * 2 + 16);
+				ntSceneNode** const leafArray = dAlloca(ntSceneNode*, fitness.GetCount() * 2 + 16);
 
 				dInt32 leafNodesCount = 0;
 				for (ntFitnessList::dListNode* nodePtr = fitness.GetFirst(); nodePtr; nodePtr = nodePtr->GetNext()) 
 				{
-					ntBroadPhaseNode* const node = nodePtr->GetInfo();
-					ntBroadPhaseNode* const leftNode = node->GetLeft();
+					ntSceneNode* const node = nodePtr->GetInfo();
+					ntSceneNode* const leftNode = node->GetLeft();
 
 					ntBodyKinematic* const leftBody = leftNode->GetBody();
 					if (leftBody) 
@@ -721,7 +721,7 @@ void ntBroadPhase::UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, n
 						leafNodesCount++;
 					}
 
-					ntBroadPhaseNode* const rightNode = node->GetRight();
+					ntSceneNode* const rightNode = node->GetRight();
 					ntBodyKinematic* const rightBody = rightNode->GetBody();
 					if (rightBody) 
 					{
@@ -751,7 +751,7 @@ void ntBroadPhase::UpdateFitness(ntFitnessList& fitness, dFloat64& oldEntropy, n
 	}
 }
 
-ntBroadPhaseNode* ntBroadPhase::BuildTopDown(ntBroadPhaseNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ntFitnessList::dListNode** const nextNode)
+ntSceneNode* ntScene::BuildTopDown(ntSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ntFitnessList::dListNode** const nextNode)
 {
 	dAssert(firstBox >= 0);
 	dAssert(lastBox >= 0);
@@ -764,7 +764,7 @@ ntBroadPhaseNode* ntBroadPhase::BuildTopDown(ntBroadPhaseNode** const leafArray,
 	{
 		ntSpliteInfo info(&leafArray[firstBox], lastBox - firstBox + 1);
 
-		ntBroadPhaseTreeNode* const parent = (*nextNode)->GetInfo();
+		ntSceneTreeNode* const parent = (*nextNode)->GetInfo();
 		parent->m_parent = nullptr;
 		*nextNode = (*nextNode)->GetNext();
 
@@ -779,7 +779,7 @@ ntBroadPhaseNode* ntBroadPhase::BuildTopDown(ntBroadPhaseNode** const leafArray,
 	}
 }
 
-ntBroadPhaseNode* ntBroadPhase::BuildTopDownBig(ntBroadPhaseNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ntFitnessList::dListNode** const nextNode)
+ntSceneNode* ntScene::BuildTopDownBig(ntSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ntFitnessList::dListNode** const nextNode)
 {
 	if (lastBox == firstBox) 
 	{
@@ -788,12 +788,12 @@ ntBroadPhaseNode* ntBroadPhase::BuildTopDownBig(ntBroadPhaseNode** const leafArr
 
 	dInt32 midPoint = -1;
 	const dFloat32 scale = dFloat32(1.0f / 64.0f);
-	const ntBroadPhaseNode* const node0 = leafArray[firstBox];
+	const ntSceneNode* const node0 = leafArray[firstBox];
 	const dInt32 count = lastBox - firstBox;
 	dFloat32 area0 = scale * node0->m_surfaceArea;
 	for (dInt32 i = 1; i <= count; i++) 
 	{
-		const ntBroadPhaseNode* const node1 = leafArray[firstBox + i];
+		const ntSceneNode* const node1 = leafArray[firstBox + i];
 		dFloat32 area1 = node1->m_surfaceArea;
 		if (area0 > area1) 
 		{
@@ -808,7 +808,7 @@ ntBroadPhaseNode* ntBroadPhase::BuildTopDownBig(ntBroadPhaseNode** const leafArr
 	}
 	else 
 	{
-		ntBroadPhaseTreeNode* const parent = (*nextNode)->GetInfo();
+		ntSceneTreeNode* const parent = (*nextNode)->GetInfo();
 
 		parent->m_parent = nullptr;
 		*nextNode = (*nextNode)->GetNext();
@@ -827,11 +827,11 @@ ntBroadPhaseNode* ntBroadPhase::BuildTopDownBig(ntBroadPhaseNode** const leafArr
 	}
 }
 
-void ntBroadPhase::UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBodyKinematic* const body)
+void ntScene::UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBodyKinematic* const body)
 {
 	if (!body->m_equilibrium)
 	{
-		ntBroadPhaseBodyNode* const node = body->GetBroadPhaseBodyNode();
+		ntSceneBodyNode* const node = body->GetBroadPhaseBodyNode();
 		body->UpdateCollisionMatrix();
 		
 		dAssert(!node->GetLeft());
@@ -853,9 +853,9 @@ void ntBroadPhase::UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBodyKinem
 
 			if (!m_rootNode->GetAsBroadPhaseBodyNode()) 
 			{
-				const ntBroadPhaseNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
+				const ntSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
 				dAssert(root == nullptr);
-				for (ntBroadPhaseNode* parent = node->m_parent; parent != root; parent = parent->m_parent) 
+				for (ntSceneNode* parent = node->m_parent; parent != root; parent = parent->m_parent) 
 				{
 					dScopeSpinLock lock(parent->m_lock);
 					if (!parent->GetAsBroadPhaseAggregate()) 
@@ -885,7 +885,7 @@ void ntBroadPhase::UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ntBodyKinem
 	}
 }
 
-bool ntBroadPhase::ValidateContactCache(ntContact* const contact, const dVector& timestep) const
+bool ntScene::ValidateContactCache(ntContact* const contact, const dVector& timestep) const
 {
 	dAssert(contact && (contact->GetAsConstraint()));
 
@@ -956,7 +956,7 @@ void ntBroadPhase::CalculatePairContacts(dInt32 threadIndex, ntPair* const pair)
 }
 */
 
-void ntBroadPhase::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact)
+void ntScene::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact)
 {
 	//DG_TRACKTIME();
 	//ntWorld* const world = (ntWorld*)m_world;
@@ -1016,7 +1016,7 @@ void ntBroadPhase::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep,
 	}
 }
 
-void ntBroadPhase::CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact)
+void ntScene::CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ntContact* const contact)
 {
 	const dUnsigned32 lru = m_lru - D_CONTACT_DELAY_FRAMES;
 
@@ -1103,9 +1103,9 @@ void ntBroadPhase::CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ntCo
 	contact->m_killContact = contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
 }
 
-void ntBroadPhase::SubmitPairs(ntBroadPhaseNode* const leafNode, ntBroadPhaseNode* const node, dFloat32 timestep)
+void ntScene::SubmitPairs(ntSceneNode* const leafNode, ntSceneNode* const node, dFloat32 timestep)
 {
-	ntBroadPhaseNode* pool[D_BROADPHASE_MAX_STACK_DEPTH];
+	ntSceneNode* pool[D_BROADPHASE_MAX_STACK_DEPTH];
 	pool[0] = node;
 	dInt32 stack = 1;
 
@@ -1118,7 +1118,7 @@ void ntBroadPhase::SubmitPairs(ntBroadPhaseNode* const leafNode, ntBroadPhaseNod
 	while (stack) 
 	{
 		stack--;
-		ntBroadPhaseNode* const rootNode = pool[stack];
+		ntSceneNode* const rootNode = pool[stack];
 		if (dOverlapTest(rootNode->m_minBox, rootNode->m_maxBox, boxP0, boxP1)) 
 		{
 			if (rootNode->GetAsBroadPhaseBodyNode()) 
@@ -1146,7 +1146,7 @@ void ntBroadPhase::SubmitPairs(ntBroadPhaseNode* const leafNode, ntBroadPhaseNod
 				}
 				else 
 				{
-					ntBroadPhaseAggregate* const aggregate = leafNode->GetAsBroadPhaseAggregate();
+					ntSceneAggregate* const aggregate = leafNode->GetAsBroadPhaseAggregate();
 					dAssert(aggregate);
 					if (body1) 
 					{
@@ -1163,7 +1163,7 @@ void ntBroadPhase::SubmitPairs(ntBroadPhaseNode* const leafNode, ntBroadPhaseNod
 			}
 			else 
 			{
-				ntBroadPhaseTreeNode* const tmpNode = rootNode->GetAsBroadPhaseTreeNode();
+				ntSceneTreeNode* const tmpNode = rootNode->GetAsBroadPhaseTreeNode();
 				dAssert(tmpNode->m_left);
 				dAssert(tmpNode->m_right);
 		
@@ -1179,7 +1179,7 @@ void ntBroadPhase::SubmitPairs(ntBroadPhaseNode* const leafNode, ntBroadPhaseNod
 	}
 }
 
-bool ntBroadPhase::TestOverlaping(const ntBodyKinematic* const body0, const ntBodyKinematic* const body1, dFloat32 timestep) const
+bool ntScene::TestOverlaping(const ntBodyKinematic* const body0, const ntBodyKinematic* const body1, dFloat32 timestep) const
 {
 	//bool mass0 = (body0->m_invMass.m_w != dFloat32(0.0f));
 	//bool mass1 = (body1->m_invMass.m_w != dFloat32(0.0f));
@@ -1237,13 +1237,13 @@ bool ntBroadPhase::TestOverlaping(const ntBodyKinematic* const body0, const ntBo
 	return dOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? true : false;
 }
 
-ntBilateralJoint* ntBroadPhase::FindBilateralJoint(ntBody* const body0, ntBody* const body1) const
+ntBilateralJoint* ntScene::FindBilateralJoint(ntBody* const body0, ntBody* const body1) const
 {
 	dAssert(0);
 	return nullptr;
 }
 
-ntContact* ntBroadPhase::FindContactJoint(ntBodyKinematic* const body0, ntBodyKinematic* const body1) const
+ntContact* ntScene::FindContactJoint(ntBodyKinematic* const body0, ntBodyKinematic* const body1) const
 {
 	//	dAssert(0);
 	dAssert((body0->GetInvMass() != dFloat32(0.0f)) || (body1->GetInvMass() != dFloat32(0.0f)));
@@ -1262,7 +1262,7 @@ ntContact* ntBroadPhase::FindContactJoint(ntBodyKinematic* const body0, ntBodyKi
 	}
 }
 
-void ntBroadPhase::AddPair(ntBodyKinematic* const body0, ntBodyKinematic* const body1, const dFloat32 timestep)
+void ntScene::AddPair(ntBodyKinematic* const body0, ntBodyKinematic* const body1, const dFloat32 timestep)
 {
 	dAssert(body0);
 	dAssert(body1);
@@ -1328,7 +1328,7 @@ void ntBroadPhase::AddPair(ntBodyKinematic* const body0, ntBodyKinematic* const 
 	}
 }
 
-void ntBroadPhase::AttachNewContact()
+void ntScene::AttachNewContact()
 {
 	D_TRACKTIME();
 	m_activeContacts.Clear();
@@ -1343,7 +1343,7 @@ void ntBroadPhase::AttachNewContact()
 	}
 }
 
-void ntBroadPhase::UpdateAabb(dFloat32 timestep)
+void ntScene::UpdateAabb(dFloat32 timestep)
 {
 	D_TRACKTIME();
 	class ntUpdateAabbJob: public ntBaseJob
@@ -1368,7 +1368,7 @@ void ntBroadPhase::UpdateAabb(dFloat32 timestep)
 	SubmitJobs<ntUpdateAabbJob>(timestep);
 }
 
-void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
+void ntScene::FindCollidingPairs(dFloat32 timestep)
 {
 	D_TRACKTIME();
 	class ntFindCollidindPairs: public ntBaseJob
@@ -1396,7 +1396,7 @@ void ntBroadPhase::FindCollidingPairs(dFloat32 timestep)
 	SubmitJobs<ntFindCollidindPairs>(timestep);
 }
 
-void ntBroadPhase::CalculateContacts(dFloat32 timestep)
+void ntScene::CalculateContacts(dFloat32 timestep)
 {
 	D_TRACKTIME();
 	class ntCalculateContacts: public ntBaseJob

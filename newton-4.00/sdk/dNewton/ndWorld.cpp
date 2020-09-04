@@ -22,14 +22,14 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
-#include "ntBroadPhaseMixed.h"
+#include "ntSceneMixed.h"
 
 
-class ndWorld::ntWorldMixedBroadPhase: public ntBroadPhaseMixed
+class ndWorld::ntWorldMixedScene: public ntSceneMixed
 {
 	public:
-	ntWorldMixedBroadPhase(ndWorld* const world)
-		:ntBroadPhaseMixed()
+	ntWorldMixedScene(ndWorld* const world)
+		:ntSceneMixed()
 		,m_world(world)
 	{
 	}
@@ -50,7 +50,7 @@ ndWorld::ndWorld()
 	,m_subSteps(1)
 {
 	// start the engine thread;
-	m_broadPhase = new ntBroadPhaseMixed();
+	m_broadPhase = new ntSceneMixed();
 	//m_broadPhase = new ntWorldMixedBroadPhase(this);
 }
 
@@ -171,7 +171,7 @@ void ndWorld::UpdateListenersPostTransform(dFloat32 timestep)
 void ndWorld::ApplyExternalForces(dFloat32 timestep)
 {
 	D_TRACKTIME();
-	class ntApplyExternalForces: public ntBroadPhase::ntBaseJob
+	class ntApplyExternalForces: public ntScene::ntBaseJob
 	{
 		public:
 		virtual void Execute()

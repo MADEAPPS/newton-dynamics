@@ -25,8 +25,8 @@
 #include "ndCollisionStdafx.h"
 #include "ntBody.h"
 
-class ntBroadPhaseBodyNode;
-class ntBroadPhaseAggregate;
+class ntSceneBodyNode;
+class ntSceneAggregate;
 
 D_MSV_NEWTON_ALIGN_32
 class ntBodyKinematic: public ntBody
@@ -47,7 +47,7 @@ class ntBodyKinematic: public ntBody
 	ND_COLLISION_API ntBodyKinematic();
 	ND_COLLISION_API virtual ~ntBodyKinematic();
 
-	ntBroadPhase* GetBroadPhase() const;
+	ntScene* GetBroadPhase() const;
 
 	dFloat32 GetInvMass() const;
 	dVector GetMassMatrix() const;
@@ -75,27 +75,27 @@ class ntBodyKinematic: public ntBody
 
 	protected:
 	void UpdateCollisionMatrix();
-	void SetBroadPhase(ntBroadPhase* const broadPhase, dList<ntBodyKinematic*>::dListNode* const node);
+	void SetBroadPhase(ntScene* const broadPhase, dList<ntBodyKinematic*>::dListNode* const node);
 
-	ntBroadPhaseBodyNode* GetBroadPhaseBodyNode() const;
-	void SetBroadPhaseBodyNode(ntBroadPhaseBodyNode* const node);
+	ntSceneBodyNode* GetBroadPhaseBodyNode() const;
+	void SetBroadPhaseBodyNode(ntSceneBodyNode* const node);
 
-	ntBroadPhaseAggregate* GetBroadPhaseAggregate() const;
-	void SetBroadPhaseAggregate(ntBroadPhaseAggregate* const node);
+	ntSceneAggregate* GetBroadPhaseAggregate() const;
+	void SetBroadPhaseAggregate(ntSceneAggregate* const node);
 
 	ntShapeInstance m_shapeInstance;
 	dVector m_mass;
 	dVector m_invMass;
 	ntContactMap m_contactList;
 
-	ntBroadPhase* m_broadPhase;
+	ntScene* m_broadPhase;
 	dList<ntBodyKinematic*>::dListNode* m_broadPhaseNode;
-	ntBroadPhaseBodyNode* m_broadPhaseBodyNode;
-	ntBroadPhaseAggregate* m_broadPhaseAggregateNode;
+	ntSceneBodyNode* m_broadPhaseBodyNode;
+	ntSceneAggregate* m_broadPhaseAggregateNode;
 
-	friend class ntBroadPhase;
-	friend class ntBroadPhaseMixed;
-	friend class ntBroadPhaseBodyNode;
+	friend class ntScene;
+	friend class ntSceneMixed;
+	friend class ntSceneBodyNode;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline dFloat32 ntBodyKinematic::GetInvMass() const
@@ -150,23 +150,23 @@ inline void ntBodyKinematic::SetMassMatrix(dFloat32 mass, const ntShapeInstance&
 	SetMassMatrix(mass, inertia);
 }
 
-inline ntBroadPhase* ntBodyKinematic::GetBroadPhase() const
+inline ntScene* ntBodyKinematic::GetBroadPhase() const
 {
 	return m_broadPhase;
 }
 
-inline void ntBodyKinematic::SetBroadPhase(ntBroadPhase* const broadPhase, dList<ntBodyKinematic*>::dListNode* const node)
+inline void ntBodyKinematic::SetBroadPhase(ntScene* const broadPhase, dList<ntBodyKinematic*>::dListNode* const node)
 {
 	m_broadPhaseNode = node;
 	m_broadPhase = broadPhase;
 }
 
-inline ntBroadPhaseBodyNode* ntBodyKinematic::GetBroadPhaseBodyNode() const
+inline ntSceneBodyNode* ntBodyKinematic::GetBroadPhaseBodyNode() const
 {
 	return m_broadPhaseBodyNode;
 }
 
-inline void ntBodyKinematic::SetBroadPhaseBodyNode(ntBroadPhaseBodyNode* const node)
+inline void ntBodyKinematic::SetBroadPhaseBodyNode(ntSceneBodyNode* const node)
 {
 	m_broadPhaseBodyNode = node;
 }

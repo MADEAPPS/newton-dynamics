@@ -78,7 +78,7 @@ class ntContact: public ntConstraint, public dContainersFreeListAlloc<ntContact*
 	bool m_killContact;
 	static dVector m_initialSeparatingVector;
 
-	friend class ntBroadPhase;
+	friend class ntScene;
 	friend class ntContactList;
 	friend class ntContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;

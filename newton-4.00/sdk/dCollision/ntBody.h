@@ -98,7 +98,7 @@ class ntBody: public dClassAlloc
 
 	dUnsigned32 m_uniqueID;
 	static dUnsigned32 m_uniqueIDCount;
-	friend class ntBroadPhase;
+	friend class ntScene;
 } D_GCC_NEWTON_ALIGN_32;
 
 

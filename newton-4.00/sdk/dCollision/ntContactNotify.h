@@ -54,8 +54,8 @@ class ntContactNotify: public dClassAlloc
 	}
 
 	protected:
-	ntBroadPhase* m_broadPhase;
-	friend class ntBroadPhase;
+	ntScene* m_broadPhase;
+	friend class ntScene;
 };
 
 #endif

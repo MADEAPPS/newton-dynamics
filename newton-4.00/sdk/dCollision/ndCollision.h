@@ -30,22 +30,24 @@
 #include <dCore.h>
 #include <ndCollisionStdafx.h>
 #include <ntBody.h>
+#include <ntScene.h>
 #include <ntShape.h>
 #include <ntContact.h>
 #include <ntShapeBox.h>
 #include <ntShapeNull.h>
+#include <ntSceneNode.h>
+#include <ntSceneMixed.h>
 #include <ntConstraint.h>
 #include <ntBodyNotify.h>
-#include <ntBroadPhase.h>
 #include <ntShapeConvex.h>
 #include <ntContactList.h>
 #include <ntBodyKinematic.h>
 #include <ntContactSolver.h>
 #include <ntShapeInstance.h>
-#include <ntBroadPhaseNode.h>
+
 #include <ntRayCastNotify.h>
 #include <ntContactNotify.h>
-#include <ntBroadPhaseMixed.h>
+
 
 #endif 
 

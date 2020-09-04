@@ -155,12 +155,12 @@ void ntBodyKinematic::SetCollisionShape(const ntShapeInstance& shapeInstance)
 	m_shapeInstance.m_ownerBody = this;
 }
 
-ntBroadPhaseAggregate* ntBodyKinematic::GetBroadPhaseAggregate() const
+ntSceneAggregate* ntBodyKinematic::GetBroadPhaseAggregate() const
 {
 	return m_broadPhaseAggregateNode;
 }
 
-void ntBodyKinematic::SetBroadPhaseAggregate(ntBroadPhaseAggregate* const node)
+void ntBodyKinematic::SetBroadPhaseAggregate(ntSceneAggregate* const node)
 {
 	m_broadPhaseAggregateNode = node;
 }

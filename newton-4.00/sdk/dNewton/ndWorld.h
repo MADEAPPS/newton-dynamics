@@ -32,7 +32,8 @@ class ndBodyDynamic;
 D_MSV_NEWTON_ALIGN_32
 class ndWorld: public dClassAlloc
 {
-	class ntWorldMixedBroadPhase;
+	class ntWorldMixedScene;
+
 	public:
 	D_NEWTON_API ndWorld();
 	D_NEWTON_API virtual ~ndWorld();
@@ -56,7 +57,7 @@ class ndWorld: public dClassAlloc
 	bool AddBody(ntBody* const body);
 	bool RemoveBody(ntBody* const body);
 
-	ntBroadPhase* GetBroadphase() const;
+	ntScene* GetBroadphase() const;
 
 	ntContactNotify* GetContactNotify() const;
 	void SetContactNotify(ntContactNotify* const notify);
@@ -81,15 +82,15 @@ class ndWorld: public dClassAlloc
 	void Tick();
 	void Signal();
 	void ThreadFunction();
-	ntBroadPhase* m_broadPhase;
+	ntScene* m_broadPhase;
 
 	dFloat32 m_timestep;
 	dInt32 m_subSteps;
 
-	friend class ntBroadPhase;
+	friend class ntScene;
 } D_GCC_NEWTON_ALIGN_32 ;
 
-inline ntBroadPhase* ndWorld::GetBroadphase() const
+inline ntScene* ndWorld::GetBroadphase() const
 {
 	return m_broadPhase;
 }

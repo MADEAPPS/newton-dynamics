@@ -164,7 +164,7 @@ class ntContactSolver: public dDownHeap<ntMinkFace *, dFloat32>
 	static dVector m_hullDirs[14]; 
 	static dInt32 m_rayCastSimplex[4][4];
 
-	friend class ntBroadPhase;
+	friend class ntScene;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #endif 

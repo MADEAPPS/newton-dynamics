@@ -21,28 +21,28 @@
 
 #include "ndCollisionStdafx.h"
 #include "ntBodyKinematic.h"
-#include "ntBroadPhaseNode.h"
+#include "ntSceneNode.h"
 
 #define D_AABB_QUANTIZATION		dFloat32 (8.0f)
 #define D_AABB_INV_QUANTIZATION	(dFloat32 (1.0f) / D_AABB_QUANTIZATION)
 
-dVector ntBroadPhaseNode::m_aabbQuantization(D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, dFloat32 (0.0f));
-dVector ntBroadPhaseNode::m_aabbInvQuantization(D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, dFloat32(0.0f));
+dVector ntSceneNode::m_aabbQuantization(D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, D_AABB_QUANTIZATION, dFloat32 (0.0f));
+dVector ntSceneNode::m_aabbInvQuantization(D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, D_AABB_INV_QUANTIZATION, dFloat32(0.0f));
 
-ntBroadPhaseBodyNode::ntBroadPhaseBodyNode(ntBodyKinematic* const body)
-	:ntBroadPhaseNode(nullptr)
+ntSceneBodyNode::ntSceneBodyNode(ntBodyKinematic* const body)
+	:ntSceneNode(nullptr)
 	,m_body(body)
 {
 	SetAABB(body->m_minAABB, body->m_maxAABB);
 	m_body->SetBroadPhaseBodyNode(this);
 }
 
-ntBroadPhaseBodyNode::~ntBroadPhaseBodyNode()
+ntSceneBodyNode::~ntSceneBodyNode()
 {
 	m_body->SetBroadPhaseBodyNode(nullptr);
 }
 
-void ntBroadPhaseNode::SetAABB(const dVector& minBox, const dVector& maxBox)
+void ntSceneNode::SetAABB(const dVector& minBox, const dVector& maxBox)
 {
 	dAssert(minBox.m_x <= maxBox.m_x);
 	dAssert(minBox.m_y <= maxBox.m_y);
@@ -61,15 +61,15 @@ void ntBroadPhaseNode::SetAABB(const dVector& minBox, const dVector& maxBox)
 	m_surfaceArea = size.DotProduct(size.ShiftTripleRight()).GetScalar();
 }
 
-ntBroadPhaseTreeNode::ntBroadPhaseTreeNode(ntBroadPhaseNode* const sibling, ntBroadPhaseNode* const myNode)
-	:ntBroadPhaseNode(sibling->m_parent)
+ntSceneTreeNode::ntSceneTreeNode(ntSceneNode* const sibling, ntSceneNode* const myNode)
+	:ntSceneNode(sibling->m_parent)
 	,m_left(sibling)
 	,m_right(myNode)
 	,m_fitnessNode(nullptr)
 {
 	if (m_parent) 
 	{
-		ntBroadPhaseTreeNode* const myParent = (ntBroadPhaseTreeNode*)m_parent;
+		ntSceneTreeNode* const myParent = (ntSceneTreeNode*)m_parent;
 		if (myParent->m_left == sibling) 
 		{
 			myParent->m_left = this;
@@ -84,8 +84,8 @@ ntBroadPhaseTreeNode::ntBroadPhaseTreeNode(ntBroadPhaseNode* const sibling, ntBr
 	sibling->m_parent = this;
 	myNode->m_parent = this;
 
-	ntBroadPhaseNode* const left = m_left;
-	ntBroadPhaseNode* const right = m_right;
+	ntSceneNode* const left = m_left;
+	ntSceneNode* const right = m_right;
 
 	m_minBox = left->m_minBox.GetMin(right->m_minBox);
 	m_maxBox = left->m_maxBox.GetMax(right->m_maxBox);
@@ -93,7 +93,7 @@ ntBroadPhaseTreeNode::ntBroadPhaseTreeNode(ntBroadPhaseNode* const sibling, ntBr
 	m_surfaceArea = side0.DotProduct(side0.ShiftTripleRight()).m_x;
 }
 
-ntBroadPhaseTreeNode::~ntBroadPhaseTreeNode()
+ntSceneTreeNode::~ntSceneTreeNode()
 {
 	if (m_left) 
 	{
