@@ -28,51 +28,6 @@
 #include "dgMemory.h"
 #include "dgStack.h"
 
-dgUnsigned64 dgGetTimeInMicrosenconds()
-{
-#if (defined (_MSC_VER) || defined (_MINGW_32_VER) || defined (_MINGW_64_VER))
-	static LARGE_INTEGER frequency;
-	static LARGE_INTEGER baseCount;
-	if (!frequency.QuadPart) {
-		QueryPerformanceFrequency(&frequency);
-		QueryPerformanceCounter (&baseCount);
-	}
-
-	LARGE_INTEGER count;
-	QueryPerformanceCounter (&count);
-	count.QuadPart -= baseCount.QuadPart;
-	dgUnsigned64 ticks = dgUnsigned64 (count.QuadPart * LONGLONG (1000000) / frequency.QuadPart);
-	return ticks;
-
-#elif (defined (_POSIX_VER) || defined (_POSIX_VER_64) || defined (ANDROID))
-
-	timespec ts;
-	static dgUnsigned64 baseCount = 0;
-	if (!baseCount) {
-		clock_gettime(CLOCK_REALTIME, &ts);
-		baseCount = dgUnsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
-	}
-	clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
-	return dgUnsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - baseCount;
-
-#elif defined (_MACOSX_VER)
-	timeval tp;
-	static dgUnsigned64 baseCount = 0;
-	if (!baseCount) {
-		gettimeofday(&tp, NULL);
-		baseCount = dgUnsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
-	}
-
-	gettimeofday(&tp, NULL);
-	dgUnsigned64 microsecunds = dgUnsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
-	return microsecunds - baseCount;
-#else 
-	#error "dgGetTimeInMicrosenconds implementation required"
-	return 0;
-#endif
-}
-
-
 dgFloat64 dgRoundToFloat(dgFloat64 val)
 {
 	dgInt32 exp;
@@ -546,3 +501,26 @@ dgFloatExceptions::~dgFloatExceptions()
 }
 
 #endif
+
+dUnsigned64 dGetTimeInMicrosenconds()
+{
+#if 0
+	static LARGE_INTEGER frequency;
+	static LARGE_INTEGER baseCount;
+	if (!frequency.QuadPart) {
+		QueryPerformanceFrequency(&frequency);
+		QueryPerformanceCounter(&baseCount);
+	}
+
+	LARGE_INTEGER count;
+	QueryPerformanceCounter(&count);
+	count.QuadPart -= baseCount.QuadPart;
+	dUnsigned64 timeStamp = dUnsigned64(count.QuadPart * LONGLONG(1000000) / frequency.QuadPart);
+
+#else
+	static std::chrono::high_resolution_clock::time_point timeStampBase = std::chrono::high_resolution_clock::now();
+	std::chrono::high_resolution_clock::time_point currentTimeStamp = std::chrono::high_resolution_clock::now();
+	dUnsigned64 timeStamp = std::chrono::duration_cast<std::chrono::microseconds>(currentTimeStamp - timeStampBase).count();
+	return timeStamp;
+#endif
+}

@@ -58,6 +58,7 @@ class ndWorld::ndWorldMixedScene: public ndSceneMixed
 
 	void ThreadFunction()
 	{
+		dUnsigned64 timeAcc = dGetTimeInMicrosenconds();
 		const bool collisionUpdate = m_world->m_collisionUpdate;
 		m_world->m_collisionUpdate = true;
 		if (collisionUpdate)
@@ -79,6 +80,7 @@ class ndWorld::ndWorldMixedScene: public ndSceneMixed
 			TransformUpdate(m_world->m_timestep);
 			m_world->UpdateListenersPostTransform(m_world->m_timestep);
 		}
+		m_world->m_lastExecutionTime = (dGetTimeInMicrosenconds() - timeAcc) * dFloat32(1.0e-6f);
 	}
 
 	ndWorld* m_world;
@@ -88,6 +90,7 @@ ndWorld::ndWorld()
 	:dClassAlloc()
 	,m_scene(nullptr)
 	,m_timestep(dFloat32 (0.0f))
+	,m_lastExecutionTime(dFloat32(0.0f))
 	,m_subSteps(1)
 	,m_collisionUpdate(true)
 {
@@ -101,7 +104,6 @@ ndWorld::~ndWorld()
 	Sync();
 	delete m_scene;
 }
-
 
 void ndWorld::UpdatePrelisteners(dFloat32 timestep)
 {

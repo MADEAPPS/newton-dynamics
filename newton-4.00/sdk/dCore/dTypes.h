@@ -62,7 +62,8 @@
 #include <mutex>
 #include <atomic>
 #include <thread>
-#include <time.h>
+#include <chrono>
+//#include <time.h>
 #include <math.h>
 #include <float.h>
 #include <ctype.h>
@@ -454,6 +455,8 @@ enum dSerializeRevisionNumber
 	m_currentRevision 
 };
 
+D_CORE_API dUnsigned64 dGetTimeInMicrosenconds();
+
 #ifdef D_USE_THREAD_EMULATION
 	template<class T>
 	class dAtomic
@@ -555,7 +558,6 @@ class dScopeSpinLock
 //void dGetMinMax (dBigVector &Min, dBigVector &Max, const dFloat64* const vArray, dInt32 vCount, dInt32 strideInBytes);
 //dInt32 dVertexListToIndexList (dFloat64* const vertexList, dInt32 strideInBytes, dInt32 compareCount,     dInt32 vertexCount,         dInt32* const indexListOut, dFloat64 tolerance = dEpsilon);
 //dInt32 dVertexListToIndexList (dFloat32* const vertexList, dInt32 strideInBytes, dInt32 floatSizeInBytes, dInt32 unsignedSizeInBytes, dInt32 vertexCount, dInt32* const indexListOut, dFloat32 tolerance = dEpsilon);
-//dUnsigned64 dGetTimeInMicrosenconds();
 //dFloat64 dRoundToFloat(dFloat64 val);
 //void dSerializeMarker(dSerialize serializeCallback, void* const userData);
 //dInt32 dDeserializeMarker(dDeserialize serializeCallback, void* const userData);

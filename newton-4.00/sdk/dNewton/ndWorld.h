@@ -57,6 +57,8 @@ class ndWorld: public dClassAlloc
 
 	ndScene* GetScene() const;
 
+	dFloat32 GetUpdateTime() const;
+
 	ndContactNotify* GetContactNotify() const;
 	void SetContactNotify(ndContactNotify* const notify);
 	
@@ -70,11 +72,10 @@ class ndWorld: public dClassAlloc
 	
 	D_NEWTON_API virtual void UpdateListenersPostTransform(dFloat32 timestep);
 
-	protected:
-
 	private:
 	ndScene* m_scene;
 	dFloat32 m_timestep;
+	dFloat32 m_lastExecutionTime;
 	dInt32 m_subSteps;
 	bool m_collisionUpdate;
 
@@ -140,6 +141,11 @@ inline bool ndWorld::RemoveBody(ndBody* const body)
 		return m_scene->RemoveBody(kinematicBody);
 	}
 	return false;
+}
+
+inline dFloat32 ndWorld::GetUpdateTime() const
+{
+	return m_lastExecutionTime;
 }
 
 inline void ndWorld::Update(dFloat32 timestep)
