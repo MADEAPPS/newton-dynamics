@@ -521,6 +521,6 @@ dUnsigned64 dGetTimeInMicrosenconds()
 	static std::chrono::high_resolution_clock::time_point timeStampBase = std::chrono::high_resolution_clock::now();
 	std::chrono::high_resolution_clock::time_point currentTimeStamp = std::chrono::high_resolution_clock::now();
 	dUnsigned64 timeStamp = std::chrono::duration_cast<std::chrono::microseconds>(currentTimeStamp - timeStampBase).count();
-	return timeStamp;
 #endif
+	return timeStamp;
 }
