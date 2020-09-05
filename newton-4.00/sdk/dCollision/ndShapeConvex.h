@@ -51,17 +51,17 @@ class ndShapeConvex: public ndShape
 		dInt32 m_vertex;
 	};
 
-	ND_COLLISION_API ndShapeConvex (dShapeID id);
+	D_COLLISION_API ndShapeConvex (dShapeID id);
 //	dShapeConvex (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
-	ND_COLLISION_API ~ndShapeConvex ();
+	D_COLLISION_API ~ndShapeConvex ();
 
 	virtual ndShapeConvex* GetAsShapeConvex() { return this; }
 
-	ND_COLLISION_API void SetVolumeAndCG();
-	ND_COLLISION_API virtual void MassProperties();
-	ND_COLLISION_API virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
-	ND_COLLISION_API virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
-	ND_COLLISION_API virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
+	D_COLLISION_API void SetVolumeAndCG();
+	D_COLLISION_API virtual void MassProperties();
+	D_COLLISION_API virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
+	D_COLLISION_API virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
+	D_COLLISION_API virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
 
 	virtual dInt32 GetConvexVertexCount() const { return m_vertexCount; }
 	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const

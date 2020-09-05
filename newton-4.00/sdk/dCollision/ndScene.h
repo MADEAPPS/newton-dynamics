@@ -64,7 +64,7 @@ class ndScene
 	};
 
 	public:
-	ND_COLLISION_API virtual ~ndScene();
+	D_COLLISION_API virtual ~ndScene();
 
 	void Sync();
 
@@ -74,24 +74,24 @@ class ndScene
 	template <class T>
 	void SubmitJobs(dFloat32 timestep);
 
-	ND_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
-	ND_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
+	D_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
+	D_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
 
-	ND_COLLISION_API virtual void Cleanup() = 0;
-	ND_COLLISION_API void Update(dFloat32 timestep);
+	D_COLLISION_API virtual void Cleanup() = 0;
+	D_COLLISION_API void Update(dFloat32 timestep);
 
-	ND_COLLISION_API ndContactNotify* GetContactNotify() const;
-	ND_COLLISION_API void SetContactNotify(ndContactNotify* const notify);
+	D_COLLISION_API ndContactNotify* GetContactNotify() const;
+	D_COLLISION_API void SetContactNotify(ndContactNotify* const notify);
 
 	private:
 	bool ValidateContactCache(ndContact* const contact, const dVector& timestep) const;
 	dFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, dVector& minBox, dVector& maxBox) const;
 
-	virtual void UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body);
-	virtual void UpdateTransform(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body);
 	virtual void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body) = 0;
-	virtual void CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ndContact* const contact);
-	void CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep, ndContact* const contact);
+	D_COLLISION_API virtual void UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body);
+	D_COLLISION_API virtual void UpdateTransform(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body);
+	D_COLLISION_API virtual void CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ndContact* const contact);
+	D_COLLISION_API void CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep, ndContact* const contact);
 
 	void RotateLeft(ndSceneTreeNode* const node, ndSceneNode** const root);
 	void RotateRight(ndSceneTreeNode* const node, ndSceneNode** const root);
@@ -104,19 +104,19 @@ class ndScene
 	void CollisionOnlyUpdate();
 
 	protected:
-	ndScene();
+	D_COLLISION_API ndScene();
 	
-	void BuildBodyArray();
-	void AttachNewContact();
-	void UpdateAabb(dFloat32 timestep);
-	void TransformUpdate(dFloat32 timestep);
-	void CalculateContacts(dFloat32 timestep);
-	void FindCollidingPairs(dFloat32 timestep);
+	D_COLLISION_API void BuildBodyArray();
+	D_COLLISION_API void AttachNewContact();
+	D_COLLISION_API void UpdateAabb(dFloat32 timestep);
+	D_COLLISION_API void TransformUpdate(dFloat32 timestep);
+	D_COLLISION_API void CalculateContacts(dFloat32 timestep);
+	D_COLLISION_API void FindCollidingPairs(dFloat32 timestep);
 
-	virtual void ThreadFunction();
+	D_COLLISION_API virtual void ThreadFunction();
 	virtual void BalanceBroadPhase() = 0;
 
-	ND_COLLISION_API ndSceneTreeNode* InsertNode(ndSceneNode* const root, ndSceneNode* const node);
+	D_COLLISION_API ndSceneTreeNode* InsertNode(ndSceneNode* const root, ndSceneNode* const node);
 	void UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndSceneNode** const root);
 
 	ndContact* FindContactJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
@@ -126,7 +126,7 @@ class ndScene
 	bool TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1, dFloat32 timestep) const;
 	void SubmitPairs(ndSceneNode* const leaftNode, ndSceneNode* const node, dFloat32 timestep);
 
-	ND_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& p0, const dVector& p1) const = 0;
+	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& p0, const dVector& p1) const = 0;
 	dFloat32 RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const;
 	
 	ndBodyList m_bodyList;

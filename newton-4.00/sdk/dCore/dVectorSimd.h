@@ -438,20 +438,20 @@ class dVector
 		};
 	};
 
-	static dVector m_zero;
-	static dVector m_one;
-	static dVector m_wOne;
-	static dVector m_two;
-	static dVector m_half;
-	static dVector m_three;
-	static dVector m_negOne;
-	static dVector m_xMask;
-	static dVector m_yMask;
-	static dVector m_zMask;
-	static dVector m_wMask;
-	static dVector m_epsilon;
-	static dVector m_signMask;
-	static dVector m_triplexMask;
+	D_CORE_API static dVector m_zero;
+	D_CORE_API static dVector m_one;
+	D_CORE_API static dVector m_wOne;
+	D_CORE_API static dVector m_two;
+	D_CORE_API static dVector m_half;
+	D_CORE_API static dVector m_three;
+	D_CORE_API static dVector m_negOne;
+	D_CORE_API static dVector m_xMask;
+	D_CORE_API static dVector m_yMask;
+	D_CORE_API static dVector m_zMask;
+	D_CORE_API static dVector m_wMask;
+	D_CORE_API static dVector m_epsilon;
+	D_CORE_API static dVector m_signMask;
+	D_CORE_API static dVector m_triplexMask;
 } D_GCC_NEWTON_ALIGN_32 ;
 #endif
 
@@ -905,20 +905,20 @@ class dVector
 			};
 		};
 
-		static dBigVector m_zero;
-		static dBigVector m_one;
-		static dBigVector m_wOne;
-		static dBigVector m_two;
-		static dBigVector m_half;
-		static dBigVector m_three;
-		static dBigVector m_negOne;
-		static dBigVector m_xMask;
-		static dBigVector m_yMask;
-		static dBigVector m_zMask;
-		static dBigVector m_wMask;
-		static dBigVector m_epsilon;
-		static dBigVector m_signMask;
-		static dBigVector m_triplexMask;
+		D_CORE_API static dBigVector m_zero;
+		D_CORE_API static dBigVector m_one;
+		D_CORE_API static dBigVector m_wOne;
+		D_CORE_API static dBigVector m_two;
+		D_CORE_API static dBigVector m_half;
+		D_CORE_API static dBigVector m_three;
+		D_CORE_API static dBigVector m_negOne;
+		D_CORE_API static dBigVector m_xMask;
+		D_CORE_API static dBigVector m_yMask;
+		D_CORE_API static dBigVector m_zMask;
+		D_CORE_API static dBigVector m_wMask;
+		D_CORE_API static dBigVector m_epsilon;
+		D_CORE_API static dBigVector m_signMask;
+		D_CORE_API static dBigVector m_triplexMask;
 	} D_GCC_NEWTON_ALIGN_32;
 
 	D_MSV_NEWTON_ALIGN_32
@@ -1425,20 +1425,20 @@ class dVector
 			};
 		};
 
-		static dBigVector m_zero;
-		static dBigVector m_one;
-		static dBigVector m_wOne;
-		static dBigVector m_two;
-		static dBigVector m_half;
-		static dBigVector m_three;
-		static dBigVector m_negOne;
-		static dBigVector m_xMask;
-		static dBigVector m_yMask;
-		static dBigVector m_zMask;
-		static dBigVector m_wMask;
-		static dBigVector m_epsilon;
-		static dBigVector m_signMask;
-		static dBigVector m_triplexMask;
+		D_CORE_API static dBigVector m_zero;
+		D_CORE_API static dBigVector m_one;
+		D_CORE_API static dBigVector m_wOne;
+		D_CORE_API static dBigVector m_two;
+		D_CORE_API static dBigVector m_half;
+		D_CORE_API static dBigVector m_three;
+		D_CORE_API static dBigVector m_negOne;
+		D_CORE_API static dBigVector m_xMask;
+		D_CORE_API static dBigVector m_yMask;
+		D_CORE_API static dBigVector m_zMask;
+		D_CORE_API static dBigVector m_wMask;
+		D_CORE_API static dBigVector m_epsilon;
+		D_CORE_API static dBigVector m_signMask;
+		D_CORE_API static dBigVector m_triplexMask;
 	} D_GCC_NEWTON_ALIGN_32 ;
 
 	D_MSV_NEWTON_ALIGN_32

@@ -46,14 +46,14 @@ enum dIntersectStatus
 //											 const dFloat32* const polygon, dInt32 strideInBytes,
 //											 const dInt32* const indexArray, dInt32 indexCount);
 
-dBigVector dPointToRayDistance (const dBigVector& point, const dBigVector& ray_p0, const dBigVector& ray_p1); 
-dBigVector dPointToTriangleDistance (const dBigVector& point, const dBigVector& p0, const dBigVector& p1, const dBigVector& p2);
-dBigVector dPointToTetrahedrumDistance (const dBigVector& point, const dBigVector& p0, const dBigVector& p1, const dBigVector& p2, const dBigVector& p3);
+D_CORE_API dBigVector dPointToRayDistance (const dBigVector& point, const dBigVector& ray_p0, const dBigVector& ray_p1); 
+D_CORE_API dBigVector dPointToTriangleDistance (const dBigVector& point, const dBigVector& p0, const dBigVector& p1, const dBigVector& p2);
+D_CORE_API dBigVector dPointToTetrahedrumDistance (const dBigVector& point, const dBigVector& p0, const dBigVector& p1, const dBigVector& p2, const dBigVector& p3);
 
-bool dRayBoxClip (dVector& ray_p0, dVector& ray_p1, const dVector& boxP0, const dVector& boxP1); 
-void dRayToRayDistance (const dVector& ray_p0, const dVector& ray_p1, const dVector& ray_q0, const dVector& ray_q1, dVector& p0Out, dVector& p1Out); 
-dFloat32 dRayCastBox (const dVector& p0, const dVector& p1, const dVector& boxP0, const dVector& boxP1, dVector& normalOut);
-dFloat32 dRayCastSphere (const dVector& p0, const dVector& p1, const dVector& origin, dFloat32 radius);
+D_CORE_API bool dRayBoxClip (dVector& ray_p0, dVector& ray_p1, const dVector& boxP0, const dVector& boxP1); 
+D_CORE_API void dRayToRayDistance (const dVector& ray_p0, const dVector& ray_p1, const dVector& ray_q0, const dVector& ray_q1, dVector& p0Out, dVector& p1Out); 
+D_CORE_API dFloat32 dRayCastBox (const dVector& p0, const dVector& p1, const dVector& boxP0, const dVector& boxP1, dVector& normalOut);
+D_CORE_API dFloat32 dRayCastSphere (const dVector& p0, const dVector& p1, const dVector& origin, dFloat32 radius);
 
 D_INLINE dInt32 dOverlapTest (const dVector& p0, const dVector& p1, const dVector& q0, const dVector& q1)
 {

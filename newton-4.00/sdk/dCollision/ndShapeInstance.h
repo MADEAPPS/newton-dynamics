@@ -60,19 +60,19 @@ class ndShapeInstance: public dClassAlloc
 		m_global,
 	};
 
-	ND_COLLISION_API ndShapeInstance(ndShape* const shape);
-	ND_COLLISION_API ndShapeInstance(const ndShapeInstance& instance);
+	D_COLLISION_API ndShapeInstance(ndShape* const shape);
+	D_COLLISION_API ndShapeInstance(const ndShapeInstance& instance);
 	//dShapeInstance(const dShapeInstance& meshInstance, const dShape* const shape);
 	//dShapeInstance(const dgWorld* const world, const dShape* const childCollision, dInt32 shapeID, const dMatrix& matrix);
 	//dShapeInstance(const dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
-	ND_COLLISION_API ~ndShapeInstance();
-	ND_COLLISION_API ndShapeInstance& operator=(const ndShapeInstance& src);
+	D_COLLISION_API ~ndShapeInstance();
+	D_COLLISION_API ndShapeInstance& operator=(const ndShapeInstance& src);
 
-	ND_COLLISION_API dMatrix CalculateInertia() const;
-	ND_COLLISION_API void CalculateAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
-	ND_COLLISION_API void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
+	D_COLLISION_API dMatrix CalculateInertia() const;
+	D_COLLISION_API void CalculateAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
+	D_COLLISION_API void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 
-	ND_COLLISION_API dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	D_COLLISION_API dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
 	ndShape* GetShape();
 	const ndShape* GetShape() const;

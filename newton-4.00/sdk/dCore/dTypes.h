@@ -213,11 +213,19 @@
 	#define	D_GCC_NEWTON_ALIGN_32 D_GCC_NEWTON_ALIGN_16	 
 #endif
 
+#if defined(_MSC_VER)
+	#define D_LIBRARY_EXPORT __declspec(dllexport)
+	#define D_LIBRARY_IMPORT __declspec(dllimport)
+#else
+	#define D_LIBRARY_EXPORT __attribute__((visibility("default")))
+	#define D_LIBRARY_IMPORT __attribute__((visibility("default")))
+#endif
+
 #ifdef _D_CORE_DLL
 	#ifdef _D_CORE_EXPORT_DLL
-		#define DCONTAINERS_API DG_LIBRARY_EXPORT
+		#define D_CORE_API D_LIBRARY_EXPORT
 	#else
-		#define DCONTAINERS_API DG_LIBRARY_IMPORT
+		#define D_CORE_API D_LIBRARY_IMPORT
 	#endif
 #else
 	#define D_CORE_API 

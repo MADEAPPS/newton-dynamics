@@ -74,7 +74,7 @@ class dThreadPool: public dSyncMutex, public dThread
 	D_CORE_API void ExecuteJobs(dThreadPoolJob** const jobs);
 
 	private:
-	virtual void Release();
+	D_CORE_API virtual void Release();
 
 	dSyncMutex m_sync;
 	dWorkerThread* m_workers;

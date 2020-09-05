@@ -36,8 +36,8 @@ D_MSV_NEWTON_ALIGN_32
 class ndBody: public dClassAlloc
 {
 	public:
-	ND_COLLISION_API ndBody();
-	ND_COLLISION_API virtual ~ndBody();
+	D_COLLISION_API ndBody();
+	D_COLLISION_API virtual ~ndBody();
 
 	virtual ndBody* GetAsBody() { return this;}
 	virtual ndBodyDynamic* GetAsBodyDynamic() { return nullptr; }
@@ -47,16 +47,16 @@ class ndBody: public dClassAlloc
 	virtual dFloat32 GetInvMass() const { return dFloat32(0.0f); }
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const = 0;
 
-	ND_COLLISION_API void SetCentreOfMass(const dVector& com);
+	D_COLLISION_API void SetCentreOfMass(const dVector& com);
 
 	ndBodyNotify* GetNotifyCallback() const;
-	ND_COLLISION_API void SetNotifyCallback(ndBodyNotify* const notify);
-	ND_COLLISION_API dVector GetOmega() const;
-	ND_COLLISION_API void SetOmega(const dVector& veloc);
-	ND_COLLISION_API dVector GetVelocity() const;
-	ND_COLLISION_API void SetVelocity(const dVector& veloc);
-	ND_COLLISION_API dMatrix GetMatrix() const;
-	ND_COLLISION_API void SetMatrix(const dMatrix& matrix);
+	D_COLLISION_API void SetNotifyCallback(ndBodyNotify* const notify);
+	D_COLLISION_API dVector GetOmega() const;
+	D_COLLISION_API void SetOmega(const dVector& veloc);
+	D_COLLISION_API dVector GetVelocity() const;
+	D_COLLISION_API void SetVelocity(const dVector& veloc);
+	D_COLLISION_API dMatrix GetMatrix() const;
+	D_COLLISION_API void SetMatrix(const dMatrix& matrix);
 
 	protected:
 	virtual void AttachContact(ndContact* const contact) {}

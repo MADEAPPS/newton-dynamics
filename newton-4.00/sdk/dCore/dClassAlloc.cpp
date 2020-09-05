@@ -24,19 +24,19 @@
 #include "dClassAlloc.h"
 
 #ifdef _D_CORE_DLL
-	void* operator new (size_t size)
-	{ 
-		dAssert(0);
-		void* const ptr = malloc (size);
-		dAssert (ptr);
-		return ptr;
-	}
-
-	void operator delete (void* ptr) 
-	{ 
-		dAssert(0);
-		free (ptr);
-	}
+	//void* operator new (size_t size)
+	//{ 
+	//	dAssert(0);
+	//	void* const ptr = malloc (size);
+	//	dAssert (ptr);
+	//	return ptr;
+	//}
+	//
+	//void operator delete (void* ptr) 
+	//{ 
+	//	dAssert(0);
+	//	free (ptr);
+	//}
 
 	BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 	{

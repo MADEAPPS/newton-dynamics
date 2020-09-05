@@ -47,30 +47,30 @@ class dRedBackNode
 	{
 	}
 
-	void RemoveAllLow ();
-	void RotateLeft(dRedBackNode** const head); 
-	void RotateRight(dRedBackNode** const head); 
-	void RemoveFixup (dRedBackNode* const node, dRedBackNode* * const head); 
+	D_CORE_API void RemoveAllLow ();
+	D_CORE_API void RotateLeft(dRedBackNode** const head); 
+	D_CORE_API void RotateRight(dRedBackNode** const head); 
+	D_CORE_API void RemoveFixup (dRedBackNode* const node, dRedBackNode* * const head); 
 
-	dRedBackNode* GetLeft() const;
-	dRedBackNode* GetRight() const;
-	dRedBackNode* GetParent() const;
+	//D_CORE_API dRedBackNode* GetLeft() const;
+	//D_CORE_API dRedBackNode* GetRight() const;
+	//D_CORE_API dRedBackNode* GetParent() const;
 
-	dRedBackNode (dRedBackNode* const parent);
-	inline void Initdata (dRedBackNode* const parent);
-	inline void SetColor (REDBLACK_COLOR color);
-	REDBLACK_COLOR GetColor () const;
-	dUnsigned32 IsInTree () const;
-	inline void SetInTreeFlag (dUnsigned32 flag);
+	D_CORE_API dRedBackNode (dRedBackNode* const parent);
+	D_CORE_API inline void Initdata (dRedBackNode* const parent);
+	D_CORE_API inline void SetColor (REDBLACK_COLOR color);
+	D_CORE_API REDBLACK_COLOR GetColor () const;
+	D_CORE_API dUnsigned32 IsInTree () const;
+	D_CORE_API inline void SetInTreeFlag (dUnsigned32 flag);
 
-	void RemoveAll ();
-	dRedBackNode* Prev() const;
-	dRedBackNode* Next() const;
-	dRedBackNode* Minimum() const;
-	dRedBackNode* Maximum() const;
-	void Remove (dRedBackNode** const head);
-	void Unlink (dRedBackNode** const head);
-	void InsertFixup(dRedBackNode** const head); 
+	D_CORE_API void RemoveAll ();
+	D_CORE_API dRedBackNode* Prev() const;
+	D_CORE_API dRedBackNode* Next() const;
+	D_CORE_API dRedBackNode* Minimum() const;
+	D_CORE_API dRedBackNode* Maximum() const;
+	D_CORE_API void Remove (dRedBackNode** const head);
+	D_CORE_API void Unlink (dRedBackNode** const head);
+	D_CORE_API void InsertFixup(dRedBackNode** const head); 
 
 	dRedBackNode* m_left;
 	dRedBackNode* m_right;

@@ -50,14 +50,14 @@ D_MSV_NEWTON_ALIGN_32
 class ndContact: public ndConstraint, public dContainersFreeListAlloc<ndContact*>
 {
 	public:
-	ND_COLLISION_API ndContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
-	ND_COLLISION_API virtual ~ndContact();
+	D_COLLISION_API ndContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
+	D_COLLISION_API virtual ~ndContact();
 
-	ND_COLLISION_API virtual ndBodyKinematic* GetBody0() const;
-	ND_COLLISION_API virtual ndBodyKinematic* GetBody1() const;
+	D_COLLISION_API virtual ndBodyKinematic* GetBody0() const;
+	D_COLLISION_API virtual ndBodyKinematic* GetBody1() const;
 
-	ND_COLLISION_API void AttachToBodies();
-	ND_COLLISION_API void DetachFromBodies();
+	D_COLLISION_API void AttachToBodies();
+	D_COLLISION_API void DetachFromBodies();
 
 	ndContact* GetAsContact() { return this; }
 	

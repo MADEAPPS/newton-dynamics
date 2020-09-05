@@ -45,8 +45,8 @@ class dClassAlloc
 		Free(ptr);
 	}
 
-	static D_CORE_API void* Malloc(size_t size);
-	static D_CORE_API void Free(void* const ptr);
+	D_CORE_API static void* Malloc(size_t size);
+	D_CORE_API static void Free(void* const ptr);
 };
 
 #endif

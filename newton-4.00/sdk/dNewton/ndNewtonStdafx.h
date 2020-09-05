@@ -32,9 +32,9 @@
 
 #ifdef _D_NEWTON_DLL
 	#ifdef _D_NEWTON_EXPORT_DLL
-		#define DNEWTON_API DG_LIBRARY_EXPORT
+		#define D_NEWTON_API D_LIBRARY_EXPORT
 	#else
-		#define DNEWTON_API DG_LIBRARY_IMPORT
+		#define D_NEWTON_API D_LIBRARY_IMPORT
 	#endif
 #else
 	#define D_NEWTON_API 

@@ -108,7 +108,7 @@ class ndShape: public dClassAlloc
 
 	virtual dInt32 GetConvexVertexCount() const;
 
-	ND_COLLISION_API virtual void MassProperties();
+	D_COLLISION_API virtual void MassProperties();
 
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const = 0;
 
@@ -121,10 +121,10 @@ class ndShape: public dClassAlloc
 	virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
 
 	protected:
-	ND_COLLISION_API ndShape(dShapeID id);
-	ND_COLLISION_API ndShape (const ndShape& source);
-//	ND_COLLISION_API dShape (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revision);
-	ND_COLLISION_API virtual ~ndShape();
+	D_COLLISION_API ndShape(dShapeID id);
+	D_COLLISION_API ndShape (const ndShape& source);
+//	D_COLLISION_API dShape (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revision);
+	D_COLLISION_API virtual ~ndShape();
 
 	//void SetSignature (dInt32 signature);
 	//virtual dInt32 CalculateSignature () const = 0;

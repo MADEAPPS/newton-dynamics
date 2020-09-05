@@ -47,7 +47,7 @@ class ndSceneNode: public dClassAlloc
 	{
 	}
 
-	ND_COLLISION_API void SetAABB(const dVector& minBox, const dVector& maxBox);
+	D_COLLISION_API void SetAABB(const dVector& minBox, const dVector& maxBox);
 
 	virtual ndSceneNode* GetAsBroadPhaseNode() { return this; }
 	virtual ndSceneBodyNode* GetAsBroadPhaseBodyNode() { return nullptr; }
@@ -94,8 +94,8 @@ D_MSV_NEWTON_ALIGN_32
 class ndSceneBodyNode: public ndSceneNode
 {
 	public:
-	ND_COLLISION_API ndSceneBodyNode(ndBodyKinematic* const body);
-	ND_COLLISION_API virtual ~ndSceneBodyNode();
+	D_COLLISION_API ndSceneBodyNode(ndBodyKinematic* const body);
+	D_COLLISION_API virtual ~ndSceneBodyNode();
 
 	virtual ndSceneBodyNode* GetAsBroadPhaseBodyNode() { return this; }
 
@@ -119,8 +119,8 @@ class ndSceneTreeNode: public ndSceneNode
 	//{
 	//}
 	
-	ND_COLLISION_API ndSceneTreeNode(ndSceneNode* const sibling, ndSceneNode* const myNode);
-	ND_COLLISION_API virtual ~ndSceneTreeNode();
+	D_COLLISION_API ndSceneTreeNode(ndSceneNode* const sibling, ndSceneNode* const myNode);
+	D_COLLISION_API virtual ~ndSceneTreeNode();
 
 	virtual ndSceneTreeNode* GetAsBroadPhaseTreeNode() { return this; }
 	

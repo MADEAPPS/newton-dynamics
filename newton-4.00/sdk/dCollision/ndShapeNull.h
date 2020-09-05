@@ -27,7 +27,7 @@
 class ndShapeNull: public ndShapeConvex
 {
 	public:
-	ND_COLLISION_API ndShapeNull();
+	D_COLLISION_API ndShapeNull();
 	//ndShapeNull(dUnsigned32 signature);
 	//ndShapeNull(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
 	virtual ~ndShapeNull() {}

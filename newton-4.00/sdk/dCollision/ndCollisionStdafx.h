@@ -29,14 +29,14 @@
 
 #include <dCore.h>
 
-#ifdef _D_NEWTON_DLL
+#ifdef _D_COLLISION_DLL
 	#ifdef _D_COLLISION_EXPORT_DLL
-		#define ND_COLLISION_API DG_LIBRARY_EXPORT
+		#define D_COLLISION_API D_LIBRARY_EXPORT
 	#else
-		#define ND_COLLISION_API DG_LIBRARY_IMPORT
+		#define D_COLLISION_API D_LIBRARY_IMPORT
 	#endif
 #else
-	#define ND_COLLISION_API 
+	#define D_COLLISION_API 
 #endif
 
 #endif 

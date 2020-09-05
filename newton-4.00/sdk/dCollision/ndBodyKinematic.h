@@ -44,8 +44,8 @@ class ndBodyKinematic: public ndBody
 	};
 
 	public:
-	ND_COLLISION_API ndBodyKinematic();
-	ND_COLLISION_API virtual ~ndBodyKinematic();
+	D_COLLISION_API ndBodyKinematic();
+	D_COLLISION_API virtual ~ndBodyKinematic();
 
 	ndScene* GetBroadPhase() const;
 
@@ -53,25 +53,25 @@ class ndBodyKinematic: public ndBody
 	dVector GetMassMatrix() const;
 	void SetMassMatrix(const dVector& massMatrix);
 
-	ND_COLLISION_API ndShapeInstance& GetCollisionShape();
-	ND_COLLISION_API const ndShapeInstance& GetCollisionShape() const;
-	ND_COLLISION_API void SetCollisionShape(const ndShapeInstance& shapeInstance);
+	D_COLLISION_API ndShapeInstance& GetCollisionShape();
+	D_COLLISION_API const ndShapeInstance& GetCollisionShape() const;
+	D_COLLISION_API void SetCollisionShape(const ndShapeInstance& shapeInstance);
 
-	ND_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
+	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
 
 	void SetMassMatrix(dFloat32 mass, const ndShapeInstance& shapeInstance);
 	void SetMassMatrix(dFloat32 Ixx, dFloat32 Iyy, dFloat32 Izz, dFloat32 mass);
 	void GetMassMatrix(dFloat32& Ixx, dFloat32& Iyy, dFloat32& Izz, dFloat32& mass);
 
-	ND_COLLISION_API virtual void AttachContact(ndContact* const contact);
-	ND_COLLISION_API virtual void DetachContact(ndContact* const contact);
-	ND_COLLISION_API virtual ndContact* FindContact(const ndBody* const otherBody) const;
-	ND_COLLISION_API static void ReleaseMemory();
+	D_COLLISION_API virtual void AttachContact(ndContact* const contact);
+	D_COLLISION_API virtual void DetachContact(ndContact* const contact);
+	D_COLLISION_API virtual ndContact* FindContact(const ndBody* const otherBody) const;
+	D_COLLISION_API static void ReleaseMemory();
 
 	virtual ndBodyKinematic* GetAsBodyKinematic() { return this; }
 
 	private:
-	void SetMassMatrix(dFloat32 mass, const dMatrix& inertia);
+	D_COLLISION_API void SetMassMatrix(dFloat32 mass, const dMatrix& inertia);
 
 	protected:
 	void UpdateCollisionMatrix();

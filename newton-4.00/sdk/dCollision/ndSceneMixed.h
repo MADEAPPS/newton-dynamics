@@ -31,21 +31,20 @@ D_MSV_NEWTON_ALIGN_32
 class ndSceneMixed : public ndScene
 {
 	public:
-	ND_COLLISION_API ndSceneMixed();
-	ND_COLLISION_API virtual ~ndSceneMixed();
+	D_COLLISION_API ndSceneMixed();
+	D_COLLISION_API virtual ~ndSceneMixed();
 
 	protected:
-	ND_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
-	ND_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
-	ND_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& p0, const dVector& p1) const;
-	ND_COLLISION_API virtual void Cleanup();
-
-	void BalanceBroadPhase();
+	D_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
+	D_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
+	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& p0, const dVector& p1) const;
+	D_COLLISION_API virtual void Cleanup();
+	D_COLLISION_API void BalanceBroadPhase();
 
 	private:
-	void AddNode(ndSceneNode* const newNode);
-	void RemoveNode(ndSceneNode* const newNode);
-	void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body);
+	D_COLLISION_API void AddNode(ndSceneNode* const newNode);
+	D_COLLISION_API void RemoveNode(ndSceneNode* const newNode);
+	D_COLLISION_API void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body);
 
 	dFloat64 m_treeEntropy;
 	ndFitnessList m_fitness;

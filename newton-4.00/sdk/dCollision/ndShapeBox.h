@@ -28,20 +28,20 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeBox: public ndShapeConvex
 {
 	public:
-	ND_COLLISION_API ndShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
+	D_COLLISION_API ndShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
 	//dShapeBox(dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
 	virtual ~ndShapeBox();
 
 	virtual ndShapeBox* GetAsShapeBox() { return this; }
 
 	protected:
-	ND_COLLISION_API void Init (dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
-	ND_COLLISION_API virtual void MassProperties();
+	D_COLLISION_API void Init (dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
+	D_COLLISION_API virtual void MassProperties();
 
-	ND_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
-	ND_COLLISION_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
-	ND_COLLISION_API virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
-	ND_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	D_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
+	D_COLLISION_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
+	D_COLLISION_API virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
+	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
 /*
 	
