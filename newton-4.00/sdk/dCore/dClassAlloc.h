@@ -49,4 +49,30 @@ class dClassAlloc
 	D_CORE_API static void Free(void* const ptr);
 };
 
+template<class T, dInt32 size>
+class ndFixSizeBuffer: public dClassAlloc
+{
+	public:
+	ndFixSizeBuffer()
+		:dClassAlloc()
+	{
+	}
+
+	T& operator[] (dInt32 i)
+	{
+		dAssert(i >= 0);
+		dAssert(i < size);
+		return m_array[i];
+	}
+
+	const T& operator[] (dInt32 i) const
+	{
+		dAssert(i >= 0);
+		dAssert(i < size);
+		return m_array[i];
+	}
+
+	T m_array[size];
+};
+
 #endif

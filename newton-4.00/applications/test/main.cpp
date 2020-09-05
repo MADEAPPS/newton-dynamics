@@ -11,11 +11,12 @@
 
 #include "testStdafx.h"
 
-#if 1
+
 // memory allocation for Newton
 static void* PhysicsAlloc(size_t sizeInBytes)
 {
-	return malloc(sizeInBytes);
+	void* const ptr = malloc(sizeInBytes);
+	return ptr;
 }
 
 // memory free use by the engine
@@ -170,7 +171,12 @@ int main (int argc, const char * argv[])
 	ndWorld world;
 	world.SetSubSteps(2);
 	world.SetThreadCount(2);
-		
+
+	//ndFixSizeBuffer<dVector, 10> xxx0;
+	//ndFixSizeBuffer<dVector, 10>* xxx1 = new ndFixSizeBuffer<dVector, 10>;
+	//(*xxx1)[0] = dVector (0.5f, 0.25f, 0.8f, 0.0f);
+	//(*xxx1)[0] = (*xxx1)[0] + (*xxx1)[0];
+
 	dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
 	dVector origin(0.5f, 0.25f, 0.8f, 0.0f);
 	BuildFloor(world);
@@ -187,12 +193,3 @@ int main (int argc, const char * argv[])
 
 	return 0;
 }
-
-#else
-
-//int main(int argc, const char * argv[])
-//{
-//	new ndShapeBox(200.0f, 1.0f, 200.f);
-//	return 0;
-//}
-#endif
