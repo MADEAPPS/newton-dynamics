@@ -141,11 +141,9 @@ void ndWorld::ApplyExternalForces(dFloat32 timestep)
 			
 			const dArray<ndBodyKinematic*>& bodyArray = scene->GetWorkingBodyArray();
 			const dInt32 count = bodyArray.GetCount();
-			
-			ndBodyKinematic** const bodies = (ndBodyKinematic**)&bodyArray[0];
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
-				ndBodyDynamic* const body = bodies[i]->GetAsBodyDynamic();
+				ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
 				if (body)
 				{
 					body->ApplyExternalForces(threadIndex, m_timestep);

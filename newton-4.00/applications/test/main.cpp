@@ -142,7 +142,7 @@ void BuildPyramid(ndWorld& world, dFloat32 mass, const dVector& origin, const dV
 	//dFloat32 y0 = matrix.m_posit.m_y + stepy / 2.0f;
 	dFloat32 z0 = matrix.m_posit.m_z - stepz * count / 2;
 
-//count = 1;
+count = 1;
 	for (int j = 0; j < count; j++) 
 	{
 		matrix.m_posit.m_z = z0;
@@ -168,12 +168,12 @@ int main (int argc, const char * argv[])
 {
 	ndWorld world;
 	world.SetSubSteps(2);
-	world.SetThreadCount(4);
+	world.SetThreadCount(2);
 		
 	dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
 	dVector origin(0.5f, 0.25f, 0.8f, 0.0f);
-	BuildFloor(world);
-	BuildPyramid(world, 10.0f, origin, size, 20);
+	//BuildFloor(world);
+	//BuildPyramid(world, 10.0f, origin, size, 20);
 
 	static dFloat32 totalTime = 0;
 	for (int i = 0; i < 10000; i ++)

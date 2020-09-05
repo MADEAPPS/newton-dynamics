@@ -173,6 +173,8 @@ ndScene::ndScene()
 	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_fullScan(true)
 {
+	m_tmpBodyArray.Resize(256);
+	m_activeContacts.Resize(256);
 	m_contactNotifyCallback->m_broadPhase = this;
 }
 
@@ -1366,12 +1368,12 @@ void ndScene::TransformUpdate(dFloat32 timestep)
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 threadsCount = m_owner->GetThreadCount();
 
-			const dInt32 count = m_owner->m_tmpBodyArray.GetCount();
-			ndBodyKinematic** const bodies = &m_owner->m_tmpBodyArray[0];
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetWorkingBodyArray();
+			const dInt32 count = bodyArray.GetCount();
 
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
-				m_owner->UpdateTransform(threadIndex, m_timestep, bodies[i]);
+				m_owner->UpdateTransform(threadIndex, m_timestep, bodyArray[i]);
 			}
 		}
 	};
@@ -1389,14 +1391,13 @@ void ndScene::UpdateAabb(dFloat32 timestep)
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 threadsCount = m_owner->GetThreadCount();
-			//ntBroadPhase* const broadPhase = m_owner;
 	
-			const dInt32 count = m_owner->m_tmpBodyArray.GetCount();
-			ndBodyKinematic** const bodies = &m_owner->m_tmpBodyArray[0];
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetWorkingBodyArray();
+			const dInt32 count = bodyArray.GetCount();
 	
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
-				m_owner->UpdateAabb(threadIndex, m_timestep, bodies[i]);
+				m_owner->UpdateAabb(threadIndex, m_timestep, bodyArray[i]);
 			}
 		}
 	};
@@ -1415,12 +1416,12 @@ void ndScene::FindCollidingPairs(dFloat32 timestep)
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 threadsCount = m_owner->GetThreadCount();
 	
-			const dInt32 count = m_owner->m_tmpBodyArray.GetCount();
-			ndBodyKinematic** const bodies = &m_owner->m_tmpBodyArray[0];
-			
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetWorkingBodyArray();
+			const dInt32 count = bodyArray.GetCount();
+
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
-				m_owner->FindCollidinPairs(threadIndex, m_timestep, bodies[i]);
+				m_owner->FindCollidinPairs(threadIndex, m_timestep, bodyArray[i]);
 			}
 		}
 	
@@ -1443,12 +1444,12 @@ void ndScene::CalculateContacts(dFloat32 timestep)
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 threadsCount = m_owner->GetThreadCount();
 
-			const dInt32 count = m_owner->m_activeContacts.GetCount();
-			ndContact** const bodies = &m_owner->m_activeContacts[0];
+			dArray<ndContact*>& activeContacts = m_owner->m_activeContacts;
+			const dInt32 count = activeContacts.GetCount();
 	
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
-				m_owner->CalculateContacts(threadIndex, m_timestep, bodies[i]);
+				m_owner->CalculateContacts(threadIndex, m_timestep, activeContacts[i]);
 			}
 		}
 	};

@@ -204,6 +204,8 @@ void ndSceneMixed::Cleanup()
 	ndContact::FlushFreeList();
 	ndFitnessList::FlushFreeList();
 	ndBodyKinematic::ReleaseMemory();
+	m_tmpBodyArray.Resize(256);
+	m_activeContacts.Resize(256);
 }
 
 bool ndSceneMixed::RemoveBody(ndBodyKinematic* const body)
