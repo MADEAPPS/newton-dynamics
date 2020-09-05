@@ -123,6 +123,9 @@ void dThreadPool::TickOne()
 {
 	dSyncMutex::Tick();
 	dSemaphore::Signal();
+#ifdef D_USE_THREAD_EMULATION	
+	ThreadFunction();
+#endif
 }
 
 void dThreadPool::Release()

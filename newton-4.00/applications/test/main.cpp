@@ -61,24 +61,36 @@ class CheckMemoryLeaks
 };
 static CheckMemoryLeaks checkLeaks;
 
-class DemobodyNotify: public ndBodyNotify
+class DemoBodyNotify: public ndBodyNotify
 {
 	public:
+	DemoBodyNotify()
+		:ndBodyNotify()
+	{
+		// here we set the application user data that 
+		// goes with the game engine, for now is just null
+		m_applicationUserData = nullptr;
+	}
+
 	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
 	{
-		ndBodyDynamic* const body = m_body->GetAsBodyDynamic();
-		dAssert(body);
-
-		dVector massMatrix (body->GetMassMatrix());
-		dVector force(dVector(0.0f, -10.0f, 0.0f, 0.0f).Scale (massMatrix.m_w));
-		body->SetForce(force);
-		body->SetTorque(dVector::m_zero);
+		ndBodyDynamic* const dynamicBody = GetBody()->GetAsBodyDynamic();
+		if (dynamicBody)
+		{
+			dVector massMatrix(dynamicBody->GetMassMatrix());
+			dVector force(dVector(0.0f, -10.0f, 0.0f, 0.0f).Scale(massMatrix.m_w));
+			dynamicBody->SetForce(force);
+			dynamicBody->SetTorque(dVector::m_zero);
+		}
 	}
 
 	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
 	{
-		dAssert(0);
+		// apply this transformation matrix to the application user data.
+		//dAssert(0);
 	}
+
+	void* m_applicationUserData;
 };
 
 dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist)
@@ -98,11 +110,10 @@ void BuildFloor(ndWorld& world)
 	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
 	ndBodyDynamic* const body = new ndBodyDynamic();
 
-	//body->SetNotifyCallback(new DemobodyNotify);
-
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_y = -0.5f;
 
+	body->SetNotifyCallback(new DemoBodyNotify);
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(box);
 	world.AddBody(body);
@@ -140,8 +151,7 @@ count = 1;
 		{
 			ndBodyDynamic* const body = new ndBodyDynamic();
 
-			body->SetNotifyCallback(new DemobodyNotify);
-			
+			body->SetNotifyCallback(new DemoBodyNotify);
 			body->SetMatrix(matrix);
 			body->SetCollisionShape(box);
 			body->SetMassMatrix(mass, box);

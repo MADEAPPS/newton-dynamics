@@ -38,6 +38,11 @@ class ndBodyNotify: public dClassAlloc
 	{
 	}
 
+	ndBody* GetBody()
+	{
+		return m_body;
+	}
+
 	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
 	{
 	}
@@ -46,7 +51,7 @@ class ndBodyNotify: public dClassAlloc
 	{
 	}
 
-	protected:
+	private:
 	ndBody* m_body;
 
 	friend class ndBody;

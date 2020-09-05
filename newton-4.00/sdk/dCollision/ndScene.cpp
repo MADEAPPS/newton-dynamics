@@ -22,6 +22,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndShapeNull.h"
 #include "ndScene.h"
+#include "ndBodyNotify.h"
 #include "ndBodyKinematic.h"
 #include "ndContactNotify.h"
 #include "ndContactSolver.h"
@@ -429,10 +430,6 @@ ndSceneTreeNode* ndScene::InsertNode(ndSceneNode* const root, ndSceneNode* const
 	return parent;
 }
 
-void ndScene::TransformUpdate(dFloat32 timestep)
-{
-}
-
 //void ndWorld::UpdateSleepState(dFloat32 timestep)
 //{
 //	//	D_TRACKTIME();
@@ -826,6 +823,18 @@ ndSceneNode* ndScene::BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firs
 		parent->SetAABB(minP, maxP);
 
 		return parent;
+	}
+}
+
+void ndScene::UpdateTransform(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body)
+{
+	if (!body->m_equilibrium)
+	{
+		ndBodyNotify* const notify = body->GetNotifyCallback();
+		if (notify)
+		{
+			notify->OnTranform(threadIndex, body->GetMatrix());
+		}
 	}
 }
 
@@ -1343,6 +1352,30 @@ void ndScene::AttachNewContact()
 		}
 		m_activeContacts.PushBack(contact);
 	}
+}
+
+void ndScene::TransformUpdate(dFloat32 timestep)
+{
+	D_TRACKTIME();
+	class ndTransformUpdate : public ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadsCount = m_owner->GetThreadCount();
+
+			const dInt32 count = m_owner->m_tmpBodyArray.GetCount();
+			ndBodyKinematic** const bodies = &m_owner->m_tmpBodyArray[0];
+
+			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
+			{
+				m_owner->UpdateTransform(threadIndex, m_timestep, bodies[i]);
+			}
+		}
+	};
+	SubmitJobs<ndTransformUpdate>(timestep);
 }
 
 void ndScene::UpdateAabb(dFloat32 timestep)

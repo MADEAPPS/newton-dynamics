@@ -84,11 +84,6 @@ void ndBody::SetNotifyCallback(ndBodyNotify* const notify)
 	}
 }
 
-ndBodyNotify* ndBody::GetNotifyCallback(ndBodyNotify* const notify) const
-{
-	return m_notifyCallback;
-}
-
 dVector ndBody::GetOmega() const
 {
 	return m_omega;

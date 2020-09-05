@@ -482,9 +482,7 @@ enum dSerializeRevisionNumber
 
 		T fetch_add(T val)
 		{
-			//T ret = m_val;
 			m_val += val;
-			//return ret;
 			return m_val - val;
 		}
 

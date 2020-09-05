@@ -86,7 +86,9 @@ class ndScene
 	private:
 	bool ValidateContactCache(ndContact* const contact, const dVector& timestep) const;
 	dFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, dVector& minBox, dVector& maxBox) const;
+
 	virtual void UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body);
+	virtual void UpdateTransform(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body);
 	virtual void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body) = 0;
 	virtual void CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ndContact* const contact);
 	void CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep, ndContact* const contact);

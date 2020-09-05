@@ -48,8 +48,9 @@ class ndBody: public dClassAlloc
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const = 0;
 
 	ND_COLLISION_API void SetCentreOfMass(const dVector& com);
+
+	ndBodyNotify* GetNotifyCallback() const;
 	ND_COLLISION_API void SetNotifyCallback(ndBodyNotify* const notify);
-	ND_COLLISION_API ndBodyNotify* GetNotifyCallback(ndBodyNotify* const notify) const;
 	ND_COLLISION_API dVector GetOmega() const;
 	ND_COLLISION_API void SetOmega(const dVector& veloc);
 	ND_COLLISION_API dVector GetVelocity() const;
@@ -106,6 +107,12 @@ inline dUnsigned32 ndBody::GetId() const
 {
 	return m_uniqueID;
 }
+
+inline ndBodyNotify* ndBody::GetNotifyCallback() const
+{
+	return m_notifyCallback;
+}
+
 
 #endif 
 
