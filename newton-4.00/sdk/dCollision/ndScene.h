@@ -36,8 +36,6 @@ class ndBilateralJoint;
 D_MSV_NEWTON_ALIGN_32
 class ndScene
 	:public dClassAlloc
-	,public dSyncMutex
-	,public dThread
 	,public dThreadPool
 {
 	public: 
@@ -67,6 +65,8 @@ class ndScene
 
 	public:
 	ND_COLLISION_API virtual ~ndScene();
+
+	void Sync();
 
 	dInt32 GetThreadCount() const;
 	const dArray<ndBodyKinematic*>& GetWorkingBodyArray() const;
@@ -143,6 +143,11 @@ class ndScene
 
 	friend class ndRayCastNotify;
 } D_GCC_NEWTON_ALIGN_32 ;
+
+inline void ndScene::Sync()
+{
+	dThreadPool::Sync();
+}
 
 inline dInt32 ndScene::GetThreadCount() const
 {

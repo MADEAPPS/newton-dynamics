@@ -78,7 +78,6 @@ class ndWorld::ndWorldMixedScene: public ndSceneMixed
 
 			TransformUpdate(m_world->m_timestep);
 			m_world->UpdateListenersPostTransform(m_world->m_timestep);
-			Release();
 		}
 	}
 
@@ -103,30 +102,6 @@ ndWorld::~ndWorld()
 	delete m_scene;
 }
 
-void ndWorld::Update(dFloat32 timestep)
-{
-	// wait for previous frame to complete
-	Sync();
-	Tick();
-	m_timestep = timestep;
-	m_collisionUpdate = false;
-	Signal();
-}
-
-void ndWorld::Signal()
-{
-	m_scene->Signal();
-}
-
-void ndWorld::Tick()
-{
-	m_scene->Tick();
-}
-
-void ndWorld::Sync()
-{
-	m_scene->dSyncMutex::Sync();
-}
 
 void ndWorld::UpdatePrelisteners(dFloat32 timestep)
 {

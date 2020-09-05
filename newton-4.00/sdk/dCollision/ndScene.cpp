@@ -162,9 +162,7 @@ dFloat64 ndScene::ndFitnessList::TotalCost() const
 	
 ndScene::ndScene()
 	:dClassAlloc()
-	,dSyncMutex()
-	,dThread()
-	,dThreadPool()
+	,dThreadPool("newtonWorker")
 	,m_bodyList()
 	,m_contactList()
 	,m_tmpBodyArray()
@@ -174,8 +172,6 @@ ndScene::ndScene()
 	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_fullScan(true)
 {
-	SetName("newton main thread");
-	Start();
 	m_contactNotifyCallback->m_broadPhase = this;
 }
 
@@ -202,15 +198,18 @@ void ndScene::ThreadFunction()
 {
 	D_TRACKTIME();
 	CollisionOnlyUpdate();
-	Release();
 }
 
 void ndScene::Update(dFloat32 timestep)
 {
+	// wait until previous update complete.
 	Sync();
-	Tick();
+
+	// save time state for use by the update callback
 	m_timestep = timestep;
-	Signal();
+
+	// update the next frame asynchronous 
+	TickOne();
 }
 
 ndContactNotify* ndScene::GetContactNotify() const

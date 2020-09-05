@@ -43,14 +43,14 @@ class ndWorld: public dClassAlloc
 		return D_NEWTON_ENGINE_VERSION;
 	}
 
-	D_NEWTON_API void Update(dFloat32 timestep);
-	D_NEWTON_API void Sync();
+	void Sync();
+	void Update(dFloat32 timestep);
 
-	D_NEWTON_API dInt32 GetThreadCount() const;
-	D_NEWTON_API void SetThreadCount(dInt32 count);
+	dInt32 GetThreadCount() const;
+	void SetThreadCount(dInt32 count);
 
-	D_NEWTON_API dInt32 GetSubSteps() const;
-	D_NEWTON_API void SetSubSteps(dInt32 subSteps);
+	dInt32 GetSubSteps() const;
+	void SetSubSteps(dInt32 subSteps);
 
 	bool AddBody(ndBody* const body);
 	bool RemoveBody(ndBody* const body);
@@ -59,7 +59,7 @@ class ndWorld: public dClassAlloc
 
 	ndContactNotify* GetContactNotify() const;
 	void SetContactNotify(ndContactNotify* const notify);
-
+	
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons(dFloat32 timestep);
 	//D_NEWTON_API virtual void UpdateSleepState(dFloat32 timestep);
@@ -73,9 +73,6 @@ class ndWorld: public dClassAlloc
 	protected:
 
 	private:
-	void Tick();
-	void Signal();
-
 	ndScene* m_scene;
 	dFloat32 m_timestep;
 	dInt32 m_subSteps;
@@ -83,6 +80,32 @@ class ndWorld: public dClassAlloc
 
 	friend class ndScene;
 } D_GCC_NEWTON_ALIGN_32 ;
+
+
+inline void ndWorld::Sync()
+{
+	m_scene->Sync();
+}
+
+inline dInt32 ndWorld::GetThreadCount() const
+{
+	return m_scene->GetThreadCount();
+}
+
+inline void ndWorld::SetThreadCount(dInt32 count)
+{
+	m_scene->SetCount(count);
+}
+
+inline dInt32 ndWorld::GetSubSteps() const
+{
+	return m_subSteps;
+}
+
+inline void ndWorld::SetSubSteps(dInt32 subSteps)
+{
+	m_subSteps = dClamp(subSteps, 1, 16);
+}
 
 inline ndScene* ndWorld::GetScene() const
 {
@@ -119,24 +142,17 @@ inline bool ndWorld::RemoveBody(ndBody* const body)
 	return false;
 }
 
-inline dInt32 ndWorld::GetThreadCount() const
+inline void ndWorld::Update(dFloat32 timestep)
 {
-	return m_scene->GetThreadCount();
-}
+	// wait until previous update complete.
+	Sync();
 
-inline void ndWorld::SetThreadCount(dInt32 count)
-{
-	m_scene->SetCount(count);
-}
+	// save time state for use by the update callback
+	m_timestep = timestep;
+	m_collisionUpdate = false;
 
-inline dInt32 ndWorld::GetSubSteps() const
-{
-	return m_subSteps;
-}
-
-inline void ndWorld::SetSubSteps(dInt32 subSteps)
-{
-	m_subSteps = dClamp(subSteps, 1, 16);
+	// update the next frame asynchronous 
+	m_scene->TickOne();
 }
 
 #endif

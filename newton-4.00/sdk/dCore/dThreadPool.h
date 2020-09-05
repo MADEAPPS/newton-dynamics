@@ -45,7 +45,7 @@ class dThreadPoolJob
 	friend class dThreadPool;
 };
 
-class dThreadPool
+class dThreadPool: public dSyncMutex, public dThread
 {
 	class dWorkerThread: public dClassAlloc, public dThread
 	{
@@ -64,18 +64,22 @@ class dThreadPool
 	};
 
 	public:
-	D_CORE_API dThreadPool();
+	D_CORE_API dThreadPool(const char* const baseName);
 	D_CORE_API virtual ~dThreadPool();
 
 	D_CORE_API dInt32 GetCount() const;
 	D_CORE_API void SetCount(dInt32 count);
 
+	D_CORE_API void TickOne();
 	D_CORE_API void ExecuteJobs(dThreadPoolJob** const jobs);
 
 	private:
+	virtual void Release();
+
 	dSyncMutex m_sync;
 	dWorkerThread* m_workers;
 	dInt32 m_count;
+	char m_baseName[32];
 };
 
 #endif

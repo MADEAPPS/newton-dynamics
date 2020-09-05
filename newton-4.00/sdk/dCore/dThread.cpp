@@ -104,6 +104,7 @@ void dThread::ThreadFunctionCallback()
 	while (!Wait())
 	{
 		ThreadFunction();
+		Release();
 	}
 #endif
 }

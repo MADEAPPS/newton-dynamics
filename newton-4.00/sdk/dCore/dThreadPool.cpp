@@ -50,11 +50,19 @@ void dThreadPool::dWorkerThread::ExecuteJob(dThreadPoolJob* const job)
 	Signal();
 }
 
-dThreadPool::dThreadPool()
-	:m_sync()
+dThreadPool::dThreadPool(const char* const baseName)
+	:dSyncMutex()
+	,dThread()
+	,m_sync()
 	,m_workers(nullptr)
 	,m_count(0)
 {
+	Start();
+
+	char name[256];
+	strncpy(m_baseName, baseName, sizeof (m_baseName));
+	sprintf(name, "%s_%d", m_baseName, 0);
+	SetName(name);
 }
 
 dThreadPool::~dThreadPool()
@@ -92,7 +100,7 @@ void dThreadPool::SetCount(dInt32 count)
 			char name[256];
 			m_workers[i].m_owner = this;
 			m_workers[i].m_threadIndex = i;
-			sprintf(name, "newton Worker %d", i);
+			sprintf(name, "%s_%d", m_baseName, i + 1);
 			m_workers[i].SetName(name);
 			m_workers[i].Start();
 		}
@@ -109,4 +117,15 @@ void dThreadPool::ExecuteJobs(dThreadPoolJob** const jobs)
 	jobs[m_count]->m_threadIndex = m_count;
 	jobs[m_count]->Execute();
 	m_sync.Sync();
+}
+
+void dThreadPool::TickOne()
+{
+	dSyncMutex::Tick();
+	dSemaphore::Signal();
+}
+
+void dThreadPool::Release()
+{
+	dSyncMutex::Release();
 }

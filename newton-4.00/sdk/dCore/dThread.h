@@ -46,6 +46,9 @@ class dThread
 
 	virtual void ThreadFunction() = 0;
 
+	protected:
+	virtual void Release(){}
+
 	private:
 	void ThreadFunctionCallback();
 
