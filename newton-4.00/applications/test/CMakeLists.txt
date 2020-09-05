@@ -39,7 +39,7 @@ endif ()
 add_executable(${projectName} ${CPP_SOURCE})
 
 #target_link_libraries (${projectName} ntNewton dScene dModel dVehicle glfw imgui glatter)
-target_link_libraries (${projectName} dCore ndCollision ndNewton)
+target_link_libraries (${projectName} ndCore ndCollision ndNewton)
 
 #if (NEWTON_BUILD_PROFILER)
 #    target_link_libraries (${projectName} dProfiler)

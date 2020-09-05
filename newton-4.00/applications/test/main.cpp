@@ -87,7 +87,7 @@ dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist)
 	dVector p0(origin);
 	dVector p1(origin - dVector(0.0f, dAbs(dist), 0.0f, 0.0f));
 
-	ndRayCastCloasestHitCallback rayCaster(world.GetBroadphase());
+	ndRayCastCloasestHitCallback rayCaster(world.GetScene());
 	dFloat32 param = rayCaster.TraceRay(p0, p1);
 	return (param < 1.0f) ? rayCaster.m_contact.m_point : p0;
 }
@@ -158,7 +158,7 @@ int main (int argc, const char * argv[])
 {
 	ndWorld world;
 	world.SetSubSteps(2);
-	//world.SetThreadCount(8);
+	world.SetThreadCount(8);
 		
 	dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
 	dVector origin(0.5f, 0.25f, 0.8f, 0.0f);
@@ -167,8 +167,8 @@ int main (int argc, const char * argv[])
 
 	for (int i = 0; i < 10000; i ++)
 	{
-		world.GetBroadphase()->Update(1.0f / 60.0f);
-		//world.Update(1.0f / 60.0f);
+		//world.GetScene()->Update(1.0f / 60.0f);
+		world.Update(1.0f / 60.0f);
 		//newton.Sync();
 	}
 

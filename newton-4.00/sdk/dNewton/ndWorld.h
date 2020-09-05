@@ -55,23 +55,19 @@ class ndWorld: public dClassAlloc
 	bool AddBody(ndBody* const body);
 	bool RemoveBody(ndBody* const body);
 
-	ndScene* GetBroadphase() const;
+	ndScene* GetScene() const;
 
 	ndContactNotify* GetContactNotify() const;
 	void SetContactNotify(ndContactNotify* const notify);
 
 	protected:
-	D_NEWTON_API virtual void SubstepUpdate(dFloat32 timestep);
 	D_NEWTON_API virtual void UpdateSkeletons(dFloat32 timestep);
-	D_NEWTON_API virtual void UpdateSleepState(dFloat32 timestep);
+	//D_NEWTON_API virtual void UpdateSleepState(dFloat32 timestep);
 	D_NEWTON_API virtual void ApplyExternalForces(dFloat32 timestep);
 	D_NEWTON_API virtual void UpdatePrelisteners(dFloat32 timestep);
 	D_NEWTON_API virtual void UpdatePostlisteners(dFloat32 timestep);
-	D_NEWTON_API virtual void UpdateBroadPhase(dFloat32 timestep);
 	D_NEWTON_API virtual void UpdateDynamics(dFloat32 timestep);
 	
-	D_NEWTON_API virtual void InternalUpdate(dFloat32 timestep);
-	D_NEWTON_API virtual void TransformUpdate(dFloat32 timestep);
 	D_NEWTON_API virtual void UpdateListenersPostTransform(dFloat32 timestep);
 
 	protected:
@@ -79,28 +75,28 @@ class ndWorld: public dClassAlloc
 	private:
 	void Tick();
 	void Signal();
-	void ThreadFunction();
-	ndScene* m_broadPhase;
 
+	ndScene* m_scene;
 	dFloat32 m_timestep;
 	dInt32 m_subSteps;
+	bool m_collisionUpdate;
 
 	friend class ndScene;
 } D_GCC_NEWTON_ALIGN_32 ;
 
-inline ndScene* ndWorld::GetBroadphase() const
+inline ndScene* ndWorld::GetScene() const
 {
-	return m_broadPhase;
+	return m_scene;
 }
 
 inline ndContactNotify* ndWorld::GetContactNotify() const
 {
-	return m_broadPhase->GetContactNotify();
+	return m_scene->GetContactNotify();
 }
 
 inline void ndWorld::SetContactNotify(ndContactNotify* const notify)
 {
-	m_broadPhase->SetContactNotify(notify);
+	m_scene->SetContactNotify(notify);
 }
 
 inline bool ndWorld::AddBody(ndBody* const body)
@@ -108,7 +104,7 @@ inline bool ndWorld::AddBody(ndBody* const body)
 	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
 	if (kinematicBody)
 	{
-		return m_broadPhase->AddBody(kinematicBody);
+		return m_scene->AddBody(kinematicBody);
 	}
 	return false;
 }
@@ -118,15 +114,29 @@ inline bool ndWorld::RemoveBody(ndBody* const body)
 	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
 	if (kinematicBody)
 	{
-		return m_broadPhase->RemoveBody(kinematicBody);
+		return m_scene->RemoveBody(kinematicBody);
 	}
 	return false;
 }
 
 inline dInt32 ndWorld::GetThreadCount() const
 {
-	return m_broadPhase->GetThreadCount();
+	return m_scene->GetThreadCount();
 }
 
+inline void ndWorld::SetThreadCount(dInt32 count)
+{
+	m_scene->SetCount(count);
+}
+
+inline dInt32 ndWorld::GetSubSteps() const
+{
+	return m_subSteps;
+}
+
+inline void ndWorld::SetSubSteps(dInt32 subSteps)
+{
+	m_subSteps = dClamp(subSteps, 1, 16);
+}
 
 #endif

@@ -40,10 +40,11 @@ class ndSceneMixed : public ndScene
 	ND_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& p0, const dVector& p1) const;
 	ND_COLLISION_API virtual void Cleanup();
 
+	void BalanceBroadPhase();
+
 	private:
 	void AddNode(ndSceneNode* const newNode);
 	void RemoveNode(ndSceneNode* const newNode);
-	void BalanceBroadPhase();
 	void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body);
 
 	dFloat64 m_treeEntropy;

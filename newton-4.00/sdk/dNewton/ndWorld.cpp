@@ -24,7 +24,6 @@
 #include "ndBodyDynamic.h"
 #include "ndSceneMixed.h"
 
-
 class ndWorld::ndWorldMixedScene: public ndSceneMixed
 {
 	public:
@@ -34,10 +33,53 @@ class ndWorld::ndWorldMixedScene: public ndSceneMixed
 	{
 	}
 
+	void SubStepUpdate(dFloat32 timestep)
+	{
+		D_TRACKTIME();
+
+		// do the a pre-physics step 
+		m_lru = m_lru + 1;
+		BuildBodyArray();
+		m_world->UpdateSkeletons(timestep);
+		m_world->ApplyExternalForces(timestep);
+		m_world->UpdatePrelisteners(timestep);
+		//UpdateSleepState(timestep);
+		
+		// update the collision system
+		UpdateAabb(m_timestep);
+		FindCollidingPairs(m_timestep);
+		AttachNewContact();
+		CalculateContacts(m_timestep);
+		
+		// calculate internal forces, integrate bodies and update matrices.
+		m_world->UpdateDynamics(timestep);
+		m_world->UpdatePostlisteners(timestep);
+	}
+
 	void ThreadFunction()
 	{
-		m_world->ThreadFunction();
-		ThreadFunction();
+		const bool collisionUpdate = m_world->m_collisionUpdate;
+		m_world->m_collisionUpdate = true;
+		if (collisionUpdate)
+		{
+			ndSceneMixed::ThreadFunction();
+		}
+		else
+		{
+			D_TRACKTIME();
+			BalanceBroadPhase();
+
+			dInt32 const steps = m_world->m_subSteps;
+			dFloat32 timestep = m_world->m_timestep / steps;
+			for (dInt32 i = 0; i < steps; i++)
+			{
+				SubStepUpdate(timestep);
+			}
+
+			TransformUpdate(m_world->m_timestep);
+			m_world->UpdateListenersPostTransform(m_world->m_timestep);
+			Release();
+		}
 	}
 
 	ndWorld* m_world;
@@ -45,19 +87,20 @@ class ndWorld::ndWorldMixedScene: public ndSceneMixed
 
 ndWorld::ndWorld()
 	:dClassAlloc()
-	,m_broadPhase(nullptr)
+	,m_scene(nullptr)
 	,m_timestep(dFloat32 (0.0f))
 	,m_subSteps(1)
+	,m_collisionUpdate(true)
 {
 	// start the engine thread;
-	m_broadPhase = new ndSceneMixed();
-	//m_broadPhase = new ntWorldMixedBroadPhase(this);
+	//m_scene = new ndSceneMixed();
+	m_scene = new ndWorldMixedScene(this);
 }
 
 ndWorld::~ndWorld()
 {
 	Sync();
-	delete m_broadPhase;
+	delete m_scene;
 }
 
 void ndWorld::Update(dFloat32 timestep)
@@ -66,86 +109,23 @@ void ndWorld::Update(dFloat32 timestep)
 	Sync();
 	Tick();
 	m_timestep = timestep;
+	m_collisionUpdate = false;
 	Signal();
 }
 
 void ndWorld::Signal()
 {
-	m_broadPhase->Signal();
+	m_scene->Signal();
 }
 
 void ndWorld::Tick()
 {
-	m_broadPhase->Tick();
+	m_scene->Tick();
 }
 
 void ndWorld::Sync()
 {
-	m_broadPhase->dSyncMutex::Sync();
-}
-
-
-void ndWorld::SetThreadCount(dInt32 count)
-{
-	dAssert(0);
-//	dThreadPool& pool = *this;
-//	return pool.SetCount(count);
-}
-
-void ndWorld::ThreadFunction()
-{
-	InternalUpdate(m_timestep);
-}
-
-//void ndWorld::DispatchJobs(dThreadPoolJob** const jobs)
-//{
-//	dAssert(0);
-////	ExecuteJobs(jobs);
-//}
-
-dInt32 ndWorld::GetSubSteps() const
-{
-	return m_subSteps;
-}
-
-void ndWorld::SetSubSteps(dInt32 subSteps)
-{
-	m_subSteps = dClamp(subSteps, 1, 16);
-}
-
-//void ndWorld::ThreadFunction()
-//{
-//	InternalUpdate(m_timestep);
-//	Release();
-//}
-
-void ndWorld::InternalUpdate(dFloat32 fullTimestep)
-{
-	D_TRACKTIME();
-	dFloat32 timestep = fullTimestep / m_subSteps;
-	for (dInt32 i = 0; i < m_subSteps; i++)
-	{
-		SubstepUpdate(timestep);
-	}
-
-	TransformUpdate(fullTimestep);
-	UpdateListenersPostTransform(fullTimestep);
-}
-
-void ndWorld::TransformUpdate(dFloat32 timestep)
-{
-}
-
-void ndWorld::SubstepUpdate(dFloat32 timestep)
-{
-	D_TRACKTIME();
-	UpdateSkeletons(timestep);
-	ApplyExternalForces(timestep);
-	UpdatePrelisteners(timestep);
-	//UpdateSleepState(timestep);
-	UpdateBroadPhase(timestep);
-	UpdateDynamics(timestep);
-	UpdatePostlisteners(timestep);
+	m_scene->dSyncMutex::Sync();
 }
 
 void ndWorld::UpdatePrelisteners(dFloat32 timestep)
@@ -171,39 +151,33 @@ void ndWorld::UpdateListenersPostTransform(dFloat32 timestep)
 void ndWorld::ApplyExternalForces(dFloat32 timestep)
 {
 	D_TRACKTIME();
-	class ntApplyExternalForces: public ndScene::ndBaseJob
+	class ndApplyExternalForces: public ndScene::ndBaseJob
 	{
 		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			dAssert(0);
-			//const dInt32 threadIndex = GetThredID();
-			//const dInt32 count = m_world->m_tmpBodyArray.GetCount();
-			//
-			//ntBodyKinematic** const bodies = &m_world->m_tmpBodyArray[0];
-			//for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
-			//{
-			//	ndBodyDynamic* const body = bodies[i]->GetAsBodyDynamic();
-			//	if (body)
-			//	{
-			//		body->ApplyExternalForces(threadIndex, m_timestep);
-			//	}
-			//
-			//}
+
+			ndWorld* const world = ((ndWorldMixedScene*)m_owner)->m_world;
+			ndScene* const scene = world->GetScene();
+			const dInt32 threadIndex = GetThredID();
+			
+			const dArray<ndBodyKinematic*>& bodyArray = scene->GetWorkingBodyArray();
+			const dInt32 count = bodyArray.GetCount();
+			
+			ndBodyKinematic** const bodies = (ndBodyKinematic**)&bodyArray[0];
+			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
+			{
+				ndBodyDynamic* const body = bodies[i]->GetAsBodyDynamic();
+				if (body)
+				{
+					body->ApplyExternalForces(threadIndex, m_timestep);
+				}
+			}
 		}
 	};
-	dAssert(0);
-	//SubmitJobs<ntApplyExternalForces>(timestep);
+	m_scene->SubmitJobs<ndApplyExternalForces>(timestep);
 }
 
-void ndWorld::UpdateSleepState(dFloat32 timestep)
-{
-//	D_TRACKTIME();
-}
 
-void ndWorld::UpdateBroadPhase(dFloat32 timestep)
-{
-	m_broadPhase->Update(timestep);
-}
 

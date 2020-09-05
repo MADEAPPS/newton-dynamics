@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
-set (projectName "dCore")
+set (projectName "ndCore")
 message (${projectName})
 
 # source and header files

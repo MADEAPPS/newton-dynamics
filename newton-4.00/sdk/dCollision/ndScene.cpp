@@ -186,11 +186,31 @@ ndScene::~ndScene()
 	delete m_contactNotifyCallback;
 }
 
+void ndScene::CollisionOnlyUpdate()
+{
+	D_TRACKTIME();
+	m_lru = m_lru + 1;
+	BuildBodyArray();
+	UpdateAabb(m_timestep);
+	BalanceBroadPhase();
+	FindCollidingPairs(m_timestep);
+	AttachNewContact();
+	CalculateContacts(m_timestep);
+}
+
 void ndScene::ThreadFunction()
 {
-	BuildBodyArray();
-	InternalUpdate(m_timestep);
+	D_TRACKTIME();
+	CollisionOnlyUpdate();
 	Release();
+}
+
+void ndScene::Update(dFloat32 timestep)
+{
+	Sync();
+	Tick();
+	m_timestep = timestep;
+	Signal();
 }
 
 ndContactNotify* ndScene::GetContactNotify() const
@@ -242,7 +262,6 @@ bool ndScene::RemoveBody(ndBodyKinematic* const body)
 void ndScene::BuildBodyArray()
 {
 	D_TRACKTIME();
-
 	int index = 0;
 	m_tmpBodyArray.SetCount(m_bodyList.GetCount());
 	for (ndBodyList::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
@@ -411,31 +430,15 @@ ndSceneTreeNode* ndScene::InsertNode(ndSceneNode* const root, ndSceneNode* const
 	return parent;
 }
 
-void ndScene::InternalUpdate(dFloat32 timestep)
+void ndScene::TransformUpdate(dFloat32 timestep)
 {
-	D_TRACKTIME();
-	m_lru = m_lru + 1;
-	UpdateAabb(timestep);
-	BalanceBroadPhase();
-	FindCollidingPairs(timestep);
-	AttachNewContact();
-	CalculateContacts(timestep);
 }
 
-void ndScene::Update(dFloat32 timestep)
-{
-	//D_TRACKTIME();
-	//m_lru = m_lru + 1;
-	//UpdateAabb(timestep);
-	//BalanceBroadPhase();
-	//FindCollidingPairs(timestep);
-	//AttachNewContact();
-	//CalculateContacts(timestep);
-	Sync();
-	Tick();
-	m_timestep = timestep;
-	Signal();
-}
+//void ndWorld::UpdateSleepState(dFloat32 timestep)
+//{
+//	//	D_TRACKTIME();
+//}
+
 
 void ndScene::RotateLeft(ndSceneTreeNode* const node, ndSceneNode** const root)
 {

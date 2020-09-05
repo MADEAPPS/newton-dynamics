@@ -69,6 +69,10 @@ class ndScene
 	ND_COLLISION_API virtual ~ndScene();
 
 	dInt32 GetThreadCount() const;
+	const dArray<ndBodyKinematic*>& GetWorkingBodyArray() const;
+
+	template <class T>
+	void SubmitJobs(dFloat32 timestep);
 
 	ND_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
 	ND_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
@@ -80,14 +84,8 @@ class ndScene
 	ND_COLLISION_API void SetContactNotify(ndContactNotify* const notify);
 
 	private:
-	void AttachNewContact();
-	void UpdateAabb(dFloat32 timestep);
-	void FindCollidingPairs(dFloat32 timestep);
-	void CalculateContacts(dFloat32 timestep);
 	bool ValidateContactCache(ndContact* const contact, const dVector& timestep) const;
 	dFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, dVector& minBox, dVector& maxBox) const;
-
-	virtual void BalanceBroadPhase() = 0;
 	virtual void UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body);
 	virtual void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body) = 0;
 	virtual void CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ndContact* const contact);
@@ -101,19 +99,24 @@ class ndScene
 	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dListNode** const nextNode);
 	ndSceneNode* BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dListNode** const nextNode);
 
-	template <class T>
-	void SubmitJobs(dFloat32 timestep);
+	void CollisionOnlyUpdate();
 
 	protected:
 	ndScene();
-	virtual void ThreadFunction();
+	
 	void BuildBodyArray();
-	void InternalUpdate(dFloat32 timestep);
+	void AttachNewContact();
+	void UpdateAabb(dFloat32 timestep);
+	void TransformUpdate(dFloat32 timestep);
+	void CalculateContacts(dFloat32 timestep);
+	void FindCollidingPairs(dFloat32 timestep);
+
+	virtual void ThreadFunction();
+	virtual void BalanceBroadPhase() = 0;
 
 	ND_COLLISION_API ndSceneTreeNode* InsertNode(ndSceneNode* const root, ndSceneNode* const node);
 	void UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndSceneNode** const root);
 
-	//void CalculatePairContacts(dInt32 threadIndex, ntPair* const pair) const;
 	ndContact* FindContactJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 	ndBilateralJoint* FindBilateralJoint(ndBody* const body0, ndBody* const body1) const;
 
@@ -147,6 +150,11 @@ inline dInt32 ndScene::GetThreadCount() const
 	return pool.GetCount();
 }
 
+inline const dArray<ndBodyKinematic*>& ndScene::GetWorkingBodyArray() const
+{
+	return m_tmpBodyArray;
+}
+
 template <class T>
 void ndScene::SubmitJobs(dFloat32 timestep)
 {
@@ -162,7 +170,6 @@ void ndScene::SubmitJobs(dFloat32 timestep)
 		extJob[i].m_timestep = timestep;
 		extJobPtr[i] = &extJob[i];
 	}
-	//DispatchJobs(extJobPtr);
 	ExecuteJobs(extJobPtr);
 }
 

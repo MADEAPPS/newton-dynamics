@@ -49,7 +49,7 @@ if (MSVC)
 endif(MSVC)
 
 #target_include_directories(${projectName} PUBLIC . ../dgMeshUtil)
-target_link_libraries(${projectName} dCore)
+target_link_libraries(${projectName} ndCore ndCollision)
 
 install(TARGETS ${projectName} 
 		LIBRARY DESTINATION lib
