@@ -25,15 +25,15 @@ static void PhysicsFree(void* ptr)
 	free (ptr);
 }
 
-void *operator new (size_t size)
-{
-	return PhysicsAlloc(size);
-}
-
-void operator delete (void* ptr)
-{
-	PhysicsFree(ptr);
-}
+//void *operator new (size_t size)
+//{
+//	return PhysicsAlloc(size);
+//}
+//
+//void operator delete (void* ptr)
+//{
+//	PhysicsFree(ptr);
+//}
 
 class CheckMemoryLeaks
 {

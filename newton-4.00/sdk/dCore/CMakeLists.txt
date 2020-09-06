@@ -31,6 +31,14 @@ if (MSVC)
 		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudCoreStdAfx.h")
 		set_source_files_properties(dCoreStdAfx.cpp PROPERTIES COMPILE_FLAGS "/YcdCoreStdAfx.h")
 	endif()
+
+	if (NEWTON_BUILD_TEST AND NEWTON_BUILD_SHARED_LIBS)
+		add_custom_command(
+			TARGET ${projectName} POST_BUILD
+			COMMAND ${CMAKE_COMMAND}
+			ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/applications/test/${CMAKE_CFG_INTDIR}/$<TARGET_FILE_NAME:${projectName}>)
+	endif ()
+
 endif(MSVC)
 
 target_include_directories(${projectName} PUBLIC .)

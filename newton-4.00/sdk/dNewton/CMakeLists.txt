@@ -19,6 +19,7 @@ endif()
 
 #source and header files
 file(GLOB CPP_SOURCE *.h *.cpp)
+file(GLOB HEADERS *.h)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
@@ -38,10 +39,18 @@ else()
 endif()
 
 if (MSVC)
-   if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
-	  set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundNewtonStdafx.h")
-      set_source_files_properties(ndNewtonStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndNewtonStdafx.h")
-   endif()
+	if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
+		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YundNewtonStdafx.h")
+		set_source_files_properties(ndNewtonStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcndNewtonStdafx.h")
+	endif()
+
+	if (NEWTON_BUILD_TEST AND NEWTON_BUILD_SHARED_LIBS)
+		add_custom_command(
+			TARGET ${projectName} POST_BUILD
+			COMMAND ${CMAKE_COMMAND}
+			ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/applications/test/${CMAKE_CFG_INTDIR}/$<TARGET_FILE_NAME:${projectName}>)
+	endif ()
+
 endif(MSVC)
 
 #target_include_directories(${projectName} PUBLIC . ../dgMeshUtil)

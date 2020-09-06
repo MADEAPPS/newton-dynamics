@@ -42,11 +42,11 @@ add_subdirectory(dCollision)
 #if (NEWTON_WITH_SSE_PLUGIN)
 #	add_subdirectory(dgNewtonSse)
 #endif()
-#
+
 #if (NEWTON_WITH_SSE4_PLUGIN)
 #	add_subdirectory(dgNewtonSse4.2)
 #endif()
-#
+
 #if (NEWTON_WITH_AVX_PLUGIN)
 #	if(ANDROID)
 #		message(FATAL_ERROR "NEWTON_WITH_AVX_PLUGIN and ANDROID are not compatible")
@@ -57,7 +57,7 @@ add_subdirectory(dCollision)
 #if (NEWTON_WITH_AVX2_PLUGIN)
 #	add_subdirectory(dgNewtonAvx2)
 #endif()
-#
+
 #if (NEWTON_WITH_REFERENCE_GPU_PLUGIN)
 #	if(ANDROID)
 #		message(FATAL_ERROR "NEWTON_WITH_REFERENCE_GPU_PLUGIN and ANDROID are not compatible")
