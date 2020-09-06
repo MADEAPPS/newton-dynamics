@@ -19,7 +19,7 @@ cmake_minimum_required(VERSION 3.4.0)
 
 if (NEWTON_BUILD_TEST STREQUAL "ON")
 	#message("BUILDING TEST.")
-	add_subdirectory(test)
+	add_subdirectory(ndTest)
 endif()
 
 if (NEWTON_BUILD_SANDBOX_DEMOS STREQUAL "ON")
