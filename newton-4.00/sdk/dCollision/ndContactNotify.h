@@ -53,6 +53,10 @@ class ndContactNotify: public dClassAlloc
 		return true;
 	}
 
+	virtual void OnContactCallback(dInt32 threadIndex, const ndContact* const contact, dFloat32 timestep)
+	{
+	}
+
 	protected:
 	ndScene* m_broadPhase;
 	friend class ndScene;

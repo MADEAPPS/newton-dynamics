@@ -39,21 +39,23 @@ class ndWorld::ndWorldMixedScene: public ndSceneMixed
 
 		// do the a pre-physics step 
 		m_lru = m_lru + 1;
+		SetTimestep(timestep);
+
 		BuildBodyArray();
-		m_world->UpdateSkeletons(timestep);
-		m_world->ApplyExternalForces(timestep);
-		m_world->UpdatePrelisteners(timestep);
-		//UpdateSleepState(timestep);
+		m_world->UpdateSkeletons();
+		m_world->ApplyExternalForces();
+		m_world->UpdatePrelisteners();
+		//UpdateSleepState();
 		
 		// update the collision system
-		UpdateAabb(m_timestep);
-		FindCollidingPairs(m_timestep);
+		UpdateAabb();
+		FindCollidingPairs();
 		AttachNewContact();
-		CalculateContacts(m_timestep);
+		CalculateContacts();
 		
 		// calculate internal forces, integrate bodies and update matrices.
-		m_world->UpdateDynamics(timestep);
-		m_world->UpdatePostlisteners(timestep);
+		m_world->UpdateDynamics();
+		m_world->UpdatePostlisteners();
 	}
 
 	void ThreadFunction()
@@ -77,8 +79,9 @@ class ndWorld::ndWorldMixedScene: public ndSceneMixed
 				SubStepUpdate(timestep);
 			}
 
-			TransformUpdate(m_world->m_timestep);
-			m_world->UpdateListenersPostTransform(m_world->m_timestep);
+			m_world->m_scene->SetTimestep(m_world->m_timestep);
+			TransformUpdate();
+			m_world->UpdateListenersPostTransform();
 		}
 		m_world->m_lastExecutionTime = (dGetTimeInMicrosenconds() - timeAcc) * dFloat32(1.0e-6f);
 	}
@@ -105,27 +108,27 @@ ndWorld::~ndWorld()
 	delete m_scene;
 }
 
-void ndWorld::UpdatePrelisteners(dFloat32 timestep)
+void ndWorld::UpdatePrelisteners()
 {
 }
 
-void ndWorld::UpdatePostlisteners(dFloat32 timestep)
+void ndWorld::UpdatePostlisteners()
 {
 }
 
-void ndWorld::UpdateDynamics(dFloat32 timestep)
+void ndWorld::UpdateDynamics()
 {
 }
 
-void ndWorld::UpdateSkeletons(dFloat32 timestep)
+void ndWorld::UpdateSkeletons()
 {
 }
 
-void ndWorld::UpdateListenersPostTransform(dFloat32 timestep)
+void ndWorld::UpdateListenersPostTransform()
 {
 }
 
-void ndWorld::ApplyExternalForces(dFloat32 timestep)
+void ndWorld::ApplyExternalForces()
 {
 	D_TRACKTIME();
 	class ndApplyExternalForces: public ndScene::ndBaseJob
@@ -151,7 +154,7 @@ void ndWorld::ApplyExternalForces(dFloat32 timestep)
 			}
 		}
 	};
-	m_scene->SubmitJobs<ndApplyExternalForces>(timestep);
+	m_scene->SubmitJobs<ndApplyExternalForces>();
 }
 
 

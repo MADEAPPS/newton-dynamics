@@ -39,14 +39,15 @@ class ndShapeBox: public ndShapeConvex
 	D_COLLISION_API virtual void MassProperties();
 
 	D_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
+	D_COLLISION_API virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
 	D_COLLISION_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 	D_COLLISION_API virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
+	const dConvexSimplexEdge** ndShapeBox::GetVertexToEdgeMapping() const;
+	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 /*
 	
-	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
-	virtual dInt32 CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 	virtual const dConvexSimplexEdge** GetVertexToEdgeMapping() const;
 	
 	virtual dInt32 CalculateSignature () const;

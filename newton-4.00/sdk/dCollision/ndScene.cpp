@@ -20,8 +20,8 @@
 */
 
 #include "ndCollisionStdafx.h"
-#include "ndShapeNull.h"
 #include "ndScene.h"
+#include "ndShapeNull.h"
 #include "ndBodyNotify.h"
 #include "ndBodyKinematic.h"
 #include "ndContactNotify.h"
@@ -168,9 +168,11 @@ ndScene::ndScene()
 	,m_contactList()
 	,m_tmpBodyArray()
 	,m_activeContacts()
+	,m_contactLock()
 	,m_rootNode(nullptr)
 	,m_contactNotifyCallback(new ndContactNotify())
 	,m_lru(D_CONTACT_DELAY_FRAMES)
+	,m_timestep(dFloat32 (0.0f))
 	,m_fullScan(true)
 {
 	m_tmpBodyArray.Resize(256);
@@ -183,6 +185,7 @@ ndScene::~ndScene()
 	Sync();
 	Finish();
 	delete m_contactNotifyCallback;
+	ndContactPointList::FlushFreeList();
 }
 
 void ndScene::CollisionOnlyUpdate()
@@ -190,11 +193,11 @@ void ndScene::CollisionOnlyUpdate()
 	D_TRACKTIME();
 	m_lru = m_lru + 1;
 	BuildBodyArray();
-	UpdateAabb(m_timestep);
+	UpdateAabb();
 	BalanceBroadPhase();
-	FindCollidingPairs(m_timestep);
+	FindCollidingPairs();
 	AttachNewContact();
-	CalculateContacts(m_timestep);
+	CalculateContacts();
 }
 
 void ndScene::ThreadFunction()
@@ -828,7 +831,7 @@ ndSceneNode* ndScene::BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firs
 	}
 }
 
-void ndScene::UpdateTransform(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body)
+void ndScene::UpdateTransform(dInt32 threadIndex, ndBodyKinematic* const body)
 {
 	if (!body->m_equilibrium)
 	{
@@ -840,7 +843,7 @@ void ndScene::UpdateTransform(dInt32 threadIndex, dFloat32 timestep, ndBodyKinem
 	}
 }
 
-void ndScene::UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body)
+void ndScene::UpdateAabb(dInt32 threadIndex, ndBodyKinematic* const body)
 {
 	if (!body->m_equilibrium)
 	{
@@ -942,42 +945,12 @@ bool ndScene::ValidateContactCache(ndContact* const contact, const dVector& time
 	return false;
 }
 
-/*
-void ntBroadPhase::CalculatePairContacts(dInt32 threadIndex, ntPair* const pair) const
-{
-	ndContactPoint contacts[D_MAX_CONTATCS];
-
-	//pair->m_cacheIsValid = false;
-	//pair->m_contactBuffer = contacts;
-	ndContactSolver contactSolver()
-	//m_world->CalculateContacts(pair, threadID, false, false);
-
-	//if (pair->m_contactCount) 
-	//{
-	//	dgAssert(pair->m_contactCount <= (DG_CONSTRAINT_MAX_ROWS / 3));
-	//	m_world->ProcessContacts(pair, threadID);
-	//	KinematicBodyActivation(pair->m_contact);
-	//}
-	//else {
-	//	if (pair->m_cacheIsValid) {
-	//		KinematicBodyActivation(pair->m_contact);
-	//	}
-	//	else {
-	//		pair->m_contact->m_maxDOF = 0;
-	//	}
-	//}
-}
-*/
-
-void ndScene::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep, ndContact* const contact)
+void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contact)
 {
 	//DG_TRACKTIME();
-	//ntWorld* const world = (ntWorld*)m_world;
 	ndBodyKinematic* const body0 = contact->GetBody0();
 	ndBodyKinematic* const body1 = contact->GetBody1();
 	
-	//dAssert(body0 != m_world->m_sentinelBody);
-	//dAssert(body1 != m_world->m_sentinelBody);
 	dAssert(body0->GetBroadPhase() == this);
 	dAssert(body1->GetBroadPhase() == this);
 	if (!(body0->m_collideWithLinkedBodies & body1->m_collideWithLinkedBodies)) 
@@ -987,53 +960,271 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep, ndCo
 	//		return;
 	//	}
 	}
-	
-	//const dgContactMaterial* const material = contact->m_material;
-	//if (material->m_flags & dgContactMaterial::m_collisionEnable) {
-	//	dgInt32 processContacts = 1;
-	//	if (material->m_aabbOverlap) {
-	//		processContacts = material->m_aabbOverlap(*contact, timestep, threadIndex);
-	//	}
-	//	if (processContacts) {
-	//		dgPair pair;
-	//		dAssert(!body0->m_collision->IsType(dgCollision::dgCollisionNull_RTTI));
-	//		dAssert(!body1->m_collision->IsType(dgCollision::dgCollisionNull_RTTI));
-	//
-	//		pair.m_contact = contact;
-	//		pair.m_timestep = timestep;
-	//		CalculatePairContacts(&pair, threadIndex);
-	//	}
-	//}
-	if (m_contactNotifyCallback)
-	{
-		bool processContacts = m_contactNotifyCallback->OnAaabbOverlap(contact, timestep);
-		if (processContacts)
-		{
-			//ntPair pair;
-			dAssert(!body0->GetCollisionShape().GetShape()->GetAsShapeNull());
-			dAssert(!body1->GetCollisionShape().GetShape()->GetAsShapeNull());
-			
-			//pair.m_contact = contact;
-			//pair.m_timestep = timestep;
-			ndContactSolver contactSolver(body0->GetCollisionShape(), body1->GetCollisionShape());
-			contactSolver.m_separatingVector = contact->m_separatingVector;
-			contactSolver.m_timestep = timestep;
-			contactSolver.m_ccdMode = false;
-			contactSolver.m_intersectionTestOnly = false;
 
-			ndContactPoint contactBuffer[D_MAX_CONTATCS];
-			//dInt32 count = contactSolver.CalculatePairContacts(threadIndex, contactBuffer);
-			//dAssert(0);
-			//count = 0;
+	dAssert(m_contactNotifyCallback);
+	bool processContacts = m_contactNotifyCallback->OnAaabbOverlap(contact, m_timestep);
+	if (processContacts)
+	{
+		//ntPair pair;
+		dAssert(!body0->GetCollisionShape().GetShape()->GetAsShapeNull());
+		dAssert(!body1->GetCollisionShape().GetShape()->GetAsShapeNull());
+			
+		//pair.m_contact = contact;
+		//pair.m_timestep = timestep;
+		ndContactPoint contactBuffer[D_MAX_CONTATCS];
+		ndContactSolver contactSolver(contact);
+		contactSolver.m_separatingVector = contact->m_separatingVector;
+		contactSolver.m_timestep = m_timestep;
+		contactSolver.m_ccdMode = false;
+		contactSolver.m_intersectionTestOnly = false;
+		contactSolver.m_contactBuffer = contactBuffer;
+		
+		dInt32 count = contactSolver.CalculatePairContacts(threadIndex);
+		if (count)
+		{
+			dAssert(count <= (D_CONSTRAINT_MAX_ROWS / 3));
+			//m_world->ProcessContacts(pair, threadID);
+			ProcessContacts(threadIndex, count, &contactSolver);
+			dAssert(0);
+			//KinematicBodyActivation(pair->m_contact);
 		}
 	}
 }
 
-void ndScene::CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ndContact* const contact)
+void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContactSolver* const contactSolver)
+{
+	ndContact* const contact = contactSolver->m_contact;
+	contact->m_positAcc = dVector::m_zero;
+	contact->m_rotationAcc = dQuaternion();
+
+//	PopulateContacts(pair, threadIndex);
+
+	ndBodyKinematic* const body0 = contact->m_body0;
+	ndBodyKinematic* const body1 = contact->m_body1;
+	dAssert(body0);
+	dAssert(body1);
+	dAssert(body0 != body1);
+
+	//const dgContactMaterial* const material = contact->m_material;
+	const ndContactPoint* const contactArray = contactSolver->m_contactBuffer;
+	
+	//if (material->m_flags & dgContactMaterial::m_resetSkeletonSelfCollision) {
+	//	contact->ResetSkeletonSelftCollision();
+	//}
+	//
+	//if (material->m_flags & dgContactMaterial::m_resetSkeletonIntraCollision) {
+	//	contact->ResetSkeletonIntraCollision();
+	//}
+	//
+	//dInt32 contactCount = pair->m_contactCount;
+	//dgList<dgContactMaterial>& list = *contact;
+	//
+	//contact->m_timeOfImpact = pair->m_timestep;
+
+	dInt32 count = 0;
+	dVector cachePosition[D_MAX_CONTATCS];
+	ndContactPointList::dListNode* nodes[D_MAX_CONTATCS];
+	ndContactPointList& list = contact->m_contacPointsList;
+	for (ndContactPointList::dListNode* contactNode = list.GetFirst(); contactNode; contactNode = contactNode->GetNext()) 
+	{
+		nodes[count] = contactNode;
+		cachePosition[count] = contactNode->GetInfo().m_point;
+		count++;
+	}
+	
+	const dVector& v0 = body0->m_veloc;
+	const dVector& w0 = body0->m_omega;
+	const dVector& com0 = body0->m_globalCentreOfMass;
+	
+	const dVector& v1 = body1->m_veloc;
+	const dVector& w1 = body1->m_omega;
+	const dVector& com1 = body1->m_globalCentreOfMass;
+
+	dVector controlDir0(dVector::m_zero);
+	dVector controlDir1(dVector::m_zero);
+	dVector controlNormal(contactArray[0].m_normal);
+	dVector vel0(v0 + w0.CrossProduct(contactArray[0].m_point - com0));
+	dVector vel1(v1 + w1.CrossProduct(contactArray[0].m_point - com1));
+	dVector vRel(vel1 - vel0);
+	dAssert(controlNormal.m_w == dFloat32(0.0f));
+	dVector tangDir(vRel - controlNormal * vRel.DotProduct(controlNormal));
+	dAssert(tangDir.m_w == dFloat32(0.0f));
+	dFloat32 diff = tangDir.DotProduct(tangDir).GetScalar();
+	
+	dInt32 staticMotion = 0;
+	if (diff <= dFloat32(1.0e-2f)) 
+	{
+		staticMotion = 1;
+		if (dAbs(controlNormal.m_z) > dFloat32(0.577f)) 
+		{
+			tangDir = dVector(-controlNormal.m_y, controlNormal.m_z, dFloat32(0.0f), dFloat32(0.0f));
+		}
+		else 
+		{
+			tangDir = dVector(-controlNormal.m_y, controlNormal.m_x, dFloat32(0.0f), dFloat32(0.0f));
+		}
+		controlDir0 = controlNormal.CrossProduct(tangDir);
+		dAssert(controlDir0.m_w == dFloat32(0.0f));
+		dAssert(controlDir0.DotProduct(controlDir0).GetScalar() > dFloat32(1.0e-8f));
+		controlDir0 = controlDir0.Normalize();
+		controlDir1 = controlNormal.CrossProduct(controlDir0);
+		dAssert(dAbs(controlNormal.DotProduct(controlDir0.CrossProduct(controlDir1)).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
+	}
+	
+	//dFloat32 maxImpulse = dFloat32(-1.0f);
+	for (dInt32 i = 0; i < contactCount; i++) 
+	{
+		dInt32 index = -1;
+		dFloat32 min = dFloat32(1.0e20f);
+		ndContactPointList::dListNode* contactNode = nullptr;
+		for (dInt32 j = 0; j < count; j++) 
+		{
+			dAssert(0);
+			dVector v(cachePosition[j] - contactArray[i].m_point);
+			dAssert(v.m_w == dFloat32(0.0f));
+			diff = v.DotProduct(v).GetScalar();
+			if (diff < min) 
+			{
+				min = diff;
+				index = j;
+				contactNode = nodes[j];
+			}
+		}
+	
+		if (contactNode) 
+		{
+			count--;
+			dAssert(index != -1);
+			nodes[index] = nodes[count];
+			cachePosition[index] = cachePosition[count];
+		}
+		else 
+		{
+			dScopeSpinLock lock(m_contactLock);
+			contactNode = list.Append();
+		}
+	
+	//	dgContactMaterial* const contactMaterial = &contactNode->GetInfo();
+		ndContactMaterial* const contactPoint = &contactNode->GetInfo();
+	
+		dAssert(dCheckFloat(contactArray[i].m_point.m_x));
+		dAssert(dCheckFloat(contactArray[i].m_point.m_y));
+		dAssert(dCheckFloat(contactArray[i].m_point.m_z));
+		dAssert(contactArray[i].m_body0);
+		dAssert(contactArray[i].m_body1);
+		dAssert(contactArray[i].m_shapeInstance0);
+		dAssert(contactArray[i].m_shapeInstance1);
+		dAssert(contactArray[i].m_body0 == body0);
+		dAssert(contactArray[i].m_body1 == body1);
+		contactPoint->m_point = contactArray[i].m_point;
+		contactPoint->m_normal = contactArray[i].m_normal;
+		contactPoint->m_penetration = contactArray[i].m_penetration;
+		contactPoint->m_body0 = contactArray[i].m_body0;
+		contactPoint->m_body1 = contactArray[i].m_body1;
+		contactPoint->m_shapeInstance0 = contactArray[i].m_shapeInstance0;
+		contactPoint->m_shapeInstance1 = contactArray[i].m_shapeInstance1;
+		//contactPoint->m_shapeId0 = contactArray[i].m_shapeId0;
+		//contactPoint->m_shapeId1 = contactArray[i].m_shapeId1;
+		//contactPoint->m_softness = material->m_softness;
+		//contactPoint->m_skinThickness = material->m_skinThickness;
+		//contactPoint->m_restitution = material->m_restitution;
+		//contactPoint->m_staticFriction0 = material->m_staticFriction0;
+		//contactPoint->m_staticFriction1 = material->m_staticFriction1;
+		//contactPoint->m_dynamicFriction0 = material->m_dynamicFriction0;
+		//contactPoint->m_dynamicFriction1 = material->m_dynamicFriction1;
+	
+		//dAssert(dAbs(contactMaterial->m_normal.DotProduct(contactMaterial->m_normal).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-1f));
+		//contactMaterial->m_flags = dgContactMaterial::m_collisionEnable | (material->m_flags & (dgContactMaterial::m_friction0Enable | dgContactMaterial::m_friction1Enable));
+		//contactMaterial->m_userData = material->m_userData;
+	
+		if (staticMotion) 
+		{
+			if (contactPoint->m_normal.DotProduct(controlNormal).GetScalar() > dFloat32(0.9995f)) 
+			{
+				contactPoint->m_dir0 = controlDir0;
+				contactPoint->m_dir1 = controlDir1;
+			}
+			else 
+			{
+				if (dAbs(contactPoint->m_normal.m_z) > dFloat32(0.577f))
+				{
+					tangDir = dVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_z, dFloat32(0.0f), dFloat32(0.0f));
+				}
+				else 
+				{
+					tangDir = dVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_x, dFloat32(0.0f), dFloat32(0.0f));
+				}
+				contactPoint->m_dir0 = contactPoint->m_normal.CrossProduct(tangDir);
+				dAssert(contactPoint->m_dir0.m_w == dFloat32(0.0f));
+				dAssert(contactPoint->m_dir0.DotProduct(contactPoint->m_dir0).GetScalar() > dFloat32(1.0e-8f));
+				contactPoint->m_dir0 = contactPoint->m_dir0.Normalize();
+				contactPoint->m_dir1 = contactPoint->m_normal.CrossProduct(contactPoint->m_dir0);
+				dAssert(dAbs(contactPoint->m_normal.DotProduct(contactPoint->m_dir0.CrossProduct(contactPoint->m_dir1)).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
+			}
+		}
+		else 
+		{
+			dAssert(0);
+	//		dVector veloc0(v0 + w0.CrossProduct(contactMaterial->m_point - com0));
+	//		dVector veloc1(v1 + w1.CrossProduct(contactMaterial->m_point - com1));
+	//		dVector relReloc(veloc1 - veloc0);
+	//
+	//		dAssert(contactMaterial->m_normal.m_w == dFloat32(0.0f));
+	//		dFloat32 impulse = relReloc.DotProduct(contactMaterial->m_normal).GetScalar();
+	//		if (dAbs(impulse) > maxImpulse) {
+	//			maxImpulse = dAbs(impulse);
+	//		}
+	//
+	//		dVector tangentDir(relReloc - contactMaterial->m_normal.Scale(impulse));
+	//		dAssert(tangentDir.m_w == dFloat32(0.0f));
+	//		diff = tangentDir.DotProduct(tangentDir).GetScalar();
+	//		if (diff > dFloat32(1.0e-2f)) {
+	//			dAssert(tangentDir.m_w == dFloat32(0.0f));
+	//			//contactMaterial->m_dir0 = tangentDir.Scale (dgRsqrt (diff));
+	//			contactMaterial->m_dir0 = tangentDir.Normalize();
+	//		}
+	//		else {
+	//			if (dAbs(contactMaterial->m_normal.m_z) > dFloat32(0.577f)) {
+	//				tangentDir = dVector(-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_z, dFloat32(0.0f), dFloat32(0.0f));
+	//			}
+	//			else {
+	//				tangentDir = dVector(-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_x, dFloat32(0.0f), dFloat32(0.0f));
+	//			}
+	//			contactMaterial->m_dir0 = contactMaterial->m_normal.CrossProduct(tangentDir);
+	//			dAssert(contactMaterial->m_dir0.m_w == dFloat32(0.0f));
+	//			dAssert(contactMaterial->m_dir0.DotProduct(contactMaterial->m_dir0).GetScalar() > dFloat32(1.0e-8f));
+	//			contactMaterial->m_dir0 = contactMaterial->m_dir0.Normalize();
+	//		}
+	//		contactMaterial->m_dir1 = contactMaterial->m_normal.CrossProduct(contactMaterial->m_dir0);
+	//		dAssert(dAbs(contactMaterial->m_normal.DotProduct(contactMaterial->m_dir0.CrossProduct(contactMaterial->m_dir1)).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
+		}
+		dAssert(contactPoint->m_dir0.m_w == dFloat32(0.0f));
+		dAssert(contactPoint->m_dir0.m_w == dFloat32(0.0f));
+		dAssert(contactPoint->m_normal.m_w == dFloat32(0.0f));
+	}
+	
+	if (count) 
+	{
+		dAssert(0);
+		dScopeSpinLock lock(m_contactLock);
+		for (dInt32 i = 0; i < count; i++) 
+		{
+			list.Remove(nodes[i]);
+		}
+	}
+	
+	contact->m_maxDOF = dUnsigned32(3 * list.GetCount());
+	//if (material->m_processContactPoint) {
+	//	material->m_processContactPoint(*contact, pair->m_timestep, threadIndex);
+	//}
+	m_contactNotifyCallback->OnContactCallback(threadIndex, contact, m_timestep);
+}
+
+void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 {
 	const dUnsigned32 lru = m_lru - D_CONTACT_DELAY_FRAMES;
 
-	dVector deltaTime(timestep);
+	dVector deltaTime(m_timestep);
 	ndBodyKinematic* const body0 = contact->GetBody0();
 	ndBodyKinematic* const body1 = contact->GetBody1();
 	
@@ -1074,7 +1265,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ndContact
 			}
 			if (distance < D_NARROW_PHASE_DIST) 
 			{
-				CalculateJointContacts(threadIndex, timestep, contact);
+				CalculateJointContacts(threadIndex, contact);
 				if (contact->m_maxDOF) 
 				{
 					contact->m_timeOfImpact = dFloat32(1.0e10f);
@@ -1116,7 +1307,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ndContact
 	contact->m_killContact = contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
 }
 
-void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node, dFloat32 timestep)
+void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node)
 {
 	ndSceneNode* pool[D_BROADPHASE_MAX_STACK_DEPTH];
 	pool[0] = node;
@@ -1146,7 +1337,7 @@ void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node, 
 					{
 						if (test0 || (body1->m_invMass.m_w != dFloat32(0.0f)))
 						{
-							AddPair(body0, body1, timestep);
+							AddPair(body0, body1);
 						}
 					}
 					else 
@@ -1192,7 +1383,7 @@ void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node, 
 	}
 }
 
-bool ndScene::TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1, dFloat32 timestep) const
+bool ndScene::TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const
 {
 	//bool mass0 = (body0->m_invMass.m_w != dFloat32(0.0f));
 	//bool mass1 = (body1->m_invMass.m_w != dFloat32(0.0f));
@@ -1201,8 +1392,8 @@ bool ndScene::TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKin
 	//bool isKinematic0 = body0->IsRTTIType(ntBodyKinematic::m_kinematicBodyRTTI) != 0;
 	//bool isKinematic1 = body1->IsRTTIType(ntBodyKinematic::m_kinematicBodyRTTI) != 0;
 	//
-	//dAssert(!body0->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
-	//dAssert(!body1->GetCollision()->IsType(dgCollision::dgCollisionNull_RTTI));
+	//dAssert(!body0->GetCollision()->IsType(dgCollision::dgCollisionnullptr_RTTI));
+	//dAssert(!body1->GetCollision()->IsType(dgCollision::dgCollisionnullptr_RTTI));
 	//
 	//const dgBroadPhaseAggregate* const agreggate0 = body0->GetBroadPhaseAggregate();
 	//const dgBroadPhaseAggregate* const agreggate1 = body1->GetBroadPhaseAggregate();
@@ -1275,11 +1466,11 @@ ndContact* ndScene::FindContactJoint(ndBodyKinematic* const body0, ndBodyKinemat
 	}
 }
 
-void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dFloat32 timestep)
+void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 {
 	dAssert(body0);
 	dAssert(body1);
-	const bool test = TestOverlaping(body0, body1, timestep);
+	const bool test = TestOverlaping(body0, body1);
 	if (test) 
 	{
 		//ndContact* contact = m_contactCache.FindContactJoint(body0, body1);
@@ -1356,7 +1547,7 @@ void ndScene::AttachNewContact()
 	}
 }
 
-void ndScene::TransformUpdate(dFloat32 timestep)
+void ndScene::TransformUpdate()
 {
 	D_TRACKTIME();
 	class ndTransformUpdate : public ndBaseJob
@@ -1373,14 +1564,14 @@ void ndScene::TransformUpdate(dFloat32 timestep)
 
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
-				m_owner->UpdateTransform(threadIndex, m_timestep, bodyArray[i]);
+				m_owner->UpdateTransform(threadIndex, bodyArray[i]);
 			}
 		}
 	};
-	SubmitJobs<ndTransformUpdate>(timestep);
+	SubmitJobs<ndTransformUpdate>();
 }
 
-void ndScene::UpdateAabb(dFloat32 timestep)
+void ndScene::UpdateAabb()
 {
 	D_TRACKTIME();
 	class ndUpdateAabbJob: public ndBaseJob
@@ -1397,14 +1588,14 @@ void ndScene::UpdateAabb(dFloat32 timestep)
 	
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
-				m_owner->UpdateAabb(threadIndex, m_timestep, bodyArray[i]);
+				m_owner->UpdateAabb(threadIndex, bodyArray[i]);
 			}
 		}
 	};
-	SubmitJobs<ndUpdateAabbJob>(timestep);
+	SubmitJobs<ndUpdateAabbJob>();
 }
 
-void ndScene::FindCollidingPairs(dFloat32 timestep)
+void ndScene::FindCollidingPairs()
 {
 	D_TRACKTIME();
 	class ndFindCollidindPairs: public ndBaseJob
@@ -1421,7 +1612,7 @@ void ndScene::FindCollidingPairs(dFloat32 timestep)
 
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
-				m_owner->FindCollidinPairs(threadIndex, m_timestep, bodyArray[i]);
+				m_owner->FindCollidinPairs(threadIndex, bodyArray[i]);
 			}
 		}
 	
@@ -1429,10 +1620,10 @@ void ndScene::FindCollidingPairs(dFloat32 timestep)
 	};
 	
 	m_fullScan = true;
-	SubmitJobs<ndFindCollidindPairs>(timestep);
+	SubmitJobs<ndFindCollidindPairs>();
 }
 
-void ndScene::CalculateContacts(dFloat32 timestep)
+void ndScene::CalculateContacts()
 {
 	D_TRACKTIME();
 	class ndCalculateContacts: public ndBaseJob
@@ -1449,10 +1640,10 @@ void ndScene::CalculateContacts(dFloat32 timestep)
 	
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
-				m_owner->CalculateContacts(threadIndex, m_timestep, activeContacts[i]);
+				m_owner->CalculateContacts(threadIndex, activeContacts[i]);
 			}
 		}
 	};
 	
-	SubmitJobs<ndCalculateContacts>(timestep);
+	SubmitJobs<ndCalculateContacts>();
 }

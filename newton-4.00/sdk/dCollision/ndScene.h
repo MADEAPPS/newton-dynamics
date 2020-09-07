@@ -27,6 +27,7 @@
 #include "ndSceneNode.h"
 
 #define D_BROADPHASE_MAX_STACK_DEPTH	256
+#define D_PRUNE_CONTACT_TOLERANCE		dFloat32 (5.0e-2f)
 
 class ndContact;
 class ndRayCastNotify;
@@ -72,7 +73,10 @@ class ndScene
 	const dArray<ndBodyKinematic*>& GetWorkingBodyArray() const;
 
 	template <class T>
-	void SubmitJobs(dFloat32 timestep);
+	void SubmitJobs();
+
+	dFloat32 GetTimestep() const;
+	void SetTimestep(dFloat32 timestep);
 
 	D_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
 	D_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
@@ -87,11 +91,13 @@ class ndScene
 	bool ValidateContactCache(ndContact* const contact, const dVector& timestep) const;
 	dFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, dVector& minBox, dVector& maxBox) const;
 
-	virtual void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body) = 0;
-	D_COLLISION_API virtual void UpdateAabb(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body);
-	D_COLLISION_API virtual void UpdateTransform(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body);
-	D_COLLISION_API virtual void CalculateContacts(dInt32 threadIndex, dFloat32 timestep, ndContact* const contact);
-	D_COLLISION_API void CalculateJointContacts(dInt32 threadIndex, dFloat32 timestep, ndContact* const contact);
+	virtual void FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body) = 0;
+	D_COLLISION_API virtual void UpdateAabb(dInt32 threadIndex, ndBodyKinematic* const body);
+	D_COLLISION_API virtual void UpdateTransform(dInt32 threadIndex, ndBodyKinematic* const body);
+	D_COLLISION_API virtual void CalculateContacts(dInt32 threadIndex, ndContact* const contact); \
+
+	void CalculateJointContacts(dInt32 threadIndex, ndContact* const contact);
+	void ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContactSolver* const contactSolver);
 
 	void RotateLeft(ndSceneTreeNode* const node, ndSceneNode** const root);
 	void RotateRight(ndSceneTreeNode* const node, ndSceneNode** const root);
@@ -108,10 +114,10 @@ class ndScene
 	
 	D_COLLISION_API void BuildBodyArray();
 	D_COLLISION_API void AttachNewContact();
-	D_COLLISION_API void UpdateAabb(dFloat32 timestep);
-	D_COLLISION_API void TransformUpdate(dFloat32 timestep);
-	D_COLLISION_API void CalculateContacts(dFloat32 timestep);
-	D_COLLISION_API void FindCollidingPairs(dFloat32 timestep);
+	D_COLLISION_API void UpdateAabb();
+	D_COLLISION_API void TransformUpdate();
+	D_COLLISION_API void CalculateContacts();
+	D_COLLISION_API void FindCollidingPairs();
 
 	D_COLLISION_API virtual void ThreadFunction();
 	virtual void BalanceBroadPhase() = 0;
@@ -122,9 +128,9 @@ class ndScene
 	ndContact* FindContactJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 	ndBilateralJoint* FindBilateralJoint(ndBody* const body0, ndBody* const body1) const;
 
-	void AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dFloat32 timestep);
-	bool TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1, dFloat32 timestep) const;
-	void SubmitPairs(ndSceneNode* const leaftNode, ndSceneNode* const node, dFloat32 timestep);
+	void AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
+	bool TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const;
+	void SubmitPairs(ndSceneNode* const leaftNode, ndSceneNode* const node);
 
 	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& p0, const dVector& p1) const = 0;
 	dFloat32 RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const;
@@ -133,10 +139,11 @@ class ndScene
 	ndContactList m_contactList;
 	dArray<ndBodyKinematic*> m_tmpBodyArray;
 	dArray<ndContact*> m_activeContacts;
+	dSpinLock m_contactLock;
 	ndSceneNode* m_rootNode;
 	ndContactNotify* m_contactNotifyCallback;
-	dUnsigned32 m_lru;
 	dFloat32 m_timestep;
+	dUnsigned32 m_lru;
 	bool m_fullScan;
 
 	static dVector m_velocTol;
@@ -163,7 +170,7 @@ inline const dArray<ndBodyKinematic*>& ndScene::GetWorkingBodyArray() const
 }
 
 template <class T>
-void ndScene::SubmitJobs(dFloat32 timestep)
+void ndScene::SubmitJobs()
 {
 	dAtomic<dInt32> it(0);
 	T extJob[D_MAX_THREADS_COUNT];
@@ -174,10 +181,20 @@ void ndScene::SubmitJobs(dFloat32 timestep)
 	{
 		extJob[i].m_it = &it;
 		extJob[i].m_owner = this;
-		extJob[i].m_timestep = timestep;
+		extJob[i].m_timestep = m_timestep;
 		extJobPtr[i] = &extJob[i];
 	}
 	ExecuteJobs(extJobPtr);
+}
+
+inline dFloat32 ndScene::GetTimestep() const
+{
+	return m_timestep;
+}
+
+inline void ndScene::SetTimestep(dFloat32 timestep)
+{
+	m_timestep = timestep;
 }
 
 D_INLINE dFloat32 ndScene::CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, dVector& minBox, dVector& maxBox) const

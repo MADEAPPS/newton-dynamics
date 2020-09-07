@@ -81,11 +81,11 @@ class dGoogol: public dClassAlloc
 	dUnsigned64 m_mantissa[DG_GOOGOL_SIZE];
 
 	public:
-	static dGoogol m_zero; 
-	static dGoogol m_one; 
-	static dGoogol m_two; 
-	static dGoogol m_three; 
-	static dGoogol m_half; 
+	D_CORE_API static dGoogol m_zero; 
+	D_CORE_API static dGoogol m_one; 
+	D_CORE_API static dGoogol m_two; 
+	D_CORE_API static dGoogol m_three; 
+	D_CORE_API static dGoogol m_half; 
 };
 
 class dHugeVector: public dTemplateVector<dGoogol>

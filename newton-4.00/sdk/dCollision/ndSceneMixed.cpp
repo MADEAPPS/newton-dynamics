@@ -224,7 +224,7 @@ void ndSceneMixed::BalanceBroadPhase()
 	UpdateFitness(m_fitness, m_treeEntropy, &m_rootNode);
 }
 
-void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body)
+void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body)
 {
 	ndSceneNode* const leafNode = body->GetBroadPhaseBodyNode();
 
@@ -245,7 +245,7 @@ void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ndBo
 			if (sibling != ptr) 
 			{
 				//SubmitPairs(bodyNode, sibling, timestep, 0, threadIndex);
-				SubmitPairs(leafNode, sibling, timestep);
+				SubmitPairs(leafNode, sibling);
 			}
 		}
 	}

@@ -44,7 +44,7 @@ class ndSceneMixed : public ndScene
 	private:
 	D_COLLISION_API void AddNode(ndSceneNode* const newNode);
 	D_COLLISION_API void RemoveNode(ndSceneNode* const newNode);
-	D_COLLISION_API void FindCollidinPairs(dInt32 threadIndex, dFloat32 timestep, ndBodyKinematic* const body);
+	D_COLLISION_API void FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body);
 
 	dFloat64 m_treeEntropy;
 	ndFitnessList m_fitness;

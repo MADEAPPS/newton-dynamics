@@ -33,14 +33,9 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeConvex: public ndShape
 {
 	public:
-/*	
-	virtual void CalcAABB (const dMatrix& matrix, dVector& p0, dVector& p1) const;
-	virtual dVector SupportVertex (const dVector& dir, dInt32* const vertexIndex) const;
-	virtual dInt32 CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const;
-	virtual dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
 
-	bool IntesectionTest (dShapeParamProxy& proxy) const;
-*/
+	//bool IntesectionTest (dShapeParamProxy& proxy) const;
+
 	protected:
 	class dConvexSimplexEdge
 	{
@@ -63,11 +58,28 @@ class ndShapeConvex: public ndShape
 	D_COLLISION_API virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
 	D_COLLISION_API virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
 
+	D_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
+	D_COLLISION_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
+	D_COLLISION_API virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
+	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+
+	bool SanityCheck(dInt32 count, const dVector& normal, dVector* const contactsOut) const;
+	dInt32 RectifyConvexSlice(dInt32 count, const dVector& normal, dVector* const contactsOut) const;
 	virtual dInt32 GetConvexVertexCount() const { return m_vertexCount; }
 	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const
 	{
 		dAssert(0);
 		return SupportVertexSpecial(dir, skinThickness, vertexIndex);
+	}
+
+	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const
+	{
+		return point;
+	}
+
+	virtual const dConvexSimplexEdge** GetVertexToEdgeMapping() const 
+	{ 
+		return nullptr; 
 	}
 
 /*
@@ -83,14 +95,7 @@ class ndShapeConvex: public ndShape
 	dVector CalculateVolumeIntegral (const dgPlane& plane) const; 
 	
 	bool SanityCheck (dgPolyhedra& hull) const;
-	bool SanityCheck(dInt32 count, const dVector& normal, dVector* const contactsOut) const;
-
-	dInt32 RectifyConvexSlice (dInt32 count, const dVector& normal, dVector* const contactsOut) const;
-	virtual dVector SupportVertexSpecialProjectPoint (const dVector& point, const dVector& dir) const;
-	virtual const dConvexSimplexEdge** GetVertexToEdgeMapping() const {return NULL;}
-
 	dInt32 BuildCylinderCapPoly (dFloat32 radius, const dMatrix& transform, dVector* const vertexOut) const;
-	
 	
 	friend class dgWorld;
 	friend class dgBroadPhase;

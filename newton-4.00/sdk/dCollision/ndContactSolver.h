@@ -58,15 +58,12 @@ D_MSV_NEWTON_ALIGN_32
 class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>  
 {
 	public: 
-	ndContactSolver(const ndShapeInstance& instance0, const ndShapeInstance& instance1);
+	ndContactSolver(ndContact* const contact);
+	//ndContactSolver(const ndShapeInstance& instance0, const ndShapeInstance& instance1);
 	//ndContactSolver(dCollisionParamProxy* const proxy);
 	//ndContactSolver(ndShapeInstance* const instance0);
-
-	
 	//dInt32 CalculateConvexCastContacts();
-	
 	//dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, ndContactPoint& contactOut);
-
 	//const dVector& GetNormal() const {return m_normal;}
 	//const dVector& GetPoint0() const {return m_closestPoint0;}
 	//const dVector& GetPoint1() const {return m_closestPoint1;}
@@ -75,7 +72,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 
 	dInt32 ConvexContacts();
 	dInt32 CalculateConvexToConvexContacts();
-	dInt32 CalculatePairContacts(dInt32 threadIndex, ndContactPoint* const buffer);
+	dInt32 CalculatePairContacts(dInt32 threadIndex);
 	
 	private:
 	class dgPerimenterEdge
@@ -99,44 +96,50 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	
 	//
 	//D_INLINE void TranslateSimplex(const dVector& step);
-	//
-	//D_INLINE void CalculateContactFromFeacture(dInt32 featureType);
 	//D_INLINE dgPerimenterEdge* OldReduceContacts(dgPerimenterEdge* poly, dInt32 maxCount) const;
 	//
 	//bool SanityCheck() const;
-	//dInt32 ConvexPolygonsIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dInt32 maxContacts) const;
-	//dInt32 ConvexPolygonToLineIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dVector* const mem) const;
-	//dInt32 CalculateContacts (const dVector& point0, const dVector& point1, const dVector& normal);
 	//dInt32 CalculateIntersectingPlane(dInt32 count);
 
 	dInt32 CalculateClosestSimplex();
 	bool CalculateClosestPoints();
 	dInt32 ConvexToConvexContacts();
 
+	dInt32 PruneContacts(dInt32 count, dInt32 maxCount) const;
+	dInt32 CalculateContacts(const dVector& point0, const dVector& point1, const dVector& normal);
+	dInt32 ConvexPolygonsIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dInt32 maxContacts) const;
+	dInt32 ConvexPolygonToLineIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dVector* const mem) const;
+
 	D_INLINE dBigVector ReduceLine(dInt32& indexOut);
 	D_INLINE dBigVector ReduceTriangle (dInt32& indexOut);
 	D_INLINE dBigVector ReduceTetrahedrum (dInt32& indexOut);
 	D_INLINE void SupportVertex(const dVector& dir, dInt32 vertexIndex);
 
-	//dVector m_normal;
-	//dVector m_closestPoint0;
-	//dVector m_closestPoint1;
-	//dCollisionParamProxy* m_proxy;
-	//ntBodyKinematic* const body0;
-	//ntBodyKinematic* const body1;
+	D_INLINE void CalculateContactFromFeacture(dInt32 featureType);
+
 	ndShapeInstance m_instance0;
 	ndShapeInstance m_instance1;
+	dVector m_closestPoint0;
+	dVector m_closestPoint1;
 	dVector m_separatingVector;
+	union
+	{
+		dVector m_buffer[2 * D_CONVEX_MINK_MAX_POINTS];
+		struct
+		{
+			dVector m_hullDiff[D_CONVEX_MINK_MAX_POINTS];
+			dVector m_hullSum[D_CONVEX_MINK_MAX_POINTS];
+		};
+	};
 
-	dVector m_hullDiff[D_CONVEX_MINK_MAX_POINTS];
-	dVector m_hullSum[D_CONVEX_MINK_MAX_POINTS];
-
-	//ndContact* m_contact;
+	ndContact* m_contact;
 	//dgFaceFreeList* m_freeFace; 
 
+	ndContactPoint* m_contactBuffer;
 	dFloat32 m_timestep;
 	dFloat32 m_closestDistance;
 	dFloat32 m_separationDistance;
+	dFloat32 m_skinThickness;
 
 	dInt32 m_maxCount;
 	dInt32 m_vertexIndex;

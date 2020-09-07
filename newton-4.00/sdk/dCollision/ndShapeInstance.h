@@ -62,9 +62,9 @@ class ndShapeInstance: public dClassAlloc
 
 	D_COLLISION_API ndShapeInstance(ndShape* const shape);
 	D_COLLISION_API ndShapeInstance(const ndShapeInstance& instance);
-	//dShapeInstance(const dShapeInstance& meshInstance, const dShape* const shape);
-	//dShapeInstance(const dgWorld* const world, const dShape* const childCollision, dInt32 shapeID, const dMatrix& matrix);
-	//dShapeInstance(const dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
+	//ndShapeInstance(const ndShapeInstance& meshInstance, const dShape* const shape);
+	//ndShapeInstance(const dgWorld* const world, const dShape* const childCollision, dInt32 shapeID, const dMatrix& matrix);
+	//ndShapeInstance(const dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
 	D_COLLISION_API ~ndShapeInstance();
 	D_COLLISION_API ndShapeInstance& operator=(const ndShapeInstance& src);
 
@@ -78,18 +78,21 @@ class ndShapeInstance: public dClassAlloc
 	const ndShape* GetShape() const;
 	dVector SupportVertex(const dVector& dir) const;
 	dMatrix GetScaledTransform(const dMatrix& matrix) const;
-	dVector SupportVertexSpecial(const dVector& dir, dInt32* const vertexIndex) const;
 	void CalculateFastAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
-
+	dVector SupportVertexSpecial(const dVector& dir, dInt32* const vertexIndex) const;
+	dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
+	dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 
 	const dMatrix& GetLocalMatrix() const;
 	const dMatrix& GetGlobalMatrix() const;
 	void SetGlobalMatrix(const dMatrix& matrix);
 
+	bool GetCollisionMode() const;
+	void SetCollisionMode(bool mode);
 	dInt32 GetConvexVertexCount() const;
 
 #if 0
-	dShapeInstance* AddRef ();
+	ndShapeInstance* AddRef ();
 	dInt32 Release ();
 
 	void SetScale (const dVector& scale);
@@ -114,7 +117,7 @@ class ndShapeInstance: public dClassAlloc
 	void SetMaterial (const dShapeInfo::dgInstanceMaterial& userData);
 
 	const void* GetCollisionHandle () const;
-	const dShapeInstance* GetParent () const;
+	const ndShapeInstance* GetParent () const;
 
 	dVector GetBoxSize() const;
 	dVector GetBoxOrigin() const;
@@ -133,9 +136,6 @@ class ndShapeInstance: public dClassAlloc
 	dInt32 IsType (dShape::dgRTTI type) const;
 	dgMemoryAllocator* GetAllocator() const;
 
-	bool GetCollisionMode() const;
-	void SetCollisionMode(bool mode);
-
 	void SetBreakImpulse(dFloat32 force);
 	dFloat32 GetBreakImpulse() const;
 
@@ -146,14 +146,12 @@ class ndShapeInstance: public dClassAlloc
 
 	dFloat32 GetBoxMinRadius () const; 
 	dFloat32 GetBoxMaxRadius () const; 
-	dInt32 CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 
 	dInt32 CalculateSignature () const;
 	void SetCollisionBBox (const dVector& p0, const dVector& p1);
 
 	void Serialize(dgSerialize callback, void* const userData, bool saveShape = true) const;
 	dVector CalculateBuoyancyVolume (const dMatrix& matrix, const dVector& fluidPlane) const;
-	dVector SupportVertexSpecialProjectPoint (const dVector& point, const dVector& dir) const;
 
 	dFloat32 GetSkinThickness() const;
 	void SetSkinThickness(dFloat32 thickness);
@@ -165,8 +163,7 @@ class ndShapeInstance: public dClassAlloc
 	const dgWorld* m_world;
 	const dShape* m_shape;
 	const void* m_subCollisionHandle;
-	const dShapeInstance* m_parent;
-	dInt32 m_collisionMode;
+	const ndShapeInstance* m_parent;
 	dInt32 m_refCount;
 	
 	bool m_isExternal;
@@ -183,12 +180,13 @@ class ndShapeInstance: public dClassAlloc
 	const ndBody* m_ownerBody;
 	dFloat32 m_skinThickness;
 	ndScaleType m_scaleType;
+	bool m_collisionMode;
 
 	static dVector m_padding;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #if 0
-D_INLINE dShapeInstance::dShapeInstance(const dShapeInstance& meshInstance, const dShape* const shape)
+D_INLINE ndShapeInstance::ndShapeInstance(const ndShapeInstance& meshInstance, const dShape* const shape)
 	:m_globalMatrix(meshInstance.m_globalMatrix)
 	,m_localMatrix (meshInstance.m_localMatrix)
 	,m_aligmentMatrix (meshInstance.m_aligmentMatrix)
@@ -211,13 +209,13 @@ D_INLINE dShapeInstance::dShapeInstance(const dShapeInstance& meshInstance, cons
 	}
 }
 
-D_INLINE dShapeInstance* dShapeInstance::AddRef () 
+D_INLINE ndShapeInstance* ndShapeInstance::AddRef () 
 {
 	m_refCount ++;
 	return this;
 }
 
-D_INLINE dInt32 dShapeInstance::Release ()
+D_INLINE dInt32 ndShapeInstance::Release ()
 {
 	m_refCount --;
 	if (m_refCount) {
@@ -227,27 +225,27 @@ D_INLINE dInt32 dShapeInstance::Release ()
 	return 0;
 }
 
-D_INLINE dInt32 dShapeInstance::IsType (dShape::dgRTTI type) const 
+D_INLINE dInt32 ndShapeInstance::IsType (dShape::dgRTTI type) const 
 {
 	return m_shape->IsType (type);
 }
 
-D_INLINE const dgWorld* dShapeInstance::GetWorld() const
+D_INLINE const dgWorld* ndShapeInstance::GetWorld() const
 {
 	return m_world;
 }
 
-D_INLINE const dShape* dShapeInstance::GetChildShape() const 
+D_INLINE const dShape* ndShapeInstance::GetChildShape() const 
 {
 	return m_shape;
 }
 
-D_INLINE void dShapeInstance::SetWorld (dgWorld* const world)
+D_INLINE void ndShapeInstance::SetWorld (dgWorld* const world)
 {
 	m_world = world;
 }
 
-D_INLINE void dShapeInstance::SetChildShape (dShape* const shape)
+D_INLINE void ndShapeInstance::SetChildShape (dShape* const shape)
 {
 	shape->AddRef();
 	if (m_shape) {
@@ -257,158 +255,111 @@ D_INLINE void dShapeInstance::SetChildShape (dShape* const shape)
 	m_shape = shape;
 }
 
-D_INLINE void dShapeInstance::GetCollisionInfo(dShapeInfo* const info) const
+D_INLINE void ndShapeInstance::GetCollisionInfo(dShapeInfo* const info) const
 {
 	info->m_offsetMatrix = m_localMatrix;
 	info->m_collisionMaterial = m_material;
 	m_shape->GetCollisionInfo(info);
 }
 
-D_INLINE const dVector& dShapeInstance::GetScale () const
+D_INLINE const dVector& ndShapeInstance::GetScale () const
 {
 	return m_scale;
 }
 
-D_INLINE const dVector& dShapeInstance::GetInvScale () const
+D_INLINE const dVector& ndShapeInstance::GetInvScale () const
 {
 	return m_invScale;
 }
 
-D_INLINE const dMatrix& dShapeInstance::GetAlignMatrix () const
+D_INLINE const dMatrix& ndShapeInstance::GetAlignMatrix () const
 {
 	return m_aligmentMatrix;
 }
 
 
-D_INLINE dgMemoryAllocator* dShapeInstance::GetAllocator() const
+D_INLINE dgMemoryAllocator* ndShapeInstance::GetAllocator() const
 {
 	return m_shape->GetAllocator();
 }
 
-D_INLINE dFloat32 dShapeInstance::GetVolume () const
+D_INLINE dFloat32 ndShapeInstance::GetVolume () const
 {
 	return m_shape->GetVolume() * m_scale.m_x * m_scale.m_y * m_scale.m_z;
 }
 
-D_INLINE bool dShapeInstance::GetCollisionMode() const
-{
-	return m_collisionMode ? true : false;
-}
 
-D_INLINE void dShapeInstance::SetCollisionMode(bool mode)
-{
-	m_collisionMode = mode ? 1 : 0;
-}
-
-D_INLINE void dShapeInstance::SetBreakImpulse(dFloat32 force)
+D_INLINE void ndShapeInstance::SetBreakImpulse(dFloat32 force)
 {
 	dAssert (0);
 //	m_destructionImpulse = force;
 }
 
-D_INLINE dFloat32 dShapeInstance::GetBreakImpulse() const
+D_INLINE dFloat32 ndShapeInstance::GetBreakImpulse() const
 {
 //	return m_destructionImpulse;
 	return dFloat32 (1.0e20f);
 }
 
-D_INLINE const void* dShapeInstance::GetCollisionHandle () const
+D_INLINE const void* ndShapeInstance::GetCollisionHandle () const
 {
 	return m_subCollisionHandle;
 }
 
-D_INLINE const dShapeInstance* dShapeInstance::GetParent () const
+D_INLINE const ndShapeInstance* ndShapeInstance::GetParent () const
 {
 	return m_parent;
 }
 
-D_INLINE dUnsigned64 dShapeInstance::GetUserDataID () const
+D_INLINE dUnsigned64 ndShapeInstance::GetUserDataID () const
 {
 	return m_material.m_userId;
 }
 
-D_INLINE void dShapeInstance::SetUserDataID (dUnsigned64 userDataId)
+D_INLINE void ndShapeInstance::SetUserDataID (dUnsigned64 userDataId)
 {
 	m_material.m_userId = userDataId;
 }
 
-D_INLINE void* dShapeInstance::GetUserData () const
+D_INLINE void* ndShapeInstance::GetUserData () const
 {
 	return m_material.m_userData;
 }
 
-D_INLINE void dShapeInstance::SetUserData (void* const userData)
+D_INLINE void ndShapeInstance::SetUserData (void* const userData)
 {
 	m_material.m_userData = userData;
 }
 
-D_INLINE dShapeInfo::dgInstanceMaterial dShapeInstance::GetMaterial () const
+D_INLINE dShapeInfo::dgInstanceMaterial ndShapeInstance::GetMaterial () const
 {
 	return m_material;
 }
 
-D_INLINE void dShapeInstance::SetMaterial(const dShapeInfo::dgInstanceMaterial& userData)
+D_INLINE void ndShapeInstance::SetMaterial(const dShapeInfo::dgInstanceMaterial& userData)
 {
 	m_material = userData;
 }
 
-D_INLINE dUnsigned32 dShapeInstance::GetSignature () const
+D_INLINE dUnsigned32 ndShapeInstance::GetSignature () const
 {
 	return m_shape->GetSignature();
 }
 
-D_INLINE dShapeID dShapeInstance::GetCollisionPrimityType () const
+D_INLINE dShapeID ndShapeInstance::GetCollisionPrimityType () const
 {
 	return m_shape->GetCollisionPrimityType();
 }
 
-D_INLINE dFloat32 dShapeInstance::GetBoxMinRadius () const
+D_INLINE dFloat32 ndShapeInstance::GetBoxMinRadius () const
 {
 	return m_shape->GetBoxMinRadius() * m_maxScale.m_x;
 } 
 
-D_INLINE dFloat32 dShapeInstance::GetBoxMaxRadius () const
+D_INLINE dFloat32 ndShapeInstance::GetBoxMaxRadius () const
 {
 	return m_shape->GetBoxMaxRadius() * m_maxScale.m_x;
 } 
-
-
-
-D_INLINE dVector ntShapeInstance::SupportVertexSpecialProjectPoint (const dVector& point, const dVector& dir) const
-{
-	dAssert(dir.m_w == dFloat32(0.0f));
-	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-2f));
-	switch (m_scaleType) 
-	{
-		case m_unit:
-		{
-		   return m_shape->SupportVertexSpecialProjectPoint(point, dir);
-		}
-		case m_uniform:
-		{
-			return m_scale * m_shape->SupportVertexSpecialProjectPoint(point * m_invScale, dir);
-		}
-
-		default:
-			return point;
-
-#if 0
-		case m_nonUniform:
-		{
-			// support((p * S), n) = S * support (p/S, n * transp(S)) 
-			dVector dir1((m_scale * dir).Normalize());
-			return m_scale * m_shape->SupportVertexSpecialProjectPoint(point * m_invScale, dir1);
-		}
-
-		case m_global:
-		default:
-		{
-			dVector dir1(m_aligmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
-			return m_scale * m_aligmentMatrix.TransformVector(m_shape->SupportVertexSpecialProjectPoint(m_aligmentMatrix.UntransformVector(point * m_invScale), dir1));
-		}
-#endif
-	}
-}
 
 D_INLINE void ndShapeInstance::SetCollisionBBox (const dVector& p0, const dVector& p1)
 {
@@ -661,6 +612,53 @@ D_INLINE dVector ndShapeInstance::SupportVertexSpecial(const dVector& dir, dInt3
 			return SupportVertex(dir);
 	}
 }
+
+D_INLINE dVector ndShapeInstance::SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const
+{
+	dAssert(dir.m_w == dFloat32(0.0f));
+	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-2f));
+	switch (m_scaleType)
+	{
+		case m_unit:
+		{
+			return m_shape->SupportVertexSpecialProjectPoint(point, dir);
+		}
+		case m_uniform:
+		{
+			return m_scale * m_shape->SupportVertexSpecialProjectPoint(point * m_invScale, dir);
+		}
+
+		default:
+			return point;
+
+#if 0
+	case m_nonUniform:
+	{
+		// support((p * S), n) = S * support (p/S, n * transp(S)) 
+		dVector dir1((m_scale * dir).Normalize());
+		return m_scale * m_shape->SupportVertexSpecialProjectPoint(point * m_invScale, dir1);
+	}
+
+	case m_global:
+	default:
+	{
+		dVector dir1(m_aligmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
+		return m_scale * m_aligmentMatrix.TransformVector(m_shape->SupportVertexSpecialProjectPoint(m_aligmentMatrix.UntransformVector(point * m_invScale), dir1));
+	}
+#endif
+	}
+}
+
+D_INLINE bool ndShapeInstance::GetCollisionMode() const
+{
+	return m_collisionMode;
+}
+
+D_INLINE void ndShapeInstance::SetCollisionMode(bool mode)
+{
+	m_collisionMode = mode;
+}
+
 
 #endif 
 

@@ -76,8 +76,7 @@ class ndShape: public dClassAlloc
 	dInt32 IsType (dgRTTI type) const; 
 	dUnsigned32 GetSignature () const;
 	dShapeID GetCollisionPrimityType () const;
-	virtual dVector SupportVertexSpecialProjectPoint (const dVector& point, const dVector& dir) const = 0;
-	virtual dInt32 CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const = 0;
+
 	virtual void SetCollisionBBox (const dVector& p0, const dVector& p1) = 0;
 	virtual dFloat32 GetVolume () const = 0;
 	virtual dFloat32 GetBoxMinRadius () const = 0; 
@@ -114,7 +113,10 @@ class ndShape: public dClassAlloc
 
 	virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const = 0;
 	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const = 0;
+
+	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const = 0;
 	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinSkinThickness, dInt32* const vertexIndex) const = 0;
+	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const = 0;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const = 0;
 
 	virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;

@@ -63,14 +63,13 @@ class ndWorld: public dClassAlloc
 	void SetContactNotify(ndContactNotify* const notify);
 	
 	protected:
-	D_NEWTON_API virtual void UpdateSkeletons(dFloat32 timestep);
-	//D_NEWTON_API virtual void UpdateSleepState(dFloat32 timestep);
-	D_NEWTON_API virtual void ApplyExternalForces(dFloat32 timestep);
-	D_NEWTON_API virtual void UpdatePrelisteners(dFloat32 timestep);
-	D_NEWTON_API virtual void UpdatePostlisteners(dFloat32 timestep);
-	D_NEWTON_API virtual void UpdateDynamics(dFloat32 timestep);
-	
-	D_NEWTON_API virtual void UpdateListenersPostTransform(dFloat32 timestep);
+	D_NEWTON_API virtual void UpdateSkeletons();
+	//D_NEWTON_API virtual void UpdateSleepState();
+	D_NEWTON_API virtual void ApplyExternalForces();
+	D_NEWTON_API virtual void UpdatePrelisteners();
+	D_NEWTON_API virtual void UpdatePostlisteners();
+	D_NEWTON_API virtual void UpdateDynamics();
+	D_NEWTON_API virtual void UpdateListenersPostTransform();
 
 	private:
 	ndScene* m_scene;

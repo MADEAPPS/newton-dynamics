@@ -209,6 +209,13 @@ dVector ndShapeBox::SupportVertexSpecial(const dVector& dir0, dFloat32 skinThick
 	return size0.Select(size1, mask);
 }
 
+dVector ndShapeBox::SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir0) const
+{
+	dVector mask0(dir0.Abs() > m_flushZero);
+	dVector dir(dir0 & mask0);
+	dAssert(dAbs((dir.DotProduct(dir).GetScalar() - dFloat32(1.0f))) < dFloat32(1.0e-3f));
+	return point + dir.Scale(D_PENETRATION_TOL);
+}
 
 dFloat32 ndShapeBox::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {
@@ -270,4 +277,179 @@ dFloat32 ndShapeBox::RayCast(ndRayCastNotify& callback, const dVector& localP0, 
 		tmin = dFloat32(1.2f);
 	}
 	return tmin;
+}
+
+const ndShapeConvex::dConvexSimplexEdge** ndShapeBox::GetVertexToEdgeMapping() const
+{
+	return (const dConvexSimplexEdge**)&m_vertexToEdgeMap[0];
+}
+
+dInt32 ndShapeBox::CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const
+{
+	dVector support[4];
+	dInt32 featureCount = 3;
+
+	const dConvexSimplexEdge** const vertToEdgeMapping = GetVertexToEdgeMapping();
+	if (vertToEdgeMapping) 
+	{
+		dInt32 edgeIndex;
+		support[0] = SupportVertex(normal, &edgeIndex);
+
+		dFloat32 dist = normal.DotProduct(support[0] - point).GetScalar();
+		if (dist <= D_PENETRATION_TOL) 
+		{
+			dVector normalAlgin(normal.Abs());
+			if (!((normalAlgin.m_x > dFloat32(0.9999f)) || (normalAlgin.m_y > dFloat32(0.9999f)) || (normalAlgin.m_z > dFloat32(0.9999f)))) 
+			{
+				// 0.25 degrees
+				const dFloat32 tiltAngle = dFloat32(0.005f);
+				const dFloat32 tiltAngle2 = tiltAngle * tiltAngle;
+				dPlane testPlane(normal, -(normal.DotProduct(support[0]).GetScalar()));
+
+				featureCount = 1;
+				const dConvexSimplexEdge* const edge = vertToEdgeMapping[edgeIndex];
+				const dConvexSimplexEdge* ptr = edge;
+				do 
+				{
+					const dVector& p = m_vertex[ptr->m_twin->m_vertex];
+					dFloat32 test1 = testPlane.Evalue(p);
+					dVector dist1(p - support[0]);
+					dFloat32 angle2 = test1 * test1 / (dist1.DotProduct(dist1).GetScalar());
+					if (angle2 < tiltAngle2) 
+					{
+						support[featureCount] = p;
+						featureCount++;
+					}
+					ptr = ptr->m_twin->m_next;
+				} while ((ptr != edge) && (featureCount < 3));
+			}
+		}
+	}
+
+	dInt32 count = 0;
+	switch (featureCount)
+	{
+		case 1:
+		{
+			contactsOut[0] = support[0] - normal * normal.DotProduct(support[0] - point);
+			count = 1;
+			break;
+		}
+
+		case 2:
+		{
+			contactsOut[0] = support[0] - normal * normal.DotProduct(support[0] - point);
+			contactsOut[1] = support[1] - normal * normal.DotProduct(support[1] - point);
+			count = 2;
+			break;
+		}
+
+		default:
+		{
+			dFloat32 test[8];
+			dAssert(normal.m_w == dFloat32(0.0f));
+			dPlane plane(normal, -(normal.DotProduct(point).GetScalar()));
+			for (dInt32 i = 0; i < 8; i++) 
+			{
+				dAssert(m_vertex[i].m_w == dFloat32(0.0f));
+				test[i] = plane.DotProduct(m_vertex[i] | dVector::m_wOne).m_x;
+			}
+
+			dConvexSimplexEdge* edge = NULL;
+			for (dInt32 i = 0; i < dInt32(sizeof(m_edgeEdgeMap) / sizeof(m_edgeEdgeMap[0])); i++) 
+			{
+				dConvexSimplexEdge* const ptr = m_edgeEdgeMap[i];
+				dFloat32 side0 = test[ptr->m_vertex];
+				dFloat32 side1 = test[ptr->m_twin->m_vertex];
+				if ((side0 * side1) < dFloat32(0.0f)) 
+				{
+					edge = ptr;
+					break;
+				}
+			}
+
+			if (edge) 
+			{
+				if (test[edge->m_vertex] < dFloat32(0.0f)) 
+				{
+					edge = edge->m_twin;
+				}
+				dAssert(test[edge->m_vertex] > dFloat32(0.0f));
+
+				dConvexSimplexEdge* ptr = edge;
+				dConvexSimplexEdge* firstEdge = NULL;
+				dFloat32 side0 = test[edge->m_vertex];
+				do 
+				{
+					dAssert(m_vertex[ptr->m_twin->m_vertex].m_w == dFloat32(0.0f));
+					dFloat32 side1 = test[ptr->m_twin->m_vertex];
+					if (side1 < side0) 
+					{
+						if (side1 < dFloat32(0.0f)) 
+						{
+							firstEdge = ptr;
+							break;
+						}
+
+						side0 = side1;
+						edge = ptr->m_twin;
+						ptr = edge;
+					}
+					ptr = ptr->m_twin->m_next;
+				} while (ptr != edge);
+
+				if (firstEdge) 
+				{
+					edge = firstEdge;
+					ptr = edge;
+					do 
+					{
+						dVector dp(m_vertex[ptr->m_twin->m_vertex] - m_vertex[ptr->m_vertex]);
+						dFloat32 t = plane.DotProduct(dp).m_x;
+						if (t >= dFloat32(-1.e-24f)) 
+						{
+							t = dFloat32(0.0f);
+						}
+						else 
+						{
+							t = test[ptr->m_vertex] / t;
+							if (t > dFloat32(0.0f)) 
+							{
+								t = dFloat32(0.0f);
+							}
+							if (t < dFloat32(-1.0f)) 
+							{
+								t = dFloat32(-1.0f);
+							}
+						}
+
+						dAssert(t <= dFloat32(0.01f));
+						dAssert(t >= dFloat32(-1.05f));
+						contactsOut[count] = m_vertex[ptr->m_vertex] - dp.Scale(t);
+						count++;
+
+						dConvexSimplexEdge* ptr1 = ptr->m_next;
+						for (; ptr1 != ptr; ptr1 = ptr1->m_next) 
+						{
+							dInt32 index0 = ptr1->m_twin->m_vertex;
+							if (test[index0] >= dFloat32(0.0f)) 
+							{
+								dAssert(test[ptr1->m_vertex] <= dFloat32(0.0f));
+								break;
+							}
+						}
+						dAssert(ptr != ptr1);
+						ptr = ptr1->m_twin;
+
+					} while ((ptr != edge) && (count < 8));
+				}
+			}
+		}
+	}
+
+	if (count > 2) 
+	{
+		count = RectifyConvexSlice(count, normal, contactsOut);
+	}
+	return count;
 }

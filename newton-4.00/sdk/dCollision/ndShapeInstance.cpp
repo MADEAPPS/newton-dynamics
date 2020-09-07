@@ -48,7 +48,7 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-ntShapeInstance::ntShapeInstance(const dgWorld* const world, const dgCollision* const childCollision, dgInt32 shapeID, const dgMatrix& matrix)
+ndShapeInstance::ndShapeInstance(const dgWorld* const world, const dgCollision* const childCollision, dInt32 shapeID, const dgMatrix& matrix)
 	:m_globalMatrix(matrix)
 	,m_localMatrix (matrix)
 	,m_aligmentMatrix (dGetIdentityMatrix())
@@ -70,7 +70,7 @@ ntShapeInstance::ntShapeInstance(const dgWorld* const world, const dgCollision* 
 	m_shape->AddRef();
 }
 
-ntShapeInstance::ntShapeInstance(const dgWorld* const constWorld, dgDeserialize serialize, void* const userData, dgInt32 revisionNumber)
+ndShapeInstance::ndShapeInstance(const dgWorld* const constWorld, dgDeserialize serialize, void* const userData, dInt32 revisionNumber)
 	:m_globalMatrix(dGetIdentityMatrix())
 	,m_localMatrix (dGetIdentityMatrix())
 	,m_aligmentMatrix (dGetIdentityMatrix())
@@ -88,10 +88,10 @@ ntShapeInstance::ntShapeInstance(const dgWorld* const constWorld, dgDeserialize 
 	,m_scaleType(m_unit)
 	,m_isExternal(true)
 {
-	dgInt32 saved;
-	dgInt32 signature;
-	dgInt32 primitive;
-	dgInt32 scaleType;
+	dInt32 saved;
+	dInt32 signature;
+	dInt32 primitive;
+	dInt32 scaleType;
 	
 	serialize (userData, &m_globalMatrix, sizeof (m_globalMatrix));
 	serialize (userData, &m_localMatrix, sizeof (m_localMatrix));
@@ -235,7 +235,7 @@ ntShapeInstance::ntShapeInstance(const dgWorld* const constWorld, dgDeserialize 
 	dgDeserializeMarker (serialize, userData);
 }
 
-ntShapeInstance::~ntShapeInstance()
+ndShapeInstance::~ndShapeInstance()
 {
 	if (m_world->m_onCollisionInstanceDestruction && m_isExternal) {
 		m_world->m_onCollisionInstanceDestruction (m_world, this);
@@ -244,12 +244,12 @@ ntShapeInstance::~ntShapeInstance()
 	world->ReleaseCollision(m_shape);
 }
 
-void ntShapeInstance::Serialize(dgSerialize serialize, void* const userData, bool saveShape) const
+void ndShapeInstance::Serialize(dgSerialize serialize, void* const userData, bool saveShape) const
 {
-	dgInt32 save = saveShape ? 1 : 0;
-	dgInt32 primitiveType = m_shape->GetCollisionPrimityType();
-	dgInt32 signature = m_shape->GetSignature();
-	dgInt32 scaleType = m_scaleType;
+	dInt32 save = saveShape ? 1 : 0;
+	dInt32 primitiveType = m_shape->GetCollisionPrimityType();
+	dInt32 signature = m_shape->GetSignature();
+	dInt32 scaleType = m_scaleType;
 
 	serialize (userData, &m_globalMatrix, sizeof (m_globalMatrix));
 	serialize (userData, &m_localMatrix, sizeof (m_localMatrix));
@@ -271,7 +271,7 @@ void ntShapeInstance::Serialize(dgSerialize serialize, void* const userData, boo
 }
 
 
-void ntShapeInstance::SetScale (const dVector& scale)
+void ndShapeInstance::SetScale (const dVector& scale)
 {
 	dFloat32 scaleX = dAbs (scale.m_x);
 	dFloat32 scaleY = dAbs (scale.m_y);
@@ -304,7 +304,7 @@ void ntShapeInstance::SetScale (const dVector& scale)
 	}
 }
 
-void ntShapeInstance::SetGlobalScale (const dVector& scale)
+void ndShapeInstance::SetGlobalScale (const dVector& scale)
 {
 	// calculate current matrix
 	dgMatrix matrix(dGetIdentityMatrix());
@@ -351,7 +351,7 @@ void ntShapeInstance::SetGlobalScale (const dVector& scale)
 //dgMatrix xxx (m_aligmentMatrix * xxx1 * m_localMatrix);
 
 		bool isIdentity = true;
-		for (dgInt32 i = 0; i < 3; i ++) {
+		for (dInt32 i = 0; i < 3; i ++) {
 			isIdentity &= dAbs (m_aligmentMatrix[i][i] - dFloat32 (1.0f)) < dFloat32 (1.0e-5f);
 			isIdentity &= dAbs (m_aligmentMatrix[3][i]) < dFloat32 (1.0e-5f);
 		}
@@ -363,7 +363,7 @@ void ntShapeInstance::SetGlobalScale (const dVector& scale)
 }
 
 
-void ntShapeInstance::SetLocalMatrix (const dgMatrix& matrix)
+void ndShapeInstance::SetLocalMatrix (const dgMatrix& matrix)
 {
 	m_localMatrix = matrix;
 	m_localMatrix[0][3] = dFloat32 (0.0f);
@@ -373,66 +373,18 @@ void ntShapeInstance::SetLocalMatrix (const dgMatrix& matrix)
 	dAssert(m_localMatrix.TestOrthogonal());
 }
 
-dgInt32 ntShapeInstance::CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const
-{
-	dgInt32 count = 0;
-	dAssert(normal.m_w == dFloat32 (0.0f));
-	switch (m_scaleType)
-	{
-		case m_unit:
-		{
-			count = m_shape->CalculatePlaneIntersection (normal, point, contactsOut);
-			break;
-		}
-		case m_uniform:
-		{
-			dVector point1 (m_invScale * point);
-			count = m_shape->CalculatePlaneIntersection (normal, point1, contactsOut);
-			for (dgInt32 i = 0; i < count; i ++) {
-				contactsOut[i] = m_scale * contactsOut[i];
-			}
-			break;
-		}
 
-		case m_nonUniform:
-		{
-			// support((p * S), n) = S * support (p, n * transp(S)) 
-			dVector point1 (m_invScale * point);
-			dVector normal1 (m_scale * normal);
-			normal1 = normal1.Normalize();
-			count = m_shape->CalculatePlaneIntersection (normal1, point1, contactsOut);
-			for (dgInt32 i = 0; i < count; i ++) {
-				contactsOut[i] = m_scale * contactsOut[i];
-			}
-			break;
-		}
-
-		case m_global:
-		default:
-		{
-			dVector point1 (m_aligmentMatrix.UntransformVector (m_invScale * point));
-			dVector normal1 (m_aligmentMatrix.UntransformVector (m_scale * normal));
-			normal1 = normal1.Normalize();
-			count = m_shape->CalculatePlaneIntersection (normal1, point1, contactsOut);
-			for (dgInt32 i = 0; i < count; i ++) {
-				contactsOut[i] = m_scale * m_aligmentMatrix.TransformVector(contactsOut[i]);
-			}
-		}
-	}
-	return count;
-}
-
-void ntShapeInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* const contactPoints) const
+void ndShapeInstance::CalculateImplicitContacts(dInt32 count, dgContactPoint* const contactPoints) const
 {
 	switch (m_scaleType)
 	{
 		case m_unit:
 		{
-		   for (dgInt32 i = 0; i < count; i++) {
+		   for (dInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_globalMatrix.UntransformVector(contactPoints[i].m_point);
 			}
 			m_shape->CalculateImplicitContacts(count, contactPoints);
-			for (dgInt32 i = 0; i < count; i++) {
+			for (dInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_globalMatrix.TransformVector(contactPoints[i].m_point);
 				contactPoints[i].m_normal = m_globalMatrix.RotateVector(contactPoints[i].m_normal);
 			}
@@ -441,11 +393,11 @@ void ntShapeInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* c
 
 		case m_uniform:
 		{
-			for (dgInt32 i = 0; i < count; i++) {
+			for (dInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_invScale * m_globalMatrix.UntransformVector(contactPoints[i].m_point);
 			}
 			m_shape->CalculateImplicitContacts(count, contactPoints);
-			for (dgInt32 i = 0; i < count; i++) {
+			for (dInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_globalMatrix.TransformVector(contactPoints[i].m_point * m_scale);
 				contactPoints[i].m_normal = m_globalMatrix.RotateVector(contactPoints[i].m_normal);
 			}
@@ -454,11 +406,11 @@ void ntShapeInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* c
 
 		case m_nonUniform:
 		{
-			for (dgInt32 i = 0; i < count; i++) {
+			for (dInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_invScale * m_globalMatrix.UntransformVector(contactPoints[i].m_point);
 			}
 			m_shape->CalculateImplicitContacts(count, contactPoints);
-			for (dgInt32 i = 0; i < count; i++) {
+			for (dInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_globalMatrix.TransformVector(contactPoints[i].m_point * m_scale);
 				contactPoints[i].m_normal = m_globalMatrix.RotateVector(contactPoints[i].m_normal * m_invScale).Normalize();
 			}
@@ -468,11 +420,11 @@ void ntShapeInstance::CalculateImplicitContacts(dgInt32 count, dgContactPoint* c
 		case m_global:
 		default:
 		{
-			for (dgInt32 i = 0; i < count; i++) {
+			for (dInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_invScale * m_globalMatrix.UntransformVector(m_aligmentMatrix.UntransformVector(contactPoints[i].m_point));
 			}
 			m_shape->CalculateImplicitContacts(count, contactPoints);
-			for (dgInt32 i = 0; i < count; i++) {
+			for (dInt32 i = 0; i < count; i++) {
 				contactPoints[i].m_point = m_globalMatrix.TransformVector(m_aligmentMatrix.TransformVector(contactPoints[i].m_point) * m_scale);
 				contactPoints[i].m_normal = m_globalMatrix.RotateVector(m_aligmentMatrix.RotateVector(contactPoints[i].m_normal) * m_invScale).Normalize();
 			}
@@ -494,15 +446,10 @@ ndShapeInstance::ndShapeInstance(ndShape* const shape)
 	,m_maxScale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
 	,m_shape(shape->AddRef())
 	,m_ownerBody(nullptr)
-	//,m_material()
-	//,m_world(NULL)
-	//,m_shape(NULL)
 	//,m_subCollisionHandle(NULL)
-	//,m_parent(NULL)
 	,m_skinThickness(dFloat32(0.0f))
-	//,m_collisionMode(1)
-	//,m_refCount(1)
 	,m_scaleType(m_unit)
+	,m_collisionMode(true)
 	//,m_isExternal(true)
 {
 }
@@ -517,22 +464,9 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 	,m_maxScale(instance.m_maxScale)
 	,m_shape(instance.m_shape->AddRef())
 	,m_ownerBody(instance.m_ownerBody)
-	//,m_globalMatrix(instance.m_globalMatrix)
-	//,m_localMatrix(instance.m_localMatrix)
-	//,m_aligmentMatrix(instance.m_aligmentMatrix)
-	//,m_scale(instance.m_scale)
-	//,m_invScale(instance.m_invScale)
-	//,m_maxScale(instance.m_maxScale)
-	//,m_material(instance.m_material)
-	//,m_world(instance.m_world)
-	//,m_shape(instance.m_shape)
-	//,m_subCollisionHandle(NULL)
-	//,m_parent(NULL)
-	//,m_skinThickness(instance.m_skinThickness)
-	//,m_collisionMode(instance.m_collisionMode)
-	//,m_refCount(1)
-	//,m_scaleType(instance.m_scaleType)
-	//,m_isExternal(true)
+	,m_skinThickness(instance.m_skinThickness)
+	,m_scaleType(instance.m_scaleType)
+	,m_collisionMode(instance.m_collisionMode)
 {
 }
 
@@ -616,8 +550,8 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				//		contactOut.m_collision0 = this;
 				//		contactOut.m_collision1 = this;
 				//	}
-					contactOut.m_collision0 = this;
-					contactOut.m_collision1 = this;
+					contactOut.m_shapeInstance0 = this;
+					contactOut.m_shapeInstance1 = this;
 				}
 				break;
 			}
@@ -694,6 +628,55 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 			}
 		}
 	}
-
 	return t;
 }
+
+dInt32 ndShapeInstance::CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const
+{
+	dInt32 count = 0;
+	dAssert(normal.m_w == dFloat32(0.0f));
+	switch (m_scaleType)
+	{
+		case m_unit:
+		{
+			count = m_shape->CalculatePlaneIntersection(normal, point, contactsOut);
+			break;
+		}
+		case m_uniform:
+		{
+			dVector point1(m_invScale * point);
+			count = m_shape->CalculatePlaneIntersection(normal, point1, contactsOut);
+			for (dInt32 i = 0; i < count; i++) {
+				contactsOut[i] = m_scale * contactsOut[i];
+			}
+			break;
+		}
+
+		case m_nonUniform:
+		{
+			// support((p * S), n) = S * support (p, n * transp(S)) 
+			dVector point1(m_invScale * point);
+			dVector normal1(m_scale * normal);
+			normal1 = normal1.Normalize();
+			count = m_shape->CalculatePlaneIntersection(normal1, point1, contactsOut);
+			for (dInt32 i = 0; i < count; i++) {
+				contactsOut[i] = m_scale * contactsOut[i];
+			}
+			break;
+		}
+
+		case m_global:
+		default:
+		{
+			dVector point1(m_aligmentMatrix.UntransformVector(m_invScale * point));
+			dVector normal1(m_aligmentMatrix.UntransformVector(m_scale * normal));
+			normal1 = normal1.Normalize();
+			count = m_shape->CalculatePlaneIntersection(normal1, point1, contactsOut);
+			for (dInt32 i = 0; i < count; i++) {
+				contactsOut[i] = m_scale * m_aligmentMatrix.TransformVector(contactsOut[i]);
+			}
+		}
+	}
+	return count;
+}
+

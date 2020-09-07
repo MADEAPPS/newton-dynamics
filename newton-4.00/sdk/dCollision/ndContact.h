@@ -28,7 +28,8 @@
 class ndBodyKinematic;
 class ndShapeInstance;
 
-#define D_MAX_CONTATCS		128
+#define D_MAX_CONTATCS			128
+#define D_CONSTRAINT_MAX_ROWS	(3 * 16)
 
 D_MSV_NEWTON_ALIGN_32
 class ndContactPoint
@@ -38,16 +39,97 @@ class ndContactPoint
 	dVector m_normal;
 	const ndBodyKinematic* m_body0;
 	const ndBodyKinematic* m_body1;
-	const ndShapeInstance* m_collision0;
-	const ndShapeInstance* m_collision1;
+	const ndShapeInstance* m_shapeInstance0;
+	const ndShapeInstance* m_shapeInstance1;
 	//dInt64 m_shapeId0;
 	//dInt64 m_shapeId1;
-	//dFloat32 m_penetration;
-} D_GCC_NEWTON_ALIGN_32 ;
+	dFloat32 m_penetration;
+} D_GCC_NEWTON_ALIGN_32;
 
+D_MSV_NEWTON_ALIGN_32
+class ndContactMaterial: public ndContactPoint
+{
+	public:
+	enum 
+	{
+		m_isSoftContact = 1 << 0,
+		m_collisionEnable = 1 << 1,
+		m_friction0Enable = 1 << 2,
+		m_friction1Enable = 1 << 3,
+		m_override0Accel = 1 << 4,
+		m_override1Accel = 1 << 5,
+		m_override0Friction = 1 << 6,
+		m_override1Friction = 1 << 7,
+		m_overrideNormalAccel = 1 << 8,
+		m_resetSkeletonSelfCollision = 1 << 9,
+		m_resetSkeletonIntraCollision = 1 << 10,
+	};
+
+	//D_MSV_NEWTON_ALIGN_32
+	//class ndUserContactPoint
+	//{
+	//	public:
+	//	dVector m_point;
+	//	dVector m_normal;
+	//	dUnsigned64 m_shapeId0;
+	//	dUnsigned64 m_shapeId1;
+	//	dFloat32 m_penetration;
+	//	dgUnsigned32 m_unused[3];
+	//} D_GCC_NEWTON_ALIGN_32;
+
+	//typedef bool (dgApi *OnAABBOverlap) (dgContact& contactJoint, dFloat32 timestep, dgInt32 threadIndex);
+	//typedef void (dgApi *OnContactCallback) (dgContact& contactJoint, dFloat32 timestep, dgInt32 threadIndex);
+	//typedef bool (dgApi *OnCompoundCollisionPrefilter) (dgContact& contactJoint, dFloat32 timestep, const dgBody* bodyA, const void* collisionNodeA, const dgBody* bodyB, const void* collisionNodeB, dgInt32 threadIndex);
+	//typedef bool (dgApi *OnContactGeneration) (const dgContactMaterial& material, const dgBody& body0, const dgCollisionInstance* collisionIntance0, const dgBody& body1, const dgCollisionInstance* collisionIntance1, dgUserContactPoint* const contacts, dgInt32 maxCount, dgInt32 threadIndex);
+
+	//dgContactMaterial();
+	//void* GetUserData() const;
+	//void SetUserData(void* const userData);
+	//void SetAsSoftContact(dFloat32 regularizer);
+	//void SetCollisionGenerationCallback(OnContactGeneration contactGeneration);
+	//void SetCollisionCallback(OnAABBOverlap abbOvelap, OnContactCallback callback);
+	//void SetCompoundCollisionCallback(OnCompoundCollisionPrefilter abbCompounndOvelap);
+	//
+	dVector m_dir0;
+	dVector m_dir1;
+	//dgForceImpactPair m_normal_Force;
+	//dgForceImpactPair m_dir0_Force;
+	//dgForceImpactPair m_dir1_Force;
+	//dFloat32 m_restitution;
+	//dFloat32 m_staticFriction0;
+	//dFloat32 m_staticFriction1;
+	//dFloat32 m_dynamicFriction0;
+	//dFloat32 m_dynamicFriction1;
+	//dFloat32 m_softness;
+	//dFloat32 m_skinThickness;
+	//dgInt32 m_flags;
+
+	private:
+	//void *m_userData;
+	//OnAABBOverlap m_aabbOverlap;
+	//OnContactCallback m_processContactPoint;
+	//OnContactGeneration m_contactGeneration;
+	//OnCompoundCollisionPrefilter m_compoundAABBOverlap;
+
+	//friend class dgWorld;
+	//friend class dgBroadPhase;
+	//friend class dgCollisionScene;
+	//friend class dgCollisionCompound;
+	//friend class dgWorldDynamicUpdate;
+	//friend class dgSolverWorlkerThreads;
+	//friend class dgCollidingPairCollector;
+	//friend class dgBroadPhaseMaterialCallbackWorkerThread;
+} D_GCC_NEWTON_ALIGN_32;
+
+class ndContactPointList: public dList<ndContactMaterial, dContainersFreeListAlloc<ndContactPoint>>
+{
+	public:
+};
 
 D_MSV_NEWTON_ALIGN_32 
-class ndContact: public ndConstraint, public dContainersFreeListAlloc<ndContact*>
+class ndContact
+	:public ndConstraint
+	,public dContainersFreeListAlloc<ndContact*>
 {
 	public:
 	D_COLLISION_API ndContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
@@ -60,16 +142,20 @@ class ndContact: public ndConstraint, public dContainersFreeListAlloc<ndContact*
 	D_COLLISION_API void DetachFromBodies();
 
 	ndContact* GetAsContact() { return this; }
+
+	dFloat32 GetPruningTolerance() const;
 	
 	private:
 	dVector m_positAcc;
 	dQuaternion m_rotationAcc;
 	dVector m_separatingVector;
+	ndContactPointList m_contacPointsList;
 	ndBodyKinematic* m_body0;
 	ndBodyKinematic* m_body1;
 	dList<ndContact, dContainersFreeListAlloc<ndContact>>::dListNode* m_linkNode;
 	dFloat32 m_timeOfImpact;
 	dFloat32 m_separationDistance;
+	dFloat32 m_contactPruningTolereance;
 	dUnsigned32 m_maxDOF;
 	dUnsigned32 m_broadphaseLru;
 	bool m_active;
@@ -152,11 +238,6 @@ DG_INLINE void ntContact::ResetMaxDOF()
 	m_maxDOF = 0;
 }
 
-DG_INLINE dFloat32 ntContact::GetPruningTolerance() const
-{
-	return m_contactPruningTolereance;
-}
-
 DG_INLINE void ntContact::SetPruningTolerance(dFloat32 tolerance)
 {
 	m_contactPruningTolereance = dgAbs (tolerance);
@@ -193,6 +274,10 @@ DG_INLINE void ntContact::SetImpulseContactSpeed(dFloat32 speed)
 }
 #endif
 
+D_INLINE dFloat32 ndContact::GetPruningTolerance() const
+{
+	return m_contactPruningTolereance;
+}
 
 
 #endif 

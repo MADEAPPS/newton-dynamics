@@ -25,15 +25,18 @@ static void PhysicsFree(void* ptr)
 	free (ptr);
 }
 
-//void *operator new (size_t size)
-//{
-//	return PhysicsAlloc(size);
-//}
-//
-//void operator delete (void* ptr)
-//{
-//	PhysicsFree(ptr);
-//}
+void *operator new (size_t size)
+{
+	// this should not happens on this test
+	// newton should never use global operator new and delete.
+	dAssert(0);
+	return PhysicsAlloc(size);
+}
+
+void operator delete (void* ptr)
+{
+	PhysicsFree(ptr);
+}
 
 class CheckMemoryLeaks
 {
@@ -144,7 +147,8 @@ void BuildPyramid(ndWorld& world, dFloat32 mass, const dVector& origin, const dV
 	//dFloat32 y0 = matrix.m_posit.m_y + stepy / 2.0f;
 	dFloat32 z0 = matrix.m_posit.m_z - stepz * count / 2;
 
-//count = 1;
+z0 = 0.0f;
+count = 1;
 	for (int j = 0; j < count; j++) 
 	{
 		matrix.m_posit.m_z = z0;
@@ -170,15 +174,17 @@ int main (int argc, const char * argv[])
 {
 	ndWorld world;
 	world.SetSubSteps(2);
-	world.SetThreadCount(2);
+	//world.SetThreadCount(2);
 
-	//ndFixSizeBuffer<dVector, 10> xxx0;
-	//ndFixSizeBuffer<dVector, 10>* xxx1 = new ndFixSizeBuffer<dVector, 10>;
-	//(*xxx1)[0] = dVector (0.5f, 0.25f, 0.8f, 0.0f);
-	//(*xxx1)[0] = (*xxx1)[0] + (*xxx1)[0];
+	// test allocation
+	ndFixSizeBuffer<dVector, 10> buffer0;
+	ndFixSizeBuffer<dVector, 10>* const buffer1 = new ndFixSizeBuffer<dVector, 10>;
+	(*buffer1)[0] = dVector (0.5f, 0.25f, 0.8f, 0.0f);
+	(*buffer1)[0] = (*buffer1)[0] + (*buffer1)[0];
+	delete buffer1;
 
 	dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
-	dVector origin(0.5f, 0.25f, 0.8f, 0.0f);
+	dVector origin(0.0f, 0.0f, 0.0f, 0.0f);
 	BuildFloor(world);
 	BuildPyramid(world, 10.0f, origin, size, 20);
 	

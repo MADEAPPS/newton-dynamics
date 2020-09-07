@@ -562,7 +562,7 @@ DG_INLINE dgInt32 dgWorld::PruneSupport(dgInt32 count, const dgVector& dir, cons
 	return index;
 }
 
-dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contactArray, int maxCount, dgFloat32 tol) const
+dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contactArray, int maxCount, dgFloat32 tol___) const
 {
 	class dgConvexFaceNode
 	{
@@ -740,7 +740,7 @@ dgInt32 dgWorld::Prune2dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 	return hullCount;
 }
 
-dgInt32 dgWorld::Prune3dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contactArray, int maxCount, dgFloat32 distTol) const
+dgInt32 dgWorld::Prune3dContacts(const dgMatrix& matrix, dgInt32 count, dgContactPoint* const contactArray, int maxCount, dgFloat32 distTol___) const
 {
 	dgVector array[DG_MAX_CONTATCS];
 	dgFloat32 max_x = dgFloat32 (1.0e20f);
@@ -812,7 +812,7 @@ dgInt32 dgWorld::Prune3dContacts(const dgMatrix& matrix, dgInt32 count, dgContac
 	return count;
 }
 
-dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactArray, dgFloat32 distTolerenace, dgInt32 maxCount) const
+dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactArray, dgFloat32 distTolerenace___, dgInt32 maxCount) const
 {
 	dgVector origin(dgVector::m_zero);
 	for (dgInt32 i = 0; i < count; i++) {
@@ -859,10 +859,10 @@ dgInt32 dgWorld::PruneContacts (dgInt32 count, dgContactPoint* const contactArra
 	const dgFloat32 eigenValueError = dgFloat32 (1.0e-4f);
 	if (eigen[2] > eigenValueError) {
 		// 3d convex Hull
-		return Prune3dContacts(covariance, count, contactArray, maxCount, distTolerenace);
+		return Prune3dContacts(covariance, count, contactArray, maxCount, distTolerenace___);
 	} else if (eigen[1] > eigenValueError) {
 		// is a 2d or 1d convex hull
-		return Prune2dContacts(covariance, count, contactArray, maxCount, distTolerenace);
+		return Prune2dContacts(covariance, count, contactArray, maxCount, distTolerenace___);
 	} else if (eigen[0] > eigenValueError) {
 		// is a 1d or 1d convex hull
 		if (count > 2) {
