@@ -24,8 +24,103 @@
 
 #include "ndCollisionStdafx.h"
 
+#define D_MAX_BOUND				dFloat32 (1.0e15f)
+#define D_MIN_BOUND				(-D_MAX_BOUND)
+#define D_INDEPENDENT_ROW		-1 
+#define D_CONSTRAINT_MAX_ROWS	(3 * 16)
+#define MIN_JOINT_PIN_LENGTH	dFloat32 (50.0f)
+
+
 class ndBody;
 class ndContact;
+
+D_MSV_NEWTON_ALIGN_32
+class ndJacobian
+{
+	public:
+	dVector m_linear;
+	dVector m_angular;
+} D_GCC_NEWTON_ALIGN_32;
+
+D_MSV_NEWTON_ALIGN_32
+class ndJacobianPair
+{
+	public:
+	ndJacobian m_jacobianM0;
+	ndJacobian m_jacobianM1;
+} D_GCC_NEWTON_ALIGN_32;
+
+class ndForceImpactPair
+{
+	public:
+	void Clear()
+	{
+		m_force = dFloat32(0.0f);
+		m_impact = dFloat32(0.0f);
+		for (dInt32 i = 0; i < sizeof(m_initialGuess) / sizeof(m_initialGuess[0]); i++) 
+		{
+			m_initialGuess[i] = dFloat32(0.0f);
+		}
+	}
+
+	void Push(dFloat32 val)
+	{
+		for (dInt32 i = 1; i < sizeof(m_initialGuess) / sizeof(m_initialGuess[0]); i++) 
+		{
+			m_initialGuess[i - 1] = m_initialGuess[i];
+		}
+		m_initialGuess[sizeof(m_initialGuess) / sizeof(m_initialGuess[0]) - 1] = val;
+	}
+
+	dFloat32 GetInitiailGuess() const
+	{
+		dFloat32 value = dFloat32(0.0f);
+		dFloat32 smallest = dFloat32(1.0e15f);
+		for (dInt32 i = 0; i < sizeof(m_initialGuess) / sizeof(m_initialGuess[0]); i++)
+		{
+			dFloat32 mag = dAbs(m_initialGuess[i]);
+			if (mag < smallest) 
+			{
+				smallest = mag;
+				value = m_initialGuess[i];
+			}
+		}
+		return value;
+	}
+
+	dFloat32 m_force;
+	dFloat32 m_impact;
+	dFloat32 m_initialGuess[4];
+};
+
+class ndBilateralBounds
+{
+	public:
+	ndForceImpactPair* m_jointForce;
+	dFloat32 m_low;
+	dFloat32 m_upper;
+	dInt32 m_normalIndex;
+};
+
+D_MSV_NEWTON_ALIGN_32
+class ndConstraintDescritor
+{
+	public:
+	ndJacobianPair m_jacobian[D_CONSTRAINT_MAX_ROWS];
+	ndBilateralBounds m_forceBounds[D_CONSTRAINT_MAX_ROWS];
+	//dFloat32 m_jointAccel[D_CONSTRAINT_MAX_ROWS];
+	//dFloat32 m_restitution[D_CONSTRAINT_MAX_ROWS];
+	//dFloat32 m_penetration[D_CONSTRAINT_MAX_ROWS];
+	//dFloat32 m_diagonalRegularizer[D_CONSTRAINT_MAX_ROWS];
+	//dFloat32 m_penetrationStiffness[D_CONSTRAINT_MAX_ROWS];
+	//dFloat32 m_zeroRowAcceleration[D_CONSTRAINT_MAX_ROWS];
+	//dInt8	m_flags[D_CONSTRAINT_MAX_ROWS];
+	//dgWorld* m_world;
+	//dInt32 m_threadIndex;
+	//dFloat32 m_timestep;
+	//dFloat32 m_invTimestep;
+} D_GCC_NEWTON_ALIGN_32;
+
 
 D_MSV_NEWTON_ALIGN_32
 class ndConstraint
@@ -36,12 +131,10 @@ class ndConstraint
 	ndConstraint* GetAsConstraint() { return this; }
 	ndContact* GetAsContact() {return nullptr;}
 
+	virtual const dUnsigned32 GetRowsCount() const = 0;
+
 	protected:
 	ndConstraint();
-	
-	//ntBody* m_body0;
-	//ntBody* m_body1;
-	//void* m_userData;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #if 0
@@ -116,21 +209,21 @@ D_INLINE dgBodyMasterListRow::dgListNode* ndConstraint::GetLink1()	const
 }
 
 
-D_INLINE dgFloat32 ndConstraint::GetStiffness() const
+D_INLINE dFloat32 ndConstraint::GetStiffness() const
 {
-	return dgFloat32 (1.0f);
+	return dFloat32 (1.0f);
 }
 
-D_INLINE void ndConstraint::SetStiffness(dgFloat32 stiffness)
+D_INLINE void ndConstraint::SetStiffness(dFloat32 stiffness)
 {
 }
 
-D_INLINE dgInt32 ndConstraint::GetSolverModel() const
+D_INLINE dInt32 ndConstraint::GetSolverModel() const
 {
 	return m_solverModel;
 }
 
-D_INLINE void ndConstraint::SetSolverModel(dgInt32 model)
+D_INLINE void ndConstraint::SetSolverModel(dInt32 model)
 {
 	m_solverModel = dgClamp(model, 0, 2);
 }
@@ -139,18 +232,18 @@ D_INLINE void ndConstraint::ResetMaxDOF()
 {
 }
 
-D_INLINE void ndConstraint::SetImpulseContactSpeed(dgFloat32 speed)
+D_INLINE void ndConstraint::SetImpulseContactSpeed(dFloat32 speed)
 {
 }
 
-D_INLINE dgFloat32 ndConstraint::GetImpulseContactSpeed() const
+D_INLINE dFloat32 ndConstraint::GetImpulseContactSpeed() const
 {
-	return dgFloat32 (0.0f);
+	return dFloat32 (0.0f);
 }
 
-D_INLINE dgInt32 ndConstraint::GetMaxDOF() const
+D_INLINE dInt32 ndConstraint::GetMaxDOF() const
 {
-	return dgInt32 (m_maxDOF);
+	return dInt32 (m_maxDOF);
 }
 
 D_INLINE bool ndConstraint::IsActive() const
@@ -158,7 +251,7 @@ D_INLINE bool ndConstraint::IsActive() const
 	return m_isActive ? true : false;
 }
 
-D_INLINE void ndConstraint::SetIndex (dgInt32 index)
+D_INLINE void ndConstraint::SetIndex (dInt32 index)
 {
 	m_index = index;
 }

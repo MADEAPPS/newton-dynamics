@@ -242,7 +242,7 @@ void ndScene::SetContactNotify(ndContactNotify* const notify)
 
 bool ndScene::AddBody(ndBodyKinematic* const body)
 {
-	if ((body->m_broadPhase == nullptr) && (body->m_broadPhaseNode == nullptr))
+	if ((body->m_scene == nullptr) && (body->m_sceneNode == nullptr))
 	{
 		ndBodyList::dListNode* const node = m_bodyList.Append(body);
 		body->SetBroadPhase(this, node);
@@ -254,9 +254,9 @@ bool ndScene::AddBody(ndBodyKinematic* const body)
 
 bool ndScene::RemoveBody(ndBodyKinematic* const body)
 {
-	if (body->m_broadPhase && body->m_broadPhaseNode)
+	if (body->m_scene && body->m_sceneNode)
 	{
-		m_bodyList.Remove(body->m_broadPhaseNode);
+		m_bodyList.Remove(body->m_sceneNode);
 		body->SetBroadPhase(nullptr, nullptr);
 		m_contactNotifyCallback->OnBodyRemoved(body);
 		return true;
@@ -1277,8 +1277,8 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 			{
 				dAssert(0);
 	//			dAssert(contact->m_maxDOF == 0);
-	//			const dgBroadPhaseNode* const bodyNode0 = contact->GetBody0()->m_broadPhaseNode;
-	//			const dgBroadPhaseNode* const bodyNode1 = contact->GetBody1()->m_broadPhaseNode;
+	//			const dgBroadPhaseNode* const bodyNode0 = contact->GetBody0()->m_sceneNode;
+	//			const dgBroadPhaseNode* const bodyNode1 = contact->GetBody1()->m_sceneNode;
 	//			if (dgOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox)) {
 	//				contact->m_sceneLru = m_lru;
 	//			}

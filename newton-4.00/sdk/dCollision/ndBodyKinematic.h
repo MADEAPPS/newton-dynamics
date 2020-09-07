@@ -94,11 +94,11 @@ class ndBodyKinematic: public ndBody
 	dVector m_mass;
 	dVector m_invMass;
 	ndContactMap m_contactList;
-
-	ndScene* m_broadPhase;
-	dList<ndBodyKinematic*>::dListNode* m_broadPhaseNode;
-	ndSceneBodyNode* m_broadPhaseBodyNode;
-	ndSceneAggregate* m_broadPhaseAggregateNode;
+	dSpinLock m_lock;
+	ndScene* m_scene;
+	dList<ndBodyKinematic*>::dListNode* m_sceneNode;
+	ndSceneBodyNode* m_sceneBodyBodyNode;
+	ndSceneAggregate* m_sceneAggregateNode;
 	dUnsigned32 m_index;
 
 	friend class ndScene;
@@ -165,23 +165,23 @@ inline void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const ndShapeInstance&
 
 inline ndScene* ndBodyKinematic::GetBroadPhase() const
 {
-	return m_broadPhase;
+	return m_scene;
 }
 
 inline void ndBodyKinematic::SetBroadPhase(ndScene* const broadPhase, dList<ndBodyKinematic*>::dListNode* const node)
 {
-	m_broadPhaseNode = node;
-	m_broadPhase = broadPhase;
+	m_sceneNode = node;
+	m_scene = broadPhase;
 }
 
 inline ndSceneBodyNode* ndBodyKinematic::GetBroadPhaseBodyNode() const
 {
-	return m_broadPhaseBodyNode;
+	return m_sceneBodyBodyNode;
 }
 
 inline void ndBodyKinematic::SetBroadPhaseBodyNode(ndSceneBodyNode* const node)
 {
-	m_broadPhaseBodyNode = node;
+	m_sceneBodyBodyNode = node;
 }
 
 

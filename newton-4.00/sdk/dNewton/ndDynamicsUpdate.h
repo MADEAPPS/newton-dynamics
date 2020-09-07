@@ -294,7 +294,6 @@ class ndDynamicsUpdate
 		public:
 		dFloat32 m_weight;
 		dFloat32 m_invWeight;
-		dSpinLock m_lock;
 	};
 
 	public:
@@ -306,9 +305,17 @@ class ndDynamicsUpdate
 	void DefaultUpdate();
 	void InitWeights();
 	void InitBodyArray();
+	void InitJacobianMatrix();
 
+	//dInt32 GetJacobianDerivatives(ndConstraintDescritor& constraintParam, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dInt32 rowCount) const
+	dInt32 GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* const joint) const;
+
+	dArray<ndConstraint*> m_jointArray;
 	dArray<ndBodyProxy> m_bodyProxyArray;
 	dInt32 m_solverPasses;
+	dUnsigned32 m_maxRowsCount;
+	dAtomic<dUnsigned32> m_rowsCount;
+	
 
 } D_GCC_NEWTON_ALIGN_32;
 

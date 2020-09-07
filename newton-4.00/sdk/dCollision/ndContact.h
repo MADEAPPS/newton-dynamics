@@ -143,6 +143,8 @@ class ndContact
 
 	ndContact* GetAsContact() { return this; }
 	dFloat32 GetPruningTolerance() const;
+
+	virtual const dUnsigned32 GetRowsCount() const;
 	
 	private:
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
@@ -280,6 +282,10 @@ D_INLINE dFloat32 ndContact::GetPruningTolerance() const
 	return m_contactPruningTolereance;
 }
 
+inline const dUnsigned32 ndContact::GetRowsCount() const
+{
+	return m_maxDOF;
+}
 
 #endif 
 

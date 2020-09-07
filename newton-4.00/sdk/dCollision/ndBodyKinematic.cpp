@@ -128,10 +128,11 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_mass(dVector::m_zero)
 	,m_invMass(dVector::m_zero)
 	,m_contactList()
-	,m_broadPhase(nullptr)
-	,m_broadPhaseNode(nullptr)
-	,m_broadPhaseBodyNode(nullptr)
-	,m_broadPhaseAggregateNode(nullptr)
+	,m_lock()
+	,m_scene(nullptr)
+	,m_sceneNode(nullptr)
+	,m_sceneBodyBodyNode(nullptr)
+	,m_sceneAggregateNode(nullptr)
 	,m_index(0)
 {
 	m_invWorldInertiaMatrix[3][3] = dFloat32(1.0f);
@@ -160,12 +161,12 @@ void ndBodyKinematic::SetCollisionShape(const ndShapeInstance& shapeInstance)
 
 ndSceneAggregate* ndBodyKinematic::GetBroadPhaseAggregate() const
 {
-	return m_broadPhaseAggregateNode;
+	return m_sceneAggregateNode;
 }
 
 void ndBodyKinematic::SetBroadPhaseAggregate(ndSceneAggregate* const node)
 {
-	m_broadPhaseAggregateNode = node;
+	m_sceneAggregateNode = node;
 }
 
 void ndBodyKinematic::ReleaseMemory()
