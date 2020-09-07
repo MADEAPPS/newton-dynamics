@@ -23,6 +23,7 @@
 #define __D_WORLD_H__
 
 #include "ndNewtonStdafx.h"
+#include "ndDynamicsUpdate.h"
 
 class ndWorld;
 class ndBodyDynamic;
@@ -30,7 +31,7 @@ class ndBodyDynamic;
 #define D_NEWTON_ENGINE_VERSION 400
 
 D_MSV_NEWTON_ALIGN_32
-class ndWorld: public dClassAlloc
+class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 {
 	class ndWorldMixedScene;
 
@@ -63,13 +64,12 @@ class ndWorld: public dClassAlloc
 	void SetContactNotify(ndContactNotify* const notify);
 	
 	protected:
-	D_NEWTON_API virtual void UpdateSkeletons();
+	virtual void UpdateSkeletons();
 	//D_NEWTON_API virtual void UpdateSleepState();
-	D_NEWTON_API virtual void ApplyExternalForces();
-	D_NEWTON_API virtual void UpdatePrelisteners();
-	D_NEWTON_API virtual void UpdatePostlisteners();
-	D_NEWTON_API virtual void UpdateDynamics();
-	D_NEWTON_API virtual void UpdateListenersPostTransform();
+	virtual void ApplyExternalForces();
+	virtual void UpdatePrelisteners();
+	virtual void UpdatePostlisteners();
+	virtual void UpdateListenersPostTransform();
 
 	private:
 	ndScene* m_scene;
@@ -79,8 +79,7 @@ class ndWorld: public dClassAlloc
 	bool m_collisionUpdate;
 
 	friend class ndScene;
-} D_GCC_NEWTON_ALIGN_32 ;
-
+} D_GCC_NEWTON_ALIGN_32;
 
 inline void ndWorld::Sync()
 {

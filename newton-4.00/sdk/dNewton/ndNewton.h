@@ -48,6 +48,7 @@
 #include <ndShapeInstance.h>
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
+#include <ndDynamicsUpdate.h>
 
 
 #endif 

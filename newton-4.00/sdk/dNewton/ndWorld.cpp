@@ -21,8 +21,8 @@
 
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
-#include "ndBodyDynamic.h"
 #include "ndSceneMixed.h"
+#include "ndBodyDynamic.h"
 
 class ndWorld::ndWorldMixedScene: public ndSceneMixed
 {
@@ -55,7 +55,7 @@ class ndWorld::ndWorldMixedScene: public ndSceneMixed
 		DeleteDeadContact();
 		
 		// calculate internal forces, integrate bodies and update matrices.
-		m_world->UpdateDynamics();
+		m_world->DynamicsUpdate();
 		m_world->UpdatePostlisteners();
 	}
 
@@ -92,6 +92,7 @@ class ndWorld::ndWorldMixedScene: public ndSceneMixed
 
 ndWorld::ndWorld()
 	:dClassAlloc()
+	,ndDynamicsUpdate()
 	,m_scene(nullptr)
 	,m_timestep(dFloat32 (0.0f))
 	,m_lastExecutionTime(dFloat32(0.0f))
@@ -114,10 +115,6 @@ void ndWorld::UpdatePrelisteners()
 }
 
 void ndWorld::UpdatePostlisteners()
-{
-}
-
-void ndWorld::UpdateDynamics()
 {
 }
 

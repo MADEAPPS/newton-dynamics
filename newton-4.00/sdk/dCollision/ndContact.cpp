@@ -31,7 +31,7 @@ dVector ndContact::m_initialSeparatingVector(dFloat32(0.0f), dFloat32(1.0f), dFl
 #include "dgWorld.h"
 #include "dgContact.h"
 #include "dgCollisionInstance.h"
-#include "dgWorldDynamicUpdate.h"
+#include "ndDynamicsUpdate.h"
 
 #define REST_RELATIVE_VELOCITY			dgFloat32 (1.0e-3f)
 #define MAX_DYNAMIC_FRICTION_SPEED		dgFloat32 (0.3f)
