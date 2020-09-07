@@ -44,7 +44,7 @@ class ndBody: public dClassAlloc
 	virtual ndBodyKinematic* GetAsBodyKinematic() { return nullptr; }
 
 	dUnsigned32 GetId() const;
-	virtual dFloat32 GetInvMass() const { return dFloat32(0.0f); }
+	virtual const dFloat32 GetInvMass() const { return dFloat32(0.0f); }
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const = 0;
 
 	D_COLLISION_API void SetCentreOfMass(const dVector& com);

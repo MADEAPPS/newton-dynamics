@@ -56,6 +56,9 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	bool AddBody(ndBody* const body);
 	bool RemoveBody(ndBody* const body);
 
+	const dInt32 GetSolverIterations() const;
+	void SetSolverIterations(dInt32 iterations);
+
 	ndScene* GetScene() const;
 
 	dFloat32 GetUpdateTime() const;
@@ -76,6 +79,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	dFloat32 m_timestep;
 	dFloat32 m_lastExecutionTime;
 	dInt32 m_subSteps;
+	dInt32 m_solverIterations;
 	bool m_collisionUpdate;
 
 	friend class ndScene;
@@ -109,6 +113,16 @@ inline void ndWorld::SetSubSteps(dInt32 subSteps)
 inline ndScene* ndWorld::GetScene() const
 {
 	return m_scene;
+}
+
+inline const dInt32 ndWorld::GetSolverIterations() const
+{
+	return m_solverIterations;
+}
+
+inline void ndWorld::SetSolverIterations(dInt32 iterations)
+{
+	m_solverIterations = dUnsigned32(dMax(4, iterations));
 }
 
 inline ndContactNotify* ndWorld::GetContactNotify() const

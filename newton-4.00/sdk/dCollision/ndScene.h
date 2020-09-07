@@ -70,6 +70,7 @@ class ndScene
 	void Sync();
 
 	dInt32 GetThreadCount() const;
+	const dArray<ndContact*>& GetActiveContacts() const;
 	const dArray<ndBodyKinematic*>& GetWorkingBodyArray() const;
 
 	template <class T>
@@ -163,6 +164,11 @@ inline dInt32 ndScene::GetThreadCount() const
 {
 	const dThreadPool& pool = *this;
 	return pool.GetCount();
+}
+
+inline const dArray<ndContact*>& ndScene::GetActiveContacts() const
+{
+	return m_activeContacts;
 }
 
 inline const dArray<ndBodyKinematic*>& ndScene::GetWorkingBodyArray() const

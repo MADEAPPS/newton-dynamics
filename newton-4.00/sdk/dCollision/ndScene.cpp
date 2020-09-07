@@ -293,6 +293,7 @@ void ndScene::BuildBodyArray()
 				if (inScene)
 				{
 					m_tmpBodyArray[index] = dynBody;
+					dynBody->m_index = index;
 					index++;
 				}
 			}

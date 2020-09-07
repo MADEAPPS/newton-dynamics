@@ -38,7 +38,7 @@ class dArray
 	dArray ();
 	~dArray ();
 
-	dInt32 GetCount() const;
+	const dInt32 GetCount() const;
 	void SetCount(dInt32 count);
 
 	void Clear();
@@ -105,7 +105,7 @@ void dArray<T>::PushBack(T& element)
 }
 
 template<class T>
-dInt32 dArray<T>::GetCount() const
+const dInt32 dArray<T>::GetCount() const
 {
 	return m_size;
 }
@@ -143,7 +143,8 @@ void dArray<T>::Resize(dInt32 size)
 		{
 			for (dInt32 i = 0; i < m_capacity; i++)
 			{
-				newArray[i] = m_array[i];
+				//newArray[i] = m_array[i];
+				memcpy(&newArray[i], &m_array[i], sizeof(T));
 			}
 			dFree(m_array);
 		}
@@ -158,7 +159,8 @@ void dArray<T>::Resize(dInt32 size)
 		{
 			for (dInt32 i = 0; i < size; i++) 
 			{
-				newArray[i] = m_array[i];
+				//newArray[i] = m_array[i];
+				memcpy(&newArray[i], &m_array[i], sizeof(T));
 			}
 			dFree(m_array);
 		}

@@ -289,10 +289,25 @@ class ndDynamicsUpdate
 	//friend class dgParallelBodySolver;
 	//friend class dgSolverWorlkerThreads;
 
+	class ndBodyProxy
+	{
+		public:
+		dFloat32 m_weight;
+		dFloat32 m_invWeight;
+		dSpinLock m_lock;
+	};
+
 	public:
 	ndDynamicsUpdate();
 	~ndDynamicsUpdate();
 	void DynamicsUpdate();
+
+	private:
+	void DefaultUpdate();
+	void InitWeights();
+
+	dArray<ndBodyProxy> m_bodyProxyArray;
+	dInt32 m_solverPasses;
 
 } D_GCC_NEWTON_ALIGN_32;
 

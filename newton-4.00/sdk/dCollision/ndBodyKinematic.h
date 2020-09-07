@@ -49,7 +49,8 @@ class ndBodyKinematic: public ndBody
 
 	ndScene* GetBroadPhase() const;
 
-	dFloat32 GetInvMass() const;
+	const dUnsigned32 GetIndex() const;
+	const dFloat32 GetInvMass() const;
 	dVector GetMassMatrix() const;
 	void SetMassMatrix(const dVector& massMatrix);
 
@@ -92,13 +93,19 @@ class ndBodyKinematic: public ndBody
 	dList<ndBodyKinematic*>::dListNode* m_broadPhaseNode;
 	ndSceneBodyNode* m_broadPhaseBodyNode;
 	ndSceneAggregate* m_broadPhaseAggregateNode;
+	dUnsigned32 m_index;
 
 	friend class ndScene;
 	friend class ndSceneMixed;
 	friend class ndSceneBodyNode;
 } D_GCC_NEWTON_ALIGN_32;
 
-inline dFloat32 ndBodyKinematic::GetInvMass() const
+inline const dUnsigned32 ndBodyKinematic::GetIndex() const
+{
+	return m_index;
+}
+
+inline const dFloat32 ndBodyKinematic::GetInvMass() const
 {
 	return m_invMass.m_w;
 }

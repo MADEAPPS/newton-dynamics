@@ -131,6 +131,7 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_broadPhaseNode(nullptr)
 	,m_broadPhaseBodyNode(nullptr)
 	,m_broadPhaseAggregateNode(nullptr)
+	,m_index(0)
 {
 	m_shapeInstance.m_ownerBody = this;
 }

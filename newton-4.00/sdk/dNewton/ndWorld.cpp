@@ -97,6 +97,7 @@ ndWorld::ndWorld()
 	,m_timestep(dFloat32 (0.0f))
 	,m_lastExecutionTime(dFloat32(0.0f))
 	,m_subSteps(1)
+	,m_solverIterations(4)
 	,m_collisionUpdate(true)
 {
 	// start the engine thread;
