@@ -32,6 +32,8 @@
 
 ndBodyDynamic::ndBodyDynamic()
 	:ndBodyKinematic()
+	,m_accel(dVector::m_zero)
+	,m_alpha(dVector::m_zero)
 	,m_externalForce(dVector::m_zero)
 	,m_externalTorque(dVector::m_zero)
 	,m_jointArray()
@@ -59,3 +61,14 @@ void ndBodyDynamic::ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep)
 		m_externalTorque = m_externalTorque & dVector::m_triplexMask;
 	}
 }
+
+void ndBodyDynamic::AddDampingAcceleration(dFloat32 timestep)
+{
+	//dgVector damp(GetDampCoeffcient(timestep));
+	//dgVector omegaDamp(damp & dgVector::m_triplexMask);
+	//dgVector omega(m_matrix.UnrotateVector(m_omega) * omegaDamp);
+	//
+	//m_veloc = m_veloc.Scale(damp.m_w);
+	//m_omega = m_matrix.RotateVector(omega);
+}
+

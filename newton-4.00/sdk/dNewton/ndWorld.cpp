@@ -33,6 +33,11 @@ class ndWorld::ndWorldMixedScene: public ndSceneMixed
 	{
 	}
 
+	ndWorld* GetWorld() const
+	{
+		return m_world;
+	}
+
 	void SubStepUpdate(dFloat32 timestep)
 	{
 		D_TRACKTIME();
@@ -137,11 +142,10 @@ void ndWorld::ApplyExternalForces()
 		{
 			D_TRACKTIME();
 
-			ndWorld* const world = ((ndWorldMixedScene*)m_owner)->m_world;
-			ndScene* const scene = world->GetScene();
+			//ndWorld* const world = m_owner->GetWorld();
 			const dInt32 threadIndex = GetThredID();
 			
-			const dArray<ndBodyKinematic*>& bodyArray = scene->GetWorkingBodyArray();
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetWorkingBodyArray();
 			const dInt32 count = bodyArray.GetCount();
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{

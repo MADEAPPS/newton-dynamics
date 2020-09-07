@@ -28,7 +28,7 @@
 #define D_MINIMUM_MASS	dFloat32(1.0e-5f)
 #define D_INFINITE_MASS	dFloat32(1.0e15f)
 
-class ndDummyCollision : public ndShapeNull
+class ndDummyCollision: public ndShapeNull
 {
 	public:
 	ndDummyCollision()
@@ -123,6 +123,7 @@ void ndBodyKinematic::ndContactMap::DetachContact(ndContact* const contact)
 
 ndBodyKinematic::ndBodyKinematic()
 	:ndBody()
+	,m_invWorldInertiaMatrix(dGetZeroMatrix())
 	,m_shapeInstance(ndDummyCollision::GetNullShape())
 	,m_mass(dVector::m_zero)
 	,m_invMass(dVector::m_zero)
@@ -133,6 +134,7 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_broadPhaseAggregateNode(nullptr)
 	,m_index(0)
 {
+	m_invWorldInertiaMatrix[3][3] = dFloat32(1.0f);
 	m_shapeInstance.m_ownerBody = this;
 }
 
@@ -268,11 +270,11 @@ void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 	dgBodyMasterList& me = *m_world;
 	for (dgBodyMasterList::dgListNode* refNode = me.GetFirst(); refNode; refNode = refNode->GetNext()) {
 		dgBody* const body0 = refNode->GetInfo().GetBody();
-		dgVector invMass(body0->GetInvMass());
+		dVector invMass(body0->GetInvMass());
 		if (invMass.m_w != 0.0f) {
 			for (; refNode; refNode = refNode->GetNext()) {
 				dgBody* const body1 = refNode->GetInfo().GetBody();
-				dgVector invMass1(body1->GetInvMass());
+				dVector invMass1(body1->GetInvMass());
 				dAssert(invMass1.m_w != 0.0f);
 			}
 			break;
@@ -323,4 +325,55 @@ void ndBodyKinematic::UpdateCollisionMatrix()
 {
 	m_shapeInstance.SetGlobalMatrix(m_shapeInstance.GetLocalMatrix() * m_matrix);
 	m_shapeInstance.CalculateFastAABB(m_shapeInstance.GetGlobalMatrix(), m_minAABB, m_maxAABB);
+}
+
+dMatrix ndBodyKinematic::CalculateInvInertiaMatrix() const
+{
+	const dVector invIxx(m_invMass[0]);
+	const dVector invIyy(m_invMass[1]);
+	const dVector invIzz(m_invMass[2]);
+	return dMatrix(
+		m_matrix.m_front.Scale(m_matrix.m_front[0]) * invIxx +
+		m_matrix.m_up.Scale(m_matrix.m_up[0])		* invIyy +
+		m_matrix.m_right.Scale(m_matrix.m_right[0]) * invIzz,
+
+		m_matrix.m_front.Scale(m_matrix.m_front[1]) * invIxx +
+		m_matrix.m_up.Scale(m_matrix.m_up[1])		* invIyy +
+		m_matrix.m_right.Scale(m_matrix.m_right[1]) * invIzz,
+
+		m_matrix.m_front.Scale(m_matrix.m_front[2]) * invIxx +
+		m_matrix.m_up.Scale(m_matrix.m_up[2])		* invIyy +
+		m_matrix.m_right.Scale(m_matrix.m_right[2]) * invIzz,
+		dVector::m_wOne);
+}
+
+void ndBodyKinematic::UpdateGyroData()
+{
+	//if (m_gyroTorqueOn) 
+	//{
+	//	m_gyroTorque = m_omega.CrossProduct(CalculateAngularMomentum());
+	//	m_gyroAlpha = m_invWorldInertiaMatrix.RotateVector(m_gyroTorque);
+	//}
+	//else 
+	//{
+	//	m_gyroTorque = dVector::m_zero;
+	//	m_gyroAlpha = dVector::m_zero;
+	//}
+}
+
+void ndBodyKinematic::UpdateInvInertiaMatrix()
+{
+	dAssert(m_invWorldInertiaMatrix[0][3] == dFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[1][3] == dFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[2][3] == dFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[3][3] == dFloat32(1.0f));
+
+	m_invWorldInertiaMatrix = CalculateInvInertiaMatrix();
+
+	dAssert(m_invWorldInertiaMatrix[0][3] == dFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[1][3] == dFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[2][3] == dFloat32(0.0f));
+	dAssert(m_invWorldInertiaMatrix[3][3] == dFloat32(1.0f));
+
+	UpdateGyroData();
 }

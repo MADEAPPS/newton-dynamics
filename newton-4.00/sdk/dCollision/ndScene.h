@@ -29,6 +29,7 @@
 #define D_BROADPHASE_MAX_STACK_DEPTH	256
 #define D_PRUNE_CONTACT_TOLERANCE		dFloat32 (5.0e-2f)
 
+class ndWorld;
 class ndContact;
 class ndRayCastNotify;
 class ndContactNotify;
@@ -70,6 +71,7 @@ class ndScene
 	void Sync();
 
 	dInt32 GetThreadCount() const;
+	virtual ndWorld* GetWorld() const;
 	const dArray<ndContact*>& GetActiveContacts() const;
 	const dArray<ndBodyKinematic*>& GetWorkingBodyArray() const;
 
@@ -158,6 +160,11 @@ class ndScene
 inline void ndScene::Sync()
 {
 	dThreadPool::Sync();
+}
+
+inline ndWorld* ndScene::GetWorld() const
+{
+	return nullptr;
 }
 
 inline dInt32 ndScene::GetThreadCount() const

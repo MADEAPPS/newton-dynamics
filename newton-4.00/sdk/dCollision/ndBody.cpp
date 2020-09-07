@@ -34,7 +34,6 @@ dUnsigned32 ndBody::m_uniqueIDCount = 0;
 
 ndBody::ndBody()
 	:m_matrix(dGetIdentityMatrix())
-	,m_invWorldInertiaMatrix(dGetZeroMatrix())
 	,m_veloc(dVector::m_zero)
 	,m_omega(dVector::m_zero)
 	,m_localCentreOfMass(dVector::m_zero)
@@ -84,20 +83,10 @@ void ndBody::SetNotifyCallback(ndBodyNotify* const notify)
 	}
 }
 
-dVector ndBody::GetOmega() const
-{
-	return m_omega;
-}
-
 void ndBody::SetOmega(const dVector& veloc)
 {
 	m_equilibrium = 0;
 	m_omega = veloc;
-}
-
-dVector ndBody::GetVelocity() const
-{
-	return m_veloc;
 }
 
 void ndBody::SetVelocity(const dVector& veloc)

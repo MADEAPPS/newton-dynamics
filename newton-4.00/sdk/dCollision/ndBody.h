@@ -64,7 +64,6 @@ class ndBody: public dClassAlloc
 	virtual ndContact* FindContact(const ndBody* const otherBody) const { return nullptr; }
 
 	dMatrix m_matrix;
-	dMatrix m_invWorldInertiaMatrix;
 	dVector m_veloc;
 	dVector m_omega;
 	dVector m_localCentreOfMass;
@@ -111,6 +110,16 @@ inline dUnsigned32 ndBody::GetId() const
 inline ndBodyNotify* ndBody::GetNotifyCallback() const
 {
 	return m_notifyCallback;
+}
+
+inline dVector ndBody::GetVelocity() const
+{
+	return m_veloc;
+}
+
+inline dVector ndBody::GetOmega() const
+{
+	return m_omega;
 }
 
 

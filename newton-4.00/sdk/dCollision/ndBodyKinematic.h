@@ -60,6 +60,10 @@ class ndBodyKinematic: public ndBody
 
 	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
 
+	D_COLLISION_API dMatrix CalculateInvInertiaMatrix() const;
+
+	D_COLLISION_API void UpdateInvInertiaMatrix();
+
 	void SetMassMatrix(dFloat32 mass, const ndShapeInstance& shapeInstance);
 	void SetMassMatrix(dFloat32 Ixx, dFloat32 Iyy, dFloat32 Izz, dFloat32 mass);
 	void GetMassMatrix(dFloat32& Ixx, dFloat32& Iyy, dFloat32& Izz, dFloat32& mass);
@@ -75,6 +79,7 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API void SetMassMatrix(dFloat32 mass, const dMatrix& inertia);
 
 	protected:
+	void UpdateGyroData();
 	void UpdateCollisionMatrix();
 	void SetBroadPhase(ndScene* const broadPhase, dList<ndBodyKinematic*>::dListNode* const node);
 
@@ -84,6 +89,7 @@ class ndBodyKinematic: public ndBody
 	ndSceneAggregate* GetBroadPhaseAggregate() const;
 	void SetBroadPhaseAggregate(ndSceneAggregate* const node);
 
+	dMatrix m_invWorldInertiaMatrix;
 	ndShapeInstance m_shapeInstance;
 	dVector m_mass;
 	dVector m_invMass;

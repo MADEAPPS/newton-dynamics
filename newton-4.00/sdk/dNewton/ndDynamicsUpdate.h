@@ -305,6 +305,7 @@ class ndDynamicsUpdate
 	private:
 	void DefaultUpdate();
 	void InitWeights();
+	void InitBodyArray();
 
 	dArray<ndBodyProxy> m_bodyProxyArray;
 	dInt32 m_solverPasses;

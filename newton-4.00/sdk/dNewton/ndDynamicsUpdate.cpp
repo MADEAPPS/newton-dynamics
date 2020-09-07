@@ -21,6 +21,7 @@
 
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
+#include "ndBodyDynamic.h"
 #include "ndDynamicsUpdate.h"
 
 #if 0
@@ -710,15 +711,12 @@ void ndDynamicsUpdate::DefaultUpdate()
 {
 	D_TRACKTIME();
 	InitWeights();
+	InitBodyArray();
 }
 
 void ndDynamicsUpdate::InitWeights()
 {
 	D_TRACKTIME();
-	//const dgJointInfo* const jointArray = m_jointArray;
-	//const dInt32 jointCount = m_cluster->m_jointCount;
-	//dgBodyProxy* const weight = m_bodyProxyArray;
-
 	const ndWorld* const world = (ndWorld*)this;
 	const ndScene* const scene = world->GetScene();
 
@@ -734,7 +732,6 @@ void ndDynamicsUpdate::InitWeights()
 
 	for (dInt32 i = contactArray.GetCount() - 1; i >= 0; i--) 
 	{
-		//const dgJointInfo* const jointInfo = &jointArray[i];
 		const ndContact* const contact = contactArray[i];
 		const ndBodyKinematic* const body0 = contact->GetBody0();
 		const ndBodyKinematic* const body1 = contact->GetBody1();
@@ -785,4 +782,47 @@ void ndDynamicsUpdate::InitWeights()
 	}
 	const dInt32 conectivity = 7;
 	m_solverPasses = world->GetSolverIterations() + 2 * dInt32(extraPasses) / conectivity + 1;
+}
+
+void ndDynamicsUpdate::InitBodyArray()
+{
+	D_TRACKTIME();
+	class ndInitBodyArray: public ndScene::ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+
+			const dInt32 threadIndex = GetThredID();
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetWorkingBodyArray();
+			const dInt32 count = bodyArray.GetCount();
+
+			ndWorld* const world = (ndWorld*)m_owner->GetWorld();
+			dArray<ndBodyProxy>& bodyProxyArray = world->m_bodyProxyArray;
+			
+			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
+			{
+				ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
+				if (body)
+				{
+					//const dgBodyInfo* const bodyInfo = &bodyArray[i];
+					//dgBody* const body = (dgDynamicBody*)bodyInfo->m_body;
+					body->AddDampingAcceleration(m_timestep);
+					body->UpdateInvInertiaMatrix();
+					
+					body->SetAccel(body->GetVelocity());
+					body->SetAlpha(body->GetOmega());
+					
+					//const dgFloat32 w = bodyProxyArray[i].m_weight ? bodyProxyArray[i].m_weight : dgFloat32(1.0f);
+					const dFloat32 w = bodyProxyArray[i].m_weight;
+					bodyProxyArray[i].m_invWeight = dFloat32(1.0f) / w;
+				}
+			}
+		}
+	};
+
+	const ndWorld* const world = (ndWorld*)this;
+	ndScene* const scene = world->GetScene();
+	scene->SubmitJobs<ndInitBodyArray>();
 }
