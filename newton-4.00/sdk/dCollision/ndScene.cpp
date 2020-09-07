@@ -985,7 +985,7 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 			dAssert(count <= (D_CONSTRAINT_MAX_ROWS / 3));
 			//m_world->ProcessContacts(pair, threadID);
 			ProcessContacts(threadIndex, count, &contactSolver);
-			dAssert(0);
+			//dAssert(0);
 			//KinematicBodyActivation(pair->m_contact);
 		}
 	}
@@ -1005,19 +1005,19 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 	dAssert(body1);
 	dAssert(body0 != body1);
 
-	//const dgContactMaterial* const material = contact->m_material;
+	//const ndContactMaterial* const material = contact->m_material;
 	const ndContactPoint* const contactArray = contactSolver->m_contactBuffer;
 	
-	//if (material->m_flags & dgContactMaterial::m_resetSkeletonSelfCollision) {
+	//if (material->m_flags & ndContactMaterial::m_resetSkeletonSelfCollision) {
 	//	contact->ResetSkeletonSelftCollision();
 	//}
 	//
-	//if (material->m_flags & dgContactMaterial::m_resetSkeletonIntraCollision) {
+	//if (material->m_flags & ndContactMaterial::m_resetSkeletonIntraCollision) {
 	//	contact->ResetSkeletonIntraCollision();
 	//}
 	//
 	//dInt32 contactCount = pair->m_contactCount;
-	//dgList<dgContactMaterial>& list = *contact;
+	//dgList<ndContactMaterial>& list = *contact;
 	//
 	//contact->m_timeOfImpact = pair->m_timestep;
 
@@ -1104,7 +1104,7 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 			contactNode = list.Append();
 		}
 	
-	//	dgContactMaterial* const contactMaterial = &contactNode->GetInfo();
+	//	ndContactMaterial* const contactMaterial = &contactNode->GetInfo();
 		ndContactMaterial* const contactPoint = &contactNode->GetInfo();
 	
 		dAssert(dCheckFloat(contactArray[i].m_point.m_x));
@@ -1134,7 +1134,7 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 		//contactPoint->m_dynamicFriction1 = material->m_dynamicFriction1;
 	
 		//dAssert(dAbs(contactMaterial->m_normal.DotProduct(contactMaterial->m_normal).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-1f));
-		//contactMaterial->m_flags = dgContactMaterial::m_collisionEnable | (material->m_flags & (dgContactMaterial::m_friction0Enable | dgContactMaterial::m_friction1Enable));
+		//contactMaterial->m_flags = ndContactMaterial::m_collisionEnable | (material->m_flags & (ndContactMaterial::m_friction0Enable | ndContactMaterial::m_friction1Enable));
 		//contactMaterial->m_userData = material->m_userData;
 	
 		if (staticMotion) 
@@ -1234,7 +1234,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 		bool active = contact->m_active;
 		if (ValidateContactCache(contact, deltaTime)) 
 		{
-			contact->m_broadphaseLru = m_lru;
+			contact->m_sceneLru = m_lru;
 			contact->m_timeOfImpact = dFloat32(1.0e10f);
 		}
 		else 
@@ -1270,7 +1270,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 				{
 					contact->m_timeOfImpact = dFloat32(1.0e10f);
 				}
-				contact->m_broadphaseLru = m_lru;
+				contact->m_sceneLru = m_lru;
 			}
 			else 
 			{
@@ -1279,9 +1279,9 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 	//			const dgBroadPhaseNode* const bodyNode0 = contact->GetBody0()->m_broadPhaseNode;
 	//			const dgBroadPhaseNode* const bodyNode1 = contact->GetBody1()->m_broadPhaseNode;
 	//			if (dgOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox)) {
-	//				contact->m_broadphaseLru = m_lru;
+	//				contact->m_sceneLru = m_lru;
 	//			}
-	//			else if (contact->m_broadphaseLru < lru) {
+	//			else if (contact->m_sceneLru < lru) {
 	//				contact->m_killContact = 1;
 	//			}
 			}
@@ -1301,7 +1301,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 	else 
 	{
 		dAssert(0);
-		//contact->m_broadphaseLru = m_lru;
+		//contact->m_sceneLru = m_lru;
 	}
 
 	contact->m_killContact = contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
@@ -1646,4 +1646,34 @@ void ndScene::CalculateContacts()
 	};
 	
 	SubmitJobs<ndCalculateContacts>();
+}
+
+void ndScene::DeleteDeadContact()
+{
+	D_TRACKTIME();
+	dInt32 activeCount = m_activeContacts.GetCount();
+	for (dInt32 i = activeCount - 1; i >= 0; i --)
+	{ 
+		ndContact* const contact = m_activeContacts[i];
+		if (contact->m_killContact) 
+		{
+			m_contactList.DeleteContact(contact);
+			activeCount--;
+			m_activeContacts[i] = m_activeContacts[activeCount];
+		}
+		//else if (contact->m_active && contact->m_maxDOF)
+		//{
+		//	dAssert(0);
+		//	constraintArray[activeCount].m_joint = contact;
+		//	activeCount++;
+		//}
+		//else if (contact->m_body0->m_continueCollisionMode | contact->m_body1->m_continueCollisionMode) 
+		//{
+		//	if (contact->EstimateCCD(timestep)) {
+		//		constraintArray[activeCount].m_joint = contact;
+		//		activeCount++;
+		//	}
+		//}
+	}
+	m_activeContacts.SetCount(activeCount);
 }

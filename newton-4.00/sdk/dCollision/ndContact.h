@@ -132,7 +132,7 @@ class ndContact
 	,public dContainersFreeListAlloc<ndContact*>
 {
 	public:
-	D_COLLISION_API ndContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
+	D_COLLISION_API ndContact();
 	D_COLLISION_API virtual ~ndContact();
 
 	D_COLLISION_API virtual ndBodyKinematic* GetBody0() const;
@@ -142,10 +142,11 @@ class ndContact
 	D_COLLISION_API void DetachFromBodies();
 
 	ndContact* GetAsContact() { return this; }
-
 	dFloat32 GetPruningTolerance() const;
 	
 	private:
+	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
+
 	dVector m_positAcc;
 	dQuaternion m_rotationAcc;
 	dVector m_separatingVector;
@@ -157,7 +158,7 @@ class ndContact
 	dFloat32 m_separationDistance;
 	dFloat32 m_contactPruningTolereance;
 	dUnsigned32 m_maxDOF;
-	dUnsigned32 m_broadphaseLru;
+	dUnsigned32 m_sceneLru;
 	bool m_active;
 	bool m_isAttached;
 	bool m_killContact;

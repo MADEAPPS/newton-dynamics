@@ -502,36 +502,42 @@ void dgContact::JointAccelerations(dgJointAccelerationDecriptor* const params)
 
 #endif
 
-ndContact::ndContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
+ndContact::ndContact()
 	:ndConstraint()
 	,dContainersFreeListAlloc<ndContact*>()
 	,m_positAcc(dFloat32(10.0f))
 	,m_rotationAcc()
 	,m_separatingVector(m_initialSeparatingVector)
 	,m_contacPointsList()
-	,m_body0(body0->GetAsBodyKinematic())
-	,m_body1(body1->GetAsBodyKinematic())
+	,m_body0(nullptr)
+	,m_body1(nullptr)
 	,m_linkNode(nullptr)
 	,m_timeOfImpact(dFloat32(1.0e10f))
 	,m_separationDistance(dFloat32(0.0f))
 	,m_contactPruningTolereance(D_PRUNE_CONTACT_TOLERANCE)
 	,m_maxDOF(0)
-	,m_broadphaseLru(0)
+	,m_sceneLru(0)
 	,m_active(false)
 	,m_isAttached(false)
 	,m_killContact(false)
 {
-	dAssert(m_body0);
-	dAssert(m_body1);
+}
+
+ndContact::~ndContact()
+{
+}
+
+void ndContact::SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
+{
+	dAssert(body0);
+	dAssert(body1);
+	m_body0 = body0;
+	m_body1 = body1;
 	if (m_body1->GetInvMass() == dFloat32(0.0f))
 	{
 		dSwap(m_body1, m_body0);
 	}
 	dAssert(m_body1->GetInvMass() > dFloat32(0.0f));
-}
-
-ndContact::~ndContact()
-{
 }
 
 ndBodyKinematic* ndContact::GetBody0() const
@@ -543,7 +549,6 @@ ndBodyKinematic* ndContact::GetBody1() const
 { 
 	return m_body1; 
 }
-
 
 void ndContact::AttachToBodies()
 {

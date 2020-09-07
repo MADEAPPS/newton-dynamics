@@ -26,16 +26,17 @@
 
 ndContact* ndContactList::CreateContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1)
 {
-	ndContact temp(body0, body1);
 	dScopeSpinLock lock(m_lock);
-	dListNode* const node = Append(temp);
+	dListNode* const node = Append();
 	ndContact* const contact = &node->GetInfo();
+	contact->SetBodies(body0, body1);
 	contact->m_linkNode = node;
 	return contact;
 }
 
 void ndContactList::DeleteContact(ndContact* const contact)
 {
+	dScopeSpinLock lock(m_lock);
 	contact->DetachFromBodies();
 	Remove(contact->m_linkNode);
 }

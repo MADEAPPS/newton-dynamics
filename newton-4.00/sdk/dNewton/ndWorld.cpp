@@ -52,6 +52,7 @@ class ndWorld::ndWorldMixedScene: public ndSceneMixed
 		FindCollidingPairs();
 		AttachNewContact();
 		CalculateContacts();
+		DeleteDeadContact();
 		
 		// calculate internal forces, integrate bodies and update matrices.
 		m_world->UpdateDynamics();

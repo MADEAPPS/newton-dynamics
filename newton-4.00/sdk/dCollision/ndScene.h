@@ -117,6 +117,7 @@ class ndScene
 	D_COLLISION_API void UpdateAabb();
 	D_COLLISION_API void TransformUpdate();
 	D_COLLISION_API void CalculateContacts();
+	D_COLLISION_API void DeleteDeadContact();
 	D_COLLISION_API void FindCollidingPairs();
 
 	D_COLLISION_API virtual void ThreadFunction();
