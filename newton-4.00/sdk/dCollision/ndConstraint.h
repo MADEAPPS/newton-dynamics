@@ -30,9 +30,20 @@
 #define D_CONSTRAINT_MAX_ROWS	(3 * 16)
 #define MIN_JOINT_PIN_LENGTH	dFloat32 (50.0f)
 
-
 class ndBody;
 class ndContact;
+class ndBodyKinematic;
+
+D_MSV_NEWTON_ALIGN_32
+class dgPointParam
+{
+	public:
+	dVector m_r0;
+	dVector m_r1;
+	dVector m_posit0;
+	dVector m_posit1;
+	dFloat32 m_defualtDiagonalRegularizer;
+} D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
 class ndJacobian
@@ -117,8 +128,8 @@ class ndConstraintDescritor
 	//dInt8	m_flags[D_CONSTRAINT_MAX_ROWS];
 	//dgWorld* m_world;
 	//dInt32 m_threadIndex;
-	//dFloat32 m_timestep;
-	//dFloat32 m_invTimestep;
+	dFloat32 m_timestep;
+	dFloat32 m_invTimestep;
 } D_GCC_NEWTON_ALIGN_32;
 
 
@@ -132,6 +143,12 @@ class ndConstraint
 	ndContact* GetAsContact() {return nullptr;}
 
 	virtual const dUnsigned32 GetRowsCount() const = 0;
+	virtual dUnsigned32 JacobianDerivative(ndConstraintDescritor& params) = 0;
+
+	void InitPointParam(dgPointParam& param, dFloat32 stiffness, const dVector& p0Global, const dVector& p1Global) const;
+
+	virtual ndBodyKinematic* GetKinematicBody0() const { return nullptr; }
+	virtual ndBodyKinematic* GetKinematicBody1() const { return nullptr; }
 
 	protected:
 	ndConstraint();

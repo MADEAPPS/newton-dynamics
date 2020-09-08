@@ -20,7 +20,9 @@
 */
 #include "ndCollisionStdafx.h"
 #include "ndBody.h"
+#include "ndContact.h"
 #include "ndConstraint.h"
+#include "ndBodyKinematic.h"
 
 #if 0
 #include "dgBody.h"
@@ -42,33 +44,33 @@ void ndConstraint::SetUserData (void *userData)
 	m_userData = userData;
 }
 
-dgFloat32 ndConstraint::GetMassScaleBody0() const
+dFloat32 ndConstraint::GetMassScaleBody0() const
 {
-	return dgFloat32(1.0f);
+	return dFloat32(1.0f);
 }
 
-dgFloat32 ndConstraint::GetMassScaleBody1() const
+dFloat32 ndConstraint::GetMassScaleBody1() const
 {
-	return dgFloat32(1.0f);
+	return dFloat32(1.0f);
 }
 
-void ndConstraint::InitPointParam (dgPointParam& param, dgFloat32 stiffness, const dgVector& p0Global, const dgVector& p1Global) const
+void ndConstraint::InitPointParam (dgPointParam& param, dFloat32 stiffness, const dVector& p0Global, const dVector& p1Global) const
 {
-	dgAssert (m_body0);
-	dgAssert (m_body1);
+	dAssert (m_body0);
+	dAssert (m_body1);
 	param.m_defualtDiagonalRegularizer = stiffness; 
 
 	param.m_posit0 = p0Global;
 	param.m_posit1 = p1Global;
 
-	param.m_r0 = (p0Global - m_body0->m_globalCentreOfMass) & dgVector::m_triplexMask;
-	param.m_r1 = (p1Global - m_body1->m_globalCentreOfMass) & dgVector::m_triplexMask;
+	param.m_r0 = (p0Global - m_body0->m_globalCentreOfMass) & dVector::m_triplexMask;
+	param.m_r1 = (p1Global - m_body1->m_globalCentreOfMass) & dVector::m_triplexMask;
 }
 
 void ndConstraint::InitInfo (dgConstraintInfo* const info) const
 {
 	info->m_attachBody_0 = GetBody0();
-	dgAssert (info->m_attachBody_0);
+	dAssert (info->m_attachBody_0);
 	dgWorld* const world = info->m_attachBody_0->GetWorld();
 	if (info->m_attachBody_0  == (dgBody*)world->GetSentinelBody()) {
 		info->m_attachBody_0  = NULL;
@@ -109,3 +111,21 @@ ndConstraint::ndConstraint()
 	//,m_isInSkeletonLoop(false)
 {
 }
+
+void ndConstraint::InitPointParam(dgPointParam& param, dFloat32 stiffness, const dVector& p0Global, const dVector& p1Global) const
+{
+	//ndBody* const body0 = GetBody0();
+	//ndBody* const body1 = GetBody1();
+	ndBodyKinematic* const body0 = GetKinematicBody0();
+	ndBodyKinematic* const body1 = GetKinematicBody1();
+	dAssert(body0);
+	dAssert(body1);
+	param.m_defualtDiagonalRegularizer = stiffness;
+
+	param.m_posit0 = p0Global;
+	param.m_posit1 = p1Global;
+
+	param.m_r0 = (p0Global - body0->m_globalCentreOfMass) & dVector::m_triplexMask;
+	param.m_r1 = (p1Global - body1->m_globalCentreOfMass) & dVector::m_triplexMask;
+}
+

@@ -83,6 +83,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	bool m_collisionUpdate;
 
 	friend class ndScene;
+	friend class ndDynamicsUpdate;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline void ndWorld::Sync()

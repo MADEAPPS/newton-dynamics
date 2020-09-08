@@ -138,6 +138,9 @@ class ndContact
 	D_COLLISION_API virtual ndBodyKinematic* GetBody0() const;
 	D_COLLISION_API virtual ndBodyKinematic* GetBody1() const;
 
+	D_COLLISION_API virtual ndBodyKinematic* GetKinematicBody0() const;
+	D_COLLISION_API virtual ndBodyKinematic* GetKinematicBody1() const;
+
 	D_COLLISION_API void AttachToBodies();
 	D_COLLISION_API void DetachFromBodies();
 
@@ -145,9 +148,11 @@ class ndContact
 	dFloat32 GetPruningTolerance() const;
 
 	virtual const dUnsigned32 GetRowsCount() const;
+	virtual dUnsigned32 JacobianDerivative(ndConstraintDescritor& params);
 	
 	private:
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
+	void JacobianContactDerivative(ndConstraintDescritor& params, const ndContactMaterial& contact, dInt32 normalIndex, dInt32& frictionIndex);
 
 	dVector m_positAcc;
 	dQuaternion m_rotationAcc;
@@ -285,6 +290,26 @@ D_INLINE dFloat32 ndContact::GetPruningTolerance() const
 inline const dUnsigned32 ndContact::GetRowsCount() const
 {
 	return m_maxDOF;
+}
+
+inline ndBodyKinematic* ndContact::GetBody0() const
+{
+	return m_body0;
+}
+
+inline ndBodyKinematic* ndContact::GetBody1() const
+{
+	return m_body1;
+}
+
+inline ndBodyKinematic* ndContact::GetKinematicBody0() const
+{
+	return m_body0;
+}
+
+inline ndBodyKinematic* ndContact::GetKinematicBody1() const
+{
+	return m_body1;
 }
 
 #endif 

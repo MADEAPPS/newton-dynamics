@@ -310,8 +310,11 @@ class ndDynamicsUpdate
 	//dInt32 GetJacobianDerivatives(ndConstraintDescritor& constraintParam, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dInt32 rowCount) const
 	dInt32 GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* const joint) const;
 
+	dArray<ndJacobian> m_intenalForces;
 	dArray<ndConstraint*> m_jointArray;
 	dArray<ndBodyProxy> m_bodyProxyArray;
+	dFloat32 m_timestep;
+	dFloat32 m_invTimestep;
 	dInt32 m_solverPasses;
 	dUnsigned32 m_maxRowsCount;
 	dAtomic<dUnsigned32> m_rowsCount;

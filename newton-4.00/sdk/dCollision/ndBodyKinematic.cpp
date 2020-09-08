@@ -127,6 +127,8 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_shapeInstance(ndDummyCollision::GetNullShape())
 	,m_mass(dVector::m_zero)
 	,m_invMass(dVector::m_zero)
+	,m_gyroAlpha(dVector::m_zero)
+	,m_gyroTorque(dVector::m_zero)
 	,m_contactList()
 	,m_lock()
 	,m_scene(nullptr)
@@ -348,18 +350,30 @@ dMatrix ndBodyKinematic::CalculateInvInertiaMatrix() const
 		dVector::m_wOne);
 }
 
+dVector ndBodyKinematic::CalculateLinearMomentum() const
+{
+	return dVector(m_veloc.Scale(m_mass.m_w));
+}
+
+dVector ndBodyKinematic::CalculateAngularMomentum() const
+{
+	dVector localOmega(m_matrix.UnrotateVector(m_omega));
+	dVector localAngularMomentum(m_mass * localOmega);
+	return m_matrix.RotateVector(localAngularMomentum);
+}
+
 void ndBodyKinematic::UpdateGyroData()
 {
-	//if (m_gyroTorqueOn) 
-	//{
-	//	m_gyroTorque = m_omega.CrossProduct(CalculateAngularMomentum());
-	//	m_gyroAlpha = m_invWorldInertiaMatrix.RotateVector(m_gyroTorque);
-	//}
-	//else 
-	//{
-	//	m_gyroTorque = dVector::m_zero;
-	//	m_gyroAlpha = dVector::m_zero;
-	//}
+	if (m_gyroTorqueOn) 
+	{
+		m_gyroTorque = m_omega.CrossProduct(CalculateAngularMomentum());
+		m_gyroAlpha = m_invWorldInertiaMatrix.RotateVector(m_gyroTorque);
+	}
+	else 
+	{
+		m_gyroTorque = dVector::m_zero;
+		m_gyroAlpha = dVector::m_zero;
+	}
 }
 
 void ndBodyKinematic::UpdateInvInertiaMatrix()

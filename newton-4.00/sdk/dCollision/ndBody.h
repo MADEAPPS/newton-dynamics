@@ -91,14 +91,16 @@ class ndBody: public dClassAlloc
 			//dUnsigned32 m_continueCollisionMode : 1;
 			dUnsigned32 m_collideWithLinkedBodies : 1;
 			//dUnsigned32 m_transformIsDirty : 1;
-			//dUnsigned32 m_gyroTorqueOn : 1;
+			dUnsigned32 m_gyroTorqueOn : 1;
 			//dUnsigned32 m_isdead : 1;
 		};
 	};
 
 	dUnsigned32 m_uniqueID;
 	static dUnsigned32 m_uniqueIDCount;
+
 	friend class ndScene;
+	friend class ndConstraint;
 } D_GCC_NEWTON_ALIGN_32;
 
 

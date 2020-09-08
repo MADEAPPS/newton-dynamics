@@ -26,8 +26,11 @@
 
 
 ndDynamicsUpdate::ndDynamicsUpdate()
-	:m_jointArray()
+	:m_intenalForces()
+	,m_jointArray()
 	,m_bodyProxyArray()
+	,m_timestep(dFloat32 (0.0f))
+	,m_invTimestep(dFloat32(0.0f))
 	,m_solverPasses(0)
 	,m_maxRowsCount(0)
 	,m_rowsCount(0)
@@ -57,6 +60,8 @@ void ndDynamicsUpdate::InitWeights()
 	const ndWorld* const world = (ndWorld*)this;
 	const ndScene* const scene = world->GetScene();
 
+	m_timestep = world->m_timestep;
+	m_invTimestep = dFloat32 (1.0f) / m_timestep;
 	const dArray<ndContact*>& contactArray = scene->GetActiveContacts();
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetWorkingBodyArray();
 
@@ -65,6 +70,8 @@ void ndDynamicsUpdate::InitWeights()
 		m_bodyProxyArray.Resize(256);
 	}
 	m_bodyProxyArray.SetCount(bodyArray.GetCount());
+	m_intenalForces.SetCount(bodyArray.GetCount());
+	memset(&m_intenalForces[0], 0, bodyArray.GetCount() * sizeof(ndJacobian));
 	memset(&m_bodyProxyArray[0], 0, bodyArray.GetCount() * sizeof(ndBodyProxy));
 
 	dUnsigned32 maxRowCount = 0;
@@ -180,15 +187,10 @@ dInt32 ndDynamicsUpdate::GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* 
 		constraintParam.m_forceBounds[i].m_normalIndex = D_INDEPENDENT_ROW;
 	}
 	
-	//dAssert(constraint->m_body0);
-	//dAssert(constraint->m_body1);
-	//ndBodyKinematic* const body0 = joint->GetBody0();
-	//dgBody* const body1 = constraint->m_body1;
-	//dAssert(body0->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body0->IsRTTIType(dgBody::m_kinematicBodyRTTI));
-	//dAssert(body1->IsRTTIType(dgBody::m_dynamicBodyRTTI) || body1->IsRTTIType(dgBody::m_kinematicBodyRTTI));
-	//
-	//dof = constraint->JacobianDerivative(constraintParam);
-	//
+	constraintParam.m_timestep = m_timestep;
+	constraintParam.m_invTimestep = m_invTimestep;
+	dof = joint->JacobianDerivative(constraintParam);
+	
 	//if (constraint->GetId() == dgConstraint::m_contactConstraint) {
 	//	dgContact* const contactJoint = (dgContact*)constraint;
 	//	contactJoint->m_isInSkeletonLoop = false;
