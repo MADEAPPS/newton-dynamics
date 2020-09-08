@@ -33,8 +33,6 @@ class ndBodyDynamic;
 D_MSV_NEWTON_ALIGN_32
 class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 {
-	class ndWorldMixedScene;
-
 	public:
 	D_NEWTON_API ndWorld();
 	D_NEWTON_API virtual ~ndWorld();
@@ -65,6 +63,11 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 
 	ndContactNotify* GetContactNotify() const;
 	void SetContactNotify(ndContactNotify* const notify);
+
+	//void SetCollisionUpdate(bool mode);
+	//const bool GetCollisionUpdate() const;
+
+	void ThreadFunction();
 	
 	protected:
 	virtual void UpdateSkeletons();
@@ -75,6 +78,8 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	virtual void UpdateListenersPostTransform();
 
 	private:
+	void SubStepUpdate(dFloat32 timestep);
+
 	ndScene* m_scene;
 	dFloat32 m_timestep;
 	dFloat32 m_lastExecutionTime;

@@ -21,3 +21,38 @@
 
 #include "ndCollisionStdafx.h"
 
+#ifdef _D_COLLISION_DLL
+
+	void *operator new (size_t size)
+	{
+		// this should not happens on this test
+		// newton should never use global operator new and delete.
+		dAssert(0);
+		return dMalloc(size);
+	}
+
+	void operator delete (void* ptr)
+	{
+		dAssert(0);
+		dFree(ptr);
+	}
+
+	BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+	{
+		switch (ul_reason_for_call)
+		{
+			case DLL_PROCESS_ATTACH:
+			case DLL_THREAD_ATTACH:
+				#if defined(_DEBUG) && defined(_MSC_VER)
+					// Track all memory leaks at the operating system level.
+					// make sure no Newton tool or utility leaves leaks behind.
+					_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_REPORT_FLAG);
+				#endif
+
+			case DLL_THREAD_DETACH:
+			case DLL_PROCESS_DETACH:
+				break;
+		}
+		return TRUE;
+	}
+#endif

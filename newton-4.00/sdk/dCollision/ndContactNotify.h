@@ -40,7 +40,9 @@ class ndMaterial
 		m_dynamicFriction1 = dFloat32(0.4f);
 		m_softness = dFloat32(0.0f);
 		m_skinThickness = dFloat32 (0.0f);
-		m_flags = ndContactMaterial::m_collisionEnable | ndContactMaterial::m_friction0Enable | ndContactMaterial::m_friction1Enable;
+		//dAssert(0);
+		//m_flags = ndContactMaterial::m_collisionEnable | ndContactMaterial::m_friction0Enable | ndContactMaterial::m_friction1Enable;
+		//m_flags = ndContactMaterial::m_collisionEnable | ndContactMaterial::m_friction0Enable | ndContactMaterial::m_friction1Enable;
 	}
 
 	dFloat32 m_restitution;

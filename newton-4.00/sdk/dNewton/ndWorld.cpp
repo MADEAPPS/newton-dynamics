@@ -21,79 +21,8 @@
 
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
-#include "ndSceneMixed.h"
+#include "ndWorldScene.h"
 #include "ndBodyDynamic.h"
-
-class ndWorld::ndWorldMixedScene: public ndSceneMixed
-{
-	public:
-	ndWorldMixedScene(ndWorld* const world)
-		:ndSceneMixed()
-		,m_world(world)
-	{
-	}
-
-	ndWorld* GetWorld() const
-	{
-		return m_world;
-	}
-
-	void SubStepUpdate(dFloat32 timestep)
-	{
-		D_TRACKTIME();
-
-		// do the a pre-physics step 
-		m_lru = m_lru + 1;
-		SetTimestep(timestep);
-
-		BuildBodyArray();
-		m_world->UpdateSkeletons();
-		m_world->ApplyExternalForces();
-		m_world->UpdatePrelisteners();
-		//UpdateSleepState();
-		
-		// update the collision system
-		UpdateAabb();
-		FindCollidingPairs();
-		AttachNewContact();
-		CalculateContacts();
-		DeleteDeadContact();
-		
-		// calculate internal forces, integrate bodies and update matrices.
-		m_world->DynamicsUpdate();
-		m_world->UpdatePostlisteners();
-	}
-
-	void ThreadFunction()
-	{
-		dUnsigned64 timeAcc = dGetTimeInMicrosenconds();
-		const bool collisionUpdate = m_world->m_collisionUpdate;
-		m_world->m_collisionUpdate = true;
-		if (collisionUpdate)
-		{
-			ndSceneMixed::ThreadFunction();
-		}
-		else
-		{
-			D_TRACKTIME();
-			BalanceBroadPhase();
-
-			dInt32 const steps = m_world->m_subSteps;
-			dFloat32 timestep = m_world->m_timestep / steps;
-			for (dInt32 i = 0; i < steps; i++)
-			{
-				SubStepUpdate(timestep);
-			}
-
-			m_world->m_scene->SetTimestep(m_world->m_timestep);
-			TransformUpdate();
-			m_world->UpdateListenersPostTransform();
-		}
-		m_world->m_lastExecutionTime = (dGetTimeInMicrosenconds() - timeAcc) * dFloat32(1.0e-6f);
-	}
-
-	ndWorld* m_world;
-};
 
 ndWorld::ndWorld()
 	:dClassAlloc()
@@ -160,5 +89,57 @@ void ndWorld::ApplyExternalForces()
 	m_scene->SubmitJobs<ndApplyExternalForces>();
 }
 
+void ndWorld::SubStepUpdate(dFloat32 timestep)
+{
+	D_TRACKTIME();
 
+	// do the a pre-physics step
+	m_scene->m_lru = m_scene->m_lru + 1;
+	m_scene->SetTimestep(timestep);
+
+	m_scene->BuildBodyArray();
+	UpdateSkeletons();
+	ApplyExternalForces();
+	UpdatePrelisteners();
+	//UpdateSleepState();
+
+	// update the collision system
+	m_scene->UpdateAabb();
+	m_scene->FindCollidingPairs();
+	m_scene->AttachNewContact();
+	m_scene->CalculateContacts();
+	m_scene->DeleteDeadContact();
+
+	// calculate internal forces, integrate bodies and update matrices.
+	DynamicsUpdate();
+	UpdatePostlisteners();
+}
+
+void ndWorld::ThreadFunction()
+{
+	dUnsigned64 timeAcc = dGetTimeInMicrosenconds();
+	const bool collisionUpdate = m_collisionUpdate;
+	m_collisionUpdate = true;
+	if (collisionUpdate)
+	{
+		m_scene->CollisionOnlyUpdate();
+	}
+	else
+	{
+		D_TRACKTIME();
+		m_scene->BalanceBroadPhase();
+	
+		dInt32 const steps = m_subSteps;
+		dFloat32 timestep = m_timestep / steps;
+		for (dInt32 i = 0; i < steps; i++)
+		{
+			SubStepUpdate(timestep);
+		}
+	
+		m_scene->SetTimestep(m_timestep);
+		m_scene->TransformUpdate();
+		UpdateListenersPostTransform();
+	}
+	m_lastExecutionTime = (dGetTimeInMicrosenconds() - timeAcc) * dFloat32(1.0e-6f);
+}
 

@@ -110,7 +110,7 @@ class ndScene
 	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dListNode** const nextNode);
 	ndSceneNode* BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dListNode** const nextNode);
 
-	void CollisionOnlyUpdate();
+	D_COLLISION_API void CollisionOnlyUpdate();
 
 	protected:
 	D_COLLISION_API ndScene();
@@ -154,6 +154,7 @@ class ndScene
 	static dVector m_linearContactError2;
 	static dVector m_angularContactError2;
 
+	friend class ndWorld;
 	friend class ndRayCastNotify;
 } D_GCC_NEWTON_ALIGN_32 ;
 

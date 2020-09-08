@@ -19,34 +19,35 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _D_CLASS_ALLOC_H_
-#define _D_CLASS_ALLOC_H_
+#ifndef __D_FIX_SIZE_BUFFER_H__
+#define __D_FIX_SIZE_BUFFER_H__
 
 #include "dCoreStdafx.h"
 
-class dClassAlloc  
+template<class T, dInt32 size>
+class ndFixSizeBuffer: public dClassAlloc
 {
 	public:
-	dClassAlloc()
+	ndFixSizeBuffer()
+		:dClassAlloc()
 	{
 	}
 
-	~dClassAlloc() 
+	T& operator[] (dInt32 i)
 	{
+		dAssert(i >= 0);
+		dAssert(i < size);
+		return m_array[i];
 	}
 
-	void *operator new (size_t size)
+	const T& operator[] (dInt32 i) const
 	{
-		return Malloc(size);
+		dAssert(i >= 0);
+		dAssert(i < size);
+		return m_array[i];
 	}
 
-	void operator delete (void* ptr)
-	{
-		Free(ptr);
-	}
-
-	D_CORE_API static void* Malloc(size_t size);
-	D_CORE_API static void Free(void* const ptr);
+	T m_array[size];
 };
 
 #endif

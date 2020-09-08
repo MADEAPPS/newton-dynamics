@@ -44,6 +44,7 @@
 #include <dClassAlloc.h>
 #include <dThreadPool.h>
 #include <dQuaternion.h>
+#include <dFixSizeBuffer.h>
 #include <dIntersections.h>
 #include <dSpatialMatrix.h>
 #include <dGeneralVector.h>

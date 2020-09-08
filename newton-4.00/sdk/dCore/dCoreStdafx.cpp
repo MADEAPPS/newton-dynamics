@@ -21,3 +21,38 @@
 
 #include "dCoreStdafx.h"
 
+#ifdef _D_CORE_DLL
+	#include "dTypes.h"
+	#include "dMemory.h"
+
+	void *operator new (size_t size)
+	{
+		// this should not happens on this test
+		// newton should never use global operator new and delete.
+		return dMalloc(size);
+	}
+
+	void operator delete (void* ptr)
+	{
+		dFree(ptr);
+	}
+
+	BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+	{
+		switch (ul_reason_for_call)
+		{
+			case DLL_PROCESS_ATTACH:
+			case DLL_THREAD_ATTACH:
+				#if defined(_DEBUG) && defined(_MSC_VER)
+					// Track all memory leaks at the operating system level.
+					// make sure no Newton tool or utility leaves leaks behind.
+					_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_REPORT_FLAG);
+				#endif
+
+			case DLL_THREAD_DETACH:
+			case DLL_PROCESS_DETACH:
+				break;
+		}
+		return TRUE;
+	}
+#endif

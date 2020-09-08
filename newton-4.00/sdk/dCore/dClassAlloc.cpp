@@ -23,43 +23,6 @@
 #include "dMemory.h"
 #include "dClassAlloc.h"
 
-#ifdef _D_CORE_DLL
-	//void* operator new (size_t size)
-	//{ 
-	//	dAssert(0);
-	//	void* const ptr = malloc (size);
-	//	dAssert (ptr);
-	//	return ptr;
-	//}
-	//
-	//void operator delete (void* ptr) 
-	//{ 
-	//	dAssert(0);
-	//	free (ptr);
-	//}
-
-	BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
-	{
-		switch (ul_reason_for_call)
-		{
-			case DLL_PROCESS_ATTACH:
-			case DLL_THREAD_ATTACH:
-				// check for memory leaks
-				#if defined(_DEBUG) && defined(_MSC_VER)
-					// Track all memory leaks at the operating system level.
-					// make sure no Newton tool or utility leaves leaks behind.
-					_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF|_CRTDBG_LEAK_CHECK_DF);
-				#endif
-
-			case DLL_THREAD_DETACH:
-			case DLL_PROCESS_DETACH:
-				break;
-		}
-		return TRUE;
-	}
-#endif
-
-
 void* dClassAlloc::Malloc(size_t size)
 {
 	return dMalloc(size);

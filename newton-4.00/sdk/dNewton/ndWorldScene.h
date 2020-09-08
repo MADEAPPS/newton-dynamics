@@ -19,8 +19,49 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#include "ndNewtonStdafx.h"
+#include "ndWorld.h"
 
-#include "dCoreStdafx.h"
-#include "dContainersAlloc.h"
+template<class scene>
+class ndWorldScene: public scene
+{
+	public:
+	ndWorldScene(ndWorld* const world)
+		:scene()
+		,m_world(world)
+	{
+	}
+
+	ndWorld* GetWorld() const
+	{
+		return m_world;
+	}
+
+	void ThreadFunction()
+	{
+		m_world->ThreadFunction();
+	}
+
+	ndWorld* m_world;
+};
+
+class ndWorldMixedScene: public ndWorldScene<ndSceneMixed>
+{
+	public:
+	ndWorldMixedScene(ndWorld* const world)
+		:ndWorldScene<ndSceneMixed>(world)
+	{
+	}
+};
+
+class ndWorldSegregatedScene: public ndWorldScene<ndSceneMixed>
+{
+	public:
+		ndWorldSegregatedScene(ndWorld* const world)
+		:ndWorldScene<ndSceneMixed>(world)
+	{
+	}
+};
+
 
 
