@@ -120,12 +120,12 @@ class ndConstraintDescritor
 	ndJacobianPair m_jacobian[D_CONSTRAINT_MAX_ROWS];
 	ndBilateralBounds m_forceBounds[D_CONSTRAINT_MAX_ROWS];
 	//dFloat32 m_jointAccel[D_CONSTRAINT_MAX_ROWS];
-	//dFloat32 m_restitution[D_CONSTRAINT_MAX_ROWS];
-	//dFloat32 m_penetration[D_CONSTRAINT_MAX_ROWS];
+	dFloat32 m_restitution[D_CONSTRAINT_MAX_ROWS];
+	dFloat32 m_penetration[D_CONSTRAINT_MAX_ROWS];
 	//dFloat32 m_diagonalRegularizer[D_CONSTRAINT_MAX_ROWS];
 	//dFloat32 m_penetrationStiffness[D_CONSTRAINT_MAX_ROWS];
 	//dFloat32 m_zeroRowAcceleration[D_CONSTRAINT_MAX_ROWS];
-	//dInt8	m_flags[D_CONSTRAINT_MAX_ROWS];
+	dInt8 m_flags[D_CONSTRAINT_MAX_ROWS];
 	//dgWorld* m_world;
 	//dInt32 m_threadIndex;
 	dFloat32 m_timestep;

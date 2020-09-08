@@ -24,12 +24,16 @@
 
 #include "ndCollisionStdafx.h"
 #include "ndConstraint.h"
+#include "ndContactNotify.h"
+#include "ndContactSolver.h"
 
 class ndBodyKinematic;
 class ndShapeInstance;
 
-#define D_MAX_CONTATCS			128
-#define D_CONSTRAINT_MAX_ROWS	(3 * 16)
+#define D_MAX_CONTATCS					128
+#define D_CONSTRAINT_MAX_ROWS			(3 * 16)
+#define D_RESTING_CONTACT_PENETRATION	(D_PENETRATION_TOL + dFloat32 (1.0f / 1024.0f))
+#define D_DIAGONAL_PRECONDITIONER		dFloat32 (25.0f)
 
 D_MSV_NEWTON_ALIGN_32
 class ndContactPoint
@@ -89,20 +93,13 @@ class ndContactMaterial: public ndContactPoint
 	//void SetCollisionGenerationCallback(OnContactGeneration contactGeneration);
 	//void SetCollisionCallback(OnAABBOverlap abbOvelap, OnContactCallback callback);
 	//void SetCompoundCollisionCallback(OnCompoundCollisionPrefilter abbCompounndOvelap);
-	//
+
 	dVector m_dir0;
 	dVector m_dir1;
-	//dgForceImpactPair m_normal_Force;
-	//dgForceImpactPair m_dir0_Force;
-	//dgForceImpactPair m_dir1_Force;
-	//dFloat32 m_restitution;
-	//dFloat32 m_staticFriction0;
-	//dFloat32 m_staticFriction1;
-	//dFloat32 m_dynamicFriction0;
-	//dFloat32 m_dynamicFriction1;
-	//dFloat32 m_softness;
-	//dFloat32 m_skinThickness;
-	//dgInt32 m_flags;
+	ndForceImpactPair m_normal_Force;
+	ndForceImpactPair m_dir0_Force;
+	ndForceImpactPair m_dir1_Force;
+	ndMaterial m_material;
 
 	private:
 	//void *m_userData;
@@ -152,6 +149,7 @@ class ndContact
 	
 	private:
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
+	void CalculatePointDerivative(dInt32 index, ndConstraintDescritor& desc, const dVector& dir, const dgPointParam& param) const;
 	void JacobianContactDerivative(ndConstraintDescritor& params, const ndContactMaterial& contact, dInt32 normalIndex, dInt32& frictionIndex);
 
 	dVector m_positAcc;

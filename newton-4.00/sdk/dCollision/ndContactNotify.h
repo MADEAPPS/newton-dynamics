@@ -24,7 +24,34 @@
 
 #include "ndCollisionStdafx.h"
 
+class ndScene;
 class ndContact;
+class ndShapeInstance;
+
+class ndMaterial
+{
+	public:
+	ndMaterial()
+	{
+		m_restitution = dFloat32(0.35f);
+		m_staticFriction0 = dFloat32(0.8f);
+		m_staticFriction1 = dFloat32(0.8f);
+		m_dynamicFriction0 = dFloat32(0.4f);
+		m_dynamicFriction1 = dFloat32(0.4f);
+		m_softness = dFloat32(0.0f);
+		m_skinThickness = dFloat32 (0.0f);
+		m_flags = 0;
+	}
+
+	dFloat32 m_restitution;
+	dFloat32 m_staticFriction0;
+	dFloat32 m_staticFriction1;
+	dFloat32 m_dynamicFriction0;
+	dFloat32 m_dynamicFriction1;
+	dFloat32 m_softness;
+	dFloat32 m_skinThickness;
+	dInt32 m_flags;
+};
 
 D_MSV_NEWTON_ALIGN_32
 class ndContactNotify: public dClassAlloc
@@ -32,7 +59,7 @@ class ndContactNotify: public dClassAlloc
 	public:
 	ndContactNotify()
 		:dClassAlloc()
-		,m_broadPhase(nullptr)
+		,m_scene(nullptr)
 	{
 	}
 
@@ -48,6 +75,11 @@ class ndContactNotify: public dClassAlloc
 	{
 	}
 
+	virtual ndMaterial GetMaterial(const ndShapeInstance& instance0, const ndShapeInstance& instance1) const
+	{
+		return ndMaterial();
+	}
+
 	virtual bool OnAaabbOverlap(const ndContact* const contact, dFloat32 timestep)
 	{
 		return true;
@@ -58,7 +90,7 @@ class ndContactNotify: public dClassAlloc
 	}
 
 	protected:
-	ndScene* m_broadPhase;
+	ndScene* m_scene;
 	friend class ndScene;
 };
 
