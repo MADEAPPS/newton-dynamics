@@ -19,34 +19,25 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-//
+#ifndef __D_CONTACT_OPTIONS_H__
+#define __D_CONTACT_OPTIONS_H__
 
-#ifndef _D_COLLISION_H__
-#define _D_COLLISION_H__
+#include "ndCollisionStdafx.h"
 
-#include <dCore.h>
-#include <ndCollisionStdafx.h>
-#include <ndBody.h>
-#include <ndScene.h>
-#include <ndShape.h>
-#include <ndContact.h>
-#include <ndShapeBox.h>
-#include <ndShapeNull.h>
-#include <ndSceneNode.h>
-#include <ndSceneMixed.h>
-#include <ndConstraint.h>
-#include <ndBodyNotify.h>
-#include <ndShapeConvex.h>
-#include <ndContactList.h>
-#include <ndBodyKinematic.h>
-#include <ndContactSolver.h>
-#include <ndShapeInstance.h>
-#include <ndRayCastNotify.h>
-#include <ndContactNotify.h>
-#include <ndContactOptions.h>
+enum ndContactOptions
+{
+	m_isSoftContact = 1 << 0,
+	m_collisionEnable = 1 << 1,
+	m_friction0Enable = 1 << 2,
+	m_friction1Enable = 1 << 3,
+	m_override0Accel = 1 << 4,
+	m_override1Accel = 1 << 5,
+	m_override0Friction = 1 << 6,
+	m_override1Friction = 1 << 7,
+	m_overrideNormalAccel = 1 << 8,
+	m_resetSkeletonSelfCollision = 1 << 9,
+	m_resetSkeletonIntraCollision = 1 << 10,
+};
 
 #endif 
 

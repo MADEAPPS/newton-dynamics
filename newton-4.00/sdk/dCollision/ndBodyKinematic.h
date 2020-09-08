@@ -27,6 +27,7 @@
 
 class ndSceneBodyNode;
 class ndSceneAggregate;
+class ndSkeletonContainer;
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodyKinematic: public ndBody
@@ -78,6 +79,7 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API static void ReleaseMemory();
 
 	virtual ndBodyKinematic* GetAsBodyKinematic() { return this; }
+	virtual ndSkeletonContainer* GetSkeleton() const { return nullptr; }
 
 	private:
 	D_COLLISION_API void SetMassMatrix(dFloat32 mass, const dMatrix& inertia);
@@ -111,6 +113,7 @@ class ndBodyKinematic: public ndBody
 	friend class ndScene;
 	friend class ndSceneMixed;
 	friend class ndSceneBodyNode;
+	friend class ndDynamicsUpdate;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline const dUnsigned32 ndBodyKinematic::GetIndex() const

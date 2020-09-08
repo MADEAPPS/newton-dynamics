@@ -177,17 +177,29 @@ class dgQueue
 	T* m_pool;
 };
 
-DG_MSC_VECTOR_ALIGNMENT
-class dgLeftHandSide
+
+class dgJacobianMemory
 {
 	public:
-	dgJacobianPair m_Jt;
-	dgJacobianPair m_JMinv;
-} DG_GCC_VECTOR_ALIGNMENT;
+	dgJacobianMemory() {}
+	void Init (dgWorld* const world, dInt32 rowsCount, dInt32 bodyCount);
 
+	dgJacobian* m_internalForcesBuffer;
+	dgLeftHandSide* m_leftHandSizeBuffer;
+	dgRightHandSide* m_righHandSizeBuffer;
+};
+#endif
 
-DG_MSC_VECTOR_ALIGNMENT
-class dgRightHandSide
+D_MSV_NEWTON_ALIGN_32
+class ndLeftHandSide
+{
+	public:
+	ndJacobianPair m_Jt;
+	ndJacobianPair m_JMinv;
+} D_GCC_NEWTON_ALIGN_32;
+
+D_MSV_NEWTON_ALIGN_32
+class ndRightHandSide
 {
 	public:
 	dFloat32 m_force;
@@ -205,21 +217,10 @@ class dgRightHandSide
 	dFloat32 m_diagonalRegularizer;
 	dFloat32 m_penetrationStiffness;
 
-	dgForceImpactPair* m_jointFeebackForce;
+	ndForceImpactPair* m_jointFeebackForce;
 	dInt32 m_normalForceIndex;
-} DG_GCC_VECTOR_ALIGNMENT;
+} D_GCC_NEWTON_ALIGN_32;
 
-class dgJacobianMemory
-{
-	public:
-	dgJacobianMemory() {}
-	void Init (dgWorld* const world, dInt32 rowsCount, dInt32 bodyCount);
-
-	dgJacobian* m_internalForcesBuffer;
-	dgLeftHandSide* m_leftHandSizeBuffer;
-	dgRightHandSide* m_righHandSizeBuffer;
-};
-#endif
 
 D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdate
@@ -307,19 +308,20 @@ class ndDynamicsUpdate
 	void InitBodyArray();
 	void InitJacobianMatrix();
 
-	//dInt32 GetJacobianDerivatives(ndConstraintDescritor& constraintParam, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dInt32 rowCount) const
-	dInt32 GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* const joint) const;
+	void BuildJacobianMatrix(ndConstraint* const joint);
+	dInt32 GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* const joint);
 
-	dArray<ndJacobian> m_intenalForces;
+	dArray<ndJacobian> m_internalForces;
 	dArray<ndConstraint*> m_jointArray;
 	dArray<ndBodyProxy> m_bodyProxyArray;
+	dArray<ndLeftHandSide> m_leftHandSide;
+	dArray<ndRightHandSide> m_rightHandSide;
+	
 	dFloat32 m_timestep;
 	dFloat32 m_invTimestep;
 	dInt32 m_solverPasses;
 	dUnsigned32 m_maxRowsCount;
 	dAtomic<dUnsigned32> m_rowsCount;
-	
-
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif

@@ -68,6 +68,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	dVector m_externalForce;
 	dVector m_externalTorque;
 	dArray<ndBilateralJoint*> m_jointArray;
+	friend class ndDynamicsUpdate;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline dVector ndBodyDynamic::GetForce() const

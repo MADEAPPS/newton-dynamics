@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __DGCONTACT_H__
-#define __DGCONTACT_H__
+#ifndef __D_CONTACT_H__
+#define __D_CONTACT_H__
 
 #include "ndCollisionStdafx.h"
 #include "ndConstraint.h"
@@ -54,21 +54,6 @@ D_MSV_NEWTON_ALIGN_32
 class ndContactMaterial: public ndContactPoint
 {
 	public:
-	enum 
-	{
-		m_isSoftContact = 1 << 0,
-		m_collisionEnable = 1 << 1,
-		m_friction0Enable = 1 << 2,
-		m_friction1Enable = 1 << 3,
-		m_override0Accel = 1 << 4,
-		m_override1Accel = 1 << 5,
-		m_override0Friction = 1 << 6,
-		m_override1Friction = 1 << 7,
-		m_overrideNormalAccel = 1 << 8,
-		m_resetSkeletonSelfCollision = 1 << 9,
-		m_resetSkeletonIntraCollision = 1 << 10,
-	};
-
 	//D_MSV_NEWTON_ALIGN_32
 	//class ndUserContactPoint
 	//{

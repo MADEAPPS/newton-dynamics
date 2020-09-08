@@ -23,6 +23,7 @@
 #include "ndScene.h"
 #include "ndContact.h"
 #include "ndBodyKinematic.h"
+#include "ndContactOptions.h"
 
 dVector ndContact::m_initialSeparatingVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
 
@@ -108,6 +109,7 @@ void ndContact::CalculatePointDerivative(dInt32 index, ndConstraintDescritor& de
 	dAssert(m_body0);
 	dAssert(m_body1);
 
+	//desc.m_flags[index] = 0;
 	ndJacobian &jacobian0 = desc.m_jacobian[index].m_jacobianM0;
 	ndJacobian &jacobian1 = desc.m_jacobian[index].m_jacobianM1;
 	jacobian0.m_linear = dir;
@@ -144,7 +146,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& params, const n
 	
 	dFloat32 relSpeed = -(normalJacobian0.m_linear * veloc0 + normalJacobian0.m_angular * omega0 + normalJacobian1.m_linear * veloc1 + normalJacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 	dFloat32 penetration = dClamp(contact.m_penetration - D_RESTING_CONTACT_PENETRATION, dFloat32(0.0f), dFloat32(0.5f));
-	params.m_flags[normalIndex] = contact.m_material.m_flags & ndContactMaterial::m_isSoftContact;
+	params.m_flags[normalIndex] = contact.m_material.m_flags & m_isSoftContact;
 	params.m_penetration[normalIndex] = penetration;
 	params.m_restitution[normalIndex] = restitutionCoefficient;
 	params.m_forceBounds[normalIndex].m_low = dFloat32(0.0f);
@@ -160,18 +162,18 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& params, const n
 	params.m_penetrationStiffness[normalIndex] = penetrationStiffness;
 	relSpeed += dMax(restitutionVelocity, penetrationVeloc);
 	
-	const bool isHardContact = !(contact.m_material.m_flags & ndContactMaterial::m_isSoftContact);
+	const bool isHardContact = !(contact.m_material.m_flags & m_isSoftContact);
 	params.m_diagonalRegularizer[normalIndex] = isHardContact ? D_DIAGONAL_REGULARIZER : dMax(D_DIAGONAL_REGULARIZER, contact.m_material.m_skinThickness);
 	const dFloat32 relGyro = (normalJacobian0.m_angular * gyroAlpha0 + normalJacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 	
 	params.m_jointAccel[normalIndex] = relGyro + relSpeed * impulseOrForceScale;
-	if (contact.m_material.m_flags & ndContactMaterial::m_overrideNormalAccel)
+	if (contact.m_material.m_flags & m_overrideNormalAccel)
 	{
 		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
 	
 	// first dir friction force
-	if (contact.m_material.m_flags & ndContactMaterial::m_friction0Enable)
+	if (contact.m_material.m_flags & m_friction0Enable)
 	{
 		dInt32 jacobIndex = frictionIndex;
 		frictionIndex += 1;
@@ -183,14 +185,14 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& params, const n
 		dFloat32 relVelocErr = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 	
 		params.m_flags[jacobIndex] = 0;
-		params.m_forceBounds[jacobIndex].m_normalIndex = dInt16((contact.m_material.m_flags & ndContactMaterial::m_override0Friction) ? D_INDEPENDENT_ROW : normalIndex);
+		params.m_forceBounds[jacobIndex].m_normalIndex = dInt16((contact.m_material.m_flags & m_override0Friction) ? D_INDEPENDENT_ROW : normalIndex);
 		params.m_diagonalRegularizer[jacobIndex] = D_DIAGONAL_REGULARIZER;
 	
 		params.m_restitution[jacobIndex] = dFloat32(0.0f);
 		params.m_penetration[jacobIndex] = dFloat32(0.0f);
 	
 		params.m_penetrationStiffness[jacobIndex] = dFloat32(0.0f);
-		if (contact.m_material.m_flags & ndContactMaterial::m_override0Accel)
+		if (contact.m_material.m_flags & m_override0Accel)
 		{
 			// note: using restitution been negative to indicate that the acceleration was override
 			params.m_restitution[jacobIndex] = dFloat32(-1.0f);
@@ -215,7 +217,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& params, const n
 		params.m_forceBounds[jacobIndex].m_jointForce = (ndForceImpactPair*)&contact.m_dir0_Force;
 	}
 	
-	if (contact.m_material.m_flags & ndContactMaterial::m_friction1Enable)
+	if (contact.m_material.m_flags & m_friction1Enable)
 	{
 		dInt32 jacobIndex = frictionIndex;
 		frictionIndex += 1;
@@ -227,13 +229,13 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& params, const n
 		dFloat32 relVelocErr = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 	
 		params.m_flags[jacobIndex] = 0;
-		params.m_forceBounds[jacobIndex].m_normalIndex = dInt16((contact.m_material.m_flags & ndContactMaterial::m_override1Friction) ? D_INDEPENDENT_ROW : normalIndex);
+		params.m_forceBounds[jacobIndex].m_normalIndex = dInt16((contact.m_material.m_flags & m_override1Friction) ? D_INDEPENDENT_ROW : normalIndex);
 		params.m_diagonalRegularizer[jacobIndex] = D_DIAGONAL_REGULARIZER;
 	
 		params.m_restitution[jacobIndex] = dFloat32(0.0f);
 		params.m_penetration[jacobIndex] = dFloat32(0.0f);
 		params.m_penetrationStiffness[jacobIndex] = dFloat32(0.0f);
-		if (contact.m_material.m_flags & ndContactMaterial::m_override1Accel)
+		if (contact.m_material.m_flags & m_override1Accel)
 		{
 			// note: using restitution been negative to indicate that the acceleration was override
 			params.m_restitution[jacobIndex] = dFloat32(-1.0f);

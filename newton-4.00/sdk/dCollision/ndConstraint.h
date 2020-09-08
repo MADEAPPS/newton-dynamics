@@ -125,7 +125,7 @@ class ndConstraintDescritor
 	dFloat32 m_diagonalRegularizer[D_CONSTRAINT_MAX_ROWS];
 	dFloat32 m_penetrationStiffness[D_CONSTRAINT_MAX_ROWS];
 	dFloat32 m_zeroRowAcceleration[D_CONSTRAINT_MAX_ROWS];
-	dInt8 m_flags[D_CONSTRAINT_MAX_ROWS];
+	dInt32 m_flags[D_CONSTRAINT_MAX_ROWS];
 	//dgWorld* m_world;
 	//dInt32 m_threadIndex;
 	dFloat32 m_timestep;
@@ -139,8 +139,10 @@ class ndConstraint
 	public:
 	virtual ~ndConstraint();
 
-	ndConstraint* GetAsConstraint() { return this; }
-	ndContact* GetAsContact() {return nullptr;}
+	virtual ndContact* GetAsContact() { return nullptr; }
+	virtual ndConstraint* GetAsConstraint() { return this; }
+
+	virtual bool IsBilateral() const { return false; }
 
 	virtual const dUnsigned32 GetRowsCount() const = 0;
 	virtual dUnsigned32 JacobianDerivative(ndConstraintDescritor& params) = 0;
@@ -150,6 +152,10 @@ class ndConstraint
 	virtual ndBodyKinematic* GetKinematicBody0() const { return nullptr; }
 	virtual ndBodyKinematic* GetKinematicBody1() const { return nullptr; }
 
+	dFloat32 m_preconditioner0;
+	dFloat32 m_preconditioner1;
+	dInt32 m_rowCount;
+	dInt32 m_rowStart;
 	protected:
 	ndConstraint();
 } D_GCC_NEWTON_ALIGN_32 ;
