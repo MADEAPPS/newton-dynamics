@@ -280,8 +280,6 @@ dInt32 ndDynamicsUpdate::GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* 
 //void ndDynamicsUpdate::BuildJacobianMatrix(dgJointInfo* const jointInfo, ndLeftHandSide* const leftHandSide, ndRightHandSide* const rightHandSide, ndJacobian* const internalForces)
 void ndDynamicsUpdate::BuildJacobianMatrix(ndConstraint* const joint)
 {
-	//const ndBodyDynamic* const body0 = joint->GetKinematicBody0()->GetAsBodyDynamic();
-	//const ndBodyDynamic* const body1 = joint->GetKinematicBody1()->GetAsBodyDynamic();
 	ndBodyKinematic* const body0 = joint->GetKinematicBody0();
 	ndBodyKinematic* const body1 = joint->GetKinematicBody1();
 	dAssert(body0);
@@ -332,15 +330,11 @@ void ndDynamicsUpdate::BuildJacobianMatrix(ndConstraint* const joint)
 		}
 	}
 	
-	//dgSoaFloat forceAcc0(m_soaZero);
-	//dgSoaFloat forceAcc1(m_soaZero);
 	dVector forceAcc0(dVector::m_zero);
 	dVector torqueAcc0(dVector::m_zero);
 	dVector forceAcc1(dVector::m_zero);
 	dVector torqueAcc1(dVector::m_zero);
 	
-	//const dgSoaFloat weight0(m_bodyProxyArray[m0].m_weight * jointInfo->m_preconditioner0);
-	//const dgSoaFloat weight1(m_bodyProxyArray[m1].m_weight * jointInfo->m_preconditioner0);
 	const dVector weight0(m_bodyProxyArray[m0].m_weight * joint->m_preconditioner0);
 	const dVector weight1(m_bodyProxyArray[m1].m_weight * joint->m_preconditioner0);
 	
@@ -358,9 +352,6 @@ void ndDynamicsUpdate::BuildJacobianMatrix(ndConstraint* const joint)
 		row->m_JMinv.m_jacobianM1.m_linear = row->m_Jt.m_jacobianM1.m_linear * invMass1;
 		row->m_JMinv.m_jacobianM1.m_angular = invInertia1.RotateVector(row->m_Jt.m_jacobianM1.m_angular);
 	
-		//const dgSoaFloat& JMinvM0 = (dgSoaFloat&)row->m_JMinv.m_jacobianM0;
-		//const dgSoaFloat& JMinvM1 = (dgSoaFloat&)row->m_JMinv.m_jacobianM1;
-		//const dgSoaFloat tmpAccel((JMinvM0 * force0).MulAdd(JMinvM1, force1));
 		const ndJacobian& JMinvM0 = row->m_JMinv.m_jacobianM0;
 		const ndJacobian& JMinvM1 = row->m_JMinv.m_jacobianM1;
 		const dVector tmpAccel(

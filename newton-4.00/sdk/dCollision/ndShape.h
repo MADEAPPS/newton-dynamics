@@ -25,6 +25,7 @@
 class ndBody;
 class ndShapeBox;
 class ndShapeNull;
+class ndShapeSphere;
 class ndShapeConvex;
 class ndContactPoint;
 class ndRayCastNotify;
@@ -66,42 +67,14 @@ D_MSV_NEWTON_ALIGN_32
 class ndShape: public dClassAlloc
 {
 	public:
-//	typedef void (*OnDebugCollisionMeshCallback) (void* userData, int vertexCount, const dFloat32* faceArray, int faceId);
-
-/*	
-	static dUnsigned32 Quantize (dFloat32 value);
-	static dUnsigned32 Quantize(const void* const buffer, int size);
-
-	// these function should be be virtual
-	dInt32 IsType (dgRTTI type) const; 
-	dUnsigned32 GetSignature () const;
-	dShapeID GetCollisionPrimityType () const;
-
-	virtual void SetCollisionBBox (const dVector& p0, const dVector& p1) = 0;
-	virtual dFloat32 GetVolume () const = 0;
-	virtual dFloat32 GetBoxMinRadius () const = 0; 
-	virtual dFloat32 GetBoxMaxRadius () const = 0; 
-	
-	virtual dVector CalculateVolumeIntegral (const dMatrix& globalMatrix, const dVector& globalPlane, const dShapeInstance& parentScale) const = 0;
-	virtual void Serialize(dgSerialize callback, void* const userData) const = 0;
-
-	virtual void GetCollisionInfo(dShapeInfo* const info) const;
-	virtual void SerializeLow(dgSerialize callback, void* const userData) const;
-
-	virtual void CalculateImplicitContacts(dInt32 count, dgContactPoint* const contactPoints) const {dAssert (0);}
-	const dVector& GetObbOrigin() const; 
-	virtual dVector GetObbSize() const; 
-
-	dFloat32 GetUmbraClipSize () const;
-	dgMemoryAllocator* GetAllocator() const;
-*/
-
 	const ndShape* AddRef() const;
 	dInt32 GetRefCount() const;
 	virtual dInt32 Release() const;
 
 	virtual ndShape* GetAsShape() { return this; }
 	virtual ndShapeBox* GetAsShapeBox() { return nullptr; }
+	virtual ndShapeSphere* GetAsShapeSphere() { return nullptr; }
+
 	virtual ndShapeNull* GetAsShapeNull() { return nullptr; }
 	virtual ndShapeConvex* GetAsShapeConvex() { return nullptr; }
 
@@ -125,11 +98,7 @@ class ndShape: public dClassAlloc
 	protected:
 	D_COLLISION_API ndShape(dShapeID id);
 	D_COLLISION_API ndShape (const ndShape& source);
-//	D_COLLISION_API dShape (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revision);
 	D_COLLISION_API virtual ~ndShape();
-
-	//void SetSignature (dInt32 signature);
-	//virtual dInt32 CalculateSignature () const = 0;
 
 	dVector m_inertia;	
 	dVector m_crossInertia;	
@@ -140,57 +109,7 @@ class ndShape: public dClassAlloc
 	//dShapeID m_collisionId;
 	static dVector m_flushZero;
 
-	//friend class dgBody;
-	//friend class dgWorld;
-	//friend class dgMinkowskiConv;
-	//friend class dShapeInstance;
-	//friend class dShapeCompound;
-
 } D_GCC_NEWTON_ALIGN_32 ;
-
-/*
-inline dShapeID dShape::GetCollisionPrimityType () const
-{
-	return m_collisionId;
-}
-
-inline dUnsigned32 dShape::GetSignature () const
-{
-	return m_signature;
-}
-
-inline void dShape::SetSignature (dInt32 signature)
-{
-	m_signature = dUnsigned32 (signature);
-}
-
-inline dgMemoryAllocator* dShape::GetAllocator() const
-{
-	return m_allocator;
-}
-
-
-inline dFloat32 dShape::GetUmbraClipSize () const
-{
-//	return GetMax (GetBoxMaxRadius() * dFloat32 (2.0f) + dFloat32 (1.0f), dFloat32 (16.0f));
-	return dFloat32 (3.0f) * GetBoxMaxRadius();
-}
-
-inline dInt32 dShape::IsType (dgRTTI type) const 
-{
-	return type & m_rtti;
-}
-
-inline dVector dShape::GetObbSize() const
-{
-	return m_boxSize;
-}
-
-inline const dVector& dShape::GetObbOrigin() const
-{
-	return m_boxOrigin;
-}
-*/
 
 inline dInt32 ndShape::GetConvexVertexCount() const
 {

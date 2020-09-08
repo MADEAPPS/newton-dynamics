@@ -131,6 +131,7 @@ void BuildPyramid(ndWorld& world, dFloat32 mass, const dVector& origin, const dV
 	matrix.m_posit.m_w = 1.0f;
 
 	world.Sync();
+ndShapeInstance xxx(new ndShapeSphere(1.0f));
 	ndShapeInstance box(new ndShapeBox(size.m_x, size.m_y, size.m_z));
 
 	dVector floor(FindFloor(world, dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));

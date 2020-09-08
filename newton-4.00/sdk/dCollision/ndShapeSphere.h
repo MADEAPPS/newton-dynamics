@@ -19,22 +19,27 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_SHAPE_BOX_H__
-#define __D_SHAPE_BOX_H__
+#ifndef _D_SHAPE_SPHERE_H__
+#define _D_SHAPE_SPHERE_H__
 
 #include "ndShapeConvex.h"
 
+#define DG_SPHERE_VERTEX_COUNT 18
+
 D_MSV_NEWTON_ALIGN_32
-class ndShapeBox: public ndShapeConvex
+class ndShapeSphere: public ndShapeConvex
 {
 	public:
-	D_COLLISION_API ndShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
-	virtual ~ndShapeBox();
+	//ndShapeSphere(dgMemoryAllocator* allocator, dgUnsigned32 signature, dFloat32 radius);
+	//ndShapeSphere(dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
+	//virtual ~ndShapeSphere();
+	D_COLLISION_API ndShapeSphere(dFloat32 radius);
+	virtual ~ndShapeSphere();
 
-	virtual ndShapeBox* GetAsShapeBox() { return this; }
+	virtual ndShapeSphere* GetAsShapeSphere() { return this; }
 
 	protected:
-	D_COLLISION_API void Init (dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
+	D_COLLISION_API void Init(dFloat32 radius);
 	D_COLLISION_API virtual void MassProperties();
 
 	D_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
@@ -42,22 +47,22 @@ class ndShapeBox: public ndShapeConvex
 	D_COLLISION_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 	D_COLLISION_API virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
-
-	const dConvexSimplexEdge** ndShapeBox::GetVertexToEdgeMapping() const;
-	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
-
-	dVector m_size[2];
-	dVector m_vertex[8];
-
-	static dInt32 m_initSimplex;
-	static dInt32 m_faces[][4];
-	static dVector m_indexMark;
-	static dVector m_penetrationTol;
-	static dConvexSimplexEdge m_edgeArray[];
-	static dConvexSimplexEdge* m_edgeEdgeMap[];
-	static dConvexSimplexEdge* m_vertexToEdgeMap[];
-
 } D_GCC_NEWTON_ALIGN_32;
+
+/*
+class dgCollisionPoint: public ndShapeSphere
+{
+	public:
+	dgCollisionPoint (dgMemoryAllocator* const allocator) 
+		:ndShapeSphere(allocator, 0x12344321, dFloat32 (0.25f))
+	{
+	}
+
+	virtual dFloat32 GetVolume () const;
+	virtual dVector SupportVertex (const dVector& dir, dInt32* const vertexIndex) const;
+	virtual dVector SupportVertexSpecial (const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
+};
+*/
 
 #endif 
 
