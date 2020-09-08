@@ -29,9 +29,6 @@ var NAVTREE =
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
       [ "Class Hierarchy", "hierarchy.html", "hierarchy" ]
-    ] ],
-    [ "Files", "files.html", [
-      [ "File List", "files.html", "files_dup" ]
     ] ]
   ] ]
 ];
@@ -43,8 +40,7 @@ var NAVTREEINDEX =
 "classd_scope_spin_lock.html#a72f07ce64d55e50f66000c3a384a04ca",
 "classd_vector.html#a4e6e0c767bc91ad7df5bf93b6a8874f8",
 "classnd_body_kinematic.html#aca58a4c4d6a95a41607046d45502b104",
-"classnd_scene_mixed.html#aece9cbfd982e679bb9855c4f687f36af",
-"nd_shape_convex_8h_source.html"
+"classnd_scene_mixed.html#aece9cbfd982e679bb9855c4f687f36af"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
