@@ -29,7 +29,7 @@ void *operator new (size_t size)
 {
 	// this should not happens on this test
 	// newton should never use global operator new and delete.
-	dAssert(0);
+	//dAssert(0);
 	return PhysicsAlloc(size);
 }
 

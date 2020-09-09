@@ -36,8 +36,8 @@
 #define	DG_SOLVER_MAX_ERROR					(DG_FREEZE_MAG * dgFloat32 (0.5f))
 
 #define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
-//#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(64)
-#define DG_PARALLEL_JOINT_COUNT_CUT_OFF	(1)
+#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(64)
+//#define DG_PARALLEL_JOINT_COUNT_CUT_OFF	(2)
 
 
 // the solver is a RK order 4, but instead of weighting the intermediate derivative by the usual 1/6, 1/3, 1/3, 1/6 coefficients

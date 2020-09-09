@@ -417,7 +417,6 @@ void ndDynamicsUpdate::BuildJacobianMatrix(ndConstraint* const joint)
 	}
 }
 
-
 void ndDynamicsUpdate::InitJacobianMatrix()
 {
 	D_TRACKTIME();

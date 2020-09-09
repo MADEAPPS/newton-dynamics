@@ -505,7 +505,6 @@ class dVector
 		D_INLINE dBigVector(const dVector& v)
 			:m_type(_mm256_cvtps_pd(v.m_type))
 		{
-			dAssert(0);
 			dAssert(dCheckVector((*this)));
 		}
 

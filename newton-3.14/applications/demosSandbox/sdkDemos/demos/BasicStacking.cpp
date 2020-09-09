@@ -441,7 +441,6 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 //high = 100;
 //high = 12;
 //high = 10;
-/*
 	for (int i = 0; i < 1; i ++) {
 		BuildPyramid (scene, 10.0f, dVector(  0.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0f), high, _BOX_PRIMITIVE);
 		BuildPyramid (scene, 10.0f, dVector( 10.0f + i * 4.0f, 0.0f, 0.0f, 0.0f), dVector (0.75f, 0.35f, 0.75f, 0.0f), high, _CYLINDER_PRIMITIVE, dRollMatrix(0.5f * dPi));
@@ -456,14 +455,14 @@ void BasicBoxStacks (DemoEntityManager* const scene)
 			BuildJenga (scene, 5.0f, dVector(-5.0f + j * 8, 0.0f, 12.0f + i * 8, 0.0f), dVector (0.5f, 0.25f, 0.8f, 0.0), high);
 		}
 	}
-*/
+
 	high = 20;
-high = 1;
+//high = 1;
 	for (int i = 0; i < 1; i ++) {
 		for (int j = 0; j < 1; j ++) {
 			SphereStack(scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, -6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
-//			CapsuleStack (scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, -14.0f + i * 8, 0.0f), dVector (0.8f, 4.0f, 0.8f, 0.0f), high);
-//			BoxStack(scene, 1.0f, dVector(-5.5f + j * 8, 0.0f, 6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
+			CapsuleStack (scene, 1.0f, dVector(-5.0f + j * 8, 0.0f, -14.0f + i * 8, 0.0f), dVector (0.8f, 4.0f, 0.8f, 0.0f), high);
+			BoxStack(scene, 1.0f, dVector(-5.5f + j * 8, 0.0f, 6.0f + i * 8, 0.0f), dVector (0.5f, 0.5f, 0.5f, 0.0f), high);
 		}
 	}
 
