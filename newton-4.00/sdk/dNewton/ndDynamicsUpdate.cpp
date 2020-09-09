@@ -33,6 +33,10 @@ ndDynamicsUpdate::ndDynamicsUpdate()
 	,m_rightHandSide()
 	,m_timestep(dFloat32 (0.0f))
 	,m_invTimestep(dFloat32(0.0f))
+	,m_firstPassCoef(dFloat32(0.0f))
+	,m_invStepRK(dFloat32(0.0f))
+	,m_timestepRK(dFloat32(0.0f))
+	,m_invTimestepRK(dFloat32(0.0f))
 	,m_solverPasses(0)
 	,m_maxRowsCount(0)
 	,m_rowsCount(0)
@@ -54,6 +58,7 @@ void ndDynamicsUpdate::DefaultUpdate()
 	InitWeights();
 	InitBodyArray();
 	InitJacobianMatrix();
+	CalculateForces();
 }
 
 void ndDynamicsUpdate::InitWeights()
@@ -64,6 +69,11 @@ void ndDynamicsUpdate::InitWeights()
 
 	m_timestep = world->m_timestep;
 	m_invTimestep = dFloat32 (1.0f) / m_timestep;
+
+	m_invStepRK = dFloat32(0.25f);
+	m_timestepRK = m_timestep * m_invStepRK;
+	m_invTimestepRK = m_invTimestep * dFloat32(4.0f);
+
 	const dArray<ndContact*>& contactArray = scene->GetActiveContacts();
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetWorkingBodyArray();
 
@@ -447,4 +457,77 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 	const ndWorld* const world = (ndWorld*)this;
 	ndScene* const scene = world->GetScene();
 	scene->SubmitJobs<ndInitJacobianMatrix>();
+}
+
+void ndDynamicsUpdate::CalculateForces()
+{
+	D_TRACKTIME();
+	m_firstPassCoef = dFloat32(0.0f);
+	//if (m_skeletonCount) 
+	//{
+	//	InitSkeletons();
+	//}
+
+	for (dInt32 step = 0; step < 4; step++) 
+	{
+		CalculateJointsAcceleration();
+	//	CalculateJointsForce();
+	//	if (m_skeletonCount) 
+	//	{
+	//		UpdateSkeletons();
+	//	}
+	//	IntegrateBodiesVelocity();
+	}
+	
+	//UpdateForceFeedback();
+	//
+	//dInt32 hasJointFeeback = 0;
+	//for (dInt32 i = 0; i < DG_MAX_THREADS_HIVE_COUNT; i++) 
+	//{
+	//	hasJointFeeback |= m_hasJointFeeback[i];
+	//}
+	//CalculateBodiesAcceleration();
+	//
+	//if (hasJointFeeback) 
+	//{
+	//	UpdateKinematicFeedback();
+	//}
+}
+
+void ndDynamicsUpdate::CalculateJointsAcceleration()
+{
+	D_TRACKTIME();
+	class ndCalculateJointsAcceleration: public ndScene::ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+
+			const dInt32 threadIndex = GetThredID();
+			ndWorld* const world = m_owner->GetWorld();
+			const dArray<ndConstraint*>& jointArray = world->m_jointArray;
+
+			ndJointAccelerationDecriptor joindDesc;
+			joindDesc.m_timeStep = world->m_timestepRK;
+			joindDesc.m_invTimeStep = world->m_invTimestepRK;
+			joindDesc.m_firstPassCoefFlag = world->m_firstPassCoef;
+			dArray<ndLeftHandSide>& leftHandSide = world->m_leftHandSide;
+			dArray<ndRightHandSide>& rightHandSide = world->m_rightHandSide;
+			
+			for (dInt32 i = m_it->fetch_add(1); i < jointArray.GetCount(); i = m_it->fetch_add(1))
+			{
+				ndConstraint* const joint = jointArray[i];
+				const dInt32 pairStart = joint->m_rowStart;
+				joindDesc.m_rowsCount = joint->m_rowCount;
+				joindDesc.m_leftHandSide = &leftHandSide[pairStart];
+				joindDesc.m_rightHandSide = &rightHandSide[pairStart];
+				joint->JointAccelerations(&joindDesc);
+			}
+		}
+	};
+
+	const ndWorld* const world = (ndWorld*)this;
+	ndScene* const scene = world->GetScene();
+	scene->SubmitJobs<ndCalculateJointsAcceleration>();
 }

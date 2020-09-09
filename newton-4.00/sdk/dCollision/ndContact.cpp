@@ -260,3 +260,73 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& params, const n
 		params.m_forceBounds[jacobIndex].m_jointForce = (ndForceImpactPair*)&contact.m_dir1_Force;
 	}
 }
+
+void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const params)
+{
+	const dVector bodyOmega0(m_body0->GetOmega());
+	const dVector bodyOmega1(m_body1->GetOmega());
+	const dVector bodyVeloc0(m_body0->GetVelocity());
+	const dVector bodyVeloc1(m_body1->GetVelocity());
+	const dVector gyroAlpha0(m_body0->GetGyroAlpha());
+	const dVector gyroAlpha1(m_body1->GetGyroAlpha());
+
+	const dInt32 count = params->m_rowsCount;
+
+	dFloat32 timestep = dFloat32(1.0f);
+	dFloat32 invTimestep = dFloat32(1.0f);
+	if (params->m_timeStep > dFloat32(0.0f)) 
+	{
+		timestep = params->m_timeStep;
+		invTimestep = params->m_invTimeStep;
+	}
+
+	ndRightHandSide* const rightHandSide = params->m_rightHandSide;
+	const ndLeftHandSide* const leftHandSide = params->m_leftHandSide;
+
+	for (dInt32 k = 0; k < count; k++) 
+	{
+		// note: using restitution been negative to indicate that the acceleration was override
+		ndRightHandSide* const rhs = &rightHandSide[k];
+		if (rhs->m_restitution >= dFloat32(0.0f)) 
+		{
+			const ndLeftHandSide* const row = &leftHandSide[k];
+			const ndJacobian& jacobian0 = row->m_Jt.m_jacobianM0;
+			const ndJacobian& jacobian1 = row->m_Jt.m_jacobianM1;
+		
+			dVector relVeloc(jacobian0.m_linear * bodyVeloc0 + jacobian0.m_angular * bodyOmega0 + jacobian1.m_linear * bodyVeloc1 + jacobian1.m_angular * bodyOmega1);
+			dFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
+			dFloat32 aRel = rhs->m_deltaAccel;
+		
+			if (rhs->m_normalForceIndex == D_INDEPENDENT_ROW) 
+			{
+				dAssert(rhs->m_restitution >= 0.0f);
+				dAssert(rhs->m_restitution <= 2.0f);
+		
+				dFloat32 penetrationVeloc = dFloat32(0.0f);
+				dFloat32 restitution = (vRel <= dFloat32(0.0f)) ? (dFloat32(1.0f) + rhs->m_restitution) : dFloat32(1.0f);
+				if (rhs->m_penetration > D_RESTING_CONTACT_PENETRATION * dFloat32(0.125f)) 
+				{
+					if (vRel > dFloat32(0.0f)) 
+					{
+						dFloat32 penetrationCorrection = vRel * timestep;
+						dAssert(penetrationCorrection >= dFloat32(0.0f));
+						rhs->m_penetration = dMax(dFloat32(0.0f), rhs->m_penetration - penetrationCorrection);
+					}
+					else 
+					{
+						dFloat32 penetrationCorrection = -vRel * timestep * rhs->m_restitution * dFloat32(8.0f);
+						if (penetrationCorrection > rhs->m_penetration) 
+						{
+							rhs->m_penetration = dFloat32(0.001f);
+						}
+					}
+					penetrationVeloc = -(rhs->m_penetration * rhs->m_penetrationStiffness);
+				}
+				vRel = vRel * restitution + penetrationVeloc;
+			}
+		
+			const dFloat32 relGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
+			rhs->m_coordenateAccel = relGyro + aRel - vRel * invTimestep;
+		}
+	}
+}

@@ -131,6 +131,7 @@ class ndContact
 
 	virtual const dUnsigned32 GetRowsCount() const;
 	virtual dUnsigned32 JacobianDerivative(ndConstraintDescritor& params);
+	virtual void JointAccelerations(ndJointAccelerationDecriptor* const params);
 	
 	private:
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);

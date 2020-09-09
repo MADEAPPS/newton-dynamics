@@ -191,38 +191,6 @@ class dgJacobianMemory
 #endif
 
 D_MSV_NEWTON_ALIGN_32
-class ndLeftHandSide
-{
-	public:
-	ndJacobianPair m_Jt;
-	ndJacobianPair m_JMinv;
-} D_GCC_NEWTON_ALIGN_32;
-
-D_MSV_NEWTON_ALIGN_32
-class ndRightHandSide
-{
-	public:
-	dFloat32 m_force;
-	dFloat32 m_diagDamp;
-	dFloat32 m_invJinvMJt;
-	dFloat32 m_coordenateAccel;
-
-	dFloat32 m_lowerBoundFrictionCoefficent;
-	dFloat32 m_upperBoundFrictionCoefficent;
-	dFloat32 m_deltaAccel;
-	dFloat32 m_restitution;
-
-	dFloat32 m_maxImpact;
-	dFloat32 m_penetration;
-	dFloat32 m_diagonalRegularizer;
-	dFloat32 m_penetrationStiffness;
-
-	ndForceImpactPair* m_jointFeebackForce;
-	dInt32 m_normalForceIndex;
-} D_GCC_NEWTON_ALIGN_32;
-
-
-D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdate
 {
 	public:
@@ -306,7 +274,10 @@ class ndDynamicsUpdate
 	void DefaultUpdate();
 	void InitWeights();
 	void InitBodyArray();
+	void CalculateForces();
 	void InitJacobianMatrix();
+
+	void CalculateJointsAcceleration();
 
 	void BuildJacobianMatrix(ndConstraint* const joint);
 	dInt32 GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* const joint);
@@ -319,6 +290,10 @@ class ndDynamicsUpdate
 	
 	dFloat32 m_timestep;
 	dFloat32 m_invTimestep;
+	dFloat32 m_firstPassCoef;
+	dFloat32 m_invStepRK;
+	dFloat32 m_timestepRK;
+	dFloat32 m_invTimestepRK;
 	dInt32 m_solverPasses;
 	dUnsigned32 m_maxRowsCount;
 	dAtomic<dUnsigned32> m_rowsCount;

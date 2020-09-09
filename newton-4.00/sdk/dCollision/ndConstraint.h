@@ -32,6 +32,8 @@
 
 class ndBody;
 class ndContact;
+class ndLeftHandSide;
+class ndRightHandSide;
 class ndBodyKinematic;
 
 D_MSV_NEWTON_ALIGN_32
@@ -104,6 +106,17 @@ class ndForceImpactPair
 	dFloat32 m_initialGuess[4];
 };
 
+class ndJointAccelerationDecriptor
+{
+	public:
+	dInt32 m_rowsCount;
+	dFloat32 m_timeStep;
+	dFloat32 m_invTimeStep;
+	dFloat32 m_firstPassCoefFlag;
+	ndRightHandSide* m_rightHandSide;
+	const ndLeftHandSide* m_leftHandSide;
+};
+
 class ndBilateralBounds
 {
 	public:
@@ -132,6 +145,36 @@ class ndConstraintDescritor
 	dFloat32 m_invTimestep;
 } D_GCC_NEWTON_ALIGN_32;
 
+D_MSV_NEWTON_ALIGN_32
+class ndLeftHandSide
+{
+	public:
+	ndJacobianPair m_Jt;
+	ndJacobianPair m_JMinv;
+} D_GCC_NEWTON_ALIGN_32;
+
+D_MSV_NEWTON_ALIGN_32
+class ndRightHandSide
+{
+	public:
+	dFloat32 m_force;
+	dFloat32 m_diagDamp;
+	dFloat32 m_invJinvMJt;
+	dFloat32 m_coordenateAccel;
+
+	dFloat32 m_lowerBoundFrictionCoefficent;
+	dFloat32 m_upperBoundFrictionCoefficent;
+	dFloat32 m_deltaAccel;
+	dFloat32 m_restitution;
+
+	dFloat32 m_maxImpact;
+	dFloat32 m_penetration;
+	dFloat32 m_diagonalRegularizer;
+	dFloat32 m_penetrationStiffness;
+
+	ndForceImpactPair* m_jointFeebackForce;
+	dInt32 m_normalForceIndex;
+} D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
 class ndConstraint
@@ -146,6 +189,7 @@ class ndConstraint
 
 	virtual const dUnsigned32 GetRowsCount() const = 0;
 	virtual dUnsigned32 JacobianDerivative(ndConstraintDescritor& params) = 0;
+	virtual void JointAccelerations(ndJointAccelerationDecriptor* const params) = 0;
 
 	void InitPointParam(dgPointParam& param, dFloat32 stiffness, const dVector& p0Global, const dVector& p1Global) const;
 
