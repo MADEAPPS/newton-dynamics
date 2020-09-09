@@ -80,7 +80,7 @@ class ndBody: public dClassAlloc
 		{
 			dUnsigned32 m_equilibrium : 1;
 			//dUnsigned32 m_freeze : 1;
-			//dUnsigned32 m_resting : 1;
+			dUnsigned32 m_resting : 1;
 			//dUnsigned32 m_sleeping : 1;
 			//dUnsigned32 m_autoSleep : 1;
 			//dUnsigned32 m_inCallback : 1;

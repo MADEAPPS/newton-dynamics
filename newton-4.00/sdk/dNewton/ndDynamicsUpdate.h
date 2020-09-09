@@ -25,15 +25,15 @@
 #include "ndNewtonStdafx.h"
 //#include "dgWorldDynamicsParallelSolver.h"
 
+
+//#define	D_BODY_LRU_STEP					2	
+//#define	D_MAX_SKELETON_JOINT_COUNT		256
+//#define D_MAX_CONTINUE_COLLISON_STEPS	8
+//#define	D_SMALL_ISLAND_COUNT			32
+//#define	D_FREEZZING_VELOCITY_DRAG		dFloat32 (0.9f)
+#define	D_SOLVER_MAX_ERROR					(D_FREEZE_MAG * dFloat32 (0.5f))
+
 #if 0
-#define	DG_BODY_LRU_STEP					2	
-#define	DG_MAX_SKELETON_JOINT_COUNT			256
-#define DG_MAX_CONTINUE_COLLISON_STEPS		8
-#define	DG_SMALL_ISLAND_COUNT				32
-
-#define	DG_FREEZZING_VELOCITY_DRAG			dFloat32 (0.9f)
-#define	DG_SOLVER_MAX_ERROR					(DG_FREEZE_MAG * dFloat32 (0.5f))
-
 #define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
 #define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(64)
 //#define DG_PARALLEL_JOINT_COUNT_CUT_OFF	(2)
@@ -276,18 +276,20 @@ class ndDynamicsUpdate
 	void InitBodyArray();
 	void CalculateForces();
 	void InitJacobianMatrix();
-
+	void CalculateJointsForce();
 	void CalculateJointsAcceleration();
 
 	void BuildJacobianMatrix(ndConstraint* const joint);
+	dFloat32 CalculateJointsForce(ndConstraint* const joint);
 	dInt32 GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* const joint);
 
 	dArray<ndJacobian> m_internalForces;
+	dArray<ndJacobian> m_internalForcesBack;
 	dArray<ndConstraint*> m_jointArray;
 	dArray<ndBodyProxy> m_bodyProxyArray;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
-	
+	dFloat32 m_accelNorm[D_MAX_THREADS_COUNT];
 	dFloat32 m_timestep;
 	dFloat32 m_invTimestep;
 	dFloat32 m_firstPassCoef;

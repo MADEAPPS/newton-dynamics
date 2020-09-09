@@ -24,20 +24,20 @@
 
 #include "ndNewtonStdafx.h"
 
-//#define DG_MAX_SPEED_ATT	dgFloat32(0.02f)
-////#define DG_FREEZE_ACCEL	dgFloat32(0.1f)
-//#define DG_FREEZE_ACCEL		dgFloat32(1.0f)
-//#define DG_FREEZE_SPEED		dgFloat32(0.032f)
-//
-//#define DG_FREEZE_ACCEL2	(DG_FREEZE_ACCEL * DG_FREEZE_ACCEL)
-//#define DG_FREEZE_SPEED2	(DG_FREEZE_SPEED * DG_FREEZE_SPEED)
-//
-//#define DG_FREEZE_MAG		DG_FREEZE_ACCEL
-//#define DG_FREEZE_MAG2		(DG_FREEZE_MAG * DG_FREEZE_MAG)
-//
-//#define DG_ERR_TOLERANCE	dgFloat32(1.0e-2f)
-//#define DG_ERR_TOLERANCE2	(DG_ERR_TOLERANCE * DG_ERR_TOLERANCE)
-//
+#define D_MAX_SPEED_ATT	dFloat32(0.02f)
+//#define D_FREEZE_ACCEL	dFloat32(0.1f)
+#define D_FREEZE_ACCEL		dFloat32(1.0f)
+#define D_FREEZE_SPEED		dFloat32(0.032f)
+
+#define D_FREEZE_ACCEL2		(D_FREEZE_ACCEL * D_FREEZE_ACCEL)
+#define D_FREEZE_SPEED2		(D_FREEZE_SPEED * D_FREEZE_SPEED)
+
+#define D_FREEZE_MAG		D_FREEZE_ACCEL
+#define D_FREEZE_MAG2		(D_FREEZE_MAG * D_FREEZE_MAG)
+
+#define D_ERR_TOLERANCE		dFloat32(1.0e-2f)
+#define D_ERR_TOLERANCE2	(D_ERR_TOLERANCE * D_ERR_TOLERANCE)
+
 //class dgSkeletonContainer;
 
 D_MSV_NEWTON_ALIGN_32
