@@ -24,7 +24,7 @@
 
 #include "ndShapeConvex.h"
 
-#define DG_SPHERE_VERTEX_COUNT 18
+#define D_SPHERE_VERTEX_COUNT 18
 
 D_MSV_NEWTON_ALIGN_32
 class ndShapeSphere: public ndShapeConvex
@@ -47,6 +47,18 @@ class ndShapeSphere: public ndShapeConvex
 	D_COLLISION_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 	D_COLLISION_API virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+
+	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
+
+	void TesselateTriangle(dInt32 level, const dVector& p0, const dVector& p1, const dVector& p2, dInt32& count, dVector* const ouput) const;
+
+	dVector m_vertex[D_SPHERE_VERTEX_COUNT];
+	dFloat32 m_radius;
+
+	static dInt32 m_shapeRefCount;
+	static dVector m_unitSphere[];
+	static ndConvexSimplexEdge m_edgeArray[];
+
 } D_GCC_NEWTON_ALIGN_32;
 
 /*

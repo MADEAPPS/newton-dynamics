@@ -136,12 +136,12 @@ $(document).ready(function(){initNavTree('nd_shape_convex_8h_source.html',''); i
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="comment">//bool IntesectionTest (dShapeParamProxy&amp; proxy) const;</span></div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">   40</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">dConvexSimplexEdge</a></div>
+<div class="line"><a name="l00040"></a><span class="lineno"><a class="line" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">   40</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a></div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    {</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <a class="code" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">dConvexSimplexEdge</a>* m_twin;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <a class="code" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">dConvexSimplexEdge</a>* m_next;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <a class="code" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">dConvexSimplexEdge</a>* m_prev;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <a class="code" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a>* m_twin;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <a class="code" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a>* m_next;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <a class="code" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a>* m_prev;</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        dInt32 m_vertex;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    };</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
@@ -176,7 +176,7 @@ $(document).ready(function(){initNavTree('nd_shape_convex_8h_source.html',''); i
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keywordflow">return</span> point;</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    }</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keyword">virtual</span> <span class="keyword">const</span> dConvexSimplexEdge** GetVertexToEdgeMapping()<span class="keyword"> const </span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keyword">virtual</span> <span class="keyword">const</span> ndConvexSimplexEdge** GetVertexToEdgeMapping()<span class="keyword"> const </span></div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="keyword">    </span>{ </div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">nullptr</span>; </div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    }</div>
@@ -204,7 +204,7 @@ $(document).ready(function(){initNavTree('nd_shape_convex_8h_source.html',''); i
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <a class="code" href="classd_vector.html">dVector</a>* m_vertex;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    dConvexSimplexEdge* m_simplex;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    ndConvexSimplexEdge* m_simplex;</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160; </div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    dFloat32 m_boxMinRadius;</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    dFloat32 m_boxMaxRadius;</div>
@@ -221,13 +221,13 @@ $(document).ready(function(){initNavTree('nd_shape_convex_8h_source.html',''); i
 </div><!-- doc-content -->
 <div class="ttc" id="aclassnd_body_html"><div class="ttname"><a href="classnd_body.html">ndBody</a></div><div class="ttdef"><b>Definition:</b> ndBody.h:37</div></div>
 <div class="ttc" id="aclassnd_shape_debug_callback_html"><div class="ttname"><a href="classnd_shape_debug_callback.html">ndShapeDebugCallback</a></div><div class="ttdef"><b>Definition:</b> ndShapeInstance.h:35</div></div>
-<div class="ttc" id="aclassnd_shape_html"><div class="ttname"><a href="classnd_shape.html">ndShape</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:67</div></div>
+<div class="ttc" id="aclassnd_shape_html"><div class="ttname"><a href="classnd_shape.html">ndShape</a></div><div class="ttdef"><b>Definition:</b> ndShape.h:68</div></div>
 <div class="ttc" id="aclassnd_ray_cast_notify_html"><div class="ttname"><a href="classnd_ray_cast_notify.html">ndRayCastNotify</a></div><div class="ttdef"><b>Definition:</b> ndRayCastNotify.h:33</div></div>
+<div class="ttc" id="aclassnd_shape_convex_1_1nd_convex_simplex_edge_html"><div class="ttname"><a href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndShapeConvex::ndConvexSimplexEdge</a></div><div class="ttdef"><b>Definition:</b> ndShapeConvex.h:41</div></div>
 <div class="ttc" id="aclassnd_shape_convex_html"><div class="ttname"><a href="classnd_shape_convex.html">ndShapeConvex</a></div><div class="ttdef"><b>Definition:</b> ndShapeConvex.h:34</div></div>
 <div class="ttc" id="aclassnd_contact_point_html"><div class="ttname"><a href="classnd_contact_point.html">ndContactPoint</a></div><div class="ttdef"><b>Definition:</b> ndContact.h:40</div></div>
 <div class="ttc" id="aclassd_vector_html"><div class="ttname"><a href="classd_vector.html">dVector</a></div><div class="ttdef"><b>Definition:</b> dVectorArmNeon.h:1104</div></div>
 <div class="ttc" id="aclassd_matrix_html"><div class="ttname"><a href="classd_matrix.html">dMatrix</a></div><div class="ttdef"><b>Definition:</b> dMatrix.h:39</div></div>
-<div class="ttc" id="aclassnd_shape_convex_1_1d_convex_simplex_edge_html"><div class="ttname"><a href="classnd_shape_convex_1_1d_convex_simplex_edge.html">ndShapeConvex::dConvexSimplexEdge</a></div><div class="ttdef"><b>Definition:</b> ndShapeConvex.h:41</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

@@ -1,6 +1,6 @@
 var classnd_shape_convex =
 [
-    [ "dConvexSimplexEdge", "classnd_shape_convex_1_1d_convex_simplex_edge.html", "classnd_shape_convex_1_1d_convex_simplex_edge" ],
+    [ "ndConvexSimplexEdge", "classnd_shape_convex_1_1nd_convex_simplex_edge.html", "classnd_shape_convex_1_1nd_convex_simplex_edge" ],
     [ "ndShapeConvex", "classnd_shape_convex.html#a24945327f7d4f9302a943c6fd77e4e02", null ],
     [ "~ndShapeConvex", "classnd_shape_convex.html#a064b635727ea28a335df2c5dc37e9b2e", null ],
     [ "CalcAABB", "classnd_shape_convex.html#a6e73b990c3fb61606a3f41daafc58552", null ],
@@ -10,7 +10,7 @@ var classnd_shape_convex =
     [ "DebugShape", "classnd_shape_convex.html#ae9e8e40388dce44419365774f4331103", null ],
     [ "GetAsShapeConvex", "classnd_shape_convex.html#a1a0dd2a5f5980ac650dee44bf206d95a", null ],
     [ "GetConvexVertexCount", "classnd_shape_convex.html#a5e99fc91f76b201c13f8ba8636335287", null ],
-    [ "GetVertexToEdgeMapping", "classnd_shape_convex.html#a54493173dbd52bb8725673522697ff12", null ],
+    [ "GetVertexToEdgeMapping", "classnd_shape_convex.html#af4085965529512326a6ce6b93c2b4af4", null ],
     [ "MassProperties", "classnd_shape_convex.html#a34c14a54c7c871096027588a568d154c", null ],
     [ "RayCast", "classnd_shape_convex.html#accc8870d047162f3e94268497383253c", null ],
     [ "RectifyConvexSlice", "classnd_shape_convex.html#a8e15752da34043e6e28fd9c667e566ad", null ],
@@ -22,7 +22,7 @@ var classnd_shape_convex =
     [ "m_boxMaxRadius", "classnd_shape_convex.html#a48e902e6a4ec072a9557d0b2ef187c57", null ],
     [ "m_boxMinRadius", "classnd_shape_convex.html#a4b3be973896efd5b1341df898239adf0", null ],
     [ "m_edgeCount", "classnd_shape_convex.html#ac66731b49b0e5a2ee918ca4c29c69821", null ],
-    [ "m_simplex", "classnd_shape_convex.html#ae21f5db159b2cb2afb6798401033d4cb", null ],
+    [ "m_simplex", "classnd_shape_convex.html#abea76d173d3484bf47c53cd4f225b3df", null ],
     [ "m_simplexVolume", "classnd_shape_convex.html#a6e98fa672bf85861c14c93d743f49966", null ],
     [ "m_vertex", "classnd_shape_convex.html#a12f2d51db8d3bf8840f340d5cd37c0e2", null ],
     [ "m_vertexCount", "classnd_shape_convex.html#aebe98f575c1b2a77810f2b92245cb929", null ]

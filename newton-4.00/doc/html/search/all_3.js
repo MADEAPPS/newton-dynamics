@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['record_114',['RECORD',['../structd_heap_base_1_1_r_e_c_o_r_d.html',1,'dHeapBase']]]
+  ['malloc_76',['Malloc',['../classd_memory.html#a4e00fab80f4de696dc7877929c50a770',1,'dMemory']]]
 ];

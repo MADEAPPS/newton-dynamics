@@ -13,6 +13,7 @@ var classnd_body_dynamic =
     [ "SetAlpha", "classnd_body_dynamic.html#a01c13f65ca40593b2466b916588b139f", null ],
     [ "SetForce", "classnd_body_dynamic.html#affceb57c5c322b543c73e473d7ad5a0e", null ],
     [ "SetTorque", "classnd_body_dynamic.html#a75234c8a105cca1dd58be4f4f1db6c4c", null ],
+    [ "ndDynamicsUpdate", "classnd_body_dynamic.html#acc29a6caf36f06571c6e986c4a8c4b13", null ],
     [ "m_accel", "classnd_body_dynamic.html#aecbcfc1786d0de5502accf72c51a0739", null ],
     [ "m_alpha", "classnd_body_dynamic.html#a7812affbb3322f3a68195b58641aa10c", null ],
     [ "m_externalForce", "classnd_body_dynamic.html#afdca22ed2ade9496851c025cebf4ad4d", null ],

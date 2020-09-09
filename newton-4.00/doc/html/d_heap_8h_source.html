@@ -197,7 +197,7 @@ $(document).ready(function(){initNavTree('d_heap_8h_source.html',''); initResiza
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> OBJECT, <span class="keyword">class</span> KEY&gt;</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<a class="code" href="classd_heap_base.html">dHeapBase&lt;OBJECT,KEY&gt;::dHeapBase</a> (dInt32 maxElements)</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    :m_pool((RECORD *)dMalloc(maxElements * sizeof(RECORD)))</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    :m_pool((RECORD *)<a class="code" href="classd_memory.html">dMemory</a>::Malloc(maxElements * sizeof(RECORD)))</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    ,m_curCount(0)</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    ,m_maxCount(maxElements)</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    ,m_bufferIsOwnned(true)</div>
@@ -220,7 +220,7 @@ $(document).ready(function(){initNavTree('d_heap_8h_source.html',''); initResiza
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;{   </div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keywordflow">if</span> (m_bufferIsOwnned)</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    {</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        dFree (m_pool);</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <a class="code" href="classd_memory.html#a56b05108042ab6faabcd1bbe0fb91394">dMemory::Free</a> (m_pool);</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    }</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;}</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
@@ -561,6 +561,8 @@ $(document).ready(function(){initNavTree('d_heap_8h_source.html',''); initResiza
 </div><!-- doc-content -->
 <div class="ttc" id="aclassd_down_heap_html"><div class="ttname"><a href="classd_down_heap.html">dDownHeap</a></div><div class="ttdef"><b>Definition:</b> dHeap.h:73</div></div>
 <div class="ttc" id="astructd_heap_base_1_1_r_e_c_o_r_d_html"><div class="ttname"><a href="structd_heap_base_1_1_r_e_c_o_r_d.html">dHeapBase::RECORD</a></div><div class="ttdef"><b>Definition:</b> dHeap.h:41</div></div>
+<div class="ttc" id="aclassd_memory_html_a56b05108042ab6faabcd1bbe0fb91394"><div class="ttname"><a href="classd_memory.html#a56b05108042ab6faabcd1bbe0fb91394">dMemory::Free</a></div><div class="ttdeci">static D_CORE_API void Free(void *const ptr)</div><div class="ttdoc">Destroy a memory buffer previously allocated by Malloc.</div><div class="ttdef"><b>Definition:</b> dMemory.cpp:56</div></div>
+<div class="ttc" id="aclassd_memory_html"><div class="ttname"><a href="classd_memory.html">dMemory</a></div><div class="ttdef"><b>Definition:</b> dMemory.h:31</div></div>
 <div class="ttc" id="aclassd_heap_base_html"><div class="ttname"><a href="classd_heap_base.html">dHeapBase</a></div><div class="ttdef"><b>Definition:</b> dHeap.h:38</div></div>
 <div class="ttc" id="aclassd_up_heap_html"><div class="ttname"><a href="classd_up_heap.html">dUpHeap</a></div><div class="ttdef"><b>Definition:</b> dHeap.h:87</div></div>
 <!-- start footer part -->

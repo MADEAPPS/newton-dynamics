@@ -28,7 +28,11 @@ var NAVTREE =
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
-      [ "Class Hierarchy", "hierarchy.html", "hierarchy" ]
+      [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
+      [ "Class Members", "functions.html", [
+        [ "All", "functions.html", null ],
+        [ "Functions", "functions_func.html", null ]
+      ] ]
     ] ]
   ] ]
 ];
@@ -37,10 +41,11 @@ var NAVTREEINDEX =
 [
 "annotated.html",
 "classd_fast_ray_test.html#ae12a05608f14e92a240b0d9c894e61be",
-"classd_scope_spin_lock.html#a72f07ce64d55e50f66000c3a384a04ca",
-"classd_vector.html#a4e6e0c767bc91ad7df5bf93b6a8874f8",
-"classnd_body_kinematic.html#aca58a4c4d6a95a41607046d45502b104",
-"classnd_scene_mixed.html#aece9cbfd982e679bb9855c4f687f36af"
+"classd_red_back_node.html#ae9a74a02d0e2802e70fc997bc71abdf3",
+"classd_vector.html#a491a8d4e482c25ac12cb0c04e3585da6",
+"classnd_body_kinematic.html#a99e204b587f73287aa3d2bbeb8b0cad7",
+"classnd_scene_1_1nd_base_job.html#a81aa2c022822ce9e40fda8d78058bcde",
+"uniond_float_sign.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

@@ -136,6 +136,9 @@ virtual dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>Release</b>
 <tr class="memitem:a5413342ef2ebc69cc02938ecad3a3310 inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="a5413342ef2ebc69cc02938ecad3a3310"></a>
 virtual <a class="el" href="classnd_shape.html">ndShape</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShape</b> ()</td></tr>
 <tr class="separator:a5413342ef2ebc69cc02938ecad3a3310 inherit pub_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80d45a6927aef2135aab4e86d9a5cee0 inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="a80d45a6927aef2135aab4e86d9a5cee0"></a>
+virtual <a class="el" href="classnd_shape_sphere.html">ndShapeSphere</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShapeSphere</b> ()</td></tr>
+<tr class="separator:a80d45a6927aef2135aab4e86d9a5cee0 inherit pub_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af79e33b2a8002f4c1b75ccf874739a4b inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="af79e33b2a8002f4c1b75ccf874739a4b"></a>
 virtual <a class="el" href="classnd_shape_null.html">ndShapeNull</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShapeNull</b> ()</td></tr>
 <tr class="separator:af79e33b2a8002f4c1b75ccf874739a4b inherit pub_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -170,9 +173,9 @@ virtual D_COLLISION_API <a class="el" href="classd_vector.html">dVector</a>&#160
 <tr class="memitem:affbc8cd428fc0926ac3b3c2637fd0e12"><td class="memItemLeft" align="right" valign="top"><a id="affbc8cd428fc0926ac3b3c2637fd0e12"></a>
 virtual D_COLLISION_API dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>RayCast</b> (<a class="el" href="classnd_ray_cast_notify.html">ndRayCastNotify</a> &amp;callback, const <a class="el" href="classd_vector.html">dVector</a> &amp;localP0, const <a class="el" href="classd_vector.html">dVector</a> &amp;localP1, dFloat32 maxT, const <a class="el" href="classnd_body.html">ndBody</a> *const body, <a class="el" href="classnd_contact_point.html">ndContactPoint</a> &amp;contactOut) const</td></tr>
 <tr class="separator:affbc8cd428fc0926ac3b3c2637fd0e12"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d189f8bd80d1f56704271844858d10a"><td class="memItemLeft" align="right" valign="top"><a id="a9d189f8bd80d1f56704271844858d10a"></a>
-const <a class="el" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">dConvexSimplexEdge</a> **&#160;</td><td class="memItemRight" valign="bottom"><b>GetVertexToEdgeMapping</b> () const</td></tr>
-<tr class="separator:a9d189f8bd80d1f56704271844858d10a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a745b12793ba572aa0f87338cdd0c58bd"><td class="memItemLeft" align="right" valign="top"><a id="a745b12793ba572aa0f87338cdd0c58bd"></a>
+const <a class="el" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a> **&#160;</td><td class="memItemRight" valign="bottom"><b>GetVertexToEdgeMapping</b> () const</td></tr>
+<tr class="separator:a745b12793ba572aa0f87338cdd0c58bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a31a70c12b6f8b1455f64e96dd2d883"><td class="memItemLeft" align="right" valign="top"><a id="a8a31a70c12b6f8b1455f64e96dd2d883"></a>
 virtual dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>CalculatePlaneIntersection</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;normal, const <a class="el" href="classd_vector.html">dVector</a> &amp;point, <a class="el" href="classd_vector.html">dVector</a> *const contactsOut) const</td></tr>
 <tr class="separator:a8a31a70c12b6f8b1455f64e96dd2d883"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -224,9 +227,9 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a12f2d51db8d3bf8840f340d5cd37c0e2 inherit pro_attribs_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="a12f2d51db8d3bf8840f340d5cd37c0e2"></a>
 <a class="el" href="classd_vector.html">dVector</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_vertex</b></td></tr>
 <tr class="separator:a12f2d51db8d3bf8840f340d5cd37c0e2 inherit pro_attribs_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae21f5db159b2cb2afb6798401033d4cb inherit pro_attribs_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="ae21f5db159b2cb2afb6798401033d4cb"></a>
-<a class="el" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">dConvexSimplexEdge</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_simplex</b></td></tr>
-<tr class="separator:ae21f5db159b2cb2afb6798401033d4cb inherit pro_attribs_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abea76d173d3484bf47c53cd4f225b3df inherit pro_attribs_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="abea76d173d3484bf47c53cd4f225b3df"></a>
+<a class="el" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_simplex</b></td></tr>
+<tr class="separator:abea76d173d3484bf47c53cd4f225b3df inherit pro_attribs_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b3be973896efd5b1341df898239adf0 inherit pro_attribs_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="a4b3be973896efd5b1341df898239adf0"></a>
 dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>m_boxMinRadius</b></td></tr>
 <tr class="separator:a4b3be973896efd5b1341df898239adf0 inherit pro_attribs_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -275,15 +278,15 @@ static <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="
 <tr class="memitem:a38a09dca57999db8a0f7bad12f90d23d"><td class="memItemLeft" align="right" valign="top"><a id="a38a09dca57999db8a0f7bad12f90d23d"></a>
 static <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_penetrationTol</b></td></tr>
 <tr class="separator:a38a09dca57999db8a0f7bad12f90d23d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a27c872152456c9f104e9ff7c94811ae5"><td class="memItemLeft" align="right" valign="top"><a id="a27c872152456c9f104e9ff7c94811ae5"></a>
-static <a class="el" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">dConvexSimplexEdge</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_edgeArray</b> []</td></tr>
-<tr class="separator:a27c872152456c9f104e9ff7c94811ae5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ace1172963dd50d920369b825f8761bef"><td class="memItemLeft" align="right" valign="top"><a id="ace1172963dd50d920369b825f8761bef"></a>
-static <a class="el" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">dConvexSimplexEdge</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_edgeEdgeMap</b> []</td></tr>
-<tr class="separator:ace1172963dd50d920369b825f8761bef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af65651d196ad70ca8dc132dc04b92514"><td class="memItemLeft" align="right" valign="top"><a id="af65651d196ad70ca8dc132dc04b92514"></a>
-static <a class="el" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">dConvexSimplexEdge</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_vertexToEdgeMap</b> []</td></tr>
-<tr class="separator:af65651d196ad70ca8dc132dc04b92514"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac263d5e49ed59e940eb3dc41e6840175"><td class="memItemLeft" align="right" valign="top"><a id="ac263d5e49ed59e940eb3dc41e6840175"></a>
+static <a class="el" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_edgeArray</b> []</td></tr>
+<tr class="separator:ac263d5e49ed59e940eb3dc41e6840175"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afeb898ac366ace929bd9a80b7b90fa7b"><td class="memItemLeft" align="right" valign="top"><a id="afeb898ac366ace929bd9a80b7b90fa7b"></a>
+static <a class="el" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_edgeEdgeMap</b> []</td></tr>
+<tr class="separator:afeb898ac366ace929bd9a80b7b90fa7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d4bed86285aa49c4d8f172ce41108cf"><td class="memItemLeft" align="right" valign="top"><a id="a6d4bed86285aa49c4d8f172ce41108cf"></a>
+static <a class="el" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_vertexToEdgeMap</b> []</td></tr>
+<tr class="separator:a6d4bed86285aa49c4d8f172ce41108cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_attribs_classnd_shape"><td colspan="2" onclick="javascript:toggleInherit('pro_static_attribs_classnd_shape')"><img src="closed.png" alt="-"/>&#160;Static Protected Attributes inherited from <a class="el" href="classnd_shape.html">ndShape</a></td></tr>
 <tr class="memitem:a3f46c588bf2ab546408aeef1ef0e6b15 inherit pro_static_attribs_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="a3f46c588bf2ab546408aeef1ef0e6b15"></a>
 static <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_flushZero</b></td></tr>

@@ -408,12 +408,12 @@ ndShapeConvex::~ndShapeConvex()
 {
 	if (m_vertex) 
 	{
-		dFree(m_vertex);
+		dMemory::Free(m_vertex);
 	}
 	
 	if (m_simplex) 
 	{
-		dFree(m_simplex);
+		dMemory::Free(m_simplex);
 	}
 }
 
@@ -430,8 +430,8 @@ void ndShapeConvex::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debu
 	{
 		if (!mark[i]) 
 		{
-			dConvexSimplexEdge* const face = &m_simplex[i];
-			dConvexSimplexEdge* edge = face;
+			ndConvexSimplexEdge* const face = &m_simplex[i];
+			ndConvexSimplexEdge* edge = face;
 			dInt32 count = 0;
 			do 
 			{
@@ -456,9 +456,9 @@ void ndShapeConvex::SetVolumeAndCG()
 	dPolyhedraMassProperties localData;
 	for (dInt32 i = 0; i < m_edgeCount; i++) 
 	{
-		dConvexSimplexEdge* const face = &m_simplex[i];
+		ndConvexSimplexEdge* const face = &m_simplex[i];
 		if (!edgeMarks[i]) {
-			dConvexSimplexEdge* edge = face;
+			ndConvexSimplexEdge* edge = face;
 			dInt32 count = 0;
 			do 
 			{
@@ -652,13 +652,13 @@ dVector ndShapeConvex::SupportVertex(const dVector& dir, dInt32* const vertexInd
 
 	dInt16 cache[16];
 	memset(cache, -1, sizeof(cache));
-	dConvexSimplexEdge* edge = &m_simplex[0];
+	ndConvexSimplexEdge* edge = &m_simplex[0];
 
 	dInt32 index = edge->m_vertex;
 	dFloat32 side0 = m_vertex[index].DotProduct(dir).GetScalar();
 
 	cache[index & (sizeof(cache) / sizeof(cache[0]) - 1)] = dInt16(index);
-	dConvexSimplexEdge* ptr = edge;
+	ndConvexSimplexEdge* ptr = edge;
 	dInt32 maxCount = 128;
 	do 
 	{
@@ -872,8 +872,8 @@ dInt32 ndShapeConvex::CalculatePlaneIntersection(const dVector& normal, const dV
 {
 	dVector support[4];
 	dInt32 featureCount = 3;
-	const dConvexSimplexEdge* edge = &m_simplex[0];
-	const dConvexSimplexEdge** const vertToEdgeMapping = GetVertexToEdgeMapping();
+	const ndConvexSimplexEdge* edge = &m_simplex[0];
+	const ndConvexSimplexEdge** const vertToEdgeMapping = GetVertexToEdgeMapping();
 	dAssert(normal.m_w == dFloat32(0.0f));
 	if (vertToEdgeMapping) 
 	{
@@ -886,7 +886,7 @@ dInt32 ndShapeConvex::CalculatePlaneIntersection(const dVector& normal, const dV
 		const dFloat32 tiltAngle = dFloat32(0.087f);
 		const dFloat32 tiltAngle2 = tiltAngle * tiltAngle;
 		dPlane testPlane(normal, -(normal.DotProduct(support[0]).GetScalar()));
-		const dConvexSimplexEdge* ptr = edge;
+		const ndConvexSimplexEdge* ptr = edge;
 		do 
 		{
 			const dVector& p = m_vertex[ptr->m_twin->m_vertex];
@@ -923,10 +923,10 @@ dInt32 ndShapeConvex::CalculatePlaneIntersection(const dVector& normal, const dV
 		{
 			dFloat32 side0 = plane.Evalue(m_vertex[edge->m_vertex]);
 			dFloat32 side1 = side0;
-			const dConvexSimplexEdge* firstEdge = nullptr;
+			const ndConvexSimplexEdge* firstEdge = nullptr;
 			if (side0 > dFloat32(0.0f)) 
 			{
-				const dConvexSimplexEdge* ptr = edge;
+				const ndConvexSimplexEdge* ptr = edge;
 				do 
 				{
 					dAssert(m_vertex[ptr->m_twin->m_vertex].m_w == dFloat32(0.0f));
@@ -966,7 +966,7 @@ dInt32 ndShapeConvex::CalculatePlaneIntersection(const dVector& normal, const dV
 			}
 			else if (side0 < dFloat32(0.0f)) 
 			{
-				const dConvexSimplexEdge* ptr = edge;
+				const ndConvexSimplexEdge* ptr = edge;
 				do 
 				{
 					dAssert(m_vertex[ptr->m_twin->m_vertex].m_w == dFloat32(0.0f));
@@ -1013,7 +1013,7 @@ dInt32 ndShapeConvex::CalculatePlaneIntersection(const dVector& normal, const dV
 				dAssert(dAbs(side0 - plane.Evalue(m_vertex[firstEdge->m_vertex])) < dFloat32(1.0e-5f));
 
 				dInt32 maxCount = 0;
-				const dConvexSimplexEdge* ptr = firstEdge;
+				const ndConvexSimplexEdge* ptr = firstEdge;
 				do 
 				{
 					if (side0 > dFloat32(0.0f)) 
@@ -1045,7 +1045,7 @@ dInt32 ndShapeConvex::CalculatePlaneIntersection(const dVector& normal, const dV
 						dAssert(t >= dFloat32(-1.05f));
 						contactsOut[count] = m_vertex[ptr->m_vertex] - dp.Scale(t);
 
-						dConvexSimplexEdge* ptr1 = ptr->m_next;
+						ndConvexSimplexEdge* ptr1 = ptr->m_next;
 						for (; ptr1 != ptr; ptr1 = ptr1->m_next) 
 						{
 							dAssert(m_vertex[ptr->m_twin->m_vertex].m_w == dFloat32(0.0f));
@@ -1061,7 +1061,7 @@ dInt32 ndShapeConvex::CalculatePlaneIntersection(const dVector& normal, const dV
 					else 
 					{
 						contactsOut[count] = m_vertex[ptr->m_vertex];
-						dConvexSimplexEdge* ptr1 = ptr->m_next;
+						ndConvexSimplexEdge* ptr1 = ptr->m_next;
 						for (; ptr1 != ptr; ptr1 = ptr1->m_next) 
 						{
 							dAssert(m_vertex[ptr1->m_twin->m_vertex].m_w == dFloat32(0.0f));

@@ -6,6 +6,7 @@ var dir_86cc7c9bf68616eaf57a10c300df72f9 =
     [ "dCore.h", "d_core_8h_source.html", null ],
     [ "dCoreStdafx.h", "d_core_stdafx_8h_source.html", null ],
     [ "dDebug.h", "d_debug_8h_source.html", null ],
+    [ "dFixSizeBuffer.h", "d_fix_size_buffer_8h_source.html", null ],
     [ "dGeneralMatrix.h", "d_general_matrix_8h_source.html", null ],
     [ "dGeneralVector.h", "d_general_vector_8h_source.html", null ],
     [ "dGoogol.h", "d_googol_8h_source.html", null ],

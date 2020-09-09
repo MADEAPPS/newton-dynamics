@@ -71,7 +71,7 @@ dArray<T>::~dArray ()
 {
 	if (m_array) 
 	{
-		dFree(m_array);
+		dMemory::Free(m_array);
 	}
 }
 
@@ -138,7 +138,7 @@ void dArray<T>::Resize(dInt32 size)
 	if (size >= m_capacity) 
 	{
 		size = dMax(size, 16);
-		T* const newArray = (T*)dMalloc(dInt32(sizeof(T) * size));
+		T* const newArray = (T*)dMemory::Malloc(dInt32(sizeof(T) * size));
 		if (m_array) 
 		{
 			for (dInt32 i = 0; i < m_capacity; i++)
@@ -146,7 +146,7 @@ void dArray<T>::Resize(dInt32 size)
 				//newArray[i] = m_array[i];
 				memcpy(&newArray[i], &m_array[i], sizeof(T));
 			}
-			dFree(m_array);
+			dMemory::Free(m_array);
 		}
 		m_array = newArray;
 		m_capacity = size;
@@ -154,7 +154,7 @@ void dArray<T>::Resize(dInt32 size)
 	else if (size < m_capacity) 
 	{
 		size = dMax(size, 16);
-		T* const newArray = (T*)dMalloc(dInt32(sizeof(T) * size));
+		T* const newArray = (T*)dMemory::Malloc(dInt32(sizeof(T) * size));
 		if (m_array) 
 		{
 			for (dInt32 i = 0; i < size; i++) 
@@ -162,7 +162,7 @@ void dArray<T>::Resize(dInt32 size)
 				//newArray[i] = m_array[i];
 				memcpy(&newArray[i], &m_array[i], sizeof(T));
 			}
-			dFree(m_array);
+			dMemory::Free(m_array);
 		}
 		m_array = newArray;
 		m_capacity = size;

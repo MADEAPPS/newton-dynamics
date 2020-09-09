@@ -149,6 +149,9 @@ virtual <a class="el" href="classnd_shape.html">ndShape</a> *&#160;</td><td clas
 <tr class="memitem:ade4df021c83d95f7f0af3e32b8ed5318 inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="ade4df021c83d95f7f0af3e32b8ed5318"></a>
 virtual <a class="el" href="classnd_shape_box.html">ndShapeBox</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShapeBox</b> ()</td></tr>
 <tr class="separator:ade4df021c83d95f7f0af3e32b8ed5318 inherit pub_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80d45a6927aef2135aab4e86d9a5cee0 inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="a80d45a6927aef2135aab4e86d9a5cee0"></a>
+virtual <a class="el" href="classnd_shape_sphere.html">ndShapeSphere</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShapeSphere</b> ()</td></tr>
+<tr class="separator:a80d45a6927aef2135aab4e86d9a5cee0 inherit pub_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classd_class_alloc.html">dClassAlloc</a></td></tr>
 <tr class="memitem:a177d4db8727ec4c7cd9767295186f69d inherit pub_methods_classd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="a177d4db8727ec4c7cd9767295186f69d"></a>
 void *&#160;</td><td class="memItemRight" valign="bottom"><b>operator new</b> (size_t size)</td></tr>
@@ -200,9 +203,9 @@ virtual dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetConvexVe
 <tr class="memitem:af7d2d70445aafaf99823544a88ca8d28 inherit pro_methods_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="af7d2d70445aafaf99823544a88ca8d28"></a>
 virtual <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>SupportVertexSpecialProjectPoint</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;point, const <a class="el" href="classd_vector.html">dVector</a> &amp;dir) const</td></tr>
 <tr class="separator:af7d2d70445aafaf99823544a88ca8d28 inherit pro_methods_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54493173dbd52bb8725673522697ff12 inherit pro_methods_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="a54493173dbd52bb8725673522697ff12"></a>
-virtual const <a class="el" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">dConvexSimplexEdge</a> **&#160;</td><td class="memItemRight" valign="bottom"><b>GetVertexToEdgeMapping</b> () const</td></tr>
-<tr class="separator:a54493173dbd52bb8725673522697ff12 inherit pro_methods_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4085965529512326a6ce6b93c2b4af4 inherit pro_methods_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="af4085965529512326a6ce6b93c2b4af4"></a>
+virtual const <a class="el" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a> **&#160;</td><td class="memItemRight" valign="bottom"><b>GetVertexToEdgeMapping</b> () const</td></tr>
+<tr class="separator:af4085965529512326a6ce6b93c2b4af4 inherit pro_methods_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classnd_shape"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classnd_shape')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classnd_shape.html">ndShape</a></td></tr>
 <tr class="memitem:a02e6165614604b027ba6de47cc6f6ea2 inherit pro_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="a02e6165614604b027ba6de47cc6f6ea2"></a>
 D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndShape</b> (dShapeID id)</td></tr>
@@ -214,9 +217,9 @@ D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndShape</b
 <tr class="memitem:a12f2d51db8d3bf8840f340d5cd37c0e2 inherit pro_attribs_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="a12f2d51db8d3bf8840f340d5cd37c0e2"></a>
 <a class="el" href="classd_vector.html">dVector</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_vertex</b></td></tr>
 <tr class="separator:a12f2d51db8d3bf8840f340d5cd37c0e2 inherit pro_attribs_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae21f5db159b2cb2afb6798401033d4cb inherit pro_attribs_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="ae21f5db159b2cb2afb6798401033d4cb"></a>
-<a class="el" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">dConvexSimplexEdge</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_simplex</b></td></tr>
-<tr class="separator:ae21f5db159b2cb2afb6798401033d4cb inherit pro_attribs_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abea76d173d3484bf47c53cd4f225b3df inherit pro_attribs_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="abea76d173d3484bf47c53cd4f225b3df"></a>
+<a class="el" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_simplex</b></td></tr>
+<tr class="separator:abea76d173d3484bf47c53cd4f225b3df inherit pro_attribs_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4b3be973896efd5b1341df898239adf0 inherit pro_attribs_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="a4b3be973896efd5b1341df898239adf0"></a>
 dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>m_boxMinRadius</b></td></tr>
 <tr class="separator:a4b3be973896efd5b1341df898239adf0 inherit pro_attribs_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>

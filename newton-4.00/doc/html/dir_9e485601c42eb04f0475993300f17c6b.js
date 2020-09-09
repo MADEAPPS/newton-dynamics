@@ -9,6 +9,7 @@ var dir_9e485601c42eb04f0475993300f17c6b =
     [ "ndContact.h", "nd_contact_8h_source.html", null ],
     [ "ndContactList.h", "nd_contact_list_8h_source.html", null ],
     [ "ndContactNotify.h", "nd_contact_notify_8h_source.html", null ],
+    [ "ndContactOptions.h", "nd_contact_options_8h_source.html", null ],
     [ "ndContactSolver.h", "nd_contact_solver_8h_source.html", null ],
     [ "ndRayCastNotify.h", "nd_ray_cast_notify_8h_source.html", null ],
     [ "ndScene.h", "nd_scene_8h_source.html", null ],
@@ -18,5 +19,6 @@ var dir_9e485601c42eb04f0475993300f17c6b =
     [ "ndShapeBox.h", "nd_shape_box_8h_source.html", null ],
     [ "ndShapeConvex.h", "nd_shape_convex_8h_source.html", null ],
     [ "ndShapeInstance.h", "nd_shape_instance_8h_source.html", null ],
-    [ "ndShapeNull.h", "nd_shape_null_8h_source.html", null ]
+    [ "ndShapeNull.h", "nd_shape_null_8h_source.html", null ],
+    [ "ndShapeSphere.h", "nd_shape_sphere_8h_source.html", null ]
 ];

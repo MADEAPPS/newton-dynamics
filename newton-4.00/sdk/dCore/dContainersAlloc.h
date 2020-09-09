@@ -72,7 +72,7 @@ class dContainersFreeListAlloc
 		}
 		else
 		{
-			return dMalloc(size);
+			return dMemory::Malloc(size);
 		}
 	}
 
@@ -93,7 +93,7 @@ class dContainersFreeListAlloc
 		{
 			FreeList* const self = first;
 			first = first->m_next;
-			dFree(self);
+			dMemory::Free(self);
 		}
 		m_size = 0;
 		*freeList = nullptr;

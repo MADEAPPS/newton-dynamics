@@ -43,7 +43,7 @@ class ndShapeBox: public ndShapeConvex
 	D_COLLISION_API virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
-	const dConvexSimplexEdge** ndShapeBox::GetVertexToEdgeMapping() const;
+	const ndConvexSimplexEdge** ndShapeBox::GetVertexToEdgeMapping() const;
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 
 	dVector m_size[2];
@@ -53,9 +53,9 @@ class ndShapeBox: public ndShapeConvex
 	static dInt32 m_faces[][4];
 	static dVector m_indexMark;
 	static dVector m_penetrationTol;
-	static dConvexSimplexEdge m_edgeArray[];
-	static dConvexSimplexEdge* m_edgeEdgeMap[];
-	static dConvexSimplexEdge* m_vertexToEdgeMap[];
+	static ndConvexSimplexEdge m_edgeArray[];
+	static ndConvexSimplexEdge* m_edgeEdgeMap[];
+	static ndConvexSimplexEdge* m_vertexToEdgeMap[];
 
 } D_GCC_NEWTON_ALIGN_32;
 

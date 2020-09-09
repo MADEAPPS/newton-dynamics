@@ -98,7 +98,7 @@ class dUpHeap: public dHeapBase<OBJECT, KEY>
 
 template <class OBJECT, class KEY>
 dHeapBase<OBJECT,KEY>::dHeapBase (dInt32 maxElements)
-	:m_pool((RECORD *)dMalloc(maxElements * sizeof(RECORD)))
+	:m_pool((RECORD *)dMemory::Malloc(maxElements * sizeof(RECORD)))
 	,m_curCount(0)
 	,m_maxCount(maxElements)
 	,m_bufferIsOwnned(true)
@@ -121,7 +121,7 @@ dHeapBase<OBJECT,KEY>::~dHeapBase ()
 {   
 	if (m_bufferIsOwnned)
 	{
-		dFree (m_pool);
+		dMemory::Free (m_pool);
 	}
 }
 

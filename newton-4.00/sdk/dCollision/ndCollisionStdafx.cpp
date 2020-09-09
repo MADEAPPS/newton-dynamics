@@ -28,13 +28,13 @@
 		// this should not happens on this test
 		// newton should never use global operator new and delete.
 		dAssert(0);
-		return dMalloc(size);
+		return dMemory::Malloc(size);
 	}
 
 	void operator delete (void* ptr)
 	{
 		dAssert(0);
-		dFree(ptr);
+		dMemory::Free(ptr);
 	}
 
 	BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)

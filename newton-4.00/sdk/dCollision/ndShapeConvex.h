@@ -37,12 +37,12 @@ class ndShapeConvex: public ndShape
 	//bool IntesectionTest (dShapeParamProxy& proxy) const;
 
 	protected:
-	class dConvexSimplexEdge
+	class ndConvexSimplexEdge
 	{
 		public:
-		dConvexSimplexEdge* m_twin;
-		dConvexSimplexEdge* m_next;
-		dConvexSimplexEdge* m_prev;
+		ndConvexSimplexEdge* m_twin;
+		ndConvexSimplexEdge* m_next;
+		ndConvexSimplexEdge* m_prev;
 		dInt32 m_vertex;
 	};
 
@@ -77,7 +77,7 @@ class ndShapeConvex: public ndShape
 		return point;
 	}
 
-	virtual const dConvexSimplexEdge** GetVertexToEdgeMapping() const 
+	virtual const ndConvexSimplexEdge** GetVertexToEdgeMapping() const 
 	{ 
 		return nullptr; 
 	}
@@ -105,7 +105,7 @@ class ndShapeConvex: public ndShape
 */
 
 	dVector* m_vertex;
-	dConvexSimplexEdge* m_simplex;
+	ndConvexSimplexEdge* m_simplex;
 
 	dFloat32 m_boxMinRadius;
 	dFloat32 m_boxMaxRadius;

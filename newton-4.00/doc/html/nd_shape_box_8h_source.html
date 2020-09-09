@@ -128,62 +128,48 @@ $(document).ready(function(){initNavTree('nd_shape_box_8h_source.html',''); init
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;{</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    D_COLLISION_API <a class="code" href="classnd_shape_box.html">ndShapeBox</a>(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="comment">//dShapeBox(dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classnd_shape_box.html">ndShapeBox</a>();</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_box.html">ndShapeBox</a>* GetAsShapeBox() { <span class="keywordflow">return</span> <span class="keyword">this</span>; }</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    D_COLLISION_API <span class="keywordtype">void</span> Init (dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> MassProperties();</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> CalcAABB(<span class="keyword">const</span> <a class="code" href="classd_matrix.html">dMatrix</a>&amp; matrix, <a class="code" href="classd_vector.html">dVector</a>&amp; p0, <a class="code" href="classd_vector.html">dVector</a>&amp; p1) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <a class="code" href="classd_vector.html">dVector</a> SupportVertexSpecialProjectPoint(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; point, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; dir) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <a class="code" href="classd_vector.html">dVector</a> SupportVertex(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; dir, dInt32* <span class="keyword">const</span> vertexIndex) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <a class="code" href="classd_vector.html">dVector</a> SupportVertexSpecial(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; dir, dFloat32 skinThickness, dInt32* <span class="keyword">const</span> vertexIndex) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> dFloat32 RayCast(<a class="code" href="classnd_ray_cast_notify.html">ndRayCastNotify</a>&amp; callback, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; localP0, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; localP1, dFloat32 maxT, <span class="keyword">const</span> <a class="code" href="classnd_body.html">ndBody</a>* <span class="keyword">const</span> body, <a class="code" href="classnd_contact_point.html">ndContactPoint</a>&amp; contactOut) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keyword">const</span> <a class="code" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">dConvexSimplexEdge</a>** ndShapeBox::GetVertexToEdgeMapping() <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keyword">virtual</span> dInt32 CalculatePlaneIntersection(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; normal, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; point, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> contactsOut) <span class="keyword">const</span>;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="comment">    </span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="comment">    virtual const dConvexSimplexEdge** GetVertexToEdgeMapping() const;</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="comment">    </span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="comment">    virtual dInt32 CalculateSignature () const;</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="comment">    virtual void SetCollisionBBox (const dVector&amp; p0, const dVector&amp; p1);</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">    </span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">    virtual void GetCollisionInfo(dgCollisionInfo* const info) const;</span></div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">    virtual void Serialize(dgSerialize callback, void* const userData) const;</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment">    static dInt32 CalculateSignature (dFloat32 dx, dFloat32 dy, dFloat32 dz);</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="comment">*/</span></div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_size[2];</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_vertex[8];</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">static</span> dInt32 m_initSimplex;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keyword">static</span> dInt32 m_faces[][4];</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">static</span> <a class="code" href="classd_vector.html">dVector</a> m_indexMark;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keyword">static</span> <a class="code" href="classd_vector.html">dVector</a> m_penetrationTol;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keyword">static</span> <a class="code" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">dConvexSimplexEdge</a> m_edgeArray[];</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keyword">static</span> <a class="code" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">dConvexSimplexEdge</a>* m_edgeEdgeMap[];</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keyword">static</span> <a class="code" href="classnd_shape_convex_1_1d_convex_simplex_edge.html">dConvexSimplexEdge</a>* m_vertexToEdgeMap[];</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;} D_GCC_NEWTON_ALIGN_32 ;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="preprocessor">#endif </span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classnd_shape_box.html">ndShapeBox</a>();</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classnd_shape_box.html">ndShapeBox</a>* GetAsShapeBox() { <span class="keywordflow">return</span> <span class="keyword">this</span>; }</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    D_COLLISION_API <span class="keywordtype">void</span> Init (dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> MassProperties();</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <span class="keywordtype">void</span> CalcAABB(<span class="keyword">const</span> <a class="code" href="classd_matrix.html">dMatrix</a>&amp; matrix, <a class="code" href="classd_vector.html">dVector</a>&amp; p0, <a class="code" href="classd_vector.html">dVector</a>&amp; p1) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <a class="code" href="classd_vector.html">dVector</a> SupportVertexSpecialProjectPoint(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; point, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; dir) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <a class="code" href="classd_vector.html">dVector</a> SupportVertex(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; dir, dInt32* <span class="keyword">const</span> vertexIndex) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> <a class="code" href="classd_vector.html">dVector</a> SupportVertexSpecial(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; dir, dFloat32 skinThickness, dInt32* <span class="keyword">const</span> vertexIndex) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    D_COLLISION_API <span class="keyword">virtual</span> dFloat32 RayCast(<a class="code" href="classnd_ray_cast_notify.html">ndRayCastNotify</a>&amp; callback, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; localP0, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; localP1, dFloat32 maxT, <span class="keyword">const</span> <a class="code" href="classnd_body.html">ndBody</a>* <span class="keyword">const</span> body, <a class="code" href="classnd_contact_point.html">ndContactPoint</a>&amp; contactOut) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">const</span> <a class="code" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a>** ndShapeBox::GetVertexToEdgeMapping() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keyword">virtual</span> dInt32 CalculatePlaneIntersection(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; normal, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; point, <a class="code" href="classd_vector.html">dVector</a>* <span class="keyword">const</span> contactsOut) <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_size[2];</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <a class="code" href="classd_vector.html">dVector</a> m_vertex[8];</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keyword">static</span> dInt32 m_initSimplex;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">static</span> dInt32 m_faces[][4];</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">static</span> <a class="code" href="classd_vector.html">dVector</a> m_indexMark;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">static</span> <a class="code" href="classd_vector.html">dVector</a> m_penetrationTol;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">static</span> <a class="code" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a> m_edgeArray[];</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keyword">static</span> <a class="code" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a>* m_edgeEdgeMap[];</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keyword">static</span> <a class="code" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a>* m_vertexToEdgeMap[];</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;} D_GCC_NEWTON_ALIGN_32;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#endif </span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160; </div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassnd_body_html"><div class="ttname"><a href="classnd_body.html">ndBody</a></div><div class="ttdef"><b>Definition:</b> ndBody.h:37</div></div>
 <div class="ttc" id="aclassnd_ray_cast_notify_html"><div class="ttname"><a href="classnd_ray_cast_notify.html">ndRayCastNotify</a></div><div class="ttdef"><b>Definition:</b> ndRayCastNotify.h:33</div></div>
+<div class="ttc" id="aclassnd_shape_convex_1_1nd_convex_simplex_edge_html"><div class="ttname"><a href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndShapeConvex::ndConvexSimplexEdge</a></div><div class="ttdef"><b>Definition:</b> ndShapeConvex.h:41</div></div>
 <div class="ttc" id="aclassnd_shape_convex_html"><div class="ttname"><a href="classnd_shape_convex.html">ndShapeConvex</a></div><div class="ttdef"><b>Definition:</b> ndShapeConvex.h:34</div></div>
 <div class="ttc" id="aclassnd_contact_point_html"><div class="ttname"><a href="classnd_contact_point.html">ndContactPoint</a></div><div class="ttdef"><b>Definition:</b> ndContact.h:40</div></div>
 <div class="ttc" id="aclassd_vector_html"><div class="ttname"><a href="classd_vector.html">dVector</a></div><div class="ttdef"><b>Definition:</b> dVectorArmNeon.h:1104</div></div>
 <div class="ttc" id="aclassd_matrix_html"><div class="ttname"><a href="classd_matrix.html">dMatrix</a></div><div class="ttdef"><b>Definition:</b> dMatrix.h:39</div></div>
 <div class="ttc" id="aclassnd_shape_box_html"><div class="ttname"><a href="classnd_shape_box.html">ndShapeBox</a></div><div class="ttdef"><b>Definition:</b> ndShapeBox.h:29</div></div>
-<div class="ttc" id="aclassnd_shape_convex_1_1d_convex_simplex_edge_html"><div class="ttname"><a href="classnd_shape_convex_1_1d_convex_simplex_edge.html">ndShapeConvex::dConvexSimplexEdge</a></div><div class="ttdef"><b>Definition:</b> ndShapeConvex.h:41</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

@@ -19,16 +19,39 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __dgMemory__
-#define __dgMemory__
+#ifndef __D_MEMORY_H__
+#define __D_MEMORY_H__
 
 #include "dCoreStdafx.h"
 
 typedef void* (*dMemAllocCallback) (size_t size);
 typedef void (*dMemFreeCallback) (void* const ptr);
 
-D_CORE_API void* dMalloc(size_t size);
-D_CORE_API void dFree(void* const ptr);
-D_CORE_API void dSetMemoryAllocators(dMemAllocCallback alloc, dMemFreeCallback free);
+class dMemory
+{
+	public:
+	/// General Memory allocation function.
+	/// All memory allocations used by the Newton Engine and Tools 
+	/// are performed by calling this function.
+	D_CORE_API static void* Malloc(size_t size);
+
+	/// Destroy a memory buffer previously allocated by Malloc.
+	D_CORE_API static void Free(void* const ptr);
+
+	/// Install low level system memory allocation functions.
+	/// \param dMemAllocCallback alloc: is a function pointer callback to allocate a memory chunk.
+	/// \param dMemFreeCallback free: is a function pointer callback to free a memory chunk.
+	/// \brief All memory allocated by alloc, does not need to be aligned, therefore an application can
+	/// write them using standard malloc and free.
+	/// By default the memory allocation is set to call the standard 
+	/// library functions malloc and free, however if an application wants to
+	/// keep track of how memory is used, it must install the memory callbacks
+	/// by calling this function before any class of the Newton Engine or tool 
+	/// was created or instantiated. The engine does not do any global 
+	/// allocation using global operators new and delete, therefore it 
+	/// is ok to install the memory allocator on the main of the 
+	/// application or just before start using the engine.
+	D_CORE_API static void SetMemoryAllocators(dMemAllocCallback alloc, dMemFreeCallback free);
+};
 
 #endif

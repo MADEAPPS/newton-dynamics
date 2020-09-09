@@ -13,6 +13,7 @@ var classnd_shape =
     [ "GetAsShapeBox", "classnd_shape.html#ade4df021c83d95f7f0af3e32b8ed5318", null ],
     [ "GetAsShapeConvex", "classnd_shape.html#adfc9d44e4ad55b506dff14dc578b0a85", null ],
     [ "GetAsShapeNull", "classnd_shape.html#af79e33b2a8002f4c1b75ccf874739a4b", null ],
+    [ "GetAsShapeSphere", "classnd_shape.html#a80d45a6927aef2135aab4e86d9a5cee0", null ],
     [ "GetConvexVertexCount", "classnd_shape.html#abd21a73c6282ff60d606c535dae5d391", null ],
     [ "GetRefCount", "classnd_shape.html#a7399380466fa44a4cc1b8b2cab2d04d8", null ],
     [ "MassProperties", "classnd_shape.html#ae42d02c1fdf9a055ab2d9ce7c327b221", null ],

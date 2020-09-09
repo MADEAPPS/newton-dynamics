@@ -95,6 +95,7 @@ $(document).ready(function(){initNavTree('classnd_constraint.html',''); initResi
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="classnd_constraint-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">ndConstraint Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
@@ -112,12 +113,15 @@ Inheritance diagram for ndConstraint:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a2d5b280a19d47d645ef69e5db364f653"><td class="memItemLeft" align="right" valign="top"><a id="a2d5b280a19d47d645ef69e5db364f653"></a>
-<a class="el" href="classnd_constraint.html">ndConstraint</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsConstraint</b> ()</td></tr>
-<tr class="separator:a2d5b280a19d47d645ef69e5db364f653"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e213a985c1eb520d174f322c05ef05d"><td class="memItemLeft" align="right" valign="top"><a id="a1e213a985c1eb520d174f322c05ef05d"></a>
-<a class="el" href="classnd_contact.html">ndContact</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsContact</b> ()</td></tr>
-<tr class="separator:a1e213a985c1eb520d174f322c05ef05d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade31628369e25397570f0e015df33307"><td class="memItemLeft" align="right" valign="top"><a id="ade31628369e25397570f0e015df33307"></a>
+virtual <a class="el" href="classnd_contact.html">ndContact</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsContact</b> ()</td></tr>
+<tr class="separator:ade31628369e25397570f0e015df33307"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7daf93d886a78910b33b25751c3f6ad0"><td class="memItemLeft" align="right" valign="top"><a id="a7daf93d886a78910b33b25751c3f6ad0"></a>
+virtual <a class="el" href="classnd_constraint.html">ndConstraint</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsConstraint</b> ()</td></tr>
+<tr class="separator:a7daf93d886a78910b33b25751c3f6ad0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71e171227f7c28adc63ad13bdbd9cf61"><td class="memItemLeft" align="right" valign="top"><a id="a71e171227f7c28adc63ad13bdbd9cf61"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsBilateral</b> () const</td></tr>
+<tr class="separator:a71e171227f7c28adc63ad13bdbd9cf61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa2977eb80b51ec0d32c3ad3816d8b9b"><td class="memItemLeft" align="right" valign="top"><a id="aaa2977eb80b51ec0d32c3ad3816d8b9b"></a>
 virtual const dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>GetRowsCount</b> () const =0</td></tr>
 <tr class="separator:aaa2977eb80b51ec0d32c3ad3816d8b9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -133,6 +137,21 @@ virtual <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *&#
 <tr class="memitem:af21635ebf56cb5190b089ebe88afe9a5"><td class="memItemLeft" align="right" valign="top"><a id="af21635ebf56cb5190b089ebe88afe9a5"></a>
 virtual <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetKinematicBody1</b> () const</td></tr>
 <tr class="separator:af21635ebf56cb5190b089ebe88afe9a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a266401275ea7c20a920922ac1f071c06"><td class="memItemLeft" align="right" valign="top"><a id="a266401275ea7c20a920922ac1f071c06"></a>
+dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>m_preconditioner0</b></td></tr>
+<tr class="separator:a266401275ea7c20a920922ac1f071c06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d14d2a2bacc924bc5e81442b17e6d2a"><td class="memItemLeft" align="right" valign="top"><a id="a1d14d2a2bacc924bc5e81442b17e6d2a"></a>
+dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>m_preconditioner1</b></td></tr>
+<tr class="separator:a1d14d2a2bacc924bc5e81442b17e6d2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c46c2154c36bd01c5bc41f7b9afb5db"><td class="memItemLeft" align="right" valign="top"><a id="a4c46c2154c36bd01c5bc41f7b9afb5db"></a>
+dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_rowCount</b></td></tr>
+<tr class="separator:a4c46c2154c36bd01c5bc41f7b9afb5db"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a139775fcdbf14ab329582da838480d9a"><td class="memItemLeft" align="right" valign="top"><a id="a139775fcdbf14ab329582da838480d9a"></a>
+dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_rowStart</b></td></tr>
+<tr class="separator:a139775fcdbf14ab329582da838480d9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 </div><!-- doc-content -->

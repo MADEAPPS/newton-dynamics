@@ -564,39 +564,39 @@ class dScopeSpinLock
 
 
 //void dGetMinMax (dBigVector &Min, dBigVector &Max, const dFloat64* const vArray, dInt32 vCount, dInt32 strideInBytes);
-//dInt32 dVertexListToIndexList (dFloat64* const vertexList, dInt32 strideInBytes, dInt32 compareCount,     dInt32 vertexCount,         dInt32* const indexListOut, dFloat64 tolerance = dEpsilon);
-//dInt32 dVertexListToIndexList (dFloat32* const vertexList, dInt32 strideInBytes, dInt32 floatSizeInBytes, dInt32 unsignedSizeInBytes, dInt32 vertexCount, dInt32* const indexListOut, dFloat32 tolerance = dEpsilon);
+D_CORE_API dInt32 dVertexListToIndexList (dFloat64* const vertexList, dInt32 strideInBytes, dInt32 compareCount,     dInt32 vertexCount,         dInt32* const indexListOut, dFloat64 tolerance = dEpsilon);
+D_CORE_API dInt32 dVertexListToIndexList (dFloat32* const vertexList, dInt32 strideInBytes, dInt32 floatSizeInBytes, dInt32 unsignedSizeInBytes, dInt32 vertexCount, dInt32* const indexListOut, dFloat32 tolerance = dEpsilon);
 //dFloat64 dRoundToFloat(dFloat64 val);
 //void dSerializeMarker(dSerialize serializeCallback, void* const userData);
 //dInt32 dDeserializeMarker(dDeserialize serializeCallback, void* const userData);
-//
-//class dFloatExceptions
-//{
-//	public:
-//	#ifdef _MSC_VER
-//		#define D_FLOAT_EXECTIONS_MASK	(EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)
-//	#else 
-//		#define D_FLOAT_EXECTIONS_MASK	0
-//	#endif
-//
-//	dFloatExceptions(dUnsigned32 mask = D_FLOAT_EXECTIONS_MASK);
-//	~dFloatExceptions();
-//
-//	private:
-//	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
-//		dUnsigned32 m_mask;
-//	#endif
-//};
-//
-//class dSetPrecisionDouble 
-//{
-//	public:
-//	dSetPrecisionDouble();
-//	~dSetPrecisionDouble();
-//	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
-//	dInt32 m_mask; 
-//	#endif
-//};
+
+class dFloatExceptions
+{
+	public:
+	#ifdef _MSC_VER
+		#define D_FLOAT_EXECTIONS_MASK	(EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)
+	#else 
+		#define D_FLOAT_EXECTIONS_MASK	0
+	#endif
+
+	dFloatExceptions(dUnsigned32 mask = D_FLOAT_EXECTIONS_MASK);
+	~dFloatExceptions();
+
+	private:
+	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+		dUnsigned32 m_mask;
+	#endif
+};
+
+class dSetPrecisionDouble 
+{
+	public:
+	dSetPrecisionDouble();
+	~dSetPrecisionDouble();
+	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+	dInt32 m_mask; 
+	#endif
+};
 
 
 #ifdef _MACOSX_VER

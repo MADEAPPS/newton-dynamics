@@ -25,10 +25,10 @@
 
 void* dClassAlloc::Malloc(size_t size)
 {
-	return dMalloc(size);
+	return dMemory::Malloc(size);
 }
 
 void dClassAlloc::Free(void* const ptr)
 {
-	dFree(ptr);
+	dMemory::Free(ptr);
 }

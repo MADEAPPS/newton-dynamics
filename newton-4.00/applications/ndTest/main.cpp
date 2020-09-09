@@ -54,7 +54,7 @@ class CheckMemoryLeaks
 		// Set the memory allocation function before creation the newton world
 		// this is the only function that can be called before the creation of the newton world.
 		// it should be called once, and the the call is optional 
-		dSetMemoryAllocators(PhysicsAlloc, PhysicsFree);
+		dMemory::SetMemoryAllocators(PhysicsAlloc, PhysicsFree);
 	}
 
 	static void CheckMemoryLeaksCallback()
@@ -171,6 +171,39 @@ count = 1;
 	}
 }
 
+void BuildSphere(ndWorld& world, dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count)
+{
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	world.Sync();
+
+	ndShapeInstance sphere(new ndShapeSphere(diameter * 0.5f));
+
+	dVector floor(FindFloor(world, dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f;
+
+	// get the dimension from shape itself
+	dVector minP(0.0f);
+	dVector maxP(0.0f);
+	sphere.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
+
+count = 1;
+	for (int i = 0; i < count; i++)
+	{
+		ndBodyDynamic* const body = new ndBodyDynamic();
+
+		body->SetNotifyCallback(new DemoBodyNotify);
+		body->SetMatrix(matrix);
+		body->SetCollisionShape(sphere);
+		body->SetMassMatrix(mass, sphere);
+
+		world.AddBody(body);
+		matrix.m_posit += matrix.m_up.Scale(diameter);
+	}
+}
+
 int main (int argc, const char * argv[]) 
 {
 	ndWorld world;
@@ -187,7 +220,8 @@ int main (int argc, const char * argv[])
 	dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
 	dVector origin(0.0f, 0.0f, 0.0f, 0.0f);
 	BuildFloor(world);
-	BuildPyramid(world, 10.0f, origin, size, 20);
+	//BuildPyramid(world, 10.0f, origin, size, 20);
+	BuildSphere(world, 10.0f, origin, 1.0f, 20);
 	
 	static dFloat32 totalTime = 0;
 	for (int i = 0; i < 10000; i ++)

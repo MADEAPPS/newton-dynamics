@@ -37,13 +37,13 @@ class dStackBase
 };
 
 inline dStackBase::dStackBase (size_t size)
-	:m_ptr (dMalloc (size_t (size)))
+	:m_ptr (dMemory::Malloc (size_t (size)))
 {
 }
 
 inline dStackBase::~dStackBase ()
 {
-	dFree ((void*)m_ptr);
+	dMemory::Free ((void*)m_ptr);
 }
 
 template<class T>

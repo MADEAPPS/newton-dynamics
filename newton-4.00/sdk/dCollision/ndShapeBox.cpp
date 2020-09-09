@@ -25,9 +25,9 @@
 #include "ndContactSolver.h"
 
 dInt32 ndShapeBox::m_initSimplex = 0;
-ndShapeConvex::dConvexSimplexEdge ndShapeBox::m_edgeArray[24];
-ndShapeConvex::dConvexSimplexEdge* ndShapeBox::m_edgeEdgeMap[12];
-ndShapeConvex::dConvexSimplexEdge* ndShapeBox::m_vertexToEdgeMap[8];
+ndShapeConvex::ndConvexSimplexEdge ndShapeBox::m_edgeArray[24];
+ndShapeConvex::ndConvexSimplexEdge* ndShapeBox::m_edgeEdgeMap[12];
+ndShapeConvex::ndConvexSimplexEdge* ndShapeBox::m_vertexToEdgeMap[8];
 dInt32 ndShapeBox::m_faces[][4] =
 {
 	{0, 1, 3, 2},
@@ -117,7 +117,7 @@ void ndShapeBox::Init(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 			do 
 			{
 				ptr->m_mark = mark;
-				dConvexSimplexEdge* const simplexPtr = &m_simplex[ptr->m_userData];
+				ndConvexSimplexEdge* const simplexPtr = &m_simplex[ptr->m_userData];
 				simplexPtr->m_vertex = ptr->m_incidentVertex;
 				simplexPtr->m_next = &m_simplex[ptr->m_next->m_userData];
 				simplexPtr->m_prev = &m_simplex[ptr->m_prev->m_userData];
@@ -279,9 +279,9 @@ dFloat32 ndShapeBox::RayCast(ndRayCastNotify& callback, const dVector& localP0, 
 	return tmin;
 }
 
-const ndShapeConvex::dConvexSimplexEdge** ndShapeBox::GetVertexToEdgeMapping() const
+const ndShapeConvex::ndConvexSimplexEdge** ndShapeBox::GetVertexToEdgeMapping() const
 {
-	return (const dConvexSimplexEdge**)&m_vertexToEdgeMap[0];
+	return (const ndConvexSimplexEdge**)&m_vertexToEdgeMap[0];
 }
 
 dInt32 ndShapeBox::CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const
@@ -289,7 +289,7 @@ dInt32 ndShapeBox::CalculatePlaneIntersection(const dVector& normal, const dVect
 	dVector support[4];
 	dInt32 featureCount = 3;
 
-	const dConvexSimplexEdge** const vertToEdgeMapping = GetVertexToEdgeMapping();
+	const ndConvexSimplexEdge** const vertToEdgeMapping = GetVertexToEdgeMapping();
 	if (vertToEdgeMapping) 
 	{
 		dInt32 edgeIndex;
@@ -307,8 +307,8 @@ dInt32 ndShapeBox::CalculatePlaneIntersection(const dVector& normal, const dVect
 				dPlane testPlane(normal, -(normal.DotProduct(support[0]).GetScalar()));
 
 				featureCount = 1;
-				const dConvexSimplexEdge* const edge = vertToEdgeMapping[edgeIndex];
-				const dConvexSimplexEdge* ptr = edge;
+				const ndConvexSimplexEdge* const edge = vertToEdgeMapping[edgeIndex];
+				const ndConvexSimplexEdge* ptr = edge;
 				do 
 				{
 					const dVector& p = m_vertex[ptr->m_twin->m_vertex];
@@ -355,10 +355,10 @@ dInt32 ndShapeBox::CalculatePlaneIntersection(const dVector& normal, const dVect
 				test[i] = plane.DotProduct(m_vertex[i] | dVector::m_wOne).m_x;
 			}
 
-			dConvexSimplexEdge* edge = NULL;
+			ndConvexSimplexEdge* edge = NULL;
 			for (dInt32 i = 0; i < dInt32(sizeof(m_edgeEdgeMap) / sizeof(m_edgeEdgeMap[0])); i++) 
 			{
-				dConvexSimplexEdge* const ptr = m_edgeEdgeMap[i];
+				ndConvexSimplexEdge* const ptr = m_edgeEdgeMap[i];
 				dFloat32 side0 = test[ptr->m_vertex];
 				dFloat32 side1 = test[ptr->m_twin->m_vertex];
 				if ((side0 * side1) < dFloat32(0.0f)) 
@@ -376,8 +376,8 @@ dInt32 ndShapeBox::CalculatePlaneIntersection(const dVector& normal, const dVect
 				}
 				dAssert(test[edge->m_vertex] > dFloat32(0.0f));
 
-				dConvexSimplexEdge* ptr = edge;
-				dConvexSimplexEdge* firstEdge = NULL;
+				ndConvexSimplexEdge* ptr = edge;
+				ndConvexSimplexEdge* firstEdge = NULL;
 				dFloat32 side0 = test[edge->m_vertex];
 				do 
 				{
@@ -428,7 +428,7 @@ dInt32 ndShapeBox::CalculatePlaneIntersection(const dVector& normal, const dVect
 						contactsOut[count] = m_vertex[ptr->m_vertex] - dp.Scale(t);
 						count++;
 
-						dConvexSimplexEdge* ptr1 = ptr->m_next;
+						ndConvexSimplexEdge* ptr1 = ptr->m_next;
 						for (; ptr1 != ptr; ptr1 = ptr1->m_next) 
 						{
 							dInt32 index0 = ptr1->m_twin->m_vertex;

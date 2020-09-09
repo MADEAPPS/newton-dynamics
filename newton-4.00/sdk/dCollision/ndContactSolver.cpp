@@ -956,10 +956,11 @@ dInt32 ndContactSolver::ConvexToConvexContacts()
 			ndShapeInstance* const instance0 = &body0->GetCollisionShape();
 			ndShapeInstance* const instance1 = &body1->GetCollisionShape();
 
+			dVector normal(m_separatingVector * dVector::m_negOne);
 			for (int i = count - 1; i >= 0; i--)
 			{
-				contactOut[i].m_point = m_buffer[count - i - 1] + offset;
-				contactOut[i].m_normal = m_separatingVector;
+				contactOut[i].m_point = m_buffer[i] + offset;
+				contactOut[i].m_normal = normal;
 				contactOut[i].m_body0 = body0;
 				contactOut[i].m_body1 = body1;
 				contactOut[i].m_shapeInstance0 = instance0;

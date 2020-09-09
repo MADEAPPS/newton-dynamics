@@ -170,7 +170,7 @@ $(document).ready(function(){initNavTree('d_array_8h_source.html',''); initResiz
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;{</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordflow">if</span> (m_array) </div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    {</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        dFree(m_array);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        <a class="code" href="classd_memory.html#a56b05108042ab6faabcd1bbe0fb91394">dMemory::Free</a>(m_array);</div>
 <div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    }</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;}</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
@@ -237,7 +237,7 @@ $(document).ready(function(){initNavTree('d_array_8h_source.html',''); initResiz
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keywordflow">if</span> (size &gt;= m_capacity) </div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    {</div>
 <div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        size = dMax(size, 16);</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        T* <span class="keyword">const</span> newArray = (T*)dMalloc(dInt32(<span class="keyword">sizeof</span>(T) * size));</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;        T* <span class="keyword">const</span> newArray = (T*)<a class="code" href="classd_memory.html#a4e00fab80f4de696dc7877929c50a770">dMemory::Malloc</a>(dInt32(<span class="keyword">sizeof</span>(T) * size));</div>
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;        <span class="keywordflow">if</span> (m_array) </div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        {</div>
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;            <span class="keywordflow">for</span> (dInt32 i = 0; i &lt; m_capacity; i++)</div>
@@ -245,7 +245,7 @@ $(document).ready(function(){initNavTree('d_array_8h_source.html',''); initResiz
 <div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;                <span class="comment">//newArray[i] = m_array[i];</span></div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;                memcpy(&amp;newArray[i], &amp;m_array[i], <span class="keyword">sizeof</span>(T));</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;            }</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;            dFree(m_array);</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;            <a class="code" href="classd_memory.html#a56b05108042ab6faabcd1bbe0fb91394">dMemory::Free</a>(m_array);</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        }</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        m_array = newArray;</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        m_capacity = size;</div>
@@ -253,7 +253,7 @@ $(document).ready(function(){initNavTree('d_array_8h_source.html',''); initResiz
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (size &lt; m_capacity) </div>
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    {</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        size = dMax(size, 16);</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        T* <span class="keyword">const</span> newArray = (T*)dMalloc(dInt32(<span class="keyword">sizeof</span>(T) * size));</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        T* <span class="keyword">const</span> newArray = (T*)<a class="code" href="classd_memory.html#a4e00fab80f4de696dc7877929c50a770">dMemory::Malloc</a>(dInt32(<span class="keyword">sizeof</span>(T) * size));</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        <span class="keywordflow">if</span> (m_array) </div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        {</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;            <span class="keywordflow">for</span> (dInt32 i = 0; i &lt; size; i++) </div>
@@ -261,7 +261,7 @@ $(document).ready(function(){initNavTree('d_array_8h_source.html',''); initResiz
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;                <span class="comment">//newArray[i] = m_array[i];</span></div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;                memcpy(&amp;newArray[i], &amp;m_array[i], <span class="keyword">sizeof</span>(T));</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;            }</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;            dFree(m_array);</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;            <a class="code" href="classd_memory.html#a56b05108042ab6faabcd1bbe0fb91394">dMemory::Free</a>(m_array);</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        }</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        m_array = newArray;</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        m_capacity = size;</div>
@@ -276,6 +276,8 @@ $(document).ready(function(){initNavTree('d_array_8h_source.html',''); initResiz
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassd_array_html"><div class="ttname"><a href="classd_array.html">dArray</a></div><div class="ttdef"><b>Definition:</b> dArray.h:36</div></div>
+<div class="ttc" id="aclassd_memory_html_a56b05108042ab6faabcd1bbe0fb91394"><div class="ttname"><a href="classd_memory.html#a56b05108042ab6faabcd1bbe0fb91394">dMemory::Free</a></div><div class="ttdeci">static D_CORE_API void Free(void *const ptr)</div><div class="ttdoc">Destroy a memory buffer previously allocated by Malloc.</div><div class="ttdef"><b>Definition:</b> dMemory.cpp:56</div></div>
+<div class="ttc" id="aclassd_memory_html_a4e00fab80f4de696dc7877929c50a770"><div class="ttname"><a href="classd_memory.html#a4e00fab80f4de696dc7877929c50a770">dMemory::Malloc</a></div><div class="ttdeci">static D_CORE_API void * Malloc(size_t size)</div><div class="ttdoc">General Memory allocation function.</div><div class="ttdef"><b>Definition:</b> dMemory.cpp:43</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

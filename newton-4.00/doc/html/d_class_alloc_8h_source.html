@@ -148,36 +148,9 @@ $(document).ready(function(){initNavTree('d_class_alloc_8h_source.html',''); ini
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    D_CORE_API <span class="keyword">static</span> <span class="keywordtype">void</span> Free(<span class="keywordtype">void</span>* <span class="keyword">const</span> ptr);</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;};</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T, dInt32 size&gt;</div>
-<div class="line"><a name="l00053"></a><span class="lineno"><a class="line" href="classnd_fix_size_buffer.html">   53</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_fix_size_buffer.html">ndFixSizeBuffer</a>: <span class="keyword">public</span> <a class="code" href="classd_class_alloc.html">dClassAlloc</a></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;{</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <a class="code" href="classnd_fix_size_buffer.html">ndFixSizeBuffer</a>()</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        :<a class="code" href="classd_class_alloc.html">dClassAlloc</a>()</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    {</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    }</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    T&amp; operator[] (dInt32 i)</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    {</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        dAssert(i &gt;= 0);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        dAssert(i &lt; size);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <span class="keywordflow">return</span> m_array[i];</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    }</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">const</span> T&amp; operator[] (dInt32 i)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        dAssert(i &gt;= 0);</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        dAssert(i &lt; size);</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordflow">return</span> m_array[i];</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    }</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    T m_array[size];</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;};</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassnd_fix_size_buffer_html"><div class="ttname"><a href="classnd_fix_size_buffer.html">ndFixSizeBuffer</a></div><div class="ttdef"><b>Definition:</b> dClassAlloc.h:54</div></div>
 <div class="ttc" id="aclassd_class_alloc_html"><div class="ttname"><a href="classd_class_alloc.html">dClassAlloc</a></div><div class="ttdef"><b>Definition:</b> dClassAlloc.h:28</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

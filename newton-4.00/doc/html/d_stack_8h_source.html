@@ -136,13 +136,13 @@ $(document).ready(function(){initNavTree('d_stack_8h_source.html',''); initResiz
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;};</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">inline</span> dStackBase::dStackBase (<span class="keywordtype">size_t</span> size)</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    :m_ptr (dMalloc (size_t (size)))</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    :m_ptr (<a class="code" href="classd_memory.html">dMemory</a>::Malloc (size_t (size)))</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;{</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;}</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keyword">inline</span> dStackBase::~dStackBase ()</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;{</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    dFree ((<span class="keywordtype">void</span>*)m_ptr);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="classd_memory.html#a56b05108042ab6faabcd1bbe0fb91394">dMemory::Free</a> ((<span class="keywordtype">void</span>*)m_ptr);</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;}</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">class</span> T&gt;</div>
@@ -210,7 +210,9 @@ $(document).ready(function(){initNavTree('d_stack_8h_source.html',''); initResiz
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassd_stack_base_html"><div class="ttname"><a href="classd_stack_base.html">dStackBase</a></div><div class="ttdef"><b>Definition:</b> dStack.h:31</div></div>
+<div class="ttc" id="aclassd_memory_html_a56b05108042ab6faabcd1bbe0fb91394"><div class="ttname"><a href="classd_memory.html#a56b05108042ab6faabcd1bbe0fb91394">dMemory::Free</a></div><div class="ttdeci">static D_CORE_API void Free(void *const ptr)</div><div class="ttdoc">Destroy a memory buffer previously allocated by Malloc.</div><div class="ttdef"><b>Definition:</b> dMemory.cpp:56</div></div>
 <div class="ttc" id="aclassd_stack_html"><div class="ttname"><a href="classd_stack.html">dStack</a></div><div class="ttdef"><b>Definition:</b> dStack.h:51</div></div>
+<div class="ttc" id="aclassd_memory_html"><div class="ttname"><a href="classd_memory.html">dMemory</a></div><div class="ttdef"><b>Definition:</b> dMemory.h:31</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

@@ -118,21 +118,31 @@ $(document).ready(function(){initNavTree('d_memory_8h_source.html',''); initResi
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment">* 3. This notice may not be removed or altered from any source distribution.</span></div>
 <div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="comment">*/</span></div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#ifndef __dgMemory__</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#define __dgMemory__</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;<span class="preprocessor">#ifndef __D_MEMORY_H__</span></div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="preprocessor">#define __D_MEMORY_H__</span></div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;dCoreStdafx.h&quot;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">typedef</span> <span class="keywordtype">void</span>* (*dMemAllocCallback) (<span class="keywordtype">size_t</span> size);</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">typedef</span> void (*dMemFreeCallback) (<span class="keywordtype">void</span>* <span class="keyword">const</span> ptr);</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;D_CORE_API <span class="keywordtype">void</span>* dMalloc(<span class="keywordtype">size_t</span> size);</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;D_CORE_API <span class="keywordtype">void</span> dFree(<span class="keywordtype">void</span>* <span class="keyword">const</span> ptr);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;D_CORE_API <span class="keywordtype">void</span> dSetMemoryAllocators(dMemAllocCallback alloc, dMemFreeCallback free);</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="classd_memory.html">   30</a></span>&#160;<span class="keyword">class </span><a class="code" href="classd_memory.html">dMemory</a></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;{</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    D_CORE_API <span class="keyword">static</span> <span class="keywordtype">void</span>* <a class="code" href="classd_memory.html#a4e00fab80f4de696dc7877929c50a770">Malloc</a>(<span class="keywordtype">size_t</span> size);</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    D_CORE_API <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classd_memory.html#a56b05108042ab6faabcd1bbe0fb91394">Free</a>(<span class="keywordtype">void</span>* <span class="keyword">const</span> ptr);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    D_CORE_API <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classd_memory.html#afd574e2f624e7838c6e66dbd9bae9341">SetMemoryAllocators</a>(dMemAllocCallback alloc, dMemFreeCallback free);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;};</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="aclassd_memory_html_a56b05108042ab6faabcd1bbe0fb91394"><div class="ttname"><a href="classd_memory.html#a56b05108042ab6faabcd1bbe0fb91394">dMemory::Free</a></div><div class="ttdeci">static D_CORE_API void Free(void *const ptr)</div><div class="ttdoc">Destroy a memory buffer previously allocated by Malloc.</div><div class="ttdef"><b>Definition:</b> dMemory.cpp:56</div></div>
+<div class="ttc" id="aclassd_memory_html"><div class="ttname"><a href="classd_memory.html">dMemory</a></div><div class="ttdef"><b>Definition:</b> dMemory.h:31</div></div>
+<div class="ttc" id="aclassd_memory_html_a4e00fab80f4de696dc7877929c50a770"><div class="ttname"><a href="classd_memory.html#a4e00fab80f4de696dc7877929c50a770">dMemory::Malloc</a></div><div class="ttdeci">static D_CORE_API void * Malloc(size_t size)</div><div class="ttdoc">General Memory allocation function.</div><div class="ttdef"><b>Definition:</b> dMemory.cpp:43</div></div>
+<div class="ttc" id="aclassd_memory_html_afd574e2f624e7838c6e66dbd9bae9341"><div class="ttname"><a href="classd_memory.html#afd574e2f624e7838c6e66dbd9bae9341">dMemory::SetMemoryAllocators</a></div><div class="ttdeci">static D_CORE_API void SetMemoryAllocators(dMemAllocCallback alloc, dMemFreeCallback free)</div><div class="ttdoc">Install low level system memory allocation functions.</div><div class="ttdef"><b>Definition:</b> dMemory.cpp:62</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

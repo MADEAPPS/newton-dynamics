@@ -40,7 +40,7 @@ class dMemoryHeader
 	};
 };
 
-void* dMalloc(size_t size)
+void* dMemory::Malloc(size_t size)
 {
 	size += 2 * sizeof(dMemoryHeader) - 1;
 	void* const ptr = m_allocMemory(size);
@@ -53,13 +53,13 @@ void* dMalloc(size_t size)
 	return &ret[1];
 }
 
-void dFree(void* const ptr)
+void dMemory::Free(void* const ptr)
 {
 	dMemoryHeader* const ret = ((dMemoryHeader*)ptr) - 1;
 	m_freeMemory(ret->m_ptr);
 }
 
-void dSetMemoryAllocators(dMemAllocCallback alloc, dMemFreeCallback free)
+void dMemory::SetMemoryAllocators(dMemAllocCallback alloc, dMemFreeCallback free)
 {
 	m_allocMemory = alloc;
 	m_freeMemory = free;

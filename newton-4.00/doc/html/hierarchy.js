@@ -16,7 +16,10 @@ var hierarchy =
         [ "dThreadPool", "classd_thread_pool.html", [
           [ "ndScene", "classnd_scene.html", [
             [ "ndSceneMixed", "classnd_scene_mixed.html", [
-              [ "ndWorld::ndWorldMixedScene", "classnd_world_1_1nd_world_mixed_scene.html", null ]
+              [ "ndWorldScene< ndSceneMixed >", "classnd_world_scene.html", [
+                [ "ndWorldMixedScene", "classnd_world_mixed_scene.html", null ],
+                [ "ndWorldSegregatedScene", "classnd_world_segregated_scene.html", null ]
+              ] ]
             ] ]
           ] ]
         ] ]
@@ -29,6 +32,8 @@ var hierarchy =
     [ "dArray< ndContact * >", "classd_array.html", null ],
     [ "dArray< ndDynamicsUpdate::ndBodyProxy >", "classd_array.html", null ],
     [ "dArray< ndJacobian >", "classd_array.html", null ],
+    [ "dArray< ndLeftHandSide >", "classd_array.html", null ],
+    [ "dArray< ndRightHandSide >", "classd_array.html", null ],
     [ "dBigVector", "classd_big_vector.html", [
       [ "dBigPlane", "classd_big_plane.html", null ]
     ] ],
@@ -58,7 +63,8 @@ var hierarchy =
           [ "ndShapeBox", "classnd_shape_box.html", null ],
           [ "ndShapeNull", "classnd_shape_null.html", [
             [ "ndDummyCollision", "classnd_dummy_collision.html", null ]
-          ] ]
+          ] ],
+          [ "ndShapeSphere", "classnd_shape_sphere.html", null ]
         ] ]
       ] ],
       [ "ndShapeInstance", "classnd_shape_instance.html", null ],
@@ -68,11 +74,11 @@ var hierarchy =
     [ "dContainersFreeListAlloc< ndContact * >", "classd_containers_free_list_alloc.html", [
       [ "ndContact", "classnd_contact.html", null ]
     ] ],
-    [ "ndShapeConvex::dConvexSimplexEdge", "classnd_shape_convex_1_1d_convex_simplex_edge.html", null ],
     [ "dDoubleInt", "uniond_double_int.html", null ],
     [ "dEdge", "classd_edge.html", null ],
     [ "dEdgeCollapseEdgeHandle", "structd_edge_collapse_edge_handle.html", null ],
     [ "dFastRayTest", "classd_fast_ray_test.html", null ],
+    [ "dFloatExceptions", "classd_float_exceptions.html", null ],
     [ "dFloatSign", "uniond_float_sign.html", null ],
     [ "dgDiagonalEdge", "classdg_diagonal_edge.html", null ],
     [ "dPolyhedra::dgPairKey", "classd_polyhedra_1_1dg_pair_key.html", null ],
@@ -102,6 +108,7 @@ var hierarchy =
       [ "ndScene::ndFitnessList", "classnd_scene_1_1nd_fitness_list.html", null ]
     ] ],
     [ "dMatrix", "classd_matrix.html", null ],
+    [ "dMemory", "classd_memory.html", null ],
     [ "dMemoryHeader", "classd_memory_header.html", null ],
     [ "dPolyhedraMassProperties", "classd_polyhedra_mass_properties.html", null ],
     [ "dQuaternion", "classd_quaternion.html", null ],
@@ -112,6 +119,7 @@ var hierarchy =
     [ "dSemaphore", "classd_semaphore.html", [
       [ "dThread", "classd_thread.html", null ]
     ] ],
+    [ "dSetPrecisionDouble", "classd_set_precision_double.html", null ],
     [ "dSpatialMatrix", "classd_spatial_matrix.html", null ],
     [ "dSpatialVector", "classd_spatial_vector.html", null ],
     [ "dSpinLock", "classd_spin_lock.html", null ],
@@ -150,20 +158,26 @@ var hierarchy =
     [ "ndContactPoint", "classnd_contact_point.html", [
       [ "ndContactMaterial", "classnd_contact_material.html", null ]
     ] ],
+    [ "ndShapeConvex::ndConvexSimplexEdge", "classnd_shape_convex_1_1nd_convex_simplex_edge.html", null ],
     [ "ndDynamicsUpdate", "classnd_dynamics_update.html", [
       [ "ndWorld", "classnd_world.html", null ]
     ] ],
     [ "ndForceImpactPair", "classnd_force_impact_pair.html", null ],
     [ "ndJacobian", "classnd_jacobian.html", null ],
     [ "ndJacobianPair", "classnd_jacobian_pair.html", null ],
+    [ "ndLeftHandSide", "classnd_left_hand_side.html", null ],
     [ "ndMaterial", "classnd_material.html", null ],
     [ "ndMinkFace", "classnd_mink_face.html", null ],
     [ "ndRayCastNotify", "classnd_ray_cast_notify.html", [
       [ "ndRayCastCloasestHitCallback", "classnd_ray_cast_cloasest_hit_callback.html", null ]
     ] ],
+    [ "ndRightHandSide", "classnd_right_hand_side.html", null ],
     [ "ndShapeDebugCallback", "classnd_shape_debug_callback.html", null ],
     [ "ndScene::ndSpliteInfo", "classnd_scene_1_1nd_splite_info.html", null ],
     [ "dHeapBase< OBJECT, KEY >::RECORD", "structd_heap_base_1_1_r_e_c_o_r_d.html", null ],
+    [ "scene", null, [
+      [ "ndWorldScene< scene >", "classnd_world_scene.html", null ]
+    ] ],
     [ "thread", null, [
       [ "dThread", "classd_thread.html", null ]
     ] ]

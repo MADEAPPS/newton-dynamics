@@ -663,39 +663,39 @@ $(document).ready(function(){initNavTree('d_types_8h_source.html',''); initResiz
 <div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160; </div>
 <div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160; </div>
 <div class="line"><a name="l00566"></a><span class="lineno">  566</span>&#160;<span class="comment">//void dGetMinMax (dBigVector &amp;Min, dBigVector &amp;Max, const dFloat64* const vArray, dInt32 vCount, dInt32 strideInBytes);</span></div>
-<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;<span class="comment">//dInt32 dVertexListToIndexList (dFloat64* const vertexList, dInt32 strideInBytes, dInt32 compareCount,     dInt32 vertexCount,         dInt32* const indexListOut, dFloat64 tolerance = dEpsilon);</span></div>
-<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;<span class="comment">//dInt32 dVertexListToIndexList (dFloat32* const vertexList, dInt32 strideInBytes, dInt32 floatSizeInBytes, dInt32 unsignedSizeInBytes, dInt32 vertexCount, dInt32* const indexListOut, dFloat32 tolerance = dEpsilon);</span></div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;D_CORE_API dInt32 dVertexListToIndexList (dFloat64* <span class="keyword">const</span> vertexList, dInt32 strideInBytes, dInt32 compareCount,     dInt32 vertexCount,         dInt32* <span class="keyword">const</span> indexListOut, dFloat64 tolerance = dEpsilon);</div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;D_CORE_API dInt32 dVertexListToIndexList (dFloat32* <span class="keyword">const</span> vertexList, dInt32 strideInBytes, dInt32 floatSizeInBytes, dInt32 unsignedSizeInBytes, dInt32 vertexCount, dInt32* <span class="keyword">const</span> indexListOut, dFloat32 tolerance = dEpsilon);</div>
 <div class="line"><a name="l00569"></a><span class="lineno">  569</span>&#160;<span class="comment">//dFloat64 dRoundToFloat(dFloat64 val);</span></div>
 <div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;<span class="comment">//void dSerializeMarker(dSerialize serializeCallback, void* const userData);</span></div>
 <div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;<span class="comment">//dInt32 dDeserializeMarker(dDeserialize serializeCallback, void* const userData);</span></div>
-<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;<span class="comment">//class dFloatExceptions</span></div>
-<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;<span class="comment">//{</span></div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;<span class="comment">//  public:</span></div>
-<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;<span class="comment">//  #ifdef _MSC_VER</span></div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;<span class="comment">//      #define D_FLOAT_EXECTIONS_MASK  (EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)</span></div>
-<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;<span class="comment">//  #else </span></div>
-<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;<span class="comment">//      #define D_FLOAT_EXECTIONS_MASK  0</span></div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;<span class="comment">//  #endif</span></div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;<span class="comment">//  dFloatExceptions(dUnsigned32 mask = D_FLOAT_EXECTIONS_MASK);</span></div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;<span class="comment">//  ~dFloatExceptions();</span></div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;<span class="comment">//  private:</span></div>
-<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;<span class="comment">//  #if (defined (_MSC_VER) &amp;&amp; defined (_WIN_32_VER))</span></div>
-<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;<span class="comment">//      dUnsigned32 m_mask;</span></div>
-<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;<span class="comment">//  #endif</span></div>
-<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;<span class="comment">//};</span></div>
-<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;<span class="comment">//</span></div>
-<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;<span class="comment">//class dSetPrecisionDouble </span></div>
-<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;<span class="comment">//{</span></div>
-<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;<span class="comment">//  public:</span></div>
-<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;<span class="comment">//  dSetPrecisionDouble();</span></div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;<span class="comment">//  ~dSetPrecisionDouble();</span></div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;<span class="comment">//  #if (defined (_MSC_VER) &amp;&amp; defined (_WIN_32_VER))</span></div>
-<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;<span class="comment">//  dInt32 m_mask; </span></div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;<span class="comment">//  #endif</span></div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;<span class="comment">//};</span></div>
+<div class="line"><a name="l00572"></a><span class="lineno">  572</span>&#160; </div>
+<div class="line"><a name="l00573"></a><span class="lineno"><a class="line" href="classd_float_exceptions.html">  573</a></span>&#160;<span class="keyword">class </span><a class="code" href="classd_float_exceptions.html">dFloatExceptions</a></div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;{</div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;<span class="preprocessor">    #ifdef _MSC_VER</span></div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;<span class="preprocessor">        #define D_FLOAT_EXECTIONS_MASK  (EM_INVALID | EM_DENORMAL | EM_ZERODIVIDE)</span></div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;<span class="preprocessor">    #else </span></div>
+<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;<span class="preprocessor">        #define D_FLOAT_EXECTIONS_MASK  0</span></div>
+<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;<span class="preprocessor">    #endif</span></div>
+<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160; </div>
+<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;    <a class="code" href="classd_float_exceptions.html">dFloatExceptions</a>(dUnsigned32 mask = D_FLOAT_EXECTIONS_MASK);</div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;    ~<a class="code" href="classd_float_exceptions.html">dFloatExceptions</a>();</div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160; </div>
+<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;<span class="preprocessor">    #if (defined (_MSC_VER) &amp;&amp; defined (_WIN_32_VER))</span></div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;        dUnsigned32 m_mask;</div>
+<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;<span class="preprocessor">    #endif</span></div>
+<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;};</div>
+<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160; </div>
+<div class="line"><a name="l00591"></a><span class="lineno"><a class="line" href="classd_set_precision_double.html">  591</a></span>&#160;<span class="keyword">class </span><a class="code" href="classd_set_precision_double.html">dSetPrecisionDouble</a> </div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;{</div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;    <a class="code" href="classd_set_precision_double.html">dSetPrecisionDouble</a>();</div>
+<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;    ~<a class="code" href="classd_set_precision_double.html">dSetPrecisionDouble</a>();</div>
+<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;<span class="preprocessor">    #if (defined (_MSC_VER) &amp;&amp; defined (_WIN_32_VER))</span></div>
+<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;    dInt32 m_mask; </div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;<span class="preprocessor">    #endif</span></div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;};</div>
 <div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160; </div>
 <div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160; </div>
 <div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;<span class="preprocessor">#ifdef _MACOSX_VER</span></div>
@@ -724,10 +724,12 @@ $(document).ready(function(){initNavTree('d_types_8h_source.html',''); initResiz
 <div class="ttc" id="aclassd_spin_lock_html"><div class="ttname"><a href="classd_spin_lock.html">dSpinLock</a></div><div class="ttdef"><b>Definition:</b> dTypes.h:516</div></div>
 <div class="ttc" id="aclassd_triplex_html"><div class="ttname"><a href="classd_triplex.html">dTriplex</a></div><div class="ttdef"><b>Definition:</b> dTypes.h:271</div></div>
 <div class="ttc" id="auniond_float_sign_html"><div class="ttname"><a href="uniond_float_sign.html">dFloatSign</a></div><div class="ttdef"><b>Definition:</b> dTypes.h:418</div></div>
+<div class="ttc" id="aclassd_set_precision_double_html"><div class="ttname"><a href="classd_set_precision_double.html">dSetPrecisionDouble</a></div><div class="ttdef"><b>Definition:</b> dTypes.h:592</div></div>
 <div class="ttc" id="aclassd_atomic_html"><div class="ttname"><a href="classd_atomic.html">dAtomic</a></div><div class="ttdef"><b>Definition:</b> dTypes.h:506</div></div>
 <div class="ttc" id="aclassd_big_vector_html"><div class="ttname"><a href="classd_big_vector.html">dBigVector</a></div><div class="ttdef"><b>Definition:</b> dVectorArmNeon.h:1521</div></div>
 <div class="ttc" id="aclassd_vector_html"><div class="ttname"><a href="classd_vector.html">dVector</a></div><div class="ttdef"><b>Definition:</b> dVectorArmNeon.h:1104</div></div>
 <div class="ttc" id="auniond_double_int_html"><div class="ttname"><a href="uniond_double_int.html">dDoubleInt</a></div><div class="ttdef"><b>Definition:</b> dTypes.h:427</div></div>
+<div class="ttc" id="aclassd_float_exceptions_html"><div class="ttname"><a href="classd_float_exceptions.html">dFloatExceptions</a></div><div class="ttdef"><b>Definition:</b> dTypes.h:574</div></div>
 <div class="ttc" id="aclassd_scope_spin_lock_html"><div class="ttname"><a href="classd_scope_spin_lock.html">dScopeSpinLock</a></div><div class="ttdef"><b>Definition:</b> dTypes.h:549</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
