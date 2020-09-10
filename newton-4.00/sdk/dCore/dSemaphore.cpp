@@ -19,7 +19,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "dCoreStdafx.h"
 #include "dSemaphore.h"
 
@@ -37,7 +36,7 @@ dSemaphore::~dSemaphore()
 {
 }
 
-dInt32 dSemaphore::GetCount()
+dInt32 dSemaphore::GetCount() const
 {
 #ifdef D_USE_THREAD_EMULATION
 	return 0;

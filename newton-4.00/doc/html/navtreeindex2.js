@@ -8,7 +8,7 @@ var NAVTREEINDEX2 =
 "classd_scope_spin_lock.html#abf53633461e7f6346288aa4ba01e32d6":[0,0,30,1],
 "classd_scope_spin_lock.html#af8840909ab7e382a7bba3c189dd84d48":[0,0,30,2],
 "classd_semaphore.html":[0,0,31],
-"classd_semaphore.html#a1cbdbf8b77b67e8155a5211e7bbb26d0":[0,0,31,2],
+"classd_semaphore.html#a2d74fe4e18a67a956732d4bfd89e818b":[0,0,31,2],
 "classd_semaphore.html#a48c11416bcf5ed8dde3d827618424c52":[0,0,31,4],
 "classd_semaphore.html#a554f666efb275ed749c68e3330aff6e3":[0,0,31,3],
 "classd_semaphore.html#a5ee195cf593fc23d354ed808d0664a33":[0,0,31,1],

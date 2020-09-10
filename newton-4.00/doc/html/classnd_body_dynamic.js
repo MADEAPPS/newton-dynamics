@@ -9,6 +9,7 @@ var classnd_body_dynamic =
     [ "GetAsBodyDynamic", "classnd_body_dynamic.html#ab6d0f7bfc644c3f4901d01f155afe320", null ],
     [ "GetForce", "classnd_body_dynamic.html#acf89f5506a029db1d61bf5fc3fac0263", null ],
     [ "GetToque", "classnd_body_dynamic.html#aead375c6914224c3aaff3aedc304e8f2", null ],
+    [ "IntegrateForceAndToque", "classnd_body_dynamic.html#ac1ab17c3acc50634d19cf41c84d68fdd", null ],
     [ "SetAccel", "classnd_body_dynamic.html#afef8848d609aeb8e73e13d9443258ba8", null ],
     [ "SetAlpha", "classnd_body_dynamic.html#a01c13f65ca40593b2466b916588b139f", null ],
     [ "SetForce", "classnd_body_dynamic.html#affceb57c5c322b543c73e473d7ad5a0e", null ],

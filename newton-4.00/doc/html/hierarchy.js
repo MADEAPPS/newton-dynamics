@@ -143,8 +143,8 @@ var hierarchy =
       [ "dPlane", "classd_plane.html", null ]
     ] ],
     [ "dVertexCollapseVertexMetric", "classd_vertex_collapse_vertex_metric.html", null ],
-    [ "dList< T, allocator >::Iterator", "classd_list_1_1_iterator.html", null ],
     [ "dTree< OBJECT, KEY, allocator >::Iterator", "classd_tree_1_1_iterator.html", null ],
+    [ "dList< T, allocator >::Iterator", "classd_list_1_1_iterator.html", null ],
     [ "mutex", null, [
       [ "dThread", "classd_thread.html", null ]
     ] ],
@@ -165,6 +165,7 @@ var hierarchy =
     [ "ndForceImpactPair", "classnd_force_impact_pair.html", null ],
     [ "ndJacobian", "classnd_jacobian.html", null ],
     [ "ndJacobianPair", "classnd_jacobian_pair.html", null ],
+    [ "ndJointAccelerationDecriptor", "classnd_joint_acceleration_decriptor.html", null ],
     [ "ndLeftHandSide", "classnd_left_hand_side.html", null ],
     [ "ndMaterial", "classnd_material.html", null ],
     [ "ndMinkFace", "classnd_mink_face.html", null ],

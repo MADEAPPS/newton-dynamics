@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['malloc_76',['Malloc',['../classd_memory.html#a4e00fab80f4de696dc7877929c50a770',1,'dMemory']]]
+  ['iterator_76',['Iterator',['../classd_tree_1_1_iterator.html',1,'dTree&lt; OBJECT, KEY, allocator &gt;::Iterator'],['../classd_list_1_1_iterator.html',1,'dList&lt; T, allocator &gt;::Iterator']]]
 ];

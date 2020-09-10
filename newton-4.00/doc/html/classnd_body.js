@@ -33,6 +33,7 @@ var classnd_body =
     [ "m_minAABB", "classnd_body.html#a63550e28ab5e1921e94802e2466c7d0d", null ],
     [ "m_notifyCallback", "classnd_body.html#af6b160171914ece086efa7db168e774e", null ],
     [ "m_omega", "classnd_body.html#a5de2856d733415a343c4109641c26e1c", null ],
+    [ "m_resting", "classnd_body.html#a8606b09782b12564a89f5c2759752169", null ],
     [ "m_rotation", "classnd_body.html#a853dc15c8f016ee6b6b052d943385bde", null ],
     [ "m_uniqueID", "classnd_body.html#aa6ccaabed07e12e805989ef33c01d726", null ],
     [ "m_veloc", "classnd_body.html#a77b38cc9aeccecf0a0759c3893f2aa81", null ]

@@ -277,6 +277,7 @@ class ndDynamicsUpdate
 	void CalculateForces();
 	void InitJacobianMatrix();
 	void CalculateJointsForce();
+	void IntegrateBodiesVelocity();
 	void CalculateJointsAcceleration();
 
 	void BuildJacobianMatrix(ndConstraint* const joint);

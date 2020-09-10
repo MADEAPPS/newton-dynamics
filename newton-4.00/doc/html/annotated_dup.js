@@ -69,6 +69,7 @@ var annotated_dup =
     [ "ndForceImpactPair", "classnd_force_impact_pair.html", "classnd_force_impact_pair" ],
     [ "ndJacobian", "classnd_jacobian.html", "classnd_jacobian" ],
     [ "ndJacobianPair", "classnd_jacobian_pair.html", "classnd_jacobian_pair" ],
+    [ "ndJointAccelerationDecriptor", "classnd_joint_acceleration_decriptor.html", "classnd_joint_acceleration_decriptor" ],
     [ "ndLeftHandSide", "classnd_left_hand_side.html", "classnd_left_hand_side" ],
     [ "ndMaterial", "classnd_material.html", "classnd_material" ],
     [ "ndMinkFace", "classnd_mink_face.html", "classnd_mink_face" ],

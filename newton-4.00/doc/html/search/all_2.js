@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['iterator_75',['Iterator',['../classd_list_1_1_iterator.html',1,'dList&lt; T, allocator &gt;::Iterator'],['../classd_tree_1_1_iterator.html',1,'dTree&lt; OBJECT, KEY, allocator &gt;::Iterator']]]
+  ['getcount_75',['GetCount',['../classd_semaphore.html#a2d74fe4e18a67a956732d4bfd89e818b',1,'dSemaphore']]]
 ];

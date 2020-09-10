@@ -101,6 +101,7 @@ class ndBodyKinematic: public ndBody
 	dVector m_invMass;
 	dVector m_gyroAlpha;
 	dVector m_gyroTorque;
+	dQuaternion m_gyroRotation;
 
 	ndContactMap m_contactList;
 	dSpinLock m_lock;

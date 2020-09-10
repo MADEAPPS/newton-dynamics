@@ -24,20 +24,38 @@
 
 #include "dCoreStdafx.h"
 
+/// Generic counting semaphore for thread synchronization 
 class dSemaphore
 {
 	public:
+	/// Create and initialize counter to zero
 	D_CORE_API dSemaphore();
+
+	/// Destroy semaphore
 	D_CORE_API ~dSemaphore();
 
-	D_CORE_API dInt32 GetCount();
-	D_CORE_API void Signal();
+	/// Returns counter counter value
+	D_CORE_API dInt32 GetCount() const;
+
+	/// Synchronize with another threads.
+	/// \return returns false if member function Terminate has not been called. 
+	/// \brief When internal variable m_counter is zero, this function blocks
+	/// the calling thread until another thread call Signal function incrementing
+	/// m_count by one. 
+	/// \brief when counter is hight that zero, this function return immediately 
+	/// decrementing the m_count by one.
 	D_CORE_API bool Wait();
+
+	/// Notify a thread blocked by member function Wait to wake and test m_counter again.
+	/// Increment internal variable m_count by one and signal the thread to wakeup.
+	D_CORE_API void Signal();
+
+	/// Notify a waiting thread on member function Wait that is time to exit the thread loop.
 	D_CORE_API void Terminate();
 
 #ifndef D_USE_THREAD_EMULATION
 	private:
-	std::mutex m_mutex;
+	mutable std::mutex m_mutex;
 	std::condition_variable m_condition;
 	dInt32 m_count;
 	dAtomic<bool> m_terminate;

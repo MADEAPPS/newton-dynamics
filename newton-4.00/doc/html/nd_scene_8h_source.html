@@ -259,7 +259,7 @@ $(document).ready(function(){initNavTree('nd_scene_8h_source.html',''); initResi
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160; </div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">void</span> ndScene::Sync()</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;{</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    dThreadPool::Sync();</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <a class="code" href="classd_sync_mutex.html#a98d5d9bdd45860795f75c0ae281d6425">dThreadPool::Sync</a>();</div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;}</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="keyword">inline</span> <a class="code" href="classnd_world.html">ndWorld</a>* ndScene::GetWorld()<span class="keyword"> const</span></div>
@@ -324,6 +324,7 @@ $(document).ready(function(){initNavTree('nd_scene_8h_source.html',''); initResi
 </div><!-- doc-content -->
 <div class="ttc" id="aclassnd_scene_tree_node_html"><div class="ttname"><a href="classnd_scene_tree_node.html">ndSceneTreeNode</a></div><div class="ttdef"><b>Definition:</b> ndSceneNode.h:112</div></div>
 <div class="ttc" id="aclassd_fast_ray_test_html"><div class="ttname"><a href="classd_fast_ray_test.html">dFastRayTest</a></div><div class="ttdef"><b>Definition:</b> dIntersections.h:124</div></div>
+<div class="ttc" id="aclassd_sync_mutex_html_a98d5d9bdd45860795f75c0ae281d6425"><div class="ttname"><a href="classd_sync_mutex.html#a98d5d9bdd45860795f75c0ae281d6425">dSyncMutex::Sync</a></div><div class="ttdeci">D_CORE_API void Sync()</div><div class="ttdoc">Synchronize with another worker threads.</div><div class="ttdef"><b>Definition:</b> dSyncMutex.cpp:38</div></div>
 <div class="ttc" id="aclassd_spin_lock_html"><div class="ttname"><a href="classd_spin_lock.html">dSpinLock</a></div><div class="ttdef"><b>Definition:</b> dTypes.h:516</div></div>
 <div class="ttc" id="aclassnd_scene_html"><div class="ttname"><a href="classnd_scene.html">ndScene</a></div><div class="ttdef"><b>Definition:</b> ndScene.h:42</div></div>
 <div class="ttc" id="aclassnd_body_html"><div class="ttname"><a href="classnd_body.html">ndBody</a></div><div class="ttdef"><b>Definition:</b> ndBody.h:37</div></div>
@@ -335,7 +336,7 @@ $(document).ready(function(){initNavTree('nd_scene_8h_source.html',''); initResi
 <div class="ttc" id="aclassnd_contact_solver_html"><div class="ttname"><a href="classnd_contact_solver.html">ndContactSolver</a></div><div class="ttdef"><b>Definition:</b> ndContactSolver.h:59</div></div>
 <div class="ttc" id="aclassnd_ray_cast_notify_html"><div class="ttname"><a href="classnd_ray_cast_notify.html">ndRayCastNotify</a></div><div class="ttdef"><b>Definition:</b> ndRayCastNotify.h:33</div></div>
 <div class="ttc" id="aclassd_atomic_html"><div class="ttname"><a href="classd_atomic.html">dAtomic&lt; int &gt;</a></div></div>
-<div class="ttc" id="aclassd_class_alloc_html"><div class="ttname"><a href="classd_class_alloc.html">dClassAlloc</a></div><div class="ttdef"><b>Definition:</b> dClassAlloc.h:28</div></div>
+<div class="ttc" id="aclassd_class_alloc_html"><div class="ttname"><a href="classd_class_alloc.html">dClassAlloc</a></div><div class="ttdoc">Base class for providing memory allocation for all other engine classes.</div><div class="ttdef"><b>Definition:</b> dClassAlloc.h:29</div></div>
 <div class="ttc" id="aclassnd_scene_1_1nd_fitness_list_html"><div class="ttname"><a href="classnd_scene_1_1nd_fitness_list.html">ndScene::ndFitnessList</a></div><div class="ttdef"><b>Definition:</b> ndScene.h:59</div></div>
 <div class="ttc" id="aclassnd_body_kinematic_html"><div class="ttname"><a href="classnd_body_kinematic.html">ndBodyKinematic</a></div><div class="ttdef"><b>Definition:</b> ndBodyKinematic.h:34</div></div>
 <div class="ttc" id="aclassnd_scene_node_html"><div class="ttname"><a href="classnd_scene_node.html">ndSceneNode</a></div><div class="ttdef"><b>Definition:</b> ndSceneNode.h:34</div></div>

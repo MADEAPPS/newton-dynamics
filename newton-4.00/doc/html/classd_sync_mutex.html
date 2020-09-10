@@ -100,6 +100,9 @@ $(document).ready(function(){initNavTree('classd_sync_mutex.html',''); initResiz
 <div class="title">dSyncMutex Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Generic counting mutex for synchronization of thread jobs.  
+ <a href="classd_sync_mutex.html#details">More...</a></p>
 <div class="dynheader">
 Inheritance diagram for dSyncMutex:</div>
 <div class="dyncontent">
@@ -117,16 +120,51 @@ Inheritance diagram for dSyncMutex:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a4214f33c3467e208f3310410ec304270"><td class="memItemLeft" align="right" valign="top"><a id="a4214f33c3467e208f3310410ec304270"></a>
+D_CORE_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_sync_mutex.html#a4214f33c3467e208f3310410ec304270">dSyncMutex</a> ()</td></tr>
+<tr class="memdesc:a4214f33c3467e208f3310410ec304270"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create and initialize counter to zero. <br /></td></tr>
+<tr class="separator:a4214f33c3467e208f3310410ec304270"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac25d0933eca52aa9e7f2ad961b4e1f0f"><td class="memItemLeft" align="right" valign="top"><a id="ac25d0933eca52aa9e7f2ad961b4e1f0f"></a>
+D_CORE_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_sync_mutex.html#ac25d0933eca52aa9e7f2ad961b4e1f0f">~dSyncMutex</a> ()</td></tr>
+<tr class="memdesc:ac25d0933eca52aa9e7f2ad961b4e1f0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy mutex. <br /></td></tr>
+<tr class="separator:ac25d0933eca52aa9e7f2ad961b4e1f0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98d5d9bdd45860795f75c0ae281d6425"><td class="memItemLeft" align="right" valign="top">D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_sync_mutex.html#a98d5d9bdd45860795f75c0ae281d6425">Sync</a> ()</td></tr>
+<tr class="memdesc:a98d5d9bdd45860795f75c0ae281d6425"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronize with another worker threads.  <a href="classd_sync_mutex.html#a98d5d9bdd45860795f75c0ae281d6425">More...</a><br /></td></tr>
+<tr class="separator:a98d5d9bdd45860795f75c0ae281d6425"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeecc71eca734ee0e85f584f1b45690f4"><td class="memItemLeft" align="right" valign="top"><a id="aeecc71eca734ee0e85f584f1b45690f4"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Tick</b> ()</td></tr>
+D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_sync_mutex.html#aeecc71eca734ee0e85f584f1b45690f4">Tick</a> ()</td></tr>
+<tr class="memdesc:aeecc71eca734ee0e85f584f1b45690f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Increment internal variable m_count by one. <br /></td></tr>
 <tr class="separator:aeecc71eca734ee0e85f584f1b45690f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad0f9b47992028dfeca7f481eaebcdb0b"><td class="memItemLeft" align="right" valign="top"><a id="ad0f9b47992028dfeca7f481eaebcdb0b"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Release</b> ()</td></tr>
+D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_sync_mutex.html#ad0f9b47992028dfeca7f481eaebcdb0b">Release</a> ()</td></tr>
+<tr class="memdesc:ad0f9b47992028dfeca7f481eaebcdb0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrement internal variable m_count by one and signal the thread to wakeup. <br /></td></tr>
 <tr class="separator:ad0f9b47992028dfeca7f481eaebcdb0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a98d5d9bdd45860795f75c0ae281d6425"><td class="memItemLeft" align="right" valign="top"><a id="a98d5d9bdd45860795f75c0ae281d6425"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Sync</b> ()</td></tr>
-<tr class="separator:a98d5d9bdd45860795f75c0ae281d6425"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Generic counting mutex for synchronization of thread jobs. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a98d5d9bdd45860795f75c0ae281d6425"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a98d5d9bdd45860795f75c0ae281d6425">&#9670;&nbsp;</a></span>Sync()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dSyncMutex::Sync </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Synchronize with another worker threads. </p>
+<p>When internal variable m_counter larger than zero, this function blocks the calling thread until another thread call member function Release.</p>
+<p>When counter is zero, this function return immediately. <br  />
+ </p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

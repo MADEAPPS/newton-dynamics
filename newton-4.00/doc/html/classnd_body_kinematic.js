@@ -38,6 +38,7 @@ var classnd_body_kinematic =
     [ "ndSceneMixed", "classnd_body_kinematic.html#ac096c169465f7fd7009289ff11fa0208", null ],
     [ "m_contactList", "classnd_body_kinematic.html#a5cae4814d99f515e2e0d4907a0115e97", null ],
     [ "m_gyroAlpha", "classnd_body_kinematic.html#adabde839e80681abc6866c3f6cb47963", null ],
+    [ "m_gyroRotation", "classnd_body_kinematic.html#aa5151e4d2f9ab52e8b81f62783a8b533", null ],
     [ "m_gyroTorque", "classnd_body_kinematic.html#aec6b23f38dcb2d06fd4fe3aee622f061", null ],
     [ "m_index", "classnd_body_kinematic.html#ad0ef0c7f166f134cd2ead7c0db1a600a", null ],
     [ "m_invMass", "classnd_body_kinematic.html#a084cac547df11afbe0600141a2f6801e", null ],

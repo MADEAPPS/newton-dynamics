@@ -101,6 +101,9 @@ $(document).ready(function(){initNavTree('classd_class_alloc.html',''); initResi
 <div class="title">dClassAlloc Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Base class for providing memory allocation for all other engine classes.  
+ <a href="classd_class_alloc.html#details">More...</a></p>
 <div class="dynheader">
 Inheritance diagram for dClassAlloc:</div>
 <div class="dyncontent">
@@ -126,23 +129,37 @@ Inheritance diagram for dClassAlloc:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:aae7ca43a2cf439a198501ea15bc7e47a"><td class="memItemLeft" align="right" valign="top"><a id="aae7ca43a2cf439a198501ea15bc7e47a"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_class_alloc.html#aae7ca43a2cf439a198501ea15bc7e47a">dClassAlloc</a> ()</td></tr>
+<tr class="memdesc:aae7ca43a2cf439a198501ea15bc7e47a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty. <br /></td></tr>
+<tr class="separator:aae7ca43a2cf439a198501ea15bc7e47a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5b8cb26b160797d123fa1329cf87655"><td class="memItemLeft" align="right" valign="top"><a id="ab5b8cb26b160797d123fa1329cf87655"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_class_alloc.html#ab5b8cb26b160797d123fa1329cf87655">~dClassAlloc</a> ()</td></tr>
+<tr class="memdesc:ab5b8cb26b160797d123fa1329cf87655"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty. <br /></td></tr>
+<tr class="separator:ab5b8cb26b160797d123fa1329cf87655"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a177d4db8727ec4c7cd9767295186f69d"><td class="memItemLeft" align="right" valign="top"><a id="a177d4db8727ec4c7cd9767295186f69d"></a>
-void *&#160;</td><td class="memItemRight" valign="bottom"><b>operator new</b> (size_t size)</td></tr>
+void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_class_alloc.html#a177d4db8727ec4c7cd9767295186f69d">operator new</a> (size_t size)</td></tr>
+<tr class="memdesc:a177d4db8727ec4c7cd9767295186f69d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded operator new for any subclass derived from <a class="el" href="classd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">dClassAlloc</a>. <br /></td></tr>
 <tr class="separator:a177d4db8727ec4c7cd9767295186f69d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a567b53e08b1053c79287c3ab51a0c62a"><td class="memItemLeft" align="right" valign="top"><a id="a567b53e08b1053c79287c3ab51a0c62a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>operator delete</b> (void *ptr)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_class_alloc.html#a567b53e08b1053c79287c3ab51a0c62a">operator delete</a> (void *ptr)</td></tr>
+<tr class="memdesc:a567b53e08b1053c79287c3ab51a0c62a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded operator delete for any subclass derived from <a class="el" href="classd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">dClassAlloc</a>. <br /></td></tr>
 <tr class="separator:a567b53e08b1053c79287c3ab51a0c62a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
 <tr class="memitem:ae74817104a54a91a0ed1f74fb1733540"><td class="memItemLeft" align="right" valign="top"><a id="ae74817104a54a91a0ed1f74fb1733540"></a>
-static D_CORE_API void *&#160;</td><td class="memItemRight" valign="bottom"><b>Malloc</b> (size_t size)</td></tr>
+static D_CORE_API void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_class_alloc.html#ae74817104a54a91a0ed1f74fb1733540">Malloc</a> (size_t size)</td></tr>
+<tr class="memdesc:ae74817104a54a91a0ed1f74fb1733540"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic allocation for any function subclass from <a class="el" href="classd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">dClassAlloc</a>. <br /></td></tr>
 <tr class="separator:ae74817104a54a91a0ed1f74fb1733540"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a36b92bbda0153a4c2e14853b75016704"><td class="memItemLeft" align="right" valign="top"><a id="a36b92bbda0153a4c2e14853b75016704"></a>
-static D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Free</b> (void *const ptr)</td></tr>
+static D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_class_alloc.html#a36b92bbda0153a4c2e14853b75016704">Free</a> (void *const ptr)</td></tr>
+<tr class="memdesc:a36b92bbda0153a4c2e14853b75016704"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generic destruction for any function subclass from <a class="el" href="classd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">dClassAlloc</a>. <br /></td></tr>
 <tr class="separator:a36b92bbda0153a4c2e14853b75016704"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-</div><!-- contents -->
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Base class for providing memory allocation for all other engine classes. </p>
+</div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

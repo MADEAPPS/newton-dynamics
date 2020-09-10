@@ -124,15 +124,15 @@ $(document).ready(function(){initNavTree('nd_dynamics_update_8h_source.html','')
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;ndNewtonStdafx.h&quot;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="comment">//#include &quot;dgWorldDynamicsParallelSolver.h&quot;</span></div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#if 0</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#define DG_BODY_LRU_STEP                    2   </span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#define DG_MAX_SKELETON_JOINT_COUNT         256</span></div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#define DG_MAX_CONTINUE_COLLISON_STEPS      8</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="preprocessor">#define DG_SMALL_ISLAND_COUNT               32</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#define DG_FREEZZING_VELOCITY_DRAG          dFloat32 (0.9f)</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#define DG_SOLVER_MAX_ERROR                 (DG_FREEZE_MAG * dFloat32 (0.5f))</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="comment">//#define   D_BODY_LRU_STEP                 2   </span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="comment">//#define   D_MAX_SKELETON_JOINT_COUNT      256</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">//#define D_MAX_CONTINUE_COLLISON_STEPS 8</span></div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment">//#define   D_SMALL_ISLAND_COUNT            32</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="comment">//#define   D_FREEZZING_VELOCITY_DRAG       dFloat32 (0.9f)</span></div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="preprocessor">#define D_SOLVER_MAX_ERROR                  (D_FREEZE_MAG * dFloat32 (0.5f))</span></div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#if 0</span></div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#define DG_CCD_EXTRA_CONTACT_COUNT          (8 * 3)</span></div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#define DG_PARALLEL_JOINT_COUNT_CUT_OFF     (64)</span></div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">//#define DG_PARALLEL_JOINT_COUNT_CUT_OFF   (2)</span></div>
@@ -290,152 +290,126 @@ $(document).ready(function(){initNavTree('nd_dynamics_update_8h_source.html','')
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
 <div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;D_MSV_NEWTON_ALIGN_32</div>
-<div class="line"><a name="l00194"></a><span class="lineno"><a class="line" href="classnd_left_hand_side.html">  194</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_left_hand_side.html">ndLeftHandSide</a></div>
+<div class="line"><a name="l00194"></a><span class="lineno"><a class="line" href="classnd_dynamics_update.html">  194</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_dynamics_update.html">ndDynamicsUpdate</a></div>
 <div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;{</div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <a class="code" href="classnd_jacobian_pair.html">ndJacobianPair</a> m_Jt;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <a class="code" href="classnd_jacobian_pair.html">ndJacobianPair</a> m_JMinv;</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;} D_GCC_NEWTON_ALIGN_32;</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160; </div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;D_MSV_NEWTON_ALIGN_32</div>
-<div class="line"><a name="l00202"></a><span class="lineno"><a class="line" href="classnd_right_hand_side.html">  202</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_right_hand_side.html">ndRightHandSide</a></div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;{</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    dFloat32 m_force;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    dFloat32 m_diagDamp;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    dFloat32 m_invJinvMJt;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    dFloat32 m_coordenateAccel;</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160; </div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    dFloat32 m_lowerBoundFrictionCoefficent;</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    dFloat32 m_upperBoundFrictionCoefficent;</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    dFloat32 m_deltaAccel;</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    dFloat32 m_restitution;</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160; </div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    dFloat32 m_maxImpact;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    dFloat32 m_penetration;</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    dFloat32 m_diagonalRegularizer;</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    dFloat32 m_penetrationStiffness;</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160; </div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <a class="code" href="classnd_force_impact_pair.html">ndForceImpactPair</a>* m_jointFeebackForce;</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    dInt32 m_normalForceIndex;</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;} D_GCC_NEWTON_ALIGN_32;</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160; </div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160; </div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;D_MSV_NEWTON_ALIGN_32</div>
-<div class="line"><a name="l00226"></a><span class="lineno"><a class="line" href="classnd_dynamics_update.html">  226</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_dynamics_update.html">ndDynamicsUpdate</a></div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;{</div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="comment">//class dgParallelClusterArray;</span></div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160; </div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="comment">//void DynamicsUpdate (dFloat32 timestep);</span></div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="comment">//dgBody* GetClusterBody (const void* const cluster, dInt32 index) const;</span></div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="comment">//dgJacobianMemory&amp; GetSolverMemory() { return m_solverMemory; }</span></div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="comment">//virtual dInt32 GetJacobianDerivatives (dgContraintDescritor&amp; constraintParamOut, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, dInt32 rowCount) const;</span></div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <span class="comment">//virtual void CalculateNetAcceleration (dgBody* const body, const dgVector&amp; invTimeStep, const dgVector&amp; accNorm) const;</span></div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="comment">//private:</span></div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="comment">//static DG_INLINE dInt32 CompareKey(dInt32 highA, dInt32 lowA, dInt32 highB, dInt32 lowB);</span></div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="comment">//static dInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);</span></div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="comment">//static dInt32 CompareClusterInfos (const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed);</span></div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="comment">//void BuildClusters(dFloat32 timestep);</span></div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="comment">//class dgParallelClusterArray;</span></div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="comment">//void DynamicsUpdate (dFloat32 timestep);</span></div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="comment">//dgBody* GetClusterBody (const void* const cluster, dInt32 index) const;</span></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="comment">//dgJacobianMemory&amp; GetSolverMemory() { return m_solverMemory; }</span></div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="comment">//virtual dInt32 GetJacobianDerivatives (dgContraintDescritor&amp; constraintParamOut, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, dInt32 rowCount) const;</span></div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="comment">//virtual void CalculateNetAcceleration (dgBody* const body, const dgVector&amp; invTimeStep, const dgVector&amp; accNorm) const;</span></div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="comment">//private:</span></div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="comment">//static DG_INLINE dInt32 CompareKey(dInt32 highA, dInt32 lowA, dInt32 highB, dInt32 lowB);</span></div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="comment">//static dInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);</span></div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="comment">//static dInt32 CompareClusterInfos (const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed);</span></div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="comment">//void BuildClusters(dFloat32 timestep);</span></div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="comment">//dgBodyCluster MergeClusters(const dgBodyCluster* const clusterArray, dInt32 clustersCount) const;</span></div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="comment">//dInt32 SortClusters(const dgBodyCluster* const cluster, dFloat32 timestep, dInt32 threadID) const;</span></div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="comment">//static dInt32 CompareBodyJacobianPair(const dgBodyJacobianPair* const infoA, const dgBodyJacobianPair* const infoB, void* notUsed);</span></div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="comment">//static void IntegrateClustersParallelKernel (void* const context, void* const worldContext, dInt32 threadID);</span></div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="comment">//static void CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dInt32 threadID);</span></div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="comment">//void BuildJacobianMatrix (dgBodyCluster* const cluster, dInt32 threadID, dFloat32 timestep) const;</span></div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="comment">//void ResolveClusterForces (dgBodyCluster* const cluster, dInt32 threadID, dFloat32 timestep) const;</span></div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="comment">//void IntegrateReactionsForces(const dgBodyCluster* const cluster, dInt32 threadID, dFloat32 timestep) const;</span></div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="comment">//void BuildJacobianMatrix (const dgBodyInfo* const bodyInfo, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, dFloat32 forceImpulseScale) const;</span></div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="comment">//void CalculateClusterReactionForces(const dgBodyCluster* const cluster, dInt32 threadID, dFloat32 timestep) const;</span></div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="comment">//void IntegrateInslandParallel(dgParallelClusterArray* const clusters, dInt32 threadID);</span></div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="comment">//void CalculateReactionForcesParallel(const dgBodyCluster* const clusters, dInt32 clustersCount, dFloat32 timestep);</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="comment">//dFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide) const;</span></div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="comment">//dFloat32 CalculateJointForce_3_13(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide) const;</span></div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="comment">//dgJacobian IntegrateForceAndToque(dgDynamicBody* const body, const dgVector&amp; force, const dgVector&amp; torque, const dgVector&amp; timestep) const ;</span></div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="comment">//void IntegrateExternalForce(const dgBodyCluster* const cluster, dFloat32 timestep, dInt32 threadID) const;</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="comment">//void IntegrateVelocity (const dgBodyCluster* const cluster, dFloat32 accelTolerance, dFloat32 timestep, dInt32 threadID) const;</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="comment">//void CalculateClusterContacts (dgBodyCluster* const cluster, dFloat32 timestep, dInt32 currLru, dInt32 threadID) const;</span></div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="comment">//void CalculateImpulseVeloc(dgJointImpulseInfo* const jointInfo, const dgLeftHandSide* const leftHandSide, const dgRightHandSide* const rightHandSide, dFloat32* const contactVeloc) const;</span></div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="comment">//void ResolveImpulse(const dgJointInfo* const constraintArray, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dgDownHeap&lt;dgContact*, dFloat32&gt;&amp; impactJoints) const;</span></div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="comment">//dFloat32 CalculateJointImpulse(const dgJointImpulseInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgLeftHandSide* const matrixRow, const dgRightHandSide* const rightHandSide, dFloat32* const relVel, dFloat32* const outImpulse) const;</span></div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="comment">//dgJacobianMemory m_solverMemory;</span></div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <span class="comment">//dgParallelBodySolver m_parallelSolver;</span></div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="comment">//dgBodyCluster* m_clusterData;</span></div>
 <div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="comment">//dgBodyCluster MergeClusters(const dgBodyCluster* const clusterArray, dInt32 clustersCount) const;</span></div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <span class="comment">//dInt32 SortClusters(const dgBodyCluster* const cluster, dFloat32 timestep, dInt32 threadID) const;</span></div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <span class="comment">//static dInt32 CompareBodyJacobianPair(const dgBodyJacobianPair* const infoA, const dgBodyJacobianPair* const infoB, void* notUsed);</span></div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    <span class="comment">//static void IntegrateClustersParallelKernel (void* const context, void* const worldContext, dInt32 threadID);</span></div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="comment">//static void CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dInt32 threadID);</span></div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="comment">//void BuildJacobianMatrix (dgBodyCluster* const cluster, dInt32 threadID, dFloat32 timestep) const;</span></div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="comment">//void ResolveClusterForces (dgBodyCluster* const cluster, dInt32 threadID, dFloat32 timestep) const;</span></div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="comment">//void IntegrateReactionsForces(const dgBodyCluster* const cluster, dInt32 threadID, dFloat32 timestep) const;</span></div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <span class="comment">//void BuildJacobianMatrix (const dgBodyInfo* const bodyInfo, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, dFloat32 forceImpulseScale) const;</span></div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="comment">//void CalculateClusterReactionForces(const dgBodyCluster* const cluster, dInt32 threadID, dFloat32 timestep) const;</span></div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="comment">//void IntegrateInslandParallel(dgParallelClusterArray* const clusters, dInt32 threadID);</span></div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <span class="comment">//void CalculateReactionForcesParallel(const dgBodyCluster* const clusters, dInt32 clustersCount, dFloat32 timestep);</span></div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    <span class="comment">//dFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide) const;</span></div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    <span class="comment">//dFloat32 CalculateJointForce_3_13(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide) const;</span></div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    <span class="comment">//dgJacobian IntegrateForceAndToque(dgDynamicBody* const body, const dgVector&amp; force, const dgVector&amp; torque, const dgVector&amp; timestep) const ;</span></div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    <span class="comment">//void IntegrateExternalForce(const dgBodyCluster* const cluster, dFloat32 timestep, dInt32 threadID) const;</span></div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <span class="comment">//void IntegrateVelocity (const dgBodyCluster* const cluster, dFloat32 accelTolerance, dFloat32 timestep, dInt32 threadID) const;</span></div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <span class="comment">//void CalculateClusterContacts (dgBodyCluster* const cluster, dFloat32 timestep, dInt32 currLru, dInt32 threadID) const;</span></div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <span class="comment">//void CalculateImpulseVeloc(dgJointImpulseInfo* const jointInfo, const dgLeftHandSide* const leftHandSide, const dgRightHandSide* const rightHandSide, dFloat32* const contactVeloc) const;</span></div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="comment">//void ResolveImpulse(const dgJointInfo* const constraintArray, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dgDownHeap&lt;dgContact*, dFloat32&gt;&amp; impactJoints) const;</span></div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <span class="comment">//dFloat32 CalculateJointImpulse(const dgJointImpulseInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgLeftHandSide* const matrixRow, const dgRightHandSide* const rightHandSide, dFloat32* const relVel, dFloat32* const outImpulse) const;</span></div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <span class="comment">//dgJacobianMemory m_solverMemory;</span></div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="comment">//dgParallelBodySolver m_parallelSolver;</span></div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="comment">//dgBodyCluster* m_clusterData;</span></div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="comment">//dInt32 m_bodies;</span></div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    <span class="comment">//dInt32 m_joints;</span></div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <span class="comment">//dInt32 m_clusters;</span></div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="comment">//dInt32 m_markLru;</span></div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    <span class="comment">//dInt32 m_softBodiesCount;</span></div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    <span class="comment">//mutable dInt32 m_impulseLru;</span></div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    <span class="comment">//mutable dInt32 m_softBodyCriticalSectionLock;</span></div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="comment">//static dgVector m_velocTol;</span></div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    <span class="comment">//friend class dgWorld;</span></div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    <span class="comment">//friend class dgJacobianMemory;</span></div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    <span class="comment">//friend class dgSkeletonContainer;</span></div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    <span class="comment">//friend class dgParallelBodySolver;</span></div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    <span class="comment">//friend class dgSolverWorlkerThreads;</span></div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160; </div>
-<div class="line"><a name="l00293"></a><span class="lineno"><a class="line" href="classnd_dynamics_update_1_1nd_body_proxy.html">  293</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_dynamics_update_1_1nd_body_proxy.html">ndBodyProxy</a></div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    {</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;        <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;        dFloat32 m_weight;</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;        dFloat32 m_invWeight;</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    };</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160; </div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    <a class="code" href="classnd_dynamics_update.html">ndDynamicsUpdate</a>();</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    ~<a class="code" href="classnd_dynamics_update.html">ndDynamicsUpdate</a>();</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    <span class="keywordtype">void</span> DynamicsUpdate();</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="comment">//dInt32 m_bodies;</span></div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <span class="comment">//dInt32 m_joints;</span></div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="comment">//dInt32 m_clusters;</span></div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <span class="comment">//dInt32 m_markLru;</span></div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    <span class="comment">//dInt32 m_softBodiesCount;</span></div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="comment">//mutable dInt32 m_impulseLru;</span></div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="comment">//mutable dInt32 m_softBodyCriticalSectionLock;</span></div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="comment">//static dgVector m_velocTol;</span></div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <span class="comment">//friend class dgWorld;</span></div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="comment">//friend class dgJacobianMemory;</span></div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    <span class="comment">//friend class dgSkeletonContainer;</span></div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="comment">//friend class dgParallelBodySolver;</span></div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <span class="comment">//friend class dgSolverWorlkerThreads;</span></div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160; </div>
+<div class="line"><a name="l00261"></a><span class="lineno"><a class="line" href="classnd_dynamics_update_1_1nd_body_proxy.html">  261</a></span>&#160;    <span class="keyword">class </span><a class="code" href="classnd_dynamics_update_1_1nd_body_proxy.html">ndBodyProxy</a></div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    {</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        dFloat32 m_weight;</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        dFloat32 m_invWeight;</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    };</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160; </div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <a class="code" href="classnd_dynamics_update.html">ndDynamicsUpdate</a>();</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    ~<a class="code" href="classnd_dynamics_update.html">ndDynamicsUpdate</a>();</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <span class="keywordtype">void</span> DynamicsUpdate();</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160; </div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="keywordtype">void</span> DefaultUpdate();</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="keywordtype">void</span> InitWeights();</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    <span class="keywordtype">void</span> InitBodyArray();</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keywordtype">void</span> CalculateForces();</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    <span class="keywordtype">void</span> InitJacobianMatrix();</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <span class="keywordtype">void</span> CalculateJointsForce();</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="keywordtype">void</span> IntegrateBodiesVelocity();</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    <span class="keywordtype">void</span> CalculateJointsAcceleration();</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160; </div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    <span class="keywordtype">void</span> BuildJacobianMatrix(<a class="code" href="classnd_constraint.html">ndConstraint</a>* <span class="keyword">const</span> joint);</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    dFloat32 CalculateJointsForce(<a class="code" href="classnd_constraint.html">ndConstraint</a>* <span class="keyword">const</span> joint);</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    dInt32 GetJacobianDerivatives(dInt32 baseIndex, <a class="code" href="classnd_constraint.html">ndConstraint</a>* <span class="keyword">const</span> joint);</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160; </div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    <a class="code" href="classd_array.html">dArray&lt;ndJacobian&gt;</a> m_internalForces;</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    <a class="code" href="classd_array.html">dArray&lt;ndJacobian&gt;</a> m_internalForcesBack;</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    <a class="code" href="classd_array.html">dArray&lt;ndConstraint*&gt;</a> m_jointArray;</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    <a class="code" href="classd_array.html">dArray&lt;ndBodyProxy&gt;</a> m_bodyProxyArray;</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    <a class="code" href="classd_array.html">dArray&lt;ndLeftHandSide&gt;</a> m_leftHandSide;</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    <a class="code" href="classd_array.html">dArray&lt;ndRightHandSide&gt;</a> m_rightHandSide;</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    dFloat32 m_accelNorm[D_MAX_THREADS_COUNT];</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    dFloat32 m_timestep;</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    dFloat32 m_invTimestep;</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    dFloat32 m_firstPassCoef;</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    dFloat32 m_invStepRK;</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    dFloat32 m_timestepRK;</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    dFloat32 m_invTimestepRK;</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    dInt32 m_solverPasses;</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    dUnsigned32 m_maxRowsCount;</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    <a class="code" href="classd_atomic.html">dAtomic&lt;dUnsigned32&gt;</a> m_rowsCount;</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;} D_GCC_NEWTON_ALIGN_32;</div>
 <div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160; </div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <span class="keywordtype">void</span> DefaultUpdate();</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <span class="keywordtype">void</span> InitWeights();</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    <span class="keywordtype">void</span> InitBodyArray();</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <span class="keywordtype">void</span> InitJacobianMatrix();</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160; </div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <span class="keywordtype">void</span> BuildJacobianMatrix(<a class="code" href="classnd_constraint.html">ndConstraint</a>* <span class="keyword">const</span> joint);</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    dInt32 GetJacobianDerivatives(dInt32 baseIndex, <a class="code" href="classnd_constraint.html">ndConstraint</a>* <span class="keyword">const</span> joint);</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160; </div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <a class="code" href="classd_array.html">dArray&lt;ndJacobian&gt;</a> m_internalForces;</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    <a class="code" href="classd_array.html">dArray&lt;ndConstraint*&gt;</a> m_jointArray;</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    <a class="code" href="classd_array.html">dArray&lt;ndBodyProxy&gt;</a> m_bodyProxyArray;</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    <a class="code" href="classd_array.html">dArray&lt;ndLeftHandSide&gt;</a> m_leftHandSide;</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    <a class="code" href="classd_array.html">dArray&lt;ndRightHandSide&gt;</a> m_rightHandSide;</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    </div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    dFloat32 m_timestep;</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    dFloat32 m_invTimestep;</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    dInt32 m_solverPasses;</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    dUnsigned32 m_maxRowsCount;</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <a class="code" href="classd_atomic.html">dAtomic&lt;dUnsigned32&gt;</a> m_rowsCount;</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;} D_GCC_NEWTON_ALIGN_32;</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160; </div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160; </div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160; </div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassnd_jacobian_pair_html"><div class="ttname"><a href="classnd_jacobian_pair.html">ndJacobianPair</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:58</div></div>
 <div class="ttc" id="aclassd_array_html"><div class="ttname"><a href="classd_array.html">dArray&lt; ndJacobian &gt;</a></div></div>
 <div class="ttc" id="aclassd_atomic_html"><div class="ttname"><a href="classd_atomic.html">dAtomic&lt; dUnsigned32 &gt;</a></div></div>
-<div class="ttc" id="aclassnd_right_hand_side_html"><div class="ttname"><a href="classnd_right_hand_side.html">ndRightHandSide</a></div><div class="ttdef"><b>Definition:</b> ndDynamicsUpdate.h:203</div></div>
-<div class="ttc" id="aclassnd_force_impact_pair_html"><div class="ttname"><a href="classnd_force_impact_pair.html">ndForceImpactPair</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:65</div></div>
-<div class="ttc" id="aclassnd_constraint_html"><div class="ttname"><a href="classnd_constraint.html">ndConstraint</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:138</div></div>
-<div class="ttc" id="aclassnd_dynamics_update_1_1nd_body_proxy_html"><div class="ttname"><a href="classnd_dynamics_update_1_1nd_body_proxy.html">ndDynamicsUpdate::ndBodyProxy</a></div><div class="ttdef"><b>Definition:</b> ndDynamicsUpdate.h:294</div></div>
-<div class="ttc" id="aclassnd_dynamics_update_html"><div class="ttname"><a href="classnd_dynamics_update.html">ndDynamicsUpdate</a></div><div class="ttdef"><b>Definition:</b> ndDynamicsUpdate.h:227</div></div>
-<div class="ttc" id="aclassnd_left_hand_side_html"><div class="ttname"><a href="classnd_left_hand_side.html">ndLeftHandSide</a></div><div class="ttdef"><b>Definition:</b> ndDynamicsUpdate.h:195</div></div>
+<div class="ttc" id="aclassnd_constraint_html"><div class="ttname"><a href="classnd_constraint.html">ndConstraint</a></div><div class="ttdef"><b>Definition:</b> ndConstraint.h:181</div></div>
+<div class="ttc" id="aclassnd_dynamics_update_1_1nd_body_proxy_html"><div class="ttname"><a href="classnd_dynamics_update_1_1nd_body_proxy.html">ndDynamicsUpdate::ndBodyProxy</a></div><div class="ttdef"><b>Definition:</b> ndDynamicsUpdate.h:262</div></div>
+<div class="ttc" id="aclassnd_dynamics_update_html"><div class="ttname"><a href="classnd_dynamics_update.html">ndDynamicsUpdate</a></div><div class="ttdef"><b>Definition:</b> ndDynamicsUpdate.h:195</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

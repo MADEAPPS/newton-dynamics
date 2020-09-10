@@ -100,6 +100,9 @@ $(document).ready(function(){initNavTree('classd_semaphore.html',''); initResiza
 <div class="title">dSemaphore Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Generic counting semaphore for thread synchronization.  
+ <a href="classd_semaphore.html#details">More...</a></p>
 <div class="dynheader">
 Inheritance diagram for dSemaphore:</div>
 <div class="dyncontent">
@@ -118,19 +121,74 @@ Inheritance diagram for dSemaphore:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a1cbdbf8b77b67e8155a5211e7bbb26d0"><td class="memItemLeft" align="right" valign="top"><a id="a1cbdbf8b77b67e8155a5211e7bbb26d0"></a>
-D_CORE_API dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetCount</b> ()</td></tr>
-<tr class="separator:a1cbdbf8b77b67e8155a5211e7bbb26d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a554f666efb275ed749c68e3330aff6e3"><td class="memItemLeft" align="right" valign="top"><a id="a554f666efb275ed749c68e3330aff6e3"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Signal</b> ()</td></tr>
-<tr class="separator:a554f666efb275ed749c68e3330aff6e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f192f85fba7aac7e41b4b97945afcf3"><td class="memItemLeft" align="right" valign="top"><a id="a9f192f85fba7aac7e41b4b97945afcf3"></a>
-D_CORE_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>Wait</b> ()</td></tr>
+<tr class="memitem:a99b67fa2708a5c6f0c195c486bf7c534"><td class="memItemLeft" align="right" valign="top"><a id="a99b67fa2708a5c6f0c195c486bf7c534"></a>
+D_CORE_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_semaphore.html#a99b67fa2708a5c6f0c195c486bf7c534">dSemaphore</a> ()</td></tr>
+<tr class="memdesc:a99b67fa2708a5c6f0c195c486bf7c534"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create and initialize counter to zero. <br /></td></tr>
+<tr class="separator:a99b67fa2708a5c6f0c195c486bf7c534"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ee195cf593fc23d354ed808d0664a33"><td class="memItemLeft" align="right" valign="top"><a id="a5ee195cf593fc23d354ed808d0664a33"></a>
+D_CORE_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_semaphore.html#a5ee195cf593fc23d354ed808d0664a33">~dSemaphore</a> ()</td></tr>
+<tr class="memdesc:a5ee195cf593fc23d354ed808d0664a33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy semaphore. <br /></td></tr>
+<tr class="separator:a5ee195cf593fc23d354ed808d0664a33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d74fe4e18a67a956732d4bfd89e818b"><td class="memItemLeft" align="right" valign="top"><a id="a2d74fe4e18a67a956732d4bfd89e818b"></a>
+D_CORE_API dInt32&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_semaphore.html#a2d74fe4e18a67a956732d4bfd89e818b">GetCount</a> () const</td></tr>
+<tr class="memdesc:a2d74fe4e18a67a956732d4bfd89e818b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns counter counter value. <br /></td></tr>
+<tr class="separator:a2d74fe4e18a67a956732d4bfd89e818b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f192f85fba7aac7e41b4b97945afcf3"><td class="memItemLeft" align="right" valign="top">D_CORE_API bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_semaphore.html#a9f192f85fba7aac7e41b4b97945afcf3">Wait</a> ()</td></tr>
+<tr class="memdesc:a9f192f85fba7aac7e41b4b97945afcf3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronize with another threads.  <a href="classd_semaphore.html#a9f192f85fba7aac7e41b4b97945afcf3">More...</a><br /></td></tr>
 <tr class="separator:a9f192f85fba7aac7e41b4b97945afcf3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a554f666efb275ed749c68e3330aff6e3"><td class="memItemLeft" align="right" valign="top">D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_semaphore.html#a554f666efb275ed749c68e3330aff6e3">Signal</a> ()</td></tr>
+<tr class="memdesc:a554f666efb275ed749c68e3330aff6e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Notify a thread blocked by member function Wait to wake and test m_counter again.  <a href="classd_semaphore.html#a554f666efb275ed749c68e3330aff6e3">More...</a><br /></td></tr>
+<tr class="separator:a554f666efb275ed749c68e3330aff6e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a48c11416bcf5ed8dde3d827618424c52"><td class="memItemLeft" align="right" valign="top"><a id="a48c11416bcf5ed8dde3d827618424c52"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Terminate</b> ()</td></tr>
+D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_semaphore.html#a48c11416bcf5ed8dde3d827618424c52">Terminate</a> ()</td></tr>
+<tr class="memdesc:a48c11416bcf5ed8dde3d827618424c52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Notify a waiting thread on member function Wait that is time to exit the thread loop. <br /></td></tr>
 <tr class="separator:a48c11416bcf5ed8dde3d827618424c52"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Generic counting semaphore for thread synchronization. </p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a554f666efb275ed749c68e3330aff6e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a554f666efb275ed749c68e3330aff6e3">&#9670;&nbsp;</a></span>Signal()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void dSemaphore::Signal </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Notify a thread blocked by member function Wait to wake and test m_counter again. </p>
+<p>Increment internal variable m_count by one and signal the thread to wakeup. </p>
+
+</div>
+</div>
+<a id="a9f192f85fba7aac7e41b4b97945afcf3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f192f85fba7aac7e41b4b97945afcf3">&#9670;&nbsp;</a></span>Wait()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool dSemaphore::Wait </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Synchronize with another threads. </p>
+<dl class="section return"><dt>Returns</dt><dd>returns false if member function Terminate has not been called.</dd></dl>
+<p>When internal variable m_counter is zero, this function blocks the calling thread until another thread call Signal function incrementing m_count by one.</p>
+<p>when counter is hight that zero, this function return immediately decrementing the m_count by one. </p>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

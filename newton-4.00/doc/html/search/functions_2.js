@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['setmemoryallocators_257',['SetMemoryAllocators',['../classd_memory.html#afd574e2f624e7838c6e66dbd9bae9341',1,'dMemory']]]
+  ['getcount_273',['GetCount',['../classd_semaphore.html#a2d74fe4e18a67a956732d4bfd89e818b',1,'dSemaphore']]]
 ];

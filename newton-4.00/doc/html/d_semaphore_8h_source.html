@@ -123,31 +123,41 @@ $(document).ready(function(){initNavTree('d_semaphore_8h_source.html',''); initR
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;dCoreStdafx.h&quot;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="classd_semaphore.html">   27</a></span>&#160;<span class="keyword">class </span><a class="code" href="classd_semaphore.html">dSemaphore</a></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;{</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    D_CORE_API <a class="code" href="classd_semaphore.html">dSemaphore</a>();</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    D_CORE_API ~<a class="code" href="classd_semaphore.html">dSemaphore</a>();</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    D_CORE_API dInt32 GetCount();</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Signal();</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    D_CORE_API <span class="keywordtype">bool</span> Wait();</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Terminate();</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="preprocessor">#ifndef D_USE_THREAD_EMULATION</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    std::mutex m_mutex;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    std::condition_variable m_condition;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    dInt32 m_count;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <a class="code" href="classd_atomic.html">dAtomic&lt;bool&gt;</a> m_terminate;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;};</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="classd_semaphore.html">   28</a></span>&#160;<span class="keyword">class </span><a class="code" href="classd_semaphore.html">dSemaphore</a></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;{</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    D_CORE_API <a class="code" href="classd_semaphore.html#a99b67fa2708a5c6f0c195c486bf7c534">dSemaphore</a>();</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    D_CORE_API <a class="code" href="classd_semaphore.html#a5ee195cf593fc23d354ed808d0664a33">~dSemaphore</a>();</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    D_CORE_API dInt32 <a class="code" href="classd_semaphore.html#a2d74fe4e18a67a956732d4bfd89e818b">GetCount</a>() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    D_CORE_API <span class="keywordtype">bool</span> <a class="code" href="classd_semaphore.html#a9f192f85fba7aac7e41b4b97945afcf3">Wait</a>();</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    D_CORE_API <span class="keywordtype">void</span> <a class="code" href="classd_semaphore.html#a554f666efb275ed749c68e3330aff6e3">Signal</a>();</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    D_CORE_API <span class="keywordtype">void</span> <a class="code" href="classd_semaphore.html#a48c11416bcf5ed8dde3d827618424c52">Terminate</a>();</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#ifndef D_USE_THREAD_EMULATION</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keyword">mutable</span> std::mutex m_mutex;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    std::condition_variable m_condition;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    dInt32 m_count;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <a class="code" href="classd_atomic.html">dAtomic&lt;bool&gt;</a> m_terminate;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;};</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="aclassd_semaphore_html_a9f192f85fba7aac7e41b4b97945afcf3"><div class="ttname"><a href="classd_semaphore.html#a9f192f85fba7aac7e41b4b97945afcf3">dSemaphore::Wait</a></div><div class="ttdeci">D_CORE_API bool Wait()</div><div class="ttdoc">Synchronize with another threads.</div><div class="ttdef"><b>Definition:</b> dSemaphore.cpp:49</div></div>
+<div class="ttc" id="aclassd_semaphore_html_a554f666efb275ed749c68e3330aff6e3"><div class="ttname"><a href="classd_semaphore.html#a554f666efb275ed749c68e3330aff6e3">dSemaphore::Signal</a></div><div class="ttdeci">D_CORE_API void Signal()</div><div class="ttdoc">Notify a thread blocked by member function Wait to wake and test m_counter again.</div><div class="ttdef"><b>Definition:</b> dSemaphore.cpp:65</div></div>
+<div class="ttc" id="aclassd_semaphore_html_a5ee195cf593fc23d354ed808d0664a33"><div class="ttname"><a href="classd_semaphore.html#a5ee195cf593fc23d354ed808d0664a33">dSemaphore::~dSemaphore</a></div><div class="ttdeci">D_CORE_API ~dSemaphore()</div><div class="ttdoc">Destroy semaphore.</div><div class="ttdef"><b>Definition:</b> dSemaphore.cpp:35</div></div>
 <div class="ttc" id="aclassd_atomic_html"><div class="ttname"><a href="classd_atomic.html">dAtomic&lt; bool &gt;</a></div></div>
-<div class="ttc" id="aclassd_semaphore_html"><div class="ttname"><a href="classd_semaphore.html">dSemaphore</a></div><div class="ttdef"><b>Definition:</b> dSemaphore.h:28</div></div>
+<div class="ttc" id="aclassd_semaphore_html_a2d74fe4e18a67a956732d4bfd89e818b"><div class="ttname"><a href="classd_semaphore.html#a2d74fe4e18a67a956732d4bfd89e818b">dSemaphore::GetCount</a></div><div class="ttdeci">D_CORE_API dInt32 GetCount() const</div><div class="ttdoc">Returns counter counter value.</div><div class="ttdef"><b>Definition:</b> dSemaphore.cpp:39</div></div>
+<div class="ttc" id="aclassd_semaphore_html"><div class="ttname"><a href="classd_semaphore.html">dSemaphore</a></div><div class="ttdoc">Generic counting semaphore for thread synchronization.</div><div class="ttdef"><b>Definition:</b> dSemaphore.h:29</div></div>
+<div class="ttc" id="aclassd_semaphore_html_a99b67fa2708a5c6f0c195c486bf7c534"><div class="ttname"><a href="classd_semaphore.html#a99b67fa2708a5c6f0c195c486bf7c534">dSemaphore::dSemaphore</a></div><div class="ttdeci">D_CORE_API dSemaphore()</div><div class="ttdoc">Create and initialize counter to zero.</div><div class="ttdef"><b>Definition:</b> dSemaphore.cpp:25</div></div>
+<div class="ttc" id="aclassd_semaphore_html_a48c11416bcf5ed8dde3d827618424c52"><div class="ttname"><a href="classd_semaphore.html#a48c11416bcf5ed8dde3d827618424c52">dSemaphore::Terminate</a></div><div class="ttdeci">D_CORE_API void Terminate()</div><div class="ttdoc">Notify a waiting thread on member function Wait that is time to exit the thread loop.</div><div class="ttdef"><b>Definition:</b> dSemaphore.cpp:74</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

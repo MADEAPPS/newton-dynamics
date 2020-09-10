@@ -12,6 +12,7 @@ var classnd_contact =
     [ "GetPruningTolerance", "classnd_contact.html#a19edb6d3d0cf18ba41db4a015e91342f", null ],
     [ "GetRowsCount", "classnd_contact.html#ac2382e187504d0ef8a042b0a7c815f83", null ],
     [ "JacobianDerivative", "classnd_contact.html#afd2043c988e801ae6a28d63d9ba09dac", null ],
+    [ "JointAccelerations", "classnd_contact.html#a02838b720008f4f84b6bfaa1fd1113c2", null ],
     [ "ndContactList", "classnd_contact.html#aed85a6c742400c2a0b737d7aba496243", null ],
     [ "ndContactSolver", "classnd_contact.html#abb14f8befffc9be23e2578f7432978da", null ],
     [ "ndScene", "classnd_contact.html#a3bf9f82d7440931a3e417bef7fdb94ab", null ]

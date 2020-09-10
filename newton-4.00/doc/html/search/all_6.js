@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['setmemoryallocators_128',['SetMemoryAllocators',['../classd_memory.html#afd574e2f624e7838c6e66dbd9bae9341',1,'dMemory']]]
+  ['operator_20delete_129',['operator delete',['../classd_class_alloc.html#a567b53e08b1053c79287c3ab51a0c62a',1,'dClassAlloc']]],
+  ['operator_20new_130',['operator new',['../classd_class_alloc.html#a177d4db8727ec4c7cd9767295186f69d',1,'dClassAlloc']]]
 ];

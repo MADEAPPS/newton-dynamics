@@ -221,7 +221,7 @@ int main (int argc, const char * argv[])
 	dVector origin(0.0f, 0.0f, 0.0f, 0.0f);
 	BuildFloor(world);
 	//BuildPyramid(world, 10.0f, origin, size, 20);
-	BuildSphere(world, 10.0f, origin, 1.0f, 20);
+	BuildSphere(world, 1.0f, origin, 1.0f, 20);
 	
 	static dFloat32 totalTime = 0;
 	for (int i = 0; i < 10000; i ++)

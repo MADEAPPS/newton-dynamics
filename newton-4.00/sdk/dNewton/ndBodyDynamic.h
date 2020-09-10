@@ -50,6 +50,8 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep);
 	D_NEWTON_API void AddDampingAcceleration(dFloat32 timestep);
 
+	ndJacobian IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep);
+
 	dVector GetForce() const;
 	void SetForce(const dVector& force);
 	

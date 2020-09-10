@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['free_255',['Free',['../classd_memory.html#a56b05108042ab6faabcd1bbe0fb91394',1,'dMemory']]]
+  ['dclassalloc_269',['dClassAlloc',['../classd_class_alloc.html#aae7ca43a2cf439a198501ea15bc7e47a',1,'dClassAlloc']]],
+  ['dsemaphore_270',['dSemaphore',['../classd_semaphore.html#a99b67fa2708a5c6f0c195c486bf7c534',1,'dSemaphore']]],
+  ['dsyncmutex_271',['dSyncMutex',['../classd_sync_mutex.html#a4214f33c3467e208f3310410ec304270',1,'dSyncMutex']]]
 ];

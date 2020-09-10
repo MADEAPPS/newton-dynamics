@@ -24,28 +24,36 @@
 
 #include "dCoreStdafx.h"
 
+/// Base class for providing memory allocation for all other engine classes.
 class dClassAlloc  
 {
 	public:
+	/// Empty
 	dClassAlloc()
 	{
 	}
 
+	/// Empty
 	~dClassAlloc() 
 	{
 	}
 
+	/// Overloaded operator new for any subclass derived from dClassAlloc
 	void *operator new (size_t size)
 	{
 		return Malloc(size);
 	}
 
+	/// Overloaded operator delete for any subclass derived from dClassAlloc
 	void operator delete (void* ptr)
 	{
 		Free(ptr);
 	}
 
+	/// Generic allocation for any function subclass from dClassAlloc
 	D_CORE_API static void* Malloc(size_t size);
+
+	/// Generic destruction for any function subclass from dClassAlloc
 	D_CORE_API static void Free(void* const ptr);
 };
 

@@ -123,28 +123,36 @@ $(document).ready(function(){initNavTree('d_sync_mutex_8h_source.html',''); init
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160; </div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#include &quot;dCoreStdafx.h&quot;</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="classd_sync_mutex.html">   27</a></span>&#160;<span class="keyword">class </span><a class="code" href="classd_sync_mutex.html">dSyncMutex</a></div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;{</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    D_CORE_API <a class="code" href="classd_sync_mutex.html">dSyncMutex</a>();</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    D_CORE_API ~<a class="code" href="classd_sync_mutex.html">dSyncMutex</a>();</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Tick();</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Release();</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Sync();</div>
+<div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="classd_sync_mutex.html">   28</a></span>&#160;<span class="keyword">class </span><a class="code" href="classd_sync_mutex.html">dSyncMutex</a></div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;{</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    D_CORE_API <a class="code" href="classd_sync_mutex.html#a4214f33c3467e208f3310410ec304270">dSyncMutex</a>();</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    D_CORE_API <a class="code" href="classd_sync_mutex.html#ac25d0933eca52aa9e7f2ad961b4e1f0f">~dSyncMutex</a>();</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#ifndef D_USE_THREAD_EMULATION  </span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    std::mutex m_mutex;</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    std::condition_variable m_condition;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keywordtype">int</span> m_count;</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;};</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    D_CORE_API <span class="keywordtype">void</span> <a class="code" href="classd_sync_mutex.html#a98d5d9bdd45860795f75c0ae281d6425">Sync</a>();</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    D_CORE_API <span class="keywordtype">void</span> <a class="code" href="classd_sync_mutex.html#aeecc71eca734ee0e85f584f1b45690f4">Tick</a>();</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    D_CORE_API <span class="keywordtype">void</span> <a class="code" href="classd_sync_mutex.html#ad0f9b47992028dfeca7f481eaebcdb0b">Release</a>();</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="preprocessor">#ifndef D_USE_THREAD_EMULATION  </span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    std::mutex m_mutex;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    std::condition_variable m_condition;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordtype">int</span> m_count;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;};</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassd_sync_mutex_html"><div class="ttname"><a href="classd_sync_mutex.html">dSyncMutex</a></div><div class="ttdef"><b>Definition:</b> dSyncMutex.h:28</div></div>
+<div class="ttc" id="aclassd_sync_mutex_html_a98d5d9bdd45860795f75c0ae281d6425"><div class="ttname"><a href="classd_sync_mutex.html#a98d5d9bdd45860795f75c0ae281d6425">dSyncMutex::Sync</a></div><div class="ttdeci">D_CORE_API void Sync()</div><div class="ttdoc">Synchronize with another worker threads.</div><div class="ttdef"><b>Definition:</b> dSyncMutex.cpp:38</div></div>
+<div class="ttc" id="aclassd_sync_mutex_html_a4214f33c3467e208f3310410ec304270"><div class="ttname"><a href="classd_sync_mutex.html#a4214f33c3467e208f3310410ec304270">dSyncMutex::dSyncMutex</a></div><div class="ttdeci">D_CORE_API dSyncMutex()</div><div class="ttdoc">Create and initialize counter to zero.</div><div class="ttdef"><b>Definition:</b> dSyncMutex.cpp:25</div></div>
+<div class="ttc" id="aclassd_sync_mutex_html_ad0f9b47992028dfeca7f481eaebcdb0b"><div class="ttname"><a href="classd_sync_mutex.html#ad0f9b47992028dfeca7f481eaebcdb0b">dSyncMutex::Release</a></div><div class="ttdeci">D_CORE_API void Release()</div><div class="ttdoc">Decrement internal variable m_count by one and signal the thread to wakeup.</div><div class="ttdef"><b>Definition:</b> dSyncMutex.cpp:49</div></div>
+<div class="ttc" id="aclassd_sync_mutex_html"><div class="ttname"><a href="classd_sync_mutex.html">dSyncMutex</a></div><div class="ttdoc">Generic counting mutex for synchronization of thread jobs.</div><div class="ttdef"><b>Definition:</b> dSyncMutex.h:29</div></div>
+<div class="ttc" id="aclassd_sync_mutex_html_aeecc71eca734ee0e85f584f1b45690f4"><div class="ttname"><a href="classd_sync_mutex.html#aeecc71eca734ee0e85f584f1b45690f4">dSyncMutex::Tick</a></div><div class="ttdeci">D_CORE_API void Tick()</div><div class="ttdoc">Increment internal variable m_count by one.</div><div class="ttdef"><b>Definition:</b> dSyncMutex.cpp:58</div></div>
+<div class="ttc" id="aclassd_sync_mutex_html_ac25d0933eca52aa9e7f2ad961b4e1f0f"><div class="ttname"><a href="classd_sync_mutex.html#ac25d0933eca52aa9e7f2ad961b4e1f0f">dSyncMutex::~dSyncMutex</a></div><div class="ttdeci">D_CORE_API ~dSyncMutex()</div><div class="ttdoc">Destroy mutex.</div><div class="ttdef"><b>Definition:</b> dSyncMutex.cpp:34</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
