@@ -113,6 +113,7 @@ ndConstraint::ndConstraint()
 	,m_preconditioner1(dFloat32(1.0f))
 	,m_rowCount(0)
 	,m_rowStart(0)
+	,m_jointFeebackForce(false)
 {
 }
 

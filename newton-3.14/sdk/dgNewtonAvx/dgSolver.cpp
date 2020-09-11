@@ -1144,7 +1144,8 @@ void dgSolver::CalculateForces()
 	UpdateForceFeedback();
 
 	dgInt32 hasJointFeeback = 0;
-	for (dgInt32 i = 0; i < DG_MAX_THREADS_HIVE_COUNT; i++) {
+	const dgInt32 threadCount = m_world->GetThreadCount();
+	for (dgInt32 i = 0; i < threadCount; i++) {
 		hasJointFeeback |= m_hasJointFeeback[i];
 	}
 	CalculateBodiesAcceleration();

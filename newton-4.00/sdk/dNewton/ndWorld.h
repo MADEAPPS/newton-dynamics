@@ -83,6 +83,11 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	ndScene* m_scene;
 	dFloat32 m_timestep;
 	dFloat32 m_lastExecutionTime;
+	dFloat32 m_freezeAccel2;
+	dFloat32 m_freezeAlpha2;
+	dFloat32 m_freezeSpeed2;
+	dFloat32 m_freezeOmega2;
+
 	dInt32 m_subSteps;
 	dInt32 m_solverIterations;
 	bool m_collisionUpdate;

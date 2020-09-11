@@ -393,3 +393,38 @@ void ndBodyKinematic::UpdateInvInertiaMatrix()
 
 	UpdateGyroData();
 }
+
+void ndBodyKinematic::IntegrateVelocity(dFloat32 timestep)
+{
+	dAssert(m_veloc.m_w == dFloat32(0.0f));
+	dAssert(m_omega.m_w == dFloat32(0.0f));
+	m_globalCentreOfMass += m_veloc.Scale(timestep);
+	dFloat32 omegaMag2 = m_omega.DotProduct(m_omega).GetScalar();
+#ifdef _DEBUG
+	const dFloat32 err = dFloat32(90.0f * dDegreeToRad);
+	const dFloat32 err2 = err * err;
+	const dFloat32 step2 = omegaMag2 * timestep * timestep;
+	const dFloat32 speed2 = m_veloc.DotProduct(m_veloc).GetScalar() * timestep * timestep;;
+	if ((step2 > err2) || (speed2 > 100.0f)) 
+	{
+		dTrace(("warning bodies %d w(%f %f %f) v(%f %f %f) with very high velocity or angular velocity, may be unstable\n", m_uniqueID,
+			m_omega.m_x, m_omega.m_y, m_omega.m_z, m_veloc.m_x, m_veloc.m_y, m_veloc.m_z));
+		//dAssert(0);
+	}
+#endif
+
+	// this is correct
+	if (omegaMag2 > ((dFloat32(0.0125f) * dDegreeToRad) * (dFloat32(0.0125f) * dDegreeToRad))) 
+	{
+		dFloat32 invOmegaMag = dRsqrt(omegaMag2);
+		dVector omegaAxis(m_omega.Scale(invOmegaMag));
+		dFloat32 omegaAngle = invOmegaMag * omegaMag2 * timestep;
+		dQuaternion rotation(omegaAxis, omegaAngle);
+		m_rotation = m_rotation * rotation;
+		m_rotation.Scale(dRsqrt(m_rotation.DotProduct(m_rotation)));
+		m_matrix = dMatrix(m_rotation, m_matrix.m_posit);
+	}
+
+	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
+	dAssert(m_matrix.TestOrthogonal());
+}

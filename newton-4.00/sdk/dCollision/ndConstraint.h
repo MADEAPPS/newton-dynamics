@@ -200,6 +200,7 @@ class ndConstraint
 	dFloat32 m_preconditioner1;
 	dInt32 m_rowCount;
 	dInt32 m_rowStart;
+	bool m_jointFeebackForce;
 	protected:
 	ndConstraint();
 } D_GCC_NEWTON_ALIGN_32 ;

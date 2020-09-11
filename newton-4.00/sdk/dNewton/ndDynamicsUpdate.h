@@ -23,8 +23,6 @@
 #define __D_WORLD_DYNAMICS_UPDATE_H__
 
 #include "ndNewtonStdafx.h"
-//#include "dgWorldDynamicsParallelSolver.h"
-
 
 //#define	D_BODY_LRU_STEP					2	
 //#define	D_MAX_SKELETON_JOINT_COUNT		256
@@ -194,70 +192,6 @@ D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdate
 {
 	public:
-	//class dgParallelClusterArray;
-
-	//void DynamicsUpdate (dFloat32 timestep);
-	//dgBody* GetClusterBody (const void* const cluster, dInt32 index) const;
-	//
-	//dgJacobianMemory& GetSolverMemory() { return m_solverMemory; }
-	//virtual dInt32 GetJacobianDerivatives (dgContraintDescritor& constraintParamOut, dgJointInfo* const jointInfo, dgConstraint* const constraint, dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, dInt32 rowCount) const;
-	//virtual void CalculateNetAcceleration (dgBody* const body, const dgVector& invTimeStep, const dgVector& accNorm) const;
-	//
-	//private:
-	//static DG_INLINE dInt32 CompareKey(dInt32 highA, dInt32 lowA, dInt32 highB, dInt32 lowB);
-	//static dInt32 CompareJointInfos(const dgJointInfo* const infoA, const dgJointInfo* const infoB, void* notUsed);
-	//static dInt32 CompareClusterInfos (const dgBodyCluster* const clusterA, const dgBodyCluster* const clusterB, void* notUsed);
-	//
-	//void BuildClusters(dFloat32 timestep);
-	//
-	//dgBodyCluster MergeClusters(const dgBodyCluster* const clusterArray, dInt32 clustersCount) const;
-	//dInt32 SortClusters(const dgBodyCluster* const cluster, dFloat32 timestep, dInt32 threadID) const;
-	//
-	//static dInt32 CompareBodyJacobianPair(const dgBodyJacobianPair* const infoA, const dgBodyJacobianPair* const infoB, void* notUsed);
-	//static void IntegrateClustersParallelKernel (void* const context, void* const worldContext, dInt32 threadID);
-	//static void CalculateClusterReactionForcesKernel (void* const context, void* const worldContext, dInt32 threadID);
-	//
-	//void BuildJacobianMatrix (dgBodyCluster* const cluster, dInt32 threadID, dFloat32 timestep) const;
-	//void ResolveClusterForces (dgBodyCluster* const cluster, dInt32 threadID, dFloat32 timestep) const;
-	//void IntegrateReactionsForces(const dgBodyCluster* const cluster, dInt32 threadID, dFloat32 timestep) const;
-	//void BuildJacobianMatrix (const dgBodyInfo* const bodyInfo, dgJointInfo* const jointInfo, dgJacobian* const internalForces, dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, dFloat32 forceImpulseScale) const;
-	//void CalculateClusterReactionForces(const dgBodyCluster* const cluster, dInt32 threadID, dFloat32 timestep) const;
-	//
-	//void IntegrateInslandParallel(dgParallelClusterArray* const clusters, dInt32 threadID);
-	//void CalculateReactionForcesParallel(const dgBodyCluster* const clusters, dInt32 clustersCount, dFloat32 timestep);
-	//
-	//dFloat32 CalculateJointForce(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide) const;
-	//dFloat32 CalculateJointForce_3_13(const dgJointInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide) const;
-	//dgJacobian IntegrateForceAndToque(dgDynamicBody* const body, const dgVector& force, const dgVector& torque, const dgVector& timestep) const ;
-	//
-	//void IntegrateExternalForce(const dgBodyCluster* const cluster, dFloat32 timestep, dInt32 threadID) const;
-	//void IntegrateVelocity (const dgBodyCluster* const cluster, dFloat32 accelTolerance, dFloat32 timestep, dInt32 threadID) const;
-	//void CalculateClusterContacts (dgBodyCluster* const cluster, dFloat32 timestep, dInt32 currLru, dInt32 threadID) const;
-	//
-	//void CalculateImpulseVeloc(dgJointImpulseInfo* const jointInfo, const dgLeftHandSide* const leftHandSide, const dgRightHandSide* const rightHandSide, dFloat32* const contactVeloc) const;
-	//void ResolveImpulse(const dgJointInfo* const constraintArray, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, dgDownHeap<dgContact*, dFloat32>& impactJoints) const;
-	//dFloat32 CalculateJointImpulse(const dgJointImpulseInfo* const jointInfo, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces, const dgLeftHandSide* const matrixRow, const dgRightHandSide* const rightHandSide, dFloat32* const relVel, dFloat32* const outImpulse) const;
-	//
-	//dgJacobianMemory m_solverMemory;
-	//dgParallelBodySolver m_parallelSolver;
-	//dgBodyCluster* m_clusterData;
-	//
-	//dInt32 m_bodies;
-	//dInt32 m_joints;
-	//dInt32 m_clusters;
-	//dInt32 m_markLru;
-	//dInt32 m_softBodiesCount;
-	//mutable dInt32 m_impulseLru;
-	//mutable dInt32 m_softBodyCriticalSectionLock;
-	//
-	//static dgVector m_velocTol;
-	//
-	//friend class dgWorld;
-	//friend class dgJacobianMemory;
-	//friend class dgSkeletonContainer;
-	//friend class dgParallelBodySolver;
-	//friend class dgSolverWorlkerThreads;
-
 	class ndBodyProxy
 	{
 		public:
@@ -276,9 +210,11 @@ class ndDynamicsUpdate
 	void InitBodyArray();
 	void CalculateForces();
 	void InitJacobianMatrix();
+	void UpdateForceFeedback();
 	void CalculateJointsForce();
 	void IntegrateBodiesVelocity();
 	void CalculateJointsAcceleration();
+	void CalculateBodiesAcceleration();
 
 	void BuildJacobianMatrix(ndConstraint* const joint);
 	dFloat32 CalculateJointsForce(ndConstraint* const joint);
@@ -291,6 +227,9 @@ class ndDynamicsUpdate
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
 	dFloat32 m_accelNorm[D_MAX_THREADS_COUNT];
+	dInt32 m_hasJointFeeback[D_MAX_THREADS_COUNT];
+
+	ndWorld* m_world;
 	dFloat32 m_timestep;
 	dFloat32 m_invTimestep;
 	dFloat32 m_firstPassCoef;
