@@ -480,7 +480,7 @@ void ndDynamicsUpdate::CalculateForces()
 	{
 		hasJointFeeback |= m_hasJointFeeback[i];
 	}
-	CalculateBodiesAcceleration();
+	IntegrateBodies();
 
 	if (hasJointFeeback) 
 	{
@@ -819,10 +819,10 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 	scene->SubmitJobs<ndUpdateForceFeedback>();
 }
 
-void ndDynamicsUpdate::CalculateBodiesAcceleration()
+void ndDynamicsUpdate::IntegrateBodies()
 {
 	D_TRACKTIME();
-	class ndCalculateBodiesAcceleration: public ndScene::ndBaseJob
+	class ndIntegrateBodies: public ndScene::ndBaseJob
 	{
 		public:
 		virtual void Execute()
@@ -841,7 +841,7 @@ void ndDynamicsUpdate::CalculateBodiesAcceleration()
 			//const dFloat32 accelFreeze = world->m_freezeAccel2 * ((count <= DG_SMALL_ISLAND_COUNT) ? dgFloat32(0.01f) : dgFloat32(1.0f));
 			//const dFloat32 accelFreeze = world->m_freezeAccel2;
 			
-			//dFloat32 timestep = world->m_timestep;
+			dFloat32 timestep = world->m_timestep;
 			for (dInt32 i = m_it->fetch_add(1); i < bodyCount; i = m_it->fetch_add(1))
 			{
 				ndBodyKinematic* const body = bodyArray[i];
@@ -855,11 +855,19 @@ void ndDynamicsUpdate::CalculateBodiesAcceleration()
 					dVector accelTest((accel.DotProduct(accel) > maxAccNorm2) | (alpha.DotProduct(alpha) > maxAccNorm2));
 					dynBody->m_accel = accel & accelTest;
 					dynBody->m_alpha = alpha & accelTest;
+
+					dVector isMovingMask(dynBody->m_veloc + dynBody->m_omega + dynBody->m_accel + dynBody->m_alpha);
+					dVector mask (isMovingMask.TestZero());
+					dInt32 test = mask.GetSignMask() & 0x07;
+					if (test != 7)
+					{
+						body->IntegrateVelocity(timestep);
+					}
 				}
 			}
 		}
 	};
 
 	ndScene* const scene = m_world->GetScene();
-	scene->SubmitJobs<ndCalculateBodiesAcceleration>();
+	scene->SubmitJobs<ndIntegrateBodies>();
 }

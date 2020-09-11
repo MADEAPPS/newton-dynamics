@@ -294,6 +294,7 @@ void ndScene::BuildBodyArray()
 				{
 					m_tmpBodyArray[index] = dynBody;
 					dynBody->m_index = index;
+					dynBody->m_islandParent = nullptr;
 					index++;
 				}
 			}

@@ -111,6 +111,8 @@ class ndBodyKinematic: public ndBody
 	dList<ndBodyKinematic*>::dListNode* m_sceneNode;
 	ndSceneBodyNode* m_sceneBodyBodyNode;
 	ndSceneAggregate* m_sceneAggregateNode;
+	ndBodyKinematic* m_islandParent;
+
 	dUnsigned32 m_index;
 
 	friend class ndScene;

@@ -209,12 +209,13 @@ class ndDynamicsUpdate
 	void InitWeights();
 	void InitBodyArray();
 	void CalculateForces();
+	void IntegrateBodies();
 	void InitJacobianMatrix();
 	void UpdateForceFeedback();
 	void CalculateJointsForce();
 	void IntegrateBodiesVelocity();
 	void CalculateJointsAcceleration();
-	void CalculateBodiesAcceleration();
+	
 
 	void BuildJacobianMatrix(ndConstraint* const joint);
 	dFloat32 CalculateJointsForce(ndConstraint* const joint);
