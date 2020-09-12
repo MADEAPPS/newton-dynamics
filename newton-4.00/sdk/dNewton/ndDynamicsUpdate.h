@@ -199,6 +199,28 @@ class ndDynamicsUpdate
 		dFloat32 m_invWeight;
 	};
 
+	class ndBodyIndexPair
+	{
+		public:
+		ndBodyKinematic* m_body;
+		ndBodyKinematic* m_root;
+	};
+
+	class ndIsland
+	{
+		public:
+		ndIsland(ndBodyKinematic* const root)
+			:m_root(root)
+			,m_start(0)
+			,m_count(0)
+		{
+		}
+
+		ndBodyKinematic* m_root;
+		dInt32 m_start;
+		dInt32 m_count;
+	};
+
 	public:
 	ndDynamicsUpdate();
 	~ndDynamicsUpdate();
@@ -206,6 +228,8 @@ class ndDynamicsUpdate
 
 	private:
 	void DefaultUpdate();
+
+	void BuildIsland();
 	void InitWeights();
 	void InitBodyArray();
 	void CalculateForces();
@@ -215,12 +239,17 @@ class ndDynamicsUpdate
 	void CalculateJointsForce();
 	void IntegrateBodiesVelocity();
 	void CalculateJointsAcceleration();
-	
 
 	void BuildJacobianMatrix(ndConstraint* const joint);
 	dFloat32 CalculateJointsForce(ndConstraint* const joint);
 	dInt32 GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* const joint);
 
+	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const context);
+	static dInt32 CompareIslandBodies(const ndBodyIndexPair* const  A, const ndBodyIndexPair* const B, void* const context);
+	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
+
+	dArray<ndIsland> m_islands;
+	dArray<ndBodyKinematic*> m_bodyIslands;
 	dArray<ndJacobian> m_internalForces;
 	dArray<ndJacobian> m_internalForcesBack;
 	dArray<ndConstraint*> m_jointArray;
@@ -237,10 +266,12 @@ class ndDynamicsUpdate
 	dFloat32 m_invStepRK;
 	dFloat32 m_timestepRK;
 	dFloat32 m_invTimestepRK;
-	dInt32 m_solverPasses;
+	dUnsigned32 m_solverPasses;
 	dUnsigned32 m_maxRowsCount;
 	dAtomic<dUnsigned32> m_rowsCount;
+
 } D_GCC_NEWTON_ALIGN_32;
+
 
 #endif
 

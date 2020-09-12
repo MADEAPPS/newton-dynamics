@@ -271,30 +271,31 @@ void ndScene::BuildBodyArray()
 	m_tmpBodyArray.SetCount(m_bodyList.GetCount());
 	for (ndBodyList::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
-		ndBodyKinematic* const dynBody = node->GetInfo();
-		if (dynBody)
+		ndBodyKinematic* const body = node->GetInfo();
+		if (body)
 		{
-			const ndShape* const shape = dynBody->GetCollisionShape().GetShape()->GetAsShapeNull();
+			const ndShape* const shape = body->GetCollisionShape().GetShape()->GetAsShapeNull();
 			if (shape)
 			{
 				dAssert(0);
-				if (dynBody->GetBroadPhaseBodyNode())
+				if (body->GetBroadPhaseBodyNode())
 				{
-					RemoveBody(dynBody);
+					RemoveBody(body);
 				}
 			}
 			else 
 			{
 				bool inScene = true;
-				if (!dynBody->GetBroadPhaseBodyNode())
+				if (!body->GetBroadPhaseBodyNode())
 				{
-					inScene = AddBody(dynBody);
+					inScene = AddBody(body);
 				}
 				if (inScene)
 				{
-					m_tmpBodyArray[index] = dynBody;
-					dynBody->m_index = index;
-					dynBody->m_islandParent = nullptr;
+					body->m_rank = 0;
+					body->m_index = index;
+					body->m_islandParent = body;
+					m_tmpBodyArray[index] = body;
 					index++;
 				}
 			}

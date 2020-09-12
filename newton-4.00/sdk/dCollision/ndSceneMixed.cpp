@@ -278,8 +278,11 @@ void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const 
 	}
 }
 
-dFloat32 ndSceneMixed::RayCast(ndRayCastNotify& callback, const dVector& p0, const dVector& p1) const
+dFloat32 ndSceneMixed::RayCast(ndRayCastNotify& callback, const dVector& q0, const dVector& q1) const
 {
+	dVector p0(q0 & dVector::m_triplexMask);
+	dVector p1(q1 & dVector::m_triplexMask);
+
 	dFloat32 param = dFloat32(1.2f);
 	if (m_rootNode) 
 	{

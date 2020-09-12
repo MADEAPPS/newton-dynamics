@@ -108,11 +108,12 @@ class ndBodyKinematic: public ndBody
 	ndContactMap m_contactList;
 	dSpinLock m_lock;
 	ndScene* m_scene;
+	ndBodyKinematic* m_islandParent;
 	dList<ndBodyKinematic*>::dListNode* m_sceneNode;
 	ndSceneBodyNode* m_sceneBodyBodyNode;
 	ndSceneAggregate* m_sceneAggregateNode;
-	ndBodyKinematic* m_islandParent;
 
+	dInt32 m_rank;
 	dUnsigned32 m_index;
 
 	friend class ndScene;

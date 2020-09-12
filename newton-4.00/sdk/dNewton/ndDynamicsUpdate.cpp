@@ -25,7 +25,9 @@
 #include "ndDynamicsUpdate.h"
 
 ndDynamicsUpdate::ndDynamicsUpdate()
-	:m_internalForces()
+	:m_islands()
+	,m_bodyIslands()
+	,m_internalForces()
 	,m_internalForcesBack()
 	,m_jointArray()
 	,m_bodyProxyArray()
@@ -51,13 +53,14 @@ ndDynamicsUpdate::~ndDynamicsUpdate()
 
 void ndDynamicsUpdate::DynamicsUpdate()
 {
+	m_world = (ndWorld*)this;
+	BuildIsland();
 	DefaultUpdate();
 }
 
 void ndDynamicsUpdate::DefaultUpdate()
 {
 	D_TRACKTIME();
-	m_world = (ndWorld*)this;
 	InitWeights();
 	InitBodyArray();
 	InitJacobianMatrix();
@@ -836,10 +839,6 @@ void ndDynamicsUpdate::IntegrateBodies()
 			ndWorld* const world = (ndWorld*)m_owner->GetWorld();
 			dVector invTime(world->m_invTimestep);
 			dFloat32 maxAccNorm2 = D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR;
-
-			//const dFloat32 speedFreeze = world->m_freezeSpeed2;
-			//const dFloat32 accelFreeze = world->m_freezeAccel2 * ((count <= DG_SMALL_ISLAND_COUNT) ? dgFloat32(0.01f) : dgFloat32(1.0f));
-			//const dFloat32 accelFreeze = world->m_freezeAccel2;
 			
 			dFloat32 timestep = world->m_timestep;
 			for (dInt32 i = m_it->fetch_add(1); i < bodyCount; i = m_it->fetch_add(1))
@@ -870,4 +869,133 @@ void ndDynamicsUpdate::IntegrateBodies()
 
 	ndScene* const scene = m_world->GetScene();
 	scene->SubmitJobs<ndIntegrateBodies>();
+}
+
+
+inline ndBodyKinematic* ndDynamicsUpdate::FindRootAndSplit(ndBodyKinematic* const body)
+{
+	ndBodyKinematic* node = body;
+	while (node->m_islandParent != node)
+	{
+		ndBodyKinematic* const prev = node;
+		node = node->m_islandParent;
+		prev->m_islandParent = node->m_islandParent;
+	}
+	return node;
+}
+
+dInt32 ndDynamicsUpdate::CompareIslandBodies(const ndBodyIndexPair* const  pairA, const ndBodyIndexPair* const pairB, void* const context)
+{
+	if (pairA->m_root->m_uniqueID > pairB->m_root->m_uniqueID)
+	{
+		return 1;
+	}
+	else if (pairA->m_root->m_uniqueID < pairB->m_root->m_uniqueID)
+	{
+		return -1;
+	}
+	return 0;
+}
+
+dInt32 ndDynamicsUpdate::CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const context)
+{
+	if (islandA->m_count < islandB->m_count)
+	{
+		return 1;
+	}
+	else if (islandA->m_count > islandB->m_count)
+	{
+		return -1;
+	}
+	return 0;
+}
+
+void ndDynamicsUpdate::BuildIsland()
+{
+	D_TRACKTIME();
+	const ndScene* const scene = m_world->GetScene();
+	const dArray<ndContact*>& contactArray = scene->GetActiveContacts();
+	for (dInt32 i = contactArray.GetCount() - 1; i >= 0; i--)
+	{
+		ndConstraint* const joint = contactArray[i];
+		ndBodyKinematic* const body0 = joint->GetKinematicBody0();
+		if (body0->GetInvMass() > dFloat32(0.0f))
+		{
+			ndBodyKinematic* const body1 = joint->GetKinematicBody1();
+			ndBodyKinematic* root0 = FindRootAndSplit(body0);
+			ndBodyKinematic* root1 = FindRootAndSplit(body1);
+			if (root0 != root1)
+			{
+				if (root0->m_rank < root1->m_rank) 
+				{
+					dSwap(root0, root1);
+				}
+				root1->m_islandParent = root0;
+				if (root0->m_rank == root1->m_rank) 
+				{
+					root0->m_rank += 1;
+					dAssert(root0->m_rank <= 6);
+				}
+			}
+		}
+	}
+
+	// re use body array and working buffer 
+	const dArray<ndBodyKinematic*>& bodyArray = scene->GetWorkingBodyArray();
+	m_internalForces.SetCount(bodyArray.GetCount());
+
+	dUnsigned32 count = 0;
+	dUnsigned32 clusterCount = 0;
+	ndBodyIndexPair* const buffer = (ndBodyIndexPair*)&m_internalForces[0];
+
+	for (dInt32 i = bodyArray.GetCount() - 1; i >= 0; i--)
+	{
+		ndBodyKinematic* const body = bodyArray[i];
+		if (body->GetInvMass() > dFloat32(0.0f))
+		{
+			ndBodyKinematic* root = body->m_islandParent;
+			while (root != root->m_islandParent)
+			{
+				root = root->m_islandParent;
+			}
+			buffer[count].m_body = body;
+			buffer[count].m_root = root;
+			count++;
+			if (root->m_rank != -1) 
+			{
+				clusterCount++;
+				root->m_rank = -1;
+			}
+		}
+	}
+
+	dSort(buffer, count, CompareIslandBodies);
+	if (m_bodyIslands.GetCapacity() < 256)
+	{
+		m_islands.Resize(256);
+		m_bodyIslands.Resize(256);
+	}
+
+	m_bodyIslands.SetCount(count);
+	for (dUnsigned32 i = 0; i < count; i++)
+	{
+		m_bodyIslands[i] = buffer[i].m_body;
+		if (buffer[i].m_root->m_rank == -1)
+		{
+			buffer[i].m_root->m_rank = 0;
+			ndIsland island(buffer[i].m_root);
+			m_islands.PushBack(island);
+		}
+		buffer[i].m_root->m_rank += 1;
+	}
+
+	dInt32 start = 0;
+	for (dInt32 i = 0; i < m_islands.GetCount(); i++)
+	{
+		m_islands[i].m_start = start;
+		m_islands[i].m_count = m_islands[i].m_root->m_rank;
+		start += m_islands[i].m_count;
+	}
+
+	dSort(&m_islands[0], m_islands.GetCount(), CompareIslands);
 }

@@ -181,7 +181,7 @@ void BuildSphere(ndWorld& world, dFloat32 mass, const dVector& origin, const dFl
 
 	ndShapeInstance sphere(new ndShapeSphere(diameter * 0.5f));
 
-	dVector floor(FindFloor(world, dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	dVector floor(FindFloor(world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f;
 
 	// get the dimension from shape itself
@@ -189,7 +189,7 @@ void BuildSphere(ndWorld& world, dFloat32 mass, const dVector& origin, const dFl
 	dVector maxP(0.0f);
 	sphere.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
 
-count = 1;
+//count = 1;
 	for (int i = 0; i < count; i++)
 	{
 		ndBodyDynamic* const body = new ndBodyDynamic();
@@ -221,7 +221,9 @@ int main (int argc, const char * argv[])
 	dVector origin(0.0f, 0.0f, 0.0f, 0.0f);
 	BuildFloor(world);
 	//BuildPyramid(world, 10.0f, origin, size, 20);
-	BuildSphere(world, 1.0f, origin, 1.0f, 20);
+	BuildSphere(world, 1.0f, origin + dVector(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1);
+	//BuildSphere(world, 1.0f, origin + dVector(3.0f, 0.0f, 0.0f, 0.0f), 1.0f, 5);
+	//BuildSphere(world, 1.0f, origin + dVector(3.0f, 0.0f, 3.0f, 0.0f), 1.0f, 4);
 	
 	static dFloat32 totalTime = 0;
 	for (int i = 0; i < 10000; i ++)

@@ -327,15 +327,14 @@ dInt32 ndShapeSphere::CalculatePlaneIntersection(const dVector& normal, const dV
 
 dFloat32 ndShapeSphere::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {
-	dAssert(0);
-	return 0;
-	//dFloat32 t = dgRayCastSphere(p0, p1, dVector(dFloat32(0.0f)), m_radius);
-	//if (t < maxT) {
-	//	dVector contact(p0 + (p1 - p0).Scale(t));
-	//	dAssert(contact.m_w == dFloat32(0.0f));
-	//	//contactOut.m_normal = contact.Scale (dgRsqrt (contact.DotProduct(contact).GetScalar()));
-	//	contactOut.m_normal = contact.Normalize();
-	//	//contactOut.m_userId = SetUserDataID();
-	//}
-	//return t;
+	dFloat32 t = dRayCastSphere(localP0, localP1, dVector::m_zero, m_radius);
+	if (t < maxT) 
+	{
+		dVector contact(localP0 + (localP1 - localP0).Scale(t));
+		dAssert(contact.m_w == dFloat32(0.0f));
+		//contactOut.m_normal = contact.Scale (dgRsqrt (contact.DotProduct(contact).GetScalar()));
+		contactOut.m_normal = contact.Normalize();
+		//contactOut.m_userId = SetUserDataID();
+	}
+	return t;
 }
