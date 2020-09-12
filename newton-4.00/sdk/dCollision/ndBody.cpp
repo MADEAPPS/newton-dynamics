@@ -47,7 +47,7 @@ ndBody::ndBody()
 	,m_flags(0)
 	,m_uniqueID(m_uniqueIDCount)
 {
-	m_equilibrium = 0;
+	m_autoSleep = 1;
 	m_collideWithLinkedBodies = 1;
 	m_uniqueIDCount++;
 }

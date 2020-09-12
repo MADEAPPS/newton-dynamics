@@ -848,56 +848,53 @@ void ndScene::UpdateTransform(dInt32 threadIndex, ndBodyKinematic* const body)
 
 void ndScene::UpdateAabb(dInt32 threadIndex, ndBodyKinematic* const body)
 {
-	if (!body->m_equilibrium)
-	{
-		ndSceneBodyNode* const node = body->GetBroadPhaseBodyNode();
-		body->UpdateCollisionMatrix();
+	ndSceneBodyNode* const node = body->GetBroadPhaseBodyNode();
+	body->UpdateCollisionMatrix();
 		
-		dAssert(!node->GetLeft());
-		dAssert(!node->GetRight());
-		dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
+	dAssert(!node->GetLeft());
+	dAssert(!node->GetRight());
+	dAssert(!body->GetCollisionShape().GetShape()->GetAsShapeNull());
 
-		if (body->GetBroadPhaseAggregate()) 
+	if (body->GetBroadPhaseAggregate()) 
+	{
+		dAssert(0);
+		//dBroadPhaseAggregate* const aggregate = body1->GetBroadPhaseAggregate();
+		//dgScopeSpinPause lock(&aggregate->m_criticalSectionLock);
+		//aggregate->m_isInEquilibrium = body1->m_equilibrium;
+	}
+
+	if (!dBoxInclusionTest(body->m_minAABB, body->m_maxAABB, node->m_minBox, node->m_maxBox)) 
+	{
+		dAssert(!node->GetAsBroadPhaseAggregate());
+		node->SetAABB(body->m_minAABB, body->m_maxAABB);
+
+		if (!m_rootNode->GetAsBroadPhaseBodyNode()) 
 		{
-			dAssert(0);
-			//dBroadPhaseAggregate* const aggregate = body1->GetBroadPhaseAggregate();
-			//dgScopeSpinPause lock(&aggregate->m_criticalSectionLock);
-			//aggregate->m_isInEquilibrium = body1->m_equilibrium;
-		}
-
-		if (!dBoxInclusionTest(body->m_minAABB, body->m_maxAABB, node->m_minBox, node->m_maxBox)) 
-		{
-			dAssert(!node->GetAsBroadPhaseAggregate());
-			node->SetAABB(body->m_minAABB, body->m_maxAABB);
-
-			if (!m_rootNode->GetAsBroadPhaseBodyNode()) 
+			const ndSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
+			dAssert(root == nullptr);
+			for (ndSceneNode* parent = node->m_parent; parent != root; parent = parent->m_parent) 
 			{
-				const ndSceneNode* const root = (m_rootNode->GetLeft() && m_rootNode->GetRight()) ? nullptr : m_rootNode;
-				dAssert(root == nullptr);
-				for (ndSceneNode* parent = node->m_parent; parent != root; parent = parent->m_parent) 
+				dScopeSpinLock lock(parent->m_lock);
+				if (!parent->GetAsBroadPhaseAggregate()) 
 				{
-					dScopeSpinLock lock(parent->m_lock);
-					if (!parent->GetAsBroadPhaseAggregate()) 
+					dVector minBox;
+					dVector maxBox;
+					dFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
+					if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox)) 
 					{
-						dVector minBox;
-						dVector maxBox;
-						dFloat32 area = CalculateSurfaceArea(parent->GetLeft(), parent->GetRight(), minBox, maxBox);
-						if (dBoxInclusionTest(minBox, maxBox, parent->m_minBox, parent->m_maxBox)) 
-						{
-							break;
-						}
-						parent->m_minBox = minBox;
-						parent->m_maxBox = maxBox;
-						parent->m_surfaceArea = area;
+						break;
 					}
-					else 
-					{
-						dAssert(0);
-						//dBroadPhaseAggregate* const aggregate = parent->GetAsBroadPhaseAggregate();
-						//aggregate->m_minBox = aggregate->m_root->m_minBox;
-						//aggregate->m_maxBox = aggregate->m_root->m_maxBox;
-						//aggregate->m_surfaceArea = aggregate->m_root->m_surfaceArea;
-					}
+					parent->m_minBox = minBox;
+					parent->m_maxBox = maxBox;
+					parent->m_surfaceArea = area;
+				}
+				else 
+				{
+					dAssert(0);
+					//dBroadPhaseAggregate* const aggregate = parent->GetAsBroadPhaseAggregate();
+					//aggregate->m_minBox = aggregate->m_root->m_minBox;
+					//aggregate->m_maxBox = aggregate->m_root->m_maxBox;
+					//aggregate->m_surfaceArea = aggregate->m_root->m_surfaceArea;
 				}
 			}
 		}
@@ -1589,7 +1586,11 @@ void ndScene::UpdateAabb()
 	
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
-				m_owner->UpdateAabb(threadIndex, bodyArray[i]);
+				ndBodyKinematic* const body = bodyArray[i];
+				if (!body->m_equilibrium) 
+				{
+					m_owner->UpdateAabb(threadIndex, body);
+				}
 			}
 		}
 	};

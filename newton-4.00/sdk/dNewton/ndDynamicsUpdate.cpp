@@ -25,7 +25,8 @@
 #include "ndDynamicsUpdate.h"
 
 ndDynamicsUpdate::ndDynamicsUpdate()
-	:m_islands()
+	:m_velocTol(dFloat32(1.0e-8f))
+	,m_islands()
 	,m_bodyIslands()
 	,m_internalForces()
 	,m_internalForcesBack()
@@ -1035,8 +1036,143 @@ void ndDynamicsUpdate::DetermineSleepStates()
 
 void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 {
+	dFloat32 velocityDragCoeff = D_FREEZZING_VELOCITY_DRAG;
+	
+	const dInt32 count = island.m_count;
+	if (count <= D_SMALL_ISLAND_COUNT) 
+	{
+		velocityDragCoeff = dFloat32(0.9999f);
+	}
+	
+	dFloat32 maxAccel = dFloat32(0.0f);
+	dFloat32 maxAlpha = dFloat32(0.0f);
+	dFloat32 maxSpeed = dFloat32(0.0f);
+	dFloat32 maxOmega = dFloat32(0.0f);
+	
+	const dFloat32 speedFreeze = m_world->m_freezeSpeed2;
+	const dFloat32 accelFreeze = m_world->m_freezeAccel2 * ((count <= D_SMALL_ISLAND_COUNT) ? dFloat32(0.01f) : dFloat32(1.0f));
+	//const dFloat32 accelFreeze = world->m_freezeAccel2 * ((count <= DG_SMALL_ISLAND_COUNT) ? dFloat32(0.0025f) : dFloat32(1.0f));
+	dVector velocDragVect(velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, dFloat32(0.0f));
+	
+	bool stackSleeping = true;
+	dInt32 sleepCounter = 10000;
+	
+	ndBodyKinematic** const bodyIslands = &m_world->m_bodyIslands[island.m_start];
 	for (dInt32 i = 0; i < island.m_count; i++)
 	{
+		ndBodyDynamic* const body = bodyIslands[i]->GetAsBodyDynamic();
+		dAssert(body);
 
+		dAssert(body->m_accel.m_w == dFloat32(0.0f));
+		dAssert(body->m_alpha.m_w == dFloat32(0.0f));
+		dAssert(body->m_veloc.m_w == dFloat32(0.0f));
+		dAssert(body->m_omega.m_w == dFloat32(0.0f));
+
+		body->m_equilibrium = 1;
+		const dVector isMovingMask(body->m_veloc + body->m_omega + body->m_accel + body->m_alpha);
+		const dVector mask(isMovingMask.TestZero());
+		const dInt32 test = mask.GetSignMask() & 7;
+		if (test != 7)
+		{
+			const dFloat32 accel2 = body->m_accel.DotProduct(body->m_accel).GetScalar();
+			const dFloat32 alpha2 = body->m_alpha.DotProduct(body->m_alpha).GetScalar();
+			const dFloat32 speed2 = body->m_veloc.DotProduct(body->m_veloc).GetScalar();
+			const dFloat32 omega2 = body->m_omega.DotProduct(body->m_omega).GetScalar();
+	
+			maxAccel = dMax(maxAccel, accel2);
+			maxAlpha = dMax(maxAlpha, alpha2);
+			maxSpeed = dMax(maxSpeed, speed2);
+			maxOmega = dMax(maxOmega, omega2);
+			bool equilibrium = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
+			if (equilibrium) 
+			{
+				const dVector veloc(body->m_veloc * velocDragVect);
+				const dVector omega(body->m_omega * velocDragVect);
+				const dVector velocMask(veloc.DotProduct(veloc) > m_velocTol);
+				const dVector omegaMask(omega.DotProduct(omega) > m_velocTol);
+				body->m_veloc = velocMask & veloc;
+				body->m_omega = omegaMask & omega;
+			}
+	
+			body->m_equilibrium = equilibrium ? 1 : 0;
+			stackSleeping &= equilibrium;
+			sleepCounter = dMin(sleepCounter, body->m_sleepingCounter);
+			body->m_sleepingCounter++;
+			//body->UpdateCollisionMatrix(timestep, threadID);
+		}
+	}
+	
+	if (stackSleeping) 
+	{
+		for (dInt32 i = 0; i < count; i++) 
+		{
+			// force entire island to equilibrium
+			ndBodyDynamic* const body = bodyIslands[i]->GetAsBodyDynamic();
+			body->m_accel = dVector::m_zero;
+			body->m_alpha = dVector::m_zero;
+			body->m_veloc = dVector::m_zero;
+			body->m_omega = dVector::m_zero;
+			body->m_sleeping = body->m_autoSleep;
+			body->m_equilibrium = 1;
+		}
+	}
+	else 
+	{
+		dAssert(0);
+//		bool state = 
+//			(maxAccel > m_world->m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxAccel) ||
+//			(maxAlpha > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAlpha) ||
+//			(maxSpeed > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxVeloc) ||
+//			(maxOmega > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxOmega);
+//		if (state) {
+//			for (dInt32 i = 0; i < count; i++) {
+//				dgBody* const body = bodyArray[i].m_body;
+//				if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+//					dgDynamicBody* const dynBody = (dgDynamicBody*)body;
+//					dynBody->m_sleepingCounter = 0;
+//				}
+//			}
+//		}
+//		else {
+//			if (count < DG_SMALL_ISLAND_COUNT) {
+//				// delay small islands for about 10 seconds
+//				sleepCounter >>= 8;
+//				for (dInt32 i = 0; i < count; i++) {
+//					dgBody* const body = bodyArray[i].m_body;
+//					body->m_equilibrium = 0;
+//				}
+//			}
+//			dInt32 timeScaleSleepCount = dInt32(dFloat32(60.0f) * sleepCounter * timestep);
+//
+//			dInt32 index = DG_SLEEP_ENTRIES;
+//			for (dInt32 i = 1; i < DG_SLEEP_ENTRIES; i++) {
+//				if (world->m_sleepTable[i].m_steps > timeScaleSleepCount) {
+//					index = i;
+//					break;
+//				}
+//			}
+//			index--;
+//
+//			bool state1 = (maxAccel < world->m_sleepTable[index].m_maxAccel) &&
+//				(maxAlpha < world->m_sleepTable[index].m_maxAlpha) &&
+//				(maxSpeed < world->m_sleepTable[index].m_maxVeloc) &&
+//				(maxOmega < world->m_sleepTable[index].m_maxOmega);
+//			if (state1) {
+//				for (dInt32 i = 0; i < count; i++) {
+//					dgBody* const body = bodyArray[i].m_body;
+//					body->m_accel = dVector::m_zero;
+//					body->m_alpha = dVector::m_zero;
+//					body->m_veloc = dVector::m_zero;
+//					body->m_omega = dVector::m_zero;
+//					body->m_sleeping = body->m_autoSleep;
+//					// force entire island to equilibrium
+//					body->m_equilibrium = 1;
+//					if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
+//						dgDynamicBody* const dynBody = (dgDynamicBody*)body;
+//						dynBody->m_sleepingCounter = 0;
+//					}
+//				}
+//			}
+//		}
 	}
 }

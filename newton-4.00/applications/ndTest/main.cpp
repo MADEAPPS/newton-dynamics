@@ -222,7 +222,7 @@ int main (int argc, const char * argv[])
 	BuildFloor(world);
 	//BuildPyramid(world, 10.0f, origin, size, 20);
 	BuildSphere(world, 1.0f, origin + dVector(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1);
-	//BuildSphere(world, 1.0f, origin + dVector(3.0f, 0.0f, 0.0f, 0.0f), 1.0f, 5);
+	BuildSphere(world, 1.0f, origin + dVector(3.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1);
 	//BuildSphere(world, 1.0f, origin + dVector(3.0f, 0.0f, 3.0f, 0.0f), 1.0f, 4);
 	
 	static dFloat32 totalTime = 0;

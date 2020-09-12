@@ -36,13 +36,52 @@ ndBodyDynamic::ndBodyDynamic()
 	,m_alpha(dVector::m_zero)
 	,m_externalForce(dVector::m_zero)
 	,m_externalTorque(dVector::m_zero)
+	,m_impulseForce(dVector::m_zero)
+	,m_impulseTorque(dVector::m_zero)
+	,m_savedExternalForce(dVector::m_zero)
+	,m_savedExternalTorque(dVector::m_zero)
 	,m_jointArray()
+	,m_sleepingCounter(0)
 {
 	SetMassMatrix(dVector::m_zero);
 }
 
 ndBodyDynamic::~ndBodyDynamic()
 {
+}
+
+void ndBodyDynamic::SetForce(const dVector& force)
+{
+	m_externalForce = force & dVector::m_triplexMask;
+	if (m_invMass.m_w == dFloat32(0.0f))
+	{
+		m_externalForce = dVector::m_zero;
+	}
+
+	if (m_equilibrium)
+	{
+		dVector deltaAccel((m_externalForce - m_savedExternalForce).Scale(m_invMass.m_w));
+		dAssert(deltaAccel.m_w == dFloat32(0.0f));
+		dFloat32 deltaAccel2 = deltaAccel.DotProduct(deltaAccel).GetScalar();
+		m_equilibrium = (deltaAccel2 < D_ERR_TOLERANCE2);
+	}
+}
+
+void ndBodyDynamic::SetTorque(const dVector& torque)
+{
+	m_externalTorque = torque & dVector::m_triplexMask;
+	if (m_invMass.m_w == dFloat32(0.0f))
+	{
+		m_externalTorque = dVector::m_zero;
+	}
+
+	if (m_equilibrium)
+	{
+		dVector deltaAlpha(m_matrix.UnrotateVector(m_externalTorque - m_savedExternalTorque) * m_invMass);
+		dAssert(deltaAlpha.m_w == dFloat32(0.0f));
+		dFloat32 deltaAlpha2 = deltaAlpha.DotProduct(deltaAlpha).GetScalar();
+		m_equilibrium = (deltaAlpha2 < D_ERR_TOLERANCE2);
+	}
 }
 
 void ndBodyDynamic::ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep)
@@ -52,22 +91,17 @@ void ndBodyDynamic::ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep)
 	if (m_notifyCallback)
 	{
 		m_notifyCallback->OnApplyExternalForce(threadIndex, timestep);
-		if (m_invMass.m_w == dFloat32(0.0f)) 
-		{
-			m_externalForce = dVector::m_zero;
-			m_externalForce = dVector::m_zero;
-		}
-		m_externalForce = m_externalForce & dVector::m_triplexMask;
-		m_externalTorque = m_externalTorque & dVector::m_triplexMask;
-
-		m_gyroRotation = m_rotation;
-		m_gyroTorque = dVector::m_zero;
-
-		//m_externalForce += m_impulseForce;
-		//m_externalTorque += m_impulseTorque;
-		//m_impulseForce = dVector::m_zero;
-		//m_impulseTorque = dVector::m_zero;
+		dAssert(m_externalForce.m_w == dFloat32(0.0f));
+		dAssert(m_externalTorque.m_w == dFloat32(0.0f));
 	}
+
+	m_gyroRotation = m_rotation;
+	m_gyroTorque = dVector::m_zero;
+
+	m_externalForce += m_impulseForce;
+	m_externalTorque += m_impulseTorque;
+	m_impulseForce = dVector::m_zero;
+	m_impulseTorque = dVector::m_zero;
 }
 
 void ndBodyDynamic::AddDampingAcceleration(dFloat32 timestep)
@@ -78,6 +112,13 @@ void ndBodyDynamic::AddDampingAcceleration(dFloat32 timestep)
 	//
 	//m_veloc = m_veloc.Scale(damp.m_w);
 	//m_omega = m_matrix.RotateVector(omega);
+}
+
+void ndBodyDynamic::IntegrateVelocity(dFloat32 timestep)
+{
+	ndBodyKinematic::IntegrateVelocity(timestep);
+	m_savedExternalForce = m_externalForce;
+	m_savedExternalTorque = m_externalTorque;
 }
 
 ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep)

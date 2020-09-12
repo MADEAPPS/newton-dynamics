@@ -49,14 +49,13 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API virtual ndBodyDynamic* GetAsBodyDynamic() { return this; }
 	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep);
 	D_NEWTON_API void AddDampingAcceleration(dFloat32 timestep);
+	D_NEWTON_API virtual void IntegrateVelocity(dFloat32 timestep);
 
-	ndJacobian IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep);
+	D_NEWTON_API void SetForce(const dVector& force);
+	D_NEWTON_API void SetTorque(const dVector& torque);
 
 	dVector GetForce() const;
-	void SetForce(const dVector& force);
-	
 	dVector GetToque() const;
-	void SetTorque(const dVector& torque);
 
 	dVector GetAccel() const;
 	void SetAccel(const dVector& accel);
@@ -64,12 +63,19 @@ class ndBodyDynamic: public ndBodyKinematic
 	dVector GetAlpha() const;
 	void SetAlpha(const dVector& alpha);
 
+	ndJacobian IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep);
+
 	protected:
 	dVector m_accel;
 	dVector m_alpha;
 	dVector m_externalForce;
 	dVector m_externalTorque;
+	dVector m_impulseForce;
+	dVector m_impulseTorque;
+	dVector m_savedExternalForce;
+	dVector m_savedExternalTorque;
 	dArray<ndBilateralJoint*> m_jointArray;
+	dInt32 m_sleepingCounter;
 	friend class ndDynamicsUpdate;
 } D_GCC_NEWTON_ALIGN_32 ;
 
@@ -78,20 +84,12 @@ inline dVector ndBodyDynamic::GetForce() const
 	return m_externalForce;
 }
 
-inline void ndBodyDynamic::SetForce(const dVector& force)
-{
-	m_externalForce = force;
-}
 
 inline dVector ndBodyDynamic::GetToque() const
 {
 	return m_externalTorque;
 }
 
-inline void ndBodyDynamic::SetTorque(const dVector& torque)
-{
-	m_externalTorque = torque;
-}
 
 inline dVector ndBodyDynamic::GetAccel() const
 {

@@ -43,13 +43,13 @@ class dVector
 	{
 	}
 
-	D_INLINE dVector(const __m128 type)
-		:m_type (type)
+	D_INLINE dVector(const __m128i type)
+		:m_typeInt (type)
 	{
 	}
 
-	D_INLINE dVector(const __m128i type)
-		:m_typeInt (type)
+	D_INLINE dVector(const __m128 type)
+		: m_type(type)
 	{
 	}
 
@@ -180,7 +180,8 @@ class dVector
 
 	D_INLINE dVector DotProduct(const dVector& A) const
 	{
-		return (*this * A).AddHorizontal();
+		dVector tmp(_mm_mul_ps(m_type, A.m_type));
+		return tmp.AddHorizontal();
 	}
 
 	D_INLINE dVector CrossProduct (const dVector& A, const dVector& B) const
@@ -836,7 +837,8 @@ class dVector
 		// return dot 4d dot product
 		D_INLINE dBigVector DotProduct(const dBigVector &A) const
 		{
-			return (*this * A).AddHorizontal();
+			dBigVector tmp(_mm256_mul_pd(m_type, A.m_type));
+			return tmp.AddHorizontal();
 		}
 
 		D_INLINE dBigVector CrossProduct(const dBigVector& A, const dBigVector& B) const
@@ -1350,7 +1352,8 @@ class dVector
 		// return dot 4d dot product
 		D_INLINE dBigVector DotProduct(const dBigVector &A) const
 		{
-			return (*this * A).AddHorizontal();
+			dBigVector tmp(_mm_mul_pd(m_typeLow, A.m_typeLow), _mm_mul_pd(m_typeHigh, A.m_typeHigh));
+			return tmp.AddHorizontal();
 		}
 
 		D_INLINE dBigVector CrossProduct(const dBigVector& A, const dBigVector& B) const

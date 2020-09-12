@@ -24,17 +24,16 @@
 
 #include "ndNewtonStdafx.h"
 
-//#define	D_BODY_LRU_STEP					2	
-//#define	D_MAX_SKELETON_JOINT_COUNT		256
+//#define D_BODY_LRU_STEP					2	
+//#define D_MAX_SKELETON_JOINT_COUNT		256
 //#define D_MAX_CONTINUE_COLLISON_STEPS	8
-//#define	D_SMALL_ISLAND_COUNT			32
-//#define	D_FREEZZING_VELOCITY_DRAG		dFloat32 (0.9f)
-#define	D_SOLVER_MAX_ERROR					(D_FREEZE_MAG * dFloat32 (0.5f))
+#define D_SMALL_ISLAND_COUNT			32
+#define	D_FREEZZING_VELOCITY_DRAG		dFloat32 (0.9f)
+#define	D_SOLVER_MAX_ERROR				(D_FREEZE_MAG * dFloat32 (0.5f))
 
-#if 0
-#define DG_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
-#define DG_PARALLEL_JOINT_COUNT_CUT_OFF		(64)
-//#define DG_PARALLEL_JOINT_COUNT_CUT_OFF	(2)
+//#define D_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
+//#define D_PARALLEL_JOINT_COUNT_CUT_OFF	(64)
+//#define D_PARALLEL_JOINT_COUNT_CUT_OFF	(2)
 
 // the solver is a RK order 4, but instead of weighting the intermediate derivative by the usual 1/6, 1/3, 1/3, 1/6 coefficients
 // I am using 1/4, 1/4, 1/4, 1/4.
@@ -47,146 +46,6 @@
 // but it allows for simpler calculation of the intermediate derivatives and also for less intermediate memory.
 // For more detail on the derivation of the Runge Kutta coefficients you can go to:  
 // http://pathfinder.scar.utoronto.ca/~dyer/csca57/book_P/node51.html
-
-class dgBody;
-class dgDynamicBody;
-class dgWorldDynamicUpdateSyncDescriptor;
-
-class dgClusterCallbackStruct
-{
-	public:
-	dgWorld* m_world;
-	dInt32 m_count;
-	dInt32 m_strideInByte;
-	void* m_bodyArray;
-};
-
-class dgBodyInfo
-{
-	public:
-	dgBody* m_body;
-};
-
-class dgJointInfo
-{
-	public:
-	union 
-	{
-		struct
-		{
-			dgBody* m_body;
-			dInt32 m_bodyCount;
-			dInt32 m_jointCount;
-			dInt32 m_setId;
-			dInt32 m_unUsed;
-		};
-		struct 
-		{
-			dgConstraint* m_joint;
-			dInt32 m_m0;
-			dInt32 m_m1;
-			dInt32 m_pairStart;
-			dInt32 m_pairCount;
-		};
-	};
-	dFloat32 m_preconditioner0;
-	dFloat32 m_preconditioner1;
-};
-
-class dgBodyJacobianPair
-{
-	public:
-	dInt32 m_bodyIndex;
-	dInt32 m_JointIndex;
-};
-
-class dgBodyCluster
-{
-	public:
-	dInt32 m_bodyCount;
-	dInt32 m_jointCount;
-	dInt32 m_rowCount;
-	dInt32 m_bodyStart;
-	dInt32 m_jointStart;	
-	dInt32 m_rowStart;
-	dgInt16 m_hasSoftBodies;
-	dgInt16 m_isContinueCollision;
-};
-
-class dgJointImpulseInfo
-{
-	public:
-	dgContact* m_joint;
-	dInt32 m_m0;
-	dInt32 m_m1;
-	dInt32 m_pairStart;
-	dInt32 m_pairCount;
-	dInt32 m_rhsStart;
-};
-
-template<class T>
-class dgQueue
-{
-	public:
-	dgQueue (T* const pool, dInt32 size)
-		:m_pool (pool)
-	{
-		m_mod = size;
-		m_lastIndex = 0;
-		m_firstIndex = 0;
-	}
-
-	void Insert (T info) 
-	{
-		m_pool[m_firstIndex] = info;
-		m_firstIndex ++;
-		if (m_firstIndex >= m_mod) {
-			m_firstIndex = 0;
-		}
-		dgAssert (m_firstIndex != m_lastIndex);
-	}
-
-	T Remove () 
-	{
-		dgAssert (m_firstIndex != m_lastIndex);
-
-		T element = m_pool[m_lastIndex];
-		m_lastIndex ++;
-		if (m_lastIndex >= m_mod) {
-			m_lastIndex = 0;
-		}
-		
-		return element;
-	}
-
-	void Reset ()
-	{
-		m_lastIndex = m_firstIndex;
-	}
-
-	bool IsEmpty () const 
-	{
-		return (m_firstIndex == m_lastIndex);
-	}
-
-	dInt32 m_mod;
-	dInt32 m_firstIndex;
-	dInt32 m_lastIndex;
-	T* m_pool;
-};
-
-
-class dgJacobianMemory
-{
-	public:
-	dgJacobianMemory() {}
-	void Init (dgWorld* const world, dInt32 rowsCount, dInt32 bodyCount);
-
-	dgJacobian* m_internalForcesBuffer;
-	dgLeftHandSide* m_leftHandSizeBuffer;
-	dgRightHandSide* m_righHandSizeBuffer;
-};
-#endif
 
 D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdate
@@ -252,6 +111,7 @@ class ndDynamicsUpdate
 	static dInt32 CompareIslandBodies(const ndBodyIndexPair* const  A, const ndBodyIndexPair* const B, void* const context);
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
+	dVector m_velocTol;
 	dArray<ndIsland> m_islands;
 	dArray<ndBodyKinematic*> m_bodyIslands;
 	dArray<ndJacobian> m_internalForces;
@@ -273,7 +133,6 @@ class ndDynamicsUpdate
 	dUnsigned32 m_solverPasses;
 	dUnsigned32 m_maxRowsCount;
 	dAtomic<dUnsigned32> m_rowsCount;
-
 } D_GCC_NEWTON_ALIGN_32;
 
 
