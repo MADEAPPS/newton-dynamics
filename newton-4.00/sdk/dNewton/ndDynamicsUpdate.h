@@ -210,15 +210,15 @@ class ndDynamicsUpdate
 	{
 		public:
 		ndIsland(ndBodyKinematic* const root)
-			:m_root(root)
-			,m_start(0)
+			:m_start(0)
 			,m_count(0)
+			,m_root(root)
 		{
 		}
 
-		ndBodyKinematic* m_root;
 		dInt32 m_start;
 		dInt32 m_count;
+		ndBodyKinematic* m_root;
 	};
 
 	public:
@@ -226,9 +226,11 @@ class ndDynamicsUpdate
 	~ndDynamicsUpdate();
 	void DynamicsUpdate();
 
+	void Clear();
+
 	private:
 	void DefaultUpdate();
-
+	
 	void BuildIsland();
 	void InitWeights();
 	void InitBodyArray();
@@ -240,6 +242,8 @@ class ndDynamicsUpdate
 	void IntegrateBodiesVelocity();
 	void CalculateJointsAcceleration();
 
+	void DetermineSleepStates();
+	void UpdateIslandState(const ndIsland& island);
 	void BuildJacobianMatrix(ndConstraint* const joint);
 	dFloat32 CalculateJointsForce(ndConstraint* const joint);
 	dInt32 GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* const joint);

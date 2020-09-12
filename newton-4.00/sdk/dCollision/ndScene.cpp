@@ -1082,14 +1082,13 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 		ndContactPointList::dListNode* contactNode = nullptr;
 		for (dInt32 j = 0; j < count; j++) 
 		{
-			dAssert(0);
 			dVector v(cachePosition[j] - contactArray[i].m_point);
 			dAssert(v.m_w == dFloat32(0.0f));
 			diff = v.DotProduct(v).GetScalar();
 			if (diff < min) 
 			{
-				min = diff;
 				index = j;
+				min = diff;
 				contactNode = nodes[j];
 			}
 		}
