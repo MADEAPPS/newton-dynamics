@@ -48,20 +48,20 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API virtual ~ndBodyDynamic ();
 	D_NEWTON_API virtual ndBodyDynamic* GetAsBodyDynamic() { return this; }
 	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep);
-	D_NEWTON_API void AddDampingAcceleration(dFloat32 timestep);
+	D_NEWTON_API virtual void AddDampingAcceleration(dFloat32 timestep);
 	D_NEWTON_API virtual void IntegrateVelocity(dFloat32 timestep);
 
 	D_NEWTON_API void SetForce(const dVector& force);
 	D_NEWTON_API void SetTorque(const dVector& torque);
 
-	dVector GetForce() const;
-	dVector GetToque() const;
+	virtual dVector GetForce() const;
+	virtual dVector GetTorque() const;
 
 	dVector GetAccel() const;
-	void SetAccel(const dVector& accel);
+	virtual void SetAccel(const dVector& accel);
 
 	dVector GetAlpha() const;
-	void SetAlpha(const dVector& alpha);
+	virtual void SetAlpha(const dVector& alpha);
 
 	ndJacobian IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep);
 
@@ -84,12 +84,10 @@ inline dVector ndBodyDynamic::GetForce() const
 	return m_externalForce;
 }
 
-
-inline dVector ndBodyDynamic::GetToque() const
+inline dVector ndBodyDynamic::GetTorque() const
 {
 	return m_externalTorque;
 }
-
 
 inline dVector ndBodyDynamic::GetAccel() const
 {
@@ -110,7 +108,6 @@ inline void ndBodyDynamic::SetAlpha(const dVector& alpha)
 {
 	m_alpha = alpha;
 }
-
 
 #endif 
 

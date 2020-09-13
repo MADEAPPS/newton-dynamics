@@ -171,7 +171,7 @@ count = 1;
 	}
 }
 
-void BuildSphere(ndWorld& world, dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count)
+void BuildSphere(ndWorld& world, dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
 {
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
@@ -183,6 +183,8 @@ void BuildSphere(ndWorld& world, dFloat32 mass, const dVector& origin, const dFl
 
 	dVector floor(FindFloor(world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f;
+
+matrix.m_posit.m_y += xxxx;
 
 	// get the dimension from shape itself
 	dVector minP(0.0f);
@@ -221,9 +223,10 @@ int main (int argc, const char * argv[])
 	dVector origin(0.0f, 0.0f, 0.0f, 0.0f);
 	BuildFloor(world);
 	//BuildPyramid(world, 10.0f, origin, size, 20);
-	BuildSphere(world, 1.0f, origin + dVector(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1);
-	BuildSphere(world, 1.0f, origin + dVector(3.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1);
-	//BuildSphere(world, 1.0f, origin + dVector(3.0f, 0.0f, 3.0f, 0.0f), 1.0f, 4);
+	BuildSphere(world, 1.0f, origin + dVector(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 2, 0.0f);
+	BuildSphere(world, 1.0f, origin + dVector(3.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 1.0f);
+	BuildSphere(world, 1.0f, origin + dVector(6.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
+	BuildSphere(world, 1.0f, origin + dVector(9.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
 	
 	static dFloat32 totalTime = 0;
 	for (int i = 0; i < 10000; i ++)

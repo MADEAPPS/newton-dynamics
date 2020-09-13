@@ -83,11 +83,16 @@ class ndBodyKinematic: public ndBody
 	virtual ndBodyKinematic* GetAsBodyKinematic() { return this; }
 	virtual ndSkeletonContainer* GetSkeleton() const { return nullptr; }
 
+	virtual dVector GetForce() const;
+	virtual dVector GetTorque() const;
+	virtual void SetAccel(const dVector& accel);
+	virtual void SetAlpha(const dVector& alpha);
+
 	private:
 	D_COLLISION_API void SetMassMatrix(dFloat32 mass, const dMatrix& inertia);
 
 	protected:
-	void UpdateGyroData();
+	D_COLLISION_API void UpdateGyroData();
 	void UpdateCollisionMatrix();
 	void SetBroadPhase(ndScene* const broadPhase, dList<ndBodyKinematic*>::dListNode* const node);
 
@@ -96,6 +101,9 @@ class ndBodyKinematic: public ndBody
 
 	ndSceneAggregate* GetBroadPhaseAggregate() const;
 	void SetBroadPhaseAggregate(ndSceneAggregate* const node);
+
+	virtual void AddDampingAcceleration(dFloat32 timestep);
+	D_COLLISION_API void IntegrateExternalForce(dFloat32 timestep);
 
 	dMatrix m_invWorldInertiaMatrix;
 	ndShapeInstance m_shapeInstance;
@@ -205,6 +213,27 @@ inline void ndBodyKinematic::SetBroadPhaseBodyNode(ndSceneBodyNode* const node)
 	m_sceneBodyBodyNode = node;
 }
 
+inline dVector ndBodyKinematic::GetForce() const
+{
+	return dVector::m_zero;
+}
+
+inline dVector ndBodyKinematic::GetTorque() const
+{
+	return dVector::m_zero;
+}
+
+inline void ndBodyKinematic::SetAccel(const dVector& accel)
+{
+}
+
+inline void ndBodyKinematic::SetAlpha(const dVector& alpha)
+{
+}
+
+inline void ndBodyKinematic::AddDampingAcceleration(dFloat32 timestep)
+{
+}
 
 #endif 
 

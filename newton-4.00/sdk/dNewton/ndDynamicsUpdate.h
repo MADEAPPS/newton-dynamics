@@ -100,6 +100,7 @@ class ndDynamicsUpdate
 	void CalculateJointsForce();
 	void IntegrateBodiesVelocity();
 	void CalculateJointsAcceleration();
+	void IntegrateUnconstrainedBodies();
 
 	void DetermineSleepStates();
 	void UpdateIslandState(const ndIsland& island);
@@ -113,7 +114,7 @@ class ndDynamicsUpdate
 
 	dVector m_velocTol;
 	dArray<ndIsland> m_islands;
-	dArray<ndBodyKinematic*> m_bodyIslands;
+	dArray<ndBodyKinematic*> m_bodyIslandOrder;
 	dArray<ndJacobian> m_internalForces;
 	dArray<ndJacobian> m_internalForcesBack;
 	dArray<ndConstraint*> m_jointArray;
@@ -132,6 +133,7 @@ class ndDynamicsUpdate
 	dFloat32 m_invTimestepRK;
 	dUnsigned32 m_solverPasses;
 	dUnsigned32 m_maxRowsCount;
+	dInt32 m_unConstrainedBodyCount;
 	dAtomic<dUnsigned32> m_rowsCount;
 } D_GCC_NEWTON_ALIGN_32;
 

@@ -429,3 +429,97 @@ void ndBodyKinematic::IntegrateVelocity(dFloat32 timestep)
 	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
 	dAssert(m_matrix.TestOrthogonal());
 }
+
+void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
+{
+	if (!m_equilibrium && (m_invMass.m_w > dFloat32(0.0f)))
+	{
+		UpdateGyroData();
+		AddDampingAcceleration(timestep);
+		if ((dAbs(m_invMass.m_x - m_invMass.m_y) < dFloat32(1.0e-1f)) &&
+			(dAbs(m_invMass.m_x - m_invMass.m_z) < dFloat32(1.0e-1f)))
+		{
+			const dVector accel(GetForce().Scale(m_invMass.m_w));
+			const dVector alpha(GetTorque().Scale(m_invMass.m_x));
+			SetAccel(accel);
+			SetAlpha(alpha);
+			m_veloc += accel.Scale(timestep);
+			m_omega += alpha.Scale(timestep);
+		}
+		else
+		{
+			// using simple backward Euler or implicit integration, this is. 
+			// f'(t + dt) = (f(t + dt) - f(t)) / dt  
+
+			// therefore: 
+			// f(t + dt) = f(t) + f'(t + dt) * dt
+
+			// approximate f'(t + dt) by expanding the Taylor of f(w + dt)
+			// f(w + dt) = f(w) + f'(w) * dt + f''(w) * dt^2 / 2! + ....
+
+			// assume dt^2 is negligible, therefore we can truncate the expansion to
+			// f(w + dt) ~= f(w) + f'(w) * dt
+
+			// calculating dw as the  f'(w) = d(wx, wy, wz) | dt
+			// dw/dt = a = (Tl - (wl x (wl * Il)) * Il^1
+
+			// expanding f(w) 
+			// f'(wx) = Ix * ax = Tx - (Iz - Iy) * wy * wz 
+			// f'(wy) = Iy * ay = Ty - (Ix - Iz) * wz * wx
+			// f'(wz) = Iz * az = Tz - (Iy - Ix) * wx * wy
+			//
+			// calculation the expansion 
+			// Ix * ax = (Tx - (Iz - Iy) * wy * wz) - ((Iz - Iy) * wy * az + (Iz - Iy) * ay * wz) * dt
+			// Iy * ay = (Ty - (Ix - Iz) * wz * wx) - ((Ix - Iz) * wz * ax + (Ix - Iz) * az * wx) * dt
+			// Iz * az = (Tz - (Iy - Ix) * wx * wy) - ((Iy - Ix) * wx * ay + (Iy - Ix) * ax * wy) * dt   
+			//
+			// factorizing a we get
+			// Ix * ax + (Iz - Iy) * dwy * az + (Iz - Iy) * dwz * ay = Tx - (Iz - Iy) * wy * wz
+			// Iy * ay + (Ix - Iz) * dwz * ax + (Ix - Iz) * dwx * az = Ty - (Ix - Iz) * wz * wx
+			// Iz * az + (Iy - Ix) * dwx * ay + (Iy - Ix) * dwy * ax = Tz - (Iy - Ix) * wx * wy
+
+			const dVector torque(GetTorque());
+			dVector localOmega(m_matrix.UnrotateVector(m_omega));
+			const dVector localTorque(m_matrix.UnrotateVector(torque - m_gyroTorque));
+
+			// and solving for alpha we get the angular acceleration at t + dt
+			// calculate gradient at a full time step
+			dVector gradientStep(localTorque.Scale(timestep));
+
+			// derivative at half time step. (similar to midpoint Euler so that it does not loses too much energy)
+			const dVector dw(localOmega.Scale(dFloat32(0.5f) * timestep));
+			//dVector dw(localOmega.Scale(dFloat32(1.0f) * timestep));
+
+			// calculates Jacobian matrix (
+			//		dWx / dwx, dWx / dwy, dWx / dwz
+			//		dWy / dwx, dWy / dwy, dWy / dwz
+			//		dWz / dwx, dWz / dwy, dWz / dwz
+			//		
+			//		dWx / dwx = Ix, dWx / dwy = (Iz - Iy) * wz * dt, dWx / dwz = (Iz - Iy) * wy * dt)
+			//		dWy / dwx = (Ix - Iz) * wz * dt, dWy / dwy = Iy, dWy / dwz = (Ix - Iz) * wx * dt
+			//		dWz / dwx = (Iy - Ix) * wy * dt, dWz / dwy = (Iy - Ix) * wx * dt, dWz / dwz = Iz
+			const dMatrix jacobianMatrix(
+				dVector(m_mass[0], (m_mass[2] - m_mass[1]) * dw[2], (m_mass[2] - m_mass[1]) * dw[1], dFloat32(0.0f)),
+				dVector((m_mass[0] - m_mass[2]) * dw[2], m_mass[1], (m_mass[0] - m_mass[2]) * dw[0], dFloat32(0.0f)),
+				dVector((m_mass[1] - m_mass[0]) * dw[1], (m_mass[1] - m_mass[0]) * dw[0], m_mass[2], dFloat32(0.0f)),
+				dVector::m_wOne);
+
+			gradientStep = jacobianMatrix.SolveByGaussianElimination(gradientStep);
+
+			localOmega += gradientStep;
+
+			const dVector accel(GetForce().Scale(m_invMass.m_w));
+			const dVector alpha(m_matrix.RotateVector(localTorque * m_invMass));
+
+			SetAccel(accel);
+			SetAlpha(alpha);
+			m_veloc += accel.Scale(timestep);
+			m_omega = m_matrix.RotateVector(localOmega);
+		}
+	}
+	else
+	{
+		SetAccel(dVector::m_zero);
+		SetAlpha(dVector::m_zero);
+	}
+}

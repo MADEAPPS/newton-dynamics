@@ -272,6 +272,7 @@ void ndScene::BuildBodyArray()
 	for (ndBodyList::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyKinematic* const body = node->GetInfo();
+		body->m_bodyIsConstrained = 0;
 		if (body)
 		{
 			const ndShape* const shape = body->GetCollisionShape().GetShape()->GetAsShapeNull();
