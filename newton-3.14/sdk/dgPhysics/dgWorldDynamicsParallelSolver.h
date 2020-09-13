@@ -201,7 +201,7 @@ class dgParallelBodySolver
 	{
 		public:
 		dgFloat32 m_weight;
-		dgFloat32 m_invWeight;
+		//dgFloat32 m_invWeight;
 		dgInt32 m_lock;
 	};
 

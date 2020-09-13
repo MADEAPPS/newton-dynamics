@@ -118,7 +118,7 @@ void dgSolver::InitBodyArray()
 		m_world->QueueJob(InitBodyArrayKernel, this, NULL, "dgSolver::InitBodyArray");
 	}
 	m_world->SynchronizationBarrier();
-	m_bodyProxyArray->m_invWeight = dgFloat32 (1.0f);
+	//m_bodyProxyArray->m_invWeight = dgFloat32 (1.0f);
 }
 
 void dgSolver::InitBodyArrayKernel(void* const context, void* const, dgInt32 threadID)
@@ -145,7 +145,7 @@ void dgSolver::InitBodyArray(dgInt32 threadID)
 
 		const dgFloat32 w = bodyProxyArray[i].m_weight ? bodyProxyArray[i].m_weight : dgFloat32(1.0f);
 		bodyProxyArray[i].m_weight = w;
-		bodyProxyArray[i].m_invWeight = dgFloat32(1.0f) / w;
+		//bodyProxyArray[i].m_invWeight = dgFloat32(1.0f) / w;
 	}
 }
 
