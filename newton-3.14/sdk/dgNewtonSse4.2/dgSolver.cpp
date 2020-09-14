@@ -618,6 +618,7 @@ void dgSolver::CalculateJointsForce()
 		}
 		m_world->SynchronizationBarrier();
 		memcpy(internalForces, tempInternalForces, bodyCount * sizeof(dgJacobian));
+		accNorm = dgFloat32(0.0f);
 		for (dgInt32 i = 0; i < threadCounts; i++) {
 			accNorm = dgMax(accNorm, m_accelNorm[i]);
 		}
