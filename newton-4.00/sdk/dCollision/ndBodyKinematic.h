@@ -121,8 +121,9 @@ class ndBodyKinematic: public ndBody
 	ndSceneBodyNode* m_sceneBodyBodyNode;
 	ndSceneAggregate* m_sceneAggregateNode;
 
+	dFloat32 m_weight;
 	dInt32 m_rank;
-	dUnsigned32 m_index;
+	dInt32 m_index;
 
 	friend class ndScene;
 	friend class ndSceneMixed;

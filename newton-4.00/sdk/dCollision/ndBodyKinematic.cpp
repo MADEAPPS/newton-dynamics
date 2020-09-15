@@ -137,6 +137,8 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_sceneNode(nullptr)
 	,m_sceneBodyBodyNode(nullptr)
 	,m_sceneAggregateNode(nullptr)
+	,m_weight(dFloat32 (0.0f))
+	,m_rank(0)
 	,m_index(0)
 {
 	m_invWorldInertiaMatrix[3][3] = dFloat32(1.0f);
@@ -436,12 +438,15 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 	{
 		UpdateGyroData();
 		AddDampingAcceleration(timestep);
-		if ((dAbs(m_invMass.m_x - m_invMass.m_y) < dFloat32(1.0e-1f)) &&
-			(dAbs(m_invMass.m_x - m_invMass.m_z) < dFloat32(1.0e-1f)))
+		if (!m_gyroTorqueOn || 
+			((dAbs(m_invMass.m_x - m_invMass.m_y) < dFloat32(1.0e-1f)) &&
+			 (dAbs(m_invMass.m_x - m_invMass.m_z) < dFloat32(1.0e-1f))))
 		{
 			const dVector accel(GetForce().Scale(m_invMass.m_w));
-			const dVector alpha(GetTorque().Scale(m_invMass.m_x));
-			SetAccel(accel);
+			//const dVector alpha(GetTorque().Scale(m_invMass.m_x));
+			const dVector alpha (GetTorque() * m_invMass);
+			dAssert(alpha.m_w == dFloat32(0.0f));
+			SetAccel(accel.m_w);
 			SetAlpha(alpha);
 			m_veloc += accel.Scale(timestep);
 			m_omega += alpha.Scale(timestep);

@@ -202,7 +202,7 @@ matrix.m_posit.m_y += xxxx;
 		body->SetMassMatrix(mass, sphere);
 
 		world.AddBody(body);
-		matrix.m_posit += matrix.m_up.Scale(diameter);
+		matrix.m_posit += matrix.m_up.Scale(diameter * 0.99f);
 	}
 }
 
@@ -224,9 +224,9 @@ int main (int argc, const char * argv[])
 	BuildFloor(world);
 	//BuildPyramid(world, 10.0f, origin, size, 20);
 	BuildSphere(world, 1.0f, origin + dVector(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 2, 0.0f);
-	BuildSphere(world, 1.0f, origin + dVector(3.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 1.0f);
-	BuildSphere(world, 1.0f, origin + dVector(6.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
-	BuildSphere(world, 1.0f, origin + dVector(9.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
+	//BuildSphere(world, 1.0f, origin + dVector(3.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 1.0f);
+	//BuildSphere(world, 1.0f, origin + dVector(6.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
+	//BuildSphere(world, 1.0f, origin + dVector(9.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
 	
 	static dFloat32 totalTime = 0;
 	for (int i = 0; i < 10000; i ++)

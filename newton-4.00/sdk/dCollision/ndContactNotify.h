@@ -34,12 +34,12 @@ class ndMaterial
 	public:
 	ndMaterial()
 	{
-		m_restitution = dFloat32(0.35f);
+		m_restitution = dFloat32(0.4f);
 		m_staticFriction0 = dFloat32(0.8f);
 		m_staticFriction1 = dFloat32(0.8f);
 		m_dynamicFriction0 = dFloat32(0.4f);
 		m_dynamicFriction1 = dFloat32(0.4f);
-		m_softness = dFloat32(0.0f);
+		m_softness = dFloat32(0.1f);
 		m_skinThickness = dFloat32 (0.0f);
 		m_flags = m_collisionEnable | m_friction0Enable | m_friction1Enable;
 	}

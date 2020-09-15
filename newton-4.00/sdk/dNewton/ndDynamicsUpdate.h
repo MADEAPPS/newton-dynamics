@@ -51,13 +51,6 @@ D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdate
 {
 	public:
-	class ndBodyProxy
-	{
-		public:
-		dFloat32 m_weight;
-		dFloat32 m_invWeight;
-	};
-
 	class ndBodyIndexPair
 	{
 		public:
@@ -118,7 +111,6 @@ class ndDynamicsUpdate
 	dArray<ndJacobian> m_internalForces;
 	dArray<ndJacobian> m_internalForcesBack;
 	dArray<ndConstraint*> m_jointArray;
-	dArray<ndBodyProxy> m_bodyProxyArray;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
 	dFloat32 m_accelNorm[D_MAX_THREADS_COUNT];

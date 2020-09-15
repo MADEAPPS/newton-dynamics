@@ -101,6 +101,8 @@ void dThread::ThreadFunctionCallback()
 	wait(lock);
 	D_SET_TRACK_NAME(m_name);
    	
+	dFloatExceptions exception;
+
 	while (!Wait())
 	{
 		ThreadFunction();

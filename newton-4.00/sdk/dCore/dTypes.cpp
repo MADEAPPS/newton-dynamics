@@ -165,27 +165,32 @@ dUnsigned64 dGetTimeInMicrosenconds()
 
 dFloatExceptions::dFloatExceptions(dUnsigned32 mask)
 {
-#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+#if defined (WIN32)
 	dClearFP();
 	m_mask = dControlFP(0, 0);
 	dControlFP(m_mask & ~mask, _MCW_EM);
 #endif
 
 #ifdef _MACOSX_VER
-#ifndef IOS
-	fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
-#endif
-#elif (defined (_WIN_32_VER) || defined (_WIN_64_VER))
+	#ifndef IOS
+		fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
+	#endif
+#elif defined (WIN32)
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 #elif defined (_ARM_VER)
 	//_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
-#pragma message ("warning!!! do not forget to set flush to zero for arm cpus")
+	#pragma message ("warning!!! do not forget to set flush to zero for arm cpus")
 #endif
 
-	//	float a (1.0f);
-	//	float b (0.1f);
-	//	while (a != 0.0f)
-	//		a = a * b;
+	//dFloat32 a = dFloat32(1.0f);
+	//dFloat32 b = dFloat32(0.5f);
+	//dInt32 count = 0;
+	//while (a != 0.0f)
+	//{
+	//	a = a * b;
+	//	count++;
+	//}
+	//count++;
 }
 
 dFloatExceptions::~dFloatExceptions()

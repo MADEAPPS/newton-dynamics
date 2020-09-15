@@ -583,7 +583,8 @@ class dFloatExceptions
 	~dFloatExceptions();
 
 	private:
-	#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+	//#if (defined (_MSC_VER) && defined (_WIN_32_VER))
+	#if defined (_MSC_VER)
 		dUnsigned32 m_mask;
 	#endif
 };

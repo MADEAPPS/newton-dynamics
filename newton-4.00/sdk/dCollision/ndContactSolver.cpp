@@ -947,7 +947,8 @@ dInt32 ndContactSolver::ConvexToConvexContacts()
 			m_closestPoint1 += offset;
 			m_closestDistance = penetration;
 			m_separationDistance = penetration;
-		
+
+			penetration = -penetration;
 			count = dMin(m_maxCount, count);
 			ndContactPoint* const contactOut = m_contactBuffer;
 

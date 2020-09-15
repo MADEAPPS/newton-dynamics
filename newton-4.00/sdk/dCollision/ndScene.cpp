@@ -295,6 +295,7 @@ void ndScene::BuildBodyArray()
 				{
 					body->m_rank = 0;
 					body->m_index = index;
+					body->m_weight = dFloat32(0.0f);
 					body->m_islandParent = body;
 					m_tmpBodyArray[index] = body;
 					index++;
@@ -1235,6 +1236,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 		{
 			contact->m_sceneLru = m_lru;
 			contact->m_timeOfImpact = dFloat32(1.0e10f);
+			//contact->m_timeOfImpact = dFloat32(0.0f);
 		}
 		else 
 		{
@@ -1267,7 +1269,9 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 				CalculateJointContacts(threadIndex, contact);
 				if (contact->m_maxDOF) 
 				{
+					contact->m_active = true;
 					contact->m_timeOfImpact = dFloat32(1.0e10f);
+					//contact->m_timeOfImpact = dFloat32(0.0f);
 				}
 				contact->m_sceneLru = m_lru;
 			}
@@ -1288,13 +1292,14 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 	
 		if (active ^ contact->m_active) 
 		{
-			dAssert(0);
-	//		if (body0->GetInvMass().m_w) {
-	//			body0->m_equilibrium = false;
-	//		}
-	//		if (body1->GetInvMass().m_w) {
-	//			body1->m_equilibrium = false;
-	//		}
+			if (body0->GetInvMass() > dFloat32 (0.0f)) 
+			{
+				body0->m_equilibrium = false;
+			}
+			if (body1->GetInvMass() > dFloat32(0.0f))
+			{
+				body1->m_equilibrium = false;
+			}
 		}
 	}
 	else 
@@ -1660,16 +1665,17 @@ void ndScene::DeleteDeadContact()
 		ndContact* const contact = m_activeContacts[i];
 		if (contact->m_killContact) 
 		{
+			dAssert(0);
 			m_contactList.DeleteContact(contact);
+			//activeCount--;
+			m_activeContacts[i] = m_activeContacts[activeCount];
+		}
+		else if (!contact->m_active || !contact->m_maxDOF)
+		{
+			//constraintArray[activeCount].m_joint = contact;
 			activeCount--;
 			m_activeContacts[i] = m_activeContacts[activeCount];
 		}
-		//else if (contact->m_active && contact->m_maxDOF)
-		//{
-		//	dAssert(0);
-		//	constraintArray[activeCount].m_joint = contact;
-		//	activeCount++;
-		//}
 		//else if (contact->m_body0->m_continueCollisionMode | contact->m_body1->m_continueCollisionMode) 
 		//{
 		//	if (contact->EstimateCCD(timestep)) {

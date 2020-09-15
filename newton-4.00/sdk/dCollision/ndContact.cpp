@@ -92,7 +92,6 @@ dUnsigned32 ndContact::JacobianDerivative(ndConstraintDescritor& params)
 	{
 		dInt32 i = 0;
 		frictionIndex = m_contacPointsList.GetCount();
-		//for (dgList<dgContactMaterial>::dgListNode* node = GetFirst(); node; node = node->GetNext()) {
 		for (ndContactPointList::dListNode* node = m_contacPointsList.GetFirst(); node; node = node->GetNext())
 		{
 			const ndContactMaterial& contact = node->GetInfo();
@@ -171,7 +170,8 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& params, const n
 	{
 		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
-	
+return;
+
 	// first dir friction force
 	if (contact.m_material.m_flags & m_friction0Enable)
 	{
