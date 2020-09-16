@@ -182,14 +182,14 @@ void BuildSphere(ndWorld& world, dFloat32 mass, const dVector& origin, const dFl
 	ndShapeInstance sphere(new ndShapeSphere(diameter * 0.5f));
 
 	dVector floor(FindFloor(world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f;
+	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f * 0.99f;
 
 matrix.m_posit.m_y += xxxx;
 
 	// get the dimension from shape itself
-	dVector minP(0.0f);
-	dVector maxP(0.0f);
-	sphere.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
+	//dVector minP(0.0f);
+	//dVector maxP(0.0f);
+	//sphere.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
 
 //count = 1;
 	for (int i = 0; i < count; i++)

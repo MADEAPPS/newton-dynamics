@@ -28,7 +28,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-dUnsigned32 ndBody::m_uniqueIDCount = 0;
+dUnsigned32 ndBody::m_uniqueIDCount = 2;
 
 ndBody::ndBody()
 	:m_matrix(dGetIdentityMatrix())

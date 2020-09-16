@@ -57,6 +57,9 @@ void dgWorldDynamicUpdate::CalculateReactionForcesParallel(const dgBodyCluster* 
 	dgBodyInfo* const bodyArray = &world->m_bodiesMemory[m_bodies];
 	dgJointInfo* const jointArray = &world->m_jointsMemory[m_joints];
 
+	memset(m_parallelSolver.m_accelNorm, 0, sizeof(m_parallelSolver.m_accelNorm));
+	memset(m_parallelSolver.m_hasJointFeeback, 0, sizeof(m_parallelSolver.m_hasJointFeeback));
+
 	if (world->GetCurrentPlugin()) {
 		dgWorldPlugin* const plugin = world->GetCurrentPlugin()->GetInfo().m_plugin;
 		plugin->CalculateJointForces(cluster, bodyArray, jointArray, timestep);

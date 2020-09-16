@@ -170,7 +170,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& params, const n
 	{
 		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
-return;
+//return;
 
 	// first dir friction force
 	if (contact.m_material.m_flags & m_friction0Enable)
