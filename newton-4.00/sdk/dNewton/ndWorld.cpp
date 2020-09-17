@@ -42,6 +42,34 @@ ndWorld::ndWorld()
 	// start the engine thread;
 	//m_scene = new ndSceneMixed();
 	m_scene = new ndWorldMixedScene(this);
+
+	dInt32 steps = 1;
+	dFloat32 freezeAccel2 = m_freezeAccel2;
+	dFloat32 freezeAlpha2 = m_freezeAlpha2;
+	dFloat32 freezeSpeed2 = m_freezeSpeed2;
+	dFloat32 freezeOmega2 = m_freezeOmega2;
+	for (dInt32 i = 0; i < D_SLEEP_ENTRIES; i++) {
+		m_sleepTable[i].m_maxAccel = freezeAccel2;
+		m_sleepTable[i].m_maxAlpha = freezeAlpha2;
+		m_sleepTable[i].m_maxVeloc = freezeSpeed2;
+		m_sleepTable[i].m_maxOmega = freezeOmega2;
+		m_sleepTable[i].m_steps = steps;
+		steps += 7;
+		freezeAccel2 *= dFloat32(1.5f);
+		freezeAlpha2 *= dFloat32(1.5f);
+		freezeSpeed2 *= dFloat32(1.5f);
+		freezeOmega2 *= dFloat32(1.5f);
+	}
+
+	m_sleepTable[0].m_maxAccel *= dFloat32(0.009f);
+	m_sleepTable[0].m_maxAlpha *= dFloat32(0.009f);
+
+	steps += 300;
+	m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxAccel *= dFloat32(100.0f);
+	m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxAlpha *= dFloat32(100.0f);
+	m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxVeloc = 0.25f;
+	m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxOmega = 0.1f;
+	m_sleepTable[D_SLEEP_ENTRIES - 1].m_steps = steps;
 }
 
 ndWorld::~ndWorld()
@@ -111,7 +139,6 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	// update the collision system
 	m_scene->UpdateAabb();
 	m_scene->FindCollidingPairs();
-	m_scene->AttachNewContact();
 	m_scene->CalculateContacts();
 	m_scene->DeleteDeadContact();
 

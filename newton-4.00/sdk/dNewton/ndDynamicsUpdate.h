@@ -51,6 +51,16 @@ D_MSV_NEWTON_ALIGN_32
 class ndDynamicsUpdate
 {
 	public:
+	class dgSolverProgressiveSleepEntry
+	{
+		public:
+		dFloat32 m_maxAccel;
+		dFloat32 m_maxAlpha;
+		dFloat32 m_maxVeloc;
+		dFloat32 m_maxOmega;
+		dInt32 m_steps;
+	};
+
 	class ndBodyIndexPair
 	{
 		public:

@@ -88,14 +88,12 @@ class ndBodyKinematic::ndContactkey
 
 ndBodyKinematic::ndContactMap::ndContactMap()
 	:dTree<ndContact*, ndContactkey, dContainersFreeListAlloc<ndContact*>>()
-	,m_lock()
 {
 }
 
 ndContact* ndBodyKinematic::ndContactMap::FindContact(const ndBody* const body0, const ndBody* const body1) const
 {
 	ndContactkey key(body0->GetId(), body1->GetId());
-	dScopeSpinLock lock(m_lock);
 	dTreeNode* const node = Find(key);
 	return node ? node->GetInfo() : nullptr;
 }
@@ -105,9 +103,7 @@ void ndBodyKinematic::ndContactMap::AttachContact(ndContact* const contact)
 	ndBody* const body0 = contact->GetBody0();
 	ndBody* const body1 = contact->GetBody1();
 	ndContactkey key(body0->GetId(), body1->GetId());
-	dScopeSpinLock lock(m_lock);
 	dAssert(!Find(key));
-	//dAssert(!(key == ndContactkey(208, 209)));
 	Insert(contact, key);
 }
 
@@ -116,7 +112,6 @@ void ndBodyKinematic::ndContactMap::DetachContact(ndContact* const contact)
 	ndBody* const body0 = contact->GetBody0();
 	ndBody* const body1 = contact->GetBody1();
 	ndContactkey key(body0->GetId(), body1->GetId());
-	dScopeSpinLock lock(m_lock);
 	dAssert(Find(key));
 	Remove(key);
 }
@@ -188,12 +183,14 @@ ndContact* ndBodyKinematic::FindContact(const ndBody* const otherBody) const
 void ndBodyKinematic::AttachContact(ndContact* const contact)
 {
 	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
+	m_equilibrium = 0;
 	m_contactList.AttachContact(contact);
 }
 
 void ndBodyKinematic::DetachContact(ndContact* const contact)
 {
 	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
+	m_equilibrium = 0;
 	m_contactList.DetachContact(contact);
 }
 

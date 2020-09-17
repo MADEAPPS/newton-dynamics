@@ -94,10 +94,11 @@ class ndScene
 	bool ValidateContactCache(ndContact* const contact, const dVector& timestep) const;
 	dFloat32 CalculateSurfaceArea(const ndSceneNode* const node0, const ndSceneNode* const node1, dVector& minBox, dVector& maxBox) const;
 
-	virtual void FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body) = 0;
+	virtual void FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body, bool oneWay) = 0;
+
 	D_COLLISION_API virtual void UpdateAabb(dInt32 threadIndex, ndBodyKinematic* const body);
 	D_COLLISION_API virtual void UpdateTransform(dInt32 threadIndex, ndBodyKinematic* const body);
-	D_COLLISION_API virtual void CalculateContacts(dInt32 threadIndex, ndContact* const contact); \
+	D_COLLISION_API virtual void CalculateContacts(dInt32 threadIndex, ndContact* const contact); 
 
 	void CalculateJointContacts(dInt32 threadIndex, ndContact* const contact);
 	void ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContactSolver* const contactSolver);
@@ -116,7 +117,6 @@ class ndScene
 	D_COLLISION_API ndScene();
 	
 	D_COLLISION_API void BuildBodyArray();
-	D_COLLISION_API void AttachNewContact();
 	D_COLLISION_API void UpdateAabb();
 	D_COLLISION_API void TransformUpdate();
 	D_COLLISION_API void CalculateContacts();
@@ -147,6 +147,7 @@ class ndScene
 	ndSceneNode* m_rootNode;
 	ndContactNotify* m_contactNotifyCallback;
 	dFloat32 m_timestep;
+	dAtomic<dUnsigned32> m_sleepBodies;
 	dUnsigned32 m_lru;
 	bool m_fullScan;
 

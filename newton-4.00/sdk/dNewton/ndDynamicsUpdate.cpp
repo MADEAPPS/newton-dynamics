@@ -70,9 +70,12 @@ void ndDynamicsUpdate::DynamicsUpdate()
 	m_timestep = m_world->GetScene()->GetTimestep();
 
 	BuildIsland();
-	IntegrateUnconstrainedBodies();
-	DefaultUpdate();
-	DetermineSleepStates();
+	if (m_islands.GetCount())
+	{
+		IntegrateUnconstrainedBodies();
+		DefaultUpdate();
+		DetermineSleepStates();
+	}
 }
 
 void ndDynamicsUpdate::DefaultUpdate()
@@ -170,6 +173,21 @@ void ndDynamicsUpdate::BuildIsland()
 					dAssert(root0->m_rank <= 6);
 				}
 			}
+
+			const dInt32 sleep = body0->m_islandSleep & body1->m_islandSleep;
+			if (!sleep)
+			{
+				dAssert(root0->m_islandParent == root0);
+				root0->m_islandSleep = 0;
+			}
+		}
+		else
+		{
+			if (!body0->m_islandSleep)
+			{
+				ndBodyKinematic* const root = FindRootAndSplit(body1);
+				root->m_islandSleep = 0;
+			}
 		}
 	}
 
@@ -182,65 +200,70 @@ void ndDynamicsUpdate::BuildIsland()
 	for (dInt32 i = bodyArray.GetCount() - 1; i >= 0; i--)
 	{
 		ndBodyKinematic* const body = bodyArray[i];
-		buffer[count].m_body = body;
-
-		if (body->GetInvMass() > dFloat32(0.0f))
+		if (!body->m_islandSleep)
 		{
-			ndBodyKinematic* root = body->m_islandParent;
-			while (root != root->m_islandParent)
+			buffer[count].m_body = body;
+			if (body->GetInvMass() > dFloat32(0.0f))
 			{
-				root = root->m_islandParent;
-			}
+				ndBodyKinematic* root = body->m_islandParent;
+				while (root != root->m_islandParent)
+				{
+					root = root->m_islandParent;
+				}
 
-			buffer[count].m_root = root;
-			if (root->m_rank != -1)
-			{
-				root->m_rank = -1;
+				buffer[count].m_root = root;
+				if (root->m_rank != -1)
+				{
+					root->m_rank = -1;
+				}
 			}
+			else
+			{
+				buffer[count].m_root = body;
+				body->m_rank = -1;
+			}
+			count++;
 		}
-		else
-		{
-			buffer[count].m_root = body;
-			body->m_rank = -1;
-		}
-		count++;
 	}
-
-	dSort(buffer, count, CompareIslandBodies);
 
 	if (m_bodyIslandOrder.GetCapacity() < 256)
 	{
 		m_islands.Resize(256);
 		m_bodyIslandOrder.Resize(256);
 	}
-
 	m_islands.SetCount(0);
 	m_bodyIslandOrder.SetCount(count);
-	for (dInt32 i = 0; i < count; i++)
+	m_unConstrainedBodyCount = 0;
+	if (count)
 	{
-		m_bodyIslandOrder[i] = buffer[i].m_body;
-		if (buffer[i].m_root->m_rank == -1)
+		dSort(buffer, count, CompareIslandBodies);
+
+		for (dInt32 i = 0; i < count; i++)
 		{
-			buffer[i].m_root->m_rank = 0;
-			ndIsland island(buffer[i].m_root);
-			m_islands.PushBack(island);
+			m_bodyIslandOrder[i] = buffer[i].m_body;
+			if (buffer[i].m_root->m_rank == -1)
+			{
+				buffer[i].m_root->m_rank = 0;
+				ndIsland island(buffer[i].m_root);
+				m_islands.PushBack(island);
+			}
+			buffer[i].m_root->m_rank += 1;
 		}
-		buffer[i].m_root->m_rank += 1;
-	}
 
-	dInt32 start = 0;
-	dInt32 unConstrainedCount = 0;
-	for (dInt32 i = 0; i < m_islands.GetCount(); i++)
-	{
-		ndIsland& island = m_islands[i];
-		island.m_start = start;
-		island.m_count = island.m_root->m_rank;
-		start += island.m_count;
-		unConstrainedCount += island.m_root->m_bodyIsConstrained ? 0 : 1;
-	}
+		dInt32 start = 0;
+		dInt32 unConstrainedCount = 0;
+		for (dInt32 i = 0; i < m_islands.GetCount(); i++)
+		{
+			ndIsland& island = m_islands[i];
+			island.m_start = start;
+			island.m_count = island.m_root->m_rank;
+			start += island.m_count;
+			unConstrainedCount += island.m_root->m_bodyIsConstrained ? 0 : 1;
+		}
 
-	m_unConstrainedBodyCount = unConstrainedCount;
-	dSort(&m_islands[0], m_islands.GetCount(), CompareIslands);
+		m_unConstrainedBodyCount = unConstrainedCount;
+		dSort(&m_islands[0], m_islands.GetCount(), CompareIslands);
+	}
 }
 
 void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
@@ -1101,7 +1124,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 	dInt32 sleepCounter = 10000;
 	
 	ndBodyKinematic** const bodyIslands = &m_world->m_bodyIslandOrder[island.m_start];
-	for (dInt32 i = 0; i < island.m_count; i++)
+	for (dInt32 i = 0; i < count; i++)
 	{
 		ndBodyDynamic* const body = bodyIslands[i]->GetAsBodyDynamic();
 		dAssert(body);
@@ -1160,61 +1183,74 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 	}
 	else 
 	{
-		dAssert(0);
-//		bool state = 
-//			(maxAccel > m_world->m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxAccel) ||
-//			(maxAlpha > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxAlpha) ||
-//			(maxSpeed > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxVeloc) ||
-//			(maxOmega > world->m_sleepTable[DG_SLEEP_ENTRIES - 1].m_maxOmega);
-//		if (state) {
-//			for (dInt32 i = 0; i < count; i++) {
-//				dgBody* const body = bodyArray[i].m_body;
-//				if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-//					dgDynamicBody* const dynBody = (dgDynamicBody*)body;
-//					dynBody->m_sleepingCounter = 0;
-//				}
-//			}
-//		}
-//		else {
-//			if (count < DG_SMALL_ISLAND_COUNT) {
-//				// delay small islands for about 10 seconds
-//				sleepCounter >>= 8;
-//				for (dInt32 i = 0; i < count; i++) {
-//					dgBody* const body = bodyArray[i].m_body;
-//					body->m_equilibrium = 0;
-//				}
-//			}
-//			dInt32 timeScaleSleepCount = dInt32(dFloat32(60.0f) * sleepCounter * timestep);
-//
-//			dInt32 index = DG_SLEEP_ENTRIES;
-//			for (dInt32 i = 1; i < DG_SLEEP_ENTRIES; i++) {
-//				if (world->m_sleepTable[i].m_steps > timeScaleSleepCount) {
-//					index = i;
-//					break;
-//				}
-//			}
-//			index--;
-//
-//			bool state1 = (maxAccel < world->m_sleepTable[index].m_maxAccel) &&
-//				(maxAlpha < world->m_sleepTable[index].m_maxAlpha) &&
-//				(maxSpeed < world->m_sleepTable[index].m_maxVeloc) &&
-//				(maxOmega < world->m_sleepTable[index].m_maxOmega);
-//			if (state1) {
-//				for (dInt32 i = 0; i < count; i++) {
-//					dgBody* const body = bodyArray[i].m_body;
-//					body->m_accel = dVector::m_zero;
-//					body->m_alpha = dVector::m_zero;
-//					body->m_veloc = dVector::m_zero;
-//					body->m_omega = dVector::m_zero;
-//					body->m_sleeping = body->m_autoSleep;
-//					// force entire island to equilibrium
-//					body->m_equilibrium = 1;
-//					if (body->IsRTTIType(dgBody::m_dynamicBodyRTTI)) {
-//						dgDynamicBody* const dynBody = (dgDynamicBody*)body;
-//						dynBody->m_sleepingCounter = 0;
-//					}
-//				}
-//			}
-//		}
+		const bool state = 
+			(maxAccel > m_world->m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxAccel) ||
+			(maxAlpha > m_world->m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxAlpha) ||
+			(maxSpeed > m_world->m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxVeloc) ||
+			(maxOmega > m_world->m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxOmega);
+
+		if (state) 
+		{
+			dAssert(0);
+			for (dInt32 i = 0; i < count; i++) 
+			{
+				ndBodyDynamic* const body = bodyIslands[i]->GetAsBodyDynamic();
+				dAssert(body);
+				if (body) 
+				{
+					body->m_sleepingCounter = 0;
+				}
+			}
+		}
+		else 
+		{
+			if (count < D_SMALL_ISLAND_COUNT) 
+			{
+				// delay small islands for about 10 seconds
+				sleepCounter >>= 8;
+				for (dInt32 i = 0; i < count; i++) 
+				{
+					ndBodyKinematic* const body = bodyIslands[i];
+					body->m_equilibrium = 0;
+				}
+			}
+			dInt32 timeScaleSleepCount = dInt32(dFloat32(60.0f) * sleepCounter * m_timestep);
+
+			dInt32 index = D_SLEEP_ENTRIES;
+			for (dInt32 i = 1; i < D_SLEEP_ENTRIES; i++) 
+			{
+				if (m_world->m_sleepTable[i].m_steps > timeScaleSleepCount) 
+				{
+					index = i;
+					break;
+				}
+			}
+			index--;
+
+			bool state1 = 
+				(maxAccel < m_world->m_sleepTable[index].m_maxAccel) &&
+				(maxAlpha < m_world->m_sleepTable[index].m_maxAlpha) &&
+				(maxSpeed < m_world->m_sleepTable[index].m_maxVeloc) &&
+				(maxOmega < m_world->m_sleepTable[index].m_maxOmega);
+			if (state1) 
+			{
+				for (dInt32 i = 0; i < count; i++) 
+				{
+					ndBodyKinematic* const body = bodyIslands[i];
+					body->m_veloc = dVector::m_zero;
+					body->m_omega = dVector::m_zero;
+					body->m_sleeping = body->m_autoSleep;
+					// force entire island to equilibrium
+					body->m_equilibrium = 1;
+					ndBodyDynamic* const dynBody = body->GetAsBodyDynamic();
+					if (dynBody)
+					{
+						dynBody->m_accel = dVector::m_zero;
+						dynBody->m_alpha = dVector::m_zero;
+						dynBody->m_sleepingCounter = 0;
+					}
+				}
+			}
+		}
 	}
 }

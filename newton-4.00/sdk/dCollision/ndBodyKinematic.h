@@ -40,8 +40,6 @@ class ndBodyKinematic: public ndBody
 		ndContact* FindContact(const ndBody* const body0, const ndBody* const body1) const;
 		void AttachContact(ndContact* const contact);
 		void DetachContact(ndContact* const contact);
-
-		mutable dSpinLock m_lock;
 	};
 
 	public:

@@ -30,7 +30,6 @@ class ndContactList: public dList<ndContact, dContainersFreeListAlloc<ndContact>
 	public:
 	ndContactList()
 		:dList<ndContact, dContainersFreeListAlloc<ndContact>>()
-		, m_lock()
 	{
 	}
 
@@ -41,9 +40,6 @@ class ndContactList: public dList<ndContact, dContainersFreeListAlloc<ndContact>
 	D_COLLISION_API void DeleteAllContacts();
 	D_COLLISION_API void DeleteContact(ndContact* const contact);
 	D_COLLISION_API ndContact* CreateContact(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
-	
-	private:
-	dSpinLock m_lock;
 };
 
 

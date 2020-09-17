@@ -224,11 +224,58 @@ void ndSceneMixed::BalanceBroadPhase()
 	UpdateFitness(m_fitness, m_treeEntropy, &m_rootNode);
 }
 
+void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body, bool oneWay)
+{
+	ndSceneNode* const leafNode = body->GetBroadPhaseBodyNode();
+
+	ndSceneAggregate* const aggregateNode = leafNode->GetAsBroadPhaseAggregate();
+	if (aggregateNode)
+	{
+		dAssert(0);
+		//aggregateNode->SubmitSelfPairs(timestep, threadID);
+	}
+
+
+	if (oneWay)
+	{
+		for (ndSceneNode* ptr = leafNode; ptr->m_parent; ptr = ptr->m_parent)
+		{
+			ndSceneTreeNode* const parent = ptr->m_parent->GetAsBroadPhaseTreeNode();
+			dAssert(!parent->GetAsBroadPhaseBodyNode());
+			dAssert(!parent->GetAsBroadPhaseAggregate());
+			ndSceneNode* const sibling = parent->m_right;
+			if (sibling != ptr)
+			{
+				SubmitPairs(leafNode, sibling);
+			}
+		}
+	}
+	else
+	{
+		for (ndSceneNode* ptr = leafNode; ptr->m_parent; ptr = ptr->m_parent)
+		{
+			ndSceneTreeNode* const parent = ptr->m_parent->GetAsBroadPhaseTreeNode();
+			dAssert(!parent->GetAsBroadPhaseBodyNode());
+			dAssert(!parent->GetAsBroadPhaseAggregate());
+			ndSceneNode* const rightSibling = parent->m_right;
+			if (rightSibling != ptr)
+			{
+				SubmitPairs(leafNode, rightSibling);
+			}
+			else 
+			{
+				SubmitPairs(leafNode, parent->m_left);
+			}
+		}
+	}
+}
+
+/*
 void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body)
 {
 	ndSceneNode* const leafNode = body->GetBroadPhaseBodyNode();
 
-	if (m_fullScan) 
+	if (m_fullScan)
 	{
 		ndSceneAggregate* const aggregateNode = leafNode->GetAsBroadPhaseAggregate();
 		if (aggregateNode)
@@ -236,20 +283,20 @@ void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const 
 			dAssert(0);
 			//aggregateNode->SubmitSelfPairs(timestep, threadID);
 		}
-		
-		for (ndSceneNode* ptr = leafNode; ptr->m_parent; ptr = ptr->m_parent) 
+
+		for (ndSceneNode* ptr = leafNode; ptr->m_parent; ptr = ptr->m_parent)
 		{
 			ndSceneTreeNode* const parent = ptr->m_parent->GetAsBroadPhaseTreeNode();
 			dAssert(!parent->GetAsBroadPhaseBodyNode());
 			ndSceneNode* const sibling = parent->m_right;
-			if (sibling != ptr) 
+			if (sibling != ptr)
 			{
 				//SubmitPairs(bodyNode, sibling, timestep, 0, threadIndex);
 				SubmitPairs(leafNode, sibling);
 			}
 		}
 	}
-	else 
+	else
 	{
 		dAssert(0);
 		//const dgBodyInfo* const bodyArray = &m_world->m_bodiesMemory[0];
@@ -277,6 +324,7 @@ void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const 
 		//}
 	}
 }
+*/
 
 dFloat32 ndSceneMixed::RayCast(ndRayCastNotify& callback, const dVector& q0, const dVector& q1) const
 {

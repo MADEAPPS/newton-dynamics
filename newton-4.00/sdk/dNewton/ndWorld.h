@@ -30,6 +30,8 @@ class ndBodyDynamic;
 
 #define D_NEWTON_ENGINE_VERSION 400
 
+#define D_SLEEP_ENTRIES			8
+
 D_MSV_NEWTON_ALIGN_32
 class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 {
@@ -87,6 +89,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	dFloat32 m_freezeAlpha2;
 	dFloat32 m_freezeSpeed2;
 	dFloat32 m_freezeOmega2;
+	dgSolverProgressiveSleepEntry m_sleepTable[D_SLEEP_ENTRIES];
 
 	dInt32 m_subSteps;
 	dInt32 m_solverIterations;
