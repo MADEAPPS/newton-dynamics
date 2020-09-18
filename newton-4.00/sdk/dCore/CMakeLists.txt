@@ -49,7 +49,7 @@ if (MSVC)
 endif(MSVC)
 
 target_include_directories(${projectName} PUBLIC .)
-if (NEWTON_BUILD_PROFILER AND NEWTON_BUILD_SHARED_LIBS)
+if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dProfiler)
 endif()
 

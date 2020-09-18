@@ -27,14 +27,14 @@ if(MSVC)
 	message (${CMAKE_EXE_LINKER_FLAGS})
 endif ()
 
-if (NEWTON_BUILD_PROFILER AND NEWTON_BUILD_SHARED_LIBS)
+if (NEWTON_BUILD_PROFILER)
 	include_directories(../../sdk/dProfiler/dProfiler/)
 endif ()
 
 add_executable(${projectName} ${CPP_SOURCE})
 target_link_libraries (${projectName} ndCore ndCollision ndNewton)
 
-if (NEWTON_BUILD_PROFILER AND NEWTON_BUILD_SHARED_LIBS)
+if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dProfiler)
 endif ()
 

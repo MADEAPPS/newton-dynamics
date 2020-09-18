@@ -22,8 +22,6 @@ add_subdirectory(dNewton)
 add_subdirectory(dCollision)
 add_subdirectory(thirdParty)
 
-#add_subdirectory(ntNewton)
-
 #if(NOT NEWTON_BUILD_CORE_ONLY)
 #	add_subdirectory(dMath)
 #	add_subdirectory(dScene)
@@ -35,7 +33,7 @@ add_subdirectory(thirdParty)
 #	add_subdirectory(dCustomJoints)
 #endif()
 
-if (NEWTON_BUILD_PROFILER AND NEWTON_BUILD_SHARED_LIBS)
+if (NEWTON_BUILD_PROFILER)
 	add_subdirectory(dProfiler)
 endif()
 
