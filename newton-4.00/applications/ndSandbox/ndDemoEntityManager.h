@@ -161,10 +161,6 @@ class ndDemoEntityManager
 	void ApplyMenuOptions();
 	void LoadDemo(int menu);
 	
-
-	
-	bool m_mousePressed[3];
-
 	DemoEntity* m_sky;
 	NewtonWorld* m_world;
 	DemoCameraManager* m_cameraManager;
@@ -248,6 +244,7 @@ class ndDemoEntityManager
 
 	int	m_defaultFont;
 	bool m_hasJoytick;
+	bool m_mousePressed[3];
 };
 
 #if 0

@@ -1348,7 +1348,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	glfwSetMouseButtonCallback(m_mainFrame, MouseButtonCallback);
 
 	LoadFont();
-#if 0
+
 	m_mousePressed[0] = false;
 	m_mousePressed[1] = false;
 	m_mousePressed[2] = false;
@@ -1369,24 +1369,22 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//	m_showJointDebugInfo = true;
 	//	m_collisionDisplayMode = 2;
 	//	m_showListenersDebugInfo = true;
-	m_asynchronousPhysicsUpdate = true;
+	//  m_asynchronousPhysicsUpdate = true;
 
-	Cleanup();
-	ResetTimer();
-
-	m_currentPlugin = 0;
-	void* preferedPlugin = NewtonGetPreferedPlugin(m_world);
-	for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
-		m_currentPlugin++;
-		if (ptr == preferedPlugin) {
-			break;
-		}
-	}
+	//Cleanup();
+	//ResetTimer();
+	//
+	//m_currentPlugin = 0;
+	//void* preferedPlugin = NewtonGetPreferedPlugin(m_world);
+	//for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
+	//	m_currentPlugin++;
+	//	if (ptr == preferedPlugin) {
+	//		break;
+	//	}
+	//}
 	//m_currentPlugin = 0;
 
-	m_shadeCache.CreateAllEffects();
-
-#endif
+	//m_shadeCache.CreateAllEffects();
 }
 
 ndDemoEntityManager::~ndDemoEntityManager()

@@ -23,6 +23,7 @@
 #include "dTypes.h"
 #include "dMemory.h"
 
+dAtomic<dUnsigned64> dMemory::m_memoryUsed(0);
 static dMemAllocCallback m_allocMemory = malloc;
 static dMemFreeCallback m_freeMemory = free;
 
@@ -50,13 +51,20 @@ void* dMemory::Malloc(size_t size)
 	dMemoryHeader* const ret = (dMemoryHeader*)val;
 	ret->m_size = dInt32 (size);
 	ret->m_ptr = ptr;
+	m_memoryUsed.fetch_add(size);
 	return &ret[1];
 }
 
 void dMemory::Free(void* const ptr)
 {
 	dMemoryHeader* const ret = ((dMemoryHeader*)ptr) - 1;
+	m_memoryUsed.fetch_sub(ret->m_size);
 	m_freeMemory(ret->m_ptr);
+}
+
+dUnsigned64 dMemory::GetMemoryUsed()
+{
+	return m_memoryUsed.load();
 }
 
 void dMemory::SetMemoryAllocators(dMemAllocCallback alloc, dMemFreeCallback free)

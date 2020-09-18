@@ -38,6 +38,9 @@ class dMemory
 	/// Destroy a memory buffer previously allocated by Malloc.
 	D_CORE_API static void Free(void* const ptr);
 
+	/// Return the total memory allocated by the newton engine and tools.
+	D_CORE_API static dUnsigned64 GetMemoryUsed();
+
 	/// Install low level system memory allocation functions.
 	/// \param dMemAllocCallback alloc: is a function pointer callback to allocate a memory chunk.
 	/// \param dMemFreeCallback free: is a function pointer callback to free a memory chunk.
@@ -52,6 +55,9 @@ class dMemory
 	/// is ok to install the memory allocator on the main of the 
 	/// application or just before start using the engine.
 	D_CORE_API static void SetMemoryAllocators(dMemAllocCallback alloc, dMemFreeCallback free);
+
+	private:
+	static dAtomic<dUnsigned64> m_memoryUsed;
 };
 
 #endif
