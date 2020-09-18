@@ -20,12 +20,13 @@ file(GLOB CPP_SOURCE
 	#sdkDemos/*.cpp
 	#sdkDemos/demos/*.h
 	#sdkDemos/demos/*.cpp
-	#sdkDemos/toolBox/*.h
-	#sdkDemos/toolBox/*.cpp 
+	toolBox/*.cpp toolBox/*.h
 )
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
+include_directories(./)
+include_directories(toolbox/)
 include_directories(../../sdk/dCore/)
 include_directories(../../sdk/dNewton/)
 include_directories(../../sdk/dCollision/)

@@ -11,6 +11,7 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndDemoEntityManager.h"
+#include "ndHighResolutionTimer.h"
 
 #if 0
 #include "SkyBox.h"
@@ -25,7 +26,7 @@
 #include "ndDemoEntityManager.h"
 #include "DemoCameraManager.h"
 #include "DemoCameraManager.h"
-#include "dHighResolutionTimer.h"
+
 
 #ifdef _MACOSX_VER
 	#include "CocoaOpenglGlue.h"
@@ -242,7 +243,7 @@ void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback,
 	m_updateCameraContext = context;
 }
 
-int ndDemoEntityManager::GetJoystickAxis (dFloat* const axisValues, int maxAxis) const
+int ndDemoEntityManager::GetJoystickAxis (dFloat32* const axisValues, int maxAxis) const
 {
 	int axisCount = 0;
 	if (m_hasJoytick) {
@@ -424,223 +425,6 @@ void ndDemoEntityManager::ApplyMenuOptions()
 	NewtonSelectPlugin(m_world, plugin);
 }
 
-void ndDemoEntityManager::ShowMainMenuBar()
-{
-	int mainMenu = 0;
-	//dAssert (m_autoSleepMode);
-	if (ImGui::BeginMainMenuBar())
-	{
-		if (ImGui::BeginMenu("File")) {
-			m_suspendPhysicsUpdate = true;
-
-			if (ImGui::MenuItem("Preferences", "")) {
-				dAssert (0);
-			}
-			ImGui::Separator();
-
-			if (ImGui::MenuItem("New", "")) {
-				mainMenu = 1;
-			}
-			ImGui::Separator();
-
-			if (ImGui::MenuItem("Open", "")) {
-				mainMenu = 2;
-			}
-			if (ImGui::MenuItem("Save", "")) {
-				mainMenu = 3;
-			}
-			ImGui::Separator();
-
-			if (ImGui::MenuItem("Serialize", "")) {
-				mainMenu = 4;
-			}
-			if (ImGui::MenuItem("Deserialize", "")) {
-				mainMenu = 5;
-			}
-
-			ImGui::Separator();
-			if (ImGui::MenuItem("import ply file", "")) {
-				mainMenu = 6;
-			}
-
-			ImGui::Separator();
-			if (ImGui::MenuItem("Exit", "")) {
-				glfwSetWindowShouldClose (m_mainFrame, 1);
-			}
-
-			ImGui::EndMenu();
-		}
-
-		if (ImGui::BeginMenu("Demos")) {
-			m_suspendPhysicsUpdate = true;
-			int demosCount = int (sizeof (m_demosSelection) / sizeof m_demosSelection[0]);
-			for (int i = 0; i < demosCount; i ++) {
-				if (ImGui::MenuItem(m_demosSelection[i].m_name, "")) {
-					m_currentScene = i;
-				}
-			}
-
-			ImGui::EndMenu();
-		}
-
-		bool optionsOn = ImGui::BeginMenu("Options");
-		if (optionsOn) {
-			m_updateMenuOptions = true;
-			m_suspendPhysicsUpdate = true;
-
-			ImGui::Checkbox("auto sleep mode", &m_autoSleepMode);
-			ImGui::Checkbox("show UI", &m_showUI);
-			ImGui::Checkbox("show stats", &m_showStats);
-			ImGui::Checkbox("concurrent physics update", &m_asynchronousPhysicsUpdate);
-			ImGui::Checkbox("solve large island in parallel", &m_solveLargeIslandInParallel);
-			ImGui::Separator();
-
-			int index = 0;
-			ImGui::RadioButton("default solver", &m_currentPlugin, index);
-			char ids[32][32];
-			for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
-				index++;
-				const char* const id = NewtonGetPluginString(m_world, plugin);
-				sprintf (&ids[index][0], "%s", id);
-				ImGui::RadioButton(&ids[index][0], &m_currentPlugin, index);
-			}
-			ImGui::Separator();
-
-			//ImGui::Text("iterative solver passes %d", m_solverPasses);
-			ImGui::SliderInt_DoubleSpace("solver sub steps", &m_solverSubSteps, 2, 8);
-			ImGui::SliderInt_DoubleSpace("iterative solver passes", &m_solverPasses, 4, 64);
-
-			//ImGui::Text("worker threads %d", m_workerThreads);
-			ImGui::SliderInt_DoubleSpace("worker threads", &m_workerThreads, 1, 20);
-			ImGui::Separator();
-
-			ImGui::RadioButton("default broad phase", &m_broadPhaseType, 0);
-			ImGui::RadioButton("persistence broad phase", &m_broadPhaseType, 1);
-			ImGui::Separator();
-
-			ImGui::RadioButton("hide collision Mesh", &m_collisionDisplayMode, 0);
-			ImGui::RadioButton("show solid collision Mesh", &m_collisionDisplayMode, 1);
-			ImGui::RadioButton("show wire frame collision Mesh", &m_collisionDisplayMode, 2);
-			ImGui::Separator();
-
-			ImGui::Checkbox("show aabb", &m_showAABB);
-			ImGui::Checkbox("hide visual meshes", &m_hideVisualMeshes);
-			ImGui::Checkbox("show contact points", &m_showContactPoints);
-			ImGui::Checkbox("show ray cast hit point", &m_showRaycastHit);
-			ImGui::Checkbox("show normal forces", &m_showNormalForces);
-			ImGui::Checkbox("show center of mass", &m_showCenterOfMass);
-			ImGui::Checkbox("show body frame", &m_showBodyFrame);
-			ImGui::Checkbox("show joint debug info", &m_showJointDebugInfo);
-			ImGui::Checkbox("show listeners debug info", &m_showListenersDebugInfo);
-			ImGui::Checkbox("show colliding faces", &m_showCollidingFaces);
-
-			ImGui::EndMenu();
-
-			SetDebugDisplayMode(m_showCollidingFaces ? 1 : 0);
-		}
-
-		if (ImGui::BeginMenu("Help")) {
-			m_suspendPhysicsUpdate = true;
-			ImGui::EndMenu();
-		}
-
-		ImGui::EndMainMenuBar();
-
-		if (!optionsOn && m_updateMenuOptions) {
-			m_updateMenuOptions = false;
-			ApplyMenuOptions();
-		}
-	}
-
-	switch (mainMenu)
-	{
-		case 1:
-		{
-			// menu new 
-			Cleanup();
-			ApplyMenuOptions();
-			ResetTimer();
-			m_currentScene = -1;
-			break;
-		}
-
-		case 2:
-		{
-			// open Scene
-			m_currentScene = -1;
-			char fileName[1024];
-			Cleanup();
-			if (dGetOpenFileNameNgd(fileName, 1024)) {
-				ApplyMenuOptions();
-				LoadScene (fileName);
-				ResetTimer();
-			}
-			break;
-		}
-
-		case 3:
-		{
-			m_currentScene = -1;
-			char fileName[1024];
-			if (dGetSaveFileNameNgd(fileName, 1024)) {
-				MakeViualMesh context(m_world);
-				dScene testScene(m_world);
-				testScene.NewtonWorldToScene(m_world, &context);
-				testScene.Serialize(fileName);
-			}
-			break;
-		}
-
-		case 4:
-		{
-			m_currentScene = -1;
-			char fileName[1024];
-			if (dGetSaveFileNameSerialization(fileName, 1024)) {
-				SerializedPhysicScene(fileName);
-			}
-			break;
-		}
-
-		case 5:
-		{
-			// open Scene
-			m_currentScene = -1;
-			char fileName[1024];
-			Cleanup();
-			if (dGetOpenFileNameSerialization(fileName, 1024)) {
-				ApplyMenuOptions();
-				DeserializedPhysicScene(fileName);
-				ResetTimer();
-			}
-			break;
-		}
-
-		case 6:
-		{
-			// open Scene
-			m_currentScene = -1;
-			char fileName[1024];
-			Cleanup();
-			if (dGetOpenFileNamePLY(fileName, 1024)) {
-				ApplyMenuOptions();
-				ImportPLYfile(fileName);
-				ResetTimer();
-			}
-			break;
-		}
-
-		default:
-		{
-			// load a demo 
-			if (m_currentScene != -1) {
-				//DeserializedPhysicScene("C:/temp/test.bin");
-				LoadDemo(m_currentScene);
-				m_lastCurrentScene = m_currentScene;
-				m_currentScene = -1;
-			}
-		}
-	}
-}
 
 void ndDemoEntityManager::LoadDemo(int menu)
 {
@@ -672,79 +456,6 @@ void ndDemoEntityManager::ToggleProfiler()
 	#endif
 }
 
-
-void ndDemoEntityManager::RenderStats()
-{
-	if (m_showStats) {
-		char text[1024];
-		
-		if (ImGui::Begin("statistics", &m_showStats)) {
-			sprintf (text, "fps:           %6.3f", m_fps);
-			ImGui::Text(text, "");
-
-			sprintf (text, "physics time: %6.3f ms", m_mainThreadPhysicsTime * 1000.0f);
-			ImGui::Text(text, "");
-
-			sprintf (text, "memory used:   %d kbytes", NewtonGetMemoryUsed() / 1024);
-			ImGui::Text(text, "");
-
-			if (m_currentPlugin) {
-				int index = 1;
-				for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
-					if (index == m_currentPlugin) {
-						sprintf(text, "plugin:        %s", NewtonGetPluginString(m_world, plugin));
-						ImGui::Text(text, "");
-					}
-					index++;
-				}
-			}
-
-			sprintf(text, "bodies:        %d", NewtonWorldGetBodyCount(m_world));
-			ImGui::Text(text, "");
-
-			sprintf (text, "threads:       %d", NewtonGetThreadsCount(m_world));
-			ImGui::Text(text, "");
-
-			sprintf(text, "iterations:	%d", NewtonGetSolverIterations(m_world));
-			ImGui::Text(text, "");
-
-			sprintf(text, "sub steps:     %d", NewtonGetNumberOfSubsteps(m_world));
-			ImGui::Text(text, "");
-
-			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
-			ImGui::End();
-		}
-	}
-
-	if (m_showUI && m_renderHelpMenus) {
-		if (ImGui::Begin("User Interface", &m_showUI)){
-			m_renderHelpMenus (this, m_renderUIContext);
-			//m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
-			ImGui::End();
-		}
-	}
-
-	ShowMainMenuBar();
-}
-
-void ndDemoEntityManager::CalculateFPS(dFloat timestep)
-{
-	m_framesCount ++;
-	m_timestepAcc += timestep;
-
-	// this probably happing on loading of and a pause, just rest counters
-	if ((m_timestepAcc <= 0.0f) || (m_timestepAcc > 2.0f)){
-		m_timestepAcc = 0;
-		m_framesCount = 0;
-	}
-
-	//update fps every quarter of a second
-	if (m_timestepAcc >= 0.25f) {
-		m_fps = dFloat (m_framesCount) / m_timestepAcc;
-		m_timestepAcc -= 0.25f;
-		m_framesCount = 0;
-	}
-}
 
 
 void ndDemoEntityManager::CreateSkyBox()
@@ -976,13 +687,13 @@ void ndDemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dV
 	m_cameraManager->SetCameraMatrix(this, rotation, position);
 }
 
-void ndDemoEntityManager::UpdatePhysics(dFloat timestep)
+void ndDemoEntityManager::UpdatePhysics(dFloat32 timestep)
 {
 	// update the physics
 	if (m_world && !m_suspendPhysicsUpdate) {
 		D_TRACKTIME();
 
-		dFloat timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
+		dFloat32 timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
 		unsigned64 timestepMicrosecunds = unsigned64 (timestepInSecunds * 1000000.0f);
 
 		unsigned64 currentTime = dGetTimeInMicrosenconds ();
@@ -993,7 +704,7 @@ void ndDemoEntityManager::UpdatePhysics(dFloat timestep)
 		}
 
 		bool newUpdate = false;
-		dFloat physicsTime = 0.0f;
+		dFloat32 physicsTime = 0.0f;
 		//while (nextTime >= timestepMicrosecunds) 
 		if (nextTime >= timestepMicrosecunds) 
 		{
@@ -1034,10 +745,10 @@ void ndDemoEntityManager::UpdatePhysics(dFloat timestep)
 	}
 }
 
-dFloat ndDemoEntityManager::CalculateInteplationParam () const
+dFloat32 ndDemoEntityManager::CalculateInteplationParam () const
 {
 	unsigned64 timeStep = dGetTimeInMicrosenconds () - m_microsecunds;		
-	dFloat param = (dFloat (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
+	dFloat32 param = (dFloat32 (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
 	dAssert (param >= 0.0f);
 	if (param > 1.0f) {
 		param = 1.0f;
@@ -1046,7 +757,7 @@ dFloat ndDemoEntityManager::CalculateInteplationParam () const
 }
 
 
-void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFloat timestep)
+void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep)
 {
 	ndDemoEntityManager* const scene = (ndDemoEntityManager*) NewtonWorldGetUserData(world);
 	scene->m_cameraManager->FixUpdate(scene->GetNewton(), timestep);
@@ -1055,168 +766,6 @@ void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFl
 	}
 }
 
-void ndDemoEntityManager::RenderScene()
-{
-	dFloat timestep = dGetElapsedSeconds();	
-	CalculateFPS(timestep);
-	UpdatePhysics(timestep);
-
-	D_TRACKTIME();
-	// Get the interpolated location of each body in the scene
-	m_cameraManager->InterpolateMatrices (this, CalculateInteplationParam());
-
-	ImGuiIO& io = ImGui::GetIO();
-	int display_w = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-	int display_h = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
-	glViewport(0, 0, display_w, display_h);
-	glScissor(0, 0, display_w, display_h);
-	glEnable(GL_SCISSOR_TEST);	
-
-	// Rendering
-	// Our shading model--Goraud (smooth). 
-	glShadeModel (GL_SMOOTH);
-
-	// Culling. 
-	glCullFace (GL_BACK);
-	glFrontFace (GL_CCW);
-	glEnable (GL_CULL_FACE);
-
-	//	glEnable(GL_DITHER);
-	// z buffer test
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc (GL_LEQUAL);
-
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
-	glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
-
-	// set default lightning
-	glEnable (GL_LIGHTING);
-
-	dFloat cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
-	glMaterialParam(GL_FRONT, GL_SPECULAR, cubeColor);
-	glMaterialParam(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cubeColor);
-	glMaterialf(GL_FRONT, GL_SHININESS, 50.0);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-	// set just one directional light
-	GLfloat lightDiffuse0[] = { 0.8f, 0.8f, 0.8f, 0.0f };
-	GLfloat lightAmbient0[] = { 0.2f, 0.2f, 0.2f, 0.0f };
-	GLfloat lightSpecular0[] = { 1.0f, 1.0f, 1.0f, 0.0f };
-	GLfloat lightPosition0[] = { 0.0f, 200.0f, 150.0f, 0.0f };
-	
-	glMaterialf(GL_FRONT, GL_SHININESS, 60.0f);
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition0);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient0);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse0);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular0);
-	glEnable(GL_LIGHT0);
-
-	// one light from the Camera eye point
-	dVector camPosition (m_cameraManager->GetCamera()->m_matrix.m_posit);
-	GLfloat lightDiffuse1[] = { 0.5f, 0.5f, 0.5f, 0.0f };
-	GLfloat lightAmbient1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	GLfloat lightSpecular1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	GLfloat lightPosition1[] = {0.0f, 0.0f, 0.0f, 1.0f};
-
-	glMaterialf(GL_FRONT, GL_SHININESS, 60.0f);
-	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
-	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular1);
-	glEnable(GL_LIGHT1);
-
-	// Setup matrix
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	//glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-
-	// make sure the model view matrix is set to identity before setting world space light sources
-	// update Camera
-	m_cameraManager->GetCamera()->SetViewMatrix(display_w, display_h);
-
-	// render all entities
-
-	dMatrix globalMatrix (dGetIdentityMatrix());
-	if (m_hideVisualMeshes) {
-		if (m_sky) {
-			glPushMatrix();	
-			m_sky->Render(timestep, this, globalMatrix);
-			glPopMatrix();
-		}
-	} else {
-		for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) {
-			DemoEntity* const entity = node->GetInfo();
-			glPushMatrix();	
-			entity->Render(timestep, this, globalMatrix);
-			glPopMatrix();
-		}
-	}
-
-	DEBUG_DRAW_MODE mode = m_solid;
-	if (m_collisionDisplayMode) {
-		mode = (m_collisionDisplayMode == 1) ? m_solid : m_lines;
-		DebugRenderWorldCollision (m_world, mode);
-	}
-
-	if (m_showAABB) {
-		RenderAABB (m_world);
-	}
-
-	if (m_showContactPoints) {
-		RenderContactPoints (m_world);
-	}
-
-	if (m_showRaycastHit) {
-		RenderRayCastHit(m_world);
-	}
-
-	if (m_showBodyFrame) {
-		RenderBodyFrame(m_world);
-	}
-
-	if (m_showCenterOfMass) {
-		RenderCenterOfMass(m_world);
-	}
-
-	if (m_showListenersDebugInfo) {
-		dJointDebugDisplay listenerDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
-		listenerDebugRender.SetScale(0.5f);
-		RenderListenersDebugInfo (m_world, &listenerDebugRender);
-	}
-
-	if (m_showJointDebugInfo) {
-		dJointDebugDisplay jointDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
-		//jointDebugRender.SetScale(0.2f);
-		jointDebugRender.SetScale(1.0f);
-
-		RenderJointsDebugInfo(m_world, &jointDebugRender);
-	}
-
-	if (m_showNormalForces) {
-		RenderNormalForces (m_world);
-	}
-
-	if (m_tranparentHeap.GetCount()) {
-		glPushMatrix();	
-		while (m_tranparentHeap.GetCount()) {
-			const TransparentMesh& transparentMesh = m_tranparentHeap[0];
-			glLoadIdentity();
-			glLoadMatrix(&transparentMesh.m_matrix[0][0]);
-			transparentMesh.m_mesh->RenderTransparency();
-			m_tranparentHeap.Pop();
-		}
-		glPopMatrix();
-	}
-
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-}
 
 #endif
 
@@ -1245,26 +794,20 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//, m_mainThreadPhysicsTime(0.0f)
 	//, m_mainThreadPhysicsTimeAcc(0.0f)
 	//, m_broadPhaseType(0)
-	//, m_workerThreads(1)
-	//, m_solverPasses(4)
-	//, m_solverSubSteps(2)
 	//, m_debugDisplayMode(0)
 	//, m_collisionDisplayMode(0)
 	//, m_showUI(true)
 	//, m_showAABB(false)
 	//, m_showStats(true)
-	,m_hasJoytick(false)
 	//, m_autoSleepMode(true)
 	//, m_hideVisualMeshes(false)
 	//, m_showNormalForces(false)
 	//, m_showCenterOfMass(false)
 	//, m_showBodyFrame(false)
-	//, m_updateMenuOptions(true)
 	//, m_showContactPoints(false)
 	//, m_showJointDebugInfo(false)
 	//, m_showListenersDebugInfo(false)
 	//, m_showCollidingFaces(false)
-	//, m_suspendPhysicsUpdate(false)
 	//, m_asynchronousPhysicsUpdate(false)
 	//, m_solveLargeIslandInParallel(true)
 	//, m_showRaycastHit(false)
@@ -1349,9 +892,24 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	LoadFont();
 
+	m_showUI = false;
+	m_showAABB = false;
+	m_showStats = false;
+	m_autoSleepMode = false;
+	m_updateMenuOptions = false;
+	m_suspendPhysicsUpdate = false;
 	m_mousePressed[0] = false;
 	m_mousePressed[1] = false;
 	m_mousePressed[2] = false;
+
+	m_workerThreads = 1;
+	m_solverPasses = 4;
+	m_solverSubSteps = 2;
+
+	m_fps = 0.0f;
+	m_timestepAcc = 0.0f;
+	m_framesCount = 0;
+	m_renderDemoGUI = nullptr;
 
 	// initialized the physics world for the new scene
 	//	m_showUI = false;
@@ -1561,7 +1119,7 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 		return;
 	}
 
-	//ndDemoEntityManager* const window = (ndDemoEntityManager*)io.UserData;
+	ndDemoEntityManager* const window = (ndDemoEntityManager*)io.UserData;
 
 	ImVec4 clearColor = ImColor(114, 144, 154);
 	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
@@ -1589,10 +1147,11 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glPushMatrix();
 	glLoadIdentity();
 
-	//if (window->m_renderDemoGUI) 
-	//{
+	if (window->m_renderDemoGUI) 
+	{
+		dAssert(0);
 	//	window->m_renderDemoGUI(window, window->m_renderUIContext);
-	//}
+	}
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -1669,8 +1228,515 @@ void ndDemoEntityManager::Run()
 
 		D_TRACKTIME();
 
-		//RenderStats();
+		RenderStats();
 		ImGui::Render();
 		glfwSwapBuffers(m_mainFrame);
 	}
+}
+
+void ndDemoEntityManager::CalculateFPS(dFloat32 timestep)
+{
+	m_framesCount++;
+	m_timestepAcc += timestep;
+
+	// this probably happing on loading of and a pause, just rest counters
+	if ((m_timestepAcc <= 0.0f) || (m_timestepAcc > 2.0f)) 
+	{
+		m_timestepAcc = 0;
+		m_framesCount = 0;
+	}
+
+	//update fps every quarter of a second
+	if (m_timestepAcc >= 0.25f) 
+	{
+		m_fps = dFloat32(m_framesCount) / m_timestepAcc;
+		//m_timestepAcc -= 0.25f;
+		m_timestepAcc -= 0.0f;
+		m_framesCount = 0;
+	}
+}
+
+void ndDemoEntityManager::ShowMainMenuBar()
+{
+	int mainMenu = 0;
+	//dAssert (m_autoSleepMode);
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("File")) 
+		{
+			m_suspendPhysicsUpdate = true;
+
+			if (ImGui::MenuItem("Preferences", "")) 
+			{
+				dAssert(0);
+			}
+			ImGui::Separator();
+
+			if (ImGui::MenuItem("New", "")) 
+			{
+				mainMenu = 1;
+			}
+			ImGui::Separator();
+
+			if (ImGui::MenuItem("Open", "")) 
+			{
+				mainMenu = 2;
+			}
+			if (ImGui::MenuItem("Save", "")) 
+			{
+				mainMenu = 3;
+			}
+			ImGui::Separator();
+
+			if (ImGui::MenuItem("Serialize", "")) 
+			{
+				mainMenu = 4;
+			}
+			if (ImGui::MenuItem("Deserialize", "")) 
+			{
+				mainMenu = 5;
+			}
+
+			ImGui::Separator();
+			if (ImGui::MenuItem("import ply file", "")) 
+			{
+				mainMenu = 6;
+			}
+
+			ImGui::Separator();
+			if (ImGui::MenuItem("Exit", "")) 
+			{
+				glfwSetWindowShouldClose(m_mainFrame, 1);
+			}
+
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Demos")) 
+		{
+			m_suspendPhysicsUpdate = true;
+			dAssert(0);
+			//int demosCount = int(sizeof(m_demosSelection) / sizeof m_demosSelection[0]);
+			//for (int i = 0; i < demosCount; i++) 
+			//{
+			//	if (ImGui::MenuItem(m_demosSelection[i].m_name, "")) 
+			//	{
+			//		m_currentScene = i;
+			//	}
+			//}
+
+			ImGui::EndMenu();
+		}
+
+		bool optionsOn = ImGui::BeginMenu("Options");
+		if (optionsOn) 
+		{
+			m_updateMenuOptions = true;
+			m_suspendPhysicsUpdate = true;
+
+			ImGui::Checkbox("auto sleep mode", &m_autoSleepMode);
+			ImGui::Checkbox("show UI", &m_showUI);
+			ImGui::Checkbox("show stats", &m_showStats);
+			//ImGui::Checkbox("concurrent physics update", &m_asynchronousPhysicsUpdate);
+			//ImGui::Checkbox("solve large island in parallel", &m_solveLargeIslandInParallel);
+			ImGui::Separator();
+
+			//int index = 0;
+			//ImGui::RadioButton("default solver", &m_currentPlugin, index);
+			//char ids[32][32];
+			//for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) 
+			//{
+			//	index++;
+			//	const char* const id = NewtonGetPluginString(m_world, plugin);
+			//	sprintf(&ids[index][0], "%s", id);
+			//	ImGui::RadioButton(&ids[index][0], &m_currentPlugin, index);
+			//}
+			//ImGui::Separator();
+
+			ImGui::SliderInt_DoubleSpace("solver sub steps", &m_solverSubSteps, 2, 8);
+			ImGui::SliderInt_DoubleSpace("iterative solver passes", &m_solverPasses, 4, 64);
+
+			//ImGui::Text("worker threads %d", m_workerThreads);
+			ImGui::SliderInt_DoubleSpace("worker threads", &m_workerThreads, 1, 20);
+			ImGui::Separator();
+
+			//ImGui::RadioButton("default broad phase", &m_broadPhaseType, 0);
+			//ImGui::RadioButton("persistence broad phase", &m_broadPhaseType, 1);
+			ImGui::Separator();
+
+			//ImGui::RadioButton("hide collision Mesh", &m_collisionDisplayMode, 0);
+			//ImGui::RadioButton("show solid collision Mesh", &m_collisionDisplayMode, 1);
+			//ImGui::RadioButton("show wire frame collision Mesh", &m_collisionDisplayMode, 2);
+			ImGui::Separator();
+
+			ImGui::Checkbox("show aabb", &m_showAABB);
+			//ImGui::Checkbox("hide visual meshes", &m_hideVisualMeshes);
+			//ImGui::Checkbox("show contact points", &m_showContactPoints);
+			//ImGui::Checkbox("show ray cast hit point", &m_showRaycastHit);
+			//ImGui::Checkbox("show normal forces", &m_showNormalForces);
+			//ImGui::Checkbox("show center of mass", &m_showCenterOfMass);
+			//ImGui::Checkbox("show body frame", &m_showBodyFrame);
+			//ImGui::Checkbox("show joint debug info", &m_showJointDebugInfo);
+			//ImGui::Checkbox("show listeners debug info", &m_showListenersDebugInfo);
+			//ImGui::Checkbox("show colliding faces", &m_showCollidingFaces);
+
+			ImGui::EndMenu();
+
+			//SetDebugDisplayMode(m_showCollidingFaces ? 1 : 0);
+		}
+
+		if (ImGui::BeginMenu("Help")) 
+		{
+			m_suspendPhysicsUpdate = true;
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMainMenuBar();
+
+		if (!optionsOn && m_updateMenuOptions) 
+		{
+			m_updateMenuOptions = false;
+			dAssert(0);
+			//ApplyMenuOptions();
+		}
+	}
+
+	switch (mainMenu)
+	{
+		case 1:
+		{
+			// menu new 
+			dAssert(0);
+			//Cleanup();
+			//ApplyMenuOptions();
+			//ResetTimer();
+			//m_currentScene = -1;
+			break;
+		}
+
+		case 2:
+		{
+			// open Scene
+			dAssert(0);
+			//m_currentScene = -1;
+			//char fileName[1024];
+			//Cleanup();
+			//if (dGetOpenFileNameNgd(fileName, 1024)) {
+			//	ApplyMenuOptions();
+			//	LoadScene(fileName);
+			//	ResetTimer();
+			//}
+			break;
+		}
+
+		case 3:
+		{
+			dAssert(0);
+			//m_currentScene = -1;
+			//char fileName[1024];
+			//if (dGetSaveFileNameNgd(fileName, 1024)) {
+			//	MakeViualMesh context(m_world);
+			//	dScene testScene(m_world);
+			//	testScene.NewtonWorldToScene(m_world, &context);
+			//	testScene.Serialize(fileName);
+			//}
+			break;
+		}
+
+		case 4:
+		{
+			dAssert(0);
+			//m_currentScene = -1;
+			//char fileName[1024];
+			//if (dGetSaveFileNameSerialization(fileName, 1024)) {
+			//	SerializedPhysicScene(fileName);
+			//}
+			break;
+		}
+
+		case 5:
+		{
+			// open Scene
+			dAssert(0);
+			//m_currentScene = -1;
+			//char fileName[1024];
+			//Cleanup();
+			//if (dGetOpenFileNameSerialization(fileName, 1024)) {
+			//	ApplyMenuOptions();
+			//	DeserializedPhysicScene(fileName);
+			//	ResetTimer();
+			//}
+			break;
+		}
+
+		case 6:
+		{
+			// open Scene
+			dAssert(0);
+			//m_currentScene = -1;
+			//char fileName[1024];
+			//Cleanup();
+			//if (dGetOpenFileNamePLY(fileName, 1024)) {
+			//	ApplyMenuOptions();
+			//	ImportPLYfile(fileName);
+			//	ResetTimer();
+			//}
+			break;
+		}
+
+		default:
+		{
+			// load a demo 
+			//dAssert(0);
+			//if (m_currentScene != -1) 
+			//{
+			//	//DeserializedPhysicScene("C:/temp/test.bin");
+			//	LoadDemo(m_currentScene);
+			//	m_lastCurrentScene = m_currentScene;
+			//	m_currentScene = -1;
+			//}
+		}
+	}
+}
+
+void ndDemoEntityManager::RenderStats()
+{
+	if (m_showStats) 
+	{
+		char text[1024];
+
+		if (ImGui::Begin("statistics", &m_showStats)) 
+		{
+			sprintf(text, "fps:           %6.3f", m_fps);
+			ImGui::Text(text, "");
+
+			//sprintf(text, "physics time: %6.3f ms", m_mainThreadPhysicsTime * 1000.0f);
+			ImGui::Text(text, "");
+
+			//sprintf(text, "memory used:   %d kbytes", NewtonGetMemoryUsed() / 1024);
+			ImGui::Text(text, "");
+
+			//if (m_currentPlugin) 
+			//{
+			//	int index = 1;
+			//	for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) 
+			//	{
+			//		if (index == m_currentPlugin) {
+			//			sprintf(text, "plugin:        %s", NewtonGetPluginString(m_world, plugin));
+			//			ImGui::Text(text, "");
+			//		}
+			//		index++;
+			//	}
+			//}
+
+			//sprintf(text, "bodies:        %d", NewtonWorldGetBodyCount(m_world));
+			//ImGui::Text(text, "");
+			//
+			//sprintf(text, "threads:       %d", NewtonGetThreadsCount(m_world));
+			//ImGui::Text(text, "");
+			//
+			//sprintf(text, "iterations:	%d", NewtonGetSolverIterations(m_world));
+			//ImGui::Text(text, "");
+			//
+			//sprintf(text, "sub steps:     %d", NewtonGetNumberOfSubsteps(m_world));
+			//ImGui::Text(text, "");
+			//
+			//m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));
+			ImGui::End();
+		}
+	}
+
+	//if (m_showUI && m_renderHelpMenus) 
+	//{
+	//	if (ImGui::Begin("User Interface", &m_showUI)) 
+	//	{
+	//		m_renderHelpMenus(this, m_renderUIContext);
+	//		//m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
+	//		ImGui::End();
+	//	}
+	//}
+
+	ShowMainMenuBar();
+}
+
+
+void ndDemoEntityManager::RenderScene()
+{
+	dFloat32 timestep = dGetElapsedSeconds();
+	CalculateFPS(timestep);
+//	UpdatePhysics(timestep);
+
+	D_TRACKTIME();
+	// Get the interpolated location of each body in the scene
+//	m_cameraManager->InterpolateMatrices(this, CalculateInteplationParam());
+
+	ImGuiIO& io = ImGui::GetIO();
+	int display_w = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+	int display_h = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+	glViewport(0, 0, display_w, display_h);
+	glScissor(0, 0, display_w, display_h);
+	glEnable(GL_SCISSOR_TEST);
+
+	// Rendering
+	// Our shading model--Goraud (smooth). 
+	glShadeModel(GL_SMOOTH);
+
+	// Culling. 
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
+	glEnable(GL_CULL_FACE);
+
+	//	glEnable(GL_DITHER);
+	// z buffer test
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LEQUAL);
+
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+	glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
+
+	// set default lightning
+	glEnable(GL_LIGHTING);
+
+	dFloat32 cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
+	glMaterialParam(GL_FRONT, GL_SPECULAR, cubeColor);
+	glMaterialParam(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cubeColor);
+	glMaterialf(GL_FRONT, GL_SHININESS, 50.0);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+	// set just one directional light
+	GLfloat lightDiffuse0[] = { 0.8f, 0.8f, 0.8f, 0.0f };
+	GLfloat lightAmbient0[] = { 0.2f, 0.2f, 0.2f, 0.0f };
+	GLfloat lightSpecular0[] = { 1.0f, 1.0f, 1.0f, 0.0f };
+	GLfloat lightPosition0[] = { 0.0f, 200.0f, 150.0f, 0.0f };
+
+	glMaterialf(GL_FRONT, GL_SHININESS, 60.0f);
+	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition0);
+	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient0);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse0);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular0);
+	glEnable(GL_LIGHT0);
+
+	// one light from the Camera eye point
+//	dVector camPosition(m_cameraManager->GetCamera()->m_matrix.m_posit);
+//	GLfloat lightDiffuse1[] = { 0.5f, 0.5f, 0.5f, 0.0f };
+//	GLfloat lightAmbient1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+//	GLfloat lightSpecular1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+//	GLfloat lightPosition1[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+//
+//	glMaterialf(GL_FRONT, GL_SHININESS, 60.0f);
+//	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
+//	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
+//	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
+//	glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular1);
+//	glEnable(GL_LIGHT1);
+
+#if 0
+	// Setup matrix
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	//glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	// make sure the model view matrix is set to identity before setting world space light sources
+	// update Camera
+//	m_cameraManager->GetCamera()->SetViewMatrix(display_w, display_h);
+
+	// render all entities
+
+	dMatrix globalMatrix(dGetIdentityMatrix());
+	if (m_hideVisualMeshes) 
+	{
+		if (m_sky) 
+		{
+			glPushMatrix();
+			m_sky->Render(timestep, this, globalMatrix);
+			glPopMatrix();
+		}
+	}
+	else 
+	{
+		for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) 
+		{
+			DemoEntity* const entity = node->GetInfo();
+			glPushMatrix();
+			entity->Render(timestep, this, globalMatrix);
+			glPopMatrix();
+		}
+	}
+
+	DEBUG_DRAW_MODE mode = m_solid;
+	if (m_collisionDisplayMode) 
+	{
+		mode = (m_collisionDisplayMode == 1) ? m_solid : m_lines;
+		DebugRenderWorldCollision(m_world, mode);
+	}
+
+	if (m_showAABB) 
+	{
+		RenderAABB(m_world);
+	}
+
+	if (m_showContactPoints) 
+	{
+		RenderContactPoints(m_world);
+	}
+
+	if (m_showRaycastHit) 
+	{
+		RenderRayCastHit(m_world);
+	}
+
+	if (m_showBodyFrame) 
+	{
+		RenderBodyFrame(m_world);
+	}
+
+	if (m_showCenterOfMass) 
+	{
+		RenderCenterOfMass(m_world);
+	}
+
+	if (m_showListenersDebugInfo) 
+	{
+		dJointDebugDisplay listenerDebugRender(m_cameraManager->GetCamera()->GetCurrentMatrix());
+		listenerDebugRender.SetScale(0.5f);
+		RenderListenersDebugInfo(m_world, &listenerDebugRender);
+	}
+
+	if (m_showJointDebugInfo) 
+	{
+		dJointDebugDisplay jointDebugRender(m_cameraManager->GetCamera()->GetCurrentMatrix());
+		//jointDebugRender.SetScale(0.2f);
+		jointDebugRender.SetScale(1.0f);
+
+		RenderJointsDebugInfo(m_world, &jointDebugRender);
+	}
+
+	if (m_showNormalForces) 
+	{
+		RenderNormalForces(m_world);
+	}
+
+	if (m_tranparentHeap.GetCount()) 
+	{
+		glPushMatrix();
+		while (m_tranparentHeap.GetCount()) 
+		{
+			const TransparentMesh& transparentMesh = m_tranparentHeap[0];
+			glLoadIdentity();
+			glLoadMatrix(&transparentMesh.m_matrix[0][0]);
+			transparentMesh.m_mesh->RenderTransparency();
+			m_tranparentHeap.Pop();
+		}
+		glPopMatrix();
+	}
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+#endif
 }

@@ -23,14 +23,14 @@ struct ImDrawData;
 //class DemoMeshInterface;
 //class DemoCameraManager;
 
-//class DemoEntityManager: public dList <DemoEntity*>
+//class ndDemoEntityManager: public dList <DemoEntity*>
 class ndDemoEntityManager
 {
 #if 0
 	public:
-	typedef void (*LaunchSDKDemoCallback) (DemoEntityManager* const scene);
-	typedef void (*RenderGuiHelpCallback) (DemoEntityManager* const manager, void* const context);
-	typedef void(*UpdateCameraCallback) (DemoEntityManager* const manager, void* const context, dFloat32 timestep);
+	typedef void (*LaunchSDKDemoCallback) (ndDemoEntityManager* const scene);
+
+	typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, dFloat32 timestep);
 
 	class TransparentMesh
 	{
@@ -139,20 +139,14 @@ class ndDemoEntityManager
 	
 
 	private:
-
-	void RenderStats();
-	
 	void Cleanup();
 
 	//void RenderUI();
-	void RenderScene();
 	
 	void UpdatePhysics(dFloat32 timestep);
 	dFloat32 CalculateInteplationParam () const;
-
-	void CalculateFPS(dFloat32 timestep);
 	
-	void ShowMainMenuBar();
+	
 	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
 
 	void ToggleProfiler();
@@ -167,7 +161,7 @@ class ndDemoEntityManager
 	ShaderPrograms m_shadeCache;
 	void* m_renderUIContext;
 	void* m_updateCameraContext;
-	RenderGuiHelpCallback m_renderDemoGUI;
+	
 	RenderGuiHelpCallback m_renderHelpMenus;
 	UpdateCameraCallback m_updateCamera;
 
@@ -176,37 +170,26 @@ class ndDemoEntityManager
 
 	int m_currentScene;
 	int m_lastCurrentScene;
-	int m_framesCount;
 	int m_physicsFramesCount;
 	int m_currentPlugin;
-	dFloat32 m_fps;
-	dFloat32 m_timestepAcc;
+	
 	dFloat32 m_currentListenerTimestep;
 	dFloat32 m_mainThreadPhysicsTime;
 	dFloat32 m_mainThreadPhysicsTimeAcc;
 
-	int m_solverPasses;
-	int m_solverSubSteps;
 	int m_broadPhaseType;
-	int m_workerThreads;
 	int m_debugDisplayMode;
 	int m_collisionDisplayMode;
 	
-	bool m_showUI;
-	bool m_showAABB;
-	bool m_showStats;
-	
-	bool m_autoSleepMode;
 	bool m_hideVisualMeshes;
 	bool m_showNormalForces;
 	bool m_showCenterOfMass;
 	bool m_showBodyFrame;
-	bool m_updateMenuOptions;
 	bool m_showContactPoints;
 	bool m_showJointDebugInfo;
 	bool m_showListenersDebugInfo;
 	bool m_showCollidingFaces;
-	bool m_suspendPhysicsUpdate;
+	
 	bool m_asynchronousPhysicsUpdate;
 	bool m_solveLargeIslandInParallel;
 	bool m_showRaycastHit;
@@ -228,6 +211,8 @@ class ndDemoEntityManager
 	void Run();
 
 	private:
+	typedef void(*RenderGuiHelpCallback) (ndDemoEntityManager* const manager, void* const context);
+
 	static void RenderDrawListsCallback(ImDrawData* const draw_data);
 	static void ErrorCallback(int error, const char* const description);
 	static void CharCallback(GLFWwindow* window, unsigned int ch);
@@ -238,59 +223,77 @@ class ndDemoEntityManager
 
 	void LoadFont();
 	void BeginFrame();
-	
+	void RenderScene();
+	void CalculateFPS(dFloat32 timestep);
+	void RenderStats();
+	void ShowMainMenuBar();
 
 	GLFWwindow* m_mainFrame;
 
+	dFloat32 m_fps;
+	dFloat32 m_timestepAcc;
+
 	int	m_defaultFont;
+	int m_framesCount;
+	int m_solverPasses;
+	int m_solverSubSteps;
+	int m_workerThreads;
+
+	bool m_showUI;
+	bool m_showAABB;
+	bool m_showStats;
+	bool m_autoSleepMode;
 	bool m_hasJoytick;
+	bool m_updateMenuOptions;
+	bool m_suspendPhysicsUpdate;
 	bool m_mousePressed[3];
+	RenderGuiHelpCallback m_renderDemoGUI;
 };
 
 #if 0
-inline NewtonWorld* DemoEntityManager::GetNewton() const
+inline NewtonWorld* ndDemoEntityManager::GetNewton() const
 {
 	return m_world;
 }
 
 // for simplicity we are not going to run the demo in a separate thread at this time
 // this confuses many user int thinking it is more complex than it really is  
-inline void DemoEntityManager::Lock(unsigned& atomicLock)
+inline void ndDemoEntityManager::Lock(unsigned& atomicLock)
 {
 	while (NewtonAtomicSwap((int*)&atomicLock, 1)) {
 		NewtonYield();
 	}
 }
 
-inline void DemoEntityManager::Unlock(unsigned& atomicLock)
+inline void ndDemoEntityManager::Unlock(unsigned& atomicLock)
 {
 	NewtonAtomicSwap((int*)&atomicLock, 0);
 }
 
-inline int DemoEntityManager::GetWidth() const 
+inline int ndDemoEntityManager::GetWidth() const 
 { 
 	ImGuiIO& io = ImGui::GetIO();
 	return (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
 }
 
-inline int DemoEntityManager::GetHeight() const 
+inline int ndDemoEntityManager::GetHeight() const 
 { 
 	ImGuiIO& io = ImGui::GetIO();
 	return (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 }
 
-inline int DemoEntityManager::GetDebugDisplay() const
+inline int ndDemoEntityManager::GetDebugDisplay() const
 {
 	dAssert (0);
 	return 0;
 }
 
-inline void DemoEntityManager::SetDebugDisplay(int mode) const
+inline void ndDemoEntityManager::SetDebugDisplay(int mode) const
 {
 	dAssert (0);
 }
 
-inline const ShaderPrograms& DemoEntityManager::GetShaderCache() const
+inline const ShaderPrograms& ndDemoEntityManager::GetShaderCache() const
 {
 	return m_shadeCache;
 }
