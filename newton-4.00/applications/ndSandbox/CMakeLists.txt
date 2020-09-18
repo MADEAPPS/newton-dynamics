@@ -10,52 +10,37 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
-set (projectName "demosSandbox")
+set (projectName "ndSandbox")
 message (${projectName})
 
 # source and header files
 file(GLOB CPP_SOURCE 
-	sdkDemos/*.h
-	sdkDemos/*.cpp
-	sdkDemos/demos/*.h
-	sdkDemos/demos/*.cpp
-	sdkDemos/toolBox/*.h
-	sdkDemos/toolBox/*.cpp 
+	*.cpp *.h
+	#sdkDemos/*.h
+	#sdkDemos/*.cpp
+	#sdkDemos/demos/*.h
+	#sdkDemos/demos/*.cpp
+	#sdkDemos/toolBox/*.h
+	#sdkDemos/toolBox/*.cpp 
 )
 
-#source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" PREFIX source/ FILES ${CPP_SOURCE})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
-include_directories(sdkDemos/)
-include_directories(sdkDemos/demos/)
-include_directories(sdkDemos/toolBox/)
-include_directories(../../sdk/dMath/)
-include_directories(../../sdk/dgCore/)
-include_directories(../../sdk/dScene/)
-include_directories(../../sdk/dModel/)
+include_directories(../../sdk/dCore/)
 include_directories(../../sdk/dNewton/)
-include_directories(../../sdk/dgNewton/)
-include_directories(../../sdk/dVehicle/)
-include_directories(../../sdk/dgPhysics/)
-include_directories(../../sdk/dAnimation/)
-include_directories(../../sdk/dgMeshUtil/)
-include_directories(../../sdk/dContainers/)
-include_directories(../../sdk/dCustomJoints/)
-include_directories(../../sdk/thirdParty/tinyxml/)
-include_directories(../../sdk/dVehicle/dPlayerController)
-include_directories(../../sdk/dVehicle/dMultiBodyVehicle)
+include_directories(../../sdk/dCollision/)
+include_directories(../../sdk/thirdParty/glfw/)
+include_directories(../../sdk/thirdParty/imgui/)
+include_directories(../../sdk/thirdParty/glfw/include/)
+include_directories(../../sdk/thirdParty/glatter/include/glatter/)
 
 if (NEWTON_BUILD_PROFILER)
 	include_directories(../../sdk/dProfiler/dProfiler/)
 endif ()
 
-include_directories(../../sdk/thirdParty/glfw/)
-include_directories(../../sdk/thirdParty/imgui/)
-include_directories(../../sdk/thirdParty/glfw/include/)
-include_directories(../../sdk/thirdParty/glatter/include/glatter/)
 add_executable(${projectName} ${CPP_SOURCE})
+target_link_libraries (${projectName} ndCore ndCollision ndNewton glfw imgui glatter)
 
-target_link_libraries (${projectName} dNewton dScene dModel dVehicle glfw imgui glatter)
 if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dProfiler)
 endif ()
@@ -74,9 +59,9 @@ if(MSVC OR MINGW)
     target_link_libraries (${projectName} glu32 opengl32)
 
     if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
-		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/Yutoolbox_stdafx.h")
-		set_source_files_properties(sdkDemos/toolBox/toolbox_stdafx.cpp PROPERTIES COMPILE_FLAGS "/Yctoolbox_stdafx.h")
-		set_source_files_properties(sdkDemos/toolBox/FileBrowser.cpp PROPERTIES COMPILE_FLAGS "/Y-")
+		#set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/Yutoolbox_stdafx.h")
+		#set_source_files_properties(sdkDemos/toolBox/toolbox_stdafx.cpp PROPERTIES COMPILE_FLAGS "/Yctoolbox_stdafx.h")
+		#set_source_files_properties(sdkDemos/toolBox/FileBrowser.cpp PROPERTIES COMPILE_FLAGS "/Y-")
     endif()
 endif()
 

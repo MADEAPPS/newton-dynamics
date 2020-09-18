@@ -9,6 +9,7 @@
 * freely
 */
 
+#if 0
 #include "toolbox_stdafx.h"
 #include "DemoEntityManager.h"
 
@@ -54,11 +55,12 @@ class CheckMemoryLeaks
 	}
 };
 static CheckMemoryLeaks checkLeaks;
+#endif
 
 int main(int, char**)
 {
-	DemoEntityManager demos;
-	demos.Run();
+	//DemoEntityManager demos;
+	//demos.Run();
     return 0;
 }
 

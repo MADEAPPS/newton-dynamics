@@ -31,14 +31,7 @@ endif ()
 #	include_directories(../../sdk/dProfiler/dProfiler/)
 #endif ()
 
-#include_directories(../../sdk/thirdParty/glfw/)
-#include_directories(../../sdk/thirdParty/imgui/)
-#include_directories(../../sdk/thirdParty/glfw/include/)
-#include_directories(../../sdk/thirdParty/glatter/include/glatter/)
-
 add_executable(${projectName} ${CPP_SOURCE})
-
-#target_link_libraries (${projectName} ntNewton dScene dModel dVehicle glfw imgui glatter)
 target_link_libraries (${projectName} ndCore ndCollision ndNewton)
 
 #if (NEWTON_BUILD_PROFILER)

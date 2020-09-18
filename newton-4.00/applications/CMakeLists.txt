@@ -25,7 +25,7 @@ endif()
 if (NEWTON_BUILD_SANDBOX_DEMOS STREQUAL "ON")
 	#message("BUILDING DEMOS.")
 	
-	add_subdirectory(applications/demosSandbox)
+	add_subdirectory(ndSandbox)
 	
      if(UNIX)
         find_package(glfw3 REQUIRED)

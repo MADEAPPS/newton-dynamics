@@ -20,6 +20,7 @@ cmake_minimum_required(VERSION 3.4.0)
 add_subdirectory(dCore)
 add_subdirectory(dNewton)
 add_subdirectory(dCollision)
+add_subdirectory(thirdParty)
 
 #add_subdirectory(ntNewton)
 
@@ -32,7 +33,6 @@ add_subdirectory(dCollision)
 #	add_subdirectory(dAnimation)
 #	add_subdirectory(dContainers)
 #	add_subdirectory(dCustomJoints)
-#	add_subdirectory(thirdParty)
 #endif()
 #
 #if (NEWTON_BUILD_PROFILER)

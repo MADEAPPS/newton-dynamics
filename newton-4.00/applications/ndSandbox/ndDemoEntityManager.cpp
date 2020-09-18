@@ -9,6 +9,7 @@
 * freely
 */
 
+#if 0
 #include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "DemoMesh.h"
@@ -1682,3 +1683,5 @@ void DemoEntityManager::Run()
 		glfwSwapBuffers(m_mainFrame);
     }
 }
+
+#endif
