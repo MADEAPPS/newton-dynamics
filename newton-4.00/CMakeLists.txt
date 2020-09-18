@@ -198,7 +198,7 @@ endif()
 # set(NEWTON_BUILD_SHARED_LIBS ON)
 #endif()
 
-if(NEWTON_BUILD_PROFILER)
+if(NEWTON_BUILD_PROFILER AND NEWTON_BUILD_SHARED_LIBS)
 	#add_definitions(-D_DG_USE_PROFILER)
 	add_definitions(-DD_PROFILER)
 endif()

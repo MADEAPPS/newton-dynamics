@@ -34,11 +34,11 @@ add_subdirectory(thirdParty)
 #	add_subdirectory(dContainers)
 #	add_subdirectory(dCustomJoints)
 #endif()
-#
-#if (NEWTON_BUILD_PROFILER)
-#	add_subdirectory(dProfiler)
-#endif (NEWTON_BUILD_PROFILER)
-#
+
+if (NEWTON_BUILD_PROFILER AND NEWTON_BUILD_SHARED_LIBS)
+	add_subdirectory(dProfiler)
+endif()
+
 #if (NEWTON_WITH_SSE_PLUGIN)
 #	add_subdirectory(dgNewtonSse)
 #endif()

@@ -29,7 +29,7 @@
 // or make a configuration that define macro D_PROFILER
 
 #ifdef D_PROFILER
-	#include <dProfiler.h>
+	#include <dTracyProfiler.h>
 	#define D_TRACKTIME() dProfilerZoneScoped(__FUNCTION__)
 	#define D_SET_TRACK_NAME(trackName) dProfilerSetTrackName(trackName)
 #else

@@ -34,14 +34,14 @@ include_directories(../../sdk/thirdParty/imgui/)
 include_directories(../../sdk/thirdParty/glfw/include/)
 include_directories(../../sdk/thirdParty/glatter/include/glatter/)
 
-if (NEWTON_BUILD_PROFILER)
+if (NEWTON_BUILD_PROFILER AND NEWTON_BUILD_SHARED_LIBS)
 	include_directories(../../sdk/dProfiler/dProfiler/)
 endif ()
 
 add_executable(${projectName} ${CPP_SOURCE})
 target_link_libraries (${projectName} ndCore ndCollision ndNewton glfw imgui glatter)
 
-if (NEWTON_BUILD_PROFILER)
+if (NEWTON_BUILD_PROFILER AND NEWTON_BUILD_SHARED_LIBS)
     target_link_libraries (${projectName} dProfiler)
 endif ()
 
