@@ -153,9 +153,12 @@ void ndDynamicsUpdate::BuildIsland()
 		ndConstraint* const joint = contactArray[i];
 		ndBodyKinematic* const body0 = joint->GetKinematicBody0();
 		ndBodyKinematic* const body1 = joint->GetKinematicBody1();
+		const dInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
 		body1->m_bodyIsConstrained = 1;
+		body1->m_resting = body1->m_resting & resting;
 		if (body0->GetInvMass() > dFloat32(0.0f))
 		{
+			body0->m_resting = body0->m_resting & resting;
 			ndBodyKinematic* root0 = FindRootAndSplit(body0);
 			ndBodyKinematic* root1 = FindRootAndSplit(body1);
 			body0->m_bodyIsConstrained = 1;
@@ -1181,7 +1184,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 			body->m_equilibrium = 1;
 		}
 	}
-	else 
+	else if ((count > 1) || bodyIslands[0]->m_bodyIsConstrained)
 	{
 		const bool state = 
 			(maxAccel > m_world->m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxAccel) ||

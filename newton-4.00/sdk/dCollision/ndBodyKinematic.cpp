@@ -443,7 +443,7 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 			//const dVector alpha(GetTorque().Scale(m_invMass.m_x));
 			const dVector alpha (GetTorque() * m_invMass);
 			dAssert(alpha.m_w == dFloat32(0.0f));
-			SetAccel(accel.m_w);
+			SetAccel(accel);
 			SetAlpha(alpha);
 			m_veloc += accel.Scale(timestep);
 			m_omega += alpha.Scale(timestep);

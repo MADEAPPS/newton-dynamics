@@ -296,6 +296,7 @@ void ndScene::BuildBodyArray()
 				{
 					body->m_rank = 0;
 					body->m_index = index;
+					body->m_resting = 1;
 					body->m_islandSleep = body->m_equilibrium;
 					body->m_weight = dFloat32(0.0f);
 					body->m_islandParent = body;
