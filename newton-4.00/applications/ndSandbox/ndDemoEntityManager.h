@@ -97,7 +97,6 @@ class ndDemoEntityManager
 	NewtonWorld* GetNewton() const;
 	void CreateSkyBox();
 
-	void ResetTimer();
 	void LoadScene (const char* const name);
 	void RemoveEntity (DemoEntity* const ent);
 	void RemoveEntity (dListNode* const entNode);
@@ -139,13 +138,8 @@ class ndDemoEntityManager
 	
 
 	private:
-	void Cleanup();
-
 	//void RenderUI();
-	
-	void UpdatePhysics(dFloat32 timestep);
 	dFloat32 CalculateInteplationParam () const;
-	
 	
 	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
 
@@ -156,7 +150,6 @@ class ndDemoEntityManager
 	void LoadDemo(int menu);
 	
 	DemoEntity* m_sky;
-	NewtonWorld* m_world;
 	DemoCameraManager* m_cameraManager;
 	ShaderPrograms m_shadeCache;
 	void* m_renderUIContext;
@@ -165,7 +158,7 @@ class ndDemoEntityManager
 	RenderGuiHelpCallback m_renderHelpMenus;
 	UpdateCameraCallback m_updateCamera;
 
-	unsigned64 m_microsecunds;
+	
 	TransparentHeap m_tranparentHeap;
 
 	int m_currentScene;
@@ -174,7 +167,7 @@ class ndDemoEntityManager
 	int m_currentPlugin;
 	
 	dFloat32 m_currentListenerTimestep;
-	dFloat32 m_mainThreadPhysicsTime;
+	
 	dFloat32 m_mainThreadPhysicsTimeAcc;
 
 	int m_broadPhaseType;
@@ -221,17 +214,25 @@ class ndDemoEntityManager
 	static void MouseScrollCallback(GLFWwindow* const window, double x, double y);
 	static void MouseButtonCallback(GLFWwindow* const window, int button, int action, int mods);
 
+	void Cleanup();
 	void LoadFont();
+	void ResetTimer();
 	void BeginFrame();
 	void RenderScene();
-	void CalculateFPS(dFloat32 timestep);
 	void RenderStats();
+	
 	void ShowMainMenuBar();
 
+	void CalculateFPS(dFloat32 timestep);
+	void UpdatePhysics(dFloat32 timestep);
+
 	GLFWwindow* m_mainFrame;
+	ndWorld* m_world;
+	dUnsigned64 m_microsecunds;
 
 	dFloat32 m_fps;
 	dFloat32 m_timestepAcc;
+	dFloat32 m_mainThreadPhysicsTime;
 
 	int	m_defaultFont;
 	int m_framesCount;

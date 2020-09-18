@@ -13,6 +13,10 @@
 #include "ndDemoEntityManager.h"
 #include "ndHighResolutionTimer.h"
 
+
+#define MAX_PHYSICS_FPS				60.0f
+#define MAX_PHYSICS_SUB_STEPS		2
+
 #if 0
 #include "SkyBox.h"
 #include "DemoMesh.h"
@@ -32,8 +36,6 @@
 	#include "CocoaOpenglGlue.h"
 #endif
 
-#define MAX_PHYSICS_FPS				60.0f
-#define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0		// using NewtonMesh tool
@@ -269,13 +271,6 @@ int ndDemoEntityManager::GetJoystickButtons (char* const axisbuttons, int maxBut
 	return buttonsCount;
 }
 
-
-void ndDemoEntityManager::ResetTimer()
-{
-	dResetTimer();
-	m_microsecunds = dGetTimeInMicrosenconds ();
-}
-
 void ndDemoEntityManager::RemoveEntity (dListNode* const entNode)
 {
 	DemoEntity* const entity = entNode->GetInfo();
@@ -293,106 +288,6 @@ void ndDemoEntityManager::RemoveEntity (DemoEntity* const ent)
 		}
 	}
 }
-
-void ndDemoEntityManager::Cleanup ()
-{
-	// is we are run asynchronous we need make sure no update in on flight.
-	if (m_world) {
-		NewtonWaitForUpdateToFinish (m_world);
-	}
-
-	// destroy all remaining visual objects
-	while (dList<DemoEntity*>::GetFirst()) {
-		RemoveEntity (dList<DemoEntity*>::GetFirst());
-	}
-
-	if (m_cameraManager) {
-		delete m_cameraManager;
-	}
-
-	m_sky = nullptr;
-	m_updateCamera = nullptr;
-
-	// destroy the Newton world
-	if (m_world) {
-		// get serialization call back before destroying the world
-		NewtonDestroy (m_world);
-		m_world = nullptr;
-	}
-
-	// check that there are no memory leak on exit
-	dAssert (NewtonGetMemoryUsed () == 0);
-
-	// create the newton world
-	m_world = NewtonCreate();
-
-	// link the work with this user data
-	NewtonWorldSetUserData(m_world, this);
-
-	// set a post update callback which is call after all simulation and all listeners updates
-	NewtonSetPostUpdateCallback (m_world, PostUpdateCallback);
-
-	// set joint serialization call back
-	dCustomJoint::Initalize(m_world);
-
-	// add the camera manager
-	m_cameraManager = new DemoCameraManager(this);
-
-	ApplyMenuOptions();
-
-	// Set the Newton world user data
-	NewtonWorldSetUserData(m_world, this);
-
-	// set the number of sub steps
-	NewtonSetNumberOfSubsteps (m_world, MAX_PHYSICS_SUB_STEPS);
-
-	// register contact creation destruction callbacks
-	NewtonWorldSetCreateDestroyContactCallback(m_world, OnCreateContact, OnDestroyContact);
-
-	// load all available plug ins
-	char plugInPath[2048];
-	plugInPath[0] = 0;
-	#if defined (_MSC_VER)
-		GetModuleFileNameA(nullptr, plugInPath, 256);
-	#endif
-
-	for (int i = int(strlen(plugInPath) - 1); i >= 0; i--) {
-		if ((plugInPath[i] == '\\') || (plugInPath[i] == '/')) {
-			plugInPath[i] = 0;
-			break;
-		}
-	}
-
-#ifdef _DEBUG
-	#ifdef __linux__
-		strcat(plugInPath, "newtonPlugins");
-	#else
-		#ifdef _NEWTON_USE_DOUBLE
-			strcat(plugInPath, "/newtonPlugins/debug_double");
-		#else
-			strcat(plugInPath, "/newtonPlugins/debug");
-		#endif
-	#endif
-#else
-	#ifdef __linux__
-		strcat(plugInPath, "newtonPlugins");
-	#else
-		#ifdef _NEWTON_USE_DOUBLE
-			strcat(plugInPath, "/newtonPlugins/release_double");
-		#else
-			strcat(plugInPath, "/newtonPlugins/release");
-		#endif
-	#endif
-#endif
-	NewtonLoadPlugins(m_world, plugInPath);
-
-	// we start without 2d render
-	m_renderDemoGUI = nullptr;
-	m_renderHelpMenus = nullptr;
-	m_renderUIContext = nullptr;
-}
-
-
 
 void ndDemoEntityManager::ApplyMenuOptions()
 {
@@ -687,67 +582,10 @@ void ndDemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dV
 	m_cameraManager->SetCameraMatrix(this, rotation, position);
 }
 
-void ndDemoEntityManager::UpdatePhysics(dFloat32 timestep)
-{
-	// update the physics
-	if (m_world && !m_suspendPhysicsUpdate) {
-		D_TRACKTIME();
-
-		dFloat32 timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
-		unsigned64 timestepMicrosecunds = unsigned64 (timestepInSecunds * 1000000.0f);
-
-		unsigned64 currentTime = dGetTimeInMicrosenconds ();
-		unsigned64 nextTime = currentTime - m_microsecunds;
-		if (nextTime > timestepMicrosecunds * 2) {
-			m_microsecunds = currentTime - timestepMicrosecunds * 2;
-			nextTime = currentTime - m_microsecunds;
-		}
-
-		bool newUpdate = false;
-		dFloat32 physicsTime = 0.0f;
-		//while (nextTime >= timestepMicrosecunds) 
-		if (nextTime >= timestepMicrosecunds) 
-		{
-			newUpdate = true;
-			ClearDebugDisplay(m_world);
-
-#ifdef DEMO_CHECK_ASYN_UPDATE
-			g_checkAsyncUpdate = 1;
-#endif
-			if (m_asynchronousPhysicsUpdate) {
-				NewtonUpdateAsync(m_world, timestepInSecunds);
-#ifdef DEMO_CHECK_ASYN_UPDATE
-				NewtonWaitForUpdateToFinish(m_world);
-				g_checkAsyncUpdate = 0;
-#endif
-			} else {
-				NewtonUpdate(m_world, timestepInSecunds);
-			}
-
-			physicsTime += NewtonGetLastUpdateTime(m_world);
-			
-			nextTime -= timestepMicrosecunds;
-			m_microsecunds += timestepMicrosecunds;
-		}
-
-		if (newUpdate) {
-			m_physicsFramesCount ++;
-			m_mainThreadPhysicsTimeAcc += physicsTime;
-			if (m_physicsFramesCount >= 16) {
-				m_mainThreadPhysicsTime = m_mainThreadPhysicsTimeAcc / m_physicsFramesCount;
-				m_physicsFramesCount = 0;
-				m_mainThreadPhysicsTimeAcc = 0.0f;
-			}
-
-		}
-		
-//dTrace (("%f\n", m_mainThreadPhysicsTime));
-	}
-}
 
 dFloat32 ndDemoEntityManager::CalculateInteplationParam () const
 {
-	unsigned64 timeStep = dGetTimeInMicrosenconds () - m_microsecunds;		
+	dUnsigned64 timeStep = dGetTimeInMicrosenconds () - m_microsecunds;		
 	dFloat32 param = (dFloat32 (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
 	dAssert (param >= 0.0f);
 	if (param > 1.0f) {
@@ -894,7 +732,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	m_showUI = false;
 	m_showAABB = false;
-	m_showStats = false;
+	m_showStats = true;
 	m_autoSleepMode = false;
 	m_updateMenuOptions = false;
 	m_suspendPhysicsUpdate = false;
@@ -929,9 +767,11 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//	m_showListenersDebugInfo = true;
 	//  m_asynchronousPhysicsUpdate = true;
 
-	//Cleanup();
-	//ResetTimer();
-	//
+	m_microsecunds = 0;
+	m_world = nullptr;
+	Cleanup();
+	ResetTimer();
+	
 	//m_currentPlugin = 0;
 	//void* preferedPlugin = NewtonGetPreferedPlugin(m_world);
 	//for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
@@ -948,20 +788,19 @@ ndDemoEntityManager::ndDemoEntityManager()
 ndDemoEntityManager::~ndDemoEntityManager()
 {
 	// is we are run asynchronous we need make sure no update in on flight.
-	//if (m_world) 
-	//{
-	//	NewtonWaitForUpdateToFinish(m_world);
-	//}
-	//
-	//Cleanup();
-	//
-	//// destroy the empty world
-	//if (m_world) 
-	//{
-	//	NewtonDestroy(m_world);
-	//	m_world = nullptr;
-	//}
-	//
+	if (m_world) 
+	{
+		m_world->Sync();
+	}
+
+	Cleanup();
+	
+	// destroy the empty world
+	if (m_world) 
+	{
+		delete m_world;
+	}
+	
 	//if (m_cameraManager) 
 	//{
 	//	delete m_cameraManager;
@@ -1022,6 +861,10 @@ void ndDemoEntityManager::LoadFont()
 	glBindTexture(GL_TEXTURE_2D, last_texture);
 }
 
+void ndDemoEntityManager::ResetTimer()
+{
+	m_microsecunds = dGetTimeInMicrosenconds();
+}
 
 void ndDemoEntityManager::ErrorCallback(int error, const char* description)
 {
@@ -1126,7 +969,7 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
 
-	//window->RenderScene();
+	window->RenderScene();
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1250,7 +1093,7 @@ void ndDemoEntityManager::CalculateFPS(dFloat32 timestep)
 	if (m_timestepAcc >= 0.25f) 
 	{
 		m_fps = dFloat32(m_framesCount) / m_timestepAcc;
-		//m_timestepAcc -= 0.25f;
+		m_timestepAcc -= 0.25f;
 		m_timestepAcc -= 0.0f;
 		m_framesCount = 0;
 	}
@@ -1510,10 +1353,10 @@ void ndDemoEntityManager::RenderStats()
 			sprintf(text, "fps:           %6.3f", m_fps);
 			ImGui::Text(text, "");
 
-			//sprintf(text, "physics time: %6.3f ms", m_mainThreadPhysicsTime * 1000.0f);
+			sprintf(text, "physics time: %6.3f ms", m_mainThreadPhysicsTime * 1000.0f);
 			ImGui::Text(text, "");
 
-			//sprintf(text, "memory used:   %d kbytes", NewtonGetMemoryUsed() / 1024);
+			sprintf(text, "memory used:   %d kbytes", int (dMemory::GetMemoryUsed() / 1024));
 			ImGui::Text(text, "");
 
 			//if (m_currentPlugin) 
@@ -1559,12 +1402,173 @@ void ndDemoEntityManager::RenderStats()
 	ShowMainMenuBar();
 }
 
+void ndDemoEntityManager::Cleanup()
+{
+	// is we are run asynchronous we need make sure no update in on flight.
+	if (m_world) 
+	{
+		m_world->Sync();
+	}
+
+	// destroy all remaining visual objects
+	//while (dList<DemoEntity*>::GetFirst()) 
+	//{
+	//	RemoveEntity(dList<DemoEntity*>::GetFirst());
+	//}
+	//if (m_cameraManager) 
+	//{
+	//	delete m_cameraManager;
+	//}
+	//m_sky = nullptr;
+	//m_updateCamera = nullptr;
+
+	// destroy the Newton world
+	if (m_world) 
+	{
+		// get serialization call back before destroying the world
+		delete m_world;
+	}
+
+	// create the newton world
+	m_world = new ndWorld();
+
+	//// link the work with this user data
+	//NewtonWorldSetUserData(m_world, this);
+	//
+	//// set a post update callback which is call after all simulation and all listeners updates
+	//NewtonSetPostUpdateCallback(m_world, PostUpdateCallback);
+	//
+	//// set joint serialization call back
+	//dCustomJoint::Initalize(m_world);
+	//
+	//// add the camera manager
+	//m_cameraManager = new DemoCameraManager(this);
+	//
+	//ApplyMenuOptions();
+	//
+	//// Set the Newton world user data
+	//NewtonWorldSetUserData(m_world, this);
+	//
+	//// set the number of sub steps
+	//NewtonSetNumberOfSubsteps(m_world, MAX_PHYSICS_SUB_STEPS);
+	//
+	//// register contact creation destruction callbacks
+	//NewtonWorldSetCreateDestroyContactCallback(m_world, OnCreateContact, OnDestroyContact);
+	//
+	//// load all available plug ins
+	//char plugInPath[2048];
+	//plugInPath[0] = 0;
+	//#if defined (_MSC_VER)
+	//	GetModuleFileNameA(nullptr, plugInPath, 256);
+	//#endif
+	//
+	//for (int i = int(strlen(plugInPath) - 1); i >= 0; i--) {
+	//	if ((plugInPath[i] == '\\') || (plugInPath[i] == '/')) {
+	//		plugInPath[i] = 0;
+	//		break;
+	//	}
+	//}
+
+#ifdef _DEBUG
+	//#ifdef __linux__
+	//	strcat(plugInPath, "newtonPlugins");
+	//#else
+	//	#ifdef _NEWTON_USE_DOUBLE
+	//		strcat(plugInPath, "/newtonPlugins/debug_double");
+	//	#else
+	//		strcat(plugInPath, "/newtonPlugins/debug");
+	//	#endif
+	//#endif
+#else
+	#ifdef __linux__
+		strcat(plugInPath, "newtonPlugins");
+	#else
+		#ifdef _NEWTON_USE_DOUBLE
+			strcat(plugInPath, "/newtonPlugins/release_double");
+		#else
+			strcat(plugInPath, "/newtonPlugins/release");
+		#endif
+	#endif
+#endif
+	//NewtonLoadPlugins(m_world, plugInPath);
+
+	// we start without 2d render
+	m_renderDemoGUI = nullptr;
+	//m_renderHelpMenus = nullptr;
+	//m_renderUIContext = nullptr;
+}
+
+void ndDemoEntityManager::UpdatePhysics(dFloat32 timestep)
+{
+#if 0
+	// update the physics
+	if (m_world && !m_suspendPhysicsUpdate) 
+	{
+		D_TRACKTIME();
+
+		dFloat32 timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
+		dUnsigned64 timestepMicrosecunds = dUnsigned64(timestepInSecunds * 1000000.0f);
+
+		dUnsigned64 currentTime = dGetTimeInMicrosenconds();
+		dUnsigned64 nextTime = currentTime - m_microsecunds;
+		if (nextTime > timestepMicrosecunds * 2) 
+		{
+			m_microsecunds = currentTime - timestepMicrosecunds * 2;
+			nextTime = currentTime - m_microsecunds;
+		}
+
+		bool newUpdate = false;
+		dFloat32 physicsTime = 0.0f;
+		//while (nextTime >= timestepMicrosecunds) 
+		if (nextTime >= timestepMicrosecunds)
+		{
+			newUpdate = true;
+			ClearDebugDisplay(m_world);
+
+#ifdef DEMO_CHECK_ASYN_UPDATE
+			g_checkAsyncUpdate = 1;
+#endif
+			if (m_asynchronousPhysicsUpdate) 
+			{
+				NewtonUpdateAsync(m_world, timestepInSecunds);
+#ifdef DEMO_CHECK_ASYN_UPDATE
+				NewtonWaitForUpdateToFinish(m_world);
+				g_checkAsyncUpdate = 0;
+#endif
+			}
+			else 
+			{
+				NewtonUpdate(m_world, timestepInSecunds);
+			}
+
+			physicsTime += NewtonGetLastUpdateTime(m_world);
+
+			nextTime -= timestepMicrosecunds;
+			m_microsecunds += timestepMicrosecunds;
+		}
+
+		if (newUpdate) 
+		{
+			m_physicsFramesCount++;
+			m_mainThreadPhysicsTimeAcc += physicsTime;
+			if (m_physicsFramesCount >= 16) 
+			{
+				m_mainThreadPhysicsTime = m_mainThreadPhysicsTimeAcc / m_physicsFramesCount;
+				m_physicsFramesCount = 0;
+				m_mainThreadPhysicsTimeAcc = 0.0f;
+			}
+		}
+
+		//dTrace (("%f\n", m_mainThreadPhysicsTime));
+	}
+#endif
+}
 
 void ndDemoEntityManager::RenderScene()
 {
 	dFloat32 timestep = dGetElapsedSeconds();
 	CalculateFPS(timestep);
-//	UpdatePhysics(timestep);
+	UpdatePhysics(timestep);
 
 	D_TRACKTIME();
 	// Get the interpolated location of each body in the scene
