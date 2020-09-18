@@ -9,8 +9,10 @@
 * freely
 */
 
+#include "ndSandboxStdafx.h"
+#include "ndDemoEntityManager.h"
+
 #if 0
-#include "toolbox_stdafx.h"
 #include "SkyBox.h"
 #include "DemoMesh.h"
 #include "DemoEntity.h"
@@ -20,7 +22,7 @@
 #include "DebugDisplay.h"
 #include "TargaToOpenGl.h"
 #include "ShaderPrograms.h"
-#include "DemoEntityManager.h"
+#include "ndDemoEntityManager.h"
 #include "DemoCameraManager.h"
 #include "DemoCameraManager.h"
 #include "dHighResolutionTimer.h"
@@ -76,49 +78,49 @@
 //#define DEFAULT_SCENE	40		// soft bodies	
 						 
 /// demos forward declaration 
-void Friction (DemoEntityManager* const scene);
-void Restitution (DemoEntityManager* const scene);
-void NewtonCradle (DemoEntityManager* const scene);
-void GyroscopyPrecession(DemoEntityManager* const scene);
-void ClosestDistance (DemoEntityManager* const scene);
-void ConvexCast (DemoEntityManager* const scene);
-void PrimitiveCollision (DemoEntityManager* const scene);
-void KinematicBodies (DemoEntityManager* const scene);
-void ObjectPlacement (DemoEntityManager* const scene);
-void ClothPatch(DemoEntityManager* const scene);
-void SoftBodies (DemoEntityManager* const scene);
-void BasicBoxStacks (DemoEntityManager* const scene);
-void SimpleMeshLevelCollision (DemoEntityManager* const scene);
-void OptimizedMeshLevelCollision (DemoEntityManager* const scene);
-void UniformScaledCollision (DemoEntityManager* const scene);
-void NonUniformScaledCollision (DemoEntityManager* const scene);
-void ScaledMeshCollision (DemoEntityManager* const scene);
-void ContinuousCollision (DemoEntityManager* const scene);
-void FlatLandGame (DemoEntityManager* const scene);
-void SceneCollision (DemoEntityManager* const scene);
-void CompoundCollision(DemoEntityManager* const scene);
-void AlchimedesBuoyancy(DemoEntityManager* const scene);
-void SimpleConvexFracturing (DemoEntityManager* const scene);
-void UsingNewtonMeshTool (DemoEntityManager* const scene);
-void MultiRayCast (DemoEntityManager* const scene);
-void MultibodyBodyCar(DemoEntityManager* const scene);
-void SuperCar (DemoEntityManager* const scene);
-void MilitaryTransport (DemoEntityManager* const scene);
-void BasicPlayerController (DemoEntityManager* const scene);
-void AnimatedPlayerController (DemoEntityManager* const scene);
-void AdvancedPlayerController (DemoEntityManager* const scene);
-void HeightFieldCollision (DemoEntityManager* const scene);
-void UserPlaneCollision (DemoEntityManager* const scene);
-void UserHeightFieldCollision (DemoEntityManager* const scene);
-void PassiveRagdoll (DemoEntityManager* const scene);
-void BalancingBiped (DemoEntityManager* const scene);
-void ServoJoints (DemoEntityManager* const scene);
-void ConstructionVehicle (DemoEntityManager* const scene);
-void StandardJoints (DemoEntityManager* const scene);
-void SixAxisManipulators(DemoEntityManager* const scene);
-void Hexapod(DemoEntityManager* const scene);
+void Friction (ndDemoEntityManager* const scene);
+void Restitution (ndDemoEntityManager* const scene);
+void NewtonCradle (ndDemoEntityManager* const scene);
+void GyroscopyPrecession(ndDemoEntityManager* const scene);
+void ClosestDistance (ndDemoEntityManager* const scene);
+void ConvexCast (ndDemoEntityManager* const scene);
+void PrimitiveCollision (ndDemoEntityManager* const scene);
+void KinematicBodies (ndDemoEntityManager* const scene);
+void ObjectPlacement (ndDemoEntityManager* const scene);
+void ClothPatch(ndDemoEntityManager* const scene);
+void SoftBodies (ndDemoEntityManager* const scene);
+void BasicBoxStacks (ndDemoEntityManager* const scene);
+void SimpleMeshLevelCollision (ndDemoEntityManager* const scene);
+void OptimizedMeshLevelCollision (ndDemoEntityManager* const scene);
+void UniformScaledCollision (ndDemoEntityManager* const scene);
+void NonUniformScaledCollision (ndDemoEntityManager* const scene);
+void ScaledMeshCollision (ndDemoEntityManager* const scene);
+void ContinuousCollision (ndDemoEntityManager* const scene);
+void FlatLandGame (ndDemoEntityManager* const scene);
+void SceneCollision (ndDemoEntityManager* const scene);
+void CompoundCollision(ndDemoEntityManager* const scene);
+void AlchimedesBuoyancy(ndDemoEntityManager* const scene);
+void SimpleConvexFracturing (ndDemoEntityManager* const scene);
+void UsingNewtonMeshTool (ndDemoEntityManager* const scene);
+void MultiRayCast (ndDemoEntityManager* const scene);
+void MultibodyBodyCar(ndDemoEntityManager* const scene);
+void SuperCar (ndDemoEntityManager* const scene);
+void MilitaryTransport (ndDemoEntityManager* const scene);
+void BasicPlayerController (ndDemoEntityManager* const scene);
+void AnimatedPlayerController (ndDemoEntityManager* const scene);
+void AdvancedPlayerController (ndDemoEntityManager* const scene);
+void HeightFieldCollision (ndDemoEntityManager* const scene);
+void UserPlaneCollision (ndDemoEntityManager* const scene);
+void UserHeightFieldCollision (ndDemoEntityManager* const scene);
+void PassiveRagdoll (ndDemoEntityManager* const scene);
+void BalancingBiped (ndDemoEntityManager* const scene);
+void ServoJoints (ndDemoEntityManager* const scene);
+void ConstructionVehicle (ndDemoEntityManager* const scene);
+void StandardJoints (ndDemoEntityManager* const scene);
+void SixAxisManipulators(ndDemoEntityManager* const scene);
+void Hexapod(ndDemoEntityManager* const scene);
 
-DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] = 
+ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
 	{"Using the newton mesh tool", "demonstrate how to use the newton mesh tool for mesh manipulation", UsingNewtonMeshTool},
 	{"Coefficients of friction", "demonstrate the effect of various coefficient of friction", Friction},
@@ -163,21 +165,21 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Simple soft Body", "show simple soft body", SoftBodies},
 };
 
-DemoEntityManager::ButtonKey::ButtonKey (bool state)
+ndDemoEntityManager::ButtonKey::ButtonKey (bool state)
 	:m_state(state)
 	,m_memory0(false)
 	,m_memory1(false)
 {
 }
 
-int DemoEntityManager::ButtonKey::UpdateTrigger (bool triggerValue)
+int ndDemoEntityManager::ButtonKey::UpdateTrigger (bool triggerValue)
 {
 	m_memory0 = m_memory1;
 	m_memory1 = triggerValue;
 	return (!m_memory0 & m_memory1) ? 1 : 0;
 }
 
-int DemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
+int ndDemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 {
 	if (UpdateTrigger (triggerValue)) {
 		m_state = ! m_state;
@@ -188,290 +190,59 @@ int DemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
-DemoEntityManager::DemoEntityManager ()
-	:m_mainFrame(NULL)
-	,m_defaultFont(0)
-	,m_sky(NULL)
-	,m_world(NULL)
-	,m_cameraManager(NULL)
-	,m_renderUIContext(NULL)
-	,m_updateCameraContext(NULL)
-	,m_renderDemoGUI(NULL)
-	,m_renderHelpMenus(NULL)
-	,m_updateCamera(NULL)
-	,m_microsecunds(0)
-	,m_tranparentHeap()
-	,m_currentScene(DEFAULT_SCENE)
-	,m_lastCurrentScene(DEFAULT_SCENE)
-	,m_framesCount(0)
-	,m_physicsFramesCount(0)
-	,m_currentPlugin(0)
-	,m_fps(0.0f)
-	,m_timestepAcc(0.0f)
-	,m_currentListenerTimestep(0.0f)
-	,m_mainThreadPhysicsTime(0.0f)
-	,m_mainThreadPhysicsTimeAcc(0.0f)
-	,m_broadPhaseType(0)
-	,m_workerThreads(1)
-	,m_solverPasses(4)
-	,m_solverSubSteps(2)
-	,m_debugDisplayMode(0)
-	,m_collisionDisplayMode(0)
-	,m_showUI(true)
-	,m_showAABB(false)
-	,m_showStats(true)
-	,m_hasJoytick(false)
-	,m_autoSleepMode(true)
-	,m_hideVisualMeshes(false)
-	,m_showNormalForces(false)
-	,m_showCenterOfMass(false)
-	,m_showBodyFrame(false)
-	,m_updateMenuOptions(true)
-	,m_showContactPoints(false)
-	,m_showJointDebugInfo(false)
-	,m_showListenersDebugInfo(false)
-	,m_showCollidingFaces(false)
-	,m_suspendPhysicsUpdate(false)
-	,m_asynchronousPhysicsUpdate(false)
-	,m_solveLargeIslandInParallel(true)
-	,m_showRaycastHit(false)
-	,m_profilerMode(0)
-	,m_contactLock(0)
-	,m_deleteLock(0)
-	,m_contactList()
-{
-	// Setup window
-	glfwSetErrorCallback(ErrorCallback);
 
-	glfwInit();
-
-	m_hasJoytick = glfwJoystickPresent(0) ?  true : false;
-
-	m_mainFrame = glfwCreateWindow(1280, 720, "Newton Game Dynamics 3.14 demos", NULL, NULL);
-	glfwMakeContextCurrent(m_mainFrame);
-
-	int monitorsCount;
-	GLFWmonitor** monitors = glfwGetMonitors(&monitorsCount);
-	if (monitorsCount > 1) {
-		int window_x;
-		int window_y;
-		int monitor_x;
-		int monitor_y;
-
-		glfwGetMonitorPos(monitors[1], &monitor_x, &monitor_y);
-		glfwGetWindowPos(m_mainFrame, &window_x, &window_y);
-		glfwSetWindowPos(m_mainFrame, monitor_x + window_x, monitor_y + 64);
-	}
-
-	// attach myself to the main frame
-	glfwSetWindowUserPointer(m_mainFrame, this);
-
-	// Setup ImGui binding
-//	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	io.UserData = this;
-
-	// Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array.
-	io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;                     
-	io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
-	io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
-	io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
-	io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
-	io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
-	io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
-	io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
-	io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
-	io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
-	io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
-	io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
-	io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
-	io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
-	io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
-	io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
-	io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
-	io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
-	io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
-
-	// Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
-	io.RenderDrawListsFn = RenderDrawListsCallback;
-	//	io.SetClipboardTextFn = ImGui_ImplGlfw_SetClipboardText;
-	//	io.GetClipboardTextFn = ImGui_ImplGlfw_GetClipboardText;
-
-#ifdef _MSC_VER 
-	io.ImeWindowHandle = glfwGetWin32Window(m_mainFrame);
-#else 
-	dTrace (("no sure what to set this to for non windews systems\n"))
-//	dAssert (0);
-#endif
-
-	glfwSwapInterval(0);
-	glfwSetKeyCallback(m_mainFrame, KeyCallback);
-	glfwSetCharCallback(m_mainFrame, CharCallback);
-	glfwSetScrollCallback(m_mainFrame, MouseScrollCallback);
-	glfwSetCursorPosCallback(m_mainFrame, CursorposCallback);
-	glfwSetMouseButtonCallback(m_mainFrame, MouseButtonCallback);
-
-	LoadFont();
-
-	m_mousePressed[0] = false;
-	m_mousePressed[1] = false;
-	m_mousePressed[2] = false;
-
-	// initialized the physics world for the new scene
-//	m_showUI = false;
-//	m_showAABB = false;
-//	m_hideVisualMeshes = true;
-//	m_autoSleepMode = false;
-//	m_broadPhaseType = 1;
-//	m_solverPasses = 4;
-//	m_workerThreads = 4;
-//	m_solverSubSteps = 2;
-//	m_showRaycastHit = true;
-//	m_showCenterOfMass = false;
-//	m_showNormalForces = true;
-//	m_showContactPoints = true;
-//	m_showJointDebugInfo = true;
-//	m_collisionDisplayMode = 2;
-//	m_showListenersDebugInfo = true;
-	m_asynchronousPhysicsUpdate = true;
-
-	Cleanup();
-	ResetTimer();
-
-	m_currentPlugin = 0;
-	void* preferedPlugin = NewtonGetPreferedPlugin(m_world);
-	for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
-		m_currentPlugin ++;
-		if (ptr == preferedPlugin) {
-			break;
-		}
-	}
-//m_currentPlugin = 0;
-
-	m_shadeCache.CreateAllEffects();
-
-/*
-	dFloat A[2][2];
-	dFloat x[2];
-	dFloat b[2];
-	dFloat l[2];
-	dFloat h[2];
-
-	A[0][0] = 2.0f;
-	A[0][1] = 1.0f;
-	A[1][0] = 1.0f;
-	A[1][1] = 2.0f;
-	b[0] = 1.0f;
-	b[1] = 1.0f;
-	x[0] = 1;
-	x[1] = 2;
-	
-	l[0] = 0.0f;
-	l[1] = 0.0f;
-	h[0] = 0.25f;
-	h[1] = 1.0f;
-	
-	dMatrixTimeVector(2, &A[0][0], x, b);
-	dSolveDantzigLCP(2, &A[0][0], x, b, l, h);
-
-	int xxx = 0;
-	const int xxxxxx = 450;
-	dDownHeap<int, unsigned> xxxxx (xxxxxx + 2);
-	for (int i = 0; i < xxxxxx; i ++){
-		xxxxx.Push (xxx, i);
-	}
-
-	for (int i = 0; i < 10000; i ++){
-		int index = dRand() % xxxxxx;
-		int key = xxxxx.Value(index);
-		xxxxx.Remove (index);
-		xxxxx.Push (xxx, key);
-	}
-*/
-}
-
-DemoEntityManager::~DemoEntityManager ()
-{
-	// is we are run asynchronous we need make sure no update in on flight.
-	if (m_world) {
-		NewtonWaitForUpdateToFinish (m_world);
-	}
-
-	Cleanup ();
-
-	// destroy the empty world
-	if (m_world) {
-		NewtonDestroy (m_world);
-		m_world = NULL;
-	}
-
-	if (m_cameraManager) {
-		delete m_cameraManager;
-	}
-
-	// Cleanup
-	GLuint font_texture (m_defaultFont);
-	glDeleteTextures(1, &font_texture);
-	ImGui::GetIO().Fonts->TexID = 0;
-
-	ImGui::Shutdown();
-	glfwTerminate();
-	dAssert (NewtonGetMemoryUsed () == 0);
-}
-
-
-DemoCamera* DemoEntityManager::GetCamera() const
+DemoCamera* ndDemoEntityManager::GetCamera() const
 {
 	return m_cameraManager->GetCamera();
 }
 
 
-bool DemoEntityManager::GetKeyState(int key) const
+bool ndDemoEntityManager::GetKeyState(int key) const
 {
 	const ImGuiIO& io = ImGui::GetIO();
 	return io.KeysDown[key];
 }
 
-bool DemoEntityManager::IsShiftKeyDown () const
+bool ndDemoEntityManager::IsShiftKeyDown () const
 {
 	const ImGuiIO& io = ImGui::GetIO();
 	bool state = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
 	return state;
 }
 
-bool DemoEntityManager::IsControlKeyDown () const
+bool ndDemoEntityManager::IsControlKeyDown () const
 {
 	const ImGuiIO& io = ImGui::GetIO();
 	bool state = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
 	return state;
 }
 
-bool DemoEntityManager::GetCaptured() const
+bool ndDemoEntityManager::GetCaptured() const
 {
 	ImGuiIO& io = ImGui::GetIO();
 	return io.WantCaptureMouse;
 }
 
-bool DemoEntityManager::GetMouseKeyState (int button) const
+bool ndDemoEntityManager::GetMouseKeyState (int button) const
 {
 	ImGuiIO& io = ImGui::GetIO();
 	return io.MouseDown[button];
 }
 
-void DemoEntityManager::Set2DDisplayRenderFunction (RenderGuiHelpCallback helpCallback, RenderGuiHelpCallback UIcallback, void* const context)
+void ndDemoEntityManager::Set2DDisplayRenderFunction (RenderGuiHelpCallback helpCallback, RenderGuiHelpCallback UIcallback, void* const context)
 {
 	m_renderDemoGUI = UIcallback;
 	m_renderHelpMenus = helpCallback;
 	m_renderUIContext = context;
 }
 
-void DemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback, void* const context)
+void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback, void* const context)
 {
 	m_updateCamera = callback;
 	m_updateCameraContext = context;
 }
 
-int DemoEntityManager::GetJoystickAxis (dFloat* const axisValues, int maxAxis) const
+int ndDemoEntityManager::GetJoystickAxis (dFloat* const axisValues, int maxAxis) const
 {
 	int axisCount = 0;
 	if (m_hasJoytick) {
@@ -484,7 +255,7 @@ int DemoEntityManager::GetJoystickAxis (dFloat* const axisValues, int maxAxis) c
 	return axisCount;
 }
 
-int DemoEntityManager::GetJoystickButtons (char* const axisbuttons, int maxButton) const
+int ndDemoEntityManager::GetJoystickButtons (char* const axisbuttons, int maxButton) const
 {
 	int buttonsCount = 0;
 	if (m_hasJoytick) {
@@ -498,20 +269,20 @@ int DemoEntityManager::GetJoystickButtons (char* const axisbuttons, int maxButto
 }
 
 
-void DemoEntityManager::ResetTimer()
+void ndDemoEntityManager::ResetTimer()
 {
 	dResetTimer();
 	m_microsecunds = dGetTimeInMicrosenconds ();
 }
 
-void DemoEntityManager::RemoveEntity (dListNode* const entNode)
+void ndDemoEntityManager::RemoveEntity (dListNode* const entNode)
 {
 	DemoEntity* const entity = entNode->GetInfo();
 	entity->Release();
 	Remove(entNode);
 }
 
-void DemoEntityManager::RemoveEntity (DemoEntity* const ent)
+void ndDemoEntityManager::RemoveEntity (DemoEntity* const ent)
 {
 	dCustomScopeLock lock(&m_deleteLock);
 	for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) {
@@ -522,7 +293,7 @@ void DemoEntityManager::RemoveEntity (DemoEntity* const ent)
 	}
 }
 
-void DemoEntityManager::Cleanup ()
+void ndDemoEntityManager::Cleanup ()
 {
 	// is we are run asynchronous we need make sure no update in on flight.
 	if (m_world) {
@@ -538,14 +309,14 @@ void DemoEntityManager::Cleanup ()
 		delete m_cameraManager;
 	}
 
-	m_sky = NULL;
-	m_updateCamera = NULL;
+	m_sky = nullptr;
+	m_updateCamera = nullptr;
 
 	// destroy the Newton world
 	if (m_world) {
 		// get serialization call back before destroying the world
 		NewtonDestroy (m_world);
-		m_world = NULL;
+		m_world = nullptr;
 	}
 
 	// check that there are no memory leak on exit
@@ -581,7 +352,7 @@ void DemoEntityManager::Cleanup ()
 	char plugInPath[2048];
 	plugInPath[0] = 0;
 	#if defined (_MSC_VER)
-		GetModuleFileNameA(NULL, plugInPath, 256);
+		GetModuleFileNameA(nullptr, plugInPath, 256);
 	#endif
 
 	for (int i = int(strlen(plugInPath) - 1); i >= 0; i--) {
@@ -615,58 +386,14 @@ void DemoEntityManager::Cleanup ()
 	NewtonLoadPlugins(m_world, plugInPath);
 
 	// we start without 2d render
-	m_renderDemoGUI = NULL;
-	m_renderHelpMenus = NULL;
-	m_renderUIContext = NULL;
+	m_renderDemoGUI = nullptr;
+	m_renderHelpMenus = nullptr;
+	m_renderUIContext = nullptr;
 }
 
 
-void DemoEntityManager::LoadFont()
-{
-	// Build texture atlas
-	ImGuiIO& io = ImGui::GetIO();
 
-    // Load Fonts
-    // (there is a default font, this is only if you want to change it. see extra_fonts/README.txt for more details)
-    //io.Fonts->AddFontDefault();
-
-	float pixedSize = 18;
-	char pathName[2048];
-	const char* const name = "Cousine-Regular.ttf";
-	//char* const name = "calibri.ttf";
-	//char* const name = "courbd.ttf";
-
-	dGetWorkingFileName (name, pathName);
-    io.Fonts->AddFontFromFileTTF(pathName, pixedSize);
-    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
-
-	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) 
-	// because it is more likely to be compatible with user's existing shaders. 
-	// If your ImTextureId represent a higher-level concept than just a GL texture id, 
-	// consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
-	unsigned char* pixels;
-	int width, height;
-	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);   
-
-	// Upload texture to graphics system
-	GLint last_texture;
-	GLuint font_texture;
-	glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
-	glGenTextures(1, &font_texture);
-	glBindTexture(GL_TEXTURE_2D, font_texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-
-	// Store our identifier
-	m_defaultFont = int (font_texture);
-	io.Fonts->TexID = (void *)(intptr_t)m_defaultFont;
-
-	// Restore state
-	glBindTexture(GL_TEXTURE_2D, last_texture);
-}
-
-void DemoEntityManager::ApplyMenuOptions()
+void ndDemoEntityManager::ApplyMenuOptions()
 {
 	NewtonWaitForUpdateToFinish(m_world);
 
@@ -684,7 +411,7 @@ void DemoEntityManager::ApplyMenuOptions()
 	NewtonSelectBroadphaseAlgorithm(m_world, m_broadPhaseType);
 	NewtonSetParallelSolverOnLargeIsland (m_world, m_solveLargeIslandInParallel ? 1 : 0);	
 
-	void* plugin = NULL;
+	void* plugin = nullptr;
 	if (m_currentPlugin) {
 		int index = 1;
 		for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
@@ -697,7 +424,7 @@ void DemoEntityManager::ApplyMenuOptions()
 	NewtonSelectPlugin(m_world, plugin);
 }
 
-void DemoEntityManager::ShowMainMenuBar()
+void ndDemoEntityManager::ShowMainMenuBar()
 {
 	int mainMenu = 0;
 	//dAssert (m_autoSleepMode);
@@ -915,7 +642,7 @@ void DemoEntityManager::ShowMainMenuBar()
 	}
 }
 
-void DemoEntityManager::LoadDemo(int menu)
+void ndDemoEntityManager::LoadDemo(int menu)
 {
 	char newTitle[256];
 	Cleanup();
@@ -926,38 +653,7 @@ void DemoEntityManager::LoadDemo(int menu)
 	ResetTimer();
 }
 
-void DemoEntityManager::ErrorCallback(int error, const char* description)
-{
-	dTrace (("Error %d: %s\n", error, description));
-	fprintf(stderr, "Error %d: %s\n", error, description);
-	dAssert (0);
-}
-
-void DemoEntityManager::MouseButtonCallback(GLFWwindow*, int button, int action, int)
-{
-	if (button >= 0 && button < 3) {
-		ImGuiIO& io = ImGui::GetIO();
-		if (action == GLFW_PRESS) {
-			io.MouseDown[button] = true;    
-		} else if (action == GLFW_RELEASE) {
-			io.MouseDown[button] = false;    
-		}
-	}
-}
-
-void DemoEntityManager::MouseScrollCallback(GLFWwindow* const window, double x, double y)
-{
-	ImGuiIO& io = ImGui::GetIO();
-	io.MouseWheel += float (y);
-}
-
-void DemoEntityManager::CursorposCallback  (GLFWwindow* , double x, double y)
-{
-	ImGuiIO& io = ImGui::GetIO();
-	io.MousePos = ImVec2((float)x, (float)y);
-}
-
-bool DemoEntityManager::GetMousePosition (int& posX, int& posY) const
+bool ndDemoEntityManager::GetMousePosition (int& posX, int& posY) const
 {
 	ImVec2 posit(ImGui::GetMousePos());
 	posX = int (posit.x);
@@ -965,46 +661,7 @@ bool DemoEntityManager::GetMousePosition (int& posX, int& posY) const
 	return true;
 }
 
-
-void DemoEntityManager::CharCallback(GLFWwindow* window, unsigned int ch)
-{
-	ImGuiIO& io = ImGui::GetIO();
-	io.AddInputCharacter((unsigned short)ch);
-}
-
-
-void DemoEntityManager::KeyCallback(GLFWwindow* const window, int key, int, int action, int mods)
-{
-	ImGuiIO& io = ImGui::GetIO();
-	if (action == GLFW_PRESS)
-		io.KeysDown[key] = true;
-	if (action == GLFW_RELEASE)
-		io.KeysDown[key] = false;
-
-	(void)mods; // Modifiers are not reliable across systems
-	io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
-	io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
-	io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
-	io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
-	
-	static int prevKey;
-	DemoEntityManager* const manager = (DemoEntityManager*)glfwGetWindowUserPointer(window);
-	if ((key == GLFW_KEY_F10) && (key != prevKey)) {
-		manager->ToggleProfiler();
-	}
-
-	if (key == GLFW_KEY_ESCAPE) {
-		glfwSetWindowShouldClose (window, 1);
-	}
-
-	if (key == GLFW_KEY_F1) {
-		manager->LoadDemo(manager->m_lastCurrentScene);
-	}
-
-	prevKey = io.KeysDown[key] ? key : 0;
-}
-
-void DemoEntityManager::ToggleProfiler()
+void ndDemoEntityManager::ToggleProfiler()
 {
 	#ifdef D_PROFILER
 		dAssert(m_world);
@@ -1015,24 +672,8 @@ void DemoEntityManager::ToggleProfiler()
 	#endif
 }
 
-void DemoEntityManager::BeginFrame()
-{
-	glfwPollEvents();
-	ImGuiIO& io = ImGui::GetIO();
 
-	// Setup display size (every frame to accommodate for window resizing)
-	int w, h;
-	int display_w, display_h;
-	glfwGetWindowSize(m_mainFrame, &w, &h);
-	glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
-	io.DisplaySize = ImVec2((float)w, (float)h);
-	io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / w) : 0, h > 0 ? ((float)display_h / h) : 0);
-
-	// Start the frame
-	ImGui::NewFrame();
-}
-
-void DemoEntityManager::RenderStats()
+void ndDemoEntityManager::RenderStats()
 {
 	if (m_showStats) {
 		char text[1024];
@@ -1086,7 +727,7 @@ void DemoEntityManager::RenderStats()
 	ShowMainMenuBar();
 }
 
-void DemoEntityManager::CalculateFPS(dFloat timestep)
+void ndDemoEntityManager::CalculateFPS(dFloat timestep)
 {
 	m_framesCount ++;
 	m_timestepAcc += timestep;
@@ -1106,7 +747,7 @@ void DemoEntityManager::CalculateFPS(dFloat timestep)
 }
 
 
-void DemoEntityManager::CreateSkyBox()
+void ndDemoEntityManager::CreateSkyBox()
 {
 	if (!m_sky) {
 		m_sky = new SkyBox(m_shadeCache.m_solidColor);
@@ -1115,7 +756,7 @@ void DemoEntityManager::CreateSkyBox()
 }
 
 
-void DemoEntityManager::PushTransparentMesh (const DemoMeshInterface* const mesh)
+void ndDemoEntityManager::PushTransparentMesh (const DemoMeshInterface* const mesh)
 {
 	dMatrix matrix;
 	glGetFloat (GL_MODELVIEW_MATRIX, &matrix[0][0]);
@@ -1124,7 +765,7 @@ void DemoEntityManager::PushTransparentMesh (const DemoMeshInterface* const mesh
 }
 
 
-void DemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary& dictionary)
+void ndDemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary& dictionary)
 {
 	// load all meshes into a Mesh cache for reuse
 	dTree<DemoMeshInterface*, dScene::dTreeNode*> meshDictionary;
@@ -1157,13 +798,13 @@ void DemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary& d
 	}
 }
 
-void DemoEntityManager::ImportPLYfile (const char* const fileName)
+void ndDemoEntityManager::ImportPLYfile (const char* const fileName)
 {
 	m_collisionDisplayMode = 2;
 	CreatePLYMesh (this, fileName, true);
 }
 
-void DemoEntityManager::LoadScene (const char* const fileName)
+void ndDemoEntityManager::LoadScene (const char* const fileName)
 {
 	dScene database (m_world);
 
@@ -1209,14 +850,14 @@ void DemoEntityManager::LoadScene (const char* const fileName)
 }
 
 
-void DemoEntityManager::SerializeFile (void* const serializeHandle, const void* const buffer, int size)
+void ndDemoEntityManager::SerializeFile (void* const serializeHandle, const void* const buffer, int size)
 {
 	// check that each chunk is a multiple of 4 bytes, this is useful for easy little to big Indian conversion
 	dAssert ((size & 0x03) == 0);
 	fwrite (buffer, size, 1, (FILE*) serializeHandle);
 }
 
-void DemoEntityManager::DeserializeFile (void* const serializeHandle, void* const buffer, int size)
+void ndDemoEntityManager::DeserializeFile (void* const serializeHandle, void* const buffer, int size)
 {
 	// check that each chunk is a multiple of 4 bytes, this is useful for easy little to big Indian conversion
 	dAssert ((size & 0x03) == 0);
@@ -1225,7 +866,7 @@ void DemoEntityManager::DeserializeFile (void* const serializeHandle, void* cons
 }
 
 
-void DemoEntityManager::BodySerialization (NewtonBody* const body, void* const bodyUserData, NewtonSerializeCallback serializeCallback, void* const serializeHandle)
+void ndDemoEntityManager::BodySerialization (NewtonBody* const body, void* const bodyUserData, NewtonSerializeCallback serializeCallback, void* const serializeHandle)
 {
 	// here the use can save information of this body, ex:
 	// a string naming the body,  
@@ -1239,7 +880,7 @@ void DemoEntityManager::BodySerialization (NewtonBody* const body, void* const b
 	serializeCallback (serializeHandle, bodyIndentification, size);
 }
 
-void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const bodyUserData, NewtonDeserializeCallback deserializecallback, void* const serializeHandle)
+void ndDemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const bodyUserData, NewtonDeserializeCallback deserializecallback, void* const serializeHandle)
 {
 	int size;
 	char bodyIndentification[256];
@@ -1249,12 +890,12 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const
 
 	// get the world and the scene form the world user data
 	NewtonWorld* const world = NewtonBodyGetWorld(body);
-	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+	ndDemoEntityManager* const scene = (ndDemoEntityManager*)NewtonWorldGetUserData(world);
 
 	// here we attach a visual object to the entity, 
 	dMatrix matrix;
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
-	DemoEntity* const entity = new DemoEntity(matrix, NULL);
+	DemoEntity* const entity = new DemoEntity(matrix, nullptr);
 	scene->Append (entity);
 
 	NewtonBodySetUserData (body, entity);
@@ -1283,13 +924,13 @@ void DemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const
 	mesh->Release();
 }
 
-void DemoEntityManager::SerializedPhysicScene(const char* const name)
+void ndDemoEntityManager::SerializedPhysicScene(const char* const name)
 {
-//	NewtonSerializeToFile(m_world, name, NULL, NULL);
-	NewtonSerializeToFile(m_world, name, BodySerialization, NULL);
+//	NewtonSerializeToFile(m_world, name, nullptr, nullptr);
+	NewtonSerializeToFile(m_world, name, BodySerialization, nullptr);
 }
 
-void DemoEntityManager::DeserializedPhysicScene(const char* const name)
+void ndDemoEntityManager::DeserializedPhysicScene(const char* const name)
 {
 	// add the sky
 	CreateSkyBox();
@@ -1302,7 +943,7 @@ void DemoEntityManager::DeserializedPhysicScene(const char* const name)
 	NewtonDeserializeFromFile(m_world, name, BodyDeserialization, &cache);
 }
 
-int DemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
+int ndDemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
 {
 	va_list argptr;
 	char string[1024];
@@ -1314,28 +955,28 @@ int DemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
 	return 0;
 }
 
-void DemoEntityManager::OnCreateContact(const NewtonWorld* const world, NewtonJoint* const contact)
+void ndDemoEntityManager::OnCreateContact(const NewtonWorld* const world, NewtonJoint* const contact)
 {
-//	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+//	ndDemoEntityManager* const scene = (ndDemoEntityManager*) NewtonWorldGetUserData(world);
 //	dCustomScopeLock lock(&scene->m_contactLock);
 //	NewtonJointSetUserData(contact, scene->m_contactList.Append(contact));
 }
 
-void DemoEntityManager::OnDestroyContact(const NewtonWorld* const world, NewtonJoint* const contact)
+void ndDemoEntityManager::OnDestroyContact(const NewtonWorld* const world, NewtonJoint* const contact)
 {
-//	DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(world);
+//	ndDemoEntityManager* const scene = (ndDemoEntityManager*)NewtonWorldGetUserData(world);
 //	dList<NewtonJoint*>::dListNode* const cooky = (dList<NewtonJoint*>::dListNode*)NewtonJointGetUserData(contact);
 //	dCustomScopeLock lock(&scene->m_contactLock);
 //	scene->m_contactList.Remove(cooky);
 }
 
 
-void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
+void ndDemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
 {
 	m_cameraManager->SetCameraMatrix(this, rotation, position);
 }
 
-void DemoEntityManager::UpdatePhysics(dFloat timestep)
+void ndDemoEntityManager::UpdatePhysics(dFloat timestep)
 {
 	// update the physics
 	if (m_world && !m_suspendPhysicsUpdate) {
@@ -1393,7 +1034,7 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 	}
 }
 
-dFloat DemoEntityManager::CalculateInteplationParam () const
+dFloat ndDemoEntityManager::CalculateInteplationParam () const
 {
 	unsigned64 timeStep = dGetTimeInMicrosenconds () - m_microsecunds;		
 	dFloat param = (dFloat (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
@@ -1405,107 +1046,16 @@ dFloat DemoEntityManager::CalculateInteplationParam () const
 }
 
 
-// This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
-// If text or lines are blurry when integrating ImGui in your engine:
-// - in your Render function, try translating your projection matrix by (0.5f,0.5f) or (0.375f,0.375f)
-void DemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
+void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFloat timestep)
 {
-	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
-	ImGuiIO& io = ImGui::GetIO();
-
-	int fb_width = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-	int fb_height = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
-	if (fb_width == 0 || fb_height == 0)
-		return;
-
-	DemoEntityManager* const window = (DemoEntityManager*)io.UserData;
-
-	ImVec4 clearColor = ImColor(114, 144, 154);
-	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
-
-	window->RenderScene();
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_LIGHTING);
-	glEnable(GL_SCISSOR_TEST);
-	glEnable(GL_TEXTURE_2D);
-	//glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context
-
-	// Setup viewport, orthographic projection matrix
-	glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-
-	if (window->m_renderDemoGUI) {
-		window->m_renderDemoGUI(window, window->m_renderUIContext);
-	}
-
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
-
-	// Render command lists
-	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
-	#define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
-	for (int n = 0; n < draw_data->CmdListsCount; n++)
-	{
-		const ImDrawList* cmd_list = draw_data->CmdLists[n];
-		const ImDrawVert* vtx_buffer = cmd_list->VtxBuffer.Data;
-		const ImDrawIdx* idx_buffer = cmd_list->IdxBuffer.Data;
-		glVertexPointer(2, GL_FLOAT, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, pos)));
-		glTexCoordPointer(2, GL_FLOAT, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, uv)));
-		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, col)));
-
-		for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
-		{
-			const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
-			if (pcmd->UserCallback)
-			{
-				pcmd->UserCallback(cmd_list, pcmd);
-			}
-			else
-			{
-				glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
-				glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
-				glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer);
-			}
-			idx_buffer += pcmd->ElemCount;
-		}
-	}
-	#undef OFFSETOF
-
-	// Restore modified state
-	glDisableClientState(GL_COLOR_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
-
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glPopAttrib();
-}
-
-void DemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFloat timestep)
-{
-	DemoEntityManager* const scene = (DemoEntityManager*) NewtonWorldGetUserData(world);
+	ndDemoEntityManager* const scene = (ndDemoEntityManager*) NewtonWorldGetUserData(world);
 	scene->m_cameraManager->FixUpdate(scene->GetNewton(), timestep);
 	if (scene->m_updateCamera) {
 		scene->m_updateCamera(scene, scene->m_updateCameraContext, timestep);
 	}
 }
 
-void DemoEntityManager::RenderScene()
+void ndDemoEntityManager::RenderScene()
 {
 	dFloat timestep = dGetElapsedSeconds();	
 	CalculateFPS(timestep);
@@ -1668,20 +1218,461 @@ void DemoEntityManager::RenderScene()
 	glPopMatrix();
 }
 
-void DemoEntityManager::Run()
+#endif
+
+
+ndDemoEntityManager::ndDemoEntityManager()
+	:m_mainFrame(nullptr)
+	//, m_defaultFont(0)
+	//, m_sky(nullptr)
+	//, m_world(nullptr)
+	//, m_cameraManager(nullptr)
+	//, m_renderUIContext(nullptr)
+	//, m_updateCameraContext(nullptr)
+	//, m_renderDemoGUI(nullptr)
+	//, m_renderHelpMenus(nullptr)
+	//, m_updateCamera(nullptr)
+	//, m_microsecunds(0)
+	//, m_tranparentHeap()
+	//, m_currentScene(DEFAULT_SCENE)
+	//, m_lastCurrentScene(DEFAULT_SCENE)
+	//, m_framesCount(0)
+	//, m_physicsFramesCount(0)
+	//, m_currentPlugin(0)
+	//, m_fps(0.0f)
+	//, m_timestepAcc(0.0f)
+	//, m_currentListenerTimestep(0.0f)
+	//, m_mainThreadPhysicsTime(0.0f)
+	//, m_mainThreadPhysicsTimeAcc(0.0f)
+	//, m_broadPhaseType(0)
+	//, m_workerThreads(1)
+	//, m_solverPasses(4)
+	//, m_solverSubSteps(2)
+	//, m_debugDisplayMode(0)
+	//, m_collisionDisplayMode(0)
+	//, m_showUI(true)
+	//, m_showAABB(false)
+	//, m_showStats(true)
+	,m_hasJoytick(false)
+	//, m_autoSleepMode(true)
+	//, m_hideVisualMeshes(false)
+	//, m_showNormalForces(false)
+	//, m_showCenterOfMass(false)
+	//, m_showBodyFrame(false)
+	//, m_updateMenuOptions(true)
+	//, m_showContactPoints(false)
+	//, m_showJointDebugInfo(false)
+	//, m_showListenersDebugInfo(false)
+	//, m_showCollidingFaces(false)
+	//, m_suspendPhysicsUpdate(false)
+	//, m_asynchronousPhysicsUpdate(false)
+	//, m_solveLargeIslandInParallel(true)
+	//, m_showRaycastHit(false)
+	//, m_profilerMode(0)
+	//, m_contactLock(0)
+	//, m_deleteLock(0)
+	//, m_contactList()
 {
-    // Main loop
-    while (!glfwWindowShouldClose(m_mainFrame))
-    {
-		m_suspendPhysicsUpdate = false;
+	// Setup window
+	glfwSetErrorCallback(ErrorCallback);
+
+	glfwInit();
+
+	m_hasJoytick = glfwJoystickPresent(0) ? true : false;
+
+	char version[256];
+	sprintf(version, "Newton Dynamics %d.%.2i sandbox demos", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION);
+	m_mainFrame = glfwCreateWindow(1280, 720, version, nullptr, nullptr);
+	glfwMakeContextCurrent(m_mainFrame);
+
+	int monitorsCount;
+	GLFWmonitor** monitors = glfwGetMonitors(&monitorsCount);
+	if (monitorsCount > 1) 
+	{
+		int window_x;
+		int window_y;
+		int monitor_x;
+		int monitor_y;
+
+		glfwGetMonitorPos(monitors[1], &monitor_x, &monitor_y);
+		glfwGetWindowPos(m_mainFrame, &window_x, &window_y);
+		glfwSetWindowPos(m_mainFrame, monitor_x + window_x, monitor_y + 64);
+	}
+
+	// attach myself to the main frame
+	glfwSetWindowUserPointer(m_mainFrame, this);
+
+	// Setup ImGui binding
+	//	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.UserData = this;
+
+	// Keyboard mapping. ImGui will use those indices to peek into the io.KeyDown[] array.
+	io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
+	io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
+	io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
+	io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
+	io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
+	io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
+	io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
+	io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
+	io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
+	io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
+	io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
+	io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
+	io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
+	io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
+	io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
+	io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
+	io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
+	io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
+	io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
+
+	// Alternatively you can set this to nullptr and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
+	io.RenderDrawListsFn = RenderDrawListsCallback;
+	//	io.SetClipboardTextFn = ImGui_ImplGlfw_SetClipboardText;
+	//	io.GetClipboardTextFn = ImGui_ImplGlfw_GetClipboardText;
+
+#ifdef _MSC_VER 
+	io.ImeWindowHandle = glfwGetWin32Window(m_mainFrame);
+#else 
+	dTrace(("no sure what to set this to for non windews systems\n"))
+		//	dAssert (0);
+#endif
+
+	glfwSwapInterval(0);
+	glfwSetKeyCallback(m_mainFrame, KeyCallback);
+	glfwSetCharCallback(m_mainFrame, CharCallback);
+	glfwSetScrollCallback(m_mainFrame, MouseScrollCallback);
+	glfwSetCursorPosCallback(m_mainFrame, CursorposCallback);
+	glfwSetMouseButtonCallback(m_mainFrame, MouseButtonCallback);
+
+	LoadFont();
+#if 0
+	m_mousePressed[0] = false;
+	m_mousePressed[1] = false;
+	m_mousePressed[2] = false;
+
+	// initialized the physics world for the new scene
+	//	m_showUI = false;
+	//	m_showAABB = false;
+	//	m_hideVisualMeshes = true;
+	//	m_autoSleepMode = false;
+	//	m_broadPhaseType = 1;
+	//	m_solverPasses = 4;
+	//	m_workerThreads = 4;
+	//	m_solverSubSteps = 2;
+	//	m_showRaycastHit = true;
+	//	m_showCenterOfMass = false;
+	//	m_showNormalForces = true;
+	//	m_showContactPoints = true;
+	//	m_showJointDebugInfo = true;
+	//	m_collisionDisplayMode = 2;
+	//	m_showListenersDebugInfo = true;
+	m_asynchronousPhysicsUpdate = true;
+
+	Cleanup();
+	ResetTimer();
+
+	m_currentPlugin = 0;
+	void* preferedPlugin = NewtonGetPreferedPlugin(m_world);
+	for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
+		m_currentPlugin++;
+		if (ptr == preferedPlugin) {
+			break;
+		}
+	}
+	//m_currentPlugin = 0;
+
+	m_shadeCache.CreateAllEffects();
+
+#endif
+}
+
+ndDemoEntityManager::~ndDemoEntityManager()
+{
+	// is we are run asynchronous we need make sure no update in on flight.
+	//if (m_world) 
+	//{
+	//	NewtonWaitForUpdateToFinish(m_world);
+	//}
+	//
+	//Cleanup();
+	//
+	//// destroy the empty world
+	//if (m_world) 
+	//{
+	//	NewtonDestroy(m_world);
+	//	m_world = nullptr;
+	//}
+	//
+	//if (m_cameraManager) 
+	//{
+	//	delete m_cameraManager;
+	//}
+
+	// Cleanup
+	GLuint font_texture(m_defaultFont);
+	glDeleteTextures(1, &font_texture);
+	ImGui::GetIO().Fonts->TexID = 0;
+
+	ImGui::Shutdown();
+	glfwTerminate();
+	//dAssert(NewtonGetMemoryUsed() == 0);
+}
+
+void ndDemoEntityManager::LoadFont()
+{
+	// Build texture atlas
+	ImGuiIO& io = ImGui::GetIO();
+
+	// Load Fonts
+	// (there is a default font, this is only if you want to change it. see extra_fonts/README.txt for more details)
+	//io.Fonts->AddFontDefault();
+
+	float pixedSize = 18;
+	char pathName[2048];
+	const char* const name = "Cousine-Regular.ttf";
+	//char* const name = "calibri.ttf";
+	//char* const name = "courbd.ttf";
+
+	dGetWorkingFileName(name, pathName);
+	io.Fonts->AddFontFromFileTTF(pathName, pixedSize);
+	//io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
+
+	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) 
+	// because it is more likely to be compatible with user's existing shaders. 
+	// If your ImTextureId represent a higher-level concept than just a GL texture id, 
+	// consider calling GetTexDataAsAlpha8() instead to save on GPU memory.
+	unsigned char* pixels;
+	int width, height;
+	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
+
+	// Upload texture to graphics system
+	GLint last_texture;
+	GLuint font_texture;
+	glGetIntegerv(GL_TEXTURE_BINDING_2D, &last_texture);
+	glGenTextures(1, &font_texture);
+	glBindTexture(GL_TEXTURE_2D, font_texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+	// Store our identifier
+	m_defaultFont = int(font_texture);
+	io.Fonts->TexID = (void *)(intptr_t)m_defaultFont;
+
+	// Restore state
+	glBindTexture(GL_TEXTURE_2D, last_texture);
+}
+
+
+void ndDemoEntityManager::ErrorCallback(int error, const char* description)
+{
+	dTrace(("Error %d: %s\n", error, description));
+	fprintf(stderr, "Error %d: %s\n", error, description);
+	dAssert(0);
+}
+
+void ndDemoEntityManager::CursorposCallback(GLFWwindow*, double x, double y)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	io.MousePos = ImVec2((float)x, (float)y);
+}
+
+void ndDemoEntityManager::MouseScrollCallback(GLFWwindow* const window, double x, double y)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	io.MouseWheel += float(y);
+}
+
+void ndDemoEntityManager::CharCallback(GLFWwindow* window, unsigned int ch)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	io.AddInputCharacter((unsigned short)ch);
+}
+
+void ndDemoEntityManager::MouseButtonCallback(GLFWwindow*, int button, int action, int)
+{
+	if (button >= 0 && button < 3) 
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		if (action == GLFW_PRESS) 
+		{
+			io.MouseDown[button] = true;
+		}
+		else if (action == GLFW_RELEASE) 
+		{
+			io.MouseDown[button] = false;
+		}
+	}
+}
+
+void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, int key, int, int action, int mods)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	if (action == GLFW_PRESS)
+	{
+		io.KeysDown[key] = true;
+	}
+	if (action == GLFW_RELEASE)
+	{
+		io.KeysDown[key] = false;
+	}
+
+	(void)mods; // Modifiers are not reliable across systems
+	io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
+	io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
+	io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
+	io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
+
+	static int prevKey;
+	//ndDemoEntityManager* const manager = (ndDemoEntityManager*)glfwGetWindowUserPointer(window);
+	if ((key == GLFW_KEY_F10) && (key != prevKey)) 
+	{
+		dAssert(0);
+		//manager->ToggleProfiler();
+	}
+
+	if (key == GLFW_KEY_ESCAPE) 
+	{
+		glfwSetWindowShouldClose(window, 1);
+	}
+
+	if (key == GLFW_KEY_F1) 
+	{
+		dAssert(0);
+		//manager->LoadDemo(manager->m_lastCurrentScene);
+	}
+
+	prevKey = io.KeysDown[key] ? key : 0;
+}
+
+// This is the main rendering function that you have to implement and provide to ImGui (via setting up 'RenderDrawListsFn' in the ImGuiIO structure)
+// If text or lines are blurry when integrating ImGui in your engine:
+// - in your Render function, try translating your projection matrix by (0.5f,0.5f) or (0.375f,0.375f)
+void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
+{
+	// Avoid rendering when minimized, scale coordinates for retina displays (screen coordinates != framebuffer coordinates)
+	ImGuiIO& io = ImGui::GetIO();
+
+	int fb_width = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
+	int fb_height = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+	if (fb_width == 0 || fb_height == 0)
+	{
+		return;
+	}
+
+	//ndDemoEntityManager* const window = (ndDemoEntityManager*)io.UserData;
+
+	ImVec4 clearColor = ImColor(114, 144, 154);
+	glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
+
+	//window->RenderScene();
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_LIGHTING);
+	glEnable(GL_SCISSOR_TEST);
+	glEnable(GL_TEXTURE_2D);
+	//glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context
+
+	// Setup viewport, orthographic projection matrix
+	glViewport(0, 0, (GLsizei)fb_width, (GLsizei)fb_height);
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	//if (window->m_renderDemoGUI) 
+	//{
+	//	window->m_renderDemoGUI(window, window->m_renderUIContext);
+	//}
+
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+
+	// Render command lists
+	draw_data->ScaleClipRects(io.DisplayFramebufferScale);
+
+	#define OFFSETOF(TYPE, ELEMENT) ((size_t)&(((TYPE *)0)->ELEMENT))
+	for (int n = 0; n < draw_data->CmdListsCount; n++)
+	{
+		const ImDrawList* cmd_list = draw_data->CmdLists[n];
+		const ImDrawVert* vtx_buffer = cmd_list->VtxBuffer.Data;
+		const ImDrawIdx* idx_buffer = cmd_list->IdxBuffer.Data;
+		glVertexPointer(2, GL_FLOAT, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, pos)));
+		glTexCoordPointer(2, GL_FLOAT, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, uv)));
+		glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(ImDrawVert), (void*)((char*)vtx_buffer + OFFSETOF(ImDrawVert, col)));
+
+		for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; cmd_i++)
+		{
+			const ImDrawCmd* pcmd = &cmd_list->CmdBuffer[cmd_i];
+			if (pcmd->UserCallback)
+			{
+				pcmd->UserCallback(cmd_list, pcmd);
+			}
+			else
+			{
+				glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId);
+				glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y));
+				glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer);
+			}
+			idx_buffer += pcmd->ElemCount;
+		}
+	}
+	#undef OFFSETOF
+
+	// Restore modified state
+	glDisableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_VERTEX_ARRAY);
+
+	glMatrixMode(GL_MODELVIEW);
+	glPopMatrix();
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glPopAttrib();
+}
+
+void ndDemoEntityManager::BeginFrame()
+{
+	glfwPollEvents();
+	ImGuiIO& io = ImGui::GetIO();
+
+	// Setup display size (every frame to accommodate for window resizing)
+	int w, h;
+	int display_w, display_h;
+	glfwGetWindowSize(m_mainFrame, &w, &h);
+	glfwGetFramebufferSize(m_mainFrame, &display_w, &display_h);
+	io.DisplaySize = ImVec2((float)w, (float)h);
+	io.DisplayFramebufferScale = ImVec2(w > 0 ? ((float)display_w / w) : 0, h > 0 ? ((float)display_h / h) : 0);
+
+	// Start the frame
+	ImGui::NewFrame();
+}
+
+
+void ndDemoEntityManager::Run()
+{
+	// Main loop
+	while (!glfwWindowShouldClose(m_mainFrame))
+	{
+		//m_suspendPhysicsUpdate = false;
 		BeginFrame();
 
 		D_TRACKTIME();
 
-		RenderStats();
+		//RenderStats();
 		ImGui::Render();
 		glfwSwapBuffers(m_mainFrame);
-    }
+	}
 }
-
-#endif

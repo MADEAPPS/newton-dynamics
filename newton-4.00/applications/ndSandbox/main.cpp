@@ -9,9 +9,9 @@
 * freely
 */
 
+#include "ndSandboxStdafx.h"
+#include "ndDemoEntityManager.h"
 #if 0
-#include "toolbox_stdafx.h"
-#include "DemoEntityManager.h"
 
 // memory allocation for Newton
 static void* PhysicsAlloc (int sizeInBytes)
@@ -26,7 +26,6 @@ static void PhysicsFree (void* ptr, int sizeInBytes)
 	//	m_totalMemoryUsed -= sizeInBytes;
 	delete[] (char*)ptr;
 }
-
 
 class CheckMemoryLeaks
 {
@@ -57,10 +56,64 @@ class CheckMemoryLeaks
 static CheckMemoryLeaks checkLeaks;
 #endif
 
+// memory allocation for Newton
+static void* PhysicsAlloc(size_t sizeInBytes)
+{
+	void* const ptr = malloc(sizeInBytes);
+	return ptr;
+}
+
+// memory free use by the engine
+static void PhysicsFree(void* ptr)
+{
+	free(ptr);
+}
+
+void *operator new (size_t size)
+{
+	// this should not happens on this test
+	// newton should never use global operator new and delete.
+	//dAssert(0);
+	return PhysicsAlloc(size);
+}
+
+void operator delete (void* ptr)
+{
+	PhysicsFree(ptr);
+}
+
+class CheckMemoryLeaks
+{
+	public:
+	CheckMemoryLeaks()
+	{
+		#if defined(_DEBUG) && defined(_MSC_VER)
+		// Track all memory leaks at the operating system level.
+		// make sure no Newton tool or utility leaves leaks behind.
+		_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_REPORT_FLAG);
+		//_CrtSetBreakAlloc (127);
+		#endif
+
+		atexit(CheckMemoryLeaksCallback);
+		// Set the memory allocation function before creation the newton world
+		// this is the only function that can be called before the creation of the newton world.
+		// it should be called once, and the the call is optional 
+		dMemory::SetMemoryAllocators(PhysicsAlloc, PhysicsFree);
+	}
+
+	static void CheckMemoryLeaksCallback()
+	{
+		#if defined(_DEBUG) && defined(_MSC_VER)
+			_CrtDumpMemoryLeaks();
+		#endif
+	}
+};
+static CheckMemoryLeaks checkLeaks;
+
 int main(int, char**)
 {
-	//DemoEntityManager demos;
-	//demos.Run();
+	ndDemoEntityManager demos;
+	demos.Run();
     return 0;
 }
 

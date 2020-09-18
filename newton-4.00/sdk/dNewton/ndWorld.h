@@ -28,7 +28,8 @@
 class ndWorld;
 class ndBodyDynamic;
 
-#define D_NEWTON_ENGINE_VERSION 400
+#define D_NEWTON_ENGINE_MAJOR_VERSION 4
+#define D_NEWTON_ENGINE_MINOR_VERSION 00
 
 #define D_SLEEP_ENTRIES			8
 
@@ -41,7 +42,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 
 	dInt32 GetEngineVersion() 
 	{
-		return D_NEWTON_ENGINE_VERSION;
+		return D_NEWTON_ENGINE_MAJOR_VERSION * 100 + D_NEWTON_ENGINE_MINOR_VERSION;
 	}
 
 	void Sync();

@@ -11,23 +11,26 @@
 #ifndef __DEMO_MAIN_FRAME_H__
 #define __DEMO_MAIN_FRAME_H__
 
-#include "ShaderPrograms.h"
+#include "ndSandboxStdafx.h"
+//#include "ShaderPrograms.h"
 
 struct GLFWwindow;
 struct ImDrawData;
 
-class DemoMesh;
-class DemoEntity;
-class DemoCamera;
-class DemoMeshInterface;
-class DemoCameraManager;
+//class DemoMesh;
+//class DemoEntity;
+//class DemoCamera;
+//class DemoMeshInterface;
+//class DemoCameraManager;
 
-class DemoEntityManager: public dList <DemoEntity*>
+//class DemoEntityManager: public dList <DemoEntity*>
+class ndDemoEntityManager
 {
+#if 0
 	public:
 	typedef void (*LaunchSDKDemoCallback) (DemoEntityManager* const scene);
 	typedef void (*RenderGuiHelpCallback) (DemoEntityManager* const manager, void* const context);
-	typedef void(*UpdateCameraCallback) (DemoEntityManager* const manager, void* const context, dFloat timestep);
+	typedef void(*UpdateCameraCallback) (DemoEntityManager* const manager, void* const context, dFloat32 timestep);
 
 	class TransparentMesh
 	{
@@ -48,11 +51,11 @@ class DemoEntityManager: public dList <DemoEntity*>
 		const DemoMesh* m_mesh;
 	};
 
-	class TransparentHeap: public dUpHeap <TransparentMesh, dFloat>
+	class TransparentHeap: public dUpHeap <TransparentMesh, dFloat32>
 	{
 		public:
 		TransparentHeap()
-			:dUpHeap <TransparentMesh, dFloat>(2048)
+			:dUpHeap <TransparentMesh, dFloat32>(2048)
 		{
 		}
 	};
@@ -83,10 +86,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	{
 	};
 
-	DemoEntityManager ();
-	~DemoEntityManager ();
-
-	void Run();
+	
 
 	void Lock(unsigned& atomicLock);
 	void Unlock(unsigned& atomicLock);
@@ -115,7 +115,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	bool IsShiftKeyDown () const;
 	bool IsControlKeyDown () const;
 	bool GetKeyState(int key) const;
-	int GetJoystickAxis (dFloat* const axisValues, int maxAxis = 8) const;
+	int GetJoystickAxis (dFloat32* const axisValues, int maxAxis = 8) const;
 	int GetJoystickButtons (char* const axisbuttons, int maxButton = 32) const;
 
 	void SerializedPhysicScene(const char* const name);
@@ -139,39 +139,30 @@ class DemoEntityManager: public dList <DemoEntity*>
 	
 
 	private:
-	void BeginFrame();
+
 	void RenderStats();
-	void LoadFont();
+	
 	void Cleanup();
 
 	//void RenderUI();
 	void RenderScene();
 	
-	void UpdatePhysics(dFloat timestep);
-	dFloat CalculateInteplationParam () const;
+	void UpdatePhysics(dFloat32 timestep);
+	dFloat32 CalculateInteplationParam () const;
 
-	void CalculateFPS(dFloat timestep);
+	void CalculateFPS(dFloat32 timestep);
 	
 	void ShowMainMenuBar();
 	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
 
 	void ToggleProfiler();
-
-	static void RenderDrawListsCallback(ImDrawData* const draw_data);
-
-	static void CharCallback(GLFWwindow* window, unsigned int ch);
-	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);
-	static void CursorposCallback  (GLFWwindow* const window, double x, double y);
-	static void MouseScrollCallback (GLFWwindow* const window, double x, double y);
-	static void MouseButtonCallback(GLFWwindow* const window, int button, int action, int mods);
-	static void ErrorCallback(int error, const char* const description);
-	static void PostUpdateCallback(const NewtonWorld* const world, dFloat timestep);
+	static void PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep);
 
 	void ApplyMenuOptions();
 	void LoadDemo(int menu);
 	
-	GLFWwindow* m_mainFrame;
-	int	m_defaultFont;
+
+	
 	bool m_mousePressed[3];
 
 	DemoEntity* m_sky;
@@ -192,11 +183,11 @@ class DemoEntityManager: public dList <DemoEntity*>
 	int m_framesCount;
 	int m_physicsFramesCount;
 	int m_currentPlugin;
-	dFloat m_fps;
-	dFloat m_timestepAcc;
-	dFloat m_currentListenerTimestep;
-	dFloat m_mainThreadPhysicsTime;
-	dFloat m_mainThreadPhysicsTimeAcc;
+	dFloat32 m_fps;
+	dFloat32 m_timestepAcc;
+	dFloat32 m_currentListenerTimestep;
+	dFloat32 m_mainThreadPhysicsTime;
+	dFloat32 m_mainThreadPhysicsTimeAcc;
 
 	int m_solverPasses;
 	int m_solverSubSteps;
@@ -208,7 +199,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	bool m_showUI;
 	bool m_showAABB;
 	bool m_showStats;
-	bool m_hasJoytick;
+	
 	bool m_autoSleepMode;
 	bool m_hideVisualMeshes;
 	bool m_showNormalForces;
@@ -232,8 +223,34 @@ class DemoEntityManager: public dList <DemoEntity*>
 	static SDKDemos m_demosSelection[];
 	friend class DemoEntityListener;
 	friend class DemoListenerManager;
+#endif
+
+	public:
+	ndDemoEntityManager();
+	~ndDemoEntityManager();
+
+	void Run();
+
+	private:
+	static void RenderDrawListsCallback(ImDrawData* const draw_data);
+	static void ErrorCallback(int error, const char* const description);
+	static void CharCallback(GLFWwindow* window, unsigned int ch);
+	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);
+	static void CursorposCallback(GLFWwindow* const window, double x, double y);
+	static void MouseScrollCallback(GLFWwindow* const window, double x, double y);
+	static void MouseButtonCallback(GLFWwindow* const window, int button, int action, int mods);
+
+	void LoadFont();
+	void BeginFrame();
+	
+
+	GLFWwindow* m_mainFrame;
+
+	int	m_defaultFont;
+	bool m_hasJoytick;
 };
 
+#if 0
 inline NewtonWorld* DemoEntityManager::GetNewton() const
 {
 	return m_world;
@@ -280,5 +297,6 @@ inline const ShaderPrograms& DemoEntityManager::GetShaderCache() const
 {
 	return m_shadeCache;
 }
+#endif
 
 #endif
