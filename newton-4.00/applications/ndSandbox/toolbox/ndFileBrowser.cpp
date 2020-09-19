@@ -18,7 +18,7 @@
 #include <commdlg.h>
 #endif
 
-#include "FileBrowser.h"
+#include "ndFileBrowser.h"
 
 
 bool dGetOpenFileNamePLY(char* const fileName, int maxSize)

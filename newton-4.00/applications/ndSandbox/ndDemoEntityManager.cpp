@@ -19,8 +19,8 @@
 
 #if 0
 #include "SkyBox.h"
-#include "DemoMesh.h"
-#include "DemoEntity.h"
+#include "ndDemoMesh.h"
+#include "ndDemoEntity.h"
 #include "DemoCamera.h"
 #include "FileBrowser.h"
 #include "PhysicsUtils.h"
@@ -273,15 +273,15 @@ int ndDemoEntityManager::GetJoystickButtons (char* const axisbuttons, int maxBut
 
 void ndDemoEntityManager::RemoveEntity (dListNode* const entNode)
 {
-	DemoEntity* const entity = entNode->GetInfo();
+	ndDemoEntity* const entity = entNode->GetInfo();
 	entity->Release();
 	Remove(entNode);
 }
 
-void ndDemoEntityManager::RemoveEntity (DemoEntity* const ent)
+void ndDemoEntityManager::RemoveEntity (ndDemoEntity* const ent)
 {
 	dCustomScopeLock lock(&m_deleteLock);
-	for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) {
+	for (dListNode* node = dList<ndDemoEntity*>::GetFirst(); node; node = node->GetNext()) {
 		if (node->GetInfo() == ent) {
 			RemoveEntity (node);
 			break;
@@ -362,11 +362,11 @@ void ndDemoEntityManager::CreateSkyBox()
 }
 
 
-void ndDemoEntityManager::PushTransparentMesh (const DemoMeshInterface* const mesh)
+void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const mesh)
 {
 	dMatrix matrix;
 	glGetFloat (GL_MODELVIEW_MATRIX, &matrix[0][0]);
-	TransparentMesh entry (matrix, (DemoMesh*) mesh);
+	TransparentMesh entry (matrix, (ndDemoMesh*) mesh);
 	m_tranparentHeap.Push (entry, matrix.m_posit.m_z);
 }
 
@@ -374,11 +374,11 @@ void ndDemoEntityManager::PushTransparentMesh (const DemoMeshInterface* const me
 void ndDemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary& dictionary)
 {
 	// load all meshes into a Mesh cache for reuse
-	dTree<DemoMeshInterface*, dScene::dTreeNode*> meshDictionary;
+	dTree<ndDemoMeshInterface*, dScene::dTreeNode*> meshDictionary;
 	for (dScene::dTreeNode* node = scene->GetFirstNode (); node; node = scene->GetNextNode (node)) {
 		dNodeInfo* info = scene->GetInfoFromNode(node);
 		if (info->GetTypeId() == dMeshNodeInfo::GetRttiType()) {
-			DemoMeshInterface* const mesh = new DemoMesh(scene, node, m_shadeCache);
+			ndDemoMeshInterface* const mesh = new ndDemoMesh(scene, node, m_shadeCache);
 			meshDictionary.Insert(mesh, node);
 		}
 	}
@@ -391,15 +391,15 @@ void ndDemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary&
 		dNodeInfo* info = scene->GetInfoFromNode(node);
 		if (info->GetTypeId() == dSceneNodeInfo::GetRttiType()) {
 			// we found a root dSceneNodeInfo, convert it to a Scene entity and load all it children 
-			DemoEntity* const entityRoot = new DemoEntity (*this, scene, node, meshDictionary, dictionary);
+			ndDemoEntity* const entityRoot = new ndDemoEntity (*this, scene, node, meshDictionary, dictionary);
 			Append(entityRoot);
 		}
 	}
 
 	// release all meshes before exiting
-	dTree<DemoMeshInterface*, dScene::dTreeNode*>::Iterator iter (meshDictionary);
+	dTree<ndDemoMeshInterface*, dScene::dTreeNode*>::Iterator iter (meshDictionary);
 	for (iter.Begin(); iter; iter++) {
-		DemoMeshInterface* const mesh = iter.GetNode()->GetInfo();
+		ndDemoMeshInterface* const mesh = iter.GetNode()->GetInfo();
 		mesh->Release();
 	}
 }
@@ -434,7 +434,7 @@ void ndDemoEntityManager::LoadScene (const char* const fileName)
 		// find the user data and set to the visual entity in the scene
 		NewtonBody* const body = bodyNode->GetInfo();
 		dScene::dTreeNode* const sceneNode = (dScene::dTreeNode*)NewtonBodyGetUserData(body);
-		DemoEntity* const entity = entDictionary.Find(sceneNode)->GetInfo();
+		ndDemoEntity* const entity = entDictionary.Find(sceneNode)->GetInfo();
 		NewtonBodySetUserData(body, entity);
 
 		// see if this body have some special setups
@@ -445,7 +445,7 @@ void ndDemoEntityManager::LoadScene (const char* const fileName)
 
 		// set the default call backs
 		if (!bodyType || !strcmp (bodyType->GetString(), "default gravity")) {
-			NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
+			NewtonBodySetTransformCallback(body, ndDemoEntity::TransformCallback);
 			NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
 			NewtonBodySetDestructorCallback (body, PhysicsBodyDestructor);
 		}
@@ -501,11 +501,11 @@ void ndDemoEntityManager::BodyDeserialization (NewtonBody* const body, void* con
 	// here we attach a visual object to the entity, 
 	dMatrix matrix;
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
-	DemoEntity* const entity = new DemoEntity(matrix, nullptr);
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	scene->Append (entity);
 
 	NewtonBodySetUserData (body, entity);
-	NewtonBodySetTransformCallback(body, DemoEntity::TransformCallback);
+	NewtonBodySetTransformCallback(body, ndDemoEntity::TransformCallback);
 	NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
 	NewtonCollision* const collision = NewtonBodyGetCollision(body);
 
@@ -516,16 +516,16 @@ void ndDemoEntityManager::BodyDeserialization (NewtonBody* const body, void* con
 	#endif
 
 	//for visual mesh we will collision mesh and convert it to a visual mesh using NewtonMesh 
-	dTree <DemoMeshInterface*, const void*>* const cache = (dTree <DemoMeshInterface*, const void*>*)bodyUserData;
-	dTree <DemoMeshInterface*, const void*>::dTreeNode* node = cache->Find(NewtonCollisionDataPointer (collision));
+	dTree <ndDemoMeshInterface*, const void*>* const cache = (dTree <ndDemoMeshInterface*, const void*>*)bodyUserData;
+	dTree <ndDemoMeshInterface*, const void*>::dTreeNode* node = cache->Find(NewtonCollisionDataPointer (collision));
 	if (!node) {
-		DemoMeshInterface* mesh = new DemoMesh(bodyIndentification, scene->m_shadeCache, collision, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga");
+		ndDemoMeshInterface* mesh = new ndDemoMesh(bodyIndentification, scene->m_shadeCache, collision, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga");
 		node = cache->Insert(mesh, NewtonCollisionDataPointer (collision));
 	} else {
 		node->GetInfo()->AddRef();
 	}
 
-	DemoMeshInterface* const mesh = node->GetInfo();
+	ndDemoMeshInterface* const mesh = node->GetInfo();
 	entity->SetMesh(mesh, dGetIdentityMatrix());
 	mesh->Release();
 }
@@ -545,7 +545,7 @@ void ndDemoEntityManager::DeserializedPhysicScene(const char* const name)
 	dVector origin(-30.0f, 10.0f, 10.0f, 0.0f);
 	SetCameraMatrix(rot, origin);
 
-	dTree <DemoMeshInterface*, const void*> cache;
+	dTree <ndDemoMeshInterface*, const void*> cache;
 	NewtonDeserializeFromFile(m_world, name, BodyDeserialization, &cache);
 }
 
@@ -1411,9 +1411,9 @@ void ndDemoEntityManager::Cleanup()
 	}
 
 	// destroy all remaining visual objects
-	//while (dList<DemoEntity*>::GetFirst()) 
+	//while (dList<ndDemoEntity*>::GetFirst()) 
 	//{
-	//	RemoveEntity(dList<DemoEntity*>::GetFirst());
+	//	RemoveEntity(dList<ndDemoEntity*>::GetFirst());
 	//}
 	//if (m_cameraManager) 
 	//{

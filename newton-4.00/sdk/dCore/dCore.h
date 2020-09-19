@@ -23,6 +23,7 @@
 #define __D_CORE_H__
 
 #include <dCoreStdafx.h>
+#include <dCRC.h>
 #include <dList.h>
 #include <dTree.h>
 #include <dHeap.h>
@@ -37,11 +38,13 @@
 #include <dThread.h>
 #include <dMemory.h>
 #include <dGoogol.h>
+#include <dString.h>
 #include <dProfiler.h>
 #include <dPolyhedra.h>
 #include <dSyncMutex.h>
 #include <dSemaphore.h>
 #include <dClassAlloc.h>
+#include <dRefCounter.h>
 #include <dThreadPool.h>
 #include <dQuaternion.h>
 #include <dFixSizeBuffer.h>
