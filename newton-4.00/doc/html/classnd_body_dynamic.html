@@ -123,35 +123,38 @@ virtual D_NEWTON_API <a class="el" href="classnd_body_dynamic.html">ndBodyDynami
 virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>ApplyExternalForces</b> (dInt32 threadIndex, dFloat32 timestep)</td></tr>
 <tr class="separator:a3fb78ea309a501e6fcbb8ab4b889e8eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c676a63da8c341c9470c53aa49a8a03"><td class="memItemLeft" align="right" valign="top"><a id="a2c676a63da8c341c9470c53aa49a8a03"></a>
-D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>AddDampingAcceleration</b> (dFloat32 timestep)</td></tr>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>AddDampingAcceleration</b> (dFloat32 timestep)</td></tr>
 <tr class="separator:a2c676a63da8c341c9470c53aa49a8a03"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac1ab17c3acc50634d19cf41c84d68fdd"><td class="memItemLeft" align="right" valign="top"><a id="ac1ab17c3acc50634d19cf41c84d68fdd"></a>
-<a class="el" href="classnd_jacobian.html">ndJacobian</a>&#160;</td><td class="memItemRight" valign="bottom"><b>IntegrateForceAndToque</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;force, const <a class="el" href="classd_vector.html">dVector</a> &amp;torque, const <a class="el" href="classd_vector.html">dVector</a> &amp;timestep)</td></tr>
-<tr class="separator:ac1ab17c3acc50634d19cf41c84d68fdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf89f5506a029db1d61bf5fc3fac0263"><td class="memItemLeft" align="right" valign="top"><a id="acf89f5506a029db1d61bf5fc3fac0263"></a>
-<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetForce</b> () const</td></tr>
-<tr class="separator:acf89f5506a029db1d61bf5fc3fac0263"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9695b1f5376ecd4773b9dafd7527e468"><td class="memItemLeft" align="right" valign="top"><a id="a9695b1f5376ecd4773b9dafd7527e468"></a>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>IntegrateVelocity</b> (dFloat32 timestep)</td></tr>
+<tr class="separator:a9695b1f5376ecd4773b9dafd7527e468"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:affceb57c5c322b543c73e473d7ad5a0e"><td class="memItemLeft" align="right" valign="top"><a id="affceb57c5c322b543c73e473d7ad5a0e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetForce</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;force)</td></tr>
+D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>SetForce</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;force)</td></tr>
 <tr class="separator:affceb57c5c322b543c73e473d7ad5a0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aead375c6914224c3aaff3aedc304e8f2"><td class="memItemLeft" align="right" valign="top"><a id="aead375c6914224c3aaff3aedc304e8f2"></a>
-<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetToque</b> () const</td></tr>
-<tr class="separator:aead375c6914224c3aaff3aedc304e8f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75234c8a105cca1dd58be4f4f1db6c4c"><td class="memItemLeft" align="right" valign="top"><a id="a75234c8a105cca1dd58be4f4f1db6c4c"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetTorque</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;torque)</td></tr>
+D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>SetTorque</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;torque)</td></tr>
 <tr class="separator:a75234c8a105cca1dd58be4f4f1db6c4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf89f5506a029db1d61bf5fc3fac0263"><td class="memItemLeft" align="right" valign="top"><a id="acf89f5506a029db1d61bf5fc3fac0263"></a>
+virtual <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetForce</b> () const</td></tr>
+<tr class="separator:acf89f5506a029db1d61bf5fc3fac0263"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1333cf872980cc7aeac887560b13a8fb"><td class="memItemLeft" align="right" valign="top"><a id="a1333cf872980cc7aeac887560b13a8fb"></a>
+virtual <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetTorque</b> () const</td></tr>
+<tr class="separator:a1333cf872980cc7aeac887560b13a8fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60cf364852dc9fbb9e8429e2684a1e37"><td class="memItemLeft" align="right" valign="top"><a id="a60cf364852dc9fbb9e8429e2684a1e37"></a>
 <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetAccel</b> () const</td></tr>
 <tr class="separator:a60cf364852dc9fbb9e8429e2684a1e37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afef8848d609aeb8e73e13d9443258ba8"><td class="memItemLeft" align="right" valign="top"><a id="afef8848d609aeb8e73e13d9443258ba8"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetAccel</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;accel)</td></tr>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>SetAccel</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;accel)</td></tr>
 <tr class="separator:afef8848d609aeb8e73e13d9443258ba8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5164bf5be45dcfea9516b7e3bc8509aa"><td class="memItemLeft" align="right" valign="top"><a id="a5164bf5be45dcfea9516b7e3bc8509aa"></a>
 <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetAlpha</b> () const</td></tr>
 <tr class="separator:a5164bf5be45dcfea9516b7e3bc8509aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a01c13f65ca40593b2466b916588b139f"><td class="memItemLeft" align="right" valign="top"><a id="a01c13f65ca40593b2466b916588b139f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetAlpha</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;alpha)</td></tr>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>SetAlpha</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;alpha)</td></tr>
 <tr class="separator:a01c13f65ca40593b2466b916588b139f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1ab17c3acc50634d19cf41c84d68fdd"><td class="memItemLeft" align="right" valign="top"><a id="ac1ab17c3acc50634d19cf41c84d68fdd"></a>
+<a class="el" href="classnd_jacobian.html">ndJacobian</a>&#160;</td><td class="memItemRight" valign="bottom"><b>IntegrateForceAndToque</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;force, const <a class="el" href="classd_vector.html">dVector</a> &amp;torque, const <a class="el" href="classd_vector.html">dVector</a> &amp;timestep)</td></tr>
+<tr class="separator:ac1ab17c3acc50634d19cf41c84d68fdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classnd_body_kinematic"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnd_body_kinematic')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a></td></tr>
 <tr class="memitem:ad38b68babc2d4f37164f388457e7de37 inherit pub_methods_classnd_body_kinematic"><td class="memItemLeft" align="right" valign="top"><a id="ad38b68babc2d4f37164f388457e7de37"></a>
 <a class="el" href="classnd_scene.html">ndScene</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetBroadPhase</b> () const</td></tr>
@@ -285,9 +288,24 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a1d22209078fbfa01fddc94eaa0473526"><td class="memItemLeft" align="right" valign="top"><a id="a1d22209078fbfa01fddc94eaa0473526"></a>
 <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_externalTorque</b></td></tr>
 <tr class="separator:a1d22209078fbfa01fddc94eaa0473526"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a207d52a13cc68f96e71d203a7a2cd5c8"><td class="memItemLeft" align="right" valign="top"><a id="a207d52a13cc68f96e71d203a7a2cd5c8"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_impulseForce</b></td></tr>
+<tr class="separator:a207d52a13cc68f96e71d203a7a2cd5c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21b12bf2abdb3cba826ced5636037f06"><td class="memItemLeft" align="right" valign="top"><a id="a21b12bf2abdb3cba826ced5636037f06"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_impulseTorque</b></td></tr>
+<tr class="separator:a21b12bf2abdb3cba826ced5636037f06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acdf9c9115b176b0471076b1a828d6bce"><td class="memItemLeft" align="right" valign="top"><a id="acdf9c9115b176b0471076b1a828d6bce"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_savedExternalForce</b></td></tr>
+<tr class="separator:acdf9c9115b176b0471076b1a828d6bce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd1c76372da7a3f1844cd8389fc78948"><td class="memItemLeft" align="right" valign="top"><a id="abd1c76372da7a3f1844cd8389fc78948"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_savedExternalTorque</b></td></tr>
+<tr class="separator:abd1c76372da7a3f1844cd8389fc78948"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26355b3af4d04be2f39a59556d507048"><td class="memItemLeft" align="right" valign="top"><a id="a26355b3af4d04be2f39a59556d507048"></a>
 <a class="el" href="classd_array.html">dArray</a>&lt; ndBilateralJoint * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_jointArray</b></td></tr>
 <tr class="separator:a26355b3af4d04be2f39a59556d507048"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5bafbe2574476a66ef43fee650aec191"><td class="memItemLeft" align="right" valign="top"><a id="a5bafbe2574476a66ef43fee650aec191"></a>
+dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_sleepingCounter</b></td></tr>
+<tr class="separator:a5bafbe2574476a66ef43fee650aec191"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classnd_body_kinematic"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classnd_body_kinematic')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a></td></tr>
 <tr class="memitem:a2f760c078d88e0d58de1d704e419de9a inherit pro_attribs_classnd_body_kinematic"><td class="memItemLeft" align="right" valign="top"><a id="a2f760c078d88e0d58de1d704e419de9a"></a>
 <a class="el" href="classd_matrix.html">dMatrix</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_invWorldInertiaMatrix</b></td></tr>
@@ -319,6 +337,9 @@ ndContactMap&#160;</td><td class="memItemRight" valign="bottom"><b>m_contactList
 <tr class="memitem:ad8689d4e1df0716f0d11d527e6b296f0 inherit pro_attribs_classnd_body_kinematic"><td class="memItemLeft" align="right" valign="top"><a id="ad8689d4e1df0716f0d11d527e6b296f0"></a>
 <a class="el" href="classnd_scene.html">ndScene</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_scene</b></td></tr>
 <tr class="separator:ad8689d4e1df0716f0d11d527e6b296f0 inherit pro_attribs_classnd_body_kinematic"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa3cb7d52d61ae4f826de3bf0674ad78 inherit pro_attribs_classnd_body_kinematic"><td class="memItemLeft" align="right" valign="top"><a id="aaa3cb7d52d61ae4f826de3bf0674ad78"></a>
+<a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_islandParent</b></td></tr>
+<tr class="separator:aaa3cb7d52d61ae4f826de3bf0674ad78 inherit pro_attribs_classnd_body_kinematic"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acce20c0147ddeeb4ec0ccf4179196b3e inherit pro_attribs_classnd_body_kinematic"><td class="memItemLeft" align="right" valign="top"><a id="acce20c0147ddeeb4ec0ccf4179196b3e"></a>
 <a class="el" href="classd_list.html">dList</a>&lt; <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> * &gt;::dListNode *&#160;</td><td class="memItemRight" valign="bottom"><b>m_sceneNode</b></td></tr>
 <tr class="separator:acce20c0147ddeeb4ec0ccf4179196b3e inherit pro_attribs_classnd_body_kinematic"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -328,9 +349,15 @@ ndContactMap&#160;</td><td class="memItemRight" valign="bottom"><b>m_contactList
 <tr class="memitem:ae64bdc0745be6325c0d9392afcab9f5a inherit pro_attribs_classnd_body_kinematic"><td class="memItemLeft" align="right" valign="top"><a id="ae64bdc0745be6325c0d9392afcab9f5a"></a>
 ndSceneAggregate *&#160;</td><td class="memItemRight" valign="bottom"><b>m_sceneAggregateNode</b></td></tr>
 <tr class="separator:ae64bdc0745be6325c0d9392afcab9f5a inherit pro_attribs_classnd_body_kinematic"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad0ef0c7f166f134cd2ead7c0db1a600a inherit pro_attribs_classnd_body_kinematic"><td class="memItemLeft" align="right" valign="top"><a id="ad0ef0c7f166f134cd2ead7c0db1a600a"></a>
-dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_index</b></td></tr>
-<tr class="separator:ad0ef0c7f166f134cd2ead7c0db1a600a inherit pro_attribs_classnd_body_kinematic"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a214be851152e228993d0bf17508adfa5 inherit pro_attribs_classnd_body_kinematic"><td class="memItemLeft" align="right" valign="top"><a id="a214be851152e228993d0bf17508adfa5"></a>
+dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>m_weight</b></td></tr>
+<tr class="separator:a214be851152e228993d0bf17508adfa5 inherit pro_attribs_classnd_body_kinematic"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a190bced31257858e13b1c84ea9988c1b inherit pro_attribs_classnd_body_kinematic"><td class="memItemLeft" align="right" valign="top"><a id="a190bced31257858e13b1c84ea9988c1b"></a>
+dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_rank</b></td></tr>
+<tr class="separator:a190bced31257858e13b1c84ea9988c1b inherit pro_attribs_classnd_body_kinematic"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93c63746c7247d983696f3093eadd30e inherit pro_attribs_classnd_body_kinematic"><td class="memItemLeft" align="right" valign="top"><a id="a93c63746c7247d983696f3093eadd30e"></a>
+dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_index</b></td></tr>
+<tr class="separator:a93c63746c7247d983696f3093eadd30e inherit pro_attribs_classnd_body_kinematic"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classnd_body"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classnd_body')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classnd_body.html">ndBody</a></td></tr>
 <tr class="memitem:adccf3f50a654e5e6dc05e695377c35f6 inherit pro_attribs_classnd_body"><td class="memItemLeft" align="right" valign="top"><a id="adccf3f50a654e5e6dc05e695377c35f6"></a>
 <a class="el" href="classd_matrix.html">dMatrix</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_matrix</b></td></tr>
@@ -372,9 +399,21 @@ union {</td></tr>
 <tr class="memitem:af025948f26e7a4cb2ccd856f05709c7c inherit pro_attribs_classnd_body"><td class="memItemLeft" >
 &#160;&#160;&#160;&#160;&#160;&#160;dUnsigned32&#160;&#160;&#160;<b>m_resting</b>: 1</td></tr>
 <tr class="separator:af025948f26e7a4cb2ccd856f05709c7c inherit pro_attribs_classnd_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbccd51b2999e9dcbd6bbb3dce82ad3b inherit pro_attribs_classnd_body"><td class="memItemLeft" >
+&#160;&#160;&#160;&#160;&#160;&#160;dUnsigned32&#160;&#160;&#160;<b>m_sleeping</b>: 1</td></tr>
+<tr class="separator:abbccd51b2999e9dcbd6bbb3dce82ad3b inherit pro_attribs_classnd_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6db63ce404f1ade257dddb4544d7824d inherit pro_attribs_classnd_body"><td class="memItemLeft" >
+&#160;&#160;&#160;&#160;&#160;&#160;dUnsigned32&#160;&#160;&#160;<b>m_autoSleep</b>: 1</td></tr>
+<tr class="separator:a6db63ce404f1ade257dddb4544d7824d inherit pro_attribs_classnd_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5e3257d2a1dfeceecd2c1fe174dc58b inherit pro_attribs_classnd_body"><td class="memItemLeft" >
+&#160;&#160;&#160;&#160;&#160;&#160;dUnsigned32&#160;&#160;&#160;<b>m_islandSleep</b>: 1</td></tr>
+<tr class="separator:af5e3257d2a1dfeceecd2c1fe174dc58b inherit pro_attribs_classnd_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a23999297fc5da282f292be1b9fdfdd inherit pro_attribs_classnd_body"><td class="memItemLeft" >
 &#160;&#160;&#160;&#160;&#160;&#160;dUnsigned32&#160;&#160;&#160;<b>m_collideWithLinkedBodies</b>: 1</td></tr>
 <tr class="separator:a6a23999297fc5da282f292be1b9fdfdd inherit pro_attribs_classnd_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99856e8b246784020e2849c7856c28ca inherit pro_attribs_classnd_body"><td class="memItemLeft" >
+&#160;&#160;&#160;&#160;&#160;&#160;dUnsigned32&#160;&#160;&#160;<b>m_bodyIsConstrained</b>: 1</td></tr>
+<tr class="separator:a99856e8b246784020e2849c7856c28ca inherit pro_attribs_classnd_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a7d516de952fe6f13657e77c2acf4a5 inherit pro_attribs_classnd_body"><td class="memItemLeft" >
 &#160;&#160;&#160;&#160;&#160;&#160;dUnsigned32&#160;&#160;&#160;<b>m_gyroTorqueOn</b>: 1</td></tr>
 <tr class="separator:a3a7d516de952fe6f13657e77c2acf4a5 inherit pro_attribs_classnd_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -409,7 +448,7 @@ static D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a cla
 <tr class="separator:a36b92bbda0153a4c2e14853b75016704 inherit pub_static_methods_classd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classnd_body_kinematic"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classnd_body_kinematic')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a></td></tr>
 <tr class="memitem:ab5d07828d77fc77e41ae299c1e09f181 inherit pro_methods_classnd_body_kinematic"><td class="memItemLeft" align="right" valign="top"><a id="ab5d07828d77fc77e41ae299c1e09f181"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateGyroData</b> ()</td></tr>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateGyroData</b> ()</td></tr>
 <tr class="separator:ab5d07828d77fc77e41ae299c1e09f181 inherit pro_methods_classnd_body_kinematic"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0092cb38415af5e2b29f71a1b13b2254 inherit pro_methods_classnd_body_kinematic"><td class="memItemLeft" align="right" valign="top"><a id="a0092cb38415af5e2b29f71a1b13b2254"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateCollisionMatrix</b> ()</td></tr>
@@ -429,9 +468,12 @@ ndSceneAggregate *&#160;</td><td class="memItemRight" valign="bottom"><b>GetBroa
 <tr class="memitem:ab896ae2f58377ff3b9e0e51996f1f7b2 inherit pro_methods_classnd_body_kinematic"><td class="memItemLeft" align="right" valign="top"><a id="ab896ae2f58377ff3b9e0e51996f1f7b2"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetBroadPhaseAggregate</b> (ndSceneAggregate *const node)</td></tr>
 <tr class="separator:ab896ae2f58377ff3b9e0e51996f1f7b2 inherit pro_methods_classnd_body_kinematic"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0453e85eb357ba2da546c13e9fa308d3 inherit pro_methods_classnd_body_kinematic"><td class="memItemLeft" align="right" valign="top"><a id="a0453e85eb357ba2da546c13e9fa308d3"></a>
+D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>IntegrateExternalForce</b> (dFloat32 timestep)</td></tr>
+<tr class="separator:a0453e85eb357ba2da546c13e9fa308d3 inherit pro_methods_classnd_body_kinematic"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_attribs_classnd_body"><td colspan="2" onclick="javascript:toggleInherit('pro_static_attribs_classnd_body')"><img src="closed.png" alt="-"/>&#160;Static Protected Attributes inherited from <a class="el" href="classnd_body.html">ndBody</a></td></tr>
 <tr class="memitem:aa8dc4f576828c7b21a058932c4e99c64 inherit pro_static_attribs_classnd_body"><td class="memItemLeft" align="right" valign="top"><a id="aa8dc4f576828c7b21a058932c4e99c64"></a>
-static dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_uniqueIDCount</b> = 0</td></tr>
+static dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>m_uniqueIDCount</b> = 2</td></tr>
 <tr class="separator:aa8dc4f576828c7b21a058932c4e99c64 inherit pro_static_attribs_classnd_body"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->

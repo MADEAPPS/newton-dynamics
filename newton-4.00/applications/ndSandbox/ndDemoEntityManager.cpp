@@ -10,34 +10,31 @@
 */
 
 #include "ndSandboxStdafx.h"
+#include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 #include "ndHighResolutionTimer.h"
 
 
-#define MAX_PHYSICS_FPS				60.0f
-#define MAX_PHYSICS_SUB_STEPS		2
-
-#if 0
-#include "SkyBox.h"
-#include "ndDemoMesh.h"
-#include "ndDemoEntity.h"
-#include "DemoCamera.h"
-#include "FileBrowser.h"
-#include "PhysicsUtils.h"
-#include "DebugDisplay.h"
-#include "TargaToOpenGl.h"
-#include "ShaderPrograms.h"
-#include "ndDemoEntityManager.h"
-#include "DemoCameraManager.h"
-#include "DemoCameraManager.h"
-
+//#include "SkyBox.h"
+//#include "ndDemoMesh.h"
+//#include "ndDemoEntity.h"
+//#include "DemoCamera.h"
+//#include "FileBrowser.h"
+//#include "PhysicsUtils.h"
+//#include "DebugDisplay.h"
+//#include "TargaToOpenGl.h"
+//#include "ShaderPrograms.h"
+//#include "ndDemoEntityManager.h"
+//#include "DemoCameraManager.h"
+//#include "DemoCameraManager.h"
 
 #ifdef _MACOSX_VER
 	#include "CocoaOpenglGlue.h"
 #endif
 
-#define PROJECTILE_INITIAL_SPEED	20.0f
+//#define PROJECTILE_INITIAL_SPEED	20.0f
 
+#define DEFAULT_SCENE	0		// basic scene set up
 //#define DEFAULT_SCENE	0		// using NewtonMesh tool
 //#define DEFAULT_SCENE	1		// coefficients of friction
 //#define DEFAULT_SCENE	2		// coefficients of restitution
@@ -48,7 +45,7 @@
 //#define DEFAULT_SCENE	7		// kinematic bodies
 //#define DEFAULT_SCENE	8		// Object Placement
 //#define DEFAULT_SCENE	9		// primitive convex cast 
-#define DEFAULT_SCENE	10		// box stacks
+//#define DEFAULT_SCENE	10		// box stacks
 //#define DEFAULT_SCENE	11		// simple level mesh collision
 //#define DEFAULT_SCENE	12		// optimized level mesh collision
 //#define DEFAULT_SCENE	13		// height field Collision
@@ -81,93 +78,98 @@
 //#define DEFAULT_SCENE	40		// soft bodies	
 						 
 /// demos forward declaration 
-void Friction (ndDemoEntityManager* const scene);
-void Restitution (ndDemoEntityManager* const scene);
-void NewtonCradle (ndDemoEntityManager* const scene);
-void GyroscopyPrecession(ndDemoEntityManager* const scene);
-void ClosestDistance (ndDemoEntityManager* const scene);
-void ConvexCast (ndDemoEntityManager* const scene);
-void PrimitiveCollision (ndDemoEntityManager* const scene);
-void KinematicBodies (ndDemoEntityManager* const scene);
-void ObjectPlacement (ndDemoEntityManager* const scene);
-void ClothPatch(ndDemoEntityManager* const scene);
-void SoftBodies (ndDemoEntityManager* const scene);
-void BasicBoxStacks (ndDemoEntityManager* const scene);
-void SimpleMeshLevelCollision (ndDemoEntityManager* const scene);
-void OptimizedMeshLevelCollision (ndDemoEntityManager* const scene);
-void UniformScaledCollision (ndDemoEntityManager* const scene);
-void NonUniformScaledCollision (ndDemoEntityManager* const scene);
-void ScaledMeshCollision (ndDemoEntityManager* const scene);
-void ContinuousCollision (ndDemoEntityManager* const scene);
-void FlatLandGame (ndDemoEntityManager* const scene);
-void SceneCollision (ndDemoEntityManager* const scene);
-void CompoundCollision(ndDemoEntityManager* const scene);
-void AlchimedesBuoyancy(ndDemoEntityManager* const scene);
-void SimpleConvexFracturing (ndDemoEntityManager* const scene);
-void UsingNewtonMeshTool (ndDemoEntityManager* const scene);
-void MultiRayCast (ndDemoEntityManager* const scene);
-void MultibodyBodyCar(ndDemoEntityManager* const scene);
-void SuperCar (ndDemoEntityManager* const scene);
-void MilitaryTransport (ndDemoEntityManager* const scene);
-void BasicPlayerController (ndDemoEntityManager* const scene);
-void AnimatedPlayerController (ndDemoEntityManager* const scene);
-void AdvancedPlayerController (ndDemoEntityManager* const scene);
-void HeightFieldCollision (ndDemoEntityManager* const scene);
-void UserPlaneCollision (ndDemoEntityManager* const scene);
-void UserHeightFieldCollision (ndDemoEntityManager* const scene);
-void PassiveRagdoll (ndDemoEntityManager* const scene);
-void BalancingBiped (ndDemoEntityManager* const scene);
-void ServoJoints (ndDemoEntityManager* const scene);
-void ConstructionVehicle (ndDemoEntityManager* const scene);
-void StandardJoints (ndDemoEntityManager* const scene);
-void SixAxisManipulators(ndDemoEntityManager* const scene);
-void Hexapod(ndDemoEntityManager* const scene);
+void ndBasicSetup(ndDemoEntityManager* const scene);
+//void Friction(ndDemoEntityManager* const scene);
+//void Restitution (ndDemoEntityManager* const scene);
+//void NewtonCradle (ndDemoEntityManager* const scene);
+//void GyroscopyPrecession(ndDemoEntityManager* const scene);
+//void ClosestDistance (ndDemoEntityManager* const scene);
+//void ConvexCast (ndDemoEntityManager* const scene);
+//void PrimitiveCollision (ndDemoEntityManager* const scene);
+//void KinematicBodies (ndDemoEntityManager* const scene);
+//void ObjectPlacement (ndDemoEntityManager* const scene);
+//void ClothPatch(ndDemoEntityManager* const scene);
+//void SoftBodies (ndDemoEntityManager* const scene);
+//void BasicBoxStacks (ndDemoEntityManager* const scene);
+//void SimpleMeshLevelCollision (ndDemoEntityManager* const scene);
+//void OptimizedMeshLevelCollision (ndDemoEntityManager* const scene);
+//void UniformScaledCollision (ndDemoEntityManager* const scene);
+//void NonUniformScaledCollision (ndDemoEntityManager* const scene);
+//void ScaledMeshCollision (ndDemoEntityManager* const scene);
+//void ContinuousCollision (ndDemoEntityManager* const scene);
+//void FlatLandGame (ndDemoEntityManager* const scene);
+//void SceneCollision (ndDemoEntityManager* const scene);
+//void CompoundCollision(ndDemoEntityManager* const scene);
+//void AlchimedesBuoyancy(ndDemoEntityManager* const scene);
+//void SimpleConvexFracturing (ndDemoEntityManager* const scene);
+//void UsingNewtonMeshTool (ndDemoEntityManager* const scene);
+//void MultiRayCast (ndDemoEntityManager* const scene);
+//void MultibodyBodyCar(ndDemoEntityManager* const scene);
+//void SuperCar (ndDemoEntityManager* const scene);
+//void MilitaryTransport (ndDemoEntityManager* const scene);
+//void BasicPlayerController (ndDemoEntityManager* const scene);
+//void AnimatedPlayerController (ndDemoEntityManager* const scene);
+//void AdvancedPlayerController (ndDemoEntityManager* const scene);
+//void HeightFieldCollision (ndDemoEntityManager* const scene);
+//void UserPlaneCollision (ndDemoEntityManager* const scene);
+//void UserHeightFieldCollision (ndDemoEntityManager* const scene);
+//void PassiveRagdoll (ndDemoEntityManager* const scene);
+//void BalancingBiped (ndDemoEntityManager* const scene);
+//void ServoJoints (ndDemoEntityManager* const scene);
+//void ConstructionVehicle (ndDemoEntityManager* const scene);
+//void StandardJoints (ndDemoEntityManager* const scene);
+//void SixAxisManipulators(ndDemoEntityManager* const scene);
+//void Hexapod(ndDemoEntityManager* const scene);
+
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
-	{"Using the newton mesh tool", "demonstrate how to use the newton mesh tool for mesh manipulation", UsingNewtonMeshTool},
-	{"Coefficients of friction", "demonstrate the effect of various coefficient of friction", Friction},
-	{"Coefficients of restitution", "demonstrate the effect of various coefficient of restitution", Restitution},
-	{"Newton Cradle", "demonstrate the effect of various versus multiple bodes", NewtonCradle},
-	{"Gyroscopic precession", "show natural precession", GyroscopyPrecession},
-	{"Closest distance", "demonstrate closest distance to a convex shape", ClosestDistance},
-	{"Primitive Collision", "demonstrate separate collision of primitives", PrimitiveCollision},
-	{"Kinematic bodies", "demonstrate separate collision of primitives", KinematicBodies},
-	{"Object Placement", "demonstrate separate collision of primitives", ObjectPlacement},
-	{"Primitive convex cast", "demonstrate separate primitive convex cast", ConvexCast},
-	{"Simple box Stacks", "show simple stack of Boxes", BasicBoxStacks},
-	{"Unoptimized mesh collision", "show simple level mesh", SimpleMeshLevelCollision},
-	{"Optimized mesh collision", "show optimized level mesh", OptimizedMeshLevelCollision},
-	{"Height field collision mesh", "show high file collision mesh", HeightFieldCollision},
-	{"User infinite Plane collision mesh", "show high file collision mesh", UserPlaneCollision},
-	{"User Height field collision mesh", "show high file collision mesh", UserHeightFieldCollision},
-	{"Compound collision shape", "demonstrate compound collision", CompoundCollision},
-	{"Archimedes Buoyancy", "show Archimedes Buoyancy using the trigger volume manager", AlchimedesBuoyancy},
-	{"Uniform scaled collision shape", "demonstrate scaling shape", UniformScaledCollision},
-	{"Non uniform scaled collision shape", "demonstrate scaling shape", NonUniformScaledCollision},
-	{"Scaled mesh collision", "demonstrate scaling mesh scaling collision", ScaledMeshCollision},
-	{"Continuous collision", "show continuous collision", ContinuousCollision },
-	{"Flat Land Game", "show usage of tow dimension joints", FlatLandGame },
-	{"Multi geometry collision", "show static mesh with the ability of moving internal parts", SceneCollision},
-	{"Simple convex fracture", "demonstrate simple fracture destruction using Voronoi partition", SimpleConvexFracturing},
-	{"Parallel ray cast", "using the threading Job scheduler", MultiRayCast},
-	{"Standard Joints", "show some of the common joints", StandardJoints},
-	{"Servo actuators joints", "demonstrate complex array of bodies interconnect by joints", ServoJoints},
-	{"Construction Vehicle", "demonstrate complex array of bodies interconnect by joints", ConstructionVehicle},
-	{"Six axis manipulator", "show using inverse dynamics to control robots", SixAxisManipulators },
-	{"Hexapod walker", "show using inverse dynamics to control robots", Hexapod },
-	{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
-	{"Balancing  (WIP)", "demonstrate self balancing rag doll biped", BalancingBiped},
-	{"Single body car", "show a generalized coordinate system body", MultibodyBodyCar },
-	{"Super car", "implement a hight performance sport car", SuperCar},
-	{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
-	{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},
-	{"Animated player controller", "demonstrate inverse kinematic player controller", AnimatedPlayerController},
-	{"Advanced player controller", "demonstrate player interacting with other objects", AdvancedPlayerController},
-	{"Simple cloth Patch", "show simple cloth patch", ClothPatch},
-	{"Simple soft Body", "show simple soft body", SoftBodies},
+	{ "basic scene setup", ndBasicSetup},
+	//{"Using the newton mesh tool", "demonstrate how to use the newton mesh tool for mesh manipulation", UsingNewtonMeshTool},
+	//{"Using the newton mesh tool", "demonstrate how to use the newton mesh tool for mesh manipulation", UsingNewtonMeshTool},
+	//{"Coefficients of friction", "demonstrate the effect of various coefficient of friction", Friction},
+	//{"Coefficients of restitution", "demonstrate the effect of various coefficient of restitution", Restitution},
+	//{"Newton Cradle", "demonstrate the effect of various versus multiple bodes", NewtonCradle},
+	//{"Gyroscopic precession", "show natural precession", GyroscopyPrecession},
+	//{"Closest distance", "demonstrate closest distance to a convex shape", ClosestDistance},
+	//{"Primitive Collision", "demonstrate separate collision of primitives", PrimitiveCollision},
+	//{"Kinematic bodies", "demonstrate separate collision of primitives", KinematicBodies},
+	//{"Object Placement", "demonstrate separate collision of primitives", ObjectPlacement},
+	//{"Primitive convex cast", "demonstrate separate primitive convex cast", ConvexCast},
+	//{"Simple box Stacks", "show simple stack of Boxes", BasicBoxStacks},
+	//{"Unoptimized mesh collision", "show simple level mesh", SimpleMeshLevelCollision},
+	//{"Optimized mesh collision", "show optimized level mesh", OptimizedMeshLevelCollision},
+	//{"Height field collision mesh", "show high file collision mesh", HeightFieldCollision},
+	//{"User infinite Plane collision mesh", "show high file collision mesh", UserPlaneCollision},
+	//{"User Height field collision mesh", "show high file collision mesh", UserHeightFieldCollision},
+	//{"Compound collision shape", "demonstrate compound collision", CompoundCollision},
+	//{"Archimedes Buoyancy", "show Archimedes Buoyancy using the trigger volume manager", AlchimedesBuoyancy},
+	//{"Uniform scaled collision shape", "demonstrate scaling shape", UniformScaledCollision},
+	//{"Non uniform scaled collision shape", "demonstrate scaling shape", NonUniformScaledCollision},
+	//{"Scaled mesh collision", "demonstrate scaling mesh scaling collision", ScaledMeshCollision},
+	//{"Continuous collision", "show continuous collision", ContinuousCollision },
+	//{"Flat Land Game", "show usage of tow dimension joints", FlatLandGame },
+	//{"Multi geometry collision", "show static mesh with the ability of moving internal parts", SceneCollision},
+	//{"Simple convex fracture", "demonstrate simple fracture destruction using Voronoi partition", SimpleConvexFracturing},
+	//{"Parallel ray cast", "using the threading Job scheduler", MultiRayCast},
+	//{"Standard Joints", "show some of the common joints", StandardJoints},
+	//{"Servo actuators joints", "demonstrate complex array of bodies interconnect by joints", ServoJoints},
+	//{"Construction Vehicle", "demonstrate complex array of bodies interconnect by joints", ConstructionVehicle},
+	//{"Six axis manipulator", "show using inverse dynamics to control robots", SixAxisManipulators },
+	//{"Hexapod walker", "show using inverse dynamics to control robots", Hexapod },
+	//{"Passive rag doll", "demonstrate passive rag doll", PassiveRagdoll},
+	//{"Balancing  (WIP)", "demonstrate self balancing rag doll biped", BalancingBiped},
+	//{"Single body car", "show a generalized coordinate system body", MultibodyBodyCar },
+	//{"Super car", "implement a hight performance sport car", SuperCar},
+	//{"Heavy vehicles", "implement military type heavy Vehicles", MilitaryTransport},
+	//{"Basic player controller", "demonstrate simple player controller", BasicPlayerController},
+	//{"Animated player controller", "demonstrate inverse kinematic player controller", AnimatedPlayerController},
+	//{"Advanced player controller", "demonstrate player interacting with other objects", AdvancedPlayerController},
+	//{"Simple cloth Patch", "show simple cloth patch", ClothPatch},
+	//{"Simple soft Body", "show simple soft body", SoftBodies},
 };
 
+#if 0
 ndDemoEntityManager::ButtonKey::ButtonKey (bool state)
 	:m_state(state)
 	,m_memory0(false)
@@ -289,48 +291,6 @@ void ndDemoEntityManager::RemoveEntity (ndDemoEntity* const ent)
 	}
 }
 
-void ndDemoEntityManager::ApplyMenuOptions()
-{
-	NewtonWaitForUpdateToFinish(m_world);
-
-	// clean up all caches the engine have saved
-	//NewtonInvalidateCache(m_world);
-	NewtonSetNumberOfSubsteps (m_world, m_solverSubSteps);
-	NewtonSetSolverIterations(m_world, m_solverPasses);
-	NewtonSetThreadsCount(m_world, m_workerThreads);
-
-	int state = m_autoSleepMode ? 1 : 0;
-	for (const NewtonBody* body = NewtonWorldGetFirstBody(m_world); body; body = NewtonWorldGetNextBody(m_world, body)) {
-		NewtonBodySetAutoSleep(body, state);
-	}
-
-	NewtonSelectBroadphaseAlgorithm(m_world, m_broadPhaseType);
-	NewtonSetParallelSolverOnLargeIsland (m_world, m_solveLargeIslandInParallel ? 1 : 0);	
-
-	void* plugin = nullptr;
-	if (m_currentPlugin) {
-		int index = 1;
-		for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
-			if (index == m_currentPlugin) {
-				plugin = ptr;
-			}
-			index ++;
-		}
-	}
-	NewtonSelectPlugin(m_world, plugin);
-}
-
-
-void ndDemoEntityManager::LoadDemo(int menu)
-{
-	char newTitle[256];
-	Cleanup();
-	m_demosSelection[menu].m_launchDemoCallback(this);
-	sprintf(newTitle, "Newton Game Dynamics 3.14 demo: %s", m_demosSelection[menu].m_name);
-	glfwSetWindowTitle(m_mainFrame, newTitle);
-	ApplyMenuOptions();
-	ResetTimer();
-}
 
 bool ndDemoEntityManager::GetMousePosition (int& posX, int& posY) const
 {
@@ -609,7 +569,7 @@ void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFl
 
 
 ndDemoEntityManager::ndDemoEntityManager()
-	:m_mainFrame(nullptr)
+	:dList <ndDemoEntity*>()
 	//, m_defaultFont(0)
 	//, m_sky(nullptr)
 	//, m_world(nullptr)
@@ -646,7 +606,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//, m_showJointDebugInfo(false)
 	//, m_showListenersDebugInfo(false)
 	//, m_showCollidingFaces(false)
-	//, m_asynchronousPhysicsUpdate(false)
 	//, m_solveLargeIslandInParallel(true)
 	//, m_showRaycastHit(false)
 	//, m_profilerMode(0)
@@ -733,9 +692,10 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_showUI = false;
 	m_showAABB = false;
 	m_showStats = true;
-	m_autoSleepMode = false;
+	m_autoSleepMode = true;
 	m_updateMenuOptions = false;
 	m_suspendPhysicsUpdate = false;
+	m_asynchronousPhysicsUpdate = true;
 	m_mousePressed[0] = false;
 	m_mousePressed[1] = false;
 	m_mousePressed[2] = false;
@@ -743,9 +703,11 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_workerThreads = 1;
 	m_solverPasses = 4;
 	m_solverSubSteps = 2;
+	m_currentScene = DEFAULT_SCENE;
+	m_lastCurrentScene = DEFAULT_SCENE;
 
 	m_fps = 0.0f;
-	m_timestepAcc = 0.0f;
+//	dUnsigned64 m_microsecunds;
 	m_framesCount = 0;
 	m_renderDemoGUI = nullptr;
 
@@ -765,9 +727,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//	m_showJointDebugInfo = true;
 	//	m_collisionDisplayMode = 2;
 	//	m_showListenersDebugInfo = true;
-	//  m_asynchronousPhysicsUpdate = true;
 
-	m_microsecunds = 0;
 	m_world = nullptr;
 	Cleanup();
 	ResetTimer();
@@ -787,12 +747,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 ndDemoEntityManager::~ndDemoEntityManager()
 {
-	// is we are run asynchronous we need make sure no update in on flight.
-	if (m_world) 
-	{
-		m_world->Sync();
-	}
-
 	Cleanup();
 	
 	// destroy the empty world
@@ -813,7 +767,6 @@ ndDemoEntityManager::~ndDemoEntityManager()
 
 	ImGui::Shutdown();
 	glfwTerminate();
-	//dAssert(NewtonGetMemoryUsed() == 0);
 }
 
 void ndDemoEntityManager::LoadFont()
@@ -859,11 +812,6 @@ void ndDemoEntityManager::LoadFont()
 
 	// Restore state
 	glBindTexture(GL_TEXTURE_2D, last_texture);
-}
-
-void ndDemoEntityManager::ResetTimer()
-{
-	m_microsecunds = dGetTimeInMicrosenconds();
 }
 
 void ndDemoEntityManager::ErrorCallback(int error, const char* description)
@@ -926,7 +874,7 @@ void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, int key, int, in
 	io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
 
 	static int prevKey;
-	//ndDemoEntityManager* const manager = (ndDemoEntityManager*)glfwGetWindowUserPointer(window);
+	ndDemoEntityManager* const manager = (ndDemoEntityManager*)glfwGetWindowUserPointer(window);
 	if ((key == GLFW_KEY_F10) && (key != prevKey)) 
 	{
 		dAssert(0);
@@ -940,8 +888,7 @@ void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, int key, int, in
 
 	if (key == GLFW_KEY_F1) 
 	{
-		dAssert(0);
-		//manager->LoadDemo(manager->m_lastCurrentScene);
+		manager->LoadDemo(manager->m_lastCurrentScene);
 	}
 
 	prevKey = io.KeysDown[key] ? key : 0;
@@ -1066,7 +1013,7 @@ void ndDemoEntityManager::Run()
 	// Main loop
 	while (!glfwWindowShouldClose(m_mainFrame))
 	{
-		//m_suspendPhysicsUpdate = false;
+		m_suspendPhysicsUpdate = false;
 		BeginFrame();
 
 		D_TRACKTIME();
@@ -1077,26 +1024,74 @@ void ndDemoEntityManager::Run()
 	}
 }
 
-void ndDemoEntityManager::CalculateFPS(dFloat32 timestep)
+void ndDemoEntityManager::ResetTimer()
+{
+	m_framesCount = 0;
+	m_microsecunds = dGetTimeInMicrosenconds();
+	if (m_world)
+	{
+		m_world->ResetTimer();
+	}
+}
+
+void ndDemoEntityManager::CalculateFPS()
 {
 	m_framesCount++;
-	m_timestepAcc += timestep;
-
-	// this probably happing on loading of and a pause, just rest counters
-	if ((m_timestepAcc <= 0.0f) || (m_timestepAcc > 2.0f)) 
+	dUnsigned64 currentTime = dGetTimeInMicrosenconds() - m_microsecunds;
+	const dUnsigned64 deltaTime = dUnsigned64(1000000 / 4);
+	if (currentTime > deltaTime) 
 	{
-		m_timestepAcc = 0;
+		dFloat64 num = m_framesCount;
+		dFloat64 den = dFloat64(currentTime) * dFloat32 (1.0e-6f);
+		m_fps = dFloat32(num / den);
 		m_framesCount = 0;
+		m_microsecunds += deltaTime;
 	}
+}
 
-	//update fps every quarter of a second
-	if (m_timestepAcc >= 0.25f) 
+void ndDemoEntityManager::ApplyMenuOptions()
+{
+	m_world->Sync();
+	// clean up all caches the engine have saved
+	////NewtonInvalidateCache(m_world);
+
+	m_world->SetSubSteps(m_solverSubSteps);
+	m_world->SetSolverIterations(m_solverPasses);
+	m_world->SetThreadCount(m_workerThreads);
+		
+	bool state = m_autoSleepMode ? true : false;
+	const dList<ndBodyKinematic*>& bodyList = m_world->GetBodyList();
+	for (dList<ndBodyKinematic*>::dListNode* node = bodyList.GetFirst(); node; node = node->GetNext())
 	{
-		m_fps = dFloat32(m_framesCount) / m_timestepAcc;
-		m_timestepAcc -= 0.25f;
-		m_timestepAcc -= 0.0f;
-		m_framesCount = 0;
+		ndBodyKinematic* const body = node->GetInfo();
+		body->SetAutoSleep(state);
 	}
+	
+	//NewtonSelectBroadphaseAlgorithm(m_world, m_broadPhaseType);
+	//NewtonSetParallelSolverOnLargeIsland(m_world, m_solveLargeIslandInParallel ? 1 : 0);
+	//
+	//void* plugin = nullptr;
+	//if (m_currentPlugin) {
+	//	int index = 1;
+	//	for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
+	//		if (index == m_currentPlugin) {
+	//			plugin = ptr;
+	//		}
+	//		index++;
+	//	}
+	//}
+	//NewtonSelectPlugin(m_world, plugin);
+}
+
+void ndDemoEntityManager::LoadDemo(int menu)
+{
+	char newTitle[256];
+	Cleanup();
+	m_demosSelection[menu].m_launchDemoCallback(this);
+	sprintf(newTitle, "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_description);
+	glfwSetWindowTitle(m_mainFrame, newTitle);
+	ApplyMenuOptions();
+	ResetTimer();
 }
 
 void ndDemoEntityManager::ShowMainMenuBar()
@@ -1158,15 +1153,15 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		if (ImGui::BeginMenu("Demos")) 
 		{
 			m_suspendPhysicsUpdate = true;
-			dAssert(0);
-			//int demosCount = int(sizeof(m_demosSelection) / sizeof m_demosSelection[0]);
-			//for (int i = 0; i < demosCount; i++) 
-			//{
-			//	if (ImGui::MenuItem(m_demosSelection[i].m_name, "")) 
-			//	{
-			//		m_currentScene = i;
-			//	}
-			//}
+
+			int demosCount = int(sizeof(m_demosSelection) / sizeof m_demosSelection[0]);
+			for (int i = 0; i < demosCount; i++) 
+			{
+				if (ImGui::MenuItem(m_demosSelection[i].m_description, ""))
+				{
+					m_currentScene = i;
+				}
+			}
 
 			ImGui::EndMenu();
 		}
@@ -1180,7 +1175,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("auto sleep mode", &m_autoSleepMode);
 			ImGui::Checkbox("show UI", &m_showUI);
 			ImGui::Checkbox("show stats", &m_showStats);
-			//ImGui::Checkbox("concurrent physics update", &m_asynchronousPhysicsUpdate);
+			ImGui::Checkbox("concurrent physics update", &m_asynchronousPhysicsUpdate);
 			//ImGui::Checkbox("solve large island in parallel", &m_solveLargeIslandInParallel);
 			ImGui::Separator();
 
@@ -1239,8 +1234,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		if (!optionsOn && m_updateMenuOptions) 
 		{
 			m_updateMenuOptions = false;
-			dAssert(0);
-			//ApplyMenuOptions();
+			ApplyMenuOptions();
 		}
 	}
 
@@ -1330,14 +1324,13 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		default:
 		{
 			// load a demo 
-			//dAssert(0);
-			//if (m_currentScene != -1) 
-			//{
-			//	//DeserializedPhysicScene("C:/temp/test.bin");
-			//	LoadDemo(m_currentScene);
-			//	m_lastCurrentScene = m_currentScene;
-			//	m_currentScene = -1;
-			//}
+			if (m_currentScene != -1) 
+			{
+				//DeserializedPhysicScene("C:/temp/test.bin");
+				LoadDemo(m_currentScene);
+				m_lastCurrentScene = m_currentScene;
+				m_currentScene = -1;
+			}
 		}
 	}
 }
@@ -1353,10 +1346,10 @@ void ndDemoEntityManager::RenderStats()
 			sprintf(text, "fps:           %6.3f", m_fps);
 			ImGui::Text(text, "");
 
-			sprintf(text, "physics time: %6.3f ms", m_mainThreadPhysicsTime * 1000.0f);
+			sprintf(text, "physics time: %6.3f ms", m_world->GetUpdateTime());
 			ImGui::Text(text, "");
 
-			sprintf(text, "memory used:   %d kbytes", int (dMemory::GetMemoryUsed() / 1024));
+			sprintf(text, "memory used:  %6.3f mbytes", dFloat32 (dFloat64 (dMemory::GetMemoryUsed()) / (1024 * 1024)));
 			ImGui::Text(text, "");
 
 			//if (m_currentPlugin) 
@@ -1383,8 +1376,8 @@ void ndDemoEntityManager::RenderStats()
 			//
 			//sprintf(text, "sub steps:     %d", NewtonGetNumberOfSubsteps(m_world));
 			//ImGui::Text(text, "");
-			//
-			//m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));
+
+			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));
 			ImGui::End();
 		}
 	}
@@ -1394,7 +1387,6 @@ void ndDemoEntityManager::RenderStats()
 	//	if (ImGui::Begin("User Interface", &m_showUI)) 
 	//	{
 	//		m_renderHelpMenus(this, m_renderUIContext);
-	//		//m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
 	//		ImGui::End();
 	//	}
 	//}
@@ -1411,10 +1403,11 @@ void ndDemoEntityManager::Cleanup()
 	}
 
 	// destroy all remaining visual objects
-	//while (dList<ndDemoEntity*>::GetFirst()) 
-	//{
-	//	RemoveEntity(dList<ndDemoEntity*>::GetFirst());
-	//}
+	while (dList<ndDemoEntity*>::GetFirst()) 
+	{
+		dAssert(0);
+		//RemoveEntity(dList<ndDemoEntity*>::GetFirst());
+	}
 	//if (m_cameraManager) 
 	//{
 	//	delete m_cameraManager;
@@ -1430,11 +1423,8 @@ void ndDemoEntityManager::Cleanup()
 	}
 
 	// create the newton world
-	m_world = new ndWorld();
+	m_world = new ndPhysicsWorld(this);
 
-	//// link the work with this user data
-	//NewtonWorldSetUserData(m_world, this);
-	//
 	//// set a post update callback which is call after all simulation and all listeners updates
 	//NewtonSetPostUpdateCallback(m_world, PostUpdateCallback);
 	//
@@ -1443,15 +1433,9 @@ void ndDemoEntityManager::Cleanup()
 	//
 	//// add the camera manager
 	//m_cameraManager = new DemoCameraManager(this);
-	//
-	//ApplyMenuOptions();
-	//
-	//// Set the Newton world user data
-	//NewtonWorldSetUserData(m_world, this);
-	//
-	//// set the number of sub steps
-	//NewtonSetNumberOfSubsteps(m_world, MAX_PHYSICS_SUB_STEPS);
-	//
+	
+	ApplyMenuOptions();
+	
 	//// register contact creation destruction callbacks
 	//NewtonWorldSetCreateDestroyContactCallback(m_world, OnCreateContact, OnDestroyContact);
 	//
@@ -1498,77 +1482,19 @@ void ndDemoEntityManager::Cleanup()
 	//m_renderUIContext = nullptr;
 }
 
-void ndDemoEntityManager::UpdatePhysics(dFloat32 timestep)
+void ndDemoEntityManager::UpdatePhysics()
 {
-#if 0
 	// update the physics
 	if (m_world && !m_suspendPhysicsUpdate) 
 	{
-		D_TRACKTIME();
-
-		dFloat32 timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
-		dUnsigned64 timestepMicrosecunds = dUnsigned64(timestepInSecunds * 1000000.0f);
-
-		dUnsigned64 currentTime = dGetTimeInMicrosenconds();
-		dUnsigned64 nextTime = currentTime - m_microsecunds;
-		if (nextTime > timestepMicrosecunds * 2) 
-		{
-			m_microsecunds = currentTime - timestepMicrosecunds * 2;
-			nextTime = currentTime - m_microsecunds;
-		}
-
-		bool newUpdate = false;
-		dFloat32 physicsTime = 0.0f;
-		//while (nextTime >= timestepMicrosecunds) 
-		if (nextTime >= timestepMicrosecunds)
-		{
-			newUpdate = true;
-			ClearDebugDisplay(m_world);
-
-#ifdef DEMO_CHECK_ASYN_UPDATE
-			g_checkAsyncUpdate = 1;
-#endif
-			if (m_asynchronousPhysicsUpdate) 
-			{
-				NewtonUpdateAsync(m_world, timestepInSecunds);
-#ifdef DEMO_CHECK_ASYN_UPDATE
-				NewtonWaitForUpdateToFinish(m_world);
-				g_checkAsyncUpdate = 0;
-#endif
-			}
-			else 
-			{
-				NewtonUpdate(m_world, timestepInSecunds);
-			}
-
-			physicsTime += NewtonGetLastUpdateTime(m_world);
-
-			nextTime -= timestepMicrosecunds;
-			m_microsecunds += timestepMicrosecunds;
-		}
-
-		if (newUpdate) 
-		{
-			m_physicsFramesCount++;
-			m_mainThreadPhysicsTimeAcc += physicsTime;
-			if (m_physicsFramesCount >= 16) 
-			{
-				m_mainThreadPhysicsTime = m_mainThreadPhysicsTimeAcc / m_physicsFramesCount;
-				m_physicsFramesCount = 0;
-				m_mainThreadPhysicsTimeAcc = 0.0f;
-			}
-		}
-
-		//dTrace (("%f\n", m_mainThreadPhysicsTime));
+		m_world->AdvanceTime();
 	}
-#endif
 }
 
 void ndDemoEntityManager::RenderScene()
 {
-	dFloat32 timestep = dGetElapsedSeconds();
-	CalculateFPS(timestep);
-	UpdatePhysics(timestep);
+	CalculateFPS();
+	UpdatePhysics();
 
 	D_TRACKTIME();
 	// Get the interpolated location of each body in the scene

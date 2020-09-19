@@ -16,12 +16,8 @@ message (${projectName})
 # source and header files
 file(GLOB CPP_SOURCE 
 	*.cpp *.h
-	#sdkDemos/*.h
-	#sdkDemos/*.cpp
-	#sdkDemos/demos/*.h
-	#sdkDemos/demos/*.cpp
-	toolBox/*.cpp toolBox/*.h
-)
+	demos/*.cpp demos/*.h
+	toolBox/*.cpp toolBox/*.h)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 

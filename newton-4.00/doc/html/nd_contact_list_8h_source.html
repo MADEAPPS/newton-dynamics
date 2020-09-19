@@ -129,27 +129,22 @@ $(document).ready(function(){initNavTree('nd_contact_list_8h_source.html',''); i
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">public</span>:</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <a class="code" href="classnd_contact_list.html">ndContactList</a>()</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;        :<a class="code" href="classd_list.html">dList&lt;ndContact, dContainersFreeListAlloc&lt;ndContact&gt;</a>&gt;()</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        , m_lock()</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    {</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    }</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    ~<a class="code" href="classnd_contact_list.html">ndContactList</a>()</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    {</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    }</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    D_COLLISION_API <span class="keywordtype">void</span> DeleteAllContacts();</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    D_COLLISION_API <span class="keywordtype">void</span> DeleteContact(<a class="code" href="classnd_contact.html">ndContact</a>* <span class="keyword">const</span> contact);</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    D_COLLISION_API <a class="code" href="classnd_contact.html">ndContact</a>* CreateContact(<a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body0, <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body1);</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    </div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="classd_spin_lock.html">dSpinLock</a> m_lock;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;};</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160; </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    {</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    }</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    ~<a class="code" href="classnd_contact_list.html">ndContactList</a>()</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    {</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    }</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    D_COLLISION_API <span class="keywordtype">void</span> DeleteAllContacts();</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    D_COLLISION_API <span class="keywordtype">void</span> DeleteContact(<a class="code" href="classnd_contact.html">ndContact</a>* <span class="keyword">const</span> contact);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    D_COLLISION_API <a class="code" href="classnd_contact.html">ndContact</a>* CreateContact(<a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body0, <a class="code" href="classnd_body_kinematic.html">ndBodyKinematic</a>* <span class="keyword">const</span> body1);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;};</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160; </div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassd_spin_lock_html"><div class="ttname"><a href="classd_spin_lock.html">dSpinLock</a></div><div class="ttdef"><b>Definition:</b> dTypes.h:516</div></div>
 <div class="ttc" id="aclassnd_contact_html"><div class="ttname"><a href="classnd_contact.html">ndContact</a></div><div class="ttdef"><b>Definition:</b> ndContact.h:115</div></div>
 <div class="ttc" id="aclassnd_body_kinematic_html"><div class="ttname"><a href="classnd_body_kinematic.html">ndBodyKinematic</a></div><div class="ttdef"><b>Definition:</b> ndBodyKinematic.h:34</div></div>
 <div class="ttc" id="aclassnd_contact_list_html"><div class="ttname"><a href="classnd_contact_list.html">ndContactList</a></div><div class="ttdef"><b>Definition:</b> ndContactList.h:29</div></div>

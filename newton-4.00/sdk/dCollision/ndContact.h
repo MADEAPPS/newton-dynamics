@@ -157,6 +157,7 @@ class ndContact
 
 	friend class ndScene;
 	friend class ndContactList;
+	friend class ndBodyKinematic;
 	friend class ndContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;
 

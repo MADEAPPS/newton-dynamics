@@ -56,11 +56,11 @@ ndDynamicsUpdate::~ndDynamicsUpdate()
 void ndDynamicsUpdate::Clear()
 {
 	m_islands.Resize(0);
-	m_bodyIslandOrder.Resize(0);
 	m_jointArray.Resize(0);
 	m_leftHandSide.Resize(0);
-	m_internalForces.Resize(0);
 	m_rightHandSide.Resize(0);
+	m_internalForces.Resize(0);
+	m_bodyIslandOrder.Resize(0);
 	m_internalForcesBack.Resize(0);
 }
 
@@ -68,6 +68,17 @@ void ndDynamicsUpdate::DynamicsUpdate()
 {
 	m_world = (ndWorld*)this;
 	m_timestep = m_world->GetScene()->GetTimestep();
+
+	if (m_jointArray.GetCapacity() < 256)
+	{
+		m_islands.Resize(256);
+		m_jointArray.Resize(256);
+		m_leftHandSide.Resize(256);
+		m_rightHandSide.Resize(256);
+		m_internalForces.Resize(256);
+		m_bodyIslandOrder.Resize(256);
+		m_internalForcesBack.Resize(256);
+	}
 
 	BuildIsland();
 	if (m_islands.GetCount())
@@ -145,127 +156,130 @@ dInt32 ndDynamicsUpdate::CompareIslandBodies(const ndBodyIndexPair* const  pairA
 }
 void ndDynamicsUpdate::BuildIsland()
 {
-	D_TRACKTIME();
 	const ndScene* const scene = m_world->GetScene();
-	const dArray<ndContact*>& contactArray = scene->GetActiveContacts();
-	for (dInt32 i = contactArray.GetCount() - 1; i >= 0; i--)
-	{
-		ndConstraint* const joint = contactArray[i];
-		ndBodyKinematic* const body0 = joint->GetKinematicBody0();
-		ndBodyKinematic* const body1 = joint->GetKinematicBody1();
-		const dInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
-		body1->m_bodyIsConstrained = 1;
-		body1->m_resting = body1->m_resting & resting;
-		if (body0->GetInvMass() > dFloat32(0.0f))
-		{
-			body0->m_resting = body0->m_resting & resting;
-			ndBodyKinematic* root0 = FindRootAndSplit(body0);
-			ndBodyKinematic* root1 = FindRootAndSplit(body1);
-			body0->m_bodyIsConstrained = 1;
-
-			if (root0 != root1)
-			{
-				if (root0->m_rank < root1->m_rank)
-				{
-					dSwap(root0, root1);
-				}
-				root1->m_islandParent = root0;
-				if (root0->m_rank == root1->m_rank)
-				{
-					root0->m_rank += 1;
-					dAssert(root0->m_rank <= 6);
-				}
-			}
-
-			const dInt32 sleep = body0->m_islandSleep & body1->m_islandSleep;
-			if (!sleep)
-			{
-				dAssert(root0->m_islandParent == root0);
-				root0->m_islandSleep = 0;
-			}
-		}
-		else
-		{
-			if (!body0->m_islandSleep)
-			{
-				ndBodyKinematic* const root = FindRootAndSplit(body1);
-				root->m_islandSleep = 0;
-			}
-		}
-	}
-
-	// re use body array and working buffer 
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetWorkingBodyArray();
-	m_internalForces.SetCount(bodyArray.GetCount());
-
-	dInt32 count = 0;
-	ndBodyIndexPair* const buffer = (ndBodyIndexPair*)&m_internalForces[0];
-	for (dInt32 i = bodyArray.GetCount() - 1; i >= 0; i--)
+	if (bodyArray.GetCount())
 	{
-		ndBodyKinematic* const body = bodyArray[i];
-		if (!body->m_islandSleep)
+		D_TRACKTIME();
+		const dArray<ndContact*>& contactArray = scene->GetActiveContacts();
+		for (dInt32 i = contactArray.GetCount() - 1; i >= 0; i--)
 		{
-			buffer[count].m_body = body;
-			if (body->GetInvMass() > dFloat32(0.0f))
+			ndConstraint* const joint = contactArray[i];
+			ndBodyKinematic* const body0 = joint->GetKinematicBody0();
+			ndBodyKinematic* const body1 = joint->GetKinematicBody1();
+			const dInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
+			body1->m_bodyIsConstrained = 1;
+			body1->m_resting = body1->m_resting & resting;
+			if (body0->GetInvMass() > dFloat32(0.0f))
 			{
-				ndBodyKinematic* root = body->m_islandParent;
-				while (root != root->m_islandParent)
+				body0->m_resting = body0->m_resting & resting;
+				ndBodyKinematic* root0 = FindRootAndSplit(body0);
+				ndBodyKinematic* root1 = FindRootAndSplit(body1);
+				body0->m_bodyIsConstrained = 1;
+
+				if (root0 != root1)
 				{
-					root = root->m_islandParent;
+					if (root0->m_rank < root1->m_rank)
+					{
+						dSwap(root0, root1);
+					}
+					root1->m_islandParent = root0;
+					if (root0->m_rank == root1->m_rank)
+					{
+						root0->m_rank += 1;
+						dAssert(root0->m_rank <= 6);
+					}
 				}
 
-				buffer[count].m_root = root;
-				if (root->m_rank != -1)
+				const dInt32 sleep = body0->m_islandSleep & body1->m_islandSleep;
+				if (!sleep)
 				{
-					root->m_rank = -1;
+					dAssert(root0->m_islandParent == root0);
+					root0->m_islandSleep = 0;
 				}
 			}
 			else
 			{
-				buffer[count].m_root = body;
-				body->m_rank = -1;
+				if (!body0->m_islandSleep)
+				{
+					ndBodyKinematic* const root = FindRootAndSplit(body1);
+					root->m_islandSleep = 0;
+				}
 			}
-			count++;
 		}
-	}
 
-	if (m_bodyIslandOrder.GetCapacity() < 256)
-	{
-		m_islands.Resize(256);
-		m_bodyIslandOrder.Resize(256);
-	}
-	m_islands.SetCount(0);
-	m_bodyIslandOrder.SetCount(count);
-	m_unConstrainedBodyCount = 0;
-	if (count)
-	{
-		dSort(buffer, count, CompareIslandBodies);
+		// re use body array and working buffer 
+		m_internalForces.SetCount(bodyArray.GetCount());
 
-		for (dInt32 i = 0; i < count; i++)
+		dInt32 count = 0;
+		ndBodyIndexPair* const buffer = (ndBodyIndexPair*)&m_internalForces[0];
+		for (dInt32 i = bodyArray.GetCount() - 1; i >= 0; i--)
 		{
-			m_bodyIslandOrder[i] = buffer[i].m_body;
-			if (buffer[i].m_root->m_rank == -1)
+			ndBodyKinematic* const body = bodyArray[i];
+			if (!body->m_islandSleep)
 			{
-				buffer[i].m_root->m_rank = 0;
-				ndIsland island(buffer[i].m_root);
-				m_islands.PushBack(island);
+				buffer[count].m_body = body;
+				if (body->GetInvMass() > dFloat32(0.0f))
+				{
+					ndBodyKinematic* root = body->m_islandParent;
+					while (root != root->m_islandParent)
+					{
+						root = root->m_islandParent;
+					}
+
+					buffer[count].m_root = root;
+					if (root->m_rank != -1)
+					{
+						root->m_rank = -1;
+					}
+				}
+				else
+				{
+					buffer[count].m_root = body;
+					body->m_rank = -1;
+				}
+				count++;
 			}
-			buffer[i].m_root->m_rank += 1;
 		}
 
-		dInt32 start = 0;
-		dInt32 unConstrainedCount = 0;
-		for (dInt32 i = 0; i < m_islands.GetCount(); i++)
+		//if (m_bodyIslandOrder.GetCapacity() < 256)
+		//{
+		//	m_islands.Resize(256);
+		//	m_bodyIslandOrder.Resize(256);
+		//}
+		m_islands.SetCount(0);
+		m_bodyIslandOrder.SetCount(count);
+		m_unConstrainedBodyCount = 0;
+		if (count)
 		{
-			ndIsland& island = m_islands[i];
-			island.m_start = start;
-			island.m_count = island.m_root->m_rank;
-			start += island.m_count;
-			unConstrainedCount += island.m_root->m_bodyIsConstrained ? 0 : 1;
-		}
+			dSort(buffer, count, CompareIslandBodies);
 
-		m_unConstrainedBodyCount = unConstrainedCount;
-		dSort(&m_islands[0], m_islands.GetCount(), CompareIslands);
+			for (dInt32 i = 0; i < count; i++)
+			{
+				m_bodyIslandOrder[i] = buffer[i].m_body;
+				if (buffer[i].m_root->m_rank == -1)
+				{
+					buffer[i].m_root->m_rank = 0;
+					ndIsland island(buffer[i].m_root);
+					m_islands.PushBack(island);
+				}
+				buffer[i].m_root->m_rank += 1;
+			}
+
+			dInt32 start = 0;
+			dInt32 unConstrainedCount = 0;
+			for (dInt32 i = 0; i < m_islands.GetCount(); i++)
+			{
+				ndIsland& island = m_islands[i];
+				island.m_start = start;
+				island.m_count = island.m_root->m_rank;
+				start += island.m_count;
+				unConstrainedCount += island.m_root->m_bodyIsConstrained ? 0 : 1;
+			}
+
+			m_unConstrainedBodyCount = unConstrainedCount;
+			dSort(&m_islands[0], m_islands.GetCount(), CompareIslands);
+		}
 	}
 }
 
@@ -312,14 +326,14 @@ void ndDynamicsUpdate::InitWeights()
 	const dArray<ndContact*>& contactArray = scene->GetActiveContacts();
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetWorkingBodyArray();
 
-	if (m_jointArray.GetCapacity() < 256)
-	{
-		m_jointArray.Resize(256);
-		m_leftHandSide.Resize(256);
-		m_internalForces.Resize(256);
-		m_rightHandSide.Resize(256);
-		m_internalForcesBack.Resize(256);
-	}
+	//if (m_jointArray.GetCapacity() < 256)
+	//{
+	//	m_jointArray.Resize(256);
+	//	m_leftHandSide.Resize(256);
+	//	m_internalForces.Resize(256);
+	//	m_rightHandSide.Resize(256);
+	//	m_internalForcesBack.Resize(256);
+	//}
 
 	const dInt32 bodyCount = bodyArray.GetCount();
 	const dInt32 jointCount = contactArray.GetCount();

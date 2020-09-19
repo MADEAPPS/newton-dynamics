@@ -22,11 +22,14 @@ var classnd_body =
     [ "SetVelocity", "classnd_body.html#ace04d7fd4ac93de0d0a7c201618776f8", null ],
     [ "ndConstraint", "classnd_body.html#af3e541510a9e2ae75f142752360094cf", null ],
     [ "ndScene", "classnd_body.html#a3bf9f82d7440931a3e417bef7fdb94ab", null ],
+    [ "m_autoSleep", "classnd_body.html#a3152d3827ee8265bd3e08a90e8fadbba", null ],
+    [ "m_bodyIsConstrained", "classnd_body.html#a80ff8793731d1c2155b9aa5bbe83f81b", null ],
     [ "m_collideWithLinkedBodies", "classnd_body.html#a5591373622068b740959c2b8dc0ee47a", null ],
     [ "m_equilibrium", "classnd_body.html#a79f9af7679c03f3e73855fc45e6bca4e", null ],
     [ "m_flags", "classnd_body.html#a4618fd61f817b8aca7085c071f9e7503", null ],
     [ "m_globalCentreOfMass", "classnd_body.html#a6149e2e4dae32e1795317d51c7c3473b", null ],
     [ "m_gyroTorqueOn", "classnd_body.html#a3d35cc856d06408dd5ba1d349433bcb8", null ],
+    [ "m_islandSleep", "classnd_body.html#a15f09678e78d7fe526675742a507ee3f", null ],
     [ "m_localCentreOfMass", "classnd_body.html#a6f32457f9ba79bb85d71745bce47c8c8", null ],
     [ "m_matrix", "classnd_body.html#adccf3f50a654e5e6dc05e695377c35f6", null ],
     [ "m_maxAABB", "classnd_body.html#a562f59386e34a08f1f32397720f09a2e", null ],
@@ -35,6 +38,7 @@ var classnd_body =
     [ "m_omega", "classnd_body.html#a5de2856d733415a343c4109641c26e1c", null ],
     [ "m_resting", "classnd_body.html#a8606b09782b12564a89f5c2759752169", null ],
     [ "m_rotation", "classnd_body.html#a853dc15c8f016ee6b6b052d943385bde", null ],
+    [ "m_sleeping", "classnd_body.html#a4d0ef3e14062485db4855aa3740e7c6c", null ],
     [ "m_uniqueID", "classnd_body.html#aa6ccaabed07e12e805989ef33c01d726", null ],
     [ "m_veloc", "classnd_body.html#a77b38cc9aeccecf0a0759c3893f2aa81", null ]
 ];

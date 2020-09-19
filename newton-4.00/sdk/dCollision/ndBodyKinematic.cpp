@@ -144,6 +144,38 @@ ndBodyKinematic::~ndBodyKinematic()
 {
 }
 
+bool ndBodyKinematic::GetSleepState() const
+{
+	return m_sleeping;
+}
+
+void ndBodyKinematic::SetSleepState(bool state)
+{
+	m_sleeping = state ? 1 : 0;
+	m_equilibrium = state ? 1 : 0;
+	if ((m_invMass.m_w > dFloat32(0.0f)) && (m_veloc.DotProduct(m_veloc).GetScalar() < dFloat32(1.0e-10f)) && (m_omega.DotProduct(m_omega).GetScalar() < dFloat32(1.0e-10f))) 
+	{
+		dVector invalidateVeloc(dFloat32(10.0f));
+		ndContactMap::Iterator it(m_contactList);
+		for (it.Begin(); it; it ++)
+		{
+			ndContact* const contactJoint = *it;
+			contactJoint->m_positAcc = invalidateVeloc;
+		}
+	}
+}
+
+bool ndBodyKinematic::GetAutoSleep() const
+{
+	return m_autoSleep;
+}
+
+void ndBodyKinematic::SetAutoSleep(bool state)
+{
+	m_autoSleep = state ? 1 : 0;
+	SetSleepState(false);
+}
+
 ndShapeInstance& ndBodyKinematic::GetCollisionShape()
 {
 	return (ndShapeInstance&)m_shapeInstance;

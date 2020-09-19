@@ -11,6 +11,7 @@ var classnd_constraint =
     [ "IsBilateral", "classnd_constraint.html#a71e171227f7c28adc63ad13bdbd9cf61", null ],
     [ "JacobianDerivative", "classnd_constraint.html#aaa27f75c9099761fa3a37e9e11e6f724", null ],
     [ "JointAccelerations", "classnd_constraint.html#a2ee7aa322b8c67dc91a5c6d1a883426a", null ],
+    [ "m_jointFeebackForce", "classnd_constraint.html#acf7e972ab9b813bedfaf1b860dd84d74", null ],
     [ "m_preconditioner0", "classnd_constraint.html#a266401275ea7c20a920922ac1f071c06", null ],
     [ "m_preconditioner1", "classnd_constraint.html#a1d14d2a2bacc924bc5e81442b17e6d2a", null ],
     [ "m_rowCount", "classnd_constraint.html#a4c46c2154c36bd01c5bc41f7b9afb5db", null ],

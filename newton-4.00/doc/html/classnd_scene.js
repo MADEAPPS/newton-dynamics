@@ -8,7 +8,6 @@ var classnd_scene =
     [ "ndScene", "classnd_scene.html#acf505716c7391fa8a1041c79129f6c0c", null ],
     [ "AddBody", "classnd_scene.html#ad376000c55e6de738770cd2a76e82e97", null ],
     [ "AddPair", "classnd_scene.html#ac45a732cc83b368fce2c9e9020c8d502", null ],
-    [ "AttachNewContact", "classnd_scene.html#afc0b6d8cac6b8c37f5e006a7f14b3a13", null ],
     [ "BalanceBroadPhase", "classnd_scene.html#aa6867201ca79d716281554fa28f652ab", null ],
     [ "BuildBodyArray", "classnd_scene.html#a0a8a6ace645c253228c0ac915ba8c71d", null ],
     [ "CalculateContacts", "classnd_scene.html#ae2ff36a248cac9f24943d60f76e256cc", null ],
@@ -48,6 +47,7 @@ var classnd_scene =
     [ "m_fullScan", "classnd_scene.html#a0dfd1b1baf4dda3a76f4a2dd11c110f4", null ],
     [ "m_lru", "classnd_scene.html#ac25cef1956062ca244244b9b4b05f81e", null ],
     [ "m_rootNode", "classnd_scene.html#a07ab0d81a062fd25e5eed4feb6fe64e5", null ],
+    [ "m_sleepBodies", "classnd_scene.html#af2c67b1c2fa50fcc6c46449c98b1d58f", null ],
     [ "m_timestep", "classnd_scene.html#a2be08249b866d2e7af00e476103834b4", null ],
     [ "m_tmpBodyArray", "classnd_scene.html#ac228d363914da9e08779d7b7af3df41b", null ]
 ];

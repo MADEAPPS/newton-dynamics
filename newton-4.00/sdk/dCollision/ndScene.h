@@ -72,6 +72,7 @@ class ndScene
 
 	dInt32 GetThreadCount() const;
 	virtual ndWorld* GetWorld() const;
+	const dList<ndBodyKinematic*>& GetBodyList() const;
 	const dArray<ndContact*>& GetActiveContacts() const;
 	const dArray<ndBodyKinematic*>& GetWorkingBodyArray() const;
 
@@ -173,6 +174,11 @@ inline dInt32 ndScene::GetThreadCount() const
 {
 	const dThreadPool& pool = *this;
 	return pool.GetCount();
+}
+
+inline const dList<ndBodyKinematic*>& ndScene::GetBodyList() const
+{
+	return m_bodyList;
 }
 
 inline const dArray<ndContact*>& ndScene::GetActiveContacts() const

@@ -17,19 +17,17 @@
 struct GLFWwindow;
 struct ImDrawData;
 
-//class DemoMesh;
-//class DemoEntity;
+class ndDemoMesh;
+class ndDemoEntity;
+class ndPhysicsWorld;
 //class DemoCamera;
 //class DemoMeshInterface;
 //class DemoCameraManager;
 
-//class ndDemoEntityManager: public dList <DemoEntity*>
-class ndDemoEntityManager
+class ndDemoEntityManager: public dList <ndDemoEntity*>
 {
 #if 0
 	public:
-	typedef void (*LaunchSDKDemoCallback) (ndDemoEntityManager* const scene);
-
 	typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, dFloat32 timestep);
 
 	class TransparentMesh
@@ -58,14 +56,6 @@ class ndDemoEntityManager
 			:dUpHeap <TransparentMesh, dFloat32>(2048)
 		{
 		}
-	};
-
-	class SDKDemos
-	{
-		public:
-		const char *m_name;
-		const char *m_description;
-		LaunchSDKDemoCallback m_launchDemoCallback;
 	};
 
 	class ButtonKey
@@ -145,9 +135,6 @@ class ndDemoEntityManager
 
 	void ToggleProfiler();
 	static void PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep);
-
-	void ApplyMenuOptions();
-	void LoadDemo(int menu);
 	
 	DemoEntity* m_sky;
 	DemoCameraManager* m_cameraManager;
@@ -160,9 +147,7 @@ class ndDemoEntityManager
 
 	
 	TransparentHeap m_tranparentHeap;
-
-	int m_currentScene;
-	int m_lastCurrentScene;
+	
 	int m_physicsFramesCount;
 	int m_currentPlugin;
 	
@@ -182,8 +167,6 @@ class ndDemoEntityManager
 	bool m_showJointDebugInfo;
 	bool m_showListenersDebugInfo;
 	bool m_showCollidingFaces;
-	
-	bool m_asynchronousPhysicsUpdate;
 	bool m_solveLargeIslandInParallel;
 	bool m_showRaycastHit;
 
@@ -191,12 +174,9 @@ class ndDemoEntityManager
 	unsigned m_contactLock;
 	unsigned m_deleteLock;
 	dList<NewtonJoint*> m_contactList;
-
-	static SDKDemos m_demosSelection[];
 	friend class DemoEntityListener;
 	friend class DemoListenerManager;
 #endif
-
 	public:
 	ndDemoEntityManager();
 	~ndDemoEntityManager();
@@ -205,6 +185,14 @@ class ndDemoEntityManager
 
 	private:
 	typedef void(*RenderGuiHelpCallback) (ndDemoEntityManager* const manager, void* const context);
+	typedef void(*LaunchSDKDemoCallback) (ndDemoEntityManager* const scene);
+
+	class SDKDemos
+	{
+		public:
+		const char* m_description;
+		LaunchSDKDemoCallback m_launchDemoCallback;
+	};
 
 	static void RenderDrawListsCallback(ImDrawData* const draw_data);
 	static void ErrorCallback(int error, const char* const description);
@@ -220,25 +208,27 @@ class ndDemoEntityManager
 	void BeginFrame();
 	void RenderScene();
 	void RenderStats();
-	
-	void ShowMainMenuBar();
 
-	void CalculateFPS(dFloat32 timestep);
-	void UpdatePhysics(dFloat32 timestep);
+	void LoadDemo(int menu);
+	void ShowMainMenuBar();
+	void ApplyMenuOptions();
+
+	void CalculateFPS();
+	void UpdatePhysics();
 
 	GLFWwindow* m_mainFrame;
-	ndWorld* m_world;
-	dUnsigned64 m_microsecunds;
+	ndPhysicsWorld* m_world;
 
 	dFloat32 m_fps;
-	dFloat32 m_timestepAcc;
-	dFloat32 m_mainThreadPhysicsTime;
+	dUnsigned64 m_microsecunds;
 
 	int	m_defaultFont;
 	int m_framesCount;
+	int m_currentScene;
 	int m_solverPasses;
-	int m_solverSubSteps;
 	int m_workerThreads;
+	int m_solverSubSteps;
+	int m_lastCurrentScene;
 
 	bool m_showUI;
 	bool m_showAABB;
@@ -247,8 +237,13 @@ class ndDemoEntityManager
 	bool m_hasJoytick;
 	bool m_updateMenuOptions;
 	bool m_suspendPhysicsUpdate;
+	bool m_asynchronousPhysicsUpdate;
 	bool m_mousePressed[3];
 	RenderGuiHelpCallback m_renderDemoGUI;
+
+	static SDKDemos m_demosSelection[];
+
+	friend class ndPhysicsWorld;
 };
 
 #if 0

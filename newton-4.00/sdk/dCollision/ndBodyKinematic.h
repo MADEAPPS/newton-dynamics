@@ -55,6 +55,12 @@ class ndBodyKinematic: public ndBody
 
 	dVector GetGyroAlpha() const;
 
+	D_COLLISION_API bool GetSleepState() const;
+	D_COLLISION_API void SetSleepState(bool state);
+
+	D_COLLISION_API bool GetAutoSleep() const;
+	D_COLLISION_API void SetAutoSleep(bool state);
+
 	D_COLLISION_API ndShapeInstance& GetCollisionShape();
 	D_COLLISION_API const ndShapeInstance& GetCollisionShape() const;
 	D_COLLISION_API void SetCollisionShape(const ndShapeInstance& shapeInstance);
@@ -73,10 +79,7 @@ class ndBodyKinematic: public ndBody
 	void SetMassMatrix(dFloat32 Ixx, dFloat32 Iyy, dFloat32 Izz, dFloat32 mass);
 	void GetMassMatrix(dFloat32& Ixx, dFloat32& Iyy, dFloat32& Izz, dFloat32& mass);
 
-	D_COLLISION_API virtual void AttachContact(ndContact* const contact);
-	D_COLLISION_API virtual void DetachContact(ndContact* const contact);
 	D_COLLISION_API virtual ndContact* FindContact(const ndBody* const otherBody) const;
-	D_COLLISION_API static void ReleaseMemory();
 
 	virtual ndBodyKinematic* GetAsBodyKinematic() { return this; }
 	virtual ndSkeletonContainer* GetSkeleton() const { return nullptr; }
@@ -90,6 +93,9 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API void SetMassMatrix(dFloat32 mass, const dMatrix& inertia);
 
 	protected:
+	D_COLLISION_API static void ReleaseMemory();
+	D_COLLISION_API virtual void AttachContact(ndContact* const contact);
+	D_COLLISION_API virtual void DetachContact(ndContact* const contact);
 	D_COLLISION_API void UpdateGyroData();
 	void UpdateCollisionMatrix();
 	void SetBroadPhase(ndScene* const broadPhase, dList<ndBodyKinematic*>::dListNode* const node);
@@ -124,6 +130,7 @@ class ndBodyKinematic: public ndBody
 	dInt32 m_index;
 
 	friend class ndScene;
+	friend class ndContact;
 	friend class ndSceneMixed;
 	friend class ndSceneBodyNode;
 	friend class ndDynamicsUpdate;

@@ -57,6 +57,8 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	bool AddBody(ndBody* const body);
 	bool RemoveBody(ndBody* const body);
 
+	const dList<ndBodyKinematic*>& GetBodyList() const;
+
 	const dInt32 GetSolverIterations() const;
 	void SetSolverIterations(dInt32 iterations);
 
@@ -168,6 +170,11 @@ inline bool ndWorld::RemoveBody(ndBody* const body)
 		return m_scene->RemoveBody(kinematicBody);
 	}
 	return false;
+}
+
+inline const dList<ndBodyKinematic*>& ndWorld::GetBodyList() const
+{
+	return m_scene->GetBodyList();
 }
 
 inline dFloat32 ndWorld::GetUpdateTime() const

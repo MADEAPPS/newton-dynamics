@@ -133,16 +133,23 @@ $(document).ready(function(){initNavTree('d_memory_8h_source.html',''); initResi
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    D_CORE_API <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classd_memory.html#a56b05108042ab6faabcd1bbe0fb91394">Free</a>(<span class="keywordtype">void</span>* <span class="keyword">const</span> ptr);</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    D_CORE_API <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classd_memory.html#afd574e2f624e7838c6e66dbd9bae9341">SetMemoryAllocators</a>(dMemAllocCallback alloc, dMemFreeCallback free);</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;};</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    D_CORE_API <span class="keyword">static</span> dUnsigned64 <a class="code" href="classd_memory.html#af8e0900cdee29fc47385739777e25fbf">GetMemoryUsed</a>();</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    D_CORE_API <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classd_memory.html#afd574e2f624e7838c6e66dbd9bae9341">SetMemoryAllocators</a>(dMemAllocCallback alloc, dMemFreeCallback free);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keyword">static</span> <a class="code" href="classd_atomic.html">dAtomic&lt;dUnsigned64&gt;</a> m_memoryUsed;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;};</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160; </div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassd_memory_html_a56b05108042ab6faabcd1bbe0fb91394"><div class="ttname"><a href="classd_memory.html#a56b05108042ab6faabcd1bbe0fb91394">dMemory::Free</a></div><div class="ttdeci">static D_CORE_API void Free(void *const ptr)</div><div class="ttdoc">Destroy a memory buffer previously allocated by Malloc.</div><div class="ttdef"><b>Definition:</b> dMemory.cpp:56</div></div>
+<div class="ttc" id="aclassd_atomic_html"><div class="ttname"><a href="classd_atomic.html">dAtomic&lt; dUnsigned64 &gt;</a></div></div>
+<div class="ttc" id="aclassd_memory_html_a56b05108042ab6faabcd1bbe0fb91394"><div class="ttname"><a href="classd_memory.html#a56b05108042ab6faabcd1bbe0fb91394">dMemory::Free</a></div><div class="ttdeci">static D_CORE_API void Free(void *const ptr)</div><div class="ttdoc">Destroy a memory buffer previously allocated by Malloc.</div><div class="ttdef"><b>Definition:</b> dMemory.cpp:58</div></div>
 <div class="ttc" id="aclassd_memory_html"><div class="ttname"><a href="classd_memory.html">dMemory</a></div><div class="ttdef"><b>Definition:</b> dMemory.h:31</div></div>
-<div class="ttc" id="aclassd_memory_html_a4e00fab80f4de696dc7877929c50a770"><div class="ttname"><a href="classd_memory.html#a4e00fab80f4de696dc7877929c50a770">dMemory::Malloc</a></div><div class="ttdeci">static D_CORE_API void * Malloc(size_t size)</div><div class="ttdoc">General Memory allocation function.</div><div class="ttdef"><b>Definition:</b> dMemory.cpp:43</div></div>
-<div class="ttc" id="aclassd_memory_html_afd574e2f624e7838c6e66dbd9bae9341"><div class="ttname"><a href="classd_memory.html#afd574e2f624e7838c6e66dbd9bae9341">dMemory::SetMemoryAllocators</a></div><div class="ttdeci">static D_CORE_API void SetMemoryAllocators(dMemAllocCallback alloc, dMemFreeCallback free)</div><div class="ttdoc">Install low level system memory allocation functions.</div><div class="ttdef"><b>Definition:</b> dMemory.cpp:62</div></div>
+<div class="ttc" id="aclassd_memory_html_af8e0900cdee29fc47385739777e25fbf"><div class="ttname"><a href="classd_memory.html#af8e0900cdee29fc47385739777e25fbf">dMemory::GetMemoryUsed</a></div><div class="ttdeci">static D_CORE_API dUnsigned64 GetMemoryUsed()</div><div class="ttdoc">Return the total memory allocated by the newton engine and tools.</div><div class="ttdef"><b>Definition:</b> dMemory.cpp:65</div></div>
+<div class="ttc" id="aclassd_memory_html_a4e00fab80f4de696dc7877929c50a770"><div class="ttname"><a href="classd_memory.html#a4e00fab80f4de696dc7877929c50a770">dMemory::Malloc</a></div><div class="ttdeci">static D_CORE_API void * Malloc(size_t size)</div><div class="ttdoc">General Memory allocation function.</div><div class="ttdef"><b>Definition:</b> dMemory.cpp:44</div></div>
+<div class="ttc" id="aclassd_memory_html_afd574e2f624e7838c6e66dbd9bae9341"><div class="ttname"><a href="classd_memory.html#afd574e2f624e7838c6e66dbd9bae9341">dMemory::SetMemoryAllocators</a></div><div class="ttdeci">static D_CORE_API void SetMemoryAllocators(dMemAllocCallback alloc, dMemFreeCallback free)</div><div class="ttdoc">Install low level system memory allocation functions.</div><div class="ttdef"><b>Definition:</b> dMemory.cpp:70</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

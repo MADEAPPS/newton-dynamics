@@ -9,6 +9,7 @@ var hierarchy =
       [ "dAtomic< bool >", "classd_atomic.html", null ],
       [ "dAtomic< dInt32 >", "classd_atomic.html", null ],
       [ "dAtomic< dUnsigned32 >", "classd_atomic.html", null ],
+      [ "dAtomic< dUnsigned64 >", "classd_atomic.html", null ],
       [ "dAtomic< int >", "classd_atomic.html", null ]
     ] ],
     [ "condition_variable", null, [
@@ -30,7 +31,7 @@ var hierarchy =
     [ "dArray< ndBodyKinematic * >", "classd_array.html", null ],
     [ "dArray< ndConstraint * >", "classd_array.html", null ],
     [ "dArray< ndContact * >", "classd_array.html", null ],
-    [ "dArray< ndDynamicsUpdate::ndBodyProxy >", "classd_array.html", null ],
+    [ "dArray< ndDynamicsUpdate::ndIsland >", "classd_array.html", null ],
     [ "dArray< ndJacobian >", "classd_array.html", null ],
     [ "dArray< ndLeftHandSide >", "classd_array.html", null ],
     [ "dArray< ndRightHandSide >", "classd_array.html", null ],
@@ -41,6 +42,8 @@ var hierarchy =
       [ "dContainersAlloc< T >", "classd_containers_alloc.html", null ],
       [ "dGoogol", "classd_googol.html", null ],
       [ "dPolyhedra", "classd_polyhedra.html", null ],
+      [ "dRefCounter", "classd_ref_counter.html", null ],
+      [ "dString", "classd_string.html", null ],
       [ "dTemplateVector< T >", "classd_template_vector.html", null ],
       [ "dTemplateVector< dGoogol >", "classd_template_vector.html", [
         [ "dHugeVector", "classd_huge_vector.html", null ]
@@ -74,6 +77,7 @@ var hierarchy =
     [ "dContainersFreeListAlloc< ndContact * >", "classd_containers_free_list_alloc.html", [
       [ "ndContact", "classnd_contact.html", null ]
     ] ],
+    [ "dString::dStringAllocator::dMemBucket::dDataChunk", "classd_string_1_1d_string_allocator_1_1d_mem_bucket_1_1d_data_chunk.html", null ],
     [ "dDoubleInt", "uniond_double_int.html", null ],
     [ "dEdge", "classd_edge.html", null ],
     [ "dEdgeCollapseEdgeHandle", "structd_edge_collapse_edge_handle.html", null ],
@@ -85,6 +89,7 @@ var hierarchy =
     [ "dgParallelSortRange", "classdg_parallel_sort_range.html", null ],
     [ "dgParallelSourtDesc< T >", "classdg_parallel_sourt_desc.html", null ],
     [ "dgPointParam", "classdg_point_param.html", null ],
+    [ "ndDynamicsUpdate::dgSolverProgressiveSleepEntry", "classnd_dynamics_update_1_1dg_solver_progressive_sleep_entry.html", null ],
     [ "dHeapBase< OBJECT, KEY >", "classd_heap_base.html", [
       [ "dDownHeap< OBJECT, KEY >", "classd_down_heap.html", null ],
       [ "dUpHeap< OBJECT, KEY >", "classd_up_heap.html", null ]
@@ -108,6 +113,7 @@ var hierarchy =
       [ "ndScene::ndFitnessList", "classnd_scene_1_1nd_fitness_list.html", null ]
     ] ],
     [ "dMatrix", "classd_matrix.html", null ],
+    [ "dString::dStringAllocator::dMemBucket", "classd_string_1_1d_string_allocator_1_1d_mem_bucket.html", null ],
     [ "dMemory", "classd_memory.html", null ],
     [ "dMemoryHeader", "classd_memory_header.html", null ],
     [ "dPolyhedraMassProperties", "classd_polyhedra_mass_properties.html", null ],
@@ -126,6 +132,7 @@ var hierarchy =
     [ "dStackBase", "classd_stack_base.html", [
       [ "dStack< T >", "classd_stack.html", null ]
     ] ],
+    [ "dString::dStringAllocator", "classd_string_1_1d_string_allocator.html", null ],
     [ "dSymmetricConjugateGradientSolver< T >", "classd_symmetric_conjugate_gradient_solver.html", null ],
     [ "dSyncMutex", "classd_sync_mutex.html", [
       [ "dThreadPool", "classd_thread_pool.html", null ]
@@ -143,13 +150,13 @@ var hierarchy =
       [ "dPlane", "classd_plane.html", null ]
     ] ],
     [ "dVertexCollapseVertexMetric", "classd_vertex_collapse_vertex_metric.html", null ],
-    [ "dTree< OBJECT, KEY, allocator >::Iterator", "classd_tree_1_1_iterator.html", null ],
     [ "dList< T, allocator >::Iterator", "classd_list_1_1_iterator.html", null ],
+    [ "dTree< OBJECT, KEY, allocator >::Iterator", "classd_tree_1_1_iterator.html", null ],
     [ "mutex", null, [
       [ "dThread", "classd_thread.html", null ]
     ] ],
     [ "ndBilateralBounds", "classnd_bilateral_bounds.html", null ],
-    [ "ndDynamicsUpdate::ndBodyProxy", "classnd_dynamics_update_1_1nd_body_proxy.html", null ],
+    [ "ndDynamicsUpdate::ndBodyIndexPair", "classnd_dynamics_update_1_1nd_body_index_pair.html", null ],
     [ "ndConstraint", "classnd_constraint.html", [
       [ "ndContact", "classnd_contact.html", null ]
     ] ],
@@ -163,6 +170,7 @@ var hierarchy =
       [ "ndWorld", "classnd_world.html", null ]
     ] ],
     [ "ndForceImpactPair", "classnd_force_impact_pair.html", null ],
+    [ "ndDynamicsUpdate::ndIsland", "classnd_dynamics_update_1_1nd_island.html", null ],
     [ "ndJacobian", "classnd_jacobian.html", null ],
     [ "ndJacobianPair", "classnd_jacobian_pair.html", null ],
     [ "ndJointAccelerationDecriptor", "classnd_joint_acceleration_decriptor.html", null ],
