@@ -82,7 +82,7 @@ class TextureCache: public dTree<TextureEntry, dUnsigned64>
 				return iter.GetNode();
 			}
 		}
-		return NULL;
+		return nullptr;
 	}
 
 
@@ -123,10 +123,11 @@ GLuint LoadTexture(const char* const filename)
 	dGetWorkingFileName (filename, fullPathName);
 	TextureCache& cache = TextureCache::GetChache();
 	GLuint texture = cache.GetTexture(fullPathName);
-	if (!texture) {
-
+	if (!texture) 
+	{
 		FILE* const pFile = fopen (fullPathName, "rb");
-		if(pFile == NULL) {
+		if(pFile == nullptr) 
+		{
 			return 0;
 		}
 
@@ -152,18 +153,19 @@ GLuint LoadTexture(const char* const filename)
 
 		// Put some validity checks here. Very simply, I only understand
 		// or care about 8, 24, or 32 bit targa's.
-		if(tgaHeader.bits != 8 && tgaHeader.bits != 24 && tgaHeader.bits != 32) {
+		if(tgaHeader.bits != 8 && tgaHeader.bits != 24 && tgaHeader.bits != 32) 
+		{
 			fclose(pFile);
 			return 0;
 		}
-
 
 		// Calculate size of image buffer
 		unsigned lImageSize = width * height * sDepth;
 
 		// Allocate memory and check for success
-		char* const pBits = new char [width * height * 4];
-		if(pBits == NULL) {
+		char* const pBits = (char*)dMemory::Malloc (width * height * 4);
+		if(pBits == nullptr) 
+		{
 			fclose(pFile);
 			return 0;
 		}
@@ -172,7 +174,8 @@ GLuint LoadTexture(const char* const filename)
 		// Check for read error. This should catch RLE or other 
 		// weird formats that I don't want to recognize
 		int readret = int (fread(pBits, lImageSize, 1, pFile));
-		if(readret != 1)  {
+		if(readret != 1)
+		{
 			fclose(pFile);
 			delete[] pBits;
 			return 0; 
@@ -198,7 +201,7 @@ GLuint LoadTexture(const char* const filename)
 
 		// Done with File
 		fclose(pFile);
-		delete[] pBits;
+		dMemory::Free (pBits);
 	}
 	return texture;
 } 
@@ -243,7 +246,8 @@ GLuint LoadImage(const char* const cacheName, const char* const buffer, int widt
 
 	GLuint texture = 0;
 	glGenTextures(1, &texture);
-	if (texture) {
+	if (texture) 
+	{
 		//GLenum errr = glGetError ();
 		glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -274,7 +278,6 @@ GLuint LoadImage(const char* const cacheName, const char* const buffer, int widt
 	return texture;
 }
 
-
 void ReleaseTexture (GLuint texture)
 {
 	TextureCache::GetChache().RemoveById (texture);
@@ -284,18 +287,19 @@ const char* FindTextureById (GLuint textureID)
 {
 	TextureCache& cache = TextureCache::GetChache();	
 	TextureCache::dTreeNode* const node = cache.FindById (textureID);
-	if (node) {
+	if (node) 
+	{
 		return node->GetInfo().m_textureName.GetStr();
 	}
-	return NULL;
+	return nullptr;
 }
-
 
 GLuint AddTextureRef (GLuint texture)
 {
 	TextureCache& cache = TextureCache::GetChache();	
 	TextureCache::dTreeNode* const node = cache.FindById (texture);
-	if (node) {
+	if (node) 
+	{
 		node->GetInfo().AddRef();
 	}
 	return texture;

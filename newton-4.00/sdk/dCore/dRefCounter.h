@@ -9,7 +9,6 @@
 * freely
 */
 
-
 #ifndef __DREF_COUNTER_H__
 #define __DREF_COUNTER_H__
 

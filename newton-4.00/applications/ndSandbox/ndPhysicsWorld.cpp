@@ -96,7 +96,6 @@ void ndPhysicsWorld::AdvanceTime()
 		}
 
 		m_microsecunds += deltaTime;
-		dTrace (("%f\n", currentTime * 1.0e-3f));
+		//dTrace (("%f\n", currentTime * 1.0e-3f));
 	}
-
 }

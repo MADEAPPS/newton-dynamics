@@ -15,7 +15,7 @@
 #include "ndSandboxStdafx.h"
 class ndDemoMesh;
 class ndDemoEntity;
-class ShaderPrograms;
+class ndShaderPrograms;
 class ndDemoEntityManager;
 
 class ndDemoSubMesh
@@ -68,12 +68,12 @@ class ndDemoMeshInterface: public dRefCounter
 class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 {
 	public:
-	ndDemoMesh(const ndDemoMesh& mesh, const ShaderPrograms& shaderCache);
-	ndDemoMesh(const char* const name, const ShaderPrograms& shaderCache);
-	//ndDemoMesh(NewtonMesh* const mesh, const ShaderPrograms& shaderCache);
-	//ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ShaderPrograms& shaderCache);
-	//ndDemoMesh(const char* const name, const ShaderPrograms& shaderCache, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
-	ndDemoMesh(const char* const name, const ShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize);
+	ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCache);
+	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache);
+	//ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCache);
+	//ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ndShaderPrograms& shaderCache);
+	//ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
+	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize);
 
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner) 
 	{ 
@@ -123,7 +123,7 @@ class DemoSkinMesh: public ndDemoMeshInterface
 	};
 
 	DemoSkinMesh(const DemoSkinMesh& clone, ndDemoEntity* const owner);
-	DemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<ndDemoEntity*, dScene::dTreeNode*>& boneMap, const ShaderPrograms& shaderCache);
+	DemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<ndDemoEntity*, dScene::dTreeNode*>& boneMap, const ndShaderPrograms& shaderCache);
 	~DemoSkinMesh();
 
 	void Render (ndDemoEntityManager* const scene);

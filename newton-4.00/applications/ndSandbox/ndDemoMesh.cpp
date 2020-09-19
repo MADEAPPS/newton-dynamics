@@ -141,7 +141,7 @@ void ndDemoSubMesh::AllocIndexData (int indexCount)
 	m_indexes = new unsigned [m_indexCount]; 
 }
 
-ndDemoMesh::ndDemoMesh(const char* const name, const ShaderPrograms& shaderCache)
+ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
 	,m_vertexCount(0)
@@ -154,7 +154,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ShaderPrograms& shaderCache
 }
 
 /*
-ndDemoMesh::ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ShaderPrograms& shaderCache)
+ndDemoMesh::ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
 	,m_uv(nullptr)
@@ -243,7 +243,7 @@ ndDemoMesh::ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshN
 }
 
 
-ndDemoMesh::ndDemoMesh(NewtonMesh* const mesh, const ShaderPrograms& shaderCache)
+ndDemoMesh::ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,m_uv(nullptr)
 	,m_vertex(nullptr)
@@ -293,7 +293,7 @@ ndDemoMesh::ndDemoMesh(NewtonMesh* const mesh, const ShaderPrograms& shaderCache
 }
 */
 
-ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ShaderPrograms& shaderCache)
+ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
 	,m_uv(nullptr)
@@ -331,7 +331,7 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ShaderPrograms& shaderCache
 }
 
 /*
-ndDemoMesh::ndDemoMesh(const char* const name, const ShaderPrograms& shaderCache, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity, const dMatrix& uvMatrix)
+ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity, const dMatrix& uvMatrix)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
 	,m_uv(nullptr)
@@ -414,7 +414,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ShaderPrograms& shaderCache
 }
 */
 
-ndDemoMesh::ndDemoMesh(const char* const name, const ShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize)
+ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
 	,m_uv(nullptr)

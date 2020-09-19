@@ -10,12 +10,14 @@
 */
 
 #include "ndSandboxStdafx.h"
+
+#include "ndSkyBox.h"
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 #include "ndHighResolutionTimer.h"
 
 
-//#include "SkyBox.h"
+
 //#include "ndDemoMesh.h"
 //#include "ndDemoEntity.h"
 //#include "DemoCamera.h"
@@ -273,25 +275,6 @@ int ndDemoEntityManager::GetJoystickButtons (char* const axisbuttons, int maxBut
 	return buttonsCount;
 }
 
-void ndDemoEntityManager::RemoveEntity (dListNode* const entNode)
-{
-	ndDemoEntity* const entity = entNode->GetInfo();
-	entity->Release();
-	Remove(entNode);
-}
-
-void ndDemoEntityManager::RemoveEntity (ndDemoEntity* const ent)
-{
-	dCustomScopeLock lock(&m_deleteLock);
-	for (dListNode* node = dList<ndDemoEntity*>::GetFirst(); node; node = node->GetNext()) {
-		if (node->GetInfo() == ent) {
-			RemoveEntity (node);
-			break;
-		}
-	}
-}
-
-
 bool ndDemoEntityManager::GetMousePosition (int& posX, int& posY) const
 {
 	ImVec2 posit(ImGui::GetMousePos());
@@ -310,17 +293,6 @@ void ndDemoEntityManager::ToggleProfiler()
 		dProfilerEnableProling(m_profilerMode);
 	#endif
 }
-
-
-
-void ndDemoEntityManager::CreateSkyBox()
-{
-	if (!m_sky) {
-		m_sky = new SkyBox(m_shadeCache.m_solidColor);
-		Append(m_sky);
-	}
-}
-
 
 void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const mesh)
 {
@@ -571,7 +543,6 @@ void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFl
 ndDemoEntityManager::ndDemoEntityManager()
 	:dList <ndDemoEntity*>()
 	//, m_defaultFont(0)
-	//, m_sky(nullptr)
 	//, m_world(nullptr)
 	//, m_cameraManager(nullptr)
 	//, m_renderUIContext(nullptr)
@@ -728,10 +699,13 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//	m_collisionDisplayMode = 2;
 	//	m_showListenersDebugInfo = true;
 
+	m_sky = nullptr;
 	m_world = nullptr;
 	Cleanup();
 	ResetTimer();
-	
+
+	m_shadeCache.CreateAllEffects();
+
 	//m_currentPlugin = 0;
 	//void* preferedPlugin = NewtonGetPreferedPlugin(m_world);
 	//for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
@@ -741,8 +715,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//	}
 	//}
 	//m_currentPlugin = 0;
-
-	//m_shadeCache.CreateAllEffects();
 }
 
 ndDemoEntityManager::~ndDemoEntityManager()
@@ -767,6 +739,20 @@ ndDemoEntityManager::~ndDemoEntityManager()
 
 	ImGui::Shutdown();
 	glfwTerminate();
+}
+
+void ndDemoEntityManager::AddEntity(ndDemoEntity* const ent)
+{
+	dScopeSpinLock lock(m_addDeleteLock);
+	dAssert(!ent->m_rootNode);
+	ent->m_rootNode = Append(ent);
+}
+
+void ndDemoEntityManager::RemoveEntity(ndDemoEntity* const ent)
+{
+	dScopeSpinLock lock(m_addDeleteLock);
+	dAssert(ent->m_rootNode);
+	Remove(ent->m_rootNode);
 }
 
 void ndDemoEntityManager::LoadFont()
@@ -812,6 +798,15 @@ void ndDemoEntityManager::LoadFont()
 
 	// Restore state
 	glBindTexture(GL_TEXTURE_2D, last_texture);
+}
+
+void ndDemoEntityManager::CreateSkyBox()
+{
+	if (!m_sky) 
+	{
+		m_sky = new ndSkyBox(m_shadeCache.m_solidColor);
+		AddEntity(m_sky);
+	}
 }
 
 void ndDemoEntityManager::ErrorCallback(int error, const char* description)
@@ -1405,8 +1400,9 @@ void ndDemoEntityManager::Cleanup()
 	// destroy all remaining visual objects
 	while (dList<ndDemoEntity*>::GetFirst()) 
 	{
-		dAssert(0);
-		//RemoveEntity(dList<ndDemoEntity*>::GetFirst());
+		ndDemoEntity* const ent = GetFirst()->GetInfo();
+		RemoveEntity(ent);
+		delete ent;
 	}
 	//if (m_cameraManager) 
 	//{

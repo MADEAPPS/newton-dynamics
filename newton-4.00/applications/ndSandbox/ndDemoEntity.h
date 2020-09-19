@@ -12,16 +12,14 @@
 #ifndef __DEMO_ENTITY_H__
 #define __DEMO_ENTITY_H__
 
-//#include "DemoEntityManager.h"
-
-class ShaderPrograms;
+class ndShaderPrograms;
 class ndDemoMeshInterface;
+class ndDemoEntityManager;
 
-#if 0
-class ndDemoEntity: public dHierarchy<ndDemoEntity>, virtual public dClassInfo
+class ndDemoEntity: public dNodeHierarchy<ndDemoEntity>
 {
+#if 0
 	public:
-
 	class UserData
 	{
 		public:
@@ -37,7 +35,7 @@ class ndDemoEntity: public dHierarchy<ndDemoEntity>, virtual public dClassInfo
 	};
 
 	ndDemoEntity(const ndDemoEntity& copyFrom);
-	ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent);
+	
 	ndDemoEntity(DemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<DemoMeshInterface*, dScene::dTreeNode*>& meshCache, DemoEntityManager::EntityDictionary& entityDictionary, ndDemoEntity* const parent = NULL);
 	virtual ~ndDemoEntity(void);
 
@@ -49,8 +47,7 @@ class ndDemoEntity: public dHierarchy<ndDemoEntity>, virtual public dClassInfo
 
 	UserData* GetUserData ();
 	void SetUserData (UserData* const data);
-
-	dBaseHierarchy* CreateClone () const;
+	
 	static ndDemoEntity* LoadNGD_mesh (const char* const fileName, NewtonWorld* const world, const ShaderPrograms& shaderCache);
 
 	const dMatrix& GetRenderMatrix () const;
@@ -87,9 +84,18 @@ class ndDemoEntity: public dHierarchy<ndDemoEntity>, virtual public dClassInfo
 	unsigned m_lock;
 	bool m_isVisible;
 	dAddRtti(dClassInfo,DOMMY_API);
+#endif
 
+	public:
+	ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent);
+
+	dNodeBaseHierarchy* CreateClone() const;
+
+	// interpolated matrix
+	dMatrix m_matrix;
+	dList <ndDemoEntity*>::dListNode* m_rootNode;
 	friend class DemoEntityManager;
 };
-#endif
+
 
 #endif

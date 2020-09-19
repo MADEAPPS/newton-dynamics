@@ -12,7 +12,7 @@
 #define __DEMO_MAIN_FRAME_H__
 
 #include "ndSandboxStdafx.h"
-//#include "ShaderPrograms.h"
+#include "ndShaderPrograms.h"
 
 struct GLFWwindow;
 struct ImDrawData;
@@ -85,11 +85,8 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	int GetHeight() const;
 
 	NewtonWorld* GetNewton() const;
-	void CreateSkyBox();
 
 	void LoadScene (const char* const name);
-	void RemoveEntity (DemoEntity* const ent);
-	void RemoveEntity (dListNode* const entNode);
 
 	void ImportPLYfile (const char* const name);
 
@@ -124,9 +121,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	int GetDebugDisplay() const;
 	void SetDebugDisplay(int mode) const;
 
-	const ShaderPrograms& GetShaderCache() const;  
-	
-
 	private:
 	//void RenderUI();
 	dFloat32 CalculateInteplationParam () const;
@@ -136,9 +130,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	void ToggleProfiler();
 	static void PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep);
 	
-	DemoEntity* m_sky;
 	DemoCameraManager* m_cameraManager;
-	ShaderPrograms m_shadeCache;
 	void* m_renderUIContext;
 	void* m_updateCameraContext;
 	
@@ -172,7 +164,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	unsigned m_profilerMode;
 	unsigned m_contactLock;
-	unsigned m_deleteLock;
 	dList<NewtonJoint*> m_contactList;
 	friend class DemoEntityListener;
 	friend class DemoListenerManager;
@@ -182,6 +173,12 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	~ndDemoEntityManager();
 
 	void Run();
+
+	void CreateSkyBox();
+	const ndShaderPrograms& GetShaderCache() const;
+
+	void AddEntity(ndDemoEntity* const ent);
+	void RemoveEntity(ndDemoEntity* const ent);
 
 	private:
 	typedef void(*RenderGuiHelpCallback) (ndDemoEntityManager* const manager, void* const context);
@@ -218,9 +215,13 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	GLFWwindow* m_mainFrame;
 	ndPhysicsWorld* m_world;
+	ndDemoEntity* m_sky;
+	ndShaderPrograms m_shadeCache;
 
 	dFloat32 m_fps;
 	dUnsigned64 m_microsecunds;
+
+	dSpinLock m_addDeleteLock;
 
 	int	m_defaultFont;
 	int m_framesCount;
@@ -288,11 +289,12 @@ inline void ndDemoEntityManager::SetDebugDisplay(int mode) const
 {
 	dAssert (0);
 }
+#endif
 
-inline const ShaderPrograms& ndDemoEntityManager::GetShaderCache() const
+inline const ndShaderPrograms& ndDemoEntityManager::GetShaderCache() const
 {
 	return m_shadeCache;
 }
-#endif
+
 
 #endif

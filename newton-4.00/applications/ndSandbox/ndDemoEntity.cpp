@@ -16,24 +16,6 @@
 #if 0
 //dInitRtti(ndDemoEntity);
 
-ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)
-	:dClassInfo()
-	,dHierarchy<ndDemoEntity>()
-	,m_matrix(matrix) 
-	,m_curPosition (matrix.m_posit)
-	,m_nextPosition (matrix.m_posit)
-	,m_curRotation (dQuaternion (matrix))
-	,m_nextRotation (dQuaternion (matrix))
-	,m_meshMatrix(dGetIdentityMatrix())
-	,m_mesh (NULL)
-	,m_userData(NULL)
-	,m_lock(0) 
-	,m_isVisible(true)
-{
-	if (parent) {
-		Attach (parent);
-	}
-}
 
 ndDemoEntity::ndDemoEntity(DemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<ndDemoMeshInterface*, dScene::dTreeNode*>& meshCache, DemoEntityManager::EntityDictionary& entityDictionary, ndDemoEntity* const parent)
 	:dClassInfo()
@@ -110,12 +92,6 @@ ndDemoEntity::~ndDemoEntity(void)
 		delete m_userData;
 	}
 	SetMesh(NULL, dGetIdentityMatrix());
-}
-
-
-dBaseHierarchy* ndDemoEntity::CreateClone () const
-{
-	return new ndDemoEntity(*this);
 }
 
 ndDemoEntity::UserData* ndDemoEntity::GetUserData ()
@@ -569,5 +545,29 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 	}
 	return shapeArray[0];
 }
-
 #endif
+
+ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)
+	:dNodeHierarchy<ndDemoEntity>()
+	,m_matrix(matrix)
+	//,m_curPosition(matrix.m_posit)
+	//,m_nextPosition(matrix.m_posit)
+	//,m_curRotation(dQuaternion(matrix))
+	//,m_nextRotation(dQuaternion(matrix))
+	//,m_meshMatrix(dGetIdentityMatrix())
+	//,m_mesh(NULL)
+	//,m_userData(NULL)
+	//,m_lock(0)
+	//,m_isVisible(true)
+{
+	m_rootNode = nullptr;
+	if (parent) 
+	{
+		Attach(parent);
+	}
+}
+
+dNodeBaseHierarchy* ndDemoEntity::CreateClone() const
+{
+	return new ndDemoEntity(*this);
+}

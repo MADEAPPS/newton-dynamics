@@ -47,6 +47,7 @@
 #include <dRefCounter.h>
 #include <dThreadPool.h>
 #include <dQuaternion.h>
+#include <dNodeHierarchy.h>
 #include <dFixSizeBuffer.h>
 #include <dIntersections.h>
 #include <dSpatialMatrix.h>

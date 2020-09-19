@@ -9,26 +9,29 @@
 * freely
 */
 
-#ifndef __TARGA_TO_OPENGL__ 
-#define __TARGA_TO_OPENGL__ 
+#ifndef __SKY_BOX_H__
+#define __SKY_BOX_H__
 
 #include "ndSandboxStdafx.h"
+#include "ndDemoEntity.h"
 
-enum TextureImageFormat
+class ndDemoEntityManager;
+
+class ndSkyBox: public ndDemoEntity
 {
-	m_rgb,
-	m_rgba,
-	m_luminace,
+	public:
+	ndSkyBox(GLuint shader);
+	~ndSkyBox();
+
+	virtual void Render(dFloat32 timeStep, DemoEntityManager* const scene, const dMatrix& matrix) const;
+
+	private:
+	void DrawMesh () const;
+
+	GLuint m_displayList;
+	GLuint m_shader;
+	GLuint m_textures[6];
 };
 
-GLuint LoadTexture(const char* const filename);
-GLuint LoadImage(const char* const cacheName, const char* const buffer, int width, int hight, TextureImageFormat format);
-
-GLuint AddTextureRef (GLuint texture);
-void ReleaseTexture (GLuint texture);
-
-const char* FindTextureById (GLuint textureID);
-
-#endif
-
+#endif 
 

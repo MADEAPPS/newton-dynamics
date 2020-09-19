@@ -21,10 +21,9 @@
 
 void ndBasicSetup(ndDemoEntityManager* const scene)
 {
-#if 0
 	// load the skybox
 	scene->CreateSkyBox();
-
+#if 0
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 
