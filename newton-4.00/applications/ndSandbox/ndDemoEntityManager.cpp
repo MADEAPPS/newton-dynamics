@@ -12,23 +12,20 @@
 #include "ndSandboxStdafx.h"
 
 #include "ndSkyBox.h"
+#include "ndDemoEntity.h"
+#include "ndDemoCamera.h"
+#include "ndFileBrowser.h"
 #include "ndPhysicsWorld.h"
+#include "ndTargaToOpenGl.h"
+#include "ndShaderPrograms.h"
 #include "ndDemoEntityManager.h"
+#include "ndDemoCameraManager.h"
 #include "ndHighResolutionTimer.h"
 
-
-
 //#include "ndDemoMesh.h"
-//#include "ndDemoEntity.h"
-//#include "DemoCamera.h"
-//#include "FileBrowser.h"
 //#include "PhysicsUtils.h"
 //#include "DebugDisplay.h"
-//#include "TargaToOpenGl.h"
-//#include "ShaderPrograms.h"
-//#include "ndDemoEntityManager.h"
-//#include "DemoCameraManager.h"
-//#include "DemoCameraManager.h"
+
 
 #ifdef _MACOSX_VER
 	#include "CocoaOpenglGlue.h"
@@ -508,13 +505,6 @@ void ndDemoEntityManager::OnDestroyContact(const NewtonWorld* const world, Newto
 //	scene->m_contactList.Remove(cooky);
 }
 
-
-void ndDemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
-{
-	m_cameraManager->SetCameraMatrix(this, rotation, position);
-}
-
-
 dFloat32 ndDemoEntityManager::CalculateInteplationParam () const
 {
 	dUnsigned64 timeStep = dGetTimeInMicrosenconds () - m_microsecunds;		
@@ -569,7 +559,6 @@ ndDemoEntityManager::ndDemoEntityManager()
 	//, m_showAABB(false)
 	//, m_showStats(true)
 	//, m_autoSleepMode(true)
-	//, m_hideVisualMeshes(false)
 	//, m_showNormalForces(false)
 	//, m_showCenterOfMass(false)
 	//, m_showBodyFrame(false)
@@ -664,6 +653,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_showAABB = false;
 	m_showStats = true;
 	m_autoSleepMode = true;
+	m_hideVisualMeshes = false;
 	m_updateMenuOptions = false;
 	m_suspendPhysicsUpdate = false;
 	m_asynchronousPhysicsUpdate = true;
@@ -701,6 +691,7 @@ ndDemoEntityManager::ndDemoEntityManager()
 
 	m_sky = nullptr;
 	m_world = nullptr;
+	m_cameraManager = nullptr;
 	Cleanup();
 	ResetTimer();
 
@@ -727,10 +718,10 @@ ndDemoEntityManager::~ndDemoEntityManager()
 		delete m_world;
 	}
 	
-	//if (m_cameraManager) 
-	//{
-	//	delete m_cameraManager;
-	//}
+	if (m_cameraManager) 
+	{
+		delete m_cameraManager;
+	}
 
 	// Cleanup
 	GLuint font_texture(m_defaultFont);
@@ -753,6 +744,11 @@ void ndDemoEntityManager::RemoveEntity(ndDemoEntity* const ent)
 	dScopeSpinLock lock(m_addDeleteLock);
 	dAssert(ent->m_rootNode);
 	Remove(ent->m_rootNode);
+}
+
+void ndDemoEntityManager::SetCameraMatrix(const dQuaternion& rotation, const dVector& position)
+{
+	m_cameraManager->SetCameraMatrix(this, rotation, position);
 }
 
 void ndDemoEntityManager::LoadFont()
@@ -1203,7 +1199,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Separator();
 
 			ImGui::Checkbox("show aabb", &m_showAABB);
-			//ImGui::Checkbox("hide visual meshes", &m_hideVisualMeshes);
+			ImGui::Checkbox("hide visual meshes", &m_hideVisualMeshes);
 			//ImGui::Checkbox("show contact points", &m_showContactPoints);
 			//ImGui::Checkbox("show ray cast hit point", &m_showRaycastHit);
 			//ImGui::Checkbox("show normal forces", &m_showNormalForces);
@@ -1404,11 +1400,12 @@ void ndDemoEntityManager::Cleanup()
 		RemoveEntity(ent);
 		delete ent;
 	}
-	//if (m_cameraManager) 
-	//{
-	//	delete m_cameraManager;
-	//}
-	//m_sky = nullptr;
+	if (m_cameraManager) 
+	{
+		delete m_cameraManager;
+	}
+
+	m_sky = nullptr;
 	//m_updateCamera = nullptr;
 
 	// destroy the Newton world
@@ -1426,9 +1423,9 @@ void ndDemoEntityManager::Cleanup()
 	//
 	//// set joint serialization call back
 	//dCustomJoint::Initalize(m_world);
-	//
-	//// add the camera manager
-	//m_cameraManager = new DemoCameraManager(this);
+
+	// add the camera manager
+	m_cameraManager = new ndDemoCameraManager(this);
 	
 	ApplyMenuOptions();
 	
@@ -1543,36 +1540,36 @@ void ndDemoEntityManager::RenderScene()
 	glEnable(GL_LIGHT0);
 
 	// one light from the Camera eye point
-//	dVector camPosition(m_cameraManager->GetCamera()->m_matrix.m_posit);
-//	GLfloat lightDiffuse1[] = { 0.5f, 0.5f, 0.5f, 0.0f };
-//	GLfloat lightAmbient1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-//	GLfloat lightSpecular1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-//	GLfloat lightPosition1[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-//
-//	glMaterialf(GL_FRONT, GL_SHININESS, 60.0f);
-//	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
-//	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
-//	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
-//	glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular1);
-//	glEnable(GL_LIGHT1);
+	dVector camPosition(m_cameraManager->GetCamera()->m_matrix.m_posit);
+	GLfloat lightDiffuse1[] = { 0.5f, 0.5f, 0.5f, 0.0f };
+	GLfloat lightAmbient1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	GLfloat lightSpecular1[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	GLfloat lightPosition1[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-#if 0
+	glMaterialf(GL_FRONT, GL_SHININESS, 60.0f);
+	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition1);
+	glLightfv(GL_LIGHT1, GL_AMBIENT, lightAmbient1);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, lightDiffuse1);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular1);
+	glEnable(GL_LIGHT1);
+
 	// Setup matrix
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glLoadIdentity();
-	//glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
 
+
 	// make sure the model view matrix is set to identity before setting world space light sources
 	// update Camera
-//	m_cameraManager->GetCamera()->SetViewMatrix(display_w, display_h);
+	m_cameraManager->GetCamera()->SetViewMatrix(display_w, display_h);
 
 	// render all entities
-
 	dMatrix globalMatrix(dGetIdentityMatrix());
+
+dFloat32 timestep = 0;
 	if (m_hideVisualMeshes) 
 	{
 		if (m_sky) 
@@ -1584,15 +1581,16 @@ void ndDemoEntityManager::RenderScene()
 	}
 	else 
 	{
-		for (dListNode* node = dList<DemoEntity*>::GetFirst(); node; node = node->GetNext()) 
+		for (dListNode* node = GetFirst(); node; node = node->GetNext()) 
 		{
-			DemoEntity* const entity = node->GetInfo();
+			ndDemoEntity* const entity = node->GetInfo();
 			glPushMatrix();
 			entity->Render(timestep, this, globalMatrix);
 			glPopMatrix();
 		}
 	}
 
+#if 0
 	DEBUG_DRAW_MODE mode = m_solid;
 	if (m_collisionDisplayMode) 
 	{
@@ -1659,10 +1657,10 @@ void ndDemoEntityManager::RenderScene()
 		}
 		glPopMatrix();
 	}
+#endif
 
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
-#endif
 }

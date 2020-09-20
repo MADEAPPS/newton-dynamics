@@ -17,7 +17,7 @@
 //dInitRtti(ndDemoEntity);
 
 
-ndDemoEntity::ndDemoEntity(DemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<ndDemoMeshInterface*, dScene::dTreeNode*>& meshCache, DemoEntityManager::EntityDictionary& entityDictionary, ndDemoEntity* const parent)
+ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<ndDemoMeshInterface*, dScene::dTreeNode*>& meshCache, ndDemoEntityManager::EntityDictionary& entityDictionary, ndDemoEntity* const parent)
 	:dClassInfo()
 	,dHierarchy<ndDemoEntity>()
 	,m_matrix(dGetIdentityMatrix())
@@ -69,31 +69,6 @@ ndDemoEntity::ndDemoEntity(DemoEntityManager& world, const dScene* const scene, 
 	}
 }
 
-ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
-	:dClassInfo()
-	,dHierarchy<ndDemoEntity>(copyFrom)
-	,m_matrix(copyFrom.m_matrix)
-	,m_curPosition(copyFrom.m_curPosition)
-	,m_nextPosition(copyFrom.m_nextPosition)
-	,m_curRotation(copyFrom.m_curRotation)
-	,m_nextRotation(copyFrom.m_nextRotation)
-	,m_meshMatrix(copyFrom.m_meshMatrix)
-	,m_mesh(NULL)
-	,m_userData(NULL)
-	,m_lock(0)
-	,m_isVisible(copyFrom.m_isVisible)
-{
-	m_mesh = copyFrom.m_mesh ? copyFrom.m_mesh->Clone(this) : NULL;
-}
-
-ndDemoEntity::~ndDemoEntity(void)
-{
-	if (m_userData) {
-		delete m_userData;
-	}
-	SetMesh(NULL, dGetIdentityMatrix());
-}
-
 ndDemoEntity::UserData* ndDemoEntity::GetUserData ()
 {
 	return m_userData;
@@ -104,11 +79,11 @@ void ndDemoEntity::SetUserData (UserData* const data)
 	m_userData = data;
 }
 
-void ndDemoEntity::TransformCallback(const NewtonBody* body, const dFloat* matrix, int threadIndex)
+void ndDemoEntity::TransformCallback(const NewtonBody* body, const dFloat32* matrix, int threadIndex)
 {
 	ndDemoEntity* const ent = (ndDemoEntity*) NewtonBodyGetUserData(body);
 	if (ent) {
-		DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
+		ndDemoEntityManager* const scene = (ndDemoEntityManager*)NewtonWorldGetUserData(NewtonBodyGetWorld(body));
 		dMatrix transform(matrix);
 		dQuaternion rot;
 		NewtonBodyGetRotation(body, &rot.m_x);
@@ -174,32 +149,8 @@ dMatrix ndDemoEntity::CalculateInterpolatedGlobalMatrix (const ndDemoEntity* con
 	return matrix;
 }
 
-void ndDemoEntity::SetMatrixUsafe(const dQuaternion& rotation, const dVector& position)
-{
-	m_curPosition = m_nextPosition;
-	m_curRotation = m_nextRotation;
 
-	m_nextPosition = position;
-	m_nextRotation = rotation;
-
-	dFloat angle = m_curRotation.DotProduct(m_nextRotation);
-	if (angle < 0.0f) {
-		m_curRotation.Scale(-1.0f);
-	}
-}
-
-void ndDemoEntity::SetMatrix(DemoEntityManager& world, const dQuaternion& rotation, const dVector& position)
-{
-	// read the data in a critical section to prevent race condition from other thread  
-	world.Lock(m_lock);
-
-	SetMatrixUsafe(rotation, position);
-
-	// release the critical section
-	world.Unlock(m_lock);
-}
-
-void ndDemoEntity::SetNextMatrix (DemoEntityManager& world, const dQuaternion& rotation, const dVector& position)
+void ndDemoEntity::SetNextMatrix (ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position)
 {
 	// read the data in a critical section to prevent race condition from other thread  
 	world.Lock(m_lock);
@@ -207,7 +158,7 @@ void ndDemoEntity::SetNextMatrix (DemoEntityManager& world, const dQuaternion& r
 	m_nextPosition = position;
 	m_nextRotation = rotation;
 
-	dFloat angle = m_curRotation.DotProduct(m_nextRotation);
+	dFloat32 angle = m_curRotation.DotProduct(m_nextRotation);
 	if (angle < 0.0f) {
 		m_curRotation.Scale(-1.0f);
 	}
@@ -216,7 +167,7 @@ void ndDemoEntity::SetNextMatrix (DemoEntityManager& world, const dQuaternion& r
 	world.Unlock(m_lock);
 }
 
-void ndDemoEntity::ResetMatrix(DemoEntityManager& scene, const dMatrix& matrix)
+void ndDemoEntity::ResetMatrix(ndDemoEntityManager& scene, const dMatrix& matrix)
 {
 	dQuaternion rot (matrix);
 	SetMatrix(scene, rot, matrix.m_posit);
@@ -224,7 +175,7 @@ void ndDemoEntity::ResetMatrix(DemoEntityManager& scene, const dMatrix& matrix)
 	InterpolateMatrix (scene, 0.0f);
 }
 
-void ndDemoEntity::InterpolateMatrixUnsafe(dFloat param)
+void ndDemoEntity::InterpolateMatrixUnsafe(dFloat32 param)
 {
 	dVector p0(m_curPosition);
 	dVector p1(m_nextPosition);
@@ -240,7 +191,7 @@ void ndDemoEntity::InterpolateMatrixUnsafe(dFloat param)
 	}
 }
 
-void ndDemoEntity::InterpolateMatrix (DemoEntityManager& world, dFloat param)
+void ndDemoEntity::InterpolateMatrix (ndDemoEntityManager& world, dFloat32 param)
 {
 	// read the data in a critical section to prevent race condition from other thread  
 	world.Lock(m_lock);
@@ -272,47 +223,6 @@ void ndDemoEntity::RenderBone() const
 	}
 }
 
-void ndDemoEntity::Render(dFloat timestep, DemoEntityManager* const scene, const dMatrix& matrix) const
-{
-
-//	char space[256];
-//	int index = 0;
-//	for (const ndDemoEntity* node = this; node; node = node->GetParent()) {
-//		space[index] = ' ';
-//		index++;
-//	}
-//	space[index] = 0;
-//	dTrace(("%s%s\n", space, GetName().GetStr()));
-
-
-	// save the model matrix before changing it Matrix
-//	glPushMatrix();
-	// Set The matrix for this entity Node
-//	glMultMatrix(&m_matrix[0][0]);
-
-	dMatrix nodeMatrix (m_matrix * matrix);
-	if (m_isVisible && m_mesh) {
-		// Render mesh if there is one 
-		dMatrix modelMatrix (m_meshMatrix * nodeMatrix);
-
-		glPushMatrix();
-		glMultMatrix(&modelMatrix[0][0]);
-		m_mesh->Render (scene);
-		//m_mesh->RenderNormals ();
-		if (m_userData) {
-			m_userData->OnRender(timestep);
-		}
-		glPopMatrix();
-	}
-
-//	RenderBone();
-	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) {
-		child->Render(timestep, scene, nodeMatrix);
-	}
-
-	// restore the matrix before leaving
-//	glPopMatrix();
-}
 
 ndDemoEntity* ndDemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* const world, const ShaderPrograms& shaderCache)
 {
@@ -472,7 +382,7 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 		if (strstr (name, "sphere")) {
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
-			dFloat* const array = mesh->m_vertex;
+			dFloat32* const array = mesh->m_vertex;
 			dVector extremes(0.0f);
 			for (int i = 0; i < mesh->m_vertexCount; i++) {
 				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
@@ -488,7 +398,7 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
 			// go over the vertex array and find and collect all vertices's weighted by this bone.
-			dFloat* const array = mesh->m_vertex;
+			dFloat32* const array = mesh->m_vertex;
 			dVector extremes(0.0f);
 			for (int i = 0; i < mesh->m_vertexCount; i++) {
 				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
@@ -505,14 +415,14 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 		} else if (strstr (name, "capsule")) {
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
-			dFloat* const array = mesh->m_vertex;
+			dFloat32* const array = mesh->m_vertex;
 			dVector extremes(0.0f);
 			for (int i = 0; i < mesh->m_vertexCount; i++) {
 				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
 				extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
 				extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
 			}
-			dFloat high = 2.0f * dMax (extremes.m_y - extremes.m_x, dFloat (0.0f));
+			dFloat32 high = 2.0f * dMax (extremes.m_y - extremes.m_x, dFloat32 (0.0f));
 
 			dMatrix alighMatrix(dRollMatrix(90.0f * dDegreeToRad));
 			dMatrix matrix (alighMatrix * child->GetCurrentMatrix());
@@ -522,9 +432,9 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 		} else if (strstr(name, "convexhull")) {
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
-			dFloat* const array = mesh->m_vertex;
+			dFloat32* const array = mesh->m_vertex;
 			dMatrix matrix(child->GetCurrentMatrix());
-			shapeArray[count] = NewtonCreateConvexHull(world, mesh->m_vertexCount, array, 3 * sizeof (dFloat), 0.01f, 0, &matrix[0][0]);
+			shapeArray[count] = NewtonCreateConvexHull(world, mesh->m_vertexCount, array, 3 * sizeof (dFloat32), 0.01f, 0, &matrix[0][0]);
 			count++;
 			dAssert(count < sizeof(shapeArray) / sizeof(shapeArray[0]));
 		}
@@ -550,10 +460,11 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)
 	:dNodeHierarchy<ndDemoEntity>()
 	,m_matrix(matrix)
-	//,m_curPosition(matrix.m_posit)
-	//,m_nextPosition(matrix.m_posit)
-	//,m_curRotation(dQuaternion(matrix))
-	//,m_nextRotation(dQuaternion(matrix))
+	,m_curPosition(matrix.m_posit)
+	,m_nextPosition(matrix.m_posit)
+	,m_curRotation(dQuaternion(matrix))
+	,m_nextRotation(dQuaternion(matrix))
+	,m_lock()
 	//,m_meshMatrix(dGetIdentityMatrix())
 	//,m_mesh(NULL)
 	//,m_userData(NULL)
@@ -567,7 +478,86 @@ ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)
 	}
 }
 
+ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
+	:dNodeHierarchy<ndDemoEntity>(copyFrom)
+	,m_matrix(copyFrom.m_matrix)
+	,m_curPosition(copyFrom.m_curPosition)
+	,m_nextPosition(copyFrom.m_nextPosition)
+	,m_curRotation(copyFrom.m_curRotation)
+	,m_nextRotation(copyFrom.m_nextRotation)
+	,m_lock()
+	//,m_meshMatrix(copyFrom.m_meshMatrix)
+	//,m_mesh(NULL)
+	//,m_userData(NULL)
+	//,m_lock(0)
+	//,m_isVisible(copyFrom.m_isVisible)
+{
+	dAssert(0);
+	//m_mesh = copyFrom.m_mesh ? copyFrom.m_mesh->Clone(this) : NULL;
+}
+
+ndDemoEntity::~ndDemoEntity(void)
+{
+	//if (m_userData) 
+	//{
+	//	delete m_userData;
+	//}
+	//SetMesh(NULL, dGetIdentityMatrix());
+}
+
 dNodeBaseHierarchy* ndDemoEntity::CreateClone() const
 {
 	return new ndDemoEntity(*this);
+}
+
+void ndDemoEntity::SetMatrixUsafe(const dQuaternion& rotation, const dVector& position)
+{
+	m_curPosition = m_nextPosition;
+	m_curRotation = m_nextRotation;
+
+	m_nextPosition = position;
+	m_nextRotation = rotation;
+
+	dFloat32 angle = m_curRotation.DotProduct(m_nextRotation);
+	if (angle < 0.0f) 
+	{
+		m_curRotation.Scale(-1.0f);
+	}
+}
+
+void ndDemoEntity::SetMatrix(ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position)
+{
+	// read the data in a critical section to prevent race condition from other thread  
+	dScopeSpinLock lock(m_lock);
+
+	SetMatrixUsafe(rotation, position);
+}
+
+void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
+{
+	dAssert(0);
+#if 0
+	dMatrix nodeMatrix(m_matrix * matrix);
+	if (m_isVisible && m_mesh) 
+	{
+		// Render mesh if there is one 
+		dMatrix modelMatrix(m_meshMatrix * nodeMatrix);
+
+		glPushMatrix();
+		glMultMatrix(&modelMatrix[0][0]);
+		m_mesh->Render(scene);
+		//m_mesh->RenderNormals ();
+		if (m_userData) 
+		{
+			m_userData->OnRender(timestep);
+		}
+		glPopMatrix();
+	}
+
+	//	RenderBone();
+	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
+	{
+		child->Render(timestep, scene, nodeMatrix);
+	}
+#endif
 }

@@ -46,11 +46,11 @@ void ndBasicSetup(ndDemoEntityManager* const scene)
 
 	dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotFrame, body0, body1);
 	joint->SetBodyMassScale(5.0f, 1.0f);
-
+#endif
 	dQuaternion rot;
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
 //	NewtonSerializeToFile(scene->GetNewton(), "xxx.bin", NULL, NULL);
-#endif
+
 }

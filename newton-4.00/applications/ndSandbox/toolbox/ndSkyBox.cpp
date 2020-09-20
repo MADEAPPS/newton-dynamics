@@ -118,7 +118,7 @@ void ndSkyBox::DrawMesh () const
 	glUseProgram(0);
 }
 
-void ndSkyBox::Render(dFloat32 timeStep, DemoEntityManager* const scene, const dMatrix& matrix__) const
+void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix__) const
 {
 	dMatrix matrix;
 
@@ -131,7 +131,8 @@ void ndSkyBox::Render(dFloat32 timeStep, DemoEntityManager* const scene, const d
 	glPushMatrix();
 	glMultMatrix(&skyMatrix[0][0]);
 
-	if (m_displayList) 
+	//if (m_displayList) 
+	if (0)
 	{
 		glCallList(m_displayList);
 	} 

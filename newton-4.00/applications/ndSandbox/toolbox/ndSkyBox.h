@@ -15,15 +15,15 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoEntity.h"
 
-class ndDemoEntityManager;
+class ndDemoCameraManager;
 
 class ndSkyBox: public ndDemoEntity
 {
 	public:
 	ndSkyBox(GLuint shader);
-	~ndSkyBox();
+	virtual ~ndSkyBox();
 
-	virtual void Render(dFloat32 timeStep, DemoEntityManager* const scene, const dMatrix& matrix) const;
+	virtual void Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
 
 	private:
 	void DrawMesh () const;

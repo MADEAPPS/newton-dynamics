@@ -44,9 +44,9 @@ class dNodeBaseHierarchy: public dClassAlloc
 	D_CORE_API dNodeBaseHierarchy ();
 	D_CORE_API dNodeBaseHierarchy (const char* const name);
 	D_CORE_API dNodeBaseHierarchy (const dNodeBaseHierarchy &clone);
-	virtual D_CORE_API ~dNodeBaseHierarchy ();
+	D_CORE_API virtual  ~dNodeBaseHierarchy ();
 
-	virtual D_CORE_API dNodeBaseHierarchy* CreateClone () const = 0;
+	D_CORE_API virtual  dNodeBaseHierarchy* CreateClone () const = 0;
 
 	private:
 	inline void Clear();

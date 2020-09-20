@@ -11,50 +11,6 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndDemoEntityManager.h"
-#if 0
-
-// memory allocation for Newton
-static void* PhysicsAlloc (int sizeInBytes)
-{
-	//	m_totalMemoryUsed += sizeInBytes;
-	return new char[sizeInBytes];
-}
-
-// memory free use by the engine
-static void PhysicsFree (void* ptr, int sizeInBytes)
-{
-	//	m_totalMemoryUsed -= sizeInBytes;
-	delete[] (char*)ptr;
-}
-
-class CheckMemoryLeaks
-{
-	public:
-	CheckMemoryLeaks() 
-	{
-		atexit(CheckMemoryLeaksCallback);
-		// Set the memory allocation function before creation the newton world
-		// this is the only function that can be called before the creation of the newton world.
-		// it should be called once, and the the call is optional 
-		NewtonSetMemorySystem(PhysicsAlloc, PhysicsFree);
-
-#if defined(_DEBUG) && defined(_MSC_VER)
-		// Track all memory leaks at the operating system level.
-		// make sure no Newton tool or utility leaves leaks behind.
-		_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_REPORT_FLAG);
-		//_CrtSetBreakAlloc (318776);
-#endif
-	}
-
-	static void CheckMemoryLeaksCallback()
-	{
-#if defined(_DEBUG) && defined(_MSC_VER)
-		_CrtDumpMemoryLeaks();
-#endif
-	}
-};
-static CheckMemoryLeaks checkLeaks;
-#endif
 
 // memory allocation for Newton
 static void* PhysicsAlloc(size_t sizeInBytes)
@@ -91,7 +47,7 @@ class CheckMemoryLeaks
 		// Track all memory leaks at the operating system level.
 		// make sure no Newton tool or utility leaves leaks behind.
 		_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_REPORT_FLAG);
-		//_CrtSetBreakAlloc (127);
+		//_CrtSetBreakAlloc (2194);
 		#endif
 
 		atexit(CheckMemoryLeaksCallback);

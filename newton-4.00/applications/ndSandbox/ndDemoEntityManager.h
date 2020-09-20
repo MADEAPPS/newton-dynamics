@@ -20,9 +20,9 @@ struct ImDrawData;
 class ndDemoMesh;
 class ndDemoEntity;
 class ndPhysicsWorld;
-//class DemoCamera;
+//class ndDemoCamera;
 //class DemoMeshInterface;
-//class DemoCameraManager;
+class ndDemoCameraManager;
 
 class ndDemoEntityManager: public dList <ndDemoEntity*>
 {
@@ -92,7 +92,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	DemoCamera* GetCamera() const;
 	bool GetMousePosition (int& posX, int& posY) const;
-	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
 
 	void PushTransparentMesh (const DemoMeshInterface* const mesh); 
 	void SetUpdateCameraFunction(UpdateCameraCallback callback, void* const context);
@@ -130,7 +129,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	void ToggleProfiler();
 	static void PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep);
 	
-	DemoCameraManager* m_cameraManager;
 	void* m_renderUIContext;
 	void* m_updateCameraContext;
 	
@@ -151,7 +149,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	int m_debugDisplayMode;
 	int m_collisionDisplayMode;
 	
-	bool m_hideVisualMeshes;
 	bool m_showNormalForces;
 	bool m_showCenterOfMass;
 	bool m_showBodyFrame;
@@ -179,6 +176,8 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	void AddEntity(ndDemoEntity* const ent);
 	void RemoveEntity(ndDemoEntity* const ent);
+
+	void SetCameraMatrix(const dQuaternion& rotation, const dVector& position);
 
 	private:
 	typedef void(*RenderGuiHelpCallback) (ndDemoEntityManager* const manager, void* const context);
@@ -215,6 +214,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	GLFWwindow* m_mainFrame;
 	ndPhysicsWorld* m_world;
+	ndDemoCameraManager* m_cameraManager;
 	ndDemoEntity* m_sky;
 	ndShaderPrograms m_shadeCache;
 
@@ -234,8 +234,9 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool m_showUI;
 	bool m_showAABB;
 	bool m_showStats;
-	bool m_autoSleepMode;
 	bool m_hasJoytick;
+	bool m_autoSleepMode;
+	bool m_hideVisualMeshes;
 	bool m_updateMenuOptions;
 	bool m_suspendPhysicsUpdate;
 	bool m_asynchronousPhysicsUpdate;
