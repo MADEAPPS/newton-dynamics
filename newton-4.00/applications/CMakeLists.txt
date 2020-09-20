@@ -18,13 +18,10 @@ cmake_minimum_required(VERSION 3.4.0)
 #include_directories(dVehicle/dVehicleMultiBody)
 
 if (NEWTON_BUILD_TEST STREQUAL "ON")
-	#message("BUILDING TEST.")
 	add_subdirectory(ndTest)
 endif()
 
 if (NEWTON_BUILD_SANDBOX_DEMOS STREQUAL "ON")
-	#message("BUILDING DEMOS.")
-	
 	add_subdirectory(ndSandbox)
 	
      if(UNIX)
