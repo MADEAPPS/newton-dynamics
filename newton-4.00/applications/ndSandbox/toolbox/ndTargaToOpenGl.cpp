@@ -12,13 +12,13 @@
 #include "ndSandboxStdafx.h"
 #include "ndTargaToOpenGl.h"
 
-struct TextureEntry: public dRefCounter
+struct ndTextureEntry: public dRefCounter
 {
 	GLuint m_textureID;
 	dString m_textureName;
 };
 
-class TextureCache: public dTree<TextureEntry, dUnsigned64>
+class ndTextureCache: public dTree<ndTextureEntry, dUnsigned64>
 {
 	public: 
 	GLuint GetTexture(const char* const texName)
@@ -26,14 +26,15 @@ class TextureCache: public dTree<TextureEntry, dUnsigned64>
 		GLuint texID = 0;
 		dAssert (texName);
 
-		TextureEntry entry;
+		ndTextureEntry entry;
 		entry.m_textureName = texName;
 		entry.m_textureName.ToLower();
 		dUnsigned64 crc = dCRC64 (entry.m_textureName.GetStr());
 
 		dTreeNode* node = Find(crc);
-		if (node) {
-			 node->GetInfo().AddRef();
+		if (node) 
+		{
+			node->GetInfo().AddRef();
 			texID = node->GetInfo().m_textureID;
 		}
 		return texID;
@@ -41,7 +42,7 @@ class TextureCache: public dTree<TextureEntry, dUnsigned64>
 
 	void InsertText (const char* const texName, GLuint id) 
 	{
-		TextureEntry entry;
+		ndTextureEntry entry;
 		entry.m_textureID = id;
 		entry.m_textureName = texName;
 		entry.m_textureName.ToLower();
@@ -49,11 +50,11 @@ class TextureCache: public dTree<TextureEntry, dUnsigned64>
 		Insert(entry, crc);
 	}
 
-
-	~TextureCache ()
+	~ndTextureCache ()
 	{
 		Iterator iter (*this);
-		for (iter.Begin(); iter; iter ++) {
+		for (iter.Begin(); iter; iter ++) 
+		{
 			glDeleteTextures(1, &iter.GetNode()->GetInfo().m_textureID);
 		}
 	}
@@ -61,10 +62,13 @@ class TextureCache: public dTree<TextureEntry, dUnsigned64>
 	void RemoveById (GLuint id)
 	{
 		Iterator iter (*this);
-		for (iter.Begin(); iter; iter ++) {
-			TextureEntry& entry = iter.GetNode()->GetInfo();
-			if (entry.m_textureID == id) {
-				if (entry.GetRef() == 1) {
+		for (iter.Begin(); iter; iter ++) 
+		{
+			ndTextureEntry& entry = iter.GetNode()->GetInfo();
+			if (entry.m_textureID == id) 
+			{
+				if (entry.GetRef() == 1) 
+				{
 					glDeleteTextures(1, &id);
 					Remove (iter.GetNode());
 				}
@@ -76,8 +80,10 @@ class TextureCache: public dTree<TextureEntry, dUnsigned64>
 	dTreeNode* FindById (GLuint id) const
 	{
 		Iterator iter (*this);
-		for (iter.Begin(); iter; iter ++) {
-			if (iter.GetNode()->GetInfo().m_textureID == id) {
+		for (iter.Begin(); iter; iter ++) 
+		{
+			if (iter.GetNode()->GetInfo().m_textureID == id) 
+			{
 				//return iter.GetNode()->GetInfo().m_textureName.GetStr();
 				return iter.GetNode();
 			}
@@ -87,14 +93,12 @@ class TextureCache: public dTree<TextureEntry, dUnsigned64>
 
 
 
-	static TextureCache& GetChache()
+	static ndTextureCache& GetChache()
 	{
-		static TextureCache texCache;
+		static ndTextureCache texCache;
 		return texCache;
 	}
 };
-
-
 
 //	Loads the texture from the specified file and stores it in iTexture. Note
 //	that we're using the GLAUX library here, which is generally discouraged,
@@ -121,7 +125,7 @@ GLuint LoadTexture(const char* const filename)
 
 	char fullPathName[2048];
 	dGetWorkingFileName (filename, fullPathName);
-	TextureCache& cache = TextureCache::GetChache();
+	ndTextureCache& cache = ndTextureCache::GetChache();
 	GLuint texture = cache.GetTexture(fullPathName);
 	if (!texture) 
 	{
@@ -271,7 +275,7 @@ GLuint LoadImage(const char* const cacheName, const char* const buffer, int widt
 		gluBuild2DMipmaps (GL_TEXTURE_2D, iComponents, iWidth, iHeight, eFormat, GL_UNSIGNED_BYTE, buffer);
 
 		// Done with File
-		TextureCache& cache = TextureCache::GetChache();
+		ndTextureCache& cache = ndTextureCache::GetChache();
 		cache.InsertText (cacheName, texture);
 	}
 
@@ -280,13 +284,13 @@ GLuint LoadImage(const char* const cacheName, const char* const buffer, int widt
 
 void ReleaseTexture (GLuint texture)
 {
-	TextureCache::GetChache().RemoveById (texture);
+	ndTextureCache::GetChache().RemoveById (texture);
 }
 
 const char* FindTextureById (GLuint textureID)
 {
-	TextureCache& cache = TextureCache::GetChache();	
-	TextureCache::dTreeNode* const node = cache.FindById (textureID);
+	ndTextureCache& cache = ndTextureCache::GetChache();	
+	ndTextureCache::dTreeNode* const node = cache.FindById (textureID);
 	if (node) 
 	{
 		return node->GetInfo().m_textureName.GetStr();
@@ -296,8 +300,8 @@ const char* FindTextureById (GLuint textureID)
 
 GLuint AddTextureRef (GLuint texture)
 {
-	TextureCache& cache = TextureCache::GetChache();	
-	TextureCache::dTreeNode* const node = cache.FindById (texture);
+	ndTextureCache& cache = ndTextureCache::GetChache();	
+	ndTextureCache::dTreeNode* const node = cache.FindById (texture);
 	if (node) 
 	{
 		node->GetInfo().AddRef();

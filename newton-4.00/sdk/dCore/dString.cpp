@@ -13,12 +13,11 @@
 #include "dString.h"
 #include "dMemory.h"
 
-#define D_USE_POOL_BUKECT_ALLOCATOR
+//#define D_USE_POOL_BUKECT_ALLOCATOR
 #define D_STRING_MEM_GRANULARITY		16
 #define D_STRING_MEM_MAX_BUCKET_SIZE	256
 #define D_STRING_MEM_BUCKETS			(D_STRING_MEM_MAX_BUCKET_SIZE / D_STRING_MEM_GRANULARITY)
 #define D_DSTRING_ENTRIES_IN_FREELIST	32
-
 
 class dString::dStringAllocator
 {
@@ -41,6 +40,7 @@ class dString::dStringAllocator
 				:m_freeListDataChunk(nullptr)
 			{
 			}
+
 			~dMemBucket()
 			{
 			}
@@ -104,6 +104,7 @@ class dString::dStringAllocator
 				m_buckects[i].Prefetch ((i + 1)* D_STRING_MEM_GRANULARITY);
 			}
 		}
+
 		~dStringAllocator()
 		{
 			for (dInt32 i = 0; i < dInt32 (sizeof (m_buckects) / sizeof (m_buckects[0])); i ++) 
@@ -147,7 +148,7 @@ class dString::dStringAllocator
 	#else 
 		char* Alloc(dInt32 size)
 		{
-			return (char*) dMemory::Alloc (size);
+			return (char*) dMemory::Malloc (size);
 		}
 
 		void Free(char* const ptr)

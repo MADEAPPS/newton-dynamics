@@ -117,7 +117,6 @@ inline dInt32 dString::Size() const
 	return m_size;
 }
 
-
 inline dInt32 dString::Find (const char* const subString, dInt32 from, dInt32 lenght) const
 {
 	return Find (subString, CalculateSize(subString), from, lenght);
