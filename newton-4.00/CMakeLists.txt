@@ -10,10 +10,11 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
-option("NEWTON_BUILD_TEST" "generate test project" "ON")
-option("NEWTON_BUILD_SANDBOX_DEMOS" "generates demos projects" "OFF")
+option("NEWTON_BUILD_TEST" "generate test project" "OFF")
+option("NEWTON_BUILD_SANDBOX_DEMOS" "generates demos projects" "ON")
 option("NEWTON_BUILD_PROFILER" "build profiler" OFF)
-option("NEWTON_ENABLE_AVX" "enable AVX float instructions" ON)
+option("NEWTON_BUILD_SHARED_LIBS" "build shared library" ON)
+option("NEWTON_ENABLE_AVX" "enable AVX float instructions" OFF)
 option("NEWTON_BUILD_SINGLE_THREADED" "multi threaded" OFF)
 option("NEWTON_DOUBLE_PRECISION" "generate double precision" OFF)
 option("NEWTON_STATIC_RUNTIME_LIBRARIES" "use windows static libraries" OFF)
@@ -22,8 +23,7 @@ option("NEWTON_WITH_AVX_PLUGIN" "adding avx parallel solver (forces shared libs)
 option("NEWTON_WITH_AVX2_PLUGIN" "adding avx2 parallel solver (forces shared libs)" OFF)
 option("NEWTON_WITH_SSE4_PLUGIN" "adding sse4 parallel solver (forces shared libs)" OFF)
 option("NEWTON_WITH_REFERENCE_GPU_PLUGIN" "adding gpu reference solver, gpu solve using avx2" OFF)
-option("NEWTON_BUILD_SHARED_LIBS" "build shared library" OFF)
-option("NEWTON_BUILD_CORE_ONLY" "build the core newton library only" OFF)
+
 
 set(CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo Release)
 set(CMAKE_DEBUG_POSTFIX "_d")
@@ -186,11 +186,6 @@ elseif(MINGW)
 	endif()
 endif()
 
-if(NEWTON_BUILD_SANDBOX_DEMOS STREQUAL "ON")
-  message("NEWTON_BUILD_SANDBOX_DEMOS is ${NEWTON_BUILD_SANDBOX_DEMOS}")
-  message("NEWTON_BUILD_CORE_ONLY is ${NEWTON_BUILD_CORE_ONLY}")
-endif()
-
 #if(NEWTON_WITH_SSE4_PLUGIN OR NEWTON_WITH_AVX_PLUGIN OR NEWTON_WITH_AVX2_PLUGIN)
 # If building any of the plugins, then switch to shared libraries.
 # set(NEWTON_BUILD_SHARED_LIBS ON)
@@ -202,8 +197,10 @@ if(NEWTON_BUILD_PROFILER)
 endif()
 
 add_subdirectory(sdk)
-add_subdirectory(thirdParty)
-add_subdirectory(applications)
+if (NEWTON_BUILD_SANDBOX_DEMOS OR NEWTON_BUILD_TEST)
+	add_subdirectory(thirdParty)
+	add_subdirectory(applications)
+endif()
 
 
 

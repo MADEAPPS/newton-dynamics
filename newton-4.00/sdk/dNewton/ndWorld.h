@@ -75,12 +75,11 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	void ThreadFunction();
 	
 	protected:
-	virtual void UpdateSkeletons();
-	//D_NEWTON_API virtual void UpdateSleepState();
-	virtual void ApplyExternalForces();
-	virtual void UpdatePrelisteners();
-	virtual void UpdatePostlisteners();
-	virtual void UpdateListenersPostTransform();
+	D_NEWTON_API virtual void UpdateSkeletons();
+	D_NEWTON_API virtual void ApplyExternalForces();
+	D_NEWTON_API virtual void UpdatePrelisteners();
+	D_NEWTON_API virtual void UpdatePostlisteners();
+	D_NEWTON_API virtual void UpdateListenersPostTransform();
 
 	private:
 	void SubStepUpdate(dFloat32 timestep);
