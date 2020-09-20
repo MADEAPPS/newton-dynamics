@@ -527,6 +527,10 @@ void ndDemoEntityManager::RemoveEntity (ndDemoEntity* const ent)
 
 void ndDemoEntityManager::Cleanup ()
 {
+m_world = NULL;
+m_cameraManager = new ndDemoCameraManager(this);
+return;
+
 	// is we are run asynchronous we need make sure no update in on flight.
 	if (m_world) 
 	{
