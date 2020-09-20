@@ -20,7 +20,6 @@ cmake_minimum_required(VERSION 3.4.0)
 add_subdirectory(dCore)
 add_subdirectory(dNewton)
 add_subdirectory(dCollision)
-add_subdirectory(thirdParty)
 
 #if(NOT NEWTON_BUILD_CORE_ONLY)
 #	add_subdirectory(dMath)
