@@ -13,7 +13,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 
-#define MAX_PHYSICS_FPS			60.0f
+
 //#define MAX_PHYSICS_SUB_STEPS	2
 
 ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)

@@ -175,30 +175,6 @@ void ndDemoEntity::ResetMatrix(ndDemoEntityManager& scene, const dMatrix& matrix
 	InterpolateMatrix (scene, 0.0f);
 }
 
-void ndDemoEntity::InterpolateMatrixUnsafe(dFloat32 param)
-{
-	dVector p0(m_curPosition);
-	dVector p1(m_nextPosition);
-	dQuaternion r0(m_curRotation);
-	dQuaternion r1(m_nextRotation);
-
-	dVector posit(p0 + (p1 - p0).Scale(param));
-	dQuaternion rotation(r0.Slerp(r1, param));
-	m_matrix = dMatrix(rotation, posit);
-
-	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) {
-		child->InterpolateMatrixUnsafe(param);
-	}
-}
-
-void ndDemoEntity::InterpolateMatrix (ndDemoEntityManager& world, dFloat32 param)
-{
-	// read the data in a critical section to prevent race condition from other thread  
-	world.Lock(m_lock);
-	InterpolateMatrixUnsafe(param);
-	world.Unlock(m_lock);
-}
-
 const dMatrix& ndDemoEntity::GetRenderMatrix () const
 {
 	return m_matrix;
@@ -523,6 +499,30 @@ void ndDemoEntity::SetMatrixUsafe(const dQuaternion& rotation, const dVector& po
 	{
 		m_curRotation.Scale(-1.0f);
 	}
+}
+
+void ndDemoEntity::InterpolateMatrixUnsafe(dFloat32 param)
+{
+	dVector p0(m_curPosition);
+	dVector p1(m_nextPosition);
+	dQuaternion r0(m_curRotation);
+	dQuaternion r1(m_nextRotation);
+
+	dVector posit(p0 + (p1 - p0).Scale(param));
+	dQuaternion rotation(r0.Slerp(r1, param));
+	m_matrix = dMatrix(rotation, posit);
+
+	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
+	{
+		child->InterpolateMatrixUnsafe(param);
+	}
+}
+
+void ndDemoEntity::InterpolateMatrix(ndDemoEntityManager& world, dFloat32 param)
+{
+	// read the data in a critical section to prevent race condition from other thread  
+	dScopeSpinLock lock(m_lock);
+	InterpolateMatrixUnsafe(param);
 }
 
 void ndDemoEntity::SetMatrix(ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position)

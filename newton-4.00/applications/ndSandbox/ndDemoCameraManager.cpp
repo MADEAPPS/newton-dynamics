@@ -13,6 +13,7 @@
 #include "ndDemoCamera.h"
 #include "ndOpenGlUtil.h"
 //#include "PhysicsUtils.h"
+#include "ndDemoEntityManager.h"
 #include "ndDemoCameraManager.h"
 
 #if 0
@@ -208,17 +209,16 @@ void ndDemoCameraManager::RenderPickedTarget () const
 void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene, dFloat32 param)
 {
 	// interpolate the location of all entities in the world
-	dAssert(0);
-/*
+
 	for (ndDemoEntityManager::dListNode* node = scene->GetFirst(); node; node = node->GetNext()) 
 	{
-		DemoEntity* const entity = node->GetInfo();
+		ndDemoEntity* const entity = node->GetInfo();
 		entity->InterpolateMatrix(*scene, param);
 	}
 
 	// interpolate the Camera matrix;
 	m_camera->InterpolateMatrix (*scene, param);
-*/
+
 }
 
 /*

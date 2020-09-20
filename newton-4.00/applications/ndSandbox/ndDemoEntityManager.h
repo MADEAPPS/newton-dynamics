@@ -122,10 +122,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	private:
 	//void RenderUI();
-	dFloat32 CalculateInteplationParam () const;
-	
 	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
-
 	void ToggleProfiler();
 	static void PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep);
 	
@@ -211,6 +208,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	void CalculateFPS();
 	void UpdatePhysics();
+	dFloat32 CalculateInteplationParam() const;
 
 	GLFWwindow* m_mainFrame;
 	ndPhysicsWorld* m_world;

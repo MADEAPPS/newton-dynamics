@@ -505,18 +505,6 @@ void ndDemoEntityManager::OnDestroyContact(const NewtonWorld* const world, Newto
 //	scene->m_contactList.Remove(cooky);
 }
 
-dFloat32 ndDemoEntityManager::CalculateInteplationParam () const
-{
-	dUnsigned64 timeStep = dGetTimeInMicrosenconds () - m_microsecunds;		
-	dFloat32 param = (dFloat32 (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
-	dAssert (param >= 0.0f);
-	if (param > 1.0f) {
-		param = 1.0f;
-	}
-	return param;
-}
-
-
 void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep)
 {
 	ndDemoEntityManager* const scene = (ndDemoEntityManager*) NewtonWorldGetUserData(world);
@@ -744,6 +732,32 @@ void ndDemoEntityManager::RemoveEntity(ndDemoEntity* const ent)
 	dScopeSpinLock lock(m_addDeleteLock);
 	dAssert(ent->m_rootNode);
 	Remove(ent->m_rootNode);
+}
+
+void ndDemoEntityManager::CalculateFPS()
+{
+	m_framesCount++;
+	dUnsigned64 currentTime = dGetTimeInMicrosenconds() - m_microsecunds;
+	const dUnsigned64 deltaTime = dUnsigned64(1000000 / 4);
+	if (currentTime > deltaTime)
+	{
+		dFloat64 num = m_framesCount;
+		dFloat64 den = dFloat64(currentTime) * dFloat32(1.0e-6f);
+		m_fps = dFloat32(num / den);
+		m_framesCount = 0;
+		m_microsecunds += deltaTime;
+	}
+}
+dFloat32 ndDemoEntityManager::CalculateInteplationParam() const
+{
+	dUnsigned64 timeStep = dGetTimeInMicrosenconds() - m_microsecunds;
+	dFloat32 param = (dFloat32(timeStep) * MAX_PHYSICS_FPS) * dFloat32 (1.0e-6f);
+	dAssert(param >= 0.0f);
+	if (param > 1.0f) 
+	{
+		param = 1.0f;
+	}
+	return param;
 }
 
 void ndDemoEntityManager::SetCameraMatrix(const dQuaternion& rotation, const dVector& position)
@@ -998,7 +1012,6 @@ void ndDemoEntityManager::BeginFrame()
 	ImGui::NewFrame();
 }
 
-
 void ndDemoEntityManager::Run()
 {
 	// Main loop
@@ -1022,21 +1035,6 @@ void ndDemoEntityManager::ResetTimer()
 	if (m_world)
 	{
 		m_world->ResetTimer();
-	}
-}
-
-void ndDemoEntityManager::CalculateFPS()
-{
-	m_framesCount++;
-	dUnsigned64 currentTime = dGetTimeInMicrosenconds() - m_microsecunds;
-	const dUnsigned64 deltaTime = dUnsigned64(1000000 / 4);
-	if (currentTime > deltaTime) 
-	{
-		dFloat64 num = m_framesCount;
-		dFloat64 den = dFloat64(currentTime) * dFloat32 (1.0e-6f);
-		m_fps = dFloat32(num / den);
-		m_framesCount = 0;
-		m_microsecunds += deltaTime;
 	}
 }
 
@@ -1495,7 +1493,7 @@ void ndDemoEntityManager::RenderScene()
 
 	D_TRACKTIME();
 	// Get the interpolated location of each body in the scene
-//	m_cameraManager->InterpolateMatrices(this, CalculateInteplationParam());
+	m_cameraManager->InterpolateMatrices(this, CalculateInteplationParam());
 
 	ImGuiIO& io = ImGui::GetIO();
 	int display_w = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
@@ -1559,12 +1557,11 @@ void ndDemoEntityManager::RenderScene()
 
 	// Setup matrix
 	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
+	//glPushMatrix();
+	//glLoadIdentity();
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
-
 
 	// make sure the model view matrix is set to identity before setting world space light sources
 	// update Camera
@@ -1665,6 +1662,6 @@ dFloat32 timestep = 0;
 
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
+	//glMatrixMode(GL_PROJECTION);
+	//glPopMatrix();
 }

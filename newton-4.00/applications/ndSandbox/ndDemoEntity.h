@@ -54,10 +54,7 @@ class ndDemoEntity: public dNodeHierarchy<ndDemoEntity>
 	dMatrix GetCurrentMatrix () const;
 	virtual void SetNextMatrix (ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position);
 
-	void InterpolateMatrixUnsafe(dFloat32 param);
-
 	virtual void ResetMatrix(ndDemoEntityManager& world, const dMatrix& matrix);
-	virtual void InterpolateMatrix (ndDemoEntityManager& world, dFloat32 param);
 	dMatrix CalculateInterpolatedGlobalMatrix (const ndDemoEntity* const root = NULL) const;
 
 	void RenderBone() const;
@@ -86,6 +83,8 @@ class ndDemoEntity: public dNodeHierarchy<ndDemoEntity>
 	void SetMatrixUsafe(const dQuaternion& rotation, const dVector& position);
 	virtual void SetMatrix(ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position);
 
+	void InterpolateMatrixUnsafe(dFloat32 param);
+	virtual void InterpolateMatrix(ndDemoEntityManager& world, dFloat32 param);
 	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
 
 	// interpolated matrix

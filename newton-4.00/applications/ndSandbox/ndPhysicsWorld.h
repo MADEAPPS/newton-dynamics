@@ -12,6 +12,8 @@
 #define __PHYSICS_WORLD_H__
 
 #include "ndSandboxStdafx.h"
+
+#define MAX_PHYSICS_FPS			60.0f
 class ndDemoEntityManager;
 
 class ndPhysicsWorld: public ndWorld
