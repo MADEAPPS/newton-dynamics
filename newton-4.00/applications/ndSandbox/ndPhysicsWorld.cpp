@@ -82,20 +82,22 @@ void ndPhysicsWorld::AdvanceTime()
 		}
 	}
 */
-	bool isSyncUpdate = !m_manager->m_asynchronousPhysicsUpdate;
-	dUnsigned64 time1 = dGetTimeInMicrosenconds();
-	dUnsigned64 currentTime = time1 - m_microsecunds;
-	const dUnsigned64 deltaTime = dUnsigned64(1.0e6f / MAX_PHYSICS_FPS);
-	if (currentTime > deltaTime)
-	{
-		D_TRACKTIME();
-		Update(1.0f / MAX_PHYSICS_FPS);
-		if (isSyncUpdate)
-		{
-			Sync();
-		}
 
-		m_microsecunds += deltaTime;
-		//dTrace (("%f\n", currentTime * 1.0e-3f));
-	}
+	dAssert(0);
+	//bool isSyncUpdate = !m_manager->m_asynchronousPhysicsUpdate;
+	//dUnsigned64 time1 = dGetTimeInMicrosenconds();
+	//dUnsigned64 currentTime = time1 - m_microsecunds;
+	//const dUnsigned64 deltaTime = dUnsigned64(1.0e6f / MAX_PHYSICS_FPS);
+	//if (currentTime > deltaTime)
+	//{
+	//	D_TRACKTIME();
+	//	Update(1.0f / MAX_PHYSICS_FPS);
+	//	if (isSyncUpdate)
+	//	{
+	//		Sync();
+	//	}
+	//
+	//	m_microsecunds += deltaTime;
+	//	//dTrace (("%f\n", currentTime * 1.0e-3f));
+	//}
 }

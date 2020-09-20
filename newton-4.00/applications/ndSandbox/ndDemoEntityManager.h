@@ -11,23 +11,27 @@
 #ifndef __DEMO_MAIN_FRAME_H__
 #define __DEMO_MAIN_FRAME_H__
 
-#include "ndSandboxStdafx.h"
 #include "ndShaderPrograms.h"
 
 struct GLFWwindow;
 struct ImDrawData;
 
-class ndDemoMesh;
+class DemoMesh;
 class ndDemoEntity;
-class ndPhysicsWorld;
-//class ndDemoCamera;
-//class DemoMeshInterface;
+class ndDemoCamera;
+class DemoMeshInterface;
 class ndDemoCameraManager;
+
+class NewtonBody;
+class NewtonWorld;
 
 class ndDemoEntityManager: public dList <ndDemoEntity*>
 {
-#if 0
 	public:
+	typedef void (*LaunchSDKDemoCallback) (ndDemoEntityManager* const scene);
+	typedef void (*RenderGuiHelpCallback) (ndDemoEntityManager* const manager, void* const context);
+	typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, dFloat32 timestep);
+
 	class TransparentMesh
 	{
 		public: 
@@ -47,13 +51,20 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 		const DemoMesh* m_mesh;
 	};
 
-	class TransparentHeap: public dUpHeap <TransparentMesh, dFloat32>
+	//class TransparentHeap: public dUpHeap <TransparentMesh, dFloat32>
+	//{
+	//	public:
+	//	TransparentHeap()
+	//		:dUpHeap <TransparentMesh, dFloat32>(2048)
+	//	{
+	//	}
+	//};
+
+	class SDKDemos
 	{
 		public:
-		TransparentHeap()
-			:dUpHeap <TransparentMesh, dFloat32>(2048)
-		{
-		}
+		const char *m_name;
+		LaunchSDKDemoCallback m_launchDemoCallback;
 	};
 
 	class ButtonKey
@@ -70,11 +81,14 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 		bool m_memory1;
 	};
 
-	class EntityDictionary: public dTree<DemoEntity*, dScene::dTreeNode*>
-	{
-	};
+	//class EntityDictionary: public dTree<ndDemoEntity*, dScene::dTreeNode*>
+	//{
+	//};
 
-	
+	ndDemoEntityManager ();
+	~ndDemoEntityManager ();
+
+	void Run();
 
 	void Lock(unsigned& atomicLock);
 	void Unlock(unsigned& atomicLock);
@@ -83,13 +97,18 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	int GetHeight() const;
 
 	NewtonWorld* GetNewton() const;
+	void CreateSkyBox();
 
+	void ResetTimer();
 	void LoadScene (const char* const name);
+	void RemoveEntity (ndDemoEntity* const ent);
+	void RemoveEntity (dListNode* const entNode);
 
 	void ImportPLYfile (const char* const name);
 
-	DemoCamera* GetCamera() const;
+	ndDemoCamera* GetCamera() const;
 	bool GetMousePosition (int& posX, int& posY) const;
+	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
 
 	void PushTransparentMesh (const DemoMeshInterface* const mesh); 
 	void SetUpdateCameraFunction(UpdateCameraCallback callback, void* const context);
@@ -106,11 +125,10 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	static void SerializeFile (void* const serializeHandle, const void* const buffer, int size);
 	static void DeserializeFile (void* const serializeHandle, void* const buffer, int size);
-	static void BodySerialization (NewtonBody* const body, void* const userData, NewtonSerializeCallback serializecallback, void* const serializeHandle);
-	static void BodyDeserialization (NewtonBody* const body, void* const userData, NewtonDeserializeCallback serializecallback, void* const serializeHandle);
-
-	static void OnCreateContact(const NewtonWorld* const world, NewtonJoint* const contact);
-	static void OnDestroyContact(const NewtonWorld* const world, NewtonJoint* const contact);
+	//static void BodySerialization (NewtonBody* const body, void* const userData, NewtonSerializeCallback serializecallback, void* const serializeHandle);
+	//static void BodyDeserialization (NewtonBody* const body, void* const userData, NewtonDeserializeCallback serializecallback, void* const serializeHandle);
+	//static void OnCreateContact(const NewtonWorld* const world, NewtonJoint* const contact);
+	//static void OnDestroyContact(const NewtonWorld* const world, NewtonJoint* const contact);
 
 	bool GetCaptured () const;
 	bool GetMouseKeyState (int button ) const;
@@ -118,132 +136,104 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	int GetDebugDisplay() const;
 	void SetDebugDisplay(int mode) const;
 
+	const ndShaderPrograms& GetShaderCache() const;  
+
 	private:
+	void BeginFrame();
+	void RenderStats();
+	void LoadFont();
+	void Cleanup();
+
 	//void RenderUI();
-	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
+	void RenderScene();
+	
+	void UpdatePhysics(dFloat32 timestep);
+	dFloat32 CalculateInteplationParam () const;
+
+	void CalculateFPS(dFloat32 timestep);
+	
+	void ShowMainMenuBar();
+	//void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
+
 	void ToggleProfiler();
+
+	static void RenderDrawListsCallback(ImDrawData* const draw_data);
+
+	static void CharCallback(GLFWwindow* window, unsigned int ch);
+	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);
+	static void CursorposCallback  (GLFWwindow* const window, double x, double y);
+	static void MouseScrollCallback (GLFWwindow* const window, double x, double y);
+	static void MouseButtonCallback(GLFWwindow* const window, int button, int action, int mods);
+	static void ErrorCallback(int error, const char* const description);
 	static void PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep);
+
+	void ApplyMenuOptions();
+	void LoadDemo(int menu);
 	
-	TransparentHeap m_tranparentHeap;
-	
+	GLFWwindow* m_mainFrame;
+	int	m_defaultFont;
+	bool m_mousePressed[3];
+
+	ndDemoEntity* m_sky;
+	NewtonWorld* m_world;
+	ndDemoCameraManager* m_cameraManager;
+	ndShaderPrograms m_shadeCache;
+	void* m_renderUIContext;
+	void* m_updateCameraContext;
+	RenderGuiHelpCallback m_renderDemoGUI;
+	RenderGuiHelpCallback m_renderHelpMenus;
+	UpdateCameraCallback m_updateCamera;
+
+	dUnsigned64 m_microsecunds;
+	//TransparentHeap m_tranparentHeap;
+
+	int m_currentScene;
+	int m_lastCurrentScene;
+	int m_framesCount;
 	int m_physicsFramesCount;
 	int m_currentPlugin;
-	
+	dFloat32 m_fps;
+	dFloat32 m_timestepAcc;
 	dFloat32 m_currentListenerTimestep;
-	
+	dFloat32 m_mainThreadPhysicsTime;
 	dFloat32 m_mainThreadPhysicsTimeAcc;
 
+	int m_solverPasses;
+	int m_solverSubSteps;
 	int m_broadPhaseType;
+	int m_workerThreads;
 	int m_debugDisplayMode;
 	int m_collisionDisplayMode;
 	
-	bool m_showNormalForces;
-	bool m_showCenterOfMass;
-	bool m_showBodyFrame;
-	bool m_showContactPoints;
-	bool m_showJointDebugInfo;
-	bool m_showListenersDebugInfo;
-	bool m_showCollidingFaces;
-	bool m_solveLargeIslandInParallel;
-	bool m_showRaycastHit;
-
-	unsigned m_profilerMode;
-	unsigned m_contactLock;
-	dList<NewtonJoint*> m_contactList;
-	friend class DemoEntityListener;
-	friend class DemoListenerManager;
-#endif
-	public:
-	ndDemoEntityManager();
-	~ndDemoEntityManager();
-
-	void Run();
-
-	void CreateSkyBox();
-	const ndShaderPrograms& GetShaderCache() const;
-
-	void AddEntity(ndDemoEntity* const ent);
-	void RemoveEntity(ndDemoEntity* const ent);
-
-	void SetCameraMatrix(const dQuaternion& rotation, const dVector& position);
-
-	private:
-	typedef void(*LaunchSDKDemoCallback) (ndDemoEntityManager* const scene);
-	typedef void(*RenderGuiHelpCallback) (ndDemoEntityManager* const manager, void* const context);
-	typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, dFloat32 timestep);
-
-	class SDKDemos
-	{
-		public:
-		const char* m_description;
-		LaunchSDKDemoCallback m_launchDemoCallback;
-	};
-
-	static void RenderDrawListsCallback(ImDrawData* const draw_data);
-	static void ErrorCallback(int error, const char* const description);
-	static void CharCallback(GLFWwindow* window, unsigned int ch);
-	static void KeyCallback(GLFWwindow* const window, int key, int, int action, int mods);
-	static void CursorposCallback(GLFWwindow* const window, double x, double y);
-	static void MouseScrollCallback(GLFWwindow* const window, double x, double y);
-	static void MouseButtonCallback(GLFWwindow* const window, int button, int action, int mods);
-
-	void Cleanup();
-	void LoadFont();
-	void ResetTimer();
-	void BeginFrame();
-	void RenderScene();
-	void RenderStats();
-
-	void LoadDemo(int menu);
-	void ShowMainMenuBar();
-	void ApplyMenuOptions();
-
-	void CalculateFPS();
-	void UpdatePhysics();
-	dFloat32 CalculateInteplationParam() const;
-
-	GLFWwindow* m_mainFrame;
-	ndPhysicsWorld* m_world;
-	ndDemoCameraManager* m_cameraManager;
-	ndDemoEntity* m_sky;
-	ndShaderPrograms m_shadeCache;
-
-	dFloat32 m_fps;
-	dUnsigned64 m_microsecunds;
-
-	dSpinLock m_addDeleteLock;
-
-	int	m_defaultFont;
-	int m_framesCount;
-	int m_currentScene;
-	int m_solverPasses;
-	int m_workerThreads;
-	int m_solverSubSteps;
-	int m_lastCurrentScene;
-
 	bool m_showUI;
 	bool m_showAABB;
 	bool m_showStats;
 	bool m_hasJoytick;
 	bool m_autoSleepMode;
 	bool m_hideVisualMeshes;
+	bool m_showNormalForces;
+	bool m_showCenterOfMass;
+	bool m_showBodyFrame;
 	bool m_updateMenuOptions;
+	bool m_showContactPoints;
+	bool m_showJointDebugInfo;
+	bool m_showListenersDebugInfo;
+	bool m_showCollidingFaces;
 	bool m_suspendPhysicsUpdate;
 	bool m_asynchronousPhysicsUpdate;
-	bool m_mousePressed[3];
+	bool m_solveLargeIslandInParallel;
+	bool m_showRaycastHit;
 
-	void* m_renderUIContext;
-	void* m_updateCameraContext;
-	UpdateCameraCallback m_updateCamera;
-	RenderGuiHelpCallback m_renderDemoGUI;
-	RenderGuiHelpCallback m_renderHelpMenus;
+	unsigned m_profilerMode;
+	unsigned m_contactLock;
+	unsigned m_deleteLock;
+//	dList<NewtonJoint*> m_contactList;
 
 	static SDKDemos m_demosSelection[];
-
-	friend class ndPhysicsWorld;
+	friend class ndDemoEntityListener;
+	friend class DemoListenerManager;
 };
 
-#if 0
 inline NewtonWorld* ndDemoEntityManager::GetNewton() const
 {
 	return m_world;
@@ -253,14 +243,15 @@ inline NewtonWorld* ndDemoEntityManager::GetNewton() const
 // this confuses many user int thinking it is more complex than it really is  
 inline void ndDemoEntityManager::Lock(unsigned& atomicLock)
 {
-	while (NewtonAtomicSwap((int*)&atomicLock, 1)) {
-		NewtonYield();
-	}
+	//while (NewtonAtomicSwap((int*)&atomicLock, 1)) 
+	//{
+	//	NewtonYield();
+	//}
 }
 
 inline void ndDemoEntityManager::Unlock(unsigned& atomicLock)
 {
-	NewtonAtomicSwap((int*)&atomicLock, 0);
+//	NewtonAtomicSwap((int*)&atomicLock, 0);
 }
 
 inline int ndDemoEntityManager::GetWidth() const 
@@ -285,12 +276,10 @@ inline void ndDemoEntityManager::SetDebugDisplay(int mode) const
 {
 	dAssert (0);
 }
-#endif
 
 inline const ndShaderPrograms& ndDemoEntityManager::GetShaderCache() const
 {
 	return m_shadeCache;
 }
-
 
 #endif
