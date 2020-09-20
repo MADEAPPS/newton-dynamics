@@ -520,46 +520,6 @@ void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFl
 
 ndDemoEntityManager::ndDemoEntityManager()
 	:dList <ndDemoEntity*>()
-	//, m_defaultFont(0)
-	//, m_world(nullptr)
-	//, m_cameraManager(nullptr)
-	//, m_renderUIContext(nullptr)
-	//, m_updateCameraContext(nullptr)
-	//, m_renderDemoGUI(nullptr)
-	//, m_renderHelpMenus(nullptr)
-	//, m_updateCamera(nullptr)
-	//, m_microsecunds(0)
-	//, m_tranparentHeap()
-	//, m_currentScene(DEFAULT_SCENE)
-	//, m_lastCurrentScene(DEFAULT_SCENE)
-	//, m_framesCount(0)
-	//, m_physicsFramesCount(0)
-	//, m_currentPlugin(0)
-	//, m_fps(0.0f)
-	//, m_timestepAcc(0.0f)
-	//, m_currentListenerTimestep(0.0f)
-	//, m_mainThreadPhysicsTime(0.0f)
-	//, m_mainThreadPhysicsTimeAcc(0.0f)
-	//, m_broadPhaseType(0)
-	//, m_debugDisplayMode(0)
-	//, m_collisionDisplayMode(0)
-	//, m_showUI(true)
-	//, m_showAABB(false)
-	//, m_showStats(true)
-	//, m_autoSleepMode(true)
-	//, m_showNormalForces(false)
-	//, m_showCenterOfMass(false)
-	//, m_showBodyFrame(false)
-	//, m_showContactPoints(false)
-	//, m_showJointDebugInfo(false)
-	//, m_showListenersDebugInfo(false)
-	//, m_showCollidingFaces(false)
-	//, m_solveLargeIslandInParallel(true)
-	//, m_showRaycastHit(false)
-	//, m_profilerMode(0)
-	//, m_contactLock(0)
-	//, m_deleteLock(0)
-	//, m_contactList()
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -656,30 +616,17 @@ ndDemoEntityManager::ndDemoEntityManager()
 	m_lastCurrentScene = DEFAULT_SCENE;
 
 	m_fps = 0.0f;
-//	dUnsigned64 m_microsecunds;
 	m_framesCount = 0;
-	m_renderDemoGUI = nullptr;
-
-	// initialized the physics world for the new scene
-	//	m_showUI = false;
-	//	m_showAABB = false;
-	//	m_hideVisualMeshes = true;
-	//	m_autoSleepMode = false;
-	//	m_broadPhaseType = 1;
-	//	m_solverPasses = 4;
-	//	m_workerThreads = 4;
-	//	m_solverSubSteps = 2;
-	//	m_showRaycastHit = true;
-	//	m_showCenterOfMass = false;
-	//	m_showNormalForces = true;
-	//	m_showContactPoints = true;
-	//	m_showJointDebugInfo = true;
-	//	m_collisionDisplayMode = 2;
-	//	m_showListenersDebugInfo = true;
 
 	m_sky = nullptr;
 	m_world = nullptr;
+	m_updateCamera = nullptr;
 	m_cameraManager = nullptr;
+	m_renderDemoGUI = nullptr;
+	m_renderUIContext = nullptr;
+	m_renderHelpMenus = nullptr;
+	m_updateCameraContext = nullptr;
+
 	Cleanup();
 	ResetTimer();
 
@@ -944,8 +891,7 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 
 	if (window->m_renderDemoGUI) 
 	{
-		dAssert(0);
-	//	window->m_renderDemoGUI(window, window->m_renderUIContext);
+		window->m_renderDemoGUI(window, window->m_renderUIContext);
 	}
 
 	glEnableClientState(GL_VERTEX_ARRAY);
@@ -1075,13 +1021,13 @@ return;
 
 void ndDemoEntityManager::LoadDemo(int menu)
 {
-	char newTitle[256];
-	Cleanup();
+//	char newTitle[256];
+//	Cleanup();
 	m_demosSelection[menu].m_launchDemoCallback(this);
-	sprintf(newTitle, "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_description);
-	glfwSetWindowTitle(m_mainFrame, newTitle);
-	ApplyMenuOptions();
-	ResetTimer();
+//	sprintf(newTitle, "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_description);
+//	glfwSetWindowTitle(m_mainFrame, newTitle);
+//	ApplyMenuOptions();
+//	ResetTimer();
 }
 
 void ndDemoEntityManager::ShowMainMenuBar()
@@ -1473,8 +1419,8 @@ return;
 
 	// we start without 2d render
 	m_renderDemoGUI = nullptr;
-	//m_renderHelpMenus = nullptr;
-	//m_renderUIContext = nullptr;
+	m_renderHelpMenus = nullptr;
+	m_renderUIContext = nullptr;
 }
 
 void ndDemoEntityManager::UpdatePhysics()

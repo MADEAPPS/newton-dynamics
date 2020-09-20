@@ -25,9 +25,9 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	m_textures[4] = LoadTexture("NewtonSky0005.tga");
 	m_textures[5] = LoadTexture("NewtonSky0006.tga");
 
-	glNewList(m_displayList, GL_COMPILE);
-	DrawMesh ();
-	glEndList();
+	//glNewList(m_displayList, GL_COMPILE);
+	//DrawMesh ();
+	//glEndList();
 }
 
 ndSkyBox::~ndSkyBox()
@@ -46,8 +46,8 @@ void ndSkyBox::DrawMesh () const
 {
 	dVector size (200.0f);
 
-	glUseProgram(m_shader);
-	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
+	//glUseProgram(m_shader);
+	//glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
 
 	glColor3f(1.0f, 1.0f, 1.0f);
 
@@ -115,7 +115,7 @@ void ndSkyBox::DrawMesh () const
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 
-	glUseProgram(0);
+	//glUseProgram(0);
 }
 
 void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix__) const

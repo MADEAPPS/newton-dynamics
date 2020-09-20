@@ -28,8 +28,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 {
 #if 0
 	public:
-	typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, dFloat32 timestep);
-
 	class TransparentMesh
 	{
 		public: 
@@ -126,13 +124,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	void ToggleProfiler();
 	static void PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep);
 	
-	void* m_renderUIContext;
-	void* m_updateCameraContext;
-	
-	RenderGuiHelpCallback m_renderHelpMenus;
-	UpdateCameraCallback m_updateCamera;
-
-	
 	TransparentHeap m_tranparentHeap;
 	
 	int m_physicsFramesCount;
@@ -177,8 +168,9 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	void SetCameraMatrix(const dQuaternion& rotation, const dVector& position);
 
 	private:
-	typedef void(*RenderGuiHelpCallback) (ndDemoEntityManager* const manager, void* const context);
 	typedef void(*LaunchSDKDemoCallback) (ndDemoEntityManager* const scene);
+	typedef void(*RenderGuiHelpCallback) (ndDemoEntityManager* const manager, void* const context);
+	typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, dFloat32 timestep);
 
 	class SDKDemos
 	{
@@ -239,7 +231,12 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool m_suspendPhysicsUpdate;
 	bool m_asynchronousPhysicsUpdate;
 	bool m_mousePressed[3];
+
+	void* m_renderUIContext;
+	void* m_updateCameraContext;
+	UpdateCameraCallback m_updateCamera;
 	RenderGuiHelpCallback m_renderDemoGUI;
+	RenderGuiHelpCallback m_renderHelpMenus;
 
 	static SDKDemos m_demosSelection[];
 
