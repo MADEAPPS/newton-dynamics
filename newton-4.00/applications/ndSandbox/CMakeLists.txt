@@ -78,4 +78,4 @@ if(WIN32)
 endif()
 
 install(DIRECTORY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications")
-install(TARGETS ${projectName} DESTINATION "${PROJECT_BINARY_DIR}/applications")
+#install(TARGETS ${projectName} DESTINATION "${PROJECT_BINARY_DIR}/applications")
