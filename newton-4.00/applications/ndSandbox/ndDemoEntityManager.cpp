@@ -1521,9 +1521,7 @@ dFloat32 timestep = 0;
 	{
 		if (m_sky) 
 		{
-			glPushMatrix();
 			m_sky->Render(timestep, this, globalMatrix);
-			glPopMatrix();
 		}
 	}
 	else 
@@ -1531,9 +1529,7 @@ dFloat32 timestep = 0;
 		for (dListNode* node = GetFirst(); node; node = node->GetNext()) 
 		{
 			ndDemoEntity* const entity = node->GetInfo();
-			glPushMatrix();
 			entity->Render(timestep, this, globalMatrix);
-			glPopMatrix();
 		}
 	}
 
@@ -1606,8 +1602,5 @@ dFloat32 timestep = 0;
 	}
 #endif
 
-	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();
-	//glMatrixMode(GL_PROJECTION);
-	//glPopMatrix();
 }
