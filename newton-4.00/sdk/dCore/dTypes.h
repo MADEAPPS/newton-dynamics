@@ -479,7 +479,7 @@ D_CORE_API dUnsigned64 dGetTimeInMicrosenconds();
 			return m_val;
 		}
 
-		void load(T val)
+		void store(T val)
 		{
 			m_val = val;
 		}
@@ -494,6 +494,12 @@ D_CORE_API dUnsigned64 dGetTimeInMicrosenconds();
 		{
 			m_val += val;
 			return m_val - val;
+		}
+
+		T fetch_sub(T val)
+		{
+			m_val -= val;
+			return m_val + val;
 		}
 
 		private:
