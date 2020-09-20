@@ -1042,6 +1042,7 @@ void ndDemoEntityManager::CalculateFPS()
 
 void ndDemoEntityManager::ApplyMenuOptions()
 {
+return;
 	m_world->Sync();
 	// clean up all caches the engine have saved
 	////NewtonInvalidateCache(m_world);
@@ -1337,7 +1338,7 @@ void ndDemoEntityManager::RenderStats()
 			sprintf(text, "fps:           %6.3f", m_fps);
 			ImGui::Text(text, "");
 
-			sprintf(text, "physics time: %6.3f ms", m_world->GetUpdateTime());
+			//sprintf(text, "physics time: %6.3f ms", m_world->GetUpdateTime());
 			ImGui::Text(text, "");
 
 			sprintf(text, "memory used:  %6.3f mbytes", dFloat32 (dFloat64 (dMemory::GetMemoryUsed()) / (1024 * 1024)));
@@ -1387,6 +1388,9 @@ void ndDemoEntityManager::RenderStats()
 
 void ndDemoEntityManager::Cleanup()
 {
+//m_world = new ndPhysicsWorld(this);
+m_cameraManager = new ndDemoCameraManager(this);
+return;
 	// is we are run asynchronous we need make sure no update in on flight.
 	if (m_world) 
 	{
@@ -1487,7 +1491,7 @@ void ndDemoEntityManager::UpdatePhysics()
 void ndDemoEntityManager::RenderScene()
 {
 	CalculateFPS();
-	UpdatePhysics();
+//	UpdatePhysics();
 
 	D_TRACKTIME();
 	// Get the interpolated location of each body in the scene
