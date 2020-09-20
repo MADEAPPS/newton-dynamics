@@ -1633,9 +1633,8 @@ void ndScene::FindCollidingPairs()
 			}
 		}
 	};
-
 	
-	m_fullScan = (3 * m_sleepBodies) < (2 * dUnsigned32(m_tmpBodyArray.GetCount()));
+	m_fullScan = (3 * m_sleepBodies.load()) < (2 * dUnsigned32(m_tmpBodyArray.GetCount()));
 	if (m_fullScan)
 	{
 		SubmitJobs<ndFindCollidindPairsFullScan>();
