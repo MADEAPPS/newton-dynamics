@@ -67,7 +67,7 @@ ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const scene)
 
 ndDemoCameraManager::~ndDemoCameraManager()
 {
-	dAssert(0);
+	//dAssert(0);
 	//if (m_targetPicked) {
 	//	ResetPickBody();
 	//}
