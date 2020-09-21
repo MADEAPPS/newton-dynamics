@@ -1560,6 +1560,7 @@ void ndDemoEntityManager::RenderScene()
 	glPopMatrix();
 }
 
+#if 1
 void ndDemoEntityManager::Run()
 {
     // Main loop
@@ -1575,3 +1576,122 @@ void ndDemoEntityManager::Run()
 		glfwSwapBuffers(m_mainFrame);
     }
 }
+
+#else
+
+void ndDemoEntityManager::Run()
+{
+	// Main loop
+	CreateSkyBox();
+	while (!glfwWindowShouldClose(m_mainFrame))
+	{
+		m_suspendPhysicsUpdate = false;
+		glfwPollEvents();
+		//BeginFrame();
+
+		D_TRACKTIME();
+
+		ImVec4 clearColor = ImColor(114, 144, 154);
+		glClearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_TRANSFORM_BIT);
+
+		// Setup matrix
+		glMatrixMode(GL_PROJECTION);
+		glPushMatrix();
+		glLoadIdentity();
+		//glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
+		glMatrixMode(GL_MODELVIEW);
+		glPushMatrix();
+		glLoadIdentity();
+
+
+		glViewport(0, 0, 1280, 768);
+		glScissor(0, 0, 1280, 768);
+		glEnable(GL_SCISSOR_TEST);
+
+		// Rendering
+		// Our shading model--Goraud (smooth).
+		glShadeModel(GL_SMOOTH);
+
+		// Culling.
+		glCullFace(GL_BACK);
+		glFrontFace(GL_CCW);
+		glEnable(GL_CULL_FACE);
+
+		//   glEnable(GL_DITHER);
+		// z buffer test
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LESS);
+		//glDepthMask(GL_TRUE);
+
+		// make sure the model view matrix is set to identity before setting world space light sources
+		// update Camera
+		m_cameraManager->GetCamera()->SetViewMatrix(1280, 768);
+
+		glClearDepth(1.0);
+		glEnable(GL_DEPTH_TEST);
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		glDepthFunc(GL_LESS);
+		glEnable(GL_CULL_FACE);
+
+		dMatrix globalMatrix(dGetIdentityMatrix());
+		m_sky->Render(0, this, globalMatrix);
+
+		//glMatrixMode(GL_MODELVIEW);
+		//glLoadIdentity();
+		//
+		//glTranslatef(1.5f, 0.0f, -7.0f);
+		//
+		//glBegin(GL_QUADS);
+		//
+		//
+		//glColor3f(0.0f, 1.0f, 0.0f);
+		//glVertex3f(1.0f, 1.0f, -1.0f);
+		//glVertex3f(-1.0f, 1.0f, -1.0f);
+		//glVertex3f(-1.0f, 1.0f, 1.0f);
+		//glVertex3f(1.0f, 1.0f, 1.0f);
+		//
+		//// Bottom face (y = -1.0f)
+		//glColor3f(1.0f, 0.5f, 0.0f);
+		//glVertex3f(1.0f, -1.0f, 1.0f);
+		//glVertex3f(-1.0f, -1.0f, 1.0f);
+		//glVertex3f(-1.0f, -1.0f, -1.0f);
+		//glVertex3f(1.0f, -1.0f, -1.0f);
+		//
+		//// Front face  (z = 1.0f)
+		//glColor3f(1.0f, 0.0f, 0.0f);
+		//glVertex3f(1.0f, 1.0f, 1.0f);
+		//glVertex3f(-1.0f, 1.0f, 1.0f);
+		//glVertex3f(-1.0f, -1.0f, 1.0f);
+		//glVertex3f(1.0f, -1.0f, 1.0f);
+		//
+		//// Back face (z = -1.0f)
+		//glColor3f(1.0f, 1.0f, 0.0f);
+		//glVertex3f(1.0f, -1.0f, -1.0f);
+		//glVertex3f(-1.0f, -1.0f, -1.0f);
+		//glVertex3f(-1.0f, 1.0f, -1.0f);
+		//glVertex3f(1.0f, 1.0f, -1.0f);
+		//
+		//// Left face (x = -1.0f)
+		//glColor3f(0.0f, 0.0f, 1.0f);
+		//glVertex3f(-1.0f, 1.0f, 1.0f);
+		//glVertex3f(-1.0f, 1.0f, -1.0f);
+		//glVertex3f(-1.0f, -1.0f, -1.0f);
+		//glVertex3f(-1.0f, -1.0f, 1.0f);
+		//
+		//// Right face (x = 1.0f)
+		//glColor3f(1.0f, 0.0f, 1.0f);
+		//glVertex3f(1.0f, 1.0f, -1.0f);
+		//glVertex3f(1.0f, 1.0f, 1.0f);
+		//glVertex3f(1.0f, -1.0f, 1.0f);
+		//glVertex3f(1.0f, -1.0f, -1.0f);
+		//glEnd();
+
+
+		glfwSwapBuffers(m_mainFrame);
+	}
+}
+
+#endif
+

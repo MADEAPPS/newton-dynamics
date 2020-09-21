@@ -26,7 +26,7 @@
 ndSkyBox::ndSkyBox(GLuint shader)
 	:ndDemoEntity (dGetIdentityMatrix(), NULL)
 	,m_shader(shader)
-	,m_displayList (glGenLists(1))
+	,m_displayList(0)
 {
 	m_textures[0] = LoadTexture("NewtonSky0001.tga");
 	m_textures[1] = LoadTexture("NewtonSky0002.tga");
@@ -35,17 +35,20 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	m_textures[4] = LoadTexture("NewtonSky0005.tga");
 	m_textures[5] = LoadTexture("NewtonSky0006.tga");
 
-	glNewList(m_displayList, GL_COMPILE);
-	DrawMesh ();
-	glEndList();
+	//m_displayList = glGenLists(1);
+	//glNewList(m_displayList, GL_COMPILE);
+	//DrawMesh ();
+	//glEndList();
 }
 
 ndSkyBox::~ndSkyBox()
 {
-	if (m_displayList) {
+	if (m_displayList) 
+	{
 		glDeleteLists (m_displayList, 1);
 	}
-	for (int i = 0; i < int(sizeof (m_textures) / sizeof (m_textures[0])); i++) {
+	for (int i = 0; i < int(sizeof (m_textures) / sizeof (m_textures[0])); i++) 
+	{
 		ReleaseTexture(m_textures[i]);
 	}
 }
@@ -54,6 +57,7 @@ void ndSkyBox::DrawMesh () const
 {
 	dVector size (200.0f);
 
+/*
 	glUseProgram(m_shader);
 	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
 
@@ -125,6 +129,59 @@ glFrontFace(GL_CW);
 	glEnable(GL_LIGHTING);
 
 	glUseProgram(0);
+*/
+
+glMatrixMode(GL_MODELVIEW);
+glLoadIdentity();
+
+glTranslatef(1.5f, 0.0f, -7.0f);
+
+glBegin(GL_QUADS);
+
+
+//// Front face  (z = 1.0f)
+glColor3f(1.0f, 0.0f, 0.0f);
+glVertex3f(1.0f, 1.0f, 1.0f);
+glVertex3f(-1.0f, 1.0f, 1.0f);
+glVertex3f(-1.0f, -1.0f, 1.0f);
+glVertex3f(1.0f, -1.0f, 1.0f);
+
+//glColor3f(0.0f, 1.0f, 0.0f);
+//glVertex3f(1.0f, 1.0f, -1.0f);
+//glVertex3f(-1.0f, 1.0f, -1.0f);
+//glVertex3f(-1.0f, 1.0f, 1.0f);
+//glVertex3f(1.0f, 1.0f, 1.0f);
+
+//// Bottom face (y = -1.0f)
+//glColor3f(1.0f, 0.5f, 0.0f);
+//glVertex3f(1.0f, -1.0f, 1.0f);
+//glVertex3f(-1.0f, -1.0f, 1.0f);
+//glVertex3f(-1.0f, -1.0f, -1.0f);
+//glVertex3f(1.0f, -1.0f, -1.0f);
+
+
+//// Back face (z = -1.0f)
+//glColor3f(1.0f, 1.0f, 0.0f);
+//glVertex3f(1.0f, -1.0f, -1.0f);
+//glVertex3f(-1.0f, -1.0f, -1.0f);
+//glVertex3f(-1.0f, 1.0f, -1.0f);
+//glVertex3f(1.0f, 1.0f, -1.0f);
+//
+//// Left face (x = -1.0f)
+//glColor3f(0.0f, 0.0f, 1.0f);
+//glVertex3f(-1.0f, 1.0f, 1.0f);
+//glVertex3f(-1.0f, 1.0f, -1.0f);
+//glVertex3f(-1.0f, -1.0f, -1.0f);
+//glVertex3f(-1.0f, -1.0f, 1.0f);
+//
+//// Right face (x = 1.0f)
+//glColor3f(1.0f, 0.0f, 1.0f);
+//glVertex3f(1.0f, 1.0f, -1.0f);
+//glVertex3f(1.0f, 1.0f, 1.0f);
+//glVertex3f(1.0f, -1.0f, 1.0f);
+//glVertex3f(1.0f, -1.0f, -1.0f);
+glEnd();
+
 }
 
 void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix__) const
@@ -141,9 +198,12 @@ skyMatrix.m_posit = matrix.UntransformVector(dVector(0.0f, 0.25f, -800.0f, 1.0f)
 	glPushMatrix();
 	glMultMatrix(&skyMatrix[0][0]);
 
-	if (m_displayList) {
+	if (m_displayList) 
+	{
 		glCallList(m_displayList);
-	} else {
+	} 
+	else 
+	{
 		DrawMesh();
 	}
 
