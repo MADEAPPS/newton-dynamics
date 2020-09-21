@@ -22,7 +22,7 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-
+/*
 class ndDemoCameraPickBodyJoint: public dCustomKinematicController
 {
 	public:
@@ -41,6 +41,7 @@ class ndDemoCameraPickBodyJoint: public dCustomKinematicController
 		
 	ndDemoCameraManager* m_manager;
 };
+*/
 
 ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const scene)
 	:m_camera (new ndDemoCamera())
@@ -58,9 +59,9 @@ ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const scene)
 	,m_pickedBodyTargetPosition(0.0f)
 	,m_pickedBodyLocalAtachmentPoint(0.0f)
 	,m_pickedBodyLocalAtachmentNormal(0.0f)
-	,m_targetPicked(NULL)
+	//,m_targetPicked(NULL)
 	,m_pickJoint(NULL)
-	,m_bodyDestructor(NULL)
+	//,m_bodyDestructor(NULL)
 {
 }
 
@@ -82,6 +83,7 @@ void ndDemoCameraManager::SetCameraMatrix(ndDemoEntityManager* const scene, cons
 	m_pitch = m_camera->GetPichAngle();
 }
 
+/*
 void ndDemoCameraManager::FixUpdate (const NewtonWorld* const world, dFloat32 timestep)
 {
 	// update the camera;
@@ -187,7 +189,7 @@ void ndDemoCameraManager::FixUpdate (const NewtonWorld* const world, dFloat32 ti
 
 	UpdatePickBody(scene, mouseState, p0, p1, timestep);
 }
-
+*/
 
 void ndDemoCameraManager::SetCameraMouseLock (bool loockState)
 {
@@ -196,6 +198,7 @@ void ndDemoCameraManager::SetCameraMouseLock (bool loockState)
 
 void ndDemoCameraManager::RenderPickedTarget () const
 {
+/*
 	if (m_targetPicked) {
 		dMatrix matrix;
 		NewtonBodyGetMatrix(m_targetPicked, &matrix[0][0]);
@@ -204,6 +207,7 @@ void ndDemoCameraManager::RenderPickedTarget () const
 		dVector p1 (p0 + matrix.RotateVector (m_pickedBodyLocalAtachmentNormal.Scale (0.5f)));
 		ShowMousePicking (p0, p1);
 	}
+*/
 }
 
 void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene, dFloat32 param)
@@ -221,19 +225,21 @@ void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene,
 	m_camera->InterpolateMatrix (*scene, param);
 }
 
+/*
 void ndDemoCameraManager::OnBodyDestroy (NewtonBody* const body)
 {
 	// remove the references pointer because the body is going to be destroyed
 	m_targetPicked = NULL;
 	m_bodyDestructor = NULL;
 }
+*/
 
 void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool mousePickState, const dVector& p0, const dVector& p1, dFloat32 timestep) 
 {
+/*
 	// handle pick body from the screen
 	if (!m_targetPicked) {
 		dAssert(0);
-/*
 		if (!m_prevMouseState && mousePickState) {
 			dFloat32 param;
 			dVector posit;
@@ -272,7 +278,6 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 				m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
 			}
 		}
-*/
 	} else {
 		if (mousePickState) {
 			m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);
@@ -290,10 +295,12 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 	}
 
 	m_prevMouseState = mousePickState;
+*/
 }
 
 void ndDemoCameraManager::ResetPickBody()
 {
+/*
 	if (m_targetPicked) {
 		NewtonBodySetSleepState(m_targetPicked, 0);
 	}
@@ -303,4 +310,5 @@ void ndDemoCameraManager::ResetPickBody()
 	m_pickJoint = NULL;
 	m_targetPicked = NULL;
 	m_bodyDestructor = NULL;
+*/
 }

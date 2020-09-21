@@ -17,7 +17,7 @@
 #include <dVector.h>
 #include <dMatrix.h>
 
-
+#if 0
 enum DEBUG_DRAW_MODE
 {
 	m_lines,
@@ -134,5 +134,6 @@ void DebugDrawCollision (const NewtonCollision* const collision, const dMatrix& 
 
 void ClearDebugDisplay(NewtonWorld* const world);
 void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const NewtonBody* const body, int faceID, int vertexCount, const dFloat32* const vertex, int vertexstrideInBytes);
+#endif
 
 #endif

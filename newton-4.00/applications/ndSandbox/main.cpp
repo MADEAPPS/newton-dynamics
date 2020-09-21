@@ -13,44 +13,55 @@
 #include "ndDemoEntityManager.h"
 
 // memory allocation for Newton
-static void* PhysicsAlloc (int sizeInBytes)
+static void* PhysicsAlloc(size_t sizeInBytes)
 {
-	//	m_totalMemoryUsed += sizeInBytes;
-	return new char[sizeInBytes];
+	void* const ptr = malloc(sizeInBytes);
+	return ptr;
 }
 
 // memory free use by the engine
-static void PhysicsFree (void* ptr, int sizeInBytes)
+static void PhysicsFree(void* ptr)
 {
-	//	m_totalMemoryUsed -= sizeInBytes;
-	delete[] (char*)ptr;
+	free(ptr);
 }
 
+void *operator new (size_t size)
+{
+	// this should not happens on this test
+	// newton should never use global operator new and delete.
+	//dAssert(0);
+	return PhysicsAlloc(size);
+}
+
+void operator delete (void* ptr)
+{
+	PhysicsFree(ptr);
+}
 
 class CheckMemoryLeaks
 {
 	public:
-	CheckMemoryLeaks() 
+	CheckMemoryLeaks()
 	{
+		#if defined(_DEBUG) && defined(_MSC_VER)
+			// Track all memory leaks at the operating system level.
+			// make sure no Newton tool or utility leaves leaks behind.
+			_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_REPORT_FLAG);
+			//_CrtSetBreakAlloc (2139);
+		#endif
+
 		atexit(CheckMemoryLeaksCallback);
 		// Set the memory allocation function before creation the newton world
 		// this is the only function that can be called before the creation of the newton world.
 		// it should be called once, and the the call is optional 
-		NewtonSetMemorySystem(PhysicsAlloc, PhysicsFree);
-
-#if defined(_DEBUG) && defined(_MSC_VER)
-		// Track all memory leaks at the operating system level.
-		// make sure no Newton tool or utility leaves leaks behind.
-		_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_REPORT_FLAG);
-		//_CrtSetBreakAlloc (318776);
-#endif
+		dMemory::SetMemoryAllocators(PhysicsAlloc, PhysicsFree);
 	}
 
 	static void CheckMemoryLeaksCallback()
 	{
-#if defined(_DEBUG) && defined(_MSC_VER)
-		_CrtDumpMemoryLeaks();
-#endif
+		#if defined(_DEBUG) && defined(_MSC_VER)
+			_CrtDumpMemoryLeaks();
+		#endif
 	}
 };
 static CheckMemoryLeaks checkLeaks;
@@ -59,6 +70,6 @@ int main(int, char**)
 {
 	ndDemoEntityManager demos;
 	demos.Run();
-    return 0;
+	return 0;
 }
 

@@ -22,9 +22,9 @@
 int g_checkAsyncUpdate = 1;
 #endif
 
+#if 0
 //const D_MESH_HEADER	"Newton Mesh"
 static const char* D_MESH_HEADER = "Newton Mesh";
-
 
 class dMousePickClass
 {
@@ -1453,4 +1453,4 @@ dCustomJoint* FindJoint(const NewtonBody* const body0, const NewtonBody* const b
 	return joint ? (dCustomJoint*)NewtonJointGetUserData(joint) : NULL;
 }
 
-
+#endif

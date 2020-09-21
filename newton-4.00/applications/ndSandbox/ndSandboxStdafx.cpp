@@ -19,23 +19,6 @@
 // TODO: reference any additional headers you need in STDAFX.H
 // and not in this file
 
-void *operator new (size_t size) 
-{ 
-	void* const ptr = ::malloc (size);
-		//unsigned xxx = unsigned (ptr);
-		//xxx &= 0xffff;
-		////dAssert (xxx != 0x2378);
-		//dAssert (!((xxx == 0x2378) && (size == 12)));
-		//dTrace (("%d %x\n", xxx, ptr))
-	return ptr; 
-}                                          
-
-void operator delete (void* ptr) 
-{ 
-	::free (ptr); 
-}
-
-
 static unsigned ___dRandSeed___ = 0;
 
 void dSetRandSeed (unsigned seed)

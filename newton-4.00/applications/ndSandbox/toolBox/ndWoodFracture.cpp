@@ -19,6 +19,7 @@
 //#define BREAK_IMPACT_IN_METERS_PER_SECONDS		8.0f
 #define BREAK_IMPACT_IN_METERS_PER_SECONDS      10.0f
 
+#if 0
 class dWoodFractureListener: public dCustomParallelListener
 {
 	class WoodFractureAtom
@@ -426,3 +427,5 @@ void AddFracturedWoodPrimitive(
 	woodFractureManager->AddFracturedWoodPrimitive(density, origin, size, xCount, zCount, spacing, stype, materialID, shapeOffsetMatrix);
 */
 }
+
+#endif

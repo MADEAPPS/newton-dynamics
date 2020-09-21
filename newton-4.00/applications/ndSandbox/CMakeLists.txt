@@ -67,7 +67,7 @@ include_directories(../../thirdParty/glatter/include/glatter/)
 
 add_executable(${projectName} ${CPP_SOURCE})
 
-target_link_libraries (${projectName} dNewton dScene dModel dVehicle glfw imgui glatter)
+target_link_libraries (${projectName} ndCore ndCollision ndNewton glfw imgui glatter)
 if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dProfiler)
 endif ()

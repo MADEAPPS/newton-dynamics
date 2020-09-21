@@ -18,7 +18,7 @@
 
 ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)
 //	:dClassInfo()
-	:dHierarchy<ndDemoEntity>()
+	:dNodeHierarchy<ndDemoEntity>()
 	,m_matrix(matrix) 
 	,m_curPosition (matrix.m_posit)
 	,m_nextPosition (matrix.m_posit)
@@ -91,7 +91,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene
 
 ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 	//:dClassInfo()
-	:dHierarchy<ndDemoEntity>(copyFrom)
+	:dNodeHierarchy<ndDemoEntity>(copyFrom)
 	,m_matrix(copyFrom.m_matrix)
 	,m_curPosition(copyFrom.m_curPosition)
 	,m_nextPosition(copyFrom.m_nextPosition)
@@ -114,8 +114,7 @@ ndDemoEntity::~ndDemoEntity(void)
 	SetMesh(NULL, dGetIdentityMatrix());
 }
 
-
-dBaseHierarchy* ndDemoEntity::CreateClone () const
+dNodeBaseHierarchy* ndDemoEntity::CreateClone () const
 {
 	return new ndDemoEntity(*this);
 }

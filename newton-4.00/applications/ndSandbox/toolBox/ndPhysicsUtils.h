@@ -19,6 +19,7 @@
 extern int g_checkAsyncUpdate;
 #endif
 
+#if 0
 enum ndPrimitiveType
 {
 	_NULL_PRIMITIVE,
@@ -44,28 +45,10 @@ class ndMakeViualMesh : public dScene::dSceneExportCallback
 
 void ExportScene (NewtonWorld* const world, const char* const fileName);
 
+
 class ndDemoMesh;
 class ndDemoEntity;
 class ndDemoEntityManager;
-
-/*
-void InitEyePoint (const dVector& dir, const dVector& origin);
-void SetShowIslands (SceneManager& me, int mode);
-void SetShowContacts (SceneManager& me, int mode);
-void SetShowMeshCollision (SceneManager& me, int mode);
-void ShowBodyContacts (const NewtonBody* body);
-void ShowJointInfo(const NewtonCustomJoint* joint);
-void ConvexCastPlacement (NewtonBody* body);
-void Keyboard(SceneManager& me);
-void PhysicsSetTransform (const NewtonBody* body, const dFloat32* matrix, int threadIndex);
-int  PhysicsIslandUpdate (const NewtonWorld* world, const void* islandHandle, int bodyCount);
-NewtonBody* CreateGenericSolid (NewtonWorld* world, SceneManager* scene, const char* meshName, dFloat32 mass, const dMatrix& matrix, const dVector& size, PrimitiveType type, int materialID);
-int GenericContactProcess (const NewtonMaterial* material, const NewtonBody* const body0, const NewtonBody* const body1, dFloat32 timestep, int threadIndex);
-int OnAABBOverlap (const NewtonMaterial* material, const NewtonBody* const body0, const NewtonBody* const body1, int threadIndex);
-NewtonMesh* CreateCollisionTreeDoubleFaces (NewtonWorld* world, NewtonCollision* optimizedDoubelFacesTree);
-*/
-
-
 
 void GetContactOnBody (NewtonBody* const body);
 void HandlecollisionPoints (NewtonJoint* const contactjoint);
@@ -100,5 +83,6 @@ NewtonBody* MousePickBody (NewtonWorld* const nWorld, const dVector& origin, con
 
 void LoadLumberYardMesh(ndDemoEntityManager* const scene, const dVector& location, int shapeid);
 //void SerializationWorld (const char* const name, NewtonWorld* const world);
+#endif
 
 #endif

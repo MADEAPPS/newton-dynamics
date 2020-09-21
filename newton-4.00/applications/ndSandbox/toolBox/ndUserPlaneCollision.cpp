@@ -22,6 +22,7 @@
 #define PASS_A_QUAD
 #define MAX_THREAD_FACES	32
 
+#if 0
 class dInfinitePlane
 {
 	public:
@@ -478,3 +479,5 @@ ndDemoMesh* CreateVisualPlaneMesh (const dVector& plane, ndDemoEntityManager* co
 {
 	return dInfinitePlane::CreateVisualMesh (plane, scene);
 }
+
+#endif

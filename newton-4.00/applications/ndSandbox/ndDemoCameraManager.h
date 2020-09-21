@@ -40,12 +40,12 @@ class ndDemoCameraManager
 	void RenderPickedTarget () const;
 	void InterpolateMatrices (ndDemoEntityManager* const scene, dFloat32 timeStepFraction);
 
-	virtual void FixUpdate(const NewtonWorld* const world, dFloat32 timestep);
+	//virtual void FixUpdate(const NewtonWorld* const world, dFloat32 timestep);
 
 	void ResetPickBody();
 
 	private:
-	virtual void OnBodyDestroy (NewtonBody* const body);
+	//virtual void OnBodyDestroy (NewtonBody* const body);
 	void UpdatePickBody (ndDemoEntityManager* const scene, bool mouseState, const dVector& camPos0, const dVector& camPos1, dFloat32 timestep); 
 	
 	ndDemoCamera* m_camera;
@@ -64,9 +64,9 @@ class ndDemoCameraManager
 	dVector m_pickedBodyTargetPosition;
 	dVector m_pickedBodyLocalAtachmentPoint;
 	dVector m_pickedBodyLocalAtachmentNormal;
-	NewtonBody* m_targetPicked;
+	//NewtonBody* m_targetPicked;
 	ndDemoCameraPickBodyJoint* m_pickJoint;
-	NewtonBodyDestructor m_bodyDestructor;
+	//NewtonBodyDestructor m_bodyDestructor;
 	friend class ndDemoCamera;
 };
 

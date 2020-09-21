@@ -295,9 +295,7 @@ ndDemoEntityManager::~ndDemoEntityManager ()
 
 	ImGui::Shutdown();
 	glfwTerminate();
-	dAssert (NewtonGetMemoryUsed () == 0);
 }
-
 
 ndDemoCamera* ndDemoEntityManager::GetCamera() const
 {
@@ -393,13 +391,14 @@ void ndDemoEntityManager::RemoveEntity (dListNode* const entNode)
 
 void ndDemoEntityManager::RemoveEntity (ndDemoEntity* const ent)
 {
-	dCustomScopeLock lock(&m_deleteLock);
-	for (dListNode* node = dList<ndDemoEntity*>::GetFirst(); node; node = node->GetNext()) {
-		if (node->GetInfo() == ent) {
-			RemoveEntity (node);
-			break;
-		}
-	}
+	dAssert(0);
+	//dCustomScopeLock lock(&m_deleteLock);
+	//for (dListNode* node = dList<ndDemoEntity*>::GetFirst(); node; node = node->GetNext()) {
+	//	if (node->GetInfo() == ent) {
+	//		RemoveEntity (node);
+	//		break;
+	//	}
+	//}
 }
 
 void ndDemoEntityManager::Cleanup ()
@@ -685,7 +684,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 
 			ImGui::EndMenu();
 
-			SetDebugDisplayMode(m_showCollidingFaces ? 1 : 0);
+			//SetDebugDisplayMode(m_showCollidingFaces ? 1 : 0);
 		}
 
 		if (ImGui::BeginMenu("Help")) {
@@ -921,7 +920,7 @@ void ndDemoEntityManager::RenderStats()
 			sprintf (text, "physics time: %6.3f ms", m_mainThreadPhysicsTime * 1000.0f);
 			ImGui::Text(text, "");
 
-			sprintf (text, "memory used:   %d kbytes", NewtonGetMemoryUsed() / 1024);
+			//sprintf (text, "memory used:   %d kbytes", NewtonGetMemoryUsed() / 1024);
 			ImGui::Text(text, "");
 
 			if (m_currentPlugin) {
@@ -1038,8 +1037,9 @@ void ndDemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary&
 
 void ndDemoEntityManager::ImportPLYfile (const char* const fileName)
 {
-	m_collisionDisplayMode = 2;
-	CreatePLYMesh (this, fileName, true);
+	dAssert(0);
+	//m_collisionDisplayMode = 2;
+	//CreatePLYMesh (this, fileName, true);
 }
 
 void ndDemoEntityManager::LoadScene (const char* const fileName)

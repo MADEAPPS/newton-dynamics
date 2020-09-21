@@ -96,7 +96,7 @@ dVector ndDemoCamera::ScreenToWorld (const dVector& screenPoint) const
 	GLdouble objz;
 	gluUnProject (winX, winY, winZ, m_modelViewMatrix, m_projectionViewMatrix, (GLint*)&m_viewport, &objx, &objy, &objz);
 
-	return dVector (dFloat32(objx), dFloat32(objy), dFloat32(objz));
+	return dVector (dFloat32(objx), dFloat32(objy), dFloat32(objz), dFloat32 (0.0f));
 }
 
 dVector ndDemoCamera::WorldToScreen (const dVector& worldPoint) const

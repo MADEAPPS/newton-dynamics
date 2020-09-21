@@ -17,6 +17,7 @@
 #ifndef _USER_HIGHFIELD_COLLISION_H__
 #define _USER_HIGHFIELD_COLLISION_H__
 
+#if 0
 class ndDemoEntityManager;
 NewtonBody* CreateUserHeightFieldTerrain (ndDemoEntityManager* const scene, int sizeInPowerOfTwos, dFloat32 cellSize, dFloat32 elevationScale, dFloat32 roughness, dFloat32 maxElevation, dFloat32 minElevation);
 
@@ -68,3 +69,4 @@ class UserHeightFieldCollision : public RenderPrimitive
 */
 #endif 
 
+#endif

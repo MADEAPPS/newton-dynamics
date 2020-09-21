@@ -16,6 +16,7 @@
 #include "ndDebugDisplay.h"
 #include "ndPhysicsUtils.h"
 
+#if 0
 static int g_debugMode = 0;
 
 
@@ -506,3 +507,5 @@ void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* con
 {
 	NewtonWorldListenerDebug(world, jointDebug);
 }
+
+#endif
