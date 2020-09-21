@@ -107,5 +107,5 @@ if(WIN32)
     file(COPY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications")
 endif()
 
-install(DIRECTORY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications/media")
-install(TARGETS ${projectName} DESTINATION "${PROJECT_BINARY_DIR}/applications/")
+install(DIRECTORY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications/")
+#install(TARGETS ${projectName} DESTINATION "${PROJECT_BINARY_DIR}/applications/")
