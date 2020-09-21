@@ -57,6 +57,7 @@ void ndSkyBox::DrawMesh () const
 	glUseProgram(m_shader);
 	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
 
+glFrontFace(GL_CW);
 	glColor3f(1.0f, 1.0f, 1.0f);
 
 	GLfloat padd = 1.0e-3f;
@@ -135,6 +136,7 @@ void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const
 
 	dMatrix skyMatrix (dGetIdentityMatrix());
 	skyMatrix.m_posit = matrix.UntransformVector (dVector (0.0f, 0.25f, 0.0f, 1.0f));
+skyMatrix.m_posit = matrix.UntransformVector(dVector(0.0f, 0.25f, -800.0f, 1.0f));
 
 	glPushMatrix();
 	glMultMatrix(&skyMatrix[0][0]);
