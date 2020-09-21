@@ -29,7 +29,7 @@ ndDemoInstanceEntity::~ndDemoInstanceEntity(void)
 {
 }
 
-void ndDemoInstanceEntity::Render(dFloat timeStep, ndDemoEntityManager* const scene, const dMatrix& matrixIn) const
+void ndDemoInstanceEntity::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrixIn) const
 {
 //	ndDemoEntity::Render(timeStep, scene);
 

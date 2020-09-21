@@ -13,10 +13,10 @@
 #include "ndOpenGlUtil.h"
 #include "ndHighResolutionTimer.h"
 
-#define LOCKED_FPS		dFloat (100.0f)
+#define LOCKED_FPS		dFloat32 (100.0f)
 #define LOCKED_TIMESTEP int ((1000000.0f/LOCKED_FPS))
 
-const dFloat TICKS2SEC = 1.0e-6f;
+const dFloat32 TICKS2SEC = 1.0e-6f;
 
 
 static unsigned64 m_prevTime = 0;
@@ -72,15 +72,15 @@ unsigned64 dGetTimeInMicrosenconds()
 }
 
 
-dFloat dGetElapsedSeconds()
+dFloat32 dGetElapsedSeconds()
 {
-	dFloat timeStep;
+	dFloat32 timeStep;
 	unsigned64 miliseconds;
 
 	miliseconds = dGetTimeInMicrosenconds();
 
 	// optimal keep the fps below 120 fps
-	timeStep = dFloat (miliseconds - m_prevTime) * TICKS2SEC;
+	timeStep = dFloat32 (miliseconds - m_prevTime) * TICKS2SEC;
 	m_prevTime = miliseconds;
 
 	return timeStep;

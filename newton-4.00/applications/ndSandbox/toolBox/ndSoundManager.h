@@ -38,10 +38,10 @@ class dSoundManager
 
 
 		private:
-		void LinkAsset (dTree<dSoundAsset, dCRCTYPE>::dTreeNode* const assetNode);
+		void LinkAsset (dTree<dSoundAsset, dUnsigned64>::dTreeNode* const assetNode);
 
 		int m_source;
-		dTree<dSoundAsset, dCRCTYPE>::dTreeNode* m_myAssetNode;
+		dTree<dSoundAsset, dUnsigned64>::dTreeNode* m_myAssetNode;
 		friend class dSoundManager;
 	};
 
@@ -64,7 +64,7 @@ class dSoundManager
 		dFloat m_frequecy;
 	};
 
-	class dSoundAssetList: public dTree<dSoundAsset, dCRCTYPE>
+	class dSoundAssetList: public dTree<dSoundAsset, dUnsigned64>
 	{
 	};
 

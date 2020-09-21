@@ -27,7 +27,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	public:
 	typedef void (*LaunchSDKDemoCallback) (ndDemoEntityManager* const scene);
 	typedef void (*RenderGuiHelpCallback) (ndDemoEntityManager* const manager, void* const context);
-	typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, dFloat timestep);
+	typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, dFloat32 timestep);
 
 	class TransparentMesh
 	{
@@ -48,11 +48,11 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 		const ndDemoMesh* m_mesh;
 	};
 
-	class TransparentHeap: public dUpHeap <TransparentMesh, dFloat>
+	class TransparentHeap: public dUpHeap <TransparentMesh, dFloat32>
 	{
 		public:
 		TransparentHeap()
-			:dUpHeap <TransparentMesh, dFloat>(2048)
+			:dUpHeap <TransparentMesh, dFloat32>(2048)
 		{
 		}
 	};
@@ -114,7 +114,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool IsShiftKeyDown () const;
 	bool IsControlKeyDown () const;
 	bool GetKeyState(int key) const;
-	int GetJoystickAxis (dFloat* const axisValues, int maxAxis = 8) const;
+	int GetJoystickAxis (dFloat32* const axisValues, int maxAxis = 8) const;
 	int GetJoystickButtons (char* const axisbuttons, int maxButton = 32) const;
 
 	void SerializedPhysicScene(const char* const name);
@@ -146,10 +146,10 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	//void RenderUI();
 	void RenderScene();
 	
-	void UpdatePhysics(dFloat timestep);
-	dFloat CalculateInteplationParam () const;
+	void UpdatePhysics(dFloat32 timestep);
+	dFloat32 CalculateInteplationParam () const;
 
-	void CalculateFPS(dFloat timestep);
+	void CalculateFPS(dFloat32 timestep);
 	
 	void ShowMainMenuBar();
 	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
@@ -164,7 +164,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	static void MouseScrollCallback (GLFWwindow* const window, double x, double y);
 	static void MouseButtonCallback(GLFWwindow* const window, int button, int action, int mods);
 	static void ErrorCallback(int error, const char* const description);
-	static void PostUpdateCallback(const NewtonWorld* const world, dFloat timestep);
+	static void PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep);
 
 	void ApplyMenuOptions();
 	void LoadDemo(int menu);
@@ -191,11 +191,11 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	int m_framesCount;
 	int m_physicsFramesCount;
 	int m_currentPlugin;
-	dFloat m_fps;
-	dFloat m_timestepAcc;
-	dFloat m_currentListenerTimestep;
-	dFloat m_mainThreadPhysicsTime;
-	dFloat m_mainThreadPhysicsTimeAcc;
+	dFloat32 m_fps;
+	dFloat32 m_timestepAcc;
+	dFloat32 m_currentListenerTimestep;
+	dFloat32 m_mainThreadPhysicsTime;
+	dFloat32 m_mainThreadPhysicsTimeAcc;
 
 	int m_solverPasses;
 	int m_solverSubSteps;

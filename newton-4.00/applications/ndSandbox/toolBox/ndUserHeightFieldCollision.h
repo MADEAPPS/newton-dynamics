@@ -18,7 +18,7 @@
 #define _USER_HIGHFIELD_COLLISION_H__
 
 class ndDemoEntityManager;
-NewtonBody* CreateUserHeightFieldTerrain (ndDemoEntityManager* const scene, int sizeInPowerOfTwos, dFloat cellSize, dFloat elevationScale, dFloat roughness, dFloat maxElevation, dFloat minElevation);
+NewtonBody* CreateUserHeightFieldTerrain (ndDemoEntityManager* const scene, int sizeInPowerOfTwos, dFloat32 cellSize, dFloat32 elevationScale, dFloat32 roughness, dFloat32 maxElevation, dFloat32 minElevation);
 
 /*
 #include "Newton.h"
@@ -42,12 +42,12 @@ class UserHeightFieldCollision : public RenderPrimitive
 
 	NewtonBody* GetRigidBody() const;
 
-	dFloat* GetElevationMap () { return &m_heightField[0][0];}
+	dFloat32* GetElevationMap () { return &m_heightField[0][0];}
 
 	private:
 
-	dFloat RayCastTriangle (const dVector& p0, const dVector& dp, const dVector& origin, const dVector& e1, const dVector& e2);
-	dFloat RayCastCell (dInt32 xIndex0, dInt32 zIndex0, const dVector& p0, const dVector& dp, dVector& normalOut);
+	dFloat32 RayCastTriangle (const dVector& p0, const dVector& dp, const dVector& origin, const dVector& e1, const dVector& e2);
+	dFloat32 RayCastCell (dInt32 xIndex0, dInt32 zIndex0, const dVector& p0, const dVector& dp, dVector& normalOut);
 	void CalculateMinExtend2d (const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1);
 	void CalculateMinExtend3d (const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1);
 	bool ClipRay2d (dVector& p0, dVector& p1, const dVector& boxP0, const dVector& boxP1); 
@@ -55,7 +55,7 @@ class UserHeightFieldCollision : public RenderPrimitive
 	NewtonBody* m_level;
 	dVector m_minBox;
 	dVector m_maxBox;
-	dFloat m_heightField[HEIGHT_SIZE][HEIGHT_SIZE];
+	dFloat32 m_heightField[HEIGHT_SIZE][HEIGHT_SIZE];
 	
 	dInt32 m_attribute[MAX_THREAD_FACES][MAX_COLLIDING_FACES];
 	dInt32 m_faceIndices[MAX_THREAD_FACES][MAX_COLLIDING_FACES];
@@ -63,7 +63,7 @@ class UserHeightFieldCollision : public RenderPrimitive
 	dVector m_collisionVertex[MAX_THREAD_FACES][MAX_COLLIDING_FACES * 2];
 
 	static void MeshCollisionCollideCallback (NewtonUserMeshCollisionCollideDesc* collideDescData);
-	static dFloat UserMeshCollisionRayHitCallback (NewtonUserMeshCollisionRayHitDesc* lineDescData);
+	static dFloat32 UserMeshCollisionRayHitCallback (NewtonUserMeshCollisionRayHitDesc* lineDescData);
 };
 */
 #endif 

@@ -30,12 +30,12 @@ class HeightfieldMap
 {
 	public:
 	
-	static dFloat Guassian (dFloat freq)
+	static dFloat32 Guassian (dFloat32 freq)
 	{
-		dFloat r = 0.0f;
+		dFloat32 r = 0.0f;
 		int maxCount = 2 * GAUSSIAN_BELL + 1;
 		for (int i = 0; i < maxCount; i ++) {
-			dFloat t = 2.0f * dFloat (dRand()) / dFloat(dRAND_MAX) - 1.0f;
+			dFloat32 t = 2.0f * dFloat32 (dRand()) / dFloat32(dRAND_MAX) - 1.0f;
 			r += t;
 		}
 freq *= 0.5f;
@@ -43,9 +43,9 @@ freq *= 0.5f;
 	}
 
 /*
-	static void SetBaseHeight (dFloat* const elevation, int size)
+	static void SetBaseHeight (dFloat32* const elevation, int size)
 	{
-		dFloat minhigh = 1.0e10;
+		dFloat32 minhigh = 1.0e10;
 		for (int i = 0; i < size * size; i ++) {
 			if (elevation[i] < minhigh) {
 				minhigh = elevation[i];
@@ -56,11 +56,11 @@ freq *= 0.5f;
 		}
 	}
 
-	static void MakeCalderas (dFloat* const elevation, int size, dFloat baseHigh, dFloat roughness)
+	static void MakeCalderas (dFloat32* const elevation, int size, dFloat32 baseHigh, dFloat32 roughness)
 	{
 		for (int i = 0; i < size * size; i ++) {
-			//dFloat h =  baseHigh + Guassian (roughness);
-			dFloat h =  baseHigh;
+			//dFloat32 h =  baseHigh + Guassian (roughness);
+			dFloat32 h =  baseHigh;
 			if (elevation[i] > h) {
 				elevation[i] = h - (elevation[i] - h);
 			}
@@ -68,7 +68,7 @@ freq *= 0.5f;
 	}
 */
 
-	static void MakeMap (dFloat* const elevation, dFloat** const map, int size)
+	static void MakeMap (dFloat32* const elevation, dFloat32** const map, int size)
 	{
 		for (int i = 0; i < size; i ++) {
 			map[i] = &elevation[i * size];
@@ -84,11 +84,11 @@ freq *= 0.5f;
 
 
 /*
-	static DemoMesh____* CreateVisualMesh (dFloat* const elevation, int size, dFloat cellSize, dFloat texelsDensity)
+	static DemoMesh____* CreateVisualMesh (dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity)
 	{
 		dVector* const normals = new dVector [size * size];
 
-		dFloat* elevationMap[4096];
+		dFloat32* elevationMap[4096];
 		dVector* normalMap[4096];
 
 		MakeMap (elevation, elevationMap, size);
@@ -127,9 +127,9 @@ freq *= 0.5f;
 		HeightfieldMap* const mesh = new HeightfieldMap () ;
 		mesh->AllocVertexData (size * size);
 
-		dFloat* const vertex = mesh->m_vertex;
-		dFloat* const normal = mesh->m_normal;
-		dFloat* const uv = mesh->m_uv;
+		dFloat32* const vertex = mesh->m_vertex;
+		dFloat32* const normal = mesh->m_normal;
+		dFloat32* const uv = mesh->m_uv;
 
 		int index = 0;
 		for (int z = 0; z < size; z ++) {
@@ -191,11 +191,11 @@ freq *= 0.5f;
 	}
 */
 
-	static void ApplySmoothFilter (dFloat* const elevation, int size)
+	static void ApplySmoothFilter (dFloat32* const elevation, int size)
 	{
-		dFloat* map0[4096 + 1];
-		dFloat* map1[4096 + 1];
-		dFloat* const buffer = new dFloat [size * size];
+		dFloat32* map0[4096 + 1];
+		dFloat32* map1[4096 + 1];
+		dFloat32* const buffer = new dFloat32 [size * size];
 
 		MakeMap (elevation, map0, size);
 		MakeMap (buffer, map1, size);
@@ -220,9 +220,9 @@ freq *= 0.5f;
 	}
 
 
-	static dFloat GetElevation (int size, dFloat elevation, dFloat maxH, dFloat minH, dFloat roughness)
+	static dFloat32 GetElevation (int size, dFloat32 elevation, dFloat32 maxH, dFloat32 minH, dFloat32 roughness)
 	{
-		dFloat h = dFloat (pow (dFloat (size) * elevation, 1.0f + roughness));
+		dFloat32 h = dFloat32 (pow (dFloat32 (size) * elevation, 1.0f + roughness));
 		if (h > maxH) {
 			h = maxH;	
 		} else if (h < minH){
@@ -231,9 +231,9 @@ freq *= 0.5f;
 		return h;
 	}
 
-	static void MakeFractalTerrain (dFloat* const elevation, int sizeInPowerOfTwos, dFloat elevationScale, dFloat roughness, dFloat maxElevation, dFloat minElevation)
+	static void MakeFractalTerrain (dFloat32* const elevation, int sizeInPowerOfTwos, dFloat32 elevationScale, dFloat32 roughness, dFloat32 maxElevation, dFloat32 minElevation)
 	{
-		dFloat* map[4096 + 1];
+		dFloat32* map[4096 + 1];
 		int size = (1 << sizeInPowerOfTwos) + 1;
 		dAssert (size < int (sizeof (map) / sizeof map[0]));
 		MakeMap (elevation, map, size);
@@ -248,7 +248,7 @@ freq *= 0.5f;
 			map[i][size - 1] = 0.0f;
 		}
 
-		//dFloat f = GetElevation (size, elevationScale, maxElevation, minElevation, roughness);
+		//dFloat32 f = GetElevation (size, elevationScale, maxElevation, minElevation, roughness);
 		//map[0][0] = Guassian(f);
 		//map[0][size-1] = Guassian(f);
 		//map[size-1][0] = Guassian(f);
@@ -258,7 +258,7 @@ freq *= 0.5f;
 		//map[size-1][0] = 0.0f;
 		//map[size-1][size-1] = 0.0f;
 		for (int frequency = size - 1; frequency > 1; frequency = frequency / 2 ) {
-			dFloat h = GetElevation (frequency, elevationScale, maxElevation, minElevation, roughness);
+			dFloat32 h = GetElevation (frequency, elevationScale, maxElevation, minElevation, roughness);
 
 			for(int y0 = 0; y0 < (size - frequency); y0 += frequency) {
 				int y1 = y0 + frequency / 2;
@@ -298,17 +298,17 @@ freq *= 0.5f;
 	}
 
 	#ifdef USE_TEST_ALL_FACE_USER_RAYCAST_CALLBACK
-		static dFloat AllRayHitCallback (const NewtonBody* const body, const NewtonCollision* const treeCollision, dFloat intersection, dFloat* const normal, int faceId, void* const usedData)
+		static dFloat32 AllRayHitCallback (const NewtonBody* const body, const NewtonCollision* const treeCollision, dFloat32 intersection, dFloat32* const normal, int faceId, void* const usedData)
 		{
 			return intersection;
 		}
 	#endif
 
 
-	static NewtonBody* CreateHeightFieldTerrain (ndDemoEntityManager* const scene, int sizeInPowerOfTwos, dFloat cellSize, dFloat elevationScale, dFloat roughness, dFloat maxElevation, dFloat minElevation)
+	static NewtonBody* CreateHeightFieldTerrain (ndDemoEntityManager* const scene, int sizeInPowerOfTwos, dFloat32 cellSize, dFloat32 elevationScale, dFloat32 roughness, dFloat32 maxElevation, dFloat32 minElevation)
 	{
 		int size = (1 << sizeInPowerOfTwos) + 1 ;
-		dFloat* const elevation = new dFloat [size * size];
+		dFloat32* const elevation = new dFloat32 [size * size];
 		//MakeFractalTerrain (elevation, sizeInPowerOfTwos, elevationScale, roughness, maxElevation, minElevation);
 		MakeFractalTerrain (elevation, sizeInPowerOfTwos, elevationScale, roughness, maxElevation, minElevation);
 
@@ -398,7 +398,7 @@ freq *= 0.5f;
 		dVector p1 (0, -100, 0, 0);
 		dVector normal;
 		dLong id;
-		dFloat parameter;
+		dFloat32 parameter;
 		parameter = NewtonCollisionRayCast (collision, &p0[0], &p1[0], &normal[0], &id);
 #endif
 
@@ -408,7 +408,7 @@ freq *= 0.5f;
 	}
 };
 
-NewtonBody* CreateHeightFieldTerrain (ndDemoEntityManager* const scene, int sizeInPowerOfTwos, dFloat cellSize, dFloat elevationScale, dFloat roughness, dFloat maxElevation, dFloat minElevation)
+NewtonBody* CreateHeightFieldTerrain (ndDemoEntityManager* const scene, int sizeInPowerOfTwos, dFloat32 cellSize, dFloat32 elevationScale, dFloat32 roughness, dFloat32 maxElevation, dFloat32 minElevation)
 {
 	return HeightfieldMap::CreateHeightFieldTerrain (scene, sizeInPowerOfTwos, cellSize, elevationScale, roughness, maxElevation, minElevation);
 }

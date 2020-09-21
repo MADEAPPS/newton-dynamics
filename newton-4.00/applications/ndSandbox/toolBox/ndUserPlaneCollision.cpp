@@ -141,19 +141,19 @@ class dInfinitePlane
 		delete me;
 	}
 
-	static int PlaneCollisionGetFacesInAABB (void* me, const dFloat* p0, const dFloat* p1, const dFloat** vertexArray, int* vertexCount, int* vertexStrideInBytes, const int* indexList, int maxIndexCount, const int* userDataList)
+	static int PlaneCollisionGetFacesInAABB (void* me, const dFloat32* p0, const dFloat32* p1, const dFloat32** vertexArray, int* vertexCount, int* vertexStrideInBytes, const int* indexList, int maxIndexCount, const int* userDataList)
 	{
 		dAssert (0);
 		return 0;
 	}
 
 
-	static int PlaneCollisionAABBOverlapTest (void* userData, const dFloat* const box0, const dFloat* const box1)
+	static int PlaneCollisionAABBOverlapTest (void* userData, const dFloat32* const box0, const dFloat32* const box1)
 	{
 		const dInfinitePlane* const me = (dInfinitePlane*) userData;
 
 		dVector minBox (box0[0], box0[1], box0[2], 0.0f);
-		dFloat test = me->m_plane.DotProduct3(minBox) +  me->m_plane.m_w;
+		dFloat32 test = me->m_plane.DotProduct3(minBox) +  me->m_plane.m_w;
 		if (test > 0.0f) {
 			return 0;
 		}
@@ -184,7 +184,7 @@ class dInfinitePlane
 	}
 
 
-	static dFloat PlaneMeshCollisionRayHitCallback (NewtonUserMeshCollisionRayHitDesc* const rayDesc)
+	static dFloat32 PlaneMeshCollisionRayHitCallback (NewtonUserMeshCollisionRayHitDesc* const rayDesc)
 	{
 		dVector q0 (rayDesc->m_p0[0], rayDesc->m_p0[1], rayDesc->m_p0[2]);
 		dVector q1 (rayDesc->m_p1[0], rayDesc->m_p1[1], rayDesc->m_p1[2]);
@@ -192,7 +192,7 @@ class dInfinitePlane
 
 		// calculate intersection between point lien a plane and return intersection parameter
 		dInfinitePlane* const me = (dInfinitePlane*) rayDesc->m_userData;
-		dFloat t = -(me->m_plane.DotProduct3(q0) + me->m_plane.m_w) / (me->m_plane.DotProduct3(dq));
+		dFloat32 t = -(me->m_plane.DotProduct3(q0) + me->m_plane.m_w) / (me->m_plane.DotProduct3(dq));
 		if ((t > 0.0f) && (t < 1.0f)) {
 			rayDesc->m_normalOut[0] = me->m_plane[0];
 			rayDesc->m_normalOut[1] = me->m_plane[1];
@@ -215,12 +215,12 @@ class dInfinitePlane
 			dVector centre ((p1 + p0).Scale (0.5f));
 
 			//find the projection of center point over the plane
-			dFloat t = - (me->m_plane.DotProduct3(centre) + me->m_plane.m_w);
+			dFloat32 t = - (me->m_plane.DotProduct3(centre) + me->m_plane.m_w);
 			centre += me->m_plane.Scale (t);
 
 			//know calculate the scale factor
 			dVector size (p1 - p0);
-			dFloat s = dMax(size.m_x, dMax (size.m_y, size.m_z)) * 0.5f;
+			dFloat32 s = dMax(size.m_x, dMax (size.m_y, size.m_z)) * 0.5f;
 
 			dInt32 threadNumber = collideDesc->m_threadNumber;
 
@@ -268,18 +268,18 @@ class dInfinitePlane
 		dVector p1 (collideDesc->m_boxP1[0], collideDesc->m_boxP1[1], collideDesc->m_boxP1[2], 0.0f);
 		dVector suportVertex ((me->m_plane.m_x > 0.0f) ? p0.m_x : p1.m_x, (me->m_plane.m_y > 0.0f) ? p0.m_y : p1.m_y, (me->m_plane.m_z > 0.0f) ? p0.m_z : p1.m_z);
 
-		dFloat dist = me->m_plane.DotProduct3(suportVertex) + me->m_plane.m_w;
+		dFloat32 dist = me->m_plane.DotProduct3(suportVertex) + me->m_plane.m_w;
 		if (dist < 0.25f) {
 			// calculate the aabb center
 			dVector centre ((p1 + p0).Scale (0.5f));
 
 			//find the projection of center point over the plane
-			dFloat t = - (me->m_plane.DotProduct3(centre) + me->m_plane.m_w);
+			dFloat32 t = - (me->m_plane.DotProduct3(centre) + me->m_plane.m_w);
 			centre += me->m_plane.Scale (t);
 
 			//know calculate the scale factor
 			dVector size (p1 - p0);
-			dFloat s = dMax(size.m_x, dMax (size.m_y, size.m_z));
+			dFloat32 s = dMax(size.m_x, dMax (size.m_y, size.m_z));
 
 			dInt32 threadNumber = collideDesc->m_threadNumber;
 
@@ -334,14 +334,14 @@ class dInfinitePlane
 		ndDemoMesh* const mesh = new ndDemoMesh ("userInfinitePlane", scene->GetShaderCache());
 
 		// build a unit grid in local space (this will be the shadow at projection of the collision aabb)
-		dFloat size = 1000.0f;
+		dFloat32 size = 1000.0f;
 		dVector shape[4];
 		shape[0] = dVector (0.0f,  1.0f,  1.0f);
 		shape[1] = dVector (0.0f, -1.0f,  1.0f);
 		shape[2] = dVector (0.0f, -1.0f, -1.0f);
 		shape[3] = dVector (0.0f,  1.0f, -1.0f);
 
-		dFloat UVtileSize = 16;
+		dFloat32 UVtileSize = 16;
 		mesh->AllocVertexData (4);
 		for (int i = 0; i < 4; i ++) {
 			mesh->m_vertex[i * 3  + 0] = shape[i].m_x * size;

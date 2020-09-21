@@ -27,23 +27,23 @@ class ndDemoCamera: public ndDemoEntity
 	ndDemoCamera();
 	~ndDemoCamera();
 
-	dFloat GetYawAngle() const;
-	dFloat GetPichAngle() const;
+	dFloat32 GetYawAngle() const;
+	dFloat32 GetPichAngle() const;
 
 	void SetMatrix (ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position);
 	void SetViewMatrix (int width, int height);
 
-	virtual void Render(dFloat timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
+	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
 
 	dVector ScreenToWorld (const dVector& screenPoint) const;
 	dVector WorldToScreen (const dVector& worldPoint) const;
 	
 	private:
-	dFloat m_fov;
-	dFloat m_backPlane;
-	dFloat m_frontPlane;
-	dFloat m_cameraYaw;
-	dFloat m_cameraPitch;
+	dFloat32 m_fov;
+	dFloat32 m_backPlane;
+	dFloat32 m_frontPlane;
+	dFloat32 m_cameraYaw;
+	dFloat32 m_cameraPitch;
 
 	GLint m_viewport[4]; 
 	GLdouble m_modelViewMatrix[16];

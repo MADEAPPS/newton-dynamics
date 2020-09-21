@@ -59,7 +59,7 @@ class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
 		glVertex3f(GLfloat (p1.m_x), GLfloat (p1.m_y), GLfloat (p1.m_z));
 	}
 
-	void DrawPoint(const dVector& point, dFloat thinckness = 1.0f)
+	void DrawPoint(const dVector& point, dFloat32 thinckness = 1.0f)
 	{
 		glEnd();
 
@@ -124,15 +124,15 @@ void RenderContactPoints (NewtonWorld* const world);
 void RenderJointsDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug);
 void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug);
 
-void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat* const faceVertec, int faceId);
+void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat32* const faceVertec, int faceId);
 
 void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE mode);
 
-void DebugDrawPoint (const dVector& p0, dFloat size);
+void DebugDrawPoint (const dVector& p0, dFloat32 size);
 void DebugDrawLine (const dVector& p0, const dVector& p1);
 void DebugDrawCollision (const NewtonCollision* const collision, const dMatrix& matrix, DEBUG_DRAW_MODE mode);
 
 void ClearDebugDisplay(NewtonWorld* const world);
-void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const NewtonBody* const body, int faceID, int vertexCount, const dFloat* const vertex, int vertexstrideInBytes);
+void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const NewtonBody* const body, int faceID, int vertexCount, const dFloat32* const vertex, int vertexstrideInBytes);
 
 #endif

@@ -18,7 +18,7 @@ struct ndTextureEntry: public dRefCounter
 	dString m_textureName;
 };
 
-class ndTextureCache: public dTree<ndTextureEntry, dCRCTYPE>
+class ndTextureCache: public dTree<ndTextureEntry, dUnsigned64>
 {
 	public: 
 	GLuint GetTexture(const char* const texName)
@@ -29,7 +29,7 @@ class ndTextureCache: public dTree<ndTextureEntry, dCRCTYPE>
 		ndTextureEntry entry;
 		entry.m_textureName = texName;
 		entry.m_textureName.ToLower();
-		dCRCTYPE crc = dCRC64 (entry.m_textureName.GetStr());
+		dUnsigned64 crc = dCRC64 (entry.m_textureName.GetStr());
 
 		dTreeNode* node = Find(crc);
 		if (node) {
@@ -45,7 +45,7 @@ class ndTextureCache: public dTree<ndTextureEntry, dCRCTYPE>
 		entry.m_textureID = id;
 		entry.m_textureName = texName;
 		entry.m_textureName.ToLower();
-		dCRCTYPE crc = dCRC64 (entry.m_textureName.GetStr());
+		dUnsigned64 crc = dCRC64 (entry.m_textureName.GetStr());
 		Insert(entry, crc);
 	}
 

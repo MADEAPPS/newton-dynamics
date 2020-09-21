@@ -87,8 +87,8 @@ dAssert (0);
 	int height;
 	int index;
 	int vertexIndex;
-	dFloat minY;
-	dFloat maxY;
+	dFloat32 minY;
+	dFloat32 maxY;
 	OGLMesh* geometry;
 	dSubMesh* segment;
 	NewtonCollision* collision;
@@ -99,7 +99,7 @@ dAssert (0);
 	// build a simple height field array. Note this could be load it from a texture map file
 	for (int z = 0; z < height; z ++) {
 		for (int x = 0; x < width; x ++) {
-			dFloat y;
+			dFloat32 y;
 			// add sine wave for rolling terrain
 			y = (5.0f * dSin(x/5.0f) + 7.0f * dCos((z)/7.0f)) * 1.5f;
 			m_heightField[z][x] = y;
@@ -199,7 +199,7 @@ dAssert (0);
 		int count;
 		dVector p0(-100, -100, -100);
 		dVector p1(100, 100, 100);
-		const dFloat* vertexArray;
+		const dFloat32* vertexArray;
 		int vertexStrideInBytes;
 		int vertexCount;
 		int indexList[256];
@@ -272,10 +272,10 @@ NewtonBody* UserHeightFieldCollision::GetRigidBody() const
 // calculate the bounding box surrounding a line segment
 void UserHeightFieldCollision::CalculateMinExtend2d (const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1)
 {
-	dFloat x0;
-	dFloat x1;
-	dFloat z0;
-	dFloat z1;
+	dFloat32 x0;
+	dFloat32 x1;
+	dFloat32 z0;
+	dFloat32 z1;
 
 	x0 = dMin (p0.m_x, p1.m_x) - 1.0e-3f;
 	z0 = dMin (p0.m_z, p1.m_z) - 1.0e-3f;
@@ -298,12 +298,12 @@ void UserHeightFieldCollision::CalculateMinExtend2d (const dVector& p0, const dV
 
 void UserHeightFieldCollision::CalculateMinExtend3d (const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1)
 {
-	dFloat x0;
-	dFloat x1;
-	dFloat y0;
-	dFloat y1;
-	dFloat z0;
-	dFloat z1;
+	dFloat32 x0;
+	dFloat32 x1;
+	dFloat32 y0;
+	dFloat32 y1;
+	dFloat32 z0;
+	dFloat32 z1;
 
 	x0 = dMin (p0.m_x, p1.m_x) - 1.0e-3f;
 	y0 = dMin (p0.m_y, p1.m_y) - 1.0e-3f;
@@ -334,9 +334,9 @@ void UserHeightFieldCollision::CalculateMinExtend3d (const dVector& p0, const dV
 // clip a line segment against a box  
 bool UserHeightFieldCollision::ClipRay2d (dVector& p0, dVector& p1, const dVector& boxP0, const dVector& boxP1) 
 {
-	dFloat t;
-	dFloat tmp0;
-	dFloat tmp1;
+	dFloat32 t;
+	dFloat32 tmp0;
+	dFloat32 tmp1;
 
 	// clip against positive x axis
 	tmp0 = boxP1.m_x - p0.m_x;
@@ -432,19 +432,19 @@ bool UserHeightFieldCollision::ClipRay2d (dVector& p0, dVector& p1, const dVecto
 
 
 // calculate the intersection of a ray and a triangle
-dFloat UserHeightFieldCollision::RayCastTriangle (const dVector& p0, const dVector& dp, const dVector& origin, const dVector& e1, const dVector& e2)
+dFloat32 UserHeightFieldCollision::RayCastTriangle (const dVector& p0, const dVector& dp, const dVector& origin, const dVector& e1, const dVector& e2)
 {
-	dFloat t;
-	dFloat b0;
-	dFloat b1;
-	dFloat b00;
-	dFloat b11;
-	dFloat a00;
-	dFloat a10;
-	dFloat a11;
-	dFloat det;
-	dFloat dot;
-	dFloat tol;
+	dFloat32 t;
+	dFloat32 b0;
+	dFloat32 b1;
+	dFloat32 b00;
+	dFloat32 b11;
+	dFloat32 a00;
+	dFloat32 a10;
+	dFloat32 a11;
+	dFloat32 det;
+	dFloat32 dot;
+	dFloat32 tol;
 
 	// clip line again first triangle
 	dVector normal (e2 * e1);
@@ -486,9 +486,9 @@ dFloat UserHeightFieldCollision::RayCastTriangle (const dVector& p0, const dVect
 }
 
 // calculate the intersection point of a line segment and the two triangles making a the cell of a heih pam terrain
-dFloat UserHeightFieldCollision::RayCastCell (dInt32 xIndex0, dInt32 zIndex0, const dVector& p0, const dVector& dp, dVector& normalOut)
+dFloat32 UserHeightFieldCollision::RayCastCell (dInt32 xIndex0, dInt32 zIndex0, const dVector& p0, const dVector& dp, dVector& normalOut)
 {
-	dFloat t;
+	dFloat32 t;
 
 
 	// if debug mode on save the line cell in wire frame
@@ -529,25 +529,25 @@ dFloat UserHeightFieldCollision::RayCastCell (dInt32 xIndex0, dInt32 zIndex0, co
 
 
 // determine if a ray segment intersection the height map cell
-dFloat  UserHeightFieldCollision::UserMeshCollisionRayHitCallback (NewtonUserMeshCollisionRayHitDesc* rayDesc)
+dFloat32  UserHeightFieldCollision::UserMeshCollisionRayHitCallback (NewtonUserMeshCollisionRayHitDesc* rayDesc)
 {
 	dInt32 xInc;
 	dInt32 zInc;
 	dInt32 xIndex0;
 	dInt32 zIndex0;
-	dFloat t;
-	dFloat tx;
-	dFloat tz;
-	dFloat txAcc;
-	dFloat tzAcc;
-	dFloat val;
-	dFloat ix0;
-	dFloat iz0;
-	dFloat scale;
-	dFloat invScale;
+	dFloat32 t;
+	dFloat32 tx;
+	dFloat32 tz;
+	dFloat32 txAcc;
+	dFloat32 tzAcc;
+	dFloat32 val;
+	dFloat32 ix0;
+	dFloat32 iz0;
+	dFloat32 scale;
+	dFloat32 invScale;
 	
-	dFloat stepX;
-	dFloat stepZ;
+	dFloat32 stepX;
+	dFloat32 stepZ;
 	dVector normalOut(0.0f);
 	UserHeightFieldCollision *map;
 

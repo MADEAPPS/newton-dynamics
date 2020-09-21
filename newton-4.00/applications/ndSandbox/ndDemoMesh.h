@@ -28,14 +28,14 @@ class ndDemoSubMesh
 	void AllocIndexData(int indexCount);
 	void OptimizeForRender(const ndDemoMesh* const mesh) const;
 
-	void SetOpacity(dFloat opacity);
+	void SetOpacity(dFloat32 opacity);
 
 	dVector m_ambient;
 	dVector m_diffuse;
 	dVector m_specular;
 	dString  m_textureName;
-	dFloat m_opacity;
-	dFloat m_shiness;
+	dFloat32 m_opacity;
+	dFloat32 m_shiness;
 	int m_indexCount;
 	unsigned m_shader;
 	unsigned m_textureHandle;
@@ -72,8 +72,8 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache);
 	ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCache);
 	ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ndShaderPrograms& shaderCache);
-	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
-	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat* const elevation, int size, dFloat cellSize, dFloat texelsDensity, int tileSize);
+	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
+	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize);
 
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner) { AddRef(); return this;}
 
@@ -102,9 +102,9 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 
 	public:
 	int m_vertexCount;
-	dFloat* m_uv;
-	dFloat* m_vertex;
-	dFloat* m_normal;
+	dFloat32* m_uv;
+	dFloat32* m_vertex;
+	dFloat32* m_normal;
 	unsigned m_optimizedOpaqueDiplayList;
 	unsigned m_optimizedTransparentDiplayList;		
 };

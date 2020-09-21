@@ -51,11 +51,11 @@ unsigned dRand ()
 }
 
 // a pseudo Gaussian random with mean 0 and variance 0.5f
-dFloat dGaussianRandom (dFloat amp)
+dFloat32 dGaussianRandom (dFloat32 amp)
 {
 	unsigned val;
 	val = dRand() + dRand();
-	return amp * (dFloat (val) / dFloat(dRAND_MAX) - 1.0f) * 0.5f;
+	return amp * (dFloat32 (val) / dFloat32(dRAND_MAX) - 1.0f) * 0.5f;
 }
 
 
@@ -65,7 +65,7 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 	#if defined(_WIN32)
 		char appPath [256];
 		GetModuleFileNameA(NULL, appPath, sizeof (appPath));
-		strlwr (appPath);
+		_strlwr (appPath);
 
 		char* const end = strstr (appPath, "applications");
 		end [0] = 0;

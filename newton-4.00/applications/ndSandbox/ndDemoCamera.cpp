@@ -40,16 +40,16 @@ ndDemoCamera::~ndDemoCamera()
 {
 }
 
-void ndDemoCamera::Render(dFloat timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
+void ndDemoCamera::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
 }
 
-dFloat ndDemoCamera::GetYawAngle() const
+dFloat32 ndDemoCamera::GetYawAngle() const
 {
 	return m_cameraYaw;
 }
 
-dFloat ndDemoCamera::GetPichAngle() const
+dFloat32 ndDemoCamera::GetPichAngle() const
 {
 	return m_cameraPitch;
 }
@@ -89,14 +89,14 @@ dVector ndDemoCamera::ScreenToWorld (const dVector& screenPoint) const
 	//Now windows coordinates start with (0,0) being at the top left 
 	//whereas OpenGL cords start lower left so we have to do this to convert it: 
 	//Remember we got viewport value before 
-	winY = (dFloat)m_viewport[3] - winY; 
+	winY = (dFloat32)m_viewport[3] - winY; 
 
 	GLdouble objx;
 	GLdouble objy;
 	GLdouble objz;
 	gluUnProject (winX, winY, winZ, m_modelViewMatrix, m_projectionViewMatrix, (GLint*)&m_viewport, &objx, &objy, &objz);
 
-	return dVector (dFloat(objx), dFloat(objy), dFloat(objz));
+	return dVector (dFloat32(objx), dFloat32(objy), dFloat32(objz));
 }
 
 dVector ndDemoCamera::WorldToScreen (const dVector& worldPoint) const
@@ -140,9 +140,9 @@ dAssert (0);
 	glGetIntegerv(GL_VIEWPORT, viewport); 
 	gluProject (objx, objy, objz, modelview, projection, viewport, &winX, &winY, &winZ);
 
-	winY = (dFloat)viewport[3] - winY; 
+	winY = (dFloat32)viewport[3] - winY; 
 
-	return dVector (dFloat(winX), dFloat (winY), dFloat(winZ), 0.0f);
+	return dVector (dFloat32(winX), dFloat32 (winY), dFloat32(winZ), 0.0f);
 */
 	return dVector (0.0f);
 }

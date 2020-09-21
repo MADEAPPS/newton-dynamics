@@ -30,7 +30,7 @@ dSoundManager::dSoundChannel::~dSoundChannel()
 	dAssert (alGetError() == AL_NO_ERROR);
 }
 
-void dSoundManager::dSoundChannel::LinkAsset( dTree<dSoundAsset, dCRCTYPE>::dTreeNode* const assetNode)
+void dSoundManager::dSoundChannel::LinkAsset( dTree<dSoundAsset, dUnsigned64>::dTreeNode* const assetNode)
 {
 	m_myAssetNode = assetNode;
 	dSoundAsset& asset = m_myAssetNode->GetInfo();
@@ -279,7 +279,7 @@ void* dSoundManager::CreateSound (const char* const fileName)
 		char path[2048];
 		dGetWorkingFileName (fileName, path);
 
-		dCRCTYPE code = dCRC64 (path);
+		dUnsigned64 code = dCRC64 (path);
 		dSoundAssetList::dTreeNode* assetNode = m_assets.Find(code);
 		if (!assetNode) {
 			assetNode = m_assets.Insert (code);

@@ -33,7 +33,7 @@ class ndDemoEntity: public dHierarchy<ndDemoEntity>, virtual public dClassInfo
 		{
 		}
 		
-		virtual void OnRender (dFloat timestep) const = 0;
+		virtual void OnRender (dFloat32 timestep) const = 0;
 	};
 
 	ndDemoEntity(const ndDemoEntity& copyFrom);
@@ -61,18 +61,18 @@ class ndDemoEntity: public dHierarchy<ndDemoEntity>, virtual public dClassInfo
 	virtual void SetMatrix(ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position);
 	virtual void SetNextMatrix (ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position);
 
-	void InterpolateMatrixUnsafe(dFloat param);
+	void InterpolateMatrixUnsafe(dFloat32 param);
 	void SetMatrixUsafe(const dQuaternion& rotation, const dVector& position);
 
 	virtual void ResetMatrix(ndDemoEntityManager& world, const dMatrix& matrix);
-	virtual void InterpolateMatrix (ndDemoEntityManager& world, dFloat param);
+	virtual void InterpolateMatrix (ndDemoEntityManager& world, dFloat32 param);
 	dMatrix CalculateInterpolatedGlobalMatrix (const ndDemoEntity* const root = NULL) const;
 
 	void RenderBone() const;
-	virtual void Render(dFloat timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
+	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
 	NewtonCollision* CreateCollisionFromchildren(NewtonWorld* const world) const;
 
-	static void TransformCallback(const NewtonBody* body, const dFloat* matrix, int threadIndex);
+	static void TransformCallback(const NewtonBody* body, const dFloat32* matrix, int threadIndex);
 
 	protected:
 	mutable dMatrix m_matrix;			// interpolated matrix

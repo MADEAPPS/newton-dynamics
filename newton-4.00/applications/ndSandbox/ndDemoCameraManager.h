@@ -38,26 +38,26 @@ class ndDemoCameraManager
 	void SetCameraMouseLock (bool loockState);
 
 	void RenderPickedTarget () const;
-	void InterpolateMatrices (ndDemoEntityManager* const scene, dFloat timeStepFraction);
+	void InterpolateMatrices (ndDemoEntityManager* const scene, dFloat32 timeStepFraction);
 
-	virtual void FixUpdate(const NewtonWorld* const world, dFloat timestep);
+	virtual void FixUpdate(const NewtonWorld* const world, dFloat32 timestep);
 
 	void ResetPickBody();
 
 	private:
 	virtual void OnBodyDestroy (NewtonBody* const body);
-	void UpdatePickBody (ndDemoEntityManager* const scene, bool mouseState, const dVector& camPos0, const dVector& camPos1, dFloat timestep); 
+	void UpdatePickBody (ndDemoEntityManager* const scene, bool mouseState, const dVector& camPos0, const dVector& camPos1, dFloat32 timestep); 
 	
 	ndDemoCamera* m_camera;
 	int m_mousePosX;
 	int m_mousePosY;
-	dFloat m_yaw;
-	dFloat m_pitch;
-	dFloat m_yawRate;
-	dFloat m_pitchRate;
-	dFloat m_frontSpeed;
-	dFloat m_sidewaysSpeed;
-	dFloat m_pickedBodyParam;
+	dFloat32 m_yaw;
+	dFloat32 m_pitch;
+	dFloat32 m_yawRate;
+	dFloat32 m_pitchRate;
+	dFloat32 m_frontSpeed;
+	dFloat32 m_sidewaysSpeed;
+	dFloat32 m_pickedBodyParam;
 
 	bool m_prevMouseState;	
 	bool m_mouseLockState;	

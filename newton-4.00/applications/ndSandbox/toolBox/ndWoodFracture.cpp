@@ -37,7 +37,7 @@ class dWoodFractureListener: public dCustomParallelListener
 		dVector m_momentOfInertia;
 		ndDemoMesh* m_mesh;
 		NewtonCollision* m_collision;
-		dFloat m_massFraction;
+		dFloat32 m_massFraction;
 	};
 
 	class WoodVoronoidEffect: public dList<WoodFractureAtom>
@@ -70,9 +70,9 @@ class dWoodFractureListener: public dCustomParallelListener
 
 			int count = 8;
 			for (int i = 0; i < count; i ++) {
-				dFloat x = dGaussianRandom(size.m_x * 0.1f);
-				dFloat y = dGaussianRandom(size.m_y * 0.1f);
-				dFloat z = dGaussianRandom(size.m_y * 0.1f);
+				dFloat32 x = dGaussianRandom(size.m_x * 0.1f);
+				dFloat32 y = dGaussianRandom(size.m_y * 0.1f);
+				dFloat32 z = dGaussianRandom(size.m_y * 0.1f);
 				points[i] += dVector(x, y, z);
 			}
 
@@ -94,7 +94,7 @@ class dWoodFractureListener: public dCustomParallelListener
 
 			// Get the volume of the original mesh
 			NewtonCollision* const collision1 = NewtonCreateConvexHullFromMesh(world, mesh, 0.0f, 16);
-			dFloat volume = NewtonConvexCollisionCalculateVolume(collision1);
+			dFloat32 volume = NewtonConvexCollisionCalculateVolume(collision1);
 			NewtonDestroyCollision(collision1);
 
 			// now we call create we decompose the mesh into several convex pieces 
@@ -117,7 +117,7 @@ class dWoodFractureListener: public dCustomParallelListener
 						WoodFractureAtom& atom = Append()->GetInfo();
 						atom.m_mesh = new ndDemoMesh(fracturePiece, scene->GetShaderCache());
 						NewtonConvexCollisionCalculateInertialMatrix(collision, &atom.m_momentOfInertia[0], &atom.m_centerOfMass[0]);
-						dFloat debriVolume = NewtonConvexCollisionCalculateVolume(collision);
+						dFloat32 debriVolume = NewtonConvexCollisionCalculateVolume(collision);
 						atom.m_massFraction = debriVolume / volume;
 						atom.m_collision = collision;
 					}
@@ -162,9 +162,9 @@ class dWoodFractureListener: public dCustomParallelListener
 	}
 
 	void AddFracturedWoodPrimitive(
-		dFloat density,
+		dFloat32 density,
 		const dVector& origin, const dVector& size,
-		int xCount, int zCount, dFloat spacing, int stype, int materialID, const dMatrix& shapeOffsetMatrix)
+		int xCount, int zCount, dFloat32 spacing, int stype, int materialID, const dMatrix& shapeOffsetMatrix)
 	{
 		// create the shape and visual mesh as a common data to be re used
 		NewtonWorld* const world = GetWorld();
@@ -190,19 +190,19 @@ class dWoodFractureListener: public dCustomParallelListener
 		// create a  mesh fracture from the newton mesh primitive
 		WoodVoronoidEffect fracture(world, mesh, internalMaterial);
 
-		dFloat startElevation = 100.0f;
+		dFloat32 startElevation = 100.0f;
 		dMatrix matrix(dGetIdentityMatrix());
 		
 		for (int i = 0; i < xCount; i++) {
-			dFloat x = origin.m_x + (i - xCount / 2) * spacing;
+			dFloat32 x = origin.m_x + (i - xCount / 2) * spacing;
 			for (int j = 0; j < zCount; j++) {
-				dFloat z = origin.m_z + (j - zCount / 2) * spacing;
+				dFloat32 z = origin.m_z + (j - zCount / 2) * spacing;
 
 				matrix.m_posit.m_x = x;
 				matrix.m_posit.m_z = z;
 				dVector floor(FindFloor(world, dVector(matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
 				matrix.m_posit.m_y = floor.m_y + 0.5f;
-				dFloat mass = density * NewtonConvexCollisionCalculateVolume(collision);
+				dFloat32 mass = density * NewtonConvexCollisionCalculateVolume(collision);
 				NewtonBody* const body = CreateSimpleSolid (scene, visualMesh, mass, matrix, collision, materialID);
 				WoodVoronoidEffect& newEffect = m_effectList.Append (fracture)->GetInfo();
 				newEffect.m_body = body;
@@ -215,7 +215,7 @@ class dWoodFractureListener: public dCustomParallelListener
 		NewtonDestroyCollision(collision);
 	}
 
-	void PostUpdate(dFloat timestep, int threadID) 
+	void PostUpdate(dFloat32 timestep, int threadID) 
 	{
 		NewtonWorld* const world = GetWorld();
 		const int threadCount = NewtonGetThreadsCount(world);
@@ -236,7 +236,7 @@ class dWoodFractureListener: public dCustomParallelListener
 		}
 	}
 
-	void PostUpdate(dFloat timestep)
+	void PostUpdate(dFloat32 timestep)
 	{
 		dCustomParallelListener::PostUpdate(timestep);
 
@@ -256,17 +256,17 @@ class dWoodFractureListener: public dCustomParallelListener
 		}
 	}
 
-	void UpdateEffect(WoodVoronoidEffect& effect, dFloat timestep) 
+	void UpdateEffect(WoodVoronoidEffect& effect, dFloat32 timestep) 
 	{
 		// see if the net force on the body comes fr a high impact collision
-		dFloat breakImpact = 0.0f;
+		dFloat32 breakImpact = 0.0f;
 		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(effect.m_body); joint; joint = NewtonBodyGetNextContactJoint(effect.m_body, joint)) {
 			for (void* contact = NewtonContactJointGetFirstContact(joint); contact; contact = NewtonContactJointGetNextContact(joint, contact)) {
 				dVector contactForce;
 				const NewtonCollision* const coll0 = NewtonContactGetCollision0(contact);
 				const NewtonCollision* const coll1 = NewtonContactGetCollision1(contact);
 				const NewtonMaterial* const material = NewtonContactGetMaterial(contact);
-				dFloat impulseImpact = NewtonMaterialGetContactMaxNormalImpact(material);
+				dFloat32 impulseImpact = NewtonMaterialGetContactMaxNormalImpact(material);
 
 				if (NewtonCollisionGetUserID(coll0) == 4) {
 					// m_tirePart
@@ -286,10 +286,10 @@ class dWoodFractureListener: public dCustomParallelListener
 			}
 		}
 
-		dFloat invMass;
-		dFloat invIxx;
-		dFloat invIyy;
-		dFloat invIzz;
+		dFloat32 invMass;
+		dFloat32 invIxx;
+		dFloat32 invIyy;
+		dFloat32 invIzz;
 		NewtonBodyGetInvMass(effect.m_body, &invMass, &invIxx, &invIyy, &invIzz);
 
 		// if the force is bigger than N time Gravities, It is considered a collision force
@@ -300,10 +300,10 @@ class dWoodFractureListener: public dCustomParallelListener
 			dVector com(0.0f);
 			dVector veloc(0.0f);
 			dVector omega(0.0f);
-			dFloat Ixx;
-			dFloat Iyy;
-			dFloat Izz;
-			dFloat mass;
+			dFloat32 Ixx;
+			dFloat32 Iyy;
+			dFloat32 Izz;
+			dFloat32 mass;
 
 			NewtonWorld* const world = GetWorld();
 			// create the shape and visual mesh as a common data to be re used
@@ -337,7 +337,7 @@ class dWoodFractureListener: public dCustomParallelListener
 				entity->SetMesh(atom.m_mesh, dGetIdentityMatrix());
 				scene->Append(entity);
 
-				dFloat debriMass = mass * atom.m_massFraction;
+				dFloat32 debriMass = mass * atom.m_massFraction;
 
 				//create the rigid body
 				NewtonBody* const rigidBody = NewtonCreateDynamicBody(world, atom.m_collision, &matrix[0][0]);
@@ -353,10 +353,10 @@ class dWoodFractureListener: public dCustomParallelListener
 				// set the debris mass properties, mass, center of mass, and inertia 
 				NewtonBodySetMassProperties(rigidBody, debriMass, atom.m_collision);
 
-				dFloat mass;
-				dFloat Ixx;
-				dFloat Iyy;
-				dFloat Izz;
+				dFloat32 mass;
+				dFloat32 Ixx;
+				dFloat32 Iyy;
+				dFloat32 Izz;
 				NewtonBodyGetMass(rigidBody, &mass, &Ixx, &Iyy, &Izz);
 				if (Iyy > 10.0f * Ixx) {
 					Iyy *= 0.25f; 
@@ -401,9 +401,9 @@ class dWoodFractureListener: public dCustomParallelListener
 };
 
 void AddFracturedWoodPrimitive(
-	ndDemoEntityManager* const scene, dFloat density,
+	ndDemoEntityManager* const scene, dFloat32 density,
 	const dVector& origin, const dVector& size,
-	int xCount, int zCount, dFloat spacing, int stype, int materialID, const dMatrix& shapeOffsetMatrix)
+	int xCount, int zCount, dFloat32 spacing, int stype, int materialID, const dMatrix& shapeOffsetMatrix)
 {
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();

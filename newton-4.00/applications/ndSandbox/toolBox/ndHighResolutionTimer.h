@@ -18,7 +18,7 @@
 
 
 void dResetTimer();
-dFloat dGetElapsedSeconds();
+dFloat32 dGetElapsedSeconds();
 unsigned64 dGetTimeInMicrosenconds();
 
 

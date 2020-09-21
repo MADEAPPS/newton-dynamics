@@ -230,11 +230,11 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	m_shadeCache.CreateAllEffects();
 
 /*
-	dFloat A[2][2];
-	dFloat x[2];
-	dFloat b[2];
-	dFloat l[2];
-	dFloat h[2];
+	dFloat32 A[2][2];
+	dFloat32 x[2];
+	dFloat32 b[2];
+	dFloat32 l[2];
+	dFloat32 h[2];
 
 	A[0][0] = 2.0f;
 	A[0][1] = 1.0f;
@@ -350,7 +350,7 @@ void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback,
 	m_updateCameraContext = context;
 }
 
-int ndDemoEntityManager::GetJoystickAxis (dFloat* const axisValues, int maxAxis) const
+int ndDemoEntityManager::GetJoystickAxis (dFloat32* const axisValues, int maxAxis) const
 {
 	int axisCount = 0;
 	if (m_hasJoytick) {
@@ -965,7 +965,7 @@ void ndDemoEntityManager::RenderStats()
 	ShowMainMenuBar();
 }
 
-void ndDemoEntityManager::CalculateFPS(dFloat timestep)
+void ndDemoEntityManager::CalculateFPS(dFloat32 timestep)
 {
 	m_framesCount ++;
 	m_timestepAcc += timestep;
@@ -978,7 +978,7 @@ void ndDemoEntityManager::CalculateFPS(dFloat timestep)
 
 	//update fps every quarter of a second
 	if (m_timestepAcc >= 0.25f) {
-		m_fps = dFloat (m_framesCount) / m_timestepAcc;
+		m_fps = dFloat32 (m_framesCount) / m_timestepAcc;
 		m_timestepAcc -= 0.25f;
 		m_framesCount = 0;
 	}
@@ -1214,13 +1214,13 @@ void ndDemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dV
 	m_cameraManager->SetCameraMatrix(this, rotation, position);
 }
 
-void ndDemoEntityManager::UpdatePhysics(dFloat timestep)
+void ndDemoEntityManager::UpdatePhysics(dFloat32 timestep)
 {
 	// update the physics
 	if (m_world && !m_suspendPhysicsUpdate) {
 		D_TRACKTIME();
 
-		dFloat timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
+		dFloat32 timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
 		unsigned64 timestepMicrosecunds = unsigned64 (timestepInSecunds * 1000000.0f);
 
 		unsigned64 currentTime = dGetTimeInMicrosenconds ();
@@ -1231,7 +1231,7 @@ void ndDemoEntityManager::UpdatePhysics(dFloat timestep)
 		}
 
 		bool newUpdate = false;
-		dFloat physicsTime = 0.0f;
+		dFloat32 physicsTime = 0.0f;
 		//while (nextTime >= timestepMicrosecunds) 
 		if (nextTime >= timestepMicrosecunds) 
 		{
@@ -1272,10 +1272,10 @@ void ndDemoEntityManager::UpdatePhysics(dFloat timestep)
 	}
 }
 
-dFloat ndDemoEntityManager::CalculateInteplationParam () const
+dFloat32 ndDemoEntityManager::CalculateInteplationParam () const
 {
 	unsigned64 timeStep = dGetTimeInMicrosenconds () - m_microsecunds;		
-	dFloat param = (dFloat (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
+	dFloat32 param = (dFloat32 (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
 	dAssert (param >= 0.0f);
 	if (param > 1.0f) {
 		param = 1.0f;
@@ -1375,7 +1375,7 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glPopAttrib();
 }
 
-void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFloat timestep)
+void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep)
 {
 	ndDemoEntityManager* const scene = (ndDemoEntityManager*) NewtonWorldGetUserData(world);
 	scene->m_cameraManager->FixUpdate(scene->GetNewton(), timestep);
@@ -1386,7 +1386,7 @@ void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFl
 
 void ndDemoEntityManager::RenderScene()
 {
-	dFloat timestep = dGetElapsedSeconds();	
+	dFloat32 timestep = dGetElapsedSeconds();	
 	CalculateFPS(timestep);
 	UpdatePhysics(timestep);
 
@@ -1421,7 +1421,7 @@ void ndDemoEntityManager::RenderScene()
 	// set default lightning
 	glEnable (GL_LIGHTING);
 
-	dFloat cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
+	dFloat32 cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
 	glMaterialParam(GL_FRONT, GL_SPECULAR, cubeColor);
 	glMaterialParam(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cubeColor);
 	glMaterialf(GL_FRONT, GL_SHININESS, 50.0);

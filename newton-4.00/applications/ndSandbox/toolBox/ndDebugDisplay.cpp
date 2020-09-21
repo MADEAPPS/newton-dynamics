@@ -34,7 +34,7 @@ void SetDebugDisplayMode(int state)
 	static dVector g_debugDisplayCallback[1024 * 4];
 #endif
 
-static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, dFloat length)
+static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, dFloat32 length)
 {
 	for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(body); joint; joint = NewtonBodyGetNextContactJoint(body, joint)) {
 		if (NewtonJointIsActive (joint)) {
@@ -58,12 +58,12 @@ static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, dFloa
 	}
 }
 
-static void RenderBodyContactsForces (NewtonBody* const body, dFloat scale)
+static void RenderBodyContactsForces (NewtonBody* const body, dFloat32 scale)
 {
-	dFloat mass;
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
+	dFloat32 mass;
+	dFloat32 Ixx;
+	dFloat32 Iyy;
+	dFloat32 Izz;
 	NewtonBodyGetMass (body, &mass, &Ixx, &Iyy, &Izz);	
 
 	//draw normal forces in term of acceleration.
@@ -108,7 +108,7 @@ static void RenderBodyContactsForces (NewtonBody* const body, dFloat scale)
 	}
 }
 
-//void NewtonMaterialGetContactForce(const NewtonMaterial* const materialHandle, NewtonBody* const body, dFloat* const forcePtr)
+//void NewtonMaterialGetContactForce(const NewtonMaterial* const materialHandle, NewtonBody* const body, dFloat32* const forcePtr)
 
 void RenderAABB (NewtonWorld* const world)
 {
@@ -293,7 +293,7 @@ void RenderNormalForces (NewtonWorld* const world)
 	glColor3f(0.0f, 0.5f, 1.0f);
 	glBegin(GL_LINES);
 
-	dFloat length = 1.0f / 200.0f;
+	dFloat32 length = 1.0f / 200.0f;
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 		RenderBodyContactsForces (body, length);
 	}
@@ -302,7 +302,7 @@ void RenderNormalForces (NewtonWorld* const world)
 
 
 
-void DebugShowGeometryCollision (void* userData, int vertexCount, const dFloat* const faceVertec, int id)
+void DebugShowGeometryCollision (void* userData, int vertexCount, const dFloat32* const faceVertec, int id)
 {
 	//DEBUG_DRAW_MODE mode = (DEBUG_DRAW_MODE) ((int)userData); //NOTE error: cast from ‘void*’ to ‘int’ loses precision
 	DEBUG_DRAW_MODE mode = (DEBUG_DRAW_MODE) ((intptr_t)userData);
@@ -334,7 +334,7 @@ void DebugShowGeometryCollision (void* userData, int vertexCount, const dFloat* 
 	}
 }
 
-void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat* const faceVertec, int clusterIndex)
+void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat32* const faceVertec, int clusterIndex)
 {
 	static dVector color[] = {dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f), dVector(0.0f, 0.0f, 1.0f, 0.0f), 
 							  dVector(1.0f, 1.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 1.0f, 0.0f), dVector(1.0f, 0.0f, 1.0f, 0.0f),
@@ -384,10 +384,10 @@ void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE 
 	}
 	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
 
-		dFloat mass;
-		dFloat Ixx;
-		dFloat Iyy;
-		dFloat Izz;
+		dFloat32 mass;
+		dFloat32 Ixx;
+		dFloat32 Iyy;
+		dFloat32 Izz;
 		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 		if (mass == 0.0f) {
 //			continue;
@@ -433,7 +433,7 @@ void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE 
 	glEnd();
 }
 
-void DebugDrawPoint (const dVector& p, dFloat size)
+void DebugDrawPoint (const dVector& p, dFloat32 size)
 {
 	glPointSize(GLfloat(size));
 	glBegin(GL_POINTS);
@@ -463,7 +463,7 @@ void ClearDebugDisplay( NewtonWorld* const world )
 	g_debugDisplayCount = 0;
 }
 
-void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const NewtonBody* const body, int faceID, int vertexCount, const dFloat* const vertex, int vertexstrideInBytes)
+void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const NewtonBody* const body, int faceID, int vertexCount, const dFloat32* const vertex, int vertexstrideInBytes)
 {
 #ifdef USE_STATIC_MESHES_DEBUG_COLLISION
 	if (g_debugMode) {
@@ -472,7 +472,7 @@ void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const 
 			// here fore we need to avoid race conditions
 			NewtonWorldCriticalSectionLock (NewtonBodyGetWorld (staticCollisionBody), 0);
 
-			int stride = vertexstrideInBytes / sizeof (dFloat);
+			int stride = vertexstrideInBytes / sizeof (dFloat32);
 			dVector l0 (vertex[(vertexCount-1) * stride + 0], vertex[(vertexCount-1) * stride + 1], vertex[(vertexCount-1) * stride + 2], 0.0f);
 			for (int j = 0; j < vertexCount; j ++) {
 				dVector l1 (vertex[j * stride + 0], vertex[j * stride + 1] , vertex[j * stride + 2], 0.0f);

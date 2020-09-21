@@ -22,27 +22,12 @@
 
 #define DOMMY_API 
 
-typedef char dInt8;
-typedef unsigned char dUnsigned8;
-
-typedef short dInt16;
-typedef unsigned short dUnsigned16;
-
-typedef int dInt32;
-typedef unsigned dUnsigned32;
-typedef unsigned int dUnsigned32;
-
-
-typedef long long unsigned64;
-
-
 #include <stddef.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <math.h>
 #include <float.h>
 #include <ctype.h>
-
 
 #define USE_STATIC_MESHES_DEBUG_COLLISION
 //#define USE_TEST_ALL_FACE_USER_RAYCAST_CALLBACK
@@ -102,111 +87,89 @@ typedef long long unsigned64;
 #endif
 
 
-
-#ifdef _MSC_VER
-	#pragma warning (disable: 4100) //unreferenced formal parameter
-	#pragma warning (disable: 4505) //unreferenced local function has been removed
-	#pragma warning (disable: 4201) //nonstandard extension used : nameless struct/union
-	#pragma warning (disable: 4127) //conditional expression is constant
-	#pragma warning (disable: 4456) //declaration of 'bone' hides previous local declaration
-
-	#if (_MSC_VER >= 1400)
-		#pragma warning (disable: 4996) // for 2005 users declared deprecated
-	#endif
-#endif
-
 // SDK includes
-#include <Newton.h>
-#include <dVector.h>
-#include <dMatrix.h>
-#include <dQuaternion.h>
-#include <dMathDefines.h>
-#include <dBezierSpline.h>
-
-#include <dCRC.h>
-#include <dMap.h>
-#include <dHeap.h>
-#include <dList.h>
-#include <dTree.h>
-#include <dRtti.h>
-#include <dArray.h>
-#include <dPointer.h>
-#include <dClassInfo.h>
-#include <dRefCounter.h>
-#include <dBaseHierarchy.h>
-
-#include <dCustomJoint.h>
-#include <dCustomGear.h>
-#include <dCustomHinge.h>
-#include <dCustomPlane.h>
-#include <dCustomWheel.h>
-#include <dCustomMotor.h>
-#include <dCustomSixdof.h>
-#include <dCustomSlider.h>
-#include <dCustomPulley.h>
-#include <dCustomCorkScrew.h>
-#include <dCustomPathFollow.h>
-#include <dCustomDoubleHinge.h>
-#include <dCustomFixDistance.h>
-#include <dCustomRackAndPinion.h>
-#include <dCustomHingeActuator.h>
-#include <dCustomBallAndSocket.h>
-#include <dCustomSliderActuator.h>
-#include <dCustomSlidingContact.h>
-#include <dCustomDoubleHingeActuator.h>
-
-#include <dCustomTriggerManager.h>
-#include <dCustomKinematicController.h>
-
-
-#include <dModelStdAfx.h>
-#include <dModelNode.h>
-#include <dModelManager.h>
-#include <dModelRootNode.h>
-#include <dModelAnimTree.h>
-#include <dModelAnimTreePose.h>
-#include <dModelAnimTreePoseBlender.h>
-
-#include <dStdafxVehicle.h>
-#include <dVehicleNode.h>
-#include <dPlayerIKNode.h>
-#include <dVehicleManager.h>
-#include <dPlayerController.h>
-#include <dMultiBodyVehicle.h>
-#include <dPlayerIKNodeJoint.h>
-#include <dPlayerIKPoseModifier.h>
-#include <dMultiBodyVehicleTire.h>
-#include <dMultiBodyVehicleEngine.h>
-#include <dMultiBodyVehicleDifferential.h>
-
-#include <dSceneStdafx.h>
-#include <dScene.h>
-#include <dRootNodeInfo.h>
-#include <dBoneNodeInfo.h>
-#include <dMeshNodeInfo.h>
-#include <dLineNodeInfo.h>
-#include <dSceneNodeInfo.h>
-#include <dAnimationTake.h>
-#include <dAnimationTrack.h>
-#include <dTextureNodeInfo.h>
-#include <dMaterialNodeInfo.h>
-#include <dRigidbodyNodeInfo.h>
-#include <dCollisionNodeInfo.h>
-#include <dCollisionBoxNodeInfo.h>
-#include <dCollisionSphereNodeInfo.h>
-#include <dCollisionConvexHullNodeInfo.h>
-#include <dGeometryNodeSkinClusterInfo.h>
-
-#include <dStdAfxNewton.h>
-#include <dNewtonMesh.h>
-
-#include <dAnimationStdAfx.h>
-#include <dAnimationPose.h>
-#include <dAnimationSequence.h>
-#include <dAnimationTwoWayBlend.h>
-#include <dAnimationBlendTreeNode.h>
-#include <dAnimationSequencePlayer.h>
-#include <dAnimationKeyframesTrack.h>
+#include <ndNewton.h>
+//#include <dVector.h>
+//#include <dMatrix.h>
+//#include <dQuaternion.h>
+//#include <dMathDefines.h>
+//#include <dBezierSpline.h>
+//#include <dCRC.h>
+//#include <dMap.h>
+//#include <dHeap.h>
+//#include <dList.h>
+//#include <dTree.h>
+//#include <dRtti.h>
+//#include <dArray.h>
+//#include <dPointer.h>
+//#include <dClassInfo.h>
+//#include <dRefCounter.h>
+//#include <dBaseHierarchy.h>
+//#include <dCustomJoint.h>
+//#include <dCustomGear.h>
+//#include <dCustomHinge.h>
+//#include <dCustomPlane.h>
+//#include <dCustomWheel.h>
+//#include <dCustomMotor.h>
+//#include <dCustomSixdof.h>
+//#include <dCustomSlider.h>
+//#include <dCustomPulley.h>
+//#include <dCustomCorkScrew.h>
+//#include <dCustomPathFollow.h>
+//#include <dCustomDoubleHinge.h>
+//#include <dCustomFixDistance.h>
+//#include <dCustomRackAndPinion.h>
+//#include <dCustomHingeActuator.h>
+//#include <dCustomBallAndSocket.h>
+//#include <dCustomSliderActuator.h>
+//#include <dCustomSlidingContact.h>
+//#include <dCustomDoubleHingeActuator.h>
+//#include <dCustomTriggerManager.h>
+//#include <dCustomKinematicController.h>
+//#include <dModelStdAfx.h>
+//#include <dModelNode.h>
+//#include <dModelManager.h>
+//#include <dModelRootNode.h>
+//#include <dModelAnimTree.h>
+//#include <dModelAnimTreePose.h>
+//#include <dModelAnimTreePoseBlender.h>
+//#include <dStdafxVehicle.h>
+//#include <dVehicleNode.h>
+//#include <dPlayerIKNode.h>
+//#include <dVehicleManager.h>
+//#include <dPlayerController.h>
+//#include <dMultiBodyVehicle.h>
+//#include <dPlayerIKNodeJoint.h>
+//#include <dPlayerIKPoseModifier.h>
+//#include <dMultiBodyVehicleTire.h>
+//#include <dMultiBodyVehicleEngine.h>
+//#include <dMultiBodyVehicleDifferential.h>
+//#include <dSceneStdafx.h>
+//#include <dScene.h>
+//#include <dRootNodeInfo.h>
+//#include <dBoneNodeInfo.h>
+//#include <dMeshNodeInfo.h>
+//#include <dLineNodeInfo.h>
+//#include <dSceneNodeInfo.h>
+//#include <dAnimationTake.h>
+//#include <dAnimationTrack.h>
+//#include <dTextureNodeInfo.h>
+//#include <dMaterialNodeInfo.h>
+//#include <dRigidbodyNodeInfo.h>
+//#include <dCollisionNodeInfo.h>
+//#include <dCollisionBoxNodeInfo.h>
+//#include <dCollisionSphereNodeInfo.h>
+//#include <dCollisionConvexHullNodeInfo.h>
+//#include <dGeometryNodeSkinClusterInfo.h>
+//#include <dStdAfxNewton.h>
+//#include <dNewtonMesh.h>
+//#include <dAnimationStdAfx.h>
+//#include <dAnimationPose.h>
+//#include <dAnimationSequence.h>
+//#include <dAnimationTwoWayBlend.h>
+//#include <dAnimationBlendTreeNode.h>
+//#include <dAnimationSequencePlayer.h>
+//#include <dAnimationKeyframesTrack.h>
 
 /*
 #ifdef _NEWTON_USE_DOUBLE
@@ -216,12 +179,12 @@ typedef long long unsigned64;
 #else
 	#define glMultMatrix(x) glMultMatrixf(x)
 	#define glLoadMatrix(x) glMultMatrixf(x)
-	#define glGetFloat(x,y) glGetFloatv(x,(dFloat  *)y) 
+	#define glGetFloat(x,y) glGetFloatv(x,(dFloat32  *)y) 
 #endif
 */
 
 #ifdef _NEWTON_USE_DOUBLE
-inline void glMaterialParam (GLenum face, GLenum pname, const dFloat *params)
+inline void glMaterialParam (GLenum face, GLenum pname, const dFloat32 *params)
 {
 	GLfloat tmp[4] = {GLfloat(params[0]), GLfloat(params[1]), GLfloat(params[2]), GLfloat(params[3])};
 	glMaterialfv (face, pname, &tmp[0]);
@@ -265,7 +228,7 @@ inline void glMaterialParam (GLenum face, GLenum pname, const dFloat *params)
 
 unsigned dRand ();
 void dSetRandSeed (unsigned seed);
-dFloat dGaussianRandom (dFloat amp);
+dFloat32 dGaussianRandom (dFloat32 amp);
 
 inline int dTwosPower (int x)
 {

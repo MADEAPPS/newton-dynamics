@@ -126,7 +126,7 @@ void ndSkyBox::DrawMesh () const
 	glUseProgram(0);
 }
 
-void ndSkyBox::Render(dFloat timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix__) const
+void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix__) const
 {
 	dMatrix matrix;
 

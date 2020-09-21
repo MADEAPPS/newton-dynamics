@@ -59,12 +59,12 @@ class dMousePickClass
 		return m_hitBody;
 	}
 
-	static dFloat RayCastFilter (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const contact, const dFloat* const normal, dLong collisionID, void* const userData, dFloat intersetParam)
+	static dFloat32 RayCastFilter (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat32* const contact, const dFloat32* const normal, dLong collisionID, void* const userData, dFloat32 intersetParam)
 	{
-		dFloat mass;
-		dFloat Ixx;
-		dFloat Iyy;
-		dFloat Izz;
+		dFloat32 mass;
+		dFloat32 Ixx;
+		dFloat32 Iyy;
+		dFloat32 Izz;
 
 		// check if we are hitting a sub shape
 		const NewtonCollision* const parent = NewtonCollisionGetParentInstance(collisionHit);
@@ -88,7 +88,7 @@ class dMousePickClass
 	}
 
 	dVector m_normal;
-	dFloat m_param;
+	dFloat32 m_param;
 	const NewtonBody* m_body;
 	static bool m_hitBody;
 	static dVector m_lastPoint;
@@ -144,10 +144,10 @@ class RayCastPlacementData
 	{
 	}
 	dVector m_normal;
-	dFloat m_param;
+	dFloat32 m_param;
 };
 
-static dFloat RayCastPlacement (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat* const contact, const dFloat* const normal, dLong collisionID, void* const userData, dFloat intersetParam)
+static dFloat32 RayCastPlacement (const NewtonBody* const body, const NewtonCollision* const collisionHit, const dFloat32* const contact, const dFloat32* const normal, dLong collisionID, void* const userData, dFloat32 intersetParam)
 {
 	// if the collision has a parent, the this can be it si a sub shape of a compound collision 
 	const NewtonCollision* const parent = NewtonCollisionGetParentInstance(collisionHit);
@@ -176,7 +176,7 @@ static unsigned RayPrefilter (const NewtonBody* const body, const NewtonCollisio
 	return 1;
 }
 
-dVector FindFloor (const NewtonWorld* world, const dVector& origin, dFloat dist, dVector* const normal)
+dVector FindFloor (const NewtonWorld* world, const dVector& origin, dFloat32 dist, dVector* const normal)
 {
 	// shot a vertical ray from a high altitude and collect the intersection parameter.
 	dVector p0 (origin); 
@@ -358,7 +358,7 @@ int PhysicsIslandUpdate (const NewtonWorld* world, const void* islandHandle, int
 	return 1;
 }
 
-void GenericContactProcess (const NewtonJoint* contactJoint, dFloat timestep, int threadIndex)
+void GenericContactProcess (const NewtonJoint* contactJoint, dFloat32 timestep, int threadIndex)
 {
 	int isHightField;
 	NewtonBody* body;
@@ -409,7 +409,7 @@ void GetForceOnStaticBody (NewtonBody* body, NewtonBody* staticBody)
 	
 				dVector point(0.0f);
 				dVector normal(0.0f);	
-				dFloat forceMag;
+				dFloat32 forceMag;
 				NewtonMaterial* material;
 
 				material = NewtonContactGetMaterial (contact);
@@ -428,10 +428,10 @@ void GetForceOnStaticBody (NewtonBody* body, NewtonBody* staticBody)
 
 
 
-static void ExtrudeFaces (void* userData, int vertexCount, const dFloat* faceVertec, int id)
+static void ExtrudeFaces (void* userData, int vertexCount, const dFloat32* faceVertec, int id)
 {
-	dFloat OFFSET = 0.1f;
-	dFloat face[32][10];
+	dFloat32 OFFSET = 0.1f;
+	dFloat32 face[32][10];
 
 	NewtonMesh* mesh = (NewtonMesh*) userData;
 
@@ -472,7 +472,7 @@ static void ExtrudeFaces (void* userData, int vertexCount, const dFloat* faceVer
 	}
 	
 	// add the face
-	NewtonMeshAddFace (mesh, vertexCount, &face[0][0], 10 * sizeof (dFloat), id);
+	NewtonMeshAddFace (mesh, vertexCount, &face[0][0], 10 * sizeof (dFloat32), id);
 
 
 	// now add on face walk the perimeter and add a rivet face
@@ -536,7 +536,7 @@ static void ExtrudeFaces (void* userData, int vertexCount, const dFloat* faceVer
 		q0 = q1;
 
 		// add this face to the mesh
-		NewtonMeshAddFace (mesh, 4, &face[0][0], 10 * sizeof (dFloat), id);
+		NewtonMeshAddFace (mesh, 4, &face[0][0], 10 * sizeof (dFloat32), id);
 	}
 }
 
@@ -577,7 +577,7 @@ void HandlecollisionPoints (NewtonJoint* const contactjoint)
 		NewtonMaterial* material = NewtonContactGetMaterial (contact);
 
 		// do whatever you want here
-		//dFloat forceMag;
+		//dFloat32 forceMag;
 		dVector point(0.0f);
 		dVector normal(0.0f);	
 		//NewtonMaterialGetContactForce (material, &forceMag);
@@ -597,7 +597,7 @@ void GetContactOnBody (NewtonBody* const body)
 		for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {
 			NewtonMaterial* const material = NewtonContactGetMaterial (contact);
 
-			//dFloat forceMag;
+			//dFloat32 forceMag;
 			dVector point(0.0f);
 			dVector normal(0.0f);	
 			//NewtonMaterialGetContactForce (material, &forceMag);
@@ -621,12 +621,12 @@ void  PhysicsBodyDestructor (const NewtonBody* body)
 }
 
 // add force and torque to rigid body
-void PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int threadIndex)
+void PhysicsApplyGravityForce (const NewtonBody* body, dFloat32 timestep, int threadIndex)
 {
-	dFloat Ixx;
-	dFloat Iyy;
-	dFloat Izz;
-	dFloat mass;
+	dFloat32 Ixx;
+	dFloat32 Iyy;
+	dFloat32 Izz;
+	dFloat32 mass;
 
 	NewtonBodyGetMass (body, &mass, &Ixx, &Iyy, &Izz);
 	dVector dir(0.0f, 1.0f, 0.0f);
@@ -638,8 +638,8 @@ void PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thre
 	// for regular gravity objects, clamp high angular velocities 
 	dVector omega(0.0f);
 	NewtonBodyGetOmega(body, &omega[0]);
-	dFloat mag2 = omega.DotProduct3(omega);
-	dFloat maxMag = 100.0f;
+	dFloat32 mag2 = omega.DotProduct3(omega);
+	dFloat32 maxMag = 100.0f;
 	if (mag2 > (maxMag * maxMag)) {
 		omega = omega.Normalize().Scale(maxMag);
 		NewtonBodySetOmega(body, &omega[0]);
@@ -654,7 +654,7 @@ void PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thre
 //	NewtonBodySetSleepState(body, 0);
 }
 
-void GenericContactProcess (const NewtonJoint* contactJoint, dFloat timestep, int threadIndex)
+void GenericContactProcess (const NewtonJoint* contactJoint, dFloat32 timestep, int threadIndex)
 {
 #if 0 
 	dFloat speed0;
@@ -729,7 +729,7 @@ void GenericContactProcess (const NewtonJoint* contactJoint, dFloat timestep, in
 		NewtonMaterialGetContactForce (material, body, &force.m_x);
 		NewtonMaterialGetContactPositionAndNormal (material, body, &point.m_x, &normal.m_x);
 		NewtonMaterialGetContactTangentDirections (material, body, &dir0.m_x, &dir1.m_x);
-		//dFloat speed = NewtonMaterialGetContactNormalSpeed(material);
+		//dFloat32 speed = NewtonMaterialGetContactNormalSpeed(material);
 
 		//speed = NewtonMaterialGetContactNormalSpeed(material);
 		// play sound base of the contact speed.
@@ -769,8 +769,8 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* const world, const dMatrix&
 
 		case _CONE_PRIMITIVE:
 		{
-			dFloat r = size.m_x * 0.5f;
-			dFloat h = size.m_y;
+			dFloat32 r = size.m_x * 0.5f;
+			dFloat32 h = size.m_y;
 
 			// create the collision 
 			collision = NewtonCreateCone (world, r, h, 0, NULL); 
@@ -832,14 +832,14 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* const world, const dMatrix&
 			//#define STEPS_HULL 3
 
 			//dVector cloud [STEPS_HULL * 4 + 256];
-			dFloat cloud [STEPS_HULL * 4 + 256][3];
+			dFloat32 cloud [STEPS_HULL * 4 + 256][3];
 			int count = 0;
-			dFloat radius = size.m_y;
-			dFloat height = size.m_x * 0.999f;
-			dFloat x = - height * 0.5f;
+			dFloat32 radius = size.m_y;
+			dFloat32 height = size.m_x * 0.999f;
+			dFloat32 x = - height * 0.5f;
 			dMatrix rotation (dPitchMatrix(2.0f * dPi / STEPS_HULL));
 			for (int i = 0; i < 4; i ++) {
-				dFloat pad = ((i == 1) || (i == 2)) * 0.25f * radius;
+				dFloat32 pad = ((i == 1) || (i == 2)) * 0.25f * radius;
 				dVector p (x, 0.0f, radius + pad);
 				x += 0.3333f * height;
 				dMatrix acc (dGetIdentityMatrix());
@@ -853,7 +853,7 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* const world, const dMatrix&
 				}
 			}
 
-			collision = NewtonCreateConvexHull (world, count, &cloud[0][0], 3 * sizeof (dFloat), 0.02f, 0, NULL); 
+			collision = NewtonCreateConvexHull (world, count, &cloud[0][0], 3 * sizeof (dFloat32), 0.02f, 0, NULL); 
 			break;
 		}
 
@@ -898,16 +898,16 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* const world, const dMatrix&
 	return collision;
 }
 
-NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
+NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
 {
 
 	// calculate the moment of inertia and the relative center of mass of the solid
 	//	dVector origin;
 	//	dVector inertia;
 	//	NewtonConvexCollisionCalculateInertialMatrix (collision, &inertia[0], &origin[0]);	
-	//	dFloat Ixx = mass * inertia[0];
-	//	dFloat Iyy = mass * inertia[1];
-	//	dFloat Izz = mass * inertia[2];
+	//	dFloat32 Ixx = mass * inertia[0];
+	//	dFloat32 Iyy = mass * inertia[1];
+	//	dFloat32 Izz = mass * inertia[2];
 
 	//create the rigid body
 	NewtonBody* const rigidBody = generalInertia ? NewtonCreateAsymetricDynamicBody (world, collision, &matrix[0][0]) : NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
@@ -945,7 +945,7 @@ NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dF
 	return rigidBody;
 }
 
-NewtonBody* CreateSimpleSolid (ndDemoEntityManager* const scene, ndDemoMesh* const mesh, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
+NewtonBody* CreateSimpleSolid (ndDemoEntityManager* const scene, ndDemoMesh* const mesh, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
 {
 	dAssert (collision);
 
@@ -959,7 +959,7 @@ NewtonBody* CreateSimpleSolid (ndDemoEntityManager* const scene, ndDemoMesh* con
 }
 
 
-NewtonBody* CreateInstancedSolid(ndDemoEntityManager* const scene, ndDemoEntity* const parent, dFloat mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
+NewtonBody* CreateInstancedSolid(ndDemoEntityManager* const scene, ndDemoEntity* const parent, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
 {
 	dAssert(collision);
 	// add an new entity to the world
@@ -968,7 +968,7 @@ NewtonBody* CreateInstancedSolid(ndDemoEntityManager* const scene, ndDemoEntity*
 }
 
 
-void AddPrimitiveArray (ndDemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, ndPrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix, dFloat startElevation, dFloat offsetHigh)
+void AddPrimitiveArray (ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat32 spacing, ndPrimitiveType type, int materialID, const dMatrix& shapeOffsetMatrix, dFloat32 startElevation, dFloat32 offsetHigh)
 {
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();
@@ -981,9 +981,9 @@ void AddPrimitiveArray (ndDemoEntityManager* const scene, dFloat mass, const dVe
 
 	dMatrix matrix (dGetIdentityMatrix());
 	for (int i = 0; i < xCount; i ++) {
-		dFloat x = origin.m_x + (i - xCount / 2) * spacing;
+		dFloat32 x = origin.m_x + (i - xCount / 2) * spacing;
 		for (int j = 0; j < zCount; j ++) {
-			dFloat z = origin.m_z + (j - zCount / 2) * spacing;
+			dFloat32 z = origin.m_z + (j - zCount / 2) * spacing;
 
 			matrix.m_posit.m_x = x;
 			matrix.m_posit.m_z = z;
@@ -1051,13 +1051,13 @@ class CollsionTreeFaceMap
 		delete[] m_faceMapInfo;
 	}
 
-	static int CountFaces (void* const context, const dFloat* const polygon, int strideInBytes, const int* const indexArray, int indexCount)
+	static int CountFaces (void* const context, const dFloat32* const polygon, int strideInBytes, const int* const indexArray, int indexCount)
 	{
 		CollsionTreeFaceMap* const me = (CollsionTreeFaceMap*) context;
 		me->m_faceCount ++;
 		return 1;
 	}
-	static int MarkFaces (void* const context, const dFloat* const polygon, int strideInBytes, const int* const indexArray, int indexCount)
+	static int MarkFaces (void* const context, const dFloat32* const polygon, int strideInBytes, const int* const indexArray, int indexCount)
 	{
 		CollsionTreeFaceMap* const me = (CollsionTreeFaceMap*) context;
 
@@ -1098,7 +1098,7 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* const world, ndDemoEntity* co
 		ndDemoMesh* const mesh = (ndDemoMesh*)model->GetMesh();
 		dAssert (mesh->IsType(ndDemoMesh::GetRttiType()));
 
-		dFloat* const vertex = mesh->m_vertex;
+		dFloat32* const vertex = mesh->m_vertex;
 		for (ndDemoMesh::dListNode* nodes = mesh->GetFirst(); nodes; nodes = nodes->GetNext()) {
 			ndDemoSubMesh& segment = nodes->GetInfo();
 			//int matID = segment.m_textureHandle;
@@ -1113,17 +1113,17 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* const world, ndDemoEntity* co
 
 
 			for (int i = 0; i < segment.m_indexCount; i += 3) {
-				dFloat face[3][3];
+				dFloat32 face[3][3];
 				for (int j = 0; j < 3; j ++) {
 					int index = segment.m_indexes[i + j] * 3;
 					face[j][0] = vertex[index + 0];
 					face[j][1] = vertex[index + 1];
 					face[j][2] = vertex[index + 2];
 				}
-				matrix.TransformTriplex (&face[0][0], 3 * sizeof (dFloat), &face[0][0], 3 * sizeof (dFloat), 3);
+				matrix.TransformTriplex (&face[0][0], 3 * sizeof (dFloat32), &face[0][0], 3 * sizeof (dFloat32), 3);
 
 				// use material ids as physics materials 
-				NewtonTreeCollisionAddFace(collision, 3, &face[0][0], 3 * sizeof (dFloat), matID);
+				NewtonTreeCollisionAddFace(collision, 3, &face[0][0], 3 * sizeof (dFloat32), matID);
 			}
 		}
 	}
@@ -1259,7 +1259,7 @@ NewtonBody* CreatePLYMesh (ndDemoEntityManager* const scene, const char* const f
 	NewtonTreeCollisionBeginBuild(collision);
 	for (int i = 0; i < faceCount; i++) {
 		int count;
-		dFloat face[32][3];
+		dFloat32 face[32][3];
 		fscanf(file, "%d", &count);
 		for (int j = 0; j < count; j++) {
 			int index;
@@ -1269,7 +1269,7 @@ NewtonBody* CreatePLYMesh (ndDemoEntityManager* const scene, const char* const f
 			face[j][2] = points[index][2];
 		}
 		fscanf(file, "\n");
-		NewtonTreeCollisionAddFace(collision, 3, &face[0][0], 3 * sizeof (dFloat), 0);
+		NewtonTreeCollisionAddFace(collision, 3, &face[0][0], 3 * sizeof (dFloat32), 0);
 	}
 	fclose(file);
 
@@ -1338,7 +1338,7 @@ void ExportScene (NewtonWorld* const world, const char* const name)
 	testScene.Serialize (fileName);
 }
 
-NewtonBody* MousePickBody (NewtonWorld* const nWorld, const dVector& origin, const dVector& end, dFloat& paramterOut, dVector& positionOut, dVector& normalOut)
+NewtonBody* MousePickBody (NewtonWorld* const nWorld, const dVector& origin, const dVector& end, dFloat32& paramterOut, dVector& positionOut, dVector& normalOut)
 {
 	dMousePickClass rayCast;
 	NewtonWorldRayCast(nWorld, &origin[0], &end[0], dMousePickClass::RayCastFilter, &rayCast, dMousePickClass::RayCastPrefilter, 0);
@@ -1365,7 +1365,7 @@ void LoadLumberYardMesh(ndDemoEntityManager* const scene, const dVector& locatio
 	dTree<NewtonCollision*, ndDemoMesh*> filter;
 	NewtonWorld* const world = scene->GetNewton();
 
-	dFloat density = 1000.0f;
+	dFloat32 density = 1000.0f;
 
 	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
 	for (ndDemoEntity* child = entity->GetFirst(); child; child = child->GetNext()) {
@@ -1375,7 +1375,7 @@ void LoadLumberYardMesh(ndDemoEntityManager* const scene, const dVector& locatio
 			dTree<NewtonCollision*, ndDemoMesh*>::dTreeNode* node = filter.Find(mesh);
 			if (!node) {
 				// make a collision shape only for and instance
-				dFloat* const array = mesh->m_vertex;
+				dFloat32* const array = mesh->m_vertex;
 				dVector minBox(1.0e10f, 1.0e10f, 1.0e10f, 1.0f);
 				dVector maxBox(-1.0e10f, -1.0e10f, -1.0e10f, 1.0f);
 
@@ -1401,7 +1401,7 @@ void LoadLumberYardMesh(ndDemoEntityManager* const scene, const dVector& locatio
 			NewtonCollision* const shape = node->GetInfo();
 			dMatrix matrix(child->GetMeshMatrix() * child->CalculateGlobalMatrix());
 			matrix.m_posit += location;
-			dFloat mass = density * NewtonConvexCollisionCalculateVolume(shape);
+			dFloat32 mass = density * NewtonConvexCollisionCalculateVolume(shape);
 			CreateSimpleSolid(scene, mesh, mass, matrix, shape, defaultMaterialID);
 		}
 	}

@@ -8,6 +8,6 @@
 #include "ndDemoCamera.h"
 #include "ndPhysicsUtils.h"
 
-void AddFracturedWoodPrimitive(ndDemoEntityManager* const scene, dFloat density, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat spacing, int stype, int materialID, const dMatrix& shapeOffsetMatrix);
+void AddFracturedWoodPrimitive(ndDemoEntityManager* const scene, dFloat32 density, const dVector& origin, const dVector& size, int xCount, int zCount, dFloat32 spacing, int stype, int materialID, const dMatrix& shapeOffsetMatrix);
 
 #endif

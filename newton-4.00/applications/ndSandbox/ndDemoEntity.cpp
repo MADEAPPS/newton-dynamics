@@ -128,7 +128,7 @@ void ndDemoEntity::SetUserData (UserData* const data)
 	m_userData = data;
 }
 
-void ndDemoEntity::TransformCallback(const NewtonBody* body, const dFloat* matrix, int threadIndex)
+void ndDemoEntity::TransformCallback(const NewtonBody* body, const dFloat32* matrix, int threadIndex)
 {
 	ndDemoEntity* const ent = (ndDemoEntity*) NewtonBodyGetUserData(body);
 	if (ent) {
@@ -206,7 +206,7 @@ void ndDemoEntity::SetMatrixUsafe(const dQuaternion& rotation, const dVector& po
 	m_nextPosition = position;
 	m_nextRotation = rotation;
 
-	dFloat angle = m_curRotation.DotProduct(m_nextRotation);
+	dFloat32 angle = m_curRotation.DotProduct(m_nextRotation);
 	if (angle < 0.0f) {
 		m_curRotation.Scale(-1.0f);
 	}
@@ -231,7 +231,7 @@ void ndDemoEntity::SetNextMatrix (ndDemoEntityManager& world, const dQuaternion&
 	m_nextPosition = position;
 	m_nextRotation = rotation;
 
-	dFloat angle = m_curRotation.DotProduct(m_nextRotation);
+	dFloat32 angle = m_curRotation.DotProduct(m_nextRotation);
 	if (angle < 0.0f) {
 		m_curRotation.Scale(-1.0f);
 	}
@@ -248,7 +248,7 @@ void ndDemoEntity::ResetMatrix(ndDemoEntityManager& scene, const dMatrix& matrix
 	InterpolateMatrix (scene, 0.0f);
 }
 
-void ndDemoEntity::InterpolateMatrixUnsafe(dFloat param)
+void ndDemoEntity::InterpolateMatrixUnsafe(dFloat32 param)
 {
 	dVector p0(m_curPosition);
 	dVector p1(m_nextPosition);
@@ -264,7 +264,7 @@ void ndDemoEntity::InterpolateMatrixUnsafe(dFloat param)
 	}
 }
 
-void ndDemoEntity::InterpolateMatrix (ndDemoEntityManager& world, dFloat param)
+void ndDemoEntity::InterpolateMatrix (ndDemoEntityManager& world, dFloat32 param)
 {
 	// read the data in a critical section to prevent race condition from other thread  
 	world.Lock(m_lock);
@@ -296,7 +296,7 @@ void ndDemoEntity::RenderBone() const
 	}
 }
 
-void ndDemoEntity::Render(dFloat timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
+void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
 
 //	char space[256];
@@ -496,7 +496,7 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 		if (strstr (name, "sphere")) {
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
-			dFloat* const array = mesh->m_vertex;
+			dFloat32* const array = mesh->m_vertex;
 			dVector extremes(0.0f);
 			for (int i = 0; i < mesh->m_vertexCount; i++) {
 				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
@@ -512,7 +512,7 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
 			// go over the vertex array and find and collect all vertices's weighted by this bone.
-			dFloat* const array = mesh->m_vertex;
+			dFloat32* const array = mesh->m_vertex;
 			dVector extremes(0.0f);
 			for (int i = 0; i < mesh->m_vertexCount; i++) {
 				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
@@ -529,14 +529,14 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 		} else if (strstr (name, "capsule")) {
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
-			dFloat* const array = mesh->m_vertex;
+			dFloat32* const array = mesh->m_vertex;
 			dVector extremes(0.0f);
 			for (int i = 0; i < mesh->m_vertexCount; i++) {
 				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
 				extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
 				extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
 			}
-			dFloat high = 2.0f * dMax (extremes.m_y - extremes.m_x, dFloat (0.0f));
+			dFloat32 high = 2.0f * dMax (extremes.m_y - extremes.m_x, dFloat32 (0.0f));
 
 			dMatrix alighMatrix(dRollMatrix(90.0f * dDegreeToRad));
 			dMatrix matrix (alighMatrix * child->GetCurrentMatrix());
@@ -546,9 +546,9 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 		} else if (strstr(name, "convexhull")) {
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 			dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
-			dFloat* const array = mesh->m_vertex;
+			dFloat32* const array = mesh->m_vertex;
 			dMatrix matrix(child->GetCurrentMatrix());
-			shapeArray[count] = NewtonCreateConvexHull(world, mesh->m_vertexCount, array, 3 * sizeof (dFloat), 0.01f, 0, &matrix[0][0]);
+			shapeArray[count] = NewtonCreateConvexHull(world, mesh->m_vertexCount, array, 3 * sizeof (dFloat32), 0.01f, 0, &matrix[0][0]);
 			count++;
 			dAssert(count < sizeof(shapeArray) / sizeof(shapeArray[0]));
 		}
