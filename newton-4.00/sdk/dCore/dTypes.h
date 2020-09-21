@@ -324,6 +324,12 @@ D_INLINE dInt32 dBitReversal(dInt32 v, dInt32 base)
 	return x;
 }
 
+template <class T>
+T dMod(T val, T mod)
+{
+	return T(fmod(T(val), T(mod)));
+}
+
 template <class T> 
 D_INLINE T dMin(T A, T B)
 {

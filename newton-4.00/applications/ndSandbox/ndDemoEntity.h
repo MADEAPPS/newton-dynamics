@@ -18,7 +18,8 @@ class ndShaderPrograms;
 class ndDemoMeshInterface;
 
 
-class ndDemoEntity: public dHierarchy<ndDemoEntity>, virtual public dClassInfo
+//class ndDemoEntity: public dHierarchy<ndDemoEntity>, virtual public dClassInfo
+class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 {
 	public:
 
@@ -50,8 +51,8 @@ class ndDemoEntity: public dHierarchy<ndDemoEntity>, virtual public dClassInfo
 	UserData* GetUserData ();
 	void SetUserData (UserData* const data);
 
-	dBaseHierarchy* CreateClone () const;
-	static ndDemoEntity* LoadNGD_mesh (const char* const fileName, NewtonWorld* const world, const ndShaderPrograms& shaderCache);
+	dNodeBaseHierarchy* CreateClone () const;
+	//static ndDemoEntity* LoadNGD_mesh (const char* const fileName, NewtonWorld* const world, const ndShaderPrograms& shaderCache);
 
 	const dMatrix& GetRenderMatrix () const;
 	dMatrix CalculateGlobalMatrix (const ndDemoEntity* const root = NULL) const;
@@ -70,9 +71,9 @@ class ndDemoEntity: public dHierarchy<ndDemoEntity>, virtual public dClassInfo
 
 	void RenderBone() const;
 	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
-	NewtonCollision* CreateCollisionFromchildren(NewtonWorld* const world) const;
+	//NewtonCollision* CreateCollisionFromchildren(NewtonWorld* const world) const;
 
-	static void TransformCallback(const NewtonBody* body, const dFloat32* matrix, int threadIndex);
+	//static void TransformCallback(const NewtonBody* body, const dFloat32* matrix, int threadIndex);
 
 	protected:
 	mutable dMatrix m_matrix;			// interpolated matrix
@@ -86,7 +87,8 @@ class ndDemoEntity: public dHierarchy<ndDemoEntity>, virtual public dClassInfo
 	UserData* m_userData;
 	unsigned m_lock;
 	bool m_isVisible;
-	dAddRtti(dClassInfo,DOMMY_API);
+
+	//dAddRtti(dClassInfo,DOMMY_API);
 
 	friend class ndDemoEntityManager;
 };

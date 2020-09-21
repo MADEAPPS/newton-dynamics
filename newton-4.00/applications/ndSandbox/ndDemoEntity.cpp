@@ -13,12 +13,12 @@
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 
-dInitRtti(ndDemoEntity);
+//dInitRtti(ndDemoEntity);
 
 
 ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)
-	:dClassInfo()
-	,dHierarchy<ndDemoEntity>()
+//	:dClassInfo()
+	:dHierarchy<ndDemoEntity>()
 	,m_matrix(matrix) 
 	,m_curPosition (matrix.m_posit)
 	,m_nextPosition (matrix.m_posit)
@@ -90,8 +90,8 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene
 */
 
 ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
-	:dClassInfo()
-	,dHierarchy<ndDemoEntity>(copyFrom)
+	//:dClassInfo()
+	:dHierarchy<ndDemoEntity>(copyFrom)
 	,m_matrix(copyFrom.m_matrix)
 	,m_curPosition(copyFrom.m_curPosition)
 	,m_nextPosition(copyFrom.m_nextPosition)
@@ -130,6 +130,7 @@ void ndDemoEntity::SetUserData (UserData* const data)
 	m_userData = data;
 }
 
+/*
 void ndDemoEntity::TransformCallback(const NewtonBody* body, const dFloat32* matrix, int threadIndex)
 {
 	ndDemoEntity* const ent = (ndDemoEntity*) NewtonBodyGetUserData(body);
@@ -144,6 +145,7 @@ void ndDemoEntity::TransformCallback(const NewtonBody* body, const dFloat32* mat
 		scene->Unlock(ent->m_lock);
 	}
 }
+*/
 
 ndDemoMeshInterface* ndDemoEntity::GetMesh() const
 {
@@ -340,6 +342,7 @@ void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, c
 //	glPopMatrix();
 }
 
+/*
 ndDemoEntity* ndDemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* const world, const ndShaderPrograms& shaderCache)
 {
 	dScene scene(world);
@@ -483,6 +486,7 @@ ndDemoEntity* ndDemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld
 	return returnEntity;
 }
 
+
 NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const world) const
 {
 	int count = 1;
@@ -575,3 +579,4 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 	}
 	return shapeArray[0];
 }
+*/

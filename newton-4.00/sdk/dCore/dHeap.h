@@ -337,7 +337,8 @@ bool dDownHeap<OBJECT,KEY>::SanityCheck()
 // **************************************************************************
 template <class OBJECT, class KEY>
 dUpHeap<OBJECT,KEY>::dUpHeap (dInt32 maxElements)
-	:dHeapBase<OBJECT, KEY> (maxElements, allocator)
+//	:dHeapBase<OBJECT, KEY> (maxElements, allocator)
+	:dHeapBase<OBJECT, KEY>(maxElements)
 {
 }
 

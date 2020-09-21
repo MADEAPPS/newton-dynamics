@@ -385,9 +385,10 @@ void ndDemoEntityManager::ResetTimer()
 
 void ndDemoEntityManager::RemoveEntity (dListNode* const entNode)
 {
-	ndDemoEntity* const entity = entNode->GetInfo();
-	entity->Release();
-	Remove(entNode);
+	dAssert(0);
+	//ndDemoEntity* const entity = entNode->GetInfo();
+	//entity->Release();
+	//Remove(entNode);
 }
 
 void ndDemoEntityManager::RemoveEntity (ndDemoEntity* const ent)

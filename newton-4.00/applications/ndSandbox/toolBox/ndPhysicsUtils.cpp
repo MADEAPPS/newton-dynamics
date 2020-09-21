@@ -900,7 +900,9 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* const world, const dMatrix&
 
 NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
 {
-
+	dAssert(0);
+	return NULL;
+/*
 	// calculate the moment of inertia and the relative center of mass of the solid
 	//	dVector origin;
 	//	dVector inertia;
@@ -943,6 +945,7 @@ NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dF
 	// force the body to be active of inactive
 	//	NewtonBodySetAutoSleep (rigidBody, sleepMode);
 	return rigidBody;
+*/
 }
 
 NewtonBody* CreateSimpleSolid (ndDemoEntityManager* const scene, ndDemoMesh* const mesh, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)

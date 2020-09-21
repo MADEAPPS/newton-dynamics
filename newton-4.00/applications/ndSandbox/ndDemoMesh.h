@@ -13,6 +13,8 @@
 #ifndef _D_MESH_H_
 #define _D_MESH_H_
 
+#include "ndSandboxStdafx.h"
+
 class ndDemoMesh;
 class ndDemoEntity;
 class ndShaderPrograms;
@@ -58,9 +60,8 @@ class ndDemoMeshInterface: public dRefCounter
 	virtual void RenderTransparency () const = 0;
 	virtual void Render (ndDemoEntityManager* const scene) = 0;
 	virtual void RenderNormals () = 0;
-	virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix) = 0;
-
-//	dAddRtti(dClassInfo,DOMMY_API);
+	//virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix) = 0;
+	//dAddRtti(dClassInfo,DOMMY_API);
 
 	dString m_name;
 	bool m_isVisible;
@@ -71,9 +72,9 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	public:
 	ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCache);
 	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache);
-	ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCache);
-	ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ndShaderPrograms& shaderCache);
-	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
+	//ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCache);
+	//ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ndShaderPrograms& shaderCache);
+	//ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
 	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize);
 
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner) { AddRef(); return this;}
@@ -91,7 +92,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	virtual void RenderNormals ();
 
 	void OptimizeForRender();
-	virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
+	//virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
 
 	protected:
 	virtual ~ndDemoMesh();
@@ -119,19 +120,19 @@ class ndDemoSkinMesh: public ndDemoMeshInterface
 	};
 
 	ndDemoSkinMesh(const ndDemoSkinMesh& clone, ndDemoEntity* const owner);
-	ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<ndDemoEntity*, dScene::dTreeNode*>& boneMap, const ndShaderPrograms& shaderCache);
+	//ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<ndDemoEntity*, dScene::dTreeNode*>& boneMap, const ndShaderPrograms& shaderCache);
 	~ndDemoSkinMesh();
 
 	void Render (ndDemoEntityManager* const scene);
 	void RenderNormals ();
 	void RenderTransparency () const;
-	NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
+	//NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
 
 	protected: 
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner);
 	int CalculateMatrixPalette(dMatrix* const bindMatrix) const;
 	void ConvertToGlMatrix(int count, const dMatrix* const bindMatrix, GLfloat* const glMatrices) const;
-	dGeometryNodeSkinClusterInfo* FindSkinModifier(dScene* const scene, dScene::dTreeNode* const meshNode) const;
+	//dGeometryNodeSkinClusterInfo* FindSkinModifier(dScene* const scene, dScene::dTreeNode* const meshNode) const;
 	void OptimizeForRender(const ndDemoSubMesh& segment, const dVector* const pointWeights, const dWeightBoneIndex* const pointSkinBone) const;
 
 	ndDemoMesh* m_mesh;
@@ -145,7 +146,7 @@ class ndDemoBezierCurve: public ndDemoMeshInterface
 {
 	public:
 	ndDemoBezierCurve(const dBezierSpline& curve);
-	ndDemoBezierCurve(const dScene* const scene, dScene::dTreeNode* const meshNode);
+	//ndDemoBezierCurve(const dScene* const scene, dScene::dTreeNode* const meshNode);
 
 	int GetRenderResolution() const;
 	void SetRenderResolution(int breaks);
@@ -154,7 +155,7 @@ class ndDemoBezierCurve: public ndDemoMeshInterface
 	virtual void Render(ndDemoEntityManager* const scene);
 	virtual void RenderNormals();
 
-	virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
+	//virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
 
 	dBezierSpline m_curve;
 	int m_renderResolution;

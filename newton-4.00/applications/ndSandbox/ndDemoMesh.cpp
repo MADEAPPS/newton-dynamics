@@ -155,6 +155,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 {
 }
 
+/*
 ndDemoMesh::ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
@@ -243,6 +244,7 @@ ndDemoMesh::ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshN
 	OptimizeForRender ();
 }
 
+
 ndDemoMesh::ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,m_uv(NULL)
@@ -291,6 +293,7 @@ ndDemoMesh::ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCac
 	// see if this mesh can be optimized
 	OptimizeForRender ();
 }
+*/
 
 ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
@@ -329,6 +332,7 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCac
 	OptimizeForRender ();
 }
 
+/*
 ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity, const dMatrix& uvMatrix)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
@@ -410,6 +414,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	// optimize this mesh for hardware buffers if possible
 	OptimizeForRender ();
 }
+*/
 
 ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize)
 	:ndDemoMeshInterface()
@@ -420,6 +425,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_optimizedOpaqueDiplayList(0)		
 	,m_optimizedTransparentDiplayList(0)
 {
+	dAssert(0);
+/*
 	dFloat32* elevationMap[4096];
 	dVector* normalMap[4096];
 	dFloat32* const normalsPtr = new dFloat32 [size * size * 4];
@@ -434,22 +441,24 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	memset (normals, 0, (size * size) * sizeof (dVector));
 	for (int z = 0; z < size - 1; z ++) {
 		for (int x = 0; x < size - 1; x ++) {
-			dVector p0 ((x + 0) * cellSize, elevationMap[z + 0][x + 0], (z + 0) * cellSize);
-			dVector p1 ((x + 1) * cellSize, elevationMap[z + 0][x + 1], (z + 0) * cellSize);
-			dVector p2 ((x + 1) * cellSize, elevationMap[z + 1][x + 1], (z + 1) * cellSize);
-			dVector p3 ((x + 0) * cellSize, elevationMap[z + 1][x + 0], (z + 1) * cellSize);
+			dVector p0 ((x + 0) * cellSize, elevationMap[z + 0][x + 0], (z + 0) * cellSize, dFloat32 (0.0f));
+			dVector p1 ((x + 1) * cellSize, elevationMap[z + 0][x + 1], (z + 0) * cellSize, dFloat32 (0.0f));
+			dVector p2 ((x + 1) * cellSize, elevationMap[z + 1][x + 1], (z + 1) * cellSize, dFloat32 (0.0f));
+			dVector p3 ((x + 0) * cellSize, elevationMap[z + 1][x + 0], (z + 1) * cellSize, dFloat32 (0.0f));
 
 			dVector e10 (p1 - p0);
 			dVector e20 (p2 - p0);
 			dVector n0 (e20.CrossProduct(e10));
-			n0 = n0.Scale ( 1.0f / dSqrt (n0.DotProduct3(n0)));
+			dAssert(n0.m_w == dFloat32(0.0f));
+			n0 = n0.Scale ( 1.0f / dSqrt (n0.DotProduct(n0).GetScalar()));
 			normalMap [z + 0][x + 0] += n0;
 			normalMap [z + 0][x + 1] += n0;
 			normalMap [z + 1][x + 1] += n0;
 
 			dVector e30 (p3 - p0);
 			dVector n1 (e30.CrossProduct(e20));
-			n1 = n1.Scale ( 1.0f / dSqrt (n1.DotProduct3(n1)));
+			dAssert(n1.m_w == dFloat32(0.0f));
+			n1 = n1.Scale ( 1.0f / dSqrt (n1.DotProduct(n1).GetScalar()));
 			normalMap [z + 0][x + 0] += n1;
 			normalMap [z + 1][x + 0] += n1;
 			normalMap [z + 1][x + 1] += n1;
@@ -457,7 +466,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	}
 
 	for (int i = 0; i < size * size; i ++) {
-		normals[i] = normals[i].Scale (1.0f / dSqrt (normals[i].DotProduct3(normals[i])));
+		dAssert(normals[i].m_w == dFloat32(0.0f));
+		normals[i] = normals[i].Scale (1.0f / dSqrt (normals[i].DotProduct(normals[i]).GetScalar()));
 	}
 	
 	AllocVertexData (size * size);
@@ -521,6 +531,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	}
 	delete[] normalsPtr; 
 	OptimizeForRender();
+*/
 }
 
 ndDemoMesh::~ndDemoMesh()
@@ -533,6 +544,7 @@ ndDemoMesh::~ndDemoMesh()
 	ResetOptimization();
 }
 
+/*
 NewtonMesh* ndDemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix)
 {
 	NewtonMesh* const mesh = NewtonMeshCreate(world);
@@ -564,7 +576,7 @@ NewtonMesh* ndDemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix
 	NewtonMeshEndBuild(mesh);
 	return mesh;
 }
-
+*/
 
 const dString& ndDemoMesh::GetTextureName (const ndDemoSubMesh* const subMesh) const
 {
@@ -859,7 +871,7 @@ void ndDemoMesh::RenderNormals ()
 	glEnable (GL_LIGHTING);
 }
 
-
+/*
 ndDemoBezierCurve::ndDemoBezierCurve(const dScene* const scene, dScene::dTreeNode* const bezierNode)
 	:ndDemoMeshInterface()
 	,m_curve()
@@ -872,7 +884,7 @@ ndDemoBezierCurve::ndDemoBezierCurve(const dScene* const scene, dScene::dTreeNod
 
 	m_curve = bezeriInfo->GetCurve();
 }
-
+*/
 
 ndDemoBezierCurve::ndDemoBezierCurve (const dBezierSpline& curve)
 	:ndDemoMeshInterface()
@@ -886,12 +898,13 @@ void ndDemoBezierCurve::RenderTransparency () const
 {
 }
 
+/*
 NewtonMesh* ndDemoBezierCurve::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix)
 {
 	dAssert(0);
 	return NULL;
 }
-
+*/
 void ndDemoBezierCurve::RenderNormals ()
 {
 }	
@@ -940,6 +953,7 @@ void ndDemoBezierCurve::Render (ndDemoEntityManager* const scene)
 	}
 }
 
+/*
 ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<ndDemoEntity*, dScene::dTreeNode*>& boneMap, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,m_mesh((ndDemoMesh*)owner->GetMesh()->Clone(NULL))
@@ -1138,15 +1152,17 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 	}
 	glEndList();
 }
+*/
 
 ndDemoSkinMesh::ndDemoSkinMesh(const ndDemoSkinMesh& clone, ndDemoEntity* const owner)
 	:ndDemoMeshInterface(clone)
 	,m_mesh((ndDemoMesh*)clone.m_mesh->Clone(NULL))
 	,m_entity(owner)
-	,m_bindingMatrixArray(new dMatrix[clone.m_nodeCount])
+//	,m_bindingMatrixArray(new dMatrix[clone.m_nodeCount])
 	,m_nodeCount(clone.m_nodeCount)
 	,m_shader(clone.m_shader)
 {
+	dAssert(0);
 	memcpy(m_bindingMatrixArray, clone.m_bindingMatrixArray, clone.m_nodeCount * sizeof(dMatrix));
 }
 
@@ -1251,6 +1267,7 @@ void ndDemoSkinMesh::ConvertToGlMatrix(int count, const dMatrix* const bindMatri
 	}
 }
 
+/*
 dGeometryNodeSkinClusterInfo* ndDemoSkinMesh::FindSkinModifier(dScene* const scene, dScene::dTreeNode* const node) const
 {
 	for (void* modifierChild = scene->GetFirstChildLink(node); modifierChild; modifierChild = scene->GetNextChildLink(node, modifierChild)) {
@@ -1262,6 +1279,7 @@ dGeometryNodeSkinClusterInfo* ndDemoSkinMesh::FindSkinModifier(dScene* const sce
 	}
 	return NULL;
 }
+*/
 
 void ndDemoSkinMesh::RenderTransparency () const
 {
@@ -1273,10 +1291,12 @@ void ndDemoSkinMesh::RenderNormals ()
 	m_mesh->RenderNormals();
 }
 
+/*
 NewtonMesh* ndDemoSkinMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix)
 {
 	return m_mesh->CreateNewtonMesh(world, meshMatrix);
 }
+*/
 
 void ndDemoSkinMesh::Render (ndDemoEntityManager* const scene)
 {

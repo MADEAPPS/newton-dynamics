@@ -47,6 +47,8 @@ class dWoodFractureListener: public dCustomParallelListener
 			:m_body(NULL)
 			,m_isDead(false)
 		{
+			dAssert(0);
+/*
 			ndDemoEntityManager* const scene = (ndDemoEntityManager*)NewtonWorldGetUserData(world);
 
 			// first we populate the bounding Box area with few random point to get some interior subdivisions.
@@ -126,6 +128,7 @@ class dWoodFractureListener: public dCustomParallelListener
 				NewtonMeshDestroy(debri);
 			}
 			NewtonMeshDestroy(debriMeshPieces);
+*/
 		}
 
 		WoodVoronoidEffect(const WoodVoronoidEffect& list)
@@ -166,6 +169,8 @@ class dWoodFractureListener: public dCustomParallelListener
 		const dVector& origin, const dVector& size,
 		int xCount, int zCount, dFloat32 spacing, int stype, int materialID, const dMatrix& shapeOffsetMatrix)
 	{
+		dAssert(0);
+/*
 		// create the shape and visual mesh as a common data to be re used
 		NewtonWorld* const world = GetWorld();
 
@@ -213,6 +218,7 @@ class dWoodFractureListener: public dCustomParallelListener
 		NewtonMeshDestroy(mesh);
 		visualMesh->Release();
 		NewtonDestroyCollision(collision);
+	*/
 	}
 
 	void PostUpdate(dFloat32 timestep, int threadID) 
@@ -258,6 +264,8 @@ class dWoodFractureListener: public dCustomParallelListener
 
 	void UpdateEffect(WoodVoronoidEffect& effect, dFloat32 timestep) 
 	{
+		dAssert(0);
+/*
 		// see if the net force on the body comes fr a high impact collision
 		dFloat32 breakImpact = 0.0f;
 		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(effect.m_body); joint; joint = NewtonBodyGetNextContactJoint(effect.m_body, joint)) {
@@ -394,6 +402,7 @@ class dWoodFractureListener: public dCustomParallelListener
 			// unlock the work after done with the effect 
 			scene->Unlock(m_lock);
 		}
+*/
 	}
 	
 	dList<WoodVoronoidEffect> m_effectList;

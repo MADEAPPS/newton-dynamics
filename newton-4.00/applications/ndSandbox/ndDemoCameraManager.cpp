@@ -66,10 +66,12 @@ ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const scene)
 
 ndDemoCameraManager::~ndDemoCameraManager()
 {
-	if (m_targetPicked) {
-		ResetPickBody();
-	}
-	m_camera->Release();
+	dAssert(0);
+	//if (m_targetPicked) {
+	//	ResetPickBody();
+	//}
+	//m_camera->Release();
+	delete m_camera;
 }
 
 void ndDemoCameraManager::SetCameraMatrix(ndDemoEntityManager* const scene, const dQuaternion& rotation, const dVector& position)
