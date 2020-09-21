@@ -53,11 +53,11 @@ ndSkyBox::~ndSkyBox()
 	}
 }
 
+#if 0
 void ndSkyBox::DrawMesh () const
 {
 	dVector size (200.0f);
 
-/*
 	glUseProgram(m_shader);
 	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
 
@@ -129,60 +129,38 @@ glFrontFace(GL_CW);
 	glEnable(GL_LIGHTING);
 
 	glUseProgram(0);
-*/
-
-glMatrixMode(GL_MODELVIEW);
-glLoadIdentity();
-
-glTranslatef(1.5f, 0.0f, -7.0f);
-
-glBegin(GL_QUADS);
-
-
-//// Front face  (z = 1.0f)
-glColor3f(1.0f, 0.0f, 0.0f);
-glVertex3f(1.0f, 1.0f, 1.0f);
-glVertex3f(-1.0f, 1.0f, 1.0f);
-glVertex3f(-1.0f, -1.0f, 1.0f);
-glVertex3f(1.0f, -1.0f, 1.0f);
-
-//glColor3f(0.0f, 1.0f, 0.0f);
-//glVertex3f(1.0f, 1.0f, -1.0f);
-//glVertex3f(-1.0f, 1.0f, -1.0f);
-//glVertex3f(-1.0f, 1.0f, 1.0f);
-//glVertex3f(1.0f, 1.0f, 1.0f);
-
-//// Bottom face (y = -1.0f)
-//glColor3f(1.0f, 0.5f, 0.0f);
-//glVertex3f(1.0f, -1.0f, 1.0f);
-//glVertex3f(-1.0f, -1.0f, 1.0f);
-//glVertex3f(-1.0f, -1.0f, -1.0f);
-//glVertex3f(1.0f, -1.0f, -1.0f);
-
-
-//// Back face (z = -1.0f)
-//glColor3f(1.0f, 1.0f, 0.0f);
-//glVertex3f(1.0f, -1.0f, -1.0f);
-//glVertex3f(-1.0f, -1.0f, -1.0f);
-//glVertex3f(-1.0f, 1.0f, -1.0f);
-//glVertex3f(1.0f, 1.0f, -1.0f);
-//
-//// Left face (x = -1.0f)
-//glColor3f(0.0f, 0.0f, 1.0f);
-//glVertex3f(-1.0f, 1.0f, 1.0f);
-//glVertex3f(-1.0f, 1.0f, -1.0f);
-//glVertex3f(-1.0f, -1.0f, -1.0f);
-//glVertex3f(-1.0f, -1.0f, 1.0f);
-//
-//// Right face (x = 1.0f)
-//glColor3f(1.0f, 0.0f, 1.0f);
-//glVertex3f(1.0f, 1.0f, -1.0f);
-//glVertex3f(1.0f, 1.0f, 1.0f);
-//glVertex3f(1.0f, -1.0f, 1.0f);
-//glVertex3f(1.0f, -1.0f, -1.0f);
-glEnd();
-
 }
+#else
+
+void ndSkyBox::DrawMesh() const
+{
+	dFloat32 padd = 1.0e-3f;
+	glUseProgram(m_shader);
+	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
+
+	glLoadIdentity();
+	glTranslatef(1.5f, 0.0f, -7.0f);
+
+	glBegin(GL_QUADS);
+	glBindTexture(GL_TEXTURE_2D, m_textures[0]);
+
+	glTexCoord2f(0.0f + padd, 0.0f + padd);
+	glVertex3f(1.0f, 1.0f, 1.0f);
+
+	glTexCoord2f(0.0f + padd, 1.0f - padd);
+	glVertex3f(-1.0f, 1.0f, 1.0f);
+
+	glTexCoord2f(1.0f - padd, 1.0f - padd);
+	glVertex3f(-1.0f, -1.0f, 1.0f);
+
+	glTexCoord2f(1.0f - padd, 0.0f + padd);
+	glVertex3f(1.0f, -1.0f, 1.0f);
+
+	glEnd();
+
+	glUseProgram(0);
+}
+#endif
 
 void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix__) const
 {
