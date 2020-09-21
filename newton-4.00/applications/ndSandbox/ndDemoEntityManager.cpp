@@ -68,16 +68,16 @@ int ndDemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 // ImGui - standalone example application for Glfw + OpenGL 2, using fixed pipeline
 // If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
 ndDemoEntityManager::ndDemoEntityManager ()
-	:m_mainFrame(NULL)
+	:m_mainFrame(nullptr)
 	,m_defaultFont(0)
-	,m_sky(NULL)
-	,m_world(NULL)
-	,m_cameraManager(NULL)
-	,m_renderUIContext(NULL)
-	,m_updateCameraContext(NULL)
-	,m_renderDemoGUI(NULL)
-	,m_renderHelpMenus(NULL)
-	,m_updateCamera(NULL)
+	,m_sky(nullptr)
+	//,m_world(nullptr)
+	,m_cameraManager(nullptr)
+	,m_renderUIContext(nullptr)
+	,m_updateCameraContext(nullptr)
+	,m_renderDemoGUI(nullptr)
+	,m_renderHelpMenus(nullptr)
+	,m_updateCamera(nullptr)
 	,m_microsecunds(0)
 	,m_tranparentHeap()
 	,m_currentScene(DEFAULT_SCENE)
@@ -117,7 +117,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_profilerMode(0)
 	,m_contactLock(0)
 	,m_deleteLock(0)
-	,m_contactList()
+	//,m_contactList()
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -126,7 +126,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 	m_hasJoytick = glfwJoystickPresent(0) ?  true : false;
 
-	m_mainFrame = glfwCreateWindow(1280, 720, "Newton Game Dynamics 3.14 demos", NULL, NULL);
+	m_mainFrame = glfwCreateWindow(1280, 720, "Newton Game Dynamics 3.14 demos", nullptr, nullptr);
 	glfwMakeContextCurrent(m_mainFrame);
 
 	int monitorsCount;
@@ -171,7 +171,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
 	io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
 
-	// Alternatively you can set this to NULL and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
+	// Alternatively you can set this to nullptr and call ImGui::GetDrawData() after ImGui::Render() to get the same ImDrawData pointer.
 	io.RenderDrawListsFn = RenderDrawListsCallback;
 	//	io.SetClipboardTextFn = ImGui_ImplGlfw_SetClipboardText;
 	//	io.GetClipboardTextFn = ImGui_ImplGlfw_GetClipboardText;
@@ -217,15 +217,15 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	Cleanup();
 	ResetTimer();
 
-	m_currentPlugin = 0;
-	void* preferedPlugin = NewtonGetPreferedPlugin(m_world);
-	for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
-		m_currentPlugin ++;
-		if (ptr == preferedPlugin) {
-			break;
-		}
-	}
-//m_currentPlugin = 0;
+	//m_currentPlugin = 0;
+	//void* preferedPlugin = NewtonGetPreferedPlugin(m_world);
+	//for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
+	//	m_currentPlugin ++;
+	//	if (ptr == preferedPlugin) {
+	//		break;
+	//	}
+	//}
+	////m_currentPlugin = 0;
 
 	m_shadeCache.CreateAllEffects();
 
@@ -272,17 +272,17 @@ ndDemoEntityManager::ndDemoEntityManager ()
 ndDemoEntityManager::~ndDemoEntityManager ()
 {
 	// is we are run asynchronous we need make sure no update in on flight.
-	if (m_world) {
-		NewtonWaitForUpdateToFinish (m_world);
-	}
+	//if (m_world) {
+	//	NewtonWaitForUpdateToFinish (m_world);
+	//}
 
 	Cleanup ();
 
 	// destroy the empty world
-	if (m_world) {
-		NewtonDestroy (m_world);
-		m_world = NULL;
-	}
+	//if (m_world) {
+	//	NewtonDestroy (m_world);
+	//	m_world = nullptr;
+	//}
 
 	if (m_cameraManager) {
 		delete m_cameraManager;
@@ -404,9 +404,9 @@ void ndDemoEntityManager::RemoveEntity (ndDemoEntity* const ent)
 void ndDemoEntityManager::Cleanup ()
 {
 	// is we are run asynchronous we need make sure no update in on flight.
-	if (m_world) {
-		NewtonWaitForUpdateToFinish (m_world);
-	}
+	//if (m_world) {
+	//	NewtonWaitForUpdateToFinish (m_world);
+	//}
 
 	// destroy all remaining visual objects
 	while (dList<ndDemoEntity*>::GetFirst()) {
@@ -417,86 +417,84 @@ void ndDemoEntityManager::Cleanup ()
 		delete m_cameraManager;
 	}
 
-	m_sky = NULL;
-	m_updateCamera = NULL;
+	m_sky = nullptr;
+	m_updateCamera = nullptr;
 
 	// destroy the Newton world
-	if (m_world) {
-		// get serialization call back before destroying the world
-		NewtonDestroy (m_world);
-		m_world = NULL;
-	}
+	//if (m_world) {
+	//	// get serialization call back before destroying the world
+	//	NewtonDestroy (m_world);
+	//	m_world = nullptr;
+	//}
 
 	// check that there are no memory leak on exit
-	dAssert (NewtonGetMemoryUsed () == 0);
-
-	// create the newton world
-	m_world = NewtonCreate();
-
-	// link the work with this user data
-	NewtonWorldSetUserData(m_world, this);
-
-	// set a post update callback which is call after all simulation and all listeners updates
-	NewtonSetPostUpdateCallback (m_world, PostUpdateCallback);
-
-	// set joint serialization call back
-	dCustomJoint::Initalize(m_world);
-
+	//dAssert (NewtonGetMemoryUsed () == 0);
+	//
+	//// create the newton world
+	//m_world = NewtonCreate();
+	//
+	//// link the work with this user data
+	//NewtonWorldSetUserData(m_world, this);
+	//
+	//// set a post update callback which is call after all simulation and all listeners updates
+	//NewtonSetPostUpdateCallback (m_world, PostUpdateCallback);
+	//
+	//// set joint serialization call back
+	//dCustomJoint::Initalize(m_world);
+	//
 	// add the camera manager
 	m_cameraManager = new ndDemoCameraManager(this);
+	
+	//ApplyMenuOptions();
+	//
+	//// Set the Newton world user data
+	//NewtonWorldSetUserData(m_world, this);
+	//
+	//// set the number of sub steps
+	//NewtonSetNumberOfSubsteps (m_world, MAX_PHYSICS_SUB_STEPS);
+	//
+	//// register contact creation destruction callbacks
+	//NewtonWorldSetCreateDestroyContactCallback(m_world, OnCreateContact, OnDestroyContact);
+	//
+	//// load all available plug ins
+	//char plugInPath[2048];
+	//plugInPath[0] = 0;
+	//#if defined (_MSC_VER)
+	//	GetModuleFileNameA(nullptr, plugInPath, 256);
+	//#endif
+	//
+	//for (int i = int(strlen(plugInPath) - 1); i >= 0; i--) {
+	//	if ((plugInPath[i] == '\\') || (plugInPath[i] == '/')) {
+	//		plugInPath[i] = 0;
+	//		break;
+	//	}
+	//}
 
-	ApplyMenuOptions();
 
-	// Set the Newton world user data
-	NewtonWorldSetUserData(m_world, this);
-
-	// set the number of sub steps
-	NewtonSetNumberOfSubsteps (m_world, MAX_PHYSICS_SUB_STEPS);
-
-	// register contact creation destruction callbacks
-	NewtonWorldSetCreateDestroyContactCallback(m_world, OnCreateContact, OnDestroyContact);
-
-	// load all available plug ins
-	char plugInPath[2048];
-	plugInPath[0] = 0;
-	#if defined (_MSC_VER)
-		GetModuleFileNameA(NULL, plugInPath, 256);
-	#endif
-
-	for (int i = int(strlen(plugInPath) - 1); i >= 0; i--) {
-		if ((plugInPath[i] == '\\') || (plugInPath[i] == '/')) {
-			plugInPath[i] = 0;
-			break;
-		}
-	}
-
-#ifdef _DEBUG
-	#ifdef __linux__
-		strcat(plugInPath, "newtonPlugins");
-	#else
-		#ifdef _NEWTON_USE_DOUBLE
-			strcat(plugInPath, "/newtonPlugins/debug_double");
-		#else
-			strcat(plugInPath, "/newtonPlugins/debug");
-		#endif
-	#endif
-#else
-	#ifdef __linux__
-		strcat(plugInPath, "newtonPlugins");
-	#else
-		#ifdef _NEWTON_USE_DOUBLE
-			strcat(plugInPath, "/newtonPlugins/release_double");
-		#else
-			strcat(plugInPath, "/newtonPlugins/release");
-		#endif
-	#endif
-#endif
-	NewtonLoadPlugins(m_world, plugInPath);
+	//#ifdef __linux__
+	//	strcat(plugInPath, "newtonPlugins");
+	//#else
+	//	#ifdef _NEWTON_USE_DOUBLE
+	//		strcat(plugInPath, "/newtonPlugins/debug_double");
+	//	#else
+	//		strcat(plugInPath, "/newtonPlugins/debug");
+	//	#endif
+	//#endif
+	//
+	//#ifdef __linux__
+	//	strcat(plugInPath, "newtonPlugins");
+	//#else
+	//	#ifdef _NEWTON_USE_DOUBLE
+	//		strcat(plugInPath, "/newtonPlugins/release_double");
+	//	#else
+	//		strcat(plugInPath, "/newtonPlugins/release");
+	//	#endif
+	//#endif
 
 	// we start without 2d render
-	m_renderDemoGUI = NULL;
-	m_renderHelpMenus = NULL;
-	m_renderUIContext = NULL;
+	m_renderDemoGUI = nullptr;
+	m_renderHelpMenus = nullptr;
+	m_renderUIContext = nullptr;
 }
 
 
@@ -517,7 +515,7 @@ void ndDemoEntityManager::LoadFont()
 
 	dGetWorkingFileName (name, pathName);
     io.Fonts->AddFontFromFileTTF(pathName, pixedSize);
-    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
 
 	// Load as RGBA 32-bits (75% of the memory is wasted, but default font is so small) 
 	// because it is more likely to be compatible with user's existing shaders. 
@@ -547,33 +545,33 @@ void ndDemoEntityManager::LoadFont()
 
 void ndDemoEntityManager::ApplyMenuOptions()
 {
-	NewtonWaitForUpdateToFinish(m_world);
-
-	// clean up all caches the engine have saved
-	//NewtonInvalidateCache(m_world);
-	NewtonSetNumberOfSubsteps (m_world, m_solverSubSteps);
-	NewtonSetSolverIterations(m_world, m_solverPasses);
-	NewtonSetThreadsCount(m_world, m_workerThreads);
-
-	int state = m_autoSleepMode ? 1 : 0;
-	for (const NewtonBody* body = NewtonWorldGetFirstBody(m_world); body; body = NewtonWorldGetNextBody(m_world, body)) {
-		NewtonBodySetAutoSleep(body, state);
-	}
-
-	NewtonSelectBroadphaseAlgorithm(m_world, m_broadPhaseType);
-	NewtonSetParallelSolverOnLargeIsland (m_world, m_solveLargeIslandInParallel ? 1 : 0);	
-
-	void* plugin = NULL;
-	if (m_currentPlugin) {
-		int index = 1;
-		for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
-			if (index == m_currentPlugin) {
-				plugin = ptr;
-			}
-			index ++;
-		}
-	}
-	NewtonSelectPlugin(m_world, plugin);
+	//NewtonWaitForUpdateToFinish(m_world);
+	//
+	//// clean up all caches the engine have saved
+	////NewtonInvalidateCache(m_world);
+	//NewtonSetNumberOfSubsteps (m_world, m_solverSubSteps);
+	//NewtonSetSolverIterations(m_world, m_solverPasses);
+	//NewtonSetThreadsCount(m_world, m_workerThreads);
+	//
+	//int state = m_autoSleepMode ? 1 : 0;
+	//for (const NewtonBody* body = NewtonWorldGetFirstBody(m_world); body; body = NewtonWorldGetNextBody(m_world, body)) {
+	//	NewtonBodySetAutoSleep(body, state);
+	//}
+	//
+	//NewtonSelectBroadphaseAlgorithm(m_world, m_broadPhaseType);
+	//NewtonSetParallelSolverOnLargeIsland (m_world, m_solveLargeIslandInParallel ? 1 : 0);	
+	//
+	//void* plugin = nullptr;
+	//if (m_currentPlugin) {
+	//	int index = 1;
+	//	for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
+	//		if (index == m_currentPlugin) {
+	//			plugin = ptr;
+	//		}
+	//		index ++;
+	//	}
+	//}
+	//NewtonSelectPlugin(m_world, plugin);
 }
 
 void ndDemoEntityManager::ShowMainMenuBar()
@@ -649,20 +647,18 @@ void ndDemoEntityManager::ShowMainMenuBar()
 
 			int index = 0;
 			ImGui::RadioButton("default solver", &m_currentPlugin, index);
-			char ids[32][32];
-			for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
-				index++;
-				const char* const id = NewtonGetPluginString(m_world, plugin);
-				sprintf (&ids[index][0], "%s", id);
-				ImGui::RadioButton(&ids[index][0], &m_currentPlugin, index);
-			}
-			ImGui::Separator();
+			//char ids[32][32];
+			//for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
+			//	index++;
+			//	const char* const id = NewtonGetPluginString(m_world, plugin);
+			//	sprintf (&ids[index][0], "%s", id);
+			//	ImGui::RadioButton(&ids[index][0], &m_currentPlugin, index);
+			//}
+			//ImGui::Separator();
 
-			//ImGui::Text("iterative solver passes %d", m_solverPasses);
 			ImGui::SliderInt_DoubleSpace("solver sub steps", &m_solverSubSteps, 2, 8);
 			ImGui::SliderInt_DoubleSpace("iterative solver passes", &m_solverPasses, 4, 64);
 
-			//ImGui::Text("worker threads %d", m_workerThreads);
 			ImGui::SliderInt_DoubleSpace("worker threads", &m_workerThreads, 1, 20);
 			ImGui::Separator();
 
@@ -733,13 +729,14 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		case 3:
 		{
 			m_currentScene = -1;
-			char fileName[1024];
-			if (dGetSaveFileNameNgd(fileName, 1024)) {
-				ndMakeViualMesh context(m_world);
-				dScene testScene(m_world);
-				testScene.NewtonWorldToScene(m_world, &context);
-				testScene.Serialize(fileName);
-			}
+			dAssert(0);
+			//char fileName[1024];
+			//if (dGetSaveFileNameNgd(fileName, 1024)) {
+			//	ndMakeViualMesh context(m_world);
+			//	dScene testScene(m_world);
+			//	testScene.NewtonWorldToScene(m_world, &context);
+			//	testScene.Serialize(fileName);
+			//}
 			break;
 		}
 
@@ -927,26 +924,27 @@ void ndDemoEntityManager::RenderStats()
 			ImGui::Text(text, "");
 
 			if (m_currentPlugin) {
-				int index = 1;
-				for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
-					if (index == m_currentPlugin) {
-						sprintf(text, "plugin:        %s", NewtonGetPluginString(m_world, plugin));
-						ImGui::Text(text, "");
-					}
-					index++;
-				}
+				dAssert(0);
+				//int index = 1;
+				//for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
+				//	if (index == m_currentPlugin) {
+				//		sprintf(text, "plugin:        %s", NewtonGetPluginString(m_world, plugin));
+				//		ImGui::Text(text, "");
+				//	}
+				//	index++;
+				//}
 			}
 
-			sprintf(text, "bodies:        %d", NewtonWorldGetBodyCount(m_world));
+			//sprintf(text, "bodies:        %d", NewtonWorldGetBodyCount(m_world));
 			ImGui::Text(text, "");
 
-			sprintf (text, "threads:       %d", NewtonGetThreadsCount(m_world));
+			//sprintf (text, "threads:       %d", NewtonGetThreadsCount(m_world));
 			ImGui::Text(text, "");
 
-			sprintf(text, "iterations:	%d", NewtonGetSolverIterations(m_world));
+			//sprintf(text, "iterations:	%d", NewtonGetSolverIterations(m_world));
 			ImGui::Text(text, "");
 
-			sprintf(text, "sub steps:     %d", NewtonGetNumberOfSubsteps(m_world));
+			//sprintf(text, "sub steps:     %d", NewtonGetNumberOfSubsteps(m_world));
 			ImGui::Text(text, "");
 
 			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
@@ -1002,7 +1000,7 @@ void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const 
 	m_tranparentHeap.Push (entry, matrix.m_posit.m_z);
 }
 
-
+/*
 void ndDemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary& dictionary)
 {
 	// load all meshes into a Mesh cache for reuse
@@ -1035,6 +1033,7 @@ void ndDemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary&
 		mesh->Release();
 	}
 }
+*/
 
 void ndDemoEntityManager::ImportPLYfile (const char* const fileName)
 {
@@ -1044,6 +1043,8 @@ void ndDemoEntityManager::ImportPLYfile (const char* const fileName)
 
 void ndDemoEntityManager::LoadScene (const char* const fileName)
 {
+	dAssert(0);
+/*
 	dScene database (m_world);
 
 	database.Deserialize(fileName);
@@ -1085,8 +1086,8 @@ void ndDemoEntityManager::LoadScene (const char* const fileName)
 
 	// clean up all caches the engine have saved
 	NewtonInvalidateCache (m_world);
+*/
 }
-
 
 void ndDemoEntityManager::SerializeFile (void* const serializeHandle, const void* const buffer, int size)
 {
@@ -1103,7 +1104,7 @@ void ndDemoEntityManager::DeserializeFile (void* const serializeHandle, void* co
 	ret = 0;
 }
 
-
+/*
 void ndDemoEntityManager::BodySerialization (NewtonBody* const body, void* const bodyUserData, NewtonSerializeCallback serializeCallback, void* const serializeHandle)
 {
 	// here the use can save information of this body, ex:
@@ -1133,7 +1134,7 @@ void ndDemoEntityManager::BodyDeserialization (NewtonBody* const body, void* con
 	// here we attach a visual object to the entity, 
 	dMatrix matrix;
 	NewtonBodyGetMatrix(body, &matrix[0][0]);
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, NULL);
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	scene->Append (entity);
 
 	NewtonBodySetUserData (body, entity);
@@ -1161,15 +1162,19 @@ void ndDemoEntityManager::BodyDeserialization (NewtonBody* const body, void* con
 	entity->SetMesh(mesh, dGetIdentityMatrix());
 	mesh->Release();
 }
+*/
 
 void ndDemoEntityManager::SerializedPhysicScene(const char* const name)
 {
-//	NewtonSerializeToFile(m_world, name, NULL, NULL);
-	NewtonSerializeToFile(m_world, name, BodySerialization, NULL);
+	dAssert(0);
+	//NewtonSerializeToFile(m_world, name, BodySerialization, nullptr);
 }
+
 
 void ndDemoEntityManager::DeserializedPhysicScene(const char* const name)
 {
+	dAssert(0);
+/*
 	// add the sky
 	CreateSkyBox();
 
@@ -1179,6 +1184,7 @@ void ndDemoEntityManager::DeserializedPhysicScene(const char* const name)
 
 	dTree <ndDemoMeshInterface*, const void*> cache;
 	NewtonDeserializeFromFile(m_world, name, BodyDeserialization, &cache);
+*/
 }
 
 int ndDemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
@@ -1193,6 +1199,7 @@ int ndDemoEntityManager::Print (const dVector& color, const char *fmt, ... ) con
 	return 0;
 }
 
+/*
 void ndDemoEntityManager::OnCreateContact(const NewtonWorld* const world, NewtonJoint* const contact)
 {
 //	ndDemoEntityManager* const scene = (ndDemoEntityManager*) NewtonWorldGetUserData(world);
@@ -1207,7 +1214,7 @@ void ndDemoEntityManager::OnDestroyContact(const NewtonWorld* const world, Newto
 //	dCustomScopeLock lock(&scene->m_contactLock);
 //	scene->m_contactList.Remove(cooky);
 }
-
+*/
 
 void ndDemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
 {
@@ -1216,15 +1223,17 @@ void ndDemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dV
 
 void ndDemoEntityManager::UpdatePhysics(dFloat32 timestep)
 {
+	dAssert(0);
+/*
 	// update the physics
 	if (m_world && !m_suspendPhysicsUpdate) {
 		D_TRACKTIME();
 
 		dFloat32 timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
-		unsigned64 timestepMicrosecunds = unsigned64 (timestepInSecunds * 1000000.0f);
+		dUnsigned64 timestepMicrosecunds = dUnsigned64 (timestepInSecunds * 1000000.0f);
 
-		unsigned64 currentTime = dGetTimeInMicrosenconds ();
-		unsigned64 nextTime = currentTime - m_microsecunds;
+		dUnsigned64 currentTime = dGetTimeInMicrosenconds ();
+		dUnsigned64 nextTime = currentTime - m_microsecunds;
 		if (nextTime > timestepMicrosecunds * 2) {
 			m_microsecunds = currentTime - timestepMicrosecunds * 2;
 			nextTime = currentTime - m_microsecunds;
@@ -1270,11 +1279,12 @@ void ndDemoEntityManager::UpdatePhysics(dFloat32 timestep)
 		
 //dTrace (("%f\n", m_mainThreadPhysicsTime));
 	}
+*/
 }
 
 dFloat32 ndDemoEntityManager::CalculateInteplationParam () const
 {
-	unsigned64 timeStep = dGetTimeInMicrosenconds () - m_microsecunds;		
+	dUnsigned64 timeStep = dGetTimeInMicrosenconds () - m_microsecunds;		
 	dFloat32 param = (dFloat32 (timeStep) * MAX_PHYSICS_FPS) / 1.0e6f;
 	dAssert (param >= 0.0f);
 	if (param > 1.0f) {
@@ -1375,6 +1385,7 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glPopAttrib();
 }
 
+/*
 void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep)
 {
 	ndDemoEntityManager* const scene = (ndDemoEntityManager*) NewtonWorldGetUserData(world);
@@ -1383,12 +1394,13 @@ void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFl
 		scene->m_updateCamera(scene, scene->m_updateCameraContext, timestep);
 	}
 }
+*/
 
 void ndDemoEntityManager::RenderScene()
 {
 	dFloat32 timestep = dGetElapsedSeconds();	
 	CalculateFPS(timestep);
-	UpdatePhysics(timestep);
+	//UpdatePhysics(timestep);
 
 	D_TRACKTIME();
 	// Get the interpolated location of each body in the scene
@@ -1485,61 +1497,61 @@ void ndDemoEntityManager::RenderScene()
 		}
 	}
 
-	DEBUG_DRAW_MODE mode = m_solid;
-	if (m_collisionDisplayMode) {
-		mode = (m_collisionDisplayMode == 1) ? m_solid : m_lines;
-		DebugRenderWorldCollision (m_world, mode);
-	}
-
-	if (m_showAABB) {
-		RenderAABB (m_world);
-	}
-
-	if (m_showContactPoints) {
-		RenderContactPoints (m_world);
-	}
-
-	if (m_showRaycastHit) {
-		RenderRayCastHit(m_world);
-	}
-
-	if (m_showBodyFrame) {
-		RenderBodyFrame(m_world);
-	}
-
-	if (m_showCenterOfMass) {
-		RenderCenterOfMass(m_world);
-	}
-
-	if (m_showListenersDebugInfo) {
-		dJointDebugDisplay listenerDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
-		listenerDebugRender.SetScale(0.5f);
-		RenderListenersDebugInfo (m_world, &listenerDebugRender);
-	}
-
-	if (m_showJointDebugInfo) {
-		dJointDebugDisplay jointDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
-		//jointDebugRender.SetScale(0.2f);
-		jointDebugRender.SetScale(1.0f);
-
-		RenderJointsDebugInfo(m_world, &jointDebugRender);
-	}
-
-	if (m_showNormalForces) {
-		RenderNormalForces (m_world);
-	}
-
-	if (m_tranparentHeap.GetCount()) {
-		glPushMatrix();	
-		while (m_tranparentHeap.GetCount()) {
-			const TransparentMesh& transparentMesh = m_tranparentHeap[0];
-			glLoadIdentity();
-			glLoadMatrix(&transparentMesh.m_matrix[0][0]);
-			transparentMesh.m_mesh->RenderTransparency();
-			m_tranparentHeap.Pop();
-		}
-		glPopMatrix();
-	}
+	//DEBUG_DRAW_MODE mode = m_solid;
+	//if (m_collisionDisplayMode) {
+	//	mode = (m_collisionDisplayMode == 1) ? m_solid : m_lines;
+	//	DebugRenderWorldCollision (m_world, mode);
+	//}
+	//
+	//if (m_showAABB) {
+	//	RenderAABB (m_world);
+	//}
+	//
+	//if (m_showContactPoints) {
+	//	RenderContactPoints (m_world);
+	//}
+	//
+	//if (m_showRaycastHit) {
+	//	RenderRayCastHit(m_world);
+	//}
+	//
+	//if (m_showBodyFrame) {
+	//	RenderBodyFrame(m_world);
+	//}
+	//
+	//if (m_showCenterOfMass) {
+	//	RenderCenterOfMass(m_world);
+	//}
+	//
+	//if (m_showListenersDebugInfo) {
+	//	dJointDebugDisplay listenerDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
+	//	listenerDebugRender.SetScale(0.5f);
+	//	RenderListenersDebugInfo (m_world, &listenerDebugRender);
+	//}
+	//
+	//if (m_showJointDebugInfo) {
+	//	dJointDebugDisplay jointDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
+	//	//jointDebugRender.SetScale(0.2f);
+	//	jointDebugRender.SetScale(1.0f);
+	//
+	//	RenderJointsDebugInfo(m_world, &jointDebugRender);
+	//}
+	//
+	//if (m_showNormalForces) {
+	//	RenderNormalForces (m_world);
+	//}
+	//
+	//if (m_tranparentHeap.GetCount()) {
+	//	glPushMatrix();	
+	//	while (m_tranparentHeap.GetCount()) {
+	//		const TransparentMesh& transparentMesh = m_tranparentHeap[0];
+	//		glLoadIdentity();
+	//		glLoadMatrix(&transparentMesh.m_matrix[0][0]);
+	//		transparentMesh.m_mesh->RenderTransparency();
+	//		m_tranparentHeap.Pop();
+	//	}
+	//	glPopMatrix();
+	//}
 
 	glMatrixMode(GL_MODELVIEW);
 	glPopMatrix();

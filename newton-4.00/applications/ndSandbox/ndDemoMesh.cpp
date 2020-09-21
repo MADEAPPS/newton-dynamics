@@ -16,12 +16,13 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 
-dInitRtti(ndDemoMeshInterface);
-dInitRtti(ndDemoMesh);
-dInitRtti(ndDemoBezierCurve);
+//dInitRtti(ndDemoMeshInterface);
+//dInitRtti(ndDemoMesh);
+//dInitRtti(ndDemoBezierCurve);
 
 ndDemoMeshInterface::ndDemoMeshInterface()
-	:dClassInfo()
+//	:dClassInfo()
+	:dRefCounter()
 	,m_name()
 	,m_isVisible(true)
 {

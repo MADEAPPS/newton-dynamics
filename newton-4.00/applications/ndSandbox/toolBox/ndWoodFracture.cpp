@@ -300,10 +300,10 @@ class dWoodFractureListener: public dCustomParallelListener
 			dVector com(0.0f);
 			dVector veloc(0.0f);
 			dVector omega(0.0f);
-			dFloat32 Ixx;
-			dFloat32 Iyy;
-			dFloat32 Izz;
-			dFloat32 mass;
+			dFloat32 Ixx__;
+			dFloat32 Iyy__;
+			dFloat32 Izz__;
+			dFloat32 mass__;
 
 			NewtonWorld* const world = GetWorld();
 			// create the shape and visual mesh as a common data to be re used
@@ -313,7 +313,7 @@ class dWoodFractureListener: public dCustomParallelListener
 			NewtonBodyGetOmega(effect.m_body, &omega[0]);
 			NewtonBodyGetCentreOfMass(effect.m_body, &com[0]);
 			NewtonBodyGetMatrix(effect.m_body, &bodyMatrix[0][0]);
-			NewtonBodyGetMass(effect.m_body, &mass, &Ixx, &Iyy, &Izz);
+			NewtonBodyGetMass(effect.m_body, &mass__, &Ixx__, &Iyy__, &Izz__);
 
 			NewtonCollisionMaterial material;
 			int defaultMaterialID = NewtonBodyGetMaterialGroupID(effect.m_body);
@@ -337,7 +337,7 @@ class dWoodFractureListener: public dCustomParallelListener
 				entity->SetMesh(atom.m_mesh, dGetIdentityMatrix());
 				scene->Append(entity);
 
-				dFloat32 debriMass = mass * atom.m_massFraction;
+				dFloat32 debriMass = mass__ * atom.m_massFraction;
 
 				//create the rigid body
 				NewtonBody* const rigidBody = NewtonCreateDynamicBody(world, atom.m_collision, &matrix[0][0]);
@@ -405,6 +405,8 @@ void AddFracturedWoodPrimitive(
 	const dVector& origin, const dVector& size,
 	int xCount, int zCount, dFloat32 spacing, int stype, int materialID, const dMatrix& shapeOffsetMatrix)
 {
+	dAssert(0);
+/*
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();
 
@@ -413,4 +415,5 @@ void AddFracturedWoodPrimitive(
 		woodFractureManager = new dWoodFractureListener(world);
 	}
 	woodFractureManager->AddFracturedWoodPrimitive(density, origin, size, xCount, zCount, spacing, stype, materialID, shapeOffsetMatrix);
+*/
 }

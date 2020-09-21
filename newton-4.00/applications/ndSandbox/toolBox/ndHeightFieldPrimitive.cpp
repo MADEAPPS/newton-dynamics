@@ -307,6 +307,9 @@ freq *= 0.5f;
 
 	static NewtonBody* CreateHeightFieldTerrain (ndDemoEntityManager* const scene, int sizeInPowerOfTwos, dFloat32 cellSize, dFloat32 elevationScale, dFloat32 roughness, dFloat32 maxElevation, dFloat32 minElevation)
 	{
+		dAssert(0);
+		return NULL;
+/*
 		int size = (1 << sizeInPowerOfTwos) + 1 ;
 		dFloat32* const elevation = new dFloat32 [size * size];
 		//MakeFractalTerrain (elevation, sizeInPowerOfTwos, elevationScale, roughness, maxElevation, minElevation);
@@ -405,6 +408,7 @@ freq *= 0.5f;
 		delete[] attibutes;
 		delete[] elevation;
 		return terrainBody;
+*/
 	}
 };
 

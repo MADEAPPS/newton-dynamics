@@ -19,7 +19,7 @@
 
 void dResetTimer();
 dFloat32 dGetElapsedSeconds();
-unsigned64 dGetTimeInMicrosenconds();
+dUnsigned64 dGetTimeInMicrosenconds();
 
 
 

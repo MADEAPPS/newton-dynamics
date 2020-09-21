@@ -230,6 +230,8 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 {
 	// handle pick body from the screen
 	if (!m_targetPicked) {
+		dAssert(0);
+/*
 		if (!m_prevMouseState && mousePickState) {
 			dFloat32 param;
 			dVector posit;
@@ -256,7 +258,7 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 				NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
 
 				// change this to make the grabbing stronger or weaker
-				//const dFloat angularFritionAccel = 10.0f;
+				//const dFloat32 angularFritionAccel = 10.0f;
 				const dFloat32 angularFritionAccel = 5.0f;
 				const dFloat32 linearFrictionAccel = 400.0f * dMax (dAbs (DEMO_GRAVITY), dFloat32(10.0f));
 				const dFloat32 inertia = dMax (Izz, dMax (Ixx, Iyy));
@@ -268,7 +270,7 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 				m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
 			}
 		}
-
+*/
 	} else {
 		if (mousePickState) {
 			m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);

@@ -38,7 +38,7 @@ class ndDemoEntity: public dHierarchy<ndDemoEntity>, virtual public dClassInfo
 
 	ndDemoEntity(const ndDemoEntity& copyFrom);
 	ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent);
-	ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<ndDemoMeshInterface*, dScene::dTreeNode*>& meshCache, ndDemoEntityManager::EntityDictionary& entityDictionary, ndDemoEntity* const parent = NULL);
+	//ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<ndDemoMeshInterface*, dScene::dTreeNode*>& meshCache, ndDemoEntityManager::EntityDictionary& entityDictionary, ndDemoEntity* const parent = NULL);
 	virtual ~ndDemoEntity(void);
 
 	ndDemoMeshInterface* GetMesh() const;

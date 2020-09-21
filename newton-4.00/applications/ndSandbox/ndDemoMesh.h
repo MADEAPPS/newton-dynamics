@@ -42,7 +42,8 @@ class ndDemoSubMesh
 	unsigned *m_indexes;
 };
 
-class ndDemoMeshInterface: public dClassInfo  
+//class ndDemoMeshInterface: public dClassInfo  
+class ndDemoMeshInterface: public dRefCounter
 {
 	public:
 	ndDemoMeshInterface();
@@ -59,7 +60,7 @@ class ndDemoMeshInterface: public dClassInfo
 	virtual void RenderNormals () = 0;
 	virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix) = 0;
 
-	dAddRtti(dClassInfo,DOMMY_API);
+//	dAddRtti(dClassInfo,DOMMY_API);
 
 	dString m_name;
 	bool m_isVisible;
@@ -77,8 +78,8 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner) { AddRef(); return this;}
 
-	using dClassInfo::operator new;
-	using dClassInfo::operator delete;
+//	using dClassInfo::operator new;
+//	using dClassInfo::operator delete;
 
 	ndDemoSubMesh* AddSubMesh();
 	void AllocVertexData (int vertexCount);
@@ -95,12 +96,12 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	protected:
 	virtual ~ndDemoMesh();
 
-	dAddRtti (ndDemoMeshInterface, DOMMY_API);
-	
-	void  ResetOptimization();
+//	dAddRtti (ndDemoMeshInterface, DOMMY_API);
 	void  SpliteSegment(dListNode* const node, int maxIndexCount);
 
 	public:
+	void  ResetOptimization();
+
 	int m_vertexCount;
 	dFloat32* m_uv;
 	dFloat32* m_vertex;
@@ -158,7 +159,7 @@ class ndDemoBezierCurve: public ndDemoMeshInterface
 	dBezierSpline m_curve;
 	int m_renderResolution;
 
-	dAddRtti(ndDemoMeshInterface, DOMMY_API);
+//	dAddRtti(ndDemoMeshInterface, DOMMY_API);
 };
 
 

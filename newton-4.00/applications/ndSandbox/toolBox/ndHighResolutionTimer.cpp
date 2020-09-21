@@ -19,14 +19,14 @@
 const dFloat32 TICKS2SEC = 1.0e-6f;
 
 
-static unsigned64 m_prevTime = 0;
+static dUnsigned64 m_prevTime = 0;
 
 
 #ifdef _WIN32
 	static LARGE_INTEGER frequency;
 	static LARGE_INTEGER baseCount;
 #else 
-	static unsigned64 baseCount;
+	static dUnsigned64 baseCount;
 #endif
 
 
@@ -40,33 +40,33 @@ void dResetTimer()
 		timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
 		//baseCount = ts.tv_nsec / 1000;
-		baseCount = unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
+		baseCount = dUnsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
 	#elif defined(_MACOSX_VER)
 		timeval tp;
 		gettimeofday(&tp, NULL);
-		unsigned64 microsecunds =  unsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
+		dUnsigned64 microsecunds =  dUnsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
 		baseCount = microsecunds;
 	#endif
 }
 
 
-unsigned64 dGetTimeInMicrosenconds()
+dUnsigned64 dGetTimeInMicrosenconds()
 {
 	#if defined(_WIN32)
 		LARGE_INTEGER count;
 		QueryPerformanceCounter (&count);
 		count.QuadPart -= baseCount.QuadPart;
-		unsigned64 ticks = unsigned64 (count.QuadPart * LONGLONG (1000000) / frequency.QuadPart);
+		dUnsigned64 ticks = dUnsigned64 (count.QuadPart * LONGLONG (1000000) / frequency.QuadPart);
 		return ticks;
 	#elif defined(__linux__)
 		timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
-		//return unsigned64 (ts.tv_nsec / 1000) - baseCount;
-		return unsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - baseCount;
+		//return dUnsigned64 (ts.tv_nsec / 1000) - baseCount;
+		return dUnsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - baseCount;
 	#elif defined(_MACOSX_VER)
 		timeval tp;
 		gettimeofday(&tp, NULL);
-		unsigned64 microsecunds =  unsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
+		dUnsigned64 microsecunds =  dUnsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
 		return microsecunds - baseCount;
 	#endif
 }
@@ -75,7 +75,7 @@ unsigned64 dGetTimeInMicrosenconds()
 dFloat32 dGetElapsedSeconds()
 {
 	dFloat32 timeStep;
-	unsigned64 miliseconds;
+	dUnsigned64 miliseconds;
 
 	miliseconds = dGetTimeInMicrosenconds();
 

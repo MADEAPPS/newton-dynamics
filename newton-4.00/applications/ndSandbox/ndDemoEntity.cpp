@@ -35,6 +35,7 @@ ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)
 	}
 }
 
+/*
 ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<ndDemoMeshInterface*, dScene::dTreeNode*>& meshCache, ndDemoEntityManager::EntityDictionary& entityDictionary, ndDemoEntity* const parent)
 	:dClassInfo()
 	,dHierarchy<ndDemoEntity>()
@@ -86,6 +87,7 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene
 		}
 	}
 }
+*/
 
 ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 	:dClassInfo()
@@ -366,8 +368,8 @@ ndDemoEntity* ndDemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld
 
 	dTree<ndDemoEntity*, dScene::dTreeNode*> boneMap;
 	ndDemoEntity* returnEntity = NULL;
-	ndDemoEntity* entity[256];
-	entity[0] = NULL;
+	ndDemoEntity* entity__[256];
+	entity__[0] = NULL;
 	if (rootCount) {
 		int stack = 0;
 		int modifiersCount = 0;
@@ -381,8 +383,8 @@ ndDemoEntity* ndDemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld
 			parent = new ndDemoEntity(dGetIdentityMatrix(), NULL);
 		}
 		for (int i = 0; i < rootCount; i ++) {
-			entity[stack] = new ndDemoEntity(dGetIdentityMatrix(), parent);
-			entityStack[stack] = entity[stack];
+			entity__[stack] = new ndDemoEntity(dGetIdentityMatrix(), parent);
+			entityStack[stack] = entity__[stack];
 			nodeStack[stack] = meshRootNodeArray[stack];
 			stack ++;
 		}
@@ -465,7 +467,7 @@ ndDemoEntity* ndDemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld
 			meshDictionary.Remove(node);
 		}
 
-		returnEntity = entity[0] ? (entity[0]->GetParent() ? entity[0]->GetParent() : entity[0]) : NULL;
+		returnEntity = entity__[0] ? (entity__[0]->GetParent() ? entity__[0]->GetParent() : entity__[0]) : NULL;
 		if (modifiersCount) {
 			for (int i = 0; i < modifiersCount; i++) {
 				dScene::dTreeNode* const skinMeshNode = nodeModifiers[i];
@@ -495,7 +497,8 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 
 		if (strstr (name, "sphere")) {
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
-			dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
+			dAssert(0);
+			//dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
 			dFloat32* const array = mesh->m_vertex;
 			dVector extremes(0.0f);
 			for (int i = 0; i < mesh->m_vertexCount; i++) {
@@ -510,7 +513,8 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 			dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
 		} else if (strstr (name, "box")) {
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
-			dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
+			dAssert(0);
+			//dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
 			// go over the vertex array and find and collect all vertices's weighted by this bone.
 			dFloat32* const array = mesh->m_vertex;
 			dVector extremes(0.0f);
@@ -528,7 +532,8 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 
 		} else if (strstr (name, "capsule")) {
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
-			dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
+			dAssert(0);
+			//dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
 			dFloat32* const array = mesh->m_vertex;
 			dVector extremes(0.0f);
 			for (int i = 0; i < mesh->m_vertexCount; i++) {
@@ -545,7 +550,8 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 			dAssert(count < sizeof(shapeArray)/ sizeof (shapeArray[0]));
 		} else if (strstr(name, "convexhull")) {
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
-			dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
+			dAssert(0);
+			//dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
 			dFloat32* const array = mesh->m_vertex;
 			dMatrix matrix(child->GetCurrentMatrix());
 			shapeArray[count] = NewtonCreateConvexHull(world, mesh->m_vertexCount, array, 3 * sizeof (dFloat32), 0.01f, 0, &matrix[0][0]);

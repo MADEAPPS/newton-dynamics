@@ -78,9 +78,9 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 		bool m_memory1;
 	};
 
-	class EntityDictionary: public dTree<ndDemoEntity*, dScene::dTreeNode*>
-	{
-	};
+	//class EntityDictionary: public dTree<ndDemoEntity*, dScene::dTreeNode*>
+	//{
+	//};
 
 	ndDemoEntityManager ();
 	~ndDemoEntityManager ();
@@ -93,7 +93,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	int GetWidth() const;
 	int GetHeight() const;
 
-	NewtonWorld* GetNewton() const;
+	//NewtonWorld* GetNewton() const;
 	void CreateSkyBox();
 
 	void ResetTimer();
@@ -122,11 +122,10 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	static void SerializeFile (void* const serializeHandle, const void* const buffer, int size);
 	static void DeserializeFile (void* const serializeHandle, void* const buffer, int size);
-	static void BodySerialization (NewtonBody* const body, void* const userData, NewtonSerializeCallback serializecallback, void* const serializeHandle);
-	static void BodyDeserialization (NewtonBody* const body, void* const userData, NewtonDeserializeCallback serializecallback, void* const serializeHandle);
-
-	static void OnCreateContact(const NewtonWorld* const world, NewtonJoint* const contact);
-	static void OnDestroyContact(const NewtonWorld* const world, NewtonJoint* const contact);
+	//static void BodySerialization (NewtonBody* const body, void* const userData, NewtonSerializeCallback serializecallback, void* const serializeHandle);
+	//static void BodyDeserialization (NewtonBody* const body, void* const userData, NewtonDeserializeCallback serializecallback, void* const serializeHandle);
+	//static void OnCreateContact(const NewtonWorld* const world, NewtonJoint* const contact);
+	//static void OnDestroyContact(const NewtonWorld* const world, NewtonJoint* const contact);
 
 	bool GetCaptured () const;
 	bool GetMouseKeyState (int button ) const;
@@ -152,7 +151,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	void CalculateFPS(dFloat32 timestep);
 	
 	void ShowMainMenuBar();
-	void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
+	//void LoadVisualScene(dScene* const scene, EntityDictionary& dictionary);
 
 	void ToggleProfiler();
 
@@ -164,7 +163,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	static void MouseScrollCallback (GLFWwindow* const window, double x, double y);
 	static void MouseButtonCallback(GLFWwindow* const window, int button, int action, int mods);
 	static void ErrorCallback(int error, const char* const description);
-	static void PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep);
+	//static void PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep);
 
 	void ApplyMenuOptions();
 	void LoadDemo(int menu);
@@ -174,7 +173,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool m_mousePressed[3];
 
 	ndDemoEntity* m_sky;
-	NewtonWorld* m_world;
+	//NewtonWorld* m_world;
 	ndDemoCameraManager* m_cameraManager;
 	ndShaderPrograms m_shadeCache;
 	void* m_renderUIContext;
@@ -183,7 +182,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	RenderGuiHelpCallback m_renderHelpMenus;
 	UpdateCameraCallback m_updateCamera;
 
-	unsigned64 m_microsecunds;
+	dUnsigned64 m_microsecunds;
 	TransparentHeap m_tranparentHeap;
 
 	int m_currentScene;
@@ -226,30 +225,32 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	unsigned m_profilerMode;
 	unsigned m_contactLock;
 	unsigned m_deleteLock;
-	dList<NewtonJoint*> m_contactList;
+	//dList<NewtonJoint*> m_contactList;
 
 	static SDKDemos m_demosSelection[];
 	friend class DemoEntityListener;
 	friend class DemoListenerManager;
 };
 
-inline NewtonWorld* ndDemoEntityManager::GetNewton() const
-{
-	return m_world;
-}
+//inline NewtonWorld* ndDemoEntityManager::GetNewton() const
+//{
+//	return m_world;
+//}
 
 // for simplicity we are not going to run the demo in a separate thread at this time
 // this confuses many user int thinking it is more complex than it really is  
 inline void ndDemoEntityManager::Lock(unsigned& atomicLock)
 {
-	while (NewtonAtomicSwap((int*)&atomicLock, 1)) {
-		NewtonYield();
-	}
+	//dAssert(0);
+	//while (NewtonAtomicSwap((int*)&atomicLock, 1)) {
+	//	NewtonYield();
+	//}
 }
 
 inline void ndDemoEntityManager::Unlock(unsigned& atomicLock)
 {
-	NewtonAtomicSwap((int*)&atomicLock, 0);
+	//dAssert(0);
+	//NewtonAtomicSwap((int*)&atomicLock, 0);
 }
 
 inline int ndDemoEntityManager::GetWidth() const 
