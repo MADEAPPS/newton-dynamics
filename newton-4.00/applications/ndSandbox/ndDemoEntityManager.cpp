@@ -1472,12 +1472,17 @@ void ndDemoEntityManager::RenderScene()
 
 	// render all entities
 	const dMatrix globalMatrix (dGetIdentityMatrix());
-	if (m_hideVisualMeshes) {
-		if (m_sky) {
+	if (m_hideVisualMeshes) 
+	{
+		if (m_sky) 
+		{
 			m_sky->Render(timestep, this, globalMatrix);
 		}
-	} else {
-		for (dListNode* node = dList<ndDemoEntity*>::GetFirst(); node; node = node->GetNext()) {
+	} 
+	else 
+	{
+		for (dListNode* node = dList<ndDemoEntity*>::GetFirst(); node; node = node->GetNext()) 
+		{
 			ndDemoEntity* const entity = node->GetInfo();
 			entity->Render(timestep, this, globalMatrix);
 		}

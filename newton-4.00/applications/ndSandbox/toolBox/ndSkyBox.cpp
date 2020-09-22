@@ -9,19 +9,13 @@
 * freely
 */
 
-
-// RenderPrimitive.cpp: implementation of the RenderPrimitive class.
-//
-//////////////////////////////////////////////////////////////////////
 #include "ndSandboxStdafx.h"
 #include "ndTargaToOpenGl.h"
 #include "ndSkyBox.h"
 
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-
 
 ndSkyBox::ndSkyBox(GLuint shader)
 	:ndDemoEntity (dGetIdentityMatrix(), NULL)
@@ -35,10 +29,10 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	m_textures[4] = LoadTexture("NewtonSky0005.tga");
 	m_textures[5] = LoadTexture("NewtonSky0006.tga");
 
-	//m_displayList = glGenLists(1);
-	//glNewList(m_displayList, GL_COMPILE);
-	//DrawMesh ();
-	//glEndList();
+	m_displayList = glGenLists(1);
+	glNewList(m_displayList, GL_COMPILE);
+	DrawMesh ();
+	glEndList();
 }
 
 ndSkyBox::~ndSkyBox()
@@ -53,7 +47,6 @@ ndSkyBox::~ndSkyBox()
 	}
 }
 
-#if 0
 void ndSkyBox::DrawMesh () const
 {
 	dVector size (200.0f);
@@ -61,7 +54,7 @@ void ndSkyBox::DrawMesh () const
 	glUseProgram(m_shader);
 	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
 
-glFrontFace(GL_CW);
+//glFrontFace(GL_CW);
 	glColor3f(1.0f, 1.0f, 1.0f);
 
 	GLfloat padd = 1.0e-3f;
@@ -130,39 +123,6 @@ glFrontFace(GL_CW);
 
 	glUseProgram(0);
 }
-#else
-
-void ndSkyBox::DrawMesh() const
-{
-	dFloat32 padd = 1.0e-3f;
-//	glUseProgram(m_shader);
-//	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
-
-	dVector size(200.0f);
-//	glLoadIdentity();
-//	glTranslatef(1.5f, 0.0f, -7.0f);
-glFrontFace(GL_CW);
-
-	glBegin(GL_QUADS);
-	glBindTexture(GL_TEXTURE_2D, m_textures[0]);
-
-	glTexCoord2f(0.0f + padd, 0.0f + padd);
-	glVertex3f(size.m_x, size.m_y, size.m_z);
-
-	glTexCoord2f(0.0f + padd, 1.0f - padd);
-	glVertex3f(-size.m_x, size.m_y, size.m_z);
-
-	glTexCoord2f(1.0f - padd, 1.0f - padd);
-	glVertex3f(-size.m_x, -size.m_y, size.m_z);
-
-	glTexCoord2f(1.0f - padd, 0.0f + padd);
-	glVertex3f(size.m_x, -size.m_y, size.m_z);
-
-	glEnd();
-
-//	glUseProgram(0);
-}
-#endif
 
 void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix__) const
 {
@@ -171,24 +131,12 @@ void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const
 	// get the model viewMatrix; 
 	glGetFloat (GL_MODELVIEW_MATRIX, &matrix[0][0]);
 
-	int viewport[4];
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	dMatrix projectionViewMatrix;
-	glGetFloat(GL_PROJECTION_MATRIX, &projectionViewMatrix[0][0]);
-
-
 	dMatrix skyMatrix (dGetIdentityMatrix());
 	skyMatrix.m_posit = matrix.UntransformVector (dVector (0.0f, 0.25f, 0.0f, 1.0f));
-skyMatrix.m_posit = matrix.UntransformVector(dVector(0.0f, 0.25f, -800.0f, 1.0f));
+	//skyMatrix.m_posit = matrix.UntransformVector(dVector(0.0f, 0.25f, -800.0f, 1.0f));
 
-dMatrix matrix1;
 	glPushMatrix();
-
-glGetFloat(GL_MODELVIEW_MATRIX, &matrix1[0][0]);
 	glMultMatrix(&skyMatrix[0][0]);
-
-
-glGetFloat(GL_MODELVIEW_MATRIX, &matrix1[0][0]);
 
 	if (m_displayList) 
 	{
@@ -199,10 +147,5 @@ glGetFloat(GL_MODELVIEW_MATRIX, &matrix1[0][0]);
 		DrawMesh();
 	}
 
-	// render the rest of the hierarchy
 	glPopMatrix();
 }
-	
-
-
-
