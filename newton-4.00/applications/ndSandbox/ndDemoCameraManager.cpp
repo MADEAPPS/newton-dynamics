@@ -44,7 +44,8 @@ class ndDemoCameraPickBodyJoint: public dCustomKinematicController
 */
 
 ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const scene)
-	:m_camera (new ndDemoCamera())
+	:dClassAlloc()
+	,m_camera (new ndDemoCamera())
 	,m_mousePosX(0)
 	,m_mousePosY(0)
 	,m_yaw (m_camera->GetYawAngle())
@@ -68,7 +69,8 @@ ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const scene)
 ndDemoCameraManager::~ndDemoCameraManager()
 {
 	//dAssert(0);
-	//if (m_targetPicked) {
+	//if (m_targetPicked) 
+	//{
 	//	ResetPickBody();
 	//}
 	//m_camera->Release();

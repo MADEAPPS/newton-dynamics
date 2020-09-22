@@ -22,7 +22,8 @@
 
 class ndDemoCamera;
 class ndDemoCameraPickBodyJoint;
-class ndDemoCameraManager
+
+class ndDemoCameraManager: public dClassAlloc
 {
 	public:
 	ndDemoCameraManager(ndDemoEntityManager* const scene);
