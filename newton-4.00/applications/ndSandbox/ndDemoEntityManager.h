@@ -87,6 +87,9 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	void Run();
 
+	void AddEntity(ndDemoEntity* const ent);
+	void RemoveEntity(ndDemoEntity* const ent);
+
 	void Lock(unsigned& atomicLock);
 	void Unlock(unsigned& atomicLock);
 
@@ -98,9 +101,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	void ResetTimer();
 	void LoadScene (const char* const name);
-	void RemoveEntity (ndDemoEntity* const ent);
-	void RemoveEntity (dListNode* const entNode);
-
 	void ImportPLYfile (const char* const name);
 
 	ndDemoCamera* GetCamera() const;
@@ -190,18 +190,21 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	int m_framesCount;
 	int m_physicsFramesCount;
 	int m_currentPlugin;
-	dFloat32 m_fps;
-	dFloat32 m_timestepAcc;
-	dFloat32 m_currentListenerTimestep;
-	dFloat32 m_mainThreadPhysicsTime;
-	dFloat32 m_mainThreadPhysicsTimeAcc;
-
 	int m_solverPasses;
 	int m_solverSubSteps;
 	int m_broadPhaseType;
 	int m_workerThreads;
 	int m_debugDisplayMode;
 	int m_collisionDisplayMode;
+
+	dFloat32 m_fps;
+	dFloat32 m_timestepAcc;
+	dFloat32 m_currentListenerTimestep;
+	dFloat32 m_mainThreadPhysicsTime;
+	dFloat32 m_mainThreadPhysicsTimeAcc;
+
+	dSpinLock m_addDeleteLock;
+
 	
 	bool m_showUI;
 	bool m_showAABB;
@@ -223,8 +226,8 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool m_showRaycastHit;
 
 	unsigned m_profilerMode;
-	unsigned m_contactLock;
-	unsigned m_deleteLock;
+	//unsigned m_contactLock;
+	//unsigned m_deleteLock;
 	//dList<NewtonJoint*> m_contactList;
 
 	static SDKDemos m_demosSelection[];

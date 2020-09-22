@@ -13,11 +13,7 @@
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 
-//dInitRtti(ndDemoEntity);
-
-
 ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)
-//	:dClassInfo()
 	:dNodeHierarchy<ndDemoEntity>()
 	,m_matrix(matrix) 
 	,m_curPosition (matrix.m_posit)
@@ -25,12 +21,14 @@ ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)
 	,m_curRotation (dQuaternion (matrix))
 	,m_nextRotation (dQuaternion (matrix))
 	,m_meshMatrix(dGetIdentityMatrix())
-	,m_mesh (NULL)
-	,m_userData(NULL)
-	,m_lock(0) 
+	,m_mesh(nullptr)
+	,m_userData(nullptr)
+	,m_rootNode(nullptr)
+	,m_lock() 
 	,m_isVisible(true)
 {
-	if (parent) {
+	if (parent) 
+	{
 		Attach (parent);
 	}
 }
@@ -45,9 +43,10 @@ ndDemoEntity::ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene
 	,m_curRotation(0.0f, 0.0f, 0.0f, 1.0f)
 	,m_nextRotation(0.0f, 0.0f, 0.0f, 1.0f)
 	,m_meshMatrix(dGetIdentityMatrix())
-	,m_mesh(NULL)
-	,m_userData(NULL)
-	,m_lock(0)
+	,m_mesh(nullptr)
+	,m_userData(nullptr)
+	,m_rootNode(nullptr)
+	,m_lock()
 	,m_isVisible(true)
 {
 	// add this entity to the dictionary
@@ -98,20 +97,22 @@ ndDemoEntity::ndDemoEntity(const ndDemoEntity& copyFrom)
 	,m_curRotation(copyFrom.m_curRotation)
 	,m_nextRotation(copyFrom.m_nextRotation)
 	,m_meshMatrix(copyFrom.m_meshMatrix)
-	,m_mesh(NULL)
-	,m_userData(NULL)
-	,m_lock(0)
+	,m_mesh(nullptr)
+	,m_userData(nullptr)
+	,m_rootNode(nullptr)
+	,m_lock()
 	,m_isVisible(copyFrom.m_isVisible)
 {
-	m_mesh = copyFrom.m_mesh ? copyFrom.m_mesh->Clone(this) : NULL;
+	m_mesh = copyFrom.m_mesh ? copyFrom.m_mesh->Clone(this) : nullptr;
 }
 
 ndDemoEntity::~ndDemoEntity(void)
 {
-	if (m_userData) {
+	if (m_userData) 
+	{
 		delete m_userData;
 	}
-	SetMesh(NULL, dGetIdentityMatrix());
+	SetMesh(nullptr, dGetIdentityMatrix());
 }
 
 dNodeBaseHierarchy* ndDemoEntity::CreateClone () const
@@ -218,18 +219,14 @@ void ndDemoEntity::SetMatrixUsafe(const dQuaternion& rotation, const dVector& po
 void ndDemoEntity::SetMatrix(ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position)
 {
 	// read the data in a critical section to prevent race condition from other thread  
-	world.Lock(m_lock);
-
+	dScopeSpinLock lock(m_lock);
 	SetMatrixUsafe(rotation, position);
-
-	// release the critical section
-	world.Unlock(m_lock);
 }
 
 void ndDemoEntity::SetNextMatrix (ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position)
 {
 	// read the data in a critical section to prevent race condition from other thread  
-	world.Lock(m_lock);
+	dScopeSpinLock lock(m_lock);
 
 	m_nextPosition = position;
 	m_nextRotation = rotation;
@@ -238,9 +235,6 @@ void ndDemoEntity::SetNextMatrix (ndDemoEntityManager& world, const dQuaternion&
 	if (angle < 0.0f) {
 		m_curRotation.Scale(-1.0f);
 	}
-
-	// release the critical section
-	world.Unlock(m_lock);
 }
 
 void ndDemoEntity::ResetMatrix(ndDemoEntityManager& scene, const dMatrix& matrix)
@@ -262,7 +256,8 @@ void ndDemoEntity::InterpolateMatrixUnsafe(dFloat32 param)
 	dQuaternion rotation(r0.Slerp(r1, param));
 	m_matrix = dMatrix(rotation, posit);
 
-	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) {
+	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
+	{
 		child->InterpolateMatrixUnsafe(param);
 	}
 }
@@ -270,9 +265,8 @@ void ndDemoEntity::InterpolateMatrixUnsafe(dFloat32 param)
 void ndDemoEntity::InterpolateMatrix (ndDemoEntityManager& world, dFloat32 param)
 {
 	// read the data in a critical section to prevent race condition from other thread  
-	world.Lock(m_lock);
+	dScopeSpinLock lock(m_lock);
 	InterpolateMatrixUnsafe(param);
-	world.Unlock(m_lock);
 }
 
 const dMatrix& ndDemoEntity::GetRenderMatrix () const
@@ -282,13 +276,15 @@ const dMatrix& ndDemoEntity::GetRenderMatrix () const
 
 void ndDemoEntity::RenderBone() const
 {
-	if (GetParent()) {
+	if (GetParent()) 
+	{
 		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);
 
 		glColor3f(0.5f, 0.5f, 0.5f);
 		glBegin(GL_LINES);
-		for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) {
+		for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
+		{
 			const dVector& posit = child->m_matrix.m_posit;
 			glVertex3f(GLfloat(0.0f), GLfloat(0.0f), GLfloat(0.0f));
 			glVertex3f(GLfloat(posit.m_x), GLfloat(posit.m_y), GLfloat(posit.m_z));
@@ -301,7 +297,6 @@ void ndDemoEntity::RenderBone() const
 
 void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
-
 //	char space[256];
 //	int index = 0;
 //	for (const ndDemoEntity* node = this; node; node = node->GetParent()) {
@@ -326,7 +321,8 @@ void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, c
 		glMultMatrix(&modelMatrix[0][0]);
 		m_mesh->Render (scene);
 		//m_mesh->RenderNormals ();
-		if (m_userData) {
+		if (m_userData) 
+		{
 			m_userData->OnRender(timestep);
 		}
 		glPopMatrix();
@@ -369,9 +365,9 @@ ndDemoEntity* ndDemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld
 	}
 
 	dTree<ndDemoEntity*, dScene::dTreeNode*> boneMap;
-	ndDemoEntity* returnEntity = NULL;
+	ndDemoEntity* returnEntity = nullptr;
 	ndDemoEntity* entity__[256];
-	entity__[0] = NULL;
+	entity__[0] = nullptr;
 	if (rootCount) {
 		int stack = 0;
 		int modifiersCount = 0;
@@ -380,9 +376,9 @@ ndDemoEntity* ndDemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld
 		ndDemoEntity* entityModifiers[256];
 		dScene::dTreeNode* nodeModifiers[256];
 
-		ndDemoEntity* parent = NULL;
+		ndDemoEntity* parent = nullptr;
 		if (rootCount > 1) {
-			parent = new ndDemoEntity(dGetIdentityMatrix(), NULL);
+			parent = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
 		}
 		for (int i = 0; i < rootCount; i ++) {
 			entity__[stack] = new ndDemoEntity(dGetIdentityMatrix(), parent);
@@ -469,7 +465,7 @@ ndDemoEntity* ndDemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld
 			meshDictionary.Remove(node);
 		}
 
-		returnEntity = entity__[0] ? (entity__[0]->GetParent() ? entity__[0]->GetParent() : entity__[0]) : NULL;
+		returnEntity = entity__[0] ? (entity__[0]->GetParent() ? entity__[0]->GetParent() : entity__[0]) : nullptr;
 		if (modifiersCount) {
 			for (int i = 0; i < modifiersCount; i++) {
 				dScene::dTreeNode* const skinMeshNode = nodeModifiers[i];
@@ -491,7 +487,7 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 	int count = 1;
 	NewtonCollision* shapeArray[128];
 	
-	shapeArray[0] = NULL;
+	shapeArray[0] = nullptr;
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) {
 		//const char* const name = child->GetName().GetStr();
 		dString tmpName(child->GetName());

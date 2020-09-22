@@ -85,17 +85,18 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_framesCount(0)
 	,m_physicsFramesCount(0)
 	,m_currentPlugin(0)
+	,m_solverPasses(4)
+	,m_solverSubSteps(2)
+	,m_broadPhaseType(0)
+	,m_workerThreads(1)
+	,m_debugDisplayMode(0)
+	,m_collisionDisplayMode(0)
 	,m_fps(0.0f)
 	,m_timestepAcc(0.0f)
 	,m_currentListenerTimestep(0.0f)
 	,m_mainThreadPhysicsTime(0.0f)
 	,m_mainThreadPhysicsTimeAcc(0.0f)
-	,m_broadPhaseType(0)
-	,m_workerThreads(1)
-	,m_solverPasses(4)
-	,m_solverSubSteps(2)
-	,m_debugDisplayMode(0)
-	,m_collisionDisplayMode(0)
+	,m_addDeleteLock()
 	,m_showUI(true)
 	,m_showAABB(false)
 	,m_showStats(true)
@@ -115,8 +116,8 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_solveLargeIslandInParallel(true)
 	,m_showRaycastHit(false)
 	,m_profilerMode(0)
-	,m_contactLock(0)
-	,m_deleteLock(0)
+	//,m_contactLock(0)
+	//,m_deleteLock(0)
 	//,m_contactList()
 {
 	// Setup window
@@ -284,7 +285,8 @@ ndDemoEntityManager::~ndDemoEntityManager ()
 	//	m_world = nullptr;
 	//}
 
-	if (m_cameraManager) {
+	if (m_cameraManager) 
+	{
 		delete m_cameraManager;
 	}
 
@@ -301,7 +303,6 @@ ndDemoCamera* ndDemoEntityManager::GetCamera() const
 {
 	return m_cameraManager->GetCamera();
 }
-
 
 bool ndDemoEntityManager::GetKeyState(int key) const
 {
@@ -374,31 +375,24 @@ int ndDemoEntityManager::GetJoystickButtons (char* const axisbuttons, int maxBut
 	return buttonsCount;
 }
 
-
 void ndDemoEntityManager::ResetTimer()
 {
 	dResetTimer();
 	m_microsecunds = dGetTimeInMicrosenconds ();
 }
 
-void ndDemoEntityManager::RemoveEntity (dListNode* const entNode)
+void ndDemoEntityManager::AddEntity(ndDemoEntity* const ent)
 {
-	dAssert(0);
-	//ndDemoEntity* const entity = entNode->GetInfo();
-	//entity->Release();
-	//Remove(entNode);
+	dScopeSpinLock lock(m_addDeleteLock);
+	dAssert(!ent->m_rootNode);
+	ent->m_rootNode = Append(ent);
 }
 
 void ndDemoEntityManager::RemoveEntity (ndDemoEntity* const ent)
 {
-	dAssert(0);
-	//dCustomScopeLock lock(&m_deleteLock);
-	//for (dListNode* node = dList<ndDemoEntity*>::GetFirst(); node; node = node->GetNext()) {
-	//	if (node->GetInfo() == ent) {
-	//		RemoveEntity (node);
-	//		break;
-	//	}
-	//}
+	dScopeSpinLock lock(m_addDeleteLock);
+	dAssert(ent->m_rootNode);
+	Remove(ent->m_rootNode);
 }
 
 void ndDemoEntityManager::Cleanup ()
@@ -409,11 +403,15 @@ void ndDemoEntityManager::Cleanup ()
 	//}
 
 	// destroy all remaining visual objects
-	while (dList<ndDemoEntity*>::GetFirst()) {
-		RemoveEntity (dList<ndDemoEntity*>::GetFirst());
+	while (GetFirst()) 
+	{
+		ndDemoEntity* const ent = GetFirst()->GetInfo();
+		RemoveEntity(ent);
+		delete ent;
 	}
 
-	if (m_cameraManager) {
+	if (m_cameraManager) 
+	{
 		delete m_cameraManager;
 	}
 
@@ -982,15 +980,16 @@ void ndDemoEntityManager::CalculateFPS(dFloat32 timestep)
 	}
 }
 
-
 void ndDemoEntityManager::CreateSkyBox()
 {
-	if (!m_sky) {
+	if (!m_sky)
+	{
 		m_sky = new ndSkyBox(m_shadeCache.m_solidColor);
-		Append(m_sky);
+		dScopeSpinLock lock(m_addDeleteLock);
+		dAssert(!m_sky->m_rootNode);
+		m_sky->m_rootNode = Addtop(m_sky);
 	}
 }
-
 
 void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const mesh)
 {

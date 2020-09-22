@@ -85,7 +85,8 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 	dMatrix m_meshMatrix;
 	ndDemoMeshInterface* m_mesh;
 	UserData* m_userData;
-	unsigned m_lock;
+	dList <ndDemoEntity*>::dListNode* m_rootNode;
+	dSpinLock m_lock;
 	bool m_isVisible;
 
 	//dAddRtti(dClassInfo,DOMMY_API);
