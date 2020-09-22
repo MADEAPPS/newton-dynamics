@@ -418,7 +418,7 @@ void AddFracturedWoodPrimitive(
 	dAssert(0);
 /*
 	// create the shape and visual mesh as a common data to be re used
-	NewtonWorld* const world = scene->GetNewton();
+	NewtonWorld* const world = scene->GetWorld();
 
 	dWoodFractureListener* woodFractureManager = (dWoodFractureListener*)NewtonWorldGetListener(world, D_WOODFRACTURE_LISTENER);
 	if (!woodFractureManager) {

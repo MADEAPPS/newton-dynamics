@@ -9,11 +9,6 @@
 * freely
 */
 
-
-// RenderPrimitive.h: interface for the RenderPrimitive class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef __DEMO_CAMERA_LISTENER_H__
 #define __DEMO_CAMERA_LISTENER_H__
 

@@ -78,6 +78,15 @@ ndWorld::~ndWorld()
 	delete m_scene;
 }
 
+void ndWorld::ClearCache()
+{
+	ndContact::FlushFreeList();
+	ndContactList::FlushFreeList();
+	ndContactPointList::FlushFreeList();
+	ndScene::ndFitnessList::FlushFreeList();
+	ndBodyKinematic::ndContactMap::FlushFreeList();
+}
+
 void ndWorld::UpdatePrelisteners()
 {
 }

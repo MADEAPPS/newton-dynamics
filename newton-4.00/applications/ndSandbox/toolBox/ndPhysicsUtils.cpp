@@ -961,7 +961,7 @@ NewtonBody* CreateSimpleSolid (ndDemoEntityManager* const scene, ndDemoMesh* con
 	if (mesh) {
 		entity->SetMesh(mesh, dGetIdentityMatrix());
 	}
-	return CreateSimpleBody (scene->GetNewton(), entity, mass, matrix, collision, materialId, generalInertia);
+	return CreateSimpleBody (scene->GetWorld(), entity, mass, matrix, collision, materialId, generalInertia);
 */
 }
 
@@ -974,7 +974,7 @@ NewtonBody* CreateInstancedSolid(ndDemoEntityManager* const scene, ndDemoEntity*
 	dAssert(collision);
 	// add an new entity to the world
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, parent);
-	return CreateSimpleBody(scene->GetNewton(), entity, mass, matrix, collision, materialId, generalInertia);
+	return CreateSimpleBody(scene->GetWorld(), entity, mass, matrix, collision, materialId, generalInertia);
 */
 }
 
@@ -984,7 +984,7 @@ void AddPrimitiveArray (ndDemoEntityManager* const scene, dFloat32 mass, const d
 	dAssert(0);
 /*
 	// create the shape and visual mesh as a common data to be re used
-	NewtonWorld* const world = scene->GetNewton();
+	NewtonWorld* const world = scene->GetWorld();
 	NewtonCollision* const collision = CreateConvexCollision (world, shapeOffsetMatrix, size, type, materialID);
 
 	// test collision mode
@@ -1219,8 +1219,8 @@ NewtonBody* AddFloorBox(ndDemoEntityManager* const scene, const dVector& origin,
 	return nullptr;
 /*
 	// create the shape and visual mesh as a common data to be re used
-	NewtonWorld* const world = scene->GetNewton();
-	const int materialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+	NewtonWorld* const world = scene->GetWorld();
+	const int materialID = NewtonMaterialGetDefaultGroupID(scene->GetWorld());
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, materialID);
 
 	// test collision mode
@@ -1272,7 +1272,7 @@ NewtonBody* CreatePLYMesh (ndDemoEntityManager* const scene, const char* const f
 		points[i] = dVector(x, y, z, dFloat32(0.0f));
 	}
 
-	NewtonWorld* const world = scene->GetNewton();
+	NewtonWorld* const world = scene->GetWorld();
 
 	// create the collision tree geometry
 	NewtonCollision* collision = NewtonCreateTreeCollision(world, 0);
@@ -1322,7 +1322,7 @@ NewtonBody* CreateLevelMesh (ndDemoEntityManager* const scene, const char* const
 	scene->LoadScene (fileName);
 
 	NewtonBody* levelBody = nullptr;
-	NewtonWorld* const world = scene->GetNewton();
+	NewtonWorld* const world = scene->GetWorld();
 	for (ndDemoEntityManager::dListNode* node = scene->GetLast(); node; node = node->GetPrev()) {
 		ndDemoEntity* const ent = node->GetInfo();
 		ndDemoMesh* const mesh = (ndDemoMesh*) ent->GetMesh();
@@ -1390,14 +1390,14 @@ void LoadLumberYardMesh(ndDemoEntityManager* const scene, const dVector& locatio
 {
 	dAssert(0);
 /*
-	ndDemoEntity* const entity = ndDemoEntity::LoadNGD_mesh ("lumber.ngd", scene->GetNewton(), scene->GetShaderCache());
+	ndDemoEntity* const entity = ndDemoEntity::LoadNGD_mesh ("lumber.ngd", scene->GetWorld(), scene->GetShaderCache());
 
 	dTree<NewtonCollision*, ndDemoMesh*> filter;
-	NewtonWorld* const world = scene->GetNewton();
+	NewtonWorld* const world = scene->GetWorld();
 
 	dFloat32 density = 1000.0f;
 
-	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetNewton());
+	int defaultMaterialID = NewtonMaterialGetDefaultGroupID(scene->GetWorld());
 	for (ndDemoEntity* child = entity->GetFirst(); child; child = child->GetNext()) {
 		ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
 		if (mesh) {

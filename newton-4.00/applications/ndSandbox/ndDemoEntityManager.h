@@ -19,6 +19,7 @@ struct ImDrawData;
 class ndDemoMesh;
 class ndDemoEntity;
 class ndDemoCamera;
+class ndPhysicsWorld;
 class ndDemoMeshInterface;
 class ndDemoCameraManager;
 
@@ -90,15 +91,12 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	void AddEntity(ndDemoEntity* const ent);
 	void RemoveEntity(ndDemoEntity* const ent);
 
-	void Lock(unsigned& atomicLock);
-	void Unlock(unsigned& atomicLock);
-
 	int GetWidth() const;
 	int GetHeight() const;
 
-	//NewtonWorld* GetNewton() const;
-	void CreateSkyBox();
+	ndPhysicsWorld* GetWorld() const;
 
+	void CreateSkyBox();
 	void ResetTimer();
 	void LoadScene (const char* const name);
 	void ImportPLYfile (const char* const name);
@@ -173,7 +171,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool m_mousePressed[3];
 
 	ndDemoEntity* m_sky;
-	//NewtonWorld* m_world;
+	ndPhysicsWorld* m_world;
 	ndDemoCameraManager* m_cameraManager;
 	ndShaderPrograms m_shadeCache;
 	void* m_renderUIContext;
@@ -231,29 +229,12 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	//dList<NewtonJoint*> m_contactList;
 
 	static SDKDemos m_demosSelection[];
-	friend class DemoEntityListener;
-	friend class DemoListenerManager;
+	friend class ndPhysicsWorld;
 };
 
-//inline NewtonWorld* ndDemoEntityManager::GetNewton() const
-//{
-//	return m_world;
-//}
-
-// for simplicity we are not going to run the demo in a separate thread at this time
-// this confuses many user int thinking it is more complex than it really is  
-inline void ndDemoEntityManager::Lock(unsigned& atomicLock)
+inline ndPhysicsWorld* ndDemoEntityManager::GetWorld() const
 {
-	//dAssert(0);
-	//while (NewtonAtomicSwap((int*)&atomicLock, 1)) {
-	//	NewtonYield();
-	//}
-}
-
-inline void ndDemoEntityManager::Unlock(unsigned& atomicLock)
-{
-	//dAssert(0);
-	//NewtonAtomicSwap((int*)&atomicLock, 0);
+	return m_world;
 }
 
 inline int ndDemoEntityManager::GetWidth() const 

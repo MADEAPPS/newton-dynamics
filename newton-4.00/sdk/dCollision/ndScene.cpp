@@ -186,6 +186,7 @@ ndScene::~ndScene()
 	Sync();
 	Finish();
 	delete m_contactNotifyCallback;
+	ndContactList::FlushFreeList();
 	ndContactPointList::FlushFreeList();
 }
 

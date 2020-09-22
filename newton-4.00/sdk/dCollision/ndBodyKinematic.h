@@ -129,6 +129,7 @@ class ndBodyKinematic: public ndBody
 	dInt32 m_rank;
 	dInt32 m_index;
 
+	friend class ndWorld;
 	friend class ndScene;
 	friend class ndContact;
 	friend class ndSceneMixed;

@@ -247,7 +247,7 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 			dVector posit;
 			dVector normal;
 
-			NewtonBody* const body = MousePickBody (scene->GetNewton(), p0, p1, param, posit, normal);
+			NewtonBody* const body = MousePickBody (scene->GetWorld(), p0, p1, param, posit, normal);
 			if (body) {
 				dMatrix matrix;
 				m_targetPicked = body;

@@ -72,6 +72,8 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	//void SetCollisionUpdate(bool mode);
 	//const bool GetCollisionUpdate() const;
 
+	D_NEWTON_API void ClearCache();
+
 	void ThreadFunction();
 	
 	protected:

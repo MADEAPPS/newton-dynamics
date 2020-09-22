@@ -15,6 +15,7 @@
 #include "ndDemoEntity.h"
 #include "ndDemoCamera.h"
 #include "ndFileBrowser.h"
+#include "ndPhysicsWorld.h"
 #include "ndPhysicsUtils.h"
 #include "ndDebugDisplay.h"
 #include "ndTargaToOpenGl.h"
@@ -71,7 +72,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	:m_mainFrame(nullptr)
 	,m_defaultFont(0)
 	,m_sky(nullptr)
-	//,m_world(nullptr)
+	,m_world(nullptr)
 	,m_cameraManager(nullptr)
 	,m_renderUIContext(nullptr)
 	,m_updateCameraContext(nullptr)
@@ -127,7 +128,9 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 	m_hasJoytick = glfwJoystickPresent(0) ?  true : false;
 
-	m_mainFrame = glfwCreateWindow(1280, 720, "Newton Game Dynamics 3.14 demos", nullptr, nullptr);
+	char version[256];
+	sprintf(version, "Newton Dynamics %d.%.2i sandbox demos", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION);
+	m_mainFrame = glfwCreateWindow(1280, 720, version, nullptr, nullptr);
 	glfwMakeContextCurrent(m_mainFrame);
 
 	int monitorsCount;
@@ -272,18 +275,13 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 ndDemoEntityManager::~ndDemoEntityManager ()
 {
-	// is we are run asynchronous we need make sure no update in on flight.
-	//if (m_world) {
-	//	NewtonWaitForUpdateToFinish (m_world);
-	//}
-
 	Cleanup ();
 
 	// destroy the empty world
-	//if (m_world) {
-	//	NewtonDestroy (m_world);
-	//	m_world = nullptr;
-	//}
+	if (m_world) 
+	{
+		delete m_world;
+	}
 
 	if (m_cameraManager) 
 	{
@@ -398,9 +396,10 @@ void ndDemoEntityManager::RemoveEntity (ndDemoEntity* const ent)
 void ndDemoEntityManager::Cleanup ()
 {
 	// is we are run asynchronous we need make sure no update in on flight.
-	//if (m_world) {
-	//	NewtonWaitForUpdateToFinish (m_world);
-	//}
+	if (m_world) 
+	{
+		m_world->Sync();
+	}
 
 	// destroy all remaining visual objects
 	while (GetFirst()) 
@@ -419,32 +418,29 @@ void ndDemoEntityManager::Cleanup ()
 	m_updateCamera = nullptr;
 
 	// destroy the Newton world
-	//if (m_world) {
-	//	// get serialization call back before destroying the world
-	//	NewtonDestroy (m_world);
-	//	m_world = nullptr;
-	//}
+	if (m_world) 
+	{
+		// get serialization call back before destroying the world
+		delete m_world;
+	}
 
-	// check that there are no memory leak on exit
-	//dAssert (NewtonGetMemoryUsed () == 0);
-	//
-	//// create the newton world
-	//m_world = NewtonCreate();
-	//
+	// create the newton world
+	m_world = new ndPhysicsWorld(this);
+	
 	//// link the work with this user data
 	//NewtonWorldSetUserData(m_world, this);
-	//
+	
 	//// set a post update callback which is call after all simulation and all listeners updates
 	//NewtonSetPostUpdateCallback (m_world, PostUpdateCallback);
-	//
+	
 	//// set joint serialization call back
 	//dCustomJoint::Initalize(m_world);
-	//
+	
 	// add the camera manager
 	m_cameraManager = new ndDemoCameraManager(this);
 	
-	//ApplyMenuOptions();
-	//
+	ApplyMenuOptions();
+	
 	//// Set the Newton world user data
 	//NewtonWorldSetUserData(m_world, this);
 	//
@@ -467,7 +463,6 @@ void ndDemoEntityManager::Cleanup ()
 	//		break;
 	//	}
 	//}
-
 
 	//#ifdef __linux__
 	//	strcat(plugInPath, "newtonPlugins");
@@ -494,7 +489,6 @@ void ndDemoEntityManager::Cleanup ()
 	m_renderHelpMenus = nullptr;
 	m_renderUIContext = nullptr;
 }
-
 
 void ndDemoEntityManager::LoadFont()
 {
@@ -543,21 +537,24 @@ void ndDemoEntityManager::LoadFont()
 
 void ndDemoEntityManager::ApplyMenuOptions()
 {
-	//NewtonWaitForUpdateToFinish(m_world);
-	//
-	//// clean up all caches the engine have saved
+	m_world->Sync();
+	// clean up all caches the engine have saved
 	////NewtonInvalidateCache(m_world);
-	//NewtonSetNumberOfSubsteps (m_world, m_solverSubSteps);
-	//NewtonSetSolverIterations(m_world, m_solverPasses);
-	//NewtonSetThreadsCount(m_world, m_workerThreads);
-	//
-	//int state = m_autoSleepMode ? 1 : 0;
-	//for (const NewtonBody* body = NewtonWorldGetFirstBody(m_world); body; body = NewtonWorldGetNextBody(m_world, body)) {
-	//	NewtonBodySetAutoSleep(body, state);
-	//}
-	//
+
+	m_world->SetSubSteps(m_solverSubSteps);
+	m_world->SetSolverIterations(m_solverPasses);
+	m_world->SetThreadCount(m_workerThreads);
+
+	bool state = m_autoSleepMode ? true : false;
+	const dList<ndBodyKinematic*>& bodyList = m_world->GetBodyList();
+	for (dList<ndBodyKinematic*>::dListNode* node = bodyList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyKinematic* const body = node->GetInfo();
+		body->SetAutoSleep(state);
+	}
+
 	//NewtonSelectBroadphaseAlgorithm(m_world, m_broadPhaseType);
-	//NewtonSetParallelSolverOnLargeIsland (m_world, m_solveLargeIslandInParallel ? 1 : 0);	
+	//NewtonSetParallelSolverOnLargeIsland(m_world, m_solveLargeIslandInParallel ? 1 : 0);
 	//
 	//void* plugin = nullptr;
 	//if (m_currentPlugin) {
@@ -566,7 +563,7 @@ void ndDemoEntityManager::ApplyMenuOptions()
 	//		if (index == m_currentPlugin) {
 	//			plugin = ptr;
 	//		}
-	//		index ++;
+	//		index++;
 	//	}
 	//}
 	//NewtonSelectPlugin(m_world, plugin);
@@ -578,52 +575,64 @@ void ndDemoEntityManager::ShowMainMenuBar()
 	//dAssert (m_autoSleepMode);
 	if (ImGui::BeginMainMenuBar())
 	{
-		if (ImGui::BeginMenu("File")) {
+		if (ImGui::BeginMenu("File")) 
+		{
 			m_suspendPhysicsUpdate = true;
 
-			if (ImGui::MenuItem("Preferences", "")) {
+			if (ImGui::MenuItem("Preferences", "")) 
+			{
 				dAssert (0);
 			}
 			ImGui::Separator();
 
-			if (ImGui::MenuItem("New", "")) {
+			if (ImGui::MenuItem("New", "")) 
+			{
 				mainMenu = 1;
 			}
 			ImGui::Separator();
 
-			if (ImGui::MenuItem("Open", "")) {
+			if (ImGui::MenuItem("Open", "")) 
+			{
 				mainMenu = 2;
 			}
-			if (ImGui::MenuItem("Save", "")) {
+			if (ImGui::MenuItem("Save", "")) 
+			{
 				mainMenu = 3;
 			}
 			ImGui::Separator();
 
-			if (ImGui::MenuItem("Serialize", "")) {
+			if (ImGui::MenuItem("Serialize", "")) 
+			{
 				mainMenu = 4;
 			}
-			if (ImGui::MenuItem("Deserialize", "")) {
+			if (ImGui::MenuItem("Deserialize", "")) 
+			{
 				mainMenu = 5;
 			}
 
 			ImGui::Separator();
-			if (ImGui::MenuItem("import ply file", "")) {
+			if (ImGui::MenuItem("import ply file", "")) 
+			{
 				mainMenu = 6;
 			}
 
 			ImGui::Separator();
-			if (ImGui::MenuItem("Exit", "")) {
+			if (ImGui::MenuItem("Exit", "")) 
+			{
 				glfwSetWindowShouldClose (m_mainFrame, 1);
 			}
 
 			ImGui::EndMenu();
 		}
 
-		if (ImGui::BeginMenu("Demos")) {
+		if (ImGui::BeginMenu("Demos")) 
+		{
 			m_suspendPhysicsUpdate = true;
 			int demosCount = int (sizeof (m_demosSelection) / sizeof m_demosSelection[0]);
-			for (int i = 0; i < demosCount; i ++) {
-				if (ImGui::MenuItem(m_demosSelection[i].m_name, "")) {
+			for (int i = 0; i < demosCount; i ++) 
+			{
+				if (ImGui::MenuItem(m_demosSelection[i].m_name, "")) 
+				{
 					m_currentScene = i;
 				}
 			}
@@ -632,7 +641,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		}
 
 		bool optionsOn = ImGui::BeginMenu("Options");
-		if (optionsOn) {
+		if (optionsOn) 
+		{
 			m_updateMenuOptions = true;
 			m_suspendPhysicsUpdate = true;
 
@@ -643,8 +653,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("solve large island in parallel", &m_solveLargeIslandInParallel);
 			ImGui::Separator();
 
-			int index = 0;
-			ImGui::RadioButton("default solver", &m_currentPlugin, index);
+			//int index = 0;
+			//ImGui::RadioButton("default solver", &m_currentPlugin, index);
 			//char ids[32][32];
 			//for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
 			//	index++;
@@ -685,14 +695,16 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			//SetDebugDisplayMode(m_showCollidingFaces ? 1 : 0);
 		}
 
-		if (ImGui::BeginMenu("Help")) {
+		if (ImGui::BeginMenu("Help")) 
+		{
 			m_suspendPhysicsUpdate = true;
 			ImGui::EndMenu();
 		}
 
 		ImGui::EndMainMenuBar();
 
-		if (!optionsOn && m_updateMenuOptions) {
+		if (!optionsOn && m_updateMenuOptions) 
+		{
 			m_updateMenuOptions = false;
 			ApplyMenuOptions();
 		}
@@ -716,7 +728,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			m_currentScene = -1;
 			char fileName[1024];
 			Cleanup();
-			if (dGetOpenFileNameNgd(fileName, 1024)) {
+			if (dGetOpenFileNameNgd(fileName, 1024)) 
+			{
 				ApplyMenuOptions();
 				LoadScene (fileName);
 				ResetTimer();
@@ -742,7 +755,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		{
 			m_currentScene = -1;
 			char fileName[1024];
-			if (dGetSaveFileNameSerialization(fileName, 1024)) {
+			if (dGetSaveFileNameSerialization(fileName, 1024)) 
+			{
 				SerializedPhysicScene(fileName);
 			}
 			break;
@@ -754,7 +768,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			m_currentScene = -1;
 			char fileName[1024];
 			Cleanup();
-			if (dGetOpenFileNameSerialization(fileName, 1024)) {
+			if (dGetOpenFileNameSerialization(fileName, 1024)) 
+			{
 				ApplyMenuOptions();
 				DeserializedPhysicScene(fileName);
 				ResetTimer();
@@ -768,7 +783,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			m_currentScene = -1;
 			char fileName[1024];
 			Cleanup();
-			if (dGetOpenFileNamePLY(fileName, 1024)) {
+			if (dGetOpenFileNamePLY(fileName, 1024)) 
+			{
 				ApplyMenuOptions();
 				ImportPLYfile(fileName);
 				ResetTimer();
@@ -779,7 +795,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		default:
 		{
 			// load a demo 
-			if (m_currentScene != -1) {
+			if (m_currentScene != -1) 
+			{
 				//DeserializedPhysicScene("C:/temp/test.bin");
 				LoadDemo(m_currentScene);
 				m_lastCurrentScene = m_currentScene;
@@ -794,7 +811,7 @@ void ndDemoEntityManager::LoadDemo(int menu)
 	char newTitle[256];
 	Cleanup();
 	m_demosSelection[menu].m_launchDemoCallback(this);
-	sprintf(newTitle, "Newton Game Dynamics 3.14 demo: %s", m_demosSelection[menu].m_name);
+	sprintf(newTitle, "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_name);
 	glfwSetWindowTitle(m_mainFrame, newTitle);
 	ApplyMenuOptions();
 	ResetTimer();
@@ -918,7 +935,7 @@ void ndDemoEntityManager::RenderStats()
 			sprintf (text, "physics time: %6.3f ms", m_mainThreadPhysicsTime * 1000.0f);
 			ImGui::Text(text, "");
 
-			//sprintf (text, "memory used:   %d kbytes", NewtonGetMemoryUsed() / 1024);
+			sprintf (text, "memory used:  %6.3f mbytes", dFloat32(dFloat64(dMemory::GetMemoryUsed()) / (1024 * 1024)));
 			ImGui::Text(text, "");
 
 			if (m_currentPlugin) {
@@ -934,16 +951,16 @@ void ndDemoEntityManager::RenderStats()
 			}
 
 			//sprintf(text, "bodies:        %d", NewtonWorldGetBodyCount(m_world));
-			ImGui::Text(text, "");
+			//ImGui::Text(text, "");
 
 			//sprintf (text, "threads:       %d", NewtonGetThreadsCount(m_world));
-			ImGui::Text(text, "");
+			//ImGui::Text(text, "");
 
 			//sprintf(text, "iterations:	%d", NewtonGetSolverIterations(m_world));
-			ImGui::Text(text, "");
+			//ImGui::Text(text, "");
 
 			//sprintf(text, "sub steps:     %d", NewtonGetNumberOfSubsteps(m_world));
-			ImGui::Text(text, "");
+			//ImGui::Text(text, "");
 
 			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
 			ImGui::End();
@@ -1389,7 +1406,7 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFloat32 timestep)
 {
 	ndDemoEntityManager* const scene = (ndDemoEntityManager*) NewtonWorldGetUserData(world);
-	scene->m_cameraManager->FixUpdate(scene->GetNewton(), timestep);
+	scene->m_cameraManager->FixUpdate(scene->GetWorld(), timestep);
 	if (scene->m_updateCamera) {
 		scene->m_updateCamera(scene, scene->m_updateCameraContext, timestep);
 	}

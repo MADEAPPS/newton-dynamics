@@ -431,14 +431,14 @@ class dInfinitePlane
 
 	static NewtonBody* CreateInfinitePlane (ndDemoEntityManager* const scene, const dVector& plane)
 	{
-        //TestAddingUserMeshToSceneCollsion (scene->GetNewton());
+        //TestAddingUserMeshToSceneCollsion (scene->GetWorld());
 
 		// create the Plane collision
-		dInfinitePlane* const planeCollision = new dInfinitePlane (scene->GetNewton(), plane);
+		dInfinitePlane* const planeCollision = new dInfinitePlane (scene->GetWorld(), plane);
 
 		// create the the rigid body for
 		dMatrix matrix (GetIdentityMatrix());
-		NewtonBody* const body = NewtonCreateDynamicBody(scene->GetNewton(), planeCollision->m_collision, &matrix[0][0]);
+		NewtonBody* const body = NewtonCreateDynamicBody(scene->GetWorld(), planeCollision->m_collision, &matrix[0][0]);
 
 		// release the collision tree (this way the application does not have to do book keeping of Newton objects
 		NewtonDestroyCollision (planeCollision->m_collision);
