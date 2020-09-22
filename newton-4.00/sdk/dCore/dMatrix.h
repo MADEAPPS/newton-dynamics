@@ -198,7 +198,7 @@ D_INLINE dVector dMatrix::TransformVector (const dVector &v) const
 
 D_INLINE dVector dMatrix::UntransformVector (const dVector &v) const
 {
-	return UnrotateVector(v - m_posit);
+	return UnrotateVector(v - m_posit) | dVector::m_wOne;
 }
 
 D_INLINE dPlane dMatrix::TransformPlane (const dPlane &localPlane) const

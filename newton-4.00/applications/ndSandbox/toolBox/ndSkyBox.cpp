@@ -135,30 +135,32 @@ glFrontFace(GL_CW);
 void ndSkyBox::DrawMesh() const
 {
 	dFloat32 padd = 1.0e-3f;
-	glUseProgram(m_shader);
-	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
+//	glUseProgram(m_shader);
+//	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
 
-	glLoadIdentity();
-	glTranslatef(1.5f, 0.0f, -7.0f);
+	dVector size(200.0f);
+//	glLoadIdentity();
+//	glTranslatef(1.5f, 0.0f, -7.0f);
+glFrontFace(GL_CW);
 
 	glBegin(GL_QUADS);
 	glBindTexture(GL_TEXTURE_2D, m_textures[0]);
 
 	glTexCoord2f(0.0f + padd, 0.0f + padd);
-	glVertex3f(1.0f, 1.0f, 1.0f);
+	glVertex3f(size.m_x, size.m_y, size.m_z);
 
 	glTexCoord2f(0.0f + padd, 1.0f - padd);
-	glVertex3f(-1.0f, 1.0f, 1.0f);
+	glVertex3f(-size.m_x, size.m_y, size.m_z);
 
 	glTexCoord2f(1.0f - padd, 1.0f - padd);
-	glVertex3f(-1.0f, -1.0f, 1.0f);
+	glVertex3f(-size.m_x, -size.m_y, size.m_z);
 
 	glTexCoord2f(1.0f - padd, 0.0f + padd);
-	glVertex3f(1.0f, -1.0f, 1.0f);
+	glVertex3f(size.m_x, -size.m_y, size.m_z);
 
 	glEnd();
 
-	glUseProgram(0);
+//	glUseProgram(0);
 }
 #endif
 
@@ -169,12 +171,24 @@ void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const
 	// get the model viewMatrix; 
 	glGetFloat (GL_MODELVIEW_MATRIX, &matrix[0][0]);
 
+	int viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	dMatrix projectionViewMatrix;
+	glGetFloat(GL_PROJECTION_MATRIX, &projectionViewMatrix[0][0]);
+
+
 	dMatrix skyMatrix (dGetIdentityMatrix());
 	skyMatrix.m_posit = matrix.UntransformVector (dVector (0.0f, 0.25f, 0.0f, 1.0f));
 skyMatrix.m_posit = matrix.UntransformVector(dVector(0.0f, 0.25f, -800.0f, 1.0f));
 
+dMatrix matrix1;
 	glPushMatrix();
+
+glGetFloat(GL_MODELVIEW_MATRIX, &matrix1[0][0]);
 	glMultMatrix(&skyMatrix[0][0]);
+
+
+glGetFloat(GL_MODELVIEW_MATRIX, &matrix1[0][0]);
 
 	if (m_displayList) 
 	{

@@ -1099,7 +1099,7 @@ NewtonCollision* CreateCollisionTree (NewtonWorld* const world, ndDemoEntity* co
 
 	// set the application level callback
 #ifdef USE_STATIC_MESHES_DEBUG_COLLISION
-	NewtonStaticCollisionSetDebugCallback (collision, ShowMeshCollidingFaces);
+	//NewtonStaticCollisionSetDebugCallback (collision, ShowMeshCollidingFaces);
 #endif
 
 	// prepare to create collision geometry

@@ -1467,34 +1467,19 @@ void ndDemoEntityManager::RenderScene()
 	glLightfv(GL_LIGHT1, GL_SPECULAR, lightSpecular1);
 	glEnable(GL_LIGHT1);
 
-	// Setup matrix
-	glMatrixMode(GL_PROJECTION);
-	glPushMatrix();
-	glLoadIdentity();
-	//glOrtho(0.0f, io.DisplaySize.x, io.DisplaySize.y, 0.0f, -1.0f, +1.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-
-	// make sure the model view matrix is set to identity before setting world space light sources
-	// update Camera
+	// Setup camera matrix
 	m_cameraManager->GetCamera()->SetViewMatrix(display_w, display_h);
 
 	// render all entities
-
-	dMatrix globalMatrix (dGetIdentityMatrix());
+	const dMatrix globalMatrix (dGetIdentityMatrix());
 	if (m_hideVisualMeshes) {
 		if (m_sky) {
-			glPushMatrix();	
 			m_sky->Render(timestep, this, globalMatrix);
-			glPopMatrix();
 		}
 	} else {
 		for (dListNode* node = dList<ndDemoEntity*>::GetFirst(); node; node = node->GetNext()) {
 			ndDemoEntity* const entity = node->GetInfo();
-			glPushMatrix();	
 			entity->Render(timestep, this, globalMatrix);
-			glPopMatrix();
 		}
 	}
 
@@ -1553,11 +1538,6 @@ void ndDemoEntityManager::RenderScene()
 	//	}
 	//	glPopMatrix();
 	//}
-
-	glMatrixMode(GL_MODELVIEW);
-	glPopMatrix();
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
 }
 
 void ndDemoEntityManager::Run()
@@ -1575,6 +1555,3 @@ void ndDemoEntityManager::Run()
 		glfwSwapBuffers(m_mainFrame);
     }
 }
-
-
-
