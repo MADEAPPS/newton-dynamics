@@ -13,6 +13,25 @@
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 
+void ndDemoEntityNotify::OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
+{
+	ndBodyDynamic* const dynamicBody = GetBody()->GetAsBodyDynamic();
+	if (dynamicBody)
+	{
+		dVector massMatrix(dynamicBody->GetMassMatrix());
+		dVector force(dVector(0.0f, -10.0f, 0.0f, 0.0f).Scale(massMatrix.m_w));
+		dynamicBody->SetForce(force);
+		dynamicBody->SetTorque(dVector::m_zero);
+	}
+}
+
+void ndDemoEntityNotify::OnTranform(dInt32 threadIndex, const dMatrix& matrix)
+{
+	// apply this transformation matrix to the application user data.
+	dTrace(("update Transform\n"));
+}
+
+
 ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)
 	:dNodeHierarchy<ndDemoEntity>()
 	,m_matrix(matrix) 

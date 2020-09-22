@@ -46,6 +46,7 @@ ndBody::ndBody()
 	,m_uniqueID(m_uniqueIDCount)
 {
 	m_autoSleep = 1;
+	m_transformIsDirty = 1;
 	m_collideWithLinkedBodies = 1;
 	m_uniqueIDCount++;
 }
@@ -101,6 +102,7 @@ dMatrix ndBody::GetMatrix() const
 void ndBody::SetMatrix(const dMatrix& matrix)
 {
 	m_equilibrium = 0;
+	m_transformIsDirty = 1;
 	m_matrix = matrix;
 	dAssert(m_matrix.TestOrthogonal(dFloat32(1.0e-4f)));
 

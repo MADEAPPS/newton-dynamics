@@ -66,10 +66,10 @@ class CheckMemoryLeaks
 };
 static CheckMemoryLeaks checkLeaks;
 
-class DemoBodyNotify: public ndBodyNotify
+class ndDemoEntityNotify: public ndBodyNotify
 {
 	public:
-	DemoBodyNotify()
+	ndDemoEntityNotify()
 		:ndBodyNotify()
 	{
 		// here we set the application user data that 
@@ -118,7 +118,7 @@ void BuildFloor(ndWorld& world)
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_y = -0.5f;
 
-	body->SetNotifyCallback(new DemoBodyNotify);
+	body->SetNotifyCallback(new ndDemoEntityNotify);
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(box);
 	world.AddBody(body);
@@ -158,7 +158,7 @@ count = 1;
 		{
 			ndBodyDynamic* const body = new ndBodyDynamic();
 
-			body->SetNotifyCallback(new DemoBodyNotify);
+			body->SetNotifyCallback(new ndDemoEntityNotify);
 			body->SetMatrix(matrix);
 			body->SetCollisionShape(box);
 			body->SetMassMatrix(mass, box);
@@ -196,7 +196,7 @@ matrix.m_posit.m_y += xxxx;
 	{
 		ndBodyDynamic* const body = new ndBodyDynamic();
 
-		body->SetNotifyCallback(new DemoBodyNotify);
+		body->SetNotifyCallback(new ndDemoEntityNotify);
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(sphere);
 		body->SetMassMatrix(mass, sphere);

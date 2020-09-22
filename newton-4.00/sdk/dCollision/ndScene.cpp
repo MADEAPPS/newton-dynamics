@@ -840,10 +840,11 @@ ndSceneNode* ndScene::BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firs
 	}
 }
 
-void ndScene::UpdateTransform(dInt32 threadIndex, ndBodyKinematic* const body)
+void ndScene::UpdateTransformNotify(dInt32 threadIndex, ndBodyKinematic* const body)
 {
-	if (!body->m_equilibrium)
+	if (body->m_transformIsDirty)
 	{
+		body->m_transformIsDirty = 0;
 		ndBodyNotify* const notify = body->GetNotifyCallback();
 		if (notify)
 		{
@@ -1550,7 +1551,7 @@ void ndScene::TransformUpdate()
 
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
-				m_owner->UpdateTransform(threadIndex, bodyArray[i]);
+				m_owner->UpdateTransformNotify(threadIndex, bodyArray[i]);
 			}
 		}
 	};

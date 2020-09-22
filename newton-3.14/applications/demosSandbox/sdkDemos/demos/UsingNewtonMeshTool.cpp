@@ -220,7 +220,7 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 {
 	// load the skybox
 	scene->CreateSkyBox();
-/*
+
 	// load the scene from a ngd file format
 	CreateLevelMesh (scene, "flatPlane.ngd", true);
 
@@ -243,7 +243,7 @@ void UsingNewtonMeshTool (DemoEntityManager* const scene)
 
 	dCustomBallAndSocket* const joint = new dCustomBallAndSocket(pinAndPivotFrame, body0, body1);
 	joint->SetBodyMassScale(5.0f, 1.0f);
-*/
+
 	dQuaternion rot;
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);

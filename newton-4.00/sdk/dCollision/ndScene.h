@@ -98,7 +98,7 @@ class ndScene
 	virtual void FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body, bool oneWay) = 0;
 
 	D_COLLISION_API virtual void UpdateAabb(dInt32 threadIndex, ndBodyKinematic* const body);
-	D_COLLISION_API virtual void UpdateTransform(dInt32 threadIndex, ndBodyKinematic* const body);
+	D_COLLISION_API virtual void UpdateTransformNotify(dInt32 threadIndex, ndBodyKinematic* const body);
 	D_COLLISION_API virtual void CalculateContacts(dInt32 threadIndex, ndContact* const contact); 
 
 	void CalculateJointContacts(dInt32 threadIndex, ndContact* const contact);

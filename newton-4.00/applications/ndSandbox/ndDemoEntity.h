@@ -14,11 +14,26 @@
 
 #include "ndDemoEntityManager.h"
 
+class ndDemoEntity;
 class ndShaderPrograms;
 class ndDemoMeshInterface;
 
+class ndDemoEntityNotify : public ndBodyNotify
+{
+	public:
+	ndDemoEntityNotify(ndDemoEntity* const entity)
+		:ndBodyNotify()
+		,m_entity(entity)
+	{
+	}
 
-//class ndDemoEntity: public dHierarchy<ndDemoEntity>, virtual public dClassInfo
+	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix);
+	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep);
+
+	ndDemoEntity* m_entity;
+};
+
+
 class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 {
 	public:
