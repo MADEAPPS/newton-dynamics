@@ -198,11 +198,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	dFloat32 m_fps;
 	dFloat32 m_timestepAcc;
 	dFloat32 m_currentListenerTimestep;
-	dFloat32 m_mainThreadPhysicsTime;
-	dFloat32 m_mainThreadPhysicsTimeAcc;
-
 	dSpinLock m_addDeleteLock;
-
 	
 	bool m_showUI;
 	bool m_showAABB;
@@ -220,7 +216,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool m_showCollidingFaces;
 	bool m_suspendPhysicsUpdate;
 	bool m_asynchronousPhysicsUpdate;
-	bool m_solveLargeIslandInParallel;
 	bool m_showRaycastHit;
 
 	unsigned m_profilerMode;

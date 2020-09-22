@@ -22,13 +22,11 @@ class ndPhysicsWorld: public ndWorld
 	ndPhysicsWorld(ndDemoEntityManager* const manager);
 	~ndPhysicsWorld();
 
-	void ResetTimer();
-	void AdvanceTime();
+	void AdvanceTime(dFloat32 timestep);
 
 	private:
 	ndDemoEntityManager* m_manager;
-
-	dUnsigned64 m_microsecunds;
+	dFloat32 m_timeAccumulator;
 };
 
 #endif

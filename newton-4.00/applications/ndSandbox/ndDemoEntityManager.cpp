@@ -29,8 +29,6 @@
 	#include "CocoaOpenglGlue.h"
 #endif
 
-#define MAX_PHYSICS_FPS				60.0f
-#define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 #define DEFAULT_SCENE	0		// using NewtonMesh tool
@@ -95,8 +93,6 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_fps(0.0f)
 	,m_timestepAcc(0.0f)
 	,m_currentListenerTimestep(0.0f)
-	,m_mainThreadPhysicsTime(0.0f)
-	,m_mainThreadPhysicsTimeAcc(0.0f)
 	,m_addDeleteLock()
 	,m_showUI(true)
 	,m_showAABB(false)
@@ -114,7 +110,6 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_showCollidingFaces(false)
 	,m_suspendPhysicsUpdate(false)
 	,m_asynchronousPhysicsUpdate(false)
-	,m_solveLargeIslandInParallel(true)
 	,m_showRaycastHit(false)
 	,m_profilerMode(0)
 	//,m_contactLock(0)
@@ -650,7 +645,6 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show UI", &m_showUI);
 			ImGui::Checkbox("show stats", &m_showStats);
 			ImGui::Checkbox("concurrent physics update", &m_asynchronousPhysicsUpdate);
-			ImGui::Checkbox("solve large island in parallel", &m_solveLargeIslandInParallel);
 			ImGui::Separator();
 
 			//int index = 0;
@@ -925,20 +919,23 @@ void ndDemoEntityManager::BeginFrame()
 
 void ndDemoEntityManager::RenderStats()
 {
-	if (m_showStats) {
+	if (m_showStats) 
+	{
 		char text[1024];
 		
-		if (ImGui::Begin("statistics", &m_showStats)) {
+		if (ImGui::Begin("statistics", &m_showStats)) 
+		{
 			sprintf (text, "fps:           %6.3f", m_fps);
 			ImGui::Text(text, "");
 
-			sprintf (text, "physics time: %6.3f ms", m_mainThreadPhysicsTime * 1000.0f);
+			sprintf (text, "physics time: %6.3f ms", m_world->GetUpdateTime() * 1.0e3f);
 			ImGui::Text(text, "");
 
 			sprintf (text, "memory used:  %6.3f mbytes", dFloat32(dFloat64(dMemory::GetMemoryUsed()) / (1024 * 1024)));
 			ImGui::Text(text, "");
 
-			if (m_currentPlugin) {
+			if (m_currentPlugin) 
+			{
 				dAssert(0);
 				//int index = 1;
 				//for (void* plugin = NewtonGetFirstPlugin(m_world); plugin; plugin = NewtonGetNextPlugin(m_world, plugin)) {
@@ -950,25 +947,27 @@ void ndDemoEntityManager::RenderStats()
 				//}
 			}
 
-			//sprintf(text, "bodies:        %d", NewtonWorldGetBodyCount(m_world));
-			//ImGui::Text(text, "");
+			sprintf(text, "bodies:        %d", m_world->GetBodyList().GetCount());
+			ImGui::Text(text, "");
 
-			//sprintf (text, "threads:       %d", NewtonGetThreadsCount(m_world));
-			//ImGui::Text(text, "");
+			sprintf(text, "threads:       %d", m_world->GetThreadCount());
+			ImGui::Text(text, "");
 
-			//sprintf(text, "iterations:	%d", NewtonGetSolverIterations(m_world));
-			//ImGui::Text(text, "");
+			sprintf(text, "iterations:    %d", m_world->GetSolverIterations());
+			ImGui::Text(text, "");
 
-			//sprintf(text, "sub steps:     %d", NewtonGetNumberOfSubsteps(m_world));
-			//ImGui::Text(text, "");
+			sprintf(text, "Substeps:      %d", m_world->GetSubSteps());
+			ImGui::Text(text, "");
 
 			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
 			ImGui::End();
 		}
 	}
 
-	if (m_showUI && m_renderHelpMenus) {
-		if (ImGui::Begin("User Interface", &m_showUI)){
+	if (m_showUI && m_renderHelpMenus) 
+	{
+		if (ImGui::Begin("User Interface", &m_showUI))
+		{
 			m_renderHelpMenus (this, m_renderUIContext);
 			//m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
 			ImGui::End();
@@ -984,13 +983,15 @@ void ndDemoEntityManager::CalculateFPS(dFloat32 timestep)
 	m_timestepAcc += timestep;
 
 	// this probably happing on loading of and a pause, just rest counters
-	if ((m_timestepAcc <= 0.0f) || (m_timestepAcc > 2.0f)){
+	if ((m_timestepAcc <= 0.0f) || (m_timestepAcc > 2.0f))
+	{
 		m_timestepAcc = 0;
 		m_framesCount = 0;
 	}
 
 	//update fps every quarter of a second
-	if (m_timestepAcc >= 0.25f) {
+	if (m_timestepAcc >= 0.25f) 
+	{
 		m_fps = dFloat32 (m_framesCount) / m_timestepAcc;
 		m_timestepAcc -= 0.25f;
 		m_framesCount = 0;
@@ -1240,63 +1241,11 @@ void ndDemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dV
 
 void ndDemoEntityManager::UpdatePhysics(dFloat32 timestep)
 {
-	dAssert(0);
-/*
 	// update the physics
-	if (m_world && !m_suspendPhysicsUpdate) {
-		D_TRACKTIME();
-
-		dFloat32 timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
-		dUnsigned64 timestepMicrosecunds = dUnsigned64 (timestepInSecunds * 1000000.0f);
-
-		dUnsigned64 currentTime = dGetTimeInMicrosenconds ();
-		dUnsigned64 nextTime = currentTime - m_microsecunds;
-		if (nextTime > timestepMicrosecunds * 2) {
-			m_microsecunds = currentTime - timestepMicrosecunds * 2;
-			nextTime = currentTime - m_microsecunds;
-		}
-
-		bool newUpdate = false;
-		dFloat32 physicsTime = 0.0f;
-		//while (nextTime >= timestepMicrosecunds) 
-		if (nextTime >= timestepMicrosecunds) 
-		{
-			newUpdate = true;
-			ClearDebugDisplay(m_world);
-
-#ifdef DEMO_CHECK_ASYN_UPDATE
-			g_checkAsyncUpdate = 1;
-#endif
-			if (m_asynchronousPhysicsUpdate) {
-				NewtonUpdateAsync(m_world, timestepInSecunds);
-#ifdef DEMO_CHECK_ASYN_UPDATE
-				NewtonWaitForUpdateToFinish(m_world);
-				g_checkAsyncUpdate = 0;
-#endif
-			} else {
-				NewtonUpdate(m_world, timestepInSecunds);
-			}
-
-			physicsTime += NewtonGetLastUpdateTime(m_world);
-			
-			nextTime -= timestepMicrosecunds;
-			m_microsecunds += timestepMicrosecunds;
-		}
-
-		if (newUpdate) {
-			m_physicsFramesCount ++;
-			m_mainThreadPhysicsTimeAcc += physicsTime;
-			if (m_physicsFramesCount >= 16) {
-				m_mainThreadPhysicsTime = m_mainThreadPhysicsTimeAcc / m_physicsFramesCount;
-				m_physicsFramesCount = 0;
-				m_mainThreadPhysicsTimeAcc = 0.0f;
-			}
-
-		}
-		
-//dTrace (("%f\n", m_mainThreadPhysicsTime));
+	if (m_world && !m_suspendPhysicsUpdate) 
+	{
+		m_world->AdvanceTime(timestep);
 	}
-*/
 }
 
 dFloat32 ndDemoEntityManager::CalculateInteplationParam () const
@@ -1417,7 +1366,7 @@ void ndDemoEntityManager::RenderScene()
 {
 	dFloat32 timestep = dGetElapsedSeconds();	
 	CalculateFPS(timestep);
-	//UpdatePhysics(timestep);
+	UpdatePhysics(timestep);
 
 	D_TRACKTIME();
 	// Get the interpolated location of each body in the scene
