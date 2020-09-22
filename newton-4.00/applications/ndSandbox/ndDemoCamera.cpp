@@ -27,7 +27,7 @@
 #define D_CAMERA_ANGLE			60.0f
 
 ndDemoCamera::ndDemoCamera()
-	:ndDemoEntity (dGetIdentityMatrix(), NULL) 
+	:ndDemoEntity (dGetIdentityMatrix(), nullptr) 
 	,m_fov(D_CAMERA_ANGLE * dDegreeToRad)
 	,m_backPlane(2000.0f)
 	,m_frontPlane (0.01f)

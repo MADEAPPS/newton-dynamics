@@ -44,7 +44,7 @@ static void GetCollisionInfo (void* userData, NewtonCollisionInfoRecord* infoRec
 	infoRecord->m_heightField.m_horizonalScale = CELL_SIZE;
 	infoRecord->m_heightField.m_elevation = (unsigned short*) me->GetElevationMap ();
 	infoRecord->m_heightField.m_gridsDiagonals = 0;
-	infoRecord->m_heightField.m_atributes = NULL;
+	infoRecord->m_heightField.m_atributes = nullptr;
 }
 
 
@@ -191,7 +191,7 @@ dAssert (0);
 	m_maxBox.m_y = maxY;
 
 #ifdef TEST_INFO_AND_AABB
-	collision = NewtonCreateUserMeshCollision (nWorld, &m_minBox[0], &m_maxBox[0], this, MeshCollisionCollideCallback, UserMeshCollisionRayHitCallback, NULL, GetCollisionInfo, UserMeshCollisionGetFacesInAABB, 0);
+	collision = NewtonCreateUserMeshCollision (nWorld, &m_minBox[0], &m_maxBox[0], this, MeshCollisionCollideCallback, UserMeshCollisionRayHitCallback, nullptr, GetCollisionInfo, UserMeshCollisionGetFacesInAABB, 0);
 
 	NewtonCollisionInfoRecord collisionInfo;
 	NewtonCollisionGetInfo (collision, &collisionInfo);
@@ -211,7 +211,7 @@ dAssert (0);
 	}
 
 #else
-	collision = NewtonCreateUserMeshCollision (nWorld, &m_minBox[0], &m_maxBox[0], this, MeshCollisionCollideCallback, UserMeshCollisionRayHitCallback, NULL, NULL, NULL);
+	collision = NewtonCreateUserMeshCollision (nWorld, &m_minBox[0], &m_maxBox[0], this, MeshCollisionCollideCallback, UserMeshCollisionRayHitCallback, nullptr, nullptr, nullptr);
 #endif
 
 

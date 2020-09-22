@@ -18,7 +18,7 @@
 //////////////////////////////////////////////////////////////////////
 
 ndSkyBox::ndSkyBox(GLuint shader)
-	:ndDemoEntity (dGetIdentityMatrix(), NULL)
+	:ndDemoEntity (dGetIdentityMatrix(), nullptr)
 	,m_shader(shader)
 	,m_displayList(0)
 {

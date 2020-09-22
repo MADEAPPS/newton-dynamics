@@ -82,7 +82,7 @@ class ndTextureCache: public dTree<ndTextureEntry, dUnsigned64>
 				return iter.GetNode();
 			}
 		}
-		return NULL;
+		return nullptr;
 	}
 
 
@@ -126,7 +126,7 @@ GLuint LoadTexture(const char* const filename)
 	if (!texture) {
 
 		FILE* const pFile = fopen (fullPathName, "rb");
-		if(pFile == NULL) {
+		if(pFile == nullptr) {
 			return 0;
 		}
 
@@ -163,7 +163,7 @@ GLuint LoadTexture(const char* const filename)
 
 		// Allocate memory and check for success
 		char* const pBits = new char [width * height * 4];
-		if(pBits == NULL) {
+		if(pBits == nullptr) {
 			fclose(pFile);
 			return 0;
 		}
@@ -287,7 +287,7 @@ const char* FindTextureById (GLuint textureID)
 	if (node) {
 		return node->GetInfo().m_textureName.GetStr();
 	}
-	return NULL;
+	return nullptr;
 }
 
 

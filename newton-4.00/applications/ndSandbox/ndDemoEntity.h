@@ -39,7 +39,7 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 
 	ndDemoEntity(const ndDemoEntity& copyFrom);
 	ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent);
-	//ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<ndDemoMeshInterface*, dScene::dTreeNode*>& meshCache, ndDemoEntityManager::EntityDictionary& entityDictionary, ndDemoEntity* const parent = NULL);
+	//ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<ndDemoMeshInterface*, dScene::dTreeNode*>& meshCache, ndDemoEntityManager::EntityDictionary& entityDictionary, ndDemoEntity* const parent = nullptr);
 	virtual ~ndDemoEntity(void);
 
 	ndDemoMeshInterface* GetMesh() const;
@@ -55,7 +55,7 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 	//static ndDemoEntity* LoadNGD_mesh (const char* const fileName, NewtonWorld* const world, const ndShaderPrograms& shaderCache);
 
 	const dMatrix& GetRenderMatrix () const;
-	dMatrix CalculateGlobalMatrix (const ndDemoEntity* const root = NULL) const;
+	dMatrix CalculateGlobalMatrix (const ndDemoEntity* const root = nullptr) const;
 
 	dMatrix GetNextMatrix () const;
 	dMatrix GetCurrentMatrix () const;
@@ -67,7 +67,7 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 
 	virtual void ResetMatrix(ndDemoEntityManager& world, const dMatrix& matrix);
 	virtual void InterpolateMatrix (ndDemoEntityManager& world, dFloat32 param);
-	dMatrix CalculateInterpolatedGlobalMatrix (const ndDemoEntity* const root = NULL) const;
+	dMatrix CalculateInterpolatedGlobalMatrix (const ndDemoEntity* const root = nullptr) const;
 
 	void RenderBone() const;
 	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;

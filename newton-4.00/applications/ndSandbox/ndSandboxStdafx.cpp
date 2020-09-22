@@ -47,7 +47,7 @@ void dGetWorkingFileName (const char* const name, char* const outPathName)
 {
 	#if defined(_WIN32)
 		char appPath [256];
-		GetModuleFileNameA(NULL, appPath, sizeof (appPath));
+		GetModuleFileNameA(nullptr, appPath, sizeof (appPath));
 		_strlwr (appPath);
 
 		char* const end = strstr (appPath, "applications");

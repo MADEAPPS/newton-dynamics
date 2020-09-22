@@ -97,11 +97,11 @@ inline dNodeBaseHierarchy::dNodeBaseHierarchy (const char* const name)
 
 inline void dNodeBaseHierarchy::Clear()
 {
-	m_child = NULL;
-	m_parent = NULL;
-	m_sibling = NULL;
+	m_child = nullptr;
+	m_parent = nullptr;
+	m_sibling = nullptr;
 	m_nameID = 0;
-	m_name = (char*)NULL;
+	m_name = (char*)nullptr;
 }
 
 

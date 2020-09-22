@@ -43,7 +43,7 @@ void dResetTimer()
 		baseCount = dUnsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000;
 	#elif defined(_MACOSX_VER)
 		timeval tp;
-		gettimeofday(&tp, NULL);
+		gettimeofday(&tp, nullptr);
 		dUnsigned64 microsecunds =  dUnsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
 		baseCount = microsecunds;
 	#endif
@@ -65,7 +65,7 @@ dUnsigned64 dGetTimeInMicrosenconds()
 		return dUnsigned64 (ts.tv_sec) * 1000000 + ts.tv_nsec / 1000 - baseCount;
 	#elif defined(_MACOSX_VER)
 		timeval tp;
-		gettimeofday(&tp, NULL);
+		gettimeofday(&tp, nullptr);
 		dUnsigned64 microsecunds =  dUnsigned64 (tp.tv_sec) * 1000000 + tp.tv_usec;
 		return microsecunds - baseCount;
 	#endif

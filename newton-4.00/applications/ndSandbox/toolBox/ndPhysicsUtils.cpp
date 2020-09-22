@@ -32,7 +32,7 @@ class dMousePickClass
 	dMousePickClass ()
 		:m_normal(0.0f)
 		,m_param (1.0f)
-		,m_body(NULL)
+		,m_body(nullptr)
 	{
 		m_hitBody = false;
 	}
@@ -287,7 +287,7 @@ void SetShowMeshCollision (SceneManager& me, int mode)
 {
 	NewtonTreeCollisionCallback showFaceCallback;
 
-	showFaceCallback = NULL;
+	showFaceCallback = nullptr;
 	if (mode) {
 		showFaceCallback = ShowMeshCollidingFaces;
 	}
@@ -563,7 +563,7 @@ NewtonJoint* CheckIfBodiesCollide (NewtonBody* const body0, NewtonBody* const bo
 			return joint;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -743,7 +743,7 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* const world, const dMatrix&
 {
 	dVector size (originalSize);
 
-	NewtonCollision* collision = NULL;
+	NewtonCollision* collision = nullptr;
 	switch (type) 
 	{
 		case _NULL_PRIMITIVE:
@@ -755,14 +755,14 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* const world, const dMatrix&
 		case _SPHERE_PRIMITIVE:
 		{
 			// create the collision 
-			collision = NewtonCreateSphere (world, size.m_x * 0.5f, 0, NULL); 
+			collision = NewtonCreateSphere (world, size.m_x * 0.5f, 0, nullptr); 
 			break;
 		}
 
 		case _BOX_PRIMITIVE:
 		{
 			// create the collision 
-			collision = NewtonCreateBox (world, size.m_x, size.m_y, size.m_z, 0, NULL); 
+			collision = NewtonCreateBox (world, size.m_x, size.m_y, size.m_z, 0, nullptr); 
 			break;
 		}
 
@@ -773,14 +773,14 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* const world, const dMatrix&
 			dFloat32 h = size.m_y;
 
 			// create the collision 
-			collision = NewtonCreateCone (world, r, h, 0, NULL); 
+			collision = NewtonCreateCone (world, r, h, 0, nullptr); 
 			break;
 		}
 
 		case _CYLINDER_PRIMITIVE:
 		{
 			// create the collision 
-			collision = NewtonCreateCylinder (world, size.m_x * 0.5f, size.m_z * 0.5f, size.m_y, 0, NULL); 
+			collision = NewtonCreateCylinder (world, size.m_x * 0.5f, size.m_z * 0.5f, size.m_y, 0, nullptr); 
 			break;
 		}
 
@@ -788,14 +788,14 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* const world, const dMatrix&
 		case _CAPSULE_PRIMITIVE:
 		{
 			// create the collision 
-			collision = NewtonCreateCapsule (world, size.m_x * 0.5f, size.m_z * 0.5f, size.m_y, 0, NULL); 
+			collision = NewtonCreateCapsule (world, size.m_x * 0.5f, size.m_z * 0.5f, size.m_y, 0, nullptr); 
 			break;
 		}
 
 		case _CHAMFER_CYLINDER_PRIMITIVE:
 		{
 			// create the collision 
-			collision = NewtonCreateChamferCylinder (world, size.m_x * 0.5f, size.m_y, 0, NULL); 
+			collision = NewtonCreateChamferCylinder (world, size.m_x * 0.5f, size.m_y, 0, nullptr); 
 			break;
 		}
 
@@ -821,7 +821,7 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* const world, const dMatrix&
 				cloud [i].m_z = dGaussianRandom (size.m_z);
 				count ++;
 			}
-			collision = NewtonCreateConvexHull (world, count, &cloud[0].m_x, sizeof (dVector), 0.01f, 0, NULL); 
+			collision = NewtonCreateConvexHull (world, count, &cloud[0].m_x, sizeof (dVector), 0.01f, 0, nullptr); 
 			break;
 		}
 
@@ -853,7 +853,7 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* const world, const dMatrix&
 				}
 			}
 
-			collision = NewtonCreateConvexHull (world, count, &cloud[0][0], 3 * sizeof (dFloat32), 0.02f, 0, NULL); 
+			collision = NewtonCreateConvexHull (world, count, &cloud[0][0], 3 * sizeof (dFloat32), 0.02f, 0, nullptr); 
 			break;
 		}
 
@@ -901,7 +901,7 @@ NewtonCollision* CreateConvexCollision (NewtonWorld* const world, const dMatrix&
 NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
 {
 	dAssert(0);
-	return NULL;
+	return nullptr;
 /*
 	// calculate the moment of inertia and the relative center of mass of the solid
 	//	dVector origin;
@@ -951,12 +951,12 @@ NewtonBody* CreateSimpleBody (NewtonWorld* const world, void* const userData, dF
 NewtonBody* CreateSimpleSolid (ndDemoEntityManager* const scene, ndDemoMesh* const mesh, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
 {
 	dAssert(0);
-	return NULL;
+	return nullptr;
 /*
 	dAssert (collision);
 
 	// add an new entity to the world
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, NULL);
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	scene->Append (entity);
 	if (mesh) {
 		entity->SetMesh(mesh, dGetIdentityMatrix());
@@ -969,7 +969,7 @@ NewtonBody* CreateSimpleSolid (ndDemoEntityManager* const scene, ndDemoMesh* con
 NewtonBody* CreateInstancedSolid(ndDemoEntityManager* const scene, ndDemoEntity* const parent, dFloat32 mass, const dMatrix& matrix, NewtonCollision* const collision, int materialId, bool generalInertia)
 {
 	dAssert(0);
-	return NULL;
+	return nullptr;
 /*
 	dAssert(collision);
 	// add an new entity to the world
@@ -1170,7 +1170,7 @@ NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, ndDemoEntity* const e
 	NewtonCollision* const collision = CreateCollisionTree (world, ent, 0, optimize);
 
 	// Get the root Matrix
-	dMatrix matrix (ent->CalculateGlobalMatrix(NULL));
+	dMatrix matrix (ent->CalculateGlobalMatrix(nullptr));
 
 	// create the level rigid body
 	NewtonBody* const level = NewtonCreateDynamicBody(world, collision, &matrix[0][0]);
@@ -1216,7 +1216,7 @@ NewtonBody* CreateLevelMeshBody (NewtonWorld* const world, ndDemoEntity* const e
 NewtonBody* AddFloorBox(ndDemoEntityManager* const scene, const dVector& origin, const dVector& size)
 {
 	dAssert(0);
-	return NULL;
+	return nullptr;
 /*
 	// create the shape and visual mesh as a common data to be re used
 	NewtonWorld* const world = scene->GetNewton();
@@ -1242,11 +1242,11 @@ NewtonBody* AddFloorBox(ndDemoEntityManager* const scene, const dVector& origin,
 NewtonBody* CreatePLYMesh (ndDemoEntityManager* const scene, const char* const fileName, bool optimized)
 {
 	dAssert(0);
-	return NULL;
+	return nullptr;
 /*
 	FILE* const file = fopen(fileName, "rb");
 	if (!file) {
-		return NULL;
+		return nullptr;
 	}
 
 	char buffer[265];
@@ -1314,14 +1314,14 @@ NewtonBody* CreatePLYMesh (ndDemoEntityManager* const scene, const char* const f
 NewtonBody* CreateLevelMesh (ndDemoEntityManager* const scene, const char* const name, bool optimized)
 {
 	dAssert(0);
-	return NULL;
+	return nullptr;
 /*
 	// load the scene from a ngd file format
 	char fileName[2048];
 	dGetWorkingFileName (name, fileName);
 	scene->LoadScene (fileName);
 
-	NewtonBody* levelBody = NULL;
+	NewtonBody* levelBody = nullptr;
 	NewtonWorld* const world = scene->GetNewton();
 	for (ndDemoEntityManager::dListNode* node = scene->GetLast(); node; node = node->GetPrev()) {
 		ndDemoEntity* const ent = node->GetInfo();
@@ -1450,7 +1450,7 @@ void LoadLumberYardMesh(ndDemoEntityManager* const scene, const dVector& locatio
 dCustomJoint* FindJoint(const NewtonBody* const body0, const NewtonBody* const body1)
 {
 	NewtonJoint* const joint = NewtonWorldFindJoint(body0, body1);
-	return joint ? (dCustomJoint*)NewtonJointGetUserData(joint) : NULL;
+	return joint ? (dCustomJoint*)NewtonJointGetUserData(joint) : nullptr;
 }
 
 #endif

@@ -91,7 +91,7 @@ GLuint ndShaderPrograms::CreateShaderEffect (const char* const vertexShaderName,
 	LoadShaderCode (tmpName, buffer);
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
-	glShaderSource(vertexShader, 1, &vPtr, NULL);
+	glShaderSource(vertexShader, 1, &vPtr, nullptr);
 	glCompileShader(vertexShader);
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &state); 
 	if (state != GL_TRUE ) {
@@ -106,7 +106,7 @@ GLuint ndShaderPrograms::CreateShaderEffect (const char* const vertexShaderName,
 	LoadShaderCode (tmpName, buffer);
 	GLuint pixelShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-	glShaderSource(pixelShader, 1, &vPtr, NULL);
+	glShaderSource(pixelShader, 1, &vPtr, nullptr);
 	glCompileShader(pixelShader);
 	glGetShaderiv(pixelShader, GL_COMPILE_STATUS, &state); 
 	if (state != GL_TRUE ) {

@@ -61,7 +61,7 @@ ndDemoSubMesh::ndDemoSubMesh ()
 	,m_opacity(1.0f)
 	,m_shiness(100.0f)
 	,m_indexCount(0)
-	,m_indexes(NULL)
+	,m_indexes(nullptr)
 	,m_textureHandle(0)
 	,m_shader(0)
 {
@@ -147,9 +147,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
 	,m_vertexCount(0)
-	,m_uv (NULL)
-	,m_vertex(NULL)
-	,m_normal(NULL)
+	,m_uv (nullptr)
+	,m_vertex(nullptr)
+	,m_normal(nullptr)
 	,m_optimizedOpaqueDiplayList(0)	
 	,m_optimizedTransparentDiplayList(0)
 {
@@ -159,9 +159,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 ndDemoMesh::ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
-	,m_uv(NULL)
-	,m_vertex(NULL)
-	,m_normal(NULL)
+	,m_uv(nullptr)
+	,m_vertex(nullptr)
+	,m_normal(nullptr)
 	,m_optimizedOpaqueDiplayList(0)
 	,m_optimizedTransparentDiplayList(0)
 {
@@ -247,9 +247,9 @@ ndDemoMesh::ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshN
 
 ndDemoMesh::ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
-	,m_uv(NULL)
-	,m_vertex(NULL)
-	,m_normal(NULL)
+	,m_uv(nullptr)
+	,m_vertex(nullptr)
+	,m_normal(nullptr)
 	,m_optimizedOpaqueDiplayList(0)		
 	,m_optimizedTransparentDiplayList(0)
 {
@@ -298,9 +298,9 @@ ndDemoMesh::ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCac
 ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
-	,m_uv(NULL)
-	,m_vertex(NULL)
-	,m_normal(NULL)
+	,m_uv(nullptr)
+	,m_vertex(nullptr)
+	,m_normal(nullptr)
 	,m_optimizedOpaqueDiplayList(0)		
 	,m_optimizedTransparentDiplayList(0)
 {
@@ -336,9 +336,9 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCac
 ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity, const dMatrix& uvMatrix)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
-	,m_uv(NULL)
-	,m_vertex(NULL)
-	,m_normal(NULL)
+	,m_uv(nullptr)
+	,m_vertex(nullptr)
+	,m_normal(nullptr)
 	,m_optimizedOpaqueDiplayList(0)		
 	,m_optimizedTransparentDiplayList(0)
 {
@@ -419,9 +419,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
-	,m_uv(NULL)
-	,m_vertex(NULL)
-	,m_normal(NULL)
+	,m_uv(nullptr)
+	,m_vertex(nullptr)
+	,m_normal(nullptr)
 	,m_optimizedOpaqueDiplayList(0)		
 	,m_optimizedTransparentDiplayList(0)
 {
@@ -902,7 +902,7 @@ void ndDemoBezierCurve::RenderTransparency () const
 NewtonMesh* ndDemoBezierCurve::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix)
 {
 	dAssert(0);
-	return NULL;
+	return nullptr;
 }
 */
 void ndDemoBezierCurve::RenderNormals ()
@@ -956,9 +956,9 @@ void ndDemoBezierCurve::Render (ndDemoEntityManager* const scene)
 /*
 ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, dScene::dTreeNode* const meshNode, const dTree<ndDemoEntity*, dScene::dTreeNode*>& boneMap, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
-	,m_mesh((ndDemoMesh*)owner->GetMesh()->Clone(NULL))
+	,m_mesh((ndDemoMesh*)owner->GetMesh()->Clone(nullptr))
 	,m_entity(owner)
-	,m_bindingMatrixArray(NULL)
+	,m_bindingMatrixArray(nullptr)
 	,m_nodeCount(0)
 	,m_shader(shaderCache.m_skinningDiffuseEffect)
 {
@@ -1156,7 +1156,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 
 ndDemoSkinMesh::ndDemoSkinMesh(const ndDemoSkinMesh& clone, ndDemoEntity* const owner)
 	:ndDemoMeshInterface(clone)
-	,m_mesh((ndDemoMesh*)clone.m_mesh->Clone(NULL))
+	,m_mesh((ndDemoMesh*)clone.m_mesh->Clone(nullptr))
 	,m_entity(owner)
 //	,m_bindingMatrixArray(new dMatrix[clone.m_nodeCount])
 	,m_nodeCount(clone.m_nodeCount)
@@ -1277,7 +1277,7 @@ dGeometryNodeSkinClusterInfo* ndDemoSkinMesh::FindSkinModifier(dScene* const sce
 			return modifierInfo;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 */
 

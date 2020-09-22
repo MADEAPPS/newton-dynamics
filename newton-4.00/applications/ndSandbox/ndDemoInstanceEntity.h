@@ -21,7 +21,7 @@ class ndDemoInstanceEntity: public ndDemoEntity
 
 	ndDemoInstanceEntity(const ndDemoInstanceEntity& copyFrom);
 	ndDemoInstanceEntity(const dMatrix& matrix, ndDemoEntity* const parent);
-	//ndDemoInstanceEntity(DemoInstanceEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<DemoMeshInterface*, dScene::dTreeNode*>& meshCache, DemoInstanceEntityManager::EntityDictionary& entityDictionary, ndDemoInstanceEntity* const parent = NULL);
+	//ndDemoInstanceEntity(DemoInstanceEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<DemoMeshInterface*, dScene::dTreeNode*>& meshCache, DemoInstanceEntityManager::EntityDictionary& entityDictionary, ndDemoInstanceEntity* const parent = nullptr);
 	virtual ~ndDemoInstanceEntity(void);
 
 	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;

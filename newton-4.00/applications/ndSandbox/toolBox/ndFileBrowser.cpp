@@ -27,7 +27,7 @@ bool dGetOpenFileNamePLY(char* const fileName, int maxSize)
 	OPENFILENAME ofn;
 	// open a file name
 	char appPath[256];
-	GetModuleFileNameA(NULL, appPath, sizeof (appPath));
+	GetModuleFileNameA(nullptr, appPath, sizeof (appPath));
 	_strlwr(appPath);
 
 	char* const end = strstr(appPath, "applications");
@@ -36,7 +36,7 @@ bool dGetOpenFileNamePLY(char* const fileName, int maxSize)
 
 	ZeroMemory(&ofn, sizeof(ofn));
 	ofn.lStructSize = sizeof (ofn);
-	ofn.hwndOwner = NULL;
+	ofn.hwndOwner = nullptr;
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
 	ofn.nMaxFile = maxSize;
@@ -60,7 +60,7 @@ bool dGetOpenFileNameNgd (char* const fileName, int maxSize)
 	OPENFILENAME ofn;
 	// open a file name
 	char appPath[256];
-	GetModuleFileNameA(NULL, appPath, sizeof (appPath));
+	GetModuleFileNameA(nullptr, appPath, sizeof (appPath));
 	_strlwr(appPath);
 
 	char* const end = strstr(appPath, "applications");
@@ -69,7 +69,7 @@ bool dGetOpenFileNameNgd (char* const fileName, int maxSize)
 
 	ZeroMemory(&ofn, sizeof(ofn));
 	ofn.lStructSize = sizeof (ofn);
-	ofn.hwndOwner = NULL;
+	ofn.hwndOwner = nullptr;
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
 	ofn.nMaxFile = maxSize;
@@ -92,7 +92,7 @@ bool dGetOpenFileNameSerialization(char* const fileName, int maxSize)
 	OPENFILENAME ofn;
 	// open a file name
 	char appPath[256];
-	GetModuleFileNameA(NULL, appPath, sizeof (appPath));
+	GetModuleFileNameA(nullptr, appPath, sizeof (appPath));
 	_strlwr(appPath);
 
 	char* const end = strstr(appPath, "applications");
@@ -101,7 +101,7 @@ bool dGetOpenFileNameSerialization(char* const fileName, int maxSize)
 
 	ZeroMemory(&ofn, sizeof(ofn));
 	ofn.lStructSize = sizeof (ofn);
-	ofn.hwndOwner = NULL;
+	ofn.hwndOwner = nullptr;
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
 	ofn.nMaxFile = maxSize;
@@ -125,7 +125,7 @@ bool dGetSaveFileNameNgd(char* const fileName, int maxSize)
 	OPENFILENAME ofn;
 	// open a file name
 	char appPath[256];
-	GetModuleFileNameA(NULL, appPath, sizeof(appPath));
+	GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
 	_strlwr(appPath);
 
 	char* const end = strstr(appPath, "applications");
@@ -134,7 +134,7 @@ bool dGetSaveFileNameNgd(char* const fileName, int maxSize)
 
 	ZeroMemory(&ofn, sizeof(ofn));
 	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = NULL;
+	ofn.hwndOwner = nullptr;
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
 	ofn.nMaxFile = maxSize;
@@ -165,7 +165,7 @@ bool dGetSaveFileNameSerialization(char* const fileName, int maxSize)
 	OPENFILENAME ofn;
 	// open a file name
 	char appPath[256];
-	GetModuleFileNameA(NULL, appPath, sizeof(appPath));
+	GetModuleFileNameA(nullptr, appPath, sizeof(appPath));
 	_strlwr(appPath);
 
 	char* const end = strstr(appPath, "applications");
@@ -174,7 +174,7 @@ bool dGetSaveFileNameSerialization(char* const fileName, int maxSize)
 
 	ZeroMemory(&ofn, sizeof(ofn));
 	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = NULL;
+	ofn.hwndOwner = nullptr;
 	ofn.lpstrFile = fileName;
 	ofn.lpstrFile[0] = '\0';
 	ofn.nMaxFile = maxSize;

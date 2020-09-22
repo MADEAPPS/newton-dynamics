@@ -55,7 +55,7 @@ class ndDemoMeshInterface: public dRefCounter
 	bool GetVisible () const;
 	void SetVisible (bool visibilityFlag);
 
-	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner) { dAssert(0); return NULL; }
+	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner) { dAssert(0); return nullptr; }
 
 	virtual void RenderTransparency () const = 0;
 	virtual void Render (ndDemoEntityManager* const scene) = 0;

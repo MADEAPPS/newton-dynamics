@@ -34,7 +34,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 		public: 
 		TransparentMesh()
 			:m_matrix(dGetIdentityMatrix())
-			,m_mesh(NULL)
+			,m_mesh(nullptr)
 		{
 		}
 

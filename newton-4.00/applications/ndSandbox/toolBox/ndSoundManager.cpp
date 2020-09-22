@@ -17,7 +17,7 @@
 #if 0
 dSoundManager::dSoundChannel::dSoundChannel()
 	:m_source(0)
-	,m_myAssetNode(NULL)
+	,m_myAssetNode(nullptr)
 {
 	alGenSources(1, (ALuint*)&m_source);
 	dAssert (m_source);
@@ -115,12 +115,12 @@ dSoundManager::dSoundAsset::~dSoundAsset()
 
 
 dSoundManager::dSoundManager()
-	:m_device(alcOpenDevice(NULL))
-	,m_context(NULL)
+	:m_device(alcOpenDevice(nullptr))
+	,m_context(nullptr)
 	,m_coordinateSystem (dGetIdentityMatrix())
 {
 	if (m_device) {
-		m_context = alcCreateContext(m_device, NULL);
+		m_context = alcCreateContext(m_device, nullptr);
 		alcMakeContextCurrent(m_context);
 
 		// clear error code
@@ -288,7 +288,7 @@ void* dSoundManager::CreateSound (const char* const fileName)
 		assetNode->GetInfo().AddRef();
 		return assetNode;
 	}
-	return NULL;
+	return nullptr;
 	
 }
 
@@ -340,7 +340,7 @@ void* dSoundManager::CreatePlayChannel (void* const soundAssetHandle)
 		channel.LinkAsset (node);
 		return channelNode;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void dSoundManager::DestroyChannel(void* const channelHandle)
@@ -358,7 +358,7 @@ void* dSoundManager::GetAsset(void* const channelHandle) const
 		dSoundChannel& channel = node->GetInfo();
 		return channel.m_myAssetNode;
 	}
-	return NULL;
+	return nullptr;
 }
 
 

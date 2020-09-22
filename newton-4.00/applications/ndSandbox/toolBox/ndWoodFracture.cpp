@@ -28,8 +28,8 @@ class dWoodFractureListener: public dCustomParallelListener
 		WoodFractureAtom()
 			:m_centerOfMass(0.0f)
 			,m_momentOfInertia(0.0f)
-			,m_mesh(NULL)
-			,m_collision(NULL)
+			,m_mesh(nullptr)
+			,m_collision(nullptr)
 			,m_massFraction(0.0f)
 		{
 		}
@@ -45,7 +45,7 @@ class dWoodFractureListener: public dCustomParallelListener
 	{
 		public:
 		WoodVoronoidEffect(NewtonWorld* const world, NewtonMesh* const mesh, int interiorMaterial)
-			:m_body(NULL)
+			:m_body(nullptr)
 			,m_isDead(false)
 		{
 			dAssert(0);
@@ -133,7 +133,7 @@ class dWoodFractureListener: public dCustomParallelListener
 		}
 
 		WoodVoronoidEffect(const WoodVoronoidEffect& list)
-			:m_body(NULL)
+			:m_body(nullptr)
 			,m_isDead(false)
 		{
 			for (dListNode* node = list.GetFirst(); node; node = node->GetNext()) {
@@ -178,7 +178,7 @@ class dWoodFractureListener: public dCustomParallelListener
 		// create the shape and visual mesh as a common data to be re used
 		ndDemoEntityManager* const scene = (ndDemoEntityManager*) NewtonWorldGetUserData(world);
 
-		NewtonCollision* const collision = NewtonCreateCylinder(world, size.m_x * 0.5f, size.m_z * 0.5f, size.m_y, stype, NULL);
+		NewtonCollision* const collision = NewtonCreateCylinder(world, size.m_x * 0.5f, size.m_z * 0.5f, size.m_y, stype, nullptr);
 
 		// create a newton mesh from the collision primitive
 		NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
@@ -229,7 +229,7 @@ class dWoodFractureListener: public dCustomParallelListener
 
 		dList<WoodVoronoidEffect>::dListNode* node = m_effectList.GetFirst();
 		for (int i = 0; i < threadID; i++) {
-			node = node ? node->GetNext() : NULL;
+			node = node ? node->GetNext() : nullptr;
 		}
 
 		if (node) {
@@ -237,7 +237,7 @@ class dWoodFractureListener: public dCustomParallelListener
 				WoodVoronoidEffect& effect = node->GetInfo();
 				UpdateEffect(effect, timestep);
 				for (int i = 0; i < threadCount; i++) {
-					node = node ? node->GetNext() : NULL;
+					node = node ? node->GetNext() : nullptr;
 				}
 			} while (node);
 		}
@@ -342,7 +342,7 @@ class dWoodFractureListener: public dCustomParallelListener
 			for (WoodVoronoidEffect::dListNode* node = effect.GetFirst(); node; node = node->GetNext()) {
 				WoodFractureAtom& atom = node->GetInfo();
 
-				ndDemoEntity* const entity = new ndDemoEntity(dMatrix(rotation, matrix.m_posit), NULL);
+				ndDemoEntity* const entity = new ndDemoEntity(dMatrix(rotation, matrix.m_posit), nullptr);
 				entity->SetMesh(atom.m_mesh, dGetIdentityMatrix());
 				scene->Append(entity);
 

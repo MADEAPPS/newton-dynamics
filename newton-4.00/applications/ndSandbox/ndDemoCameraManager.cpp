@@ -59,9 +59,9 @@ ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const scene)
 	,m_pickedBodyTargetPosition(0.0f)
 	,m_pickedBodyLocalAtachmentPoint(0.0f)
 	,m_pickedBodyLocalAtachmentNormal(0.0f)
-	//,m_targetPicked(NULL)
-	,m_pickJoint(NULL)
-	//,m_bodyDestructor(NULL)
+	//,m_targetPicked(nullptr)
+	,m_pickJoint(nullptr)
+	//,m_bodyDestructor(nullptr)
 {
 }
 
@@ -229,8 +229,8 @@ void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene,
 void ndDemoCameraManager::OnBodyDestroy (NewtonBody* const body)
 {
 	// remove the references pointer because the body is going to be destroyed
-	m_targetPicked = NULL;
-	m_bodyDestructor = NULL;
+	m_targetPicked = nullptr;
+	m_bodyDestructor = nullptr;
 }
 */
 
@@ -256,7 +256,7 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 				m_pickedBodyParam = param;
 				if(m_pickJoint) {
 					delete m_pickJoint;
-					m_pickJoint = NULL;
+					m_pickJoint = nullptr;
 				}
 					
 				dFloat32 Ixx;
@@ -305,10 +305,10 @@ void ndDemoCameraManager::ResetPickBody()
 		NewtonBodySetSleepState(m_targetPicked, 0);
 	}
 	if (m_pickJoint) {
-		m_pickJoint->m_manager = NULL;
+		m_pickJoint->m_manager = nullptr;
 	}
-	m_pickJoint = NULL;
-	m_targetPicked = NULL;
-	m_bodyDestructor = NULL;
+	m_pickJoint = nullptr;
+	m_targetPicked = nullptr;
+	m_bodyDestructor = nullptr;
 */
 }

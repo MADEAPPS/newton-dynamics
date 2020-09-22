@@ -380,7 +380,7 @@ class dInfinitePlane
 		matrix.m_posit = plane.Scale (-plane.m_w / (plane % plane));
 		matrix.m_posit.m_w = 1.0f;
 
-		DemoEntity* const entity = new DemoEntity(matrix, NULL);
+		DemoEntity* const entity = new DemoEntity(matrix, nullptr);
 		scene->Append (entity);
 		entity->SetMesh(mesh, GetIdentityMatrix());
 		mesh->Release();
@@ -398,12 +398,12 @@ class dInfinitePlane
         // make a use mesh collision for testing
         dVector minBox(-100.0f, -100.0f, -100.0f, 0.0f);
         dVector maxBox(100.0f, 100.0f, 100.0f, 0.0f);
-        NewtonCollision* const collision0 = NewtonCreateUserMeshCollision (world, &minBox[0], &maxBox[0], NULL, 
-            NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0);
-        NewtonCollision* const collision1 = NewtonCreateUserMeshCollision (world, &minBox[0], &maxBox[0], NULL, 
-            NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0);
-        NewtonCollision* const collision2 = NewtonCreateUserMeshCollision (world, &minBox[0], &maxBox[0], NULL, 
-            NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0);
+        NewtonCollision* const collision0 = NewtonCreateUserMeshCollision (world, &minBox[0], &maxBox[0], nullptr, 
+            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, 0);
+        NewtonCollision* const collision1 = NewtonCreateUserMeshCollision (world, &minBox[0], &maxBox[0], nullptr, 
+            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, 0);
+        NewtonCollision* const collision2 = NewtonCreateUserMeshCollision (world, &minBox[0], &maxBox[0], nullptr, 
+            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, 0);
 
         // add some use mesh collision
         NewtonCollision* const rootScene = NewtonBodyGetCollision(body);
