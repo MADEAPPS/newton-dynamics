@@ -72,7 +72,7 @@ bool dMeshEffect::PlaneClip(const dMeshEffect& convexMesh, const dEdge* const co
 		const dEdge* e1 = e0->m_next;
 		const dEdge* e2 = e1->m_next;
 
-		dgMatrix matrix;
+		dMatrix matrix;
 		dBigVector p1 (convexMesh.m_points.m_vertex[e1->m_incidentVertex]);
 
 		dBigVector xDir (p1 - origin);
@@ -334,7 +334,7 @@ dMeshEffect* dMeshEffect::ConvexMeshIntersection (const dMeshEffect* const conve
 }
 
 
-void dMeshEffect::ClipMesh (const dgMatrix& matrix, const dMeshEffect* const clipMesh, dMeshEffect** const back, dMeshEffect** const front) const
+void dMeshEffect::ClipMesh (const dMatrix& matrix, const dMeshEffect* const clipMesh, dMeshEffect** const back, dMeshEffect** const front) const
 {
 	dAssert (0);
 /*
@@ -395,7 +395,7 @@ void dMeshEffect::ClipMesh (const dgMatrix& matrix, const dMeshEffect* const cli
 
 
 
-dMeshEffect* dMeshEffect::Union (const dgMatrix& matrix, const dMeshEffect* const clipperMesh) const
+dMeshEffect* dMeshEffect::Union (const dMatrix& matrix, const dMeshEffect* const clipperMesh) const
 {
 	dAssert (0);
 	return nullptr;
@@ -419,7 +419,7 @@ dMeshEffect* dMeshEffect::Union (const dgMatrix& matrix, const dMeshEffect* cons
 */
 }
 
-dMeshEffect* dMeshEffect::Difference (const dgMatrix& matrix, const dMeshEffect* const clipperMesh) const
+dMeshEffect* dMeshEffect::Difference (const dMatrix& matrix, const dMeshEffect* const clipperMesh) const
 {
 /*
 	dMeshEffect copy (*this);
@@ -1134,7 +1134,7 @@ class dgBooleanMeshClipper: public dMeshEffect::dMeshBVH
 
 
 
-dMeshEffect* dMeshEffect::Intersection (const dgMatrix& matrix, const dMeshEffect* const clipperMesh) const
+dMeshEffect* dMeshEffect::Intersection (const dMatrix& matrix, const dMeshEffect* const clipperMesh) const
 {
 	dMeshEffect copy (*this);
 	dMeshEffect clipper (*clipperMesh);

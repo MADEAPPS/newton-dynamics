@@ -23,6 +23,7 @@
 #define __D_SHAPE_H__ 
 
 class ndBody;
+class ndShape;
 class ndShapeBox;
 class ndShapeNull;
 class ndShapeSphere;
@@ -36,7 +37,7 @@ class ndShapeDebugCallback;
 //	#define DG_DEBUG_AABB
 #endif
 
-enum dShapeID
+enum ndShapeID
 {
 	// do not change the order of these enum
 	m_sphereCollision = 0,
@@ -65,6 +66,144 @@ enum dShapeID
 };
 
 D_MSV_NEWTON_ALIGN_32
+class ndShapeInfo
+{
+	public:
+	class ndInstanceMaterial
+	{
+		public:
+		ndInstanceMaterial()
+		{
+			memset(this, 0, sizeof(ndInstanceMaterial));
+		}
+
+		dInt64 m_userId;
+		union 
+		{
+			void* m_userData;
+			dUnsigned64 m_alignPad;
+		};
+		union 
+		{
+			dUnsigned64 m_intData;
+			dFloat32 m_floatData;
+		} m_userParam[6];
+	};
+
+	struct dgBoxData
+	{
+		dFloat32 m_x;
+		dFloat32 m_y;
+		dFloat32 m_z;
+	};
+
+	struct dgSphereData
+	{
+		dFloat32 m_radius;
+	};
+
+	struct dgCylinderData
+	{
+		dFloat32 m_radio0;
+		dFloat32 m_radio1;
+		dFloat32 m_height;
+	};
+
+	struct dgCapsuleData
+	{
+		dFloat32 m_radio0;
+		dFloat32 m_radio1;
+		dFloat32 m_height;
+	};
+
+	struct dgConeData
+	{
+		dFloat32 m_r;
+		dFloat32 m_height;
+	};
+
+	struct dgChamferCylinderData
+	{
+		dFloat32 m_r;
+		dFloat32 m_height;
+	};
+
+	struct dgConvexHullData
+	{
+		dInt32 m_vertexCount;
+		dInt32 m_strideInBytes;
+		dInt32 m_faceCount;
+		dVector* m_vertex;
+	};
+
+	struct dgConvexModifierData
+	{
+		ndShape* m_child;
+	};
+
+	struct dgCoumpountCollisionData
+	{
+		dInt32 m_chidrenCount;
+		//dgCollision** m_chidren;
+	};
+
+	struct dgCollisionBVHData
+	{
+		dInt32 m_vertexCount;
+		dInt32 m_indexCount;
+	};
+
+	struct dgDeformableMeshData
+	{
+		dInt32 m_vertexCount;
+		dInt32 m_triangleCount;
+		dInt32 m_vertexStrideInBytes;
+		dUnsigned16* m_indexList;
+		dFloat32* m_vertexList;
+	};
+
+	struct dgHeightMapCollisionData
+	{
+		dInt32 m_width;
+		dInt32 m_height;
+		dInt32 m_gridsDiagonals;
+		dInt32 m_elevationDataType;		// 0 = 32 bit floats, 1 = unsigned 16 bit intergers
+		dFloat32 m_verticalScale;
+		dFloat32 m_horizonalScale_x;
+		dFloat32 m_horizonalScale_z;
+		void* m_elevation;
+		dInt8* m_atributes;
+	};
+
+	struct dgSceneData
+	{
+		dInt32 m_childrenProxyCount;
+	};
+
+	dMatrix m_offsetMatrix;
+	ndInstanceMaterial m_collisionMaterial;
+	ndShapeID m_collisionType;
+	union
+	{
+		dgBoxData m_box;
+		dgConeData m_cone;
+		dgSphereData m_sphere;
+		dgCapsuleData m_capsule;
+		dgCylinderData m_cylinder;
+		dgChamferCylinderData m_chamferCylinder;
+		dgConvexHullData m_convexHull;
+		dgDeformableMeshData m_deformableMesh;
+		dgConvexModifierData m_convexModifierData;
+		dgCoumpountCollisionData m_compoundCollision;
+		dgCollisionBVHData m_bvhCollision;
+		dgHeightMapCollisionData m_heightFieldCollision;
+		dgSceneData m_sceneCollision;
+		dFloat32 m_paramArray[32];
+	};
+} D_GCC_NEWTON_ALIGN_32;
+
+
+D_MSV_NEWTON_ALIGN_32
 class ndShape: public dClassAlloc
 {
 	public:
@@ -86,9 +225,9 @@ class ndShape: public dClassAlloc
 
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const = 0;
 
+	virtual ndShapeInfo GetShapeInfo() const;
 	virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const = 0;
 	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const = 0;
-
 	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const = 0;
 	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinSkinThickness, dInt32* const vertexIndex) const = 0;
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const = 0;
@@ -98,7 +237,7 @@ class ndShape: public dClassAlloc
 	virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
 
 	protected:
-	D_COLLISION_API ndShape(dShapeID id);
+	D_COLLISION_API ndShape(ndShapeID id);
 	D_COLLISION_API ndShape (const ndShape& source);
 	D_COLLISION_API virtual ~ndShape();
 
@@ -108,10 +247,10 @@ class ndShape: public dClassAlloc
 	dVector m_boxSize;
 	dVector m_boxOrigin;
 	mutable dAtomic<dInt32> m_refCount;
-	//dShapeID m_collisionId;
+	ndShapeID m_collisionId;
 	static dVector m_flushZero;
 
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_ALIGN_32;
 
 inline dInt32 ndShape::GetConvexVertexCount() const
 {

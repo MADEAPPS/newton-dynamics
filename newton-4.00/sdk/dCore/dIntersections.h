@@ -183,7 +183,7 @@ class dFastRayTest
 
 				if (t1 > t2) 
 				{
-					dgSwap(t1, t2);
+					dSwap(t1, t2);
 				}
 				if (t1 > tmin) 
 				{
@@ -246,7 +246,7 @@ class dFastRayTest
 //	{
 //	}
 //
-//	D_INLINE dFastAaabbInfo(const dgMatrix& matrix, const dVector& size)
+//	D_INLINE dFastAaabbInfo(const dMatrix& matrix, const dVector& size)
 //		:dgObb(matrix, size)
 //		,m_separationDistance(dFloat32(1.0e10f))
 //	{
@@ -266,7 +266,7 @@ class dFastRayTest
 //		m_posit = ((dVector::m_half * (p1 + p0)) & dVector::m_triplexMask) | dVector::m_wOne;
 //	}
 //
-//	D_INLINE void SetTransposeAbsMatrix (const dgMatrix& matrix)
+//	D_INLINE void SetTransposeAbsMatrix (const dMatrix& matrix)
 //	{
 //		m_absDir = matrix.Transpose();
 //		m_absDir[0] = m_absDir[0].Abs();
@@ -282,7 +282,7 @@ class dFastRayTest
 //		MakeBox1 (indexCount, indexArray, stride, vertexArray, minBox, maxBox);
 //		dFloat32 dist0 = ray.BoxIntersect(minBox, maxBox);
 //		if (dist0 < dFloat32 (1.0f)) {
-//			dgMatrix faceMatrix (MakeFaceMatrix (faceNormal, indexCount, indexArray, stride, vertexArray));
+//			dMatrix faceMatrix (MakeFaceMatrix (faceNormal, indexCount, indexArray, stride, vertexArray));
 //
 //			MakeBox2 (faceMatrix, indexCount, indexArray, stride, vertexArray, minBox, maxBox);
 //			dVector veloc (faceMatrix.RotateVector(ray.m_diff) & dVector::m_triplexMask);
@@ -305,7 +305,7 @@ class dFastRayTest
 //		dist = dist.GetMin(dist.ShiftTripleRight());
 //		dFloat32 dist0 = dist.GetScalar();
 //		if (dist0 > dFloat32 (0.0f)) {
-//			dgMatrix faceMatrix (MakeFaceMatrix (faceNormal, indexCount, indexArray, stride, vertexArray));
+//			dMatrix faceMatrix (MakeFaceMatrix (faceNormal, indexCount, indexArray, stride, vertexArray));
 //			MakeBox2 (faceMatrix, indexCount, indexArray, stride, vertexArray, minBox, maxBox);
 //			dVector mask2(minBox * maxBox < dVector(dFloat32(0.0f)));
 //			dVector dist2(maxBox.GetMin(minBox.Abs()) & mask2);
@@ -345,7 +345,7 @@ class dFastRayTest
 //		maxBox = faceBoxP1 - m_p0;
 //	}
 //
-//	D_INLINE void MakeBox2 (const dgMatrix& faceMatrix, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, dVector& minBox, dVector& maxBox) const
+//	D_INLINE void MakeBox2 (const dMatrix& faceMatrix, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, dVector& minBox, dVector& maxBox) const
 //	{
 //		dVector faceBoxP0 (faceMatrix.TransformVector (dVector (&vertexArray[indexArray[0] * stride]) & dVector::m_triplexMask));
 //		dVector faceBoxP1 (faceBoxP0);
@@ -357,7 +357,7 @@ class dFastRayTest
 //		faceBoxP0 = faceBoxP0 & dVector::m_triplexMask;
 //		faceBoxP1 = faceBoxP1 & dVector::m_triplexMask;
 //
-//		dgMatrix matrix = *this * faceMatrix;
+//		dMatrix matrix = *this * faceMatrix;
 //		dVector size (matrix[0].Abs().Scale(m_size.m_x) + matrix[1].Abs().Scale(m_size.m_y) + matrix[2].Abs().Scale(m_size.m_z));
 //		dVector boxP0 ((matrix.m_posit - size) & dVector::m_triplexMask);
 //		dVector boxP1 ((matrix.m_posit + size) & dVector::m_triplexMask);
@@ -367,9 +367,9 @@ class dFastRayTest
 //	}
 //
 //
-//	D_INLINE dgMatrix MakeFaceMatrix (const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const
+//	D_INLINE dMatrix MakeFaceMatrix (const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const
 //	{
-//		dgMatrix faceMatrix;
+//		dMatrix faceMatrix;
 //		dVector origin (&vertexArray[indexArray[0] * stride]);
 //		dVector pin (&vertexArray[indexArray[0] * stride]);
 //		pin = pin & dVector::m_triplexMask;
@@ -387,7 +387,7 @@ class dFastRayTest
 //	}
 //
 //	protected:
-//	dgMatrix m_absDir;
+//	dMatrix m_absDir;
 //	mutable dVector m_separationDistance;
 //	dVector m_p0;
 //	dVector m_p1;

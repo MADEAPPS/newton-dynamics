@@ -27,6 +27,7 @@
 #include "ndShape.h"
 
 class ndBody;
+class ndShapeInfo;
 class ndContactPoint;
 class ndShapeInstance;
 class ndRayCastNotify;
@@ -71,8 +72,9 @@ class ndShapeInstance: public dClassAlloc
 	D_COLLISION_API dMatrix CalculateInertia() const;
 	D_COLLISION_API void CalculateAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	D_COLLISION_API void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
-
 	D_COLLISION_API dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+
+	D_COLLISION_API ndShapeInfo GetShapeInfo() const;
 
 	ndShape* GetShape();
 	const ndShape* GetShape() const;
@@ -113,8 +115,8 @@ class ndShapeInstance: public dClassAlloc
 	void* GetUserData () const;
 	void SetUserData (void* const userData);
 
-	dShapeInfo::dgInstanceMaterial GetMaterial () const;
-	void SetMaterial (const dShapeInfo::dgInstanceMaterial& userData);
+	ndShapeInfo::dgInstanceMaterial GetMaterial () const;
+	void SetMaterial (const ndShapeInfo::dgInstanceMaterial& userData);
 
 	const void* GetCollisionHandle () const;
 	const ndShapeInstance* GetParent () const;
@@ -131,7 +133,6 @@ class ndShapeInstance: public dClassAlloc
 	void SetChildShape (dShape* const shape);
 
 	dFloat32 GetVolume () const;
-	void GetCollisionInfo(dShapeInfo* const info) const;
 
 	dInt32 IsType (dShape::dgRTTI type) const;
 	dgMemoryAllocator* GetAllocator() const;
@@ -140,7 +141,7 @@ class ndShapeInstance: public dClassAlloc
 	dFloat32 GetBreakImpulse() const;
 
 	dUnsigned32 GetSignature () const;
-	dShapeID GetCollisionPrimityType () const;
+	ndShapeID GetCollisionPrimityType () const;
 
 	void CalcObb (dVector& origin, dVector& size) const;
 
@@ -157,9 +158,8 @@ class ndShapeInstance: public dClassAlloc
 	void SetSkinThickness(dFloat32 thickness);
 
 	void CalculateImplicitContacts(dInt32 count, dgContactPoint* const contactPoints) const;
+	ndShapeInfo::dgInstanceMaterial m_material;
 
-	
-	dShapeInfo::dgInstanceMaterial m_material;
 	const dgWorld* m_world;
 	const dShape* m_shape;
 	const void* m_subCollisionHandle;
@@ -255,7 +255,7 @@ D_INLINE void ndShapeInstance::SetChildShape (dShape* const shape)
 	m_shape = shape;
 }
 
-D_INLINE void ndShapeInstance::GetCollisionInfo(dShapeInfo* const info) const
+D_INLINE void ndShapeInstance::GetCollisionInfo(ndShapeInfo* const info) const
 {
 	info->m_offsetMatrix = m_localMatrix;
 	info->m_collisionMaterial = m_material;
@@ -331,12 +331,12 @@ D_INLINE void ndShapeInstance::SetUserData (void* const userData)
 	m_material.m_userData = userData;
 }
 
-D_INLINE dShapeInfo::dgInstanceMaterial ndShapeInstance::GetMaterial () const
+D_INLINE ndShapeInfo::dgInstanceMaterial ndShapeInstance::GetMaterial () const
 {
 	return m_material;
 }
 
-D_INLINE void ndShapeInstance::SetMaterial(const dShapeInfo::dgInstanceMaterial& userData)
+D_INLINE void ndShapeInstance::SetMaterial(const ndShapeInfo::dgInstanceMaterial& userData)
 {
 	m_material = userData;
 }
@@ -346,7 +346,7 @@ D_INLINE dUnsigned32 ndShapeInstance::GetSignature () const
 	return m_shape->GetSignature();
 }
 
-D_INLINE dShapeID ndShapeInstance::GetCollisionPrimityType () const
+D_INLINE ndShapeID ndShapeInstance::GetCollisionPrimityType () const
 {
 	return m_shape->GetCollisionPrimityType();
 }

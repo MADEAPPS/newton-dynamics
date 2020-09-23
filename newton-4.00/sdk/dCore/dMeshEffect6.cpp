@@ -34,6 +34,8 @@
 // for automatic seam and atlas generation 
 
 #include "dCoreStdafx.h"
+#include "dStack.h"
+#include "dMatrix.h"
 #include "dMeshEffect.h"
 //#include "dgWorld.h"
 //#include "dMeshEffect.h"
@@ -1466,14 +1468,6 @@ dAssert (0);
 	mutable bool m_continueExecution;
 };	
 
-dBigVector dMeshEffect::GetOrigin ()const
-{
-    dBigVector origin (dFloat64 (0.0f), dFloat64 (0.0f), dFloat64 (0.0f), dFloat64 (0.0f));	
-    for (dInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
-        origin += m_points.m_vertex[i];
-    }	
-    return origin.Scale (dFloat64 (1.0f) / m_points.m_vertex.m_count);
-}
 
 /*
 void dMeshEffect::ClearAttributeArray ()
@@ -1506,7 +1500,7 @@ void dMeshEffect::ClearAttributeArray ()
 */
 
 
-void dMeshEffect::SphericalMapping (dInt32 material, const dgMatrix& uvAligment)
+void dMeshEffect::SphericalMapping (dInt32 material, const dMatrix& uvAligment)
 {
     dBigVector origin (GetOrigin());
     dStack<dBigVector>sphere (m_points.m_vertex.m_count);
@@ -1566,7 +1560,7 @@ void dMeshEffect::SphericalMapping (dInt32 material, const dgMatrix& uvAligment)
 	PackAttibuteData();
 }
 
-void dMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMaterial, const dgMatrix& uvAligment)
+void dMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMaterial, const dMatrix& uvAligment)
 {
 	dBigVector origin (GetOrigin());
 	dStack<dBigVector> buffer(m_points.m_vertex.m_count);
@@ -1681,101 +1675,9 @@ void dMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMateria
 	PackAttibuteData();
 }
 
-void dMeshEffect::BoxMapping (dInt32 front, dInt32 side, dInt32 top, const dgMatrix& uvAligment)
-{
-/*
-    dBigVector minVal;
-    dBigVector maxVal;
-
-    dgGetMinMax (minVal, maxVal, &m_points.m_vertex[0][0], m_points.m_vertex.m_count, sizeof (dBigVector));
-    dBigVector dist (maxVal - minVal);
-    dist[0] = dMax (dFloat64 (1.0e-3f), dist[0]);
-    dist[1] = dMax (dFloat64 (1.0e-3f), dist[1]);
-    dist[2] = dMax (dFloat64 (1.0e-3f), dist[2]);
-    dBigVector scale (dFloat64 (1.0f)/ dist[0], dFloat64 (1.0f)/ dist[1], dFloat64 (1.0f)/ dist[2], dFloat64 (0.0f));
-*/
-
-	dBigVector origin(GetOrigin());
-	dStack<dBigVector> buffer(m_points.m_vertex.m_count);
-	dBigVector pMin(dFloat64(1.0e10f), dFloat64(1.0e10f), dFloat64(1.0e10f), dFloat64(0.0f));
-	dBigVector pMax(dFloat64(-1.0e10f), dFloat64(-1.0e10f), dFloat64(-1.0e10f), dFloat64(0.0f));
-
-	for (dInt32 i = 0; i < m_points.m_vertex.m_count; i++) {
-		buffer[i] = uvAligment.RotateVector(m_points.m_vertex[i] - origin);
-		const dBigVector& tmp = buffer[i];
-		pMin.m_x = dMin(pMin.m_x, tmp.m_x);
-		pMax.m_x = dMax(pMax.m_x, tmp.m_x);
-		pMin.m_y = dMin(pMin.m_y, tmp.m_y);
-		pMax.m_y = dMax(pMax.m_y, tmp.m_y);
-		pMin.m_z = dMin(pMin.m_z, tmp.m_z);
-		pMax.m_z = dMax(pMax.m_z, tmp.m_z);
-	}
-    dInt32 materialArray[3];
-
-    dBigVector dist (pMax);
-	dist[0] = dMax(dFloat64(1.0e-3f), dist[0]);
-	dist[1] = dMax(dFloat64(1.0e-3f), dist[1]);
-	dist[2] = dMax(dFloat64(1.0e-3f), dist[2]);
-    dBigVector scale (dFloat64 (0.5f)/ dist[0], dFloat64 (0.5f)/ dist[1], dFloat64 (0.5f)/ dist[2], dFloat64 (0.0f));
-
-	UnpackAttibuteData();
-	m_attrib.m_uv0Channel.Reserve(m_attrib.m_pointChannel.m_count);
-	m_attrib.m_materialChannel.Reserve(m_attrib.m_pointChannel.m_count);
-
-    materialArray[0] = front;
-    materialArray[1] = side;
-    materialArray[2] = top;
-
-    dInt32 mark = IncLRU();
-    dPolyhedra::Iterator iter (*this);	
-    for(iter.Begin(); iter; iter ++){
-        dEdge* const edge = &(*iter);
-        if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) {
-            const dBigVector& p0 = buffer[edge->m_incidentVertex];
-            const dBigVector& p1 = buffer[edge->m_next->m_incidentVertex];
-            const dBigVector& p2 = buffer[edge->m_prev->m_incidentVertex];
-
-            edge->m_mark = mark;
-            edge->m_next->m_mark = mark;
-            edge->m_prev->m_mark = mark;
-
-            dBigVector e0 (p1 - p0);
-            dBigVector e1 (p2 - p0);
-            dBigVector n (e0.CrossProduct(e1));
-
-            dInt32 index = 0;
-            dFloat64 maxProjection = dFloat32 (0.0f);
-
-            for (dInt32 i = 0; i < 3; i ++) {
-                dFloat64 proj = fabs (n[i]);
-                if (proj > maxProjection) {
-                    index = i;
-                    maxProjection = proj;
-                }
-            }
-
-            dInt32 u = (index + 1) % 3;
-            dInt32 v = (u + 1) % 3;
-            if (index == 1) {
-                dgSwap (u, v);
-            }
-            dEdge* ptr = edge;
-            do {
-				dAttibutFormat::dgUV uv;
-				dBigVector p(scale * buffer[ptr->m_incidentVertex] - dFloat32 (0.5f));
-				uv.m_u = dFloat32 (p[u]);
-				uv.m_v = dFloat32 (p[v]);
-				m_attrib.m_uv0Channel[dInt32(ptr->m_userData)] = uv;
-				m_attrib.m_materialChannel[dInt32(ptr->m_userData)] = materialArray[index];
-                ptr = ptr->m_next;
-            } while (ptr !=  edge);
-        }
-    }
-	PackAttibuteData();
-}
 
 
-void dMeshEffect::UniformBoxMapping (dInt32 material, const dgMatrix& textureMatrix)
+void dMeshEffect::UniformBoxMapping (dInt32 material, const dMatrix& textureMatrix)
 {
 	UnpackAttibuteData();
 	m_attrib.m_uv0Channel.Reserve(m_attrib.m_pointChannel.m_count);
@@ -1783,7 +1685,7 @@ void dMeshEffect::UniformBoxMapping (dInt32 material, const dgMatrix& textureMat
 
     dInt32 mark = IncLRU();
     for (dInt32 i = 0; i < 3; i ++) {
-        dgMatrix rotationMatrix (dgGetIdentityMatrix());
+        dMatrix rotationMatrix (dgGetIdentityMatrix());
         if (i == 1) {
             rotationMatrix = dgYawMatrix(dFloat32 (90.0f * dgDegreeToRad));
         } else if (i == 2) {
@@ -1835,7 +1737,7 @@ void dMeshEffect::AngleBaseFlatteningMapping (dInt32 material, dgReportProgress 
 	dBigVector size (maxBox - minBox);
 	dFloat32 scale = dFloat32 (1.0 / dMax (size.m_x, size.m_y, size.m_z));
 
-	dgMatrix matrix (dgGetIdentityMatrix());
+	dMatrix matrix (dgGetIdentityMatrix());
 	matrix[0][0] = scale;
 	matrix[1][1] = scale;
 	matrix[2][2] = scale;
@@ -1926,6 +1828,105 @@ void dMeshEffect::CalculateNormals(dFloat64 angleInRadians)
 				dInt32 index = dInt32(edgeBuffer[i]->m_userData);
 				m_attrib.m_normalChannel[index] = n;
 			}
+		}
+	}
+	PackAttibuteData();
+}
+
+dBigVector dMeshEffect::GetOrigin()const
+{
+	dBigVector origin(dFloat64(0.0f), dFloat64(0.0f), dFloat64(0.0f), dFloat64(0.0f));
+	for (dInt32 i = 0; i < m_points.m_vertex.GetCount(); i++) 
+	{
+		origin += m_points.m_vertex[i];
+	}
+	return origin.Scale(dFloat64(1.0f) / m_points.m_vertex.GetCount());
+}
+
+void dMeshEffect::BoxMapping(dInt32 front, dInt32 side, dInt32 top, const dMatrix& uvAligment)
+{
+	dBigVector origin(GetOrigin());
+	dStack<dBigVector> buffer(m_points.m_vertex.GetCount());
+	dBigVector pMin(dFloat64(1.0e10f), dFloat64(1.0e10f), dFloat64(1.0e10f), dFloat64(0.0f));
+	dBigVector pMax(dFloat64(-1.0e10f), dFloat64(-1.0e10f), dFloat64(-1.0e10f), dFloat64(0.0f));
+
+	for (dInt32 i = 0; i < m_points.m_vertex.GetCount(); i++) 
+	{
+		buffer[i] = uvAligment.RotateVector(m_points.m_vertex[i] - origin);
+		const dBigVector& tmp = buffer[i];
+		pMin.m_x = dMin(pMin.m_x, tmp.m_x);
+		pMax.m_x = dMax(pMax.m_x, tmp.m_x);
+		pMin.m_y = dMin(pMin.m_y, tmp.m_y);
+		pMax.m_y = dMax(pMax.m_y, tmp.m_y);
+		pMin.m_z = dMin(pMin.m_z, tmp.m_z);
+		pMax.m_z = dMax(pMax.m_z, tmp.m_z);
+	}
+	dInt32 materialArray[3];
+
+	dBigVector dist(pMax);
+	dist[0] = dMax(dFloat64(1.0e-3f), dist[0]);
+	dist[1] = dMax(dFloat64(1.0e-3f), dist[1]);
+	dist[2] = dMax(dFloat64(1.0e-3f), dist[2]);
+	dBigVector scale(dFloat64(0.5f) / dist[0], dFloat64(0.5f) / dist[1], dFloat64(0.5f) / dist[2], dFloat64(0.0f));
+
+	UnpackAttibuteData();
+	m_attrib.m_uv0Channel.SetCount(m_attrib.m_pointChannel.GetCount());
+	m_attrib.m_materialChannel.SetCount(m_attrib.m_pointChannel.GetCount());
+	m_attrib.m_uv0Channel.m_isValid = true;
+	m_attrib.m_materialChannel.m_isValid = true;
+
+	materialArray[0] = front;
+	materialArray[1] = side;
+	materialArray[2] = top;
+
+	dInt32 mark = IncLRU();
+	dPolyhedra::Iterator iter(*this);
+	for (iter.Begin(); iter; iter++) {
+		dEdge* const edge = &(*iter);
+		if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) 
+		{
+			const dBigVector& p0 = buffer[edge->m_incidentVertex];
+			const dBigVector& p1 = buffer[edge->m_next->m_incidentVertex];
+			const dBigVector& p2 = buffer[edge->m_prev->m_incidentVertex];
+
+			edge->m_mark = mark;
+			edge->m_next->m_mark = mark;
+			edge->m_prev->m_mark = mark;
+
+			dBigVector e0(p1 - p0);
+			dBigVector e1(p2 - p0);
+			dBigVector n(e0.CrossProduct(e1));
+
+			dInt32 index = 0;
+			dFloat64 maxProjection = dFloat32(0.0f);
+
+			for (dInt32 i = 0; i < 3; i++) 
+			{
+				dFloat64 proj = fabs(n[i]);
+				if (proj > maxProjection) 
+				{
+					index = i;
+					maxProjection = proj;
+				}
+			}
+
+			dInt32 u = (index + 1) % 3;
+			dInt32 v = (u + 1) % 3;
+			if (index == 1) 
+			{
+				dSwap(u, v);
+			}
+			dEdge* ptr = edge;
+			do 
+			{
+				dAttibutFormat::dgUV uv;
+				dBigVector p(scale * buffer[ptr->m_incidentVertex] - dFloat32(0.5f));
+				uv.m_u = dFloat32(p[u]);
+				uv.m_v = dFloat32(p[v]);
+				m_attrib.m_uv0Channel[dInt32(ptr->m_userData)] = uv;
+				m_attrib.m_materialChannel[dInt32(ptr->m_userData)] = materialArray[index];
+				ptr = ptr->m_next;
+			} while (ptr != edge);
 		}
 	}
 	PackAttibuteData();

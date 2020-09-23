@@ -832,7 +832,7 @@ dMeshEffect::dMeshEffect(dgMemoryAllocator* const allocator)
 	Init();
 }
 
-dMeshEffect::dMeshEffect (dgMemoryAllocator* const allocator, const dgMatrix& planeMatrix, dFloat32 witdth, dFloat32 breadth, dInt32 material, const dgMatrix& textureMatrix0, const dgMatrix& textureMatrix1)
+dMeshEffect::dMeshEffect (dgMemoryAllocator* const allocator, const dMatrix& planeMatrix, dFloat32 witdth, dFloat32 breadth, dInt32 material, const dMatrix& textureMatrix0, const dMatrix& textureMatrix1)
 	:dPolyhedra(allocator)
 	,m_points(allocator)
 	,m_attrib(allocator)
@@ -960,7 +960,7 @@ dMeshEffect::dMeshEffect(dgCollisionInstance* const collision)
 		collision->GetCollisionInfo (&collisionInfo);
 
 		dInt32 brush = 0;
-		dgMatrix matrix (collisionInfo.m_offsetMatrix);
+		dMatrix matrix (collisionInfo.m_offsetMatrix);
 		dgCollisionCompound* const compoundCollision = (dgCollisionCompound*) collision->GetChildShape();
 		for (dTree<dgCollisionCompound::dgNodeBase*, dInt32>::dTreeNode* node = compoundCollision->GetFirstNode(); node; node = compoundCollision->GetNextNode(node)) {
 			builder.m_brush = brush;
@@ -970,7 +970,7 @@ dMeshEffect::dMeshEffect(dgCollisionInstance* const collision)
 		}
 
 	} else {
-		dgMatrix matrix (dgGetIdentityMatrix());
+		dMatrix matrix (dgGetIdentityMatrix());
 		collision->DebugCollision (matrix, (dgCollision::OnDebugCollisionMeshCallback) dgMeshEffectBuilder::GetShapeFromCollision, &builder);
 	}
 
@@ -1232,13 +1232,13 @@ void dMeshEffect::RemoveUnusedVertices(dInt32* const vertexMapResult)
 }
 
 
-void dMeshEffect::ApplyTransform (const dgMatrix& matrix)
+void dMeshEffect::ApplyTransform (const dMatrix& matrix)
 {
 	matrix.TransformTriplex(&m_points.m_vertex[0].m_x, sizeof (dBigVector), &m_points.m_vertex[0].m_x, sizeof (dBigVector), m_points.m_vertex.m_count);
 
-	dgMatrix invMatix(matrix.Inverse4x4());
+	dMatrix invMatix(matrix.Inverse4x4());
 	invMatix.m_posit = dVector::m_wOne;
-	dgMatrix rotation (invMatix.Transpose4X4());
+	dMatrix rotation (invMatix.Transpose4X4());
 	for (dInt32 i = 0; i < m_attrib.m_normalChannel.m_count; i ++) {
 		dVector n (dFloat32 (m_attrib.m_normalChannel[i].m_x), dFloat32 (m_attrib.m_normalChannel[i].m_y), dFloat32 (m_attrib.m_normalChannel[i].m_z), dFloat32 (0.0f));
 		n = rotation.RotateVector(n);
@@ -1262,13 +1262,13 @@ void dMeshEffect::ApplyTransform (const dgMatrix& matrix)
 	}
 }
 
-dgMatrix dMeshEffect::CalculateOOBB (dBigVector& size) const
+dMatrix dMeshEffect::CalculateOOBB (dBigVector& size) const
 {
 	dgObb sphere (CalculateSphere (&m_points.m_vertex[0].m_x, sizeof (dBigVector), nullptr));
 	size = sphere.m_size;
 	size.m_w = 0.0f;
 
-//	dgMatrix permuation (dgGetIdentityMatrix());
+//	dMatrix permuation (dgGetIdentityMatrix());
 //	permuation[0][0] = dFloat32 (0.0f);
 //	permuation[0][1] = dFloat32 (1.0f);
 //	permuation[1][1] = dFloat32 (0.0f);
@@ -2315,7 +2315,7 @@ dgCollisionInstance* dMeshEffect::CreateCollisionTree(dgWorld* const world, dInt
 	return instance;
 }
 
-dgCollisionInstance* dMeshEffect::CreateConvexCollision(dgWorld* const world, dFloat64 tolerance, dInt32 shapeID, const dgMatrix& srcMatrix) const
+dgCollisionInstance* dMeshEffect::CreateConvexCollision(dgWorld* const world, dFloat64 tolerance, dInt32 shapeID, const dMatrix& srcMatrix) const
 {
 	dStack<dVector> poolPtr (m_points.m_vertex.m_count * 2); 
 	dVector* const pool = &poolPtr[0];
@@ -2346,7 +2346,7 @@ dgCollisionInstance* dMeshEffect::CreateConvexCollision(dgWorld* const world, dF
 		}
 	}
 
-	dgMatrix matrix (srcMatrix);
+	dMatrix matrix (srcMatrix);
 	matrix.m_posit += matrix.RotateVector(com);
 	matrix.m_posit.m_w = dFloat32 (1.0f);
 
@@ -2362,11 +2362,11 @@ dgCollisionInstance* dMeshEffect::CreateConvexCollision(dgWorld* const world, dF
 }
 
 
-void dMeshEffect::TransformMesh (const dgMatrix& matrix)
+void dMeshEffect::TransformMesh (const dMatrix& matrix)
 {
 	dAssert(0);
 	/*
-	dgMatrix normalMatrix (matrix);
+	dMatrix normalMatrix (matrix);
 	normalMatrix.m_posit = dVector (dFloat32 (0.0f), dFloat32 (0.0f), dFloat32 (0.0f), dFloat32 (1.0f));
 
 	matrix.TransformTriplex (&m_points->m_x, sizeof (dBigVector), &m_points->m_x, sizeof (dBigVector), m_pointCount);

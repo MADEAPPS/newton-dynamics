@@ -46,7 +46,7 @@ class ndShapeConvex: public ndShape
 		dInt32 m_vertex;
 	};
 
-	D_COLLISION_API ndShapeConvex (dShapeID id);
+	D_COLLISION_API ndShapeConvex (ndShapeID id);
 //	dShapeConvex (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
 	D_COLLISION_API ~ndShapeConvex ();
 
@@ -58,6 +58,7 @@ class ndShapeConvex: public ndShape
 	D_COLLISION_API virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
 	D_COLLISION_API virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
 
+	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
 	D_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
 	D_COLLISION_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 	D_COLLISION_API virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;

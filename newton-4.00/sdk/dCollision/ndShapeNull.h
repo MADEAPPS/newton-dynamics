@@ -59,6 +59,13 @@ class ndShapeNull: public ndShapeConvex
 		p1 = dVector::m_zero;
 	}
 
+	virtual ndShapeInfo GetShapeInfo() const
+	{
+		dAssert(0);
+		ndShapeInfo info;
+		return info;
+	}
+
 /*
 	protected:
 	virtual dFloat32 GetVolume () const;

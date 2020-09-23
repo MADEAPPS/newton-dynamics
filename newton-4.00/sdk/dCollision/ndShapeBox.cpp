@@ -453,3 +453,12 @@ dInt32 ndShapeBox::CalculatePlaneIntersection(const dVector& normal, const dVect
 	}
 	return count;
 }
+
+ndShapeInfo ndShapeBox::GetShapeInfo() const
+{
+	ndShapeInfo info(ndShapeConvex::GetShapeInfo());
+	info.m_box.m_x = m_size[0].m_x * dFloat32(2.0f);
+	info.m_box.m_y = m_size[0].m_y * dFloat32(2.0f);
+	info.m_box.m_z = m_size[0].m_z * dFloat32(2.0f);
+	return info;
+}

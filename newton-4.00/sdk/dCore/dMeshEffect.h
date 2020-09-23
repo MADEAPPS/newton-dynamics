@@ -138,7 +138,6 @@ class dMeshEffect : public dPolyhedra
 	void FlipWinding(); 
 	void UniformBoxMapping (dInt32 material, const dMatrix& textureMatrix);
 	void SphericalMapping (dInt32 material, const dMatrix& uvAligment);
-	void BoxMapping (dInt32 front, dInt32 side, dInt32 top, const dMatrix& uvAligment);
 	void CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMaterial, const dMatrix& uvAligment);
 	void AngleBaseFlatteningMapping (dInt32 cylinderMaterial, dgReportProgress progressReportCallback, void* const userData);
 
@@ -470,6 +469,9 @@ class dMeshEffect : public dPolyhedra
 	//		D_CORE_API void AddUV1(dFloat32 u, dFloat32 v);
 	//	D_CORE_API void EndBuildFace();
 	D_CORE_API void EndBuild(dFloat64 tol, bool fixTjoint = true);
+
+	D_CORE_API dBigVector GetOrigin()const;
+	D_CORE_API void BoxMapping(dInt32 front, dInt32 side, dInt32 top, const dMatrix& uvAligment);
 
 	protected:
 	D_CORE_API void Init();

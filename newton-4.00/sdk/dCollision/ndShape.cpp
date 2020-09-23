@@ -25,7 +25,7 @@
 
 dVector ndShape::m_flushZero(dFloat32(1.0e-7f));
 
-ndShape::ndShape(dShapeID id)
+ndShape::ndShape(ndShapeID id)
 	:dClassAlloc()
 	,m_inertia(dVector::m_zero)
 	,m_crossInertia(dVector::m_zero)
@@ -34,7 +34,7 @@ ndShape::ndShape(dShapeID id)
 	,m_boxOrigin(dVector::m_zero)
 	,m_refCount(0)
 //	,m_signature(signature)
-//	,m_collisionId(id)
+	,m_collisionId(id)
 //	,m_allocator(allocator)
 {
 }
@@ -91,4 +91,11 @@ void ndShape::MassProperties()
 	m_crossInertia[0] = inertia[2][1];
 	m_crossInertia[1] = inertia[2][0];
 	m_crossInertia[2] = inertia[1][0];
+}
+
+ndShapeInfo ndShape::GetShapeInfo() const
+{
+	ndShapeInfo info;
+	info.m_collisionType = m_collisionId;
+	return info;
 }

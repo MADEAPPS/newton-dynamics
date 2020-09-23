@@ -338,3 +338,10 @@ dFloat32 ndShapeSphere::RayCast(ndRayCastNotify& callback, const dVector& localP
 	}
 	return t;
 }
+
+ndShapeInfo ndShapeSphere::GetShapeInfo() const
+{
+	dAssert(0);
+	ndShapeInfo info;
+	return info;
+}

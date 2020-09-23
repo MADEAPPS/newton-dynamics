@@ -392,7 +392,7 @@ dInt32 ndShapeConvex::BuildCylinderCapPoly (dFloat32 radius, const dMatrix& tran
 
 #endif
 
-ndShapeConvex::ndShapeConvex(dShapeID id)
+ndShapeConvex::ndShapeConvex(ndShapeID id)
 	:ndShape(id)
 	,m_vertex(nullptr)
 	,m_simplex(nullptr)
@@ -1103,4 +1103,10 @@ dInt32 ndShapeConvex::CalculatePlaneIntersection(const dVector& normal, const dV
 		}
 	}
 	return count;
+}
+
+ndShapeInfo ndShapeConvex::GetShapeInfo() const
+{
+	ndShapeInfo info(ndShape::GetShapeInfo());
+	return info;
 }

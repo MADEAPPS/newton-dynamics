@@ -1491,7 +1491,7 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 			//dUnsigned32 group0_ID = dUnsigned32(body0->m_bodyGroupId);
 			//dUnsigned32 group1_ID = dUnsigned32(body1->m_bodyGroupId);
 			//if (group1_ID < group0_ID) {
-			//	dgSwap(group0_ID, group1_ID);
+			//	dSwap(group0_ID, group1_ID);
 			//}
 			//dUnsigned32 key = (group1_ID << 16) + group0_ID;
 			//const ntBodyMaterialList* const materialList = m_world;

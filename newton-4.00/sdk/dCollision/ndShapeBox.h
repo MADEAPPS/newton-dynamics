@@ -37,6 +37,7 @@ class ndShapeBox: public ndShapeConvex
 	D_COLLISION_API void Init (dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
 	D_COLLISION_API virtual void MassProperties();
 
+	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
 	D_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
 	D_COLLISION_API virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
 	D_COLLISION_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;

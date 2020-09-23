@@ -707,7 +707,7 @@ class dgHACDClusterGraph
 		dVector polygon[64];
 		dInt32 indexList[64];
 
-		dgMatrix matrix (dgGetIdentityMatrix());
+		dMatrix matrix (dgGetIdentityMatrix());
 		for (dInt32 i = 0; i < sizeof (polygon) / sizeof (polygon[0]); i ++) {
 			indexList[i] = i;
 		}

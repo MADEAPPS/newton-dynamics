@@ -48,7 +48,7 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-ndShapeInstance::ndShapeInstance(const dgWorld* const world, const dgCollision* const childCollision, dInt32 shapeID, const dgMatrix& matrix)
+ndShapeInstance::ndShapeInstance(const dgWorld* const world, const dgCollision* const childCollision, dInt32 shapeID, const dMatrix& matrix)
 	:m_globalMatrix(matrix)
 	,m_localMatrix (matrix)
 	,m_aligmentMatrix (dGetIdentityMatrix())
@@ -307,17 +307,17 @@ void ndShapeInstance::SetScale (const dVector& scale)
 void ndShapeInstance::SetGlobalScale (const dVector& scale)
 {
 	// calculate current matrix
-	dgMatrix matrix(dGetIdentityMatrix());
+	dMatrix matrix(dGetIdentityMatrix());
 	matrix[0][0] = m_scale.m_x;
 	matrix[1][1] = m_scale.m_y;
 	matrix[2][2] = m_scale.m_z;
 	matrix = m_aligmentMatrix * matrix * m_localMatrix;
 
 	// extract the original local matrix
-	dgMatrix transpose (matrix.Transpose());
+	dMatrix transpose (matrix.Transpose());
 	dVector globalScale (dgSqrt (transpose[0].DotProduct(transpose[0]).GetScalar()), dgSqrt (transpose[1].DotProduct(transpose[1]).GetScalar()), dgSqrt (transpose[2].DotProduct(transpose[2]).GetScalar()), dFloat32 (1.0f));
 	dVector invGlobalScale (dFloat32 (1.0f) / globalScale.m_x, dFloat32 (1.0f) / globalScale.m_y, dFloat32 (1.0f) / globalScale.m_z, dFloat32 (1.0f));
-	dgMatrix localMatrix (m_aligmentMatrix.Transpose() * m_localMatrix);
+	dMatrix localMatrix (m_aligmentMatrix.Transpose() * m_localMatrix);
 	localMatrix.m_posit = matrix.m_posit * invGlobalScale;
 	dAssert (localMatrix.m_posit.m_w == dFloat32 (1.0f));
 
@@ -344,11 +344,11 @@ void ndShapeInstance::SetGlobalScale (const dVector& scale)
 		dAssert (m_localMatrix.TestOrthogonal());
 		dAssert (m_aligmentMatrix.TestOrthogonal());
 
-//dgMatrix xxx1 (dGetIdentityMatrix());
+//dMatrix xxx1 (dGetIdentityMatrix());
 //xxx1[0][0] = m_scale.m_x;
 //xxx1[1][1] = m_scale.m_y;
 //xxx1[2][2] = m_scale.m_z;
-//dgMatrix xxx (m_aligmentMatrix * xxx1 * m_localMatrix);
+//dMatrix xxx (m_aligmentMatrix * xxx1 * m_localMatrix);
 
 		bool isIdentity = true;
 		for (dInt32 i = 0; i < 3; i ++) {
@@ -363,7 +363,7 @@ void ndShapeInstance::SetGlobalScale (const dVector& scale)
 }
 
 
-void ndShapeInstance::SetLocalMatrix (const dgMatrix& matrix)
+void ndShapeInstance::SetLocalMatrix (const dMatrix& matrix)
 {
 	m_localMatrix = matrix;
 	m_localMatrix[0][3] = dFloat32 (0.0f);
@@ -499,6 +499,14 @@ void ndShapeInstance::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& de
 {
 	debugCallback.m_instance = this;
 	m_shape->DebugShape(GetScaledTransform(matrix), debugCallback);
+}
+
+ndShapeInfo ndShapeInstance::GetShapeInfo() const
+{
+	ndShapeInfo info(m_shape->GetShapeInfo());
+	info.m_offsetMatrix = m_localMatrix;
+	//info.m_collisionMaterial = m_material;
+	return info;
 }
 
 void ndShapeInstance::CalculateAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const

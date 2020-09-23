@@ -670,7 +670,7 @@ class dgTetraIsoSufaceStuffing
 			}
 			dFloat64 volume = CalculateVolume(stuffingTetra);
 			if (volume < dFloat64 (0.0f)) {
-				dgSwap(stuffingTetra[0], stuffingTetra[1]);
+				dSwap(stuffingTetra[0], stuffingTetra[1]);
 			}
 			AddTetra(graph, stuffingTetra, vertexSigns, closePoint);
 		}
@@ -937,7 +937,7 @@ void dMeshEffect::LoadTetraMesh (const char* const filename)
 	}
 }
 
-dMeshEffect* dMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dInt32 pointCount, dInt32 pointStrideInBytes, const dFloat32* const pointCloud, dInt32 materialId, const dgMatrix& textureProjectionMatrix)
+dMeshEffect* dMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dInt32 pointCount, dInt32 pointStrideInBytes, const dFloat32* const pointCloud, dInt32 materialId, const dMatrix& textureProjectionMatrix)
 {
 	dStack<dBigVector> buffer(pointCount + 16);
 	dBigVector* const pool = &buffer[0];

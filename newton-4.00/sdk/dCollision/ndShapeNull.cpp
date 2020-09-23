@@ -56,7 +56,7 @@ dInt32 ntShapeNull::CalculateSignature () const
 	return dInt32 (GetSignature());
 }
 
-void ntShapeNull::CalcAABB (const dgMatrix& matrix, dVector &p0, dVector &p1) const
+void ntShapeNull::CalcAABB (const dMatrix& matrix, dVector &p0, dVector &p1) const
 {
 	p0 = matrix[3] & dVector::m_triplexMask;
 	p1 = matrix[3] & dVector::m_triplexMask;
@@ -85,7 +85,7 @@ dFloat32 ntShapeNull::RayCast (const dVector& localP0, const dVector& localP1, d
 }
 
 
-dVector ntShapeNull::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dVector& plane, const dgCollisionInstance& parentScale) const
+dVector ntShapeNull::CalculateVolumeIntegral (const dMatrix& globalMatrix, const dVector& plane, const dgCollisionInstance& parentScale) const
 {
 	dAssert (0);
 	return dVector::m_zero;
