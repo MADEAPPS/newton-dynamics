@@ -12,7 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
-
+#include "ndDemoCameraManager.h"
 
 #define MAX_PHYSICS_FPS				60.0f
 #define MAX_PHYSICS_RECOVER_STEPS	2
@@ -49,4 +49,15 @@ void ndPhysicsWorld::AdvanceTime(dFloat32 timetep)
 			Sync();
 		}
 	}
+}
+
+void ndPhysicsWorld::OnPostUpdate(dFloat32 timestep)
+{
+	m_manager->m_cameraManager->FixUpdate(m_manager, timestep);
+	if (m_manager->m_updateCamera)
+	{
+		dAssert(0);
+		//scene->m_updateCamera(scene, scene->m_updateCameraContext, timestep);
+	}
+
 }

@@ -25,6 +25,8 @@ class ndPhysicsWorld: public ndWorld
 	void AdvanceTime(dFloat32 timestep);
 
 	private:
+	void OnPostUpdate(dFloat32 timestep);
+
 	ndDemoEntityManager* m_manager;
 	dFloat32 m_timeAccumulator;
 };

@@ -37,11 +37,6 @@ class ndWorldScene: public scene
 		return m_world;
 	}
 
-	void ThreadFunction()
-	{
-		m_world->ThreadFunction();
-	}
-
 	ndWorld* m_world;
 };
 
@@ -52,6 +47,11 @@ class ndWorldMixedScene: public ndWorldScene<ndSceneMixed>
 		:ndWorldScene<ndSceneMixed>(world)
 	{
 	}
+
+	void ThreadFunction()
+	{
+		m_world->ThreadFunction();
+	}
 };
 
 class ndWorldSegregatedScene: public ndWorldScene<ndSceneMixed>
@@ -60,6 +60,11 @@ class ndWorldSegregatedScene: public ndWorldScene<ndSceneMixed>
 		ndWorldSegregatedScene(ndWorld* const world)
 		:ndWorldScene<ndSceneMixed>(world)
 	{
+	}
+
+	void ThreadFunction()
+	{
+		m_world->ThreadFunction();
 	}
 };
 

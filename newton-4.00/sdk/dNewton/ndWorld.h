@@ -48,6 +48,8 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	void Sync();
 	void Update(dFloat32 timestep);
 
+	virtual void OnPostUpdate(dFloat32 timestep);
+
 	dInt32 GetThreadCount() const;
 	void SetThreadCount(dInt32 count);
 
@@ -74,6 +76,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 
 	D_NEWTON_API void ClearCache();
 
+	private:
 	void ThreadFunction();
 	
 	protected:
@@ -101,6 +104,8 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 
 	friend class ndScene;
 	friend class ndDynamicsUpdate;
+	friend class ndWorldMixedScene;
+	friend class ndWorldSegregatedScene;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline void ndWorld::Sync()
@@ -181,6 +186,10 @@ inline const dList<ndBodyKinematic*>& ndWorld::GetBodyList() const
 inline dFloat32 ndWorld::GetUpdateTime() const
 {
 	return m_lastExecutionTime;
+}
+
+inline void ndWorld::OnPostUpdate(dFloat32 timestep)
+{
 }
 
 inline void ndWorld::Update(dFloat32 timestep)

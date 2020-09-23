@@ -180,6 +180,7 @@ void ndWorld::ThreadFunction()
 		m_scene->SetTimestep(m_timestep);
 		m_scene->TransformUpdate();
 		UpdateListenersPostTransform();
+		OnPostUpdate(m_timestep);
 	}
 	m_lastExecutionTime = (dGetTimeInMicrosenconds() - timeAcc) * dFloat32(1.0e-6f);
 }
