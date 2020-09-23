@@ -45,7 +45,7 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 
 void ndBasicSetup (ndDemoEntityManager* const scene)
 {
-	// load the skybox
+	// load the sky box
 	scene->CreateSkyBox();
 
 	// sync just in case we are on a pending update
