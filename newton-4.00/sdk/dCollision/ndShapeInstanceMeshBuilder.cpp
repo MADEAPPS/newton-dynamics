@@ -63,7 +63,7 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 		//dInt32 brush = 0;
 		//dMatrix matrix(collisionInfo.m_offsetMatrix);
 		//dgCollisionCompound* const compoundCollision = (dgCollisionCompound*)collision->GetChildShape();
-		//for (dgTree<dgCollisionCompound::dgNodeBase*, dInt32>::dgTreeNode* node = compoundCollision->GetFirstNode(); node; node = compoundCollision->GetNextNode(node)) {
+		//for (dTree<dgCollisionCompound::dgNodeBase*, dInt32>::dTreeNode* node = compoundCollision->GetFirstNode(); node; node = compoundCollision->GetNextNode(node)) {
 		//	builder.m_brush = brush;
 		//	brush++;
 		//	dgCollisionInstance* const childShape = compoundCollision->GetCollisionFromNode(node);
@@ -90,7 +90,7 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 	vertexFormat.m_vertex.m_strideInBytes = sizeof(dBigVector);
 	vertexFormat.m_vertex.m_indexList = &indexList[0];
 	
-	//BuildFromIndexList(&vertexFormat);
-	//RepairTJoints();
-	//CalculateNormals(dFloat32(45.0f) * dDegreeToRad);
+	BuildFromIndexList(&vertexFormat);
+	RepairTJoints();
+	CalculateNormals(dFloat32(45.0f) * dDegreeToRad);
 }

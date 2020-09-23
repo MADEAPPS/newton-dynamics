@@ -35,7 +35,9 @@ template<class T>
 class dArray
 {
 	public:
-	dArray ();
+	dArray();
+	dArray(const dArray& source);
+
 	~dArray ();
 
 	const dInt32 GetCount() const;
@@ -64,6 +66,23 @@ dArray<T>::dArray()
 	,m_size(0)
 	,m_capacity(0)
 {
+}
+
+template<class T>
+dArray<T>::dArray(const dArray& source)
+	:m_array(nullptr)
+	,m_size(0)
+	,m_capacity(0)
+{
+	if (source.m_array)
+	{
+		Resize(source.m_capacity);
+		SetCount(source.m_size);
+		for (int i = 0; i < source.m_size; i++)
+		{
+			m_array[i] = source[i];
+		}
+	}
 }
 
 template<class T>

@@ -1494,7 +1494,7 @@ dInt32 ndContactSolver::CalculateContacts(const dVector& point0, const dVector& 
 				dVector alternatePointOnInstance0(matrix0.UntransformVector(alternatePoint));
 				count0 = m_instance0.CalculatePlaneIntersection(normalOnInstance0, alternatePointOnInstance0, shape0);
 			}
-			//dgTrace (("If this is a frequent event, this routine should return the translation distance as the contact point\n"))
+			//dTrace (("If this is a frequent event, this routine should return the translation distance as the contact point\n"))
 			//dAssert(count0);
 			step = matrix0.UnrotateVector(normal * ((alternatePoint - origin).DotProduct(normal)));
 			for (dInt32 i = 0; i < count0; i++) 

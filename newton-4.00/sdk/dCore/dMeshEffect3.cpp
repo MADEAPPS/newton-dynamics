@@ -822,16 +822,16 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 			//dHACDClusterFace& faceA = clusterA.GetFirst()->GetInfo();
 			//dEdge* const edgeA = faceA.m_edge;
 
-			dgTrace (("cluster node: %d\n", clusterA.m_color));
-			dgTrace (("            links: "));
+			dTrace (("cluster node: %d\n", clusterA.m_color));
+			dTrace (("            links: "));
 			for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dListNode* edgeNodeA = clusterNodeA->GetInfo().GetFirst(); edgeNodeA; edgeNodeA = edgeNodeA->GetNext()) {
 				dListNode* const clusterNodeB = edgeNodeA->GetInfo().m_node;
 				dgHACDCluster& clusterB = clusterNodeB->GetInfo().m_nodeData;
-				dgTrace (("%d ", clusterB.m_color));
+				dTrace (("%d ", clusterB.m_color));
 			}
-			dgTrace (("\n"));
+			dTrace (("\n"));
 		}
-		dgTrace (("\n"));
+		dTrace (("\n"));
 #endif
 	}
 
@@ -1031,7 +1031,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 
 	dFloat64 CalculateConcavity (dgHACDConveHull& hull, dMeshEffect& mesh, dgHACDCluster& clusterA, dgHACDCluster& clusterB)
 	{
-		return dgMax(CalculateConcavity(hull, mesh, clusterA), CalculateConcavity(hull, mesh, clusterB));
+		return dMax(CalculateConcavity(hull, mesh, clusterA), CalculateConcavity(hull, mesh, clusterB));
 	}
 
 
@@ -1339,7 +1339,7 @@ dMeshEffect* dMeshEffect::CreateConvexApproximation(dFloat32 maxConcavity, dFloa
 	mesh.UnpackPoints();
 	bool state = mesh.Optimize (&mesh.m_points.m_vertex[0].m_x, sizeof (dBigVector), reportProgressCallback, progressReportUserData, dFloat32 (1.0e-3f), 1500);
 	// optimized override userdata
-	dgPolyhedra::Iterator iter(mesh);
+	dPolyhedra::Iterator iter(mesh);
 	for (iter.Begin(); iter; iter++) {
 		dEdge* const edge = &iter.GetNode()->GetInfo();
 		if (edge->m_incidentFace > 0) {

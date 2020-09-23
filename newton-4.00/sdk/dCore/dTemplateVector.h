@@ -182,7 +182,7 @@ class dTemplateVector: public dClassAlloc
 
 	T GetMax () const
 	{
-		return dgMax(dgMax(m_x, m_y), dgMax(m_z, m_w));
+		return dMax(dMax(m_x, m_y), dMax(m_z, m_w));
 	}
 
 	dTemplateVector<T> GetMax(const dTemplateVector<T>& data) const
@@ -199,7 +199,7 @@ class dTemplateVector: public dClassAlloc
 #ifdef _DEBUG
 	void Trace (char* const name) const
 	{
-		dgTrace (("%s %f %f %f %f\n", name, m_x, m_y, m_z, m_w));
+		dTrace (("%s %f %f %f %f\n", name, m_x, m_y, m_z, m_w));
 	}
 #endif
 

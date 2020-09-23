@@ -94,7 +94,7 @@ class ndShapeConvex: public ndShape
 	dInt32 RayCastClosestFace (dVector* tetrahedrum, const dVector& origin, dFloat32& pointDist) const;
 	dVector CalculateVolumeIntegral (const dgPlane& plane) const; 
 	
-	bool SanityCheck (dgPolyhedra& hull) const;
+	bool SanityCheck (dPolyhedra& hull) const;
 	dInt32 BuildCylinderCapPoly (dFloat32 radius, const dMatrix& transform, dVector* const vertexOut) const;
 	
 	friend class dgWorld;

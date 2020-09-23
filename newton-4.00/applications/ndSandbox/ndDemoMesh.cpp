@@ -334,6 +334,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	//NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
 	ndShapeInstanceMeshBuilder mesh (*collision);
 
+	dAssert(0);
 #if 0
 	// apply the vertex normals
 //	NewtonMeshCalculateVertexNormals(mesh, 30.0f * dDegreeToRad);

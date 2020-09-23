@@ -288,7 +288,7 @@ class dFastRayTest
 //			dVector veloc (faceMatrix.RotateVector(ray.m_diff) & dVector::m_triplexMask);
 //			dgFastRayTest localRay (dVector (dFloat32 (0.0f)), veloc);
 //			dFloat32 dist1 = localRay.BoxIntersect(minBox, maxBox);
-//			dist0 = dgMax (dist1, dist0);
+//			dist0 = dMax (dist1, dist0);
 //		}
 //		return dist0;
 //	}
@@ -312,7 +312,7 @@ class dFastRayTest
 //			dist2 = dist2.GetMin(dist2.ShiftTripleRight());
 //			dist2 = dist2.GetMin(dist2.ShiftTripleRight());
 //			dFloat32 dist1 = dist2.GetScalar();
-//			dist0 = (dist1 > dFloat32 (0.0f)) ? dgMax (dist0, dist1) : dFloat32 (0.0f);
+//			dist0 = (dist1 > dFloat32 (0.0f)) ? dMax (dist0, dist1) : dFloat32 (0.0f);
 //			if (dist0 <= dFloat32(0.0f)) {
 //				dVector p1p0((minBox.Abs()).GetMin(maxBox.Abs()).AndNot(mask2));
 //				dist2 = p1p0.DotProduct(p1p0);

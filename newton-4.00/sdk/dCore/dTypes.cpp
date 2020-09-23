@@ -58,9 +58,9 @@ void dgGetMinMax (dBigVector &minOut, dBigVector &maxOut, const dFloat64* const 
 		minOut.m_y = dMin (minOut.m_y, vArray[1]);
 		minOut.m_z = dMin (minOut.m_z, vArray[2]);
 
-		maxOut.m_x = dgMax (maxOut.m_x, vArray[0]);
-		maxOut.m_y = dgMax (maxOut.m_y, vArray[1]);
-		maxOut.m_z = dgMax (maxOut.m_z, vArray[2]);
+		maxOut.m_x = dMax (maxOut.m_x, vArray[0]);
+		maxOut.m_y = dMax (maxOut.m_y, vArray[1]);
+		maxOut.m_z = dMax (maxOut.m_z, vArray[2]);
 
 		vArray += stride;
 	}
@@ -462,7 +462,7 @@ static dInt32 QuickSortVertices(dFloat64* const vertList, dInt32 stride, dInt32 
 		}
 
 
-		//dFloat64* const indexPtr = (dgInt64*)vertList;
+		//dFloat64* const indexPtr = (dInt64*)vertList;
 		for (dInt32 i = i0; i < vertexCount; i++) 
 		{
 			//indexPtr[i * stride] += count0;

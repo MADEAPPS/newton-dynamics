@@ -811,7 +811,8 @@ void dPolyhedra::ChangeEdgeIncidentVertex (dEdge* const edge, dInt32 newIndex)
 
 void dPolyhedra::DeleteDegenerateFaces (const dFloat64* const pool, dInt32 strideInBytes, dFloat64 area)
 {
-	if (!GetCount()) {
+	if (!GetCount()) 
+	{
 		return;
 	}
 
@@ -824,10 +825,12 @@ void dPolyhedra::DeleteDegenerateFaces (const dFloat64* const pool, dInt32 strid
 	dPolyhedra::dTreeNode** const faceArray = &faceArrayPool[0];
 	dInt32 mark = IncLRU();
 	Iterator iter (*this);
-	for (iter.Begin(); iter; iter ++) {
+	for (iter.Begin(); iter; iter ++) 
+	{
 		dEdge* const edge = &(*iter);
 
-		if ((edge->m_mark != mark) && (edge->m_incidentFace > 0)) {
+		if ((edge->m_mark != mark) && (edge->m_incidentFace > 0)) 
+		{
 			faceArray[count] = iter.GetNode();
 			count ++;
 			dEdge* ptr = edge;
@@ -841,26 +844,31 @@ void dPolyhedra::DeleteDegenerateFaces (const dFloat64* const pool, dInt32 strid
 	dFloat64 area2 = area * area;
 	area2 *= dFloat64 (4.0f);
 
-	for (dInt32 i = 0; i < count; i ++) {
+	for (dInt32 i = 0; i < count; i ++) 
+	{
 		dPolyhedra::dTreeNode* const faceNode = faceArray[i];
 		dEdge* const edge = &faceNode->GetInfo();
 
 		dBigVector normal (FaceNormal (edge, pool, strideInBytes));
 
 		dFloat64 faceArea = normal.DotProduct(normal).GetScalar();
-		if (faceArea < area2) {
+		if (faceArea < area2) 
+		{
 			DeleteFace (edge);
 		}
 	}
 
 #ifdef __ENABLE_DG_CONTAINERS_SANITY_CHECK 
 	mark = IncLRU();
-	for (iter.Begin(); iter; iter ++) {
+	for (iter.Begin(); iter; iter ++) 
+	{
 		dEdge* const edge = &(*iter);
-		if ((edge->m_mark != mark) && (edge->m_incidentFace > 0)) {
+		if ((edge->m_mark != mark) && (edge->m_incidentFace > 0)) 
+		{
 			//dAssert (edge->m_next->m_next->m_next == edge);
 			dEdge* ptr = edge;
-			do	{
+			do	
+			{
 				ptr->m_mark = mark;
 				ptr = ptr->m_next;
 			} while (ptr != edge);

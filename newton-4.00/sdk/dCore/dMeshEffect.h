@@ -24,17 +24,14 @@
 
 #include "dCoreStdafx.h"
 #include "dArray.h"
+#include "dVector.h"
 #include "dPolyhedra.h"
 //#include "dRefCounter.h"
-
-//class dgWorld;
-//class dMeshEffect;
-//class dgCollisionInstance;
 
 class dMemoryAllocator___;
 
 #define DG_MESH_EFFECT_PRECISION_BITS		48
-#define DG_MESH_EFFECT_PRECISION_SCALE		dFloat64(dgInt64(1)<<DG_MESH_EFFECT_PRECISION_BITS)
+#define DG_MESH_EFFECT_PRECISION_SCALE		dFloat64(dInt64(1)<<DG_MESH_EFFECT_PRECISION_BITS)
 #define DG_MESH_EFFECT_PRECISION_SCALE_INV	(dFloat64 (1.0f) / DG_MESH_EFFECT_PRECISION_SCALE)
 
 #define DG_VERTEXLIST_INDEXLIST_TOL			(dFloat64 (0.0f))
@@ -46,9 +43,6 @@ class dMeshEffect : public dPolyhedra
 {
 #if 0
 	public:
-
-
-
 	class dgIndexArray 
 	{
 		public:
@@ -82,7 +76,7 @@ class dMeshEffect : public dPolyhedra
 			dgMeshBVHNode* m_parent;
 		};
 
-		class dgFitnessList: public dgTree <dgMeshBVHNode*, dgMeshBVHNode*>
+		class dgFitnessList: public dTree <dgMeshBVHNode*, dgMeshBVHNode*>
 		{
 			public:
 			dgFitnessList (dMemoryAllocator___* const allocator);
@@ -134,9 +128,6 @@ class dMeshEffect : public dPolyhedra
 
 	// create a planar Mesh
 	dMeshEffect(dMemoryAllocator___* const allocator, const dMatrix& planeMatrix, dFloat32 witdth, dFloat32 breadth, dInt32 material, const dMatrix& textureMatrix0, const dMatrix& textureMatrix1);
-	
-
-	
 
 	void Trace () const;
 
@@ -146,7 +137,6 @@ class dMeshEffect : public dPolyhedra
 
 	void FlipWinding(); 
 	void UniformBoxMapping (dInt32 material, const dMatrix& textureMatrix);
-	void CalculateNormals (dFloat64 angleInRadians);
 	void SphericalMapping (dInt32 material, const dMatrix& uvAligment);
 	void BoxMapping (dInt32 front, dInt32 side, dInt32 top, const dMatrix& uvAligment);
 	void CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMaterial, const dMatrix& uvAligment);
@@ -170,18 +160,6 @@ class dMeshEffect : public dPolyhedra
 	void ConvertToPolygons ();
 	void RemoveUnusedVertices(dInt32* const vertexRemapTable);
 	
-	void BeginBuild ();
-		void BeginBuildFace ();
-			void AddPoint (dFloat64 x, dFloat64 y, dFloat64 z);
-			void AddLayer (dInt32 layer);
-			void AddMaterial (dInt32 materialIndex);
-			void AddNormal (dFloat32 x, dFloat32 y, dFloat32 z);
-			void AddBinormal (dFloat32 x, dFloat32 y, dFloat32 z);
-			void AddVertexColor (dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w);
-			void AddUV0 (dFloat32 u, dFloat32 v);
-			void AddUV1 (dFloat32 u, dFloat32 v);
-		void EndBuildFace ();
-	void EndBuild (dFloat64 tol, bool fixTjoint = true);
 
 	dInt32 GetVertexCount() const;
 	dInt32 GetVertexStrideInByte() const;
@@ -196,16 +174,12 @@ class dMeshEffect : public dPolyhedra
 	dInt32 GetTotalIndexCount() const;
 	void GetFaces (dInt32* const faceCount, dInt32* const materials, void** const faceNodeList) const;
 
-	void RepairTJoints ();
-	bool SeparateDuplicateLoops (dEdge* const face);
-
 	bool HasOpenEdges () const;
 
 	dFloat64 CalculateVolume () const;
 
 	void OptimizePoints();
 	void OptimizeAttibutes();
-	void BuildFromIndexList(const dMeshVertexFormat* const format);
 
 	dInt32 GetPropertiesCount() const;
 	const dInt32* GetIndexToVertexMap() const;
@@ -285,14 +259,9 @@ class dMeshEffect : public dPolyhedra
 
 	void SetFaceMaterial (const void* const face, int materialID);
 	void AddInterpolatedEdgeAttribute (dEdge* const edge, dFloat64 param);
-	dInt32 AddInterpolatedHalfAttribute(dEdge* const edge, dInt32 midPoint);
 	dInt32 InterpolateVertex (const dBigVector& point, const dEdge* const face) const;
 
-	bool Sanity () const;
-
 	protected:
-	virtual void BeginFace();
-	virtual bool EndFace ();
 
 	dBigVector GetOrigin ()const;
 	dInt32 CalculateMaxAttributes () const;
@@ -305,13 +274,9 @@ class dMeshEffect : public dPolyhedra
 
 	dMeshEffect* GetNextLayer (dInt32 mark);
 	dMeshEffect* CreateVoronoiConvex (const dBigVector* const conevexPointCloud, dInt32 count, dInt32 materialId, const dMatrix& textureProjectionMatrix, dFloat32 normalAngleInRadians) const;
-
-	void PackAttibuteData ();
-	void UnpackAttibuteData ();
-
+	
 	void PackPoints (dFloat64 tol);
 	void UnpackPoints();
-
 	
 	friend class dConvexHull3d;
 	friend class dgConvexHull4d;
@@ -339,23 +304,12 @@ class dMeshEffect : public dPolyhedra
 	class dChannel: public dArray<T>
 	{
 		public:
-		dChannel()
-			:dArray<T>()
-			,m_type(type)
-		{
-		}
+		dChannel();
+		dChannel(const dChannel& source);
+		~dChannel();
 
-		dChannel(const dChannel& source)
-			:dArray<T>(source)
-			//,m_count(source.m_count)
-			,m_type(source.m_type)
-		{
-			dAssert(0);
-		}
-
-		~dChannel()
-		{
-		}
+		void Clear();
+		void PushBack(const T& element);
 
 		//void CopyFrom(const dChannel<T, type>& source)
 		//{
@@ -370,27 +324,11 @@ class dMeshEffect : public dPolyhedra
 		//		me[i] = src[i];
 		//	}
 		//}
-		//
-		//void Clear()
-		//{
-		//	m_count = 0;
-		//	dArray<T>::Clear();
-		//}
-		//
 		//void Reserve(dInt32 size)
 		//{
 		//	dArray<T>::Resize(size);
 		//	m_count = size;
 		//}
-		//
-		//void PushBack(const T& element)
-		//{
-		//	T tmp(element);
-		//	dArray<T>& me = *this;
-		//	me[m_count] = tmp;
-		//	m_count++;
-		//}
-		//
 		//void SetCount(dInt32 count)
 		//{
 		//	if (m_count) 
@@ -401,14 +339,15 @@ class dMeshEffect : public dPolyhedra
 		//	}
 		//}
 
-		//dInt32 m_count;
+		
 		dChannelType m_type;
+		bool m_isValid;
 	};
 
 	class dFormat
 	{
 		public:
-		class dgSortKey
+		class dSortKey
 		{
 			public:
 			dInt32 m_mask;
@@ -416,7 +355,7 @@ class dMeshEffect : public dPolyhedra
 			dInt32 m_vertexIndex;
 			dInt32 m_attibuteIndex;
 		};
-		class VertexSortData
+		class dVertexSortData
 		{
 			public:
 			const dChannel<dBigVector, m_point>* m_points;
@@ -424,25 +363,25 @@ class dMeshEffect : public dPolyhedra
 		};
 
 		dInt32 GetSortIndex(const dChannel<dBigVector, m_point>& points, dFloat64& dist) const;
-		static dInt32 CompareVertex(const dgSortKey* const ptr0, const dgSortKey* const ptr1, void* const context);
+		static dInt32 CompareVertex(const dSortKey* const ptr0, const dSortKey* const ptr1, void* const context);
 	};
 
-	class dPointFormat : public dFormat
+	class dPointFormat: public dFormat
 	{
 		public:
 		dPointFormat();
 		dPointFormat(const dPointFormat& source);
 		~dPointFormat();
 
-		//void Clear();
-		//void SetCount(dInt32 count);
-		//void CompressData(dInt32* const indexList);
+		void Clear();
+		void SetCount(dInt32 count);
+		void CompressData(dInt32* const indexList);
 		
 		dChannel<dInt32, m_layer> m_layers;
-		dChannel <dBigVector, m_point> m_vertex;
+		dChannel<dBigVector, m_point> m_vertex;
 	};
 
-	class dAttibutFormat : public dFormat
+	class dAttibutFormat: public dFormat
 	{
 		public:
 		class dgUV
@@ -516,8 +455,33 @@ class dMeshEffect : public dPolyhedra
 	D_CORE_API dMeshEffect();
 	D_CORE_API virtual ~dMeshEffect();
 
+	D_CORE_API void CalculateNormals(dFloat64 angleInRadians);
+	D_CORE_API void BuildFromIndexList(const dMeshVertexFormat* const format);
+
+	D_CORE_API void BeginBuild();
+	//	D_CORE_API void BeginBuildFace();
+	//		D_CORE_API void AddPoint(dFloat64 x, dFloat64 y, dFloat64 z);
+	//		D_CORE_API void AddLayer(dInt32 layer);
+	//		D_CORE_API void AddMaterial(dInt32 materialIndex);
+	//		D_CORE_API void AddNormal(dFloat32 x, dFloat32 y, dFloat32 z);
+	//		D_CORE_API void AddBinormal(dFloat32 x, dFloat32 y, dFloat32 z);
+	//		D_CORE_API void AddVertexColor(dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 w);
+	//		D_CORE_API void AddUV0(dFloat32 u, dFloat32 v);
+	//		D_CORE_API void AddUV1(dFloat32 u, dFloat32 v);
+	//	D_CORE_API void EndBuildFace();
+	D_CORE_API void EndBuild(dFloat64 tol, bool fixTjoint = true);
+
 	protected:
 	D_CORE_API void Init();
+	D_CORE_API void RepairTJoints();
+	D_CORE_API virtual void BeginFace();
+	D_CORE_API virtual bool EndFace();
+
+	bool Sanity() const;
+	void PackAttibuteData();
+	void UnpackAttibuteData();
+	bool SeparateDuplicateLoops(dEdge* const face);
+	dInt32 AddInterpolatedHalfAttribute(dEdge* const edge, dInt32 midPoint);
 
 	dPointFormat m_points;
 	dAttibutFormat m_attrib;
@@ -540,7 +504,6 @@ inline void dMeshEffect::SetVertexBaseCount(dInt32 count)
 {
 	m_vertexBaseCount = count;
 }
-
 
 inline dInt32 dMeshEffect::GetPropertiesCount() const
 {
@@ -616,4 +579,118 @@ inline dFloat64 dMeshEffect::QuantizeCordinade(dFloat64 x) const
 	return x1;
 }
 #endif
+
+template<class T, dMeshEffect::dChannelType type>
+dMeshEffect::dChannel<T, type>::dChannel()
+	:dArray<T>()
+	,m_type(type)
+	,m_isValid(false)
+{
+}
+
+template<class T, dMeshEffect::dChannelType type>
+dMeshEffect::dChannel<T, type>::dChannel(const dChannel& source)
+	:dArray<T>(source)
+	,m_type(source.m_type)
+	,m_isValid(source.m_isValid)
+{
+}
+
+template<class T, dMeshEffect::dChannelType type>
+dMeshEffect::dChannel<T, type>::~dChannel()
+{
+}
+
+template<class T, dMeshEffect::dChannelType type>
+void dMeshEffect::dChannel<T, type>::Clear()
+{
+	m_isValid = false;
+	dArray<T>::Clear();
+}
+
+template<class T, dMeshEffect::dChannelType type>
+void dMeshEffect::dChannel<T, type>::PushBack(const T& element)
+{
+	T tmp(element);
+	m_isValid = true;
+	dArray<T>::PushBack(tmp);
+}
+
+inline dMeshEffect::dPointFormat::dPointFormat()
+	:m_layers()
+	,m_vertex()
+{
+}
+
+inline dMeshEffect::dPointFormat::dPointFormat(const dPointFormat& source)
+	:m_layers(source.m_layers)
+	, m_vertex(source.m_vertex)
+{
+}
+
+inline dMeshEffect::dPointFormat::~dPointFormat()
+{
+}
+
+inline void dMeshEffect::dPointFormat::Clear()
+{
+	m_layers.Clear();
+	m_vertex.Clear();
+}
+
+inline void dMeshEffect::dPointFormat::SetCount(dInt32 count)
+{
+	m_layers.SetCount(count);
+	m_vertex.SetCount(count);
+}
+
+inline dMeshEffect::dAttibutFormat::dAttibutFormat()
+	:m_pointChannel()
+	,m_materialChannel()
+	,m_normalChannel()
+	,m_binormalChannel()
+	,m_colorChannel()
+	,m_uv0Channel()
+	,m_uv1Channel()
+{
+}
+
+inline dMeshEffect::dAttibutFormat::dAttibutFormat(const dAttibutFormat& source)
+	:m_pointChannel(source.m_pointChannel)
+	,m_materialChannel(source.m_materialChannel)
+	,m_normalChannel(source.m_normalChannel)
+	,m_binormalChannel(source.m_binormalChannel)
+	,m_colorChannel(source.m_colorChannel)
+	,m_uv0Channel(source.m_uv0Channel)
+	,m_uv1Channel(source.m_uv1Channel)
+{
+}
+
+inline dMeshEffect::dAttibutFormat::~dAttibutFormat()
+{
+}
+
+inline void dMeshEffect::dAttibutFormat::Clear()
+{
+	m_pointChannel.Clear();
+	m_materialChannel.Clear();
+	m_normalChannel.Clear();
+	m_binormalChannel.Clear();
+	m_colorChannel.Clear();
+	m_uv0Channel.Clear();
+	m_uv1Channel.Clear();
+}
+
+inline void dMeshEffect::dAttibutFormat::SetCount(dInt32 count)
+{
+	m_pointChannel.SetCount(count);
+	m_materialChannel.SetCount(count);
+	m_normalChannel.SetCount(count);
+	m_binormalChannel.SetCount(count);
+	m_colorChannel.SetCount(count);
+	m_uv0Channel.SetCount(count);
+	m_uv1Channel.SetCount(count);
+}
+
+
 #endif

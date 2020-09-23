@@ -872,7 +872,7 @@ void dMeshEffect::LoadOffMesh(const char* const fileName)
 						parcel.SkipLine();
 					}
 
-					dgMeshVertexFormat vertexFormat;
+					dMeshVertexFormat vertexFormat;
 					vertexFormat.m_faceCount = faceCount;
 					vertexFormat.m_faceIndexCount = &faceVertex[0];
 
@@ -939,7 +939,7 @@ void dMeshEffect::LoadTetraMesh (const char* const filename)
 
 dMeshEffect* dMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* const allocator, dInt32 pointCount, dInt32 pointStrideInBytes, const dFloat32* const pointCloud, dInt32 materialId, const dgMatrix& textureProjectionMatrix)
 {
-	dgStack<dBigVector> buffer(pointCount + 16);
+	dStack<dBigVector> buffer(pointCount + 16);
 	dBigVector* const pool = &buffer[0];
 	dInt32 count = 0;
 	dFloat64 quantizeFactor = dFloat64 (16.0f);
@@ -956,8 +956,8 @@ dMeshEffect* dMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* c
 		y = floor (y * quantizeFactor) * invQuantizeFactor;
 		z = floor (z * quantizeFactor) * invQuantizeFactor;
 		dBigVector p (x, y, z, dFloat64 (0.0f));
-		pMin = dBigVector (dgMin (x, pMin.m_x), dgMin (y, pMin.m_y), dgMin (z, pMin.m_z), dFloat64 (0.0f));
-		pMax = dBigVector (dgMax (x, pMax.m_x), dgMax (y, pMax.m_y), dgMax (z, pMax.m_z), dFloat64 (0.0f));
+		pMin = dBigVector (dMin (x, pMin.m_x), dMin (y, pMin.m_y), dMin (z, pMin.m_z), dFloat64 (0.0f));
+		pMax = dBigVector (dMax (x, pMax.m_x), dMax (y, pMax.m_y), dMax (z, pMax.m_z), dFloat64 (0.0f));
 		pool[count] = p;
 		count ++;
 	}
@@ -972,11 +972,11 @@ dMeshEffect* dMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* c
 	pool[count + 7] = dBigVector ( pMax.m_x, pMax.m_y, pMax.m_z, dFloat64 (0.0f));
 	count += 8;
 
-	dgStack<dInt32> indexList(count);
+	dStack<dInt32> indexList(count);
 	count = dgVertexListToIndexList(&pool[0].m_x, sizeof (dBigVector), 3, count, &indexList[0], dFloat64 (5.0e-2f));	
 	dAssert (count >= 8);
 
-	dFloat64 maxSize = dgMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y, pMax.m_z - pMin.m_z);
+	dFloat64 maxSize = dMax(pMax.m_x - pMin.m_x, pMax.m_y - pMin.m_y, pMax.m_z - pMin.m_z);
 	pMin -= dBigVector (maxSize, maxSize, maxSize, dFloat64 (0.0f));
 	pMax += dBigVector (maxSize, maxSize, maxSize, dFloat64 (0.0f));
 
@@ -997,9 +997,9 @@ dMeshEffect* dMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* c
 
 //	delaunayTetrahedras.Save("xxx0.txt");
 	dInt32 tetraCount = delaunayTetrahedras.GetCount();
-	dgStack<dBigVector> voronoiPoints(tetraCount + 32);
-	dgStack<dgDelaunayTetrahedralization::dListNode*> tetradrumNode(tetraCount);
-	dgTree<dList<dInt32>, dInt32> delaunayNodes (allocator);	
+	dStack<dBigVector> voronoiPoints(tetraCount + 32);
+	dStack<dgDelaunayTetrahedralization::dListNode*> tetradrumNode(tetraCount);
+	dTree<dList<dInt32>, dInt32> delaunayNodes (allocator);	
 
 	dInt32 index = 0;
 	const dgConvexHull4dVector* const convexHulPoints = delaunayTetrahedras.GetHullVertexArray();
@@ -1009,7 +1009,7 @@ dMeshEffect* dMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* c
 		tetradrumNode[index] = node;
 
 		for (dInt32 i = 0; i < 4; i ++) {
-			dgTree<dList<dInt32>, dInt32>::dgTreeNode* header = delaunayNodes.Find(tetra.m_faces[0].m_index[i]);
+			dTree<dList<dInt32>, dInt32>::dTreeNode* header = delaunayNodes.Find(tetra.m_faces[0].m_index[i]);
 			if (!header) {
 				dList<dInt32> list (allocator);
 				header = delaunayNodes.Insert(list, tetra.m_faces[0].m_index[i]);
@@ -1023,9 +1023,9 @@ dMeshEffect* dMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* c
 	dMeshEffect* const voronoiPartition = new (allocator) dMeshEffect (allocator);
 	voronoiPartition->BeginBuild();
 	dInt32 layer = 0;
-	dgTree<dList<dInt32>, dInt32>::Iterator iter (delaunayNodes);
+	dTree<dList<dInt32>, dInt32>::Iterator iter (delaunayNodes);
 	for (iter.Begin(); iter; iter ++) {
-		dgTree<dList<dInt32>, dInt32>::dgTreeNode* const nodeNode = iter.GetNode();
+		dTree<dList<dInt32>, dInt32>::dTreeNode* const nodeNode = iter.GetNode();
 		const dList<dInt32>& list = nodeNode->GetInfo();
 		dInt32 key = nodeNode->GetKey();
 
@@ -1213,7 +1213,7 @@ dAssert(0);
 		}
 		dAssert (weightFound);
 		if (!weightFound) {
-			dgTrace (("%d %f %f %f\n", i, p.m_x, p.m_y, p.m_z));
+			dTrace (("%d %f %f %f\n", i, p.m_x, p.m_y, p.m_z));
 		}
 
 		overlapNodes.RemoveAll();

@@ -53,9 +53,9 @@ dSpatialMatrix dSpatialMatrix::Inverse(dInt32 rows) const
 			//{
 			//	for (dInt32 m = 0; m < rows; m++) {
 			//		for (dInt32 n = 0; n < rows; n++) {
-			//			dgTrace(("%f ", m_rows[m][n]));
+			//			dTrace(("%f ", m_rows[m][n]));
 			//		}
-			//		dgTrace(("\n"));
+			//		dTrace(("\n"));
 			//	}
 			//	dAssert(0);
 			//}

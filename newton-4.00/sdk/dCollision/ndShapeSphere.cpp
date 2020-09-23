@@ -77,7 +77,7 @@ dInt32 ndShapeSphere::CalculateSignature () const
 
 void ndShapeSphere::DebugCollision (const dMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
-	dgTriplex pool[1024 * 2];
+	dTriplex pool[1024 * 2];
 	dVector tmpVectex[1024 * 2];
 
 	dVector p0 ( dFloat32 (1.0f), dFloat32 (0.0f), dFloat32 (0.0f), dFloat32 (0.0f)); 
@@ -103,7 +103,7 @@ void ndShapeSphere::DebugCollision (const dMatrix& matrix, dgCollision::OnDebugC
 	}
 
 	//dMatrix matrix (GetLocalMatrix() * matrixPtr);
-	matrix.TransformTriplex (&pool[0].m_x, sizeof (dgTriplex), &tmpVectex[0].m_x, sizeof (dVector), count);
+	matrix.TransformTriplex (&pool[0].m_x, sizeof (dTriplex), &tmpVectex[0].m_x, sizeof (dVector), count);
 	for (dInt32 i = 0; i < count; i += 3) {
 		callback (userData, 3, &pool[i].m_x, 0);
 	}

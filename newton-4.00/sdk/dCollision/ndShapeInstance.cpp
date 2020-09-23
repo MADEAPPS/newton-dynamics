@@ -112,7 +112,7 @@ ndShapeInstance::ndShapeInstance(const dgWorld* const constWorld, dgDeserialize 
 	dgWorld* const world = (dgWorld*) constWorld;
 	if (saved) {
 		const dgCollision* collision = nullptr;
-		dgBodyCollisionList::dgTreeNode* node = world->dgBodyCollisionList::Find (dUnsigned32 (signature));
+		dgBodyCollisionList::dTreeNode* node = world->dgBodyCollisionList::Find (dUnsigned32 (signature));
 
 		if (node) {
 			collision = node->GetInfo();
@@ -298,7 +298,7 @@ void ndShapeInstance::SetScale (const dVector& scale)
 		}
 	} else {
 		m_scaleType = m_nonUniform;
-		m_maxScale = dgMax(scaleX, scaleY, scaleZ);
+		m_maxScale = dMax(scaleX, scaleY, scaleZ);
 		m_scale	= dVector (scaleX, scaleY, scaleZ, dFloat32 (0.0f));	
 		m_invScale = dVector (dFloat32 (1.0f) / scaleX, dFloat32 (1.0f) / scaleY, dFloat32 (1.0f) / scaleZ, dFloat32 (0.0f));	
 	}
@@ -357,7 +357,7 @@ void ndShapeInstance::SetGlobalScale (const dVector& scale)
 		}
 		m_scaleType = isIdentity ? m_nonUniform : m_global;
 
-		m_maxScale = dgMax(m_scale[0], m_scale[1], m_scale[2]);
+		m_maxScale = dMax(m_scale[0], m_scale[1], m_scale[2]);
 		m_invScale = dVector (dFloat32 (1.0f) / m_scale[0], dFloat32 (1.0f) / m_scale[1], dFloat32 (1.0f) / m_scale[2], dFloat32 (0.0f));	
 	}
 }

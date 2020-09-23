@@ -310,8 +310,8 @@ void dMatrix::CalcPitchYawRoll (dVector& euler0, dVector& euler1) const
 	} else {
 		dFloat32 yaw0 = -dAsin ( matrix[0][2]);
 		dFloat32 yaw1 = dFloat32 (dgPI) - yaw0;
-		dFloat32 sign0 = dSign(dgCos (yaw0));
-		dFloat32 sign1 = dSign(dgCos (yaw1));
+		dFloat32 sign0 = dSign(dCos (yaw0));
+		dFloat32 sign1 = dSign(dCos (yaw1));
 
 		dFloat32 picth0 = dAtan2(matrix[1][2] * sign0, matrix[2][2] * sign0);
 		dFloat32 picth1 = dAtan2(matrix[1][2] * sign1, matrix[2][2] * sign1);

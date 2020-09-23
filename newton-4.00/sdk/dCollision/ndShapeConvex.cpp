@@ -56,9 +56,9 @@ void ndShapeConvex::SerializeLow(dgSerialize callback, void* const userData) con
 }
 
 
-bool ndShapeConvex::SanityCheck (dgPolyhedra& hull) const
+bool ndShapeConvex::SanityCheck (dPolyhedra& hull) const
 {
-	dgPolyhedra::Iterator iter (hull);
+	dPolyhedra::Iterator iter (hull);
 	for (iter.Begin(); iter; iter ++) { 
 		dEdge* const edge = &(*iter);
 		if (edge->m_incidentFace < 0) {
@@ -337,7 +337,7 @@ dVector ndShapeConvex::CalculateVolumeIntegral (const dPlane& plane) const
 	dVector inertia;
 	dVector crossInertia;
 	dFloat32 volume = localData.MassProperties (cg, inertia, crossInertia);
-	cg = cg.Scale (dFloat32 (1.0f) / dgMax (volume, dFloat32 (1.0e-6f)));
+	cg = cg.Scale (dFloat32 (1.0f) / dMax (volume, dFloat32 (1.0e-6f)));
 	cg.m_w = volume;
 	return cg; 
 }
@@ -364,8 +364,8 @@ dInt32 ndShapeConvex::BuildCylinderCapPoly (dFloat32 radius, const dMatrix& tran
 	dFloat32 a0 = h * h * (dgPi / n);
 
 	dFloat32 h0 = h * dgSin (0.5 * dgPI2 / n);
-	dFloat32 h1 = h * dgCos (0.5 * dgPI2 / n);
-	dFloat32 a1 = h * h * (dgSin (0.5 * dgPI2 / n) * dgCos (0.5 * dgPI2 / n));
+	dFloat32 h1 = h * dCos (0.5 * dgPI2 / n);
+	dFloat32 a1 = h * h * (dgSin (0.5 * dgPI2 / n) * dCos (0.5 * dgPI2 / n));
 
 	dFloat32 a = h * h * (dgPi / n - 0.5f * dgSin (dgPI2 / n));
 
@@ -449,7 +449,7 @@ void ndShapeConvex::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debu
 void ndShapeConvex::SetVolumeAndCG()
 {
 	dVector faceVertex[D_MAX_EDGE_COUNT];
-	//dgStack<dInt8> edgeMarks(m_edgeCount);
+	//dStack<dInt8> edgeMarks(m_edgeCount);
 	dInt8* const edgeMarks = dAlloca(dInt8, m_edgeCount + 32);
 	memset(&edgeMarks[0], 0, sizeof(dInt8) * m_edgeCount);
 

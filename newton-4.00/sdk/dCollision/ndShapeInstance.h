@@ -415,7 +415,7 @@ D_INLINE ndShapeInstance::ndScaleType ndShapeInstance::GetScaleType() const
 D_INLINE ndShapeInstance::ndScaleType ndShapeInstance::GetCombinedScaleType(ndShapeInstance::ndScaleType type) const
 {
 	dAssert (0);
-	return dgMax(m_scaleType, type);
+	return dMax(m_scaleType, type);
 }
 
 
@@ -658,7 +658,6 @@ D_INLINE void ndShapeInstance::SetCollisionMode(bool mode)
 {
 	m_collisionMode = mode;
 }
-
 
 #endif 
 

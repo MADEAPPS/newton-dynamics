@@ -720,7 +720,7 @@ class dgHACDClusterGraph
 		m_diagonal = rayDiagonalLength;
 
 		builder.Begin();
-		dgTree<dListNode*,dInt32> clusterMap (GetAllocator());
+		dTree<dListNode*,dInt32> clusterMap (GetAllocator());
 		for (dListNode* clusterNode = GetFirst(); clusterNode; clusterNode = clusterNode->GetNext()) {
 
 			// call the progress callback
@@ -796,7 +796,7 @@ class dgHACDClusterGraph
 		const dVector& p1, 
 		const dVector& p2,
 		dFloat32 distanceThreshold,
-		dgTree<dListNode*,dInt32>& clusterMap)
+		dTree<dListNode*,dInt32>& clusterMap)
 	{
 		dVector origin ((p0 + p1 + p2).Scale (dFloat32 (1.0f/3.0f)));
 
@@ -873,16 +873,16 @@ class dgHACDClusterGraph
 		//dHACDClusterFace& faceA = clusterA.GetFirst()->GetInfo();
 		//dEdge* const edgeA = faceA.m_edge;
 
-		dgTrace (("cluster node: %d\n", clusterA.m_color));
-		dgTrace (("            links: "));
+		dTrace (("cluster node: %d\n", clusterA.m_color));
+		dTrace (("            links: "));
 		for (dgGraphNode<dgHACDCluster, dgHACDEdge>::dListNode* edgeNodeA = clusterNodeA->GetInfo().GetFirst(); edgeNodeA; edgeNodeA = edgeNodeA->GetNext()) {
 		dListNode* const clusterNodeB = edgeNodeA->GetInfo().m_node;
 		dgHACDCluster& clusterB = clusterNodeB->GetInfo().m_nodeData;
-		dgTrace (("%d ", clusterB.m_color));
+		dTrace (("%d ", clusterB.m_color));
 		}
-		dgTrace (("\n"));
+		dTrace (("\n"));
 		}
-		dgTrace (("\n"));
+		dTrace (("\n"));
 		*/
 	}
 
@@ -1115,7 +1115,7 @@ class dgHACDClusterGraph
 
 	dFloat64 CalculateConcavitySingleThread (dgHACDConveHull& hull, dMeshEffect& mesh, dgHACDCluster& clusterA, dgHACDCluster& clusterB)
 	{
-		return dgMax(CalculateConcavity(hull, mesh, clusterA), CalculateConcavity(hull, mesh, clusterB));
+		return dMax(CalculateConcavity(hull, mesh, clusterA), CalculateConcavity(hull, mesh, clusterB));
 	}
 
 
@@ -1226,7 +1226,7 @@ class dgHACDClusterGraph
 		}
 		m_parallerConcavityCalculator.SynchronizationBarrier();
 		
-		concavity = dgMax(concavity, data.GetConcavity());
+		concavity = dMax(concavity, data.GetConcavity());
 		//dFloat64 xxx = CalculateConcavitySingleThread (hull, mesh, clusterA, clusterB);
 		//dAssert (fabs(concavity - xxx) < dFloat64 (1.0e-5f));
 		return concavity;
@@ -1561,10 +1561,10 @@ return new (GetAllocator()) dMeshEffect(*this);
 	if (faceCount  > meshSimplicationMaxFaceCount) {
 		mesh.Triangulate();
 
-		dgPolyhedra polygon(GetAllocator());
+		dPolyhedra polygon(GetAllocator());
 		dInt32 mark = mesh.IncLRU();
 		polygon.BeginFace();
-		dgPolyhedra::Iterator iter (mesh);
+		dPolyhedra::Iterator iter (mesh);
 		for (iter.Begin(); iter; iter ++){
 			dEdge* const face = &(*iter);
 
@@ -1590,7 +1590,7 @@ return new (GetAllocator()) dMeshEffect(*this);
 		
 		mark = polygon.IncLRU();
 		mesh.BeginFace();
-		dgPolyhedra::Iterator iter1 (polygon);
+		dPolyhedra::Iterator iter1 (polygon);
 		for (iter1.Begin(); iter1; iter1 ++){
 			dEdge* const face = &(*iter1);
 			if ((face->m_mark != mark) && (face->m_incidentFace > 0)) {

@@ -241,8 +241,6 @@ class dList
 	dListNode* m_first;
 	dListNode* m_last;
 	dInt32 m_count;
-
-//	static dInt32 m_size;
 	friend class dListNode;
 };
 
@@ -545,7 +543,7 @@ template<class T, class allocator = dContainersAlloc<T> >
 typename dList<T,allocator>::dListNode *dList<T,allocator>::GetNodeFromInfo (T &info) const
 {
 	dListNode* const node = (dListNode *) &info;
-	dgInt64 offset = ((char*) &node->m_info) - ((char *) node);
+	dInt64 offset = ((char*) &node->m_info) - ((char *) node);
 	dListNode* const retnode = (dListNode *) (((char *) node) - offset);
 
 	dAssert (&retnode->GetInfo () == &info);
@@ -667,9 +665,6 @@ bool dList<T,allocator>::SanityCheck () const
 	#endif
 	return true;
 }
-
-
-//template<class T, class allocator = dContainersAlloc<T> > dInt32 dList <T>::m_size = 0;
 
 #endif
 
