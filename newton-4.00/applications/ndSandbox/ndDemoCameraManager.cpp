@@ -213,25 +213,23 @@ void ndDemoCameraManager::SetCameraMouseLock (bool loockState)
 
 void ndDemoCameraManager::RenderPickedTarget () const
 {
-/*
-	if (m_targetPicked) {
-		dMatrix matrix;
-		NewtonBodyGetMatrix(m_targetPicked, &matrix[0][0]);
-
-		dVector p0 (matrix.TransformVector(m_pickedBodyLocalAtachmentPoint));
-		dVector p1 (p0 + matrix.RotateVector (m_pickedBodyLocalAtachmentNormal.Scale (0.5f)));
-		ShowMousePicking (p0, p1);
+	if (m_targetPicked) 
+	{
+		dAssert(0);
+		//dMatrix matrix;
+		//NewtonBodyGetMatrix(m_targetPicked, &matrix[0][0]);
+		//
+		//dVector p0 (matrix.TransformVector(m_pickedBodyLocalAtachmentPoint));
+		//dVector p1 (p0 + matrix.RotateVector (m_pickedBodyLocalAtachmentNormal.Scale (0.5f)));
+		//ShowMousePicking (p0, p1);
 	}
-*/
 }
 
 void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene, dFloat32 param)
 {
 	// interpolate the location of all entities in the world
-//	ndDemoEntity* const entity
-//	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
-//	ndDemoEntity* const entity = (ndDemoEntity*)NewtonBodyGetUserData(body);
-	for (ndDemoEntityManager::dListNode* node = scene->GetFirst(); node; node = node->GetNext()) {
+	for (ndDemoEntityManager::dListNode* node = scene->GetFirst(); node; node = node->GetNext()) 
+	{
 		ndDemoEntity* const entity = node->GetInfo();
 		entity->InterpolateMatrix(*scene, param);
 	}
@@ -251,79 +249,88 @@ void ndDemoCameraManager::OnBodyDestroy (NewtonBody* const body)
 
 void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool mousePickState, const dVector& p0, const dVector& p1, dFloat32 timestep) 
 {
-/*
 	// handle pick body from the screen
-	if (!m_targetPicked) {
-		dAssert(0);
-		if (!m_prevMouseState && mousePickState) {
-			dFloat32 param;
-			dVector posit;
-			dVector normal;
-
-			NewtonBody* const body = MousePickBody (scene->GetWorld(), p0, p1, param, posit, normal);
-			if (body) {
-				dMatrix matrix;
-				m_targetPicked = body;
-				NewtonBodyGetMatrix(m_targetPicked, &matrix[0][0]);
-
-				dTrace (("body Id: %d\n", NewtonBodyGetID(m_targetPicked)));
-
-				m_pickedBodyParam = param;
-				if(m_pickJoint) {
-					delete m_pickJoint;
-					m_pickJoint = nullptr;
-				}
-					
-				dFloat32 Ixx;
-				dFloat32 Iyy;
-				dFloat32 Izz;
-				dFloat32 mass;
-				NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-
-				// change this to make the grabbing stronger or weaker
-				//const dFloat32 angularFritionAccel = 10.0f;
-				const dFloat32 angularFritionAccel = 5.0f;
-				const dFloat32 linearFrictionAccel = 400.0f * dMax (dAbs (DEMO_GRAVITY), dFloat32(10.0f));
-				const dFloat32 inertia = dMax (Izz, dMax (Ixx, Iyy));
-
-				m_pickJoint = new ndDemoCameraPickBodyJoint (body, posit, this);
-				m_pickJoint->SetControlMode(dCustomKinematicController::m_linearPlusAngularFriction);
-
-				m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
-				m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
-			}
+	if (!m_targetPicked) 
+	{
+		if (!m_prevMouseState && mousePickState) 
+		{
+			dTrace(("Implmement object picking\n"));
+		//	dFloat32 param;
+		//	dVector posit;
+		//	dVector normal;
+		//
+		//	NewtonBody* const body = MousePickBody (scene->GetWorld(), p0, p1, param, posit, normal);
+		//	if (body) {
+		//		dMatrix matrix;
+		//		m_targetPicked = body;
+		//		NewtonBodyGetMatrix(m_targetPicked, &matrix[0][0]);
+		//
+		//		dTrace (("body Id: %d\n", NewtonBodyGetID(m_targetPicked)));
+		//
+		//		m_pickedBodyParam = param;
+		//		if(m_pickJoint) {
+		//			delete m_pickJoint;
+		//			m_pickJoint = nullptr;
+		//		}
+		//			
+		//		dFloat32 Ixx;
+		//		dFloat32 Iyy;
+		//		dFloat32 Izz;
+		//		dFloat32 mass;
+		//		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
+		//
+		//		// change this to make the grabbing stronger or weaker
+		//		//const dFloat32 angularFritionAccel = 10.0f;
+		//		const dFloat32 angularFritionAccel = 5.0f;
+		//		const dFloat32 linearFrictionAccel = 400.0f * dMax (dAbs (DEMO_GRAVITY), dFloat32(10.0f));
+		//		const dFloat32 inertia = dMax (Izz, dMax (Ixx, Iyy));
+		//
+		//		m_pickJoint = new ndDemoCameraPickBodyJoint (body, posit, this);
+		//		m_pickJoint->SetControlMode(dCustomKinematicController::m_linearPlusAngularFriction);
+		//
+		//		m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
+		//		m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
+		//	}
 		}
-	} else {
-		if (mousePickState) {
-			m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);
-
-			if (m_pickJoint) {
-				m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
-			}
-
-		} else {
-			if (m_pickJoint) {
-				delete m_pickJoint;
+	} 
+	else 
+	{
+		if (mousePickState) 
+		{
+			dAssert(0);
+			//m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);
+			//
+			//if (m_pickJoint) {
+			//	m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
+			//}
+		} 
+		else 
+		{
+			if (m_pickJoint) 
+			{
+				dAssert(0);
+				//delete m_pickJoint;
 			}
 			ResetPickBody();
 		}
 	}
 
 	m_prevMouseState = mousePickState;
-*/
 }
 
 void ndDemoCameraManager::ResetPickBody()
 {
-/*
-	if (m_targetPicked) {
-		NewtonBodySetSleepState(m_targetPicked, 0);
+	if (m_targetPicked) 
+	{
+		dAssert(0);
+		//NewtonBodySetSleepState(m_targetPicked, 0);
 	}
-	if (m_pickJoint) {
-		m_pickJoint->m_manager = nullptr;
+	if (m_pickJoint) 
+	{
+		dAssert(0);
+		//m_pickJoint->m_manager = nullptr;
 	}
 	m_pickJoint = nullptr;
 	m_targetPicked = nullptr;
-	m_bodyDestructor = nullptr;
-*/
+	//m_bodyDestructor = nullptr;
 }
