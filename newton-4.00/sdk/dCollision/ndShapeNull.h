@@ -29,7 +29,7 @@ class ndShapeNull: public ndShapeConvex
 	public:
 	D_COLLISION_API ndShapeNull();
 	//ndShapeNull(dUnsigned32 signature);
-	//ndShapeNull(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber);
+	//ndShapeNull(dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
 	virtual ~ndShapeNull() {}
 
 	virtual ndShapeNull* GetAsShapeNull() { return this; }
@@ -61,13 +61,13 @@ class ndShapeNull: public ndShapeConvex
 
 /*
 	protected:
-	virtual dgFloat32 GetVolume () const;
-	virtual dVector SupportVertex (const dVector& dir, dgInt32* const vertexIndex) const;
+	virtual dFloat32 GetVolume () const;
+	virtual dVector SupportVertex (const dVector& dir, dInt32* const vertexIndex) const;
 	virtual dVector CalculateVolumeIntegral (const dMatrix& globalMatrix, const dVector& plane, const dgCollisionInstance& parentScale) const;
-	virtual dgFloat32 RayCast (const dVector& localP0, const dVector& localP1, dgFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
+	virtual dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
 
 	private:
-	virtual dgInt32 CalculateSignature () const;
+	virtual dInt32 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dVector& p0, const dVector& p1);
 
 	virtual void Serialize(dgSerialize callback, void* const userData) const;

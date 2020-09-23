@@ -1878,12 +1878,12 @@ dgObb dPolyhedra::CalculateSphere (const dFloat64* const vertex, dInt32 strideIn
 
 	dMatrix axis (dGetIdentityMatrix());
 	dgObb sphere (axis);
-	dgConvexHull3d convexHull (GetAllocator(), &pool[0].m_x, sizeof (dBigVector), vertexCountIndex, 0.0f);
+	dConvexHull3d convexHull (GetAllocator(), &pool[0].m_x, sizeof (dBigVector), vertexCountIndex, 0.0f);
 	if (convexHull.GetCount()) {
 		dStack<dInt32> triangleList (convexHull.GetCount() * 3); 				
 		dInt32 trianglesCount = 0;
-		for (dgConvexHull3d::dListNode* node = convexHull.GetFirst(); node; node = node->GetNext()) {
-			dgConvexHull3DFace* const face = &node->GetInfo();
+		for (dConvexHull3d::dListNode* node = convexHull.GetFirst(); node; node = node->GetNext()) {
+			dConvexHull3DFace* const face = &node->GetInfo();
 			triangleList[trianglesCount * 3 + 0] = face->m_index[0];
 			triangleList[trianglesCount * 3 + 1] = face->m_index[1];
 			triangleList[trianglesCount * 3 + 2] = face->m_index[2];

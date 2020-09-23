@@ -243,10 +243,10 @@ D_INLINE bool ndConstraint::IsCollidable () const
 
 D_INLINE void ndConstraint::SetCollidable (bool state)
 {
-	m_enableCollision = dgUnsigned32 (state);
+	m_enableCollision = dUnsigned32 (state);
 }
 
-D_INLINE dgUnsigned32 ndConstraint::GetId () const
+D_INLINE dUnsigned32 ndConstraint::GetId () const
 {
 	return m_constId;
 }
@@ -267,11 +267,11 @@ D_INLINE ntBody* ndConstraint::GetBody1 () const
 //	m_body1 = body1;
 //}
 
-D_INLINE dgBodyMasterListRow::dgListNode* ndConstraint::GetLink0()	const
+D_INLINE dgBodyMasterListRow::dListNode* ndConstraint::GetLink0()	const
 {
 	return m_link0;
 }
-D_INLINE dgBodyMasterListRow::dgListNode* ndConstraint::GetLink1()	const
+D_INLINE dgBodyMasterListRow::dListNode* ndConstraint::GetLink1()	const
 {
 	return m_link1;
 }
@@ -326,7 +326,7 @@ D_INLINE void ndConstraint::SetIndex (dInt32 index)
 
 D_INLINE void ndConstraint::GetInfo(dgConstraintInfo* const info) const
 {
-	dgAssert(0);
+	dAssert(0);
 }
 #endif
 

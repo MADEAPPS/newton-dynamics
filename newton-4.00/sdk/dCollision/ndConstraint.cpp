@@ -73,12 +73,12 @@ void ndConstraint::InitInfo (dgConstraintInfo* const info) const
 	dAssert (info->m_attachBody_0);
 	dgWorld* const world = info->m_attachBody_0->GetWorld();
 	if (info->m_attachBody_0  == (dgBody*)world->GetSentinelBody()) {
-		info->m_attachBody_0  = NULL;
+		info->m_attachBody_0  = nullptr;
 	}
 
 	info->m_attachBody_1 = GetBody1();
 	if (info->m_attachBody_1  == (dgBody*)world->GetSentinelBody()) {
-		info->m_attachBody_1  = NULL;
+		info->m_attachBody_1  = nullptr;
 	}
 
 	info->m_attachMatrix_0 = dgGetIdentityMatrix();

@@ -25,7 +25,7 @@
 
 #include "dCoreStdafx.h"
 #include "dTypes.h"
-//#include "dgVector.h"
+//#include "dVector.h"
 #include "dGeneralVector.h"
 
 #define DG_LCP_MAX_VALUE dFloat32 (1.0e10f)

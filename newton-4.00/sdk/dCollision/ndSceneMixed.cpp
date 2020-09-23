@@ -300,10 +300,10 @@ void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const 
 	{
 		dAssert(0);
 		//const dgBodyInfo* const bodyArray = &m_world->m_bodiesMemory[0];
-		//const dgInt32 bodyCount = descriptor->m_atomicPendingBodiesCount;
-		//dgInt32* const atomicIndex = &descriptor->m_atomicIndex;
+		//const dInt32 bodyCount = descriptor->m_atomicPendingBodiesCount;
+		//dInt32* const atomicIndex = &descriptor->m_atomicIndex;
 		//
-		//for (dgInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
+		//for (dInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
 		//	ntBroadPhaseNode* const broadPhaseNode = bodyArray[i].m_body->GetBroadPhase();
 		//	dAssert(broadPhaseNode->ntBroadPhaseBodyNode());
 		//	dAssert(!broadPhaseNode->GetBody() || (broadPhaseNode->GetBody()->GetBroadPhase() == broadPhaseNode));

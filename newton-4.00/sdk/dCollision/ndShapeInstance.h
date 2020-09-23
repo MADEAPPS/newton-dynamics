@@ -196,8 +196,8 @@ D_INLINE ndShapeInstance::ndShapeInstance(const ndShapeInstance& meshInstance, c
 	,m_material(meshInstance.m_material)
 	,m_world(meshInstance.m_world)
 	,m_shape (shape)
-	,m_subCollisionHandle(NULL)
-	,m_parent(NULL)
+	,m_subCollisionHandle(nullptr)
+	,m_parent(nullptr)
 	,m_skinThickness(meshInstance.m_skinThickness)
 	,m_collisionMode(meshInstance.m_collisionMode)
 	,m_refCount(1)
@@ -570,24 +570,24 @@ D_INLINE dVector ndShapeInstance::SupportVertex(const dVector& dir) const
 	{
 		case m_unit:
 		{
-			return m_shape->SupportVertex(dir, NULL);
+			return m_shape->SupportVertex(dir, nullptr);
 		}
 		case m_uniform:
 		{
-			return m_scale * m_shape->SupportVertex(dir, NULL);
+			return m_scale * m_shape->SupportVertex(dir, nullptr);
 		}
 		case m_nonUniform:
 		{
 			// support((p * S), n) = S * support (p, n * transp(S)) 
 			dVector dir1((m_scale * dir).Normalize());
-			return m_scale * m_shape->SupportVertex(dir1, NULL);
+			return m_scale * m_shape->SupportVertex(dir1, nullptr);
 		}
 
 		case m_global:
 		default:
 		{
 			dVector dir1(m_aligmentMatrix.UnrotateVector((m_scale * dir).Normalize()));
-			return m_scale * m_aligmentMatrix.TransformVector(m_shape->SupportVertex(dir1, NULL));
+			return m_scale * m_aligmentMatrix.TransformVector(m_shape->SupportVertex(dir1, nullptr));
 		}
 	}
 }

@@ -9,7 +9,6 @@
 * freely
 */
 
-
 #include "ndSandboxStdafx.h"
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
@@ -49,10 +48,6 @@ void ndDemoMeshInterface::SetVisible (bool visibilityFlag)
 	m_isVisible = visibilityFlag;
 }
 
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 ndDemoSubMesh::ndDemoSubMesh ()
 	:m_ambient(0.8f, 0.8f, 0.8f, 1.0f)
 	,m_diffuse(0.8f, 0.8f, 0.8f, 1.0f)
@@ -332,8 +327,7 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCac
 	OptimizeForRender ();
 }
 
-/*
-ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const NewtonCollision* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity, const dMatrix& uvMatrix)
+ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity, const dMatrix& uvMatrix)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
 	,m_uv(nullptr)
@@ -343,8 +337,10 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_optimizedTransparentDiplayList(0)
 {
 	// create a helper mesh from the collision collision
-	NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
+	//NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
+	ndMeshEffect mesh = new ndMeshEffect(shaderCache);
 
+#if 0
 	// apply the vertex normals
 //	NewtonMeshCalculateVertexNormals(mesh, 30.0f * dDegreeToRad);
 
@@ -413,8 +409,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 
 	// optimize this mesh for hardware buffers if possible
 	OptimizeForRender ();
+#endif
 }
-*/
 
 ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize)
 	:ndDemoMeshInterface()

@@ -1024,7 +1024,7 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 	//}
 	//
 	//dInt32 contactCount = pair->m_contactCount;
-	//dgList<ndContactMaterial>& list = *contact;
+	//dList<ndContactMaterial>& list = *contact;
 	//
 	//contact->m_timeOfImpact = pair->m_timestep;
 

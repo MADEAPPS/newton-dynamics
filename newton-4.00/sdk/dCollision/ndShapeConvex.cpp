@@ -60,11 +60,11 @@ bool ndShapeConvex::SanityCheck (dgPolyhedra& hull) const
 {
 	dgPolyhedra::Iterator iter (hull);
 	for (iter.Begin(); iter; iter ++) { 
-		dgEdge* const edge = &(*iter);
+		dEdge* const edge = &(*iter);
 		if (edge->m_incidentFace < 0) {
 			return false;
 		}
-		dgEdge* ptr = edge;
+		dEdge* ptr = edge;
 		dVector p0 (m_vertex[edge->m_incidentVertex]);
 		ptr = ptr->m_next;
 		dVector p1 (m_vertex[ptr->m_incidentVertex]);
@@ -81,7 +81,7 @@ bool ndShapeConvex::SanityCheck (dgPolyhedra& hull) const
 		ptr = edge;
 		do {
 			dVector q0 (m_vertex[ptr->m_twin->m_incidentVertex]);
-			for (dgEdge* neiborg = ptr->m_twin->m_next->m_next; neiborg != ptr->m_twin; neiborg = neiborg->m_next) { 
+			for (dEdge* neiborg = ptr->m_twin->m_next->m_next; neiborg != ptr->m_twin; neiborg = neiborg->m_next) { 
 				dVector q1 (m_vertex[neiborg->m_incidentVertex]);
 				dVector q1q0 (q1 - q0);
 				dFloat32 project = q1q0.DotProduct(n0).GetScalar();

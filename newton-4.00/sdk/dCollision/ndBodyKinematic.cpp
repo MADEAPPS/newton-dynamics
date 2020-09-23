@@ -304,7 +304,7 @@ void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 	//#ifdef _DEBUG
 #if 0
 	dgBodyMasterList& me = *m_world;
-	for (dgBodyMasterList::dgListNode* refNode = me.GetFirst(); refNode; refNode = refNode->GetNext()) {
+	for (dgBodyMasterList::dListNode* refNode = me.GetFirst(); refNode; refNode = refNode->GetNext()) {
 		dgBody* const body0 = refNode->GetInfo().GetBody();
 		dVector invMass(body0->GetInvMass());
 		if (invMass.m_w != 0.0f) {

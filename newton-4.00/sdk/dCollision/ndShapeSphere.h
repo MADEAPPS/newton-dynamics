@@ -30,7 +30,7 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeSphere: public ndShapeConvex
 {
 	public:
-	//ndShapeSphere(dgMemoryAllocator* allocator, dgUnsigned32 signature, dFloat32 radius);
+	//ndShapeSphere(dgMemoryAllocator* allocator, dUnsigned32 signature, dFloat32 radius);
 	//ndShapeSphere(dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
 	//virtual ~ndShapeSphere();
 	D_COLLISION_API ndShapeSphere(dFloat32 radius);

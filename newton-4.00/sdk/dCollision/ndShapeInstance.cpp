@@ -58,8 +58,8 @@ ndShapeInstance::ndShapeInstance(const dgWorld* const world, const dgCollision* 
 	,m_material()
 	,m_world(world)
 	,m_shape (childCollision)
-	,m_subCollisionHandle(NULL)
-	,m_parent(NULL)
+	,m_subCollisionHandle(nullptr)
+	,m_parent(nullptr)
 	,m_skinThickness(dFloat32 (0.0f))
 	,m_collisionMode(1)
 	,m_refCount(1)
@@ -79,9 +79,9 @@ ndShapeInstance::ndShapeInstance(const dgWorld* const constWorld, dgDeserialize 
 	,m_maxScale(dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (0.0f))
 	,m_material()
 	,m_world(constWorld)
-	,m_shape (NULL)
-	,m_subCollisionHandle(NULL)
-	,m_parent(NULL)
+	,m_shape (nullptr)
+	,m_subCollisionHandle(nullptr)
+	,m_parent(nullptr)
 	,m_skinThickness(dFloat32 (0.0f))
 	,m_collisionMode(1)
 	,m_refCount(1)
@@ -111,8 +111,8 @@ ndShapeInstance::ndShapeInstance(const dgWorld* const constWorld, dgDeserialize 
 
 	dgWorld* const world = (dgWorld*) constWorld;
 	if (saved) {
-		const dgCollision* collision = NULL;
-		dgBodyCollisionList::dgTreeNode* node = world->dgBodyCollisionList::Find (dgUnsigned32 (signature));
+		const dgCollision* collision = nullptr;
+		dgBodyCollisionList::dgTreeNode* node = world->dgBodyCollisionList::Find (dUnsigned32 (signature));
 
 		if (node) {
 			collision = node->GetInfo();
@@ -223,7 +223,7 @@ ndShapeInstance::ndShapeInstance(const dgWorld* const constWorld, dgDeserialize 
 //				case m_deformableMesh:
 //				{
 //					dAssert (0);
-//					return NULL;
+//					return nullptr;
 //				}
 
 				default:
@@ -446,7 +446,7 @@ ndShapeInstance::ndShapeInstance(ndShape* const shape)
 	,m_maxScale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
 	,m_shape(shape->AddRef())
 	,m_ownerBody(nullptr)
-	//,m_subCollisionHandle(NULL)
+	//,m_subCollisionHandle(nullptr)
 	,m_skinThickness(dFloat32(0.0f))
 	,m_scaleType(m_unit)
 	,m_collisionMode(true)

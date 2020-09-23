@@ -23,14 +23,14 @@
 #include "ndShapeNull.h"
 
 #if 0
-ntShapeNull::ntShapeNull(dgMemoryAllocator* const allocator, dgUnsigned32 signature)
+ntShapeNull::ntShapeNull(dgMemoryAllocator* const allocator, dUnsigned32 signature)
 	:dShape(allocator, signature, m_nullCollision) 
 {
 	m_rtti |= ntShapeNull_RTTI;
 	m_inertia = dVector (dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (0.0f));
 }
 
-ntShapeNull::ntShapeNull(dgWorld* const world, dgDeserialize deserialization, void* const userData, dgInt32 revisionNumber)
+ntShapeNull::ntShapeNull(dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber)
 	:dShape (world, deserialization, userData, revisionNumber)
 {
 	m_rtti |= ntShapeNull_RTTI;
@@ -47,13 +47,13 @@ ntShapeNull::~ntShapeNull()
 
 void ntShapeNull::SetCollisionBBox (const dVector& p0, const dVector& p1)
 {
-	dgAssert (0);
+	dAssert (0);
 }
 
 
-dgInt32 ntShapeNull::CalculateSignature () const
+dInt32 ntShapeNull::CalculateSignature () const
 {
-	return dgInt32 (GetSignature());
+	return dInt32 (GetSignature());
 }
 
 void ntShapeNull::CalcAABB (const dgMatrix& matrix, dVector &p0, dVector &p1) const
@@ -62,15 +62,15 @@ void ntShapeNull::CalcAABB (const dgMatrix& matrix, dVector &p0, dVector &p1) co
 	p1 = matrix[3] & dVector::m_triplexMask;
 }
 
-dVector ntShapeNull::SupportVertex (const dVector& dir, dgInt32* const vertexIndex) const
+dVector ntShapeNull::SupportVertex (const dVector& dir, dInt32* const vertexIndex) const
 {
-	dgAssert (0);
+	dAssert (0);
 	return dVector::m_zero;
 }
 
-dVector ntShapeNull::SupportVertexSpecial (const dVector& dir, dFloat32 skinThickness, dgInt32* const vertexIndex) const
+dVector ntShapeNull::SupportVertexSpecial (const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const
 {
-	dgAssert(0);
+	dAssert(0);
 	return dVector::m_zero;
 }
 
@@ -87,7 +87,7 @@ dFloat32 ntShapeNull::RayCast (const dVector& localP0, const dVector& localP1, d
 
 dVector ntShapeNull::CalculateVolumeIntegral (const dgMatrix& globalMatrix, const dVector& plane, const dgCollisionInstance& parentScale) const
 {
-	dgAssert (0);
+	dAssert (0);
 	return dVector::m_zero;
 }
 #endif

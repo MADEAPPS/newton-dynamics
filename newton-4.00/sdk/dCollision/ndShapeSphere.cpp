@@ -38,7 +38,7 @@ ndShapeConvex::ndConvexSimplexEdge ndShapeSphere::m_edgeArray[D_SPHERE_EDGE_COUN
 
 
 
-ndShapeSphere::ndShapeSphere(dgMemoryAllocator* const allocator, dgUnsigned32 signature, dFloat32 radii)
+ndShapeSphere::ndShapeSphere(dgMemoryAllocator* const allocator, dUnsigned32 signature, dFloat32 radii)
 	:dgCollisionConvex(allocator, signature, m_sphereCollision) 
 {
 	Init (radii, allocator);
@@ -60,7 +60,7 @@ void ndShapeSphere::SetCollisionBBox (const dVector& p0__, const dVector& p1__)
 
 dInt32 ndShapeSphere::CalculateSignature (dFloat32 radius)
 {
-	dgUnsigned32 buffer[2];
+	dUnsigned32 buffer[2];
 	radius = dAbs (radius);
 
 	buffer[0] = m_sphereCollision;

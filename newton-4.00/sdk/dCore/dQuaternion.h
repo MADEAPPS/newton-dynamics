@@ -37,8 +37,8 @@ class dQuaternion
 	dQuaternion (dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3);
 	D_CORE_API dQuaternion (const dVector &unit_Axis, dFloat32 angle = dFloat32 (0.0f));
 
-//	dFloat32& operator[] (dgInt32 i);
-//	const dFloat32& operator[] (dgInt32 i) const;
+//	dFloat32& operator[] (dInt32 i);
+//	const dFloat32& operator[] (dInt32 i) const;
 
 	void Scale (dFloat32 scale); 
 	void Normalize (); 
@@ -72,21 +72,21 @@ D_INLINE dQuaternion::dQuaternion(dFloat32 Q0, dFloat32 Q1, dFloat32 Q2, dFloat3
 	,m_z(Q3)
 	,m_w(Q0)
 {
-//	dgAssert (dgAbs (DotProduct (*this) -dFloat32 (1.0f)) < dFloat32(1.0e-4f));
+//	dAssert (dgAbs (DotProduct (*this) -dFloat32 (1.0f)) < dFloat32(1.0e-4f));
 }
 
 /*
-D_INLINE dFloat32& dQuaternion::operator[] (dgInt32 i)
+D_INLINE dFloat32& dQuaternion::operator[] (dInt32 i)
 {
-	dgAssert(i < 4);
-	dgAssert(i >= 0);
+	dAssert(i < 4);
+	dAssert(i >= 0);
 	return (&m_w)[i];
 }
 
-D_INLINE const dFloat32& dQuaternion::operator[] (dgInt32 i) const
+D_INLINE const dFloat32& dQuaternion::operator[] (dInt32 i) const
 {
-	dgAssert(i < 4);
-	dgAssert(i >= 0);
+	dAssert(i < 4);
+	dAssert(i >= 0);
 	return (&m_w)[i];
 }
 */

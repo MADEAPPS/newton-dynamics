@@ -63,13 +63,13 @@ class ndContactMaterial: public ndContactPoint
 	//	dUnsigned64 m_shapeId0;
 	//	dUnsigned64 m_shapeId1;
 	//	dFloat32 m_penetration;
-	//	dgUnsigned32 m_unused[3];
+	//	dUnsigned32 m_unused[3];
 	//} D_GCC_NEWTON_ALIGN_32;
 
-	//typedef bool (dgApi *OnAABBOverlap) (dgContact& contactJoint, dFloat32 timestep, dgInt32 threadIndex);
-	//typedef void (dgApi *OnContactCallback) (dgContact& contactJoint, dFloat32 timestep, dgInt32 threadIndex);
-	//typedef bool (dgApi *OnCompoundCollisionPrefilter) (dgContact& contactJoint, dFloat32 timestep, const dgBody* bodyA, const void* collisionNodeA, const dgBody* bodyB, const void* collisionNodeB, dgInt32 threadIndex);
-	//typedef bool (dgApi *OnContactGeneration) (const dgContactMaterial& material, const dgBody& body0, const dgCollisionInstance* collisionIntance0, const dgBody& body1, const dgCollisionInstance* collisionIntance1, dgUserContactPoint* const contacts, dgInt32 maxCount, dgInt32 threadIndex);
+	//typedef bool (dgApi *OnAABBOverlap) (dgContact& contactJoint, dFloat32 timestep, dInt32 threadIndex);
+	//typedef void (dgApi *OnContactCallback) (dgContact& contactJoint, dFloat32 timestep, dInt32 threadIndex);
+	//typedef bool (dgApi *OnCompoundCollisionPrefilter) (dgContact& contactJoint, dFloat32 timestep, const dgBody* bodyA, const void* collisionNodeA, const dgBody* bodyB, const void* collisionNodeB, dInt32 threadIndex);
+	//typedef bool (dgApi *OnContactGeneration) (const dgContactMaterial& material, const dgBody& body0, const dgCollisionInstance* collisionIntance0, const dgBody& body1, const dgCollisionInstance* collisionIntance1, dgUserContactPoint* const contacts, dInt32 maxCount, dInt32 threadIndex);
 
 	//dgContactMaterial();
 	//void* GetUserData() const;
@@ -190,8 +190,8 @@ DG_INLINE void dgContactMaterial::SetUserData (void* const userData)
 
 DG_INLINE void dgContactMaterial::SetAsSoftContact(dFloat32 regularizer)
 {
-	dgAssert(regularizer >= dFloat32 (0.0f));
-	dgAssert(regularizer <= dFloat32 (1.0f));
+	dAssert(regularizer >= dFloat32 (0.0f));
+	dAssert(regularizer <= dFloat32 (1.0f));
 	// re purpose some of the variable to store parameter for soft contact
 	m_flags |= m_isSoftContact;
 	m_skinThickness = regularizer;

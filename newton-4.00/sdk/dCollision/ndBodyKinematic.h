@@ -188,7 +188,7 @@ inline void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const ndShapeInstance&
 		inertia[i] = inertia[i].Scale(mass);
 		//inertia[i][i] = (inertia[i][i] + origin[i] * origin[i]) * mass;
 		//for (dInt32 j = i + 1; j < 3; j ++) {
-		//	dgFloat32 crossIJ = origin[i] * origin[j];
+		//	dFloat32 crossIJ = origin[i] * origin[j];
 		//	inertia[i][j] = (inertia[i][j] + crossIJ) * mass;
 		//	inertia[j][i] = (inertia[j][i] + crossIJ) * mass;
 		//}

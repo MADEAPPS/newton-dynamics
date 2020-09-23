@@ -30,6 +30,9 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 
+	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+
+
 	body->SetNotifyCallback(new ndDemoEntityNotify(entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(box);

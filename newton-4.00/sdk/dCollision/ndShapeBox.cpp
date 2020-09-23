@@ -49,8 +49,8 @@ ndShapeBox::ndShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 
 ndShapeBox::~ndShapeBox()
 {
-	ndShapeConvex::m_simplex = NULL;
-	ndShapeConvex::m_vertex = NULL;
+	ndShapeConvex::m_simplex = nullptr;
+	ndShapeConvex::m_vertex = nullptr;
 }
 
 void ndShapeBox::Init(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
@@ -355,7 +355,7 @@ dInt32 ndShapeBox::CalculatePlaneIntersection(const dVector& normal, const dVect
 				test[i] = plane.DotProduct(m_vertex[i] | dVector::m_wOne).m_x;
 			}
 
-			ndConvexSimplexEdge* edge = NULL;
+			ndConvexSimplexEdge* edge = nullptr;
 			for (dInt32 i = 0; i < dInt32(sizeof(m_edgeEdgeMap) / sizeof(m_edgeEdgeMap[0])); i++) 
 			{
 				ndConvexSimplexEdge* const ptr = m_edgeEdgeMap[i];
@@ -377,7 +377,7 @@ dInt32 ndShapeBox::CalculatePlaneIntersection(const dVector& normal, const dVect
 				dAssert(test[edge->m_vertex] > dFloat32(0.0f));
 
 				ndConvexSimplexEdge* ptr = edge;
-				ndConvexSimplexEdge* firstEdge = NULL;
+				ndConvexSimplexEdge* firstEdge = nullptr;
 				dFloat32 side0 = test[edge->m_vertex];
 				do 
 				{
