@@ -30,7 +30,7 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 
-	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "wood_0.tga", "marbleCheckBoard.tga", "wood_0.tga");
 	entity->SetMesh(geometry, dGetIdentityMatrix());
 
 	body->SetNotifyCallback(new ndDemoEntityNotify(entity));
@@ -55,6 +55,6 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 	BuildFloor(scene);
 
 	dQuaternion rot;
-	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-40.0f, 10.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
