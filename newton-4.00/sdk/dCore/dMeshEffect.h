@@ -23,6 +23,7 @@
 #define __D_MESH_EFFECT_H__
 
 #include "dCoreStdafx.h"
+#include "dArray.h"
 #include "dPolyhedra.h"
 //#include "dRefCounter.h"
 
@@ -45,192 +46,8 @@ class dMeshEffect : public dPolyhedra
 {
 #if 0
 	public:
-	enum dgChannelType
-	{
-		m_vertex,
-		m_normal,
-		m_binormal,
-		m_uv0,
-		m_uv1,
-		m_color,
-		m_material,
-		m_layer,
-		m_point,
-	};
 
-	class dgMeshVertexFormat
-	{
-		public:
-		class dgDoubleData
-		{
-			public:
-			const dFloat64* m_data;
-			const dInt32* m_indexList;
-			dInt32 m_strideInBytes;
-		};
 
-		class dgFloatData
-		{
-			public:
-			const dFloat32* m_data;
-			const dInt32* m_indexList;
-			dInt32 m_strideInBytes;
-		};
-
-		dgMeshVertexFormat ()
-		{
-			Clear ();
-		}
-
-		void Clear ()
-		{
-			memset (this, 0, sizeof (dgMeshVertexFormat));
-		}
-
-		dInt32 m_faceCount;
-		const dInt32* m_faceIndexCount;
-		const dInt32* m_faceMaterial;
-		dgDoubleData m_vertex;
-		dgFloatData m_normal;
-		dgFloatData m_binormal;
-		dgFloatData m_uv0;
-		dgFloatData m_uv1;
-		dgFloatData m_vertexColor;
-	};
-
-	template<class T, dgChannelType type>
-	class dgChannel: public dArray<T>
-	{
-		public:
-		dgChannel(dMemoryAllocator___* const allocator)
-			:dArray<T>(allocator)
-			,m_count(0)
-			,m_type(type)
-		{
-		}
-
-		dgChannel(const dgChannel& source)
-			:dArray<T>(source, source.m_count)
-			,m_count(source.m_count)
-			,m_type(source.m_type)
-		{
-		}
-
-		~dgChannel()
-		{
-		}
-
-		void CopyFrom (const dgChannel<T, type>& source)
-		{
-			dArray<T>& me = *this;
-			dgChannel& src = *((dgChannel*)&source);
-
-			Clear();
-			m_count = src.m_count;
-			dAssert (m_type == src.m_type);
-			for (dInt32 i = 0; i < m_count; i++) {
-				me[i] = src[i];
-			}
-		}
-
-		void Clear()
-		{
-			m_count = 0;
-			dArray<T>::Clear ();
-		}
-
-		void Reserve (dInt32 size)
-		{
-			dArray<T>::Resize(size);
-			m_count = size;
-		}
-
-		void PushBack (const T& element) 
-		{
-			T tmp (element);
-			dArray<T>& me = *this;
-			me[m_count] = tmp;
-			m_count ++;
-		}
-
-		void SetCount (dInt32 count) 
-		{
-			if (m_count) {
-				dAssert (count >= 0);
-				dAssert (m_count >= count);
-				m_count = count;
-			}
-		}
-
-		dInt32 m_count;
-		dgChannelType m_type;
-	};
-
-	class dgFormat
-	{
-		public:
-		class dgSortKey
-		{
-			public:
-			dInt32 m_mask;
-			dInt32 m_ordinal;
-			dInt32 m_vertexIndex;
-			dInt32 m_attibuteIndex;
-		};
-		class VertexSortData
-		{
-			public:
-			const dgChannel<dBigVector, m_point>* m_points;
-			dInt32 m_vertexSortIndex;
-		};
-
-		dInt32 GetSortIndex (const dgChannel<dBigVector, m_point>& points, dFloat64& dist) const;
-		static dInt32 CompareVertex(const dgSortKey* const ptr0, const dgSortKey* const ptr1, void* const context);
-	};
-
-	class dgPointFormat: public dgFormat
-	{
-		public:
-		dgPointFormat(dMemoryAllocator___* const allocator);
-		dgPointFormat(const dgPointFormat& source);
-		~dgPointFormat();
-
-		void Clear();
-		void SetCount (dInt32 count);
-		void CompressData(dInt32* const indexList);
-
-		dgChannel<dInt32, m_layer> m_layers;
-		dgChannel <dBigVector, m_point> m_vertex;
-	};
-
-	class dgAttibutFormat: public dgFormat
-	{
-		public:
-		class dgUV
-		{
-			public:
-			dFloat32 m_u;
-			dFloat32 m_v;
-		};
-
-		dgAttibutFormat(dMemoryAllocator___* const allocator);
-		dgAttibutFormat(const dgAttibutFormat& source);
-		~dgAttibutFormat();
-
-		void Clear();
-		void SetCount (dInt32 count);
-		void CopyFrom (const dgAttibutFormat& source);
-		void CopyEntryFrom (dInt32 index, const dgAttibutFormat& source, dInt32 sourceIndex);
-		void CompressData (const dgPointFormat& points, dInt32* const indexList);
-
-		dgChannel<dInt32, m_vertex> m_pointChannel;
-		dgChannel<dInt32, m_material> m_materialChannel;
-		dgChannel<dTriplex, m_normal> m_normalChannel;
-		dgChannel<dTriplex, m_binormal> m_binormalChannel;
-		dgChannel<dVector, m_color> m_colorChannel;
-		dgChannel<dgUV, m_uv0> m_uv0Channel;
-		dgChannel<dgUV, m_uv1> m_uv1Channel;
-	};
 
 	class dgIndexArray 
 	{
@@ -302,7 +119,7 @@ class dMeshEffect : public dPolyhedra
 		friend class dMeshEffect;
 	};
 
-	dMeshEffect ();
+	
 	dMeshEffect(dMemoryAllocator___* const allocator);
 	dMeshEffect(dgCollisionInstance* const collision);
 	dMeshEffect(const dMeshEffect& source);
@@ -317,9 +134,9 @@ class dMeshEffect : public dPolyhedra
 
 	// create a planar Mesh
 	dMeshEffect(dMemoryAllocator___* const allocator, const dMatrix& planeMatrix, dFloat32 witdth, dFloat32 breadth, dInt32 material, const dMatrix& textureMatrix0, const dMatrix& textureMatrix1);
-	virtual ~dMeshEffect(void);
+	
 
-	void Init();
+	
 
 	void Trace () const;
 
@@ -388,7 +205,7 @@ class dMeshEffect : public dPolyhedra
 
 	void OptimizePoints();
 	void OptimizeAttibutes();
-	void BuildFromIndexList(const dgMeshVertexFormat* const format);
+	void BuildFromIndexList(const dMeshVertexFormat* const format);
 
 	dInt32 GetPropertiesCount() const;
 	const dInt32* GetIndexToVertexMap() const;
@@ -495,10 +312,6 @@ class dMeshEffect : public dPolyhedra
 	void PackPoints (dFloat64 tol);
 	void UnpackPoints();
 
-	dgPointFormat m_points;
-	dgAttibutFormat m_attrib;
-	dInt32 m_vertexBaseCount;
-	dInt32 m_constructionIndex;
 	
 	friend class dConvexHull3d;
 	friend class dgConvexHull4d;
@@ -508,6 +321,208 @@ class dMeshEffect : public dPolyhedra
 	friend class dgTetraIsoSufaceStuffing;
 	friend class dgCollisionCompoundFractured;
 #endif
+
+	enum dChannelType
+	{
+		m_vertex,
+		m_normal,
+		m_binormal,
+		m_uv0,
+		m_uv1,
+		m_color,
+		m_material,
+		m_layer,
+		m_point,
+	};
+
+	template<class T, dChannelType type>
+	class dChannel: public dArray<T>
+	{
+		public:
+		dChannel()
+			:dArray<T>()
+			,m_type(type)
+		{
+		}
+
+		dChannel(const dChannel& source)
+			:dArray<T>(source)
+			//,m_count(source.m_count)
+			,m_type(source.m_type)
+		{
+			dAssert(0);
+		}
+
+		~dChannel()
+		{
+		}
+
+		//void CopyFrom(const dChannel<T, type>& source)
+		//{
+		//	dArray<T>& me = *this;
+		//	dChannel& src = *((dChannel*)&source);
+		//
+		//	Clear();
+		//	m_count = src.m_count;
+		//	dAssert(m_type == src.m_type);
+		//	for (dInt32 i = 0; i < m_count; i++) 
+		//	{
+		//		me[i] = src[i];
+		//	}
+		//}
+		//
+		//void Clear()
+		//{
+		//	m_count = 0;
+		//	dArray<T>::Clear();
+		//}
+		//
+		//void Reserve(dInt32 size)
+		//{
+		//	dArray<T>::Resize(size);
+		//	m_count = size;
+		//}
+		//
+		//void PushBack(const T& element)
+		//{
+		//	T tmp(element);
+		//	dArray<T>& me = *this;
+		//	me[m_count] = tmp;
+		//	m_count++;
+		//}
+		//
+		//void SetCount(dInt32 count)
+		//{
+		//	if (m_count) 
+		//	{
+		//		dAssert(count >= 0);
+		//		dAssert(m_count >= count);
+		//		m_count = count;
+		//	}
+		//}
+
+		//dInt32 m_count;
+		dChannelType m_type;
+	};
+
+	class dFormat
+	{
+		public:
+		class dgSortKey
+		{
+			public:
+			dInt32 m_mask;
+			dInt32 m_ordinal;
+			dInt32 m_vertexIndex;
+			dInt32 m_attibuteIndex;
+		};
+		class VertexSortData
+		{
+			public:
+			const dChannel<dBigVector, m_point>* m_points;
+			dInt32 m_vertexSortIndex;
+		};
+
+		dInt32 GetSortIndex(const dChannel<dBigVector, m_point>& points, dFloat64& dist) const;
+		static dInt32 CompareVertex(const dgSortKey* const ptr0, const dgSortKey* const ptr1, void* const context);
+	};
+
+	class dPointFormat : public dFormat
+	{
+		public:
+		dPointFormat();
+		dPointFormat(const dPointFormat& source);
+		~dPointFormat();
+
+		//void Clear();
+		//void SetCount(dInt32 count);
+		//void CompressData(dInt32* const indexList);
+		
+		dChannel<dInt32, m_layer> m_layers;
+		dChannel <dBigVector, m_point> m_vertex;
+	};
+
+	class dAttibutFormat : public dFormat
+	{
+		public:
+		class dgUV
+		{
+			public:
+			dFloat32 m_u;
+			dFloat32 m_v;
+		};
+
+		dAttibutFormat();
+		dAttibutFormat(const dAttibutFormat& source);
+		~dAttibutFormat();
+
+		void Clear();
+		void SetCount(dInt32 count);
+		void CopyFrom(const dAttibutFormat& source);
+		void CopyEntryFrom(dInt32 index, const dAttibutFormat& source, dInt32 sourceIndex);
+		void CompressData(const dPointFormat& points, dInt32* const indexList);
+
+		dChannel<dInt32, m_vertex> m_pointChannel;
+		dChannel<dInt32, m_material> m_materialChannel;
+		dChannel<dTriplex, m_normal> m_normalChannel;
+		dChannel<dTriplex, m_binormal> m_binormalChannel;
+		dChannel<dVector, m_color> m_colorChannel;
+		dChannel<dgUV, m_uv0> m_uv0Channel;
+		dChannel<dgUV, m_uv1> m_uv1Channel;
+	};
+
+	protected:
+	class dMeshVertexFormat
+	{
+		public:
+		class dDoubleData
+		{
+			public:
+			const dFloat64* m_data;
+			const dInt32* m_indexList;
+			dInt32 m_strideInBytes;
+		};
+
+		class dFloatData
+		{
+			public:
+			const dFloat32* m_data;
+			const dInt32* m_indexList;
+			dInt32 m_strideInBytes;
+		};
+
+		dMeshVertexFormat()
+		{
+			Clear();
+		}
+
+		void Clear()
+		{
+			memset(this, 0, sizeof(dMeshVertexFormat));
+		}
+
+		dInt32 m_faceCount;
+		const dInt32* m_faceIndexCount;
+		const dInt32* m_faceMaterial;
+		dDoubleData m_vertex;
+		dFloatData m_normal;
+		dFloatData m_binormal;
+		dFloatData m_uv0;
+		dFloatData m_uv1;
+		dFloatData m_vertexColor;
+	};
+
+	public:
+	D_CORE_API dMeshEffect();
+	D_CORE_API virtual ~dMeshEffect();
+
+	protected:
+	D_CORE_API void Init();
+
+	dPointFormat m_points;
+	dAttibutFormat m_attrib;
+	dInt32 m_vertexBaseCount;
+	dInt32 m_constructionIndex;
 };
 
 #if 0

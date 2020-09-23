@@ -23,6 +23,8 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
+
+	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 	ndBodyDynamic* const body = new ndBodyDynamic();
 
 	dMatrix matrix(dGetIdentityMatrix());
@@ -30,15 +32,14 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 
-	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), collision, "wood_0.tga", "wood_0.tga", "wood_0.tga");
-
-
 	body->SetNotifyCallback(new ndDemoEntityNotify(entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(box);
 	world->AddBody(body);
 
 	scene->AddEntity(entity);
+
+	geometry->Release();
 }
 
 void ndBasicSetup (ndDemoEntityManager* const scene)

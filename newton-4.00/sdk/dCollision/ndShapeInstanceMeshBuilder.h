@@ -19,36 +19,19 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-//
+#ifndef __D_SHAPE_INSTANCE_MESH_BUILDER_H__ 
+#define __D_SHAPE_INSTANCE_MESH_BUILDER_H__ 
 
-#ifndef _D_COLLISION_H__
-#define _D_COLLISION_H__
+#include "ndCollisionStdafx.h"
 
-#include <dCore.h>
-#include <ndCollisionStdafx.h>
-#include <ndBody.h>
-#include <ndScene.h>
-#include <ndShape.h>
-#include <ndContact.h>
-#include <ndShapeBox.h>
-#include <ndShapeNull.h>
-#include <ndSceneNode.h>
-#include <ndSceneMixed.h>
-#include <ndConstraint.h>
-#include <ndBodyNotify.h>
-#include <ndShapeSphere.h>
-#include <ndShapeConvex.h>
-#include <ndContactList.h>
-#include <ndBodyKinematic.h>
-#include <ndContactSolver.h>
-#include <ndShapeInstance.h>
-#include <ndRayCastNotify.h>
-#include <ndContactNotify.h>
-#include <ndContactOptions.h>
-#include <ndShapeInstanceMeshBuilder.h>
+class ndShapeInstance;
+
+class ndShapeInstanceMeshBuilder : public dMeshEffect
+{
+	public:
+	D_COLLISION_API ndShapeInstanceMeshBuilder(const ndShapeInstance& instance);
+};
+
 
 #endif 
 

@@ -28,6 +28,7 @@ class ndShapeNull;
 class ndShapeSphere;
 class ndShapeConvex;
 class ndContactPoint;
+class ndShapeCompound;
 class ndRayCastNotify;
 class ndShapeDebugCallback;
 
@@ -74,6 +75,7 @@ class ndShape: public dClassAlloc
 	virtual ndShape* GetAsShape() { return this; }
 	virtual ndShapeBox* GetAsShapeBox() { return nullptr; }
 	virtual ndShapeSphere* GetAsShapeSphere() { return nullptr; }
+	virtual ndShapeCompound* GetAsShapeCompound() { return nullptr; }
 
 	virtual ndShapeNull* GetAsShapeNull() { return nullptr; }
 	virtual ndShapeConvex* GetAsShapeConvex() { return nullptr; }

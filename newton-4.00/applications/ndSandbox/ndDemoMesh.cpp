@@ -15,12 +15,7 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 
-//dInitRtti(ndDemoMeshInterface);
-//dInitRtti(ndDemoMesh);
-//dInitRtti(ndDemoBezierCurve);
-
 ndDemoMeshInterface::ndDemoMeshInterface()
-//	:dClassInfo()
 	:dRefCounter()
 	,m_name()
 	,m_isVisible(true)
@@ -239,7 +234,6 @@ ndDemoMesh::ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshN
 	OptimizeForRender ();
 }
 
-
 ndDemoMesh::ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,m_uv(nullptr)
@@ -338,7 +332,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 {
 	// create a helper mesh from the collision collision
 	//NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
-	ndMeshEffect mesh = new ndMeshEffect(shaderCache);
+	ndShapeInstanceMeshBuilder mesh (*collision);
 
 #if 0
 	// apply the vertex normals
@@ -532,7 +526,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 
 ndDemoMesh::~ndDemoMesh()
 {
-	if (m_vertex) {
+	if (m_vertex) 
+	{
 		delete[] m_vertex;
 		delete[] m_normal;
 		delete[] m_uv;

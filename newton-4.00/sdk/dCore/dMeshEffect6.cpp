@@ -1609,7 +1609,7 @@ void dMeshEffect::SphericalMapping (dInt32 material, const dgMatrix& uvAligment)
     dgPolyhedra::Iterator iter (*this);	
     for(iter.Begin(); iter; iter ++){
         dEdge* const edge = &(*iter);
-		dgAttibutFormat::dgUV uv;
+		dAttibutFormat::dgUV uv;
 		uv.m_u = dFloat32 (sphere[edge->m_incidentVertex].m_x);
 		uv.m_v = dFloat32 (sphere[edge->m_incidentVertex].m_y);
 		m_attrib.m_uv0Channel[dInt32 (edge->m_userData)] = uv;
@@ -1620,13 +1620,13 @@ void dMeshEffect::SphericalMapping (dInt32 material, const dgMatrix& uvAligment)
     for(iter.Begin(); iter; iter ++){
         dEdge* const edge = &(*iter);
         if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) {
-			dgAttibutFormat::dgUV uvRef(m_attrib.m_uv0Channel[dInt32(edge->m_userData)]);
+			dAttibutFormat::dgUV uvRef(m_attrib.m_uv0Channel[dInt32(edge->m_userData)]);
 			dFloat32 UVrefSin = dgSin(uvRef.m_v);
 			dFloat32 UVrefCos = dgCos(uvRef.m_v);
 			dEdge* ptr = edge;
 			do {
 				ptr->m_mark = mark;
-				dgAttibutFormat::dgUV uv(m_attrib.m_uv0Channel[dInt32(ptr->m_userData)]);
+				dAttibutFormat::dgUV uv(m_attrib.m_uv0Channel[dInt32(ptr->m_userData)]);
 				dFloat32 sinAngle = UVrefCos * dgSin(uv.m_v) - UVrefSin * dgCos(uv.m_v);
 				dFloat32 cosAngle = UVrefCos * dgCos(uv.m_v) + UVrefSin * dgSin(uv.m_v);
 				dFloat32 deltaAngle = dgAtan2(sinAngle, cosAngle);
@@ -1682,7 +1682,7 @@ void dMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMateria
     dgPolyhedra::Iterator iter (*this);	
     for(iter.Begin(); iter; iter ++){
         dEdge* const edge = &(*iter);
-		dgAttibutFormat::dgUV uv;
+		dAttibutFormat::dgUV uv;
 		uv.m_u = dFloat32(cylinder[edge->m_incidentVertex].m_x);
 		uv.m_v = dFloat32(cylinder[edge->m_incidentVertex].m_y);
 		m_attrib.m_uv0Channel[dInt32(edge->m_userData)] = uv;
@@ -1693,13 +1693,13 @@ void dMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMateria
     for(iter.Begin(); iter; iter ++){
         dEdge* const edge = &(*iter);
         if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) {
-			dgAttibutFormat::dgUV uvRef(m_attrib.m_uv0Channel[dInt32(edge->m_userData)]);
+			dAttibutFormat::dgUV uvRef(m_attrib.m_uv0Channel[dInt32(edge->m_userData)]);
 			dFloat32 UVrefSin = dgSin(uvRef.m_v);
 			dFloat32 UVrefCos = dgCos(uvRef.m_v);
 			dEdge* ptr = edge;
             do {
 				ptr->m_mark = mark;
-				dgAttibutFormat::dgUV uv(m_attrib.m_uv0Channel[dInt32(ptr->m_userData)]);
+				dAttibutFormat::dgUV uv(m_attrib.m_uv0Channel[dInt32(ptr->m_userData)]);
 				dFloat32 sinAngle = UVrefCos * dgSin(uv.m_v) - UVrefSin * dgCos(uv.m_v);
 				dFloat32 cosAngle = UVrefCos * dgCos(uv.m_v) + UVrefSin * dgSin(uv.m_v);
 				dFloat32 deltaAngle = dgAtan2(sinAngle, cosAngle);
@@ -1733,7 +1733,7 @@ void dMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMateria
 			if (dgAbs(normal.m_x) > dFloat32 (0.99f)) {
 				dEdge* ptr = edge;
 				do {
-					dgAttibutFormat::dgUV uv;
+					dAttibutFormat::dgUV uv;
 					//dVector p(uvAligment.RotateVector(m_points.m_vertex[ptr->m_incidentVertex] - origin));
 					dVector p(buffer[ptr->m_incidentVertex]);
 					uv.m_u = dFloat32((p.m_y - pMin.m_y) * scale.m_y);
@@ -1835,7 +1835,7 @@ void dMeshEffect::BoxMapping (dInt32 front, dInt32 side, dInt32 top, const dgMat
             }
             dEdge* ptr = edge;
             do {
-				dgAttibutFormat::dgUV uv;
+				dAttibutFormat::dgUV uv;
 				dBigVector p(scale * buffer[ptr->m_incidentVertex] - dFloat32 (0.5f));
 				uv.m_u = dFloat32 (p[u]);
 				uv.m_v = dFloat32 (p[v]);
@@ -1878,7 +1878,7 @@ void dMeshEffect::UniformBoxMapping (dInt32 material, const dgMatrix& textureMat
                     dEdge* ptr = edge;
                     do {
                         ptr->m_mark = mark;
-						dgAttibutFormat::dgUV uv;
+						dAttibutFormat::dgUV uv;
                         dVector p (textureMatrix.TransformVector(rotationMatrix.RotateVector(m_points.m_vertex[ptr->m_incidentVertex])));
                         uv.m_u = p.m_x;
                         uv.m_v = p.m_y;

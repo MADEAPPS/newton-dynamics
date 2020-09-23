@@ -31,7 +31,6 @@ void ndDemoEntityNotify::OnTranform(dInt32 threadIndex, const dMatrix& matrix)
 	dTrace(("update Transform\n"));
 }
 
-
 ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)
 	:dNodeHierarchy<ndDemoEntity>()
 	,m_matrix(matrix) 

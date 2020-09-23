@@ -43,7 +43,7 @@ class ndShapeDebugCallback
 	{
 	}
 
-	void virtual DrawPolygon(dInt32 vertexCount, const dVector* const faceArray) = 0;
+	virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray) = 0;
 
 	const ndShapeInstance* m_instance;
 };
