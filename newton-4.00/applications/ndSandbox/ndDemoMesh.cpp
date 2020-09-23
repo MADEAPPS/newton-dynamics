@@ -379,40 +379,37 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 		}
 	}
 
-	dAssert(0);
-#if 0
 
 	// extract vertex data  from the newton mesh		
-	int vertexCount = NewtonMeshGetPointCount (mesh); 
+	int vertexCount = mesh.GetPropertiesCount(); 
 	AllocVertexData(vertexCount);
-	NewtonMeshGetVertexChannel(mesh, 3 * sizeof (dFloat32), (dFloat32*)m_vertex);
-	NewtonMeshGetNormalChannel(mesh, 3 * sizeof (dFloat32), (dFloat32*)m_normal);
-	NewtonMeshGetUV0Channel(mesh, 2 * sizeof (dFloat32), (dFloat32*)m_uv);
+
+	mesh.GetVertexChannel(3 * sizeof (dFloat32), (dFloat32*)m_vertex);
+	mesh.GetNormalChannel(3 * sizeof (dFloat32), (dFloat32*)m_normal);
+	mesh.GetUV0Channel(2 * sizeof (dFloat32), (dFloat32*)m_uv);
 
 	// extract the materials index array for mesh
-	void* const geometryHandle = NewtonMeshBeginHandle (mesh); 
-	for (int handle = NewtonMeshFirstMaterial (mesh, geometryHandle); handle != -1; handle = NewtonMeshNextMaterial (mesh, geometryHandle, handle)) {
-		int material = NewtonMeshMaterialGetMaterial (mesh, geometryHandle, handle); 
-		int indexCount = NewtonMeshMaterialGetIndexCount (mesh, geometryHandle, handle); 
-
+	ndIndexArray* const geometryHandle = mesh.MaterialGeometryBegin();
+	for (int handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle)) 
+	{
+		int material = mesh.GetMaterialID (geometryHandle, handle);
+		int indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
+	
 		ndDemoSubMesh* const segment = AddSubMesh();
-
+		
 		segment->m_textureHandle = (GLuint)material;
 		segment->SetOpacity(opacity);
-
+		
 		segment->m_shader = shaderCache.m_diffuseEffect;
-
+		
 		segment->AllocIndexData (indexCount);
-		NewtonMeshMaterialGetIndexStream (mesh, geometryHandle, handle, (int*)segment->m_indexes); 
+		mesh.GetMaterialGetIndexStream(geometryHandle, handle, (int*)segment->m_indexes);
 	}
-	NewtonMeshEndHandle (mesh, geometryHandle); 
-
-	// destroy helper mesh
-	NewtonMeshDestroy(mesh);
+	//NewtonMeshEndHandle (mesh, geometryHandle); 
+	mesh.MaterialGeomteryEnd(geometryHandle);
 
 	// optimize this mesh for hardware buffers if possible
 	OptimizeForRender ();
-#endif
 }
 
 ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize)
@@ -715,10 +712,12 @@ void ndDemoMesh::OptimizeForRender()
 	ResetOptimization();
 
 	dListNode* nextNode;
-	for (dListNode* node = GetFirst(); node; node = nextNode) {
+	for (dListNode* node = GetFirst(); node; node = nextNode) 
+	{
 		ndDemoSubMesh& segment = node->GetInfo();
 		nextNode = node->GetNext();
-		if (segment.m_indexCount > 128 * 128 * 6) {
+		if (segment.m_indexCount > 128 * 128 * 6) 
+		{
 			SpliteSegment(node, 128 * 128 * 6);
 		}
 	}
@@ -726,26 +725,31 @@ void ndDemoMesh::OptimizeForRender()
 	bool isOpaque = false;
 	bool hasTranparency = false;
 
-	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+	for (dListNode* node = GetFirst(); node; node = node->GetNext()) 
+	{
 		ndDemoSubMesh& segment = node->GetInfo();
 		isOpaque |= segment.m_opacity > 0.999f;
 		hasTranparency |= segment.m_opacity <= 0.999f;
 	}
 
-	if (isOpaque) {
+	if (isOpaque) 
+	{
 		m_optimizedOpaqueDiplayList = glGenLists(1);
 
 		glNewList(m_optimizedOpaqueDiplayList, GL_COMPILE);
-		for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+		for (dListNode* node = GetFirst(); node; node = node->GetNext()) 
+		{
 			ndDemoSubMesh& segment = node->GetInfo();
-			if (segment.m_opacity > 0.999f) {
+			if (segment.m_opacity > 0.999f) 
+			{
 				segment.OptimizeForRender(this);
 			}
 		}
 		glEndList();
 	}
 
-	if (hasTranparency) {
+	if (hasTranparency) 
+	{
         m_optimizedTransparentDiplayList = glGenLists(1);
 
         glNewList(m_optimizedTransparentDiplayList, GL_COMPILE);
@@ -753,9 +757,11 @@ void ndDemoMesh::OptimizeForRender()
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		glEnable (GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
+        for (dListNode* node = GetFirst(); node; node = node->GetNext()) 
+		{
             ndDemoSubMesh& segment = node->GetInfo();
-            if (segment.m_opacity <= 0.999f) {
+            if (segment.m_opacity <= 0.999f) 
+			{
                 segment.OptimizeForRender(this);
             }
         }
@@ -767,12 +773,14 @@ void ndDemoMesh::OptimizeForRender()
 
 void  ndDemoMesh::ResetOptimization()
 {
-	if (m_optimizedOpaqueDiplayList) {
+	if (m_optimizedOpaqueDiplayList) 
+	{
 		glDeleteLists(m_optimizedOpaqueDiplayList, 1);
 		m_optimizedOpaqueDiplayList = 0;
 	}
 
-	if (m_optimizedTransparentDiplayList) {
+	if (m_optimizedTransparentDiplayList) 
+	{
 		glDeleteLists(m_optimizedTransparentDiplayList, 1);
 		m_optimizedTransparentDiplayList = 0;
 	}

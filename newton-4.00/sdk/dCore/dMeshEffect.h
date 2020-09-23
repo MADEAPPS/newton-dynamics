@@ -38,21 +38,20 @@ class dMemoryAllocator___;
 #define DG_MESH_EFFECT_POINT_SPLITED		512
 #define DG_MESH_EFFECT_BVH_STACK_DEPTH		256
 
-//class dMeshEffect: public dPolyhedra, public dgRefCounter
-class dMeshEffect : public dPolyhedra
+class ndIndexArray
+{
+	public:
+	dInt32 m_materialCount;
+	dInt32 m_indexCount;
+	dInt32 m_materials[256];
+	dInt32 m_materialsIndexCount[256];
+	dInt32* m_indexList;
+};
+
+class dMeshEffect: public dPolyhedra
 {
 #if 0
 	public:
-	class dgIndexArray 
-	{
-		public:
-		dInt32 m_materialCount;
-		dInt32 m_indexCount;
-		dInt32 m_materials[256];
-		dInt32 m_materialsIndexCount[256];
-		dInt32* m_indexList;
-	};
-
 	class dMeshBVH
 	{
 		public:
@@ -179,8 +178,6 @@ class dMeshEffect : public dPolyhedra
 
 	void OptimizePoints();
 	void OptimizeAttibutes();
-
-	dInt32 GetPropertiesCount() const;
 	const dInt32* GetIndexToVertexMap() const;
 
 	bool HasLayersChannel() const;
@@ -189,25 +186,6 @@ class dMeshEffect : public dPolyhedra
 	bool HasUV0Channel() const;
 	bool HasUV1Channel() const;
 	bool HasVertexColorChannel() const;
-	
-	void GetVertexChannel64(dInt32 strideInByte, dFloat64* const bufferOut) const;
-	void GetVertexChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
-	void GetNormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
-	void GetBinormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
-	void GetUV0Channel(dInt32 strideInByte, dFloat32* const bufferOut) const;
-	void GetUV1Channel(dInt32 strideInByte, dFloat32* const bufferOut) const;
-	void GetVertexColorChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
-//	void GetWeightBlendChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
-//	void GetWeightIndexChannel(dInt32 strideInByte, dInt32* const bufferOut) const;
-
-	dgIndexArray* MaterialGeometryBegin();
-	void MaterialGeomteryEnd(dgIndexArray* const handle);
-	dInt32 GetFirstMaterial (dgIndexArray* const handle) const;
-	dInt32 GetNextMaterial (dgIndexArray* const handle, dInt32 materialHandle) const;
-	dInt32 GetMaterialID (dgIndexArray* const handle, dInt32 materialHandle) const;
-	dInt32 GetMaterialIndexCount (dgIndexArray* const handle, dInt32 materialHandle) const;
-	void GetMaterialGetIndexStream (dgIndexArray* const handle, dInt32 materialHandle, dInt32* const index) const;
-	void GetMaterialGetIndexStreamShort (dgIndexArray* const handle, dInt32 materialHandle, dgInt16* const index) const;
 	
 	dgCollisionInstance* CreateCollisionTree(dgWorld* const world, dInt32 shapeID) const;
 	dgCollisionInstance* CreateConvexCollision(dgWorld* const world, dFloat64 tolerance, dInt32 shapeID, const dMatrix& matrix = dgGetIdentityMatrix()) const;
@@ -457,6 +435,26 @@ class dMeshEffect : public dPolyhedra
 	D_CORE_API void CalculateNormals(dFloat64 angleInRadians);
 	D_CORE_API void BuildFromIndexList(const dMeshVertexFormat* const format);
 
+	dInt32 GetPropertiesCount() const;
+	D_CORE_API void GetVertexChannel64(dInt32 strideInByte, dFloat64* const bufferOut) const;
+	D_CORE_API void GetVertexChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
+	D_CORE_API void GetNormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
+	D_CORE_API void GetBinormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
+	D_CORE_API void GetUV0Channel(dInt32 strideInByte, dFloat32* const bufferOut) const;
+	D_CORE_API void GetUV1Channel(dInt32 strideInByte, dFloat32* const bufferOut) const;
+	D_CORE_API void GetVertexColorChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
+	//	void GetWeightBlendChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
+	//	void GetWeightIndexChannel(dInt32 strideInByte, dInt32* const bufferOut) const;
+
+	D_CORE_API ndIndexArray* MaterialGeometryBegin();
+		D_CORE_API dInt32 GetFirstMaterial(ndIndexArray* const handle) const;
+		D_CORE_API dInt32 GetNextMaterial(ndIndexArray* const handle, dInt32 materialHandle) const;
+		D_CORE_API dInt32 GetMaterialID(ndIndexArray* const handle, dInt32 materialHandle) const;
+		D_CORE_API dInt32 GetMaterialIndexCount(ndIndexArray* const handle, dInt32 materialHandle) const;
+		D_CORE_API void GetMaterialGetIndexStream(ndIndexArray* const handle, dInt32 materialHandle, dInt32* const index) const;
+		D_CORE_API void GetMaterialGetIndexStreamShort(ndIndexArray* const handle, dInt32 materialHandle, dInt16* const index) const;
+	D_CORE_API void MaterialGeomteryEnd(ndIndexArray* const handle);
+
 	D_CORE_API void BeginBuild();
 	//	D_CORE_API void BeginBuildFace();
 	//		D_CORE_API void AddPoint(dFloat64 x, dFloat64 y, dFloat64 z);
@@ -507,24 +505,10 @@ inline void dMeshEffect::SetVertexBaseCount(dInt32 count)
 	m_vertexBaseCount = count;
 }
 
-inline dInt32 dMeshEffect::GetPropertiesCount() const
-{
-	return m_attrib.m_pointChannel.m_count;
-}
 
 inline const dInt32* dMeshEffect::GetIndexToVertexMap() const
 {
 	return &m_attrib.m_pointChannel[0];
-}
-
-inline dInt32 dMeshEffect::GetMaterialID (dgIndexArray* const handle, dInt32 materialHandle) const
-{
-	return handle->m_materials[materialHandle];
-}
-
-inline dInt32 dMeshEffect::GetMaterialIndexCount (dgIndexArray* const handle, dInt32 materialHandle) const
-{
-	return handle->m_materialsIndexCount[materialHandle];
 }
 
 inline dBigVector dMeshEffect::GetVertex (dInt32 index) const
@@ -692,6 +676,11 @@ inline void dMeshEffect::dAttibutFormat::SetCount(dInt32 count)
 	m_colorChannel.SetCount(count);
 	m_uv0Channel.SetCount(count);
 	m_uv1Channel.SetCount(count);
+}
+
+inline dInt32 dMeshEffect::GetPropertiesCount() const
+{
+	return m_attrib.m_pointChannel.GetCount();
 }
 
 

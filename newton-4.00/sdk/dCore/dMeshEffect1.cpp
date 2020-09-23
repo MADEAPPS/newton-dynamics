@@ -1981,12 +1981,12 @@ dInt32 GetTotalFaceCount() const;
 	dInt32 materialCount;
 	dInt32 materials[256];
 	dInt32 streamIndexMap[256];
-	dgIndexArray* array;
+	ndIndexArray* array;
 
 	count = 0;
 	materialCount = 0;
 
-	array = (dgIndexArray*) GetAllocator()->MallocLow (4 * sizeof (dInt32) * GetCount() + sizeof (dgIndexArray) + 2048);
+	array = (ndIndexArray*) GetAllocator()->MallocLow (4 * sizeof (dInt32) * GetCount() + sizeof (ndIndexArray) + 2048);
 	array->m_indexList = (dInt32*)&array[1];
 
 	mark = IncLRU();
@@ -2057,30 +2057,6 @@ bool dMeshEffect::HasVertexColorChannel() const
 	return m_attrib.m_colorChannel.m_count != 0;
 }
 
-void dMeshEffect::GetVertexChannel64(dInt32 strideInByte, dFloat64* const bufferOut) const
-{
-	dInt32 stride = strideInByte / sizeof (dFloat64);
-	for (dInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i ++)	{
-		const dInt32 j = i * stride;
-		const dInt32 index = m_attrib.m_pointChannel[i];
-		bufferOut[j + 0] = m_points.m_vertex[index].m_x;
-		bufferOut[j + 1] = m_points.m_vertex[index].m_y;
-		bufferOut[j + 2] = m_points.m_vertex[index].m_z;
-	}
-}
-
-void dMeshEffect::GetVertexChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
-{
-	dInt32 stride = strideInByte / sizeof (dFloat32);
-	for (dInt32 i = 0; i < m_attrib.m_pointChannel.m_count; i++) {
-		const dInt32 j = i * stride;
-		const dInt32 index = m_attrib.m_pointChannel[i];
-		const dBigVector& p = m_points.m_vertex[index];
-		bufferOut[j + 0] = dFloat32(p.m_x);
-		bufferOut[j + 1] = dFloat32(p.m_y);
-		bufferOut[j + 2] = dFloat32(p.m_z);
-	}
-}
 
 /*
 void dMeshEffect::GetWeightBlendChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
@@ -2115,171 +2091,6 @@ void dMeshEffect::GetWeightIndexChannel(dInt32 strideInByte, dInt32* const buffe
 }
 */
 
-void dMeshEffect::GetNormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
-{
-	dInt32 stride = strideInByte / sizeof (dFloat32);
-	for (dInt32 i = 0; i < m_attrib.m_normalChannel.m_count; i++) {
-		const dInt32 j = i * stride;
-		bufferOut[j + 0] = dFloat32(m_attrib.m_normalChannel[i].m_x);
-		bufferOut[j + 1] = dFloat32(m_attrib.m_normalChannel[i].m_y);
-		bufferOut[j + 2] = dFloat32(m_attrib.m_normalChannel[i].m_z);
-	}
-}
-
-void dMeshEffect::GetBinormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
-{
-	dInt32 stride = strideInByte / sizeof (dFloat32);
-	for (dInt32 i = 0; i < m_attrib.m_binormalChannel.m_count; i++) {
-		const dInt32 j = i * stride;
-		bufferOut[j + 0] = dFloat32(m_attrib.m_binormalChannel[i].m_x);
-		bufferOut[j + 1] = dFloat32(m_attrib.m_binormalChannel[i].m_y);
-		bufferOut[j + 2] = dFloat32(m_attrib.m_binormalChannel[i].m_z);
-	}
-}
-
-void dMeshEffect::GetUV0Channel(dInt32 strideInByte, dFloat32* const bufferOut) const
-{
-	dInt32 stride = strideInByte / sizeof (dFloat32);
-	for (dInt32 i = 0; i < m_attrib.m_uv0Channel.m_count; i++) {
-		const dInt32 j = i * stride;
-		bufferOut[j + 0] = dFloat32(m_attrib.m_uv0Channel[i].m_u);
-		bufferOut[j + 1] = dFloat32(m_attrib.m_uv0Channel[i].m_v);
-	}
-}
-
-void dMeshEffect::GetUV1Channel(dInt32 strideInByte, dFloat32* const bufferOut) const
-{
-	dInt32 stride = strideInByte / sizeof (dFloat32);
-	for (dInt32 i = 0; i < m_attrib.m_uv1Channel.m_count; i++) {
-		const dInt32 j = i * stride;
-		bufferOut[j + 0] = dFloat32(m_attrib.m_uv1Channel[i].m_u);
-		bufferOut[j + 1] = dFloat32(m_attrib.m_uv1Channel[i].m_v);
-	}
-}
-
-void dMeshEffect::GetVertexColorChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
-{
-	dInt32 stride = strideInByte / sizeof (dFloat32);
-	for (dInt32 i = 0; i < m_attrib.m_colorChannel.m_count; i++) {
-		const dInt32 j = i * stride;
-		bufferOut[j + 0] = dFloat32(m_attrib.m_colorChannel[i].m_x);
-		bufferOut[j + 1] = dFloat32(m_attrib.m_colorChannel[i].m_y);
-		bufferOut[j + 2] = dFloat32(m_attrib.m_colorChannel[i].m_z);
-		bufferOut[j + 3] = dFloat32(m_attrib.m_colorChannel[i].m_w);
-	}
-}
-
-dMeshEffect::dgIndexArray* dMeshEffect::MaterialGeometryBegin()
-{
-	dInt32 materials[256];
-	dInt32 streamIndexMap[256];
-
-	dInt32 count = 0;
-	dInt32 materialCount = 0;
-	
-	dgIndexArray* const array = (dgIndexArray*) GetAllocator()->MallocLow (dInt32 (4 * sizeof (dInt32) * GetCount() + sizeof (dgIndexArray) + 2048));
-	array->m_indexList = (dInt32*)&array[1];
-	
-	dInt32 mark = IncLRU();
-	dPolyhedra::Iterator iter (*this);	
-	memset(streamIndexMap, 0, sizeof (streamIndexMap));
-	for(iter.Begin(); iter; iter ++){
-		dEdge* const edge = &(*iter);
-		if ((edge->m_incidentFace >= 0) && (edge->m_mark != mark)) {
-			dEdge* ptr = edge;
-			ptr->m_mark = mark;
-			dInt32 index0 = dInt32 (ptr->m_userData);
-
-			ptr = ptr->m_next;
-			ptr->m_mark = mark;
-			dInt32 index1 = dInt32 (ptr->m_userData);
-
-			ptr = ptr->m_next;
-			do {
-				ptr->m_mark = mark;
-
-				array->m_indexList[count * 4 + 0] = index0;
-				array->m_indexList[count * 4 + 1] = index1;
-				array->m_indexList[count * 4 + 2] = dInt32 (ptr->m_userData);
-				array->m_indexList[count * 4 + 3] = m_attrib.m_materialChannel.m_count ? dInt32 (m_attrib.m_materialChannel[dInt32 (edge->m_userData)]) : 0;
-				index1 = dInt32 (ptr->m_userData);
-
-				dInt32 hashValue = array->m_indexList[count * 4 + 3] & 0xff;
-				streamIndexMap[hashValue] ++;
-				materials[hashValue] = array->m_indexList[count * 4 + 3];
-				count ++;
-
-				ptr = ptr->m_next;
-			} while (ptr != edge);
-		}
-	}
-
-	array->m_indexCount = count;
-	array->m_materialCount = materialCount;
-
-	count = 0;
-	for (dInt32 i = 0; i < 256;i ++) {
-		if (streamIndexMap[i]) {
-			array->m_materials[count] = materials[i];
-			array->m_materialsIndexCount[count] = streamIndexMap[i] * 3;
-			count ++;
-		}
-	}
-
-	array->m_materialCount = count;
-
-	return array;
-}
-
-void dMeshEffect::MaterialGeomteryEnd(dgIndexArray* const handle)
-{
-	GetAllocator()->FreeLow (handle);
-}
-
-
-dInt32 dMeshEffect::GetFirstMaterial (dgIndexArray* const handle) const
-{
-	return GetNextMaterial (handle, -1);
-}
-
-dInt32 dMeshEffect::GetNextMaterial (dgIndexArray* const handle, dInt32 materialId) const
-{
-	materialId ++;
-	if(materialId >= handle->m_materialCount) {
-		materialId = -1;
-	}
-	return materialId;
-}
-
-void dMeshEffect::GetMaterialGetIndexStream (dgIndexArray* const handle, dInt32 materialHandle, dInt32* const indexArray) const
-{
-
-	dInt32 index = 0;
-	dInt32 textureID = handle->m_materials[materialHandle];
-	for (dInt32 j = 0; j < handle->m_indexCount; j ++) {
-		if (handle->m_indexList[j * 4 + 3] == textureID) {
-			indexArray[index + 0] = handle->m_indexList[j * 4 + 0];
-			indexArray[index + 1] = handle->m_indexList[j * 4 + 1];
-			indexArray[index + 2] = handle->m_indexList[j * 4 + 2];
-
-			index += 3;
-		}
-	}
-}
-
-void dMeshEffect::GetMaterialGetIndexStreamShort (dgIndexArray* const handle, dInt32 materialHandle, dgInt16* const indexArray) const
-{
-	dInt32 index = 0;
-	dInt32 textureID = handle->m_materials[materialHandle];
-	for (dInt32 j = 0; j < handle->m_indexCount; j ++) {
-		if (handle->m_indexList[j * 4 + 3] == textureID) {
-			indexArray[index + 0] = (dgInt16)handle->m_indexList[j * 4 + 0];
-			indexArray[index + 1] = (dgInt16)handle->m_indexList[j * 4 + 1];
-			indexArray[index + 2] = (dgInt16)handle->m_indexList[j * 4 + 2];
-			index += 3;
-		}
-	}
-}
 
 dgCollisionInstance* dMeshEffect::CreateCollisionTree(dgWorld* const world, dInt32 shapeID) const
 {
@@ -4124,4 +3935,219 @@ void dMeshEffect::RepairTJoints()
 	*/
 
 	dAssert(Sanity());
+}
+
+
+void dMeshEffect::GetVertexChannel64(dInt32 strideInByte, dFloat64* const bufferOut) const
+{
+	dInt32 stride = strideInByte / sizeof(dFloat64);
+	for (dInt32 i = 0; i < m_attrib.m_pointChannel.GetCount(); i++) 
+	{
+		const dInt32 j = i * stride;
+		const dInt32 index = m_attrib.m_pointChannel[i];
+		bufferOut[j + 0] = m_points.m_vertex[index].m_x;
+		bufferOut[j + 1] = m_points.m_vertex[index].m_y;
+		bufferOut[j + 2] = m_points.m_vertex[index].m_z;
+	}
+}
+
+void dMeshEffect::GetVertexChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
+{
+	dInt32 stride = strideInByte / sizeof(dFloat32);
+	for (dInt32 i = 0; i < m_attrib.m_pointChannel.GetCount(); i++) 
+	{
+		const dInt32 j = i * stride;
+		const dInt32 index = m_attrib.m_pointChannel[i];
+		const dBigVector& p = m_points.m_vertex[index];
+		bufferOut[j + 0] = dFloat32(p.m_x);
+		bufferOut[j + 1] = dFloat32(p.m_y);
+		bufferOut[j + 2] = dFloat32(p.m_z);
+	}
+}
+
+void dMeshEffect::GetNormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
+{
+	dInt32 stride = strideInByte / sizeof(dFloat32);
+	for (dInt32 i = 0; i < m_attrib.m_normalChannel.GetCount(); i++) 
+	{
+		const dInt32 j = i * stride;
+		bufferOut[j + 0] = dFloat32(m_attrib.m_normalChannel[i].m_x);
+		bufferOut[j + 1] = dFloat32(m_attrib.m_normalChannel[i].m_y);
+		bufferOut[j + 2] = dFloat32(m_attrib.m_normalChannel[i].m_z);
+	}
+}
+
+void dMeshEffect::GetBinormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
+{
+	dInt32 stride = strideInByte / sizeof(dFloat32);
+	for (dInt32 i = 0; i < m_attrib.m_binormalChannel.GetCount(); i++) 
+	{
+		const dInt32 j = i * stride;
+		bufferOut[j + 0] = dFloat32(m_attrib.m_binormalChannel[i].m_x);
+		bufferOut[j + 1] = dFloat32(m_attrib.m_binormalChannel[i].m_y);
+		bufferOut[j + 2] = dFloat32(m_attrib.m_binormalChannel[i].m_z);
+	}
+}
+
+void dMeshEffect::GetUV0Channel(dInt32 strideInByte, dFloat32* const bufferOut) const
+{
+	dInt32 stride = strideInByte / sizeof(dFloat32);
+	for (dInt32 i = 0; i < m_attrib.m_uv0Channel.GetCount(); i++) 
+	{
+		const dInt32 j = i * stride;
+		bufferOut[j + 0] = dFloat32(m_attrib.m_uv0Channel[i].m_u);
+		bufferOut[j + 1] = dFloat32(m_attrib.m_uv0Channel[i].m_v);
+	}
+}
+
+void dMeshEffect::GetUV1Channel(dInt32 strideInByte, dFloat32* const bufferOut) const
+{
+	dInt32 stride = strideInByte / sizeof(dFloat32);
+	for (dInt32 i = 0; i < m_attrib.m_uv1Channel.GetCount(); i++) 
+	{
+		const dInt32 j = i * stride;
+		bufferOut[j + 0] = dFloat32(m_attrib.m_uv1Channel[i].m_u);
+		bufferOut[j + 1] = dFloat32(m_attrib.m_uv1Channel[i].m_v);
+	}
+}
+
+void dMeshEffect::GetVertexColorChannel(dInt32 strideInByte, dFloat32* const bufferOut) const
+{
+	dInt32 stride = strideInByte / sizeof(dFloat32);
+	for (dInt32 i = 0; i < m_attrib.m_colorChannel.GetCount(); i++) 
+	{
+		const dInt32 j = i * stride;
+		bufferOut[j + 0] = dFloat32(m_attrib.m_colorChannel[i].m_x);
+		bufferOut[j + 1] = dFloat32(m_attrib.m_colorChannel[i].m_y);
+		bufferOut[j + 2] = dFloat32(m_attrib.m_colorChannel[i].m_z);
+		bufferOut[j + 3] = dFloat32(m_attrib.m_colorChannel[i].m_w);
+	}
+}
+
+ndIndexArray* dMeshEffect::MaterialGeometryBegin()
+{
+	dInt32 materials[256];
+	dInt32 streamIndexMap[256];
+
+	dInt32 count = 0;
+	dInt32 materialCount = 0;
+
+	ndIndexArray* const array = (ndIndexArray*)dMemory::Malloc(dInt32(4 * sizeof(dInt32) * GetCount() + sizeof(ndIndexArray) + 2048));
+	array->m_indexList = (dInt32*)&array[1];
+
+	dInt32 mark = IncLRU();
+	dPolyhedra::Iterator iter(*this);
+	memset(streamIndexMap, 0, sizeof(streamIndexMap));
+	for (iter.Begin(); iter; iter++) 
+	{
+		dEdge* const edge = &(*iter);
+		if ((edge->m_incidentFace >= 0) && (edge->m_mark != mark)) 
+		{
+			dEdge* ptr = edge;
+			ptr->m_mark = mark;
+			dInt32 index0 = dInt32(ptr->m_userData);
+
+			ptr = ptr->m_next;
+			ptr->m_mark = mark;
+			dInt32 index1 = dInt32(ptr->m_userData);
+
+			ptr = ptr->m_next;
+			do 
+			{
+				ptr->m_mark = mark;
+
+				array->m_indexList[count * 4 + 0] = index0;
+				array->m_indexList[count * 4 + 1] = index1;
+				array->m_indexList[count * 4 + 2] = dInt32(ptr->m_userData);
+				array->m_indexList[count * 4 + 3] = m_attrib.m_materialChannel.m_isValid ? dInt32(m_attrib.m_materialChannel[dInt32(edge->m_userData)]) : 0;
+				index1 = dInt32(ptr->m_userData);
+
+				dInt32 hashValue = array->m_indexList[count * 4 + 3] & 0xff;
+				streamIndexMap[hashValue] ++;
+				materials[hashValue] = array->m_indexList[count * 4 + 3];
+				count++;
+
+				ptr = ptr->m_next;
+			} while (ptr != edge);
+		}
+	}
+
+	array->m_indexCount = count;
+	array->m_materialCount = materialCount;
+
+	count = 0;
+	for (dInt32 i = 0; i < 256; i++) 
+	{
+		if (streamIndexMap[i]) 
+		{
+			array->m_materials[count] = materials[i];
+			array->m_materialsIndexCount[count] = streamIndexMap[i] * 3;
+			count++;
+		}
+	}
+
+	array->m_materialCount = count;
+	return array;
+}
+
+void dMeshEffect::MaterialGeomteryEnd(ndIndexArray* const handle)
+{
+	dMemory::Free(handle);
+}
+
+dInt32 dMeshEffect::GetFirstMaterial(ndIndexArray* const handle) const
+{
+	return GetNextMaterial(handle, -1);
+}
+
+dInt32 dMeshEffect::GetNextMaterial(ndIndexArray* const handle, dInt32 materialId) const
+{
+	materialId++;
+	if (materialId >= handle->m_materialCount) 
+	{
+		materialId = -1;
+	}
+	return materialId;
+}
+
+dInt32 dMeshEffect::GetMaterialID(ndIndexArray* const handle, dInt32 materialHandle) const
+{
+	return handle->m_materials[materialHandle];
+}
+
+dInt32 dMeshEffect::GetMaterialIndexCount(ndIndexArray* const handle, dInt32 materialHandle) const
+{
+	return handle->m_materialsIndexCount[materialHandle];
+}
+
+void dMeshEffect::GetMaterialGetIndexStream(ndIndexArray* const handle, dInt32 materialHandle, dInt32* const indexArray) const
+{
+	dInt32 index = 0;
+	dInt32 textureID = handle->m_materials[materialHandle];
+	for (dInt32 j = 0; j < handle->m_indexCount; j++) 
+	{
+		if (handle->m_indexList[j * 4 + 3] == textureID) 
+		{
+			indexArray[index + 0] = handle->m_indexList[j * 4 + 0];
+			indexArray[index + 1] = handle->m_indexList[j * 4 + 1];
+			indexArray[index + 2] = handle->m_indexList[j * 4 + 2];
+			index += 3;
+		}
+	}
+}
+
+void dMeshEffect::GetMaterialGetIndexStreamShort(ndIndexArray* const handle, dInt32 materialHandle, dInt16* const indexArray) const
+{
+	dInt32 index = 0;
+	dInt32 textureID = handle->m_materials[materialHandle];
+	for (dInt32 j = 0; j < handle->m_indexCount; j++) 
+	{
+		if (handle->m_indexList[j * 4 + 3] == textureID) 
+		{
+			indexArray[index + 0] = (dInt16)handle->m_indexList[j * 4 + 0];
+			indexArray[index + 1] = (dInt16)handle->m_indexList[j * 4 + 1];
+			indexArray[index + 2] = (dInt16)handle->m_indexList[j * 4 + 2];
+			index += 3;
+		}
+	}
 }
