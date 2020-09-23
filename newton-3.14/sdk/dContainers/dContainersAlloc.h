@@ -54,7 +54,7 @@ class dContainerNodeAllocator
 	{
 	}
 
-	virtual ~DCONTAINERS_API dContainerNodeAllocator()
+	virtual ~dContainerNodeAllocator()
 	{
 	}
 
@@ -84,7 +84,7 @@ class dContainerFreeListAllocator: public dContainerNodeAllocator
 	{
 	}
 
-	virtual ~DCONTAINERS_API dContainerFreeListAllocator()
+	virtual ~dContainerFreeListAllocator()
 	{
 		Flush();
 	}
