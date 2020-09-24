@@ -199,7 +199,6 @@ void ndShapeSphere::TesselateTriangle(dInt32 level, const dVector& p0, const dVe
 
 void ndShapeSphere::Init(dFloat32 radius)
 {
-	//m_rtti |= ndShapeSphere_RTTI;
 	m_radius = dMax(dAbs(radius), D_MIN_CONVEX_SHAPE_SIZE);
 	
 	m_edgeCount = D_SPHERE_EDGE_COUNT;
@@ -344,4 +343,37 @@ ndShapeInfo ndShapeSphere::GetShapeInfo() const
 	ndShapeInfo info(ndShapeConvex::GetShapeInfo());
 	info.m_sphere.m_radius = m_radius;
 	return info;
+}
+
+void ndShapeSphere::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+{
+	dVector tmpVectex[1024 * 2];
+
+	dVector p0(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+	dVector p1(-dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+	dVector p2(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
+	dVector p3(dFloat32(0.0f), -dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
+	dVector p4(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f));
+	dVector p5(dFloat32(0.0f), dFloat32(0.0f), -dFloat32(1.0f), dFloat32(0.0f));
+
+	dInt32 index = 3;
+	dInt32 count = 0;
+	TesselateTriangle(index, p4, p0, p2, count, tmpVectex);
+	TesselateTriangle(index, p4, p2, p1, count, tmpVectex);
+	TesselateTriangle(index, p4, p1, p3, count, tmpVectex);
+	TesselateTriangle(index, p4, p3, p0, count, tmpVectex);
+	TesselateTriangle(index, p5, p2, p0, count, tmpVectex);
+	TesselateTriangle(index, p5, p1, p2, count, tmpVectex);
+	TesselateTriangle(index, p5, p3, p1, count, tmpVectex);
+	TesselateTriangle(index, p5, p0, p3, count, tmpVectex);
+
+	for (dInt32 i = 0; i < count; i++) 
+	{
+		tmpVectex[i] = matrix.TransformVector(tmpVectex[i].Scale(m_radius)) & dVector::m_triplexMask;
+	}
+
+	for (dInt32 i = 0; i < count; i += 3) 
+	{
+		debugCallback.DrawPolygon(3, &tmpVectex[i]);
+	}
 }

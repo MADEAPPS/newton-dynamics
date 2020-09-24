@@ -18,7 +18,7 @@ class ndDemoEntity;
 class ndShaderPrograms;
 class ndDemoMeshInterface;
 
-class ndDemoEntityNotify : public ndBodyNotify
+class ndDemoEntityNotify: public ndBodyNotify
 {
 	public:
 	ndDemoEntityNotify(ndDemoEntity* const entity)

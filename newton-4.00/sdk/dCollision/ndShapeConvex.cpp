@@ -24,13 +24,6 @@
 #include "ndShapeNull.h"
 #include "ndContactSolver.h"
 
-
-//#include "dShapeMesh.h"
-//#include "ndShapeConvex.h"
-//#include "dShapeInstance.h"
-//#include "ndShapeConvexHull.h"
-//#include "ndShapeConvexPolygon.h"
-
 #define D_MAX_MIN_VOLUME				dFloat32 (1.0e-6f)
 #define D_MAX_VERTEX_CLIP_FACE			16
 
@@ -47,8 +40,6 @@ ndShapeConvex::ndShapeConvex (dgWorld* const world, dgDeserialize deserializatio
 {
 	dAssert (m_rtti | ndShapeConvexShape_RTTI);
 }
-
-
 
 void ndShapeConvex::SerializeLow(dgSerialize callback, void* const userData) const
 {
@@ -643,7 +634,6 @@ return 0;
 	//instance.m_material.m_userData = nullptr;
 	//return rayCaster.RayCast(localP0, localP1, maxT, contactOut);
 }
-
 
 dVector ndShapeConvex::SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
 {
