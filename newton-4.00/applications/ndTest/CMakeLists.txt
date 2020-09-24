@@ -32,7 +32,12 @@ if (NEWTON_BUILD_PROFILER)
 endif ()
 
 add_executable(${projectName} ${CPP_SOURCE})
-target_link_libraries (${projectName} ndCore ndCollision ndNewton)
+
+if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
+	target_link_libraries (${projectName} ndCore ndCollision ndNewton)
+else()
+	target_link_libraries (${projectName} ndNewton)
+endif()
 
 if (NEWTON_BUILD_PROFILER)
     target_link_libraries (${projectName} dProfiler)

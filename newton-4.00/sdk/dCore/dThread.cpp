@@ -31,8 +31,11 @@ dThread::dThread()
 	,std::thread(&dThread::ThreadFunctionCallback, this)
 #endif
 {
-	strcpy (m_name, "thread");
-	store(false);
+	strcpy (m_name, "newtonWorker");
+	while (load())
+	{
+		std::this_thread::yield();
+	}
 }
 
 dThread::~dThread()
@@ -68,6 +71,8 @@ void dThread::SetName(const char* const name)
 	{
 	}
 #endif
+
+	D_SET_TRACK_NAME(m_name);
 }
 
 void dThread::Finish()
@@ -92,13 +97,9 @@ void dThread::ThreadFunctionCallback()
 #ifndef D_USE_THREAD_EMULATION
 
 	// wait until constructor was fully initialized.
-	while (load())
-	{
-		std::this_thread::yield();
-	}
 
+	store(false);
 	D_SET_TRACK_NAME(m_name);
-   	
 	dFloatExceptions exception;
 
 	while (!Wait())
