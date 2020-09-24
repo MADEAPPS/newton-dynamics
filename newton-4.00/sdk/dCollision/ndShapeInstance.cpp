@@ -474,11 +474,6 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 
 ndShapeInstance::~ndShapeInstance()
 {
-//	if (m_world->m_onCollisionInstanceDestruction && m_isExternal) {
-//		m_world->m_onCollisionInstanceDestruction(m_world, this);
-//	}
-//	dgWorld* const world = (dgWorld*)m_world;
-//	world->ReleaseCollision(m_shape);
 	m_shape->Release();
 }
 
@@ -549,7 +544,7 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				t = m_shape->RayCast(callback, localP0, localP1, maxT, body, contactOut);
 				if (t <= maxT) 
 				{
-					dAssert(((ndShape*)m_shape)->GetAsShapeBox());
+					dAssert(((ndShape*)m_shape)->GetAsShapeBox() || ((ndShape*)m_shape)->GetAsShapeSphere());
 				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
 				//	{
 				//		contactOut.m_shapeId0 = GetUserDataID();

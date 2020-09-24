@@ -373,7 +373,7 @@ dInt32 ndShapeConvex::BuildCylinderCapPoly (dFloat32 radius, const dMatrix& tran
 
 	dFloat32 angle = dPI2 / count;
 	dVector r (dFloat32 (0.0f), dFloat32 (0.0f), radius, dFloat32 (0.0f));
-	dMatrix rotation (dgPitchMatrix(angle));
+	dMatrix rotation (dPitchMatrix(angle));
 
 	for (dInt32 i = 0; i < count; i++) {
 		vertexOut[i] = transform.TransformVector(r); 

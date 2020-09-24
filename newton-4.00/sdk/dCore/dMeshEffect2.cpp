@@ -169,9 +169,9 @@ class dgTetraIsoSufaceStuffing
 		void TessellateTriangle(dInt32 level, const dVector& p0, const dVector& p1, const dVector& p2, dInt32& count)
 		{
 			if (level) {
-				dAssert(dgAbs(p0.DotProduct(p0).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
-				dAssert(dgAbs(p1.DotProduct(p1).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
-				dAssert(dgAbs(p2.DotProduct(p2).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
+				dAssert(dAbs(p0.DotProduct(p0).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
+				dAssert(dAbs(p1.DotProduct(p1).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
+				dAssert(dAbs(p2.DotProduct(p2).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
 				dVector p01(p0 + p1);
 				dVector p12(p1 + p2);
 				dVector p20(p2 + p0);
@@ -180,9 +180,9 @@ class dgTetraIsoSufaceStuffing
 				p12 = p12.Scale(dgRsqrt(p12.DotProduct(p12).GetScalar()));
 				p20 = p20.Scale(dgRsqrt(p20.DotProduct(p20).GetScalar()));
 
-				dAssert(dgAbs(p01.DotProduct(p01).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
-				dAssert(dgAbs(p12.DotProduct(p12).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
-				dAssert(dgAbs(p20.DotProduct(p20).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
+				dAssert(dAbs(p01.DotProduct(p01).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
+				dAssert(dAbs(p12.DotProduct(p12).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
+				dAssert(dAbs(p20.DotProduct(p20).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-4f));
 
 				TessellateTriangle(level - 1, p0, p01, p20, count);
 				TessellateTriangle(level - 1, p1, p12, p01, count);
@@ -370,7 +370,7 @@ class dgTetraIsoSufaceStuffing
 
 			const dFloat64 det = a00 * a11 - a01 * a01;
 			dAssert(det >= dFloat32(0.0f));
-			if (dgAbs(det) > dFloat32(1.0e-24f)) {
+			if (dAbs(det) > dFloat32(1.0e-24f)) {
 				dBigVector p0Point(point0 - p0);
 				dBigVector normal(e10.CrossProduct(e20));
 				dFloat64 t = -normal.DotProduct3(p0Point) / normal.DotProduct3(point1 - point0);
@@ -412,7 +412,7 @@ class dgTetraIsoSufaceStuffing
 
 			const dFloat64 det = a00 * a11 - a01 * a01;
 			dAssert(det >= dFloat32(0.0f));
-			if (dgAbs(det) > dFloat32(1.0e-24f)) {
+			if (dAbs(det) > dFloat32(1.0e-24f)) {
 				dBigVector p0Point(point0 - p0);
 				dBigVector normal(e10.CrossProduct(e20));
 				dFloat64 t = -normal.DotProduct3(p0Point) / normal.DotProduct3(point1 - point0);
@@ -881,7 +881,7 @@ void dMeshEffect::LoadOffMesh(const char* const fileName)
 					vertexFormat.m_vertex.m_indexList = &indexList[0];
 					BuildFromIndexList(&vertexFormat);
 
-					CalculateNormals(30.0f * dgDegreeToRad);
+					CalculateNormals(30.0f * dDegreeToRad);
 					stillData = false;
 					break;
 				}
@@ -926,7 +926,7 @@ void dMeshEffect::LoadTetraMesh (const char* const filename)
 			dMeshEffect convexMesh(allocator, &pointArray[0].m_x, 4, sizeof (dBigVector), dFloat64(0.0f));
 
 			dAssert(convexMesh.GetCount());
-			convexMesh.CalculateNormals(dFloat32(30.0f * dgDegreeToRad));
+			convexMesh.CalculateNormals(dFloat32(30.0f * dDegreeToRad));
 			for (dInt32 i = 0; i < convexMesh.m_points.m_vertex.m_count; i++) {
 				convexMesh.m_points.m_layers[i] = layers;
 			}
@@ -1019,7 +1019,7 @@ dMeshEffect* dMeshEffect::CreateVoronoiConvexDecomposition (dgMemoryAllocator* c
 		index ++;
 	}
 
-	const dFloat32 normalAngleInRadians = dFloat32 (30.0f * dgDegreeToRad);
+	const dFloat32 normalAngleInRadians = dFloat32 (30.0f * dDegreeToRad);
 	dMeshEffect* const voronoiPartition = new (allocator) dMeshEffect (allocator);
 	voronoiPartition->BeginBuild();
 	dInt32 layer = 0;

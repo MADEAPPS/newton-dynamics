@@ -31,10 +31,14 @@ class ndTextureCache: public dTree<ndTextureEntry, dUnsigned64>
 		GLuint texID = 0;
 		dAssert (texName);
 
-		ndTextureEntry entry;
-		entry.m_textureName = texName;
-		entry.m_textureName.ToLower();
-		dUnsigned64 crc = dCRC64 (entry.m_textureName.GetStr());
+		//ndTextureEntry entry;
+		//entry.m_textureName = texName;
+		//entry.m_textureName.ToLower();
+		//dUnsigned64 crc = dCRC64 (entry.m_textureName.GetStr());
+		char name[256];
+		strcpy(name, texName);
+		_strlwr(name);
+		dUnsigned64 crc = dCRC64(name);
 
 		dTreeNode* node = Find(crc);
 		if (node) 
@@ -132,7 +136,6 @@ GLuint LoadTexture(const char* const filename)
 	GLuint texture = cache.GetTexture(fullPathName);
 	if (!texture) 
 	{
-
 		FILE* const pFile = fopen (fullPathName, "rb");
 		if(pFile == nullptr) 
 		{

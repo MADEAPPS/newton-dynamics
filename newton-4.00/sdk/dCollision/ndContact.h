@@ -233,7 +233,7 @@ DG_INLINE void ntContact::ResetMaxDOF()
 
 DG_INLINE void ntContact::SetPruningTolerance(dFloat32 tolerance)
 {
-	m_contactPruningTolereance = dgAbs (tolerance);
+	m_contactPruningTolereance = dAbs (tolerance);
 }
 
 DG_INLINE void ntContact::ResetSkeletonIntraCollision()

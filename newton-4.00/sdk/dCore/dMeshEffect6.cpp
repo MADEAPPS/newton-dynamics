@@ -1591,7 +1591,7 @@ void dMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMateria
 				e1 = e2;
 			}
 			normal = normal.Normalize();
-			if (dgAbs(normal.m_x) > dFloat32 (0.99f)) {
+			if (dAbs(normal.m_x) > dFloat32 (0.99f)) {
 				dEdge* ptr = edge;
 				do {
 					dAttibutFormat::dgUV uv;
@@ -1616,55 +1616,6 @@ void dMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMateria
 	PackAttibuteData();
 }
 
-
-
-void dMeshEffect::UniformBoxMapping (dInt32 material, const dMatrix& textureMatrix)
-{
-	UnpackAttibuteData();
-	m_attrib.m_uv0Channel.Reserve(m_attrib.m_pointChannel.m_count);
-	m_attrib.m_materialChannel.Reserve(m_attrib.m_pointChannel.m_count);
-
-    dInt32 mark = IncLRU();
-    for (dInt32 i = 0; i < 3; i ++) {
-        dMatrix rotationMatrix (dgGetIdentityMatrix());
-        if (i == 1) {
-            rotationMatrix = dgYawMatrix(dFloat32 (90.0f * dgDegreeToRad));
-        } else if (i == 2) {
-            rotationMatrix = dgPitchMatrix(dFloat32 (90.0f * dgDegreeToRad));
-        }
-
-        dPolyhedra::Iterator iter (*this);	
-
-        for(iter.Begin(); iter; iter ++){
-            dEdge* const edge = &(*iter);
-            if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) {
-                dBigVector n (FaceNormal(edge, &m_points.m_vertex[0].m_x, sizeof (dBigVector)));
-                dVector normal (rotationMatrix.RotateVector(dVector (n.Normalize())));
-                normal.m_x = dgAbs (normal.m_x);
-                normal.m_y = dgAbs (normal.m_y);
-                normal.m_z = dgAbs (normal.m_z);
-                if ((normal.m_z >= (normal.m_x - dFloat32 (1.0e-4f))) && (normal.m_z >= (normal.m_y - dFloat32 (1.0e-4f)))) {
-                    dEdge* ptr = edge;
-                    do {
-                        ptr->m_mark = mark;
-						dAttibutFormat::dgUV uv;
-                        dVector p (textureMatrix.TransformVector(rotationMatrix.RotateVector(m_points.m_vertex[ptr->m_incidentVertex])));
-                        uv.m_u = p.m_x;
-                        uv.m_v = p.m_y;
-						m_attrib.m_uv0Channel[dInt32(ptr->m_userData)] = uv;
-						m_attrib.m_materialChannel[dInt32(ptr->m_userData)] = material;
-
-                        ptr = ptr->m_next;
-                    }while (ptr !=  edge);
-                }
-            }
-        }
-    }
-
-    PackAttibuteData();
-}
-
-
 void dMeshEffect::AngleBaseFlatteningMapping (dInt32 material, dgReportProgress progressReportCallback, void* const userData)
 {
 	dgSetPrecisionDouble presicion;
@@ -1678,7 +1629,7 @@ void dMeshEffect::AngleBaseFlatteningMapping (dInt32 material, dgReportProgress 
 	dBigVector size (maxBox - minBox);
 	dFloat32 scale = dFloat32 (1.0 / dMax (size.m_x, size.m_y, size.m_z));
 
-	dMatrix matrix (dgGetIdentityMatrix());
+	dMatrix matrix (dGetIdentityMatrix());
 	matrix[0][0] = scale;
 	matrix[1][1] = scale;
 	matrix[2][2] = scale;
@@ -1871,6 +1822,62 @@ void dMeshEffect::BoxMapping(dInt32 front, dInt32 side, dInt32 top, const dMatri
 			} while (ptr != edge);
 		}
 	}
+	PackAttibuteData();
+}
+
+void dMeshEffect::UniformBoxMapping(dInt32 material, const dMatrix& textureMatrix)
+{
+	UnpackAttibuteData();
+	m_attrib.m_uv0Channel.SetCount(m_attrib.m_pointChannel.GetCount());
+	m_attrib.m_materialChannel.SetCount(m_attrib.m_pointChannel.GetCount());
+	m_attrib.m_uv0Channel.m_isValid = true;
+	m_attrib.m_materialChannel.m_isValid = true;
+
+	dInt32 mark = IncLRU();
+	for (dInt32 i = 0; i < 3; i++) 
+	{
+		dMatrix rotationMatrix(dGetIdentityMatrix());
+		if (i == 1) 
+		{
+			rotationMatrix = dYawMatrix(dFloat32(90.0f * dDegreeToRad));
+		}
+		else if (i == 2) 
+		{
+			rotationMatrix = dPitchMatrix(dFloat32(90.0f * dDegreeToRad));
+		}
+
+		dPolyhedra::Iterator iter(*this);
+
+		for (iter.Begin(); iter; iter++) 
+		{
+			dEdge* const edge = &(*iter);
+			if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) 
+			{
+				dBigVector n(FaceNormal(edge, &m_points.m_vertex[0].m_x, sizeof(dBigVector)));
+				dVector normal(rotationMatrix.RotateVector(dVector(n.Normalize())));
+				normal.m_x = dAbs(normal.m_x);
+				normal.m_y = dAbs(normal.m_y);
+				normal.m_z = dAbs(normal.m_z);
+				if ((normal.m_z >= (normal.m_x - dFloat32(1.0e-4f))) && (normal.m_z >= (normal.m_y - dFloat32(1.0e-4f)))) 
+				{
+					dEdge* ptr = edge;
+					do 
+					{
+						ptr->m_mark = mark;
+						dAttibutFormat::dgUV uv;
+						dVector p(textureMatrix.TransformVector(rotationMatrix.RotateVector(m_points.m_vertex[ptr->m_incidentVertex])));
+						uv.m_u = p.m_x;
+						uv.m_v = p.m_y;
+						m_attrib.m_uv0Channel[dInt32(ptr->m_userData)] = uv;
+						m_attrib.m_materialChannel[dInt32(ptr->m_userData)] = material;
+
+						ptr = ptr->m_next;
+					} while (ptr != edge);
+				}
+			}
+		}
+	}
+
 	PackAttibuteData();
 }
 

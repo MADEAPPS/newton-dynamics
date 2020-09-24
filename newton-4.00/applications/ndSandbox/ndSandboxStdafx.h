@@ -123,7 +123,7 @@ inline void glMaterialParam (GLenum face, GLenum pname, const dFloat32 *params)
 		#define stricmp strcasecmp
 	#endif
 
-	#ifndef strlwr
+	#ifndef _strlwr
 		inline char *_strlwr_ (char *a) 
 		{ 
 			char *ret = a; 

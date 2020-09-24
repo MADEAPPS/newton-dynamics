@@ -22,6 +22,8 @@
 #ifndef __D_SHAPE_H__ 
 #define __D_SHAPE_H__ 
 
+#include "ndCollisionStdafx.h"
+
 class ndBody;
 class ndShape;
 class ndShapeBox;

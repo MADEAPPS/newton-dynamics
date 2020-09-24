@@ -970,7 +970,7 @@ dMeshEffect::dMeshEffect(dgCollisionInstance* const collision)
 		}
 
 	} else {
-		dMatrix matrix (dgGetIdentityMatrix());
+		dMatrix matrix (dGetIdentityMatrix());
 		collision->DebugCollision (matrix, (dgCollision::OnDebugCollisionMeshCallback) dgMeshEffectBuilder::GetShapeFromCollision, &builder);
 	}
 
@@ -991,7 +991,7 @@ dMeshEffect::dMeshEffect(dgCollisionInstance* const collision)
 	BuildFromIndexList (&vertexFormat);
 
     RepairTJoints();
-	CalculateNormals(dFloat32 (45.0f * dgDegreeToRad));
+	CalculateNormals(dFloat32 (45.0f * dDegreeToRad));
 }
 
 // create a convex hull
@@ -1268,7 +1268,7 @@ dMatrix dMeshEffect::CalculateOOBB (dBigVector& size) const
 	size = sphere.m_size;
 	size.m_w = 0.0f;
 
-//	dMatrix permuation (dgGetIdentityMatrix());
+//	dMatrix permuation (dGetIdentityMatrix());
 //	permuation[0][0] = dFloat32 (0.0f);
 //	permuation[0][1] = dFloat32 (1.0f);
 //	permuation[1][1] = dFloat32 (0.0f);
@@ -2121,7 +2121,7 @@ dgCollisionInstance* dMeshEffect::CreateCollisionTree(dgWorld* const world, dInt
 	}
 	collision->EndBuild(0);
 
-	dgCollisionInstance* const instance = world->CreateInstance(collision, shapeID, dgGetIdentityMatrix());
+	dgCollisionInstance* const instance = world->CreateInstance(collision, shapeID, dGetIdentityMatrix());
 	collision->Release();
 	return instance;
 }

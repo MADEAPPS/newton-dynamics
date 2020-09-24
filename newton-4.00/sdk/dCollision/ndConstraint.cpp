@@ -84,8 +84,8 @@ void ndConstraint::InitInfo (dgConstraintInfo* const info) const
 		info->m_attachBody_1  = nullptr;
 	}
 
-	info->m_attachMatrix_0 = dgGetIdentityMatrix();
-	info->m_attachMatrix_1 = dgGetIdentityMatrix();
+	info->m_attachMatrix_0 = dGetIdentityMatrix();
+	info->m_attachMatrix_1 = dGetIdentityMatrix();
 	
 	info->m_discriptionType[0] = 0;
 

@@ -241,7 +241,7 @@ class dFastRayTest
 //	public:
 //	D_INLINE dFastAaabbInfo()
 //		:dgObb()
-//		,m_absDir(dgGetIdentityMatrix())
+//		,m_absDir(dGetIdentityMatrix())
 //		,m_separationDistance(dFloat32(1.0e10f))
 //	{
 //	}
@@ -257,8 +257,8 @@ class dFastRayTest
 //	}
 //
 //	D_INLINE dFastAaabbInfo(const dVector& p0, const dVector& p1)
-//		:dgObb(dgGetIdentityMatrix(), dVector::m_half * (p1 - p0))
-//		,m_absDir(dgGetIdentityMatrix())
+//		:dgObb(dGetIdentityMatrix(), dVector::m_half * (p1 - p0))
+//		,m_absDir(dGetIdentityMatrix())
 //		,m_separationDistance(dFloat32(1.0e10f))
 //		,m_p0(p0)
 //		,m_p1(p1)

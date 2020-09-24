@@ -328,8 +328,8 @@ dFloat32 ndBodyKinematic::RayCast(ndRayCastNotify& callback, const dFastRayTest&
 	if (dRayBoxClip(l0, l1, m_minAABB, m_maxAABB))
 	{
 		const dMatrix& globalMatrix = m_shapeInstance.GetGlobalMatrix();
-		dVector localP0(globalMatrix.UntransformVector(l0));
-		dVector localP1(globalMatrix.UntransformVector(l1));
+		dVector localP0(globalMatrix.UntransformVector(l0) & dVector::m_triplexMask);
+		dVector localP1(globalMatrix.UntransformVector(l1) & dVector::m_triplexMask);
 		dVector p1p0(localP1 - localP0);
 		dAssert(p1p0.m_w == dFloat32(0.0f));
 		if (p1p0.DotProduct(p1p0).GetScalar() > dFloat32(1.0e-12f))

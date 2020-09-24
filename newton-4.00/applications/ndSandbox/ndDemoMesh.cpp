@@ -17,7 +17,7 @@
 
 ndDemoMeshInterface::ndDemoMeshInterface()
 	:dClassAlloc()
-	,dRefCounter()
+	,dRefCounter<ndDemoMeshInterface>()
 	,m_name()
 	,m_isVisible(true)
 {
@@ -370,7 +370,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 			int tex0 = LoadTexture(texture0);
 			int tex1 = LoadTexture(texture1);
 			int tex2 = LoadTexture(texture2);
-			mesh.BoxMapping(tex0, tex1, tex2, aligmentUV);
+			//mesh.BoxMapping(tex0, tex1, tex2, aligmentUV);
+			mesh.UniformBoxMapping(tex1, aligmentUV);
 			break;
 		}
 

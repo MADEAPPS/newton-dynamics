@@ -72,7 +72,7 @@ D_INLINE dQuaternion::dQuaternion(dFloat32 Q0, dFloat32 Q1, dFloat32 Q2, dFloat3
 	,m_z(Q3)
 	,m_w(Q0)
 {
-//	dAssert (dgAbs (DotProduct (*this) -dFloat32 (1.0f)) < dFloat32(1.0e-4f));
+//	dAssert (dAbs (DotProduct (*this) -dFloat32 (1.0f)) < dFloat32(1.0e-4f));
 }
 
 /*

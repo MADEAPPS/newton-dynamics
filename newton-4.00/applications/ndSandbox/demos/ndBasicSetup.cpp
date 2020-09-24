@@ -23,23 +23,25 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
-	ndBodyDynamic* const body = new ndBodyDynamic();
-
+	dMatrix uvMatrix(dGetIdentityMatrix());
+	uvMatrix[0][0] *= 0.025f;
+	uvMatrix[1][1] *= 0.025f;
+	uvMatrix[2][2] *= 0.025f;
+	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "wood_0.tga", "marbleCheckBoard.tga", "wood_0.tga", 1.0f, uvMatrix);
+	
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_y = -0.5f;
-
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-
-	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "wood_0.tga", "marbleCheckBoard.tga", "wood_0.tga");
 	entity->SetMesh(geometry, dGetIdentityMatrix());
 
+	ndBodyDynamic* const body = new ndBodyDynamic();
 	body->SetNotifyCallback(new ndDemoEntityNotify(entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(box);
-
+	
 	world->AddBody(body);
-	scene->AddEntity(entity);
 
+	scene->AddEntity(entity);
 	geometry->Release();
 }
 
@@ -96,6 +98,8 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 	BuildFloor(scene);
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
+	BuildSphere(scene, 10.0f, origin1, 1.0f, 2, 0.0f);
+
 	BuildSphere(scene, 10.0f, origin1, 1.0f, 2, 0.0f);
 
 	dQuaternion rot;

@@ -133,7 +133,6 @@ class dMeshEffect: public dPolyhedra
 	void CalculateAABB (dBigVector& min, dBigVector& max) const;
 
 	void FlipWinding(); 
-	void UniformBoxMapping (dInt32 material, const dMatrix& textureMatrix);
 	void CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMaterial, const dMatrix& uvAligment);
 	void AngleBaseFlatteningMapping (dInt32 cylinderMaterial, dgReportProgress progressReportCallback, void* const userData);
 
@@ -185,7 +184,7 @@ class dMeshEffect: public dPolyhedra
 	bool HasVertexColorChannel() const;
 	
 	dgCollisionInstance* CreateCollisionTree(dgWorld* const world, dInt32 shapeID) const;
-	dgCollisionInstance* CreateConvexCollision(dgWorld* const world, dFloat64 tolerance, dInt32 shapeID, const dMatrix& matrix = dgGetIdentityMatrix()) const;
+	dgCollisionInstance* CreateConvexCollision(dgWorld* const world, dFloat64 tolerance, dInt32 shapeID, const dMatrix& matrix = dGetIdentityMatrix()) const;
 
 	dMeshEffect* CreateSimplification (dInt32 maxVertexCount, dgReportProgress reportProgressCallback, void* const userData) const;
 	dMeshEffect* CreateConvexApproximation (dFloat32 maxConcavity, dFloat32 backFaceDistanceFactor, dInt32 maxHullOuputCount, dInt32 maxVertexPerHull, dgReportProgress reportProgressCallback, void* const userData) const;
@@ -467,6 +466,7 @@ class dMeshEffect: public dPolyhedra
 
 	D_CORE_API dBigVector GetOrigin()const;
 	D_CORE_API void SphericalMapping(dInt32 material, const dMatrix& uvAligment);
+	D_CORE_API void UniformBoxMapping(dInt32 material, const dMatrix& textureMatrix);
 	D_CORE_API void BoxMapping(dInt32 front, dInt32 side, dInt32 top, const dMatrix& uvAligment);
 
 	protected:
