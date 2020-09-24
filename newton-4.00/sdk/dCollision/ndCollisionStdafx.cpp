@@ -19,9 +19,10 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
+#include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 
-#ifdef _D_COLLISION_DLL
+#if defined (_D_COLLISION_DLL) && !defined (_D_SINGLE_LIBRARY)
 
 	void *operator new (size_t size)
 	{
