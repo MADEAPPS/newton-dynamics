@@ -344,12 +344,12 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	ndShapeInfo info (collision->GetShapeInfo());
 	switch (info.m_collisionType) 
 	{
-		//case SERIALIZE_ID_SPHERE:
-		//{
-		//	NewtonMeshApplySphericalMapping(mesh, LoadTexture (texture0), &aligmentUV[0][0]);
-		//	break;
-		//}
-		//
+		case ndShapeID::m_sphereCollision:
+		{
+			mesh.SphericalMapping(LoadTexture (texture0), &aligmentUV[0][0]);
+			break;
+		}
+		
 		//case SERIALIZE_ID_CONE:
 		//case SERIALIZE_ID_CAPSULE:
 		//case SERIALIZE_ID_CYLINDER:

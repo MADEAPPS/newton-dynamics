@@ -337,8 +337,7 @@ dFloat32 ndBodyKinematic::RayCast(ndRayCastNotify& callback, const dFastRayTest&
 			dFloat32 t = m_shapeInstance.RayCast(callback, localP0, localP1, maxT, this, contactOut);
 			if (t < dFloat32(1.0f))
 			{
-				dAssert(localP0.m_w == dFloat32(0.0f));
-				dAssert(localP1.m_w == dFloat32(0.0f));
+				dAssert(localP0.m_w == localP1.m_w);
 				dVector p(globalMatrix.TransformVector(localP0 + (localP1 - localP0).Scale(t)));
 				t = ray.m_diff.DotProduct(p - ray.m_p0).GetScalar() / ray.m_diff.DotProduct(ray.m_diff).GetScalar();
 				if (t < maxT)

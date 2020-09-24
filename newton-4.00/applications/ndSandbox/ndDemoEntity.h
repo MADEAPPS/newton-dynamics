@@ -33,7 +33,6 @@ class ndDemoEntityNotify : public ndBodyNotify
 	ndDemoEntity* m_entity;
 };
 
-
 class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 {
 	public:
@@ -104,8 +103,7 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 	dSpinLock m_lock;
 	bool m_isVisible;
 
-	//dAddRtti(dClassInfo,DOMMY_API);
-
+	friend class ndDemoEntityNotify;
 	friend class ndDemoEntityManager;
 };
 

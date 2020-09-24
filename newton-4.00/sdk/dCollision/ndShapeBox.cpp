@@ -219,8 +219,7 @@ dVector ndShapeBox::SupportVertexSpecialProjectPoint(const dVector& point, const
 
 dFloat32 ndShapeBox::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {
-	dAssert(localP0.m_w == dFloat32(0.0f));
-	dAssert(localP1.m_w == dFloat32(0.0f));
+	dAssert(localP0.m_w == localP1.m_w);
 
 	dInt32 index = 0;
 	dFloat32 signDir = dFloat32(0.0f);

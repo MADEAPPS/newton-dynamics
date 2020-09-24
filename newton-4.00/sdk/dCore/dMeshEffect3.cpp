@@ -898,7 +898,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 
 	dFloat64 CalculateConcavityMetric (dFloat64 convexConcavity, dFloat64 area, dFloat64 perimeter, dInt32 faceCountA, dInt32 faceCountB) const 
 	{
-		dFloat64 edgeCost = perimeter * perimeter / (dFloat64(4.0f * dgPi) * area);
+		dFloat64 edgeCost = perimeter * perimeter / (dFloat64(4.0f * dPi) * area);
 		return convexConcavity * DG_CONCAVITY_SCALE + edgeCost + ConcavityByFaceMedian (faceCountA, faceCountB);
 	}
 
@@ -1320,7 +1320,7 @@ dMeshEffect* dMeshEffect::CreateConvexApproximation(dFloat32 maxConcavity, dFloa
 	if (maxVertexPerHull < 4) {
 		maxVertexPerHull = 4;
 	}
-	backFaceDistanceFactor = dgClamp(backFaceDistanceFactor, dFloat32 (1.0e-6f), dFloat32 (1.0f));
+	backFaceDistanceFactor = dClamp(backFaceDistanceFactor, dFloat32 (1.0e-6f), dFloat32 (1.0f));
 
 	dMeshEffect* partition = nullptr;
 

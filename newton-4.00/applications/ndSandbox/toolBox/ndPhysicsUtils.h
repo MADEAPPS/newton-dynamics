@@ -55,7 +55,7 @@ void HandlecollisionPoints (NewtonJoint* const contactjoint);
 NewtonJoint* CheckIfBodiesCollide (NewtonBody* const body0, NewtonBody* const body1);
 
 dCustomJoint* FindJoint(const NewtonBody* const body0, const NewtonBody* const body1);
-dVector FindFloor (const NewtonWorld* world, const dVector& origin, dFloat32 dist, dVector* const normal = nullptr);
+
 
 void PhysicsBodyDestructor (const NewtonBody* body);
 void PhysicsApplyGravityForce (const NewtonBody* body, dFloat32 timestep, int threadIndex);
@@ -84,5 +84,8 @@ NewtonBody* MousePickBody (NewtonWorld* const nWorld, const dVector& origin, con
 void LoadLumberYardMesh(ndDemoEntityManager* const scene, const dVector& location, int shapeid);
 //void SerializationWorld (const char* const name, NewtonWorld* const world);
 #endif
+
+dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist);
+
 
 #endif

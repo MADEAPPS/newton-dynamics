@@ -361,16 +361,16 @@ dInt32 ndShapeConvex::BuildCylinderCapPoly (dFloat32 radius, const dMatrix& tran
 /*
 	dFloat32 h = 2.0;
 	dInt32 n = 8;
-	dFloat32 a0 = h * h * (dgPi / n);
+	dFloat32 a0 = h * h * (dPi / n);
 
-	dFloat32 h0 = h * dgSin (0.5 * dgPI2 / n);
-	dFloat32 h1 = h * dCos (0.5 * dgPI2 / n);
-	dFloat32 a1 = h * h * (dgSin (0.5 * dgPI2 / n) * dCos (0.5 * dgPI2 / n));
+	dFloat32 h0 = h * dSin (0.5 * dPI2 / n);
+	dFloat32 h1 = h * dCos (0.5 * dPI2 / n);
+	dFloat32 a1 = h * h * (dSin (0.5 * dPI2 / n) * dCos (0.5 * dPI2 / n));
 
-	dFloat32 a = h * h * (dgPi / n - 0.5f * dgSin (dgPI2 / n));
+	dFloat32 a = h * h * (dPi / n - 0.5f * dSin (dPI2 / n));
 
 	for (int i = 8; i < 16; i ++) {
-		dFloat32 den = dgPi / i - 0.5f * dgSin (dgPI2 / i);
+		dFloat32 den = dPi / i - 0.5f * dSin (dPI2 / i);
 		dFloat32 h1 = dSqrt (a / den);
 		dFloat32 h2 = dSqrt (a / den);
 	}
@@ -378,7 +378,7 @@ dInt32 ndShapeConvex::BuildCylinderCapPoly (dFloat32 radius, const dMatrix& tran
 
 	dInt32 count = (radius < dFloat32 (1.0f)) ? 8 : ((radius < dFloat32 (2.0f)) ? 12 : 16);
 
-	dFloat32 angle = dgPI2 / count;
+	dFloat32 angle = dPI2 / count;
 	dVector r (dFloat32 (0.0f), dFloat32 (0.0f), radius, dFloat32 (0.0f));
 	dMatrix rotation (dgPitchMatrix(angle));
 

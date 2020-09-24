@@ -57,6 +57,7 @@ class ndBody: public dClassAlloc
 	D_COLLISION_API void SetVelocity(const dVector& veloc);
 	D_COLLISION_API dMatrix GetMatrix() const;
 	D_COLLISION_API void SetMatrix(const dMatrix& matrix);
+	D_COLLISION_API dQuaternion GetRotation() const;
 
 	protected:
 	virtual void AttachContact(ndContact* const contact) {}

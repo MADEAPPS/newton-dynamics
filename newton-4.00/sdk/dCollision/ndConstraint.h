@@ -293,7 +293,7 @@ D_INLINE dInt32 ndConstraint::GetSolverModel() const
 
 D_INLINE void ndConstraint::SetSolverModel(dInt32 model)
 {
-	m_solverModel = dgClamp(model, 0, 2);
+	m_solverModel = dClamp(model, 0, 2);
 }
 
 D_INLINE void ndConstraint::ResetMaxDOF()

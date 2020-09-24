@@ -341,7 +341,7 @@ dFloat32 ndShapeSphere::RayCast(ndRayCastNotify& callback, const dVector& localP
 
 ndShapeInfo ndShapeSphere::GetShapeInfo() const
 {
-	dAssert(0);
-	ndShapeInfo info;
+	ndShapeInfo info(ndShapeConvex::GetShapeInfo());
+	info.m_sphere.m_radius = m_radius;
 	return info;
 }

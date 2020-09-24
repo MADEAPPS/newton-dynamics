@@ -330,8 +330,8 @@ class dgTriangleAnglesToUV: public dgSymmetricConjugateGradientSolver<dFloat64>
 			e20 = e20.Scale (dFloat64 (1.0) / sqrt (e20.DotProduct(e20).GetScalar()));
 			e12 = e20.Scale (dFloat64 (1.0) / sqrt (e12.DotProduct(e12).GetScalar()));
 
-			m_triangleAngles[i * 3 + 0] = acos (dgClamp(e10.DotProduct(e20).GetScalar(), dFloat64 (-1.0f), dFloat64 (1.0f)));
-			m_triangleAngles[i * 3 + 1] = acos (dgClamp(e10.DotProduct(e20).GetScalar(), dFloat64 (-1.0f), dFloat64 (1.0f)));
+			m_triangleAngles[i * 3 + 0] = acos (dClamp(e10.DotProduct(e20).GetScalar(), dFloat64 (-1.0f), dFloat64 (1.0f)));
+			m_triangleAngles[i * 3 + 1] = acos (dClamp(e10.DotProduct(e20).GetScalar(), dFloat64 (-1.0f), dFloat64 (1.0f)));
 			m_triangleAngles[i * 3 + 2] = dgABF_PI - m_triangleAngles[i * 3 + 0] - m_triangleAngles[i * 3 + 1];
 		}
 	}
@@ -1073,7 +1073,7 @@ dAssert (0);
 			dAssert(e10.m_w == dFloat32(0.0f));
 			dAssert(e20.m_w == dFloat32(0.0f));
 
-			m_beta[i] = acos (dgClamp(e10.DotProduct(e20).GetScalar(), dFloat64 (-1.0f), dFloat64 (1.0f)));
+			m_beta[i] = acos (dClamp(e10.DotProduct(e20).GetScalar(), dFloat64 (-1.0f), dFloat64 (1.0f)));
 			dAssert (m_beta[i] > dFloat64 (0.0f));
 		}
 
@@ -1500,65 +1500,6 @@ void dMeshEffect::ClearAttributeArray ()
 */
 
 
-void dMeshEffect::SphericalMapping (dInt32 material, const dMatrix& uvAligment)
-{
-    dBigVector origin (GetOrigin());
-    dStack<dBigVector>sphere (m_points.m_vertex.m_count);
-    for (dInt32 i = 0; i < m_points.m_vertex.m_count; i ++) {
-		dBigVector point(uvAligment.RotateVector(m_points.m_vertex[i] - origin));
-		dAssert(point.m_w == dFloat32(0.0f));
-		dAssert(point.DotProduct(point).GetScalar() > dFloat32(0.0f));
-		point = point.Normalize();
-
-		dFloat64 u = dgAsin(dgClamp(point.m_x, dFloat64(-1.0f + 1.0e-6f), dFloat64(1.0f - 1.0e-6f)));
-		dFloat64 v = dgAtan2(point.m_y, point.m_z);
-
-		u = dFloat32(1.0f) - (dFloat64(dgPi / 2.0f) - u) / dFloat64(dgPi);
-		dAssert(u >= dFloat32(0.0f));
-		dAssert(u <= dFloat32(1.0f));
-
-		v = v + dgPi;
-		sphere[i].m_x = u;
-		sphere[i].m_y = v;
-    }
-
-	UnpackAttibuteData ();
-	m_attrib.m_uv0Channel.Reserve(m_attrib.m_pointChannel.m_count);
-	m_attrib.m_materialChannel.Reserve(m_attrib.m_pointChannel.m_count);
-	
-    dPolyhedra::Iterator iter (*this);	
-    for(iter.Begin(); iter; iter ++){
-        dEdge* const edge = &(*iter);
-		dAttibutFormat::dgUV uv;
-		uv.m_u = dFloat32 (sphere[edge->m_incidentVertex].m_x);
-		uv.m_v = dFloat32 (sphere[edge->m_incidentVertex].m_y);
-		m_attrib.m_uv0Channel[dInt32 (edge->m_userData)] = uv;
-		m_attrib.m_materialChannel[dInt32 (edge->m_userData)] = material;
-    }
-
-    dInt32 mark = IncLRU ();
-    for(iter.Begin(); iter; iter ++){
-        dEdge* const edge = &(*iter);
-        if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) {
-			dAttibutFormat::dgUV uvRef(m_attrib.m_uv0Channel[dInt32(edge->m_userData)]);
-			dFloat32 UVrefSin = dgSin(uvRef.m_v);
-			dFloat32 UVrefCos = dCos(uvRef.m_v);
-			dEdge* ptr = edge;
-			do {
-				ptr->m_mark = mark;
-				dAttibutFormat::dgUV uv(m_attrib.m_uv0Channel[dInt32(ptr->m_userData)]);
-				dFloat32 sinAngle = UVrefCos * dgSin(uv.m_v) - UVrefSin * dCos(uv.m_v);
-				dFloat32 cosAngle = UVrefCos * dCos(uv.m_v) + UVrefSin * dgSin(uv.m_v);
-				dFloat32 deltaAngle = dgAtan2(sinAngle, cosAngle);
-				uv.m_v = (uvRef.m_v + deltaAngle) / dgPI2;
-				m_attrib.m_uv0Channel[dInt32(ptr->m_userData)] = uv;
-				ptr = ptr->m_next;
-			} while (ptr != edge);
-        }
-    }
-
-	PackAttibuteData();
-}
 
 void dMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMaterial, const dMatrix& uvAligment)
 {
@@ -1588,9 +1529,9 @@ void dMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMateria
 		dAssert(point.m_w == dFloat32(0.0f));
 		dAssert(point.DotProduct(point).GetScalar() > dFloat32 (0.0f));
 		point = point.Normalize();
-		dFloat64 v = dgAtan2 (point.m_y, point.m_z);
+		dFloat64 v = dAtan2 (point.m_y, point.m_z);
 
-		v = v + dgPi;
+		v = v + dPi;
 		cylinder[i].m_x = u;
 		cylinder[i].m_y = v;
     }
@@ -1614,16 +1555,16 @@ void dMeshEffect::CylindricalMapping (dInt32 cylinderMaterial, dInt32 capMateria
         dEdge* const edge = &(*iter);
         if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) {
 			dAttibutFormat::dgUV uvRef(m_attrib.m_uv0Channel[dInt32(edge->m_userData)]);
-			dFloat32 UVrefSin = dgSin(uvRef.m_v);
+			dFloat32 UVrefSin = dSin(uvRef.m_v);
 			dFloat32 UVrefCos = dCos(uvRef.m_v);
 			dEdge* ptr = edge;
             do {
 				ptr->m_mark = mark;
 				dAttibutFormat::dgUV uv(m_attrib.m_uv0Channel[dInt32(ptr->m_userData)]);
-				dFloat32 sinAngle = UVrefCos * dgSin(uv.m_v) - UVrefSin * dCos(uv.m_v);
-				dFloat32 cosAngle = UVrefCos * dCos(uv.m_v) + UVrefSin * dgSin(uv.m_v);
-				dFloat32 deltaAngle = dgAtan2(sinAngle, cosAngle);
-				uv.m_v = (uvRef.m_v + deltaAngle) / dgPI2;
+				dFloat32 sinAngle = UVrefCos * dSin(uv.m_v) - UVrefSin * dCos(uv.m_v);
+				dFloat32 cosAngle = UVrefCos * dCos(uv.m_v) + UVrefSin * dSin(uv.m_v);
+				dFloat32 deltaAngle = dAtan2(sinAngle, cosAngle);
+				uv.m_v = (uvRef.m_v + deltaAngle) / dPi2;
 				m_attrib.m_uv0Channel[dInt32(ptr->m_userData)] = uv;
                 ptr = ptr->m_next;
             } while (ptr != edge);
@@ -1881,7 +1822,8 @@ void dMeshEffect::BoxMapping(dInt32 front, dInt32 side, dInt32 top, const dMatri
 
 	dInt32 mark = IncLRU();
 	dPolyhedra::Iterator iter(*this);
-	for (iter.Begin(); iter; iter++) {
+	for (iter.Begin(); iter; iter++) 
+	{
 		dEdge* const edge = &(*iter);
 		if ((edge->m_mark < mark) && (edge->m_incidentFace > 0)) 
 		{
@@ -1929,5 +1871,72 @@ void dMeshEffect::BoxMapping(dInt32 front, dInt32 side, dInt32 top, const dMatri
 			} while (ptr != edge);
 		}
 	}
+	PackAttibuteData();
+}
+
+void dMeshEffect::SphericalMapping(dInt32 material, const dMatrix& uvAligment)
+{
+	dBigVector origin(GetOrigin());
+	dStack<dBigVector>sphere(m_points.m_vertex.GetCount());
+	for (dInt32 i = 0; i < m_points.m_vertex.GetCount(); i++)
+	{
+		dBigVector point(uvAligment.RotateVector(m_points.m_vertex[i] - origin));
+		dAssert(point.m_w == dFloat32(0.0f));
+		dAssert(point.DotProduct(point).GetScalar() > dFloat32(0.0f));
+		point = point.Normalize();
+
+		dFloat64 u = dAsin(dClamp(point.m_x, dFloat64(-1.0f + 1.0e-6f), dFloat64(1.0f - 1.0e-6f)));
+		dFloat64 v = dAtan2(point.m_y, point.m_z);
+
+		u = dFloat32(1.0f) - (dFloat64(dPi / 2.0f) - u) / dFloat64(dPi);
+		dAssert(u >= dFloat32(0.0f));
+		dAssert(u <= dFloat32(1.0f));
+
+		v = v + dPi;
+		sphere[i].m_x = u;
+		sphere[i].m_y = v;
+	}
+
+	UnpackAttibuteData();
+	m_attrib.m_uv0Channel.SetCount(m_attrib.m_pointChannel.GetCount());
+	m_attrib.m_materialChannel.SetCount(m_attrib.m_pointChannel.GetCount());
+	m_attrib.m_uv0Channel.m_isValid = true;
+	m_attrib.m_materialChannel.m_isValid = true;
+
+	dPolyhedra::Iterator iter(*this);
+	for (iter.Begin(); iter; iter++) 
+	{
+		dEdge* const edge = &(*iter);
+		dAttibutFormat::dgUV uv;
+		uv.m_u = dFloat32(sphere[edge->m_incidentVertex].m_x);
+		uv.m_v = dFloat32(sphere[edge->m_incidentVertex].m_y);
+		m_attrib.m_uv0Channel[dInt32(edge->m_userData)] = uv;
+		m_attrib.m_materialChannel[dInt32(edge->m_userData)] = material;
+	}
+
+	dInt32 mark = IncLRU();
+	for (iter.Begin(); iter; iter++) 
+	{
+		dEdge* const edge = &(*iter);
+		if ((edge->m_incidentFace > 0) && (edge->m_mark != mark)) 
+		{
+			dAttibutFormat::dgUV uvRef(m_attrib.m_uv0Channel[dInt32(edge->m_userData)]);
+			dFloat32 UVrefSin = dSin(uvRef.m_v);
+			dFloat32 UVrefCos = dCos(uvRef.m_v);
+			dEdge* ptr = edge;
+			do 
+			{
+				ptr->m_mark = mark;
+				dAttibutFormat::dgUV uv(m_attrib.m_uv0Channel[dInt32(ptr->m_userData)]);
+				dFloat32 sinAngle = UVrefCos * dSin(uv.m_v) - UVrefSin * dCos(uv.m_v);
+				dFloat32 cosAngle = UVrefCos * dCos(uv.m_v) + UVrefSin * dSin(uv.m_v);
+				dFloat32 deltaAngle = dAtan2(sinAngle, cosAngle);
+				uv.m_v = (uvRef.m_v + deltaAngle) / dPi2;
+				m_attrib.m_uv0Channel[dInt32(ptr->m_userData)] = uv;
+				ptr = ptr->m_next;
+			} while (ptr != edge);
+		}
+	}
+
 	PackAttibuteData();
 }

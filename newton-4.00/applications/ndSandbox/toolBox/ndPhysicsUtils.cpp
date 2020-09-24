@@ -176,22 +176,6 @@ static unsigned RayPrefilter (const NewtonBody* const body, const NewtonCollisio
 	return 1;
 }
 
-dVector FindFloor (const NewtonWorld* world, const dVector& origin, dFloat32 dist, dVector* const normal)
-{
-	// shot a vertical ray from a high altitude and collect the intersection parameter.
-	dVector p0 (origin); 
-	dVector p1 (origin - dVector (0.0f, dAbs (dist), 0.0f, 0.0f)); 
-
-	RayCastPlacementData parameter;
-	NewtonWorldRayCast (world, &p0[0], &p1[0], RayCastPlacement, &parameter, RayPrefilter, 0);
-	if (parameter.m_param < 1.0f) {
-		p0 -= dVector (0.0f, dAbs (dist) * parameter.m_param, 0.0f, 0.0f);
-		if (normal) {
-			*normal = parameter.m_normal;
-		}
-	}
-	return p0;
-}
 
 
 
@@ -1454,3 +1438,30 @@ dCustomJoint* FindJoint(const NewtonBody* const body0, const NewtonBody* const b
 }
 
 #endif
+
+
+dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist)
+{
+/*
+	// shot a vertical ray from a high altitude and collect the intersection parameter.
+	dVector p0(origin);
+	dVector p1(origin - dVector(0.0f, dAbs(dist), 0.0f, 0.0f));
+
+	RayCastPlacementData parameter;
+	NewtonWorldRayCast(world, &p0[0], &p1[0], RayCastPlacement, &parameter, RayPrefilter, 0);
+	if (parameter.m_param < 1.0f) {
+		p0 -= dVector(0.0f, dAbs(dist) * parameter.m_param, 0.0f, 0.0f);
+		if (normal) {
+			*normal = parameter.m_normal;
+		}
+	}
+	return p0;
+*/
+
+	dVector p0(origin);
+	dVector p1(origin - dVector(0.0f, dAbs(dist), 0.0f, 0.0f));
+
+	ndRayCastCloasestHitCallback rayCaster(world.GetScene());
+	dFloat32 param = rayCaster.TraceRay(p0, p1);
+	return (param < 1.0f) ? rayCaster.m_contact.m_point : p0;
+}
