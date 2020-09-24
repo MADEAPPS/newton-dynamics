@@ -20,7 +20,7 @@ class ndPhysicsWorld: public ndWorld
 {
 	public:
 	ndPhysicsWorld(ndDemoEntityManager* const manager);
-	~ndPhysicsWorld();
+	virtual ~ndPhysicsWorld();
 
 	void AdvanceTime(dFloat32 timestep);
 

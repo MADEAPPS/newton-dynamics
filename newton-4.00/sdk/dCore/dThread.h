@@ -29,7 +29,7 @@
 class dThread
 	:public dSemaphore
 #ifndef D_USE_THREAD_EMULATION
-	,public std::mutex
+	,public dAtomic<bool>
 	,public std::condition_variable
 	,public std::thread
 #endif
@@ -40,7 +40,6 @@ class dThread
 
 	D_CORE_API void SetName(const char* const name);
 
-	D_CORE_API void Start();
 	D_CORE_API void Finish();
 	D_CORE_API void Signal();
 

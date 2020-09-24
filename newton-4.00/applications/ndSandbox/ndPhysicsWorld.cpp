@@ -29,7 +29,6 @@ ndPhysicsWorld::~ndPhysicsWorld()
 {
 }
 
-
 void ndPhysicsWorld::AdvanceTime(dFloat32 timetep)
 {
 	const dFloat32 timeLimit = (1.0f / MAX_PHYSICS_FPS);

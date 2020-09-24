@@ -57,8 +57,6 @@ dThreadPool::dThreadPool(const char* const baseName)
 	,m_workers(nullptr)
 	,m_count(0)
 {
-	Start();
-
 	char name[256];
 	strncpy(m_baseName, baseName, sizeof (m_baseName));
 	sprintf(name, "%s_%d", m_baseName, 0);
@@ -102,7 +100,6 @@ void dThreadPool::SetCount(dInt32 count)
 			m_workers[i].m_threadIndex = i;
 			sprintf(name, "%s_%d", m_baseName, i + 1);
 			m_workers[i].SetName(name);
-			m_workers[i].Start();
 		}
 	}
 }

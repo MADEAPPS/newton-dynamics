@@ -25,13 +25,14 @@
 
 dThread::dThread()
 #ifndef D_USE_THREAD_EMULATION
-	:std::mutex() 
+	:dAtomic<bool>(true)
 	,std::condition_variable()
 	,dSemaphore()
 	,std::thread(&dThread::ThreadFunctionCallback, this)
 #endif
 {
 	strcpy (m_name, "thread");
+	store(false);
 }
 
 dThread::~dThread()
@@ -69,14 +70,6 @@ void dThread::SetName(const char* const name)
 #endif
 }
 
-void dThread::Start()
-{
-#ifndef D_USE_THREAD_EMULATION
-	std::unique_lock<std::mutex> lock(*this);
-	notify_one();  
-#endif
-}
-
 void dThread::Finish()
 {
 #ifndef D_USE_THREAD_EMULATION
@@ -97,8 +90,13 @@ void dThread::Signal()
 void dThread::ThreadFunctionCallback()
 {
 #ifndef D_USE_THREAD_EMULATION
-	std::unique_lock<std::mutex> lock(*this);
-	wait(lock);
+
+	// wait until constructor was fully initialized.
+	while (load())
+	{
+		std::this_thread::yield();
+	}
+
 	D_SET_TRACK_NAME(m_name);
    	
 	dFloatExceptions exception;

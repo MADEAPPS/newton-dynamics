@@ -422,62 +422,10 @@ void ndDemoEntityManager::Cleanup ()
 	// create the newton world
 	m_world = new ndPhysicsWorld(this);
 	
-	//// link the work with this user data
-	//NewtonWorldSetUserData(m_world, this);
-	
-	//// set a post update callback which is call after all simulation and all listeners updates
-	//NewtonSetPostUpdateCallback (m_world, PostUpdateCallback);
-	
-	//// set joint serialization call back
-	//dCustomJoint::Initalize(m_world);
-	
 	// add the camera manager
 	m_cameraManager = new ndDemoCameraManager(this);
 	
 	ApplyMenuOptions();
-	
-	//// Set the Newton world user data
-	//NewtonWorldSetUserData(m_world, this);
-	//
-	//// set the number of sub steps
-	//NewtonSetNumberOfSubsteps (m_world, MAX_PHYSICS_SUB_STEPS);
-	//
-	//// register contact creation destruction callbacks
-	//NewtonWorldSetCreateDestroyContactCallback(m_world, OnCreateContact, OnDestroyContact);
-	//
-	//// load all available plug ins
-	//char plugInPath[2048];
-	//plugInPath[0] = 0;
-	//#if defined (_MSC_VER)
-	//	GetModuleFileNameA(nullptr, plugInPath, 256);
-	//#endif
-	//
-	//for (int i = int(strlen(plugInPath) - 1); i >= 0; i--) {
-	//	if ((plugInPath[i] == '\\') || (plugInPath[i] == '/')) {
-	//		plugInPath[i] = 0;
-	//		break;
-	//	}
-	//}
-
-	//#ifdef __linux__
-	//	strcat(plugInPath, "newtonPlugins");
-	//#else
-	//	#ifdef _NEWTON_USE_DOUBLE
-	//		strcat(plugInPath, "/newtonPlugins/debug_double");
-	//	#else
-	//		strcat(plugInPath, "/newtonPlugins/debug");
-	//	#endif
-	//#endif
-	//
-	//#ifdef __linux__
-	//	strcat(plugInPath, "newtonPlugins");
-	//#else
-	//	#ifdef _NEWTON_USE_DOUBLE
-	//		strcat(plugInPath, "/newtonPlugins/release_double");
-	//	#else
-	//		strcat(plugInPath, "/newtonPlugins/release");
-	//	#endif
-	//#endif
 
 	// we start without 2d render
 	m_renderDemoGUI = nullptr;
