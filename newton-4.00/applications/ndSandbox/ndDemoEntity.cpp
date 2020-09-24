@@ -178,12 +178,14 @@ ndDemoMeshInterface* ndDemoEntity::GetMesh() const
 void ndDemoEntity::SetMesh(ndDemoMeshInterface* const mesh, const dMatrix& meshMatrix)
 {
 	m_meshMatrix = meshMatrix;
-	if (m_mesh) {
+	if (m_mesh) 
+	{
 		m_mesh->Release();
 	}
-	m_mesh = mesh;
-	if (mesh) {
-		mesh->AddRef();
+	m_mesh = nullptr;
+	if (mesh) 
+	{
+		m_mesh = mesh->AddRef();
 	}
 }
 

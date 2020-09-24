@@ -44,8 +44,7 @@ class ndDemoSubMesh
 	unsigned *m_indexes;
 };
 
-//class ndDemoMeshInterface: public dClassInfo  
-class ndDemoMeshInterface: public dRefCounter
+class ndDemoMeshInterface: public dClassAlloc, public dRefCounter<ndDemoMeshInterface>
 {
 	public:
 	ndDemoMeshInterface();
@@ -61,7 +60,6 @@ class ndDemoMeshInterface: public dRefCounter
 	virtual void Render (ndDemoEntityManager* const scene) = 0;
 	virtual void RenderNormals () = 0;
 	//virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix) = 0;
-	//dAddRtti(dClassInfo,DOMMY_API);
 
 	dString m_name;
 	bool m_isVisible;
@@ -72,12 +70,15 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	public:
 	ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCache);
 	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache);
-	//ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCache);
 	//ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ndShaderPrograms& shaderCache);
 	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize);
 	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
 
-	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner) { AddRef(); return this;}
+	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner) 
+	{ 
+		AddRef(); 
+		return this;
+	}
 
 //	using dClassInfo::operator new;
 //	using dClassInfo::operator delete;
@@ -97,16 +98,15 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	protected:
 	virtual ~ndDemoMesh();
 
-//	dAddRtti (ndDemoMeshInterface, DOMMY_API);
 	void  SpliteSegment(dListNode* const node, int maxIndexCount);
 
 	public:
 	void  ResetOptimization();
-
-	int m_vertexCount;
+	
 	dFloat32* m_uv;
 	dFloat32* m_vertex;
 	dFloat32* m_normal;
+	int m_vertexCount;
 	unsigned m_optimizedOpaqueDiplayList;
 	unsigned m_optimizedTransparentDiplayList;		
 };
@@ -159,8 +159,6 @@ class ndDemoBezierCurve: public ndDemoMeshInterface
 
 	dBezierSpline m_curve;
 	int m_renderResolution;
-
-//	dAddRtti(ndDemoMeshInterface, DOMMY_API);
 };
 
 

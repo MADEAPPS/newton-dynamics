@@ -13,16 +13,19 @@
 #define __DREF_COUNTER_H__
 
 #include "dCoreStdafx.h"
-#include "dClassAlloc.h"
+//#include "dClassAlloc.h"
 
-class dRefCounter: public dClassAlloc
+//class dRefCounter: public dClassAlloc
+
+template<class T>
+class dRefCounter// : public dClassAlloc
 {
 	public:
-	dRefCounter(void);
+	dRefCounter();
 	dInt32 GetRef() const;
-	dRefCounter* AddRef();
 
-	D_CORE_API dInt32 Release();
+	T* AddRef();
+	dInt32 Release();
 
 	protected:
 	virtual ~dRefCounter(void);
@@ -31,24 +34,40 @@ class dRefCounter: public dClassAlloc
 	dInt32 m_refCount;
 };
 
-inline dRefCounter::dRefCounter(void)
-	:dClassAlloc()
-	, m_refCount(1)
+template<class T>
+dRefCounter<T>::dRefCounter(void)
+//	:dClassAlloc()
+	:m_refCount(1)
 {
 }
 
-inline dRefCounter::~dRefCounter(void)
+template<class T>
+inline dRefCounter<T>::~dRefCounter(void)
 {
 }
 
-inline dRefCounter* dRefCounter::AddRef()
+template<class T>
+inline T* dRefCounter<T>::AddRef()
 {
 	m_refCount++;
-	return this;
+	return (T*) this;
 }
 
+template<class T>
+inline dInt32 dRefCounter<T>::Release()
+{
+	m_refCount--;
+	dAssert(m_refCount >= 0);
+	if (!m_refCount)
+	{
+		delete this;
+		return 0;
+	}
+	return m_refCount;
+}
 
-inline dInt32 dRefCounter::GetRef() const
+template<class T>
+inline dInt32 dRefCounter<T>::GetRef() const
 {
 	return m_refCount;
 }

@@ -16,7 +16,8 @@
 #include "ndDemoEntityManager.h"
 
 ndDemoMeshInterface::ndDemoMeshInterface()
-	:dRefCounter()
+	:dClassAlloc()
+	,dRefCounter()
 	,m_name()
 	,m_isVisible(true)
 {
@@ -28,7 +29,6 @@ ndDemoMeshInterface::~ndDemoMeshInterface()
 
 const dString& ndDemoMeshInterface::GetName () const
 {
-	//	strcpy (nameOut, m_name);
 	return m_name;
 }
 
@@ -136,10 +136,10 @@ void ndDemoSubMesh::AllocIndexData (int indexCount)
 ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
-	,m_vertexCount(0)
 	,m_uv (nullptr)
 	,m_vertex(nullptr)
 	,m_normal(nullptr)
+	,m_vertexCount(0)
 	,m_optimizedOpaqueDiplayList(0)	
 	,m_optimizedTransparentDiplayList(0)
 {
@@ -152,6 +152,7 @@ ndDemoMesh::ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshN
 	,m_uv(nullptr)
 	,m_vertex(nullptr)
 	,m_normal(nullptr)
+	,m_vertexCount(0)
 	,m_optimizedOpaqueDiplayList(0)
 	,m_optimizedTransparentDiplayList(0)
 {
@@ -239,6 +240,7 @@ ndDemoMesh::ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCac
 	,m_uv(nullptr)
 	,m_vertex(nullptr)
 	,m_normal(nullptr)
+	,m_vertexCount(0)
 	,m_optimizedOpaqueDiplayList(0)		
 	,m_optimizedTransparentDiplayList(0)
 {
@@ -290,6 +292,7 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCac
 	,m_uv(nullptr)
 	,m_vertex(nullptr)
 	,m_normal(nullptr)
+	,m_vertexCount(0)
 	,m_optimizedOpaqueDiplayList(0)		
 	,m_optimizedTransparentDiplayList(0)
 {
@@ -312,7 +315,8 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCac
 		segment->m_textureHandle = srcSegment.m_textureHandle;
 		segment->m_textureName = srcSegment.m_textureName;
 		segment->m_shader = srcSegment.m_shader;
-		if (segment->m_textureHandle) {
+		if (segment->m_textureHandle) 
+		{
 			AddTextureRef (srcSegment.m_textureHandle);
 		}
 	}
@@ -327,6 +331,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_uv(nullptr)
 	,m_vertex(nullptr)
 	,m_normal(nullptr)
+	,m_vertexCount(0)
 	,m_optimizedOpaqueDiplayList(0)		
 	,m_optimizedTransparentDiplayList(0)
 {
@@ -418,6 +423,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_uv(nullptr)
 	,m_vertex(nullptr)
 	,m_normal(nullptr)
+	,m_vertexCount(0)
 	,m_optimizedOpaqueDiplayList(0)		
 	,m_optimizedTransparentDiplayList(0)
 {
@@ -684,13 +690,17 @@ void ndDemoMesh::SpliteSegment(dListNode* const node, int maxIndexCount)
 
 			leftCount = 0;
 			rightCount = 0;
-			for (int i = 0; i < segment.m_indexCount; i += 3) {
-				if (i / 3 & 1) {
+			for (int i = 0; i < segment.m_indexCount; i += 3) 
+			{
+				if (i / 3 & 1) 
+				{
 					leftSubMesh->m_indexes[leftCount + 0] = segment.m_indexes[i + 0];
 					leftSubMesh->m_indexes[leftCount + 1] = segment.m_indexes[i + 1];
 					leftSubMesh->m_indexes[leftCount + 2] = segment.m_indexes[i + 2];
 					leftCount += 3;
-				} else {
+				} 
+				else 
+				{
 					rightSubMesh->m_indexes[rightCount + 0] = segment.m_indexes[i + 0];
 					rightSubMesh->m_indexes[rightCount + 1] = segment.m_indexes[i + 1];
 					rightSubMesh->m_indexes[rightCount + 2] = segment.m_indexes[i + 2];

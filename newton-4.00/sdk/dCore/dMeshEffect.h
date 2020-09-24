@@ -26,9 +26,7 @@
 #include "dArray.h"
 #include "dVector.h"
 #include "dPolyhedra.h"
-//#include "dRefCounter.h"
 
-class dMemoryAllocator___;
 
 #define DG_MESH_EFFECT_PRECISION_BITS		48
 #define DG_MESH_EFFECT_PRECISION_SCALE		dFloat64(dInt64(1)<<DG_MESH_EFFECT_PRECISION_BITS)
