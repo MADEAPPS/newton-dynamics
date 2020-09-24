@@ -41,12 +41,13 @@ add_executable(${projectName} ${CPP_SOURCE})
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	target_link_libraries (${projectName} ndCore ndCollision ndNewton glfw imgui glatter)
-	if (NEWTON_BUILD_PROFILER)
-		target_link_libraries (${projectName} dProfiler)
-	endif ()
 else()
 	target_link_libraries (${projectName} ndNewton glfw imgui glatter)
 endif()
+
+if (NEWTON_BUILD_PROFILER)
+	target_link_libraries (${projectName} dProfiler)
+endif ()
 
 if(MSVC OR MINGW)
     if(NEWTON_BUILD_SHARED_LIBS)

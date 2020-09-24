@@ -10,14 +10,14 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
+if (NEWTON_BUILD_PROFILER)
+	add_subdirectory(dProfiler)
+endif()
+
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	add_subdirectory(dCore)
 	add_subdirectory(dNewton)
 	add_subdirectory(dCollision)
-
-	if (NEWTON_BUILD_PROFILER)
-		add_subdirectory(dProfiler)
-	endif()
 
 else()
 

@@ -15,8 +15,38 @@
 
 #ifdef WIN32 
 #include <windows.h>
+#include <crtdbg.h>
 
 #pragma warning (disable: 4100) //unreferenced formal parameter
+
+class CheckMemoryLeaks
+{
+public:
+	CheckMemoryLeaks()
+	{
+		#if defined(_DEBUG) && defined(_MSC_VER)
+			// Track all memory leaks at the operating system level.
+			// make sure no Newton tool or utility leaves leaks behind.
+			_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_REPORT_FLAG);
+			//_CrtSetBreakAlloc(168);
+		#endif
+
+		atexit(CheckMemoryLeaksCallback);
+		// Set the memory allocation function before creation the newton world
+		// this is the only function that can be called before the creation of the newton world.
+		// it should be called once, and the the call is optional 
+		//dMemory::SetMemoryAllocators(PhysicsAlloc, PhysicsFree);
+	}
+
+	static void CheckMemoryLeaksCallback()
+	{
+#if defined(_DEBUG) && defined(_MSC_VER)
+		_CrtDumpMemoryLeaks();
+#endif
+	}
+};
+static CheckMemoryLeaks checkLeaks;
+
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,

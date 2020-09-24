@@ -842,7 +842,7 @@ void ndDemoEntityManager::ToggleProfiler()
 	#ifdef D_PROFILER
 		dAssert(m_world);
 		dTrace(("profiler Enable\n"));
-		NewtonWaitForUpdateToFinish(m_world);
+		m_world->Sync();
 		m_profilerMode = !m_profilerMode;
 		dProfilerEnableProling(m_profilerMode);
 	#endif
