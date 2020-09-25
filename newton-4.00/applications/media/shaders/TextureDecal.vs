@@ -10,10 +10,16 @@
 */
 #version 120
 
+attribute vec3 vertexPosition;
+attribute vec2 vertexTexCoord;
+
 void main()
 {	
-	gl_TexCoord[0] = gl_MultiTexCoord0;
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	//gl_TexCoord[0] = gl_MultiTexCoord0;
+	//gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+
+	gl_TexCoord[0] = vertexTexCoord;
+	gl_Position = matrixModelViewProjection * vec4(vertexPosition, 1.0);
 } 
 
 

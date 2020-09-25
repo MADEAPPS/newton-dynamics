@@ -23,7 +23,6 @@
 ndSkyBox::ndSkyBox(GLuint shader)
 	:ndDemoEntity (dGetIdentityMatrix(), nullptr)
 	,m_shader(shader)
-	,m_displayList(0)
 {
 	m_textures[0] = LoadTexture("NewtonSky0001.tga");
 	m_textures[1] = LoadTexture("NewtonSky0002.tga");
@@ -79,11 +78,6 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	m_displayList = glGenLists(1);
-	glNewList(m_displayList, GL_COMPILE);
-	DrawMesh ();
-	glEndList();
 }
 
 ndSkyBox::~ndSkyBox()
@@ -91,91 +85,12 @@ ndSkyBox::~ndSkyBox()
 
 	// delete VBO when program terminated
 	glDeleteBuffers(1, &m_vertexBuffer);
+	glDeleteBuffers(1, &m_indexBuffer);
 
-	if (m_displayList) 
-	{
-		glDeleteLists (m_displayList, 1);
-	}
 	for (int i = 0; i < int(sizeof (m_textures) / sizeof (m_textures[0])); i++) 
 	{
 		ReleaseTexture(m_textures[i]);
 	}
-}
-
-void ndSkyBox::DrawMesh () const
-{
-	glUseProgram(m_shader);
-	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
-
-	glColor3f(1.0f, 1.0f, 1.0f);
-
-	GLfloat padd = 1.0e-3f;
-	dFloat32 size = 200.0f;
-
-	glDisable(GL_BLEND);
-	glDisable(GL_LIGHTING);
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_TEXTURE_2D);
-
-	// front
-	glBindTexture(GL_TEXTURE_2D, m_textures[0]);
-	glBegin(GL_QUADS);
-	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f(GLfloat(size), GLfloat(size), -GLfloat(size));
-	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f(-GLfloat(size), GLfloat(size), -GLfloat(size));
-	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f(-GLfloat(size), -GLfloat(size), -GLfloat(size));
-	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(GLfloat(size), -GLfloat(size), -GLfloat(size));
-	glEnd();
-
-	// left
-	glBindTexture(GL_TEXTURE_2D, m_textures[3]);
-	glBegin(GL_QUADS);
-	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f(-GLfloat(size), GLfloat(size), -GLfloat(size));
-	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f(-GLfloat(size), GLfloat(size), GLfloat(size));
-	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f(-GLfloat(size), -GLfloat(size), GLfloat(size));
-	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(-GLfloat(size), -GLfloat(size), -GLfloat(size));
-	glEnd();
-
-	// right
-	glBindTexture(GL_TEXTURE_2D, m_textures[1]);
-	glBegin(GL_QUADS);
-	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f(GLfloat(size), GLfloat(size), GLfloat(size));
-	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f(GLfloat(size), GLfloat(size), -GLfloat(size));
-	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f(GLfloat(size), -GLfloat(size), -GLfloat(size));
-	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(GLfloat(size), -GLfloat(size), GLfloat(size));
-	glEnd();
-
-	// back
-	glBindTexture(GL_TEXTURE_2D, m_textures[2]);
-	glBegin(GL_QUADS);
-	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f(-GLfloat(size), GLfloat(size), GLfloat(size));
-	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f(GLfloat(size), GLfloat(size), GLfloat(size));
-	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f(GLfloat(size), -GLfloat(size), GLfloat(size));
-	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(-GLfloat(size), -GLfloat(size), GLfloat(size));
-	glEnd();
-
-	// top
-	glBindTexture(GL_TEXTURE_2D, m_textures[4]);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f(-GLfloat(size), GLfloat(size), -GLfloat(size));
-	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f(GLfloat(size), GLfloat(size), -GLfloat(size));
-	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(GLfloat(size), GLfloat(size), GLfloat(size));
-	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f(-GLfloat(size), GLfloat(size), GLfloat(size));
-	glEnd();
-
-	// bottom
-	glBindTexture(GL_TEXTURE_2D, m_textures[5]);
-	glBegin(GL_QUADS);
-	glTexCoord2f(0.0f + padd, 0.0f + padd); glVertex3f(-GLfloat(size), -GLfloat(size), GLfloat(size));
-	glTexCoord2f(0.0f + padd, 1.0f - padd); glVertex3f(GLfloat(size), -GLfloat(size), GLfloat(size));
-	glTexCoord2f(1.0f - padd, 1.0f - padd); glVertex3f(GLfloat(size), -GLfloat(size), -GLfloat(size));
-	glTexCoord2f(1.0f - padd, 0.0f + padd); glVertex3f(-GLfloat(size), -GLfloat(size), -GLfloat(size));
-	glEnd();
-
-	//	glDepthMask(GL_TRUE);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHTING);
-
-	glUseProgram(0);
 }
 
 void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix__) const
@@ -192,43 +107,34 @@ skyMatrix.m_posit = matrix.UntransformVector(dVector(0.0f, 0.25f, -800.0f, 1.0f)
 	glPushMatrix();
 	glMultMatrix(&skyMatrix[0][0]);
 
-	if (m_displayList) 
-//	if (0)
-	{
-		glCallList(m_displayList);
-	} 
-	else 
-	{
-		//DrawMesh();
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
-		GLint attribVertexPosition;
-		GLint attribVertexTexCoord;
+	GLint attribVertexPosition;
+	GLint attribVertexTexCoord;
 
-		glUseProgram(m_shader);
-		attribVertexPosition = glGetAttribLocation(m_shader, "vertexPosition");
-		attribVertexTexCoord = glGetAttribLocation(m_shader, "vertexTexCoord");
+	glUseProgram(m_shader);
+	attribVertexPosition = glGetAttribLocation(m_shader, "vertexPosition");
+	attribVertexTexCoord = glGetAttribLocation(m_shader, "vertexTexCoord");
 
-		// activate attributes
-		glEnableVertexAttribArray(attribVertexPosition);
-		glEnableVertexAttribArray(attribVertexTexCoord);
+	// activate attributes
+	glEnableVertexAttribArray(attribVertexPosition);
+	glEnableVertexAttribArray(attribVertexTexCoord);
 
-		// set attrib arrays using glVertexAttribPointer()
-		glVertexAttribPointer(attribVertexPosition, 3, GL_FLOAT, false, 0, 0);
-		glVertexAttribPointer(attribVertexTexCoord, 2, GL_FLOAT, false, 0, (void*)m_uvOffest);
+	// set attrib arrays using glVertexAttribPointer()
+	glVertexAttribPointer(attribVertexPosition, 3, GL_FLOAT, false, 0, 0);
+	glVertexAttribPointer(attribVertexTexCoord, 2, GL_FLOAT, false, 0, (void*)m_uvOffest);
 
-		glBindTexture(GL_TEXTURE_2D, m_textures[0]);
-		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)0); 
+	glBindTexture(GL_TEXTURE_2D, m_textures[0]);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)0); 
 		
-		glDisableVertexAttribArray(attribVertexPosition);
-		glDisableVertexAttribArray(attribVertexTexCoord);
+	glDisableVertexAttribArray(attribVertexPosition);
+	glDisableVertexAttribArray(attribVertexTexCoord);
 
-		// unbind
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glUseProgram(0);
-	}
+	// unbind
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glUseProgram(0);
 
 	glPopMatrix();
 }

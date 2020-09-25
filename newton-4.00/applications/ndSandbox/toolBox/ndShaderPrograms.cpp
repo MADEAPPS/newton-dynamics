@@ -24,19 +24,24 @@ ndShaderPrograms::ndShaderPrograms(void)
 
 ndShaderPrograms::~ndShaderPrograms(void)
 {
-	if (m_solidColor) {
+	if (m_solidColor) 
+	{
 		glDeleteShader(m_solidColor);
 	}
-	if (m_decalEffect) {
+	if (m_decalEffect) 
+	{
 		glDeleteShader(m_decalEffect);
 	}
-	if (m_diffuseEffect) {
+	if (m_diffuseEffect) 
+	{
 		glDeleteShader(m_diffuseEffect);
 	}
-	if (m_diffuseNoTextureEffect) {
+	if (m_diffuseNoTextureEffect) 
+	{
 		glDeleteShader(m_diffuseNoTextureEffect);
 	}
-	if (m_skinningDiffuseEffect) {
+	if (m_skinningDiffuseEffect) 
+	{
 		glDeleteShader(m_skinningDiffuseEffect);
 	}
 	if (m_diffuseIntanceEffect) {
