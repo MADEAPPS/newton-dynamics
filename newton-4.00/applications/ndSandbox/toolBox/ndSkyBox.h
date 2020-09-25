@@ -33,6 +33,9 @@ class ndSkyBox: public ndDemoEntity
 	private:
 	void DrawMesh () const;
 
+	int m_uvOffest;
+	GLuint m_indexBuffer;
+	GLuint m_vertexBuffer;
 	GLuint m_displayList;
 	GLuint m_shader;
 	GLuint m_textures[6];
