@@ -104,7 +104,7 @@ dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist)
 	dVector p0(origin);
 	dVector p1(origin - dVector(0.0f, dAbs(dist), 0.0f, 0.0f));
 
-	ndRayCastCloasestHitCallback rayCaster(world.GetScene());
+	ndRayCastClosestHitCallback rayCaster(world.GetScene());
 	dFloat32 param = rayCaster.TraceRay(p0, p1);
 	return (param < 1.0f) ? rayCaster.m_contact.m_point : p0;
 }

@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _D_DYNAMIC_BODY_H_
-#define _D_DYNAMIC_BODY_H_
+#ifndef __D_DYNAMIC_BODY_H__
+#define __D_DYNAMIC_BODY_H__
 
 #include "ndNewtonStdafx.h"
 

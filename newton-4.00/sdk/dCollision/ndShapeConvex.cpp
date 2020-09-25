@@ -442,7 +442,6 @@ void ndShapeConvex::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debu
 void ndShapeConvex::SetVolumeAndCG()
 {
 	dVector faceVertex[D_MAX_EDGE_COUNT];
-	//dStack<dInt8> edgeMarks(m_edgeCount);
 	dInt8* const edgeMarks = dAlloca(dInt8, m_edgeCount + 32);
 	memset(&edgeMarks[0], 0, sizeof(dInt8) * m_edgeCount);
 
@@ -474,8 +473,8 @@ void ndShapeConvex::SetVolumeAndCG()
 	m_simplexVolume = volume;
 
 	// calculate the origin of the bound box of this primitive
-	dVector p0(dFloat32(0.0f));
-	dVector p1(dFloat32(0.0f));
+	dVector p0(dVector::m_zero);
+	dVector p1(dVector::m_zero);
 
 	for (dInt32 i = 0; i < 3; i++) 
 	{

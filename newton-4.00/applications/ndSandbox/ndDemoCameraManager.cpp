@@ -16,6 +16,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoCamera.h"
 #include "ndOpenGlUtil.h"
+#include "ndPhysicsWorld.h"
 #include "ndPhysicsUtils.h"
 #include "ndDemoCameraManager.h"
 
@@ -255,54 +256,53 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 		if (!m_prevMouseState && mousePickState) 
 		{
 			dTrace(("Implmement object picking\n"));
-		//	dFloat32 param;
-		//	dVector posit;
-		//	dVector normal;
-		//
-		//	NewtonBody* const body = MousePickBody (scene->GetWorld(), p0, p1, param, posit, normal);
-		//	if (body) {
-		//		dMatrix matrix;
-		//		m_targetPicked = body;
-		//		NewtonBodyGetMatrix(m_targetPicked, &matrix[0][0]);
-		//
-		//		dTrace (("body Id: %d\n", NewtonBodyGetID(m_targetPicked)));
-		//
-		//		m_pickedBodyParam = param;
-		//		if(m_pickJoint) {
-		//			delete m_pickJoint;
-		//			m_pickJoint = nullptr;
-		//		}
-		//			
-		//		dFloat32 Ixx;
-		//		dFloat32 Iyy;
-		//		dFloat32 Izz;
-		//		dFloat32 mass;
-		//		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-		//
-		//		// change this to make the grabbing stronger or weaker
-		//		//const dFloat32 angularFritionAccel = 10.0f;
-		//		const dFloat32 angularFritionAccel = 5.0f;
-		//		const dFloat32 linearFrictionAccel = 400.0f * dMax (dAbs (DEMO_GRAVITY), dFloat32(10.0f));
-		//		const dFloat32 inertia = dMax (Izz, dMax (Ixx, Iyy));
-		//
-		//		m_pickJoint = new ndDemoCameraPickBodyJoint (body, posit, this);
-		//		m_pickJoint->SetControlMode(dCustomKinematicController::m_linearPlusAngularFriction);
-		//
-		//		m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
-		//		m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
-		//	}
+			dFloat32 param;
+			dVector posit;
+			dVector normal;
+		
+			ndBodyKinematic* const body = MousePickBody (scene->GetWorld(), p0, p1, param, posit, normal);
+			if (body) 
+			{
+				m_targetPicked = body;
+				dMatrix matrix (m_targetPicked->GetMatrix());
+				
+				m_pickedBodyParam = param;
+				if(m_pickJoint) 
+				{
+					dAssert(0);
+					//delete m_pickJoint;
+					m_pickJoint = nullptr;
+				}
+					
+				dVector mass (m_targetPicked->GetMassMatrix());
+
+				// change this to make the grabbing stronger or weaker
+				//const dFloat32 angularFritionAccel = 10.0f;
+				const dFloat32 angularFritionAccel = 5.0f;
+				const dFloat32 linearFrictionAccel = 400.0f * dMax (dAbs (DEMO_GRAVITY), dFloat32(10.0f));
+				const dFloat32 inertia = dMax (mass.m_z, dMax (mass.m_x, mass.m_y));
+
+				dTrace(("create teh pick joint here: %d\n", m_targetPicked->GetId()));
+				//m_pickJoint = new ndDemoCameraPickBodyJoint (body, posit, this);
+				//m_pickJoint->SetControlMode(dCustomKinematicController::m_linearPlusAngularFriction);
+				//
+				//m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
+				//m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
+			}
 		}
 	} 
 	else 
 	{
 		if (mousePickState) 
 		{
-			dAssert(0);
-			//m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);
-			//
-			//if (m_pickJoint) {
-			//	m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
-			//}
+			
+			m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);
+			
+			if (m_pickJoint) 
+			{
+				dAssert(0);
+				//m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
+			}
 		} 
 		else 
 		{
@@ -322,8 +322,7 @@ void ndDemoCameraManager::ResetPickBody()
 {
 	if (m_targetPicked) 
 	{
-		dAssert(0);
-		//NewtonBodySetSleepState(m_targetPicked, 0);
+		m_targetPicked->SetSleepState(false);
 	}
 	if (m_pickJoint) 
 	{

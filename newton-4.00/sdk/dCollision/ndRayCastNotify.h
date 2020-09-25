@@ -58,10 +58,10 @@ class ndRayCastNotify
 } D_GCC_NEWTON_ALIGN_32 ;
 
 D_MSV_NEWTON_ALIGN_32
-class ndRayCastCloasestHitCallback: public ndRayCastNotify
+class ndRayCastClosestHitCallback: public ndRayCastNotify
 {
 	public:
-	ndRayCastCloasestHitCallback(const ndScene* const broadPhase)
+	ndRayCastClosestHitCallback(const ndScene* const broadPhase)
 		:ndRayCastNotify(broadPhase)
 		,m_param(dFloat32(1.2f))
 	{
@@ -78,8 +78,7 @@ class ndRayCastCloasestHitCallback: public ndRayCastNotify
 	}
 
 	ndContactPoint m_contact;
-
-	private:
+	protected:
 	dFloat32 m_param;
 } D_GCC_NEWTON_ALIGN_32 ;
 

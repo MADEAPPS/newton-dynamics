@@ -37,9 +37,6 @@ dVector ndShapeSphere::m_unitSphere[D_SPHERE_VERTEX_COUNT];
 ndShapeConvex::ndConvexSimplexEdge ndShapeSphere::m_edgeArray[D_SPHERE_EDGE_COUNT];
 
 #if 0
-
-
-
 ndShapeSphere::ndShapeSphere(dgMemoryAllocator* const allocator, dUnsigned32 signature, dFloat32 radii)
 	:dgCollisionConvex(allocator, signature, m_sphereCollision) 
 {

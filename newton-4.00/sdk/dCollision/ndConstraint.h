@@ -139,8 +139,6 @@ class ndConstraintDescritor
 	dFloat32 m_penetrationStiffness[D_CONSTRAINT_MAX_ROWS];
 	dFloat32 m_zeroRowAcceleration[D_CONSTRAINT_MAX_ROWS];
 	dInt32 m_flags[D_CONSTRAINT_MAX_ROWS];
-	//dgWorld* m_world;
-	//dInt32 m_threadIndex;
 	dFloat32 m_timestep;
 	dFloat32 m_invTimestep;
 } D_GCC_NEWTON_ALIGN_32;
