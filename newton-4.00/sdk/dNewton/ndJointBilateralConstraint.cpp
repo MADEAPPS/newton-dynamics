@@ -22,14 +22,14 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndBilateralConstraint.h"
+#include "ndJointBilateralConstraint.h"
 
 
 //#include "dgBody.h"
 //#include "dgWorld.h"
 //#include "dgConstraint.h"
 //#include "dgWorldDynamicUpdate.h"
-//#include "dBilateralConstraint.h"
+//#include "ndJointBilateralConstraint.h"
 
 
 //////////////////////////////////////////////////////////////////////
@@ -315,7 +315,7 @@ void dBilateralConstraint::CalculateAngularDerivative (dInt32 index, dgContraint
 	}
 }
 
-void dBilateralConstraint::CalculatePointDerivative (dInt32 index, dgContraintDescritor& desc, const dgVector& dir, const dgPointParam& param, dgForceImpactPair* const jointForce)
+void ndJointBilateralConstraint::CalculatePointDerivative (dInt32 index, dgContraintDescritor& desc, const dgVector& dir, const dgPointParam& param, dgForceImpactPair* const jointForce)
 {
 	dAssert (jointForce);
 	dAssert (m_body0);
@@ -394,7 +394,7 @@ void dBilateralConstraint::CalculatePointDerivative (dInt32 index, dgContraintDe
 	}
 }
 
-void dBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* const params)
+void ndJointBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* const params)
 {
 	const dgVector& bodyVeloc0 = m_body0->m_veloc;
 	const dgVector& bodyOmega0 = m_body0->m_omega;
@@ -466,12 +466,10 @@ void dBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor* cons
 #endif
 
 
-dBilateralConstraint::dBilateralConstraint(
-	ndBodyKinematic* const body0, const dMatrix& globalMatrix0,
-	ndBodyKinematic* const body1, const dMatrix& globalMatrix1)
+ndJointBilateralConstraint::ndJointBilateralConstraint(ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix)
 	:ndConstraint()
-	,m_localMatrix0(globalMatrix0)
-	,m_localMatrix1(globalMatrix1)
+	,m_localMatrix0(globalMatrix)
+	,m_localMatrix1(globalMatrix)
 	,m_body0(body0)
 	,m_body1(body1)
 	//,m_destructor(NULL)
@@ -480,7 +478,6 @@ dBilateralConstraint::dBilateralConstraint(
 	if (m_body0->GetInvMass() == dFloat32(0.0f)) 
 	{
 		dSwap(m_body0, m_body1);
-		dSwap(m_localMatrix0, m_localMatrix1);
 	}
 	dAssert(m_body0->GetInvMass() > dFloat32(0.0f));
 
@@ -501,7 +498,7 @@ dBilateralConstraint::dBilateralConstraint(
 	//memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
 }
 
-dBilateralConstraint::~dBilateralConstraint()
+ndJointBilateralConstraint::~ndJointBilateralConstraint()
 {
 	dAssert(0);
 	//if (m_destructor) 

@@ -19,25 +19,25 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_BILATERALCONSTRAINT_H__
-#define __D_BILATERALCONSTRAINT_H__
+#ifndef __D_JOINT_BILATERAL_CONSTRAINT_H__
+#define __D_JOINT_BILATERAL_CONSTRAINT_H__
 
 #include "ndNewtonStdafx.h"
 
-class dBilateralConstraint;
+class ndJointBilateralConstraint;
 #define DG_BILATERAL_CONTRAINT_DOF	8
 
-//class dBilateralConstraintList: public dgList<dBilateralConstraint*>
+//class dBilateralConstraintList: public dgList<ndJointBilateralConstraint*>
 //{
 //	public:
 //	dBilateralConstraintList(dgMemoryAllocator* const allocator)
-//		:dgList<dBilateralConstraint*>(allocator)
+//		:dgList<ndJointBilateralConstraint*>(allocator)
 //	{
 //	}
 //};
 
 D_MSV_NEWTON_ALIGN_32
-class dBilateralConstraint: public ndConstraint
+class ndJointBilateralConstraint: public ndConstraint
 {
 /*
 	public:
@@ -91,10 +91,8 @@ class dBilateralConstraint: public ndConstraint
 	friend class dgWorldDynamicUpdate;
 */
 	public:
-	D_NEWTON_API dBilateralConstraint(
-		ndBodyKinematic* const body0, const dMatrix& globalMatrix0,
-		ndBodyKinematic* const body1, const dMatrix& globalMatrix1);
-	D_NEWTON_API virtual ~dBilateralConstraint();
+	D_NEWTON_API ndJointBilateralConstraint(ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix);
+	D_NEWTON_API virtual ~ndJointBilateralConstraint();
 
 	protected:
 	dMatrix m_localMatrix0;

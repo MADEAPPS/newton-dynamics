@@ -18,11 +18,16 @@ if(NEWTON_USE_PLUGIN_DLL)
 endif()
 
 #source and header files
-file(GLOB CPP_SOURCE *.h *.cpp)
-file(GLOB HEADERS *.h)
+file(GLOB CPP_SOURCE 
+	*.h *.cpp 
+	dJoints/*.h
+	dJoints/*.cpp)
+file(GLOB HEADERS *.h dJoints/*.h)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
+include_directories(./)
+include_directories(dJoints/)
 include_directories(../dCore/)
 include_directories(../dCollision/)
 

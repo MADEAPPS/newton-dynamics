@@ -27,16 +27,19 @@ else()
 	include_directories(dCore/)
 	include_directories(dNewton/)
 	include_directories(dCollision/)
+	include_directories(dNewton/dJoints/)
 	
 	# source and header files
-	file(GLOB HEADERS dCore/*.h dNewton/*.h dCollision/*.h)
+	file(GLOB HEADERS dCore/*.h dNewton/*.h dCollision/*.h dNewton/dJoints/*.h)
 	file(GLOB CPP_SOURCE 
 		dCore/*.h 
 		dCore/*.cpp
 		dNewton/*.h 
 		dNewton/*.cpp
 		dCollision/*.h 
-		dCollision/*.cpp)
+		dCollision/*.cpp
+		dNewton/dJoints/*.h 
+		dNewton/dJoints/*.cpp)
 
 	source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
