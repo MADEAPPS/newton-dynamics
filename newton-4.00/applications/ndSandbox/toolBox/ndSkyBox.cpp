@@ -74,6 +74,13 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(texCoords), texCoords);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+
+	glUseProgram(m_shader);
+	m_textureLocation = glGetUniformLocation(m_shader, "texture");
+	m_attribVertexPosition = glGetAttribLocation(m_shader, "vertexPosition");
+	m_attribVertexTexCoord = glGetAttribLocation(m_shader, "vertexTexCoord");
+	glUseProgram(0);
+
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
@@ -109,27 +116,22 @@ skyMatrix.m_posit = matrix.UntransformVector(dVector(0.0f, 0.25f, -800.0f, 1.0f)
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-
-	GLint attribVertexPosition;
-	GLint attribVertexTexCoord;
-
+	
 	glUseProgram(m_shader);
-	attribVertexPosition = glGetAttribLocation(m_shader, "vertexPosition");
-	attribVertexTexCoord = glGetAttribLocation(m_shader, "vertexTexCoord");
-
 	// activate attributes
-	glEnableVertexAttribArray(attribVertexPosition);
-	glEnableVertexAttribArray(attribVertexTexCoord);
+	glUniform1i(m_textureLocation, 0);
+	glEnableVertexAttribArray(m_attribVertexPosition);
+	glEnableVertexAttribArray(m_attribVertexTexCoord);
 
 	// set attrib arrays using glVertexAttribPointer()
-	glVertexAttribPointer(attribVertexPosition, 3, GL_FLOAT, false, 0, 0);
-	glVertexAttribPointer(attribVertexTexCoord, 2, GL_FLOAT, false, 0, (void*)m_uvOffest);
+	glVertexAttribPointer(m_attribVertexPosition, 3, GL_FLOAT, false, 0, 0);
+	glVertexAttribPointer(m_attribVertexTexCoord, 2, GL_FLOAT, false, 0, (void*)m_uvOffest);
 
 	glBindTexture(GL_TEXTURE_2D, m_textures[0]);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)0); 
 		
-	glDisableVertexAttribArray(attribVertexPosition);
-	glDisableVertexAttribArray(attribVertexTexCoord);
+	glDisableVertexAttribArray(m_attribVertexPosition);
+	glDisableVertexAttribArray(m_attribVertexTexCoord);
 
 	// unbind
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

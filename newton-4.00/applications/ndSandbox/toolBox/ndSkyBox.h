@@ -36,6 +36,11 @@ class ndSkyBox: public ndDemoEntity
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
 	GLuint m_textures[6];
+
+	GLint m_textureLocation;
+	GLint m_attribVertexPosition;
+	GLint m_attribVertexTexCoord;
+
 };
 
 #endif 
