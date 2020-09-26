@@ -559,18 +559,23 @@ dgInt32 dgCollisionConvexPolygon::CalculateContactToConvexHullContinue(const dgW
 	dgFastRayTest ray(dgVector(dgFloat32(0.0f)), polygonMatrix.UnrotateVector(relStep));
  	dgFloat32 distance = ray.BoxIntersect(minBox, maxBox);
 
+	dgFloat32 relStepSpeed = m_normal.DotProduct(relStep).GetScalar();
 	dgInt32 count = 0;
-	if (distance < dgFloat32(1.0f)) {
+	if ((distance < dgFloat32(1.0f)) && (dgAbs (relStepSpeed) > dgFloat32 (1.0e-12f))) {
 		bool inside = false;
-
+		dgAssert(m_normal.DotProduct(relStep).GetScalar() == relStepSpeed);
+		dgFloat32 invSpeed = dgFloat32(1.0f) / relStepSpeed;
 		dgVector sphOrigin(polygonMatrix.TransformVector((hullBoxP1 + hullBoxP0) * dgVector::m_half));
-		dgVector pointInPlane (sphOrigin - relStep.Scale (m_normal.DotProduct(sphOrigin - m_localPoly[0]).GetScalar() / m_normal.DotProduct(relStep).GetScalar()));
+		//dgVector pointInPlane (sphOrigin - relStep.Scale (m_normal.DotProduct(sphOrigin - m_localPoly[0]).GetScalar() / m_normal.DotProduct(relStep).GetScalar()));
+		dgVector pointInPlane(sphOrigin - relStep.Scale(m_normal.DotProduct(sphOrigin - m_localPoly[0]).GetScalar() * invSpeed));
 
 		dgVector sphRadius(dgVector::m_half * (hullBoxP1 - hullBoxP0));
 		dgFloat32 radius = dgSqrt(sphRadius.DotProduct(sphRadius).GetScalar());
 		dgVector planeMinkStep (m_normal.Scale (radius));
 		sphOrigin -= planeMinkStep;
-		dgVector supportPoint (sphOrigin - relStep.Scale (m_normal.DotProduct(sphOrigin - m_localPoly[0]).GetScalar() / m_normal.DotProduct(relStep).GetScalar()));
+		dgAssert(m_normal.DotProduct(relStep).GetScalar() == relStepSpeed);
+		//dgVector supportPoint (sphOrigin - relStep.Scale (m_normal.DotProduct(sphOrigin - m_localPoly[0]).GetScalar() / m_normal.DotProduct(relStep).GetScalar()));
+		dgVector supportPoint(sphOrigin - relStep.Scale(m_normal.DotProduct(sphOrigin - m_localPoly[0]).GetScalar() * invSpeed));
 
 		supportPoint -= pointInPlane;
 		dgAssert (supportPoint.m_w == dgFloat32 (0.0f));
