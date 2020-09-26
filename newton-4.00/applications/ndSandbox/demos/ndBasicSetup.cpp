@@ -101,6 +101,6 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 	BuildSphere(scene, 10.0f, origin1, 1.0f, 10, 0.0f);
 
 	dQuaternion rot;
-	dVector origin(-40.0f, 10.0f, 0.0f, 0.0f);
+	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
