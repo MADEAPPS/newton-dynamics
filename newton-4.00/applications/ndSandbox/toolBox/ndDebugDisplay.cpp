@@ -302,40 +302,7 @@ void RenderNormalForces (NewtonWorld* const world)
 }
 
 
-
-void DebugShowGeometryCollision (void* userData, int vertexCount, const dFloat32* const faceVertec, int id)
-{
-	//DEBUG_DRAW_MODE mode = (DEBUG_DRAW_MODE) ((int)userData); //NOTE error: cast from ‘void*’ to ‘int’ loses precision
-	DEBUG_DRAW_MODE mode = (DEBUG_DRAW_MODE) ((intptr_t)userData);
-	
-	if (mode == m_lines) {
-		int index = vertexCount - 1;
-		dVector p0 (faceVertec[index * 3 + 0], faceVertec[index * 3 + 1], faceVertec[index * 3 + 2]);
-		for (int i = 0; i < vertexCount; i ++) {
-			dVector p1 (faceVertec[i * 3 + 0], faceVertec[i * 3 + 1], faceVertec[i * 3 + 2]);
-			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-			p0 = p1;
-		}
-	} else {
-		dVector p0 (faceVertec[0 * 3 + 0], faceVertec[0 * 3 + 1], faceVertec[0 * 3 + 2]);
-		dVector p1 (faceVertec[1 * 3 + 0], faceVertec[1 * 3 + 1], faceVertec[1 * 3 + 2]);
-		dVector p2 (faceVertec[2 * 3 + 0], faceVertec[2 * 3 + 1], faceVertec[2 * 3 + 2]);
-
-		dVector normal ((p1 - p0).CrossProduct(p2 - p0));
-		normal = normal.Scale (1.0f / dSqrt (normal.DotProduct3(normal)));
-		glNormal3f(GLfloat(normal.m_x), GLfloat(normal.m_y), GLfloat(normal.m_z));
-		for (int i = 2; i < vertexCount; i ++) {
-			p2 = dVector (faceVertec[i * 3 + 0], faceVertec[i * 3 + 1], faceVertec[i * 3 + 2]);
-			glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-			glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-			glVertex3f(GLfloat(p2.m_x), GLfloat(p2.m_y), GLfloat(p2.m_z));
-			p1 = p2;
-		}
-	}
-}
-
-void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat32* const faceVertec, int clusterIndex)
+void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat32* const faceVertex, int clusterIndex)
 {
 	static dVector color[] = {dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f), dVector(0.0f, 0.0f, 1.0f, 0.0f), 
 							  dVector(1.0f, 1.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 1.0f, 0.0f), dVector(1.0f, 0.0f, 1.0f, 0.0f),
@@ -343,95 +310,7 @@ void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const d
 		
 	int index = clusterIndex % (sizeof (color) / sizeof (color[0]));
 	glColor3f(GLfloat(color[index].m_x), GLfloat(color[index].m_y), GLfloat(color[index].m_z));
-	DebugShowGeometryCollision (userData, vertexCount, faceVertec, clusterIndex);
-}
-
-
-static void DebugShowBodyCollision (const NewtonBody* const body, DEBUG_DRAW_MODE mode)
-{
-	switch (NewtonBodyGetType(body)) 
-	{
-		case NEWTON_DYNAMIC_BODY:
-		{
-			int sleepState = NewtonBodyGetSleepState(body);
-			if (sleepState == 1) {
-				// indicate when body is sleeping 
-				glColor3f(0.42f, 0.73f, 0.98f);
-			} else {
-				// body is active
-				glColor3f(1.0f, 1.0f, 1.0f);
-			}
-			break;
-		}
-
-		case NEWTON_KINEMATIC_BODY:
-			glColor3f(1.0f, 1.0f, 0.0f);
-			break;
-	}
-	dMatrix matrix;
-	NewtonBodyGetMatrix(body, &matrix[0][0]);
-	NewtonCollisionForEachPolygonDo (NewtonBodyGetCollision(body), &matrix[0][0], DebugShowGeometryCollision, (void*) mode);
-}
-
-
-void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE mode)
-{
-	glDisable(GL_TEXTURE_2D);
-	if (mode == m_lines) {
-		glDisable (GL_LIGHTING);
-		glBegin(GL_LINES);
-	} else {
-		glBegin(GL_TRIANGLES);
-	}
-	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
-
-		dFloat32 mass;
-		dFloat32 Ixx;
-		dFloat32 Iyy;
-		dFloat32 Izz;
-		NewtonBodyGetMass(body, &mass, &Ixx, &Iyy, &Izz);
-		if (mass == 0.0f) {
-//			continue;
-		}
-
-		NewtonCollision* const collision = NewtonBodyGetCollision(body);
-		int collisionType = NewtonCollisionGetType (collision);
-		switch (collisionType) 
-		{
-			//SERIALIZE_ID_SPHERE:
-			//SERIALIZE_ID_CAPSULE:
-			//SERIALIZE_ID_CHAMFERCYLINDER:
-			//SERIALIZE_ID_TAPEREDCAPSULE:
-			//SERIALIZE_ID_CYLINDER:
-			//SERIALIZE_ID_TAPEREDCYLINDER:
-			//SERIALIZE_ID_BOX:
-			//SERIALIZE_ID_CONE:
-			//SERIALIZE_ID_CONVEXHULL:
-			//SERIALIZE_ID_NULL:
-			//SERIALIZE_ID_COMPOUND:
-			//SERIALIZE_ID_CLOTH_PATCH:
-			//SERIALIZE_ID_DEFORMABLE_SOLID:
-//			case SERIALIZE_ID_TREE:
-//			case SERIALIZE_ID_SCENE:
-//			case SERIALIZE_ID_USERMESH:
-//			case SERIALIZE_ID_HEIGHTFIELD:
-//			case SERIALIZE_ID_COMPOUND_BREAKABLE:
-			case 1000:
-				break;
-			default: 
-				DebugShowBodyCollision (body, mode);
-		}
-	}
-	glEnd();
-
-	glDisable (GL_LIGHTING);
-	glBegin(GL_LINES);
-	glColor3f(1.0f, 1.0f, 0.0f);
-	for (int i = 0; i < g_debugDisplayCount; i += 2) {
-		glVertex3f (GLfloat(g_debugDisplayCallback[i].m_x), GLfloat(g_debugDisplayCallback[i].m_y), GLfloat(g_debugDisplayCallback[i].m_z));
-		glVertex3f (GLfloat(g_debugDisplayCallback[i+1].m_x), GLfloat(g_debugDisplayCallback[i+1].m_y), GLfloat(g_debugDisplayCallback[i+1].m_z));
-	}
-	glEnd();
+	DebugShowGeometryCollision (userData, vertexCount, faceVertex, clusterIndex);
 }
 
 void DebugDrawPoint (const dVector& p, dFloat32 size)
@@ -451,7 +330,7 @@ void DebugDrawLine (const dVector& p0, const dVector& p1)
 	glEnd();
 }
 
-void DebugDrawCollision (const NewtonCollision* const collision, const dMatrix& matrix, DEBUG_DRAW_MODE mode)
+void DebugDrawCollision (const NewtonCollision* const collision, const dMatrix& matrix, dDebugDisplayMode mode)
 {
 //	glBegin(GL_LINES);
 	NewtonCollisionForEachPolygonDo (collision, &matrix[0][0], DebugShowGeometryCollision, (void*)mode);
@@ -509,3 +388,100 @@ void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* con
 }
 
 #endif
+
+void DebugRenderWorldCollision(const ndWorld* const world, dDebugDisplayMode mode)
+{
+	glDisable(GL_TEXTURE_2D);
+	if (mode == m_lines) 
+	{
+		glDisable(GL_LIGHTING);
+		glBegin(GL_LINES);
+	}
+	else 
+	{
+		glBegin(GL_TRIANGLES);
+	}
+
+	class ndDrawShape: public ndShapeDebugCallback
+	{
+		public:
+		ndDrawShape(dDebugDisplayMode mode)
+			:ndShapeDebugCallback()
+			,m_mode(mode)
+		{
+		}
+
+		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceVertex)
+		{
+			if (m_mode == m_lines)
+			{
+				int i0 = vertexCount - 1;
+				for (int i1 = 0; i1 < vertexCount; i1++)
+				{
+					glVertex3f(GLfloat(faceVertex[i0].m_x), GLfloat(faceVertex[i0].m_y), GLfloat(faceVertex[i0].m_z));
+					glVertex3f(GLfloat(faceVertex[i1].m_x), GLfloat(faceVertex[i1].m_y), GLfloat(faceVertex[i1].m_z));
+					i0 = i1;
+				}
+			}
+			else
+			{
+				dVector p0(faceVertex[0]);
+				dVector p1(faceVertex[1]);
+				dVector p2(faceVertex[2]);
+
+				dVector normal((p1 - p0).CrossProduct(p2 - p0));
+				normal = normal.Scale(1.0f / dSqrt(normal.DotProduct(normal).GetScalar()));
+				glNormal3f(GLfloat(normal.m_x), GLfloat(normal.m_y), GLfloat(normal.m_z));
+				for (int i = 2; i < vertexCount; i++) 
+				{
+					p2 = dVector(faceVertex[i]);
+					glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+					glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+					glVertex3f(GLfloat(p2.m_x), GLfloat(p2.m_y), GLfloat(p2.m_z));
+					p1 = p2;
+				}
+			}
+		}
+
+		dDebugDisplayMode m_mode;
+	};
+
+	ndDrawShape drawShapes(mode);
+	const ndBodyList& bodyList = world->GetBodyList();
+	for (ndBodyList::dListNode* node = bodyList.GetFirst(); node; node = node->GetNext()) 
+	{
+		ndBodyKinematic* const body = node->GetInfo();
+		
+		
+		if (body->GetInvMass() == 0.0f) 
+		{
+			//continue;
+		}
+	
+		ndShapeInstance& collision = body->GetCollisionShape();
+
+		int sleepState = body->GetSleepState();
+		if (sleepState == 1) 
+		{
+			// indicate when body is sleeping 
+			glColor3f(0.42f, 0.73f, 0.98f);
+		}
+		else 
+		{
+			// body is active
+			glColor3f(1.0f, 1.0f, 1.0f);
+		}
+		collision.DebugShape(body->GetMatrix(), drawShapes);
+	}
+	glEnd();
+	
+	//glDisable(GL_LIGHTING);
+	//glBegin(GL_LINES);
+	//glColor3f(1.0f, 1.0f, 0.0f);
+	//for (int i = 0; i < g_debugDisplayCount; i += 2) 
+	//{
+	//	glVertex3f(GLfloat(g_debugDisplayCallback[i].m_x), GLfloat(g_debugDisplayCallback[i].m_y), GLfloat(g_debugDisplayCallback[i].m_z));
+	//	glVertex3f(GLfloat(g_debugDisplayCallback[i + 1].m_x), GLfloat(g_debugDisplayCallback[i + 1].m_y), GLfloat(g_debugDisplayCallback[i + 1].m_z));
+	//}
+	//glEnd();
+}

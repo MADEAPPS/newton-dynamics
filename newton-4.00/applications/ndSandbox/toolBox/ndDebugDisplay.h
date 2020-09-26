@@ -17,13 +17,14 @@
 #include <dVector.h>
 #include <dMatrix.h>
 
-#if 0
-enum DEBUG_DRAW_MODE
+
+enum dDebugDisplayMode
 {
 	m_lines,
 	m_solid,
 };
 
+#if 0
 class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
 {
 	public:
@@ -126,14 +127,17 @@ void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* con
 
 void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat32* const faceVertec, int faceId);
 
-void DebugRenderWorldCollision (const NewtonWorld* const world, DEBUG_DRAW_MODE mode);
+
 
 void DebugDrawPoint (const dVector& p0, dFloat32 size);
 void DebugDrawLine (const dVector& p0, const dVector& p1);
-void DebugDrawCollision (const NewtonCollision* const collision, const dMatrix& matrix, DEBUG_DRAW_MODE mode);
+void DebugDrawCollision (const NewtonCollision* const collision, const dMatrix& matrix, dDebugDisplayMode mode);
 
 void ClearDebugDisplay(NewtonWorld* const world);
 void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const NewtonBody* const body, int faceID, int vertexCount, const dFloat32* const vertex, int vertexstrideInBytes);
 #endif
 
+void DebugRenderWorldCollision(const ndWorld* const world, dDebugDisplayMode mode);
+
 #endif
+

@@ -997,7 +997,6 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 				}
 				else 
 				{
-					dAssert(0);
 					const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
 					const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
 					const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);

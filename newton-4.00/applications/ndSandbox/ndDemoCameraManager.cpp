@@ -169,14 +169,14 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	dVector p0(m_camera->ScreenToWorld(dVector(x, y, 0.0f, 0.0f)));
 	dVector p1(m_camera->ScreenToWorld(dVector(x, y, 1.0f, 0.0f)));
 
-#if 0
-	struct dReplay
+#if 1
+	struct ndReplay
 	{
 		dVector m_p0;
 		dVector m_p1;
 		int m_mouseState;
 	};
-	dReplay replay;
+	ndReplay replay;
 
 	#if 1
 		replay.m_p0 = p0;
@@ -184,14 +184,16 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 		replay.m_mouseState = mouseState ? 1 : 0;
 
 		static FILE* file = fopen("log.bin", "wb");
-		if (file) {
-			fwrite(&replay, sizeof(dReplay), 1, file);
+		if (file) 
+		{
+			fwrite(&replay, sizeof(ndReplay), 1, file);
 			fflush(file);
 		}
 	#else 
 		static FILE* file = fopen("log.bin", "rb");
-		if (file) {
-			fread(&replay, sizeof(dReplay), 1, file);
+		if (file) 
+		{
+			fread(&replay, sizeof(ndReplay), 1, file);
 			p0 = replay.m_p0;
 			p1 = replay.m_p1;
 			mouseState = replay.m_mouseState ? true : false;
@@ -201,7 +203,6 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 
 	UpdatePickBody(scene, mouseState, p0, p1, timestep);
 }
-
 
 void ndDemoCameraManager::SetCameraMouseLock (bool loockState)
 {

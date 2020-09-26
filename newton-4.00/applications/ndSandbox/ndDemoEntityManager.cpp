@@ -205,7 +205,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 //	m_showNormalForces = true;
 //	m_showContactPoints = true;
 //	m_showJointDebugInfo = true;
-//	m_collisionDisplayMode = 2;
+	m_collisionDisplayMode = 2;
 //	m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
 
@@ -1397,12 +1397,13 @@ void ndDemoEntityManager::RenderScene()
 		}
 	}
 
-	//DEBUG_DRAW_MODE mode = m_solid;
-	//if (m_collisionDisplayMode) {
-	//	mode = (m_collisionDisplayMode == 1) ? m_solid : m_lines;
-	//	DebugRenderWorldCollision (m_world, mode);
-	//}
-	//
+	//dDebugDisplayMode mode = m_solid;
+	if (m_collisionDisplayMode) 
+	{
+		dDebugDisplayMode mode = (m_collisionDisplayMode == 1) ? m_solid : m_lines;
+		DebugRenderWorldCollision (m_world, mode);
+	}
+	
 	//if (m_showAABB) {
 	//	RenderAABB (m_world);
 	//}
