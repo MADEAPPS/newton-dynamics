@@ -41,7 +41,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 		-size,-size,-size,   size,-size,-size,   size,-size, size, -size,-size, size, // v7,v4,v3,v2 (bottom)
 		size,-size,-size,  -size,-size,-size,  -size, size,-size,  size, size,-size  // v4,v7,v6,v5 (back)
 	};
-	m_uvOffest = sizeof(vertices);
+	//m_uvOffest = sizeof(vertices);
 
 	// texture coordinate array
 	static GLfloat texCoords[] = 
@@ -68,18 +68,27 @@ ndSkyBox::ndSkyBox(GLuint shader)
 
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices) + sizeof(texCoords), 0, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof (vertices), vertices, GL_STATIC_DRAW);
 
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-	glBufferSubData(GL_ARRAY_BUFFER, sizeof(vertices), sizeof(texCoords), texCoords);
+	glGenBuffers(1, &m_uvBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_uvBuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(texCoords), texCoords, GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+	// Create and set-up the vertex array object
+	glGenVertexArrays(1, &m_vertexArrayHandle);
+	glBindVertexArray(m_vertexArrayHandle);
+	glEnableVertexAttribArray(0);  // Vertex position
+	glEnableVertexAttribArray(1);  // Vertex uv
 
-	glUseProgram(m_shader);
-	m_textureLocation = glGetUniformLocation(m_shader, "texture");
-	m_attribVertexPosition = glGetAttribLocation(m_shader, "vertexPosition");
-	m_attribVertexTexCoord = glGetAttribLocation(m_shader, "vertexTexCoord");
-	glUseProgram(0);
+	glBindVertexBuffer(0, m_vertexBuffer, 0, 3 * sizeof(GLfloat));
+	glBindVertexBuffer(1, m_uvBuffer, 0, 2 * sizeof(GLfloat));
+
+	glVertexAttribFormat(0, 3, GL_FLOAT, GL_FALSE, 0);
+	glVertexAttribBinding(0, 0);
+	glVertexAttribFormat(1, 2, GL_FLOAT, GL_FALSE, 0);
+	glVertexAttribBinding(1, 1);
+	glBindVertexArray(0);
 
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
@@ -89,11 +98,12 @@ ndSkyBox::ndSkyBox(GLuint shader)
 
 ndSkyBox::~ndSkyBox()
 {
-
 	// delete VBO when program terminated
-	glDeleteBuffers(1, &m_vertexBuffer);
+	glDeleteBuffers(1, &m_uvBuffer);
 	glDeleteBuffers(1, &m_indexBuffer);
-
+	glDeleteBuffers(1, &m_vertexBuffer);
+	glDeleteBuffers(1, &m_vertexArrayHandle);
+	
 	for (int i = 0; i < int(sizeof (m_textures) / sizeof (m_textures[0])); i++) 
 	{
 		ReleaseTexture(m_textures[i]);
@@ -113,25 +123,15 @@ skyMatrix.m_posit = matrix.UntransformVector(dVector(0.0f, 0.25f, -800.0f, 1.0f)
 
 	glPushMatrix();
 	glMultMatrix(&skyMatrix[0][0]);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 	
 	glUseProgram(m_shader);
 	// activate attributes
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexArrayHandle);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 	glUniform1i(m_textureLocation, 0);
-	glEnableVertexAttribArray(m_attribVertexPosition);
-	glEnableVertexAttribArray(m_attribVertexTexCoord);
 
-	// set attrib arrays using glVertexAttribPointer()
-	glVertexAttribPointer(m_attribVertexPosition, 3, GL_FLOAT, false, 0, 0);
-	glVertexAttribPointer(m_attribVertexTexCoord, 2, GL_FLOAT, false, 0, (void*)m_uvOffest);
-
-	glBindTexture(GL_TEXTURE_2D, m_textures[0]);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)0); 
-		
-	glDisableVertexAttribArray(m_attribVertexPosition);
-	glDisableVertexAttribArray(m_attribVertexTexCoord);
+	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); 
 
 	// unbind
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

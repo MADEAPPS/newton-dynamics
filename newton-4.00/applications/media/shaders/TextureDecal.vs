@@ -10,8 +10,8 @@
 */
 #version 120
 
-attribute vec3 vertexPosition;
-attribute vec2 vertexTexCoord;
+layout(location = 0) in vec3 vertexPosition;
+layout(location = 1) in vec2 vertexTexCoord;
 
 void main()
 {	
@@ -19,7 +19,7 @@ void main()
 	//gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 
 	gl_TexCoord[0] = vertexTexCoord;
-	gl_Position = matrixModelViewProjection * vec4(vertexPosition, 1.0);
+	gl_Position = gl_ModelViewProjectionMatrix * vec4(vertexPosition, 1.0);
 } 
 
 
