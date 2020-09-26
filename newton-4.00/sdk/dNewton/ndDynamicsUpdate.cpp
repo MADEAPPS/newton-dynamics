@@ -158,11 +158,12 @@ dInt32 ndDynamicsUpdate::CompareIslandBodies(const ndBodyIndexPair* const  pairA
 void ndDynamicsUpdate::BuildIsland()
 {
 	const ndScene* const scene = m_world->GetScene();
-	const dArray<ndBodyKinematic*>& bodyArray = scene->GetWorkingBodyArray();
-	if (bodyArray.GetCount())
+	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
+	dAssert(bodyArray.GetCount() >= 1);
+	if (bodyArray.GetCount() - 1)
 	{
 		D_TRACKTIME();
-		const dArray<ndContact*>& contactArray = scene->GetActiveContacts();
+		const dArray<ndContact*>& contactArray = scene->GetActiveContactArray();
 		for (dInt32 i = contactArray.GetCount() - 1; i >= 0; i--)
 		{
 			ndConstraint* const joint = contactArray[i];
@@ -243,11 +244,6 @@ void ndDynamicsUpdate::BuildIsland()
 			}
 		}
 
-		//if (m_bodyIslandOrder.GetCapacity() < 256)
-		//{
-		//	m_islands.Resize(256);
-		//	m_bodyIslandOrder.Resize(256);
-		//}
 		m_islands.SetCount(0);
 		m_bodyIslandOrder.SetCount(count);
 		m_unConstrainedBodyCount = 0;
@@ -298,6 +294,7 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 			const dFloat32 timestep = m_timestep;
 			const dInt32 count = world->m_unConstrainedBodyCount;
 			const dInt32 base = bodyArray.GetCount() - count;
+			//const ndBodyKinematic* const sentinelBody = world->GetSentinelBody();
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
 				ndBodyDynamic* const body = bodyArray[base + i]->GetAsBodyDynamic();
@@ -324,17 +321,8 @@ void ndDynamicsUpdate::InitWeights()
 	m_timestepRK = m_timestep * m_invStepRK;
 	m_invTimestepRK = m_invTimestep * dFloat32(4.0f);
 
-	const dArray<ndContact*>& contactArray = scene->GetActiveContacts();
-	const dArray<ndBodyKinematic*>& bodyArray = scene->GetWorkingBodyArray();
-
-	//if (m_jointArray.GetCapacity() < 256)
-	//{
-	//	m_jointArray.Resize(256);
-	//	m_leftHandSide.Resize(256);
-	//	m_internalForces.Resize(256);
-	//	m_rightHandSide.Resize(256);
-	//	m_internalForcesBack.Resize(256);
-	//}
+	const dArray<ndContact*>& contactArray = scene->GetActiveContactArray();
+	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 
 	const dInt32 bodyCount = bodyArray.GetCount();
 	const dInt32 jointCount = contactArray.GetCount();
@@ -792,7 +780,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 	const dInt32 bodyCount = m_internalForces.GetCount();
 	const dInt32 passes = m_solverPasses;
 	const dInt32 threadCounts = scene->GetThreadCount();
-	dAssert(bodyCount == scene->GetWorkingBodyArray().GetCount());
+	dAssert(bodyCount == scene->GetActiveBodyArray().GetCount());
 
 	dFloat32 accNorm = D_SOLVER_MAX_ERROR * dFloat32(2.0f);
 	for (dInt32 i = 0; (i < passes) && (accNorm > D_SOLVER_MAX_ERROR); i++) 

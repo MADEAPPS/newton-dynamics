@@ -71,8 +71,12 @@ class ndScene
 	dInt32 GetThreadCount() const;
 	virtual ndWorld* GetWorld() const;
 	const ndBodyList& GetBodyList() const;
-	const dArray<ndContact*>& GetActiveContacts() const;
-	const dArray<ndBodyKinematic*>& GetWorkingBodyArray() const;
+
+	dArray<ndContact*>& GetActiveContactArray();
+	const dArray<ndContact*>& GetActiveContactArray() const;
+
+	dArray<ndBodyKinematic*>& GetActiveBodyArray();
+	const dArray<ndBodyKinematic*>& GetActiveBodyArray() const;
 
 	template <class T>
 	void SubmitJobs();
@@ -140,8 +144,8 @@ class ndScene
 	
 	ndBodyList m_bodyList;
 	ndContactList m_contactList;
-	dArray<ndBodyKinematic*> m_tmpBodyArray;
-	dArray<ndContact*> m_activeContacts;
+	dArray<ndContact*> m_activeContactArray;
+	dArray<ndBodyKinematic*> m_activeBodyArray;
 	dSpinLock m_contactLock;
 	ndSceneNode* m_rootNode;
 	ndContactNotify* m_contactNotifyCallback;
@@ -179,14 +183,24 @@ inline const ndBodyList& ndScene::GetBodyList() const
 	return m_bodyList;
 }
 
-inline const dArray<ndContact*>& ndScene::GetActiveContacts() const
+inline dArray<ndContact*>& ndScene::GetActiveContactArray()
 {
-	return m_activeContacts;
+	return m_activeContactArray;
 }
 
-inline const dArray<ndBodyKinematic*>& ndScene::GetWorkingBodyArray() const
+inline const dArray<ndContact*>& ndScene::GetActiveContactArray() const
 {
-	return m_tmpBodyArray;
+	return m_activeContactArray;
+}
+
+inline dArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray()
+{
+	return m_activeBodyArray;
+}
+
+inline const dArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray() const
+{
+	return m_activeBodyArray;
 }
 
 template <class T>

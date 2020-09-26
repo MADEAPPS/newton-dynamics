@@ -74,7 +74,7 @@ ndWorld::ndWorld()
 	m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxOmega = 0.1f;
 	m_sleepTable[D_SLEEP_ENTRIES - 1].m_steps = steps;
 
-	m_sentinelBody = new ndBodyKinematic;
+	m_sentinelBody = new ndBodyDynamic;
 }
 
 ndWorld::~ndWorld()
@@ -134,8 +134,8 @@ void ndWorld::ApplyExternalForces()
 			//ndWorld* const world = m_owner->GetWorld();
 			const dInt32 threadIndex = GetThredID();
 			
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetWorkingBodyArray();
-			const dInt32 count = bodyArray.GetCount();
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+			const dInt32 count = bodyArray.GetCount() - 1;
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
 				ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
@@ -158,6 +158,14 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	m_scene->SetTimestep(timestep);
 
 	m_scene->BuildBodyArray();
+
+	ndBodyKinematic* sentinelBody = m_sentinelBody;
+	sentinelBody->PrepareStep(m_scene->GetActiveBodyArray().GetCount());
+	sentinelBody->m_resting = 1;
+	sentinelBody->m_sleeping = 1;
+	sentinelBody->m_equilibrium = 1;
+	m_scene->GetActiveBodyArray().PushBack(sentinelBody);
+
 	UpdateSkeletons();
 	ApplyExternalForces();
 	UpdatePrelisteners();
@@ -202,6 +210,28 @@ void ndWorld::ThreadFunction()
 	}
 	m_lastExecutionTime = (dGetTimeInMicrosenconds() - timeAcc) * dFloat32(1.0e-6f);
 }
+
+bool ndWorld::AddBody(ndBody* const body)
+{
+	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+	dAssert(kinematicBody != m_sentinelBody);
+	if (kinematicBody)
+	{
+		return m_scene->AddBody(kinematicBody);
+	}
+	return false;
+}
+
+void ndWorld::RemoveBody(ndBody* const body)
+{
+	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+	dAssert(kinematicBody != m_sentinelBody);
+	if (kinematicBody)
+	{
+		m_scene->RemoveBody(kinematicBody);
+	}
+}
+
 
 void ndWorld::AddJoint(ndJointBilateralConstraint* const joint)
 {

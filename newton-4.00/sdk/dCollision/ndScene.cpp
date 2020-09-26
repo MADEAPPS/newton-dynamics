@@ -168,8 +168,8 @@ ndScene::ndScene()
 	,dThreadPool("newtonWorker")
 	,m_bodyList()
 	,m_contactList()
-	,m_tmpBodyArray()
-	,m_activeContacts()
+	,m_activeContactArray()
+	,m_activeBodyArray()
 	,m_contactLock()
 	,m_rootNode(nullptr)
 	,m_contactNotifyCallback(new ndContactNotify())
@@ -178,8 +178,8 @@ ndScene::ndScene()
 	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_fullScan(true)
 {
-	m_tmpBodyArray.Resize(256);
-	m_activeContacts.Resize(256);
+	m_activeBodyArray.Resize(256);
+	m_activeContactArray.Resize(256);
 	m_contactNotifyCallback->m_scene = this;
 }
 
@@ -272,7 +272,7 @@ void ndScene::BuildBodyArray()
 {
 	D_TRACKTIME();
 	int index = 0;
-	m_tmpBodyArray.SetCount(m_bodyList.GetCount());
+	m_activeBodyArray.SetCount(m_bodyList.GetCount());
 	for (ndBodyList::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyKinematic* const body = node->GetInfo();
@@ -297,13 +297,8 @@ void ndScene::BuildBodyArray()
 				}
 				if (inScene)
 				{
-					body->m_rank = 0;
-					body->m_index = index;
-					body->m_resting = 1;
-					body->m_islandSleep = body->m_equilibrium;
-					body->m_weight = dFloat32(0.0f);
-					body->m_islandParent = body;
-					m_tmpBodyArray[index] = body;
+					body->PrepareStep(index);
+					m_activeBodyArray[index] = body;
 					index++;
 				}
 			}
@@ -1548,8 +1543,8 @@ void ndScene::TransformUpdate()
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 threadsCount = m_owner->GetThreadCount();
 
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetWorkingBodyArray();
-			const dInt32 count = bodyArray.GetCount();
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+			const dInt32 count = bodyArray.GetCount() - 1;
 
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
@@ -1572,8 +1567,8 @@ void ndScene::UpdateAabb()
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 threadsCount = m_owner->GetThreadCount();
 	
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetWorkingBodyArray();
-			const dInt32 count = bodyArray.GetCount();
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+			const dInt32 count = bodyArray.GetCount() - 1;
 	
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
@@ -1605,8 +1600,8 @@ void ndScene::FindCollidingPairs()
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 threadsCount = m_owner->GetThreadCount();
 	
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetWorkingBodyArray();
-			const dInt32 count = bodyArray.GetCount();
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+			const dInt32 count = bodyArray.GetCount() - 1;
 
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
@@ -1624,8 +1619,8 @@ void ndScene::FindCollidingPairs()
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 threadsCount = m_owner->GetThreadCount();
 
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetWorkingBodyArray();
-			const dInt32 count = bodyArray.GetCount();
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+			const dInt32 count = bodyArray.GetCount() - 1;
 
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
@@ -1638,7 +1633,7 @@ void ndScene::FindCollidingPairs()
 		}
 	};
 	
-	m_fullScan = (3 * m_sleepBodies.load()) < (2 * dUnsigned32(m_tmpBodyArray.GetCount()));
+	m_fullScan = (3 * m_sleepBodies.load()) < (2 * dUnsigned32(m_activeBodyArray.GetCount()));
 	if (m_fullScan)
 	{
 		SubmitJobs<ndFindCollidindPairsFullScan>();
@@ -1649,12 +1644,12 @@ void ndScene::FindCollidingPairs()
 	}
 
 	int count = 0;
-	m_activeContacts.SetCount(m_contactList.GetCount());
+	m_activeContactArray.SetCount(m_contactList.GetCount());
 	for (ndContactList::dListNode* node = m_contactList.GetFirst(); node; node = node->GetNext())
 	{
 		ndContact* const contact = &node->GetInfo();
 		dAssert(contact->m_isAttached);
-		m_activeContacts[count] = contact;
+		m_activeContactArray[count] = contact;
 		count ++;
 	}
 }
@@ -1671,7 +1666,7 @@ void ndScene::CalculateContacts()
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 threadsCount = m_owner->GetThreadCount();
 
-			dArray<ndContact*>& activeContacts = m_owner->m_activeContacts;
+			dArray<ndContact*>& activeContacts = m_owner->m_activeContactArray;
 			const dInt32 count = activeContacts.GetCount();
 	
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
@@ -1687,22 +1682,22 @@ void ndScene::CalculateContacts()
 void ndScene::DeleteDeadContact()
 {
 	D_TRACKTIME();
-	dInt32 activeCount = m_activeContacts.GetCount();
+	dInt32 activeCount = m_activeContactArray.GetCount();
 	for (dInt32 i = activeCount - 1; i >= 0; i --)
 	{ 
-		ndContact* const contact = m_activeContacts[i];
+		ndContact* const contact = m_activeContactArray[i];
 		if (contact->m_killContact) 
 		{
 			dAssert(0);
 			m_contactList.DeleteContact(contact);
 			//activeCount--;
-			m_activeContacts[i] = m_activeContacts[activeCount];
+			m_activeContactArray[i] = m_activeContactArray[activeCount];
 		}
 		else if (!contact->m_active || !contact->m_maxDOF)
 		{
 			//constraintArray[activeCount].m_joint = contact;
 			activeCount--;
-			m_activeContacts[i] = m_activeContacts[activeCount];
+			m_activeContactArray[i] = m_activeContactArray[activeCount];
 		}
 		//else if (contact->m_body0->m_continueCollisionMode | contact->m_body1->m_continueCollisionMode) 
 		//{
@@ -1712,5 +1707,5 @@ void ndScene::DeleteDeadContact()
 		//	}
 		//}
 	}
-	m_activeContacts.SetCount(activeCount);
+	m_activeContactArray.SetCount(activeCount);
 }

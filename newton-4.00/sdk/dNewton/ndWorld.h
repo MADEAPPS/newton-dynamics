@@ -59,15 +59,15 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	dInt32 GetSubSteps() const;
 	void SetSubSteps(dInt32 subSteps);
 
-	bool AddBody(ndBody* const body);
-	void RemoveBody(ndBody* const body);
-	const ndBodyList& GetBodyList() const;
-
+	D_NEWTON_API bool AddBody(ndBody* const body);
+	D_NEWTON_API void RemoveBody(ndBody* const body);
 	D_NEWTON_API void AddJoint(ndJointBilateralConstraint* const joint);
 	D_NEWTON_API void RemoveJoint(ndJointBilateralConstraint* const joint);
+
+	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;
 
-	ndBodyKinematic* GetSentinelBody() const;
+	ndBodyDynamic* GetSentinelBody() const;
 
 	const dInt32 GetSolverIterations() const;
 	void SetSolverIterations(dInt32 iterations);
@@ -98,7 +98,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	void SubStepUpdate(dFloat32 timestep);
 
 	ndScene* m_scene;
-	ndBodyKinematic* m_sentinelBody;
+	ndBodyDynamic* m_sentinelBody;
 	ndJointList m_jointList;
 
 	dFloat32 m_timestep;
@@ -169,28 +169,8 @@ inline void ndWorld::SetContactNotify(ndContactNotify* const notify)
 	m_scene->SetContactNotify(notify);
 }
 
-inline bool ndWorld::AddBody(ndBody* const body)
-{
-	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
-	dAssert(kinematicBody != m_sentinelBody);
-	if (kinematicBody)
-	{
-		return m_scene->AddBody(kinematicBody);
-	}
-	return false;
-}
 
-inline void ndWorld::RemoveBody(ndBody* const body)
-{
-	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
-	dAssert(kinematicBody != m_sentinelBody);
-	if (kinematicBody)
-	{
-		m_scene->RemoveBody(kinematicBody);
-	}
-}
-
-inline ndBodyKinematic* ndWorld::GetSentinelBody() const
+inline ndBodyDynamic* ndWorld::GetSentinelBody() const
 {
 	return m_sentinelBody;
 }

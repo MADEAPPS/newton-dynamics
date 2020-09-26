@@ -98,7 +98,9 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API virtual void AttachContact(ndContact* const contact);
 	D_COLLISION_API virtual void DetachContact(ndContact* const contact);
 	D_COLLISION_API void UpdateGyroData();
+
 	void UpdateCollisionMatrix();
+	void PrepareStep(dInt32 index);
 	void SetBroadPhase(ndScene* const broadPhase, ndBodyList::dListNode* const node);
 
 	ndSceneBodyNode* GetBroadPhaseBodyNode() const;
@@ -242,6 +244,18 @@ inline void ndBodyKinematic::SetAlpha(const dVector& alpha)
 inline void ndBodyKinematic::AddDampingAcceleration(dFloat32 timestep)
 {
 }
+
+inline void ndBodyKinematic::PrepareStep(dInt32 index)
+{
+	m_rank = 0;
+	m_index = index;
+	m_resting = 1;
+	m_islandSleep = m_equilibrium;
+	m_weight = dFloat32(0.0f);
+	m_islandParent = this;
+	//m_tmpBodyArray[index] = body;
+}
+
 
 #endif 
 
