@@ -54,8 +54,6 @@ ndSkyBox::ndSkyBox(GLuint shader)
 		0, 1,   1, 1,   1, 0,   0, 0                // v4,v7,v6,v5 (back)
 	};
 
-	// index array for glDrawElements()
-	// A cube requires 36 indices = 6 sides * 2 tris * 3 verts
 	static GLuint indices[] = 
 	{
 		0, 1, 2,   2, 3, 0,    // v0-v1-v2, v2-v3-v0 (front)
@@ -127,14 +125,14 @@ skyMatrix.m_posit = matrix.UntransformVector(dVector(0.0f, 0.25f, -800.0f, 1.0f)
 	glUseProgram(m_shader);
 	// activate attributes
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexArrayHandle);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 	glUniform1i(m_textureLocation, 0);
+	glBindVertexArray(GL_ARRAY_BUFFER, m_vertexArrayHandle);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); 
 
 	// unbind
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glUseProgram(0);
 

@@ -33,11 +33,11 @@ class ndSkyBox: public ndDemoEntity
 	private:
 	//int m_uvOffest;
 	GLuint m_shader;
-
-	GLuint m_indexBuffer;
-	GLuint m_vertexBuffer;
-	GLuint m_vertexArrayHandle;
+	
 	GLuint m_uvBuffer;
+	GLuint m_vertexBuffer;
+	GLuint m_indexBuffer;
+	GLuint m_vertexArrayHandle;
 	GLuint m_textures[6];
 
 	GLint m_textureLocation;
