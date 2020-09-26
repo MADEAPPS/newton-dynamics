@@ -95,10 +95,10 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 	scene->GetWorld()->Sync();
 
 	// build a floor
-//	BuildFloor(scene);
+	BuildFloor(scene);
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-//	BuildSphere(scene, 10.0f, origin1, 1.0f, 2, 0.0f);
+	BuildSphere(scene, 10.0f, origin1, 1.0f, 2, 0.0f);
 
 	dQuaternion rot;
 	dVector origin(-40.0f, 10.0f, 0.0f, 0.0f);

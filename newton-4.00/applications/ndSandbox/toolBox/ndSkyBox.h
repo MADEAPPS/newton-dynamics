@@ -28,19 +28,14 @@ class ndSkyBox: public ndDemoEntity
 	ndSkyBox(GLuint shader);
 	~ndSkyBox();
 
-	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
+	void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
 
 	private:
-	//int m_uvOffest;
-	GLuint m_shader;
-	
-	GLuint m_uvBuffer;
-	GLuint m_vertexBuffer;
-	GLuint m_indexBuffer;
-	GLuint m_vertexArrayHandle;
-	GLuint m_textures[6];
+	void DrawMesh() const;
 
-	GLint m_textureLocation;
+	GLuint m_displayList;
+	GLuint m_shader;
+	GLuint m_textures[6];
 
 };
 
