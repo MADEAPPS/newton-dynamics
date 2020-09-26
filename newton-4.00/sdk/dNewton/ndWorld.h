@@ -23,10 +23,13 @@
 #define __D_WORLD_H__
 
 #include "ndNewtonStdafx.h"
+#include "ndJointList.h"
 #include "ndDynamicsUpdate.h"
+
 
 class ndWorld;
 class ndBodyDynamic;
+class ndJointBilateralConstraint;
 
 #define D_NEWTON_ENGINE_MAJOR_VERSION 4
 #define D_NEWTON_ENGINE_MINOR_VERSION 00
@@ -57,9 +60,14 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	void SetSubSteps(dInt32 subSteps);
 
 	bool AddBody(ndBody* const body);
-	bool RemoveBody(ndBody* const body);
+	void RemoveBody(ndBody* const body);
+	const ndBodyList& GetBodyList() const;
 
-	const dList<ndBodyKinematic*>& GetBodyList() const;
+	D_NEWTON_API void AddJoint(ndJointBilateralConstraint* const joint);
+	D_NEWTON_API void RemoveJoint(ndJointBilateralConstraint* const joint);
+	const ndJointList& GetJointList() const;
+
+	ndBodyKinematic* GetSentinelBody() const;
 
 	const dInt32 GetSolverIterations() const;
 	void SetSolverIterations(dInt32 iterations);
@@ -90,6 +98,9 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	void SubStepUpdate(dFloat32 timestep);
 
 	ndScene* m_scene;
+	ndBodyKinematic* m_sentinelBody;
+	ndJointList m_jointList;
+
 	dFloat32 m_timestep;
 	dFloat32 m_lastExecutionTime;
 	dFloat32 m_freezeAccel2;
@@ -161,6 +172,7 @@ inline void ndWorld::SetContactNotify(ndContactNotify* const notify)
 inline bool ndWorld::AddBody(ndBody* const body)
 {
 	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+	dAssert(kinematicBody != m_sentinelBody);
 	if (kinematicBody)
 	{
 		return m_scene->AddBody(kinematicBody);
@@ -168,19 +180,29 @@ inline bool ndWorld::AddBody(ndBody* const body)
 	return false;
 }
 
-inline bool ndWorld::RemoveBody(ndBody* const body)
+inline void ndWorld::RemoveBody(ndBody* const body)
 {
 	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+	dAssert(kinematicBody != m_sentinelBody);
 	if (kinematicBody)
 	{
-		return m_scene->RemoveBody(kinematicBody);
+		m_scene->RemoveBody(kinematicBody);
 	}
-	return false;
 }
 
-inline const dList<ndBodyKinematic*>& ndWorld::GetBodyList() const
+inline ndBodyKinematic* ndWorld::GetSentinelBody() const
+{
+	return m_sentinelBody;
+}
+
+inline const ndBodyList& ndWorld::GetBodyList() const
 {
 	return m_scene->GetBodyList();
+}
+
+inline const ndJointList& ndWorld::GetJointList() const
+{
+	return m_jointList;
 }
 
 inline dFloat32 ndWorld::GetUpdateTime() const

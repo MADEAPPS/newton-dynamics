@@ -24,6 +24,7 @@
 
 #include "ndCollisionStdafx.h"
 #include "ndBody.h"
+#include "ndBodyList.h"
 
 class ndSceneBodyNode;
 class ndSceneAggregate;
@@ -98,7 +99,7 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API virtual void DetachContact(ndContact* const contact);
 	D_COLLISION_API void UpdateGyroData();
 	void UpdateCollisionMatrix();
-	void SetBroadPhase(ndScene* const broadPhase, dList<ndBodyKinematic*>::dListNode* const node);
+	void SetBroadPhase(ndScene* const broadPhase, ndBodyList::dListNode* const node);
 
 	ndSceneBodyNode* GetBroadPhaseBodyNode() const;
 	void SetBroadPhaseBodyNode(ndSceneBodyNode* const node);
@@ -121,7 +122,7 @@ class ndBodyKinematic: public ndBody
 	dSpinLock m_lock;
 	ndScene* m_scene;
 	ndBodyKinematic* m_islandParent;
-	dList<ndBodyKinematic*>::dListNode* m_sceneNode;
+	ndBodyList::dListNode* m_sceneNode;
 	ndSceneBodyNode* m_sceneBodyBodyNode;
 	ndSceneAggregate* m_sceneAggregateNode;
 
@@ -204,7 +205,7 @@ inline ndScene* ndBodyKinematic::GetBroadPhase() const
 	return m_scene;
 }
 
-inline void ndBodyKinematic::SetBroadPhase(ndScene* const broadPhase, dList<ndBodyKinematic*>::dListNode* const node)
+inline void ndBodyKinematic::SetBroadPhase(ndScene* const broadPhase, ndBodyList::dListNode* const node)
 {
 	m_sceneNode = node;
 	m_scene = broadPhase;

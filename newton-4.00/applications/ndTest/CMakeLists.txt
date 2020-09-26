@@ -21,6 +21,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 include_directories(../../sdk/dCore/)
 include_directories(../../sdk/dNewton/)
 include_directories(../../sdk/dCollision/)
+include_directories(../../sdk/dNewton/dJoints)
 
 if(MSVC)
 	set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEBUG") 

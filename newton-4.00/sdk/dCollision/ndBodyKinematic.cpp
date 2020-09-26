@@ -139,10 +139,12 @@ ndBodyKinematic::ndBodyKinematic()
 {
 	m_invWorldInertiaMatrix[3][3] = dFloat32(1.0f);
 	m_shapeInstance.m_ownerBody = this;
+	SetMassMatrix(dVector::m_zero);
 }
 
 ndBodyKinematic::~ndBodyKinematic()
 {
+	dAssert(m_sceneNode == nullptr);
 }
 
 bool ndBodyKinematic::GetSleepState() const

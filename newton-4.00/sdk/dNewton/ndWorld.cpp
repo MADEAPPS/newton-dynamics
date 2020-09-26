@@ -24,11 +24,13 @@
 #include "ndWorld.h"
 #include "ndWorldScene.h"
 #include "ndBodyDynamic.h"
+#include "ndJointBilateralConstraint.h"
 
 ndWorld::ndWorld()
 	:dClassAlloc()
 	,ndDynamicsUpdate()
 	,m_scene(nullptr)
+	,m_sentinelBody(nullptr)
 	,m_timestep(dFloat32 (0.0f))
 	,m_lastExecutionTime(dFloat32(0.0f))
 	,m_freezeAccel2(D_FREEZE_ACCEL2)
@@ -71,17 +73,32 @@ ndWorld::ndWorld()
 	m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxVeloc = 0.25f;
 	m_sleepTable[D_SLEEP_ENTRIES - 1].m_maxOmega = 0.1f;
 	m_sleepTable[D_SLEEP_ENTRIES - 1].m_steps = steps;
+
+	m_sentinelBody = new ndBodyKinematic;
 }
 
 ndWorld::~ndWorld()
 {
 	Sync();
+
+	while (m_jointList.GetFirst())
+	{
+		dAssert(0);
+		//ndBodyKinematic* const body = m_bodyList.GetFirst()->GetInfo();
+		//RemoveBody(body);
+		//delete body;
+	}
+
+	delete m_sentinelBody;
 	delete m_scene;
+	ClearCache();
 }
 
 void ndWorld::ClearCache()
 {
 	ndContact::FlushFreeList();
+	ndBodyList::FlushFreeList();
+	ndJointList::FlushFreeList();
 	ndContactList::FlushFreeList();
 	ndContactPointList::FlushFreeList();
 	ndScene::ndFitnessList::FlushFreeList();
@@ -186,3 +203,15 @@ void ndWorld::ThreadFunction()
 	m_lastExecutionTime = (dGetTimeInMicrosenconds() - timeAcc) * dFloat32(1.0e-6f);
 }
 
+void ndWorld::AddJoint(ndJointBilateralConstraint* const joint)
+{
+	dAssert(joint->m_worldNode == nullptr);
+	joint->m_worldNode = m_jointList.Append(joint);
+}
+
+void ndWorld::RemoveJoint(ndJointBilateralConstraint* const joint)
+{
+	dAssert(joint->m_worldNode != nullptr);
+	m_jointList.Remove(joint->m_worldNode);
+	joint->m_worldNode = nullptr;
+}

@@ -23,8 +23,9 @@
 #define __D_BROADPHASE_H__
 
 #include "ndCollisionStdafx.h"
-#include "ndContactList.h"
+#include "ndBodyList.h"
 #include "ndSceneNode.h"
+#include "ndContactList.h"
 
 #define D_BROADPHASE_MAX_STACK_DEPTH	256
 #define D_PRUNE_CONTACT_TOLERANCE		dFloat32 (5.0e-2f)
@@ -34,6 +35,7 @@ class ndContact;
 class ndRayCastNotify;
 class ndContactNotify;
 class ndBilateralJoint;
+
 
 D_MSV_NEWTON_ALIGN_32
 class ndScene
@@ -50,10 +52,6 @@ class ndScene
 	};
 
 	protected:
-	class ndBodyList: public dList<ndBodyKinematic*>
-	{
-	};
-
 	class ndSpliteInfo;
 	class ndFitnessList: public dList <ndSceneTreeNode*, dContainersFreeListAlloc<ndSceneTreeNode*>>
 	{
@@ -72,7 +70,7 @@ class ndScene
 
 	dInt32 GetThreadCount() const;
 	virtual ndWorld* GetWorld() const;
-	const dList<ndBodyKinematic*>& GetBodyList() const;
+	const ndBodyList& GetBodyList() const;
 	const dArray<ndContact*>& GetActiveContacts() const;
 	const dArray<ndBodyKinematic*>& GetWorkingBodyArray() const;
 
@@ -176,7 +174,7 @@ inline dInt32 ndScene::GetThreadCount() const
 	return pool.GetCount();
 }
 
-inline const dList<ndBodyKinematic*>& ndScene::GetBodyList() const
+inline const ndBodyList& ndScene::GetBodyList() const
 {
 	return m_bodyList;
 }

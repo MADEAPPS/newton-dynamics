@@ -468,21 +468,22 @@ void ndJointBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor
 
 ndJointBilateralConstraint::ndJointBilateralConstraint(ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix)
 	:ndConstraint()
-	,m_localMatrix0(globalMatrix)
-	,m_localMatrix1(globalMatrix)
+	,dClassAlloc()
 	,m_body0(body0)
 	,m_body1(body1)
-	//,m_destructor(NULL)
-	//,m_jointNode(NULL)
+	,m_worldNode(nullptr)
+	//,m_destructor(nullptr)
+	//,m_jointNode(nullptr)
 {
-	if (m_body0->GetInvMass() == dFloat32(0.0f)) 
+	dAssert(m_body0 && m_body1);
+
+	if (m_body1->GetInvMass() == dFloat32(0.0f)) 
 	{
 		dSwap(m_body0, m_body1);
 	}
-	dAssert(m_body0->GetInvMass() > dFloat32(0.0f));
+	dAssert(m_body1->GetInvMass() > dFloat32(0.0f));
 
-	m_localMatrix0 = m_localMatrix0 * m_body0->GetMatrix().Inverse();
-	m_localMatrix1 = m_localMatrix1 * m_body1->GetMatrix().Inverse();
+	CalculateLocalMatrix(globalMatrix, m_localMatrix0, m_localMatrix1);
 
 	//m_maxDOF = 6;
 	//m_isBilateral = true;
@@ -500,7 +501,8 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(ndBodyKinematic* const bo
 
 ndJointBilateralConstraint::~ndJointBilateralConstraint()
 {
-	dAssert(0);
+	dAssert(m_worldNode == nullptr);
+
 	//if (m_destructor) 
 	//{
 	//	m_destructor(*this);
@@ -512,4 +514,12 @@ ndJointBilateralConstraint::~ndJointBilateralConstraint()
 	//	dgBilateralConstraintList* const jointList = m_body0->m_world;
 	//	jointList->Remove(m_jointNode);
 	//}
+}
+
+
+void ndJointBilateralConstraint::CalculateLocalMatrix(const dMatrix& globalMatrix, dMatrix& localMatrix0, dMatrix& localMatrix1) const
+{
+	dAssert(globalMatrix.TestOrthogonal());
+	localMatrix0 = globalMatrix * m_body0->GetMatrix().Inverse();
+	localMatrix1 = globalMatrix * m_body1->GetMatrix().Inverse();
 }

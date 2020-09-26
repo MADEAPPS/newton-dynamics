@@ -70,14 +70,19 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	dFloat m_angularFrictionCoefficient;
 	dFloat m_maxSpeed;
 	dFloat m_maxOmega;
-	char m_autoSleepState;
 	dControlModes m_controlMode;
 
 	DECLARE_CUSTOM_JOINT(ndJointKinematicController, dCustomJoint)
 #endif
 
-	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const body, const dMatrix& attachmentMatrixInGlobalSpace, ndBodyKinematic* const referenceBody = nullptr);
+	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const dVector& attachmentPointInGlobalSpace);
+	D_NEWTON_API ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const dMatrix& attachmentMatrixInGlobalSpace);
 	D_NEWTON_API virtual ~ndJointKinematicController();
+
+	protected:
+	void Init(const dMatrix& matrix);
+
+	bool m_autoSleepState;
 
 };
 

@@ -23,21 +23,13 @@
 #define __D_JOINT_BILATERAL_CONSTRAINT_H__
 
 #include "ndNewtonStdafx.h"
+#include "ndJointList.h"
 
 class ndJointBilateralConstraint;
 #define DG_BILATERAL_CONTRAINT_DOF	8
 
-//class dBilateralConstraintList: public dgList<ndJointBilateralConstraint*>
-//{
-//	public:
-//	dBilateralConstraintList(dgMemoryAllocator* const allocator)
-//		:dgList<ndJointBilateralConstraint*>(allocator)
-//	{
-//	}
-//};
-
 D_MSV_NEWTON_ALIGN_32
-class ndJointBilateralConstraint: public ndConstraint
+class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 {
 /*
 	public:
@@ -94,12 +86,53 @@ class ndJointBilateralConstraint: public ndConstraint
 	D_NEWTON_API ndJointBilateralConstraint(ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix);
 	D_NEWTON_API virtual ~ndJointBilateralConstraint();
 
+	virtual const dUnsigned32 GetRowsCount() const;
+	virtual dUnsigned32 JacobianDerivative(ndConstraintDescritor& params);
+	virtual void JointAccelerations(ndJointAccelerationDecriptor* const params);
+
+	virtual ndBodyKinematic* GetKinematicBody0() const;
+	virtual ndBodyKinematic* GetKinematicBody1() const;
+
+
+	D_NEWTON_API void CalculateLocalMatrix(const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
+
 	protected:
 	dMatrix m_localMatrix0;
 	dMatrix m_localMatrix1;
 	ndBodyKinematic* m_body0;
 	ndBodyKinematic* m_body1;
+
+	ndJointList::dListNode* m_worldNode;
+
+	friend class ndWorld;
 };
+
+inline const dUnsigned32 ndJointBilateralConstraint::GetRowsCount() const
+{
+	dAssert(0);
+	return 0;
+}
+
+inline dUnsigned32 ndJointBilateralConstraint::JacobianDerivative(ndConstraintDescritor& params)
+{
+	dAssert(0);
+	return 0;
+}
+
+inline void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor* const params)
+{
+	dAssert(0);
+}
+
+inline ndBodyKinematic* ndJointBilateralConstraint::GetKinematicBody0() const
+{
+	return m_body0;
+}
+
+inline ndBodyKinematic* ndJointBilateralConstraint::GetKinematicBody1() const
+{
+	return m_body1;
+}
 
 #endif
 

@@ -37,6 +37,7 @@
 #include <ndShapeBox.h>
 #include <ndShapeNull.h>
 #include <ndSceneNode.h>
+#include <ndJointList.h>
 #include <ndConstraint.h>
 #include <ndBodyNotify.h>
 #include <ndSceneMixed.h>
@@ -49,7 +50,7 @@
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
 #include <ndDynamicsUpdate.h>
-
+#include <ndJointKinematicController.h>
 
 #endif 
 

@@ -44,7 +44,6 @@ ndBodyDynamic::ndBodyDynamic()
 	,m_jointArray()
 	,m_sleepingCounter(0)
 {
-	SetMassMatrix(dVector::m_zero);
 }
 
 ndBodyDynamic::~ndBodyDynamic()

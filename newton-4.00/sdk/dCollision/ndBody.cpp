@@ -29,7 +29,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-dUnsigned32 ndBody::m_uniqueIDCount = 2;
+dUnsigned32 ndBody::m_uniqueIDCount = 0;
 
 ndBody::ndBody()
 	:m_matrix(dGetIdentityMatrix())
@@ -40,9 +40,7 @@ ndBody::ndBody()
 	,m_minAABB(dVector::m_zero)
 	,m_maxAABB(dVector::m_zero)
 	,m_rotation()
-//	,m_broadPhase(nullptr)
 	,m_notifyCallback(nullptr)
-//	, m_broadPhaseNode(nullptr)
 	,m_flags(0)
 	,m_uniqueID(m_uniqueIDCount)
 {

@@ -375,26 +375,42 @@ void ndJointKinematicController::SubmitConstraints (dFloat timestep, int threadI
 #endif
 
 
-//ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const body, const dVector& handleInGlobalSpace, ndBodyKinematic* const referenceBody)
-//	:ndJointBilateralConstraint(body, referenceBody, )
-//{
-//	dAssert(0);
-//	dMatrix matrix;
-//	dAssert(GetBody0() == body);
-//	ndBodyKinematicGetMatrix(body, &matrix[0][0]);
-//	matrix.m_posit = handleInGlobalSpace;
-//	Init(matrix);
-//}
-
-ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const body, const dMatrix& attachmentMatrixInGlobalSpace, ndBodyKinematic* const referenceBody)
-	:ndJointBilateralConstraint(body, referenceBody, attachmentMatrixInGlobalSpace)
+ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const dVector& attachmentPointInGlobalSpace)
+	:ndJointBilateralConstraint(referenceBody, body, dMatrix(attachmentPointInGlobalSpace))
 {
-	dAssert(0);
-//	Init(attachmentMatrixInGlobalSpace);
+	dAssert(GetKinematicBody1() == body);
+	dMatrix matrix(body->GetMatrix());
+	matrix.m_posit = attachmentPointInGlobalSpace;
+	matrix.m_posit.m_w = dFloat32(1.0f);
+	Init(matrix);
+}
+
+ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const dMatrix& attachmentMatrixInGlobalSpace)
+	:ndJointBilateralConstraint(referenceBody, body, attachmentMatrixInGlobalSpace)
+{
+	Init(attachmentMatrixInGlobalSpace);
 }
 
 ndJointKinematicController::~ndJointKinematicController()
 {
-	dAssert(0);
-	//ndBodyKinematicSetAutoSleep(m_body0, m_autoSleepState);
+	m_body1->SetAutoSleep(m_autoSleepState);
+}
+
+void ndJointKinematicController::Init(const dMatrix& globalMatrix)
+{
+	CalculateLocalMatrix(globalMatrix, m_localMatrix0, m_localMatrix1);
+
+	m_autoSleepState = m_body1->GetAutoSleep();
+	m_body1->SetAutoSleep(false);
+
+	//SetControlMode(m_full6dof);
+	//CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
+	//SetMaxLinearFriction(1.0f);
+	//SetMaxAngularFriction(1.0f);
+	//SetAngularViscuosFrictionCoefficient(1.0f);
+	//SetMaxSpeed(30.0f);
+	//SetMaxOmega(10.0f * 360.0f * dDegreeToRad);
+	//
+	//// set as soft joint
+	//SetSolverModel(3);
 }

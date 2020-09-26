@@ -127,29 +127,20 @@ D_INLINE dMatrix::dMatrix (const dVector& p, const dVector& q)
 }
 
 D_INLINE dMatrix::dMatrix (const dVector& front)
+	:m_front((front & dVector::m_triplexMask).Normalize())
+	,m_posit(dVector::m_wOne)
 {
-	m_front = front; 
-	if (dAbs (front.m_z) > dFloat32 (0.577f)) 
+	if (dAbs(m_front.m_z) > dFloat32 (0.577f)) 
 	{
-		m_right = front.CrossProduct(dVector (-front.m_y, front.m_z, dFloat32(0.0f), dFloat32(0.0f)));
-	} 
+		m_right = m_front.CrossProduct(dVector(-m_front.m_y, m_front.m_z, dFloat32(0.0f), dFloat32(0.0f)));
+	}
 	else 
 	{
-	  	m_right = front.CrossProduct(dVector (-front.m_y, front.m_x, dFloat32(0.0f), dFloat32(0.0f)));
+		m_right = m_front.CrossProduct(dVector(-m_front.m_y, m_front.m_x, dFloat32(0.0f), dFloat32(0.0f)));
 	}
-  	//m_right = m_right.Scale (dgRsqrt (m_right.DotProduct(m_right).GetScalar()));
 	m_right = m_right.Normalize();
-  	m_up = m_right.CrossProduct(m_front);
-
-	m_front.m_w = dFloat32(0.0f);
-	m_up.m_w = dFloat32(0.0f);
-	m_right.m_w = dFloat32(0.0f);
-	m_posit = dVector (dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f));
-
-	dAssert ((dAbs (m_front.DotProduct(m_front).GetScalar()) - dFloat32(1.0f)) < dFloat32(1.0e-5f)); 
-	dAssert ((dAbs (m_up.DotProduct(m_up).GetScalar()) - dFloat32(1.0f)) < dFloat32(1.0e-5f)); 
-	dAssert ((dAbs (m_right.DotProduct(m_right).GetScalar()) - dFloat32(1.0f)) < dFloat32(1.0e-5f)); 
-	dAssert ((dAbs (m_right.DotProduct(m_front.CrossProduct(m_up)).GetScalar()) - dFloat32(1.0f)) < dFloat32(1.0e-5f)); 
+	m_up = m_right.CrossProduct(m_front);
+	dAssert(TestOrthogonal());
 }
 
 D_INLINE dVector& dMatrix::operator[] (dInt32  i)

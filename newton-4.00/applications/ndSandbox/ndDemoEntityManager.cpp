@@ -25,15 +25,11 @@
 #include "ndDemoCameraManager.h"
 #include "ndHighResolutionTimer.h"
 
-#ifdef _MACOSX_VER
-	#include "CocoaOpenglGlue.h"
-#endif
-
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 #define DEFAULT_SCENE	0		// using NewtonMesh tool
 						 
-/// demos forward declaration 
+// demos forward declaration 
 void ndBasicSetup (ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
@@ -489,8 +485,8 @@ void ndDemoEntityManager::ApplyMenuOptions()
 	m_world->SetThreadCount(m_workerThreads);
 
 	bool state = m_autoSleepMode ? true : false;
-	const dList<ndBodyKinematic*>& bodyList = m_world->GetBodyList();
-	for (dList<ndBodyKinematic*>::dListNode* node = bodyList.GetFirst(); node; node = node->GetNext())
+	const ndBodyList& bodyList = m_world->GetBodyList();
+	for (ndBodyList::dListNode* node = bodyList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyKinematic* const body = node->GetInfo();
 		body->SetAutoSleep(state);

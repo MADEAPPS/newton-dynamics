@@ -9,10 +9,6 @@
 * freely
 */
 
-
-// RenderPrimitive.cpp: implementation of the RenderPrimitive class.
-//
-//////////////////////////////////////////////////////////////////////
 #include "ndSandboxStdafx.h"
 #include "ndDemoCamera.h"
 #include "ndOpenGlUtil.h"
@@ -23,26 +19,26 @@
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-/*
-class ndDemoCameraPickBodyJoint: public dCustomKinematicController
+
+class ndDemoCameraPickBodyJoint: public ndJointKinematicController
 {
 	public:
-	ndDemoCameraPickBodyJoint(NewtonBody* const body, const dVector& attachmentPointInGlobalSpace, ndDemoCameraManager* const camera)
-		:dCustomKinematicController(body, attachmentPointInGlobalSpace)
+	ndDemoCameraPickBodyJoint(ndBodyKinematic* const worldBody, ndBodyKinematic* const childBody, const dVector& attachmentPointInGlobalSpace, ndDemoCameraManager* const camera)
+		:ndJointKinematicController(worldBody, childBody, attachmentPointInGlobalSpace)
 		,m_manager (camera)
 	{
 	}
 	
 	~ndDemoCameraPickBodyJoint()
 	{
-		if (m_manager) {
+		if (m_manager) 
+		{
 			m_manager->ResetPickBody();
 		}
 	}
 		
 	ndDemoCameraManager* m_manager;
 };
-*/
 
 ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const scene)
 	:dClassAlloc()
@@ -255,7 +251,6 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 	{
 		if (!m_prevMouseState && mousePickState) 
 		{
-			dTrace(("Implmement object picking\n"));
 			dFloat32 param;
 			dVector posit;
 			dVector normal;
@@ -269,8 +264,8 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 				m_pickedBodyParam = param;
 				if(m_pickJoint) 
 				{
-					dAssert(0);
-					//delete m_pickJoint;
+					scene->GetWorld()->RemoveJoint(m_pickJoint);
+					delete m_pickJoint;
 					m_pickJoint = nullptr;
 				}
 					
@@ -282,8 +277,9 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 				const dFloat32 linearFrictionAccel = 400.0f * dMax (dAbs (DEMO_GRAVITY), dFloat32(10.0f));
 				const dFloat32 inertia = dMax (mass.m_z, dMax (mass.m_x, mass.m_y));
 
-				dTrace(("create teh pick joint here: %d\n", m_targetPicked->GetId()));
-				//m_pickJoint = new ndDemoCameraPickBodyJoint (body, posit, this);
+				m_pickJoint = new ndDemoCameraPickBodyJoint (scene->GetWorld()->GetSentinelBody(), body, posit, this);
+				scene->GetWorld()->AddJoint(m_pickJoint);
+				dTrace(("set the pick joint controll mode: %s\n", __FUNCTION__));
 				//m_pickJoint->SetControlMode(dCustomKinematicController::m_linearPlusAngularFriction);
 				//
 				//m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
@@ -295,12 +291,11 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 	{
 		if (mousePickState) 
 		{
-			
 			m_pickedBodyTargetPosition = p0 + (p1 - p0).Scale (m_pickedBodyParam);
 			
 			if (m_pickJoint) 
 			{
-				dAssert(0);
+				dTrace(("set target Matrix: %s\n", __FUNCTION__));
 				//m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
 			}
 		} 
@@ -308,8 +303,9 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 		{
 			if (m_pickJoint) 
 			{
-				dAssert(0);
-				//delete m_pickJoint;
+				scene->GetWorld()->RemoveJoint(m_pickJoint);
+				delete m_pickJoint;
+				m_pickJoint = nullptr;
 			}
 			ResetPickBody();
 		}
@@ -326,8 +322,7 @@ void ndDemoCameraManager::ResetPickBody()
 	}
 	if (m_pickJoint) 
 	{
-		dAssert(0);
-		//m_pickJoint->m_manager = nullptr;
+		m_pickJoint->m_manager = nullptr;
 	}
 	m_pickJoint = nullptr;
 	m_targetPicked = nullptr;

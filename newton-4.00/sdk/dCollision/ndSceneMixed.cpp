@@ -204,6 +204,7 @@ void ndSceneMixed::Cleanup()
 		delete body;
 	}
 	ndContact::FlushFreeList();
+	ndBodyList::FlushFreeList();
 	ndFitnessList::FlushFreeList();
 	ndBodyKinematic::ReleaseMemory();
 	m_tmpBodyArray.Resize(256);
