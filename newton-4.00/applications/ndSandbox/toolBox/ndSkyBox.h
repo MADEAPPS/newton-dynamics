@@ -42,6 +42,7 @@ class ndSkyBox: public ndDemoEntity
 	GLuint m_texturecubemap;
 	GLuint m_vao;
 	GLuint m_ibo;
+	GLint matrixUniformLocation;
 	GLuint m_textures1[6];
 //	TextureEx* m_textures;
 

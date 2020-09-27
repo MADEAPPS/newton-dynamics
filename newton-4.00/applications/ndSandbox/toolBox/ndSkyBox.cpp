@@ -120,13 +120,17 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glUseProgram(m_shader);
+	matrixUniformLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
+	glUseProgram(0);
 }
 
 void ndSkyBox::SetupCubeMap()
 {
 /*
 	glActiveTexture(GL_TEXTURE0);
-	// Exemple this call is deprecated.
+	// Example this call is deprecated.
 	//glEnable(GL_TEXTURE_CUBE_MAP);
 	glGenTextures(1, &m_texturecubemap);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_texturecubemap);
@@ -258,22 +262,21 @@ void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const
 	glDepthMask(GL_FALSE);
 
 	ndDemoCamera* const camera = scene->GetCamera();
-
-//	skyMatrix = camera->GetViewMatrix().Inverse();
-//	skyMatrix[0] = dVector(1.0f, 0.0f, 0.0f, 0.0f); // front
-//	skyMatrix[1] = dVector(0.0f, 1.0f, 0.0f, 0.0f); // up
-//	skyMatrix[2] = dVector(0.0f, 0.0f, 1.0f, 0.0f); // right
 	
 	dMatrix skyMatrix(dGetIdentityMatrix());
 	dMatrix viewMatrix(camera->GetViewMatrix());
 //	skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, 0.0f, 1.0f));
 	skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, -800.0f, 1.0f));
+
+	dMatrix viewModelMatrix(skyMatrix * camera->GetViewMatrix());
+	dMatrix projectionViewModelMatrix(skyMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 	
 	glUseProgram(m_shader);
-	glUniformMatrix4fv(glGetUniformLocation(m_shader, "P"), 1, false, &camera->GetProjectionMatrix()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(m_shader, "V"), 1, false, &camera->GetViewMatrix()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(m_shader, "M"), 1, false, &skyMatrix[0][0]);
-
+	//glUniformMatrix4fv(glGetUniformLocation(m_shader, "P"), 1, false, &camera->GetProjectionMatrix()[0][0]);
+	//glUniformMatrix4fv(glGetUniformLocation(m_shader, "V"), 1, false, &camera->GetViewMatrix()[0][0]);
+	//glUniformMatrix4fv(glGetUniformLocation(m_shader, "M"), 1, false, &skyMatrix[0][0]);
+	//glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewModelMatrix"), 1, false, &viewModelMatrix[0][0]);
+	glUniformMatrix4fv(matrixUniformLocation, 1, false, &projectionViewModelMatrix[0][0]);
 
 		//glActiveTexture(GL_TEXTURE0);
 		//glBindTexture(GL_TEXTURE_CUBE_MAP, m_texturecubemap);
