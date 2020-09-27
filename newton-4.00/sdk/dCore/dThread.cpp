@@ -32,10 +32,12 @@ dThread::dThread()
 #endif
 {
 	strcpy (m_name, "newtonWorker");
+#ifndef D_USE_THREAD_EMULATION
 	while (load())
 	{
 		std::this_thread::yield();
 	}
+#endif
 }
 
 dThread::~dThread()
