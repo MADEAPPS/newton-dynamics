@@ -205,7 +205,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 //	m_showNormalForces = true;
 //	m_showContactPoints = true;
 //	m_showJointDebugInfo = true;
-	m_collisionDisplayMode = 2;
+//	m_collisionDisplayMode = 2;
 //	m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
 
@@ -601,11 +601,12 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			//	ImGui::RadioButton(&ids[index][0], &m_currentPlugin, index);
 			//}
 			//ImGui::Separator();
-
-			ImGui::SliderInt_DoubleSpace("solver sub steps", &m_solverSubSteps, 2, 8);
-			ImGui::SliderInt_DoubleSpace("iterative solver passes", &m_solverPasses, 4, 64);
-
-			ImGui::SliderInt_DoubleSpace("worker threads", &m_workerThreads, 1, 20);
+			ImGui::Text("solver sub steps");
+			ImGui::SliderInt("##solv", &m_solverSubSteps, 2, 8);
+			ImGui::Text("iterative solver passes");
+			ImGui::SliderInt("##intera", &m_solverPasses, 4, 64);
+			ImGui::Text("worker threads");
+			ImGui::SliderInt("##worlt", &m_workerThreads, 1, 20);
 			ImGui::Separator();
 
 			ImGui::RadioButton("default broad phase", &m_broadPhaseType, 0);
@@ -786,14 +787,13 @@ void ndDemoEntityManager::CursorposCallback  (GLFWwindow* , double x, double y)
 	io.MousePos = ImVec2((float)x, (float)y);
 }
 
-bool ndDemoEntityManager::GetMousePosition (int& posX, int& posY) const
+bool ndDemoEntityManager::GetMousePosition (dFloat32& posX, dFloat32& posY) const
 {
 	ImVec2 posit(ImGui::GetMousePos());
-	posX = int (posit.x);
-	posY = int (posit.y);
+	posX = posit.x;
+	posY = posit.y;
 	return true;
 }
-
 
 void ndDemoEntityManager::CharCallback(GLFWwindow* window, unsigned int ch)
 {

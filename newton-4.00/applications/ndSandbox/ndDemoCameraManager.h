@@ -45,8 +45,8 @@ class ndDemoCameraManager: public dClassAlloc
 	void UpdatePickBody (ndDemoEntityManager* const scene, bool mouseState, const dVector& camPos0, const dVector& camPos1, dFloat32 timestep); 
 	
 	ndDemoCamera* m_camera;
-	int m_mousePosX;
-	int m_mousePosY;
+	dFloat32 m_mousePosX;
+	dFloat32 m_mousePosY;
 	dFloat32 m_yaw;
 	dFloat32 m_pitch;
 	dFloat32 m_yawRate;

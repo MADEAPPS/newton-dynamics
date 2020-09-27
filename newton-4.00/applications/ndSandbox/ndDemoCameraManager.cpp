@@ -16,10 +16,6 @@
 #include "ndPhysicsUtils.h"
 #include "ndDemoCameraManager.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 class ndDemoCameraPickBodyJoint: public ndJointKinematicController
 {
 	public:
@@ -88,8 +84,8 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	// update the camera;
 	dMatrix targetMatrix (m_camera->GetNextMatrix());
 
-	int mouseX;
-	int mouseY;
+	dFloat32 mouseX;
+	dFloat32 mouseY;
 	scene->GetMousePosition (mouseX, mouseY);
 
 	// slow down the Camera if we have a Body
@@ -130,25 +126,25 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	bool buttonState = m_mouseLockState || mouseState;
 	if (!m_targetPicked && buttonState) 
 	{
-		int mouseSpeedX = mouseX - m_mousePosX;
-		int mouseSpeedY = mouseY - m_mousePosY;
+		dFloat32 mouseSpeedX = mouseX - m_mousePosX;
+		dFloat32 mouseSpeedY = mouseY - m_mousePosY;
 
 		if ((ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0))) 
 		{
-			if (mouseSpeedX > 0) 
+			if (mouseSpeedX > 0.0f) 
 			{
 				m_yaw = dMod(m_yaw + m_yawRate, dFloat32(2.0f * dPi));
 			} 
-			else if (mouseSpeedX < 0)
+			else if (mouseSpeedX < 0.0f)
 			{
 				m_yaw = dMod(m_yaw - m_yawRate, dFloat32 (2.0f * dPi));
 			}
 
-			if (mouseSpeedY > 0) 
+			if (mouseSpeedY > 0.0f)
 			{
 				m_pitch += m_pitchRate;
 			} 
-			else if (mouseSpeedY < 0)
+			else if (mouseSpeedY < 0.0f)
 			{
 				m_pitch -= m_pitchRate;
 			}
@@ -164,8 +160,8 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	m_camera->SetMatrix (*scene, rot, targetMatrix.m_posit);
 
 	// get the mouse pick parameter so that we can do replay for debugging
-	dFloat32 x = dFloat32(m_mousePosX);
-	dFloat32 y = dFloat32(m_mousePosY);
+	dFloat32 x = m_mousePosX;
+	dFloat32 y = m_mousePosY;
 	dVector p0(m_camera->ScreenToWorld(dVector(x, y, 0.0f, 0.0f)));
 	dVector p1(m_camera->ScreenToWorld(dVector(x, y, 1.0f, 0.0f)));
 
@@ -178,7 +174,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	};
 	ndReplay replay;
 
-	#if 1
+	#if 0
 		replay.m_p0 = p0;
 		replay.m_p1 = p1;
 		replay.m_mouseState = mouseState ? 1 : 0;

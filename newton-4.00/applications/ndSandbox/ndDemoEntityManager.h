@@ -102,7 +102,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	void ImportPLYfile (const char* const name);
 
 	ndDemoCamera* GetCamera() const;
-	bool GetMousePosition (int& posX, int& posY) const;
+	bool GetMousePosition (dFloat32& posX, dFloat32& posY) const;
 	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
 
 	void PushTransparentMesh (const ndDemoMeshInterface* const mesh); 
@@ -133,7 +133,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	const ndShaderPrograms& GetShaderCache() const;  
 	
-
 	private:
 	void BeginFrame();
 	void RenderStats();

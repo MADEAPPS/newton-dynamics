@@ -157,6 +157,9 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	m_scene->m_lru = m_scene->m_lru + 1;
 	m_scene->SetTimestep(timestep);
 
+static int xxxx;
+xxxx++;
+
 	m_scene->BuildBodyArray();
 
 	ndBodyKinematic* sentinelBody = m_sentinelBody;

@@ -14,6 +14,7 @@
 
 ndShaderPrograms::ndShaderPrograms(void)
 {
+	m_skyBox = 0;
 	m_solidColor = 0;
 	m_decalEffect = 0;
 	m_diffuseEffect = 0;
@@ -24,6 +25,10 @@ ndShaderPrograms::ndShaderPrograms(void)
 
 ndShaderPrograms::~ndShaderPrograms(void)
 {
+	if (m_skyBox)
+	{
+		glDeleteShader(m_skyBox);
+	}
 	if (m_solidColor) 
 	{
 		glDeleteShader(m_solidColor);
@@ -51,6 +56,7 @@ ndShaderPrograms::~ndShaderPrograms(void)
 
 bool ndShaderPrograms::CreateAllEffects()
 {
+	m_skyBox = CreateShaderEffect("skyboxvert", "skyboxfrag");
 	m_solidColor = CreateShaderEffect ("TextureDecal", "TextureDecal");
 	m_diffuseEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuse");
 	m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse", "DirectionalDiffuse");
@@ -92,14 +98,15 @@ GLuint ndShaderPrograms::CreateShaderEffect (const char* const vertexShaderName,
 	const char* const vPtr = buffer;
 	GLuint program = glCreateProgram();
 
-	sprintf (tmpName, "shaders/%s.vs", vertexShaderName);
+	sprintf (tmpName, "shaders/%s.vtx", vertexShaderName);
 	LoadShaderCode (tmpName, buffer);
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
 	glShaderSource(vertexShader, 1, &vPtr, nullptr);
 	glCompileShader(vertexShader);
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &state); 
-	if (state != GL_TRUE ) {
+	if (state != GL_TRUE ) 
+	{
 		GLsizei length;  
 		glGetShaderInfoLog(vertexShader, sizeof (buffer), &length, errorLog);
 		dTrace ((errorLog));
@@ -114,7 +121,8 @@ GLuint ndShaderPrograms::CreateShaderEffect (const char* const vertexShaderName,
 	glShaderSource(pixelShader, 1, &vPtr, nullptr);
 	glCompileShader(pixelShader);
 	glGetShaderiv(pixelShader, GL_COMPILE_STATUS, &state); 
-	if (state != GL_TRUE ) {
+	if (state != GL_TRUE ) 
+	{
 		GLsizei length;  
 		glGetShaderInfoLog(vertexShader, sizeof (buffer), &length, errorLog);
 		dTrace((errorLog));
@@ -123,7 +131,8 @@ GLuint ndShaderPrograms::CreateShaderEffect (const char* const vertexShaderName,
 
 	glLinkProgram(program);
 	glGetProgramiv(program, GL_LINK_STATUS, &state);   
-	if (state != GL_TRUE ) {
+	if (state != GL_TRUE ) 
+	{
 		GLsizei length;  
 		glGetProgramInfoLog(program, sizeof (buffer), &length, errorLog);
 		dTrace((errorLog));

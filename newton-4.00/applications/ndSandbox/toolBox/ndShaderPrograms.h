@@ -42,6 +42,7 @@ class ndShaderPrograms
 	GLuint CreateShaderEffect (const char* const vertexShader, const char* const pixelShader);
 
 	public:
+	GLuint m_skyBox;
 	GLuint m_solidColor;
 	GLuint m_decalEffect;
 	GLuint m_diffuseEffect;
