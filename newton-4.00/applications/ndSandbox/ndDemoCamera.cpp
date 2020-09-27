@@ -28,6 +28,8 @@
 
 ndDemoCamera::ndDemoCamera()
 	:ndDemoEntity (dGetIdentityMatrix(), nullptr) 
+	,m_viewMatrix(dGetIdentityMatrix())
+	,m_projectionMatrix(dGetIdentityMatrix())
 	,m_fov(D_CAMERA_ANGLE * dDegreeToRad)
 	,m_backPlane(2000.0f)
 	,m_frontPlane (0.01f)
@@ -54,10 +56,113 @@ dFloat32 ndDemoCamera::GetPichAngle() const
 	return m_cameraPitch;
 }
 
+dMatrix ndDemoCamera::CreateMatrixFromFrustum(dFloat32 Left, dFloat32 Right, dFloat32 Bottom, dFloat32 Top, dFloat32 ZNear, dFloat32 ZFar)
+{
+	dMatrix Result(dGetIdentityMatrix());
+
+	Result[0][0] = 2 * ZNear / (Right - Left);
+	Result[0][1] = 0;
+	Result[0][2] = 0;
+	Result[0][3] = 0;
+
+	Result[1][0] = 0;
+	Result[1][1] = 2 * ZNear / (Top - Bottom);
+	Result[1][2] = 0;
+	Result[1][3] = 0;
+
+	Result[2][0] = (Right + Left) / (Right - Left);
+	Result[2][1] = (Top + Bottom) / (Top - Bottom);
+	Result[2][2] = -(ZFar + ZNear) / (ZFar - ZNear);
+	Result[2][3] = -1;
+
+	Result[3][0] = 0;
+	Result[3][1] = 0;
+	Result[3][2] = -2 * ZFar * ZNear / (ZFar - ZNear);
+	Result[3][3] = 0;
+
+	return Result;
+}
+
+dMatrix ndDemoCamera::CreateLookAtMatrix(const dVector& eye, const dVector& center, const dVector& normUp)
+{
+	//dVector XAxis, YAxis, ZAxis, negEye;
+	dMatrix Result(dGetIdentityMatrix());
+	
+	dVector ZAxis (center - eye);
+
+	//NormalizeVector(ZAxis);
+	ZAxis = ZAxis.Normalize();
+
+	dVector XAxis (ZAxis.CrossProduct(normUp));
+
+	//NormalizeVector(XAxis);
+	XAxis = XAxis.Normalize();
+
+	dVector YAxis (XAxis.CrossProduct(ZAxis));
+
+	Result[0] = XAxis;
+	Result[1] = YAxis;
+	Result[2] = ZAxis;
+
+	Result[2] = Result[2].Scale(-1.0f);
+
+	Result[3] = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+
+	Result = Result.Transpose();
+
+	dVector negEye (eye);
+	negEye = negEye.Scale(-1.0f);
+	negEye[3] = 1.0f;
+
+	negEye = Result.TransformVector(negEye);
+
+	Result[3] = negEye;
+
+	return Result;
+}
+
+dMatrix ndDemoCamera::CreatePerspectiveMatrix(dFloat32 fov, dFloat32 Aspect, dFloat32 ZNear, dFloat32 ZFar)
+{
+	fov = dClamp (fov, 0.0f, dPi);
+	//y = ZNear * (dFloat32)dTan((fov * cPIdiv180) * 0.5f);
+	dFloat32 y = ZNear * dTan(fov * 0.5f);
+	dFloat32 x = y * Aspect;
+	dMatrix Result (CreateMatrixFromFrustum(-x, x, -y, y, ZNear, ZFar));
+	return Result;
+}
+
 void ndDemoCamera::SetViewMatrix(int width, int height)
 {
 	// set the view port for this render section
-	glViewport(0, 0, (GLint) width, (GLint) height);
+	glViewport(0, 0, (GLint)width, (GLint)height);
+
+#ifdef USING_GLES_4 
+
+	dMatrix matrix;
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(m_fov * 180.0f / dPi, GLfloat(width) / GLfloat(height), m_frontPlane, m_backPlane);
+	glGetFloat(GL_PROJECTION_MATRIX, &matrix[0][0]);
+
+	// calculate projection matrix
+	m_projectionMatrix = CreatePerspectiveMatrix(m_fov, GLfloat(width) / GLfloat(height), m_frontPlane, m_backPlane);
+
+
+	// set the model view matrix 
+
+	// set the model view matrix 
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	dVector pointOfInterest(m_matrix.m_posit + m_matrix.m_front);
+	gluLookAt(m_matrix.m_posit.m_x, m_matrix.m_posit.m_y, m_matrix.m_posit.m_z,
+		pointOfInterest.m_x, pointOfInterest.m_y, pointOfInterest.m_z,
+		m_matrix.m_up.m_x, m_matrix.m_up.m_y, m_matrix.m_up.m_z);
+	
+	m_viewMatrix = CreateLookAtMatrix(dVector(m_matrix.m_posit.m_x, m_matrix.m_posit.m_y, m_matrix.m_posit.m_z, 1.0f),
+		dVector(pointOfInterest.m_x, pointOfInterest.m_y, pointOfInterest.m_z, 1.0f),
+		dVector(m_matrix.m_up.m_x, m_matrix.m_up.m_y, m_matrix.m_up.m_z, 0.0f));
+
+#else
 
 	// set the projection matrix
 	glMatrixMode(GL_PROJECTION);
@@ -74,10 +179,10 @@ void ndDemoCamera::SetViewMatrix(int width, int height)
 		      pointOfInterest.m_x, pointOfInterest.m_y, pointOfInterest.m_z, 
 			  m_matrix.m_up.m_x, m_matrix.m_up.m_y, m_matrix.m_up.m_z);	
 
-
 	glGetIntegerv(GL_VIEWPORT, m_viewport); 
-	glGetDoublev(GL_MODELVIEW_MATRIX, m_modelViewMatrix); 
-	glGetDoublev(GL_PROJECTION_MATRIX, m_projectionViewMatrix); 
+	glGetFloat(GL_MODELVIEW_MATRIX, &m_viewMatrix[0][0]); 
+	glGetFloat(GL_PROJECTION_MATRIX, &m_projectionMatrix[0][0]);
+#endif
 }
 
 dVector ndDemoCamera::ScreenToWorld (const dVector& screenPoint) const
@@ -94,8 +199,19 @@ dVector ndDemoCamera::ScreenToWorld (const dVector& screenPoint) const
 	GLdouble objx;
 	GLdouble objy;
 	GLdouble objz;
-	gluUnProject (winX, winY, winZ, m_modelViewMatrix, m_projectionViewMatrix, (GLint*)&m_viewport, &objx, &objy, &objz);
 
+	GLdouble modelViewMatrix[16];
+	GLdouble projectionViewMatrix[16];
+	for (int i = 0; i < 4; i++) 
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			modelViewMatrix[i * 4 + j] = m_viewMatrix[i][j];
+			projectionViewMatrix[i * 4 + j] = m_projectionMatrix[i][j];
+		}
+	}
+
+	gluUnProject (winX, winY, winZ, modelViewMatrix, projectionViewMatrix, (GLint*)&m_viewport, &objx, &objy, &objz);
 	return dVector (dFloat32(objx), dFloat32(objy), dFloat32(objz), dFloat32 (0.0f));
 }
 
@@ -144,7 +260,7 @@ dAssert (0);
 
 	return dVector (dFloat32(winX), dFloat32 (winY), dFloat32(winZ), 0.0f);
 */
-	return dVector (0.0f);
+	return dVector::m_zero;
 }
 
 

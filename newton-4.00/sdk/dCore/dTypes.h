@@ -456,6 +456,7 @@ union dDoubleInt
 #define dFloor(x)		dFloat32 (floor(x))	
 #define dPow(x,y)		dFloat32 (pow(x,y))
 #define dFmod(x,y)		dFloat32 (fmod(x,y))
+#define dTan(x)			dFloat32 (tan(x))
 #define dAtan2(x,y)		dFloat32 (atan2(x,y))
 #define dRsqrt(x)		(dFloat32 (1.0f) / dSqrt(x))
 #define dClearFP()		_clearfp() 

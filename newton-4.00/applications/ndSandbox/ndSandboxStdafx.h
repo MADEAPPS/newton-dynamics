@@ -22,6 +22,8 @@
 
 #define DOMMY_API 
 
+//#define USING_GLES_4
+
 #include <stddef.h>
 #include <stdarg.h>
 #include <stdio.h>

@@ -39,6 +39,14 @@ class ndDemoCamera: public ndDemoEntity
 	dVector WorldToScreen (const dVector& worldPoint) const;
 	
 	private:
+	dMatrix CreateLookAtMatrix(const dVector& eye, const dVector& center, const dVector& normUp);
+	dMatrix CreateMatrixFromFrustum(dFloat32 Left, dFloat32 Right, dFloat32 Bottom, dFloat32 Top, dFloat32 ZNear, dFloat32 ZFar);
+	dMatrix CreatePerspectiveMatrix(dFloat32 FOV, dFloat32 Aspect, dFloat32 ZNear, dFloat32 ZFar);
+
+
+	dMatrix m_viewMatrix;
+	dMatrix m_projectionMatrix;
+
 	dFloat32 m_fov;
 	dFloat32 m_backPlane;
 	dFloat32 m_frontPlane;
@@ -46,12 +54,11 @@ class ndDemoCamera: public ndDemoEntity
 	dFloat32 m_cameraPitch;
 
 	GLint m_viewport[4]; 
-	GLdouble m_modelViewMatrix[16];
-	GLdouble m_projectionViewMatrix[16];
+	//GLdouble m_modelViewMatrix[16];
+	//GLdouble m_projectionViewMatrix[16];
 	friend class ndDemoEntity;
 };
 
 
 
 #endif 
-

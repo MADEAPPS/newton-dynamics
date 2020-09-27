@@ -946,7 +946,8 @@ void ndDemoEntityManager::CreateSkyBox()
 {
 	if (!m_sky)
 	{
-		m_sky = new ndSkyBox(m_shadeCache.m_solidColor);
+		//m_sky = new ndSkyBox(m_shadeCache.m_solidColor);
+		m_sky = new ndSkyBox(m_shadeCache.m_skyBox);
 		dScopeSpinLock lock(m_addDeleteLock);
 		dAssert(!m_sky->m_rootNode);
 		m_sky->m_rootNode = Addtop(m_sky);
