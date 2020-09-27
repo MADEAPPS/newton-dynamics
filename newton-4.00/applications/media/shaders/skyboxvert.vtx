@@ -21,6 +21,6 @@ uniform mat4 P, V, M;
  
 void main() 
 {	
-  gl_Position = P * V * M * vec4(vertex, 1.0);
-  texCoord = vertex;
+	texCoord = vertex;
+	gl_Position = P * V * M * vec4(vertex, 1.0);
 }

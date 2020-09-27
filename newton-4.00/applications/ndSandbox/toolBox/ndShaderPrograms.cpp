@@ -15,7 +15,7 @@
 ndShaderPrograms::ndShaderPrograms(void)
 {
 	m_skyBox = 0;
-	m_solidColor = 0;
+	m_texturedDecal = 0;
 	m_decalEffect = 0;
 	m_diffuseEffect = 0;
 	m_diffuseIntanceEffect = 0;
@@ -29,9 +29,9 @@ ndShaderPrograms::~ndShaderPrograms(void)
 	{
 		glDeleteShader(m_skyBox);
 	}
-	if (m_solidColor) 
+	if (m_texturedDecal) 
 	{
-		glDeleteShader(m_solidColor);
+		glDeleteShader(m_texturedDecal);
 	}
 	if (m_decalEffect) 
 	{
@@ -57,7 +57,7 @@ ndShaderPrograms::~ndShaderPrograms(void)
 bool ndShaderPrograms::CreateAllEffects()
 {
 	m_skyBox = CreateShaderEffect("skyboxvert", "skyboxfrag");
-	m_solidColor = CreateShaderEffect ("TextureDecal", "TextureDecal");
+	m_texturedDecal = CreateShaderEffect ("TextureDecal", "TextureDecal");
 	m_diffuseEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuse");
 	m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse", "DirectionalDiffuse");
 	m_diffuseNoTextureEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuseNoTexture");

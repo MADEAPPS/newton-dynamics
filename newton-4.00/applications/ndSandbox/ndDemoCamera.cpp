@@ -89,6 +89,7 @@ dMatrix ndDemoCamera::CreateLookAtMatrix(const dVector& eye, const dVector& cent
 	dMatrix Result(dGetIdentityMatrix());
 	
 	dVector ZAxis (center - eye);
+	ZAxis = ZAxis & dVector::m_triplexMask;
 
 	//NormalizeVector(ZAxis);
 	ZAxis = ZAxis.Normalize();
@@ -106,7 +107,7 @@ dMatrix ndDemoCamera::CreateLookAtMatrix(const dVector& eye, const dVector& cent
 
 	Result[2] = Result[2].Scale(-1.0f);
 
-	Result[3] = dVector(0.0f, 0.0f, 0.0f, 1.0f);
+	Result[3] = dVector::m_wOne;
 
 	Result = Result.Transpose();
 
@@ -147,21 +148,22 @@ void ndDemoCamera::SetViewMatrix(int width, int height)
 	// calculate projection matrix
 	m_projectionMatrix = CreatePerspectiveMatrix(m_fov, GLfloat(width) / GLfloat(height), m_frontPlane, m_backPlane);
 
-
-	// set the model view matrix 
-
 	// set the model view matrix 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	dVector pointOfInterest(m_matrix.m_posit + m_matrix.m_front);
-	gluLookAt(m_matrix.m_posit.m_x, m_matrix.m_posit.m_y, m_matrix.m_posit.m_z,
+	gluLookAt(
+		m_matrix.m_posit.m_x, m_matrix.m_posit.m_y, m_matrix.m_posit.m_z,
 		pointOfInterest.m_x, pointOfInterest.m_y, pointOfInterest.m_z,
 		m_matrix.m_up.m_x, m_matrix.m_up.m_y, m_matrix.m_up.m_z);
 	
-	m_viewMatrix = CreateLookAtMatrix(dVector(m_matrix.m_posit.m_x, m_matrix.m_posit.m_y, m_matrix.m_posit.m_z, 1.0f),
+	m_viewMatrix = CreateLookAtMatrix(
+		dVector(m_matrix.m_posit.m_x, m_matrix.m_posit.m_y, m_matrix.m_posit.m_z, 1.0f),
 		dVector(pointOfInterest.m_x, pointOfInterest.m_y, pointOfInterest.m_z, 1.0f),
 		dVector(m_matrix.m_up.m_x, m_matrix.m_up.m_y, m_matrix.m_up.m_z, 0.0f));
 
+	glGetFloat(GL_MODELVIEW_MATRIX, &matrix[0][0]);
+	glGetIntegerv(GL_VIEWPORT, m_viewport);
 #else
 
 	// set the projection matrix

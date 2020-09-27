@@ -310,9 +310,8 @@ class dVector
 	D_INLINE dVector Normalize () const
 	{
 		dAssert (m_w == dFloat32 (0.0f));
-		// somehow this function changes the behavior with 3.13
-		//return Scale(dFloat32 (1.0f) / dgSqrt(DotProduct(*this).GetScalar()));
-		return *this * InvMagSqrt ();
+		//return *this * InvMagSqrt ();
+		return Scale(dFloat32(1.0f) / dSqrt(DotProduct(*this).GetScalar()));
 	}
 
 	// relational operators
