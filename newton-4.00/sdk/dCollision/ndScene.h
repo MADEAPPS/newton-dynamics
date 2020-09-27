@@ -72,8 +72,8 @@ class ndScene
 	virtual ndWorld* GetWorld() const;
 	const ndBodyList& GetBodyList() const;
 
-	dArray<ndContact*>& GetActiveContactArray();
-	const dArray<ndContact*>& GetActiveContactArray() const;
+	ndConstraintArray& GetActiveContactArray();
+	const ndConstraintArray& GetActiveContactArray() const;
 
 	dArray<ndBodyKinematic*>& GetActiveBodyArray();
 	const dArray<ndBodyKinematic*>& GetActiveBodyArray() const;
@@ -144,8 +144,8 @@ class ndScene
 	
 	ndBodyList m_bodyList;
 	ndContactList m_contactList;
-	dArray<ndContact*> m_activeContactArray;
 	dArray<ndBodyKinematic*> m_activeBodyArray;
+	ndConstraintArray m_activeConstraintArray;
 	dSpinLock m_contactLock;
 	ndSceneNode* m_rootNode;
 	ndContactNotify* m_contactNotifyCallback;
@@ -183,14 +183,14 @@ inline const ndBodyList& ndScene::GetBodyList() const
 	return m_bodyList;
 }
 
-inline dArray<ndContact*>& ndScene::GetActiveContactArray()
+inline ndConstraintArray& ndScene::GetActiveContactArray()
 {
-	return m_activeContactArray;
+	return m_activeConstraintArray;
 }
 
-inline const dArray<ndContact*>& ndScene::GetActiveContactArray() const
+inline const ndConstraintArray& ndScene::GetActiveContactArray() const
 {
-	return m_activeContactArray;
+	return m_activeConstraintArray;
 }
 
 inline dArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray()

@@ -120,9 +120,6 @@ class ndContact
 	D_COLLISION_API virtual ndBodyKinematic* GetBody0() const;
 	D_COLLISION_API virtual ndBodyKinematic* GetBody1() const;
 
-	D_COLLISION_API virtual ndBodyKinematic* GetKinematicBody0() const;
-	D_COLLISION_API virtual ndBodyKinematic* GetKinematicBody1() const;
-
 	D_COLLISION_API void AttachToBodies();
 	D_COLLISION_API void DetachFromBodies();
 
@@ -287,15 +284,6 @@ inline ndBodyKinematic* ndContact::GetBody1() const
 	return m_body1;
 }
 
-inline ndBodyKinematic* ndContact::GetKinematicBody0() const
-{
-	return m_body0;
-}
-
-inline ndBodyKinematic* ndContact::GetKinematicBody1() const
-{
-	return m_body1;
-}
 
 #endif 
 

@@ -90,8 +90,8 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	virtual dUnsigned32 JacobianDerivative(ndConstraintDescritor& params);
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const params);
 
-	virtual ndBodyKinematic* GetKinematicBody0() const;
-	virtual ndBodyKinematic* GetKinematicBody1() const;
+	virtual ndBodyKinematic* GetBody0() const;
+	virtual ndBodyKinematic* GetBody1() const;
 
 
 	D_NEWTON_API void CalculateLocalMatrix(const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
@@ -124,12 +124,12 @@ inline void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDe
 	dAssert(0);
 }
 
-inline ndBodyKinematic* ndJointBilateralConstraint::GetKinematicBody0() const
+inline ndBodyKinematic* ndJointBilateralConstraint::GetBody0() const
 {
 	return m_body0;
 }
 
-inline ndBodyKinematic* ndJointBilateralConstraint::GetKinematicBody1() const
+inline ndBodyKinematic* ndJointBilateralConstraint::GetBody1() const
 {
 	return m_body1;
 }

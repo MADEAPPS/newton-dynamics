@@ -181,18 +181,17 @@ class ndConstraint
 	virtual ~ndConstraint();
 
 	virtual ndContact* GetAsContact() { return nullptr; }
-	virtual ndConstraint* GetAsConstraint() { return this; }
+
 
 	virtual bool IsBilateral() const { return false; }
 
 	virtual const dUnsigned32 GetRowsCount() const = 0;
+	virtual ndBodyKinematic* GetBody0() const { return nullptr; }
+	virtual ndBodyKinematic* GetBody1() const { return nullptr; }
 	virtual dUnsigned32 JacobianDerivative(ndConstraintDescritor& params) = 0;
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const params) = 0;
 
 	void InitPointParam(dgPointParam& param, dFloat32 stiffness, const dVector& p0Global, const dVector& p1Global) const;
-
-	virtual ndBodyKinematic* GetKinematicBody0() const { return nullptr; }
-	virtual ndBodyKinematic* GetKinematicBody1() const { return nullptr; }
 
 	dFloat32 m_preconditioner0;
 	dFloat32 m_preconditioner1;

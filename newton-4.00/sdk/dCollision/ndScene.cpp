@@ -168,8 +168,8 @@ ndScene::ndScene()
 	,dThreadPool("newtonWorker")
 	,m_bodyList()
 	,m_contactList()
-	,m_activeContactArray()
 	,m_activeBodyArray()
+	,m_activeConstraintArray()
 	,m_contactLock()
 	,m_rootNode(nullptr)
 	,m_contactNotifyCallback(new ndContactNotify())
@@ -179,7 +179,7 @@ ndScene::ndScene()
 	,m_fullScan(true)
 {
 	m_activeBodyArray.Resize(256);
-	m_activeContactArray.Resize(256);
+	m_activeConstraintArray.Resize(256);
 	m_contactNotifyCallback->m_scene = this;
 }
 
@@ -907,7 +907,7 @@ void ndScene::UpdateAabb(dInt32 threadIndex, ndBodyKinematic* const body)
 
 bool ndScene::ValidateContactCache(ndContact* const contact, const dVector& timestep) const
 {
-	dAssert(contact && (contact->GetAsConstraint()));
+	dAssert(contact && (contact->GetAsContact()));
 
 	//dMatrix pitch(dPitchMatrix(30.0 * dRadToDegree));
 	//dMatrix yaw(dYawMatrix(60.0 * dRadToDegree));
@@ -1644,12 +1644,12 @@ void ndScene::FindCollidingPairs()
 	}
 
 	int count = 0;
-	m_activeContactArray.SetCount(m_contactList.GetCount());
+	m_activeConstraintArray.SetCount(m_contactList.GetCount());
 	for (ndContactList::dListNode* node = m_contactList.GetFirst(); node; node = node->GetNext())
 	{
 		ndContact* const contact = &node->GetInfo();
 		dAssert(contact->m_isAttached);
-		m_activeContactArray[count] = contact;
+		m_activeConstraintArray[count] = contact;
 		count ++;
 	}
 }
@@ -1666,12 +1666,12 @@ void ndScene::CalculateContacts()
 			const dInt32 threadIndex = GetThredID();
 			const dInt32 threadsCount = m_owner->GetThreadCount();
 
-			dArray<ndContact*>& activeContacts = m_owner->m_activeContactArray;
+			ndConstraintArray& activeContacts = m_owner->m_activeConstraintArray;
 			const dInt32 count = activeContacts.GetCount();
-	
 			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
 			{
-				m_owner->CalculateContacts(threadIndex, activeContacts[i]);
+				dAssert(activeContacts[i]->GetAsContact());
+				m_owner->CalculateContacts(threadIndex, activeContacts[i]->GetAsContact());
 			}
 		}
 	};
@@ -1682,22 +1682,21 @@ void ndScene::CalculateContacts()
 void ndScene::DeleteDeadContact()
 {
 	D_TRACKTIME();
-	dInt32 activeCount = m_activeContactArray.GetCount();
+	dInt32 activeCount = m_activeConstraintArray.GetCount();
 	for (dInt32 i = activeCount - 1; i >= 0; i --)
 	{ 
-		ndContact* const contact = m_activeContactArray[i];
+		ndContact* const contact = m_activeConstraintArray[i]->GetAsContact();
+		dAssert(contact);
 		if (contact->m_killContact) 
 		{
 			dAssert(0);
 			m_contactList.DeleteContact(contact);
-			//activeCount--;
-			m_activeContactArray[i] = m_activeContactArray[activeCount];
+			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
 		}
 		else if (!contact->m_active || !contact->m_maxDOF)
 		{
-			//constraintArray[activeCount].m_joint = contact;
 			activeCount--;
-			m_activeContactArray[i] = m_activeContactArray[activeCount];
+			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
 		}
 		//else if (contact->m_body0->m_continueCollisionMode | contact->m_body1->m_continueCollisionMode) 
 		//{
@@ -1707,5 +1706,5 @@ void ndScene::DeleteDeadContact()
 		//	}
 		//}
 	}
-	m_activeContactArray.SetCount(activeCount);
+	m_activeConstraintArray.SetCount(activeCount);
 }

@@ -208,7 +208,7 @@ void ndSceneMixed::Cleanup()
 	ndFitnessList::FlushFreeList();
 	ndBodyKinematic::ReleaseMemory();
 	m_activeBodyArray.Resize(256);
-	m_activeContactArray.Resize(256);
+	m_activeConstraintArray.Resize(256);
 }
 
 bool ndSceneMixed::RemoveBody(ndBodyKinematic* const body)

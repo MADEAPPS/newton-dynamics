@@ -122,10 +122,8 @@ ndConstraint::ndConstraint()
 
 void ndConstraint::InitPointParam(dgPointParam& param, dFloat32 stiffness, const dVector& p0Global, const dVector& p1Global) const
 {
-	//ndBody* const body0 = GetBody0();
-	//ndBody* const body1 = GetBody1();
-	ndBodyKinematic* const body0 = GetKinematicBody0();
-	ndBodyKinematic* const body1 = GetKinematicBody1();
+	ndBodyKinematic* const body0 = GetBody0();
+	ndBodyKinematic* const body1 = GetBody1();
 	dAssert(body0);
 	dAssert(body1);
 	param.m_defualtDiagonalRegularizer = stiffness;

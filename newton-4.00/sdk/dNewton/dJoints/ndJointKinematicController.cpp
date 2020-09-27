@@ -378,7 +378,7 @@ void ndJointKinematicController::SubmitConstraints (dFloat timestep, int threadI
 ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const dVector& attachmentPointInGlobalSpace)
 	:ndJointBilateralConstraint(referenceBody, body, dMatrix(attachmentPointInGlobalSpace))
 {
-	dAssert(GetKinematicBody1() == body);
+	dAssert(GetBody1() == body);
 	dMatrix matrix(body->GetMatrix());
 	matrix.m_posit = attachmentPointInGlobalSpace;
 	matrix.m_posit.m_w = dFloat32(1.0f);

@@ -120,7 +120,7 @@ class ndDynamicsUpdate
 	dArray<ndBodyKinematic*> m_bodyIslandOrder;
 	dArray<ndJacobian> m_internalForces;
 	dArray<ndJacobian> m_internalForcesBack;
-	dArray<ndConstraint*> m_jointArray;
+	ndConstraintArray m_jointArray;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
 	dFloat32 m_accelNorm[D_MAX_THREADS_COUNT];

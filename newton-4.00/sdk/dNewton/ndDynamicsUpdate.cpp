@@ -24,6 +24,7 @@
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
 #include "ndDynamicsUpdate.h"
+#include "ndJointBilateralConstraint.h"
 
 ndDynamicsUpdate::ndDynamicsUpdate()
 	:m_velocTol(dFloat32(1.0e-8f))
@@ -157,18 +158,28 @@ dInt32 ndDynamicsUpdate::CompareIslandBodies(const ndBodyIndexPair* const  pairA
 }
 void ndDynamicsUpdate::BuildIsland()
 {
-	const ndScene* const scene = m_world->GetScene();
+	ndScene* const scene = m_world->GetScene();
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	dAssert(bodyArray.GetCount() >= 1);
 	if (bodyArray.GetCount() - 1)
 	{
 		D_TRACKTIME();
-		const dArray<ndContact*>& contactArray = scene->GetActiveContactArray();
+		const ndJointList& jointList = m_world->GetJointList();
+		ndConstraintArray& contactArray = scene->GetActiveContactArray();
+
+		int index = contactArray.GetCount();
+		contactArray.SetCount(index + jointList.GetCount());
+		for (ndJointList::dListNode* node = jointList.GetFirst(); node; node = node->GetNext())
+		{
+			contactArray[index] = node->GetInfo();
+			index++;
+		}
+		
 		for (dInt32 i = contactArray.GetCount() - 1; i >= 0; i--)
 		{
 			ndConstraint* const joint = contactArray[i];
-			ndBodyKinematic* const body0 = joint->GetKinematicBody0();
-			ndBodyKinematic* const body1 = joint->GetKinematicBody1();
+			ndBodyKinematic* const body0 = joint->GetBody0();
+			ndBodyKinematic* const body1 = joint->GetBody1();
 			const dInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
 			body1->m_bodyIsConstrained = 1;
 			body1->m_resting = body1->m_resting & resting;
@@ -321,11 +332,11 @@ void ndDynamicsUpdate::InitWeights()
 	m_timestepRK = m_timestep * m_invStepRK;
 	m_invTimestepRK = m_invTimestep * dFloat32(4.0f);
 
-	const dArray<ndContact*>& contactArray = scene->GetActiveContactArray();
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
+	const ndConstraintArray& constraintArray = scene->GetActiveContactArray();
 
 	const dInt32 bodyCount = bodyArray.GetCount();
-	const dInt32 jointCount = contactArray.GetCount();
+	const dInt32 jointCount = constraintArray.GetCount();
 
 	m_jointArray.SetCount(jointCount);
 	m_internalForces.SetCount(bodyCount);
@@ -334,13 +345,13 @@ void ndDynamicsUpdate::InitWeights()
 	memset(&m_internalForces[0], 0, bodyArray.GetCount() * sizeof(ndJacobian));
 
 	dUnsigned32 maxRowCount = 0;
-	for (dInt32 i = contactArray.GetCount() - 1; i >= 0; i--) 
+	for (dInt32 i = constraintArray.GetCount() - 1; i >= 0; i--) 
 	{
-		const ndContact* const contact = contactArray[i];
-		m_jointArray[i] = (ndConstraint*)contact;
-		ndBodyKinematic* const body0 = contact->GetBody0();
-		ndBodyKinematic* const body1 = contact->GetBody1();
-		maxRowCount += contact->GetRowsCount();
+		ndConstraint* const constraint = constraintArray[i];
+		m_jointArray[i] = constraint;
+		ndBodyKinematic* const body0 = constraint->GetBody0();
+		ndBodyKinematic* const body1 = constraint->GetBody1();
+		maxRowCount += constraint->GetRowsCount();
 		
 		if (body0->GetInvMass() == dFloat32(0.0f))
 		{
@@ -511,8 +522,8 @@ dInt32 ndDynamicsUpdate::GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* 
 
 void ndDynamicsUpdate::BuildJacobianMatrix(ndConstraint* const joint)
 {
-	ndBodyKinematic* const body0 = joint->GetKinematicBody0();
-	ndBodyKinematic* const body1 = joint->GetKinematicBody1();
+	ndBodyKinematic* const body0 = joint->GetBody0();
+	ndBodyKinematic* const body1 = joint->GetBody1();
 	dAssert(body0);
 	dAssert(body1);
 	const ndBodyDynamic* const dynBody0 = body0->GetAsBodyDynamic();
@@ -652,7 +663,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			D_TRACKTIME();
 
 			ndWorld* const world = m_owner->GetWorld();
-			const dArray<ndConstraint*>& jointArray = world->m_jointArray;
+			const ndConstraintArray& jointArray = world->m_jointArray;
 
 			dAtomic<dUnsigned32>& rowCount = world->m_rowsCount;
 			for (dInt32 i = m_it->fetch_add(1); i < jointArray.GetCount(); i = m_it->fetch_add(1))
@@ -725,7 +736,7 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 			D_TRACKTIME();
 
 			ndWorld* const world = m_owner->GetWorld();
-			const dArray<ndConstraint*>& jointArray = world->m_jointArray;
+			const ndConstraintArray& jointArray = world->m_jointArray;
 
 			ndJointAccelerationDecriptor joindDesc;
 			joindDesc.m_timeStep = world->m_timestepRK;
@@ -763,7 +774,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			D_TRACKTIME();
 
 			ndWorld* const world = m_owner->GetWorld();
-			dArray<ndConstraint*>& jointArray = world->m_jointArray;
+			ndConstraintArray& jointArray = world->m_jointArray;
 			dFloat32 accNorm = dFloat32 (0.0f);
 			const dInt32 jointCount = jointArray.GetCount();
 			for (dInt32 i = m_it->fetch_add(1); i < jointCount; i = m_it->fetch_add(1))
@@ -801,8 +812,8 @@ dFloat32 ndDynamicsUpdate::CalculateJointsForce(ndConstraint* const joint)
 	dVector accNorm(dVector::m_zero);
 	dFloat32 normalForce[D_CONSTRAINT_MAX_ROWS + 1];
 
-	ndBodyKinematic* const body0 = joint->GetKinematicBody0();
-	ndBodyKinematic* const body1 = joint->GetKinematicBody1();
+	ndBodyKinematic* const body0 = joint->GetBody0();
+	ndBodyKinematic* const body1 = joint->GetBody1();
 	dAssert(body0);
 	dAssert(body1);
 
@@ -1012,7 +1023,7 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 			D_TRACKTIME();
 
 			ndWorld* const world = m_owner->GetWorld();
-			dArray<ndConstraint*>& jointArray = world->m_jointArray;
+			ndConstraintArray& jointArray = world->m_jointArray;
 			ndRightHandSide* const rightHandSide = &world->m_rightHandSide[0];
 
 			bool hasJointFeeback = false;

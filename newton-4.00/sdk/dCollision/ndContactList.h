@@ -25,6 +25,16 @@
 #include "ndCollisionStdafx.h"
 #include "ndContact.h"
 
+
+class ndConstraintArray: public dArray<ndConstraint*>
+{
+	public: 
+	ndConstraintArray()
+		:dArray<ndConstraint*>()
+	{
+	}
+};
+
 class ndContactList: public dList<ndContact, dContainersFreeListAlloc<ndContact>>
 {
 	public:
