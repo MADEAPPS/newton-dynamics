@@ -164,9 +164,7 @@ static GLuint LoadTargaImage(const char* const cacheName, const char* const buff
 
 		// build our texture mip maps
 		gluBuild2DMipmaps(GL_TEXTURE_2D, iComponents, iWidth, iHeight, eFormat, GL_UNSIGNED_BYTE, buffer);
-		int xxx = glGetError();
-		dAssert(xxx == GL_NO_ERROR);
-
+		dAssert(glGetError() == GL_NO_ERROR);
 
 		// Done with File
 		ndTextureCache& cache = ndTextureCache::GetChache();

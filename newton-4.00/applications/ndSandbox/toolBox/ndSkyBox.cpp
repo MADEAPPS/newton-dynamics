@@ -176,6 +176,7 @@ void ndSkyBox::LoadCubeTexture(GLenum face, char* const filename)
 	{
 		dAssert(0);
 		fclose(pFile);
+		return;
 	}
 	
 	// Calculate size of image buffer
@@ -187,20 +188,21 @@ void ndSkyBox::LoadCubeTexture(GLenum face, char* const filename)
 	{
 		dAssert(0);
 		fclose(pFile);
+		return;
 	}
 	
 	int readret = int(fread(pBits, lImageSize, 1, pFile));
 	if (readret != 1)
 	{
+		dAssert(0);
 		fclose(pFile);
 		delete[] pBits;
+		return;
 	}
-
 
 	glTexImage2D(face, 0, 4, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, pBits);
 	//gluBuild2DMipmaps(face, 4, width, height, GL_BGR, GL_UNSIGNED_BYTE, pBits);
-	int xxx = glGetError();
-	dAssert(xxx == GL_NO_ERROR);
+	dAssert(glGetError() == GL_NO_ERROR);
 	
 	// Done with File
 	fclose(pFile);
