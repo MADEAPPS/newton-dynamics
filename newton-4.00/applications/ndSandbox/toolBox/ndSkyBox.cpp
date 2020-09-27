@@ -23,10 +23,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	,m_texturecubemap(0)
 	,m_vao(0)
 	,m_ibo(0)
-	//,m_textures(nullptr)
 {
-	//m_textures = new TextureEx();
-
 	GLfloat size = 200.0f;
 	static GLfloat vertices[] =
 	{
@@ -83,7 +80,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 
 	VertexPT vtx[24];
 	for (int i = 0; i < 24; i++) 
-	{//VertexPTN
+	{
 		vtx[i].posit.x = vertices[i * 3 + 0];
 		vtx[i].posit.y = vertices[i * 3 + 1];
 		vtx[i].posit.z = vertices[i * 3 + 2];
@@ -93,7 +90,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	}
 	// Setup the cubemap texture.
 
-//	SetupCubeMap();
+	SetupCubeMap();
 
 	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
@@ -126,117 +123,114 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	glUseProgram(0);
 }
 
+void ndSkyBox::LoadCubeTexture(GLenum face, char* const filename)
+{
+	#pragma pack(1)
+	struct TGAHEADER
+	{
+		char identsize;					// Size of ID field that follows header (0)
+		char colorMapType;				// 0 = None, 1 = palette
+		char imageType;					// 0 = none, 1 = indexed, 2 = rgb, 3 = grey, +8=rle
+		unsigned short colorMapStart;	// First color map entry
+		unsigned short colorMapLength;	// Number of colors
+		unsigned char colorMapBits;		// bits per palette entry
+		unsigned short xstart;			// image x origin
+		unsigned short ystart;			// image y origin
+		unsigned short width;			// width in pixels
+		unsigned short height;			// height in pixels
+		char bits;						// bits per pixel (8 16, 24, 32)
+		char descriptor;				// image descriptor
+	};
+	#pragma pack(8)
+
+	char fullPathName[2048];
+	dGetWorkingFileName(filename, fullPathName);
+	
+	FILE* const pFile = fopen(fullPathName, "rb");
+	dAssert(pFile);
+
+	TGAHEADER tgaHeader;		// TGA file header
+	size_t ret = fread(&tgaHeader, 18, 1, pFile);
+	ret = 0;
+	
+	// Do byte swap for big vs little Indian
+	tgaHeader.colorMapStart = SWAP_INT16(tgaHeader.colorMapStart);
+	tgaHeader.colorMapLength = SWAP_INT16(tgaHeader.colorMapLength);
+	tgaHeader.xstart = SWAP_INT16(tgaHeader.xstart);
+	tgaHeader.ystart = SWAP_INT16(tgaHeader.ystart);
+	tgaHeader.width = SWAP_INT16(tgaHeader.width);
+	tgaHeader.height = SWAP_INT16(tgaHeader.height);
+	
+	// Get width, height, and depth of texture
+	int width = tgaHeader.width;
+	int height = tgaHeader.height;
+	short sDepth = tgaHeader.bits / 8;
+	dAssert((sDepth == 3) || (sDepth == 4));
+	
+	// Put some validity checks here. Very simply, I only understand
+	// or care about 8, 24, or 32 bit targa's.
+	if (tgaHeader.bits != 8 && tgaHeader.bits != 24 && tgaHeader.bits != 32)
+	{
+		dAssert(0);
+		fclose(pFile);
+	}
+	
+	// Calculate size of image buffer
+	unsigned lImageSize = width * height * sDepth;
+	
+	// Allocate memory and check for success
+	char* const pBits = (char*)dMemory::Malloc(width * height * sizeof(dInt32));
+	if (pBits == nullptr)
+	{
+		dAssert(0);
+		fclose(pFile);
+	}
+	
+	int readret = int(fread(pBits, lImageSize, 1, pFile));
+	if (readret != 1)
+	{
+		fclose(pFile);
+		delete[] pBits;
+	}
+
+
+	glTexImage2D(face, 0, 4, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, pBits);
+	//gluBuild2DMipmaps(face, 4, width, height, GL_BGR, GL_UNSIGNED_BYTE, pBits);
+	int xxx = glGetError();
+	dAssert(xxx == GL_NO_ERROR);
+	
+	// Done with File
+	fclose(pFile);
+	dMemory::Free(pBits);
+}
+
 void ndSkyBox::SetupCubeMap()
 {
-/*
 	glActiveTexture(GL_TEXTURE0);
-	// Example this call is deprecated.
-	//glEnable(GL_TEXTURE_CUBE_MAP);
 	glGenTextures(1, &m_texturecubemap);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, m_texturecubemap);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); 
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE); 
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	//
-	int ws, hs, cp = 0;
-	//
-	unsigned char* textemp = nullptr;
-	//char* textemp2 = nullptr;
-	GLenum format = 0;
-	//
-	char fullPathName[2048];
-	//
-	GetFullFilePathEx("NewtonSky0003.tga", fullPathName);
-	textemp = m_textures->TextureFromFileData(fullPathName, ws, hs, cp);
-	// I have try to convert the newton tga texture for use with new opengl but I always get problems with data.
-	// I have success to remove all opengl error when I load the texture but now it is inverted and with wrong color...
-	// I have temporary disable it for use a other texture loader.
-	//m_textures1[0] = LoadTextureEx("NewtonSky0003.tga", cp, ws, hs, textemp2);
-	//
-	//
-	if (cp == 1) format = GL_RED;
-	if (cp == 3) format = GL_RGB;
-	if (cp == 4) format = GL_RGBA;
-	//if (cp == 5) format = GL_BGRA;
-	//
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, format, ws, hs, 0, format, GL_UNSIGNED_BYTE, textemp);
-	m_textures->TextureFreeData(textemp);
-	textemp = nullptr;
-	// this delete the date when you use LoadTextureEx
-	//glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, format, ws, hs, 0, format, GL_UNSIGNED_BYTE, textemp2);
-	//if (textemp2) deleteTextureData(textemp2);
-	//textemp2 = nullptr;
-	//
-	ws, hs, cp = 0;
-	GetFullFilePathEx("NewtonSky0001.tga", fullPathName);
-	textemp = m_textures->TextureFromFileData(fullPathName, ws, hs, cp);
-	//
-	if (cp == 1) format = GL_RED;
-	if (cp == 3) format = GL_RGB;
-	if (cp == 4) format = GL_RGBA;
-	//
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, format, ws, hs, 0, format, GL_UNSIGNED_BYTE, textemp);
-	m_textures->TextureFreeData(textemp);
-	textemp = nullptr;
-	//
-	ws, hs, cp = 0;
-	GetFullFilePathEx("NewtonSky0005.tga", fullPathName);
-	textemp = m_textures->TextureFromFileData(fullPathName, ws, hs, cp);
-	//
-	if (cp == 1) format = GL_RED;
-	if (cp == 3) format = GL_RGB;
-	if (cp == 4) format = GL_RGBA;
-	//
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, format, ws, hs, 0, format, GL_UNSIGNED_BYTE, textemp);
-	m_textures->TextureFreeData(textemp);
-	textemp = nullptr;
-	//
-	ws, hs, cp = 0;
-	GetFullFilePathEx("NewtonSky0006.tga", fullPathName);
-	textemp = m_textures->TextureFromFileData(fullPathName, ws, hs, cp);
-	//
-	if (cp == 1) format = GL_RED;
-	if (cp == 3) format = GL_RGB;
-	if (cp == 4) format = GL_RGBA;
-	//
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, format, ws, hs, 0, format, GL_UNSIGNED_BYTE, textemp);
-	m_textures->TextureFreeData(textemp);
-	textemp = nullptr;
-	//
-	ws, hs, cp = 0;
-	GetFullFilePathEx("NewtonSky0002.tga", fullPathName);
-	textemp = m_textures->TextureFromFileData(fullPathName, ws, hs, cp);
-	//
-	if (cp == 1) format = GL_RED;
-	if (cp == 3) format = GL_RGB;
-	if (cp == 4) format = GL_RGBA;
-	//
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, format, ws, hs, 0, format, GL_UNSIGNED_BYTE, textemp);
-	m_textures->TextureFreeData(textemp);
-	textemp = nullptr;
-	//
-	ws, hs, cp = 0;
-	GetFullFilePathEx("NewtonSky0004.tga", fullPathName);
-	textemp = m_textures->TextureFromFileData(fullPathName, ws, hs, cp);
-	//
-	if (cp == 1) format = GL_RED;
-	if (cp == 3) format = GL_RGB;
-	if (cp == 4) format = GL_RGBA;
-	//
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, format, ws, hs, 0, format, GL_UNSIGNED_BYTE, textemp);
-	m_textures->TextureFreeData(textemp);
-	textemp = nullptr;
-*/
+
+	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_X, "NewtonSky0003.tga");
+	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, "NewtonSky0001.tga");
+
+	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, "NewtonSky0005.tga");
+	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, "NewtonSky0006.tga");
+
+	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, "NewtonSky0002.tga");
+	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "NewtonSky0004.tga");
 }
 
 ndSkyBox::~ndSkyBox()
 {
-	//if (m_textures)
-	//{
-	//	delete m_textures;
-	//}
+	if (m_texturecubemap)
+	{
+		glDeleteTextures(1, &m_texturecubemap);
+	}
 	
 	// delete VBO when program terminated
 	if (m_vertexBuffer)
@@ -265,7 +259,7 @@ void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const
 	
 	dMatrix skyMatrix(dGetIdentityMatrix());
 	dMatrix viewMatrix(camera->GetViewMatrix());
-//	skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, 0.0f, 1.0f));
+	//skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, 0.0f, 1.0f));
 	skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, -800.0f, 1.0f));
 
 	dMatrix viewModelMatrix(skyMatrix * camera->GetViewMatrix());
@@ -278,8 +272,8 @@ void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const
 	//glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewModelMatrix"), 1, false, &viewModelMatrix[0][0]);
 	glUniformMatrix4fv(matrixUniformLocation, 1, false, &projectionViewModelMatrix[0][0]);
 
-		//glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_CUBE_MAP, m_texturecubemap);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, m_texturecubemap);
 		glBindVertexArray(m_vao);
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);

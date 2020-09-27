@@ -12,13 +12,16 @@
 
 out vec3 texCoord;
 
-layout(location = 0) in vec3 in_vertex;
-layout(location = 1) in vec3 in_texture;
+//layout(location = 0) in vec3 in_vertex;
+//layout(location = 1) in vec3 in_texture;
 
+in vec3 in_vertex;
 uniform mat4 projectionViewModelMatrix;
  
 void main() 
 {	
-	texCoord = in_texture;
+	//texCoord = in_texture;
+	texCoord = in_vertex;
+
 	gl_Position = projectionViewModelMatrix * vec4(in_vertex, 1.0);
 }

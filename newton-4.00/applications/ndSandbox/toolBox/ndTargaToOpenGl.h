@@ -25,9 +25,6 @@ enum TextureImageFormat
 };
 
 GLuint LoadTexture(const char* const filename);
-GLuint LoadTextureEx(const char* const filename, int& txcomponent, int& txwidth, int& txheight, char*& txdata);
-
-GLuint LoadImage(const char* const cacheName, const char* const buffer, int width, int hight, TextureImageFormat format);
 
 GLuint AddTextureRef (GLuint texture);
 void ReleaseTexture (GLuint texture);

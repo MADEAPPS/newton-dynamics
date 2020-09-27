@@ -107,6 +107,75 @@ class ndTextureCache: public dTree<ndTextureEntry, dUnsigned64>
 	}
 };
 
+
+static GLuint LoadTargaImage(const char* const cacheName, const char* const buffer, int width, int hight, TextureImageFormat format)
+{
+	// Get width, height, and depth of texture
+	GLint iWidth = width;
+	GLint iHeight = hight;
+
+	GLenum eFormat = GL_RGBA;
+	GLint iComponents = 4;
+	switch (format)
+	{
+	case m_rgb:
+		// Most likely case
+		eFormat = GL_BGR;
+		//eFormat = GL_RGB;
+		iComponents = 4;
+		break;
+
+	case m_rgba:
+		eFormat = GL_BGRA;
+		//eFormat = GL_RGBA;
+		iComponents = 4;
+		break;
+
+	case m_luminace:
+		//eFormat = GL_LUMINANCE;
+		eFormat = GL_LUMINANCE_ALPHA;
+		//eFormat = GL_ALPHA;
+		iComponents = 4;
+		break;
+	};
+
+	GLuint texture = 0;
+	glGenTextures(1, &texture);
+	if (texture)
+	{
+		//GLenum errr = glGetError ();
+		glBindTexture(GL_TEXTURE_2D, texture);
+
+		// select modulate to mix texture with color for shading
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		// when texture area is small, tri linear filter mip mapped
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+		// when texture area is large, bilinear filter the first mipmap
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		float anisotropic = 0.0f;
+		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &anisotropic);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropic);
+
+		// build our texture mip maps
+		gluBuild2DMipmaps(GL_TEXTURE_2D, iComponents, iWidth, iHeight, eFormat, GL_UNSIGNED_BYTE, buffer);
+		int xxx = glGetError();
+		dAssert(xxx == GL_NO_ERROR);
+
+
+		// Done with File
+		ndTextureCache& cache = ndTextureCache::GetChache();
+		cache.InsertText(cacheName, texture);
+	}
+
+	return texture;
+}
+
 //	Loads the texture from the specified file and stores it in iTexture. Note
 //	that we're using the GLAUX library here, which is generally discouraged,
 //	but in this case spares us having to write a bitmap loading routine.
@@ -208,7 +277,7 @@ GLuint LoadTexture(const char* const filename)
 				break;
 		};
 
-		texture = LoadImage(fullPathName, pBits, tgaHeader.width, tgaHeader.height, format);
+		texture = LoadTargaImage(fullPathName, pBits, tgaHeader.width, tgaHeader.height, format);
 
 		// Done with File
 		fclose(pFile);
@@ -221,73 +290,6 @@ GLuint LoadTexture(const char* const filename)
 #define GL_BGR 0x80E0
 #define GL_BGRA 0x80E1
 #endif
-
-GLuint LoadImage(const char* const cacheName, const char* const buffer, int width, int hight, TextureImageFormat format)
-{
-	// Get width, height, and depth of texture
-	GLint iWidth = width;
-	GLint iHeight = hight;
-
-	//GL_COLOR_INDEX, GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA, GL_RGB, GL_RGBA, GL_BGR_EXT, GL_BGRA_EXT, GL_LUMINANCE, or GL_LUMINANCE_ALPHA.
-
-	GLenum eFormat = GL_RGBA;
-	GLint iComponents = 4;
-	switch(format)
-	{
-		case m_rgb:     
-			// Most likely case
-			eFormat = GL_BGR;
-			//eFormat = GL_RGB;
-			iComponents = 4;
-			break;
-
-		case m_rgba:
-			eFormat = GL_BGRA;
-			//eFormat = GL_RGBA;
-			iComponents = 4;
-			break;
-
-		case m_luminace:
-			//eFormat = GL_LUMINANCE;
-			eFormat = GL_LUMINANCE_ALPHA;
-			//eFormat = GL_ALPHA;
-			iComponents = 4;
-			break;
-	};
-
-	GLuint texture = 0;
-	glGenTextures(1, &texture);
-	if (texture) 
-	{
-		//GLenum errr = glGetError ();
-		glBindTexture(GL_TEXTURE_2D, texture);
-
-		// select modulate to mix texture with color for shading
-		glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-		// when texture area is small, tri linear filter mip mapped
-		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-		// when texture area is large, bilinear filter the first mipmap
-		glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-
-		float anisotropic = 0.0f;
-		glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &anisotropic);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisotropic);
-
-		// build our texture mip maps
-		gluBuild2DMipmaps (GL_TEXTURE_2D, iComponents, iWidth, iHeight, eFormat, GL_UNSIGNED_BYTE, buffer);
-
-		// Done with File
-		ndTextureCache& cache = ndTextureCache::GetChache();
-		cache.InsertText (cacheName, texture);
-	}
-
-	return texture;
-}
 
 void ReleaseTexture (GLuint texture)
 {

@@ -194,7 +194,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	// initialized the physics world for the new scene
 //	m_showUI = false;
 //	m_showAABB = false;
-//	m_hideVisualMeshes = true;
+	m_hideVisualMeshes = true;
 //	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
