@@ -30,6 +30,9 @@ class ndDemoCamera: public ndDemoEntity
 	dFloat32 GetYawAngle() const;
 	dFloat32 GetPichAngle() const;
 
+	const dMatrix& GetViewMatrix() const;
+	const dMatrix& GetProjectionMatrix() const;
+
 	void SetMatrix (ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position);
 	void SetViewMatrix (int width, int height);
 

@@ -12,6 +12,7 @@
 #include "ndSandboxStdafx.h"
 #include "ndTargaToOpenGl.h"
 #include "ndSkyBox.h"
+#include "ndDemoCamera.h"
 
 
 #ifdef USING_GLES_4
@@ -252,40 +253,44 @@ ndSkyBox::~ndSkyBox()
 
 void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix__) const
 {
-/*
-	dMatrix skyMatrix(dGetIdentityMatrix());
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW);
 	glDepthMask(GL_FALSE);
 
 	ndDemoCamera* const camera = scene->GetCamera();
 
-	skyMatrix = camera->GetViewMatrix().Inverse();
-	skyMatrix[0] = dVector(1.0f, 0.0f, 0.0f, 0.0f); // front
-	skyMatrix[1] = dVector(0.0f, 1.0f, 0.0f, 0.0f); // up
-	skyMatrix[2] = dVector(0.0f, 0.0f, 1.0f, 0.0f); // right
+//	skyMatrix = camera->GetViewMatrix().Inverse();
+//	skyMatrix[0] = dVector(1.0f, 0.0f, 0.0f, 0.0f); // front
+//	skyMatrix[1] = dVector(0.0f, 1.0f, 0.0f, 0.0f); // up
+//	skyMatrix[2] = dVector(0.0f, 0.0f, 1.0f, 0.0f); // right
+	
+	dMatrix skyMatrix(dGetIdentityMatrix());
+	dMatrix viewMatrix(camera->GetViewMatrix());
+//	skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, 0.0f, 1.0f));
+	skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, -800.0f, 1.0f));
 	
 	glUseProgram(m_shader);
-	glUniformMatrix4fv(glGetUniformLocation(skyshad, "P"), 1, false, &camera->GetProjectionMatrix()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(skyshad, "V"), 1, false, &camera->GetViewMatrix()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(skyshad, "M"), 1, false, &skyMatrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(m_shader, "P"), 1, false, &camera->GetProjectionMatrix()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(m_shader, "V"), 1, false, &camera->GetViewMatrix()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(m_shader, "M"), 1, false, &skyMatrix[0][0]);
 
 
 		//glActiveTexture(GL_TEXTURE0);
 		//glBindTexture(GL_TEXTURE_CUBE_MAP, m_texturecubemap);
-		//glBindVertexArray(m_vao);
-		//glEnableVertexAttribArray(0);
-		//glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-		//glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-		//glBindBuffer(GL_ARRAY_BUFFER, 0);
-		//glDisableVertexAttribArray(0);
-		//glBindVertexArray(0);
+		glBindVertexArray(m_vao);
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glDisableVertexAttribArray(0);
+		glBindVertexArray(0);
 
 	glUseProgram(0);
 	glDepthMask(GL_TRUE);
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW);
-*/
 }
 
 #else

@@ -56,6 +56,16 @@ dFloat32 ndDemoCamera::GetPichAngle() const
 	return m_cameraPitch;
 }
 
+const dMatrix& ndDemoCamera::GetProjectionMatrix() const
+{
+	return m_projectionMatrix;
+}
+
+const dMatrix& ndDemoCamera::GetViewMatrix() const
+{
+	return m_viewMatrix;
+}
+
 dMatrix ndDemoCamera::CreateMatrixFromFrustum(dFloat32 Left, dFloat32 Right, dFloat32 Bottom, dFloat32 Top, dFloat32 ZNear, dFloat32 ZFar)
 {
 	dMatrix Result(dGetIdentityMatrix());
@@ -201,7 +211,6 @@ dVector ndDemoCamera::ScreenToWorld (const dVector& screenPoint) const
 	GLdouble objx;
 	GLdouble objy;
 	GLdouble objz;
-
 	GLdouble modelViewMatrix[16];
 	GLdouble projectionViewMatrix[16];
 	for (int i = 0; i < 4; i++) 
