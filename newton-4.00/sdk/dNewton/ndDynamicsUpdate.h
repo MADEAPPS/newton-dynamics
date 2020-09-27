@@ -109,7 +109,7 @@ class ndDynamicsUpdate
 	void UpdateIslandState(const ndIsland& island);
 	void BuildJacobianMatrix(ndConstraint* const joint);
 	dFloat32 CalculateJointsForce(ndConstraint* const joint);
-	dInt32 GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* const joint);
+	void GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* const joint);
 
 	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const context);
 	static dInt32 CompareIslandBodies(const ndBodyIndexPair* const  A, const ndBodyIndexPair* const B, void* const context);

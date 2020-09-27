@@ -466,12 +466,13 @@ void ndJointBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor
 #endif
 
 
-ndJointBilateralConstraint::ndJointBilateralConstraint(ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix)
+ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix)
 	:ndConstraint()
 	,dClassAlloc()
 	,m_body0(body0)
 	,m_body1(body1)
 	,m_worldNode(nullptr)
+	,m_maxDof(dInt32 (maxDof))
 	//,m_destructor(nullptr)
 	//,m_jointNode(nullptr)
 {

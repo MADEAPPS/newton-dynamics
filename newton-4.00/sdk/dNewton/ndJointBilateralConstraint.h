@@ -77,13 +77,13 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	dFloat32 m_defualtDiagonalRegularizer;
 	OnConstraintDestroy m_destructor;
 	dBilateralConstraintList::dListNode* m_jointNode;
-	dgInt8	  m_rowIsMotor;
+	dInt8	  m_rowIsMotor;
 
 	friend class dgBodyMasterList;
 	friend class dgWorldDynamicUpdate;
 */
 	public:
-	D_NEWTON_API ndJointBilateralConstraint(ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix);
+	D_NEWTON_API ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix);
 	D_NEWTON_API virtual ~ndJointBilateralConstraint();
 
 	virtual const dUnsigned32 GetRowsCount() const;
@@ -101,16 +101,16 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	dMatrix m_localMatrix1;
 	ndBodyKinematic* m_body0;
 	ndBodyKinematic* m_body1;
-
 	ndJointList::dListNode* m_worldNode;
+
+	dInt8 m_maxDof;
 
 	friend class ndWorld;
 };
 
 inline const dUnsigned32 ndJointBilateralConstraint::GetRowsCount() const
 {
-	dAssert(0);
-	return 0;
+	return m_maxDof;
 }
 
 inline dUnsigned32 ndJointBilateralConstraint::JacobianDerivative(ndConstraintDescritor& params)

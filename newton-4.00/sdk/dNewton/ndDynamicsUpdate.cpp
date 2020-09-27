@@ -427,12 +427,11 @@ void ndDynamicsUpdate::InitBodyArray()
 	scene->SubmitJobs<ndInitBodyArray>();
 }
 
-dInt32 ndDynamicsUpdate::GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* const joint)
+void ndDynamicsUpdate::GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* const joint)
 {
 	ndConstraintDescritor constraintParam;
-	dInt32 dof = joint->GetRowsCount();
-	dAssert(dof <= D_CONSTRAINT_MAX_ROWS);
-	for (dInt32 i = 0; i < dof; i++) 
+	dAssert(joint->GetRowsCount() <= D_CONSTRAINT_MAX_ROWS);
+	for (dInt32 i = joint->GetRowsCount() - 1; i >= 0; i--)
 	{
 		constraintParam.m_forceBounds[i].m_low = D_MIN_BOUND;
 		constraintParam.m_forceBounds[i].m_upper = D_MAX_BOUND;
@@ -442,7 +441,7 @@ dInt32 ndDynamicsUpdate::GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* 
 	
 	constraintParam.m_timestep = m_timestep;
 	constraintParam.m_invTimestep = m_invTimestep;
-	dof = joint->JacobianDerivative(constraintParam);
+	dInt32 dof = joint->JacobianDerivative(constraintParam);
 	
 	//if (constraint->GetId() == dgConstraint::m_contactConstraint) 
 	//{
@@ -499,8 +498,8 @@ dInt32 ndDynamicsUpdate::GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* 
 	{
 		dAssert(constraintParam.m_forceBounds[i].m_jointForce);
 	
-		ndLeftHandSide* const row = &m_leftHandSide[baseIndex];
-		ndRightHandSide* const rhs = &m_rightHandSide[baseIndex];
+		ndLeftHandSide* const row = &m_leftHandSide[baseIndex + i];
+		ndRightHandSide* const rhs = &m_rightHandSide[baseIndex + i];
 	
 		row->m_Jt = constraintParam.m_jacobian[i];
 		rhs->m_diagDamp = dFloat32(0.0f);
@@ -515,17 +514,15 @@ dInt32 ndDynamicsUpdate::GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* 
 	
 		dAssert(constraintParam.m_forceBounds[i].m_normalIndex >= -1);
 		rhs->m_normalForceIndex = constraintParam.m_forceBounds[i].m_normalIndex;
-		baseIndex++;
 	}
-	return baseIndex;
 }
 
 void ndDynamicsUpdate::BuildJacobianMatrix(ndConstraint* const joint)
 {
+	dAssert(joint->GetBody0());
+	dAssert(joint->GetBody1());
 	ndBodyKinematic* const body0 = joint->GetBody0();
 	ndBodyKinematic* const body1 = joint->GetBody1();
-	dAssert(body0);
-	dAssert(body1);
 	const ndBodyDynamic* const dynBody0 = body0->GetAsBodyDynamic();
 	const ndBodyDynamic* const dynBody1 = body1->GetAsBodyDynamic();
 
@@ -610,9 +607,6 @@ void ndDynamicsUpdate::BuildJacobianMatrix(ndConstraint* const joint)
 		rhs->m_force = isBilateral ? dClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
 		rhs->m_maxImpact = dFloat32(0.0f);
 	
-		//const dgSoaFloat& JtM0 = (dgSoaFloat&)row->m_Jt.m_jacobianM0;
-		//const dgSoaFloat& JtM1 = (dgSoaFloat&)row->m_Jt.m_jacobianM1;
-		//const dgSoaFloat tmpDiag((weight0 * JMinvM0 * JtM0).MulAdd(weight1, JMinvM1 * JtM1));
 		const ndJacobian& JtM0 = row->m_Jt.m_jacobianM0;
 		const ndJacobian& JtM1 = row->m_Jt.m_jacobianM1;
 		const dVector tmpDiag(
