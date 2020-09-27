@@ -38,7 +38,7 @@ class ndSkyBox: public ndDemoEntity
 
 	void LoadCubeTexture(GLenum face, char* const filename);
 
-	int m_uvOffest;
+	dMatrix m_textureMatrix;
 	GLuint m_shader;
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
@@ -46,10 +46,11 @@ class ndSkyBox: public ndDemoEntity
 	GLuint m_vao;
 	GLuint m_ibo;
 	GLint matrixUniformLocation;
+	GLint textureMatrixLocation;
 
-	GLint m_textureLocation;
-	GLint m_attribVertexPosition;
-	GLint m_attribVertexTexCoord;
+	//GLint m_textureLocation;
+	//GLint m_attribVertexPosition;
+	//GLint m_attribVertexTexCoord;
 };
 
 #else

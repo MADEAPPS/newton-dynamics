@@ -15,13 +15,13 @@ out vec3 texCoord;
 //layout(location = 0) in vec3 in_vertex;
 //layout(location = 1) in vec3 in_texture;
 
-in vec3 in_vertex;
+in vec3 vertex;
+
+uniform mat4 textureMatrix;
 uniform mat4 projectionViewModelMatrix;
  
 void main() 
 {	
-	//texCoord = in_texture;
-	texCoord = in_vertex;
-
-	gl_Position = projectionViewModelMatrix * vec4(in_vertex, 1.0);
+	texCoord = vec3 (textureMatrix * vec4(vertex, 1.0));
+	gl_Position = projectionViewModelMatrix * vec4(vertex, 1.0);
 }

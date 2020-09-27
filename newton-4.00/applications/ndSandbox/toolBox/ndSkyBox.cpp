@@ -34,18 +34,17 @@ ndSkyBox::ndSkyBox(GLuint shader)
 		-size,-size,-size,   size,-size,-size,   size,-size, size, -size,-size, size, // v7,v4,v3,v2 (bottom)
 		 size,-size,-size,  -size,-size,-size,  -size, size,-size,  size, size,-size  // v4,v7,v6,v5 (back)
 	};
-	m_uvOffest = sizeof(vertices);
 
 	// texture coordinate array
-	static GLfloat texCoords[] =
-	{
-		1, 0,   0, 0,   0, 1,   1, 1,               // v0,v1,v2,v3 (front)
-		0, 0,   0, 1,   1, 1,   1, 0,               // v0,v3,v4,v5 (right)
-		1, 1,   1, 0,   0, 0,   0, 1,               // v0,v5,v6,v1 (top)
-		1, 0,   0, 0,   0, 1,   1, 1,               // v1,v6,v7,v2 (left)
-		0, 1,   1, 1,   1, 0,   0, 0,               // v7,v4,v3,v2 (bottom)
-		0, 1,   1, 1,   1, 0,   0, 0                // v4,v7,v6,v5 (back)
-	};
+	//static GLfloat texCoords[] =
+	//{
+	//	1, 0,   0, 0,   0, 1,   1, 1,               // v0,v1,v2,v3 (front)
+	//	0, 0,   0, 1,   1, 1,   1, 0,               // v0,v3,v4,v5 (right)
+	//	1, 1,   1, 0,   0, 0,   0, 1,               // v0,v5,v6,v1 (top)
+	//	1, 0,   0, 0,   0, 1,   1, 1,               // v1,v6,v7,v2 (left)
+	//	0, 1,   1, 1,   1, 0,   0, 0,               // v7,v4,v3,v2 (bottom)
+	//	0, 1,   1, 1,   1, 0,   0, 0                // v4,v7,v6,v5 (back)
+	//};
 
 	// index array for glDrawElements()
 	// A cube requires 36 indices = 6 sides * 2 tris * 3 verts
@@ -59,37 +58,40 @@ ndSkyBox::ndSkyBox(GLuint shader)
 		20,21,22,  22,23,20     // v4-v7-v6, v6-v5-v4 (back)
 	};
 
-	struct dVectex3f
-	{
-		GLfloat x;
-		GLfloat y;
-		GLfloat z;
-	};
+	//struct dVectex3f
+	//{
+	//	GLfloat x;
+	//	GLfloat y;
+	//	GLfloat z;
+	//};
+	//struct dTexCoord2f
+	//{
+	//	GLfloat u;
+	//	GLfloat v;
+	//};
+	//
+	//struct VertexPT
+	//{
+	//	dVectex3f posit;
+	//	dTexCoord2f uv;
+	//};
 
-	struct dTexCoord2f
-	{
-		GLfloat u;
-		GLfloat v;
-	};
+	//dVectex3f vtx[24];
+	//for (int i = 0; i < 24; i++) 
+	//{
+	//	vtx[i].posit.x = vertices[i * 3 + 0];
+	//	vtx[i].posit.y = vertices[i * 3 + 1];
+	//	vtx[i].posit.z = vertices[i * 3 + 2];
+	//	
+	//	vtx[i].uv.u = texCoords[i * 2 + 0];
+	//	vtx[i].uv.v = texCoords[i * 2 + 1];
+	//}
 
-	struct VertexPT
-	{
-		dVectex3f posit;
-		dTexCoord2f uv;
-	};
+	m_textureMatrix = dGetIdentityMatrix();
 
-	VertexPT vtx[24];
-	for (int i = 0; i < 24; i++) 
-	{
-		vtx[i].posit.x = vertices[i * 3 + 0];
-		vtx[i].posit.y = vertices[i * 3 + 1];
-		vtx[i].posit.z = vertices[i * 3 + 2];
-		//
-		vtx[i].uv.u = texCoords[i * 2 + 0];
-		vtx[i].uv.v = texCoords[i * 2 + 1];
-	}
-	// Setup the cubemap texture.
-
+	m_textureMatrix[1][1] = -1.0f;
+	m_textureMatrix[1][3] = size;
+		
 	SetupCubeMap();
 
 	glGenVertexArrays(1, &m_vao);
@@ -98,14 +100,14 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	glGenBuffers(1, &m_vertexBuffer); //m_vbo
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexPT) * 24, &vtx[0], GL_STATIC_DRAW);
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(VertexPT) * 24, &vtx[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
 	
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexPT), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
 
-	glEnableVertexAttribArray(1);
-	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexPT), (void*)(offsetof(VertexPT, VertexPT::uv)));
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexPT), (void*)sizeof(dVectex3f));
+	//glEnableVertexAttribArray(1);
+	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexPT), (void*)sizeof(dVectex3f));
 	
 	glGenBuffers(1, &m_ibo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
@@ -119,6 +121,7 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glUseProgram(m_shader);
+	textureMatrixLocation = glGetUniformLocation(m_shader, "textureMatrix");
 	matrixUniformLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
 	glUseProgram(0);
 }
@@ -218,8 +221,8 @@ void ndSkyBox::SetupCubeMap()
 	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_X, "NewtonSky0003.tga");
 	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, "NewtonSky0001.tga");
 
-	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, "NewtonSky0005.tga");
-	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, "NewtonSky0006.tga");
+	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, "NewtonSky0006.tga");
+	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, "NewtonSky0005.tga");
 
 	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, "NewtonSky0002.tga");
 	LoadCubeTexture(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "NewtonSky0004.tga");
@@ -259,8 +262,8 @@ void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const
 	
 	dMatrix skyMatrix(dGetIdentityMatrix());
 	dMatrix viewMatrix(camera->GetViewMatrix());
-	//skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, 0.0f, 1.0f));
-	skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, -800.0f, 1.0f));
+	skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, 0.0f, 1.0f));
+	//skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, -800.0f, 1.0f));
 
 	dMatrix viewModelMatrix(skyMatrix * camera->GetViewMatrix());
 	dMatrix projectionViewModelMatrix(skyMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
@@ -270,6 +273,8 @@ void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const
 	//glUniformMatrix4fv(glGetUniformLocation(m_shader, "V"), 1, false, &camera->GetViewMatrix()[0][0]);
 	//glUniformMatrix4fv(glGetUniformLocation(m_shader, "M"), 1, false, &skyMatrix[0][0]);
 	//glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewModelMatrix"), 1, false, &viewModelMatrix[0][0]);
+
+	glUniformMatrix4fv(textureMatrixLocation, 1, false, &m_textureMatrix[0][0]);
 	glUniformMatrix4fv(matrixUniformLocation, 1, false, &projectionViewModelMatrix[0][0]);
 
 		glActiveTexture(GL_TEXTURE0);
