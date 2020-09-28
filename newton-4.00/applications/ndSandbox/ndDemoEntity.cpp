@@ -329,15 +329,19 @@ void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, c
 		// Render mesh if there is one 
 		dMatrix modelMatrix (m_meshMatrix * nodeMatrix);
 
+#ifdef USING_GLES_4
+		m_mesh->Render(scene, modelMatrix);
+#else
 		glPushMatrix();
 		glMultMatrix(&modelMatrix[0][0]);
-		m_mesh->Render (scene);
+		m_mesh->Render (scene, modelMatrix);
 		//m_mesh->RenderNormals ();
 		if (m_userData) 
 		{
 			m_userData->OnRender(timestep);
 		}
 		glPopMatrix();
+#endif
 	}
 
 //	RenderBone();

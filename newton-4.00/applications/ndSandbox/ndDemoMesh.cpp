@@ -11,6 +11,7 @@
 
 #include "ndSandboxStdafx.h"
 #include "ndDemoMesh.h"
+#include "ndDemoCamera.h"
 #include "ndDemoEntity.h"
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
@@ -52,13 +53,12 @@ ndDemoSubMesh::ndDemoSubMesh ()
 	,m_textureName()
 	,m_opacity(1.0f)
 	,m_shiness(100.0f)
-	,m_shader(0)
 	,m_textureHandle(0)
 	,m_indexCount(0)
 #ifdef USING_GLES_4
 	,m_segmentStart(0)
 #else
-
+	,m_shader(0)
 	,m_indexes(nullptr)
 #endif
 {
@@ -113,9 +113,7 @@ void ndDemoSubMesh::Render() const
 
 void ndDemoSubMesh::OptimizeForRender(const ndDemoMesh* const mesh) const
 {
-#ifdef USING_GLES_4
-	dAssert(0);
-#else
+#ifndef USING_GLES_4
 	glUseProgram(m_shader);
 	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
 
@@ -172,6 +170,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 #ifdef USING_GLES_4
 	,m_indexCount(0)
 	,m_indexArray(nullptr)
+	,m_shader(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
@@ -334,7 +333,8 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCac
 	,m_vertexCount(0)
 #ifdef USING_GLES_4
 	,m_indexCount(0)
-	, m_indexArray(nullptr)
+	,m_indexArray(nullptr)
+	,m_shader(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
@@ -380,6 +380,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 #ifdef USING_GLES_4
 	,m_indexCount(0)
 	,m_indexArray(nullptr)
+	,m_shader(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
@@ -397,6 +398,10 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	dMatrix aligmentUV(uvMatrix);
 	//dMatrix aligmentUV (collision->GetLocalMatrix());
 	//aligmentUV = aligmentUV.Inverse();
+
+#ifdef USING_GLES_4
+	m_shader = shaderCache.m_diffuseEffect;
+#endif
 
 	// apply uv projections
 	ndShapeInfo info (collision->GetShapeInfo());
@@ -473,7 +478,6 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 		segment->m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
 #ifdef USING_GLES_4
 		segment->m_segmentStart = segmentStart;
-		segment->m_shader = shaderCache.m_diffuseEffect;
 		mesh.GetMaterialGetIndexStream(geometryHandle, handle, (int*)&m_indexArray[segmentStart]);
 #else
 		segment->m_shader = shaderCache.m_diffuseEffectOld;
@@ -498,6 +502,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 #ifdef USING_GLES_4
 	,m_indexCount(0)
 	,m_indexArray(nullptr)
+	,m_shader(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
@@ -935,7 +940,9 @@ void  ndDemoMesh::ResetOptimization()
 #ifdef USING_GLES_4
 	if (m_vetextArrayBuffer)
 	{
-		dAssert(0);
+		glDeleteBuffers(1, &m_indexBuffer);
+		glDeleteBuffers(1, &m_vertexBuffer);
+		glDeleteVertexArrays(1, &m_vetextArrayBuffer);
 	}
 #else
 	if (m_optimizedOpaqueDiplayList) 
@@ -978,12 +985,54 @@ ndDemoSubMesh* ndDemoMesh::AddSubMesh()
 }
 
 
-void ndDemoMesh::Render (ndDemoEntityManager* const scene)
+void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
 	if (m_isVisible) 
 	{
 #ifdef USING_GLES_4
-		dAssert(0);
+
+		glUseProgram(m_shader);
+
+		ndDemoCamera* const camera = scene->GetCamera();
+		dInt32 viewMatrixLocation = glGetUniformLocation(m_shader, "View_Matrix");
+		dInt32 modelMatrixLocation = glGetUniformLocation(m_shader, "Model_Matrix");
+		dInt32 projectMatrixLocation = glGetUniformLocation(m_shader, "Projection_Matrix");
+
+		const dMatrix& viewMatrix = camera->GetViewMatrix();
+		const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
+
+		glUniformMatrix4fv(projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
+		glUniformMatrix4fv(viewMatrixLocation, 1, false, &viewMatrix[0][0]);
+		glUniformMatrix4fv(modelMatrixLocation, 1, false, &modelMatrix[0][0]);
+
+		glBindVertexArray(m_vetextArrayBuffer);
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+		glActiveTexture(GL_TEXTURE0);
+		for (dListNode* node = GetFirst(); node; node = node->GetNext())
+		{
+			ndDemoSubMesh& segment = node->GetInfo();
+
+			glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_specular.m_x);
+			glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_ambient.m_x);
+			glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_diffuse.m_x);
+			glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_shiness));
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+			glBindTexture(GL_TEXTURE_2D, segment.m_textureHandle);
+			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)segment.m_segmentStart);
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glDisableVertexAttribArray(2);
+		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(0);
+		glBindVertexArray(0);
+		glUseProgram(0);
+
 #else
 		if (m_optimizedTransparentDiplayList) 
 		{
@@ -994,26 +1043,6 @@ void ndDemoMesh::Render (ndDemoEntityManager* const scene)
 		{
 			glCallList(m_optimizedOpaqueDiplayList);
 		} 
-		else if (!m_optimizedTransparentDiplayList) 
-		{
-			dAssert(0);
-			//glEnableClientState (GL_VERTEX_ARRAY);
-			//glEnableClientState (GL_NORMAL_ARRAY);
-			//glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-			//
-			//glVertexPointer (3, GL_FLOAT, 0, m_vertex);
-			//glNormalPointer (GL_FLOAT, 0, m_normal);
-			//glTexCoordPointer (2, GL_FLOAT, 0, m_uv);
-			//
-			//for (dListNode* nodes = GetFirst(); nodes; nodes = nodes->GetNext()) 
-			//{
-			//	ndDemoSubMesh& segment = nodes->GetInfo();
-			//	segment.Render();
-			//}
-			//glDisableClientState(GL_VERTEX_ARRAY);	// disable vertex arrays
-			//glDisableClientState(GL_NORMAL_ARRAY);	// disable normal arrays
-			//glDisableClientState(GL_TEXTURE_COORD_ARRAY);	// disable normal arrays
-		}
 #endif
 	}
 }
@@ -1027,25 +1056,6 @@ void ndDemoMesh::RenderTransparency () const
 		//{
 		//	glCallList(m_optimizedTransparentDiplayList);
 		//} 
-		//else 
-		//{
-		//	glEnableClientState (GL_VERTEX_ARRAY);
-		//	glEnableClientState (GL_NORMAL_ARRAY);
-		//	glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-		//
-		//	glVertexPointer (3, GL_FLOAT, 0, m_vertex);
-		//	glNormalPointer (GL_FLOAT, 0, m_normal);
-		//	glTexCoordPointer (2, GL_FLOAT, 0, m_uv);
-		//
-		//	for (dListNode* nodes = GetFirst(); nodes; nodes = nodes->GetNext()) 
-		//	{
-		//		ndDemoSubMesh& segment = nodes->GetInfo();
-		//		segment.Render();
-		//	}
-		//	glDisableClientState(GL_VERTEX_ARRAY);	// disable vertex arrays
-		//	glDisableClientState(GL_NORMAL_ARRAY);	// disable normal arrays
-		//	glDisableClientState(GL_TEXTURE_COORD_ARRAY);	// disable normal arrays
-		//}
 	}
 }
 
@@ -1122,23 +1132,25 @@ void ndDemoBezierCurve::SetRenderResolution (int breaks)
 }
 
 
-void ndDemoBezierCurve::Render (ndDemoEntityManager* const scene)
+void ndDemoBezierCurve::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
-	if (m_isVisible) {
-		glDisable (GL_LIGHTING);
-		glDisable(GL_TEXTURE_2D);
-		glColor3f(1.0f, 1.0f, 1.0f);
-
-		dFloat64 scale = 1.0f / m_renderResolution;
-		glBegin(GL_LINES);
-		dBigVector p0 (m_curve.CurvePoint(0.0f)) ;
-		for (int i = 1; i <= m_renderResolution; i ++) {
-			dBigVector p1 (m_curve.CurvePoint(i * scale));
-			glVertex3f (GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-			glVertex3f (GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-			p0 = p1;
-		}
-		glEnd();
+	if (m_isVisible) 
+	{
+		dAssert(0);
+		//glDisable (GL_LIGHTING);
+		//glDisable(GL_TEXTURE_2D);
+		//glColor3f(1.0f, 1.0f, 1.0f);
+		//
+		//dFloat64 scale = 1.0f / m_renderResolution;
+		//glBegin(GL_LINES);
+		//dBigVector p0 (m_curve.CurvePoint(0.0f)) ;
+		//for (int i = 1; i <= m_renderResolution; i ++) {
+		//	dBigVector p1 (m_curve.CurvePoint(i * scale));
+		//	glVertex3f (GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+		//	glVertex3f (GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+		//	p0 = p1;
+		//}
+		//glEnd();
 /*
 		glPointSize(4.0f);
 		glBegin(GL_POINTS);
@@ -1504,7 +1516,7 @@ NewtonMesh* ndDemoSkinMesh::CreateNewtonMesh(NewtonWorld* const world, const dMa
 }
 */
 
-void ndDemoSkinMesh::Render (ndDemoEntityManager* const scene)
+void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
 	dAssert(0);
 	//dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);

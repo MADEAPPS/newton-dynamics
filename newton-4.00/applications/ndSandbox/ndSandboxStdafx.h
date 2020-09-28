@@ -20,7 +20,7 @@
 // Insert your headers here
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 
-//#define USING_GLES_4
+#define USING_GLES_4
 
 #include <stddef.h>
 #include <stdarg.h>

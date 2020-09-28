@@ -10,10 +10,6 @@
 */
 
 
-
-// RenderPrimitive.cpp: implementation of the RenderPrimitive class.
-//
-//////////////////////////////////////////////////////////////////////
 #include "ndSandboxStdafx.h"
 #include "ndDemoCamera.h"
 

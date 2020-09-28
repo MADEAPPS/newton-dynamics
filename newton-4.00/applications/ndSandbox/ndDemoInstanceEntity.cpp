@@ -31,19 +31,18 @@ ndDemoInstanceEntity::~ndDemoInstanceEntity(void)
 
 void ndDemoInstanceEntity::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrixIn) const
 {
-//	ndDemoEntity::Render(timeStep, scene);
-
-	glPushMatrix();
-
-	// Set The matrix for this entity Node
-	glMultMatrix(&m_matrix[0][0]);
-	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) {
-		glPushMatrix();
-		dMatrix matrix(m_meshMatrix * child->GetRenderMatrix());
-		glMultMatrix(&matrix[0][0]);
-		m_mesh->Render(scene);
-		glPopMatrix();
-	}
-
-	glPopMatrix();
+	dAssert(0);
+	//glPushMatrix();
+	//
+	//// Set The matrix for this entity Node
+	//glMultMatrix(&m_matrix[0][0]);
+	//for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) {
+	//	glPushMatrix();
+	//	dMatrix matrix(m_meshMatrix * child->GetRenderMatrix());
+	//	glMultMatrix(&matrix[0][0]);
+	//	m_mesh->Render(scene, TODO);
+	//	glPopMatrix();
+	//}
+	//
+	//glPopMatrix();
 }
