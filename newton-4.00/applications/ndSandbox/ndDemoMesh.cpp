@@ -140,8 +140,14 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_vertex(nullptr)
 	,m_normal(nullptr)
 	,m_vertexCount(0)
+#ifdef USING_GLES_4
+	,m_vao(0)
+	,m_vbo(0)
+//	,m_ibo[3];
+#else
 	,m_optimizedOpaqueDiplayList(0)	
 	,m_optimizedTransparentDiplayList(0)
+#endif
 {
 }
 
@@ -293,8 +299,14 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCac
 	,m_vertex(nullptr)
 	,m_normal(nullptr)
 	,m_vertexCount(0)
-	,m_optimizedOpaqueDiplayList(0)		
+#ifdef USING_GLES_4
+	, m_vao(0)
+	, m_vbo(0)
+	//	,m_ibo[3];
+#else
+	,m_optimizedOpaqueDiplayList(0)
 	,m_optimizedTransparentDiplayList(0)
+#endif
 {
 	AllocVertexData(mesh.m_vertexCount);
 	memcpy (m_vertex, mesh.m_vertex, 3 * m_vertexCount * sizeof (dFloat32));
@@ -332,8 +344,14 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_vertex(nullptr)
 	,m_normal(nullptr)
 	,m_vertexCount(0)
-	,m_optimizedOpaqueDiplayList(0)		
-	,m_optimizedTransparentDiplayList(0)
+#ifdef USING_GLES_4
+	,m_vao(0)
+	,m_vbo(0)
+	//,m_ibo[3];
+#else
+	, m_optimizedOpaqueDiplayList(0)
+	, m_optimizedTransparentDiplayList(0)
+#endif
 {
 	// create a helper mesh from the collision collision
 	//NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
@@ -425,8 +443,14 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_vertex(nullptr)
 	,m_normal(nullptr)
 	,m_vertexCount(0)
-	,m_optimizedOpaqueDiplayList(0)		
-	,m_optimizedTransparentDiplayList(0)
+#ifdef USING_GLES_4
+	,m_vao(0)
+	,m_vbo(0)
+	//	,m_ibo[3];
+#else
+	, m_optimizedOpaqueDiplayList(0)
+	, m_optimizedTransparentDiplayList(0)
+#endif
 {
 	dAssert(0);
 /*
@@ -745,6 +769,9 @@ void ndDemoMesh::OptimizeForRender()
 
 	if (isOpaque) 
 	{
+#ifdef USING_GLES_4
+		dAssert(0);
+#else
 		m_optimizedOpaqueDiplayList = glGenLists(1);
 
 		glNewList(m_optimizedOpaqueDiplayList, GL_COMPILE);
@@ -757,33 +784,41 @@ void ndDemoMesh::OptimizeForRender()
 			}
 		}
 		glEndList();
+#endif
 	}
 
 	if (hasTranparency) 
 	{
-        m_optimizedTransparentDiplayList = glGenLists(1);
-
-        glNewList(m_optimizedTransparentDiplayList, GL_COMPILE);
-
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		glEnable (GL_BLEND);
-		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        for (dListNode* node = GetFirst(); node; node = node->GetNext()) 
-		{
-            ndDemoSubMesh& segment = node->GetInfo();
-            if (segment.m_opacity <= 0.999f) 
-			{
-                segment.OptimizeForRender(this);
-            }
-        }
-		glDisable(GL_BLEND);
-		glLoadIdentity();
-        glEndList();
+		dAssert(0);
+        //m_optimizedTransparentDiplayList = glGenLists(1);
+		//
+        //glNewList(m_optimizedTransparentDiplayList, GL_COMPILE);
+		//
+		//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		//glEnable (GL_BLEND);
+		//glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //for (dListNode* node = GetFirst(); node; node = node->GetNext()) 
+		//{
+        //    ndDemoSubMesh& segment = node->GetInfo();
+        //    if (segment.m_opacity <= 0.999f) 
+		//	{
+        //        segment.OptimizeForRender(this);
+        //    }
+        //}
+		//glDisable(GL_BLEND);
+		//glLoadIdentity();
+        //glEndList();
 	}
 }
 
 void  ndDemoMesh::ResetOptimization()
 {
+#ifdef USING_GLES_4
+	if (m_vao)
+	{
+		dAssert(0);
+	}
+#else
 	if (m_optimizedOpaqueDiplayList) 
 	{
 		glDeleteLists(m_optimizedOpaqueDiplayList, 1);
@@ -795,6 +830,7 @@ void  ndDemoMesh::ResetOptimization()
 		glDeleteLists(m_optimizedTransparentDiplayList, 1);
 		m_optimizedTransparentDiplayList = 0;
 	}
+#endif
 }
 
 void ndDemoMesh::AllocVertexData (int vertexCount)
@@ -818,14 +854,22 @@ ndDemoSubMesh* ndDemoMesh::AddSubMesh()
 
 void ndDemoMesh::Render (ndDemoEntityManager* const scene)
 {
-	if (m_isVisible) {
-		if (m_optimizedTransparentDiplayList) {
+	if (m_isVisible) 
+	{
+#ifdef USING_GLES_4
+		dAssert(0);
+#else
+		if (m_optimizedTransparentDiplayList) 
+		{
 			scene->PushTransparentMesh (this); 
 		}
 
-		if (m_optimizedOpaqueDiplayList) {
+		if (m_optimizedOpaqueDiplayList) 
+		{
 			glCallList(m_optimizedOpaqueDiplayList);
-		} else if (!m_optimizedTransparentDiplayList) {
+		} 
+		else if (!m_optimizedTransparentDiplayList) 
+		{
 			glEnableClientState (GL_VERTEX_ARRAY);
 			glEnableClientState (GL_NORMAL_ARRAY);
 			glEnableClientState (GL_TEXTURE_COORD_ARRAY);
@@ -834,7 +878,8 @@ void ndDemoMesh::Render (ndDemoEntityManager* const scene)
 			glNormalPointer (GL_FLOAT, 0, m_normal);
 			glTexCoordPointer (2, GL_FLOAT, 0, m_uv);
 
-			for (dListNode* nodes = GetFirst(); nodes; nodes = nodes->GetNext()) {
+			for (dListNode* nodes = GetFirst(); nodes; nodes = nodes->GetNext()) 
+			{
 				ndDemoSubMesh& segment = nodes->GetInfo();
 				segment.Render();
 			}
@@ -842,31 +887,38 @@ void ndDemoMesh::Render (ndDemoEntityManager* const scene)
 			glDisableClientState(GL_NORMAL_ARRAY);	// disable normal arrays
 			glDisableClientState(GL_TEXTURE_COORD_ARRAY);	// disable normal arrays
 		}
+#endif
 	}
 }
 
 void ndDemoMesh::RenderTransparency () const
 {
-	if (m_isVisible) {
-		if (m_optimizedTransparentDiplayList) {
-			glCallList(m_optimizedTransparentDiplayList);
-		} else {
-			glEnableClientState (GL_VERTEX_ARRAY);
-			glEnableClientState (GL_NORMAL_ARRAY);
-			glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-
-			glVertexPointer (3, GL_FLOAT, 0, m_vertex);
-			glNormalPointer (GL_FLOAT, 0, m_normal);
-			glTexCoordPointer (2, GL_FLOAT, 0, m_uv);
-
-			for (dListNode* nodes = GetFirst(); nodes; nodes = nodes->GetNext()) {
-				ndDemoSubMesh& segment = nodes->GetInfo();
-				segment.Render();
-			}
-			glDisableClientState(GL_VERTEX_ARRAY);	// disable vertex arrays
-			glDisableClientState(GL_NORMAL_ARRAY);	// disable normal arrays
-			glDisableClientState(GL_TEXTURE_COORD_ARRAY);	// disable normal arrays
-		}
+	if (m_isVisible) 
+	{
+		dAssert(0);
+		//if (m_optimizedTransparentDiplayList) 
+		//{
+		//	glCallList(m_optimizedTransparentDiplayList);
+		//} 
+		//else 
+		//{
+		//	glEnableClientState (GL_VERTEX_ARRAY);
+		//	glEnableClientState (GL_NORMAL_ARRAY);
+		//	glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+		//
+		//	glVertexPointer (3, GL_FLOAT, 0, m_vertex);
+		//	glNormalPointer (GL_FLOAT, 0, m_normal);
+		//	glTexCoordPointer (2, GL_FLOAT, 0, m_uv);
+		//
+		//	for (dListNode* nodes = GetFirst(); nodes; nodes = nodes->GetNext()) 
+		//	{
+		//		ndDemoSubMesh& segment = nodes->GetInfo();
+		//		segment.Render();
+		//	}
+		//	glDisableClientState(GL_VERTEX_ARRAY);	// disable vertex arrays
+		//	glDisableClientState(GL_NORMAL_ARRAY);	// disable normal arrays
+		//	glDisableClientState(GL_TEXTURE_COORD_ARRAY);	// disable normal arrays
+		//}
 	}
 }
 
@@ -1319,14 +1371,15 @@ NewtonMesh* ndDemoSkinMesh::CreateNewtonMesh(NewtonWorld* const world, const dMa
 
 void ndDemoSkinMesh::Render (ndDemoEntityManager* const scene)
 {
-	dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);
-	int count = CalculateMatrixPalette(bindMatrix);
-	GLfloat* const glMatrixPallete = dAlloca(GLfloat, 16 * count);
-	ConvertToGlMatrix(count, bindMatrix, glMatrixPallete);
-
-	glUseProgram(m_shader);
-	int matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
-	glUniformMatrix4fv(matrixPalette, count, GL_FALSE, glMatrixPallete);
-	glCallList(m_mesh->m_optimizedOpaqueDiplayList);
+	dAssert(0);
+	//dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);
+	//int count = CalculateMatrixPalette(bindMatrix);
+	//GLfloat* const glMatrixPallete = dAlloca(GLfloat, 16 * count);
+	//ConvertToGlMatrix(count, bindMatrix, glMatrixPallete);
+	//
+	//glUseProgram(m_shader);
+	//int matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
+	//glUniformMatrix4fv(matrixPalette, count, GL_FALSE, glMatrixPallete);
+	//glCallList(m_mesh->m_optimizedOpaqueDiplayList);
 }
 

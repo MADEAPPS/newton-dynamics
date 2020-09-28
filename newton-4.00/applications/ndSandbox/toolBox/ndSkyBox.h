@@ -22,9 +22,6 @@
 
 class ndDemoEntityManager;
 
-
-#ifdef USING_GLES_4
-
 class ndSkyBox: public ndDemoEntity
 {
 	public:
@@ -47,29 +44,7 @@ class ndSkyBox: public ndDemoEntity
 	GLuint m_ibo;
 	GLint matrixUniformLocation;
 	GLint textureMatrixLocation;
-
-	//GLint m_textureLocation;
-	//GLint m_attribVertexPosition;
-	//GLint m_attribVertexTexCoord;
 };
-
-#else
-class ndSkyBox: public ndDemoEntity
-{
-	public:
-	ndSkyBox(GLuint shader);
-	~ndSkyBox();
-
-	void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
-
-	private:
-	void DrawMesh() const;
-
-	GLuint m_displayList;
-	GLuint m_shader;
-	GLuint m_textures[6];
-};
-#endif
 
 #endif 
 

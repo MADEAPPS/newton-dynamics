@@ -9,7 +9,6 @@
 * freely
 */
 
-
 #ifndef _D_MESH_H_
 #define _D_MESH_H_
 
@@ -88,7 +87,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 
 	virtual const dString& GetTextureName (const ndDemoSubMesh* const subMesh) const;
 
-    virtual void RenderTransparency () const;
+	virtual void RenderTransparency () const;
 	virtual void Render (ndDemoEntityManager* const scene);
 	virtual void RenderNormals ();
 
@@ -107,8 +106,16 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	dFloat32* m_vertex;
 	dFloat32* m_normal;
 	int m_vertexCount;
+
+#ifdef USING_GLES_4
+	GLuint m_vao;
+	GLuint m_vbo;
+	//GLuint m_ibo[3];
+#else
 	unsigned m_optimizedOpaqueDiplayList;
 	unsigned m_optimizedTransparentDiplayList;		
+#endif
+
 };
 
 class ndDemoSkinMesh: public ndDemoMeshInterface

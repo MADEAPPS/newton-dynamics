@@ -303,42 +303,29 @@ void ndDemoEntity::RenderBone() const
 {
 	if (GetParent()) 
 	{
-		glDisable(GL_LIGHTING);
-		glDisable(GL_TEXTURE_2D);
-
-		glColor3f(0.5f, 0.5f, 0.5f);
-		glBegin(GL_LINES);
-		for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
-		{
-			const dVector& posit = child->m_matrix.m_posit;
-			glVertex3f(GLfloat(0.0f), GLfloat(0.0f), GLfloat(0.0f));
-			glVertex3f(GLfloat(posit.m_x), GLfloat(posit.m_y), GLfloat(posit.m_z));
-		}
-
-		glEnd();
-		glEnable(GL_LIGHTING);
+		dAssert(0);
+		//glDisable(GL_LIGHTING);
+		//glDisable(GL_TEXTURE_2D);
+		//
+		//glColor3f(0.5f, 0.5f, 0.5f);
+		//glBegin(GL_LINES);
+		//for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
+		//{
+		//	const dVector& posit = child->m_matrix.m_posit;
+		//	glVertex3f(GLfloat(0.0f), GLfloat(0.0f), GLfloat(0.0f));
+		//	glVertex3f(GLfloat(posit.m_x), GLfloat(posit.m_y), GLfloat(posit.m_z));
+		//}
+		//
+		//glEnd();
+		//glEnable(GL_LIGHTING);
 	}
 }
 
 void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
-//	char space[256];
-//	int index = 0;
-//	for (const ndDemoEntity* node = this; node; node = node->GetParent()) {
-//		space[index] = ' ';
-//		index++;
-//	}
-//	space[index] = 0;
-//	dTrace(("%s%s\n", space, GetName().GetStr()));
-
-
-	// save the model matrix before changing it Matrix
-//	glPushMatrix();
-	// Set The matrix for this entity Node
-//	glMultMatrix(&m_matrix[0][0]);
-
 	dMatrix nodeMatrix (m_matrix * matrix);
-	if (m_isVisible && m_mesh) {
+	if (m_isVisible && m_mesh) 
+	{
 		// Render mesh if there is one 
 		dMatrix modelMatrix (m_meshMatrix * nodeMatrix);
 
@@ -354,7 +341,8 @@ void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, c
 	}
 
 //	RenderBone();
-	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) {
+	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
+	{
 		child->Render(timestep, scene, nodeMatrix);
 	}
 

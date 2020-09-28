@@ -128,7 +128,6 @@ void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* con
 void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat32* const faceVertec, int faceId);
 
 
-
 void DebugDrawPoint (const dVector& p0, dFloat32 size);
 void DebugDrawLine (const dVector& p0, const dVector& p1);
 void DebugDrawCollision (const NewtonCollision* const collision, const dMatrix& matrix, dDebugDisplayMode mode);
