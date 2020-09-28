@@ -8,13 +8,15 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */  
-#version 460 core
+#version 330 core
 
 in vec3 texCoord;
-out vec4 fragColor;
+
+out vec4 color;
 
 uniform samplerCube cubemap;
 
-void main (void) {	
-  fragColor = texture(cubemap, texCoord);
+void main (void) 
+{	
+	color = texture(cubemap, texCoord);
 }

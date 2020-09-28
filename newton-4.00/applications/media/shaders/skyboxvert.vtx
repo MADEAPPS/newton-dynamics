@@ -8,14 +8,11 @@
 * including commercial applications, and to alter it and redistribute it
 * freely
 */  
-#version 460 core
-
-out vec3 texCoord;
-
-//layout(location = 0) in vec3 in_vertex;
-//layout(location = 1) in vec3 in_texture;
+#version 330 core
 
 in vec3 vertex;
+
+out vec3 texCoord;
 
 uniform mat4 textureMatrix;
 uniform mat4 projectionViewModelMatrix;

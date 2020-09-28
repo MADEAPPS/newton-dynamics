@@ -9,25 +9,11 @@
 * freely
 */  
 
-#version 460 core
+#version 330 core
 
 layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec3 in_normal;
 layout(location = 2) in vec2 in_uv;
-
-//uniform mat4 Projection_Matrix;
-//uniform mat4 View_Matrix;
-//uniform mat4 Model_Matrix;
-//out VS_FS_INTERFACE
-//{
-//    vec4 world_coord;
-//    vec3 v_coord;
-//    vec3 eye_coord;
-//    vec3 normal_coord;
-//    vec3 normals;
-//	//vec4 colors;
-//	vec2 texture;
-//} vertex;
 
 uniform mat4 normalMatrix;
 uniform mat4 viewModelMatrix;
@@ -39,24 +25,6 @@ out vec3 normal;
 
 void main()
 {	
-    //vec4 world_pos = Model_Matrix * vec4(in_position, 1.0);
-    //vec4 eye_pos = View_Matrix * world_pos;
-    //vec4 clip_pos = Projection_Matrix * eye_pos;
-    //mat4 modelView = View_Matrix * Model_Matrix;	
-	//
-	//gl_Position = clip_pos;
-	//
-	//vec3 aeyeNorm = normalize(inverse(mat3(Model_Matrix)) * in_normal);
-	//
-    //vertex.v_coord = eye_pos.xyz;
-    //vertex.world_coord = world_pos;	
-	//
-    //vertex.eye_coord = -vertex.v_coord;
-    //vertex.normals = mat3(Model_Matrix) * in_normal;
-    //vertex.normal_coord = aeyeNorm;
-    ////vertex.colors = color;	
-    //vertex.texture = in_uv;		
-
 	uv = in_uv;
 	normal = vec3 (normalize (normalMatrix * vec4(in_normal, 0.0)));
 	posit = vec3 (viewModelMatrix * vec4(in_position, 1.0));
