@@ -39,8 +39,10 @@ class ndDemoSubMesh
 	dFloat32 m_shiness;
 	unsigned m_shader;
 	unsigned m_textureHandle;
-#ifndef USING_GLES_4
 	int m_indexCount;
+#ifdef USING_GLES_4
+	dInt32 m_segmentStart;
+#else
 	unsigned *m_indexes;
 #endif
 };
@@ -128,7 +130,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	int m_vertexCount;
 
 #ifdef USING_GLES_4
-	dInt32 m_indexCount____;
+	dInt32 m_indexCount;
 	GLuint* m_indexArray;
 
 	GLuint m_indexBuffer;

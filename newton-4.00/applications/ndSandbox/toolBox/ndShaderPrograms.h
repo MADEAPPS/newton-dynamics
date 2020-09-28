@@ -45,7 +45,7 @@ class ndShaderPrograms
 	GLuint m_skyBox;
 	GLuint m_texturedDecal;
 	GLuint m_decalEffect;
-	GLuint m_diffuseEffect___;
+	GLuint m_diffuseEffect;
 	GLuint m_diffuseEffectOld;
 	GLuint m_diffuseIntanceEffect;
 	GLuint m_skinningDiffuseEffect;
