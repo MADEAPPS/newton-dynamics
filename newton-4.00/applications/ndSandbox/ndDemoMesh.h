@@ -101,10 +101,31 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 
 	public:
 	void  ResetOptimization();
+
+	struct dVector3f
+	{
+		GLfloat m_x;
+		GLfloat m_y;
+		GLfloat m_z;
+	};
+
+	struct dTexCoord2f
+	{
+		GLfloat m_u;
+		GLfloat m_v;
+	};
+
+	struct ndMeshPoint
+	{
+		dVector3f m_posit;
+		dVector3f m_normal;
+		dTexCoord2f m_uv;
+	};
 	
-	dFloat32* m_uv;
-	dFloat32* m_vertex;
-	dFloat32* m_normal;
+	//dFloat32* m_uv;
+	//dFloat32* m_vertex;
+	//dFloat32* m_normal;
+	ndMeshPoint* m_points;
 	int m_vertexCount;
 
 #ifdef USING_GLES_4

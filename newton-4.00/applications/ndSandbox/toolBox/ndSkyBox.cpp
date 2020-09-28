@@ -14,28 +14,6 @@
 #include "ndSkyBox.h"
 #include "ndDemoCamera.h"
 
-// define vertex format
-struct dVector3f
-{
-	GLfloat m_x;
-	GLfloat m_y;
-	GLfloat m_z;
-};
-
-struct dTexCoord2f
-{
-	GLfloat m_u;
-	GLfloat m_v;
-};
-
-struct ndMeshPoint
-{
-	dVector3f m_posit;
-	dVector3f m_normal;
-	dTexCoord2f m_uv;
-};
-
-
 ndSkyBox::ndSkyBox(GLuint shader)
 	:ndDemoEntity(dGetIdentityMatrix(), nullptr)
 	,m_shader(shader)
