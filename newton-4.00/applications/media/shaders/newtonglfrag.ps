@@ -70,6 +70,9 @@ void main()
 	//float opacity = 1.0;
 	//gl_FragColor = vec4 (color, opacity);
 
+	vec3 lightIntensity = normal;
 	vec3 texColor = vec3 (texture2D(texture, uv));
+
+	texColor = texColor + lightIntensity;
 	gl_FragColor = vec4(texColor, 1.0f);
 }

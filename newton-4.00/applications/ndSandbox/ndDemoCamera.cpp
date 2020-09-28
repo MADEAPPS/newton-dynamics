@@ -144,34 +144,16 @@ void ndDemoCamera::SetViewMatrix(int width, int height)
 	glViewport(0, 0, (GLint)width, (GLint)height);
 
 #ifdef USING_GLES_4 
-
-	dMatrix matrix;
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(m_fov * 180.0f / dPi, GLfloat(width) / GLfloat(height), m_frontPlane, m_backPlane);
-	glGetFloat(GL_PROJECTION_MATRIX, &matrix[0][0]);
-
 	// calculate projection matrix
 	m_projectionMatrix = CreatePerspectiveMatrix(m_fov, GLfloat(width) / GLfloat(height), m_frontPlane, m_backPlane);
 
 	// set the model view matrix 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
 	dVector pointOfInterest(m_matrix.m_posit + m_matrix.m_front);
-	gluLookAt(
-		m_matrix.m_posit.m_x, m_matrix.m_posit.m_y, m_matrix.m_posit.m_z,
-		pointOfInterest.m_x, pointOfInterest.m_y, pointOfInterest.m_z,
-		m_matrix.m_up.m_x, m_matrix.m_up.m_y, m_matrix.m_up.m_z);
-	
 	m_viewMatrix = CreateLookAtMatrix(
 		dVector(m_matrix.m_posit.m_x, m_matrix.m_posit.m_y, m_matrix.m_posit.m_z, 1.0f),
 		dVector(pointOfInterest.m_x, pointOfInterest.m_y, pointOfInterest.m_z, 1.0f),
 		dVector(m_matrix.m_up.m_x, m_matrix.m_up.m_y, m_matrix.m_up.m_z, 0.0f));
-
-	glGetFloat(GL_MODELVIEW_MATRIX, &matrix[0][0]);
-	glGetIntegerv(GL_VIEWPORT, m_viewport);
 #else
-
 	// set the projection matrix
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -187,10 +169,11 @@ void ndDemoCamera::SetViewMatrix(int width, int height)
 		      pointOfInterest.m_x, pointOfInterest.m_y, pointOfInterest.m_z, 
 			  m_matrix.m_up.m_x, m_matrix.m_up.m_y, m_matrix.m_up.m_z);	
 
-	glGetIntegerv(GL_VIEWPORT, m_viewport); 
+	
 	glGetFloat(GL_MODELVIEW_MATRIX, &m_viewMatrix[0][0]); 
 	glGetFloat(GL_PROJECTION_MATRIX, &m_projectionMatrix[0][0]);
 #endif
+	glGetIntegerv(GL_VIEWPORT, m_viewport);
 }
 
 dVector ndDemoCamera::ScreenToWorld (const dVector& screenPoint) const

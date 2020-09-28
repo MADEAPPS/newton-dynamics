@@ -1478,9 +1478,9 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 		glUseProgram(m_shader);
 
 		ndDemoCamera* const camera = scene->GetCamera();
-		//dInt32 viewMatrixLocation = glGetUniformLocation(m_shader, "View_Matrix");
-		//dInt32 modelMatrixLocation = glGetUniformLocation(m_shader, "Model_Matrix");
-		//dInt32 normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+
+		dInt32 textureLocation = glGetUniformLocation(m_shader, "texture");
+		dInt32 normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
 		dInt32 projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
 		dInt32 viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
 
@@ -1488,9 +1488,9 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 		const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
 		dMatrix viewModelMatrix(modelMatrix * viewMatrix);
 
+		glUniform1i(textureLocation, 0);
+		glUniformMatrix4fv(normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 		glUniformMatrix4fv(projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
-		//glUniformMatrix4fv(viewMatrixLocation, 1, false, &viewMatrix[0][0]);
-		//glUniformMatrix4fv(modelMatrixLocation, 1, false, &modelMatrix[0][0]);
 		glUniformMatrix4fv(viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 
 		glBindVertexArray(m_vetextArrayBuffer);
