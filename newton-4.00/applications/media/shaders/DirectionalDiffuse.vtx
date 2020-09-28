@@ -15,7 +15,7 @@ varying vec3 position;
 
 void main()
 {	
-	// get normal in camera space for ligh calculation
+	// get normal in camera space for light calculation
 	normal = gl_NormalMatrix * gl_Normal;
 	position = vec3 (gl_ModelViewMatrix * gl_Vertex);
 	

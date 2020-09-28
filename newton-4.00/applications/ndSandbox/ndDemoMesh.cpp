@@ -984,69 +984,6 @@ ndDemoSubMesh* ndDemoMesh::AddSubMesh()
 	return &Append()->GetInfo();
 }
 
-
-void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
-{
-	if (m_isVisible) 
-	{
-#ifdef USING_GLES_4
-
-		glUseProgram(m_shader);
-
-		ndDemoCamera* const camera = scene->GetCamera();
-		dInt32 viewMatrixLocation = glGetUniformLocation(m_shader, "View_Matrix");
-		dInt32 modelMatrixLocation = glGetUniformLocation(m_shader, "Model_Matrix");
-		dInt32 projectMatrixLocation = glGetUniformLocation(m_shader, "Projection_Matrix");
-
-		const dMatrix& viewMatrix = camera->GetViewMatrix();
-		const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
-
-		glUniformMatrix4fv(projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
-		glUniformMatrix4fv(viewMatrixLocation, 1, false, &viewMatrix[0][0]);
-		glUniformMatrix4fv(modelMatrixLocation, 1, false, &modelMatrix[0][0]);
-
-		glBindVertexArray(m_vetextArrayBuffer);
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-
-		glActiveTexture(GL_TEXTURE0);
-		for (dListNode* node = GetFirst(); node; node = node->GetNext())
-		{
-			ndDemoSubMesh& segment = node->GetInfo();
-
-			glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_specular.m_x);
-			glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_ambient.m_x);
-			glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_diffuse.m_x);
-			glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_shiness));
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-			glBindTexture(GL_TEXTURE_2D, segment.m_textureHandle);
-			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)segment.m_segmentStart);
-		}
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glDisableVertexAttribArray(2);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(0);
-		glBindVertexArray(0);
-		glUseProgram(0);
-
-#else
-		if (m_optimizedTransparentDiplayList) 
-		{
-			scene->PushTransparentMesh (this); 
-		}
-
-		if (m_optimizedOpaqueDiplayList) 
-		{
-			glCallList(m_optimizedOpaqueDiplayList);
-		} 
-#endif
-	}
-}
-
 void ndDemoMesh::RenderTransparency () const
 {
 	if (m_isVisible) 
@@ -1530,3 +1467,70 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& mod
 	//glCallList(m_mesh->m_optimizedOpaqueDiplayList);
 }
 
+
+
+void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+{
+	if (m_isVisible)
+	{
+#ifdef USING_GLES_4
+
+		glUseProgram(m_shader);
+
+		ndDemoCamera* const camera = scene->GetCamera();
+		//dInt32 viewMatrixLocation = glGetUniformLocation(m_shader, "View_Matrix");
+		//dInt32 modelMatrixLocation = glGetUniformLocation(m_shader, "Model_Matrix");
+		//dInt32 normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+		dInt32 projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
+		dInt32 viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+
+		const dMatrix& viewMatrix = camera->GetViewMatrix();
+		const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
+		dMatrix viewModelMatrix(modelMatrix * viewMatrix);
+
+		glUniformMatrix4fv(projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
+		//glUniformMatrix4fv(viewMatrixLocation, 1, false, &viewMatrix[0][0]);
+		//glUniformMatrix4fv(modelMatrixLocation, 1, false, &modelMatrix[0][0]);
+		glUniformMatrix4fv(viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+
+		glBindVertexArray(m_vetextArrayBuffer);
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+		glActiveTexture(GL_TEXTURE0);
+		for (dListNode* node = GetFirst(); node; node = node->GetNext())
+		{
+			ndDemoSubMesh& segment = node->GetInfo();
+
+			glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_specular.m_x);
+			glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_ambient.m_x);
+			glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_diffuse.m_x);
+			glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_shiness));
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+			glBindTexture(GL_TEXTURE_2D, segment.m_textureHandle);
+			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)segment.m_segmentStart);
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glDisableVertexAttribArray(2);
+		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(0);
+		glBindVertexArray(0);
+		glUseProgram(0);
+
+#else
+		if (m_optimizedTransparentDiplayList)
+		{
+			scene->PushTransparentMesh(this);
+		}
+
+		if (m_optimizedOpaqueDiplayList)
+		{
+			glCallList(m_optimizedOpaqueDiplayList);
+		}
+#endif
+	}
+}
