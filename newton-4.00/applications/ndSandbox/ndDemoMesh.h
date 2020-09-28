@@ -37,10 +37,12 @@ class ndDemoSubMesh
 	dString  m_textureName;
 	dFloat32 m_opacity;
 	dFloat32 m_shiness;
-	int m_indexCount;
 	unsigned m_shader;
 	unsigned m_textureHandle;
+#ifndef USING_GLES_4
+	int m_indexCount;
 	unsigned *m_indexes;
+#endif
 };
 
 class ndDemoMeshInterface: public dClassAlloc, public dRefCounter<ndDemoMeshInterface>
@@ -79,12 +81,12 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 		return this;
 	}
 
-//	using dClassInfo::operator new;
-//	using dClassInfo::operator delete;
-
 	ndDemoSubMesh* AddSubMesh();
-	void AllocVertexData (int vertexCount);
-
+#ifndef USING_GLES_4
+	void AllocVertexData(int vertexCount);
+#else
+	void AllocVertexData(int vertexCount, int indexCount);
+#endif
 	virtual const dString& GetTextureName (const ndDemoSubMesh* const subMesh) const;
 
 	virtual void RenderTransparency () const;
@@ -102,14 +104,14 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	public:
 	void  ResetOptimization();
 
-	struct dVector3f
+	struct ndMeshVector
 	{
 		GLfloat m_x;
 		GLfloat m_y;
 		GLfloat m_z;
 	};
 
-	struct dTexCoord2f
+	struct ndMeshUV
 	{
 		GLfloat m_u;
 		GLfloat m_v;
@@ -117,18 +119,18 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 
 	struct ndMeshPoint
 	{
-		dVector3f m_posit;
-		dVector3f m_normal;
-		dTexCoord2f m_uv;
+		ndMeshVector m_posit;
+		ndMeshVector m_normal;
+		ndMeshUV m_uv;
 	};
 	
-	//dFloat32* m_uv;
-	//dFloat32* m_vertex;
-	//dFloat32* m_normal;
 	ndMeshPoint* m_points;
 	int m_vertexCount;
 
 #ifdef USING_GLES_4
+	dInt32 m_indexCount____;
+	GLuint* m_indexArray;
+
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
 	GLuint m_vetextArrayBuffer;
@@ -136,7 +138,6 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	unsigned m_optimizedOpaqueDiplayList;
 	unsigned m_optimizedTransparentDiplayList;		
 #endif
-
 };
 
 class ndDemoSkinMesh: public ndDemoMeshInterface

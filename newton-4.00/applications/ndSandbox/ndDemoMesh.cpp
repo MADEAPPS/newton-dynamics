@@ -52,23 +52,27 @@ ndDemoSubMesh::ndDemoSubMesh ()
 	,m_textureName()
 	,m_opacity(1.0f)
 	,m_shiness(100.0f)
+	,m_shader(0)
+	,m_textureHandle(0)
+#ifndef USING_GLES_4
 	,m_indexCount(0)
 	,m_indexes(nullptr)
-	,m_textureHandle(0)
-	,m_shader(0)
+#endif
 {
 }
 
 ndDemoSubMesh::~ndDemoSubMesh ()
 {
-	if (m_textureHandle) {
+	if (m_textureHandle) 
+	{
 		ReleaseTexture(m_textureHandle);
 	}
-
+#ifndef USING_GLES_4
 	if (m_indexes) 
 	{
 		delete[] m_indexes;
 	}
+#endif
 }
 
 void ndDemoSubMesh::SetOpacity(dFloat32 opacity)
@@ -158,6 +162,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,dList<ndDemoSubMesh>()
 	,m_points(nullptr)
 #ifdef USING_GLES_4
+	,m_indexCount____(0)
+	,m_indexArray(nullptr)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
@@ -319,6 +325,8 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCac
 	,m_points(nullptr)
 	,m_vertexCount(0)
 #ifdef USING_GLES_4
+	,m_indexCount____(0)
+	, m_indexArray(nullptr)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
@@ -360,6 +368,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_points(nullptr)
 	,m_vertexCount(0)
 #ifdef USING_GLES_4
+	,m_indexCount____(0)
+	,m_indexArray(nullptr)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
@@ -421,7 +431,11 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 
 	// extract vertex data  from the newton mesh		
 	int vertexCount = mesh.GetPropertiesCount(); 
+#ifndef USING_GLES_4
 	AllocVertexData(vertexCount);
+#else
+	dAssert(0);
+#endif
 
 	//mesh.GetVertexChannel(3 * sizeof (dFloat32), (dFloat32*)m_vertex);
 	//mesh.GetNormalChannel(3 * sizeof (dFloat32), (dFloat32*)m_normal);
@@ -446,10 +460,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 		segment->m_shader = shaderCache.m_diffuseEffect___;
 #else
 		segment->m_shader = shaderCache.m_diffuseEffectOld;
-#endif
-		
-		segment->AllocIndexData (indexCount);
+		segment->AllocIndexData(indexCount);
 		mesh.GetMaterialGetIndexStream(geometryHandle, handle, (int*)segment->m_indexes);
+#endif
 	}
 	//NewtonMeshEndHandle (mesh, geometryHandle); 
 	mesh.MaterialGeomteryEnd(geometryHandle);
@@ -464,6 +477,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_points(nullptr)
 	,m_vertexCount(0)
 #ifdef USING_GLES_4
+	,m_indexCount____(0)
+	,m_indexArray(nullptr)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
@@ -587,6 +602,14 @@ ndDemoMesh::~ndDemoMesh()
 	{
 		dMemory::Free(m_points);
 	}
+
+#ifdef USING_GLES_4
+	if (m_indexArray)
+	{
+		dMemory::Free(m_indexArray);
+	}
+#endif
+
 	ResetOptimization();
 }
 
@@ -800,7 +823,7 @@ void ndDemoMesh::OptimizeForRender()
 	bool isOpaque = false;
 	bool hasTranparency = false;
 
-	for (dListNode* node = GetFirst(); node; node = node->GetNext()) 
+	for (dListNode* node = GetFirst(); node; node = node->GetNext())
 	{
 		ndDemoSubMesh& segment = node->GetInfo();
 		isOpaque |= segment.m_opacity > 0.999f;
@@ -818,24 +841,28 @@ void ndDemoMesh::OptimizeForRender()
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
 		//glBufferData(GL_ARRAY_BUFFER, sizeof(VertexPT) * 24, &vtx[0], GL_STATIC_DRAW);
-		glBufferData(GL_ARRAY_BUFFER, m_vertexCount * (ndMeshPoint), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, m_vertexCount * sizeof (ndMeshPoint), &m_points[0], GL_STATIC_DRAW);
 		
-		//glEnableVertexAttribArray(0);
-		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
-		//
-		////glEnableVertexAttribArray(1);
-		////glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexPT), (void*)sizeof(dVectex3f));
-		//
-		//glGenBuffers(1, &m_ibo);
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
-		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(int), &indices[0], GL_STATIC_DRAW);
-		//
-		//glBindVertexArray(0);
-		//
-		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		//glDisableVertexAttribArray(1);
-		//glDisableVertexAttribArray(0);
-		//glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshPoint), (void*)0);
+		
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshPoint), (void*)sizeof(ndMeshVector));
+
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(ndMeshPoint), (void*)(2 * sizeof(ndMeshVector)));
+
+		glGenBuffers(1, &m_indexBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount____ * sizeof (GLuint), m_indexArray, GL_STATIC_DRAW);
+		
+		glBindVertexArray(0);
+		
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glDisableVertexAttribArray(2);
+		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 #else
 		m_optimizedOpaqueDiplayList = glGenLists(1);
