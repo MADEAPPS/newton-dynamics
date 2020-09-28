@@ -14,12 +14,37 @@
 #include "ndSkyBox.h"
 #include "ndDemoCamera.h"
 
+// define vertex format
+struct dVector3f
+{
+	GLfloat m_x;
+	GLfloat m_y;
+	GLfloat m_z;
+};
+
+struct dTexCoord2f
+{
+	GLfloat m_u;
+	GLfloat m_v;
+};
+
+struct ndMeshPoint
+{
+	dVector3f m_posit;
+	dVector3f m_normal;
+	dTexCoord2f m_uv;
+};
+
+
 ndSkyBox::ndSkyBox(GLuint shader)
 	:ndDemoEntity(dGetIdentityMatrix(), nullptr)
 	,m_shader(shader)
+	,m_indexBuffer(0)
+	,m_vertexBuffer(0)
 	,m_texturecubemap(0)
-	,m_vao(0)
-	,m_ibo(0)
+	,m_vetextArrayBuffer(0)
+	,matrixUniformLocation(0)
+	,textureMatrixLocation(0)
 {
 	GLfloat size = 200.0f;
 	static GLfloat vertices[] =
@@ -91,8 +116,8 @@ ndSkyBox::ndSkyBox(GLuint shader)
 		
 	SetupCubeMap();
 
-	glGenVertexArrays(1, &m_vao);
-	glBindVertexArray(m_vao);
+	glGenVertexArrays(1, &m_vetextArrayBuffer);
+	glBindVertexArray(m_vetextArrayBuffer);
 	
 	glGenBuffers(1, &m_vertexBuffer); //m_vbo
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
@@ -106,8 +131,8 @@ ndSkyBox::ndSkyBox(GLuint shader)
 	//glEnableVertexAttribArray(1);
 	//glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexPT), (void*)sizeof(dVectex3f));
 	
-	glGenBuffers(1, &m_ibo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
+	glGenBuffers(1, &m_indexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(int), &indices[0], GL_STATIC_DRAW);
 	
 	glBindVertexArray(0);
@@ -233,21 +258,20 @@ ndSkyBox::~ndSkyBox()
 	{
 		glDeleteTextures(1, &m_texturecubemap);
 	}
-	
-	// delete VBO when program terminated
-	if (m_vertexBuffer)
-	{
-		glDeleteBuffers(1, &m_vertexBuffer);
-	}
-	
+
 	if (m_indexBuffer)
 	{
 		glDeleteBuffers(1, &m_indexBuffer);
 	}
-
-	if (m_vao)
+	
+	if (m_vertexBuffer)
 	{
-		glDeleteVertexArrays(1, &m_vao);
+		glDeleteBuffers(1, &m_vertexBuffer);
+	}
+
+	if (m_vetextArrayBuffer)
+	{
+		glDeleteVertexArrays(1, &m_vetextArrayBuffer);
 	}
 }
 
@@ -278,7 +302,7 @@ void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, m_texturecubemap);
-		glBindVertexArray(m_vao);
+		glBindVertexArray(m_vetextArrayBuffer);
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 

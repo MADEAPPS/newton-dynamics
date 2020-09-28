@@ -108,9 +108,9 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	int m_vertexCount;
 
 #ifdef USING_GLES_4
-	GLuint m_vao;
-	GLuint m_vbo;
-	//GLuint m_ibo[3];
+	GLuint m_indexBuffer;
+	GLuint m_vertexBuffer;
+	GLuint m_vetextArrayBuffer;
 #else
 	unsigned m_optimizedOpaqueDiplayList;
 	unsigned m_optimizedTransparentDiplayList;		

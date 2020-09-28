@@ -15,6 +15,8 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 
+
+
 ndDemoMeshInterface::ndDemoMeshInterface()
 	:dClassAlloc()
 	,dRefCounter<ndDemoMeshInterface>()
@@ -141,9 +143,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_normal(nullptr)
 	,m_vertexCount(0)
 #ifdef USING_GLES_4
-	,m_vao(0)
-	,m_vbo(0)
-//	,m_ibo[3];
+	,m_indexBuffer(0)
+	,m_vertexBuffer(0)
+	,m_vetextArrayBuffer(0)
 #else
 	,m_optimizedOpaqueDiplayList(0)	
 	,m_optimizedTransparentDiplayList(0)
@@ -300,9 +302,9 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCac
 	,m_normal(nullptr)
 	,m_vertexCount(0)
 #ifdef USING_GLES_4
-	, m_vao(0)
-	, m_vbo(0)
-	//	,m_ibo[3];
+	,m_indexBuffer(0)
+	,m_vertexBuffer(0)
+	,m_vetextArrayBuffer(0)
 #else
 	,m_optimizedOpaqueDiplayList(0)
 	,m_optimizedTransparentDiplayList(0)
@@ -345,12 +347,12 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_normal(nullptr)
 	,m_vertexCount(0)
 #ifdef USING_GLES_4
-	,m_vao(0)
-	,m_vbo(0)
-	//,m_ibo[3];
+	,m_indexBuffer(0)
+	,m_vertexBuffer(0)
+	,m_vetextArrayBuffer(0)
 #else
-	, m_optimizedOpaqueDiplayList(0)
-	, m_optimizedTransparentDiplayList(0)
+	,m_optimizedOpaqueDiplayList(0)
+	,m_optimizedTransparentDiplayList(0)
 #endif
 {
 	// create a helper mesh from the collision collision
@@ -423,8 +425,12 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 		
 		segment->m_textureHandle = (GLuint)material;
 		segment->SetOpacity(opacity);
-		
+
+#ifdef USING_GLES_4
 		segment->m_shader = shaderCache.m_diffuseEffect;
+#else
+		segment->m_shader = shaderCache.m_diffuseEffectOld;
+#endif
 		
 		segment->AllocIndexData (indexCount);
 		mesh.GetMaterialGetIndexStream(geometryHandle, handle, (int*)segment->m_indexes);
@@ -444,12 +450,12 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_normal(nullptr)
 	,m_vertexCount(0)
 #ifdef USING_GLES_4
-	,m_vao(0)
-	,m_vbo(0)
-	//	,m_ibo[3];
+	,m_indexBuffer(0)
+	,m_vertexBuffer(0)
+	,m_vetextArrayBuffer(0)
 #else
-	, m_optimizedOpaqueDiplayList(0)
-	, m_optimizedTransparentDiplayList(0)
+	,m_optimizedOpaqueDiplayList(0)
+	,m_optimizedTransparentDiplayList(0)
 #endif
 {
 	dAssert(0);
@@ -770,7 +776,33 @@ void ndDemoMesh::OptimizeForRender()
 	if (isOpaque) 
 	{
 #ifdef USING_GLES_4
-		dAssert(0);
+
+		glGenVertexArrays(1, &m_vetextArrayBuffer);
+		glBindVertexArray(m_vetextArrayBuffer);
+
+		glGenBuffers(1, &m_vertexBuffer); //m_vbo
+		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+		////glBufferData(GL_ARRAY_BUFFER, sizeof(VertexPT) * 24, &vtx[0], GL_STATIC_DRAW);
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
+		//
+		//glEnableVertexAttribArray(0);
+		//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
+		//
+		////glEnableVertexAttribArray(1);
+		////glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(VertexPT), (void*)sizeof(dVectex3f));
+		//
+		//glGenBuffers(1, &m_ibo);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
+		//glBufferData(GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof(int), &indices[0], GL_STATIC_DRAW);
+		//
+		//glBindVertexArray(0);
+		//
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		//glDisableVertexAttribArray(1);
+		//glDisableVertexAttribArray(0);
+		//glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 #else
 		m_optimizedOpaqueDiplayList = glGenLists(1);
 
@@ -814,7 +846,7 @@ void ndDemoMesh::OptimizeForRender()
 void  ndDemoMesh::ResetOptimization()
 {
 #ifdef USING_GLES_4
-	if (m_vao)
+	if (m_vetextArrayBuffer)
 	{
 		dAssert(0);
 	}
