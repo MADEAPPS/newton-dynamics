@@ -494,6 +494,80 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	OptimizeForRender ();
 }
 
+ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision)
+	:ndDemoMeshInterface()
+	,dList<ndDemoSubMesh>()
+	,m_points(nullptr)
+	,m_vertexCount(0)
+#ifdef USING_GLES_4
+	,m_indexCount(0)
+	,m_indexArray(nullptr)
+	,m_shader(0)
+	,m_indexBuffer(0)
+	,m_vertexBuffer(0)
+	,m_vetextArrayBuffer(0)
+#else
+	, m_optimizedOpaqueDiplayList(0)
+	, m_optimizedTransparentDiplayList(0)
+#endif
+{
+	ndShapeInstanceMeshBuilder mesh(*collision);
+
+	//mesh.CalculateNormals(30.0f * dDegreeToRad);
+
+#ifdef USING_GLES_4
+	m_shader = shaderCache.m_diffuseEffect;
+#endif
+
+	// extract the materials index array for mesh
+	ndIndexArray* const geometryHandle = mesh.MaterialGeometryBegin();
+
+	// extract vertex data  from the newton mesh		
+	int vertexCount = mesh.GetPropertiesCount();
+#ifndef USING_GLES_4
+	AllocVertexData(vertexCount);
+#else
+	int indexCount = 0;
+	for (int handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
+	{
+		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
+	}
+	AllocVertexData(vertexCount, indexCount);
+#endif
+
+	mesh.GetVertexChannel(sizeof(ndMeshPoint), &m_points[0].m_posit.m_x);
+	mesh.GetNormalChannel(sizeof(ndMeshPoint), &m_points[0].m_normal.m_x);
+	mesh.GetUV0Channel(sizeof(ndMeshPoint), &m_points[0].m_uv.m_u);
+
+	dInt32 segmentStart = 0;
+	for (int handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
+	{
+		int material = mesh.GetMaterialID(geometryHandle, handle);
+		ndDemoSubMesh* const segment = AddSubMesh();
+
+		segment->m_textureHandle = (GLuint)material;
+//		segment->SetOpacity(opacity);
+
+		segment->m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
+#ifdef USING_GLES_4
+		segment->m_segmentStart = segmentStart;
+		mesh.GetMaterialGetIndexStream(geometryHandle, handle, (int*)&m_indexArray[segmentStart]);
+#else
+		segment->m_shader = shaderCache.m_diffuseEffectOld;
+		segment->AllocIndexData(segment->m_indexCount);
+		mesh.GetMaterialGetIndexStream(geometryHandle, handle, (int*)segment->m_indexes);
+#endif
+		segmentStart += segment->m_indexCount;
+	}
+
+	//NewtonMeshEndHandle (mesh, geometryHandle); 
+	mesh.MaterialGeomteryEnd(geometryHandle);
+
+	// optimize this mesh for hardware buffers if possible
+	OptimizeForRender();
+}
+
+
 ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
@@ -1494,6 +1568,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 //float d1 = sqrt(d2);
 //float attenuation = 1.0 / (1.0 + k1 * d1 + k2 * d2);
 //dAssert(attenuation > 0.0f);
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 		glBindVertexArray(m_vetextArrayBuffer);
 		glEnableVertexAttribArray(0);

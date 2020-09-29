@@ -213,7 +213,6 @@ class ndShape: public dClassAlloc
 	dInt32 GetRefCount() const;
 	virtual dInt32 Release() const;
 
-	virtual ndShape* GetAsShape() { return this; }
 	virtual ndShapeBox* GetAsShapeBox() { return nullptr; }
 	virtual ndShapeSphere* GetAsShapeSphere() { return nullptr; }
 	virtual ndShapeCompound* GetAsShapeCompound() { return nullptr; }

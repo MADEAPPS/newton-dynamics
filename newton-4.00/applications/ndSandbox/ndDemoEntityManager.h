@@ -175,6 +175,8 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	void ApplyMenuOptions();
 	void LoadDemo(int menu);
+
+	void DrawDebugShapes();
 	
 	GLFWwindow* m_mainFrame;
 	int	m_defaultFont;
@@ -183,7 +185,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	ndDemoEntity* m_sky;
 	ndPhysicsWorld* m_world;
 	ndDemoCameraManager* m_cameraManager;
-	ndShaderPrograms m_shadeCache;
+	ndShaderPrograms m_shaderCache;
 	void* m_renderUIContext;
 	void* m_updateCameraContext;
 	RenderGuiHelpCallback m_renderDemoGUI;
@@ -227,9 +229,10 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool m_suspendPhysicsUpdate;
 	bool m_asynchronousPhysicsUpdate;
 	bool m_showRaycastHit;
-	bool m_profilerMode____;
+	bool m_profilerMode;
 
 	ndLightSource m_directionalLight;
+	dTree<ndDemoMesh*, ndShape*> m_debugShapeCache;
 
 	static SDKDemos m_demosSelection[];
 	friend class ndPhysicsWorld;
@@ -265,7 +268,7 @@ inline void ndDemoEntityManager::SetDebugDisplay(int mode) const
 
 inline const ndShaderPrograms& ndDemoEntityManager::GetShaderCache() const
 {
-	return m_shadeCache;
+	return m_shaderCache;
 }
 
 #endif

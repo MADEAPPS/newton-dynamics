@@ -93,13 +93,13 @@ class ndShapeInstance: public dClassAlloc
 	void SetCollisionMode(bool mode);
 	dInt32 GetConvexVertexCount() const;
 
+	void SetScale(const dVector& scale);
+	const dVector& GetScale() const;
+	const dVector& GetInvScale() const;
+
 #if 0
 	ndShapeInstance* AddRef ();
 	dInt32 Release ();
-
-	void SetScale (const dVector& scale);
-	const dVector& GetScale () const;
-	const dVector& GetInvScale () const;
 
 	void SetGlobalScale (const dVector& scale);
 
@@ -262,15 +262,6 @@ D_INLINE void ndShapeInstance::GetCollisionInfo(ndShapeInfo* const info) const
 	m_shape->GetCollisionInfo(info);
 }
 
-D_INLINE const dVector& ndShapeInstance::GetScale () const
-{
-	return m_scale;
-}
-
-D_INLINE const dVector& ndShapeInstance::GetInvScale () const
-{
-	return m_invScale;
-}
 
 D_INLINE const dMatrix& ndShapeInstance::GetAlignMatrix () const
 {
@@ -658,6 +649,17 @@ D_INLINE void ndShapeInstance::SetCollisionMode(bool mode)
 {
 	m_collisionMode = mode;
 }
+
+D_INLINE const dVector& ndShapeInstance::GetScale() const
+{
+	return m_scale;
+}
+
+D_INLINE const dVector& ndShapeInstance::GetInvScale() const
+{
+	return m_invScale;
+}
+
 
 #endif 
 

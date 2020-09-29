@@ -273,38 +273,6 @@ void ndShapeInstance::Serialize(dgSerialize serialize, void* const userData, boo
 }
 
 
-void ndShapeInstance::SetScale (const dVector& scale)
-{
-	dFloat32 scaleX = dAbs (scale.m_x);
-	dFloat32 scaleY = dAbs (scale.m_y);
-	dFloat32 scaleZ = dAbs (scale.m_z);
-	dAssert (scaleX > dFloat32 (0.0f));
-	dAssert (scaleY > dFloat32 (0.0f));
-	dAssert (scaleZ > dFloat32 (0.0f));
-
-	if (IsType(dgCollision::dgCollisionCompound_RTTI)) {
-		dAssert (m_scaleType == m_unit);
-		dgCollisionCompound* const compound = (dgCollisionCompound*) m_shape;
-		compound->ApplyScale(scale);
-	} else if ((dAbs (scaleX - scaleY) < dFloat32 (1.0e-4f)) && (dAbs (scaleX - scaleZ) < dFloat32 (1.0e-4f))) {
-		if ((dAbs (scaleX - dFloat32 (1.0f)) < dFloat32 (1.0e-4f))) {
-			m_scaleType = m_unit;
-			m_scale	= dVector (dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (1.0f), dFloat32 (0.0f));	
-			m_maxScale = m_scale;	
-			m_invScale = m_scale;
-		} else {
-			m_scaleType = m_uniform;
-			m_scale	= dVector (scaleX, scaleX, scaleX, dFloat32 (0.0f));	
-			m_maxScale = m_scale;	
-			m_invScale = dVector (dFloat32 (1.0f) / scaleX, dFloat32 (1.0f) / scaleX, dFloat32 (1.0f) / scaleX, dFloat32 (0.0f));	
-		}
-	} else {
-		m_scaleType = m_nonUniform;
-		m_maxScale = dMax(scaleX, scaleY, scaleZ);
-		m_scale	= dVector (scaleX, scaleY, scaleZ, dFloat32 (0.0f));	
-		m_invScale = dVector (dFloat32 (1.0f) / scaleX, dFloat32 (1.0f) / scaleY, dFloat32 (1.0f) / scaleZ, dFloat32 (0.0f));	
-	}
-}
 
 void ndShapeInstance::SetGlobalScale (const dVector& scale)
 {
@@ -684,4 +652,48 @@ dInt32 ndShapeInstance::CalculatePlaneIntersection(const dVector& normal, const 
 	}
 	return count;
 }
+
+void ndShapeInstance::SetScale(const dVector& scale)
+{
+	dFloat32 scaleX = dAbs(scale.m_x);
+	dFloat32 scaleY = dAbs(scale.m_y);
+	dFloat32 scaleZ = dAbs(scale.m_z);
+	dAssert(scaleX > dFloat32(0.0f));
+	dAssert(scaleY > dFloat32(0.0f));
+	dAssert(scaleZ > dFloat32(0.0f));
+
+	//if (IsType(dgCollision::dgCollisionCompound_RTTI)) 
+	if (((ndShape*)m_shape)->GetAsShapeCompound())
+	{
+		dAssert(0);
+		//dAssert(m_scaleType == m_unit);
+		//dgCollisionCompound* const compound = (dgCollisionCompound*)m_shape;
+		//compound->ApplyScale(scale);
+	}
+	else if ((dAbs(scaleX - scaleY) < dFloat32(1.0e-4f)) && (dAbs(scaleX - scaleZ) < dFloat32(1.0e-4f))) 
+	{
+		if ((dAbs(scaleX - dFloat32(1.0f)) < dFloat32(1.0e-4f))) 
+		{
+			m_scaleType = m_unit;
+			m_scale = dVector(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f));
+			m_maxScale = m_scale;
+			m_invScale = m_scale;
+		}
+		else 
+		{
+			m_scaleType = m_uniform;
+			m_scale = dVector(scaleX, scaleX, scaleX, dFloat32(0.0f));
+			m_maxScale = m_scale;
+			m_invScale = dVector(dFloat32(1.0f) / scaleX, dFloat32(1.0f) / scaleX, dFloat32(1.0f) / scaleX, dFloat32(0.0f));
+		}
+	}
+	else 
+	{
+		m_scaleType = m_nonUniform;
+		m_maxScale = dMax(scaleX, scaleY, scaleZ);
+		m_scale = dVector(scaleX, scaleY, scaleZ, dFloat32(0.0f));
+		m_invScale = dVector(dFloat32(1.0f) / scaleX, dFloat32(1.0f) / scaleY, dFloat32(1.0f) / scaleZ, dFloat32(0.0f));
+	}
+}
+
 

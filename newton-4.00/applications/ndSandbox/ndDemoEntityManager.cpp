@@ -107,10 +107,9 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_suspendPhysicsUpdate(false)
 	,m_asynchronousPhysicsUpdate(false)
 	,m_showRaycastHit(false)
-	,m_profilerMode____(false)
-	//,m_contactLock(0)
-	//,m_deleteLock(0)
-	//,m_contactList()
+	,m_profilerMode(false)
+	//,m_directionalLight(0.0f, 1.0f, 0.0f, 0.0f)
+	,m_debugShapeCache()
 {
 	// Setup window
 	glfwSetErrorCallback(ErrorCallback);
@@ -126,7 +125,8 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 	int monitorsCount;
 	GLFWmonitor** monitors = glfwGetMonitors(&monitorsCount);
-	if (monitorsCount > 1) {
+	if (monitorsCount > 1) 
+	{
 		int window_x;
 		int window_y;
 		int monitor_x;
@@ -205,7 +205,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 //	m_showNormalForces = true;
 //	m_showContactPoints = true;
 //	m_showJointDebugInfo = true;
-//	m_collisionDisplayMode = 2;
+	m_collisionDisplayMode = 2;
 //	m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
 
@@ -222,7 +222,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//}
 	////m_currentPlugin = 0;
 
-	m_shadeCache.CreateAllEffects();
+	m_shaderCache.CreateAllEffects();
 
 /*
 	dFloat32 A[2][2];
@@ -341,10 +341,12 @@ void ndDemoEntityManager::SetUpdateCameraFunction(UpdateCameraCallback callback,
 int ndDemoEntityManager::GetJoystickAxis (dFloat32* const axisValues, int maxAxis) const
 {
 	int axisCount = 0;
-	if (m_hasJoytick) {
+	if (m_hasJoytick) 
+	{
 		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
 		axisCount = dMin (axisCount, maxAxis);
-		for (int i = 0; i < axisCount; i ++) {
+		for (int i = 0; i < axisCount; i ++) 
+		{
 			axisValues[i] = axis[i];
 		}
 	}
@@ -357,7 +359,8 @@ int ndDemoEntityManager::GetJoystickButtons (char* const axisbuttons, int maxBut
 	if (m_hasJoytick) {
 		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
 		buttonsCount = dMin (buttonsCount, maxButton);
-		for (int i = 0; i < buttonsCount; i ++) {
+		for (int i = 0; i < buttonsCount; i ++) 
+		{
 			axisbuttons[i] = buttons[i];
 		}
 	}
@@ -390,6 +393,13 @@ void ndDemoEntityManager::Cleanup ()
 	if (m_world) 
 	{
 		m_world->Sync();
+	}
+
+	while (m_debugShapeCache.GetRoot())
+	{
+		dTree<ndDemoMesh*, ndShape*>::dTreeNode* const root = m_debugShapeCache.GetRoot();
+		root->GetInfo()->Release();
+		m_debugShapeCache.Remove(root);
 	}
 
 	// destroy all remaining visual objects
@@ -765,11 +775,15 @@ void ndDemoEntityManager::ErrorCallback(int error, const char* description)
 
 void ndDemoEntityManager::MouseButtonCallback(GLFWwindow*, int button, int action, int)
 {
-	if (button >= 0 && button < 3) {
+	if (button >= 0 && button < 3) 
+	{
 		ImGuiIO& io = ImGui::GetIO();
-		if (action == GLFW_PRESS) {
+		if (action == GLFW_PRESS) 
+		{
 			io.MouseDown[button] = true;    
-		} else if (action == GLFW_RELEASE) {
+		} 
+		else if (action == GLFW_RELEASE) 
+		{
 			io.MouseDown[button] = false;    
 		}
 	}
@@ -818,15 +832,18 @@ void ndDemoEntityManager::KeyCallback(GLFWwindow* const window, int key, int, in
 	
 	static int prevKey;
 	ndDemoEntityManager* const manager = (ndDemoEntityManager*)glfwGetWindowUserPointer(window);
-	if ((key == GLFW_KEY_F10) && (key != prevKey)) {
+	if ((key == GLFW_KEY_F10) && (key != prevKey)) 
+	{
 		manager->ToggleProfiler();
 	}
 
-	if (key == GLFW_KEY_ESCAPE) {
+	if (key == GLFW_KEY_ESCAPE) 
+	{
 		glfwSetWindowShouldClose (window, 1);
 	}
 
-	if (key == GLFW_KEY_F1) {
+	if (key == GLFW_KEY_F1) 
+	{
 		manager->LoadDemo(manager->m_lastCurrentScene);
 	}
 
@@ -946,7 +963,7 @@ void ndDemoEntityManager::CreateSkyBox()
 {
 	if (!m_sky)
 	{
-		m_sky = new ndSkyBox(m_shadeCache.m_skyBox);
+		m_sky = new ndSkyBox(m_shaderCache.m_skyBox);
 		
 		dScopeSpinLock lock(m_addDeleteLock);
 		dAssert(!m_sky->m_rootNode);
@@ -970,7 +987,7 @@ void ndDemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary&
 	for (dScene::dTreeNode* node = scene->GetFirstNode (); node; node = scene->GetNextNode (node)) {
 		dNodeInfo* info = scene->GetInfoFromNode(node);
 		if (info->GetTypeId() == dMeshNodeInfo::GetRttiType()) {
-			ndDemoMeshInterface* const mesh = new ndDemoMesh(scene, node, m_shadeCache);
+			ndDemoMeshInterface* const mesh = new ndDemoMesh(scene, node, m_shaderCache);
 			meshDictionary.Insert(mesh, node);
 		}
 	}
@@ -1115,7 +1132,7 @@ void ndDemoEntityManager::BodyDeserialization (NewtonBody* const body, void* con
 	dTree <ndDemoMeshInterface*, const void*>* const cache = (dTree <ndDemoMeshInterface*, const void*>*)bodyUserData;
 	dTree <ndDemoMeshInterface*, const void*>::dTreeNode* node = cache->Find(NewtonCollisionDataPointer (collision));
 	if (!node) {
-		ndDemoMeshInterface* mesh = new ndDemoMesh(bodyIndentification, scene->m_shadeCache, collision, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga");
+		ndDemoMeshInterface* mesh = new ndDemoMesh(bodyIndentification, scene->m_shaderCache, collision, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga");
 		node = cache->Insert(mesh, NewtonCollisionDataPointer (collision));
 	} else {
 		node->GetInfo()->AddRef();
@@ -1245,7 +1262,8 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glPushMatrix();
 	glLoadIdentity();
 
-	if (window->m_renderDemoGUI) {
+	if (window->m_renderDemoGUI) 
+	{
 		window->m_renderDemoGUI(window, window->m_renderUIContext);
 	}
 
@@ -1395,11 +1413,9 @@ void ndDemoEntityManager::RenderScene()
 		}
 	}
 
-	//dDebugDisplayMode mode = m_solid;
 	if (m_collisionDisplayMode) 
 	{
-		dDebugDisplayMode mode = (m_collisionDisplayMode == 1) ? m_solid : m_lines;
-		DebugRenderWorldCollision (m_world, mode);
+		DrawDebugShapes();
 	}
 	
 	//if (m_showAABB) {
@@ -1467,4 +1483,31 @@ void ndDemoEntityManager::Run()
 		ImGui::Render();
 		glfwSwapBuffers(m_mainFrame);
     }
+}
+
+void ndDemoEntityManager::DrawDebugShapes()
+{
+	//dDebugDisplayMode mode = (m_collisionDisplayMode == 1) ? m_solid : m_lines;
+	//DebugRenderWorldCollision(m_world, mode);
+
+	dVector scale(1.0f);
+
+	
+	const ndBodyList& bodyList = m_world->GetBodyList();
+	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	{
+		ndBodyKinematic* const body = bodyNode->GetInfo();
+		ndShape* const key = body->GetCollisionShape().GetShape();
+		dTree<ndDemoMesh*, ndShape*>::dTreeNode* shapeNode = m_debugShapeCache.Find(key);
+		if (!shapeNode)
+		{
+			ndShapeInstance shape(body->GetCollisionShape());
+			shape.SetScale(dVector(1.0));
+			ndDemoMesh* const mesh = new ndDemoMesh("debugShape", m_shaderCache, &shape);
+			shapeNode = m_debugShapeCache.Insert(mesh, key);
+		}
+
+		
+	}
+
 }
