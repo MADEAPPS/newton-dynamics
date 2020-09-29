@@ -1488,6 +1488,13 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 		glUniformMatrix4fv(projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
 		glUniformMatrix4fv(viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 
+//float k1 = 7.0 / 120.0;
+//float k2 = 1.0 / 240.0;
+//float d2 = viewModelMatrix.m_posit.DotProduct(viewModelMatrix.m_posit & dVector::m_triplexMask).GetScalar();
+//float d1 = sqrt(d2);
+//float attenuation = 1.0 / (1.0 + k1 * d1 + k2 * d2);
+//dAssert(attenuation > 0.0f);
+
 		glBindVertexArray(m_vetextArrayBuffer);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
