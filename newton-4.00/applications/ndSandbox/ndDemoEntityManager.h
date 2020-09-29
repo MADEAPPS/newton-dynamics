@@ -22,6 +22,7 @@ class ndDemoCamera;
 class ndPhysicsWorld;
 class ndDemoMeshInterface;
 class ndDemoCameraManager;
+class ndWireFrameCollisionMesh;
 
 class ndDemoEntityManager: public dList <ndDemoEntity*>
 {
@@ -232,7 +233,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool m_profilerMode;
 
 	ndLightSource m_directionalLight;
-	dTree<ndDemoMesh*, ndShape*> m_debugShapeCache;
+	dTree<ndWireFrameCollisionMesh*, ndShape*> m_debugShapeCache;
 
 	static SDKDemos m_demosSelection[];
 	friend class ndPhysicsWorld;

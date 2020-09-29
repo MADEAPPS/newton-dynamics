@@ -397,7 +397,7 @@ void ndDemoEntityManager::Cleanup ()
 
 	while (m_debugShapeCache.GetRoot())
 	{
-		dTree<ndDemoMesh*, ndShape*>::dTreeNode* const root = m_debugShapeCache.GetRoot();
+		dTree<ndWireFrameCollisionMesh*, ndShape*>::dTreeNode* const root = m_debugShapeCache.GetRoot();
 		root->GetInfo()->Release();
 		m_debugShapeCache.Remove(root);
 	}
@@ -1498,16 +1498,13 @@ void ndDemoEntityManager::DrawDebugShapes()
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
 		ndShape* const key = body->GetCollisionShape().GetShape();
-		dTree<ndDemoMesh*, ndShape*>::dTreeNode* shapeNode = m_debugShapeCache.Find(key);
+		dTree<ndWireFrameCollisionMesh*, ndShape*>::dTreeNode* shapeNode = m_debugShapeCache.Find(key);
 		if (!shapeNode)
 		{
 			ndShapeInstance shape(body->GetCollisionShape());
 			shape.SetScale(dVector(1.0));
-			ndDemoMesh* const mesh = new ndDemoMesh("debugShape", m_shaderCache, &shape);
+			ndWireFrameCollisionMesh* const mesh = new ndWireFrameCollisionMesh(m_shaderCache, &shape);
 			shapeNode = m_debugShapeCache.Insert(mesh, key);
 		}
-
-		
 	}
-
 }

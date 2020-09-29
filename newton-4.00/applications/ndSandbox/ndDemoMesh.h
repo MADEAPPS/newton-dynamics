@@ -58,6 +58,7 @@ class ndDemoMeshInterface: public dClassAlloc, public dRefCounter<ndDemoMeshInte
 	bool m_isVisible;
 };
 
+
 class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 {
 	public:
@@ -65,7 +66,6 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache);
 	//ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ndShaderPrograms& shaderCache);
 	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize);
-	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision);
 	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
 
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner) 
@@ -172,6 +172,16 @@ class ndDemoBezierCurve: public ndDemoMeshInterface
 
 	dBezierSpline m_curve;
 	int m_renderResolution;
+};
+
+class ndWireFrameCollisionMesh: public ndDemoMeshInterface
+{
+	public:
+	ndWireFrameCollisionMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision);
+
+	virtual void RenderNormals() {}
+	virtual void RenderTransparency() const {}
+	virtual void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 };
 
 
