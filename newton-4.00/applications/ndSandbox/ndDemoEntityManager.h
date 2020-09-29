@@ -30,6 +30,17 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	typedef void (*RenderGuiHelpCallback) (ndDemoEntityManager* const manager, void* const context);
 	typedef void(*UpdateCameraCallback) (ndDemoEntityManager* const manager, void* const context, dFloat32 timestep);
 
+	class ndLightSource
+	{
+		public:
+		dVector m_position;
+		dVector m_ambient;
+		dVector m_diffuse;
+		dVector m_specular;
+		dFloat32 m_shininess;
+	};
+
+
 	class TransparentMesh
 	{
 		public: 
@@ -216,11 +227,9 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool m_suspendPhysicsUpdate;
 	bool m_asynchronousPhysicsUpdate;
 	bool m_showRaycastHit;
+	bool m_profilerMode____;
 
-	unsigned m_profilerMode;
-	//unsigned m_contactLock;
-	//unsigned m_deleteLock;
-	//dList<NewtonJoint*> m_contactList;
+	ndLightSource m_directionalLight;
 
 	static SDKDemos m_demosSelection[];
 	friend class ndPhysicsWorld;

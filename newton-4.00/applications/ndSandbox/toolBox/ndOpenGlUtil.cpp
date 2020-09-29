@@ -55,30 +55,27 @@ void GetCursorPos(dMOUSE_POINT& point)
 
 void ShowMousePicking (const dVector& p0, const dVector& p1, const dVector& originColor, const dVector& lineColor)
 {
+	dTrace((__FUNCTION__));
 	// set up the cube's texture
-	glDisable (GL_LIGHTING);
-	glDisable(GL_TEXTURE_2D);
-
-	glColor3f(GLfloat(lineColor.m_x), GLfloat(lineColor.m_y), GLfloat(lineColor.m_z));
-	glLineWidth(2.0f);
-	glBegin(GL_LINES);
-	glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-	glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-	glEnd();
-	glLineWidth(1.0f);
-
-	// draw the bone points
-	glColor3f(GLfloat(originColor.m_x), GLfloat(originColor.m_y), GLfloat(originColor.m_z));
-	glPointSize(8.0f);
-//glPointSize(16.0f);
-	glBegin(GL_POINTS);
-	glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+	//glDisable(GL_TEXTURE_2D);
+	//glColor3f(GLfloat(lineColor.m_x), GLfloat(lineColor.m_y), GLfloat(lineColor.m_z));
+	//glLineWidth(2.0f);
+	//glBegin(GL_LINES);
+	//glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
 	//glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-	glEnd();
-	glPointSize(1.0f);
-
-	glColor3f(1.0f, 1.0f, 0.0f);
-	glEnable (GL_LIGHTING);
+	//glEnd();
+	//glLineWidth(1.0f);
+	//
+	//// draw the bone points
+	//glColor3f(GLfloat(originColor.m_x), GLfloat(originColor.m_y), GLfloat(originColor.m_z));
+	//glPointSize(8.0f);
+	//
+	//glBegin(GL_POINTS);
+	//glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+	//glEnd();
+	//glPointSize(1.0f);
+	//
+	//glColor3f(1.0f, 1.0f, 0.0f);
 }
 
 

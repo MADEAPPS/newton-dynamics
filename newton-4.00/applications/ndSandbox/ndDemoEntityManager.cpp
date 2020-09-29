@@ -107,7 +107,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_suspendPhysicsUpdate(false)
 	,m_asynchronousPhysicsUpdate(false)
 	,m_showRaycastHit(false)
-	,m_profilerMode(0)
+	,m_profilerMode____(false)
 	//,m_contactLock(0)
 	//,m_deleteLock(0)
 	//,m_contactList()
@@ -1231,7 +1231,6 @@ void ndDemoEntityManager::RenderDrawListsCallback(ImDrawData* const draw_data)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_LIGHTING);
 	glEnable(GL_SCISSOR_TEST);
 	glEnable(GL_TEXTURE_2D);
 	//glUseProgram(0); // You may want this if using this code in an OpenGL 3+ context
@@ -1342,26 +1341,24 @@ void ndDemoEntityManager::RenderScene()
 	glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST);
 
 	// set default lightning
-	glEnable (GL_LIGHTING);
-
-	dFloat32 cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
-	glMaterialParam(GL_FRONT, GL_SPECULAR, cubeColor);
-	glMaterialParam(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cubeColor);
-	glMaterialf(GL_FRONT, GL_SHININESS, 50.0);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-	// set just one directional light
-	GLfloat lightDiffuse0[] = { 0.8f, 0.8f, 0.8f, 0.0f };
-	GLfloat lightAmbient0[] = { 0.2f, 0.2f, 0.2f, 0.0f };
-	GLfloat lightSpecular0[] = { 1.0f, 1.0f, 1.0f, 0.0f };
-	GLfloat lightPosition0[] = { 0.0f, 200.0f, 150.0f, 0.0f };
-	
-	glMaterialf(GL_FRONT, GL_SHININESS, 60.0f);
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition0);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient0);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse0);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular0);
-	glEnable(GL_LIGHT0);
+	//dFloat32 cubeColor[] = { 1.0f, 1.0f, 1.0f, 1.0 };
+	//glMaterialParam(GL_FRONT, GL_SPECULAR, cubeColor);
+	//glMaterialParam(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, cubeColor);
+	//glMaterialf(GL_FRONT, GL_SHININESS, 50.0);
+	//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	//
+	//// set just one directional light
+	//GLfloat lightDiffuse0[] = { 0.8f, 0.8f, 0.8f, 0.0f };
+	//GLfloat lightAmbient0[] = { 0.2f, 0.2f, 0.2f, 0.0f };
+	//GLfloat lightSpecular0[] = { 1.0f, 1.0f, 1.0f, 0.0f };
+	//GLfloat lightPosition0[] = { 0.0f, 200.0f, 150.0f, 0.0f };
+	//
+	//glMaterialf(GL_FRONT, GL_SHININESS, 60.0f);
+	//glLightfv(GL_LIGHT0, GL_POSITION, lightPosition0);
+	//glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient0);
+	//glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse0);
+	//glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular0);
+	//glEnable(GL_LIGHT0);
 
 	// one light from the Camera eye point
 	dVector camPosition (m_cameraManager->GetCamera()->m_matrix.m_posit);

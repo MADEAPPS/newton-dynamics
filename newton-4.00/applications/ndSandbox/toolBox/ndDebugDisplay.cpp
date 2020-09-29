@@ -113,7 +113,6 @@ static void RenderBodyContactsForces (NewtonBody* const body, dFloat32 scale)
 
 void RenderAABB (NewtonWorld* const world)
 {
-	glDisable (GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 
 	glColor3f(0.0f, 0.0f, 1.0f);
@@ -174,7 +173,6 @@ void RenderAABB (NewtonWorld* const world)
 
 void RenderCenterOfMass (NewtonWorld* const world)
 {
-	glDisable (GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 
 	glColor3f(0.0f, 0.0f, 1.0f);
@@ -209,7 +207,6 @@ void RenderCenterOfMass (NewtonWorld* const world)
 
 void RenderBodyFrame(NewtonWorld* const world)
 {
-	glDisable(GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 
 	glColor3f(0.0f, 0.0f, 1.0f);
@@ -242,7 +239,6 @@ void RenderBodyFrame(NewtonWorld* const world)
 
 void RenderContactPoints (NewtonWorld* const world)
 {
-	glDisable (GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 
 	glPointSize(8.0f);
@@ -271,9 +267,8 @@ void RenderRayCastHit(NewtonWorld* const world)
 {
 	dVector point;
 	dVector normal;
-	if (GetLastHit (point, normal)) { 
-
-		glDisable(GL_LIGHTING);
+	if (GetLastHit (point, normal)) 
+	{
 		glDisable(GL_TEXTURE_2D);
 
 		glPointSize(8.0f);
@@ -288,7 +283,6 @@ void RenderRayCastHit(NewtonWorld* const world)
 
 void RenderNormalForces (NewtonWorld* const world)
 {
-	glDisable (GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 
 	glColor3f(0.0f, 0.5f, 1.0f);
@@ -394,7 +388,6 @@ void DebugRenderWorldCollision(const ndWorld* const world, dDebugDisplayMode mod
 	glDisable(GL_TEXTURE_2D);
 	if (mode == m_lines) 
 	{
-		glDisable(GL_LIGHTING);
 		glBegin(GL_LINES);
 	}
 	else 
@@ -475,7 +468,6 @@ void DebugRenderWorldCollision(const ndWorld* const world, dDebugDisplayMode mod
 	}
 	glEnd();
 	
-	//glDisable(GL_LIGHTING);
 	//glBegin(GL_LINES);
 	//glColor3f(1.0f, 1.0f, 0.0f);
 	//for (int i = 0; i < g_debugDisplayCount; i += 2) 

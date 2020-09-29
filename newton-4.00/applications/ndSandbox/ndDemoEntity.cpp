@@ -304,7 +304,6 @@ void ndDemoEntity::RenderBone() const
 	if (GetParent()) 
 	{
 		dAssert(0);
-		//glDisable(GL_LIGHTING);
 		//glDisable(GL_TEXTURE_2D);
 		//
 		//glColor3f(0.5f, 0.5f, 0.5f);
@@ -317,7 +316,6 @@ void ndDemoEntity::RenderBone() const
 		//}
 		//
 		//glEnd();
-		//glEnable(GL_LIGHTING);
 	}
 }
 

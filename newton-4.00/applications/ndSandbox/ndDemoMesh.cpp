@@ -1000,7 +1000,6 @@ void ndDemoMesh::RenderNormals ()
 {
 	dAssert(0);
 /*
-	glDisable (GL_LIGHTING);
 	glDisable(GL_TEXTURE_2D);
 
 	glColor3f(1.0f, 1.0f, 1.0f);
@@ -1015,8 +1014,6 @@ void ndDemoMesh::RenderNormals ()
 	}
 
 	glEnd();
-
-	glEnable (GL_LIGHTING);
 */
 }
 
@@ -1074,7 +1071,6 @@ void ndDemoBezierCurve::Render(ndDemoEntityManager* const scene, const dMatrix& 
 	if (m_isVisible) 
 	{
 		dAssert(0);
-		//glDisable (GL_LIGHTING);
 		//glDisable(GL_TEXTURE_2D);
 		//glColor3f(1.0f, 1.0f, 1.0f);
 		//
@@ -1100,7 +1096,6 @@ void ndDemoBezierCurve::Render(ndDemoEntityManager* const scene, const dMatrix& 
 		}
 		glEnd();
 */
-		glEnable (GL_LIGHTING);
 	}
 }
 

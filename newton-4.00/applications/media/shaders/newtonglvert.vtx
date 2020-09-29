@@ -22,9 +22,12 @@ uniform mat4 projectionMatrix;
 out vec2 uv;
 out vec3 posit;
 out vec3 normal;
+out vec3 lightDir;
 
 void main()
 {	
+lightDir = vec3 (viewModelMatrix * normalize (vec4(-1.0f, 1.0f, 0.0f, 0.0f)));
+
 	uv = in_uv;
 	normal = vec3 (normalize (normalMatrix * vec4(in_normal, 0.0)));
 	posit = vec3 (viewModelMatrix * vec4(in_position, 1.0));

@@ -20,7 +20,6 @@
 #include "ndSandboxStdafx.h"
 #include "ndDemoEntity.h"
 
-
 class ndDemoCamera: public ndDemoEntity
 {
 	public:
@@ -40,12 +39,12 @@ class ndDemoCamera: public ndDemoEntity
 
 	dVector ScreenToWorld (const dVector& screenPoint) const;
 	dVector WorldToScreen (const dVector& worldPoint) const;
+
 	
 	private:
 	dMatrix CreateLookAtMatrix(const dVector& eye, const dVector& center, const dVector& normUp);
 	dMatrix CreateMatrixFromFrustum(dFloat32 Left, dFloat32 Right, dFloat32 Bottom, dFloat32 Top, dFloat32 ZNear, dFloat32 ZFar);
 	dMatrix CreatePerspectiveMatrix(dFloat32 FOV, dFloat32 Aspect, dFloat32 ZNear, dFloat32 ZFar);
-
 
 	dMatrix m_viewMatrix;
 	dMatrix m_projectionMatrix;

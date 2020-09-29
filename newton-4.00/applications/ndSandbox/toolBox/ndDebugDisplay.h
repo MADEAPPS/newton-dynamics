@@ -31,7 +31,6 @@ class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
 	dJointDebugDisplay(const dMatrix& cameraMatrix)
 		:dCustomJoint::dDebugDisplay(cameraMatrix)
 	{
-		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);
 		glColor3f(1.0f, 1.0f, 1.0f);
 
@@ -45,7 +44,6 @@ class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
 	~dJointDebugDisplay()
 	{
 		glEnd();
-		glEnable(GL_LIGHTING);
 		glEnable(GL_TEXTURE_2D);
 	}
 
