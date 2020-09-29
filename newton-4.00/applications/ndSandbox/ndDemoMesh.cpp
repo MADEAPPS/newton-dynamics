@@ -55,12 +55,7 @@ ndDemoSubMesh::ndDemoSubMesh ()
 	,m_shiness(100.0f)
 	,m_textureHandle(0)
 	,m_indexCount(0)
-#ifdef USING_GLES_4
 	,m_segmentStart(0)
-#else
-	,m_shader(0)
-	,m_indexes(nullptr)
-#endif
 {
 }
 
@@ -70,12 +65,6 @@ ndDemoSubMesh::~ndDemoSubMesh ()
 	{
 		ReleaseTexture(m_textureHandle);
 	}
-#ifndef USING_GLES_4
-	if (m_indexes) 
-	{
-		delete[] m_indexes;
-	}
-#endif
 }
 
 void ndDemoSubMesh::SetOpacity(dFloat32 opacity)
@@ -86,98 +75,16 @@ void ndDemoSubMesh::SetOpacity(dFloat32 opacity)
 	m_specular.m_w = opacity;
 }
 
-void ndDemoSubMesh::Render() const
-{
-#ifdef USING_GLES_4
-	dAssert(0);
-#else
-
-	glMaterialParam(GL_FRONT, GL_SPECULAR, &m_specular.m_x);
-	glMaterialParam(GL_FRONT, GL_AMBIENT, &m_ambient.m_x);
-	glMaterialParam(GL_FRONT, GL_DIFFUSE, &m_diffuse.m_x);
-	glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(m_shiness));
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	if (m_textureHandle) 
-	{
-		glEnable(GL_TEXTURE_2D);		
-		glBindTexture(GL_TEXTURE_2D, GLuint (m_textureHandle));
-	} 
-	else 
-	{
-		glDisable(GL_TEXTURE_2D);
-	}
-
-	glDrawElements (GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, m_indexes);
-#endif
-}
-
-void ndDemoSubMesh::OptimizeForRender(const ndDemoMesh* const mesh) const
-{
-#ifndef USING_GLES_4
-	glUseProgram(m_shader);
-	glUniform1i(glGetUniformLocation(m_shader, "texture"), 0);
-
-	glMaterialParam(GL_FRONT, GL_AMBIENT, &m_ambient.m_x);
-	glMaterialParam(GL_FRONT, GL_DIFFUSE, &m_diffuse.m_x);
-	glMaterialParam(GL_FRONT, GL_SPECULAR, &m_specular.m_x);
-	glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(m_shiness));
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	if (m_textureHandle) 
-	{
-		glEnable(GL_TEXTURE_2D);		
-		glBindTexture(GL_TEXTURE_2D, GLuint (m_textureHandle));
-	} 
-	else 
-	{
-		glDisable(GL_TEXTURE_2D);
-	}
-
-	glBegin(GL_TRIANGLES);
-	//const dFloat32* const uv = mesh->m_uv;
-	//const dFloat32* const normal = mesh->m_normal;
-	//const dFloat32* const vertex = mesh->m_vertex;
-	ndDemoMesh::ndMeshPoint* const points = mesh->m_points;
-	for (int i = 0; i < m_indexCount; i ++) 
-	{
-		int index = m_indexes[i];
-		glTexCoord2f(points[index].m_uv.m_u, points[index].m_uv.m_v);
-		glNormal3f(points[index].m_normal.m_x, points[index].m_normal.m_y, points[index].m_normal.m_z);
-		glVertex3f(points[index].m_posit.m_x, points[index].m_posit.m_y, points[index].m_posit.m_z);
-	}
-	glEnd();
-	glUseProgram(0);
-#endif
-}
-
-void ndDemoSubMesh::AllocIndexData (int indexCount)
-{
-#ifdef USING_GLES_4
-	dAssert(0);
-#else
-	m_indexCount = indexCount;
-	if (m_indexes) 
-	{
-		delete[] m_indexes;
-	}
-	m_indexes = new unsigned [m_indexCount]; 
-#endif
-}
-
 ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
 	,m_points(nullptr)
-#ifdef USING_GLES_4
 	,m_indexCount(0)
 	,m_indexArray(nullptr)
 	,m_shader(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
-#else
-	,m_optimizedOpaqueDiplayList(0)	
-	,m_optimizedTransparentDiplayList(0)
-#endif
 {
 }
 
@@ -251,11 +158,7 @@ ndDemoMesh::ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshN
 			segment->m_specular = material->GetSpecularColor();
 			segment->SetOpacity(material->GetOpacity());
 
-			#ifdef USING_GLES_4
-				segment->m_shader = shaderCache.m_diffuseEffect;
-			#else
-				segment->m_shader = shaderCache.m_diffuseEffectOld;
-			#endif
+			segment->m_shader = shaderCache.m_diffuseEffect;
 		}
 
 		segment->AllocIndexData (indexCount);
@@ -310,11 +213,7 @@ ndDemoMesh::ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCac
 		// for 16 bit indices meshes
 		//NewtonMeshMaterialGetIndexStreamShort (mesh, meshCookie, handle, (short int*)segment->m_indexes); 
 
-		#ifdef USING_GLES_4
-			segment->m_shader = shaderCache.m_diffuseEffect;
-		#else
-			segment->m_shader = shaderCache.m_diffuseEffectOld;
-		#endif
+		segment->m_shader = shaderCache.m_diffuseEffect;
 
 		// for 32 bit indices mesh
 		NewtonMeshMaterialGetIndexStream (mesh, meshCookie, handle, (int*)segment->m_indexes); 
@@ -331,17 +230,12 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCac
 	,dList<ndDemoSubMesh>()
 	,m_points(nullptr)
 	,m_vertexCount(0)
-#ifdef USING_GLES_4
 	,m_indexCount(0)
 	,m_indexArray(nullptr)
 	,m_shader(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
-#else
-	,m_optimizedOpaqueDiplayList(0)
-	,m_optimizedTransparentDiplayList(0)
-#endif
 {
 	dAssert(0);
 	//AllocVertexData(mesh.m_vertexCount);
@@ -377,17 +271,12 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,dList<ndDemoSubMesh>()
 	,m_points(nullptr)
 	,m_vertexCount(0)
-#ifdef USING_GLES_4
 	,m_indexCount(0)
 	,m_indexArray(nullptr)
 	,m_shader(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
-#else
-	,m_optimizedOpaqueDiplayList(0)
-	,m_optimizedTransparentDiplayList(0)
-#endif
 {
 	// create a helper mesh from the collision collision
 	//NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
@@ -399,9 +288,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	//dMatrix aligmentUV (collision->GetLocalMatrix());
 	//aligmentUV = aligmentUV.Inverse();
 
-#ifdef USING_GLES_4
 	m_shader = shaderCache.m_diffuseEffect;
-#endif
 
 	// apply uv projections
 	ndShapeInfo info (collision->GetShapeInfo());
@@ -448,16 +335,12 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 
 	// extract vertex data  from the newton mesh		
 	int vertexCount = mesh.GetPropertiesCount(); 
-#ifndef USING_GLES_4
-	AllocVertexData(vertexCount);
-#else
 	int indexCount = 0;
 	for (int handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
 	{
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
 	AllocVertexData(vertexCount, indexCount);
-#endif
 
 	//mesh.GetVertexChannel(3 * sizeof (dFloat32), (dFloat32*)m_vertex);
 	//mesh.GetNormalChannel(3 * sizeof (dFloat32), (dFloat32*)m_normal);
@@ -476,18 +359,12 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 		segment->SetOpacity(opacity);
 		
 		segment->m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
-#ifdef USING_GLES_4
+
 		segment->m_segmentStart = segmentStart;
 		mesh.GetMaterialGetIndexStream(geometryHandle, handle, (int*)&m_indexArray[segmentStart]);
-#else
-		segment->m_shader = shaderCache.m_diffuseEffectOld;
-		segment->AllocIndexData(segment->m_indexCount);
-		mesh.GetMaterialGetIndexStream(geometryHandle, handle, (int*)segment->m_indexes);
-#endif
 		segmentStart += segment->m_indexCount;
 	}
 
-	//NewtonMeshEndHandle (mesh, geometryHandle); 
 	mesh.MaterialGeomteryEnd(geometryHandle);
 
 	// optimize this mesh for hardware buffers if possible
@@ -499,41 +376,30 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,dList<ndDemoSubMesh>()
 	,m_points(nullptr)
 	,m_vertexCount(0)
-#ifdef USING_GLES_4
 	,m_indexCount(0)
 	,m_indexArray(nullptr)
 	,m_shader(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
-#else
-	, m_optimizedOpaqueDiplayList(0)
-	, m_optimizedTransparentDiplayList(0)
-#endif
 {
 	ndShapeInstanceMeshBuilder mesh(*collision);
 
 	//mesh.CalculateNormals(30.0f * dDegreeToRad);
-
-#ifdef USING_GLES_4
 	m_shader = shaderCache.m_diffuseEffect;
-#endif
 
 	// extract the materials index array for mesh
 	ndIndexArray* const geometryHandle = mesh.MaterialGeometryBegin();
 
 	// extract vertex data  from the newton mesh		
 	int vertexCount = mesh.GetPropertiesCount();
-#ifndef USING_GLES_4
-	AllocVertexData(vertexCount);
-#else
+
 	int indexCount = 0;
 	for (int handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
 	{
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
 	AllocVertexData(vertexCount, indexCount);
-#endif
 
 	mesh.GetVertexChannel(sizeof(ndMeshPoint), &m_points[0].m_posit.m_x);
 	mesh.GetNormalChannel(sizeof(ndMeshPoint), &m_points[0].m_normal.m_x);
@@ -549,14 +415,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 //		segment->SetOpacity(opacity);
 
 		segment->m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
-#ifdef USING_GLES_4
 		segment->m_segmentStart = segmentStart;
 		mesh.GetMaterialGetIndexStream(geometryHandle, handle, (int*)&m_indexArray[segmentStart]);
-#else
-		segment->m_shader = shaderCache.m_diffuseEffectOld;
-		segment->AllocIndexData(segment->m_indexCount);
-		mesh.GetMaterialGetIndexStream(geometryHandle, handle, (int*)segment->m_indexes);
-#endif
 		segmentStart += segment->m_indexCount;
 	}
 
@@ -573,17 +433,12 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,dList<ndDemoSubMesh>()
 	,m_points(nullptr)
 	,m_vertexCount(0)
-#ifdef USING_GLES_4
 	,m_indexCount(0)
 	,m_indexArray(nullptr)
 	,m_shader(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
-#else
-	,m_optimizedOpaqueDiplayList(0)
-	,m_optimizedTransparentDiplayList(0)
-#endif
 {
 	dAssert(0);
 /*
@@ -701,12 +556,10 @@ ndDemoMesh::~ndDemoMesh()
 		dMemory::Free(m_points);
 	}
 
-#ifdef USING_GLES_4
 	if (m_indexArray)
 	{
 		dMemory::Free(m_indexArray);
 	}
-#endif
 
 	ResetOptimization();
 }
@@ -907,23 +760,20 @@ void ndDemoMesh::OptimizeForRender()
 	// first make sure the previous optimization is removed
 	ResetOptimization();
 	
-#ifdef USING_GLES_4
 	if (m_indexCount > 128 * 128 * 6)
 	{
 		dAssert(0);
-	}
-#else
-	dListNode* nextNode;
-	for (dListNode* node = GetFirst(); node; node = nextNode) 
-	{
-		ndDemoSubMesh& segment = node->GetInfo();
-		nextNode = node->GetNext();
-		if (segment.m_indexCount > 128 * 128 * 6) 
+		dListNode* nextNode;
+		for (dListNode* node = GetFirst(); node; node = nextNode)
 		{
-			SpliteSegment(node, 128 * 128 * 6);
+			ndDemoSubMesh& segment = node->GetInfo();
+			nextNode = node->GetNext();
+			if (segment.m_indexCount > 128 * 128 * 6)
+			{
+				SpliteSegment(node, 128 * 128 * 6);
+			}
 		}
 	}
-#endif
 
 	bool isOpaque = false;
 	bool hasTranparency = false;
@@ -937,8 +787,6 @@ void ndDemoMesh::OptimizeForRender()
 
 	if (isOpaque) 
 	{
-#ifdef USING_GLES_4
-
 		glGenVertexArrays(1, &m_vetextArrayBuffer);
 		glBindVertexArray(m_vetextArrayBuffer);
 
@@ -968,21 +816,6 @@ void ndDemoMesh::OptimizeForRender()
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-#else
-		m_optimizedOpaqueDiplayList = glGenLists(1);
-
-		glNewList(m_optimizedOpaqueDiplayList, GL_COMPILE);
-		for (dListNode* node = GetFirst(); node; node = node->GetNext()) 
-		{
-			ndDemoSubMesh& segment = node->GetInfo();
-			if (segment.m_opacity > 0.999f) 
-			{
-				segment.OptimizeForRender(this);
-			}
-		}
-		glEndList();
-#endif
 	}
 
 	if (hasTranparency) 
@@ -1011,29 +844,14 @@ void ndDemoMesh::OptimizeForRender()
 
 void  ndDemoMesh::ResetOptimization()
 {
-#ifdef USING_GLES_4
 	if (m_vetextArrayBuffer)
 	{
 		glDeleteBuffers(1, &m_indexBuffer);
 		glDeleteBuffers(1, &m_vertexBuffer);
 		glDeleteVertexArrays(1, &m_vetextArrayBuffer);
 	}
-#else
-	if (m_optimizedOpaqueDiplayList) 
-	{
-		glDeleteLists(m_optimizedOpaqueDiplayList, 1);
-		m_optimizedOpaqueDiplayList = 0;
-	}
-
-	if (m_optimizedTransparentDiplayList) 
-	{
-		glDeleteLists(m_optimizedTransparentDiplayList, 1);
-		m_optimizedTransparentDiplayList = 0;
-	}
-#endif
 }
 
-#ifdef USING_GLES_4
 void ndDemoMesh::AllocVertexData(int vertexCount, int indexCount)
 {
 	m_vertexCount = vertexCount;
@@ -1044,14 +862,6 @@ void ndDemoMesh::AllocVertexData(int vertexCount, int indexCount)
 	m_indexArray = (GLuint*)dMemory::Malloc(m_indexCount * sizeof(GLuint));
 	memset(m_indexArray, 0, m_indexCount * sizeof(GLuint));
 }
-#else
-void ndDemoMesh::AllocVertexData (int vertexCount)
-{
-	m_vertexCount = vertexCount;
-	m_points = (ndMeshPoint*)dMemory::Malloc(m_vertexCount * sizeof(ndMeshPoint));
-	memset (m_points, 0, m_vertexCount * sizeof (ndMeshPoint));
-}
-#endif
 
 ndDemoSubMesh* ndDemoMesh::AddSubMesh()
 {
@@ -1542,8 +1352,6 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 {
 	if (m_isVisible)
 	{
-#ifdef USING_GLES_4
-
 		glUseProgram(m_shader);
 
 		ndDemoCamera* const camera = scene->GetCamera();
@@ -1598,16 +1406,9 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 		glBindVertexArray(0);
 		glUseProgram(0);
 
-#else
-		if (m_optimizedTransparentDiplayList)
-		{
-			scene->PushTransparentMesh(this);
-		}
-
-		if (m_optimizedOpaqueDiplayList)
-		{
-			glCallList(m_optimizedOpaqueDiplayList);
-		}
-#endif
+		//if (m_optimizedTransparentDiplayList)
+		//{
+		//	scene->PushTransparentMesh(this);
+		//}
 	}
 }

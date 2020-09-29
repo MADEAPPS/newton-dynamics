@@ -9,18 +9,6 @@
 * freely
 */
 
-//********************************************************************
-// Newton Game dynamics 
-// copyright 2000-2004
-// By Julio Jerez
-// VC: 6.0
-// 
-//********************************************************************
-
-
-// RenderPrimitive.cpp: implementation of the RenderPrimitive class.
-//
-//////////////////////////////////////////////////////////////////////
 
 #ifndef __SHADERS_PROGRAMS__
 #define __SHADERS_PROGRAMS__
@@ -46,7 +34,6 @@ class ndShaderPrograms
 	GLuint m_texturedDecal;
 	GLuint m_decalEffect;
 	GLuint m_diffuseEffect;
-	GLuint m_diffuseEffectOld;
 	GLuint m_diffuseIntanceEffect;
 	GLuint m_skinningDiffuseEffect;
 	GLuint m_diffuseNoTextureEffect;

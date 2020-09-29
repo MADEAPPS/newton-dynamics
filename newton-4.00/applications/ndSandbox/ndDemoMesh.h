@@ -24,11 +24,6 @@ class ndDemoSubMesh
 	public:
 	ndDemoSubMesh();
 	~ndDemoSubMesh();
-
-	void Render() const;
-	void AllocIndexData(int indexCount);
-	void OptimizeForRender(const ndDemoMesh* const mesh) const;
-
 	void SetOpacity(dFloat32 opacity);
 
 	dVector m_ambient;
@@ -39,12 +34,7 @@ class ndDemoSubMesh
 	dFloat32 m_shiness;
 	GLuint m_textureHandle;
 	int m_indexCount;
-#ifdef USING_GLES_4
 	dInt32 m_segmentStart;
-#else
-	unsigned m_shader;
-	unsigned *m_indexes;
-#endif
 };
 
 class ndDemoMeshInterface: public dClassAlloc, public dRefCounter<ndDemoMeshInterface>
@@ -85,11 +75,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	}
 
 	ndDemoSubMesh* AddSubMesh();
-#ifndef USING_GLES_4
-	void AllocVertexData(int vertexCount);
-#else
 	void AllocVertexData(int vertexCount, int indexCount);
-#endif
 	virtual const dString& GetTextureName (const ndDemoSubMesh* const subMesh) const;
 
 	virtual void RenderTransparency () const;
@@ -130,18 +116,12 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	ndMeshPoint* m_points;
 	int m_vertexCount;
 
-#ifdef USING_GLES_4
 	dInt32 m_indexCount;
 	GLuint* m_indexArray;
-
 	GLuint m_shader;
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
 	GLuint m_vetextArrayBuffer;
-#else
-	unsigned m_optimizedOpaqueDiplayList;
-	unsigned m_optimizedTransparentDiplayList;		
-#endif
 };
 
 class ndDemoSkinMesh: public ndDemoMeshInterface
