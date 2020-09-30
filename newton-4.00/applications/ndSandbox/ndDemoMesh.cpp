@@ -1353,54 +1353,53 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 
 		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceVertex)
 		{
-			m_faces.PushBack(vertexCount);
 			dVector p0(faceVertex[0]);
 			dVector p1(faceVertex[1]);
 			dVector p2(faceVertex[2]);
 			
 			dVector normal((p1 - p0).CrossProduct(p2 - p0));
 			normal = normal.Normalize();
-			for (dInt32 i = 0; i < vertexCount; i++)
+			for (dInt32 i = 2; i < vertexCount; i++)
 			{
 				ndPointNormal point;
+				point.m_posit.m_x = faceVertex[0].m_x;
+				point.m_posit.m_y = faceVertex[0].m_y;
+				point.m_posit.m_z = faceVertex[0].m_z;
+				point.m_normal.m_x = normal.m_x;
+				point.m_normal.m_y = normal.m_y;
+				point.m_normal.m_z = normal.m_z;
+				m_triangles.PushBack(point);
+
+				point.m_posit.m_x = faceVertex[i - 1].m_x;
+				point.m_posit.m_y = faceVertex[i - 1].m_y;
+				point.m_posit.m_z = faceVertex[i - 1].m_z;
+				point.m_normal.m_x = normal.m_x;
+				point.m_normal.m_y = normal.m_y;
+				point.m_normal.m_z = normal.m_z;
+				m_triangles.PushBack(point);
+
 				point.m_posit.m_x = faceVertex[i].m_x;
 				point.m_posit.m_y = faceVertex[i].m_y;
 				point.m_posit.m_z = faceVertex[i].m_z;
 				point.m_normal.m_x = normal.m_x;
 				point.m_normal.m_y = normal.m_y;
 				point.m_normal.m_z = normal.m_z;
-				m_points.PushBack(point);
+				m_triangles.PushBack(point);
 			}
 		}
-
-		dArray<dInt32> m_faces;
-		dArray<ndPointNormal> m_points;
+				
+		dArray<ndPointNormal> m_triangles;
 	};
 
 	ndDrawShape drawShapes;
 	collision->DebugShape(dGetIdentityMatrix(), drawShapes);
-	
-	m_shader = shaderCache.m_flatShaded;
-	m_vertextCount = drawShapes.m_points.GetCount();
 
 	dArray<dInt32> m_triangles;
-	dInt32 acc = 0;
-	dInt32 indexCount = 0;
-	for (int i = 0; i < drawShapes.m_faces.GetCount(); i++)
-	{
-		dInt32 pointCount = drawShapes.m_faces[i];
-		for (dInt32 j = 2; j < pointCount; j++)
-		{
-			dInt32 j1 = acc + j - 1;
-			dInt32 j2 = acc + j;
-			m_triangles.PushBack(acc);
-			m_triangles.PushBack(j1);
-			m_triangles.PushBack(j2);
-			indexCount += 3;
-		}
-		acc += pointCount;
-	}
-	m_indexCount = indexCount;
+	m_triangles.SetCount(drawShapes.m_triangles.GetCount());
+	dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_triangles[0].m_posit.m_x, sizeof(ndPointNormal), sizeof(ndPointNormal), 0, drawShapes.m_triangles.GetCount(), &m_triangles[0], dFloat32(1.0e-6f));
+	
+	m_shader = shaderCache.m_flatShaded;
+	m_indexCount = m_triangles.GetCount();
 
 	m_color = dVector(1.0f);
 	glGenVertexArrays(1, &m_vetextArrayBuffer);
@@ -1409,7 +1408,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
-	glBufferData(GL_ARRAY_BUFFER, m_vertextCount * sizeof(ndPointNormal), &drawShapes.m_points[0].m_posit.m_x, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(ndPointNormal), &drawShapes.m_triangles[0].m_posit.m_x, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndPointNormal), (void*)0);
@@ -1419,7 +1418,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 
 	glGenBuffers(1, &m_triangleIndexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, acc * sizeof(GLuint), &m_triangles[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indexCount * sizeof(GLuint), &m_triangles[0], GL_STATIC_DRAW);
 	
 	glBindVertexArray(0);
 	

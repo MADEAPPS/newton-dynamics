@@ -116,6 +116,8 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 	glfwInit();
 
+	glfwWindowHint(GLFW_SAMPLES, 4);
+
 	m_hasJoytick = glfwJoystickPresent(0) ?  true : false;
 
 	char version[256];
@@ -184,8 +186,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	glfwSetScrollCallback(m_mainFrame, MouseScrollCallback);
 	glfwSetCursorPosCallback(m_mainFrame, CursorposCallback);
 	glfwSetMouseButtonCallback(m_mainFrame, MouseButtonCallback);
-
-	//glfwWindowHint(GLFW_SAMPLES, 8);
+		
 
 	LoadFont();
 

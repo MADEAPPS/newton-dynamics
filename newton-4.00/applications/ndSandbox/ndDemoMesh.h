@@ -185,7 +185,6 @@ class ndFlatShadedDebugMesh: public ndDemoMeshInterface
 
 	dVector m_color;
 	dInt32 m_indexCount;
-	dInt32 m_vertextCount;
 	dInt32 m_shadeColorLocation;
 	dInt32 m_normalMatrixLocation;
 	dInt32 m_projectMatrixLocation;
