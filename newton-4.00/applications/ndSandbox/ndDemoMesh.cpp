@@ -1512,16 +1512,40 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 	ndDrawShape drawShapes;
 	collision->DebugShape(dGetIdentityMatrix(), drawShapes);
 
-	m_shader = shaderCache.m_wireFrame;
-	m_vertextCount = drawShapes.m_lines.GetCount();
-
 	dArray<dInt32> m_lines;
-	for (dInt32 i = 0; i < m_vertextCount; i++)
-	{
-		m_lines.PushBack(i);
-	}
-	m_indexCount = m_lines.GetCount();
+	m_lines.SetCount(drawShapes.m_lines.GetCount());
+	dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_lines[0].m_x, sizeof(ndMeshVector), sizeof(ndMeshVector), 0, drawShapes.m_lines.GetCount(), &m_lines[0], dFloat32(1.0e-6f));
 
+	m_indexCount = m_lines.GetCount();
+	dTree<dUnsigned64, dUnsigned64> filter;
+	for (dInt32 i = m_lines.GetCount() - 1; i >= 0; i -= 2)
+	{
+		union
+		{
+			dUnsigned64 m_key;
+			struct
+			{
+				dUnsigned32 m_low;
+				dUnsigned32 m_high;
+			};
+		} key;
+		dInt32 i0 = m_lines[i - 1];
+		dInt32 i1 = m_lines[i - 0];
+		key.m_low = dMin(i0, i1);
+		key.m_high = dMax(i0, i1);
+		if (filter.Find(key.m_key))
+		{
+			m_lines[i - 1] = m_lines[m_indexCount - 2];
+			m_lines[i - 0] = m_lines[m_indexCount - 1];
+			m_indexCount -= 2;
+		}
+		else 
+		{
+			filter.Insert(key.m_key, key.m_key);
+		}
+	}
+
+	m_shader = shaderCache.m_wireFrame;
 	m_color = dVector(1.0f);
 	glGenVertexArrays(1, &m_vetextArrayBuffer);
 	glBindVertexArray(m_vetextArrayBuffer);
@@ -1529,7 +1553,7 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
-	glBufferData(GL_ARRAY_BUFFER, m_vertextCount * sizeof(ndMeshVector), &drawShapes.m_lines[0].m_x, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexCount * sizeof(ndMeshVector), &drawShapes.m_lines[0].m_x, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshVector), (void*)0);
