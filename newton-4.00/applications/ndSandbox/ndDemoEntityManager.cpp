@@ -185,6 +185,8 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	glfwSetCursorPosCallback(m_mainFrame, CursorposCallback);
 	glfwSetMouseButtonCallback(m_mainFrame, MouseButtonCallback);
 
+	//glfwWindowHint(GLFW_SAMPLES, 4);
+
 	LoadFont();
 
 	m_mousePressed[0] = false;
@@ -1497,6 +1499,25 @@ void ndDemoEntityManager::DrawDebugShapes()
 
 
 	const ndBodyList& bodyList = m_world->GetBodyList();
+
+	if (m_collisionDisplayMode == 2)
+	{
+		// do a z buffer pre pass for hidden line 
+		glColorMask(0, 0, 0, 0);
+		for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+		{
+			ndBodyKinematic* const body = bodyNode->GetInfo();
+			const ndShapeInstance& shapeInstance = body->GetCollisionShape();
+			ndDebugMeshCache::dTreeNode* const shapeNode = m_debugShapeCache.Find(shapeInstance.GetShape());
+			if (shapeNode)
+			{
+				dMatrix matrix(shapeInstance.GetLocalMatrix() * body->GetMatrix());
+				shapeNode->GetInfo().m_flatShaded->Render(this, matrix);
+			}
+		}
+		glColorMask(1, 1, 1, 1);
+	}
+
 	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
@@ -1524,6 +1545,11 @@ void ndDemoEntityManager::DrawDebugShapes()
 		{
 			ndWireFrameDebugMesh* const mesh = shapeNode->GetInfo().m_wireFrame;
 			mesh->SetColor(color);
+
+			glColorMask(0, 0, 0, 0);
+			shapeNode->GetInfo().m_flatShaded->Render(this, matrix);
+			glColorMask(1, 1, 1, 1);
+
 			mesh->Render(this, matrix);
 		}
 		else

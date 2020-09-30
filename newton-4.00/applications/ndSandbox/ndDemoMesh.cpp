@@ -1591,6 +1591,7 @@ void ndWireFrameDebugMesh::Render(ndDemoEntityManager* const scene, const dMatri
 	dMatrix projectionViewModelMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glDepthFunc(GL_LESS);
 
 	glUseProgram(m_shader);
 	glUniform4fv(m_shadeColorLocation, 1, &m_color.m_x);
@@ -1606,5 +1607,7 @@ void ndWireFrameDebugMesh::Render(ndDemoEntityManager* const scene, const dMatri
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);
 	glUseProgram(0);
+
+	//glDepthFunc(GL_EQUAL);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
