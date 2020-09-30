@@ -18,12 +18,6 @@
 #include <dMatrix.h>
 
 
-enum dDebugDisplayMode
-{
-	m_lines,
-	m_solid,
-};
-
 #if 0
 class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
 {
@@ -134,7 +128,6 @@ void ClearDebugDisplay(NewtonWorld* const world);
 void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const NewtonBody* const body, int faceID, int vertexCount, const dFloat32* const vertex, int vertexstrideInBytes);
 #endif
 
-void DebugRenderWorldCollision(const ndWorld* const world, dDebugDisplayMode mode);
 
 #endif
 
