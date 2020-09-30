@@ -867,10 +867,6 @@ ndDemoBezierCurve::ndDemoBezierCurve (const dBezierSpline& curve)
 	m_isVisible = false;
 }
 
-void ndDemoBezierCurve::RenderTransparency () const
-{
-}
-
 /*
 NewtonMesh* ndDemoBezierCurve::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix)
 {
@@ -878,9 +874,6 @@ NewtonMesh* ndDemoBezierCurve::CreateNewtonMesh(NewtonWorld* const world, const 
 	return nullptr;
 }
 */
-void ndDemoBezierCurve::RenderNormals ()
-{
-}	
 
 int ndDemoBezierCurve::GetRenderResolution () const
 {
@@ -1258,15 +1251,6 @@ dGeometryNodeSkinClusterInfo* ndDemoSkinMesh::FindSkinModifier(dScene* const sce
 }
 */
 
-void ndDemoSkinMesh::RenderTransparency () const
-{
-	m_mesh->RenderTransparency();
-}
-
-void ndDemoSkinMesh::RenderNormals ()
-{
-	m_mesh->RenderNormals();
-}
 
 /*
 NewtonMesh* ndDemoSkinMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix)
@@ -1356,17 +1340,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 	}
 }
 
-ndWireFrameCollisionMesh::~ndWireFrameCollisionMesh()
-{
-	if (m_vetextArrayBuffer)
-	{
-		glDeleteBuffers(1, &m_triangleIndexBuffer);
-		glDeleteBuffers(1, &m_vertexBuffer);
-		glDeleteVertexArrays(1, &m_vetextArrayBuffer);
-	}
-}
-
-ndWireFrameCollisionMesh::ndWireFrameCollisionMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision)
+ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision)
 	:ndDemoMeshInterface()
 {
 	class ndDrawShape : public ndShapeDebugCallback
@@ -1428,6 +1402,7 @@ ndWireFrameCollisionMesh::ndWireFrameCollisionMesh(const ndShaderPrograms& shade
 	}
 	m_indexCount = indexCount;
 
+	m_color = dVector(1.0f);
 	glGenVertexArrays(1, &m_vetextArrayBuffer);
 	glBindVertexArray(m_vetextArrayBuffer);
 
@@ -1452,25 +1427,39 @@ ndWireFrameCollisionMesh::ndWireFrameCollisionMesh(const ndShaderPrograms& shade
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glUseProgram(m_shader);
+	m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
+	m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
+	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+	glUseProgram(0);
 }
 
-void ndWireFrameCollisionMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+ndFlatShadedDebugMesh::~ndFlatShadedDebugMesh()
+{
+	if (m_vetextArrayBuffer)
+	{
+		glDeleteBuffers(1, &m_triangleIndexBuffer);
+		glDeleteBuffers(1, &m_vertexBuffer);
+		glDeleteVertexArrays(1, &m_vetextArrayBuffer);
+	}
+}
+
+void ndFlatShadedDebugMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
 	glUseProgram(m_shader);
 
 	ndDemoCamera* const camera = scene->GetCamera();
 
-	dInt32 normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
-	dInt32 projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
-	dInt32 viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
-
 	const dMatrix& viewMatrix = camera->GetViewMatrix();
 	const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
 	dMatrix viewModelMatrix(modelMatrix * viewMatrix);
 
-	glUniformMatrix4fv(normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-	glUniformMatrix4fv(projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
-	glUniformMatrix4fv(viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniform4fv(m_shadeColorLocation, 1, &m_color.m_x);
+	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 
 	glBindVertexArray(m_vetextArrayBuffer);
 	glEnableVertexAttribArray(0);
@@ -1484,4 +1473,141 @@ void ndWireFrameCollisionMesh::Render(ndDemoEntityManager* const scene, const dM
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);
 	glUseProgram(0);
+}
+
+
+ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision)
+	:ndDemoMeshInterface()
+{
+	class ndDrawShape : public ndShapeDebugCallback
+	{
+		public:
+		ndDrawShape()
+			:ndShapeDebugCallback()
+		{
+		}
+
+		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceVertex)
+		{
+			m_faces.PushBack(vertexCount);
+			dVector p0(faceVertex[0]);
+			dVector p1(faceVertex[1]);
+			dVector p2(faceVertex[2]);
+
+			dVector normal((p1 - p0).CrossProduct(p2 - p0));
+			normal = normal.Normalize();
+			for (int i = 0; i < vertexCount; i++)
+			{
+				ndPointNormal point;
+				point.m_posit.m_x = faceVertex[i].m_x;
+				point.m_posit.m_y = faceVertex[i].m_y;
+				point.m_posit.m_z = faceVertex[i].m_z;
+				point.m_normal.m_x = normal.m_x;
+				point.m_normal.m_y = normal.m_y;
+				point.m_normal.m_z = normal.m_z;
+				m_points.PushBack(point);
+			}
+		}
+
+		dArray<dInt32> m_faces;
+		dArray<ndPointNormal> m_points;
+	};
+
+	ndDrawShape drawShapes;
+	collision->DebugShape(dGetIdentityMatrix(), drawShapes);
+
+	m_shader = shaderCache.m_wireFrame;
+	m_vertextCount = drawShapes.m_points.GetCount();
+
+	dArray<dInt32> m_triangles;
+	dInt32 acc = 0;
+	dInt32 indexCount = 0;
+	for (int i = 0; i < drawShapes.m_faces.GetCount(); i++)
+	{
+		dInt32 pointCount = drawShapes.m_faces[i];
+		for (int j = 2; j < pointCount; j++)
+		{
+			int j1 = acc + j - 1;
+			int j2 = acc + j;
+			m_triangles.PushBack(acc);
+			m_triangles.PushBack(j1);
+			m_triangles.PushBack(j2);
+			indexCount += 3;
+		}
+		acc += pointCount;
+	}
+	m_indexCount = indexCount;
+
+	m_color = dVector(1.0f);
+	glGenVertexArrays(1, &m_vetextArrayBuffer);
+	glBindVertexArray(m_vetextArrayBuffer);
+
+	glGenBuffers(1, &m_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+	glBufferData(GL_ARRAY_BUFFER, m_vertextCount * sizeof(ndPointNormal), &drawShapes.m_points[0].m_posit.m_x, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndPointNormal), (void*)0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndPointNormal), (void*)sizeof(ndMeshVector));
+
+	glGenBuffers(1, &m_triangleIndexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, acc * sizeof(GLuint), &m_triangles[0], GL_STATIC_DRAW);
+
+	glBindVertexArray(0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glUseProgram(m_shader);
+	m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
+	m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
+	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+	glUseProgram(0);
+}
+
+ndWireFrameDebugMesh::~ndWireFrameDebugMesh()
+{
+	if (m_vetextArrayBuffer)
+	{
+		glDeleteBuffers(1, &m_triangleIndexBuffer);
+		glDeleteBuffers(1, &m_vertexBuffer);
+		glDeleteVertexArrays(1, &m_vetextArrayBuffer);
+	}
+}
+
+void ndWireFrameDebugMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+{
+	ndDemoCamera* const camera = scene->GetCamera();
+	const dMatrix& viewMatrix = camera->GetViewMatrix();
+	const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
+	dMatrix viewModelMatrix(modelMatrix * viewMatrix);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	glUseProgram(m_shader);
+	glUniform4fv(m_shadeColorLocation, 1, &m_color.m_x);
+	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+
+	glBindVertexArray(m_vetextArrayBuffer);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
+	glBindVertexArray(0);
+	glUseProgram(0);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }

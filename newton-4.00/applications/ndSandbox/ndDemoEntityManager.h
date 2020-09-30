@@ -22,7 +22,8 @@ class ndDemoCamera;
 class ndPhysicsWorld;
 class ndDemoMeshInterface;
 class ndDemoCameraManager;
-class ndWireFrameCollisionMesh;
+class ndWireFrameDebugMesh;
+class ndFlatShadedDebugMesh;
 
 class ndDemoEntityManager: public dList <ndDemoEntity*>
 {
@@ -91,9 +92,17 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 		bool m_memory1;
 	};
 
-	//class EntityDictionary: public dTree<ndDemoEntity*, dScene::dTreeNode*>
-	//{
-	//};
+	class ndDebuMesh
+	{
+		public:
+		ndWireFrameDebugMesh* m_wireFrame;
+		ndFlatShadedDebugMesh* m_flatShaded;
+	};
+
+	class ndDebugMeshCache: public dTree<ndDebuMesh, const ndShape*>
+	{
+	};
+	
 
 	ndDemoEntityManager ();
 	~ndDemoEntityManager ();
@@ -233,7 +242,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool m_profilerMode;
 
 	ndLightSource m_directionalLight;
-	dTree<ndWireFrameCollisionMesh*, const ndShape*> m_debugShapeCache;
+	ndDebugMeshCache m_debugShapeCache;
 
 	static SDKDemos m_demosSelection[];
 	friend class ndPhysicsWorld;

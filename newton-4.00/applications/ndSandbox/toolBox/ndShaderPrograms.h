@@ -31,9 +31,10 @@ class ndShaderPrograms
 
 	public:
 	GLuint m_skyBox;
+	GLuint m_wireFrame;
 	GLuint m_flatShaded;
-	GLuint m_texturedDecal;
 	GLuint m_decalEffect;
+	GLuint m_texturedDecal;
 	GLuint m_diffuseEffect;
 	GLuint m_diffuseIntanceEffect;
 	GLuint m_skinningDiffuseEffect;

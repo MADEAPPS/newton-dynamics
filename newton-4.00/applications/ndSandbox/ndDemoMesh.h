@@ -73,15 +73,12 @@ class ndDemoMeshInterface: public dClassAlloc, public dRefCounter<ndDemoMeshInte
 
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner) { dAssert(0); return nullptr; }
 
-	virtual void RenderTransparency () const = 0;
 	virtual void Render (ndDemoEntityManager* const scene, const dMatrix& modelMatrix) = 0;
-	virtual void RenderNormals () = 0;
 	//virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix) = 0;
 
 	dString m_name;
 	bool m_isVisible;
 };
-
 
 class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 {
@@ -140,8 +137,6 @@ class ndDemoSkinMesh: public ndDemoMeshInterface
 	~ndDemoSkinMesh();
 
 	void Render (ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
-	void RenderNormals ();
-	void RenderTransparency () const;
 	//NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
 
 	protected: 
@@ -167,9 +162,8 @@ class ndDemoBezierCurve: public ndDemoMeshInterface
 	int GetRenderResolution() const;
 	void SetRenderResolution(int breaks);
 
-	virtual void RenderTransparency() const;
 	virtual void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
-	virtual void RenderNormals();
+
 
 	//virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
 
@@ -177,25 +171,57 @@ class ndDemoBezierCurve: public ndDemoMeshInterface
 	int m_renderResolution;
 };
 
-class ndWireFrameCollisionMesh: public ndDemoMeshInterface
+class ndFlatShadedDebugMesh: public ndDemoMeshInterface
 {
 	public:
-	ndWireFrameCollisionMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision);
-	~ndWireFrameCollisionMesh();
+	ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision);
+	~ndFlatShadedDebugMesh();
 
-	virtual void RenderNormals() {}
-	virtual void RenderTransparency() const {}
-	virtual void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+	void SetColor(const dVector& color)
+	{
+		m_color = color;
+	}
+	void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 
+	dVector m_color;
 	dInt32 m_indexCount;
 	dInt32 m_vertextCount;
-	
+	dInt32 m_shadeColorLocation;
+	dInt32 m_normalMatrixLocation;
+	dInt32 m_projectMatrixLocation;
+	dInt32 m_viewModelMatrixLocation;
+
 	GLuint m_shader;
 	GLuint m_vertexBuffer;
 	GLuint m_vetextArrayBuffer;
 	GLuint m_triangleIndexBuffer;
 };
 
+class ndWireFrameDebugMesh: public ndDemoMeshInterface
+{
+	public:
+	ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision);
+	~ndWireFrameDebugMesh();
+
+	void SetColor(const dVector& color)
+	{
+		m_color = color;
+	}
+	void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+
+	dVector m_color;
+	dInt32 m_indexCount;
+	dInt32 m_vertextCount;
+	dInt32 m_shadeColorLocation;
+	dInt32 m_normalMatrixLocation;
+	dInt32 m_projectMatrixLocation;
+	dInt32 m_viewModelMatrixLocation;
+
+	GLuint m_shader;
+	GLuint m_vertexBuffer;
+	GLuint m_vetextArrayBuffer;
+	GLuint m_triangleIndexBuffer;
+};
 
 #endif 
 

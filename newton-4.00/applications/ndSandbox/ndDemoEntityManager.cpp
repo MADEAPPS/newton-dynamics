@@ -397,8 +397,9 @@ void ndDemoEntityManager::Cleanup ()
 
 	while (m_debugShapeCache.GetRoot())
 	{
-		dTree<ndWireFrameCollisionMesh*, const ndShape*>::dTreeNode* const root = m_debugShapeCache.GetRoot();
-		root->GetInfo()->Release();
+		ndDebugMeshCache::dTreeNode* const root = m_debugShapeCache.GetRoot();
+		root->GetInfo().m_wireFrame->Release();
+		root->GetInfo().m_flatShaded->Release();
 		m_debugShapeCache.Remove(root);
 	}
 
@@ -1490,28 +1491,46 @@ void ndDemoEntityManager::DrawDebugShapes()
 	//dDebugDisplayMode mode = (m_collisionDisplayMode == 1) ? m_solid : m_lines;
 	//DebugRenderWorldCollision(m_world, mode);
 
-	dVector scale(1.0f);
+	//dVector scale(1.0f);
+	const dVector awakeColor(1.0f, 1.0f, 1.0f, 1.0f);
+	const dVector sleepColor(0.42f, 0.73f, 0.98f, 1.0f);
 
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	const ndBodyList& bodyList = m_world->GetBodyList();
 	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
 		const ndShapeInstance& shapeInstance = body->GetCollisionShape();
 		const ndShape* const key = shapeInstance.GetShape();
-		dTree<ndWireFrameCollisionMesh*, const ndShape*>::dTreeNode* shapeNode = m_debugShapeCache.Find(key);
+
+		ndDebugMeshCache::dTreeNode* shapeNode = m_debugShapeCache.Find(key);
 		if (!shapeNode)
 		{
 			ndShapeInstance shape(body->GetCollisionShape());
-			shape.SetScale(dVector(1.0));
-			ndWireFrameCollisionMesh* const mesh = new ndWireFrameCollisionMesh(m_shaderCache, &shape);
-			shapeNode = m_debugShapeCache.Insert(mesh, key);
+			shape.SetScale(dVector(1.0f));
+
+			ndDebuMesh debugMesh;
+			debugMesh.m_flatShaded = new ndFlatShadedDebugMesh(m_shaderCache, &shape);
+			debugMesh.m_wireFrame = new ndWireFrameDebugMesh(m_shaderCache, &shape);
+			shapeNode = m_debugShapeCache.Insert(debugMesh, key);
 		}
 
 		dMatrix matrix(shapeInstance.GetLocalMatrix() * body->GetMatrix());
-		ndWireFrameCollisionMesh* const mesh = shapeNode->GetInfo();
 
-		mesh->Render(this, matrix);
+		int sleepState = body->GetSleepState();
+		dVector color((sleepState == 1) ? sleepColor : awakeColor);
+
+		if (m_collisionDisplayMode == 2)
+		{
+			ndWireFrameDebugMesh* const mesh = shapeNode->GetInfo().m_wireFrame;
+			mesh->SetColor(color);
+			mesh->Render(this, matrix);
+		}
+		else
+		{
+			ndFlatShadedDebugMesh* const mesh = shapeNode->GetInfo().m_flatShaded;
+			mesh->SetColor(color);
+			mesh->Render(this, matrix);
+		}
 	}
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
