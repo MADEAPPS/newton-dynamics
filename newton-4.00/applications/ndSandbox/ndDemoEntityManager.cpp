@@ -185,7 +185,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	glfwSetCursorPosCallback(m_mainFrame, CursorposCallback);
 	glfwSetMouseButtonCallback(m_mainFrame, MouseButtonCallback);
 
-	//glfwWindowHint(GLFW_SAMPLES, 4);
+	//glfwWindowHint(GLFW_SAMPLES, 8);
 
 	LoadFont();
 
@@ -207,7 +207,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 //	m_showNormalForces = true;
 //	m_showContactPoints = true;
 //	m_showJointDebugInfo = true;
-	m_collisionDisplayMode = 2;
+	m_collisionDisplayMode = 3;
 //	m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
 
@@ -627,8 +627,9 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Separator();
 
 			ImGui::RadioButton("hide collision Mesh", &m_collisionDisplayMode, 0);
-			ImGui::RadioButton("show solid collision Mesh", &m_collisionDisplayMode, 1);
-			ImGui::RadioButton("show wire frame collision Mesh", &m_collisionDisplayMode, 2);
+			ImGui::RadioButton("show solid collision", &m_collisionDisplayMode, 1);
+			ImGui::RadioButton("show wire frame collision", &m_collisionDisplayMode, 2);
+			ImGui::RadioButton("show hidden wire frame collision", &m_collisionDisplayMode, 3);
 			ImGui::Separator();
 
 			ImGui::Checkbox("show aabb", &m_showAABB);
@@ -1490,17 +1491,12 @@ void ndDemoEntityManager::Run()
 
 void ndDemoEntityManager::DrawDebugShapes()
 {
-	//dDebugDisplayMode mode = (m_collisionDisplayMode == 1) ? m_solid : m_lines;
-	//DebugRenderWorldCollision(m_world, mode);
-
-	//dVector scale(1.0f);
 	const dVector awakeColor(1.0f, 1.0f, 1.0f, 1.0f);
 	const dVector sleepColor(0.42f, 0.73f, 0.98f, 1.0f);
 
-
 	const ndBodyList& bodyList = m_world->GetBodyList();
 
-	if (m_collisionDisplayMode == 2)
+	if (m_collisionDisplayMode == 3)
 	{
 		// do a z buffer pre pass for hidden line 
 		glColorMask(0, 0, 0, 0);
@@ -1541,15 +1537,10 @@ void ndDemoEntityManager::DrawDebugShapes()
 		int sleepState = body->GetSleepState();
 		dVector color((sleepState == 1) ? sleepColor : awakeColor);
 
-		if (m_collisionDisplayMode == 2)
+		if (m_collisionDisplayMode >= 2)
 		{
 			ndWireFrameDebugMesh* const mesh = shapeNode->GetInfo().m_wireFrame;
 			mesh->SetColor(color);
-
-			glColorMask(0, 0, 0, 0);
-			shapeNode->GetInfo().m_flatShaded->Render(this, matrix);
-			glColorMask(1, 1, 1, 1);
-
 			mesh->Render(this, matrix);
 		}
 		else
