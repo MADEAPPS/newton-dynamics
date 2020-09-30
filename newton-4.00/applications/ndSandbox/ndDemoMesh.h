@@ -114,9 +114,13 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	public:
 	void  ResetOptimization();
 	ndMeshPointUV* m_points;
-	int m_vertexCount;
-
+	dInt32 m_vertexCount;
 	dInt32 m_indexCount;
+	dInt32 m_textureLocation;
+	dInt32 m_normalMatrixLocation;
+	dInt32 m_projectMatrixLocation;
+	dInt32 m_viewModelMatrixLocation;
+	
 	GLuint* m_indexArray;
 	GLuint m_shader;
 	GLuint m_indexBuffer;
