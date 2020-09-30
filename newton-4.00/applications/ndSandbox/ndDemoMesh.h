@@ -19,6 +19,30 @@ class ndDemoEntity;
 class ndShaderPrograms;
 class ndDemoEntityManager;
 
+struct ndMeshVector
+{
+	GLfloat m_x;
+	GLfloat m_y;
+	GLfloat m_z;
+};
+
+struct ndMeshUV
+{
+	GLfloat m_u;
+	GLfloat m_v;
+};
+
+struct ndPointNormal
+{
+	ndMeshVector m_posit;
+	ndMeshVector m_normal;
+};
+
+struct ndMeshPointUV: public ndPointNormal
+{
+	ndMeshUV m_uv;
+};
+
 class ndDemoSubMesh
 {
 	public:
@@ -92,28 +116,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 
 	public:
 	void  ResetOptimization();
-
-	struct ndMeshVector
-	{
-		GLfloat m_x;
-		GLfloat m_y;
-		GLfloat m_z;
-	};
-
-	struct ndMeshUV
-	{
-		GLfloat m_u;
-		GLfloat m_v;
-	};
-
-	struct ndMeshPoint
-	{
-		ndMeshVector m_posit;
-		ndMeshVector m_normal;
-		ndMeshUV m_uv;
-	};
-	
-	ndMeshPoint* m_points;
+	ndMeshPointUV* m_points;
 	int m_vertexCount;
 
 	dInt32 m_indexCount;
@@ -178,10 +181,19 @@ class ndWireFrameCollisionMesh: public ndDemoMeshInterface
 {
 	public:
 	ndWireFrameCollisionMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision);
+	~ndWireFrameCollisionMesh();
 
 	virtual void RenderNormals() {}
 	virtual void RenderTransparency() const {}
 	virtual void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+
+	dInt32 m_indexCount;
+	dInt32 m_vertextCount;
+	
+	GLuint m_shader;
+	GLuint m_vertexBuffer;
+	GLuint m_vetextArrayBuffer;
+	GLuint m_triangleIndexBuffer;
 };
 
 

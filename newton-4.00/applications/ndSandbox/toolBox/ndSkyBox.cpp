@@ -35,17 +35,6 @@ ndSkyBox::ndSkyBox(GLuint shader)
 		 size,-size,-size,  -size,-size,-size,  -size, size,-size,  size, size,-size  // v4,v7,v6,v5 (back)
 	};
 
-	// texture coordinate array
-	//static GLfloat texCoords[] =
-	//{
-	//	1, 0,   0, 0,   0, 1,   1, 1,               // v0,v1,v2,v3 (front)
-	//	0, 0,   0, 1,   1, 1,   1, 0,               // v0,v3,v4,v5 (right)
-	//	1, 1,   1, 0,   0, 0,   0, 1,               // v0,v5,v6,v1 (top)
-	//	1, 0,   0, 0,   0, 1,   1, 1,               // v1,v6,v7,v2 (left)
-	//	0, 1,   1, 1,   1, 0,   0, 0,               // v7,v4,v3,v2 (bottom)
-	//	0, 1,   1, 1,   1, 0,   0, 0                // v4,v7,v6,v5 (back)
-	//};
-
 	// index array for glDrawElements()
 	// A cube requires 36 indices = 6 sides * 2 tris * 3 verts
 	static int indices[] =
@@ -57,35 +46,6 @@ ndSkyBox::ndSkyBox(GLuint shader)
 		16,17,18,  18,19,16,    // v7-v4-v3, v3-v2-v7 (bottom)
 		20,21,22,  22,23,20     // v4-v7-v6, v6-v5-v4 (back)
 	};
-
-	//struct dVectex3f
-	//{
-	//	GLfloat x;
-	//	GLfloat y;
-	//	GLfloat z;
-	//};
-	//struct dTexCoord2f
-	//{
-	//	GLfloat u;
-	//	GLfloat v;
-	//};
-	//
-	//struct VertexPT
-	//{
-	//	dVectex3f posit;
-	//	dTexCoord2f uv;
-	//};
-
-	//dVectex3f vtx[24];
-	//for (int i = 0; i < 24; i++) 
-	//{
-	//	vtx[i].posit.x = vertices[i * 3 + 0];
-	//	vtx[i].posit.y = vertices[i * 3 + 1];
-	//	vtx[i].posit.z = vertices[i * 3 + 2];
-	//	
-	//	vtx[i].uv.u = texCoords[i * 2 + 0];
-	//	vtx[i].uv.v = texCoords[i * 2 + 1];
-	//}
 
 	m_textureMatrix = dGetIdentityMatrix();
 

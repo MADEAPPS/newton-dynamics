@@ -1,0 +1,68 @@
+/* Copyright (c) <2003-2016> <Newton Game Dynamics>
+* 
+* This software is provided 'as-is', without any express or implied
+* warranty. In no event will the authors be held liable for any damages
+* arising from the use of this software.
+* 
+* Permission is granted to anyone to use this software for any purpose,
+* including commercial applications, and to alter it and redistribute it
+* freely
+*/  
+
+#version 330 core
+
+layout(location = 0) in vec3 in_position;
+layout(location = 1) in vec3 in_normal;
+
+uniform mat4 normalMatrix;
+uniform mat4 viewModelMatrix;
+uniform mat4 projectionMatrix;
+
+out vec4 color;
+
+//vec3 FlashLightShading(vec3 normalDir)
+//{
+//	vec3 lightDir = -normalize (posit);
+//	
+//	//vec3 diffuseCoeff = vec3(gl_LightSource[index].diffuse * gl_FrontMaterial.diffuse); 
+//	vec3 diffuseCoeff = vec3(0.7f, 0.7f, 0.7f);  
+//
+//	float k1 = 7.0/120.0; 
+//	float k2 = 1.0/240.0; 
+//	float d2 = dot(posit, posit);
+//	float d1 = sqrt(d2);
+//	float attenuation = 1.0 / (1.0 + k1 * d1 + k2 * d2);
+//	
+//	return diffuseCoeff * max (dot(normalDir, lightDir), 0.0) * attenuation;
+//}
+
+vec3 PhongDirectionalShading(vec3 normalDir, vec3 posit)
+{
+	vec3 lightDir = vec3 (viewModelMatrix * normalize (vec4(0.0f, 1.0f, 0.0f, 0.0f)));
+	vec3 specularDir = normalize (-posit);
+	
+	vec3 reflectionDir = -reflect (lightDir, normalDir);
+	
+	vec3 ambientCoeff = vec3(0.1f, 0.1f, 0.1f);
+	vec3 diffuseCoeff = vec3(0.9f, 0.9f, 0.9f); 
+	vec3 specularCoeff = vec3(0.8f, 0.8f, 0.8f);
+	float shininess = 20.0f;
+	
+	vec3 ambientColor = ambientCoeff; 
+	vec3 diffuseColor = diffuseCoeff * max (dot(normalDir, lightDir), 0.0f);
+	vec3 specularColor = specularCoeff * pow (max (dot (reflectionDir, specularDir), 0.1), shininess);
+	
+	return ambientColor + diffuseColor + specularColor;
+}
+
+void main()
+{	
+	vec3 normal = normalize (vec3 (normalize (normalMatrix * vec4(in_normal, 0.0))));
+	vec3 posit = vec3 (viewModelMatrix * vec4(in_position, 1.0));
+
+	//vec3 lightIntensity = PhongDirectionalShading(normal, posit) + FlashLightShading(normal, posit);
+	vec3 lightIntensity = PhongDirectionalShading(normal, posit);
+
+	vec4 color = vec4 (lightIntensity, 1.0f);
+	gl_Position = projectionMatrix * vec4(posit, 1.0);
+}

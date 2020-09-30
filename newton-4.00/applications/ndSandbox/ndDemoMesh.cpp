@@ -239,7 +239,7 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCac
 {
 	dAssert(0);
 	//AllocVertexData(mesh.m_vertexCount);
-	//memcpy (m_points, mesh.m_points, m_vertexCount * sizeof (ndMeshPoint));
+	//memcpy (m_points, mesh.m_points, m_vertexCount * sizeof (ndMeshPointUV));
 	//
 	//for (dListNode* nodes = mesh.GetFirst(); nodes; nodes = nodes->GetNext()) 
 	//{
@@ -345,9 +345,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	//mesh.GetVertexChannel(3 * sizeof (dFloat32), (dFloat32*)m_vertex);
 	//mesh.GetNormalChannel(3 * sizeof (dFloat32), (dFloat32*)m_normal);
 	//mesh.GetUV0Channel(2 * sizeof (dFloat32), (dFloat32*)m_uv);
-	mesh.GetVertexChannel(sizeof(ndMeshPoint), &m_points[0].m_posit.m_x);
-	mesh.GetNormalChannel(sizeof(ndMeshPoint), &m_points[0].m_normal.m_x);
-	mesh.GetUV0Channel(sizeof(ndMeshPoint), &m_points[0].m_uv.m_u);
+	mesh.GetVertexChannel(sizeof(ndMeshPointUV), &m_points[0].m_posit.m_x);
+	mesh.GetNormalChannel(sizeof(ndMeshPointUV), &m_points[0].m_normal.m_x);
+	mesh.GetUV0Channel(sizeof(ndMeshPointUV), &m_points[0].m_uv.m_u);
 
 	dInt32 segmentStart = 0;
 	for (int handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle)) 
@@ -737,16 +737,16 @@ void ndDemoMesh::OptimizeForRender()
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
 		//glBufferData(GL_ARRAY_BUFFER, sizeof(VertexPT) * 24, &vtx[0], GL_STATIC_DRAW);
-		glBufferData(GL_ARRAY_BUFFER, m_vertexCount * sizeof (ndMeshPoint), &m_points[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, m_vertexCount * sizeof (ndMeshPointUV), &m_points[0], GL_STATIC_DRAW);
 		
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshPoint), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)0);
 		
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshPoint), (void*)sizeof(ndMeshVector));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)sizeof(ndMeshVector));
 
 		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(ndMeshPoint), (void*)(2 * sizeof(ndMeshVector)));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)(2 * sizeof(ndMeshVector)));
 
 		glGenBuffers(1, &m_indexBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
@@ -798,8 +798,8 @@ void  ndDemoMesh::ResetOptimization()
 void ndDemoMesh::AllocVertexData(int vertexCount, int indexCount)
 {
 	m_vertexCount = vertexCount;
-	m_points = (ndMeshPoint*)dMemory::Malloc(m_vertexCount * sizeof(ndMeshPoint));
-	memset(m_points, 0, m_vertexCount * sizeof(ndMeshPoint));
+	m_points = (ndMeshPointUV*)dMemory::Malloc(m_vertexCount * sizeof(ndMeshPointUV));
+	memset(m_points, 0, m_vertexCount * sizeof(ndMeshPointUV));
 
 	m_indexCount = indexCount;
 	m_indexArray = (GLuint*)dMemory::Malloc(m_indexCount * sizeof(GLuint));
@@ -1356,67 +1356,132 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 	}
 }
 
+ndWireFrameCollisionMesh::~ndWireFrameCollisionMesh()
+{
+	if (m_vetextArrayBuffer)
+	{
+		glDeleteBuffers(1, &m_triangleIndexBuffer);
+		glDeleteBuffers(1, &m_vertexBuffer);
+		glDeleteVertexArrays(1, &m_vetextArrayBuffer);
+	}
+}
 
 ndWireFrameCollisionMesh::ndWireFrameCollisionMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision)
 	:ndDemoMeshInterface()
-	//, dList<ndDemoSubMesh>()
-	//, m_points(nullptr)
-	//, m_vertexCount(0)
-	//, m_indexCount(0)
-	//, m_indexArray(nullptr)
-	//, m_shader(0)
-	//, m_indexBuffer(0)
-	//, m_vertexBuffer(0)
-	//, m_vetextArrayBuffer(0)
 {
-	//dAssert(0);
-/*
-	ndShapeInstanceMeshBuilder mesh(*collision);
-
-	//mesh.CalculateNormals(30.0f * dDegreeToRad);
-	m_shader = shaderCache.m_diffuseEffect;
-
-	// extract the materials index array for mesh
-	ndIndexArray* const geometryHandle = mesh.MaterialGeometryBegin();
-
-	// extract vertex data  from the newton mesh		
-	int vertexCount = mesh.GetPropertiesCount();
-
-	int indexCount = 0;
-	for (int handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
+	class ndDrawShape : public ndShapeDebugCallback
 	{
-		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
-	}
-	AllocVertexData(vertexCount, indexCount);
+		public:
+		ndDrawShape()
+			:ndShapeDebugCallback()
+		{
+		}
 
-	mesh.GetVertexChannel(sizeof(ndMeshPoint), &m_points[0].m_posit.m_x);
-	mesh.GetNormalChannel(sizeof(ndMeshPoint), &m_points[0].m_normal.m_x);
-	mesh.GetUV0Channel(sizeof(ndMeshPoint), &m_points[0].m_uv.m_u);
+		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceVertex)
+		{
+			m_faces.PushBack(vertexCount);
+			dVector p0(faceVertex[0]);
+			dVector p1(faceVertex[1]);
+			dVector p2(faceVertex[2]);
+			
+			dVector normal((p1 - p0).CrossProduct(p2 - p0));
+			normal = normal.Normalize();
+			for (int i = 0; i < vertexCount; i++)
+			{
+				ndPointNormal point;
+				point.m_posit.m_x = faceVertex[i].m_x;
+				point.m_posit.m_y = faceVertex[i].m_y;
+				point.m_posit.m_z = faceVertex[i].m_z;
+				point.m_normal.m_x = normal.m_x;
+				point.m_normal.m_y = normal.m_y;
+				point.m_normal.m_z = normal.m_z;
+				m_points.PushBack(point);
+			}
+		}
 
-	dInt32 segmentStart = 0;
-	for (int handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
+		dArray<dInt32> m_faces;
+		dArray<ndPointNormal> m_points;
+	};
+
+	ndDrawShape drawShapes;
+	collision->DebugShape(dGetIdentityMatrix(), drawShapes);
+	
+	m_shader = shaderCache.m_flatShaded;
+	m_vertextCount = drawShapes.m_points.GetCount();
+
+	dArray<dInt32> m_triangles;
+	dInt32 acc = 0;
+	dInt32 indexCount = 0;
+	for (int i = 0; i < drawShapes.m_faces.GetCount(); i++)
 	{
-		int material = mesh.GetMaterialID(geometryHandle, handle);
-		ndDemoSubMesh* const segment = AddSubMesh();
-
-		segment->m_textureHandle = (GLuint)material;
-		//		segment->SetOpacity(opacity);
-
-		segment->m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
-		segment->m_segmentStart = segmentStart;
-		mesh.GetMaterialGetIndexStream(geometryHandle, handle, (int*)&m_indexArray[segmentStart]);
-		segmentStart += segment->m_indexCount;
+		dInt32 pointCount = drawShapes.m_faces[i];
+		for (int j = 2; j < pointCount; j++)
+		{
+			int j1 = acc + j - 1;
+			int j2 = acc + j;
+			m_triangles.PushBack(acc);
+			m_triangles.PushBack(j1);
+			m_triangles.PushBack(j2);
+			indexCount += 3;
+		}
+		acc += pointCount;
 	}
+	m_indexCount = indexCount;
 
-	//NewtonMeshEndHandle (mesh, geometryHandle); 
-	mesh.MaterialGeomteryEnd(geometryHandle);
+	glGenVertexArrays(1, &m_vetextArrayBuffer);
+	glBindVertexArray(m_vetextArrayBuffer);
 
-	// optimize this mesh for hardware buffers if possible
-	OptimizeForRender();
-*/
+	glGenBuffers(1, &m_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+	glBufferData(GL_ARRAY_BUFFER, m_vertextCount * sizeof(ndPointNormal), &drawShapes.m_points[0].m_posit.m_x, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndPointNormal), (void*)0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndPointNormal), (void*)sizeof(ndMeshVector));
+
+	glGenBuffers(1, &m_triangleIndexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, acc * sizeof(GLuint), &m_triangles[0], GL_STATIC_DRAW);
+	
+	glBindVertexArray(0);
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void ndWireFrameCollisionMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
-	dAssert(0);
+	glUseProgram(m_shader);
+
+	ndDemoCamera* const camera = scene->GetCamera();
+
+	dInt32 normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+	dInt32 projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
+	dInt32 viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+
+	const dMatrix& viewMatrix = camera->GetViewMatrix();
+	const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
+	dMatrix viewModelMatrix(modelMatrix * viewMatrix);
+
+	glUniformMatrix4fv(normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniformMatrix4fv(projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
+	glUniformMatrix4fv(viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+
+	glBindVertexArray(m_vetextArrayBuffer);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
+	glBindVertexArray(0);
+	glUseProgram(0);
 }
