@@ -1475,7 +1475,6 @@ void ndFlatShadedDebugMesh::Render(ndDemoEntityManager* const scene, const dMatr
 	glUseProgram(0);
 }
 
-
 ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision)
 	:ndDemoMeshInterface()
 {
@@ -1490,27 +1489,19 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 		virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceVertex)
 		{
 			m_faces.PushBack(vertexCount);
-			dVector p0(faceVertex[0]);
-			dVector p1(faceVertex[1]);
-			dVector p2(faceVertex[2]);
 
-			dVector normal((p1 - p0).CrossProduct(p2 - p0));
-			normal = normal.Normalize();
 			for (int i = 0; i < vertexCount; i++)
 			{
-				ndPointNormal point;
-				point.m_posit.m_x = faceVertex[i].m_x;
-				point.m_posit.m_y = faceVertex[i].m_y;
-				point.m_posit.m_z = faceVertex[i].m_z;
-				point.m_normal.m_x = normal.m_x;
-				point.m_normal.m_y = normal.m_y;
-				point.m_normal.m_z = normal.m_z;
+				ndMeshVector point;
+				point.m_x = faceVertex[i].m_x;
+				point.m_y = faceVertex[i].m_y;
+				point.m_z = faceVertex[i].m_z;
 				m_points.PushBack(point);
 			}
 		}
 
 		dArray<dInt32> m_faces;
-		dArray<ndPointNormal> m_points;
+		dArray<ndMeshVector> m_points;
 	};
 
 	ndDrawShape drawShapes;
@@ -1545,13 +1536,10 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 	glGenBuffers(1, &m_vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
-	glBufferData(GL_ARRAY_BUFFER, m_vertextCount * sizeof(ndPointNormal), &drawShapes.m_points[0].m_posit.m_x, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_vertextCount * sizeof(ndMeshVector), &drawShapes.m_points[0].m_x, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndPointNormal), (void*)0);
-
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndPointNormal), (void*)sizeof(ndMeshVector));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshVector), (void*)0);
 
 	glGenBuffers(1, &m_triangleIndexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
@@ -1566,9 +1554,7 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 
 	glUseProgram(m_shader);
 	m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
-	m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
-	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
-	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+	m_projectionViewModelMatrixLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
 	glUseProgram(0);
 }
 
@@ -1585,27 +1571,24 @@ ndWireFrameDebugMesh::~ndWireFrameDebugMesh()
 void ndWireFrameDebugMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
 	ndDemoCamera* const camera = scene->GetCamera();
-	const dMatrix& viewMatrix = camera->GetViewMatrix();
-	const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
-	dMatrix viewModelMatrix(modelMatrix * viewMatrix);
+	//const dMatrix& viewMatrix = camera->GetViewMatrix();
+	//const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
+	//dMatrix viewModelMatrix(modelMatrix * viewMatrix);
+	dMatrix projectionViewModelMatrix(modelMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glUseProgram(m_shader);
 	glUniform4fv(m_shadeColorLocation, 1, &m_color.m_x);
-	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
-	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &projectionViewModelMatrix[0][0]);
 
 	glBindVertexArray(m_vetextArrayBuffer);
 	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);
 	glUseProgram(0);

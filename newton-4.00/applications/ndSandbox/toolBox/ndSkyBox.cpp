@@ -230,11 +230,6 @@ void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const
 	dMatrix projectionViewModelMatrix(skyMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());
 	
 	glUseProgram(m_shader);
-	//glUniformMatrix4fv(glGetUniformLocation(m_shader, "P"), 1, false, &camera->GetProjectionMatrix()[0][0]);
-	//glUniformMatrix4fv(glGetUniformLocation(m_shader, "V"), 1, false, &camera->GetViewMatrix()[0][0]);
-	//glUniformMatrix4fv(glGetUniformLocation(m_shader, "M"), 1, false, &skyMatrix[0][0]);
-	//glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewModelMatrix"), 1, false, &viewModelMatrix[0][0]);
-
 	glUniformMatrix4fv(textureMatrixLocation, 1, false, &m_textureMatrix[0][0]);
 	glUniformMatrix4fv(matrixUniformLocation, 1, false, &projectionViewModelMatrix[0][0]);
 

@@ -213,9 +213,7 @@ class ndWireFrameDebugMesh: public ndDemoMeshInterface
 	dInt32 m_indexCount;
 	dInt32 m_vertextCount;
 	dInt32 m_shadeColorLocation;
-	dInt32 m_normalMatrixLocation;
-	dInt32 m_projectMatrixLocation;
-	dInt32 m_viewModelMatrixLocation;
+	dInt32 m_projectionViewModelMatrixLocation;
 
 	GLuint m_shader;
 	GLuint m_vertexBuffer;
