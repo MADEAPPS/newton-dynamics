@@ -218,7 +218,7 @@ class ndWireFrameDebugMesh: public ndDemoMeshInterface
 	GLuint m_shader;
 	GLuint m_vertexBuffer;
 	GLuint m_vetextArrayBuffer;
-	GLuint m_triangleIndexBuffer;
+	GLuint m_lineIndexBuffer;
 };
 
 #endif 

@@ -41,8 +41,8 @@ class ndSkyBox: public ndDemoEntity
 	GLuint m_vertexBuffer;
 	GLuint m_texturecubemap;
 	GLuint m_vetextArrayBuffer;
-	GLint matrixUniformLocation;
-	GLint textureMatrixLocation;
+	GLint m_matrixUniformLocation;
+	GLint m_textureMatrixLocation;
 };
 
 #endif 
