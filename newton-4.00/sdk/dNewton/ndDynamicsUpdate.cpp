@@ -158,11 +158,6 @@ dInt32 ndDynamicsUpdate::CompareIslandBodies(const ndBodyIndexPair* const  pairA
 }
 void ndDynamicsUpdate::BuildIsland()
 {
-static int xxxx;
-xxxx++;
-if (xxxx > 780)
-xxxx *= 1;
-
 	ndScene* const scene = m_world->GetScene();
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	dAssert(bodyArray.GetCount() >= 1);
@@ -179,25 +174,26 @@ xxxx *= 1;
 			contactArray[index] = node->GetInfo();
 			index++;
 		}
-		
+
 		for (dInt32 i = contactArray.GetCount() - 1; i >= 0; i--)
 		{
 			ndConstraint* const joint = contactArray[i];
-			ndBodyKinematic* const body0 = joint->GetBody0();
 			ndBodyKinematic* const body1 = joint->GetBody1();
-			const dInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
-			body0->m_bodyIsConstrained = 1;
-			body0->m_resting = body0->m_resting & resting;
 			if (body1->GetInvMass() > dFloat32(0.0f))
 			{
+				ndBodyKinematic* const body0 = joint->GetBody0();
+
+				body0->m_bodyIsConstrained = 1;
+				body1->m_bodyIsConstrained = 1;
+				const dInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
+				body0->m_resting = body0->m_resting & resting;
 				body1->m_resting = body1->m_resting & resting;
+
 				ndBodyKinematic* root0 = FindRootAndSplit(body0);
 				ndBodyKinematic* root1 = FindRootAndSplit(body1);
-				body1->m_bodyIsConstrained = 1;
-
 				if (root0 != root1)
 				{
-					if (root0->m_rank < root1->m_rank)
+					if (root0->m_rank > root1->m_rank)
 					{
 						dSwap(root0, root1);
 					}
@@ -216,9 +212,19 @@ xxxx *= 1;
 					root1->m_islandSleep = 0;
 				}
 			}
-			else
+		}
+
+		for (dInt32 i = contactArray.GetCount() - 1; i >= 0; i--)
+		{
+			ndConstraint* const joint = contactArray[i];
+			ndBodyKinematic* const body1 = joint->GetBody1();
+			if (body1->GetInvMass() == dFloat32(0.0f))
 			{
-				if (!body1->m_islandSleep)
+				ndBodyKinematic* const body0 = joint->GetBody0();
+				const dInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
+				body0->m_bodyIsConstrained = 1;
+				body0->m_resting = body0->m_resting & resting;
+				if (!body0->m_islandSleep)
 				{
 					ndBodyKinematic* const root = FindRootAndSplit(body0);
 					root->m_islandSleep = 0;
