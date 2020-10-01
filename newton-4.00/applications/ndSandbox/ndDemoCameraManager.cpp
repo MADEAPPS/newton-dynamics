@@ -165,7 +165,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	dVector p0(m_camera->ScreenToWorld(dVector(x, y, 0.0f, 0.0f)));
 	dVector p1(m_camera->ScreenToWorld(dVector(x, y, 1.0f, 0.0f)));
 
-#if 0
+#if 1
 	struct ndReplay
 	{
 		dVector m_p0;
@@ -232,15 +232,6 @@ void ndDemoCameraManager::InterpolateMatrices (ndDemoEntityManager* const scene,
 	m_camera->InterpolateMatrix (*scene, param);
 }
 
-/*
-void ndDemoCameraManager::OnBodyDestroy (NewtonBody* const body)
-{
-	// remove the references pointer because the body is going to be destroyed
-	m_targetPicked = nullptr;
-	m_bodyDestructor = nullptr;
-}
-*/
-
 void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool mousePickState, const dVector& p0, const dVector& p1, dFloat32 timestep) 
 {
 	// handle pick body from the screen
@@ -277,10 +268,10 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 				m_pickJoint = new ndDemoCameraPickBodyJoint (scene->GetWorld()->GetSentinelBody(), body, posit, this);
 				scene->GetWorld()->AddJoint(m_pickJoint);
 				dTrace(("set the pick joint controll mode: %s\n", __FUNCTION__));
-				//m_pickJoint->SetControlMode(dCustomKinematicController::m_linearPlusAngularFriction);
-				//
-				//m_pickJoint->SetMaxLinearFriction(mass * linearFrictionAccel);
-				//m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
+				m_pickJoint->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
+				
+				m_pickJoint->SetMaxLinearFriction(mass.m_w * linearFrictionAccel);
+				m_pickJoint->SetMaxAngularFriction(inertia * angularFritionAccel);
 			}
 		}
 	} 
@@ -293,7 +284,7 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 			if (m_pickJoint) 
 			{
 				dTrace(("set target Matrix: %s\n", __FUNCTION__));
-				//m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
+				m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
 			}
 		} 
 		else 
@@ -323,5 +314,4 @@ void ndDemoCameraManager::ResetPickBody()
 	}
 	m_pickJoint = nullptr;
 	m_targetPicked = nullptr;
-	//m_bodyDestructor = nullptr;
 }

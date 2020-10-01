@@ -138,6 +138,7 @@ class ndBodyKinematic: public ndBody
 	friend class ndSceneMixed;
 	friend class ndSceneBodyNode;
 	friend class ndDynamicsUpdate;
+	friend class ndJointBilateralConstraint;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline const dUnsigned32 ndBodyKinematic::GetIndex() const

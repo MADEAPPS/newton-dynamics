@@ -439,56 +439,65 @@ void ndDynamicsUpdate::GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* co
 		constraintParam.m_forceBounds[i].m_normalIndex = D_INDEPENDENT_ROW;
 	}
 	
+	constraintParam.m_rowsCount = 0;
 	constraintParam.m_timestep = m_timestep;
 	constraintParam.m_invTimestep = m_invTimestep;
-	dInt32 dof = joint->JacobianDerivative(constraintParam);
+	joint->JacobianDerivative(constraintParam);
+	const dInt32 dof = constraintParam.m_rowsCount;
 	
 	//if (constraint->GetId() == dgConstraint::m_contactConstraint) 
-	//{
-	//	dgContact* const contactJoint = (dgContact*)constraint;
-	//	contactJoint->m_isInSkeletonLoop = false;
-	//	dgSkeletonContainer* const skeleton0 = body0->GetSkeleton();
-	//	dgSkeletonContainer* const skeleton1 = body1->GetSkeleton();
-	//	if (skeleton0 && (skeleton0 == skeleton1)) 
-	//	{
-	//		if (contactJoint->IsSkeletonSelftCollision()) 
-	//		{
-	//			contactJoint->m_isInSkeletonLoop = true;
-	//			skeleton0->AddSelfCollisionJoint(contactJoint);
-	//		}
-	//	}
-	//	else if (contactJoint->IsSkeletonIntraCollision()) 
-	//	{
-	//		if (skeleton0 && !skeleton1) 
-	//		{
-	//			contactJoint->m_isInSkeletonLoop = true;
-	//			skeleton0->AddSelfCollisionJoint(contactJoint);
-	//		}
-	//		else if (skeleton1 && !skeleton0) 
-	//		{
-	//			contactJoint->m_isInSkeletonLoop = true;
-	//			skeleton1->AddSelfCollisionJoint(contactJoint);
-	//		}
-	//	}
-	//}
-	//else if (constraint->IsBilateral() && !constraint->m_isInSkeleton && (constraint->m_solverModel == 3)) 
-	//{
-	//	dgSkeletonContainer* const skeleton0 = body0->GetSkeleton();
-	//	dgSkeletonContainer* const skeleton1 = body1->GetSkeleton();
-	//	if (skeleton0 || skeleton1) 
-	//	{
-	//		if (skeleton0 && !skeleton1) 
-	//		{
-	//			constraint->m_isInSkeletonLoop = true;
-	//			skeleton0->AddSelfCollisionJoint(constraint);
-	//		}
-	//		else if (skeleton1 && !skeleton0) 
-	//		{
-	//			constraint->m_isInSkeletonLoop = true;
-	//			skeleton1->AddSelfCollisionJoint(constraint);
-	//		}
-	//	}
-	//}
+	if (joint->GetAsContact())
+	{
+		//dgContact* const contactJoint = (dgContact*)constraint;
+		//contactJoint->m_isInSkeletonLoop = false;
+		//dgSkeletonContainer* const skeleton0 = body0->GetSkeleton();
+		//dgSkeletonContainer* const skeleton1 = body1->GetSkeleton();
+		//if (skeleton0 && (skeleton0 == skeleton1)) 
+		//{
+		//	if (contactJoint->IsSkeletonSelftCollision()) 
+		//	{
+		//		contactJoint->m_isInSkeletonLoop = true;
+		//		skeleton0->AddSelfCollisionJoint(contactJoint);
+		//	}
+		//}
+		//else if (contactJoint->IsSkeletonIntraCollision()) 
+		//{
+		//	if (skeleton0 && !skeleton1) 
+		//	{
+		//		contactJoint->m_isInSkeletonLoop = true;
+		//		skeleton0->AddSelfCollisionJoint(contactJoint);
+		//	}
+		//	else if (skeleton1 && !skeleton0) 
+		//	{
+		//		contactJoint->m_isInSkeletonLoop = true;
+		//		skeleton1->AddSelfCollisionJoint(contactJoint);
+		//	}
+		//}
+	}
+	else
+	{ 
+		ndJointBilateralConstraint* const bilareral = joint->GetAsBilateral();
+		dAssert(bilareral);
+		if (!bilareral->m_isInSkeleton && (bilareral->m_solverModel == 3))
+		{
+			ndSkeletonContainer* const skeleton0 = bilareral->m_body0->GetSkeleton();
+			ndSkeletonContainer* const skeleton1 = bilareral->m_body1->GetSkeleton();
+			if (skeleton0 || skeleton1) 
+			{
+				dAssert(0);
+			//	if (skeleton0 && !skeleton1) 
+			//	{
+			//		constraint->m_isInSkeletonLoop = true;
+			//		skeleton0->AddSelfCollisionJoint(constraint);
+			//	}
+			//	else if (skeleton1 && !skeleton0) 
+			//	{
+			//		constraint->m_isInSkeletonLoop = true;
+			//		skeleton1->AddSelfCollisionJoint(constraint);
+			//	}
+			}
+		}
+	}
 	
 	//jointInfo->m_pairCount = dof;
 	//jointInfo->m_pairStart = rowCount;

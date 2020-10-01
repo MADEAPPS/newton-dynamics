@@ -86,7 +86,7 @@ void ndContact::DetachFromBodies()
 	m_body1->DetachContact(this);
 }
 
-dUnsigned32 ndContact::JacobianDerivative(ndConstraintDescritor& params)
+void ndContact::JacobianDerivative(ndConstraintDescritor& params)
 {
 	dInt32 frictionIndex = 0;
 	//m_impulseSpeed = dFloat32(0.0f);
@@ -101,8 +101,7 @@ dUnsigned32 ndContact::JacobianDerivative(ndConstraintDescritor& params)
 			i++;
 		}
 	}
-
-	return dUnsigned32(frictionIndex);
+	params.m_rowsCount = frictionIndex;
 }
 
 void ndContact::CalculatePointDerivative(dInt32 index, ndConstraintDescritor& desc, const dVector& dir, const dgPointParam& param) const

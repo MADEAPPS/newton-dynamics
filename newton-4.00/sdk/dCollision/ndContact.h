@@ -127,7 +127,7 @@ class ndContact
 	dFloat32 GetPruningTolerance() const;
 
 	virtual const dUnsigned32 GetRowsCount() const;
-	virtual dUnsigned32 JacobianDerivative(ndConstraintDescritor& params);
+	virtual void JacobianDerivative(ndConstraintDescritor& params);
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const params);
 	
 	private:

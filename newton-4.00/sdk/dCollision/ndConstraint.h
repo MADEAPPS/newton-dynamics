@@ -35,6 +35,7 @@ class ndContact;
 class ndLeftHandSide;
 class ndRightHandSide;
 class ndBodyKinematic;
+class ndJointBilateralConstraint;
 
 D_MSV_NEWTON_ALIGN_32
 class dgPointParam
@@ -141,6 +142,7 @@ class ndConstraintDescritor
 	dInt32 m_flags[D_CONSTRAINT_MAX_ROWS];
 	dFloat32 m_timestep;
 	dFloat32 m_invTimestep;
+	dInt32 m_rowsCount;
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
@@ -181,14 +183,14 @@ class ndConstraint
 	virtual ~ndConstraint();
 
 	virtual ndContact* GetAsContact() { return nullptr; }
-
+	virtual ndJointBilateralConstraint* GetAsBilateral() { return nullptr; }
 
 	virtual bool IsBilateral() const { return false; }
 
 	virtual const dUnsigned32 GetRowsCount() const = 0;
 	virtual ndBodyKinematic* GetBody0() const { return nullptr; }
 	virtual ndBodyKinematic* GetBody1() const { return nullptr; }
-	virtual dUnsigned32 JacobianDerivative(ndConstraintDescritor& params) = 0;
+	virtual void JacobianDerivative(ndConstraintDescritor& params) = 0;
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const params) = 0;
 
 	void InitPointParam(dgPointParam& param, dFloat32 stiffness, const dVector& p0Global, const dVector& p1Global) const;
@@ -283,15 +285,6 @@ D_INLINE void ndConstraint::SetStiffness(dFloat32 stiffness)
 {
 }
 
-D_INLINE dInt32 ndConstraint::GetSolverModel() const
-{
-	return m_solverModel;
-}
-
-D_INLINE void ndConstraint::SetSolverModel(dInt32 model)
-{
-	m_solverModel = dClamp(model, 0, 2);
-}
 
 D_INLINE void ndConstraint::ResetMaxDOF()
 {
@@ -331,6 +324,7 @@ D_INLINE void ndConstraint::GetInfo(dgConstraintInfo* const info) const
 D_INLINE ndConstraint::~ndConstraint()
 {
 }
+
 
 #endif 
 
