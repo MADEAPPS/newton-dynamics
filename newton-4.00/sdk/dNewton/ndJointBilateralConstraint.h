@@ -78,7 +78,7 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	public:
 	D_NEWTON_API ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix);
 	D_NEWTON_API virtual ~ndJointBilateralConstraint();
-
+	
 	virtual ndJointBilateralConstraint* GetAsBilateral() { return this; }
 
 	virtual const dUnsigned32 GetRowsCount() const;
@@ -87,11 +87,12 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 
 	virtual ndBodyKinematic* GetBody0() const;
 	virtual ndBodyKinematic* GetBody1() const;
-
+	
 	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const;
 	D_NEWTON_API void CalculateLocalMatrix(const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
-
 	D_NEWTON_API void AddLinearRowJacobian(ndConstraintDescritor& paramOut, const dVector& pivot0, const dVector& pivot1, const dVector& dir);
+
+	D_NEWTON_API virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 	virtual dInt32 GetSolverModel() const;
 	virtual void SetSolverModel(dInt32 model);
@@ -149,10 +150,6 @@ inline void ndJointBilateralConstraint::JacobianDerivative(ndConstraintDescritor
 	dAssert(0);
 }
 
-inline void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor* const params)
-{
-	dAssert(0);
-}
 
 inline ndBodyKinematic* ndJointBilateralConstraint::GetBody0() const
 {

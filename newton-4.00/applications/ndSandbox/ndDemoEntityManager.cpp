@@ -186,7 +186,6 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	glfwSetScrollCallback(m_mainFrame, MouseScrollCallback);
 	glfwSetCursorPosCallback(m_mainFrame, CursorposCallback);
 	glfwSetMouseButtonCallback(m_mainFrame, MouseButtonCallback);
-		
 
 	LoadFont();
 
@@ -197,7 +196,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	// initialized the physics world for the new scene
 //	m_showUI = false;
 //	m_showAABB = false;
-//	m_hideVisualMeshes = true;
+	m_hideVisualMeshes = true;
 //	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
@@ -207,7 +206,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 //	m_showCenterOfMass = false;
 //	m_showNormalForces = true;
 //	m_showContactPoints = true;
-//	m_showJointDebugInfo = true;
+	m_showJointDebugInfo = true;
 	m_collisionDisplayMode = 3;
 //	m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
@@ -1329,6 +1328,69 @@ void ndDemoEntityManager::PostUpdateCallback(const NewtonWorld* const world, dFl
 }
 */
 
+void ndDemoEntityManager::DrawDebugShapes()
+{
+	const dVector awakeColor(1.0f, 1.0f, 1.0f, 1.0f);
+	const dVector sleepColor(0.42f, 0.73f, 0.98f, 1.0f);
+
+	const ndBodyList& bodyList = m_world->GetBodyList();
+
+	if (m_collisionDisplayMode == 3)
+	{
+		// do a z buffer pre pass for hidden line 
+		glColorMask(0, 0, 0, 0);
+		for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+		{
+			ndBodyKinematic* const body = bodyNode->GetInfo();
+			const ndShapeInstance& shapeInstance = body->GetCollisionShape();
+			ndDebugMeshCache::dTreeNode* const shapeNode = m_debugShapeCache.Find(shapeInstance.GetShape());
+			if (shapeNode)
+			{
+				dMatrix matrix(shapeInstance.GetLocalMatrix() * body->GetMatrix());
+				shapeNode->GetInfo().m_flatShaded->Render(this, matrix);
+			}
+		}
+		glColorMask(1, 1, 1, 1);
+	}
+
+	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	{
+		ndBodyKinematic* const body = bodyNode->GetInfo();
+		const ndShapeInstance& shapeInstance = body->GetCollisionShape();
+		const ndShape* const key = shapeInstance.GetShape();
+
+		ndDebugMeshCache::dTreeNode* shapeNode = m_debugShapeCache.Find(key);
+		if (!shapeNode)
+		{
+			ndShapeInstance shape(body->GetCollisionShape());
+			shape.SetScale(dVector(1.0f));
+
+			ndDebuMesh debugMesh;
+			debugMesh.m_flatShaded = new ndFlatShadedDebugMesh(m_shaderCache, &shape);
+			debugMesh.m_wireFrame = new ndWireFrameDebugMesh(m_shaderCache, &shape);
+			shapeNode = m_debugShapeCache.Insert(debugMesh, key);
+		}
+
+		dMatrix matrix(shapeInstance.GetLocalMatrix() * body->GetMatrix());
+
+		int sleepState = body->GetSleepState();
+		dVector color((sleepState == 1) ? sleepColor : awakeColor);
+
+		if (m_collisionDisplayMode >= 2)
+		{
+			ndWireFrameDebugMesh* const mesh = shapeNode->GetInfo().m_wireFrame;
+			mesh->SetColor(color);
+			mesh->Render(this, matrix);
+		}
+		else
+		{
+			ndFlatShadedDebugMesh* const mesh = shapeNode->GetInfo().m_flatShaded;
+			mesh->SetColor(color);
+			mesh->Render(this, matrix);
+		}
+	}
+}
+
 void ndDemoEntityManager::RenderScene()
 {
 	dFloat32 timestep = dGetElapsedSeconds();	
@@ -1448,15 +1510,12 @@ void ndDemoEntityManager::RenderScene()
 	//	listenerDebugRender.SetScale(0.5f);
 	//	RenderListenersDebugInfo (m_world, &listenerDebugRender);
 	//}
-	//
-	//if (m_showJointDebugInfo) {
-	//	dJointDebugDisplay jointDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
-	//	//jointDebugRender.SetScale(0.2f);
-	//	jointDebugRender.SetScale(1.0f);
-	//
-	//	RenderJointsDebugInfo(m_world, &jointDebugRender);
-	//}
-	//
+
+	if (m_showJointDebugInfo) 
+	{
+		RenderJointsDebugInfo(this);
+	}
+
 	//if (m_showNormalForces) {
 	//	RenderNormalForces (m_world);
 	//}
@@ -1490,65 +1549,4 @@ void ndDemoEntityManager::Run()
     }
 }
 
-void ndDemoEntityManager::DrawDebugShapes()
-{
-	const dVector awakeColor(1.0f, 1.0f, 1.0f, 1.0f);
-	const dVector sleepColor(0.42f, 0.73f, 0.98f, 1.0f);
 
-	const ndBodyList& bodyList = m_world->GetBodyList();
-
-	if (m_collisionDisplayMode == 3)
-	{
-		// do a z buffer pre pass for hidden line 
-		glColorMask(0, 0, 0, 0);
-		for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
-		{
-			ndBodyKinematic* const body = bodyNode->GetInfo();
-			const ndShapeInstance& shapeInstance = body->GetCollisionShape();
-			ndDebugMeshCache::dTreeNode* const shapeNode = m_debugShapeCache.Find(shapeInstance.GetShape());
-			if (shapeNode)
-			{
-				dMatrix matrix(shapeInstance.GetLocalMatrix() * body->GetMatrix());
-				shapeNode->GetInfo().m_flatShaded->Render(this, matrix);
-			}
-		}
-		glColorMask(1, 1, 1, 1);
-	}
-
-	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
-	{
-		ndBodyKinematic* const body = bodyNode->GetInfo();
-		const ndShapeInstance& shapeInstance = body->GetCollisionShape();
-		const ndShape* const key = shapeInstance.GetShape();
-
-		ndDebugMeshCache::dTreeNode* shapeNode = m_debugShapeCache.Find(key);
-		if (!shapeNode)
-		{
-			ndShapeInstance shape(body->GetCollisionShape());
-			shape.SetScale(dVector(1.0f));
-
-			ndDebuMesh debugMesh;
-			debugMesh.m_flatShaded = new ndFlatShadedDebugMesh(m_shaderCache, &shape);
-			debugMesh.m_wireFrame = new ndWireFrameDebugMesh(m_shaderCache, &shape);
-			shapeNode = m_debugShapeCache.Insert(debugMesh, key);
-		}
-
-		dMatrix matrix(shapeInstance.GetLocalMatrix() * body->GetMatrix());
-
-		int sleepState = body->GetSleepState();
-		dVector color((sleepState == 1) ? sleepColor : awakeColor);
-
-		if (m_collisionDisplayMode >= 2)
-		{
-			ndWireFrameDebugMesh* const mesh = shapeNode->GetInfo().m_wireFrame;
-			mesh->SetColor(color);
-			mesh->Render(this, matrix);
-		}
-		else
-		{
-			ndFlatShadedDebugMesh* const mesh = shapeNode->GetInfo().m_flatShaded;
-			mesh->SetColor(color);
-			mesh->Render(this, matrix);
-		}
-	}
-}

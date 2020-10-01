@@ -32,7 +32,8 @@ class ndContactPoint;
 class ndShapeInstance;
 class ndRayCastNotify;
 
-class ndShapeDebugCallback
+D_MSV_NEWTON_ALIGN_32
+class ndShapeDebugCallback : public dClassAlloc
 {
 	public: 
 	ndShapeDebugCallback()
@@ -47,7 +48,7 @@ class ndShapeDebugCallback
 	virtual void DrawPolygon(dInt32 vertexCount, const dVector* const faceArray) = 0;
 
 	const ndShapeInstance* m_instance;
-};
+} D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
 class ndShapeInstance: public dClassAlloc

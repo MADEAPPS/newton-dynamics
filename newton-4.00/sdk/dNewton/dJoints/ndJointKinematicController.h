@@ -120,7 +120,6 @@ inline void ndJointKinematicController::SetAngularViscuosFrictionCoefficient(dFl
 
 inline void ndJointKinematicController::SetTargetPosit(const dVector& posit)
 {
-	dAssert(0);
 	m_localMatrix0.m_posit = posit;
 	m_localMatrix0.m_posit.m_w = 1.0f;
 	CheckSleep();

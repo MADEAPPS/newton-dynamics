@@ -17,6 +17,7 @@
 #include <dVector.h>
 #include <dMatrix.h>
 
+class ndDemoEntityManager;
 
 #if 0
 class dJointDebugDisplay: public dCustomJoint::dDebugDisplay
@@ -114,7 +115,7 @@ void RenderBodyFrame (NewtonWorld* const world);
 void RenderRayCastHit(NewtonWorld* const world);
 void RenderNormalForces (NewtonWorld* const world);
 void RenderContactPoints (NewtonWorld* const world); 
-void RenderJointsDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug);
+
 void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug);
 
 void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat32* const faceVertec, int faceId);
@@ -128,6 +129,7 @@ void ClearDebugDisplay(NewtonWorld* const world);
 void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const NewtonBody* const body, int faceID, int vertexCount, const dFloat32* const vertex, int vertexstrideInBytes);
 #endif
 
+void RenderJointsDebugInfo(ndDemoEntityManager* const scene);
 
 #endif
 

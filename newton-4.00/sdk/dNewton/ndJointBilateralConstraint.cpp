@@ -394,7 +394,7 @@ void ndJointBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor
 	const dVector& gyroAlpha1 = m_body1->m_gyroAlpha;
 
 	dRightHandSide* const rhs = params->m_rightHandSide;
-	const dgLeftHandSide* const row = params->m_leftHandSide;
+	const ndLeftHandSide* const row = params->m_leftHandSide;
 	if (params->m_timeStep > dFloat32 (0.0f)) {
 		const dFloat32 ks = DG_POS_DAMP * dFloat32 (0.5f);
 		const dFloat32 kd = DG_VEL_DAMP * dFloat32 (4.0f);
@@ -510,6 +510,14 @@ ndJointBilateralConstraint::~ndJointBilateralConstraint()
 	//}
 }
 
+void ndJointBilateralConstraint::DebugJoint(ndConstraintDebugCallback& debugCallback) const
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+	debugCallback.DrawFrame(matrix0);
+	debugCallback.DrawFrame(matrix1);
+}
 
 void ndJointBilateralConstraint::CalculateLocalMatrix(const dMatrix& globalMatrix, dMatrix& localMatrix0, dMatrix& localMatrix1) const
 {
@@ -602,4 +610,89 @@ void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& des
 	//	desc.m_forceBounds[index].m_jointForce = jointForce;
 	}
 	desc.m_rowsCount = index + 1;
+}
+
+
+void ndJointBilateralConstraint::JointAccelerations(ndJointAccelerationDecriptor* const desc)
+{
+	const dVector& bodyVeloc0 = m_body0->m_veloc;
+	const dVector& bodyOmega0 = m_body0->m_omega;
+	const dVector& bodyVeloc1 = m_body1->m_veloc;
+	const dVector& bodyOmega1 = m_body1->m_omega;
+	const dVector& gyroAlpha0 = m_body0->m_gyroAlpha;
+	const dVector& gyroAlpha1 = m_body1->m_gyroAlpha;
+
+	ndRightHandSide* const rhs = desc->m_rightHandSide;
+	const ndLeftHandSide* const row = desc->m_leftHandSide;
+	dAssert(desc->m_timestep > dFloat32(0.0f));
+	if (desc->m_timestep > dFloat32(0.0f)) 
+	{
+		const dFloat32 ks = DG_POS_DAMP * dFloat32(0.5f);
+		const dFloat32 kd = DG_VEL_DAMP * dFloat32(4.0f);
+		const dFloat32 dt = desc->m_timestep;
+		for (dInt32 k = 0; k < desc->m_rowsCount; k++) 
+		{
+			if (m_rowIsMotor & (1 << k)) 
+			{
+				rhs[k].m_coordenateAccel = m_motorAcceleration[k] + rhs[k].m_deltaAccel;
+			}
+			else 
+			{
+				const ndJacobianPair& Jt = row[k].m_Jt;
+
+				//calculate internal centripetal each sub step 
+				const dVector& centripetal0(bodyOmega0.CrossProduct(bodyOmega0.CrossProduct(m_r0[k])));
+				const dVector& centripetal1(bodyOmega1.CrossProduct(bodyOmega1.CrossProduct(m_r1[k])));
+
+				const dVector relVeloc(
+					Jt.m_jacobianM0.m_linear * bodyVeloc0 + Jt.m_jacobianM0.m_angular * bodyOmega0 +
+					Jt.m_jacobianM1.m_linear * bodyVeloc1 + Jt.m_jacobianM1.m_angular * bodyOmega1);
+				const dFloat32 relGyro = (Jt.m_jacobianM0.m_angular * gyroAlpha0 + Jt.m_jacobianM1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
+				const dFloat32 relCentr = -(Jt.m_jacobianM0.m_linear * centripetal0 + Jt.m_jacobianM1.m_linear * centripetal1).AddHorizontal().GetScalar();
+
+				dFloat32 vRel = relVeloc.AddHorizontal().GetScalar();
+
+				//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
+				//alphaError = num / den;
+				//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
+				//dFloat32 dt = desc.m_timestep;
+				//dFloat32 ks = DG_POS_DAMP;
+				//dFloat32 kd = DG_VEL_DAMP;
+				//dFloat32 ksd = dt * ks;
+				//dFloat32 num = ks * relPosit + kd * relVeloc + ksd * relVeloc;
+				//dFloat32 den = dFloat32 (1.0f) + dt * kd + dt * ksd;
+				//accelError = num / den;
+
+				dFloat32 relPosit = rhs[k].m_penetration - vRel * dt * desc->m_firstPassCoefFlag;
+				rhs[k].m_penetration = relPosit;
+
+				dFloat32 ksd = dt * ks;
+				dFloat32 num = ks * relPosit - kd * vRel - ksd * vRel;
+				dFloat32 den = dFloat32(1.0f) + dt * kd + dt * ksd;
+				dFloat32 aRelErr = num / den;
+				rhs[k].m_coordenateAccel = rhs[k].m_deltaAccel + aRelErr + relCentr + relGyro;
+			}
+		}
+	}
+	else 
+	{
+		dAssert(0);
+		for (dInt32 k = 0; k < desc->m_rowsCount; k++) 
+		{
+			if (m_rowIsMotor & (1 << k)) 
+			{
+				rhs[k].m_coordenateAccel = m_motorAcceleration[k] + rhs[k].m_deltaAccel;
+			}
+			else 
+			{
+				const ndJacobianPair& Jt = row[k].m_Jt;
+				dVector relVeloc(
+					Jt.m_jacobianM0.m_linear * bodyVeloc0 + Jt.m_jacobianM0.m_angular * bodyOmega0 +
+					Jt.m_jacobianM1.m_linear * bodyVeloc1 + Jt.m_jacobianM1.m_angular * bodyOmega1);
+
+				dFloat32 vRel = relVeloc.m_x + relVeloc.m_y + relVeloc.m_z;
+				rhs[k].m_coordenateAccel = rhs[k].m_deltaAccel - vRel;
+			}
+		}
+	}
 }

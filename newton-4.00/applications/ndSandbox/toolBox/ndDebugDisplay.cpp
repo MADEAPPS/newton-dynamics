@@ -13,8 +13,12 @@
 //
 //////////////////////////////////////////////////////////////////////
 #include "ndSandboxStdafx.h"
+#include "ndDemoMesh.h"
+#include "ndDemoCamera.h"
 #include "ndDebugDisplay.h"
 #include "ndPhysicsUtils.h"
+#include "ndPhysicsWorld.h"
+#include "ndDemoEntityManager.h"
 
 #if 0
 static int g_debugMode = 0;
@@ -362,19 +366,6 @@ void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const 
 #endif
 }
 
-void RenderJointsDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug)
-{
-	// this will go over the joint list twice, 
-	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
-		for (NewtonJoint* joint = NewtonBodyGetFirstJoint(body); joint; joint = NewtonBodyGetNextJoint(body, joint)) {
-			dCustomJoint* const customJoint = (dCustomJoint*)NewtonJointGetUserData(joint);
-			if (customJoint) {
-				customJoint->Debug(jointDebug);
-			}
-		}
-	}
-	
-}
 
 void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug)
 {
@@ -382,3 +373,67 @@ void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* con
 }
 
 #endif
+
+
+void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
+{
+	
+
+	//	dJointDebugDisplay jointDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
+	//	//jointDebugRender.SetScale(0.2f);
+	//	jointDebugRender.SetScale(1.0f);
+
+	class ndJoindDebug: public ndConstraintDebugCallback
+	{
+		public:
+		ndJoindDebug(ndDemoEntityManager* const scene)
+		{
+			ndDemoCamera* const camera = scene->GetCamera();
+			dMatrix viewProjectionMatrix (camera->GetViewMatrix() * camera->GetProjectionMatrix());
+			m_shader = scene->GetShaderCache().m_wireFrame;
+
+			glUseProgram(m_shader);
+
+			m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
+			m_projectionViewModelMatrixLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
+			glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glVertexPointer(3, GL_FLOAT, 0, m_line);
+		}
+
+		~ndJoindDebug()
+		{
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glUseProgram(0);
+		}
+
+		void DrawLine(const dVector& p0, const dVector& p1, const dVector& color)
+		{
+			m_line[0].m_x = p0.m_x;
+			m_line[0].m_y = p0.m_y;
+			m_line[0].m_z = p0.m_z;
+			m_line[1].m_x = p1.m_x;
+			m_line[1].m_y = p1.m_y;
+			m_line[1].m_z = p1.m_z;
+			glUniform4fv(m_shadeColorLocation, 1, &color.m_x);
+			glDrawArrays(GL_LINES, 0, 2);
+		}
+		
+		GLuint m_shader;
+		dInt32 m_shadeColorLocation;
+		dInt32 m_projectionViewModelMatrixLocation;
+
+		ndMeshVector m_line[2];
+	};
+
+	ndJoindDebug debugJoint(scene);
+	ndWorld* const workd = scene->GetWorld();
+	const ndJointList& jointList = workd->GetJointList();
+	for (ndJointList::dListNode* jointNode = jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+	{
+		ndJointBilateralConstraint* const joint = jointNode->GetInfo();
+		joint->DebugJoint(debugJoint);
+	}
+
+}

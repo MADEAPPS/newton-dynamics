@@ -63,8 +63,7 @@ ndDemoCameraManager::~ndDemoCameraManager()
 {
 	if (m_targetPicked) 
 	{
-		dAssert(0);
-		//ResetPickBody();
+		ResetPickBody();
 	}
 	//m_camera->Release();
 	delete m_camera;
@@ -165,7 +164,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	dVector p0(m_camera->ScreenToWorld(dVector(x, y, 0.0f, 0.0f)));
 	dVector p1(m_camera->ScreenToWorld(dVector(x, y, 1.0f, 0.0f)));
 
-#if 1
+#if 0
 	struct ndReplay
 	{
 		dVector m_p0;

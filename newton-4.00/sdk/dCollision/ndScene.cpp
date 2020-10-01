@@ -1075,7 +1075,7 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 		dAssert(dAbs(controlNormal.DotProduct(controlDir0.CrossProduct(controlDir1)).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
 	}
 	
-	//dFloat32 maxImpulse = dFloat32(-1.0f);
+	dFloat32 maxImpulse = dFloat32(-1.0f);
 	for (dInt32 i = 0; i < contactCount; i++) 
 	{
 		dInt32 index = -1;
@@ -1134,10 +1134,10 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 		//contactPoint->m_staticFriction1 = material->m_staticFriction1;
 		//contactPoint->m_dynamicFriction0 = material->m_dynamicFriction0;
 		//contactPoint->m_dynamicFriction1 = material->m_dynamicFriction1;
-		//contactMaterial->m_flags = ndContactMaterial::m_collisionEnable | (material->m_flags & (ndContactMaterial::m_friction0Enable | ndContactMaterial::m_friction1Enable));
-		//contactMaterial->m_userData = material->m_userData;
+		//contactPoint->m_flags = ndContactMaterial::m_collisionEnable | (material->m_flags & (ndContactMaterial::m_friction0Enable | ndContactMaterial::m_friction1Enable));
+		//contactPoint->m_userData = material->m_userData;
 		contactPoint->m_material = material;
-		//dAssert(dAbs(contactMaterial->m_normal.DotProduct(contactMaterial->m_normal).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-1f));
+		//dAssert(dAbs(contactPoint->m_normal.DotProduct(contactPoint->m_normal).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-1f));
 	
 		if (staticMotion) 
 		{
@@ -1166,39 +1166,39 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 		}
 		else 
 		{
-			dAssert(0);
-	//		dVector veloc0(v0 + w0.CrossProduct(contactMaterial->m_point - com0));
-	//		dVector veloc1(v1 + w1.CrossProduct(contactMaterial->m_point - com1));
-	//		dVector relReloc(veloc1 - veloc0);
-	//
-	//		dAssert(contactMaterial->m_normal.m_w == dFloat32(0.0f));
-	//		dFloat32 impulse = relReloc.DotProduct(contactMaterial->m_normal).GetScalar();
-	//		if (dAbs(impulse) > maxImpulse) {
-	//			maxImpulse = dAbs(impulse);
-	//		}
-	//
-	//		dVector tangentDir(relReloc - contactMaterial->m_normal.Scale(impulse));
-	//		dAssert(tangentDir.m_w == dFloat32(0.0f));
-	//		diff = tangentDir.DotProduct(tangentDir).GetScalar();
-	//		if (diff > dFloat32(1.0e-2f)) {
-	//			dAssert(tangentDir.m_w == dFloat32(0.0f));
-	//			//contactMaterial->m_dir0 = tangentDir.Scale (dgRsqrt (diff));
-	//			contactMaterial->m_dir0 = tangentDir.Normalize();
-	//		}
-	//		else {
-	//			if (dAbs(contactMaterial->m_normal.m_z) > dFloat32(0.577f)) {
-	//				tangentDir = dVector(-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_z, dFloat32(0.0f), dFloat32(0.0f));
-	//			}
-	//			else {
-	//				tangentDir = dVector(-contactMaterial->m_normal.m_y, contactMaterial->m_normal.m_x, dFloat32(0.0f), dFloat32(0.0f));
-	//			}
-	//			contactMaterial->m_dir0 = contactMaterial->m_normal.CrossProduct(tangentDir);
-	//			dAssert(contactMaterial->m_dir0.m_w == dFloat32(0.0f));
-	//			dAssert(contactMaterial->m_dir0.DotProduct(contactMaterial->m_dir0).GetScalar() > dFloat32(1.0e-8f));
-	//			contactMaterial->m_dir0 = contactMaterial->m_dir0.Normalize();
-	//		}
-	//		contactMaterial->m_dir1 = contactMaterial->m_normal.CrossProduct(contactMaterial->m_dir0);
-	//		dAssert(dAbs(contactMaterial->m_normal.DotProduct(contactMaterial->m_dir0.CrossProduct(contactMaterial->m_dir1)).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
+			dVector veloc0(v0 + w0.CrossProduct(contactPoint->m_point - com0));
+			dVector veloc1(v1 + w1.CrossProduct(contactPoint->m_point - com1));
+			dVector relReloc(veloc1 - veloc0);
+	
+			dAssert(contactPoint->m_normal.m_w == dFloat32(0.0f));
+			dFloat32 impulse = relReloc.DotProduct(contactPoint->m_normal).GetScalar();
+			if (dAbs(impulse) > maxImpulse) 
+			{
+				maxImpulse = dAbs(impulse);
+			}
+	
+			dVector tangentDir(relReloc - contactPoint->m_normal.Scale(impulse));
+			dAssert(tangentDir.m_w == dFloat32(0.0f));
+			diff = tangentDir.DotProduct(tangentDir).GetScalar();
+			if (diff > dFloat32(1.0e-2f)) {
+				dAssert(tangentDir.m_w == dFloat32(0.0f));
+				//contactPoint->m_dir0 = tangentDir.Scale (dgRsqrt (diff));
+				contactPoint->m_dir0 = tangentDir.Normalize();
+			}
+			else {
+				if (dAbs(contactPoint->m_normal.m_z) > dFloat32(0.577f)) {
+					tangentDir = dVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_z, dFloat32(0.0f), dFloat32(0.0f));
+				}
+				else {
+					tangentDir = dVector(-contactPoint->m_normal.m_y, contactPoint->m_normal.m_x, dFloat32(0.0f), dFloat32(0.0f));
+				}
+				contactPoint->m_dir0 = contactPoint->m_normal.CrossProduct(tangentDir);
+				dAssert(contactPoint->m_dir0.m_w == dFloat32(0.0f));
+				dAssert(contactPoint->m_dir0.DotProduct(contactPoint->m_dir0).GetScalar() > dFloat32(1.0e-8f));
+				contactPoint->m_dir0 = contactPoint->m_dir0.Normalize();
+			}
+			contactPoint->m_dir1 = contactPoint->m_normal.CrossProduct(contactPoint->m_dir0);
+			dAssert(dAbs(contactPoint->m_normal.DotProduct(contactPoint->m_dir0.CrossProduct(contactPoint->m_dir1)).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
 		}
 		dAssert(contactPoint->m_dir0.m_w == dFloat32(0.0f));
 		dAssert(contactPoint->m_dir0.m_w == dFloat32(0.0f));

@@ -83,10 +83,9 @@ ndWorld::~ndWorld()
 
 	while (m_jointList.GetFirst())
 	{
-		dAssert(0);
-		//ndBodyKinematic* const body = m_bodyList.GetFirst()->GetInfo();
-		//RemoveBody(body);
-		//delete body;
+		ndJointBilateralConstraint* const joint = m_jointList.GetFirst()->GetInfo();
+		RemoveJoint(joint);
+		delete joint;
 	}
 
 	delete m_sentinelBody;

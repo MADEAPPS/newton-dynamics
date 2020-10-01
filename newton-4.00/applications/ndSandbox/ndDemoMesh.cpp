@@ -1308,15 +1308,15 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 
 ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize)
 	:ndDemoMeshInterface()
-	, dList<ndDemoSubMesh>()
-	, m_points(nullptr)
-	, m_vertexCount(0)
-	, m_indexCount(0)
-	, m_indexArray(nullptr)
-	, m_shader(0)
-	, m_indexBuffer(0)
-	, m_vertexBuffer(0)
-	, m_vetextArrayBuffer(0)
+	,dList<ndDemoSubMesh>()
+	,m_points(nullptr)
+	,m_vertexCount(0)
+	,m_indexCount(0)
+	,m_indexArray(nullptr)
+	,m_shader(0)
+	,m_indexBuffer(0)
+	,m_vertexBuffer(0)
+	,m_vetextArrayBuffer(0)
 {
 	dAssert(0);
 	/*

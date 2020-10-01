@@ -32,10 +32,84 @@
 
 class ndBody;
 class ndContact;
+class ndConstraint;
 class ndLeftHandSide;
 class ndRightHandSide;
 class ndBodyKinematic;
 class ndJointBilateralConstraint;
+
+D_MSV_NEWTON_ALIGN_32
+class ndConstraintDebugCallback: public dClassAlloc
+{
+	public:
+	ndConstraintDebugCallback()
+	{
+		m_debugScale = dFloat32(1.0f);
+	}
+
+	virtual ~ndConstraintDebugCallback() 
+	{
+	}
+
+	virtual void DrawLine(const dVector& p0, const dVector& p1, const dVector& color) = 0;
+
+	virtual void SetScale(dFloat32 scale)
+	{
+		m_debugScale = scale;
+	}
+
+	virtual void DrawFrame(const dMatrix& matrix)
+	{
+		dVector x(matrix.m_posit + matrix.RotateVector(dVector(m_debugScale, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f))));
+		DrawLine(matrix.m_posit, x, dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)));
+
+		dVector y(matrix.m_posit + matrix.RotateVector(dVector(dFloat32(0.0f), m_debugScale, dFloat32(0.0f), dFloat32(0.0f))));
+		DrawLine(matrix.m_posit, y, dVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f)));
+
+		dVector z(matrix.m_posit + matrix.RotateVector(dVector(dFloat32(0.0f), dFloat32(0.0f), m_debugScale, dFloat32(0.0f))));
+		DrawLine(matrix.m_posit, z, dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f)));
+	}
+
+	//virtual void DrawPoint(const dVector& p0, dFloat32 thinckness = dFloat32(1.0f)) = 0;
+	//virtual void SetOrthRendering() {};
+	//virtual void ResetOrthRendering() {};
+	//
+	//dFloat32 GetScale() const
+	//{ 
+	//	return m_debugScale; 
+	//} 
+	//
+	//void SetScale(dFloat32 scale) 
+	//{ 
+	//	m_debugScale = scale; 
+	//}
+	//
+	//void DrawFrame(const dMatrix& matrix) 
+	//{ 
+	//	DrawFrame(matrix, m_debugScale); 
+	//}
+	//
+	//void DrawFrame(const dMatrix& matrix, dFloat32 scale)
+	//{
+	//	dVector x(matrix.m_posit + matrix.RotateVector(dVector(scale, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f))));
+	//	SetColor(dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)));
+	//	DrawLine(matrix.m_posit, x);
+	//
+	//	dVector y(matrix.m_posit + matrix.RotateVector(dVector(dFloat32(0.0f), scale, dFloat32(0.0f), dFloat32(0.0f))));
+	//	SetColor(dVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f)));
+	//	DrawLine(matrix.m_posit, y);
+	//
+	//	dVector z(matrix.m_posit + matrix.RotateVector(dVector(dFloat32(0.0f), dFloat32(0.0f), scale, dFloat32(0.0f))));
+	//	SetColor(dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f)));
+	//	DrawLine(matrix.m_posit, z);
+	//}
+	
+	dFloat32 m_debugScale;
+	//int m_width;
+	//int m_height;
+
+
+} D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
 class dgPointParam
@@ -69,11 +143,11 @@ class ndForceImpactPair
 	public:
 	void Clear()
 	{
-		m_force = dFloat32(0.0f);
-		m_impact = dFloat32(0.0f);
+		m_force = dFloat32(dFloat32(0.0f));
+		m_impact = dFloat32(dFloat32(0.0f));
 		for (dInt32 i = 0; i < sizeof(m_initialGuess) / sizeof(m_initialGuess[0]); i++) 
 		{
-			m_initialGuess[i] = dFloat32(0.0f);
+			m_initialGuess[i] = dFloat32(dFloat32(0.0f));
 		}
 	}
 
@@ -88,7 +162,7 @@ class ndForceImpactPair
 
 	dFloat32 GetInitiailGuess() const
 	{
-		dFloat32 value = dFloat32(0.0f);
+		dFloat32 value = dFloat32(dFloat32(0.0f));
 		dFloat32 smallest = dFloat32(1.0e15f);
 		for (dInt32 i = 0; i < sizeof(m_initialGuess) / sizeof(m_initialGuess[0]); i++)
 		{
@@ -111,7 +185,7 @@ class ndJointAccelerationDecriptor
 {
 	public:
 	dInt32 m_rowsCount;
-	dFloat32 m_timeStep;
+	dFloat32 m_timestep;
 	dFloat32 m_invTimeStep;
 	dFloat32 m_firstPassCoefFlag;
 	ndRightHandSide* m_rightHandSide;
@@ -194,6 +268,8 @@ class ndConstraint
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const params) = 0;
 
 	void InitPointParam(dgPointParam& param, dFloat32 stiffness, const dVector& p0Global, const dVector& p1Global) const;
+
+	virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const {}
 
 	dFloat32 m_preconditioner0;
 	dFloat32 m_preconditioner1;
@@ -278,7 +354,7 @@ D_INLINE dgBodyMasterListRow::dListNode* ndConstraint::GetLink1()	const
 
 D_INLINE dFloat32 ndConstraint::GetStiffness() const
 {
-	return dFloat32 (1.0f);
+	return dFloat32 (dFloat32(1.0f));
 }
 
 D_INLINE void ndConstraint::SetStiffness(dFloat32 stiffness)
@@ -296,7 +372,7 @@ D_INLINE void ndConstraint::SetImpulseContactSpeed(dFloat32 speed)
 
 D_INLINE dFloat32 ndConstraint::GetImpulseContactSpeed() const
 {
-	return dFloat32 (0.0f);
+	return dFloat32 (dFloat32(0.0f));
 }
 
 D_INLINE dInt32 ndConstraint::GetMaxDOF() const
@@ -320,8 +396,7 @@ D_INLINE void ndConstraint::GetInfo(dgConstraintInfo* const info) const
 }
 #endif
 
-
-D_INLINE ndConstraint::~ndConstraint()
+inline ndConstraint::~ndConstraint()
 {
 }
 

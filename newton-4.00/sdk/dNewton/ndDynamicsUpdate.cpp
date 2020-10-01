@@ -742,7 +742,7 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 			const ndConstraintArray& jointArray = world->m_jointArray;
 
 			ndJointAccelerationDecriptor joindDesc;
-			joindDesc.m_timeStep = world->m_timestepRK;
+			joindDesc.m_timestep = world->m_timestepRK;
 			joindDesc.m_invTimeStep = world->m_invTimestepRK;
 			joindDesc.m_firstPassCoefFlag = world->m_firstPassCoef;
 			dArray<ndLeftHandSide>& leftHandSide = world->m_leftHandSide;
@@ -1210,7 +1210,6 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 
 		if (state) 
 		{
-			dAssert(0);
 			for (dInt32 i = 0; i < count; i++) 
 			{
 				ndBodyDynamic* const body = bodyIslands[i]->GetAsBodyDynamic();

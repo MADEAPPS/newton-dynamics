@@ -275,9 +275,9 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const params)
 
 	dFloat32 timestep = dFloat32(1.0f);
 	dFloat32 invTimestep = dFloat32(1.0f);
-	if (params->m_timeStep > dFloat32(0.0f)) 
+	if (params->m_timestep > dFloat32(0.0f)) 
 	{
-		timestep = params->m_timeStep;
+		timestep = params->m_timestep;
 		invTimestep = params->m_invTimeStep;
 	}
 

@@ -467,7 +467,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& param
 
 void ndJointKinematicController::CheckSleep() const
 {
-	dAssert(0);
+	//dAssert(0);
 	//dMatrix matrix0;
 	//dMatrix matrix1;
 	//CalculateGlobalMatrix(matrix0, matrix1);
