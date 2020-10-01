@@ -308,10 +308,12 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& param
 	
 	const dFloat32 damp = dFloat32 (0.3f);
 	const dFloat32 maxDistance = 2.0f * m_maxSpeed * timestep;
-	for (dInt32 i = 0; i < 3; i++) 
+	//for (dInt32 i = 0; i < 3; i++) 
+	for (dInt32 i = 0; i < 1; i++)
 	{
 		const dInt32 index = params.m_rowsCount;
-		AddLinearRowJacobian(params, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
+		//AddLinearRowJacobian(params, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
+		AddLinearRowJacobian(params, &matrix1.m_posit[0], &matrix1.m_posit[0], dVector(0.0f, 1.0f, 0.0f, 0.0f));
 		const ndJacobianPair& jacobianPair = params.m_jacobian[index];
 	
 		const dVector pointPosit(matrix0.m_posit * jacobianPair.m_jacobianM0.m_linear + matrix1.m_posit * jacobianPair.m_jacobianM1.m_linear);
