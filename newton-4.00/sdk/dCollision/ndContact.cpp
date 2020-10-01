@@ -65,11 +65,11 @@ void ndContact::SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const b
 	dAssert(body1);
 	m_body0 = body0;
 	m_body1 = body1;
-	if (m_body1->GetInvMass() == dFloat32(0.0f))
+	if (m_body0->GetInvMass() == dFloat32(0.0f))
 	{
 		dSwap(m_body1, m_body0);
 	}
-	dAssert(m_body1->GetInvMass() > dFloat32(0.0f));
+	dAssert(m_body0->GetInvMass() > dFloat32(0.0f));
 }
 
 void ndContact::AttachToBodies()

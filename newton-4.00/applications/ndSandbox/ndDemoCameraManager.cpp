@@ -19,8 +19,8 @@
 class ndDemoCameraPickBodyJoint: public ndJointKinematicController
 {
 	public:
-	ndDemoCameraPickBodyJoint(ndBodyKinematic* const worldBody, ndBodyKinematic* const childBody, const dVector& attachmentPointInGlobalSpace, ndDemoCameraManager* const camera)
-		:ndJointKinematicController(worldBody, childBody, attachmentPointInGlobalSpace)
+	ndDemoCameraPickBodyJoint(ndBodyKinematic* const childBody, ndBodyKinematic* const worldBody, const dVector& attachmentPointInGlobalSpace, ndDemoCameraManager* const camera)
+		:ndJointKinematicController(childBody, worldBody, attachmentPointInGlobalSpace)
 		,m_manager (camera)
 	{
 	}
@@ -50,9 +50,9 @@ ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const scene)
 	,m_pickedBodyParam(0.0f)
 	,m_prevMouseState(false)
 	,m_mouseLockState(false)
-	,m_pickedBodyTargetPosition(0.0f)
-	,m_pickedBodyLocalAtachmentPoint(0.0f)
-	,m_pickedBodyLocalAtachmentNormal(0.0f)
+	,m_pickedBodyTargetPosition(dVector::m_wOne)
+	,m_pickedBodyLocalAtachmentPoint(dVector::m_wOne)
+	,m_pickedBodyLocalAtachmentNormal(dVector::m_zero)
 	,m_targetPicked(nullptr)
 	,m_pickJoint(nullptr)
 	//,m_bodyDestructor(nullptr)
@@ -159,10 +159,10 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	m_camera->SetMatrix (*scene, rot, targetMatrix.m_posit);
 
 	// get the mouse pick parameter so that we can do replay for debugging
-	dFloat32 x = m_mousePosX;
-	dFloat32 y = m_mousePosY;
-	dVector p0(m_camera->ScreenToWorld(dVector(x, y, 0.0f, 0.0f)));
-	dVector p1(m_camera->ScreenToWorld(dVector(x, y, 1.0f, 0.0f)));
+	//dFloat32 x = m_mousePosX;
+	//dFloat32 y = m_mousePosY;
+	dVector p0(m_camera->ScreenToWorld(dVector(mouseX, mouseY, 0.0f, 0.0f)));
+	dVector p1(m_camera->ScreenToWorld(dVector(mouseX, mouseY, 1.0f, 0.0f)));
 
 #if 0
 	struct ndReplay
@@ -264,7 +264,7 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 				const dFloat32 linearFrictionAccel = 400.0f * dMax (dAbs (DEMO_GRAVITY), dFloat32(10.0f));
 				const dFloat32 inertia = dMax (mass.m_z, dMax (mass.m_x, mass.m_y));
 
-				m_pickJoint = new ndDemoCameraPickBodyJoint (scene->GetWorld()->GetSentinelBody(), body, posit, this);
+				m_pickJoint = new ndDemoCameraPickBodyJoint (body, scene->GetWorld()->GetSentinelBody(), posit, this);
 				scene->GetWorld()->AddJoint(m_pickJoint);
 				dTrace(("set the pick joint controll mode: %s\n", __FUNCTION__));
 				m_pickJoint->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);

@@ -1294,10 +1294,8 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 	
 		if (active ^ contact->m_active) 
 		{
-			if (body0->GetInvMass() > dFloat32 (0.0f)) 
-			{
-				body0->m_equilibrium = false;
-			}
+			dAssert(body0->GetInvMass() > dFloat32(0.0f));
+			body0->m_equilibrium = false;
 			if (body1->GetInvMass() > dFloat32(0.0f))
 			{
 				body1->m_equilibrium = false;
@@ -1456,20 +1454,17 @@ ndBilateralJoint* ndScene::FindBilateralJoint(ndBody* const body0, ndBody* const
 
 ndContact* ndScene::FindContactJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const
 {
-	//	dAssert(0);
-	dAssert((body0->GetInvMass() != dFloat32(0.0f)) || (body1->GetInvMass() != dFloat32(0.0f)));
-	if (body0->GetInvMass() != dFloat32(0.0f))
-	{
-		ndContact* const contact = body0->FindContact(body1);
-		dAssert(!contact || (body1->FindContact(body0) == contact));
-		return contact;
-	}
-	else
+	dAssert(body0->GetInvMass() != dFloat32(0.0f));
+	if (body1->GetInvMass() != dFloat32(0.0f))
 	{
 		ndContact* const contact = body1->FindContact(body0);
 		dAssert(!contact || (body0->FindContact(body1) == contact));
 		return contact;
 	}
+
+	ndContact* const contact = body0->FindContact(body1);
+	dAssert(!contact || (body1->FindContact(body0) == contact));
+	return contact;
 }
 
 void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1)

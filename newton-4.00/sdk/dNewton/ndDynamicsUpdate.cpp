@@ -158,6 +158,11 @@ dInt32 ndDynamicsUpdate::CompareIslandBodies(const ndBodyIndexPair* const  pairA
 }
 void ndDynamicsUpdate::BuildIsland()
 {
+static int xxxx;
+xxxx++;
+if (xxxx > 780)
+xxxx *= 1;
+
 	ndScene* const scene = m_world->GetScene();
 	const dArray<ndBodyKinematic*>& bodyArray = scene->GetActiveBodyArray();
 	dAssert(bodyArray.GetCount() >= 1);
@@ -181,14 +186,14 @@ void ndDynamicsUpdate::BuildIsland()
 			ndBodyKinematic* const body0 = joint->GetBody0();
 			ndBodyKinematic* const body1 = joint->GetBody1();
 			const dInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
-			body1->m_bodyIsConstrained = 1;
-			body1->m_resting = body1->m_resting & resting;
-			if (body0->GetInvMass() > dFloat32(0.0f))
+			body0->m_bodyIsConstrained = 1;
+			body0->m_resting = body0->m_resting & resting;
+			if (body1->GetInvMass() > dFloat32(0.0f))
 			{
-				body0->m_resting = body0->m_resting & resting;
+				body1->m_resting = body1->m_resting & resting;
 				ndBodyKinematic* root0 = FindRootAndSplit(body0);
 				ndBodyKinematic* root1 = FindRootAndSplit(body1);
-				body0->m_bodyIsConstrained = 1;
+				body1->m_bodyIsConstrained = 1;
 
 				if (root0 != root1)
 				{
@@ -196,26 +201,26 @@ void ndDynamicsUpdate::BuildIsland()
 					{
 						dSwap(root0, root1);
 					}
-					root1->m_islandParent = root0;
+					root0->m_islandParent = root1;
 					if (root0->m_rank == root1->m_rank)
 					{
-						root0->m_rank += 1;
-						dAssert(root0->m_rank <= 6);
+						root1->m_rank += 1;
+						dAssert(root1->m_rank <= 6);
 					}
 				}
 
 				const dInt32 sleep = body0->m_islandSleep & body1->m_islandSleep;
 				if (!sleep)
 				{
-					dAssert(root0->m_islandParent == root0);
-					root0->m_islandSleep = 0;
+					dAssert(root1->m_islandParent == root1);
+					root1->m_islandSleep = 0;
 				}
 			}
 			else
 			{
-				if (!body0->m_islandSleep)
+				if (!body1->m_islandSleep)
 				{
-					ndBodyKinematic* const root = FindRootAndSplit(body1);
+					ndBodyKinematic* const root = FindRootAndSplit(body0);
 					root->m_islandSleep = 0;
 				}
 			}
@@ -353,16 +358,17 @@ void ndDynamicsUpdate::InitWeights()
 		ndBodyKinematic* const body1 = constraint->GetBody1();
 		maxRowCount += constraint->GetRowsCount();
 		
-		if (body0->GetInvMass() == dFloat32(0.0f))
+		if (body1->GetInvMass() == dFloat32(0.0f))
 		{
-			body0->m_weight = dFloat32(1.0f);
+			body1->m_weight = dFloat32(1.0f);
 		}
 		else
 		{
-			body0->m_weight += dFloat32(1.0f);
+			body1->m_weight += dFloat32(1.0f);
 		}
-		body1->m_weight += dFloat32(1.0f);
-		dAssert(body1->GetInvMass() != dFloat32(0.0f));
+
+		body0->m_weight += dFloat32(1.0f);
+		dAssert(body0->GetInvMass() != dFloat32(0.0f));
 	}
 
 	m_maxRowsCount = maxRowCount;
@@ -637,8 +643,9 @@ void ndDynamicsUpdate::BuildJacobianMatrix(ndConstraint* const joint)
 		forceAcc1 = forceAcc1 + JtM1.m_linear * f1;
 		torqueAcc1 = torqueAcc1 + JtM1.m_angular * f1;
 	}
-	
-	if (body0->GetInvMass() > dFloat32 (0.0f)) 
+
+	dAssert(body0->GetInvMass() > dFloat32(0.0f));
+	//if (body0->GetInvMass() > dFloat32(0.0f))
 	{
 		ndJacobian& out = m_internalForces[m0];
 		dScopeSpinLock lock(body0->m_lock);
@@ -646,8 +653,7 @@ void ndDynamicsUpdate::BuildJacobianMatrix(ndConstraint* const joint)
 		out.m_angular += torqueAcc0;
 	}
 
-	dAssert(body1->GetInvMass() > dFloat32(0.0f));
-	//if (m1) 
+	if (body1->GetInvMass() > dFloat32 (0.0f)) 
 	{
 		ndJacobian& out = m_internalForces[m1];
 		dScopeSpinLock lock(body1->m_lock);

@@ -468,11 +468,11 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKine
 {
 	dAssert(m_body0 && m_body1);
 
-	if (m_body1->GetInvMass() == dFloat32(0.0f)) 
+	if (m_body0->GetInvMass() == dFloat32(0.0f)) 
 	{
 		dSwap(m_body0, m_body1);
 	}
-	dAssert(m_body1->GetInvMass() > dFloat32(0.0f));
+	dAssert(m_body0->GetInvMass() > dFloat32(0.0f));
 
 	CalculateLocalMatrix(globalMatrix, m_localMatrix0, m_localMatrix1);
 

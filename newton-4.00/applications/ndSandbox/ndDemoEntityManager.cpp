@@ -143,7 +143,6 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	glfwSetWindowUserPointer(m_mainFrame, this);
 
 	// Setup ImGui binding
-//	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	io.UserData = this;
 
@@ -196,7 +195,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	// initialized the physics world for the new scene
 //	m_showUI = false;
 //	m_showAABB = false;
-	m_hideVisualMeshes = true;
+//	m_hideVisualMeshes = true;
 //	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;

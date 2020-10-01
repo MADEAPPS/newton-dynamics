@@ -251,10 +251,10 @@ void ndJointKinematicController::SubmitConstraints (dFloat32 timestep, int threa
 #endif
 
 
-ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const referenceBody, ndBodyKinematic* const body, const dVector& attachmentPointInGlobalSpace)
-	:ndJointBilateralConstraint(3, referenceBody, body, dMatrix(attachmentPointInGlobalSpace))
+ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const body, ndBodyKinematic* const referenceBody, const dVector& attachmentPointInGlobalSpace)
+	:ndJointBilateralConstraint(3, body, referenceBody, dMatrix(attachmentPointInGlobalSpace))
 {
-	dAssert(GetBody1() == body);
+	dAssert(GetBody0() == body);
 	//dMatrix matrix(body->GetMatrix());
 dMatrix matrix(dVector(0.0f, 1.0f, 0.0f, 0.0f));
 
@@ -271,15 +271,15 @@ ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const re
 
 ndJointKinematicController::~ndJointKinematicController()
 {
-	m_body1->SetAutoSleep(m_autoSleepState);
+	m_body0->SetAutoSleep(m_autoSleepState);
 }
 
 void ndJointKinematicController::Init(const dMatrix& globalMatrix)
 {
 	CalculateLocalMatrix(globalMatrix, m_localMatrix0, m_localMatrix1);
 
-	m_autoSleepState = m_body1->GetAutoSleep();
-	m_body1->SetAutoSleep(false);
+	m_autoSleepState = m_body0->GetAutoSleep();
+	m_body0->SetAutoSleep(false);
 
 	SetControlMode(m_full6dof);
 	SetMaxLinearFriction(1.0f);
@@ -314,7 +314,6 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& param
 	{
 		const dInt32 index = params.m_rowsCount;
 		AddLinearRowJacobian(params, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
-		//AddLinearRowJacobian(params, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix0[i][0]);
 		const ndJacobianPair& jacobianPair = params.m_jacobian[index];
 	
 		const dVector pointPosit(
@@ -472,6 +471,8 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& param
 
 void ndJointKinematicController::CheckSleep() const
 {
+GetBody0()->SetSleepState(false);
+
 	//dAssert(0);
 	//dMatrix matrix0;
 	//dMatrix matrix1;
