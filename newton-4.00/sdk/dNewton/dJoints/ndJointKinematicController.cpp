@@ -255,7 +255,9 @@ ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const re
 	:ndJointBilateralConstraint(3, referenceBody, body, dMatrix(attachmentPointInGlobalSpace))
 {
 	dAssert(GetBody1() == body);
-	dMatrix matrix(body->GetMatrix());
+	//dMatrix matrix(body->GetMatrix());
+dMatrix matrix(dVector(0.0f, 1.0f, 0.0f, 0.0f));
+
 	matrix.m_posit = attachmentPointInGlobalSpace;
 	matrix.m_posit.m_w = dFloat32(1.0f);
 	Init(matrix);
@@ -308,19 +310,20 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& param
 	
 	const dFloat32 damp = dFloat32 (0.3f);
 	const dFloat32 maxDistance = 2.0f * m_maxSpeed * timestep;
-	//for (dInt32 i = 0; i < 3; i++) 
-	for (dInt32 i = 0; i < 1; i++)
+	for (dInt32 i = 0; i < 3; i++) 
 	{
 		const dInt32 index = params.m_rowsCount;
-		//AddLinearRowJacobian(params, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
-		AddLinearRowJacobian(params, &matrix1.m_posit[0], &matrix1.m_posit[0], dVector(0.0f, 1.0f, 0.0f, 0.0f));
+		AddLinearRowJacobian(params, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
+		//AddLinearRowJacobian(params, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix0[i][0]);
 		const ndJacobianPair& jacobianPair = params.m_jacobian[index];
 	
-		const dVector pointPosit(matrix0.m_posit * jacobianPair.m_jacobianM0.m_linear + matrix1.m_posit * jacobianPair.m_jacobianM1.m_linear);
-		const dVector pointVeloc(veloc0 * jacobianPair.m_jacobianM0.m_linear + 
-								omega0 * jacobianPair.m_jacobianM0.m_angular + 
-								veloc1 * jacobianPair.m_jacobianM1.m_linear + 
-								omega1 * jacobianPair.m_jacobianM1.m_angular);
+		const dVector pointPosit(
+			matrix0.m_posit * jacobianPair.m_jacobianM0.m_linear + 
+			matrix1.m_posit * jacobianPair.m_jacobianM1.m_linear);
+
+		const dVector pointVeloc(
+			veloc0 * jacobianPair.m_jacobianM0.m_linear + omega0 * jacobianPair.m_jacobianM0.m_angular + 
+			veloc1 * jacobianPair.m_jacobianM1.m_linear + omega1 * jacobianPair.m_jacobianM1.m_angular);
 	
 		const dFloat32 dist = pointPosit.m_x + pointPosit.m_y + pointPosit.m_z;
 		const dFloat32 speed = pointVeloc.m_x + pointVeloc.m_y + pointVeloc.m_z;
