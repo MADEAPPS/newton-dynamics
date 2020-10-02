@@ -1080,25 +1080,29 @@ void ndDynamicsUpdate::IntegrateBodies()
 			D_TRACKTIME();
 
 			ndWorld* const world = m_owner->GetWorld();
-			//const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetWorkingBodyArray();
+			//dArray<ndBodyKinematic*>& bodyArray = m_owner->GetWorkingBodyArray();
 			dArray<ndBodyKinematic*>& bodyArray = world->m_bodyIslandOrder;
 
 			const dVector invTime(world->m_invTimestep);
 			const dFloat32 timestep = m_timestep;
 
 			dFloat32 maxAccNorm2 = D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR;
-			const dInt32 bodyCount = bodyArray.GetCount() - world->m_unConstrainedBodyCount;
+			//const dInt32 bodyCount = bodyArray.GetCount() - world->m_unConstrainedBodyCount;
+			const dInt32 bodyCount = bodyArray.GetCount();
 			for (dInt32 i = m_it->fetch_add(1); i < bodyCount; i = m_it->fetch_add(1))
 			{
 				ndBodyDynamic* const dynBody = bodyArray[i]->GetAsBodyDynamic();
 
 				// the initial velocity and angular velocity were stored in m_accel and body->m_alpha for memory saving
-				dVector accel(invTime * (dynBody->m_veloc - dynBody->m_accel));
-				dVector alpha(invTime * (dynBody->m_omega - dynBody->m_alpha));
-				dVector accelTest((accel.DotProduct(accel) > maxAccNorm2) | (alpha.DotProduct(alpha) > maxAccNorm2));
-				dynBody->m_accel = accel & accelTest;
-				dynBody->m_alpha = alpha & accelTest;
-				dynBody->IntegrateVelocity(timestep);
+				if (!dynBody->m_equilibrium)
+				{
+					dVector accel(invTime * (dynBody->m_veloc - dynBody->m_accel));
+					dVector alpha(invTime * (dynBody->m_omega - dynBody->m_alpha));
+					dVector accelTest((accel.DotProduct(accel) > maxAccNorm2) | (alpha.DotProduct(alpha) > maxAccNorm2));
+					dynBody->m_accel = accel & accelTest;
+					dynBody->m_alpha = alpha & accelTest;
+					dynBody->IntegrateVelocity(timestep);
+				}
 			}
 		}
 	};
