@@ -120,6 +120,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	dInt32 m_normalMatrixLocation;
 	dInt32 m_projectMatrixLocation;
 	dInt32 m_viewModelMatrixLocation;
+	dInt32 m_directionalLightDirLocation;
 	
 	GLuint* m_indexArray;
 	GLuint m_shader;

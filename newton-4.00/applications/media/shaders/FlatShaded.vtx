@@ -38,19 +38,20 @@ vec3 FlashLightShading(vec3 normal, vec3 posit)
 
 vec3 PhongDirectionalShading(vec3 normal, vec3 posit)
 {
-	vec3 lightDir = vec3 (viewModelMatrix * vec4(0.0f, 1.0f, 0.0f, 0.0f));
+	vec3 lightDir = normalize (vec3 (1.0f, 1.0f, 1.0f));
 	vec3 specularDir = normalize (-posit);
 	
 	vec3 reflectionDir = -reflect (lightDir, normal);
 	
-	vec3 ambientCoeff = vec3(0.1f, 0.1f, 0.1f);
+	vec3 ambientCoeff = vec3(0.3f, 0.3f, 0.3f);
 	vec3 diffuseCoeff = vec3(0.9f, 0.9f, 0.9f); 
-	vec3 specularCoeff = vec3(0.8f, 0.8f, 0.8f);
-	float shininess = 20.0f;
+	vec3 specularCoeff = vec3(0.6f, 0.6f, 0.6f);
+	float shininess = 40.0f;
 	
 	vec3 ambientColor = ambientCoeff; 
 	vec3 diffuseColor = diffuseCoeff * max (dot(normal, lightDir), 0.0f);
-	vec3 specularColor = specularCoeff * pow (max (dot (reflectionDir, specularDir), 0.1), shininess);
+	//vec3 specularColor = specularCoeff * pow (max (dot (reflectionDir, specularDir), 0.1), shininess);
+	vec3 specularColor = vec3(0.0f, 0.0f, 0.0f);
 	
 	return ambientColor + diffuseColor + specularColor;
 }

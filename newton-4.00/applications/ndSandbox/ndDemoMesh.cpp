@@ -874,8 +874,6 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& mod
 }
 
 
-
-
 ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision)
 	:ndDemoMeshInterface()
 {
@@ -1509,6 +1507,7 @@ void ndDemoMesh::OptimizeForRender()
 		m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
 		m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
 		m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+		m_directionalLightDirLocation = glGetUniformLocation(m_shader, "directionalLightDir");
 		glUseProgram(0);
 	}
 
@@ -1568,8 +1567,10 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 		const dMatrix& viewMatrix = camera->GetViewMatrix();
 		const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
 		dMatrix viewModelMatrix(modelMatrix * viewMatrix);
+		dVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
 
 		glUniform1i(m_textureLocation, 0);
+		glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight.m_x);
 		glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 		glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
 		glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
