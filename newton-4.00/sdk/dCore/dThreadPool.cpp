@@ -89,19 +89,18 @@ void dThreadPool::SetCount(dInt32 count)
 			delete[] m_workers;
 			m_workers = nullptr;
 		}
-	}
-
-	if (count)
-	{
-		m_count = count;
-		m_workers = new dWorkerThread[count];
-		for (dInt32 i = 0; i < count; i++)
+		if (count)
 		{
-			char name[256];
-			m_workers[i].m_owner = this;
-			m_workers[i].m_threadIndex = i;
-			sprintf(name, "%s_%d", m_baseName, i + 1);
-			m_workers[i].SetName(name);
+			m_count = count;
+			m_workers = new dWorkerThread[count];
+			for (dInt32 i = 0; i < count; i++)
+			{
+				char name[256];
+				m_workers[i].m_owner = this;
+				m_workers[i].m_threadIndex = i;
+				sprintf(name, "%s_%d", m_baseName, i + 1);
+				m_workers[i].SetName(name);
+			}
 		}
 	}
 }
