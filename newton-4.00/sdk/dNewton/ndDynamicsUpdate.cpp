@@ -1212,8 +1212,9 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 			body->m_alpha = dVector::m_zero;
 			body->m_veloc = dVector::m_zero;
 			body->m_omega = dVector::m_zero;
-			body->m_sleeping = body->m_autoSleep;
-			body->m_equilibrium = 1;
+			//body->m_sleeping = body->m_autoSleep;
+			//body->m_equilibrium = 1;
+			body->m_equilibrium = body->m_autoSleep;
 		}
 	}
 	else if ((count > 1) || bodyIslands[0]->m_bodyIsConstrained)
@@ -1273,9 +1274,9 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 					ndBodyKinematic* const body = bodyIslands[i];
 					body->m_veloc = dVector::m_zero;
 					body->m_omega = dVector::m_zero;
-					body->m_sleeping = body->m_autoSleep;
-					// force entire island to equilibrium
-					body->m_equilibrium = 1;
+					//body->m_sleeping = body->m_autoSleep;
+					//body->m_equilibrium = 1;
+					body->m_equilibrium = body->m_autoSleep;
 					ndBodyDynamic* const dynBody = body->GetAsBodyDynamic();
 					if (dynBody)
 					{

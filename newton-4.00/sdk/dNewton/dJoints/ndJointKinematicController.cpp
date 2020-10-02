@@ -14,10 +14,6 @@
 #include "ndJointKinematicController.h"
 
 #if 0
-IMPLEMENT_CUSTOM_JOINT(ndJointKinematicController)
-
-
-
 void ndJointKinematicController::Deserialize (NewtonDeserializeCallback callback, void* const userData)
 {
 	dAssert (0);
@@ -33,27 +29,6 @@ void ndJointKinematicController::ResetAutoSleep ()
 	ndBodyKinematicSetAutoSleep(GetBody0(), 0);
 }
 
-
-void ndJointKinematicController::Init (const dMatrix& matrix)
-{
-	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
-
-	ndBodyKinematic* const body = GetBody0(); 
-	m_autoSleepState = ndBodyKinematicGetAutoSleep(body) ? true : false;
-	ndBodyKinematicSetSleepState(body, 0);
-
-	SetControlMode(m_full6dof);
-	CalculateLocalMatrix(matrix, m_localMatrix0, m_localMatrix1);
-	SetMaxLinearFriction(1.0f);
-	SetMaxAngularFriction(1.0f);
-	SetAngularViscuosFrictionCoefficient(1.0f);
-	SetMaxSpeed(30.0f);
-	SetMaxOmega(10.0f * 360.0f * dDegreeToRad);
-
-	// set as soft joint
-	SetSolverModel(3);
-}
-
 dMatrix ndJointKinematicController::GetBodyMatrix () const
 {
 	dMatrix matrix0;
@@ -61,60 +36,6 @@ dMatrix ndJointKinematicController::GetBodyMatrix () const
 	return m_localMatrix0 * matrix0;
 }
 
-void ndJointKinematicController::Debug(dDebugDisplay* const debugDisplay) const
-{
-	dMatrix matrix1(GetTargetMatrix());
-	if (m_body1) {
-		ndBodyKinematicGetMatrix(m_body1, &matrix1[0][0]);
-		matrix1 = GetTargetMatrix() * matrix1;
-	}
-	debugDisplay->DrawFrame(matrix1);
-	debugDisplay->DrawFrame(GetBodyMatrix());
-}
-
-void ndJointKinematicController::SubmitLinearConstraints (const dMatrix& matrix0, const dMatrix& matrix1, dFloat32 timestep)
-{
-	dVector omega0(0.0f);
-	dVector omega1(0.0f);
-	dVector veloc0(0.0f);
-	dVector veloc1(0.0f);
-	dComplementaritySolver::dJacobian jacobian0;
-	dComplementaritySolver::dJacobian jacobian1;
-
-	ndBodyKinematicGetOmega(m_body0, &omega0[0]);
-	ndBodyKinematicGetVelocity(m_body0, &veloc0[0]);
-	if (m_body1) {
-		ndBodyKinematicGetOmega(m_body1, &omega1[0]);
-		ndBodyKinematicGetVelocity(m_body1, &veloc1[0]);
-	}
-
-	const dFloat32 invTimestep = 1.0f / timestep;
-
-	const dFloat32 damp = 0.3f;
-	const dFloat32 maxDistance = 2.0f * m_maxSpeed * timestep;
-	for (int i = 0; i < 3; i++) {
-		// Restrict the movement on the pivot point along all tree orthonormal direction
-		NewtonUserJointAddLinearRow(m_joint, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
-		NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
-
-		dVector pointPosit(matrix0.m_posit * jacobian0.m_linear + matrix1.m_posit * jacobian1.m_linear);
-		dVector pointVeloc(veloc0 * jacobian0.m_linear + omega0 * jacobian0.m_angular + veloc1 * jacobian1.m_linear + omega1 * jacobian1.m_angular);
-
-		dFloat32 dist = pointPosit.m_x + pointPosit.m_y + pointPosit.m_z;
-		dFloat32 speed = pointVeloc.m_x + pointVeloc.m_y + pointVeloc.m_z;
-
-		dFloat32 v = m_maxSpeed * dSign(dist);
-		if ((dist < maxDistance) && (dist > -maxDistance)) {
-			v = damp * dist * invTimestep;
-		}
-		dAssert(dAbs(v) <= m_maxSpeed);
-
-		dFloat32 relAccel = (v + speed) * invTimestep;
-		NewtonUserJointSetRowAcceleration(m_joint, -relAccel);
-		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxLinearFriction);
-		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxLinearFriction);
-	}
-}
 
 void ndJointKinematicController::SubmitConstraints (dFloat32 timestep, int threadIndex)
 {
@@ -259,9 +180,6 @@ ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const bo
 	matrix.m_posit = attachmentPointInGlobalSpace;
 	matrix.m_posit.m_w = dFloat32(1.0f);
 
-//matrix = dMatrix(dVector(0.0f, 1.0f, 0.0f, 0.0f));
-//matrix.m_posit = body->GetMatrix().m_posit;
-
 	Init(matrix);
 }
 
@@ -299,12 +217,6 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& param
 	dMatrix matrix0;
 	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
-
-m_body0->SetOmega(dVector::m_zero);
-dVector xxxxxx(m_body0->GetVelocity());
-xxxxxx.m_x = 0.0f;
-xxxxxx.m_z = 0.0f;
-m_body0->SetVelocity(xxxxxx);
 
 	const dVector omega0(m_body0->GetOmega());
 	const dVector omega1(m_body1->GetOmega());

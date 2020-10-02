@@ -149,12 +149,13 @@ ndBodyKinematic::~ndBodyKinematic()
 
 bool ndBodyKinematic::GetSleepState() const
 {
-	return m_sleeping;
+	//return m_sleeping;
+	return m_equilibrium;
 }
 
 void ndBodyKinematic::SetSleepState(bool state)
 {
-	m_sleeping = state ? 1 : 0;
+	//m_sleeping = state ? 1 : 0;
 	m_equilibrium = state ? 1 : 0;
 	if ((m_invMass.m_w > dFloat32(0.0f)) && (m_veloc.DotProduct(m_veloc).GetScalar() < dFloat32(1.0e-10f)) && (m_omega.DotProduct(m_omega).GetScalar() < dFloat32(1.0e-10f))) 
 	{
