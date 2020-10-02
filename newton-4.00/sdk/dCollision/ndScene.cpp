@@ -992,6 +992,10 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 			//dAssert(0);
 			//KinematicBodyActivation(pair->m_contact);
 		}
+		else
+		{
+			contact->m_maxDOF = 0;
+		}
 	}
 }
 
@@ -1684,7 +1688,7 @@ void ndScene::DeleteDeadContact()
 		dAssert(contact);
 		if (contact->m_killContact) 
 		{
-			dAssert(0);
+			activeCount--;
 			m_contactList.DeleteContact(contact);
 			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
 		}

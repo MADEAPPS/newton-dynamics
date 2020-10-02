@@ -255,11 +255,13 @@ ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const bo
 	:ndJointBilateralConstraint(3, body, referenceBody, dMatrix(attachmentPointInGlobalSpace))
 {
 	dAssert(GetBody0() == body);
-	//dMatrix matrix(body->GetMatrix());
-dMatrix matrix(dVector(0.0f, 1.0f, 0.0f, 0.0f));
-
+	dMatrix matrix(body->GetMatrix());
 	matrix.m_posit = attachmentPointInGlobalSpace;
 	matrix.m_posit.m_w = dFloat32(1.0f);
+
+//matrix = dMatrix(dVector(0.0f, 1.0f, 0.0f, 0.0f));
+//matrix.m_posit = body->GetMatrix().m_posit;
+
 	Init(matrix);
 }
 
@@ -298,22 +300,26 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& param
 	dMatrix matrix1;
 	CalculateGlobalMatrix(matrix0, matrix1);
 
-	dVector omega0(m_body0->GetOmega());
-	dVector omega1(m_body1->GetOmega());
-	dVector veloc0(m_body0->GetVelocity());
-	dVector veloc1(m_body1->GetVelocity());
-	//dComplementaritySolver::dJacobian jacobian0;
-	//dComplementaritySolver::dJacobian jacobian1;
+m_body0->SetOmega(dVector::m_zero);
+dVector xxxxxx(m_body0->GetVelocity());
+xxxxxx.m_x = 0.0f;
+xxxxxx.m_z = 0.0f;
+m_body0->SetVelocity(xxxxxx);
+
+	const dVector omega0(m_body0->GetOmega());
+	const dVector omega1(m_body1->GetOmega());
+	const dVector veloc0(m_body0->GetVelocity());
+	const dVector veloc1(m_body1->GetVelocity());
 
 	const dFloat32 timestep = params.m_timestep;
 	const dFloat32 invTimestep = params.m_invTimestep;
-	
+
 	const dFloat32 damp = dFloat32 (0.3f);
 	const dFloat32 maxDistance = 2.0f * m_maxSpeed * timestep;
 	for (dInt32 i = 0; i < 3; i++) 
 	{
 		const dInt32 index = params.m_rowsCount;
-		AddLinearRowJacobian(params, &matrix1.m_posit[0], &matrix1.m_posit[0], &matrix1[i][0]);
+		AddLinearRowJacobian(params, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix1[i][0]);
 		const ndJacobianPair& jacobianPair = params.m_jacobian[index];
 	
 		const dVector pointPosit(

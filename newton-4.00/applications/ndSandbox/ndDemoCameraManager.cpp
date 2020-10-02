@@ -266,7 +266,6 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 
 				m_pickJoint = new ndDemoCameraPickBodyJoint (body, scene->GetWorld()->GetSentinelBody(), posit, this);
 				scene->GetWorld()->AddJoint(m_pickJoint);
-				dTrace(("set the pick joint controll mode: %s\n", __FUNCTION__));
 				m_pickJoint->SetControlMode(ndJointKinematicController::m_linearPlusAngularFriction);
 				
 				m_pickJoint->SetMaxLinearFriction(mass.m_w * linearFrictionAccel);

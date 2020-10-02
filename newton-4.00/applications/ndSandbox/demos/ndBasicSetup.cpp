@@ -58,6 +58,7 @@ static void BuildSphere(ndDemoEntityManager* const scene, dFloat32 mass, const d
 	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f * 0.99f;
 
 	matrix.m_posit.m_y += xxxx;
+matrix.m_posit.m_y += 4.0f;
 
 	// get the dimension from shape itself
 	//dVector minP(0.0f);
@@ -66,7 +67,6 @@ static void BuildSphere(ndDemoEntityManager* const scene, dFloat32 mass, const d
 
 	ndDemoMesh* const geometry = new ndDemoMesh("sphere", scene->GetShaderCache(), &sphere, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
-	//count = 1;
 	for (int i = 0; i < count; i++)
 	{
 		ndBodyDynamic* const body = new ndBodyDynamic();
