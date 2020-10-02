@@ -1458,7 +1458,6 @@ ndBilateralJoint* ndScene::FindBilateralJoint(ndBody* const body0, ndBody* const
 
 ndContact* ndScene::FindContactJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const
 {
-	dAssert(body0->GetInvMass() != dFloat32(0.0f));
 	if (body1->GetInvMass() != dFloat32(0.0f))
 	{
 		ndContact* const contact = body1->FindContact(body0);
@@ -1466,6 +1465,7 @@ ndContact* ndScene::FindContactJoint(ndBodyKinematic* const body0, ndBodyKinemat
 		return contact;
 	}
 
+	dAssert(body0->GetInvMass() != dFloat32(0.0f));
 	ndContact* const contact = body0->FindContact(body1);
 	dAssert(!contact || (body1->FindContact(body0) == contact));
 	return contact;

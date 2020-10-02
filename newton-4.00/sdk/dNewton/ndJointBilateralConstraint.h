@@ -90,7 +90,9 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	
 	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const;
 	D_NEWTON_API void CalculateLocalMatrix(const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
-	D_NEWTON_API void AddLinearRowJacobian(ndConstraintDescritor& paramOut, const dVector& pivot0, const dVector& pivot1, const dVector& dir);
+
+	D_NEWTON_API void AddAngularRowJacobian(ndConstraintDescritor& desc, const dVector& dir, dFloat32 relAngle);
+	D_NEWTON_API void AddLinearRowJacobian(ndConstraintDescritor& desc, const dVector& pivot0, const dVector& pivot1, const dVector& dir);
 
 	D_NEWTON_API virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 

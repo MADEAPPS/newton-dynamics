@@ -37,7 +37,7 @@ dMatrix ndJointKinematicController::GetBodyMatrix () const
 }
 
 
-void ndJointKinematicController::SubmitConstraints (dFloat32 timestep, int threadIndex)
+void ndJointKinematicController::SubmitConstraints (dFloat32 timestep, dInt32 threadIndex)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -64,7 +64,7 @@ void ndJointKinematicController::SubmitConstraints (dFloat32 timestep, int threa
 		if (m_controlMode == m_linearPlusAngularFriction) {
 			dFloat32 omegaMag2 = omega0.DotProduct3(omega0);
 			dFloat32 angularFriction = m_maxAngularFriction + m_angularFrictionCoefficient * omegaMag2;
-			for (int i = 0; i < 3; i++) {
+			for (dInt32 i = 0; i < 3; i++) {
 				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[i][0]);
 				NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
 
@@ -83,7 +83,7 @@ void ndJointKinematicController::SubmitConstraints (dFloat32 timestep, int threa
 			dFloat32 cosAngle = matrix1[0].DotProduct3(matrix0[0]);
 			if (cosAngle > dFloat32 (0.998f)) {
 				if ((m_controlMode == m_linearAndCone) || (m_controlMode == m_full6dof)) {
-					for (int i = 1; i < 3; i++) {
+					for (dInt32 i = 1; i < 3; i++) {
 						dFloat32 coneAngle = -damp * CalculateAngle(matrix0[0], matrix1[0], matrix1[i]);
 						NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[i][0]);
 						NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
@@ -173,7 +173,7 @@ void ndJointKinematicController::SubmitConstraints (dFloat32 timestep, int threa
 
 
 ndJointKinematicController::ndJointKinematicController(ndBodyKinematic* const body, ndBodyKinematic* const referenceBody, const dVector& attachmentPointInGlobalSpace)
-	:ndJointBilateralConstraint(3, body, referenceBody, dMatrix(attachmentPointInGlobalSpace))
+	:ndJointBilateralConstraint(6, body, referenceBody, dMatrix(attachmentPointInGlobalSpace))
 {
 	dAssert(GetBody0() == body);
 	dMatrix matrix(body->GetMatrix());
@@ -212,7 +212,7 @@ void ndJointKinematicController::Init(const dMatrix& globalMatrix)
 	SetSolverModel(3);
 }
 
-void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& params)
+void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -223,16 +223,16 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& param
 	const dVector veloc0(m_body0->GetVelocity());
 	const dVector veloc1(m_body1->GetVelocity());
 
-	const dFloat32 timestep = params.m_timestep;
-	const dFloat32 invTimestep = params.m_invTimestep;
+	const dFloat32 timestep = desc.m_timestep;
+	const dFloat32 invTimestep = desc.m_invTimestep;
 
 	const dFloat32 damp = dFloat32 (0.3f);
 	const dFloat32 maxDistance = 2.0f * m_maxSpeed * timestep;
 	for (dInt32 i = 0; i < 3; i++) 
 	{
-		const dInt32 index = params.m_rowsCount;
-		AddLinearRowJacobian(params, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix1[i][0]);
-		const ndJacobianPair& jacobianPair = params.m_jacobian[index];
+		const dInt32 index = desc.m_rowsCount;
+		AddLinearRowJacobian(desc, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix1[i][0]);
+		const ndJacobianPair& jacobianPair = desc.m_jacobian[index];
 	
 		const dVector pointPosit(
 			matrix0.m_posit * jacobianPair.m_jacobianM0.m_linear + 
@@ -253,138 +253,125 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& param
 		dAssert(dAbs(v) <= m_maxSpeed);
 	
 		const dFloat32 relAccel = (v + speed) * invTimestep;
-		SetMotorAcceleration(params, index, -relAccel);
-		SetLowerFriction(params, index, -m_maxLinearFriction);
-		SetHighFriction(params, index, m_maxLinearFriction);
+		SetMotorAcceleration(desc, index, -relAccel);
+		SetLowerFriction(desc, index, -m_maxLinearFriction);
+		SetHighFriction(desc, index, m_maxLinearFriction);
 	}
 
-	//if (m_controlMode != m_linear) 
-	//{
-	//	dVector omega0(0.0f);
-	//	dVector omega1(0.0f);
-	//	dVector veloc0(0.0f);
-	//	dVector veloc1(0.0f);
-	//	dComplementaritySolver::dJacobian jacobian0;
-	//	dComplementaritySolver::dJacobian jacobian1;
-	//
-	//	NewtonBodyGetOmega(m_body0, &omega0[0]);
-	//	NewtonBodyGetVelocity(m_body0, &veloc0[0]);
-	//	if (m_body1) {
-	//		NewtonBodyGetOmega(m_body1, &omega1[0]);
-	//		NewtonBodyGetVelocity(m_body1, &veloc1[0]);
-	//	}
-	//
-	//	const dFloat32 damp = 0.3f;
-	//	const dFloat32 invTimestep = 1.0f / timestep;
-	//	if (m_controlMode == m_linearPlusAngularFriction) 
-	//	{
-	//		dFloat32 omegaMag2 = omega0.DotProduct3(omega0);
-	//		dFloat32 angularFriction = m_maxAngularFriction + m_angularFrictionCoefficient * omegaMag2;
-	//		for (int i = 0; i < 3; i++) {
-	//			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[i][0]);
-	//			NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
-	//
-	//			dVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-	//			dFloat32 relSpeed = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
-	//			dFloat32 relAccel = relSpeed * invTimestep;
-	//
-	//			NewtonUserJointSetRowAcceleration(m_joint, -relAccel);
-	//			NewtonUserJointSetRowMinimumFriction(m_joint, -angularFriction);
-	//			NewtonUserJointSetRowMaximumFriction(m_joint, angularFriction);
-	//		}
-	//	}
-	//	else {
-	//
-	//		dFloat32 pitchAngle = 0.0f;
-	//		const dFloat32 maxAngle = 2.0f * m_maxOmega * timestep;
-	//		dFloat32 cosAngle = matrix1[0].DotProduct3(matrix0[0]);
-	//		if (cosAngle > dFloat32(0.998f)) {
-	//			if ((m_controlMode == m_linearAndCone) || (m_controlMode == m_full6dof)) {
-	//				for (int i = 1; i < 3; i++) {
-	//					dFloat32 coneAngle = -damp * CalculateAngle(matrix0[0], matrix1[0], matrix1[i]);
-	//					NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[i][0]);
-	//					NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
-	//
-	//					dVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-	//					dFloat32 relOmega = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
-	//
-	//					dFloat32 w = m_maxOmega * dSign(coneAngle);
-	//					if ((coneAngle < maxAngle) && (coneAngle > -maxAngle)) {
-	//						w = damp * coneAngle * invTimestep;
-	//					}
-	//
-	//					dAssert(dAbs(w) <= m_maxOmega);
-	//					dFloat32 relAlpha = (w + relOmega) * invTimestep;
-	//
-	//					NewtonUserJointSetRowAcceleration(m_joint, -relAlpha);
-	//					NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-	//					NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-	//				}
-	//			}
-	//			pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
-	//
-	//		}
-	//		else {
-	//
-	//			dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
-	//			dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
-	//			lateralDir = lateralDir.Normalize();
-	//			dFloat32 coneAngle = dAcos(dClamp(cosAngle, dFloat32(-1.0f), dFloat32(1.0f)));
-	//			dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
-	//
-	//			if ((m_controlMode == m_linearAndCone) || (m_controlMode == m_full6dof)) {
-	//				NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
-	//				NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
-	//
-	//				dVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-	//				dFloat32 relOmega = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
-	//
-	//				dFloat32 w = m_maxOmega * dSign(coneAngle);
-	//				if ((coneAngle < maxAngle) && (coneAngle > -maxAngle)) {
-	//					w = damp * coneAngle * invTimestep;
-	//				}
-	//				dFloat32 relAlpha = (w + relOmega) * invTimestep;
-	//
-	//				NewtonUserJointSetRowAcceleration(m_joint, -relAlpha);
-	//				NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-	//				NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-	//
-	//
-	//				dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
-	//				NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
-	//				NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
-	//				pointOmega = omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular;
-	//				relOmega = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
-	//				relAlpha = relOmega * invTimestep;
-	//
-	//				NewtonUserJointSetRowAcceleration(m_joint, -relAlpha);
-	//				NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-	//				NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-	//			}
-	//
-	//			dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
-	//			pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
-	//		}
-	//
-	//		if ((m_controlMode == m_linearAndTwist) || (m_controlMode == m_full6dof)) {
-	//			NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
-	//			NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
-	//			dVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
-	//			dFloat32 relOmega = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
-	//
-	//			dFloat32 w = m_maxOmega * dSign(pitchAngle);
-	//			if ((pitchAngle < maxAngle) && (pitchAngle > -maxAngle)) {
-	//				w = damp * pitchAngle * invTimestep;
-	//			}
-	//			dAssert(dAbs(w) <= m_maxOmega);
-	//			dFloat32 relAlpha = (w + relOmega) * invTimestep;
-	//
-	//			NewtonUserJointSetRowAcceleration(m_joint, -relAlpha);
-	//			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
-	//			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
-	//		}
-	//	}
-	//}
+	if (m_controlMode != m_linear) 
+	{
+		if (m_controlMode == m_linearPlusAngularFriction) 
+		{
+			const dFloat32 omegaMag2 = omega0.DotProduct(omega0).GetScalar();
+			const dFloat32 angularFriction = m_maxAngularFriction + m_angularFrictionCoefficient * omegaMag2;
+			for (dInt32 i = 0; i < 3; i++) 
+			{
+				const dInt32 index = desc.m_rowsCount;
+				AddAngularRowJacobian(desc, &matrix1[i][0], dFloat32 (0.0f));
+				const ndJacobianPair& jacobianPair = desc.m_jacobian[index];
+				
+				const dVector pointOmega(omega0 * jacobianPair.m_jacobianM0.m_angular + omega1 * jacobianPair.m_jacobianM1.m_angular);
+				const dFloat32 relSpeed = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
+				const dFloat32 relAccel = relSpeed * invTimestep;
+				
+				SetMotorAcceleration(desc, index, -relAccel);
+				SetLowerFriction(desc, index, -angularFriction);
+				SetHighFriction(desc, index, angularFriction);
+			}
+		}
+		else 
+		{
+			dAssert(0);
+		//	dFloat32 pitchAngle = 0.0f;
+		//	const dFloat32 maxAngle = 2.0f * m_maxOmega * timestep;
+		//	dFloat32 cosAngle = matrix1[0].DotProduct3(matrix0[0]);
+		//	if (cosAngle > dFloat32(0.998f)) {
+		//		if ((m_controlMode == m_linearAndCone) || (m_controlMode == m_full6dof)) {
+		//			for (dInt32 i = 1; i < 3; i++) {
+		//				dFloat32 coneAngle = -damp * CalculateAngle(matrix0[0], matrix1[0], matrix1[i]);
+		//				NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix1[i][0]);
+		//				NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
+		//
+		//				dVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+		//				dFloat32 relOmega = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
+		//
+		//				dFloat32 w = m_maxOmega * dSign(coneAngle);
+		//				if ((coneAngle < maxAngle) && (coneAngle > -maxAngle)) {
+		//					w = damp * coneAngle * invTimestep;
+		//				}
+		//
+		//				dAssert(dAbs(w) <= m_maxOmega);
+		//				dFloat32 relAlpha = (w + relOmega) * invTimestep;
+		//
+		//				NewtonUserJointSetRowAcceleration(m_joint, -relAlpha);
+		//				NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
+		//				NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+		//			}
+		//		}
+		//		pitchAngle = -CalculateAngle(matrix0[1], matrix1[1], matrix1[0]);
+		//
+		//	}
+		//	else {
+		//
+		//		dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
+		//		dAssert(lateralDir.DotProduct3(lateralDir) > 1.0e-6f);
+		//		lateralDir = lateralDir.Normalize();
+		//		dFloat32 coneAngle = dAcos(dClamp(cosAngle, dFloat32(-1.0f), dFloat32(1.0f)));
+		//		dMatrix coneRotation(dQuaternion(lateralDir, coneAngle), matrix1.m_posit);
+		//
+		//		if ((m_controlMode == m_linearAndCone) || (m_controlMode == m_full6dof)) {
+		//			NewtonUserJointAddAngularRow(m_joint, 0.0f, &lateralDir[0]);
+		//			NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
+		//
+		//			dVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+		//			dFloat32 relOmega = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
+		//
+		//			dFloat32 w = m_maxOmega * dSign(coneAngle);
+		//			if ((coneAngle < maxAngle) && (coneAngle > -maxAngle)) {
+		//				w = damp * coneAngle * invTimestep;
+		//			}
+		//			dFloat32 relAlpha = (w + relOmega) * invTimestep;
+		//
+		//			NewtonUserJointSetRowAcceleration(m_joint, -relAlpha);
+		//			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
+		//			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+		//
+		//
+		//			dVector sideDir(lateralDir.CrossProduct(matrix0.m_front));
+		//			NewtonUserJointAddAngularRow(m_joint, 0.0f, &sideDir[0]);
+		//			NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
+		//			pointOmega = omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular;
+		//			relOmega = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
+		//			relAlpha = relOmega * invTimestep;
+		//
+		//			NewtonUserJointSetRowAcceleration(m_joint, -relAlpha);
+		//			NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
+		//			NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+		//		}
+		//
+		//		dMatrix pitchMatrix(matrix1 * coneRotation * matrix0.Inverse());
+		//		pitchAngle = -dAtan2(pitchMatrix[1][2], pitchMatrix[1][1]);
+		//	}
+		//
+		//	if ((m_controlMode == m_linearAndTwist) || (m_controlMode == m_full6dof)) {
+		//		NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0[0][0]);
+		//		NewtonUserJointGetRowJacobian(m_joint, &jacobian0.m_linear[0], &jacobian0.m_angular[0], &jacobian1.m_linear[0], &jacobian1.m_angular[0]);
+		//		dVector pointOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+		//		dFloat32 relOmega = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
+		//
+		//		dFloat32 w = m_maxOmega * dSign(pitchAngle);
+		//		if ((pitchAngle < maxAngle) && (pitchAngle > -maxAngle)) {
+		//			w = damp * pitchAngle * invTimestep;
+		//		}
+		//		dAssert(dAbs(w) <= m_maxOmega);
+		//		dFloat32 relAlpha = (w + relOmega) * invTimestep;
+		//
+		//		NewtonUserJointSetRowAcceleration(m_joint, -relAlpha);
+		//		NewtonUserJointSetRowMinimumFriction(m_joint, -m_maxAngularFriction);
+		//		NewtonUserJointSetRowMaximumFriction(m_joint, m_maxAngularFriction);
+		//	}
+		}
+	}
 }
 
 void ndJointKinematicController::CheckSleep() const
