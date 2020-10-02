@@ -746,6 +746,22 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 	class ndCalculateJointsAcceleration: public ndScene::ndBaseJob
 	{
 		public:
+		void ExecuteBatch(const dInt32 start, const dInt32 count, 
+			const ndConstraintArray& jointArray, ndJointAccelerationDecriptor joindDesc,
+			dArray<ndLeftHandSide>& leftHandSide,
+			dArray<ndRightHandSide>& rightHandSide)
+		{
+			for (dInt32 i = 0; i < count; i++)
+			{
+				ndConstraint* const joint = jointArray[i + start];
+				const dInt32 pairStart = joint->m_rowStart;
+				joindDesc.m_rowsCount = joint->m_rowCount;
+				joindDesc.m_leftHandSide = &leftHandSide[pairStart];
+				joindDesc.m_rightHandSide = &rightHandSide[pairStart];
+				joint->JointAccelerations(&joindDesc);
+			}
+		}
+
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -759,16 +775,18 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 			joindDesc.m_firstPassCoefFlag = world->m_firstPassCoef;
 			dArray<ndLeftHandSide>& leftHandSide = world->m_leftHandSide;
 			dArray<ndRightHandSide>& rightHandSide = world->m_rightHandSide;
-			
+
+			const dInt32 stepSize = 64;
 			const dInt32 jointCount = jointArray.GetCount();
-			for (dInt32 i = m_it->fetch_add(1); i < jointCount; i = m_it->fetch_add(1))
+			const dInt32 jointCountBatches = jointCount & -stepSize;
+			dInt32 index = m_it->fetch_add(stepSize);
+			for (; index < jointCountBatches; index = m_it->fetch_add(stepSize))
 			{
-				ndConstraint* const joint = jointArray[i];
-				const dInt32 pairStart = joint->m_rowStart;
-				joindDesc.m_rowsCount = joint->m_rowCount;
-				joindDesc.m_leftHandSide = &leftHandSide[pairStart];
-				joindDesc.m_rightHandSide = &rightHandSide[pairStart];
-				joint->JointAccelerations(&joindDesc);
+				ExecuteBatch(index, stepSize, jointArray, joindDesc, leftHandSide, rightHandSide);
+			}
+			if (index < jointCount)
+			{
+				ExecuteBatch(index, jointCount - index, jointArray, joindDesc, leftHandSide, rightHandSide);
 			}
 		}
 	};
@@ -784,6 +802,18 @@ void ndDynamicsUpdate::CalculateJointsForce()
 	class ndCalculateJointsForce : public ndScene::ndBaseJob
 	{
 		public:
+		dFloat32 ExecuteBatch(const dInt32 start, const dInt32 count, ndConstraintArray& jointArray)
+		{
+			ndWorld* const world = m_owner->GetWorld();
+			dFloat32 accNorm = dFloat32(0.0f);
+			for (dInt32 i = 0; i < count; i++)
+			{
+				ndConstraint* const joint = jointArray[i + start];
+				accNorm += world->CalculateJointsForce(joint);
+			}
+			return accNorm;
+		}
+
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -791,12 +821,20 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			ndWorld* const world = m_owner->GetWorld();
 			ndConstraintArray& jointArray = world->m_jointArray;
 			dFloat32 accNorm = dFloat32 (0.0f);
+			
+			const dInt32 stepSize = 64;
 			const dInt32 jointCount = jointArray.GetCount();
-			for (dInt32 i = m_it->fetch_add(1); i < jointCount; i = m_it->fetch_add(1))
+			const dInt32 jointCountBatches = jointCount & -stepSize;
+			dInt32 index = m_it->fetch_add(stepSize);
+			for (; index < jointCountBatches; index = m_it->fetch_add(stepSize))
 			{
-				ndConstraint* const joint = jointArray[i];
-				accNorm += world->CalculateJointsForce(joint);
+				accNorm += ExecuteBatch(index, stepSize, jointArray);
 			}
+			if (index < jointCount)
+			{
+				accNorm += ExecuteBatch(index, jointCount - index, jointArray);
+			}
+
 			const dInt32 threadIndex = GetThredID();
 			world->m_accelNorm[threadIndex] = accNorm;
 		}
@@ -977,24 +1015,15 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 	class ndIntegrateBodiesVelocity : public ndScene::ndBaseJob
 	{
 		public:
-		virtual void Execute()
+		void ExecuteBatch(const dInt32 start, const dInt32 count, dArray<ndBodyKinematic*>& bodyArray, const dArray<ndJacobian>& internalForces)
 		{
-			D_TRACKTIME();
-
-			//const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetWorkingBodyArray();
-			//const dInt32 bodyCount = bodyArray.GetCount();
-			//ndWorld* const world = m_owner->GetWorld();
-
 			ndWorld* const world = m_owner->GetWorld();
-			dArray<ndBodyKinematic*>& bodyArray = world->m_bodyIslandOrder;
-			const dArray<ndJacobian>& internalForces = world->m_internalForces;
-			const dInt32 bodyCount = bodyArray.GetCount() - world->m_unConstrainedBodyCount;
+			const dVector timestep4(world->m_timestepRK);
+			const dVector speedFreeze2(world->m_freezeSpeed2 * dFloat32(0.1f));
 
-			dVector timestep4(world->m_timestepRK);
-			dVector speedFreeze2(world->m_freezeSpeed2 * dFloat32(0.1f));
-			for (dInt32 i = m_it->fetch_add(1); i < bodyCount; i = m_it->fetch_add(1))
+			for (dInt32 i = 0; i < count; i++)
 			{
-				ndBodyKinematic* const body = bodyArray[i];
+				ndBodyKinematic* const body = bodyArray[i + start];
 				ndBodyDynamic* const dynBody = body->GetAsBodyDynamic();
 				dAssert(dynBody);
 				dAssert(dynBody->m_bodyIsConstrained);
@@ -1003,13 +1032,13 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 				const dVector force(dynBody->GetForce() + forceAndTorque.m_linear);
 				const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
 				const ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
-				
-				if (!body->m_resting) 
+
+				if (!body->m_resting)
 				{
 					body->m_veloc += velocStep.m_linear;
 					body->m_omega += velocStep.m_angular;
 				}
-				else 
+				else
 				{
 					const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
 					const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
@@ -1019,6 +1048,27 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 				}
 				dAssert(body->m_veloc.m_w == dFloat32(0.0f));
 				dAssert(body->m_omega.m_w == dFloat32(0.0f));
+			}
+		}
+
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			dArray<ndBodyKinematic*>& bodyArray = world->m_bodyIslandOrder;
+			const dArray<ndJacobian>& internalForces = world->m_internalForces;
+			const dInt32 bodyCount = bodyArray.GetCount() - world->m_unConstrainedBodyCount;
+
+			const dInt32 stepSize = 64;
+			const dInt32 bodyCountBatches = bodyCount & -stepSize;
+			dInt32 index = m_it->fetch_add(stepSize);
+			for (; index < bodyCountBatches; index = m_it->fetch_add(stepSize))
+			{
+				ExecuteBatch(index, stepSize, bodyArray, internalForces);
+			}
+			if (index < bodyCount)
+			{
+				ExecuteBatch(index, bodyCount - index, bodyArray, internalForces);
 			}
 		}
 	};
@@ -1036,7 +1086,6 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-
 			ndWorld* const world = m_owner->GetWorld();
 			ndConstraintArray& jointArray = world->m_jointArray;
 			ndRightHandSide* const rightHandSide = &world->m_rightHandSide[0];
@@ -1289,3 +1338,4 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 		}
 	}
 }
+

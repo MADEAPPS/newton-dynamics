@@ -32,7 +32,7 @@
 
 #define	D_MAX_THREADS_COUNT	16
 
-//#define	D_LOCK_FREE_THREADS_POOL
+#define	D_LOCK_FREE_THREADS_POOL
 
 class dThreadPoolJob
 {
@@ -72,13 +72,17 @@ class dThreadPool: public dSyncMutex, public dThread
 		public:
 		dThreadLockFreeUpdate()
 			:dThreadPoolJob()
-			, m_begin(false)
+			,m_job(nullptr)
+			,m_begin(false)
+			,m_joindInqueue(nullptr)
 		{
 		}
 
 		virtual void Execute();
 		private:
+		dAtomic<dThreadPoolJob*> m_job;
 		dAtomic<bool> m_begin;
+		dAtomic<dInt32>* m_joindInqueue;
 		friend class dThreadPool;
 		
 	};
@@ -106,6 +110,7 @@ class dThreadPool: public dSyncMutex, public dThread
 	char m_baseName[32];
 
 #ifdef D_LOCK_FREE_THREADS_POOL
+	dAtomic<dInt32> m_joindInqueue;
 	dThreadLockFreeUpdate m_lockFreeJobs[D_MAX_THREADS_COUNT];
 #endif
 };

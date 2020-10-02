@@ -97,7 +97,7 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 	BuildFloor(scene);
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	const int n = 1;
+	const int n = 10;
 	for (int i = 0; i < n; i++)
 	{
 		for (int j = 0; j < n; j++)
