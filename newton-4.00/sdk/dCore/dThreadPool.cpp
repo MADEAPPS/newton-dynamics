@@ -23,6 +23,17 @@
 #include "dThreadPool.h"
 #include "dProfiler.h"
 
+#ifdef D_LOCK_FREE_THREADS_POOL
+void dThreadPool::dThreadLockFreeUpdate::Execute()
+{
+	m_begin.store(true);
+	while (m_begin.load())
+	{
+		std::this_thread::yield();
+	}
+}
+#endif
+
 dThreadPool::dWorkerThread::dWorkerThread()
 	:dClassAlloc()
 	,dThread()
@@ -107,6 +118,10 @@ void dThreadPool::SetCount(dInt32 count)
 
 void dThreadPool::ExecuteJobs(dThreadPoolJob** const jobs)
 {
+#ifdef D_LOCK_FREE_THREADS_POOL
+	jobs[m_count]->m_threadIndex = m_count;
+	jobs[m_count]->Execute();
+#else
 	for (dInt32 i = 0; i < m_count; i++)
 	{
 		m_workers[i].ExecuteJob(jobs[i]);
@@ -115,6 +130,28 @@ void dThreadPool::ExecuteJobs(dThreadPoolJob** const jobs)
 	jobs[m_count]->m_threadIndex = m_count;
 	jobs[m_count]->Execute();
 	m_sync.Sync();
+#endif
+}
+
+void dThreadPool::Begin()
+{
+#ifdef	D_LOCK_FREE_THREADS_POOL
+	for (dInt32 i = 0; i < m_count; i++)
+	{
+		m_workers[i].ExecuteJob(&m_lockFreeJobs[i]);
+	}
+#endif
+}
+
+void dThreadPool::End()
+{
+#ifdef	D_LOCK_FREE_THREADS_POOL
+	for (dInt32 i = 0; i < m_count; i++)
+	{
+		m_lockFreeJobs[i].m_begin.store(false);
+	}
+	m_sync.Sync();
+#endif
 }
 
 void dThreadPool::TickOne()

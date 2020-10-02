@@ -194,6 +194,7 @@ void ndWorld::ThreadFunction()
 	else
 	{
 		D_TRACKTIME();
+		m_scene->Begin();
 		m_scene->BalanceBroadPhase();
 	
 		dInt32 const steps = m_subSteps;
@@ -207,6 +208,7 @@ void ndWorld::ThreadFunction()
 		m_scene->TransformUpdate();
 		UpdateListenersPostTransform();
 		PostUpdate(m_timestep);
+		m_scene->End();
 	}
 	m_lastExecutionTime = (dGetTimeInMicrosenconds() - timeAcc) * dFloat32(1.0e-6f);
 }

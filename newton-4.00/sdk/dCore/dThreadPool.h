@@ -23,6 +23,7 @@
 #define _D_THREAD_POOL_H_
 
 #include "dCoreStdafx.h"
+#include "dTypes.h"
 #include "dArray.h"
 #include "dThread.h"
 #include "dSyncMutex.h"
@@ -30,6 +31,8 @@
 #include "dClassAlloc.h"
 
 #define	D_MAX_THREADS_COUNT	16
+
+//#define	D_LOCK_FREE_THREADS_POOL
 
 class dThreadPoolJob
 {
@@ -63,6 +66,24 @@ class dThreadPool: public dSyncMutex, public dThread
 		friend class dThreadPool;
 	};
 
+#ifdef D_LOCK_FREE_THREADS_POOL
+	class dThreadLockFreeUpdate: public dThreadPoolJob
+	{
+		public:
+		dThreadLockFreeUpdate()
+			:dThreadPoolJob()
+			, m_begin(false)
+		{
+		}
+
+		virtual void Execute();
+		private:
+		dAtomic<bool> m_begin;
+		friend class dThreadPool;
+		
+	};
+#endif
+
 	public:
 	D_CORE_API dThreadPool(const char* const baseName);
 	D_CORE_API virtual ~dThreadPool();
@@ -73,6 +94,9 @@ class dThreadPool: public dSyncMutex, public dThread
 	D_CORE_API void TickOne();
 	D_CORE_API void ExecuteJobs(dThreadPoolJob** const jobs);
 
+	D_CORE_API void Begin();
+	D_CORE_API void End();
+
 	private:
 	D_CORE_API virtual void Release();
 
@@ -80,6 +104,10 @@ class dThreadPool: public dSyncMutex, public dThread
 	dWorkerThread* m_workers;
 	dInt32 m_count;
 	char m_baseName[32];
+
+#ifdef D_LOCK_FREE_THREADS_POOL
+	dThreadLockFreeUpdate m_lockFreeJobs[D_MAX_THREADS_COUNT];
+#endif
 };
 
 #endif

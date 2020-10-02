@@ -195,6 +195,7 @@ ndScene::~ndScene()
 void ndScene::CollisionOnlyUpdate()
 {
 	D_TRACKTIME();
+	Begin();
 	m_lru = m_lru + 1;
 	BuildBodyArray();
 	UpdateAabb();
@@ -202,6 +203,7 @@ void ndScene::CollisionOnlyUpdate()
 	FindCollidingPairs();
 	CalculateContacts();
 	DeleteDeadContact();
+	End();
 }
 
 void ndScene::ThreadFunction()
