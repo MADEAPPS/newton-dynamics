@@ -86,6 +86,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 
 	private:
 	void ThreadFunction();
+	void PostUpdate(dFloat32 timestep);
 	
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons();

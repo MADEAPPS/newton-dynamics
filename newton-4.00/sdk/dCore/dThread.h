@@ -51,6 +51,7 @@ class dThread
 	private:
 	void ThreadFunctionCallback();
 
+	protected:
 	char m_name[32];
 };
 

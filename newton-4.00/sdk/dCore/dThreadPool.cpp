@@ -21,6 +21,7 @@
 
 #include "dCoreStdafx.h"
 #include "dThreadPool.h"
+#include "dProfiler.h"
 
 dThreadPool::dWorkerThread::dWorkerThread()
 	:dClassAlloc()
@@ -38,6 +39,7 @@ dThreadPool::dWorkerThread::~dWorkerThread()
 void dThreadPool::dWorkerThread::ThreadFunction()
 {
 	dAssert(m_job);
+	D_SET_TRACK_NAME(m_name);
 	m_job->Execute();
 	m_owner->m_sync.Release();
 }

@@ -206,9 +206,15 @@ void ndWorld::ThreadFunction()
 		m_scene->SetTimestep(m_timestep);
 		m_scene->TransformUpdate();
 		UpdateListenersPostTransform();
-		OnPostUpdate(m_timestep);
+		PostUpdate(m_timestep);
 	}
 	m_lastExecutionTime = (dGetTimeInMicrosenconds() - timeAcc) * dFloat32(1.0e-6f);
+}
+
+void ndWorld::PostUpdate(dFloat32 timestep)
+{
+	D_TRACKTIME();
+	OnPostUpdate(m_timestep);
 }
 
 bool ndWorld::AddBody(ndBody* const body)

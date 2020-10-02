@@ -196,10 +196,10 @@ ndDemoEntityManager::ndDemoEntityManager ()
 //	m_showUI = false;
 //	m_showAABB = false;
 //	m_hideVisualMeshes = true;
-//	m_autoSleepMode = false;
+	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
-//	m_workerThreads = 4;
+	m_workerThreads = 4;
 //	m_solverSubSteps = 2;
 //	m_showRaycastHit = true;
 //	m_showCenterOfMass = false;
