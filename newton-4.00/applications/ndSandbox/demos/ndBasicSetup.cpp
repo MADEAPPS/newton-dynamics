@@ -82,6 +82,7 @@ matrix.m_posit.m_y += 4.0f;
 		scene->AddEntity(entity);
 
 		matrix.m_posit += matrix.m_up.Scale(diameter * 0.99f);
+matrix.m_posit += matrix.m_up.Scale(diameter);
 	}
 	geometry->Release();
 }
@@ -98,7 +99,7 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 	BuildFloor(scene);
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	BuildSphere(scene, 10.0f, origin1, 1.0f, 1, 0.0f);
+	BuildSphere(scene, 10.0f, origin1, 1.0f, 4, 0.0f);
 
 	dQuaternion rot;
 	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
