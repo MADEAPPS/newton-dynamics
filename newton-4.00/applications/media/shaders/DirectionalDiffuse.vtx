@@ -27,7 +27,8 @@ out vec3 lightDir;
 
 void main()
 {	
-lightDir = vec3 (viewModelMatrix * normalize (vec4(-1.0f, 1.0f, 0.0f, 0.0f)));
+//lightDir = vec3 (viewModelMatrix * normalize (vec4(-1.0f, 1.0f, 0.0f, 0.0f)));
+lightDir = vec3 (normalize (vec4(-1.0f, 1.0f, 0.0f, 0.0f)));
 
 	uv = in_uv;
 	normal = vec3 (normalize (normalMatrix * vec4(in_normal, 0.0)));

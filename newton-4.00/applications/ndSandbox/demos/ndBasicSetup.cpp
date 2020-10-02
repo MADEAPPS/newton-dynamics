@@ -82,7 +82,7 @@ matrix.m_posit.m_y += 4.0f;
 		scene->AddEntity(entity);
 
 		matrix.m_posit += matrix.m_up.Scale(diameter * 0.99f);
-matrix.m_posit += matrix.m_up.Scale(diameter);
+//matrix.m_posit += matrix.m_up.Scale(diameter);
 	}
 	geometry->Release();
 }
