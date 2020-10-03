@@ -618,7 +618,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Text("iterative solver passes");
 			ImGui::SliderInt("##intera", &m_solverPasses, 4, 64);
 			ImGui::Text("worker threads");
-			ImGui::SliderInt("##worlt", &m_workerThreads, 1, 20);
+			ImGui::SliderInt("##worker", &m_workerThreads, 1, D_MAX_THREADS_COUNT);
 			ImGui::Separator();
 
 			ImGui::RadioButton("default broad phase", &m_broadPhaseType, 0);

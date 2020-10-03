@@ -26,6 +26,8 @@
 #include "ndDynamicsUpdate.h"
 #include "ndJointBilateralConstraint.h"
 
+#define D_BASH_SIZE	64
+
 ndDynamicsUpdate::ndDynamicsUpdate()
 	:m_velocTol(dFloat32(1.0e-8f))
 	,m_islands()
@@ -327,7 +329,7 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 			const dInt32 bodyCount = world->m_unConstrainedBodyCount;
 			const dInt32 base = bodyArray.GetCount() - bodyCount;
 
-			const dInt32 stepSize = 64;
+			const dInt32 stepSize = D_BASH_SIZE;
 			const dInt32 bodyCountBatches = bodyCount & -stepSize;
 			dInt32 index = m_it->fetch_add(stepSize);
 			for (; index < bodyCountBatches; index = m_it->fetch_add(stepSize))
@@ -453,7 +455,7 @@ void ndDynamicsUpdate::InitBodyArray()
 			const dFloat32 timestep = m_timestep;
 			const dInt32 bodyCount = bodyArray.GetCount() - world->m_unConstrainedBodyCount;
 
-			const dInt32 stepSize = 64;
+			const dInt32 stepSize = D_BASH_SIZE;
 			const dInt32 bodyCountBatches = bodyCount & -stepSize;
 			dInt32 index = m_it->fetch_add(stepSize);
 			for (; index < bodyCountBatches; index = m_it->fetch_add(stepSize))
@@ -737,7 +739,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			ndWorld* const world = m_owner->GetWorld();
 			const ndConstraintArray& jointArray = world->m_jointArray;
 
-			const dInt32 stepSize = 64;
+			const dInt32 stepSize = D_BASH_SIZE;
 			const dInt32 jointCount = jointArray.GetCount();
 			const dInt32 jointCountBatches = jointCount & -stepSize;
 			dInt32 index = m_it->fetch_add(stepSize);
@@ -837,7 +839,7 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 			dArray<ndLeftHandSide>& leftHandSide = world->m_leftHandSide;
 			dArray<ndRightHandSide>& rightHandSide = world->m_rightHandSide;
 
-			const dInt32 stepSize = 64;
+			const dInt32 stepSize = D_BASH_SIZE;
 			const dInt32 jointCount = jointArray.GetCount();
 			const dInt32 jointCountBatches = jointCount & -stepSize;
 			dInt32 index = m_it->fetch_add(stepSize);
@@ -879,12 +881,11 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-
 			ndWorld* const world = m_owner->GetWorld();
 			ndConstraintArray& jointArray = world->m_jointArray;
 			dFloat32 accNorm = dFloat32 (0.0f);
 			
-			const dInt32 stepSize = 64;
+			const dInt32 stepSize = D_BASH_SIZE;
 			const dInt32 jointCount = jointArray.GetCount();
 			const dInt32 jointCountBatches = jointCount & -stepSize;
 			dInt32 index = m_it->fetch_add(stepSize);
@@ -1122,7 +1123,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 			const dArray<ndJacobian>& internalForces = world->m_internalForces;
 			const dInt32 bodyCount = bodyArray.GetCount() - world->m_unConstrainedBodyCount;
 
-			const dInt32 stepSize = 64;
+			const dInt32 stepSize = D_BASH_SIZE;
 			const dInt32 bodyCountBatches = bodyCount & -stepSize;
 			dInt32 index = m_it->fetch_add(stepSize);
 			for (; index < bodyCountBatches; index = m_it->fetch_add(stepSize))
@@ -1146,22 +1147,18 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 	class ndUpdateForceFeedback : public ndScene::ndBaseJob
 	{
 		public:
-		virtual void Execute()
+		bool ExecuteBatch(const dInt32 start, const dInt32 count, dFloat32 timestepRK,
+			const ndConstraintArray& jointArray, const ndRightHandSide* const rightHandSide)
 		{
 			D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
-			ndConstraintArray& jointArray = world->m_jointArray;
-			ndRightHandSide* const rightHandSide = &world->m_rightHandSide[0];
-
 			bool hasJointFeeback = false;
-			dFloat32 timestepRK = world->m_timestepRK;
-			for (dInt32 i = m_it->fetch_add(1); i < jointArray.GetCount(); i = m_it->fetch_add(1))
+			for (dInt32 i = 0; i < count; i++)
 			{
-				ndConstraint* const joint = jointArray[i];
+				ndConstraint* const joint = jointArray[i + start];
 				const dInt32 first = joint->m_rowStart;
-				const dInt32 count = joint->m_rowCount;
-
-				for (dInt32 j = 0; j < count; j++) 
+				const dInt32 rows = joint->m_rowCount;
+				
+				for (dInt32 j = 0; j < rows; j++) 
 				{
 					const ndRightHandSide* const rhs = &rightHandSide[j + first];
 					dAssert(dCheckFloat(rhs->m_force));
@@ -1171,6 +1168,32 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 				}
 				hasJointFeeback |= joint->m_jointFeebackForce;
 			}
+			return hasJointFeeback;
+		}
+
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			ndConstraintArray& jointArray = world->m_jointArray;
+			const ndRightHandSide* const rightHandSide = &world->m_rightHandSide[0];
+
+			bool hasJointFeeback = false;
+			const dFloat32 timestepRK = world->m_timestepRK;
+
+			const dInt32 stepSize = D_BASH_SIZE;
+			const dInt32 jointCount = jointArray.GetCount();
+			const dInt32 jointCountBatches = jointCount & -stepSize;
+			dInt32 index = m_it->fetch_add(stepSize);
+			for (; index < jointCountBatches; index = m_it->fetch_add(stepSize))
+			{
+				hasJointFeeback |= ExecuteBatch(index, stepSize, timestepRK, jointArray, rightHandSide);
+			}
+			if (index < jointCount)
+			{
+				hasJointFeeback |= ExecuteBatch(index, jointCount - index, timestepRK, jointArray, rightHandSide);
+			}
+
 			const dInt32 threadIndex = GetThredID();
 			world->m_hasJointFeeback[threadIndex] = hasJointFeeback ? 1 : 0;
 		}
@@ -1186,6 +1209,33 @@ void ndDynamicsUpdate::IntegrateBodies()
 	class ndIntegrateBodies: public ndScene::ndBaseJob
 	{
 		public:
+
+		void ExecuteBatch(const dInt32 start, const dInt32 count, dArray<ndBodyKinematic*>& bodyArray)
+		{
+			D_TRACKTIME();
+
+			ndWorld* const world = m_owner->GetWorld();
+			const dVector invTime(world->m_invTimestep);
+			const dFloat32 timestep = m_timestep;
+
+			const dFloat32 maxAccNorm2 = D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR;
+			for (dInt32 i = 0; i < count; i++)
+			{
+				ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
+			
+				// the initial velocity and angular velocity were stored in m_accel and body->m_alpha for memory saving
+				if (!body->m_equilibrium)
+				{
+					dVector accel(invTime * (body->m_veloc - body->m_accel));
+					dVector alpha(invTime * (body->m_omega - body->m_alpha));
+					dVector accelTest((accel.DotProduct(accel) > maxAccNorm2) | (alpha.DotProduct(alpha) > maxAccNorm2));
+					body->m_accel = accel & accelTest;
+					body->m_alpha = alpha & accelTest;
+					body->IntegrateVelocity(timestep);
+				}
+			}
+		}
+
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -1196,23 +1246,18 @@ void ndDynamicsUpdate::IntegrateBodies()
 
 			const dVector invTime(world->m_invTimestep);
 			const dFloat32 timestep = m_timestep;
-
-			dFloat32 maxAccNorm2 = D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR;
+			
 			const dInt32 bodyCount = bodyArray.GetCount();
-			for (dInt32 i = m_it->fetch_add(1); i < bodyCount; i = m_it->fetch_add(1))
+			const dInt32 stepSize = D_BASH_SIZE;
+			const dInt32 bodyCountBatches = bodyCount & -stepSize;
+			dInt32 index = m_it->fetch_add(stepSize);
+			for (; index < bodyCountBatches; index = m_it->fetch_add(stepSize))
 			{
-				ndBodyDynamic* const dynBody = bodyArray[i]->GetAsBodyDynamic();
-
-				// the initial velocity and angular velocity were stored in m_accel and body->m_alpha for memory saving
-				if (!dynBody->m_equilibrium)
-				{
-					dVector accel(invTime * (dynBody->m_veloc - dynBody->m_accel));
-					dVector alpha(invTime * (dynBody->m_omega - dynBody->m_alpha));
-					dVector accelTest((accel.DotProduct(accel) > maxAccNorm2) | (alpha.DotProduct(alpha) > maxAccNorm2));
-					dynBody->m_accel = accel & accelTest;
-					dynBody->m_alpha = alpha & accelTest;
-					dynBody->IntegrateVelocity(timestep);
-				}
+				ExecuteBatch(index, stepSize, bodyArray);
+			}
+			if (index < bodyCount)
+			{
+				ExecuteBatch(index, bodyCount - index, bodyArray);
 			}
 		}
 	};
@@ -1227,16 +1272,36 @@ void ndDynamicsUpdate::DetermineSleepStates()
 	class ndDetermineSleepStates : public ndScene::ndBaseJob
 	{
 		public:
+
+		void ExecuteBatch(const dInt32 start, const dInt32 count, const dArray<ndIsland>& islandArray)
+		{
+			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			for (dInt32 i = 0; i < count; i++)
+			{
+				const ndIsland& island = islandArray[start + i];
+				world->UpdateIslandState(island);
+			}
+		}
+
 		virtual void Execute()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			const dArray<ndIsland>& islands = world->m_islands;
-			const dInt32 islandsCount = islands.GetCount();
-			for (dInt32 i = m_it->fetch_add(1); i < islandsCount; i = m_it->fetch_add(1))
+			const dArray<ndIsland>& islandArray = world->m_islands;
+			const dInt32 islandCount = islandArray.GetCount();
+
+			const dInt32 stepSize = D_BASH_SIZE;
+			const dInt32 islandCountBatches = islandCount & -stepSize;
+
+			dInt32 index = m_it->fetch_add(stepSize);
+			for (; index < islandCountBatches; index = m_it->fetch_add(stepSize))
 			{
-				const ndIsland& island = islands[i];
-				world->UpdateIslandState(island);
+				ExecuteBatch(index, stepSize, islandArray);
+			}
+			if (index < islandCount)
+			{
+				ExecuteBatch(index, islandCount - index, islandArray);
 			}
 		}
 	};
@@ -1265,7 +1330,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 	//const dFloat32 accelFreeze = world->m_freezeAccel2 * ((count <= DG_SMALL_ISLAND_COUNT) ? dFloat32(0.0025f) : dFloat32(1.0f));
 	dVector velocDragVect(velocityDragCoeff, velocityDragCoeff, velocityDragCoeff, dFloat32(0.0f));
 	
-	bool stackSleeping = true;
+	dInt32 stackSleeping = 1;
 	dInt32 sleepCounter = 10000;
 	
 	ndBodyKinematic** const bodyIslands = &m_world->m_bodyIslandOrder[island.m_start];
@@ -1279,7 +1344,8 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 		dAssert(body->m_veloc.m_w == dFloat32(0.0f));
 		dAssert(body->m_omega.m_w == dFloat32(0.0f));
 
-		body->m_equilibrium = 1;
+		//dUnsigned32 equilibrium = 1;
+		dUnsigned32 equilibrium = (body->GetInvMass() == dFloat32(0.0f)) ? 1 : body->m_autoSleep;
 		const dVector isMovingMask(body->m_veloc + body->m_omega + body->m_accel + body->m_alpha);
 		const dVector mask(isMovingMask.TestZero());
 		const dInt32 test = mask.GetSignMask() & 7;
@@ -1294,8 +1360,8 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 			maxAlpha = dMax(maxAlpha, alpha2);
 			maxSpeed = dMax(maxSpeed, speed2);
 			maxOmega = dMax(maxOmega, omega2);
-			bool equilibrium = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
-			if (equilibrium) 
+			dUnsigned32 equilibriumTest = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
+			if (equilibriumTest)
 			{
 				const dVector veloc(body->m_veloc * velocDragVect);
 				const dVector omega(body->m_omega * velocDragVect);
@@ -1305,10 +1371,14 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 				body->m_omega = omegaMask & omega;
 			}
 	
-			body->m_equilibrium = equilibrium ? 1 : 0;
-			stackSleeping &= equilibrium;
+			equilibrium &= equilibriumTest;
+			stackSleeping &= equilibriumTest;
 			sleepCounter = dMin(sleepCounter, body->m_sleepingCounter);
 			body->m_sleepingCounter++;
+		}
+		if (body->m_equilibrium != equilibrium)
+		{
+			body->m_equilibrium = equilibrium;
 		}
 	}
 	
@@ -1316,7 +1386,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 	{
 		for (dInt32 i = 0; i < count; i++) 
 		{
-			// force entire island to equilibrium
+			// force entire island to equilibriumTest
 			ndBodyDynamic* const body = bodyIslands[i]->GetAsBodyDynamic();
 			body->m_accel = dVector::m_zero;
 			body->m_alpha = dVector::m_zero;
@@ -1324,7 +1394,8 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 			body->m_omega = dVector::m_zero;
 			//body->m_sleeping = body->m_autoSleep;
 			//body->m_equilibrium = 1;
-			body->m_equilibrium = body->m_autoSleep;
+			//body->m_equilibrium = body->m_autoSleep;
+			body->m_equilibrium = (body->GetInvMass() == dFloat32(0.0f)) ? 1 : body->m_autoSleep;
 		}
 	}
 	else if ((count > 1) || bodyIslands[0]->m_bodyIsConstrained)
@@ -1351,7 +1422,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 		{
 			if (count < D_SMALL_ISLAND_COUNT) 
 			{
-				// delay small islands for about 10 seconds
+				// delay small islandArray for about 10 seconds
 				sleepCounter >>= 8;
 				for (dInt32 i = 0; i < count; i++) 
 				{

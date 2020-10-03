@@ -17,8 +17,6 @@
 #include <windows.h>
 #include <crtdbg.h>
 
-#pragma warning (disable: 4100) //unreferenced formal parameter
-
 class CheckMemoryLeaks
 {
 public:
@@ -45,7 +43,7 @@ public:
 #endif
 	}
 };
-static CheckMemoryLeaks checkLeaks;
+//static CheckMemoryLeaks checkLeaks;
 
 
 BOOL APIENTRY DllMain( HMODULE hModule,

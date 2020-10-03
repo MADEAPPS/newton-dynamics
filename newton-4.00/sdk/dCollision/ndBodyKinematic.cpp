@@ -150,7 +150,7 @@ ndBodyKinematic::~ndBodyKinematic()
 bool ndBodyKinematic::GetSleepState() const
 {
 	//return m_sleeping;
-	return m_equilibrium;
+	return m_equilibrium ? true : false;
 }
 
 void ndBodyKinematic::SetSleepState(bool state)

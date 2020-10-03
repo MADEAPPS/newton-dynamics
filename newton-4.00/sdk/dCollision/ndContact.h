@@ -147,9 +147,12 @@ class ndContact
 	dFloat32 m_contactPruningTolereance;
 	dUnsigned32 m_maxDOF;
 	dUnsigned32 m_sceneLru;
-	bool m_active;
-	bool m_isAttached;
-	bool m_killContact;
+	//bool m_active;
+	//bool m_isAttached;
+	//bool m_killContact;
+	dUnsigned32 m_active : 1;
+	dUnsigned32 m_isAttached : 1;
+	dUnsigned32 m_killContact : 1;
 	static dVector m_initialSeparatingVector;
 
 	friend class ndScene;

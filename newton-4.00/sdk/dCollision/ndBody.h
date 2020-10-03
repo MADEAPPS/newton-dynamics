@@ -74,12 +74,13 @@ class ndBody: public dClassAlloc
 	dQuaternion m_rotation;
 	ndBodyNotify* m_notifyCallback;
 
+	dUnsigned32 m_equilibrium;
 	union
 	{
 		dUnsigned32 m_flags;
 		struct
 		{
-			dUnsigned32 m_equilibrium : 1;
+//			dUnsigned32 m_equilibrium : 1;
 			//dUnsigned32 m_freeze : 1;
 			dUnsigned32 m_resting : 1;
 			//dUnsigned32 m_sleeping : 1;
