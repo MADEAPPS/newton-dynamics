@@ -137,28 +137,44 @@ void dThreadPool::SetCount(dInt32 count)
 void dThreadPool::ExecuteJobs(dThreadPoolJob** const jobs)
 {
 #ifdef D_LOCK_FREE_THREADS_POOL
-	m_joindInqueue.fetch_add(m_count);
-	for (dInt32 i = 0; i < m_count; i++)
+	if (m_count > 0)
 	{
-		jobs[i]->m_threadIndex = i;
-		m_lockFreeJobs[i].m_job.store(jobs[i]);
-	}
+		m_joindInqueue.fetch_add(m_count);
+		for (dInt32 i = 0; i < m_count; i++)
+		{
+			jobs[i]->m_threadIndex = i;
+			m_lockFreeJobs[i].m_job.store(jobs[i]);
+		}
 
-	jobs[m_count]->m_threadIndex = m_count;
-	jobs[m_count]->Execute();
-	while (m_joindInqueue.load())
+		jobs[m_count]->m_threadIndex = m_count;
+		jobs[m_count]->Execute();
+		while (m_joindInqueue.load())
+		{
+			std::this_thread::yield();
+		}
+	}
+	else
 	{
-		std::this_thread::yield();
+		jobs[0]->m_threadIndex = 0;
+		jobs[0]->Execute();
 	}
 #else
-	for (dInt32 i = 0; i < m_count; i++)
+	if (m_count > 0)
 	{
-		m_workers[i].ExecuteJob(jobs[i]);
-	}
+		for (dInt32 i = 0; i < m_count; i++)
+		{
+			m_workers[i].ExecuteJob(jobs[i]);
+		}
 
-	jobs[m_count]->m_threadIndex = m_count;
-	jobs[m_count]->Execute();
-	m_sync.Sync();
+		jobs[m_count]->m_threadIndex = m_count;
+		jobs[m_count]->Execute();
+		m_sync.Sync();
+	}
+	else
+	{
+		jobs[0]->m_threadIndex = 0;
+		jobs[0]->Execute();
+	}
 #endif
 }
 

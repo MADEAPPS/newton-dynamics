@@ -139,6 +139,8 @@ class ndScene
 	bool TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const;
 	void SubmitPairs(ndSceneNode* const leaftNode, ndSceneNode* const node);
 
+	void BuildContactArray();
+
 	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& p0, const dVector& p1) const = 0;
 	dFloat32 RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const;
 	

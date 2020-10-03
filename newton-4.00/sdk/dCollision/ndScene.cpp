@@ -1644,14 +1644,20 @@ void ndScene::FindCollidingPairs()
 		SubmitJobs<ndFindCollidindPairsTwoWays>();
 	}
 
-	int count = 0;
+	BuildContactArray();
+}
+
+void ndScene::BuildContactArray()
+{
+	D_TRACKTIME();
+	dInt32 count = 0;
 	m_activeConstraintArray.SetCount(m_contactList.GetCount());
 	for (ndContactList::dListNode* node = m_contactList.GetFirst(); node; node = node->GetNext())
 	{
 		ndContact* const contact = &node->GetInfo();
 		dAssert(contact->m_isAttached);
 		m_activeConstraintArray[count] = contact;
-		count ++;
+		count++;
 	}
 }
 
