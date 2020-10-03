@@ -307,6 +307,16 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 	class ndIntegrateUnconstrainedBodies : public ndScene::ndBaseJob
 	{
 		public:
+		void ExecuteBatch(const dInt32 start, const dInt32 count, dArray<ndBodyKinematic*>& bodyArray, dFloat32 timestep)
+		{
+			D_TRACKTIME();
+			for (dInt32 i = 0; i < count; i++)
+			{
+				ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
+				body->IntegrateExternalForce(timestep);
+			}
+		}
+
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -314,13 +324,19 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 			dArray<ndBodyKinematic*>& bodyArray = world->m_bodyIslandOrder;
 
 			const dFloat32 timestep = m_timestep;
-			const dInt32 count = world->m_unConstrainedBodyCount;
-			const dInt32 base = bodyArray.GetCount() - count;
-			//const ndBodyKinematic* const sentinelBody = world->GetSentinelBody();
-			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
+			const dInt32 bodyCount = world->m_unConstrainedBodyCount;
+			const dInt32 base = bodyArray.GetCount() - bodyCount;
+
+			const dInt32 stepSize = 64;
+			const dInt32 bodyCountBatches = bodyCount & -stepSize;
+			dInt32 index = m_it->fetch_add(stepSize);
+			for (; index < bodyCountBatches; index = m_it->fetch_add(stepSize))
 			{
-				ndBodyDynamic* const body = bodyArray[base + i]->GetAsBodyDynamic();
-				body->IntegrateExternalForce(timestep);
+				ExecuteBatch(index + base, stepSize, bodyArray, timestep);
+			}
+			if (index < bodyCount)
+			{
+				ExecuteBatch(index + base, bodyCount - index, bodyArray, timestep);
 			}
 		}
 	};
@@ -411,19 +427,12 @@ void ndDynamicsUpdate::InitBodyArray()
 	class ndInitBodyArray: public ndScene::ndBaseJob
 	{
 		public:
-		virtual void Execute()
+		void ExecuteBatch(const dInt32 start, const dInt32 count, dArray<ndBodyKinematic*>& bodyArray, dFloat32 timestep)
 		{
 			D_TRACKTIME();
-
-			ndWorld* const world = m_owner->GetWorld();
-			dArray<ndBodyKinematic*>& bodyArray = world->m_bodyIslandOrder;
-			//const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetWorkingBodyArray();
-
-			const dFloat32 timestep = m_timestep;
-			const dInt32 count = bodyArray.GetCount() - world->m_unConstrainedBodyCount;
-			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
+			for (dInt32 i = 0; i < count; i++)
 			{
-				ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
+				ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
 				dAssert(body);
 				dAssert(body->m_bodyIsConstrained);
 				body->AddDampingAcceleration(m_timestep);
@@ -432,6 +441,30 @@ void ndDynamicsUpdate::InitBodyArray()
 				body->m_accel = body->m_veloc;
 				body->m_alpha = body->m_omega;
 			}
+		}
+
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+
+			ndWorld* const world = m_owner->GetWorld();
+			dArray<ndBodyKinematic*>& bodyArray = world->m_bodyIslandOrder;
+
+			const dFloat32 timestep = m_timestep;
+			const dInt32 bodyCount = bodyArray.GetCount() - world->m_unConstrainedBodyCount;
+
+			const dInt32 stepSize = 64;
+			const dInt32 bodyCountBatches = bodyCount & -stepSize;
+			dInt32 index = m_it->fetch_add(stepSize);
+			for (; index < bodyCountBatches; index = m_it->fetch_add(stepSize))
+			{
+				ExecuteBatch(index, stepSize, bodyArray, timestep);
+			}
+			if (index < bodyCount)
+			{
+				ExecuteBatch(index, bodyCount - index, bodyArray, timestep);
+			}
+
 		}
 	};
 
@@ -1136,7 +1169,6 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 					rhs->m_jointFeebackForce->m_force = rhs->m_force;
 					rhs->m_jointFeebackForce->m_impact = rhs->m_maxImpact * timestepRK;
 				}
-				//hasJointFeeback |= (joint->m_updaFeedbackCallback ? 1 : 0);
 				hasJointFeeback |= joint->m_jointFeebackForce;
 			}
 			const dInt32 threadIndex = GetThredID();
@@ -1166,7 +1198,6 @@ void ndDynamicsUpdate::IntegrateBodies()
 			const dFloat32 timestep = m_timestep;
 
 			dFloat32 maxAccNorm2 = D_SOLVER_MAX_ERROR * D_SOLVER_MAX_ERROR;
-			//const dInt32 bodyCount = bodyArray.GetCount() - world->m_unConstrainedBodyCount;
 			const dInt32 bodyCount = bodyArray.GetCount();
 			for (dInt32 i = m_it->fetch_add(1); i < bodyCount; i = m_it->fetch_add(1))
 			{
