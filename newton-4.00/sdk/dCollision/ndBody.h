@@ -74,28 +74,27 @@ class ndBody: public dClassAlloc
 	dQuaternion m_rotation;
 	ndBodyNotify* m_notifyCallback;
 
-	dUnsigned32 m_equilibrium;
 	union
 	{
 		dUnsigned32 m_flags;
 		struct
 		{
-//			dUnsigned32 m_equilibrium : 1;
-			//dUnsigned32 m_freeze : 1;
 			dUnsigned32 m_resting : 1;
-			//dUnsigned32 m_sleeping : 1;
 			dUnsigned32 m_autoSleep : 1;
+			dUnsigned32 m_equilibrium : 1;
 			dUnsigned32 m_islandSleep : 1;
+			dUnsigned32 m_gyroTorqueOn : 1;
+			dUnsigned32 m_transformIsDirty : 1;
+			dUnsigned32 m_bodyIsConstrained : 1;
+			dUnsigned32 m_collideWithLinkedBodies : 1;
+
+			//dUnsigned32 m_freeze : 1;
+			//dUnsigned32 m_sleeping : 1;
 			//dUnsigned32 m_inCallback : 1;
 			//dUnsigned32 m_jointSet : 1;
 			//dUnsigned32 m_collidable : 1;
-			//dUnsigned32 m_equilibrium : 1;
 			//dUnsigned32 m_spawnnedFromCallback : 1;
 			//dUnsigned32 m_continueCollisionMode : 1;
-			dUnsigned32 m_collideWithLinkedBodies : 1;
-			dUnsigned32 m_bodyIsConstrained : 1;
-			dUnsigned32 m_transformIsDirty : 1;
-			dUnsigned32 m_gyroTorqueOn : 1;
 			//dUnsigned32 m_isdead : 1;
 		};
 	};

@@ -148,13 +148,32 @@ class ndScene::ndSpliteInfo
 
 ndScene::ndFitnessList::ndFitnessList()
 	:dList <ndSceneTreeNode*, dContainersFreeListAlloc<ndSceneTreeNode*>>()
-	,m_prevCost(dFloat32(0.0f))
+	,m_currentCost(dFloat32(0.0f))
+	,m_currentNode(nullptr)
 	,m_index(0)
 {
 }
 
+void ndScene::ndFitnessList::AddNode(ndSceneTreeNode* const node)
+{
+	node->m_fitnessNode = Append(node);
+}
+
+void ndScene::ndFitnessList::RemoveNode(ndSceneTreeNode* const node)
+{
+	dAssert(node->m_fitnessNode);
+	if (node->m_fitnessNode == m_currentNode)
+	{
+		m_currentNode = node->m_fitnessNode->GetNext();
+	}
+	Remove(node->m_fitnessNode);
+	node->m_fitnessNode = nullptr;
+}
+
+
 dFloat64 ndScene::ndFitnessList::TotalCost() const
 {
+	D_TRACKTIME();
 	dFloat64 cost = dFloat32(0.0f);
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		ndSceneNode* const box = node->GetInfo();
@@ -641,43 +660,25 @@ void ndScene::ImproveNodeFitness(ndSceneTreeNode* const node, ndSceneNode** cons
 
 dFloat64 ndScene::ReduceEntropy(ndFitnessList& fitness, ndSceneNode** const root)
 {
-	dFloat64 cost = dFloat32(0.0f);
-	if (fitness.GetCount() < 32) 
+	D_TRACKTIME();
+
+	if (!fitness.m_currentNode) 
 	{
-		for (ndFitnessList::dListNode* node = fitness.GetFirst(); node; node = node->GetNext()) 
+		fitness.m_currentCost = fitness.TotalCost();
+		fitness.m_currentNode = fitness.GetFirst();
+	}
+	else
+	{
+		int count = 0;
+		ndFitnessList::dListNode* node = fitness.m_currentNode;
+		for ( ;node && count < 64; node = node->GetNext())
 		{
+			count++;
 			ImproveNodeFitness(node->GetInfo(), root);
 		}
-		cost = fitness.TotalCost();
-		fitness.m_prevCost = cost;
+		fitness.m_currentNode = node;
 	}
-	else 
-	{
-		const dInt32 mod = 16;
-		cost = fitness.m_prevCost;
-		ndFitnessList::dListNode* node = fitness.GetFirst();
-		for (dInt32 i = 0; i < fitness.m_index; i++) 
-		{
-			node = node->GetNext();
-		}
-
-		do 
-		{
-			ImproveNodeFitness(node->GetInfo(), root);
-			for (dInt32 i = 0; i < mod; i++) 
-			{
-				node = node ? node->GetNext() : nullptr;
-			}
-		} while (node);
-
-		if (!fitness.m_index) 
-		{
-			cost = fitness.TotalCost();
-			fitness.m_prevCost = cost;
-		}
-		fitness.m_index = (fitness.m_index + 1) % mod;
-	}
-	return cost;
+	return fitness.m_currentCost;
 }
 
 dInt32 ndScene::CompareNodes(const ndSceneNode* const nodeA, const ndSceneNode* const nodeB, void* const)
@@ -755,7 +756,7 @@ void ndScene::UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndScen
 				*root = BuildTopDownBig(leafArray, 0, leafNodesCount - 1, &nodePtr);
 				dAssert(!(*root)->m_parent);
 				entropy = fitness.TotalCost();
-				fitness.m_prevCost = entropy;
+				fitness.m_currentCost = entropy;
 			}
 			oldEntropy = entropy;
 		}

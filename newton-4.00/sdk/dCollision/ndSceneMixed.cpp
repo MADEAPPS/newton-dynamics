@@ -43,7 +43,7 @@ void ndSceneMixed::AddNode(ndSceneNode* const newNode)
 	if (m_rootNode) 
 	{
 		ndSceneTreeNode* const node = InsertNode(m_rootNode, newNode);
-		node->m_fitnessNode = m_fitness.Append(node);
+		m_fitness.AddNode(node);
 		if (!node->m_parent) 
 		{
 			m_rootNode = node;
@@ -154,7 +154,7 @@ void ndSceneMixed::RemoveNode(ndSceneNode* const node)
 				}
 				else 
 				{
-					m_fitness.Remove(parent->m_fitnessNode);
+					m_fitness.RemoveNode(parent);
 				}
 			}
 			delete parent;

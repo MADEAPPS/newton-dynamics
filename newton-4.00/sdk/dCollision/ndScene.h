@@ -58,8 +58,12 @@ class ndScene
 		public:
 		ndFitnessList();
 		dFloat64 TotalCost() const;
+
+		void AddNode(ndSceneTreeNode* const node);
+		void RemoveNode(ndSceneTreeNode* const node);
 		
-		dFloat64 m_prevCost;
+		dFloat64 m_currentCost;
+		dListNode* m_currentNode;
 		dInt32 m_index;
 	};
 
