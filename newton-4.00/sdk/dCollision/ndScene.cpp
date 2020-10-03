@@ -29,8 +29,9 @@
 #include "ndContactNotify.h"
 #include "ndContactSolver.h"
 
+#define D_BASH_SIZE					64
 #define D_CONTACT_DELAY_FRAMES		4
-#define D_NARROW_PHASE_DIST		dFloat32 (0.2f)
+#define D_NARROW_PHASE_DIST			dFloat32 (0.2f)
 #define D_CONTACT_TRANSLATION_ERROR	dFloat32 (1.0e-3f)
 #define D_CONTACT_ANGULAR_ERROR		(dFloat32 (0.25f * dDegreeToRad))
 
@@ -194,6 +195,7 @@ ndScene::ndScene()
 	,m_contactNotifyCallback(new ndContactNotify())
 	,m_timestep(dFloat32 (0.0f))
 	,m_sleepBodies(0)
+	,m_activeBodyCount(0)
 	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_fullScan(true)
 {
@@ -289,43 +291,6 @@ bool ndScene::RemoveBody(ndBodyKinematic* const body)
 	return false;
 }
 
-void ndScene::BuildBodyArray()
-{
-	D_TRACKTIME();
-	int index = 0;
-	m_activeBodyArray.SetCount(m_bodyList.GetCount());
-	for (ndBodyList::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
-	{
-		ndBodyKinematic* const body = node->GetInfo();
-		body->m_bodyIsConstrained = 0;
-		if (body)
-		{
-			const ndShape* const shape = body->GetCollisionShape().GetShape()->GetAsShapeNull();
-			if (shape)
-			{
-				dAssert(0);
-				if (body->GetBroadPhaseBodyNode())
-				{
-					RemoveBody(body);
-				}
-			}
-			else 
-			{
-				bool inScene = true;
-				if (!body->GetBroadPhaseBodyNode())
-				{
-					inScene = AddBody(body);
-				}
-				if (inScene)
-				{
-					body->PrepareStep(index);
-					m_activeBodyArray[index] = body;
-					index++;
-				}
-			}
-		}
-	}
-}
 
 dFloat32 ndScene::RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPool, dFloat32* const distance, dInt32 stack, const dFastRayTest& ray) const
 {
@@ -1715,4 +1680,136 @@ void ndScene::DeleteDeadContact()
 		//}
 	}
 	m_activeConstraintArray.SetCount(activeCount);
+}
+
+
+void ndScene::BuildBodyArray()
+{
+	m_activeBodyArray.SetCount(m_bodyList.GetCount());
+	D_TRACKTIME();
+#if 0
+	dInt32 bodyCount = 0;
+	for (ndBodyList::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyKinematic* const body = node->GetInfo();
+		body->m_bodyIsConstrained = 0;
+		if (body)
+		{
+			const ndShape* const shape = body->GetCollisionShape().GetShape()->GetAsShapeNull();
+			if (shape)
+			{
+				dAssert(0);
+				if (body->GetBroadPhaseBodyNode())
+				{
+					RemoveBody(body);
+				}
+			}
+			else
+			{
+				bool inScene = true;
+				if (!body->GetBroadPhaseBodyNode())
+				{
+					inScene = AddBody(body);
+				}
+				if (inScene)
+				{
+					body->PrepareStep(bodyCount);
+					m_activeBodyArray[bodyCount] = body;
+					bodyCount++;
+				}
+			}
+		}
+	}
+	m_activeBodyCount.store(0);
+	m_activeBodyArray.SetCount(bodyCount);
+	m_activeBodyArray.SetCount(m_activeBodyCount.load());
+#else
+
+	class ndBuildBodyArray : public ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThredID();
+
+			ndBodyList::dListNode* node = m_owner->m_bodyList.GetFirst();
+			for (dInt32 i = 0; i < threadIndex; i++)
+			{
+				node = node ? node->GetNext() : nullptr;
+			}
+
+			dArray<ndBodyKinematic*>& activeBodyArray = m_owner->m_activeBodyArray;
+
+			dInt32 bodyCount = 0;
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			while (node)
+			{
+				ndBodyKinematic* const body = node->GetInfo();
+				body->m_bodyIsConstrained = 0;
+				if (body)
+				{
+					const ndShape* const shape = body->GetCollisionShape().GetShape()->GetAsShapeNull();
+					if (shape)
+					{
+						dAssert(0);
+						if (body->GetBroadPhaseBodyNode())
+						{
+							dScopeSpinLock lock(m_owner->m_contactLock);
+							m_owner->RemoveBody(body);
+						}
+					}
+					else
+					{
+						bool inScene = true;
+						if (!body->GetBroadPhaseBodyNode())
+						{
+							dScopeSpinLock lock(m_owner->m_contactLock);
+							inScene = m_owner->AddBody(body);
+						}
+						if (inScene)
+						{
+							//body->PrepareStep(bodyCount);
+							m_buffer[bodyCount] = body;
+							bodyCount++;
+							if (bodyCount >= D_BASH_SIZE)
+							{
+								bodyCount = 0;
+								const dInt32 baseIndex = m_owner->m_activeBodyCount.fetch_add(D_BASH_SIZE);
+								for (dInt32 i = 0; i < D_BASH_SIZE; i++)
+								{
+									const dInt32 index = baseIndex + i;
+									m_buffer[i]->PrepareStep(index);
+									activeBodyArray[index] = m_buffer[i];
+								}
+							}
+						}
+					}
+				}
+				for (dInt32 i = 0; i < threadCount; i++)
+				{
+					node = node ? node->GetNext() : nullptr;
+				}
+			}
+
+			if (bodyCount) 
+			{
+				const dInt32 baseIndex = m_owner->m_activeBodyCount.fetch_add(bodyCount);
+				for (dInt32 i = 0; i < bodyCount; i++)
+				{
+					const dInt32 index = baseIndex + i;
+					m_buffer[i]->PrepareStep(index);
+					activeBodyArray[index] = m_buffer[i];
+				}
+			}
+		}
+
+		ndBodyKinematic* m_buffer[D_BASH_SIZE];
+	};
+
+	m_activeBodyCount.store(0);
+	SubmitJobs<ndBuildBodyArray>();
+	m_activeBodyArray.SetCount(m_activeBodyCount.load());
+
+#endif
 }

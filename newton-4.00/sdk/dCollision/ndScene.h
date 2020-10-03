@@ -157,6 +157,7 @@ class ndScene
 	ndContactNotify* m_contactNotifyCallback;
 	dFloat32 m_timestep;
 	dAtomic<dUnsigned32> m_sleepBodies;
+	dAtomic<dUnsigned32> m_activeBodyCount;
 	dUnsigned32 m_lru;
 	bool m_fullScan;
 
