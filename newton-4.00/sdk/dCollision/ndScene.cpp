@@ -1685,46 +1685,7 @@ void ndScene::DeleteDeadContact()
 
 void ndScene::BuildBodyArray()
 {
-	m_activeBodyArray.SetCount(m_bodyList.GetCount());
 	D_TRACKTIME();
-#if 0
-	dInt32 bodyCount = 0;
-	for (ndBodyList::dListNode* node = m_bodyList.GetFirst(); node; node = node->GetNext())
-	{
-		ndBodyKinematic* const body = node->GetInfo();
-		body->m_bodyIsConstrained = 0;
-		if (body)
-		{
-			const ndShape* const shape = body->GetCollisionShape().GetShape()->GetAsShapeNull();
-			if (shape)
-			{
-				dAssert(0);
-				if (body->GetBroadPhaseBodyNode())
-				{
-					RemoveBody(body);
-				}
-			}
-			else
-			{
-				bool inScene = true;
-				if (!body->GetBroadPhaseBodyNode())
-				{
-					inScene = AddBody(body);
-				}
-				if (inScene)
-				{
-					body->PrepareStep(bodyCount);
-					m_activeBodyArray[bodyCount] = body;
-					bodyCount++;
-				}
-			}
-		}
-	}
-	m_activeBodyCount.store(0);
-	m_activeBodyArray.SetCount(bodyCount);
-	m_activeBodyArray.SetCount(m_activeBodyCount.load());
-#else
-
 	class ndBuildBodyArray : public ndBaseJob
 	{
 		public:
@@ -1808,8 +1769,7 @@ void ndScene::BuildBodyArray()
 	};
 
 	m_activeBodyCount.store(0);
+	m_activeBodyArray.SetCount(m_bodyList.GetCount());
 	SubmitJobs<ndBuildBodyArray>();
 	m_activeBodyArray.SetCount(m_activeBodyCount.load());
-
-#endif
 }

@@ -181,10 +181,27 @@ void dThreadPool::ExecuteJobs(dThreadPoolJob** const jobs)
 void dThreadPool::Begin()
 {
 #ifdef	D_LOCK_FREE_THREADS_POOL
+	D_TRACKTIME();
 	for (dInt32 i = 0; i < m_count; i++)
 	{
 		m_workers[i].ExecuteJob(&m_lockFreeJobs[i]);
 	}
+
+	class ndDoNothing : public dThreadPoolJob
+	{
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+		}
+	};
+
+	ndDoNothing extJob[D_MAX_THREADS_COUNT];
+	dThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
+	for (int i = 0; i < D_MAX_THREADS_COUNT; i++)
+	{
+		extJobPtr[i] = &extJob[i];
+	}
+	ExecuteJobs(extJobPtr);
 #endif
 }
 
