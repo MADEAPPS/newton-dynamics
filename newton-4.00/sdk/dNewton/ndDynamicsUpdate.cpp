@@ -311,7 +311,7 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 		public:
 		void ExecuteBatch(const dInt32 start, const dInt32 count, dArray<ndBodyKinematic*>& bodyArray, dFloat32 timestep)
 		{
-			D_TRACKTIME();
+			//D_TRACKTIME();
 			for (dInt32 i = 0; i < count; i++)
 			{
 				ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
@@ -431,7 +431,7 @@ void ndDynamicsUpdate::InitBodyArray()
 		public:
 		void ExecuteBatch(const dInt32 start, const dInt32 count, dArray<ndBodyKinematic*>& bodyArray, dFloat32 timestep)
 		{
-			D_TRACKTIME();
+			//D_TRACKTIME();
 			for (dInt32 i = 0; i < count; i++)
 			{
 				ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
@@ -710,7 +710,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 		public:
 		void ExecuteBatch(const dInt32 start, const dInt32 count, const ndConstraintArray& jointArray)
 		{
-			D_TRACKTIME();
+			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			dAtomic<dUnsigned32>& rowCount = world->m_rowsCount;
 
@@ -813,7 +813,7 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 			dArray<ndLeftHandSide>& leftHandSide,
 			dArray<ndRightHandSide>& rightHandSide)
 		{
-			D_TRACKTIME();
+			//D_TRACKTIME();
 			for (dInt32 i = 0; i < count; i++)
 			{
 				ndConstraint* const joint = jointArray[i + start];
@@ -867,7 +867,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		public:
 		dFloat32 ExecuteBatch(const dInt32 start, const dInt32 count, ndConstraintArray& jointArray)
 		{
-			D_TRACKTIME();
+			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			dFloat32 accNorm = dFloat32(0.0f);
 			for (dInt32 i = 0; i < count; i++)
@@ -1080,7 +1080,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 		public:
 		void ExecuteBatch(const dInt32 start, const dInt32 count, dArray<ndBodyKinematic*>& bodyArray, const dArray<ndJacobian>& internalForces)
 		{
-			D_TRACKTIME();
+			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			const dVector timestep4(world->m_timestepRK);
 			const dVector speedFreeze2(world->m_freezeSpeed2 * dFloat32(0.1f));
@@ -1150,7 +1150,7 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 		bool ExecuteBatch(const dInt32 start, const dInt32 count, dFloat32 timestepRK,
 			const ndConstraintArray& jointArray, const ndRightHandSide* const rightHandSide)
 		{
-			D_TRACKTIME();
+			//D_TRACKTIME();
 			bool hasJointFeeback = false;
 			for (dInt32 i = 0; i < count; i++)
 			{
@@ -1212,8 +1212,7 @@ void ndDynamicsUpdate::IntegrateBodies()
 
 		void ExecuteBatch(const dInt32 start, const dInt32 count, dArray<ndBodyKinematic*>& bodyArray)
 		{
-			D_TRACKTIME();
-
+			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			const dVector invTime(world->m_invTimestep);
 			const dFloat32 timestep = m_timestep;
@@ -1275,7 +1274,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 
 		void ExecuteBatch(const dInt32 start, const dInt32 count, const dArray<ndIsland>& islandArray)
 		{
-			D_TRACKTIME();
+			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			for (dInt32 i = 0; i < count; i++)
 			{
