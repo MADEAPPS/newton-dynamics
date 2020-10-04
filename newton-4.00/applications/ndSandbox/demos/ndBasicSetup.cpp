@@ -103,8 +103,8 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 		for (int j = 0; j < n; j++)
 		{
 			dVector location((j - n/2) * 8.0f, 0.0f, (i - n/2) * 8.0f, 0.0f);
-			BuildSphere(scene, 10.0f, location + origin1, 1.0f, 10, 2.0f);
-			//BuildSphere(scene, 10.0f, location + origin1, 1.0f, 1, 2.0f);
+			//BuildSphere(scene, 10.0f, location + origin1, 1.0f, 10, 2.0f);
+			BuildSphere(scene, 10.0f, location + origin1, 1.0f, 1, 2.0f);
 		}
 	}
 
