@@ -41,6 +41,8 @@ class ndSceneMixed : public ndScene
 	D_COLLISION_API virtual void Cleanup();
 	D_COLLISION_API void BalanceBroadPhase();
 
+	D_COLLISION_API virtual void DebugBroadphase(ndSceneTreeNotiFy* const notify);
+
 	private:
 	D_COLLISION_API void AddNode(ndSceneNode* const newNode);
 	D_COLLISION_API void RemoveNode(ndSceneNode* const newNode);

@@ -59,6 +59,8 @@ class ndBody: public dClassAlloc
 	D_COLLISION_API void SetMatrix(const dMatrix& matrix);
 	D_COLLISION_API dQuaternion GetRotation() const;
 
+	void GetAABB(dVector& p0, dVector& p1) const;
+
 	protected:
 	virtual void AttachContact(ndContact* const contact) {}
 	virtual void DetachContact(ndContact* const contact) {}
@@ -127,6 +129,11 @@ inline dVector ndBody::GetOmega() const
 	return m_omega;
 }
 
+inline void ndBody::GetAABB(dVector& p0, dVector& p1) const
+{
+	p0 = m_minAABB;
+	p1 = m_maxAABB;
+}
 
 #endif 
 

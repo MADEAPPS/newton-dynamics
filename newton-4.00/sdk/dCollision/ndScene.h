@@ -31,11 +31,27 @@
 #define D_PRUNE_CONTACT_TOLERANCE		dFloat32 (5.0e-2f)
 
 class ndWorld;
+class ndScene;
 class ndContact;
 class ndRayCastNotify;
 class ndContactNotify;
 class ndBilateralJoint;
 
+D_MSV_NEWTON_ALIGN_32
+class ndSceneTreeNotiFy
+{
+	public:
+	ndSceneTreeNotiFy()
+	{
+	}
+
+	virtual ~ndSceneTreeNotiFy()
+	{
+	}
+
+	virtual void OnDebugNode(const ndSceneTreeNode* const node) = 0;
+
+} D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
 class ndScene
@@ -96,6 +112,8 @@ class ndScene
 
 	D_COLLISION_API ndContactNotify* GetContactNotify() const;
 	D_COLLISION_API void SetContactNotify(ndContactNotify* const notify);
+
+	virtual void DebugBroadphase(ndSceneTreeNotiFy* const notify) = 0;
 
 	private:
 	bool ValidateContactCache(ndContact* const contact, const dVector& timestep) const;

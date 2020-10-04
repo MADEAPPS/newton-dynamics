@@ -227,6 +227,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool m_showStats;
 	bool m_hasJoytick;
 	bool m_autoSleepMode;
+	bool m_showBroadphase;
 	bool m_hideVisualMeshes;
 	bool m_showNormalForces;
 	bool m_showCenterOfMass;

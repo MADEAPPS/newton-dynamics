@@ -292,7 +292,11 @@ void ndShapeSphere::MassProperties()
 
 void ndShapeSphere::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) const
 {
-	dVector size(matrix.m_front.Abs().Scale(m_radius) + matrix.m_up.Abs().Scale(m_radius) + matrix.m_right.Abs().Scale(m_radius));
+	//dMatrix transp(matrix.Transpose4X4());
+	////dVector size(matrix.m_front.Abs().Scale(m_radius) + matrix.m_up.Abs().Scale(m_radius) + matrix.m_right.Abs().Scale(m_radius));
+	//dVector size(transp.m_front.Abs() + transp.m_up.Abs() + transp.m_right.Abs());
+	//size = size.Scale(m_radius);
+	dVector size(m_radius);
 	p0 = (matrix[3] - size) & dVector::m_triplexMask;
 	p1 = (matrix[3] + size) & dVector::m_triplexMask;
 }

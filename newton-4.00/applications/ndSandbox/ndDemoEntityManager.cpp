@@ -95,6 +95,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_showStats(true)
 	,m_hasJoytick(false)
 	,m_autoSleepMode(true)
+	,m_showBroadphase(false)
 	,m_hideVisualMeshes(false)
 	,m_showNormalForces(false)
 	,m_showCenterOfMass(false)
@@ -194,12 +195,13 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 	// initialized the physics world for the new scene
 //	m_showUI = false;
-//	m_showAABB = false;
+	m_showAABB = true;
 //	m_hideVisualMeshes = true;
+	m_showBroadphase = true;
 	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
-	m_workerThreads = 4;
+//	m_workerThreads = 4;
 //	m_solverSubSteps = 2;
 //	m_showRaycastHit = true;
 //	m_showCenterOfMass = false;
@@ -632,6 +634,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Separator();
 
 			ImGui::Checkbox("show aabb", &m_showAABB);
+			ImGui::Checkbox("show broadphase", &m_showBroadphase);
 			ImGui::Checkbox("hide visual meshes", &m_hideVisualMeshes);
 			ImGui::Checkbox("show contact points", &m_showContactPoints);
 			ImGui::Checkbox("show ray cast hit point", &m_showRaycastHit);
@@ -1484,10 +1487,16 @@ void ndDemoEntityManager::RenderScene()
 		DrawDebugShapes();
 	}
 	
-	//if (m_showAABB) {
-	//	RenderAABB (m_world);
-	//}
-	//
+	if (m_showAABB) 
+	{
+		RenderBodiesAABB(this);
+	}
+
+	if (m_showBroadphase)
+	{
+		RenderBroadPhase(this);
+	}
+	
 	//if (m_showContactPoints) {
 	//	RenderContactPoints (m_world);
 	//}

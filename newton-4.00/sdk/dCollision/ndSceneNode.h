@@ -47,6 +47,12 @@ class ndSceneNode: public dClassAlloc
 	{
 	}
 
+	void GetAABB(dVector& minBox, dVector& maxBox) const
+	{
+		minBox = m_minBox;
+		maxBox = m_maxBox;
+	}
+
 	D_COLLISION_API void SetAABB(const dVector& minBox, const dVector& maxBox);
 
 	virtual ndSceneNode* GetAsBroadPhaseNode() { return this; }
@@ -105,20 +111,11 @@ class ndSceneBodyNode: public ndSceneNode
 	}
 
 	ndBodyKinematic* m_body;
-	//dList<dBroadPhaseNode*>::dListNode* m_updateNode;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 class ndSceneTreeNode: public ndSceneNode
 {
 	public:
-	//ntScenereeNode()
-	//	:ndSceneNode(nullptr)
-	//	,m_left(nullptr)
-	//	,m_right(nullptr)
-	//	,m_fitnessNode(nullptr)
-	//{
-	//}
-	
 	D_COLLISION_API ndSceneTreeNode(ndSceneNode* const sibling, ndSceneNode* const myNode);
 	D_COLLISION_API virtual ~ndSceneTreeNode();
 

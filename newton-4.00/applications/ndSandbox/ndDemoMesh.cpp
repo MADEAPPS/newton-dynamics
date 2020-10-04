@@ -935,7 +935,11 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 	m_shader = shaderCache.m_flatShaded;
 	m_indexCount = m_triangles.GetCount();
 
-	m_color = dVector(1.0f);
+	m_color.m_x = 1.0f;
+	m_color.m_y = 1.0f;
+	m_color.m_z = 1.0f;
+	m_color.m_w = 1.0f;
+
 	glGenVertexArrays(1, &m_vetextArrayBuffer);
 	glBindVertexArray(m_vetextArrayBuffer);
 
@@ -1079,7 +1083,11 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 	}
 
 	m_shader = shaderCache.m_wireFrame;
-	m_color = dVector(1.0f);
+	m_color.m_x = 1.0f;
+	m_color.m_y = 1.0f;
+	m_color.m_z = 1.0f;
+	m_color.m_w = 1.0f;
+
 	glGenVertexArrays(1, &m_vetextArrayBuffer);
 	glBindVertexArray(m_vetextArrayBuffer);
 

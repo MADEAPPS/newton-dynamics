@@ -354,3 +354,11 @@ dFloat32 ndSceneMixed::RayCast(ndRayCastNotify& callback, const dVector& q0, con
 	}
 	return param;
 }
+
+void ndSceneMixed::DebugBroadphase(ndSceneTreeNotiFy* const notify)
+{
+	for (ndFitnessList::dListNode* node = m_fitness.GetFirst(); node; node = node->GetNext())
+	{
+		notify->OnDebugNode(node->GetInfo());
+	}
+}

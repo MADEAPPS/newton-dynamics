@@ -21,9 +21,20 @@ class ndDemoEntityManager;
 
 struct ndMeshVector
 {
+	ndMeshVector() {}
+	ndMeshVector(GLfloat x, GLfloat y, GLfloat z)
+		:m_x(x), m_y(y), m_z(z)
+	{
+	}
+
 	GLfloat m_x;
 	GLfloat m_y;
 	GLfloat m_z;
+};
+
+struct ndMeshVector4: public ndMeshVector
+{
+	GLfloat m_w;
 };
 
 struct ndMeshUV
@@ -184,11 +195,14 @@ class ndFlatShadedDebugMesh: public ndDemoMeshInterface
 
 	void SetColor(const dVector& color)
 	{
-		m_color = color;
+		m_color.m_x = GLfloat(color.m_x);
+		m_color.m_y = GLfloat(color.m_y);
+		m_color.m_z = GLfloat(color.m_z);
+		m_color.m_w = GLfloat(color.m_w);
 	}
 	void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 
-	dVector m_color;
+	ndMeshVector4 m_color;
 	dInt32 m_indexCount;
 	dInt32 m_shadeColorLocation;
 	dInt32 m_normalMatrixLocation;
@@ -209,13 +223,16 @@ class ndWireFrameDebugMesh: public ndDemoMeshInterface
 
 	void SetColor(const dVector& color)
 	{
-		m_color = color;
+		m_color.m_x = GLfloat(color.m_x);
+		m_color.m_y = GLfloat(color.m_y);
+		m_color.m_z = GLfloat(color.m_z);
+		m_color.m_w = GLfloat(color.m_w);
 	}
+
 	void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 
-	dVector m_color;
+	ndMeshVector4 m_color;
 	dInt32 m_indexCount;
-	//dInt32 m_vertextCount;
 	dInt32 m_shadeColorLocation;
 	dInt32 m_projectionViewModelMatrixLocation;
 

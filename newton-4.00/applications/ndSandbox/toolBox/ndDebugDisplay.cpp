@@ -377,12 +377,6 @@ void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* con
 
 void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 {
-	
-
-	//	dJointDebugDisplay jointDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
-	//	//jointDebugRender.SetScale(0.2f);
-	//	jointDebugRender.SetScale(1.0f);
-
 	class ndJoindDebug: public ndConstraintDebugCallback
 	{
 		public:
@@ -435,5 +429,136 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 		ndJointBilateralConstraint* const joint = jointNode->GetInfo();
 		joint->DebugJoint(debugJoint);
 	}
+}
 
+static void DrawBox(const dVector& p0, const dVector& p1, ndMeshVector box[12][2])
+{
+	//ndMeshVector box[12][2];
+	box[0][0] = ndMeshVector(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+	box[0][1] = ndMeshVector(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+
+	box[1][0] = ndMeshVector(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
+	box[1][1] = ndMeshVector(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
+
+	box[2][0] = ndMeshVector(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+	box[2][1] = ndMeshVector(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+
+	box[3][0] = ndMeshVector(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
+	box[3][1] = ndMeshVector(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
+
+	box[4][0] = ndMeshVector(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+	box[4][1] = ndMeshVector(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
+
+	box[5][0] = ndMeshVector(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+	box[5][1] = ndMeshVector(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
+
+	box[6][0] = ndMeshVector(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
+	box[6][1] = ndMeshVector(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+
+	box[7][0] = ndMeshVector(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
+	box[7][1] = ndMeshVector(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+
+	box[8][0] = ndMeshVector(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+	box[8][1] = ndMeshVector(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
+
+	box[9][0] = ndMeshVector(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
+	box[9][1] = ndMeshVector(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
+
+	box[10][0] = ndMeshVector(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
+	box[10][1] = ndMeshVector(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+
+	box[11][0] = ndMeshVector(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
+	box[11][1] = ndMeshVector(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
+
+	glDrawArrays(GL_LINES, 0, 24);
+}
+
+void RenderBodiesAABB(ndDemoEntityManager* const scene)
+{
+	ndWorld* const world = scene->GetWorld();
+	const ndBodyList& bodyList = world->GetBodyList();
+
+	GLuint shader = scene->GetShaderCache().m_wireFrame;
+
+	ndDemoCamera* const camera = scene->GetCamera();
+	dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+
+	ndMeshVector4 color;
+	color.m_x = 0.0f;
+	color.m_y = 0.0f;
+	color.m_z = 1.0f;
+	color.m_w = 1.0f;
+
+	glUseProgram(shader);
+
+	dInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	dInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+
+	glUniform4fv(shadeColorLocation, 1, &color.m_x);
+	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+
+	ndMeshVector box[12][2];
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(3, GL_FLOAT, 0, box);
+
+	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	{
+		dVector p0;
+		dVector p1;
+		ndBodyKinematic* const body = bodyNode->GetInfo();
+		body->GetAABB(p0, p1);
+		DrawBox(p0, p1, box);
+	}
+	glUseProgram(0);
+	glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+void RenderBroadPhase(ndDemoEntityManager* const scene)
+{
+	ndWorld* const world = scene->GetWorld();
+	GLuint shader = scene->GetShaderCache().m_wireFrame;
+
+	ndDemoCamera* const camera = scene->GetCamera();
+	dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+
+	ndMeshVector4 color;
+	color.m_x = 1.0f;
+	color.m_y = 1.0f;
+	color.m_z = 0.0f;
+	color.m_w = 1.0f;
+
+	glUseProgram(shader);
+
+	dInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	dInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+
+	glUniform4fv(shadeColorLocation, 1, &color.m_x);
+	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+	glEnableClientState(GL_VERTEX_ARRAY);
+
+	class ndDrawBroadPhase: public ndSceneTreeNotiFy
+	{
+		public: 
+		ndDrawBroadPhase()
+			:ndSceneTreeNotiFy()
+		{
+			glVertexPointer(3, GL_FLOAT, 0, m_box);
+		}
+
+		virtual void OnDebugNode(const ndSceneTreeNode* const node)
+		{
+			dVector p0;
+			dVector p1;
+			node->GetAABB(p0, p1);
+			DrawBox(p0, p1, m_box);
+		}
+
+		ndMeshVector m_box[12][2];
+	};
+
+	ndDrawBroadPhase drawBroaphase;
+	world->DebugBroadphase(&drawBroaphase);
+
+	glUseProgram(0);
+	glDisableClientState(GL_VERTEX_ARRAY);
 }
