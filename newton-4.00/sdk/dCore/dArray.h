@@ -78,7 +78,7 @@ dArray<T>::dArray(const dArray& source)
 	{
 		Resize(source.m_capacity);
 		SetCount(source.m_size);
-		for (int i = 0; i < source.m_size; i++)
+		for (dInt32 i = 0; i < source.m_size; i++)
 		{
 			m_array[i] = source[i];
 		}

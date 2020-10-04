@@ -229,7 +229,7 @@ D_INLINE dMatrix dMatrix::Inverse () const
 D_INLINE bool dMatrix::TestIdentity() const
 {
 	const dMatrix& me = *this;
-	for (int i = 0; i < 4; i++) 
+	for (dInt32 i = 0; i < 4; i++) 
 	{
 		if (me[i][i] != dFloat32 (1.0f)) 
 		{
@@ -260,7 +260,7 @@ D_INLINE bool dMatrix::TestOrthogonal(dFloat32 tol) const
 
 #ifdef _DEBUG
 	const dMatrix& me = *this;
-	for (int i = 0; i < 4; i++) 
+	for (dInt32 i = 0; i < 4; i++) 
 	{
 		for (int j = 0; j < 4; j++) 
 		{

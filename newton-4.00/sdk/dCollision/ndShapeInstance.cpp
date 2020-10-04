@@ -476,7 +476,7 @@ ndShapeInfo ndShapeInstance::GetShapeInfo() const
 
 void ndShapeInstance::CalculateAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const
 {
-	for (int i = 0; i < 3; i++) 
+	for (dInt32 i = 0; i < 3; i++) 
 	{
 		dVector minSupport(matrix.TransformVector(SupportVertex(matrix[i].Scale(dFloat32(-1.0f)))));
 		minP[i] = minSupport[i];

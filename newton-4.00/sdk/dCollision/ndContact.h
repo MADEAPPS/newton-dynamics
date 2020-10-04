@@ -131,6 +131,8 @@ class ndContact
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const params);
 
 	const ndContactPointList& GetContactPoints() const;
+
+	bool IsActive() const;
 	
 	private:
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
@@ -292,6 +294,11 @@ inline ndBodyKinematic* ndContact::GetBody1() const
 inline const ndContactPointList& ndContact::GetContactPoints() const
 {
 	return m_contacPointsList;
+}
+
+inline bool ndContact::IsActive() const
+{
+	return m_active ? true : false;
 }
 
 #endif 

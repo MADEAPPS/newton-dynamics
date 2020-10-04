@@ -474,19 +474,22 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 		for (iter.Begin(); iter; iter++)
 		{
 			const ndContact* const contact = *iter;
-			const ndContactPointList& contactPoints = contact->GetContactPoints();
-			for (ndContactPointList::dListNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
+			if (contact->IsActive())
 			{
-				const ndContactPoint& contactPoint = contactPointsNode->GetInfo();
-				dVector point (viewProjectionMatrix.TransformVector1x4 (contactPoint.m_point));
-				dFloat32 zDist = point.m_w;
-				point = point.Scale(1.0f / zDist);
+				const ndContactPointList& contactPoints = contact->GetContactPoints();
+				for (ndContactPointList::dListNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
+				{
+					const ndContactPoint& contactPoint = contactPointsNode->GetInfo();
+					dVector point(viewProjectionMatrix.TransformVector1x4(contactPoint.m_point));
+					dFloat32 zDist = point.m_w;
+					point = point.Scale(1.0f / zDist);
 
-				pointBuffer[0] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize,  pizelSize, zDist);
-				pointBuffer[1] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, -pizelSize, zDist);
-				pointBuffer[2] = CalculatePoint(invViewProjectionMatrix, point,  pizelSize,  pizelSize, zDist);
-				pointBuffer[3] = CalculatePoint(invViewProjectionMatrix, point,  pizelSize, -pizelSize, zDist);
-				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+					pointBuffer[0] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, pizelSize, zDist);
+					pointBuffer[1] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, -pizelSize, zDist);
+					pointBuffer[2] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, pizelSize, zDist);
+					pointBuffer[3] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, -pizelSize, zDist);
+					glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+				}
 			}
 		}
 	}

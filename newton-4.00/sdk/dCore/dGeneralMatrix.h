@@ -262,7 +262,7 @@ bool dTestPSDmatrix(dInt32 size, dInt32 stride, T* const matrix)
 {
 	T* const copy = dAlloca(T, size * size);
 	int row = 0;
-	for (int i = 0; i < size; i++) 
+	for (dInt32 i = 0; i < size; i++) 
 	{
 		memcpy(&copy[i * size], &matrix[row], size * sizeof (T));
 		row += stride;
@@ -542,7 +542,7 @@ T dConditionNumber(const dInt32 size, const dInt32 stride, const T* const choles
 
 	T minVal = T(1.0e20f);
 	T maxVal = T(-1.0e20f);
-	for (int i = 0; i < size; i++) 
+	for (dInt32 i = 0; i < size; i++) 
 	{
 		minVal = dMin(minVal, eigenValues[i]);
 		maxVal = dMax(maxVal, eigenValues[i]);
@@ -782,7 +782,7 @@ void dCholeskyUpdate(dInt32 size, dInt32 row, dInt32 colum, T* const choleskyMat
 	memcpy(psdMatrixCopy, psdMatrix, sizeof(T) * size * size);
 	dCholeskyFactorization(size, psdMatrixCopy);
 
-	for (int i = 0; i < size; i++) 
+	for (dInt32 i = 0; i < size; i++) 
 	{
 		for (int j = 0; j < size; j++) 
 		{

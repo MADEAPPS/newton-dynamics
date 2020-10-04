@@ -197,7 +197,7 @@ void dThreadPool::Begin()
 
 	ndDoNothing extJob[D_MAX_THREADS_COUNT];
 	dThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
-	for (int i = 0; i < D_MAX_THREADS_COUNT; i++)
+	for (dInt32 i = 0; i < D_MAX_THREADS_COUNT; i++)
 	{
 		extJobPtr[i] = &extJob[i];
 	}

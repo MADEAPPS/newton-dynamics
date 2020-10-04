@@ -77,7 +77,7 @@ bool dRayBoxClip (dVector& p0, dVector& p1, const dVector& boxP0, const dVector&
 	dAssert (p1.m_w == dFloat32(0.0f));
 	dAssert (boxP0.m_w == dFloat32(0.0f));
 	dAssert (boxP1.m_w == dFloat32(0.0f));
-	for (int i = 0; i < 3; i ++) 
+	for (dInt32 i = 0; i < 3; i ++) 
 	{
 		dFloat32 tmp0 = boxP1[i] - p0[i];
 		if (tmp0 > dFloat32 (0.0f)) 

@@ -3217,7 +3217,7 @@ void dMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 
 				if (!faceMark[j]) 
 				{
-					for (int i = 0; i < indexCount; i++) 
+					for (dInt32 i = 0; i < indexCount; i++) 
 					{
 						dInt32 k = attributeCount + i;
 						userdata[i] = k;
@@ -3228,7 +3228,7 @@ void dMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 					if (edge) 
 					{
 						faceMark[j] = 1;
-						for (int i = 0; i < indexCount; i++) 
+						for (dInt32 i = 0; i < indexCount; i++) 
 						{
 							m_attrib.m_pointChannel.PushBack(index[i]);
 						}
@@ -3236,7 +3236,7 @@ void dMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 						if (format->m_faceMaterial) 
 						{
 							dInt32 materialIndex = format->m_faceMaterial[j];
-							for (int i = 0; i < indexCount; i++) {
+							for (dInt32 i = 0; i < indexCount; i++) {
 								m_attrib.m_materialChannel.PushBack(materialIndex);
 							}
 						}
@@ -3244,7 +3244,7 @@ void dMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 						if (format->m_normal.m_data) 
 						{
 							dTriplex normal;
-							for (int i = 0; i < indexCount; i++) 
+							for (dInt32 i = 0; i < indexCount; i++) 
 							{
 								dInt32 k = attributeCount + i;
 								dInt32 m = format->m_normal.m_indexList[k] * normalStride;
@@ -3258,7 +3258,7 @@ void dMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 						if (format->m_binormal.m_data) 
 						{
 							dTriplex normal;
-							for (int i = 0; i < indexCount; i++) 
+							for (dInt32 i = 0; i < indexCount; i++) 
 							{
 								dInt32 k = attributeCount + i;
 								dInt32 m = format->m_binormal.m_indexList[k] * binormalStride;
@@ -3271,7 +3271,7 @@ void dMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 
 						if (format->m_vertexColor.m_data) 
 						{
-							for (int i = 0; i < indexCount; i++) 
+							for (dInt32 i = 0; i < indexCount; i++) 
 							{
 								dInt32 k = attributeCount + i;
 								dInt32 m = format->m_vertexColor.m_indexList[k] * vertexColorStride;
@@ -3283,7 +3283,7 @@ void dMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 						if (format->m_uv0.m_data) 
 						{
 							dAttibutFormat::dgUV uv;
-							for (int i = 0; i < indexCount; i++) 
+							for (dInt32 i = 0; i < indexCount; i++) 
 							{
 								dInt32 k = attributeCount + i;
 								dInt32 m = format->m_uv0.m_indexList[k] * uv0Stride;
@@ -3296,7 +3296,7 @@ void dMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 						if (format->m_uv1.m_data) 
 						{
 							dAttibutFormat::dgUV uv;
-							for (int i = 0; i < indexCount; i++) 
+							for (dInt32 i = 0; i < indexCount; i++) 
 							{
 								dInt32 k = attributeCount + i;
 								dInt32 m = format->m_uv1.m_indexList[k] * uv1Stride;
@@ -3311,7 +3311,7 @@ void dMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 					{
 						// check if the face is not degenerated
 						bool degeneratedFace = false;
-						for (int i = 0; i < indexCount - 1; i++) 
+						for (dInt32 i = 0; i < indexCount - 1; i++) 
 						{
 							for (int k = i + 1; k < indexCount; k++) 
 							{

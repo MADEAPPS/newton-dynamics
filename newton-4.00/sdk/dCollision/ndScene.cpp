@@ -1264,7 +1264,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 			}
 		}
 	
-		if (active ^ contact->m_active) 
+		if (active ^ contact->m_active)
 		{
 			dAssert(body0->GetInvMass() > dFloat32(0.0f));
 			body0->m_equilibrium = false;
@@ -1625,6 +1625,7 @@ void ndScene::BuildContactArray()
 		m_activeConstraintArray[count] = contact;
 		count++;
 	}
+	m_activeConstraintArray.SetCount(count);
 }
 
 void ndScene::CalculateContacts()

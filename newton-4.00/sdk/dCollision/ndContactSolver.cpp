@@ -722,7 +722,7 @@ dInt32 ndContactSolver::CalculateConvexCastContacts()
 						count = dMin(m_proxy->m_maxContacts, count);
 						ntContactPoint* const contactOut = m_proxy->m_contacts;
 
-						for (int i = 0; i < count; i++) {
+						for (dInt32 i = 0; i < count; i++) {
 							contactOut[i].m_point = m_hullDiff[i] + step;
 							contactOut[i].m_normal = m_normal;
 							contactOut[i].m_penetration = penetration;
@@ -960,7 +960,7 @@ dInt32 ndContactSolver::ConvexToConvexContacts()
 			ndShapeInstance* const instance1 = &body1->GetCollisionShape();
 
 			dVector normal(m_separatingVector * dVector::m_negOne);
-			for (int i = count - 1; i >= 0; i--)
+			for (dInt32 i = count - 1; i >= 0; i--)
 			{
 				contactOut[i].m_point = m_buffer[i] + offset;
 				contactOut[i].m_normal = normal;
@@ -1471,7 +1471,7 @@ dInt32 ndContactSolver::CalculateContacts(const dVector& point0, const dVector& 
 
 	if (count1) 
 	{
-		for (int i = 0; i < count1; i++) 
+		for (dInt32 i = 0; i < count1; i++) 
 		{
 			shape1[i] = matrix1.TransformVector(shape1[i]);
 		}

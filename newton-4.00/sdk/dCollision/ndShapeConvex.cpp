@@ -362,7 +362,7 @@ dInt32 ndShapeConvex::BuildCylinderCapPoly (dFloat32 radius, const dMatrix& tran
 
 	dFloat32 a = h * h * (dPi / n - 0.5f * dSin (dPI2 / n));
 
-	for (int i = 8; i < 16; i ++) {
+	for (dInt32 i = 8; i < 16; i ++) {
 		dFloat32 den = dPi / i - 0.5f * dSin (dPI2 / i);
 		dFloat32 h1 = dSqrt (a / den);
 		dFloat32 h2 = dSqrt (a / den);

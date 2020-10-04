@@ -236,7 +236,7 @@ void ndScene::SubmitJobs()
 	dThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
 
 	const dInt32 threadCount = GetThreadCount();
-	for (int i = 0; i < threadCount; i++)
+	for (dInt32 i = 0; i < threadCount; i++)
 	{
 		extJob[i].m_it = &it;
 		extJob[i].m_owner = this;
