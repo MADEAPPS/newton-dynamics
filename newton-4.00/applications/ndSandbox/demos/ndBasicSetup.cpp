@@ -66,7 +66,7 @@ static void BuildSphere(ndDemoEntityManager* const scene, dFloat32 mass, const d
 
 	ndDemoMesh* const geometry = new ndDemoMesh("sphere", scene->GetShaderCache(), &sphere, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
-	for (int i = 0; i < count; i++)
+	for (dInt32 i = 0; i < count; i++)
 	{
 		ndBodyDynamic* const body = new ndBodyDynamic();
 		ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
@@ -98,9 +98,9 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	const int n = 1;
-	for (int i = 0; i < n; i++)
+	for (dInt32 i = 0; i < n; i++)
 	{
-		for (int j = 0; j < n; j++)
+		for (dInt32 j = 0; j < n; j++)
 		{
 			dVector location((j - n/2) * 8.0f, 0.0f, (i - n/2) * 8.0f, 0.0f);
 			BuildSphere(scene, 10.0f, location + origin1, 1.0f, 10, 2.0f);

@@ -45,7 +45,7 @@ class dInfinitePlane
 
 #ifdef PASS_A_QUAD
 		// passing a single quad	
-		for (int i = 0; i < MAX_THREAD_FACES; i ++) {
+		for (dInt32 i = 0; i < MAX_THREAD_FACES; i ++) {
 			m_faceIndices[i][0] = 4;
 			// face attribute
 			m_indexArray[i][4] = 0;
@@ -63,7 +63,7 @@ class dInfinitePlane
 		}
 #else
 		// passing two triangle	
-		for (int i = 0; i < MAX_THREAD_FACES; i ++) {
+		for (dInt32 i = 0; i < MAX_THREAD_FACES; i ++) {
 			// first triangle
 			{
 				// index count
@@ -236,7 +236,7 @@ class dInfinitePlane
 			collideDesc->m_faceVertexIndex = &me->m_indexArray[threadNumber][0];
 			collideDesc->m_vertex = &me->m_collisionVertex[threadNumber][0][0];
 			dVector* const polygon = &me->m_collisionVertex[threadNumber][0];
-			for (int i = 0; i < 4; i ++) {
+			for (dInt32 i = 0; i < 4; i ++) {
 				polygon[i] = centre + me->m_unitSphape[i].Scale (s);
 			}
 			// save face normal
@@ -295,7 +295,7 @@ class dInfinitePlane
 			collideDesc->m_faceVertexIndex = &me->m_indexArray[threadNumber][0];
 			collideDesc->m_vertex = &me->m_collisionVertex[threadNumber][0][0];
 			dVector* const polygon = &me->m_collisionVertex[threadNumber][0];
-			for (int i = 0; i < 4; i ++) {
+			for (dInt32 i = 0; i < 4; i ++) {
 				polygon[i] = centre + me->m_unitSphape[i].Scale (s);
 			}
 			// save face normal
@@ -344,7 +344,7 @@ class dInfinitePlane
 
 		dFloat32 UVtileSize = 16;
 		mesh->AllocVertexData (4);
-		for (int i = 0; i < 4; i ++) {
+		for (dInt32 i = 0; i < 4; i ++) {
 			mesh->m_vertex[i * 3  + 0] = shape[i].m_x * size;
 			mesh->m_vertex[i * 3  + 1] = shape[i].m_y * size;
 			mesh->m_vertex[i * 3  + 2] = shape[i].m_z * size;
@@ -359,7 +359,7 @@ class dInfinitePlane
 
 		ndDemoSubMesh* const subMesh = mesh->AddSubMesh();
 		subMesh->AllocIndexData (6);
-		for (int i = 0; i < 2; i ++) {
+		for (dInt32 i = 0; i < 2; i ++) {
 			subMesh->m_indexes[i * 3 + 0] = 0;
 			subMesh->m_indexes[i * 3 + 1] = i + 1;
 			subMesh->m_indexes[i * 3 + 2] = i + 2;

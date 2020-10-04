@@ -210,7 +210,7 @@ void dSoundManager::LoadWaveFile(dSoundAsset* const asset, const char* const fil
 					fread(&byteRate, sizeof(int), 1, wave);
 					fread(&blockAlign, sizeof(short), 1, wave);
 					fread(&bitsPerSample, sizeof(short), 1, wave);
-					for (int i = 0; i < (chunkSize - 16); i ++) {
+					for (dInt32 i = 0; i < (chunkSize - 16); i ++) {
 						fread(xbuffer, sizeof(char), 1, wave);
 					}
 					

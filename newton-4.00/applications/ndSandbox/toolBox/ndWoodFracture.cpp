@@ -72,7 +72,7 @@ class dWoodFractureListener: public dCustomParallelListener
 			points[7] = dVector(size.m_x * 0.5f, size.m_y * 0.5f, size.m_z * 0.5f);
 
 			int count = 8;
-			for (int i = 0; i < count; i ++) {
+			for (dInt32 i = 0; i < count; i ++) {
 				dFloat32 x = dGaussianRandom(size.m_x * 0.1f);
 				dFloat32 y = dGaussianRandom(size.m_y * 0.1f);
 				dFloat32 z = dGaussianRandom(size.m_y * 0.1f);
@@ -199,7 +199,7 @@ class dWoodFractureListener: public dCustomParallelListener
 		dFloat32 startElevation = 100.0f;
 		dMatrix matrix(dGetIdentityMatrix());
 		
-		for (int i = 0; i < xCount; i++) {
+		for (dInt32 i = 0; i < xCount; i++) {
 			dFloat32 x = origin.m_x + (i - xCount / 2) * spacing;
 			for (int j = 0; j < zCount; j++) {
 				dFloat32 z = origin.m_z + (j - zCount / 2) * spacing;
@@ -228,7 +228,7 @@ class dWoodFractureListener: public dCustomParallelListener
 		const int threadCount = NewtonGetThreadsCount(world);
 
 		dList<WoodVoronoidEffect>::dListNode* node = m_effectList.GetFirst();
-		for (int i = 0; i < threadID; i++) {
+		for (dInt32 i = 0; i < threadID; i++) {
 			node = node ? node->GetNext() : nullptr;
 		}
 
@@ -236,7 +236,7 @@ class dWoodFractureListener: public dCustomParallelListener
 			do {
 				WoodVoronoidEffect& effect = node->GetInfo();
 				UpdateEffect(effect, timestep);
-				for (int i = 0; i < threadCount; i++) {
+				for (dInt32 i = 0; i < threadCount; i++) {
 					node = node ? node->GetNext() : nullptr;
 				}
 			} while (node);

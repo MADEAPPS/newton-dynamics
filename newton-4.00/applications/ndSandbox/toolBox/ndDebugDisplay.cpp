@@ -216,7 +216,7 @@ void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const 
 
 			int stride = vertexstrideInBytes / sizeof (dFloat32);
 			dVector l0 (vertex[(vertexCount-1) * stride + 0], vertex[(vertexCount-1) * stride + 1], vertex[(vertexCount-1) * stride + 2], 0.0f);
-			for (int j = 0; j < vertexCount; j ++) {
+			for (dInt32 j = 0; j < vertexCount; j ++) {
 				dVector l1 (vertex[j * stride + 0], vertex[j * stride + 1] , vertex[j * stride + 2], 0.0f);
 				g_debugDisplayCallback[g_debugDisplayCount + 0] = l0;
 				g_debugDisplayCallback[g_debugDisplayCount + 1] = l1;

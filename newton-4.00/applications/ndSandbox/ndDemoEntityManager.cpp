@@ -254,11 +254,11 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	int xxx = 0;
 	const int xxxxxx = 450;
 	dDownHeap<int, unsigned> xxxxx (xxxxxx + 2);
-	for (int i = 0; i < xxxxxx; i ++){
+	for (dInt32 i = 0; i < xxxxxx; i ++){
 		xxxxx.Push (xxx, i);
 	}
 
-	for (int i = 0; i < 10000; i ++){
+	for (dInt32 i = 0; i < 10000; i ++){
 		int index = dRand() % xxxxxx;
 		int key = xxxxx.Value(index);
 		xxxxx.Remove (index);
@@ -348,7 +348,7 @@ int ndDemoEntityManager::GetJoystickAxis (dFloat32* const axisValues, int maxAxi
 	{
 		const float* const axis = glfwGetJoystickAxes(0, &axisCount);
 		axisCount = dMin (axisCount, maxAxis);
-		for (int i = 0; i < axisCount; i ++) 
+		for (dInt32 i = 0; i < axisCount; i ++) 
 		{
 			axisValues[i] = axis[i];
 		}
@@ -362,7 +362,7 @@ int ndDemoEntityManager::GetJoystickButtons (char* const axisbuttons, int maxBut
 	if (m_hasJoytick) {
 		const unsigned char* const buttons = glfwGetJoystickButtons(0, &buttonsCount);
 		buttonsCount = dMin (buttonsCount, maxButton);
-		for (int i = 0; i < buttonsCount; i ++) 
+		for (dInt32 i = 0; i < buttonsCount; i ++) 
 		{
 			axisbuttons[i] = buttons[i];
 		}
@@ -582,7 +582,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 		{
 			m_suspendPhysicsUpdate = true;
 			int demosCount = int (sizeof (m_demosSelection) / sizeof m_demosSelection[0]);
-			for (int i = 0; i < demosCount; i ++) 
+			for (dInt32 i = 0; i < demosCount; i ++) 
 			{
 				if (ImGui::MenuItem(m_demosSelection[i].m_name, "")) 
 				{

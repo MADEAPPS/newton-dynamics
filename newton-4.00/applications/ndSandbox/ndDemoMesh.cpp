@@ -224,7 +224,7 @@ NewtonMesh* ndDemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix
 
 	for (dListNode* node = GetFirst(); node; node = node->GetNext()) {
 		ndDemoSubMesh& segment = node->GetInfo();
-		for (int i = 0; i < segment.m_indexCount; i += 3) {
+		for (dInt32 i = 0; i < segment.m_indexCount; i += 3) {
 			NewtonMeshBeginFace(mesh);
 			for (int j = 0; j < 3; j ++) {
 				int index = segment.m_indexes[i + j];
@@ -263,7 +263,7 @@ void ndDemoMesh::SpliteSegment(dListNode* const node, int maxIndexCount)
 	{
 		dVector minBox (1.0e10f, 1.0e10f, 1.0e10f, 0.0f);
 		dVector maxBox (-1.0e10f, -1.0e10f, -1.0e10f, 0.0f);
-		for (int i = 0; i < segment.m_indexCount; i ++) 
+		for (dInt32 i = 0; i < segment.m_indexCount; i ++) 
 		{
 			int index = segment.m_indexes[i];
 			for (int j = 0; j < 3; j ++) 
@@ -288,7 +288,7 @@ void ndDemoMesh::SpliteSegment(dListNode* const node, int maxIndexCount)
 		int leftCount = 0;
 		int rightCount = 0;
 		dFloat32 spliteDist = (maxBox[index ] + minBox[index]) * 0.5f;
-		for (int i = 0; i < segment.m_indexCount; i += 3) 
+		for (dInt32 i = 0; i < segment.m_indexCount; i += 3) 
 		{
 			bool isleft = true;
 			for (int j = 0; j < 3; j ++) 
@@ -322,7 +322,7 @@ void ndDemoMesh::SpliteSegment(dListNode* const node, int maxIndexCount)
 
 			leftCount = 0;
 			rightCount = 0;
-			for (int i = 0; i < segment.m_indexCount; i += 3) 
+			for (dInt32 i = 0; i < segment.m_indexCount; i += 3) 
 			{
 				bool isleft = true;
 				for (int j = 0; j < 3; j ++) 
@@ -353,7 +353,7 @@ void ndDemoMesh::SpliteSegment(dListNode* const node, int maxIndexCount)
 		{
 			leftCount = 0;
 			rightCount = 0;
-			for (int i = 0; i < segment.m_indexCount; i += 3) 
+			for (dInt32 i = 0; i < segment.m_indexCount; i += 3) 
 			{
 				if (i / 3 & 1) 
 				{
@@ -379,7 +379,7 @@ void ndDemoMesh::SpliteSegment(dListNode* const node, int maxIndexCount)
 
 			leftCount = 0;
 			rightCount = 0;
-			for (int i = 0; i < segment.m_indexCount; i += 3) 
+			for (dInt32 i = 0; i < segment.m_indexCount; i += 3) 
 			{
 				if (i / 3 & 1) 
 				{
@@ -434,7 +434,7 @@ void ndDemoMesh::RenderNormals ()
 	dFloat32 length = 0.1f;
 	glBegin(GL_LINES);
 
-	for (int i = 0; i < m_vertexCount; i ++) 
+	for (dInt32 i = 0; i < m_vertexCount; i ++) 
 	{
 		glVertex3f (GLfloat(m_vertex[i * 3 + 0]), GLfloat(m_vertex[i * 3 + 1]), GLfloat(m_vertex[i * 3 + 2]));
 		glVertex3f (GLfloat(m_vertex[i * 3 + 0] + m_normal[i * 3 + 0] * length), GLfloat(m_vertex[i * 3 + 1] + m_normal[i * 3 + 1] * length), GLfloat(m_vertex[i * 3 + 2] + m_normal[i * 3 + 2] * length));
@@ -497,7 +497,7 @@ void ndDemoBezierCurve::Render(ndDemoEntityManager* const scene, const dMatrix& 
 		//dFloat64 scale = 1.0f / m_renderResolution;
 		//glBegin(GL_LINES);
 		//dBigVector p0 (m_curve.CurvePoint(0.0f)) ;
-		//for (int i = 1; i <= m_renderResolution; i ++) {
+		//for (dInt32 i = 1; i <= m_renderResolution; i ++) {
 		//	dBigVector p1 (m_curve.CurvePoint(i * scale));
 		//	glVertex3f (GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
 		//	glVertex3f (GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
@@ -509,7 +509,7 @@ void ndDemoBezierCurve::Render(ndDemoEntityManager* const scene, const dMatrix& 
 		glBegin(GL_POINTS);
 		glColor3f(1.0f, 0.0f, 0.0f);
 		int count = m_curve.GetKnotCount();
-		for (int i = 0; i < count; i ++) {
+		for (dInt32 i = 0; i < count; i ++) {
 			dFloat32 u = m_curve.GetKnot(i);
 			dBigVector p0 (m_curve.CurvePoint(u));
 			glVertex3f (p0.m_x, p0.m_y, p0.m_z);
@@ -609,7 +609,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 		if (cluster) {
 			int boneIndex = boneClusterRemapIndex[cluster->GetNodeID()];
 			dAssert (boneIndex != -1);
-			for (int i = 0; i < cluster->m_vertexIndex.GetSize(); i ++) {
+			for (dInt32 i = 0; i < cluster->m_vertexIndex.GetSize(); i ++) {
 				int vertexIndex = cluster->m_vertexIndex[i];
 
 				vCount = dMax (vertexIndex + 1, vCount);
@@ -633,7 +633,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 	const int* const indexToPointMap = meshInfo->GetIndexToVertexMap();
 	const int vertexBaseCount = NewtonMeshGetVertexBaseCount(meshInfo->GetMesh());
 
-	for (int i = 0; i < vertexBaseCount; i ++) {
+	for (dInt32 i = 0; i < vertexBaseCount; i ++) {
 
 		dVector w (weight[i]);
 		dFloat32 invMag = w.m_x + w.m_y + w.m_z + w.m_w;
@@ -661,7 +661,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 	memset(&pointSkinBone[0], 0, m_mesh->m_vertexCount * sizeof(dWeightBoneIndex));
 
 	dList<int> pendingVertices;
-	for (int i = 0; i < m_mesh->m_vertexCount; i ++) {
+	for (dInt32 i = 0; i < m_mesh->m_vertexCount; i ++) {
 		int index = indexToPointMap[i];
 
 		dAssert (index >= 0);
@@ -675,7 +675,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 	}
 
 	for (dList<int>::dListNode* ptr = pendingVertices.GetFirst(); ptr; ptr = ptr->GetNext()) {
-		int i = ptr->GetInfo();
+		dInt32 i = ptr->GetInfo();
 		dVector p (m_mesh->m_vertex[i * 3 + 0], m_mesh->m_vertex[i * 3 + 1], m_mesh->m_vertex[i * 3 + 2], 0.0f);
 		for (int j = 0; j < m_mesh->m_vertexCount; j ++) {
 			if (i != j) {
@@ -773,7 +773,7 @@ void ndDemoSkinMesh::OptimizeForRender(const ndDemoSubMesh& segment, const dVect
 	const dFloat32* const uv = m_mesh->m_uv;
 	const dFloat32* const normal = m_mesh->m_normal;
 	const dFloat32* const vertex = m_mesh->m_vertex;
-	for (int i = 0; i < segment.m_indexCount; i++) 
+	for (dInt32 i = 0; i < segment.m_indexCount; i++) 
 	{
 		int index = segment.m_indexes[i];
 
@@ -826,7 +826,7 @@ int ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
 
 void ndDemoSkinMesh::ConvertToGlMatrix(int count, const dMatrix* const bindMatrix, GLfloat* const glMatrices) const
 {
-	for (int i = 0; i < count; i++) {
+	for (dInt32 i = 0; i < count; i++) {
 		const dMatrix& src = bindMatrix[i];
 		GLfloat* dst = &glMatrices[i * 16];
 		for (int j = 0; j < 4; j++) {
@@ -1332,7 +1332,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	//	dVector* const normals = new dVector [size * size];
 	dVector* const normals = (dVector*)normalsPtr;
 
-	for (int i = 0; i < size; i ++) {
+	for (dInt32 i = 0; i < size; i ++) {
 	elevationMap[i] = &elevation[i * size];
 	normalMap[i] = &normals[i * size];
 	}
@@ -1364,7 +1364,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	}
 	}
 
-	for (int i = 0; i < size * size; i ++) {
+	for (dInt32 i = 0; i < size * size; i ++) {
 	dAssert(normals[i].m_w == dFloat32(0.0f));
 	normals[i] = normals[i].Scale (1.0f / dSqrt (normals[i].DotProduct(normals[i]).GetScalar()));
 	}

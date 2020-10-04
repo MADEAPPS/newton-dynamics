@@ -784,7 +784,7 @@ void dCholeskyUpdate(dInt32 size, dInt32 row, dInt32 colum, T* const choleskyMat
 
 	for (dInt32 i = 0; i < size; i++) 
 	{
-		for (int j = 0; j < size; j++) 
+		for (dInt32 j = 0; j < size; j++) 
 		{
 			T err = psdMatrixCopy[i*size + j] - choleskyMatrix[i*size + j];
 			dAssert(dAbs(err) < T(1.0e-4f));

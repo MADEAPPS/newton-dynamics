@@ -382,7 +382,7 @@ ndDemoEntity* ndDemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld
 		if (rootCount > 1) {
 			parent = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
 		}
-		for (int i = 0; i < rootCount; i ++) {
+		for (dInt32 i = 0; i < rootCount; i ++) {
 			entity__[stack] = new ndDemoEntity(dGetIdentityMatrix(), parent);
 			entityStack[stack] = entity__[stack];
 			nodeStack[stack] = meshRootNodeArray[stack];
@@ -469,7 +469,7 @@ ndDemoEntity* ndDemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld
 
 		returnEntity = entity__[0] ? (entity__[0]->GetParent() ? entity__[0]->GetParent() : entity__[0]) : nullptr;
 		if (modifiersCount) {
-			for (int i = 0; i < modifiersCount; i++) {
+			for (dInt32 i = 0; i < modifiersCount; i++) {
 				dScene::dTreeNode* const skinMeshNode = nodeModifiers[i];
 				dAssert (((dMeshNodeInfo*)scene.GetInfoFromNode(skinMeshNode))->GetTypeId() == dMeshNodeInfo::GetRttiType());
 				ndDemoEntity* const skinEntity = entityModifiers[i];
@@ -502,7 +502,7 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 			//dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
 			dFloat32* const array = mesh->m_vertex;
 			dVector extremes(0.0f);
-			for (int i = 0; i < mesh->m_vertexCount; i++) {
+			for (dInt32 i = 0; i < mesh->m_vertexCount; i++) {
 				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
 				extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
 				extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
@@ -519,7 +519,7 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 			// go over the vertex array and find and collect all vertices's weighted by this bone.
 			dFloat32* const array = mesh->m_vertex;
 			dVector extremes(0.0f);
-			for (int i = 0; i < mesh->m_vertexCount; i++) {
+			for (dInt32 i = 0; i < mesh->m_vertexCount; i++) {
 				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
 				extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
 				extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
@@ -537,7 +537,7 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 			//dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
 			dFloat32* const array = mesh->m_vertex;
 			dVector extremes(0.0f);
-			for (int i = 0; i < mesh->m_vertexCount; i++) {
+			for (dInt32 i = 0; i < mesh->m_vertexCount; i++) {
 				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
 				extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
 				extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
@@ -564,7 +564,7 @@ NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const wo
 	if (count > 2) {
 		NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
 		NewtonCompoundCollisionBeginAddRemove (compound);	
-		for (int i = 1; i < count; i ++) {
+		for (dInt32 i = 1; i < count; i ++) {
 			NewtonCompoundCollisionAddSubCollision (compound, shapeArray[i]);
 			NewtonDestroyCollision(shapeArray[i]);
 		}

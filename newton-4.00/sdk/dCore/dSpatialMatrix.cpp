@@ -74,11 +74,11 @@ dSpatialMatrix dSpatialMatrix::Inverse(dInt32 rows) const
 		{
 			dFloat64 scale = tmp[j][i] / tmp[i][i];
 			tmp[j][i] = dFloat64(0.0f);
-			for (int k = i + 1; k < rows; k++) 
+			for (dInt32 k = i + 1; k < rows; k++) 
 			{
 				tmp[j][k] -= scale * tmp[i][k];
 			}
-			for (int k = 0; k <= i; k++) 
+			for (dInt32 k = 0; k <= i; k++) 
 			{
 				inv[j][k] -= scale * inv[i][k];
 			}
@@ -91,7 +91,7 @@ dSpatialMatrix dSpatialMatrix::Inverse(dInt32 rows) const
 		for (dInt32 j = i + 1; j < rows; j++) 
 		{
 			dFloat64 pivot = tmp[i][j];
-			for (int k = 0; k < rows; k++) 
+			for (dInt32 k = 0; k < rows; k++) 
 			{
 				acc[k] += pivot * inv[j][k];
 			}

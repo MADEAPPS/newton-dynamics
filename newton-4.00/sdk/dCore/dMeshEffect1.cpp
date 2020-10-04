@@ -3313,7 +3313,7 @@ void dMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 						bool degeneratedFace = false;
 						for (dInt32 i = 0; i < indexCount - 1; i++) 
 						{
-							for (int k = i + 1; k < indexCount; k++) 
+							for (dInt32 k = i + 1; k < indexCount; k++) 
 							{
 								if (index[i] == index[k]) 
 								{

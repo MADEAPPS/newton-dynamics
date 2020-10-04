@@ -234,7 +234,7 @@ int PhysicsIslandUpdate (const ndWorld* world, const void* islandHandle, int bod
 	if (showIslans) {
 		dVector minAABB ( 1.0e10f,  1.0e10f,  1.0e10f, 0.0f);
 		dVector maxAABB (-1.0e10f, -1.0e10f, -1.0e10f, 0.0f);
-		for (int i = 0; i < bodyCount; i ++) {
+		for (dInt32 i = 0; i < bodyCount; i ++) {
 			dVector p0;
 			dVector p1;
 
@@ -348,7 +348,7 @@ static void ExtrudeFaces (void* userData, int vertexCount, const dFloat32* faceV
 	dVector p1 (faceVertec[1 * 3 + 0], faceVertec[1 * 3 + 1], faceVertec[1 * 3 + 2]);
 
 	dVector e0 (p1 - p0);
-	for (int i = 2; i < vertexCount; i ++) {
+	for (dInt32 i = 2; i < vertexCount; i ++) {
 		dVector p2 (faceVertec[i * 3 + 0], faceVertec[i * 3 + 1], faceVertec[i * 3 + 2]);
 		dVector e1 (p2 - p0);
 
@@ -360,7 +360,7 @@ static void ExtrudeFaces (void* userData, int vertexCount, const dFloat32* faceV
 	dVector displacemnet (normal.Scale (OFFSET));
 
 	// add the face displace by some offset
-	for (int i = 0; i < vertexCount; i ++) {
+	for (dInt32 i = 0; i < vertexCount; i ++) {
 		dVector p1 (faceVertec[i * 3 + 0], faceVertec[i * 3 + 1], faceVertec[i * 3 + 2]);
 		p1 += displacemnet;
 
@@ -385,7 +385,7 @@ static void ExtrudeFaces (void* userData, int vertexCount, const dFloat32* faceV
 	// now add on face walk the perimeter and add a rivet face
 	dVector q0 (faceVertec[(vertexCount - 1) * 3 + 0], faceVertec[(vertexCount - 1) * 3 + 1], faceVertec[(vertexCount - 1) * 3 + 2]);
 	q0 += displacemnet;
-	for (int i = 0; i < vertexCount; i ++) {
+	for (dInt32 i = 0; i < vertexCount; i ++) {
 		dVector q1 (faceVertec[i * 3 + 0], faceVertec[i * 3 + 1], faceVertec[i * 3 + 2]);
 		q1 += displacemnet;
 
@@ -722,7 +722,7 @@ NewtonCollision* CreateConvexCollision (ndWorld* const world, const dMatrix& src
 
 			int count = 6;
 			// populate the cloud with pseudo Gaussian random points
-			for (int i = 6; i < SAMPLE_COUNT; i ++) {
+			for (dInt32 i = 6; i < SAMPLE_COUNT; i ++) {
 				cloud [i].m_x = dGaussianRandom (size.m_x);
 				cloud [i].m_y = dGaussianRandom (size.m_y);
 				cloud [i].m_z = dGaussianRandom (size.m_z);
@@ -745,7 +745,7 @@ NewtonCollision* CreateConvexCollision (ndWorld* const world, const dMatrix& src
 			dFloat32 height = size.m_x * 0.999f;
 			dFloat32 x = - height * 0.5f;
 			dMatrix rotation (dPitchMatrix(2.0f * dPi / STEPS_HULL));
-			for (int i = 0; i < 4; i ++) {
+			for (dInt32 i = 0; i < 4; i ++) {
 				dFloat32 pad = ((i == 1) || (i == 2)) * 0.25f * radius;
 				dVector p (x, 0.0f, radius + pad);
 				x += 0.3333f * height;
@@ -900,7 +900,7 @@ void AddPrimitiveArray (ndDemoEntityManager* const scene, dFloat32 mass, const d
 	ndDemoMesh* const geometry = new ndDemoMesh("primitive", scene->GetShaderCache(), collision, "smilli.tga", "smilli.tga", "smilli.tga");
 
 	dMatrix matrix (dGetIdentityMatrix());
-	for (int i = 0; i < xCount; i ++) {
+	for (dInt32 i = 0; i < xCount; i ++) {
 		dFloat32 x = origin.m_x + (i - xCount / 2) * spacing;
 		for (int j = 0; j < zCount; j ++) {
 			dFloat32 z = origin.m_z + (j - zCount / 2) * spacing;
@@ -922,7 +922,7 @@ void AddPrimitiveArray (ndDemoEntityManager* const scene, dFloat32 mass, const d
 
 void CalculateAABB (const NewtonCollision* const collision, const dMatrix& matrix, dVector& minP, dVector& maxP)
 {
-	for (int i = 0; i < 3; i ++) {
+	for (dInt32 i = 0; i < 3; i ++) {
 		dVector support(0.0f);
 		dVector dir (0.0f);
 		dir[i] = 1.0f;
@@ -1034,7 +1034,7 @@ NewtonCollision* CreateCollisionTree (ndWorld* const world, ndDemoEntity* const 
 			}
 
 
-			for (int i = 0; i < segment.m_indexCount; i += 3) {
+			for (dInt32 i = 0; i < segment.m_indexCount; i += 3) {
 				dFloat32 face[3][3];
 				for (int j = 0; j < 3; j ++) {
 					int index = segment.m_indexes[i + j] * 3;
@@ -1171,7 +1171,7 @@ ndBodyKinematic* CreatePLYMesh (ndDemoEntityManager* const scene, const char* co
 	fgets(buffer, sizeof (buffer), file);
 
 	dArray<dVector> points(vertexCount);
-	for (int i = 0; i < vertexCount; i++) {
+	for (dInt32 i = 0; i < vertexCount; i++) {
 		dFloat32 x;
 		dFloat32 y;
 		dFloat32 z;
@@ -1186,7 +1186,7 @@ ndBodyKinematic* CreatePLYMesh (ndDemoEntityManager* const scene, const char* co
 
 	// prepare to create collision geometry
 	NewtonTreeCollisionBeginBuild(collision);
-	for (int i = 0; i < faceCount; i++) {
+	for (dInt32 i = 0; i < faceCount; i++) {
 		int count;
 		dFloat32 face[32][3];
 		fscanf(file, "%d", &count);
@@ -1299,7 +1299,7 @@ void LoadLumberYardMesh(ndDemoEntityManager* const scene, const dVector& locatio
 				dVector minBox(1.0e10f, 1.0e10f, 1.0e10f, 1.0f);
 				dVector maxBox(-1.0e10f, -1.0e10f, -1.0e10f, 1.0f);
 
-				for (int i = 0; i < mesh->m_vertexCount; i++) {
+				for (dInt32 i = 0; i < mesh->m_vertexCount; i++) {
 					dVector p(array[i * 3 + 0], array[i * 3 + 1], array[i * 3 + 2], 1.0f);
 					minBox.m_x = dMin(p.m_x, minBox.m_x);
 					minBox.m_y = dMin(p.m_y, minBox.m_y);

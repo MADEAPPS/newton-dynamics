@@ -35,7 +35,7 @@ class HeightfieldMap
 	{
 		dFloat32 r = 0.0f;
 		int maxCount = 2 * GAUSSIAN_BELL + 1;
-		for (int i = 0; i < maxCount; i ++) {
+		for (dInt32 i = 0; i < maxCount; i ++) {
 			dFloat32 t = 2.0f * dFloat32 (dRand()) / dFloat32(dRAND_MAX) - 1.0f;
 			r += t;
 		}
@@ -47,19 +47,19 @@ freq *= 0.5f;
 	static void SetBaseHeight (dFloat32* const elevation, int size)
 	{
 		dFloat32 minhigh = 1.0e10;
-		for (int i = 0; i < size * size; i ++) {
+		for (dInt32 i = 0; i < size * size; i ++) {
 			if (elevation[i] < minhigh) {
 				minhigh = elevation[i];
 			}
 		}
-		for (int i = 0; i < size * size; i ++) {
+		for (dInt32 i = 0; i < size * size; i ++) {
 			elevation[i] -= minhigh;
 		}
 	}
 
 	static void MakeCalderas (dFloat32* const elevation, int size, dFloat32 baseHigh, dFloat32 roughness)
 	{
-		for (int i = 0; i < size * size; i ++) {
+		for (dInt32 i = 0; i < size * size; i ++) {
 			//dFloat32 h =  baseHigh + Guassian (roughness);
 			dFloat32 h =  baseHigh;
 			if (elevation[i] > h) {
@@ -71,14 +71,14 @@ freq *= 0.5f;
 
 	static void MakeMap (dFloat32* const elevation, dFloat32** const map, int size)
 	{
-		for (int i = 0; i < size; i ++) {
+		for (dInt32 i = 0; i < size; i ++) {
 			map[i] = &elevation[i * size];
 		}
 	}
 
 	static void MakeMap (dVector* const normal, dVector** const map, int size)
 	{
-		for (int i = 0; i < size; i ++) {
+		for (dInt32 i = 0; i < size; i ++) {
 			map[i] = &normal[i * size];
 		}
 	}
@@ -120,7 +120,7 @@ freq *= 0.5f;
 			}
 		}
 
-		for (int i = 0; i < size * size; i ++) {
+		for (dInt32 i = 0; i < size * size; i ++) {
 			normals[i] = normals[i].Scale (1.0f / sqrtf (normals[i] % normals[i]));
 		}
 
@@ -238,11 +238,11 @@ freq *= 0.5f;
 		int size = (1 << sizeInPowerOfTwos) + 1;
 		dAssert (size < int (sizeof (map) / sizeof map[0]));
 		MakeMap (elevation, map, size);
-		//for (int i = 0; i < (size + 1) * (size + 1); i++) {
+		//for (dInt32 i = 0; i < (size + 1) * (size + 1); i++) {
 		//	elevation[i] = -1.0e6f;
 		//}
 
-		for (int i = 0; i < size; i++) {
+		for (dInt32 i = 0; i < size; i++) {
 			map[0][i] = 0.0f;
 			map[size - 1][i] = 0.0f;
 			map[i][0] = 0.0f;
@@ -316,7 +316,7 @@ freq *= 0.5f;
 		//MakeFractalTerrain (elevation, sizeInPowerOfTwos, elevationScale, roughness, maxElevation, minElevation);
 		MakeFractalTerrain (elevation, sizeInPowerOfTwos, elevationScale, roughness, maxElevation, minElevation);
 
-		for (int i = 0; i < 4; i ++) {
+		for (dInt32 i = 0; i < 4; i ++) {
 			ApplySmoothFilter (elevation, size);
 		}
 
@@ -375,7 +375,7 @@ freq *= 0.5f;
 #if 0
 		// uncomment this to test horizontal displacement
 		unsigned short* const horizontalDisplacemnet = new unsigned short[size * size];
-		for (int i = 0; i < size * size; i++) {
+		for (dInt32 i = 0; i < size * size; i++) {
 			horizontalDisplacemnet[i] = dRand();
 		}
 		NewtonHeightFieldSetHorizontalDisplacement(collision, horizontalDisplacemnet, 0.02f);
