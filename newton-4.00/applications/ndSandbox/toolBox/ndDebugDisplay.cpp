@@ -425,6 +425,13 @@ void RenderBroadPhase(ndDemoEntityManager* const scene)
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
+static ndMeshVector CalculatePoint(const dMatrix& matrix, const dVector& center, dFloat32 x, dFloat32 y, dFloat32 w)
+{
+	dVector point(center.m_x + x, center.m_y + y, center.m_z, center.m_w);
+	point = matrix.TransformVector1x4(point.Scale(w));
+	return ndMeshVector(GLfloat(point.m_x), GLfloat(point.m_y), GLfloat(point.m_z));
+}
+
 void RenderContactPoints(ndDemoEntityManager* const scene)
 {
 	ndWorld* const world = scene->GetWorld();
@@ -451,7 +458,11 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 	glUniform4fv(shadeColorLocation, 1, &color.m_x);
 	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
 
-	ndMeshVector pointBuffer[3][3];
+	GLint viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	dFloat32 pizelSize = 8.0f / viewport[2];
+
+	ndMeshVector pointBuffer[4];
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof (ndMeshVector), pointBuffer);
 
@@ -467,32 +478,15 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 			for (ndContactPointList::dListNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
 			{
 				const ndContactPoint& contactPoint = contactPointsNode->GetInfo();
-				//dVector point (viewProjectionMatrix.TransformVector1x4 (contactPoint.m_point));
-				//dFloat32 zDist = point.m_w;
-				//point = point.Scale(1.0f / zDist);
-				//dFloat32 xStep = -1.0f;
-				//for (dInt32 i = 0; i < 3; i++)
-				//{
-				//	dFloat32 yStep = -1.0f;
-				//	for (dInt32 j = 0; j < 3; j++)
-				//	{
-				//		dVector thickPoint(point.m_x + xStep, point.m_y + yStep, point.m_z, point.m_w);
-				//		//dVector thickPoint(point.m_x, point.m_y, point.m_z, point.m_w);
-				//		thickPoint = thickPoint.Scale(zDist);
-				//		thickPoint = invViewProjectionMatrix.TransformVector1x4(thickPoint);
-				//		pointBuffer[i][j] = ndMeshVector(GLfloat(thickPoint.m_x), GLfloat(thickPoint.m_y), GLfloat(thickPoint.m_z));
-				//		yStep += 1.0f;
-				//	}
-				//	xStep += 1.0f;
-				//}
-				//glDrawArrays(GL_POINTS, 0, 9);
+				dVector point (viewProjectionMatrix.TransformVector1x4 (contactPoint.m_point));
+				dFloat32 zDist = point.m_w;
+				point = point.Scale(1.0f / zDist);
 
-				const dVector& point1 = contactPoint.m_point;
-				pointBuffer[0][0] = ndMeshVector(GLfloat(point1.m_x), GLfloat(point1.m_y), GLfloat(point1.m_z));
-				pointBuffer[0][1] = ndMeshVector(GLfloat(point1.m_x), GLfloat(point1.m_y + 0.5f), GLfloat(point1.m_z));
-				glDrawArrays(GL_POINTS, 0, 2);
-				//glDrawArrays(GL_LINES, 0, 2);
-
+				pointBuffer[0] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize,  pizelSize, zDist);
+				pointBuffer[1] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, -pizelSize, zDist);
+				pointBuffer[2] = CalculatePoint(invViewProjectionMatrix, point,  pizelSize,  pizelSize, zDist);
+				pointBuffer[3] = CalculatePoint(invViewProjectionMatrix, point,  pizelSize, -pizelSize, zDist);
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 			}
 		}
 	}

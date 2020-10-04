@@ -138,7 +138,7 @@ dMatrix ndDemoCamera::CreatePerspectiveMatrix(dFloat32 fov, dFloat32 Aspect, dFl
 	return Result;
 }
 
-void ndDemoCamera::SetViewMatrix(int width, int height)
+void ndDemoCamera::SetViewMatrix(dInt32 width, dInt32 height)
 {
 	// set the view port for this render section
 	glViewport(0, 0, (GLint)width, (GLint)height);

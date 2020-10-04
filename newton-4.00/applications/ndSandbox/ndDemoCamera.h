@@ -33,7 +33,7 @@ class ndDemoCamera: public ndDemoEntity
 	const dMatrix& GetProjectionMatrix() const;
 
 	void SetMatrix (ndDemoEntityManager& world, const dQuaternion& rotation, const dVector& position);
-	void SetViewMatrix (int width, int height);
+	void SetViewMatrix (dInt32 width, dInt32 height);
 
 	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
 
@@ -56,8 +56,6 @@ class ndDemoCamera: public ndDemoEntity
 	dFloat32 m_cameraPitch;
 
 	GLint m_viewport[4]; 
-	//GLdouble m_modelViewMatrix[16];
-	//GLdouble m_projectionViewMatrix[16];
 	friend class ndDemoEntity;
 };
 
