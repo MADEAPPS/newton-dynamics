@@ -174,7 +174,7 @@ dMatrix dMatrix::Inverse4x4 () const
 	for (dInt32 i = 0; i < 4; i++) 
 	{
 		dFloat32 pivot = dAbs(tmp[i][i]);
-		if (pivot < dFloat32(0.01f)) 
+		if (pivot < dFloat32(0.1f)) 
 		{
 			dInt32 permute = i;
 			for (dInt32 j = i + 1; j < 4; j++) 
@@ -186,7 +186,8 @@ dMatrix dMatrix::Inverse4x4 () const
 					pivot = pivot1;
 				}
 			}
-			if (permute != i) {
+			if (permute != i) 
+			{
 				dAssert(pivot > dFloat32(0.0f));
 				dAssert((pivot > dFloat32(1.0e-6f)) || (dConditionNumber(4, 4, (dFloat32*)&(*this)[0][0]) < dFloat32(1.0e5f)));
 				dSwap(inv[i], inv[permute]);
@@ -219,11 +220,12 @@ dMatrix dMatrix::Inverse4x4 () const
 	tmp = *this * inv;
 	for (dInt32 i = 0; i < 4; i++) 
 	{
-		dAssert(dAbs(tmp[i][i] - dFloat32(1.0f)) < dFloat32(1.0e-6f));
+		dFloat32 error = tmp[i][i] - dFloat32(1.0f);
+		dAssert(dAbs(error) < dFloat32(1.0e-3f));
 		for (dInt32 j = i + 1; j < 4; j++) 
 		{
-			dAssert(dAbs(tmp[i][j]) < dFloat32(1.0e-5f));
-			dAssert(dAbs(tmp[j][i]) < dFloat32(1.0e-5f));
+			dAssert(dAbs(tmp[i][j]) < dFloat32(1.0e-3f));
+			dAssert(dAbs(tmp[j][i]) < dFloat32(1.0e-3f));
 		}
 	}
 #endif

@@ -50,42 +50,6 @@ class ndDummyCollision: public ndShapeNull
 	}
 };
 
-class ndBodyKinematic::ndContactkey
-{
-	public:
-	ndContactkey(dUnsigned32 tag0, dUnsigned32 tag1)
-		:m_tagLow(dMin(tag0, tag1))
-		,m_tagHigh(dMax(tag0, tag1))
-	{
-		dAssert(m_tagLow < m_tagHigh);
-	}
-
-	bool operator== (const ndContactkey& key) const
-	{
-		return m_tag == key.m_tag;
-	}
-
-	bool operator< (const ndContactkey& key) const
-	{
-		return m_tag < key.m_tag;
-	}
-
-	bool operator> (const ndContactkey& key) const
-	{
-		return m_tag > key.m_tag;
-	}
-
-	private:
-	union
-	{
-		dUnsigned64 m_tag;
-		struct
-		{
-			dUnsigned32 m_tagLow;
-			dUnsigned32 m_tagHigh;
-		};
-	};
-};
 
 ndBodyKinematic::ndContactMap::ndContactMap()
 	:dTree<ndContact*, ndContactkey, dContainersFreeListAlloc<ndContact*>>()

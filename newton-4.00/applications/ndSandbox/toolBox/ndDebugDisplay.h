@@ -21,15 +21,11 @@ class ndDemoEntityManager;
 
 #if 0
 
-int DebugDisplayOn();
-void SetDebugDisplayMode(int state);
-
 
 void RenderCenterOfMass (NewtonWorld* const world);
 void RenderBodyFrame (NewtonWorld* const world);
 void RenderRayCastHit(NewtonWorld* const world);
 void RenderNormalForces (NewtonWorld* const world);
-void RenderContactPoints (NewtonWorld* const world); 
 
 void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug);
 
@@ -47,6 +43,7 @@ void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const 
 
 void RenderBroadPhase(ndDemoEntityManager* const scene);
 void RenderBodiesAABB(ndDemoEntityManager* const scene);
+void RenderContactPoints(ndDemoEntityManager* const scene);
 void RenderJointsDebugInfo(ndDemoEntityManager* const scene);
 
 #endif

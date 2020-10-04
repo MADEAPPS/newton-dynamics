@@ -33,17 +33,55 @@ class ndSkeletonContainer;
 D_MSV_NEWTON_ALIGN_32
 class ndBodyKinematic: public ndBody
 {
-	class ndContactkey;
+	class ndContactkey
+	{
+		public:
+		ndContactkey(dUnsigned32 tag0, dUnsigned32 tag1)
+			:m_tagLow(dMin(tag0, tag1))
+			,m_tagHigh(dMax(tag0, tag1))
+		{
+			dAssert(m_tagLow < m_tagHigh);
+		}
+
+		bool operator== (const ndContactkey& key) const
+		{
+			return m_tag == key.m_tag;
+		}
+
+		bool operator< (const ndContactkey& key) const
+		{
+			return m_tag < key.m_tag;
+		}
+
+		bool operator> (const ndContactkey& key) const
+		{
+			return m_tag > key.m_tag;
+		}
+
+		private:
+		union
+		{
+			dUnsigned64 m_tag;
+			struct
+			{
+				dUnsigned32 m_tagLow;
+				dUnsigned32 m_tagHigh;
+			};
+		};
+	};
+	public:
 	class ndContactMap: public dTree<ndContact*, ndContactkey, dContainersFreeListAlloc<ndContact*>>
 	{
 		public:
 		ndContactMap();
-		ndContact* FindContact(const ndBody* const body0, const ndBody* const body1) const;
+		D_COLLISION_API ndContact* FindContact(const ndBody* const body0, const ndBody* const body1) const;
+
+		private:
 		void AttachContact(ndContact* const contact);
 		void DetachContact(ndContact* const contact);
+		friend class ndBodyKinematic;
 	};
 
-	public:
 	D_COLLISION_API ndBodyKinematic();
 	D_COLLISION_API virtual ~ndBodyKinematic();
 
@@ -89,6 +127,8 @@ class ndBodyKinematic: public ndBody
 	virtual dVector GetTorque() const;
 	virtual void SetAccel(const dVector& accel);
 	virtual void SetAlpha(const dVector& alpha);
+
+	const ndContactMap& GetContactMap() const;
 
 	private:
 	D_COLLISION_API void SetMassMatrix(dFloat32 mass, const dMatrix& inertia);
@@ -257,6 +297,10 @@ inline void ndBodyKinematic::PrepareStep(dInt32 index)
 	//m_tmpBodyArray[index] = body;
 }
 
+inline const ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap() const
+{
+	return m_contactList;
+}
 
 #endif 
 

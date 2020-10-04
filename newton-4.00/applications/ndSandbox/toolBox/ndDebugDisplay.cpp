@@ -21,23 +21,6 @@
 #include "ndDemoEntityManager.h"
 
 #if 0
-static int g_debugMode = 0;
-
-
-int DebugDisplayOn()
-{
-	return g_debugMode;
-}
-
-void SetDebugDisplayMode(int state)
-{
-	g_debugMode = state;
-}
-
-#ifdef USE_STATIC_MESHES_DEBUG_COLLISION
-	static int g_debugDisplayCount;
-	static dVector g_debugDisplayCallback[1024 * 4];
-#endif
 
 static void RenderBodyContactsAndTangentDiretions (NewtonBody* const body, dFloat32 length)
 {
@@ -113,68 +96,6 @@ static void RenderBodyContactsForces (NewtonBody* const body, dFloat32 scale)
 	}
 }
 
-//void NewtonMaterialGetContactForce(const NewtonMaterial* const materialHandle, NewtonBody* const body, dFloat32* const forcePtr)
-
-void RenderAABB (NewtonWorld* const world)
-{
-	glDisable(GL_TEXTURE_2D);
-
-	glColor3f(0.0f, 0.0f, 1.0f);
-
-	glBegin(GL_LINES);
-//glVertex3f (-20.3125000f, 3.54991579f, 34.3441200f);
-//glVertex3f (-19.6875000f, 3.54257250f, 35.2211456f);
-
-	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
-		dMatrix matrix;
-		dVector p0(0.0f); 
-		dVector p1(0.0f); 
-		
-		NewtonCollision* const collision = NewtonBodyGetCollision(body);
-		NewtonBodyGetMatrix (body, &matrix[0][0]);
-		NewtonCollisionCalculateAABB (collision, &matrix[0][0], &p0[0], &p1[0]);
-//		CalculateAABB (collision, matrix, p0, p1);
-
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-		glVertex3f(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
-		glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
-
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-		glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
-		glVertex3f(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
-
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
-
-		glVertex3f(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-		glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
-
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-
-		glVertex3f(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
-		glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
-
-		glVertex3f(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-		glVertex3f(GLfloat(p1.m_x), GLfloat(p0.m_y), GLfloat(p1.m_z));
-
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
-		glVertex3f(GLfloat(p0.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-
-		glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p0.m_z));
-		glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-
-	}
-	glEnd();
-}
-
 void RenderCenterOfMass (NewtonWorld* const world)
 {
 	glDisable(GL_TEXTURE_2D);
@@ -241,32 +162,6 @@ void RenderBodyFrame(NewtonWorld* const world)
 	glEnd();
 }
 
-void RenderContactPoints (NewtonWorld* const world)
-{
-	glDisable(GL_TEXTURE_2D);
-
-	glPointSize(8.0f);
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glBegin(GL_POINTS);
-	for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
-		for (NewtonJoint* joint = NewtonBodyGetFirstContactJoint(body); joint; joint = NewtonBodyGetNextContactJoint(body, joint)) {
-			if (NewtonJointIsActive (joint)) {
-				for (void* contact = NewtonContactJointGetFirstContact (joint); contact; contact = NewtonContactJointGetNextContact (joint, contact)) {
-					dVector point(0.0f);
-					dVector normal(0.0f);	
-					NewtonMaterial* const material = NewtonContactGetMaterial (contact);
-					NewtonMaterialGetContactPositionAndNormal (material, body, &point.m_x, &normal.m_x);
-
-					// if we are display debug info we need to block other threads from writing the data at the same time
-					glVertex3f (GLfloat(point.m_x), GLfloat(point.m_y), GLfloat(point.m_z));
-				}
-			}
-		}
-	}
-	glEnd();
-	glPointSize(1.0f);
-}
-
 void RenderRayCastHit(NewtonWorld* const world)
 {
 	dVector point;
@@ -299,7 +194,6 @@ void RenderNormalForces (NewtonWorld* const world)
 	glEnd();
 }
 
-
 void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const dFloat32* const faceVertex, int clusterIndex)
 {
 	static dVector color[] = {dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f), dVector(0.0f, 0.0f, 1.0f, 0.0f), 
@@ -309,36 +203,6 @@ void DebugShowSoftBodySpecialCollision (void* userData, int vertexCount, const d
 	int index = clusterIndex % (sizeof (color) / sizeof (color[0]));
 	glColor3f(GLfloat(color[index].m_x), GLfloat(color[index].m_y), GLfloat(color[index].m_z));
 	DebugShowGeometryCollision (userData, vertexCount, faceVertex, clusterIndex);
-}
-
-void DebugDrawPoint (const dVector& p, dFloat32 size)
-{
-	glPointSize(GLfloat(size));
-	glBegin(GL_POINTS);
-	glVertex3f(GLfloat(p.m_x), GLfloat(p.m_y), GLfloat(p.m_z));
-	glEnd();
-	glPointSize(1.0f);
-}
-
-void DebugDrawLine (const dVector& p0, const dVector& p1)
-{
-	glBegin(GL_LINES);
-	glVertex3f(GLfloat(p0.m_x), GLfloat(p0.m_y), GLfloat(p0.m_z));
-	glVertex3f(GLfloat(p1.m_x), GLfloat(p1.m_y), GLfloat(p1.m_z));
-	glEnd();
-}
-
-void DebugDrawCollision (const NewtonCollision* const collision, const dMatrix& matrix, dDebugDisplayMode mode)
-{
-//	glBegin(GL_LINES);
-	NewtonCollisionForEachPolygonDo (collision, &matrix[0][0], DebugShowGeometryCollision, (void*)mode);
-//	glEnd();
-}
-
-
-void ClearDebugDisplay( NewtonWorld* const world )
-{
-	g_debugDisplayCount = 0;
 }
 
 void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const NewtonBody* const body, int faceID, int vertexCount, const dFloat32* const vertex, int vertexstrideInBytes)
@@ -366,14 +230,12 @@ void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const 
 #endif
 }
 
-
 void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* const jointDebug)
 {
 	NewtonWorldListenerDebug(world, jointDebug);
 }
 
 #endif
-
 
 void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 {
@@ -393,7 +255,7 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 			glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
 
 			glEnableClientState(GL_VERTEX_ARRAY);
-			glVertexPointer(3, GL_FLOAT, 0, m_line);
+			glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), m_line);
 		}
 
 		~ndJoindDebug()
@@ -499,7 +361,7 @@ void RenderBodiesAABB(ndDemoEntityManager* const scene)
 
 	ndMeshVector box[12][2];
 	glEnableClientState(GL_VERTEX_ARRAY);
-	glVertexPointer(3, GL_FLOAT, 0, box);
+	glVertexPointer(3, GL_FLOAT, sizeof (ndMeshVector), box);
 
 	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
@@ -542,10 +404,10 @@ void RenderBroadPhase(ndDemoEntityManager* const scene)
 		ndDrawBroadPhase()
 			:ndSceneTreeNotiFy()
 		{
-			glVertexPointer(3, GL_FLOAT, 0, m_box);
+			glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), m_box);
 		}
 
-		virtual void OnDebugNode(const ndSceneTreeNode* const node)
+		virtual void OnDebugNode(const ndSceneNode* const node)
 		{
 			dVector p0;
 			dVector p1;
@@ -559,6 +421,81 @@ void RenderBroadPhase(ndDemoEntityManager* const scene)
 	ndDrawBroadPhase drawBroaphase;
 	world->DebugBroadphase(&drawBroaphase);
 
+	glUseProgram(0);
+	glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+void RenderContactPoints(ndDemoEntityManager* const scene)
+{
+	ndWorld* const world = scene->GetWorld();
+	const ndBodyList& bodyList = world->GetBodyList();
+
+	GLuint shader = scene->GetShaderCache().m_wireFrame;
+
+	ndDemoCamera* const camera = scene->GetCamera();
+	dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+	//dMatrix invViewProjectionMatrix(viewProjectionMatrix.Inverse4x4());
+	dMatrix invViewProjectionMatrix(camera->GetProjectionMatrix().Inverse4x4() * camera->GetViewMatrix().Inverse());
+
+	ndMeshVector4 color;
+	color.m_x = 1.0f;
+	color.m_y = 0.0f;
+	color.m_z = 0.0f;
+	color.m_w = 1.0f;
+
+	glUseProgram(shader);
+
+	dInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	dInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+
+	glUniform4fv(shadeColorLocation, 1, &color.m_x);
+	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+
+	ndMeshVector pointBuffer[3][3];
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(3, GL_FLOAT, sizeof (ndMeshVector), pointBuffer);
+
+	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	{
+		ndBodyKinematic* const body = bodyNode->GetInfo();
+		const ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
+		ndBodyKinematic::ndContactMap::Iterator iter(contactMap);
+		for (iter.Begin(); iter; iter++)
+		{
+			const ndContact* const contact = *iter;
+			const ndContactPointList& contactPoints = contact->GetContactPoints();
+			for (ndContactPointList::dListNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
+			{
+				const ndContactPoint& contactPoint = contactPointsNode->GetInfo();
+				//dVector point (viewProjectionMatrix.TransformVector1x4 (contactPoint.m_point));
+				//dFloat32 zDist = point.m_w;
+				//point = point.Scale(1.0f / zDist);
+				//dFloat32 xStep = -1.0f;
+				//for (dInt32 i = 0; i < 3; i++)
+				//{
+				//	dFloat32 yStep = -1.0f;
+				//	for (dInt32 j = 0; j < 3; j++)
+				//	{
+				//		dVector thickPoint(point.m_x + xStep, point.m_y + yStep, point.m_z, point.m_w);
+				//		//dVector thickPoint(point.m_x, point.m_y, point.m_z, point.m_w);
+				//		thickPoint = thickPoint.Scale(zDist);
+				//		thickPoint = invViewProjectionMatrix.TransformVector1x4(thickPoint);
+				//		pointBuffer[i][j] = ndMeshVector(GLfloat(thickPoint.m_x), GLfloat(thickPoint.m_y), GLfloat(thickPoint.m_z));
+				//		yStep += 1.0f;
+				//	}
+				//	xStep += 1.0f;
+				//}
+				//glDrawArrays(GL_POINTS, 0, 9);
+
+				const dVector& point1 = contactPoint.m_point;
+				pointBuffer[0][0] = ndMeshVector(GLfloat(point1.m_x), GLfloat(point1.m_y), GLfloat(point1.m_z));
+				pointBuffer[0][1] = ndMeshVector(GLfloat(point1.m_x), GLfloat(point1.m_y + 0.5f), GLfloat(point1.m_z));
+				glDrawArrays(GL_POINTS, 0, 2);
+				//glDrawArrays(GL_LINES, 0, 2);
+
+			}
+		}
+	}
 	glUseProgram(0);
 	glDisableClientState(GL_VERTEX_ARRAY);
 }

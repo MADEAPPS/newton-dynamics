@@ -49,7 +49,7 @@ class ndSceneTreeNotiFy
 	{
 	}
 
-	virtual void OnDebugNode(const ndSceneTreeNode* const node) = 0;
+	virtual void OnDebugNode(const ndSceneNode* const node) = 0;
 
 } D_GCC_NEWTON_ALIGN_32;
 

@@ -62,6 +62,7 @@ class dMatrix
 	dVector UntransformVector (const dVector &v) const;
 	dPlane TransformPlane (const dPlane &localPlane) const;
 	dPlane UntransformPlane (const dPlane &globalPlane) const;
+	dVector TransformVector1x4(const dVector &v) const;
 	D_CORE_API dVector SolveByGaussianElimination(const dVector &v) const;
 	D_CORE_API void TransformBBox (const dVector& p0local, const dVector& p1local, dVector& p0, dVector& p1) const;
 
@@ -185,6 +186,12 @@ D_INLINE dVector dMatrix::UnrotateVector (const dVector &v) const
 D_INLINE dVector dMatrix::TransformVector (const dVector &v) const
 {
 	return RotateVector(v) + m_posit;
+}
+
+D_INLINE dVector dMatrix::TransformVector1x4(const dVector &v) const
+{
+	return m_front * v.BroadcastX() + m_up * v.BroadcastY() +
+		   m_right * v.BroadcastZ() + m_posit * v.BroadcastW();
 }
 
 D_INLINE dVector dMatrix::UntransformVector (const dVector &v) const

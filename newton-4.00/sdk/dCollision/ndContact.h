@@ -129,6 +129,8 @@ class ndContact
 	virtual const dUnsigned32 GetRowsCount() const;
 	virtual void JacobianDerivative(ndConstraintDescritor& params);
 	virtual void JointAccelerations(ndJointAccelerationDecriptor* const params);
+
+	const ndContactPointList& GetContactPoints() const;
 	
 	private:
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
@@ -287,6 +289,10 @@ inline ndBodyKinematic* ndContact::GetBody1() const
 	return m_body1;
 }
 
+inline const ndContactPointList& ndContact::GetContactPoints() const
+{
+	return m_contacPointsList;
+}
 
 #endif 
 

@@ -195,9 +195,9 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 	// initialized the physics world for the new scene
 //	m_showUI = false;
-	m_showAABB = true;
-//	m_hideVisualMeshes = true;
-	m_showBroadphase = true;
+//	m_showAABB = true;
+	m_hideVisualMeshes = true;
+//	m_showBroadphase = true;
 	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
@@ -206,9 +206,9 @@ ndDemoEntityManager::ndDemoEntityManager ()
 //	m_showRaycastHit = true;
 //	m_showCenterOfMass = false;
 //	m_showNormalForces = true;
-//	m_showContactPoints = true;
+	m_showContactPoints = true;
 	m_showJointDebugInfo = true;
-//	m_collisionDisplayMode = 3;
+	m_collisionDisplayMode = 3;
 //	m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
 
@@ -1482,25 +1482,31 @@ void ndDemoEntityManager::RenderScene()
 		}
 	}
 
+	if (m_showContactPoints)
+	{
+		m_world->Sync();
+		RenderContactPoints(this);
+	}
+
 	if (m_collisionDisplayMode) 
 	{
+		m_world->Sync();
 		DrawDebugShapes();
 	}
 	
 	if (m_showAABB) 
 	{
+		m_world->Sync();
 		RenderBodiesAABB(this);
 	}
 
 	if (m_showBroadphase)
 	{
+		m_world->Sync();
 		RenderBroadPhase(this);
 	}
-	
-	//if (m_showContactPoints) {
-	//	RenderContactPoints (m_world);
-	//}
-	//
+
+
 	//if (m_showRaycastHit) {
 	//	RenderRayCastHit(m_world);
 	//}

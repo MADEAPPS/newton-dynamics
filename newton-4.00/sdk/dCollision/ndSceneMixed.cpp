@@ -359,6 +359,15 @@ void ndSceneMixed::DebugBroadphase(ndSceneTreeNotiFy* const notify)
 {
 	for (ndFitnessList::dListNode* node = m_fitness.GetFirst(); node; node = node->GetNext())
 	{
-		notify->OnDebugNode(node->GetInfo());
+		//notify->OnDebugNode(node->GetInfo());
+		if (node->GetInfo()->GetLeft()->GetAsBroadPhaseBodyNode())
+		{
+			notify->OnDebugNode(node->GetInfo()->GetLeft());
+		}
+		if (node->GetInfo()->GetRight()->GetAsBroadPhaseBodyNode())
+		{
+			notify->OnDebugNode(node->GetInfo()->GetRight());
+		}
+
 	}
 }
