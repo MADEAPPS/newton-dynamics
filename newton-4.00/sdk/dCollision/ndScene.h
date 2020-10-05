@@ -136,6 +136,8 @@ class ndScene
 	ndSceneNode* BuildTopDown(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dListNode** const nextNode);
 	ndSceneNode* BuildTopDownBig(ndSceneNode** const leafArray, dInt32 firstBox, dInt32 lastBox, ndFitnessList::dListNode** const nextNode);
 
+	const ndContactList& GetContactList() const;
+
 	D_COLLISION_API void CollisionOnlyUpdate();
 
 	protected:
@@ -228,6 +230,11 @@ inline dArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray()
 inline const dArray<ndBodyKinematic*>& ndScene::GetActiveBodyArray() const
 {
 	return m_activeBodyArray;
+}
+
+inline const ndContactList& ndScene::GetContactList() const
+{
+	return m_contactList;
 }
 
 template <class T>

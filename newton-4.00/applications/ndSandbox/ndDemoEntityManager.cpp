@@ -892,13 +892,13 @@ void ndDemoEntityManager::RenderStats()
 		
 		if (ImGui::Begin("statistics", &m_showStats)) 
 		{
-			sprintf (text, "fps:           %6.3f", m_fps);
+			sprintf (text, "fps:             %6.3f", m_fps);
 			ImGui::Text(text, "");
 
-			sprintf (text, "physics time: %6.3f ms", m_world->GetUpdateTime() * 1.0e3f);
+			sprintf (text, "physics time:   %6.3f ms", m_world->GetUpdateTime() * 1.0e3f);
 			ImGui::Text(text, "");
 
-			sprintf (text, "memory used:  %6.3f mbytes", dFloat32(dFloat64(dMemory::GetMemoryUsed()) / (1024 * 1024)));
+			sprintf (text, "memory used:    %6.3f mbytes", dFloat32(dFloat64(dMemory::GetMemoryUsed()) / (1024 * 1024)));
 			ImGui::Text(text, "");
 
 			if (m_currentPlugin) 
@@ -914,16 +914,23 @@ void ndDemoEntityManager::RenderStats()
 				//}
 			}
 
-			sprintf(text, "bodies:        %d", m_world->GetBodyList().GetCount());
+			sprintf(text, "bodies:         %d", m_world->GetBodyList().GetCount());
 			ImGui::Text(text, "");
 
-			sprintf(text, "threads:       %d", m_world->GetThreadCount());
+			sprintf(text, "joints:         %d", m_world->GetJointList().GetCount());
 			ImGui::Text(text, "");
 
-			sprintf(text, "iterations:    %d", m_world->GetSolverIterations());
+			sprintf(text, "contact joints: %d", m_world->GetContactList().GetCount());
 			ImGui::Text(text, "");
 
-			sprintf(text, "Substeps:      %d", m_world->GetSubSteps());
+
+			sprintf(text, "threads:        %d", m_world->GetThreadCount());
+			ImGui::Text(text, "");
+
+			sprintf(text, "iterations:     %d", m_world->GetSolverIterations());
+			ImGui::Text(text, "");
+
+			sprintf(text, "Substeps:       %d", m_world->GetSubSteps());
 			ImGui::Text(text, "");
 
 			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  

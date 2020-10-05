@@ -1745,7 +1745,7 @@ void ndScene::FindCollidingPairs()
 	D_TRACKTIME();
 	class ndFindCollidindPairsFullScan : public ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -1798,7 +1798,10 @@ void ndScene::FindCollidingPairs()
 				for (dInt32 j = 0; j < stepSize; j++)
 				{
 					ndBodyKinematic* const body = bodyArray[index + j];
-					m_owner->FindCollidinPairs(threadIndex, body, false);
+					if (!body->m_equilibrium)
+					{
+						m_owner->FindCollidinPairs(threadIndex, body, false);
+					}
 				}
 			}
 			if (index < bodyCount)
@@ -1807,10 +1810,12 @@ void ndScene::FindCollidingPairs()
 				for (dInt32 j = 0; j < count; j++)
 				{
 					ndBodyKinematic* const body = bodyArray[index + j];
-					m_owner->FindCollidinPairs(threadIndex, body, false);
+					if (!body->m_equilibrium)
+					{
+						m_owner->FindCollidinPairs(threadIndex, body, false);
+					}
 				}
 			}
-
 		}
 	};
 

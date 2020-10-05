@@ -45,44 +45,63 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 	geometry->Release();
 }
 
-static void BuildSphere(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
+static void BuildSphere(ndDemoEntityManager* const scene, 
+	ndDemoMesh* const sphereMesh, const ndShapeInstance& sphereShape,
+	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
 {
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
 	ndPhysicsWorld* const world = scene->GetWorld();
-	ndShapeInstance sphere(new ndShapeSphere(diameter * 0.5f));
 
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f * 0.99f;
 
 	matrix.m_posit.m_y += xxxx;
-
-	// get the dimension from shape itself
-	//dVector minP(0.0f);
-	//dVector maxP(0.0f);
-	//sphere.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
-
-	ndDemoMesh* const geometry = new ndDemoMesh("sphere", scene->GetShaderCache(), &sphere, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	
 
 	for (dInt32 i = 0; i < count; i++)
 	{
 		ndBodyDynamic* const body = new ndBodyDynamic();
 		ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-		entity->SetMesh(geometry, dGetIdentityMatrix());
+		entity->SetMesh(sphereMesh, dGetIdentityMatrix());
 
 		body->SetNotifyCallback(new ndDemoEntityNotify(entity));
 		body->SetMatrix(matrix);
-		body->SetCollisionShape(sphere);
-		body->SetMassMatrix(mass, sphere);
+		body->SetCollisionShape(sphereShape);
+		body->SetMassMatrix(mass, sphereShape);
 
 		world->AddBody(body);
 		scene->AddEntity(entity);
 
 		matrix.m_posit += matrix.m_up.Scale(diameter * 0.99f);
 	}
-	geometry->Release();
+}
+
+static void BuildSphereStacks(ndDemoEntityManager* const scene, const dVector& origin)
+{
+	dFloat32 diameter = 1.0f;
+	ndShapeInstance sphere(new ndShapeSphere(diameter * 0.5f));
+	ndDemoMesh* const mesh = new ndDemoMesh("sphere", scene->GetShaderCache(), &sphere, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+
+	// get the dimension from shape itself
+	//dVector minP(0.0f);
+	//dVector maxP(0.0f);
+	//sphere.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
+
+	const int n = 10;
+	for (dInt32 i = 0; i < n; i++)
+	{
+		for (dInt32 j = 0; j < n; j++)
+		{
+			dVector location((j - n / 2) * 4.0f, 0.0f, (i - n / 2) * 4.0f, 0.0f);
+			BuildSphere(scene, mesh, sphere, 10.0f, location + origin, 1.0f, 10, 2.0f);
+			//BuildSphere(scene, mesh, sphere, 10.0f, location + origin, 1.0f, 1, 2.0f);
+		}
+	}
+
+	mesh->Release();
 }
 
 void ndBasicSetup (ndDemoEntityManager* const scene)
@@ -97,16 +116,7 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 	BuildFloor(scene);
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	const int n = 20;
-	for (dInt32 i = 0; i < n; i++)
-	{
-		for (dInt32 j = 0; j < n; j++)
-		{
-			dVector location((j - n/2) * 4.0f, 0.0f, (i - n/2) * 4.0f, 0.0f);
-			BuildSphere(scene, 10.0f, location + origin1, 1.0f, 30, 2.0f);
-			//BuildSphere(scene, 10.0f, location + origin1, 1.0f, 1, 2.0f);
-		}
-	}
+	BuildSphereStacks(scene, origin1);
 
 	dQuaternion rot;
 	dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);

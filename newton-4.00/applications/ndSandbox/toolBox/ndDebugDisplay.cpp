@@ -237,60 +237,12 @@ void RenderListenersDebugInfo (NewtonWorld* const world, dJointDebugDisplay* con
 
 #endif
 
-void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
+
+static ndMeshVector CalculatePoint(const dMatrix& matrix, const dVector& center, dFloat32 x, dFloat32 y, dFloat32 w)
 {
-	class ndJoindDebug: public ndConstraintDebugCallback
-	{
-		public:
-		ndJoindDebug(ndDemoEntityManager* const scene)
-		{
-			ndDemoCamera* const camera = scene->GetCamera();
-			dMatrix viewProjectionMatrix (camera->GetViewMatrix() * camera->GetProjectionMatrix());
-			m_shader = scene->GetShaderCache().m_wireFrame;
-
-			glUseProgram(m_shader);
-
-			m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
-			m_projectionViewModelMatrixLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
-			glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
-
-			glEnableClientState(GL_VERTEX_ARRAY);
-			glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), m_line);
-		}
-
-		~ndJoindDebug()
-		{
-			glDisableClientState(GL_VERTEX_ARRAY);
-			glUseProgram(0);
-		}
-
-		void DrawLine(const dVector& p0, const dVector& p1, const dVector& color)
-		{
-			m_line[0].m_x = p0.m_x;
-			m_line[0].m_y = p0.m_y;
-			m_line[0].m_z = p0.m_z;
-			m_line[1].m_x = p1.m_x;
-			m_line[1].m_y = p1.m_y;
-			m_line[1].m_z = p1.m_z;
-			glUniform4fv(m_shadeColorLocation, 1, &color.m_x);
-			glDrawArrays(GL_LINES, 0, 2);
-		}
-		
-		GLuint m_shader;
-		dInt32 m_shadeColorLocation;
-		dInt32 m_projectionViewModelMatrixLocation;
-
-		ndMeshVector m_line[2];
-	};
-
-	ndJoindDebug debugJoint(scene);
-	ndWorld* const workd = scene->GetWorld();
-	const ndJointList& jointList = workd->GetJointList();
-	for (ndJointList::dListNode* jointNode = jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
-	{
-		ndJointBilateralConstraint* const joint = jointNode->GetInfo();
-		joint->DebugJoint(debugJoint);
-	}
+	dVector point(center.m_x + x, center.m_y + y, center.m_z, center.m_w);
+	point = matrix.TransformVector1x4(point.Scale(w));
+	return ndMeshVector(GLfloat(point.m_x), GLfloat(point.m_y), GLfloat(point.m_z));
 }
 
 static void DrawBox(const dVector& p0, const dVector& p1, ndMeshVector box[12][2])
@@ -425,18 +377,9 @@ void RenderBroadPhase(ndDemoEntityManager* const scene)
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-static ndMeshVector CalculatePoint(const dMatrix& matrix, const dVector& center, dFloat32 x, dFloat32 y, dFloat32 w)
-{
-	dVector point(center.m_x + x, center.m_y + y, center.m_z, center.m_w);
-	point = matrix.TransformVector1x4(point.Scale(w));
-	return ndMeshVector(GLfloat(point.m_x), GLfloat(point.m_y), GLfloat(point.m_z));
-}
-
 void RenderContactPoints(ndDemoEntityManager* const scene)
 {
 	ndWorld* const world = scene->GetWorld();
-	const ndBodyList& bodyList = world->GetBodyList();
-
 	GLuint shader = scene->GetShaderCache().m_wireFrame;
 
 	ndDemoCamera* const camera = scene->GetCamera();
@@ -465,7 +408,8 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 	ndMeshVector pointBuffer[4];
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof (ndMeshVector), pointBuffer);
-
+#if 0
+	const ndBodyList& bodyList = world->GetBodyList();
 	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
@@ -493,6 +437,87 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 			}
 		}
 	}
+#else
+	const ndContactList& contactList = world->GetContactList();
+	for (ndContactList::dListNode* contactNode = contactList.GetFirst(); contactNode; contactNode = contactNode->GetNext())
+	{
+		const ndContact* const contact = &contactNode->GetInfo();
+		if (contact->IsActive())
+		{
+			const ndContactPointList& contactPoints = contact->GetContactPoints();
+			for (ndContactPointList::dListNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
+			{
+				const ndContactPoint& contactPoint = contactPointsNode->GetInfo();
+				dVector point(viewProjectionMatrix.TransformVector1x4(contactPoint.m_point));
+				dFloat32 zDist = point.m_w;
+				point = point.Scale(1.0f / zDist);
+
+				pointBuffer[0] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, pizelSize, zDist);
+				pointBuffer[1] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, -pizelSize, zDist);
+				pointBuffer[2] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, pizelSize, zDist);
+				pointBuffer[3] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, -pizelSize, zDist);
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+			}
+		}
+	}
+#endif
+
 	glUseProgram(0);
 	glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
+{
+	class ndJoindDebug : public ndConstraintDebugCallback
+	{
+	public:
+		ndJoindDebug(ndDemoEntityManager* const scene)
+		{
+			ndDemoCamera* const camera = scene->GetCamera();
+			dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+			m_shader = scene->GetShaderCache().m_wireFrame;
+
+			glUseProgram(m_shader);
+
+			m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
+			m_projectionViewModelMatrixLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
+			glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), m_line);
+		}
+
+		~ndJoindDebug()
+		{
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glUseProgram(0);
+		}
+
+		void DrawLine(const dVector& p0, const dVector& p1, const dVector& color)
+		{
+			m_line[0].m_x = p0.m_x;
+			m_line[0].m_y = p0.m_y;
+			m_line[0].m_z = p0.m_z;
+			m_line[1].m_x = p1.m_x;
+			m_line[1].m_y = p1.m_y;
+			m_line[1].m_z = p1.m_z;
+			glUniform4fv(m_shadeColorLocation, 1, &color.m_x);
+			glDrawArrays(GL_LINES, 0, 2);
+		}
+
+		GLuint m_shader;
+		dInt32 m_shadeColorLocation;
+		dInt32 m_projectionViewModelMatrixLocation;
+
+		ndMeshVector m_line[2];
+	};
+
+	ndJoindDebug debugJoint(scene);
+	ndWorld* const workd = scene->GetWorld();
+	const ndJointList& jointList = workd->GetJointList();
+	for (ndJointList::dListNode* jointNode = jointList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+	{
+		ndJointBilateralConstraint* const joint = jointNode->GetInfo();
+		joint->DebugJoint(debugJoint);
+	}
 }
