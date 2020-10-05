@@ -19,8 +19,6 @@
 #define D_PROFILER_API __declspec(dllimport)
 #endif
 
-//#define D_PROFILER
-
 struct dProfilerSourceLocation
 {
 	const char* name;

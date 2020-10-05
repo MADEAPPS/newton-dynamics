@@ -1628,30 +1628,6 @@ void ndScene::BuildContactArray()
 	m_activeConstraintArray.SetCount(count);
 }
 
-void ndScene::CalculateContacts()
-{
-	D_TRACKTIME();
-	class ndCalculateContacts: public ndBaseJob
-	{
-		public:
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			const dInt32 threadIndex = GetThredID();
-			const dInt32 threadsCount = m_owner->GetThreadCount();
-
-			ndConstraintArray& activeContacts = m_owner->m_activeConstraintArray;
-			const dInt32 count = activeContacts.GetCount();
-			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
-			{
-				dAssert(activeContacts[i]->GetAsContact());
-				m_owner->CalculateContacts(threadIndex, activeContacts[i]->GetAsContact());
-			}
-		}
-	};
-	
-	SubmitJobs<ndCalculateContacts>();
-}
 
 void ndScene::DeleteDeadContact()
 {
@@ -1682,7 +1658,6 @@ void ndScene::DeleteDeadContact()
 	}
 	m_activeConstraintArray.SetCount(activeCount);
 }
-
 
 void ndScene::BuildBodyArray()
 {
@@ -1731,7 +1706,6 @@ void ndScene::BuildBodyArray()
 						}
 						if (inScene)
 						{
-							//body->PrepareStep(bodyCount);
 							m_buffer[bodyCount] = body;
 							bodyCount++;
 							if (bodyCount >= D_BASH_SIZE)
@@ -1773,4 +1747,45 @@ void ndScene::BuildBodyArray()
 	m_activeBodyArray.SetCount(m_bodyList.GetCount());
 	SubmitJobs<ndBuildBodyArray>();
 	m_activeBodyArray.SetCount(m_activeBodyCount.load());
+}
+
+void ndScene::CalculateContacts()
+{
+	D_TRACKTIME();
+	class ndCalculateContacts : public ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadsCount = m_owner->GetThreadCount();
+
+			ndConstraintArray& activeContacts = m_owner->m_activeConstraintArray;
+
+			const dInt32 stepSize = D_BASH_SIZE;
+			const dInt32 contactCount = activeContacts.GetCount();
+			const dInt32 contactCountBatches = contactCount & -stepSize;
+			dInt32 index = m_it->fetch_add(stepSize);
+			for (; index < contactCountBatches; index = m_it->fetch_add(stepSize))
+			{
+				for (dInt32 j = 0; j < D_BASH_SIZE; j++)
+				{
+					dAssert(activeContacts[index + j]->GetAsContact());
+					m_owner->CalculateContacts(threadIndex, activeContacts[index + j]->GetAsContact());
+				}
+			}
+			if (index < contactCount)
+			{
+				const dInt32 count = contactCount - index;
+				for (dInt32 j = 0; j < count; j++)
+				{
+					dAssert(activeContacts[index + j]->GetAsContact());
+					m_owner->CalculateContacts(threadIndex, activeContacts[index + j]->GetAsContact());
+				}
+			}
+		}
+	};
+
+	SubmitJobs<ndCalculateContacts>();
 }

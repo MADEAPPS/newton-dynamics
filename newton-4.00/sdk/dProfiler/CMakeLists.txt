@@ -17,6 +17,8 @@ message (${projectName})
 file(GLOB HEADERS *.h)
 file(GLOB CPP_SOURCE *.cpp *.h ../../thirdParty/tracy/TracyClient.cpp)
 
+#source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
+
 add_definitions(-DD_PROFILER_EXPORTS)
 
 if (NOT MSVC OR MSVC_VERSION VERSION_GREATER 1800)

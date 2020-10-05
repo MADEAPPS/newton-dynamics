@@ -30,7 +30,8 @@
 	
 	long long dProfilerStartTraceLow(const dProfilerSourceLocation* const srcloc)
 	{
-		if (profileOn) {
+		if (profileOn) 
+		{
 			const auto thread = GetThreadHandle();
 			Magic magic;
 			auto token = GetToken();
@@ -48,14 +49,17 @@
 			MemWrite(&item->zoneBegin.srcloc, (uint64_t)srcloc);
 			tail.store(magic + 1, std::memory_order_release);
 			return long long(thread);
-		} else {
+		} 
+		else 
+		{
 			return 0;
 		}
 	}
 
 	void dProfilerEndTraceLow(long long threadId)
 	{
-		if (profileOn) {
+		if (profileOn) 
+		{
 			Magic magic;
 			std::thread::native_handle_type thread = (std::thread::native_handle_type) threadId;
 			auto token = GetToken();
