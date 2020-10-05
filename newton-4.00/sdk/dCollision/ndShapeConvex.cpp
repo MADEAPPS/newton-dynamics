@@ -25,6 +25,7 @@
 #include "ndContact.h"
 #include "ndShapeNull.h"
 #include "ndContactSolver.h"
+#include "ndBodyKinematic.h"
 
 #define D_MAX_MIN_VOLUME				dFloat32 (1.0e-6f)
 #define D_MAX_VERTEX_CLIP_FACE			16
@@ -573,10 +574,11 @@ void ndShapeConvex::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) co
 
 dFloat32 ndShapeConvex::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {
-dAssert(0);
-return 0;
-	//dShapeInstance instance(*body->GetCollision(), this);
-	//dgContactSolver rayCaster(&instance);
+	dAssert(0);
+	return 0;
+	//ndBodyKinematic* const kinBody = ((ndBodyKinematic*)body)->GetAsBodyKinematic();
+	//ndShapeInstance instance(kinBody->GetCollisionShape());
+	//ndContactSolver rayCaster(&instance);
 	//instance.m_material.m_userData = nullptr;
 	//return rayCaster.RayCast(localP0, localP1, maxT, contactOut);
 }

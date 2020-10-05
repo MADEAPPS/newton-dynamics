@@ -577,12 +577,11 @@ dFloat32 ndShapeCapsule::RayCast(ndRayCastNotify& callback, const dVector& r0, c
 		}
 	}
 
-	dAssert(0);
-	return 0;
 	//dFloat32 ret = ndShapeConvex::RayCast(q0, q1, maxT, contactOut, body, NULL, NULL);
-	//if (ret <= dFloat32(1.0f)) 
-	//{
-	//	contactOut.m_normal = m_transform * contactOut.m_normal;
-	//}
-	//return ret;
+	dFloat32 ret = ndShapeConvex::RayCast(callback, q0, q1, maxT, body, contactOut);
+	if (ret <= dFloat32(1.0f)) 
+	{
+		contactOut.m_normal = m_transform * contactOut.m_normal;
+	}
+	return ret;
 }
