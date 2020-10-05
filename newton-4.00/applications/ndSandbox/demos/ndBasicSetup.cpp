@@ -97,7 +97,7 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 	BuildFloor(scene);
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	const int n = 1;
+	const int n = 10;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)
@@ -109,7 +109,7 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 	}
 
 	dQuaternion rot;
-	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
-	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
+	//dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
