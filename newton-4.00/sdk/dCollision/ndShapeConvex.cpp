@@ -171,16 +171,6 @@ dFloat32 ndShapeConvex::GetVolume () const
 	return m_centerOfMass.m_w;
 }
 
-dFloat32 ndShapeConvex::GetBoxMinRadius () const 
-{
-	return m_boxMinRadius;
-} 
-
-dFloat32 ndShapeConvex::GetBoxMaxRadius () const 
-{
-	return m_boxMaxRadius;
-} 
-
 dVector ndShapeConvex::CalculateVolumeIntegral (const dMatrix& globalMatrix, const dVector& globalPlane, const dShapeInstance& parentScale) const
 {
 	dPlane localPlane (globalMatrix.UntransformPlane (globalPlane));
@@ -1100,4 +1090,14 @@ ndShapeInfo ndShapeConvex::GetShapeInfo() const
 {
 	ndShapeInfo info(ndShape::GetShapeInfo());
 	return info;
+}
+
+dFloat32 ndShapeConvex::GetBoxMinRadius() const
+{
+	return m_boxMinRadius;
+}
+
+dFloat32 ndShapeConvex::GetBoxMaxRadius() const
+{
+	return m_boxMaxRadius;
 }

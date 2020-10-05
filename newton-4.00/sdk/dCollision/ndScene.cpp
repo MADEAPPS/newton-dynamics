@@ -1195,94 +1195,6 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 	m_contactNotifyCallback->OnContactCallback(threadIndex, contact, m_timestep);
 }
 
-void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
-{
-	const dUnsigned32 lru = m_lru - D_CONTACT_DELAY_FRAMES;
-
-	dVector deltaTime(m_timestep);
-	ndBodyKinematic* const body0 = contact->GetBody0();
-	ndBodyKinematic* const body1 = contact->GetBody1();
-	
-	if (!(contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium))) 
-	{
-		dAssert(!contact->m_killContact);
-		bool active = contact->m_active;
-		if (ValidateContactCache(contact, deltaTime)) 
-		{
-			contact->m_sceneLru = m_lru;
-			contact->m_timeOfImpact = dFloat32(1.0e10f);
-			//contact->m_timeOfImpact = dFloat32(0.0f);
-		}
-		else 
-		{
-			contact->m_active = false;
-			contact->m_positAcc = dVector::m_zero;
-			contact->m_rotationAcc = dQuaternion();
-	
-			dFloat32 distance = contact->m_separationDistance;
-			if (distance >= D_NARROW_PHASE_DIST) 
-			{
-				dAssert(0);
-	//			const dVector veloc0(body0->GetVelocity());
-	//			const dVector veloc1(body1->GetVelocity());
-	//
-	//			const dVector veloc(veloc1 - veloc0);
-	//			const dVector omega0(body0->GetOmega());
-	//			const dVector omega1(body1->GetOmega());
-	//			const dgCollisionInstance* const collision0 = body0->GetCollision();
-	//			const dgCollisionInstance* const collision1 = body1->GetCollision();
-	//			const dVector scale(dFloat32(1.0f), dFloat32(3.5f) * collision0->GetBoxMaxRadius(), dFloat32(3.5f) * collision1->GetBoxMaxRadius(), dFloat32(0.0f));
-	//			const dVector velocMag2(veloc.DotProduct(veloc).GetScalar(), omega0.DotProduct(omega0).GetScalar(), omega1.DotProduct(omega1).GetScalar(), dFloat32(0.0f));
-	//			const dVector velocMag(velocMag2.GetMax(dVector::m_epsilon).InvSqrt() * velocMag2 * scale);
-	//			const dFloat32 speed = velocMag.AddHorizontal().GetScalar() + dFloat32(0.5f);
-	//
-	//			distance -= speed * timestep;
-	//			contact->m_separationDistance = distance;
-			}
-			if (distance < D_NARROW_PHASE_DIST) 
-			{
-				CalculateJointContacts(threadIndex, contact);
-				if (contact->m_maxDOF) 
-				{
-					contact->m_active = true;
-					contact->m_timeOfImpact = dFloat32(1.0e10f);
-					//contact->m_timeOfImpact = dFloat32(0.0f);
-				}
-				contact->m_sceneLru = m_lru;
-			}
-			else 
-			{
-				dAssert(0);
-	//			dAssert(contact->m_maxDOF == 0);
-	//			const dgBroadPhaseNode* const bodyNode0 = contact->GetBody0()->m_sceneNode;
-	//			const dgBroadPhaseNode* const bodyNode1 = contact->GetBody1()->m_sceneNode;
-	//			if (dgOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox)) {
-	//				contact->m_sceneLru = m_lru;
-	//			}
-	//			else if (contact->m_sceneLru < lru) {
-	//				contact->m_killContact = 1;
-	//			}
-			}
-		}
-	
-		if (active ^ contact->m_active)
-		{
-			dAssert(body0->GetInvMass() > dFloat32(0.0f));
-			body0->m_equilibrium = false;
-			if (body1->GetInvMass() > dFloat32(0.0f))
-			{
-				body1->m_equilibrium = false;
-			}
-		}
-	}
-	else 
-	{
-		contact->m_sceneLru = m_lru;
-	}
-
-	contact->m_killContact = contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
-}
-
 void ndScene::SubmitPairs(ndSceneNode* const leafNode, ndSceneNode* const node)
 {
 	ndSceneNode* pool[D_BROADPHASE_MAX_STACK_DEPTH];
@@ -1512,37 +1424,6 @@ void ndScene::BuildContactArray()
 		count++;
 	}
 	m_activeConstraintArray.SetCount(count);
-}
-
-
-void ndScene::DeleteDeadContact()
-{
-	D_TRACKTIME();
-	dInt32 activeCount = m_activeConstraintArray.GetCount();
-	for (dInt32 i = activeCount - 1; i >= 0; i --)
-	{ 
-		ndContact* const contact = m_activeConstraintArray[i]->GetAsContact();
-		dAssert(contact);
-		if (contact->m_killContact) 
-		{
-			activeCount--;
-			m_contactList.DeleteContact(contact);
-			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
-		}
-		else if (!contact->m_active || !contact->m_maxDOF)
-		{
-			activeCount--;
-			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
-		}
-		//else if (contact->m_body0->m_continueCollisionMode | contact->m_body1->m_continueCollisionMode) 
-		//{
-		//	if (contact->EstimateCCD(timestep)) {
-		//		constraintArray[activeCount].m_joint = contact;
-		//		activeCount++;
-		//	}
-		//}
-	}
-	m_activeConstraintArray.SetCount(activeCount);
 }
 
 void ndScene::BuildBodyArray()
@@ -1869,4 +1750,122 @@ void ndScene::TransformUpdate()
 		}
 	};
 	SubmitJobs<ndTransformUpdate>();
+}
+
+void ndScene::DeleteDeadContact()
+{
+	D_TRACKTIME();
+	dInt32 activeCount = m_activeConstraintArray.GetCount();
+	for (dInt32 i = activeCount - 1; i >= 0; i--)
+	{
+		ndContact* const contact = m_activeConstraintArray[i]->GetAsContact();
+		dAssert(contact);
+		if (contact->m_killContact)
+		{
+			activeCount--;
+			m_contactList.DeleteContact(contact);
+			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
+		}
+		else if (!contact->m_active || !contact->m_maxDOF)
+		{
+			activeCount--;
+			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
+		}
+		//else if (contact->m_body0->m_continueCollisionMode | contact->m_body1->m_continueCollisionMode) 
+		//{
+		//	if (contact->EstimateCCD(timestep)) {
+		//		constraintArray[activeCount].m_joint = contact;
+		//		activeCount++;
+		//	}
+		//}
+	}
+	m_activeConstraintArray.SetCount(activeCount);
+}
+
+void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
+{
+	const dUnsigned32 lru = m_lru - D_CONTACT_DELAY_FRAMES;
+
+	dVector deltaTime(m_timestep);
+	ndBodyKinematic* const body0 = contact->GetBody0();
+	ndBodyKinematic* const body1 = contact->GetBody1();
+
+	if (!(contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium)))
+	{
+		dAssert(!contact->m_killContact);
+		bool active = contact->m_active;
+		if (ValidateContactCache(contact, deltaTime))
+		{
+			contact->m_sceneLru = m_lru;
+			contact->m_timeOfImpact = dFloat32(1.0e10f);
+			//contact->m_timeOfImpact = dFloat32(0.0f);
+		}
+		else
+		{
+			contact->m_active = false;
+			contact->m_positAcc = dVector::m_zero;
+			contact->m_rotationAcc = dQuaternion();
+
+			dFloat32 distance = contact->m_separationDistance;
+			if (distance >= D_NARROW_PHASE_DIST)
+			{
+				const dVector veloc0(body0->GetVelocity());
+				const dVector veloc1(body1->GetVelocity());
+				
+				const dVector veloc(veloc1 - veloc0);
+				const dVector omega0(body0->GetOmega());
+				const dVector omega1(body1->GetOmega());
+				const ndShapeInstance* const collision0 = &body0->GetCollisionShape();
+				const ndShapeInstance* const collision1 = &body1->GetCollisionShape();
+				const dVector scale(dFloat32(1.0f), dFloat32(3.5f) * collision0->GetBoxMaxRadius(), dFloat32(3.5f) * collision1->GetBoxMaxRadius(), dFloat32(0.0f));
+				const dVector velocMag2(veloc.DotProduct(veloc).GetScalar(), omega0.DotProduct(omega0).GetScalar(), omega1.DotProduct(omega1).GetScalar(), dFloat32(0.0f));
+				const dVector velocMag(velocMag2.GetMax(dVector::m_epsilon).InvSqrt() * velocMag2 * scale);
+				const dFloat32 speed = velocMag.AddHorizontal().GetScalar() + dFloat32(0.5f);
+				
+				distance -= speed * m_timestep;
+				contact->m_separationDistance = distance;
+			}
+			if (distance < D_NARROW_PHASE_DIST)
+			{
+				CalculateJointContacts(threadIndex, contact);
+				if (contact->m_maxDOF)
+				{
+					contact->m_active = true;
+					contact->m_timeOfImpact = dFloat32(1.0e10f);
+					//contact->m_timeOfImpact = dFloat32(0.0f);
+				}
+				contact->m_sceneLru = m_lru;
+			}
+			else
+			{
+				dAssert(contact->m_maxDOF == 0);
+				const ndSceneBodyNode* const bodyNode0 = contact->GetBody0()->m_sceneBodyBodyNode;
+				const ndSceneBodyNode* const bodyNode1 = contact->GetBody1()->m_sceneBodyBodyNode;
+				if (dOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox)) 
+				{
+					contact->m_sceneLru = m_lru;
+				}
+				else if (contact->m_sceneLru < lru) 
+				{
+					contact->m_killContact = 1;
+				}
+			}
+		}
+
+		if (active ^ contact->m_active)
+		{
+			dAssert(body0->GetInvMass() > dFloat32(0.0f));
+			body0->m_equilibrium = false;
+			if (body1->GetInvMass() > dFloat32(0.0f))
+			{
+				body1->m_equilibrium = false;
+			}
+		}
+	}
+	else
+	{
+		contact->m_sceneLru = m_lru;
+	}
+
+	contact->m_killContact = contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
 }

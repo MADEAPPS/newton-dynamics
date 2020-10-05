@@ -227,6 +227,9 @@ class ndShape: public dClassAlloc
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const = 0;
 
 	virtual ndShapeInfo GetShapeInfo() const;
+	virtual dFloat32 GetBoxMinRadius() const = 0;
+	virtual dFloat32 GetBoxMaxRadius() const = 0;
+
 	virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const = 0;
 	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const = 0;
 	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const = 0;

@@ -83,14 +83,15 @@ class ndShapeConvex: public ndShape
 		return nullptr; 
 	}
 
+	virtual dFloat32 GetBoxMinRadius() const;
+	virtual dFloat32 GetBoxMaxRadius() const;
+
+
 /*
 	virtual void SerializeLow(dgSerialize callback, void* const userData) const;
 
 	virtual dVector CalculateVolumeIntegral (const dMatrix& globalMatrix, const dVector& plane, const dShapeInstance& parentScale) const;
 	virtual dFloat32 GetVolume () const;
-
-	virtual dFloat32 GetBoxMinRadius () const; 
-	virtual dFloat32 GetBoxMaxRadius () const;
 
 	dInt32 RayCastClosestFace (dVector* tetrahedrum, const dVector& origin, dFloat32& pointDist) const;
 	dVector CalculateVolumeIntegral (const dgPlane& plane) const; 

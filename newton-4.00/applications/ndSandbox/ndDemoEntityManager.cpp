@@ -201,7 +201,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 //	m_autoSleepMode = false;
 //	m_broadPhaseType = 1;
 //	m_solverPasses = 4;
-	m_workerThreads = 4;
+//	m_workerThreads = 4;
 //	m_solverSubSteps = 2;
 //	m_showRaycastHit = true;
 //	m_showCenterOfMass = false;
@@ -898,9 +898,6 @@ void ndDemoEntityManager::RenderStats()
 			sprintf (text, "physics time:   %6.3f ms", m_world->GetUpdateTime() * 1.0e3f);
 			ImGui::Text(text, "");
 
-			sprintf (text, "memory used:    %6.3f mbytes", dFloat32(dFloat64(dMemory::GetMemoryUsed()) / (1024 * 1024)));
-			ImGui::Text(text, "");
-
 			if (m_currentPlugin) 
 			{
 				dAssert(0);
@@ -921,6 +918,9 @@ void ndDemoEntityManager::RenderStats()
 			ImGui::Text(text, "");
 
 			sprintf(text, "contact joints: %d", m_world->GetContactList().GetCount());
+			ImGui::Text(text, "");
+
+			sprintf(text, "memory used:   %6.3f mbytes", dFloat32(dFloat64(dMemory::GetMemoryUsed()) / (1024 * 1024)));
 			ImGui::Text(text, "");
 
 

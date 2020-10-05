@@ -90,7 +90,7 @@ static void BuildSphereStacks(ndDemoEntityManager* const scene, const dVector& o
 	//dVector maxP(0.0f);
 	//sphere.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
 
-	const int n = 1;
+	const int n = 10;
 	const int stackHigh = 10;
 	for (dInt32 i = 0; i < n; i++)
 	{
@@ -119,7 +119,7 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 	BuildSphereStacks(scene, origin1);
 
 	dQuaternion rot;
-	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
-	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
+	//dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

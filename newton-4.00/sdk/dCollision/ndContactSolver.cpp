@@ -77,7 +77,6 @@ ndContactSolver::ndContactSolver(ndContact* const contact)
 	,m_vertexIndex(0)
 	,m_ccdMode(false)
 	,m_intersectionTestOnly(false)
-	//,m_normal (proxy->m_contactJoint->m_separtingVector)
 {
 }
 
@@ -894,8 +893,10 @@ dInt32 ndContactSolver::CalculatePairContacts(dInt32 threadIndex)
 	{
 		count = PruneContacts(count, 16);
 	}
-	//pair->m_timestep = proxy.m_timestep;
+
 	m_contact->m_timeOfImpact = m_timestep;
+	m_contact->m_separationDistance = m_separationDistance;
+	m_contact->m_separatingVector = m_separatingVector;
 
 	return count;
 }

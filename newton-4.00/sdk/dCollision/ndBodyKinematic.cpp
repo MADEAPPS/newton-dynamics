@@ -146,16 +146,6 @@ void ndBodyKinematic::SetAutoSleep(bool state)
 	SetSleepState(false);
 }
 
-ndShapeInstance& ndBodyKinematic::GetCollisionShape()
-{
-	return (ndShapeInstance&)m_shapeInstance;
-}
-
-const ndShapeInstance& ndBodyKinematic::GetCollisionShape() const
-{
-	return m_shapeInstance;
-}
-
 void ndBodyKinematic::SetCollisionShape(const ndShapeInstance& shapeInstance)
 {
 	m_shapeInstance = shapeInstance;

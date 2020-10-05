@@ -98,6 +98,9 @@ class ndShapeInstance: public dClassAlloc
 	const dVector& GetScale() const;
 	const dVector& GetInvScale() const;
 
+	dFloat32 GetBoxMinRadius() const;
+	dFloat32 GetBoxMaxRadius() const;
+
 #if 0
 	ndShapeInstance* AddRef ();
 	dInt32 Release ();
@@ -145,9 +148,6 @@ class ndShapeInstance: public dClassAlloc
 	ndShapeID GetCollisionPrimityType () const;
 
 	void CalcObb (dVector& origin, dVector& size) const;
-
-	dFloat32 GetBoxMinRadius () const; 
-	dFloat32 GetBoxMaxRadius () const; 
 
 	dInt32 CalculateSignature () const;
 	void SetCollisionBBox (const dVector& p0, const dVector& p1);
@@ -342,16 +342,6 @@ D_INLINE ndShapeID ndShapeInstance::GetCollisionPrimityType () const
 {
 	return m_shape->GetCollisionPrimityType();
 }
-
-D_INLINE dFloat32 ndShapeInstance::GetBoxMinRadius () const
-{
-	return m_shape->GetBoxMinRadius() * m_maxScale.m_x;
-} 
-
-D_INLINE dFloat32 ndShapeInstance::GetBoxMaxRadius () const
-{
-	return m_shape->GetBoxMaxRadius() * m_maxScale.m_x;
-} 
 
 D_INLINE void ndShapeInstance::SetCollisionBBox (const dVector& p0, const dVector& p1)
 {
@@ -659,6 +649,16 @@ D_INLINE const dVector& ndShapeInstance::GetScale() const
 D_INLINE const dVector& ndShapeInstance::GetInvScale() const
 {
 	return m_invScale;
+}
+
+D_INLINE dFloat32 ndShapeInstance::GetBoxMinRadius() const
+{
+	return m_shape->GetBoxMinRadius() * m_maxScale.m_x;
+}
+
+D_INLINE dFloat32 ndShapeInstance::GetBoxMaxRadius() const
+{
+	return m_shape->GetBoxMaxRadius() * m_maxScale.m_x;
 }
 
 

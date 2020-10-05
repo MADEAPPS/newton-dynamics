@@ -304,5 +304,16 @@ inline const ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap() con
 	return m_contactList;
 }
 
+inline ndShapeInstance& ndBodyKinematic::GetCollisionShape()
+{
+	return (ndShapeInstance&)m_shapeInstance;
+}
+
+inline const ndShapeInstance& ndBodyKinematic::GetCollisionShape() const
+{
+	return m_shapeInstance;
+}
+
+
 #endif 
 
