@@ -174,8 +174,10 @@ class ndScene
 	ndSceneNode* m_rootNode;
 	ndContactNotify* m_contactNotifyCallback;
 	dFloat32 m_timestep;
-	dAtomic<dUnsigned32> m_sleepBodies;
+	//dAtomic<dUnsigned32> m_sleepBodies;
+	dUnsigned32 m_sleepBodies;
 	dAtomic<dUnsigned32> m_activeBodyCount;
+	dUnsigned32 m_sleepBodiesLane[D_MAX_THREADS_COUNT];
 	dUnsigned32 m_lru;
 	bool m_fullScan;
 

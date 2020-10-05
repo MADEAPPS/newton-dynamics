@@ -130,17 +130,34 @@ void ndWorld::ApplyExternalForces()
 		{
 			D_TRACKTIME();
 
-			//ndWorld* const world = m_owner->GetWorld();
 			const dInt32 threadIndex = GetThredID();
-			
 			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-			const dInt32 count = bodyArray.GetCount() - 1;
-			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
+
+			const dInt32 stepSize = 64;
+			const dInt32 bodyCount = bodyArray.GetCount() - 1;
+			const dInt32 contactCountBatches = bodyCount & -stepSize;
+			dInt32 index = m_it->fetch_add(stepSize);
+			for (; index < contactCountBatches; index = m_it->fetch_add(stepSize))
 			{
-				ndBodyDynamic* const body = bodyArray[i]->GetAsBodyDynamic();
-				if (body)
+				for (dInt32 j = 0; j < stepSize; j++)
 				{
-					body->ApplyExternalForces(threadIndex, m_timestep);
+					ndBodyDynamic* const body = bodyArray[index + j]->GetAsBodyDynamic();
+					if (body)
+					{
+						body->ApplyExternalForces(threadIndex, m_timestep);
+					}
+				}
+			}
+			if (index < bodyCount)
+			{
+				const dInt32 count = bodyCount - index;
+				for (dInt32 j = 0; j < count; j++)
+				{
+					ndBodyDynamic* const body = bodyArray[index + j]->GetAsBodyDynamic();
+					if (body)
+					{
+						body->ApplyExternalForces(threadIndex, m_timestep);
+					}
 				}
 			}
 		}
@@ -174,6 +191,7 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	// update the collision system
 	m_scene->UpdateAabb();
 	m_scene->FindCollidingPairs();
+	m_scene->BuildContactArray();
 	m_scene->CalculateContacts();
 	m_scene->DeleteDeadContact();
 

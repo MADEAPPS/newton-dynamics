@@ -222,6 +222,7 @@ void ndScene::CollisionOnlyUpdate()
 	UpdateAabb();
 	BalanceBroadPhase();
 	FindCollidingPairs();
+	BuildContactArray();
 	CalculateContacts();
 	DeleteDeadContact();
 	End();
@@ -1498,121 +1499,6 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 	}
 }
 
-void ndScene::TransformUpdate()
-{
-	D_TRACKTIME();
-	class ndTransformUpdate : public ndBaseJob
-	{
-		public:
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			const dInt32 threadIndex = GetThredID();
-			const dInt32 threadsCount = m_owner->GetThreadCount();
-
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-			const dInt32 count = bodyArray.GetCount() - 1;
-
-			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
-			{
-				m_owner->UpdateTransformNotify(threadIndex, bodyArray[i]);
-			}
-		}
-	};
-	SubmitJobs<ndTransformUpdate>();
-}
-
-void ndScene::UpdateAabb()
-{
-	D_TRACKTIME();
-	class ndUpdateAabbJob: public ndBaseJob
-	{
-		public:
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			const dInt32 threadIndex = GetThredID();
-			const dInt32 threadsCount = m_owner->GetThreadCount();
-	
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-			const dInt32 count = bodyArray.GetCount() - 1;
-	
-			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
-			{
-				ndBodyKinematic* const body = bodyArray[i];
-				if (!body->m_equilibrium) 
-				{
-					m_owner->UpdateAabb(threadIndex, body);
-				}
-				else
-				{
-					m_owner->m_sleepBodies.fetch_add(1);
-				}
-			}
-		}
-	};
-	m_sleepBodies.store(0);
-	SubmitJobs<ndUpdateAabbJob>();
-}
-
-void ndScene::FindCollidingPairs()
-{
-	D_TRACKTIME();
-	class ndFindCollidindPairsFullScan: public ndBaseJob
-	{
-		public:
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			const dInt32 threadIndex = GetThredID();
-			const dInt32 threadsCount = m_owner->GetThreadCount();
-	
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-			const dInt32 count = bodyArray.GetCount() - 1;
-
-			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
-			{
-				m_owner->FindCollidinPairs(threadIndex, bodyArray[i], true);
-			}
-		}
-	};
-
-	class ndFindCollidindPairsTwoWays: public ndBaseJob
-	{
-		public:
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			const dInt32 threadIndex = GetThredID();
-			const dInt32 threadsCount = m_owner->GetThreadCount();
-
-			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-			const dInt32 count = bodyArray.GetCount() - 1;
-
-			for (dInt32 i = m_it->fetch_add(1); i < count; i = m_it->fetch_add(1))
-			{
-				ndBodyKinematic* const body = bodyArray[i];
-				if (!body->m_equilibrium)
-				{
-					m_owner->FindCollidinPairs(threadIndex, body, false);
-				}
-			}
-		}
-	};
-	
-	m_fullScan = (3 * m_sleepBodies.load()) < (2 * dUnsigned32(m_activeBodyArray.GetCount()));
-	if (m_fullScan)
-	{
-		SubmitJobs<ndFindCollidindPairsFullScan>();
-	}
-	else
-	{
-		SubmitJobs<ndFindCollidindPairsTwoWays>();
-	}
-
-	BuildContactArray();
-}
-
 void ndScene::BuildContactArray()
 {
 	D_TRACKTIME();
@@ -1788,4 +1674,194 @@ void ndScene::CalculateContacts()
 	};
 
 	SubmitJobs<ndCalculateContacts>();
+}
+
+void ndScene::UpdateAabb()
+{
+	D_TRACKTIME();
+	class ndUpdateAabbJob : public ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadsCount = m_owner->GetThreadCount();
+
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+	
+			const dInt32 stepSize = D_BASH_SIZE;
+			const dInt32 bodyCount = bodyArray.GetCount() - 1;
+			const dInt32 contactCountBatches = bodyCount & -stepSize;
+			dInt32 index = m_it->fetch_add(stepSize);
+			for (; index < contactCountBatches; index = m_it->fetch_add(stepSize))
+			{
+				for (dInt32 j = 0; j < stepSize; j++)
+				{
+					ndBodyKinematic* const body = bodyArray[index + j];
+					if (!body->m_equilibrium)
+					{
+						m_owner->UpdateAabb(threadIndex, body);
+					}
+					else
+					{
+						m_owner->m_sleepBodiesLane[threadIndex] += 1;
+					}
+				}
+			}
+			if (index < bodyCount)
+			{
+				const dInt32 count = bodyCount - index;
+				for (dInt32 j = 0; j < count; j++)
+				{
+					ndBodyKinematic* const body = bodyArray[index + j];
+					if (!body->m_equilibrium)
+					{
+						m_owner->UpdateAabb(threadIndex, body);
+					}
+					else
+					{
+						m_owner->m_sleepBodiesLane[threadIndex] += 1;
+					}
+				}
+			}
+		}
+	};
+
+	//m_sleepBodies.store(0);
+	memset(m_sleepBodiesLane, 0, sizeof(m_sleepBodiesLane));
+
+	SubmitJobs<ndUpdateAabbJob>();
+
+	m_sleepBodies = 0;
+	for (dInt32 i = 0; i < GetThreadCount(); i++)
+	{
+		m_sleepBodies += m_sleepBodiesLane[i];
+	}
+}
+
+void ndScene::FindCollidingPairs()
+{
+	D_TRACKTIME();
+	class ndFindCollidindPairsFullScan : public ndBaseJob
+	{
+	public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadsCount = m_owner->GetThreadCount();
+
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+
+			const dInt32 stepSize = D_BASH_SIZE;
+			const dInt32 bodyCount = bodyArray.GetCount() - 1;
+			const dInt32 contactCountBatches = bodyCount & -stepSize;
+			dInt32 index = m_it->fetch_add(stepSize);
+			for (; index < contactCountBatches; index = m_it->fetch_add(stepSize))
+			{
+				for (dInt32 j = 0; j < stepSize; j++)
+				{
+					ndBodyKinematic* const body = bodyArray[index + j];
+					m_owner->FindCollidinPairs(threadIndex, body, true);
+				}
+			}
+			if (index < bodyCount)
+			{
+				const dInt32 count = bodyCount - index;
+				for (dInt32 j = 0; j < count; j++)
+				{
+					ndBodyKinematic* const body = bodyArray[index + j];
+					m_owner->FindCollidinPairs(threadIndex, body, true);
+				}
+			}
+		}
+	};
+
+	class ndFindCollidindPairsTwoWays : public ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadsCount = m_owner->GetThreadCount();
+
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+
+			const dInt32 stepSize = D_BASH_SIZE;
+			const dInt32 bodyCount = bodyArray.GetCount() - 1;
+			const dInt32 contactCountBatches = bodyCount & -stepSize;
+			dInt32 index = m_it->fetch_add(stepSize);
+			for (; index < contactCountBatches; index = m_it->fetch_add(stepSize))
+			{
+				for (dInt32 j = 0; j < stepSize; j++)
+				{
+					ndBodyKinematic* const body = bodyArray[index + j];
+					m_owner->FindCollidinPairs(threadIndex, body, false);
+				}
+			}
+			if (index < bodyCount)
+			{
+				const dInt32 count = bodyCount - index;
+				for (dInt32 j = 0; j < count; j++)
+				{
+					ndBodyKinematic* const body = bodyArray[index + j];
+					m_owner->FindCollidinPairs(threadIndex, body, false);
+				}
+			}
+
+		}
+	};
+
+	m_fullScan = (3 * m_sleepBodies) < (2 * dUnsigned32(m_activeBodyArray.GetCount()));
+	if (m_fullScan)
+	{
+		SubmitJobs<ndFindCollidindPairsFullScan>();
+	}
+	else
+	{
+		SubmitJobs<ndFindCollidindPairsTwoWays>();
+	}
+}
+
+void ndScene::TransformUpdate()
+{
+	D_TRACKTIME();
+	class ndTransformUpdate : public ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadsCount = m_owner->GetThreadCount();
+
+			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
+
+			const dInt32 stepSize = D_BASH_SIZE;
+			const dInt32 bodyCount = bodyArray.GetCount() - 1;
+			const dInt32 contactCountBatches = bodyCount & -stepSize;
+			dInt32 index = m_it->fetch_add(stepSize);
+			for (; index < contactCountBatches; index = m_it->fetch_add(stepSize))
+			{
+				for (dInt32 j = 0; j < stepSize; j++)
+				{
+					ndBodyKinematic* const body = bodyArray[index + j];
+					m_owner->UpdateTransformNotify(threadIndex, body);
+				}
+			}
+			if (index < bodyCount)
+			{
+				const dInt32 count = bodyCount - index;
+				for (dInt32 j = 0; j < count; j++)
+				{
+					ndBodyKinematic* const body = bodyArray[index + j];
+					m_owner->UpdateTransformNotify(threadIndex, body);
+				}
+			}
+
+		}
+	};
+	SubmitJobs<ndTransformUpdate>();
 }

@@ -97,13 +97,13 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 	BuildFloor(scene);
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	const int n = 10;
+	const int n = 20;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)
 		{
-			dVector location((j - n/2) * 8.0f, 0.0f, (i - n/2) * 8.0f, 0.0f);
-			BuildSphere(scene, 10.0f, location + origin1, 1.0f, 10, 2.0f);
+			dVector location((j - n/2) * 4.0f, 0.0f, (i - n/2) * 4.0f, 0.0f);
+			BuildSphere(scene, 10.0f, location + origin1, 1.0f, 30, 2.0f);
 			//BuildSphere(scene, 10.0f, location + origin1, 1.0f, 1, 2.0f);
 		}
 	}
