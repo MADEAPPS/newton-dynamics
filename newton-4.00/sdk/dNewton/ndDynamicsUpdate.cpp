@@ -1360,6 +1360,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 			maxSpeed = dMax(maxSpeed, speed2);
 			maxOmega = dMax(maxOmega, omega2);
 			dUnsigned32 equilibriumTest = (accel2 < accelFreeze) && (alpha2 < accelFreeze) && (speed2 < speedFreeze) && (omega2 < speedFreeze);
+
 			if (equilibriumTest)
 			{
 				const dVector veloc(body->m_veloc * velocDragVect);

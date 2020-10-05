@@ -156,6 +156,8 @@ class ndBodyKinematic: public ndBody
 	ndShapeInstance m_shapeInstance;
 	dVector m_mass;
 	dVector m_invMass;
+	dVector m_residualVeloc;
+	dVector m_residualOmega;
 	dVector m_gyroAlpha;
 	dVector m_gyroTorque;
 	dQuaternion m_gyroRotation;

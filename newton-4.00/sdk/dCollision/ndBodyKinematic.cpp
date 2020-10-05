@@ -87,6 +87,8 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_shapeInstance(ndDummyCollision::GetNullShape())
 	,m_mass(dVector::m_zero)
 	,m_invMass(dVector::m_zero)
+	,m_residualVeloc(dVector::m_zero)
+	,m_residualOmega(dVector::m_zero)
 	,m_gyroAlpha(dVector::m_zero)
 	,m_gyroTorque(dVector::m_zero)
 	,m_gyroRotation()
@@ -427,6 +429,9 @@ void ndBodyKinematic::IntegrateVelocity(dFloat32 timestep)
 
 	m_matrix.m_posit = m_globalCentreOfMass - m_matrix.RotateVector(m_localCentreOfMass);
 	dAssert(m_matrix.TestOrthogonal());
+
+	m_residualVeloc = m_veloc;
+	m_residualOmega = m_omega;
 }
 
 void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)

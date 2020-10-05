@@ -891,23 +891,23 @@ bool ndScene::ValidateContactCache(ndContact* const contact, const dVector& time
 	//if (!contact->m_material->m_contactGeneration) 
 	if (1)
 	{
-		dVector positStep(timestep * (body0->m_veloc - body1->m_veloc));
+		//dVector positStep(timestep * (body0->m_veloc - body1->m_veloc));
+		dVector positStep(timestep * (body0->m_residualVeloc - body1->m_residualVeloc));
 		positStep = ((positStep.DotProduct(positStep)) > m_velocTol) & positStep;
 		contact->m_positAcc += positStep;
 	
 		dVector positError2(contact->m_positAcc.DotProduct(contact->m_positAcc));
 		dVector positSign(dVector::m_negOne & (positError2 < m_linearContactError2));
-		//if ((positError2 < m_linearContactError2).GetSignMask()) 
 		if (positSign.GetSignMask())
 		{
-			dVector rotationStep(timestep * (body0->m_omega - body1->m_omega));
+			//dVector rotationStep(timestep * (body0->m_omega - body1->m_omega));
+			dVector rotationStep(timestep * (body0->m_residualOmega - body1->m_residualOmega));
 			rotationStep = ((rotationStep.DotProduct(rotationStep)) > m_velocTol) & rotationStep;
 			contact->m_rotationAcc = contact->m_rotationAcc * dQuaternion(dFloat32(1.0f), rotationStep.m_x, rotationStep.m_y, rotationStep.m_z);
 	
 			dVector angle(contact->m_rotationAcc.m_x, contact->m_rotationAcc.m_y, contact->m_rotationAcc.m_z, dFloat32(0.0f));
 			dVector rotatError2(angle.DotProduct(angle));
 			dVector rotationSign(dVector::m_negOne & (rotatError2 < m_linearContactError2));
-			//if ((rotatError2 < m_angularContactError2).GetSignMask()) 
 			if (rotationSign.GetSignMask())
 			{
 				return true;
