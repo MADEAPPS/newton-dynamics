@@ -119,7 +119,7 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 	BuildSphereStacks(scene, origin1);
 
 	dQuaternion rot;
-	dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
-	//dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-50.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
