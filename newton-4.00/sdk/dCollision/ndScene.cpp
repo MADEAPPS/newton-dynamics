@@ -1180,7 +1180,6 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 	
 	if (count) 
 	{
-		dAssert(0);
 		dScopeSpinLock lock(m_contactLock);
 		for (dInt32 i = 0; i < count; i++) 
 		{

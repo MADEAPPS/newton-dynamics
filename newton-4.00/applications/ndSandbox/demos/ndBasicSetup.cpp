@@ -82,7 +82,8 @@ static void BuildSphere(ndDemoEntityManager* const scene,
 static void BuildSphereStacks(ndDemoEntityManager* const scene, const dVector& origin)
 {
 	dFloat32 diameter = 1.0f;
-	ndShapeInstance sphere(new ndShapeSphere(diameter * 0.5f));
+	//ndShapeInstance sphere(new ndShapeSphere(diameter * 0.5f));
+	ndShapeInstance sphere(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 	ndDemoMesh* const mesh = new ndDemoMesh("sphere", scene->GetShaderCache(), &sphere, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 
 	// get the dimension from shape itself
@@ -90,8 +91,8 @@ static void BuildSphereStacks(ndDemoEntityManager* const scene, const dVector& o
 	//dVector maxP(0.0f);
 	//sphere.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
 
-	const int n = 10;
-	const int stackHigh = 10;
+	const int n = 1;
+	const int stackHigh = 1;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)

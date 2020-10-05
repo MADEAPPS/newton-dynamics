@@ -1235,40 +1235,41 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	ndShapeInfo info(collision->GetShapeInfo());
 	switch (info.m_collisionType)
 	{
-	case ndShapeID::m_sphereCollision:
-	{
-		mesh.SphericalMapping(LoadTexture(texture0), &aligmentUV[0][0]);
-		break;
-	}
+		case ndShapeID::m_sphereCollision:
+		case ndShapeID::m_capsuleCollision:
+		{
+			mesh.SphericalMapping(LoadTexture(texture0), &aligmentUV[0][0]);
+			break;
+		}
 
-	//case SERIALIZE_ID_CONE:
-	//case SERIALIZE_ID_CAPSULE:
-	//case SERIALIZE_ID_CYLINDER:
-	//case SERIALIZE_ID_CHAMFERCYLINDER:
-	//{
-	//	//NewtonMeshApplySphericalMapping(mesh, LoadTexture(texture0));
-	//	NewtonMeshApplyCylindricalMapping(mesh, LoadTexture(texture0), LoadTexture(texture1), &aligmentUV[0][0]);
-	//	break;
-	//}
+		//case SERIALIZE_ID_CONE:
+		//case SERIALIZE_ID_CAPSULE:
+		//case SERIALIZE_ID_CYLINDER:
+		//case SERIALIZE_ID_CHAMFERCYLINDER:
+		//{
+		//	//NewtonMeshApplySphericalMapping(mesh, LoadTexture(texture0));
+		//	NewtonMeshApplyCylindricalMapping(mesh, LoadTexture(texture0), LoadTexture(texture1), &aligmentUV[0][0]);
+		//	break;
+		//}
 
-	case ndShapeID::m_boxCollision:
-	{
-		//int tex0 = LoadTexture(texture0);
-		int tex1 = LoadTexture(texture1);
-		//int tex2 = LoadTexture(texture2);
-		//mesh.BoxMapping(tex0, tex1, tex2, aligmentUV);
-		mesh.UniformBoxMapping(tex1, aligmentUV);
-		break;
-	}
+		case ndShapeID::m_boxCollision:
+		{
+			//int tex0 = LoadTexture(texture0);
+			int tex1 = LoadTexture(texture1);
+			//int tex2 = LoadTexture(texture2);
+			//mesh.BoxMapping(tex0, tex1, tex2, aligmentUV);
+			mesh.UniformBoxMapping(tex1, aligmentUV);
+			break;
+		}
 
-	default:
-	{
-		dAssert(0);
-		//int tex0 = LoadTexture(texture0);
-		//int tex1 = LoadTexture(texture1);
-		//int tex2 = LoadTexture(texture2);
-		//NewtonMeshApplyBoxMapping(mesh, tex0, tex1, tex2, &aligmentUV[0][0]);
-	}
+		default:
+		{
+			dAssert(0);
+			//int tex0 = LoadTexture(texture0);
+			//int tex1 = LoadTexture(texture1);
+			//int tex2 = LoadTexture(texture2);
+			//NewtonMeshApplyBoxMapping(mesh, tex0, tex1, tex2, &aligmentUV[0][0]);
+		}
 	}
 
 	// extract the materials index array for mesh

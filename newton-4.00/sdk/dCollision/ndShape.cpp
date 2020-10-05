@@ -80,7 +80,8 @@ void ndShape::MassProperties()
 
 	dMatrix Covariance(origin, origin);
 	dMatrix parallel(dGetIdentityMatrix());
-	for (dInt32 i = 0; i < 3; i++) {
+	for (dInt32 i = 0; i < 3; i++) 
+	{
 		parallel[i][i] = originMag2;
 		inertia[i] += (parallel[i] - Covariance[i]);
 		dAssert(inertia[i][i] > dFloat32(0.0f));

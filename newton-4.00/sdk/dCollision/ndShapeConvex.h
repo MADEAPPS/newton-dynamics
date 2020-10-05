@@ -47,7 +47,6 @@ class ndShapeConvex: public ndShape
 	};
 
 	D_COLLISION_API ndShapeConvex (ndShapeID id);
-//	dShapeConvex (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
 	D_COLLISION_API ~ndShapeConvex ();
 
 	virtual ndShapeConvex* GetAsShapeConvex() { return this; }
@@ -64,6 +63,7 @@ class ndShapeConvex: public ndShape
 	D_COLLISION_API virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
+	bool SanityCheck(dPolyhedra& hull) const;
 	bool SanityCheck(dInt32 count, const dVector& normal, dVector* const contactsOut) const;
 	dInt32 RectifyConvexSlice(dInt32 count, const dVector& normal, dVector* const contactsOut) const;
 	virtual dInt32 GetConvexVertexCount() const { return m_vertexCount; }
@@ -95,8 +95,6 @@ class ndShapeConvex: public ndShape
 
 	dInt32 RayCastClosestFace (dVector* tetrahedrum, const dVector& origin, dFloat32& pointDist) const;
 	dVector CalculateVolumeIntegral (const dgPlane& plane) const; 
-	
-	bool SanityCheck (dPolyhedra& hull) const;
 	dInt32 BuildCylinderCapPoly (dFloat32 radius, const dMatrix& transform, dVector* const vertexOut) const;
 	
 	friend class dgWorld;

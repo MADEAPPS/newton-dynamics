@@ -124,12 +124,6 @@ dVector dgCollisionPoint::SupportVertexSpecial (const dVector& dir, dFloat32 ski
 	return dVector (dFloat32 (0.0f)); 
 }
 
-void ndShapeSphere::GetCollisionInfo(dgCollisionInfo* const info) const
-{
-	dgCollisionConvex::GetCollisionInfo(info);
-	info->m_sphere.m_radius = m_radius;
-}
-
 void ndShapeSphere::Serialize(dgSerialize callback, void* const userData) const
 {
 	SerializeLow(callback, userData);

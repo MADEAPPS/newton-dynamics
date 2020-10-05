@@ -28,8 +28,9 @@ class ndBody;
 class ndShape;
 class ndShapeBox;
 class ndShapeNull;
-class ndShapeSphere;
 class ndShapeConvex;
+class ndShapeSphere;
+class ndShapeCapsule;
 class ndContactPoint;
 class ndShapeCompound;
 class ndRayCastNotify;
@@ -43,7 +44,7 @@ enum ndShapeID
 {
 	// do not change the order of these enum
 	m_sphereCollision = 0,
-//	m_capsuleCollision,
+	m_capsuleCollision,
 //	m_cylinderCollision,
 //	m_chamferCylinderCollision,
 	m_boxCollision,
@@ -215,6 +216,7 @@ class ndShape: public dClassAlloc
 
 	virtual ndShapeBox* GetAsShapeBox() { return nullptr; }
 	virtual ndShapeSphere* GetAsShapeSphere() { return nullptr; }
+	virtual ndShapeCapsule* GetAsShapeCapsule() { return nullptr; }
 	virtual ndShapeCompound* GetAsShapeCompound() { return nullptr; }
 
 	virtual ndShapeNull* GetAsShapeNull() { return nullptr; }

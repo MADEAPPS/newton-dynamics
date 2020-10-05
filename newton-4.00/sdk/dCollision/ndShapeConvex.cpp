@@ -48,50 +48,6 @@ void ndShapeConvex::SerializeLow(dgSerialize callback, void* const userData) con
 	dShape::SerializeLow(callback, userData);
 }
 
-
-bool ndShapeConvex::SanityCheck (dPolyhedra& hull) const
-{
-	dPolyhedra::Iterator iter (hull);
-	for (iter.Begin(); iter; iter ++) { 
-		dEdge* const edge = &(*iter);
-		if (edge->m_incidentFace < 0) {
-			return false;
-		}
-		dEdge* ptr = edge;
-		dVector p0 (m_vertex[edge->m_incidentVertex]);
-		ptr = ptr->m_next;
-		dVector p1 (m_vertex[ptr->m_incidentVertex]);
-		dVector e1 (p1 - p0);
-		dVector n0 (dFloat32 (0.0f));
-		for (ptr = ptr->m_next; ptr != edge; ptr = ptr->m_next) {
-			dVector p2 (m_vertex[ptr->m_incidentVertex]);
-			dVector e2 (p2 - p0);
-			n0 += e1.CrossProduct(e2);
-			e1 = e2;
-		} 
-
-		dAssert (n0.m_w == dFloat32 (0.0f));
-		ptr = edge;
-		do {
-			dVector q0 (m_vertex[ptr->m_twin->m_incidentVertex]);
-			for (dEdge* neiborg = ptr->m_twin->m_next->m_next; neiborg != ptr->m_twin; neiborg = neiborg->m_next) { 
-				dVector q1 (m_vertex[neiborg->m_incidentVertex]);
-				dVector q1q0 (q1 - q0);
-				dFloat32 project = q1q0.DotProduct(n0).GetScalar();
-				if (project > dFloat32 (1.0e-5f)) {
-					return false;
-				}
-			}
-
-			ptr = ptr->m_next;
-		} while (ptr != edge);
-	}
-
-	return true;
-}
-
-
-
 dMatrix ndShapeConvex::CalculateInertiaAndCenterOfMass (const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const
 {
 	if ((dAbs (localScale.m_x - localScale.m_y) < dFloat32 (1.0e-5f)) && (dAbs (localScale.m_x - localScale.m_z) < dFloat32 (1.0e-5f))) {
@@ -488,7 +444,6 @@ void ndShapeConvex::SetVolumeAndCG()
 
 void ndShapeConvex::MassProperties()
 {
-	//dFloat32 volume = ndShapeConvex::CalculateMassProperties(dGetIdentityMatrix(), m_inertia, m_crossInertia, m_centerOfMass);
 	dFloat32 volume = CalculateMassProperties(dGetIdentityMatrix(), m_inertia, m_crossInertia, m_centerOfMass);
 	if (volume < D_MAX_MIN_VOLUME) 
 	{
@@ -1100,4 +1055,51 @@ dFloat32 ndShapeConvex::GetBoxMinRadius() const
 dFloat32 ndShapeConvex::GetBoxMaxRadius() const
 {
 	return m_boxMaxRadius;
+}
+
+bool ndShapeConvex::SanityCheck(dPolyhedra& hull) const
+{
+	dPolyhedra::Iterator iter(hull);
+	for (iter.Begin(); iter; iter++) 
+	{
+		dEdge* const edge = &(*iter);
+		if (edge->m_incidentFace < 0) 
+		{
+			return false;
+		}
+		dEdge* ptr = edge;
+		dVector p0(m_vertex[edge->m_incidentVertex]);
+		ptr = ptr->m_next;
+		dVector p1(m_vertex[ptr->m_incidentVertex]);
+		dVector e1(p1 - p0);
+		dVector n0(dFloat32(0.0f));
+		for (ptr = ptr->m_next; ptr != edge; ptr = ptr->m_next) 
+		{
+			dVector p2(m_vertex[ptr->m_incidentVertex]);
+			dVector e2(p2 - p0);
+			n0 += e1.CrossProduct(e2);
+			e1 = e2;
+		}
+
+		dAssert(n0.m_w == dFloat32(0.0f));
+		ptr = edge;
+		do 
+		{
+			dVector q0(m_vertex[ptr->m_twin->m_incidentVertex]);
+			for (dEdge* neiborg = ptr->m_twin->m_next->m_next; neiborg != ptr->m_twin; neiborg = neiborg->m_next) 
+			{
+				dVector q1(m_vertex[neiborg->m_incidentVertex]);
+				dVector q1q0(q1 - q0);
+				dFloat32 project = q1q0.DotProduct(n0).GetScalar();
+				if (project > dFloat32(1.0e-5f)) 
+				{
+					return false;
+				}
+			}
+
+			ptr = ptr->m_next;
+		} while (ptr != edge);
+	}
+
+	return true;
 }

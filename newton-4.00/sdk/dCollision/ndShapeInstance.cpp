@@ -512,7 +512,8 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				t = m_shape->RayCast(callback, localP0, localP1, maxT, body, contactOut);
 				if (t <= maxT) 
 				{
-					dAssert(((ndShape*)m_shape)->GetAsShapeBox() || ((ndShape*)m_shape)->GetAsShapeSphere());
+					//dAssert(((ndShape*)m_shape)->GetAsShapeBox() || ((ndShape*)m_shape)->GetAsShapeSphere());
+					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
 				//	{
 				//		contactOut.m_shapeId0 = GetUserDataID();
