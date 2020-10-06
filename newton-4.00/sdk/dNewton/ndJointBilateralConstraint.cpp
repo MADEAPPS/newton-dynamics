@@ -488,9 +488,9 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKine
 	m_isInSkeleton = 0;
 	m_defualtDiagonalRegularizer = dFloat32(0.0f);
 	//SetStiffness(dFloat32(0.0f));
-	//
-	//memset(m_jointForce, 0, sizeof(m_jointForce));
-	//memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
+	
+	memset(m_jointForce, 0, sizeof(m_jointForce));
+	memset(m_motorAcceleration, 0, sizeof(m_motorAcceleration));
 }
 
 ndJointBilateralConstraint::~ndJointBilateralConstraint()

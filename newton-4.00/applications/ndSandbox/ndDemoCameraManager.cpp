@@ -164,7 +164,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	dVector p0(m_camera->ScreenToWorld(dVector(mouseX, mouseY, 0.0f, 0.0f)));
 	dVector p1(m_camera->ScreenToWorld(dVector(mouseX, mouseY, 1.0f, 0.0f)));
 
-#if 1
+#if 0
 	struct ndReplay
 	{
 		dVector m_p0;
@@ -260,7 +260,7 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 
 				// change this to make the grabbing stronger or weaker
 				//const dFloat32 angularFritionAccel = 10.0f;
-				const dFloat32 angularFritionAccel = 5.0f;
+				const dFloat32 angularFritionAccel = 100.0f;
 				const dFloat32 linearFrictionAccel = 400.0f * dMax (dAbs (DEMO_GRAVITY), dFloat32(10.0f));
 				const dFloat32 inertia = dMax (mass.m_z, dMax (mass.m_x, mass.m_y));
 
@@ -281,7 +281,6 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 			
 			if (m_pickJoint) 
 			{
-				dTrace(("set target Matrix: %s\n", __FUNCTION__));
 				m_pickJoint->SetTargetPosit (m_pickedBodyTargetPosition); 
 			}
 		} 

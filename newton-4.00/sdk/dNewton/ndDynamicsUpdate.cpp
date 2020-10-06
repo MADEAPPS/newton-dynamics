@@ -686,7 +686,6 @@ void ndDynamicsUpdate::BuildJacobianMatrix(ndConstraint* const joint)
 	}
 
 	dAssert(body0->GetInvMass() > dFloat32(0.0f));
-	//if (body0->GetInvMass() > dFloat32(0.0f))
 	{
 		ndJacobian& out = m_internalForces[m0];
 		dScopeSpinLock lock(body0->m_lock);
@@ -1055,8 +1054,8 @@ dFloat32 ndDynamicsUpdate::CalculateJointsForce(ndConstraint* const joint)
 		torqueM1 = torqueM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_angular, f);
 	}
 		
+	dAssert(body0->GetInvMass() > dFloat32(0.0f));
 	//if (m0) 
-	if (body0->GetInvMass() > dFloat32(0.0f))
 	{
 		dScopeSpinLock lock(body0->m_lock);
 		m_internalForcesBack[m0].m_linear += forceM0;
@@ -1064,6 +1063,7 @@ dFloat32 ndDynamicsUpdate::CalculateJointsForce(ndConstraint* const joint)
 	}
 
 	//if (m1) 
+	if (body1->GetInvMass() > dFloat32(0.0f))
 	{
 		dScopeSpinLock lock(body1->m_lock);
 		m_internalForcesBack[m1].m_linear += forceM1;

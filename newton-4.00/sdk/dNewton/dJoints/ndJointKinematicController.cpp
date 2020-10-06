@@ -242,8 +242,8 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 			veloc0 * jacobianPair.m_jacobianM0.m_linear + omega0 * jacobianPair.m_jacobianM0.m_angular + 
 			veloc1 * jacobianPair.m_jacobianM1.m_linear + omega1 * jacobianPair.m_jacobianM1.m_angular);
 	
-		const dFloat32 dist = pointPosit.m_x + pointPosit.m_y + pointPosit.m_z;
-		const dFloat32 speed = pointVeloc.m_x + pointVeloc.m_y + pointVeloc.m_z;
+		const dFloat32 dist = pointPosit.AddHorizontal().GetScalar();
+		const dFloat32 speed = pointVeloc.AddHorizontal().GetScalar();
 	
 		dFloat32 v = m_maxSpeed * dSign(dist);
 		if ((dist < maxDistance) && (dist > -maxDistance)) 
@@ -252,7 +252,8 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 		}
 		dAssert(dAbs(v) <= m_maxSpeed);
 	
-		const dFloat32 relAccel = (v + speed) * invTimestep;
+		const dFloat32 relAccel = dClamp ((v + speed) * invTimestep, dFloat32 (-400.0f), dFloat32 (400.0f));
+
 		SetMotorAcceleration(desc, index, -relAccel);
 		SetLowerFriction(desc, index, -m_maxLinearFriction);
 		SetHighFriction(desc, index, m_maxLinearFriction);
@@ -271,9 +272,8 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 				const ndJacobianPair& jacobianPair = desc.m_jacobian[index];
 				
 				const dVector pointOmega(omega0 * jacobianPair.m_jacobianM0.m_angular + omega1 * jacobianPair.m_jacobianM1.m_angular);
-				const dFloat32 relSpeed = pointOmega.m_x + pointOmega.m_y + pointOmega.m_z;
-				const dFloat32 relAccel = relSpeed * invTimestep;
-				
+				const dFloat32 relSpeed = pointOmega.AddHorizontal().GetScalar();
+				const dFloat32 relAccel = dClamp (relSpeed * invTimestep, dFloat32 (-3000.0f), dFloat32(3000.0f));
 				SetMotorAcceleration(desc, index, -relAccel);
 				SetLowerFriction(desc, index, -angularFriction);
 				SetHighFriction(desc, index, angularFriction);

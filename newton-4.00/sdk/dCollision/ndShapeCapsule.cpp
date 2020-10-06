@@ -83,29 +83,6 @@ void ndShapeCapsule::Serialize(dgSerialize callback, void* const userData) const
 }
 
 
-dInt32 ndShapeCapsule::CalculatePlaneIntersection (const dVector& direction, const dVector& point, dVector* const contactsOut) const
-{
-	dVector normal(direction * m_transform);
-	dVector origin(point * m_transform);
-	
-	dInt32 count = 0;
-	dVector p0 (-m_height, dFloat32 (0.0f), dFloat32 (0.0f), dFloat32 (0.0f));
-	dVector dir0 (p0 - origin);
-	dFloat32 dist0 = dir0.DotProduct(normal).GetScalar();
-	if ((dist0 * dist0 - dFloat32 (5.0e-5f)) < (m_radio0 * m_radio0)) {
-		contactsOut[count] = m_transform * (p0 - normal.Scale (dist0));
-		count ++;
-	}
-
-	dVector p1 (m_height, dFloat32 (0.0f), dFloat32 (0.0f), dFloat32 (0.0f));
-	dVector dir1 (p1 - origin);
-	dFloat32 dist1 = dir1.DotProduct(normal).GetScalar();
-	if ((dist1 * dist1 - dFloat32 (5.0e-5f)) < (m_radio1 * m_radio1)) {
-		contactsOut[count] = m_transform * (p1 - normal.Scale (dist1));
-		count ++;
-	}
-	return count;
-}
 
 void ndShapeCapsule::CalculateImplicitContacts(dInt32 count, dgContactPoint* const contactPoints) const
 {
@@ -584,4 +561,30 @@ dFloat32 ndShapeCapsule::RayCast(ndRayCastNotify& callback, const dVector& r0, c
 		contactOut.m_normal = m_transform * contactOut.m_normal;
 	}
 	return ret;
+}
+
+dInt32 ndShapeCapsule::CalculatePlaneIntersection(const dVector& direction, const dVector& point, dVector* const contactsOut) const
+{
+	dVector normal(direction * m_transform);
+	dVector origin(point * m_transform);
+
+	dInt32 count = 0;
+	dVector p0(-m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+	dVector dir0(p0 - origin);
+	dFloat32 dist0 = dir0.DotProduct(normal).GetScalar();
+	if ((dist0 * dist0 - dFloat32(5.0e-5f)) < (m_radio0 * m_radio0)) 
+	{
+		contactsOut[count] = m_transform * (p0 - normal.Scale(dist0));
+		count++;
+	}
+
+	dVector p1(m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+	dVector dir1(p1 - origin);
+	dFloat32 dist1 = dir1.DotProduct(normal).GetScalar();
+	if ((dist1 * dist1 - dFloat32(5.0e-5f)) < (m_radio1 * m_radio1)) 
+	{
+		contactsOut[count] = m_transform * (p1 - normal.Scale(dist1));
+		count++;
+	}
+	return count;
 }
