@@ -108,6 +108,7 @@ class ndBodyKinematic: public ndBody
 
 	D_COLLISION_API dVector CalculateLinearMomentum() const;
 	D_COLLISION_API dVector CalculateAngularMomentum() const;
+	D_COLLISION_API dFloat32 TotalEnergy() const;
 
 	D_COLLISION_API dMatrix CalculateInvInertiaMatrix() const;
 	D_COLLISION_API void UpdateInvInertiaMatrix();

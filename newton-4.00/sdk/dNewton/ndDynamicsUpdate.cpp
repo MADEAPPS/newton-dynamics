@@ -869,10 +869,20 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			dFloat32 accNorm = dFloat32(0.0f);
+
+static int xxx;
 			for (dInt32 i = 0; i < count; i++)
 			{
 				ndConstraint* const joint = jointArray[i + start];
+
+xxx++;
+dFloat32 e0(joint->GetBody0()->TotalEnergy());
+
 				accNorm += world->CalculateJointsForce(joint);
+
+dFloat32 e1(joint->GetBody0()->TotalEnergy());
+dTrace(("%d %f %f\n", xxx, e0, e1));
+
 			}
 			return accNorm;
 		}
@@ -1343,7 +1353,6 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 		dAssert(body->m_veloc.m_w == dFloat32(0.0f));
 		dAssert(body->m_omega.m_w == dFloat32(0.0f));
 
-		//dUnsigned32 equilibrium = 1;
 		dUnsigned32 equilibrium = (body->GetInvMass() == dFloat32(0.0f)) ? 1 : body->m_autoSleep;
 		const dVector isMovingMask(body->m_veloc + body->m_omega + body->m_accel + body->m_alpha);
 		const dVector mask(isMovingMask.TestZero());
@@ -1392,9 +1401,6 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 			body->m_alpha = dVector::m_zero;
 			body->m_veloc = dVector::m_zero;
 			body->m_omega = dVector::m_zero;
-			//body->m_sleeping = body->m_autoSleep;
-			//body->m_equilibrium = 1;
-			//body->m_equilibrium = body->m_autoSleep;
 			body->m_equilibrium = (body->GetInvMass() == dFloat32(0.0f)) ? 1 : body->m_autoSleep;
 		}
 	}
@@ -1455,8 +1461,6 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 					ndBodyKinematic* const body = bodyIslands[i];
 					body->m_veloc = dVector::m_zero;
 					body->m_omega = dVector::m_zero;
-					//body->m_sleeping = body->m_autoSleep;
-					//body->m_equilibrium = 1;
 					body->m_equilibrium = body->m_autoSleep;
 					ndBodyDynamic* const dynBody = body->GetAsBodyDynamic();
 					if (dynBody)

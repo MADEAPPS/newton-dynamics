@@ -124,11 +124,11 @@ void ndContact::CalculatePointDerivative(dInt32 index, ndConstraintDescritor& de
 	dAssert(jacobian1.m_angular.m_w == dFloat32(0.0f));
 }
 
-void ndContact::JacobianContactDerivative(ndConstraintDescritor& params, const ndContactMaterial& contact, dInt32 normalIndex, dInt32& frictionIndex)
+void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, dInt32 normalIndex, dInt32& frictionIndex)
 {
 	dgPointParam pointData;
 	InitPointParam(pointData, dFloat32(1.0f), contact.m_point, contact.m_point);
-	CalculatePointDerivative(normalIndex, params, contact.m_normal, pointData);
+	CalculatePointDerivative(normalIndex, desc, contact.m_normal, pointData);
 
 	const dVector omega0(m_body0->GetOmega());
 	const dVector omega1(m_body1->GetOmega());
@@ -138,20 +138,20 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& params, const n
 	const dVector gyroAlpha1(m_body1->GetGyroAlpha());
 
 	dAssert(contact.m_normal.m_w == dFloat32(0.0f));
-	const ndJacobian& normalJacobian0 = params.m_jacobian[normalIndex].m_jacobianM0;
-	const ndJacobian& normalJacobian1 = params.m_jacobian[normalIndex].m_jacobianM1;
+	const ndJacobian& normalJacobian0 = desc.m_jacobian[normalIndex].m_jacobianM0;
+	const ndJacobian& normalJacobian1 = desc.m_jacobian[normalIndex].m_jacobianM1;
 
-	const dFloat32 impulseOrForceScale = (params.m_timestep > dFloat32(0.0f)) ? params.m_invTimestep : dFloat32(1.0f);
+	const dFloat32 impulseOrForceScale = (desc.m_timestep > dFloat32(0.0f)) ? desc.m_invTimestep : dFloat32(1.0f);
 	const dFloat32 restitutionCoefficient = contact.m_material.m_restitution;
 	
 	dFloat32 relSpeed = -(normalJacobian0.m_linear * veloc0 + normalJacobian0.m_angular * omega0 + normalJacobian1.m_linear * veloc1 + normalJacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 	dFloat32 penetration = dClamp(contact.m_penetration - D_RESTING_CONTACT_PENETRATION, dFloat32(0.0f), dFloat32(0.5f));
-	params.m_flags[normalIndex] = contact.m_material.m_flags & m_isSoftContact;
-	params.m_penetration[normalIndex] = penetration;
-	params.m_restitution[normalIndex] = restitutionCoefficient;
-	params.m_forceBounds[normalIndex].m_low = dFloat32(0.0f);
-	params.m_forceBounds[normalIndex].m_normalIndex = D_INDEPENDENT_ROW;
-	params.m_forceBounds[normalIndex].m_jointForce = (ndForceImpactPair*)&contact.m_normal_Force;
+	desc.m_flags[normalIndex] = contact.m_material.m_flags & m_isSoftContact;
+	desc.m_penetration[normalIndex] = penetration;
+	desc.m_restitution[normalIndex] = restitutionCoefficient;
+	desc.m_forceBounds[normalIndex].m_low = dFloat32(0.0f);
+	desc.m_forceBounds[normalIndex].m_normalIndex = D_INDEPENDENT_ROW;
+	desc.m_forceBounds[normalIndex].m_jointForce = (ndForceImpactPair*)&contact.m_normal_Force;
 	
 	const dFloat32 restitutionVelocity = (relSpeed > D_REST_RELATIVE_VELOCITY) ? relSpeed * restitutionCoefficient : dFloat32(0.0f);
 	//m_impulseSpeed = dMax(m_impulseSpeed, restitutionVelocity);
@@ -159,19 +159,19 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& params, const n
 	dFloat32 penetrationStiffness = D_MAX_PENETRATION_STIFFNESS * contact.m_material.m_softness;
 	dFloat32 penetrationVeloc = penetration * penetrationStiffness;
 	dAssert(dAbs(penetrationVeloc - D_MAX_PENETRATION_STIFFNESS * contact.m_material.m_softness * penetration) < dFloat32(1.0e-6f));
-	params.m_penetrationStiffness[normalIndex] = penetrationStiffness;
+	desc.m_penetrationStiffness[normalIndex] = penetrationStiffness;
 	relSpeed += dMax(restitutionVelocity, penetrationVeloc);
 	
 	const bool isHardContact = !(contact.m_material.m_flags & m_isSoftContact);
-	params.m_diagonalRegularizer[normalIndex] = isHardContact ? D_DIAGONAL_REGULARIZER : dMax(D_DIAGONAL_REGULARIZER, contact.m_material.m_skinThickness);
+	desc.m_diagonalRegularizer[normalIndex] = isHardContact ? D_DIAGONAL_REGULARIZER : dMax(D_DIAGONAL_REGULARIZER, contact.m_material.m_skinThickness);
 	const dFloat32 relGyro = (normalJacobian0.m_angular * gyroAlpha0 + normalJacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 	
-	params.m_jointAccel[normalIndex] = relGyro + relSpeed * impulseOrForceScale;
+	desc.m_jointAccel[normalIndex] = relGyro + relSpeed * impulseOrForceScale;
 	if (contact.m_material.m_flags & m_overrideNormalAccel)
 	{
-		params.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
+		desc.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
-//return;
+return;
 
 	// first dir friction force
 	if (contact.m_material.m_flags & m_friction0Enable)
@@ -179,43 +179,43 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& params, const n
 		dInt32 jacobIndex = frictionIndex;
 		frictionIndex += 1;
 		dAssert(contact.m_dir0.m_w == dFloat32(0.0f));
-		CalculatePointDerivative(jacobIndex, params, contact.m_dir0, pointData);
+		CalculatePointDerivative(jacobIndex, desc, contact.m_dir0, pointData);
 	
-		const ndJacobian &jacobian0 = params.m_jacobian[jacobIndex].m_jacobianM0;
-		const ndJacobian &jacobian1 = params.m_jacobian[jacobIndex].m_jacobianM1;
+		const ndJacobian &jacobian0 = desc.m_jacobian[jacobIndex].m_jacobianM0;
+		const ndJacobian &jacobian1 = desc.m_jacobian[jacobIndex].m_jacobianM1;
 		dFloat32 relVelocErr = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 	
-		params.m_flags[jacobIndex] = 0;
-		params.m_forceBounds[jacobIndex].m_normalIndex = dInt16((contact.m_material.m_flags & m_override0Friction) ? D_INDEPENDENT_ROW : normalIndex);
-		params.m_diagonalRegularizer[jacobIndex] = D_DIAGONAL_REGULARIZER;
+		desc.m_flags[jacobIndex] = 0;
+		desc.m_forceBounds[jacobIndex].m_normalIndex = dInt16((contact.m_material.m_flags & m_override0Friction) ? D_INDEPENDENT_ROW : normalIndex);
+		desc.m_diagonalRegularizer[jacobIndex] = D_DIAGONAL_REGULARIZER;
 	
-		params.m_restitution[jacobIndex] = dFloat32(0.0f);
-		params.m_penetration[jacobIndex] = dFloat32(0.0f);
+		desc.m_restitution[jacobIndex] = dFloat32(0.0f);
+		desc.m_penetration[jacobIndex] = dFloat32(0.0f);
 	
-		params.m_penetrationStiffness[jacobIndex] = dFloat32(0.0f);
+		desc.m_penetrationStiffness[jacobIndex] = dFloat32(0.0f);
 		if (contact.m_material.m_flags & m_override0Accel)
 		{
 			// note: using restitution been negative to indicate that the acceleration was override
-			params.m_restitution[jacobIndex] = dFloat32(-1.0f);
-			params.m_jointAccel[jacobIndex] = contact.m_dir0_Force.m_force;
+			desc.m_restitution[jacobIndex] = dFloat32(-1.0f);
+			desc.m_jointAccel[jacobIndex] = contact.m_dir0_Force.m_force;
 		}
 		else 
 		{
 			const dFloat32 relFrictionGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
-			params.m_restitution[jacobIndex] = dFloat32(0.0f);
-			params.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * impulseOrForceScale;
+			desc.m_restitution[jacobIndex] = dFloat32(0.0f);
+			desc.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * impulseOrForceScale;
 		}
 		if (dAbs(relVelocErr) > D_MAX_DYNAMIC_FRICTION_SPEED) 
 		{
-			params.m_forceBounds[jacobIndex].m_low = -contact.m_material.m_dynamicFriction0;
-			params.m_forceBounds[jacobIndex].m_upper = contact.m_material.m_dynamicFriction0;
+			desc.m_forceBounds[jacobIndex].m_low = -contact.m_material.m_dynamicFriction0;
+			desc.m_forceBounds[jacobIndex].m_upper = contact.m_material.m_dynamicFriction0;
 		}
 		else 
 		{
-			params.m_forceBounds[jacobIndex].m_low = -contact.m_material.m_staticFriction0;
-			params.m_forceBounds[jacobIndex].m_upper = contact.m_material.m_staticFriction0;
+			desc.m_forceBounds[jacobIndex].m_low = -contact.m_material.m_staticFriction0;
+			desc.m_forceBounds[jacobIndex].m_upper = contact.m_material.m_staticFriction0;
 		}
-		params.m_forceBounds[jacobIndex].m_jointForce = (ndForceImpactPair*)&contact.m_dir0_Force;
+		desc.m_forceBounds[jacobIndex].m_jointForce = (ndForceImpactPair*)&contact.m_dir0_Force;
 	}
 	
 	if (contact.m_material.m_flags & m_friction1Enable)
@@ -223,42 +223,42 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& params, const n
 		dInt32 jacobIndex = frictionIndex;
 		frictionIndex += 1;
 		dAssert(contact.m_dir1.m_w == dFloat32(0.0f));
-		CalculatePointDerivative(jacobIndex, params, contact.m_dir1, pointData);
+		CalculatePointDerivative(jacobIndex, desc, contact.m_dir1, pointData);
 	
-		const ndJacobian &jacobian0 = params.m_jacobian[jacobIndex].m_jacobianM0;
-		const ndJacobian &jacobian1 = params.m_jacobian[jacobIndex].m_jacobianM1;
+		const ndJacobian &jacobian0 = desc.m_jacobian[jacobIndex].m_jacobianM0;
+		const ndJacobian &jacobian1 = desc.m_jacobian[jacobIndex].m_jacobianM1;
 		dFloat32 relVelocErr = -(jacobian0.m_linear * veloc0 + jacobian0.m_angular * omega0 + jacobian1.m_linear * veloc1 + jacobian1.m_angular * omega1).AddHorizontal().GetScalar();
 	
-		params.m_flags[jacobIndex] = 0;
-		params.m_forceBounds[jacobIndex].m_normalIndex = dInt16((contact.m_material.m_flags & m_override1Friction) ? D_INDEPENDENT_ROW : normalIndex);
-		params.m_diagonalRegularizer[jacobIndex] = D_DIAGONAL_REGULARIZER;
+		desc.m_flags[jacobIndex] = 0;
+		desc.m_forceBounds[jacobIndex].m_normalIndex = dInt16((contact.m_material.m_flags & m_override1Friction) ? D_INDEPENDENT_ROW : normalIndex);
+		desc.m_diagonalRegularizer[jacobIndex] = D_DIAGONAL_REGULARIZER;
 	
-		params.m_restitution[jacobIndex] = dFloat32(0.0f);
-		params.m_penetration[jacobIndex] = dFloat32(0.0f);
-		params.m_penetrationStiffness[jacobIndex] = dFloat32(0.0f);
+		desc.m_restitution[jacobIndex] = dFloat32(0.0f);
+		desc.m_penetration[jacobIndex] = dFloat32(0.0f);
+		desc.m_penetrationStiffness[jacobIndex] = dFloat32(0.0f);
 		if (contact.m_material.m_flags & m_override1Accel)
 		{
 			// note: using restitution been negative to indicate that the acceleration was override
-			params.m_restitution[jacobIndex] = dFloat32(-1.0f);
-			params.m_jointAccel[jacobIndex] = contact.m_dir1_Force.m_force;
+			desc.m_restitution[jacobIndex] = dFloat32(-1.0f);
+			desc.m_jointAccel[jacobIndex] = contact.m_dir1_Force.m_force;
 		}
 		else 
 		{
 			const dFloat32 relFrictionGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
-			params.m_restitution[jacobIndex] = dFloat32(0.0f);
-			params.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * impulseOrForceScale;
+			desc.m_restitution[jacobIndex] = dFloat32(0.0f);
+			desc.m_jointAccel[jacobIndex] = relFrictionGyro + relVelocErr * impulseOrForceScale;
 		}
 		if (dAbs(relVelocErr) > D_MAX_DYNAMIC_FRICTION_SPEED) 
 		{
-			params.m_forceBounds[jacobIndex].m_low = -contact.m_material.m_dynamicFriction1;
-			params.m_forceBounds[jacobIndex].m_upper = contact.m_material.m_dynamicFriction1;
+			desc.m_forceBounds[jacobIndex].m_low = -contact.m_material.m_dynamicFriction1;
+			desc.m_forceBounds[jacobIndex].m_upper = contact.m_material.m_dynamicFriction1;
 		}
 		else 
 		{
-			params.m_forceBounds[jacobIndex].m_low = -contact.m_material.m_staticFriction1;
-			params.m_forceBounds[jacobIndex].m_upper = contact.m_material.m_staticFriction1;
+			desc.m_forceBounds[jacobIndex].m_low = -contact.m_material.m_staticFriction1;
+			desc.m_forceBounds[jacobIndex].m_upper = contact.m_material.m_staticFriction1;
 		}
-		params.m_forceBounds[jacobIndex].m_jointForce = (ndForceImpactPair*)&contact.m_dir1_Force;
+		desc.m_forceBounds[jacobIndex].m_jointForce = (ndForceImpactPair*)&contact.m_dir1_Force;
 	}
 }
 

@@ -355,6 +355,12 @@ dVector ndBodyKinematic::CalculateAngularMomentum() const
 	return m_matrix.RotateVector(localAngularMomentum);
 }
 
+dFloat32 ndBodyKinematic::TotalEnergy() const
+{
+	dVector energy (m_veloc.DotProduct(CalculateLinearMomentum()) + m_veloc.DotProduct(CalculateAngularMomentum()));
+	return energy.AddHorizontal().GetScalar()* dFloat32(0.5f);
+}
+
 void ndBodyKinematic::UpdateGyroData()
 {
 	if (m_gyroTorqueOn) 
