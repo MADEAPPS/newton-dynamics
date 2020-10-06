@@ -88,7 +88,9 @@ static void BuildSphereStacks(ndDemoEntityManager* const scene, const dVector& o
 	dFloat32 diameter = 1.0f;
 	//ndShapeInstance sphere(new ndShapeSphere(diameter * 0.5f));
 	ndShapeInstance sphere(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
-	ndDemoMesh* const mesh = new ndDemoMesh("sphere", scene->GetShaderCache(), &sphere, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	//ndDemoMesh* const mesh = new ndDemoMesh("sphere", scene->GetShaderCache(), &sphere, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndDemoMesh* const mesh = new ndDemoMesh("sphere", scene->GetShaderCache(), &sphere, "marble.tga", "marble.tga", "marble.tga");
+	
 
 	// get the dimension from shape itself
 	//dVector minP(0.0f);

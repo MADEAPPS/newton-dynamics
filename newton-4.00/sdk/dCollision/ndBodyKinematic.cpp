@@ -419,13 +419,22 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 	{
 		UpdateGyroData();
 		AddDampingAcceleration(timestep);
-		if (!m_gyroTorqueOn || 
-			((dAbs(m_invMass.m_x - m_invMass.m_y) < dFloat32(1.0e-1f)) &&
-			 (dAbs(m_invMass.m_x - m_invMass.m_z) < dFloat32(1.0e-1f))))
+
+		const dVector accel(GetForce().Scale(m_invMass.m_w));
+		if ((dAbs(m_invMass.m_x - m_invMass.m_y) < dFloat32(1.0e-1f)) &&
+			(dAbs(m_invMass.m_x - m_invMass.m_z) < dFloat32(1.0e-1f)))
 		{
-			const dVector accel(GetForce().Scale(m_invMass.m_w));
-			//const dVector alpha(GetTorque().Scale(m_invMass.m_x));
 			const dVector alpha (GetTorque() * m_invMass);
+			dAssert(alpha.m_w == dFloat32(0.0f));
+			SetAccel(accel);
+			SetAlpha(alpha);
+			m_veloc += accel.Scale(timestep);
+			m_omega += alpha.Scale(timestep);
+		}
+		else if (!m_gyroTorqueOn)
+		{
+			//const dVector alpha(GetTorque() * m_invMass);
+			const dVector alpha(m_invWorldInertiaMatrix.RotateVector(GetTorque()));
 			dAssert(alpha.m_w == dFloat32(0.0f));
 			SetAccel(accel);
 			SetAlpha(alpha);
@@ -494,7 +503,6 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 
 			localOmega += gradientStep;
 
-			const dVector accel(GetForce().Scale(m_invMass.m_w));
 			const dVector alpha(m_matrix.RotateVector(localTorque * m_invMass));
 
 			SetAccel(accel);
