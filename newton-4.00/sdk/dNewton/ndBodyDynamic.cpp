@@ -124,9 +124,14 @@ void ndBodyDynamic::IntegrateVelocity(dFloat32 timestep)
 ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep)
 {
 	ndJacobian velocStep;
-	if (!m_gyroTorqueOn ||
-		((dAbs(m_invMass.m_x - m_invMass.m_y) < dFloat32(1.0e-1f)) &&
-		 (dAbs(m_invMass.m_x - m_invMass.m_z) < dFloat32(1.0e-1f))))
+
+	if ((dAbs(m_invMass.m_x - m_invMass.m_y) < dFloat32(1.0e-1f)) &&
+		(dAbs(m_invMass.m_x - m_invMass.m_z) < dFloat32(1.0e-1f)))
+	{
+		velocStep.m_angular = torque * m_invMass * timestep;
+		dAssert(velocStep.m_angular.m_w == dFloat32(0.0f));
+	} 
+	else if (!m_gyroTorqueOn)
 	{
 		velocStep.m_angular = m_invWorldInertiaMatrix.RotateVector(torque) * timestep;
 		dAssert(velocStep.m_angular.m_w == dFloat32(0.0f));
