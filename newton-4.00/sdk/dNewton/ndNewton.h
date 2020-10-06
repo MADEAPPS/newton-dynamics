@@ -50,6 +50,7 @@
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
 #include <ndDynamicsUpdate.h>
+#include <ndJointBallAndSocket.h>
 #include <ndJointKinematicController.h>
 
 #endif 
