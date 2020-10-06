@@ -45,10 +45,14 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 	geometry->Release();
 }
 
-static void BuildSphere(ndDemoEntityManager* const scene, 
-	ndDemoMesh* const sphereMesh, const ndShapeInstance& sphereShape,
-	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
+static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& origin)
 {
+	dFloat32 mass = 1.0f;
+	dFloat32 diameter = 0.5f;
+	//ndShapeInstance capsule(new ndShapeSphere(diameter * 0.5f));
+	ndShapeInstance capsule(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
+	ndDemoMesh* const mesh = new ndDemoMesh("capsule", scene->GetShaderCache(), &capsule, "marble.tga", "marble.tga", "marble.tga");
+
 	//dMatrix matrix(dGetIdentityMatrix());
 	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
 	//dMatrix matrix(dYawMatrix(90.0f * dDegreeToRad) * dPitchMatrix(-45.0f * dDegreeToRad));
@@ -58,60 +62,36 @@ static void BuildSphere(ndDemoEntityManager* const scene,
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f * 0.99f;
+	matrix.m_posit.m_y = floor.m_y;
 
 	//matrix.m_posit.m_y += xxxx;
-matrix.m_posit.m_y += 7.0f;
+	matrix.m_posit.m_y += 5.0f;
 
-	for (dInt32 i = 0; i < count; i++)
-	{
-		ndBodyDynamic* const body = new ndBodyDynamic();
-		ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-		entity->SetMesh(sphereMesh, dGetIdentityMatrix());
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	entity->SetMesh(mesh, dGetIdentityMatrix());
 
-		body->SetNotifyCallback(new ndDemoEntityNotify(entity));
-		body->SetMatrix(matrix);
-		body->SetCollisionShape(sphereShape);
-		body->SetMassMatrix(mass, sphereShape);
-		body->SetGyroMode(true);
+	body->SetNotifyCallback(new ndDemoEntityNotify(entity));
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(capsule);
+	body->SetMassMatrix(mass, capsule);
+	world->AddBody(body);
+	scene->AddEntity(entity);
 
-		world->AddBody(body);
-		scene->AddEntity(entity);
+	ndBodyDynamic* const fixBody = world->GetSentinelBody();
 
-		//matrix.m_posit.m_y += diameter * 0.99f;
-		matrix.m_posit.m_y += diameter * 0.99f * 3.0f;
-	}
-}
+	dMatrix pinMatrix(matrix);
+	pinMatrix.m_posit.m_y += diameter * 2.0f;
 
-static void BuildSphereStacks(ndDemoEntityManager* const scene, const dVector& origin)
-{
-	dFloat32 diameter = 1.0f;
-	//ndShapeInstance sphere(new ndShapeSphere(diameter * 0.5f));
-	ndShapeInstance sphere(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
-	//ndShapeInstance sphere(new ndShapeBox(diameter, diameter, diameter));
-	//ndDemoMesh* const mesh = new ndDemoMesh("sphere", scene->GetShaderCache(), &sphere, "wood_0.tga", "wood_0.tga", "wood_0.tga");
-	ndDemoMesh* const mesh = new ndDemoMesh("sphere", scene->GetShaderCache(), &sphere, "marble.tga", "marble.tga", "marble.tga");
+	ndJointBallAndSocket* const joint = new ndJointBallAndSocket(pinMatrix, body, fixBody);
+	world->AddJoint(joint);
 
-	// get the dimension from shape itself
-	//dVector minP(0.0f);
-	//dVector maxP(0.0f);
-	//sphere.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
-
-	const int n = 10;
-	const int stackHigh = 7;
-	for (dInt32 i = 0; i < n; i++)
-	{
-		for (dInt32 j = 0; j < n; j++)
-		{
-			dVector location((j - n / 2) * 4.0f, 0.0f, (i - n / 2) * 4.0f, 0.0f);
-			BuildSphere(scene, mesh, sphere, 10.0f, location + origin, 1.0f, stackHigh, 2.0f);
-		}
-	}
 
 	mesh->Release();
 }
 
-void ndBasicSetup (ndDemoEntityManager* const scene)
+
+void ndBasicJoints (ndDemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
@@ -122,8 +102,7 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloor(scene);
 
-	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	BuildSphereStacks(scene, origin1);
+	BuildBallSocket(scene, dVector(0.0f, 0.0f, 0.0f, 0.0f));
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);

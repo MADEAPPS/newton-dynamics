@@ -135,8 +135,8 @@ class ndContact
 	dFloat32 GetPruningTolerance() const;
 
 	virtual const dUnsigned32 GetRowsCount() const;
-	virtual void JacobianDerivative(ndConstraintDescritor& params);
-	virtual void JointAccelerations(ndJointAccelerationDecriptor* const params);
+	virtual void JacobianDerivative(ndConstraintDescritor& desc);
+	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
 
 	const ndContactPointList& GetContactPoints() const;
 
@@ -145,7 +145,7 @@ class ndContact
 	private:
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 	void CalculatePointDerivative(dInt32 index, ndConstraintDescritor& desc, const dVector& dir, const dgPointParam& param) const;
-	void JacobianContactDerivative(ndConstraintDescritor& params, const ndContactMaterial& contact, dInt32 normalIndex, dInt32& frictionIndex);
+	void JacobianContactDerivative(ndConstraintDescritor& desc, const ndContactMaterial& contact, dInt32 normalIndex, dInt32& frictionIndex);
 
 	dVector m_positAcc;
 	dQuaternion m_rotationAcc;

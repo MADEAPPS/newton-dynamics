@@ -86,7 +86,7 @@ void ndContact::DetachFromBodies()
 	m_body1->DetachContact(this);
 }
 
-void ndContact::JacobianDerivative(ndConstraintDescritor& params)
+void ndContact::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dInt32 frictionIndex = 0;
 	//m_impulseSpeed = dFloat32(0.0f);
@@ -97,11 +97,11 @@ void ndContact::JacobianDerivative(ndConstraintDescritor& params)
 		for (ndContactPointList::dListNode* node = m_contacPointsList.GetFirst(); node; node = node->GetNext())
 		{
 			const ndContactMaterial& contact = node->GetInfo();
-			JacobianContactDerivative(params, contact, i, frictionIndex);
+			JacobianContactDerivative(desc, contact, i, frictionIndex);
 			i++;
 		}
 	}
-	params.m_rowsCount = frictionIndex;
+	desc.m_rowsCount = frictionIndex;
 }
 
 void ndContact::CalculatePointDerivative(dInt32 index, ndConstraintDescritor& desc, const dVector& dir, const dgPointParam& param) const
@@ -262,7 +262,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	}
 }
 
-void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const params)
+void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 {
 	const dVector bodyOmega0(m_body0->GetOmega());
 	const dVector bodyOmega1(m_body1->GetOmega());
@@ -271,18 +271,18 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const params)
 	const dVector gyroAlpha0(m_body0->GetGyroAlpha());
 	const dVector gyroAlpha1(m_body1->GetGyroAlpha());
 
-	const dInt32 count = params->m_rowsCount;
+	const dInt32 count = desc->m_rowsCount;
 
 	dFloat32 timestep = dFloat32(1.0f);
 	dFloat32 invTimestep = dFloat32(1.0f);
-	if (params->m_timestep > dFloat32(0.0f)) 
+	if (desc->m_timestep > dFloat32(0.0f)) 
 	{
-		timestep = params->m_timestep;
-		invTimestep = params->m_invTimeStep;
+		timestep = desc->m_timestep;
+		invTimestep = desc->m_invTimeStep;
 	}
 
-	ndRightHandSide* const rightHandSide = params->m_rightHandSide;
-	const ndLeftHandSide* const leftHandSide = params->m_leftHandSide;
+	ndRightHandSide* const rightHandSide = desc->m_rightHandSide;
+	const ndLeftHandSide* const leftHandSide = desc->m_leftHandSide;
 
 	for (dInt32 k = 0; k < count; k++) 
 	{

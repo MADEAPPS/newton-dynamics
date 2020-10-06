@@ -82,8 +82,8 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	virtual ndJointBilateralConstraint* GetAsBilateral() { return this; }
 
 	virtual const dUnsigned32 GetRowsCount() const;
-	virtual void JacobianDerivative(ndConstraintDescritor& params);
-	virtual void JointAccelerations(ndJointAccelerationDecriptor* const params);
+	virtual void JacobianDerivative(ndConstraintDescritor& desc);
+	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
 
 	virtual ndBodyKinematic* GetBody0() const;
 	virtual ndBodyKinematic* GetBody1() const;
@@ -147,12 +147,6 @@ inline void ndJointBilateralConstraint::CalculateGlobalMatrix(dMatrix& matrix0, 
 	matrix1 = m_localMatrix1 * m_body1->GetMatrix();
 }
 
-inline void ndJointBilateralConstraint::JacobianDerivative(ndConstraintDescritor& params)
-{
-	dAssert(0);
-}
-
-
 inline ndBodyKinematic* ndJointBilateralConstraint::GetBody0() const
 {
 	return m_body0;
@@ -209,6 +203,11 @@ inline void ndJointBilateralConstraint::SetHighFriction(ndConstraintDescritor& d
 		dTrace(("make sure that friction joint are issue at last\n"));
 	}
 	#endif
+}
+
+inline void ndJointBilateralConstraint::JacobianDerivative(ndConstraintDescritor& desc)
+{
+	dAssert(0);
 }
 
 

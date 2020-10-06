@@ -27,14 +27,17 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-#define DEFAULT_SCENE	0		// using NewtonMesh tool
+//#define DEFAULT_SCENE	0		// setting basic rigid body
+#define DEFAULT_SCENE	1		// setting basic joints
 						 
 // demos forward declaration 
-void ndBasicSetup (ndDemoEntityManager* const scene);
+void ndBasicRigidBody (ndDemoEntityManager* const scene);
+void ndBasicJoints(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
-	{ "basic scene setup", ndBasicSetup },
+	{ "basic rigid body", ndBasicRigidBody },
+	{ "basic joints", ndBasicJoints },
 };
 
 ndDemoEntityManager::ButtonKey::ButtonKey (bool state)
@@ -207,7 +210,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 //	m_showCenterOfMass = false;
 //	m_showNormalForces = true;
 //	m_showContactPoints = true;
-//	m_showJointDebugInfo = true;
+	m_showJointDebugInfo = true;
 //	m_collisionDisplayMode = 3;
 //	m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;

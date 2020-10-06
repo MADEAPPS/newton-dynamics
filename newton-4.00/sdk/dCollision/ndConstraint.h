@@ -264,8 +264,8 @@ class ndConstraint
 	virtual const dUnsigned32 GetRowsCount() const = 0;
 	virtual ndBodyKinematic* GetBody0() const { return nullptr; }
 	virtual ndBodyKinematic* GetBody1() const { return nullptr; }
-	virtual void JacobianDerivative(ndConstraintDescritor& params) = 0;
-	virtual void JointAccelerations(ndJointAccelerationDecriptor* const params) = 0;
+	virtual void JacobianDerivative(ndConstraintDescritor& desc) = 0;
+	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc) = 0;
 
 	void InitPointParam(dgPointParam& param, dFloat32 stiffness, const dVector& p0Global, const dVector& p1Global) const;
 

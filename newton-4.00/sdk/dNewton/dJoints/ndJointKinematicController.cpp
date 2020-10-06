@@ -231,7 +231,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 	for (dInt32 i = 0; i < 3; i++) 
 	{
 		const dInt32 index = desc.m_rowsCount;
-		AddLinearRowJacobian(desc, &matrix0.m_posit[0], &matrix0.m_posit[0], &matrix1[i][0]);
+		AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, matrix1[i]);
 		const ndJacobianPair& jacobianPair = desc.m_jacobian[index];
 	
 		const dVector pointPosit(
@@ -268,7 +268,7 @@ void ndJointKinematicController::JacobianDerivative(ndConstraintDescritor& desc)
 			for (dInt32 i = 0; i < 3; i++) 
 			{
 				const dInt32 index = desc.m_rowsCount;
-				AddAngularRowJacobian(desc, &matrix1[i][0], dFloat32 (0.0f));
+				AddAngularRowJacobian(desc, matrix1[i], dFloat32 (0.0f));
 				const ndJacobianPair& jacobianPair = desc.m_jacobian[index];
 				
 				const dVector pointOmega(omega0 * jacobianPair.m_jacobianM0.m_angular + omega1 * jacobianPair.m_jacobianM1.m_angular);

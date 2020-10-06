@@ -75,7 +75,7 @@ class ndJointKinematicController: public ndJointBilateralConstraint
 	void Init(const dMatrix& matrix);
 
 	D_NEWTON_API void CheckSleep() const;
-	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& params);
+	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
 	dFloat32 m_maxSpeed;
 	dFloat32 m_maxOmega;

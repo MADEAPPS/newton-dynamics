@@ -368,3 +368,16 @@ void ndJointBallAndSocket::SubmitConstraints(dFloat timestep, int threadIndex)
 	}
 }
 #endif
+
+void ndJointBallAndSocket::JacobianDerivative(ndConstraintDescritor& desc)
+{
+	dMatrix matrix0;
+	dMatrix matrix1;
+	CalculateGlobalMatrix(matrix0, matrix1);
+
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
+}
+
+

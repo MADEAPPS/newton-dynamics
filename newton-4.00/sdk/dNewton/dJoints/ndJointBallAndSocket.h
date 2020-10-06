@@ -23,6 +23,8 @@ class ndJointBallAndSocket: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointBallAndSocket(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointBallAndSocket();
 
+	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+
 #if 0
 	D_NEWTON_API ndJointBallAndSocket(const dMatrix& pinAndPivotFrame0, const dMatrix& pinAndPivotFrame1, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API void EnableTwist(bool state);
