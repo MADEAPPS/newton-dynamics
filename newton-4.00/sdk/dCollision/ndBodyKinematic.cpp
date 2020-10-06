@@ -113,12 +113,6 @@ ndBodyKinematic::~ndBodyKinematic()
 	dAssert(m_sceneNode == nullptr);
 }
 
-bool ndBodyKinematic::GetSleepState() const
-{
-	//return m_sleeping;
-	return m_equilibrium ? true : false;
-}
-
 void ndBodyKinematic::SetSleepState(bool state)
 {
 	//m_sleeping = state ? 1 : 0;
@@ -133,17 +127,6 @@ void ndBodyKinematic::SetSleepState(bool state)
 			contactJoint->m_positAcc = invalidateVeloc;
 		}
 	}
-}
-
-bool ndBodyKinematic::GetAutoSleep() const
-{
-	return m_autoSleep;
-}
-
-void ndBodyKinematic::SetAutoSleep(bool state)
-{
-	m_autoSleep = state ? 1 : 0;
-	SetSleepState(false);
 }
 
 void ndBodyKinematic::SetCollisionShape(const ndShapeInstance& shapeInstance)

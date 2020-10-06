@@ -112,7 +112,7 @@ class ndShapeConvex: public ndShape
 	dFloat32 m_simplexVolume;
 	dUnsigned16 m_edgeCount;
 	dUnsigned16 m_vertexCount;
-
+	friend class ndContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #endif 

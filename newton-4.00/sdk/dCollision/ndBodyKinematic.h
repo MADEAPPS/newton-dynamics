@@ -94,11 +94,14 @@ class ndBodyKinematic: public ndBody
 
 	dVector GetGyroAlpha() const;
 
-	D_COLLISION_API bool GetSleepState() const;
+	bool GetSleepState() const;
 	D_COLLISION_API void SetSleepState(bool state);
 
-	D_COLLISION_API bool GetAutoSleep() const;
-	D_COLLISION_API void SetAutoSleep(bool state);
+	bool GetAutoSleep() const;
+	void SetAutoSleep(bool state);
+
+	bool GetGyroMode() const;
+	void SetGyroMode(bool state);
 
 	D_COLLISION_API ndShapeInstance& GetCollisionShape();
 	D_COLLISION_API const ndShapeInstance& GetCollisionShape() const;
@@ -313,6 +316,32 @@ inline ndShapeInstance& ndBodyKinematic::GetCollisionShape()
 inline const ndShapeInstance& ndBodyKinematic::GetCollisionShape() const
 {
 	return m_shapeInstance;
+}
+
+inline bool ndBodyKinematic::GetAutoSleep() const
+{
+	return m_autoSleep;
+}
+
+inline bool ndBodyKinematic::GetSleepState() const
+{
+	return m_equilibrium ? true : false;
+}
+
+inline void ndBodyKinematic::SetAutoSleep(bool state)
+{
+	m_autoSleep = state ? 1 : 0;
+	SetSleepState(false);
+}
+
+inline bool ndBodyKinematic::GetGyroMode() const
+{
+	return m_gyroTorqueOn ? true : false;
+}
+
+inline void ndBodyKinematic::SetGyroMode(bool state)
+{
+	m_gyroTorqueOn = state ? 1 : 0;
 }
 
 

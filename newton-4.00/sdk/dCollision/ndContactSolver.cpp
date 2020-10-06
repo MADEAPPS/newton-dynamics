@@ -23,6 +23,8 @@
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndContact.h"
+#include "ndShape.h"
+#include "ndShapeConvex.h"
 #include "ndBodyKinematic.h"
 #include "ndContactSolver.h"
 
@@ -52,16 +54,24 @@ dInt32 ndContactSolver::m_rayCastSimplex[4][4] =
 	{ 1, 0, 3, 2 },
 };
 
-//ndContactSolver::ndContactSolver(ndShapeInstance* const instance)
-//	:dDownHeap<ndMinkFace*, dFloat32>(m_heapBuffer, sizeof (m_heapBuffer))
-//	,m_proxy (nullptr)
-//	,m_instance0(instance)
-//	,m_instance1(instance)
-//	,m_vertexIndex(0)
-//{
-//}
+ndContactSolver::ndContactSolver(ndShapeInstance* const instance)
+	:dDownHeap<ndMinkFace*, dFloat32>(m_heapBuffer, sizeof (m_heapBuffer))
+	,m_contact(nullptr)
+	,m_instance0(*instance)
+	,m_instance1(*instance)
+	,m_separatingVector(ndContact::m_initialSeparatingVector)
+	,m_contactBuffer(nullptr)
+	,m_timestep(dFloat32(1.0e10f))
+	,m_closestDistance(dFloat32(1.0e10f))
+	,m_separationDistance(dFloat32(0.0f))
+	,m_skinThickness(dFloat32(0.0f))
+	,m_maxCount(D_MAX_CONTATCS)
+	,m_vertexIndex(0)
+	,m_ccdMode(false)
+	,m_intersectionTestOnly(false)
+{
+}
 
-//ndContactSolver::ndContactSolver(dCollisionParamProxy* const proxy)
 ndContactSolver::ndContactSolver(ndContact* const contact)
 	:dDownHeap<ndMinkFace*, dFloat32>(m_heapBuffer, sizeof(m_heapBuffer))
 	,m_contact(contact)
@@ -508,156 +518,6 @@ bool ndContactSolver::SanityCheck() const
 	return true;
 }
 
-dFloat32 ndContactSolver::RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, ndContactPoint& contactOut)
-{
-	dAssert(0);
-	return 0;
-#if 0
-	dVector normal(dFloat32 (0.0f));
-	dVector point (localP0);
-	dVector point0 (localP0);
-	dVector p0p1 (localP0 - localP1);
-
-	// avoid NaN as a result of a division by zero
-	if ((p0p1.TestZero().GetSignMask() & 7) == 7) {
-		return dFloat32(1.2f);
-	}
-
-	dFloat32 param = dFloat32 (0.0f);
-
-	dInt32 index = 0;
-	memset (m_hullSum, 0, 4 * sizeof (m_hullSum[0]));
-	const dgCollisionConvex* const collision = (dgCollisionConvex*)m_instance0->GetChildShape();
-
-	dVector dir1 (p0p1.Normalize());
-	m_hullDiff[0] = collision->SupportVertex (dir1, nullptr) - point;
-	dBigVector v (m_hullDiff[0]);
-	index = 1;
-	do {
-		dInt32 iter = 0;
-		dInt32 cycling = 0;
-		dFloat64 minDist = dFloat32 (1.0e20f);
-
-		do {
-			dAssert (v.m_w == dFloat32 (0.0f));
-			const dFloat64 distance = v.DotProduct(v).GetScalar();
-			if (distance < dFloat32 (1.0e-9f)) {
-				index = -1; 
-				break;
-			}
-
-			if (distance < minDist) {
-				minDist = distance;
-				cycling = -1;
-			}
-			cycling ++;
-			if (cycling > 4) {
-				//dAssert (0);
-				index = -1; 
-				break;
-			}
-
-			dVector dir (v.Scale (-dRsqrt(dFloat32 (distance))));
-			dAssert (dir.m_w == dFloat32 (0.0f));
-			m_hullDiff[index] = collision->SupportVertex (dir, nullptr) - point;
-			const dBigVector w (m_hullDiff[index]);
-			const dVector wv (w - v);
-			dAssert (wv.m_w == dFloat32 (0.0f));
-			const dFloat32 distance1 = dir.DotProduct(wv).GetScalar();
-			if (distance1 < dFloat64 (1.0e-3f)) {
-				normal = dir;
-				break;
-			}
-
-			index ++;
-			switch (index) 
-			{
-				case 2:
-				{
-					v = ReduceLine (index);
-					break;
-				}
-
-				case 3:
-				{
-					v = ReduceTriangle (index);
-					break;
-				}
-
-				case 4:
-				{
-					v = ReduceTetrahedrum (index);
-					break;
-				}
-			}
-
-			iter ++;
-		} while (iter < D_CONNICS_CONTATS_ITERATIONS); 
-
-		dAssert (index);
-		if (index > 0) {
-			dVector q (v + point);
-			dFloat32 den = normal.DotProduct(p0p1).GetScalar();
-			if (dAbs (den) < dFloat32(1.0e-12f))  {
-				den = dSign(den) * dFloat32(1.0e-12f);
-			}
-			dAssert (normal.m_w == dFloat32 (0.0f));
-			dFloat32 t1 = normal.DotProduct(localP0 - q).GetScalar() / den;
-
-			if (t1 < param) {
-				index = -1;
-				t1 = dFloat32 (0.0f);
-			} else if (t1 > maxT) {
-				index = -1;
-				t1 = dFloat32 (1.0f);
-			}
-			param = t1;
-	
-			point = localP0 - p0p1.Scale (param);
-			dVector step (point0 - point);
-			point0 = point;
-			for(dInt32 i = 0; i < index; i ++) {
-				m_hullDiff[i] += step;
-			}
-
-			switch (index) 
-			{
-				case 1:
-				{
-					v = m_hullDiff[0];
-					break;
-				}
-
-				case 2:
-				{
-					v = ReduceLine (index);
-					break;
-				}
-
-				case 3:
-				{
-					v = ReduceTriangle (index);
-					break;
-				}
-
-				case 4:
-				{
-					v = ReduceTetrahedrum (index);
-					break;
-				}
-			}
-		}
-	} while (index >= 0);
-
-	if ((param > dFloat32 (0.0f)) && (param < maxT)) {
-		contactOut.m_normal = normal;
-	} else {
-		param = dFloat32 (1.2f);
-	}
-
-	return param;
-#endif
-}
 
 D_INLINE void ndContactSolver::TranslateSimplex(const dVector& step)
 {
@@ -767,8 +627,8 @@ dInt32 ndContactSolver::CalculateConvexToConvexContacts()
 	//
 	//dgCollisionInstance* const collision0 = proxy.m_instance0;
 	//dgCollisionInstance* const collision1 = proxy.m_instance1;
-	//dAssert(collision0->IsType(dgCollision::dgCollisionConvexShape_RTTI));
-	//dAssert(collision1->IsType(dgCollision::dgCollisionConvexShape_RTTI));
+	//dAssert(collision0->IsType(dgCollision::ndShapeConvexShape_RTTI));
+	//dAssert(collision1->IsType(dgCollision::ndShapeConvexShape_RTTI));
 	//contactJoint->m_closestDistance = dFloat32(1.0e10f);
 	//contactJoint->m_separationDistance = dFloat32(0.0f);
 	
@@ -824,8 +684,8 @@ dInt32 ndContactSolver::ConvexContacts()
 	else 
 	{
 		dAssert(0);
-		//dAssert(constraint->m_body0->m_collision->IsType(dgCollision::dgCollisionConvexShape_RTTI));
-		//dAssert(convexBody->m_collision->IsType(dgCollision::dgCollisionConvexShape_RTTI));
+		//dAssert(constraint->m_body0->m_collision->IsType(dgCollision::ndShapeConvexShape_RTTI));
+		//dAssert(convexBody->m_collision->IsType(dgCollision::ndShapeConvexShape_RTTI));
 		//pair->m_contactCount = CalculateConvexToNonConvexContacts(proxy);
 		return 0;
 	}
@@ -868,11 +728,11 @@ dInt32 ndContactSolver::CalculatePairContacts(dInt32 threadIndex)
 	//	pair->m_flipContacts = -1;
 	//	CompoundContacts(pair, proxy);
 	//}
-	//else if (body0->m_collision->IsType(dgCollision::dgCollisionConvexShape_RTTI)) 
+	//else if (body0->m_collision->IsType(dgCollision::ndShapeConvexShape_RTTI)) 
 	//{
 	//	ConvexContacts(pair, proxy);
 	//}
-	//else if (body1->m_collision->IsType(dgCollision::dgCollisionConvexShape_RTTI)) 
+	//else if (body1->m_collision->IsType(dgCollision::ndShapeConvexShape_RTTI)) 
 	//{
 	//	contact->SwapBodies();
 	//	pair->m_flipContacts = -1;
@@ -1948,4 +1808,167 @@ dInt32 ndContactSolver::PruneContacts(dInt32 count, dInt32 maxCount) const
 		return 2;
 	}
 	return 1;
+}
+
+
+dFloat32 ndContactSolver::RayCast(const dVector& localP0, const dVector& localP1, dFloat32 maxT, ndContactPoint& contactOut)
+{
+	dVector point(localP0);
+	dVector point0(localP0);
+	dVector normal(dVector::m_zero);
+	dVector p0p1(localP0 - localP1);
+
+	// avoid NaN as a result of a division by zero
+	if ((p0p1.TestZero().GetSignMask() & 7) == 7) 
+	{
+		return dFloat32(1.2f);
+	}
+
+	dFloat32 param = dFloat32(0.0f);
+
+	dInt32 index = 0;
+	memset(m_hullSum, 0, 4 * sizeof(m_hullSum[0]));
+	const ndShapeConvex* const shape = m_instance0.GetShape()->GetAsShapeConvex();
+
+	dVector dir1(p0p1.Normalize());
+	m_hullDiff[0] = shape->SupportVertex(dir1, nullptr) - point;
+	dBigVector v(m_hullDiff[0]);
+	index = 1;
+	do 
+	{
+		dInt32 iter = 0;
+		dInt32 cycling = 0;
+		dFloat64 minDist = dFloat32(1.0e20f);
+
+		do 
+		{
+			dAssert(v.m_w == dFloat32(0.0f));
+			const dFloat64 distance = v.DotProduct(v).GetScalar();
+			if (distance < dFloat32(1.0e-9f)) 
+			{
+				index = -1;
+				break;
+			}
+
+			if (distance < minDist) 
+			{
+				minDist = distance;
+				cycling = -1;
+			}
+			cycling++;
+			if (cycling > 4) 
+			{
+				//dAssert (0);
+				index = -1;
+				break;
+			}
+
+			dVector dir(v.Scale(-dRsqrt(dFloat32(distance))));
+			dAssert(dir.m_w == dFloat32(0.0f));
+			m_hullDiff[index] = shape->SupportVertex(dir, nullptr) - point;
+			const dBigVector w(m_hullDiff[index]);
+			const dVector wv(w - v);
+			dAssert(wv.m_w == dFloat32(0.0f));
+			const dFloat32 distance1 = dir.DotProduct(wv).GetScalar();
+			if (distance1 < dFloat64(1.0e-3f)) 
+			{
+				normal = dir;
+				break;
+			}
+
+			index++;
+			switch (index)
+			{
+				case 2:
+				{
+					v = ReduceLine(index);
+					break;
+				}
+
+				case 3:
+				{
+					v = ReduceTriangle(index);
+					break;
+				}
+
+				case 4:
+				{
+					v = ReduceTetrahedrum(index);
+					break;
+				}
+			}
+
+			iter++;
+		} while (iter < D_CONNICS_CONTATS_ITERATIONS);
+
+		dAssert(index);
+		if (index > 0) 
+		{
+			dVector q(v + point);
+			dFloat32 den = normal.DotProduct(p0p1).GetScalar();
+			if (dAbs(den) < dFloat32(1.0e-12f)) 
+			{
+				den = dSign(den) * dFloat32(1.0e-12f);
+			}
+			dAssert(normal.m_w == dFloat32(0.0f));
+			dFloat32 t1 = normal.DotProduct(localP0 - q).GetScalar() / den;
+
+			if (t1 < param) 
+			{
+				index = -1;
+				t1 = dFloat32(0.0f);
+			}
+			else if (t1 > maxT) 
+			{
+				index = -1;
+				t1 = dFloat32(1.0f);
+			}
+			param = t1;
+
+			point = localP0 - p0p1.Scale(param);
+			dVector step(point0 - point);
+			point0 = point;
+			for (dInt32 i = 0; i < index; i++) 
+			{
+				m_hullDiff[i] += step;
+			}
+
+			switch (index)
+			{
+				case 1:
+				{
+					v = m_hullDiff[0];
+					break;
+				}
+
+				case 2:
+				{
+					v = ReduceLine(index);
+					break;
+				}
+
+				case 3:
+				{
+					v = ReduceTriangle(index);
+					break;
+				}
+
+				case 4:
+				{
+					v = ReduceTetrahedrum(index);
+					break;
+				}
+			}
+		}
+	} while (index >= 0);
+
+	if ((param > dFloat32(0.0f)) && (param < maxT)) 
+	{
+		contactOut.m_normal = normal;
+	}
+	else 
+	{
+		param = dFloat32(1.2f);
+	}
+	return param;
 }

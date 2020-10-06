@@ -50,7 +50,8 @@ static void BuildSphere(ndDemoEntityManager* const scene,
 	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
 {
 	//dMatrix matrix(dGetIdentityMatrix());
-	dMatrix matrix(dYawMatrix(90.0f * dDegreeToRad) * dPitchMatrix(-45.0f * dDegreeToRad));
+	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
+	//dMatrix matrix(dYawMatrix(90.0f * dDegreeToRad) * dPitchMatrix(-45.0f * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -61,7 +62,6 @@ static void BuildSphere(ndDemoEntityManager* const scene,
 
 	//matrix.m_posit.m_y += xxxx;
 matrix.m_posit.m_y += 7.0f;
-	
 
 	for (dInt32 i = 0; i < count; i++)
 	{
@@ -73,11 +73,13 @@ matrix.m_posit.m_y += 7.0f;
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(sphereShape);
 		body->SetMassMatrix(mass, sphereShape);
+		body->SetGyroMode(true);
 
 		world->AddBody(body);
 		scene->AddEntity(entity);
 
-		matrix.m_posit.m_y += diameter * 0.99f;
+		//matrix.m_posit.m_y += diameter * 0.99f;
+		matrix.m_posit.m_y += diameter * 0.99f * 3.0f;
 	}
 }
 
@@ -93,8 +95,8 @@ static void BuildSphereStacks(ndDemoEntityManager* const scene, const dVector& o
 	//dVector maxP(0.0f);
 	//sphere.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
 
-	const int n = 1;
-	const int stackHigh = 1;
+	const int n = 10;
+	const int stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)
@@ -123,6 +125,6 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
-	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

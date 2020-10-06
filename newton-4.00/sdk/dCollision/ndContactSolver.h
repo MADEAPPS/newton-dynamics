@@ -59,11 +59,11 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 {
 	public: 
 	ndContactSolver(ndContact* const contact);
+	ndContactSolver(ndShapeInstance* const instance);
+
 	//ndContactSolver(const ndShapeInstance& instance0, const ndShapeInstance& instance1);
 	//ndContactSolver(dCollisionParamProxy* const proxy);
-	//ndContactSolver(ndShapeInstance* const instance0);
 	//dInt32 CalculateConvexCastContacts();
-	//dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, ndContactPoint& contactOut);
 	//const dVector& GetNormal() const {return m_normal;}
 	//const dVector& GetPoint0() const {return m_closestPoint0;}
 	//const dVector& GetPoint1() const {return m_closestPoint1;}
@@ -73,6 +73,8 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 ConvexContacts();
 	dInt32 CalculateConvexToConvexContacts();
 	dInt32 CalculatePairContacts(dInt32 threadIndex);
+
+	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, ndContactPoint& contactOut);
 	
 	private:
 	class dgPerimenterEdge

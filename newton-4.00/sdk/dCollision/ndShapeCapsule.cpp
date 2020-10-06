@@ -344,7 +344,6 @@ void ndShapeCapsule::TesselateTriangle(dInt32 level, const dVector& p0, const dV
 	}
 }
 
-//void ndShapeCapsule::DebugCollision(const dMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 void ndShapeCapsule::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 {
 	if (m_radio0 == m_radio1) 
@@ -499,7 +498,6 @@ dVector ndShapeCapsule::SupportVertexSpecial(const dVector& direction, dFloat32 
 }
 
 dFloat32 ndShapeCapsule::RayCast(ndRayCastNotify& callback, const dVector& r0, const dVector& r1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
-//dFloat32 ndShapeCapsule::RayCast(const dVector& r0, const dVector& r1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
 {
 	dVector q0(r0 * m_transform);
 	dVector q1(r1 * m_transform);
@@ -554,7 +552,6 @@ dFloat32 ndShapeCapsule::RayCast(ndRayCastNotify& callback, const dVector& r0, c
 		}
 	}
 
-	//dFloat32 ret = ndShapeConvex::RayCast(q0, q1, maxT, contactOut, body, NULL, NULL);
 	dFloat32 ret = ndShapeConvex::RayCast(callback, q0, q1, maxT, body, contactOut);
 	if (ret <= dFloat32(1.0f)) 
 	{

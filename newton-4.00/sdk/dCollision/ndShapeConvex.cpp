@@ -24,6 +24,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndContact.h"
 #include "ndShapeNull.h"
+#include "ndShapeConvex.h"
 #include "ndContactSolver.h"
 #include "ndBodyKinematic.h"
 
@@ -574,13 +575,9 @@ void ndShapeConvex::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) co
 
 dFloat32 ndShapeConvex::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {
-	dAssert(0);
-	return 0;
-	//ndBodyKinematic* const kinBody = ((ndBodyKinematic*)body)->GetAsBodyKinematic();
-	//ndShapeInstance instance(kinBody->GetCollisionShape());
-	//ndContactSolver rayCaster(&instance);
-	//instance.m_material.m_userData = nullptr;
-	//return rayCaster.RayCast(localP0, localP1, maxT, contactOut);
+	ndBodyKinematic* const kinBody = ((ndBodyKinematic*)body)->GetAsBodyKinematic();
+	ndContactSolver rayCaster(&kinBody->GetCollisionShape());
+	return rayCaster.RayCast(localP0, localP1, maxT, contactOut);
 }
 
 dVector ndShapeConvex::SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
