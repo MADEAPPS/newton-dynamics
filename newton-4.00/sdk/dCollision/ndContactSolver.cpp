@@ -91,401 +91,6 @@ ndContactSolver::ndContactSolver(ndContact* const contact)
 }
 
 #if 0
-D_INLINE ntMinkFace* ntContactSolver::NewFace()
-{
-	ntMinkFace* face = (ntMinkFace*)m_freeFace;
-	if (m_freeFace) {
-		m_freeFace = m_freeFace->m_next;
-	} else {
-		face = &m_facePool[m_faceIndex];
-		m_faceIndex++;
-		if (m_faceIndex >= D_CONVEX_MINK_MAX_FACES) {
-			return nullptr;
-		}
-	}
-
-#ifdef _DEBUG
-	memset(face, 0, sizeof (ntMinkFace));
-#endif
-	return face;
-}
-
-D_INLINE ndMinkFace* ndContactSolver::AddFace(dInt32 v0, dInt32 v1, dInt32 v2)
-{
-	ndMinkFace* const face = NewFace();
-	face->m_mark = 0;
-	face->m_vertex[0] = dInt16(v0);
-	face->m_vertex[1] = dInt16(v1);
-	face->m_vertex[2] = dInt16(v2);
-	return face;
-}
-
-D_INLINE void ndContactSolver::DeleteFace(ndMinkFace* const face)
-{
-	dgFaceFreeList* const freeFace = (dgFaceFreeList*)face;
-	freeFace->m_next = m_freeFace;
-	m_freeFace = freeFace;
-}
-
-
-D_INLINE void ndContactSolver::PushFace(ndMinkFace* const face)
-{
-	dInt32 i0 = face->m_vertex[0];
-	dInt32 i1 = face->m_vertex[1];
-	dInt32 i2 = face->m_vertex[2];
-
-	dPlane plane(m_hullDiff[i0], m_hullDiff[i1], m_hullDiff[i2]);
-	dFloat32 mag2 = plane.DotProduct(plane & dVector::m_triplexMask).GetScalar();
-	face->m_alive = 1;
-	if (mag2 > dFloat32(1.0e-16f)) {
-		face->m_plane = plane.Scale(dRsqrt(mag2));
-		ndMinkFace* face1 = face;
-		Push(face1, face->m_plane.m_w);
-	} else {
-		face->m_plane = dPlane(dVector::m_zero);
-	}
-}
-
-dInt32 ndContactSolver::CalculateIntersectingPlane(dInt32 count)
-{
-	dAssert(0);
-	return 0;
-#if 0
-	dAssert(count >= 1);
-	if (count == 1) {
-		SupportVertex(m_proxy->m_contactJoint->m_separtingVector.Scale(dFloat32(-1.0f)), 1);
-		dVector err(m_hullDiff[1] - m_hullDiff[0]);
-		dAssert (err.m_w == dFloat32 (0.0f));
-		if (err.DotProduct(err).GetScalar() < dFloat32(1.0e-8f)) {
-			return -1;
-		}
-		count = 2;
-	}
-	
-	if (count == 2) {
-		dVector e0(m_hullDiff[1] - m_hullDiff[0]);
-		dAssert (e0.m_w == dFloat32 (0.0f));
-		dAssert(e0.DotProduct(e0).GetScalar() > dFloat32(0.0f));
-		dMatrix matrix(e0.Scale(dRsqrt(e0.DotProduct(e0).GetScalar())));
-		dMatrix rotation(dPitchMatrix(dFloat32(45.0f * dDegreeToRad)));
-		dFloat32 maxArea = dFloat32(0.0f);
-		for (dInt32 i = 0; i < 8; i++) {
-			SupportVertex(matrix[1], 3);
-			dVector e1(m_hullDiff[3] - m_hullDiff[0]);
-			dAssert (e1.m_w == dFloat32 (0.0f));
-			dVector area(e0.CrossProduct(e1));
-			dFloat32 area2 = area.DotProduct(area).GetScalar();
-			if (area2 > maxArea) {
-				m_hullSum[2] = m_hullSum[3];
-				m_hullDiff[2] = m_hullDiff[3];
-				maxArea = area2;
-			}
-			matrix = rotation * matrix;
-		}
-		if (dAbs (maxArea) < dFloat32(1e-15f)) {
-			return -1;
-		}
-		dAssert(maxArea > dFloat32(0.0f));
-		count++;
-	}
-
-	dFloat32 volume = dFloat32(0.0f);
-	if (count == 3) {
-		dVector e10(m_hullDiff[1] - m_hullDiff[0]);
-		dVector e20(m_hullDiff[2] - m_hullDiff[0]);
-		dVector normal(e10.CrossProduct(e20));
-		dAssert (normal.m_w == dFloat32 (0.0f));
-		dFloat32 mag2 = normal.DotProduct(normal).GetScalar();
-		dAssert(mag2 > dFloat32(0.0f));
-		normal = normal.Scale(dRsqrt(mag2));
-		SupportVertex(normal, 3);
-		volume = normal.DotProduct(m_hullDiff[3] - m_hullDiff[0]).GetScalar();
-		if (dAbs(volume) < dFloat32(1.0e-10f)) {
-			normal = normal.Scale(dFloat32(-1.0f));
-			SupportVertex(normal, 3);
-			volume = - normal.DotProduct(m_hullDiff[3] - m_hullDiff[0]).GetScalar();
-			if (dAbs(volume) < dFloat32(1.0e-10f)) {
-				volume = dFloat32(0.0f);
-			}
-		}
-		count = 4;
-	} else if (count == 4) {
-		dVector e0(m_hullDiff[1] - m_hullDiff[0]);
-		dVector e1(m_hullDiff[2] - m_hullDiff[0]);
-		dVector e2(m_hullDiff[3] - m_hullDiff[0]);
-		dVector n(e1.CrossProduct(e2));
-		dAssert (n.m_w == dFloat32 (0.0f));
-		volume = e0.DotProduct(n).GetScalar();
-	}
-
-
-	dAssert(count == 4);
-	if (volume > dFloat32(0.0f)) {
-		dSwap(m_hullSum[1], m_hullSum[0]);
-		dSwap(m_hullDiff[1], m_hullDiff[0]);
-	}
-
-	if (dAbs(volume) < dFloat32(1e-15f)) {
-
-		// this volume is unrealizable, let us build  a different tetrahedron using the method of core 200
-		dVector e1;
-		dVector e2;
-		dVector e3;
-		dVector normal(dFloat32(0.0f));
-
-		const dInt32 nCount = dInt32(sizeof(m_hullDirs) / sizeof(m_hullDirs[0]));
-		const dFloat32 D_CALCULATE_SEPARATING_PLANE_ERROR = dFloat32(1.0f / 1024.0f);
-
-		dFloat32 error2 = dFloat32(0.0f);
-		SupportVertex(m_hullDirs[0], 0);
-
-		dInt32 i = 1;
-		for (; i < nCount; i++) {
-			SupportVertex(m_hullDirs[i], 1);
-			e1 = m_hullDiff[1] - m_hullDiff[0];
-			dAssert (e1.m_w == dFloat32 (0.0f));
-			error2 = e1.DotProduct(e1).GetScalar();
-			if (error2 > D_CALCULATE_SEPARATING_PLANE_ERROR) {
-				break;
-			}
-		}
-
-		for (i++; i < nCount; i++) {
-			SupportVertex(m_hullDirs[i], 2);
-			e2 = m_hullDiff[2] - m_hullDiff[0];
-			normal = e1.CrossProduct(e2);
-			dAssert (normal.m_w == dFloat32 (0.0f));
-			error2 = normal.DotProduct(normal).GetScalar();
-			if (error2 > D_CALCULATE_SEPARATING_PLANE_ERROR) {
-				break;
-			}
-		}
-
-		error2 = dFloat32(0.0f);
-		for (i++; i < nCount; i++) {
-			SupportVertex(m_hullDirs[i], 3);
-			e3 = m_hullDiff[3] - m_hullDiff[0];
-			dAssert (normal.m_w == dFloat32 (0.0f));
-			error2 = normal.DotProduct(e3).GetScalar();
-			if (dAbs(error2) > D_CALCULATE_SEPARATING_PLANE_ERROR) {
-				break;
-			}
-		}
-
-		if (i >= nCount) {
-//			dAssert(0);
-			return -1;
-		}
-
-		if (error2 > dFloat32(0.0f)) {
-			dSwap(m_hullSum[1], m_hullSum[2]);
-			dSwap(m_hullDiff[1], m_hullDiff[2]);
-		}
-
-#ifdef _DEBUG
-		{
-			dVector f0(m_hullDiff[1] - m_hullDiff[0]);
-			dVector f1(m_hullDiff[2] - m_hullDiff[0]);
-			dVector f2(m_hullDiff[3] - m_hullDiff[0]);
-			dVector n(f1.CrossProduct(f2));
-			dAssert (n.m_w == dFloat32 (0.0f));
-			dFloat32 volume1 = f0.DotProduct(n).GetScalar();
-			dAssert(volume1 < dFloat32(0.0f));
-		}
-#endif
-	}
-
-	// clear the face cache!!
-	Flush();
-	m_faceIndex = 0;
-	m_vertexIndex = 4;
-	m_freeFace = nullptr;
-
-	ndMinkFace* const f0 = AddFace(0, 1, 2);
-	ndMinkFace* const f1 = AddFace(0, 2, 3);
-	ndMinkFace* const f2 = AddFace(2, 1, 3);
-	ndMinkFace* const f3 = AddFace(1, 0, 3);
-
-	f0->m_twin[0] = f3;
-	f0->m_twin[1] = f2;
-	f0->m_twin[2] = f1;
-
-	f1->m_twin[0] = f0;
-	f1->m_twin[1] = f2;
-	f1->m_twin[2] = f3;
-
-	f2->m_twin[0] = f0;
-	f2->m_twin[1] = f3;
-	f2->m_twin[2] = f1;
-
-	f3->m_twin[0] = f0;
-	f3->m_twin[1] = f1;
-	f3->m_twin[2] = f2;
-
-	PushFace(f0);
-	PushFace(f1);
-	PushFace(f2);
-	PushFace(f3);
-
-	dInt32 cycling = 0;
-	dInt32 iterCount = 0;
-	dFloat32 cyclingMem[4];
-	cyclingMem[0] = dFloat32(1.0e10f);
-	cyclingMem[1] = dFloat32(1.0e10f);
-	cyclingMem[2] = dFloat32(1.0e10f);
-	cyclingMem[3] = dFloat32(1.0e10f);
-
-	const dFloat32 resolutionScale = dFloat32(0.125f);
-	const dFloat32 minTolerance = D_PENETRATION_TOL;
-
-	while (GetCount()) {
-		ndMinkFace* const faceNode = (*this)[0];
-		Pop();
-
-		if (faceNode->m_alive) {
-			SupportVertex(faceNode->m_plane & dVector::m_triplexMask, m_vertexIndex);
-			const dVector& p = m_hullDiff[m_vertexIndex];
-			dFloat32 dist = faceNode->m_plane.Evalue(p);
-			dFloat32 distTolerance = dMax(dAbs(faceNode->m_plane.m_w) * resolutionScale, minTolerance);
-
-			if (dist < distTolerance) {
-				dVector sum[3];
-				dVector diff[3];
-				m_normal = faceNode->m_plane & dVector::m_triplexMask;
-				for (dInt32 i = 0; i < 3; i++) {
-					dInt32 j = faceNode->m_vertex[i];
-					sum[i] = m_hullSum[j];
-					diff[i] = m_hullDiff[j];
-				}
-				for (dInt32 i = 0; i < 3; i++) {
-					m_hullSum[i] = sum[i];
-					m_hullDiff[i] = diff[i];
-				}
-				return 3;
-			}
-
-			iterCount++;
-			bool isCycling = false;
-			cyclingMem[cycling] = dist;
-			if (iterCount > 10) {
-				dInt32 cyclingIndex = cycling;
-				for (dInt32 i = 0; i < 3; i++) {
-					dInt32 cyclingIndex0 = (cyclingIndex - 1) & 3;
-					if (((cyclingMem[cyclingIndex0] - cyclingMem[cyclingIndex]) < dFloat32(-1.0e-5f))) {
-						isCycling = true;
-						cyclingMem[0] = dFloat32(1.0e10f);
-						cyclingMem[1] = dFloat32(1.0e10f);
-						cyclingMem[2] = dFloat32(1.0e10f);
-						cyclingMem[3] = dFloat32(1.0e10f);
-						break;
-					}
-					cyclingIndex = cyclingIndex0;
-				}
-			}
-			cycling = (cycling + 1) & 3;
-
-			if (!isCycling) {
-				m_faceStack[0] = faceNode;
-				dInt32 stackIndex = 1;
-				dInt32 deletedCount = 0;
-
-				while (stackIndex) {
-					stackIndex--;
-					ndMinkFace* const face = m_faceStack[stackIndex];
-
-					if (!face->m_mark && (face->m_plane.Evalue(p) > dFloat32(0.0f))) {
-#ifdef _DEBUG
-						for (dInt32 i = 0; i < deletedCount; i++) {
-							dAssert(m_deletedFaceList[i] != face);
-						}
-#endif
-
-						m_deletedFaceList[deletedCount] = face;
-						deletedCount++;
-						dAssert(deletedCount < sizeof (m_deletedFaceList) / sizeof (m_deletedFaceList[0]));
-						face->m_mark = 1;
-
-						for (dInt32 i = 0; i < 3; i++) {
-							ndMinkFace* const twinFace = face->m_twin[i];
-							if (twinFace && !twinFace->m_mark) {
-								m_faceStack[stackIndex] = twinFace;
-								stackIndex++;
-								dAssert(stackIndex < sizeof (m_faceStack) / sizeof (m_faceStack[0]));
-							}
-						}
-					}
-				}
-
-				//dAssert (SanityCheck());
-				dInt32 newCount = 0;
-				for (dInt32 i = 0; i < deletedCount; i++) {
-					ndMinkFace* const face = m_deletedFaceList[i];
-					face->m_alive = 0;
-					dAssert(face->m_mark == 1);
-					dInt32 j0 = 2;
-					for (dInt32 j1 = 0; j1 < 3; j1++) {
-						ndMinkFace* const twinFace = face->m_twin[j0];
-						if (twinFace && !twinFace->m_mark) {
-							//dMinkFace* const newFace = AddFace(m_vertexIndex, face->m_vertex[j0], face->m_vertex[j1]);
-							ndMinkFace* const newFace = NewFace();
-							if (newFace) {
-								newFace->m_mark = 0;
-								newFace->m_vertex[0] = dInt16(m_vertexIndex);
-								newFace->m_vertex[1] = dInt16(face->m_vertex[j0]);
-								newFace->m_vertex[2] = dInt16(face->m_vertex[j1]);
-								PushFace(newFace);
-
-								newFace->m_twin[1] = twinFace;
-								dInt32 index = (twinFace->m_twin[0] == face) ? 0 : ((twinFace->m_twin[1] == face) ? 1 : 2);
-								twinFace->m_twin[index] = newFace;
-
-								m_coneFaceList[newCount] = newFace;
-								newCount++;
-								dAssert(newCount < sizeof(m_coneFaceList) / sizeof(m_coneFaceList[0]));
-							} else {
-								// this is very rare but is does happend with some degenerated faces.
-								return -1;
-							}
-						}
-						j0 = j1;
-					}
-				}
-
-				dInt32 i0 = newCount - 1;
-				for (dInt32 i1 = 0; i1 < newCount; i1++) {
-					ndMinkFace* const faceA = m_coneFaceList[i0];
-					dAssert(faceA->m_mark == 0);
-
-					dInt32 j0 = newCount - 1;
-					for (dInt32 j1 = 0; j1 < newCount; j1++) {
-						if (i0 != j0) {
-							ndMinkFace* const faceB = m_coneFaceList[j0];
-							dAssert(faceB->m_mark == 0);
-							if (faceA->m_vertex[2] == faceB->m_vertex[1]) {
-								faceA->m_twin[2] = faceB;
-								faceB->m_twin[0] = faceA;
-								break;
-							}
-						}
-						j0 = j1;
-					}
-					i0 = i1;
-				}
-
-				m_vertexIndex++;
-				dAssert(m_vertexIndex < sizeof (m_hullDiff) / sizeof (m_hullDiff[0]));
-
-				//dAssert(SanityCheck());
-			}
-		} else {
-			DeleteFace(faceNode);
-		}
-	}
-	
-	return -1;
-#endif
-}
-
 
 bool ndContactSolver::SanityCheck() const
 {
@@ -1274,8 +879,7 @@ bool ndContactSolver::CalculateClosestPoints()
 	dInt32 simplexPointCount = CalculateClosestSimplex();
 	if (simplexPointCount < 0)
 	{
-		dAssert(0);
-		//	simplexPointCount = CalculateIntersectingPlane(-simplexPointCount);
+		simplexPointCount = CalculateIntersectingPlane(-simplexPointCount);
 	}
 
 	if (simplexPointCount > 0)
@@ -1971,4 +1575,441 @@ dFloat32 ndContactSolver::RayCast(const dVector& localP0, const dVector& localP1
 		param = dFloat32(1.2f);
 	}
 	return param;
+}
+
+D_INLINE ndMinkFace* ndContactSolver::NewFace()
+{
+	ndMinkFace* face = (ndMinkFace*)m_freeFace;
+	if (m_freeFace) 
+	{
+		m_freeFace = m_freeFace->m_next;
+	}
+	else 
+	{
+		face = &m_facePool[m_faceIndex];
+		m_faceIndex++;
+		if (m_faceIndex >= D_CONVEX_MINK_MAX_FACES) 
+		{
+			return nullptr;
+		}
+	}
+
+#ifdef _DEBUG
+	memset(face, 0, sizeof(ndMinkFace));
+#endif
+	return face;
+}
+
+D_INLINE ndMinkFace* ndContactSolver::AddFace(dInt32 v0, dInt32 v1, dInt32 v2)
+{
+	ndMinkFace* const face = NewFace();
+	face->m_mark = 0;
+	face->m_vertex[0] = dInt16(v0);
+	face->m_vertex[1] = dInt16(v1);
+	face->m_vertex[2] = dInt16(v2);
+	return face;
+}
+
+D_INLINE void ndContactSolver::PushFace(ndMinkFace* const face)
+{
+	dInt32 i0 = face->m_vertex[0];
+	dInt32 i1 = face->m_vertex[1];
+	dInt32 i2 = face->m_vertex[2];
+
+	dPlane plane(m_hullDiff[i0], m_hullDiff[i1], m_hullDiff[i2]);
+	dFloat32 mag2 = plane.DotProduct(plane & dVector::m_triplexMask).GetScalar();
+	face->m_alive = 1;
+	if (mag2 > dFloat32(1.0e-16f)) 
+	{
+		face->m_plane = plane.Scale(dRsqrt(mag2));
+		ndMinkFace* face1 = face;
+		Push(face1, face->m_plane.m_w);
+	}
+	else 
+	{
+		face->m_plane = dPlane(dVector::m_zero);
+	}
+}
+
+D_INLINE void ndContactSolver::DeleteFace(ndMinkFace* const face)
+{
+	dgFaceFreeList* const freeFace = (dgFaceFreeList*)face;
+	freeFace->m_next = m_freeFace;
+	m_freeFace = freeFace;
+}
+
+dInt32 ndContactSolver::CalculateIntersectingPlane(dInt32 count)
+{
+	dAssert(count >= 1);
+	if (count == 1) 
+	{
+		SupportVertex(m_contact->m_initialSeparatingVector.Scale(dFloat32(-1.0f)), 1);
+		dVector err(m_hullDiff[1] - m_hullDiff[0]);
+		dAssert(err.m_w == dFloat32(0.0f));
+		if (err.DotProduct(err).GetScalar() < dFloat32(1.0e-8f)) 
+		{
+			return -1;
+		}
+		count = 2;
+	}
+
+	if (count == 2) 
+	{
+		dVector e0(m_hullDiff[1] - m_hullDiff[0]);
+		dAssert(e0.m_w == dFloat32(0.0f));
+		dAssert(e0.DotProduct(e0).GetScalar() > dFloat32(0.0f));
+		dMatrix matrix(e0.Scale(dRsqrt(e0.DotProduct(e0).GetScalar())));
+		dMatrix rotation(dPitchMatrix(dFloat32(45.0f * dDegreeToRad)));
+		dFloat32 maxArea = dFloat32(0.0f);
+		for (dInt32 i = 0; i < 8; i++) 
+		{
+			SupportVertex(matrix[1], 3);
+			dVector e1(m_hullDiff[3] - m_hullDiff[0]);
+			dAssert(e1.m_w == dFloat32(0.0f));
+			dVector area(e0.CrossProduct(e1));
+			dFloat32 area2 = area.DotProduct(area).GetScalar();
+			if (area2 > maxArea) 
+			{
+				m_hullSum[2] = m_hullSum[3];
+				m_hullDiff[2] = m_hullDiff[3];
+				maxArea = area2;
+			}
+			matrix = rotation * matrix;
+		}
+		if (dAbs(maxArea) < dFloat32(1e-15f)) 
+		{
+			return -1;
+		}
+		dAssert(maxArea > dFloat32(0.0f));
+		count++;
+	}
+
+	dFloat32 volume = dFloat32(0.0f);
+	if (count == 3) 
+	{
+		dVector e10(m_hullDiff[1] - m_hullDiff[0]);
+		dVector e20(m_hullDiff[2] - m_hullDiff[0]);
+		dVector normal(e10.CrossProduct(e20));
+		dAssert(normal.m_w == dFloat32(0.0f));
+		dFloat32 mag2 = normal.DotProduct(normal).GetScalar();
+		dAssert(mag2 > dFloat32(0.0f));
+		normal = normal.Scale(dRsqrt(mag2));
+		SupportVertex(normal, 3);
+		volume = normal.DotProduct(m_hullDiff[3] - m_hullDiff[0]).GetScalar();
+		if (dAbs(volume) < dFloat32(1.0e-10f)) 
+		{
+			normal = normal.Scale(dFloat32(-1.0f));
+			SupportVertex(normal, 3);
+			volume = -normal.DotProduct(m_hullDiff[3] - m_hullDiff[0]).GetScalar();
+			if (dAbs(volume) < dFloat32(1.0e-10f)) 
+			{
+				volume = dFloat32(0.0f);
+			}
+		}
+		count = 4;
+	}
+	else if (count == 4) 
+	{
+		dVector e0(m_hullDiff[1] - m_hullDiff[0]);
+		dVector e1(m_hullDiff[2] - m_hullDiff[0]);
+		dVector e2(m_hullDiff[3] - m_hullDiff[0]);
+		dVector n(e1.CrossProduct(e2));
+		dAssert(n.m_w == dFloat32(0.0f));
+		volume = e0.DotProduct(n).GetScalar();
+	}
+
+	dAssert(count == 4);
+	if (volume > dFloat32(0.0f)) 
+	{
+		dSwap(m_hullSum[1], m_hullSum[0]);
+		dSwap(m_hullDiff[1], m_hullDiff[0]);
+	}
+
+	if (dAbs(volume) < dFloat32(1e-15f)) 
+	{
+		// this volume is unrealizable, let us build  a different tetrahedron using the method of core 200
+		dVector e1;
+		dVector e2;
+		dVector e3;
+		dVector normal(dFloat32(0.0f));
+
+		const dInt32 nCount = dInt32(sizeof(m_hullDirs) / sizeof(m_hullDirs[0]));
+		const dFloat32 D_CALCULATE_SEPARATING_PLANE_ERROR = dFloat32(1.0f / 1024.0f);
+
+		dFloat32 error2 = dFloat32(0.0f);
+		SupportVertex(m_hullDirs[0], 0);
+
+		dInt32 i = 1;
+		for (; i < nCount; i++) 
+		{
+			SupportVertex(m_hullDirs[i], 1);
+			e1 = m_hullDiff[1] - m_hullDiff[0];
+			dAssert(e1.m_w == dFloat32(0.0f));
+			error2 = e1.DotProduct(e1).GetScalar();
+			if (error2 > D_CALCULATE_SEPARATING_PLANE_ERROR) 
+			{
+				break;
+			}
+		}
+
+		for (i++; i < nCount; i++) 
+		{
+			SupportVertex(m_hullDirs[i], 2);
+			e2 = m_hullDiff[2] - m_hullDiff[0];
+			normal = e1.CrossProduct(e2);
+			dAssert(normal.m_w == dFloat32(0.0f));
+			error2 = normal.DotProduct(normal).GetScalar();
+			if (error2 > D_CALCULATE_SEPARATING_PLANE_ERROR) 
+			{
+				break;
+			}
+		}
+
+		error2 = dFloat32(0.0f);
+		for (i++; i < nCount; i++) 
+		{
+			SupportVertex(m_hullDirs[i], 3);
+			e3 = m_hullDiff[3] - m_hullDiff[0];
+			dAssert(normal.m_w == dFloat32(0.0f));
+			error2 = normal.DotProduct(e3).GetScalar();
+			if (dAbs(error2) > D_CALCULATE_SEPARATING_PLANE_ERROR) 
+			{
+				break;
+			}
+		}
+
+		if (i >= nCount) 
+		{
+			return -1;
+		}
+
+		if (error2 > dFloat32(0.0f)) 
+		{
+			dSwap(m_hullSum[1], m_hullSum[2]);
+			dSwap(m_hullDiff[1], m_hullDiff[2]);
+		}
+
+		#ifdef _DEBUG
+		{
+			dVector f0(m_hullDiff[1] - m_hullDiff[0]);
+			dVector f1(m_hullDiff[2] - m_hullDiff[0]);
+			dVector f2(m_hullDiff[3] - m_hullDiff[0]);
+			dVector n(f1.CrossProduct(f2));
+			dAssert(n.m_w == dFloat32(0.0f));
+			dFloat32 volume1 = f0.DotProduct(n).GetScalar();
+			dAssert(volume1 < dFloat32(0.0f));
+		}
+		#endif
+	}
+
+	// clear the face cache!!
+	Flush();
+	m_faceIndex = 0;
+	m_vertexIndex = 4;
+	m_freeFace = nullptr;
+
+	ndMinkFace* const f0 = AddFace(0, 1, 2);
+	ndMinkFace* const f1 = AddFace(0, 2, 3);
+	ndMinkFace* const f2 = AddFace(2, 1, 3);
+	ndMinkFace* const f3 = AddFace(1, 0, 3);
+
+	f0->m_twin[0] = f3;
+	f0->m_twin[1] = f2;
+	f0->m_twin[2] = f1;
+
+	f1->m_twin[0] = f0;
+	f1->m_twin[1] = f2;
+	f1->m_twin[2] = f3;
+
+	f2->m_twin[0] = f0;
+	f2->m_twin[1] = f3;
+	f2->m_twin[2] = f1;
+
+	f3->m_twin[0] = f0;
+	f3->m_twin[1] = f1;
+	f3->m_twin[2] = f2;
+
+	PushFace(f0);
+	PushFace(f1);
+	PushFace(f2);
+	PushFace(f3);
+
+	dInt32 cycling = 0;
+	dInt32 iterCount = 0;
+	dFloat32 cyclingMem[4];
+	cyclingMem[0] = dFloat32(1.0e10f);
+	cyclingMem[1] = dFloat32(1.0e10f);
+	cyclingMem[2] = dFloat32(1.0e10f);
+	cyclingMem[3] = dFloat32(1.0e10f);
+
+	const dFloat32 resolutionScale = dFloat32(0.125f);
+	const dFloat32 minTolerance = D_PENETRATION_TOL;
+
+	while (GetCount()) 
+	{
+		ndMinkFace* const faceNode = (*this)[0];
+		Pop();
+
+		if (faceNode->m_alive) {
+			SupportVertex(faceNode->m_plane & dVector::m_triplexMask, m_vertexIndex);
+			const dVector& p = m_hullDiff[m_vertexIndex];
+			dFloat32 dist = faceNode->m_plane.Evalue(p);
+			dFloat32 distTolerance = dMax(dAbs(faceNode->m_plane.m_w) * resolutionScale, minTolerance);
+
+			if (dist < distTolerance) 
+			{
+				dVector sum[3];
+				dVector diff[3];
+				m_separatingVector = faceNode->m_plane & dVector::m_triplexMask;
+				for (dInt32 i = 0; i < 3; i++) 
+				{
+					dInt32 j = faceNode->m_vertex[i];
+					sum[i] = m_hullSum[j];
+					diff[i] = m_hullDiff[j];
+				}
+				for (dInt32 i = 0; i < 3; i++) 
+				{
+					m_hullSum[i] = sum[i];
+					m_hullDiff[i] = diff[i];
+				}
+				return 3;
+			}
+
+			iterCount++;
+			bool isCycling = false;
+			cyclingMem[cycling] = dist;
+			if (iterCount > 10) 
+			{
+				dInt32 cyclingIndex = cycling;
+				for (dInt32 i = 0; i < 3; i++) 
+				{
+					dInt32 cyclingIndex0 = (cyclingIndex - 1) & 3;
+					if (((cyclingMem[cyclingIndex0] - cyclingMem[cyclingIndex]) < dFloat32(-1.0e-5f))) 
+					{
+						isCycling = true;
+						cyclingMem[0] = dFloat32(1.0e10f);
+						cyclingMem[1] = dFloat32(1.0e10f);
+						cyclingMem[2] = dFloat32(1.0e10f);
+						cyclingMem[3] = dFloat32(1.0e10f);
+						break;
+					}
+					cyclingIndex = cyclingIndex0;
+				}
+			}
+			cycling = (cycling + 1) & 3;
+
+			if (!isCycling) 
+			{
+				m_faceStack[0] = faceNode;
+				dInt32 stackIndex = 1;
+				dInt32 deletedCount = 0;
+
+				while (stackIndex) 
+				{
+					stackIndex--;
+					ndMinkFace* const face = m_faceStack[stackIndex];
+
+					if (!face->m_mark && (face->m_plane.Evalue(p) > dFloat32(0.0f))) 
+					{
+						#ifdef _DEBUG
+						for (dInt32 i = 0; i < deletedCount; i++) 
+						{
+							dAssert(m_deletedFaceList[i] != face);
+						}
+						#endif
+
+						m_deletedFaceList[deletedCount] = face;
+						deletedCount++;
+						dAssert(deletedCount < sizeof(m_deletedFaceList) / sizeof(m_deletedFaceList[0]));
+						face->m_mark = 1;
+
+						for (dInt32 i = 0; i < 3; i++) 
+						{
+							ndMinkFace* const twinFace = face->m_twin[i];
+							if (twinFace && !twinFace->m_mark) 
+							{
+								m_faceStack[stackIndex] = twinFace;
+								stackIndex++;
+								dAssert(stackIndex < sizeof(m_faceStack) / sizeof(m_faceStack[0]));
+							}
+						}
+					}
+				}
+
+				//dAssert (SanityCheck());
+				dInt32 newCount = 0;
+				for (dInt32 i = 0; i < deletedCount; i++) 
+				{
+					ndMinkFace* const face = m_deletedFaceList[i];
+					face->m_alive = 0;
+					dAssert(face->m_mark == 1);
+					dInt32 j0 = 2;
+					for (dInt32 j1 = 0; j1 < 3; j1++) 
+					{
+						ndMinkFace* const twinFace = face->m_twin[j0];
+						if (twinFace && !twinFace->m_mark) 
+						{
+							ndMinkFace* const newFace = NewFace();
+							if (newFace) 
+							{
+								newFace->m_mark = 0;
+								newFace->m_vertex[0] = dInt16(m_vertexIndex);
+								newFace->m_vertex[1] = dInt16(face->m_vertex[j0]);
+								newFace->m_vertex[2] = dInt16(face->m_vertex[j1]);
+								PushFace(newFace);
+
+								newFace->m_twin[1] = twinFace;
+								dInt32 index = (twinFace->m_twin[0] == face) ? 0 : ((twinFace->m_twin[1] == face) ? 1 : 2);
+								twinFace->m_twin[index] = newFace;
+
+								m_coneFaceList[newCount] = newFace;
+								newCount++;
+								dAssert(newCount < sizeof(m_coneFaceList) / sizeof(m_coneFaceList[0]));
+							}
+							else 
+							{
+								// this is very rare but is does happend with some degenerated faces.
+								return -1;
+							}
+						}
+						j0 = j1;
+					}
+				}
+
+				dInt32 i0 = newCount - 1;
+				for (dInt32 i1 = 0; i1 < newCount; i1++) 
+				{
+					ndMinkFace* const faceA = m_coneFaceList[i0];
+					dAssert(faceA->m_mark == 0);
+
+					dInt32 j0 = newCount - 1;
+					for (dInt32 j1 = 0; j1 < newCount; j1++) 
+					{
+						if (i0 != j0) 
+						{
+							ndMinkFace* const faceB = m_coneFaceList[j0];
+							dAssert(faceB->m_mark == 0);
+							if (faceA->m_vertex[2] == faceB->m_vertex[1]) 
+							{
+								faceA->m_twin[2] = faceB;
+								faceB->m_twin[0] = faceA;
+								break;
+							}
+						}
+						j0 = j1;
+					}
+					i0 = i1;
+				}
+
+				m_vertexIndex++;
+				dAssert(m_vertexIndex < sizeof(m_hullDiff) / sizeof(m_hullDiff[0]));
+				//dAssert(SanityCheck());
+			}
+		}
+		else 
+		{
+			DeleteFace(faceNode);
+		}
+	}
+	return -1;
 }

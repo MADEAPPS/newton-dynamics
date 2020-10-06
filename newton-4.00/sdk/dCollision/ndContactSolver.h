@@ -91,22 +91,21 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 		dgFaceFreeList* m_next;
 	};
 
-	//D_INLINE ndMinkFace* NewFace();
-	//D_INLINE void PushFace(ndMinkFace* const face);
-	//D_INLINE void DeleteFace(ndMinkFace* const face);
-	//D_INLINE ndMinkFace* AddFace(dInt32 v0, dInt32 v1, dInt32 v2);
+	D_INLINE ndMinkFace* NewFace();
+	D_INLINE void PushFace(ndMinkFace* const face);
+	D_INLINE void DeleteFace(ndMinkFace* const face);
+	D_INLINE ndMinkFace* AddFace(dInt32 v0, dInt32 v1, dInt32 v2);
 	
-	//
 	//D_INLINE void TranslateSimplex(const dVector& step);
 	//D_INLINE dgPerimenterEdge* OldReduceContacts(dgPerimenterEdge* poly, dInt32 maxCount) const;
 	//
 	//bool SanityCheck() const;
-	//dInt32 CalculateIntersectingPlane(dInt32 count);
 
 	dInt32 CalculateClosestSimplex();
 	bool CalculateClosestPoints();
 	dInt32 ConvexToConvexContacts();
 
+	dInt32 CalculateIntersectingPlane(dInt32 count);
 	dInt32 PruneContacts(dInt32 count, dInt32 maxCount) const;
 	dInt32 CalculateContacts(const dVector& point0, const dVector& point1, const dVector& normal);
 	dInt32 ConvexPolygonsIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dInt32 maxContacts) const;
@@ -135,7 +134,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	};
 
 	ndContact* m_contact;
-	//dgFaceFreeList* m_freeFace; 
+	dgFaceFreeList* m_freeFace; 
 
 	ndContactPoint* m_contactBuffer;
 	dFloat32 m_timestep;
@@ -148,11 +147,11 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	bool m_ccdMode;
 	bool m_intersectionTestOnly;
 	
-	//dInt32 m_faceIndex;
-	//ndMinkFace* m_faceStack[D_CONVEX_MINK_STACK_SIZE];
-	//ndMinkFace* m_coneFaceList[D_CONVEX_MINK_STACK_SIZE];
-	//ndMinkFace* m_deletedFaceList[D_CONVEX_MINK_STACK_SIZE];
-	//ndMinkFace m_facePool[D_CONVEX_MINK_MAX_FACES];
+	dInt32 m_faceIndex;
+	ndMinkFace* m_faceStack[D_CONVEX_MINK_STACK_SIZE];
+	ndMinkFace* m_coneFaceList[D_CONVEX_MINK_STACK_SIZE];
+	ndMinkFace* m_deletedFaceList[D_CONVEX_MINK_STACK_SIZE];
+	ndMinkFace m_facePool[D_CONVEX_MINK_MAX_FACES];
 	dInt8 m_heapBuffer[D_CONVEX_MINK_MAX_FACES * (sizeof (dFloat32) + sizeof (ndMinkFace *))];
 
 	static dVector m_hullDirs[14]; 
