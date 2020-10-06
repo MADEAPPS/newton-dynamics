@@ -49,7 +49,8 @@ static void BuildSphere(ndDemoEntityManager* const scene,
 	ndDemoMesh* const sphereMesh, const ndShapeInstance& sphereShape,
 	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
 {
-	dMatrix matrix(dGetIdentityMatrix());
+	//dMatrix matrix(dGetIdentityMatrix());
+	dMatrix matrix(dYawMatrix(90.0f * dDegreeToRad) * dPitchMatrix(-45.0f * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -58,7 +59,8 @@ static void BuildSphere(ndDemoEntityManager* const scene,
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f * 0.99f;
 
-	matrix.m_posit.m_y += xxxx;
+	//matrix.m_posit.m_y += xxxx;
+matrix.m_posit.m_y += 7.0f;
 	
 
 	for (dInt32 i = 0; i < count; i++)
@@ -75,7 +77,7 @@ static void BuildSphere(ndDemoEntityManager* const scene,
 		world->AddBody(body);
 		scene->AddEntity(entity);
 
-		matrix.m_posit += matrix.m_up.Scale(diameter * 0.99f);
+		matrix.m_posit.m_y += diameter * 0.99f;
 	}
 }
 
@@ -121,6 +123,6 @@ void ndBasicSetup (ndDemoEntityManager* const scene)
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
-	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
