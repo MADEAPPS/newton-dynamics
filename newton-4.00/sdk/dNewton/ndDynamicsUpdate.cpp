@@ -28,8 +28,6 @@
 
 #define D_BASH_SIZE	64
 
-static int xxx;
-
 ndDynamicsUpdate::ndDynamicsUpdate()
 	:m_velocTol(dFloat32(1.0e-8f))
 	,m_islands()
@@ -1100,11 +1098,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 				const dVector force(dynBody->GetForce() + forceAndTorque.m_linear);
 				const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
 
-xxx++;
-dFloat32 e0(dynBody->TotalEnergy());
-
 				const ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
-
 				if (!body->m_resting)
 				{
 					body->m_veloc += velocStep.m_linear;
@@ -1118,12 +1112,6 @@ dFloat32 e0(dynBody->TotalEnergy());
 					const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
 					body->m_resting &= equilibrium;
 				}
-
-dFloat32 e1(dynBody->TotalEnergy());
-dTrace(("%d %f %f\n", xxx, e0, e1));
-if (xxx >= 377)
-xxx *= 1;
-
 				dAssert(body->m_veloc.m_w == dFloat32(0.0f));
 				dAssert(body->m_omega.m_w == dFloat32(0.0f));
 			}
