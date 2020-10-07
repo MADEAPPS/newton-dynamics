@@ -85,7 +85,7 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API ndBodyKinematic();
 	D_COLLISION_API virtual ~ndBodyKinematic();
 
-	ndScene* GetBroadPhase() const;
+	ndScene* GetScene() const;
 
 	const dUnsigned32 GetIndex() const;
 	const dFloat32 GetInvMass() const;
@@ -124,8 +124,10 @@ class ndBodyKinematic: public ndBody
 
 	D_COLLISION_API virtual ndContact* FindContact(const ndBody* const otherBody) const;
 
-	virtual ndBodyKinematic* GetAsBodyKinematic() { return this; }
-	virtual ndSkeletonContainer* GetSkeleton() const { return nullptr; }
+	virtual ndBodyKinematic* GetAsBodyKinematic();
+
+	ndSkeletonContainer* GetSkeleton() const;
+	void SetSkeleton(ndSkeletonContainer* const skeleton);
 
 	virtual dVector GetForce() const;
 	virtual dVector GetTorque() const;
@@ -173,8 +175,9 @@ class ndBodyKinematic: public ndBody
 	ndBodyList::dListNode* m_sceneNode;
 	ndSceneBodyNode* m_sceneBodyBodyNode;
 	ndSceneAggregate* m_sceneAggregateNode;
+	ndSkeletonContainer* m_skeletonContainer;
 
-	dFloat32 m_weight;
+	dFloat32 m_weigh;
 	dInt32 m_rank;
 	dInt32 m_index;
 
@@ -234,7 +237,8 @@ inline void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const ndShapeInstance&
 	dMatrix inertia(shapeInstance.CalculateInertia());
 
 	dVector origin(inertia.m_posit);
-	for (dInt32 i = 0; i < 3; i++) {
+	for (dInt32 i = 0; i < 3; i++) 
+	{
 		inertia[i] = inertia[i].Scale(mass);
 		//inertia[i][i] = (inertia[i][i] + origin[i] * origin[i]) * mass;
 		//for (dInt32 j = i + 1; j < 3; j ++) {
@@ -249,7 +253,12 @@ inline void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const ndShapeInstance&
 	SetMassMatrix(mass, inertia);
 }
 
-inline ndScene* ndBodyKinematic::GetBroadPhase() const
+inline ndBodyKinematic* ndBodyKinematic::GetAsBodyKinematic() 
+{ 
+	return this; 
+}
+
+inline ndScene* ndBodyKinematic::GetScene() const
 {
 	return m_scene;
 }
@@ -298,7 +307,7 @@ inline void ndBodyKinematic::PrepareStep(dInt32 index)
 	m_index = index;
 	m_resting = 1;
 	m_islandSleep = m_equilibrium;
-	m_weight = dFloat32(0.0f);
+	m_weigh = dFloat32(0.0f);
 	m_islandParent = this;
 	//m_tmpBodyArray[index] = body;
 }
@@ -344,6 +353,15 @@ inline void ndBodyKinematic::SetGyroMode(bool state)
 	m_gyroTorqueOn = state ? 1 : 0;
 }
 
+inline ndSkeletonContainer* ndBodyKinematic::GetSkeleton() const
+{ 
+	return m_skeletonContainer;
+}
+
+inline void ndBodyKinematic::SetSkeleton(ndSkeletonContainer* const skeleton)
+{
+	m_skeletonContainer = skeleton;
+}
 
 #endif 
 

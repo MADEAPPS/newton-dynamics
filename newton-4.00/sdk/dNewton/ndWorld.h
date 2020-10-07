@@ -24,8 +24,8 @@
 
 #include "ndNewtonStdafx.h"
 #include "ndJointList.h"
+#include "ndSkeletonList.h"
 #include "ndDynamicsUpdate.h"
-
 
 class ndWorld;
 class ndBodyDynamic;
@@ -90,6 +90,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	private:
 	void ThreadFunction();
 	void PostUpdate(dFloat32 timestep);
+	static dInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const jointA, const ndJointBilateralConstraint* const jointB, void* notUsed);
 	
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons();
@@ -104,6 +105,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	ndScene* m_scene;
 	ndBodyDynamic* m_sentinelBody;
 	ndJointList m_jointList;
+	ndSkeletonList m_skeletonList;
 
 	dFloat32 m_timestep;
 	dFloat32 m_lastExecutionTime;

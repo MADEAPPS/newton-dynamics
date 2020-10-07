@@ -924,8 +924,8 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 	ndBodyKinematic* const body0 = contact->GetBody0();
 	ndBodyKinematic* const body1 = contact->GetBody1();
 	
-	dAssert(body0->GetBroadPhase() == this);
-	dAssert(body1->GetBroadPhase() == this);
+	dAssert(body0->GetScene() == this);
+	dAssert(body1->GetScene() == this);
 	if (!(body0->m_collideWithLinkedBodies & body1->m_collideWithLinkedBodies)) 
 	{
 		dAssert(0);

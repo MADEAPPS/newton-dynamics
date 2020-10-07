@@ -470,7 +470,7 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 {
 	class ndJoindDebug : public ndConstraintDebugCallback
 	{
-	public:
+		public:
 		ndJoindDebug(ndDemoEntityManager* const scene)
 		{
 			ndDemoCamera* const camera = scene->GetCamera();

@@ -86,6 +86,7 @@ class ndBody: public dClassAlloc
 			dUnsigned32 m_equilibrium : 1;
 			dUnsigned32 m_islandSleep : 1;
 			dUnsigned32 m_gyroTorqueOn : 1;
+			dUnsigned32 m_skeletonMark : 1;
 			dUnsigned32 m_transformIsDirty : 1;
 			dUnsigned32 m_bodyIsConstrained : 1;
 			dUnsigned32 m_collideWithLinkedBodies : 1;

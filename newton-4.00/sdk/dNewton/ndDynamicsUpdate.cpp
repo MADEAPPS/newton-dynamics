@@ -384,14 +384,14 @@ void ndDynamicsUpdate::InitWeights()
 		
 		if (body1->GetInvMass() == dFloat32(0.0f))
 		{
-			body1->m_weight = dFloat32(1.0f);
+			body1->m_weigh = dFloat32(1.0f);
 		}
 		else
 		{
-			body1->m_weight += dFloat32(1.0f);
+			body1->m_weigh += dFloat32(1.0f);
 		}
 
-		body0->m_weight += dFloat32(1.0f);
+		body0->m_weigh += dFloat32(1.0f);
 		dAssert(body0->GetInvMass() != dFloat32(0.0f));
 	}
 
@@ -409,8 +409,8 @@ void ndDynamicsUpdate::InitWeights()
 	for (dInt32 i = bodyCount - 1; i >= 0; i--)
 	{
 		const ndBodyKinematic* const body = bodyArray[i];
-		dAssert((body->GetInvMass() > 0.0f) || (body->m_weight <= dFloat32(1.0f)));
-		extraPasses = dMax(body->m_weight, extraPasses);
+		dAssert((body->GetInvMass() > 0.0f) || (body->m_weigh <= dFloat32(1.0f)));
+		extraPasses = dMax(body->m_weigh, extraPasses);
 	
 	//	dgSkeletonContainer* const container = body->GetSkeleton();
 	//	if (container && (container->m_lru != lru)) {
@@ -630,8 +630,8 @@ void ndDynamicsUpdate::BuildJacobianMatrix(ndConstraint* const joint)
 	dVector forceAcc1(dVector::m_zero);
 	dVector torqueAcc1(dVector::m_zero);
 	
-	const dVector weight0(body0->m_weight * joint->m_preconditioner0);
-	const dVector weight1(body1->m_weight * joint->m_preconditioner0);
+	const dVector weigh0(body0->m_weigh * joint->m_preconditioner0);
+	const dVector weigh1(body1->m_weigh * joint->m_preconditioner0);
 	
 	const dFloat32 forceImpulseScale = dFloat32(1.0f);
 	const dFloat32 preconditioner0 = joint->m_preconditioner0;
@@ -666,8 +666,8 @@ void ndDynamicsUpdate::BuildJacobianMatrix(ndConstraint* const joint)
 		const ndJacobian& JtM0 = row->m_Jt.m_jacobianM0;
 		const ndJacobian& JtM1 = row->m_Jt.m_jacobianM1;
 		const dVector tmpDiag(
-			weight0 * (JMinvM0.m_linear * JtM0.m_linear + JMinvM0.m_angular * JtM0.m_angular) +
-			weight1 * (JMinvM1.m_linear * JtM1.m_linear + JMinvM1.m_angular * JtM1.m_angular));
+			weigh0 * (JMinvM0.m_linear * JtM0.m_linear + JMinvM0.m_angular * JtM0.m_angular) +
+			weigh1 * (JMinvM1.m_linear * JtM1.m_linear + JMinvM1.m_angular * JtM1.m_angular));
 	
 		dFloat32 diag = tmpDiag.AddHorizontal().GetScalar();
 		dAssert(diag > dFloat32(0.0f));
@@ -949,8 +949,8 @@ dFloat32 ndDynamicsUpdate::CalculateJointsForce(ndConstraint* const joint)
 		dVector forceM1(m_internalForces[m1].m_linear * preconditioner1);
 		dVector torqueM1(m_internalForces[m1].m_angular * preconditioner1);
 		
-		preconditioner0 = preconditioner0.Scale(body0->m_weight);
-		preconditioner1 = preconditioner1.Scale(body1->m_weight);
+		preconditioner0 = preconditioner0.Scale(body0->m_weigh);
+		preconditioner1 = preconditioner1.Scale(body1->m_weigh);
 		
 		normalForce[0] = dFloat32(1.0f);
 		for (dInt32 j = 0; j < rowsCount; j++) 

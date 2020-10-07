@@ -69,10 +69,6 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	dFloat32 m_defualtDiagonalRegularizer;
 	OnConstraintDestroy m_destructor;
 	dBilateralConstraintList::dListNode* m_jointNode;
-	
-
-	friend class dgBodyMasterList;
-	friend class dgWorldDynamicUpdate;
 */
 	public:
 	D_NEWTON_API ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix);
@@ -102,6 +98,8 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	void SetHighFriction(ndConstraintDescritor& desc, dInt32 index, dFloat32 friction);
 	void SetLowerFriction(ndConstraintDescritor& desc, dInt32 index, dFloat32 friction);
 	void SetMotorAcceleration(ndConstraintDescritor& desc, dInt32 index, dFloat32 acceleration);
+
+	void SetSkeletonFlag(bool flag);
 
 	protected:
 	dMatrix m_localMatrix0;
@@ -211,6 +209,9 @@ inline void ndJointBilateralConstraint::JacobianDerivative(ndConstraintDescritor
 	dAssert(0);
 }
 
-
+inline void ndJointBilateralConstraint::SetSkeletonFlag(bool flag)
+{
+	m_isInSkeleton = flag ? 1 : 0;
+}
 #endif
 

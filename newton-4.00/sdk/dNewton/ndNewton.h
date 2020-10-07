@@ -44,12 +44,14 @@
 #include <ndShapeConvex.h>
 #include <ndBodyDynamic.h>
 #include <ndContactList.h>
+#include <ndSkeletonList.h>
 #include <ndBodyKinematic.h>
 #include <ndContactSolver.h>
 #include <ndShapeInstance.h>
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
 #include <ndDynamicsUpdate.h>
+#include <ndSkeletonContainer.h>
 #include <ndJointBallAndSocket.h>
 #include <ndJointKinematicController.h>
 

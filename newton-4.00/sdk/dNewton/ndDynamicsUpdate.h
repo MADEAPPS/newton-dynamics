@@ -32,8 +32,6 @@
 #define	D_SOLVER_MAX_ERROR				(D_FREEZE_MAG * dFloat32 (0.5f))
 
 //#define D_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
-//#define D_PARALLEL_JOINT_COUNT_CUT_OFF	(64)
-//#define D_PARALLEL_JOINT_COUNT_CUT_OFF	(2)
 
 // the solver is a RK order 4, but instead of weighting the intermediate derivative by the usual 1/6, 1/3, 1/3, 1/6 coefficients
 // I am using 1/4, 1/4, 1/4, 1/4.
@@ -137,6 +135,7 @@ class ndDynamicsUpdate
 	dUnsigned32 m_maxRowsCount;
 	dInt32 m_unConstrainedBodyCount;
 	dAtomic<dUnsigned32> m_rowsCount;
+	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;
 
 
