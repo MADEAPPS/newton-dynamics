@@ -25,7 +25,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointList.h"
 
-class ndJointBilateralConstraint;
 #define DG_BILATERAL_CONTRAINT_DOF	8
 
 D_MSV_NEWTON_ALIGN_32
@@ -83,14 +82,15 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 
 	virtual const dUnsigned32 GetRowsCount() const;
 	virtual void JacobianDerivative(ndConstraintDescritor& desc);
-	virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
+	
 
 	virtual ndBodyKinematic* GetBody0() const;
 	virtual ndBodyKinematic* GetBody1() const;
 	
 	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const;
-	D_NEWTON_API void CalculateLocalMatrix(const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
 
+	D_NEWTON_API virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
+	D_NEWTON_API void CalculateLocalMatrix(const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
 	D_NEWTON_API void AddAngularRowJacobian(ndConstraintDescritor& desc, const dVector& dir, dFloat32 relAngle);
 	D_NEWTON_API void AddLinearRowJacobian(ndConstraintDescritor& desc, const dVector& pivot0, const dVector& pivot1, const dVector& dir);
 
@@ -121,6 +121,7 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	dInt8 m_rowIsMotor;
 	dInt8 m_solverModel;
 	dInt8 m_isInSkeleton;
+	dInt8 m_mark;
 
 	friend class ndWorld;
 	friend class ndDynamicsUpdate;

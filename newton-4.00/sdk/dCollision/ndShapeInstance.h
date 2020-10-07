@@ -93,10 +93,10 @@ class ndShapeInstance: public dClassAlloc
 	bool GetCollisionMode() const;
 	void SetCollisionMode(bool mode);
 	dInt32 GetConvexVertexCount() const;
-
-	void SetScale(const dVector& scale);
+	
 	const dVector& GetScale() const;
 	const dVector& GetInvScale() const;
+	D_COLLISION_API void SetScale(const dVector& scale);
 
 	dFloat32 GetBoxMinRadius() const;
 	dFloat32 GetBoxMaxRadius() const;
