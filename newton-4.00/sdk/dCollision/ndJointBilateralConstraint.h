@@ -115,6 +115,8 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	ndBodyKinematic* m_body0;
 	ndBodyKinematic* m_body1;
 	ndJointList::dListNode* m_worldNode;
+	ndJointList::dListNode* m_body0Node;
+	ndJointList::dListNode* m_body1Node;
 
 	dFloat32 m_defualtDiagonalRegularizer;
 	dInt8 m_maxDof;

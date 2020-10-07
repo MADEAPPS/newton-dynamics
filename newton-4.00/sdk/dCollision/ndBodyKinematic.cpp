@@ -25,6 +25,7 @@
 #include "ndShapeNull.h"
 #include "ndRayCastNotify.h"
 #include "ndBodyKinematic.h"
+#include "ndJointBilateralConstraint.h"
 
 #define D_MINIMUM_MASS	dFloat32(1.0e-5f)
 #define D_INFINITE_MASS	dFloat32(1.0e15f)
@@ -169,6 +170,48 @@ void ndBodyKinematic::DetachContact(ndContact* const contact)
 	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
 	m_equilibrium = 0;
 	m_contactList.DetachContact(contact);
+}
+
+ndJointList::dListNode* ndBodyKinematic::AttachJoint(ndJointBilateralConstraint* const joint)
+{
+	m_equilibrium = 0;
+#ifdef _DEBUG
+	//dAssert((joint->GetBody0() == this) || (joint->GetBody1() == this));
+	//dInt32 id0 = joint->GetBody0()->m_uniqueID;
+	//dInt32 id1 = joint->GetBody1()->m_uniqueID;
+	//if (id0 > id1)
+	//{
+	//	dSwap(id0, id1);
+	//}
+	//
+	//for (ndJointList::dListNode* node = m_jointList.GetFirst(); node; node = node->GetNext())
+	//{
+	//	dAssert(0);
+	//	ndJointBilateralConstraint* const joint1 = node->GetInfo();
+	//	dInt32 jd0 = joint1->GetBody0()->m_uniqueID;
+	//	dInt32 jd1 = joint1->GetBody1()->m_uniqueID;
+	//	if (jd0 > jd1)
+	//	{
+	//		dSwap(jd0, jd1);
+	//	}
+	//	dAssert(!((id0 == jd0) && (id1 == jd1)));
+	//}
+#endif
+	return m_jointList.Append(joint);
+}
+
+void ndBodyKinematic::DetachJoint(ndJointList::dListNode* const node)
+{
+	m_equilibrium = 0;
+#ifdef _DEBUG
+	bool found = false;
+	for (ndJointList::dListNode* nodeptr = m_jointList.GetFirst(); nodeptr; nodeptr = nodeptr->GetNext())
+	{
+		found = found || nodeptr;
+	}
+	dAssert(found);
+#endif
+	m_jointList.Remove(node);
 }
 
 void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)

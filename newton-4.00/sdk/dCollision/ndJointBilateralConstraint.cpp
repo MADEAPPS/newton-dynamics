@@ -462,9 +462,9 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKine
 	,m_body0(body0)
 	,m_body1(body1)
 	,m_worldNode(nullptr)
+	,m_body0Node(nullptr)
+	,m_body1Node(nullptr)
 	,m_maxDof(dInt8(maxDof))
-	//,m_destructor(nullptr)
-	//,m_jointNode(nullptr)
 {
 	dAssert(m_body0 && m_body1);
 
@@ -496,18 +496,8 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKine
 ndJointBilateralConstraint::~ndJointBilateralConstraint()
 {
 	dAssert(m_worldNode == nullptr);
-
-	//if (m_destructor) 
-	//{
-	//	m_destructor(*this);
-	//}
-	//
-	//if (m_jointNode) 
-	//{
-	//	dAssert(m_body0);
-	//	dgBilateralConstraintList* const jointList = m_body0->m_world;
-	//	jointList->Remove(m_jointNode);
-	//}
+	dAssert(m_body0Node == nullptr);
+	dAssert(m_body1Node == nullptr);
 }
 
 void ndJointBilateralConstraint::DebugJoint(ndConstraintDebugCallback& debugCallback) const

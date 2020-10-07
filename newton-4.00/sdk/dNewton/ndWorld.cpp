@@ -268,17 +268,26 @@ void ndWorld::AddJoint(ndJointBilateralConstraint* const joint)
 		m_skeletonList.m_skelListIsDirty = true;
 	}
 	joint->m_worldNode = m_jointList.Append(joint);
+	joint->m_body0Node = joint->GetBody0()->AttachJoint(joint);
+	joint->m_body1Node = joint->GetBody1()->AttachJoint(joint);
 }
 
 void ndWorld::RemoveJoint(ndJointBilateralConstraint* const joint)
 {
 	dAssert(joint->m_worldNode != nullptr);
+	dAssert(joint->m_body0Node != nullptr);
+	dAssert(joint->m_body1Node != nullptr);
+	joint->GetBody0()->DetachJoint(joint->m_body0Node);
+	joint->GetBody1()->DetachJoint(joint->m_body1Node);
+
 	m_jointList.Remove(joint->m_worldNode);
 	if (joint->m_solverModel <= 3)
 	{
 		m_skeletonList.m_skelListIsDirty = true;
 	}
 	joint->m_worldNode = nullptr;
+	joint->m_body0Node = nullptr;
+	joint->m_body1Node = nullptr;
 }
 
 dInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const jointA, const ndJointBilateralConstraint* const jointB, void* notUsed)

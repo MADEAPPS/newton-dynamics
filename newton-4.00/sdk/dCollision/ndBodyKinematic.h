@@ -30,6 +30,7 @@
 class ndSceneBodyNode;
 class ndSceneAggregate;
 class ndSkeletonContainer;
+class ndJointBilateralConstraint;
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodyKinematic: public ndBody
@@ -144,6 +145,10 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API static void ReleaseMemory();
 	D_COLLISION_API virtual void AttachContact(ndContact* const contact);
 	D_COLLISION_API virtual void DetachContact(ndContact* const contact);
+
+	D_COLLISION_API virtual ndJointList::dListNode* AttachJoint(ndJointBilateralConstraint* const joint);
+	D_COLLISION_API virtual void DetachJoint(ndJointList::dListNode* const node);
+
 	D_COLLISION_API void UpdateGyroData();
 
 	void UpdateCollisionMatrix();
