@@ -25,6 +25,7 @@
 #include "ndCollisionStdafx.h"
 #include "ndBody.h"
 #include "ndBodyList.h"
+#include "ndJointList.h"
 
 class ndSceneBodyNode;
 class ndSceneAggregate;
@@ -168,6 +169,7 @@ class ndBodyKinematic: public ndBody
 	dVector m_gyroTorque;
 	dQuaternion m_gyroRotation;
 
+	ndJointList m_jointList;
 	ndContactMap m_contactList;
 	dSpinLock m_lock;
 	ndScene* m_scene;

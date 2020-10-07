@@ -37,6 +37,7 @@
 #include <ndShapeBox.h>
 #include <ndShapeNull.h>
 #include <ndSceneNode.h>
+#include <ndJointList.h>
 #include <ndSceneMixed.h>
 #include <ndConstraint.h>
 #include <ndBodyNotify.h>
@@ -50,6 +51,7 @@
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
 #include <ndContactOptions.h>
+#include <ndJointBilateralConstraint.h>
 #include <ndShapeInstanceMeshBuilder.h>
 
 #endif 

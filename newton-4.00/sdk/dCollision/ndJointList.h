@@ -22,7 +22,7 @@
 #ifndef __D_JOINT_LIST_H__
 #define __D_JOINT_LIST_H__
 
-#include "ndNewtonStdafx.h"
+#include "ndCollisionStdafx.h"
 
 class ndJointBilateralConstraint;
 

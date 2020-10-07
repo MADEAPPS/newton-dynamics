@@ -20,7 +20,7 @@
 */
 
 #include "dCoreStdafx.h"
-#include "ndNewtonStdafx.h"
+#include "ndCollisionStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
 //#include "dgBody.h"

@@ -22,8 +22,10 @@
 #ifndef __D_JOINT_BILATERAL_CONSTRAINT_H__
 #define __D_JOINT_BILATERAL_CONSTRAINT_H__
 
-#include "ndNewtonStdafx.h"
+#include "ndCollisionStdafx.h"
 #include "ndJointList.h"
+#include "ndConstraint.h"
+#include "ndBodyKinematic.h"
 
 #define DG_BILATERAL_CONTRAINT_DOF	8
 
@@ -71,8 +73,8 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	dBilateralConstraintList::dListNode* m_jointNode;
 */
 	public:
-	D_NEWTON_API ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix);
-	D_NEWTON_API virtual ~ndJointBilateralConstraint();
+	D_COLLISION_API ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix);
+	D_COLLISION_API virtual ~ndJointBilateralConstraint();
 	
 	virtual ndJointBilateralConstraint* GetAsBilateral() { return this; }
 
@@ -85,12 +87,12 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	
 	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const;
 
-	D_NEWTON_API virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
-	D_NEWTON_API void CalculateLocalMatrix(const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
-	D_NEWTON_API void AddAngularRowJacobian(ndConstraintDescritor& desc, const dVector& dir, dFloat32 relAngle);
-	D_NEWTON_API void AddLinearRowJacobian(ndConstraintDescritor& desc, const dVector& pivot0, const dVector& pivot1, const dVector& dir);
+	D_COLLISION_API virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
+	D_COLLISION_API void CalculateLocalMatrix(const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
+	D_COLLISION_API void AddAngularRowJacobian(ndConstraintDescritor& desc, const dVector& dir, dFloat32 relAngle);
+	D_COLLISION_API void AddLinearRowJacobian(ndConstraintDescritor& desc, const dVector& pivot0, const dVector& pivot1, const dVector& dir);
 
-	D_NEWTON_API virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
+	D_COLLISION_API virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 
 	virtual dInt32 GetSolverModel() const;
 	virtual void SetSolverModel(dInt32 model);
