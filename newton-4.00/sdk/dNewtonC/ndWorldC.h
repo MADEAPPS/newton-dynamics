@@ -31,7 +31,8 @@ extern "C" {
 	typedef void* ndWorldC;
 
 	NEWTON_API ndWorldC ndCreateWorld();
-	NEWTON_API void ndDestroyWorld(ndWorldC world);
+	NEWTON_API void ndDestroyWorld(ndWorldC worldc);
+	NEWTON_API void ndWorldSync(ndWorldC worldc);
 
 #ifdef __cplusplus 
 }

@@ -32,3 +32,9 @@ void ndDestroyWorld(ndWorldC worldc)
 	ndWorld* const world = (ndWorld*)worldc;
 	delete world;
 }
+
+void ndWorldSync(ndWorldC worldc)
+{
+	ndWorld* const world = (ndWorld*)worldc;
+	world->Sync();
+}

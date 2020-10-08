@@ -108,20 +108,6 @@ dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist)
 	return (param < 1.0f) ? rayCaster.m_contact.m_point : p0;
 }
 
-void BuildFloor(ndWorld& world)
-{
-	world.Sync();
-	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
-	ndBodyDynamic* const body = new ndBodyDynamic();
-
-	dMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit.m_y = -0.5f;
-
-	body->SetNotifyCallback(new ndDemoEntityNotify);
-	body->SetMatrix(matrix);
-	body->SetCollisionShape(box);
-	world.AddBody(body);
-}
 
 void BuildPyramid(ndWorld& world, dFloat32 mass, const dVector& origin, const dVector& size, int count)
 {
@@ -206,23 +192,32 @@ matrix.m_posit.m_y += xxxx;
 }
 */
 
+void BuildFloor(ndWorldC world)
+{
+	ndWorldSync(world);
+	//ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
+	//ndBodyDynamic* const body = new ndBodyDynamic();
+	//
+	//dMatrix matrix(dGetIdentityMatrix());
+	//matrix.m_posit.m_y = -0.5f;
+	//
+	//body->SetNotifyCallback(new ndDemoEntityNotify);
+	//body->SetMatrix(matrix);
+	//body->SetCollisionShape(box);
+	//world.AddBody(body);
+}
+
+
 int main (int argc, const char * argv[]) 
 {
 	ndWorldC world = ndCreateWorld();
 	//world.SetSubSteps(2);
 	//world.SetThreadCount(2);
 
-/*
-	// test allocation
-	ndFixSizeBuffer<dVector, 10> buffer0;
-	ndFixSizeBuffer<dVector, 10>* const buffer1 = new ndFixSizeBuffer<dVector, 10>;
-	(*buffer1)[0] = dVector (0.5f, 0.25f, 0.8f, 0.0f);
-	(*buffer1)[0] = (*buffer1)[0] + (*buffer1)[0];
-	delete buffer1;
-
-	dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
-	dVector origin(0.0f, 0.0f, 0.0f, 0.0f);
+	//dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
+	//dVector origin(0.0f, 0.0f, 0.0f, 0.0f);
 	BuildFloor(world);
+/*
 	//BuildPyramid(world, 10.0f, origin, size, 20);
 	//BuildSphere(world, 1.0f, origin + dVector(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 2, 0.0f);
 	BuildSphere(world, 1.0f, origin + dVector(3.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 1.0f);
