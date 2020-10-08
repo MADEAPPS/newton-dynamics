@@ -48,7 +48,7 @@ add_definitions(-D_D_NEWTON_BUILD_DLL)
 #	add_library(${projectName} STATIC ${CPP_SOURCE})
 #endif()
 
-add_library(${projectName} STATIC ${CPP_SOURCE})
+add_library(${projectName} SHARED ${CPP_SOURCE})
     
 #if (MSVC)
 #	if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
