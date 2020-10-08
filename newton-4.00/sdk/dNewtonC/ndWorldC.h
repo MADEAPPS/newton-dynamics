@@ -41,15 +41,15 @@
 extern "C" {
 #endif
 
-typedef void* ndWorldC;
-typedef void* (*ndMalloc) (size_t sizeInBytes);
-typedef void(*ncFree) (void* const ptr);
+	typedef void* ndWorldC;
+	typedef void* (*ndMalloc) (size_t sizeInBytes);
+	typedef void(*ncFree) (void* const ptr);
 
-NEWTON_API size_t ndGetMemoryUsed();
-NEWTON_API void ndSetAllocators(ndMalloc malloc, ncFree free);
+	NEWTON_API size_t ndGetMemoryUsed();
+	NEWTON_API void ndSetAllocators(ndMalloc malloc, ncFree free);
 
-NEWTON_API ndWorldC ndCreateWorld();
-NEWTON_API void ndDestroyWorkd(ndWorldC world);
+	NEWTON_API ndWorldC ndCreateWorld();
+	NEWTON_API void ndDestroyWorkd(ndWorldC world);
 
 #ifdef __cplusplus 
 }
