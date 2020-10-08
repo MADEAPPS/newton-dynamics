@@ -9,14 +9,5 @@
 * freely
 */
 
-#ifndef _TEST_SDT_AFTX_H_
-#define _TEST_SDT_AFTX_H_
-
-#include <stdio.h>
-#include <conio.h>
-#include <stdlib.h>
-#include <crtdbg.h>
-#include <ndNewton.h>
-
-#endif
+#include "testStdafx.h"
 

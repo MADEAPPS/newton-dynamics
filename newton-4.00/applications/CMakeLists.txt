@@ -10,18 +10,15 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
-#include_directories(dModel)
-#include_directories(dVehicle)
-#include_directories(dgMeshUtil)
-#include_directories(dCustomJoints)
-#include_directories(dVehicle/dPlayerController)
-#include_directories(dVehicle/dVehicleMultiBody)
-
-if (NEWTON_BUILD_TEST STREQUAL "ON")
+if (NEWTON_BUILD_TEST)
 	add_subdirectory(ndTest)
 endif()
 
-if (NEWTON_BUILD_SANDBOX_DEMOS STREQUAL "ON")
+if (NEWTON_CREATE_C_INTERFACE)
+	add_subdirectory(ndTestC)
+endif()
+
+if (NEWTON_BUILD_SANDBOX_DEMOS)
 	add_subdirectory(ndSandbox)
 	
      if(UNIX)

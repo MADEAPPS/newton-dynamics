@@ -16,7 +16,7 @@
 #include <conio.h>
 #include <stdlib.h>
 #include <crtdbg.h>
-#include <ndNewton.h>
+#include <ndNewtonC.h>
 
 #endif
 

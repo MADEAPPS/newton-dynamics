@@ -62,6 +62,13 @@ if (NEWTON_BUILD_PROFILER)
 	target_link_libraries (${projectName} dProfiler)
 endif()
 
+
+add_custom_command(
+	TARGET ${projectName} POST_BUILD
+	COMMAND ${CMAKE_COMMAND}
+	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/applications/ndTestC/${CMAKE_CFG_INTDIR}/$<TARGET_FILE_NAME:${projectName}>)
+
+
 install(TARGETS ${projectName} 
 		LIBRARY DESTINATION libc
 		ARCHIVE DESTINATION libc
