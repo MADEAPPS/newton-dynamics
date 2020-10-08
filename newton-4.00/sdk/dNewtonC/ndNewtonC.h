@@ -26,6 +26,7 @@
 #include <ndWorldC.h>
 #include <ndShapeC.h>
 #include <ndShapeBoxC.h>
+#include <ndShapeInstanceC.h>
 
 
 #endif

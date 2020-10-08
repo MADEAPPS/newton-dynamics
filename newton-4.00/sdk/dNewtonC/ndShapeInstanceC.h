@@ -19,22 +19,24 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_SHAPE_C_H__ 
-#define __D_SHAPE_C_H__ 
+#ifndef __D_SHAPE_INSTANCE_C_H__ 
+#define __D_SHAPE_INSTANCE_C_H__ 
 
 #include "ndTypes.h"
+#include "ndShapeC.h"
 
 #ifdef __cplusplus 
 extern "C" 
 {
 #endif
-	
-	typedef void* ndShapeC;
+	typedef void* ndShapeInstanceC;
 
-	NEWTON_API void ndShapeRelease(ndShapeC shapeC);
+	NEWTON_API ndShapeInstanceC ndCreateInstance(ndShapeC shape);
+	NEWTON_API void ndDestroyInstance(ndShapeInstanceC shapeInstanceC);
 
 #ifdef __cplusplus 
 }
 #endif
 
-#endif
+#endif 
+

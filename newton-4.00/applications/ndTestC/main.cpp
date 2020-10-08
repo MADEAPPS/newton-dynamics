@@ -197,10 +197,9 @@ void BuildFloor(ndWorldC world)
 	ndWorldSync(world);
 
 	ndShapeC boxShape = ndCreateBox(200.0f, 1.0f, 200.f);
+	ndShapeInstanceC instance = ndCreateInstance(boxShape);
 
-	//ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
 	//ndBodyDynamic* const body = new ndBodyDynamic();
-	//
 	//dMatrix matrix(dGetIdentityMatrix());
 	//matrix.m_posit.m_y = -0.5f;
 	//
@@ -209,6 +208,7 @@ void BuildFloor(ndWorldC world)
 	//body->SetCollisionShape(box);
 	//world.AddBody(body);
 
+	ndDestroyInstance(instance);
 	ndShapeRelease(boxShape);
 }
 
