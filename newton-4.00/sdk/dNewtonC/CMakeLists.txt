@@ -20,8 +20,10 @@ include_directories(../dCollision/)
 include_directories(../dNewton/dJoints/)
 	
 # source and header files
-file(GLOB HEADERS ../dCore/*.h ../dNewton/*.h ../dCollision/*.h ../dNewton/dJoints/*.h)
+file(GLOB HEADERS *.h *.cpp ../dCore/*.h ../dNewton/*.h ../dCollision/*.h ../dNewton/dJoints/*.h)
 file(GLOB CPP_SOURCE 
+	*.h
+	*.cpp
 	../dCore/*.h 
 	../dCore/*.cpp
 	../dNewton/*.h 
@@ -35,6 +37,7 @@ file(GLOB CPP_SOURCE
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/../" FILES ${CPP_SOURCE})
 
 add_definitions(-D_D_SINGLE_LIBRARY)
+add_definitions(-D_D_NEWTON_BUILD_DLL)
 
 #if(NEWTON_BUILD_SHARED_LIBS STREQUAL "ON")
 #	add_definitions(-D_D_CORE_EXPORT_DLL)
