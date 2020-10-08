@@ -141,6 +141,8 @@ class ndContact
 	const ndContactPointList& GetContactPoints() const;
 
 	bool IsActive() const;
+	bool IsSkeletonSelftCollision() const;
+	bool IsSkeletonIntraCollision() const;
 	
 	private:
 	void SetBodies(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
@@ -165,6 +167,8 @@ class ndContact
 	dUnsigned32 m_active : 1;
 	dUnsigned32 m_isAttached : 1;
 	dUnsigned32 m_killContact : 1;
+	dUnsigned32 m_skeletonIntraCollision : 1;
+	dUnsigned32 m_skeletonSelftCollision : 1;
 	static dVector m_initialSeparatingVector;
 
 	friend class ndScene;
@@ -209,71 +213,63 @@ DG_INLINE void dgContactMaterial::SetAsSoftContact(dFloat32 regularizer)
 	m_skinThickness = regularizer;
 }
 
-DG_INLINE const dgContactMaterial* ntContact::GetMaterial() const
+DG_INLINE const dgContactMaterial* ndContact::GetMaterial() const
 {
 	return m_material;
 }
 
-DG_INLINE bool ntContact::IsDeformable() const 
+DG_INLINE bool ndContact::IsDeformable() const 
 {
 	return false;
 }
 
-DG_INLINE void ntContact::SetDestructorCallback (OnConstraintDestroy destructor)
+DG_INLINE void ndContact::SetDestructorCallback (OnConstraintDestroy destructor)
 {
 }
 
-DG_INLINE void ntContact::SetTimeOfImpact(dFloat32 timetoImpact)
+DG_INLINE void ndContact::SetTimeOfImpact(dFloat32 timetoImpact)
 {
 	m_timeOfImpact = timetoImpact;
 }
 
-DG_INLINE dFloat32 ntContact::GetTimeOfImpact() const
+DG_INLINE dFloat32 ndContact::GetTimeOfImpact() const
 {
 	return m_timeOfImpact;
 }
 
-DG_INLINE dFloat32 ntContact::GetClosestDistance() const
+DG_INLINE dFloat32 ndContact::GetClosestDistance() const
 {
     return m_closestDistance;
 }
 
-DG_INLINE void ntContact::ResetMaxDOF()
+DG_INLINE void ndContact::ResetMaxDOF()
 {
 	m_maxDOF = 0;
 }
 
-DG_INLINE void ntContact::SetPruningTolerance(dFloat32 tolerance)
+DG_INLINE void ndContact::SetPruningTolerance(dFloat32 tolerance)
 {
 	m_contactPruningTolereance = dAbs (tolerance);
 }
 
-DG_INLINE void ntContact::ResetSkeletonIntraCollision()
+DG_INLINE void ndContact::ResetSkeletonIntraCollision()
 {
 	m_skeletonIntraCollision = 0;
 }
 
-DG_INLINE bool ntContact::IsSkeletonIntraCollision() const
-{
-	return m_skeletonIntraCollision;
-}
 
-DG_INLINE void ntContact::ResetSkeletonSelftCollision()
+DG_INLINE void ndContact::ResetSkeletonSelftCollision()
 {
 	m_skeletonSelftCollision = 0;
 }
 
-DG_INLINE bool ntContact::IsSkeletonSelftCollision() const
-{
-	return m_skeletonSelftCollision;
-}
 
-DG_INLINE dFloat32 ntContact::GetImpulseContactSpeed() const
+DG_INLINE dFloat32 ndContact::GetImpulseContactSpeed() const
 {
 	return m_impulseSpeed;
 }
 
-DG_INLINE void ntContact::SetImpulseContactSpeed(dFloat32 speed)
+DG_INLINE void ndContact::SetImpulseContactSpeed(dFloat32 speed)
 {
 	m_impulseSpeed = speed;
 }
@@ -307,6 +303,16 @@ inline const ndContactPointList& ndContact::GetContactPoints() const
 inline bool ndContact::IsActive() const
 {
 	return m_active ? true : false;
+}
+
+inline bool ndContact::IsSkeletonSelftCollision() const
+{
+	return m_skeletonSelftCollision ? true : false;;
+}
+
+inline bool ndContact::IsSkeletonIntraCollision() const
+{
+	return m_skeletonIntraCollision ? true : false;
 }
 
 #endif 

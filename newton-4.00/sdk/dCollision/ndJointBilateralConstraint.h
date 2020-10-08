@@ -76,6 +76,7 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	D_COLLISION_API ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix);
 	D_COLLISION_API virtual ~ndJointBilateralConstraint();
 	
+	bool IsCollidable() const;
 	virtual ndJointBilateralConstraint* GetAsBilateral() { return this; }
 
 	virtual const dUnsigned32 GetRowsCount() const;
@@ -119,11 +120,12 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	ndJointList::dListNode* m_body1Node;
 
 	dFloat32 m_defualtDiagonalRegularizer;
-	dInt8 m_maxDof;
+	dUnsigned32 m_maxDof			: 6;
+	dUnsigned32 m_solverModel		: 2;
+	dUnsigned32 m_isInSkeleton		: 1;
+	dUnsigned32 m_mark				: 1;
+	dUnsigned32 m_enableCollision	: 1;
 	dInt8 m_rowIsMotor;
-	dInt8 m_solverModel;
-	dInt8 m_isInSkeleton;
-	dInt8 m_mark;
 
 	friend class ndWorld;
 	friend class ndDynamicsUpdate;
@@ -218,5 +220,11 @@ inline void ndJointBilateralConstraint::SetSkeletonFlag(bool flag)
 {
 	m_isInSkeleton = flag ? 1 : 0;
 }
+
+inline bool ndJointBilateralConstraint::IsCollidable() const
+{
+	return m_enableCollision ? true : false;
+}
+
 #endif
 

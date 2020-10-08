@@ -49,9 +49,11 @@ ndContact::ndContact()
 	,m_contactPruningTolereance(D_PRUNE_CONTACT_TOLERANCE)
 	,m_maxDOF(0)
 	,m_sceneLru(0)
-	,m_active(false)
-	,m_isAttached(false)
-	,m_killContact(false)
+	,m_active(0)
+	,m_isAttached(0)
+	,m_killContact(0)
+	,m_skeletonIntraCollision(1)
+	,m_skeletonSelftCollision(1)
 {
 }
 

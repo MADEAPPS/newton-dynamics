@@ -28,6 +28,7 @@
 #include "ndBodyKinematic.h"
 #include "ndContactNotify.h"
 #include "ndContactSolver.h"
+#include "ndJointBilateralConstraint.h"
 
 #define D_BASH_SIZE					64
 #define D_CONTACT_DELAY_FRAMES		4
@@ -1330,9 +1331,30 @@ bool ndScene::TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKin
 	return dOverlapTest(body0->m_minAABB, body0->m_maxAABB, body1->m_minAABB, body1->m_maxAABB) ? true : false;
 }
 
-ndBilateralJoint* ndScene::FindBilateralJoint(ndBody* const body0, ndBody* const body1) const
+ndJointBilateralConstraint* ndScene::FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const
 {
-	dAssert(0);
+	if (body0->m_jointList.GetCount() <= body1->m_jointList.GetCount())
+	{
+		for (ndJointList::dListNode* node = body0->m_jointList.GetFirst(); node; node = node->GetNext())
+		{
+			ndJointBilateralConstraint* const joint = node->GetInfo();
+			if ((joint->GetBody0() == body1) || (joint->GetBody1() == body1))
+			{
+				return joint;
+			}
+		}
+	}
+	else
+	{
+		for (ndJointList::dListNode* node = body1->m_jointList.GetFirst(); node; node = node->GetNext())
+		{
+			ndJointBilateralConstraint* const joint = node->GetInfo();
+			if ((joint->GetBody0() == body0) || (joint->GetBody1() == body0))
+			{
+				return joint;
+			}
+		}
+	}
 	return nullptr;
 }
 
@@ -1357,11 +1379,8 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 	ndContact* const contact = FindContactJoint(body0, body1);
 	if (!contact) 
 	{
-		//dAssert(0);
-		//const ndBilateralJoint* const bilateral = FindBilateralJoint(body0, body1);
-		//const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
-		const bool isCollidable = true;
-	
+		const ndJointBilateralConstraint* const bilateral = FindBilateralJoint(body0, body1);
+		const bool isCollidable = bilateral ? bilateral->IsCollidable() : true;
 		if (isCollidable) 
 		{
 			//dUnsigned32 group0_ID = dUnsigned32(body0->m_bodyGroupId);

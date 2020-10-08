@@ -30,7 +30,7 @@ class ndBodyNotify;
 class ndBodyDynamic;
 class ndBodyKinematic;
 class ndRayCastNotify;
-class ndBilateralJoint;
+class ndJointBilateralConstraint;
 
 D_MSV_NEWTON_ALIGN_32
 class ndBody: public dClassAlloc

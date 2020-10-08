@@ -464,7 +464,6 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKine
 	,m_worldNode(nullptr)
 	,m_body0Node(nullptr)
 	,m_body1Node(nullptr)
-	,m_maxDof(dInt8(maxDof))
 {
 	dAssert(m_body0 && m_body1);
 
@@ -476,16 +475,12 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKine
 
 	CalculateLocalMatrix(globalMatrix, m_localMatrix0, m_localMatrix1);
 
-	//m_maxDOF = 6;
-	//m_isBilateral = true;
-	//m_isActive = true;
-	
-	//m_rowIsMotor = 0;
-	//m_massScaleBody0 = dFloat32(1.0f);
-	//m_massScaleBody1 = dFloat32(1.0f);
-
+	m_mark = 0;
+	m_maxDof = maxDof;
 	m_solverModel = 0;
 	m_isInSkeleton = 0;
+	m_enableCollision = 0;
+	m_rowIsMotor = 0;
 	m_defualtDiagonalRegularizer = dFloat32(0.0f);
 	//SetStiffness(dFloat32(0.0f));
 	

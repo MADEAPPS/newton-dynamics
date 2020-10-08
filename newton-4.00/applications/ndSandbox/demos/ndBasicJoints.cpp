@@ -66,26 +66,36 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 
 	//matrix.m_posit.m_y += xxxx;
 	matrix.m_posit.m_y += 5.0f;
+	ndDemoEntity* const entity0 = new ndDemoEntity(matrix, nullptr);
+	entity0->SetMesh(mesh, dGetIdentityMatrix());
+	ndBodyDynamic* const body0 = new ndBodyDynamic();
+	body0->SetNotifyCallback(new ndDemoEntityNotify(entity0));
+	body0->SetMatrix(matrix);
+	body0->SetCollisionShape(capsule);
+	body0->SetMassMatrix(mass, capsule);
+	world->AddBody(body0);
+	scene->AddEntity(entity0);
 
-	ndBodyDynamic* const body = new ndBodyDynamic();
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(mesh, dGetIdentityMatrix());
+	matrix.m_posit.m_y += 0.5f;
+	ndDemoEntity* const entity1 = new ndDemoEntity(matrix, nullptr);
+	entity1->SetMesh(mesh, dGetIdentityMatrix());
+	ndBodyDynamic* const body1 = new ndBodyDynamic();
+	body1->SetNotifyCallback(new ndDemoEntityNotify(entity1));
+	body1->SetMatrix(matrix);
+	body1->SetCollisionShape(capsule);
+	body1->SetMassMatrix(mass, capsule);
+	world->AddBody(body1);
+	scene->AddEntity(entity1);
 
-	body->SetNotifyCallback(new ndDemoEntityNotify(entity));
-	body->SetMatrix(matrix);
-	body->SetCollisionShape(capsule);
-	body->SetMassMatrix(mass, capsule);
-	world->AddBody(body);
-	scene->AddEntity(entity);
-
-	ndBodyDynamic* const fixBody = world->GetSentinelBody();
-
-	dMatrix pinMatrix(matrix);
-	pinMatrix.m_posit.m_y += diameter * 2.0f;
-
-	ndJointBallAndSocket* const joint = new ndJointBallAndSocket(pinMatrix, body, fixBody);
+	dMatrix bodyMatrix0(body0->GetMatrix());
+	dMatrix bodyMatrix1(body1->GetMatrix());
+	dMatrix pinMatrix(bodyMatrix0);
+	pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
+	ndJointBallAndSocket* const joint = new ndJointBallAndSocket(pinMatrix, body0, body1);
 	world->AddJoint(joint);
 
+	//ndBodyDynamic* const fixBody = world->GetSentinelBody();
+	//pinMatrix.m_posit.m_y += diameter * 2.0f;
 
 	mesh->Release();
 }

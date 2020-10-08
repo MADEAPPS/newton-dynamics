@@ -35,7 +35,7 @@ class ndScene;
 class ndContact;
 class ndRayCastNotify;
 class ndContactNotify;
-class ndBilateralJoint;
+class ndJointBilateralConstraint;
 
 D_MSV_NEWTON_ALIGN_32
 class ndSceneTreeNotiFy
@@ -157,7 +157,7 @@ class ndScene
 	void UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndSceneNode** const root);
 
 	ndContact* FindContactJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
-	ndBilateralJoint* FindBilateralJoint(ndBody* const body0, ndBody* const body1) const;
+	ndJointBilateralConstraint* FindBilateralJoint(ndBodyKinematic* const body0, ndBodyKinematic* const body1) const;
 
 	void AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1);
 	bool TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKinematic* const body1) const;

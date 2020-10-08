@@ -495,31 +495,31 @@ void ndDynamicsUpdate::GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* co
 	//if (constraint->GetId() == dgConstraint::m_contactConstraint) 
 	if (joint->GetAsContact())
 	{
-		//dgContact* const contactJoint = (dgContact*)constraint;
-		//contactJoint->m_isInSkeletonLoop = false;
-		//dgSkeletonContainer* const skeleton0 = body0->GetSkeleton();
-		//dgSkeletonContainer* const skeleton1 = body1->GetSkeleton();
-		//if (skeleton0 && (skeleton0 == skeleton1)) 
-		//{
-		//	if (contactJoint->IsSkeletonSelftCollision()) 
-		//	{
-		//		contactJoint->m_isInSkeletonLoop = true;
-		//		skeleton0->AddSelfCollisionJoint(contactJoint);
-		//	}
-		//}
-		//else if (contactJoint->IsSkeletonIntraCollision()) 
-		//{
-		//	if (skeleton0 && !skeleton1) 
-		//	{
-		//		contactJoint->m_isInSkeletonLoop = true;
-		//		skeleton0->AddSelfCollisionJoint(contactJoint);
-		//	}
-		//	else if (skeleton1 && !skeleton0) 
-		//	{
-		//		contactJoint->m_isInSkeletonLoop = true;
-		//		skeleton1->AddSelfCollisionJoint(contactJoint);
-		//	}
-		//}
+		ndContact* const contactJoint = joint->GetAsContact();
+		contactJoint->m_isInSkeletonLoop = false;
+		ndSkeletonContainer* const skeleton0 = contactJoint->GetBody0()->GetSkeleton();
+		ndSkeletonContainer* const skeleton1 = contactJoint->GetBody1()->GetSkeleton();
+		if (skeleton0 && (skeleton0 == skeleton1)) 
+		{
+			if (contactJoint->IsSkeletonSelftCollision()) 
+			{
+				contactJoint->m_isInSkeletonLoop = true;
+				skeleton0->AddSelfCollisionJoint(contactJoint);
+			}
+		}
+		else if (contactJoint->IsSkeletonIntraCollision()) 
+		{
+			if (skeleton0 && !skeleton1) 
+			{
+				contactJoint->m_isInSkeletonLoop = true;
+				skeleton0->AddSelfCollisionJoint(contactJoint);
+			}
+			else if (skeleton1 && !skeleton0) 
+			{
+				contactJoint->m_isInSkeletonLoop = true;
+				skeleton1->AddSelfCollisionJoint(contactJoint);
+			}
+		}
 	}
 	else
 	{ 

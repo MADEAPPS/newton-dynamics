@@ -446,9 +446,8 @@ void ndWorld::UpdateSkeletons()
 				}
 				else 
 				{
-					dAssert(0);
-		//			queuePool.Insert(rootNode);
-		//			rootBody->m_dynamicsLru = lru;
+					queuePool.Push(rootNode);
+					rootBody->m_skeletonMark = 0;
 				}
 		
 				while (!queuePool.IsEmpty()) 
@@ -481,14 +480,12 @@ void ndWorld::UpdateSkeletons()
 								ndBodyKinematic* const childBody = (constraint1->GetBody0() == parentBody) ? constraint1->GetBody1() : constraint1->GetBody0();
 								if (!constraint1->m_solverModel) 
 								{
-									dAssert(0);
 									//if ((childBody->m_dynamicsLru != lru) && (childBody->GetInvMass().m_w != dFloat32(0.0f))) 
 									if (childBody->m_skeletonMark && (childBody->GetInvMass() != dFloat32(0.0f)))
 									{
-										dAssert(0);
-									//	childBody->m_dynamicsLru = lru;
-									//	ndSkeletonContainer::ndNode* const childNode = skeleton->AddChild((ndJointBilateralConstraint*)constraint1, parentNode);
-									//	queuePool.Insert(childNode);
+										childBody->m_skeletonMark = 0;
+										ndSkeletonContainer::ndNode* const childNode = skeleton->AddChild(constraint1, parentNode);
+										queuePool.Push(childNode);
 									}
 									else if (loopCount < (sizeof(loopJoints) / sizeof(loopJoints[0]))) 
 									{
