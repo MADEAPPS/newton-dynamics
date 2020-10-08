@@ -127,6 +127,7 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 
 	friend class ndWorld;
 	friend class ndDynamicsUpdate;
+	friend class ndSkeletonContainer;
 };
 
 inline dInt32 ndJointBilateralConstraint::GetSolverModel() const

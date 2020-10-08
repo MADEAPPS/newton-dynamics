@@ -117,6 +117,7 @@ ndConstraint::ndConstraint()
 	,m_rowCount(0)
 	,m_rowStart(0)
 	,m_jointFeebackForce(false)
+	,m_isInSkeletonLoop(false)
 {
 }
 

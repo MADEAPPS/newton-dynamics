@@ -263,7 +263,7 @@ void ndWorld::RemoveBody(ndBody* const body)
 void ndWorld::AddJoint(ndJointBilateralConstraint* const joint)
 {
 	dAssert(joint->m_worldNode == nullptr);
-	if (joint->m_solverModel <= 3)
+	if (joint->m_solverModel < 3)
 	{
 		m_skeletonList.m_skelListIsDirty = true;
 	}
@@ -281,7 +281,7 @@ void ndWorld::RemoveJoint(ndJointBilateralConstraint* const joint)
 	joint->GetBody1()->DetachJoint(joint->m_body1Node);
 
 	m_jointList.Remove(joint->m_worldNode);
-	if (joint->m_solverModel <= 3)
+	if (joint->m_solverModel < 3)
 	{
 		m_skeletonList.m_skelListIsDirty = true;
 	}
@@ -322,7 +322,7 @@ dInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const jo
 void ndWorld::UpdateSkeletons()
 {
 	D_TRACKTIME();
-return;
+
 	if (m_skeletonList.m_skelListIsDirty) 
 	{
 		m_skeletonList.m_skelListIsDirty = false;
@@ -407,6 +407,7 @@ return;
 			dInt32 m_mod;
 		};
 
+		ndJointBilateralConstraint* loopJoints[64];
 		ndQueue queuePool;
 		
 		//m_dynamicsLru = m_dynamicsLru + 1;
@@ -417,8 +418,8 @@ return;
 			ndJointBilateralConstraint* const constraint = (ndJointBilateralConstraint*)jointArray[i];
 			if (constraint->m_mark) 
 			{
-				//dInt32 loopCount = 0;
 				queuePool.Clear();
+				dInt32 loopCount = 0;
 				ndBodyKinematic* const rootBody = (ndBodyKinematic*)(constraint->GetBody0()->GetInvMass() < constraint->GetBody1()->GetInvMass()) ? constraint->GetBody0() : constraint->GetBody1();
 				ndSkeletonContainer* const skeleton = m_skeletonList.CreateContatiner(rootBody);
 				ndSkeletonContainer::ndNode* const rootNode = skeleton->GetRoot();
@@ -467,33 +468,45 @@ return;
 						//ndBodyKinematic* const parentBody = skeleton->GetBody(parentNode);
 						ndBodyKinematic* const parentBody = parentNode->m_body;
 				
-				//		for (dgBodyMasterListRow::dgListNode* jointNode1 = parentBody->m_masterNode->GetInfo().GetFirst(); jointNode1; jointNode1 = jointNode1->GetNext()) {
-				//			dgBodyMasterListCell* const cell1 = &jointNode1->GetInfo();
-				//			ndJointBilateralConstraint* const constraint1 = cell1->m_joint;
-				//			if (constraint1->IsBilateral() && (constraint1->m_dynamicsLru != lru)) {
-				//				constraint1->m_dynamicsLru = lru;
-				//
-				//				ndBodyKinematic* const childBody = (ndBodyKinematic*)((constraint1->GetBody0() == parentBody) ? constraint1->GetBody1() : constraint1->GetBody0());
-				//				if (!constraint1->m_solverModel) {
-				//					if ((childBody->m_dynamicsLru != lru) && (childBody->GetInvMass().m_w != dFloat32(0.0f))) {
-				//						childBody->m_dynamicsLru = lru;
-				//						ndSkeletonContainer::ndNode* const childNode = skeleton->AddChild((ndJointBilateralConstraint*)constraint1, parentNode);
-				//						queuePool.Insert(childNode);
-				//					}
-				//					else if (loopCount < (sizeof(loopJoints) / sizeof(loopJoints[0]))) {
-				//						loopJoints[loopCount] = (ndJointBilateralConstraint*)constraint1;
-				//						loopCount++;
-				//					}
-				//
-				//					//} else if ((constraint1->m_solverModel != 2) && loopCount < (sizeof (loopJoints) / sizeof(loopJoints[0]))) {
-				//				}
-				//				else if ((constraint1->m_solverModel == 1) && (loopCount < (sizeof(loopJoints) / sizeof(loopJoints[0])))) {
-				//					dAssert(constraint1->m_solverModel != 0);
-				//					loopJoints[loopCount] = (ndJointBilateralConstraint*)constraint1;
-				//					loopCount++;
-				//				}
-				//			}
-				//		}
+						for (ndJointList::dListNode* jointNode1 = parentBody->m_jointList.GetFirst(); jointNode1; jointNode1 = jointNode1->GetNext()) 
+						{
+							//dgBodyMasterListCell* const cell1 = &jointNode1->GetInfo();
+							ndJointBilateralConstraint* const constraint1 = jointNode1->GetInfo();
+							//if (constraint1->IsBilateral() && (constraint1->m_dynamicsLru != lru)) {
+							if (constraint1->m_mark)
+							{ 
+								//constraint1->m_dynamicsLru = lru;
+								constraint1->m_mark = 0;
+							
+								ndBodyKinematic* const childBody = (constraint1->GetBody0() == parentBody) ? constraint1->GetBody1() : constraint1->GetBody0();
+								if (!constraint1->m_solverModel) 
+								{
+									dAssert(0);
+									//if ((childBody->m_dynamicsLru != lru) && (childBody->GetInvMass().m_w != dFloat32(0.0f))) 
+									if (childBody->m_skeletonMark && (childBody->GetInvMass() != dFloat32(0.0f)))
+									{
+										dAssert(0);
+									//	childBody->m_dynamicsLru = lru;
+									//	ndSkeletonContainer::ndNode* const childNode = skeleton->AddChild((ndJointBilateralConstraint*)constraint1, parentNode);
+									//	queuePool.Insert(childNode);
+									}
+									else if (loopCount < (sizeof(loopJoints) / sizeof(loopJoints[0]))) 
+									{
+										dAssert(0);
+									//	loopJoints[loopCount] = (ndJointBilateralConstraint*)constraint1;
+									//	loopCount++;
+									}
+								}
+								else if ((constraint1->m_solverModel == 1) && (loopCount < (sizeof(loopJoints) / sizeof(loopJoints[0])))) 
+								{
+									dAssert(0);
+									dAssert(constraint1->m_solverModel != 0);
+									loopJoints[loopCount] = constraint1;
+									loopCount++;
+								}
+							}
+						}
+
 						index++;
 						if (index >= queuePool.m_mod) 
 						{
@@ -501,7 +514,7 @@ return;
 						}
 					}
 				}
-				//skeleton->Finalize(loopCount, loopJoints);
+				skeleton->Finalize(loopCount, loopJoints);
 			}
 		}
 	}
@@ -509,8 +522,7 @@ return;
 	ndSkeletonList::Iterator iter(m_skeletonList);
 	for (iter.Begin(); iter; iter++) 
 	{
-		dAssert(0);
-		//ndSkeletonContainer* const skeleton = iter.GetNode()->GetInfo();
-		//skeleton->ClearSelfCollision();
+		ndSkeletonContainer* const skeleton = &iter.GetNode()->GetInfo();
+		skeleton->ClearSelfCollision();
 	}
 }

@@ -176,7 +176,6 @@ class ndScene
 	ndSceneNode* m_rootNode;
 	ndContactNotify* m_contactNotifyCallback;
 	dFloat32 m_timestep;
-	//dAtomic<dUnsigned32> m_sleepBodies;
 	dUnsigned32 m_sleepBodies;
 	dAtomic<dUnsigned32> m_activeBodyCount;
 	dUnsigned32 m_sleepBodiesLane[D_MAX_THREADS_COUNT];
@@ -189,6 +188,7 @@ class ndScene
 
 	friend class ndWorld;
 	friend class ndRayCastNotify;
+	friend class ndSkeletonContainer;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline void ndScene::Sync()

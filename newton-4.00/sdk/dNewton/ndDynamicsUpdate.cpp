@@ -531,17 +531,16 @@ void ndDynamicsUpdate::GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* co
 			ndSkeletonContainer* const skeleton1 = bilareral->m_body1->GetSkeleton();
 			if (skeleton0 || skeleton1) 
 			{
-				dAssert(0);
-			//	if (skeleton0 && !skeleton1) 
-			//	{
-			//		constraint->m_isInSkeletonLoop = true;
-			//		skeleton0->AddSelfCollisionJoint(constraint);
-			//	}
-			//	else if (skeleton1 && !skeleton0) 
-			//	{
-			//		constraint->m_isInSkeletonLoop = true;
-			//		skeleton1->AddSelfCollisionJoint(constraint);
-			//	}
+				if (skeleton0 && !skeleton1) 
+				{
+					bilareral->m_isInSkeletonLoop = true;
+					skeleton0->AddSelfCollisionJoint(bilareral);
+				}
+				else if (skeleton1 && !skeleton0) 
+				{
+					bilareral->m_isInSkeletonLoop = true;
+					skeleton1->AddSelfCollisionJoint(bilareral);
+				}
 			}
 		}
 	}
