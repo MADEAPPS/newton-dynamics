@@ -19,23 +19,16 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_WORLD_C_H__
-#define __D_WORLD_C_H__
-
+#include <ndNewton.h>
 #include "ndTypes.h"
 
-#ifdef __cplusplus 
-extern "C" {
-#endif
-
-	typedef void* ndWorldC;
-
-	NEWTON_API ndWorldC ndCreateWorld();
-	NEWTON_API void ndDestroyWorkd(ndWorldC world);
-
-#ifdef __cplusplus 
+void ndSetAllocators(ndMalloc malloc, ncFree free)
+{
+	dMemory::SetMemoryAllocators((dMemAllocCallback)malloc, (dMemFreeCallback)free);
 }
-#endif
 
+size_t ndGetMemoryUsed()
+{
+	return size_t(dMemory::GetMemoryUsed());
+}
 
-#endif

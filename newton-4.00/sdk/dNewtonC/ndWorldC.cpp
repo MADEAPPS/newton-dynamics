@@ -22,16 +22,6 @@
 #include <ndNewton.h>
 #include "ndWorldC.h"
 
-void ndSetAllocators(ndMalloc malloc, ncFree free)
-{
-	dMemory::SetMemoryAllocators((dMemAllocCallback)malloc, (dMemFreeCallback)free);
-}
-
-size_t ndGetMemoryUsed()
-{
-	return size_t(dMemory::GetMemoryUsed());
-}
-
 ndWorldC ndCreateWorld()
 {
 	return (ndWorldC) new ndWorld();
