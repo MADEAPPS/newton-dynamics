@@ -19,36 +19,18 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_TYPES_C_H__
-#define __D_TYPES_C_H__
+#ifndef __D_SHAPE_BOX_C_H__ 
+#define __D_SHAPE_BOX_C_H__ 
 
-#if defined(_MSC_VER)
-	#define ND_LIBRARY_EXPORT __declspec(dllexport)
-	#define ND_LIBRARY_IMPORT __declspec(dllimport)
-#else
-	#define ND_LIBRARY_EXPORT __attribute__((visibility("default")))
-	#define ND_LIBRARY_IMPORT __attribute__((visibility("default")))
-#endif
-
-#ifdef _D_NEWTON_BUILD_DLL
-	#define NEWTON_API ND_LIBRARY_EXPORT
-#else
-	#define NEWTON_API ND_LIBRARY_IMPORT
-#endif
-
+#include "ndTypes.h"
+#include "ndShapeC.h"
 
 #ifdef __cplusplus 
-extern "C" 
-{
+extern "C" {
 #endif
 	
-	typedef float dFloat32;
+	NEWTON_API ndShapeC ndCreateBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);
 
-	typedef void* (*ndMalloc) (size_t sizeInBytes);
-	typedef void(*ncFree) (void* const ptr);
-
-	NEWTON_API size_t ndGetMemoryUsed();
-	NEWTON_API void ndSetAllocators(ndMalloc malloc, ncFree free);
 
 #ifdef __cplusplus 
 }

@@ -195,6 +195,9 @@ matrix.m_posit.m_y += xxxx;
 void BuildFloor(ndWorldC world)
 {
 	ndWorldSync(world);
+
+	ndShapeC boxShape = ndCreateBox(200.0f, 1.0f, 200.f);
+
 	//ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
 	//ndBodyDynamic* const body = new ndBodyDynamic();
 	//
@@ -205,6 +208,8 @@ void BuildFloor(ndWorldC world)
 	//body->SetMatrix(matrix);
 	//body->SetCollisionShape(box);
 	//world.AddBody(body);
+
+	ndShapeRelease(boxShape);
 }
 
 
