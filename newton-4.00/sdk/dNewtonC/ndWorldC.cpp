@@ -27,7 +27,7 @@ ndWorldC ndCreateWorld()
 	return (ndWorldC) new ndWorld();
 }
 
-void ndDestroyWorkd(ndWorldC worldc)
+void ndDestroyWorld(ndWorldC worldc)
 {
 	ndWorld* const world = (ndWorld*)worldc;
 	delete world;
