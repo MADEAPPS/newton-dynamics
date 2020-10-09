@@ -10,6 +10,7 @@
 */
 
 #include "testStdafx.h"
+#include "dMatrix.h"
 
 
 // memory allocation for Newton
@@ -200,9 +201,9 @@ void BuildFloor(ndWorldC world)
 	ndShapeInstanceC instance = ndCreateInstance(boxShape);
 
 	ndBodyDynamicC body = ndCreateBodyDynamic();
-	//dMatrix matrix(dGetIdentityMatrix());
-	//matrix.m_posit.m_y = -0.5f;
-	//
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit.m_y = -0.5f;
+	
 	//body->SetNotifyCallback(new ndDemoEntityNotify);
 	//body->SetMatrix(matrix);
 	//body->SetCollisionShape(box);
