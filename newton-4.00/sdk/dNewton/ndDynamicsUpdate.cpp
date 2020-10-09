@@ -242,8 +242,8 @@ void ndDynamicsUpdate::BuildIsland()
 		for (dInt32 i = bodyArray.GetCount() - 1; i >= 0; i--)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
-			//if (!body->m_islandSleep)
-			if (!body->m_resting)
+			//if (!(body->m_islandSleep)
+			if (!(body->m_resting & body->m_islandSleep))
 			{
 				buffer[count].m_body = body;
 				if (body->GetInvMass() > dFloat32(0.0f))
