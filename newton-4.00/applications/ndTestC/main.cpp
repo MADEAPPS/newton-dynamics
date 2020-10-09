@@ -39,12 +39,10 @@ void operator delete (void* ptr)
 
 static void ForceAndTorqueCallback (ndBodyDynamicC body, dFloat32 timestep)
 {
-
 }
 
 static void SetTransformCallback(ndBodyDynamicC body, const dFloat32* const matrix)
 {
-
 }
 
 
@@ -212,16 +210,15 @@ void BuildFloor(ndWorldC world)
 	ndShapeC boxShape = ndCreateBox(200.0f, 1.0f, 200.f);
 	ndShapeInstanceC instance = ndCreateInstance(boxShape);
 
-	ndBodyDynamicC body = ndCreateBodyDynamic();
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_y = -0.5f;
 
+	ndBodyDynamicC body = ndCreateBodyDynamic();
+	ndBodyDynamicSetMatrix(body, &matrix[0][0]);
 	ndBodyDynamicSetCallbacks(body, nullptr, ForceAndTorqueCallback, SetTransformCallback);
-
-	//body->SetMatrix(matrix);
+	
 	//body->SetCollisionShape(box);
 
-	//world.AddBody(body);
 	ndWorldAddBody(world, body);
 
 	ndDestroyInstance(instance);

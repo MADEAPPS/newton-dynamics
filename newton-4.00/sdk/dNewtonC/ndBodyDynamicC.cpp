@@ -71,3 +71,9 @@ void ndBodyDynamicSetCallbacks(ndBodyDynamicC bodyc, void* const usedData, ndFor
 	ndBodyDynamic* const body = (ndBodyDynamic*)bodyc;
 	body->SetNotifyCallback(new ndBodyNotiFyC(usedData, forceAndTorque, transform));
 }
+
+void ndBodyDynamicSetMatrix(ndBodyDynamicC bodyc, dFloat32* const matrixPtr)
+{
+	ndBodyDynamic* const body = (ndBodyDynamic*)bodyc;
+	body->SetMatrix(dMatrix(matrixPtr));
+}
