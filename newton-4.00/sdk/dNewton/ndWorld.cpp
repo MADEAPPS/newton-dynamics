@@ -340,7 +340,7 @@ void ndWorld::UpdateSkeletons()
 
 		ndDynamicsUpdate& solverUpdate = *this;
 		ndConstraintArray& jointArray = solverUpdate.m_jointArray;
-		jointArray.SetCount(m_jointList.GetCount());
+		jointArray.SetCount(m_jointList.GetCount() + 1);
 
 		dInt32 jointCount = 0;
 		for (ndJointList::dListNode* node = m_jointList.GetFirst(); node; node = node->GetNext())

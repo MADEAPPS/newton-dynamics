@@ -36,8 +36,10 @@ extern "C" {
 	NEWTON_API void ndWorldSync(ndWorldC worldc);
 	NEWTON_API void ndWorldSetSubSteps(ndWorldC worldc, int subSteps);
 	NEWTON_API void ndWorldSetThreadCount(ndWorldC worldc, int workerThreads);
+	NEWTON_API dFloat32 ndWorldGetUpdateTime(ndWorldC worldc);
 
 	NEWTON_API void ndWorldAddBody(ndWorldC worldc, ndBodyDynamicC body);
+	NEWTON_API void ndWorldUpdate(ndWorldC worldc, dFloat32 timestep);
 
 #ifdef __cplusplus 
 }

@@ -45,81 +45,19 @@ static void SetTransformCallback(ndBodyDynamicC body, const dFloat32* const matr
 {
 }
 
-
-class CheckMemoryLeaks
-{
-	public:
-	CheckMemoryLeaks()
-	{
-		#if defined(_DEBUG) && defined(_MSC_VER)
-			// Track all memory leaks at the operating system level.
-			// make sure no Newton tool or utility leaves leaks behind.
-			_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_REPORT_FLAG);
-			//_CrtSetBreakAlloc (127);
-		#endif
-
-		atexit(CheckMemoryLeaksCallback);
-		// Set the memory allocation function before creation the newton world
-		// this is the only function that can be called before the creation of the newton world.
-		// it should be called once, and the the call is optional 
-		//dMemory::SetMemoryAllocators(PhysicsAlloc, PhysicsFree);
-		ndSetAllocators(PhysicsAlloc, PhysicsFree);
-	}
-
-	static void CheckMemoryLeaksCallback()
-	{
-		#if defined(_DEBUG) && defined(_MSC_VER)
-		_CrtDumpMemoryLeaks();
-		#endif
-	}
-};
-
-static CheckMemoryLeaks checkLeaks;
-/*
-class ndDemoEntityNotify: public ndBodyNotify
-{
-	public:
-	ndDemoEntityNotify()
-		:ndBodyNotify()
-	{
-		// here we set the application user data that 
-		// goes with the game engine, for now is just null
-		m_applicationUserData = nullptr;
-	}
-
-	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
-	{
-		ndBodyDynamic* const dynamicBody = GetBody()->GetAsBodyDynamic();
-		if (dynamicBody)
-		{
-			dVector massMatrix(dynamicBody->GetMassMatrix());
-			dVector force(dVector(0.0f, -10.0f, 0.0f, 0.0f).Scale(massMatrix.m_w));
-			dynamicBody->SetForce(force);
-			dynamicBody->SetTorque(dVector::m_zero);
-		}
-	}
-
-	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
-	{
-		// apply this transformation matrix to the application user data.
-		//dAssert(0);
-	}
-
-	void* m_applicationUserData;
-};
-
-dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist)
+static dVector FindFloor(ndWorldC world, const dVector& origin, dFloat32 dist)
 {
 	// shot a vertical ray from a high altitude and collect the intersection parameter.
 	dVector p0(origin);
 	dVector p1(origin - dVector(0.0f, dAbs(dist), 0.0f, 0.0f));
-
-	ndRayCastClosestHitCallback rayCaster(world.GetScene());
-	dFloat32 param = rayCaster.TraceRay(p0, p1);
-	return (param < 1.0f) ? rayCaster.m_contact.m_point : p0;
+	
+	//ndRayCastClosestHitCallback rayCaster(world.GetScene());
+	//dFloat32 param = rayCaster.TraceRay(p0, p1);
+	//return (param < 1.0f) ? rayCaster.m_contact.m_point : p0;
+	return dVector(0.0f);
 }
 
-
+/*
 void BuildPyramid(ndWorld& world, dFloat32 mass, const dVector& origin, const dVector& size, int count)
 {
 	dMatrix matrix(dGetIdentityMatrix());
@@ -176,9 +114,11 @@ void BuildSphere(ndWorldC world, dFloat32 mass, const dVector& origin, const dFl
 
 	ndWorldSync(world);
 
-	//ndShapeInstance sphere(new ndShapeSphere(diameter * 0.5f));
-	//
-	//dVector floor(FindFloor(world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	ndShapeC sphereShape = ndCreateSphere(diameter * 0.5f);
+	ndShapeInstanceC sphereInstance = ndCreateInstance(sphereShape);
+	ndShapeRelease(sphereShape);
+
+	dVector floor(FindFloor(world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	//matrix.m_posit.m_y = floor.m_y + diameter * 0.5f * 0.99f;
 	//matrix.m_posit.m_y += xxxx;
 
@@ -194,6 +134,8 @@ void BuildSphere(ndWorldC world, dFloat32 mass, const dVector& origin, const dFl
 	//	world.AddBody(body);
 	//	matrix.m_posit += matrix.m_up.Scale(diameter * 0.99f);
 	//}
+
+	ndDestroyInstance(sphereInstance);
 }
 
 void BuildFloor(ndWorldC world)
@@ -202,6 +144,7 @@ void BuildFloor(ndWorldC world)
 
 	ndShapeC boxShape = ndCreateBox(200.0f, 1.0f, 200.f);
 	ndShapeInstanceC boxInstance = ndCreateInstance(boxShape);
+	ndShapeRelease(boxShape);
 
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_y = -0.5f;
@@ -213,12 +156,16 @@ void BuildFloor(ndWorldC world)
 	ndWorldAddBody(world, body);
 
 	ndDestroyInstance(boxInstance);
-	ndShapeRelease(boxShape);
 }
 
 
 int main (int argc, const char * argv[]) 
 {
+	#if defined(_DEBUG) && defined(_MSC_VER)
+	_CrtSetDbgFlag(_CRTDBG_LEAK_CHECK_DF | _CRTDBG_REPORT_FLAG);
+	//_CrtSetBreakAlloc (127);
+	#endif
+
 	ndWorldC world = ndCreateWorld();
 	ndWorldSetSubSteps(world, 2);
 	ndWorldSetThreadCount(world, 4);
@@ -232,14 +179,18 @@ int main (int argc, const char * argv[])
 	BuildSphere(world, 1.0f, origin + dVector(3.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 1.0f);
 	//BuildSphere(world, 1.0f, origin + dVector(6.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
 	//BuildSphere(world, 1.0f, origin + dVector(9.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
-/*	
+	
 	dFloat32 totalTime = 0;
 	for (int i = 0; i < 10000; i ++)
 	{
-		totalTime += world.GetUpdateTime();
-		world.Update(1.0f / 60.0f);
+		totalTime += ndWorldGetUpdateTime(world);
+		ndWorldUpdate(world, 1.0f / 60.0f);
 	}
-*/
+
 	ndDestroyWorld(world);
+
+	#if defined(_DEBUG) && defined(_MSC_VER)
+	_CrtDumpMemoryLeaks();
+	#endif
 	return 0;
 }

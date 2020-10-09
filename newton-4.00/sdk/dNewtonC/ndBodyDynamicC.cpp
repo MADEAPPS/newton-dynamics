@@ -34,6 +34,11 @@ class ndBodyNotiFyC: public ndBodyNotify
 	{
 	}
 
+	virtual void* GetUserData() const
+	{
+		return m_usedData;
+	}
+
 	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
 	{
 		if (m_forceAndTorque)
@@ -57,13 +62,21 @@ class ndBodyNotiFyC: public ndBodyNotify
 
 ndBodyDynamicC ndCreateBodyDynamic()
 {
-	return (ndBodyDynamicC)new ndBodyKinematic();
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	return (ndBodyDynamicC)body;
 }
 
-void ndDestroyCreateBodyDynamic(ndBodyDynamicC bodyC)
+void ndBodyDynamicDestroy(ndBodyDynamicC bodyc)
 {
-	ndBodyDynamic* const body = (ndBodyDynamic*)bodyC;
+	ndBodyDynamic* const body = (ndBodyDynamic*)bodyc;
 	delete body;
+}
+
+void* ndBodyDynamicGetUserData(ndBodyDynamicC bodyc)
+{
+	ndBodyDynamic* const body = (ndBodyDynamic*)bodyc;
+	ndBodyNotify* const notify = body->GetNotifyCallback();
+	return notify->GetUserData();
 }
 
 void ndBodyDynamicSetCallbacks(ndBodyDynamicC bodyc, void* const usedData, ndForceAndTorque forceAndTorque, ndSetTransform transform)

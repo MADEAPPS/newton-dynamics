@@ -314,6 +314,7 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 			//D_TRACKTIME();
 			for (dInt32 i = 0; i < count; i++)
 			{
+				dAssert(bodyArray[start + i]->GetAsBodyDynamic());
 				ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
 				body->IntegrateExternalForce(timestep);
 			}

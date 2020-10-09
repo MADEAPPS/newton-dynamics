@@ -19,49 +19,11 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_BODY_NOTIFY_H__
-#define __D_BODY_NOTIFY_H__
+#include <ndNewton.h>
+#include "ndShapeSphereC.h"
 
-#include "ndCollisionStdafx.h"
-
-D_MSV_NEWTON_ALIGN_32
-class ndBodyNotify: public dClassAlloc
+ndShapeC ndCreateSphere(dFloat32 radius)
 {
-	public:  
-	ndBodyNotify()
-		:dClassAlloc()
-		,m_body(nullptr)
-	{
-	}
-
-	virtual ~ndBodyNotify()
-	{
-	}
-
-	ndBody* GetBody()
-	{
-		return m_body;
-	}
-
-	virtual void* GetUserData() const
-	{
-		return nullptr;
-	}
-
-	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
-	{
-	}
-
-	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
-	{
-	}
-
-	private:
-	ndBody* m_body;
-
-	friend class ndBody;
-
-} D_GCC_NEWTON_ALIGN_32;
-
-#endif 
-
+	ndShape* const shape = new ndShapeSphere(radius);
+	return (ndShapeC) shape->AddRef();
+}

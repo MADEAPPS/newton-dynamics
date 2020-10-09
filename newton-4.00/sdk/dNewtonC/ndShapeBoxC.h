@@ -26,7 +26,8 @@
 #include "ndShapeC.h"
 
 #ifdef __cplusplus 
-extern "C" {
+extern "C" 
+{
 #endif
 	
 	NEWTON_API ndShapeC ndCreateBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z);

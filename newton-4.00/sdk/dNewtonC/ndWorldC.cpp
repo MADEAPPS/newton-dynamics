@@ -51,10 +51,21 @@ void ndWorldSetThreadCount(ndWorldC worldc, int workerThreads)
 	world->SetThreadCount(workerThreads);
 }
 
-
 void ndWorldAddBody(ndWorldC worldc, ndBodyDynamicC bodyc)
 {
 	ndWorld* const world = (ndWorld*)worldc;
 	ndBodyDynamic* const body = (ndBodyDynamic*)bodyc;
 	world->AddBody(body);
+}
+
+dFloat32 ndWorldGetUpdateTime(ndWorldC worldc)
+{
+	ndWorld* const world = (ndWorld*)worldc;
+	return world->GetUpdateTime();
+}
+
+void ndWorldUpdate(ndWorldC worldc, dFloat32 timestep)
+{
+	ndWorld* const world = (ndWorld*)worldc;
+	world->Update(timestep);
 }

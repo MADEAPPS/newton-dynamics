@@ -21,5 +21,12 @@
 
 #define dAssert(x)
 
+template <class T>
+T dAbs(T A)
+{
+	// according to Intel this is better because is does not read after write
+	return (A >= T(0)) ? A : -A;
+}
+
 #endif
 

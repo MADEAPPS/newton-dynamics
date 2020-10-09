@@ -35,7 +35,9 @@ extern "C"
 	typedef void(*ndSetTransform) (ndBodyDynamicC body, const dFloat32* const matrix);
 
 	NEWTON_API ndBodyDynamicC ndCreateBodyDynamic();
-	NEWTON_API void ndDestroyCreateBodyDynamic(ndBodyDynamicC bodyc);
+	NEWTON_API void ndBodyDynamicDestroy(ndBodyDynamicC bodyc);
+
+	NEWTON_API void* ndBodyDynamicGetUserData(ndBodyDynamicC bodyc);
 	NEWTON_API void ndBodyDynamicSetMatrix(ndBodyDynamicC bodyc, dFloat32* const matrix);
 	NEWTON_API void ndBodyDynamicSetCollisionShape(ndBodyDynamicC bodyc, ndShapeInstanceC shapeInstancec);
 	NEWTON_API void ndBodyDynamicSetCallbacks(ndBodyDynamicC bodyc, void* const usedData, ndForceAndTorque forceAndTorque, ndSetTransform transform);
