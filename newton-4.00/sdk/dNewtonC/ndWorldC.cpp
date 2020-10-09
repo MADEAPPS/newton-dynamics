@@ -39,6 +39,19 @@ void ndWorldSync(ndWorldC worldc)
 	world->Sync();
 }
 
+void ndWorldSetSubSteps(ndWorldC worldc, int subSteps)
+{
+	ndWorld* const world = (ndWorld*)worldc;
+	world->SetSubSteps(subSteps);
+}
+
+void ndWorldSetThreadCount(ndWorldC worldc, int workerThreads)
+{
+	ndWorld* const world = (ndWorld*)worldc;
+	world->SetThreadCount(workerThreads);
+}
+
+
 void ndWorldAddBody(ndWorldC worldc, ndBodyDynamicC bodyc)
 {
 	ndWorld* const world = (ndWorld*)worldc;
