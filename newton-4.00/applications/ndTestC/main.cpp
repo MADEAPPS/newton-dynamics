@@ -45,16 +45,42 @@ static void SetTransformCallback(ndBodyDynamicC body, const dFloat32* const matr
 {
 }
 
+
+class RayCastData
+{
+	public:
+	RayCastData()
+		:m_param(1.2f)
+	{
+	}
+
+	dVector m_hitPoint;
+	dFloat m_param;
+};
+	
+static dFloat32 RayCastFilterCallback(void* const userData, const ndRayCastContactC* const contact, dFloat32 intersetParam)
+{
+	RayCastData* const data = (RayCastData*)userData;
+	if (intersetParam < data->m_param)
+	{
+		data->m_param = intersetParam;
+		data->m_hitPoint.m_x = contact->m_point.m_x;
+		data->m_hitPoint.m_y = contact->m_point.m_y;
+		data->m_hitPoint.m_z = contact->m_point.m_z;
+		data->m_hitPoint.m_w = contact->m_point.m_w;
+	}
+	return intersetParam;
+}
+
 static dVector FindFloor(ndWorldC world, const dVector& origin, dFloat32 dist)
 {
 	// shot a vertical ray from a high altitude and collect the intersection parameter.
 	dVector p0(origin);
 	dVector p1(origin - dVector(0.0f, dAbs(dist), 0.0f, 0.0f));
-	
-	//ndRayCastClosestHitCallback rayCaster(world.GetScene());
-	//dFloat32 param = rayCaster.TraceRay(p0, p1);
-	//return (param < 1.0f) ? rayCaster.m_contact.m_point : p0;
-	return dVector(0.0f);
+
+	RayCastData contact;
+	dFloat32 param = ndWorldRayCast(world, &p0.m_x, &p1.m_x, &contact, RayCastFilterCallback, nullptr);
+	return (param < 1.0f) ? contact.m_hitPoint : p0;
 }
 
 /*
@@ -119,11 +145,11 @@ void BuildSphere(ndWorldC world, dFloat32 mass, const dVector& origin, const dFl
 	ndShapeRelease(sphereShape);
 
 	dVector floor(FindFloor(world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	//matrix.m_posit.m_y = floor.m_y + diameter * 0.5f * 0.99f;
-	//matrix.m_posit.m_y += xxxx;
+	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f * 0.99f;
+	matrix.m_posit.m_y += xxxx;
 
-	//for (int i = 0; i < count; i++)
-	//{
+	for (int i = 0; i < count; i++)
+	{
 	//	ndBodyDynamic* const body = new ndBodyDynamic();
 	//
 	//	body->SetNotifyCallback(new ndDemoEntityNotify);
@@ -133,7 +159,7 @@ void BuildSphere(ndWorldC world, dFloat32 mass, const dVector& origin, const dFl
 	//
 	//	world.AddBody(body);
 	//	matrix.m_posit += matrix.m_up.Scale(diameter * 0.99f);
-	//}
+	}
 
 	ndDestroyInstance(sphereInstance);
 }

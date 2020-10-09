@@ -31,6 +31,7 @@ extern "C"
 #endif
 
 	typedef void* ndBodyDynamicC;
+
 	typedef void(*ndForceAndTorque) (ndBodyDynamicC body, dFloat32 timestep);
 	typedef void(*ndSetTransform) (ndBodyDynamicC body, const dFloat32* const matrix);
 

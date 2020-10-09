@@ -32,8 +32,8 @@ D_MSV_NEWTON_ALIGN_32
 class ndRayCastNotify
 {
 	public: 
-	ndRayCastNotify(const ndScene* const broadPhase)
-		:m_broadPhase(broadPhase)
+	ndRayCastNotify(const ndScene* const scene)
+		:m_scene(scene)
 	{
 	}
 
@@ -43,10 +43,10 @@ class ndRayCastNotify
 
 	dFloat32 TraceRay(const dVector& p0, const dVector& p1)
 	{
-		return m_broadPhase->RayCast(*this, p0, p1);
+		return m_scene->RayCast(*this, p0, p1);
 	}
 
-	dUnsigned32 virtual OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const collision)
+	virtual dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const collision)
 	{
 		return 1;
 	}
@@ -54,7 +54,7 @@ class ndRayCastNotify
 	virtual dFloat32 OnRayCastAction(const ndContactPoint& contact, dFloat32 intersetParam) = 0;
 
 	protected:
-	const ndScene* m_broadPhase;
+	const ndScene* m_scene;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 D_MSV_NEWTON_ALIGN_32

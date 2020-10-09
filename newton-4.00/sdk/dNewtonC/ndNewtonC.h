@@ -25,6 +25,7 @@
 #include <ndTypes.h>
 #include <ndWorldC.h>
 #include <ndShapeC.h>
+#include <ndRayCastC.h>
 #include <ndShapeBoxC.h>
 #include <ndShapeSphereC.h>
 #include <ndBodyDynamicC.h>

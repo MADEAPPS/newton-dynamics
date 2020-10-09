@@ -19,44 +19,33 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_TYPES_C_H__
-#define __D_TYPES_C_H__
+#ifndef __D_RAYCAST_C_H__ 
+#define __D_RAYCAST_C_H__ 
 
-#if defined(_MSC_VER)
-	#define ND_LIBRARY_EXPORT __declspec(dllexport)
-	#define ND_LIBRARY_IMPORT __declspec(dllimport)
-#else
-	#define ND_LIBRARY_EXPORT __attribute__((visibility("default")))
-	#define ND_LIBRARY_IMPORT __attribute__((visibility("default")))
-#endif
-
-#ifdef _D_NEWTON_BUILD_DLL
-	#define NEWTON_API ND_LIBRARY_EXPORT
-#else
-	#define NEWTON_API ND_LIBRARY_IMPORT
-#endif
-
+#include "ndTypes.h"
+#include "ndWorldC.h"
+#include "ndBodyDynamicC.h"
 
 #ifdef __cplusplus 
 extern "C" 
 {
 #endif
 	
-	typedef float dFloat32;
-
-	typedef struct dVector4
+	typedef struct ndRayCastContactC
 	{
-		dFloat32 m_x;
-		dFloat32 m_y;
-		dFloat32 m_z;
-		dFloat32 m_w;
-	} dVector4;
+		dVector4 m_point;
+		dVector4 m_normal;
+		ndBodyDynamicC m_body;
+		ndShapeInstanceC m_shapeInstance;
+		dFloat32 m_penetration;
+	} ndRayCastContactC;
 
-	typedef void* (*ndMalloc) (size_t sizeInBytes);
-	typedef void(*ndFree) (void* const ptr);
+	typedef dFloat32 (*ndRayCastFilterCallback) (void* const userData, const ndRayCastContactC* const contact, dFloat32 intersetParam);
+	typedef unsigned(*ndRayCastPrefilterCallback)(void* const userData, ndBodyDynamicC body, ndShapeC shapec);
 
-	NEWTON_API size_t ndGetMemoryUsed();
-	NEWTON_API void ndSetAllocators(ndMalloc malloc, ndFree free);
+	NEWTON_API dFloat32 ndWorldRayCast(
+		ndWorldC worldc, dFloat32* const p0, dFloat32* const p1,
+		void* const userdata, ndRayCastFilterCallback filter, ndRayCastPrefilterCallback prefilter);
 
 #ifdef __cplusplus 
 }
