@@ -64,12 +64,6 @@ dFloat32 ndWorldGetUpdateTime(ndWorldC worldc)
 	return world->GetUpdateTime();
 }
 
-void ndWorldRayCast(ndWorldC worldc)
-{
-	ndWorld* const world = (ndWorld*)worldc;
-
-}
-
 void ndWorldUpdate(ndWorldC worldc, dFloat32 timestep)
 {
 	ndWorld* const world = (ndWorld*)worldc;

@@ -41,6 +41,7 @@ extern "C"
 	NEWTON_API void* ndBodyDynamicGetUserData(ndBodyDynamicC bodyc);
 	NEWTON_API void ndBodyDynamicSetMatrix(ndBodyDynamicC bodyc, dFloat32* const matrix);
 	NEWTON_API void ndBodyDynamicSetCollisionShape(ndBodyDynamicC bodyc, ndShapeInstanceC shapeInstancec);
+	NEWTON_API void ndBodyDynamicSetMassMatrix(ndBodyDynamicC bodyc, dFloat32 mass, ndShapeInstanceC shapeInstancec);
 	NEWTON_API void ndBodyDynamicSetCallbacks(ndBodyDynamicC bodyc, void* const usedData, ndForceAndTorque forceAndTorque, ndSetTransform transform);
 
 #ifdef __cplusplus 

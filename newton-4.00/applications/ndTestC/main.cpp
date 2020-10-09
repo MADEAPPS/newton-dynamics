@@ -83,55 +83,6 @@ static dVector FindFloor(ndWorldC world, const dVector& origin, dFloat32 dist)
 	return (param < 1.0f) ? contact.m_hitPoint : p0;
 }
 
-/*
-void BuildPyramid(ndWorld& world, dFloat32 mass, const dVector& origin, const dVector& size, int count)
-{
-	dMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
-	world.Sync();
-ndShapeInstance xxx(new ndShapeSphere(1.0f));
-	ndShapeInstance box(new ndShapeBox(size.m_x, size.m_y, size.m_z));
-
-	dVector floor(FindFloor(world, dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y + size.m_y / 2.0f;
-
-	// get the dimension from shape itself
-	dVector minP(0.0f);
-	dVector maxP(0.0f);
-	box.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
-
-	dFloat32 stepz = maxP.m_z - minP.m_z + 0.03125f;
-	dFloat32 stepy = (maxP.m_y - minP.m_y) - 0.01f;
-		  
-	//dFloat32 y0 = matrix.m_posit.m_y + stepy / 2.0f;
-	dFloat32 z0 = matrix.m_posit.m_z - stepz * count / 2;
-
-z0 = 0.0f;
-count = 1;
-	for (int j = 0; j < count; j++) 
-	{
-		matrix.m_posit.m_z = z0;
-		const dInt32 count1 = count - j;
-		for (int i = 0; i < count1; i++)
-		{
-			ndBodyDynamic* const body = new ndBodyDynamic();
-
-			body->SetNotifyCallback(new ndDemoEntityNotify);
-			body->SetMatrix(matrix);
-			body->SetCollisionShape(box);
-			body->SetMassMatrix(mass, box);
-
-			world.AddBody(body);
-			matrix.m_posit.m_z += stepz;
-		}
-		z0 += stepz * 0.5f;
-		matrix.m_posit.m_y += stepy;
-	}
-}
-*/
-
 void BuildSphere(ndWorldC world, dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
 {
 	dMatrix matrix(dGetIdentityMatrix());
@@ -150,15 +101,15 @@ void BuildSphere(ndWorldC world, dFloat32 mass, const dVector& origin, const dFl
 
 	for (int i = 0; i < count; i++)
 	{
-	//	ndBodyDynamic* const body = new ndBodyDynamic();
-	//
-	//	body->SetNotifyCallback(new ndDemoEntityNotify);
-	//	body->SetMatrix(matrix);
-	//	body->SetCollisionShape(sphere);
-	//	body->SetMassMatrix(mass, sphere);
-	//
-	//	world.AddBody(body);
-	//	matrix.m_posit += matrix.m_up.Scale(diameter * 0.99f);
+		ndBodyDynamicC body = ndCreateBodyDynamic();
+	
+		ndBodyDynamicSetMatrix(body, &matrix[0][0]);
+		ndBodyDynamicSetCollisionShape(body, sphereInstance);
+		ndBodyDynamicSetCallbacks(body, nullptr, ForceAndTorqueCallback, SetTransformCallback);
+		ndBodyDynamicSetMassMatrix(body, mass, sphereInstance);
+	
+		ndWorldAddBody(world, body);
+		matrix.m_posit += matrix.m_up.Scale(diameter * 0.99f);
 	}
 
 	ndDestroyInstance(sphereInstance);
@@ -177,8 +128,8 @@ void BuildFloor(ndWorldC world)
 
 	ndBodyDynamicC body = ndCreateBodyDynamic();
 	ndBodyDynamicSetMatrix(body, &matrix[0][0]);
-	ndBodyDynamicSetCallbacks(body, nullptr, ForceAndTorqueCallback, SetTransformCallback);
 	ndBodyDynamicSetCollisionShape(body, boxInstance);
+	ndBodyDynamicSetCallbacks(body, nullptr, ForceAndTorqueCallback, SetTransformCallback);
 	ndWorldAddBody(world, body);
 
 	ndDestroyInstance(boxInstance);
@@ -196,15 +147,9 @@ int main (int argc, const char * argv[])
 	ndWorldSetSubSteps(world, 2);
 	ndWorldSetThreadCount(world, 4);
 
-	//dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
 	dVector origin(0.0f, 0.0f, 0.0f, 0.0f);
 	BuildFloor(world);
-
-	//BuildPyramid(world, 10.0f, origin, size, 20);
-	//BuildSphere(world, 1.0f, origin + dVector(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 2, 0.0f);
 	BuildSphere(world, 1.0f, origin + dVector(3.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 1.0f);
-	//BuildSphere(world, 1.0f, origin + dVector(6.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
-	//BuildSphere(world, 1.0f, origin + dVector(9.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 0.0f);
 	
 	dFloat32 totalTime = 0;
 	for (int i = 0; i < 10000; i ++)
