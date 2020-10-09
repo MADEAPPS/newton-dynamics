@@ -208,7 +208,7 @@ void BuildFloor(ndWorldC world)
 	ndWorldSync(world);
 
 	ndShapeC boxShape = ndCreateBox(200.0f, 1.0f, 200.f);
-	ndShapeInstanceC instance = ndCreateInstance(boxShape);
+	ndShapeInstanceC boxInstance = ndCreateInstance(boxShape);
 
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_y = -0.5f;
@@ -216,12 +216,10 @@ void BuildFloor(ndWorldC world)
 	ndBodyDynamicC body = ndCreateBodyDynamic();
 	ndBodyDynamicSetMatrix(body, &matrix[0][0]);
 	ndBodyDynamicSetCallbacks(body, nullptr, ForceAndTorqueCallback, SetTransformCallback);
-	
-	//body->SetCollisionShape(box);
-
+	ndBodyDynamicSetCollisionShape(body, boxInstance);
 	ndWorldAddBody(world, body);
 
-	ndDestroyInstance(instance);
+	ndDestroyInstance(boxInstance);
 	ndShapeRelease(boxShape);
 }
 

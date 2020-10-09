@@ -23,23 +23,22 @@
 #define __D_DYNAMIC_BODY_C_H__ 
 
 #include "ndTypes.h"
-
+#include "ndShapeInstanceC.h"
 
 #ifdef __cplusplus 
 extern "C" 
 {
 #endif
+
 	typedef void* ndBodyDynamicC;
 	typedef void(*ndForceAndTorque) (ndBodyDynamicC body, dFloat32 timestep);
 	typedef void(*ndSetTransform) (ndBodyDynamicC body, const dFloat32* const matrix);
 
-
 	NEWTON_API ndBodyDynamicC ndCreateBodyDynamic();
 	NEWTON_API void ndDestroyCreateBodyDynamic(ndBodyDynamicC bodyc);
-	NEWTON_API void ndBodyDynamicSetCallbacks(ndBodyDynamicC bodyc, void* const usedData, ndForceAndTorque forceAndTorque, ndSetTransform transform);
 	NEWTON_API void ndBodyDynamicSetMatrix(ndBodyDynamicC bodyc, dFloat32* const matrix);
-
-
+	NEWTON_API void ndBodyDynamicSetCollisionShape(ndBodyDynamicC bodyc, ndShapeInstanceC shapeInstancec);
+	NEWTON_API void ndBodyDynamicSetCallbacks(ndBodyDynamicC bodyc, void* const usedData, ndForceAndTorque forceAndTorque, ndSetTransform transform);
 
 #ifdef __cplusplus 
 }

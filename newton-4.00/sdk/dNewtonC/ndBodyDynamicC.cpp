@@ -77,3 +77,10 @@ void ndBodyDynamicSetMatrix(ndBodyDynamicC bodyc, dFloat32* const matrixPtr)
 	ndBodyDynamic* const body = (ndBodyDynamic*)bodyc;
 	body->SetMatrix(dMatrix(matrixPtr));
 }
+
+void ndBodyDynamicSetCollisionShape(ndBodyDynamicC bodyc, ndShapeInstanceC shapeInstancec)
+{
+	ndBodyDynamic* const body = (ndBodyDynamic*)bodyc;
+	ndShapeInstance* const instance = (ndShapeInstance*)shapeInstancec;
+	body->SetCollisionShape(*instance);
+}
