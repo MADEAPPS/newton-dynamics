@@ -19,39 +19,18 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_TYPES_C_H__
-#define __D_TYPES_C_H__
 
-#if defined(_MSC_VER)
-	#define ND_LIBRARY_EXPORT __declspec(dllexport)
-	#define ND_LIBRARY_IMPORT __declspec(dllimport)
-#else
-	#define ND_LIBRARY_EXPORT __attribute__((visibility("default")))
-	#define ND_LIBRARY_IMPORT __attribute__((visibility("default")))
-#endif
+#include <ndNewton.h>
+#include "ndBodyDynamicC.h"
 
-#ifdef _D_NEWTON_BUILD_DLL
-	#define NEWTON_API ND_LIBRARY_EXPORT
-#else
-	#define NEWTON_API ND_LIBRARY_IMPORT
-#endif
-
-
-#ifdef __cplusplus 
-extern "C" 
+ndBodyDynamicC ndCreateBodyDynamic()
 {
-#endif
-	
-	typedef float dFloat32;
-
-	typedef void* (*ndMalloc) (size_t sizeInBytes);
-	typedef void(*ndFree) (void* const ptr);
-
-	NEWTON_API size_t ndGetMemoryUsed();
-	NEWTON_API void ndSetAllocators(ndMalloc malloc, ndFree free);
-
-#ifdef __cplusplus 
+	return (ndBodyDynamicC)new ndBodyKinematic();
 }
-#endif
 
-#endif
+void ndDestroyCreateBodyDynamic(ndBodyDynamicC bodyC)
+{
+	ndBodyDynamic* const body = (ndBodyDynamic*)bodyC;
+	delete body;
+}
+

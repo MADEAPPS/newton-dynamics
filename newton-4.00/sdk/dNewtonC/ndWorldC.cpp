@@ -38,3 +38,10 @@ void ndWorldSync(ndWorldC worldc)
 	ndWorld* const world = (ndWorld*)worldc;
 	world->Sync();
 }
+
+void ndWorldAddBody(ndWorldC worldc, ndBodyDynamicC bodyc)
+{
+	ndWorld* const world = (ndWorld*)worldc;
+	ndBodyDynamic* const body = (ndBodyDynamic*)bodyc;
+	world->AddBody(body);
+}

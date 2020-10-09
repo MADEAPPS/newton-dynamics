@@ -22,7 +22,7 @@
 #include <ndNewton.h>
 #include "ndTypes.h"
 
-void ndSetAllocators(ndMalloc malloc, ncFree free)
+void ndSetAllocators(ndMalloc malloc, ndFree free)
 {
 	dMemory::SetMemoryAllocators((dMemAllocCallback)malloc, (dMemFreeCallback)free);
 }

@@ -23,6 +23,7 @@
 #define __D_WORLD_C_H__
 
 #include "ndTypes.h"
+#include "ndBodyDynamicC.h"
 
 #ifdef __cplusplus 
 extern "C" {
@@ -33,6 +34,8 @@ extern "C" {
 	NEWTON_API ndWorldC ndCreateWorld();
 	NEWTON_API void ndDestroyWorld(ndWorldC worldc);
 	NEWTON_API void ndWorldSync(ndWorldC worldc);
+
+	NEWTON_API void ndWorldAddBody(ndWorldC worldc, ndBodyDynamicC body);
 
 #ifdef __cplusplus 
 }

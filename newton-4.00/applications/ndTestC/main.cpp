@@ -199,14 +199,16 @@ void BuildFloor(ndWorldC world)
 	ndShapeC boxShape = ndCreateBox(200.0f, 1.0f, 200.f);
 	ndShapeInstanceC instance = ndCreateInstance(boxShape);
 
-	//ndBodyDynamic* const body = new ndBodyDynamic();
+	ndBodyDynamicC body = ndCreateBodyDynamic();
 	//dMatrix matrix(dGetIdentityMatrix());
 	//matrix.m_posit.m_y = -0.5f;
 	//
 	//body->SetNotifyCallback(new ndDemoEntityNotify);
 	//body->SetMatrix(matrix);
 	//body->SetCollisionShape(box);
+
 	//world.AddBody(body);
+	ndWorldAddBody(world, body);
 
 	ndDestroyInstance(instance);
 	ndShapeRelease(boxShape);
