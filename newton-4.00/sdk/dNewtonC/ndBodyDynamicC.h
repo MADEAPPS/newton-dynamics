@@ -30,9 +30,16 @@ extern "C"
 {
 #endif
 	typedef void* ndBodyDynamicC;
+	typedef void(*ndForceAndTorque) (ndBodyDynamicC body, dFloat32 timestep);
+	typedef void(*ndSetTransform) (ndBodyDynamicC body, const dFloat32* const matrix);
+
 
 	NEWTON_API ndBodyDynamicC ndCreateBodyDynamic();
 	NEWTON_API void ndDestroyCreateBodyDynamic(ndBodyDynamicC body);
+
+	NEWTON_API void ndBodyDynamicSetCallbacks(ndBodyDynamicC body, void* const usedData, ndForceAndTorque forceAndTorque, ndSetTransform transform);
+
+
 
 #ifdef __cplusplus 
 }

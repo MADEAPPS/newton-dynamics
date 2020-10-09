@@ -23,6 +23,38 @@
 #include <ndNewton.h>
 #include "ndBodyDynamicC.h"
 
+class ndBodyNotiFyC: public ndBodyNotify
+{
+	public:
+	ndBodyNotiFyC(void* const usedData, ndForceAndTorque forceAndTorque, ndSetTransform transform)
+		:ndBodyNotify()
+		,m_usedData(usedData)
+		,m_transform(transform)
+		,m_forceAndTorque(forceAndTorque)
+	{
+	}
+
+	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
+	{
+		if (m_forceAndTorque)
+		{
+			m_forceAndTorque((ndBodyDynamicC)GetBody(), timestep);
+		}
+	}
+
+	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
+	{
+		if (m_transform)
+		{
+			m_transform((ndBodyDynamicC)GetBody(), &matrix[0][0]);
+		}
+	}
+
+	void* m_usedData;
+	ndSetTransform m_transform;
+	ndForceAndTorque m_forceAndTorque;
+};
+
 ndBodyDynamicC ndCreateBodyDynamic()
 {
 	return (ndBodyDynamicC)new ndBodyKinematic();
@@ -34,3 +66,8 @@ void ndDestroyCreateBodyDynamic(ndBodyDynamicC bodyC)
 	delete body;
 }
 
+void ndBodyDynamicSetCallbacks(ndBodyDynamicC bodyc, void* const usedData, ndForceAndTorque forceAndTorque, ndSetTransform transform)
+{
+	ndBodyDynamic* const body = (ndBodyDynamic*)bodyc;
+	body->SetNotifyCallback(new ndBodyNotiFyC(usedData, forceAndTorque, transform));
+}

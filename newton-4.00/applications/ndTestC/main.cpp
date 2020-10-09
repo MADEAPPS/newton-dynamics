@@ -36,6 +36,18 @@ void operator delete (void* ptr)
 	PhysicsFree(ptr);
 }
 
+
+static void ForceAndTorqueCallback (ndBodyDynamicC body, dFloat32 timestep)
+{
+
+}
+
+static void SetTransformCallback(ndBodyDynamicC body, const dFloat32* const matrix)
+{
+
+}
+
+
 class CheckMemoryLeaks
 {
 	public:
@@ -203,8 +215,9 @@ void BuildFloor(ndWorldC world)
 	ndBodyDynamicC body = ndCreateBodyDynamic();
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_y = -0.5f;
-	
-	//body->SetNotifyCallback(new ndDemoEntityNotify);
+
+	ndBodyDynamicSetCallbacks(body, nullptr, ForceAndTorqueCallback, SetTransformCallback);
+
 	//body->SetMatrix(matrix);
 	//body->SetCollisionShape(box);
 
