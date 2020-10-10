@@ -761,10 +761,10 @@ void ndDynamicsUpdate::CalculateForces()
 		{
 			CalculateJointsAcceleration();
 			CalculateJointsForce();
-			//if (m_skeletonCount) 
-			//{
-			//	UpdateSkeletons();
-			//}
+			if (m_world->m_skeletonList.GetCount())
+			{
+				UpdateSkeletons();
+			}
 			IntegrateBodiesVelocity();
 		}
 		
@@ -1487,4 +1487,43 @@ void ndDynamicsUpdate::InitSkeletons()
 
 	ndScene* const scene = m_world->GetScene();
 	scene->SubmitJobs<ndInitSkeletons>();
+}
+
+void ndDynamicsUpdate::UpdateSkeletons()
+{
+	D_TRACKTIME();
+	class ndUpdateSkeletons : public ndScene::ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThredID();
+			ndWorld* const world = m_owner->GetWorld();
+			ndSkeletonList::dListNode* node = world->GetSkeletonList().GetFirst();
+			for (dInt32 i = 0; i < threadIndex; i++)
+			{
+				node = node ? node->GetNext() : nullptr;
+			}
+
+			ndJacobian* const internalForces = &world->m_internalForces[0];
+			const dArray<ndBodyKinematic*>& ativeBodies = m_owner->ndScene::GetActiveBodyArray();
+			const ndBodyKinematic** const bodyArray = (const ndBodyKinematic**)&ativeBodies[0];
+
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			while (node)
+			{
+				ndSkeletonContainer* const skeleton = &node->GetInfo();
+				skeleton->CalculateJointForce(bodyArray, internalForces);
+
+				for (dInt32 i = 0; i < threadCount; i++)
+				{
+					node = node ? node->GetNext() : nullptr;
+				}
+			}
+		}
+	};
+
+	ndScene* const scene = m_world->GetScene();
+	scene->SubmitJobs<ndUpdateSkeletons>();
 }

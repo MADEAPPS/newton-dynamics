@@ -124,7 +124,9 @@ class ndSkeletonContainer
 
 	void ClearSelfCollision();
 	void AddSelfCollisionJoint(ndConstraint* const joint);
+	void CalculateJointForce(const ndBodyKinematic** const bodyArray, ndJacobian* const internalForces);
 	void InitMassMatrix(const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide, bool m_consideredCloseLoop = true);
+	
 
 	private:
 	void InitLoopMassMatrix();
@@ -158,7 +160,6 @@ class ndSkeletonContainer
 	dInt32 GetLru() const { return m_lru; }
 	void SetLru(dInt32 lru) { m_lru = lru; }
 
-	virtual void CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces);
 	
 	private:
 	bool SanityCheck(const ndForcePair* const force, const ndForcePair* const accel) const;
@@ -169,12 +170,12 @@ class ndSkeletonContainer
 	DG_INLINE void CalculateForce(ndForcePair* const force, const ndForcePair* const accel) const;
 	DG_INLINE void SolveBackward(ndForcePair* const force) const;
 	DG_INLINE void SolveForward(ndForcePair* const force, const ndForcePair* const accel, dInt32 startNode = 0) const;
-	DG_INLINE void UpdateForces(dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const ndForcePair* const force) const;
-	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const dgJacobian* const internalForces, ndForcePair* const accel) const;
+	DG_INLINE void UpdateForces(dgJointInfo* const jointInfoArray, ndJacobian* const internalForces, const ndForcePair* const force) const;
+	DG_INLINE void CalculateJointAccel (dgJointInfo* const jointInfoArray, const ndJacobian* const internalForces, ndForcePair* const accel) const;
 
 	ndNode* FindNode(ndBodyKinematic* const node) const;
 	dInt8* CalculateBufferSizeInBytes (const dgJointInfo* const jointInfoArray);
-	void SolveAuxiliary (const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
+	void SolveAuxiliary (const dgJointInfo* const jointInfoArray, ndJacobian* const internalForces, const ndForcePair* const accel, ndForcePair* const force) const;
 	void SolveLcp(dInt32 stride, dInt32 size, const dFloat32* const matrix, const dFloat32* const x0, dFloat32* const x, const dFloat32* const b, const dFloat32* const low, const dFloat32* const high, const dInt32* const normalIndex) const;
 	void SolveBlockLcp(dInt32 size, dInt32 blockSize, const dFloat32* const x0, dFloat32* const x, dFloat32* const b, const dFloat32* const low, const dFloat32* const high, const dInt32* const normalIndex) const;
 	void FactorizeMatrix(dInt32 size, dInt32 stride, dFloat32* const matrix, dFloat32* const diagDamp) const;

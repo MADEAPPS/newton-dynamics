@@ -479,20 +479,6 @@ void ndSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 
 
 
-void ndSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, ndJacobian* const internalForces)
-{
-	D_TRACKTIME();
-	ndForcePair* const force = dAlloca(ndForcePair, m_nodeCount);
-	ndForcePair* const accel = dAlloca(ndForcePair, m_nodeCount);
-
-	CalculateJointAccel(jointInfoArray, internalForces, accel);
-	CalculateForce(force, accel);
-	if (m_auxiliaryRowCount && m_consideredCloseLoop) {
-		SolveAuxiliary (jointInfoArray, internalForces, accel, force);
-	} else {
-		UpdateForces(jointInfoArray, internalForces, force);
-	}
-}
 #endif
 
 ndSkeletonContainer::ndNode::ndNode()
@@ -1479,4 +1465,24 @@ void ndSkeletonContainer::InitLoopMassMatrix()
 		}
 		dAssert(dTestPSDmatrix(m_auxiliaryRowCount - m_blockSize, m_auxiliaryRowCount, &m_massMatrix11[m_auxiliaryRowCount * m_blockSize + m_blockSize]));
 	}
+}
+
+
+//void ndSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, ndJacobian* const internalForces)
+void ndSkeletonContainer::CalculateJointForce(const ndBodyKinematic** const bodyArray, ndJacobian* const internalForces)
+{
+	D_TRACKTIME();
+	//dAssert(0);
+	//ndForcePair* const force = dAlloca(ndForcePair, m_nodeCount);
+	//ndForcePair* const accel = dAlloca(ndForcePair, m_nodeCount);
+	//
+	//CalculateJointAccel(jointInfoArray, internalForces, accel);
+	//CalculateForce(force, accel);
+	//if (m_auxiliaryRowCount && m_consideredCloseLoop) {
+	//	SolveAuxiliary(jointInfoArray, internalForces, accel, force);
+	//}
+	//else 
+	//{
+	//	UpdateForces(jointInfoArray, internalForces, force);
+	//}
 }

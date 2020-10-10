@@ -97,6 +97,7 @@ class ndDynamicsUpdate
 	void InitSkeletons();
 	void CalculateForces();
 	void IntegrateBodies();
+	void UpdateSkeletons();
 	void InitJacobianMatrix();
 	void UpdateForceFeedback();
 	void CalculateJointsForce();
