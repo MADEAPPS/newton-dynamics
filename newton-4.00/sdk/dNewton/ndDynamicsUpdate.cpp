@@ -571,8 +571,8 @@ void ndDynamicsUpdate::BuildJacobianMatrix(ndConstraint* const joint)
 	const dInt32 count = joint->m_rowCount;
 	const bool isBilateral = joint->IsBilateral();
 	
-	const dMatrix invInertia0 (body0->m_invWorldInertiaMatrix);
-	const dMatrix invInertia1 (body1->m_invWorldInertiaMatrix);
+	const dMatrix& invInertia0 = body0->m_invWorldInertiaMatrix;
+	const dMatrix& invInertia1 = body1->m_invWorldInertiaMatrix;
 	const dVector invMass0(body0->m_invMass[3]);
 	const dVector invMass1(body1->m_invMass[3]);
 	

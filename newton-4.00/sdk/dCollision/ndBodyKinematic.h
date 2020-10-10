@@ -91,7 +91,9 @@ class ndBodyKinematic: public ndBody
 
 	const dUnsigned32 GetIndex() const;
 	const dFloat32 GetInvMass() const;
-	dVector GetMassMatrix() const;
+	const dVector& GetMassMatrix() const;
+	const dMatrix& GetInvInertiaMatrix() const;
+
 	void SetMassMatrix(const dVector& massMatrix);
 
 	dVector GetGyroAlpha() const;
@@ -115,6 +117,7 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API dVector CalculateAngularMomentum() const;
 	D_COLLISION_API dFloat32 TotalEnergy() const;
 
+	D_COLLISION_API dMatrix CalculateInertiaMatrix() const;
 	D_COLLISION_API dMatrix CalculateInvInertiaMatrix() const;
 	D_COLLISION_API void UpdateInvInertiaMatrix();
 
@@ -194,6 +197,7 @@ class ndBodyKinematic: public ndBody
 	friend class ndSceneMixed;
 	friend class ndSceneBodyNode;
 	friend class ndDynamicsUpdate;
+	friend class ndSkeletonContainer;
 	friend class ndJointBilateralConstraint;
 } D_GCC_NEWTON_ALIGN_32;
 
@@ -207,9 +211,14 @@ inline const dFloat32 ndBodyKinematic::GetInvMass() const
 	return m_invMass.m_w;
 }
 
-inline dVector ndBodyKinematic::GetMassMatrix() const
+inline const dVector& ndBodyKinematic::GetMassMatrix() const
 {
 	return m_mass;
+}
+
+inline const dMatrix& ndBodyKinematic::GetInvInertiaMatrix() const
+{
+	return m_invWorldInertiaMatrix;
 }
 
 inline dVector ndBodyKinematic::GetGyroAlpha() const

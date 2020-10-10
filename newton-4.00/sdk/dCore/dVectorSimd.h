@@ -1457,22 +1457,22 @@ class dVector
 		{
 		}
 
-	#ifdef D_NEWTON_USE_DOUBLE
-	#define PURMUT_MASK2(y, x)		_MM_SHUFFLE2(x, y)
+#ifdef D_NEWTON_USE_DOUBLE
+#define PURMUT_MASK2(y, x)		_MM_SHUFFLE2(x, y)
 		D_INLINE dSpatialVector(const dVector& low, const dVector& high)
 			:m_d0(low.m_typeLow)
 			,m_d1(_mm_shuffle_pd(low.m_typeHigh, high.m_typeLow, PURMUT_MASK2(0, 0)))
 			,m_d2(_mm_shuffle_pd(high.m_typeLow, high.m_typeHigh, PURMUT_MASK2(1, 0)))
 		{
 		}
-	#else 
+#else 
 		D_INLINE dSpatialVector(const dVector& low, const dVector& high)
 			:m_d0(_mm_cvtps_pd(low.m_type))
-			,m_d1(_mm_cvtps_pd(_mm_unpackhi_ps(low.m_type, _mm_shuffle_ps(low.m_type, high.m_type, PERMUTE_MASK(0, 0, 0, 2)))))
-			,m_d2(_mm_cvtps_pd(_mm_shuffle_ps(high.m_type, high.m_type, PERMUTE_MASK(3, 3, 2, 1))))
+			, m_d1(_mm_cvtps_pd(_mm_unpackhi_ps(low.m_type, _mm_shuffle_ps(low.m_type, high.m_type, PERMUTE_MASK(0, 0, 0, 2)))))
+			, m_d2(_mm_cvtps_pd(_mm_shuffle_ps(high.m_type, high.m_type, PERMUTE_MASK(3, 3, 2, 1))))
 		{
 		}
-	#endif
+#endif
 
 		D_INLINE dSpatialVector(const dSpatialVector& copy)
 			:m_d0(copy.m_d0)
@@ -1525,9 +1525,16 @@ class dVector
 			return dSpatialVector(_mm_mul_pd(m_d0, tmp), _mm_mul_pd(m_d1, tmp), _mm_mul_pd(m_d2, tmp));
 		}
 
-		__m128d m_d0;
-		__m128d m_d1;
-		__m128d m_d2;
+		union
+		{
+			dFloat64 m_f[6];
+			struct
+			{
+				__m128d m_d0;
+				__m128d m_d1;
+				__m128d m_d2;
+			};
+		};
 		static dSpatialVector m_zero;
 	} D_GCC_NEWTON_ALIGN_32 ;
 #endif

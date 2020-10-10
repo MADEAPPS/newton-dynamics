@@ -25,10 +25,9 @@
 
 #include "dCoreStdafx.h"
 #include "dTypes.h"
-//#include "dVector.h"
 #include "dGeneralVector.h"
 
-#define DG_LCP_MAX_VALUE dFloat32 (1.0e10f)
+#define D_LCP_MAX_VALUE dFloat32 (1.0e10f)
 
 
 template<class T>
@@ -1132,7 +1131,7 @@ bool dSolvePartitionDantzigLCP(dInt32 size, T* const symmetricMatrixPSD , T* con
 	dInt32 unboundedSize = size;
 	for (dInt32 i = 0; i < unboundedSize; i++) 
 	{
-		if ((low[i] <= T(-DG_LCP_MAX_VALUE)) && (high[i] >= T(DG_LCP_MAX_VALUE))) 
+		if ((low[i] <= T(-D_LCP_MAX_VALUE)) && (high[i] >= T(D_LCP_MAX_VALUE))) 
 		{
 			dCholeskyFactorizationAddRow(size, i, symmetricMatrixPSD );
 		} 

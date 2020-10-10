@@ -371,6 +371,27 @@ dMatrix ndBodyKinematic::CalculateInvInertiaMatrix() const
 		dVector::m_wOne);
 }
 
+dMatrix ndBodyKinematic::CalculateInertiaMatrix() const
+{
+	const dVector Ixx(m_mass[0]);
+	const dVector Iyy(m_mass[1]);
+	const dVector Izz(m_mass[2]);
+	return dMatrix(
+		m_matrix.m_front.Scale(m_matrix.m_front[0]) * Ixx +
+		m_matrix.m_up.Scale(m_matrix.m_up[0])		* Iyy +
+		m_matrix.m_right.Scale(m_matrix.m_right[0]) * Izz,
+
+		m_matrix.m_front.Scale(m_matrix.m_front[1]) * Ixx +
+		m_matrix.m_up.Scale(m_matrix.m_up[1])       * Iyy +
+		m_matrix.m_right.Scale(m_matrix.m_right[1]) * Izz,
+
+		m_matrix.m_front.Scale(m_matrix.m_front[2]) * Ixx +
+		m_matrix.m_up.Scale(m_matrix.m_up[2])       * Iyy +
+		m_matrix.m_right.Scale(m_matrix.m_right[2]) * Izz,
+		dVector::m_wOne);
+
+}
+
 dVector ndBodyKinematic::CalculateLinearMomentum() const
 {
 	return dVector(m_veloc.Scale(m_mass.m_w));
