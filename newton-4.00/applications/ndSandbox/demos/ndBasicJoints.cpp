@@ -64,13 +64,11 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 {
 	dFloat32 mass = 1.0f;
 	dFloat32 diameter = 0.5f;
-	//ndShapeInstance capsule(new ndShapeSphere(diameter * 0.5f));
 	ndShapeInstance capsule(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 	ndDemoMesh* const mesh = new ndDemoMesh("capsule", scene->GetShaderCache(), &capsule, "marble.tga", "marble.tga", "marble.tga");
 
 	//dMatrix matrix(dGetIdentityMatrix());
 	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
-	//dMatrix matrix(dYawMatrix(90.0f * dDegreeToRad) * dPitchMatrix(-45.0f * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -81,7 +79,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 
 	matrix.m_posit.m_y += 5.0f;
 	ndBodyDynamic* const body0 = MakeCapule(scene, matrix, capsule, mesh, mass);
-	matrix.m_posit.m_y += 0.5f;
+	matrix.m_posit.m_y += 1.0f;
 	ndBodyDynamic* const body1 = MakeCapule(scene, matrix, capsule, mesh, mass);
 
 	dMatrix bodyMatrix0(body0->GetMatrix());
@@ -91,10 +89,10 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 	ndJointBallAndSocket* const joint0 = new ndJointBallAndSocket(pinMatrix, body0, body1);
 	world->AddJoint(joint0);
 	
-	//odyMatrix1.m_posit.m_y += 0.5f;
-	//dBodyDynamic* const fixBody = world->GetSentinelBody();
-	//ndJointBallAndSocket* const joint1 = new ndJointBallAndSocket(bodyMatrix1, body1, fixBody);
-	//world->AddJoint(joint1);
+	bodyMatrix1.m_posit.m_y += 0.5f;
+	ndBodyDynamic* const fixBody = world->GetSentinelBody();
+	ndJointBallAndSocket* const joint1 = new ndJointBallAndSocket(bodyMatrix1, body1, fixBody);
+	world->AddJoint(joint1);
 
 	mesh->Release();
 }
