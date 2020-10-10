@@ -108,6 +108,9 @@ class ndSkeletonContainer
 	void ClearSelfCollision();
 	void AddSelfCollisionJoint(ndConstraint* const joint);
 
+	//virtual void InitMassMatrix(const dgJointInfo* const jointInfoArray, const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide, bool m_consideredCloseLoop = true);
+	virtual void InitMassMatrix(const ndLeftHandSide* const matrixRow, ndRightHandSide* const rightHandSide, bool m_consideredCloseLoop = true);
+
 	private:
 	void SortGraph(ndNode* const root, dInt32& index);
 
@@ -131,7 +134,6 @@ class ndSkeletonContainer
 	void SetLru(dInt32 lru) { m_lru = lru; }
 
 	virtual void CalculateJointForce (dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces);
-	virtual void InitMassMatrix (const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const matrixRow, dgRightHandSide* const rightHandSide, bool m_consideredCloseLoop = true);
 	
 	private:
 	bool SanityCheck(const ndForcePair* const force, const ndForcePair* const accel) const;
@@ -161,8 +163,6 @@ class ndSkeletonContainer
 	dgFloat32* m_massMatrix11;
 	dgFloat32* m_massMatrix10;
 
-	dgRightHandSide* m_rightHandSide;
-	const dgLeftHandSide* m_leftHandSide;
 	dInt32* m_frictionIndex;
 	dInt32* m_matrixRowsIndex;
 	dgSkeletonList::dgListNode* m_listNode;
@@ -175,7 +175,7 @@ class ndSkeletonContainer
 	dInt16 m_rowCount;
 	dInt16 m_loopRowCount;
 	dInt16 m_auxiliaryRowCount;
-	dInt16 m_consideredCloseLoop;
+
 
 	friend class dgWorld;
 	friend class dgParallelBodySolver;
@@ -184,10 +184,14 @@ class ndSkeletonContainer
 
 	ndNode* m_skeleton;
 	ndNode** m_nodesOrder;
+	ndRightHandSide* m_rightHandSide;
+	const ndLeftHandSide* m_leftHandSide;
+
 	ndNodeList m_nodeList;
 	dArray<ndConstraint*> m_loopingJoints;
 	dInt16 m_loopCount;
 	dInt16 m_dynamicsLoopCount;
+	dInt16 m_consideredCloseLoop;
 };
 
 inline ndSkeletonContainer::ndNode* ndSkeletonContainer::GetRoot() const

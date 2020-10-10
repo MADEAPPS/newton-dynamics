@@ -94,6 +94,7 @@ class ndDynamicsUpdate
 	void BuildIsland();
 	void InitWeights();
 	void InitBodyArray();
+	void InitSkeletons();
 	void CalculateForces();
 	void IntegrateBodies();
 	void InitJacobianMatrix();

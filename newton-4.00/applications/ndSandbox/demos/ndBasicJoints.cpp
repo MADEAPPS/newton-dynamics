@@ -91,10 +91,10 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 	ndJointBallAndSocket* const joint0 = new ndJointBallAndSocket(pinMatrix, body0, body1);
 	world->AddJoint(joint0);
 	
-	bodyMatrix1.m_posit.m_y += 0.5f;
-	ndBodyDynamic* const fixBody = world->GetSentinelBody();
-	ndJointBallAndSocket* const joint1 = new ndJointBallAndSocket(bodyMatrix1, body1, fixBody);
-	world->AddJoint(joint1);
+	//odyMatrix1.m_posit.m_y += 0.5f;
+	//dBodyDynamic* const fixBody = world->GetSentinelBody();
+	//ndJointBallAndSocket* const joint1 = new ndJointBallAndSocket(bodyMatrix1, body1, fixBody);
+	//world->AddJoint(joint1);
 
 	mesh->Release();
 }

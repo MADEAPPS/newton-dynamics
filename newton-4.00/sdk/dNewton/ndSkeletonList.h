@@ -32,7 +32,6 @@ class ndSkeletonList: public dList<ndSkeletonContainer, dContainersFreeListAlloc
 	public:
 	ndSkeletonList()
 		:dList<ndSkeletonContainer, dContainersFreeListAlloc<ndSkeletonContainer>>()
-		,m_lruMarker(1)
 		,m_skelListIsDirty(true)
 	{
 	}
@@ -45,7 +44,6 @@ class ndSkeletonList: public dList<ndSkeletonContainer, dContainersFreeListAlloc
 		return container;
 	}
 
-	dInt32 m_lruMarker;
 	bool m_skelListIsDirty;
 };
 

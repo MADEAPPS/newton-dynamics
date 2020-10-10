@@ -67,6 +67,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;
 	const ndContactList& GetContactList() const;
+	const ndSkeletonList& GetSkeletonList() const;
 
 	ndBodyDynamic* GetSentinelBody() const;
 
@@ -194,6 +195,11 @@ inline const ndJointList& ndWorld::GetJointList() const
 inline const ndContactList& ndWorld::GetContactList() const
 {
 	return m_scene->GetContactList();
+}
+
+inline const ndSkeletonList& ndWorld::GetSkeletonList() const
+{
+	return m_skeletonList;
 }
 
 inline dFloat32 ndWorld::GetUpdateTime() const

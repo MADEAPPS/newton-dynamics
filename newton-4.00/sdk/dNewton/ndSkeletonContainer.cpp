@@ -56,8 +56,8 @@ DG_MSC_VECTOR_ALIGNMENT
 class ndSkeletonContainer::dgMatriData
 {
 	public:
-	dgSpatialMatrix m_jt;
-	dgSpatialMatrix m_invMass;
+	dSpatialMatrix m_jt;
+	dSpatialMatrix m_invMass;
 } DG_GCC_VECTOR_ALIGNMENT;
 
 DG_MSC_VECTOR_ALIGNMENT 
@@ -93,11 +93,11 @@ ndSkeletonContainer::ndNode::~ndNode()
 class ndSkeletonContainer::ndNode
 {
 	public:
-	DG_INLINE void CalculateInertiaMatrix(dgSpatialMatrix* const bodyMassArray) const
+	DG_INLINE void CalculateInertiaMatrix(dSpatialMatrix* const bodyMassArray) const
 	{
-		dgSpatialMatrix& bodyMass = bodyMassArray[m_index];
+		dSpatialMatrix& bodyMass = bodyMassArray[m_index];
 
-		bodyMass = dgSpatialMatrix(dFloat32(0.0f));
+		bodyMass = dSpatialMatrix(dFloat32(0.0f));
 		if (m_body->GetInvMass().m_w != dFloat32(0.0f)) {
 			const dFloat32 mass = m_body->GetMass().m_w;
 			dgMatrix inertia(m_body->CalculateInertiaMatrix());
@@ -110,22 +110,22 @@ class ndSkeletonContainer::ndNode
 		}
 	}
 
-	DG_INLINE void GetJacobians(const dgJointInfo* const jointInfo, const dgLeftHandSide* const leftHandSide, const dgRightHandSide* const rightHandSide, dgSpatialMatrix* const jointMassArray)
+	DG_INLINE void GetJacobians(const dgJointInfo* const jointInfo, const ndLeftHandSide* const leftHandSide, const ndRightHandSide* const rightHandSide, dSpatialMatrix* const jointMassArray)
 	{
 		dAssert(m_parent);
 		dAssert(jointInfo->m_joint == m_joint);
 
-		dgSpatialMatrix& bodyJt = m_data.m_body.m_jt;
-		dgSpatialMatrix& jointJ = m_data.m_joint.m_jt;
-		dgSpatialMatrix& jointMass = jointMassArray[m_index];
+		dSpatialMatrix& bodyJt = m_data.m_body.m_jt;
+		dSpatialMatrix& jointJ = m_data.m_joint.m_jt;
+		dSpatialMatrix& jointMass = jointMassArray[m_index];
 
 		const dInt32 start = jointInfo->m_pairStart;
 		const dgSpatialVector zero (dgSpatialVector::m_zero);
 		if (!m_swapJacobianBodiesIndex) {
 			for (dInt32 i = 0; i < m_dof; i++) {
 				const dInt32 k = m_sourceJacobianIndex[i];
-				const dgRightHandSide* const rhs = &rightHandSide[start + k];
-				const dgLeftHandSide* const row = &leftHandSide[start + k];
+				const ndRightHandSide* const rhs = &rightHandSide[start + k];
+				const ndLeftHandSide* const row = &leftHandSide[start + k];
 				jointMass[i] = zero;
 				jointMass[i][i] = -rhs->m_diagDamp;
 				bodyJt[i] = dgSpatialVector (row->m_Jt.m_jacobianM0.m_linear * dgVector::m_negOne, row->m_Jt.m_jacobianM0.m_angular * dgVector::m_negOne);
@@ -134,8 +134,8 @@ class ndSkeletonContainer::ndNode
 		} else {
 			for (dInt32 i = 0; i < m_dof; i++) {
 				const dInt32 k = m_sourceJacobianIndex[i];
-				const dgRightHandSide* const rhs = &rightHandSide[start + k];
-				const dgLeftHandSide* const row = &leftHandSide[start + k];
+				const ndRightHandSide* const rhs = &rightHandSide[start + k];
+				const ndLeftHandSide* const row = &leftHandSide[start + k];
 				jointMass[i] = zero;
 				jointMass[i][i] = -rhs->m_diagDamp;
 				bodyJt[i] = dgSpatialVector(row->m_Jt.m_jacobianM1.m_linear * dgVector::m_negOne, row->m_Jt.m_jacobianM1.m_angular * dgVector::m_negOne);
@@ -144,7 +144,7 @@ class ndSkeletonContainer::ndNode
 		}
 	}
 
-	dInt32 Factorize(const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, const dgRightHandSide* const rightHandSide, dgSpatialMatrix* const bodyMassArray, dgSpatialMatrix* const jointMassArray)
+	dInt32 Factorize(const dgJointInfo* const jointInfoArray, const ndLeftHandSide* const leftHandSide, const ndRightHandSide* const rightHandSide, dSpatialMatrix* const bodyMassArray, dSpatialMatrix* const jointMassArray)
 	{
 		CalculateInertiaMatrix(bodyMassArray);
 
@@ -160,7 +160,7 @@ class ndSkeletonContainer::ndNode
 			const dInt32 first = jointInfo->m_pairStart;
 			for (dInt32 i = 0; i < count; i++) {
 				dInt32 k = m_sourceJacobianIndex[i];
-				const dgRightHandSide* const rhs = &rightHandSide[k + first];
+				const ndRightHandSide* const rhs = &rightHandSide[k + first];
 				if ((rhs->m_lowerBoundFrictionCoefficent <= dFloat32 (-DG_LCP_MAX_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= dFloat32 (DG_LCP_MAX_VALUE))) {
 					m_dof ++;
 				} else {
@@ -175,19 +175,19 @@ class ndSkeletonContainer::ndNode
 			GetJacobians(jointInfo, leftHandSide, rightHandSide, jointMassArray);
 		}
 
-		dgSpatialMatrix& bodyInvMass = m_data.m_body.m_invMass;
-		const dgSpatialMatrix& bodyMass = bodyMassArray[m_index];
+		dSpatialMatrix& bodyInvMass = m_data.m_body.m_invMass;
+		const dSpatialMatrix& bodyMass = bodyMassArray[m_index];
 		if (m_body->GetInvMass().m_w != dFloat32(0.0f)) {
 			for (ndNode* child = m_child; child; child = child->m_sibling) {
 				CalculateBodyDiagonal(child, bodyMassArray, jointMassArray);
 			}
 			bodyInvMass = bodyMass.Inverse(6);
 		} else {
-			bodyInvMass = dgSpatialMatrix(dFloat32(0.0f));
+			bodyInvMass = dSpatialMatrix(dFloat32(0.0f));
 		}
 
 		if (m_joint) {
-			dgSpatialMatrix& bodyJt = m_data.m_body.m_jt;
+			dSpatialMatrix& bodyJt = m_data.m_body.m_jt;
 			dAssert(m_parent);
 			for (dInt32 i = 0; i < m_dof; i++) {
 				bodyJt[i] = bodyInvMass.VectorTimeMatrix(bodyJt[i]);
@@ -198,14 +198,14 @@ class ndSkeletonContainer::ndNode
 		return boundedDof;
 	}
 
-	DG_INLINE void CalculateBodyDiagonal(ndNode* const child, dgSpatialMatrix* const bodyMassArray, const dgSpatialMatrix* const jointMassArray)
+	DG_INLINE void CalculateBodyDiagonal(ndNode* const child, dSpatialMatrix* const bodyMassArray, const dSpatialMatrix* const jointMassArray)
 	{
 		dAssert(child->m_joint);
 		
-		dgSpatialMatrix copy (dFloat32(0.0f));
+		dSpatialMatrix copy (dFloat32(0.0f));
 		const dInt32 dof = child->m_dof;
-		const dgSpatialMatrix& jacobianMatrix = child->m_data.m_joint.m_jt;
-		const dgSpatialMatrix& childDiagonal = jointMassArray[child->m_index];
+		const dSpatialMatrix& jacobianMatrix = child->m_data.m_joint.m_jt;
+		const dSpatialMatrix& childDiagonal = jointMassArray[child->m_index];
 		for (dInt32 i = 0; i < dof ; i++) {
 			const dgSpatialVector& jacobian = jacobianMatrix[i];
 			for (dInt32 j = 0; j < dof ; j++) {
@@ -215,7 +215,7 @@ class ndSkeletonContainer::ndNode
 			}
 		}
 
-		dgSpatialMatrix& bodyMass = bodyMassArray[m_index];
+		dSpatialMatrix& bodyMass = bodyMassArray[m_index];
 		for (dInt32 i = 0; i < dof; i++) {
 			const dgSpatialVector& Jacobian = copy[i];
 			const dgSpatialVector& JacobianTranspose = jacobianMatrix[i];
@@ -226,17 +226,17 @@ class ndSkeletonContainer::ndNode
 		}
 	}
 
-	DG_INLINE void CalculateJointDiagonal (const dgSpatialMatrix* const bodyMassArray, dgSpatialMatrix* const jointMassArray)
+	DG_INLINE void CalculateJointDiagonal (const dSpatialMatrix* const bodyMassArray, dSpatialMatrix* const jointMassArray)
 	{
-		const dgSpatialMatrix& bodyMass = bodyMassArray[m_index];
-		const dgSpatialMatrix& bodyJt = m_data.m_body.m_jt;
+		const dSpatialMatrix& bodyMass = bodyMassArray[m_index];
+		const dSpatialMatrix& bodyJt = m_data.m_body.m_jt;
 
-		dgSpatialMatrix tmp;
+		dSpatialMatrix tmp;
 		for (dInt32 i = 0; i < m_dof; i++) {
 			tmp[i] = bodyMass.VectorTimeMatrix(bodyJt[i]);
 		}
 
-		dgSpatialMatrix& jointMass = jointMassArray[m_index];
+		dSpatialMatrix& jointMass = jointMassArray[m_index];
 		for (dInt32 i = 0; i < m_dof; i++) {
 			dgFloat64 a = bodyJt[i].DotProduct(tmp[i]);
 			jointMass[i][i] -= a;
@@ -247,22 +247,22 @@ class ndSkeletonContainer::ndNode
 			}
 		}
 
-		dgSpatialMatrix& jointInvMass = m_data.m_joint.m_invMass;
+		dSpatialMatrix& jointInvMass = m_data.m_joint.m_invMass;
 		jointInvMass = jointMass.Inverse(m_dof);
 	}
 
 	DG_INLINE void CalculateJacobianBlock()
 	{
-		dgSpatialMatrix& jointJ = m_data.m_joint.m_jt;
+		dSpatialMatrix& jointJ = m_data.m_joint.m_jt;
 
-		dgSpatialMatrix copy;
+		dSpatialMatrix copy;
 		const dgSpatialVector zero (dgSpatialVector::m_zero);
 		for (dInt32 i = 0; i < m_dof; i++) {
 			copy[i] = jointJ[i];
 			jointJ[i] = zero;
 		}
 
-		const dgSpatialMatrix& jointInvMass = m_data.m_joint.m_invMass;
+		const dSpatialMatrix& jointInvMass = m_data.m_joint.m_invMass;
 		for (dInt32 i = 0; i < m_dof; i++) {
 			const dgSpatialVector& jacobian = copy[i];
 			const dgSpatialVector& invDiagonalRow = jointInvMass[i];
@@ -275,7 +275,7 @@ class ndSkeletonContainer::ndNode
 
 	DG_INLINE void JointJacobianTimeMassForward (dgForcePair& force)
 	{
-		const dgSpatialMatrix& bodyJt = m_data.m_body.m_jt;
+		const dSpatialMatrix& bodyJt = m_data.m_body.m_jt;
 		for (dInt32 i = 0; i < m_dof; i++) {
 			force.m_joint[i] -= bodyJt[i].DotProduct(force.m_body);
 		}
@@ -283,7 +283,7 @@ class ndSkeletonContainer::ndNode
 
 	DG_INLINE void BodyJacobianTimeMassForward(const dgForcePair& force, dgForcePair& parentForce) const 
 	{
-		const dgSpatialMatrix& jointJ = m_data.m_joint.m_jt;
+		const dSpatialMatrix& jointJ = m_data.m_joint.m_jt;
 		for (dInt32 i = 0; i < m_dof; i++) {
 			parentForce.m_body = parentForce.m_body + jointJ[i].Scale(-force.m_joint[i]);
 		}
@@ -291,7 +291,7 @@ class ndSkeletonContainer::ndNode
 
 	DG_INLINE void JointJacobianTimeSolutionBackward(dgForcePair& force, const dgForcePair& parentForce)
 	{
-		const dgSpatialMatrix& jointJ = m_data.m_joint.m_jt;
+		const dSpatialMatrix& jointJ = m_data.m_joint.m_jt;
 		const dgSpatialVector& f = parentForce.m_body;
 		for (dInt32 i = 0; i < m_dof; i++) {
 			force.m_joint[i] -= f.DotProduct(jointJ[i]);
@@ -300,7 +300,7 @@ class ndSkeletonContainer::ndNode
 
 	DG_INLINE void BodyJacobianTimeSolutionBackward(dgForcePair& force)
 	{
-		const dgSpatialMatrix& bodyJt = m_data.m_body.m_jt;
+		const dSpatialMatrix& bodyJt = m_data.m_body.m_jt;
 		for (dInt32 i = 0; i < m_dof; i++) {
 			force.m_body = force.m_body + bodyJt[i].Scale(-force.m_joint[i]);
 		}
@@ -308,17 +308,17 @@ class ndSkeletonContainer::ndNode
 
 	DG_INLINE void BodyDiagInvTimeSolution(dgForcePair& force)
 	{
-		const dgSpatialMatrix& bodyInvMass = m_data.m_body.m_invMass;
+		const dSpatialMatrix& bodyInvMass = m_data.m_body.m_invMass;
 		force.m_body = bodyInvMass.VectorTimeMatrix(force.m_body);
 	}
 
 	DG_INLINE void JointDiagInvTimeSolution(dgForcePair& force)
 	{
-		const dgSpatialMatrix& jointInvMass = m_data.m_joint.m_invMass;
+		const dSpatialMatrix& jointInvMass = m_data.m_joint.m_invMass;
 		force.m_joint = jointInvMass.VectorTimeMatrix(force.m_joint, m_dof);
 	}
 
-	DG_INLINE dInt32 GetAuxiliaryRows(const dgJointInfo* const jointInfoArray, const dgRightHandSide* const rightHandSide) const
+	DG_INLINE dInt32 GetAuxiliaryRows(const dgJointInfo* const jointInfoArray, const ndRightHandSide* const rightHandSide) const
 	{
 		dInt32 rowCount = 0;
 		if (m_joint) {
@@ -328,7 +328,7 @@ class ndSkeletonContainer::ndNode
 			dInt32 count = jointInfo->m_pairCount;
 			const dInt32 first = jointInfo->m_pairStart;
 			for (dInt32 i = 0; i < count; i++) {
-				const dgRightHandSide* const rhs = &rightHandSide[i + first];
+				const ndRightHandSide* const rhs = &rightHandSide[i + first];
 				if (!((rhs->m_lowerBoundFrictionCoefficent <= dFloat32 (-DG_LCP_MAX_VALUE)) && (rhs->m_upperBoundFrictionCoefficent >= dFloat32 (DG_LCP_MAX_VALUE)))) {
 					rowCount++;
 				}
@@ -425,7 +425,7 @@ void ndSkeletonContainer::FactorizeMatrix(dInt32 size, dInt32 stride, dFloat32* 
 {
 	DG_TRACKTIME();
 	bool isPsdMatrix = false;
-	dFloat32* const backupMatrix = dgAlloca(dFloat32, size * stride);
+	dFloat32* const backupMatrix = dAlloca(dFloat32, size * stride);
 	do {
 		{
 			dInt32 srcLine = 0;
@@ -456,8 +456,8 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(dFloat32* const di
 	const dInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
 	for (dInt32 index = 0; index < m_auxiliaryRowCount; index ++) {
 		const dInt32 ii = m_matrixRowsIndex[primaryCount + index];
-		const dgLeftHandSide* const row_i = &m_leftHandSide[ii];
-		const dgRightHandSide* const rhs_i = &m_rightHandSide[ii];
+		const ndLeftHandSide* const row_i = &m_leftHandSide[ii];
+		const ndRightHandSide* const rhs_i = &m_rightHandSide[ii];
 		const dgJacobian JMinvM0(row_i->m_JMinv.m_jacobianM0);
 		const dgJacobian JMinvM1(row_i->m_JMinv.m_jacobianM1);
 		const dgVector element(
@@ -475,7 +475,7 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(dFloat32* const di
 		const dInt32 m1_i = m_pairs[primaryCount + index].m_m1;
 		for (dInt32 j = index + 1; j < m_auxiliaryRowCount; j++) {
 			const dInt32 jj = m_matrixRowsIndex[primaryCount + j];
-			const dgLeftHandSide* const row_j = &m_leftHandSide[jj];
+			const ndLeftHandSide* const row_j = &m_leftHandSide[jj];
 
 			const dInt32 k = primaryCount + j;
 			dgVector acc(dgVector::m_zero);
@@ -509,7 +509,7 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(dFloat32* const di
 		dFloat32* const matrixRow10 = &m_massMatrix10[primaryCount * index];
 		for (dInt32 j = 0; j < primaryCount; j++) {
 			const dInt32 jj = m_matrixRowsIndex[j];
-			const dgLeftHandSide* const row_j = &m_leftHandSide[jj];
+			const ndLeftHandSide* const row_j = &m_leftHandSide[jj];
 
 			const dInt32 m0_j = m_pairs[j].m_m0;
 			const dInt32 m1_j = m_pairs[j].m_m1;
@@ -543,8 +543,8 @@ void ndSkeletonContainer::CalculateLoopMassMatrixCoefficients(dFloat32* const di
 void ndSkeletonContainer::ConditionMassMatrix () const
 {
 	DG_TRACKTIME();
-	dgForcePair* const forcePair = dgAlloca(dgForcePair, m_nodeCount);
-//	dgForcePair* const accelPair = dgAlloca(dgForcePair, m_nodeCount);
+	dgForcePair* const forcePair = dAlloca(dgForcePair, m_nodeCount);
+//	dgForcePair* const accelPair = dAlloca(dgForcePair, m_nodeCount);
 	const dgSpatialVector zero(dgSpatialVector::m_zero);
 //	accelPair[m_nodeCount - 1].m_body = zero;
 //	accelPair[m_nodeCount - 1].m_joint = zero;
@@ -598,7 +598,7 @@ void ndSkeletonContainer::RebuildMassMatrix(const dFloat32* const diagDamp) cons
 {
 	DG_TRACKTIME();
 	const dInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
-	dInt16* const indexList = dgAlloca(dInt16, primaryCount);
+	dInt16* const indexList = dAlloca(dInt16, primaryCount);
 	for (dInt32 i = 0; i < m_auxiliaryRowCount; i ++) {
 		const dFloat32* const matrixRow10 = &m_massMatrix10[i * primaryCount];
 		dFloat32* const matrixRow11 = &m_massMatrix11[i * m_auxiliaryRowCount];
@@ -636,8 +636,8 @@ void ndSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 	m_massMatrix10 = (dFloat32*)&m_massMatrix11[m_auxiliaryRowCount * m_auxiliaryRowCount];
 	m_deltaForce = &m_massMatrix10[m_auxiliaryRowCount * primaryCount];
 
-	dFloat32* const diagDamp = dgAlloca(dFloat32, m_auxiliaryRowCount);
-	dInt32* const boundRow = dgAlloca(dInt32, m_auxiliaryRowCount);
+	dFloat32* const diagDamp = dAlloca(dFloat32, m_auxiliaryRowCount);
+	dInt32* const boundRow = dAlloca(dInt32, m_auxiliaryRowCount);
 
 	m_blockSize = 0;
 	dInt32 primaryIndex = 0;
@@ -664,7 +664,7 @@ void ndSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 		const dInt32 auxiliaryDof = jointInfo->m_pairCount - primaryDof;
 		for (dInt32 j = 0; j < auxiliaryDof; j++) {
 			const dInt32 index = node->m_sourceJacobianIndex[primaryDof + j];
-			const dgRightHandSide* const rhs = &m_rightHandSide[first + index];
+			const ndRightHandSide* const rhs = &m_rightHandSide[first + index];
 
 			m_pairs[auxiliaryIndex + primaryCount].m_m0 = m0;
 			m_pairs[auxiliaryIndex + primaryCount].m_m1 = m1;
@@ -689,7 +689,7 @@ void ndSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 		const dInt32 auxiliaryDof = jointInfo->m_pairCount;
 
 		for (dInt32 i = 0; i < auxiliaryDof; i++) {
-			const dgRightHandSide* const rhs = &m_rightHandSide[first + i];
+			const ndRightHandSide* const rhs = &m_rightHandSide[first + i];
 			m_pairs[auxiliaryIndex + primaryCount].m_m0 = m0;
 			m_pairs[auxiliaryIndex + primaryCount].m_m1 = m1;
 			m_frictionIndex[auxiliaryIndex + primaryCount] = (rhs->m_normalForceIndex < 0) ? 0 : rhs->m_normalForceIndex - i;
@@ -734,7 +734,7 @@ void ndSkeletonContainer::InitLoopMassMatrix(const dgJointInfo* const jointInfoA
 	if (m_blockSize) {
 		FactorizeMatrix(m_blockSize, m_auxiliaryRowCount, m_massMatrix11, diagDamp);
 		const int boundedSize = m_auxiliaryRowCount - m_blockSize;
-		dFloat32* const acc = dgAlloca(dFloat32, m_auxiliaryRowCount);
+		dFloat32* const acc = dAlloca(dFloat32, m_auxiliaryRowCount);
 		dInt32 rowStart = 0;
 		for (dInt32 i = 0; i < m_blockSize; i++) {
 			memset(acc, 0, boundedSize * sizeof (dFloat32));
@@ -870,8 +870,8 @@ DG_INLINE void ndSkeletonContainer::UpdateForces (dgJointInfo* const jointInfoAr
 		const dInt32 count = node->m_dof;
 		for (dInt32 j = 0; j < count; j ++) {
 			const dInt32 k = node->m_sourceJacobianIndex[j];
-			dgRightHandSide* const rhs = &m_rightHandSide[first + k];
-			const dgLeftHandSide* const row = &m_leftHandSide[first + k];
+			ndRightHandSide* const rhs = &m_rightHandSide[first + k];
+			const ndLeftHandSide* const row = &m_leftHandSide[first + k];
 
 			rhs->m_force += dFloat32(f[j]);
 			dgVector jointForce = dFloat32 (f[j]);
@@ -915,8 +915,8 @@ DG_INLINE void ndSkeletonContainer::CalculateJointAccel(dgJointInfo* const joint
 
 		for (dInt32 j = 0; j < dof; j++) {
 			const dInt32 k = node->m_sourceJacobianIndex[j];
-			const dgLeftHandSide* const row = &m_leftHandSide[first + k];
-			const dgRightHandSide* const rhs = &m_rightHandSide[first + k];
+			const ndLeftHandSide* const row = &m_leftHandSide[first + k];
+			const ndRightHandSide* const rhs = &m_rightHandSide[first + k];
 			dgVector diag(row->m_JMinv.m_jacobianM0.m_linear * y0.m_linear + row->m_JMinv.m_jacobianM0.m_angular * y0.m_angular +
 						  row->m_JMinv.m_jacobianM1.m_linear * y1.m_linear + row->m_JMinv.m_jacobianM1.m_angular * y1.m_angular);
 			a.m_joint[j] = -(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp - diag.AddHorizontal().GetScalar());
@@ -940,7 +940,7 @@ void ndSkeletonContainer::SolveLcp(dInt32 stride, dInt32 size, const dFloat32* c
 		const dFloat32 tol2 = dFloat32(0.25f);
 		const dInt32 maxIterCount = 64;
 
-		dFloat32* const invDiag1 = dgAlloca(dFloat32, size);
+		dFloat32* const invDiag1 = dAlloca(dFloat32, size);
 
 		int rowStart = 0;
 		for (dInt32 i = 0; i < size; i++) {
@@ -988,8 +988,8 @@ void ndSkeletonContainer::SolveLcp(dInt32 stride, dInt32 size, const dFloat32* c
 		const dFloat32 tol2 = dFloat32(0.25f);
 		const dInt32 maxIterCount = 64;
 
-		dFloat32* const invDiag1 = dgAlloca(dFloat32, size);
-		dFloat32* const residual = dgAlloca(dFloat32, size);
+		dFloat32* const invDiag1 = dAlloca(dFloat32, size);
+		dFloat32* const residual = dAlloca(dFloat32, size);
 
 		dInt32 rowStart = 0;
 		for (dInt32 i = 0; i < size; i++) {
@@ -1087,13 +1087,13 @@ void ndSkeletonContainer::SolveBlockLcp(dInt32 size, dInt32 blockSize, const dFl
 
 void ndSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray, dgJacobian* const internalForces, const dgForcePair* const accel, dgForcePair* const force) const
 {
-	dFloat32* const f = dgAlloca(dFloat32, m_rowCount);
-	dFloat32* const u = dgAlloca(dFloat32, m_auxiliaryRowCount);
-	dFloat32* const b = dgAlloca(dFloat32, m_auxiliaryRowCount);
-	dFloat32* const u0 = dgAlloca(dFloat32, m_auxiliaryRowCount);
-	dFloat32* const low = dgAlloca(dFloat32, m_auxiliaryRowCount);
-	dFloat32* const high = dgAlloca(dFloat32, m_auxiliaryRowCount);
-	dInt32* const normalIndex = dgAlloca(dInt32, m_auxiliaryRowCount);
+	dFloat32* const f = dAlloca(dFloat32, m_rowCount);
+	dFloat32* const u = dAlloca(dFloat32, m_auxiliaryRowCount);
+	dFloat32* const b = dAlloca(dFloat32, m_auxiliaryRowCount);
+	dFloat32* const u0 = dAlloca(dFloat32, m_auxiliaryRowCount);
+	dFloat32* const low = dAlloca(dFloat32, m_auxiliaryRowCount);
+	dFloat32* const high = dAlloca(dFloat32, m_auxiliaryRowCount);
+	dInt32* const normalIndex = dAlloca(dInt32, m_auxiliaryRowCount);
 
 	dInt32 primaryIndex = 0;
 	const dInt32 primaryCount = m_rowCount - m_auxiliaryRowCount;
@@ -1112,8 +1112,8 @@ void ndSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 	dAssert (primaryIndex == primaryCount);
 	for (dInt32 i = 0; i < m_auxiliaryRowCount; i++) {
 		const int index = m_matrixRowsIndex[primaryCount + i];
-		const dgLeftHandSide* const row = &m_leftHandSide[index];
-		const dgRightHandSide* const rhs = &m_rightHandSide[index];
+		const ndLeftHandSide* const row = &m_leftHandSide[index];
+		const ndRightHandSide* const rhs = &m_rightHandSide[index];
 
 		const int m0 = m_pairs[primaryCount + i].m_m0;
 		const int m1 = m_pairs[primaryCount + i].m_m1;
@@ -1148,8 +1148,8 @@ void ndSkeletonContainer::SolveAuxiliary(const dgJointInfo* const jointInfoArray
 
 	for (dInt32 i = 0; i < m_rowCount; i++) {
 		dInt32 index = m_matrixRowsIndex[i];
-		dgRightHandSide* const rhs = &m_rightHandSide[index];
-		const dgLeftHandSide* const row = &m_leftHandSide[index];
+		ndRightHandSide* const rhs = &m_rightHandSide[index];
+		const ndLeftHandSide* const row = &m_leftHandSide[index];
 		const dInt32 m0 = m_pairs[i].m_m0;
 		const dInt32 m1 = m_pairs[i].m_m1;
 
@@ -1194,50 +1194,12 @@ dgInt8* ndSkeletonContainer::CalculateBufferSizeInBytes (const dgJointInfo* cons
 	return &m_auxiliaryMemoryBuffer[0];
 }
 
-void ndSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray, const dgLeftHandSide* const leftHandSide, dgRightHandSide* const rightHandSide, bool consideredCloseLoop)
-{
-	D_TRACKTIME();
-	dInt32 rowCount = 0;
-	dInt32 auxiliaryCount = 0;
-	m_leftHandSide = leftHandSide;
-	m_rightHandSide = rightHandSide;
-	m_consideredCloseLoop = consideredCloseLoop ? 1 : 0;
-
-	dgSpatialMatrix* const bodyMassArray = dgAlloca (dgSpatialMatrix, m_nodeCount);
-	dgSpatialMatrix* const jointMassArray = dgAlloca (dgSpatialMatrix, m_nodeCount);
-
-	if (m_nodesOrder) {
-		for (dInt32 i = 0; i < m_nodeCount - 1; i++) {
-			ndNode* const node = m_nodesOrder[i];
-			const dgJointInfo& info = jointInfoArray[node->m_joint->m_index];
-			rowCount += info.m_pairCount;
-			auxiliaryCount += node->Factorize(jointInfoArray, leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
-		}
-		m_nodesOrder[m_nodeCount - 1]->Factorize(jointInfoArray, leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
-	}
-	m_rowCount = dInt16 (rowCount);
-	m_auxiliaryRowCount = dInt16 (auxiliaryCount);
-
-	dInt32 loopRowCount = 0;
-	const dInt32 loopCount = m_loopCount + m_dynamicsLoopCount;
-	for (dInt32 j = 0; j < loopCount; j++) {
-		const ndConstraint* const joint = m_loopingJoints[j];
-		loopRowCount += jointInfoArray[joint->m_index].m_pairCount;
-	}
-	m_loopRowCount = dInt16 (loopRowCount);
-	m_rowCount += m_loopRowCount;
-	m_auxiliaryRowCount += m_loopRowCount;
-
-	if (m_auxiliaryRowCount && m_consideredCloseLoop) {
-		InitLoopMassMatrix(jointInfoArray);
-	}
-}
 
 void ndSkeletonContainer::CalculateJointForce(dgJointInfo* const jointInfoArray, const dgBodyInfo* const bodyArray, dgJacobian* const internalForces)
 {
 	D_TRACKTIME();
-	dgForcePair* const force = dgAlloca(dgForcePair, m_nodeCount);
-	dgForcePair* const accel = dgAlloca(dgForcePair, m_nodeCount);
+	dgForcePair* const force = dAlloca(dgForcePair, m_nodeCount);
+	dgForcePair* const accel = dAlloca(dgForcePair, m_nodeCount);
 
 	CalculateJointAccel(jointInfoArray, internalForces, accel);
 	CalculateForce(force, accel);
@@ -1255,12 +1217,12 @@ ndSkeletonContainer::ndSkeletonContainer()
 	,m_nodesOrder(nullptr)
 	,m_nodeList()
 	,m_loopingJoints()
+	,m_rightHandSide(nullptr)
+	,m_leftHandSide(nullptr)
 	//, m_pairs(nullptr)
 	//, m_deltaForce(nullptr)
 	//, m_massMatrix11(nullptr)
 	//, m_massMatrix10(nullptr)
-	//, m_rightHandSide(nullptr)
-	//, m_leftHandSide(nullptr)
 	//, m_frictionIndex(nullptr)
 	//, m_matrixRowsIndex(nullptr)
 	//, m_listNode(nullptr)
@@ -1271,10 +1233,10 @@ ndSkeletonContainer::ndSkeletonContainer()
 	//, m_nodeCount(1)
 	,m_loopCount(0)
 	,m_dynamicsLoopCount(0)
+	,m_consideredCloseLoop(1)
 	//, m_rowCount(0)
 	//, m_loopRowCount(0)
 	//, m_auxiliaryRowCount(0)
-	//, m_consideredCloseLoop(1)
 {
 }
 
@@ -1399,4 +1361,48 @@ void ndSkeletonContainer::AddSelfCollisionJoint(ndConstraint* const joint)
 	}
 	m_loopingJoints[m_loopCount + m_dynamicsLoopCount] = joint;
 	m_dynamicsLoopCount++;
+}
+
+//void ndSkeletonContainer::InitMassMatrix(const dgJointInfo* const jointInfoArray, const ndLeftHandSide* const leftHandSide, ndRightHandSide* const rightHandSide, bool consideredCloseLoop)
+void ndSkeletonContainer::InitMassMatrix(const ndLeftHandSide* const leftHandSide, ndRightHandSide* const rightHandSide, bool consideredCloseLoop)
+{
+	D_TRACKTIME();
+	dInt32 rowCount = 0;
+	dInt32 auxiliaryCount = 0;
+	m_leftHandSide = leftHandSide;
+	m_rightHandSide = rightHandSide;
+	m_consideredCloseLoop = consideredCloseLoop ? 1 : 0;
+	
+	const dInt32 nodeCount = m_nodeList.GetCount();
+	dSpatialMatrix* const bodyMassArray = dAlloca(dSpatialMatrix, nodeCount);
+	dSpatialMatrix* const jointMassArray = dAlloca(dSpatialMatrix, nodeCount);
+	if (m_nodesOrder) 
+	{
+		for (dInt32 i = 0; i < nodeCount - 1; i++) 
+		{
+			ndNode* const node = m_nodesOrder[i];
+	//		const dgJointInfo& info = jointInfoArray[node->m_joint->m_index];
+	//		rowCount += info.m_pairCount;
+			rowCount += node->m_joint->m_rowCount;
+	//		auxiliaryCount += node->Factorize(jointInfoArray, leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
+		}
+		//m_nodesOrder[nodeCount - 1]->Factorize(jointInfoArray, leftHandSide, rightHandSide, bodyMassArray, jointMassArray);
+	}
+
+	//m_rowCount = dInt16(rowCount);
+	//m_auxiliaryRowCount = dInt16(auxiliaryCount);
+	//
+	//dInt32 loopRowCount = 0;
+	//const dInt32 loopCount = m_loopCount + m_dynamicsLoopCount;
+	//for (dInt32 j = 0; j < loopCount; j++) {
+	//	const ndConstraint* const joint = m_loopingJoints[j];
+	//	loopRowCount += jointInfoArray[joint->m_index].m_pairCount;
+	//}
+	//m_loopRowCount = dInt16(loopRowCount);
+	//m_rowCount += m_loopRowCount;
+	//m_auxiliaryRowCount += m_loopRowCount;
+	//
+	//if (m_auxiliaryRowCount && m_consideredCloseLoop) {
+	//	InitLoopMassMatrix(jointInfoArray);
+	//}
 }

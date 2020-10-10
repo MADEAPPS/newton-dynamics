@@ -23,6 +23,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
+#include "ndSkeletonList.h"
 #include "ndDynamicsUpdate.h"
 #include "ndJointBilateralConstraint.h"
 
@@ -376,6 +377,7 @@ void ndDynamicsUpdate::InitWeights()
 	memset(&m_internalForces[0], 0, bodyArray.GetCount() * sizeof(ndJacobian));
 
 	dUnsigned32 maxRowCount = 0;
+	dFloat32 extraPasses = dFloat32(1.0f);
 	for (dInt32 i = constraintArray.GetCount() - 1; i >= 0; i--) 
 	{
 		ndConstraint* const constraint = constraintArray[i];
@@ -391,36 +393,18 @@ void ndDynamicsUpdate::InitWeights()
 		else
 		{
 			body1->m_weigh += dFloat32(1.0f);
+			extraPasses = dMax(body1->m_weigh, extraPasses);
 		}
 
 		body0->m_weigh += dFloat32(1.0f);
 		dAssert(body0->GetInvMass() != dFloat32(0.0f));
+		extraPasses = dMax(body0->m_weigh, extraPasses);
 	}
 
 	m_maxRowsCount = maxRowCount;
 	m_leftHandSide.SetCount(maxRowCount);
 	m_rightHandSide.SetCount(maxRowCount);
-	
-	dFloat32 extraPasses = dFloat32(0.0f);
 
-	//dgSkeletonList& skeletonList = *m_world;
-	//const dInt32 lru = skeletonList.m_lruMarker;
-	//skeletonList.m_lruMarker += 1;
-	//m_skeletonCount = 0;
-
-	for (dInt32 i = bodyCount - 1; i >= 0; i--)
-	{
-		const ndBodyKinematic* const body = bodyArray[i];
-		dAssert((body->GetInvMass() > 0.0f) || (body->m_weigh <= dFloat32(1.0f)));
-		extraPasses = dMax(body->m_weigh, extraPasses);
-	
-	//	dgSkeletonContainer* const container = body->GetSkeleton();
-	//	if (container && (container->m_lru != lru)) {
-	//		container->m_lru = lru;
-	//		m_skeletonArray[m_skeletonCount] = container;
-	//		m_skeletonCount++;
-	//	}
-	}
 	const dInt32 conectivity = 7;
 	m_solverPasses = m_world->GetSolverIterations() + 2 * dInt32(extraPasses) / conectivity + 1;
 }
@@ -547,8 +531,6 @@ void ndDynamicsUpdate::GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* co
 		}
 	}
 	
-	//jointInfo->m_pairCount = dof;
-	//jointInfo->m_pairStart = rowCount;
 	joint->m_rowCount = dof;
 	joint->m_rowStart = baseIndex;
 	for (dInt32 i = 0; i < dof; i++) 
@@ -770,10 +752,10 @@ void ndDynamicsUpdate::CalculateForces()
 	if (m_jointArray.GetCount())
 	{
 		m_firstPassCoef = dFloat32(0.0f);
-		//if (m_skeletonCount) 
-		//{
-		//	InitSkeletons();
-		//}
+		if (m_world->m_skeletonList.GetCount()) 
+		{
+			InitSkeletons();
+		}
 
 		for (dInt32 step = 0; step < 4; step++)
 		{
@@ -1468,3 +1450,41 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 	}
 }
 
+void ndDynamicsUpdate::InitSkeletons()
+{
+	D_TRACKTIME();
+
+	class ndInitSkeletons : public ndScene::ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			const dInt32 threadIndex = GetThredID();
+			ndWorld* const world = m_owner->GetWorld();
+			ndSkeletonList::dListNode* node = world->GetSkeletonList().GetFirst();
+			for (dInt32 i = 0; i < threadIndex; i++)
+			{
+				node = node ? node->GetNext() : nullptr;
+			}
+
+			dArray<ndRightHandSide>& rightHandSide = world->m_rightHandSide;
+			const dArray<ndLeftHandSide>& leftHandSide = world->m_leftHandSide;
+			
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			while (node)
+			{
+				ndSkeletonContainer* const skeleton = &node->GetInfo();
+				skeleton->InitMassMatrix(&leftHandSide[0], &rightHandSide[0]);
+
+				for (dInt32 i = 0; i < threadCount; i++)
+				{
+					node = node ? node->GetNext() : nullptr;
+				}
+			}
+		}
+	};
+
+	ndScene* const scene = m_world->GetScene();
+	scene->SubmitJobs<ndInitSkeletons>();
+}
