@@ -478,7 +478,7 @@ void ndShapeInstance::CalculateAABB(const dMatrix& matrix, dVector& minP, dVecto
 {
 	for (dInt32 i = 0; i < 3; i++) 
 	{
-		dVector minSupport(matrix.TransformVector(SupportVertex(matrix[i].Scale(dFloat32(-1.0f)))));
+		dVector minSupport(matrix.TransformVector(SupportVertex(matrix[i] * dVector::m_negOne)));
 		minP[i] = minSupport[i];
 		dVector maxSupport (matrix.TransformVector(SupportVertex(matrix[i])));
 		maxP[i] = maxSupport[i];

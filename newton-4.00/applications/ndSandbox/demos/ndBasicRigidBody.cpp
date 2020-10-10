@@ -98,7 +98,9 @@ static void BuildSphereStacks(ndDemoEntityManager* const scene, const dVector& o
 	//sphere.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
 
 	const int n = 10;
+	//const int n = 1;
 	const int stackHigh = 7;
+	//const int stackHigh = 1;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)

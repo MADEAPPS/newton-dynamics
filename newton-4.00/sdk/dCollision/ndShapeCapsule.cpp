@@ -585,3 +585,22 @@ dInt32 ndShapeCapsule::CalculatePlaneIntersection(const dVector& direction, cons
 	}
 	return count;
 }
+
+void ndShapeCapsule::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
+{
+	//ndShapeConvex::CalcAABB(matrix, p0, p1);
+
+	dVector size0(m_radio0);
+	dVector size1(m_radio1);
+	dVector q0(matrix.m_posit - matrix.m_front.Scale(m_height));
+	dVector q1(matrix.m_posit + matrix.m_front.Scale(m_height));
+
+	dVector min_q0(q0 - size0);
+	dVector min_q1(q1 - size1);
+
+	dVector max_q0(q0 + size1);
+	dVector max_q1(q1 + size1);
+
+	p0 = min_q0.GetMin(min_q1) & dVector::m_triplexMask;
+	p1 = max_q0.GetMax(max_q1) & dVector::m_triplexMask;
+}

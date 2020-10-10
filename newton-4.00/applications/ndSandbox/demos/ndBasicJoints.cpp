@@ -45,6 +45,21 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 	geometry->Release();
 }
 
+static ndBodyDynamic* MakeCapule(ndDemoEntityManager* const scene, const dMatrix& matrix, const ndShapeInstance& capsule, ndDemoMesh* const mesh, dFloat32 mass)
+{
+	ndPhysicsWorld* const world = scene->GetWorld();
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	entity->SetMesh(mesh, dGetIdentityMatrix());
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	body->SetNotifyCallback(new ndDemoEntityNotify(entity));
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(capsule);
+	body->SetMassMatrix(mass, capsule);
+	world->AddBody(body);
+	scene->AddEntity(entity);
+	return body;
+}
+
 static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& origin)
 {
 	dFloat32 mass = 1.0f;
@@ -64,38 +79,22 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 
-	//matrix.m_posit.m_y += xxxx;
 	matrix.m_posit.m_y += 5.0f;
-	ndDemoEntity* const entity0 = new ndDemoEntity(matrix, nullptr);
-	entity0->SetMesh(mesh, dGetIdentityMatrix());
-	ndBodyDynamic* const body0 = new ndBodyDynamic();
-	body0->SetNotifyCallback(new ndDemoEntityNotify(entity0));
-	body0->SetMatrix(matrix);
-	body0->SetCollisionShape(capsule);
-	body0->SetMassMatrix(mass, capsule);
-	world->AddBody(body0);
-	scene->AddEntity(entity0);
-
+	ndBodyDynamic* const body0 = MakeCapule(scene, matrix, capsule, mesh, mass);
 	matrix.m_posit.m_y += 0.5f;
-	ndDemoEntity* const entity1 = new ndDemoEntity(matrix, nullptr);
-	entity1->SetMesh(mesh, dGetIdentityMatrix());
-	ndBodyDynamic* const body1 = new ndBodyDynamic();
-	body1->SetNotifyCallback(new ndDemoEntityNotify(entity1));
-	body1->SetMatrix(matrix);
-	body1->SetCollisionShape(capsule);
-	body1->SetMassMatrix(mass, capsule);
-	world->AddBody(body1);
-	scene->AddEntity(entity1);
+	ndBodyDynamic* const body1 = MakeCapule(scene, matrix, capsule, mesh, mass);
 
 	dMatrix bodyMatrix0(body0->GetMatrix());
 	dMatrix bodyMatrix1(body1->GetMatrix());
 	dMatrix pinMatrix(bodyMatrix0);
 	pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
-	ndJointBallAndSocket* const joint = new ndJointBallAndSocket(pinMatrix, body0, body1);
-	world->AddJoint(joint);
-
-	//ndBodyDynamic* const fixBody = world->GetSentinelBody();
-	//pinMatrix.m_posit.m_y += diameter * 2.0f;
+	ndJointBallAndSocket* const joint0 = new ndJointBallAndSocket(pinMatrix, body0, body1);
+	world->AddJoint(joint0);
+	
+	bodyMatrix1.m_posit.m_y += 0.5f;
+	ndBodyDynamic* const fixBody = world->GetSentinelBody();
+	ndJointBallAndSocket* const joint1 = new ndJointBallAndSocket(bodyMatrix1, body1, fixBody);
+	world->AddJoint(joint1);
 
 	mesh->Release();
 }

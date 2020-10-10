@@ -27,8 +27,8 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0		// setting basic rigid body
-#define DEFAULT_SCENE	1		// setting basic joints
+#define DEFAULT_SCENE	0		// setting basic rigid body
+//#define DEFAULT_SCENE	1		// setting basic joints
 						 
 // demos forward declaration 
 void ndBasicRigidBody (ndDemoEntityManager* const scene);
@@ -198,7 +198,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 	// initialized the physics world for the new scene
 //	m_showUI = false;
-//	m_showAABB = true;
+	m_showAABB = true;
 //	m_hideVisualMeshes = true;
 //	m_showBroadphase = true;
 //	m_autoSleepMode = false;
