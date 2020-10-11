@@ -93,22 +93,6 @@ class ndContactMaterial: public ndContactPoint
 	ndForceImpactPair m_dir0_Force;
 	ndForceImpactPair m_dir1_Force;
 	ndMaterial m_material;
-
-	private:
-	//void *m_userData;
-	//OnAABBOverlap m_aabbOverlap;
-	//OnContactCallback m_processContactPoint;
-	//OnContactGeneration m_contactGeneration;
-	//OnCompoundCollisionPrefilter m_compoundAABBOverlap;
-
-	//friend class dgWorld;
-	//friend class dgBroadPhase;
-	//friend class dgCollisionScene;
-	//friend class dgCollisionCompound;
-	//friend class dgWorldDynamicUpdate;
-	//friend class dgSolverWorlkerThreads;
-	//friend class dgCollidingPairCollector;
-	//friend class dgBroadPhaseMaterialCallbackWorkerThread;
 } D_GCC_NEWTON_ALIGN_32;
 
 class ndContactPointList: public dList<ndContactMaterial, dContainersFreeListAlloc<ndContactPoint>>

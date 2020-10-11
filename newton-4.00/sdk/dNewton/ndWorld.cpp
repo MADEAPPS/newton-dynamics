@@ -53,7 +53,8 @@ ndWorld::ndWorld()
 	dFloat32 freezeAlpha2 = m_freezeAlpha2;
 	dFloat32 freezeSpeed2 = m_freezeSpeed2;
 	dFloat32 freezeOmega2 = m_freezeOmega2;
-	for (dInt32 i = 0; i < D_SLEEP_ENTRIES; i++) {
+	for (dInt32 i = 0; i < D_SLEEP_ENTRIES; i++) 
+	{
 		m_sleepTable[i].m_maxAccel = freezeAccel2;
 		m_sleepTable[i].m_maxAlpha = freezeAlpha2;
 		m_sleepTable[i].m_maxVeloc = freezeSpeed2;
@@ -216,7 +217,7 @@ void ndWorld::ThreadFunction()
 	{
 		D_TRACKTIME();
 		m_scene->Begin();
-		m_scene->BalanceBroadPhase();
+		m_scene->BalanceScene();
 	
 		dInt32 const steps = m_subSteps;
 		dFloat32 timestep = m_timestep / steps;
@@ -260,7 +261,6 @@ void ndWorld::RemoveBody(ndBody* const body)
 		m_scene->RemoveBody(kinematicBody);
 	}
 }
-
 
 void ndWorld::AddJoint(ndJointBilateralConstraint* const joint)
 {

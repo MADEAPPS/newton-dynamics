@@ -327,7 +327,7 @@ void RenderBodiesAABB(ndDemoEntityManager* const scene)
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void RenderBroadPhase(ndDemoEntityManager* const scene)
+void RenderWorldScene(ndDemoEntityManager* const scene)
 {
 	ndWorld* const world = scene->GetWorld();
 	GLuint shader = scene->GetShaderCache().m_wireFrame;
@@ -350,10 +350,10 @@ void RenderBroadPhase(ndDemoEntityManager* const scene)
 	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
 	glEnableClientState(GL_VERTEX_ARRAY);
 
-	class ndDrawBroadPhase: public ndSceneTreeNotiFy
+	class ndDrawScene: public ndSceneTreeNotiFy
 	{
 		public: 
-		ndDrawBroadPhase()
+		ndDrawScene()
 			:ndSceneTreeNotiFy()
 		{
 			glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), m_box);
@@ -370,8 +370,8 @@ void RenderBroadPhase(ndDemoEntityManager* const scene)
 		ndMeshVector m_box[12][2];
 	};
 
-	ndDrawBroadPhase drawBroaphase;
-	world->DebugBroadphase(&drawBroaphase);
+	ndDrawScene drawBroaphase;
+	world->DebugScene(&drawBroaphase);
 
 	glUseProgram(0);
 	glDisableClientState(GL_VERTEX_ARRAY);

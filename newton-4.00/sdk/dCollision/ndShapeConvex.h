@@ -98,7 +98,6 @@ class ndShapeConvex: public ndShape
 	dInt32 BuildCylinderCapPoly (dFloat32 radius, const dMatrix& transform, dVector* const vertexOut) const;
 	
 	friend class dgWorld;
-	friend class dgBroadPhase;
 	friend class dgMinkowskiConv;
 	friend class dShapeCompound;
 	friend class dShapeConvexModifier;

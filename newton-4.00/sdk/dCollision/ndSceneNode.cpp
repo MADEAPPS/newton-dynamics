@@ -35,12 +35,12 @@ ndSceneBodyNode::ndSceneBodyNode(ndBodyKinematic* const body)
 	,m_body(body)
 {
 	SetAABB(body->m_minAABB, body->m_maxAABB);
-	m_body->SetBroadPhaseBodyNode(this);
+	m_body->SetSceneBodyNode(this);
 }
 
 ndSceneBodyNode::~ndSceneBodyNode()
 {
-	m_body->SetBroadPhaseBodyNode(nullptr);
+	m_body->SetSceneBodyNode(nullptr);
 }
 
 void ndSceneNode::SetAABB(const dVector& minBox, const dVector& maxBox)

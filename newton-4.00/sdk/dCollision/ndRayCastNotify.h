@@ -61,8 +61,8 @@ D_MSV_NEWTON_ALIGN_32
 class ndRayCastClosestHitCallback: public ndRayCastNotify
 {
 	public:
-	ndRayCastClosestHitCallback(const ndScene* const broadPhase)
-		:ndRayCastNotify(broadPhase)
+	ndRayCastClosestHitCallback(const ndScene* const scene)
+		:ndRayCastNotify(scene)
 		,m_param(dFloat32(1.2f))
 	{
 	}

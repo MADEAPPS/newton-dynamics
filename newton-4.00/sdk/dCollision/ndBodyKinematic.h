@@ -156,13 +156,13 @@ class ndBodyKinematic: public ndBody
 
 	void UpdateCollisionMatrix();
 	void PrepareStep(dInt32 index);
-	void SetBroadPhase(ndScene* const broadPhase, ndBodyList::dListNode* const node);
+	void SetSceneNodes(ndScene* const scene, ndBodyList::dListNode* const node);
 
-	ndSceneBodyNode* GetBroadPhaseBodyNode() const;
-	void SetBroadPhaseBodyNode(ndSceneBodyNode* const node);
+	ndSceneBodyNode* GetSceneBodyNode() const;
+	void SetSceneBodyNode(ndSceneBodyNode* const node);
 
-	ndSceneAggregate* GetBroadPhaseAggregate() const;
-	void SetBroadPhaseAggregate(ndSceneAggregate* const node);
+	ndSceneAggregate* GetSceneAggregate() const;
+	void SetSceneAggregate(ndSceneAggregate* const node);
 
 	virtual void AddDampingAcceleration(dFloat32 timestep);
 	D_COLLISION_API void IntegrateExternalForce(dFloat32 timestep);
@@ -279,18 +279,18 @@ inline ndScene* ndBodyKinematic::GetScene() const
 	return m_scene;
 }
 
-inline void ndBodyKinematic::SetBroadPhase(ndScene* const broadPhase, ndBodyList::dListNode* const node)
+inline void ndBodyKinematic::SetSceneNodes(ndScene* const scene, ndBodyList::dListNode* const node)
 {
+	m_scene = scene;
 	m_sceneNode = node;
-	m_scene = broadPhase;
 }
 
-inline ndSceneBodyNode* ndBodyKinematic::GetBroadPhaseBodyNode() const
+inline ndSceneBodyNode* ndBodyKinematic::GetSceneBodyNode() const
 {
 	return m_sceneBodyBodyNode;
 }
 
-inline void ndBodyKinematic::SetBroadPhaseBodyNode(ndSceneBodyNode* const node)
+inline void ndBodyKinematic::SetSceneBodyNode(ndSceneBodyNode* const node)
 {
 	m_sceneBodyBodyNode = node;
 }

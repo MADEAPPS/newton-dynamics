@@ -37,11 +37,23 @@ void ndPhysicsWorld::AdvanceTime(dFloat32 timetep)
 	{
 		D_TRACKTIME();
 
+static int xxxx;
 		//dTrace (("%f\n", m_timeAccumulator));
 		for (int recover = MAX_PHYSICS_RECOVER_STEPS; recover && (m_timeAccumulator > timeLimit); recover--)
 		{
 			Update(timeLimit);
 			m_timeAccumulator -= timeLimit;
+
+xxxx++;
+if (xxxx == 500)
+{
+	Sync();
+	//const ndBodyList& bodyList = GetBodyList();
+	//ndBodyKinematic* body = bodyList.GetFirst()->GetInfo();
+	//RemoveBody(body);
+	//delete body;
+}
+
 		}
 		if (!m_manager->m_asynchronousPhysicsUpdate)
 		{
@@ -58,5 +70,4 @@ void ndPhysicsWorld::OnPostUpdate(dFloat32 timestep)
 		dAssert(0);
 		//scene->m_updateCamera(scene, scene->m_updateCameraContext, timestep);
 	}
-
 }

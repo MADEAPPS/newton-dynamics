@@ -81,7 +81,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	ndContactNotify* GetContactNotify() const;
 	void SetContactNotify(ndContactNotify* const notify);
 
-	void DebugBroadphase(ndSceneTreeNotiFy* const notify);
+	void DebugScene(ndSceneTreeNotiFy* const notify);
 
 	//void SetCollisionUpdate(bool mode);
 	//const bool GetCollisionUpdate() const;
@@ -211,9 +211,9 @@ inline void ndWorld::OnPostUpdate(dFloat32 timestep)
 {
 }
 
-inline void ndWorld::DebugBroadphase(ndSceneTreeNotiFy* const notify)
+inline void ndWorld::DebugScene(ndSceneTreeNotiFy* const notify)
 {
-	m_scene->DebugBroadphase(notify);
+	m_scene->DebugScene(notify);
 }
 
 inline void ndWorld::Update(dFloat32 timestep)

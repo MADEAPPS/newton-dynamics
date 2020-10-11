@@ -27,8 +27,8 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0		// setting basic rigid body
-#define DEFAULT_SCENE	1		// setting basic joints
+#define DEFAULT_SCENE	0		// setting basic rigid body
+//#define DEFAULT_SCENE	1		// setting basic joints
 						 
 // demos forward declaration 
 void ndBasicRigidBody (ndDemoEntityManager* const scene);
@@ -56,7 +56,8 @@ int ndDemoEntityManager::ButtonKey::UpdateTrigger (bool triggerValue)
 
 int ndDemoEntityManager::ButtonKey::UpdatePushButton (bool triggerValue)
 {
-	if (UpdateTrigger (triggerValue)) {
+	if (UpdateTrigger (triggerValue)) 
+	{
 		m_state = ! m_state;
 	}
 	return m_state ? 1 : 0;
@@ -85,7 +86,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_currentPlugin(0)
 	,m_solverPasses(4)
 	,m_solverSubSteps(2)
-	,m_broadPhaseType(0)
+	,m_sceneType(0)
 	,m_workerThreads(1)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
@@ -98,7 +99,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_showStats(true)
 	,m_hasJoytick(false)
 	,m_autoSleepMode(true)
-	,m_showBroadphase(false)
+	,m_showScene(false)
 	,m_hideVisualMeshes(false)
 	,m_showNormalForces(false)
 	,m_showCenterOfMass(false)
@@ -197,22 +198,22 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	m_mousePressed[2] = false;
 
 	// initialized the physics world for the new scene
-//	m_showUI = false;
-	m_showAABB = true;
-//	m_hideVisualMeshes = true;
-//	m_showBroadphase = true;
-//	m_autoSleepMode = false;
-//	m_broadPhaseType = 1;
-//	m_solverPasses = 4;
-//	m_workerThreads = 4;
-//	m_solverSubSteps = 2;
-//	m_showRaycastHit = true;
-//	m_showCenterOfMass = false;
-//	m_showNormalForces = true;
-//	m_showContactPoints = true;
-	m_showJointDebugInfo = true;
-//	m_collisionDisplayMode = 3;
-//	m_showListenersDebugInfo = true;
+	//m_showUI = false;
+	//m_showAABB = true;
+	//m_hideVisualMeshes = true;
+	//m_showScene = true;
+	//m_autoSleepMode = false;
+	//m_sceneType = 1;
+	//m_solverPasses = 4;
+	//m_workerThreads = 4;
+	//m_solverSubSteps = 2;
+	//m_showRaycastHit = true;
+	//m_showCenterOfMass = false;
+	//m_showNormalForces = true;
+	//m_showContactPoints = true;
+	//m_showJointDebugInfo = true;
+	//m_collisionDisplayMode = 3;
+	//m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
 
 	Cleanup();
@@ -509,7 +510,7 @@ void ndDemoEntityManager::ApplyMenuOptions()
 		body->SetAutoSleep(state);
 	}
 
-	//NewtonSelectBroadphaseAlgorithm(m_world, m_broadPhaseType);
+	//NewtonSelectBroadphaseAlgorithm(m_world, m_sceneType);
 	//NewtonSetParallelSolverOnLargeIsland(m_world, m_solveLargeIslandInParallel ? 1 : 0);
 	//
 	//void* plugin = nullptr;
@@ -626,8 +627,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::SliderInt("##worker", &m_workerThreads, 1, D_MAX_THREADS_COUNT);
 			ImGui::Separator();
 
-			ImGui::RadioButton("default broad phase", &m_broadPhaseType, 0);
-			ImGui::RadioButton("persistence broad phase", &m_broadPhaseType, 1);
+			ImGui::RadioButton("default broad phase", &m_sceneType, 0);
+			ImGui::RadioButton("persistence broad phase", &m_sceneType, 1);
 			ImGui::Separator();
 
 			ImGui::RadioButton("hide collision Mesh", &m_collisionDisplayMode, 0);
@@ -637,7 +638,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Separator();
 
 			ImGui::Checkbox("show aabb", &m_showAABB);
-			ImGui::Checkbox("show broadphase", &m_showBroadphase);
+			ImGui::Checkbox("show broad phase", &m_showScene);
 			ImGui::Checkbox("hide visual meshes", &m_hideVisualMeshes);
 			ImGui::Checkbox("show contact points", &m_showContactPoints);
 			ImGui::Checkbox("show ray cast hit point", &m_showRaycastHit);
@@ -1510,10 +1511,10 @@ void ndDemoEntityManager::RenderScene()
 		RenderBodiesAABB(this);
 	}
 
-	if (m_showBroadphase)
+	if (m_showScene)
 	{
 		m_world->Sync();
-		RenderBroadPhase(this);
+		RenderWorldScene(this);
 	}
 
 

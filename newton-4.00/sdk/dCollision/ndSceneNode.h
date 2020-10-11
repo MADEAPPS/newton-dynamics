@@ -19,8 +19,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_BROADPHASE_NODE_H__
-#define __D_BROADPHASE_NODE_H__
+#ifndef __D_SCENE_NODE_H__
+#define __D_SCENE_NODE_H__
 
 #include "ndCollisionStdafx.h"
 
@@ -55,10 +55,10 @@ class ndSceneNode: public dClassAlloc
 
 	D_COLLISION_API void SetAABB(const dVector& minBox, const dVector& maxBox);
 
-	virtual ndSceneNode* GetAsBroadPhaseNode() { return this; }
-	virtual ndSceneBodyNode* GetAsBroadPhaseBodyNode() { return nullptr; }
-	virtual ndSceneTreeNode* GetAsBroadPhaseTreeNode() { return nullptr; }
-	virtual ndSceneAggregate* GetAsBroadPhaseAggregate() { return nullptr; }
+	virtual ndSceneNode* GetAsSceneNode() { return this; }
+	virtual ndSceneBodyNode* GetAsSceneBodyNode() { return nullptr; }
+	virtual ndSceneTreeNode* GetAsSceneTreeNode() { return nullptr; }
+	virtual ndSceneAggregate* GetAsSceneAggregate() { return nullptr; }
 
 /*
 	virtual bool IsSegregatedRoot() const
@@ -103,7 +103,7 @@ class ndSceneBodyNode: public ndSceneNode
 	D_COLLISION_API ndSceneBodyNode(ndBodyKinematic* const body);
 	D_COLLISION_API virtual ~ndSceneBodyNode();
 
-	virtual ndSceneBodyNode* GetAsBroadPhaseBodyNode() { return this; }
+	virtual ndSceneBodyNode* GetAsSceneBodyNode() { return this; }
 
 	virtual ndBodyKinematic* GetBody() const
 	{
@@ -119,7 +119,7 @@ class ndSceneTreeNode: public ndSceneNode
 	D_COLLISION_API ndSceneTreeNode(ndSceneNode* const sibling, ndSceneNode* const myNode);
 	D_COLLISION_API virtual ~ndSceneTreeNode();
 
-	virtual ndSceneTreeNode* GetAsBroadPhaseTreeNode() { return this; }
+	virtual ndSceneTreeNode* GetAsSceneTreeNode() { return this; }
 	
 	virtual ndSceneNode* GetLeft() const
 	{

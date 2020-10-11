@@ -113,6 +113,7 @@ ndBodyKinematic::ndBodyKinematic()
 
 ndBodyKinematic::~ndBodyKinematic()
 {
+	dAssert(m_scene == nullptr);
 	dAssert(m_sceneNode == nullptr);
 }
 
@@ -138,12 +139,12 @@ void ndBodyKinematic::SetCollisionShape(const ndShapeInstance& shapeInstance)
 	m_shapeInstance.m_ownerBody = this;
 }
 
-ndSceneAggregate* ndBodyKinematic::GetBroadPhaseAggregate() const
+ndSceneAggregate* ndBodyKinematic::GetSceneAggregate() const
 {
 	return m_sceneAggregateNode;
 }
 
-void ndBodyKinematic::SetBroadPhaseAggregate(ndSceneAggregate* const node)
+void ndBodyKinematic::SetSceneAggregate(ndSceneAggregate* const node)
 {
 	m_sceneAggregateNode = node;
 }
@@ -236,9 +237,6 @@ void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 	//		mass = DG_INFINITE_MASS * 2.0f;
 	//	}
 	//}
-
-	//dAssert (m_masterNode);
-	//m_world->GetBroadPhase()->CheckStaticDynamic(this, mass);
 
 	if (mass >= D_INFINITE_MASS)
 	{

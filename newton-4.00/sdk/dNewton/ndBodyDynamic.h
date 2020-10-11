@@ -38,8 +38,6 @@
 #define D_ERR_TOLERANCE		dFloat32(1.0e-2f)
 #define D_ERR_TOLERANCE2	(D_ERR_TOLERANCE * D_ERR_TOLERANCE)
 
-//class dgSkeletonContainer;
-
 D_MSV_NEWTON_ALIGN_32
 class ndBodyDynamic: public ndBodyKinematic
 {

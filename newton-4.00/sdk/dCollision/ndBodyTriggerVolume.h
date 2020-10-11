@@ -19,41 +19,20 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_SCENE_DEFAULT_H__
-#define __D_SCENE_DEFAULT_H__
+#ifndef __D_BODY_TRIGGER_VOLUME_H__
+#define __D_BODY_TRIGGER_VOLUME_H__
 
 #include "ndCollisionStdafx.h"
-#include "ndScene.h"
-
-class ndRayCastNotify;
+#include "ndBodyKinematic.h"
 
 D_MSV_NEWTON_ALIGN_32
-class ndSceneMixed : public ndScene
+class ndBodyTriggerVolume : public ndBodyKinematic
 {
 	public:
-	D_COLLISION_API ndSceneMixed();
-	D_COLLISION_API virtual ~ndSceneMixed();
-
-	protected:
-	D_COLLISION_API virtual bool AddBody(ndBodyKinematic* const body);
-	D_COLLISION_API virtual bool RemoveBody(ndBodyKinematic* const body);
-	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& p0, const dVector& p1) const;
-	D_COLLISION_API virtual void Cleanup();
-	D_COLLISION_API void BalanceScene();
-
-	D_COLLISION_API virtual void DebugScene(ndSceneTreeNotiFy* const notify);
-
-	private:
-	D_COLLISION_API void AddNode(ndSceneNode* const newNode);
-	D_COLLISION_API void RemoveNode(ndSceneNode* const newNode);
-	D_COLLISION_API void FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body, bool oneWay);
-
-	dFloat64 m_treeEntropy;
-	ndFitnessList m_fitness;
-
-} D_GCC_NEWTON_ALIGN_32 ;
+	D_COLLISION_API ndBodyTriggerVolume();
+	D_COLLISION_API virtual ~ndBodyTriggerVolume();
 
 
-
+} D_GCC_NEWTON_ALIGN_32;
 
 #endif

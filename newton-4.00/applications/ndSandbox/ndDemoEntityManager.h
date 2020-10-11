@@ -212,7 +212,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	int m_currentPlugin;
 	int m_solverPasses;
 	int m_solverSubSteps;
-	int m_broadPhaseType;
+	int m_sceneType;
 	int m_workerThreads;
 	int m_debugDisplayMode;
 	int m_collisionDisplayMode;
@@ -227,7 +227,7 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool m_showStats;
 	bool m_hasJoytick;
 	bool m_autoSleepMode;
-	bool m_showBroadphase;
+	bool m_showScene;
 	bool m_hideVisualMeshes;
 	bool m_showNormalForces;
 	bool m_showCenterOfMass;

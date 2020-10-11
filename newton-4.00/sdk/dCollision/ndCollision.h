@@ -51,6 +51,7 @@
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
 #include <ndContactOptions.h>
+#include <ndBodyTriggerVolume.h>
 #include <ndJointBilateralConstraint.h>
 #include <ndShapeInstanceMeshBuilder.h>
 

@@ -19,15 +19,15 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_BROADPHASE_H__
-#define __D_BROADPHASE_H__
+#ifndef __D_SCENE_H__
+#define __D_SCENE_H__
 
 #include "ndCollisionStdafx.h"
 #include "ndBodyList.h"
 #include "ndSceneNode.h"
 #include "ndContactList.h"
 
-#define D_BROADPHASE_MAX_STACK_DEPTH	256
+#define D_SCENE_MAX_STACK_DEPTH	256
 #define D_PRUNE_CONTACT_TOLERANCE		dFloat32 (5.0e-2f)
 
 class ndWorld;
@@ -113,7 +113,7 @@ class ndScene
 	D_COLLISION_API ndContactNotify* GetContactNotify() const;
 	D_COLLISION_API void SetContactNotify(ndContactNotify* const notify);
 
-	virtual void DebugBroadphase(ndSceneTreeNotiFy* const notify) = 0;
+	virtual void DebugScene(ndSceneTreeNotiFy* const notify) = 0;
 
 	private:
 	bool ValidateContactCache(ndContact* const contact, const dVector& timestep) const;
@@ -151,7 +151,7 @@ class ndScene
 	D_COLLISION_API void FindCollidingPairs();
 
 	D_COLLISION_API virtual void ThreadFunction();
-	virtual void BalanceBroadPhase() = 0;
+	virtual void BalanceScene() = 0;
 
 	D_COLLISION_API ndSceneTreeNode* InsertNode(ndSceneNode* const root, ndSceneNode* const node);
 	void UpdateFitness(ndFitnessList& fitness, dFloat64& oldEntropy, ndSceneNode** const root);

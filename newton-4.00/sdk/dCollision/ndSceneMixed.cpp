@@ -59,12 +59,12 @@ void ndSceneMixed::RemoveNode(ndSceneNode* const node)
 {
 	if (node->m_parent) 
 	{
-		if (!node->m_parent->GetAsBroadPhaseAggregate()) 
+		if (!node->m_parent->GetAsSceneAggregate()) 
 		{
 			ndSceneTreeNode* const parent = (ndSceneTreeNode*)node->m_parent;
 			if (parent->m_parent) 
 			{
-				ndSceneAggregate* const aggregate = parent->m_parent->GetAsBroadPhaseAggregate();
+				ndSceneAggregate* const aggregate = parent->m_parent->GetAsSceneAggregate();
 				if (aggregate)
 				{
 					dAssert(0);
@@ -127,8 +127,8 @@ void ndSceneMixed::RemoveNode(ndSceneNode* const node)
 			}
 			else 
 			{
-				dAssert(!node->m_parent->GetAsBroadPhaseBodyNode());
-				ndSceneTreeNode* const parent1 = node->m_parent->GetAsBroadPhaseTreeNode();
+				dAssert(!node->m_parent->GetAsSceneBodyNode());
+				ndSceneTreeNode* const parent1 = node->m_parent->GetAsSceneTreeNode();
 				if (parent1->m_right == node) 
 				{
 					m_rootNode = parent1->m_left;
@@ -146,11 +146,11 @@ void ndSceneMixed::RemoveNode(ndSceneNode* const node)
 			if (parent->m_fitnessNode) 
 			{
 				ndBodyKinematic* const body = node->GetBody();
-				if (body && body->GetBroadPhaseAggregate()) 
+				if (body && body->GetSceneAggregate()) 
 				{
 					dAssert(0);
-					//body->GetBroadPhaseAggregate()->m_fitnessList.Remove(parent->m_fitnessNode);
-					//body->SetBroadPhaseAggregate(nullptr);
+					//body->GetSceneAggregate()->m_fitnessList.Remove(parent->m_fitnessNode);
+					//body->SetSceneAggregate(nullptr);
 				}
 				else 
 				{
@@ -163,11 +163,11 @@ void ndSceneMixed::RemoveNode(ndSceneNode* const node)
 		{
 			dAssert(0);
 #if 0
-			dBroadPhaseAggregate* const aggregate = (dBroadPhaseAggregate*)node->m_parent;
+			ndSceneAggregate* const aggregate = (ndSceneAggregate*)node->m_parent;
 			dBody* const body = node->GetBody();
 			dAssert(body);
-			dAssert(body->GetBroadPhaseAggregate() == aggregate);
-			body->SetBroadPhaseAggregate(nullptr);
+			dAssert(body->GetSceneAggregate() == aggregate);
+			body->SetSceneAggregate(nullptr);
 			aggregate->m_root = nullptr;
 			node->m_parent = nullptr;
 			delete node;
@@ -213,7 +213,7 @@ void ndSceneMixed::Cleanup()
 
 bool ndSceneMixed::RemoveBody(ndBodyKinematic* const body)
 {
-	ndSceneBodyNode* const node = body->GetBroadPhaseBodyNode();
+	ndSceneBodyNode* const node = body->GetSceneBodyNode();
 	if (node)
 	{
 		RemoveNode(node);
@@ -221,7 +221,7 @@ bool ndSceneMixed::RemoveBody(ndBodyKinematic* const body)
 	return ndScene::RemoveBody(body);
 }
 
-void ndSceneMixed::BalanceBroadPhase()
+void ndSceneMixed::BalanceScene()
 {
 	D_TRACKTIME();
 	UpdateFitness(m_fitness, m_treeEntropy, &m_rootNode);
@@ -229,9 +229,9 @@ void ndSceneMixed::BalanceBroadPhase()
 
 void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body, bool oneWay)
 {
-	ndSceneNode* const leafNode = body->GetBroadPhaseBodyNode();
+	ndSceneNode* const leafNode = body->GetSceneBodyNode();
 
-	ndSceneAggregate* const aggregateNode = leafNode->GetAsBroadPhaseAggregate();
+	ndSceneAggregate* const aggregateNode = leafNode->GetAsSceneAggregate();
 	if (aggregateNode)
 	{
 		dAssert(0);
@@ -243,9 +243,9 @@ void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const 
 	{
 		for (ndSceneNode* ptr = leafNode; ptr->m_parent; ptr = ptr->m_parent)
 		{
-			ndSceneTreeNode* const parent = ptr->m_parent->GetAsBroadPhaseTreeNode();
-			dAssert(!parent->GetAsBroadPhaseBodyNode());
-			dAssert(!parent->GetAsBroadPhaseAggregate());
+			ndSceneTreeNode* const parent = ptr->m_parent->GetAsSceneTreeNode();
+			dAssert(!parent->GetAsSceneBodyNode());
+			dAssert(!parent->GetAsSceneAggregate());
 			ndSceneNode* const sibling = parent->m_right;
 			if (sibling != ptr)
 			{
@@ -257,9 +257,9 @@ void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const 
 	{
 		for (ndSceneNode* ptr = leafNode; ptr->m_parent; ptr = ptr->m_parent)
 		{
-			ndSceneTreeNode* const parent = ptr->m_parent->GetAsBroadPhaseTreeNode();
-			dAssert(!parent->GetAsBroadPhaseBodyNode());
-			dAssert(!parent->GetAsBroadPhaseAggregate());
+			ndSceneTreeNode* const parent = ptr->m_parent->GetAsSceneTreeNode();
+			dAssert(!parent->GetAsSceneBodyNode());
+			dAssert(!parent->GetAsSceneAggregate());
 			ndSceneNode* const rightSibling = parent->m_right;
 			if (rightSibling != ptr)
 			{
@@ -276,11 +276,11 @@ void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const 
 /*
 void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const body)
 {
-	ndSceneNode* const leafNode = body->GetBroadPhaseBodyNode();
+	ndSceneNode* const leafNode = body->GetSceneBodyNode();
 
 	if (m_fullScan)
 	{
-		ndSceneAggregate* const aggregateNode = leafNode->GetAsBroadPhaseAggregate();
+		ndSceneAggregate* const aggregateNode = leafNode->GetAsSceneAggregate();
 		if (aggregateNode)
 		{
 			dAssert(0);
@@ -289,8 +289,8 @@ void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const 
 
 		for (ndSceneNode* ptr = leafNode; ptr->m_parent; ptr = ptr->m_parent)
 		{
-			ndSceneTreeNode* const parent = ptr->m_parent->GetAsBroadPhaseTreeNode();
-			dAssert(!parent->GetAsBroadPhaseBodyNode());
+			ndSceneTreeNode* const parent = ptr->m_parent->GetAsSceneTreeNode();
+			dAssert(!parent->GetAsSceneBodyNode());
 			ndSceneNode* const sibling = parent->m_right;
 			if (sibling != ptr)
 			{
@@ -307,20 +307,20 @@ void ndSceneMixed::FindCollidinPairs(dInt32 threadIndex, ndBodyKinematic* const 
 		//dInt32* const atomicIndex = &descriptor->m_atomicIndex;
 		//
 		//for (dInt32 i = dgAtomicExchangeAndAdd(atomicIndex, 1); i < bodyCount; i = dgAtomicExchangeAndAdd(atomicIndex, 1)) {
-		//	ntBroadPhaseNode* const broadPhaseNode = bodyArray[i].m_body->GetBroadPhase();
-		//	dAssert(broadPhaseNode->ntBroadPhaseBodyNode());
-		//	dAssert(!broadPhaseNode->GetBody() || (broadPhaseNode->GetBody()->GetBroadPhase() == broadPhaseNode));
+		//	ndSceneNode* const sceneNode = bodyArray[i].m_body->GetSceneNode();
+		//	dAssert(sceneNode->ndSceneBodyNode());
+		//	dAssert(!sceneNode->GetBody() || (sceneNode->GetBody()->GetSceneNode() == sceneNode));
 		//
-		//	for (ntBroadPhaseNode* ptr = broadPhaseNode; ptr->m_parent; ptr = ptr->m_parent) {
-		//		ntBroadPhaseTreeNode* const parent = (ntBroadPhaseTreeNode*)ptr->m_parent;
+		//	for (ndSceneNode* ptr = sceneNode; ptr->m_parent; ptr = ptr->m_parent) {
+		//		ndSceneTreeNode* const parent = (ndSceneTreeNode*)ptr->m_parent;
 		//		if (!parent->IsAggregate()) {
-		//			dAssert(!parent->ntBroadPhaseBodyNode());
-		//			ntBroadPhaseNode* const rightSibling = parent->m_right;
+		//			dAssert(!parent->ndSceneBodyNode());
+		//			ndSceneNode* const rightSibling = parent->m_right;
 		//			if (rightSibling != ptr) {
-		//				SubmitPairs(broadPhaseNode, rightSibling, timestep, threadCount, threadID);
+		//				SubmitPairs(sceneNode, rightSibling, timestep, threadCount, threadID);
 		//			}
 		//			else {
-		//				SubmitPairs(broadPhaseNode, parent->m_left, timestep, threadCount, threadID);
+		//				SubmitPairs(sceneNode, parent->m_left, timestep, threadCount, threadID);
 		//			}
 		//		}
 		//	}
@@ -342,8 +342,8 @@ dFloat32 ndSceneMixed::RayCast(ndRayCastNotify& callback, const dVector& q0, con
 		dFloat32 dist2 = segment.DotProduct(segment).GetScalar();
 		if (dist2 > dFloat32(1.0e-8f)) {
 
-			dFloat32 distance[D_BROADPHASE_MAX_STACK_DEPTH];
-			const ndSceneNode* stackPool[D_BROADPHASE_MAX_STACK_DEPTH];
+			dFloat32 distance[D_SCENE_MAX_STACK_DEPTH];
+			const ndSceneNode* stackPool[D_SCENE_MAX_STACK_DEPTH];
 
 			dFastRayTest ray(p0, p1);
 
@@ -355,16 +355,16 @@ dFloat32 ndSceneMixed::RayCast(ndRayCastNotify& callback, const dVector& q0, con
 	return param;
 }
 
-void ndSceneMixed::DebugBroadphase(ndSceneTreeNotiFy* const notify)
+void ndSceneMixed::DebugScene(ndSceneTreeNotiFy* const notify)
 {
 	for (ndFitnessList::dListNode* node = m_fitness.GetFirst(); node; node = node->GetNext())
 	{
 		//notify->OnDebugNode(node->GetInfo());
-		if (node->GetInfo()->GetLeft()->GetAsBroadPhaseBodyNode())
+		if (node->GetInfo()->GetLeft()->GetAsSceneBodyNode())
 		{
 			notify->OnDebugNode(node->GetInfo()->GetLeft());
 		}
-		if (node->GetInfo()->GetRight()->GetAsBroadPhaseBodyNode())
+		if (node->GetInfo()->GetRight()->GetAsSceneBodyNode())
 		{
 			notify->OnDebugNode(node->GetInfo()->GetRight());
 		}

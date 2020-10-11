@@ -1360,8 +1360,8 @@ ndBodyKinematic* MousePickBody(ndWorld* const world, const dVector& origin, cons
 	class ndRayPickingCallback: public ndRayCastClosestHitCallback
 	{
 		public: 
-		ndRayPickingCallback(const ndScene* const broadPhase)
-			:ndRayCastClosestHitCallback(broadPhase)
+		ndRayPickingCallback(const ndScene* const scene)
+			:ndRayCastClosestHitCallback(scene)
 		{
 		}
 
