@@ -107,14 +107,13 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	}
 
 	ndDemoSubMesh* AddSubMesh();
-	void AllocVertexData(int vertexCount, int indexCount);
+	//void AllocVertexData(int vertexCount, int indexCount);
 	virtual const dString& GetTextureName (const ndDemoSubMesh* const subMesh) const;
 
 	virtual void RenderTransparency () const;
 	virtual void Render (ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 	virtual void RenderNormals ();
-
-	void OptimizeForRender();
+	
 	//virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
 
 	protected:
@@ -123,17 +122,17 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	void  SpliteSegment(dListNode* const node, int maxIndexCount);
 
 	public:
-	void  ResetOptimization();
-	ndMeshPointUV* m_points;
-	dInt32 m_vertexCount;
+	void ResetOptimization();
+	void OptimizeForRender(const dArray<ndMeshPointUV>& points, const dArray<dInt32>& indices);
+
 	dInt32 m_indexCount;
+	dInt32 m_vertexCount;
 	dInt32 m_textureLocation;
 	dInt32 m_normalMatrixLocation;
 	dInt32 m_projectMatrixLocation;
 	dInt32 m_viewModelMatrixLocation;
 	dInt32 m_directionalLightDirLocation;
-	
-	GLuint* m_indexArray;
+
 	GLuint m_shader;
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
