@@ -410,14 +410,6 @@ void ndDemoEntityManager::Cleanup ()
 		m_debugShapeCache.Remove(root);
 	}
 
-	// destroy all remaining visual objects
-	while (GetFirst()) 
-	{
-		ndDemoEntity* const ent = GetFirst()->GetInfo();
-		RemoveEntity(ent);
-		delete ent;
-	}
-
 	if (m_cameraManager) 
 	{
 		delete m_cameraManager;
@@ -432,6 +424,15 @@ void ndDemoEntityManager::Cleanup ()
 		// get serialization call back before destroying the world
 		delete m_world;
 	}
+
+	// destroy all remaining visual objects
+	while (GetFirst())
+	{
+		ndDemoEntity* const ent = GetFirst()->GetInfo();
+		RemoveEntity(ent);
+		delete ent;
+	}
+
 
 	// create the newton world
 	m_world = new ndPhysicsWorld(this);

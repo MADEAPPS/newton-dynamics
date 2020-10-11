@@ -64,6 +64,8 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	D_NEWTON_API void AddJoint(ndJointBilateralConstraint* const joint);
 	D_NEWTON_API void RemoveJoint(ndJointBilateralConstraint* const joint);
 
+	D_NEWTON_API void DeleteBody(ndBody* const body);
+
 	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;
 	const ndContactList& GetContactList() const;

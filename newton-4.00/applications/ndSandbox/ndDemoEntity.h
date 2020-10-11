@@ -21,16 +21,14 @@ class ndDemoMeshInterface;
 class ndDemoEntityNotify: public ndBodyNotify
 {
 	public:
-	ndDemoEntityNotify(ndDemoEntity* const entity)
-		:ndBodyNotify()
-		,m_entity(entity)
-	{
-	}
+	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity);
+	~ndDemoEntityNotify();
 
 	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix);
 	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep);
 
 	ndDemoEntity* m_entity;
+	ndDemoEntityManager* m_manager;
 };
 
 class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>

@@ -91,6 +91,16 @@ ndWorld::~ndWorld()
 		delete joint;
 	}
 
+	const ndBodyList& bodyList = GetBodyList();
+	while (bodyList.GetFirst())
+	{
+		ndBodyKinematic* const body = bodyList.GetFirst()->GetInfo();
+		RemoveBody(body);
+		delete body;
+	}
+
+	dAssert(!m_scene->GetContactList().GetCount());
+
 	delete m_sentinelBody;
 	delete m_scene;
 	ClearCache();
@@ -260,6 +270,22 @@ void ndWorld::RemoveBody(ndBody* const body)
 	{
 		m_scene->RemoveBody(kinematicBody);
 	}
+}
+
+void ndWorld::DeleteBody(ndBody* const body)
+{
+	RemoveBody(body);
+	ndBodyKinematic* const kinematicBody = body->GetAsBodyKinematic();
+	if (kinematicBody)
+	{
+		while (kinematicBody->m_jointList.GetFirst())
+		{
+			ndJointBilateralConstraint* const joint = kinematicBody->m_jointList.GetFirst()->GetInfo();
+			RemoveJoint(joint);
+			delete joint;
+		}
+	}
+	delete body;
 }
 
 void ndWorld::AddJoint(ndJointBilateralConstraint* const joint)

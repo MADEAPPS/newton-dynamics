@@ -44,15 +44,17 @@ static int xxxx;
 			Update(timeLimit);
 			m_timeAccumulator -= timeLimit;
 
-xxxx++;
-if (xxxx == 500)
-{
-	Sync();
-	//const ndBodyList& bodyList = GetBodyList();
-	//ndBodyKinematic* body = bodyList.GetFirst()->GetInfo();
-	//RemoveBody(body);
-	//delete body;
-}
+//xxxx++;
+//if (xxxx == 500)
+//{
+//	Sync();
+//	xxxx = 0;
+//	const ndBodyList& bodyList = GetBodyList();
+//	ndBodyKinematic* body = bodyList.GetFirst()->GetNext()->GetInfo();
+//	//RemoveBody(body);
+//	//delete body;
+//	DeleteBody(body);
+//}
 
 		}
 		if (!m_manager->m_asynchronousPhysicsUpdate)

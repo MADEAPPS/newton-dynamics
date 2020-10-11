@@ -13,6 +13,20 @@
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 
+ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity)
+	:ndBodyNotify()
+	,m_entity(entity)
+	,m_manager(manager)
+{
+}
+
+ndDemoEntityNotify::~ndDemoEntityNotify()
+{
+	dAssert(m_entity->m_rootNode);
+	m_manager->RemoveEntity(m_entity);
+	delete m_entity;
+}
+
 void ndDemoEntityNotify::OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
 {
 	ndBodyDynamic* const dynamicBody = GetBody()->GetAsBodyDynamic();

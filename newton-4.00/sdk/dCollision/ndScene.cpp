@@ -283,6 +283,13 @@ bool ndScene::AddBody(ndBodyKinematic* const body)
 
 bool ndScene::RemoveBody(ndBodyKinematic* const body)
 {
+	ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
+	while (contactMap.GetRoot())
+	{
+		ndContact* const contact = contactMap.GetRoot()->GetInfo();
+		m_contactList.DeleteContact(contact);
+	}
+
 	if (body->m_scene && body->m_sceneNode)
 	{
 		m_bodyList.Remove(body->m_sceneNode);
@@ -1470,16 +1477,17 @@ void ndScene::BuildBodyArray()
 				if (body)
 				{
 					const ndShape* const shape = body->GetCollisionShape().GetShape()->GetAsShapeNull();
-					if (shape)
-					{
-						dAssert(0);
-						if (body->GetSceneBodyNode())
-						{
-							dScopeSpinLock lock(m_owner->m_contactLock);
-							m_owner->RemoveBody(body);
-						}
-					}
-					else
+					//if (shape)
+					//{
+					//	dAssert(0);
+					//	if (body->GetSceneBodyNode())
+					//	{
+					//		dScopeSpinLock lock(m_owner->m_contactLock);
+					//		m_owner->RemoveBody(body);
+					//	}
+					//}
+					//else
+					if (!shape)
 					{
 						bool inScene = true;
 						if (!body->GetSceneBodyNode())

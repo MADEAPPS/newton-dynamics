@@ -35,7 +35,7 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 	entity->SetMesh(geometry, dGetIdentityMatrix());
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
-	body->SetNotifyCallback(new ndDemoEntityNotify(entity));
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(box);
 	
@@ -51,7 +51,7 @@ static ndBodyDynamic* MakeCapule(ndDemoEntityManager* const scene, const dMatrix
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(mesh, dGetIdentityMatrix());
 	ndBodyDynamic* const body = new ndBodyDynamic();
-	body->SetNotifyCallback(new ndDemoEntityNotify(entity));
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(capsule);
 	body->SetMassMatrix(mass, capsule);

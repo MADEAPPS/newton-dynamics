@@ -33,14 +33,14 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_y = -0.5f;
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
-
+	
 	ndBodyDynamic* const body = new ndBodyDynamic();
-	body->SetNotifyCallback(new ndDemoEntityNotify(entity));
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(box);
 	
 	world->AddBody(body);
-
+	
 	scene->AddEntity(entity);
 	geometry->Release();
 }
@@ -69,7 +69,7 @@ matrix.m_posit.m_y += 7.0f;
 		ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 		entity->SetMesh(sphereMesh, dGetIdentityMatrix());
 
-		body->SetNotifyCallback(new ndDemoEntityNotify(entity));
+		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(sphereShape);
 		body->SetMassMatrix(mass, sphereShape);
@@ -96,11 +96,11 @@ static void BuildSphereStacks(ndDemoEntityManager* const scene, const dVector& o
 	//dVector minP(0.0f);
 	//dVector maxP(0.0f);
 	//sphere.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
-
-	const int n = 10;
+	
 	//const int n = 1;
-	const int stackHigh = 7;
 	//const int stackHigh = 1;
+	const int n = 10;
+	const int stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)

@@ -139,6 +139,7 @@ class ndBodyKinematic: public ndBody
 	virtual void SetAccel(const dVector& accel);
 	virtual void SetAlpha(const dVector& alpha);
 
+	ndContactMap& GetContactMap();
 	const ndContactMap& GetContactMap() const;
 
 	private:
@@ -325,7 +326,11 @@ inline void ndBodyKinematic::PrepareStep(dInt32 index)
 	m_islandSleep = m_equilibrium;
 	m_weigh = dFloat32(0.0f);
 	m_islandParent = this;
-	//m_tmpBodyArray[index] = body;
+}
+
+inline ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap()
+{
+	return m_contactList;
 }
 
 inline const ndBodyKinematic::ndContactMap& ndBodyKinematic::GetContactMap() const
