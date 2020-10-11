@@ -1535,18 +1535,6 @@ void  ndDemoMesh::ResetOptimization()
 	}
 }
 
-//void ndDemoMesh::AllocVertexData(int vertexCount, int indexCount)
-//void ndDemoMesh::AllocVertexData(dArray<ndMeshPointUV>& points)
-//{
-//	m_vertexCount = points.GetCount();
-//	m_points = (ndMeshPointUV*)dMemory::Malloc(m_vertexCount * sizeof(ndMeshPointUV));
-//	memset(m_points, 0, m_vertexCount * sizeof(ndMeshPointUV));
-//
-//	m_indexCount = indexCount;
-//	m_indexArray = (GLuint*)dMemory::Malloc(m_indexCount * sizeof(GLuint));
-//	memset(m_indexArray, 0, m_indexCount * sizeof(GLuint));
-//}
-
 void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
 	if (m_isVisible)

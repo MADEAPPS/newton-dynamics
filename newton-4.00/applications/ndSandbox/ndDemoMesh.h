@@ -107,7 +107,6 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	}
 
 	ndDemoSubMesh* AddSubMesh();
-	//void AllocVertexData(int vertexCount, int indexCount);
 	virtual const dString& GetTextureName (const ndDemoSubMesh* const subMesh) const;
 
 	virtual void RenderTransparency () const;
