@@ -184,10 +184,8 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	sentinelBody->m_equilibrium = 1;
 	m_scene->GetActiveBodyArray().PushBack(sentinelBody);
 
-	UpdateSkeletons();
+
 	ApplyExternalForces();
-	UpdatePrelisteners();
-	//UpdateSleepState();
 
 	// update the collision system
 	m_scene->UpdateAabb();
@@ -195,6 +193,10 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	m_scene->BuildContactArray();
 	m_scene->CalculateContacts();
 	m_scene->DeleteDeadContact();
+
+	// update all special models.
+	UpdateSkeletons();
+	UpdatePrelisteners();
 
 	// calculate internal forces, integrate bodies and update matrices.
 	DynamicsUpdate();
@@ -335,9 +337,6 @@ void ndWorld::UpdateSkeletons()
 		}
 		m_skeletonList.RemoveAll();
 
-		//m_dynamicsLru = m_dynamicsLru + 1;
-		//dgUnsigned32 lru = m_dynamicsLru;
-
 		ndDynamicsUpdate& solverUpdate = *this;
 		ndConstraintArray& jointArray = solverUpdate.m_jointArray;
 		jointArray.SetCount(m_jointList.GetCount() + 1);
@@ -407,42 +406,35 @@ void ndWorld::UpdateSkeletons()
 			dInt32 m_mod;
 		};
 
-		ndJointBilateralConstraint* loopJoints[64];
+		ndJointBilateralConstraint* loopJoints[128];
 		ndQueue queuePool;
 		
-		//m_dynamicsLru = m_dynamicsLru + 1;
-		//lru = m_dynamicsLru;
 		for (dInt32 i = 0; i < jointCount; i++) 
 		{
-		//	ndJointBilateralConstraint* const constraint = jointList[i];
 			ndJointBilateralConstraint* const constraint = (ndJointBilateralConstraint*)jointArray[i];
 			if (constraint->m_mark) 
 			{
 				queuePool.Clear();
 				dInt32 loopCount = 0;
-				ndBodyKinematic* const rootBody = (ndBodyKinematic*)(constraint->GetBody0()->GetInvMass() < constraint->GetBody1()->GetInvMass()) ? constraint->GetBody0() : constraint->GetBody1();
+				ndBodyKinematic* const rootBody = (constraint->GetBody0()->GetInvMass() < constraint->GetBody1()->GetInvMass()) ? constraint->GetBody0() : constraint->GetBody1();
 				ndSkeletonContainer* const skeleton = m_skeletonList.CreateContatiner(rootBody);
 				ndSkeletonContainer::ndNode* const rootNode = skeleton->GetRoot();
 				if (rootBody->GetInvMass() == dFloat32(0.0f)) 
 				{
 					dAssert(constraint->m_mark);
-					//if (constraint->IsBilateral() && (constraint->m_dynamicsLru != lru)) 
-					//{
-						//constraint->m_dynamicsLru = lru;
-						constraint->m_mark = 0;
-						ndBodyKinematic* const childBody = (constraint->GetBody0() == rootBody) ? constraint->GetBody1() : constraint->GetBody0();
-						if (!constraint->m_solverModel) 
+					constraint->m_mark = 0;
+					ndBodyKinematic* const childBody = (constraint->GetBody0() == rootBody) ? constraint->GetBody1() : constraint->GetBody0();
+					if (!constraint->m_solverModel) 
+					{
+						dAssert(childBody->GetInvMass() != dFloat32(0.0f));
+						//if ((childBody->m_skeletonMark) && (childBody->GetInvMass().m_w != dFloat32(0.0f))) {
+						if (childBody->m_skeletonMark) 
 						{
-							dAssert(childBody->GetInvMass() != dFloat32(0.0f));
-							//if ((childBody->m_skeletonMark) && (childBody->GetInvMass().m_w != dFloat32(0.0f))) {
-							if (childBody->m_skeletonMark) 
-							{
-								childBody->m_skeletonMark = 0;
-								ndSkeletonContainer::ndNode* const node = skeleton->AddChild((ndJointBilateralConstraint*)constraint, rootNode);
-								queuePool.Push(node);
-							}
+							childBody->m_skeletonMark = 0;
+							ndSkeletonContainer::ndNode* const node = skeleton->AddChild((ndJointBilateralConstraint*)constraint, rootNode);
+							queuePool.Push(node);
 						}
-					//}
+					}
 				}
 				else 
 				{
@@ -464,17 +456,14 @@ void ndWorld::UpdateSkeletons()
 					for (dInt32 j = 0; j < count; j++) 
 					{
 						ndSkeletonContainer::ndNode* const parentNode = queuePool[index];
-						//ndBodyKinematic* const parentBody = skeleton->GetBody(parentNode);
 						ndBodyKinematic* const parentBody = parentNode->m_body;
 				
 						for (ndJointList::dListNode* jointNode1 = parentBody->m_jointList.GetFirst(); jointNode1; jointNode1 = jointNode1->GetNext()) 
 						{
-							//dgBodyMasterListCell* const cell1 = &jointNode1->GetInfo();
 							ndJointBilateralConstraint* const constraint1 = jointNode1->GetInfo();
 							//if (constraint1->IsBilateral() && (constraint1->m_dynamicsLru != lru)) {
 							if (constraint1->m_mark)
 							{ 
-								//constraint1->m_dynamicsLru = lru;
 								constraint1->m_mark = 0;
 							
 								ndBodyKinematic* const childBody = (constraint1->GetBody0() == parentBody) ? constraint1->GetBody1() : constraint1->GetBody0();
