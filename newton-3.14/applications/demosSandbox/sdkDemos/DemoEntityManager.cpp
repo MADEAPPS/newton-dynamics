@@ -32,7 +32,7 @@
 #define MAX_PHYSICS_SUB_STEPS		2
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-#define DEFAULT_SCENE	0		// using NewtonMesh tool
+//#define DEFAULT_SCENE	0		// using NewtonMesh tool
 //#define DEFAULT_SCENE	1		// coefficients of friction
 //#define DEFAULT_SCENE	2		// coefficients of restitution
 //#define DEFAULT_SCENE	3		// newton cradle
@@ -68,7 +68,7 @@
 //#define DEFAULT_SCENE	33		// multi body body vehicle
 //#define DEFAULT_SCENE	34		// super Car
 //#define DEFAULT_SCENE	35		// heavy vehicles
-//#define DEFAULT_SCENE	36		// basic player controller
+#define DEFAULT_SCENE	36		// basic player controller
 //#define DEFAULT_SCENE	37		// animated player controller
 //#define DEFAULT_SCENE	38		// advanced player controller
 //#define DEFAULT_SCENE	39		// cloth patch			

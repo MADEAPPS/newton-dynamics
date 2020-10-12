@@ -408,9 +408,9 @@ void BasicPlayerController (DemoEntityManager* const scene)
 	location.m_posit.m_x += 4.0f;
 	location.m_posit.m_z += 1.0f;
 	location.m_posit.m_y += 5.0f;
-	playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	//playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 	location.m_posit.m_z += 3.0f;
-	playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
+	//playerManager->CreatePlayer(location, 1.9f, 0.5, 100.0f);
 
 	// show player special effects
 	if (0)
