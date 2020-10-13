@@ -1238,8 +1238,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 		case ndShapeID::m_boxCollision:
 		{
 			int tex0 = LoadTexture(texture0);
-			int tex1 = LoadTexture(texture1);
-			int tex2 = LoadTexture(texture2);
+			//int tex1 = LoadTexture(texture1);
+			//int tex2 = LoadTexture(texture2);
 			//mesh.BoxMapping(tex0, tex1, tex2, aligmentUV);
 			mesh.UniformBoxMapping(tex0, aligmentUV);
 			break;

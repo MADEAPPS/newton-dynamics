@@ -144,8 +144,8 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 
 	dInt32 m_maxCount;
 	dInt32 m_vertexIndex;
-	bool m_ccdMode;
-	bool m_intersectionTestOnly;
+	dUnsigned32 m_ccdMode : 1;
+	dUnsigned32 m_intersectionTestOnly : 1;
 	
 	dInt32 m_faceIndex;
 	ndMinkFace* m_faceStack[D_CONVEX_MINK_STACK_SIZE];

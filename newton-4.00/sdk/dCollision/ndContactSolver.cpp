@@ -247,35 +247,15 @@ dInt32 ndContactSolver::CalculateConvexToConvexContacts()
 	dAssert(!m_instance0.GetShape()->GetAsShapeNull());
 	dAssert(!m_instance1.GetShape()->GetAsShapeNull());
 
-	//if (!contactJoint->m_material->m_contactGeneration) {
-	if (1) 
+	if (m_ccdMode)
 	{
-		if (m_ccdMode)
-		{
-			dAssert(0);
-	//		count = contactSolver.CalculateConvexCastContacts();
-		}
-		else 
-		{
-			count = ConvexToConvexContacts();
-		}
-		return count;
+		dAssert(0);
+//		count = contactSolver.CalculateConvexCastContacts();
 	}
 	else 
 	{
-		dAssert(0);
-	//	count = CalculateUserContacts(proxy);
-	//	ndContactPoint* const contactOut = proxy.m_contacts;
-	//	for (dInt32 i = 0; i < count; i++) {
-	//		contactOut[i].m_body0 = proxy.m_body0;
-	//		contactOut[i].m_body1 = proxy.m_body1;
-	//		contactOut[i].m_collision0 = collision0;
-	//		contactOut[i].m_collision1 = collision1;
-	//		contactOut[i].m_shapeId0 = collision0->GetUserDataID();
-	//		contactOut[i].m_shapeId1 = collision1->GetUserDataID();
-	//	}
+		count = ConvexToConvexContacts();
 	}
-	
 	return count;
 }
 
@@ -294,10 +274,8 @@ dInt32 ndContactSolver::ConvexContacts()
 		//pair->m_contactCount = CalculateConvexToNonConvexContacts(proxy);
 		return 0;
 	}
-
 }
 
-//void ndContactSolver::CalculateContacts(ntPair* const pair, dInt32 threadIndex, bool ccdMode, bool intersectionTestOnly)
 dInt32 ndContactSolver::CalculatePairContacts(dInt32 threadIndex)
 {
 	//ndContact* const contact = pair->m_contact;
@@ -369,38 +347,36 @@ dInt32 ndContactSolver::CalculatePairContacts(dInt32 threadIndex)
 dInt32 ndContactSolver::ConvexToConvexContacts()
 {
 	dInt32 count = 0;
-	if (m_intersectionTestOnly) 
+
+	dVector origin0(m_instance0.m_globalMatrix.m_posit);
+	dVector origin1(m_instance1.m_globalMatrix.m_posit);
+	m_instance0.m_globalMatrix.m_posit = dVector::m_wOne;
+	m_instance1.m_globalMatrix.m_posit -= (origin0 & dVector::m_triplexMask);
+
+	// handle rare case of two shapes located exactly at the same origin
+	dVector error(m_instance1.m_globalMatrix.m_posit - m_instance0.m_globalMatrix.m_posit);
+	if (error.DotProduct(error).GetScalar() < dFloat32(1.0e-6f))
 	{
 		dAssert(0);
-		//CalculateClosestPoints();
-		//dFloat32 penetration = m_normal.DotProduct(m_closestPoint1 - m_closestPoint0).GetScalar() - m_proxy->m_skinThickness - D_PENETRATION_TOL;
+		// shift instance1 by some small value to prevent infinite loop
+		// in contact solve iterations.
+		//dVector step(m_instance0.m_globalMatrix[0][1], m_instance0.m_globalMatrix[1][1], m_instance0.m_globalMatrix[2][1], dFloat32(0.0f));
+		//m_instance1.m_globalMatrix.m_posit += step.Scale (1.0e-3f);
+		m_instance1.m_globalMatrix.m_posit.m_y += dFloat32(1.0e-3f);
+	}
+
+	bool colliding = CalculateClosestPoints();
+	dFloat32 penetration = m_separatingVector.DotProduct(m_closestPoint1 - m_closestPoint0).GetScalar() - m_skinThickness - D_PENETRATION_TOL;
+	if (m_intersectionTestOnly) 
+	{
 		//dInt32 retVal = (penetration <= dFloat32(0.0f)) ? -1 : 0;
 		//m_proxy->m_contactJoint->m_isActive = retVal;
-		//return retVal;
+		count = (penetration <= dFloat32(0.0f)) ? 1 : 0;
 	}
 	else 
 	{
-		dVector origin0(m_instance0.m_globalMatrix.m_posit);
-		dVector origin1(m_instance1.m_globalMatrix.m_posit);
-		m_instance0.m_globalMatrix.m_posit = dVector::m_wOne;
-		m_instance1.m_globalMatrix.m_posit -= (origin0 & dVector::m_triplexMask);
-
-		// handle rare case of two shapes located exactly at the same origin
-		dVector error(m_instance1.m_globalMatrix.m_posit - m_instance0.m_globalMatrix.m_posit);
-		if (error.DotProduct(error).GetScalar() < dFloat32(1.0e-6f))
-		{
-			dAssert(0);
-			// shift instance1 by some small value to prevent infinite loop
-			// in contact solve iterations.
-			//dVector step(m_instance0.m_globalMatrix[0][1], m_instance0.m_globalMatrix[1][1], m_instance0.m_globalMatrix[2][1], dFloat32(0.0f));
-			//m_instance1.m_globalMatrix.m_posit += step.Scale (1.0e-3f);
-			m_instance1.m_globalMatrix.m_posit.m_y += dFloat32(1.0e-3f);
-		}
-
-		bool colliding = CalculateClosestPoints();
 		if (colliding) 
 		{
-			dFloat32 penetration = m_separatingVector.DotProduct(m_closestPoint1 - m_closestPoint0).GetScalar() - m_skinThickness - D_PENETRATION_TOL;
 			if (penetration <= dFloat32(1.0e-5f)) 
 			{
 				//m_proxy->m_contactJoint->m_isActive = 1;
@@ -437,9 +413,10 @@ dInt32 ndContactSolver::ConvexToConvexContacts()
 				contactOut[i].m_penetration = penetration;
 			}
 		}
-		m_instance0.m_globalMatrix.m_posit = origin0;
-		m_instance1.m_globalMatrix.m_posit = origin1;
 	}
+
+	m_instance0.m_globalMatrix.m_posit = origin0;
+	m_instance1.m_globalMatrix.m_posit = origin1;
 	return count;
 }
 

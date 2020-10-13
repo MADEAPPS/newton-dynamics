@@ -28,6 +28,7 @@
 #include "ndBodyKinematic.h"
 #include "ndContactNotify.h"
 #include "ndContactSolver.h"
+#include "ndBodyTriggerVolume.h"
 #include "ndJointBilateralConstraint.h"
 
 #define D_BASH_SIZE					64
@@ -319,7 +320,6 @@ dFloat32 ndScene::RayCast(ndRayCastNotify& callback, const ndSceneNode** stackPo
 			ndBodyKinematic* const body = me->GetBody();
 			if (body) 
 			{
-		//		if (!body->m_isdead) {
 				dAssert(!me->GetLeft());
 				dAssert(!me->GetRight());
 				dFloat32 param = body->RayCast(callback, ray, maxParam);
@@ -944,28 +944,34 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 	bool processContacts = m_contactNotifyCallback->OnAaabbOverlap(contact, m_timestep);
 	if (processContacts)
 	{
-		//ntPair pair;
+		dAssert(!body0->GetAsTrigger());
 		dAssert(!body0->GetCollisionShape().GetShape()->GetAsShapeNull());
 		dAssert(!body1->GetCollisionShape().GetShape()->GetAsShapeNull());
 			
-		//pair.m_contact = contact;
-		//pair.m_timestep = timestep;
 		ndContactPoint contactBuffer[D_MAX_CONTATCS];
 		ndContactSolver contactSolver(contact);
 		contactSolver.m_separatingVector = contact->m_separatingVector;
 		contactSolver.m_timestep = m_timestep;
 		contactSolver.m_ccdMode = false;
-		contactSolver.m_intersectionTestOnly = false;
 		contactSolver.m_contactBuffer = contactBuffer;
+		contactSolver.m_intersectionTestOnly = body1->GetAsTrigger() ? 1 : 0;
 		
 		dInt32 count = contactSolver.CalculatePairContacts(threadIndex);
 		if (count)
 		{
-			dAssert(count <= (D_CONSTRAINT_MAX_ROWS / 3));
-			//m_world->ProcessContacts(pair, threadID);
-			ProcessContacts(threadIndex, count, &contactSolver);
-			//dAssert(0);
-			//KinematicBodyActivation(pair->m_contact);
+			if (!contactSolver.m_intersectionTestOnly)
+			{
+				dAssert(count <= (D_CONSTRAINT_MAX_ROWS / 3));
+				ProcessContacts(threadIndex, count, &contactSolver);
+			}
+			else
+			{
+				if (!contact->m_isTrigger && contactSolver.m_intersectionTestOnly)
+				{
+					body1->GetAsTrigger()->OnTriggerEnter(body0, m_timestep);
+				}
+				contact->m_isTrigger = contactSolver.m_intersectionTestOnly;
+			}
 		}
 		else
 		{
@@ -1776,35 +1782,6 @@ void ndScene::TransformUpdate()
 	SubmitJobs<ndTransformUpdate>();
 }
 
-void ndScene::DeleteDeadContact()
-{
-	D_TRACKTIME();
-	dInt32 activeCount = m_activeConstraintArray.GetCount();
-	for (dInt32 i = activeCount - 1; i >= 0; i--)
-	{
-		ndContact* const contact = m_activeConstraintArray[i]->GetAsContact();
-		dAssert(contact);
-		if (contact->m_killContact)
-		{
-			activeCount--;
-			m_contactList.DeleteContact(contact);
-			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
-		}
-		else if (!contact->m_active || !contact->m_maxDOF)
-		{
-			activeCount--;
-			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
-		}
-		//else if (contact->m_body0->m_continueCollisionMode | contact->m_body1->m_continueCollisionMode) 
-		//{
-		//	if (contact->EstimateCCD(timestep)) {
-		//		constraintArray[activeCount].m_joint = contact;
-		//		activeCount++;
-		//	}
-		//}
-	}
-	m_activeConstraintArray.SetCount(activeCount);
-}
 
 void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 {
@@ -1892,4 +1869,35 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 	}
 
 	contact->m_killContact = contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
+}
+
+void ndScene::DeleteDeadContact()
+{
+	D_TRACKTIME();
+	dInt32 activeCount = m_activeConstraintArray.GetCount();
+	for (dInt32 i = activeCount - 1; i >= 0; i--)
+	{
+		ndContact* const contact = m_activeConstraintArray[i]->GetAsContact();
+		dAssert(contact);
+		if (contact->m_killContact)
+		{
+			activeCount--;
+			m_contactList.DeleteContact(contact);
+			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
+		}
+		else if (!contact->m_active || !contact->m_maxDOF)
+		{
+			activeCount--;
+			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
+		}
+
+		//else if (contact->m_body0->m_continueCollisionMode | contact->m_body1->m_continueCollisionMode) 
+		//{
+		//	if (contact->EstimateCCD(timestep)) {
+		//		constraintArray[activeCount].m_joint = contact;
+		//		activeCount++;
+		//	}
+		//}
+	}
+	m_activeConstraintArray.SetCount(activeCount);
 }

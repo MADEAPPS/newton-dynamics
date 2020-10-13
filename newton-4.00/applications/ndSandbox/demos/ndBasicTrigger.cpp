@@ -18,6 +18,27 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 
+class ndDemoTriggerVolume : public ndBodyTriggerVolume
+{
+	public:
+	
+	void OnTrigger(ndBodyKinematic* const body, dFloat32 timestep)
+	{
+		dAssert(0);
+	}
+
+	void OnTriggerEnter(ndBodyKinematic* const body, dFloat32 timestep)
+	{
+		dTrace(("enter trigger body: %d\n", body->GetId()));
+	}
+
+	void OnTriggerExit(ndBodyKinematic* const body, dFloat32 timestep)
+	{
+		dAssert(0);
+	}
+
+};
+
 static void BuildFloor(ndDemoEntityManager* const scene)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
@@ -67,7 +88,7 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	entity->SetMesh(geometry, dGetIdentityMatrix());
 
 	//ndBodyDynamic* const body = new ndBodyDynamic();
-	ndBodyTriggerVolume* const body = new ndBodyTriggerVolume();
+	ndBodyTriggerVolume* const body = new ndDemoTriggerVolume();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(box);

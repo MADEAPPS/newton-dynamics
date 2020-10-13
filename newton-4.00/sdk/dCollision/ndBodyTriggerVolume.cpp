@@ -23,7 +23,6 @@
 #include "ndCollisionStdafx.h"
 #include "ndBodyTriggerVolume.h"
 
-
 ndBodyTriggerVolume::ndBodyTriggerVolume()
 	:ndBodyKinematic()
 {

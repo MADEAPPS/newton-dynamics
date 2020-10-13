@@ -34,11 +34,31 @@ class ndBodyTriggerVolume : public ndBodyKinematic
 
 	ndBodyTriggerVolume* ndBodyTriggerVolume::GetAsTrigger();
 
+	virtual void OnTrigger(ndBodyKinematic* const body, dFloat32 timestep);
+	virtual void OnTriggerEnter(ndBodyKinematic* const body, dFloat32 timestep);
+	virtual void OnTriggerExit(ndBodyKinematic* const body, dFloat32 timestep);
+
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndBodyTriggerVolume* ndBodyTriggerVolume::GetAsTrigger()
 { 
 	return this; 
 }
+
+inline void ndBodyTriggerVolume::OnTriggerEnter(ndBodyKinematic* const body, dFloat32 timestep)
+{
+	dAssert(0);
+}
+
+inline void ndBodyTriggerVolume::OnTrigger(ndBodyKinematic* const body, dFloat32 timestep)
+{
+	dAssert(0);
+}
+
+inline void ndBodyTriggerVolume::OnTriggerExit(ndBodyKinematic* const body, dFloat32 timestep)
+{
+	dAssert(0);
+}
+
 
 #endif
