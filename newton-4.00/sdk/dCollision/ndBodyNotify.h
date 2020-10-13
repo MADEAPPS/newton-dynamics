@@ -23,6 +23,7 @@
 #define __D_BODY_NOTIFY_H__
 
 #include "ndCollisionStdafx.h"
+class ndBodyTriggerVolume;
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodyNotify: public dClassAlloc
@@ -55,6 +56,22 @@ class ndBodyNotify: public dClassAlloc
 	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
 	{
 	}
+
+	virtual void OnTriggerEnter(ndBodyTriggerVolume* const trigger, dFloat32 timestep)
+	{
+		dAssert(0);
+	}
+
+	virtual void OnTrigger(ndBodyTriggerVolume* const trigger, dFloat32 timestep)
+	{
+		dAssert(0);
+	}
+
+	virtual void OnTriggerExit(ndBodyTriggerVolume* const trigger, dFloat32 timestep)
+	{
+		dAssert(0);
+	}
+
 
 	private:
 	ndBody* m_body;

@@ -52,14 +52,14 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 		{
 		}
 
-		TransparentMesh(const dMatrix& matrix, const ndDemoMesh* const mesh)
+		TransparentMesh(const dMatrix& matrix, ndDemoMesh* const mesh)
 			:m_matrix(matrix)
 			,m_mesh(mesh)
 		{
 		}
 
 		dMatrix m_matrix;
-		const ndDemoMesh* m_mesh;
+		ndDemoMesh* m_mesh;
 	};
 
 	class TransparentHeap: public dUpHeap <TransparentMesh, dFloat32>
@@ -125,9 +125,9 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	ndDemoCamera* GetCamera() const;
 	bool GetMousePosition (dFloat32& posX, dFloat32& posY) const;
 	void SetCameraMatrix (const dQuaternion& rotation, const dVector& position);
-
-	void PushTransparentMesh (const ndDemoMeshInterface* const mesh); 
+	
 	void SetUpdateCameraFunction(UpdateCameraCallback callback, void* const context);
+	void PushTransparentMesh(const ndDemoMeshInterface* const mesh, const dMatrix& modelMatrix);
 	void Set2DDisplayRenderFunction (RenderGuiHelpCallback helpCallback, RenderGuiHelpCallback UIcallback, void* const context);
 
 	bool IsShiftKeyDown () const;

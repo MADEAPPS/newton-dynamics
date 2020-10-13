@@ -30,6 +30,7 @@ class ndBodyNotify;
 class ndBodyDynamic;
 class ndBodyKinematic;
 class ndRayCastNotify;
+class ndBodyTriggerVolume;
 class ndJointBilateralConstraint;
 
 D_MSV_NEWTON_ALIGN_32
@@ -41,6 +42,7 @@ class ndBody: public dClassAlloc
 
 	virtual ndBody* GetAsBody() { return this;}
 	virtual ndBodyDynamic* GetAsBodyDynamic() { return nullptr; }
+	virtual ndBodyTriggerVolume* GetAsTrigger() { return nullptr; }
 	virtual ndBodyKinematic* GetAsBodyKinematic() { return nullptr; }
 
 	dUnsigned32 GetId() const;

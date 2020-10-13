@@ -68,8 +68,9 @@ class ndDemoSubMesh
 	dFloat32 m_opacity;
 	dFloat32 m_shiness;
 	GLuint m_textureHandle;
-	int m_indexCount;
+	dInt32 m_indexCount;
 	dInt32 m_segmentStart;
+	bool m_hasTranparency;
 };
 
 class ndDemoMeshInterface: public dClassAlloc, public dRefCounter<ndDemoMeshInterface>
@@ -85,6 +86,7 @@ class ndDemoMeshInterface: public dClassAlloc, public dRefCounter<ndDemoMeshInte
 	virtual ndDemoMeshInterface* Clone(ndDemoEntity* const owner) { dAssert(0); return nullptr; }
 
 	virtual void Render (ndDemoEntityManager* const scene, const dMatrix& modelMatrix) = 0;
+	virtual void RenderTransparency(ndDemoEntityManager* const scene, const dMatrix& modelMatrix) {}
 	//virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix) = 0;
 
 	dString m_name;
@@ -109,8 +111,8 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	ndDemoSubMesh* AddSubMesh();
 	virtual const dString& GetTextureName (const ndDemoSubMesh* const subMesh) const;
 
-	virtual void RenderTransparency () const;
 	virtual void Render (ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+	virtual void RenderTransparency(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 	virtual void RenderNormals ();
 	
 	//virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
@@ -127,6 +129,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	dInt32 m_indexCount;
 	dInt32 m_vertexCount;
 	dInt32 m_textureLocation;
+	dInt32 m_transparencyLocation;
 	dInt32 m_normalMatrixLocation;
 	dInt32 m_projectMatrixLocation;
 	dInt32 m_viewModelMatrixLocation;
@@ -136,6 +139,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
 	GLuint m_vetextArrayBuffer;
+	bool m_hasTransparency;
 };
 
 class ndDemoSkinMesh: public ndDemoMeshInterface

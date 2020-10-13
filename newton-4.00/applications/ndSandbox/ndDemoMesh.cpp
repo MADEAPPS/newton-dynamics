@@ -56,6 +56,7 @@ ndDemoSubMesh::ndDemoSubMesh ()
 	,m_textureHandle(0)
 	,m_indexCount(0)
 	,m_segmentStart(0)
+	,m_hasTranparency(false)
 {
 }
 
@@ -73,6 +74,7 @@ void ndDemoSubMesh::SetOpacity(dFloat32 opacity)
 	m_ambient.m_w = opacity;
 	m_diffuse.m_w = opacity;
 	m_specular.m_w = opacity;
+	m_hasTranparency = (opacity <= 0.99f) ? true : false;
 }
 
 
@@ -409,18 +411,6 @@ void ndDemoMesh::SpliteSegment(dListNode* const node, int maxIndexCount)
 ndDemoSubMesh* ndDemoMesh::AddSubMesh()
 {
 	return &Append()->GetInfo();
-}
-
-void ndDemoMesh::RenderTransparency () const
-{
-	if (m_isVisible) 
-	{
-		dAssert(0);
-		//if (m_optimizedTransparentDiplayList) 
-		//{
-		//	glCallList(m_optimizedTransparentDiplayList);
-		//} 
-	}
 }
 
 void ndDemoMesh::RenderNormals ()
@@ -792,7 +782,8 @@ int ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
 	dMatrix parentMatrix[32];
 
 	ndDemoEntity* root = m_entity;
-	while (root->GetParent()) {
+	while (root->GetParent()) 
+	{
 		root = root->GetParent();
 	}
 
@@ -965,6 +956,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 	m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
 	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
 	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+
 	glUseProgram(0);
 }
 
@@ -1208,6 +1200,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
+	,m_hasTransparency(false)
 {
 	// create a helper mesh from the collision collision
 	//NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
@@ -1244,11 +1237,11 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 
 		case ndShapeID::m_boxCollision:
 		{
-			//int tex0 = LoadTexture(texture0);
-			int tex1 = LoadTexture(texture1);
+			int tex0 = LoadTexture(texture0);
+			//int tex1 = LoadTexture(texture1);
 			//int tex2 = LoadTexture(texture2);
 			//mesh.BoxMapping(tex0, tex1, tex2, aligmentUV);
-			mesh.UniformBoxMapping(tex1, aligmentUV);
+			mesh.UniformBoxMapping(tex0, aligmentUV);
 			break;
 		}
 
@@ -1272,7 +1265,6 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	{
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
-	//AllocVertexData(vertexCount, indexCount);
 
 	dArray<dInt32> indices;
 	dArray<ndMeshPointUV> points;
@@ -1285,6 +1277,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	mesh.GetUV0Channel(sizeof(ndMeshPointUV), &points[0].m_uv.m_u);
 
 	dInt32 segmentStart = 0;
+	bool hasTransparency = false;
 	for (int handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
 	{
 		int material = mesh.GetMaterialID(geometryHandle, handle);
@@ -1292,6 +1285,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 
 		segment->m_textureHandle = (GLuint)material;
 		segment->SetOpacity(opacity);
+		hasTransparency = hasTransparency | segment->m_hasTranparency;
 
 		segment->m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
 
@@ -1301,6 +1295,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	}
 
 	mesh.MaterialGeomteryEnd(geometryHandle);
+
+	m_hasTransparency = hasTransparency;
 
 	// optimize this mesh for hardware buffers if possible
 	OptimizeForRender(points, indices);
@@ -1450,77 +1446,52 @@ void ndDemoMesh::OptimizeForRender(const dArray<ndMeshPointUV>& points, const dA
 		}
 	}
 
-	bool isOpaque = false;
-	bool hasTranparency = false;
+	//bool isOpaque = false;
+	//bool hasTranparency = false;
+	//for (dListNode* node = GetFirst(); node; node = node->GetNext())
+	//{
+	//	ndDemoSubMesh& segment = node->GetInfo();
+	//	isOpaque |= segment.m_opacity > 0.999f;
+	//	hasTranparency |= segment.m_opacity <= 0.999f;
+	//}
 
-	for (dListNode* node = GetFirst(); node; node = node->GetNext())
-	{
-		ndDemoSubMesh& segment = node->GetInfo();
-		isOpaque |= segment.m_opacity > 0.999f;
-		hasTranparency |= segment.m_opacity <= 0.999f;
-	}
+	glGenVertexArrays(1, &m_vetextArrayBuffer);
+	glBindVertexArray(m_vetextArrayBuffer);
 
-	if (isOpaque)
-	{
-		glGenVertexArrays(1, &m_vetextArrayBuffer);
-		glBindVertexArray(m_vetextArrayBuffer);
+	glGenBuffers(1, &m_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, points.GetCount() * sizeof(ndMeshPointUV), &points[0], GL_STATIC_DRAW);
 
-		glGenBuffers(1, &m_vertexBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
-		glBufferData(GL_ARRAY_BUFFER, points.GetCount() * sizeof(ndMeshPointUV), &points[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)0);
 
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)0);
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)sizeof(ndMeshVector));
 
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)sizeof(ndMeshVector));
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)(2 * sizeof(ndMeshVector)));
 
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)(2 * sizeof(ndMeshVector)));
+	glGenBuffers(1, &m_indexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.GetCount() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
 
-		glGenBuffers(1, &m_indexBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.GetCount() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+	glBindVertexArray(0);
 
-		glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glDisableVertexAttribArray(2);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glUseProgram(m_shader);
+	m_textureLocation = glGetUniformLocation(m_shader, "texture");
+	m_transparencyLocation = glGetUniformLocation(m_shader, "transparency");
+	m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
+	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+	m_directionalLightDirLocation = glGetUniformLocation(m_shader, "directionalLightDir");
+	glUseProgram(0);
 
-		glUseProgram(m_shader);
-		m_textureLocation = glGetUniformLocation(m_shader, "texture");
-		m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
-		m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
-		m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
-		m_directionalLightDirLocation = glGetUniformLocation(m_shader, "directionalLightDir");
-		glUseProgram(0);
-	}
-
-	if (hasTranparency)
-	{
-		dAssert(0);
-		//m_optimizedTransparentDiplayList = glGenLists(1);
-		//
-		//glNewList(m_optimizedTransparentDiplayList, GL_COMPILE);
-		//
-		//glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-		//glEnable (GL_BLEND);
-		//glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		//for (dListNode* node = GetFirst(); node; node = node->GetNext()) 
-		//{
-		//    ndDemoSubMesh& segment = node->GetInfo();
-		//    if (segment.m_opacity <= 0.999f) 
-		//	{
-		//        segment.OptimizeForRender(this);
-		//    }
-		//}
-		//glDisable(GL_BLEND);
-		//glLoadIdentity();
-		//glEndList();
-	}
 	m_vertexCount = points.GetCount();
 	m_indexCount = indices.GetCount();
 }
@@ -1539,6 +1510,89 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 {
 	if (m_isVisible)
 	{
+		bool hasTrasnparency = m_hasTransparency;
+		if (hasTrasnparency) 
+		{
+			scene->PushTransparentMesh(this, modelMatrix);
+		}
+
+		if (hasTrasnparency)
+		{
+			for (dListNode* node = GetFirst(); node; node = node->GetNext())
+			{
+				ndDemoSubMesh& segment = node->GetInfo();
+				hasTrasnparency = hasTrasnparency & segment.m_hasTranparency;
+			}
+		}
+
+		if (!hasTrasnparency)
+		{
+			glUseProgram(m_shader);
+
+			ndDemoCamera* const camera = scene->GetCamera();
+
+			const dMatrix& viewMatrix = camera->GetViewMatrix();
+			const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
+			dMatrix viewModelMatrix(modelMatrix * viewMatrix);
+			dVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+
+			glUniform1i(m_textureLocation, 0);
+			glUniform1f(m_transparencyLocation, 1.0f);
+			glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight.m_x);
+			glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+			glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
+			glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+
+			//float k1 = 7.0 / 120.0;
+			//float k2 = 1.0 / 240.0;
+			//float d2 = viewModelMatrix.m_posit.DotProduct(viewModelMatrix.m_posit & dVector::m_triplexMask).GetScalar();
+			//float d1 = sqrt(d2);
+			//float attenuation = 1.0 / (1.0 + k1 * d1 + k2 * d2);
+			//dAssert(attenuation > 0.0f);
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+			glBindVertexArray(m_vetextArrayBuffer);
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+			glEnableVertexAttribArray(2);
+			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+
+			glActiveTexture(GL_TEXTURE0);
+			for (dListNode* node = GetFirst(); node; node = node->GetNext())
+			{
+				ndDemoSubMesh& segment = node->GetInfo();
+				if (!segment.m_hasTranparency)
+				{
+					glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_specular.m_x);
+					glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_ambient.m_x);
+					glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_diffuse.m_x);
+					glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_shiness));
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+					glBindTexture(GL_TEXTURE_2D, segment.m_textureHandle);
+					glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)segment.m_segmentStart);
+				}
+			}
+
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glDisableVertexAttribArray(2);
+			glDisableVertexAttribArray(1);
+			glDisableVertexAttribArray(0);
+			glBindVertexArray(0);
+			glUseProgram(0);
+		}
+	}
+}
+
+void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+{
+	if (m_isVisible)
+	{
+		glDisable(GL_CULL_FACE);
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		glUseProgram(m_shader);
 
 		ndDemoCamera* const camera = scene->GetCamera();
@@ -1554,14 +1608,6 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 		glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
 		glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 
-		//float k1 = 7.0 / 120.0;
-		//float k2 = 1.0 / 240.0;
-		//float d2 = viewModelMatrix.m_posit.DotProduct(viewModelMatrix.m_posit & dVector::m_triplexMask).GetScalar();
-		//float d1 = sqrt(d2);
-		//float attenuation = 1.0 / (1.0 + k1 * d1 + k2 * d2);
-		//dAssert(attenuation > 0.0f);
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
 		glBindVertexArray(m_vetextArrayBuffer);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
@@ -1572,15 +1618,18 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 		for (dListNode* node = GetFirst(); node; node = node->GetNext())
 		{
 			ndDemoSubMesh& segment = node->GetInfo();
+			if (segment.m_hasTranparency)
+			{
+				glUniform1f(m_transparencyLocation, segment.m_opacity);
+				glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_specular.m_x);
+				glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_ambient.m_x);
+				glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_diffuse.m_x);
+				glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_shiness));
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-			glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_specular.m_x);
-			glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_ambient.m_x);
-			glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_diffuse.m_x);
-			glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_shiness));
-			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-			glBindTexture(GL_TEXTURE_2D, segment.m_textureHandle);
-			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)segment.m_segmentStart);
+				glBindTexture(GL_TEXTURE_2D, segment.m_textureHandle);
+				glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)segment.m_segmentStart);
+			}
 		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -1590,9 +1639,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 		glBindVertexArray(0);
 		glUseProgram(0);
 
-		//if (m_optimizedTransparentDiplayList)
-		//{
-		//	scene->PushTransparentMesh(this);
-		//}
+		glEnable(GL_CULL_FACE);
+		glDisable(GL_BLEND);
 	}
 }

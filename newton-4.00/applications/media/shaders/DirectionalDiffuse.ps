@@ -12,6 +12,7 @@
 #version 330 core
 
 uniform sampler2D texture;
+uniform float transparency;
 
 in vec2 uv;
 in vec3 posit;
@@ -68,5 +69,5 @@ void main()
 	vec3 lightIntensity = PhongDirectionalShading(normalDir) + FlashLightShading(normalDir);
 
 	vec3 texColor = lightIntensity * vec3 (texture2D(texture, uv));
-	pixelColor = vec4(texColor, 1.0f);
+	pixelColor = vec4(texColor, transparency);
 }

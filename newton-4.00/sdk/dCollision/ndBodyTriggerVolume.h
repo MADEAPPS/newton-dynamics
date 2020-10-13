@@ -32,7 +32,13 @@ class ndBodyTriggerVolume : public ndBodyKinematic
 	D_COLLISION_API ndBodyTriggerVolume();
 	D_COLLISION_API virtual ~ndBodyTriggerVolume();
 
+	ndBodyTriggerVolume* ndBodyTriggerVolume::GetAsTrigger();
 
 } D_GCC_NEWTON_ALIGN_32;
+
+inline ndBodyTriggerVolume* ndBodyTriggerVolume::GetAsTrigger()
+{ 
+	return this; 
+}
 
 #endif

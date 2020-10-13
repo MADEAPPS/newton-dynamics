@@ -27,16 +27,19 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-#define DEFAULT_SCENE	0		// setting basic rigid body
-//#define DEFAULT_SCENE	1		// setting basic joints
+//#define DEFAULT_SCENE	0		// setting basic rigid body
+#define DEFAULT_SCENE	1		// setting basic Trigger
+//#define DEFAULT_SCENE	2		// setting basic joints
 						 
 // demos forward declaration 
-void ndBasicRigidBody (ndDemoEntityManager* const scene);
 void ndBasicJoints(ndDemoEntityManager* const scene);
+void ndBasicTrigger(ndDemoEntityManager* const scene);
+void ndBasicRigidBody(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
 	{ "basic rigid body", ndBasicRigidBody },
+	{ "basic trigger", ndBasicTrigger },
 	{ "basic joints", ndBasicJoints },
 };
 
@@ -989,12 +992,11 @@ void ndDemoEntityManager::CreateSkyBox()
 	}
 }
 
-void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const mesh)
+void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const mesh, const dMatrix& modelMatrix)
 {
-	dMatrix matrix;
-	glGetFloat (GL_MODELVIEW_MATRIX, &matrix[0][0]);
-	TransparentMesh entry (matrix, (ndDemoMesh*) mesh);
-	m_tranparentHeap.Push (entry, matrix.m_posit.m_z);
+	dVector dist (m_cameraManager->GetCamera()->GetViewMatrix().TransformVector(modelMatrix.m_posit));
+	TransparentMesh entry (modelMatrix, (ndDemoMesh*) mesh);
+	m_tranparentHeap.Push (entry, dist.m_z);
 }
 
 /*
@@ -1492,6 +1494,14 @@ void ndDemoEntityManager::RenderScene()
 			ndDemoEntity* const entity = node->GetInfo();
 			entity->Render(timestep, this, globalMatrix);
 		}
+
+
+		while (m_tranparentHeap.GetCount()) 
+		{
+			const TransparentMesh& transparentMesh = m_tranparentHeap[0];
+			transparentMesh.m_mesh->RenderTransparency(this, transparentMesh.m_matrix);
+			m_tranparentHeap.Pop();
+		}
 	}
 
 	if (m_showContactPoints)
@@ -1546,17 +1556,6 @@ void ndDemoEntityManager::RenderScene()
 	//	RenderNormalForces (m_world);
 	//}
 	//
-	//if (m_tranparentHeap.GetCount()) {
-	//	glPushMatrix();	
-	//	while (m_tranparentHeap.GetCount()) {
-	//		const TransparentMesh& transparentMesh = m_tranparentHeap[0];
-	//		glLoadIdentity();
-	//		glLoadMatrix(&transparentMesh.m_matrix[0][0]);
-	//		transparentMesh.m_mesh->RenderTransparency();
-	//		m_tranparentHeap.Pop();
-	//	}
-	//	glPopMatrix();
-	//}
 }
 
 void ndDemoEntityManager::Run()
