@@ -55,7 +55,7 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	uvMatrix[1][1] *= 1.0f / 10.0f;
 	uvMatrix[2][2] *= 1.0f / 20.0f;
 	uvMatrix.m_posit = dVector(0.5f, 0.5f, 0.5f, 1.0f);
-	ndDemoMesh* const geometry = new ndDemoMesh("trigger", scene->GetShaderCache(), &box, "metal_30.tga", "logo_php.tga", "metal_30.tga", 0.5f, uvMatrix);
+	ndDemoMesh* const geometry = new ndDemoMesh("trigger", scene->GetShaderCache(), &box, "metal_30.tga", "metal_30.tga", "logo_php.tga", 0.5f, uvMatrix);
 
 	dVector floor(FindFloor(*world, dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	dMatrix matrix(dGetIdentityMatrix());
@@ -66,8 +66,8 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
 
-
-	ndBodyDynamic* const body = new ndBodyDynamic();
+	//ndBodyDynamic* const body = new ndBodyDynamic();
+	ndBodyTriggerVolume* const body = new ndBodyTriggerVolume();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(box);
@@ -78,8 +78,7 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	geometry->Release();
 }
 
-/*
-static void BuildSphere(ndDemoEntityManager* const scene, 
+static void AddShape(ndDemoEntityManager* const scene, 
 	ndDemoMesh* const sphereMesh, const ndShapeInstance& sphereShape,
 	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
 {
@@ -117,36 +116,31 @@ matrix.m_posit.m_y += 7.0f;
 	}
 }
 
-static void BuildSphereStacks(ndDemoEntityManager* const scene, const dVector& origin)
+static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
 {
 	dFloat32 diameter = 1.0f;
-	//ndShapeInstance sphere(new ndShapeSphere(diameter * 0.5f));
-	ndShapeInstance sphere(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
-	//ndShapeInstance sphere(new ndShapeBox(diameter, diameter, diameter));
-	//ndDemoMesh* const mesh = new ndDemoMesh("sphere", scene->GetShaderCache(), &sphere, "wood_0.tga", "wood_0.tga", "wood_0.tga");
-	ndDemoMesh* const mesh = new ndDemoMesh("sphere", scene->GetShaderCache(), &sphere, "marble.tga", "marble.tga", "marble.tga");
-
-	// get the dimension from shape itself
-	//dVector minP(0.0f);
-	//dVector maxP(0.0f);
-	//sphere.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
+	//ndShapeInstance shape(new ndShapeSphere(diameter * 0.5f));
+	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
+	//ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
+	//ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 	
-	//const int n = 1;
-	//const int stackHigh = 1;
-	const int n = 10;
-	const int stackHigh = 7;
+	const int n = 1;
+	const int stackHigh = 1;
+	//const int n = 10;
+	//const int stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)
 		{
 			dVector location((j - n / 2) * 4.0f, 0.0f, (i - n / 2) * 4.0f, 0.0f);
-			BuildSphere(scene, mesh, sphere, 10.0f, location + origin, 1.0f, stackHigh, 2.0f);
+			AddShape(scene, mesh, shape, 10.0f, location + origin, 1.0f, stackHigh, 2.0f);
 		}
 	}
 
 	mesh->Release();
 }
-*/
+
 
 void ndBasicTrigger (ndDemoEntityManager* const scene)
 {
@@ -162,9 +156,8 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 	// build a floor
 	AddTrigger(scene);
 
-
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-//	BuildSphereStacks(scene, origin1);
+	AddShapes(scene, origin1);
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);

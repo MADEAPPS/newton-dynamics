@@ -67,6 +67,11 @@ class ndRayCastClosestHitCallback: public ndRayCastNotify
 	{
 	}
 
+	dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const collision)
+	{
+		return ((ndBody*)body)->GetAsTrigger() ? 0 : 1;
+	}
+
 	dFloat32 OnRayCastAction(const ndContactPoint& contact, dFloat32 intersetParam)
 	{
 		if (intersetParam < m_param)

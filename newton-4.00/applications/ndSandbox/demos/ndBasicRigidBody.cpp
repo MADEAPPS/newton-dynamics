@@ -45,7 +45,7 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 	geometry->Release();
 }
 
-static void BuildSphere(ndDemoEntityManager* const scene, 
+static void AddShape(ndDemoEntityManager* const scene, 
 	ndDemoMesh* const sphereMesh, const ndShapeInstance& sphereShape,
 	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
 {
@@ -83,19 +83,19 @@ matrix.m_posit.m_y += 7.0f;
 	}
 }
 
-static void BuildSphereStacks(ndDemoEntityManager* const scene, const dVector& origin)
+static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
 {
 	dFloat32 diameter = 1.0f;
-	//ndShapeInstance sphere(new ndShapeSphere(diameter * 0.5f));
-	ndShapeInstance sphere(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
-	//ndShapeInstance sphere(new ndShapeBox(diameter, diameter, diameter));
-	//ndDemoMesh* const mesh = new ndDemoMesh("sphere", scene->GetShaderCache(), &sphere, "wood_0.tga", "wood_0.tga", "wood_0.tga");
-	ndDemoMesh* const mesh = new ndDemoMesh("sphere", scene->GetShaderCache(), &sphere, "marble.tga", "marble.tga", "marble.tga");
+	//ndShapeInstance shape(new ndShapeSphere(diameter * 0.5f));
+	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
+	//ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
+	//ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
 	// get the dimension from shape itself
 	//dVector minP(0.0f);
 	//dVector maxP(0.0f);
-	//sphere.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
+	//shape.CalculateAABB(dGetIdentityMatrix(), minP, maxP);
 	
 	//const int n = 1;
 	//const int stackHigh = 1;
@@ -106,7 +106,7 @@ static void BuildSphereStacks(ndDemoEntityManager* const scene, const dVector& o
 		for (dInt32 j = 0; j < n; j++)
 		{
 			dVector location((j - n / 2) * 4.0f, 0.0f, (i - n / 2) * 4.0f, 0.0f);
-			BuildSphere(scene, mesh, sphere, 10.0f, location + origin, 1.0f, stackHigh, 2.0f);
+			AddShape(scene, mesh, shape, 10.0f, location + origin, 1.0f, stackHigh, 2.0f);
 		}
 	}
 
@@ -125,7 +125,7 @@ void ndBasicRigidBody (ndDemoEntityManager* const scene)
 	BuildFloor(scene);
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	BuildSphereStacks(scene, origin1);
+	AddShapes(scene, origin1);
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
