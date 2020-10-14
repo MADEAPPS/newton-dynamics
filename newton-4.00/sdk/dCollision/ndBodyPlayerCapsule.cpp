@@ -21,11 +21,41 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
+#include "ndShapeCapsule.h"
 #include "ndBodyPlayerCapsule.h"
 
-ndBodyPlayerCapsule::ndBodyPlayerCapsule()
+ndBodyPlayerCapsule::ndBodyPlayerCapsule(const dMatrix& localAxis, dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight)
 	:ndBodyKinematic()
 {
+	m_impulse = dVector::m_zero;
+	m_headingAngle = dFloat32(0.0f);
+	m_forwardSpeed = dFloat32(0.0f);
+	m_lateralSpeed = dFloat32(0.0f);
+	m_stepHeight = dFloat32(0.0f);
+	m_contactPatch = dFloat32(0.0f);
+	m_height = height;
+	m_weistScale = dFloat32(3.0f);
+	m_crouchScale = dFloat32(0.5f);
+	m_isAirbone = false;
+	m_isOnFloor = false;
+	m_isCrouched = false;
+
+	dMatrix shapeMatrix(localAxis);
+	shapeMatrix.m_posit = shapeMatrix.m_front.Scale(height * 0.5f);
+	shapeMatrix.m_posit.m_w = 1.0f;
+	
+	height = dMax(height - 2.0f * radius / m_weistScale, dFloat32(0.1f));
+	ndShapeInstance instance(new ndShapeCapsule(radius / m_weistScale, radius / m_weistScale, height));
+	instance.SetLocalMatrix(shapeMatrix);
+	instance.SetScale(dVector (dFloat32 (1.0f), m_weistScale, m_weistScale, dFloat32 (0.0f)));
+	ndBodyKinematic::SetCollisionShape(instance);
+	
+	SetMassMatrix(mass, instance);
+		
+	m_localFrame = shapeMatrix;
+	m_localFrame.m_posit = dVector::m_wOne;
+	m_contactPatch = radius / m_weistScale;
+	m_stepHeight = dMax(stepHeight, m_contactPatch * dFloat32(2.0f));
 }
 
 ndBodyPlayerCapsule::~ndBodyPlayerCapsule()

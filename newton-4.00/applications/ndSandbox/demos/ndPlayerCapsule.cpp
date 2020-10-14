@@ -18,6 +18,15 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 
+class ndBasicPlayer: public ndBodyPlayerCapsule
+{
+	public:
+	ndBasicPlayer(const dMatrix& localAxis, dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight)
+		:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
+	{
+	}
+};
+
 
 static void BuildFloor(ndDemoEntityManager* const scene)
 {
@@ -110,7 +119,41 @@ static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
 }
 */
 
-void ndPlayerCapsule (ndDemoEntityManager* const scene)
+
+static ndBasicPlayer* AddPlayer(ndDemoEntityManager* const scene, const dMatrix& location, dFloat32 mass, dFloat32 radius, dFloat32 height)
+{
+	// set the play coordinate system
+	dMatrix localAxis(dGetIdentityMatrix());
+
+	//up is first vector
+	localAxis[0] = dVector(0.0, 1.0f, 0.0f, 0.0f);
+	// up is the second vector
+	localAxis[1] = dVector(1.0, 0.0f, 0.0f, 0.0f);
+	// size if the cross product
+	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
+
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit.m_y = 2.0f;
+
+	ndBasicPlayer* const player = new ndBasicPlayer(localAxis, mass, radius, height, height / 3.0f);
+	player->SetMatrix(matrix);
+
+	ndDemoEntity* const entity = new ndDemoEntity(player->GetMatrix(), nullptr);
+
+	const ndShapeInstance& shape = player->GetCollisionShape();
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	entity->SetMesh(mesh, dGetIdentityMatrix());
+	mesh->Release();
+
+	player->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+	world->AddBody(player);
+	scene->AddEntity(entity);
+	return player;
+}
+
+void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 {
 	// load the sky box
 	scene->CreateSkyBox();
@@ -122,10 +165,12 @@ void ndPlayerCapsule (ndDemoEntityManager* const scene)
 	BuildFloor(scene);
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	//AddShapes(scene, origin1);
+	dMatrix location(dGetIdentityMatrix());
+	ndBasicPlayer* const player = AddPlayer(scene, location, 100.0f, 0.5f, 1.9f);
+	player;
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
-	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

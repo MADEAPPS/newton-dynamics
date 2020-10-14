@@ -36,14 +36,14 @@
 // demos forward declaration 
 void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
-void ndPlayerCapsule(ndDemoEntityManager* const scene);
+void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
 	{ "basic rigid body", ndBasicRigidBody },
 	{ "basic trigger", ndBasicTrigger },
-	{ "basic player", ndPlayerCapsule },
+	{ "basic player", ndPlayerCapsuleDemo },
 	{ "basic joints", ndBasicJoints },
 };
 
@@ -219,7 +219,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
-	//m_collisionDisplayMode = 3;
+	m_collisionDisplayMode = 3;
 	//m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
 
@@ -1366,7 +1366,8 @@ void ndDemoEntityManager::DrawDebugShapes()
 			ndDebugMeshCache::dTreeNode* const shapeNode = m_debugShapeCache.Find(shapeInstance.GetShape());
 			if (shapeNode)
 			{
-				dMatrix matrix(shapeInstance.GetLocalMatrix() * body->GetMatrix());
+				//dMatrix matrix(shapeInstance.GetLocalMatrix() * body->GetMatrix());
+				dMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
 				shapeNode->GetInfo().m_flatShaded->Render(this, matrix);
 			}
 		}
@@ -1384,6 +1385,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 		{
 			ndShapeInstance shape(body->GetCollisionShape());
 			shape.SetScale(dVector(1.0f));
+			shape.SetLocalMatrix(dGetIdentityMatrix());
 
 			ndDebuMesh debugMesh;
 			debugMesh.m_flatShaded = new ndFlatShadedDebugMesh(m_shaderCache, &shape);
@@ -1391,8 +1393,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 			shapeNode = m_debugShapeCache.Insert(debugMesh, key);
 		}
 
-		dMatrix matrix(shapeInstance.GetLocalMatrix() * body->GetMatrix());
-
+		dMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
 		int sleepState = body->GetSleepState();
 		dVector color((sleepState == 1) ? sleepColor : awakeColor);
 

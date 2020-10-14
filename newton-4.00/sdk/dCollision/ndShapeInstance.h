@@ -89,6 +89,8 @@ class ndShapeInstance: public dClassAlloc
 	dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 
 	const dMatrix& GetLocalMatrix() const;
+	void SetLocalMatrix(const dMatrix& matrix);
+
 	const dMatrix& GetGlobalMatrix() const;
 	void SetGlobalMatrix(const dMatrix& matrix);
 
@@ -114,8 +116,6 @@ class ndShapeInstance: public dClassAlloc
 	dScaleType GetCombinedScaleType(dScaleType type) const;
 
 	const dMatrix& GetAlignMatrix () const;
-	void SetLocalMatrix (const dMatrix& matrix);
-
 	dUnsigned64 GetUserDataID () const;
 	void SetUserDataID (dUnsigned64 userData);
 
@@ -465,6 +465,11 @@ D_INLINE const ndShape* ndShapeInstance::GetShape() const
 D_INLINE const dMatrix& ndShapeInstance::GetLocalMatrix() const
 {
 	return m_localMatrix;
+}
+
+D_INLINE void ndShapeInstance::SetLocalMatrix(const dMatrix& matrix)
+{
+	m_localMatrix = matrix;
 }
 
 D_INLINE dInt32 ndShapeInstance::GetConvexVertexCount() const

@@ -29,13 +29,29 @@ D_MSV_NEWTON_ALIGN_32
 class ndBodyPlayerCapsule : public ndBodyKinematic
 {
 	public:
-	D_COLLISION_API ndBodyPlayerCapsule();
+	D_COLLISION_API ndBodyPlayerCapsule(const dMatrix& localAxis, dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight);
 	D_COLLISION_API virtual ~ndBodyPlayerCapsule();
 
 	ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule();
 
 	virtual void SetCollisionShape(const ndShapeInstance& shapeInstance);
 
+	protected: 
+	dMatrix m_localFrame;
+	dVector m_impulse;
+	dFloat32 m_mass;
+	dFloat32 m_invMass;
+	dFloat32 m_headingAngle;
+	dFloat32 m_forwardSpeed;
+	dFloat32 m_lateralSpeed;
+	dFloat32 m_stepHeight;
+	dFloat32 m_contactPatch;
+	dFloat32 m_height;
+	dFloat32 m_weistScale;
+	dFloat32 m_crouchScale;
+	bool m_isAirbone;
+	bool m_isOnFloor;
+	bool m_isCrouched;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule()
