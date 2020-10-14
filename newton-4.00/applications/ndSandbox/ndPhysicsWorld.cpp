@@ -32,13 +32,16 @@ ndPhysicsWorld::~ndPhysicsWorld()
 void ndPhysicsWorld::AdvanceTime(dFloat32 timetep)
 {
 	const dFloat32 timeLimit = (1.0f / MAX_PHYSICS_FPS);
+	if (timetep > MAX_PHYSICS_RECOVER_STEPS * 2 * timeLimit)
+	{
+		// clamp timestep because was probably on a brake point for a long time.
+		timetep = MAX_PHYSICS_RECOVER_STEPS * 2 * timeLimit;
+	}
+
 	m_timeAccumulator += timetep;
 	if (m_timeAccumulator > timeLimit)
 	{
 		D_TRACKTIME();
-
-static int xxxx;
-		//dTrace (("%f\n", m_timeAccumulator));
 		for (int recover = MAX_PHYSICS_RECOVER_STEPS; recover && (m_timeAccumulator > timeLimit); recover--)
 		{
 			Update(timeLimit);

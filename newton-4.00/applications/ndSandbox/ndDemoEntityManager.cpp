@@ -28,18 +28,22 @@
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0		// setting basic rigid body
-#define DEFAULT_SCENE	1		// setting basic Trigger
+//#define DEFAULT_SCENE	1		// setting basic Trigger
+#define DEFAULT_SCENE	2		// setting basic joints
 //#define DEFAULT_SCENE	2		// setting basic joints
+
 						 
 // demos forward declaration 
 void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
+void ndPlayerCapsule(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
 	{ "basic rigid body", ndBasicRigidBody },
 	{ "basic trigger", ndBasicTrigger },
+	{ "basic player", ndPlayerCapsule },
 	{ "basic joints", ndBasicJoints },
 };
 

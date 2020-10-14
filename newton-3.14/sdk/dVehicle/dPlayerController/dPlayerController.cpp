@@ -510,7 +510,7 @@ void dPlayerController::PreUpdate(dFloat timestep)
 	NewtonBodyGetPosition(m_newtonBody, &matrix.m_posit[0]);
 	NewtonBodySetMatrix(m_newtonBody, &matrix[0][0]);
 
-dTrace(("player matrix: heading %f front: (%f %f)\n", GetHeadingAngle() * dRadToDegree, matrix[0][0], matrix[0][2]));
+//dTrace(("player matrix: heading %f front: (%f %f)\n", GetHeadingAngle() * dRadToDegree, matrix[0][0], matrix[0][2]));
 
 	// set play desired velocity
 	dVector veloc(GetVelocity() + m_impulse.Scale(m_invMass));
