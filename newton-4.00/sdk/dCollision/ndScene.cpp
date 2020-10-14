@@ -975,6 +975,11 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 		}
 		else
 		{
+			if (contact->m_isTrigger)
+			{
+				body1->GetAsTrigger()->OnTriggerExit(body0, m_timestep);
+				contact->m_isTrigger = 0;
+			}
 			contact->m_maxDOF = 0;
 		}
 	}
@@ -1782,7 +1787,6 @@ void ndScene::TransformUpdate()
 	SubmitJobs<ndTransformUpdate>();
 }
 
-
 void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 {
 	const dUnsigned32 lru = m_lru - D_CONTACT_DELAY_FRAMES;
@@ -1790,16 +1794,19 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 	dVector deltaTime(m_timestep);
 	ndBodyKinematic* const body0 = contact->GetBody0();
 	ndBodyKinematic* const body1 = contact->GetBody1();
+if (body1->GetAsTrigger())
+{
+deltaTime = m_timestep;
+}
 
 	if (!(contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium)))
 	{
 		dAssert(!contact->m_killContact);
-		bool active = contact->m_active;
+		dUnsigned32 active = contact->m_active;
 		if (ValidateContactCache(contact, deltaTime))
 		{
 			contact->m_sceneLru = m_lru;
 			contact->m_timeOfImpact = dFloat32(1.0e10f);
-			//contact->m_timeOfImpact = dFloat32(0.0f);
 		}
 		else
 		{
@@ -1829,11 +1836,10 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 			if (distance < D_NARROW_PHASE_DIST)
 			{
 				CalculateJointContacts(threadIndex, contact);
-				if (contact->m_maxDOF)
+				if (contact->m_maxDOF || contact->m_isTrigger)
 				{
 					contact->m_active = true;
 					contact->m_timeOfImpact = dFloat32(1.0e10f);
-					//contact->m_timeOfImpact = dFloat32(0.0f);
 				}
 				contact->m_sceneLru = m_lru;
 			}

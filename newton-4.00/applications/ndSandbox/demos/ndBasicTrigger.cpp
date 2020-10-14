@@ -34,7 +34,7 @@ class ndDemoTriggerVolume : public ndBodyTriggerVolume
 
 	void OnTriggerExit(ndBodyKinematic* const body, dFloat32 timestep)
 	{
-		dAssert(0);
+		dTrace(("exit trigger body: %d\n", body->GetId()));
 	}
 
 };
@@ -114,8 +114,7 @@ static void AddShape(ndDemoEntityManager* const scene,
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f * 0.99f;
 
-	//matrix.m_posit.m_y += xxxx;
-matrix.m_posit.m_y += 7.0f;
+	matrix.m_posit.m_y += 10.0f;
 
 	for (dInt32 i = 0; i < count; i++)
 	{
