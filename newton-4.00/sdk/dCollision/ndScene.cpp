@@ -1456,6 +1456,10 @@ void ndScene::BuildContactArray()
 		dAssert(contact->m_isAttached);
 		m_activeConstraintArray[count] = contact;
 		count++;
+		if (contact->m_isTrigger)
+		{
+			contact->GetBody1()->GetAsTrigger()->OnTrigger(contact->GetBody0(), m_timestep);
+		}
 	}
 	m_activeConstraintArray.SetCount(count);
 }

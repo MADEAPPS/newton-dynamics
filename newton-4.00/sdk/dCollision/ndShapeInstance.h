@@ -77,6 +77,8 @@ class ndShapeInstance: public dClassAlloc
 
 	D_COLLISION_API ndShapeInfo GetShapeInfo() const;
 
+	D_COLLISION_API dFloat32 CalculateBuoyancyCenterOfPresure(dVector& com, const dMatrix& matrix, const dVector& fluidPlane) const;
+
 	ndShape* GetShape();
 	const ndShape* GetShape() const;
 	dVector SupportVertex(const dVector& dir) const;
@@ -153,7 +155,7 @@ class ndShapeInstance: public dClassAlloc
 	void SetCollisionBBox (const dVector& p0, const dVector& p1);
 
 	void Serialize(dgSerialize callback, void* const userData, bool saveShape = true) const;
-	dVector CalculateBuoyancyVolume (const dMatrix& matrix, const dVector& fluidPlane) const;
+	
 
 	dFloat32 GetSkinThickness() const;
 	void SetSkinThickness(dFloat32 thickness);
@@ -454,10 +456,6 @@ D_INLINE void ndShapeInstance::SetSkinThickness(dFloat32 thickness)
 	m_skinThickness = dAbs (thickness);
 }
 
-D_INLINE dVector ndShapeInstance::CalculateBuoyancyVolume(const dMatrix& matrix, const dVector& fluidPlane) const
-{
-	return m_shape->CalculateVolumeIntegral(m_localMatrix * matrix, fluidPlane, *this);
-}
 #endif
 
 D_INLINE ndShape* ndShapeInstance::GetShape()

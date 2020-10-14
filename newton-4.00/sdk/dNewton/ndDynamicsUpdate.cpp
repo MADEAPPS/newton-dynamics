@@ -946,7 +946,6 @@ dFloat32 ndDynamicsUpdate::CalculateJointsForce(ndConstraint* const joint)
 			a = a.MulAdd(lhs->m_JMinv.m_jacobianM0.m_angular, torqueM0);
 			a = a.MulAdd(lhs->m_JMinv.m_jacobianM1.m_linear, forceM1);
 			a = a.MulAdd(lhs->m_JMinv.m_jacobianM1.m_angular, torqueM1);
-			//a = dVector(rhs->m_coordenateAccel + rhs->m_gyroAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
 			a = dVector(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
 			dVector f(rhs->m_force + rhs->m_invJinvMJt * a.GetScalar());
 		
