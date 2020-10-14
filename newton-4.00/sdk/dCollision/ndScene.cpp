@@ -944,7 +944,7 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 	bool processContacts = m_contactNotifyCallback->OnAaabbOverlap(contact, m_timestep);
 	if (processContacts)
 	{
-		dAssert(!body0->GetAsTrigger());
+		dAssert(!body0->GetAsBodyTriggerVolume());
 		dAssert(!body0->GetCollisionShape().GetShape()->GetAsShapeNull());
 		dAssert(!body1->GetCollisionShape().GetShape()->GetAsShapeNull());
 			
@@ -954,7 +954,7 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 		contactSolver.m_timestep = m_timestep;
 		contactSolver.m_ccdMode = false;
 		contactSolver.m_contactBuffer = contactBuffer;
-		contactSolver.m_intersectionTestOnly = body1->GetAsTrigger() ? 1 : 0;
+		contactSolver.m_intersectionTestOnly = body1->GetAsBodyTriggerVolume() ? 1 : 0;
 		
 		dInt32 count = contactSolver.CalculatePairContacts(threadIndex);
 		if (count)
@@ -968,7 +968,7 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 			{
 				if (!contact->m_isTrigger && contactSolver.m_intersectionTestOnly)
 				{
-					body1->GetAsTrigger()->OnTriggerEnter(body0, m_timestep);
+					body1->GetAsBodyTriggerVolume()->OnTriggerEnter(body0, m_timestep);
 				}
 				contact->m_isTrigger = contactSolver.m_intersectionTestOnly;
 			}
@@ -977,7 +977,7 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 		{
 			if (contact->m_isTrigger)
 			{
-				body1->GetAsTrigger()->OnTriggerExit(body0, m_timestep);
+				body1->GetAsBodyTriggerVolume()->OnTriggerExit(body0, m_timestep);
 				contact->m_isTrigger = 0;
 			}
 			contact->m_maxDOF = 0;
@@ -1458,7 +1458,7 @@ void ndScene::BuildContactArray()
 		count++;
 		if (contact->m_isTrigger)
 		{
-			contact->GetBody1()->GetAsTrigger()->OnTrigger(contact->GetBody0(), m_timestep);
+			contact->GetBody1()->GetAsBodyTriggerVolume()->OnTrigger(contact->GetBody0(), m_timestep);
 		}
 	}
 	m_activeConstraintArray.SetCount(count);
@@ -1798,7 +1798,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 	dVector deltaTime(m_timestep);
 	ndBodyKinematic* const body0 = contact->GetBody0();
 	ndBodyKinematic* const body1 = contact->GetBody1();
-if (body1->GetAsTrigger())
+if (body1->GetAsBodyTriggerVolume())
 {
 deltaTime = m_timestep;
 }

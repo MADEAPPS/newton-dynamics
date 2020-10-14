@@ -42,8 +42,9 @@ class ndBody: public dClassAlloc
 
 	virtual ndBody* GetAsBody() { return this;}
 	virtual ndBodyDynamic* GetAsBodyDynamic() { return nullptr; }
-	virtual ndBodyTriggerVolume* GetAsTrigger() { return nullptr; }
 	virtual ndBodyKinematic* GetAsBodyKinematic() { return nullptr; }
+	virtual ndBodyKinematic* GetAsBodyPlayerCapsule() { return nullptr; }
+	virtual ndBodyTriggerVolume* GetAsBodyTriggerVolume() { return nullptr; }
 
 	dUnsigned32 GetId() const;
 	virtual const dFloat32 GetInvMass() const { return dFloat32(0.0f); }

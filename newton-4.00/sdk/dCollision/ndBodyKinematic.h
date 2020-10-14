@@ -109,8 +109,7 @@ class ndBodyKinematic: public ndBody
 
 	D_COLLISION_API ndShapeInstance& GetCollisionShape();
 	D_COLLISION_API const ndShapeInstance& GetCollisionShape() const;
-	D_COLLISION_API void SetCollisionShape(const ndShapeInstance& shapeInstance);
-
+	D_COLLISION_API virtual void SetCollisionShape(const ndShapeInstance& shapeInstance);
 	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
 
 	D_COLLISION_API dVector CalculateLinearMomentum() const;

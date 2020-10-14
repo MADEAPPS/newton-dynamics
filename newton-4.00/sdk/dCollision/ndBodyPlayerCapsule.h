@@ -19,46 +19,33 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_BODY_TRIGGER_VOLUME_H__
-#define __D_BODY_TRIGGER_VOLUME_H__
+#ifndef __D_BODY_PLAYER_CAPSULE_H__
+#define __D_BODY_PLAYER_CAPSULE_H__
 
 #include "ndCollisionStdafx.h"
 #include "ndBodyKinematic.h"
 
 D_MSV_NEWTON_ALIGN_32
-class ndBodyTriggerVolume : public ndBodyKinematic
+class ndBodyPlayerCapsule : public ndBodyKinematic
 {
 	public:
-	D_COLLISION_API ndBodyTriggerVolume();
-	D_COLLISION_API virtual ~ndBodyTriggerVolume();
+	D_COLLISION_API ndBodyPlayerCapsule();
+	D_COLLISION_API virtual ~ndBodyPlayerCapsule();
 
-	ndBodyTriggerVolume* ndBodyTriggerVolume::GetAsBodyTriggerVolume();
+	ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule();
 
-	virtual void OnTrigger(ndBodyKinematic* const body, dFloat32 timestep);
-	virtual void OnTriggerEnter(ndBodyKinematic* const body, dFloat32 timestep);
-	virtual void OnTriggerExit(ndBodyKinematic* const body, dFloat32 timestep);
+	virtual void SetCollisionShape(const ndShapeInstance& shapeInstance);
 
 } D_GCC_NEWTON_ALIGN_32;
 
-inline ndBodyTriggerVolume* ndBodyTriggerVolume::GetAsBodyTriggerVolume()
+inline ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule()
 { 
 	return this; 
 }
 
-inline void ndBodyTriggerVolume::OnTriggerEnter(ndBodyKinematic* const body, dFloat32 timestep)
+inline void ndBodyPlayerCapsule::SetCollisionShape(const ndShapeInstance& shapeInstance)
 {
-	dAssert(0);
+	// ignore the changing collision shape;
 }
-
-inline void ndBodyTriggerVolume::OnTrigger(ndBodyKinematic* const body, dFloat32 timestep)
-{
-	dAssert(0);
-}
-
-inline void ndBodyTriggerVolume::OnTriggerExit(ndBodyKinematic* const body, dFloat32 timestep)
-{
-	dAssert(0);
-}
-
 
 #endif

@@ -41,7 +41,7 @@ class ndArchimedesBuoyancyVolume : public ndBodyTriggerVolume
 
 			dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const collision)
 			{
-				return ((ndBody*)body)->GetAsTrigger() ? 1 : 0;
+				return ((ndBody*)body)->GetAsBodyTriggerVolume() ? 1 : 0;
 			}
 		};
 
@@ -271,7 +271,6 @@ static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
 
 	mesh->Release();
 }
-
 
 void ndBasicTrigger (ndDemoEntityManager* const scene)
 {
