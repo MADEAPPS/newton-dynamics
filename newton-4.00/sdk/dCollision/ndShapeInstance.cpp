@@ -700,8 +700,9 @@ void ndShapeInstance::SetScale(const dVector& scale)
 //dVector ndShapeInstance::CalculateBuoyancyCenterOfPresure(const dMatrix& matrix, const dVector& fluidPlane) const
 dFloat32 ndShapeInstance::CalculateBuoyancyCenterOfPresure(dVector& com, const dMatrix& matrix, const dVector& fluidPlane) const
 {
-//	dAssert(0);
-	//return m_shape->CalculateVolumeIntegral(m_localMatrix * matrix, fluidPlane, *this);
-	return 0.0f;
+	com = m_shape->CalculateVolumeIntegral(m_localMatrix * matrix, fluidPlane, *this);
+	dFloat32 volume = com.m_w;
+	com.m_w = dFloat32(0.0f);
+	return volume;
 }
 

@@ -49,6 +49,7 @@ class ndBody: public dClassAlloc
 	virtual const dFloat32 GetInvMass() const { return dFloat32(0.0f); }
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const = 0;
 
+	const dVector& GetCentreOfMass() const;
 	D_COLLISION_API void SetCentreOfMass(const dVector& com);
 
 	ndBodyNotify* GetNotifyCallback() const;
@@ -137,6 +138,12 @@ inline void ndBody::GetAABB(dVector& p0, dVector& p1) const
 	p0 = m_minAABB;
 	p1 = m_maxAABB;
 }
+
+inline const dVector& ndBody::GetCentreOfMass() const
+{
+	return m_localCentreOfMass;
+}
+
 
 #endif 
 

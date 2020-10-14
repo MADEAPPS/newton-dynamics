@@ -108,7 +108,8 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 
 			TriggerCallback::OnInside(visitor, timestep);
 			NewtonBodyGetMass(visitor, &mass, &Ixx, &Iyy, &Izz);
-			if (mass > 0.0f) {
+			if (mass > 0.0f) 
+			{
 				dMatrix matrix;
 				dVector cenyterOfPreasure(0.0f);
 
@@ -118,7 +119,8 @@ class BuoyancyTriggerManager: public dCustomTriggerManager
 				// calculate the volume and center of mass of the shape under the water surface 
 				dVector plane(CalculateWaterPlane(matrix.m_posit));
 				dFloat volume = NewtonConvexCollisionCalculateBuoyancyVolume (collision, &matrix[0][0], &plane[0], &cenyterOfPreasure[0]);
-				if (volume > 0.0f) {
+				if (volume > 0.0f) 
+				{
 					// if some part of the shape si under water, calculate the buoyancy force base on 
 					// Archimedes's buoyancy principle, which is the buoyancy force is equal to the 
 					// weight of the fluid displaced by the volume under water. 

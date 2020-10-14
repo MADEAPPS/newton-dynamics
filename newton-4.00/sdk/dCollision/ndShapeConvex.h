@@ -61,6 +61,7 @@ class ndShapeConvex: public ndShape
 	D_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
 	D_COLLISION_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 	D_COLLISION_API virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
+	D_COLLISION_API virtual dVector CalculateVolumeIntegral(const dMatrix& globalMatrix, const dVector& globalPlane, const ndShapeInstance& parentScale) const;
 	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 
 	bool SanityCheck(dPolyhedra& hull) const;
@@ -83,18 +84,17 @@ class ndShapeConvex: public ndShape
 		return nullptr; 
 	}
 
+	virtual dFloat32 GetVolume() const;
 	virtual dFloat32 GetBoxMinRadius() const;
 	virtual dFloat32 GetBoxMaxRadius() const;
 
+	dVector CalculateVolumeIntegral(const dPlane& plane) const;
 
 /*
 	virtual void SerializeLow(dgSerialize callback, void* const userData) const;
-
-	virtual dVector CalculateVolumeIntegral (const dMatrix& globalMatrix, const dVector& plane, const dShapeInstance& parentScale) const;
-	virtual dFloat32 GetVolume () const;
+	
 
 	dInt32 RayCastClosestFace (dVector* tetrahedrum, const dVector& origin, dFloat32& pointDist) const;
-	dVector CalculateVolumeIntegral (const dgPlane& plane) const; 
 	dInt32 BuildCylinderCapPoly (dFloat32 radius, const dMatrix& transform, dVector* const vertexOut) const;
 	
 	friend class dgWorld;

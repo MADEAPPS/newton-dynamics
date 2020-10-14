@@ -64,6 +64,11 @@ class ndShapeNull: public ndShapeConvex
 		return info;
 	}
 
+	virtual dFloat32 GetVolume() const
+	{
+		return dFloat32(0.0f);
+	}
+
 	virtual dFloat32 GetBoxMinRadius() const
 	{
 		return dFloat32(0.0f);
@@ -73,6 +78,12 @@ class ndShapeNull: public ndShapeConvex
 	{
 		return dFloat32(0.0f);
 	}
+
+	virtual dVector CalculateVolumeIntegral(const dMatrix& globalMatrix, const dVector& globalPlane, const ndShapeInstance& parentScale) const
+	{
+		return dVector::m_zero;
+	}
+
 };
 
 #endif 

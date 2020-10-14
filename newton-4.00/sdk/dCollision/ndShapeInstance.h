@@ -100,6 +100,7 @@ class ndShapeInstance: public dClassAlloc
 	const dVector& GetInvScale() const;
 	D_COLLISION_API void SetScale(const dVector& scale);
 
+	dFloat32 GetVolume() const;
 	dFloat32 GetBoxMinRadius() const;
 	dFloat32 GetBoxMaxRadius() const;
 
@@ -137,8 +138,6 @@ class ndShapeInstance: public dClassAlloc
 
 	void SetWorld (dgWorld* const world);
 	void SetChildShape (dShape* const shape);
-
-	dFloat32 GetVolume () const;
 
 	dInt32 IsType (dShape::dgRTTI type) const;
 	dgMemoryAllocator* GetAllocator() const;
@@ -275,11 +274,6 @@ D_INLINE const dMatrix& ndShapeInstance::GetAlignMatrix () const
 D_INLINE dgMemoryAllocator* ndShapeInstance::GetAllocator() const
 {
 	return m_shape->GetAllocator();
-}
-
-D_INLINE dFloat32 ndShapeInstance::GetVolume () const
-{
-	return m_shape->GetVolume() * m_scale.m_x * m_scale.m_y * m_scale.m_z;
 }
 
 
@@ -657,6 +651,11 @@ D_INLINE dFloat32 ndShapeInstance::GetBoxMinRadius() const
 D_INLINE dFloat32 ndShapeInstance::GetBoxMaxRadius() const
 {
 	return m_shape->GetBoxMaxRadius() * m_maxScale.m_x;
+}
+
+D_INLINE dFloat32 ndShapeInstance::GetVolume() const
+{
+	return m_shape->GetVolume() * m_scale.m_x * m_scale.m_y * m_scale.m_z;
 }
 
 

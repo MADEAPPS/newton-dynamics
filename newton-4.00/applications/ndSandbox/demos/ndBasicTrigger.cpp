@@ -23,133 +23,131 @@ class ndArchimedesBuoyancyVolume : public ndBodyTriggerVolume
 	public:
 	ndArchimedesBuoyancyVolume()
 		:ndBodyTriggerVolume()
+		,m_plane(dVector::m_zero)
 		,m_density(1.0f)
+		,m_hasPlane(0)
 	{
 	}
 
-	dVector CalculateSurfacePosition(const dVector& position) const
+	void CalculatePlane(ndBodyKinematic* const body)
 	{
-		//BuoyancyTriggerManager* const manager = (BuoyancyTriggerManager*)m_controller->GetManager();
-		//
-		//dFloat32 xAngle = 2.0f * (position.m_x / manager->m_wavePeriod) * dPi;
-		//dFloat32 yAngle = 2.0f * (position.m_z / manager->m_wavePeriod) * dPi;
-		//
-		//dFloat32 heigh = m_waterSufaceRestHeight;
-		//dFloat32 amplitud = manager->m_waveAmplitud;
-		//for (int i = 0; i < 3; i++) {
-		//	heigh += amplitud * dSin(xAngle + manager->m_faceAngle) * dCos(yAngle + manager->m_faceAngle);
-		//	amplitud *= 0.5f;
-		//	xAngle *= 0.5f;
-		//	yAngle *= 0.5f;
-		//}
-		//return dVector(position.m_x, heigh, position.m_z, 1.0f);
-		return dVector(position.m_x, 10.0f, position.m_z, 1.0f);
+		class ndCastTriggerPlane : public ndRayCastClosestHitCallback
+		{
+			public:
+			ndCastTriggerPlane(const ndScene* const scene)
+				:ndRayCastClosestHitCallback(scene)
+			{
+			}
+
+			dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const collision)
+			{
+				return ((ndBody*)body)->GetAsTrigger() ? 1 : 0;
+			}
+		};
+
+		dMatrix matrix(body->GetMatrix());
+
+		dVector p0(matrix.m_posit);
+		dVector p1(matrix.m_posit);
+
+		p0.m_y += 30.0f;
+		p1.m_y -= 30.0f;
+
+		ndCastTriggerPlane rayCaster(body->GetScene());
+		dFloat32 param = rayCaster.TraceRay(p0, p1);
+		param = rayCaster.TraceRay(p0, p1);
+		bool hasPlane = false;
+		if (param < 1.0f)
+		{
+			hasPlane = true;
+			//dFloat32 dist = rayCaster.m_contact.m_normal.DotProduct(p1 - p0).GetScalar();
+			dFloat32 dist = -rayCaster.m_contact.m_normal.DotProduct(rayCaster.m_contact.m_point).GetScalar();
+			m_plane = dPlane(rayCaster.m_contact.m_normal, dist);
+		}
+		m_hasPlane = hasPlane;
 	}
 
-
-
-	dVector CalculateWaterPlane(const dVector& position) const
+	void OnTriggerEnter(ndBodyKinematic* const body, dFloat32 timestep)
 	{
-		dVector origin(CalculateSurfacePosition(position));
-
-		dVector px0(position.m_x - 0.1f, position.m_y, position.m_z, position.m_w);
-		dVector px1(position.m_x + 0.1f, position.m_y, position.m_z, position.m_w);
-		dVector pz0(position.m_x, position.m_y, position.m_z - 0.1f, position.m_w);
-		dVector pz1(position.m_x, position.m_y, position.m_z + 0.1f, position.m_w);
-
-		dVector ex(CalculateSurfacePosition(px1) - CalculateSurfacePosition(px0));
-		dVector ez(CalculateSurfacePosition(pz1) - CalculateSurfacePosition(pz0));
-
-		dVector surfacePlane(ez.CrossProduct(ex));
-		surfacePlane.m_w = 0.0f;
-		surfacePlane = surfacePlane.Normalize();
-		surfacePlane.m_w = -surfacePlane.DotProduct(origin).GetScalar();
-		return surfacePlane;
+		CalculatePlane(body);
 	}
-
 	
-	void OnTrigger(ndBodyKinematic* const body, dFloat32 timestep)
+	void OnTrigger(ndBodyKinematic* const kinBody, dFloat32 timestep)
 	{
-		if (body->GetInvMass() != 0.0f)
+		ndBodyDynamic* const body = kinBody->GetAsBodyDynamic();
+		if (!m_hasPlane)
+		{
+			CalculatePlane(body);
+		}
+
+		if (body && m_hasPlane && (body->GetInvMass() != 0.0f))
 		{
 			dVector mass (body->GetMassMatrix());
 			dVector centerOfPreasure(dVector::m_zero);
 			dMatrix matrix (body->GetMatrix());
 			ndShapeInstance& collision = body->GetCollisionShape();
 
-			// calculate the volume and center of mass of the shape under the water surface 
-			dVector plane(CalculateWaterPlane(matrix.m_posit));
-
-			//dFloat32 volume = NewtonConvexCollisionCalculateBuoyancyVolume(collision, &matrix[0][0], &plane[0], &cenyterOfPreasure[0]);
-			dFloat32 volume = collision.CalculateBuoyancyCenterOfPresure (centerOfPreasure, matrix, plane);
-
+			dFloat32 volume = collision.CalculateBuoyancyCenterOfPresure (centerOfPreasure, matrix, m_plane);
 			if (volume > 0.0f)
 			{
-				//// if some part of the shape si under water, calculate the buoyancy force base on 
-				//// Archimedes's buoyancy principle, which is the buoyancy force is equal to the 
-				//// weight of the fluid displaced by the volume under water. 
-				//dVector cog(0.0f);
-				//const dFloat32 viscousDrag = 0.99f;
-				////const dFloat32 solidDentityFactor = 1.35f;
-				//
-				//// Get the body density form the collision material.
+				// if some part of the shape si under water, calculate the buoyancy force base on 
+				// Archimedes's buoyancy principle, which is the buoyancy force is equal to the 
+				// weight of the fluid displaced by the volume under water. 
+				//dVector cog(dVector::m_zero);
+				const dFloat32 viscousDrag = 0.99f;
+				
+				// Get the body density form the collision material.
 				//NewtonCollisionMaterial collisionMaterial;
 				//NewtonCollisionGetMaterial(collision, &collisionMaterial);
 				//const dFloat32 solidDentityFactor = collisionMaterial.m_userParam[0].m_float;
-				//
-				//// calculate the ratio of volumes an use it calculate a density equivalent
-				//dFloat32 shapeVolume = NewtonConvexCollisionCalculateVolume(collision);
-				//dFloat32 density = mass * solidDentityFactor / shapeVolume;
-				//
-				//dFloat32 displacedMass = density * volume;
-				//NewtonBodyGetCentreOfMass(visitor, &cog[0]);
-				//cenyterOfPreasure -= matrix.TransformVector(cog);
-				//
-				//// now with the mass and center of mass of the volume under water, calculate buoyancy force and torque
-				//dVector force(dFloat32(0.0f), dFloat32(-DEMO_GRAVITY * displacedMass), dFloat32(0.0f), dFloat32(0.0f));
-				//dVector torque(cenyterOfPreasure.CrossProduct(force));
-				//
-				//NewtonBodyAddForce(visitor, &force[0]);
-				//NewtonBodyAddTorque(visitor, &torque[0]);
-				//
-				//// apply a fake viscous drag to damp the under water motion 
-				//dVector omega(0.0f);
-				//dVector veloc(0.0f);
-				//NewtonBodyGetOmega(visitor, &omega[0]);
-				//NewtonBodyGetVelocity(visitor, &veloc[0]);
-				//omega = omega.Scale(viscousDrag);
-				//veloc = veloc.Scale(viscousDrag);
-				//NewtonBodySetOmega(visitor, &omega[0]);
-				//NewtonBodySetVelocity(visitor, &veloc[0]);
+				//const dFloat32 solidDentityFactor = 1.35f;
 
-				/*
-				// test delete bodies inside trigger
-				collisionMaterial.m_userParam[1].m_float += timestep;
-				NewtonCollisionSetMaterial(collision, &collisionMaterial);
-				if (collisionMaterial.m_userParam[1].m_float >= 30.0f) {
-				// delete body after 2 minutes inside the pool
-				NewtonDestroyBody(visitor);
-				}
-				*/
+				const dFloat32 solidDentityFactor = 1.1f;
+				
+				// calculate the ratio of volumes an use it calculate a density equivalent
+				dFloat32 shapeVolume = collision.GetVolume();
+				dFloat32 density = mass.m_w * solidDentityFactor / shapeVolume;
+				
+				dFloat32 displacedMass = density * volume;
+
+				dVector cog(body->GetCentreOfMass());
+				centerOfPreasure -= matrix.TransformVector(cog);
+				
+				// now with the mass and center of mass of the volume under water, calculate buoyancy force and torque
+				dVector force(dFloat32(0.0f), dFloat32(-DEMO_GRAVITY * displacedMass), dFloat32(0.0f), dFloat32(0.0f));
+				dVector torque(centerOfPreasure.CrossProduct(force));
+				
+				body->SetForce(body->GetForce() + force);
+				body->SetTorque(body->GetTorque() + torque);
+				
+				// apply a fake viscous drag to damp the under water motion 
+				dVector omega(body->GetOmega());
+				dVector veloc(body->GetVelocity());
+				omega = omega.Scale(viscousDrag);
+				veloc = veloc.Scale(viscousDrag);
+				body->SetOmega(omega);
+				body->SetVelocity(veloc);
+				
+				//// test delete bodies inside trigger
+				//collisionMaterial.m_userParam[1].m_float += timestep;
+				//NewtonCollisionSetMaterial(collision, &collisionMaterial);
+				//if (collisionMaterial.m_userParam[1].m_float >= 30.0f) {
+				//	// delete body after 2 minutes inside the pool
+				//	NewtonDestroyBody(visitor);
+				//}
 			}
-
 		}
-
-		
-
-	}
-
-	void OnTriggerEnter(ndBodyKinematic* const body, dFloat32 timestep)
-	{
-		//ndShapeInstance& collision = body->GetCollisionShape();
 	}
 
 	void OnTriggerExit(ndBodyKinematic* const body, dFloat32 timestep)
 	{
-		dTrace(("exit trigger body: %d\n", body->GetId()));
+		//dTrace(("exit trigger body: %d\n", body->GetId()));
 	}
 
+	ndDemoEntityManager* m_scene;
+	dPlane m_plane;
 	dFloat32 m_density;
+	bool m_hasPlane;
 };
 
 static void BuildFloor(ndDemoEntityManager* const scene)

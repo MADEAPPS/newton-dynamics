@@ -34,6 +34,7 @@ class ndShapeCapsule;
 class ndContactPoint;
 class ndShapeCompound;
 class ndRayCastNotify;
+class ndShapeInstance;
 class ndShapeDebugCallback;
 
 #ifdef _DEBUG
@@ -229,6 +230,7 @@ class ndShape: public dClassAlloc
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const = 0;
 
 	virtual ndShapeInfo GetShapeInfo() const;
+	virtual dFloat32 GetVolume() const = 0;
 	virtual dFloat32 GetBoxMinRadius() const = 0;
 	virtual dFloat32 GetBoxMaxRadius() const = 0;
 
@@ -237,6 +239,7 @@ class ndShape: public dClassAlloc
 	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const = 0;
 	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinSkinThickness, dInt32* const vertexIndex) const = 0;
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const = 0;
+	virtual dVector CalculateVolumeIntegral(const dMatrix& globalMatrix, const dVector& globalPlane, const ndShapeInstance& parentScale) const = 0;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const = 0;
 
 	virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
