@@ -316,11 +316,10 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 			//D_TRACKTIME();
 			for (dInt32 i = 0; i < count; i++)
 			{
-				ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
-				if (body)
-				{
-					body->IntegrateExternalForce(timestep);
-				}
+				//ndBodyKinematic* const body = bodyArray[start + i]->GetAsBodyDynamic();
+				ndBodyKinematic* const body = bodyArray[start + i]->GetAsBodyKinematic();
+				dAssert(body);
+				body->IntegrateExternalForce(timestep);
 			}
 		}
 

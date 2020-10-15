@@ -25,6 +25,8 @@
 #include "ndCollisionStdafx.h"
 #include "ndBodyKinematic.h"
 
+class ndBodyPlayerCapsuleContactSolver;
+
 D_MSV_NEWTON_ALIGN_32
 class ndBodyPlayerCapsule : public ndBodyKinematic
 {
@@ -34,7 +36,13 @@ class ndBodyPlayerCapsule : public ndBodyKinematic
 
 	ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule();
 
+	dFloat32 GetHeadingAngle() const;
+	virtual void ApplyInputs(dFloat32 timestep);
+
+	private:
 	virtual void SetCollisionShape(const ndShapeInstance& shapeInstance);
+	void ResolveStep(dFloat32 timestep, ndBodyPlayerCapsuleContactSolver& contactSolver);
+	D_COLLISION_API virtual void IntegrateExternalForce(dFloat32 timestep);
 
 	protected: 
 	dMatrix m_localFrame;
@@ -64,4 +72,12 @@ inline void ndBodyPlayerCapsule::SetCollisionShape(const ndShapeInstance& shapeI
 	// ignore the changing collision shape;
 }
 
+inline void ndBodyPlayerCapsule::ApplyInputs(dFloat32 timestep)
+{
+}
+
+inline dFloat32 ndBodyPlayerCapsule::GetHeadingAngle() const
+{ 
+	return m_headingAngle; 
+}
 #endif

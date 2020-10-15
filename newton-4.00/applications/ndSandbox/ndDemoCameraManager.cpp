@@ -55,7 +55,6 @@ ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const scene)
 	,m_pickedBodyLocalAtachmentNormal(dVector::m_zero)
 	,m_targetPicked(nullptr)
 	,m_pickJoint(nullptr)
-	//,m_bodyDestructor(nullptr)
 {
 }
 
@@ -159,8 +158,6 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	m_camera->SetMatrix (*scene, rot, targetMatrix.m_posit);
 
 	// get the mouse pick parameter so that we can do replay for debugging
-	//dFloat32 x = m_mousePosX;
-	//dFloat32 y = m_mousePosY;
 	dVector p0(m_camera->ScreenToWorld(dVector(mouseX, mouseY, 0.0f, 0.0f)));
 	dVector p1(m_camera->ScreenToWorld(dVector(mouseX, mouseY, 1.0f, 0.0f)));
 

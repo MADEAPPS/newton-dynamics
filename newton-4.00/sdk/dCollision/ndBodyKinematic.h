@@ -153,6 +153,7 @@ class ndBodyKinematic: public ndBody
 	D_COLLISION_API virtual void DetachJoint(ndJointList::dListNode* const node);
 
 	D_COLLISION_API void UpdateGyroData();
+	D_COLLISION_API virtual void IntegrateExternalForce(dFloat32 timestep);
 
 	void UpdateCollisionMatrix();
 	void PrepareStep(dInt32 index);
@@ -165,7 +166,7 @@ class ndBodyKinematic: public ndBody
 	void SetSceneAggregate(ndSceneAggregate* const node);
 
 	virtual void AddDampingAcceleration(dFloat32 timestep);
-	D_COLLISION_API void IntegrateExternalForce(dFloat32 timestep);
+	
 
 	dMatrix m_invWorldInertiaMatrix;
 	ndShapeInstance m_shapeInstance;
