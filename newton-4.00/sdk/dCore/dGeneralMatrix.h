@@ -619,6 +619,108 @@ void dGaussSeidelLcpSor(const dInt32 size, const T* const matrix, T* const x, co
 	}
 }
 
+template <class T>
+void dGaussSeidelLcpSor(const int size, const int stride, const T* const matrix, T* const x, const T* const b, const int* const normalIndex, const T* const low, const T* const high, T tol2, int maxIterCount, T sor)
+{
+	const T* const me = matrix;
+	T* const invDiag1 = dAlloca(T, size);
+	T* const u = dAlloca(T, size + 1);
+	int* const index = dAlloca(int, size);
+
+	u[size] = T(1.0f);
+	int rowStart = 0;
+	for (dInt32 j = 0; j < size; j++) 
+	{
+		u[j] = x[j];
+		index[j] = normalIndex[j] ? j + normalIndex[j] : size;
+	}
+
+	for (dInt32 j = 0; j < size; j++) 
+	{
+		const T val = u[index[j]];
+		const T l = low[j] * val;
+		const T h = high[j] * val;
+		u[j] = dClamp(u[j], l, h);
+		invDiag1[j] = T(1.0f) / me[rowStart + j];
+		rowStart += stride;
+	}
+
+	T tolerance(tol2 * 2.0f);
+	const T* const invDiag = invDiag1;
+	const int maxCount = dMax(8, size);
+	for (dInt32 i = 0; (i < maxCount) && (tolerance > tol2); i++) 
+	{
+		int base = 0;
+		tolerance = T(0.0f);
+		for (dInt32 j = 0; j < size; j++) 
+		{
+			const T* const row = &me[base];
+			T r(b[j] - dDotProduct(size, row, u));
+			T f((r + row[j] * u[j]) * invDiag[j]);
+
+			const T val = u[index[j]];
+			const T l = low[j] * val;
+			const T h = high[j] * val;
+			if (f > h) 
+			{
+				u[j] = h;
+			}
+			else if (f < l) 
+			{
+				u[j] = l;
+			}
+			else 
+			{
+				tolerance += r * r;
+				u[j] = f;
+			}
+			base += stride;
+		}
+	}
+
+#ifdef _DEBUG 
+	int passes = 0;
+#endif
+	for (dInt32 i = 0; (i < maxIterCount) && (tolerance > tol2); i++) 
+	{
+		int base = 0;
+		tolerance = T(0.0f);
+#ifdef _DEBUG 
+		passes++;
+#endif
+		for (dInt32 j = 0; j < size; j++) 
+		{
+			const T* const row = &me[base];
+			T r(b[j] - dDotProduct(size, row, u));
+			T f((r + row[j] * u[j]) * invDiag[j]);
+			f = u[j] + (f - u[j]) * sor;
+
+			const T val = u[index[j]];
+			const T l = low[j] * val;
+			const T h = high[j] * val;
+			if (f > h) 
+			{
+				u[j] = h;
+			}
+			else if (f < l) 
+			{
+				u[j] = l;
+			}
+			else 
+			{
+				tolerance += r * r;
+				u[j] = f;
+			}
+			base += stride;
+		}
+	}
+
+	for (dInt32 j = 0; j < size; j++) 
+	{
+		x[j] = u[j];
+	}
+}
+
 // solve a general Linear complementary program (LCP)
 // A * x = b + r
 // subjected to constraints

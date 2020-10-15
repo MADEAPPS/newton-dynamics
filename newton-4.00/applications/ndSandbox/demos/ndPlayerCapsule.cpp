@@ -25,6 +25,18 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 		:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
 	{
 	}
+
+	void ApplyInputs(dFloat32 timestep)
+	{
+		// calculate the gravity contribution to the velocity, 
+		// use twice the gravity 
+		dFloat32 g = 2.0f * DEMO_GRAVITY;
+		//dVector gravity(m_localFrame.RotateVector(dVector(g, 0.0f, 0.0f, 0.0f)));
+		dVector gravity(0.0f, g, 0.0f, 0.0f);
+		dVector totalImpulse(m_impulse + gravity.Scale(m_mass * timestep));
+		m_impulse = totalImpulse;
+	}
+
 };
 
 static void BuildFloor(ndDemoEntityManager* const scene)

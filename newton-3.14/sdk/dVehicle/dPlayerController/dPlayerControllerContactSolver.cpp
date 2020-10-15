@@ -22,10 +22,11 @@
 unsigned dPlayerControllerContactSolver::PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData)
 {
 	dPlayerController* const controller = (dPlayerController*)userData;
-	if (controller->GetBody() == body) {
-		return false;
-	}
-	return 1;
+	//if (controller->GetBody() == body) {
+	//	return false;
+	//}
+	//return 1;
+	return (controller->GetBody() != body) ? 1 : 0;
 }
 
 void dPlayerControllerContactSolver::CalculateContacts()

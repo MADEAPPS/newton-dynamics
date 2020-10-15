@@ -1409,7 +1409,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 
 				equilibrium &= equilibriumTest;
 				stackSleeping &= equilibriumTest;
-				sleepCounter = dMin(sleepCounter, dynBody->m_sleepingCounter);
+				//sleepCounter = dMin(sleepCounter, kinBody->m_sleepingCounter);
 				//kinBody->m_sleepingCounter++;
 			}
 			if (kinBody->m_equilibrium != equilibrium)

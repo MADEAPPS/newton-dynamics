@@ -40,9 +40,21 @@ class ndBodyPlayerCapsule : public ndBodyKinematic
 	virtual void ApplyInputs(dFloat32 timestep);
 
 	private:
-	virtual void SetCollisionShape(const ndShapeInstance& shapeInstance);
-	void ResolveStep(dFloat32 timestep, ndBodyPlayerCapsuleContactSolver& contactSolver);
+	enum dCollisionState
+	{
+		m_colliding,
+		m_freeMovement,
+		m_deepPenetration,
+	};
+
 	D_COLLISION_API virtual void IntegrateExternalForce(dFloat32 timestep);
+	virtual void SetCollisionShape(const ndShapeInstance& shapeInstance);
+	
+	void UpdatePlayerStatus(ndBodyPlayerCapsuleContactSolver& contactSolver);
+	void ResolveStep(ndBodyPlayerCapsuleContactSolver& contactSolver, dFloat32 timestep);
+	void ResolveCollision(ndBodyPlayerCapsuleContactSolver& contactSolver, dFloat32 timestep);
+	dFloat32 PredictTimestep(ndBodyPlayerCapsuleContactSolver& contactSolver, dFloat32 timestep);
+	dCollisionState TestPredictCollision(const ndBodyPlayerCapsuleContactSolver& contactSolver, const dVector& veloc) const;
 
 	protected: 
 	dMatrix m_localFrame;

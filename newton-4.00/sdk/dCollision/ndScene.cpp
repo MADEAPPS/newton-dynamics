@@ -1445,25 +1445,6 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 	}
 }
 
-void ndScene::BuildContactArray()
-{
-	D_TRACKTIME();
-	dInt32 count = 0;
-	m_activeConstraintArray.SetCount(m_contactList.GetCount());
-	for (ndContactList::dListNode* node = m_contactList.GetFirst(); node; node = node->GetNext())
-	{
-		ndContact* const contact = &node->GetInfo();
-		dAssert(contact->m_isAttached);
-		m_activeConstraintArray[count] = contact;
-		count++;
-		if (contact->m_isTrigger)
-		{
-			contact->GetBody1()->GetAsBodyTriggerVolume()->OnTrigger(contact->GetBody0(), m_timestep);
-		}
-	}
-	m_activeConstraintArray.SetCount(count);
-}
-
 void ndScene::BuildBodyArray()
 {
 	D_TRACKTIME();
@@ -1879,6 +1860,23 @@ deltaTime = m_timestep;
 	}
 
 	contact->m_killContact = contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
+}
+
+void ndScene::BuildContactArray()
+{
+	D_TRACKTIME();
+	dInt32 count = 0;
+	m_activeConstraintArray.SetCount(m_contactList.GetCount());
+	for (ndContactList::dListNode* node = m_contactList.GetFirst(); node; node = node->GetNext())
+	{
+		ndContact* const contact = &node->GetInfo();
+		dAssert(contact->m_isAttached);
+		if (contact->m_isTrigger)
+		{
+			contact->GetBody1()->GetAsBodyTriggerVolume()->OnTrigger(contact->GetBody0(), m_timestep);
+		}
+	}
+	m_activeConstraintArray.SetCount(count);
 }
 
 void ndScene::DeleteDeadContact()
