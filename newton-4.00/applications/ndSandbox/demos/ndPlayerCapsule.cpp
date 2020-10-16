@@ -30,11 +30,16 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 	{
 		// calculate the gravity contribution to the velocity, 
 		// use twice the gravity 
-		dFloat32 g = 2.0f * DEMO_GRAVITY;
 		//dVector gravity(m_localFrame.RotateVector(dVector(g, 0.0f, 0.0f, 0.0f)));
-		dVector gravity(0.0f, g, 0.0f, 0.0f);
+
+		dVector gravity(0.0f, 2.0f * DEMO_GRAVITY, 0.0f, 0.0f);
 		dVector totalImpulse(m_impulse + gravity.Scale(m_mass * timestep));
 		m_impulse = totalImpulse;
+	}
+
+	inline dFloat32 ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const
+	{
+		return dFloat32(2.0f);
 	}
 
 };
