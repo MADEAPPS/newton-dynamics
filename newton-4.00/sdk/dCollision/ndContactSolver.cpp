@@ -62,7 +62,6 @@ ndContactSolver::ndContactSolver(ndShapeInstance* const instance)
 	,m_separatingVector(ndContact::m_initialSeparatingVector)
 	,m_contactBuffer(nullptr)
 	,m_timestep(dFloat32(1.0e10f))
-	,m_closestDistance(dFloat32(1.0e10f))
 	,m_separationDistance(dFloat32(0.0f))
 	,m_skinThickness(dFloat32(0.0f))
 	,m_maxCount(D_MAX_CONTATCS)
@@ -80,7 +79,6 @@ ndContactSolver::ndContactSolver(ndContact* const contact)
 	,m_separatingVector(ndContact::m_initialSeparatingVector)
 	,m_contactBuffer(nullptr)
 	,m_timestep(dFloat32 (1.0e10f))
-	,m_closestDistance(dFloat32(1.0e10f))
 	,m_separationDistance(dFloat32(0.0f))
 	,m_skinThickness(dFloat32(0.0f))
 	,m_maxCount(D_MAX_CONTATCS)
@@ -338,8 +336,8 @@ dInt32 ndContactSolver::CalculatePairContacts(dInt32 threadIndex)
 	}
 
 	m_contact->m_timeOfImpact = m_timestep;
-	m_contact->m_separationDistance = m_separationDistance;
 	m_contact->m_separatingVector = m_separatingVector;
+	m_contact->m_separationDistance = m_separationDistance;
 
 	return count;
 }
@@ -371,6 +369,7 @@ dInt32 ndContactSolver::ConvexToConvexContacts()
 	{
 		//dInt32 retVal = (penetration <= dFloat32(0.0f)) ? -1 : 0;
 		//m_proxy->m_contactJoint->m_isActive = retVal;
+		m_separationDistance = penetration;
 		count = (penetration <= dFloat32(0.0f)) ? 1 : 0;
 	}
 	else 
@@ -389,7 +388,6 @@ dInt32 ndContactSolver::ConvexToConvexContacts()
 			dVector offset = (origin0 & dVector::m_triplexMask);
 			m_closestPoint0 += offset;
 			m_closestPoint1 += offset;
-			m_closestDistance = penetration;
 			m_separationDistance = penetration;
 
 			penetration = -penetration;

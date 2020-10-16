@@ -138,7 +138,6 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 
 	ndContactPoint* m_contactBuffer;
 	dFloat32 m_timestep;
-	dFloat32 m_closestDistance;
 	dFloat32 m_separationDistance;
 	dFloat32 m_skinThickness;
 
