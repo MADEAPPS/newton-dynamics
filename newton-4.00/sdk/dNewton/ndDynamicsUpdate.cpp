@@ -421,15 +421,15 @@ void ndDynamicsUpdate::InitBodyArray()
 			//D_TRACKTIME();
 			for (dInt32 i = 0; i < count; i++)
 			{
-				ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
-				if (body)
+				ndBodyKinematic* const body = bodyArray[start + i]->GetAsBodyDynamic();
+				ndBodyDynamic* const kinBody = body->GetAsBodyDynamic();
+				if (kinBody)
 				{
-					dAssert(body->m_bodyIsConstrained);
-					body->AddDampingAcceleration(m_timestep);
-					body->UpdateInvInertiaMatrix();
-
-					body->m_accel = body->m_veloc;
-					body->m_alpha = body->m_omega;
+					dAssert(kinBody->m_bodyIsConstrained);
+					kinBody->AddDampingAcceleration(m_timestep);
+					kinBody->UpdateInvInertiaMatrix();
+					kinBody->m_accel = kinBody->m_veloc;
+					kinBody->m_alpha = kinBody->m_omega;
 				}
 			}
 		}
@@ -455,7 +455,6 @@ void ndDynamicsUpdate::InitBodyArray()
 			{
 				ExecuteBatch(index, bodyCount - index, bodyArray, timestep);
 			}
-
 		}
 	};
 

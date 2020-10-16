@@ -39,6 +39,7 @@ class ndBodyPlayerCapsule : public ndBodyKinematic
 
 	dFloat32 GetHeadingAngle() const;
 	virtual void ApplyInputs(dFloat32 timestep);
+	virtual dFloat32 ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const;
 
 	private:
 	enum dCollisionState
@@ -94,4 +95,10 @@ inline dFloat32 ndBodyPlayerCapsule::GetHeadingAngle() const
 { 
 	return m_headingAngle; 
 }
+
+inline dFloat32 ndBodyPlayerCapsule::ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const
+{
+	return dFloat32 (2.0f);
+}
+
 #endif
