@@ -942,30 +942,40 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 		contactSolver.m_timestep = m_timestep;
 		contactSolver.m_ccdMode = 0;
 		contactSolver.m_contactBuffer = contactBuffer;
-		contactSolver.m_intersectionTestOnly = body1->GetAsBodyTriggerVolume() ? 1 : 0;
+		contactSolver.m_intersectionTestOnly = body0->m_contactTestOnly | body1->m_contactTestOnly;
 		
 		dInt32 count = contactSolver.CalculatePairContacts(threadIndex);
 		if (count)
 		{
-			if (!contactSolver.m_intersectionTestOnly)
+			if (contactSolver.m_intersectionTestOnly)
 			{
-				dAssert(count <= (D_CONSTRAINT_MAX_ROWS / 3));
-				ProcessContacts(threadIndex, count, &contactSolver);
+				if (!contact->m_isIntersetionTestOnly)
+				{
+					ndBodyTriggerVolume* const trigger = body1->GetAsBodyTriggerVolume();
+					if (trigger)
+					{
+						trigger->OnTriggerEnter(body0, m_timestep);
+					}
+				}
+				contact->m_isIntersetionTestOnly = 1;
 			}
 			else
 			{
-				if (!contact->m_isIntersetionTestOnly && contactSolver.m_intersectionTestOnly)
-				{
-					body1->GetAsBodyTriggerVolume()->OnTriggerEnter(body0, m_timestep);
-				}
-				contact->m_isIntersetionTestOnly = contactSolver.m_intersectionTestOnly;
+				dAssert(count <= (D_CONSTRAINT_MAX_ROWS / 3));
+				ProcessContacts(threadIndex, count, &contactSolver);
+				dAssert(contact->m_maxDOF);
+				contact->m_isIntersetionTestOnly = 0;
 			}
 		}
 		else
 		{
 			if (contact->m_isIntersetionTestOnly)
 			{
-				body1->GetAsBodyTriggerVolume()->OnTriggerExit(body0, m_timestep);
+				ndBodyTriggerVolume* const trigger = body1->GetAsBodyTriggerVolume();
+				if (trigger)
+				{
+					body1->GetAsBodyTriggerVolume()->OnTriggerExit(body0, m_timestep);
+				}
 				contact->m_isIntersetionTestOnly = 0;
 			}
 			contact->m_maxDOF = 0;
