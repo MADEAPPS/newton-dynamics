@@ -158,6 +158,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	static dInt32 m_rayCastSimplex[4][4];
 
 	friend class ndScene;
+	friend class ndBodyPlayerCapsuleContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #endif 

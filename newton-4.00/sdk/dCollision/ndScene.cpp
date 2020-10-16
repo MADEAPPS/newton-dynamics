@@ -952,9 +952,10 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 		ndContactSolver contactSolver(contact);
 		contactSolver.m_separatingVector = contact->m_separatingVector;
 		contactSolver.m_timestep = m_timestep;
-		contactSolver.m_ccdMode = false;
+		contactSolver.m_ccdMode = 0;
 		contactSolver.m_contactBuffer = contactBuffer;
-		contactSolver.m_intersectionTestOnly = body1->GetAsBodyTriggerVolume() ? 1 : 0;
+		//contactSolver.m_intersectionTestOnly = body1->GetAsBodyTriggerVolume() ? 1 : 0;
+		contactSolver.m_intersectionTestOnly = body0->m_contactTestOnly | body1->m_contactTestOnly;
 		
 		dInt32 count = contactSolver.CalculatePairContacts(threadIndex);
 		if (count)
@@ -966,9 +967,10 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 			}
 			else
 			{
-				if (!contact->m_isTrigger && contactSolver.m_intersectionTestOnly)
+				ndBodyTriggerVolume* const trigger = body1->GetAsBodyTriggerVolume();
+				if (trigger && !contact->m_isTrigger)
 				{
-					body1->GetAsBodyTriggerVolume()->OnTriggerEnter(body0, m_timestep);
+					trigger->OnTriggerEnter(body0, m_timestep);
 				}
 				contact->m_isTrigger = contactSolver.m_intersectionTestOnly;
 			}
@@ -1779,10 +1781,6 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 	dVector deltaTime(m_timestep);
 	ndBodyKinematic* const body0 = contact->GetBody0();
 	ndBodyKinematic* const body1 = contact->GetBody1();
-if (body1->GetAsBodyTriggerVolume())
-{
-deltaTime = m_timestep;
-}
 
 	if (!(contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium)))
 	{
@@ -1871,6 +1869,8 @@ void ndScene::BuildContactArray()
 	{
 		ndContact* const contact = &node->GetInfo();
 		dAssert(contact->m_isAttached);
+		m_activeConstraintArray[count] = contact;
+		count++;
 		if (contact->m_isTrigger)
 		{
 			contact->GetBody1()->GetAsBodyTriggerVolume()->OnTrigger(contact->GetBody0(), m_timestep);

@@ -91,18 +91,10 @@ class ndBody: public dClassAlloc
 			dUnsigned32 m_islandSleep : 1;
 			dUnsigned32 m_gyroTorqueOn : 1;
 			dUnsigned32 m_skeletonMark : 1;
+			dUnsigned32 m_contactTestOnly : 1;
 			dUnsigned32 m_transformIsDirty : 1;
 			dUnsigned32 m_bodyIsConstrained : 1;
 			dUnsigned32 m_collideWithLinkedBodies : 1;
-
-			//dUnsigned32 m_freeze : 1;
-			//dUnsigned32 m_sleeping : 1;
-			//dUnsigned32 m_inCallback : 1;
-			//dUnsigned32 m_jointSet : 1;
-			//dUnsigned32 m_collidable : 1;
-			//dUnsigned32 m_spawnnedFromCallback : 1;
-			//dUnsigned32 m_continueCollisionMode : 1;
-			//dUnsigned32 m_isdead : 1;
 		};
 	};
 

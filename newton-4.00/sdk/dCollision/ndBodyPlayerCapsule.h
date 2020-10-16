@@ -26,6 +26,7 @@
 #include "ndBodyKinematic.h"
 
 class ndBodyPlayerCapsuleContactSolver;
+class ndBodyPlayerCapsuleImpulseSolver;
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodyPlayerCapsule : public ndBodyKinematic
@@ -55,6 +56,7 @@ class ndBodyPlayerCapsule : public ndBodyKinematic
 	void ResolveCollision(ndBodyPlayerCapsuleContactSolver& contactSolver, dFloat32 timestep);
 	dFloat32 PredictTimestep(ndBodyPlayerCapsuleContactSolver& contactSolver, dFloat32 timestep);
 	dCollisionState TestPredictCollision(const ndBodyPlayerCapsuleContactSolver& contactSolver, const dVector& veloc) const;
+	void ResolveInterpenetrations(ndBodyPlayerCapsuleContactSolver& contactSolver, ndBodyPlayerCapsuleImpulseSolver& impulseSolver);
 
 	protected: 
 	dMatrix m_localFrame;
