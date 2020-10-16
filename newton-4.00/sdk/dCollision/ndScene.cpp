@@ -1778,9 +1778,9 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 	ndBodyKinematic* const body0 = contact->GetBody0();
 	ndBodyKinematic* const body1 = contact->GetBody1();
 
-	if (!(contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium)))
+	if (!(contact->m_isDead | (body0->m_equilibrium & body1->m_equilibrium)))
 	{
-		dAssert(!contact->m_killContact);
+		dAssert(!contact->m_isDead);
 		dUnsigned32 active = contact->m_active;
 		if (ValidateContactCache(contact, deltaTime))
 		{
@@ -1833,7 +1833,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 				}
 				else if (contact->m_sceneLru < lru) 
 				{
-					contact->m_killContact = 1;
+					contact->m_isDead = 1;
 				}
 			}
 		}
@@ -1853,7 +1853,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 		contact->m_sceneLru = m_lru;
 	}
 
-	contact->m_killContact = contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
+	contact->m_isDead = contact->m_isDead | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
 }
 
 void ndScene::BuildContactArray()
@@ -1884,7 +1884,7 @@ void ndScene::DeleteDeadContact()
 	{
 		ndContact* const contact = m_activeConstraintArray[i]->GetAsContact();
 		dAssert(contact);
-		if (contact->m_killContact)
+		if (contact->m_isDead)
 		{
 			activeCount--;
 			m_contactList.DeleteContact(contact);
@@ -1895,14 +1895,6 @@ void ndScene::DeleteDeadContact()
 			activeCount--;
 			m_activeConstraintArray[i] = m_activeConstraintArray[activeCount];
 		}
-
-		//else if (contact->m_body0->m_continueCollisionMode | contact->m_body1->m_continueCollisionMode) 
-		//{
-		//	if (contact->EstimateCCD(timestep)) {
-		//		constraintArray[activeCount].m_joint = contact;
-		//		activeCount++;
-		//	}
-		//}
 	}
 	m_activeConstraintArray.SetCount(activeCount);
 }
