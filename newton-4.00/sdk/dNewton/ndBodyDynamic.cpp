@@ -41,7 +41,6 @@ ndBodyDynamic::ndBodyDynamic()
 	,m_impulseTorque(dVector::m_zero)
 	,m_savedExternalForce(dVector::m_zero)
 	,m_savedExternalTorque(dVector::m_zero)
-	,m_sleepingCounter(0)
 {
 }
 

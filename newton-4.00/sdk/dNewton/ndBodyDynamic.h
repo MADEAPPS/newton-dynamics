@@ -72,7 +72,6 @@ class ndBodyDynamic: public ndBodyKinematic
 	dVector m_impulseTorque;
 	dVector m_savedExternalForce;
 	dVector m_savedExternalTorque;
-	dInt32 m_sleepingCounter;
 	friend class ndDynamicsUpdate;
 } D_GCC_NEWTON_ALIGN_32 ;
 

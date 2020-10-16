@@ -191,6 +191,7 @@ class ndBodyKinematic: public ndBody
 	dFloat32 m_weigh;
 	dInt32 m_rank;
 	dInt32 m_index;
+	dInt32 m_sleepingCounter;
 
 	friend class ndWorld;
 	friend class ndScene;

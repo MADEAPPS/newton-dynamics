@@ -105,6 +105,7 @@ ndBodyKinematic::ndBodyKinematic()
 	,m_weigh(dFloat32 (0.0f))
 	,m_rank(0)
 	,m_index(0)
+	,m_sleepingCounter(0)
 {
 	m_invWorldInertiaMatrix[3][3] = dFloat32(1.0f);
 	m_shapeInstance.m_ownerBody = this;
