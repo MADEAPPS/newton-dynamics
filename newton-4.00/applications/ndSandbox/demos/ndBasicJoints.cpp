@@ -97,15 +97,8 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 	mesh->Release();
 }
 
-
 void ndBasicJoints (ndDemoEntityManager* const scene)
 {
-	// load the sky box
-	scene->CreateSkyBox();
-
-	// sync just in case we are on a pending update
-	scene->GetWorld()->Sync();
-
 	// build a floor
 	BuildFloor(scene);
 

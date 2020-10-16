@@ -316,10 +316,11 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 			//D_TRACKTIME();
 			for (dInt32 i = 0; i < count; i++)
 			{
-				//ndBodyKinematic* const body = bodyArray[start + i]->GetAsBodyDynamic();
-				ndBodyKinematic* const body = bodyArray[start + i]->GetAsBodyKinematic();
-				dAssert(body);
-				body->IntegrateExternalForce(timestep);
+				ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
+				if (body)
+				{
+					body->IntegrateExternalForce(timestep);
+				}
 			}
 		}
 
@@ -421,16 +422,14 @@ void ndDynamicsUpdate::InitBodyArray()
 			//D_TRACKTIME();
 			for (dInt32 i = 0; i < count; i++)
 			{
-				ndBodyKinematic* const body = bodyArray[start + i]->GetAsBodyDynamic();
-				ndBodyDynamic* const kinBody = body->GetAsBodyDynamic();
-				if (kinBody)
-				{
-					dAssert(kinBody->m_bodyIsConstrained);
-					kinBody->AddDampingAcceleration(m_timestep);
-					kinBody->UpdateInvInertiaMatrix();
-					kinBody->m_accel = kinBody->m_veloc;
-					kinBody->m_alpha = kinBody->m_omega;
-				}
+				ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
+				dAssert(body);
+				dAssert(body->m_bodyIsConstrained);
+				body->AddDampingAcceleration(m_timestep);
+				body->UpdateInvInertiaMatrix();
+
+				body->m_accel = body->m_veloc;
+				body->m_alpha = body->m_omega;
 			}
 		}
 
@@ -455,6 +454,7 @@ void ndDynamicsUpdate::InitBodyArray()
 			{
 				ExecuteBatch(index, bodyCount - index, bodyArray, timestep);
 			}
+
 		}
 	};
 
@@ -1074,31 +1074,29 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 			{
 				ndBodyKinematic* const body = bodyArray[i + start];
 				ndBodyDynamic* const dynBody = body->GetAsBodyDynamic();
-				if (dynBody)
-				{
-					dAssert(dynBody->m_bodyIsConstrained);
-					const dInt32 index = dynBody->m_index;
-					const ndJacobian& forceAndTorque = internalForces[index];
-					const dVector force(dynBody->GetForce() + forceAndTorque.m_linear);
-					const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
+				dAssert(dynBody);
+				dAssert(dynBody->m_bodyIsConstrained);
+				const dInt32 index = dynBody->m_index;
+				const ndJacobian& forceAndTorque = internalForces[index];
+				const dVector force(dynBody->GetForce() + forceAndTorque.m_linear);
+				const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
 
-					const ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
-					if (!body->m_resting)
-					{
-						body->m_veloc += velocStep.m_linear;
-						body->m_omega += velocStep.m_angular;
-					}
-					else
-					{
-						const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
-						const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
-						const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
-						const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
-						body->m_resting &= equilibrium;
-					}
-					dAssert(body->m_veloc.m_w == dFloat32(0.0f));
-					dAssert(body->m_omega.m_w == dFloat32(0.0f));
+				const ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
+				if (!body->m_resting)
+				{
+					body->m_veloc += velocStep.m_linear;
+					body->m_omega += velocStep.m_angular;
 				}
+				else
+				{
+					const dVector velocStep2(velocStep.m_linear.DotProduct(velocStep.m_linear));
+					const dVector omegaStep2(velocStep.m_angular.DotProduct(velocStep.m_angular));
+					const dVector test(((velocStep2 > speedFreeze2) | (omegaStep2 > speedFreeze2)) & dVector::m_negOne);
+					const dInt32 equilibrium = test.GetSignMask() ? 0 : 1;
+					body->m_resting &= equilibrium;
+				}
+				dAssert(body->m_veloc.m_w == dFloat32(0.0f));
+				dAssert(body->m_omega.m_w == dFloat32(0.0f));
 			}
 		}
 
@@ -1408,7 +1406,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 
 				equilibrium &= equilibriumTest;
 				stackSleeping &= equilibriumTest;
-				//sleepCounter = dMin(sleepCounter, kinBody->m_sleepingCounter);
+				sleepCounter = dMin(sleepCounter, dynBody->m_sleepingCounter);
 				//kinBody->m_sleepingCounter++;
 			}
 			if (kinBody->m_equilibrium != equilibrium)

@@ -28,8 +28,8 @@
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0		// setting basic rigidbody
-//#define DEFAULT_SCENE	1		// setting basic Trigger
-#define DEFAULT_SCENE	2		// setting basic player
+#define DEFAULT_SCENE	1		// setting basic Trigger
+//#define DEFAULT_SCENE	2		// setting basic player
 //#define DEFAULT_SCENE	3		// setting basic joints
 
 						 
@@ -440,7 +440,6 @@ void ndDemoEntityManager::Cleanup ()
 		delete ent;
 	}
 
-
 	// create the newton world
 	m_world = new ndPhysicsWorld(this);
 	
@@ -777,6 +776,10 @@ void ndDemoEntityManager::LoadDemo(int menu)
 {
 	char newTitle[256];
 	Cleanup();
+
+	// make the sky box 
+	//m_world->Sync();
+	CreateSkyBox();
 	m_demosSelection[menu].m_launchDemoCallback(this);
 	sprintf(newTitle, "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_name);
 	glfwSetWindowTitle(m_mainFrame, newTitle);
@@ -1366,7 +1369,6 @@ void ndDemoEntityManager::DrawDebugShapes()
 			ndDebugMeshCache::dTreeNode* const shapeNode = m_debugShapeCache.Find(shapeInstance.GetShape());
 			if (shapeNode)
 			{
-				//dMatrix matrix(shapeInstance.GetLocalMatrix() * body->GetMatrix());
 				dMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
 				shapeNode->GetInfo().m_flatShaded->Render(this, matrix);
 			}

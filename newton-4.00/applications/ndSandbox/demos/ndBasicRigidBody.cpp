@@ -115,12 +115,6 @@ static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
 
 void ndBasicRigidBody (ndDemoEntityManager* const scene)
 {
-	// load the sky box
-	scene->CreateSkyBox();
-
-	// sync just in case we are on a pending update
-	scene->GetWorld()->Sync();
-
 	// build a floor
 	BuildFloor(scene);
 

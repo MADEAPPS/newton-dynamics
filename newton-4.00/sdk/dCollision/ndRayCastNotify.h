@@ -69,7 +69,6 @@ class ndRayCastClosestHitCallback: public ndRayCastNotify
 
 	dUnsigned32 OnRayPrecastAction(const ndBody* const body, const ndShapeInstance* const collision)
 	{
-		//return ((ndBody*)body)->GetAsBodyTriggerVolume() ? 0 : 1;
 		return ((ndBody*)body)->GetAsBodyDynamic() ? 1 : 0;
 	}
 

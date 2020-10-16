@@ -25,56 +25,17 @@
 #include "ndCollisionStdafx.h"
 #include "ndBodyKinematic.h"
 
-class ndBodyPlayerCapsuleContactSolver;
-class ndBodyPlayerCapsuleImpulseSolver;
-
 D_MSV_NEWTON_ALIGN_32
 class ndBodyPlayerCapsule : public ndBodyKinematic
 {
 	public:
-	D_COLLISION_API ndBodyPlayerCapsule(const dMatrix& localAxis, dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight);
+	D_COLLISION_API ndBodyPlayerCapsule();
 	D_COLLISION_API virtual ~ndBodyPlayerCapsule();
 
 	ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule();
 
-	dFloat32 GetHeadingAngle() const;
-	virtual void ApplyInputs(dFloat32 timestep);
-	virtual dFloat32 ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const;
-
-	private:
-	enum dCollisionState
-	{
-		m_colliding,
-		m_freeMovement,
-		m_deepPenetration,
-	};
-
-	D_COLLISION_API virtual void IntegrateExternalForce(dFloat32 timestep);
 	virtual void SetCollisionShape(const ndShapeInstance& shapeInstance);
-	
-	void UpdatePlayerStatus(ndBodyPlayerCapsuleContactSolver& contactSolver);
-	void ResolveStep(ndBodyPlayerCapsuleContactSolver& contactSolver, dFloat32 timestep);
-	void ResolveCollision(ndBodyPlayerCapsuleContactSolver& contactSolver, dFloat32 timestep);
-	dFloat32 PredictTimestep(ndBodyPlayerCapsuleContactSolver& contactSolver, dFloat32 timestep);
-	dCollisionState TestPredictCollision(const ndBodyPlayerCapsuleContactSolver& contactSolver, const dVector& veloc) const;
-	void ResolveInterpenetrations(ndBodyPlayerCapsuleContactSolver& contactSolver, ndBodyPlayerCapsuleImpulseSolver& impulseSolver);
 
-	protected: 
-	dMatrix m_localFrame;
-	dVector m_impulse;
-	dFloat32 m_mass;
-	dFloat32 m_invMass;
-	dFloat32 m_headingAngle;
-	dFloat32 m_forwardSpeed;
-	dFloat32 m_lateralSpeed;
-	dFloat32 m_stepHeight;
-	dFloat32 m_contactPatch;
-	dFloat32 m_height;
-	dFloat32 m_weistScale;
-	dFloat32 m_crouchScale;
-	bool m_isAirbone;
-	bool m_isOnFloor;
-	bool m_isCrouched;
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule()
@@ -85,20 +46,6 @@ inline ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule()
 inline void ndBodyPlayerCapsule::SetCollisionShape(const ndShapeInstance& shapeInstance)
 {
 	// ignore the changing collision shape;
-}
-
-inline void ndBodyPlayerCapsule::ApplyInputs(dFloat32 timestep)
-{
-}
-
-inline dFloat32 ndBodyPlayerCapsule::GetHeadingAngle() const
-{ 
-	return m_headingAngle; 
-}
-
-inline dFloat32 ndBodyPlayerCapsule::ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const
-{
-	return dFloat32 (2.0f);
 }
 
 #endif

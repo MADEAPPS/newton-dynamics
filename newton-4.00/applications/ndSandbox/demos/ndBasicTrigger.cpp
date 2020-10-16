@@ -144,7 +144,6 @@ class ndArchimedesBuoyancyVolume : public ndBodyTriggerVolume
 		//dTrace(("exit trigger body: %d\n", body->GetId()));
 	}
 
-	ndDemoEntityManager* m_scene;
 	dPlane m_plane;
 	dFloat32 m_density;
 	bool m_hasPlane;
@@ -274,12 +273,6 @@ static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
 
 void ndBasicTrigger (ndDemoEntityManager* const scene)
 {
-	// load the sky box
-	scene->CreateSkyBox();
-
-	// sync just in case we are on a pending update
-	scene->GetWorld()->Sync();
-
 	// build a floor
 	BuildFloor(scene);
 

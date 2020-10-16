@@ -38,9 +38,6 @@ class ndBodyTriggerVolume : public ndBodyKinematic
 	virtual void OnTriggerEnter(ndBodyKinematic* const body, dFloat32 timestep);
 	virtual void OnTriggerExit(ndBodyKinematic* const body, dFloat32 timestep);
 
-	private:
-	virtual void IntegrateExternalForce(dFloat32 timestep);
-
 } D_GCC_NEWTON_ALIGN_32;
 
 inline ndBodyTriggerVolume* ndBodyTriggerVolume::GetAsBodyTriggerVolume()
@@ -63,8 +60,5 @@ inline void ndBodyTriggerVolume::OnTriggerExit(ndBodyKinematic* const body, dFlo
 	dAssert(0);
 }
 
-inline void ndBodyTriggerVolume::IntegrateExternalForce(dFloat32 timestep) 
-{
-}
 
 #endif
