@@ -884,41 +884,29 @@ bool ndScene::ValidateContactCache(ndContact* const contact, const dVector& time
 {
 	dAssert(contact && (contact->GetAsContact()));
 
-	//dMatrix pitch(dPitchMatrix(30.0 * dRadToDegree));
-	//dMatrix yaw(dYawMatrix(60.0 * dRadToDegree));
-	//dMatrix roll(dRollMatrix(30.0 * dRadToDegree));
-	//dQuaternion q0(pitch);
-	//dQuaternion q1(yaw);
-	//dQuaternion q2(roll);
-	//dMatrix matrix0(pitch * yaw * roll);
-	//dMatrix matrix1(dMatrix(q0 * q1 * q2, dVector::m_wOne));
-	
 	ndBodyKinematic* const body0 = contact->GetBody0();
 	ndBodyKinematic* const body1 = contact->GetBody1();
-	//if (!contact->m_material->m_contactGeneration) 
-	if (1)
+
+	//dVector positStep(timestep * (body0->m_veloc - body1->m_veloc));
+	dVector positStep(timestep * (body0->m_residualVeloc - body1->m_residualVeloc));
+	positStep = ((positStep.DotProduct(positStep)) > m_velocTol) & positStep;
+	contact->m_positAcc += positStep;
+	
+	dVector positError2(contact->m_positAcc.DotProduct(contact->m_positAcc));
+	dVector positSign(dVector::m_negOne & (positError2 < m_linearContactError2));
+	if (positSign.GetSignMask())
 	{
-		//dVector positStep(timestep * (body0->m_veloc - body1->m_veloc));
-		dVector positStep(timestep * (body0->m_residualVeloc - body1->m_residualVeloc));
-		positStep = ((positStep.DotProduct(positStep)) > m_velocTol) & positStep;
-		contact->m_positAcc += positStep;
+		//dVector rotationStep(timestep * (body0->m_omega - body1->m_omega));
+		dVector rotationStep(timestep * (body0->m_residualOmega - body1->m_residualOmega));
+		rotationStep = ((rotationStep.DotProduct(rotationStep)) > m_velocTol) & rotationStep;
+		contact->m_rotationAcc = contact->m_rotationAcc * dQuaternion(dFloat32(1.0f), rotationStep.m_x, rotationStep.m_y, rotationStep.m_z);
 	
-		dVector positError2(contact->m_positAcc.DotProduct(contact->m_positAcc));
-		dVector positSign(dVector::m_negOne & (positError2 < m_linearContactError2));
-		if (positSign.GetSignMask())
+		dVector angle(contact->m_rotationAcc.m_x, contact->m_rotationAcc.m_y, contact->m_rotationAcc.m_z, dFloat32(0.0f));
+		dVector rotatError2(angle.DotProduct(angle));
+		dVector rotationSign(dVector::m_negOne & (rotatError2 < m_linearContactError2));
+		if (rotationSign.GetSignMask())
 		{
-			//dVector rotationStep(timestep * (body0->m_omega - body1->m_omega));
-			dVector rotationStep(timestep * (body0->m_residualOmega - body1->m_residualOmega));
-			rotationStep = ((rotationStep.DotProduct(rotationStep)) > m_velocTol) & rotationStep;
-			contact->m_rotationAcc = contact->m_rotationAcc * dQuaternion(dFloat32(1.0f), rotationStep.m_x, rotationStep.m_y, rotationStep.m_z);
-	
-			dVector angle(contact->m_rotationAcc.m_x, contact->m_rotationAcc.m_y, contact->m_rotationAcc.m_z, dFloat32(0.0f));
-			dVector rotatError2(angle.DotProduct(angle));
-			dVector rotationSign(dVector::m_negOne & (rotatError2 < m_linearContactError2));
-			if (rotationSign.GetSignMask())
-			{
-				return true;
-			}
+			return true;
 		}
 	}
 	return false;
@@ -952,7 +940,7 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 		ndContactSolver contactSolver(contact);
 		contactSolver.m_separatingVector = contact->m_separatingVector;
 		contactSolver.m_timestep = m_timestep;
-		contactSolver.m_ccdMode = false;
+		contactSolver.m_ccdMode = 0;
 		contactSolver.m_contactBuffer = contactBuffer;
 		contactSolver.m_intersectionTestOnly = body1->GetAsBodyTriggerVolume() ? 1 : 0;
 		
@@ -966,19 +954,19 @@ void ndScene::CalculateJointContacts(dInt32 threadIndex, ndContact* const contac
 			}
 			else
 			{
-				if (!contact->m_isTrigger && contactSolver.m_intersectionTestOnly)
+				if (!contact->m_isIntersetionTestOnly && contactSolver.m_intersectionTestOnly)
 				{
 					body1->GetAsBodyTriggerVolume()->OnTriggerEnter(body0, m_timestep);
 				}
-				contact->m_isTrigger = contactSolver.m_intersectionTestOnly;
+				contact->m_isIntersetionTestOnly = contactSolver.m_intersectionTestOnly;
 			}
 		}
 		else
 		{
-			if (contact->m_isTrigger)
+			if (contact->m_isIntersetionTestOnly)
 			{
 				body1->GetAsBodyTriggerVolume()->OnTriggerExit(body0, m_timestep);
-				contact->m_isTrigger = 0;
+				contact->m_isIntersetionTestOnly = 0;
 			}
 			contact->m_maxDOF = 0;
 		}
@@ -1445,25 +1433,6 @@ void ndScene::AddPair(ndBodyKinematic* const body0, ndBodyKinematic* const body1
 	}
 }
 
-void ndScene::BuildContactArray()
-{
-	D_TRACKTIME();
-	dInt32 count = 0;
-	m_activeConstraintArray.SetCount(m_contactList.GetCount());
-	for (ndContactList::dListNode* node = m_contactList.GetFirst(); node; node = node->GetNext())
-	{
-		ndContact* const contact = &node->GetInfo();
-		dAssert(contact->m_isAttached);
-		m_activeConstraintArray[count] = contact;
-		count++;
-		if (contact->m_isTrigger)
-		{
-			contact->GetBody1()->GetAsBodyTriggerVolume()->OnTrigger(contact->GetBody0(), m_timestep);
-		}
-	}
-	m_activeConstraintArray.SetCount(count);
-}
-
 void ndScene::BuildBodyArray()
 {
 	D_TRACKTIME();
@@ -1798,10 +1767,6 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 	dVector deltaTime(m_timestep);
 	ndBodyKinematic* const body0 = contact->GetBody0();
 	ndBodyKinematic* const body1 = contact->GetBody1();
-if (body1->GetAsBodyTriggerVolume())
-{
-deltaTime = m_timestep;
-}
 
 	if (!(contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium)))
 	{
@@ -1840,7 +1805,7 @@ deltaTime = m_timestep;
 			if (distance < D_NARROW_PHASE_DIST)
 			{
 				CalculateJointContacts(threadIndex, contact);
-				if (contact->m_maxDOF || contact->m_isTrigger)
+				if (contact->m_maxDOF || contact->m_isIntersetionTestOnly)
 				{
 					contact->m_active = true;
 					contact->m_timeOfImpact = dFloat32(1.0e10f);
@@ -1879,6 +1844,26 @@ deltaTime = m_timestep;
 	}
 
 	contact->m_killContact = contact->m_killContact | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
+}
+
+void ndScene::BuildContactArray()
+{
+	D_TRACKTIME();
+	dInt32 count = 0;
+	m_activeConstraintArray.SetCount(m_contactList.GetCount());
+	for (ndContactList::dListNode* node = m_contactList.GetFirst(); node; node = node->GetNext())
+	{
+		ndContact* const contact = &node->GetInfo();
+		dAssert(contact->m_isAttached);
+		m_activeConstraintArray[count] = contact;
+		count++;
+		ndBodyTriggerVolume* const trigger = contact->GetBody1()->GetAsBodyTriggerVolume();
+		if (trigger)
+		{
+			trigger->OnTrigger(contact->GetBody0(), m_timestep);
+		}
+	}
+	m_activeConstraintArray.SetCount(count);
 }
 
 void ndScene::DeleteDeadContact()
