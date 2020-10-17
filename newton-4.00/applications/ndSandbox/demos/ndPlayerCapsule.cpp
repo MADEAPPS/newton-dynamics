@@ -118,6 +118,14 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 		camOrigin -= frontDir.Scale(PLAYER_THIRD_PERSON_VIEW_DIST);
 		
 		camera->SetNextMatrix(*m_scene, camMatrix, camOrigin);
+
+		if (m_scene->GetKeyState('A') ||
+			m_scene->GetKeyState('D') ||
+			m_scene->GetKeyState('W') ||
+			m_scene->GetKeyState('S'))
+		{
+			SetSleepState(false);
+		}
 	}
 
 	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, dFloat32 timestep)
