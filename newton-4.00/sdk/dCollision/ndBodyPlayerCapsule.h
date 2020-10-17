@@ -37,6 +37,12 @@ class ndBodyPlayerCapsule : public ndBodyKinematic
 
 	ndBodyPlayerCapsule* ndBodyPlayerCapsule::GetAsBodyPlayerCapsule();
 
+	dFloat32 GetForwardSpeed() const;
+	void SetForwardSpeed(dFloat32 speed);
+
+	dFloat32 GetLateralSpeed() const;
+	void SetLateralSpeed(dFloat32 speed);
+
 	dFloat32 GetHeadingAngle() const;
 	virtual void ApplyInputs(dFloat32 timestep);
 	virtual dFloat32 ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const;
@@ -100,5 +106,26 @@ inline dFloat32 ndBodyPlayerCapsule::ContactFrictionCallback(const dVector& posi
 {
 	return dFloat32 (2.0f);
 }
+
+inline dFloat32 ndBodyPlayerCapsule::GetForwardSpeed() const 
+{ 
+	return -m_forwardSpeed; 
+}
+
+inline void ndBodyPlayerCapsule::SetForwardSpeed(dFloat32 speed) 
+{ 
+	m_forwardSpeed = -speed; 
+}
+
+inline dFloat32 ndBodyPlayerCapsule::GetLateralSpeed() const 
+{ 
+	return -m_lateralSpeed; 
+}
+
+inline void ndBodyPlayerCapsule::SetLateralSpeed(dFloat32 speed) 
+{ 
+	m_lateralSpeed = -speed; 
+}
+
 
 #endif

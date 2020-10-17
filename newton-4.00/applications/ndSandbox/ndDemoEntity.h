@@ -22,7 +22,12 @@ class ndDemoEntityNotify: public ndBodyNotify
 {
 	public:
 	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity);
-	~ndDemoEntityNotify();
+	virtual ~ndDemoEntityNotify();
+
+	void* GetUserData() const
+	{
+		return m_entity;
+	}
 
 	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix);
 	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep);
