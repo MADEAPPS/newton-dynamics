@@ -281,6 +281,22 @@ class dTriplex
 #define dDegreeToRad	dFloat32 (dPi / 180.0f)
 #define dRadToDegree  	dFloat32 (180.0f / dPi)
 
+#define dSqrt(x)		dFloat32 (sqrt(x))	
+#define dSin(x)			dFloat32 (sin(x))
+#define dCos(x)			dFloat32 (cos(x))
+#define dAsin(x)		dFloat32 (asin(x))
+#define dAcos(x)		dFloat32 (acos(x))
+#define dLog(x)			dFloat32 (log(x))
+#define dCeil(x)		dFloat32 (ceil(x))
+#define dFloor(x)		dFloat32 (floor(x))	
+#define dPow(x,y)		dFloat32 (pow(x,y))
+#define dFmod(x,y)		dFloat32 (fmod(x,y))
+#define dTan(x)			dFloat32 (tan(x))
+#define dAtan2(x,y)		dFloat32 (atan2(x,y))
+#define dRsqrt(x)		(dFloat32 (1.0f) / dSqrt(x))
+#define dClearFP()		_clearfp() 
+#define dControlFP(x,y)	_controlfp(x,y)
+
 class dBigVector;
 #ifndef D_NEWTON_USE_DOUBLE
 	class dVector;
@@ -409,6 +425,32 @@ D_INLINE bool dAreEqual(T A, T B, T tol)
 	return dAbs(A - B) < tol;
 }
 
+template <class T>
+D_INLINE T AngleAdd (T angleInRadiand0, T angleInRadiand1)
+{
+	T c0 = T (dSin(angleInRadiand0));
+	T s0 = T (dCos(angleInRadiand0));
+	T c1 = T (dSin(angleInRadiand1));
+	T s1 = T (dCos(angleInRadiand1));
+
+	T s = s0 * c1 + s1 * c0;
+	T c = c0 * c1 - s0 * s1;
+	return T(dAtan2(s, c));
+}
+
+template <class T>
+D_INLINE T AngleSub(T angleInRadiand0, T angleInRadiand1)
+{
+	T c0 = T(dSin(angleInRadiand0));
+	T s0 = T(dCos(angleInRadiand0));
+	T c1 = T(dSin(angleInRadiand1));
+	T s1 = T(dCos(angleInRadiand1));
+
+	T s = s0 * c1 - s1 * c0;
+	T c = c0 * c1 + s0 * s1;
+	return T(dAtan2(s, c));
+}
+
 #ifdef D_NEWTON_USE_DOUBLE
 	union dFloatSign
 	{
@@ -445,22 +487,6 @@ union dDoubleInt
 #ifndef _MSC_VER 
 	#define _stricmp(x,y) strcasecmp(x,y)
 #endif
-
-#define dSqrt(x)		dFloat32 (sqrt(x))	
-#define dSin(x)			dFloat32 (sin(x))
-#define dCos(x)			dFloat32 (cos(x))
-#define dAsin(x)		dFloat32 (asin(x))
-#define dAcos(x)		dFloat32 (acos(x))
-#define dLog(x)			dFloat32 (log(x))
-#define dCeil(x)		dFloat32 (ceil(x))
-#define dFloor(x)		dFloat32 (floor(x))	
-#define dPow(x,y)		dFloat32 (pow(x,y))
-#define dFmod(x,y)		dFloat32 (fmod(x,y))
-#define dTan(x)			dFloat32 (tan(x))
-#define dAtan2(x,y)		dFloat32 (atan2(x,y))
-#define dRsqrt(x)		(dFloat32 (1.0f) / dSqrt(x))
-#define dClearFP()		_clearfp() 
-#define dControlFP(x,y)	_controlfp(x,y)
 
 enum dSerializeRevisionNumber
 {

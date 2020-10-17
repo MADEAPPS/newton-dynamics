@@ -67,6 +67,8 @@ class ndBodyPlayerCapsule : public ndBodyKinematic
 	dCollisionState TestPredictCollision(const ndBodyPlayerCapsuleContactSolver& contactSolver, const dVector& veloc) const;
 	void ResolveInterpenetrations(ndBodyPlayerCapsuleContactSolver& contactSolver, ndBodyPlayerCapsuleImpulseSolver& impulseSolver);
 
+	void IntegrateVelocity(dFloat32 timestep);
+
 	protected: 
 	dMatrix m_localFrame;
 	dVector m_impulse;
@@ -132,6 +134,12 @@ inline dFloat32 ndBodyPlayerCapsule::GetHeadingAngle() const
 inline void ndBodyPlayerCapsule::SetHeadingAngle(dFloat32 angle)
 { 
 	m_headingAngle = dClamp(angle, dFloat32(-dPi), dFloat32(dPi)); 
+}
+
+inline void ndBodyPlayerCapsule::IntegrateVelocity(dFloat32 timestep)
+{
+	m_residualVeloc = m_veloc;
+	m_residualOmega = m_omega;
 }
 
 #endif

@@ -189,7 +189,7 @@ void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactS
 		{
 			advanceIsBlocked = false;
 			SetVelocity(veloc);
-			IntegrateVelocity(timestep);
+			ndBodyKinematic::IntegrateVelocity(timestep);
 			contactSolver.CalculateContacts();
 			if (contactSolver.m_contactCount) 
 			{
@@ -232,7 +232,7 @@ void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactS
 		
 		SetVelocity(veloc);
 		SetMatrix(startMatrix);
-		IntegrateVelocity(timestep);
+		ndBodyKinematic::IntegrateVelocity(timestep);
 		contactSolver.CalculateContacts();
 		if (contactSolver.m_contactCount) 
 		{
@@ -317,7 +317,7 @@ dFloat32 ndBodyPlayerCapsule::PredictTimestep(ndBodyPlayerCapsuleContactSolver& 
 {
 	dMatrix matrix(m_matrix);
 	dVector veloc(GetVelocity());
-	IntegrateVelocity(timestep);
+	ndBodyKinematic::IntegrateVelocity(timestep);
 	dCollisionState playerCollide = TestPredictCollision(contactSolver, veloc);
 	SetMatrix(matrix);
 
@@ -399,7 +399,7 @@ void ndBodyPlayerCapsule::ResolveInterpenetrations(ndBodyPlayerCapsuleContactSol
 	
 		dVector veloc(impulseSolver.CalculateImpulse().Scale(m_invMass));
 		SetVelocity(veloc);
-		IntegrateVelocity(timestep);
+		ndBodyKinematic::IntegrateVelocity(timestep);
 	
 		penetration = 0.0f;
 		contactSolver.CalculateContacts();
@@ -720,22 +720,22 @@ void ndBodyPlayerCapsule::IntegrateExternalForce(dFloat32 timestep)
 	ApplyInputs(timestep);
 
 #if 0
-#if 0
-	static FILE* file = fopen("log.bin", "wb");
-	if (file) {
-		fwrite(&m_headingAngle, sizeof(m_headingAngle), 1, file);
-		fwrite(&m_forwardSpeed, sizeof(m_forwardSpeed), 1, file);
-		fwrite(&m_lateralSpeed, sizeof(m_lateralSpeed), 1, file);
-		fflush(file);
-	}
-#else 
-	static FILE* file = fopen("log.bin", "rb");
-	if (file) {
-		fread(&m_headingAngle, sizeof(m_headingAngle), 1, file);
-		fread(&m_forwardSpeed, sizeof(m_forwardSpeed), 1, file);
-		fread(&m_lateralSpeed, sizeof(m_lateralSpeed), 1, file);
-	}
-#endif
+	#if 0
+		static FILE* file = fopen("log.bin", "wb");
+		if (file) {
+			fwrite(&m_headingAngle, sizeof(m_headingAngle), 1, file);
+			fwrite(&m_forwardSpeed, sizeof(m_forwardSpeed), 1, file);
+			fwrite(&m_lateralSpeed, sizeof(m_lateralSpeed), 1, file);
+			fflush(file);
+		}
+	#else 
+		static FILE* file = fopen("log.bin", "rb");
+		if (file) {
+			fread(&m_headingAngle, sizeof(m_headingAngle), 1, file);
+			fread(&m_forwardSpeed, sizeof(m_forwardSpeed), 1, file);
+			fread(&m_lateralSpeed, sizeof(m_lateralSpeed), 1, file);
+		}
+	#endif
 #endif
 
 	// set player orientation
@@ -759,7 +759,7 @@ void ndBodyPlayerCapsule::IntegrateExternalForce(dFloat32 timestep)
 		}
 
 		dFloat32 predicetdTime = PredictTimestep(contactSolver, timeLeft);
-		IntegrateVelocity(predicetdTime);
+		ndBodyKinematic::IntegrateVelocity(predicetdTime);
 		timeLeft -= predicetdTime;
 	}
 
