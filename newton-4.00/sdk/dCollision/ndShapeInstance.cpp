@@ -453,6 +453,9 @@ ndShapeInstance& ndShapeInstance::operator=(const ndShapeInstance& instance)
 	m_scale = instance.m_scale;
 	m_invScale = instance.m_invScale;
 	m_maxScale = instance.m_maxScale;
+	m_scaleType = instance.m_scaleType;
+	m_skinThickness = instance.m_skinThickness;
+	m_collisionMode = instance.m_collisionMode;
 
 	m_shape->Release();
 	m_shape = instance.m_shape->AddRef();
