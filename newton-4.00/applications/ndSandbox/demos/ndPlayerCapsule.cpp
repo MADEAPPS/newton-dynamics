@@ -83,12 +83,11 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 		//	strafeSpeed *= invMag;
 		//}
 		//
-		//DemoCamera* const camera = scene->GetCamera();
-		//dMatrix camMatrix(camera->GetNextMatrix());
-		//controller->SetHeadingAngle(camera->GetYawAngle());
+		ndDemoCamera* const camera = m_scene->GetCamera();
 
 		SetForwardSpeed(forwarSpeed);
 		SetLateralSpeed(strafeSpeed);
+		SetHeadingAngle(camera->GetYawAngle());
 	}
 
 	dFloat32 ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const
@@ -113,7 +112,12 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 		
 		camera->SetNextMatrix(*m_scene, camMatrix, camOrigin);
 
-		if (m_scene->GetKeyState('A') ||
+		dFloat32 angle0 = camera->GetYawAngle();
+		dFloat32 angle1 = GetHeadingAngle();
+		dFloat32 error(angle1 - angle0);
+
+		if ((dAbs (error) > 1.0e-3f) ||
+			m_scene->GetKeyState('A') ||
 			m_scene->GetKeyState('D') ||
 			m_scene->GetKeyState('W') ||
 			m_scene->GetKeyState('S'))
