@@ -56,7 +56,7 @@ class dSpatialMatrix
 		return m_rows[i];
 	}
 
-	dSpatialMatrix Inverse(dInt32 rows) const;
+	D_CORE_API dSpatialMatrix Inverse(dInt32 rows) const;
 
 	D_INLINE dSpatialVector VectorTimeMatrix(const dSpatialVector& jacobian) const
 	{

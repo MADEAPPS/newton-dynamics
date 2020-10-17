@@ -1535,7 +1535,7 @@ class dVector
 				__m128d m_d2;
 			};
 		};
-		static dSpatialVector m_zero;
+		D_CORE_API static dSpatialVector m_zero;
 	} D_GCC_NEWTON_ALIGN_32 ;
 #endif
 
