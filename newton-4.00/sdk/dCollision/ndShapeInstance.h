@@ -83,7 +83,6 @@ class ndShapeInstance: public dClassAlloc
 	const ndShape* GetShape() const;
 	dVector SupportVertex(const dVector& dir) const;
 	dMatrix GetScaledTransform(const dMatrix& matrix) const;
-	void CalculateFastAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	dVector SupportVertexSpecial(const dVector& dir, dInt32* const vertexIndex) const;
 	dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
 	dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
@@ -497,48 +496,6 @@ D_INLINE dMatrix ndShapeInstance::GetScaledTransform(const dMatrix& matrix) cons
 	return m_aligmentMatrix * scaledMatrix;
 }
 
-D_INLINE void ndShapeInstance::CalculateFastAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
-{
-	switch (m_scaleType)
-	{
-		case m_unit:
-		{
-			m_shape->CalcAABB(matrix, p0, p1);
-			p0 -= m_padding;
-			p1 += m_padding;
-			break;
-		}
-
-		case m_uniform:
-		case m_nonUniform:
-		{
-			dMatrix matrix1(matrix);
-			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
-			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
-			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
-			m_shape->CalcAABB(matrix1, p0, p1);
-			p0 -= m_padding;
-			p1 += m_padding;
-			break;
-		}
-
-		case m_global:
-		default:
-		{
-			dMatrix matrix1(matrix);
-			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
-			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
-			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
-			m_shape->CalcAABB(m_aligmentMatrix * matrix1, p0, p1);
-			p0 -= m_padding;
-			p1 += m_padding;
-			break;
-		}
-	}
-
-	dAssert(p0.m_w == dFloat32(0.0f));
-	dAssert(p1.m_w == dFloat32(0.0f));
-}
 
 D_INLINE dVector ndShapeInstance::SupportVertex(const dVector& dir) const
 {

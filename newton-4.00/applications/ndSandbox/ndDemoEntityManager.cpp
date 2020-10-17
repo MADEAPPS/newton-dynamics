@@ -206,7 +206,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 
 	// initialized the physics world for the new scene
 	//m_showUI = false;
-	//m_showAABB = true;
+	m_showAABB = true;
 	//m_hideVisualMeshes = true;
 	//m_showScene = true;
 	//m_autoSleepMode = false;

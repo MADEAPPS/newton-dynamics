@@ -320,45 +320,50 @@ dFloat32 ndBodyPlayerCapsule::PredictTimestep(ndBodyPlayerCapsuleContactSolver& 
 
 	if (playerCollide == m_deepPenetration) 
 	{
+		dFloat32 savedTimeStep = timestep;
+		timestep *= 0.5f;
+		dFloat32 dt = timestep;
+		for (dInt32 i = 0; i < D_MAX_COLLIONSION_STEPS; i++) 
+		{
+			ndBodyKinematic::IntegrateVelocity(timestep);
+			contactSolver.CalculateContacts();
+			SetMatrix(matrix);
+		
+			dt *= 0.5f;
+			playerCollide = TestPredictCollision(contactSolver, veloc);
+			if (playerCollide == m_colliding) 
+			{
+				return timestep;
+			}
+			if (playerCollide == m_deepPenetration) 
+			{
+				timestep -= dt;
+			}
+			else 
+			{
+				timestep += dt;
+			}
+		}
+		if (timestep > dt * 2.0f) 
+		{
+			return timestep;
+		}
+		
+		dt = savedTimeStep / D_MAX_COLLIONSION_STEPS;
+		timestep = dt;
+		for (dInt32 i = 1; i < D_MAX_COLLIONSION_STEPS; i++) 
+		{
+			ndBodyKinematic::IntegrateVelocity(timestep);
+			contactSolver.CalculateContacts();
+			SetMatrix(matrix);
+			playerCollide = TestPredictCollision(contactSolver, veloc);
+			if (playerCollide != m_freeMovement) 
+			{
+				return timestep;
+			}
+			timestep += dt;
+		}
 		dAssert(0);
-		//dFloat32 savedTimeStep = timestep;
-		//timestep *= 0.5f;
-		//dFloat32 dt = timestep;
-		//for (dInt32 i = 0; i < D_MAX_COLLIONSION_STEPS; i++) 
-		//{
-		//	NewtonBodyIntegrateVelocity(m_newtonBody, timestep);
-		//	contactSolver.CalculateContacts();
-		//	NewtonBodySetMatrix(m_newtonBody, &matrix[0][0]);
-		//
-		//	dt *= 0.5f;
-		//	playerCollide = TestPredictCollision(contactSolver, veloc);
-		//	if (playerCollide == m_colliding) {
-		//		return timestep;
-		//	}
-		//	if (playerCollide == m_deepPenetration) {
-		//		timestep -= dt;
-		//	}
-		//	else {
-		//		timestep += dt;
-		//	}
-		//}
-		//if (timestep > dt * 2.0f) {
-		//	return timestep;
-		//}
-		//
-		//dt = savedTimeStep / D_MAX_COLLIONSION_STEPS;
-		//timestep = dt;
-		//for (dInt32 i = 1; i < D_MAX_COLLIONSION_STEPS; i++) {
-		//	NewtonBodyIntegrateVelocity(m_newtonBody, timestep);
-		//	contactSolver.CalculateContacts();
-		//	NewtonBodySetMatrix(m_newtonBody, &matrix[0][0]);
-		//	playerCollide = TestPredictCollision(contactSolver, veloc);
-		//	if (playerCollide != m_freeMovement) {
-		//		return timestep;
-		//	}
-		//	timestep += dt;
-		//}
-		//dAssert(0);
 	}
 
 	return timestep;
@@ -376,10 +381,7 @@ void ndBodyPlayerCapsule::ResolveInterpenetrations(ndBodyPlayerCapsuleContactSol
 	{
 		SetVelocity(dVector::m_zero);
 		dMatrix matrix(GetMatrix());
-		//dVector com(GetCentreOfMass());
-		//com = matrix.TransformVector(com);
 		dVector com(matrix.TransformVector(GetCentreOfMass()));
-		//com.m_w = dFloat32 (0.0f);
 	
 		impulseSolver.Reset(this);
 		for (dInt32 i = 0; i < contactSolver.m_contactCount; i++) 
@@ -434,8 +436,6 @@ void ndBodyPlayerCapsule::ResolveCollision(ndBodyPlayerCapsuleContactSolver& con
 
 	dVector veloc (GetVelocity());
 	const dMatrix frameMatrix(m_localFrame * matrix);
-	//dVector com (GetCentreOfMass());
-	//com = matrix.TransformVector(com);
 	dVector com(matrix.TransformVector(GetCentreOfMass()));
 
 	impulseSolver.Reset(this);
@@ -454,9 +454,8 @@ void ndBodyPlayerCapsule::ResolveCollision(ndBodyPlayerCapsuleContactSolver& con
 		{
 			if (impulseSolver.m_contactPoint[normalIndex]) 
 			{
-				dAssert(0);
-		//		impulseSolver.m_jacobianPairs[normalIndex].m_jacobian_J10.m_linear = impulseSolver.m_zero;
-		//		impulseSolver.m_jacobianPairs[normalIndex].m_jacobian_J10.m_angular = impulseSolver.m_zero;
+				impulseSolver.m_jacobianPairs[normalIndex].m_jacobianM1.m_linear = dVector::m_zero;
+				impulseSolver.m_jacobianPairs[normalIndex].m_jacobianM1.m_angular = dVector::m_zero;
 			}
 		
 			//dFloat32 friction = ContactFrictionCallback(point, normal, dInt32(contact.m_contactID), contact.m_hitBody);
@@ -644,8 +643,6 @@ dInt32 ndBodyPlayerCapsuleImpulseSolver::AddContactRow(const ndContactPoint* con
 	dVector omega(contact->m_body1->GetOmega());
 	dVector veloc(contact->m_body1->GetVelocity());
 	dMatrix matrix(contact->m_body1->GetMatrix());
-	//dVector com(contact->m_body1->GetCentreOfMass());
-	//com = matrix.TransformVector(com);
 	dVector com(matrix.TransformVector(contact->m_body1->GetCentreOfMass()));
 	
 	dVector p1(contact->m_point);

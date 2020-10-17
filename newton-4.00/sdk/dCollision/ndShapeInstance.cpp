@@ -477,19 +477,6 @@ ndShapeInfo ndShapeInstance::GetShapeInfo() const
 	return info;
 }
 
-void ndShapeInstance::CalculateAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const
-{
-	for (dInt32 i = 0; i < 3; i++) 
-	{
-		dVector minSupport(matrix.TransformVector(SupportVertex(matrix[i] * dVector::m_negOne)));
-		minP[i] = minSupport[i];
-		dVector maxSupport (matrix.TransformVector(SupportVertex(matrix[i])));
-		maxP[i] = maxSupport[i];
-	}
-	minP = minP & dVector::m_triplexMask;
-	maxP = maxP & dVector::m_triplexMask;
-}
-
 dMatrix ndShapeInstance::CalculateInertia() const
 {
 	ndShape* const shape = (ndShape*)m_shape;
@@ -502,6 +489,60 @@ dMatrix ndShapeInstance::CalculateInertia() const
 		return m_shape->CalculateInertiaAndCenterOfMass(m_aligmentMatrix, m_scale, m_localMatrix);
 	}
 }
+
+void ndShapeInstance::CalculateAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const
+{
+	m_shape->CalcAABB(matrix, p0, p1);
+	switch (m_scaleType)
+	{
+		case m_unit:
+		{
+			p0 -= m_padding;
+			p1 += m_padding;
+			break;
+		}
+
+		case m_uniform:
+		{
+
+		}
+
+		case m_nonUniform:
+		{
+			dMatrix matrix1(matrix);
+			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
+			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
+			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
+			matrix1 = matrix.Inverse() * matrix1;
+
+			dVector size0((p1 - p0) * dVector::m_half);
+			dVector origin(matrix1.TransformVector((p0 + p1) * dVector::m_half));
+			dVector size(matrix1.m_front.Abs().Scale(size0.m_x) + matrix1.m_up.Abs().Scale(size0.m_y) + matrix1.m_right.Abs().Scale(size0.m_z));
+
+			p0 = (origin - size - m_padding) & dVector::m_triplexMask;
+			p1 = (origin + size + m_padding) & dVector::m_triplexMask;
+			break;
+		}
+
+		case m_global:
+		default:
+		{
+			dAssert(0);
+			//dMatrix matrix1(matrix);
+			//matrix1[0] = matrix1[0].Scale(m_scale.m_x);
+			//matrix1[1] = matrix1[1].Scale(m_scale.m_y);
+			//matrix1[2] = matrix1[2].Scale(m_scale.m_z);
+			//m_shape->CalcAABB(m_aligmentMatrix * matrix1, p0, p1);
+			//p0 -= m_padding;
+			//p1 += m_padding;
+			break;
+		}
+	}
+
+	dAssert(p0.m_w == dFloat32(0.0f));
+	dAssert(p1.m_w == dFloat32(0.0f));
+}
+
 
 dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {

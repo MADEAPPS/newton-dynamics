@@ -225,7 +225,6 @@ static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
 	mesh->Release();
 }
 
-
 void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 {
 	// build a floor

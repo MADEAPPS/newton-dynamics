@@ -347,7 +347,7 @@ void ndBodyKinematic::UpdateCollisionMatrix()
 {
 	m_transformIsDirty = 1;
 	m_shapeInstance.SetGlobalMatrix(m_shapeInstance.GetLocalMatrix() * m_matrix);
-	m_shapeInstance.CalculateFastAABB(m_shapeInstance.GetGlobalMatrix(), m_minAABB, m_maxAABB);
+	m_shapeInstance.CalculateAABB(m_shapeInstance.GetGlobalMatrix(), m_minAABB, m_maxAABB);
 }
 
 dMatrix ndBodyKinematic::CalculateInvInertiaMatrix() const
