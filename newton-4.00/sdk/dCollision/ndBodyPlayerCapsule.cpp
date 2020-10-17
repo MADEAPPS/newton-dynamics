@@ -40,11 +40,6 @@ class ndBodyPlayerCapsuleContactSolver
 	ndBodyPlayerCapsuleContactSolver(ndBodyPlayerCapsule* const player);
 	void CalculateContacts();
 
-	//static unsigned PrefilterCallback(const NewtonBody* const body, const NewtonCollision* const collision, void* const userData);
-	//NewtonWorldConvexCastReturnInfo m_contactBuffer[D_PLAYER_MAX_ROWS];
-	//ndBodyPlayerCapsule* m_player;
-	//dInt32 m_contactCount;
-
 	ndContactPoint m_contactBuffer[D_PLAYER_MAX_ROWS];
 	ndBodyPlayerCapsule* m_player;
 	dInt32 m_contactCount;
@@ -198,8 +193,6 @@ void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactS
 			contactSolver.CalculateContacts();
 			if (contactSolver.m_contactCount) 
 			{
-				//dVector com(zero);
-				//NewtonBodyGetMatrix(m_newtonBody, &stepMatrix[0][0]);
 				dMatrix stepMatrix (GetMatrix());
 				dInt32 count = contactSolver.m_contactCount;
 
@@ -282,7 +275,6 @@ void ndBodyPlayerCapsule::UpdatePlayerStatus(ndBodyPlayerCapsuleContactSolver& c
 	for (dInt32 i = 0; i < contactSolver.m_contactCount; i++) 
 	{
 		m_isAirbone = false;
-		//NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
 		const ndContactPoint* const contact = &contactSolver.m_contactBuffer[i];
 		dVector point(contact->m_point);
 		dVector localPoint(matrix.UntransformVector(point));
@@ -311,7 +303,6 @@ ndBodyPlayerCapsule::dCollisionState ndBodyPlayerCapsule::TestPredictCollision(c
 
 	for (dInt32 i = 0; i < contactSolver.m_contactCount; i++) 
 	{
-		//const NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
 		const ndContactPoint* const contact = &contactSolver.m_contactBuffer[i];
 		dFloat32 projecSpeed = veloc.DotProduct(contact->m_normal).GetScalar();
 		if (projecSpeed < dFloat32(0.0f)) 
@@ -455,7 +446,6 @@ void ndBodyPlayerCapsule::ResolveCollision(ndBodyPlayerCapsuleContactSolver& con
 
 	for (dInt32 i = 0; i < contactSolver.m_contactCount; i++) 
 	{
-		//NewtonWorldConvexCastReturnInfo& contact = contactSolver.m_contactBuffer[i];
 		ndContactPoint* const contact = &contactSolver.m_contactBuffer[i];
 		dVector point(contact->m_point);
 		dVector normal(contact->m_normal);
@@ -498,7 +488,6 @@ ndBodyPlayerCapsuleImpulseSolver::ndBodyPlayerCapsuleImpulseSolver(ndBodyPlayerC
 {
 	m_mass = controller->GetMassMatrix().m_w;
 	m_invMass = controller->GetInvMass();
-	//NewtonBodyGetInvInertiaMatrix(controller->m_newtonBody, &m_invInertia[0][0]);
 	m_invInertia = controller->GetInvInertiaMatrix();
 	Reset(controller);
 }
@@ -508,7 +497,6 @@ void ndBodyPlayerCapsuleImpulseSolver::Reset(ndBodyPlayerCapsule* const controll
 	m_rowCount = 0;
 	m_veloc = controller->GetVelocity();
 }
-
 
 ndBodyPlayerCapsuleContactSolver::ndBodyPlayerCapsuleContactSolver(ndBodyPlayerCapsule* const player)
 	:m_player(player)
@@ -578,7 +566,6 @@ dVector ndBodyPlayerCapsuleImpulseSolver::CalculateImpulse()
 	const ndBodyKinematic* bodyArray[D_PLAYER_MAX_ROWS];
 	for (dInt32 i = 0; i < m_rowCount; i++) 
 	{
-		//bodyArray[i] = m_contactPoint[i] ? m_contactPoint[i]->m_hitBody : NULL;
 		bodyArray[i] = m_contactPoint[i] ? m_contactPoint[i]->m_body0 : nullptr;
 	}
 
@@ -721,7 +708,6 @@ void ndBodyPlayerCapsuleImpulseSolver::ApplyReaction(dFloat32 timestep)
 	}
 }
 
-
 void ndBodyPlayerCapsule::IntegrateExternalForce(dFloat32 timestep)
 {
 	ndBodyPlayerCapsuleContactSolver contactSolver(this);
@@ -755,8 +741,6 @@ void ndBodyPlayerCapsule::IntegrateExternalForce(dFloat32 timestep)
 	// set player orientation
 	dMatrix matrix(dYawMatrix(GetHeadingAngle()));
 	matrix.m_posit = m_matrix.m_posit;
-	//NewtonBodyGetPosition(m_newtonBody, &matrix.m_posit[0]);
-	//NewtonBodySetMatrix(m_newtonBody, &matrix[0][0]);
 	SetMatrix(matrix);
 
 	//// set play desired velocity
