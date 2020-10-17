@@ -34,7 +34,7 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 		ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
 
 		const ndShapeInstance& shape = GetCollisionShape();
-		ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+		ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "smilli.tga", "marble.tga", "marble.tga");
 		entity->SetMesh(mesh, dGetIdentityMatrix());
 		mesh->Release();
 		
@@ -167,9 +167,7 @@ static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoMesh* const sphereMesh, const ndShapeInstance& sphereShape,
 	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
 {
-	//dMatrix matrix(dGetIdentityMatrix());
 	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
-	//dMatrix matrix(dYawMatrix(90.0f * dDegreeToRad) * dPitchMatrix(-45.0f * dDegreeToRad));
 	matrix.m_posit = origin;
 	matrix.m_posit.m_w = 1.0f;
 
@@ -195,7 +193,6 @@ static void AddShape(ndDemoEntityManager* const scene,
 		world->AddBody(body);
 		scene->AddEntity(entity);
 
-		//matrix.m_posit.m_y += diameter * 0.99f;
 		matrix.m_posit.m_y += diameter * 0.99f * 3.0f;
 	}
 }
@@ -203,14 +200,11 @@ static void AddShape(ndDemoEntityManager* const scene,
 static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
 {
 	dFloat32 diameter = 1.0f;
-	//ndShapeInstance shape(new ndShapeSphere(diameter * 0.5f));
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
-	//ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	//ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	const int n = 2;
-	const int stackHigh = 2;
+	const int n = 5;
+	const int stackHigh = 5;
 	//const int n = 10;
 	//const int stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)
@@ -242,11 +236,11 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	dFloat32 radio = 0.5f;
 	dFloat32 mass = 100.0f;
 	ndBasicPlayer* const player = new ndBasicPlayer(
-		scene, localAxis, location, mass, radio, height, height/3.0f);
+		scene, localAxis, location, mass, radio, height, height/4.0f);
 
 	scene->SetUpdateCameraFunction(ndBasicPlayer::UpdateCameraCallback, player);
 
-	dVector origin1(8.0f, 0.0f, 0.0f, 0.0f);
+	dVector origin1(10.0f, 0.0f, 0.0f, 0.0f);
 	AddShapes(scene, origin1);
 
 	dQuaternion rot;

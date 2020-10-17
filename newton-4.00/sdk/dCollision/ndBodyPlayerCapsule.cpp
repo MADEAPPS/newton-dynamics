@@ -21,6 +21,7 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
+#include "ndBody.h"
 #include "ndContact.h"
 #include "ndShapeCapsule.h"
 #include "ndContactSolver.h"
@@ -221,7 +222,6 @@ void ndBodyPlayerCapsule::ResolveStep(ndBodyPlayerCapsuleContactSolver& contactS
 					
 					impulseSolver.AddAngularRows();
 					veloc += impulseSolver.CalculateImpulse().Scale(m_invMass);
-					//NewtonBodySetMatrix(m_newtonBody, &startMatrix[0][0]);
 					SetMatrix(startMatrix);
 				}
 			}	
@@ -573,17 +573,7 @@ dVector ndBodyPlayerCapsuleImpulseSolver::CalculateImpulse()
 		jInvMass.m_jacobianM0.m_angular = m_invInertia.RotateVector(jInvMass.m_jacobianM0.m_angular);
 		if (bodyArray[i]) 
 		{
-			//dMatrix invInertia;
-			//dFloat32 invIxx;
-			//dFloat32 invIyy;
-			//dFloat32 invIzz;
-			//dFloat32 invMass;
-			
-			//dAssert(bodyArray[i]->GetAsBodyDynamic());
-			//NewtonBodyGetInvMass(bodyArray[i], &invMass, &invIxx, &invIyy, &invIzz);
 			dFloat32 invMass = bodyArray[i]->GetInvMass();
-			//NewtonBodyGetInvInertiaMatrix(bodyArray[i], &invInertia[0][0]);
-			//dMatrix invInertia(bodyArray[i]->GetInvInertiaMatrix());
 			dMatrix invInertia(bodyArray[i]->CalculateInvInertiaMatrix());
 			jInvMass.m_jacobianM1.m_linear = jInvMass.m_jacobianM1.m_linear.Scale(invMass);
 			jInvMass.m_jacobianM1.m_angular = invInertia.RotateVector(jInvMass.m_jacobianM1.m_angular);
@@ -659,11 +649,11 @@ dInt32 ndBodyPlayerCapsuleImpulseSolver::AddContactRow(const ndContactPoint* con
 	m_high[m_rowCount] = high;
 	m_normalIndex[m_rowCount] = (normalIndex == -1) ? 0 : normalIndex - m_rowCount;
 	
-	dVector s(
+	dVector reactionSpeed(
 		m_veloc * m_jacobianPairs[m_rowCount].m_jacobianM0.m_linear +
 		veloc * m_jacobianPairs[m_rowCount].m_jacobianM1.m_linear +
 		omega * m_jacobianPairs[m_rowCount].m_jacobianM1.m_angular);
-	m_rhs[m_rowCount] = speed - s.AddHorizontal().GetScalar();
+	m_rhs[m_rowCount] = speed - reactionSpeed.AddHorizontal().GetScalar();
 	
 	m_rowCount++;
 	dAssert(m_rowCount < D_PLAYER_MAX_ROWS);
@@ -697,11 +687,13 @@ void ndBodyPlayerCapsuleImpulseSolver::ApplyReaction(dFloat32 timestep)
 	{
 		if (m_contactPoint[i]) 
 		{
-			dVector force(m_jacobianPairs[i].m_jacobianM0.m_linear.Scale(m_impulseMag[i] * invTimeStep));
-			dVector torque(m_jacobianPairs[i].m_jacobianM0.m_angular.Scale(m_impulseMag[i] * invTimeStep));
-			
-			//NewtonBodyAddForce(m_contactPoint[i]->m_body1, &force[0]);
-			//NewtonBodyAddTorque(m_contactPoint[i]->m_body1, &torque[0]);
+			ndBodyKinematic* const body0 = ((ndBodyKinematic*)m_contactPoint[i]->m_body0);
+			ndBodyKinematic* const body1 = ((ndBodyKinematic*)m_contactPoint[i]->m_body1);
+			dVector force(m_jacobianPairs[i].m_jacobianM1.m_linear.Scale(m_impulseMag[i] * invTimeStep));
+			dVector torque(m_jacobianPairs[i].m_jacobianM1.m_angular.Scale(m_impulseMag[i] * invTimeStep));
+			body1->SetForce(force + body1->GetForce());
+			body1->SetTorque(torque + body1->GetTorque());
+			body0->m_equilibriumOverride = 1;
 		}
 	}
 }
@@ -713,12 +705,13 @@ void ndBodyPlayerCapsule::IntegrateExternalForce(dFloat32 timestep)
 	dFloat32 timeLeft = timestep;
 	const dFloat32 timeEpsilon = timestep * (1.0f / 16.0f);
 
+	m_equilibriumOverride = 0;
 	UpdateInvInertiaMatrix();
 	m_impulse = dVector::m_zero;
 	ApplyInputs(timestep);
 
 #if 0
-	#if 1
+	#if 0
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
 			fwrite(&m_headingAngle, sizeof(m_headingAngle), 1, file);

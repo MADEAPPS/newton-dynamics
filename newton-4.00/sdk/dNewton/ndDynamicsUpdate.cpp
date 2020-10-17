@@ -1370,7 +1370,8 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 				}
 
 				equilibrium &= equilibriumTest;
-				stackSleeping &= equilibriumTest;
+				//stackSleeping &= equilibriumTest;
+				stackSleeping &= equilibrium;
 				sleepCounter = dMin(sleepCounter, dynBody->m_sleepingCounter);
 				dynBody->m_sleepingCounter++;
 			}
@@ -1383,7 +1384,7 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 		{
 			ndBodyKinematic* const kinBody = bodyIslands[i]->GetAsBodyKinematic();
 			dAssert(kinBody);
-			dUnsigned32 equilibrium = (kinBody->GetInvMass() == dFloat32(0.0f)) ? 1 : kinBody->m_autoSleep;
+			dUnsigned32 equilibrium = (kinBody->GetInvMass() == dFloat32(0.0f)) ? 1 : (kinBody->m_autoSleep & ~kinBody->m_equilibriumOverride);
 			const dVector isMovingMask(kinBody->m_veloc + kinBody->m_omega);
 			const dVector mask(isMovingMask.TestZero());
 			const dInt32 test = mask.GetSignMask() & 7;
@@ -1407,7 +1408,8 @@ void ndDynamicsUpdate::UpdateIslandState(const ndIsland& island)
 				}
 
 				equilibrium &= equilibriumTest;
-				stackSleeping &= equilibriumTest;
+				//stackSleeping &= equilibriumTest;
+				stackSleeping &= equilibrium;
 				sleepCounter = dMin(sleepCounter, kinBody->m_sleepingCounter);
 				//kinBody->m_sleepingCounter++;
 			}

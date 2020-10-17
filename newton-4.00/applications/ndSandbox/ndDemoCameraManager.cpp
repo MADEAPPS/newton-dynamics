@@ -170,7 +170,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	};
 	ndReplay replay;
 
-	#if 1
+	#if 0
 		replay.m_p0 = p0;
 		replay.m_p1 = p1;
 		replay.m_mouseState = mouseState ? 1 : 0;

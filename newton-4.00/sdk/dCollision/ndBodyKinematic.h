@@ -135,6 +135,9 @@ class ndBodyKinematic: public ndBody
 
 	virtual dVector GetForce() const;
 	virtual dVector GetTorque() const;
+	virtual void SetForce(const dVector& force);
+	virtual void SetTorque(const dVector& torque);
+
 	virtual void SetAccel(const dVector& accel);
 	virtual void SetAlpha(const dVector& alpha);
 
@@ -305,6 +308,14 @@ inline dVector ndBodyKinematic::GetForce() const
 inline dVector ndBodyKinematic::GetTorque() const
 {
 	return dVector::m_zero;
+}
+
+inline void ndBodyKinematic::SetForce(const dVector& force)
+{
+}
+
+inline void ndBodyKinematic::SetTorque(const dVector& torque)
+{
 }
 
 inline void ndBodyKinematic::SetAccel(const dVector& accel)
