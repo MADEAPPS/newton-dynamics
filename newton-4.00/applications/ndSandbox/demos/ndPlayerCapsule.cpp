@@ -39,7 +39,6 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 		mesh->Release();
 		
 		SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-		SetAutoSleep(false);
 		
 		ndPhysicsWorld* const world = scene->GetWorld();
 		world->AddBody(this);
@@ -87,11 +86,6 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 		//DemoCamera* const camera = scene->GetCamera();
 		//dMatrix camMatrix(camera->GetNextMatrix());
 		//controller->SetHeadingAngle(camera->GetYawAngle());
-
-		if (m_scene->GetKeyState('W'))
-		{
-			dTrace(("%d\n", 1));
-		}
 
 		SetForwardSpeed(forwarSpeed);
 		SetLateralSpeed(strafeSpeed);
