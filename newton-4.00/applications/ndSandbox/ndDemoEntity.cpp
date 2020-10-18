@@ -13,10 +13,11 @@
 #include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 
-ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity)
+ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, dFloat32 gravity)
 	:ndBodyNotify()
 	,m_entity(entity)
 	,m_manager(manager)
+	,m_gravity(gravity)
 {
 }
 
@@ -29,13 +30,17 @@ ndDemoEntityNotify::~ndDemoEntityNotify()
 
 void ndDemoEntityNotify::OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
 {
-	ndBodyDynamic* const dynamicBody = GetBody()->GetAsBodyDynamic();
-	if (dynamicBody)
+	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
+	dAssert(body);
+	if (body->GetInvMass() > 0.0f)
 	{
-		dVector massMatrix(dynamicBody->GetMassMatrix());
-		dVector force(dVector(0.0f, -10.0f, 0.0f, 0.0f).Scale(massMatrix.m_w));
-		dynamicBody->SetForce(force);
-		dynamicBody->SetTorque(dVector::m_zero);
+		dVector massMatrix(body->GetMassMatrix());
+		dVector force(0.0f, m_gravity * massMatrix.m_w, 0.0f, 0.0f);
+		body->SetForce(force);
+		body->SetTorque(dVector::m_zero);
+
+		dVector omega(body->CalculateAngularMomentum());
+		dTrace(("%f %f %f\n", omega.m_x, omega.m_y, omega.m_z));
 	}
 }
 

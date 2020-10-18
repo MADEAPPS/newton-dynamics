@@ -21,7 +21,7 @@ class ndDemoMeshInterface;
 class ndDemoEntityNotify: public ndBodyNotify
 {
 	public:
-	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity);
+	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, dFloat32 gravity = -10.0f);
 	virtual ~ndDemoEntityNotify();
 
 	void* GetUserData() const
@@ -34,6 +34,7 @@ class ndDemoEntityNotify: public ndBodyNotify
 
 	ndDemoEntity* m_entity;
 	ndDemoEntityManager* m_manager;
+	dFloat32 m_gravity;
 };
 
 class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>

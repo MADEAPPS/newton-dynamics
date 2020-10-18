@@ -10,8 +10,8 @@
 */
 
 
-#ifndef AFX_DEBUG_DISPLAY_H___H
-#define AFX_DEBUG_DISPLAY_H___H
+#ifndef __DEBUG_DISPLAY_H__
+#define __DEBUG_DISPLAY_H__
 
 #include "ndSandboxStdafx.h"
 #include <dVector.h>

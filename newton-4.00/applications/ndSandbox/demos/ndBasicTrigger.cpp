@@ -60,7 +60,6 @@ class ndArchimedesBuoyancyVolume : public ndBodyTriggerVolume
 		if (param < 1.0f)
 		{
 			hasPlane = true;
-			//dFloat32 dist = rayCaster.m_contact.m_normal.DotProduct(p1 - p0).GetScalar();
 			dFloat32 dist = -rayCaster.m_contact.m_normal.DotProduct(rayCaster.m_contact.m_point).GetScalar();
 			m_plane = dPlane(rayCaster.m_contact.m_normal, dist);
 		}
@@ -249,10 +248,8 @@ static void AddShape(ndDemoEntityManager* const scene,
 static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
 {
 	dFloat32 diameter = 1.0f;
-	//ndShapeInstance shape(new ndShapeSphere(diameter * 0.5f));
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 	//ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	//ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "wood_0.tga", "wood_0.tga", "wood_0.tga");
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 	
 	const int n = 1;
@@ -283,7 +280,6 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 	AddShapes(scene, origin1);
 
 	dQuaternion rot;
-	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
 	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
