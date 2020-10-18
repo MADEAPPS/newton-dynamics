@@ -43,8 +43,14 @@ class ndDemoCameraManager: public dClassAlloc
 	private:
 	//virtual void OnBodyDestroy (NewtonBody* const body);
 	void UpdatePickBody (ndDemoEntityManager* const scene, bool mouseState, const dVector& camPos0, const dVector& camPos1, dFloat32 timestep); 
-	
+
+	dVector m_pickedBodyTargetPosition;
+	dVector m_pickedBodyLocalAtachmentPoint;
+	dVector m_pickedBodyLocalAtachmentNormal;
+
 	ndDemoCamera* m_camera;
+	ndBodyKinematic* m_targetPicked;
+	ndDemoCameraPickBodyJoint* m_pickJoint;
 	dFloat32 m_mousePosX;
 	dFloat32 m_mousePosY;
 	dFloat32 m_yaw;
@@ -54,15 +60,10 @@ class ndDemoCameraManager: public dClassAlloc
 	dFloat32 m_frontSpeed;
 	dFloat32 m_sidewaysSpeed;
 	dFloat32 m_pickedBodyParam;
-
+	
 	bool m_prevMouseState;	
 	bool m_mouseLockState;	
-	dVector m_pickedBodyTargetPosition;
-	dVector m_pickedBodyLocalAtachmentPoint;
-	dVector m_pickedBodyLocalAtachmentNormal;
-	ndBodyKinematic* m_targetPicked;
-	ndDemoCameraPickBodyJoint* m_pickJoint;
-	//NewtonBodyDestructor m_bodyDestructor;
+
 	friend class ndDemoCamera;
 };
 

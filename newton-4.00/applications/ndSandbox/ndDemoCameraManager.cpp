@@ -38,23 +38,23 @@ class ndDemoCameraPickBodyJoint: public ndJointKinematicController
 
 ndDemoCameraManager::ndDemoCameraManager(ndDemoEntityManager* const scene)
 	:dClassAlloc()
-	,m_camera (new ndDemoCamera())
+	,m_pickedBodyTargetPosition(dVector::m_wOne)
+	,m_pickedBodyLocalAtachmentPoint(dVector::m_wOne)
+	,m_pickedBodyLocalAtachmentNormal(dVector::m_zero)
+	,m_camera(new ndDemoCamera())
+	,m_targetPicked(nullptr)
+	,m_pickJoint(nullptr)
 	,m_mousePosX(0)
 	,m_mousePosY(0)
 	,m_yaw (m_camera->GetYawAngle())
 	,m_pitch (m_camera->GetPichAngle())
-	,m_yawRate (0.01f)
-	,m_pitchRate (0.01f)
+	,m_yawRate (0.04f)
+	,m_pitchRate (0.02f)
 	,m_frontSpeed(15.0f)
 	,m_sidewaysSpeed(10.0f)
 	,m_pickedBodyParam(0.0f)
 	,m_prevMouseState(false)
 	,m_mouseLockState(false)
-	,m_pickedBodyTargetPosition(dVector::m_wOne)
-	,m_pickedBodyLocalAtachmentPoint(dVector::m_wOne)
-	,m_pickedBodyLocalAtachmentNormal(dVector::m_zero)
-	,m_targetPicked(nullptr)
-	,m_pickJoint(nullptr)
 {
 }
 
@@ -76,7 +76,6 @@ void ndDemoCameraManager::SetCameraMatrix(ndDemoEntityManager* const scene, cons
 	m_pitch = m_camera->GetPichAngle();
 }
 
-
 void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 timestep)
 {
 	// update the camera;
@@ -85,7 +84,7 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 	dFloat32 mouseX;
 	dFloat32 mouseY;
 	scene->GetMousePosition (mouseX, mouseY);
-
+	
 	// slow down the Camera if we have a Body
 	dFloat32 slowDownFactor = scene->IsShiftKeyDown() ? 0.5f/10.0f : 0.5f;
 
@@ -117,7 +116,8 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 		targetMatrix.m_posit += targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
 	}
 
-
+m_yaw = AnglesAdd(m_yaw, m_yawRate);
+dTrace(("frame: %d  camera angle: %f\n", scene->GetWorld()->GetFrameIndex(), m_yaw * dRadToDegree));
 	bool mouseState = !scene->GetCaptured() && (scene->GetMouseKeyState(0) && !scene->GetMouseKeyState(1));
 
 	// do camera rotation, only if we do not have anything picked
@@ -131,11 +131,11 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 		{
 			if (mouseSpeedX > 0.0f) 
 			{
-				m_yaw = dMod(m_yaw + m_yawRate, dFloat32(2.0f * dPi));
+				m_yaw = AnglesAdd(m_yaw, m_yawRate);
 			} 
 			else if (mouseSpeedX < 0.0f)
 			{
-				m_yaw = dMod(m_yaw - m_yawRate, dFloat32 (2.0f * dPi));
+				m_yaw = AnglesAdd(m_yaw, -m_yawRate);
 			}
 
 			if (mouseSpeedY > 0.0f)

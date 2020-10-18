@@ -55,6 +55,7 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 		strafeSpeed = (dInt32(m_scene->GetKeyState('D')) - dInt32(m_scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
 		jump = m_scene->GetKeyState(' ') && IsOnFloor();
 
+dTrace(("  frame: %d    player camera: %f\n", m_scene->GetWorld()->GetFrameIndex(), heading * dRadToDegree));
 		//bool crowchKey = scene->GetKeyState('C') ? true : false;
 		//if (m_crowchKey.UpdateTrigger(crowchKey))
 		//{
@@ -133,7 +134,8 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 
 			dFloat32 angle0 = camera->GetYawAngle();
 			dFloat32 angle1 = GetHeadingAngle();
-			dFloat32 error = AngleSub(angle1, angle0);
+			//dFloat32 error = AnglesAdd(angle1, -angle0);
+			dFloat32 error = 1.0f;
 
 			if ((dAbs (error) > 1.0e-3f) ||
 				m_scene->GetKeyState(' ') ||
@@ -184,10 +186,9 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 	geometry->Release();
 }
 
-
 static void AddShape(ndDemoEntityManager* const scene,
-	ndDemoMesh* const sphereMesh, const ndShapeInstance& sphereShape,
-	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
+	ndDemoMesh* const mesh, const ndShapeInstance& shape,
+	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count)
 {
 	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
 	matrix.m_posit = origin;
@@ -204,12 +205,12 @@ static void AddShape(ndDemoEntityManager* const scene,
 	{
 		ndBodyDynamic* const body = new ndBodyDynamic();
 		ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-		entity->SetMesh(sphereMesh, dGetIdentityMatrix());
+		entity->SetMesh(mesh, dGetIdentityMatrix());
 
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 		body->SetMatrix(matrix);
-		body->SetCollisionShape(sphereShape);
-		body->SetMassMatrix(mass, sphereShape);
+		body->SetCollisionShape(shape);
+		body->SetMassMatrix(mass, shape);
 		body->SetGyroMode(true);
 
 		world->AddBody(body);
@@ -234,7 +235,7 @@ static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
 		for (dInt32 j = 0; j < n; j++)
 		{
 			dVector location((j - n / 2) * 4.0f, 0.0f, (i - n / 2) * 4.0f, 0.0f);
-			AddShape(scene, mesh, shape, 10.0f, location + origin, 1.0f, stackHigh, 2.0f);
+			AddShape(scene, mesh, shape, 10.0f, location + origin, 1.0f, stackHigh);
 		}
 	}
 

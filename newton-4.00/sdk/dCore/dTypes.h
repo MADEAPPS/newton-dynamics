@@ -426,28 +426,15 @@ D_INLINE bool dAreEqual(T A, T B, T tol)
 }
 
 template <class T>
-D_INLINE T AngleAdd (T angleInRadiand0, T angleInRadiand1)
+D_INLINE T AnglesAdd (T angleInRadiand1, T angleInRadiand0)
 {
-	T c0 = T (dSin(angleInRadiand0));
-	T s0 = T (dCos(angleInRadiand0));
-	T c1 = T (dSin(angleInRadiand1));
-	T s1 = T (dCos(angleInRadiand1));
+	T s1 = T(dSin(angleInRadiand1));
+	T c1 = T(dCos(angleInRadiand1));
+	T s0 = T(dSin(angleInRadiand0));
+	T c0 = T(dCos(angleInRadiand0));
 
-	T s = s0 * c1 + s1 * c0;
-	T c = c0 * c1 - s0 * s1;
-	return T(dAtan2(s, c));
-}
-
-template <class T>
-D_INLINE T AngleSub(T angleInRadiand0, T angleInRadiand1)
-{
-	T c0 = T(dSin(angleInRadiand0));
-	T s0 = T(dCos(angleInRadiand0));
-	T c1 = T(dSin(angleInRadiand1));
-	T s1 = T(dCos(angleInRadiand1));
-
-	T s = s0 * c1 - s1 * c0;
-	T c = c0 * c1 + s0 * s1;
+	T s = s1 * c0 + s0 * c1;
+	T c = c1 * c0 - s0 * s1;
 	return T(dAtan2(s, c));
 }
 

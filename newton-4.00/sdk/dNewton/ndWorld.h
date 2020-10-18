@@ -79,6 +79,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	ndScene* GetScene() const;
 
 	dFloat32 GetUpdateTime() const;
+	dUnsigned32 GetFrameIndex() const;
 
 	ndContactNotify* GetContactNotify() const;
 	void SetContactNotify(ndContactNotify* const notify);
@@ -120,6 +121,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 
 	dInt32 m_subSteps;
 	dInt32 m_solverIterations;
+	dUnsigned32 m_frameIndex;
 	bool m_collisionUpdate;
 
 	friend class ndScene;
@@ -208,6 +210,12 @@ inline dFloat32 ndWorld::GetUpdateTime() const
 {
 	return m_lastExecutionTime;
 }
+
+inline dUnsigned32 ndWorld::GetFrameIndex() const
+{
+	return m_frameIndex;
+}
+
 
 inline void ndWorld::OnPostUpdate(dFloat32 timestep)
 {

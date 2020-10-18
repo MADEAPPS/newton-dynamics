@@ -42,6 +42,7 @@ ndWorld::ndWorld()
 	,m_freezeOmega2(D_FREEZE_SPEED2)
 	,m_subSteps(1)
 	,m_solverIterations(4)
+	,m_frameIndex(0)
 	,m_collisionUpdate(true)
 {
 	// start the engine thread;
@@ -242,6 +243,7 @@ void ndWorld::ThreadFunction()
 		PostUpdate(m_timestep);
 		m_scene->End();
 	}
+	m_frameIndex++;
 	m_lastExecutionTime = (dGetTimeInMicrosenconds() - timeAcc) * dFloat32(1.0e-6f);
 }
 
