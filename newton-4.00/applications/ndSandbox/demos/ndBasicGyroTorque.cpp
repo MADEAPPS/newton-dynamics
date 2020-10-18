@@ -54,9 +54,9 @@ static void DzhanibekovEffect(ndDemoEntityManager* const scene, dFloat32 mass, d
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y += 10.0f;
+	matrix.m_posit.m_y += 5.0f;
 
-	ndShapeInstance shape(new ndShapeBox(1.0f, 0.25f, 0.5));
+	ndShapeInstance shape(new ndShapeBox(2.0f, 0.5f, 1.0));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
 	dVector omega(0.1f, 0.0f, angularSpeed, 0.0f);
@@ -100,7 +100,6 @@ static void Phitop(ndDemoEntityManager* const scene, dFloat32 mass, dFloat32 ang
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(mesh, dGetIdentityMatrix());
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	//body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity, 0.0f));
 
 	body->SetOmega(omega);
 	body->SetMatrix(matrix);
@@ -129,6 +128,6 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	Phitop(scene, 10.0f, 35.0f, dVector(0.0f, 0.0f,  4.0f, 0.0f));
 
 	dQuaternion rot;
-	dVector origin(-25.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-15.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
