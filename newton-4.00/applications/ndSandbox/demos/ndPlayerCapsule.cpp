@@ -240,7 +240,7 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 
 	scene->SetUpdateCameraFunction(ndBasicPlayer::UpdateCameraCallback, player);
 
-	dVector origin1(10.0f, 0.0f, 0.0f, 0.0f);
+	dVector origin1(14.0f, 0.0f, 0.0f, 0.0f);
 	AddShapes(scene, origin1);
 
 	dQuaternion rot;
