@@ -355,11 +355,6 @@ dInt32 ndContactSolver::ConvexToConvexContacts()
 	dVector error(m_instance1.m_globalMatrix.m_posit - m_instance0.m_globalMatrix.m_posit);
 	if (error.DotProduct(error).GetScalar() < dFloat32(1.0e-6f))
 	{
-		dAssert(0);
-		// shift instance1 by some small value to prevent infinite loop
-		// in contact solve iterations.
-		//dVector step(m_instance0.m_globalMatrix[0][1], m_instance0.m_globalMatrix[1][1], m_instance0.m_globalMatrix[2][1], dFloat32(0.0f));
-		//m_instance1.m_globalMatrix.m_posit += step.Scale (1.0e-3f);
 		m_instance1.m_globalMatrix.m_posit.m_y += dFloat32(1.0e-3f);
 	}
 

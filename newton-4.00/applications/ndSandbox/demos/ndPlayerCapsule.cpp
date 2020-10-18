@@ -233,6 +233,36 @@ static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
 	mesh->Release();
 }
 
+static void AddPlatform(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin)
+{
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit.m_y += 1.0f;
+
+	ndShapeInstance shape(new ndShapeBox(2.0f, 0.25f, 2.5f));
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	entity->SetMesh(mesh, dGetIdentityMatrix());
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(shape);
+	body->SetMassMatrix(mass, shape);
+	body->SetGyroMode(true);
+
+	world->AddBody(body);
+	scene->AddEntity(entity);
+
+	mesh->Release();
+}
+
 void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 {
 	// build a floor
@@ -255,8 +285,10 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	player->m_isPlayer = true;
 	scene->SetUpdateCameraFunction(ndBasicPlayer::UpdateCameraCallback, player);
 
-	dVector origin1(14.0f, 0.0f, 0.0f, 0.0f);
-	AddShapes(scene, origin1);
+	AddShapes(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f));
+	AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
+	AddPlatform(scene, 30.0f, dVector(10.0f, 1.0f, 1.125f, 0.0f));
+//	AddPlatform(scene, 30.0f, dVector(14.0f, 1.0f, 0.0f, 0.0f));
 
 	location.m_posit.m_z += 2.0f;
 	new ndBasicPlayer(scene, localAxis, location, mass, radio, height, height / 4.0f);
