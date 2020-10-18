@@ -116,8 +116,6 @@ void ndDemoCameraManager::FixUpdate (ndDemoEntityManager* const scene, dFloat32 
 		targetMatrix.m_posit += targetMatrix.m_up.Scale(m_sidewaysSpeed * timestep * slowDownFactor);
 	}
 
-m_yaw = AnglesAdd(m_yaw, m_yawRate);
-dTrace(("frame: %d  camera angle: %f\n", scene->GetWorld()->GetFrameIndex(), m_yaw * dRadToDegree));
 	bool mouseState = !scene->GetCaptured() && (scene->GetMouseKeyState(0) && !scene->GetMouseKeyState(1));
 
 	// do camera rotation, only if we do not have anything picked
@@ -193,6 +191,7 @@ dTrace(("frame: %d  camera angle: %f\n", scene->GetWorld()->GetFrameIndex(), m_y
 	#endif
 #endif
 
+	//dTrace(("frame: %d  camera angle: %f\n", scene->GetWorld()->GetFrameIndex(), m_yaw * dRadToDegree));
 	UpdatePickBody(scene, mouseState, p0, p1, timestep);
 }
 

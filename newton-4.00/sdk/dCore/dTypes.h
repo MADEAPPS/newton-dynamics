@@ -504,7 +504,7 @@ D_CORE_API dUnsigned64 dGetTimeInMicrosenconds();
 			m_val = val;
 		}
 
-		void exchage(T val)
+		T exchange(T val)
 		{
 			dSwap(val, m_val);
 			return val;

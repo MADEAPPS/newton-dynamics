@@ -25,6 +25,22 @@
 class ndBasicPlayer: public ndBodyPlayerCapsule
 {
 	public:
+	class PlayerInputs
+	{
+		public:
+		PlayerInputs()
+		{
+			m_heading = 0.0f;
+			m_forwardSpeed = 0.0f;
+			m_strafeSpeed = 0.0f;
+			m_jump = false;
+		}
+		dFloat32 m_heading;
+		dFloat32 m_forwardSpeed;
+		dFloat32 m_strafeSpeed;
+		bool m_jump;
+	};
+
 	ndBasicPlayer(ndDemoEntityManager* const scene,
 		const dMatrix& localAxis, const dMatrix& location,
 		dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight)
@@ -47,30 +63,6 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 		scene->AddEntity(entity);
 	}
 
-	void KeyboardInputs(dFloat32& heading, dFloat32& forwarSpeed, dFloat32& strafeSpeed, bool& jump)
-	{
-		ndDemoCamera* const camera = m_scene->GetCamera();
-		heading = camera->GetYawAngle();
-		forwarSpeed = (dInt32(m_scene->GetKeyState('W')) - dInt32(m_scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
-		strafeSpeed = (dInt32(m_scene->GetKeyState('D')) - dInt32(m_scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
-		jump = m_scene->GetKeyState(' ') && IsOnFloor();
-
-dTrace(("  frame: %d    player camera: %f\n", m_scene->GetWorld()->GetFrameIndex(), heading * dRadToDegree));
-		//bool crowchKey = scene->GetKeyState('C') ? true : false;
-		//if (m_crowchKey.UpdateTrigger(crowchKey))
-		//{
-		//	controller->ToggleCrouch();
-		//	DemoEntity* const playerEntity = (DemoEntity*)NewtonBodyGetUserData(controller->GetBody());
-		//	if (controller->IsCrouched()) {
-		//		playerEntity->SetMesh(m_crouchMesh, dGetIdentityMatrix());
-		//	}
-		//	else {
-		//		playerEntity->SetMesh(m_standingMesh, dGetIdentityMatrix());
-		//	}
-		//}
-
-	}
-
 	void ApplyInputs(dFloat32 timestep)
 	{
 		//calculate the gravity contribution to the velocity, 
@@ -81,31 +73,17 @@ dTrace(("  frame: %d    player camera: %f\n", m_scene->GetWorld()->GetFrameIndex
 		dVector totalImpulse(m_impulse + gravity.Scale(m_mass * timestep));
 		m_impulse = totalImpulse;
 
-		bool jump = false;
-		dFloat32 heading = 0.0f;
-		dFloat32 forwarSpeed = 0.0f;
-		dFloat32 strafeSpeed = 0.0f;
-		if (m_isPlayer)
-		{
-			KeyboardInputs(heading, forwarSpeed, strafeSpeed, jump);
-		}
-
-		if (jump) 
+		//dTrace(("  frame: %d    player camera: %f\n", m_scene->GetWorld()->GetFrameIndex(), m_playerInput.m_heading * dRadToDegree));
+		if (m_playerInput.m_jump)
 		{
 			dVector jumpImpule(0.0f, PLAYER_JUMP_SPEED * m_mass, 0.0f, 0.0f);
 			m_impulse += jumpImpule;
+			m_playerInput.m_jump = false;
 		}
 
-		if (forwarSpeed && strafeSpeed) 
-		{
-			dFloat32 invMag = PLAYER_WALK_SPEED / dSqrt(forwarSpeed * forwarSpeed + strafeSpeed * strafeSpeed);
-			forwarSpeed *= invMag;
-			strafeSpeed *= invMag;
-		}
-
-		SetForwardSpeed(forwarSpeed);
-		SetLateralSpeed(strafeSpeed);
-		SetHeadingAngle(heading);
+		SetForwardSpeed(m_playerInput.m_forwardSpeed);
+		SetLateralSpeed(m_playerInput.m_strafeSpeed);
+		SetHeadingAngle(m_playerInput.m_heading);
 	}
 
 	dFloat32 ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const
@@ -134,8 +112,8 @@ dTrace(("  frame: %d    player camera: %f\n", m_scene->GetWorld()->GetFrameIndex
 
 			dFloat32 angle0 = camera->GetYawAngle();
 			dFloat32 angle1 = GetHeadingAngle();
-			//dFloat32 error = AnglesAdd(angle1, -angle0);
-			dFloat32 error = 1.0f;
+			dFloat32 error = AnglesAdd(angle1, -angle0);
+			//dFloat32 error = 1.0f;
 
 			if ((dAbs (error) > 1.0e-3f) ||
 				m_scene->GetKeyState(' ') ||
@@ -145,6 +123,18 @@ dTrace(("  frame: %d    player camera: %f\n", m_scene->GetWorld()->GetFrameIndex
 				m_scene->GetKeyState('S'))
 			{
 				SetSleepState(false);
+			}
+
+			m_playerInput.m_heading = camera->GetYawAngle();
+			m_playerInput.m_forwardSpeed = (dInt32(m_scene->GetKeyState('W')) - dInt32(m_scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
+			m_playerInput.m_strafeSpeed = (dInt32(m_scene->GetKeyState('D')) - dInt32(m_scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
+			m_playerInput.m_jump = m_scene->GetKeyState(' ') && IsOnFloor();
+
+			if (m_playerInput.m_forwardSpeed && m_playerInput.m_strafeSpeed)
+			{
+				dFloat32 invMag = PLAYER_WALK_SPEED / dSqrt(m_playerInput.m_forwardSpeed * m_playerInput.m_forwardSpeed + m_playerInput.m_strafeSpeed * m_playerInput.m_strafeSpeed);
+				m_playerInput.m_forwardSpeed *= invMag;
+				m_playerInput.m_strafeSpeed *= invMag;
 			}
 		}
 	}
@@ -156,6 +146,7 @@ dTrace(("  frame: %d    player camera: %f\n", m_scene->GetWorld()->GetFrameIndex
 	}
 
 	ndDemoEntityManager* m_scene;
+	PlayerInputs m_playerInput;
 	bool m_isPlayer;
 };
 
