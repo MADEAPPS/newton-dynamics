@@ -488,7 +488,7 @@ void ndSkeletonContainer::Finalize(dInt32 loopJointsCount, ndJointBilateralConst
 {
 	dAssert(m_nodeList.GetCount() >= 1);
 	
-	const ndBodyKinematic* const rootBody = m_skeleton->m_body;
+	//const ndBodyKinematic* const rootBody = m_skeleton->m_body;
 	dAssert(((rootBody->GetInvMass() == dFloat32(0.0f)) && (m_skeleton->m_child->m_sibling == nullptr)) || (m_skeleton->m_body->GetInvMass() != dFloat32(0.0f)));
 	
 	m_nodesOrder = (ndNode**)dMemory::Malloc(m_nodeList.GetCount() * sizeof(ndNode*));

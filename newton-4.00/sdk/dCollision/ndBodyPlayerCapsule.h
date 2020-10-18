@@ -46,6 +46,8 @@ class ndBodyPlayerCapsule : public ndBodyKinematic
 	dFloat32 GetHeadingAngle() const;
 	void SetHeadingAngle(dFloat32 angle);
 
+	bool IsOnFloor() const;
+
 	virtual void ApplyInputs(dFloat32 timestep);
 	virtual dFloat32 ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const;
 
@@ -140,6 +142,11 @@ inline void ndBodyPlayerCapsule::IntegrateVelocity(dFloat32 timestep)
 {
 	m_residualVeloc = m_veloc;
 	m_residualOmega = m_omega;
+}
+
+inline bool ndBodyPlayerCapsule::IsOnFloor() const 
+{ 
+	return m_isOnFloor; 
 }
 
 #endif

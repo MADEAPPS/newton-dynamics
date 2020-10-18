@@ -20,6 +20,7 @@
 
 #define PLAYER_WALK_SPEED				8.0f
 #define PLAYER_THIRD_PERSON_VIEW_DIST	8.0f
+#define PLAYER_JUMP_SPEED				5.0f
 
 class ndBasicPlayer: public ndBodyPlayerCapsule
 {
@@ -70,13 +71,14 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 		//		playerEntity->SetMesh(m_standingMesh, dGetIdentityMatrix());
 		//	}
 		//}
-		//
-		//if (scene->GetKeyState(' ') && controller->IsOnFloor()) {
-		//	dVector jumpImpule(controller->GetLocalFrame().RotateVector(dVector(PLAYER_JUMP_SPEED * controller->GetMass(), 0.0f, 0.0f, 0.0f)));
-		//	dVector totalImpulse(controller->GetImpulse() + jumpImpule);
-		//	controller->SetImpulse(totalImpulse);
-		//}
-		//
+
+		if (m_scene->GetKeyState(' ') && IsOnFloor()) 
+		{
+			//dVector jumpImpule(controller->GetLocalFrame().RotateVector(dVector(PLAYER_JUMP_SPEED * controller->GetMass(), 0.0f, 0.0f, 0.0f)));
+			dVector jumpImpule(0.0f, PLAYER_JUMP_SPEED * m_mass, 0.0f, 0.0f);
+			m_impulse += jumpImpule;
+		}
+
 		//if (forwarSpeed && strafeSpeed) {
 		//	dFloat32 invMag = PLAYER_WALK_SPEED / dSqrt(forwarSpeed * forwarSpeed + strafeSpeed * strafeSpeed);
 		//	forwarSpeed *= invMag;
@@ -117,6 +119,7 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 		dFloat32 error(angle1 - angle0);
 
 		if ((dAbs (error) > 1.0e-3f) ||
+			m_scene->GetKeyState(' ') ||
 			m_scene->GetKeyState('A') ||
 			m_scene->GetKeyState('D') ||
 			m_scene->GetKeyState('W') ||

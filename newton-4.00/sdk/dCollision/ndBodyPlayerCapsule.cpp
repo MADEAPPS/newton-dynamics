@@ -285,6 +285,11 @@ void ndBodyPlayerCapsule::UpdatePlayerStatus(ndBodyPlayerCapsuleContactSolver& c
 			}
 		}
 	}
+
+	if (m_isAirbone || !m_isOnFloor)
+	{
+		m_equilibriumOverride = true;
+	}
 }
 
 ndBodyPlayerCapsule::dCollisionState ndBodyPlayerCapsule::TestPredictCollision(const ndBodyPlayerCapsuleContactSolver& contactSolver, const dVector& veloc) const
