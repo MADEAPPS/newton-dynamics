@@ -133,9 +133,9 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 
 			dFloat32 angle0 = camera->GetYawAngle();
 			dFloat32 angle1 = GetHeadingAngle();
-			dFloat32 error(angle1 - angle0);
+			dFloat32 error = AngleSub(angle1, angle0);
 
-			if (//(dAbs (error) > 1.0e-3f) ||
+			if ((dAbs (error) > 1.0e-3f) ||
 				m_scene->GetKeyState(' ') ||
 				m_scene->GetKeyState('A') ||
 				m_scene->GetKeyState('D') ||
