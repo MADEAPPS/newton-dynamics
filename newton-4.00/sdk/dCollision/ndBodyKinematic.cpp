@@ -482,9 +482,8 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 {
 	if (!m_equilibrium && (m_invMass.m_w > dFloat32(0.0f)))
 	{
+		//AddDampingAcceleration(timestep);
 		UpdateGyroData();
-		AddDampingAcceleration(timestep);
-
 		const dVector accel(GetForce().Scale(m_invMass.m_w));
 		if ((dAbs(m_invMass.m_x - m_invMass.m_y) < dFloat32(1.0e-1f)) &&
 			(dAbs(m_invMass.m_x - m_invMass.m_z) < dFloat32(1.0e-1f)))

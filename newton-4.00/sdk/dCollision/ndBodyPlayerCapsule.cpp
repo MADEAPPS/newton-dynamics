@@ -711,7 +711,6 @@ void ndBodyPlayerCapsule::IntegrateExternalForce(dFloat32 timestep)
 	const dFloat32 timeEpsilon = timestep * (1.0f / 16.0f);
 
 	m_equilibriumOverride = 0;
-	UpdateInvInertiaMatrix();
 	m_impulse = dVector::m_zero;
 	ApplyInputs(timestep);
 

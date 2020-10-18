@@ -18,7 +18,6 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 
-
 static void BuildFloor(ndDemoEntityManager* const scene)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
@@ -47,7 +46,7 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 }
 
 static void AddShape(ndDemoEntityManager* const scene, 
-	ndDemoMesh* const sphereMesh, const ndShapeInstance& sphereShape,
+	ndDemoMesh* const capsuleMesh, const ndShapeInstance& capsuleShape,
 	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
 {
 	//dMatrix matrix(dGetIdentityMatrix());
@@ -63,18 +62,19 @@ static void AddShape(ndDemoEntityManager* const scene,
 
 	matrix.m_posit.m_y += 10.0f;
 
-	dVector omega(0.0f, 10.0f, 0.0f, 0.0f);
+	dVector omega(0.0f, 50.0f, 0.0f, 0.0f);
 	for (dInt32 i = 0; i < count; i++)
 	{
 		ndBodyDynamic* const body = new ndBodyDynamic();
 		ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-		entity->SetMesh(sphereMesh, dGetIdentityMatrix());
+		entity->SetMesh(capsuleMesh, dGetIdentityMatrix());
+		//body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity, 0.0f));
 
 		body->SetOmega(omega);
 		body->SetMatrix(matrix);
-		body->SetCollisionShape(sphereShape);
-		body->SetMassMatrix(mass, sphereShape);
+		body->SetCollisionShape(capsuleShape);
+		body->SetMassMatrix(mass, capsuleShape);
 		body->SetGyroMode(true);
 
 		world->AddBody(body);
@@ -117,6 +117,6 @@ void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 	AddShapes(scene, origin1);
 
 	dQuaternion rot;
-	dVector origin(-10.0f, 10.0f, 0.0f, 0.0f);
+	dVector origin(-25.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

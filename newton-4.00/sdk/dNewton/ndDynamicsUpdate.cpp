@@ -316,9 +316,10 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 			//D_TRACKTIME();
 			for (dInt32 i = 0; i < count; i++)
 			{
-				//ndBodyKinematic* const body = bodyArray[start + i]->GetAsBodyDynamic();
 				ndBodyKinematic* const body = bodyArray[start + i]->GetAsBodyKinematic();
 				dAssert(body);
+				body->UpdateInvInertiaMatrix();
+				body->AddDampingAcceleration(m_timestep);
 				body->IntegrateExternalForce(timestep);
 			}
 		}
@@ -426,8 +427,8 @@ void ndDynamicsUpdate::InitBodyArray()
 				if (kinBody)
 				{
 					dAssert(kinBody->m_bodyIsConstrained);
-					kinBody->AddDampingAcceleration(m_timestep);
 					kinBody->UpdateInvInertiaMatrix();
+					kinBody->AddDampingAcceleration(m_timestep);
 					kinBody->m_accel = kinBody->m_veloc;
 					kinBody->m_alpha = kinBody->m_omega;
 				}

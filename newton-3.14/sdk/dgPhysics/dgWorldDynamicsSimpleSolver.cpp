@@ -968,8 +968,9 @@ void dgWorldDynamicUpdate::IntegrateExternalForce(const dgBodyCluster* const clu
 	const dgInt32 bodyCount = cluster->m_bodyCount;
 	for (dgInt32 i = 1; i < bodyCount; i ++) {
 		dgDynamicBody* const body = (dgDynamicBody*) bodyArray[i].m_body;
-		body->UpdateGyroData();
+		body->CalcInvInertiaMatrix();
 		body->AddDampingAcceleration(timestep);
+		body->UpdateGyroData();
 		body->IntegrateOpenLoopExternalForce(timestep);
 	}
 }

@@ -39,8 +39,8 @@ void ndDemoEntityNotify::OnApplyExternalForce(dInt32 threadIndex, dFloat32 times
 		body->SetForce(force);
 		body->SetTorque(dVector::m_zero);
 
-		dVector omega(body->CalculateAngularMomentum());
-		dTrace(("%f %f %f\n", omega.m_x, omega.m_y, omega.m_z));
+		//dVector L(body->CalculateAngularMomentum());
+		//dTrace(("%f %f %f\n", L.m_x, L.m_y, L.m_z));
 	}
 }
 
