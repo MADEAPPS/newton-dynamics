@@ -576,12 +576,12 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 
 			case m_uniform:
 			{
-				dAssert(0);
-				//dVector p0(localP0 * m_invScale);
-				//dVector p1(localP1 * m_invScale);
-				//dFloat32 t = m_shape->RayCast(p0, p1, maxT, contactOut, body, userData, preFilter);
-				//if (t <= maxT) 
-				//{
+				dVector p0(localP0 * m_invScale);
+				dVector p1(localP1 * m_invScale);
+				t = m_shape->RayCast(callback, p0, p1, maxT, body, contactOut);
+				if (t <= maxT) 
+				{
+					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
 				//	{
 				//		contactOut.m_shapeId0 = GetUserDataID();
@@ -592,18 +592,20 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				//		contactOut.m_collision0 = this;
 				//		contactOut.m_collision1 = this;
 				//	}
-				//}
+					contactOut.m_shapeInstance0 = this;
+					contactOut.m_shapeInstance1 = this;
+				}
 				break;
 			}
 
 			case m_nonUniform:
 			{
-				dAssert(0);
-				//dVector p0(localP0 * m_invScale);
-				//dVector p1(localP1 * m_invScale);
-				//dFloat32 t = m_shape->RayCast(p0, p1, maxT, contactOut, body, userData, preFilter);
-				//if (t <= maxT) 
-				//{
+				dVector p0(localP0 * m_invScale);
+				dVector p1(localP1 * m_invScale);
+				t = m_shape->RayCast(callback, p0, p1, maxT, body, contactOut);
+				if (t <= maxT) 
+				{
+					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
 				//	{
 				//		contactOut.m_shapeId0 = GetUserDataID();
@@ -616,19 +618,24 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				//		contactOut.m_collision0 = this;
 				//		contactOut.m_collision1 = this;
 				//	}
-				//}
+
+					dVector normal(m_invScale * contactOut.m_normal);
+					contactOut.m_normal = normal.Normalize();
+					contactOut.m_shapeInstance0 = this;
+					contactOut.m_shapeInstance1 = this;
+				}
 				break;
 			}
 
 			case m_global:
 			default:
 			{
-				dAssert(0);
-				//dVector p0(m_aligmentMatrix.UntransformVector(localP0 * m_invScale));
-				//dVector p1(m_aligmentMatrix.UntransformVector(localP1 * m_invScale));
-				//dFloat32 t = m_shape->RayCast(p0, p1, maxT, contactOut, body, userData, preFilter);
-				//if (t <= maxT) 
-				//{
+				dVector p0(m_aligmentMatrix.UntransformVector(localP0 * m_invScale));
+				dVector p1(m_aligmentMatrix.UntransformVector(localP1 * m_invScale));
+				t = m_shape->RayCast(callback, p0, p1, maxT, body, contactOut);
+				if (t <= maxT) 
+				{
+					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
 				//	{
 				//		contactOut.m_shapeId0 = GetUserDataID();
@@ -641,7 +648,12 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 				//		contactOut.m_collision0 = this;
 				//		contactOut.m_collision1 = this;
 				//	}
-				//}
+
+					dVector normal(m_aligmentMatrix.RotateVector(m_invScale * contactOut.m_normal));
+					contactOut.m_normal = normal.Normalize();
+					contactOut.m_shapeInstance0 = this;
+					contactOut.m_shapeInstance1 = this;
+				}
 				break;
 			}
 		}
