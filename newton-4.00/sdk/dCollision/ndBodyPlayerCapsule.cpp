@@ -716,7 +716,7 @@ void ndBodyPlayerCapsule::IntegrateExternalForce(dFloat32 timestep)
 	ApplyInputs(timestep);
 
 #if 0
-	#if 0
+	#if 1
 		static FILE* file = fopen("log.bin", "wb");
 		if (file) {
 			fwrite(&m_headingAngle, sizeof(m_headingAngle), 1, file);

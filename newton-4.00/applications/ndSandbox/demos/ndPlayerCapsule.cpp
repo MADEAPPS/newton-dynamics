@@ -30,6 +30,7 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 		dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight)
 		:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
 		,m_scene(scene)
+		,m_isPlayer(false)
 	{
 		SetMatrix(location);
 		ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
@@ -46,18 +47,13 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 		scene->AddEntity(entity);
 	}
 
-	void ApplyInputs(dFloat32 timestep)
+	void KeyboardInputs(dFloat32& heading, dFloat32& forwarSpeed, dFloat32& strafeSpeed, bool& jump)
 	{
-		//calculate the gravity contribution to the velocity, 
-		//use twice the gravity 
-		//dVector gravity(m_localFrame.RotateVector(dVector(g, 0.0f, 0.0f, 0.0f)));
-
-		dVector gravity(0.0f, 2.0f * DEMO_GRAVITY, 0.0f, 0.0f);
-		dVector totalImpulse(m_impulse + gravity.Scale(m_mass * timestep));
-		m_impulse = totalImpulse;
-
-		dFloat32 forwarSpeed = (dInt32(m_scene->GetKeyState('W')) - dInt32(m_scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
-		dFloat32 strafeSpeed = (dInt32(m_scene->GetKeyState('D')) - dInt32(m_scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
+		ndDemoCamera* const camera = m_scene->GetCamera();
+		heading = camera->GetYawAngle();
+		forwarSpeed = (dInt32(m_scene->GetKeyState('W')) - dInt32(m_scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
+		strafeSpeed = (dInt32(m_scene->GetKeyState('D')) - dInt32(m_scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
+		jump = m_scene->GetKeyState(' ') && IsOnFloor();
 
 		//bool crowchKey = scene->GetKeyState('C') ? true : false;
 		//if (m_crowchKey.UpdateTrigger(crowchKey))
@@ -72,24 +68,43 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 		//	}
 		//}
 
-		if (m_scene->GetKeyState(' ') && IsOnFloor()) 
+	}
+
+	void ApplyInputs(dFloat32 timestep)
+	{
+		//calculate the gravity contribution to the velocity, 
+		//use twice the gravity 
+		//dVector gravity(m_localFrame.RotateVector(dVector(g, 0.0f, 0.0f, 0.0f)));
+
+		dVector gravity(0.0f, 2.0f * DEMO_GRAVITY, 0.0f, 0.0f);
+		dVector totalImpulse(m_impulse + gravity.Scale(m_mass * timestep));
+		m_impulse = totalImpulse;
+
+		bool jump = false;
+		dFloat32 heading = 0.0f;
+		dFloat32 forwarSpeed = 0.0f;
+		dFloat32 strafeSpeed = 0.0f;
+		if (m_isPlayer)
 		{
-			//dVector jumpImpule(controller->GetLocalFrame().RotateVector(dVector(PLAYER_JUMP_SPEED * controller->GetMass(), 0.0f, 0.0f, 0.0f)));
+			KeyboardInputs(heading, forwarSpeed, strafeSpeed, jump);
+		}
+
+		if (jump) 
+		{
 			dVector jumpImpule(0.0f, PLAYER_JUMP_SPEED * m_mass, 0.0f, 0.0f);
 			m_impulse += jumpImpule;
 		}
 
-		//if (forwarSpeed && strafeSpeed) {
-		//	dFloat32 invMag = PLAYER_WALK_SPEED / dSqrt(forwarSpeed * forwarSpeed + strafeSpeed * strafeSpeed);
-		//	forwarSpeed *= invMag;
-		//	strafeSpeed *= invMag;
-		//}
-		//
-		ndDemoCamera* const camera = m_scene->GetCamera();
+		if (forwarSpeed && strafeSpeed) 
+		{
+			dFloat32 invMag = PLAYER_WALK_SPEED / dSqrt(forwarSpeed * forwarSpeed + strafeSpeed * strafeSpeed);
+			forwarSpeed *= invMag;
+			strafeSpeed *= invMag;
+		}
 
 		SetForwardSpeed(forwarSpeed);
 		SetLateralSpeed(strafeSpeed);
-		SetHeadingAngle(camera->GetYawAngle());
+		SetHeadingAngle(heading);
 	}
 
 	dFloat32 ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const
@@ -99,33 +114,36 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 
 	void SetCamera()
 	{
-		ndDemoCamera* const camera = m_scene->GetCamera();
-		dMatrix camMatrix(camera->GetNextMatrix());
-
-		ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)GetNotifyCallback();
-		ndDemoEntity* const player = (ndDemoEntity*)notify->GetUserData();
-		dMatrix playerMatrix(player->GetNextMatrix());
-		
-		dFloat32 height = 2.0f;
-		dVector frontDir(camMatrix[0]);
-		dVector upDir(0.0f, 1.0f, 0.0f, 0.0f);
-		dVector camOrigin = playerMatrix.TransformVector(upDir.Scale(height));
-		camOrigin -= frontDir.Scale(PLAYER_THIRD_PERSON_VIEW_DIST);
-		
-		camera->SetNextMatrix(*m_scene, camMatrix, camOrigin);
-
-		dFloat32 angle0 = camera->GetYawAngle();
-		dFloat32 angle1 = GetHeadingAngle();
-		dFloat32 error(angle1 - angle0);
-
-		if ((dAbs (error) > 1.0e-3f) ||
-			m_scene->GetKeyState(' ') ||
-			m_scene->GetKeyState('A') ||
-			m_scene->GetKeyState('D') ||
-			m_scene->GetKeyState('W') ||
-			m_scene->GetKeyState('S'))
+		if (m_isPlayer)
 		{
-			SetSleepState(false);
+			ndDemoCamera* const camera = m_scene->GetCamera();
+			dMatrix camMatrix(camera->GetNextMatrix());
+
+			ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)GetNotifyCallback();
+			ndDemoEntity* const player = (ndDemoEntity*)notify->GetUserData();
+			dMatrix playerMatrix(player->GetNextMatrix());
+
+			dFloat32 height = 2.0f;
+			dVector frontDir(camMatrix[0]);
+			dVector upDir(0.0f, 1.0f, 0.0f, 0.0f);
+			dVector camOrigin = playerMatrix.TransformVector(upDir.Scale(height));
+			camOrigin -= frontDir.Scale(PLAYER_THIRD_PERSON_VIEW_DIST);
+
+			camera->SetNextMatrix(*m_scene, camMatrix, camOrigin);
+
+			dFloat32 angle0 = camera->GetYawAngle();
+			dFloat32 angle1 = GetHeadingAngle();
+			dFloat32 error(angle1 - angle0);
+
+			if (//(dAbs (error) > 1.0e-3f) ||
+				m_scene->GetKeyState(' ') ||
+				m_scene->GetKeyState('A') ||
+				m_scene->GetKeyState('D') ||
+				m_scene->GetKeyState('W') ||
+				m_scene->GetKeyState('S'))
+			{
+				SetSleepState(false);
+			}
 		}
 	}
 
@@ -136,6 +154,7 @@ class ndBasicPlayer: public ndBodyPlayerCapsule
 	}
 
 	ndDemoEntityManager* m_scene;
+	bool m_isPlayer;
 };
 
 static void BuildFloor(ndDemoEntityManager* const scene)
@@ -241,10 +260,17 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	ndBasicPlayer* const player = new ndBasicPlayer(
 		scene, localAxis, location, mass, radio, height, height/4.0f);
 
+	player->m_isPlayer = true;
 	scene->SetUpdateCameraFunction(ndBasicPlayer::UpdateCameraCallback, player);
 
 	dVector origin1(14.0f, 0.0f, 0.0f, 0.0f);
 	AddShapes(scene, origin1);
+
+	location.m_posit.m_z += 2.0f;
+	new ndBasicPlayer(scene, localAxis, location, mass, radio, height, height / 4.0f);
+
+	location.m_posit.m_z += 2.0f;
+	new ndBasicPlayer(scene, localAxis, location, mass, radio, height, height / 4.0f);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
