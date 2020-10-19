@@ -91,11 +91,14 @@ class ndShapeInstance: public dClassAlloc
 	void SetLocalMatrix(const dMatrix& matrix);
 
 	const dMatrix& GetGlobalMatrix() const;
-	void SetGlobalMatrix(const dMatrix& matrix);
+	void SetGlobalMatrix(const dMatrix& scale);
 
 	bool GetCollisionMode() const;
 	void SetCollisionMode(bool mode);
 	dInt32 GetConvexVertexCount() const;
+
+	ndShapeMaterial GetMaterial() const;
+	void SetMaterial(const ndShapeMaterial& material);
 	
 	const dVector& GetScale() const;
 	const dVector& GetInvScale() const;
@@ -120,9 +123,6 @@ class ndShapeInstance: public dClassAlloc
 
 	void* GetUserData () const;
 	void SetUserData (void* const userData);
-
-	ndShapeInfo::dgInstanceMaterial GetMaterial () const;
-	void SetMaterial (const ndShapeInfo::dgInstanceMaterial& userData);
 
 	const void* GetCollisionHandle () const;
 	const ndShapeInstance* GetParent () const;
@@ -177,6 +177,7 @@ class ndShapeInstance: public dClassAlloc
 	dVector m_invScale;
 	dVector m_maxScale;
 
+	ndShapeMaterial m_shapeMaterial;
 	const ndShape* m_shape;
 	const ndBody* m_ownerBody;
 	dFloat32 m_skinThickness;
@@ -316,16 +317,6 @@ D_INLINE void* ndShapeInstance::GetUserData () const
 D_INLINE void ndShapeInstance::SetUserData (void* const userData)
 {
 	m_material.m_userData = userData;
-}
-
-D_INLINE ndShapeInfo::dgInstanceMaterial ndShapeInstance::GetMaterial () const
-{
-	return m_material;
-}
-
-D_INLINE void ndShapeInstance::SetMaterial(const ndShapeInfo::dgInstanceMaterial& userData)
-{
-	m_material = userData;
 }
 
 D_INLINE dUnsigned32 ndShapeInstance::GetSignature () const
@@ -476,7 +467,6 @@ D_INLINE dInt32 ndShapeInstance::GetConvexVertexCount() const
 	return m_shape->GetConvexVertexCount();
 }
 
-
 D_INLINE const dMatrix& ndShapeInstance::GetGlobalMatrix() const
 {
 	return m_globalMatrix;
@@ -618,6 +608,16 @@ D_INLINE dFloat32 ndShapeInstance::GetBoxMaxRadius() const
 D_INLINE dFloat32 ndShapeInstance::GetVolume() const
 {
 	return m_shape->GetVolume() * m_scale.m_x * m_scale.m_y * m_scale.m_z;
+}
+
+D_INLINE ndShapeMaterial ndShapeInstance::GetMaterial() const
+{
+	return m_shapeMaterial;
+}
+
+D_INLINE void ndShapeInstance::SetMaterial(const ndShapeMaterial& material)
+{
+	m_shapeMaterial = material;
 }
 
 

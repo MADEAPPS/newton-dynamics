@@ -69,31 +69,32 @@ enum ndShapeID
 //	m_lumpedMassCollision
 };
 
+class ndShapeMaterial
+{
+	public:
+	ndShapeMaterial()
+	{
+		memset(this, 0, sizeof(ndShapeMaterial));
+	}
+
+	dInt64 m_userId;
+	union
+	{
+		void* m_userData;
+		dUnsigned64 m_alignPad;
+	};
+	union
+	{
+		dUnsigned64 m_intData;
+		dFloat32 m_floatData;
+	} m_userParam[6];
+};
+
+
 D_MSV_NEWTON_ALIGN_32
 class ndShapeInfo
 {
 	public:
-	class ndInstanceMaterial
-	{
-		public:
-		ndInstanceMaterial()
-		{
-			memset(this, 0, sizeof(ndInstanceMaterial));
-		}
-
-		dInt64 m_userId;
-		union 
-		{
-			void* m_userData;
-			dUnsigned64 m_alignPad;
-		};
-		union 
-		{
-			dUnsigned64 m_intData;
-			dFloat32 m_floatData;
-		} m_userParam[6];
-	};
-
 	struct dgBoxData
 	{
 		dFloat32 m_x;
@@ -185,7 +186,7 @@ class ndShapeInfo
 	};
 
 	dMatrix m_offsetMatrix;
-	ndInstanceMaterial m_collisionMaterial;
+	ndShapeMaterial m_shapeMaterial;
 	ndShapeID m_collisionType;
 	union
 	{

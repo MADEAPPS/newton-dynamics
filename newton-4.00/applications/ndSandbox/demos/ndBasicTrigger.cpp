@@ -94,21 +94,13 @@ class ndArchimedesBuoyancyVolume : public ndBodyTriggerVolume
 				// weight of the fluid displaced by the volume under water. 
 				//dVector cog(dVector::m_zero);
 				const dFloat32 viscousDrag = 0.99f;
-				
-				// Get the body density form the collision material.
-				//NewtonCollisionMaterial collisionMaterial;
-				//NewtonCollisionGetMaterial(collision, &collisionMaterial);
-				//const dFloat32 solidDentityFactor = collisionMaterial.m_userParam[0].m_float;
-				//const dFloat32 solidDentityFactor = 1.35f;
 
-				const dFloat32 solidDentityFactor = 1.1f;
+				ndShapeMaterial material(collision.GetMaterial());
+				body->GetCollisionShape().SetMaterial(material);
+				dFloat32 density = material.m_userParam[0].m_floatData;
+				dFloat32 desplacedVolume = density * collision.GetVolume();
 				
-				// calculate the ratio of volumes an use it calculate a density equivalent
-				dFloat32 shapeVolume = collision.GetVolume();
-				dFloat32 density = mass.m_w * solidDentityFactor / shapeVolume;
-				
-				dFloat32 displacedMass = density * volume;
-
+				dFloat32 displacedMass = mass.m_w * volume / desplacedVolume;
 				dVector cog(body->GetCentreOfMass());
 				centerOfPreasure -= matrix.TransformVector(cog);
 				
@@ -208,64 +200,69 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	geometry->Release();
 }
 
-static void AddShape(ndDemoEntityManager* const scene, 
-	ndDemoMesh* const sphereMesh, const ndShapeInstance& sphereShape,
-	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
+static void AddShape(ndDemoEntityManager* const scene, const dMatrix& location,
+	const ndShapeInstance& shape, dFloat32 mass, dFloat32 density)
 {
-	//dMatrix matrix(dGetIdentityMatrix());
-	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
-	//dMatrix matrix(dYawMatrix(90.0f * dDegreeToRad) * dPitchMatrix(-45.0f * dDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
+	dMatrix matrix(location);
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f * 0.99f;
+	matrix.m_posit.m_y = floor.m_y + 10.0f;
 
-	matrix.m_posit.m_y += 10.0f;
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	entity->SetMesh(mesh, dGetIdentityMatrix());
 
-	for (dInt32 i = 0; i < count; i++)
-	{
-		ndBodyDynamic* const body = new ndBodyDynamic();
-		ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-		entity->SetMesh(sphereMesh, dGetIdentityMatrix());
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(shape);
+	body->SetMassMatrix(mass, shape);
+	body->SetGyroMode(true);
 
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-		body->SetMatrix(matrix);
-		body->SetCollisionShape(sphereShape);
-		body->SetMassMatrix(mass, sphereShape);
-		body->SetGyroMode(true);
+	// save the density with the body shape.
+	ndShapeMaterial material;
+	material.m_userParam[0].m_floatData = density;
+	body->GetCollisionShape().SetMaterial(material);
 
-		world->AddBody(body);
-		scene->AddEntity(entity);
+	world->AddBody(body);
+	scene->AddEntity(entity);
 
-		//matrix.m_posit.m_y += diameter * 0.99f;
-		matrix.m_posit.m_y += diameter * 0.99f * 3.0f;
-	}
+	mesh->Release();
 }
 
-static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
+static void AddSphere(ndDemoEntityManager* const scene, const dVector& origin)
+{
+	dFloat32 diameter = 0.5f;
+	ndShapeInstance shape(new ndShapeSphere(diameter));
+
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+
+	AddShape(scene, matrix, shape, 10.0f, 1.1f);
+}
+
+static void AddCapsule(ndDemoEntityManager* const scene, const dVector& origin)
 {
 	dFloat32 diameter = 1.0f;
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
-	//ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
-	
-	const int n = 1;
-	const int stackHigh = 1;
-	//const int n = 10;
-	//const int stackHigh = 7;
-	for (dInt32 i = 0; i < n; i++)
-	{
-		for (dInt32 j = 0; j < n; j++)
-		{
-			dVector location((j - n / 2) * 4.0f, 0.0f, (i - n / 2) * 4.0f, 0.0f);
-			AddShape(scene, mesh, shape, 10.0f, location + origin, 1.0f, stackHigh, 2.0f);
-		}
-	}
 
-	mesh->Release();
+	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
+	matrix.m_posit = origin;
+
+	AddShape(scene, matrix, shape, 10.0f, 1.0f);
+}
+
+static void AddBox(ndDemoEntityManager* const scene, const dVector& origin)
+{
+	//ndShapeInstance shape(new ndShapeBox(1.0f, 2.0f, 0.5f));
+	ndShapeInstance shape(new ndShapeBox(1.0f, 1.0f, 1.0f));
+
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+
+	AddShape(scene, matrix, shape, 10.0f, 0.9f);
 }
 
 void ndBasicTrigger (ndDemoEntityManager* const scene)
@@ -276,8 +273,9 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 	// build a floor
 	AddTrigger(scene);
 
-	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	AddShapes(scene, origin1);
+	AddBox(scene, dVector(0.0f, 0.0f, -3.0f, 1.0f));
+	AddSphere(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f));
+	AddCapsule(scene, dVector(0.0f, 0.0f, 3.0f, 1.0f));
 
 	dQuaternion rot;
 	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);

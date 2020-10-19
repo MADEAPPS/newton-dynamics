@@ -19,38 +19,14 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef __D_COLLISION_CAPSULE_H__
-#define __D_COLLISION_CAPSULE_H__
-
+#ifndef __D_SHAPE_CAPSULE_H__
+#define __D_SHAPE_CAPSULE_H__
 
 #include "ndShapeConvex.h"
 
 D_MSV_NEWTON_ALIGN_32
 class ndShapeCapsule : public ndShapeConvex
 {
-	//public:
-	//ndShapeCapsule (dgMemoryAllocator* const allocator, dgUnsigned32 signature, dFloat32 radio0, dFloat32 radio1, dFloat32 height);
-	//ndShapeCapsule(dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
-	//virtual ~ndShapeCapsule();
-	//
-	//private:
-	//virtual dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
-	//
-	//virtual dVector SupportVertex (const dVector& dir, dInt32* const vertexIndex) const;
-	//virtual dInt32 CalculateSignature () const;
-	//virtual void SetCollisionBBox (const dVector& p0, const dVector& p1);
-	//virtual dFloat32 CalculateMassProperties (const dgMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
-	//
-	//virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
-	//virtual void Serialize(dgSerialize callback, void* const userData) const;
-	//
-	//static dInt32 CalculateSignature(dFloat32 radio0, dFloat32 radio1, dFloat32 height);
-	//
-	//virtual void CalculateImplicitContacts(dInt32 count, dgContactPoint* const contactPoints) const;
-	//virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
-	//virtual dVector SupportVertexSpecial (const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
-
-
 	public:
 	D_COLLISION_API ndShapeCapsule (dFloat32 radio0, dFloat32 radio1, dFloat32 height);
 

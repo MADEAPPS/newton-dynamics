@@ -28,7 +28,7 @@
 //#include "dMeshEffect.h"
 //#include "dgCollisionBVH.h"
 //#include "dgCollisionCompound.h"
-//#include "dgCollisionConvexHull.h"
+//#include "ndShapeConvexHull.h"
 
 
 
@@ -2161,8 +2161,8 @@ dgCollisionInstance* dMeshEffect::CreateConvexCollision(dgWorld* const world, dF
 	matrix.m_posit += matrix.RotateVector(com);
 	matrix.m_posit.m_w = dFloat32 (1.0f);
 
-	dUnsigned32 crc = dgCollisionConvexHull::CalculateSignature (count, &pool[0].m_x, sizeof (dVector));
-	dgCollisionConvexHull* const collision = new (GetAllocator()) dgCollisionConvexHull (GetAllocator(), crc, count, sizeof (dVector), dFloat32 (tolerance), &pool[0].m_x);
+	dUnsigned32 crc = ndShapeConvexHull::CalculateSignature (count, &pool[0].m_x, sizeof (dVector));
+	ndShapeConvexHull* const collision = new (GetAllocator()) ndShapeConvexHull (GetAllocator(), crc, count, sizeof (dVector), dFloat32 (tolerance), &pool[0].m_x);
 	if (!collision->GetConvexVertexCount()) {
 		collision->Release();
 		return nullptr;
