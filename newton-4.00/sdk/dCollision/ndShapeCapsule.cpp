@@ -200,7 +200,7 @@ void ndShapeCapsule::Init(dFloat32 radio0, dFloat32 radio1, dFloat32 height)
 			dFloat32 y = dCos(angle);
 			tempVertex[index] = dVector(x0, y * r0, z * r0, dFloat32(0.0f));
 			index++;
-			angle += dPi2 / DG_CAPSULE_CAP_SEGMENTS;
+			angle += (dFloat32(2.0f) * dPi) / DG_CAPSULE_CAP_SEGMENTS;
 			dAssert(index < sizeof(tempVertex) / sizeof(tempVertex[0]));
 		}
 	}
@@ -220,7 +220,7 @@ void ndShapeCapsule::Init(dFloat32 radio0, dFloat32 radio1, dFloat32 height)
 			dFloat32 y = dCos(angle);
 			tempVertex[index] = dVector(x1, y * r1, z * r1, dFloat32(0.0f));
 			index++;
-			angle += dPi2 / DG_CAPSULE_CAP_SEGMENTS;
+			angle += (dFloat32(2.0f) * dPi) / DG_CAPSULE_CAP_SEGMENTS;
 			dAssert(index < sizeof(tempVertex) / sizeof(tempVertex[0]));
 		}
 		x1 += step;

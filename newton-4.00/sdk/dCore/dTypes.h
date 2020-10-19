@@ -275,7 +275,7 @@ class dTriplex
 };
 
 #define dPi		 		dFloat32 (3.141592f)
-#define dPi2		 	dFloat32 (dPi * 2.0f)
+//#define dPi2		 	dFloat32 (dPi * 2.0f)
 #define dEXP		 	dFloat32 (2.71828f)
 #define dEpsilon	  	dFloat32 (1.0e-5f)
 #define dDegreeToRad	dFloat32 (dPi / 180.0f)

@@ -927,7 +927,7 @@ class dgHACDClusterGraph
 			if (convexHull.GetCount()) {
 				const dBigVector* const vertex = convexHull.GetVertexPool();
 				for (dConvexHull3d::dListNode* node = convexHull.GetFirst(); node; node = node->GetNext()) {
-					const dConvexHull3DFace* const face = &node->GetInfo();
+					const dConvexHull3dFace* const face = &node->GetInfo();
 
 					dInt32 i0 = face->m_index[0];
 					dInt32 i1 = face->m_index[1];

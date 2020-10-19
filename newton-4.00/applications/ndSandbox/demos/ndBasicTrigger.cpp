@@ -267,18 +267,19 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origi
 {
 	dVector points[1024];
 	const dInt32 pointCount = 10;
+	dInt32 count = 0;
 	for (dInt32 i = 0; i < pointCount; i++)
 	{
-		dFloat32 y = dCos(dPi2 * i / 10.0f);
-		dFloat32 z = dCos(dPi2 * i / 10.0f);
-		points[i * 4 + 0] = dVector(-0.5f, 0.7f * y, 0.7f* z, 0.0f);
-		points[i * 4 + 1] = dVector( 0.5f, 0.7f * y, 0.7f* z, 0.0f);
-		points[i * 4 + 2] = dVector(0.25f, y, z, 0.0f);
-		points[i * 4 + 2] = dVector(-0.25f, y, z, 0.0f);
+		dFloat32 y = dCos((dFloat32(2.0f) * dPi) * i / pointCount);
+		dFloat32 z = dSin((dFloat32(2.0f) * dPi) * i / pointCount);
+		points[count++] = dVector(-0.5f, 0.7f * y, 0.7f* z, 0.0f);
+		points[count++] = dVector( 0.5f, 0.7f * y, 0.7f* z, 0.0f);
+		points[count++] = dVector(0.25f, y, z, 0.0f);
+		points[count++] = dVector(-0.25f, y, z, 0.0f);
 	}
 
-	ndShapeInstance shape(new ndShapeBox(1.0f, 2.0f, 0.7f));
-	//ndShapeInstance shape(new ndShapeConvexHull(4 * pointCount, sizeof (dVector), 0.0f, &points[0].m_x));
+	//ndShapeInstance shape(new ndShapeBox(1.0f, 2.0f, 0.7f));
+	ndShapeInstance shape(new ndShapeConvexHull(count, sizeof (dVector), 0.0f, &points[0].m_x));
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
 

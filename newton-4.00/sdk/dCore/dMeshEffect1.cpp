@@ -1015,7 +1015,7 @@ dMeshEffect::dMeshEffect(dgMemoryAllocator* const allocator, const dFloat64* con
 			format.m_vertex.m_data = &convexHull.GetVertexPool()[0].m_x;
 			format.m_vertex.m_strideInBytes = sizeof (dBigVector);
 			for (dConvexHull3d::dListNode* faceNode = convexHull.GetFirst(); faceNode; faceNode = faceNode->GetNext()) {
-				dConvexHull3DFace& face = faceNode->GetInfo();
+				dConvexHull3dFace& face = faceNode->GetInfo();
 				faceCountPool[index] = 3;
 				vertexIndexListPool[index * 3 + 0] = face.m_index[0];
 				vertexIndexListPool[index * 3 + 1] = face.m_index[1];

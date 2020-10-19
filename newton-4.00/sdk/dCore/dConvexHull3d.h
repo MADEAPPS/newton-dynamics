@@ -32,17 +32,17 @@
 
 #define DG_OLD_CONVEXHULL_3D
 
-class dConvexHull3DVertex;
-class dgConvexHull3dAABBTreeNode;
+class dConvexHull3dVertex;
+class dConvexHull3dAABBTreeNode;
 
-class dConvexHull3DFace
+class dConvexHull3dFace
 {
 	public:
-	dConvexHull3DFace();
+	dConvexHull3dFace();
 	
 	void SetMark(dInt32 mark) {m_mark = mark;}
 	dInt32 GetMark() const {return m_mark;}
-	dList<dConvexHull3DFace>::dListNode* GetTwin(dInt32 index) const { return m_twin[index];}
+	dList<dConvexHull3dFace>::dListNode* GetTwin(dInt32 index) const { return m_twin[index];}
 
 	private:
 	dFloat64 Evalue (const dBigVector* const pointArray, const dBigVector& point) const;
@@ -52,12 +52,12 @@ class dConvexHull3DFace
 	dInt32 m_index[3]; 
 	private:
 	dInt32 m_mark;
-	dList<dConvexHull3DFace>::dListNode* m_twin[3];
+	dList<dConvexHull3dFace>::dListNode* m_twin[3];
 	friend class dConvexHull3d;
 };
 
 D_MSV_NEWTON_ALIGN_32
-class dConvexHull3d: public dClassAlloc, public dList<dConvexHull3DFace>
+class dConvexHull3d: public dClassAlloc, public dList<dConvexHull3dFace>
 {
 #ifdef	DG_OLD_CONVEXHULL_3D
 	class dNormalMap;
@@ -83,18 +83,18 @@ class dConvexHull3d: public dClassAlloc, public dList<dConvexHull3DFace>
 
 	virtual dListNode* AddFace (dInt32 i0, dInt32 i1, dInt32 i2);
 	virtual void DeleteFace (dListNode* const node) ;
-	virtual dInt32 InitVertexArray(dConvexHull3DVertex* const points, const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, void* const memoryPool, dInt32 maxMemSize);
+	virtual dInt32 InitVertexArray(dConvexHull3dVertex* const points, const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, void* const memoryPool, dInt32 maxMemSize);
 
-	bool CheckFlatSurface(dgConvexHull3dAABBTreeNode* vertexTree, dConvexHull3DVertex* const points, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount);
-	void CalculateConvexHull2d (dgConvexHull3dAABBTreeNode* vertexTree, dConvexHull3DVertex* const points, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount);
-	void CalculateConvexHull3d (dgConvexHull3dAABBTreeNode* vertexTree, dConvexHull3DVertex* const points, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount);
+	bool CheckFlatSurface(dConvexHull3dAABBTreeNode* vertexTree, dConvexHull3dVertex* const points, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount);
+	void CalculateConvexHull2d (dConvexHull3dAABBTreeNode* vertexTree, dConvexHull3dVertex* const points, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount);
+	void CalculateConvexHull3d (dConvexHull3dAABBTreeNode* vertexTree, dConvexHull3dVertex* const points, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount);
 	
-	dInt32 SupportVertex (dgConvexHull3dAABBTreeNode** const tree, const dConvexHull3DVertex* const points, const dBigVector& dir, const bool removeEntry = true) const;
+	dInt32 SupportVertex (dConvexHull3dAABBTreeNode** const tree, const dConvexHull3dVertex* const points, const dBigVector& dir, const bool removeEntry = true) const;
 	dFloat64 TetrahedrumVolume (const dBigVector& p0, const dBigVector& p1, const dBigVector& p2, const dBigVector& p3) const;
 
-	dInt32 GetUniquePoints(dConvexHull3DVertex* const points, const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, void* const memoryPool, dInt32 maxMemSize);
-	dgConvexHull3dAABBTreeNode* BuildTree (dgConvexHull3dAABBTreeNode* const parent, dConvexHull3DVertex* const points, dInt32 count, dInt32 baseIndex, dInt8** const memoryPool, dInt32& maxMemSize) const;
-	static dInt32 ConvexCompareVertex(const dConvexHull3DVertex* const A, const dConvexHull3DVertex* const B, void* const context);
+	dInt32 GetUniquePoints(dConvexHull3dVertex* const points, const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, void* const memoryPool, dInt32 maxMemSize);
+	dConvexHull3dAABBTreeNode* BuildTree (dConvexHull3dAABBTreeNode* const parent, dConvexHull3dVertex* const points, dInt32 count, dInt32 baseIndex, dInt8** const memoryPool, dInt32& maxMemSize) const;
+	static dInt32 ConvexCompareVertex(const dConvexHull3dVertex* const A, const dConvexHull3dVertex* const B, void* const context);
 	bool Sanity() const;
 	void Save (const char* const filename) const;
 

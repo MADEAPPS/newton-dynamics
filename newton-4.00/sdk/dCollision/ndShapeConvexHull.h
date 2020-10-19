@@ -29,7 +29,7 @@
 D_MSV_NEWTON_ALIGN_32
 class ndShapeConvexHull : public ndShapeConvex
 {
-	class dgConvexBox;
+	class ndConvexBox;
 	class dgSOAVectorArray;
 
 	public:
@@ -37,14 +37,17 @@ class ndShapeConvexHull : public ndShapeConvex
 	D_COLLISION_API virtual ~ndShapeConvexHull();
 
 	protected:
+	void CreateSOAdata();
+	dBigVector FaceNormal(const dEdge *face, const dBigVector* const pool) const;
+	bool RemoveCoplanarEdge(dPolyhedra& convex, const dBigVector* const hullVertexArray) const;
 	bool Create(dInt32 count, dInt32 strideInBytes, const dFloat32* const vertexArray, dFloat32 tolerance);
-
+	
 /*
 	dInt32 GetFaceIndices (dInt32 index, dInt32* const indices) const;
 	protected:
 	void BuildHull (dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray);
-	bool RemoveCoplanarEdge (dPolyhedra& convex, const dBigVector* const hullVertexArray) const;	
-	dBigVector FaceNormal (const dEdge *face, const dBigVector* const pool) const;
+	
+	
 	bool CheckConvex (dPolyhedra& polyhedra, const dBigVector* hullVertexArray) const;
 
 	virtual dVector SupportVertex (const dVector& dir, dInt32* const vertexIndex) const;
@@ -56,17 +59,19 @@ class ndShapeConvexHull : public ndShapeConvex
 
 	void MassProperties ();
 	virtual const ndConvexSimplexEdge** GetVertexToEdgeMapping() const {return m_vertexToEdgeMapping;}
-
-	void CreateSOAdata();
 	
-	dgConvexBox* m_supportTree;
+	
+	
+
+	
+*/
+	ndConvexBox* m_supportTree;
 	ndConvexSimplexEdge** m_faceArray;
 	dgSOAVectorArray* m_soaVertexArray;
 	const ndConvexSimplexEdge** m_vertexToEdgeMapping;
 	dInt32 m_faceCount;
 	dInt32 m_soaVertexCount;
 	dInt32 m_supportTreeCount;
-*/
 } D_GCC_NEWTON_ALIGN_32;
 
 #endif 

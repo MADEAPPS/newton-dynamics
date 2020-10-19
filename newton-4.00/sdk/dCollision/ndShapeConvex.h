@@ -70,8 +70,7 @@ class ndShapeConvex: public ndShape
 	virtual dInt32 GetConvexVertexCount() const { return m_vertexCount; }
 	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const
 	{
-		dAssert(0);
-		return SupportVertexSpecial(dir, skinThickness, vertexIndex);
+		return SupportVertex(dir, vertexIndex);
 	}
 
 	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const

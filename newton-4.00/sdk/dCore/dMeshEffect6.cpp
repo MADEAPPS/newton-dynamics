@@ -1938,7 +1938,7 @@ void dMeshEffect::SphericalMapping(dInt32 material, const dMatrix& uvAligment)
 				dFloat32 sinAngle = UVrefCos * dSin(uv.m_v) - UVrefSin * dCos(uv.m_v);
 				dFloat32 cosAngle = UVrefCos * dCos(uv.m_v) + UVrefSin * dSin(uv.m_v);
 				dFloat32 deltaAngle = dAtan2(sinAngle, cosAngle);
-				uv.m_v = (uvRef.m_v + deltaAngle) / dPi2;
+				uv.m_v = (uvRef.m_v + deltaAngle) / (dFloat32(2.0f) * dPi);
 				m_attrib.m_uv0Channel[dInt32(ptr->m_userData)] = uv;
 				ptr = ptr->m_next;
 			} while (ptr != edge);

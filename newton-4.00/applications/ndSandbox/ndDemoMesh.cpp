@@ -1247,11 +1247,12 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 
 		default:
 		{
-			dAssert(0);
+			int tex0 = LoadTexture(texture0);
 			//int tex0 = LoadTexture(texture0);
 			//int tex1 = LoadTexture(texture1);
 			//int tex2 = LoadTexture(texture2);
 			//NewtonMeshApplyBoxMapping(mesh, tex0, tex1, tex2, &aligmentUV[0][0]);
+			mesh.UniformBoxMapping(tex0, aligmentUV);
 		}
 	}
 
