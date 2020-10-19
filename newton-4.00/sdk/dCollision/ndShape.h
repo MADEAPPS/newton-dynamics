@@ -50,7 +50,7 @@ enum ndShapeID
 //	m_chamferCylinderCollision,
 	m_boxCollision,
 //	m_coneCollision,
-//	m_convexHullCollision,
+	m_convexHull,
 //	// this must be the last convex shape ID
 	m_nullCollision,
 

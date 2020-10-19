@@ -135,8 +135,6 @@ ndShapeCapsule::ndShapeCapsule(dFloat32 radio0, dFloat32 radio1, dFloat32 height
 
 void ndShapeCapsule::Init(dFloat32 radio0, dFloat32 radio1, dFloat32 height)
 {
-	//m_rtti |= dgCollisionCapsule_RTTI;
-
 	radio0 = dMax(dAbs(radio0), D_MIN_CONVEX_SHAPE_SIZE);
 	radio1 = dMax(dAbs(radio1), D_MIN_CONVEX_SHAPE_SIZE);
 	height = dMax(dAbs(height), D_MIN_CONVEX_SHAPE_SIZE);

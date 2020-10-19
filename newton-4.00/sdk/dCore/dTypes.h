@@ -331,7 +331,8 @@ D_INLINE dInt32 dBitReversal(dInt32 v, dInt32 base)
 {
 	dInt32 x = 0;
 	dInt32 power = dExp2 (base) - 1;
-	do {
+	do 
+	{
 		x += (v & 1) << power;
 		v >>= 1;
 		power--;

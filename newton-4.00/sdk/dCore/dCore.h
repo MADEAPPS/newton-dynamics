@@ -48,6 +48,7 @@
 #include <dThreadPool.h>
 #include <dQuaternion.h>
 #include <dMeshEffect.h>
+#include <dConvexHull3d.h>
 #include <dBezierSpline.h>
 #include <dNodeHierarchy.h>
 #include <dFixSizeBuffer.h>

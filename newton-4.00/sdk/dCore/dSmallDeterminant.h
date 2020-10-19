@@ -25,13 +25,13 @@
 #include "dCoreStdafx.h"
 #include "dTypes.h"
 
-class dgGoogol;
+class dGoogol;
 dFloat64 Determinant2x2 (const dFloat64 matrix[2][2], dFloat64* const error);
 dFloat64 Determinant3x3 (const dFloat64 matrix[3][3], dFloat64* const error);
 dFloat64 Determinant4x4 (const dFloat64 matrix[4][4], dFloat64* const error);
 
-dgGoogol Determinant2x2 (const dgGoogol matrix[2][2]);
-dgGoogol Determinant3x3 (const dgGoogol matrix[3][3]);
-dgGoogol Determinant4x4 (const dgGoogol matrix[4][4]);
+dGoogol Determinant2x2 (const dGoogol matrix[2][2]);
+dGoogol Determinant3x3 (const dGoogol matrix[3][3]);
+dGoogol Determinant4x4 (const dGoogol matrix[4][4]);
 
 #endif

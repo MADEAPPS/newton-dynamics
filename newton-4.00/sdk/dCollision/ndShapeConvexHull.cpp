@@ -56,46 +56,28 @@ class ndShapeConvexHull::dgConvexBox
 
 ndShapeConvexHull::ndShapeConvexHull(dgMemoryAllocator* const allocator, dUnsigned32 signature)
 	:dgCollisionConvex(allocator, signature, m_convexHullCollision)
-	,m_supportTree(NULL)
-	,m_faceArray(NULL)
-	,m_soaVertexArray(NULL)
-	,m_vertexToEdgeMapping(NULL)
+	,m_supportTree(nullptr)
+	,m_faceArray(nullptr)
+	,m_soaVertexArray(nullptr)
+	,m_vertexToEdgeMapping(nullptr)
 	,m_faceCount(0)
 	,m_soaVertexCount(0)
 	,m_supportTreeCount(0)
 {
 	m_edgeCount = 0;
 	m_vertexCount = 0;
-	m_vertex = NULL;
-	m_simplex = NULL;
+	m_vertex = nullptr;
+	m_simplex = nullptr;
 	m_rtti |= dgCollisionConvexHull_RTTI;
 }
 
-ndShapeConvexHull::ndShapeConvexHull(dgMemoryAllocator* const allocator, dUnsigned32 signature, dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray)
-	:dgCollisionConvex(allocator, signature, m_convexHullCollision)
-	,m_supportTree(NULL)
-	,m_faceArray(NULL)
-	,m_soaVertexArray(NULL)
-	,m_vertexToEdgeMapping(NULL)
-	,m_faceCount(0)
-	,m_soaVertexCount(0)
-	,m_supportTreeCount(0)
-{
-	m_edgeCount = 0;
-	m_vertexCount = 0;
-	m_vertex = NULL;
-	m_simplex = NULL;
-	m_rtti |= dgCollisionConvexHull_RTTI;
-
-	BuildHull (count, strideInBytes, tolerance, vertexArray);
-}
 
 ndShapeConvexHull::ndShapeConvexHull(dgWorld* const world, dgDeserialize callback, void* const userData, dInt32 revisionNumber)
 	:dgCollisionConvex (world, callback, userData, revisionNumber)
-	,m_supportTree(NULL)
-	,m_faceArray(NULL)
-	,m_soaVertexArray(NULL)
-	,m_vertexToEdgeMapping(NULL)
+	,m_supportTree(nullptr)
+	,m_faceArray(nullptr)
+	,m_soaVertexArray(nullptr)
+	,m_vertexToEdgeMapping(nullptr)
 	,m_faceCount(0)
 	,m_soaVertexCount(0)
 	,m_supportTreeCount(0)
@@ -153,24 +135,6 @@ ndShapeConvexHull::ndShapeConvexHull(dgWorld* const world, dgDeserialize callbac
 	SetVolumeAndCG ();
 }
 
-ndShapeConvexHull::~ndShapeConvexHull()
-{
-	if (m_vertexToEdgeMapping) {
-		m_allocator->Free(m_vertexToEdgeMapping);
-	}
-
-	if (m_faceArray) {
-		m_allocator->Free(m_faceArray);
-	}
-
-	if (m_supportTree) {
-		m_allocator->Free(m_supportTree);
-	}
-
-	if (m_soaVertexArray) {
-		m_allocator->Free(m_soaVertexArray);
-	}
-}
 
 void ndShapeConvexHull::Serialize(dgSerialize callback, void* const userData) const
 {
@@ -445,368 +409,6 @@ bool ndShapeConvexHull::CheckConvex (dPolyhedra& polyhedra1, const dBigVector* h
 	return true;
 }
 
-bool ndShapeConvexHull::Create (dInt32 count, dInt32 strideInBytes, const dFloat32* const vertexArray, dFloat32 tolerance)
-{
-	dInt32 stride = strideInBytes / sizeof (dFloat32);
-	dStack<dFloat64> buffer(3 * 2 * count);
-	for (dInt32 i = 0; i < count; i ++) {
-		buffer[i * 3 + 0] = vertexArray[i * stride + 0];
-		buffer[i * 3 + 1] = vertexArray[i * stride + 1];
-		buffer[i * 3 + 2] = vertexArray[i * stride + 2];
-	}
-
-	dConvexHull3d* convexHull =  new (GetAllocator()) dConvexHull3d (GetAllocator(), &buffer[0], 3 * sizeof (dFloat64), count, tolerance);
-	if (!convexHull->GetCount()) {
-		// this is a degenerated hull hull to add some thickness and for a thick plane
-		delete convexHull;
-
-		dStack<dVector> tmp(3 * count);
-		for (dInt32 i = 0; i < count; i ++) {
-			tmp[i][0] = dFloat32 (buffer[i*3 + 0]);
-			tmp[i][1] = dFloat32 (buffer[i*3 + 1]);
-			tmp[i][2] = dFloat32 (buffer[i*3 + 2]);
-			tmp[i][2] = dFloat32 (0.0f);
-		}
-	
-		dgObb sphere;
-		sphere.SetDimensions (&tmp[0][0], sizeof (dVector), count);
-
-		dInt32 index = 0;
-		dFloat32 size = dFloat32 (1.0e10f);
-		for (dInt32 i = 0; i < 3; i ++) {
-			if (sphere.m_size[i] < size) {
-				index = i;
-				size = sphere.m_size[i];
-			}
-		}
-		dVector normal (dFloat32 (0.0f));
-		normal[index] = dFloat32 (1.0f);
-		dVector step = sphere.RotateVector (normal.Scale (dFloat32 (0.05f)));
-		for (dInt32 i = 0; i < count; i ++) {
-			dVector p1 (tmp[i] + step);
-			dVector p2 (tmp[i] - step);
-
-			buffer[i * 3 + 0] = p1.m_x;
-			buffer[i * 3 + 1] = p1.m_y;
-			buffer[i * 3 + 2] = p1.m_z;
-			buffer[(i + count) * 3 + 0] = p2.m_x;
-			buffer[(i + count) * 3 + 1] = p2.m_y;
-			buffer[(i + count) * 3 + 2] = p2.m_z;
-		}
-		count *= 2;
-		convexHull =  new (GetAllocator()) dConvexHull3d (GetAllocator(), &buffer[0], 3 * sizeof (dFloat64), count, tolerance);
-		if (!convexHull->GetCount()) {
-			delete convexHull;
-			return false;
-		}
-	}
-
-	// check for degenerated faces
-	for (bool success = false; !success;  ) {
-		success = true;
-		const dBigVector* const hullVertexArray = convexHull->GetVertexPool();
-
-		dStack<dgInt8> mask(convexHull->GetVertexCount());
-		memset (&mask[0], 1, mask.GetSizeInBytes());
-		for (dConvexHull3d::dgListNode* node = convexHull->GetFirst(); node; node = node->GetNext()) {
-			dConvexHull3dFace& face = node->GetInfo();
-			const dBigVector& p0 = hullVertexArray[face.m_index[0]];
-			const dBigVector& p1 = hullVertexArray[face.m_index[1]];
-			const dBigVector& p2 = hullVertexArray[face.m_index[2]];
-			dAssert(p0.m_w == p1.m_w);
-			dAssert(p0.m_w == p2.m_w);
-			dBigVector p1p0 (p1 - p0);
-			dBigVector p2p0 (p2 - p0);
-			dBigVector normal (p2p0.CrossProduct(p1p0));
-			dFloat64 mag2 = normal.DotProduct(normal).GetScalar();
-			if (mag2 < dFloat64 (1.0e-6f * 1.0e-6f)) {
-				success = false;
-				dInt32 index = -1;
-				dBigVector p2p1 (p2 - p1);
-				dFloat64 dist10 = p1p0.DotProduct(p1p0).GetScalar();
-				dFloat64 dist20 = p2p0.DotProduct(p2p0).GetScalar();
-				dFloat64 dist21 = p2p1.DotProduct(p2p1).GetScalar();
-				if ((dist10 >= dist20) && (dist10 >= dist21)) {
-					index = 2;
-				} else if ((dist20 >= dist10) && (dist20 >= dist21)) {
-					index = 1;
-				} else if ((dist21 >= dist10) && (dist21 >= dist20)) {
-					index = 0;
-				}
-				dAssert (index != -1);
-				mask[face.m_index[index]] = 0;
-			}
-		}
-		if (!success) {
-			dInt32 count1 = 0;
-			dInt32 vertexCount = convexHull->GetVertexCount();
-			for (dInt32 i = 0; i < vertexCount; i ++) {
-				if (mask[i]) {
-					buffer[count1 * 3 + 0] = hullVertexArray[i].m_x;
-					buffer[count1 * 3 + 1] = hullVertexArray[i].m_y;
-					buffer[count1 * 3 + 2] = hullVertexArray[i].m_z;
-					count1 ++;
-				}
-			}
-			delete convexHull;
-			convexHull =  new (GetAllocator()) dConvexHull3d (GetAllocator(), &buffer[0], 3 * sizeof (dFloat64), count1, tolerance);
-		}
-	}
-
-	dAssert (convexHull);
-	dInt32 vertexCount = convexHull->GetVertexCount();
-	if (vertexCount < 4) {
-		delete convexHull;
-		return false;
-	}
-
-	const dBigVector* const hullVertexArray = convexHull->GetVertexPool();
-	dPolyhedra polyhedra (GetAllocator());
-	polyhedra.BeginFace();
-	for (dConvexHull3d::dgListNode* node = convexHull->GetFirst(); node; node = node->GetNext()) {
-		dConvexHull3dFace& face = node->GetInfo();
-		polyhedra.AddFace (face.m_index[0], face.m_index[1], face.m_index[2]);
-	}
-	polyhedra.EndFace();
-
-	if (vertexCount > 4) {
-		while (RemoveCoplanarEdge (polyhedra, hullVertexArray));
-	}
-
-	dStack<dInt32> vertexMap(vertexCount);
-	memset (&vertexMap[0], -1, vertexCount * sizeof (dInt32));
-
-	dInt32 mark = polyhedra.IncLRU();
-	dPolyhedra::Iterator iter (polyhedra);
-	for (iter.Begin(); iter; iter ++) {
-		dEdge* const edge = &iter.GetNode()->GetInfo();
-		if (edge->m_mark != mark) {
-			if (vertexMap[edge->m_incidentVertex] == -1) {
-				vertexMap[edge->m_incidentVertex] = m_vertexCount;
-				m_vertexCount ++;
-			}
-			dEdge* ptr = edge;
-			do {
-				ptr->m_mark = mark;
-				ptr->m_userData = m_edgeCount;
-				m_edgeCount ++;
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != edge) ;
-		}
-	} 
-
-	m_vertex = (dVector*) m_allocator->Malloc (dInt32 (m_vertexCount * sizeof (dVector)));
-	m_simplex = (ndConvexSimplexEdge*) m_allocator->Malloc (dInt32 (m_edgeCount * sizeof (ndConvexSimplexEdge)));
-	m_vertexToEdgeMapping = (const ndConvexSimplexEdge**) m_allocator->Malloc (dInt32 (m_vertexCount * sizeof (ndConvexSimplexEdge*)));
-
-	for (dInt32 i = 0; i < vertexCount; i ++) {
-		if (vertexMap[i] != -1) {
-			m_vertex[vertexMap[i]] = hullVertexArray[i];
-			m_vertex[vertexMap[i]].m_w = dFloat32 (0.0f);
-		}
-	}
-	delete convexHull;
-
-	vertexCount = m_vertexCount;
-	mark = polyhedra.IncLRU();;
-	for (iter.Begin(); iter; iter ++) {
-		dEdge* const edge = &iter.GetNode()->GetInfo();
-		if (edge->m_mark != mark) {
-			dEdge *ptr = edge;
-			do {
-				ptr->m_mark = mark;
-				ndConvexSimplexEdge* const simplexPtr = &m_simplex[ptr->m_userData];
-				simplexPtr->m_vertex = vertexMap[ptr->m_incidentVertex];
-				simplexPtr->m_next = &m_simplex[ptr->m_next->m_userData];
-				simplexPtr->m_prev = &m_simplex[ptr->m_prev->m_userData];
-				simplexPtr->m_twin = &m_simplex[ptr->m_twin->m_userData];
-
-				ptr = ptr->m_twin->m_next;
-			} while (ptr != edge) ;
-		}
-	} 
-
-	
-	m_faceCount = 0;
-	dStack<char> faceMarks (m_edgeCount);
-	memset (&faceMarks[0], 0, m_edgeCount * sizeof (dgInt8));
-
-	dStack<ndConvexSimplexEdge*> faceArray (m_edgeCount);
-	for (dInt32 i = 0; i < m_edgeCount; i ++) {
-		ndConvexSimplexEdge* const face = &m_simplex[i];
-		if (!faceMarks[i]) {
-			ndConvexSimplexEdge* ptr = face;
-			do {
-				dAssert ((ptr - m_simplex) >= 0);
-				faceMarks[dInt32 (ptr - m_simplex)] = '1';
-				ptr = ptr->m_next;
-			} while (ptr != face);
-
-			faceArray[m_faceCount] = face;
-			m_faceCount ++;
-		}
-	}
-	m_faceArray = (ndConvexSimplexEdge **) m_allocator->Malloc(dInt32 (m_faceCount * sizeof(ndConvexSimplexEdge *)));
-	memcpy (m_faceArray, &faceArray[0], m_faceCount * sizeof(ndConvexSimplexEdge *));
-	
-	if (vertexCount > D_CONVEX_VERTEX_SPLITE_SIZE) {
-		// create a face structure for support vertex
-			dStack<dgConvexBox> boxTree (vertexCount);
-		dTree<dVector,dInt32> sortTree(GetAllocator());
-		dStack<dTree<dVector,dInt32>::dTreeNode*> vertexNodeList(vertexCount);
-
-		dVector boxP0 ( dFloat32 (1.0e15f)); 
-		dVector boxP1 (-dFloat32 (1.0e15f));
-		for (dInt32 i = 0; i < vertexCount; i ++) {
-			const dVector& p = m_vertex[i];
-			vertexNodeList[i] = sortTree.Insert (p, i);
-			boxP0 = boxP0.GetMin(p);
-			boxP1 = boxP1.GetMax(p);
-		}
-
-		boxTree[0].m_box[0] = boxP0 & dVector::m_triplexMask;
-		boxTree[0].m_box[1] = boxP1 & dVector::m_triplexMask;
-		boxTree[0].m_leftBox = -1;
-		boxTree[0].m_rightBox = -1;
-		boxTree[0].m_vertexStart = 0;
-		boxTree[0].m_vertexCount = vertexCount;
-		dInt32 boxCount = 1;
-
-		dInt32 stack = 1;
-		dInt32 stackBoxPool[64];
-		stackBoxPool[0] = 0;
-
-		while (stack) {
-			stack --;
-			dInt32 boxIndex = stackBoxPool[stack];
-			dgConvexBox& box = boxTree[boxIndex];
-			if (box.m_vertexCount > D_CONVEX_VERTEX_BOX_CELL_SIZE) {
-				dVector median (dFloat32 (0.0f));
-				dVector varian (dFloat32 (0.0f));
-				for (dInt32 i = 0; i < box.m_vertexCount; i ++) {
-					dVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
-					boxP0 = boxP0.GetMin(p);
-					boxP1 = boxP1.GetMax(p);
-					median += p;
-					varian += p * p;
-				}
-
-				varian = varian.Scale (dFloat32 (box.m_vertexCount)) - median * median;
-				dInt32 index = 0;
-				dFloat64 maxVarian = dFloat64 (-1.0e10f);
-				for (dInt32 i = 0; i < 3; i ++) {
-					if (varian[i] > maxVarian) {
-						index = i;
-						maxVarian = varian[i];
-					}
-				}
-				dVector center = median.Scale (dFloat32 (1.0f) / dFloat32 (box.m_vertexCount));
-				dFloat32 test = center[index];
-
-				dInt32 i0 = 0;
-				dInt32 i1 = box.m_vertexCount - 1;
-				do {    
-					for (; i0 <= i1; i0 ++) {
-						dFloat32 val = vertexNodeList[box.m_vertexStart + i0]->GetInfo()[index];
-						if (val > test) {
-							break;
-						}
-					}
-
-					for (; i1 >= i0; i1 --) {
-						dFloat32 val = vertexNodeList[box.m_vertexStart + i1]->GetInfo()[index];
-						if (val < test) {
-							break;
-						}
-					}
-
-					if (i0 < i1)	{
-						dgSwap(vertexNodeList[box.m_vertexStart + i0], vertexNodeList[box.m_vertexStart + i1]);
-						i0++; 
-						i1--;
-					}
-				} while (i0 <= i1);
-
-				if (i0 == 0){
-					i0 = box.m_vertexCount / 2;
-				}
-				if (i0 >= (box.m_vertexCount - 1)){
-					i0 = box.m_vertexCount / 2;
-				}
-
-				{
-					// insert right branch AABB
-					dVector rightBoxP0 ( dFloat32 (1.0e15f)); 
-					dVector rightBoxP1 (-dFloat32 (1.0e15f)); 	
-					for (dInt32 i = i0; i < box.m_vertexCount; i ++) {
-						const dVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
-						rightBoxP0 = rightBoxP0.GetMin(p);
-						rightBoxP1 = rightBoxP1.GetMax(p);
-					}
-
-					box.m_rightBox = boxCount;
-					boxTree[boxCount].m_box[0] = rightBoxP0 & dVector::m_triplexMask;
-					boxTree[boxCount].m_box[1] = rightBoxP1 & dVector::m_triplexMask;
-					boxTree[boxCount].m_leftBox = -1;
-					boxTree[boxCount].m_rightBox = -1;
-					boxTree[boxCount].m_vertexStart = box.m_vertexStart + i0;
-					boxTree[boxCount].m_vertexCount = box.m_vertexCount - i0;
-					stackBoxPool[stack] = boxCount;
-					stack ++;
-					boxCount ++;
-				}
-
-				{
-					// insert left branch AABB
-					dVector leftBoxP0 ( dFloat32 (1.0e15f));
-					dVector leftBoxP1 (-dFloat32 (1.0e15f));
-					for (dInt32 i = 0; i < i0; i ++) {
-						const dVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
-						leftBoxP0 = leftBoxP0.GetMin(p);
-						leftBoxP1 = leftBoxP1.GetMax(p);
-					}
-
-					box.m_leftBox = boxCount;
-					boxTree[boxCount].m_box[0] = leftBoxP0 & dVector::m_triplexMask;;
-					boxTree[boxCount].m_box[1] = leftBoxP1 & dVector::m_triplexMask;;
-					boxTree[boxCount].m_leftBox = -1;
-					boxTree[boxCount].m_rightBox = -1;
-					boxTree[boxCount].m_vertexStart = box.m_vertexStart;
-					boxTree[boxCount].m_vertexCount = i0;
-					stackBoxPool[stack] = boxCount;
-					stack ++;
-					boxCount ++;
-				}
-			}
-		}
-
-		for (dInt32 i = 0; i < m_vertexCount; i ++) {
-			m_vertex[i] = vertexNodeList[i]->GetInfo();
-			vertexNodeList[i]->GetInfo().m_w = dFloat32 (i);
-		}
-
-		m_supportTreeCount = boxCount;
-		m_supportTree = (dgConvexBox*) m_allocator->Malloc(dInt32 (boxCount * sizeof(dgConvexBox)));		
-		memcpy (m_supportTree, &boxTree[0], boxCount * sizeof(dgConvexBox));
-
-		for (dInt32 i = 0; i < m_edgeCount; i ++) {
-			ndConvexSimplexEdge* const ptr = &m_simplex[i];
-			dTree<dVector,dInt32>::dTreeNode* const node = sortTree.Find(ptr->m_vertex);
-			dInt32 index = dInt32 (node->GetInfo().m_w);
-			ptr->m_vertex = dgInt16 (index);
-		}
-	} else {
-		CreateSOAdata();
-	}
-
-	for (dInt32 i = 0; i < m_edgeCount; i ++) {
-		ndConvexSimplexEdge* const edge = &m_simplex[i];
-		m_vertexToEdgeMapping[edge->m_vertex] = edge;
-	}
-
-	SetVolumeAndCG ();
-	return true;
-}
 
 dInt32 ndShapeConvexHull::CalculateSignature (dInt32 vertexCount, const dFloat32* const vertexArray, dInt32 strideInBytes)
 {
@@ -1043,3 +645,412 @@ dVector ndShapeConvexHull::SupportVertex(const dVector& dir, dInt32* const verte
 }
 
 #endif
+
+
+//ndShapeConvexHull::ndShapeConvexHull(dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray)
+ndShapeConvexHull::ndShapeConvexHull (dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray)
+	:ndShapeConvex(m_convexHull)
+	//,m_supportTree(nullptr)
+	//,m_faceArray(nullptr)
+	//,m_soaVertexArray(nullptr)
+	//,m_vertexToEdgeMapping(nullptr)
+	//,m_faceCount(0)
+	//,m_soaVertexCount(0)
+	//,m_supportTreeCount(0)
+{
+	m_edgeCount = 0;
+	m_vertexCount = 0;
+	m_vertex = nullptr;
+	m_simplex = nullptr;
+	//BuildHull(count, strideInBytes, tolerance, vertexArray);
+	Create(count, strideInBytes, vertexArray, tolerance);
+}
+
+ndShapeConvexHull::~ndShapeConvexHull()
+{
+	dAssert(0);
+	//if (m_vertexToEdgeMapping) {
+	//	m_allocator->Free(m_vertexToEdgeMapping);
+	//}
+	//
+	//if (m_faceArray) {
+	//	m_allocator->Free(m_faceArray);
+	//}
+	//
+	//if (m_supportTree) {
+	//	m_allocator->Free(m_supportTree);
+	//}
+	//
+	//if (m_soaVertexArray) {
+	//	m_allocator->Free(m_soaVertexArray);
+	//}
+}
+
+bool ndShapeConvexHull::Create(dInt32 count, dInt32 strideInBytes, const dFloat32* const vertexArray, dFloat32 tolerance)
+{
+	dInt32 stride = strideInBytes / sizeof(dFloat32);
+	//dStack<dFloat64> buffer(3 * 2 * count);
+	dBigVector* const buffer = dAlloca(dBigVector, 2 * count);
+	for (dInt32 i = 0; i < count; i++) 
+	{
+		buffer[i] = dVector(vertexArray[i * stride + 0], vertexArray[i * stride + 1], vertexArray[i * stride + 2], dFloat32(0.0f));
+	}
+
+	dConvexHull3d* convexHull = new dConvexHull3d(&buffer[0].m_x, sizeof (dBigVector), count, tolerance);
+	dAssert(0);
+#if 0
+	if (!convexHull->GetCount()) {
+		// this is a degenerated hull hull to add some thickness and for a thick plane
+		delete convexHull;
+
+		dStack<dVector> tmp(3 * count);
+		for (dInt32 i = 0; i < count; i++) {
+			tmp[i][0] = dFloat32(buffer[i * 3 + 0]);
+			tmp[i][1] = dFloat32(buffer[i * 3 + 1]);
+			tmp[i][2] = dFloat32(buffer[i * 3 + 2]);
+			tmp[i][2] = dFloat32(0.0f);
+		}
+
+		dgObb sphere;
+		sphere.SetDimensions(&tmp[0][0], sizeof(dVector), count);
+
+		dInt32 index = 0;
+		dFloat32 size = dFloat32(1.0e10f);
+		for (dInt32 i = 0; i < 3; i++) {
+			if (sphere.m_size[i] < size) {
+				index = i;
+				size = sphere.m_size[i];
+			}
+		}
+		dVector normal(dFloat32(0.0f));
+		normal[index] = dFloat32(1.0f);
+		dVector step = sphere.RotateVector(normal.Scale(dFloat32(0.05f)));
+		for (dInt32 i = 0; i < count; i++) {
+			dVector p1(tmp[i] + step);
+			dVector p2(tmp[i] - step);
+
+			buffer[i * 3 + 0] = p1.m_x;
+			buffer[i * 3 + 1] = p1.m_y;
+			buffer[i * 3 + 2] = p1.m_z;
+			buffer[(i + count) * 3 + 0] = p2.m_x;
+			buffer[(i + count) * 3 + 1] = p2.m_y;
+			buffer[(i + count) * 3 + 2] = p2.m_z;
+		}
+		count *= 2;
+		convexHull = new (GetAllocator()) dConvexHull3d(GetAllocator(), &buffer[0], 3 * sizeof(dFloat64), count, tolerance);
+		if (!convexHull->GetCount()) {
+			delete convexHull;
+			return false;
+		}
+	}
+
+	// check for degenerated faces
+	for (bool success = false; !success; ) {
+		success = true;
+		const dBigVector* const hullVertexArray = convexHull->GetVertexPool();
+
+		dStack<dgInt8> mask(convexHull->GetVertexCount());
+		memset(&mask[0], 1, mask.GetSizeInBytes());
+		for (dConvexHull3d::dgListNode* node = convexHull->GetFirst(); node; node = node->GetNext()) {
+			dConvexHull3dFace& face = node->GetInfo();
+			const dBigVector& p0 = hullVertexArray[face.m_index[0]];
+			const dBigVector& p1 = hullVertexArray[face.m_index[1]];
+			const dBigVector& p2 = hullVertexArray[face.m_index[2]];
+			dAssert(p0.m_w == p1.m_w);
+			dAssert(p0.m_w == p2.m_w);
+			dBigVector p1p0(p1 - p0);
+			dBigVector p2p0(p2 - p0);
+			dBigVector normal(p2p0.CrossProduct(p1p0));
+			dFloat64 mag2 = normal.DotProduct(normal).GetScalar();
+			if (mag2 < dFloat64(1.0e-6f * 1.0e-6f)) {
+				success = false;
+				dInt32 index = -1;
+				dBigVector p2p1(p2 - p1);
+				dFloat64 dist10 = p1p0.DotProduct(p1p0).GetScalar();
+				dFloat64 dist20 = p2p0.DotProduct(p2p0).GetScalar();
+				dFloat64 dist21 = p2p1.DotProduct(p2p1).GetScalar();
+				if ((dist10 >= dist20) && (dist10 >= dist21)) {
+					index = 2;
+				}
+				else if ((dist20 >= dist10) && (dist20 >= dist21)) {
+					index = 1;
+				}
+				else if ((dist21 >= dist10) && (dist21 >= dist20)) {
+					index = 0;
+				}
+				dAssert(index != -1);
+				mask[face.m_index[index]] = 0;
+			}
+		}
+		if (!success) {
+			dInt32 count1 = 0;
+			dInt32 vertexCount = convexHull->GetVertexCount();
+			for (dInt32 i = 0; i < vertexCount; i++) {
+				if (mask[i]) {
+					buffer[count1 * 3 + 0] = hullVertexArray[i].m_x;
+					buffer[count1 * 3 + 1] = hullVertexArray[i].m_y;
+					buffer[count1 * 3 + 2] = hullVertexArray[i].m_z;
+					count1++;
+				}
+			}
+			delete convexHull;
+			convexHull = new (GetAllocator()) dConvexHull3d(GetAllocator(), &buffer[0], 3 * sizeof(dFloat64), count1, tolerance);
+		}
+	}
+
+	dAssert(convexHull);
+	dInt32 vertexCount = convexHull->GetVertexCount();
+	if (vertexCount < 4) {
+		delete convexHull;
+		return false;
+	}
+
+	const dBigVector* const hullVertexArray = convexHull->GetVertexPool();
+	dPolyhedra polyhedra(GetAllocator());
+	polyhedra.BeginFace();
+	for (dConvexHull3d::dgListNode* node = convexHull->GetFirst(); node; node = node->GetNext()) {
+		dConvexHull3dFace& face = node->GetInfo();
+		polyhedra.AddFace(face.m_index[0], face.m_index[1], face.m_index[2]);
+	}
+	polyhedra.EndFace();
+
+	if (vertexCount > 4) {
+		while (RemoveCoplanarEdge(polyhedra, hullVertexArray));
+	}
+
+	dStack<dInt32> vertexMap(vertexCount);
+	memset(&vertexMap[0], -1, vertexCount * sizeof(dInt32));
+
+	dInt32 mark = polyhedra.IncLRU();
+	dPolyhedra::Iterator iter(polyhedra);
+	for (iter.Begin(); iter; iter++) {
+		dEdge* const edge = &iter.GetNode()->GetInfo();
+		if (edge->m_mark != mark) {
+			if (vertexMap[edge->m_incidentVertex] == -1) {
+				vertexMap[edge->m_incidentVertex] = m_vertexCount;
+				m_vertexCount++;
+			}
+			dEdge* ptr = edge;
+			do {
+				ptr->m_mark = mark;
+				ptr->m_userData = m_edgeCount;
+				m_edgeCount++;
+				ptr = ptr->m_twin->m_next;
+			} while (ptr != edge);
+		}
+	}
+
+	m_vertex = (dVector*)m_allocator->Malloc(dInt32(m_vertexCount * sizeof(dVector)));
+	m_simplex = (ndConvexSimplexEdge*)m_allocator->Malloc(dInt32(m_edgeCount * sizeof(ndConvexSimplexEdge)));
+	m_vertexToEdgeMapping = (const ndConvexSimplexEdge**)m_allocator->Malloc(dInt32(m_vertexCount * sizeof(ndConvexSimplexEdge*)));
+
+	for (dInt32 i = 0; i < vertexCount; i++) {
+		if (vertexMap[i] != -1) {
+			m_vertex[vertexMap[i]] = hullVertexArray[i];
+			m_vertex[vertexMap[i]].m_w = dFloat32(0.0f);
+		}
+	}
+	delete convexHull;
+
+	vertexCount = m_vertexCount;
+	mark = polyhedra.IncLRU();;
+	for (iter.Begin(); iter; iter++) {
+		dEdge* const edge = &iter.GetNode()->GetInfo();
+		if (edge->m_mark != mark) {
+			dEdge *ptr = edge;
+			do {
+				ptr->m_mark = mark;
+				ndConvexSimplexEdge* const simplexPtr = &m_simplex[ptr->m_userData];
+				simplexPtr->m_vertex = vertexMap[ptr->m_incidentVertex];
+				simplexPtr->m_next = &m_simplex[ptr->m_next->m_userData];
+				simplexPtr->m_prev = &m_simplex[ptr->m_prev->m_userData];
+				simplexPtr->m_twin = &m_simplex[ptr->m_twin->m_userData];
+
+				ptr = ptr->m_twin->m_next;
+			} while (ptr != edge);
+		}
+	}
+
+
+	m_faceCount = 0;
+	dStack<char> faceMarks(m_edgeCount);
+	memset(&faceMarks[0], 0, m_edgeCount * sizeof(dgInt8));
+
+	dStack<ndConvexSimplexEdge*> faceArray(m_edgeCount);
+	for (dInt32 i = 0; i < m_edgeCount; i++) {
+		ndConvexSimplexEdge* const face = &m_simplex[i];
+		if (!faceMarks[i]) {
+			ndConvexSimplexEdge* ptr = face;
+			do {
+				dAssert((ptr - m_simplex) >= 0);
+				faceMarks[dInt32(ptr - m_simplex)] = '1';
+				ptr = ptr->m_next;
+			} while (ptr != face);
+
+			faceArray[m_faceCount] = face;
+			m_faceCount++;
+		}
+	}
+	m_faceArray = (ndConvexSimplexEdge **)m_allocator->Malloc(dInt32(m_faceCount * sizeof(ndConvexSimplexEdge *)));
+	memcpy(m_faceArray, &faceArray[0], m_faceCount * sizeof(ndConvexSimplexEdge *));
+
+	if (vertexCount > D_CONVEX_VERTEX_SPLITE_SIZE) {
+		// create a face structure for support vertex
+		dStack<dgConvexBox> boxTree(vertexCount);
+		dTree<dVector, dInt32> sortTree(GetAllocator());
+		dStack<dTree<dVector, dInt32>::dTreeNode*> vertexNodeList(vertexCount);
+
+		dVector boxP0(dFloat32(1.0e15f));
+		dVector boxP1(-dFloat32(1.0e15f));
+		for (dInt32 i = 0; i < vertexCount; i++) {
+			const dVector& p = m_vertex[i];
+			vertexNodeList[i] = sortTree.Insert(p, i);
+			boxP0 = boxP0.GetMin(p);
+			boxP1 = boxP1.GetMax(p);
+		}
+
+		boxTree[0].m_box[0] = boxP0 & dVector::m_triplexMask;
+		boxTree[0].m_box[1] = boxP1 & dVector::m_triplexMask;
+		boxTree[0].m_leftBox = -1;
+		boxTree[0].m_rightBox = -1;
+		boxTree[0].m_vertexStart = 0;
+		boxTree[0].m_vertexCount = vertexCount;
+		dInt32 boxCount = 1;
+
+		dInt32 stack = 1;
+		dInt32 stackBoxPool[64];
+		stackBoxPool[0] = 0;
+
+		while (stack) {
+			stack--;
+			dInt32 boxIndex = stackBoxPool[stack];
+			dgConvexBox& box = boxTree[boxIndex];
+			if (box.m_vertexCount > D_CONVEX_VERTEX_BOX_CELL_SIZE) {
+				dVector median(dFloat32(0.0f));
+				dVector varian(dFloat32(0.0f));
+				for (dInt32 i = 0; i < box.m_vertexCount; i++) {
+					dVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
+					boxP0 = boxP0.GetMin(p);
+					boxP1 = boxP1.GetMax(p);
+					median += p;
+					varian += p * p;
+				}
+
+				varian = varian.Scale(dFloat32(box.m_vertexCount)) - median * median;
+				dInt32 index = 0;
+				dFloat64 maxVarian = dFloat64(-1.0e10f);
+				for (dInt32 i = 0; i < 3; i++) {
+					if (varian[i] > maxVarian) {
+						index = i;
+						maxVarian = varian[i];
+					}
+				}
+				dVector center = median.Scale(dFloat32(1.0f) / dFloat32(box.m_vertexCount));
+				dFloat32 test = center[index];
+
+				dInt32 i0 = 0;
+				dInt32 i1 = box.m_vertexCount - 1;
+				do {
+					for (; i0 <= i1; i0++) {
+						dFloat32 val = vertexNodeList[box.m_vertexStart + i0]->GetInfo()[index];
+						if (val > test) {
+							break;
+						}
+					}
+
+					for (; i1 >= i0; i1--) {
+						dFloat32 val = vertexNodeList[box.m_vertexStart + i1]->GetInfo()[index];
+						if (val < test) {
+							break;
+						}
+					}
+
+					if (i0 < i1) {
+						dgSwap(vertexNodeList[box.m_vertexStart + i0], vertexNodeList[box.m_vertexStart + i1]);
+						i0++;
+						i1--;
+					}
+				} while (i0 <= i1);
+
+				if (i0 == 0) {
+					i0 = box.m_vertexCount / 2;
+				}
+				if (i0 >= (box.m_vertexCount - 1)) {
+					i0 = box.m_vertexCount / 2;
+				}
+
+				{
+					// insert right branch AABB
+					dVector rightBoxP0(dFloat32(1.0e15f));
+					dVector rightBoxP1(-dFloat32(1.0e15f));
+					for (dInt32 i = i0; i < box.m_vertexCount; i++) {
+						const dVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
+						rightBoxP0 = rightBoxP0.GetMin(p);
+						rightBoxP1 = rightBoxP1.GetMax(p);
+					}
+
+					box.m_rightBox = boxCount;
+					boxTree[boxCount].m_box[0] = rightBoxP0 & dVector::m_triplexMask;
+					boxTree[boxCount].m_box[1] = rightBoxP1 & dVector::m_triplexMask;
+					boxTree[boxCount].m_leftBox = -1;
+					boxTree[boxCount].m_rightBox = -1;
+					boxTree[boxCount].m_vertexStart = box.m_vertexStart + i0;
+					boxTree[boxCount].m_vertexCount = box.m_vertexCount - i0;
+					stackBoxPool[stack] = boxCount;
+					stack++;
+					boxCount++;
+				}
+
+				{
+					// insert left branch AABB
+					dVector leftBoxP0(dFloat32(1.0e15f));
+					dVector leftBoxP1(-dFloat32(1.0e15f));
+					for (dInt32 i = 0; i < i0; i++) {
+						const dVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
+						leftBoxP0 = leftBoxP0.GetMin(p);
+						leftBoxP1 = leftBoxP1.GetMax(p);
+					}
+
+					box.m_leftBox = boxCount;
+					boxTree[boxCount].m_box[0] = leftBoxP0 & dVector::m_triplexMask;;
+					boxTree[boxCount].m_box[1] = leftBoxP1 & dVector::m_triplexMask;;
+					boxTree[boxCount].m_leftBox = -1;
+					boxTree[boxCount].m_rightBox = -1;
+					boxTree[boxCount].m_vertexStart = box.m_vertexStart;
+					boxTree[boxCount].m_vertexCount = i0;
+					stackBoxPool[stack] = boxCount;
+					stack++;
+					boxCount++;
+				}
+			}
+		}
+
+		for (dInt32 i = 0; i < m_vertexCount; i++) {
+			m_vertex[i] = vertexNodeList[i]->GetInfo();
+			vertexNodeList[i]->GetInfo().m_w = dFloat32(i);
+		}
+
+		m_supportTreeCount = boxCount;
+		m_supportTree = (dgConvexBox*)m_allocator->Malloc(dInt32(boxCount * sizeof(dgConvexBox)));
+		memcpy(m_supportTree, &boxTree[0], boxCount * sizeof(dgConvexBox));
+
+		for (dInt32 i = 0; i < m_edgeCount; i++) {
+			ndConvexSimplexEdge* const ptr = &m_simplex[i];
+			dTree<dVector, dInt32>::dTreeNode* const node = sortTree.Find(ptr->m_vertex);
+			dInt32 index = dInt32(node->GetInfo().m_w);
+			ptr->m_vertex = dInt16(index);
+		}
+	}
+	else {
+		CreateSOAdata();
+	}
+
+	for (dInt32 i = 0; i < m_edgeCount; i++) {
+		ndConvexSimplexEdge* const edge = &m_simplex[i];
+		m_vertexToEdgeMapping[edge->m_vertex] = edge;
+	}
+
+	SetVolumeAndCG();
+#endif
+	return true;
+}

@@ -256,14 +256,35 @@ static void AddCapsule(ndDemoEntityManager* const scene, const dVector& origin)
 
 static void AddBox(ndDemoEntityManager* const scene, const dVector& origin)
 {
-	//ndShapeInstance shape(new ndShapeBox(1.0f, 2.0f, 0.5f));
-	ndShapeInstance shape(new ndShapeBox(1.0f, 1.0f, 1.0f));
-
+	ndShapeInstance shape(new ndShapeBox(1.0f, 2.0f, 0.7f));
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
 
 	AddShape(scene, matrix, shape, 10.0f, 0.9f);
 }
+
+static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origin)
+{
+	dVector points[1024];
+	const dInt32 pointCount = 10;
+	for (dInt32 i = 0; i < pointCount; i++)
+	{
+		dFloat32 y = dCos(dPi2 * i / 10.0f);
+		dFloat32 z = dCos(dPi2 * i / 10.0f);
+		points[i * 4 + 0] = dVector(-0.5f, 0.7f * y, 0.7f* z, 0.0f);
+		points[i * 4 + 1] = dVector( 0.5f, 0.7f * y, 0.7f* z, 0.0f);
+		points[i * 4 + 2] = dVector(0.25f, y, z, 0.0f);
+		points[i * 4 + 2] = dVector(-0.25f, y, z, 0.0f);
+	}
+
+	ndShapeInstance shape(new ndShapeBox(1.0f, 2.0f, 0.7f));
+	//ndShapeInstance shape(new ndShapeConvexHull(4 * pointCount, sizeof (dVector), 0.0f, &points[0].m_x));
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+
+	AddShape(scene, matrix, shape, 10.0f, 0.8f);
+}
+
 
 void ndBasicTrigger (ndDemoEntityManager* const scene)
 {
@@ -276,6 +297,7 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 	AddBox(scene, dVector(0.0f, 0.0f, -3.0f, 1.0f));
 	AddSphere(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f));
 	AddCapsule(scene, dVector(0.0f, 0.0f, 3.0f, 1.0f));
+	AddConvexHull(scene, dVector(-2.0f, 0.0f, -2.0f, 1.0f));
 
 	dQuaternion rot;
 	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);

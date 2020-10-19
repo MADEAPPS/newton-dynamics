@@ -36,13 +36,13 @@ class ndShapeConvexHull : public ndShapeConvex
 	D_COLLISION_API ndShapeConvexHull(dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray);
 	D_COLLISION_API virtual ~ndShapeConvexHull();
 
+	protected:
+	bool Create(dInt32 count, dInt32 strideInBytes, const dFloat32* const vertexArray, dFloat32 tolerance);
+
 /*
 	dInt32 GetFaceIndices (dInt32 index, dInt32* const indices) const;
-
 	protected:
 	void BuildHull (dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray);
-	bool Create (dInt32 count, dInt32 strideInBytes, const dFloat32* const vertexArray, dFloat32 tolerance);
-
 	bool RemoveCoplanarEdge (dPolyhedra& convex, const dBigVector* const hullVertexArray) const;	
 	dBigVector FaceNormal (const dEdge *face, const dBigVector* const pool) const;
 	bool CheckConvex (dPolyhedra& polyhedra, const dBigVector* hullVertexArray) const;
