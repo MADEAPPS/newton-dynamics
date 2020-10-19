@@ -270,8 +270,8 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origi
 	dInt32 count = 0;
 	for (dInt32 i = 0; i < pointCount; i++)
 	{
-		dFloat32 y = dCos((dFloat32(2.0f) * dPi) * i / pointCount);
-		dFloat32 z = dSin((dFloat32(2.0f) * dPi) * i / pointCount);
+		dFloat32 y = 0.7f * dCos((dFloat32(2.0f) * dPi) * i / pointCount);
+		dFloat32 z = 0.7f * dSin((dFloat32(2.0f) * dPi) * i / pointCount);
 		points[count++] = dVector(-0.5f, 0.7f * y, 0.7f* z, 0.0f);
 		points[count++] = dVector( 0.5f, 0.7f * y, 0.7f* z, 0.0f);
 		points[count++] = dVector(0.25f, y, z, 0.0f);

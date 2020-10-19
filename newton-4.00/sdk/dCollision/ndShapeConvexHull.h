@@ -41,6 +41,7 @@ class ndShapeConvexHull : public ndShapeConvex
 	dBigVector FaceNormal(const dEdge *face, const dBigVector* const pool) const;
 	bool RemoveCoplanarEdge(dPolyhedra& convex, const dBigVector* const hullVertexArray) const;
 	bool Create(dInt32 count, dInt32 strideInBytes, const dFloat32* const vertexArray, dFloat32 tolerance);
+	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 	
 /*
 	dInt32 GetFaceIndices (dInt32 index, dInt32* const indices) const;
@@ -50,7 +51,7 @@ class ndShapeConvexHull : public ndShapeConvex
 	
 	bool CheckConvex (dPolyhedra& polyhedra, const dBigVector* hullVertexArray) const;
 
-	virtual dVector SupportVertex (const dVector& dir, dInt32* const vertexIndex) const;
+	
 
 	virtual dInt32 CalculateSignature () const;
 	virtual void SetCollisionBBox (const dVector& p0, const dVector& p1);

@@ -103,8 +103,8 @@ ndShapeConvexHull::ndShapeConvexHull(dgWorld* const world, dgDeserialize callbac
 	callback(userData, m_vertex, m_vertexCount * sizeof(dVector));
 
 	if (m_supportTreeCount) {
-		m_supportTree = (dgConvexBox *) m_allocator->Malloc(dInt32 (m_supportTreeCount * sizeof(dgConvexBox)));
-		callback (userData, m_supportTree, m_supportTreeCount * sizeof(dgConvexBox));
+		m_supportTree = (ndConvexBox *) m_allocator->Malloc(dInt32 (m_supportTreeCount * sizeof(ndConvexBox)));
+		callback (userData, m_supportTree, m_supportTreeCount * sizeof(ndConvexBox));
 	}
 
 	for (dInt32 i = 0; i < m_edgeCount; i ++) {
@@ -150,7 +150,7 @@ void ndShapeConvexHull::Serialize(dgSerialize callback, void* const userData) co
 	callback(userData, m_vertex, m_vertexCount * sizeof(dVector));
 
 	if (m_supportTreeCount) {
-		callback(userData, m_supportTree, m_supportTreeCount * sizeof(dgConvexBox));
+		callback(userData, m_supportTree, m_supportTreeCount * sizeof(ndConvexBox));
 	}
 
 	for (dInt32 i = 0; i < m_edgeCount; i++) {
@@ -312,147 +312,6 @@ void ndShapeConvexHull::GetCollisionInfo(dgCollisionInfo* const info) const
 }
 
 
-dVector ndShapeConvexHull::SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
-{
-	dAssert(dir.m_w == dFloat32(0.0f));
-	dInt32 index = -1;
-	dVector maxProj(dFloat32(-1.0e20f));
-	if (m_vertexCount > D_CONVEX_VERTEX_SPLITE_SIZE) {
-		dFloat32 distPool[32];
-		const dgConvexBox* stackPool[32];
-
-		dInt32 ix = (dir[0] > dFloat64(0.0f)) ? 1 : 0;
-		dInt32 iy = (dir[1] > dFloat64(0.0f)) ? 1 : 0;
-		dInt32 iz = (dir[2] > dFloat64(0.0f)) ? 1 : 0;
-
-		const dgConvexBox& leftBox = m_supportTree[m_supportTree[0].m_leftBox];
-		const dgConvexBox& rightBox = m_supportTree[m_supportTree[0].m_rightBox];
-
-		dVector leftP(leftBox.m_box[ix][0], leftBox.m_box[iy][1], leftBox.m_box[iz][2], dFloat32(0.0f));
-		dVector rightP(rightBox.m_box[ix][0], rightBox.m_box[iy][1], rightBox.m_box[iz][2], dFloat32(0.0f));
-
-		dFloat32 leftDist = leftP.DotProduct(dir).GetScalar();
-		dFloat32 rightDist = rightP.DotProduct(dir).GetScalar();
-		if (rightDist >= leftDist) {
-			distPool[0] = leftDist;
-			stackPool[0] = &leftBox;
-
-			distPool[1] = rightDist;
-			stackPool[1] = &rightBox;
-		} else {
-			distPool[0] = rightDist;
-			stackPool[0] = &rightBox;
-
-			distPool[1] = leftDist;
-			stackPool[1] = &leftBox;
-		}
-
-		dInt32 stack = 2;
-
-		while (stack) {
-			stack--;
-			dFloat32 dist = distPool[stack];
-			if (dist > maxProj.m_x) {
-				const dgConvexBox& box = *stackPool[stack];
-
-				if (box.m_leftBox > 0) {
-					dAssert(box.m_rightBox > 0);
-					const dgConvexBox& leftBox1 = m_supportTree[box.m_leftBox];
-					const dgConvexBox& rightBox1 = m_supportTree[box.m_rightBox];
-
-					dVector leftBoxP(leftBox1.m_box[ix][0], leftBox1.m_box[iy][1], leftBox1.m_box[iz][2], dFloat32(0.0f));
-					dVector rightBoxP(rightBox1.m_box[ix][0], rightBox1.m_box[iy][1], rightBox1.m_box[iz][2], dFloat32(0.0f));
-
-					dFloat32 leftBoxDist = leftBoxP.DotProduct(dir).GetScalar();
-					dFloat32 rightBoxDist = rightBoxP.DotProduct(dir).GetScalar();
-					if (rightBoxDist >= leftBoxDist) {
-						distPool[stack] = leftBoxDist;
-						stackPool[stack] = &leftBox1;
-						stack++;
-						dAssert(stack < sizeof (distPool) / sizeof (distPool[0]));
-
-						distPool[stack] = rightBoxDist;
-						stackPool[stack] = &rightBox1;
-						stack++;
-						dAssert(stack < sizeof (distPool) / sizeof (distPool[0]));
-
-					} else {
-						distPool[stack] = rightBoxDist;
-						stackPool[stack] = &rightBox1;
-						stack++;
-						dAssert(stack < sizeof (distPool) / sizeof (distPool[0]));
-
-						distPool[stack] = leftBoxDist;
-						stackPool[stack] = &leftBox1;
-						stack++;
-						dAssert(stack < sizeof (distPool) / sizeof (distPool[0]));
-					}
-				} else {
-					for (dInt32 i = 0; i < box.m_vertexCount; i++) {
-						const dVector& p = m_vertex[box.m_vertexStart + i];
-						dAssert(p.m_x >= box.m_box[0].m_x);
-						dAssert(p.m_x <= box.m_box[1].m_x);
-						dAssert(p.m_y >= box.m_box[0].m_y);
-						dAssert(p.m_y <= box.m_box[1].m_y);
-						dAssert(p.m_z >= box.m_box[0].m_z);
-						dAssert(p.m_z <= box.m_box[1].m_z);
-						dVector projectionDist(p.DotProduct(dir));
-						dVector mask(projectionDist > maxProj);
-						dInt32 intMask = *((dInt32*)&mask.m_x);
-						index = ((box.m_vertexStart + i) & intMask) | (index & ~intMask);
-						maxProj = maxProj.GetMax(projectionDist);
-					}
-				}
-			}
-		}
-	} else {
-#if 0
-		for (dInt32 i = 0; i < m_vertexCount; i++) {
-			const dVector& p = m_vertex[i];
-			dVector dist(p.DotProduct(dir));
-			dVector mask(dist > maxProj);
-			dInt32 intMask = *((dInt32*)&mask.m_x);
-			index = (i & intMask) | (index & ~intMask);
-			maxProj = maxProj.GetMax(dist);
-		}
-#else
-		const dVector x(dir.m_x);
-		const dVector y(dir.m_y);
-		const dVector z(dir.m_z);
-		dVector support (dVector::m_negOne);
-		for (dInt32 i = 0; i < m_soaVertexCount; i+=2) {
-			dVector dot (m_soaVertexArray->m_x[i] * x + 
-						  m_soaVertexArray->m_y[i] * y + 
-						  m_soaVertexArray->m_z[i] * z);
-			support = support.Select (m_soaVertexArray->m_index[i], dot > maxProj);
-			maxProj = maxProj.GetMax(dot);
-
-			dot = m_soaVertexArray->m_x[i + 1] * x +
-				  m_soaVertexArray->m_y[i + 1] * y +
-				  m_soaVertexArray->m_z[i + 1] * z;
-			support = support.Select(m_soaVertexArray->m_index[i + 1], dot > maxProj);
-			maxProj = maxProj.GetMax(dot);
-		}
-		 
-		dVector dot (maxProj.ShiftRight().ShiftRight());
-		dVector support1 (support.ShiftRight().ShiftRight());
-		support = support.Select(support1, dot > maxProj);
-		maxProj = maxProj.GetMax(dot);
-
-		dot = dVector (maxProj.ShiftRight());
-		support1 = dVector (support.ShiftRight());
-		support = support.Select(support1, dot > maxProj);
-
-		index = dInt32 (support.GetScalar()); 
-#endif
-	}
-
-	if (vertexIndex) {
-		*vertexIndex = index;
-	}
-	dAssert(index != -1);
-	return m_vertex[index];
-}
 
 #endif
 
@@ -1087,4 +946,146 @@ void ndShapeConvexHull::CreateSOAdata()
 	{
 		indexPtr[i] = dFloat32(0.0f);
 	}
+}
+
+dVector ndShapeConvexHull::SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
+{
+	dAssert(dir.m_w == dFloat32(0.0f));
+	dInt32 index = -1;
+	dVector maxProj(dFloat32(-1.0e20f));
+	if (m_vertexCount > D_CONVEX_VERTEX_SPLITE_SIZE) {
+		dFloat32 distPool[32];
+		const ndConvexBox* stackPool[32];
+
+		dInt32 ix = (dir[0] > dFloat64(0.0f)) ? 1 : 0;
+		dInt32 iy = (dir[1] > dFloat64(0.0f)) ? 1 : 0;
+		dInt32 iz = (dir[2] > dFloat64(0.0f)) ? 1 : 0;
+
+		const ndConvexBox& leftBox = m_supportTree[m_supportTree[0].m_leftBox];
+		const ndConvexBox& rightBox = m_supportTree[m_supportTree[0].m_rightBox];
+
+		dVector leftP(leftBox.m_box[ix][0], leftBox.m_box[iy][1], leftBox.m_box[iz][2], dFloat32(0.0f));
+		dVector rightP(rightBox.m_box[ix][0], rightBox.m_box[iy][1], rightBox.m_box[iz][2], dFloat32(0.0f));
+
+		dFloat32 leftDist = leftP.DotProduct(dir).GetScalar();
+		dFloat32 rightDist = rightP.DotProduct(dir).GetScalar();
+		if (rightDist >= leftDist) 
+		{
+			distPool[0] = leftDist;
+			stackPool[0] = &leftBox;
+
+			distPool[1] = rightDist;
+			stackPool[1] = &rightBox;
+		}
+		else 
+		{
+			distPool[0] = rightDist;
+			stackPool[0] = &rightBox;
+
+			distPool[1] = leftDist;
+			stackPool[1] = &leftBox;
+		}
+
+		dInt32 stack = 2;
+
+		while (stack) 
+		{
+			stack--;
+			dFloat32 dist = distPool[stack];
+			if (dist > maxProj.m_x) 
+			{
+				const ndConvexBox& box = *stackPool[stack];
+
+				if (box.m_leftBox > 0) 
+				{
+					dAssert(box.m_rightBox > 0);
+					const ndConvexBox& leftBox1 = m_supportTree[box.m_leftBox];
+					const ndConvexBox& rightBox1 = m_supportTree[box.m_rightBox];
+
+					dVector leftBoxP(leftBox1.m_box[ix][0], leftBox1.m_box[iy][1], leftBox1.m_box[iz][2], dFloat32(0.0f));
+					dVector rightBoxP(rightBox1.m_box[ix][0], rightBox1.m_box[iy][1], rightBox1.m_box[iz][2], dFloat32(0.0f));
+
+					dFloat32 leftBoxDist = leftBoxP.DotProduct(dir).GetScalar();
+					dFloat32 rightBoxDist = rightBoxP.DotProduct(dir).GetScalar();
+					if (rightBoxDist >= leftBoxDist) 
+					{
+						distPool[stack] = leftBoxDist;
+						stackPool[stack] = &leftBox1;
+						stack++;
+						dAssert(stack < sizeof(distPool) / sizeof(distPool[0]));
+
+						distPool[stack] = rightBoxDist;
+						stackPool[stack] = &rightBox1;
+						stack++;
+						dAssert(stack < sizeof(distPool) / sizeof(distPool[0]));
+					}
+					else 
+					{
+						distPool[stack] = rightBoxDist;
+						stackPool[stack] = &rightBox1;
+						stack++;
+						dAssert(stack < sizeof(distPool) / sizeof(distPool[0]));
+
+						distPool[stack] = leftBoxDist;
+						stackPool[stack] = &leftBox1;
+						stack++;
+						dAssert(stack < sizeof(distPool) / sizeof(distPool[0]));
+					}
+				}
+				else 
+				{
+					for (dInt32 i = 0; i < box.m_vertexCount; i++) 
+					{
+						const dVector& p = m_vertex[box.m_vertexStart + i];
+						dAssert(p.m_x >= box.m_box[0].m_x);
+						dAssert(p.m_x <= box.m_box[1].m_x);
+						dAssert(p.m_y >= box.m_box[0].m_y);
+						dAssert(p.m_y <= box.m_box[1].m_y);
+						dAssert(p.m_z >= box.m_box[0].m_z);
+						dAssert(p.m_z <= box.m_box[1].m_z);
+						dVector projectionDist(p.DotProduct(dir));
+						dVector mask(projectionDist > maxProj);
+						dInt32 intMask = *((dInt32*)&mask.m_x);
+						index = ((box.m_vertexStart + i) & intMask) | (index & ~intMask);
+						maxProj = maxProj.GetMax(projectionDist);
+					}
+				}
+			}
+		}
+	}
+	else 
+	{
+		const dVector x(dir.m_x);
+		const dVector y(dir.m_y);
+		const dVector z(dir.m_z);
+		dVector support(dVector::m_negOne);
+		for (dInt32 i = 0; i < m_soaVertexCount; i += 2) 
+		{
+			dVector dot(m_soaVertexArray->m_x[i] * x + m_soaVertexArray->m_y[i] * y + m_soaVertexArray->m_z[i] * z);
+			support = support.Select(m_soaVertexArray->m_index[i], dot > maxProj);
+			maxProj = maxProj.GetMax(dot);
+
+			dot = m_soaVertexArray->m_x[i + 1] * x + m_soaVertexArray->m_y[i + 1] * y + m_soaVertexArray->m_z[i + 1] * z;
+			support = support.Select(m_soaVertexArray->m_index[i + 1], dot > maxProj);
+			maxProj = maxProj.GetMax(dot);
+		}
+
+		dVector dot(maxProj.ShiftRight().ShiftRight());
+		dVector support1(support.ShiftRight().ShiftRight());
+		support = support.Select(support1, dot > maxProj);
+		maxProj = maxProj.GetMax(dot);
+
+		dot = dVector(maxProj.ShiftRight());
+		support1 = dVector(support.ShiftRight());
+		support = support.Select(support1, dot > maxProj);
+
+		index = dInt32(support.GetScalar());
+	}
+
+	if (vertexIndex) 
+	{
+		*vertexIndex = index;
+	}
+	dAssert(index != -1);
+	return m_vertex[index];
 }
