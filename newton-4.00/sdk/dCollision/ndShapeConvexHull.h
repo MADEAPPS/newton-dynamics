@@ -30,7 +30,6 @@ D_MSV_NEWTON_ALIGN_32
 class ndShapeConvexHull : public ndShapeConvex
 {
 	class ndConvexBox;
-	class dgSOAVectorArray;
 
 	public:
 	D_COLLISION_API ndShapeConvexHull(dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray);
@@ -46,29 +45,20 @@ class ndShapeConvexHull : public ndShapeConvex
 /*
 	dInt32 GetFaceIndices (dInt32 index, dInt32* const indices) const;
 	protected:
-	void BuildHull (dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray);
-	
-	
 	bool CheckConvex (dPolyhedra& polyhedra, const dBigVector* hullVertexArray) const;
 
-	
-
-	virtual dInt32 CalculateSignature () const;
-	virtual void SetCollisionBBox (const dVector& p0, const dVector& p1);
 	virtual void DebugCollision  (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 
-	void MassProperties ();
 	virtual const ndConvexSimplexEdge** GetVertexToEdgeMapping() const {return m_vertexToEdgeMapping;}
-	
-	
-	
-
-	
 */
 	ndConvexBox* m_supportTree;
 	ndConvexSimplexEdge** m_faceArray;
-	dgSOAVectorArray* m_soaVertexArray;
+	dVector* m_soa_x;
+	dVector* m_soa_y;
+	dVector* m_soa_z;
+	dVector* m_soa_index;
+
 	const ndConvexSimplexEdge** m_vertexToEdgeMapping;
 	dInt32 m_faceCount;
 	dInt32 m_soaVertexCount;

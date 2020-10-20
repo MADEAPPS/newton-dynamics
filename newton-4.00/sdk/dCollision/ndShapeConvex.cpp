@@ -206,9 +206,11 @@ void ndShapeConvex::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debu
 	dVector tmp[D_MAX_EDGE_COUNT];
 	dVector vertex[D_MAX_EDGE_COUNT];
 
-	matrix.TransformTriplex(&tmp[0].m_x, sizeof(dVector), &m_vertex[0].m_x, sizeof(dVector), m_vertexCount);
+	dAssert(m_edgeCount < D_MAX_EDGE_COUNT);
+	dAssert(m_vertexCount < D_MAX_EDGE_COUNT);
 
 	memset(mark, 0, sizeof(mark));
+	matrix.TransformTriplex(&tmp[0].m_x, sizeof(dVector), &m_vertex[0].m_x, sizeof(dVector), m_vertexCount);
 	for (dInt32 i = 0; i < m_edgeCount; i++) 
 	{
 		if (!mark[i]) 

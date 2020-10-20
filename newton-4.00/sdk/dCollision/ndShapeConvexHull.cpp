@@ -22,27 +22,8 @@
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndShapeConvexHull.h"
-//#include "dgPhysicsStdafx.h"
-//#include "dgBody.h"
-//#include "dgContact.h"
-//#include "dgMeshEffect.h"
-//#include "ndShapeConvexHull.h"
 
-
-//#define D_CONVEX_VERTEX_BOX_CELL_SIZE	(1<<3)
-//#define D_CONVEX_VERTEX_SPLITE_SIZE	(D_CONVEX_VERTEX_BOX_CELL_SIZE * 3)
 #define D_CONVEX_VERTEX_SPLITE_SIZE	48
-
-
-D_MSV_NEWTON_ALIGN_32
-class ndShapeConvexHull::dgSOAVectorArray
-{
-	public:
-	dVector m_x[D_CONVEX_VERTEX_SPLITE_SIZE/4];
-	dVector m_y[D_CONVEX_VERTEX_SPLITE_SIZE/4];
-	dVector m_z[D_CONVEX_VERTEX_SPLITE_SIZE/4];
-	dVector m_index[D_CONVEX_VERTEX_SPLITE_SIZE/4];
-} D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
 class ndShapeConvexHull::ndConvexBox
@@ -175,53 +156,6 @@ void ndShapeConvexHull::Serialize(dgSerialize callback, void* const userData) co
 	}
 }
 
-void ndShapeConvexHull::BuildHull (dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray)
-{
-	Create (count, strideInBytes, vertexArray, tolerance);
-}
-
-void ndShapeConvexHull::MassProperties ()
-{
-	dFloat32 volume = dgCollisionConvex::CalculateMassProperties(dGetIdentityMatrix(), m_inertia, m_crossInertia, m_centerOfMass);
-	if (volume < dFloat32 (1.0e-6f)) {
-		volume = dFloat32 (1.0e-6f);
-	}
-	dFloat32 invVolume = dFloat32(1.0f) / volume;
-	m_inertia = m_inertia.Scale(invVolume);
-	m_crossInertia = m_crossInertia.Scale(invVolume);
-	m_centerOfMass = m_centerOfMass.Scale(invVolume);
-	m_centerOfMass.m_w = volume;
-
-
-	dMatrix inertia(dGetIdentityMatrix());
-	inertia[0][0] = m_inertia[0];
-	inertia[1][1] = m_inertia[1];
-	inertia[2][2] = m_inertia[2];
-	inertia[0][1] = m_crossInertia[2];
-	inertia[1][0] = m_crossInertia[2];
-	inertia[0][2] = m_crossInertia[1];
-	inertia[2][0] = m_crossInertia[1];
-	inertia[1][2] = m_crossInertia[0];
-	inertia[2][1] = m_crossInertia[0];
-
-	dVector origin(m_centerOfMass);
-	dFloat32 originMag2 = origin.DotProduct(origin & dVector::m_triplexMask).GetScalar();
-
-	dMatrix Covariance(origin, origin);
-	dMatrix parallel(dGetIdentityMatrix());
-	for (dInt32 i = 0; i < 3; i++) {
-		parallel[i][i] = originMag2;
-		inertia[i] -= (parallel[i] - Covariance[i]);
-		dAssert(inertia[i][i] > dFloat32(0.0f));
-	}
-
-	m_inertia[0] = inertia[0][0];
-	m_inertia[1] = inertia[1][1];
-	m_inertia[2] = inertia[2][2];
-	m_crossInertia[0] = inertia[2][1];
-	m_crossInertia[1] = inertia[2][0];
-	m_crossInertia[2] = inertia[1][0];
-}
 
 dInt32 ndShapeConvexHull::GetFaceIndices (dInt32 index, dInt32* const indices) const
 {
@@ -321,7 +255,10 @@ ndShapeConvexHull::ndShapeConvexHull (dInt32 count, dInt32 strideInBytes, dFloat
 	:ndShapeConvex(m_convexHull)
 	,m_supportTree(nullptr)
 	,m_faceArray(nullptr)
-	,m_soaVertexArray(nullptr)
+	,m_soa_x(nullptr)
+	,m_soa_y(nullptr)
+	,m_soa_z(nullptr)
+	,m_soa_index(nullptr)
 	,m_vertexToEdgeMapping(nullptr)
 	,m_faceCount(0)
 	,m_soaVertexCount(0)
@@ -351,9 +288,12 @@ ndShapeConvexHull::~ndShapeConvexHull()
 		dMemory::Free(m_supportTree);
 	}
 	
-	if (m_soaVertexArray) 
+	if (m_soa_index)
 	{
-		dMemory::Free(m_soaVertexArray);
+		dMemory::Free(m_soa_x);
+		dMemory::Free(m_soa_y);
+		dMemory::Free(m_soa_z);
+		dMemory::Free(m_soa_index);
 	}
 }
 
@@ -620,142 +560,141 @@ bool ndShapeConvexHull::Create(dInt32 count, dInt32 strideInBytes, const dFloat3
 		dInt32 stackBoxPool[64];
 		stackBoxPool[0] = 0;
 		
-		dAssert(0);
-		//while (stack) 
-		//{
-		//	stack--;
-		//	dInt32 boxIndex = stackBoxPool[stack];
-		//	ndConvexBox& box = boxTree[boxIndex];
-		//	if (box.m_vertexCount > D_CONVEX_VERTEX_BOX_CELL_SIZE) 
-		//	{
-		//		dVector median(dVector::m_zero);
-		//		dVector varian(dVector::m_zero);
-		//		for (dInt32 i = 0; i < box.m_vertexCount; i++) 
-		//		{
-		//			dVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
-		//			boxP0 = boxP0.GetMin(p);
-		//			boxP1 = boxP1.GetMax(p);
-		//			median += p;
-		//			varian += p * p;
-		//		}
-		//
-		//		dInt32 index = 0;
-		//		dFloat64 maxVarian = dFloat64(-1.0e10f);
-		//		varian = varian.Scale(dFloat32(box.m_vertexCount)) - median * median;
-		//		for (dInt32 i = 0; i < 3; i++) 
-		//		{
-		//			if (varian[i] > maxVarian) 
-		//			{
-		//				index = i;
-		//				maxVarian = varian[i];
-		//			}
-		//		}
-		//		dVector center = median.Scale(dFloat32(1.0f) / dFloat32(box.m_vertexCount));
-		//		dFloat32 test = center[index];
-		//
-		//		dInt32 i0 = 0;
-		//		dInt32 i1 = box.m_vertexCount - 1;
-		//		do 
-		//		{
-		//			for (; i0 <= i1; i0++) 
-		//			{
-		//				dFloat32 val = vertexNodeList[box.m_vertexStart + i0]->GetInfo()[index];
-		//				if (val > test) 
-		//				{
-		//					break;
-		//				}
-		//			}
-		//
-		//			for (; i1 >= i0; i1--) 
-		//			{
-		//				dFloat32 val = vertexNodeList[box.m_vertexStart + i1]->GetInfo()[index];
-		//				if (val < test) 
-		//				{
-		//					break;
-		//				}
-		//			}
-		//
-		//			if (i0 < i1) 
-		//			{
-		//				dSwap(vertexNodeList[box.m_vertexStart + i0], vertexNodeList[box.m_vertexStart + i1]);
-		//				i0++;
-		//				i1--;
-		//			}
-		//		} while (i0 <= i1);
-		//
-		//		if (i0 == 0) 
-		//		{
-		//			i0 = box.m_vertexCount / 2;
-		//		}
-		//		if (i0 >= (box.m_vertexCount - 1)) 
-		//		{
-		//			i0 = box.m_vertexCount / 2;
-		//		}
-		//
-		//		{
-		//			// insert right branch AABB
-		//			dVector rightBoxP0(dFloat32(1.0e15f));
-		//			dVector rightBoxP1(-dFloat32(1.0e15f));
-		//			for (dInt32 i = i0; i < box.m_vertexCount; i++) 
-		//			{
-		//				const dVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
-		//				rightBoxP0 = rightBoxP0.GetMin(p);
-		//				rightBoxP1 = rightBoxP1.GetMax(p);
-		//			}
-		//
-		//			box.m_rightBox = boxCount;
-		//			boxTree[boxCount].m_box[0] = rightBoxP0 & dVector::m_triplexMask;
-		//			boxTree[boxCount].m_box[1] = rightBoxP1 & dVector::m_triplexMask;
-		//			boxTree[boxCount].m_leftBox = -1;
-		//			boxTree[boxCount].m_rightBox = -1;
-		//			boxTree[boxCount].m_vertexStart = box.m_vertexStart + i0;
-		//			boxTree[boxCount].m_vertexCount = box.m_vertexCount - i0;
-		//			stackBoxPool[stack] = boxCount;
-		//			stack++;
-		//			boxCount++;
-		//		}
-		//
-		//		{
-		//			// insert left branch AABB
-		//			dVector leftBoxP0(dFloat32(1.0e15f));
-		//			dVector leftBoxP1(-dFloat32(1.0e15f));
-		//			for (dInt32 i = 0; i < i0; i++) {
-		//				const dVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
-		//				leftBoxP0 = leftBoxP0.GetMin(p);
-		//				leftBoxP1 = leftBoxP1.GetMax(p);
-		//			}
-		//
-		//			box.m_leftBox = boxCount;
-		//			boxTree[boxCount].m_box[0] = leftBoxP0 & dVector::m_triplexMask;;
-		//			boxTree[boxCount].m_box[1] = leftBoxP1 & dVector::m_triplexMask;;
-		//			boxTree[boxCount].m_leftBox = -1;
-		//			boxTree[boxCount].m_rightBox = -1;
-		//			boxTree[boxCount].m_vertexStart = box.m_vertexStart;
-		//			boxTree[boxCount].m_vertexCount = i0;
-		//			stackBoxPool[stack] = boxCount;
-		//			stack++;
-		//			boxCount++;
-		//		}
-		//	}
-		//}
-		//
-		//for (dInt32 i = 0; i < m_vertexCount; i++) 
-		//{
-		//	m_vertex[i] = vertexNodeList[i]->GetInfo();
-		//	vertexNodeList[i]->GetInfo().m_w = dFloat32(i);
-		//}
-		//
-		//m_supportTreeCount = boxCount;
-		//m_supportTree = (ndConvexBox*)dMemory::Malloc(dInt32(boxCount * sizeof(ndConvexBox)));
-		//memcpy(m_supportTree, &boxTree[0], boxCount * sizeof(ndConvexBox));
-		//
-		//for (dInt32 i = 0; i < m_edgeCount; i++) 
-		//{
-		//	ndConvexSimplexEdge* const ptr = &m_simplex[i];
-		//	dTree<dVector, dInt32>::dTreeNode* const node = sortTree.Find(ptr->m_vertex);
-		//	dInt32 index = dInt32(node->GetInfo().m_w);
-		//	ptr->m_vertex = dInt16(index);
-		//}
+		while (stack) 
+		{
+			stack--;
+			dInt32 boxIndex = stackBoxPool[stack];
+			ndConvexBox& box = boxTree[boxIndex];
+			if (box.m_vertexCount > D_CONVEX_VERTEX_SPLITE_SIZE/2)
+			{
+				dVector median(dVector::m_zero);
+				dVector varian(dVector::m_zero);
+				for (dInt32 i = 0; i < box.m_vertexCount; i++) 
+				{
+					dVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
+					boxP0 = boxP0.GetMin(p);
+					boxP1 = boxP1.GetMax(p);
+					median += p;
+					varian += p * p;
+				}
+		
+				dInt32 index = 0;
+				dFloat64 maxVarian = dFloat64(-1.0e10f);
+				varian = varian.Scale(dFloat32(box.m_vertexCount)) - median * median;
+				for (dInt32 i = 0; i < 3; i++) 
+				{
+					if (varian[i] > maxVarian) 
+					{
+						index = i;
+						maxVarian = varian[i];
+					}
+				}
+				dVector center = median.Scale(dFloat32(1.0f) / dFloat32(box.m_vertexCount));
+				dFloat32 test = center[index];
+		
+				dInt32 i0 = 0;
+				dInt32 i1 = box.m_vertexCount - 1;
+				do 
+				{
+					for (; i0 <= i1; i0++) 
+					{
+						dFloat32 val = vertexNodeList[box.m_vertexStart + i0]->GetInfo()[index];
+						if (val > test) 
+						{
+							break;
+						}
+					}
+		
+					for (; i1 >= i0; i1--) 
+					{
+						dFloat32 val = vertexNodeList[box.m_vertexStart + i1]->GetInfo()[index];
+						if (val < test) 
+						{
+							break;
+						}
+					}
+		
+					if (i0 < i1) 
+					{
+						dSwap(vertexNodeList[box.m_vertexStart + i0], vertexNodeList[box.m_vertexStart + i1]);
+						i0++;
+						i1--;
+					}
+				} while (i0 <= i1);
+		
+				if (i0 == 0) 
+				{
+					i0 = box.m_vertexCount / 2;
+				}
+				if (i0 >= (box.m_vertexCount - 1)) 
+				{
+					i0 = box.m_vertexCount / 2;
+				}
+		
+				{
+					// insert right branch AABB
+					dVector rightBoxP0(dFloat32(1.0e15f));
+					dVector rightBoxP1(-dFloat32(1.0e15f));
+					for (dInt32 i = i0; i < box.m_vertexCount; i++) 
+					{
+						const dVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
+						rightBoxP0 = rightBoxP0.GetMin(p);
+						rightBoxP1 = rightBoxP1.GetMax(p);
+					}
+		
+					box.m_rightBox = boxCount;
+					boxTree[boxCount].m_box[0] = rightBoxP0 & dVector::m_triplexMask;
+					boxTree[boxCount].m_box[1] = rightBoxP1 & dVector::m_triplexMask;
+					boxTree[boxCount].m_leftBox = -1;
+					boxTree[boxCount].m_rightBox = -1;
+					boxTree[boxCount].m_vertexStart = box.m_vertexStart + i0;
+					boxTree[boxCount].m_vertexCount = box.m_vertexCount - i0;
+					stackBoxPool[stack] = boxCount;
+					stack++;
+					boxCount++;
+				}
+		
+				{
+					// insert left branch AABB
+					dVector leftBoxP0(dFloat32(1.0e15f));
+					dVector leftBoxP1(-dFloat32(1.0e15f));
+					for (dInt32 i = 0; i < i0; i++) {
+						const dVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
+						leftBoxP0 = leftBoxP0.GetMin(p);
+						leftBoxP1 = leftBoxP1.GetMax(p);
+					}
+		
+					box.m_leftBox = boxCount;
+					boxTree[boxCount].m_box[0] = leftBoxP0 & dVector::m_triplexMask;;
+					boxTree[boxCount].m_box[1] = leftBoxP1 & dVector::m_triplexMask;;
+					boxTree[boxCount].m_leftBox = -1;
+					boxTree[boxCount].m_rightBox = -1;
+					boxTree[boxCount].m_vertexStart = box.m_vertexStart;
+					boxTree[boxCount].m_vertexCount = i0;
+					stackBoxPool[stack] = boxCount;
+					stack++;
+					boxCount++;
+				}
+			}
+		}
+		
+		for (dInt32 i = 0; i < m_vertexCount; i++) 
+		{
+			m_vertex[i] = vertexNodeList[i]->GetInfo();
+			vertexNodeList[i]->GetInfo().m_w = dFloat32(i);
+		}
+		
+		m_supportTreeCount = boxCount;
+		m_supportTree = (ndConvexBox*)dMemory::Malloc(dInt32(boxCount * sizeof(ndConvexBox)));
+		memcpy(m_supportTree, &boxTree[0], boxCount * sizeof(ndConvexBox));
+		
+		for (dInt32 i = 0; i < m_edgeCount; i++) 
+		{
+			ndConvexSimplexEdge* const ptr = &m_simplex[i];
+			dTree<dVector, dInt32>::dTreeNode* const node = sortTree.Find(ptr->m_vertex);
+			dInt32 index = dInt32(node->GetInfo().m_w);
+			ptr->m_vertex = dInt16(index);
+		}
 	}
 	else 
 	{
@@ -914,37 +853,33 @@ bool ndShapeConvexHull::RemoveCoplanarEdge(dPolyhedra& polyhedra, const dBigVect
 
 void ndShapeConvexHull::CreateSOAdata()
 {
-	m_soaVertexArray = (dgSOAVectorArray*)dMemory::Malloc(sizeof(dgSOAVectorArray));
+	m_soaVertexCount = ((m_vertexCount + 3) & -4) / 4;
+	m_soa_x = (dVector*)dMemory::Malloc(m_soaVertexCount * sizeof (dVector));
+	m_soa_y = (dVector*)dMemory::Malloc(m_soaVertexCount * sizeof(dVector));
+	m_soa_z = (dVector*)dMemory::Malloc(m_soaVertexCount * sizeof(dVector));
+	m_soa_index = (dVector*)dMemory::Malloc(m_soaVertexCount * sizeof(dVector));
 
-	m_soaVertexCount = ((m_vertexCount + 7) & -8) / 8;
 	dVector array[D_CONVEX_VERTEX_SPLITE_SIZE];
+	dFloat32* indexptr = &m_soa_index[0].m_x;
+	memset(m_soa_index, 0, m_soaVertexCount * sizeof(dVector));
 	for (dInt32 i = 0; i < m_vertexCount; i++) 
 	{
 		array[i] = m_vertex[i];
+		indexptr[i] = dFloat32(i);
 	}
-
+	
 	for (dInt32 i = m_vertexCount; i < D_CONVEX_VERTEX_SPLITE_SIZE; i++) 
 	{
 		array[i] = array[0];
 	}
 
-	dVector step(dFloat32(4.0f));
-	dVector index(dFloat32(0.0f), dFloat32(1.0f), dFloat32(2.0f), dFloat32(3.0f));
-	for (dInt32 i = 0; i < D_CONVEX_VERTEX_SPLITE_SIZE; i += 4) 
+	for (dInt32 i = 0; i < m_vertexCount; i += 4)
 	{
 		dVector temp;
 		dInt32 j = i / 4;
 		dVector::Transpose4x4(
-			m_soaVertexArray->m_x[j], m_soaVertexArray->m_y[j], m_soaVertexArray->m_z[j], temp,
-			m_vertex[i + 0], m_vertex[i + 1], m_vertex[i + 2], m_vertex[i + 3]);
-		m_soaVertexArray->m_index[j] = index;
-		index += step;
-	}
-
-	dFloat32* const indexPtr = &m_soaVertexArray->m_index[0][0];
-	for (dInt32 i = m_vertexCount; i < D_CONVEX_VERTEX_SPLITE_SIZE; i++) 
-	{
-		indexPtr[i] = dFloat32(0.0f);
+			m_soa_x[j], m_soa_y[j], m_soa_z[j], temp,
+			array[i + 0], array[i + 1], array[i + 2], array[i + 3]);
 	}
 }
 
@@ -953,7 +888,8 @@ dVector ndShapeConvexHull::SupportVertex(const dVector& dir, dInt32* const verte
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dInt32 index = -1;
 	dVector maxProj(dFloat32(-1.0e20f));
-	if (m_vertexCount > D_CONVEX_VERTEX_SPLITE_SIZE) {
+	if (m_vertexCount > D_CONVEX_VERTEX_SPLITE_SIZE) 
+	{
 		dFloat32 distPool[32];
 		const ndConvexBox* stackPool[32];
 
@@ -1061,12 +997,12 @@ dVector ndShapeConvexHull::SupportVertex(const dVector& dir, dInt32* const verte
 		dVector support(dVector::m_negOne);
 		for (dInt32 i = 0; i < m_soaVertexCount; i += 2) 
 		{
-			dVector dot(m_soaVertexArray->m_x[i] * x + m_soaVertexArray->m_y[i] * y + m_soaVertexArray->m_z[i] * z);
-			support = support.Select(m_soaVertexArray->m_index[i], dot > maxProj);
+			dVector dot(m_soa_x[i] * x + m_soa_y[i] * y + m_soa_z[i] * z);
+			support = support.Select(m_soa_index[i], dot > maxProj);
 			maxProj = maxProj.GetMax(dot);
 
-			dot = m_soaVertexArray->m_x[i + 1] * x + m_soaVertexArray->m_y[i + 1] * y + m_soaVertexArray->m_z[i + 1] * z;
-			support = support.Select(m_soaVertexArray->m_index[i + 1], dot > maxProj);
+			dot = m_soa_x[i + 1] * x + m_soa_y[i + 1] * y + m_soa_z[i + 1] * z;
+			support = support.Select(m_soa_index[i + 1], dot > maxProj);
 			maxProj = maxProj.GetMax(dot);
 		}
 
