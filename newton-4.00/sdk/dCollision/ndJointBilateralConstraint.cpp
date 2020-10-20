@@ -75,18 +75,18 @@ void ndJointBilateralConstraint::SetDestructorCallback (OnConstraintDestroy dest
 	m_destructor = destructor;
 }
 
-void ndJointBilateralConstraint::CalculateMatrixOffset (const dVector& pivot, const dVector& dir, dgMatrix& matrix0, dgMatrix& matrix1) const
+void ndJointBilateralConstraint::CalculateMatrixOffset (const dVector& pivot, const dVector& dir, dMatrix& matrix0, dMatrix& matrix1) const
 {
 	dFloat32 length; 
 	dAssert (m_body0);
 	dAssert (m_body1);
 	dAssert (dir.m_w == dFloat32 (0.0f));
-	const dgMatrix& body0_Matrix = m_body0->GetMatrix();
+	const dMatrix& body0_Matrix = m_body0->GetMatrix();
 
 	length = dir.DotProduct(dir).GetScalar();
 	length = dgSqrt (length);
 	dAssert (length > dFloat32 (0.0f));
-	matrix0 = dgMatrix (body0_Matrix.UnrotateVector (dir.Scale (dFloat32 (1.0f) / length)));
+	matrix0 = dMatrix (body0_Matrix.UnrotateVector (dir.Scale (dFloat32 (1.0f) / length)));
 	matrix0.m_posit = body0_Matrix.UntransformVector (pivot);
 
 	matrix0.m_front.m_w = dFloat32 (0.0f);
@@ -94,22 +94,22 @@ void ndJointBilateralConstraint::CalculateMatrixOffset (const dVector& pivot, co
 	matrix0.m_right.m_w = dFloat32 (0.0f);
 	matrix0.m_posit.m_w = dFloat32 (1.0f);
 
-	const dgMatrix& body1_Matrix = m_body1->GetMatrix();
+	const dMatrix& body1_Matrix = m_body1->GetMatrix();
 	matrix1 = matrix0 * body0_Matrix * body1_Matrix.Inverse(); 
 }
 
 
-void ndJointBilateralConstraint::SetPivotAndPinDir(const dVector &pivot, const dVector &pinDirection, dgMatrix& matrix0, dgMatrix& matrix1) const
+void ndJointBilateralConstraint::SetPivotAndPinDir(const dVector &pivot, const dVector &pinDirection, dMatrix& matrix0, dMatrix& matrix1) const
 {
 	CalculateMatrixOffset (pivot, pinDirection, matrix0, matrix1);
 }
 
-void ndJointBilateralConstraint::SetPivotAndPinDir (const dVector& pivot, const dVector& pinDirection0, const dVector& pinDirection1, dgMatrix& matrix0, dgMatrix& matrix1) const
+void ndJointBilateralConstraint::SetPivotAndPinDir (const dVector& pivot, const dVector& pinDirection0, const dVector& pinDirection1, dMatrix& matrix0, dMatrix& matrix1) const
 {
 	dAssert (m_body0);
 	dAssert (m_body1);
 
-	const dgMatrix& body0_Matrix = m_body0->GetMatrix();
+	const dMatrix& body0_Matrix = m_body0->GetMatrix();
 	dAssert (pinDirection0.m_w == dFloat32 (0.0f));
 	dAssert ((pinDirection0.DotProduct(pinDirection0).GetScalar()) > dFloat32 (0.0f));
 
@@ -124,23 +124,23 @@ void ndJointBilateralConstraint::SetPivotAndPinDir (const dVector& pivot, const 
 	matrix0.m_right.m_w = dFloat32 (0.0f);
 	matrix0.m_posit.m_w = dFloat32 (1.0f);
 	 
-	const dgMatrix& body1_Matrix = m_body1->GetMatrix();
+	const dMatrix& body1_Matrix = m_body1->GetMatrix();
 
 	matrix1 = matrix0 * body1_Matrix.Inverse(); 
 	matrix0 = matrix0 * body0_Matrix.Inverse();
 }
 
-dVector ndJointBilateralConstraint::CalculateGlobalMatrixAndAngle (const dgMatrix& localMatrix0, const dgMatrix& localMatrix1, dgMatrix& globalMatrix0, dgMatrix& globalMatrix1) const
+dVector ndJointBilateralConstraint::CalculateGlobalMatrixAndAngle (const dMatrix& localMatrix0, const dMatrix& localMatrix1, dMatrix& globalMatrix0, dMatrix& globalMatrix1) const
 {
 	dAssert (m_body0);
 	dAssert (m_body1);
-	const dgMatrix& body0Matrix = m_body0->GetMatrix();
-	const dgMatrix& body1Matrix = m_body1->GetMatrix();
+	const dMatrix& body0Matrix = m_body0->GetMatrix();
+	const dMatrix& body1Matrix = m_body1->GetMatrix();
 
 	globalMatrix0 = localMatrix0 * body0Matrix;
 	globalMatrix1 = localMatrix1 * body1Matrix;
 
-	dgMatrix relMatrix (globalMatrix1 * globalMatrix0.Inverse());
+	dMatrix relMatrix (globalMatrix1 * globalMatrix0.Inverse());
 
 	dAssert (dAbs (dFloat32 (1.0f) - (relMatrix.m_front.DotProduct(relMatrix.m_front).GetScalar())) < 1.0e-5f); 
 	dAssert (dAbs (dFloat32 (1.0f) - (relMatrix.m_up.DotProduct(relMatrix.m_up).GetScalar())) < 1.0e-5f); 

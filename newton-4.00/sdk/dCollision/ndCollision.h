@@ -50,8 +50,10 @@
 #include <ndShapeInstance.h>
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
+#include <ndShapeStaticBVH.h>
 #include <ndContactOptions.h>
 #include <ndShapeConvexHull.h>
+#include <ndShapeStaticMesh.h>
 #include <ndBodyPlayerCapsule.h>
 #include <ndBodyTriggerVolume.h>
 #include <ndJointBilateralConstraint.h>

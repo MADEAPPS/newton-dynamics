@@ -939,7 +939,7 @@ public:
 
 	D_INLINE dBigVector ShiftRightLogical(int bits) const
 	{
-		return dBigVector(dInt64(dgUnsigned64(m_ix) >> bits), dInt64(dgUnsigned64(m_iy) >> bits), dInt64(dgUnsigned64(m_iz) >> bits), dInt64(dgUnsigned64(m_iw) >> bits));
+		return dBigVector(dInt64(dUnsigned64(m_ix) >> bits), dInt64(dUnsigned64(m_iy) >> bits), dInt64(dUnsigned64(m_iz) >> bits), dInt64(dUnsigned64(m_iw) >> bits));
 	}
 
 	D_INLINE static void Transpose4x4(dBigVector& dst0, dBigVector& dst1, dBigVector& dst2, dBigVector& dst3, const dBigVector& src0, const dBigVector& src1, const dBigVector& src2, const dBigVector& src3)
@@ -1896,7 +1896,7 @@ class dBigVector
 
 	D_INLINE dBigVector ShiftRightLogical(int bits) const
 	{
-		return dBigVector(dInt64(dgUnsigned64(m_ix) >> bits), dInt64(dgUnsigned64(m_iy) >> bits), dInt64(dgUnsigned64(m_iz) >> bits), dInt64(dgUnsigned64(m_iw) >> bits));
+		return dBigVector(dInt64(dUnsigned64(m_ix) >> bits), dInt64(dUnsigned64(m_iy) >> bits), dInt64(dUnsigned64(m_iz) >> bits), dInt64(dUnsigned64(m_iw) >> bits));
 	}
 
 	D_INLINE static void Transpose4x4(dBigVector& dst0, dBigVector& dst1, dBigVector& dst2, dBigVector& dst3, const dBigVector& src0, const dBigVector& src1, const dBigVector& src2, const dBigVector& src3)

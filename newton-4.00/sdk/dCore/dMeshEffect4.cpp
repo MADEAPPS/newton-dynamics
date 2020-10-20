@@ -644,7 +644,7 @@ class dgHACDClusterGraph
 					dBigVector p1p0(points[ptr->m_incidentVertex] - points[ptr->m_prev->m_incidentVertex]);
 					perimeter += sqrt(p1p0 % p1p0);
 					ptr->m_incidentFace = color;
-					ptr->m_userData = dgUnsigned64 (clusterNode);
+					ptr->m_userData = dUnsigned64 (clusterNode);
 					ptr->m_mark = meshMask;
 					ptr = ptr->m_next;
 				} while (ptr != edge);

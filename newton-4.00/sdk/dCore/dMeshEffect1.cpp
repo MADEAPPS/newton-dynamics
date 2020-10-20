@@ -26,7 +26,7 @@
 //#include "dgBody.h"
 //#include "dgWorld.h"
 //#include "dMeshEffect.h"
-//#include "dgCollisionBVH.h"
+//#include "ndShapeStaticBVH.h"
 //#include "dgCollisionCompound.h"
 //#include "ndShapeConvexHull.h"
 
@@ -2094,7 +2094,7 @@ void dMeshEffect::GetWeightIndexChannel(dInt32 strideInByte, dInt32* const buffe
 
 dgCollisionInstance* dMeshEffect::CreateCollisionTree(dgWorld* const world, dInt32 shapeID) const
 {
-	dgCollisionBVH* const collision = new  (GetAllocator()) dgCollisionBVH (world);
+	ndShapeStaticBVH* const collision = new  (GetAllocator()) ndShapeStaticBVH (world);
 
 	collision->BeginBuild();
 
@@ -2269,11 +2269,11 @@ dEdge* dMeshEffect::InsertEdgeVertex (dEdge* const edge, dFloat64 param)
 	dEdge* const faceB1 = twin->m_prev;
 	SpliteEdge (m_points.m_vertex.m_count - 1, edge);
 
-	faceA0->m_prev->m_userData = dgUnsigned64 (m_attrib.m_pointChannel.m_count - 2);
-	faceA1->m_next->m_userData = dgUnsigned64 (edgeAttrV0);
+	faceA0->m_prev->m_userData = dUnsigned64 (m_attrib.m_pointChannel.m_count - 2);
+	faceA1->m_next->m_userData = dUnsigned64 (edgeAttrV0);
 
-	faceB0->m_prev->m_userData = dgUnsigned64 (m_attrib.m_pointChannel.m_count - 1);
-	faceB1->m_next->m_userData = dgUnsigned64 (twinAttrV0);
+	faceB0->m_prev->m_userData = dUnsigned64 (m_attrib.m_pointChannel.m_count - 1);
+	faceB1->m_next->m_userData = dUnsigned64 (twinAttrV0);
 	return faceA1->m_next;
 }
 

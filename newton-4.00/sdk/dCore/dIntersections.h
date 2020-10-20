@@ -235,18 +235,20 @@ class dFastRayTest
 	dVector m_isParallel;
 } D_GCC_NEWTON_ALIGN_32 ;
 
-//D_MSV_NEWTON_ALIGN_32 
-//class dFastAaabbInfo: public dgObb
-//{
-//	public:
-//	D_INLINE dFastAaabbInfo()
-//		:dgObb()
-//		,m_absDir(dGetIdentityMatrix())
-//		,m_separationDistance(dFloat32(1.0e10f))
-//	{
-//	}
+D_MSV_NEWTON_ALIGN_32 
+//class dFastAabbInfo: public dgObb
+class dFastAabbInfo : public dMatrix
+{
+	public:
+	D_INLINE dFastAabbInfo()
+		//:dgObb()
+		//,m_absDir(dGetIdentityMatrix())
+		//,m_separationDistance(dFloat32(1.0e10f))
+	{
+		dAssert(0);
+	}
 //
-//	D_INLINE dFastAaabbInfo(const dMatrix& matrix, const dVector& size)
+//	D_INLINE dFastAabbInfo(const dMatrix& matrix, const dVector& size)
 //		:dgObb(matrix, size)
 //		,m_separationDistance(dFloat32(1.0e10f))
 //	{
@@ -256,7 +258,7 @@ class dFastRayTest
 //		m_p1 = (matrix[3] + size1) & dVector::m_triplexMask;
 //	}
 //
-//	D_INLINE dFastAaabbInfo(const dVector& p0, const dVector& p1)
+//	D_INLINE dFastAabbInfo(const dVector& p0, const dVector& p1)
 //		:dgObb(dGetIdentityMatrix(), dVector::m_half * (p1 - p0))
 //		,m_absDir(dGetIdentityMatrix())
 //		,m_separationDistance(dFloat32(1.0e10f))
@@ -395,7 +397,7 @@ class dFastRayTest
 //	friend class dgAABBPolygonSoup;
 //	friend class dgCollisionUserMesh;
 //	friend class dgCollisionHeightField;
-//} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_ALIGN_32 ;
 
 #endif
 

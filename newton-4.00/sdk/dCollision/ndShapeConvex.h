@@ -23,7 +23,8 @@
 #define __D_SHAPE_CONVEX_H__
 
 #include "ndCollisionStdafx.h"
-#include "ndBody.h"
+#include "ndShape.h"
+//#include "ndBody.h"
 
 #define D_CLIP_MAX_COUNT				512
 #define D_CLIP_MAX_POINT_COUNT			64

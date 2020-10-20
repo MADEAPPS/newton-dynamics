@@ -702,7 +702,7 @@ class dgHACDClusterGraph: public dGraph<dgHACDCluster, dgHACDEdge>
 					dAssert(p1p0.m_w == dFloat32(0.0f));
 					perimeter += sqrt(p1p0.DotProduct(p1p0).GetScalar());
 					ptr->m_incidentFace = color;
-					ptr->m_userData = dgUnsigned64 (clusterNode);
+					ptr->m_userData = dUnsigned64 (clusterNode);
 					ptr->m_mark = meshMask;
 					ptr = ptr->m_next;
 				} while (ptr != edge);

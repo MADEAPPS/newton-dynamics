@@ -49,10 +49,10 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	virtual dFloat32 GetMassScaleBody0() const;
 	virtual dFloat32 GetMassScaleBody1() const;
 
-	void CalculateMatrixOffset (const dVector& pivot, const dVector& dir, dgMatrix& matrix0, dgMatrix& matrix1) const;
-	void SetPivotAndPinDir(const dVector &pivot, const dVector &pinDirection, dgMatrix& matrix0, dgMatrix& matrix1) const;
-	void SetPivotAndPinDir(const dVector& pivot, const dVector& pinDirection0, const dVector& pinDirection1, dgMatrix& matrix0, dgMatrix& matrix1) const;
-	dVector CalculateGlobalMatrixAndAngle (const dgMatrix& localMatrix0, const dgMatrix& localMatrix1, dgMatrix& globalMatrix0, dgMatrix& globalMatrix1) const;
+	void CalculateMatrixOffset (const dVector& pivot, const dVector& dir, dMatrix& matrix0, dMatrix& matrix1) const;
+	void SetPivotAndPinDir(const dVector &pivot, const dVector &pinDirection, dMatrix& matrix0, dMatrix& matrix1) const;
+	void SetPivotAndPinDir(const dVector& pivot, const dVector& pinDirection0, const dVector& pinDirection1, dMatrix& matrix0, dMatrix& matrix1) const;
+	dVector CalculateGlobalMatrixAndAngle (const dMatrix& localMatrix0, const dMatrix& localMatrix1, dMatrix& globalMatrix0, dMatrix& globalMatrix1) const;
 
 	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params); 
 

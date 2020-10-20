@@ -50,7 +50,7 @@ class ndShapeConvexHull : public ndShapeConvex
 	protected:
 	bool CheckConvex (dPolyhedra& polyhedra, const dBigVector* hullVertexArray) const;
 
-	virtual void DebugCollision  (const dgMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
+	virtual void DebugCollision  (const dMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 
 	virtual const ndConvexSimplexEdge** GetVertexToEdgeMapping() const {return m_vertexToEdgeMapping;}

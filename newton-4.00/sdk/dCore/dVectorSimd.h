@@ -1315,7 +1315,7 @@ class dVector
 
 		D_INLINE dBigVector ShiftRightLogical(int bits) const
 		{
-			//return dBigVector(dInt64(dgUnsigned64(m_ix) >> bits), dInt64(dgUnsigned64(m_iy) >> bits), dInt64(dgUnsigned64(m_iz) >> bits), dInt64(dgUnsigned64(m_iw) >> bits));
+			//return dBigVector(dInt64(dUnsigned64(m_ix) >> bits), dInt64(dUnsigned64(m_iy) >> bits), dInt64(dUnsigned64(m_iz) >> bits), dInt64(dUnsigned64(m_iw) >> bits));
 			return dBigVector(_mm_srli_epi64(m_typeIntLow, bits), _mm_srli_epi64(m_typeIntHigh, bits));
 		}
 
