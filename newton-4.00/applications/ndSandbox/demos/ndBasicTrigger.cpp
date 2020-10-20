@@ -263,7 +263,7 @@ static void AddBox(ndDemoEntityManager* const scene, const dVector& origin)
 	AddShape(scene, matrix, shape, 10.0f, 0.9f);
 }
 
-static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origin, const dInt32 segments)
+static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origin, const dInt32 segments, dFloat32 density)
 {
 	dVector points[1024];
 	dInt32 count = 0;
@@ -282,7 +282,7 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origi
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = origin;
 
-	AddShape(scene, matrix, shape, 10.0f, 0.8f);
+	AddShape(scene, matrix, shape, 10.0f, density);
 }
 
 void ndBasicTrigger (ndDemoEntityManager* const scene)
@@ -296,8 +296,8 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 	AddBox(scene, dVector(0.0f, 0.0f, -3.0f, 1.0f));
 	AddSphere(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f));
 	AddCapsule(scene, dVector(0.0f, 0.0f, 3.0f, 1.0f));
-	AddConvexHull(scene, dVector(-2.0f, 0.0f, -2.0f, 1.0f), 7);
-	AddConvexHull(scene, dVector(-2.0f, 0.0f,  2.0f, 1.0f), 21);
+	AddConvexHull(scene, dVector(-2.0f, 0.0f, -2.0f, 1.0f), 7, 0.8f);
+	AddConvexHull(scene, dVector(-2.0f, 0.0f,  2.0f, 1.0f), 21, 0.7f);
 
 	dQuaternion rot;
 	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
