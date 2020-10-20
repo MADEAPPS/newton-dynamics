@@ -263,15 +263,14 @@ static void AddBox(ndDemoEntityManager* const scene, const dVector& origin)
 	AddShape(scene, matrix, shape, 10.0f, 0.9f);
 }
 
-static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origin)
+static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origin, const dInt32 segments)
 {
 	dVector points[1024];
-	const dInt32 pointCount = 21;
 	dInt32 count = 0;
-	for (dInt32 i = 0; i < pointCount; i++)
+	for (dInt32 i = 0; i < segments; i++)
 	{
-		dFloat32 y = 0.7f * dCos((dFloat32(2.0f) * dPi) * i / pointCount);
-		dFloat32 z = 0.7f * dSin((dFloat32(2.0f) * dPi) * i / pointCount);
+		dFloat32 y = 0.7f * dCos((dFloat32(2.0f) * dPi) * i / segments);
+		dFloat32 z = 0.7f * dSin((dFloat32(2.0f) * dPi) * i / segments);
 		points[count++] = dVector(-0.5f, 0.7f * y, 0.7f* z, 0.0f);
 		points[count++] = dVector( 0.5f, 0.7f * y, 0.7f* z, 0.0f);
 		//points[count++] = dVector(0.25f, y, z, 0.0f);
@@ -297,7 +296,8 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 	AddBox(scene, dVector(0.0f, 0.0f, -3.0f, 1.0f));
 	AddSphere(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f));
 	AddCapsule(scene, dVector(0.0f, 0.0f, 3.0f, 1.0f));
-	AddConvexHull(scene, dVector(-2.0f, 0.0f, -2.0f, 1.0f));
+	AddConvexHull(scene, dVector(-2.0f, 0.0f, -2.0f, 1.0f), 7);
+	AddConvexHull(scene, dVector(-2.0f, 0.0f,  2.0f, 1.0f), 21);
 
 	dQuaternion rot;
 	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
