@@ -266,7 +266,7 @@ static void AddBox(ndDemoEntityManager* const scene, const dVector& origin)
 static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origin)
 {
 	dVector points[1024];
-	const dInt32 pointCount = 10;
+	const dInt32 pointCount = 21;
 	dInt32 count = 0;
 	for (dInt32 i = 0; i < pointCount; i++)
 	{
@@ -274,7 +274,7 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origi
 		dFloat32 z = 0.7f * dSin((dFloat32(2.0f) * dPi) * i / pointCount);
 		points[count++] = dVector(-0.5f, 0.7f * y, 0.7f* z, 0.0f);
 		points[count++] = dVector( 0.5f, 0.7f * y, 0.7f* z, 0.0f);
-		points[count++] = dVector(0.25f, y, z, 0.0f);
+		//points[count++] = dVector(0.25f, y, z, 0.0f);
 		points[count++] = dVector(-0.25f, y, z, 0.0f);
 	}
 
@@ -285,7 +285,6 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origi
 
 	AddShape(scene, matrix, shape, 10.0f, 0.8f);
 }
-
 
 void ndBasicTrigger (ndDemoEntityManager* const scene)
 {

@@ -36,7 +36,6 @@ class ndShapeConvexHull : public ndShapeConvex
 	D_COLLISION_API virtual ~ndShapeConvexHull();
 
 	protected:
-	void CreateSOAdata();
 	dBigVector FaceNormal(const dEdge *face, const dBigVector* const pool) const;
 	bool RemoveCoplanarEdge(dPolyhedra& convex, const dBigVector* const hullVertexArray) const;
 	bool Create(dInt32 count, dInt32 strideInBytes, const dFloat32* const vertexArray, dFloat32 tolerance);
