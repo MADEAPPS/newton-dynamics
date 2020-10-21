@@ -46,6 +46,7 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 	geometry->Release();
 }
 
+/*
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoMesh* const mesh, const ndShapeInstance& shape,
 	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count)
@@ -131,8 +132,9 @@ static void AddPlatform(ndDemoEntityManager* const scene, dFloat32 mass, const d
 
 	mesh->Release();
 }
+*/
 
-void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
+void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloor(scene);
@@ -154,16 +156,16 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	player->m_isPlayer = true;
 	scene->SetUpdateCameraFunction(ndBasicPlayerCapsule::UpdateCameraCallback, player);
 
-	AddShapes(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f));
-	AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
-	AddPlatform(scene, 30.0f, dVector(10.0f, 0.5f, 1.125f, 0.0f));
-	AddPlatform(scene, 30.0f, dVector(10.0f, 1.0f, 1.250f, 0.0f));
+	//AddShapes(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f));
+	//AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
+	//AddPlatform(scene, 30.0f, dVector(10.0f, 0.5f, 1.125f, 0.0f));
+	//AddPlatform(scene, 30.0f, dVector(10.0f, 1.0f, 1.250f, 0.0f));
 
-	location.m_posit.m_z += 2.0f;
-	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
-
-	location.m_posit.m_z += 2.0f;
-	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	//location.m_posit.m_z += 2.0f;
+	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	//
+	//location.m_posit.m_z += 2.0f;
+	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);

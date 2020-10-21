@@ -10,10 +10,6 @@
 */
 
 
-// RenderPrimitive.h: interface for the RenderPrimitive class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef _D_FILE_BROWSER_H_
 #define _D_FILE_BROWSER_H_
 
