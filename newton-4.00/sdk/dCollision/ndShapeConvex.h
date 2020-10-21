@@ -89,18 +89,9 @@ class ndShapeConvex: public ndShape
 
 	dVector CalculateVolumeIntegral(const dPlane& plane) const;
 
-/*
-	virtual void SerializeLow(dgSerialize callback, void* const userData) const;
-	
-
-	dInt32 RayCastClosestFace (dVector* tetrahedrum, const dVector& origin, dFloat32& pointDist) const;
-	dInt32 BuildCylinderCapPoly (dFloat32 radius, const dMatrix& transform, dVector* const vertexOut) const;
-	
-	friend class dgWorld;
-	friend class dgMinkowskiConv;
-	friend class dShapeCompound;
-	friend class dShapeConvexModifier;
-*/
+	//virtual void SerializeLow(dgSerialize callback, void* const userData) const;
+	//dInt32 RayCastClosestFace (dVector* tetrahedrum, const dVector& origin, dFloat32& pointDist) const;
+	//dInt32 BuildCylinderCapPoly (dFloat32 radius, const dMatrix& transform, dVector* const vertexOut) const;
 
 	dVector* m_vertex;
 	ndConvexSimplexEdge* m_simplex;

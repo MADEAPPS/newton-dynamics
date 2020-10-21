@@ -36,7 +36,6 @@ ndShape::ndShape(ndShapeID id)
 	,m_refCount(0)
 //	,m_signature(signature)
 	,m_collisionId(id)
-//	,m_allocator(allocator)
 {
 }
 

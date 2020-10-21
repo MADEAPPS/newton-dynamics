@@ -21,6 +21,7 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
+#include "ndShapeInstance.h"
 #include "ndShapeConvexHull.h"
 
 #define D_CONVEX_VERTEX_SPLITE_SIZE	48
@@ -95,25 +96,6 @@ bool ndShapeConvexHull::CheckConvex (dPolyhedra& polyhedra1, const dBigVector* h
 	return true;
 }
 
-void ndShapeConvexHull::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
-{
-	dTriplex vertex[256];
-	for (dInt32 i = 0; i < m_faceCount; i ++) {
-		ndConvexSimplexEdge* const face = m_faceArray[i];
-		ndConvexSimplexEdge* ptr = face;
-		dInt32 count = 0;
-		do {
-			vertex[count].m_x = m_vertex[ptr->m_vertex].m_x;
-			vertex[count].m_y = m_vertex[ptr->m_vertex].m_y;
-			vertex[count].m_z = m_vertex[ptr->m_vertex].m_z;
-			count ++;
-			dAssert (count < sizeof (vertex)/ sizeof (vertex[0]));
-			ptr = ptr->m_next;
-		} while (ptr != face);
-		matrix.TransformTriplex (&vertex[0].m_x, sizeof (dTriplex), &vertex[0].m_x, sizeof (dTriplex), count);
-		callback (userData, count, &vertex[0].m_x, 0);
-	}
-}
 #endif
 
 ndShapeConvexHull::ndShapeConvexHull (dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray)
@@ -983,4 +965,24 @@ ndShapeInfo ndShapeConvexHull::GetShapeInfo() const
 	info.m_convexHull.m_faceCount = m_faceCount;
 	info.m_convexHull.m_vertex = &m_vertex[0];
 	return info;
+}
+
+void ndShapeConvexHull::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+{
+	dVector vertex[256];
+	for (dInt32 i = 0; i < m_faceCount; i++) 
+	{
+		ndConvexSimplexEdge* const face = m_faceArray[i];
+		ndConvexSimplexEdge* ptr = face;
+		dInt32 count = 0;
+		do 
+		{
+			vertex[count] = m_vertex[ptr->m_vertex];
+			count++;
+			dAssert(count < sizeof(vertex) / sizeof(vertex[0]));
+			ptr = ptr->m_next;
+		} while (ptr != face);
+		matrix.TransformTriplex(&vertex[0].m_x, sizeof(dVector), &vertex[0].m_x, sizeof(dVector), count);
+		debugCallback.DrawPolygon(count, vertex);
+	}
 }
