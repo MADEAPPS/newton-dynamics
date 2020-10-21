@@ -26,10 +26,11 @@
 #include "ndShape.h"
 
 class ndBodyKinematic;
+class ndShapeInstance;
 
 //#include "dgCollision.h"
 //#include "dgCollisionConvex.h"
-//#include "dgCollisionInstance.h"
+//#include "ndShapeInstance.h"
 
 
 #define DG_MAX_COLLIDING_FACES			512
@@ -116,8 +117,8 @@ class dgPolygonMeshDesc: public dFastAabbInfo
 	void* m_userData;
 	ndBodyKinematic *m_objBody;
 	ndBodyKinematic *m_polySoupBody;
-	dgCollisionInstance* m_convexInstance;
-	dgCollisionInstance* m_polySoupInstance;
+	ndShapeInstance* m_convexInstance;
+	ndShapeInstance* m_polySoupInstance;
 	dFloat32* m_vertex;
 	dInt32* m_faceIndexCount;
 	dInt32* m_faceVertexIndex;
@@ -155,6 +156,23 @@ class dgCollisionMeshRayHitDesc
 class ndShapeStaticMesh: public ndShape
 {
 	public:
+	D_COLLISION_API ndShapeStaticMesh(ndShapeID id);
+	D_COLLISION_API virtual ~ndShapeStaticMesh();
+
+	protected:
+	virtual dFloat32 GetVolume() const;
+	virtual dFloat32 GetBoxMinRadius() const;
+	virtual dFloat32 GetBoxMaxRadius() const;
+	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
+	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
+	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
+	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
+	virtual dVector CalculateVolumeIntegral(const dMatrix& globalMatrix, const dVector& plane, const ndShapeInstance& parentScale) const;
+
+	D_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
+	D_COLLISION_API dInt32 CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 strideInFloat, const dPlane& localPlane, dVector* const contactsOut) const;
+
+
 #if 0
 	D_MSV_NEWTON_ALIGN_32 
 	class dgMeshVertexListIndexList
@@ -168,15 +186,9 @@ class ndShapeStaticMesh: public ndShape
 		dInt32 m_vertexCount;
 		dInt32 m_vertexStrideInBytes;
 	}D_GCC_NEWTON_ALIGN_32;
-
-
-	ndShapeStaticMesh (dgWorld* const world, dgCollisionID type);
+	
 	ndShapeStaticMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
-	virtual ~ndShapeStaticMesh();
-
-	virtual dFloat32 GetVolume () const;
-	virtual dFloat32 GetBoxMinRadius () const; 
-	virtual dFloat32 GetBoxMaxRadius () const;
+	
 	virtual void GetVertexListIndexList (const dVector& p0, const dVector& p1, dgMeshVertexListIndexList &data) const = 0;
 
 	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const = 0;
@@ -189,17 +201,7 @@ class ndShapeStaticMesh: public ndShape
 
 	private:
 	virtual dInt32 CalculateSignature () const;
-	virtual dVector SupportVertex (const dVector& dir, dInt32* const vertexIndex) const;
-
-	virtual void CalcAABB (const dMatrix& matrix, dVector& p0, dVector& p1) const;
 	virtual void DebugCollision  (const dMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
-
-	virtual dVector CalculateVolumeIntegral (const dMatrix& globalMatrix, const dVector& plane, const dgCollisionInstance& parentScale) const;
-	virtual dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const ndBodyKinematic* const body, void* const userData, OnRayPrecastAction preFilter) const = 0;
-
-	dInt32 CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const;
-	dInt32 CalculatePlaneIntersection (const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 strideInFloat, const dgPlane& localPlane, dVector* const contactsOut) const;
-	
 
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 	virtual void Serialize(dgSerialize callback, void* const userData) const;
@@ -212,11 +214,54 @@ class ndShapeStaticMesh: public ndShape
 	protected:
 	dgCollisionMeshCollisionCallback m_debugCallback;
 	friend class dgWorld;
-	friend class dgCollisionInstance;
+	friend class ndShapeInstance;
 #endif
 };
 
+inline dFloat32 ndShapeStaticMesh::GetVolume() const
+{
+	return dFloat32(0.0f);
+}
+
+inline dFloat32 ndShapeStaticMesh::GetBoxMinRadius() const
+{
+	return dFloat32(0.0f);
+}
+
+inline dFloat32 ndShapeStaticMesh::GetBoxMaxRadius() const
+{
+	return dFloat32(0.0f);
+}
+
+inline dVector ndShapeStaticMesh::SupportVertex(const dVector& dir, dInt32* const vertexIndex) const
+{
+	dAssert(0);
+	return dVector::m_zero;
+}
+
+inline dVector ndShapeStaticMesh::SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const
+{
+	dAssert(0);
+	return SupportVertex(dir, vertexIndex);
+}
+
+inline dVector ndShapeStaticMesh::SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const
+{ 
+	return point; 
+}
+
+inline dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const
+{
+	return 0;
+}
+
+inline dVector ndShapeStaticMesh::CalculateVolumeIntegral(const dMatrix& globalMatrix, const dVector& plane, const ndShapeInstance& parentScale) const
+{
+	return dVector::m_zero;
+}
 
 
 #endif 
+
+
 

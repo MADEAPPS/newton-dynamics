@@ -136,8 +136,8 @@ $(document).ready(function(){initNavTree('d_quaternion_8h_source.html',''); init
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <a class="code" href="classd_quaternion.html">dQuaternion</a> (dFloat32 q0, dFloat32 q1, dFloat32 q2, dFloat32 q3);</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    D_CORE_API <a class="code" href="classd_quaternion.html">dQuaternion</a> (<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a> &amp;unit_Axis, dFloat32 angle = dFloat32 (0.0f));</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">//  dFloat32&amp; operator[] (dgInt32 i);</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">//  const dFloat32&amp; operator[] (dgInt32 i) const;</span></div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">//  dFloat32&amp; operator[] (dInt32 i);</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">//  const dFloat32&amp; operator[] (dInt32 i) const;</span></div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keywordtype">void</span> Scale (dFloat32 scale); </div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keywordtype">void</span> Normalize (); </div>
@@ -171,21 +171,21 @@ $(document).ready(function(){initNavTree('d_quaternion_8h_source.html',''); init
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    ,m_z(Q3)</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    ,m_w(Q0)</div>
 <div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;{</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">//  dgAssert (dgAbs (DotProduct (*this) -dFloat32 (1.0f)) &lt; dFloat32(1.0e-4f));</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="comment">//  dAssert (dAbs (DotProduct (*this) -dFloat32 (1.0f)) &lt; dFloat32(1.0e-4f));</span></div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;}</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="comment">/*</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment">D_INLINE dFloat32&amp; dQuaternion::operator[] (dgInt32 i)</span></div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment">D_INLINE dFloat32&amp; dQuaternion::operator[] (dInt32 i)</span></div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment">{</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment">    dgAssert(i &lt; 4);</span></div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">    dgAssert(i &gt;= 0);</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="comment">    dAssert(i &lt; 4);</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">    dAssert(i &gt;= 0);</span></div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">    return (&amp;m_w)[i];</span></div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="comment">}</span></div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment">D_INLINE const dFloat32&amp; dQuaternion::operator[] (dgInt32 i) const</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="comment">D_INLINE const dFloat32&amp; dQuaternion::operator[] (dInt32 i) const</span></div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="comment">{</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment">    dgAssert(i &lt; 4);</span></div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment">    dgAssert(i &gt;= 0);</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="comment">    dAssert(i &lt; 4);</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="comment">    dAssert(i &gt;= 0);</span></div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="comment">    return (&amp;m_w)[i];</span></div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="comment">}</span></div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment">*/</span></div>

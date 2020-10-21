@@ -64,12 +64,12 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 
 	switch (m_polySoupInstance->GetScaleType())
 	{
-		case dgCollisionInstance::m_unit:
+		case ndShapeInstance::m_unit:
 		{
 			break;
 		}
 
-		case dgCollisionInstance::m_uniform:
+		case ndShapeInstance::m_uniform:
 		{
 			const dVector& invScale = m_polySoupInstance->GetInvScale();
 			convexMatrix[0][0] = invScale.GetScalar();
@@ -79,7 +79,7 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 			break;
 		}
 
-		case dgCollisionInstance::m_nonUniform:
+		case ndShapeInstance::m_nonUniform:
 		{
 			const dVector& invScale = m_polySoupInstance->GetInvScale();
 			dMatrix tmp (matrix[0] * invScale, matrix[1] * invScale, matrix[2] * invScale, dVector::m_wOne);
@@ -89,7 +89,7 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 			break;
 		}
 
-		case dgCollisionInstance::m_global:
+		case ndShapeInstance::m_global:
 		default:
 		{
 		   dgAssert (0);
@@ -189,14 +189,6 @@ void dgPolygonMeshDesc::SortFaceArray ()
 }
 
 
-ndShapeStaticMesh::ndShapeStaticMesh(dgWorld* const world, dgCollisionID type)
-	:dgCollision(world->GetAllocator(), 0, type)
-{
-	m_rtti |= dgCollisionMesh_RTTI;
-	m_debugCallback = NULL;
-	SetCollisionBBox (dVector (dFloat32 (0.0f)), dVector (dFloat32 (0.0f)));
-}
-
 ndShapeStaticMesh::ndShapeStaticMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber)
 	:dgCollision(world, deserialization, userData, revisionNumber)
 {
@@ -204,10 +196,6 @@ ndShapeStaticMesh::ndShapeStaticMesh (dgWorld* const world, dgDeserialize deseri
 
 	m_debugCallback = NULL;
 	SetCollisionBBox (dVector (dFloat32 (0.0f)), dVector (dFloat32 (0.0f)));
-}
-
-ndShapeStaticMesh::~ndShapeStaticMesh()
-{
 }
 
 void ndShapeStaticMesh::SetCollisionBBox (const dVector& p0, const dVector& p1)
@@ -223,12 +211,6 @@ void ndShapeStaticMesh::SetCollisionBBox (const dVector& p0, const dVector& p1)
 dInt32 ndShapeStaticMesh::CalculateSignature () const
 {
 	dgAssert (0);
-	return 0;
-}
-
-
-dInt32 ndShapeStaticMesh::CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const
-{
 	return 0;
 }
 
@@ -249,38 +231,10 @@ dVector ndShapeStaticMesh::BoxSupportMapping  (const dVector& dir) const
 }
 #endif
 
-
-
-
-dVector ndShapeStaticMesh::CalculateVolumeIntegral (const dMatrix& globalMatrix, const dVector& plane, const dgCollisionInstance& parentScale) const
-{
-	return dVector (dFloat32 (0.0f));
-}
-
-
 void ndShapeStaticMesh::DebugCollision (const dMatrix& matrixPtr, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dgAssert (0);
 }
-
-
-dFloat32 ndShapeStaticMesh::GetVolume () const
-{
-//	dgAssert (0);
-	return dFloat32 (0.0f); 
-}
-
-dFloat32 ndShapeStaticMesh::GetBoxMinRadius () const
-{
-	return dFloat32 (0.0f);  
-}
-
-dFloat32 ndShapeStaticMesh::GetBoxMaxRadius () const
-{
-	return dFloat32 (0.0f);  
-}
-
-
 
 void ndShapeStaticMesh::GetCollisionInfo(dgCollisionInfo* const info) const
 {
@@ -294,68 +248,80 @@ void ndShapeStaticMesh::Serialize(dgSerialize callback, void* const userData) co
 	dgAssert (0);
 }
 
-dVector ndShapeStaticMesh::SupportVertex (const dVector& dir, dInt32* const vertexIndex) const
+
+
+#endif
+
+ndShapeStaticMesh::ndShapeStaticMesh(ndShapeID id)
+	:ndShape(id)
 {
-	dgAssert (0);
-	return dVector (0, 0, 0, 0);
+	dAssert(0);
+	//m_rtti |= dgCollisionMesh_RTTI;
+	//m_debugCallback = NULL;
+	//SetCollisionBBox(dVector(dFloat32(0.0f)), dVector(dFloat32(0.0f)));
 }
 
+ndShapeStaticMesh::~ndShapeStaticMesh()
+{
+	dAssert(0);
+}
 
 void ndShapeStaticMesh::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) const
 {
-	dVector origin (matrix.TransformVector(m_boxOrigin));
-	dVector size (matrix.m_front.Abs().Scale(m_boxSize.m_x) + matrix.m_up.Abs().Scale(m_boxSize.m_y) + matrix.m_right.Abs().Scale(m_boxSize.m_z));
+	dVector origin(matrix.TransformVector(m_boxOrigin));
+	dVector size(matrix.m_front.Abs().Scale(m_boxSize.m_x) + matrix.m_up.Abs().Scale(m_boxSize.m_y) + matrix.m_right.Abs().Scale(m_boxSize.m_z));
 
 	p0 = (origin - size) & dVector::m_triplexMask;
 	p1 = (origin + size) & dVector::m_triplexMask;
 }
 
 
-dInt32 ndShapeStaticMesh::CalculatePlaneIntersection (const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 stride, const dgPlane& localPlane, dVector* const contactsOut) const
+dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 stride, const dPlane& localPlane, dVector* const contactsOut) const
 {
-	dInt32 count = 0;
-	dInt32 j = index[indexCount - 1] * stride;
-	dVector p0 (&vertex[j]);
-	p0 = p0 & dVector::m_triplexMask;
-	dFloat32 side0 = localPlane.Evalue (p0);
-	for (dInt32 i = 0; i < indexCount; i ++) {
-		j = index[i] * stride;
-		dVector p1 (&vertex[j]);
-		p1 = p1 & dVector::m_triplexMask;
-		dFloat32 side1 = localPlane.Evalue (p1);
-
-		if (side0 < dFloat32 (0.0f)) {
-			if (side1 >= dFloat32 (0.0f)) {
-				dVector dp (p1 - p0);
-				dgAssert (dp.m_w == dFloat32 (0.0f));
-				dFloat32 t = localPlane.DotProduct(dp).GetScalar();
-				dgAssert (dgAbs (t) >= dFloat32 (0.0f));
-				if (dgAbs (t) < dFloat32 (1.0e-8f)) {
-					t = dgSign(t) * dFloat32 (1.0e-8f);	
-				}
-				dgAssert (0);
-				contactsOut[count] = p0 - dp.Scale (side0 / t);
-				count ++;
-
-			} 
-		} else if (side1 <= dFloat32 (0.0f)) {
-			dVector dp (p1 - p0);
-			dgAssert (dp.m_w == dFloat32 (0.0f));
-			dFloat32 t = localPlane.DotProduct(dp).GetScalar();
-			dgAssert (dgAbs (t) >= dFloat32 (0.0f));
-			if (dgAbs (t) < dFloat32 (1.0e-8f)) {
-				t = dgSign(t) * dFloat32 (1.0e-8f);	
-			}
-			dgAssert (0);
-			contactsOut[count] = p0 - dp.Scale (side0 / t);
-			count ++;
-		}
-
-		side0 = side1;
-		p0 = p1;
-	}
-
-	return count;
+	dAssert(0);
+	return 0;
+	//dInt32 count = 0;
+	//dInt32 j = index[indexCount - 1] * stride;
+	//dVector p0(&vertex[j]);
+	//p0 = p0 & dVector::m_triplexMask;
+	//dFloat32 side0 = localPlane.Evalue(p0);
+	//for (dInt32 i = 0; i < indexCount; i++) {
+	//	j = index[i] * stride;
+	//	dVector p1(&vertex[j]);
+	//	p1 = p1 & dVector::m_triplexMask;
+	//	dFloat32 side1 = localPlane.Evalue(p1);
+	//
+	//	if (side0 < dFloat32(0.0f)) {
+	//		if (side1 >= dFloat32(0.0f)) {
+	//			dVector dp(p1 - p0);
+	//			dgAssert(dp.m_w == dFloat32(0.0f));
+	//			dFloat32 t = localPlane.DotProduct(dp).GetScalar();
+	//			dgAssert(dgAbs(t) >= dFloat32(0.0f));
+	//			if (dgAbs(t) < dFloat32(1.0e-8f)) {
+	//				t = dgSign(t) * dFloat32(1.0e-8f);
+	//			}
+	//			dgAssert(0);
+	//			contactsOut[count] = p0 - dp.Scale(side0 / t);
+	//			count++;
+	//
+	//		}
+	//	}
+	//	else if (side1 <= dFloat32(0.0f)) {
+	//		dVector dp(p1 - p0);
+	//		dgAssert(dp.m_w == dFloat32(0.0f));
+	//		dFloat32 t = localPlane.DotProduct(dp).GetScalar();
+	//		dgAssert(dgAbs(t) >= dFloat32(0.0f));
+	//		if (dgAbs(t) < dFloat32(1.0e-8f)) {
+	//			t = dgSign(t) * dFloat32(1.0e-8f);
+	//		}
+	//		dgAssert(0);
+	//		contactsOut[count] = p0 - dp.Scale(side0 / t);
+	//		count++;
+	//	}
+	//
+	//	side0 = side1;
+	//	p0 = p1;
+	//}
+	//
+	//return count;
 }
-
-#endif

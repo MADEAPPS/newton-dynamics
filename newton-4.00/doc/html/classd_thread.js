@@ -6,6 +6,6 @@ var classd_thread =
     [ "Release", "classd_thread.html#a56eeccc6250234a248b0625d26d040e2", null ],
     [ "SetName", "classd_thread.html#a701bf18d8f073c62b6606f61fdee98fa", null ],
     [ "Signal", "classd_thread.html#a5597391cc6fac5880bc7007bca5659b3", null ],
-    [ "Start", "classd_thread.html#a3a8268429d62152d9ee65f713ec45318", null ],
-    [ "ThreadFunction", "classd_thread.html#a3b09b0eabe46699a5409d6f12d4c94cb", null ]
+    [ "ThreadFunction", "classd_thread.html#a3b09b0eabe46699a5409d6f12d4c94cb", null ],
+    [ "m_name", "classd_thread.html#a9cccfd838a40604aa9124da3e1b46d5e", null ]
 ];

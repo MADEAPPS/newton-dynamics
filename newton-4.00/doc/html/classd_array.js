@@ -1,6 +1,7 @@
 var classd_array =
 [
     [ "dArray", "classd_array.html#af4838ffbf96fe7211e86b6046c4970f6", null ],
+    [ "dArray", "classd_array.html#af8b2c71e2c7e382a99bf0362e671f7f9", null ],
     [ "~dArray", "classd_array.html#a9e0ddaf094be6c2b7fee2759cc87d2a0", null ],
     [ "Clear", "classd_array.html#aca8523eeb8f5790435ace57dbf77f5fb", null ],
     [ "GetCapacity", "classd_array.html#a024423364c78dd3a0edbff127d09050d", null ],

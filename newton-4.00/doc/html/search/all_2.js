@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['getcount_82',['GetCount',['../classd_semaphore.html#a2d74fe4e18a67a956732d4bfd89e818b',1,'dSemaphore']]],
-  ['getmemoryused_83',['GetMemoryUsed',['../classd_memory.html#af8e0900cdee29fc47385739777e25fbf',1,'dMemory']]]
+  ['getcount_121',['GetCount',['../classd_semaphore.html#a2d74fe4e18a67a956732d4bfd89e818b',1,'dSemaphore']]],
+  ['getmemoryused_122',['GetMemoryUsed',['../classd_memory.html#af8e0900cdee29fc47385739777e25fbf',1,'dMemory']]]
 ];

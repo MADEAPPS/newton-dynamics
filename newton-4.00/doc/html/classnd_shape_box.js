@@ -5,6 +5,7 @@ var classnd_shape_box =
     [ "CalcAABB", "classnd_shape_box.html#a78e20def967e84643c582d0525609c76", null ],
     [ "CalculatePlaneIntersection", "classnd_shape_box.html#a8a31a70c12b6f8b1455f64e96dd2d883", null ],
     [ "GetAsShapeBox", "classnd_shape_box.html#a7ad5ed99efc67a6f7d811f488faf0df2", null ],
+    [ "GetShapeInfo", "classnd_shape_box.html#a6b5093c4b46e5322e807bbfbce2882a8", null ],
     [ "GetVertexToEdgeMapping", "classnd_shape_box.html#a745b12793ba572aa0f87338cdd0c58bd", null ],
     [ "Init", "classnd_shape_box.html#ae8c21970d726523ffb62f0aa852fea2b", null ],
     [ "MassProperties", "classnd_shape_box.html#abc20b5554999589e5391303721c19821", null ],

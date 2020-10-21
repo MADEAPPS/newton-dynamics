@@ -116,6 +116,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8e6ad774f499542e3a62d5375d65c64d"><td class="memItemLeft" align="right" valign="top"><a id="a8e6ad774f499542e3a62d5375d65c64d"></a>
 dFloat64&#160;</td><td class="memItemRight" valign="bottom"><b>TotalCost</b> () const</td></tr>
 <tr class="separator:a8e6ad774f499542e3a62d5375d65c64d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96d5af73d1f12636d31e8ebc7aa8cf10"><td class="memItemLeft" align="right" valign="top"><a id="a96d5af73d1f12636d31e8ebc7aa8cf10"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>AddNode</b> (<a class="el" href="classnd_scene_tree_node.html">ndSceneTreeNode</a> *const node)</td></tr>
+<tr class="separator:a96d5af73d1f12636d31e8ebc7aa8cf10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18da4702d093d2b17bcbaaa52e98e2ca"><td class="memItemLeft" align="right" valign="top"><a id="a18da4702d093d2b17bcbaaa52e98e2ca"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveNode</b> (<a class="el" href="classnd_scene_tree_node.html">ndSceneTreeNode</a> *const node)</td></tr>
+<tr class="separator:a18da4702d093d2b17bcbaaa52e98e2ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classd_list"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classd_list')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classd_list.html">dList&lt; ndSceneTreeNode *, dContainersFreeListAlloc&lt; ndSceneTreeNode * &gt; &gt;</a></td></tr>
 <tr class="memitem:a717649d51417bdcae0e05de6ceb5de78 inherit pub_methods_classd_list"><td class="memItemLeft" align="right" valign="top"><a id="a717649d51417bdcae0e05de6ceb5de78"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>operator dInt32</b> () const</td></tr>
@@ -186,9 +192,12 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>SanityCheck</b> () co
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:afc79766451ffbe43fd12aa94f560ca72"><td class="memItemLeft" align="right" valign="top"><a id="afc79766451ffbe43fd12aa94f560ca72"></a>
-dFloat64&#160;</td><td class="memItemRight" valign="bottom"><b>m_prevCost</b></td></tr>
-<tr class="separator:afc79766451ffbe43fd12aa94f560ca72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0daea6fd9c65b6dd49b156a1cb9b5486"><td class="memItemLeft" align="right" valign="top"><a id="a0daea6fd9c65b6dd49b156a1cb9b5486"></a>
+dFloat64&#160;</td><td class="memItemRight" valign="bottom"><b>m_currentCost</b></td></tr>
+<tr class="separator:a0daea6fd9c65b6dd49b156a1cb9b5486"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51e4e85e1fbc8395696ee705e08a3f20"><td class="memItemLeft" align="right" valign="top"><a id="a51e4e85e1fbc8395696ee705e08a3f20"></a>
+dListNode *&#160;</td><td class="memItemRight" valign="bottom"><b>m_currentNode</b></td></tr>
+<tr class="separator:a51e4e85e1fbc8395696ee705e08a3f20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab14d6dbb01379e55756be539b20c8066"><td class="memItemLeft" align="right" valign="top"><a id="ab14d6dbb01379e55756be539b20c8066"></a>
 dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_index</b></td></tr>
 <tr class="separator:ab14d6dbb01379e55756be539b20c8066"><td class="memSeparator" colspan="2">&#160;</td></tr>

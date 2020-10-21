@@ -6,5 +6,6 @@ var classnd_dynamics_update =
     [ "ndDynamicsUpdate", "classnd_dynamics_update.html#aec3ad4721aa14f8f5365063023324ec7", null ],
     [ "~ndDynamicsUpdate", "classnd_dynamics_update.html#a69e8a0071834de01b44884c361b7e176", null ],
     [ "Clear", "classnd_dynamics_update.html#a7f4b979927505d04b59f63c432e73e37", null ],
-    [ "DynamicsUpdate", "classnd_dynamics_update.html#aacbd8d7f2f10150883d3114202026ee6", null ]
+    [ "DynamicsUpdate", "classnd_dynamics_update.html#aacbd8d7f2f10150883d3114202026ee6", null ],
+    [ "ndWorld", "classnd_dynamics_update.html#ad49f00efc60b56b55283b4fe56f31c09", null ]
 ];

@@ -107,14 +107,15 @@ Inheritance diagram for dThreadPool:</div>
  <div class="center">
   <img src="classd_thread_pool.png" usemap="#dThreadPool_map" alt=""/>
   <map id="dThreadPool_map" name="dThreadPool_map">
-<area href="classd_sync_mutex.html" title="Generic counting mutex for synchronization of thread jobs." alt="dSyncMutex" shape="rect" coords="0,56,203,80"/>
-<area href="classd_thread.html" alt="dThread" shape="rect" coords="319,56,522,80"/>
-<area href="classd_semaphore.html" title="Generic counting semaphore for thread synchronization." alt="dSemaphore" shape="rect" coords="0,0,203,24"/>
-<area href="classnd_scene.html" alt="ndScene" shape="rect" coords="159,168,362,192"/>
-<area href="classnd_scene_mixed.html" alt="ndSceneMixed" shape="rect" coords="159,224,362,248"/>
-<area href="classnd_world_scene.html" alt="ndWorldScene&lt; ndSceneMixed &gt;" shape="rect" coords="159,280,362,304"/>
-<area href="classnd_world_mixed_scene.html" alt="ndWorldMixedScene" shape="rect" coords="53,336,256,360"/>
-<area href="classnd_world_segregated_scene.html" alt="ndWorldSegregatedScene" shape="rect" coords="266,336,469,360"/>
+<area href="classd_sync_mutex.html" title="Generic counting mutex for synchronization of thread jobs." alt="dSyncMutex" shape="rect" coords="0,112,203,136"/>
+<area href="classd_thread.html" alt="dThread" shape="rect" coords="319,112,522,136"/>
+<area href="classd_semaphore.html" title="Generic counting semaphore for thread synchronization." alt="dSemaphore" shape="rect" coords="0,56,203,80"/>
+<area href="classd_atomic.html" alt="dAtomic&lt; bool &gt;" shape="rect" coords="213,56,416,80"/>
+<area href="classnd_scene.html" alt="ndScene" shape="rect" coords="159,224,362,248"/>
+<area href="classnd_scene_mixed.html" alt="ndSceneMixed" shape="rect" coords="159,280,362,304"/>
+<area href="classnd_world_scene.html" alt="ndWorldScene&lt; ndSceneMixed &gt;" shape="rect" coords="159,336,362,360"/>
+<area href="classnd_world_mixed_scene.html" alt="ndWorldMixedScene" shape="rect" coords="53,392,256,416"/>
+<area href="classnd_world_segregated_scene.html" alt="ndWorldSegregatedScene" shape="rect" coords="266,392,469,416"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -135,6 +136,12 @@ D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>TickOne</b
 <tr class="memitem:a453b57622e5c8249e2c67035229224e7"><td class="memItemLeft" align="right" valign="top"><a id="a453b57622e5c8249e2c67035229224e7"></a>
 D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>ExecuteJobs</b> (<a class="el" href="classd_thread_pool_job.html">dThreadPoolJob</a> **const jobs)</td></tr>
 <tr class="separator:a453b57622e5c8249e2c67035229224e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7fb76a652da82ce938d0ea5bab70a8f9"><td class="memItemLeft" align="right" valign="top"><a id="a7fb76a652da82ce938d0ea5bab70a8f9"></a>
+D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Begin</b> ()</td></tr>
+<tr class="separator:a7fb76a652da82ce938d0ea5bab70a8f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5177a779cdb984608685ac73cba45a90"><td class="memItemLeft" align="right" valign="top"><a id="a5177a779cdb984608685ac73cba45a90"></a>
+D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>End</b> ()</td></tr>
+<tr class="separator:a5177a779cdb984608685ac73cba45a90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classd_sync_mutex"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classd_sync_mutex')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classd_sync_mutex.html">dSyncMutex</a></td></tr>
 <tr class="memitem:a4214f33c3467e208f3310410ec304270 inherit pub_methods_classd_sync_mutex"><td class="memItemLeft" align="right" valign="top"><a id="a4214f33c3467e208f3310410ec304270"></a>
 D_CORE_API&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_sync_mutex.html#a4214f33c3467e208f3310410ec304270">dSyncMutex</a> ()</td></tr>
@@ -159,9 +166,6 @@ D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 <tr class="memitem:a701bf18d8f073c62b6606f61fdee98fa inherit pub_methods_classd_thread"><td class="memItemLeft" align="right" valign="top"><a id="a701bf18d8f073c62b6606f61fdee98fa"></a>
 D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>SetName</b> (const char *const name)</td></tr>
 <tr class="separator:a701bf18d8f073c62b6606f61fdee98fa inherit pub_methods_classd_thread"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a8268429d62152d9ee65f713ec45318 inherit pub_methods_classd_thread"><td class="memItemLeft" align="right" valign="top"><a id="a3a8268429d62152d9ee65f713ec45318"></a>
-D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Start</b> ()</td></tr>
-<tr class="separator:a3a8268429d62152d9ee65f713ec45318 inherit pub_methods_classd_thread"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae4955edb678930f64d17bb7fbf680e37 inherit pub_methods_classd_thread"><td class="memItemLeft" align="right" valign="top"><a id="ae4955edb678930f64d17bb7fbf680e37"></a>
 D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><b>Finish</b> ()</td></tr>
 <tr class="separator:ae4955edb678930f64d17bb7fbf680e37 inherit pub_methods_classd_thread"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -194,9 +198,17 @@ D_CORE_API dInt32&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 D_CORE_API void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_semaphore.html#a48c11416bcf5ed8dde3d827618424c52">Terminate</a> ()</td></tr>
 <tr class="memdesc:a48c11416bcf5ed8dde3d827618424c52 inherit pub_methods_classd_semaphore"><td class="mdescLeft">&#160;</td><td class="mdescRight">Notify a waiting thread on member function Wait that is time to exit the thread loop. <br /></td></tr>
 <tr class="separator:a48c11416bcf5ed8dde3d827618424c52 inherit pub_methods_classd_semaphore"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classd_atomic"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classd_atomic')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classd_atomic.html">dAtomic&lt; bool &gt;</a></td></tr>
+<tr class="memitem:a0ba3b7cdc444bd16076eac36cd826652 inherit pub_methods_classd_atomic"><td class="memItemLeft" align="right" valign="top"><a id="a0ba3b7cdc444bd16076eac36cd826652"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>dAtomic</b> (bool val)</td></tr>
+<tr class="separator:a0ba3b7cdc444bd16076eac36cd826652 inherit pub_methods_classd_atomic"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pro_attribs_classd_thread"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classd_thread')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classd_thread.html">dThread</a></td></tr>
+<tr class="memitem:a9cccfd838a40604aa9124da3e1b46d5e inherit pro_attribs_classd_thread"><td class="memItemLeft" align="right" valign="top"><a id="a9cccfd838a40604aa9124da3e1b46d5e"></a>
+char&#160;</td><td class="memItemRight" valign="bottom"><b>m_name</b> [32]</td></tr>
+<tr class="separator:a9cccfd838a40604aa9124da3e1b46d5e inherit pro_attribs_classd_thread"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 </div><!-- doc-content -->

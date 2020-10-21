@@ -128,7 +128,7 @@ $(document).ready(function(){initNavTree('d_thread_8h_source.html',''); initResi
 <div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="classd_thread.html">   29</a></span>&#160;<span class="keyword">class </span><a class="code" href="classd_thread.html">dThread</a></div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    :<span class="keyword">public</span> <a class="code" href="classd_semaphore.html">dSemaphore</a></div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="preprocessor">#ifndef D_USE_THREAD_EMULATION</span></div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    ,<span class="keyword">public</span> std::mutex</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    ,<span class="keyword">public</span> <a class="code" href="classd_atomic.html">dAtomic</a>&lt;bool&gt;</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    ,<span class="keyword">public</span> std::condition_variable</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    ,<span class="keyword">public</span> std::thread</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#endif</span></div>
@@ -139,24 +139,25 @@ $(document).ready(function(){initNavTree('d_thread_8h_source.html',''); initResi
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    D_CORE_API <span class="keywordtype">void</span> SetName(<span class="keyword">const</span> <span class="keywordtype">char</span>* <span class="keyword">const</span> name);</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Start();</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Finish();</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Signal();</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> ThreadFunction() = 0;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> Release(){}</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordtype">void</span> ThreadFunctionCallback();</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Finish();</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    D_CORE_API <span class="keywordtype">void</span> Signal();</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> ThreadFunction() = 0;</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160; </div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> Release(){}</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordtype">void</span> ThreadFunctionCallback();</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">protected</span>:</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordtype">char</span> m_name[32];</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;};</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="aclassd_atomic_html"><div class="ttname"><a href="classd_atomic.html">dAtomic</a></div><div class="ttdef"><b>Definition:</b> dTypes.h:532</div></div>
 <div class="ttc" id="aclassd_semaphore_html"><div class="ttname"><a href="classd_semaphore.html">dSemaphore</a></div><div class="ttdoc">Generic counting semaphore for thread synchronization.</div><div class="ttdef"><b>Definition:</b> dSemaphore.h:29</div></div>
 <div class="ttc" id="aclassd_thread_html"><div class="ttname"><a href="classd_thread.html">dThread</a></div><div class="ttdef"><b>Definition:</b> dThread.h:36</div></div>
 <!-- start footer part -->

@@ -124,6 +124,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>Sync</b> ()</td></tr>
 <tr class="memitem:a2b42038139fb245244ba331b82eb5ad3"><td class="memItemLeft" align="right" valign="top"><a id="a2b42038139fb245244ba331b82eb5ad3"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>Update</b> (dFloat32 timestep)</td></tr>
 <tr class="separator:a2b42038139fb245244ba331b82eb5ad3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c437ea9669e7878036779ad4162ddd0"><td class="memItemLeft" align="right" valign="top"><a id="a9c437ea9669e7878036779ad4162ddd0"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>OnPostUpdate</b> (dFloat32 timestep)</td></tr>
+<tr class="separator:a9c437ea9669e7878036779ad4162ddd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d019e8c27e178587c273cf490fc374c"><td class="memItemLeft" align="right" valign="top"><a id="a1d019e8c27e178587c273cf490fc374c"></a>
 dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetThreadCount</b> () const</td></tr>
 <tr class="separator:a1d019e8c27e178587c273cf490fc374c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -137,11 +140,35 @@ dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetSubSteps</b> () 
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetSubSteps</b> (dInt32 subSteps)</td></tr>
 <tr class="separator:a8b663d9ee1597b7c36e6b504114148cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3863ff66e1657778dd79087a532d0a80"><td class="memItemLeft" align="right" valign="top"><a id="a3863ff66e1657778dd79087a532d0a80"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>AddBody</b> (<a class="el" href="classnd_body.html">ndBody</a> *const body)</td></tr>
+D_NEWTON_API bool&#160;</td><td class="memItemRight" valign="bottom"><b>AddBody</b> (<a class="el" href="classnd_body.html">ndBody</a> *const body)</td></tr>
 <tr class="separator:a3863ff66e1657778dd79087a532d0a80"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac99c312563c38f65819a42b47a5cb50"><td class="memItemLeft" align="right" valign="top"><a id="aac99c312563c38f65819a42b47a5cb50"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveBody</b> (<a class="el" href="classnd_body.html">ndBody</a> *const body)</td></tr>
-<tr class="separator:aac99c312563c38f65819a42b47a5cb50"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12a0be8521c1f58b8dac9d90477b71c0"><td class="memItemLeft" align="right" valign="top"><a id="a12a0be8521c1f58b8dac9d90477b71c0"></a>
+D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveBody</b> (<a class="el" href="classnd_body.html">ndBody</a> *const body)</td></tr>
+<tr class="separator:a12a0be8521c1f58b8dac9d90477b71c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae34627878c72b78e935da58501ba8dd"><td class="memItemLeft" align="right" valign="top"><a id="aae34627878c72b78e935da58501ba8dd"></a>
+D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>AddJoint</b> (<a class="el" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a> *const joint)</td></tr>
+<tr class="separator:aae34627878c72b78e935da58501ba8dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc17fa04bdd17cad3b1175e183c1ccf9"><td class="memItemLeft" align="right" valign="top"><a id="abc17fa04bdd17cad3b1175e183c1ccf9"></a>
+D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>RemoveJoint</b> (<a class="el" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a> *const joint)</td></tr>
+<tr class="separator:abc17fa04bdd17cad3b1175e183c1ccf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf8fde66129855e8af4f0a4c7313806e"><td class="memItemLeft" align="right" valign="top"><a id="aaf8fde66129855e8af4f0a4c7313806e"></a>
+D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>DeleteBody</b> (<a class="el" href="classnd_body.html">ndBody</a> *const body)</td></tr>
+<tr class="separator:aaf8fde66129855e8af4f0a4c7313806e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1d70169cb963a10926580da66fb0b8c"><td class="memItemLeft" align="right" valign="top"><a id="ab1d70169cb963a10926580da66fb0b8c"></a>
+const <a class="el" href="classnd_body_list.html">ndBodyList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetBodyList</b> () const</td></tr>
+<tr class="separator:ab1d70169cb963a10926580da66fb0b8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34b7c44e439d14d05e3541a8bbf0abbd"><td class="memItemLeft" align="right" valign="top"><a id="a34b7c44e439d14d05e3541a8bbf0abbd"></a>
+const <a class="el" href="classnd_joint_list.html">ndJointList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetJointList</b> () const</td></tr>
+<tr class="separator:a34b7c44e439d14d05e3541a8bbf0abbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2033563d58e36de0e8fc0e51612d5d9"><td class="memItemLeft" align="right" valign="top"><a id="af2033563d58e36de0e8fc0e51612d5d9"></a>
+const <a class="el" href="classnd_contact_list.html">ndContactList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetContactList</b> () const</td></tr>
+<tr class="separator:af2033563d58e36de0e8fc0e51612d5d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac281adc9ce05193d4b9a36e212c28598"><td class="memItemLeft" align="right" valign="top"><a id="ac281adc9ce05193d4b9a36e212c28598"></a>
+const <a class="el" href="classnd_skeleton_list.html">ndSkeletonList</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>GetSkeletonList</b> () const</td></tr>
+<tr class="separator:ac281adc9ce05193d4b9a36e212c28598"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99624dfd7fb519a0c7fe98a5b5003b4b"><td class="memItemLeft" align="right" valign="top"><a id="a99624dfd7fb519a0c7fe98a5b5003b4b"></a>
+<a class="el" href="classnd_body_dynamic.html">ndBodyDynamic</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetSentinelBody</b> () const</td></tr>
+<tr class="separator:a99624dfd7fb519a0c7fe98a5b5003b4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afbac217f9bcad5b99b7b1219496bea6b"><td class="memItemLeft" align="right" valign="top"><a id="afbac217f9bcad5b99b7b1219496bea6b"></a>
 const dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetSolverIterations</b> () const</td></tr>
 <tr class="separator:afbac217f9bcad5b99b7b1219496bea6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -154,15 +181,21 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetSolverIterations</
 <tr class="memitem:a6e16db0bbeecce0e2aa6a04d8cc1a3c0"><td class="memItemLeft" align="right" valign="top"><a id="a6e16db0bbeecce0e2aa6a04d8cc1a3c0"></a>
 dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetUpdateTime</b> () const</td></tr>
 <tr class="separator:a6e16db0bbeecce0e2aa6a04d8cc1a3c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a348ed66dbe1027fbcedc92bc635c8245"><td class="memItemLeft" align="right" valign="top"><a id="a348ed66dbe1027fbcedc92bc635c8245"></a>
+dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>GetFrameIndex</b> () const</td></tr>
+<tr class="separator:a348ed66dbe1027fbcedc92bc635c8245"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed569f489c3e0c4a501091ba5f769e19"><td class="memItemLeft" align="right" valign="top"><a id="aed569f489c3e0c4a501091ba5f769e19"></a>
 <a class="el" href="classnd_contact_notify.html">ndContactNotify</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetContactNotify</b> () const</td></tr>
 <tr class="separator:aed569f489c3e0c4a501091ba5f769e19"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea145e0ad4360e4d8b6ebdc5fdfd7584"><td class="memItemLeft" align="right" valign="top"><a id="aea145e0ad4360e4d8b6ebdc5fdfd7584"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetContactNotify</b> (<a class="el" href="classnd_contact_notify.html">ndContactNotify</a> *const notify)</td></tr>
 <tr class="separator:aea145e0ad4360e4d8b6ebdc5fdfd7584"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a76037bcfc96926482435acae59f0c600"><td class="memItemLeft" align="right" valign="top"><a id="a76037bcfc96926482435acae59f0c600"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>ThreadFunction</b> ()</td></tr>
-<tr class="separator:a76037bcfc96926482435acae59f0c600"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa74a03c82595e94a9eeab86db1f855a0"><td class="memItemLeft" align="right" valign="top"><a id="aa74a03c82595e94a9eeab86db1f855a0"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DebugScene</b> (<a class="el" href="classnd_scene_tree_noti_fy.html">ndSceneTreeNotiFy</a> *const notify)</td></tr>
+<tr class="separator:aa74a03c82595e94a9eeab86db1f855a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad929d91f74d532350f2bb0a76d0ce2b5"><td class="memItemLeft" align="right" valign="top"><a id="ad929d91f74d532350f2bb0a76d0ce2b5"></a>
+D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>ClearCache</b> ()</td></tr>
+<tr class="separator:ad929d91f74d532350f2bb0a76d0ce2b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classd_class_alloc.html">dClassAlloc</a></td></tr>
 <tr class="memitem:aae7ca43a2cf439a198501ea15bc7e47a inherit pub_methods_classd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="aae7ca43a2cf439a198501ea15bc7e47a"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_class_alloc.html#aae7ca43a2cf439a198501ea15bc7e47a">dClassAlloc</a> ()</td></tr>
@@ -191,19 +224,19 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>Clear</b> ()</td></tr
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
 <tr class="memitem:a19c2679662de20b65401fe63397ff18e"><td class="memItemLeft" align="right" valign="top"><a id="a19c2679662de20b65401fe63397ff18e"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateSkeletons</b> ()</td></tr>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateSkeletons</b> ()</td></tr>
 <tr class="separator:a19c2679662de20b65401fe63397ff18e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aac4c4d3a75ff7b77a212b7373daa748a"><td class="memItemLeft" align="right" valign="top"><a id="aac4c4d3a75ff7b77a212b7373daa748a"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>ApplyExternalForces</b> ()</td></tr>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>ApplyExternalForces</b> ()</td></tr>
 <tr class="separator:aac4c4d3a75ff7b77a212b7373daa748a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7cb49861d58dd34983333f6cffcc62e"><td class="memItemLeft" align="right" valign="top"><a id="ad7cb49861d58dd34983333f6cffcc62e"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdatePrelisteners</b> ()</td></tr>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdatePrelisteners</b> ()</td></tr>
 <tr class="separator:ad7cb49861d58dd34983333f6cffcc62e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fa6ceddccd11918f113ea87a4f2158c"><td class="memItemLeft" align="right" valign="top"><a id="a2fa6ceddccd11918f113ea87a4f2158c"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdatePostlisteners</b> ()</td></tr>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdatePostlisteners</b> ()</td></tr>
 <tr class="separator:a2fa6ceddccd11918f113ea87a4f2158c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aabdc662dcbc3f8a0d9c8e30bc8a213c7"><td class="memItemLeft" align="right" valign="top"><a id="aabdc662dcbc3f8a0d9c8e30bc8a213c7"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateListenersPostTransform</b> ()</td></tr>
+virtual D_NEWTON_API void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateListenersPostTransform</b> ()</td></tr>
 <tr class="separator:aabdc662dcbc3f8a0d9c8e30bc8a213c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
@@ -214,6 +247,12 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>ndScene</b></td></tr
 <tr class="memitem:acc29a6caf36f06571c6e986c4a8c4b13"><td class="memItemLeft" align="right" valign="top"><a id="acc29a6caf36f06571c6e986c4a8c4b13"></a>
 class&#160;</td><td class="memItemRight" valign="bottom"><b>ndDynamicsUpdate</b></td></tr>
 <tr class="separator:acc29a6caf36f06571c6e986c4a8c4b13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a596db98605bdae9f19aca5e739780089"><td class="memItemLeft" align="right" valign="top"><a id="a596db98605bdae9f19aca5e739780089"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>ndWorldMixedScene</b></td></tr>
+<tr class="separator:a596db98605bdae9f19aca5e739780089"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac19a855c7fe758b1218e2b791fa26ccb"><td class="memItemLeft" align="right" valign="top"><a id="ac19a855c7fe758b1218e2b791fa26ccb"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>ndWorldSegregatedScene</b></td></tr>
+<tr class="separator:ac19a855c7fe758b1218e2b791fa26ccb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>

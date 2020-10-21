@@ -1,8 +1,8 @@
 var classd_ref_counter =
 [
-    [ "dRefCounter", "classd_ref_counter.html#ab407af8416abd7a2c86b0f4e011926df", null ],
-    [ "~dRefCounter", "classd_ref_counter.html#aa2c975b58d1781e0c6793f1ac18acd39", null ],
-    [ "AddRef", "classd_ref_counter.html#a3895c4fa1c9e0010d5831abc0b7c8503", null ],
-    [ "GetRef", "classd_ref_counter.html#a04e1bc5d2c48fabc92b165cb6c034bf9", null ],
-    [ "Release", "classd_ref_counter.html#a09e299fd930dfe8928c75bbab591db23", null ]
+    [ "dRefCounter", "classd_ref_counter.html#a25e734d5b2f156ad6ae08b61612a1fc5", null ],
+    [ "~dRefCounter", "classd_ref_counter.html#ab12f857ea3483dc195242bcecf1de578", null ],
+    [ "AddRef", "classd_ref_counter.html#ac95c397ed75f893eac5d3d33c8ecea26", null ],
+    [ "GetRef", "classd_ref_counter.html#a3d711911679028d5e30df3eb1ddb573a", null ],
+    [ "Release", "classd_ref_counter.html#aef7b48771226f33c2c04c7df26bd4308", null ]
 ];

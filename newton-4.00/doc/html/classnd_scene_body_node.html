@@ -117,9 +117,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae75ee5fee2cf3d6c0be24c38bf8ae871"><td class="memItemLeft" align="right" valign="top"><a id="ae75ee5fee2cf3d6c0be24c38bf8ae871"></a>
 D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndSceneBodyNode</b> (<a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *const body)</td></tr>
 <tr class="separator:ae75ee5fee2cf3d6c0be24c38bf8ae871"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1756b43d1c7de06e145c2cb023622bbe"><td class="memItemLeft" align="right" valign="top"><a id="a1756b43d1c7de06e145c2cb023622bbe"></a>
-virtual <a class="el" href="classnd_scene_body_node.html">ndSceneBodyNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsBroadPhaseBodyNode</b> ()</td></tr>
-<tr class="separator:a1756b43d1c7de06e145c2cb023622bbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ed1edbd6e8fb01ba49ce6045c7b0c90"><td class="memItemLeft" align="right" valign="top"><a id="a3ed1edbd6e8fb01ba49ce6045c7b0c90"></a>
+virtual <a class="el" href="classnd_scene_body_node.html">ndSceneBodyNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsSceneBodyNode</b> ()</td></tr>
+<tr class="separator:a3ed1edbd6e8fb01ba49ce6045c7b0c90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02af71fda291548f80f79855d9162451"><td class="memItemLeft" align="right" valign="top"><a id="a02af71fda291548f80f79855d9162451"></a>
 virtual <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetBody</b> () const</td></tr>
 <tr class="separator:a02af71fda291548f80f79855d9162451"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -127,18 +127,21 @@ virtual <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *&#
 <tr class="memitem:a579388ce51043a719f6119eecee5aefe inherit pub_methods_classnd_scene_node"><td class="memItemLeft" align="right" valign="top"><a id="a579388ce51043a719f6119eecee5aefe"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>ndSceneNode</b> (<a class="el" href="classnd_scene_node.html">ndSceneNode</a> *const parent)</td></tr>
 <tr class="separator:a579388ce51043a719f6119eecee5aefe inherit pub_methods_classnd_scene_node"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acba6ceb339fee98482bba6ef40e4eeee inherit pub_methods_classnd_scene_node"><td class="memItemLeft" align="right" valign="top"><a id="acba6ceb339fee98482bba6ef40e4eeee"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>GetAABB</b> (<a class="el" href="classd_vector.html">dVector</a> &amp;minBox, <a class="el" href="classd_vector.html">dVector</a> &amp;maxBox) const</td></tr>
+<tr class="separator:acba6ceb339fee98482bba6ef40e4eeee inherit pub_methods_classnd_scene_node"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47026ddfb690fbb4d3918fa7899caa17 inherit pub_methods_classnd_scene_node"><td class="memItemLeft" align="right" valign="top"><a id="a47026ddfb690fbb4d3918fa7899caa17"></a>
 D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom"><b>SetAABB</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;minBox, const <a class="el" href="classd_vector.html">dVector</a> &amp;maxBox)</td></tr>
 <tr class="separator:a47026ddfb690fbb4d3918fa7899caa17 inherit pub_methods_classnd_scene_node"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a16b79b528a43ad2a8fd5e8ddbd95eca0 inherit pub_methods_classnd_scene_node"><td class="memItemLeft" align="right" valign="top"><a id="a16b79b528a43ad2a8fd5e8ddbd95eca0"></a>
-virtual <a class="el" href="classnd_scene_node.html">ndSceneNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsBroadPhaseNode</b> ()</td></tr>
-<tr class="separator:a16b79b528a43ad2a8fd5e8ddbd95eca0 inherit pub_methods_classnd_scene_node"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e9bee1adaef03a6e3100c495a589514 inherit pub_methods_classnd_scene_node"><td class="memItemLeft" align="right" valign="top"><a id="a2e9bee1adaef03a6e3100c495a589514"></a>
-virtual <a class="el" href="classnd_scene_tree_node.html">ndSceneTreeNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsBroadPhaseTreeNode</b> ()</td></tr>
-<tr class="separator:a2e9bee1adaef03a6e3100c495a589514 inherit pub_methods_classnd_scene_node"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f6c3bf17151e1ed9c9eef89625d162c inherit pub_methods_classnd_scene_node"><td class="memItemLeft" align="right" valign="top"><a id="a3f6c3bf17151e1ed9c9eef89625d162c"></a>
-virtual ndSceneAggregate *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsBroadPhaseAggregate</b> ()</td></tr>
-<tr class="separator:a3f6c3bf17151e1ed9c9eef89625d162c inherit pub_methods_classnd_scene_node"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ab6d9900a3613224d2d363f3004c428 inherit pub_methods_classnd_scene_node"><td class="memItemLeft" align="right" valign="top"><a id="a6ab6d9900a3613224d2d363f3004c428"></a>
+virtual <a class="el" href="classnd_scene_node.html">ndSceneNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsSceneNode</b> ()</td></tr>
+<tr class="separator:a6ab6d9900a3613224d2d363f3004c428 inherit pub_methods_classnd_scene_node"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a490dcd72293a6c255f0ff0ee66dbc9d9 inherit pub_methods_classnd_scene_node"><td class="memItemLeft" align="right" valign="top"><a id="a490dcd72293a6c255f0ff0ee66dbc9d9"></a>
+virtual <a class="el" href="classnd_scene_tree_node.html">ndSceneTreeNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsSceneTreeNode</b> ()</td></tr>
+<tr class="separator:a490dcd72293a6c255f0ff0ee66dbc9d9 inherit pub_methods_classnd_scene_node"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad06192b025f3159bbae0c2c90fa4cde8 inherit pub_methods_classnd_scene_node"><td class="memItemLeft" align="right" valign="top"><a id="ad06192b025f3159bbae0c2c90fa4cde8"></a>
+virtual ndSceneAggregate *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsSceneAggregate</b> ()</td></tr>
+<tr class="separator:ad06192b025f3159bbae0c2c90fa4cde8 inherit pub_methods_classnd_scene_node"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63d918ab772c7d51e8702dbfb27d0b94 inherit pub_methods_classnd_scene_node"><td class="memItemLeft" align="right" valign="top"><a id="a63d918ab772c7d51e8702dbfb27d0b94"></a>
 virtual <a class="el" href="classnd_scene_node.html">ndSceneNode</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetLeft</b> () const</td></tr>
 <tr class="separator:a63d918ab772c7d51e8702dbfb27d0b94 inherit pub_methods_classnd_scene_node"><td class="memSeparator" colspan="2">&#160;</td></tr>

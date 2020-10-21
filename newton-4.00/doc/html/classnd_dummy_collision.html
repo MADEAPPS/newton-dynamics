@@ -149,6 +149,21 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>DebugShape</b
 <tr class="memitem:a3d6d4eac6957d2f4eed7d792b591a497 inherit pub_methods_classnd_shape_null"><td class="memItemLeft" align="right" valign="top"><a id="a3d6d4eac6957d2f4eed7d792b591a497"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>CalcAABB</b> (const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;matrix, <a class="el" href="classd_vector.html">dVector</a> &amp;p0, <a class="el" href="classd_vector.html">dVector</a> &amp;p1) const</td></tr>
 <tr class="separator:a3d6d4eac6957d2f4eed7d792b591a497 inherit pub_methods_classnd_shape_null"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b48dd85d8eda59fb15cdbb322190a7c inherit pub_methods_classnd_shape_null"><td class="memItemLeft" align="right" valign="top"><a id="a3b48dd85d8eda59fb15cdbb322190a7c"></a>
+virtual <a class="el" href="classnd_shape_info.html">ndShapeInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetShapeInfo</b> () const</td></tr>
+<tr class="separator:a3b48dd85d8eda59fb15cdbb322190a7c inherit pub_methods_classnd_shape_null"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa543a2a385e02e9f9d1a9072005d4fab inherit pub_methods_classnd_shape_null"><td class="memItemLeft" align="right" valign="top"><a id="aa543a2a385e02e9f9d1a9072005d4fab"></a>
+virtual dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetVolume</b> () const</td></tr>
+<tr class="separator:aa543a2a385e02e9f9d1a9072005d4fab inherit pub_methods_classnd_shape_null"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab66db04232ca079e93901e6790e902b0 inherit pub_methods_classnd_shape_null"><td class="memItemLeft" align="right" valign="top"><a id="ab66db04232ca079e93901e6790e902b0"></a>
+virtual dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetBoxMinRadius</b> () const</td></tr>
+<tr class="separator:ab66db04232ca079e93901e6790e902b0 inherit pub_methods_classnd_shape_null"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afeedebb01b3af89f1d25da0a72812577 inherit pub_methods_classnd_shape_null"><td class="memItemLeft" align="right" valign="top"><a id="afeedebb01b3af89f1d25da0a72812577"></a>
+virtual dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetBoxMaxRadius</b> () const</td></tr>
+<tr class="separator:afeedebb01b3af89f1d25da0a72812577 inherit pub_methods_classnd_shape_null"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf670ef92892610d27a77a6843020029 inherit pub_methods_classnd_shape_null"><td class="memItemLeft" align="right" valign="top"><a id="abf670ef92892610d27a77a6843020029"></a>
+virtual <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateVolumeIntegral</b> (const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;globalMatrix, const <a class="el" href="classd_vector.html">dVector</a> &amp;globalPlane, const <a class="el" href="classnd_shape_instance.html">ndShapeInstance</a> &amp;parentScale) const</td></tr>
+<tr class="separator:abf670ef92892610d27a77a6843020029 inherit pub_methods_classnd_shape_null"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classnd_shape"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classnd_shape')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classnd_shape.html">ndShape</a></td></tr>
 <tr class="memitem:ad25e5e5aa2b20218aa4964f2346e2bba inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="ad25e5e5aa2b20218aa4964f2346e2bba"></a>
 const <a class="el" href="classnd_shape.html">ndShape</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>AddRef</b> () const</td></tr>
@@ -159,15 +174,18 @@ dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetRefCount</b> () 
 <tr class="memitem:a6fa8ce03eb930fd844ebb58f2a792362 inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="a6fa8ce03eb930fd844ebb58f2a792362"></a>
 virtual dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>Release</b> () const</td></tr>
 <tr class="separator:a6fa8ce03eb930fd844ebb58f2a792362 inherit pub_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5413342ef2ebc69cc02938ecad3a3310 inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="a5413342ef2ebc69cc02938ecad3a3310"></a>
-virtual <a class="el" href="classnd_shape.html">ndShape</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShape</b> ()</td></tr>
-<tr class="separator:a5413342ef2ebc69cc02938ecad3a3310 inherit pub_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade4df021c83d95f7f0af3e32b8ed5318 inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="ade4df021c83d95f7f0af3e32b8ed5318"></a>
 virtual <a class="el" href="classnd_shape_box.html">ndShapeBox</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShapeBox</b> ()</td></tr>
 <tr class="separator:ade4df021c83d95f7f0af3e32b8ed5318 inherit pub_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80d45a6927aef2135aab4e86d9a5cee0 inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="a80d45a6927aef2135aab4e86d9a5cee0"></a>
 virtual <a class="el" href="classnd_shape_sphere.html">ndShapeSphere</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShapeSphere</b> ()</td></tr>
 <tr class="separator:a80d45a6927aef2135aab4e86d9a5cee0 inherit pub_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2af2eaf3650c3dff55299289e61ebed inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="ae2af2eaf3650c3dff55299289e61ebed"></a>
+virtual <a class="el" href="classnd_shape_capsule.html">ndShapeCapsule</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShapeCapsule</b> ()</td></tr>
+<tr class="separator:ae2af2eaf3650c3dff55299289e61ebed inherit pub_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1afb55e209088c821df49be717174e2b inherit pub_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="a1afb55e209088c821df49be717174e2b"></a>
+virtual ndShapeCompound *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShapeCompound</b> ()</td></tr>
+<tr class="separator:a1afb55e209088c821df49be717174e2b inherit pub_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classd_class_alloc"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classd_class_alloc')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classd_class_alloc.html">dClassAlloc</a></td></tr>
 <tr class="memitem:aae7ca43a2cf439a198501ea15bc7e47a inherit pub_methods_classd_class_alloc"><td class="memItemLeft" align="right" valign="top"><a id="aae7ca43a2cf439a198501ea15bc7e47a"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classd_class_alloc.html#aae7ca43a2cf439a198501ea15bc7e47a">dClassAlloc</a> ()</td></tr>
@@ -186,9 +204,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memdesc:a567b53e08b1053c79287c3ab51a0c62a inherit pub_methods_classd_class_alloc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded operator delete for any subclass derived from <a class="el" href="classd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes.">dClassAlloc</a>. <br /></td></tr>
 <tr class="separator:a567b53e08b1053c79287c3ab51a0c62a inherit pub_methods_classd_class_alloc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classnd_shape_convex"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classnd_shape_convex')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classnd_shape_convex.html">ndShapeConvex</a></td></tr>
-<tr class="memitem:a24945327f7d4f9302a943c6fd77e4e02 inherit pro_methods_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="a24945327f7d4f9302a943c6fd77e4e02"></a>
-D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndShapeConvex</b> (dShapeID id)</td></tr>
-<tr class="separator:a24945327f7d4f9302a943c6fd77e4e02 inherit pro_methods_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad75c95e9ab69eb114d05e136bbd9492c inherit pro_methods_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="ad75c95e9ab69eb114d05e136bbd9492c"></a>
+D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndShapeConvex</b> (ndShapeID id)</td></tr>
+<tr class="separator:ad75c95e9ab69eb114d05e136bbd9492c inherit pro_methods_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a0dd2a5f5980ac650dee44bf206d95a inherit pro_methods_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="a1a0dd2a5f5980ac650dee44bf206d95a"></a>
 virtual <a class="el" href="classnd_shape_convex.html">ndShapeConvex</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShapeConvex</b> ()</td></tr>
 <tr class="separator:a1a0dd2a5f5980ac650dee44bf206d95a inherit pro_methods_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -207,6 +225,9 @@ virtual D_COLLISION_API <a class="el" href="classd_matrix.html">dMatrix</a>&#160
 <tr class="memitem:a2418a00ae1cefc3310c1c6fc72b3c401 inherit pro_methods_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="a2418a00ae1cefc3310c1c6fc72b3c401"></a>
 virtual D_COLLISION_API dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>CalculatePlaneIntersection</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;normal, const <a class="el" href="classd_vector.html">dVector</a> &amp;point, <a class="el" href="classd_vector.html">dVector</a> *const contactsOut) const</td></tr>
 <tr class="separator:a2418a00ae1cefc3310c1c6fc72b3c401 inherit pro_methods_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af45d9d309feb2a5bb0fc3be21b1d6948 inherit pro_methods_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="af45d9d309feb2a5bb0fc3be21b1d6948"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>SanityCheck</b> (<a class="el" href="classd_polyhedra.html">dPolyhedra</a> &amp;hull) const</td></tr>
+<tr class="separator:af45d9d309feb2a5bb0fc3be21b1d6948 inherit pro_methods_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab36b90af23c875c2fe8af444e93545d7 inherit pro_methods_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="ab36b90af23c875c2fe8af444e93545d7"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>SanityCheck</b> (dInt32 count, const <a class="el" href="classd_vector.html">dVector</a> &amp;normal, <a class="el" href="classd_vector.html">dVector</a> *const contactsOut) const</td></tr>
 <tr class="separator:ab36b90af23c875c2fe8af444e93545d7 inherit pro_methods_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -222,10 +243,13 @@ virtual <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class=
 <tr class="memitem:af4085965529512326a6ce6b93c2b4af4 inherit pro_methods_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="af4085965529512326a6ce6b93c2b4af4"></a>
 virtual const <a class="el" href="classnd_shape_convex_1_1nd_convex_simplex_edge.html">ndConvexSimplexEdge</a> **&#160;</td><td class="memItemRight" valign="bottom"><b>GetVertexToEdgeMapping</b> () const</td></tr>
 <tr class="separator:af4085965529512326a6ce6b93c2b4af4 inherit pro_methods_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9edc75dae82e8a4716c3440309c25566 inherit pro_methods_classnd_shape_convex"><td class="memItemLeft" align="right" valign="top"><a id="a9edc75dae82e8a4716c3440309c25566"></a>
+<a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateVolumeIntegral</b> (const <a class="el" href="classd_plane.html">dPlane</a> &amp;plane) const</td></tr>
+<tr class="separator:a9edc75dae82e8a4716c3440309c25566 inherit pro_methods_classnd_shape_convex"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classnd_shape"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classnd_shape')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classnd_shape.html">ndShape</a></td></tr>
-<tr class="memitem:a02e6165614604b027ba6de47cc6f6ea2 inherit pro_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="a02e6165614604b027ba6de47cc6f6ea2"></a>
-D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndShape</b> (dShapeID id)</td></tr>
-<tr class="separator:a02e6165614604b027ba6de47cc6f6ea2 inherit pro_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad68bada310ae3c115583963e7be36cad inherit pro_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="ad68bada310ae3c115583963e7be36cad"></a>
+D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndShape</b> (ndShapeID id)</td></tr>
+<tr class="separator:ad68bada310ae3c115583963e7be36cad inherit pro_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab91401321ddcb50f781cdb2c4dcf31f8 inherit pro_methods_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="ab91401321ddcb50f781cdb2c4dcf31f8"></a>
 D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndShape</b> (const <a class="el" href="classnd_shape.html">ndShape</a> &amp;source)</td></tr>
 <tr class="separator:ab91401321ddcb50f781cdb2c4dcf31f8 inherit pro_methods_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -270,6 +294,9 @@ dUnsigned16&#160;</td><td class="memItemRight" valign="bottom"><b>m_vertexCount<
 <tr class="memitem:ae2af70e1f641becd8334d44cbae6b0e9 inherit pro_attribs_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="ae2af70e1f641becd8334d44cbae6b0e9"></a>
 <a class="el" href="classd_atomic.html">dAtomic</a>&lt; dInt32 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_refCount</b></td></tr>
 <tr class="separator:ae2af70e1f641becd8334d44cbae6b0e9 inherit pro_attribs_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a611accedce1845f9985b8c6478f8ce1c inherit pro_attribs_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="a611accedce1845f9985b8c6478f8ce1c"></a>
+ndShapeID&#160;</td><td class="memItemRight" valign="bottom"><b>m_collisionId</b></td></tr>
+<tr class="separator:a611accedce1845f9985b8c6478f8ce1c inherit pro_attribs_classnd_shape"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_attribs_classnd_shape"><td colspan="2" onclick="javascript:toggleInherit('pro_static_attribs_classnd_shape')"><img src="closed.png" alt="-"/>&#160;Static Protected Attributes inherited from <a class="el" href="classnd_shape.html">ndShape</a></td></tr>
 <tr class="memitem:a3f46c588bf2ab546408aeef1ef0e6b15 inherit pro_static_attribs_classnd_shape"><td class="memItemLeft" align="right" valign="top"><a id="a3f46c588bf2ab546408aeef1ef0e6b15"></a>
 static <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_flushZero</b></td></tr>

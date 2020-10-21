@@ -23,7 +23,8 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
+	//ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
+	ndShapeInstance box(new ndShapeStaticBVH());
 	dMatrix uvMatrix(dGetIdentityMatrix());
 	uvMatrix[0][0] *= 0.025f;
 	uvMatrix[1][1] *= 0.025f;

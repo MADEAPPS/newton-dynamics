@@ -34,5 +34,6 @@ var classd_spatial_vector =
     [ "m_d", "classd_spatial_vector.html#ae023d5340facf4d7a1571251ba24ed7a", null ],
     [ "m_d0", "classd_spatial_vector.html#abdff9d0324749dcd73ac429e8a4e4484", null ],
     [ "m_d1", "classd_spatial_vector.html#a72c724dafd899d5f5ff57b1cd2feb4b8", null ],
-    [ "m_d2", "classd_spatial_vector.html#a553f7c095b17272c7521c97f6ab1f4f1", null ]
+    [ "m_d2", "classd_spatial_vector.html#a553f7c095b17272c7521c97f6ab1f4f1", null ],
+    [ "m_f", "classd_spatial_vector.html#ac7f629efe875a2825d5a8cb099afd062", null ]
 ];

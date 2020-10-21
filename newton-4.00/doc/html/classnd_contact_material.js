@@ -1,5 +1,6 @@
 var classnd_contact_material =
 [
+    [ "ndContactMaterial", "classnd_contact_material.html#a0024d51305c10217b7b60f55d290b122", null ],
     [ "m_dir0", "classnd_contact_material.html#ab9da67fe53186e9313742f9b5ec571c8", null ],
     [ "m_dir0_Force", "classnd_contact_material.html#af84e5de30d6014227537b60d5106bc28", null ],
     [ "m_dir1", "classnd_contact_material.html#a609006f3d63f61cbf24682378bd66a0b", null ],

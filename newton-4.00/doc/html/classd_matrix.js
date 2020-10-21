@@ -27,6 +27,7 @@ var classd_matrix =
     [ "TransformTriplex", "classd_matrix.html#a435de142ba67d4243cd885c4d6c9a354", null ],
     [ "TransformTriplex", "classd_matrix.html#a45092a20c2131bd7deb9852dc294177a", null ],
     [ "TransformVector", "classd_matrix.html#a2c8be31992c8af319efe5b8689a253a6", null ],
+    [ "TransformVector1x4", "classd_matrix.html#a50e1bc83e04e99401eafa531b0e028a1", null ],
     [ "Transpose", "classd_matrix.html#a46af5ef199c16df0236c33bb26eb46fc", null ],
     [ "Transpose4X4", "classd_matrix.html#acaf81c294ff6e67577c66fe710890273", null ],
     [ "UnrotateVector", "classd_matrix.html#ab8c785ce19be3e0169831ada4e056178", null ],

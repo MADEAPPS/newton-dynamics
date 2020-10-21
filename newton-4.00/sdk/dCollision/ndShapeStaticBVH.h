@@ -31,6 +31,15 @@
 //class ndShapeStaticBVH: public ndShapeStaticMesh, public dgAABBPolygonSoup
 class ndShapeStaticBVH : public ndShapeStaticMesh
 {
+	public:
+	D_COLLISION_API ndShapeStaticBVH();
+	D_COLLISION_API virtual ~ndShapeStaticBVH(void);
+
+	protected:
+	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
+
+	//virtual dFloat32 RayCast(const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
+	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
 #if 0
 	public:
 	D_MSV_NEWTON_ALIGN_32 
@@ -51,9 +60,9 @@ class ndShapeStaticBVH : public ndShapeStaticMesh
 		const ndShapeStaticBVH* m_me;
 	} D_GCC_NEWTON_ALIGN_32;
 
-	ndShapeStaticBVH(dgWorld* const world);
+	
 	ndShapeStaticBVH (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
-	virtual ~ndShapeStaticBVH(void);
+	
 
 	void BeginBuild();
 	void AddFace (dInt32 vertexCount, const dFloat32* const vertexPtr, dInt32 strideInBytes, dInt32 faceAttribute);
@@ -75,13 +84,11 @@ class ndShapeStaticBVH : public ndShapeStaticMesh
 
 	void Serialize(dgSerialize callback, void* const userData) const;
 	virtual dVector SupportVertex (const dVector& dir) const;
-
-	virtual dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
+	
 	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const;
 	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
 
 	virtual void GetLocalAABB (const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
-	virtual void DebugCollision (const dMatrix& matrixPtr, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
 
 	virtual dVector SupportVertex (const dVector& dir, dInt32* const vertexIndex) const;
 	virtual dVector SupportVertexSpecial (const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;

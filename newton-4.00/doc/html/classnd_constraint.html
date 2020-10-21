@@ -107,7 +107,10 @@ Inheritance diagram for ndConstraint:</div>
  <div class="center">
   <img src="classnd_constraint.png" usemap="#ndConstraint_map" alt=""/>
   <map id="ndConstraint_map" name="ndConstraint_map">
-<area href="classnd_contact.html" alt="ndContact" shape="rect" coords="0,56,83,80"/>
+<area href="classnd_contact.html" alt="ndContact" shape="rect" coords="0,56,163,80"/>
+<area href="classnd_joint_bilateral_constraint.html" alt="ndJointBilateralConstraint" shape="rect" coords="173,56,336,80"/>
+<area href="classnd_joint_ball_and_socket.html" alt="ndJointBallAndSocket" shape="rect" coords="86,112,249,136"/>
+<area href="classnd_joint_kinematic_controller.html" alt="ndJointKinematicController" shape="rect" coords="259,112,422,136"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -116,30 +119,33 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ade31628369e25397570f0e015df33307"><td class="memItemLeft" align="right" valign="top"><a id="ade31628369e25397570f0e015df33307"></a>
 virtual <a class="el" href="classnd_contact.html">ndContact</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsContact</b> ()</td></tr>
 <tr class="separator:ade31628369e25397570f0e015df33307"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7daf93d886a78910b33b25751c3f6ad0"><td class="memItemLeft" align="right" valign="top"><a id="a7daf93d886a78910b33b25751c3f6ad0"></a>
-virtual <a class="el" href="classnd_constraint.html">ndConstraint</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsConstraint</b> ()</td></tr>
-<tr class="separator:a7daf93d886a78910b33b25751c3f6ad0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4dbff6524dbc93ee7b5c12613e2629ea"><td class="memItemLeft" align="right" valign="top"><a id="a4dbff6524dbc93ee7b5c12613e2629ea"></a>
+virtual <a class="el" href="classnd_joint_bilateral_constraint.html">ndJointBilateralConstraint</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsBilateral</b> ()</td></tr>
+<tr class="separator:a4dbff6524dbc93ee7b5c12613e2629ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a71e171227f7c28adc63ad13bdbd9cf61"><td class="memItemLeft" align="right" valign="top"><a id="a71e171227f7c28adc63ad13bdbd9cf61"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsBilateral</b> () const</td></tr>
 <tr class="separator:a71e171227f7c28adc63ad13bdbd9cf61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa2977eb80b51ec0d32c3ad3816d8b9b"><td class="memItemLeft" align="right" valign="top"><a id="aaa2977eb80b51ec0d32c3ad3816d8b9b"></a>
 virtual const dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>GetRowsCount</b> () const =0</td></tr>
 <tr class="separator:aaa2977eb80b51ec0d32c3ad3816d8b9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa27f75c9099761fa3a37e9e11e6f724"><td class="memItemLeft" align="right" valign="top"><a id="aaa27f75c9099761fa3a37e9e11e6f724"></a>
-virtual dUnsigned32&#160;</td><td class="memItemRight" valign="bottom"><b>JacobianDerivative</b> (<a class="el" href="classnd_constraint_descritor.html">ndConstraintDescritor</a> &amp;params)=0</td></tr>
-<tr class="separator:aaa27f75c9099761fa3a37e9e11e6f724"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ee7aa322b8c67dc91a5c6d1a883426a"><td class="memItemLeft" align="right" valign="top"><a id="a2ee7aa322b8c67dc91a5c6d1a883426a"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>JointAccelerations</b> (<a class="el" href="classnd_joint_acceleration_decriptor.html">ndJointAccelerationDecriptor</a> *const params)=0</td></tr>
-<tr class="separator:a2ee7aa322b8c67dc91a5c6d1a883426a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d05fb9d221f9841f92b5557118fe053"><td class="memItemLeft" align="right" valign="top"><a id="a8d05fb9d221f9841f92b5557118fe053"></a>
+virtual <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetBody0</b> () const</td></tr>
+<tr class="separator:a8d05fb9d221f9841f92b5557118fe053"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf8a210bacefc67271564a226d482503"><td class="memItemLeft" align="right" valign="top"><a id="abf8a210bacefc67271564a226d482503"></a>
+virtual <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetBody1</b> () const</td></tr>
+<tr class="separator:abf8a210bacefc67271564a226d482503"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a510f5e82ed1d5149ae9ac88792f3f628"><td class="memItemLeft" align="right" valign="top"><a id="a510f5e82ed1d5149ae9ac88792f3f628"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>JacobianDerivative</b> (<a class="el" href="classnd_constraint_descritor.html">ndConstraintDescritor</a> &amp;desc)=0</td></tr>
+<tr class="separator:a510f5e82ed1d5149ae9ac88792f3f628"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50c6d0a4dc34d97f8e448239bf22434a"><td class="memItemLeft" align="right" valign="top"><a id="a50c6d0a4dc34d97f8e448239bf22434a"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>JointAccelerations</b> (<a class="el" href="classnd_joint_acceleration_decriptor.html">ndJointAccelerationDecriptor</a> *const desc)=0</td></tr>
+<tr class="separator:a50c6d0a4dc34d97f8e448239bf22434a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a092192a50f95e32aa7fc9d15d0928fe9"><td class="memItemLeft" align="right" valign="top"><a id="a092192a50f95e32aa7fc9d15d0928fe9"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>InitPointParam</b> (<a class="el" href="classdg_point_param.html">dgPointParam</a> &amp;param, dFloat32 stiffness, const <a class="el" href="classd_vector.html">dVector</a> &amp;p0Global, const <a class="el" href="classd_vector.html">dVector</a> &amp;p1Global) const</td></tr>
 <tr class="separator:a092192a50f95e32aa7fc9d15d0928fe9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ade81daf877a3a0a021017b80daef7cb9"><td class="memItemLeft" align="right" valign="top"><a id="ade81daf877a3a0a021017b80daef7cb9"></a>
-virtual <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetKinematicBody0</b> () const</td></tr>
-<tr class="separator:ade81daf877a3a0a021017b80daef7cb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af21635ebf56cb5190b089ebe88afe9a5"><td class="memItemLeft" align="right" valign="top"><a id="af21635ebf56cb5190b089ebe88afe9a5"></a>
-virtual <a class="el" href="classnd_body_kinematic.html">ndBodyKinematic</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetKinematicBody1</b> () const</td></tr>
-<tr class="separator:af21635ebf56cb5190b089ebe88afe9a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a864e2402ca2b8ec33886da9ad3fd183b"><td class="memItemLeft" align="right" valign="top"><a id="a864e2402ca2b8ec33886da9ad3fd183b"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>DebugJoint</b> (<a class="el" href="classnd_constraint_debug_callback.html">ndConstraintDebugCallback</a> &amp;debugCallback) const</td></tr>
+<tr class="separator:a864e2402ca2b8ec33886da9ad3fd183b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -158,6 +164,9 @@ dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>m_rowStart</b></td>
 <tr class="memitem:acf7e972ab9b813bedfaf1b860dd84d74"><td class="memItemLeft" align="right" valign="top"><a id="acf7e972ab9b813bedfaf1b860dd84d74"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>m_jointFeebackForce</b></td></tr>
 <tr class="separator:acf7e972ab9b813bedfaf1b860dd84d74"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6929c6aa8ab197f23077994c4892148"><td class="memItemLeft" align="right" valign="top"><a id="aa6929c6aa8ab197f23077994c4892148"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>m_isInSkeletonLoop</b></td></tr>
+<tr class="separator:aa6929c6aa8ab197f23077994c4892148"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 </div><!-- doc-content -->

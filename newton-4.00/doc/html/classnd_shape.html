@@ -109,12 +109,16 @@ Inheritance diagram for ndShape:</div>
  <div class="center">
   <img src="classnd_shape.png" usemap="#ndShape_map" alt=""/>
   <map id="ndShape_map" name="ndShape_map">
-<area href="classd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes." alt="dClassAlloc" shape="rect" coords="125,0,240,24"/>
-<area href="classnd_shape_convex.html" alt="ndShapeConvex" shape="rect" coords="125,112,240,136"/>
-<area href="classnd_shape_box.html" alt="ndShapeBox" shape="rect" coords="0,168,115,192"/>
-<area href="classnd_shape_null.html" alt="ndShapeNull" shape="rect" coords="125,168,240,192"/>
-<area href="classnd_shape_sphere.html" alt="ndShapeSphere" shape="rect" coords="250,168,365,192"/>
-<area href="classnd_dummy_collision.html" alt="ndDummyCollision" shape="rect" coords="125,224,240,248"/>
+<area href="classd_class_alloc.html" title="Base class for providing memory allocation for all other engine classes." alt="dClassAlloc" shape="rect" coords="479,0,606,24"/>
+<area href="classnd_shape_convex.html" alt="ndShapeConvex" shape="rect" coords="274,112,401,136"/>
+<area href="classnd_shape_static_mesh.html" alt="ndShapeStaticMesh" shape="rect" coords="685,112,812,136"/>
+<area href="classnd_shape_box.html" alt="ndShapeBox" shape="rect" coords="0,168,127,192"/>
+<area href="classnd_shape_capsule.html" alt="ndShapeCapsule" shape="rect" coords="137,168,264,192"/>
+<area href="classnd_shape_convex_hull.html" alt="ndShapeConvexHull" shape="rect" coords="274,168,401,192"/>
+<area href="classnd_shape_null.html" alt="ndShapeNull" shape="rect" coords="411,168,538,192"/>
+<area href="classnd_shape_sphere.html" alt="ndShapeSphere" shape="rect" coords="548,168,675,192"/>
+<area href="classnd_shape_static_b_v_h.html" alt="ndShapeStaticBVH" shape="rect" coords="685,168,812,192"/>
+<area href="classnd_dummy_collision.html" alt="ndDummyCollision" shape="rect" coords="411,224,538,248"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -129,15 +133,18 @@ dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>GetRefCount</b> () 
 <tr class="memitem:a6fa8ce03eb930fd844ebb58f2a792362"><td class="memItemLeft" align="right" valign="top"><a id="a6fa8ce03eb930fd844ebb58f2a792362"></a>
 virtual dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>Release</b> () const</td></tr>
 <tr class="separator:a6fa8ce03eb930fd844ebb58f2a792362"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5413342ef2ebc69cc02938ecad3a3310"><td class="memItemLeft" align="right" valign="top"><a id="a5413342ef2ebc69cc02938ecad3a3310"></a>
-virtual <a class="el" href="classnd_shape.html">ndShape</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShape</b> ()</td></tr>
-<tr class="separator:a5413342ef2ebc69cc02938ecad3a3310"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade4df021c83d95f7f0af3e32b8ed5318"><td class="memItemLeft" align="right" valign="top"><a id="ade4df021c83d95f7f0af3e32b8ed5318"></a>
 virtual <a class="el" href="classnd_shape_box.html">ndShapeBox</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShapeBox</b> ()</td></tr>
 <tr class="separator:ade4df021c83d95f7f0af3e32b8ed5318"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80d45a6927aef2135aab4e86d9a5cee0"><td class="memItemLeft" align="right" valign="top"><a id="a80d45a6927aef2135aab4e86d9a5cee0"></a>
 virtual <a class="el" href="classnd_shape_sphere.html">ndShapeSphere</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShapeSphere</b> ()</td></tr>
 <tr class="separator:a80d45a6927aef2135aab4e86d9a5cee0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2af2eaf3650c3dff55299289e61ebed"><td class="memItemLeft" align="right" valign="top"><a id="ae2af2eaf3650c3dff55299289e61ebed"></a>
+virtual <a class="el" href="classnd_shape_capsule.html">ndShapeCapsule</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShapeCapsule</b> ()</td></tr>
+<tr class="separator:ae2af2eaf3650c3dff55299289e61ebed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1afb55e209088c821df49be717174e2b"><td class="memItemLeft" align="right" valign="top"><a id="a1afb55e209088c821df49be717174e2b"></a>
+virtual ndShapeCompound *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShapeCompound</b> ()</td></tr>
+<tr class="separator:a1afb55e209088c821df49be717174e2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af79e33b2a8002f4c1b75ccf874739a4b"><td class="memItemLeft" align="right" valign="top"><a id="af79e33b2a8002f4c1b75ccf874739a4b"></a>
 virtual <a class="el" href="classnd_shape_null.html">ndShapeNull</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetAsShapeNull</b> ()</td></tr>
 <tr class="separator:af79e33b2a8002f4c1b75ccf874739a4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -153,6 +160,18 @@ virtual D_COLLISION_API void&#160;</td><td class="memItemRight" valign="bottom">
 <tr class="memitem:ad25ad69a5b8c6b0d97537dc8bf765eb4"><td class="memItemLeft" align="right" valign="top"><a id="ad25ad69a5b8c6b0d97537dc8bf765eb4"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>DebugShape</b> (const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;matrix, <a class="el" href="classnd_shape_debug_callback.html">ndShapeDebugCallback</a> &amp;debugCallback) const =0</td></tr>
 <tr class="separator:ad25ad69a5b8c6b0d97537dc8bf765eb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf62affffa503d71acc95741f21d1ff1"><td class="memItemLeft" align="right" valign="top"><a id="aaf62affffa503d71acc95741f21d1ff1"></a>
+virtual <a class="el" href="classnd_shape_info.html">ndShapeInfo</a>&#160;</td><td class="memItemRight" valign="bottom"><b>GetShapeInfo</b> () const</td></tr>
+<tr class="separator:aaf62affffa503d71acc95741f21d1ff1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4f27632bd29a79a1f527dd45414f992"><td class="memItemLeft" align="right" valign="top"><a id="ac4f27632bd29a79a1f527dd45414f992"></a>
+virtual dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetVolume</b> () const =0</td></tr>
+<tr class="separator:ac4f27632bd29a79a1f527dd45414f992"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a826800a422cef60f87fed7c3f9a3f773"><td class="memItemLeft" align="right" valign="top"><a id="a826800a422cef60f87fed7c3f9a3f773"></a>
+virtual dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetBoxMinRadius</b> () const =0</td></tr>
+<tr class="separator:a826800a422cef60f87fed7c3f9a3f773"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7a43ddc4fecc00b36a9f6d6ea60b75f"><td class="memItemLeft" align="right" valign="top"><a id="ad7a43ddc4fecc00b36a9f6d6ea60b75f"></a>
+virtual dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>GetBoxMaxRadius</b> () const =0</td></tr>
+<tr class="separator:ad7a43ddc4fecc00b36a9f6d6ea60b75f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab6535fde3201e97cc8fbfbf089f0ea89"><td class="memItemLeft" align="right" valign="top"><a id="ab6535fde3201e97cc8fbfbf089f0ea89"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>CalcAABB</b> (const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;matrix, <a class="el" href="classd_vector.html">dVector</a> &amp;p0, <a class="el" href="classd_vector.html">dVector</a> &amp;p1) const =0</td></tr>
 <tr class="separator:ab6535fde3201e97cc8fbfbf089f0ea89"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -168,6 +187,9 @@ virtual <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class=
 <tr class="memitem:a03885e0ce994379c6a4d5427106f8e3f"><td class="memItemLeft" align="right" valign="top"><a id="a03885e0ce994379c6a4d5427106f8e3f"></a>
 virtual dInt32&#160;</td><td class="memItemRight" valign="bottom"><b>CalculatePlaneIntersection</b> (const <a class="el" href="classd_vector.html">dVector</a> &amp;normal, const <a class="el" href="classd_vector.html">dVector</a> &amp;point, <a class="el" href="classd_vector.html">dVector</a> *const contactsOut) const =0</td></tr>
 <tr class="separator:a03885e0ce994379c6a4d5427106f8e3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62916bb8da7157011c70485b56747500"><td class="memItemLeft" align="right" valign="top"><a id="a62916bb8da7157011c70485b56747500"></a>
+virtual <a class="el" href="classd_vector.html">dVector</a>&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateVolumeIntegral</b> (const <a class="el" href="classd_matrix.html">dMatrix</a> &amp;globalMatrix, const <a class="el" href="classd_vector.html">dVector</a> &amp;globalPlane, const <a class="el" href="classnd_shape_instance.html">ndShapeInstance</a> &amp;parentScale) const =0</td></tr>
+<tr class="separator:a62916bb8da7157011c70485b56747500"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9ba027712a7b27414847f3e0f5bbc314"><td class="memItemLeft" align="right" valign="top"><a id="a9ba027712a7b27414847f3e0f5bbc314"></a>
 virtual dFloat32&#160;</td><td class="memItemRight" valign="bottom"><b>RayCast</b> (<a class="el" href="classnd_ray_cast_notify.html">ndRayCastNotify</a> &amp;callback, const <a class="el" href="classd_vector.html">dVector</a> &amp;localP0, const <a class="el" href="classd_vector.html">dVector</a> &amp;localP1, dFloat32 maxT, const <a class="el" href="classnd_body.html">ndBody</a> *const body, <a class="el" href="classnd_contact_point.html">ndContactPoint</a> &amp;contactOut) const =0</td></tr>
 <tr class="separator:a9ba027712a7b27414847f3e0f5bbc314"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -197,9 +219,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a02e6165614604b027ba6de47cc6f6ea2"><td class="memItemLeft" align="right" valign="top"><a id="a02e6165614604b027ba6de47cc6f6ea2"></a>
-D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndShape</b> (dShapeID id)</td></tr>
-<tr class="separator:a02e6165614604b027ba6de47cc6f6ea2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad68bada310ae3c115583963e7be36cad"><td class="memItemLeft" align="right" valign="top"><a id="ad68bada310ae3c115583963e7be36cad"></a>
+D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndShape</b> (ndShapeID id)</td></tr>
+<tr class="separator:ad68bada310ae3c115583963e7be36cad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab91401321ddcb50f781cdb2c4dcf31f8"><td class="memItemLeft" align="right" valign="top"><a id="ab91401321ddcb50f781cdb2c4dcf31f8"></a>
 D_COLLISION_API&#160;</td><td class="memItemRight" valign="bottom"><b>ndShape</b> (const <a class="el" href="classnd_shape.html">ndShape</a> &amp;source)</td></tr>
 <tr class="separator:ab91401321ddcb50f781cdb2c4dcf31f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -224,6 +246,9 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:ae2af70e1f641becd8334d44cbae6b0e9"><td class="memItemLeft" align="right" valign="top"><a id="ae2af70e1f641becd8334d44cbae6b0e9"></a>
 <a class="el" href="classd_atomic.html">dAtomic</a>&lt; dInt32 &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_refCount</b></td></tr>
 <tr class="separator:ae2af70e1f641becd8334d44cbae6b0e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a611accedce1845f9985b8c6478f8ce1c"><td class="memItemLeft" align="right" valign="top"><a id="a611accedce1845f9985b8c6478f8ce1c"></a>
+ndShapeID&#160;</td><td class="memItemRight" valign="bottom"><b>m_collisionId</b></td></tr>
+<tr class="separator:a611accedce1845f9985b8c6478f8ce1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-attribs"></a>
 Static Protected Attributes</h2></td></tr>

@@ -55,7 +55,7 @@ enum ndShapeID
 	m_nullCollision,
 
 //	m_compoundCollision,
-//	m_boundingBoxHierachy,
+	m_boundingBoxHierachy,
 //	m_heightField,
 //	m_deformableClothPatch,
 //	m_deformableSolidMesh,

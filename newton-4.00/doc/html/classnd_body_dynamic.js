@@ -22,8 +22,6 @@ var classnd_body_dynamic =
     [ "m_externalTorque", "classnd_body_dynamic.html#a1d22209078fbfa01fddc94eaa0473526", null ],
     [ "m_impulseForce", "classnd_body_dynamic.html#a207d52a13cc68f96e71d203a7a2cd5c8", null ],
     [ "m_impulseTorque", "classnd_body_dynamic.html#a21b12bf2abdb3cba826ced5636037f06", null ],
-    [ "m_jointArray", "classnd_body_dynamic.html#a26355b3af4d04be2f39a59556d507048", null ],
     [ "m_savedExternalForce", "classnd_body_dynamic.html#acdf9c9115b176b0471076b1a828d6bce", null ],
-    [ "m_savedExternalTorque", "classnd_body_dynamic.html#abd1c76372da7a3f1844cd8389fc78948", null ],
-    [ "m_sleepingCounter", "classnd_body_dynamic.html#a5bafbe2574476a66ef43fee650aec191", null ]
+    [ "m_savedExternalTorque", "classnd_body_dynamic.html#abd1c76372da7a3f1844cd8389fc78948", null ]
 ];

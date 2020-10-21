@@ -131,8 +131,8 @@ $(document).ready(function(){initNavTree('nd_ray_cast_notify_8h_source.html','')
 <div class="line"><a name="l00032"></a><span class="lineno"><a class="line" href="classnd_ray_cast_notify.html">   32</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_ray_cast_notify.html">ndRayCastNotify</a></div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;{</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">public</span>: </div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="classnd_ray_cast_notify.html">ndRayCastNotify</a>(<span class="keyword">const</span> <a class="code" href="classnd_scene.html">ndScene</a>* <span class="keyword">const</span> broadPhase)</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        :m_broadPhase(broadPhase)</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="classnd_ray_cast_notify.html">ndRayCastNotify</a>(<span class="keyword">const</span> <a class="code" href="classnd_scene.html">ndScene</a>* <span class="keyword">const</span> scene)</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        :m_scene(scene)</div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    {</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    }</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
@@ -142,10 +142,10 @@ $(document).ready(function(){initNavTree('nd_ray_cast_notify_8h_source.html','')
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    dFloat32 TraceRay(<span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; p0, <span class="keyword">const</span> <a class="code" href="classd_vector.html">dVector</a>&amp; p1)</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    {</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="keywordflow">return</span> m_broadPhase-&gt;RayCast(*<span class="keyword">this</span>, p0, p1);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        <span class="keywordflow">return</span> m_scene-&gt;RayCast(*<span class="keyword">this</span>, p0, p1);</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    }</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    dUnsigned32 <span class="keyword">virtual</span> OnRayPrecastAction(<span class="keyword">const</span> <a class="code" href="classnd_body.html">ndBody</a>* <span class="keyword">const</span> body, <span class="keyword">const</span> <a class="code" href="classnd_shape_instance.html">ndShapeInstance</a>* <span class="keyword">const</span> collision)</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">virtual</span> dUnsigned32 OnRayPrecastAction(<span class="keyword">const</span> <a class="code" href="classnd_body.html">ndBody</a>* <span class="keyword">const</span> body, <span class="keyword">const</span> <a class="code" href="classnd_shape_instance.html">ndShapeInstance</a>* <span class="keyword">const</span> collision)</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    {</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <span class="keywordflow">return</span> 1;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    }</div>
@@ -153,46 +153,50 @@ $(document).ready(function(){initNavTree('nd_ray_cast_notify_8h_source.html','')
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">virtual</span> dFloat32 OnRayCastAction(<span class="keyword">const</span> <a class="code" href="classnd_contact_point.html">ndContactPoint</a>&amp; contact, dFloat32 intersetParam) = 0;</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160; </div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keyword">const</span> <a class="code" href="classnd_scene.html">ndScene</a>* m_broadPhase;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="keyword">const</span> <a class="code" href="classnd_scene.html">ndScene</a>* m_scene;</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;} D_GCC_NEWTON_ALIGN_32 ;</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160; </div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;D_MSV_NEWTON_ALIGN_32</div>
-<div class="line"><a name="l00061"></a><span class="lineno"><a class="line" href="classnd_ray_cast_cloasest_hit_callback.html">   61</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_ray_cast_cloasest_hit_callback.html">ndRayCastCloasestHitCallback</a>: <span class="keyword">public</span> <a class="code" href="classnd_ray_cast_notify.html">ndRayCastNotify</a></div>
+<div class="line"><a name="l00061"></a><span class="lineno"><a class="line" href="classnd_ray_cast_closest_hit_callback.html">   61</a></span>&#160;<span class="keyword">class </span><a class="code" href="classnd_ray_cast_closest_hit_callback.html">ndRayCastClosestHitCallback</a>: <span class="keyword">public</span> <a class="code" href="classnd_ray_cast_notify.html">ndRayCastNotify</a></div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;{</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <a class="code" href="classnd_ray_cast_cloasest_hit_callback.html">ndRayCastCloasestHitCallback</a>(<span class="keyword">const</span> <a class="code" href="classnd_scene.html">ndScene</a>* <span class="keyword">const</span> broadPhase)</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        :<a class="code" href="classnd_ray_cast_notify.html">ndRayCastNotify</a>(broadPhase)</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <a class="code" href="classnd_ray_cast_closest_hit_callback.html">ndRayCastClosestHitCallback</a>(<span class="keyword">const</span> <a class="code" href="classnd_scene.html">ndScene</a>* <span class="keyword">const</span> scene)</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        :<a class="code" href="classnd_ray_cast_notify.html">ndRayCastNotify</a>(scene)</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        ,m_param(dFloat32(1.2f))</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    {</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    }</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    dFloat32 OnRayCastAction(<span class="keyword">const</span> <a class="code" href="classnd_contact_point.html">ndContactPoint</a>&amp; contact, dFloat32 intersetParam)</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    dUnsigned32 OnRayPrecastAction(<span class="keyword">const</span> <a class="code" href="classnd_body.html">ndBody</a>* <span class="keyword">const</span> body, <span class="keyword">const</span> <a class="code" href="classnd_shape_instance.html">ndShapeInstance</a>* <span class="keyword">const</span> collision)</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    {</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordflow">if</span> (intersetParam &lt; m_param)</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        {</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;            m_param = intersetParam;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;            m_contact = contact;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        }</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keywordflow">return</span> intersetParam;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    }</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <a class="code" href="classnd_contact_point.html">ndContactPoint</a> m_contact;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    dFloat32 m_param;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;} D_GCC_NEWTON_ALIGN_32 ;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordflow">return</span> ((<a class="code" href="classnd_body.html">ndBody</a>*)body)-&gt;GetAsBodyDynamic() ? 1 : 0;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    }</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    dFloat32 OnRayCastAction(<span class="keyword">const</span> <a class="code" href="classnd_contact_point.html">ndContactPoint</a>&amp; contact, dFloat32 intersetParam)</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    {</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keywordflow">if</span> (intersetParam &lt; m_param)</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        {</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;            m_param = intersetParam;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            m_contact = contact;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        }</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="keywordflow">return</span> intersetParam;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    }</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <a class="code" href="classnd_contact_point.html">ndContactPoint</a> m_contact;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    dFloat32 m_param;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;} D_GCC_NEWTON_ALIGN_32 ;</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassnd_scene_html"><div class="ttname"><a href="classnd_scene.html">ndScene</a></div><div class="ttdef"><b>Definition:</b> ndScene.h:42</div></div>
-<div class="ttc" id="aclassnd_body_html"><div class="ttname"><a href="classnd_body.html">ndBody</a></div><div class="ttdef"><b>Definition:</b> ndBody.h:37</div></div>
-<div class="ttc" id="aclassnd_ray_cast_cloasest_hit_callback_html"><div class="ttname"><a href="classnd_ray_cast_cloasest_hit_callback.html">ndRayCastCloasestHitCallback</a></div><div class="ttdef"><b>Definition:</b> ndRayCastNotify.h:62</div></div>
+<div class="ttc" id="aclassnd_scene_html"><div class="ttname"><a href="classnd_scene.html">ndScene</a></div><div class="ttdef"><b>Definition:</b> ndScene.h:60</div></div>
+<div class="ttc" id="aclassnd_body_html"><div class="ttname"><a href="classnd_body.html">ndBody</a></div><div class="ttdef"><b>Definition:</b> ndBody.h:38</div></div>
 <div class="ttc" id="aclassnd_ray_cast_notify_html"><div class="ttname"><a href="classnd_ray_cast_notify.html">ndRayCastNotify</a></div><div class="ttdef"><b>Definition:</b> ndRayCastNotify.h:33</div></div>
 <div class="ttc" id="aclassnd_contact_point_html"><div class="ttname"><a href="classnd_contact_point.html">ndContactPoint</a></div><div class="ttdef"><b>Definition:</b> ndContact.h:40</div></div>
 <div class="ttc" id="aclassd_vector_html"><div class="ttname"><a href="classd_vector.html">dVector</a></div><div class="ttdef"><b>Definition:</b> dVectorArmNeon.h:1104</div></div>
-<div class="ttc" id="aclassnd_shape_instance_html"><div class="ttname"><a href="classnd_shape_instance.html">ndShapeInstance</a></div><div class="ttdef"><b>Definition:</b> ndShapeInstance.h:53</div></div>
+<div class="ttc" id="aclassnd_ray_cast_closest_hit_callback_html"><div class="ttname"><a href="classnd_ray_cast_closest_hit_callback.html">ndRayCastClosestHitCallback</a></div><div class="ttdef"><b>Definition:</b> ndRayCastNotify.h:62</div></div>
+<div class="ttc" id="aclassnd_shape_instance_html"><div class="ttname"><a href="classnd_shape_instance.html">ndShapeInstance</a></div><div class="ttdef"><b>Definition:</b> ndShapeInstance.h:55</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

@@ -30,14 +30,6 @@
 #include "ndShapeStaticBVH.h"
 
 
-ndShapeStaticBVH::ndShapeStaticBVH(dgWorld* const world)
-	:ndShapeStaticMesh (world, m_boundingBoxHierachy), dgAABBPolygonSoup()
-	,m_trianglesCount(0)
-{
-	m_rtti |= dgCollisionBVH_RTTI;
-	m_builder = NULL;
-	m_userRayCastCallback = NULL;
-}
 
 ndShapeStaticBVH::ndShapeStaticBVH (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber)
 	:ndShapeStaticMesh (world, deserialization, userData, revisionNumber)
@@ -56,10 +48,6 @@ ndShapeStaticBVH::ndShapeStaticBVH (dgWorld* const world, dgDeserialize deserial
 	SetCollisionBBox(p0, p1);
 
 	deserialization(userData, &m_trianglesCount, sizeof (dInt32));
-}
-
-ndShapeStaticBVH::~ndShapeStaticBVH(void)
-{
 }
 
 void ndShapeStaticBVH::Serialize(dgSerialize callback, void* const userData) const
@@ -260,44 +248,6 @@ dgAssert (0);
 
 
 
-dFloat32 ndShapeStaticBVH::RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
-{
-	dgBVHRay ray (localP0, localP1);
-	ray.m_t = dgMin(maxT, dFloat32 (1.0f));
-	ray.m_me = this;
-	ray.m_userData = userData;
-	if (!m_userRayCastCallback) {
-		ForAllSectorsRayHit (ray, maxT, RayHit, &ray);
-		if (ray.m_t < maxT) {
-			maxT = ray.m_t; 
-			dgAssert (ray.m_normal.m_w == dFloat32 (0.0f));
-			dgAssert (ray.m_normal.DotProduct(ray.m_normal).GetScalar() > dFloat32(0.0f));
-			//contactOut.m_normal = ray.m_normal.Scale (dgRsqrt (ray.m_normal.DotProduct(ray.m_normal).GetScalar() + dFloat32 (1.0e-8f)));
-			contactOut.m_normal = ray.m_normal.Normalize();
-			//contactOut.m_userId = ray.m_id;
-			contactOut.m_shapeId0 = ray.m_id;
-			contactOut.m_shapeId1 = ray.m_id;
-		}
-	} else {
-		if (body) {
-			//ray.m_matrix = body->m_collisionWorldMatrix;
-			ray.m_matrix = body->m_collision->GetGlobalMatrix();
-		}
-		
-		ForAllSectorsRayHit (ray, maxT, RayHitUser, &ray);
-		if (ray.m_t < dFloat32 (1.0f)) {
-			maxT = ray.m_t; 
-			dgAssert(ray.m_normal.m_w == dFloat32(0.0f));
-			dgAssert(ray.m_normal.DotProduct(ray.m_normal).GetScalar() > dFloat32(0.0f));
-			//contactOut.m_normal = ray.m_normal.Scale (dgRsqrt (ray.m_normal.DotProduct(ray.m_normal).GetScalar() + dFloat32 (1.0e-8f)));
-			contactOut.m_normal = ray.m_normal.Normalize();
-			//contactOut.m_userId = ray.m_id;
-			contactOut.m_shapeId0 = ray.m_id;
-			contactOut.m_shapeId1 = ray.m_id;
-		}
-	}
-	return maxT;
-}
 
 dgIntersectStatus ndShapeStaticBVH::GetPolygon (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
 {
@@ -426,3 +376,67 @@ void ndShapeStaticBVH::DebugCollision (const dMatrix& matrixPtr, dgCollision::On
 	ForAllSectors (box, dVector(dFloat32 (0.0f)), dFloat32 (1.0f), ShowDebugPolygon, &context);
 }
 #endif
+
+ndShapeStaticBVH::ndShapeStaticBVH()
+	:ndShapeStaticMesh(m_boundingBoxHierachy)
+//	:ndShapeStaticMesh(world, m_boundingBoxHierachy), dgAABBPolygonSoup()
+//	, m_trianglesCount(0)
+{
+	dAssert(0);
+	//m_rtti |= dgCollisionBVH_RTTI;
+	//m_builder = NULL;
+	//m_userRayCastCallback = NULL;
+}
+
+ndShapeStaticBVH::~ndShapeStaticBVH(void)
+{
+	dAssert(0);
+}
+
+void ndShapeStaticBVH::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
+{
+	dAssert(0);
+}
+
+//dFloat32 ndShapeStaticBVH::RayCast(const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
+dFloat32 ndShapeStaticBVH::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
+{
+	dAssert(0);
+	return 0;
+	//dgBVHRay ray(localP0, localP1);
+	//ray.m_t = dgMin(maxT, dFloat32(1.0f));
+	//ray.m_me = this;
+	//ray.m_userData = userData;
+	//if (!m_userRayCastCallback) {
+	//	ForAllSectorsRayHit(ray, maxT, RayHit, &ray);
+	//	if (ray.m_t < maxT) {
+	//		maxT = ray.m_t;
+	//		dgAssert(ray.m_normal.m_w == dFloat32(0.0f));
+	//		dgAssert(ray.m_normal.DotProduct(ray.m_normal).GetScalar() > dFloat32(0.0f));
+	//		//contactOut.m_normal = ray.m_normal.Scale (dgRsqrt (ray.m_normal.DotProduct(ray.m_normal).GetScalar() + dFloat32 (1.0e-8f)));
+	//		contactOut.m_normal = ray.m_normal.Normalize();
+	//		//contactOut.m_userId = ray.m_id;
+	//		contactOut.m_shapeId0 = ray.m_id;
+	//		contactOut.m_shapeId1 = ray.m_id;
+	//	}
+	//}
+	//else {
+	//	if (body) {
+	//		//ray.m_matrix = body->m_collisionWorldMatrix;
+	//		ray.m_matrix = body->m_collision->GetGlobalMatrix();
+	//	}
+	//
+	//	ForAllSectorsRayHit(ray, maxT, RayHitUser, &ray);
+	//	if (ray.m_t < dFloat32(1.0f)) {
+	//		maxT = ray.m_t;
+	//		dgAssert(ray.m_normal.m_w == dFloat32(0.0f));
+	//		dgAssert(ray.m_normal.DotProduct(ray.m_normal).GetScalar() > dFloat32(0.0f));
+	//		//contactOut.m_normal = ray.m_normal.Scale (dgRsqrt (ray.m_normal.DotProduct(ray.m_normal).GetScalar() + dFloat32 (1.0e-8f)));
+	//		contactOut.m_normal = ray.m_normal.Normalize();
+	//		//contactOut.m_userId = ray.m_id;
+	//		contactOut.m_shapeId0 = ray.m_id;
+	//		contactOut.m_shapeId1 = ray.m_id;
+	//	}
+	//}
+	//return maxT;
+}
