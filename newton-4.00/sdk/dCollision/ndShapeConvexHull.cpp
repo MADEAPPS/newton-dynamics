@@ -39,126 +39,6 @@ class ndShapeConvexHull::ndConvexBox
 } D_GCC_NEWTON_ALIGN_32;
 
 #if 0
-ndShapeConvexHull::ndShapeConvexHull(dgMemoryAllocator* const allocator, dUnsigned32 signature)
-	:dgCollisionConvex(allocator, signature, m_convexHullCollision)
-	,m_supportTree(nullptr)
-	,m_faceArray(nullptr)
-	,m_soaVertexArray(nullptr)
-	,m_vertexToEdgeMapping(nullptr)
-	,m_faceCount(0)
-	,m_soaVertexCount(0)
-	,m_supportTreeCount(0)
-{
-	m_edgeCount = 0;
-	m_vertexCount = 0;
-	m_vertex = nullptr;
-	m_simplex = nullptr;
-	m_rtti |= dgCollisionConvexHull_RTTI;
-}
-
-ndShapeConvexHull::ndShapeConvexHull(dgWorld* const world, dgDeserialize callback, void* const userData, dInt32 revisionNumber)
-	:dgCollisionConvex (world, callback, userData, revisionNumber)
-	,m_supportTree(nullptr)
-	,m_faceArray(nullptr)
-	,m_soaVertexArray(nullptr)
-	,m_vertexToEdgeMapping(nullptr)
-	,m_faceCount(0)
-	,m_soaVertexCount(0)
-	,m_supportTreeCount(0)
-{
-	m_rtti |= dgCollisionConvexHull_RTTI;
-
-	dInt32 edgeCount;
-	dInt32 vertexCount;
-	callback(userData, &vertexCount, sizeof(dInt32));
-	callback(userData, &edgeCount, sizeof(dInt32));
-	callback(userData, &m_faceCount, sizeof(dInt32));
-	callback(userData, &m_supportTreeCount, sizeof(dInt32));
-
-	m_edgeCount = dUnsigned16(edgeCount);
-	m_vertexCount = dUnsigned16 (vertexCount);
-	
-	m_vertex = (dVector*) m_allocator->Malloc (dInt32 (m_vertexCount * sizeof (dVector)));
-	m_simplex = (ndConvexSimplexEdge*) m_allocator->Malloc (dInt32 (m_edgeCount * sizeof (ndConvexSimplexEdge)));
-	m_faceArray = (ndConvexSimplexEdge **) m_allocator->Malloc(dInt32 (m_faceCount * sizeof(ndConvexSimplexEdge *)));
-	m_vertexToEdgeMapping = (const ndConvexSimplexEdge **) m_allocator->Malloc(dInt32 (m_vertexCount * sizeof(ndConvexSimplexEdge *)));
-
-	callback(userData, m_vertex, m_vertexCount * sizeof(dVector));
-
-	if (m_supportTreeCount) {
-		m_supportTree = (ndConvexBox *) m_allocator->Malloc(dInt32 (m_supportTreeCount * sizeof(ndConvexBox)));
-		callback (userData, m_supportTree, m_supportTreeCount * sizeof(ndConvexBox));
-	}
-
-	for (dInt32 i = 0; i < m_edgeCount; i ++) {
-		dInt32 serialization[4];
-		callback (userData, serialization, sizeof (serialization));
-
-		m_simplex[i].m_vertex = serialization[0];
-		m_simplex[i].m_twin = m_simplex + serialization[1];
-		m_simplex[i].m_next = m_simplex + serialization[2];
-		m_simplex[i].m_prev = m_simplex + serialization[3];
-	}
-
-	for (dInt32 i = 0; i < m_faceCount; i ++) {
-		dInt32 faceOffset;
-		callback (userData, &faceOffset, sizeof (dInt32));
-		m_faceArray[i] = m_simplex + faceOffset; 
-	}
-
-	for (dInt32 i = 0; i < m_vertexCount; i ++) {
-		dInt32 faceOffset;
-		callback (userData, &faceOffset, sizeof (dInt32));
-		m_vertexToEdgeMapping[i] = m_simplex + faceOffset; 
-	}
-
-	if (vertexCount <= D_CONVEX_VERTEX_SPLITE_SIZE) {
-		CreateSOAdata();
-	}
-
-	SetVolumeAndCG ();
-}
-
-void ndShapeConvexHull::Serialize(dgSerialize callback, void* const userData) const
-{
-	SerializeLow(callback, userData);
-
-	dInt32 edgeCount = m_edgeCount;
-	dInt32 vertexCount = m_vertexCount;
-	callback(userData, &vertexCount, sizeof(dInt32));
-	callback(userData, &edgeCount, sizeof(dInt32));
-	callback(userData, &m_faceCount, sizeof(dInt32));
-	callback(userData, &m_supportTreeCount, sizeof(dInt32));
-
-	callback(userData, m_vertex, m_vertexCount * sizeof(dVector));
-
-	if (m_supportTreeCount) {
-		callback(userData, m_supportTree, m_supportTreeCount * sizeof(ndConvexBox));
-	}
-
-	for (dInt32 i = 0; i < m_edgeCount; i++) {
-		dInt32 serialization[4];
-		serialization[0] = m_simplex[i].m_vertex;
-		serialization[1] = dInt32(m_simplex[i].m_twin - m_simplex);
-		serialization[2] = dInt32(m_simplex[i].m_next - m_simplex);
-		serialization[3] = dInt32(m_simplex[i].m_prev - m_simplex);
-		callback(userData, serialization, sizeof(serialization));
-	}
-
-	for (dInt32 i = 0; i < m_faceCount; i++) {
-		dInt32 faceOffset;
-		faceOffset = dInt32(m_faceArray[i] - m_simplex);
-		callback(userData, &faceOffset, sizeof(dInt32));
-	}
-
-	for (dInt32 i = 0; i < m_vertexCount; i++) {
-		dInt32 faceOffset;
-		faceOffset = dInt32(m_vertexToEdgeMapping[i] - m_simplex);
-		callback(userData, &faceOffset, sizeof(dInt32));
-	}
-}
-
-
 dInt32 ndShapeConvexHull::GetFaceIndices (dInt32 index, dInt32* const indices) const
 {
 	dInt32 count = 0;
@@ -171,7 +51,6 @@ dInt32 ndShapeConvexHull::GetFaceIndices (dInt32 index, dInt32* const indices) c
 
 	return count;
 }
-
 
 bool ndShapeConvexHull::CheckConvex (dPolyhedra& polyhedra1, const dBigVector* hullVertexArray) const
 {
@@ -216,8 +95,7 @@ bool ndShapeConvexHull::CheckConvex (dPolyhedra& polyhedra1, const dBigVector* h
 	return true;
 }
 
-
-void ndShapeConvexHull::DebugCollision (const dMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
+void ndShapeConvexHull::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 {
 	dTriplex vertex[256];
 	for (dInt32 i = 0; i < m_faceCount; i ++) {
@@ -236,23 +114,8 @@ void ndShapeConvexHull::DebugCollision (const dMatrix& matrix, dgCollision::OnDe
 		callback (userData, count, &vertex[0].m_x, 0);
 	}
 }
-
-void ndShapeConvexHull::GetCollisionInfo(dgCollisionInfo* const info) const
-{
-	dgCollisionConvex::GetCollisionInfo(info);
-
-	info->m_convexHull.m_vertexCount = m_vertexCount;
-	info->m_convexHull.m_strideInBytes = sizeof (dVector);
-	info->m_convexHull.m_faceCount = m_faceCount;
-	info->m_convexHull.m_vertex = &m_vertex[0];
-}
-
-
-
 #endif
 
-
-//ndShapeConvexHull::ndShapeConvexHull(dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray)
 ndShapeConvexHull::ndShapeConvexHull (dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray)
 	:ndShapeConvex(m_convexHull)
 	,m_supportTree(nullptr)
@@ -1109,4 +972,15 @@ dVector ndShapeConvexHull::SupportVertex(const dVector& dir, dInt32* const verte
 	{
 		return SupportVertexBruteForce(dir, vertexIndex);
 	}
+}
+
+ndShapeInfo ndShapeConvexHull::GetShapeInfo() const
+{
+	ndShapeInfo info(ndShapeConvex::GetShapeInfo());
+
+	info.m_convexHull.m_vertexCount = m_vertexCount;
+	info.m_convexHull.m_strideInBytes = sizeof(dVector);
+	info.m_convexHull.m_faceCount = m_faceCount;
+	info.m_convexHull.m_vertex = &m_vertex[0];
+	return info;
 }

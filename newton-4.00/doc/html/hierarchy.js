@@ -94,10 +94,10 @@ var hierarchy =
           [ "ndShapeBox", "classnd_shape_box.html", null ],
           [ "ndShapeCapsule", "classnd_shape_capsule.html", null ],
           [ "ndShapeConvexHull", "classnd_shape_convex_hull.html", null ],
-          [ "ndShapeNull", "classnd_shape_null.html", [
-            [ "ndDummyCollision", "classnd_dummy_collision.html", null ]
-          ] ],
           [ "ndShapeSphere", "classnd_shape_sphere.html", null ]
+        ] ],
+        [ "ndShapeNull", "classnd_shape_null.html", [
+          [ "ndDummyCollision", "classnd_dummy_collision.html", null ]
         ] ],
         [ "ndShapeStaticMesh", "classnd_shape_static_mesh.html", [
           [ "ndShapeStaticBVH", "classnd_shape_static_b_v_h.html", null ]

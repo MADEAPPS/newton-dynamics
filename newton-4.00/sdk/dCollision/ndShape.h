@@ -46,27 +46,27 @@ enum ndShapeID
 	// do not change the order of these enum
 	m_sphereCollision = 0,
 	m_capsuleCollision,
-//	m_cylinderCollision,
-//	m_chamferCylinderCollision,
+	//m_cylinderCollision,
+	//m_chamferCylinderCollision,
 	m_boxCollision,
-//	m_coneCollision,
-	m_convexHull,
-//	// this must be the last convex shape ID
-	m_nullCollision,
+	//m_coneCollision,
+	m_convexHull, // this must be the last convex shape ID
 
-//	m_compoundCollision,
+	// non convex collisions.
+	m_nullCollision,
 	m_boundingBoxHierachy,
-//	m_heightField,
-//	m_deformableClothPatch,
-//	m_deformableSolidMesh,
-//	m_userMesh,
-//	m_sceneCollision,
-//	m_compoundFracturedCollision,
-//
-//	// these are for internal use only	
-//	m_contactCloud,
-//	m_polygonCollision,
-//	m_lumpedMassCollision
+	//m_compoundCollision,
+	//m_heightField,
+	//m_deformableClothPatch,
+	//m_deformableSolidMesh,
+	//m_userMesh,
+	//m_sceneCollision,
+	//m_compoundFracturedCollision,
+
+	// these are for internal use only	
+	//m_contactCloud,
+	//m_polygonCollision,
+	//m_lumpedMassCollision
 };
 
 class ndShapeMaterial

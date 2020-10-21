@@ -24,7 +24,6 @@
 
 #include "ndCollisionStdafx.h"
 #include "ndShape.h"
-//#include "ndBody.h"
 
 #define D_CLIP_MAX_COUNT				512
 #define D_CLIP_MAX_POINT_COUNT			64

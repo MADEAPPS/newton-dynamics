@@ -36,6 +36,7 @@ class ndShapeConvexHull : public ndShapeConvex
 	D_COLLISION_API virtual ~ndShapeConvexHull();
 
 	protected:
+	ndShapeInfo GetShapeInfo() const;
 	dBigVector FaceNormal(const dEdge *face, const dBigVector* const pool) const;
 	bool RemoveCoplanarEdge(dPolyhedra& convex, const dBigVector* const hullVertexArray) const;
 	bool Create(dInt32 count, dInt32 strideInBytes, const dFloat32* const vertexArray, dFloat32 tolerance);
@@ -45,16 +46,11 @@ class ndShapeConvexHull : public ndShapeConvex
 	dVector SupportVertexBruteForce(const dVector& dir, dInt32* const vertexIndex) const;
 	dVector SupportVertexhierarchical(const dVector& dir, dInt32* const vertexIndex) const;
 	
-/*
-	dInt32 GetFaceIndices (dInt32 index, dInt32* const indices) const;
-	protected:
-	bool CheckConvex (dPolyhedra& polyhedra, const dBigVector* hullVertexArray) const;
+	//void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 
-	virtual void DebugCollision  (const dMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const;
-	virtual void GetCollisionInfo(dgCollisionInfo* const info) const;
-
-	virtual const ndConvexSimplexEdge** GetVertexToEdgeMapping() const {return m_vertexToEdgeMapping;}
-*/
+	//protected:
+	//dInt32 GetFaceIndices (dInt32 index, dInt32* const indices) const;
+	//virtual const ndConvexSimplexEdge** GetVertexToEdgeMapping() const {return m_vertexToEdgeMapping;}
 	ndConvexBox* m_supportTree;
 	ndConvexSimplexEdge** m_faceArray;
 	dVector* m_soa_x;
