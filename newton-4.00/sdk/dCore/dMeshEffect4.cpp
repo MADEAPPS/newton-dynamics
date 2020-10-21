@@ -583,7 +583,7 @@ class dgHACDClusterGraph
 
 	dgHACDClusterGraph(dMeshEffect& mesh, dFloat32 backFaceDistanceFactor, dgReportProgress reportProgressCallback)
 		:dGraph<dgHACDCluster, dgHACDEdge> (mesh.GetAllocator())
-		,dgAABBPolygonSoup()
+		,dAabbPolygonSoup()
 		,m_mark(0)
 		,m_faceCount(0)
 		,m_vertexMark(0)
@@ -703,7 +703,7 @@ class dgHACDClusterGraph
 		Trace();
 
 		// add links to back faces
-		dgPolygonSoupDatabaseBuilder builder (mesh.GetAllocator());
+		dPolygonSoupBuilder builder (mesh.GetAllocator());
 		dVector polygon[64];
 		dInt32 indexList[64];
 

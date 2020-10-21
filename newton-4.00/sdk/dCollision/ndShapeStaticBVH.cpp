@@ -112,7 +112,7 @@ void ndShapeStaticBVH::EndBuild(dInt32 optimize)
 	data.m_maxIndexCount = 1000000000;
 	data.m_triangleCount = 0; 
 	dVector zero (dFloat32 (0.0f));
-	dFastAABBInfo box (dGetIdentityMatrix(), dVector (dFloat32 (1.0e15f)));
+	dFastAabbInfo box (dGetIdentityMatrix(), dVector (dFloat32 (1.0e15f)));
 	ForAllSectors (box, zero, dFloat32 (1.0f), GetTriangleCount, &data);
 	m_trianglesCount = data.m_triangleCount;
 }
@@ -131,7 +131,7 @@ void ndShapeStaticBVH::ForEachFace (dgAABBIntersectCallback callback, void* cons
 	dVector p0 (-1.0e10f, -1.0e10f, -1.0e10f, 1.0f);
 	dVector p1 ( 1.0e10f,  1.0e10f,  1.0e10f, 1.0f);
 	dVector zero (dFloat32 (0.0f));
-	dFastAABBInfo box (dGetIdentityMatrix(), dVector (dFloat32 (1.0e15f)));
+	dFastAabbInfo box (dGetIdentityMatrix(), dVector (dFloat32 (1.0e15f)));
 	//ForAllSectors (p0, p1, zero, dFloat32 (1.0f), callback, context);
 	ForAllSectors (box, zero, dFloat32 (1.0f), callback, context);
 }
@@ -186,7 +186,7 @@ dgIntersectStatus ndShapeStaticBVH::GetTriangleCount (void* const context, const
 
 void ndShapeStaticBVH::GetVertexListIndexList (const dVector& p0, const dVector& p1, dgMeshVertexListIndexList &data) const
 {
-	dFastAABBInfo box (p0, p1);
+	dFastAabbInfo box (p0, p1);
 	ForAllSectors (box, dVector (dFloat32 (0.0f)), dFloat32 (1.0f), CollectVertexListIndexList, &data);
 
 	data.m_veterxArray = GetLocalVertexPool(); 
@@ -372,7 +372,7 @@ void ndShapeStaticBVH::DebugCollision (const dMatrix& matrixPtr, dgCollision::On
 	context.m_userData = userData;;
 	context.m_callback = callback;
 
-	dFastAABBInfo box (dGetIdentityMatrix(), dVector (1.0e15f));
+	dFastAabbInfo box (dGetIdentityMatrix(), dVector (1.0e15f));
 	ForAllSectors (box, dVector(dFloat32 (0.0f)), dFloat32 (1.0f), ShowDebugPolygon, &context);
 }
 #endif

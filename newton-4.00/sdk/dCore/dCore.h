@@ -59,6 +59,8 @@
 #include <dTemplateVector.h>
 #include <dContainersAlloc.h>
 #include <dSmallDeterminant.h>
+#include <dPolygonSoupBuilder.h>
+#include <dPolygonSoupDatabase.h>
 #include <dPolyhedraMassProperties.h>
 
 

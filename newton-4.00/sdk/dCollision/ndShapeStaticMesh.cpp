@@ -33,7 +33,7 @@
 #if 0
 
 dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const userData)
-	:dFastAABBInfo()
+	:dFastAabbInfo()
 	,m_boxDistanceTravelInMeshSpace(dFloat32 (0.0f))
 	,m_threadNumber(proxy.m_threadIndex)
 	,m_faceCount(0)

@@ -389,14 +389,15 @@ class dFastAabbInfo : public dMatrix
 //	}
 //
 //	protected:
-//	dMatrix m_absDir;
+	dMatrix m_absDir;
 //	mutable dVector m_separationDistance;
-//	dVector m_p0;
-//	dVector m_p1;
-//
-//	friend class dgAABBPolygonSoup;
-//	friend class dgCollisionUserMesh;
-//	friend class dgCollisionHeightField;
+	dVector m_p0;
+	dVector m_p1;
+	dVector m_size;
+
+	friend class dAABBPolygonSoup;
+//	friend class dCollisionUserMesh;
+//	friend class dCollisionHeightField;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #endif
