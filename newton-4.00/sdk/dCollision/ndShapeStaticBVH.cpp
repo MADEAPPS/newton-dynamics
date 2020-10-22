@@ -126,7 +126,7 @@ void ndShapeStaticBVH::GetCollisionInfo(dgCollisionInfo* const info) const
 	info->m_bvhCollision.m_indexCount = m_trianglesCount * 3;
 }
 
-void ndShapeStaticBVH::ForEachFace (dgAABBIntersectCallback callback, void* const context) const
+void ndShapeStaticBVH::ForEachFace (dAaabbIntersectCallback callback, void* const context) const
 {
 	dVector p0 (-1.0e10f, -1.0e10f, -1.0e10f, 1.0f);
 	dVector p1 ( 1.0e10f,  1.0e10f,  1.0e10f, 1.0f);
@@ -377,15 +377,22 @@ void ndShapeStaticBVH::DebugCollision (const dMatrix& matrixPtr, dgCollision::On
 }
 #endif
 
-ndShapeStaticBVH::ndShapeStaticBVH()
+ndShapeStaticBVH::ndShapeStaticBVH(const dPolygonSoupBuilder& builder)
 	:ndShapeStaticMesh(m_boundingBoxHierachy)
-//	:ndShapeStaticMesh(world, m_boundingBoxHierachy), dgAABBPolygonSoup()
-//	, m_trianglesCount(0)
+	,dAabbPolygonSoup()
+//	,m_trianglesCount(0)
 {
-	dAssert(0);
-	//m_rtti |= dgCollisionBVH_RTTI;
-	//m_builder = NULL;
-	//m_userRayCastCallback = NULL;
+	Create(builder, true);
+	CalculateAdjacendy();
+
+	dVector p0;
+	dVector p1;
+	GetAABB(p0, p1);
+	//SetCollisionBBox(p0, p1);
+	m_boxSize = (p1 - p0) * dVector::m_half;
+	m_boxOrigin = (p1 + p0) * dVector::m_half;
+	//m_boxMinRadius = dMin(m_boxSize.m_x, m_boxSize.m_y, m_boxSize.m_z);
+	//m_boxMaxRadius = dSqrt((m_boxSize.DotProduct(m_boxSize)).GetScalar());
 }
 
 ndShapeStaticBVH::~ndShapeStaticBVH(void)

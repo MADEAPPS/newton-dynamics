@@ -1329,7 +1329,7 @@ bool ndScene::TestOverlaping(const ndBodyKinematic* const body0, const ndBodyKin
 	//
 	//			dVector boxp0(box0_p0 - box1_p1);
 	//			dVector boxp1(box0_p1 - box1_p0);
-	//			dgFastRayTest ray(dVector::m_zero, velRelative.Scale(timestep * dFloat32(4.0f)));
+	//			dFastRayTest ray(dVector::m_zero, velRelative.Scale(timestep * dFloat32(4.0f)));
 	//			dFloat32 distance = ray.BoxIntersect(boxp0, boxp1);
 	//			ret = (distance < dFloat32(1.0f));
 	//		}

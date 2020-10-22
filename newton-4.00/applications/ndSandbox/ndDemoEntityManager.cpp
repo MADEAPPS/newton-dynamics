@@ -224,7 +224,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
-	//m_collisionDisplayMode = 3;
+	m_collisionDisplayMode = 3;
 	//m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
 
@@ -1370,12 +1370,15 @@ void ndDemoEntityManager::DrawDebugShapes()
 		for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 		{
 			ndBodyKinematic* const body = bodyNode->GetInfo();
-			const ndShapeInstance& shapeInstance = body->GetCollisionShape();
-			ndDebugMeshCache::dTreeNode* const shapeNode = m_debugShapeCache.Find(shapeInstance.GetShape());
-			if (shapeNode)
+			if (!body->GetAsBodyTriggerVolume())
 			{
-				dMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
-				shapeNode->GetInfo().m_flatShaded->Render(this, matrix);
+				const ndShapeInstance& shapeInstance = body->GetCollisionShape();
+				ndDebugMeshCache::dTreeNode* const shapeNode = m_debugShapeCache.Find(shapeInstance.GetShape());
+				if (shapeNode)
+				{
+					dMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
+					shapeNode->GetInfo().m_flatShaded->Render(this, matrix);
+				}
 			}
 		}
 		glColorMask(1, 1, 1, 1);

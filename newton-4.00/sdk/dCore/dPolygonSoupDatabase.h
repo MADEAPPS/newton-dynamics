@@ -24,8 +24,9 @@
 
 #include "dCoreStdafx.h"
 #include "dTypes.h"
+#include "dClassAlloc.h"
 
-class dPolygonSoupDatabase
+class dPolygonSoupDatabase: public dClassAlloc
 {
 	public:
 	dFloat32 GetRadius() const;

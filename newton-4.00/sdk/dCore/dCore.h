@@ -58,6 +58,7 @@
 #include <dGeneralMatrix.h>
 #include <dTemplateVector.h>
 #include <dContainersAlloc.h>
+#include <dAabbPolygonSoup.h>
 #include <dSmallDeterminant.h>
 #include <dPolygonSoupBuilder.h>
 #include <dPolygonSoupDatabase.h>

@@ -38,10 +38,10 @@ enum dIntersectStatus
 	t_ContinueSearh
 };
 
-//typedef dIntersectStatus (*dgAABBIntersectCallback) (void* const context, 
-//													  const dFloat32* const polygon, dInt32 strideInBytes,
-//													  const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
-//
+typedef dIntersectStatus (*dAaabbIntersectCallback) (void* const context, 
+													  const dFloat32* const polygon, dInt32 strideInBytes,
+													  const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
+
 //typedef dFloat32 (*dgRayIntersectCallback) (void* const context, 
 //											 const dFloat32* const polygon, dInt32 strideInBytes,
 //											 const dInt32* const indexArray, dInt32 indexCount);
@@ -242,31 +242,37 @@ class dFastAabbInfo : public dMatrix
 	public:
 	D_INLINE dFastAabbInfo()
 		//:dgObb()
+		:dMatrix(dGetIdentityMatrix())
 		//,m_absDir(dGetIdentityMatrix())
-		//,m_separationDistance(dFloat32(1.0e10f))
+		,m_separationDistance(dFloat32(1.0e10f))
 	{
 		dAssert(0);
 	}
-//
-//	D_INLINE dFastAabbInfo(const dMatrix& matrix, const dVector& size)
+
+	D_INLINE dFastAabbInfo(const dMatrix& matrix, const dVector& size)
 //		:dgObb(matrix, size)
-//		,m_separationDistance(dFloat32(1.0e10f))
-//	{
+		:dMatrix(matrix)
+		,m_separationDistance(dFloat32(1.0e10f))
+	{
+		dAssert(0);
 //		SetTransposeAbsMatrix (matrix);
 //		dVector size1 (matrix[0].Abs().Scale(size.m_x) + matrix[1].Abs().Scale(size.m_y) + matrix[2].Abs().Scale(size.m_z));
 //		m_p0 = (matrix[3] - size1) & dVector::m_triplexMask;
 //		m_p1 = (matrix[3] + size1) & dVector::m_triplexMask;
-//	}
-//
-//	D_INLINE dFastAabbInfo(const dVector& p0, const dVector& p1)
-//		:dgObb(dGetIdentityMatrix(), dVector::m_half * (p1 - p0))
-//		,m_absDir(dGetIdentityMatrix())
-//		,m_separationDistance(dFloat32(1.0e10f))
-//		,m_p0(p0)
-//		,m_p1(p1)
-//	{
-//		m_posit = ((dVector::m_half * (p1 + p0)) & dVector::m_triplexMask) | dVector::m_wOne;
-//	}
+	}
+
+	D_INLINE dFastAabbInfo(const dVector& p0, const dVector& p1)
+		:dMatrix(dGetIdentityMatrix())
+		,m_absDir(dGetIdentityMatrix())
+		,m_p0(p0)
+		,m_p1(p1)
+		,m_size(dVector::m_half * (p1 - p0))
+		,m_separationDistance(dFloat32(1.0e10f))
+	{
+		m_posit = (dVector::m_half * (p1 + p0)) | dVector::m_wOne;
+		dAssert(m_size.m_w == dFloat32(0.0f));
+		dAssert(m_posit.m_w == dFloat32(1.0f));
+	}
 //
 //	D_INLINE void SetTransposeAbsMatrix (const dMatrix& matrix)
 //	{
@@ -277,8 +283,10 @@ class dFastAabbInfo : public dMatrix
 //		//m_absDir[3] = dVector::m_wOne;
 //	}
 //
-//	D_INLINE dFloat32 PolygonBoxRayDistance (const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, const dgFastRayTest& ray) const
-//	{
+	D_INLINE dFloat32 PolygonBoxRayDistance (const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, const dFastRayTest& ray) const
+	{
+		dAssert(0);
+		return 0;
 //		dVector minBox;
 //		dVector maxBox;
 //		MakeBox1 (indexCount, indexArray, stride, vertexArray, minBox, maxBox);
@@ -288,16 +296,17 @@ class dFastAabbInfo : public dMatrix
 //
 //			MakeBox2 (faceMatrix, indexCount, indexArray, stride, vertexArray, minBox, maxBox);
 //			dVector veloc (faceMatrix.RotateVector(ray.m_diff) & dVector::m_triplexMask);
-//			dgFastRayTest localRay (dVector (dFloat32 (0.0f)), veloc);
+//			dFastRayTest localRay (dVector (dFloat32 (0.0f)), veloc);
 //			dFloat32 dist1 = localRay.BoxIntersect(minBox, maxBox);
 //			dist0 = dMax (dist1, dist0);
 //		}
 //		return dist0;
-//	}
+	}
 //
-//
-//	D_INLINE dFloat32 PolygonBoxDistance (const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const
-//	{
+	D_INLINE dFloat32 PolygonBoxDistance (const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const
+	{
+		dAssert(0);
+		return 0;
 //		dVector minBox;
 //		dVector maxBox;
 //		MakeBox1 (indexCount, indexArray, stride, vertexArray, minBox, maxBox);
@@ -328,7 +337,7 @@ class dFastAabbInfo : public dMatrix
 //			dist0 = dist.GetScalar();
 //		}
 //		return	dist0;
-//	}
+	}
 //
 //	private:
 //	D_INLINE void MakeBox1 (dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray, dVector& minBox, dVector& maxBox) const
@@ -368,7 +377,6 @@ class dFastAabbInfo : public dMatrix
 //		maxBox = faceBoxP1 - boxP0;
 //	}
 //
-//
 //	D_INLINE dMatrix MakeFaceMatrix (const dVector& faceNormal, dInt32 indexCount, const dInt32* const indexArray, dInt32 stride, const dFloat32* const vertexArray) const
 //	{
 //		dMatrix faceMatrix;
@@ -387,15 +395,15 @@ class dFastAabbInfo : public dMatrix
 //		faceMatrix[3] = origin | dVector::m_wOne; 
 //		return faceMatrix.Inverse();
 //	}
-//
-//	protected:
+
+	protected:
 	dMatrix m_absDir;
-//	mutable dVector m_separationDistance;
 	dVector m_p0;
 	dVector m_p1;
 	dVector m_size;
+	mutable dVector m_separationDistance;
 
-	friend class dAABBPolygonSoup;
+	friend class dAabbPolygonSoup;
 //	friend class dCollisionUserMesh;
 //	friend class dCollisionHeightField;
 } D_GCC_NEWTON_ALIGN_32 ;

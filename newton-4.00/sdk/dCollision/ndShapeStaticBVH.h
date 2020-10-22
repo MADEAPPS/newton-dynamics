@@ -29,11 +29,11 @@
 //typedef dFloat32 (*dgCollisionBVHUserRayCastCallback) (const dgBody* const body, const ndShapeStaticBVH* const heightFieldCollision, dFloat32 interception, dFloat32* normal, dInt32 faceId, void* usedData);
 
 //class ndShapeStaticBVH: public ndShapeStaticMesh, public dgAABBPolygonSoup
-class ndShapeStaticBVH : public ndShapeStaticMesh
+class ndShapeStaticBVH : public ndShapeStaticMesh, public dAabbPolygonSoup
 {
 	public:
-	D_COLLISION_API ndShapeStaticBVH();
-	D_COLLISION_API virtual ~ndShapeStaticBVH(void);
+	D_COLLISION_API ndShapeStaticBVH(const dPolygonSoupBuilder& builder);
+	D_COLLISION_API virtual ~ndShapeStaticBVH();
 
 	protected:
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
@@ -43,11 +43,11 @@ class ndShapeStaticBVH : public ndShapeStaticMesh
 #if 0
 	public:
 	D_MSV_NEWTON_ALIGN_32 
-	class dgBVHRay: public dgFastRayTest 
+	class dgBVHRay: public dFastRayTest 
 	{
 		public:
 		dgBVHRay(const dVector& l0, const dVector& l1)
-			:dgFastRayTest (l0, l1)
+			:dFastRayTest (l0, l1)
 		{
 		}
 

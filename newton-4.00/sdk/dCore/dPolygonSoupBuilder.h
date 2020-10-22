@@ -43,7 +43,7 @@ class AdjacentdFace
 	dInt64 m_edgeMap[256];
 };
 
-class dPolygonSoupBuilder 
+class dPolygonSoupBuilder: public dClassAlloc 
 {
 	class dgFaceMap;
 	class dgFaceInfo;
@@ -51,16 +51,21 @@ class dPolygonSoupBuilder
 	class dgPolySoupFilterAllocator;
 	public:
 
-	dPolygonSoupBuilder ();
-	dPolygonSoupBuilder (const dPolygonSoupBuilder& sopurce);
-	~dPolygonSoupBuilder ();
+	D_CORE_API dPolygonSoupBuilder ();
+	D_CORE_API dPolygonSoupBuilder (const dPolygonSoupBuilder& sopurce);
+	D_CORE_API ~dPolygonSoupBuilder ();
 
-	void Begin();
-	void End(bool optimize);
-	void AddMesh (const dFloat32* const vertex, dInt32 vertexCount, dInt32 strideInBytes, dInt32 faceCount, 
-		          const dInt32* const faceArray, const dInt32* const indexArray, const dInt32* const faceTagsData, const dMatrix& worldMatrix); 
+	D_CORE_API void Begin();
+	D_CORE_API void End(bool optimize);
+	//D_CORE_API void AddMesh (const dFloat32* const vertex, dInt32 vertexCount, 
+	//						 dInt32 strideInBytes, dInt32 faceCount,
+	//						 const dInt32* const faceArray, const dInt32* const indexArray, 
+	//						 const dInt32* const faceTagsData, const dMatrix& worldMatrix); 
 
-	void SavePLY(const char* const fileName) const;
+	D_CORE_API void AddFace(const dFloat32* const vertex, dInt32 strideInBytes, dInt32 vertexCount, const dInt32 faceId);
+	D_CORE_API void AddFaceIndirect(const dFloat32* const vertex, dInt32 strideInBytes, dInt32 faceId, const dInt32* const indexArray, dInt32 indexCount);
+
+	D_CORE_API void SavePLY(const char* const fileName) const;
 
 	private:
 	void Optimize(dInt32 faceId, const dgFaceBucket& faceBucket, const dPolygonSoupBuilder& source);
@@ -91,16 +96,12 @@ class dPolygonSoupBuilder
 		}
 	};
 
-	dInt32 m_run;
-	dInt32 m_faceCount;
-	dInt32 m_indexCount;
-	dInt32 m_vertexCount;
-	dInt32 m_normalCount;
 	dgIndexArray m_faceVertexCount;
 	dgIndexArray m_vertexIndex;
 	dgIndexArray m_normalIndex;
 	dgVertexArray m_vertexPoints;
 	dgVertexArray m_normalPoints;
+	dInt32 m_run;
 };
 
 #endif

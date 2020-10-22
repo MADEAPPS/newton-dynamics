@@ -255,10 +255,6 @@ void ndShapeStaticMesh::Serialize(dgSerialize callback, void* const userData) co
 ndShapeStaticMesh::ndShapeStaticMesh(ndShapeID id)
 	:ndShape(id)
 {
-	dAssert(0);
-	//m_rtti |= dgCollisionMesh_RTTI;
-	//m_debugCallback = NULL;
-	//SetCollisionBBox(dVector(dFloat32(0.0f)), dVector(dFloat32(0.0f)));
 }
 
 ndShapeStaticMesh::~ndShapeStaticMesh()

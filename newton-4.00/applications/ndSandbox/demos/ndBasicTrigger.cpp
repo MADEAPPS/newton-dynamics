@@ -186,9 +186,8 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	matrix.m_posit.m_y += 2.0f;
 
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, dGetIdentityMatrix());
+//	entity->SetMesh(geometry, dGetIdentityMatrix());
 
-	//ndBodyDynamic* const body = new ndBodyDynamic();
 	ndBodyTriggerVolume* const body = new ndArchimedesBuoyancyVolume();
 	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 	body->SetMatrix(matrix);
@@ -297,8 +296,8 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 	//AddSphere(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f));
 	//AddCapsule(scene, dVector(0.0f, 0.0f, 3.0f, 1.0f));
 	//AddConvexHull(scene, dVector(-2.0f, 0.0f, -2.0f, 1.0f), 7, 0.8f);
-	AddConvexHull(scene, dVector(-2.0f, 0.0f,  2.0f, 1.0f), 21, 0.7f);
-	AddConvexHull(scene, dVector(-0.0f, 0.0f, 2.0f, 1.0f), 210, 0.7f);
+	//AddConvexHull(scene, dVector(-2.0f, 0.0f,  2.0f, 1.0f), 21, 0.7f);
+	AddConvexHull(scene, dVector(-0.0f, 0.0f, 2.0f, 1.0f), 150, 0.7f);
 
 	dQuaternion rot;
 	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
