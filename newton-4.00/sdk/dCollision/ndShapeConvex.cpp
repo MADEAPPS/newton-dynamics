@@ -955,9 +955,6 @@ bool ndShapeConvex::SanityCheck(dPolyhedra& hull) const
 
 dVector ndShapeConvex::CalculateVolumeIntegral(const dPlane& plane) const
 {
-	//dInt8 mark[D_MAX_EDGE_COUNT];
-	//dFloat32 test[D_MAX_EDGE_COUNT];
-	//dVector faceVertex[D_MAX_EDGE_COUNT];
 	dInt8* const mark = dAlloca(dInt8, m_edgeCount + 256);
 	dFloat32* test = dAlloca(dFloat32, m_edgeCount + 256);
 	dVector* faceVertex = dAlloca(dVector, m_edgeCount + 256);
@@ -1059,9 +1056,9 @@ dVector ndShapeConvex::CalculateVolumeIntegral(const dPlane& plane) const
 			dAssert(dp.m_w == dFloat32(0.0f));
 			faceVertex[count] = m_vertex[edge->m_vertex] - dp.Scale(test[edge->m_vertex] / dp.DotProduct(plane).GetScalar());
 			count++;
-			if (count == 127) 
+			if (count >= m_edgeCount)
 			{
-				// something is wrong return zero
+				dTrace(("%s something is wrong return zero\n", __FUNCTION__));
 				return dVector::m_zero;
 			}
 

@@ -969,7 +969,7 @@ ndShapeInfo ndShapeConvexHull::GetShapeInfo() const
 
 void ndShapeConvexHull::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 {
-	dVector vertex[256];
+	dVector vertex[512];
 	for (dInt32 i = 0; i < m_faceCount; i++) 
 	{
 		ndConvexSimplexEdge* const face = m_faceArray[i];

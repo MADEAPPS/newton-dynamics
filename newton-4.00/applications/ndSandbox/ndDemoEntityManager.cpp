@@ -224,7 +224,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
-	m_collisionDisplayMode = 3;
+	//m_collisionDisplayMode = 3;
 	//m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
 
@@ -1412,6 +1412,9 @@ void ndDemoEntityManager::DrawDebugShapes()
 			ndWireFrameDebugMesh* const mesh = shapeNode->GetInfo().m_wireFrame;
 			mesh->SetColor(color);
 			mesh->Render(this, matrix);
+			//ndShapeInstance shape(body->GetCollisionShape());
+			//ndWireFrameDebugMesh debugMesh (m_shaderCache, &shape);
+			//debugMesh.Render(this, matrix);
 		}
 		else
 		{
