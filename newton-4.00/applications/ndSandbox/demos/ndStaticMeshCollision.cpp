@@ -16,9 +16,9 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndTargaToOpenGl.h"
+#include "ndMakeStaticMap.h"
 #include "ndDemoEntityManager.h"
 #include "ndBasicPlayerCapsule.h"
-
 
 /*
 static void AddShape(ndDemoEntityManager* const scene,
@@ -106,9 +106,8 @@ static void AddPlatform(ndDemoEntityManager* const scene, dFloat32 mass, const d
 
 	mesh->Release();
 }
-*/
 
-static void BuildFloor(ndDemoEntityManager* const scene)
+static void BuildFlatFloor(ndDemoEntityManager* const scene)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 	dVector floor[] =
@@ -150,10 +149,13 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 	scene->AddEntity(entity);
 	geometry->Release();
 }
+*/
+
 void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloor(scene);
+	//BuildFlatFloor(scene);
+	BuildStaticMap(scene, "flatPlane.fbx");
 
 	dMatrix location(dGetIdentityMatrix());
 	location.m_posit.m_y += 2.0f;
@@ -163,9 +165,9 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	localAxis[1] = dVector(1.0, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
-	dFloat32 height = 1.9f;
-	dFloat32 radio = 0.5f;
-	dFloat32 mass = 100.0f;
+//	dFloat32 height = 1.9f;
+//	dFloat32 radio = 0.5f;
+//	dFloat32 mass = 100.0f;
 //	ndBasicPlayerCapsule* const player = new ndBasicPlayerCapsule(
 //		scene, localAxis, location, mass, radio, height, height/4.0f);
 //

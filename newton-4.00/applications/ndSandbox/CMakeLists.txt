@@ -41,9 +41,9 @@ include_directories(../../thirdParty/glatter/include/glatter/)
 add_executable(${projectName} ${CPP_SOURCE})
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
-	target_link_libraries (${projectName} ndCore ndCollision ndNewton glfw imgui glatter)
+	target_link_libraries (${projectName} ndCore ndCollision ndNewton glfw imgui glatter openfbx)
 else()
-	target_link_libraries (${projectName} ndNewton glfw imgui glatter)
+	target_link_libraries (${projectName} ndNewton glfw imgui glatter openfbx)
 endif()
 
 if (NEWTON_BUILD_PROFILER)

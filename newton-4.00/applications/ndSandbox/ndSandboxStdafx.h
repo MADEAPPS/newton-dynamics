@@ -48,12 +48,14 @@
 	#include <tchar.h>
 	#include <crtdbg.h>
 
+	#include <ofbx.h>
 	#include <glatter.h>
 	#include <GL/glu.h>
 	#include <GL/gl.h>
 	#include <imgui.h>
 	#include <GLFW/glfw3.h>
 	#include <GLFW/glfw3native.h>
+	
 #endif
 	
 #if (defined (_POSIX_VER) || defined (_POSIX_VER_64))

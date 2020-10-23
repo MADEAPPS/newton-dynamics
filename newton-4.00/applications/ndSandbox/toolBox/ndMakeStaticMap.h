@@ -19,5 +19,6 @@ class ndDemoEntity;
 class ndDemoEntityManager;
 
 
+void BuildStaticMap(ndDemoEntityManager* const scene, const char* const meshName);
 
 #endif
