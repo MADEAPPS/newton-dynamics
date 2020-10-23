@@ -10,18 +10,15 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
-#add_subdirectory(tinyxml)
+set (projectName "openfbx")
+message (${projectName})
 
-if (NEWTON_BUILD_SANDBOX_DEMOS)
-	if (MSVC OR MINGW)
-        add_subdirectory(glfw)
-	endif(MSVC OR MINGW)
-
-    add_subdirectory(imgui)
-	add_subdirectory(glatter)
-	add_subdirectory(openFBX/src)
+if (MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4018 /wd4244 /wd4389 /wd4458 /wd4505")
 endif()
 
+file(GLOB CPP_SOURCE *.c *.cpp *.h)
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
-
+add_library(${projectName} STATIC ${CPP_SOURCE})
 

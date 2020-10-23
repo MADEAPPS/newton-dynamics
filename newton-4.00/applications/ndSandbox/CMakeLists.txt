@@ -34,9 +34,9 @@ include_directories(../../sdk/dCollision/)
 include_directories(../../sdk/dNewton/dJoints)
 include_directories(../../thirdParty/glfw/)
 include_directories(../../thirdParty/imgui/)
+include_directories(../../thirdParty/openFBX/src/)
 include_directories(../../thirdParty/glfw/include/)
 include_directories(../../thirdParty/glatter/include/glatter/)
-
 
 add_executable(${projectName} ${CPP_SOURCE})
 
