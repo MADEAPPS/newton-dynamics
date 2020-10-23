@@ -199,7 +199,7 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 	dAabbPolygonSoup ();
 	virtual ~dAabbPolygonSoup ();
 
-	void Create (const dPolygonSoupBuilder& builder, bool optimizedBuild);
+	void Create (const dPolygonSoupBuilder& builder);
 	void CalculateAdjacendy ();
 //	virtual void ForAllSectorsRayHit (const dFastRayTest& ray, dFloat32 maxT, dgRayIntersectCallback callback, void* const context) const;
 	virtual void ForAllSectors (const dFastAabbInfo& obbAabb, const dVector& boxDistanceTravel, dFloat32 m_maxT, dAaabbIntersectCallback callback, void* const context) const;
@@ -235,7 +235,7 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 	private:
 	dgNodeBuilder* BuildTopDown (dgNodeBuilder* const leafArray, dInt32 firstBox, dInt32 lastBox, dgNodeBuilder** const allocator) const;
 	dFloat32 CalculateFaceMaxSize (const dVector* const vertex, dInt32 indexCount, const dInt32* const indexArray) const;
-//	static dgIntersectStatus CalculateManifoldFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount);
+//	static dIntersectStatus CalculateManifoldFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount);
 	static dIntersectStatus CalculateDisjointedFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 	static dIntersectStatus CalculateAllFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 	void ImproveNodeFitness (dgNodeBuilder* const node) const;

@@ -72,8 +72,6 @@ dInt32 ndShapeSphere::CalculateSignature () const
 	return CalculateSignature(m_radius);
 }
 
-
-
 void ndShapeSphere::DebugCollision (const dMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
 	dTriplex pool[1024 * 2];

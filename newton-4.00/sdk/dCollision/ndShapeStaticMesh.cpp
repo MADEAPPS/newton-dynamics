@@ -259,7 +259,6 @@ ndShapeStaticMesh::ndShapeStaticMesh(ndShapeID id)
 
 ndShapeStaticMesh::~ndShapeStaticMesh()
 {
-	dAssert(0);
 }
 
 void ndShapeStaticMesh::CalcAABB(const dMatrix& matrix, dVector &p0, dVector &p1) const

@@ -493,131 +493,143 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 	GetAABB (p0, p1);
 	dFastAabbInfo box (p0, p1);
 	ForAllSectors (box, dVector::m_zero, dFloat32 (1.0f), CalculateAllFaceEdgeNormals, this);
+
+	dStack<dTriplex> pool ((m_indexCount / 2) - 1);
+	const dTriplex* const vertexArray = (dTriplex*)GetLocalVertexPool();
+	dInt32 normalCount = 0;
+	for (dInt32 i = 0; i < m_nodesCount; i ++) 
+	{
+		const dNode* const node = &m_aabb[i];
+		if (node->m_left.IsLeaf()) 
+		{
+			dInt32 vCount = dInt32 (node->m_left.GetCount());
+			if (vCount) 
+			{
+				dInt32 index = dInt32 (node->m_left.GetIndex());
+				dInt32* const face = &m_indices[index];
 	
-	dAssert(0);
-	//dStack<dTriplex> pool ((m_indexCount / 2) - 1);
-	//const dTriplex* const vertexArray = (dTriplex*)GetLocalVertexPool();
-	//dInt32 normalCount = 0;
-	//for (dInt32 i = 0; i < m_nodesCount; i ++) {
-	//	const dNode* const node = &m_aabb[i];
-	//	if (node->m_left.IsLeaf()) {
-	//		dInt32 vCount = dInt32 (node->m_left.GetCount());
-	//		if (vCount) {
-	//			dInt32 index = dInt32 (node->m_left.GetIndex());
-	//			dInt32* const face = &m_indices[index];
-	//
-	//			dInt32 j0 = 2 * (vCount + 1) - 1;
-	//			dVector normal (&vertexArray[face[vCount + 1]].m_x);
-	//			normal = normal & dVector::m_triplexMask;
-	//			dAssert (dAbs (normal.DotProduct(normal).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
-	//			dVector q0 (&vertexArray[face[vCount - 1]].m_x);
-	//			q0 = q0 & dVector::m_triplexMask;
-	//			for (dInt32 j = 0; j < vCount; j ++) {
-	//				dInt32 j1 = vCount + 2 + j;
-	//				dVector q1 (&vertexArray[face[j]].m_x);
-	//				q1 = q1 & dVector::m_triplexMask;
-	//				if (face[j0] == -1) {
-	//					dVector e (q1 - q0);
-	//					dVector n (e.CrossProduct(normal));
-	//					n = n.Scale(dFloat32 (1.0f) / dgSqrt (n.DotProduct(n).GetScalar()));
-	//					dAssert (dAbs (n.DotProduct(n).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
-	//					pool[normalCount].m_x = n.m_x;
-	//					pool[normalCount].m_y = n.m_y;
-	//					pool[normalCount].m_z = n.m_z;
-	//					face[j0] = -normalCount - 1;
-	//					normalCount ++;
-	//				}
-	//				q0 = q1;
-	//				j0 = j1;
-	//			}
-	//		}
-	//	}
-	//
-	//	if (node->m_right.IsLeaf()) {
-	//		dInt32 vCount = dInt32 (node->m_right.GetCount());
-	//		if (vCount) {
-	//			dInt32 index = dInt32 (node->m_right.GetIndex());
-	//			dInt32* const face = &m_indices[index];
-	//
-	//			dInt32 j0 = 2 * (vCount + 1) - 1;
-	//			dVector normal (&vertexArray[face[vCount + 1]].m_x);
-	//			normal = normal & dVector::m_triplexMask;
-	//			dAssert (dAbs (normal.DotProduct(normal).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
-	//			dVector q0 (&vertexArray[face[vCount - 1]].m_x);
-	//			q0 = q0 & dVector::m_triplexMask;
-	//			for (dInt32 j = 0; j < vCount; j ++) {
-	//				dInt32 j1 = vCount + 2 + j;
-	//				dVector q1 (&vertexArray[face[j]].m_x);
-	//				q1 = q1 & dVector::m_triplexMask;
-	//				if (face[j0] == -1) {
-	//					dVector e (q1 - q0);
-	//					dVector n (e.CrossProduct(normal));
-	//					n = n.Scale(dFloat32 (1.0f) / dgSqrt (n.DotProduct(n).GetScalar()));
-	//					dAssert (dAbs (n.DotProduct(n).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
-	//					pool[normalCount].m_x = n.m_x;
-	//					pool[normalCount].m_y = n.m_y;
-	//					pool[normalCount].m_z = n.m_z;
-	//					face[j0] = -normalCount - 1;
-	//					normalCount ++;
-	//				}
-	//				q0 = q1;
-	//				j0 = j1;
-	//			}
-	//		}
-	//	}
-	//}
-	//
-	//if (normalCount) {
-	//	dStack<dInt32> indexArray (normalCount);
-	//	dInt32 newNormalCount = dgVertexListToIndexList (&pool[0].m_x, sizeof (dTriplex), sizeof (dTriplex), 0, normalCount, &indexArray[0], dFloat32 (1.0e-6f));
-	//
-	//	dInt32 oldCount = GetVertexCount();
-	//	dTriplex* const vertexArray1 = (dTriplex*) dgMallocStack (sizeof (dTriplex) * (oldCount + newNormalCount));
-	//	memcpy (vertexArray1, GetLocalVertexPool(), sizeof (dTriplex) * oldCount);
-	//	memcpy (&vertexArray1[oldCount], &pool[0].m_x, sizeof (dTriplex) * newNormalCount);
-	//	dgFreeStack(GetLocalVertexPool());
-	//
-	//	m_localVertex = &vertexArray1[0].m_x;
-	//	m_vertexCount = oldCount + newNormalCount;
-	//
-	//	for (dInt32 i = 0; i < m_nodesCount; i ++) {
-	//		const dNode* const node = &m_aabb[i];
-	//		if (node->m_left.IsLeaf()) {
-	//			dInt32 vCount = dInt32 (node->m_left.GetCount());
-	//			dInt32 index = dInt32 (node->m_left.GetIndex());
-	//			dInt32* const face = &m_indices[index];
-	//			for (dInt32 j = 0; j < vCount; j ++) {
-	//				if (face[vCount + 2 + j] < 0) {
-	//					dInt32 k = -1 - face[vCount + 2 + j];
-	//					face[vCount + 2 + j] = indexArray[k] + oldCount;
-	//				}
-	//				#ifdef _DEBUG	
-	//					dVector normal (&vertexArray1[face[vCount + 2 + j]].m_x);
-	//					normal = normal & dVector::m_triplexMask;
-	//					dAssert (dAbs (normal.DotProduct(normal).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
-	//				#endif
-	//			}
-	//		}
-	//
-	//		if (node->m_right.IsLeaf()) {
-	//			dInt32 vCount = dInt32 (node->m_right.GetCount());
-	//			dInt32 index = dInt32 (node->m_right.GetIndex());
-	//			dInt32* const face = &m_indices[index];
-	//			for (dInt32 j = 0; j < vCount; j ++) {
-	//				if (face[vCount + 2 + j] < 0) {
-	//					dInt32 k = -1 - face[vCount + 2 + j];
-	//					face[vCount + 2 + j] = indexArray[k] + oldCount;
-	//				}
-	//
-	//				#ifdef _DEBUG	
-	//					dVector normal (&vertexArray1[face[vCount + 2 + j]].m_x);
-	//					normal = normal & dVector::m_triplexMask;
-	//					dAssert (dAbs (normal.DotProduct(normal).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
-	//				#endif
-	//			}
-	//		}
-	//	}
-	//}
+				dInt32 j0 = 2 * (vCount + 1) - 1;
+				dVector normal (&vertexArray[face[vCount + 1]].m_x);
+				normal = normal & dVector::m_triplexMask;
+				dAssert (dAbs (normal.DotProduct(normal).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
+				dVector q0 (&vertexArray[face[vCount - 1]].m_x);
+				q0 = q0 & dVector::m_triplexMask;
+				for (dInt32 j = 0; j < vCount; j ++) 
+				{
+					dInt32 j1 = vCount + 2 + j;
+					dVector q1 (&vertexArray[face[j]].m_x);
+					q1 = q1 & dVector::m_triplexMask;
+					if (face[j0] == -1) 
+					{
+						dVector e (q1 - q0);
+						dVector n (e.CrossProduct(normal).Normalize());
+						//n = n.Scale(dFloat32 (1.0f) / dSqrt (n.DotProduct(n).GetScalar()));
+						dAssert (dAbs (n.DotProduct(n).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
+						pool[normalCount].m_x = n.m_x;
+						pool[normalCount].m_y = n.m_y;
+						pool[normalCount].m_z = n.m_z;
+						face[j0] = -normalCount - 1;
+						normalCount ++;
+					}
+					q0 = q1;
+					j0 = j1;
+				}
+			}
+		}
+	
+		if (node->m_right.IsLeaf()) {
+			dInt32 vCount = dInt32 (node->m_right.GetCount());
+			if (vCount) {
+				dInt32 index = dInt32 (node->m_right.GetIndex());
+				dInt32* const face = &m_indices[index];
+	
+				dInt32 j0 = 2 * (vCount + 1) - 1;
+				dVector normal (&vertexArray[face[vCount + 1]].m_x);
+				normal = normal & dVector::m_triplexMask;
+				dAssert (dAbs (normal.DotProduct(normal).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
+				dVector q0 (&vertexArray[face[vCount - 1]].m_x);
+				q0 = q0 & dVector::m_triplexMask;
+				for (dInt32 j = 0; j < vCount; j ++) {
+					dInt32 j1 = vCount + 2 + j;
+					dVector q1 (&vertexArray[face[j]].m_x);
+					q1 = q1 & dVector::m_triplexMask;
+					if (face[j0] == -1) {
+						dVector e (q1 - q0);
+						dVector n (e.CrossProduct(normal).Normalize());
+						//n = n.Scale(dFloat32 (1.0f) / dSqrt (n.DotProduct(n).GetScalar()));
+						dAssert (dAbs (n.DotProduct(n).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
+						pool[normalCount].m_x = n.m_x;
+						pool[normalCount].m_y = n.m_y;
+						pool[normalCount].m_z = n.m_z;
+						face[j0] = -normalCount - 1;
+						normalCount ++;
+					}
+					q0 = q1;
+					j0 = j1;
+				}
+			}
+		}
+	}
+	
+	if (normalCount) 
+	{
+		dStack<dInt32> indexArray (normalCount);
+		dInt32 newNormalCount = dVertexListToIndexList (&pool[0].m_x, sizeof (dTriplex), sizeof (dTriplex), 0, normalCount, &indexArray[0], dFloat32 (1.0e-6f));
+	
+		dInt32 oldCount = GetVertexCount();
+		dTriplex* const vertexArray1 = (dTriplex*)dMemory::Malloc (sizeof (dTriplex) * (oldCount + newNormalCount));
+		memcpy (vertexArray1, GetLocalVertexPool(), sizeof (dTriplex) * oldCount);
+		memcpy (&vertexArray1[oldCount], &pool[0].m_x, sizeof (dTriplex) * newNormalCount);
+		dMemory::Free(GetLocalVertexPool());
+	
+		m_localVertex = &vertexArray1[0].m_x;
+		m_vertexCount = oldCount + newNormalCount;
+	
+		for (dInt32 i = 0; i < m_nodesCount; i ++) 
+		{
+			const dNode* const node = &m_aabb[i];
+			if (node->m_left.IsLeaf()) 
+			{
+				dInt32 vCount = dInt32 (node->m_left.GetCount());
+				dInt32 index = dInt32 (node->m_left.GetIndex());
+				dInt32* const face = &m_indices[index];
+				for (dInt32 j = 0; j < vCount; j ++) 
+				{
+					if (face[vCount + 2 + j] < 0) 
+					{
+						dInt32 k = -1 - face[vCount + 2 + j];
+						face[vCount + 2 + j] = indexArray[k] + oldCount;
+					}
+					#ifdef _DEBUG	
+						dVector normal (&vertexArray1[face[vCount + 2 + j]].m_x);
+						normal = normal & dVector::m_triplexMask;
+						dAssert (dAbs (normal.DotProduct(normal).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
+					#endif
+				}
+			}
+	
+			if (node->m_right.IsLeaf()) 
+			{
+				dInt32 vCount = dInt32 (node->m_right.GetCount());
+				dInt32 index = dInt32 (node->m_right.GetIndex());
+				dInt32* const face = &m_indices[index];
+				for (dInt32 j = 0; j < vCount; j ++) 
+				{
+					if (face[vCount + 2 + j] < 0) 
+					{
+						dInt32 k = -1 - face[vCount + 2 + j];
+						face[vCount + 2 + j] = indexArray[k] + oldCount;
+					}
+	
+					#ifdef _DEBUG	
+						dVector normal (&vertexArray1[face[vCount + 2 + j]].m_x);
+						normal = normal & dVector::m_triplexMask;
+						dAssert (dAbs (normal.DotProduct(normal).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
+					#endif
+				}
+			}
+		}
+	}
 }
 
 dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
@@ -661,12 +673,10 @@ dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormals (void* const cont
 	p1.m_y += padding;
 	p1.m_z += padding;
 
-	dAssert(0);
-	//dAabbPolygonSoup* const me = (dAabbPolygonSoup*) context;
-	//dFastAabbInfo box (p0, p1);
-	//me->ForAllSectors (box, dVector (dFloat32 (0.0f)), dFloat32 (1.0f), CalculateDisjointedFaceEdgeNormals, &adjacentFaces);
-	//return t_ContinueSearh;
-return t_ContinueSearh;
+	dAabbPolygonSoup* const me = (dAabbPolygonSoup*) context;
+	dFastAabbInfo box (p0, p1);
+	me->ForAllSectors (box, dVector (dFloat32 (0.0f)), dFloat32 (1.0f), CalculateDisjointedFaceEdgeNormals, &adjacentFaces);
+	return t_ContinueSearh;
 }
 
 dIntersectStatus dAabbPolygonSoup::CalculateDisjointedFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
@@ -803,7 +813,7 @@ dAabbPolygonSoup::dgNodeBuilder* dAabbPolygonSoup::BuildTopDown (dgNodeBuilder* 
 	}
 }
 
-void dAabbPolygonSoup::Create (const dPolygonSoupBuilder& builder, bool optimizedBuild)
+void dAabbPolygonSoup::Create (const dPolygonSoupBuilder& builder)
 {
 	if (builder.m_faceVertexCount.GetCount() == 0) 
 	{

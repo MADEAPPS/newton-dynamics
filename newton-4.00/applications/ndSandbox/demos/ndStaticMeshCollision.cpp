@@ -126,7 +126,7 @@ static void BuildFloor(ndDemoEntityManager* const scene)
 	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[0][0], 3);
 	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[1][0], 3);
 	//meshBuilder.AddFace(&floor[0].m_x, sizeof(dVector), 4, 31);
-	meshBuilder.End(false);
+	meshBuilder.End(true);
 
 	ndShapeInstance box(new ndShapeStaticBVH(meshBuilder));
 	dMatrix uvMatrix(dGetIdentityMatrix());
@@ -166,11 +166,11 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	dFloat32 height = 1.9f;
 	dFloat32 radio = 0.5f;
 	dFloat32 mass = 100.0f;
-	ndBasicPlayerCapsule* const player = new ndBasicPlayerCapsule(
-		scene, localAxis, location, mass, radio, height, height/4.0f);
-
-	player->m_isPlayer = true;
-	scene->SetUpdateCameraFunction(ndBasicPlayerCapsule::UpdateCameraCallback, player);
+//	ndBasicPlayerCapsule* const player = new ndBasicPlayerCapsule(
+//		scene, localAxis, location, mass, radio, height, height/4.0f);
+//
+//	player->m_isPlayer = true;
+//	scene->SetUpdateCameraFunction(ndBasicPlayerCapsule::UpdateCameraCallback, player);
 
 	//AddShapes(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f));
 	//AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));

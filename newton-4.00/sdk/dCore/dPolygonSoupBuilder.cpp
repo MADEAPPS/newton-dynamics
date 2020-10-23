@@ -150,34 +150,22 @@ dPolygonSoupBuilder::dPolygonSoupBuilder (const dPolygonSoupBuilder& source)
 	,m_normalPoints()
 {
 	m_run = DG_POINTS_RUN;
-
-	dAssert(0);
-//	m_faceCount = source.m_faceCount;
-//	m_indexCount = source.m_indexCount;
-//	m_vertexCount = source.m_vertexCount;
-//	m_normalCount = source.m_normalCount;
+	m_faceVertexCount.SetCount(source.m_faceVertexCount.GetCount());
+	m_vertexIndex.SetCount(source.m_vertexIndex.GetCount());
+	m_vertexPoints.SetCount(source.m_vertexPoints.GetCount());
 	
-//	m_vertexIndex[m_indexCount-1] = 0;
-//	m_faceVertexCount[m_faceCount-1] = 0;
-//	m_vertexPoints[m_vertexCount-1].m_w = 0;
+	memcpy (&m_vertexIndex[0], &source.m_vertexIndex[0], sizeof (dInt32) * source.m_vertexIndex.GetCount());
+	memcpy (&m_faceVertexCount[0], &source.m_faceVertexCount[0], sizeof (dInt32) * source.m_faceVertexCount.GetCount());
+	memcpy (&m_vertexPoints[0], &source.m_vertexPoints[0], sizeof (dBigVector) * source.m_vertexPoints.GetCount());
 
-//	memcpy (&m_vertexIndex[0], &source.m_vertexIndex[0], sizeof (dInt32) * m_indexCount);
-//	memcpy (&m_faceVertexCount[0], &source.m_faceVertexCount[0], sizeof (dInt32) * m_faceCount);
-//	memcpy (&m_vertexPoints[0], &source.m_vertexPoints[0], sizeof (dBigVector) * m_vertexCount);
+	if (m_normalPoints.GetCount())
+	{
+		m_normalIndex.SetCount(source.m_normalIndex.GetCount());
+		m_normalPoints.SetCount(source.m_normalPoints.GetCount());
 
-//	if (m_normalCount) 
-//	{
-//		m_normalIndex[m_faceCount-1] = 0;
-//		m_normalPoints[m_normalCount - 1].m_w = 0;
-//
-//		memcpy (&m_normalIndex[0], &source.m_normalIndex[0], sizeof (dInt32) * m_faceCount);
-//		memcpy (&m_normalPoints[0], &source.m_normalPoints[0], sizeof (dBigVector) * m_normalCount);
-//	} 
-//	else 
-//	{
-//		m_normalIndex[0] = 0;
-//		m_normalPoints[0].m_w = 0;
-//	}
+		memcpy (&m_normalIndex[0], &source.m_normalIndex[0], sizeof (dInt32) * source.m_normalIndex.GetCount());
+		memcpy (&m_normalPoints[0], &source.m_normalPoints[0], sizeof (dBigVector) * source.m_normalPoints.GetCount());
+	}
 }
 
 dPolygonSoupBuilder::~dPolygonSoupBuilder ()
@@ -479,7 +467,7 @@ void dPolygonSoupBuilder::Finalize()
 	}
 }
 
-void dPolygonSoupBuilder::FinalizeAndOptimize()
+void dPolygonSoupBuilder::FinalizeAndOptimize(dInt32 id)
 {
 	Finalize();
 	dPolyhedra polyhedra;
@@ -487,14 +475,13 @@ void dPolygonSoupBuilder::FinalizeAndOptimize()
 	dPolygonSoupBuilder leftOver;
 	dInt32 tmpIndexPool[1024];
 	dVector tmpVertexPool[1024];
-	
+
 	Begin();
 	leftOver.Begin();
 	polyhedra.BeginFace ();
+	dInt32 attribute = id;
 	dInt32 faceIndexNumber = 0;
-	dInt32 attribute = m_vertexIndex[0];
-
-	for (dInt32 i = 0; i < m_faceVertexCount.GetCount(); i ++)
+	for (dInt32 i = 0; i < source.m_faceVertexCount.GetCount(); i ++)
 	{
 		dInt32 indexCount = source.m_faceVertexCount[i];
 		dAssert (indexCount < 1024);
@@ -511,6 +498,7 @@ void dPolygonSoupBuilder::FinalizeAndOptimize()
 			dAssert(0);
 			//dInt32 faceArray = indexCount - 1;
 			//leftOver.AddMesh (&tmpVertexPool[0].m_x, indexCount, sizeof (tmpVertexPool[0]), 1, &faceArray, tmpIndexPool, &attribute, dGetIdentityMatrix());
+			leftOver.AddFaceIndirect(&tmpVertexPool[0].m_x, sizeof (dVector), attribute, tmpIndexPool, indexCount);
 		} 
 		else 
 		{
@@ -558,8 +546,8 @@ void dPolygonSoupBuilder::FinalizeAndOptimize()
 
 		if (indexCount >= 3) 
 		{
-			dAssert(0);
 			//AddMesh (&tmpVertexPool[0].m_x, indexCount, sizeof (tmpVertexPool[0]), 1, &indexCount, tmpIndexPool, &attribute, dGetIdentityMatrix());
+			AddFaceIndirect(&tmpVertexPool[0].m_x, sizeof (dVector), attribute, tmpIndexPool, indexCount);
 		}
 	}
 
@@ -589,8 +577,8 @@ void dPolygonSoupBuilder::FinalizeAndOptimize()
 		} while (ptr != edge);
 		if (indexCount >= 3) 
 		{
-			dAssert(0);
 			//AddMesh (&tmpVertexPool[0].m_x, indexCount, sizeof (dVector), 1, &indexCount, tmpIndexPool, &attribute, dGetIdentityMatrix());
+			AddFaceIndirect(&tmpVertexPool[0].m_x, sizeof(dVector), attribute, tmpIndexPool, indexCount);
 		}
 	}
 
@@ -604,9 +592,9 @@ void dPolygonSoupBuilder::FinalizeAndOptimize()
 			tmpVertexPool[j] = leftOver.m_vertexPoints[index];
 			tmpIndexPool[j] = j;
 		}
-		dAssert(0);
 		//dInt32 faceArray = indexCount;
 		//AddMesh (&tmpVertexPool[0].m_x, indexCount, sizeof (tmpVertexPool[0]), 1, &faceArray, tmpIndexPool, &attribute, dGetIdentityMatrix());
+		AddFaceIndirect(&tmpVertexPool[0].m_x, sizeof(dVector), attribute, tmpIndexPool, indexCount);
 
 		faceIndexNumber += (indexCount + 1); 
 	}
@@ -752,11 +740,11 @@ void dPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket
 						face[j] = points[index];
 						faceIndex[j] = j;
 					}
-					dAssert(0);
 					//dInt32 faceIndexCount = count1;
 					//tmpBuilder.AddMesh (&face[0].m_x, count1, sizeof (dVector), 1, &faceIndexCount, &faceIndex[0], &faceId, dGetIdentityMatrix()); 
+					tmpBuilder.AddFaceIndirect(&face[0].m_x, sizeof(dVector), faceId, faceIndex, count1);
 				}
-				tmpBuilder.FinalizeAndOptimize ();
+				tmpBuilder.FinalizeAndOptimize (faceId);
 
 				dInt32 faceIndexNumber = 0;
 				for (dInt32 i = 0; i < tmpBuilder.m_faceVertexCount.GetCount(); i ++)
@@ -768,9 +756,9 @@ void dPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket
 						face[j] = tmpBuilder.m_vertexPoints[index];
 						faceIndex[j] = j;
 					}
-					dAssert(0);
 					//dInt32 faceArray = indexCount;
 					//AddMesh (&face[0].m_x, indexCount, sizeof (dVector), 1, &faceArray, faceIndex, &faceId, dGetIdentityMatrix());
+					AddFaceIndirect(&face[0].m_x, sizeof(dVector), faceId, faceIndex, indexCount);
 					faceIndexNumber += (indexCount + 1); 
 				}
 			} 
@@ -874,11 +862,11 @@ void dPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket
 				face[j] = points[index];
 				faceIndex[j] = j;
 			}
-			dAssert(0);
 			//dInt32 faceIndexCount = count;
 			//tmpBuilder.AddMesh (&face[0].m_x, count, sizeof (dVector), 1, &faceIndexCount, &faceIndex[0], &faceId, dGetIdentityMatrix()); 
+			tmpBuilder.AddFaceIndirect(&face[0].m_x, sizeof(dVector), faceId, faceIndex, count);
 		}
-		tmpBuilder.FinalizeAndOptimize ();
+		tmpBuilder.FinalizeAndOptimize (faceId);
 
 		dInt32 faceIndexNumber = 0;
 		for (dInt32 i = 0; i < tmpBuilder.m_faceVertexCount.GetCount(); i ++)
@@ -890,9 +878,9 @@ void dPolygonSoupBuilder::Optimize(dInt32 faceId, const dgFaceBucket& faceBucket
 				face[j] = tmpBuilder.m_vertexPoints[index];
 				faceIndex[j] = j;
 			}
-			dAssert(0);
 			//dInt32 faceArray = indexCount;
 			//AddMesh (&face[0].m_x, indexCount, sizeof (dVector), 1, &faceArray, faceIndex, &faceId, dGetIdentityMatrix());
+			AddFaceIndirect(&face[0].m_x, sizeof(dVector), faceId, faceIndex, indexCount);
 		
 			faceIndexNumber += (indexCount + 1); 
 		}

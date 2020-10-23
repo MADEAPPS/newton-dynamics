@@ -71,8 +71,8 @@ class dPolygonSoupBuilder: public dClassAlloc
 	void Optimize(dInt32 faceId, const dgFaceBucket& faceBucket, const dPolygonSoupBuilder& source);
 
 	void Finalize();
-	void FinalizeAndOptimize();
 	void OptimizeByIndividualFaces();
+	void FinalizeAndOptimize(dInt32 id);
 	dInt32 FilterFace (dInt32 count, dInt32* const indexArray);
 	dInt32 AddConvexFace (dInt32 count, dInt32* const indexArray, dInt32* const  facesArray);
 	void PackArray();

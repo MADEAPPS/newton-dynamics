@@ -197,7 +197,7 @@ class dgAABBPolygonSoup: public dgPolygonSoupDatabase
 	dgAABBPolygonSoup ();
 	virtual ~dgAABBPolygonSoup ();
 
-	void Create (const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild);
+	void Create (const dgPolygonSoupDatabaseBuilder& builder);
 	void CalculateAdjacendy ();
 	virtual void ForAllSectorsRayHit (const dgFastRayTest& ray, dgFloat32 maxT, dgRayIntersectCallback callback, void* const context) const;
 	virtual void ForAllSectors (const dgFastAABBInfo& obbAabb, const dgVector& boxDistanceTravel, dgFloat32 m_maxT, dgAABBIntersectCallback callback, void* const context) const;

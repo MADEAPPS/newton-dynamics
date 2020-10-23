@@ -104,7 +104,7 @@ void dgCollisionBVH::EndBuild(dgInt32 optimize)
 #endif
 
 	m_builder->End(state);
-	Create (*m_builder, state);
+	Create (*m_builder);
 	CalculateAdjacendy();
 	
 	GetAABB (p0, p1);

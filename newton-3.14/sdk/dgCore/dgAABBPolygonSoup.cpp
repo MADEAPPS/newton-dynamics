@@ -737,7 +737,7 @@ dgAABBPolygonSoup::dgNodeBuilder* dgAABBPolygonSoup::BuildTopDown (dgNodeBuilder
 	}
 }
 
-void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder, bool optimizedBuild)
+void dgAABBPolygonSoup::Create (const dgPolygonSoupDatabaseBuilder& builder)
 {
 	if (builder.m_faceCount == 0) {
 		return;

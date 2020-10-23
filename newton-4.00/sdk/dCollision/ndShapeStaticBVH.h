@@ -25,10 +25,10 @@
 #include "ndCollisionStdafx.h"
 #include "ndShapeStaticMesh.h"
 
-//class ndShapeStaticBVH;
-//typedef dFloat32 (*dgCollisionBVHUserRayCastCallback) (const dgBody* const body, const ndShapeStaticBVH* const heightFieldCollision, dFloat32 interception, dFloat32* normal, dInt32 faceId, void* usedData);
+class ndBodyKinematic;
+class ndShapeStaticBVH;
+typedef dFloat32 (*dgCollisionBVHUserRayCastCallback) (const ndBodyKinematic* const body, const ndShapeStaticBVH* const collsionShape, dFloat32 interception, dFloat32* normal, dInt32 faceId, void* usedData);
 
-//class ndShapeStaticBVH: public ndShapeStaticMesh, public dgAABBPolygonSoup
 class ndShapeStaticBVH : public ndShapeStaticMesh, public dAabbPolygonSoup
 {
 	public:
@@ -40,6 +40,8 @@ class ndShapeStaticBVH : public ndShapeStaticMesh, public dAabbPolygonSoup
 
 	//virtual dFloat32 RayCast(const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
 	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+
+	static dIntersectStatus ShowDebugPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 #if 0
 	public:
 	D_MSV_NEWTON_ALIGN_32 
@@ -77,10 +79,9 @@ class ndShapeStaticBVH : public ndShapeStaticMesh, public dAabbPolygonSoup
 	private:
 	static dFloat32 RayHit (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount);
 	static dFloat32 RayHitUser (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount);
-	static dgIntersectStatus GetPolygon (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
-	static dgIntersectStatus ShowDebugPolygon (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
-	static dgIntersectStatus GetTriangleCount (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
-	static dgIntersectStatus CollectVertexListIndexList (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
+	static dIntersectStatus GetPolygon (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
+	static dIntersectStatus GetTriangleCount (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
+	static dIntersectStatus CollectVertexListIndexList (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 
 	void Serialize(dgSerialize callback, void* const userData) const;
 	virtual dVector SupportVertex (const dVector& dir) const;

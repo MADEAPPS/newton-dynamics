@@ -21,6 +21,7 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
+#include "ndShapeInstance.h"
 #include "ndShapeStaticBVH.h"
 
 #if 0
@@ -137,7 +138,7 @@ void ndShapeStaticBVH::ForEachFace (dAaabbIntersectCallback callback, void* cons
 }
 
 
-dgIntersectStatus ndShapeStaticBVH::CollectVertexListIndexList (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
+dIntersectStatus ndShapeStaticBVH::CollectVertexListIndexList (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
 {
 	dgMeshVertexListIndexList& data = (*(dgMeshVertexListIndexList*) context);
 
@@ -170,7 +171,7 @@ dgIntersectStatus ndShapeStaticBVH::CollectVertexListIndexList (void* const cont
 
 
 
-dgIntersectStatus ndShapeStaticBVH::GetTriangleCount (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
+dIntersectStatus ndShapeStaticBVH::GetTriangleCount (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
 {
 	dgMeshVertexListIndexList& data = (*(dgMeshVertexListIndexList*) context);
 
@@ -249,7 +250,7 @@ dgAssert (0);
 
 
 
-dgIntersectStatus ndShapeStaticBVH::GetPolygon (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
+dIntersectStatus ndShapeStaticBVH::GetPolygon (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
 {
 	dgPolygonMeshDesc& data = (*(dgPolygonMeshDesc*) context);
 	if (data.m_faceCount >= DG_MAX_COLLIDING_FACES) {
@@ -262,7 +263,7 @@ dgIntersectStatus ndShapeStaticBVH::GetPolygon (void* const context, const dFloa
 	}
 
 	if (data.m_me->GetDebugCollisionCallback()) { 
-		dgTriplex triplex[128];
+		dTriplex triplex[128];
 		dInt32 stride = dInt32 (strideInBytes / sizeof (dFloat32));
 		const dVector scale = data.m_polySoupInstance->GetScale();
 		dMatrix matrix (data.m_polySoupInstance->GetLocalMatrix() * data.m_polySoupBody->GetMatrix());
@@ -273,7 +274,7 @@ dgIntersectStatus ndShapeStaticBVH::GetPolygon (void* const context, const dFloa
 			triplex[i].m_z = p.m_z;
 		}
 		if (data.m_polySoupBody) {
-			data.m_me->GetDebugCollisionCallback() (data.m_polySoupBody, data.m_objBody, indexArray[indexCount], indexCount, &triplex[0].m_x, sizeof (dgTriplex));
+			data.m_me->GetDebugCollisionCallback() (data.m_polySoupBody, data.m_objBody, indexArray[indexCount], indexCount, &triplex[0].m_x, sizeof (dTriplex));
 		}
 	}
 
@@ -337,44 +338,7 @@ void ndShapeStaticBVH::GetLocalAABB (const dVector& p0, const dVector& p1, dVect
 	dgAssert (0);
 }
 
-struct dgCollisionBVHShowPolyContext
-{
-	dMatrix m_matrix;
-	void* m_userData;
-	dgCollision::OnDebugCollisionMeshCallback m_callback;
-};
 
-dgIntersectStatus ndShapeStaticBVH::ShowDebugPolygon (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
-{
-	dgTriplex triplex[128];
-	dInt32 stride = dInt32 (strideInBytes / sizeof (dFloat32));
-
-	dgCollisionBVHShowPolyContext& data = *(dgCollisionBVHShowPolyContext*) context;
-	for (dInt32 i = 0; i < indexCount; i ++ ) {
-		dVector p (&polygon[indexArray[i] * stride]);
-		p = p & dVector::m_triplexMask;
-		p = data.m_matrix.TransformVector(p);
-		triplex[i].m_x = p.m_x;
-		triplex[i].m_y = p.m_y;
-		triplex[i].m_z = p.m_z;
-	}
-//	data.m_callback (data.m_userData, indexCount, &triplex[0].m_x, indexArray[-1]);
-	data.m_callback (data.m_userData, indexCount, &triplex[0].m_x, indexArray[indexCount]);
-
-	return t_ContinueSearh;
-}
-
-void ndShapeStaticBVH::DebugCollision (const dMatrix& matrixPtr, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
-{
-	dgCollisionBVHShowPolyContext context;
-
-	context.m_matrix = matrixPtr;
-	context.m_userData = userData;;
-	context.m_callback = callback;
-
-	dFastAabbInfo box (dGetIdentityMatrix(), dVector (1.0e15f));
-	ForAllSectors (box, dVector(dFloat32 (0.0f)), dFloat32 (1.0f), ShowDebugPolygon, &context);
-}
 #endif
 
 ndShapeStaticBVH::ndShapeStaticBVH(const dPolygonSoupBuilder& builder)
@@ -382,7 +346,7 @@ ndShapeStaticBVH::ndShapeStaticBVH(const dPolygonSoupBuilder& builder)
 	,dAabbPolygonSoup()
 //	,m_trianglesCount(0)
 {
-	Create(builder, true);
+	Create(builder);
 	CalculateAdjacendy();
 
 	dVector p0;
@@ -397,12 +361,40 @@ ndShapeStaticBVH::ndShapeStaticBVH(const dPolygonSoupBuilder& builder)
 
 ndShapeStaticBVH::~ndShapeStaticBVH(void)
 {
-	dAssert(0);
+}
+
+struct dgCollisionBVHShowPolyContext
+{
+	dMatrix m_matrix;
+	void* m_userData;
+	ndShapeDebugCallback* m_callback;
+};
+
+dIntersectStatus ndShapeStaticBVH::ShowDebugPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
+{
+	dVector poly[128];
+	dInt32 stride = dInt32(strideInBytes / sizeof(dFloat32));
+
+	dgCollisionBVHShowPolyContext& data = *(dgCollisionBVHShowPolyContext*)context;
+	for (dInt32 i = 0; i < indexCount; i++) 
+	{
+		dVector p(&polygon[indexArray[i] * stride]);
+		poly[i] = data.m_matrix.TransformVector(p & dVector::m_triplexMask);
+	}
+	data.m_callback->DrawPolygon(indexCount, poly);
+	return t_ContinueSearh;
 }
 
 void ndShapeStaticBVH::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 {
-	dAssert(0);
+	dgCollisionBVHShowPolyContext context;
+
+	context.m_matrix = matrix;
+	context.m_userData = (void*)this;
+	context.m_callback = &debugCallback;
+
+	dFastAabbInfo box(dGetIdentityMatrix(), dVector(1.0e15f));
+	ForAllSectors(box, dVector::m_zero, dFloat32(1.0f), ShowDebugPolygon, &context);
 }
 
 //dFloat32 ndShapeStaticBVH::RayCast(const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
