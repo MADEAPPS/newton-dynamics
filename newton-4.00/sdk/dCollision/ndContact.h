@@ -45,8 +45,8 @@ class ndContactPoint
 	const ndBodyKinematic* m_body1;
 	const ndShapeInstance* m_shapeInstance0;
 	const ndShapeInstance* m_shapeInstance1;
-	//dInt64 m_shapeId0;
-	//dInt64 m_shapeId1;
+	dInt64 m_shapeId0;
+	dInt64 m_shapeId1;
 	dFloat32 m_penetration;
 } D_GCC_NEWTON_ALIGN_32;
 

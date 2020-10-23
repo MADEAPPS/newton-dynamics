@@ -25,7 +25,6 @@
 #include "ndCollisionStdafx.h"
 #include "ndShape.h"
 
-//class ndShapeNull: public ndShapeConvex
 class ndShapeNull : public ndShape
 {
 	public:

@@ -172,10 +172,8 @@ class ndShapeStaticMesh: public ndShape
 	D_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
 	D_COLLISION_API dInt32 CalculatePlaneIntersection(const dFloat32* const vertex, const dInt32* const index, dInt32 indexCount, dInt32 strideInFloat, const dPlane& localPlane, dVector* const contactsOut) const;
 
-
-#if 0
 	D_MSV_NEWTON_ALIGN_32 
-	class dgMeshVertexListIndexList
+	class ndMeshVertexListIndexList
 	{
 		public:
 		dInt32* m_indexList;
@@ -185,11 +183,12 @@ class ndShapeStaticMesh: public ndShape
 		dInt32 m_maxIndexCount;
 		dInt32 m_vertexCount;
 		dInt32 m_vertexStrideInBytes;
-	}D_GCC_NEWTON_ALIGN_32;
-	
+	} D_GCC_NEWTON_ALIGN_32;
+
+#if 0
 	ndShapeStaticMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
 	
-	virtual void GetVertexListIndexList (const dVector& p0, const dVector& p1, dgMeshVertexListIndexList &data) const = 0;
+	virtual void GetVertexListIndexList (const dVector& p0, const dVector& p1, ndMeshVertexListIndexList &data) const = 0;
 
 	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const = 0;
 

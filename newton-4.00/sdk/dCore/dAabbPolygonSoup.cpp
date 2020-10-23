@@ -1235,8 +1235,7 @@ dVector dAabbPolygonSoup::ForAllSectorsSupportVectex (const dVector& dir) const
 	return supportVertex;
 }
 
-/*
-void dAabbPolygonSoup::ForAllSectorsRayHit (const dFastRayTest& raySrc, dFloat32 maxParam, dgRayIntersectCallback callback, void* const context) const
+void dAabbPolygonSoup::ForAllSectorsRayHit (const dFastRayTest& raySrc, dFloat32 maxParam, dRayIntersectCallback callback, void* const context) const
 {
 	const dNode *stackPool[DG_STACK_DEPTH];
 	dFloat32 distance[DG_STACK_DEPTH];
@@ -1247,33 +1246,45 @@ void dAabbPolygonSoup::ForAllSectorsRayHit (const dFastRayTest& raySrc, dFloat32
 
 	stackPool[0] = m_aabb;
 	distance[0] = m_aabb->RayDistance(ray, vertexArray);
-	while (stack) {
+	while (stack) 
+	{
 		stack --;
 		dFloat32 dist = distance[stack];
-		if (dist > maxParam) {
+		if (dist > maxParam) 
+		{
 			break;
-		} else {
+		} 
+		else 
+		{
 			const dNode *const me = stackPool[stack];
-			if (me->m_left.IsLeaf()) {
+			if (me->m_left.IsLeaf()) 
+			{
 				dInt32 vCount = dInt32 (me->m_left.GetCount());
-				if (vCount > 0) {
+				if (vCount > 0) 
+				{
 					dInt32 index = dInt32 (me->m_left.GetIndex());
 					dFloat32 param = callback(context, &vertexArray[0].m_x, sizeof (dTriplex), &m_indices[index], vCount);
 					dAssert (param >= dFloat32 (0.0f));
-					if (param < maxParam) {
+					if (param < maxParam) 
+					{
 						maxParam = param;
-						if (maxParam == dFloat32 (0.0f)) {
+						if (maxParam == dFloat32 (0.0f)) 
+						{
 							break;
 						}
 					}
 				}
 
-			} else {
+			} 
+			else 
+			{
 				const dNode* const node = me->m_left.GetNode(m_aabb);
 				dFloat32 dist1 = node->RayDistance(ray, vertexArray);
-				if (dist1 < maxParam) {
+				if (dist1 < maxParam) 
+				{
 					dInt32 j = stack;
-					for ( ; j && (dist1 > distance[j - 1]); j --) {
+					for ( ; j && (dist1 > distance[j - 1]); j --) 
+					{
 						stackPool[j] = stackPool[j - 1];
 						distance[j] = distance[j - 1];
 					}
@@ -1284,26 +1295,33 @@ void dAabbPolygonSoup::ForAllSectorsRayHit (const dFastRayTest& raySrc, dFloat32
 				}
 			}
 
-			if (me->m_right.IsLeaf()) {
+			if (me->m_right.IsLeaf()) 
+			{
 				dInt32 vCount = dInt32 (me->m_right.GetCount());
-				if (vCount > 0) {
+				if (vCount > 0) 
+				{
 					dInt32 index = dInt32 (me->m_right.GetIndex());
 					dFloat32 param = callback(context, &vertexArray[0].m_x, sizeof (dTriplex), &m_indices[index], vCount);
 					dAssert (param >= dFloat32 (0.0f));
-					if (param < maxParam) {
+					if (param < maxParam) 
+					{
 						maxParam = param;
-						if (maxParam == dFloat32 (0.0f)) {
+						if (maxParam == dFloat32 (0.0f)) 
+						{
 							break;
 						}
 					}
 				}
-
-			} else {
+			} 
+			else 
+			{
 				const dNode* const node = me->m_right.GetNode(m_aabb);
 				dFloat32 dist1 = node->RayDistance(ray, vertexArray);
-				if (dist1 < maxParam) {
+				if (dist1 < maxParam) 
+				{
 					dInt32 j = stack;
-					for ( ; j && (dist1 > distance[j - 1]); j --) {
+					for ( ; j && (dist1 > distance[j - 1]); j --) 
+					{
 						stackPool[j] = stackPool[j - 1];
 						distance[j] = distance[j - 1];
 					}
@@ -1316,7 +1334,6 @@ void dAabbPolygonSoup::ForAllSectorsRayHit (const dFastRayTest& raySrc, dFloat32
 		}
 	}
 }
-*/
 
 void dAabbPolygonSoup::ForAllSectors (const dFastAabbInfo& obbAabbInfo, const dVector& boxDistanceTravel, dFloat32 m_maxT, dAaabbIntersectCallback callback, void* const context) const
 {
@@ -1452,7 +1469,6 @@ void dAabbPolygonSoup::ForAllSectors (const dFastAabbInfo& obbAabbInfo, const dV
 					}
 				}
 			}
-
 		} 
 		else 
 		{

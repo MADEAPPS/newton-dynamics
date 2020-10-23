@@ -21,112 +21,12 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
+#include "ndContact.h"
+#include "ndBodyKinematic.h"
 #include "ndShapeInstance.h"
 #include "ndShapeStaticBVH.h"
 
 #if 0
-#include "dgPhysicsStdafx.h"
-#include "dgBody.h"
-#include "dgWorld.h"
-#include "ndShapeStaticBVH.h"
-
-
-
-ndShapeStaticBVH::ndShapeStaticBVH (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber)
-	:ndShapeStaticMesh (world, deserialization, userData, revisionNumber)
-	,dgAABBPolygonSoup()
-	,m_trianglesCount(0)
-{
-	dgAssert (m_rtti | dgCollisionBVH_RTTI);
-	m_builder = NULL;;
-	m_userRayCastCallback = NULL;
-
-	dgAABBPolygonSoup::Deserialize (deserialization, userData, revisionNumber);
-
-	dVector p0; 
-	dVector p1; 
-	GetAABB (p0, p1);
-	SetCollisionBBox(p0, p1);
-
-	deserialization(userData, &m_trianglesCount, sizeof (dInt32));
-}
-
-void ndShapeStaticBVH::Serialize(dgSerialize callback, void* const userData) const
-{
-	SerializeLow(callback, userData);
-	dgAABBPolygonSoup::Serialize ((dgSerialize) callback, userData);
-	callback(userData, &m_trianglesCount, sizeof (dInt32));
-}
-
-void ndShapeStaticBVH::BeginBuild()
-{
-	m_builder = new (m_allocator) dgPolygonSoupDatabaseBuilder(m_allocator);
-	m_builder->Begin();
-}
-
-void ndShapeStaticBVH::AddFace(dInt32 vertexCount, const dFloat32* const vertexPtr, dInt32 strideInBytes, dInt32 faceAttribute)
-{
-	dInt32 faceArray;
-	dInt32 indexList[256];
-
-	faceArray = vertexCount;
-	dgAssert (vertexCount < dInt32 (sizeof (indexList) / sizeof (indexList[0])));
-	for (dInt32 i = 0; i < vertexCount; i ++) {
-		indexList[i] = i;
-	}
-	m_builder->AddMesh (vertexPtr, vertexCount, strideInBytes, 1, &faceArray, indexList, &faceAttribute, dGetIdentityMatrix());
-}
-
-void ndShapeStaticBVH::SetCollisionRayCastCallback (dgCollisionBVHUserRayCastCallback rayCastCallback)
-{
-	m_userRayCastCallback = rayCastCallback;
-}
-
-void ndShapeStaticBVH::EndBuild(dInt32 optimize)
-{
-	dVector p0;
-	dVector p1;
-
-	bool state = optimize ? true : false;
-
-#ifdef _DEBUG
-	if (state && (optimize >> 1)) {
-		char debugMesh[256];
-		sprintf (debugMesh, "debugMesh_%d.ply", optimize-1);
-		m_builder->SavePLY(debugMesh);
-	}
-#endif
-
-	m_builder->End(state);
-	Create (*m_builder, state);
-	CalculateAdjacendy();
-	
-	GetAABB (p0, p1);
-	SetCollisionBBox (p0, p1);
-
-	delete m_builder;
-	m_builder = NULL;
-		
-	dgMeshVertexListIndexList data;
-	data.m_indexList = NULL;
-	data.m_userDataList = NULL;
-	data.m_maxIndexCount = 1000000000;
-	data.m_triangleCount = 0; 
-	dVector zero (dFloat32 (0.0f));
-	dFastAabbInfo box (dGetIdentityMatrix(), dVector (dFloat32 (1.0e15f)));
-	ForAllSectors (box, zero, dFloat32 (1.0f), GetTriangleCount, &data);
-	m_trianglesCount = data.m_triangleCount;
-}
-
-
-void ndShapeStaticBVH::GetCollisionInfo(dgCollisionInfo* const info) const
-{
-	dgCollision::GetCollisionInfo(info);
-
-	info->m_bvhCollision.m_vertexCount = GetVertexCount();
-	info->m_bvhCollision.m_indexCount = m_trianglesCount * 3;
-}
-
 void ndShapeStaticBVH::ForEachFace (dAaabbIntersectCallback callback, void* const context) const
 {
 	dVector p0 (-1.0e10f, -1.0e10f, -1.0e10f, 1.0f);
@@ -137,10 +37,9 @@ void ndShapeStaticBVH::ForEachFace (dAaabbIntersectCallback callback, void* cons
 	ForAllSectors (box, zero, dFloat32 (1.0f), callback, context);
 }
 
-
 dIntersectStatus ndShapeStaticBVH::CollectVertexListIndexList (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
 {
-	dgMeshVertexListIndexList& data = (*(dgMeshVertexListIndexList*) context);
+	ndMeshVertexListIndexList& data = (*(ndMeshVertexListIndexList*) context);
 
 	if ((data.m_triangleCount + indexCount - 2) * 3 > data.m_maxIndexCount) {
 		return t_StopSearh;
@@ -162,30 +61,14 @@ dIntersectStatus ndShapeStaticBVH::CollectVertexListIndexList (void* const conte
 		j += 3;
 	}
 
-	dgAssert (j <= data.m_maxIndexCount);
+	dAssert (j <= data.m_maxIndexCount);
 	data.m_triangleCount = k;
-	dgAssert ((data.m_triangleCount * 3) <= data.m_maxIndexCount);
+	dAssert ((data.m_triangleCount * 3) <= data.m_maxIndexCount);
 
 	return t_ContinueSearh;
 }
 
-
-
-dIntersectStatus ndShapeStaticBVH::GetTriangleCount (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
-{
-	dgMeshVertexListIndexList& data = (*(dgMeshVertexListIndexList*) context);
-
-	if ((data.m_triangleCount + indexCount - 2) * 3 > data.m_maxIndexCount) {
-		return t_StopSearh;
-	}
-
-	data.m_triangleCount += (indexCount - 2);
-	dgAssert ((data.m_triangleCount * 3) <= data.m_maxIndexCount);
-	return t_ContinueSearh;
-}
-
-
-void ndShapeStaticBVH::GetVertexListIndexList (const dVector& p0, const dVector& p1, dgMeshVertexListIndexList &data) const
+void ndShapeStaticBVH::GetVertexListIndexList (const dVector& p0, const dVector& p1, ndMeshVertexListIndexList &data) const
 {
 	dFastAabbInfo box (p0, p1);
 	ForAllSectors (box, dVector (dFloat32 (0.0f)), dFloat32 (1.0f), CollectVertexListIndexList, &data);
@@ -193,47 +76,17 @@ void ndShapeStaticBVH::GetVertexListIndexList (const dVector& p0, const dVector&
 	data.m_veterxArray = GetLocalVertexPool(); 
 	data.m_vertexCount = GetVertexCount(); 
 	data.m_vertexStrideInBytes = GetStrideInBytes(); 
-
 }
 
-
-
-dFloat32 ndShapeStaticBVH::RayHit (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount)
-{
-	dgBVHRay& me = *((dgBVHRay*) context);
-	dVector normal (&polygon[indexArray[indexCount + 1] * (strideInBytes / sizeof (dFloat32))]);
-	normal = normal & dVector::m_triplexMask;
-	dFloat32 t = me.PolygonIntersect (normal, me.m_t, polygon, strideInBytes, indexArray, indexCount);
-	if (t <= (me.m_t * dFloat32 (1.0001f))) {
-//		if ((t * dFloat32 (1.0001f)) >= me.m_t) {
-//			dFloat32 dist0;
-//			dFloat32 dist1;
-//			dist0 = me.m_diff % normal;
-//			dist1 = me.m_diff % me.m_normal;
-//			if (dist0 < dist1) {
-//				me.m_t = t;
-//				me.m_normal = normal;
-//				me.m_id = me.m_me->GetTagId(indexArray, indexCount);
-//			} else {
-//				t = me.m_t;
-//			}
-//		} else {
-			me.m_t = t;
-			me.m_normal = normal;
-			me.m_id = me.m_me->GetTagId(indexArray, indexCount);
-//		}
-	}
-	return t;
-}
 
 dFloat32 ndShapeStaticBVH::RayHitUser (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount)
 {
-	dgAssert (0);
+	dAssert (0);
 	dFloat32 t = dFloat32 (1.2f);
-	dgBVHRay& me = *((dgBVHRay*) context);
+	ndBvhRay& me = *((ndBvhRay*) context);
 	dVector normal (&polygon[indexArray[indexCount + 1] * (strideInBytes / sizeof (dFloat32))]);
 	normal = normal & dVector::m_triplexMask;
-dgAssert (0);
+dAssert (0);
 	t = me.PolygonIntersect (normal, me.m_t, polygon, strideInBytes, indexArray, indexCount);
 	if (t < dFloat32 (1.0f)) {
 		if (t < me.m_t) {
@@ -246,9 +99,6 @@ dgAssert (0);
 	}
 	return t;
 }
-
-
-
 
 dIntersectStatus ndShapeStaticBVH::GetPolygon (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
 {
@@ -278,7 +128,7 @@ dIntersectStatus ndShapeStaticBVH::GetPolygon (void* const context, const dFloat
 		}
 	}
 
-	dgAssert (data.m_vertex == polygon);
+	dAssert (data.m_vertex == polygon);
 	dInt32 count = indexCount * 2 + 3;
 
 	data.m_faceIndexCount[data.m_faceCount] = indexCount;
@@ -327,41 +177,15 @@ dVector ndShapeStaticBVH::SupportVertex(const dVector& dir, dInt32* const vertex
 
 dVector ndShapeStaticBVH::SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const
 {
-	dgAssert(0);
+	dAssert(0);
 	return SupportVertex(dir, vertexIndex);
 }
 
-
-
 void ndShapeStaticBVH::GetLocalAABB (const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const
 {
-	dgAssert (0);
+	dAssert (0);
 }
-
-
 #endif
-
-ndShapeStaticBVH::ndShapeStaticBVH(const dPolygonSoupBuilder& builder)
-	:ndShapeStaticMesh(m_boundingBoxHierachy)
-	,dAabbPolygonSoup()
-//	,m_trianglesCount(0)
-{
-	Create(builder);
-	CalculateAdjacendy();
-
-	dVector p0;
-	dVector p1;
-	GetAABB(p0, p1);
-	//SetCollisionBBox(p0, p1);
-	m_boxSize = (p1 - p0) * dVector::m_half;
-	m_boxOrigin = (p1 + p0) * dVector::m_half;
-	//m_boxMinRadius = dMin(m_boxSize.m_x, m_boxSize.m_y, m_boxSize.m_z);
-	//m_boxMaxRadius = dSqrt((m_boxSize.DotProduct(m_boxSize)).GetScalar());
-}
-
-ndShapeStaticBVH::~ndShapeStaticBVH(void)
-{
-}
 
 struct dgCollisionBVHShowPolyContext
 {
@@ -369,6 +193,58 @@ struct dgCollisionBVHShowPolyContext
 	void* m_userData;
 	ndShapeDebugCallback* m_callback;
 };
+
+ndShapeStaticBVH::ndShapeStaticBVH(const dPolygonSoupBuilder& builder)
+	:ndShapeStaticMesh(m_boundingBoxHierachy)
+	,dAabbPolygonSoup()
+	,m_trianglesCount(0)
+{
+	Create(builder);
+	CalculateAdjacendy();
+
+	dVector p0;
+	dVector p1;
+	GetAABB(p0, p1);
+	m_boxSize = (p1 - p0) * dVector::m_half;
+	m_boxOrigin = (p1 + p0) * dVector::m_half;
+
+	ndMeshVertexListIndexList data;
+	data.m_indexList = nullptr;
+	data.m_userDataList = nullptr;
+	data.m_maxIndexCount = 1000000000;
+	data.m_triangleCount = 0;
+	dVector zero(dVector::m_zero);
+	dFastAabbInfo box(dGetIdentityMatrix(), dVector(dFloat32(1.0e15f)));
+	ForAllSectors(box, zero, dFloat32(1.0f), GetTriangleCount, &data);
+	m_trianglesCount = data.m_triangleCount;
+}
+
+ndShapeStaticBVH::~ndShapeStaticBVH(void)
+{
+}
+
+dIntersectStatus ndShapeStaticBVH::GetTriangleCount(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
+{
+	ndMeshVertexListIndexList& data = (*(ndMeshVertexListIndexList*)context);
+
+	if ((data.m_triangleCount + indexCount - 2) * 3 > data.m_maxIndexCount) 
+	{
+		return t_StopSearh;
+	}
+
+	data.m_triangleCount += (indexCount - 2);
+	dAssert((data.m_triangleCount * 3) <= data.m_maxIndexCount);
+	return t_ContinueSearh;
+}
+
+ndShapeInfo ndShapeStaticBVH::GetShapeInfo() const
+{
+	ndShapeInfo info(ndShapeStaticMesh::GetShapeInfo());
+
+	info.m_bvhCollision.m_vertexCount = GetVertexCount();
+	info.m_bvhCollision.m_indexCount = m_trianglesCount * 3;
+	return info;
+}
 
 dIntersectStatus ndShapeStaticBVH::ShowDebugPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
 {
@@ -397,45 +273,37 @@ void ndShapeStaticBVH::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& d
 	ForAllSectors(box, dVector::m_zero, dFloat32(1.0f), ShowDebugPolygon, &context);
 }
 
-//dFloat32 ndShapeStaticBVH::RayCast(const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const
+dFloat32 ndShapeStaticBVH::RayHit(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount)
+{
+	ndBvhRay& me = *((ndBvhRay*)context);
+	dVector normal(&polygon[indexArray[indexCount + 1] * (strideInBytes / sizeof(dFloat32))]);
+	normal = normal & dVector::m_triplexMask;
+	dFloat32 t = me.PolygonIntersect(normal, me.m_t, polygon, strideInBytes, indexArray, indexCount);
+	if (t <= (me.m_t * dFloat32(1.0001f))) 
+	{
+		me.m_t = t;
+		me.m_normal = normal;
+		me.m_id = me.m_me->GetTagId(indexArray, indexCount);
+	}
+	return t;
+}
+
 dFloat32 ndShapeStaticBVH::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
 {
-	dAssert(0);
-	return 0;
-	//dgBVHRay ray(localP0, localP1);
-	//ray.m_t = dgMin(maxT, dFloat32(1.0f));
-	//ray.m_me = this;
-	//ray.m_userData = userData;
-	//if (!m_userRayCastCallback) {
-	//	ForAllSectorsRayHit(ray, maxT, RayHit, &ray);
-	//	if (ray.m_t < maxT) {
-	//		maxT = ray.m_t;
-	//		dgAssert(ray.m_normal.m_w == dFloat32(0.0f));
-	//		dgAssert(ray.m_normal.DotProduct(ray.m_normal).GetScalar() > dFloat32(0.0f));
-	//		//contactOut.m_normal = ray.m_normal.Scale (dgRsqrt (ray.m_normal.DotProduct(ray.m_normal).GetScalar() + dFloat32 (1.0e-8f)));
-	//		contactOut.m_normal = ray.m_normal.Normalize();
-	//		//contactOut.m_userId = ray.m_id;
-	//		contactOut.m_shapeId0 = ray.m_id;
-	//		contactOut.m_shapeId1 = ray.m_id;
-	//	}
-	//}
-	//else {
-	//	if (body) {
-	//		//ray.m_matrix = body->m_collisionWorldMatrix;
-	//		ray.m_matrix = body->m_collision->GetGlobalMatrix();
-	//	}
-	//
-	//	ForAllSectorsRayHit(ray, maxT, RayHitUser, &ray);
-	//	if (ray.m_t < dFloat32(1.0f)) {
-	//		maxT = ray.m_t;
-	//		dgAssert(ray.m_normal.m_w == dFloat32(0.0f));
-	//		dgAssert(ray.m_normal.DotProduct(ray.m_normal).GetScalar() > dFloat32(0.0f));
-	//		//contactOut.m_normal = ray.m_normal.Scale (dgRsqrt (ray.m_normal.DotProduct(ray.m_normal).GetScalar() + dFloat32 (1.0e-8f)));
-	//		contactOut.m_normal = ray.m_normal.Normalize();
-	//		//contactOut.m_userId = ray.m_id;
-	//		contactOut.m_shapeId0 = ray.m_id;
-	//		contactOut.m_shapeId1 = ray.m_id;
-	//	}
-	//}
-	//return maxT;
+	ndBvhRay ray(localP0, localP1);
+	ray.m_t = dMin(maxT, dFloat32(1.0f));
+	ray.m_me = this;
+	ray.m_myBody = ((ndBody*)body)->GetAsBodyKinematic();
+	ray.m_callback = &callback;
+	ForAllSectorsRayHit(ray, maxT, RayHit, &ray);
+	if (ray.m_t < maxT) 
+	{
+		maxT = ray.m_t;
+		dAssert(ray.m_normal.m_w == dFloat32(0.0f));
+		dAssert(ray.m_normal.DotProduct(ray.m_normal).GetScalar() > dFloat32(0.0f));
+		contactOut.m_normal = ray.m_normal.Normalize();
+		contactOut.m_shapeId0 = ray.m_id;
+		contactOut.m_shapeId1 = ray.m_id;
+	}
+	return maxT;
 }

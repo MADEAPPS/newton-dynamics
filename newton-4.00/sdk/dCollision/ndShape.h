@@ -90,7 +90,6 @@ class ndShapeMaterial
 	} m_userParam[6];
 };
 
-
 D_MSV_NEWTON_ALIGN_32
 class ndShapeInfo
 {
@@ -152,7 +151,7 @@ class ndShapeInfo
 		//dgCollision** m_chidren;
 	};
 
-	struct dgCollisionBVHData
+	struct dgCollisionBvhData
 	{
 		dInt32 m_vertexCount;
 		dInt32 m_indexCount;
@@ -200,7 +199,7 @@ class ndShapeInfo
 		dgDeformableMeshData m_deformableMesh;
 		dgConvexModifierData m_convexModifierData;
 		dgCoumpountCollisionData m_compoundCollision;
-		dgCollisionBVHData m_bvhCollision;
+		dgCollisionBvhData m_bvhCollision;
 		dgHeightMapCollisionData m_heightFieldCollision;
 		dgSceneData m_sceneCollision;
 		dFloat32 m_paramArray[32];

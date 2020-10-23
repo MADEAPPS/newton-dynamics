@@ -201,7 +201,7 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 
 	void Create (const dPolygonSoupBuilder& builder);
 	void CalculateAdjacendy ();
-//	virtual void ForAllSectorsRayHit (const dFastRayTest& ray, dFloat32 maxT, dgRayIntersectCallback callback, void* const context) const;
+	virtual void ForAllSectorsRayHit (const dFastRayTest& ray, dFloat32 maxT, dRayIntersectCallback callback, void* const context) const;
 	virtual void ForAllSectors (const dFastAabbInfo& obbAabb, const dVector& boxDistanceTravel, dFloat32 m_maxT, dAaabbIntersectCallback callback, void* const context) const;
 
 	inline void* GetRootNode() const 

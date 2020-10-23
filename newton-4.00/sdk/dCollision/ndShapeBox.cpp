@@ -269,7 +269,7 @@ dFloat32 ndShapeBox::RayCast(ndRayCastNotify& callback, const dVector& localP0, 
 	if (tmin > dFloat32(0.0f)) 
 	{
 		dAssert(tmin <= 1.0f);
-		contactOut.m_normal = dVector(dFloat32(0.0f));
+		contactOut.m_normal = dVector::m_zero;
 		contactOut.m_normal[index] = signDir;
 		//contactOut.m_userId = SetUserDataID();
 	}
