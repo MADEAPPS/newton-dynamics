@@ -25,8 +25,8 @@
 #include "dCoreStdafx.h"
 #include "dArray.h"
 #include "dVector.h"
+#include "dString.h"
 #include "dPolyhedra.h"
-
 
 #define DG_MESH_EFFECT_PRECISION_BITS		48
 #define DG_MESH_EFFECT_PRECISION_SCALE		dFloat64(dInt64(1)<<DG_MESH_EFFECT_PRECISION_BITS)
@@ -383,7 +383,7 @@ class dMeshEffect: public dPolyhedra
 		dChannel<dgUV, m_uv1> m_uv1Channel;
 	};
 
-	protected:
+	public:
 	class dMeshVertexFormat
 	{
 		public:
@@ -424,9 +424,12 @@ class dMeshEffect: public dPolyhedra
 		dFloatData m_vertexColor;
 	};
 
-	public:
+	
 	D_CORE_API dMeshEffect();
 	D_CORE_API virtual ~dMeshEffect();
+
+	D_CORE_API void SetName (const dString& name);
+	D_CORE_API const dString& GetName() const;
 
 	D_CORE_API void CalculateNormals(dFloat64 angleInRadians);
 	D_CORE_API void BuildFromIndexList(const dMeshVertexFormat* const format);
@@ -468,10 +471,10 @@ class dMeshEffect: public dPolyhedra
 	D_CORE_API void SphericalMapping(dInt32 material, const dMatrix& uvAligment);
 	D_CORE_API void UniformBoxMapping(dInt32 material, const dMatrix& textureMatrix);
 	D_CORE_API void BoxMapping(dInt32 front, dInt32 side, dInt32 top, const dMatrix& uvAligment);
+	D_CORE_API void RepairTJoints();
 
 	protected:
 	D_CORE_API void Init();
-	D_CORE_API void RepairTJoints();
 	D_CORE_API virtual void BeginFace();
 	D_CORE_API virtual bool EndFace();
 
@@ -481,6 +484,7 @@ class dMeshEffect: public dPolyhedra
 	bool SeparateDuplicateLoops(dEdge* const face);
 	dInt32 AddInterpolatedHalfAttribute(dEdge* const edge, dInt32 midPoint);
 
+	dString m_name;
 	dPointFormat m_points;
 	dAttibutFormat m_attrib;
 	dInt32 m_vertexBaseCount;
@@ -679,6 +683,16 @@ inline void dMeshEffect::dAttibutFormat::SetCount(dInt32 count)
 inline dInt32 dMeshEffect::GetPropertiesCount() const
 {
 	return m_attrib.m_pointChannel.GetCount();
+}
+
+inline void dMeshEffect::SetName(const dString& name)
+{
+	m_name = name;
+}
+
+inline const dString& dMeshEffect::GetName() const
+{
+	return m_name;
 }
 
 

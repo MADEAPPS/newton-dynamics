@@ -15,7 +15,7 @@
 dNodeBaseHierarchy::dNodeBaseHierarchy (const dNodeBaseHierarchy &clone)
 {
 	Clear ();
-	SetNameID (clone.m_name.GetStr());
+	SetName (clone.m_name.GetStr());
 	for (dNodeBaseHierarchy* obj = clone.m_child; obj; obj = obj->m_sibling) 
 	{
 		dNodeBaseHierarchy* const newObj = obj->CreateClone ();

@@ -3568,7 +3568,6 @@ dInt32 dMeshEffect::AddInterpolatedHalfAttribute(dEdge* const edge, dInt32 midPo
 	return m_attrib.m_pointChannel.GetCount() - 1;
 }
 
-
 void dMeshEffect::RepairTJoints()
 {
 	dAssert(Sanity());

@@ -36,9 +36,9 @@ class dNodeBaseHierarchy: public dClassAlloc
 	D_CORE_API dNodeBaseHierarchy* Find (dUnsigned64 nameCRC) const; 
 	D_CORE_API dNodeBaseHierarchy* Find (const char* const name) const;
 
-	D_CORE_API dUnsigned64 GetNameID() const;
-	D_CORE_API const dString& GetName() const;
-	void SetNameID(const char* const name);
+	dUnsigned64 GetNameID() const;
+	const dString& GetName() const;
+	void SetName(const char* const name);
 	
 	protected:
 	D_CORE_API dNodeBaseHierarchy ();
@@ -91,7 +91,7 @@ inline dNodeBaseHierarchy::dNodeBaseHierarchy ()
 inline dNodeBaseHierarchy::dNodeBaseHierarchy (const char* const name)
 {
 	Clear ();
-	SetNameID (name);
+	SetName (name);
 }
 
 
@@ -126,10 +126,10 @@ inline dNodeBaseHierarchy* dNodeBaseHierarchy::Find (const char* const name) con
 	return Find (dCRC64 (name)); 
 } 
 
-inline void dNodeBaseHierarchy::SetNameID(const char* const name)
+inline void dNodeBaseHierarchy::SetName(const char* const name)
 {
-	m_nameID = dCRC64 (name);
 	m_name = name;
+	m_nameID = dCRC64 (name);
 }
 
 inline dUnsigned64  dNodeBaseHierarchy::GetNameID() const

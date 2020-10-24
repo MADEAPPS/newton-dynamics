@@ -1385,7 +1385,7 @@ dInt32 ndContactSolver::PruneContacts(dInt32 count, dInt32 maxCount) const
 }
 
 
-dFloat32 ndContactSolver::RayCast(const dVector& localP0, const dVector& localP1, dFloat32 maxT, ndContactPoint& contactOut)
+dFloat32 ndContactSolver::RayCast(const dVector& localP0, const dVector& localP1, ndContactPoint& contactOut)
 {
 	dVector point(localP0);
 	dVector point0(localP0);
@@ -1492,7 +1492,7 @@ dFloat32 ndContactSolver::RayCast(const dVector& localP0, const dVector& localP1
 				index = -1;
 				t1 = dFloat32(0.0f);
 			}
-			else if (t1 > maxT) 
+			else if (t1 > dFloat32 (1.0f)) 
 			{
 				index = -1;
 				t1 = dFloat32(1.0f);
@@ -1536,7 +1536,7 @@ dFloat32 ndContactSolver::RayCast(const dVector& localP0, const dVector& localP1
 		}
 	} while (index >= 0);
 
-	if ((param > dFloat32(0.0f)) && (param < maxT)) 
+	if ((param > dFloat32(0.0f)) && (param < dFloat32(1.0f)))
 	{
 		contactOut.m_normal = normal;
 	}

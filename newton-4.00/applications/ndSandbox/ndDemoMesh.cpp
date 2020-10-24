@@ -1140,7 +1140,7 @@ void ndWireFrameDebugMesh::Render(ndDemoEntityManager* const scene, const dMatri
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache)
+ndDemoMesh::ndDemoMesh(const char* const name)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
 	,m_indexCount(0)
@@ -1150,6 +1150,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
 {
+	m_name = name;
 }
 
 ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCache)

@@ -495,7 +495,7 @@ dVector ndShapeCapsule::SupportVertexSpecial(const dVector& direction, dFloat32 
 	return p0 * m_transform;
 }
 
-dFloat32 ndShapeCapsule::RayCast(ndRayCastNotify& callback, const dVector& r0, const dVector& r1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapeCapsule::RayCast(ndRayCastNotify& callback, const dVector& r0, const dVector& r1, const ndBody* const body, ndContactPoint& contactOut) const
 {
 	dVector q0(r0 * m_transform);
 	dVector q1(r1 * m_transform);
@@ -504,7 +504,7 @@ dFloat32 ndShapeCapsule::RayCast(ndRayCastNotify& callback, const dVector& r0, c
 	dVector origin1(m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
 	dFloat32 t0 = dRayCastSphere(q0, q1, origin0, m_radio0);
 	dFloat32 t1 = dRayCastSphere(q0, q1, origin1, m_radio1);
-	if ((t0 < maxT) && (t1 < maxT)) 
+	if ((t0 < dFloat32(1.0f)) && (t1 < dFloat32 (1.0f)))
 	{
 		if (t0 < t1) 
 		{
@@ -525,7 +525,7 @@ dFloat32 ndShapeCapsule::RayCast(ndRayCastNotify& callback, const dVector& r0, c
 			return t1;
 		}
 	}
-	else if (t1 < maxT) 
+	else if (t1 < dFloat32(1.0f))
 	{
 		dVector q(q0 + (q1 - q0).Scale(t1));
 		if (q.m_x >= m_p1.m_x) 
@@ -537,7 +537,7 @@ dFloat32 ndShapeCapsule::RayCast(ndRayCastNotify& callback, const dVector& r0, c
 			return t1;
 		}
 	}
-	else if (t0 < maxT) 
+	else if (t0 < dFloat32(1.0f))
 	{
 		dVector q(q0 + (q1 - q0).Scale(t0));
 		if (q.m_x <= m_p0.m_x) 
@@ -550,7 +550,7 @@ dFloat32 ndShapeCapsule::RayCast(ndRayCastNotify& callback, const dVector& r0, c
 		}
 	}
 
-	dFloat32 ret = ndShapeConvex::RayCast(callback, q0, q1, maxT, body, contactOut);
+	dFloat32 ret = ndShapeConvex::RayCast(callback, q0, q1, body, contactOut);
 	if (ret <= dFloat32(1.0f)) 
 	{
 		contactOut.m_normal = m_transform * contactOut.m_normal;

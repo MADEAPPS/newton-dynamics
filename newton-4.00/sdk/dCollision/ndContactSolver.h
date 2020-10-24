@@ -74,7 +74,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 CalculateConvexToConvexContacts();
 	dInt32 CalculatePairContacts(dInt32 threadIndex);
 
-	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, ndContactPoint& contactOut);
+	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, ndContactPoint& contactOut);
 	
 	private:
 	class dgPerimenterEdge

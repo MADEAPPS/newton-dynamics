@@ -321,7 +321,7 @@ dFloat32 ndBodyKinematic::RayCast(ndRayCastNotify& callback, const dFastRayTest&
 		if (p1p0.DotProduct(p1p0).GetScalar() > dFloat32(1.0e-12f))
 		{
 			ndContactPoint contactOut;
-			dFloat32 t = m_shapeInstance.RayCast(callback, localP0, localP1, maxT, this, contactOut);
+			dFloat32 t = m_shapeInstance.RayCast(callback, localP0, localP1, this, contactOut);
 			if (t < dFloat32(1.0f))
 			{
 				dAssert(localP0.m_w == localP1.m_w);

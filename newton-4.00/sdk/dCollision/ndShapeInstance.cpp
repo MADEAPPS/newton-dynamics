@@ -543,8 +543,7 @@ void ndShapeInstance::CalculateAABB(const dMatrix& matrix, dVector& p0, dVector&
 	dAssert(p1.m_w == dFloat32(0.0f));
 }
 
-
-dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const
 {
 	dFloat32 t = dFloat32(1.2f);
 	if (callback.OnRayPrecastAction(body, this))
@@ -553,8 +552,8 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 		{
 			case m_unit:
 			{
-				t = m_shape->RayCast(callback, localP0, localP1, maxT, body, contactOut);
-				if (t <= maxT) 
+				t = m_shape->RayCast(callback, localP0, localP1, body, contactOut);
+				if (t < dFloat32 (1.0f)) 
 				{
 					//dAssert(((ndShape*)m_shape)->GetAsShapeBox() || ((ndShape*)m_shape)->GetAsShapeSphere());
 					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
@@ -578,8 +577,8 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 			{
 				dVector p0(localP0 * m_invScale);
 				dVector p1(localP1 * m_invScale);
-				t = m_shape->RayCast(callback, p0, p1, maxT, body, contactOut);
-				if (t <= maxT) 
+				t = m_shape->RayCast(callback, p0, p1, body, contactOut);
+				if (t < dFloat32(1.0f))
 				{
 					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
@@ -602,8 +601,8 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 			{
 				dVector p0(localP0 * m_invScale);
 				dVector p1(localP1 * m_invScale);
-				t = m_shape->RayCast(callback, p0, p1, maxT, body, contactOut);
-				if (t <= maxT) 
+				t = m_shape->RayCast(callback, p0, p1, body, contactOut);
+				if (t < dFloat32(1.0f))
 				{
 					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 
@@ -632,8 +631,8 @@ dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& loca
 			{
 				dVector p0(m_aligmentMatrix.UntransformVector(localP0 * m_invScale));
 				dVector p1(m_aligmentMatrix.UntransformVector(localP1 * m_invScale));
-				t = m_shape->RayCast(callback, p0, p1, maxT, body, contactOut);
-				if (t <= maxT) 
+				t = m_shape->RayCast(callback, p0, p1, body, contactOut);
+				if (t < dFloat32(1.0f))
 				{
 					dAssert(!((ndShape*)m_shape)->GetAsShapeCompound());
 				//	if (!(m_shape->IsType(dgCollision::dgCollisionMesh_RTTI) || m_shape->IsType(dgCollision::dgCollisionCompound_RTTI))) 

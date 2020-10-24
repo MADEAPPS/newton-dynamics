@@ -66,6 +66,8 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 	const dMatrix& GetMeshMatrix() const;  
 	void SetMeshMatrix(const dMatrix& matrix);  
 
+	//void SetMatrix(const dMatrix& matrix);
+
 	UserData* GetUserData ();
 	void SetUserData (UserData* const data);
 

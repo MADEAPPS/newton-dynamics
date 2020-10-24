@@ -288,22 +288,23 @@ dFloat32 ndShapeStaticBVH::RayHit(void* const context, const dFloat32* const pol
 	return t;
 }
 
-dFloat32 ndShapeStaticBVH::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const
+dFloat32 ndShapeStaticBVH::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const
 {
 	ndBvhRay ray(localP0, localP1);
-	ray.m_t = dMin(maxT, dFloat32(1.0f));
+	ray.m_t = dFloat32(1.0f);
 	ray.m_me = this;
 	ray.m_myBody = ((ndBody*)body)->GetAsBodyKinematic();
 	ray.m_callback = &callback;
-	ForAllSectorsRayHit(ray, maxT, RayHit, &ray);
-	if (ray.m_t < maxT) 
+	dFloat32 t = dFloat32 (1.2f);
+	ForAllSectorsRayHit(ray, dFloat32(1.0f), RayHit, &ray);
+	if (ray.m_t < dFloat32 (1.0f))
 	{
-		maxT = ray.m_t;
+		t = ray.m_t;
 		dAssert(ray.m_normal.m_w == dFloat32(0.0f));
 		dAssert(ray.m_normal.DotProduct(ray.m_normal).GetScalar() > dFloat32(0.0f));
 		contactOut.m_normal = ray.m_normal.Normalize();
 		contactOut.m_shapeId0 = ray.m_id;
 		contactOut.m_shapeId1 = ray.m_id;
 	}
-	return maxT;
+	return t;
 }
