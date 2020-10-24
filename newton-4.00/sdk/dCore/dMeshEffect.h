@@ -128,7 +128,7 @@ class dMeshEffect: public dPolyhedra
 
 	void Trace () const;
 
-	void ApplyTransform (const dMatrix& matrix);
+	
 	dMatrix CalculateOOBB (dBigVector& size) const;
 	void CalculateAABB (dBigVector& min, dBigVector& max) const;
 
@@ -431,6 +431,7 @@ class dMeshEffect: public dPolyhedra
 	D_CORE_API void SetName (const dString& name);
 	D_CORE_API const dString& GetName() const;
 
+	D_CORE_API void ApplyTransform(const dMatrix& matrix);
 	D_CORE_API void CalculateNormals(dFloat64 angleInRadians);
 	D_CORE_API void BuildFromIndexList(const dMeshVertexFormat* const format);
 

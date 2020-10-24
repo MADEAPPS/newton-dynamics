@@ -22,6 +22,7 @@
 #include "dCoreStdafx.h"
 #include "dSort.h"
 #include "dStack.h"
+#include "dMatrix.h"
 #include "dMeshEffect.h"
 //#include "dgBody.h"
 //#include "dgWorld.h"
@@ -1232,35 +1233,6 @@ void dMeshEffect::RemoveUnusedVertices(dInt32* const vertexMapResult)
 }
 
 
-void dMeshEffect::ApplyTransform (const dMatrix& matrix)
-{
-	matrix.TransformTriplex(&m_points.m_vertex[0].m_x, sizeof (dBigVector), &m_points.m_vertex[0].m_x, sizeof (dBigVector), m_points.m_vertex.m_count);
-
-	dMatrix invMatix(matrix.Inverse4x4());
-	invMatix.m_posit = dVector::m_wOne;
-	dMatrix rotation (invMatix.Transpose4X4());
-	for (dInt32 i = 0; i < m_attrib.m_normalChannel.m_count; i ++) {
-		dVector n (dFloat32 (m_attrib.m_normalChannel[i].m_x), dFloat32 (m_attrib.m_normalChannel[i].m_y), dFloat32 (m_attrib.m_normalChannel[i].m_z), dFloat32 (0.0f));
-		n = rotation.RotateVector(n);
-		dAssert(n.m_w == dFloat32(0.0f));
-		dAssert (n.DotProduct(n).GetScalar() > dFloat32 (0.0f));
-		n = n.Normalize(); 
-		m_attrib.m_normalChannel[i].m_x = n.m_x;
-		m_attrib.m_normalChannel[i].m_y = n.m_y;
-		m_attrib.m_normalChannel[i].m_z = n.m_z;
-	}
-
-	for (dInt32 i = 0; i < m_attrib.m_binormalChannel.m_count; i++) {
-		dVector n(dFloat32(m_attrib.m_binormalChannel[i].m_x), dFloat32(m_attrib.m_binormalChannel[i].m_y), dFloat32(m_attrib.m_binormalChannel[i].m_z), dFloat32(0.0f));
-		n = rotation.RotateVector(n);
-		dAssert(n.m_w == dFloat32(0.0f));
-		dAssert(n.DotProduct(n).GetScalar() > dFloat32(0.0f));
-		n = n.Normalize();
-		m_attrib.m_binormalChannel[i].m_x = n.m_x;
-		m_attrib.m_binormalChannel[i].m_y = n.m_y;
-		m_attrib.m_binormalChannel[i].m_z = n.m_z;
-	}
-}
 
 dMatrix dMeshEffect::CalculateOOBB (dBigVector& size) const
 {
@@ -4148,5 +4120,37 @@ void dMeshEffect::GetMaterialGetIndexStreamShort(ndIndexArray* const handle, dIn
 			indexArray[index + 2] = (dInt16)handle->m_indexList[j * 4 + 2];
 			index += 3;
 		}
+	}
+}
+
+void dMeshEffect::ApplyTransform(const dMatrix& matrix)
+{
+	matrix.TransformTriplex(&m_points.m_vertex[0].m_x, sizeof(dBigVector), &m_points.m_vertex[0].m_x, sizeof(dBigVector), m_points.m_vertex.GetCount());
+	
+	dMatrix invMatix(matrix.Inverse4x4());
+	invMatix.m_posit = dVector::m_wOne;
+	dMatrix rotation(invMatix.Transpose4X4());
+	for (dInt32 i = 0; i < m_attrib.m_normalChannel.GetCount(); i++) 
+	{
+		dVector n(dFloat32(m_attrib.m_normalChannel[i].m_x), dFloat32(m_attrib.m_normalChannel[i].m_y), dFloat32(m_attrib.m_normalChannel[i].m_z), dFloat32(0.0f));
+		n = rotation.RotateVector(n);
+		dAssert(n.m_w == dFloat32(0.0f));
+		dAssert(n.DotProduct(n).GetScalar() > dFloat32(0.0f));
+		n = n.Normalize();
+		m_attrib.m_normalChannel[i].m_x = n.m_x;
+		m_attrib.m_normalChannel[i].m_y = n.m_y;
+		m_attrib.m_normalChannel[i].m_z = n.m_z;
+	}
+	
+	for (dInt32 i = 0; i < m_attrib.m_binormalChannel.GetCount(); i++) 
+	{
+		dVector n(dFloat32(m_attrib.m_binormalChannel[i].m_x), dFloat32(m_attrib.m_binormalChannel[i].m_y), dFloat32(m_attrib.m_binormalChannel[i].m_z), dFloat32(0.0f));
+		n = rotation.RotateVector(n);
+		dAssert(n.m_w == dFloat32(0.0f));
+		dAssert(n.DotProduct(n).GetScalar() > dFloat32(0.0f));
+		n = n.Normalize();
+		m_attrib.m_binormalChannel[i].m_x = n.m_x;
+		m_attrib.m_binormalChannel[i].m_y = n.m_y;
+		m_attrib.m_binormalChannel[i].m_z = n.m_z;
 	}
 }
