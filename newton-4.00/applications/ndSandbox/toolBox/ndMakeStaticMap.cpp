@@ -331,7 +331,9 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNoceM
 		for (int i = 0; i < count; i++) 
 		{
 			ofbx::Object* const child = buffer[count - i - 1];
-			nodeStack[i] = fbxImportStackData(child, node);
+			nodeStack[stack] = fbxImportStackData(child, node);
+			stack++;
+			dAssert(stack < sizeof(nodeStack) / sizeof(nodeStack[0]));
 		}
 	}
 	return entity;
@@ -673,11 +675,13 @@ static void BakeScale(fbxDemoEntity* const entity)
 {
 	dInt32 stack = 1;
 	fbxDemoEntity* entBuffer[1024];
+	dMatrix parentMatrix[1024];
 	entBuffer[0] = entity;
-	dMatrix scaleMatrix(dGetIdentityMatrix());
+	parentMatrix[0] = dGetIdentityMatrix();
 	while (stack)
 	{
 		stack--;
+		dMatrix scaleMatrix(dGetIdentityMatrix());
 		fbxDemoEntity* const ent = entBuffer[stack];
 
 		if (ent->m_fbxMeshEffect)
@@ -703,6 +707,7 @@ static void BakeScale(fbxDemoEntity* const entity)
 		for (fbxDemoEntity* child = (fbxDemoEntity*)ent->GetChild(); child; child = (fbxDemoEntity*)child->GetSibling())
 		{
 			entBuffer[stack] = child;
+			parentMatrix[stack] = scaleMatrix;
 			stack++;
 		}
 	}
@@ -770,6 +775,7 @@ fbxDemoEntity* LoadFbxMesh(ndDemoEntityManager* const scene, const char* const m
 
 	for (fbxDemoEntity* child = (fbxDemoEntity*)entity->GetFirst(); child; child = (fbxDemoEntity*)child->GetNext())
 	{
+		child->ResetMatrix(*scene, child->GetMeshMatrix());
 		if (child->m_fbxMeshEffect)
 		{
 			ndDemoMesh* const mesh = new ndDemoMesh("fbxMesh", child->m_fbxMeshEffect, scene->GetShaderCache());
@@ -783,7 +789,7 @@ fbxDemoEntity* LoadFbxMesh(ndDemoEntityManager* const scene, const char* const m
 
 ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName)
 {
-	fbxDemoEntity* const entity_ = LoadFbxMesh(scene, "flatPlane.fbx");
+	fbxDemoEntity* const entity_ = LoadFbxMesh(scene, meshName);
 	scene->AddEntity(entity_);
 
 	//ndPhysicsWorld* const world = scene->GetWorld();
