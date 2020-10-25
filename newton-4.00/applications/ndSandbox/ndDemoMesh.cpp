@@ -1217,7 +1217,6 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	OptimizeForRender(points, indices);
 }
 
-//ndDemoMesh::ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ndShaderPrograms& shaderCache)
 ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
