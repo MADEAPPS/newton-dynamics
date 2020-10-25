@@ -24,6 +24,7 @@ enum TextureImageFormat
 	m_luminace,
 };
 
+GLuint GetDefaultTexture();
 GLuint LoadTexture(const char* const filename);
 
 GLuint AddTextureRef (GLuint texture);

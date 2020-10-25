@@ -315,3 +315,8 @@ GLuint AddTextureRef (GLuint texture)
 	}
 	return texture;
 }
+
+GLuint GetDefaultTexture()
+{
+	return LoadTexture("default.tga");
+}

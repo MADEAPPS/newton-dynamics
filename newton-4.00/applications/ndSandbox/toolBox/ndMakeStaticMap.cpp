@@ -72,7 +72,12 @@ class fbxGlobalMaterialMap : public dTree<fbxDemoSubMeshMaterial, const ofbx::Ma
 					ofbx::DataView dataView = texture->getRelativeFileName();
 					dataView.toString(textName);
 					strncpy (meshMaterial.m_textureName, textName, sizeof (meshMaterial.m_textureName));
-					meshMaterial.m_textureHandle = LoadTexture(textName);
+					meshMaterial.m_textureHandle = LoadTexture(meshMaterial.m_textureName);
+				}
+				else
+				{
+					strcpy(meshMaterial.m_textureName, "default.tga");
+					meshMaterial.m_textureHandle = GetDefaultTexture();
 				}
 			}
 
