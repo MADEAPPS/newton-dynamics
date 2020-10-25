@@ -35,7 +35,7 @@ class fbxDemoEntity : public ndDemoEntity
 		}
 	}
 
-	void SetMatrix(const dMatrix& matrix)
+	void SetRenderMatrix(const dMatrix& matrix)
 	{
 		m_matrix = matrix;
 	}

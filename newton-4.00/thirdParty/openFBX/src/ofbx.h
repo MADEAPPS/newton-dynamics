@@ -52,7 +52,11 @@ struct Vec4
 
 struct Matrix
 {
-	double m[16]; // last 4 are translation
+	union
+	{
+		double f[4][4];
+		double m[16]; // last 4 are translation
+	};
 };
 
 

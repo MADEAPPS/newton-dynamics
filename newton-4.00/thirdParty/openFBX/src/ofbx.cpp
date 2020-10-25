@@ -176,9 +176,11 @@ static Matrix operator*(const Matrix& lhs, const Matrix& rhs)
 			double tmp = 0;
 			for (int k = 0; k < 4; ++k)
 			{
-				tmp += lhs.m[i + k * 4] * rhs.m[k + j * 4];
+				//tmp += lhs.m[i + k * 4] * rhs.m[k + j * 4];
+				tmp += lhs.f[j][k] * rhs.f[k][i];
 			}
-			res.m[i + j * 4] = tmp;
+			//res.m[i + j * 4] = tmp;
+			res.f[j][i] = tmp;
 		}
 	}
 	return res;
@@ -235,20 +237,23 @@ static Matrix rotationZ(double angle)
 
 static Matrix getRotationMatrix(const Vec3& euler, RotationOrder order)
 {
-	const double TO_RAD = 3.1415926535897932384626433832795028 / 180.0;
+	const double TO_RAD = 3.14159265358 / 180.0;
 	Matrix rx = rotationX(euler.x * TO_RAD);
 	Matrix ry = rotationY(euler.y * TO_RAD);
 	Matrix rz = rotationZ(euler.z * TO_RAD);
 	switch (order)
 	{
-		default:
-		case RotationOrder::EULER_XYZ: return rz * ry * rx;
-		case RotationOrder::EULER_XZY: return ry * rz * rx;
-		case RotationOrder::EULER_YXZ: return rz * rx * ry;
-		case RotationOrder::EULER_YZX: return rx * rz * ry;
-		case RotationOrder::EULER_ZXY: return ry * rx * rz;
-		case RotationOrder::EULER_ZYX: return rx * ry * rz;
-		case RotationOrder::SPHERIC_XYZ: assert(false); Error::s_message = "Unsupported rotation order."; return rx * ry * rz;
+		//case RotationOrder::EULER_XYZ: return rz * ry * rx;
+		case RotationOrder::EULER_XYZ: return rx * ry * rz;
+		//case RotationOrder::EULER_XZY: return ry * rz * rx;
+		//case RotationOrder::EULER_YXZ: return rz * rx * ry;
+		//case RotationOrder::EULER_YZX: return rx * rz * ry;
+		//case RotationOrder::EULER_ZXY: return ry * rx * rz;
+		//case RotationOrder::EULER_ZYX: return rx * ry * rz;
+		case RotationOrder::EULER_ZYX: return rz * ry * rx;
+		//case RotationOrder::SPHERIC_XYZ: assert(false); Error::s_message = "Unsupported rotation order."; return rx * ry * rz;
+		default:;
+			assert(false);
 	}
 }
 
@@ -3450,7 +3455,8 @@ Matrix Object::evalLocal(const Vec3& translation, const Vec3& rotation, const Ve
 	setTranslation(-scaling_pivot, &s_p_inv);
 
 	// http://help.autodesk.com/view/FBX/2017/ENU/?guid=__files_GUID_10CDD63C_79C1_4F2D_BB28_AD2BE65A02ED_htm
-	return t * r_off * r_p * r_pre * r * r_post_inv * r_p_inv * s_off * s_p * s * s_p_inv;
+	//return t * r_off * r_p * r_pre * r * r_post_inv * r_p_inv * s_off * s_p * s * s_p_inv;
+	return  s_p_inv * s * s_p * s_off * r_p_inv * r_post_inv * r * r_pre * r_p * r_off * t;
 }
 
 

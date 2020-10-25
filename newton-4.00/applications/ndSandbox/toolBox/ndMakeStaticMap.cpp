@@ -47,13 +47,11 @@ class fbxImportStackData
 
 	//fbxImportStackData(const dMatrix& parentMatrix, const ofbx::Object* const fbxNode, ndDemoEntity* const parentNode)
 	fbxImportStackData(const ofbx::Object* const fbxNode, ndDemoEntity* const parentNode)
-		//:m_parentMatrix(parentMatrix)
 		:m_fbxNode(fbxNode)
 		,m_parentNode(parentNode)
 	{
 	}
 
-	//dMatrix m_parentMatrix;
 	const ofbx::Object* m_fbxNode;
 	ndDemoEntity* m_parentNode;
 };
@@ -220,7 +218,6 @@ static dMatrix GetCodinateSystemMatrix(ofbx::IScene* const fbxScene)
 	//int sign;
 	dVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
 	dVector frontVector(1.0f, 0.0f, 0.0f, 0.0f);
-	//FbxAxisSystem axisSystem = settings.GetAxisSystem();
 	if (globalSettings->UpAxis == ofbx::UpVector_AxisX) 
 	{
 		dAssert(0);
@@ -238,7 +235,7 @@ static dMatrix GetCodinateSystemMatrix(ofbx::IScene* const fbxScene)
 	}
 	else 
 	{
-		upVector = dVector(1.0f * globalSettings->UpAxisSign, 0.0f, 0.0f, 0.0f);
+		upVector = dVector(dFloat32 (globalSettings->UpAxisSign), 0.0f, 0.0f, 0.0f);
 		if (globalSettings->FrontAxis == ofbx::FrontVector_ParityEven)
 		{
 			dAssert(0);
@@ -246,7 +243,7 @@ static dMatrix GetCodinateSystemMatrix(ofbx::IScene* const fbxScene)
 		}
 		else 
 		{
-			frontVector = dVector(0.0f, 0.0f, -1.0f * globalSettings->FrontAxisSign, 0.0f);
+			frontVector = dVector(0.0f, 0.0f, -dFloat32 (globalSettings->FrontAxisSign), 0.0f);
 		}
 	}
 	
@@ -254,6 +251,7 @@ static dMatrix GetCodinateSystemMatrix(ofbx::IScene* const fbxScene)
 	axisMatrix.m_front = frontVector;
 	axisMatrix.m_up = upVector;
 	axisMatrix.m_right = frontVector.CrossProduct(upVector);
+	axisMatrix = axisMatrix * dYawMatrix(dPi);
 	convertMatrix = axisMatrix * convertMatrix;
 
 	return convertMatrix;
@@ -324,7 +322,7 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNoceM
 		dMatrix localMatrix(ofbxMatrix2dMatrix(data.m_fbxNode->getLocalTransform()));
 
 		node->SetName(data.m_fbxNode->name);
-		node->SetMatrix(localMatrix);
+		node->SetRenderMatrix(localMatrix);
 
 		nodeMap.Insert(node, data.m_fbxNode);
 		const dInt32 count = GetChildrenNodes(data.m_fbxNode, buffer);
@@ -671,7 +669,7 @@ static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
 	return entity;
 }
 
-static void BakeScale(fbxDemoEntity* const entity)
+static void FreezeScale(fbxDemoEntity* const entity)
 {
 	dInt32 stack = 1;
 	fbxDemoEntity* entBuffer[1024];
@@ -681,7 +679,7 @@ static void BakeScale(fbxDemoEntity* const entity)
 	while (stack)
 	{
 		stack--;
-		dMatrix scaleMatrix(dGetIdentityMatrix());
+		dMatrix scaleMatrix(parentMatrix[stack]);
 		fbxDemoEntity* const ent = entBuffer[stack];
 
 		if (ent->m_fbxMeshEffect)
@@ -691,7 +689,7 @@ static void BakeScale(fbxDemoEntity* const entity)
 			dMatrix stretchAxis;
 			dVector scale;
 			matrix.PolarDecomposition(transformMatrix, scale, stretchAxis);
-			ent->SetMatrix(transformMatrix);
+			ent->SetRenderMatrix(transformMatrix);
 			scaleMatrix = dMatrix(dGetIdentityMatrix(), scale, stretchAxis);
 
 			if (ent->m_fbxMeshEffect)
@@ -713,7 +711,7 @@ static void BakeScale(fbxDemoEntity* const entity)
 	}
 }
 
-static void ApplyCordinade(fbxDemoEntity* const entity, const dMatrix& cordinateSystem)
+static void ApplyTransform(fbxDemoEntity* const entity, const dMatrix& cordinateSystem)
 {
 	dInt32 stack = 1;
 	fbxDemoEntity* entBuffer[1024];
@@ -726,12 +724,12 @@ static void ApplyCordinade(fbxDemoEntity* const entity, const dMatrix& cordinate
 
 		if (ent->m_fbxMeshEffect)
 		{
-			dMatrix matrix(invCordinateSystem * ent->GetRenderMatrix() * cordinateSystem);
-			ent->SetMatrix(matrix);
+			dMatrix entMatrix(invCordinateSystem * ent->GetRenderMatrix() * cordinateSystem);
+			ent->SetRenderMatrix(entMatrix);
 			if (ent->m_fbxMeshEffect)
 			{
-				matrix = invCordinateSystem * ent->GetMeshMatrix() * cordinateSystem;
-				ent->SetMeshMatrix(matrix);
+				dMatrix meshMatrix (invCordinateSystem * ent->GetMeshMatrix() * cordinateSystem);
+				ent->SetMeshMatrix(meshMatrix);
 				ent->m_fbxMeshEffect->ApplyTransform(cordinateSystem);
 			}
 		}
@@ -767,15 +765,15 @@ fbxDemoEntity* LoadFbxMesh(ndDemoEntityManager* const scene, const char* const m
 
 	dMatrix convertMatrix(GetCodinateSystemMatrix(fbxScene));
 	fbxDemoEntity* const entity = FbxToEntity(fbxScene);
-	BakeScale(entity);
-	ApplyCordinade(entity, convertMatrix);
+	FreezeScale(entity);
+	ApplyTransform(entity, convertMatrix);
 
 	fbxScene->destroy();
 	delete[] content;
 
 	for (fbxDemoEntity* child = (fbxDemoEntity*)entity->GetFirst(); child; child = (fbxDemoEntity*)child->GetNext())
 	{
-		child->ResetMatrix(*scene, child->GetMeshMatrix());
+		child->ResetMatrix(*scene, child->GetRenderMatrix());
 		if (child->m_fbxMeshEffect)
 		{
 			ndDemoMesh* const mesh = new ndDemoMesh("fbxMesh", child->m_fbxMeshEffect, scene->GetShaderCache());
@@ -789,8 +787,8 @@ fbxDemoEntity* LoadFbxMesh(ndDemoEntityManager* const scene, const char* const m
 
 ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName)
 {
-	fbxDemoEntity* const entity_ = LoadFbxMesh(scene, meshName);
-	scene->AddEntity(entity_);
+	fbxDemoEntity* const entity = LoadFbxMesh(scene, meshName);
+	scene->AddEntity(entity);
 
 	//ndPhysicsWorld* const world = scene->GetWorld();
 	//dVector floor[] =
