@@ -155,8 +155,8 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFlatFloor(scene);
-	//BuildStaticMesh(scene, "flatPlane.fbx");
-	BuildStaticMesh(scene, "excavator.fbx");
+	BuildStaticMesh(scene, "flatPlane.fbx");
+	//BuildStaticMesh(scene, "excavator.fbx");
 
 	dMatrix location(dGetIdentityMatrix());
 	location.m_posit.m_y += 2.0f;
@@ -187,6 +187,6 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
 
 	dQuaternion rot;
-	dVector origin(-10.0f, 0.0f, 0.0f, 0.0f);
+	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

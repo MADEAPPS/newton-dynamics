@@ -16,7 +16,26 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 
-// define vertex format
+
+ndDemoSubMeshMaterial::ndDemoSubMeshMaterial()
+	:m_ambient(0.8f, 0.8f, 0.8f, 1.0f)
+	,m_diffuse(0.8f, 0.8f, 0.8f, 1.0f)
+	,m_specular(1.0f, 1.0f, 1.0f, 1.0f)
+	,m_textureName()
+	,m_opacity(1.0f)
+	,m_shiness(100.0f)
+	,m_textureHandle(0)
+{
+}
+
+ndDemoSubMeshMaterial::~ndDemoSubMeshMaterial()
+{
+	if (m_textureHandle)
+	{
+		ReleaseTexture(m_textureHandle);
+	}
+}
+
 
 ndDemoMeshInterface::ndDemoMeshInterface()
 	:dClassAlloc()
@@ -47,13 +66,7 @@ void ndDemoMeshInterface::SetVisible (bool visibilityFlag)
 }
 
 ndDemoSubMesh::ndDemoSubMesh ()
-	:m_ambient(0.8f, 0.8f, 0.8f, 1.0f)
-	,m_diffuse(0.8f, 0.8f, 0.8f, 1.0f)
-	,m_specular(1.0f, 1.0f, 1.0f, 1.0f)
-	,m_textureName()
-	,m_opacity(1.0f)
-	,m_shiness(100.0f)
-	,m_textureHandle(0)
+	:m_material()
 	,m_indexCount(0)
 	,m_segmentStart(0)
 	,m_hasTranparency(false)
@@ -62,18 +75,14 @@ ndDemoSubMesh::ndDemoSubMesh ()
 
 ndDemoSubMesh::~ndDemoSubMesh ()
 {
-	if (m_textureHandle) 
-	{
-		ReleaseTexture(m_textureHandle);
-	}
 }
 
 void ndDemoSubMesh::SetOpacity(dFloat32 opacity)
 {
-	m_opacity = opacity;
-	m_ambient.m_w = opacity;
-	m_diffuse.m_w = opacity;
-	m_specular.m_w = opacity;
+	m_material.m_opacity = opacity;
+	m_material.m_ambient.m_w = opacity;
+	m_material.m_diffuse.m_w = opacity;
+	m_material.m_specular.m_w = opacity;
 	m_hasTranparency = (opacity <= 0.99f) ? true : false;
 }
 
@@ -164,10 +173,9 @@ NewtonMesh* ndDemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix
 }
 */
 
-const dString& ndDemoMesh::GetTextureName (const ndDemoSubMesh* const subMesh) const
+const char* ndDemoMesh::GetTextureName (const ndDemoSubMesh* const subMesh) const
 {
-//	strcpy (nameOut, subMesh->m_textureName);
-	return subMesh->m_textureName;
+	return subMesh->m_material.m_textureName;
 }
 
 void ndDemoMesh::SpliteSegment(dListNode* const node, int maxIndexCount)
@@ -1198,7 +1206,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 		dInt32 material = mesh.GetMaterialID(geometryHandle, handle);
 		ndDemoSubMesh* const segment = AddSubMesh();
 
-		segment->m_textureHandle = (GLuint)material;
+		segment->m_material.m_textureHandle = (GLuint)material;
 		segment->SetOpacity(opacity);
 		hasTransparency = hasTransparency | segment->m_hasTranparency;
 
@@ -1217,7 +1225,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	OptimizeForRender(points, indices);
 }
 
-ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
+ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, const ndDemoSubMeshMaterial* const materialArray)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
 	,m_indexCount(0)
@@ -1252,16 +1260,17 @@ ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, cons
 	meshNode->GetNormalChannel(sizeof(ndMeshPointUV), &points[0].m_normal.m_x);
 	meshNode->GetUV0Channel(sizeof(ndMeshPointUV), &points[0].m_uv.m_u);
 
-	dFloat32 opacity = 1.0f;
 	dInt32 segmentStart = 0;
 	bool hasTransparency = false;
 	for (dInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
 	{
-		dInt32 material = meshNode->GetMaterialID(geometryHandle, handle);
+		dInt32 materialIndex = meshNode->GetMaterialID(geometryHandle, handle);
 		ndDemoSubMesh* const segment = AddSubMesh();
 
-		segment->m_textureHandle = (GLuint)material;
-		segment->SetOpacity(opacity);
+		const ndDemoSubMeshMaterial& material = materialArray[materialIndex];
+		segment->m_material = material;
+		segment->m_material.m_textureHandle = (GLuint)material.m_textureHandle;
+		segment->SetOpacity(material.m_opacity);
 		hasTransparency = hasTransparency | segment->m_hasTranparency;
 
 		segment->m_indexCount = meshNode->GetMaterialIndexCount(geometryHandle, handle);
@@ -1504,7 +1513,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 
 		if (!hasTrasnparency)
 		{
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glUseProgram(m_shader);
 
 			ndDemoCamera* const camera = scene->GetCamera();
@@ -1541,13 +1550,13 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 				ndDemoSubMesh& segment = node->GetInfo();
 				if (!segment.m_hasTranparency)
 				{
-					glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_specular.m_x);
-					glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_ambient.m_x);
-					glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_diffuse.m_x);
-					glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_shiness));
+					glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_material.m_specular.m_x);
+					glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_material.m_ambient.m_x);
+					glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_material.m_diffuse.m_x);
+					glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_material.m_shiness));
 					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-					glBindTexture(GL_TEXTURE_2D, segment.m_textureHandle);
+					glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
 					glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)segment.m_segmentStart);
 				}
 			}
@@ -1559,7 +1568,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 			glBindVertexArray(0);
 			glUseProgram(0);
 
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 	}
 }
@@ -1600,14 +1609,14 @@ void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const dMat
 			ndDemoSubMesh& segment = node->GetInfo();
 			if (segment.m_hasTranparency)
 			{
-				glUniform1f(m_transparencyLocation, segment.m_opacity);
-				glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_specular.m_x);
-				glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_ambient.m_x);
-				glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_diffuse.m_x);
-				glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_shiness));
+				glUniform1f(m_transparencyLocation, segment.m_material.m_opacity);
+				glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_material.m_specular.m_x);
+				glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_material.m_ambient.m_x);
+				glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_material.m_diffuse.m_x);
+				glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_material.m_shiness));
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-				glBindTexture(GL_TEXTURE_2D, segment.m_textureHandle);
+				glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
 				glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)segment.m_segmentStart);
 			}
 		}

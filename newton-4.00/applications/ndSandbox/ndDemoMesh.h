@@ -54,6 +54,21 @@ struct ndMeshPointUV: public ndPointNormal
 	ndMeshUV m_uv;
 };
 
+class ndDemoSubMeshMaterial
+{
+	public:
+	ndDemoSubMeshMaterial();
+	~ndDemoSubMeshMaterial();
+
+	dVector m_ambient;
+	dVector m_diffuse;
+	dVector m_specular;
+	dFloat32 m_opacity;
+	dFloat32 m_shiness;
+	dUnsigned32 m_textureHandle;
+	char  m_textureName[32];
+};
+
 class ndDemoSubMesh
 {
 	public:
@@ -61,13 +76,7 @@ class ndDemoSubMesh
 	~ndDemoSubMesh();
 	void SetOpacity(dFloat32 opacity);
 
-	dVector m_ambient;
-	dVector m_diffuse;
-	dVector m_specular;
-	dString  m_textureName;
-	dFloat32 m_opacity;
-	dFloat32 m_shiness;
-	GLuint m_textureHandle;
+	ndDemoSubMeshMaterial m_material;
 	dInt32 m_indexCount;
 	dInt32 m_segmentStart;
 	bool m_hasTranparency;
@@ -98,7 +107,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	public:
 	ndDemoMesh(const char* const name);
 	ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCache);
-	ndDemoMesh(const char* const name, dMeshEffect* const meshNode, const ndShaderPrograms& shaderCache);
+	ndDemoMesh(const char* const name, dMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, const ndDemoSubMeshMaterial* const materialArray);
 	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize);
 	ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
 
@@ -109,7 +118,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	}
 
 	ndDemoSubMesh* AddSubMesh();
-	virtual const dString& GetTextureName (const ndDemoSubMesh* const subMesh) const;
+	virtual const char* GetTextureName (const ndDemoSubMesh* const subMesh) const;
 
 	virtual void Render (ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 	virtual void RenderTransparency(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);

@@ -32,10 +32,57 @@ void fbxDemoEntity::CleanIntermidiate()
 	}
 }
 
-
-
 class fbxGlobalNoceMap : public dTree<fbxDemoEntity*, const ofbx::Object*>
 {
+};
+
+class fbxDemoSubMeshMaterial : public ndDemoSubMeshMaterial
+{
+	public: 
+	~fbxDemoSubMeshMaterial()
+	{
+		m_textureHandle = 0;
+	}
+
+	dInt32 m_index;
+};
+
+class fbxGlobalMaterialMap : public dTree<fbxDemoSubMeshMaterial, const ofbx::Material*>
+{
+	public:
+	fbxGlobalMaterialMap()
+	{
+		m_index = 0;
+	}
+
+	dInt32 AddMaterial(const ofbx::Material* const fbxMaterial)
+	{
+		dTreeNode* node = Find(fbxMaterial);
+		if (!node)
+		{
+			node = Insert(fbxDemoSubMeshMaterial(), fbxMaterial);
+			fbxDemoSubMeshMaterial& meshMaterial = node->GetInfo();
+
+			if (fbxMaterial)
+			{
+				const ofbx::Texture* const texture = fbxMaterial->getTexture(ofbx::Texture::DIFFUSE);
+				if (texture)
+				{
+					char textName[1024];
+					ofbx::DataView dataView = texture->getRelativeFileName();
+					dataView.toString(textName);
+					strncpy (meshMaterial.m_textureName, textName, sizeof (meshMaterial.m_textureName));
+					meshMaterial.m_textureHandle = LoadTexture(textName);
+				}
+			}
+
+			meshMaterial.m_index = m_index;
+			m_index++;
+		}
+		return node->GetInfo().m_index;
+	}
+
+	dInt32 m_index;
 };
 
 class fbxImportStackData
@@ -55,100 +102,6 @@ class fbxImportStackData
 	const ofbx::Object* m_fbxNode;
 	ndDemoEntity* m_parentNode;
 };
-
-static bool saveAsOBJ(ofbx::IScene& scene, const char* path)
-{
-	FILE* fp = fopen(path, "wb");
-	if (!fp) return false;
-	int obj_idx = 0;
-	int indices_offset = 0;
-	int normals_offset = 0;
-	int mesh_count = scene.getMeshCount();
-	for (int j = 0; j < mesh_count; ++j)
-	{
-		fprintf(fp, "o obj%d\ng grp%d\n", j, obj_idx);
-
-		const ofbx::Mesh& mesh = *scene.getMesh(j);
-		const ofbx::Geometry& geom = *mesh.getGeometry();
-		int vertex_count = geom.getVertexCount();
-		const ofbx::Vec3* vertices = geom.getVertices();
-		for (int i = 0; i < vertex_count; ++i)
-		{
-			ofbx::Vec3 v = vertices[i];
-			fprintf(fp, "v %f %f %f\n", v.x, v.y, v.z);
-		}
-
-		bool has_normals = geom.getNormals() != nullptr;
-		if (has_normals)
-		{
-			const ofbx::Vec3* normals = geom.getNormals();
-			int count = geom.getIndexCount();
-
-			for (int i = 0; i < count; ++i)
-			{
-				ofbx::Vec3 n = normals[i];
-				fprintf(fp, "vn %f %f %f\n", n.x, n.y, n.z);
-			}
-		}
-
-		bool has_uvs = geom.getUVs() != nullptr;
-		if (has_uvs)
-		{
-			const ofbx::Vec2* uvs = geom.getUVs();
-			int count = geom.getIndexCount();
-
-			for (int i = 0; i < count; ++i)
-			{
-				ofbx::Vec2 uv = uvs[i];
-				fprintf(fp, "vt %f %f\n", uv.x, uv.y);
-			}
-		}
-
-		const int* faceIndices = geom.getFaceIndices();
-		int index_count = geom.getIndexCount();
-		bool new_face = true;
-		for (int i = 0; i < index_count; ++i)
-		{
-			if (new_face)
-			{
-				fputs("f ", fp);
-				new_face = false;
-			}
-			int idx = (faceIndices[i] < 0) ? -faceIndices[i] : (faceIndices[i] + 1);
-			int vertex_idx = indices_offset + idx;
-			fprintf(fp, "%d", vertex_idx);
-
-			if (has_uvs)
-			{
-				int uv_idx = normals_offset + i + 1;
-				fprintf(fp, "/%d", uv_idx);
-			}
-			else
-			{
-				fprintf(fp, "/");
-			}
-
-			if (has_normals)
-			{
-				int normal_idx = normals_offset + i + 1;
-				fprintf(fp, "/%d", normal_idx);
-			}
-			else
-			{
-				fprintf(fp, "/");
-			}
-
-			new_face = faceIndices[i] < 0;
-			fputc(new_face ? '\n' : ' ', fp);
-		}
-
-		indices_offset += vertex_count;
-		normals_offset += index_count;
-		++obj_idx;
-	}
-	fclose(fp);
-	return true;
-}
 
 static void showObjectGUI(const ofbx::Object& object)
 {
@@ -337,8 +290,30 @@ static fbxDemoEntity* LoadHierarchy(ofbx::IScene* const fbxScene, fbxGlobalNoceM
 	return entity;
 }
 
+static dInt32 ImportMaterials(const ofbx::Mesh* const fbxMesh, fbxGlobalMaterialMap& materialCache)
+{
+	dInt32 materialId = -1;
+	dInt32 materialCount = fbxMesh->getMaterialCount();
+	if (materialCount == 0)
+	{
+		materialId = materialCache.AddMaterial(nullptr);
+	}
+	else if (materialCount == 1)
+	{
+		materialId = materialCache.AddMaterial(fbxMesh->getMaterial(0));
+	}
+	else
+	{
+		for (dInt32 i = 0; i < materialCount; i++)
+		{
+			materialCache.AddMaterial(fbxMesh->getMaterial(i));
+		}
+	}
+	return materialId;
+}
+
 //static void ImportMeshNode(FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials, GlobalNoceMap& nodeMap)
-static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMap)
+static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMap, fbxGlobalMaterialMap& materialCache)
 {
 	const ofbx::Mesh* const fbxMesh = (ofbx::Mesh*)fbxNode;
 
@@ -351,15 +326,13 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 	entity->SetMeshMatrix(pivotMatrix);
 	entity->m_fbxMeshEffect = mesh;
 
-	//LocalMaterialMap localMaterialIndex;
-	//ImportMaterials(fbxScene, ngdScene, fbxMeshNode, meshNode, materialCache, localMaterialIndex, textureCache, usedMaterials);
-
 	const ofbx::Geometry* const geom = fbxMesh->getGeometry();
 
 	const ofbx::Vec3* const vertices = geom->getVertices();
 	dInt32 indexCount = geom->getIndexCount();
 	dInt32* const indexArray = new dInt32 [indexCount];
 	memcpy(indexArray, geom->getFaceIndices(), indexCount * sizeof(dInt32));
+
 	dInt32 faceCount = 0;
 	for (dInt32 i = 0; i < indexCount; i++)
 	{
@@ -369,10 +342,13 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 		}
 	}
 
-	dInt32 count = 0;
-	dInt32 index = 0;
 	dInt32* const faceIndexArray = new dInt32[faceCount];
 	dInt32* const faceMaterialArray = new dInt32[faceCount];
+
+	dInt32 materialId = ImportMaterials(fbxMesh, materialCache);
+
+	dInt32 count = 0;
+	dInt32 index = 0;
 	for (dInt32 i = 0; i < indexCount; i++)
 	{
 		count++;
@@ -380,7 +356,19 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 		{
 			indexArray[i] = -indexArray[i] - 1;
 			faceIndexArray[index] = count;
-			faceMaterialArray[index] = 0;
+			if (materialId != -1)
+			{
+				faceMaterialArray[index] = materialId;
+			}
+			else
+			{
+				//dAssert (count < geom->getM)
+				dInt32 fbxMatIndex = geom->getMaterials()[count];
+				const ofbx::Material* const fbxMaterial = fbxMesh->getMaterial(fbxMatIndex);
+				dAssert (materialCache.Find(fbxMaterial));
+				fbxDemoSubMeshMaterial& material = materialCache.Find(fbxMaterial)->GetInfo();
+				faceMaterialArray[index] = material.m_index;
+			}
 			count = 0;
 			index++;
 		}
@@ -427,59 +415,6 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 	format.m_uv0.m_data = &uvArray[0].m_x;
 	format.m_uv0.m_indexList = indexArray;
 	format.m_uv0.m_strideInBytes = sizeof(dVector);
-
-	//FbxGeometryElementUV* const uvArray = fbxMesh->GetElementUV();
-	//FbxLayerElement::EMappingMode uvMapingMode = uvArray ? uvArray->GetMappingMode() : FbxGeometryElement::eNone;
-	//FbxLayerElement::EReferenceMode uvRefMode = uvArray ? uvArray->GetReferenceMode() : FbxGeometryElement::eIndex;
-	//
-	//FbxGeometryElementMaterial* const materialArray = fbxMesh->GetElementMaterial();
-	//FbxLayerElement::EMappingMode materialMapingMode = materialArray ? materialArray->GetMappingMode() : FbxGeometryElement::eNone;
-	//FbxLayerElement::EReferenceMode materialRefMode = materialArray ? materialArray->GetReferenceMode() : FbxGeometryElement::eIndex;
-	//
-	//int index = 0;
-	//for (int i = 0; i < faceCount; i++) {
-	//	int polygonIndexCount = fbxMesh->GetPolygonSize(i);
-	//
-	//	int materialID = DEFUALT_MATERIAL_ID;
-	//	if (materialArray) {
-	//		if (materialMapingMode == FbxGeometryElement::eByPolygon) {
-	//			materialID = (materialRefMode == FbxGeometryElement::eDirect) ? i : materialArray->GetIndexArray().GetAt(i);
-	//		}
-	//		else {
-	//			materialID = (materialRefMode == FbxGeometryElement::eDirect) ? 0 : materialArray->GetIndexArray().GetAt(0);
-	//		}
-	//	}
-	//	LocalMaterialMap::dTreeNode* const matNode = localMaterialIndex.Find(materialID);
-	//	dAssert(matNode);
-	//	dMaterialNodeInfo* const material = (dMaterialNodeInfo*)ngdScene->GetInfoFromNode(matNode->GetInfo());
-	//	materialIndex[i] = material->GetId();
-	//
-	//	dAssert(usedMaterials.Find(matNode->GetInfo()));
-	//	usedMaterials.Find(matNode->GetInfo())->GetInfo() += 1;
-	//
-	//	faceIndexList[i] = polygonIndexCount;
-	//	for (int j = 0; j < polygonIndexCount; j++) {
-	//		vertexIndex[index] = fbxMesh->GetPolygonVertex(i, j);
-	//		FbxVector4 n(0, 1, 0, 0);
-	//		fbxMesh->GetPolygonVertexNormal(i, j, n);
-	//		normalArray[index] = dVector(dFloat(n[0]), dFloat(n[1]), dFloat(n[2]), 0.0f);
-	//		normalIndex[index] = index;
-	//
-	//		FbxVector2 uv(0, 0);
-	//		if (uvMapingMode == FbxGeometryElement::eByPolygonVertex) {
-	//			int textIndex = (uvRefMode == FbxGeometryElement::eDirect) ? index : uvArray->GetIndexArray().GetAt(index);
-	//			uv = uvArray->GetDirectArray().GetAt(textIndex);
-	//		}
-	//		uv0Index[index] = index;
-	//		uv0Array[index] = dVector(dFloat(uv[0]), dFloat(uv[1]), 0.0f, 0.0f);
-	//
-	//		//uv1Index[index] = 0;
-	//		//uv1Array[index] = dVector (0.0f, 0.0f, 0.0f, 0.0f);
-	//
-	//		index++;
-	//		dAssert(index <= indexCount);
-	//	}
-	//}
 
 	mesh->BuildFromIndexList(&format);
 	mesh->RepairTJoints();
@@ -551,19 +486,9 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 	delete[] indexArray;
 }
 
-static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
+static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene, fbxGlobalMaterialMap& materialCache)
 {
 	fbxGlobalNoceMap nodeMap;
-	//GlobalTextureMap textureCache;
-	//GlobalMaterialMap materialCache;
-	//UsedMaterials usedMaterials;
-	//
-	//dScene::dTreeNode* const defaulMaterialNode = ngdScene->CreateMaterialNode(DEFUALT_MATERIAL_ID);
-	//dMaterialNodeInfo* const defaulMaterial = (dMaterialNodeInfo*)ngdScene->GetInfoFromNode(defaulMaterialNode);
-	//defaulMaterial->SetName("default_material");
-	//usedMaterials.Insert(0, defaulMaterialNode);
-	//
-	//m_materialId = 0;
 	fbxDemoEntity* const entity = LoadHierarchy(fbxScene, nodeMap);
 
 	fbxGlobalNoceMap::Iterator iter(nodeMap);
@@ -576,7 +501,7 @@ static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
 			case ofbx::Object::Type::MESH:
 			{
 				//ImportMeshNode(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials, nodeMap);
-				ImportMeshNode(fbxNode, nodeMap);
+				ImportMeshNode(fbxNode, nodeMap, materialCache);
 				break;
 			}
 		
@@ -738,24 +663,36 @@ fbxDemoEntity* LoadFbxMesh(ndDemoEntityManager* const scene, const char* const m
 	fread(content, 1, file_size, fp);
 	ofbx::IScene* const fbxScene = ofbx::load((ofbx::u8*)content, file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
 
-//saveAsOBJ(*fbxScene, "xxx.txt");
+	fbxGlobalMaterialMap materialCache;
 
 	dMatrix convertMatrix(GetCodinateSystemMatrix(fbxScene));
-	fbxDemoEntity* const entity = FbxToEntity(fbxScene);
+	fbxDemoEntity* const entity = FbxToEntity(fbxScene, materialCache);
 	FreezeScale(entity);
 	ApplyTransform(entity, convertMatrix);
 
 	fbxScene->destroy();
 	delete[] content;
 
+	ndDemoSubMeshMaterial* const materials = dAlloca(ndDemoSubMeshMaterial, materialCache.GetCount());
+	memset(materials, 0, materialCache.GetCount() * sizeof(ndDemoSubMeshMaterial));
+	while (materialCache.GetRoot())
+	{
+		fbxDemoSubMeshMaterial material(materialCache.GetRoot()->GetInfo());
+		materials[material.m_index] = material;
+		materialCache.Remove(materialCache.GetRoot());
+	}
+
 	for (fbxDemoEntity* child = (fbxDemoEntity*)entity->GetFirst(); child; child = (fbxDemoEntity*)child->GetNext())
 	{
 		child->ResetMatrix(*scene, child->GetRenderMatrix());
 		if (child->m_fbxMeshEffect)
 		{
-			ndDemoMesh* const mesh = new ndDemoMesh("fbxMesh", child->m_fbxMeshEffect, scene->GetShaderCache());
-			child->SetMesh(mesh, child->GetMeshMatrix());
-			mesh->Release();
+			if (child->GetName().Find("hidden"))
+			{
+				ndDemoMesh* const mesh = new ndDemoMesh("fbxMesh", child->m_fbxMeshEffect, scene->GetShaderCache(), materials);
+				child->SetMesh(mesh, child->GetMeshMatrix());
+				mesh->Release();
+			}
 		}
 	}
 
