@@ -18,22 +18,21 @@
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityManager.h"
 
-class fbxDemoEntity : public ndDemoEntity
+void fbxDemoEntity::CleanIntermidiate()
 {
-	public:
-	fbxDemoEntity(ndDemoEntity* const parent)
-		:ndDemoEntity(dGetIdentityMatrix(), parent)
-		,m_fbxMeshEffect(nullptr)
+	if (m_fbxMeshEffect)
 	{
+		delete m_fbxMeshEffect;
+		m_fbxMeshEffect = nullptr;
 	}
 
-	void SetMatrix(const dMatrix& matrix)
+	for (fbxDemoEntity* child = (fbxDemoEntity*)GetChild(); child; child = (fbxDemoEntity*)child->GetSibling())
 	{
-		m_matrix = matrix;
+		child->CleanIntermidiate();
 	}
+}
 
-	dMeshEffect* m_fbxMeshEffect;
-};
+
 
 class fbxGlobalNoceMap : public dTree<fbxDemoEntity*, const ofbx::Object*>
 {
@@ -727,8 +726,7 @@ static void ApplyCordinade(fbxDemoEntity* const entity, const dMatrix& cordinate
 	}
 }
 
-
-void BuildStaticMap(ndDemoEntityManager* const scene, const char* const meshName)
+fbxDemoEntity* LoadFbxMesh(ndDemoEntityManager* const scene, const char* const meshName)
 {
 	char outPathName[1024];
 	dGetWorkingFileName(meshName, outPathName);
@@ -737,7 +735,7 @@ void BuildStaticMap(ndDemoEntityManager* const scene, const char* const meshName
 	if (!fp)
 	{
 		dAssert(0);
-		return;
+		return nullptr;
 	}
 
 	fseek(fp, 0, SEEK_END);
@@ -750,59 +748,70 @@ void BuildStaticMap(ndDemoEntityManager* const scene, const char* const meshName
 //saveAsOBJ(*fbxScene, "xxx.txt");
 
 	dMatrix convertMatrix(GetCodinateSystemMatrix(fbxScene));
-	fbxDemoEntity* const ent = FbxToEntity(fbxScene);
-	BakeScale(ent);
-	ApplyCordinade(ent, convertMatrix);
-
-	ndPhysicsWorld* const world = scene->GetWorld();
-	dVector floor[] =
-	{
-		{ 100.0f, 0.0f,  100.0f, 1.0f },
-		{ 100.0f, 0.0f, -100.0f, 1.0f },
-		{ -100.0f, 0.0f, -100.0f, 1.0f },
-		{ -100.0f, 0.0f,  100.0f, 1.0f },
-	};
-	dInt32 index[][3] = { { 0, 1, 2 },{ 0, 2, 3 } };
-
-	dPolygonSoupBuilder meshBuilder;
-	meshBuilder.Begin();
-	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[0][0], 3);
-	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[1][0], 3);
-	meshBuilder.End(true);
-
-	ndShapeInstance box(new ndShapeStaticBVH(meshBuilder));
-	dMatrix uvMatrix(dGetIdentityMatrix());
-	uvMatrix[0][0] *= 0.025f;
-	uvMatrix[1][1] *= 0.025f;
-	uvMatrix[2][2] *= 0.025f;
-	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
-
-	dMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit.m_y = -0.5f;
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, dGetIdentityMatrix());
-
-	ndBodyDynamic* const body = new ndBodyDynamic();
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(matrix);
-	body->SetCollisionShape(box);
-
-	world->AddBody(body);
-
-	scene->AddEntity(entity);
-	geometry->Release();
+	fbxDemoEntity* const entity = FbxToEntity(fbxScene);
+	BakeScale(entity);
+	ApplyCordinade(entity, convertMatrix);
 
 	fbxScene->destroy();
 	delete[] content;
 
-	for (fbxDemoEntity* node = (fbxDemoEntity*)ent->GetFirst(); node; node = (fbxDemoEntity*)node->GetNext())
+	for (fbxDemoEntity* child = (fbxDemoEntity*)entity->GetFirst(); child; child = (fbxDemoEntity*)child->GetNext())
 	{
-		if (node->m_fbxMeshEffect)
+		if (child->m_fbxMeshEffect)
 		{
-			delete node->m_fbxMeshEffect;
-			node->m_fbxMeshEffect = nullptr;
+			ndDemoMesh* const mesh = new ndDemoMesh("fbxMesh", child->m_fbxMeshEffect, scene->GetShaderCache());
+			child->SetMesh(mesh, child->GetMeshMatrix());
+			mesh->Release();
 		}
 	}
-	delete ent;
+
+	return entity;
 }
 
+ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName)
+{
+	fbxDemoEntity* const entity_ = LoadFbxMesh(scene, "flatPlane.fbx");
+	//entity_->CleanIntermidiate();
+	//delete entity_;
+	scene->AddEntity(entity_);
+
+	//ndPhysicsWorld* const world = scene->GetWorld();
+	//dVector floor[] =
+	//{
+	//	{ 100.0f, 0.0f,  100.0f, 1.0f },
+	//	{ 100.0f, 0.0f, -100.0f, 1.0f },
+	//	{ -100.0f, 0.0f, -100.0f, 1.0f },
+	//	{ -100.0f, 0.0f,  100.0f, 1.0f },
+	//};
+	//dInt32 index[][3] = { { 0, 1, 2 },{ 0, 2, 3 } };
+	//
+	//dPolygonSoupBuilder meshBuilder;
+	//meshBuilder.Begin();
+	//meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[0][0], 3);
+	//meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[1][0], 3);
+	//meshBuilder.End(true);
+	//
+	//ndShapeInstance box(new ndShapeStaticBVH(meshBuilder));
+	//dMatrix uvMatrix(dGetIdentityMatrix());
+	//uvMatrix[0][0] *= 0.025f;
+	//uvMatrix[1][1] *= 0.025f;
+	//uvMatrix[2][2] *= 0.025f;
+	//ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
+	//
+	//dMatrix matrix(dGetIdentityMatrix());
+	//matrix.m_posit.m_y = -0.5f;
+	//ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	//entity->SetMesh(geometry, dGetIdentityMatrix());
+	//
+	//ndBodyDynamic* const body = new ndBodyDynamic();
+	//body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	//body->SetMatrix(matrix);
+	//body->SetCollisionShape(box);
+	//
+	//world->AddBody(body);
+	//
+	//scene->AddEntity(entity);
+	//geometry->Release();
+
+	return nullptr;
+}

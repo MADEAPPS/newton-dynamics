@@ -353,9 +353,6 @@ void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, c
 	{
 		child->Render(timestep, scene, nodeMatrix);
 	}
-
-	// restore the matrix before leaving
-//	glPopMatrix();
 }
 
 /*

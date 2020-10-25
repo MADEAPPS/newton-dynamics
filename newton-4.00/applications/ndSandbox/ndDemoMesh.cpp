@@ -77,93 +77,7 @@ void ndDemoSubMesh::SetOpacity(dFloat32 opacity)
 	m_hasTranparency = (opacity <= 0.99f) ? true : false;
 }
 
-
 /*
-ndDemoMesh::ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ndShaderPrograms& shaderCache)
-	:ndDemoMeshInterface()
-	,dList<ndDemoSubMesh>()
-	,m_uv(nullptr)
-	,m_vertex(nullptr)
-	,m_normal(nullptr)
-	,m_vertexCount(0)
-	,m_optimizedOpaqueDiplayList(0)
-	,m_optimizedTransparentDiplayList(0)
-{
-	dMeshNodeInfo* const meshInfo = (dMeshNodeInfo*)scene->GetInfoFromNode(meshNode);
-	m_name = meshInfo->GetName();
-	
-	NewtonMesh* const mesh = meshInfo->GetMesh();
-
-	// recalculate mesh normals
-//	NewtonMeshCalculateVertexNormals(mesh, 45.0f * dDegreeToRad);
-
-	// extract vertex data  from the newton mesh		
-	AllocVertexData(NewtonMeshGetPointCount (mesh));
-	NewtonMeshGetVertexChannel (mesh, 3 * sizeof (dFloat32), (dFloat32*) m_vertex);
-	NewtonMeshGetNormalChannel (mesh, 3 * sizeof (dFloat32), (dFloat32*) m_normal);
-	NewtonMeshGetUV0Channel (mesh, 2 * sizeof (dFloat32), (dFloat32*) m_uv);
-
-	// bake the matrix into the vertex array
-//	dMatrix matrix (meshInfo->GetPivotMatrix());
-//	matrix.TransformTriplex(m_vertex, 3 * sizeof (dFloat32), m_vertex, 3 * sizeof (dFloat32), m_vertexCount);
-//	matrix.m_posit = dVector (0.0f, 0.0f, 0.0f, 1.0f);
-//	matrix = (matrix.Inverse4x4()).Transpose();
-//	matrix.TransformTriplex(m_normal, 3 * sizeof (dFloat32), m_normal, 3 * sizeof (dFloat32), m_vertexCount);
-
-	dTree<dScene::dTreeNode*, dUnsigned64> materialMap;
-	for (void* ptr = scene->GetFirstChildLink(meshNode); ptr; ptr = scene->GetNextChildLink (meshNode, ptr)) {
-		dScene::dTreeNode* const node = scene->GetNodeFromLink(ptr);
-		dNodeInfo* const info = scene->GetInfoFromNode(node);
-		if (info->GetTypeId() == dMaterialNodeInfo::GetRttiType()) {
-			dMaterialNodeInfo* const material = (dMaterialNodeInfo*)info;
-			dUnsigned64 id = material->GetId();
-			materialMap.Insert(node, id);
-		}
-	}
-
-	// extract the materials index array for mesh
-	void* const meshCookie = NewtonMeshBeginHandle (mesh); 
-	for (int handle = NewtonMeshFirstMaterial (mesh, meshCookie); handle != -1; handle = NewtonMeshNextMaterial (mesh, meshCookie, handle)) {
-		int materialIndex = NewtonMeshMaterialGetMaterial (mesh, meshCookie, handle); 
-		int indexCount = NewtonMeshMaterialGetIndexCount (mesh, meshCookie, handle); 
-		ndDemoSubMesh* const segment = AddSubMesh();
-
-		dTree<dScene::dTreeNode*, dUnsigned64>::dTreeNode* matNodeCache = materialMap.Find(materialIndex);
-		if (matNodeCache) {
-			dScene::dTreeNode* const matNode = matNodeCache->GetInfo();
-			dMaterialNodeInfo* const material = (dMaterialNodeInfo*) scene->GetInfoFromNode(matNode);
-
-			if (material->GetDiffuseTextId() != -1) {
-				dScene::dTreeNode* const node = scene->FindTextureByTextId(matNode, material->GetDiffuseTextId());
-				dAssert (node);
-				if (node) {
-					dTextureNodeInfo* const texture = (dTextureNodeInfo*)scene->GetInfoFromNode(node);
-					segment->m_textureHandle = LoadTexture(texture->GetPathName());
-					segment->m_textureName = texture->GetPathName();
-				}
-			}
-			segment->m_shiness = material->GetShininess();
-			segment->m_ambient = material->GetAmbientColor();
-			segment->m_diffuse = material->GetDiffuseColor();
-			segment->m_specular = material->GetSpecularColor();
-			segment->SetOpacity(material->GetOpacity());
-
-			segment->m_shader = shaderCache.m_diffuseEffect;
-		}
-
-		segment->AllocIndexData (indexCount);
-		// for 16 bit indices meshes
-		//NewtonMeshMaterialGetIndexStreamShort (mesh, meshCookie, handle, (short int*)segment->m_indexes); 
-
-		// for 32 bit indices mesh
-		NewtonMeshMaterialGetIndexStream (mesh, meshCookie, handle, (int*)segment->m_indexes); 
-	}
-	NewtonMeshEndHandle (mesh, meshCookie); 
-
-	// see if this mesh can be optimized
-	OptimizeForRender ();
-}
-
 ndDemoMesh::ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,m_uv(nullptr)
@@ -1203,8 +1117,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	,m_vetextArrayBuffer(0)
 	,m_hasTransparency(false)
 {
-	// create a helper mesh from the collision collision
-	//NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
+	m_name = name;
 	ndShapeInstanceMeshBuilder mesh(*collision);
 
 	//mesh.CalculateNormals(30.0f * dDegreeToRad);
@@ -1280,9 +1193,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 
 	dInt32 segmentStart = 0;
 	bool hasTransparency = false;
-	for (int handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
+	for (dInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
 	{
-		int material = mesh.GetMaterialID(geometryHandle, handle);
+		dInt32 material = mesh.GetMaterialID(geometryHandle, handle);
 		ndDemoSubMesh* const segment = AddSubMesh();
 
 		segment->m_textureHandle = (GLuint)material;
@@ -1297,6 +1210,69 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	}
 
 	mesh.MaterialGeomteryEnd(geometryHandle);
+
+	m_hasTransparency = hasTransparency;
+
+	// optimize this mesh for hardware buffers if possible
+	OptimizeForRender(points, indices);
+}
+
+//ndDemoMesh::ndDemoMesh(const dScene* const scene, dScene::dTreeNode* const meshNode, const ndShaderPrograms& shaderCache)
+ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
+	:ndDemoMeshInterface()
+	,dList<ndDemoSubMesh>()
+	,m_indexCount(0)
+	,m_vertexCount(0)
+	,m_shader(0)
+	,m_indexBuffer(0)
+	,m_vertexBuffer(0)
+	,m_vetextArrayBuffer(0)
+	,m_hasTransparency(false)
+{
+	m_name = name;
+	m_shader = shaderCache.m_diffuseEffect;
+
+	// extract the materials index array for mesh
+	ndIndexArray* const geometryHandle = meshNode->MaterialGeometryBegin();
+
+	// extract vertex data  from the newton mesh		
+	int vertexCount = meshNode->GetPropertiesCount();
+	int indexCount = 0;
+	for (int handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
+	{
+		indexCount += meshNode->GetMaterialIndexCount(geometryHandle, handle);
+	}
+
+	dArray<dInt32> indices;
+	dArray<ndMeshPointUV> points;
+
+	points.SetCount(vertexCount);
+	indices.SetCount(indexCount);
+
+	meshNode->GetVertexChannel(sizeof(ndMeshPointUV), &points[0].m_posit.m_x);
+	meshNode->GetNormalChannel(sizeof(ndMeshPointUV), &points[0].m_normal.m_x);
+	meshNode->GetUV0Channel(sizeof(ndMeshPointUV), &points[0].m_uv.m_u);
+
+	dFloat32 opacity = 1.0f;
+	dInt32 segmentStart = 0;
+	bool hasTransparency = false;
+	for (dInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
+	{
+		dInt32 material = meshNode->GetMaterialID(geometryHandle, handle);
+		ndDemoSubMesh* const segment = AddSubMesh();
+
+		segment->m_textureHandle = (GLuint)material;
+		segment->SetOpacity(opacity);
+		hasTransparency = hasTransparency | segment->m_hasTranparency;
+
+		segment->m_indexCount = meshNode->GetMaterialIndexCount(geometryHandle, handle);
+
+		segment->m_segmentStart = segmentStart;
+		meshNode->GetMaterialGetIndexStream(geometryHandle, handle, (dInt32*)&indices[segmentStart]);
+		segmentStart += segment->m_indexCount;
+	}
+
+	meshNode->MaterialGeomteryEnd(geometryHandle);
 
 	m_hasTransparency = hasTransparency;
 

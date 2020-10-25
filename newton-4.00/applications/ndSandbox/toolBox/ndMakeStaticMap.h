@@ -18,7 +18,37 @@ class ndDemoMesh;
 class ndDemoEntity;
 class ndDemoEntityManager;
 
+class fbxDemoEntity : public ndDemoEntity
+{
+	public:
+	fbxDemoEntity(ndDemoEntity* const parent)
+		:ndDemoEntity(dGetIdentityMatrix(), parent)
+		,m_fbxMeshEffect(nullptr)
+	{
+	}
 
-void BuildStaticMap(ndDemoEntityManager* const scene, const char* const meshName);
+	~fbxDemoEntity()
+	{
+		if (m_fbxMeshEffect)
+		{
+			delete m_fbxMeshEffect;
+		}
+	}
+
+	void SetMatrix(const dMatrix& matrix)
+	{
+		m_matrix = matrix;
+	}
+
+	void CleanIntermidiate();
+
+	dMeshEffect* m_fbxMeshEffect;
+};
+
+
+fbxDemoEntity* LoadFbxMesh(ndDemoEntityManager* const scene, const char* const meshName);
+
+ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName);
+
 
 #endif
