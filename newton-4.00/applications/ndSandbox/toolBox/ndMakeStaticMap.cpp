@@ -65,6 +65,22 @@ class fbxGlobalMaterialMap : public dTree<fbxDemoSubMeshMaterial, const ofbx::Ma
 
 			if (fbxMaterial)
 			{
+				ofbx::Color color = fbxMaterial->getDiffuseColor();
+				meshMaterial.m_diffuse = dVector(color.r, color.g, color.b, 1.0f);
+
+				color = fbxMaterial->getAmbientColor();
+				meshMaterial.m_ambient = dVector(color.r, color.g, color.b, 1.0f);
+
+				color = fbxMaterial->getSpecularColor();
+				meshMaterial.m_specular = dVector(color.r, color.g, color.b, 1.0f);
+
+				meshMaterial.m_opacity = dFloat32(fbxMaterial->getOpacityFactor());
+				if (meshMaterial.m_opacity < 1.0f)
+				{
+					meshMaterial.m_opacity = dFloat32(fbxMaterial->getOpacityFactor());
+				}
+				meshMaterial.m_shiness = dFloat32 (fbxMaterial->getShininess());
+
 				const ofbx::Texture* const texture = fbxMaterial->getTexture(ofbx::Texture::DIFFUSE);
 				if (texture)
 				{
@@ -337,29 +353,28 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 	dInt32 materialId = ImportMaterials(fbxMesh, materialCache);
 
 	dInt32 count = 0;
-	dInt32 index = 0;
+	dInt32 faceIndex = 0;
 	for (dInt32 i = 0; i < indexCount; i++)
 	{
 		count++;
 		if (indexArray[i] < 0)
 		{
 			indexArray[i] = -indexArray[i] - 1;
-			faceIndexArray[index] = count;
+			faceIndexArray[faceIndex] = count;
 			if (materialId != -1)
 			{
-				faceMaterialArray[index] = materialId;
+				faceMaterialArray[faceIndex] = materialId;
 			}
 			else
 			{
-				//dAssert (count < geom->getM)
-				dInt32 fbxMatIndex = geom->getMaterials()[count];
+				dInt32 fbxMatIndex = geom->getMaterials()[faceIndex];
 				const ofbx::Material* const fbxMaterial = fbxMesh->getMaterial(fbxMatIndex);
 				dAssert (materialCache.Find(fbxMaterial));
 				fbxDemoSubMeshMaterial& material = materialCache.Find(fbxMaterial)->GetInfo();
-				faceMaterialArray[index] = material.m_index;
+				faceMaterialArray[faceIndex] = material.m_index;
 			}
 			count = 0;
-			index++;
+			faceIndex++;
 		}
 	}
 

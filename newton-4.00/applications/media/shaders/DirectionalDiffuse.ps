@@ -13,6 +13,9 @@
 
 uniform sampler2D texture;
 uniform float transparency;
+uniform vec3 material_ambient;
+uniform vec3 material_diffuse; 
+uniform vec3 material_specular; 
 
 in vec2 uv;
 in vec3 posit;
@@ -24,8 +27,7 @@ out vec4 pixelColor;
 vec3 FlashLightShading(vec3 normalDir)
 {
 	vec3 lightDir = -normalize (posit);
-	
-	//vec3 diffuseCoeff = vec3(gl_LightSource[index].diffuse * gl_FrontMaterial.diffuse); 
+
 	vec3 diffuseCoeff = vec3(0.7f, 0.7f, 0.7f);  
 
 	float k1 = 7.0/120.0; 
@@ -47,10 +49,15 @@ vec3 PhongDirectionalShading(vec3 normalDir)
 	//vec3 ambientCoeff = vec3(gl_LightSource[0].ambient * gl_FrontMaterial.ambient);
 	//vec3 diffuseCoeff = vec3(gl_LightSource[0].diffuse * gl_FrontMaterial.diffuse); 
 	//vec3 specularCoeff = vec3(gl_LightSource[0].specular * gl_FrontMaterial.specular);
+
+	//vec3 ambientCoeff = vec3(material_ambient);
+	vec3 diffuseCoeff = vec3(material_diffuse); 
+	//vec3 specularCoeff = vec3(material_specular);
+
+	vec3 ambientCoeff = vec3(0.0f, 0.0f, 0.0f);
+	//vec3 diffuseCoeff = vec3(1.0f, 0.0f, 0.0f); 
+	vec3 specularCoeff = vec3(0.0f, 0.0f, 0.0f);
 	
-	vec3 ambientCoeff = vec3(0.1f, 0.1f, 0.1f);
-	vec3 diffuseCoeff = vec3(0.9f, 0.9f, 0.9f); 
-	vec3 specularCoeff = vec3(0.8f, 0.8f, 0.8f);
 	vec3 emission = vec3(0.0f, 0.0f, 0.0f);
 	float shininess = 20.0f;
 	
@@ -65,8 +72,8 @@ void main()
 {
 	vec3 normalDir = normalize (normal);
 
-	//vec3 lightIntensity = PhongDirectionalShading() + FlashLightShading(1);
-	vec3 lightIntensity = PhongDirectionalShading(normalDir) + FlashLightShading(normalDir);
+	//vec3 lightIntensity = PhongDirectionalShading(normalDir) + FlashLightShading(normalDir);
+	vec3 lightIntensity = PhongDirectionalShading(normalDir);
 
 	vec3 texColor = lightIntensity * vec3 (texture2D(texture, uv));
 	pixelColor = vec4(texColor, transparency);

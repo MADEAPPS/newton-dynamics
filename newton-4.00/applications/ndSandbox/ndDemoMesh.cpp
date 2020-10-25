@@ -36,7 +36,6 @@ ndDemoSubMeshMaterial::~ndDemoSubMeshMaterial()
 	}
 }
 
-
 ndDemoMeshInterface::ndDemoMeshInterface()
 	:dClassAlloc()
 	,dRefCounter<ndDemoMeshInterface>()
@@ -110,9 +109,9 @@ ndDemoMesh::ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCac
 
 	// extract the materials index array for mesh
 	void* const meshCookie = NewtonMeshBeginHandle (mesh); 
-	for (int handle = NewtonMeshFirstMaterial (mesh, meshCookie); handle != -1; handle = NewtonMeshNextMaterial (mesh, meshCookie, handle)) {
-		int textureId = NewtonMeshMaterialGetMaterial (mesh, meshCookie, handle); 
-		int indexCount = NewtonMeshMaterialGetIndexCount (mesh, meshCookie, handle); 
+	for (dInt32 handle = NewtonMeshFirstMaterial (mesh, meshCookie); handle != -1; handle = NewtonMeshNextMaterial (mesh, meshCookie, handle)) {
+		dInt32 textureId = NewtonMeshMaterialGetMaterial (mesh, meshCookie, handle); 
+		dInt32 indexCount = NewtonMeshMaterialGetIndexCount (mesh, meshCookie, handle); 
 		ndDemoSubMesh* const segment = AddSubMesh();
 
 		segment->m_shiness = 1.0f;
@@ -136,10 +135,7 @@ ndDemoMesh::ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCac
 	// see if this mesh can be optimized
 	OptimizeForRender ();
 }
-*/
 
-
-/*
 NewtonMesh* ndDemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix)
 {
 	NewtonMesh* const mesh = NewtonMeshCreate(world);
@@ -151,8 +147,8 @@ NewtonMesh* ndDemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix
 		ndDemoSubMesh& segment = node->GetInfo();
 		for (dInt32 i = 0; i < segment.m_indexCount; i += 3) {
 			NewtonMeshBeginFace(mesh);
-			for (int j = 0; j < 3; j ++) {
-				int index = segment.m_indexes[i + j];
+			for (dInt32 j = 0; j < 3; j ++) {
+				dInt32 index = segment.m_indexes[i + j];
 				dVector p (meshMatrix.TransformVector(dVector (m_vertex[index * 3 + 0], m_vertex[index * 3 + 1], m_vertex[index * 3 + 2], 0.0f)));
 				dVector n (rotation.RotateVector(dVector (m_normal[index * 3 + 0], m_normal[index * 3 + 1], m_normal[index * 3 + 2], 0.0f)));
 				dAssert ((n.DotProduct3(n)) > 0.0f);
@@ -178,7 +174,7 @@ const char* ndDemoMesh::GetTextureName (const ndDemoSubMesh* const subMesh) cons
 	return subMesh->m_material.m_textureName;
 }
 
-void ndDemoMesh::SpliteSegment(dListNode* const node, int maxIndexCount)
+void ndDemoMesh::SpliteSegment(dListNode* const node, dInt32 maxIndexCount)
 {
 	dAssert(0);
 #if 0
@@ -189,17 +185,17 @@ void ndDemoMesh::SpliteSegment(dListNode* const node, int maxIndexCount)
 		dVector maxBox (-1.0e10f, -1.0e10f, -1.0e10f, 0.0f);
 		for (dInt32 i = 0; i < segment.m_indexCount; i ++) 
 		{
-			int index = segment.m_indexes[i];
-			for (int j = 0; j < 3; j ++) 
+			dInt32 index = segment.m_indexes[i];
+			for (dInt32 j = 0; j < 3; j ++) 
 			{
 				minBox[j] = (m_vertex[index * 3 + j] < minBox[j]) ? m_vertex[index * 3 + j] : minBox[j];
 				maxBox[j] = (m_vertex[index * 3 + j] > maxBox[j]) ? m_vertex[index * 3 + j] : maxBox[j];
 			}
 		}
 
-		int index = 0;
+		dInt32 index = 0;
 		dFloat32 maxExtend = -1.0e10f;
-		for (int j = 0; j < 3; j ++) 
+		for (dInt32 j = 0; j < 3; j ++) 
 		{
 			dFloat32 ext = maxBox[j] - minBox[j];
 			if (ext > maxExtend ) 
@@ -209,15 +205,15 @@ void ndDemoMesh::SpliteSegment(dListNode* const node, int maxIndexCount)
 			}
 		}
 
-		int leftCount = 0;
-		int rightCount = 0;
+		dInt32 leftCount = 0;
+		dInt32 rightCount = 0;
 		dFloat32 spliteDist = (maxBox[index ] + minBox[index]) * 0.5f;
 		for (dInt32 i = 0; i < segment.m_indexCount; i += 3) 
 		{
 			bool isleft = true;
-			for (int j = 0; j < 3; j ++) 
+			for (dInt32 j = 0; j < 3; j ++) 
 			{
-				int vertexIndex = segment.m_indexes[i + j];
+				dInt32 vertexIndex = segment.m_indexes[i + j];
 				isleft &= (m_vertex[vertexIndex * 3 + index] < spliteDist);
 			}
 			if (isleft) 
@@ -249,9 +245,9 @@ void ndDemoMesh::SpliteSegment(dListNode* const node, int maxIndexCount)
 			for (dInt32 i = 0; i < segment.m_indexCount; i += 3) 
 			{
 				bool isleft = true;
-				for (int j = 0; j < 3; j ++) 
+				for (dInt32 j = 0; j < 3; j ++) 
 				{
-					int vertexIndex = segment.m_indexes[i + j];
+					dInt32 vertexIndex = segment.m_indexes[i + j];
 					isleft &= (m_vertex[vertexIndex * 3 + index] < spliteDist);
 				}
 				if (isleft) 
@@ -387,12 +383,12 @@ NewtonMesh* ndDemoBezierCurve::CreateNewtonMesh(NewtonWorld* const world, const 
 }
 */
 
-int ndDemoBezierCurve::GetRenderResolution () const
+dInt32 ndDemoBezierCurve::GetRenderResolution () const
 {
 	return m_renderResolution;
 }
 
-void ndDemoBezierCurve::SetRenderResolution (int breaks)
+void ndDemoBezierCurve::SetRenderResolution (dInt32 breaks)
 {
 	m_renderResolution = breaks;
 }
@@ -420,7 +416,7 @@ void ndDemoBezierCurve::Render(ndDemoEntityManager* const scene, const dMatrix& 
 		glPointSize(4.0f);
 		glBegin(GL_POINTS);
 		glColor3f(1.0f, 0.0f, 0.0f);
-		int count = m_curve.GetKnotCount();
+		dInt32 count = m_curve.GetKnotCount();
 		for (dInt32 i = 0; i < count; i ++) {
 			dFloat32 u = m_curve.GetKnot(i);
 			dBigVector p0 (m_curve.CurvePoint(u));
@@ -461,8 +457,8 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 		}
 	}
 
-	int stack = 1;
-	int entityCount = 0;
+	dInt32 stack = 1;
+	dInt32 entityCount = 0;
 	ndDemoEntity* pool[32];
 	dMatrix parentMatrix[32];
 
@@ -475,7 +471,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 	parentMatrix[0] = dGetIdentityMatrix();
 	dMatrix shapeBindMatrix(m_entity->GetMeshMatrix() * m_entity->CalculateGlobalMatrix());
 
-	const int boneCount = boneMap.GetCount() + 1024;
+	const dInt32 boneCount = boneMap.GetCount() + 1024;
 //	int* const boneClusterRemapIndex = dAlloca (int, boneCount);
 	dArray<int> boneClusterRemapIndex (boneCount);
 	memset (&boneClusterRemapIndex[0], -1, boneCount * sizeof (int));
@@ -514,15 +510,15 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 	memset (&weight[0], 0, m_mesh->m_vertexCount * sizeof (dVector));
 	memset (&skinBone[0], -1, m_mesh->m_vertexCount * sizeof (dWeightBoneIndex));
 
-	int vCount = 0;
+	dInt32 vCount = 0;
 	for (iter.Begin(); iter; iter++) {
 		dScene::dTreeNode* const boneNode = iter.GetKey();
 		const dGeometryNodeSkinClusterInfo* const cluster = FindSkinModifier(scene, boneNode);
 		if (cluster) {
-			int boneIndex = boneClusterRemapIndex[cluster->GetNodeID()];
+			dInt32 boneIndex = boneClusterRemapIndex[cluster->GetNodeID()];
 			dAssert (boneIndex != -1);
 			for (dInt32 i = 0; i < cluster->m_vertexIndex.GetSize(); i ++) {
-				int vertexIndex = cluster->m_vertexIndex[i];
+				dInt32 vertexIndex = cluster->m_vertexIndex[i];
 
 				vCount = dMax (vertexIndex + 1, vCount);
 				dFloat32 vertexWeight = cluster->m_vertexWeight[i];
@@ -530,7 +526,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 					weight[vertexIndex][3] = vertexWeight;
 					skinBone[vertexIndex].m_boneIndex[3] = boneIndex;
 
-					for (int j = 2; j >= 0; j --) {
+					for (dInt32 j = 2; j >= 0; j --) {
 						if (weight[vertexIndex][j] < weight[vertexIndex][j + 1]) {
 							dSwap (weight[vertexIndex][j], weight[vertexIndex][j + 1]);
 							dSwap (skinBone[vertexIndex].m_boneIndex[j], skinBone[vertexIndex].m_boneIndex[j + 1]);
@@ -541,9 +537,9 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 		}
 	}
 
-	int weightcount = 0;
+	dInt32 weightcount = 0;
 	const int* const indexToPointMap = meshInfo->GetIndexToVertexMap();
-	const int vertexBaseCount = NewtonMeshGetVertexBaseCount(meshInfo->GetMesh());
+	const dInt32 vertexBaseCount = NewtonMeshGetVertexBaseCount(meshInfo->GetMesh());
 
 	for (dInt32 i = 0; i < vertexBaseCount; i ++) {
 
@@ -557,7 +553,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 		weight[i].m_w = w.m_w * invMag;
 
 		dAssert (skinBone[i].m_boneIndex[0] != -1);
-		for (int j = 0; j < 4; j++) {
+		for (dInt32 j = 0; j < 4; j++) {
 			if (skinBone[i].m_boneIndex[j] != -1) {
 				weightcount = dMax(weightcount, j + 1);
 			} else {
@@ -574,7 +570,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 
 	dList<int> pendingVertices;
 	for (dInt32 i = 0; i < m_mesh->m_vertexCount; i ++) {
-		int index = indexToPointMap[i];
+		dInt32 index = indexToPointMap[i];
 
 		dAssert (index >= 0);
 		//dAssert (index < vCount);
@@ -589,7 +585,7 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 	for (dList<int>::dListNode* ptr = pendingVertices.GetFirst(); ptr; ptr = ptr->GetNext()) {
 		dInt32 i = ptr->GetInfo();
 		dVector p (m_mesh->m_vertex[i * 3 + 0], m_mesh->m_vertex[i * 3 + 1], m_mesh->m_vertex[i * 3 + 2], 0.0f);
-		for (int j = 0; j < m_mesh->m_vertexCount; j ++) {
+		for (dInt32 j = 0; j < m_mesh->m_vertexCount; j ++) {
 			if (i != j) {
 				dVector q (m_mesh->m_vertex[j * 3 + 0], m_mesh->m_vertex[j * 3 + 1], m_mesh->m_vertex[j * 3 + 2], 0.0f);
 				dVector diff (q - p);
@@ -608,12 +604,12 @@ ndDemoSkinMesh::ndDemoSkinMesh(dScene* const scene, ndDemoEntity* const owner, d
 	}
 	m_mesh->ResetOptimization();
 
-	int count = CalculateMatrixPalette(&bindMatrix[0]);
+	dInt32 count = CalculateMatrixPalette(&bindMatrix[0]);
 	GLfloat* const glMatrixPallete = dAlloca (GLfloat, 16 * count);
 	ConvertToGlMatrix(count, &bindMatrix[0], glMatrixPallete);
 
 	glUseProgram(m_shader);
-	int matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
+	dInt32 matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
 	glUniformMatrix4fv(matrixPalette, count, GL_FALSE, glMatrixPallete);
 	dAssert (glGetError() == GL_NO_ERROR);
 
@@ -673,8 +669,8 @@ void ndDemoSkinMesh::OptimizeForRender(const ndDemoSubMesh& segment, const dVect
 	glBindAttribLocation(m_shader, 10, "boneIndices");
 	glBindAttribLocation(m_shader, 11, "boneWeights");
 
-	int boneIndices = glGetAttribLocation(m_shader, "boneIndices");
-	int boneWeights = glGetAttribLocation(m_shader, "boneWeights");
+	dInt32 boneIndices = glGetAttribLocation(m_shader, "boneIndices");
+	dInt32 boneWeights = glGetAttribLocation(m_shader, "boneWeights");
 
 	glBegin(GL_TRIANGLES);
 	const dFloat32* const uv = m_mesh->m_uv;
@@ -682,7 +678,7 @@ void ndDemoSkinMesh::OptimizeForRender(const ndDemoSubMesh& segment, const dVect
 	const dFloat32* const vertex = m_mesh->m_vertex;
 	for (dInt32 i = 0; i < segment.m_indexCount; i++) 
 	{
-		int index = segment.m_indexes[i];
+		dInt32 index = segment.m_indexes[i];
 
 		const dVector& weights = pointWeights[index];
 		const dWeightBoneIndex& boneIndex = pointSkinBone[index];
@@ -697,9 +693,9 @@ void ndDemoSkinMesh::OptimizeForRender(const ndDemoSubMesh& segment, const dVect
 */
 }
 
-int ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
+dInt32 ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
 {
-	int stack = 1;
+	dInt32 stack = 1;
 	ndDemoEntity* pool[32];
 	dMatrix parentMatrix[32];
 
@@ -709,7 +705,7 @@ int ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
 		root = root->GetParent();
 	}
 
-	int count = 0;
+	dInt32 count = 0;
 	pool[0] = root;
 	parentMatrix[0] = dGetIdentityMatrix();
 	dMatrix shapeBindMatrix((m_entity->GetMeshMatrix() * m_entity->CalculateGlobalMatrix()).Inverse());
@@ -732,13 +728,16 @@ int ndDemoSkinMesh::CalculateMatrixPalette(dMatrix* const bindMatrix) const
 	return count;
 }
 
-void ndDemoSkinMesh::ConvertToGlMatrix(int count, const dMatrix* const bindMatrix, GLfloat* const glMatrices) const
+void ndDemoSkinMesh::ConvertToGlMatrix(dInt32 count, const dMatrix* const bindMatrix, GLfloat* const glMatrices) const
 {
-	for (dInt32 i = 0; i < count; i++) {
+	for (dInt32 i = 0; i < count; i++) 
+	{
 		const dMatrix& src = bindMatrix[i];
 		GLfloat* dst = &glMatrices[i * 16];
-		for (int j = 0; j < 4; j++) {
-			for (int k = 0; k < 4; k++) {
+		for (dInt32 j = 0; j < 4; j++) 
+		{
+			for (dInt32 k = 0; k < 4; k++) 
+			{
 				dst[j * 4 + k] = GLfloat (src[j][k]);
 			}
 		}
@@ -771,12 +770,12 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& mod
 {
 	dAssert(0);
 	//dMatrix* const bindMatrix = dAlloca(dMatrix, m_nodeCount);
-	//int count = CalculateMatrixPalette(bindMatrix);
+	//dInt32 count = CalculateMatrixPalette(bindMatrix);
 	//GLfloat* const glMatrixPallete = dAlloca(GLfloat, 16 * count);
 	//ConvertToGlMatrix(count, bindMatrix, glMatrixPallete);
 	//
 	//glUseProgram(m_shader);
-	//int matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
+	//dInt32 matrixPalette = glGetUniformLocation(m_shader, "matrixPallete");
 	//glUniformMatrix4fv(matrixPalette, count, GL_FALSE, glMatrixPallete);
 	//glCallList(m_mesh->m_optimizedOpaqueDiplayList);
 }
@@ -1159,9 +1158,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 
 		case ndShapeID::m_boxCollision:
 		{
-			int tex0 = LoadTexture(texture0);
-			//int tex1 = LoadTexture(texture1);
-			//int tex2 = LoadTexture(texture2);
+			dInt32 tex0 = LoadTexture(texture0);
+			//dInt32 tex1 = LoadTexture(texture1);
+			//dInt32 tex2 = LoadTexture(texture2);
 			//mesh.BoxMapping(tex0, tex1, tex2, aligmentUV);
 			mesh.UniformBoxMapping(tex0, aligmentUV);
 			break;
@@ -1169,10 +1168,10 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 
 		default:
 		{
-			int tex0 = LoadTexture(texture0);
-			//int tex0 = LoadTexture(texture0);
-			//int tex1 = LoadTexture(texture1);
-			//int tex2 = LoadTexture(texture2);
+			dInt32 tex0 = LoadTexture(texture0);
+			//dInt32 tex0 = LoadTexture(texture0);
+			//dInt32 tex1 = LoadTexture(texture1);
+			//dInt32 tex2 = LoadTexture(texture2);
 			//NewtonMeshApplyBoxMapping(mesh, tex0, tex1, tex2, &aligmentUV[0][0]);
 			mesh.UniformBoxMapping(tex0, aligmentUV);
 		}
@@ -1182,9 +1181,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	ndIndexArray* const geometryHandle = mesh.MaterialGeometryBegin();
 
 	// extract vertex data  from the newton mesh		
-	int vertexCount = mesh.GetPropertiesCount();
-	int indexCount = 0;
-	for (int handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
+	dInt32 vertexCount = mesh.GetPropertiesCount();
+	dInt32 indexCount = 0;
+	for (dInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
 	{
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
@@ -1243,9 +1242,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, cons
 	ndIndexArray* const geometryHandle = meshNode->MaterialGeometryBegin();
 
 	// extract vertex data  from the newton mesh		
-	int vertexCount = meshNode->GetPropertiesCount();
-	int indexCount = 0;
-	for (int handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
+	dInt32 vertexCount = meshNode->GetPropertiesCount();
+	dInt32 indexCount = 0;
+	for (dInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
 	{
 		indexCount += meshNode->GetMaterialIndexCount(geometryHandle, handle);
 	}
@@ -1288,7 +1287,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, cons
 	OptimizeForRender(points, indices);
 }
 
-ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, int size, dFloat32 cellSize, dFloat32 texelsDensity, int tileSize)
+ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, dInt32 size, dFloat32 cellSize, dFloat32 texelsDensity, dInt32 tileSize)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
 	,m_indexCount(0)
@@ -1312,8 +1311,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	}
 
 	memset(normals, 0, (size * size) * sizeof(dVector));
-	for (int z = 0; z < size - 1; z++) {
-		for (int x = 0; x < size - 1; x++) {
+	for (dInt32 z = 0; z < size - 1; z++) {
+		for (dInt32 x = 0; x < size - 1; x++) {
 			dVector p0((x + 0) * cellSize, elevationMap[z + 0][x + 0], (z + 0) * cellSize, dFloat32(0.0f));
 			dVector p1((x + 1) * cellSize, elevationMap[z + 0][x + 1], (z + 0) * cellSize, dFloat32(0.0f));
 			dVector p2((x + 1) * cellSize, elevationMap[z + 1][x + 1], (z + 1) * cellSize, dFloat32(0.0f));
@@ -1349,9 +1348,9 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	dFloat32* const normal = m_normal;
 	dFloat32* const uv = m_uv;
 
-	int index0 = 0;
-	for (int z = 0; z < size; z++) {
-		for (int x = 0; x < size; x++) {
+	dInt32 index0 = 0;
+	for (dInt32 z = 0; z < size; z++) {
+		for (dInt32 x = 0; x < size; x++) {
 			vertex[index0 * 3 + 0] = x * cellSize;
 			vertex[index0 * 3 + 1] = elevationMap[z][x];
 			vertex[index0 * 3 + 2] = z * cellSize;
@@ -1366,11 +1365,11 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 		}
 	}
 
-	int segmentsCount = (size - 1) / tileSize;
-	for (int z0 = 0; z0 < segmentsCount; z0++) {
-		int z = z0 * tileSize;
-		for (int x0 = 0; x0 < segmentsCount; x0++) {
-			int x = x0 * tileSize;
+	dInt32 segmentsCount = (size - 1) / tileSize;
+	for (dInt32 z0 = 0; z0 < segmentsCount; z0++) {
+		dInt32 z = z0 * tileSize;
+		for (dInt32 x0 = 0; x0 < segmentsCount; x0++) {
+			dInt32 x = x0 * tileSize;
 
 			ndDemoSubMesh* const tile = AddSubMesh();
 			tile->AllocIndexData(tileSize * tileSize * 6);
@@ -1380,15 +1379,15 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 			tile->m_textureName = "grassanddirt.tga";
 			tile->m_textureHandle = LoadTexture(tile->m_textureName.GetStr());
 
-			int index1 = 0;
-			int x1 = x + tileSize;
-			int z1 = z + tileSize;
-			for (int z2 = z; z2 < z1; z2++) {
-				for (int x2 = x; x2 < x1; x2++) {
-					int i0 = x2 + 0 + (z2 + 0) * size;
-					int i1 = x2 + 1 + (z2 + 0) * size;
-					int i2 = x2 + 1 + (z2 + 1) * size;
-					int i3 = x2 + 0 + (z2 + 1) * size;
+			dInt32 index1 = 0;
+			dInt32 x1 = x + tileSize;
+			dInt32 z1 = z + tileSize;
+			for (dInt32 z2 = z; z2 < z1; z2++) {
+				for (dInt32 x2 = x; x2 < x1; x2++) {
+					dInt32 i0 = x2 + 0 + (z2 + 0) * size;
+					dInt32 i1 = x2 + 1 + (z2 + 0) * size;
+					dInt32 i2 = x2 + 1 + (z2 + 1) * size;
+					dInt32 i3 = x2 + 0 + (z2 + 1) * size;
 
 					indexes[index1 + 0] = i0;
 					indexes[index1 + 1] = i2;
@@ -1432,15 +1431,6 @@ void ndDemoMesh::OptimizeForRender(const dArray<ndMeshPointUV>& points, const dA
 		}
 	}
 
-	//bool isOpaque = false;
-	//bool hasTranparency = false;
-	//for (dListNode* node = GetFirst(); node; node = node->GetNext())
-	//{
-	//	ndDemoSubMesh& segment = node->GetInfo();
-	//	isOpaque |= segment.m_opacity > 0.999f;
-	//	hasTranparency |= segment.m_opacity <= 0.999f;
-	//}
-
 	glGenVertexArrays(1, &m_vetextArrayBuffer);
 	glBindVertexArray(m_vetextArrayBuffer);
 
@@ -1476,6 +1466,11 @@ void ndDemoMesh::OptimizeForRender(const dArray<ndMeshPointUV>& points, const dA
 	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
 	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
 	m_directionalLightDirLocation = glGetUniformLocation(m_shader, "directionalLightDir");
+
+	m_materialAmbientLocation = glGetUniformLocation(m_shader, "material_ambient");
+	m_materialDiffuseLocation = glGetUniformLocation(m_shader, "material_diffuse");
+	m_materialSpecularLocation = glGetUniformLocation(m_shader, "material_specular");
+
 	glUseProgram(0);
 
 	m_vertexCount = points.GetCount();
@@ -1550,12 +1545,16 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 				ndDemoSubMesh& segment = node->GetInfo();
 				if (!segment.m_hasTranparency)
 				{
-					glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_material.m_specular.m_x);
-					glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_material.m_ambient.m_x);
-					glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_material.m_diffuse.m_x);
-					glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_material.m_shiness));
-					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+					//glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_material.m_specular.m_x);
+					//glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_material.m_ambient.m_x);
+					//glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_material.m_diffuse.m_x);
+					//glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_material.m_shiness));
 
+					glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient.m_x);
+					glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse.m_x);
+					glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular.m_x);
+
+					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 					glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
 					glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)segment.m_segmentStart);
 				}

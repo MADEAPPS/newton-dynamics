@@ -144,6 +144,10 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	dInt32 m_viewModelMatrixLocation;
 	dInt32 m_directionalLightDirLocation;
 
+	dInt32 m_materialAmbientLocation;
+	dInt32 m_materialDiffuseLocation;
+	dInt32 m_materialSpecularLocation;
+
 	GLuint m_shader;
 	GLuint m_indexBuffer;
 	GLuint m_vertexBuffer;
