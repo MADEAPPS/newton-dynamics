@@ -245,14 +245,19 @@ static Matrix getRotationMatrix(const Vec3& euler, RotationOrder order)
 	{
 		//case RotationOrder::EULER_XYZ: return rz * ry * rx;
 		case RotationOrder::EULER_XYZ: return rx * ry * rz;
-		//case RotationOrder::EULER_XZY: return ry * rz * rx;
-		//case RotationOrder::EULER_YXZ: return rz * rx * ry;
-		//case RotationOrder::EULER_YZX: return rx * rz * ry;
-		//case RotationOrder::EULER_ZXY: return ry * rx * rz;
 		//case RotationOrder::EULER_ZYX: return rx * ry * rz;
 		case RotationOrder::EULER_ZYX: return rz * ry * rx;
-		//case RotationOrder::SPHERIC_XYZ: assert(false); Error::s_message = "Unsupported rotation order."; return rx * ry * rz;
+		//case RotationOrder::EULER_XZY: return ry * rz * rx;
+		case RotationOrder::EULER_XZY: return rx * rz * ry;
+		//case RotationOrder::EULER_YXZ: return rz * rx * ry;
+		case RotationOrder::EULER_YXZ: return ry * rx * rz;
+		//case RotationOrder::EULER_YZX: return rx * rz * ry;
+		case RotationOrder::EULER_YZX: return ry * rz * rx;
+		//case RotationOrder::EULER_ZXY: return ry * rx * rz;
+		case RotationOrder::EULER_ZXY: return rz * rx * ry;
+		case RotationOrder::SPHERIC_XYZ: assert(false); Error::s_message = "Unsupported rotation order."; return rx * ry * rz;
 		default:;
+			return rx * ry * rz;
 			assert(false);
 	}
 }
@@ -3489,7 +3494,8 @@ Matrix Object::getGlobalTransform() const
 	const Object* parent = getParent();
 	if (!parent) return evalLocal(getLocalTranslation(), getLocalRotation());
 
-	return parent->getGlobalTransform() * evalLocal(getLocalTranslation(), getLocalRotation());
+	//return parent->getGlobalTransform() * evalLocal(getLocalTranslation(), getLocalRotation());
+	return evalLocal(getLocalTranslation(), getLocalRotation()) * parent->getGlobalTransform();
 }
 
 

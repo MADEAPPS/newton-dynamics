@@ -356,29 +356,6 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 
 	const ofbx::Geometry* const geom = fbxMesh->getGeometry();
 
-	//int faceCount = fbxMesh->GetPolygonCount();
-	//int indexCount = 0;
-	//for (int i = 0; i < faceCount; i++) 
-	//{
-	//	indexCount += fbxMesh->GetPolygonSize(i);
-	//}
-
-	//dInt32* const faceIndexList = new dInt32[faceCount];
-	//dInt32* const materialIndex = new dInt32[faceCount];
-	//dInt32* const vertexIndex = new dInt32[indexCount];
-	//dInt32* const normalIndex = new dInt32[indexCount];
-	//dInt32* const uv0Index = new dInt32[indexCount];
-	//dInt32* const uv1Index = new dInt32[indexCount];
-	//dVector* const normalArray = new dVector[indexCount];
-	//dVector* const uv0Array = new dVector[indexCount];
-	//dVector* const uv1Array = new dVector[indexCount];
-	//
-	//const FbxVector4* const controlPoints = fbxMesh->GetControlPoints();
-	//for (int i = 0; i < fbxMesh->GetControlPointsCount(); i++) {
-	//	const FbxVector4& p = controlPoints[i];
-	//	vertexArray[i] = dVector(dFloat(p[0]), dFloat(p[1]), dFloat(p[2]), 0.0f);
-	//}
-
 	const ofbx::Vec3* const vertices = geom->getVertices();
 	dInt32 indexCount = geom->getIndexCount();
 	dInt32* const indexArray = new dInt32 [indexCount];
@@ -436,20 +413,20 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 	}
 
 	dArray<dVector> uvArray;
+	uvArray.SetCount(indexCount);
+	memset(&uvArray[0].m_x, 0, indexCount * sizeof(dVector));
 	if (geom->getUVs())
 	{
-		uvArray.SetCount(indexCount);
 		const ofbx::Vec2* const uv = geom->getUVs();
 		for (dInt32 i = 0; i < indexCount; ++i)
 		{
 			ofbx::Vec2 n = uv[i];
 			uvArray[i] = dVector(dFloat32(n.x), dFloat32(n.y), dFloat32(0.0f), dFloat32(0.0f));
 		}
-
-		format.m_uv0.m_data = &uvArray[0].m_x;
-		format.m_uv0.m_indexList = indexArray;
-		format.m_uv0.m_strideInBytes = sizeof(dVector);
 	}
+	format.m_uv0.m_data = &uvArray[0].m_x;
+	format.m_uv0.m_indexList = indexArray;
+	format.m_uv0.m_strideInBytes = sizeof(dVector);
 
 	//FbxGeometryElementUV* const uvArray = fbxMesh->GetElementUV();
 	//FbxLayerElement::EMappingMode uvMapingMode = uvArray ? uvArray->GetMappingMode() : FbxGeometryElement::eNone;
