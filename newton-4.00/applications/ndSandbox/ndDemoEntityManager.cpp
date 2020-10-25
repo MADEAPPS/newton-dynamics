@@ -783,8 +783,7 @@ void ndDemoEntityManager::LoadDemo(int menu)
 	Cleanup();
 
 	// make the sky box 
-	//m_world->Sync();
-//	CreateSkyBox();
+	CreateSkyBox();
 	m_demosSelection[menu].m_launchDemoCallback(this);
 	sprintf(newTitle, "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_name);
 	glfwSetWindowTitle(m_mainFrame, newTitle);

@@ -1558,6 +1558,8 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 			glDisableVertexAttribArray(0);
 			glBindVertexArray(0);
 			glUseProgram(0);
+
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 	}
 }
