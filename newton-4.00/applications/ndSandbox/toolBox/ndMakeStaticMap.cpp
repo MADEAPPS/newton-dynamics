@@ -407,7 +407,6 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 			count = 0;
 			index++;
 		}
-			
 	}
 
 	dMeshEffect::dMeshVertexFormat format;
@@ -419,6 +418,38 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 	format.m_faceCount = faceCount;
 	format.m_faceIndexCount = faceIndexArray;
 	format.m_faceMaterial = faceMaterialArray;
+	
+	dArray<dVector> normalArray;
+	if (geom->getNormals())
+	{
+		normalArray.SetCount(indexCount);
+		const ofbx::Vec3* const normals = geom->getNormals();
+		for (dInt32 i = 0; i < indexCount; ++i)
+		{
+			ofbx::Vec3 n = normals[i];
+			normalArray[i] = dVector(dFloat32(n.x), dFloat32(n.y), dFloat32(n.z), dFloat32(0.0f));
+		}
+
+		format.m_normal.m_data = &normalArray[0].m_x;
+		format.m_normal.m_indexList = indexArray;
+		format.m_normal.m_strideInBytes = sizeof(dVector);
+	}
+
+	dArray<dVector> uvArray;
+	if (geom->getUVs())
+	{
+		uvArray.SetCount(indexCount);
+		const ofbx::Vec2* const uv = geom->getUVs();
+		for (dInt32 i = 0; i < indexCount; ++i)
+		{
+			ofbx::Vec2 n = uv[i];
+			uvArray[i] = dVector(dFloat32(n.x), dFloat32(n.y), dFloat32(0.0f), dFloat32(0.0f));
+		}
+
+		format.m_uv0.m_data = &uvArray[0].m_x;
+		format.m_uv0.m_indexList = indexArray;
+		format.m_uv0.m_strideInBytes = sizeof(dVector);
+	}
 
 	//FbxGeometryElementUV* const uvArray = fbxMesh->GetElementUV();
 	//FbxLayerElement::EMappingMode uvMapingMode = uvArray ? uvArray->GetMappingMode() : FbxGeometryElement::eNone;
@@ -472,23 +503,6 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 	//		dAssert(index <= indexCount);
 	//	}
 	//}
-	//format.m_vertex.m_data = &vertexArray[0].m_x;
-	//format.m_vertex.m_indexList = vertexIndex;
-	//format.m_vertex.m_strideInBytes = sizeof(dBigVector);
-	//
-	//format.m_normal.m_data = &normalArray[0].m_x;
-	//format.m_normal.m_indexList = vertexIndex;
-	//format.m_normal.m_strideInBytes = sizeof(dVector);
-	//
-	//format.m_uv0.m_data = &uv0Array[0].m_x;
-	//format.m_uv0.m_indexList = uv0Index;
-	//format.m_uv0.m_strideInBytes = sizeof(dVector);
-	//
-	////instance->BuildFromVertexListIndexList(faceCount, faceIndexList, materialIndex,
-	////&vertexArray[0].m_x, sizeof (dVector), vertexIndex,
-	////&normalArray[0].m_x, sizeof (dVector), normalIndex,
-	////&uv0Array[0].m_x, sizeof (dVector), uv0Index,
-	////&uv1Array[0].m_x, sizeof (dVector), uv1Index);
 
 	mesh->BuildFromIndexList(&format);
 	mesh->RepairTJoints();
@@ -660,7 +674,6 @@ static void BakeScale(fbxDemoEntity* const entity)
 	dInt32 stack = 1;
 	fbxDemoEntity* entBuffer[1024];
 	entBuffer[0] = entity;
-//	dMatrix invCordinateSystem(cordinateSystem.Inverse4x4());
 	dMatrix scaleMatrix(dGetIdentityMatrix());
 	while (stack)
 	{
@@ -771,8 +784,6 @@ fbxDemoEntity* LoadFbxMesh(ndDemoEntityManager* const scene, const char* const m
 ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName)
 {
 	fbxDemoEntity* const entity_ = LoadFbxMesh(scene, "flatPlane.fbx");
-	//entity_->CleanIntermidiate();
-	//delete entity_;
 	scene->AddEntity(entity_);
 
 	//ndPhysicsWorld* const world = scene->GetWorld();

@@ -1504,6 +1504,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 
 		if (!hasTrasnparency)
 		{
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glUseProgram(m_shader);
 
 			ndDemoCamera* const camera = scene->GetCamera();
