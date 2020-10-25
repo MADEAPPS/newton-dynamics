@@ -182,14 +182,15 @@ static dMatrix GetCodinateSystemMatrix(ofbx::IScene* const fbxScene)
 	}
 	else if (globalSettings->UpAxis == ofbx::UpVector_AxisY) 
 	{
-		dAssert(0);
-	//	upVector = dVector(0.0f, 1.0f * sign, 0.0f, 0.0f);
-	//	if (axisSystem.GetFrontVector(sign) == FbxAxisSystem::eParityEven) {
-	//		frontVector = dVector(1.0f * sign, 0.0f, 0.0f, 0.0f);
-	//	}
-	//	else {
-	//		frontVector = dVector(0.0f, 0.0f, 1.0f * sign, 0.0f);
-	//	}
+		upVector = dVector(0.0f, 1.0f, 0.0f, 0.0f);
+		if (globalSettings->FrontAxis == ofbx::FrontVector_ParityEven)
+		{
+			frontVector = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+		}
+		else 
+		{
+			frontVector = dVector(0.0f, 0.0f, 1.0f, 0.0f);
+		}
 	}
 	else 
 	{

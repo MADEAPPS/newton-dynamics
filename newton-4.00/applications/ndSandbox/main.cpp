@@ -16,6 +16,7 @@
 static void* PhysicsAlloc(size_t sizeInBytes)
 {
 	void* const ptr = malloc(sizeInBytes);
+	dAssert(ptr);
 	return ptr;
 }
 
