@@ -141,22 +141,6 @@ static void showObjectGUI(const ofbx::Object& object)
 	}
 }
 
-static void showObjectsGUI(const ofbx::IScene& scene)
-{
-	const ofbx::Object* root = scene.getRoot();
-	if (root)
-	{
-		showObjectGUI(*root);
-	}
-
-	int count = scene.getAnimationStackCount();
-	for (int i = 0; i < count; ++i)
-	{
-		const ofbx::Object* stack = scene.getAnimationStack(i);
-		showObjectGUI(*stack);
-	}
-}
-
 static dMatrix GetCodinateSystemMatrix(ofbx::IScene* const fbxScene)
 {
 	const ofbx::GlobalSettings* const globalSettings = fbxScene->getGlobalSettings();
