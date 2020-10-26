@@ -57,11 +57,6 @@ class dPolygonSoupBuilder: public dClassAlloc
 
 	D_CORE_API void Begin();
 	D_CORE_API void End(bool optimize);
-	//D_CORE_API void AddMesh (const dFloat32* const vertex, dInt32 vertexCount, 
-	//						 dInt32 strideInBytes, dInt32 faceCount,
-	//						 const dInt32* const faceArray, const dInt32* const indexArray, 
-	//						 const dInt32* const faceTagsData, const dMatrix& worldMatrix); 
-
 	D_CORE_API void AddFace(const dFloat32* const vertex, dInt32 strideInBytes, dInt32 vertexCount, const dInt32 faceId);
 	D_CORE_API void AddFaceIndirect(const dFloat32* const vertex, dInt32 strideInBytes, dInt32 faceId, const dInt32* const indexArray, dInt32 indexCount);
 

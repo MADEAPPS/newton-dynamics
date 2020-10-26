@@ -393,11 +393,10 @@ D_CORE_API void dPolygonSoupBuilder::AddFaceIndirect(const dFloat32* const verte
 		m_faceVertexCount.PushBack(count1);
 	}
 
-	m_run -= vertexCount;
+	m_run -= indexCount;
 	if (m_run <= 0)
 	{
-		dAssert(0);
-//		PackArray();
+		PackArray();
 	}
 }
 
@@ -415,13 +414,12 @@ D_CORE_API void dPolygonSoupBuilder::AddFace(const dFloat32* const vertex, dInt3
 void dPolygonSoupBuilder::PackArray()
 {
 	dAssert(0);
-/*
-	dStack<dInt32> indexMapPool (m_vertexCount);
+	dStack<dInt32> indexMapPool (m_vertexPoints.GetCount());
 	dInt32* const indexMap = &indexMapPool[0];
-	m_vertexCount = dVertexListToIndexList (&m_vertexPoints[0].m_x, sizeof (dBigVector), 3, m_vertexCount, &indexMap[0], dFloat32 (1.0e-6f));
+	dInt32 vertexCount = dVertexListToIndexList (&m_vertexPoints[0].m_x, sizeof (dBigVector), 3, m_vertexPoints.GetCount(), &indexMap[0], dFloat32 (1.0e-6f));
 
 	dInt32 k = 0;
-	for (dInt32 i = 0; i < m_faceCount; i ++) 
+	for (dInt32 i = 0; i < m_faceVertexCount.GetCount(); i ++)
 	{
 		dInt32 count = m_faceVertexCount[i] - 1;
 		for (dInt32 j = 0; j < count; j ++) 
@@ -433,8 +431,8 @@ void dPolygonSoupBuilder::PackArray()
 		}
 		k ++;
 	}
+	m_vertexPoints.SetCount(vertexCount);
 	m_run = DG_POINTS_RUN;
-*/
 }
 
 void dPolygonSoupBuilder::Finalize()
