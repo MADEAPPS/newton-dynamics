@@ -243,22 +243,16 @@ static Matrix getRotationMatrix(const Vec3& euler, RotationOrder order)
 	Matrix rz = rotationZ(euler.z * TO_RAD);
 	switch (order)
 	{
-		//case RotationOrder::EULER_XYZ: return rz * ry * rx;
 		case RotationOrder::EULER_XYZ: return rx * ry * rz;
-		//case RotationOrder::EULER_ZYX: return rx * ry * rz;
 		case RotationOrder::EULER_ZYX: return rz * ry * rx;
-		//case RotationOrder::EULER_XZY: return ry * rz * rx;
 		case RotationOrder::EULER_XZY: return rx * rz * ry;
-		//case RotationOrder::EULER_YXZ: return rz * rx * ry;
 		case RotationOrder::EULER_YXZ: return ry * rx * rz;
-		//case RotationOrder::EULER_YZX: return rx * rz * ry;
 		case RotationOrder::EULER_YZX: return ry * rz * rx;
-		//case RotationOrder::EULER_ZXY: return ry * rx * rz;
 		case RotationOrder::EULER_ZXY: return rz * rx * ry;
 		case RotationOrder::SPHERIC_XYZ: assert(false); Error::s_message = "Unsupported rotation order."; return rx * ry * rz;
 		default:;
-			return rx * ry * rz;
 			assert(false);
+			return rx * ry * rz;
 	}
 }
 
