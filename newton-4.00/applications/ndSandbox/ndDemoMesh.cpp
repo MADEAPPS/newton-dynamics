@@ -21,11 +21,11 @@ ndDemoSubMeshMaterial::ndDemoSubMeshMaterial()
 	:m_ambient(0.8f, 0.8f, 0.8f, 1.0f)
 	,m_diffuse(0.8f, 0.8f, 0.8f, 1.0f)
 	,m_specular(1.0f, 1.0f, 1.0f, 1.0f)
-	,m_textureName()
 	,m_opacity(1.0f)
 	,m_shiness(100.0f)
 	,m_textureHandle(0)
 {
+	m_textureName[0] = 0;
 }
 
 ndDemoSubMeshMaterial::~ndDemoSubMeshMaterial()
@@ -1224,7 +1224,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 	OptimizeForRender(points, indices);
 }
 
-ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, const ndShaderPrograms& shaderCache, const ndDemoSubMeshMaterial* const materialArray)
+ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, const ndShaderPrograms& shaderCache)
 	:ndDemoMeshInterface()
 	,dList<ndDemoSubMesh>()
 	,m_indexCount(0)
@@ -1261,19 +1261,26 @@ ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, cons
 
 	dInt32 segmentStart = 0;
 	bool hasTransparency = false;
+	const dArray<dMeshEffect::dMaterial>& materialArray = meshNode->GetMaterials();
 	for (dInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
 	{
 		dInt32 materialIndex = meshNode->GetMaterialID(geometryHandle, handle);
 		ndDemoSubMesh* const segment = AddSubMesh();
-
-		const ndDemoSubMeshMaterial& material = materialArray[materialIndex];
-		segment->m_material = material;
-		segment->m_material.m_textureHandle = (GLuint)material.m_textureHandle;
+		
+		const dMeshEffect::dMaterial& material = materialArray[materialIndex];
+		segment->m_material.m_ambient = material.m_ambient;
+		segment->m_material.m_diffuse = material.m_diffuse;
+		segment->m_material.m_specular = material.m_specular;
+		segment->m_material.m_opacity = material.m_opacity;
+		segment->m_material.m_shiness = material.m_shiness;
+		strcpy(segment->m_material.m_textureName, material.m_textureName);
+		//segment->m_material.m_textureHandle = (GLuint)material.m_textureHandle;
+		segment->m_material.m_textureHandle = LoadTexture(material.m_textureName);
 		segment->SetOpacity(material.m_opacity);
 		hasTransparency = hasTransparency | segment->m_hasTranparency;
-
+		
 		segment->m_indexCount = meshNode->GetMaterialIndexCount(geometryHandle, handle);
-
+		
 		segment->m_segmentStart = segmentStart;
 		meshNode->GetMaterialGetIndexStream(geometryHandle, handle, (dInt32*)&indices[segmentStart]);
 		segmentStart += segment->m_indexCount;

@@ -142,7 +142,6 @@ inline const dString& dNodeBaseHierarchy::GetName() const
 	return m_name;
 }
 
-
 template<class T>
 dNodeHierarchy<T>::dNodeHierarchy ()
 	:dNodeBaseHierarchy ()

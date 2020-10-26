@@ -15,7 +15,8 @@
 
 ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName)
 {
-	fbxDemoEntity* const entity = LoadFbxMesh(scene, meshName);
+	fbxDemoEntity* const entity = LoadFbxMesh(meshName);
+	entity->BuildRenderMeshes(scene);
 	scene->AddEntity(entity);
 
 	//ndPhysicsWorld* const world = scene->GetWorld();

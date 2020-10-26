@@ -29,11 +29,12 @@ class fbxDemoEntity : public ndDemoEntity
 	}
 
 	void CleanIntermediate();
+	void BuildRenderMeshes(ndDemoEntityManager* const scene);
 	void ApplyTransform(const dMatrix& cordinateSystem);
 
 	dMeshEffect* m_fbxMeshEffect;
 };
 
-fbxDemoEntity* LoadFbxMesh(ndDemoEntityManager* const scene, const char* const meshName);
+fbxDemoEntity* LoadFbxMesh(const char* const meshName);
 
 #endif

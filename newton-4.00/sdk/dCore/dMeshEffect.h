@@ -384,6 +384,28 @@ class dMeshEffect: public dPolyhedra
 	};
 
 	public:
+	D_MSV_NEWTON_ALIGN_16
+	class dMaterial
+	{
+		public:
+		dMaterial()
+			:m_ambient(dFloat32(0.8f), dFloat32(0.8f), dFloat32(0.8f), dFloat32(1.0f))
+			,m_diffuse(dFloat32(0.8f), dFloat32(0.8f), dFloat32(0.8f), dFloat32(1.0f))
+			,m_specular(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f))
+			,m_opacity(dFloat32(1.0f))
+			,m_shiness(dFloat32 (60.0f))
+		{
+			m_textureName[0] = 0;
+		}
+
+		dVector m_ambient;
+		dVector m_diffuse;
+		dVector m_specular;
+		dFloat32 m_opacity;
+		dFloat32 m_shiness;
+		char m_textureName[32];
+	}D_GCC_NEWTON_ALIGN_16;
+
 	class dMeshVertexFormat
 	{
 		public:
@@ -423,19 +445,20 @@ class dMeshEffect: public dPolyhedra
 		dFloatData m_uv1;
 		dFloatData m_vertexColor;
 	};
-
 	
 	D_CORE_API dMeshEffect();
 	D_CORE_API virtual ~dMeshEffect();
 
-	D_CORE_API void SetName (const dString& name);
-	D_CORE_API const dString& GetName() const;
+	void SetName (const dString& name);
+	const dString& GetName() const;
+
+	dArray<dMaterial>& GetMaterials();
+	dInt32 GetPropertiesCount() const;
 
 	D_CORE_API void ApplyTransform(const dMatrix& matrix);
 	D_CORE_API void CalculateNormals(dFloat64 angleInRadians);
 	D_CORE_API void BuildFromIndexList(const dMeshVertexFormat* const format);
-
-	dInt32 GetPropertiesCount() const;
+	
 	D_CORE_API void GetVertexChannel64(dInt32 strideInByte, dFloat64* const bufferOut) const;
 	D_CORE_API void GetVertexChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
 	D_CORE_API void GetNormalChannel(dInt32 strideInByte, dFloat32* const bufferOut) const;
@@ -488,6 +511,7 @@ class dMeshEffect: public dPolyhedra
 	dString m_name;
 	dPointFormat m_points;
 	dAttibutFormat m_attrib;
+	dArray<dMaterial> m_materials;
 	dInt32 m_vertexBaseCount;
 	dInt32 m_constructionIndex;
 };
@@ -696,5 +720,9 @@ inline const dString& dMeshEffect::GetName() const
 	return m_name;
 }
 
+inline dArray<dMeshEffect::dMaterial>& dMeshEffect::GetMaterials()
+{
+	return m_materials;
+}
 
 #endif

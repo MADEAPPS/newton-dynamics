@@ -452,7 +452,7 @@ class dVector
 	D_CORE_API static dVector m_epsilon;
 	D_CORE_API static dVector m_signMask;
 	D_CORE_API static dVector m_triplexMask;
-} D_GCC_NEWTON_ALIGN_32 ;
+} D_GCC_NEWTON_ALIGN_16 ;
 #endif
 
 
