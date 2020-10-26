@@ -153,11 +153,6 @@ class dMeshEffect: public dPolyhedra
 	void Triangulate ();
 	void ConvertToPolygons ();
 	void RemoveUnusedVertices(dInt32* const vertexRemapTable);
-	
-
-	dInt32 GetVertexCount() const;
-	dInt32 GetVertexStrideInByte() const;
-	const dFloat64* GetVertexPool () const;
 
 	dInt32 GetVertexBaseCount() const;
 	void SetVertexBaseCount(dInt32 count);
@@ -455,6 +450,10 @@ class dMeshEffect: public dPolyhedra
 	dArray<dMaterial>& GetMaterials();
 	dInt32 GetPropertiesCount() const;
 
+	dInt32 GetVertexCount() const;
+	dInt32 GetVertexStrideInByte() const;
+	const dFloat64* GetVertexPool() const;
+
 	D_CORE_API void ApplyTransform(const dMatrix& matrix);
 	D_CORE_API void CalculateNormals(dFloat64 angleInRadians);
 	D_CORE_API void BuildFromIndexList(const dMeshVertexFormat* const format);
@@ -517,10 +516,6 @@ class dMeshEffect: public dPolyhedra
 };
 
 #if 0
-inline dInt32 dMeshEffect::GetVertexCount() const
-{
-	return m_points.m_vertex.m_count;
-}
 
 inline dInt32 dMeshEffect::GetVertexBaseCount() const
 {
@@ -555,17 +550,6 @@ inline dInt32 dMeshEffect::GetVertexLayer(dInt32 index) const
 	dAssert(index >= 0);
 	dAssert(index < m_points.m_vertex.m_count);
 	return (m_points.m_layers.m_count) ? m_points.m_layers[index] : 0;
-}
-
-
-inline dInt32 dMeshEffect::GetVertexStrideInByte() const 
-{
-	return sizeof (dBigVector);
-}
-
-inline const dFloat64* dMeshEffect::GetVertexPool () const 
-{
-	return &m_points.m_vertex[0].m_x;
 }
 
 inline dMeshEffect* dMeshEffect::GetFirstLayer ()
@@ -724,5 +708,22 @@ inline dArray<dMeshEffect::dMaterial>& dMeshEffect::GetMaterials()
 {
 	return m_materials;
 }
+
+inline dInt32 dMeshEffect::GetVertexCount() const
+{
+	return m_points.m_vertex.GetCount();
+}
+
+inline dInt32 dMeshEffect::GetVertexStrideInByte() const
+{
+	return sizeof(dBigVector);
+}
+
+inline const dFloat64* dMeshEffect::GetVertexPool() const
+{
+	return &m_points.m_vertex[0].m_x;
+}
+
+
 
 #endif
