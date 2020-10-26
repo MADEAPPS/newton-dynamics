@@ -84,6 +84,10 @@ void fbxDemoEntity::ApplyTransform(const dMatrix& transform)
 		dMatrix entMatrix(invTransform * ent->GetRenderMatrix() * transform);
 		ent->SetRenderMatrix(entMatrix);
 
+		dQuaternion rot(entMatrix);
+		ent->SetMatrixUsafe(rot, entMatrix.m_posit);
+		ent->SetMatrixUsafe(rot, entMatrix.m_posit);
+
 		if (ent->m_fbxMeshEffect)
 		{
 			dMatrix meshMatrix(invTransform * ent->GetMeshMatrix() * transform);
@@ -406,12 +410,8 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 			}
 			else
 			{
-				dAssert(0);
-				//dInt32 fbxMatIndex = geom->getMaterials()[faceIndex];
-				//const ofbx::Material* const fbxMaterial = fbxMesh->getMaterial(fbxMatIndex);
-				//dAssert (materialCache.Find(fbxMaterial));
-				//fbxDemoSubMeshMaterial& material = materialCache.Find(fbxMaterial)->GetInfo();
-				//faceMaterialArray[faceIndex] = material.m_index;
+				dInt32 fbxMatIndex = geom->getMaterials()[faceIndex];
+				faceMaterialArray[faceIndex] = fbxMatIndex;
 			}
 			count = 0;
 			faceIndex++;

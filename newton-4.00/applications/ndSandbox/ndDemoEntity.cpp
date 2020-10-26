@@ -255,7 +255,8 @@ void ndDemoEntity::SetMatrixUsafe(const dQuaternion& rotation, const dVector& po
 	m_nextRotation = rotation;
 
 	dFloat32 angle = m_curRotation.DotProduct(m_nextRotation);
-	if (angle < 0.0f) {
+	if (angle < 0.0f) 
+	{
 		m_curRotation.Scale(-1.0f);
 	}
 }
