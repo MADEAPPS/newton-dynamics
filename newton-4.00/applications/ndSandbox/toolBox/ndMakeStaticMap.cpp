@@ -318,7 +318,6 @@ static dInt32 ImportMaterials(const ofbx::Mesh* const fbxMesh, fbxGlobalMaterial
 	return materialId;
 }
 
-//static void ImportMeshNode(FbxScene* const fbxScene, dPluginScene* const ngdScene, FbxNode* const fbxMeshNode, dPluginScene::dTreeNode* const node, GlobalMeshMap& meshCache, GlobalMaterialMap& materialCache, GlobalTextureMap& textureCache, UsedMaterials& usedMaterials, GlobalNoceMap& nodeMap)
 static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMap, fbxGlobalMaterialMap& materialCache)
 {
 	const ofbx::Mesh* const fbxMesh = (ofbx::Mesh*)fbxNode;
@@ -422,7 +421,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 	format.m_uv0.m_strideInBytes = sizeof(dVector);
 
 	mesh->BuildFromIndexList(&format);
-	mesh->RepairTJoints();
+	//mesh->RepairTJoints();
 
 	// import skin if there is any
 	//int deformerCount = fbxMesh->GetDeformerCount(FbxDeformer::eSkin);
@@ -689,12 +688,15 @@ fbxDemoEntity* LoadFbxMesh(ndDemoEntityManager* const scene, const char* const m
 
 	for (fbxDemoEntity* child = (fbxDemoEntity*)entity->GetFirst(); child; child = (fbxDemoEntity*)child->GetNext())
 	{
+//if (child->GetName() == "bucket")
+//child->ResetMatrix(*scene, child->GetRenderMatrix());
+
 		child->ResetMatrix(*scene, child->GetRenderMatrix());
 		if (child->m_fbxMeshEffect)
 		{
 			if (child->GetName().Find("hidden"))
 			{
-				ndDemoMesh* const mesh = new ndDemoMesh("fbxMesh", child->m_fbxMeshEffect, scene->GetShaderCache(), materials);
+				ndDemoMesh* const mesh = new ndDemoMesh(child->GetName().GetStr(), child->m_fbxMeshEffect, scene->GetShaderCache(), materials);
 				child->SetMesh(mesh, child->GetMeshMatrix());
 				mesh->Release();
 			}

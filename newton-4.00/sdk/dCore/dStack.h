@@ -77,7 +77,7 @@ dStack<T>::~dStack ()
 template<class T>
 dInt32 dStack<T>::GetElementsCount() const
 {
-	return m_size;
+	return dInt32 (m_size);
 }
 
 template<class T>
