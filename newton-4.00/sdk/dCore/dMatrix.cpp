@@ -666,8 +666,9 @@ dVector dMatrix::EigenVectors ()
 		{
 			for (dInt32 k = 0; k < 3; k++) 
 			{
-				dFloat32 error = originalMatrix[j][k] - tempMatrix[j][k];
-				dAssert((error * error) < dFloat32(1.0e-4f));
+				//dFloat32 error = originalMatrix[j][k] - tempMatrix[j][k];
+				//dAssert((error * error) < dFloat32(1.0e-4f));
+				dAssert(dAreEqual(originalMatrix[j][k], tempMatrix[j][k], dFloat32(1.0e-4f)));
 			}
 		}
 	#endif

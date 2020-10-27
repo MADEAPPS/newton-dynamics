@@ -1423,20 +1423,20 @@ void ndDemoMesh::OptimizeForRender(const dArray<ndMeshPointUV>& points, const dA
 	// first make sure the previous optimization is removed
 	ResetOptimization();
 
-	if (indices.GetCount() > 128 * 128 * 6)
-	{
-		dAssert(0);
-		dListNode* nextNode;
-		for (dListNode* node = GetFirst(); node; node = nextNode)
-		{
-			ndDemoSubMesh& segment = node->GetInfo();
-			nextNode = node->GetNext();
-			if (segment.m_indexCount > 128 * 128 * 6)
-			{
-				SpliteSegment(node, 128 * 128 * 6);
-			}
-		}
-	}
+	//if (indices.GetCount() > 128 * 128 * 6)
+	//{
+	//	dAssert(0);
+	//	dListNode* nextNode;
+	//	for (dListNode* node = GetFirst(); node; node = nextNode)
+	//	{
+	//		ndDemoSubMesh& segment = node->GetInfo();
+	//		nextNode = node->GetNext();
+	//		if (segment.m_indexCount > 128 * 128 * 6)
+	//		{
+	//			SpliteSegment(node, 128 * 128 * 6);
+	//		}
+	//	}
+	//}
 
 	glGenVertexArrays(1, &m_vetextArrayBuffer);
 	glBindVertexArray(m_vetextArrayBuffer);

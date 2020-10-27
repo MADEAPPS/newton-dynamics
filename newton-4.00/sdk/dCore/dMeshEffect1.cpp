@@ -3060,64 +3060,63 @@ bool dMeshEffect::EndFace()
 		dAssert(!collisionFound.GetFirst() || Sanity());
 		for (dList<dTreeNode*>::dListNode* node = collisionFound.GetFirst(); node; node = node->GetNext()) 
 		{
-			dAssert(0);
-			//state = true;
-			//dEdge* const edge = &node->GetInfo()->GetInfo();
-			//
-			//// this is a vertex collision
-			//m_points.m_vertex.PushBack(m_points.m_vertex[edge->m_incidentVertex]);
-			//if (m_points.m_layers.m_count) 
-			//{
-			//	m_points.m_layers.PushBack(m_points.m_layers[edge->m_incidentVertex]);
-			//}
-			//
-			//dEdge* ptr = edge;
-			//do 
-			//{
-			//	if (ptr->m_incidentFace > 0) 
-			//	{
-			//		//m_attrib.m_pointChannel[dInt32 (ptr->m_userData)] = m_points.m_vertex.m_count - 1;
-			//		dInt32 index = dInt32(ptr->m_userData);
-			//		m_attrib.m_pointChannel.PushBack(m_points.m_vertex.m_count - 1);
-			//		if (m_attrib.m_materialChannel.m_count) 
-			//		{
-			//			m_attrib.m_materialChannel.PushBack(m_attrib.m_materialChannel[index]);
-			//		}
-			//		if (m_attrib.m_normalChannel.m_count) 
-			//		{
-			//			m_attrib.m_normalChannel.PushBack(m_attrib.m_normalChannel[index]);
-			//		}
-			//		if (m_attrib.m_binormalChannel.m_count) 
-			//		{
-			//			m_attrib.m_binormalChannel.PushBack(m_attrib.m_binormalChannel[index]);
-			//		}
-			//		if (m_attrib.m_colorChannel.m_count) 
-			//		{
-			//			m_attrib.m_colorChannel.PushBack(m_attrib.m_colorChannel[index]);
-			//		}
-			//		if (m_attrib.m_uv0Channel.m_count) 
-			//		{
-			//			m_attrib.m_uv0Channel.PushBack(m_attrib.m_uv0Channel[index]);
-			//		}
-			//		if (m_attrib.m_uv1Channel.m_count) 
-			//		{
-			//			m_attrib.m_uv1Channel.PushBack(m_attrib.m_uv1Channel[index]);
-			//		}
-			//		ptr->m_userData = m_attrib.m_pointChannel.m_count - 1;
-			//	}
-			//
-			//	dTreeNode* const edgeNode = GetNodeFromInfo(*ptr);
-			//	dgPairKey edgeKey(ptr->m_incidentVertex, ptr->m_twin->m_incidentVertex);
-			//	ReplaceKey(edgeNode, edgeKey.GetVal());
-			//
-			//	dTreeNode* const twinNode = GetNodeFromInfo(*(ptr->m_twin));
-			//	dgPairKey twinKey(ptr->m_twin->m_incidentVertex, ptr->m_incidentVertex);
-			//	ReplaceKey(twinNode, twinKey.GetVal());
-			//
-			//	ptr->m_incidentVertex = m_points.m_vertex.m_count - 1;
-			//
-			//	ptr = ptr->m_twin->m_next;
-			//} while (ptr != edge);
+			state = true;
+			dEdge* const edge = &node->GetInfo()->GetInfo();
+			
+			// this is a vertex collision
+			m_points.m_vertex.PushBack(m_points.m_vertex[edge->m_incidentVertex]);
+			if (m_points.m_layers.GetCount()) 
+			{
+				m_points.m_layers.PushBack(m_points.m_layers[edge->m_incidentVertex]);
+			}
+			
+			dEdge* ptr = edge;
+			do 
+			{
+				if (ptr->m_incidentFace > 0) 
+				{
+					//m_attrib.m_pointChannel[dInt32 (ptr->m_userData)] = m_points.m_vertex.m_count - 1;
+					dInt32 index = dInt32(ptr->m_userData);
+					m_attrib.m_pointChannel.PushBack(m_points.m_vertex.GetCount() - 1);
+					if (m_attrib.m_materialChannel.GetCount())
+					{
+						m_attrib.m_materialChannel.PushBack(m_attrib.m_materialChannel[index]);
+					}
+					if (m_attrib.m_normalChannel.GetCount())
+					{
+						m_attrib.m_normalChannel.PushBack(m_attrib.m_normalChannel[index]);
+					}
+					if (m_attrib.m_binormalChannel.GetCount())
+					{
+						m_attrib.m_binormalChannel.PushBack(m_attrib.m_binormalChannel[index]);
+					}
+					if (m_attrib.m_colorChannel.GetCount())
+					{
+						m_attrib.m_colorChannel.PushBack(m_attrib.m_colorChannel[index]);
+					}
+					if (m_attrib.m_uv0Channel.GetCount())
+					{
+						m_attrib.m_uv0Channel.PushBack(m_attrib.m_uv0Channel[index]);
+					}
+					if (m_attrib.m_uv1Channel.GetCount())
+					{
+						m_attrib.m_uv1Channel.PushBack(m_attrib.m_uv1Channel[index]);
+					}
+					ptr->m_userData = m_attrib.m_pointChannel.GetCount() - 1;
+				}
+			
+				dTreeNode* const edgeNode = GetNodeFromInfo(*ptr);
+				dgPairKey edgeKey(ptr->m_incidentVertex, ptr->m_twin->m_incidentVertex);
+				ReplaceKey(edgeNode, edgeKey.GetVal());
+			
+				dTreeNode* const twinNode = GetNodeFromInfo(*(ptr->m_twin));
+				dgPairKey twinKey(ptr->m_twin->m_incidentVertex, ptr->m_incidentVertex);
+				ReplaceKey(twinNode, twinKey.GetVal());
+			
+				ptr->m_incidentVertex = m_points.m_vertex.GetCount() - 1;
+			
+				ptr = ptr->m_twin->m_next;
+			} while (ptr != edge);
 		}
 		dAssert(!collisionFound.GetFirst() || Sanity());
 	}

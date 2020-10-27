@@ -107,17 +107,6 @@ class fbxGlobalNoceMap : public dTree<fbxDemoEntity*, const ofbx::Object*>
 {
 };
 
-class fbxDemoSubMeshMaterial : public ndDemoSubMeshMaterial
-{
-	public: 
-	~fbxDemoSubMeshMaterial()
-	{
-		m_textureHandle = 0;
-	}
-
-	dInt32 m_index;
-};
-
 class fbxImportStackData
 {
 	public:
@@ -125,7 +114,6 @@ class fbxImportStackData
 	{
 	}
 
-	//fbxImportStackData(const dMatrix& parentMatrix, const ofbx::Object* const fbxNode, ndDemoEntity* const parentNode)
 	fbxImportStackData(const ofbx::Object* const fbxNode, ndDemoEntity* const parentNode)
 		:m_fbxNode(fbxNode)
 		,m_parentNode(parentNode)
@@ -136,45 +124,7 @@ class fbxImportStackData
 	ndDemoEntity* m_parentNode;
 };
 
-static void showObjectGUI(const ofbx::Object& object)
-{
-	const char* label;
-	switch (object.getType())
-	{
-		case ofbx::Object::Type::GEOMETRY: label = "geometry"; break;
-		case ofbx::Object::Type::MESH: label = "mesh"; break;
-		case ofbx::Object::Type::MATERIAL: label = "material"; break;
-		case ofbx::Object::Type::ROOT: label = "root"; break;
-		case ofbx::Object::Type::TEXTURE: label = "texture"; break;
-		case ofbx::Object::Type::NULL_NODE: label = "null"; break;
-		case ofbx::Object::Type::LIMB_NODE: label = "limb node"; break;
-		case ofbx::Object::Type::NODE_ATTRIBUTE: label = "node attribute"; break;
-		case ofbx::Object::Type::CLUSTER: label = "cluster"; break;
-		case ofbx::Object::Type::SKIN: label = "skin"; break;
-		case ofbx::Object::Type::ANIMATION_STACK: label = "animation stack"; break;
-		case ofbx::Object::Type::ANIMATION_LAYER: label = "animation layer"; break;
-		case ofbx::Object::Type::ANIMATION_CURVE: label = "animation curve"; break;
-		case ofbx::Object::Type::ANIMATION_CURVE_NODE: label = "animation curve node"; break;
-		default: assert(false); break;
-	}
-
-	//ImGuiTreeNodeFlags flags = g_selected_object == &object ? ImGuiTreeNodeFlags_Selected : 0;
-	char tmp[128];
-	sprintf_s(tmp, "%lld %s (%s)", object.id, object.name, label);
-	int i = 0;
-	while (ofbx::Object* child = object.resolveObjectLink(i))
-	{
-		showObjectGUI(*child);
-		++i;
-	}
-	if (object.getType() == ofbx::Object::Type::ANIMATION_CURVE) 
-	{
-		dAssert(0);
-		//showCurveGUI(object);
-	}
-}
-
-static dMatrix GetCodinateSystemMatrix(ofbx::IScene* const fbxScene)
+static dMatrix GetCoordinateSystemMatrix(ofbx::IScene* const fbxScene)
 {
 	const ofbx::GlobalSettings* const globalSettings = fbxScene->getGlobalSettings();
 
@@ -322,8 +272,6 @@ static void ImportMaterials(const ofbx::Mesh* const fbxMesh, dMeshEffect* const 
 	{
 		for (dInt32 i = 0; i < materialCount; i++)
 		{
-			//dMeshEffect::dMaterial material(GetMaterial(fbxMesh->getMaterial(i)));
-
 			dMeshEffect::dMaterial material;
 			const ofbx::Material* const fbxMaterial = fbxMesh->getMaterial(i);
 			dAssert(fbxMaterial);
@@ -346,13 +294,24 @@ static void ImportMaterials(const ofbx::Mesh* const fbxMesh, dMeshEffect* const 
 				char textName[1024];
 				ofbx::DataView dataView = texture->getRelativeFileName();
 				dataView.toString(textName);
-				strncpy(material.m_textureName, textName, sizeof(material.m_textureName));
-				//meshMaterial.m_textureHandle = LoadTexture(meshMaterial.m_textureName);
+				char* namePtr = strrchr(textName, '\\');
+				if (!namePtr)
+				{
+					namePtr = strrchr(textName, '/');
+				}
+				if (namePtr)
+				{
+					namePtr++;
+				}
+				else
+				{
+					namePtr = textName;
+				}
+				strncpy(material.m_textureName, namePtr, sizeof(material.m_textureName));
 			}
-			else
+ 			else
 			{
 				strcpy(material.m_textureName, "default.tga");
-				//material.m_textureHandle = GetDefaultTexture();
 			}
 			materialArray.PushBack(material);
 		}
@@ -374,6 +333,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 
 	const ofbx::Geometry* const geom = fbxMesh->getGeometry();
 
+	
 	const ofbx::Vec3* const vertices = geom->getVertices();
 	dInt32 indexCount = geom->getIndexCount();
 	dInt32* const indexArray = new dInt32 [indexCount];
@@ -411,6 +371,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 			else
 			{
 				dInt32 fbxMatIndex = geom->getMaterials()[faceIndex];
+				fbxMatIndex = 0;
 				faceMaterialArray[faceIndex] = fbxMatIndex;
 			}
 			count = 0;
@@ -418,10 +379,15 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 		}
 	}
 
-	dMeshEffect::dMeshVertexFormat format;
+	//dArray<dInt32> vertexIndexArray;
+	//dInt32 vCount = geom->getVertexCount();
+	//vertexIndexArray.SetCount(vCount);
+	//vCount = dVertexListToIndexList((dFloat64*) (&vertices->x), dInt32 (sizeof(ofbx::Vec3)), 3, vCount, &vertexIndexArray[0], dFloat64(0.0f));
 
+	dMeshEffect::dMeshVertexFormat format;
 	format.m_vertex.m_data = &vertices[0].x;
 	format.m_vertex.m_indexList = indexArray;
+	//format.m_vertex.m_indexList = &vertexIndexArray[0];
 	format.m_vertex.m_strideInBytes = sizeof(ofbx::Vec3);
 
 	format.m_faceCount = faceCount;
@@ -544,7 +510,6 @@ static fbxDemoEntity* FbxToEntity(ofbx::IScene* const fbxScene)
 		{
 			case ofbx::Object::Type::MESH:
 			{
-				//ImportMeshNode(fbxScene, ngdScene, fbxNode, node, meshCache, materialCache, textureCache, usedMaterials, nodeMap);
 				ImportMeshNode(fbxNode, nodeMap);
 				break;
 			}
@@ -673,39 +638,13 @@ fbxDemoEntity* LoadFbxMesh(const char* const meshName)
 	fread(content, 1, file_size, fp);
 	ofbx::IScene* const fbxScene = ofbx::load((ofbx::u8*)content, file_size, (ofbx::u64)ofbx::LoadFlags::TRIANGULATE);
 
-	dMatrix convertMatrix(GetCodinateSystemMatrix(fbxScene));
+	dMatrix convertMatrix(GetCoordinateSystemMatrix(fbxScene));
 	fbxDemoEntity* const entity = FbxToEntity(fbxScene);
 	FreezeScale(entity);
 	entity->ApplyTransform(convertMatrix);
 
 	fbxScene->destroy();
 	delete[] content;
-
-	//ndDemoSubMeshMaterial* const materials = dAlloca(ndDemoSubMeshMaterial, materialCache.GetCount());
-	//memset(materials, 0, materialCache.GetCount() * sizeof(ndDemoSubMeshMaterial));
-	//while (materialCache.GetRoot())
-	//{
-	//	fbxDemoSubMeshMaterial material(materialCache.GetRoot()->GetInfo());
-	//	materials[material.m_index] = material;
-	//	materialCache.Remove(materialCache.GetRoot());
-	//}
-	//for (fbxDemoEntity* child = (fbxDemoEntity*)entity->GetFirst(); child; child = (fbxDemoEntity*)child->GetNext())
-	//{
-	//	//if (child->GetName() == "bucket")
-	//	//child->ResetMatrix(*scene, child->GetRenderMatrix());
-	//
-	//	child->ResetMatrix(*scene, child->GetRenderMatrix());
-	//	if (child->m_fbxMeshEffect)
-	//	{
-	//		if (child->GetName().Find("hidden"))
-	//		{
-	//			ndDemoMesh* const mesh = new ndDemoMesh(child->GetName().GetStr(), child->m_fbxMeshEffect, scene->GetShaderCache(), materials);
-	//			child->SetMesh(mesh, child->GetMeshMatrix());
-	//			mesh->Release();
-	//		}
-	//	}
-	//}
-
 	return entity;
 }
 
