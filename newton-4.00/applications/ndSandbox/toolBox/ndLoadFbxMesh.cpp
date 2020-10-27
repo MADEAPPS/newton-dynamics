@@ -136,43 +136,49 @@ static dMatrix GetCoordinateSystemMatrix(ofbx::IScene* const fbxScene)
 	convertMatrix[2][2] = dFloat32(scaleFactor / 100.0f);
 	
 	//int sign;
-	dVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
-	dVector frontVector(1.0f, 0.0f, 0.0f, 0.0f);
-	if (globalSettings->UpAxis == ofbx::UpVector_AxisX) 
-	{
-		dAssert(0);
-	}
-	else if (globalSettings->UpAxis == ofbx::UpVector_AxisY) 
-	{
-		upVector = dVector(0.0f, 1.0f, 0.0f, 0.0f);
-		if (globalSettings->FrontAxis == ofbx::FrontVector_ParityEven)
-		{
-			frontVector = dVector(1.0f, 0.0f, 0.0f, 0.0f);
-		}
-		else 
-		{
-			frontVector = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-		}
-	}
-	else 
-	{
-		upVector = dVector(dFloat32 (globalSettings->UpAxisSign), 0.0f, 0.0f, 0.0f);
-		if (globalSettings->FrontAxis == ofbx::FrontVector_ParityEven)
-		{
-			dAssert(0);
-			//frontVector = dVector(1.0f * sign, 0.0f, 0.0f, 0.0f);
-		}
-		else 
-		{
-			frontVector = dVector(0.0f, 0.0f, -dFloat32 (globalSettings->FrontAxisSign), 0.0f);
-		}
-	}
+	//dVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
+	//dVector frontVector(1.0f, 0.0f, 0.0f, 0.0f);
+	//if (globalSettings->UpAxis == ofbx::UpVector_AxisX) 
+	//{
+	//	dAssert(0);
+	//}
+	//else if (globalSettings->UpAxis == ofbx::UpVector_AxisY) 
+	//{
+	//	upVector = dVector(0.0f, 1.0f, 0.0f, 0.0f);
+	//	if (globalSettings->FrontAxis == ofbx::FrontVector_ParityEven)
+	//	{
+	//		frontVector = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+	//	}
+	//	else 
+	//	{
+	//		frontVector = dVector(0.0f, 0.0f, 1.0f, 0.0f);
+	//	}
+	//}
+	//else 
+	//{
+	//	upVector = dVector(dFloat32 (globalSettings->UpAxisSign), 0.0f, 0.0f, 0.0f);
+	//	if (globalSettings->FrontAxis == ofbx::FrontVector_ParityEven)
+	//	{
+	//		dAssert(0);
+	//		//frontVector = dVector(1.0f * sign, 0.0f, 0.0f, 0.0f);
+	//	}
+	//	else 
+	//	{
+	//		frontVector = dVector(0.0f, 0.0f, -dFloat32 (globalSettings->FrontAxisSign), 0.0f);
+	//	}
+	//}
+	//dMatrix axisMatrix(dGetIdentityMatrix());
+	//axisMatrix.m_front = frontVector;
+	//axisMatrix.m_up = upVector;
+	//axisMatrix.m_right = frontVector.CrossProduct(upVector);
+	//axisMatrix = axisMatrix * dYawMatrix(dPi);
+
+	dMatrix axisMatrix(dGetZeroMatrix());
+	axisMatrix.m_up[globalSettings->UpAxis] = dFloat32(globalSettings->UpAxisSign);
+	axisMatrix.m_front[globalSettings->FrontAxis] = dFloat32(globalSettings->FrontAxisSign);
+	axisMatrix.m_right = axisMatrix.m_front.CrossProduct(axisMatrix.m_up);
+	axisMatrix = axisMatrix.Transpose();
 	
-	dMatrix axisMatrix(dGetIdentityMatrix());
-	axisMatrix.m_front = frontVector;
-	axisMatrix.m_up = upVector;
-	axisMatrix.m_right = frontVector.CrossProduct(upVector);
-	axisMatrix = axisMatrix * dYawMatrix(dPi);
 	convertMatrix = axisMatrix * convertMatrix;
 
 	return convertMatrix;

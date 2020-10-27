@@ -157,7 +157,7 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	//BuildFlatFloor(scene);
 	//BuildStaticMesh(scene, "flatPlane.fbx");
 	BuildStaticMesh(scene, "track.fbx");
-	//BuildStaticMesh(scene, "excavator.fbx");
+	BuildStaticMesh(scene, "excavator.fbx");
 
 	dMatrix location(dGetIdentityMatrix());
 	location.m_posit.m_y += 2.0f;
