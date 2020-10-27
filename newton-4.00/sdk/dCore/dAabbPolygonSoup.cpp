@@ -675,7 +675,7 @@ dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormals (void* const cont
 
 	dAabbPolygonSoup* const me = (dAabbPolygonSoup*) context;
 	dFastAabbInfo box (p0, p1);
-	me->ForAllSectors (box, dVector (dFloat32 (0.0f)), dFloat32 (1.0f), CalculateDisjointedFaceEdgeNormals, &adjacentFaces);
+	me->ForAllSectors (box, dVector::m_zero, dFloat32 (1.0f), CalculateDisjointedFaceEdgeNormals, &adjacentFaces);
 	return t_ContinueSearh;
 }
 

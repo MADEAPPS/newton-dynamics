@@ -219,7 +219,6 @@ class dMeshEffect: public dPolyhedra
 	void* GetFirstFace () const;
 	void* GetNextFace (const void* const face) const;
 	dInt32 IsFaceOpen (const void* const face) const;
-	dInt32 GetFaceMaterial (const void* const face) const;
 	dInt32 GetFaceIndexCount (const void* const face) const;
 	void GetFaceIndex (const void* const face, dInt32* const indices) const;
 	void GetFaceAttributeIndex (const void* const face, dInt32* const indices) const;
@@ -453,6 +452,8 @@ class dMeshEffect: public dPolyhedra
 	dInt32 GetVertexCount() const;
 	dInt32 GetVertexStrideInByte() const;
 	const dFloat64* GetVertexPool() const;
+
+	dInt32 GetFaceMaterial(dEdge* const faceEdge) const;
 
 	D_CORE_API void ApplyTransform(const dMatrix& matrix);
 	D_CORE_API void CalculateNormals(dFloat64 angleInRadians);
@@ -724,6 +725,12 @@ inline const dFloat64* dMeshEffect::GetVertexPool() const
 	return &m_points.m_vertex[0].m_x;
 }
 
+inline dInt32 dMeshEffect::GetFaceMaterial(dEdge* const faceEdge) const
+{
+	//dTreeNode* const node = (dTreeNode*)face;
+	//dEdge* const edge = &node->GetInfo();
+	return dInt32(m_attrib.m_materialChannel.GetCount() ? m_attrib.m_materialChannel[dInt32(faceEdge->m_userData)] : 0);
+}
 
 
 #endif

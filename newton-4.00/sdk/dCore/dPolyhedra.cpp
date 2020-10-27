@@ -489,28 +489,34 @@ void dPolyhedra::DeleteFace(dEdge* const face)
 {
 	dEdge* edgeList[DG_LOCAL_BUFFER_SIZE * 16];
 
-	if (face->m_incidentFace > 0) {
+	if (face->m_incidentFace > 0) 
+	{
 		dInt32 count = 0;
 		dEdge* ptr = face;
-		do {
+		do 
+		{
 			ptr->m_incidentFace = -1;
 			dInt32 i = 0;
-			for (; i < count; i ++) {
-				if ((edgeList[i] == ptr) || (edgeList[i]->m_twin == ptr)) {
+			for (; i < count; i ++) 
+			{
+				if ((edgeList[i] == ptr) || (edgeList[i]->m_twin == ptr)) 
+				{
 					break;
 				}
 			}
-			if (i == count) {
+			if (i == count) 
+			{
 				edgeList[count] = ptr;
 				count ++;
 			}
 			ptr = ptr->m_next;
 		} while (ptr != face);
 
-
-		for (dInt32 i = 0; i < count; i ++) {
+		for (dInt32 i = 0; i < count; i ++) 
+		{
 			dEdge* const ptr1 = edgeList[i];
-			if (ptr1->m_twin->m_incidentFace < 0) {
+			if (ptr1->m_twin->m_incidentFace < 0) 
+			{
 				DeleteEdge (ptr1);
 			}
 		}
@@ -526,8 +532,9 @@ dBigVector dPolyhedra::FaceNormal (const dEdge* const face, const dFloat64* cons
 	dBigVector p1 (dBigVector::m_triplexMask & dBigVector(&pool[edge->m_incidentVertex * stride]));
 	dBigVector e1 (p1 - p0);
 
-	dBigVector normal (dFloat32 (0.0f));
-	for (edge = edge->m_next; edge != face; edge = edge->m_next) {
+	dBigVector normal (dBigVector::m_zero);
+	for (edge = edge->m_next; edge != face; edge = edge->m_next) 
+	{
 		dBigVector p2 (dBigVector::m_triplexMask & dBigVector(&pool[edge->m_incidentVertex * stride]));
 		dBigVector e2 (p2 - p0);
 		normal += e1.CrossProduct(e2);
@@ -539,13 +546,16 @@ dBigVector dPolyhedra::FaceNormal (const dEdge* const face, const dFloat64* cons
 
 dEdge* dPolyhedra::AddHalfEdge (dInt32 v0, dInt32 v1)
 {
-	if (v0 != v1) {
+	if (v0 != v1) 
+	{
 		dgPairKey pairKey (v0, v1);
 		dEdge tmpEdge (v0, -1);
 
 		dTreeNode* node = Insert (tmpEdge, pairKey.GetVal()); 
 		return node ? &node->GetInfo() : nullptr;
-	} else {
+	}
+	else 
+	{
 		return nullptr;
 	}
 }
@@ -1617,15 +1627,17 @@ void dPolyhedra::Triangulate (const dFloat64* const vertex, dInt32 strideInBytes
 
 bool dPolyhedra::IsFaceConvex(dEdge* const face, const dFloat64* const vertex, dInt32 strideInBytes) const
 {
-	if (face->m_next->m_next->m_next == face) {
+	if (face->m_next->m_next->m_next == face) 
+	{
 		return true;
 	}
 	dBigVector normal(FaceNormal(face, vertex, strideInBytes));
-	dAssert(normal.m_w = dFloat32(0.0f));
+	dAssert(normal.m_w == dFloat32(0.0f));
 
 	dInt32 stride = strideInBytes / sizeof(dFloat64);
 	dEdge* ptr = face;
-	do {
+	do 
+	{
 		dBigVector p0(dBigVector::m_triplexMask & dBigVector(&vertex[ptr->m_incidentVertex * stride]));
 		dBigVector p1(dBigVector::m_triplexMask & dBigVector(&vertex[ptr->m_prev->m_incidentVertex * stride]));
 		dBigVector p2(dBigVector::m_triplexMask & dBigVector(&vertex[ptr->m_next->m_incidentVertex * stride]));
@@ -1634,7 +1646,8 @@ bool dPolyhedra::IsFaceConvex(dEdge* const face, const dFloat64* const vertex, d
 		dBigVector e1(p2 - p1);
 		dBigVector cornerNormal(e1.CrossProduct(e0));
 		dFloat64 project(normal.DotProduct(cornerNormal).GetScalar());
-		if (project < dFloat32(0.0f)) {
+		if (project < dFloat32(0.0f)) 
+		{
 			return false;
 		}
 

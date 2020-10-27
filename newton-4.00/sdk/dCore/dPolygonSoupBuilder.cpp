@@ -389,7 +389,6 @@ void dPolygonSoupBuilder::FinalizeAndOptimize(dInt32 id)
 				tmpVertexPool[j] = source.m_vertexPoints[index];
 				tmpIndexPool[j] = j;
 			}
-			dAssert(0);
 			//dInt32 faceArray = indexCount - 1;
 			//leftOver.AddMesh (&tmpVertexPool[0].m_x, indexCount, sizeof (tmpVertexPool[0]), 1, &faceArray, tmpIndexPool, &attribute, dGetIdentityMatrix());
 			leftOver.AddFaceIndirect(&tmpVertexPool[0].m_x, sizeof (dVector), attribute, tmpIndexPool, indexCount);
