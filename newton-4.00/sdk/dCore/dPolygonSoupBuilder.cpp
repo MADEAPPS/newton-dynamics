@@ -219,111 +219,7 @@ void dPolygonSoupBuilder::SavePLY(const char* const fileName) const
 	fclose(file);
 }
 
-/*
-void dPolygonSoupBuilder::AddMesh (const dFloat32* const vertex, dInt32 vertexCount, dInt32 strideInBytes, dInt32 faceCount,	
-	const dInt32* const faceArray, const dInt32* const indexArray, const dInt32* const faceMaterialId, const dMatrix& worldMatrix) 
-{
-	dInt32 faces[256];
-	dInt32 pool[2048];
-
-	m_vertexPoints[m_vertexCount + vertexCount].m_x = dFloat64 (0.0f);
-	dBigVector* const vertexPool = &m_vertexPoints[m_vertexCount];
-
-	worldMatrix.TransformTriplex (&vertexPool[0].m_x, sizeof (dBigVector), vertex, strideInBytes, vertexCount);
-	for (dInt32 i = 0; i < vertexCount; i ++) 
-	{
-		vertexPool[i].m_w = dFloat64 (0.0f);
-	}
-
-	dInt32 totalIndexCount = faceCount;
-	for (dInt32 i = 0; i < faceCount; i ++) 
-	{
-		totalIndexCount += faceArray[i];
-	}
-
-	m_vertexIndex[m_indexCount + totalIndexCount] = 0;
-	m_faceVertexCount[m_faceCount + faceCount] = 0;
-
-	dInt32 k = 0;
-	for (dInt32 i = 0; i < faceCount; i ++) 
-	{
-		dInt32 count = faceArray[i];
-		for (dInt32 j = 0; j < count; j ++) 
-		{
-			dInt32 index = indexArray[k];
-			pool[j] = index + m_vertexCount;
-			k ++;
-		}
-
-		dInt32 convexFaces = 0;
-		if (count == 3) 
-		{
-			convexFaces = 1;
-			dBigVector p0 (m_vertexPoints[pool[2]]);
-			p0 = p0 & dBigVector::m_triplexMask;
-			for (dInt32 j = 0; j < 3; j ++) 
-			{
-				dBigVector p1 (m_vertexPoints[pool[j]]);
-				p1 = p1 & dBigVector::m_triplexMask;
-				dBigVector edge (p1 - p0);
-				dFloat64 mag2 = edge.DotProduct(edge).GetScalar();
-				if (mag2 < dFloat32 (1.0e-6f)) 
-				{
-					convexFaces = 0;
-				}
-				p0 = p1;
-			}
-
-			if (convexFaces) 
-			{
-				dBigVector edge0 (m_vertexPoints[pool[2]] - m_vertexPoints[pool[0]]);
-				dBigVector edge1 (m_vertexPoints[pool[1]] - m_vertexPoints[pool[0]]);
-				dAssert (edge0.m_w == dFloat32 (0.0f));
-				dAssert (edge1.m_w == dFloat32 (0.0f));
-				dBigVector normal (edge0.CrossProduct(edge1));
-				dFloat64 mag2 = normal.DotProduct(normal).GetScalar();
-				if (mag2 < dFloat32 (1.0e-8f)) 
-				{
-					convexFaces = 0;
-				}
-			}
-
-			if (convexFaces) 
-			{
-				faces[0] = 3;
-			}
-
-		} 
-		else 
-		{
-			convexFaces = AddConvexFace (count, pool, faces);
-		}
-
-		dInt32 indexAcc = 0;
-		for (dInt32 j = 0; j < convexFaces; j ++) 
-		{
-			dInt32 count1 = faces[j];
-			m_vertexIndex[m_indexCount + count1] = faceMaterialId[i];
-			for (dInt32 m = 0; m < count1; m ++) 
-			{
-				m_vertexIndex[m_indexCount + m] = pool[indexAcc + m];
-			}
-			indexAcc += count1;
-			m_indexCount += (count1 + 1);
-			m_faceVertexCount[m_faceCount] = count1 + 1;
-			m_faceCount ++;
-		}
-	}
-	m_vertexCount += vertexCount;
-	m_run -= vertexCount;
-	if (m_run <= 0) 
-	{
-		PackArray();
-	}
-}
-*/
-
-D_CORE_API void dPolygonSoupBuilder::AddFaceIndirect(const dFloat32* const vertex, dInt32 strideInBytes, dInt32 faceId, const dInt32* const indexArray, dInt32 indexCount)
+void dPolygonSoupBuilder::AddFaceIndirect(const dFloat32* const vertex, dInt32 strideInBytes, dInt32 faceId, const dInt32* const indexArray, dInt32 indexCount)
 {
 	dInt32 faces[32];
 	dInt32 pool[512];
@@ -400,7 +296,7 @@ D_CORE_API void dPolygonSoupBuilder::AddFaceIndirect(const dFloat32* const verte
 	}
 }
 
-D_CORE_API void dPolygonSoupBuilder::AddFace(const dFloat32* const vertex, dInt32 strideInBytes, dInt32 vertexCount, const dInt32 faceId)
+void dPolygonSoupBuilder::AddFace(const dFloat32* const vertex, dInt32 strideInBytes, dInt32 vertexCount, const dInt32 faceId)
 {
 	dInt32 indexArray[1024];
 	dAssert(vertexCount < sizeof(indexArray)/sizeof (indexArray[0]));

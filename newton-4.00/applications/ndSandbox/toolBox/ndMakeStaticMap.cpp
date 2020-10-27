@@ -20,7 +20,7 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 	entity->BuildRenderMeshes(scene);
 	scene->AddEntity(entity);
 	
-	//dPolygonSoupBuilder meshBuilder;
+	dPolygonSoupBuilder meshBuilder;
 	//meshBuilder.Begin();
 	//
 	//dInt32 stack = 1;
