@@ -780,7 +780,6 @@ void ndDemoSkinMesh::Render(ndDemoEntityManager* const scene, const dMatrix& mod
 	//glCallList(m_mesh->m_optimizedOpaqueDiplayList);
 }
 
-
 ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision)
 	:ndDemoMeshInterface()
 {
@@ -910,9 +909,11 @@ void ndFlatShadedDebugMesh::Render(ndDemoEntityManager* const scene, const dMatr
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
 
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
@@ -1049,9 +1050,11 @@ void ndWireFrameDebugMesh::Render(ndDemoEntityManager* const scene, const dMatri
 	glBindVertexArray(m_vetextArrayBuffer);
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_lineIndexBuffer);
 
 	glDrawElements(GL_LINES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);
@@ -1265,6 +1268,7 @@ ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, cons
 	for (dInt32 handle = meshNode->GetFirstMaterial(geometryHandle); handle != -1; handle = meshNode->GetNextMaterial(geometryHandle, handle))
 	{
 		dInt32 materialIndex = meshNode->GetMaterialID(geometryHandle, handle);
+		//if (materialIndex == 0) continue;
 		ndDemoSubMesh* const segment = AddSubMesh();
 		
 		const dMeshEffect::dMaterial& material = materialArray[materialIndex];
@@ -1545,6 +1549,7 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 			glEnableVertexAttribArray(1);
 			glEnableVertexAttribArray(2);
 			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 			glActiveTexture(GL_TEXTURE0);
 			for (dListNode* node = GetFirst(); node; node = node->GetNext())
@@ -1552,21 +1557,17 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 				ndDemoSubMesh& segment = node->GetInfo();
 				if (!segment.m_hasTranparency)
 				{
-					//glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_material.m_specular.m_x);
-					//glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_material.m_ambient.m_x);
-					//glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_material.m_diffuse.m_x);
-					//glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_material.m_shiness));
-
 					glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient.m_x);
 					glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse.m_x);
 					glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular.m_x);
 
 					glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 					glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
-					glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)segment.m_segmentStart);
+					glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
 				}
 			}
 
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glDisableVertexAttribArray(2);
 			glDisableVertexAttribArray(1);
@@ -1608,6 +1609,7 @@ void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const dMat
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 		glActiveTexture(GL_TEXTURE0);
 		for (dListNode* node = GetFirst(); node; node = node->GetNext())
@@ -1623,10 +1625,11 @@ void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const dMat
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 				glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
-				glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)segment.m_segmentStart);
+				glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
 			}
 		}
 
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glDisableVertexAttribArray(2);
 		glDisableVertexAttribArray(1);

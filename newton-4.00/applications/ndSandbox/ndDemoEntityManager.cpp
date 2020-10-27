@@ -1512,7 +1512,6 @@ void ndDemoEntityManager::RenderScene()
 			entity->Render(timestep, this, globalMatrix);
 		}
 
-
 		while (m_tranparentHeap.GetCount()) 
 		{
 			const TransparentMesh& transparentMesh = m_tranparentHeap[0];

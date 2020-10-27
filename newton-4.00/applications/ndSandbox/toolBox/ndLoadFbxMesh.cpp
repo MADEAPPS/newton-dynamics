@@ -339,7 +339,7 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 			else
 			{
 				dInt32 fbxMatIndex = geom->getMaterials()[faceIndex];
-				fbxMatIndex = 0;
+				//fbxMatIndex = fbxMatIndex == 0 ? 0 : 1;
 				faceMaterialArray[faceIndex] = fbxMatIndex;
 			}
 			count = 0;
