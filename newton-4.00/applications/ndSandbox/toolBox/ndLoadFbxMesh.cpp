@@ -134,44 +134,6 @@ static dMatrix GetCoordinateSystemMatrix(ofbx::IScene* const fbxScene)
 	convertMatrix[0][0] = dFloat32(scaleFactor / 100.0f);
 	convertMatrix[1][1] = dFloat32(scaleFactor / 100.0f);
 	convertMatrix[2][2] = dFloat32(scaleFactor / 100.0f);
-	
-	//int sign;
-	//dVector upVector(0.0f, 1.0f, 0.0f, 0.0f);
-	//dVector frontVector(1.0f, 0.0f, 0.0f, 0.0f);
-	//if (globalSettings->UpAxis == ofbx::UpVector_AxisX) 
-	//{
-	//	dAssert(0);
-	//}
-	//else if (globalSettings->UpAxis == ofbx::UpVector_AxisY) 
-	//{
-	//	upVector = dVector(0.0f, 1.0f, 0.0f, 0.0f);
-	//	if (globalSettings->FrontAxis == ofbx::FrontVector_ParityEven)
-	//	{
-	//		frontVector = dVector(1.0f, 0.0f, 0.0f, 0.0f);
-	//	}
-	//	else 
-	//	{
-	//		frontVector = dVector(0.0f, 0.0f, 1.0f, 0.0f);
-	//	}
-	//}
-	//else 
-	//{
-	//	upVector = dVector(dFloat32 (globalSettings->UpAxisSign), 0.0f, 0.0f, 0.0f);
-	//	if (globalSettings->FrontAxis == ofbx::FrontVector_ParityEven)
-	//	{
-	//		dAssert(0);
-	//		//frontVector = dVector(1.0f * sign, 0.0f, 0.0f, 0.0f);
-	//	}
-	//	else 
-	//	{
-	//		frontVector = dVector(0.0f, 0.0f, -dFloat32 (globalSettings->FrontAxisSign), 0.0f);
-	//	}
-	//}
-	//dMatrix axisMatrix(dGetIdentityMatrix());
-	//axisMatrix.m_front = frontVector;
-	//axisMatrix.m_up = upVector;
-	//axisMatrix.m_right = frontVector.CrossProduct(upVector);
-	//axisMatrix = axisMatrix * dYawMatrix(dPi);
 
 	dMatrix axisMatrix(dGetZeroMatrix());
 	axisMatrix.m_up[globalSettings->UpAxis] = dFloat32(globalSettings->UpAxisSign);
