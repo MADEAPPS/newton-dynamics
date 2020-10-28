@@ -44,6 +44,8 @@ class ndShapeConvexPolygon: public ndShapeConvex
 	ndShapeConvexPolygon ();
 	~ndShapeConvexPolygon ();
 
+	dVector CalculateGlobalNormal(const ndShapeInstance* const parentMesh, const dVector& localNormal) const;
+	dInt32 CalculateContactToConvexHullDescrete(const ndShapeInstance* const parentMesh, ndContactSolver& proxy);
 #if 0
 	//virtual dInt32 CalculateSignature () const;
 	//virtual void Serialize(dgSerialize callback, void* const userData) const;
@@ -59,8 +61,7 @@ class ndShapeConvexPolygon: public ndShapeConvex
 	virtual dFloat32 GetBoxMaxRadius () const;
 	
 	bool BeamClipping (const dVector& origin, dFloat32 size, const ndShapeInstance* const parentMesh);
-	dVector CalculateGlobalNormal (const ndShapeInstance* const parentMesh, const dVector& localNormal) const;
-	dInt32 CalculateContactToConvexHullDescrete(const dgWorld* const world, const ndShapeInstance* const parentMesh, dgCollisionParamProxy& proxy);
+	
 	dInt32 CalculateContactToConvexHullContinue (const dgWorld* const world, const ndShapeInstance* const parentMesh, dgCollisionParamProxy& proxy);
 #endif
 
