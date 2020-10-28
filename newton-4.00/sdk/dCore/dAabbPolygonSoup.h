@@ -237,7 +237,8 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 	dFloat32 CalculateFaceMaxSize (const dVector* const vertex, dInt32 indexCount, const dInt32* const indexArray) const;
 //	static dIntersectStatus CalculateManifoldFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount);
 	static dIntersectStatus CalculateDisjointedFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
-	static dIntersectStatus CalculateAllFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
+	static dIntersectStatus CalculateAllFaceEdgeNormalsOld (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
+	static dIntersectStatus CalculateAllFaceEdgeNormals(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 	void ImproveNodeFitness (dgNodeBuilder* const node) const;
 
 	dInt32 m_nodesCount;

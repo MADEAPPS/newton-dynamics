@@ -2156,6 +2156,7 @@ dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDes
 	
 	for (dInt32 i = data.m_faceCount - 1; (i >= 0) && (count < 32); i--) 
 	{
+		dAssert(0);
 	//	dInt32 address = data.m_faceIndexStart[i];
 	//	const dInt32* const localIndexArray = &indexArray[address];
 	//	polygon.m_vertexIndex = localIndexArray;

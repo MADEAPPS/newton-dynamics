@@ -323,7 +323,7 @@ dInt32 dPolyhedra::GetFaceCount() const
 	return count;
 }
 
-dEdge* dPolyhedra::AddFace ( dInt32 count, const dInt32* const index, const dInt64* const userdata)
+dEdge* dPolyhedra::AddFace (dInt32 count, const dInt32* const index, const dInt64* const userdata)
 {
 	class IntersectionFilter
 	{

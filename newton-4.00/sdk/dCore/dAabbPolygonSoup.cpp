@@ -25,11 +25,11 @@
 #include "dStack.h"
 #include "dList.h"
 #include "dMatrix.h"
+#include "dPolyhedra.h"
 #include "dAabbPolygonSoup.h"
 #include "dPolygonSoupBuilder.h"
 
 #define DG_STACK_DEPTH 512
-
 
 D_MSV_NEWTON_ALIGN_32
 class dAabbPolygonSoup::dgNodeBuilder: public dAabbPolygonSoup::dNode
@@ -492,10 +492,100 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 	dVector p1;
 	GetAABB (p0, p1);
 	dFastAabbInfo box (p0, p1);
-	ForAllSectors (box, dVector::m_zero, dFloat32 (1.0f), CalculateAllFaceEdgeNormals, this);
+
+//	ForAllSectors(box, dVector::m_zero, dFloat32(1.0f), CalculateAllFaceEdgeNormalsOld, this);
+
+	dPolyhedra adjacenyMesh;
+	adjacenyMesh.BeginFace();
+	ForAllSectors(box, dVector::m_zero, dFloat32(1.0f), CalculateAllFaceEdgeNormals, &adjacenyMesh);
+	adjacenyMesh.EndFace();
+
+	dInt32 mark = adjacenyMesh.IncLRU();
+	dPolyhedra::Iterator iter(adjacenyMesh);
+	const dTriplex* const vertexArray = (dTriplex*)GetLocalVertexPool();
+	for (iter.Begin(); iter; iter++)
+	{
+		dEdge* const edge = &(*iter);
+		if ((edge->m_mark != mark) && (edge->m_incidentFace >= 0) && (edge->m_twin->m_incidentFace >= 0))
+		{
+			dInt32 indexCount0 = 0;
+			dEdge* ptr = edge;
+			do
+			{
+				indexCount0++;
+				ptr = ptr->m_next;
+			} while (ptr != edge);
+
+			dInt32* const indexArray0 = (dInt32*)edge->m_userData;
+			dVector n0(&vertexArray[indexArray0[indexCount0 + 1]].m_x);
+			dVector q0(&vertexArray[indexArray0[0]].m_x);
+			n0 = n0 & dVector::m_triplexMask;
+			q0 = q0 & dVector::m_triplexMask;
+
+			dInt32 indexCount1 = 0;
+			ptr = edge->m_twin;
+			do
+			{
+				indexCount1++;
+				ptr = ptr->m_next;
+			} while (ptr != edge->m_twin);
+
+			dInt32* const indexArray1 = (dInt32*)edge->m_twin->m_userData;
+			dVector n1(&vertexArray[indexArray1[indexCount1 + 1]].m_x);
+			dVector q1(&vertexArray[indexArray1[0]].m_x);
+			n1 = n1 & dVector::m_triplexMask;
+			q1 = q1 & dVector::m_triplexMask;
+
+			dPlane plane0(n0, -n0.DotProduct(q0).GetScalar());
+			dFloat32 maxDist0 = dFloat32 (-1.0f);
+			dInt32 offsetIndex1 = -1;
+			for (dInt32 i = 0; i < indexCount1; i++)
+			{
+				if (edge->m_twin->m_incidentVertex == indexArray1[i])
+				{
+					offsetIndex1 = i;
+				}
+				dVector point(&vertexArray[indexArray1[i]].m_x);
+				dFloat32 dist(plane0.Evalue(point & dVector::m_triplexMask));
+				if (dist > maxDist0)
+				{
+					maxDist0 = dist;
+				}
+			}
+			if (maxDist0 < dFloat32 (1.0e-3f))
+			{
+				dPlane plane1(n1, -n1.DotProduct(q1).GetScalar());
+				dFloat32 maxDist1 = dFloat32(-1.0f);
+				dInt32 offsetIndex0 = -1;
+				for (dInt32 i = 0; i < indexCount0; i++)
+				{
+					if (edge->m_incidentVertex == indexArray0[i])
+					{
+						offsetIndex0 = i;
+					}
+
+					dVector point(&vertexArray[indexArray0[i]].m_x);
+					dFloat32 dist(plane1.Evalue(point & dVector::m_triplexMask));
+					if (dist > maxDist1)
+					{
+						maxDist1 = dist;
+					}
+				}
+				if (maxDist1 < dFloat32(1.0e-3f))
+				{
+					dAssert(offsetIndex0 != -1);
+					dAssert(offsetIndex1 != -1);
+					indexArray0[indexCount0 + 2 + offsetIndex0] = indexArray1[indexCount1 + 1];
+					indexArray1[indexCount1 + 2 + offsetIndex1] = indexArray0[indexCount0 + 1];
+					maxDist1 *= 1;
+				}
+			}
+		}
+		edge->m_mark = mark;
+		edge->m_twin->m_mark = mark;
+	}
 
 	dStack<dTriplex> pool ((m_indexCount / 2) - 1);
-	const dTriplex* const vertexArray = (dTriplex*)GetLocalVertexPool();
 	dInt32 normalCount = 0;
 	for (dInt32 i = 0; i < m_nodesCount; i ++) 
 	{
@@ -523,7 +613,6 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 					{
 						dVector e (q1 - q0);
 						dVector n (e.CrossProduct(normal).Normalize());
-						//n = n.Scale(dFloat32 (1.0f) / dSqrt (n.DotProduct(n).GetScalar()));
 						dAssert (dAbs (n.DotProduct(n).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
 						pool[normalCount].m_x = n.m_x;
 						pool[normalCount].m_y = n.m_y;
@@ -556,7 +645,6 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 					if (face[j0] == -1) {
 						dVector e (q1 - q0);
 						dVector n (e.CrossProduct(normal).Normalize());
-						//n = n.Scale(dFloat32 (1.0f) / dSqrt (n.DotProduct(n).GetScalar()));
 						dAssert (dAbs (n.DotProduct(n).GetScalar() - dFloat32 (1.0f)) < dFloat32 (1.0e-6f));
 						pool[normalCount].m_x = n.m_x;
 						pool[normalCount].m_y = n.m_y;
@@ -632,7 +720,8 @@ void dAabbPolygonSoup::CalculateAdjacendy ()
 	}
 }
 
-dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormals (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
+
+dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormalsOld (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
 {
 	dInt32 stride = dInt32 (strideInBytes / sizeof (dFloat32));
 
@@ -676,6 +765,63 @@ dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormals (void* const cont
 	dAabbPolygonSoup* const me = (dAabbPolygonSoup*) context;
 	dFastAabbInfo box (p0, p1);
 	me->ForAllSectors (box, dVector::m_zero, dFloat32 (1.0f), CalculateDisjointedFaceEdgeNormals, &adjacentFaces);
+	return t_ContinueSearh;
+}
+
+dIntersectStatus dAabbPolygonSoup::CalculateAllFaceEdgeNormals(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance)
+{
+	//dInt32 stride = dInt32(strideInBytes / sizeof(dFloat32));
+	//
+	//AdjacentdFace adjacentFaces;
+	//adjacentFaces.m_count = indexCount;
+	//adjacentFaces.m_index = (dInt32*)indexArray;
+	//
+	//dVector n(&polygon[indexArray[indexCount + 1] * stride]);
+	//dVector p(&polygon[indexArray[0] * stride]);
+	//n = n & dVector::m_triplexMask;
+	//p = p & dVector::m_triplexMask;
+	//adjacentFaces.m_normal = dPlane(n, -n.DotProduct(p).GetScalar());
+	//
+	//dAssert(indexCount < dInt32(sizeof(adjacentFaces.m_edgeMap) / sizeof(adjacentFaces.m_edgeMap[0])));
+	//
+	//dInt32 edgeIndex = indexCount - 1;
+	//dInt32 i0 = indexArray[indexCount - 1];
+	//dVector p0(dFloat32(1.0e15f), dFloat32(1.0e15f), dFloat32(1.0e15f), dFloat32(0.0f));
+	//dVector p1(-dFloat32(1.0e15f), -dFloat32(1.0e15f), -dFloat32(1.0e15f), dFloat32(0.0f));
+	//for (dInt32 i = 0; i < indexCount; i++)
+	//{
+	//	dInt32 i1 = indexArray[i];
+	//	dInt32 index = i1 * stride;
+	//	dVector point(&polygon[index]);
+	//	point = point & dVector::m_triplexMask;
+	//	p0 = p0.GetMin(point);
+	//	p1 = p1.GetMax(point);
+	//	adjacentFaces.m_edgeMap[edgeIndex] = (dInt64(i1) << 32) + i0;
+	//	edgeIndex = i;
+	//	i0 = i1;
+	//}
+	//
+	//dFloat32 padding = dFloat32(1.0f / 16.0f);
+	//p0.m_x -= padding;
+	//p0.m_y -= padding;
+	//p0.m_z -= padding;
+	//p1.m_x += padding;
+	//p1.m_y += padding;
+	//p1.m_z += padding;
+	//
+	//dAabbPolygonSoup* const me = (dAabbPolygonSoup*)context;
+	//dFastAabbInfo box(p0, p1);
+	//me->ForAllSectors(box, dVector::m_zero, dFloat32(1.0f), CalculateDisjointedFaceEdgeNormals, &adjacentFaces);
+
+	dInt32 face[256];
+	dInt64 data[256];
+	dPolyhedra& adjacency = *((dPolyhedra*)context);
+	for (dInt32 i = 0; i < indexCount; i++)
+	{
+		face[i] = indexArray[i];
+		data[i] = dInt64(indexArray);
+	}
+	adjacency.AddFace(indexCount, face, data);
 	return t_ContinueSearh;
 }
 
