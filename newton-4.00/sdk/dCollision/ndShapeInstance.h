@@ -71,6 +71,7 @@ class ndShapeInstance: public dClassAlloc
 	D_COLLISION_API ndShapeInstance& operator=(const ndShapeInstance& src);
 
 	D_COLLISION_API dMatrix CalculateInertia() const;
+	D_COLLISION_API void CalculateObb(dVector& origin, dVector& size) const;
 	D_COLLISION_API void CalculateAABB(const dMatrix& matrix, dVector& minP, dVector& maxP) const;
 	D_COLLISION_API void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	D_COLLISION_API dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const;
@@ -109,6 +110,8 @@ class ndShapeInstance: public dClassAlloc
 	dFloat32 GetBoxMaxRadius() const;
 
 	ndScaleType GetScaleType() const;
+	dFloat32 GetUmbraClipSize() const;
+	dUnsigned64 GetUserDataID() const;
 #if 0
 	ndShapeInstance* AddRef ();
 	dInt32 Release ();
@@ -119,7 +122,6 @@ class ndShapeInstance: public dClassAlloc
 	dScaleType GetCombinedScaleType(dScaleType type) const;
 
 	const dMatrix& GetAlignMatrix () const;
-	dUnsigned64 GetUserDataID () const;
 	void SetUserDataID (dUnsigned64 userData);
 
 	void* GetUserData () const;
@@ -130,8 +132,6 @@ class ndShapeInstance: public dClassAlloc
 
 	dVector GetBoxSize() const;
 	dVector GetBoxOrigin() const;
-
-	dFloat32 GetUmbraClipSize () const;
 	
 	const dgWorld* GetWorld() const;
 	const dShape* GetChildShape() const;
@@ -147,8 +147,6 @@ class ndShapeInstance: public dClassAlloc
 
 	dUnsigned32 GetSignature () const;
 	ndShapeID GetCollisionPrimityType () const;
-
-	void CalcObb (dVector& origin, dVector& size) const;
 
 	dInt32 CalculateSignature () const;
 	void SetCollisionBBox (const dVector& p0, const dVector& p1);
@@ -186,6 +184,7 @@ class ndShapeInstance: public dClassAlloc
 	bool m_collisionMode;
 
 	static dVector m_padding;
+	friend class ndShapeConvexPolygon;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #if 0
@@ -278,11 +277,6 @@ D_INLINE const ndShapeInstance* ndShapeInstance::GetParent () const
 	return m_parent;
 }
 
-D_INLINE dUnsigned64 ndShapeInstance::GetUserDataID () const
-{
-	return m_material.m_userId;
-}
-
 D_INLINE void ndShapeInstance::SetUserDataID (dUnsigned64 userDataId)
 {
 	m_material.m_userId = userDataId;
@@ -349,11 +343,6 @@ D_INLINE dVector ndShapeInstance::GetBoxOrigin() const
 	}
 }
 
-D_INLINE dFloat32 ndShapeInstance::GetUmbraClipSize () const
-{
-	return m_shape->GetUmbraClipSize() * m_maxScale.m_x;
-}
-
 D_INLINE ndShapeInstance::ndScaleType ndShapeInstance::GetCombinedScaleType(ndShapeInstance::ndScaleType type) const
 {
 	dAssert (0);
@@ -361,48 +350,6 @@ D_INLINE ndShapeInstance::ndScaleType ndShapeInstance::GetCombinedScaleType(ndSh
 }
 
 
-D_INLINE void ndShapeInstance::CalcObb (dVector& origin, dVector& size) const
-{
-	size = m_shape->GetObbSize(); 
-	origin = m_shape->GetObbOrigin(); 
-
-	switch (m_scaleType)
-	{
-		case m_unit:
-		{
-			size += m_padding;
-			break;
-		}
-
-		case m_uniform:
-		case m_nonUniform:
-		{
-			size = size * m_scale + m_padding;
-			origin = origin * m_scale;
-			break;
-		}
-		case m_global:
-		{
-//			dMatrix matrix1 (matrix);
-//			matrix1[0] = matrix1[0].Scale(m_scale.m_x);
-//			matrix1[1] = matrix1[1].Scale(m_scale.m_y);
-//			matrix1[2] = matrix1[2].Scale(m_scale.m_z);
-//			m_shape->CalcAABB (m_aligmentMatrix * matrix1, p0, p1);
-//			p0 -= m_padding;
-//			p1 += m_padding;
-
-			dVector p0;
-			dVector p1;
-			m_shape->CalcAABB(m_aligmentMatrix, p0, p1);
-			size = (dVector::m_half * (p1 - p0) * m_scale + m_padding) & dVector::m_triplexMask;
-			origin = (dVector::m_half * (p1 + p0) * m_scale) & dVector::m_triplexMask;;
-			break;
-		}
-	}
-
-	dAssert (size.m_w == dFloat32 (0.0f));
-	dAssert (origin.m_w == dFloat32 (0.0f));
-}
 
 D_INLINE dFloat32 ndShapeInstance::GetSkinThickness() const
 {
@@ -459,7 +406,6 @@ D_INLINE dMatrix ndShapeInstance::GetScaledTransform(const dMatrix& matrix) cons
 	scaledMatrix[2] = scaledMatrix[2].Scale(m_scale[2]);
 	return m_aligmentMatrix * scaledMatrix;
 }
-
 
 D_INLINE dVector ndShapeInstance::SupportVertex(const dVector& dir) const
 {
@@ -614,5 +560,16 @@ D_INLINE ndShapeInstance::ndScaleType ndShapeInstance::GetScaleType() const
 	return m_scaleType;
 }
 
+D_INLINE dFloat32 ndShapeInstance::GetUmbraClipSize() const
+{
+	return m_shape->GetUmbraClipSize() * m_maxScale.m_x;
+}
+
+D_INLINE dUnsigned64 ndShapeInstance::GetUserDataID() const
+{
+	return m_shapeMaterial.m_userId;
+}
+
 #endif 
+
 

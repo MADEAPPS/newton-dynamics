@@ -109,9 +109,9 @@ static void AddPlatform(ndDemoEntityManager* const scene, dFloat32 mass, const d
 void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	//BuildFlatPlane(scene);
+	BuildFlatPlane(scene);
 	//BuildStaticMesh(scene, "flatPlane.fbx");
-	BuildStaticMesh(scene, "track.fbx");
+	//BuildStaticMesh(scene, "track.fbx");
 	//BuildStaticMesh(scene, "excavator.fbx");
 
 	dMatrix location(dGetIdentityMatrix());

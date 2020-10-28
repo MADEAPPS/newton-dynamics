@@ -21,7 +21,7 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene)
 	dVector floor[] =
 	{
 		{ 100.0f, 0.0f,  100.0f, 1.0f },
-		{ 100.0f, -10.0f, -100.0f, 1.0f },
+		{ 100.0f, 0.0f, -100.0f, 1.0f },
 		{ -100.0f, 0.0f, -100.0f, 1.0f },
 		{ -100.0f, 0.0f,  100.0f, 1.0f },
 	};
@@ -31,8 +31,8 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene)
 	meshBuilder.Begin();
 	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[0][0], 3);
 	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[1][0], 3);
-	//meshBuilder.End(true);
-	meshBuilder.End(false);
+	meshBuilder.End(true);
+	//meshBuilder.End(false);
 
 	ndShapeInstance box(new ndShapeStaticBVH(meshBuilder));
 	dMatrix uvMatrix(dGetIdentityMatrix());

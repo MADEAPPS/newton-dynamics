@@ -543,6 +543,50 @@ void ndShapeInstance::CalculateAABB(const dMatrix& matrix, dVector& p0, dVector&
 	dAssert(p1.m_w == dFloat32(0.0f));
 }
 
+void ndShapeInstance::CalculateObb(dVector& origin, dVector& size) const
+{
+	size = m_shape->GetObbSize();
+	origin = m_shape->GetObbOrigin();
+
+	switch (m_scaleType)
+	{
+		case m_unit:
+		{
+			size += m_padding;
+			break;
+		}
+
+		case m_uniform:
+		case m_nonUniform:
+		{
+			size = size * m_scale + m_padding;
+			origin = origin * m_scale;
+			break;
+		}
+		case m_global:
+		{
+			//dMatrix matrix1 (matrix);
+			//matrix1[0] = matrix1[0].Scale(m_scale.m_x);
+			//matrix1[1] = matrix1[1].Scale(m_scale.m_y);
+			//matrix1[2] = matrix1[2].Scale(m_scale.m_z);
+			//m_shape->CalcAABB (m_aligmentMatrix * matrix1, p0, p1);
+			//p0 -= m_padding;
+			//p1 += m_padding;
+
+			dVector p0;
+			dVector p1;
+			m_shape->CalcAABB(m_aligmentMatrix, p0, p1);
+			size = (dVector::m_half * (p1 - p0) * m_scale + m_padding) & dVector::m_triplexMask;
+			origin = (dVector::m_half * (p1 + p0) * m_scale) & dVector::m_triplexMask;;
+			break;
+		}
+	}
+
+	dAssert(size.m_w == dFloat32(0.0f));
+	dAssert(origin.m_w == dFloat32(0.0f));
+}
+
+
 dFloat32 ndShapeInstance::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const
 {
 	dFloat32 t = dFloat32(1.2f);

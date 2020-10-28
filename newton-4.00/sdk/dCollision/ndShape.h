@@ -36,6 +36,7 @@ class ndShapeCompound;
 class ndRayCastNotify;
 class ndShapeInstance;
 class ndShapeStaticMesh;
+class ndShapeConvexPolygon;
 class ndShapeDebugCallback;
 
 #ifdef _DEBUG
@@ -221,10 +222,15 @@ class ndShape: public dClassAlloc
 	virtual ndShapeCapsule* GetAsShapeCapsule() { return nullptr; }
 	virtual ndShapeCompound* GetAsShapeCompound() { return nullptr; }
 	virtual ndShapeNull* GetAsShapeNull() { return nullptr; }
+	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon() { return nullptr; }
 	virtual ndShapeConvex* GetAsShapeConvex() { return nullptr; }
 	virtual ndShapeStaticMesh* GetAsShapeStaticMeshShape() { return nullptr; }
 
 	virtual dInt32 GetConvexVertexCount() const;
+
+	dVector GetObbSize() const;
+	dVector GetObbOrigin() const;
+	dFloat32 GetUmbraClipSize() const;
 
 	D_COLLISION_API virtual void MassProperties();
 
@@ -299,6 +305,21 @@ inline dMatrix ndShape::CalculateInertiaAndCenterOfMass(const dMatrix& alignMatr
 {
 	dAssert(0);
 	return dGetZeroMatrix();
+}
+
+inline dVector ndShape::GetObbOrigin() const
+{
+	return m_boxOrigin;
+}
+
+inline dVector ndShape::GetObbSize() const
+{
+	return m_boxOrigin;
+}
+
+inline dFloat32 ndShape::GetUmbraClipSize() const
+{
+	return dFloat32(3.0f) * GetBoxMaxRadius();
 }
 
 

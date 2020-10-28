@@ -435,54 +435,28 @@ dInt32 ndContactSolver::ConvexToConvexContacts()
 dInt32 ndContactSolver::ConvexToStaticMeshContacts()
 {
 	dInt32 count = 0;
-	//dgContact* const contactJoint = proxy.m_contactJoint;
-	//dAssert(contactJoint);
 
-	//dgCollisionInstance* const collision0 = proxy.m_instance0;
-	//dgCollisionInstance* const collision1 = proxy.m_instance1;
-	//dAssert(collision1->IsType(dgCollision::dgCollisionMesh_RTTI));
-	//dAssert(collision0->IsType(dgCollision::dgCollisionConvexShape_RTTI));
-	//contactJoint->m_closestDistance = dFloat32(1.0e10f);
-	//if (!collision0->GetConvexVertexCount()) 
-	//{
-	//	return count;
-	//}
-
-	//dFloat32 separationDistance = dFloat32(0.0f);
-	//
-	//dgCollisionInstance instance0(*collision0, collision0->m_childShape);
-	//dgCollisionInstance instance1(*collision1, collision1->m_childShape);
-	//proxy.m_instance0 = &instance0;
-	//proxy.m_instance1 = &instance1;
-	//
-	//dVector origin(instance0.m_globalMatrix.m_posit & dVector::m_triplexMask);
-	//instance0.m_globalMatrix.m_posit = dVector::m_wOne;
-	//instance1.m_globalMatrix.m_posit -= origin;
-	//
-	//dAssert(proxy.m_timestep <= dFloat32(2.0f));
-	//dAssert(proxy.m_timestep >= dFloat32(0.0f));
-	
 	ndPolygonMeshDesc data(*this, NULL);
 	if (m_ccdMode) 
 	{
 		dAssert(0);
-	//	data.m_doContinuesCollisionTest = true;
-	//
-	//	const dVector& hullVeloc = data.m_objBody->m_veloc;
-	//	const dVector& hullOmega = data.m_objBody->m_omega;
-	//
-	//	dFloat32 baseLinearSpeed = dgSqrt(hullVeloc.DotProduct(hullVeloc).GetScalar());
-	//	if (baseLinearSpeed > dFloat32(1.0e-6f)) 
-	//	{
-	//		const dFloat32 minRadius = instance0.GetBoxMinRadius();
-	//		const dFloat32 maxRadius = instance0.GetBoxMaxRadius();
-	//		dFloat32 maxAngularSpeed = dgSqrt(hullOmega.DotProduct(hullOmega).GetScalar());
-	//		dFloat32 angularSpeedBound = maxAngularSpeed * (maxRadius - minRadius);
-	//
-	//		dFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt(angularSpeedBound);
-	//		dVector upperBoundVeloc(hullVeloc.Scale(proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
-	//		data.SetDistanceTravel(upperBoundVeloc);
-	//	}
+		//data.m_doContinuesCollisionTest = true;
+		//
+		//const dVector& hullVeloc = data.m_objBody->m_veloc;
+		//const dVector& hullOmega = data.m_objBody->m_omega;
+		//
+		//dFloat32 baseLinearSpeed = dgSqrt(hullVeloc.DotProduct(hullVeloc).GetScalar());
+		//if (baseLinearSpeed > dFloat32(1.0e-6f)) 
+		//{
+		//	const dFloat32 minRadius = instance0.GetBoxMinRadius();
+		//	const dFloat32 maxRadius = instance0.GetBoxMaxRadius();
+		//	dFloat32 maxAngularSpeed = dgSqrt(hullOmega.DotProduct(hullOmega).GetScalar());
+		//	dFloat32 angularSpeedBound = maxAngularSpeed * (maxRadius - minRadius);
+		//
+		//	dFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt(angularSpeedBound);
+		//	dVector upperBoundVeloc(hullVeloc.Scale(proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
+		//	data.SetDistanceTravel(upperBoundVeloc);
+		//}
 	}
 	
 	//ndShapeStaticMesh* const polysoup = (dgCollisionMesh *)data.m_polySoupInstance->GetChildShape();
@@ -502,33 +476,30 @@ dInt32 ndContactSolver::ConvexToStaticMeshContacts()
 			count = CalculatePolySoupToHullContactsDescrete(data);
 		}
 	
-		if (count > 0) 
-		{
-			dAssert(0);
-	//		proxy.m_contactJoint->m_isActive = 1;
-		}
+		//if (count > 0) 
+		//{
+		//	dAssert(0);
+		//	//proxy.m_contactJoint->m_isActive = 1;
+		//}
 	}
 	
 	//proxy.m_closestPointBody0 += origin;
 	//proxy.m_closestPointBody1 += origin;
 	//separationDistance = data.GetSeparetionDistance();
-	//ndContactPoint* const contactOut = proxy.m_contacts;
-	//for (dInt32 i = 0; i < count; i++) {
-	//	contactOut[i].m_point += origin;
-	//	contactOut[i].m_body0 = proxy.m_body0;
-	//	contactOut[i].m_body1 = proxy.m_body1;
-	//	contactOut[i].m_collision0 = collision0;
-	//	contactOut[i].m_collision1 = collision1;
-	//	contactOut[i].m_shapeId0 = collision0->GetUserDataID();
-	//	//contactOut[i].m_shapeId1 = collision1->GetUserDataID();
-	//}
-	//
-	//instance0.m_material.m_userData = NULL;
-	//instance1.m_material.m_userData = NULL;
-	//proxy.m_instance0 = collision0;
-	//proxy.m_instance1 = collision1;
-	//
-	//contactJoint->m_separationDistance = separationDistance;
+
+	ndBodyKinematic* const body0 = m_contact->GetBody0();
+	ndBodyKinematic* const body1 = m_contact->GetBody1();
+	ndShapeInstance* const instance0 = &body0->GetCollisionShape();
+	ndShapeInstance* const instance1 = &body1->GetCollisionShape();
+
+	ndContactPoint* const contactOut = m_contactBuffer;
+	for (dInt32 i = 0; i < count; i++) 
+	{
+		contactOut[i].m_body0 = body0;
+		contactOut[i].m_body1 = body1;
+		contactOut[i].m_shapeInstance0 = instance0;
+		contactOut[i].m_shapeInstance1 = instance1;
+	}
 
 	return count;
 }
@@ -2180,16 +2151,17 @@ dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDes
 	
 		if (count1 > 0) 
 		{
-			dAssert(0);
-	//		count += count1;
-	//		countleft -= count1;
-	//		dAssert(countleft >= 0);
-	//		if (count >= maxReduceLimit) {
-	//			count = PruneContacts(count, contactOut, dFloat32(1.0e-2f), 16);
-	//			countleft = maxContacts - count;
-	//			dAssert(countleft >= 0);
-	//			proxy.m_maxContacts = countleft;
-	//		}
+			count += count1;
+			countleft -= count1;
+			dAssert(countleft >= 0);
+			if (count >= maxReduceLimit) 
+			{
+				dAssert(0);
+				//count = PruneContacts(count, contactOut, dFloat32(1.0e-2f), 16);
+				//countleft = maxContacts - count;
+				//dAssert(countleft >= 0);
+				//proxy.m_maxContacts = countleft;
+			}
 		}
 		else if (count1 == -1) 
 		{
@@ -2199,10 +2171,10 @@ dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDes
 		}
 	}
 
-	dAssert(0);
-	//contactJoint->m_closestDistance = closestDist;
-	//
-	//if (count) {
+	contactJoint->m_separationDistance = closestDist;
+	
+	if (count) 
+	{
 	//	switch (proxy.m_instance0->GetCollisionPrimityType())
 	//	{
 	//	case m_sphereCollision:
@@ -2243,13 +2215,12 @@ dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDes
 	//		}
 	//	}
 	//	}
-	//}
-	//
-	//proxy.m_contacts = contactOut;
-	//
-	//// restore the pointer
+	}
+	
+	m_contactBuffer = contactOut;
+	
+	// restore the pointer
 	//polyInstance.m_material.m_userData = NULL;
-	//proxy.m_instance1 = polySoupInstance;
 
 	m_contactBuffer = contactOut;
 	m_instance1.m_shape = polySoupInstance.m_shape;

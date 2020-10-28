@@ -162,6 +162,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 
 	friend class ndScene;
 	friend class ndPolygonMeshDesc;
+	friend class ndShapeConvexPolygon;
 	friend class ndBodyPlayerCapsuleContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;
 

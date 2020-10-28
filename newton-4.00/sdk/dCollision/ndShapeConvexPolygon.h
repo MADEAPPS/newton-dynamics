@@ -44,6 +44,8 @@ class ndShapeConvexPolygon: public ndShapeConvex
 	ndShapeConvexPolygon ();
 	~ndShapeConvexPolygon ();
 
+	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon();
+
 	dVector CalculateGlobalNormal(const ndShapeInstance* const parentMesh, const dVector& localNormal) const;
 	dInt32 CalculateContactToConvexHullDescrete(const ndShapeInstance* const parentMesh, ndContactSolver& proxy);
 #if 0
@@ -59,11 +61,10 @@ class ndShapeConvexPolygon: public ndShapeConvex
 	virtual dFloat32 GetVolume () const;
 	virtual dFloat32 GetBoxMinRadius () const; 
 	virtual dFloat32 GetBoxMaxRadius () const;
-	
-	bool BeamClipping (const dVector& origin, dFloat32 size, const ndShapeInstance* const parentMesh);
-	
 	dInt32 CalculateContactToConvexHullContinue (const dgWorld* const world, const ndShapeInstance* const parentMesh, dgCollisionParamProxy& proxy);
 #endif
+
+	bool BeamClipping(const dVector& origin, dFloat32 size, const ndShapeInstance* const parentMesh);
 
 	dVector m_normal;
 	dVector m_localPoly[D_CONVEX_POLYGON_MAX_VERTEX_COUNT];
@@ -78,5 +79,10 @@ class ndShapeConvexPolygon: public ndShapeConvex
 	const dInt32* m_vertexIndex;
 	const dInt32* m_adjacentFaceEdgeNormalIndex;
 } D_GCC_NEWTON_ALIGN_32;
+
+inline ndShapeConvexPolygon* ndShapeConvexPolygon::GetAsShapeAsConvexPolygon()
+{
+	return this; 
+}
 
 #endif
