@@ -35,6 +35,7 @@ class ndContactPoint;
 class ndShapeCompound;
 class ndRayCastNotify;
 class ndShapeInstance;
+class ndShapeStaticMesh;
 class ndShapeDebugCallback;
 
 #ifdef _DEBUG
@@ -65,7 +66,7 @@ enum ndShapeID
 
 	// these are for internal use only	
 	//m_contactCloud,
-	//m_polygonCollision,
+	m_polygonCollision,
 	//m_lumpedMassCollision
 };
 
@@ -219,9 +220,9 @@ class ndShape: public dClassAlloc
 	virtual ndShapeSphere* GetAsShapeSphere() { return nullptr; }
 	virtual ndShapeCapsule* GetAsShapeCapsule() { return nullptr; }
 	virtual ndShapeCompound* GetAsShapeCompound() { return nullptr; }
-
 	virtual ndShapeNull* GetAsShapeNull() { return nullptr; }
 	virtual ndShapeConvex* GetAsShapeConvex() { return nullptr; }
+	virtual ndShapeStaticMesh* GetAsShapeStaticMeshShape() { return nullptr; }
 
 	virtual dInt32 GetConvexVertexCount() const;
 

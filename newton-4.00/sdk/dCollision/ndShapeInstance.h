@@ -64,7 +64,7 @@ class ndShapeInstance: public dClassAlloc
 
 	D_COLLISION_API ndShapeInstance(ndShape* const shape);
 	D_COLLISION_API ndShapeInstance(const ndShapeInstance& instance);
-	//ndShapeInstance(const ndShapeInstance& meshInstance, const dShape* const shape);
+	//ndShapeInstance(const ndShapeInstance& meshInstance, const ndShape* const shape);
 	//ndShapeInstance(const dgWorld* const world, const dShape* const childCollision, dInt32 shapeID, const dMatrix& matrix);
 	//ndShapeInstance(const dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
 	D_COLLISION_API ~ndShapeInstance();
@@ -108,13 +108,14 @@ class ndShapeInstance: public dClassAlloc
 	dFloat32 GetBoxMinRadius() const;
 	dFloat32 GetBoxMaxRadius() const;
 
+	ndScaleType GetScaleType() const;
 #if 0
 	ndShapeInstance* AddRef ();
 	dInt32 Release ();
 
 	void SetGlobalScale (const dVector& scale);
 
-	dScaleType GetScaleType() const;
+	
 	dScaleType GetCombinedScaleType(dScaleType type) const;
 
 	const dMatrix& GetAlignMatrix () const;
@@ -188,28 +189,6 @@ class ndShapeInstance: public dClassAlloc
 } D_GCC_NEWTON_ALIGN_32 ;
 
 #if 0
-D_INLINE ndShapeInstance::ndShapeInstance(const ndShapeInstance& meshInstance, const dShape* const shape)
-	:m_globalMatrix(meshInstance.m_globalMatrix)
-	,m_localMatrix (meshInstance.m_localMatrix)
-	,m_aligmentMatrix (meshInstance.m_aligmentMatrix)
-	,m_scale(meshInstance.m_scale)
-	,m_invScale(meshInstance.m_invScale)
-	,m_maxScale(meshInstance.m_maxScale)
-	,m_material(meshInstance.m_material)
-	,m_world(meshInstance.m_world)
-	,m_shape (shape)
-	,m_subCollisionHandle(nullptr)
-	,m_parent(nullptr)
-	,m_skinThickness(meshInstance.m_skinThickness)
-	,m_collisionMode(meshInstance.m_collisionMode)
-	,m_refCount(1)
-	,m_scaleType(meshInstance.m_scaleType)
-	,m_isExternal(false)
-{
-	if (m_shape) {
-		m_shape->AddRef();
-	}
-}
 
 D_INLINE ndShapeInstance* ndShapeInstance::AddRef () 
 {
@@ -373,11 +352,6 @@ D_INLINE dVector ndShapeInstance::GetBoxOrigin() const
 D_INLINE dFloat32 ndShapeInstance::GetUmbraClipSize () const
 {
 	return m_shape->GetUmbraClipSize() * m_maxScale.m_x;
-}
-
-D_INLINE ndShapeInstance::ndScaleType ndShapeInstance::GetScaleType() const
-{
-	return m_scaleType;
 }
 
 D_INLINE ndShapeInstance::ndScaleType ndShapeInstance::GetCombinedScaleType(ndShapeInstance::ndScaleType type) const
@@ -575,6 +549,21 @@ D_INLINE dVector ndShapeInstance::SupportVertexSpecialProjectPoint(const dVector
 	}
 }
 
+//D_INLINE ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance, const ndShape* const shape)
+//	:m_globalMatrix(instance.m_globalMatrix)
+//	,m_localMatrix(instance.m_localMatrix)
+//	,m_aligmentMatrix(instance.m_aligmentMatrix)
+//	,m_scale(instance.m_scale)
+//	,m_invScale(instance.m_invScale)
+//	,m_maxScale(instance.m_maxScale)
+//	,m_shape(instance.m_shape->AddRef())
+//	,m_ownerBody(instance.m_ownerBody)
+//	,m_skinThickness(instance.m_skinThickness)
+//	,m_scaleType(instance.m_scaleType)
+//	,m_collisionMode(instance.m_collisionMode)
+//{
+//}
+
 D_INLINE bool ndShapeInstance::GetCollisionMode() const
 {
 	return m_collisionMode;
@@ -620,6 +609,10 @@ D_INLINE void ndShapeInstance::SetMaterial(const ndShapeMaterial& material)
 	m_shapeMaterial = material;
 }
 
+D_INLINE ndShapeInstance::ndScaleType ndShapeInstance::GetScaleType() const
+{
+	return m_scaleType;
+}
 
 #endif 
 

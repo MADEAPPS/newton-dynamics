@@ -27,35 +27,30 @@
 
 class ndBodyKinematic;
 class ndShapeInstance;
+class ndContactSolver;
 
-//#include "dgCollision.h"
-//#include "dgCollisionConvex.h"
-//#include "ndShapeInstance.h"
+#define D_MAX_COLLIDING_FACES		512
+#define D_MAX_COLLIDING_INDICES		(D_MAX_COLLIDING_FACES * (4 * 2 + 3))
 
 
-#define DG_MAX_COLLIDING_FACES			512
-#define DG_MAX_COLLIDING_INDICES		(DG_MAX_COLLIDING_FACES * (4 * 2 + 3))
-
-#if 0
 class ndShapeStaticMesh;
 typedef void (*dgCollisionMeshCollisionCallback) (const ndBodyKinematic* const bodyWithTreeCollision, const ndBodyKinematic* const body, dInt32 faceID, 
 												  dInt32 vertexCount, const dFloat32* const vertex, dInt32 vertexStrideInBytes); 
 
-
 D_MSV_NEWTON_ALIGN_32 
-class dgPolygonMeshDesc: public dFastAabbInfo
+class ndPolygonMeshDesc: public dFastAabbInfo
 {
 	public:
 	class dgMesh
 	{
 		public:
-		dInt32 m_globalFaceIndexCount[DG_MAX_COLLIDING_FACES];
-		dInt32 m_globalFaceIndexStart[DG_MAX_COLLIDING_FACES];
-		dFloat32 m_globalHitDistance[DG_MAX_COLLIDING_FACES];
+		dInt32 m_globalFaceIndexCount[D_MAX_COLLIDING_FACES];
+		dInt32 m_globalFaceIndexStart[D_MAX_COLLIDING_FACES];
+		dFloat32 m_globalHitDistance[D_MAX_COLLIDING_FACES];
 	};
 
 	// colliding box in polygonSoup local space
-	dgPolygonMeshDesc()
+	ndPolygonMeshDesc()
 		:dFastAabbInfo()
 		,m_boxDistanceTravelInMeshSpace(dFloat32 (0.0f))
 		,m_maxT(dFloat32 (1.0f))
@@ -63,7 +58,7 @@ class dgPolygonMeshDesc: public dFastAabbInfo
 	{
 	}
 
-	dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const userData);
+	ndPolygonMeshDesc(ndContactSolver& proxy, void* const userData);
 
 	void SetDistanceTravel (const dVector& distanceInGlobalSpace)
 	{
@@ -106,7 +101,6 @@ class dgPolygonMeshDesc: public dFastAabbInfo
 		return m_separationDistance[0] * m_polySoupInstance->GetScale().GetScalar();
 	}
 
-
 	void SortFaceArray ();
 
 	dVector m_boxDistanceTravelInMeshSpace;
@@ -130,10 +124,11 @@ class dgPolygonMeshDesc: public dFastAabbInfo
 	dInt32 m_globalIndexCount;
 	dFloat32 m_maxT;
 	bool m_doContinuesCollisionTest;
-	dInt32 m_globalFaceVertexIndex[DG_MAX_COLLIDING_INDICES];
+	dInt32 m_globalFaceVertexIndex[D_MAX_COLLIDING_INDICES];
 	dgMesh m_meshData;
 } D_GCC_NEWTON_ALIGN_32;
 
+#if 0
 D_MSV_NEWTON_ALIGN_32 
 class dgCollisionMeshRayHitDesc
 {
@@ -159,10 +154,12 @@ class ndShapeStaticMesh: public ndShape
 	D_COLLISION_API ndShapeStaticMesh(ndShapeID id);
 	D_COLLISION_API virtual ~ndShapeStaticMesh();
 
+	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const = 0;
 	protected:
 	virtual dFloat32 GetVolume() const;
 	virtual dFloat32 GetBoxMinRadius() const;
 	virtual dFloat32 GetBoxMaxRadius() const;
+	virtual ndShapeStaticMesh* GetAsShapeStaticMeshShape();
 	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 	virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
 	virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
@@ -189,9 +186,6 @@ class ndShapeStaticMesh: public ndShape
 	ndShapeStaticMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
 	
 	virtual void GetVertexListIndexList (const dVector& p0, const dVector& p1, ndMeshVertexListIndexList &data) const = 0;
-
-	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const = 0;
-
 	void SetDebugCollisionCallback (dgCollisionMeshCollisionCallback debugCallback);
 	dgCollisionMeshCollisionCallback GetDebugCollisionCallback() const { return m_debugCallback;} 
 
@@ -259,6 +253,10 @@ inline dVector ndShapeStaticMesh::CalculateVolumeIntegral(const dMatrix& globalM
 	return dVector::m_zero;
 }
 
+inline ndShapeStaticMesh* ndShapeStaticMesh::GetAsShapeStaticMeshShape()
+{ 
+	return this; 
+}
 
 #endif 
 

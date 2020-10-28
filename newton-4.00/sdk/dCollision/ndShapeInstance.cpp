@@ -41,7 +41,7 @@
 #include "ndShapeInstance.h"
 #include "dgCollisionCompound.h"
 #include "dgCollisionHeightField.h"
-#include "dgCollisionConvexPolygon.h"
+#include "ndShapeConvexPolygon.h"
 #include "dgCollisionChamferCylinder.h"
 #include "dgCollisionCompoundFractured.h"
 #include "dgCollisionDeformableSolidMesh.h"

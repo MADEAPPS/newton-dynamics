@@ -20,6 +20,7 @@
 */
 
 #include "dCoreStdafx.h"
+#include "ndContactSolver.h"
 #include "ndCollisionStdafx.h"
 #include "ndShapeStaticMesh.h"
 
@@ -30,45 +31,45 @@
 //#include "ndShapeStaticMesh.h"
 //#include "dgCollisionConvexPolygon.h"
 
-#if 0
 
-dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const userData)
+//ndPolygonMeshDesc::ndPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const userData)
+ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, void* const userData)
 	:dFastAabbInfo()
-	,m_boxDistanceTravelInMeshSpace(dFloat32 (0.0f))
-	,m_threadNumber(proxy.m_threadIndex)
-	,m_faceCount(0)
-	,m_vertexStrideInBytes(0)
-	,m_skinThickness(proxy.m_skinThickness)
-	,m_userData (userData)
-	,m_objBody (proxy.m_body0)
-	,m_polySoupBody(proxy.m_body1)
-	,m_convexInstance(proxy.m_instance0)
-	,m_polySoupInstance(proxy.m_instance1)
-	,m_vertex(NULL)
-	,m_faceIndexCount(NULL)
-	,m_faceVertexIndex(NULL)
-	,m_faceIndexStart(NULL)
-	,m_hitDistance(NULL)
-	,m_maxT(dFloat32 (1.0f))
-	,m_doContinuesCollisionTest(proxy.m_continueCollision)
+	//,m_boxDistanceTravelInMeshSpace(dFloat32 (0.0f))
+	//,m_threadNumber(proxy.m_threadIndex)
+	//,m_faceCount(0)
+	//,m_vertexStrideInBytes(0)
+	//,m_skinThickness(proxy.m_skinThickness)
+	//,m_userData (userData)
+	//,m_objBody (proxy.m_body0)
+	//,m_polySoupBody(proxy.m_body1)
+	,m_convexInstance(&proxy.m_instance0)
+	,m_polySoupInstance(&proxy.m_instance1)
+	//,m_vertex(nullptr)
+	//,m_faceIndexCount(nullptr)
+	//,m_faceVertexIndex(nullptr)
+	//,m_faceIndexStart(nullptr)
+	//,m_hitDistance(nullptr)
+	//,m_maxT(dFloat32 (1.0f))
+	//,m_doContinuesCollisionTest(proxy.m_ccdMode)
 {
-	dgAssert (m_polySoupInstance->IsType (dgCollision::dgCollisionMesh_RTTI));
-	dgAssert (m_convexInstance->IsType (dgCollision::dgCollisionConvexShape_RTTI));
+	//dAssert (m_polySoupInstance->IsType (dgCollision::dgCollisionMesh_RTTI));
+	//dAssert (m_convexInstance->IsType (dgCollision::dgCollisionConvexShape_RTTI));
 
 	const dMatrix& hullMatrix = m_convexInstance->GetGlobalMatrix();
 	const dMatrix& soupMatrix = m_polySoupInstance->GetGlobalMatrix();
-
+	
 	dMatrix& matrix = *this;
 	matrix = hullMatrix * soupMatrix.Inverse();
 	dMatrix convexMatrix (dGetIdentityMatrix());
-
+	
 	switch (m_polySoupInstance->GetScaleType())
 	{
 		case ndShapeInstance::m_unit:
 		{
 			break;
 		}
-
+	
 		case ndShapeInstance::m_uniform:
 		{
 			const dVector& invScale = m_polySoupInstance->GetInvScale();
@@ -78,7 +79,7 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 			matrix.m_posit = matrix.m_posit * (invScale | dVector::m_wOne);
 			break;
 		}
-
+	
 		case ndShapeInstance::m_nonUniform:
 		{
 			const dVector& invScale = m_polySoupInstance->GetInvScale();
@@ -88,57 +89,63 @@ dgPolygonMeshDesc::dgPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const u
 			matrix.m_posit = matrix.m_posit * (invScale | dVector::m_wOne);
 			break;
 		}
-
+	
 		case ndShapeInstance::m_global:
 		default:
 		{
-		   dgAssert (0);
+		   dAssert (0);
 		}
 	}
-
+	
 	dMatrix fullMatrix (convexMatrix * matrix);
-	m_convexInstance->CalcAABB(fullMatrix, m_p0, m_p1);
-
+	m_convexInstance->CalculateAABB(fullMatrix, m_p0, m_p1);
+	
 	dVector p0;
 	dVector p1;
 	SetTransposeAbsMatrix(matrix);
-	m_convexInstance->CalcAABB(convexMatrix, p0, p1);
+	m_convexInstance->CalculateAABB(convexMatrix, p0, p1);
 	m_size = dVector::m_half * (p1 - p0);
 	m_posit = matrix.TransformVector(dVector::m_half * (p1 + p0));
-	dgAssert (m_posit.m_w == dFloat32 (1.0f));
+	dAssert (m_posit.m_w == dFloat32 (1.0f));
 }
 
-void dgPolygonMeshDesc::SortFaceArray ()
+void ndPolygonMeshDesc::SortFaceArray ()
 {
 	dInt32 stride = 8;
-	if (m_faceCount >= 8) {
-		dInt32 stack[DG_MAX_COLLIDING_FACES][2];
+	if (m_faceCount >= 8) 
+	{
+		dInt32 stack[D_MAX_COLLIDING_FACES][2];
 
 		stack[0][0] = 0;
 		stack[0][1] = m_faceCount - 1;
 		dInt32 stackIndex = 1;
-		while (stackIndex) {
+		while (stackIndex) 
+		{
 			stackIndex --;
 			dInt32 lo = stack[stackIndex][0];
 			dInt32 hi = stack[stackIndex][1];
-			if ((hi - lo) > stride) {
+			if ((hi - lo) > stride) 
+			{
 				dInt32 i = lo;
 				dInt32 j = hi;
 				dFloat32 dist = m_hitDistance[(lo + hi) >> 1];
-				do {    
+				do 
+				{    
 					while (m_hitDistance[i] < dist) i ++;
 					while (m_hitDistance[j] > dist) j --;
 
-					if (i <= j)	{
-						dgSwap (m_hitDistance[i], m_hitDistance[j]);
-						dgSwap (m_faceIndexStart[i], m_faceIndexStart[j]);
-						dgSwap (m_faceIndexCount[i], m_faceIndexCount[j]);
+					if (i <= j)	
+					{
+						dSwap (m_hitDistance[i], m_hitDistance[j]);
+						dSwap (m_faceIndexStart[i], m_faceIndexStart[j]);
+						dSwap (m_faceIndexCount[i], m_faceIndexCount[j]);
 						i++; 
 						j--;
 					}
 				} while (i <= j);
 
-				if (i < hi) {
+				if (i < hi) 
+				{
 					stack[stackIndex][0] = i;
 					stack[stackIndex][1] = hi;
 					stackIndex ++;
@@ -148,30 +155,35 @@ void dgPolygonMeshDesc::SortFaceArray ()
 					stack[stackIndex][1] = j;
 					stackIndex ++;
 				}
-				dgAssert (stackIndex < dInt32 (sizeof (stack) / (2 * sizeof (stack[0][0]))));
+				dAssert (stackIndex < dInt32 (sizeof (stack) / (2 * sizeof (stack[0][0]))));
 			}
 		}
 	}
 
 	stride = stride * 2;
-	if (m_faceCount < stride) {
+	if (m_faceCount < stride) 
+	{
 		stride = m_faceCount;
 	}
-	for (dInt32 i = 1; i < stride; i ++) {
-		if (m_hitDistance[i] < m_hitDistance[0]) {
-			dgSwap (m_hitDistance[i], m_hitDistance[0]);
-			dgSwap (m_faceIndexStart[i], m_faceIndexStart[0]);
-			dgSwap (m_faceIndexCount[i], m_faceIndexCount[0]);
+	for (dInt32 i = 1; i < stride; i ++) 
+	{
+		if (m_hitDistance[i] < m_hitDistance[0]) 
+		{
+			dSwap (m_hitDistance[i], m_hitDistance[0]);
+			dSwap (m_faceIndexStart[i], m_faceIndexStart[0]);
+			dSwap (m_faceIndexCount[i], m_faceIndexCount[0]);
 		}
 	}
 
-	for (dInt32 i = 1; i < m_faceCount; i ++) {
+	for (dInt32 i = 1; i < m_faceCount; i ++) 
+	{
 		dInt32 j = i;
 		dInt32 ptr = m_faceIndexStart[i];
 		dInt32 count = m_faceIndexCount[i];
 		dFloat32 dist = m_hitDistance[i];
-		for ( ; dist < m_hitDistance[j - 1]; j --) {
-			dgAssert (j > 0);
+		for ( ; dist < m_hitDistance[j - 1]; j --) 
+		{
+			dAssert (j > 0);
 			m_hitDistance[j] = m_hitDistance [j-1];
 			m_faceIndexStart[j] = m_faceIndexStart[j-1];
 			m_faceIndexCount[j] = m_faceIndexCount[j-1];
@@ -183,26 +195,26 @@ void dgPolygonMeshDesc::SortFaceArray ()
 
 #ifdef _DEBUG
 	for (dInt32 i = 0; i < m_faceCount - 1; i ++) {
-		dgAssert (m_hitDistance[i] <= m_hitDistance[i+1]);
+		dAssert (m_hitDistance[i] <= m_hitDistance[i+1]);
 	}
 #endif
 }
 
-
+#if 0
 ndShapeStaticMesh::ndShapeStaticMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber)
 	:dgCollision(world, deserialization, userData, revisionNumber)
 {
-	dgAssert (m_rtti | dgCollisionMesh_RTTI);
+	dAssert (m_rtti | dgCollisionMesh_RTTI);
 
-	m_debugCallback = NULL;
+	m_debugCallback = nullptr;
 	SetCollisionBBox (dVector (dFloat32 (0.0f)), dVector (dFloat32 (0.0f)));
 }
 
 void ndShapeStaticMesh::SetCollisionBBox (const dVector& p0, const dVector& p1)
 {
-	dgAssert (p0.m_x <= p1.m_x);
-	dgAssert (p0.m_y <= p1.m_y);
-	dgAssert (p0.m_z <= p1.m_z);
+	dAssert (p0.m_x <= p1.m_x);
+	dAssert (p0.m_y <= p1.m_y);
+	dAssert (p0.m_z <= p1.m_z);
 
 	m_boxSize = (p1 - p0).Scale (dFloat32 (0.5f)) & dVector::m_triplexMask;
 	m_boxOrigin = (p1 + p0).Scale (dFloat32 (0.5f)) & dVector::m_triplexMask; 
@@ -210,7 +222,7 @@ void ndShapeStaticMesh::SetCollisionBBox (const dVector& p0, const dVector& p1)
 
 dInt32 ndShapeStaticMesh::CalculateSignature () const
 {
-	dgAssert (0);
+	dAssert (0);
 	return 0;
 }
 
@@ -233,19 +245,19 @@ dVector ndShapeStaticMesh::BoxSupportMapping  (const dVector& dir) const
 
 void ndShapeStaticMesh::DebugCollision (const dMatrix& matrixPtr, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
 {
-	dgAssert (0);
+	dAssert (0);
 }
 
 void ndShapeStaticMesh::GetCollisionInfo(dgCollisionInfo* const info) const
 {
-	dgAssert (0);
+	dAssert (0);
 	dgCollision::GetCollisionInfo(info);
 //	info->m_offsetMatrix = GetLocalMatrix();
 }
 
 void ndShapeStaticMesh::Serialize(dgSerialize callback, void* const userData) const
 {
-	dgAssert (0);
+	dAssert (0);
 }
 
 
@@ -289,13 +301,13 @@ dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dFloat32* const verte
 	//	if (side0 < dFloat32(0.0f)) {
 	//		if (side1 >= dFloat32(0.0f)) {
 	//			dVector dp(p1 - p0);
-	//			dgAssert(dp.m_w == dFloat32(0.0f));
+	//			dAssert(dp.m_w == dFloat32(0.0f));
 	//			dFloat32 t = localPlane.DotProduct(dp).GetScalar();
-	//			dgAssert(dgAbs(t) >= dFloat32(0.0f));
+	//			dAssert(dgAbs(t) >= dFloat32(0.0f));
 	//			if (dgAbs(t) < dFloat32(1.0e-8f)) {
 	//				t = dgSign(t) * dFloat32(1.0e-8f);
 	//			}
-	//			dgAssert(0);
+	//			dAssert(0);
 	//			contactsOut[count] = p0 - dp.Scale(side0 / t);
 	//			count++;
 	//
@@ -303,13 +315,13 @@ dInt32 ndShapeStaticMesh::CalculatePlaneIntersection(const dFloat32* const verte
 	//	}
 	//	else if (side1 <= dFloat32(0.0f)) {
 	//		dVector dp(p1 - p0);
-	//		dgAssert(dp.m_w == dFloat32(0.0f));
+	//		dAssert(dp.m_w == dFloat32(0.0f));
 	//		dFloat32 t = localPlane.DotProduct(dp).GetScalar();
-	//		dgAssert(dgAbs(t) >= dFloat32(0.0f));
+	//		dAssert(dgAbs(t) >= dFloat32(0.0f));
 	//		if (dgAbs(t) < dFloat32(1.0e-8f)) {
 	//			t = dgSign(t) * dFloat32(1.0e-8f);
 	//		}
-	//		dgAssert(0);
+	//		dAssert(0);
 	//		contactsOut[count] = p0 - dp.Scale(side0 / t);
 	//		count++;
 	//	}

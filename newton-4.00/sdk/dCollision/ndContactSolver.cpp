@@ -19,7 +19,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndContact.h"
@@ -27,6 +26,8 @@
 #include "ndShapeConvex.h"
 #include "ndBodyKinematic.h"
 #include "ndContactSolver.h"
+#include "ndShapeStaticMesh.h"
+#include "ndShapeConvexPolygon.h"
 
 dVector ndContactSolver::m_hullDirs[] =
 {
@@ -217,28 +218,11 @@ dInt32 ndContactSolver::CalculateConvexCastContacts()
 	return count;
 #endif
 }
-
-
-
 #endif
 
 dInt32 ndContactSolver::CalculateConvexToConvexContacts()
 {
 	dInt32 count = 0;
-	//ndContact* const contactJoint = proxy.m_contactJoint;
-	//dAssert(contactJoint);
-	//
-	//dgCollisionInstance* const collision0 = proxy.m_instance0;
-	//dgCollisionInstance* const collision1 = proxy.m_instance1;
-	//dAssert(collision0->IsType(dgCollision::ndShapeConvexShape_RTTI));
-	//dAssert(collision1->IsType(dgCollision::ndShapeConvexShape_RTTI));
-	//contactJoint->m_closestDistance = dFloat32(1.0e10f);
-	//contactJoint->m_separationDistance = dFloat32(0.0f);
-	
-	//if (!(m_instance0.GetConvexVertexCount() && m_instance1.GetConvexVertexCount())) {
-	//	return count;
-	//}
-
 	dAssert(m_instance0.GetConvexVertexCount() && m_instance1.GetConvexVertexCount());
 	dAssert(m_instance0.GetShape()->GetAsShapeConvex());
 	dAssert(m_instance1.GetShape()->GetAsShapeConvex());
@@ -248,30 +232,82 @@ dInt32 ndContactSolver::CalculateConvexToConvexContacts()
 	if (m_ccdMode)
 	{
 		dAssert(0);
-//		count = contactSolver.CalculateConvexCastContacts();
+		//count = contactSolver.CalculateConvexCastContacts();
 	}
-	else 
+	else
 	{
 		count = ConvexToConvexContacts();
 	}
 	return count;
 }
 
-dInt32 ndContactSolver::ConvexContacts()
+dInt32 ndContactSolver::CalculateConvexToSaticMeshContacts()
 {
-	if (m_instance0.GetShape()->GetAsShapeConvex()) 
-	{
-		dAssert(m_instance1.GetShape()->GetAsShapeConvex());
-		return CalculateConvexToConvexContacts();
-	}
-	else 
+	dInt32 count = 0;
+	dAssert(!m_instance0.GetShape()->GetAsShapeNull());
+	dAssert(m_instance0.GetConvexVertexCount());
+	dAssert(m_instance0.GetShape()->GetAsShapeConvex());
+	dAssert(m_instance1.GetShape()->GetAsShapeStaticMeshShape());
+
+	if (m_ccdMode)
 	{
 		dAssert(0);
-		//dAssert(constraint->m_body0->m_collision->IsType(dgCollision::ndShapeConvexShape_RTTI));
-		//dAssert(convexBody->m_collision->IsType(dgCollision::ndShapeConvexShape_RTTI));
-		//pair->m_contactCount = CalculateConvexToNonConvexContacts(proxy);
-		return 0;
+		//count = contactSolver.CalculateConvexCastContacts();
 	}
+	else
+	{
+		count = ConvexToStaticMeshContacts();
+	}
+	return count;
+}
+
+dInt32 ndContactSolver::ConvexContacts()
+{
+	dVector origin0(m_instance0.m_globalMatrix.m_posit);
+	dVector origin1(m_instance1.m_globalMatrix.m_posit);
+	m_instance0.m_globalMatrix.m_posit = dVector::m_wOne;
+	m_instance1.m_globalMatrix.m_posit -= (origin0 & dVector::m_triplexMask);
+
+	// handle rare case of two shapes located exactly at the same origin
+	dVector error(m_instance1.m_globalMatrix.m_posit - m_instance0.m_globalMatrix.m_posit);
+	if (error.DotProduct(error).GetScalar() < dFloat32(1.0e-6f))
+	{
+		m_instance1.m_globalMatrix.m_posit.m_y += dFloat32(1.0e-3f);
+	}
+
+	dInt32 count = 0;
+	if (m_instance1.GetShape()->GetAsShapeConvex())
+	{
+		dAssert(m_instance0.GetShape()->GetAsShapeConvex());
+		count = CalculateConvexToConvexContacts();
+	}
+	else
+	{
+		ndShapeStaticMesh* const meshShape = m_instance1.GetShape()->GetAsShapeStaticMeshShape();
+		if (meshShape)
+		{
+			count = CalculateConvexToSaticMeshContacts();
+		}
+		else
+		{
+			dAssert(0);
+			count = 0;
+		}
+	}
+
+	dVector offset = (origin0 & dVector::m_triplexMask);
+	m_closestPoint0 += offset;
+	m_closestPoint1 += offset;
+
+	ndContactPoint* const contactOut = m_contactBuffer;
+	for (dInt32 i = count - 1; i >= 0; i--)
+	{
+		contactOut[i].m_point += offset;
+	}
+
+	m_instance0.m_globalMatrix.m_posit = origin0;
+	m_instance1.m_globalMatrix.m_posit = origin1;
+	return count;
 }
 
 dInt32 ndContactSolver::CalculatePairContacts(dInt32 threadIndex)
@@ -321,10 +357,15 @@ dInt32 ndContactSolver::CalculatePairContacts(dInt32 threadIndex)
 	//}
 
 	dInt32 count = 0;
-	if (m_instance1.GetShape()->GetAsShapeConvex())
+	//if (m_instance1.GetShape()->GetAsShapeConvex())
+	if (m_instance0.GetShape()->GetAsShapeConvex())
 	{
 		count = ConvexContacts();
 	}
+	//else if (m_instance0.GetShape()->GetAsShapeConvex())
+	//{
+	//	count = ConvexContacts();
+	//}
 	else
 	{
 		dAssert(0);
@@ -345,25 +386,10 @@ dInt32 ndContactSolver::CalculatePairContacts(dInt32 threadIndex)
 dInt32 ndContactSolver::ConvexToConvexContacts()
 {
 	dInt32 count = 0;
-
-	dVector origin0(m_instance0.m_globalMatrix.m_posit);
-	dVector origin1(m_instance1.m_globalMatrix.m_posit);
-	m_instance0.m_globalMatrix.m_posit = dVector::m_wOne;
-	m_instance1.m_globalMatrix.m_posit -= (origin0 & dVector::m_triplexMask);
-
-	// handle rare case of two shapes located exactly at the same origin
-	dVector error(m_instance1.m_globalMatrix.m_posit - m_instance0.m_globalMatrix.m_posit);
-	if (error.DotProduct(error).GetScalar() < dFloat32(1.0e-6f))
-	{
-		m_instance1.m_globalMatrix.m_posit.m_y += dFloat32(1.0e-3f);
-	}
-
 	bool colliding = CalculateClosestPoints();
 	dFloat32 penetration = m_separatingVector.DotProduct(m_closestPoint1 - m_closestPoint0).GetScalar() - m_skinThickness - D_PENETRATION_TOL;
 	if (m_intersectionTestOnly) 
 	{
-		//dInt32 retVal = (penetration <= dFloat32(0.0f)) ? -1 : 0;
-		//m_proxy->m_contactJoint->m_isActive = retVal;
 		m_separationDistance = penetration;
 		count = (penetration <= dFloat32(0.0f)) ? 1 : 0;
 	}
@@ -373,16 +399,12 @@ dInt32 ndContactSolver::ConvexToConvexContacts()
 		{
 			if (penetration <= dFloat32(1.0e-5f)) 
 			{
-				//m_proxy->m_contactJoint->m_isActive = 1;
 				if (m_instance0.GetCollisionMode() & m_instance1.GetCollisionMode()) 
 				{
 					count = CalculateContacts(m_closestPoint0, m_closestPoint1, m_separatingVector * dVector::m_negOne);
 				}
 			}
 
-			dVector offset = (origin0 & dVector::m_triplexMask);
-			m_closestPoint0 += offset;
-			m_closestPoint1 += offset;
 			m_separationDistance = penetration;
 
 			penetration = -penetration;
@@ -397,7 +419,7 @@ dInt32 ndContactSolver::ConvexToConvexContacts()
 			dVector normal(m_separatingVector * dVector::m_negOne);
 			for (dInt32 i = count - 1; i >= 0; i--)
 			{
-				contactOut[i].m_point = m_buffer[i] + offset;
+				contactOut[i].m_point = m_buffer[i];
 				contactOut[i].m_normal = normal;
 				contactOut[i].m_body0 = body0;
 				contactOut[i].m_body1 = body1;
@@ -407,9 +429,107 @@ dInt32 ndContactSolver::ConvexToConvexContacts()
 			}
 		}
 	}
+	return count;
+}
 
-	m_instance0.m_globalMatrix.m_posit = origin0;
-	m_instance1.m_globalMatrix.m_posit = origin1;
+dInt32 ndContactSolver::ConvexToStaticMeshContacts()
+{
+	dInt32 count = 0;
+	//dgContact* const contactJoint = proxy.m_contactJoint;
+	//dAssert(contactJoint);
+
+	//dgCollisionInstance* const collision0 = proxy.m_instance0;
+	//dgCollisionInstance* const collision1 = proxy.m_instance1;
+	//dAssert(collision1->IsType(dgCollision::dgCollisionMesh_RTTI));
+	//dAssert(collision0->IsType(dgCollision::dgCollisionConvexShape_RTTI));
+	//contactJoint->m_closestDistance = dFloat32(1.0e10f);
+	//if (!collision0->GetConvexVertexCount()) 
+	//{
+	//	return count;
+	//}
+
+	//dFloat32 separationDistance = dFloat32(0.0f);
+	//
+	//dgCollisionInstance instance0(*collision0, collision0->m_childShape);
+	//dgCollisionInstance instance1(*collision1, collision1->m_childShape);
+	//proxy.m_instance0 = &instance0;
+	//proxy.m_instance1 = &instance1;
+	//
+	//dVector origin(instance0.m_globalMatrix.m_posit & dVector::m_triplexMask);
+	//instance0.m_globalMatrix.m_posit = dVector::m_wOne;
+	//instance1.m_globalMatrix.m_posit -= origin;
+	//
+	//dAssert(proxy.m_timestep <= dFloat32(2.0f));
+	//dAssert(proxy.m_timestep >= dFloat32(0.0f));
+	
+	ndPolygonMeshDesc data(*this, NULL);
+	if (m_ccdMode) 
+	{
+		dAssert(0);
+	//	data.m_doContinuesCollisionTest = true;
+	//
+	//	const dVector& hullVeloc = data.m_objBody->m_veloc;
+	//	const dVector& hullOmega = data.m_objBody->m_omega;
+	//
+	//	dFloat32 baseLinearSpeed = dgSqrt(hullVeloc.DotProduct(hullVeloc).GetScalar());
+	//	if (baseLinearSpeed > dFloat32(1.0e-6f)) 
+	//	{
+	//		const dFloat32 minRadius = instance0.GetBoxMinRadius();
+	//		const dFloat32 maxRadius = instance0.GetBoxMaxRadius();
+	//		dFloat32 maxAngularSpeed = dgSqrt(hullOmega.DotProduct(hullOmega).GetScalar());
+	//		dFloat32 angularSpeedBound = maxAngularSpeed * (maxRadius - minRadius);
+	//
+	//		dFloat32 upperBoundSpeed = baseLinearSpeed + dgSqrt(angularSpeedBound);
+	//		dVector upperBoundVeloc(hullVeloc.Scale(proxy.m_timestep * upperBoundSpeed / baseLinearSpeed));
+	//		data.SetDistanceTravel(upperBoundVeloc);
+	//	}
+	}
+	
+	//ndShapeStaticMesh* const polysoup = (dgCollisionMesh *)data.m_polySoupInstance->GetChildShape();
+	ndShapeStaticMesh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticMeshShape();
+	polysoup->GetCollidingFaces(&data);
+	
+	if (data.m_faceCount) 
+	{
+	//	proxy.m_polyMeshData = &data;
+		if (m_ccdMode) 
+		{
+			dAssert(0);
+			//count = CalculateConvexToNonConvexContactsContinue(proxy);
+		}
+		else 
+		{
+			count = CalculatePolySoupToHullContactsDescrete(data);
+		}
+	
+		if (count > 0) 
+		{
+			dAssert(0);
+	//		proxy.m_contactJoint->m_isActive = 1;
+		}
+	}
+	
+	//proxy.m_closestPointBody0 += origin;
+	//proxy.m_closestPointBody1 += origin;
+	//separationDistance = data.GetSeparetionDistance();
+	//ndContactPoint* const contactOut = proxy.m_contacts;
+	//for (dInt32 i = 0; i < count; i++) {
+	//	contactOut[i].m_point += origin;
+	//	contactOut[i].m_body0 = proxy.m_body0;
+	//	contactOut[i].m_body1 = proxy.m_body1;
+	//	contactOut[i].m_collision0 = collision0;
+	//	contactOut[i].m_collision1 = collision1;
+	//	contactOut[i].m_shapeId0 = collision0->GetUserDataID();
+	//	//contactOut[i].m_shapeId1 = collision1->GetUserDataID();
+	//}
+	//
+	//instance0.m_material.m_userData = NULL;
+	//instance1.m_material.m_userData = NULL;
+	//proxy.m_instance0 = collision0;
+	//proxy.m_instance1 = collision1;
+	//
+	//contactJoint->m_separationDistance = separationDistance;
+
 	return count;
 }
 
@@ -1982,4 +2102,151 @@ dInt32 ndContactSolver::CalculateIntersectingPlane(dInt32 count)
 		}
 	}
 	return -1;
+}
+
+
+//dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(dgCollisionParamProxy& proxy) const
+dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDesc& data)
+{
+	//dAssert(proxy.m_instance1->IsType(dgCollision::dgCollisionMesh_RTTI));
+	//dAssert(proxy.m_instance0->IsType(dgCollision::dgCollisionConvexShape_RTTI));
+	//
+	//dgCollisionInstance* const polySoupInstance = proxy.m_instance1;
+	//dgPolygonMeshDesc& data = *proxy.m_polyMeshData;
+	//
+	dAssert(data.m_faceCount);
+	
+	ndShapeConvexPolygon polygon;
+	ndShapeInstance polySoupInstance(m_instance1);
+	m_instance1.m_shape = &polygon;
+	m_instance1.SetScale(dVector::m_one);
+	m_instance1.m_localMatrix = dGetIdentityMatrix();
+	m_instance1.m_globalMatrix = dGetIdentityMatrix();
+
+	polygon.m_vertex = data.m_vertex;
+	polygon.m_stride = dInt32(data.m_vertexStrideInBytes / sizeof(dFloat32));
+	
+	dInt32 count = 0;
+	dInt32 maxContacts = m_maxCount;
+	dInt32 maxReduceLimit = maxContacts - 16;
+	dInt32 countleft = maxContacts;
+	
+	const dVector& polygonInstanceScale = polySoupInstance.GetScale();
+	const dMatrix polySoupGlobalMatrix = polySoupInstance.m_globalMatrix;
+	const dMatrix polySoupGlobalAligmentMatrix = polySoupInstance.m_aligmentMatrix;
+	
+	dMatrix polySoupScaledMatrix(polySoupGlobalAligmentMatrix[0] * polygonInstanceScale,
+		polySoupGlobalAligmentMatrix[1] * polygonInstanceScale,
+		polySoupGlobalAligmentMatrix[2] * polygonInstanceScale,
+		polySoupGlobalAligmentMatrix[3]);
+	polySoupScaledMatrix = polySoupScaledMatrix * polySoupGlobalMatrix;
+	
+	dAssert(m_contact);
+	dVector separatingVector(m_instance0.m_globalMatrix.m_up);
+	
+	const dInt32 stride = polygon.m_stride;
+	const dFloat32* const vertex = polygon.m_vertex;
+	dAssert(m_instance1.m_scaleType == ndShapeInstance::m_unit);
+	dFloat32 closestDist = dFloat32(1.0e10f);
+	ndContactPoint* const contactOut = m_contactBuffer;
+	ndContact* const contactJoint = m_contact;
+	dInt32* const indexArray = (dInt32*)data.m_faceVertexIndex;
+
+	data.SortFaceArray();
+	
+	for (dInt32 i = data.m_faceCount - 1; (i >= 0) && (count < 32); i--) 
+	{
+	//	dInt32 address = data.m_faceIndexStart[i];
+	//	const dInt32* const localIndexArray = &indexArray[address];
+	//	polygon.m_vertexIndex = localIndexArray;
+	//	polygon.m_count = data.m_faceIndexCount[i];
+	//	polygon.m_paddedCount = polygon.m_count;
+	//	polygon.m_adjacentFaceEdgeNormalIndex = data.GetAdjacentFaceEdgeNormalArray(localIndexArray, polygon.m_count);
+	//	polygon.m_faceId = data.GetFaceId(localIndexArray, polygon.m_count);
+	//	polygon.m_faceClipSize = data.GetFaceSize(localIndexArray, polygon.m_count);
+	//	polygon.m_faceNormalIndex = data.GetNormalIndex(localIndexArray, polygon.m_count);
+	//	polygon.m_normal = polygon.CalculateGlobalNormal(polySoupInstance, dVector(&vertex[polygon.m_faceNormalIndex * stride]) & dVector::m_triplexMask);
+	//	dAssert(polygon.m_normal.m_w == dFloat32(0.0f));
+	//	for (dInt32 j = 0; j < polygon.m_count; j++) {
+	//		polygon.m_localPoly[j] = polySoupScaledMatrix.TransformVector(dVector(&vertex[localIndexArray[j] * stride]) & dVector::m_triplexMask);
+	//	}
+	//	contactJoint->m_separtingVector = separatingVector;
+	//	proxy.m_maxContacts = countleft;
+	//	proxy.m_contacts = &contactOut[count];
+	//	dInt32 count1 = polygon.CalculateContactToConvexHullDescrete(this, polySoupInstance, proxy);
+	//	closestDist = dgMin(closestDist, contactJoint->m_closestDistance);
+	//
+	//	if (count1 > 0) {
+	//		count += count1;
+	//		countleft -= count1;
+	//		dAssert(countleft >= 0);
+	//		if (count >= maxReduceLimit) {
+	//			count = PruneContacts(count, contactOut, dFloat32(1.0e-2f), 16);
+	//			countleft = maxContacts - count;
+	//			dAssert(countleft >= 0);
+	//			proxy.m_maxContacts = countleft;
+	//		}
+	//	}
+	//	else if (count1 == -1) 
+	//	{
+	//		count = -1;
+	//		break;
+	//	}
+	}
+	
+	//contactJoint->m_closestDistance = closestDist;
+	//
+	//if (count) {
+	//	switch (proxy.m_instance0->GetCollisionPrimityType())
+	//	{
+	//	case m_sphereCollision:
+	//	case m_capsuleCollision:
+	//	case m_chamferCylinderCollision:
+	//		proxy.m_instance0->CalculateImplicitContacts(count, contactOut);
+	//		break;
+	//
+	//	default:
+	//	{
+	//		bool contactsValid = true;
+	//
+	//		for (dInt32 i = 0; (i < count) && contactsValid; i++) {
+	//			const dVector& normal = contactOut[i].m_normal;
+	//			for (dInt32 j = i + 1; (j < count) && contactsValid; j++) {
+	//				const dFloat32 project = (normal.DotProduct(contactOut[j].m_normal)).GetScalar();
+	//				contactsValid = contactsValid && (project > dFloat32(-0.1f));
+	//			}
+	//		}
+	//
+	//		if (!contactsValid) {
+	//			dgCollisionContactCloud contactCloud(GetAllocator(), count, contactOut);
+	//			dgCollisionInstance cloudInstance(*polySoupInstance, &contactCloud);
+	//			cloudInstance.m_globalMatrix = dgGetIdentityMatrix();
+	//			cloudInstance.SetScale(dVector::m_one);
+	//			bool saveintersectionTestOnly = proxy.m_intersectionTestOnly;
+	//			proxy.m_instance1 = &cloudInstance;
+	//			proxy.m_intersectionTestOnly = true;
+	//			dgContactSolver contactSolver(&proxy);
+	//			contactSolver.CalculateConvexToConvexContacts();
+	//			dVector normal(contactSolver.GetNormal() * dVector::m_negOne);
+	//			for (dInt32 i = 0; i < count; i++) {
+	//				contactOut[i].m_normal = normal;
+	//			}
+	//
+	//			proxy.m_intersectionTestOnly = saveintersectionTestOnly;
+	//			cloudInstance.m_material.m_userData = NULL;
+	//		}
+	//	}
+	//	}
+	//}
+	//
+	//proxy.m_contacts = contactOut;
+	//
+	//// restore the pointer
+	//polyInstance.m_material.m_userData = NULL;
+	//proxy.m_instance1 = polySoupInstance;
+
+	m_instance1.m_shape = polySoupInstance.m_shape;
+	m_instance1 = polySoupInstance;
+
+	return count;
 }

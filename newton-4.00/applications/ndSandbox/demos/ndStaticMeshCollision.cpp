@@ -20,7 +20,6 @@
 #include "ndDemoEntityManager.h"
 #include "ndBasicPlayerCapsule.h"
 
-/*
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoMesh* const mesh, const ndShapeInstance& shape,
 	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count)
@@ -61,8 +60,8 @@ static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	const int n = 5;
-	const int stackHigh = 5;
+	const int n = 1;
+	const int stackHigh = 1;
 	//const int n = 10;
 	//const int stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)
@@ -107,14 +106,12 @@ static void AddPlatform(ndDemoEntityManager* const scene, dFloat32 mass, const d
 	mesh->Release();
 }
 
-*/
-
 void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	//BuildFlatPlaner(scene);
-	//BuildStaticMesh(scene, "flatPlane.fbx");
-	BuildStaticMesh(scene, "track.fbx");
+	BuildStaticMesh(scene, "flatPlane.fbx");
+	//BuildStaticMesh(scene, "track.fbx");
 	//BuildStaticMesh(scene, "excavator.fbx");
 
 	dMatrix location(dGetIdentityMatrix());
@@ -134,7 +131,7 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 //	player->m_isPlayer = true;
 //	scene->SetUpdateCameraFunction(ndBasicPlayerCapsule::UpdateCameraCallback, player);
 
-	//AddShapes(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f));
+	AddShapes(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f));
 	//AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
 	//AddPlatform(scene, 30.0f, dVector(10.0f, 0.5f, 1.125f, 0.0f));
 	//AddPlatform(scene, 30.0f, dVector(10.0f, 1.0f, 1.250f, 0.0f));

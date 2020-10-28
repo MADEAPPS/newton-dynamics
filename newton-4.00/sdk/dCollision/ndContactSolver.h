@@ -28,7 +28,7 @@
 
 class dPlane;
 class ndBodyKinematic;
-//class ndContactPoint;
+class ndPolygonMeshDesc;
 
 D_MSV_NEWTON_ALIGN_32
 class ndMinkFace
@@ -72,6 +72,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 
 	dInt32 ConvexContacts();
 	dInt32 CalculateConvexToConvexContacts();
+	dInt32 CalculateConvexToSaticMeshContacts();
 	dInt32 CalculatePairContacts(dInt32 threadIndex);
 
 	dFloat32 RayCast (const dVector& localP0, const dVector& localP1, ndContactPoint& contactOut);
@@ -104,12 +105,15 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 CalculateClosestSimplex();
 	bool CalculateClosestPoints();
 	dInt32 ConvexToConvexContacts();
+	dInt32 ConvexToStaticMeshContacts();
 
 	dInt32 CalculateIntersectingPlane(dInt32 count);
 	dInt32 PruneContacts(dInt32 count, dInt32 maxCount) const;
 	dInt32 CalculateContacts(const dVector& point0, const dVector& point1, const dVector& normal);
 	dInt32 ConvexPolygonsIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dInt32 maxContacts) const;
 	dInt32 ConvexPolygonToLineIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dVector* const mem) const;
+
+	dInt32 CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDesc& data);
 
 	D_INLINE dBigVector ReduceLine(dInt32& indexOut);
 	D_INLINE dBigVector ReduceTriangle (dInt32& indexOut);
@@ -157,6 +161,7 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	static dInt32 m_rayCastSimplex[4][4];
 
 	friend class ndScene;
+	friend class ndPolygonMeshDesc;
 	friend class ndBodyPlayerCapsuleContactSolver;
 } D_GCC_NEWTON_ALIGN_32 ;
 

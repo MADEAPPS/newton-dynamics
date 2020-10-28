@@ -39,11 +39,12 @@ class ndShapeStaticBVH : public ndShapeStaticMesh, public dAabbPolygonSoup
 	virtual ndShapeInfo GetShapeInfo() const;
 	virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const;
+	virtual void GetCollidingFaces(ndPolygonMeshDesc* const data) const;
 	
 	static dFloat32 RayHit(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount);
 	static dIntersectStatus ShowDebugPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 	static dIntersectStatus GetTriangleCount(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
-
+	static dIntersectStatus GetPolygon(void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 	public:
 	D_MSV_NEWTON_ALIGN_32 
 	class ndBvhRay: public dFastRayTest 
@@ -70,12 +71,8 @@ class ndShapeStaticBVH : public ndShapeStaticMesh, public dAabbPolygonSoup
 	private:
 	
 	static dFloat32 RayHitUser (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount);
-	static dIntersectStatus GetPolygon (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 	static dIntersectStatus CollectVertexListIndexList (void* const context, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount, dFloat32 hitDistance);
 	virtual dVector SupportVertex (const dVector& dir) const;
-	
-	virtual void GetCollidingFaces (dgPolygonMeshDesc* const data) const;
-	
 
 	virtual void GetLocalAABB (const dVector& p0, const dVector& p1, dVector& boxP0, dVector& boxP1) const;
 
