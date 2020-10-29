@@ -109,8 +109,8 @@ class ndPolygonMeshDesc: public dFastAabbInfo
 	dInt32 m_vertexStrideInBytes;
 	dFloat32 m_skinThickness;
 	void* m_userData;
-	ndBodyKinematic *m_objBody;
-	ndBodyKinematic *m_polySoupBody;
+	//ndBodyKinematic *m_objBody;
+	//ndBodyKinematic *m_polySoupBody;
 	ndShapeInstance* m_convexInstance;
 	ndShapeInstance* m_polySoupInstance;
 	dFloat32* m_vertex;

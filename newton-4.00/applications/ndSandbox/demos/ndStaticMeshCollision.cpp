@@ -122,16 +122,15 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	localAxis[1] = dVector(1.0, 0.0f, 0.0f, 0.0f);
 	localAxis[2] = localAxis[0].CrossProduct(localAxis[1]);
 
-//	dFloat32 height = 1.9f;
-//	dFloat32 radio = 0.5f;
-//	dFloat32 mass = 100.0f;
-//	ndBasicPlayerCapsule* const player = new ndBasicPlayerCapsule(
-//		scene, localAxis, location, mass, radio, height, height/4.0f);
-//
-//	player->m_isPlayer = true;
-//	scene->SetUpdateCameraFunction(ndBasicPlayerCapsule::UpdateCameraCallback, player);
+	dFloat32 height = 1.9f;
+	dFloat32 radio = 0.5f;
+	dFloat32 mass = 100.0f;
+	ndBasicPlayerCapsule* const player = new ndBasicPlayerCapsule(
+		scene, localAxis, location, mass, radio, height, height/4.0f);
+	player->m_isPlayer = true;
+	scene->SetUpdateCameraFunction(ndBasicPlayerCapsule::UpdateCameraCallback, player);
 
-	AddShapes(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f));
+	//AddShapes(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f));
 	//AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
 	//AddPlatform(scene, 30.0f, dVector(10.0f, 0.5f, 1.125f, 0.0f));
 	//AddPlatform(scene, 30.0f, dVector(10.0f, 1.0f, 1.250f, 0.0f));

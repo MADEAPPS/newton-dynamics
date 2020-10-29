@@ -111,7 +111,8 @@ class ndContactSolver: public dDownHeap<ndMinkFace *, dFloat32>
 	dInt32 PruneContacts(dInt32 count, dInt32 maxCount) const;
 	dInt32 PruneSupport(dInt32 count, const dVector& dir, const dVector* const points) const;
 	dInt32 CalculateContacts(const dVector& point0, const dVector& point1, const dVector& normal);
-	dInt32 Prune2dContacts(const dMatrix& matrix, dInt32 count, ndContactPoint* const contactArray, int maxCount) const;
+	dInt32 Prune2dContacts(const dMatrix& matrix, dInt32 count, ndContactPoint* const contactArray, dInt32 maxCount) const;
+	dInt32 Prune3dContacts(const dMatrix& matrix, dInt32 count, ndContactPoint* const contactArray, dInt32 maxCount) const;
 	dInt32 ConvexPolygonsIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dInt32 maxContacts) const;
 	dInt32 ConvexPolygonToLineIntersection(const dVector& normal, dInt32 count1, dVector* const shape1, dInt32 count2, dVector* const shape2, dVector* const contactOut, dVector* const mem) const;
 

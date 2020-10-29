@@ -1394,7 +1394,7 @@ dInt32 ndContactSolver::PruneSupport(dInt32 count, const dVector& dir, const dVe
 	return index;
 }
 
-dInt32 ndContactSolver::Prune2dContacts(const dMatrix& matrix, dInt32 count, ndContactPoint* const contactArray, int maxCount) const
+dInt32 ndContactSolver::Prune2dContacts(const dMatrix& matrix, dInt32 count, ndContactPoint* const contactArray, dInt32 maxCount) const
 {
 	class dgConvexFaceNode
 	{
@@ -1587,6 +1587,92 @@ dInt32 ndContactSolver::Prune2dContacts(const dMatrix& matrix, dInt32 count, ndC
 	return hullCount;
 }
 
+dInt32 ndContactSolver::Prune3dContacts(const dMatrix& matrix, dInt32 count, ndContactPoint* const contactArray, dInt32 maxCount) const
+{
+	dVector array[D_MAX_CONTATCS];
+	dFloat32 max_x = dFloat32(1.0e20f);
+	dInt32 maxIndex = 0;
+	for (dInt32 i = 0; i < count; i++) 
+	{
+		array[i] = matrix.UntransformVector(contactArray[i].m_point);
+		array[i].m_w = dFloat32(i);
+		if (array[i].m_x < max_x) 
+		{
+			maxIndex = i;
+			max_x = array[i].m_x;
+		}
+	}
+	dSwap(array[0], array[maxIndex]);
+
+	for (dInt32 i = 2; i < count; i++) 
+	{
+		dInt32 j = i;
+		dVector tmp(array[i]);
+		for (; array[j - 1].m_x > tmp.m_x; j--) 
+		{
+			dAssert(j > 0);
+			array[j] = array[j - 1];
+		}
+		array[j] = tmp;
+	}
+
+	dFloat32 window = dFloat32(2.5e-3f);
+	do 
+	{
+		dInt32 packContacts = 0;
+		window *= dFloat32(2.0f);
+		const dFloat32 window2 = window * window;
+
+		dUnsigned8 mask[D_MAX_CONTATCS];
+		memset(mask, 0, count * sizeof(dUnsigned8));
+		for (dInt32 i = 0; i < count; i++) 
+		{
+			if (!mask[i]) 
+			{
+				const dFloat32 val = array[i].m_x + window;
+				for (dInt32 j = i + 1; (j < count) && (array[j].m_x < val); j++) 
+				{
+					if (!mask[j]) 
+					{
+						dVector dp((array[j] - array[i]) & dVector::m_triplexMask);
+						dAssert(dp.m_w == dFloat32(0.0f));
+						dFloat32 dist2 = dp.DotProduct(dp).GetScalar();
+						if (dist2 < window2) 
+						{
+							mask[j] = 1;
+							packContacts = 1;
+						}
+					}
+				}
+			}
+		}
+
+		if (packContacts) 
+		{
+			dInt32 j = 0;
+			for (dInt32 i = 0; i < count; i++) 
+			{
+				if (!mask[i]) 
+				{
+					array[j] = array[i];
+					j++;
+				}
+			}
+			count = j;
+		}
+	} while (count > maxCount);
+
+	ndContactPoint tmpContact[16];
+	for (dInt32 i = 0; i < count; i++) 
+	{
+		dInt32 index = dInt32(array[i].m_w);
+		tmpContact[i] = contactArray[index];
+	}
+
+	memcpy(contactArray, tmpContact, count * sizeof(ndContactPoint));
+	return count;
+}
+
 dInt32 ndContactSolver::PruneContacts(dInt32 count, dInt32 maxCount) const
 {
 	ndContactPoint* const contactArray = m_contactBuffer;
@@ -1603,7 +1689,7 @@ dInt32 ndContactSolver::PruneContacts(dInt32 count, dInt32 maxCount) const
 	dMatrix covariance(dGetZeroMatrix());
 	for (dInt32 i = 0; i < count; i++) 
 	{
-		dVector p(contactArray[i].m_point - origin);
+		dVector p((contactArray[i].m_point - origin) & dVector::m_triplexMask);
 		dAssert(p.m_w == dFloat32(0.0f));
 		dMatrix matrix(p, p);
 		covariance.m_front += matrix.m_front;
@@ -1645,9 +1731,7 @@ dInt32 ndContactSolver::PruneContacts(dInt32 count, dInt32 maxCount) const
 	if (eigen[2] > eigenValueError) 
 	{
 		// 3d convex Hull
-		dAssert(0);
-		return 0;
-		//return Prune3dContacts(covariance, count, contactArray, maxCount, distTolerenace);
+		return Prune3dContacts(covariance, count, contactArray, maxCount);
 	}
 	else if (eigen[1] > eigenValueError) 
 	{
