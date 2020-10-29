@@ -15,7 +15,7 @@
 #include "ndSandboxStdafx.h"
 class ndDemoEntityManager;
 
-ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene);
-ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName);
+ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized);
+ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized);
 
 #endif

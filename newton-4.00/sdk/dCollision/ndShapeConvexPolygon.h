@@ -48,23 +48,17 @@ class ndShapeConvexPolygon: public ndShapeConvex
 
 	dVector CalculateGlobalNormal(const ndShapeInstance* const parentMesh, const dVector& localNormal) const;
 	dInt32 CalculateContactToConvexHullDescrete(const ndShapeInstance* const parentMesh, ndContactSolver& proxy);
-#if 0
-	//virtual dInt32 CalculateSignature () const;
-	//virtual void Serialize(dgSerialize callback, void* const userData) const;
-	virtual void SetCollisionBBox (const dVector& p0, const dVector& p1);
-	virtual dFloat32 RayCast (const dVector& localP0, const dVector& localP1, dFloat32 maxT, dgContactPoint& contactOut, const dgBody* const body, void* const userData, OnRayPrecastAction preFilter) const;
-	
-	virtual dVector SupportVertex (const dVector& dir, dInt32* const vertexIndex) const;
 
-	virtual dInt32 CalculatePlaneIntersection (const dVector& normal, const dVector& point, dVector* const contactsOut) const;
+	//dInt32 CalculateContactToConvexHullContinue (const dgWorld* const world, const ndShapeInstance* const parentMesh, dgCollisionParamProxy& proxy);
 
-	virtual dFloat32 GetVolume () const;
-	virtual dFloat32 GetBoxMinRadius () const; 
-	virtual dFloat32 GetBoxMaxRadius () const;
-	dInt32 CalculateContactToConvexHullContinue (const dgWorld* const world, const ndShapeInstance* const parentMesh, dgCollisionParamProxy& proxy);
-#endif
-
+	virtual dFloat32 GetVolume() const;
+	virtual dFloat32 GetBoxMinRadius() const;
+	virtual dFloat32 GetBoxMaxRadius() const;
+	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 	bool BeamClipping(const dVector& origin, dFloat32 size, const ndShapeInstance* const parentMesh);
+	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
+
+	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const;
 
 	dVector m_normal;
 	dVector m_localPoly[D_CONVEX_POLYGON_MAX_VERTEX_COUNT];
@@ -85,4 +79,25 @@ inline ndShapeConvexPolygon* ndShapeConvexPolygon::GetAsShapeAsConvexPolygon()
 	return this; 
 }
 
+inline dFloat32 ndShapeConvexPolygon::RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const
+{
+	return dFloat32(1.2f);
+}
+
+inline dFloat32 ndShapeConvexPolygon::GetVolume() const
+{
+	return dFloat32(0.0f);
+}
+
+inline dFloat32 ndShapeConvexPolygon::GetBoxMinRadius() const
+{
+	return m_faceClipSize;
+}
+
+inline dFloat32 ndShapeConvexPolygon::GetBoxMaxRadius() const
+{
+	return GetBoxMinRadius();
+}
+
 #endif
+

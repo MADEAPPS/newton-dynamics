@@ -77,6 +77,8 @@ ndContactSolver::ndContactSolver(ndContact* const contact)
 	,m_contact(contact)
 	,m_instance0(contact->GetBody0()->GetCollisionShape())
 	,m_instance1(contact->GetBody1()->GetCollisionShape())
+	,m_closestPoint0(dVector::m_zero)
+	,m_closestPoint1(dVector::m_zero)
 	,m_separatingVector(ndContact::m_initialSeparatingVector)
 	,m_contactBuffer(nullptr)
 	,m_timestep(dFloat32 (1.0e10f))
@@ -371,7 +373,7 @@ dInt32 ndContactSolver::CalculatePairContacts(dInt32 threadIndex)
 		dAssert(0);
 	}
 
-	if ((count > 1) && !m_instance0.GetShape()->GetAsShapeConvex())
+	if ((count > 1) && !m_instance1.GetShape()->GetAsShapeConvex())
 	{
 		count = PruneContacts(count, 16);
 	}
@@ -2144,6 +2146,7 @@ dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDes
 		
 		contactJoint->m_separatingVector = separatingVector;
 		m_maxCount = countleft;
+		m_vertexIndex = 0;
 		m_contactBuffer = &contactOut[count];
 		dInt32 count1 = polygon.CalculateContactToConvexHullDescrete(&polySoupInstance, *this);
 		//closestDist = dMin(closestDist, contactJoint->m_closestDistance);

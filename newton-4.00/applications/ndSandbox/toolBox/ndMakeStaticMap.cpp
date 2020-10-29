@@ -15,7 +15,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 
-ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene)
+ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 	dVector floor[] =
@@ -31,8 +31,7 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene)
 	meshBuilder.Begin();
 	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[0][0], 3);
 	meshBuilder.AddFaceIndirect(&floor[0].m_x, sizeof(dVector), 31, &index[1][0], 3);
-	meshBuilder.End(true);
-	//meshBuilder.End(false);
+	meshBuilder.End(optimized);
 
 	ndShapeInstance box(new ndShapeStaticBVH(meshBuilder));
 	dMatrix uvMatrix(dGetIdentityMatrix());
@@ -58,7 +57,7 @@ ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene)
 	return body;
 }
 
-ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName)
+ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* const meshName, bool optimized)
 {
 	fbxDemoEntity* const entity = LoadFbxMesh(meshName);
 	entity->BuildRenderMeshes(scene);
@@ -120,8 +119,7 @@ ndBodyKinematic* BuildStaticMesh(ndDemoEntityManager* const scene, const char* c
 			stack++;
 		}
 	}
-	//meshBuilder.End(true);
-	meshBuilder.End(false);
+	meshBuilder.End(optimized);
 	ndShapeInstance shape(new ndShapeStaticBVH(meshBuilder));
 
 	dMatrix matrix(entity->GetCurrentMatrix());

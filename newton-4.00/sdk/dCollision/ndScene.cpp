@@ -1203,9 +1203,6 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 	}
 	
 	contact->m_maxDOF = dUnsigned32(3 * list.GetCount());
-	//if (material->m_processContactPoint) {
-	//	material->m_processContactPoint(*contact, pair->m_timestep, threadIndex);
-	//}
 	m_contactNotifyCallback->OnContactCallback(threadIndex, contact, m_timestep);
 }
 
