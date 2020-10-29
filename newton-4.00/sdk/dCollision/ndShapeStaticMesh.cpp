@@ -20,19 +20,103 @@
 */
 
 #include "dCoreStdafx.h"
+#include "ndCollisionStdafx.h"
+#include "ndShapeInstance.h"
 #include "ndContactSolver.h"
 #include "ndCollisionStdafx.h"
 #include "ndShapeStaticMesh.h"
 
-//#include "dgPhysicsStdafx.h"
-//#include "dgBody.h"
-//#include "dgWorld.h"
-//#include "dgContact.h"
-//#include "ndShapeStaticMesh.h"
-//#include "dgCollisionConvexPolygon.h"
+void ndPolygonMeshDesc::SortFaceArray()
+{
+	dInt32 stride = 8;
+	if (m_faceCount >= 8)
+	{
+		dInt32 stack[D_MAX_COLLIDING_FACES][2];
 
+		stack[0][0] = 0;
+		stack[0][1] = m_faceCount - 1;
+		dInt32 stackIndex = 1;
+		while (stackIndex)
+		{
+			stackIndex--;
+			dInt32 lo = stack[stackIndex][0];
+			dInt32 hi = stack[stackIndex][1];
+			if ((hi - lo) > stride)
+			{
+				dInt32 i = lo;
+				dInt32 j = hi;
+				dFloat32 dist = m_hitDistance[(lo + hi) >> 1];
+				do
+				{
+					while (m_hitDistance[i] < dist) i++;
+					while (m_hitDistance[j] > dist) j--;
 
-//ndPolygonMeshDesc::ndPolygonMeshDesc(dgCollisionParamProxy& proxy, void* const userData)
+					if (i <= j)
+					{
+						dSwap(m_hitDistance[i], m_hitDistance[j]);
+						dSwap(m_faceIndexStart[i], m_faceIndexStart[j]);
+						dSwap(m_faceIndexCount[i], m_faceIndexCount[j]);
+						i++;
+						j--;
+					}
+				} while (i <= j);
+
+				if (i < hi)
+				{
+					stack[stackIndex][0] = i;
+					stack[stackIndex][1] = hi;
+					stackIndex++;
+				}
+				if (lo < j) {
+					stack[stackIndex][0] = lo;
+					stack[stackIndex][1] = j;
+					stackIndex++;
+				}
+				dAssert(stackIndex < dInt32(sizeof(stack) / (2 * sizeof(stack[0][0]))));
+			}
+		}
+	}
+
+	stride = stride * 2;
+	if (m_faceCount < stride)
+	{
+		stride = m_faceCount;
+	}
+	for (dInt32 i = 1; i < stride; i++)
+	{
+		if (m_hitDistance[i] < m_hitDistance[0])
+		{
+			dSwap(m_hitDistance[i], m_hitDistance[0]);
+			dSwap(m_faceIndexStart[i], m_faceIndexStart[0]);
+			dSwap(m_faceIndexCount[i], m_faceIndexCount[0]);
+		}
+	}
+
+	for (dInt32 i = 1; i < m_faceCount; i++)
+	{
+		dInt32 j = i;
+		dInt32 ptr = m_faceIndexStart[i];
+		dInt32 count = m_faceIndexCount[i];
+		dFloat32 dist = m_hitDistance[i];
+		for (; dist < m_hitDistance[j - 1]; j--)
+		{
+			dAssert(j > 0);
+			m_hitDistance[j] = m_hitDistance[j - 1];
+			m_faceIndexStart[j] = m_faceIndexStart[j - 1];
+			m_faceIndexCount[j] = m_faceIndexCount[j - 1];
+		}
+		m_hitDistance[j] = dist;
+		m_faceIndexStart[j] = ptr;
+		m_faceIndexCount[j] = count;
+	}
+
+#ifdef _DEBUG
+	for (dInt32 i = 0; i < m_faceCount - 1; i++) {
+		dAssert(m_hitDistance[i] <= m_hitDistance[i + 1]);
+	}
+#endif
+}
+
 ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, void* const userData)
 	:dFastAabbInfo()
 	,m_boxDistanceTravelInMeshSpace(dVector::m_zero)
@@ -106,96 +190,6 @@ ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, void* const userDat
 	dAssert (m_posit.m_w == dFloat32 (1.0f));
 }
 
-void ndPolygonMeshDesc::SortFaceArray ()
-{
-	dInt32 stride = 8;
-	if (m_faceCount >= 8) 
-	{
-		dInt32 stack[D_MAX_COLLIDING_FACES][2];
-
-		stack[0][0] = 0;
-		stack[0][1] = m_faceCount - 1;
-		dInt32 stackIndex = 1;
-		while (stackIndex) 
-		{
-			stackIndex --;
-			dInt32 lo = stack[stackIndex][0];
-			dInt32 hi = stack[stackIndex][1];
-			if ((hi - lo) > stride) 
-			{
-				dInt32 i = lo;
-				dInt32 j = hi;
-				dFloat32 dist = m_hitDistance[(lo + hi) >> 1];
-				do 
-				{    
-					while (m_hitDistance[i] < dist) i ++;
-					while (m_hitDistance[j] > dist) j --;
-
-					if (i <= j)	
-					{
-						dSwap (m_hitDistance[i], m_hitDistance[j]);
-						dSwap (m_faceIndexStart[i], m_faceIndexStart[j]);
-						dSwap (m_faceIndexCount[i], m_faceIndexCount[j]);
-						i++; 
-						j--;
-					}
-				} while (i <= j);
-
-				if (i < hi) 
-				{
-					stack[stackIndex][0] = i;
-					stack[stackIndex][1] = hi;
-					stackIndex ++;
-				}
-				if (lo < j) {
-					stack[stackIndex][0] = lo;
-					stack[stackIndex][1] = j;
-					stackIndex ++;
-				}
-				dAssert (stackIndex < dInt32 (sizeof (stack) / (2 * sizeof (stack[0][0]))));
-			}
-		}
-	}
-
-	stride = stride * 2;
-	if (m_faceCount < stride) 
-	{
-		stride = m_faceCount;
-	}
-	for (dInt32 i = 1; i < stride; i ++) 
-	{
-		if (m_hitDistance[i] < m_hitDistance[0]) 
-		{
-			dSwap (m_hitDistance[i], m_hitDistance[0]);
-			dSwap (m_faceIndexStart[i], m_faceIndexStart[0]);
-			dSwap (m_faceIndexCount[i], m_faceIndexCount[0]);
-		}
-	}
-
-	for (dInt32 i = 1; i < m_faceCount; i ++) 
-	{
-		dInt32 j = i;
-		dInt32 ptr = m_faceIndexStart[i];
-		dInt32 count = m_faceIndexCount[i];
-		dFloat32 dist = m_hitDistance[i];
-		for ( ; dist < m_hitDistance[j - 1]; j --) 
-		{
-			dAssert (j > 0);
-			m_hitDistance[j] = m_hitDistance [j-1];
-			m_faceIndexStart[j] = m_faceIndexStart[j-1];
-			m_faceIndexCount[j] = m_faceIndexCount[j-1];
-		}
-		m_hitDistance[j] = dist;
-		m_faceIndexStart[j] = ptr;
-		m_faceIndexCount[j] = count;
-	}
-
-#ifdef _DEBUG
-	for (dInt32 i = 0; i < m_faceCount - 1; i ++) {
-		dAssert (m_hitDistance[i] <= m_hitDistance[i+1]);
-	}
-#endif
-}
 
 #if 0
 ndShapeStaticMesh::ndShapeStaticMesh (dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber)

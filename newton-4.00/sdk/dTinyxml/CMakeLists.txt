@@ -10,7 +10,7 @@
 
 cmake_minimum_required(VERSION 3.4.0)
 
-set (projectName "tinyxml")
+set (projectName "ndTinyxml")
 message (${projectName})
 
 
@@ -20,6 +20,9 @@ file(GLOB HEADERS *.h)
 
 add_library(${projectName} STATIC ${CPP_SOURCE})
 target_include_directories(${projectName} PUBLIC .)
+target_include_directories(${projectName} PUBLIC ../dCore)
+target_include_directories(${projectName} PUBLIC ../dNewton)
+target_include_directories(${projectName} PUBLIC ../dCollision)
 if(UNIX)
     target_compile_options(${projectName} PRIVATE -fPIC)
 endif()

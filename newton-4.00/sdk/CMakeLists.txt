@@ -22,6 +22,7 @@ if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	add_subdirectory(dCore)
 	add_subdirectory(dNewton)
 	add_subdirectory(dCollision)
+	add_subdirectory(dTinyxml)
 
 else()
 

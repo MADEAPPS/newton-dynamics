@@ -60,14 +60,9 @@ class ndPolygonMeshDesc: public dFastAabbInfo
 
 	ndPolygonMeshDesc(ndContactSolver& proxy, void* const userData);
 
-	void SetDistanceTravel (const dVector& distanceInGlobalSpace)
-	{
-		const dMatrix& soupMatrix = m_polySoupInstance->GetGlobalMatrix();
-		m_boxDistanceTravelInMeshSpace = m_polySoupInstance->GetInvScale() * soupMatrix.UnrotateVector(distanceInGlobalSpace * m_convexInstance->GetInvScale());
-		if (m_boxDistanceTravelInMeshSpace.DotProduct(m_boxDistanceTravelInMeshSpace).GetScalar() < dFloat32 (1.0e-2f)) {
-			m_doContinuesCollisionTest = false;
-		}
-	}
+	void SortFaceArray();
+	dFloat32 GetSeparetionDistance() const;
+	void SetDistanceTravel(const dVector& distanceInGlobalSpace);
 
 	dInt32 GetFaceIndexCount(dInt32 indexCount) const
 	{
@@ -78,7 +73,6 @@ class ndPolygonMeshDesc: public dFastAabbInfo
 	{
 		return &faceIndexArray[indexCount + 2];
 	}
-
 
 	dInt32 GetNormalIndex(const dInt32* const faceIndexArray, dInt32 indexCount) const
 	{
@@ -95,13 +89,6 @@ class ndPolygonMeshDesc: public dFastAabbInfo
 		dInt32 size = faceIndexArray[indexCount * 2 + 2];
 		return dFloat32 ((size >= 1) ? size : dFloat32 (1.0f));
 	}
-
-	dFloat32 GetSeparetionDistance() const
-	{
-		return m_separationDistance[0] * m_polySoupInstance->GetScale().GetScalar();
-	}
-
-	void SortFaceArray ();
 
 	dVector m_boxDistanceTravelInMeshSpace;
 	dInt32 m_threadNumber;
@@ -257,6 +244,22 @@ inline ndShapeStaticMesh* ndShapeStaticMesh::GetAsShapeStaticMeshShape()
 { 
 	return this; 
 }
+
+inline dFloat32 ndPolygonMeshDesc::GetSeparetionDistance() const
+{
+	return m_separationDistance[0] * m_polySoupInstance->GetScale().GetScalar();
+}
+
+inline void ndPolygonMeshDesc::SetDistanceTravel(const dVector& distanceInGlobalSpace)
+{
+	const dMatrix& soupMatrix = m_polySoupInstance->GetGlobalMatrix();
+	m_boxDistanceTravelInMeshSpace = m_polySoupInstance->GetInvScale() * soupMatrix.UnrotateVector(distanceInGlobalSpace * m_convexInstance->GetInvScale());
+	if (m_boxDistanceTravelInMeshSpace.DotProduct(m_boxDistanceTravelInMeshSpace).GetScalar() < dFloat32(1.0e-2f))
+	{
+		m_doContinuesCollisionTest = false;
+	}
+}
+
 
 #endif 
 

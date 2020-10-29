@@ -29,6 +29,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 include_directories(./)
 include_directories(dJoints/)
 include_directories(../dCore/)
+include_directories(../dTinyxml/)
 include_directories(../dCollision/)
 
 if (MSVC)
@@ -65,7 +66,6 @@ if (MSVC)
 
 endif(MSVC)
 
-#target_include_directories(${projectName} PUBLIC . ../dgMeshUtil)
 target_link_libraries(${projectName} ndCore ndCollision)
 
 install(TARGETS ${projectName} 
