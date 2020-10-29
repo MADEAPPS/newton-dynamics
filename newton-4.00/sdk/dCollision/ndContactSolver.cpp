@@ -300,14 +300,22 @@ dInt32 ndContactSolver::ConvexContacts()
 		}
 	}
 
+	if (count > 1)
+	{
+		count = PruneContacts(count, 16);
+	}
+
 	dVector offset = (origin0 & dVector::m_triplexMask);
 	m_closestPoint0 += offset;
 	m_closestPoint1 += offset;
 
-	ndContactPoint* const contactOut = m_contactBuffer;
-	for (dInt32 i = count - 1; i >= 0; i--)
+	if (!m_intersectionTestOnly)
 	{
-		contactOut[i].m_point += offset;
+		ndContactPoint* const contactOut = m_contactBuffer;
+		for (dInt32 i = count - 1; i >= 0; i--)
+		{
+			contactOut[i].m_point += offset;
+		}
 	}
 
 	m_instance0.m_globalMatrix.m_posit = origin0;
@@ -374,11 +382,6 @@ dInt32 ndContactSolver::CalculatePairContacts(dInt32 threadIndex)
 	else
 	{
 		dAssert(0);
-	}
-
-	if ((count > 1) && !m_instance1.GetShape()->GetAsShapeConvex())
-	{
-		count = PruneContacts(count, 16);
 	}
 
 	m_contact->m_timeOfImpact = m_timestep;
@@ -463,14 +466,12 @@ dInt32 ndContactSolver::ConvexToStaticMeshContacts()
 		//	data.SetDistanceTravel(upperBoundVeloc);
 		//}
 	}
-	
-	//ndShapeStaticMesh* const polysoup = (dgCollisionMesh *)data.m_polySoupInstance->GetChildShape();
+
 	ndShapeStaticMesh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticMeshShape();
 	polysoup->GetCollidingFaces(&data);
 	
 	if (data.m_faceCount) 
 	{
-	//	proxy.m_polyMeshData = &data;
 		if (m_ccdMode) 
 		{
 			dAssert(0);
@@ -480,30 +481,23 @@ dInt32 ndContactSolver::ConvexToStaticMeshContacts()
 		{
 			count = CalculatePolySoupToHullContactsDescrete(data);
 		}
-	
-		//if (count > 0) 
-		//{
-		//	dAssert(0);
-		//	//proxy.m_contactJoint->m_isActive = 1;
-		//}
 	}
-	
-	//proxy.m_closestPointBody0 += origin;
-	//proxy.m_closestPointBody1 += origin;
-	//separationDistance = data.GetSeparetionDistance();
 
 	ndBodyKinematic* const body0 = m_contact->GetBody0();
 	ndBodyKinematic* const body1 = m_contact->GetBody1();
 	ndShapeInstance* const instance0 = &body0->GetCollisionShape();
 	ndShapeInstance* const instance1 = &body1->GetCollisionShape();
 
-	ndContactPoint* const contactOut = m_contactBuffer;
-	for (dInt32 i = 0; i < count; i++) 
+	if (!m_intersectionTestOnly)
 	{
-		contactOut[i].m_body0 = body0;
-		contactOut[i].m_body1 = body1;
-		contactOut[i].m_shapeInstance0 = instance0;
-		contactOut[i].m_shapeInstance1 = instance1;
+		ndContactPoint* const contactOut = m_contactBuffer;
+		for (dInt32 i = count - 1; i >= 0; i--)
+		{
+			contactOut[i].m_body0 = body0;
+			contactOut[i].m_body1 = body1;
+			contactOut[i].m_shapeInstance0 = instance0;
+			contactOut[i].m_shapeInstance1 = instance1;
+		}
 	}
 
 	return count;
@@ -2371,16 +2365,8 @@ dInt32 ndContactSolver::CalculateIntersectingPlane(dInt32 count)
 	return -1;
 }
 
-
-//dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(dgCollisionParamProxy& proxy) const
 dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDesc& data)
 {
-	//dAssert(proxy.m_instance1->IsType(dgCollision::dgCollisionMesh_RTTI));
-	//dAssert(proxy.m_instance0->IsType(dgCollision::dgCollisionConvexShape_RTTI));
-	//
-	//dgCollisionInstance* const polySoupInstance = proxy.m_instance1;
-	//dgPolygonMeshDesc& data = *proxy.m_polyMeshData;
-	//
 	dAssert(data.m_faceCount);
 	
 	ndShapeConvexPolygon polygon;
@@ -2446,25 +2432,29 @@ dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDes
 		//closestDist = dMin(closestDist, contactJoint->m_closestDistance);
 		closestDist = dMin(closestDist, contactJoint->m_separationDistance);
 	
-		if (count1 > 0) 
+		//if (count1 > 0) 
+		if (count1 > 0)
 		{
-			count += count1;
-			countleft -= count1;
-			dAssert(countleft >= 0);
-			if (count >= maxReduceLimit) 
+			if (!m_intersectionTestOnly)
 			{
-				dAssert(0);
-				//count = PruneContacts(count, contactOut, dFloat32(1.0e-2f), 16);
-				//countleft = maxContacts - count;
-				//dAssert(countleft >= 0);
-				//proxy.m_maxContacts = countleft;
+				count += count1;
+				countleft -= count1;
+				dAssert(countleft >= 0);
+				if (count >= maxReduceLimit)
+				{
+					dAssert(0);
+					//count = PruneContacts(count, contactOut, dFloat32(1.0e-2f), 16);
+					//countleft = maxContacts - count;
+					//dAssert(countleft >= 0);
+					//proxy.m_maxContacts = countleft;
+				}
 			}
-		}
-		else if (count1 == -1) 
-		{
-			dAssert(0);
-	//		count = -1;
-	//		break;
+			else
+			{
+				//count = -1;
+				count = 1;
+				break;
+			}
 		}
 	}
 
@@ -2513,9 +2503,7 @@ dInt32 ndContactSolver::CalculatePolySoupToHullContactsDescrete(ndPolygonMeshDes
 	//	}
 	//	}
 	}
-	
-	m_contactBuffer = contactOut;
-	
+
 	// restore the pointer
 	//polyInstance.m_material.m_userData = NULL;
 

@@ -1821,7 +1821,7 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 			}
 			else
 			{
-				dAssert(contact->m_maxDOF == 0);
+				//dAssert(contact->m_maxDOF == 0);
 				const ndSceneBodyNode* const bodyNode0 = contact->GetBody0()->m_sceneBodyBodyNode;
 				const ndSceneBodyNode* const bodyNode1 = contact->GetBody1()->m_sceneBodyBodyNode;
 				if (dOverlapTest(bodyNode0->m_minBox, bodyNode0->m_maxBox, bodyNode1->m_minBox, bodyNode1->m_maxBox)) 

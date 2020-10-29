@@ -401,31 +401,35 @@ D_INLINE T dSign(T A)
 template <class T> 
 D_INLINE bool dAreEqual(T A, T B, T tol)
 {
-	//dInt32 exp0;
-	//dFloat64 mantissa0 = frexp(dFloat64 (A), &exp0);
-	//
-	//dInt32 exp1;
-	//dFloat64 mantissa1 = frexp(dFloat64(B), &exp1);
-	//
-	//if ((exp0 < -12) && (exp1 < -12)) {
-	//	return true;
-	//}
-	//
-	//if (exp0 != exp1) {
-	//	return false;
-	//}
-	//return dAbs(mantissa0 - mantissa1) < tol;
-
+	// deal with too small and de normal values.
 	if ((dAbs(A) < tol) && (dAbs(B) < tol)) 
 	{
 		return true;
 	}
-	T maxVal = dMax(dAbs(A), dAbs(B));
-	T den = maxVal > (tol * T(100.0f)) ? maxVal + tol : T(1.0f);
-	if (dAbs(A))
-	A /= den;
-	B /= den;
-	return dAbs(A - B) < tol;
+	//return dAbs(A - B) < tol;
+
+	dInt32 exp0;
+	dFloat64 mantissa0 = frexp(dFloat64 (A), &exp0);
+	
+	dInt32 exp1;
+	dFloat64 mantissa1 = frexp(dFloat64(B), &exp1);
+	//if (exp0 != exp1)
+	if (dAbs(exp0 - exp1) > 1)
+	{
+		return false;
+	}
+	if (exp0 != exp1)
+	{
+		if (exp0 > exp1)
+		{
+			mantissa0 *= dFloat32(2.0f);
+		}
+		else
+		{
+			mantissa1 *= dFloat32(2.0f);
+		}
+	}
+	return dAbs(mantissa0 - mantissa1) < tol;
 }
 
 template <class T>

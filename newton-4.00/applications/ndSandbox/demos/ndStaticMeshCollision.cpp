@@ -60,8 +60,8 @@ static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	const int n = 1;
-	const int stackHigh = 1;
+	const int n = 5;
+	const int stackHigh = 5;
 	//const int n = 10;
 	//const int stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)
@@ -131,16 +131,16 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	player->m_isPlayer = true;
 	scene->SetUpdateCameraFunction(ndBasicPlayerCapsule::UpdateCameraCallback, player);
 
-	//AddShapes(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f));
-	//AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
-	//AddPlatform(scene, 30.0f, dVector(10.0f, 0.5f, 1.125f, 0.0f));
-	//AddPlatform(scene, 30.0f, dVector(10.0f, 1.0f, 1.250f, 0.0f));
+	AddShapes(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f));
+	AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
+	AddPlatform(scene, 30.0f, dVector(10.0f, 0.5f, 1.125f, 0.0f));
+	AddPlatform(scene, 30.0f, dVector(10.0f, 1.0f, 1.250f, 0.0f));
 
-	//location.m_posit.m_z += 2.0f;
-	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
-	//
-	//location.m_posit.m_z += 2.0f;
-	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	location.m_posit.m_z += 2.0f;
+	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	
+	location.m_posit.m_z += 2.0f;
+	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);

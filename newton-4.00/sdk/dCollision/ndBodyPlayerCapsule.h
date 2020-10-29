@@ -135,7 +135,12 @@ inline dFloat32 ndBodyPlayerCapsule::GetHeadingAngle() const
 
 inline void ndBodyPlayerCapsule::SetHeadingAngle(dFloat32 angle)
 { 
-	m_headingAngle = dClamp(angle, dFloat32(-dPi), dFloat32(dPi)); 
+	//m_headingAngle = dClamp(angle, dFloat32(-dPi), dFloat32(dPi)); 
+	const dFloat32 interpolation = dFloat32(0.3f);
+	dFloat32 deltaAngle = AnglesAdd(angle, -m_headingAngle) * interpolation;
+	dFloat32 headingAngle = AnglesAdd(m_headingAngle, deltaAngle);
+	//dTrace(("%f %f %f\n", angle * dRadToDegree, m_headingAngle * dRadToDegree, headingAngle * dRadToDegree));
+	m_headingAngle = headingAngle;
 }
 
 inline void ndBodyPlayerCapsule::IntegrateVelocity(dFloat32 timestep)

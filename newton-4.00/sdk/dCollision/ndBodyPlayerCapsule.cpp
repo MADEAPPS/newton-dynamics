@@ -32,6 +32,7 @@
 #define D_PLAYER_MAX_ROWS			(3 * D_PLAYER_MAX_CONTACTS)
 
 #define D_MAX_COLLIONSION_STEPS		8
+#define D_SLOP_JUMP_ANGLE			dFloat32(0.8f)
 #define D_MAX_COLLISION_PENETRATION	dFloat32 (5.0e-3f)
 
 D_MSV_NEWTON_ALIGN_32
@@ -279,7 +280,8 @@ void ndBodyPlayerCapsule::UpdatePlayerStatus(ndBodyPlayerCapsuleContactSolver& c
 		{
 			dVector normal(contact->m_normal);
 			dVector localNormal(matrix.UnrotateVector(normal));
-			if (localNormal.m_x > 0.95f) 
+			//if (localNormal.m_x > dFloat32 (0.95f)) 
+			if (localNormal.m_x > D_SLOP_JUMP_ANGLE)
 			{
 				m_isOnFloor = true;
 			}
