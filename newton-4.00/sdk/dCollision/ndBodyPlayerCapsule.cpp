@@ -457,13 +457,6 @@ void ndBodyPlayerCapsule::ResolveCollision(ndBodyPlayerCapsuleContactSolver& con
 		
 		if (localPoint.m_x < contactPatchHigh) 
 		{
-			//if (impulseSolver.m_contactPoint[normalIndex]) 
-			//{
-			//	impulseSolver.m_jacobianPairs[normalIndex].m_jacobianM1.m_linear = dVector::m_zero;
-			//	impulseSolver.m_jacobianPairs[normalIndex].m_jacobianM1.m_angular = dVector::m_zero;
-			//}
-		
-			//dFloat32 friction = ContactFrictionCallback(point, normal, dInt32(contact.m_contactID), contact.m_hitBody);
 			dFloat32 friction = ContactFrictionCallback(point, normal, 0, contact->m_body1);
 			if (friction > 0.0f) 
 			{

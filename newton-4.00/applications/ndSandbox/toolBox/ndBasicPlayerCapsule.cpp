@@ -68,6 +68,11 @@ void ndBasicPlayerCapsule::ApplyInputs(dFloat32 timestep)
 
 dFloat32 ndBasicPlayerCapsule::ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const
 {
+	//return dFloat32(2.0f);
+	if (dAbs(normal.m_y) < 0.8f)
+	{
+		return 0.4f;
+	}
 	return dFloat32(2.0f);
 }
 
