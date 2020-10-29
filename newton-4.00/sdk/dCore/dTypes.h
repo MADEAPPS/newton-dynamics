@@ -420,7 +420,9 @@ D_INLINE bool dAreEqual(T A, T B, T tol)
 	{
 		return true;
 	}
-	T den = dMax(dAbs(A), dAbs(B)) + tol;
+	T maxVal = dMax(dAbs(A), dAbs(B));
+	T den = maxVal > (tol * T(100.0f)) ? maxVal + tol : T(1.0f);
+	if (dAbs(A))
 	A /= den;
 	B /= den;
 	return dAbs(A - B) < tol;

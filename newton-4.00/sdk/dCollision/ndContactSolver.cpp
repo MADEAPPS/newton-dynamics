@@ -29,6 +29,9 @@
 #include "ndShapeStaticMesh.h"
 #include "ndShapeConvexPolygon.h"
 
+dVector ndContactSolver::m_pruneUpDir(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f));
+dVector ndContactSolver::m_pruneSupportX(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+
 dVector ndContactSolver::m_hullDirs[] =
 {
 	dVector(dFloat32(0.577350f), dFloat32(-0.577350f), dFloat32(0.577350f), dFloat32(0.0f)),
@@ -1375,6 +1378,215 @@ dInt32 ndContactSolver::ConvexPolygonsIntersection(const dVector& normal, dInt32
 	return count;
 }
 
+dInt32 ndContactSolver::PruneSupport(dInt32 count, const dVector& dir, const dVector* const points) const
+{
+	dInt32 index = 0;
+	dFloat32 maxVal = dFloat32(-1.0e20f);
+	for (dInt32 i = 0; i < count; i++) 
+	{
+		dFloat32 dist = dir.DotProduct(points[i]).GetScalar();
+		if (dist > maxVal) 
+		{
+			index = i;
+			maxVal = dist;
+		}
+	}
+	return index;
+}
+
+dInt32 ndContactSolver::Prune2dContacts(const dMatrix& matrix, dInt32 count, ndContactPoint* const contactArray, int maxCount) const
+{
+	class dgConvexFaceNode
+	{
+		public:
+		dVector m_point2d;
+		ndContactPoint m_contact;
+		dgConvexFaceNode* m_next;
+		dgConvexFaceNode* m_prev;
+		dInt32 m_mask;
+	};
+
+	class dgHullStackSegment
+	{
+		public:
+		dVector m_p0;
+		dVector m_p1;
+		dgConvexFaceNode* m_edgeP0;
+	};
+
+	dVector xyMask(dVector::m_xMask | dVector::m_yMask);
+
+	dVector array[D_MAX_CONTATCS];
+	dgHullStackSegment stack[D_MAX_CONTATCS];
+
+	dgConvexFaceNode convexHull[32];
+	ndContactPoint buffer[32];
+
+	// it is a big mistake to set contact to deepest penetration because si cause unwanted pops.
+	// is better to present the original contact penetrations
+	//dFloat32 maxPenetration = dFloat32(0.0f);
+	for (dInt32 i = 0; i < count; i++) 
+	{
+		array[i] = matrix.UntransformVector(contactArray[i].m_point) & xyMask;
+	}
+
+	dInt32 i0 = PruneSupport(count, m_pruneSupportX, array);
+	count--;
+	convexHull[0].m_point2d = array[i0];
+	convexHull[0].m_contact = contactArray[i0];
+	stack[0].m_p0 = array[i0];
+	array[i0] = array[count];
+	contactArray[i0] = contactArray[count];
+
+	dInt32 i1 = PruneSupport(count, m_pruneSupportX.Scale(dFloat32(-1.0f)), array);
+	count--;
+	convexHull[1].m_point2d = array[i1];
+	convexHull[1].m_contact = contactArray[i1];
+	stack[0].m_p1 = array[i1];
+	array[i1] = array[count];
+	contactArray[i1] = contactArray[count];
+
+	stack[0].m_edgeP0 = &convexHull[0];
+	convexHull[0].m_next = &convexHull[1];
+	convexHull[0].m_prev = &convexHull[1];
+	convexHull[1].m_next = &convexHull[0];
+	convexHull[1].m_prev = &convexHull[0];
+
+	stack[1].m_edgeP0 = &convexHull[1];
+	stack[1].m_p0 = stack[0].m_p1;
+	stack[1].m_p1 = stack[0].m_p0;
+
+	int hullCount = 2;
+	dInt32 stackIndex = 2;
+	dFloat32 totalArea = dFloat32(0.0f);
+	while (stackIndex && count && (hullCount < sizeof(convexHull) / sizeof(convexHull[0]))) 
+	{
+		stackIndex--;
+
+		dgHullStackSegment segment(stack[stackIndex]);
+		dVector p1p0((segment.m_p1 - segment.m_p0));
+		dFloat32 mag2 = p1p0.DotProduct(p1p0).GetScalar();
+		if (mag2 > dFloat32(1.0e-5f)) 
+		{
+			dVector dir(m_pruneUpDir.CrossProduct(p1p0));
+			dInt32 newIndex = PruneSupport(count, dir, array);
+
+			dVector edge(array[newIndex] - segment.m_p0);
+			dVector normal(p1p0.CrossProduct(edge));
+			if (normal.m_z > dFloat32(1.e-4f)) 
+			{
+				totalArea += normal.m_z;
+				dAssert(stackIndex < (D_MAX_CONTATCS - 2));
+				convexHull[hullCount].m_point2d = array[newIndex];
+				convexHull[hullCount].m_contact = contactArray[newIndex];
+				convexHull[hullCount].m_next = segment.m_edgeP0->m_next;
+				segment.m_edgeP0->m_next->m_prev = &convexHull[hullCount];
+
+				convexHull[hullCount].m_prev = segment.m_edgeP0;
+				segment.m_edgeP0->m_next = &convexHull[hullCount];
+
+				stack[stackIndex + 0].m_p0 = segment.m_p0;
+				stack[stackIndex + 0].m_p1 = array[newIndex];
+				stack[stackIndex + 0].m_edgeP0 = segment.m_edgeP0;
+
+				stack[stackIndex + 1].m_p0 = array[newIndex];
+				stack[stackIndex + 1].m_p1 = segment.m_p1;
+				stack[stackIndex + 1].m_edgeP0 = &convexHull[hullCount];
+
+				hullCount++;
+				stackIndex += 2;
+				count--;
+				array[newIndex] = array[count];
+				contactArray[newIndex] = contactArray[count];
+			}
+		}
+	}
+	dAssert(hullCount < sizeof(convexHull) / sizeof(convexHull[0]));
+
+	dUpHeap<dgConvexFaceNode*, dFloat32> sortHeap(array, sizeof(array));
+	dgConvexFaceNode* hullPoint = &convexHull[0];
+
+	bool hasLinearCombination = true;
+	while (hasLinearCombination) 
+	{
+		sortHeap.Flush();
+		hasLinearCombination = false;
+		dgConvexFaceNode* ptr = hullPoint;
+		dVector e0(ptr->m_next->m_point2d - ptr->m_point2d);
+		do 
+		{
+			dVector e1(ptr->m_next->m_next->m_point2d - ptr->m_next->m_point2d);
+			dFloat32 area = e0.m_y * e1.m_x - e0.m_x * e1.m_y;
+			sortHeap.Push(ptr->m_next, area);
+			e0 = e1;
+			ptr->m_mask = 1;
+			ptr = ptr->m_next;
+		} while (ptr != hullPoint);
+
+		while (sortHeap.GetCount() && (sortHeap.Value() * dFloat32(16.0f) < totalArea)) 
+		{
+			dgConvexFaceNode* const corner = sortHeap[0];
+			if (corner->m_mask && corner->m_prev->m_mask) 
+			{
+				if (hullPoint == corner) 
+				{
+					hullPoint = corner->m_prev;
+				}
+				hullCount--;
+				hasLinearCombination = true;
+				corner->m_prev->m_mask = 0;
+				corner->m_next->m_prev = corner->m_prev;
+				corner->m_prev->m_next = corner->m_next;
+			}
+			sortHeap.Pop();
+		}
+	}
+
+	while (hullCount > maxCount) 
+	{
+		sortHeap.Flush();
+		dgConvexFaceNode* ptr = hullPoint;
+		dVector e0(ptr->m_next->m_point2d - ptr->m_point2d);
+		do 
+		{
+			dVector e1(ptr->m_next->m_next->m_point2d - ptr->m_next->m_point2d);
+			dFloat32 area = e0.m_y * e1.m_x - e0.m_x * e1.m_y;
+			sortHeap.Push(ptr->m_next, area);
+			e0 = e1;
+			ptr->m_mask = 1;
+			ptr = ptr->m_next;
+		} while (ptr != hullPoint);
+
+		while (sortHeap.GetCount() && (hullCount > maxCount)) 
+		{
+			dgConvexFaceNode* const corner = sortHeap[0];
+			if (corner->m_mask && corner->m_prev->m_mask) 
+			{
+				if (hullPoint == corner) 
+				{
+					hullPoint = corner->m_prev;
+				}
+				hullCount--;
+				hasLinearCombination = true;
+				corner->m_prev->m_mask = 0;
+				corner->m_next->m_prev = corner->m_prev;
+				corner->m_prev->m_next = corner->m_next;
+			}
+			sortHeap.Pop();
+		}
+	}
+
+	hullCount = 0;
+	dgConvexFaceNode* ptr = hullPoint;
+	do 
+	{
+		contactArray[hullCount] = ptr->m_contact;
+		hullCount++;
+		ptr = ptr->m_next;
+	} while (ptr != hullPoint);
+	return hullCount;
+}
+
 dInt32 ndContactSolver::PruneContacts(dInt32 count, dInt32 maxCount) const
 {
 	ndContactPoint* const contactArray = m_contactBuffer;
@@ -1440,9 +1652,7 @@ dInt32 ndContactSolver::PruneContacts(dInt32 count, dInt32 maxCount) const
 	else if (eigen[1] > eigenValueError) 
 	{
 		// is a 2d or 1d convex hull
-		dAssert(0);
-		return 0;
-		//return Prune2dContacts(covariance, count, contactArray, maxCount, distTolerenace);
+		return Prune2dContacts(covariance, count, contactArray, maxCount);
 	}
 	else if (eigen[0] > eigenValueError) 
 	{
