@@ -314,7 +314,7 @@ inline dVector ndShape::GetObbOrigin() const
 
 inline dVector ndShape::GetObbSize() const
 {
-	return m_boxOrigin;
+	return m_boxSize;
 }
 
 inline dFloat32 ndShape::GetUmbraClipSize() const

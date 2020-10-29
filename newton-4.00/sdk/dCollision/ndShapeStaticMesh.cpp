@@ -53,9 +53,6 @@ ndPolygonMeshDesc::ndPolygonMeshDesc(ndContactSolver& proxy, void* const userDat
 	,m_maxT(dFloat32 (1.0f))
 	,m_doContinuesCollisionTest(proxy.m_ccdMode)
 {
-	//dAssert (m_polySoupInstance->IsType (dgCollision::dgCollisionMesh_RTTI));
-	//dAssert (m_convexInstance->IsType (dgCollision::dgCollisionConvexShape_RTTI));
-
 	const dMatrix& hullMatrix = m_convexInstance->GetGlobalMatrix();
 	const dMatrix& soupMatrix = m_polySoupInstance->GetGlobalMatrix();
 	
