@@ -471,14 +471,7 @@ void ndShapeBox::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
 
 	paramNode->SetAttribute("nodeId", nodeid);
 
-	#define ADD_PARAM(root, label, data) \
-	{	\
-		nd::TiXmlElement* const node = new nd::TiXmlElement("param"); \
-		root->LinkEndChild(node); \
-		node->SetDoubleAttribute(label, data); \
-	}
-
-	ADD_PARAM(paramNode, "sized_x", m_size[0][0] * dFloat32(2.0f));
-	ADD_PARAM(paramNode, "sized_y", m_size[0][1] * dFloat32(2.0f));
-	ADD_PARAM(paramNode, "sized_z", m_size[0][2] * dFloat32(2.0f));
+	SaveParam(paramNode, "sized_x", m_size[0][0] * dFloat32(2.0f));
+	SaveParam(paramNode, "sized_y", m_size[0][1] * dFloat32(2.0f));
+	SaveParam(paramNode, "sized_z", m_size[0][2] * dFloat32(2.0f));
 }

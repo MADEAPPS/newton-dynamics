@@ -23,6 +23,7 @@
 #include "dTypes.h"
 #include "dStack.h"
 #include "dVector.h"
+#include "dMatrix.h"
 
 #if 0
 #include "dgDebug.h"
@@ -565,6 +566,78 @@ dInt32 dVertexListToIndexList(dFloat64* const vertList, dInt32 strideInBytes, dI
 		indexListOut[i1] = index;
 		m += stride2;
 	}
-
 	return count;
+}
+
+static char* FloatToString(char* const buffer, dFloat32 value)
+{
+	sprintf(buffer, "%f", value);
+	char* ptr = buffer + strlen(buffer);
+	while (*(--ptr) == '0')
+	{
+		*ptr = ' ';
+	}
+	if (*ptr == '.')
+	{
+		ptr++;
+		*ptr = '0';
+	}
+	ptr++;
+	*ptr = ' ';
+	ptr++;
+	*ptr = 0;
+	return ptr;
+}
+
+void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const value)
+{
+	nd::TiXmlElement* const node = new nd::TiXmlElement("param");
+	rootNode->LinkEndChild(node);
+	node->SetAttribute(name, value);
+}
+
+void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 value)
+{
+	char buffer[1024];
+	sprintf(buffer, "%d", value);
+	SaveParam(rootNode, name, buffer);
+}
+
+void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt64 value)
+{
+	char buffer[1024];
+	sprintf(buffer, "%lld", value);
+	SaveParam(rootNode, name, buffer);
+}
+
+void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dFloat32 value)
+{
+	char buffer[1024];
+	FloatToString(buffer, value);
+	SaveParam(rootNode, name, buffer);
+}
+
+void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, const dVector& value)
+{
+	char buffer[1024];
+	//sprintf(buffer, "%f %f %f %f", value.m_x, value.m_y, value.m_z, value.m_z);
+	char* ptr0 = FloatToString(buffer, value.m_x);
+	char* ptr1 = FloatToString(ptr0, value.m_y);
+	char* ptr2 = FloatToString(ptr1, value.m_z);
+	FloatToString(ptr2, value.m_w);
+	SaveParam(rootNode, name, buffer);
+}
+
+void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, const dMatrix& value)
+{
+	dVector euler0;
+	dVector euler1;
+	value.CalcPitchYawRoll(euler0, euler1);
+	euler0 = euler0.Scale(dRadToDegree);
+
+	char buffer[256];
+	sprintf(buffer, "%sEulerAngles", name);
+	SaveParam(rootNode, buffer, euler0);
+	sprintf(buffer, "%sPosition", name);
+	SaveParam(rootNode, buffer, value.m_posit);
 }

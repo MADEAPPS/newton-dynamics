@@ -79,7 +79,7 @@ class ndShapeInstance: public dClassAlloc
 	D_COLLISION_API ndShapeInfo GetShapeInfo() const;
 
 	D_COLLISION_API dFloat32 CalculateBuoyancyCenterOfPresure(dVector& com, const dMatrix& matrix, const dVector& fluidPlane) const;
-	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode) const;
+	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
 	ndShape* GetShape();
 	const ndShape* GetShape() const;

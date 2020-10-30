@@ -549,12 +549,6 @@ void ndWorld::Save(const char* const path)
 	nd::TiXmlDocument asciifile;
 	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
 	asciifile.LinkEndChild(decl);
-	#define ADD_PARAM(root, label, data) \
-	{	\
-		nd::TiXmlElement* const node = new nd::TiXmlElement("param"); \
-		root->LinkEndChild(node); \
-		node->SetAttribute(label, data); \
-	}
 
 	nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
 	asciifile.LinkEndChild(worldNode);
@@ -562,13 +556,13 @@ void ndWorld::Save(const char* const path)
 	nd::TiXmlElement* const config = new nd::TiXmlElement("settings");
 	worldNode->LinkEndChild(config);
 
-	ADD_PARAM(config, "description", "Newton Dynamics 4.00");
-	ADD_PARAM(config, "revision", 100);
-	ADD_PARAM(config, "solverSubsteps", m_subSteps);
-	ADD_PARAM(config, "solverIterations", m_solverIterations);
+	SaveParam(config, "description", "Newton Dynamics 4.00");
+	SaveParam(config, "revision", 100);
+	SaveParam(config, "solverSubsteps", m_subSteps);
+	SaveParam(config, "solverIterations", m_solverIterations);
 
 	dInt32 shapesCount = 0;
-	dTree<dUnsigned32, ndShape*> uniqueShapes;
+	dTree<dUnsigned32, const ndShape*> uniqueShapes;
 	const ndBodyList& bodyList = GetBodyList();
 	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
@@ -586,11 +580,11 @@ void ndWorld::Save(const char* const path)
 		nd::TiXmlElement* const shapesNode = new nd::TiXmlElement("ndShapes");
 		worldNode->LinkEndChild(shapesNode);
 
-		dTree<dUnsigned32, ndShape*>::Iterator it(uniqueShapes);
+		dTree<dUnsigned32, const ndShape*>::Iterator it(uniqueShapes);
 		for (it.Begin(); it; it ++)
 		{
 			dInt32 nodeId = *it;
-			ndShape* const shape = it.GetKey();
+			const ndShape* const shape = it.GetKey();
 			shape->Save(shapesNode, nodeId);
 		}
 	}
@@ -604,7 +598,7 @@ void ndWorld::Save(const char* const path)
 		for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 		{
 			ndBodyKinematic* const body = bodyNode->GetInfo();
-			body->Save(bodiesNode, bodyIndex);
+			body->Save(bodiesNode, bodyIndex, uniqueShapes);
 			bodyIndex++;
 		}
 	}

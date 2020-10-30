@@ -299,6 +299,7 @@ class dTriplex
 #define dClearFP()		_clearfp() 
 #define dControlFP(x,y)	_controlfp(x,y)
 
+class dMatrix;
 class dBigVector;
 #ifndef D_NEWTON_USE_DOUBLE
 	class dVector;
@@ -596,13 +597,15 @@ class dScopeSpinLock
 	dSpinLock& m_spinLock;
 };
 
+D_CORE_API void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const value);
+D_CORE_API void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 value);
+D_CORE_API void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt64 value);
+D_CORE_API void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dFloat32 value);
+D_CORE_API void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, const dVector& value);
+D_CORE_API void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, const dMatrix& value);
 
-//void dGetMinMax (dBigVector &Min, dBigVector &Max, const dFloat64* const vArray, dInt32 vCount, dInt32 strideInBytes);
 D_CORE_API dInt32 dVertexListToIndexList (dFloat64* const vertexList, dInt32 strideInBytes, dInt32 compareCount,     dInt32 vertexCount,         dInt32* const indexListOut, dFloat64 tolerance = dEpsilon);
 D_CORE_API dInt32 dVertexListToIndexList (dFloat32* const vertexList, dInt32 strideInBytes, dInt32 floatSizeInBytes, dInt32 unsignedSizeInBytes, dInt32 vertexCount, dInt32* const indexListOut, dFloat32 tolerance = dEpsilon);
-//dFloat64 dRoundToFloat(dFloat64 val);
-//void dSerializeMarker(dSerialize serializeCallback, void* const userData);
-//dInt32 dDeserializeMarker(dDeserialize serializeCallback, void* const userData);
 
 class dFloatExceptions
 {

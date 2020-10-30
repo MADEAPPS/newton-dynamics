@@ -49,7 +49,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API virtual void AddDampingAcceleration(dFloat32 timestep);
 	D_NEWTON_API virtual void IntegrateVelocity(dFloat32 timestep);
 
-	D_NEWTON_API virtual void Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const;
+	D_NEWTON_API virtual void Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
 	D_NEWTON_API void SetForce(const dVector& force);
 	D_NEWTON_API void SetTorque(const dVector& torque);

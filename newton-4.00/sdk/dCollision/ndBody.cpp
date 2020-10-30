@@ -111,40 +111,17 @@ void ndBody::SetMatrix(const dMatrix& matrix)
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
 }
 
-void ndBody::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
+void ndBody::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndBody");
 	rootNode->LinkEndChild(paramNode);
 
 	paramNode->SetAttribute("nodeId", nodeid);
 	
-	#define ADD_PARAM(root, label, data) \
-	{	\
-		nd::TiXmlElement* const node = new nd::TiXmlElement("param"); \
-		root->LinkEndChild(node); \
-		node->SetAttribute(label, data); \
-	}
-	
-	char buffer[1024];
-	
-	sprintf(buffer, "%f %f %f", m_matrix.m_posit.m_x, m_matrix.m_posit.m_y, m_matrix.m_posit.m_z);
-	ADD_PARAM(paramNode, "position", buffer);
-	
-	dVector euler0;
-	dVector euler1;
-	m_matrix.CalcPitchYawRoll(euler0, euler1);
-	sprintf(buffer, "%f %f %f", euler0.m_x * dRadToDegree, euler0.m_y * dRadToDegree, euler0.m_z * dRadToDegree);
-	ADD_PARAM(paramNode, "rotation", buffer);
-	
-	sprintf(buffer, "%f %f %f", m_veloc.m_x, m_veloc.m_y, m_veloc.m_z);
-	ADD_PARAM(paramNode, "velocity", buffer);
-	
-	sprintf(buffer, "%f %f %f", m_omega.m_x, m_omega.m_y, m_omega.m_z);
-	ADD_PARAM(paramNode, "omega", buffer);
-	
-	sprintf(buffer, "%f %f %f", m_localCentreOfMass.m_x, m_localCentreOfMass.m_y, m_localCentreOfMass.m_z);
-	ADD_PARAM(paramNode, "centreOfMass", buffer);
-
-	ADD_PARAM(paramNode, "autoSleep", m_autoSleep ? 1 : 0);
-	ADD_PARAM(paramNode, "useGyroTorque", m_gyroTorqueOn ? 1 : 0);
+	SaveParam(paramNode, "matrix", m_matrix);
+	SaveParam(paramNode, "velocity", m_veloc);
+	SaveParam(paramNode, "omega", m_omega);
+	SaveParam(paramNode, "centreOfMass", m_localCentreOfMass);
+	SaveParam(paramNode, "autoSleep", m_autoSleep ? 1 : 0);
+	SaveParam(paramNode, "useGyroTorque", m_gyroTorqueOn ? 1 : 0);
 }

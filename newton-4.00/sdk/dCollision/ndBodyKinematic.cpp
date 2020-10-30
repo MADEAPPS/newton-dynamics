@@ -582,13 +582,16 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 	}
 }
 
-void ndBodyKinematic::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
+void ndBodyKinematic::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndBodyKinematic");
 	rootNode->LinkEndChild(paramNode);
 
 	paramNode->SetAttribute("nodeId", nodeid);
 
-	ndBody::Save(paramNode, nodeid);
-	m_shapeInstance.Save(paramNode);
+	ndBody::Save(paramNode, nodeid, shapesCache);
+	SaveParam(paramNode, "invMass", m_invMass.m_w);
+	dVector invInertia(m_invMass & dVector::m_triplexMask);
+	SaveParam(paramNode, "invPrincipalInertia", invInertia);
+	m_shapeInstance.Save(paramNode, shapesCache);
 }
