@@ -31,6 +31,7 @@ else()
 
 	include_directories(dCore/)
 	include_directories(dNewton/)
+	include_directories(dTinyxml/)
 	include_directories(dCollision/)
 	include_directories(dNewton/dJoints/)
 	

@@ -66,6 +66,8 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 
 	D_NEWTON_API void DeleteBody(ndBody* const body);
 
+	D_NEWTON_API virtual void Save(const char* const path);
+
 	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;
 	const ndContactList& GetContactList() const;

@@ -21,6 +21,7 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
+#include "tinyxml.h"
 #include "ndContact.h"
 #include "ndShapeCapsule.h"
 #include "ndContactSolver.h"
@@ -601,4 +602,29 @@ void ndShapeCapsule::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) c
 
 	p0 = min_q0.GetMin(min_q1) & dVector::m_triplexMask;
 	p1 = max_q0.GetMax(max_q1) & dVector::m_triplexMask;
+}
+
+void ndShapeCapsule::Save(void* const xmlNode, dInt32 nodeid) const
+{
+	nd::TiXmlElement* const rootNode = (nd::TiXmlElement*)xmlNode;
+
+	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeCapsule");
+	rootNode->LinkEndChild(paramNode);
+
+	paramNode->SetAttribute("nodeId", nodeid);
+
+	//m_radio0 = radio0;
+	//m_radio1 = radio1;
+	//m_height = height * dFloat32(0.5f);
+
+	#define ADD_PARAM(root, label, data) \
+	{	\
+		nd::TiXmlElement* const node = new nd::TiXmlElement("param"); \
+		root->LinkEndChild(node); \
+		node->SetDoubleAttribute(label, data); \
+	}
+
+	ADD_PARAM(paramNode, "radio0", m_radio0);
+	ADD_PARAM(paramNode, "radio1", m_radio0);
+	ADD_PARAM(paramNode, "height", m_height * dFloat32 (2.0f));
 }

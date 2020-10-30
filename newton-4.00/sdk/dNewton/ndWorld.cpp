@@ -22,6 +22,7 @@
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
+#include "tinyxml.h"
 #include "ndWorldScene.h"
 #include "ndBodyDynamic.h"
 #include "ndSkeletonList.h"
@@ -539,4 +540,66 @@ void ndWorld::UpdateSkeletons()
 		ndSkeletonContainer* const skeleton = &iter.GetNode()->GetInfo();
 		skeleton->ClearSelfCollision();
 	}
+}
+
+void ndWorld::Save(const char* const path)
+{
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+
+	nd::TiXmlDocument asciifile;
+	nd::TiXmlDeclaration* const decl = new nd::TiXmlDeclaration("1.0", "", "");
+	asciifile.LinkEndChild(decl);
+	#define ADD_PARAM(root, label, data) \
+	{	\
+		nd::TiXmlElement* const node = new nd::TiXmlElement("param"); \
+		root->LinkEndChild(node); \
+		node->SetAttribute(label, data); \
+	}
+
+	nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
+	asciifile.LinkEndChild(worldNode);
+
+	nd::TiXmlElement* const config = new nd::TiXmlElement("settings");
+	worldNode->LinkEndChild(config);
+
+	ADD_PARAM(config, "description", "Newton Dynamics 4.00");
+	ADD_PARAM(config, "revision", 100);
+	ADD_PARAM(config, "solverSubsteps", m_subSteps);
+	ADD_PARAM(config, "solverIterations", m_solverIterations);
+
+	dInt32 shapesCount = 0;
+	dTree<dUnsigned32, ndShape*> uniqueShapes;
+	const ndBodyList& bodyList = GetBodyList();
+	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	{
+		ndBodyKinematic* const body = bodyNode->GetInfo();
+		dAssert(body != m_sentinelBody);
+		ndShape* const shape = body->GetCollisionShape().GetShape();
+		dAssert(!shape->GetAsShapeNull());
+		if (!uniqueShapes.Find(shape))
+		{
+			uniqueShapes.Insert(shapesCount, shape);
+			shapesCount++;
+		}
+	}
+
+	if (uniqueShapes.GetCount())
+	{
+		nd::TiXmlElement* const shapesNode = new nd::TiXmlElement("ndShapes");
+		worldNode->LinkEndChild(shapesNode);
+
+		dTree<dUnsigned32, ndShape*>::Iterator it(uniqueShapes);
+		for (it.Begin(); it; it ++)
+		{
+			dInt32 nodeId = *it;
+			ndShape* const shape = it.GetKey();
+			shape->Save(shapesNode, nodeId);
+		}
+
+		
+	}
+	
+	asciifile.SaveFile(path);
+	setlocale(LC_ALL, oldloc);
 }

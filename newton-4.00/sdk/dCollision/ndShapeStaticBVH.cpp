@@ -314,3 +314,9 @@ void ndShapeStaticBVH::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	data->m_hitDistance = data->m_meshData.m_globalHitDistance;
 	ForAllSectors(*data, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 }
+
+void ndShapeStaticBVH::Save(void* const xmlNode, dInt32 nodeid) const
+{
+
+
+}

@@ -22,6 +22,7 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
+#include "tinyxml.h"
 #include "ndContact.h"
 #include "ndShapeBox.h"
 #include "ndContactSolver.h"
@@ -462,4 +463,29 @@ ndShapeInfo ndShapeBox::GetShapeInfo() const
 	info.m_box.m_y = m_size[0].m_y * dFloat32(2.0f);
 	info.m_box.m_z = m_size[0].m_z * dFloat32(2.0f);
 	return info;
+}
+
+void ndShapeBox::Save(void* const xmlNode, dInt32 nodeid) const
+{
+	nd::TiXmlElement* const rootNode = (nd::TiXmlElement*)xmlNode;
+
+	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeBox");
+	rootNode->LinkEndChild(paramNode);
+
+	paramNode->SetAttribute("nodeId", nodeid);
+
+	//m_radio0 = radio0;
+	//m_radio1 = radio1;
+	//m_height = height * dFloat32(0.5f);
+
+#define ADD_PARAM(root, label, data) \
+	{	\
+		nd::TiXmlElement* const node = new nd::TiXmlElement("param"); \
+		root->LinkEndChild(node); \
+		node->SetDoubleAttribute(label, data); \
+	}
+
+	ADD_PARAM(paramNode, "sized_x", m_size[0][0] * dFloat32(2.0f));
+	ADD_PARAM(paramNode, "sized_y", m_size[0][1] * dFloat32(2.0f));
+	ADD_PARAM(paramNode, "sized_z", m_size[0][2] * dFloat32(2.0f));
 }
