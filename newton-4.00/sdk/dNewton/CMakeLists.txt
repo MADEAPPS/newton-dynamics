@@ -66,7 +66,7 @@ if (MSVC)
 
 endif(MSVC)
 
-target_link_libraries(${projectName} ndCore ndCollision)
+target_link_libraries(${projectName} ndTinyxml ndCore ndCollision)
 
 install(TARGETS ${projectName} 
 		LIBRARY DESTINATION lib

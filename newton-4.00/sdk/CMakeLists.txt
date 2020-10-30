@@ -36,7 +36,7 @@ else()
 	include_directories(dNewton/dJoints/)
 	
 	# source and header files
-	file(GLOB HEADERS dCore/*.h dNewton/*.h dCollision/*.h dNewton/dJoints/*.h)
+	file(GLOB HEADERS dTinyxml/*.h dCore/*.h dNewton/*.h dCollision/*.h dNewton/dJoints/*.h)
 	file(GLOB CPP_SOURCE 
 		dTinyxml/*.h
 		dTinyxml/*.cpp

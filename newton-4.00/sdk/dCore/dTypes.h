@@ -71,6 +71,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <locale.h>
+#include <tinyxml.h>
 #include <condition_variable>
 
 #if (defined (__MINGW32__) || defined (__MINGW64__))

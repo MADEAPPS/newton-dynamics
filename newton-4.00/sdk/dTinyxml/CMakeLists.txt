@@ -13,16 +13,25 @@ cmake_minimum_required(VERSION 3.4.0)
 set (projectName "ndTinyxml")
 message (${projectName})
 
-
 # low level core
-file(GLOB CPP_SOURCE *.cpp)
+file(GLOB CPP_SOURCE *.cpp *.h)
 file(GLOB HEADERS *.h)
 
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
+
+include_directories(../dCore)
+include_directories(../dNewton)
+include_directories(../dCollision)
+
 add_library(${projectName} STATIC ${CPP_SOURCE})
-target_include_directories(${projectName} PUBLIC .)
-target_include_directories(${projectName} PUBLIC ../dCore)
-target_include_directories(${projectName} PUBLIC ../dNewton)
-target_include_directories(${projectName} PUBLIC ../dCollision)
+
 if(UNIX)
     target_compile_options(${projectName} PRIVATE -fPIC)
 endif()
+
+install(TARGETS ${projectName} 
+		LIBRARY DESTINATION lib
+		ARCHIVE DESTINATION lib
+		RUNTIME DESTINATION bin)
+
+install(FILES ${HEADERS} DESTINATION include/${projectName})

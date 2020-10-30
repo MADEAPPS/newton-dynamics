@@ -22,7 +22,6 @@
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
-#include "tinyxml.h"
 #include "ndWorldScene.h"
 #include "ndBodyDynamic.h"
 #include "ndSkeletonList.h"

@@ -20,6 +20,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 include_directories(../../sdk/dCore/)
 include_directories(../../sdk/dNewton/)
+include_directories(../../sdk/dTinyxml/)
 include_directories(../../sdk/dNewtonC/)
 include_directories(../../sdk/dCollision/)
 include_directories(../../sdk/dNewton/dJoints)

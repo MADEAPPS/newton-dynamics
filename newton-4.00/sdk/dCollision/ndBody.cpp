@@ -21,7 +21,6 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
-#include "tinyxml.h"
 #include "ndBody.h"
 #include "ndContact.h"
 #include "ndBodyNotify.h"

@@ -21,7 +21,6 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "tinyxml.h"
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
 

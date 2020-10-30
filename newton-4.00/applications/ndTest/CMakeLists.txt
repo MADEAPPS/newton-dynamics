@@ -20,8 +20,10 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 include_directories(../../sdk/dCore/)
 include_directories(../../sdk/dNewton/)
+include_directories(../../sdk/dTinyxml/)
 include_directories(../../sdk/dCollision/)
 include_directories(../../sdk/dNewton/dJoints)
+
 
 if(MSVC)
 	set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /DEBUG") 
@@ -35,7 +37,7 @@ endif ()
 add_executable(${projectName} ${CPP_SOURCE})
 
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
-	target_link_libraries (${projectName} ndCore ndCollision ndNewton)
+	target_link_libraries (${projectName} ndCore ndTinyxml ndCollision ndNewton)
 else()
 	target_link_libraries (${projectName} ndNewton)
 endif()
@@ -64,10 +66,4 @@ endif()
 #        DEPENDS ${destination}
 #        COMMENT "symbolic link resources folder from ${source} => ${destination}")
 #endif()
-#
-#if(WIN32)
-#    file(COPY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications")
-#endif()
-#
-#install(DIRECTORY ../media DESTINATION "${PROJECT_BINARY_DIR}/applications/media")
-#install(TARGETS ${projectName} DESTINATION "${PROJECT_BINARY_DIR}/applications/")
+

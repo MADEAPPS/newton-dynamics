@@ -22,7 +22,6 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
-#include "tinyxml.h"
 #include "ndContact.h"
 #include "ndShapeBox.h"
 #include "ndContactSolver.h"

@@ -52,7 +52,9 @@ endif(MSVC)
 
 target_include_directories(${projectName} PUBLIC .)
 if (NEWTON_BUILD_PROFILER)
-    target_link_libraries (${projectName} dProfiler)
+    target_link_libraries (${projectName} ndTinyxml dProfiler)
+else()
+	target_link_libraries (${projectName} ndTinyxml)
 endif()
 
 install(TARGETS ${projectName} 
