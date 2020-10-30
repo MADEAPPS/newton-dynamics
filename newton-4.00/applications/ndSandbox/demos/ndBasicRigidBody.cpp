@@ -18,7 +18,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 
-static void BuildFloor(ndDemoEntityManager* const scene)
+static void BuildFloorBox(ndDemoEntityManager* const scene)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
@@ -102,7 +102,7 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 void ndBasicRigidBody (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloor(scene);
+	BuildFloorBox(scene);
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	AddCapsulesStacks(scene, origin1);
@@ -111,4 +111,6 @@ void ndBasicRigidBody (ndDemoEntityManager* const scene)
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
 	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
+
+	scene->GetWorld()->Save("xxxx.ngd");
 }

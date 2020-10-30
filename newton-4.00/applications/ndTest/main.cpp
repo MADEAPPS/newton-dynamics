@@ -109,7 +109,7 @@ dVector FindFloor(const ndWorld& world, const dVector& origin, dFloat32 dist)
 	return (param < 1.0f) ? rayCaster.m_contact.m_point : p0;
 }
 
-void BuildFloor(ndWorld& world)
+void BuildFloorBox(ndWorld& world)
 {
 	world.Sync();
 	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
@@ -221,7 +221,7 @@ int main (int argc, const char * argv[])
 
 	dVector size(0.5f, 0.25f, 0.8f, 0.0f); 
 	dVector origin(0.0f, 0.0f, 0.0f, 0.0f);
-	BuildFloor(world);
+	BuildFloorBox(world);
 	//BuildPyramid(world, 10.0f, origin, size, 20);
 	//BuildSphere(world, 1.0f, origin + dVector(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 2, 0.0f);
 	BuildSphere(world, 1.0f, origin + dVector(3.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1, 1.0f);

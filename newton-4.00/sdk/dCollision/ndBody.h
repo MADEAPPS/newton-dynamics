@@ -65,7 +65,10 @@ class ndBody: public dClassAlloc
 
 	void GetAABB(dVector& p0, dVector& p1) const;
 
+	virtual void Save(void* const xmlNode, dInt32 nodeid) const;
+
 	protected:
+	virtual void SaveLow(void* const xmlNode, dInt32 nodeid) const;
 	virtual void AttachContact(ndContact* const contact) {}
 	virtual void DetachContact(ndContact* const contact) {}
 	virtual ndContact* FindContact(const ndBody* const otherBody) const { return nullptr; }
@@ -139,6 +142,10 @@ inline const dVector& ndBody::GetCentreOfMass() const
 	return m_localCentreOfMass;
 }
 
+inline void ndBody::Save(void* const xmlNode, dInt32 nodeid) const
+{
+	dAssert(0);
+}
 
 #endif 
 

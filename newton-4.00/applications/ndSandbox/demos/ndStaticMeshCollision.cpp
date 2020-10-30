@@ -146,6 +146,5 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 
-	scene->GetWorld()->Save("xxxx.ngd");
-	
+	//scene->GetWorld()->Save("xxxx.ngd");
 }

@@ -21,6 +21,7 @@
 
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
+#include "tinyxml.h"
 #include "ndBody.h"
 #include "ndContact.h"
 #include "ndBodyNotify.h"
@@ -111,3 +112,35 @@ void ndBody::SetMatrix(const dMatrix& matrix)
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
 }
 
+void ndBody::SaveLow(void* const xmlNode, dInt32 nodeid) const
+{
+	nd::TiXmlElement* const paramNode = (nd::TiXmlElement*)xmlNode;
+	paramNode->SetAttribute("nodeId", nodeid);
+
+	#define ADD_PARAM(root, label, data) \
+	{	\
+		nd::TiXmlElement* const node = new nd::TiXmlElement("param"); \
+		root->LinkEndChild(node); \
+		node->SetAttribute(label, data); \
+	}
+
+	char buffer[1024];
+
+	sprintf(buffer, "%f %f %f", m_matrix.m_posit.m_x, m_matrix.m_posit.m_y, m_matrix.m_posit.m_z);
+	ADD_PARAM(paramNode, "position", buffer);
+
+	dVector euler0;
+	dVector euler1;
+	m_matrix.CalcPitchYawRoll(euler0, euler1);
+	sprintf(buffer, "%f %f %f", euler0.m_x * dRadToDegree, euler0.m_y * dRadToDegree, euler0.m_z * dRadToDegree);
+	ADD_PARAM(paramNode, "rotation", buffer);
+	
+	sprintf(buffer, "%f %f %f", m_veloc.m_x, m_veloc.m_y, m_veloc.m_z);
+	ADD_PARAM(paramNode, "velocity", buffer);
+	
+	sprintf(buffer, "%f %f %f", m_omega.m_x, m_omega.m_y, m_omega.m_z);
+	ADD_PARAM(paramNode, "omega", buffer);
+
+	sprintf(buffer, "%f %f %f", m_localCentreOfMass.m_x, m_localCentreOfMass.m_y, m_localCentreOfMass.m_z);
+	ADD_PARAM(paramNode, "centreOfMass", buffer);
+}

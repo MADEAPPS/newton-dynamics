@@ -140,7 +140,7 @@ class ndArchimedesBuoyancyVolume : public ndBodyTriggerVolume
 	bool m_hasPlane;
 };
 
-static void BuildFloor(ndDemoEntityManager* const scene)
+static void BuildFloorBox(ndDemoEntityManager* const scene)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
@@ -287,7 +287,7 @@ static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origi
 void ndBasicTrigger (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloor(scene);
+	BuildFloorBox(scene);
 
 	// build a floor
 	AddTrigger(scene);

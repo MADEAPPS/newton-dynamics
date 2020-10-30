@@ -64,6 +64,7 @@ class ndBodyDynamic: public ndBodyKinematic
 	ndJacobian IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep);
 
 	protected:
+	virtual void Save(void* const xmlNode, dInt32 nodeid) const;
 	dVector m_accel;
 	dVector m_alpha;
 	dVector m_externalForce;

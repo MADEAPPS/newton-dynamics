@@ -574,9 +574,7 @@ void ndWorld::Save(const char* const path)
 	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
-		dAssert(body != m_sentinelBody);
 		ndShape* const shape = body->GetCollisionShape().GetShape();
-		dAssert(!shape->GetAsShapeNull());
 		if (!uniqueShapes.Find(shape))
 		{
 			uniqueShapes.Insert(shapesCount, shape);
@@ -596,10 +594,22 @@ void ndWorld::Save(const char* const path)
 			ndShape* const shape = it.GetKey();
 			shape->Save(shapesNode, nodeId);
 		}
-
-		
 	}
-	
+
+	if (bodyList.GetCount())
+	{
+		dInt32 bodyIndex = 0;
+		nd::TiXmlElement* const bodiesNode = new nd::TiXmlElement("ndBodies");
+		worldNode->LinkEndChild(bodiesNode);
+
+		for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+		{
+			ndBodyKinematic* const body = bodyNode->GetInfo();
+			body->Save(bodiesNode, bodyIndex);
+			bodyIndex++;
+		}
+	}
+		
 	asciifile.SaveFile(path);
 	setlocale(LC_ALL, oldloc);
 }

@@ -18,7 +18,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 
-static void BuildFloor(ndDemoEntityManager* const scene)
+static void BuildFloorBox(ndDemoEntityManager* const scene)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
@@ -100,7 +100,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 void ndBasicJoints (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloor(scene);
+	BuildFloorBox(scene);
 
 	BuildBallSocket(scene, dVector(0.0f, 0.0f, 0.0f, 0.0f));
 

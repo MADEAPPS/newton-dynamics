@@ -474,11 +474,7 @@ void ndShapeBox::Save(void* const xmlNode, dInt32 nodeid) const
 
 	paramNode->SetAttribute("nodeId", nodeid);
 
-	//m_radio0 = radio0;
-	//m_radio1 = radio1;
-	//m_height = height * dFloat32(0.5f);
-
-#define ADD_PARAM(root, label, data) \
+	#define ADD_PARAM(root, label, data) \
 	{	\
 		nd::TiXmlElement* const node = new nd::TiXmlElement("param"); \
 		root->LinkEndChild(node); \

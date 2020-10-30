@@ -18,7 +18,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 
-static void BuildFloor(ndDemoEntityManager* const scene)
+static void BuildFloorBox(ndDemoEntityManager* const scene)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
@@ -117,7 +117,7 @@ static void Phitop(ndDemoEntityManager* const scene, dFloat32 mass, dFloat32 ang
 void ndBasicAngularMomentum (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloor(scene);
+	BuildFloorBox(scene);
 
 	DzhanibekovEffect(scene, 10.0f,  5.0f, dVector(0.0f, 0.0f, -2.0f, 0.0f));
 	DzhanibekovEffect(scene, 10.0f, -5.0f, dVector(0.0f, 0.0f, 0.0f, 0.0f));

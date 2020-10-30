@@ -21,6 +21,7 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
+#include "tinyxml.h"
 #include "ndWorld.h"
 #include "ndBodyDynamic.h"
 
@@ -181,4 +182,26 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVe
 
 	velocStep.m_linear = force.Scale(m_invMass.m_w) * timestep;
 	return velocStep;
+}
+
+void ndBodyDynamic::Save(void* const xmlNode, dInt32 nodeid) const
+{
+	nd::TiXmlElement* const rootNode = (nd::TiXmlElement*)xmlNode;
+
+	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndBodyDynamic");
+	rootNode->LinkEndChild(paramNode);
+
+	ndBodyKinematic::SaveLow(paramNode, nodeid);
+	//paramNode->SetAttribute("nodeId", nodeid);
+	//
+	//#define ADD_PARAM(root, label, data) \
+	//{	\
+	//	nd::TiXmlElement* const node = new nd::TiXmlElement("param"); \
+	//	root->LinkEndChild(node); \
+	//	node->SetDoubleAttribute(label, data); \
+	//}
+	//
+	//ADD_PARAM(paramNode, "sized_x", m_size[0][0] * dFloat32(2.0f));
+	//ADD_PARAM(paramNode, "sized_y", m_size[0][1] * dFloat32(2.0f));
+	//ADD_PARAM(paramNode, "sized_z", m_size[0][2] * dFloat32(2.0f));
 }
