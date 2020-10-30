@@ -84,7 +84,7 @@ class ndShapeStaticBVH : public ndShapeStaticMesh, public dAabbPolygonSoup
 #endif
 
 	private: 
-	virtual void Save(void* const xmlNode, dInt32 nodeid) const;
+	virtual void Save(nd::TiXmlElement* const xmlNode, dInt32 nodeid) const;
 	dInt32 m_trianglesCount;
 };
 

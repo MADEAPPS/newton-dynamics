@@ -252,7 +252,7 @@ class ndShape: public dClassAlloc
 	virtual dMatrix CalculateInertiaAndCenterOfMass(const dMatrix& alignMatrix, const dVector& localScale, const dMatrix& matrix) const;
 	virtual dFloat32 CalculateMassProperties(const dMatrix& offset, dVector& inertia, dVector& crossInertia, dVector& centerOfMass) const;
 
-	virtual void Save(void* const xmlNode, dInt32 nodeid) const;
+	virtual void Save(nd::TiXmlElement* const xmlNode, dInt32 nodeid) const;
 
 	protected:
 	D_COLLISION_API ndShape(ndShapeID id);
@@ -324,7 +324,7 @@ inline dFloat32 ndShape::GetUmbraClipSize() const
 	return dFloat32(3.0f) * GetBoxMaxRadius();
 }
 
-inline void ndShape::Save(void* const parentNode, dInt32 nodeid) const
+inline void ndShape::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
 {
 	dAssert(0);
 }

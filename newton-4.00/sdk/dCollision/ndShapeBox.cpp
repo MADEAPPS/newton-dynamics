@@ -464,10 +464,8 @@ ndShapeInfo ndShapeBox::GetShapeInfo() const
 	return info;
 }
 
-void ndShapeBox::Save(void* const xmlNode, dInt32 nodeid) const
+void ndShapeBox::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
 {
-	nd::TiXmlElement* const rootNode = (nd::TiXmlElement*)xmlNode;
-
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeBox");
 	rootNode->LinkEndChild(paramNode);
 

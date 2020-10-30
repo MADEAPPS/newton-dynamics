@@ -315,7 +315,7 @@ void ndShapeStaticBVH::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	ForAllSectors(*data, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 }
 
-void ndShapeStaticBVH::Save(void* const xmlNode, dInt32 nodeid) const
+void ndShapeStaticBVH::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
 {
 
 

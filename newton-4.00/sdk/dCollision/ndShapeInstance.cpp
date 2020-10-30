@@ -805,3 +805,46 @@ dFloat32 ndShapeInstance::CalculateBuoyancyCenterOfPresure(dVector& com, const d
 	return volume;
 }
 
+void ndShapeInstance::Save(nd::TiXmlElement* const rootNode) const
+{
+	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeInstance");
+	rootNode->LinkEndChild(paramNode);
+
+	#define ADD_PARAM(root, label, data) \
+	{	\
+		nd::TiXmlElement* const node = new nd::TiXmlElement("param"); \
+		root->LinkEndChild(node); \
+		node->SetAttribute(label, data); \
+	}
+
+	dVector euler0;
+	dVector euler1;
+
+	char buffer[1024];
+
+	sprintf(buffer, "%f %f %f", m_localMatrix.m_posit.m_x, m_localMatrix.m_posit.m_y, m_localMatrix.m_posit.m_z);
+	ADD_PARAM(paramNode, "localMatrixPosition", buffer);
+
+	m_localMatrix.CalcPitchYawRoll(euler0, euler1);
+	sprintf(buffer, "%f %f %f", euler0.m_x * dRadToDegree, euler0.m_y * dRadToDegree, euler0.m_z * dRadToDegree);
+	ADD_PARAM(paramNode, "localMatrixRotation", buffer);
+
+	sprintf(buffer, "%f %f %f", m_aligmentMatrix.m_posit.m_x, m_aligmentMatrix.m_posit.m_y, m_aligmentMatrix.m_posit.m_z);
+	ADD_PARAM(paramNode, "aligmentMatrixPosition", buffer);
+
+	m_aligmentMatrix.CalcPitchYawRoll(euler0, euler1);
+	sprintf(buffer, "%f %f %f", euler0.m_x * dRadToDegree, euler0.m_y * dRadToDegree, euler0.m_z * dRadToDegree);
+	ADD_PARAM(paramNode, "aligmentMatrixRotation", buffer);
+
+	sprintf(buffer, "%f %f %f", m_scale.m_x, m_scale.m_y, m_scale.m_z);
+	ADD_PARAM(paramNode, "scale", buffer);
+	
+	//sprintf(buffer, "%f %f %f", m_omega.m_x, m_omega.m_y, m_omega.m_z);
+	//ADD_PARAM(paramNode, "omega", buffer);
+	//
+	//sprintf(buffer, "%f %f %f", m_localCentreOfMass.m_x, m_localCentreOfMass.m_y, m_localCentreOfMass.m_z);
+	//ADD_PARAM(paramNode, "centreOfMass", buffer);
+	//
+	//ADD_PARAM(paramNode, "autoSleep", m_autoSleep ? 1 : 0);
+	//ADD_PARAM(paramNode, "useGyroTorque", m_gyroTorqueOn ? 1 : 0);
+}

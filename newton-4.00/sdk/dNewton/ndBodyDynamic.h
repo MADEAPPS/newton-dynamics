@@ -49,6 +49,8 @@ class ndBodyDynamic: public ndBodyKinematic
 	D_NEWTON_API virtual void AddDampingAcceleration(dFloat32 timestep);
 	D_NEWTON_API virtual void IntegrateVelocity(dFloat32 timestep);
 
+	D_NEWTON_API virtual void Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const;
+
 	D_NEWTON_API void SetForce(const dVector& force);
 	D_NEWTON_API void SetTorque(const dVector& torque);
 
@@ -64,7 +66,6 @@ class ndBodyDynamic: public ndBodyKinematic
 	ndJacobian IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep);
 
 	protected:
-	virtual void Save(void* const xmlNode, dInt32 nodeid) const;
 	dVector m_accel;
 	dVector m_alpha;
 	dVector m_externalForce;

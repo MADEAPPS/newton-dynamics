@@ -47,6 +47,8 @@ class ndBody: public dClassAlloc
 	virtual ndBodyTriggerVolume* GetAsBodyTriggerVolume() { return nullptr; }
 
 	dUnsigned32 GetId() const;
+	void GetAABB(dVector& p0, dVector& p1) const;
+
 	virtual const dFloat32 GetInvMass() const { return dFloat32(0.0f); }
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const = 0;
 
@@ -62,13 +64,9 @@ class ndBody: public dClassAlloc
 	D_COLLISION_API dMatrix GetMatrix() const;
 	D_COLLISION_API void SetMatrix(const dMatrix& matrix);
 	D_COLLISION_API dQuaternion GetRotation() const;
-
-	void GetAABB(dVector& p0, dVector& p1) const;
-
-	virtual void Save(void* const xmlNode, dInt32 nodeid) const;
+	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const;
 
 	protected:
-	virtual void SaveLow(void* const xmlNode, dInt32 nodeid) const;
 	virtual void AttachContact(ndContact* const contact) {}
 	virtual void DetachContact(ndContact* const contact) {}
 	virtual ndContact* FindContact(const ndBody* const otherBody) const { return nullptr; }
@@ -140,11 +138,6 @@ inline void ndBody::GetAABB(dVector& p0, dVector& p1) const
 inline const dVector& ndBody::GetCentreOfMass() const
 {
 	return m_localCentreOfMass;
-}
-
-inline void ndBody::Save(void* const xmlNode, dInt32 nodeid) const
-{
-	dAssert(0);
 }
 
 #endif 

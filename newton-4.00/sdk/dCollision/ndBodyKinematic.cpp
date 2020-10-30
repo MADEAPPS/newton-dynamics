@@ -581,3 +581,14 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 		SetAlpha(dVector::m_zero);
 	}
 }
+
+void ndBodyKinematic::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
+{
+	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndBodyKinematic");
+	rootNode->LinkEndChild(paramNode);
+
+	paramNode->SetAttribute("nodeId", nodeid);
+
+	ndBody::Save(paramNode, nodeid);
+	m_shapeInstance.Save(paramNode);
+}

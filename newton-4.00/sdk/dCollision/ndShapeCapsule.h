@@ -47,7 +47,7 @@ class ndShapeCapsule : public ndShapeConvex
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 	void TesselateTriangle(dInt32 level, const dVector& p0, const dVector& p1, const dVector& p2, dInt32& count, dVector* ouput) const;
 
-	virtual void Save(void* const xmlNode, dInt32 nodeid) const;
+	virtual void Save(nd::TiXmlElement* const xmlNode, dInt32 nodeid) const;
 
 	dVector m_p0;
 	dVector m_p1;
