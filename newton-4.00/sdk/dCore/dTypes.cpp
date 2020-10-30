@@ -641,3 +641,19 @@ void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, const d
 	sprintf(buffer, "%sPosition", name);
 	SaveParam(rootNode, buffer, value.m_posit);
 }
+
+void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 count, const dVector* const array)
+{
+	char* const buffer = dAlloca(char, count * 4 * 12);
+
+	char* ptr = buffer;
+	for (dInt32 i = 0; i < count; i++)
+	{
+		for (dInt32 j = 0; j < 3; j++)
+		{
+			ptr = FloatToString(ptr, array[i][j]);
+		}
+	}
+
+	SaveParam(rootNode, name, buffer);
+}

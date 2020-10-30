@@ -27,8 +27,8 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-#define DEFAULT_SCENE	0		// setting basic rigidbody
-//#define DEFAULT_SCENE	1		// setting basic Trigger
+//#define DEFAULT_SCENE	0		// setting basic rigidbody
+#define DEFAULT_SCENE	1		// setting basic Trigger
 //#define DEFAULT_SCENE	2		// setting basic player
 //#define DEFAULT_SCENE	3		// static mesh collision 
 //#define DEFAULT_SCENE	4		// setting basic joints

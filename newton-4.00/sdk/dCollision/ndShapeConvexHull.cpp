@@ -986,3 +986,14 @@ void ndShapeConvexHull::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& 
 		debugCallback.DrawPolygon(count, vertex);
 	}
 }
+
+void ndShapeConvexHull::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
+{
+	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeConvexHull");
+	rootNode->LinkEndChild(paramNode);
+
+	paramNode->SetAttribute("nodeId", nodeid);
+
+	SaveParam(paramNode, "vextexCount", m_vertexCount);
+	SaveParam(paramNode, "vextexArray", m_vertexCount, m_vertex);
+}

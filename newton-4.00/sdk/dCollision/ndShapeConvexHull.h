@@ -42,6 +42,8 @@ class ndShapeConvexHull : public ndShapeConvex
 	bool Create(dInt32 count, dInt32 strideInBytes, const dFloat32* const vertexArray, dFloat32 tolerance);
 	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 
+	virtual void Save(nd::TiXmlElement* const xmlNode, dInt32 nodeid) const;
+
 	private:
 	dVector SupportVertexBruteForce(const dVector& dir, dInt32* const vertexIndex) const;
 	dVector SupportVertexhierarchical(const dVector& dir, dInt32* const vertexIndex) const;

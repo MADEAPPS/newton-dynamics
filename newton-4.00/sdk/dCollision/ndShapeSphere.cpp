@@ -372,3 +372,13 @@ void ndShapeSphere::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debu
 		debugCallback.DrawPolygon(3, &tmpVectex[i]);
 	}
 }
+
+void ndShapeSphere::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
+{
+	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeSphere");
+	rootNode->LinkEndChild(paramNode);
+
+	paramNode->SetAttribute("nodeId", nodeid);
+
+	SaveParam(paramNode, "radio", m_radius);
+}
