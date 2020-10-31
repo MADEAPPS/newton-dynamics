@@ -692,7 +692,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			if (dGetOpenFileNameNgd(fileName, 1024)) 
 			{
 				ApplyMenuOptions();
-				LoadScene (fileName);
+				m_world->Load(fileName);
 				ResetTimer();
 			}
 			break;
@@ -1030,54 +1030,6 @@ void ndDemoEntityManager::ImportPLYfile (const char* const fileName)
 	dAssert(0);
 	//m_collisionDisplayMode = 2;
 	//CreatePLYMesh (this, fileName, true);
-}
-
-void ndDemoEntityManager::LoadScene (const char* const fileName)
-{
-	dAssert(0);
-/*
-	dScene database (m_world);
-
-	database.Deserialize(fileName);
-
-	// this will apply all global the scale to the mesh
-	database.FreezeScale();
-	// this will apply all local scale and transform to the mesh
-	//database.FreezePivot();
-
-	// Load the Visual Scene
-	EntityDictionary entDictionary;
-	LoadVisualScene(&database, entDictionary);
-
-	//Load the physics world
-	dList<NewtonBody*> bodyList;
-	database.SceneToNewtonWorld(m_world, bodyList);
-
-	// bind every rigidBody loaded to the scene entity
-	for (dList<NewtonBody*>::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext()) {
-		// find the user data and set to the visual entity in the scene
-		NewtonBody* const body = bodyNode->GetInfo();
-		dScene::dTreeNode* const sceneNode = (dScene::dTreeNode*)NewtonBodyGetUserData(body);
-		ndDemoEntity* const entity = entDictionary.Find(sceneNode)->GetInfo();
-		NewtonBodySetUserData(body, entity);
-
-		// see if this body have some special setups
-		dScene::dTreeNode* const node = database.FindChildByType(sceneNode, dRigidbodyNodeInfo::GetRttiType());
-		dAssert (node);
-		dRigidbodyNodeInfo* const bodyData = (dRigidbodyNodeInfo*) database.GetInfoFromNode(node);
-		dVariable* bodyType = bodyData->FindVariable("rigidBodyType");
-
-		// set the default call backs
-		if (!bodyType || !strcmp (bodyType->GetString(), "default gravity")) {
-			NewtonBodySetTransformCallback(body, ndDemoEntity::TransformCallback);
-			NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
-			NewtonBodySetDestructorCallback (body, PhysicsBodyDestructor);
-		}
-	}
-
-	// clean up all caches the engine have saved
-	NewtonInvalidateCache (m_world);
-*/
 }
 
 int ndDemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const

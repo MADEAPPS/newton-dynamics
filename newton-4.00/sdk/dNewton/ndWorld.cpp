@@ -611,3 +611,69 @@ void ndWorld::Save(nd::TiXmlElement* const worldNode) const
 		}
 	}
 }
+
+void ndWorld::Load(const char* const path)
+{
+	char* const oldloc = setlocale(LC_ALL, 0);
+	setlocale(LC_ALL, "C");
+
+	nd::TiXmlDocument doc(path);
+	doc.LoadFile();
+	dAssert(!doc.Error());
+
+	const nd::TiXmlElement* const rootNode = doc.RootElement();
+	if (doc.FirstChild("ndWorld"))
+	{
+		Load(rootNode);
+	}
+
+	setlocale(LC_ALL, oldloc);
+}
+
+void ndWorld::LoadSettings(const nd::TiXmlNode* const rootNode)
+{
+	const nd::TiXmlNode* const settings = rootNode->FirstChild("settings");
+	dAssert(settings);
+}
+
+void ndWorld::LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache)
+{
+	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndShapes");
+	dAssert(shapes);
+
+	for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
+	{
+		ndShape* shape = nullptr;
+		const char* const name = node->Value();
+		if (!strcmp(name, "ndShapeBox"))
+		{
+			dAssert(0);
+		}
+		else if (!strcmp(name, "ndShapeCapsule"))
+		{
+			dAssert(0);
+		}
+		else
+		{
+			dAssert(0);
+		}
+		if (shape)
+		{
+			dAssert(0);
+		}
+	}
+
+}
+
+void ndWorld::Load(const nd::TiXmlElement* const rootNode)
+{
+	dTree<const ndShape*, dUnsigned32> uniqueShapes;
+
+	LoadSettings(rootNode);
+	LoadShapes(rootNode, uniqueShapes);
+
+	while (uniqueShapes.GetRoot())
+	{
+		uniqueShapes.GetRoot()->GetInfo()->Release();
+	}
+}

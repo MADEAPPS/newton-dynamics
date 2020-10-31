@@ -119,7 +119,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 
 	void CreateSkyBox();
 	void ResetTimer();
-	void LoadScene (const char* const name);
 	void ImportPLYfile (const char* const name);
 
 	ndDemoCamera* GetCamera() const;

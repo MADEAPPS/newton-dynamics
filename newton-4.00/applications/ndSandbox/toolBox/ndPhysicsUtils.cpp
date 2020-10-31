@@ -1204,63 +1204,6 @@ ndBodyKinematic* CreatePLYMesh (ndDemoEntityManager* const scene, const char* co
 */
 }
 
-ndBodyKinematic* CreateLevelMesh (ndDemoEntityManager* const scene, const char* const name, bool optimized)
-{
-	dAssert(0);
-	return nullptr;
-/*
-	// load the scene from a ngd file format
-	char fileName[2048];
-	dGetWorkingFileName (name, fileName);
-	scene->LoadScene (fileName);
-
-	ndBodyKinematic* levelBody = nullptr;
-	ndWorld* const world = scene->GetWorld();
-	for (ndDemoEntityManager::dListNode* node = scene->GetLast(); node; node = node->GetPrev()) {
-		ndDemoEntity* const ent = node->GetInfo();
-		ndDemoMesh* const mesh = (ndDemoMesh*) ent->GetMesh();
-		if (mesh) {
-			dAssert(0);
-			//dAssert (mesh->IsType(ndDemoMesh::GetRttiType()));
-			const dString& namePtr = mesh->GetName();
-			if (namePtr == "levelGeometry_mesh") {
-				levelBody = CreateLevelMeshBody (world, ent, optimized);
-				break;
-			}
-		}
-	}
-	return levelBody;
-*/
-}
-
-
-ndMakeViualMesh::ndMakeViualMesh (ndWorld* const world)
-	:m_world (world)
-{
-}
-
-NewtonMesh* ndMakeViualMesh::CreateVisualMesh (ndBodyKinematic* const body, char* const name, int maxNameSize) const
-{
-	// here the use should take the user data from the body create newtonMesh form it and return that back
-	NewtonCollision* const collision = ndBodyKinematicGetCollision(body);
-	NewtonMesh* const mesh = NewtonMeshCreateFromCollision(collision);
-	sprintf (name, "visual Mesh");
-	return mesh;
-}
-
-void ExportScene (ndWorld* const world, const char* const name)
-{
-	char fileName[2048];
-	dGetWorkingFileName(name, fileName);
-
-	ndMakeViualMesh context (world);
-	dScene testScene (world);
-	testScene.ndWorldToScene (world, &context);
-	testScene.Serialize (fileName);
-}
-
-
-
 void LoadLumberYardMesh(ndDemoEntityManager* const scene, const dVector& location, int shapeid)
 {
 	dAssert(0);
