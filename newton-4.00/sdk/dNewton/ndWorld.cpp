@@ -680,23 +680,33 @@ void ndWorld::LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShap
 	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndBodies");
 	dAssert(shapes);
 
-	for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
+	for (const nd::TiXmlNode* parentNode = shapes->FirstChild(); parentNode; parentNode = parentNode->NextSibling())
 	{
 		ndBody* body = nullptr;
-		const char* const name = node->Value();
-		if (!strcmp(name, "ndBodyDynamic"))
+		const char* const bodyClassName = parentNode->Value();
+		if (!strcmp(bodyClassName, "ndBodyDynamic"))
 		{
-			body = new ndBodyDynamic(node, shapesCache);
+			body = new ndBodyDynamic(parentNode, shapesCache);
+		}
+		else if (!strcmp(bodyClassName, "ndBodyTriggerVolume"))
+		{
+			body = new ndBodyTriggerVolume(parentNode, shapesCache);
 		}
 		else
 		{
-			body = new ndBodyTriggerVolume(node, shapesCache);
+			body = LoadUserDefinedBody(parentNode, bodyClassName, shapesCache);
 		}
 		if (body)
 		{
 			AddBody(body);
 		}
 	}
+}
+
+ndBody* ndWorld::LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache) const
+{
+	dAssert(0);
+	return nullptr;
 }
 
 void ndWorld::Load(const nd::TiXmlElement* const rootNode)

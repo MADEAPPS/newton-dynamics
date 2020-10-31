@@ -136,13 +136,18 @@ void ndBody::SetMatrix(const dMatrix& matrix)
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
 }
 
-void ndBody::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+nd::TiXmlElement* ndBody::CreateRootElement(nd::TiXmlElement* const rootNode, const char* const name, dInt32 nodeid) const
 {
-	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndBody");
+	nd::TiXmlElement* const paramNode = new nd::TiXmlElement(name);
 	rootNode->LinkEndChild(paramNode);
 
 	paramNode->SetAttribute("nodeId", nodeid);
-	
+	return paramNode;
+}
+
+void ndBody::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+{
+	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBody", nodeid);
 	xmlSaveParam(paramNode, "matrix", m_matrix);
 	xmlSaveParam(paramNode, "veloc", m_veloc);
 	xmlSaveParam(paramNode, "omega", m_omega);

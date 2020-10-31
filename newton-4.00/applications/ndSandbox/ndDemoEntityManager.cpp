@@ -27,8 +27,8 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-#define DEFAULT_SCENE	0		// setting basic rigidbody
-//#define DEFAULT_SCENE	1		// setting basic Trigger
+//#define DEFAULT_SCENE	0		// setting basic rigidbody
+#define DEFAULT_SCENE	1		// setting basic Trigger
 //#define DEFAULT_SCENE	2		// setting basic player
 //#define DEFAULT_SCENE	3		// static mesh collision 
 //#define DEFAULT_SCENE	4		// setting basic joints
@@ -1205,39 +1205,42 @@ void ndDemoEntityManager::DrawDebugShapes()
 	{
 		ndBodyKinematic* const body = bodyNode->GetInfo();
 		const ndShapeInstance& shapeInstance = body->GetCollisionShape();
+		//if (!shapeInstance->GetShape()->GetAsShapeNull())
 		const ndShape* const key = shapeInstance.GetShape();
-
-		ndDebugMeshCache::dTreeNode* shapeNode = m_debugShapeCache.Find(key);
-		if (!shapeNode)
+		if (!((ndShape*)key)->GetAsShapeNull())
 		{
-			ndShapeInstance shape(body->GetCollisionShape());
-			shape.SetScale(dVector(1.0f));
-			shape.SetLocalMatrix(dGetIdentityMatrix());
+			ndDebugMeshCache::dTreeNode* shapeNode = m_debugShapeCache.Find(key);
+			if (!shapeNode)
+			{
+				ndShapeInstance shape(body->GetCollisionShape());
+				shape.SetScale(dVector(1.0f));
+				shape.SetLocalMatrix(dGetIdentityMatrix());
 
-			ndDebuMesh debugMesh;
-			debugMesh.m_flatShaded = new ndFlatShadedDebugMesh(m_shaderCache, &shape);
-			debugMesh.m_wireFrame = new ndWireFrameDebugMesh(m_shaderCache, &shape);
-			shapeNode = m_debugShapeCache.Insert(debugMesh, key);
-		}
+				ndDebuMesh debugMesh;
+				debugMesh.m_flatShaded = new ndFlatShadedDebugMesh(m_shaderCache, &shape);
+				debugMesh.m_wireFrame = new ndWireFrameDebugMesh(m_shaderCache, &shape);
+				shapeNode = m_debugShapeCache.Insert(debugMesh, key);
+			}
 
-		dMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
-		int sleepState = body->GetSleepState();
-		dVector color((sleepState == 1) ? sleepColor : awakeColor);
+			dMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
+			int sleepState = body->GetSleepState();
+			dVector color((sleepState == 1) ? sleepColor : awakeColor);
 
-		if (m_collisionDisplayMode >= 2)
-		{
-			ndWireFrameDebugMesh* const mesh = shapeNode->GetInfo().m_wireFrame;
-			mesh->SetColor(color);
-			mesh->Render(this, matrix);
-			//ndShapeInstance shape(body->GetCollisionShape());
-			//ndWireFrameDebugMesh debugMesh (m_shaderCache, &shape);
-			//debugMesh.Render(this, matrix);
-		}
-		else
-		{
-			ndFlatShadedDebugMesh* const mesh = shapeNode->GetInfo().m_flatShaded;
-			mesh->SetColor(color);
-			mesh->Render(this, matrix);
+			if (m_collisionDisplayMode >= 2)
+			{
+				ndWireFrameDebugMesh* const mesh = shapeNode->GetInfo().m_wireFrame;
+				mesh->SetColor(color);
+				mesh->Render(this, matrix);
+				//ndShapeInstance shape(body->GetCollisionShape());
+				//ndWireFrameDebugMesh debugMesh (m_shaderCache, &shape);
+				//debugMesh.Render(this, matrix);
+			}
+			else
+			{
+				ndFlatShadedDebugMesh* const mesh = shapeNode->GetInfo().m_flatShaded;
+				mesh->SetColor(color);
+				mesh->Render(this, matrix);
+			}
 		}
 	}
 }

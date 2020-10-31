@@ -624,10 +624,7 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 
 void ndBodyKinematic::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
 {
-	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndBodyKinematic");
-	rootNode->LinkEndChild(paramNode);
-
-	paramNode->SetAttribute("nodeId", nodeid);
+	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyKinematic", nodeid);
 
 	ndBody::Save(paramNode, nodeid, shapesCache);
 

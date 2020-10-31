@@ -27,6 +27,8 @@ class ndPhysicsWorld: public ndWorld
 	private:
 	void OnPostUpdate(dFloat32 timestep);
 
+	ndBody* LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache) const;
+
 	ndDemoEntityManager* m_manager;
 	dFloat32 m_timeAccumulator;
 };

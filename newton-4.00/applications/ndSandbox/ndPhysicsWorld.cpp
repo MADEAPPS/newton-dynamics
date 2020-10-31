@@ -13,6 +13,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoCameraManager.h"
+#include "ndArchimedesBuoyancyVolume.h"
 
 #define MAX_PHYSICS_FPS				60.0f
 #define MAX_PHYSICS_RECOVER_STEPS	2
@@ -74,4 +75,10 @@ void ndPhysicsWorld::OnPostUpdate(dFloat32 timestep)
 	{
 		m_manager->m_updateCamera(m_manager, m_manager->m_updateCameraContext, timestep);
 	}
+}
+
+ndBody* ndPhysicsWorld::LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache) const
+{
+	return new ndBodyTriggerVolume();
+	//return new ndArchimedesBuoyancyVolume();
 }

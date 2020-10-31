@@ -200,10 +200,6 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVe
 
 void ndBodyDynamic::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
 {
-	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndBodyDynamic");
-	rootNode->LinkEndChild(paramNode);
-
-	paramNode->SetAttribute("nodeId", nodeid);
+	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyDynamic", nodeid);
 	ndBodyKinematic::Save(paramNode, nodeid, shapesCache);
-
 }
