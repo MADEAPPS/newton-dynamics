@@ -605,6 +605,8 @@ D_CORE_API void SaveParam(nd::TiXmlElement* const rootNode, const char* const na
 D_CORE_API void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, const dMatrix& value);
 D_CORE_API void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 count, const dVector* const array);
 
+D_CORE_API dFloat32 GetFloat(const nd::TiXmlNode* const rootNode, const char* const name);
+
 D_CORE_API dInt32 dVertexListToIndexList (dFloat64* const vertexList, dInt32 strideInBytes, dInt32 compareCount,     dInt32 vertexCount,         dInt32* const indexListOut, dFloat64 tolerance = dEpsilon);
 D_CORE_API dInt32 dVertexListToIndexList (dFloat32* const vertexList, dInt32 strideInBytes, dInt32 floatSizeInBytes, dInt32 unsignedSizeInBytes, dInt32 vertexCount, dInt32* const indexListOut, dFloat32 tolerance = dEpsilon);
 

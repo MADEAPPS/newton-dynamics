@@ -647,11 +647,15 @@ void ndWorld::LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShap
 		const char* const name = node->Value();
 		if (!strcmp(name, "ndShapeBox"))
 		{
-			dAssert(0);
+			shape = new ndShapeBox(node);
+		}
+		else if (!strcmp(name, "ndShapeSphere"))
+		{
+			shape = new ndShapeSphere(node);
 		}
 		else if (!strcmp(name, "ndShapeCapsule"))
 		{
-			dAssert(0);
+			shape = new ndShapeCapsule(node);
 		}
 		else
 		{
@@ -659,10 +663,12 @@ void ndWorld::LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShap
 		}
 		if (shape)
 		{
-			dAssert(0);
+			dInt32 shapeId;
+			const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+			element->Attribute("nodeId", &shapeId);
+			shapesCache.Insert(shape->AddRef(), shapeId);
 		}
 	}
-
 }
 
 void ndWorld::Load(const nd::TiXmlElement* const rootNode)
@@ -674,6 +680,8 @@ void ndWorld::Load(const nd::TiXmlElement* const rootNode)
 
 	while (uniqueShapes.GetRoot())
 	{
-		uniqueShapes.GetRoot()->GetInfo()->Release();
+		const ndShape* const shape = uniqueShapes.GetRoot()->GetInfo();
+		shape->Release();
+		uniqueShapes.Remove(uniqueShapes.GetRoot());
 	}
 }

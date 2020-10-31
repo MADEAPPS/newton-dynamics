@@ -663,3 +663,12 @@ void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 
 
 	SaveParam(rootNode, name, "floatArray3", buffer);
 }
+
+dFloat32 GetFloat(const nd::TiXmlNode* const rootNode, const char* const name)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
+	dAssert(element);
+	dFloat64 value;
+	element->Attribute("float", &value);
+	return dFloat32 (value);
+}

@@ -49,6 +49,15 @@ ndShapeBox::ndShapeBox(dFloat32 size_x, dFloat32 size_y, dFloat32 size_z)
 	Init(size_x, size_y, size_z);
 }
 
+ndShapeBox::ndShapeBox(const nd::TiXmlNode* const xmlNode)
+	:ndShapeConvex(m_boxCollision)
+{
+	dFloat32 size_x = GetFloat(xmlNode, "size_x");
+	dFloat32 size_y = GetFloat(xmlNode, "size_y");
+	dFloat32 size_z = GetFloat(xmlNode, "size_z");
+	Init(size_x, size_y, size_z);
+}
+
 ndShapeBox::~ndShapeBox()
 {
 	ndShapeConvex::m_simplex = nullptr;
@@ -471,7 +480,7 @@ void ndShapeBox::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
 
 	paramNode->SetAttribute("nodeId", nodeid);
 
-	SaveParam(paramNode, "sized_x", m_size[0][0] * dFloat32(2.0f));
-	SaveParam(paramNode, "sized_y", m_size[0][1] * dFloat32(2.0f));
-	SaveParam(paramNode, "sized_z", m_size[0][2] * dFloat32(2.0f));
+	SaveParam(paramNode, "size_x", m_size[0][0] * dFloat32(2.0f));
+	SaveParam(paramNode, "size_y", m_size[0][1] * dFloat32(2.0f));
+	SaveParam(paramNode, "size_z", m_size[0][2] * dFloat32(2.0f));
 }

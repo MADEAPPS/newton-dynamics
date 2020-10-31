@@ -31,7 +31,8 @@ class ndShapeSphere: public ndShapeConvex
 {
 	public:
 	D_COLLISION_API ndShapeSphere(dFloat32 radius);
-	virtual ~ndShapeSphere();
+	D_COLLISION_API ndShapeSphere(const nd::TiXmlNode* const xmlNode);
+	D_COLLISION_API virtual ~ndShapeSphere();
 
 	virtual ndShapeSphere* GetAsShapeSphere() { return this; }
 

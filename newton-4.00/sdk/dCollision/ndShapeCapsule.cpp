@@ -127,10 +127,19 @@ void ndShapeCapsule::CalculateImplicitContacts(dInt32 count, dgContactPoint* con
 
 #endif
 
-ndShapeCapsule::ndShapeCapsule(dFloat32 radio0, dFloat32 radio1, dFloat32 height)
+ndShapeCapsule::ndShapeCapsule(dFloat32 radius0, dFloat32 radius1, dFloat32 height)
 	:ndShapeConvex(m_capsuleCollision)
 {
-	Init(radio0, radio1, height);
+	Init(radius0, radius1, height);
+}
+
+ndShapeCapsule::ndShapeCapsule(const nd::TiXmlNode* const xmlNode)
+	: ndShapeConvex(m_capsuleCollision)
+{
+	dFloat32 radius0 = GetFloat(xmlNode, "radius0");
+	dFloat32 radius1 = GetFloat(xmlNode, "radius1");
+	dFloat32 height = GetFloat(xmlNode, "height");
+	Init(radius0, radius1, height);
 }
 
 void ndShapeCapsule::Init(dFloat32 radio0, dFloat32 radio1, dFloat32 height)
@@ -147,12 +156,12 @@ void ndShapeCapsule::Init(dFloat32 radio0, dFloat32 radio1, dFloat32 height)
 		dSwap(radio0, radio1);
 	}
 
-	m_radio0 = radio0;
-	m_radio1 = radio1;
+	m_radius0 = radio0;
+	m_radius1 = radio1;
 	m_height = height * dFloat32(0.5f);
 
-	m_p0 = dVector(-m_height, m_radio0, dFloat32(0.0f), dFloat32(0.0f));
-	m_p1 = dVector(m_height, m_radio1, dFloat32(0.0f), dFloat32(0.0f));
+	m_p0 = dVector(-m_height, m_radius0, dFloat32(0.0f), dFloat32(0.0f));
+	m_p1 = dVector( m_height, m_radius1, dFloat32(0.0f), dFloat32(0.0f));
 	m_normal = dVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
 	dVector side(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f));
 
@@ -160,8 +169,8 @@ void ndShapeCapsule::Init(dFloat32 radio0, dFloat32 radio1, dFloat32 height)
 	{
 		dVector p1p0(m_p1 - m_p0);
 		m_normal = side.CrossProduct(p1p0).Normalize();
-		dVector support0(m_normal.Scale(m_radio0));
-		dVector support1(m_normal.Scale(m_radio1));
+		dVector support0(m_normal.Scale(m_radius0));
+		dVector support1(m_normal.Scale(m_radius1));
 		support0.m_x -= m_height;
 		support1.m_x += m_height;
 		dFloat32 distance0 = support0.DotProduct(m_normal).GetScalar();
@@ -183,14 +192,14 @@ void ndShapeCapsule::Init(dFloat32 radio0, dFloat32 radio1, dFloat32 height)
 
 	dVector tempVertex[4 * DG_CAPSULE_CAP_SEGMENTS * DG_CAPSULE_SEGMENTS + 100];
 	dInt32 index = 0;
-	dInt32 dx0 = dInt32(dFloor(DG_CAPSULE_SEGMENTS * ((m_p0.m_x + m_height + m_radio0) / m_radio0)) + dFloat32(1.0f));
-	dFloat32 step = m_radio0 / DG_CAPSULE_SEGMENTS;
+	dInt32 dx0 = dInt32(dFloor(DG_CAPSULE_SEGMENTS * ((m_p0.m_x + m_height + m_radius0) / m_radius0)) + dFloat32(1.0f));
+	dFloat32 step = m_radius0 / DG_CAPSULE_SEGMENTS;
 	dFloat32 x0 = m_p0.m_x - step * dx0;
 	for (dInt32 j = 0; j < dx0; j++) 
 	{
 		x0 += step;
 		dFloat32 x = x0 + m_height;
-		dFloat32 arg = dMax(m_radio0 * m_radio0 - x * x, dFloat32(1.0e-3f));
+		dFloat32 arg = dMax(m_radius0 * m_radius0 - x * x, dFloat32(1.0e-3f));
 		dFloat32 r0 = dSqrt(arg);
 
 		dFloat32 angle = dFloat32(0.0f);
@@ -206,12 +215,12 @@ void ndShapeCapsule::Init(dFloat32 radio0, dFloat32 radio1, dFloat32 height)
 	}
 
 	dFloat32 x1 = m_p1.m_x;
-	dInt32 dx1 = dInt32(dFloor(DG_CAPSULE_SEGMENTS * ((m_height + m_radio1 - m_p1.m_x) / m_radio1)) + dFloat32(1.0f));
-	step = m_radio1 / DG_CAPSULE_SEGMENTS;
+	dInt32 dx1 = dInt32(dFloor(DG_CAPSULE_SEGMENTS * ((m_height + m_radius1 - m_p1.m_x) / m_radius1)) + dFloat32(1.0f));
+	step = m_radius1 / DG_CAPSULE_SEGMENTS;
 	for (dInt32 j = 0; j < dx1; j++) 
 	{
 		dFloat32 x = x1 - m_height;
-		dFloat32 arg = dMax(m_radio1 * m_radio1 - x * x, dFloat32(1.0e-3f));
+		dFloat32 arg = dMax(m_radius1 * m_radius1 - x * x, dFloat32(1.0e-3f));
 		dFloat32 r1 = dSqrt(arg);
 		dFloat32 angle = dFloat32(0.0f);
 		for (dInt32 i = 0; i < DG_CAPSULE_CAP_SEGMENTS; i++) 
@@ -298,8 +307,8 @@ ndShapeInfo ndShapeCapsule::GetShapeInfo() const
 {
 	ndShapeInfo info(ndShapeConvex::GetShapeInfo());
 
-	info.m_capsule.m_radio0 = m_radio0;
-	info.m_capsule.m_radio1 = m_radio1;
+	info.m_capsule.m_radio0 = m_radius0;
+	info.m_capsule.m_radio1 = m_radius1;
 	info.m_capsule.m_height = dFloat32(2.0f) * m_height;
 
 	if (m_transform.m_x < dFloat32(0.0f)) 
@@ -335,16 +344,16 @@ void ndShapeCapsule::TesselateTriangle(dInt32 level, const dVector& p0, const dV
 	}
 	else 
 	{
-		ouput[count + 0] = p0.Scale(m_radio0);
-		ouput[count + 1] = p1.Scale(m_radio0);
-		ouput[count + 2] = p2.Scale(m_radio0);
+		ouput[count + 0] = p0.Scale(m_radius0);
+		ouput[count + 1] = p1.Scale(m_radius0);
+		ouput[count + 2] = p2.Scale(m_radius0);
 		count += 3;
 	}
 }
 
 void ndShapeCapsule::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const
 {
-	if (m_radio0 == m_radio1) 
+	if (m_radius0 == m_radius1) 
 	{
 		#define POWER 2
 		dVector tmpVectex[512];
@@ -452,7 +461,7 @@ dVector ndShapeCapsule::SupportVertexSpecialProjectPoint(const dVector& testPoin
 {
 	dVector dir(direction * m_transform);
 	dVector point(testPoint * m_transform);
-	point += dir.Scale(m_radio0 - D_PENETRATION_TOL);
+	point += dir.Scale(m_radius0 - D_PENETRATION_TOL);
 	return m_transform * point;
 }
 
@@ -463,8 +472,8 @@ dVector ndShapeCapsule::SupportVertex(const dVector& direction, dInt32* const ve
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
 
-	dVector p0(dir.Scale(m_radio0));
-	dVector p1(dir.Scale(m_radio1));
+	dVector p0(dir.Scale(m_radius0));
+	dVector p1(dir.Scale(m_radius1));
 	p0.m_x -= m_height;
 	p1.m_x += m_height;
 	dFloat32 dir0 = p0.DotProduct(dir).GetScalar();
@@ -483,7 +492,7 @@ dVector ndShapeCapsule::SupportVertexSpecial(const dVector& direction, dFloat32 
 	dAssert(dAbs(dir.DotProduct(dir).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-3f));
 
 	dVector p0(dVector::m_zero);
-	dVector p1(dir.Scale(m_radio1 - m_radio0));
+	dVector p1(dir.Scale(m_radius1 - m_radius0));
 	p0.m_x -= m_height;
 	p1.m_x += m_height;
 	dFloat32 dir0 = p0.DotProduct(dir).GetScalar();
@@ -502,8 +511,8 @@ dFloat32 ndShapeCapsule::RayCast(ndRayCastNotify& callback, const dVector& r0, c
 
 	dVector origin0(-m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
 	dVector origin1(m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
-	dFloat32 t0 = dRayCastSphere(q0, q1, origin0, m_radio0);
-	dFloat32 t1 = dRayCastSphere(q0, q1, origin1, m_radio1);
+	dFloat32 t0 = dRayCastSphere(q0, q1, origin0, m_radius0);
+	dFloat32 t1 = dRayCastSphere(q0, q1, origin1, m_radius1);
 	if ((t0 < dFloat32(1.0f)) && (t1 < dFloat32 (1.0f)))
 	{
 		if (t0 < t1) 
@@ -567,7 +576,7 @@ dInt32 ndShapeCapsule::CalculatePlaneIntersection(const dVector& direction, cons
 	dVector p0(-m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
 	dVector dir0(p0 - origin);
 	dFloat32 dist0 = dir0.DotProduct(normal).GetScalar();
-	if ((dist0 * dist0 - dFloat32(5.0e-5f)) < (m_radio0 * m_radio0)) 
+	if ((dist0 * dist0 - dFloat32(5.0e-5f)) < (m_radius0 * m_radius0)) 
 	{
 		contactsOut[count] = m_transform * (p0 - normal.Scale(dist0));
 		count++;
@@ -576,7 +585,7 @@ dInt32 ndShapeCapsule::CalculatePlaneIntersection(const dVector& direction, cons
 	dVector p1(m_height, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
 	dVector dir1(p1 - origin);
 	dFloat32 dist1 = dir1.DotProduct(normal).GetScalar();
-	if ((dist1 * dist1 - dFloat32(5.0e-5f)) < (m_radio1 * m_radio1)) 
+	if ((dist1 * dist1 - dFloat32(5.0e-5f)) < (m_radius1 * m_radius1)) 
 	{
 		contactsOut[count] = m_transform * (p1 - normal.Scale(dist1));
 		count++;
@@ -588,8 +597,8 @@ void ndShapeCapsule::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) c
 {
 	//ndShapeConvex::CalcAABB(matrix, p0, p1);
 
-	dVector size0(m_radio0);
-	dVector size1(m_radio1);
+	dVector size0(m_radius0);
+	dVector size1(m_radius1);
 	dVector q0(matrix.m_posit - matrix.m_front.Scale(m_height));
 	dVector q1(matrix.m_posit + matrix.m_front.Scale(m_height));
 
@@ -610,7 +619,7 @@ void ndShapeCapsule::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
 
 	paramNode->SetAttribute("nodeId", nodeid);
 
-	SaveParam(paramNode, "radio0", m_radio0);
-	SaveParam(paramNode, "radio1", m_radio0);
+	SaveParam(paramNode, "radius0", m_radius0);
+	SaveParam(paramNode, "radius1", m_radius0);
 	SaveParam(paramNode, "height", m_height * dFloat32 (2.0f));
 }

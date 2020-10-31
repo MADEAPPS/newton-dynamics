@@ -147,6 +147,13 @@ ndShapeSphere::ndShapeSphere(dFloat32 radius)
 	Init(radius);
 }
 
+ndShapeSphere::ndShapeSphere(const nd::TiXmlNode* const xmlNode)
+	: ndShapeConvex(m_sphereCollision)
+{
+	dFloat32 radius = GetFloat(xmlNode, "radius");
+	Init(radius);
+}
+
 ndShapeSphere::~ndShapeSphere()
 {
 	m_shapeRefCount--;
@@ -380,5 +387,5 @@ void ndShapeSphere::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
 
 	paramNode->SetAttribute("nodeId", nodeid);
 
-	SaveParam(paramNode, "radio", m_radius);
+	SaveParam(paramNode, "radius", m_radius);
 }
