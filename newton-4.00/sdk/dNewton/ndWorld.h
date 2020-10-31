@@ -113,6 +113,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	void SubStepUpdate(dFloat32 timestep);
 	void LoadSettings(const nd::TiXmlNode* const rootNode);
 	void LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache);
+	void LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache);
 
 	ndScene* m_scene;
 	ndBodyDynamic* m_sentinelBody;

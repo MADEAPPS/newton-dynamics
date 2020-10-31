@@ -44,6 +44,21 @@ ndBodyDynamic::ndBodyDynamic()
 {
 }
 
+ndBodyDynamic::ndBodyDynamic(const nd::TiXmlNode* const xmlNode)
+	:ndBodyKinematic(xmlNode->FirstChild("ndBodyKinematic"))
+	,m_accel(dVector::m_zero)
+	,m_alpha(dVector::m_zero)
+	,m_externalForce(dVector::m_zero)
+	,m_externalTorque(dVector::m_zero)
+	,m_impulseForce(dVector::m_zero)
+	,m_impulseTorque(dVector::m_zero)
+	,m_savedExternalForce(dVector::m_zero)
+	,m_savedExternalTorque(dVector::m_zero)
+{
+	// nothing was saved
+	//dAssert(0);
+}
+
 ndBodyDynamic::~ndBodyDynamic()
 {
 }

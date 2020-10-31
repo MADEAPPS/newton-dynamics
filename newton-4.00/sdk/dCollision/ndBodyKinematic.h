@@ -85,6 +85,7 @@ class ndBodyKinematic: public ndBody
 	};
 
 	D_COLLISION_API ndBodyKinematic();
+	D_COLLISION_API ndBodyKinematic(const nd::TiXmlNode* const xmlNode);
 	D_COLLISION_API virtual ~ndBodyKinematic();
 
 	ndScene* GetScene() const;

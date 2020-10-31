@@ -43,7 +43,9 @@ class ndBodyDynamic: public ndBodyKinematic
 {
 	public:
 	D_NEWTON_API ndBodyDynamic();
+	D_NEWTON_API ndBodyDynamic(const nd::TiXmlNode* const xmlNode);
 	D_NEWTON_API virtual ~ndBodyDynamic ();
+
 	D_NEWTON_API virtual ndBodyDynamic* GetAsBodyDynamic() { return this; }
 	D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep);
 	D_NEWTON_API virtual void AddDampingAcceleration(dFloat32 timestep);

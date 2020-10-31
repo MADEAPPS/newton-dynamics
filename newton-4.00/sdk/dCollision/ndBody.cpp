@@ -47,6 +47,31 @@ ndBody::ndBody()
 	m_uniqueIDCount++;
 }
 
+ndBody::ndBody(const nd::TiXmlNode* const xmlNode)
+	:m_matrix(dGetIdentityMatrix())
+	,m_veloc(dVector::m_zero)
+	,m_omega(dVector::m_zero)
+	,m_localCentreOfMass(dVector::m_wOne)
+	,m_globalCentreOfMass(dVector::m_wOne)
+	,m_minAABB(dVector::m_wOne)
+	,m_maxAABB(dVector::m_wOne)
+	,m_rotation()
+	,m_notifyCallback(nullptr)
+	,m_flags(0)
+	,m_uniqueID(m_uniqueIDCount)
+{
+	m_uniqueIDCount++;
+	m_transformIsDirty = 1;
+
+	m_matrix = xmlGetMatrix(xmlNode, "matrix");
+	m_veloc = xmlGetVector3(xmlNode, "veloc");
+	m_omega = xmlGetVector3(xmlNode, "omega");
+	m_localCentreOfMass = xmlGetVector3(xmlNode, "centreOfMass");
+	m_autoSleep = xmlGetInt(xmlNode, "autoSleep") ? 1 : 0;
+	m_gyroTorqueOn = xmlGetInt(xmlNode, "useGyroTorque") ? 1 : 0;
+	m_collideWithLinkedBodies = xmlGetInt(xmlNode, "collideWithLinkedBodies") ? 1 : 0;
+}
+
 ndBody::~ndBody()
 {
 	if (m_notifyCallback)
@@ -118,10 +143,11 @@ void ndBody::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<d
 
 	paramNode->SetAttribute("nodeId", nodeid);
 	
-	SaveParam(paramNode, "matrix", m_matrix);
-	SaveParam(paramNode, "velocity", m_veloc);
-	SaveParam(paramNode, "omega", m_omega);
-	SaveParam(paramNode, "centreOfMass", m_localCentreOfMass);
-	SaveParam(paramNode, "autoSleep", m_autoSleep ? 1 : 0);
-	SaveParam(paramNode, "useGyroTorque", m_gyroTorqueOn ? 1 : 0);
+	xmlSaveParam(paramNode, "matrix", m_matrix);
+	xmlSaveParam(paramNode, "veloc", m_veloc);
+	xmlSaveParam(paramNode, "omega", m_omega);
+	xmlSaveParam(paramNode, "centreOfMass", m_localCentreOfMass);
+	xmlSaveParam(paramNode, "autoSleep", m_autoSleep ? 1 : 0);
+	xmlSaveParam(paramNode, "useGyroTorque", m_gyroTorqueOn ? 1 : 0);
+	xmlSaveParam(paramNode, "collideWithLinkedBodies", m_collideWithLinkedBodies ? 1 : 0);
 }

@@ -112,6 +112,44 @@ ndBodyKinematic::ndBodyKinematic()
 	SetMassMatrix(dVector::m_zero);
 }
 
+ndBodyKinematic::ndBodyKinematic(const nd::TiXmlNode* const xmlNode)
+	:ndBody(xmlNode->FirstChild("ndBody"))
+	,m_invWorldInertiaMatrix(dGetZeroMatrix())
+	,m_shapeInstance(ndDummyCollision::GetNullShape())
+	,m_mass(dVector::m_zero)
+	,m_invMass(dVector::m_zero)
+	,m_residualVeloc(dVector::m_zero)
+	,m_residualOmega(dVector::m_zero)
+	,m_gyroAlpha(dVector::m_zero)
+	,m_gyroTorque(dVector::m_zero)
+	,m_gyroRotation()
+	,m_jointList()
+	,m_contactList()
+	,m_lock()
+	,m_scene(nullptr)
+	,m_islandParent(nullptr)
+	,m_sceneNode(nullptr)
+	,m_sceneBodyBodyNode(nullptr)
+	,m_sceneAggregateNode(nullptr)
+	,m_skeletonContainer(nullptr)
+	,m_weigh(dFloat32(0.0f))
+	,m_rank(0)
+	,m_index(0)
+	,m_sleepingCounter(0)
+{
+	//dAssert(0);
+	//m_shapeInstance.Save(paramNode, shapesCache);
+
+	dFloat32 invMass = xmlGetFloat(xmlNode, "invMass");
+	if (invMass > dFloat32 (0.0f))
+	{
+		dVector invInertia(xmlGetVector3(xmlNode, "invPrincipalInertia"));
+		invInertia.m_w = dFloat32 (1.0f);
+		dVector mass (invInertia.Scale(dFloat32(1.0f) / invMass));
+		SetMassMatrix(mass.m_x, mass.m_y, mass.m_z, mass.m_w);
+	}
+}
+
 ndBodyKinematic::~ndBodyKinematic()
 {
 	dAssert(m_scene == nullptr);
@@ -590,8 +628,9 @@ void ndBodyKinematic::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, cons
 	paramNode->SetAttribute("nodeId", nodeid);
 
 	ndBody::Save(paramNode, nodeid, shapesCache);
-	SaveParam(paramNode, "invMass", m_invMass.m_w);
-	dVector invInertia(m_invMass & dVector::m_triplexMask);
-	SaveParam(paramNode, "invPrincipalInertia", invInertia);
+
 	m_shapeInstance.Save(paramNode, shapesCache);
+	xmlSaveParam(paramNode, "invMass", m_invMass.m_w);
+	dVector invInertia(m_invMass & dVector::m_triplexMask);
+	xmlSaveParam(paramNode, "invPrincipalInertia", invInertia);
 }

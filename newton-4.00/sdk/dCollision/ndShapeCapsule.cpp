@@ -136,9 +136,9 @@ ndShapeCapsule::ndShapeCapsule(dFloat32 radius0, dFloat32 radius1, dFloat32 heig
 ndShapeCapsule::ndShapeCapsule(const nd::TiXmlNode* const xmlNode)
 	: ndShapeConvex(m_capsuleCollision)
 {
-	dFloat32 radius0 = GetFloat(xmlNode, "radius0");
-	dFloat32 radius1 = GetFloat(xmlNode, "radius1");
-	dFloat32 height = GetFloat(xmlNode, "height");
+	dFloat32 radius0 = xmlGetFloat(xmlNode, "radius0");
+	dFloat32 radius1 = xmlGetFloat(xmlNode, "radius1");
+	dFloat32 height = xmlGetFloat(xmlNode, "height");
 	Init(radius0, radius1, height);
 }
 
@@ -619,7 +619,7 @@ void ndShapeCapsule::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
 
 	paramNode->SetAttribute("nodeId", nodeid);
 
-	SaveParam(paramNode, "radius0", m_radius0);
-	SaveParam(paramNode, "radius1", m_radius0);
-	SaveParam(paramNode, "height", m_height * dFloat32 (2.0f));
+	xmlSaveParam(paramNode, "radius0", m_radius0);
+	xmlSaveParam(paramNode, "radius1", m_radius0);
+	xmlSaveParam(paramNode, "height", m_height * dFloat32 (2.0f));
 }

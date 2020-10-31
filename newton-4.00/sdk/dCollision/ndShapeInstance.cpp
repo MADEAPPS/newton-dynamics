@@ -810,12 +810,12 @@ void ndShapeInstance::Save(nd::TiXmlElement* const rootNode, const dTree<dUnsign
 	rootNode->LinkEndChild(paramNode);
 
 	dAssert(shapesCache.Find(m_shape));
-	SaveParam(paramNode, "localMatrix", m_localMatrix);
-	SaveParam(paramNode, "aligmentMatrix", m_aligmentMatrix);
-	SaveParam(paramNode, "scale", m_scale);
-	SaveParam(paramNode, "shapeNodeId", dInt32 (shapesCache.Find(m_shape)->GetInfo()));
+	xmlSaveParam(paramNode, "localMatrix", m_localMatrix);
+	xmlSaveParam(paramNode, "aligmentMatrix", m_aligmentMatrix);
+	xmlSaveParam(paramNode, "scale", m_scale);
+	xmlSaveParam(paramNode, "shapeNodeId", dInt32 (shapesCache.Find(m_shape)->GetInfo()));
 
-	SaveParam(paramNode, "skinThickness", m_skinThickness);
-	SaveParam(paramNode, "collisionMode", m_collisionMode ? 1 : 0);
-	SaveParam(paramNode, "materialID", m_shapeMaterial.m_userId);
+	xmlSaveParam(paramNode, "skinThickness", m_skinThickness);
+	xmlSaveParam(paramNode, "collisionMode", m_collisionMode ? 1 : 0);
+	xmlSaveParam(paramNode, "materialID", m_shapeMaterial.m_userId);
 }

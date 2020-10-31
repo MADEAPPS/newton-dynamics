@@ -32,6 +32,7 @@ class ndShapeConvexHull : public ndShapeConvex
 	class ndConvexBox;
 
 	public:
+	D_COLLISION_API ndShapeConvexHull(const nd::TiXmlNode* const xmlNode);
 	D_COLLISION_API ndShapeConvexHull(dInt32 count, dInt32 strideInBytes, dFloat32 tolerance, const dFloat32* const vertexArray);
 	D_COLLISION_API virtual ~ndShapeConvexHull();
 

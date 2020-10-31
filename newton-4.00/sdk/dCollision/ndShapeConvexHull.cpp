@@ -118,6 +118,29 @@ ndShapeConvexHull::ndShapeConvexHull (dInt32 count, dInt32 strideInBytes, dFloat
 	Create(count, strideInBytes, vertexArray, tolerance);
 }
 
+ndShapeConvexHull::ndShapeConvexHull(const nd::TiXmlNode* const xmlNode)
+	:ndShapeConvex(m_convexHull)
+	,m_supportTree(nullptr)
+	,m_faceArray(nullptr)
+	,m_soa_x(nullptr)
+	,m_soa_y(nullptr)
+	,m_soa_z(nullptr)
+	,m_soa_index(nullptr)
+	,m_vertexToEdgeMapping(nullptr)
+	,m_faceCount(0)
+	,m_soaVertexCount(0)
+	,m_supportTreeCount(0)
+{
+	m_edgeCount = 0;
+	m_vertexCount = 0;
+	m_vertex = nullptr;
+	m_simplex = nullptr;
+
+	dArray<dVector> array;
+	xmlGetFloatArray3(xmlNode, "vextexArray3", array);
+	Create(array.GetCount(), sizeof (dVector), &array[0].m_x, dFloat32 (0.0f));
+}
+
 ndShapeConvexHull::~ndShapeConvexHull()
 {
 	if (m_vertexToEdgeMapping) 
@@ -994,6 +1017,5 @@ void ndShapeConvexHull::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) co
 
 	paramNode->SetAttribute("nodeId", nodeid);
 
-	SaveParam(paramNode, "vextexCount", m_vertexCount);
-	SaveParam(paramNode, "vextexArray", m_vertexCount, m_vertex);
+	xmlSaveParam(paramNode, "vextexArray3", m_vertexCount, m_vertex);
 }

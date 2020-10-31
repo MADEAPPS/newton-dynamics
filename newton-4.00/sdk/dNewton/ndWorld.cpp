@@ -564,10 +564,10 @@ void ndWorld::Save(nd::TiXmlElement* const worldNode) const
 	nd::TiXmlElement* const config = new nd::TiXmlElement("settings");
 	worldNode->LinkEndChild(config);
 
-	SaveParam(config, "description", "string", "Newton Dynamics 4.00");
-	SaveParam(config, "revision", "string", "1.00");
-	SaveParam(config, "solverSubsteps", m_subSteps);
-	SaveParam(config, "solverIterations", m_solverIterations);
+	xmlSaveParam(config, "description", "string", "Newton Dynamics 4.00");
+	xmlSaveParam(config, "revision", "string", "1.00");
+	xmlSaveParam(config, "solverSubsteps", m_subSteps);
+	xmlSaveParam(config, "solverIterations", m_solverIterations);
 
 	dInt32 shapesCount = 0;
 	dTree<dUnsigned32, const ndShape*> uniqueShapes;
@@ -657,6 +657,10 @@ void ndWorld::LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShap
 		{
 			shape = new ndShapeCapsule(node);
 		}
+		else if (!strcmp(name, "ndShapeConvexHull"))
+		{
+			shape = new ndShapeConvexHull(node);
+		}
 		else
 		{
 			dAssert(0);
@@ -671,12 +675,42 @@ void ndWorld::LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShap
 	}
 }
 
+void ndWorld::LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache)
+{
+	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndBodies");
+	dAssert(shapes);
+
+	for (const nd::TiXmlNode* node = shapes->FirstChild(); node; node = node->NextSibling())
+	{
+		ndBody* body = nullptr;
+		const char* const name = node->Value();
+		if (!strcmp(name, "ndBodyDynamic"))
+		{
+			body = new ndBodyDynamic(node);
+		}
+		else
+		{
+			body = new ndBodyTriggerVolume(node);
+		}
+		if (body)
+		{
+			//dAssert(0);
+			//dInt32 shapeId;
+			//const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
+			//element->Attribute("nodeId", &shapeId);
+			//shapesCache.Insert(shape->AddRef(), shapeId);
+		}
+	}
+
+}
+
 void ndWorld::Load(const nd::TiXmlElement* const rootNode)
 {
 	dTree<const ndShape*, dUnsigned32> uniqueShapes;
 
 	LoadSettings(rootNode);
 	LoadShapes(rootNode, uniqueShapes);
+	LoadBodies(rootNode, uniqueShapes);
 
 	while (uniqueShapes.GetRoot())
 	{

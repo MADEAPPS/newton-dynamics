@@ -48,6 +48,7 @@
 #include <dThreadPool.h>
 #include <dQuaternion.h>
 #include <dMeshEffect.h>
+#include <dTinyXmlGlue.h>
 #include <dConvexHull3d.h>
 #include <dBezierSpline.h>
 #include <dNodeHierarchy.h>
@@ -63,7 +64,6 @@
 #include <dPolygonSoupBuilder.h>
 #include <dPolygonSoupDatabase.h>
 #include <dPolyhedraMassProperties.h>
-
 
 #endif
 
