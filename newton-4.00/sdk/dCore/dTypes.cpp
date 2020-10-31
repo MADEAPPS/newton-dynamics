@@ -589,43 +589,49 @@ static char* FloatToString(char* const buffer, dFloat32 value)
 	return ptr;
 }
 
-void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const value)
+void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const type, const char* const value)
 {
-	nd::TiXmlElement* const node = new nd::TiXmlElement("param");
+	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
 	rootNode->LinkEndChild(node);
-	node->SetAttribute(name, value);
+	dInt32 size = strlen(value) - 1;
+	if (value[size] == ' ')
+	{
+		char* ptr = (char*)value;
+		ptr[size] = 0;
+	}
+	node->SetAttribute(type, value);
 }
 
 void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 value)
 {
 	char buffer[1024];
 	sprintf(buffer, "%d", value);
-	SaveParam(rootNode, name, buffer);
+	SaveParam(rootNode, name, "int32", buffer);
 }
 
 void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt64 value)
 {
 	char buffer[1024];
 	sprintf(buffer, "%lld", value);
-	SaveParam(rootNode, name, buffer);
+	SaveParam(rootNode, name, "int64", buffer);
 }
 
 void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dFloat32 value)
 {
 	char buffer[1024];
 	FloatToString(buffer, value);
-	SaveParam(rootNode, name, buffer);
+	SaveParam(rootNode, name, "float", buffer);
 }
 
 void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, const dVector& value)
 {
 	char buffer[1024];
-	//sprintf(buffer, "%f %f %f %f", value.m_x, value.m_y, value.m_z, value.m_z);
 	char* ptr0 = FloatToString(buffer, value.m_x);
 	char* ptr1 = FloatToString(ptr0, value.m_y);
-	char* ptr2 = FloatToString(ptr1, value.m_z);
-	FloatToString(ptr2, value.m_w);
-	SaveParam(rootNode, name, buffer);
+	FloatToString(ptr1, value.m_z);
+	//char* ptr2 = FloatToString(ptr1, value.m_z);
+	//FloatToString(ptr2, value.m_w);
+	SaveParam(rootNode, name, "vector3", buffer);
 }
 
 void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, const dMatrix& value)
@@ -655,5 +661,5 @@ void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 
 		}
 	}
 
-	SaveParam(rootNode, name, buffer);
+	SaveParam(rootNode, name, "floatArray3", buffer);
 }

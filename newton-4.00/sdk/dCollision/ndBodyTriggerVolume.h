@@ -32,11 +32,13 @@ class ndBodyTriggerVolume : public ndBodyKinematic
 	D_COLLISION_API ndBodyTriggerVolume();
 	D_COLLISION_API virtual ~ndBodyTriggerVolume();
 
-	ndBodyTriggerVolume* ndBodyTriggerVolume::GetAsBodyTriggerVolume();
+	ndBodyTriggerVolume* GetAsBodyTriggerVolume();
 
 	virtual void OnTrigger(ndBodyKinematic* const body, dFloat32 timestep);
 	virtual void OnTriggerEnter(ndBodyKinematic* const body, dFloat32 timestep);
 	virtual void OnTriggerExit(ndBodyKinematic* const body, dFloat32 timestep);
+
+	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
 	private:
 	virtual void IntegrateExternalForce(dFloat32 timestep);

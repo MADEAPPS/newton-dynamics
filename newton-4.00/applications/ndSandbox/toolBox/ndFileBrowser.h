@@ -17,9 +17,6 @@ bool dGetOpenFileNamePLY (char* const fileName, int maxSize);
 bool dGetOpenFileNameNgd (char* const fileName, int maxSize);
 bool dGetSaveFileNameNgd(char* const fileName, int maxSize);
 
-bool dGetOpenFileNameSerialization(char* const fileName, int maxSize);
-bool dGetSaveFileNameSerialization(char* const fileName, int maxSize);
-
 
 #endif 
 

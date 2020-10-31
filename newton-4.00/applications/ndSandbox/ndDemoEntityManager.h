@@ -136,16 +136,6 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	int GetJoystickAxis (dFloat32* const axisValues, int maxAxis = 8) const;
 	int GetJoystickButtons (char* const axisbuttons, int maxButton = 32) const;
 
-	void SerializedPhysicScene(const char* const name);
-	void DeserializedPhysicScene(const char* const name);
-
-	static void SerializeFile (void* const serializeHandle, const void* const buffer, int size);
-	static void DeserializeFile (void* const serializeHandle, void* const buffer, int size);
-	//static void BodySerialization (NewtonBody* const body, void* const userData, NewtonSerializeCallback serializecallback, void* const serializeHandle);
-	//static void BodyDeserialization (NewtonBody* const body, void* const userData, NewtonDeserializeCallback serializecallback, void* const serializeHandle);
-	//static void OnCreateContact(const NewtonWorld* const world, NewtonJoint* const contact);
-	//static void OnDestroyContact(const NewtonWorld* const world, NewtonJoint* const contact);
-
 	bool GetCaptured () const;
 	bool GetMouseKeyState (int button ) const;
 	int Print (const dVector& color, const char *fmt, ... ) const;

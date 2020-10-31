@@ -1052,20 +1052,6 @@ NewtonCollision* CreateCollisionTree (ndWorld* const world, ndDemoEntity* const 
 	//NewtonTreeCollisionEndBuild(collision, optimize ? 2 : 0);
 	NewtonTreeCollisionEndBuild(collision, optimize ? 1 : 0);
 
-	// test Serialization
-#if 0
-	FILE* file = fopen ("serialize.bin", "wb");
-	NewtonCollisionSerialize (world, collision, DemoEntityManager::SerializeFile, file);
-	fclose (file);
-	NewtonDestroyCollision (collision);
-
-	file = fopen ("serialize.bin", "rb");
-	collision = NewtonCreateCollisionFromSerialization (world, DemoEntityManager::DeserializeFile, file);
-	fclose (file);
-#endif	
-
-
-
 	// measure the time to build a collision tree
 	timer0 = (dGetTimeInMicrosenconds() - timer0) / 1000;
 

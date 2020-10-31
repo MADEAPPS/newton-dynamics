@@ -33,3 +33,11 @@ ndBodyTriggerVolume::~ndBodyTriggerVolume()
 {
 }
 
+void ndBodyTriggerVolume::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+{
+	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndBodyTriggerVolume");
+	rootNode->LinkEndChild(paramNode);
+
+	paramNode->SetAttribute("nodeId", nodeid);
+	ndBodyKinematic::Save(paramNode, nodeid, shapesCache);
+}

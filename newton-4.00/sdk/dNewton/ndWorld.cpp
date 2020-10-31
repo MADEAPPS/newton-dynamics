@@ -541,7 +541,7 @@ void ndWorld::UpdateSkeletons()
 	}
 }
 
-void ndWorld::Save(const char* const path)
+void ndWorld::Save(const char* const path) const
 {
 	char* const oldloc = setlocale(LC_ALL, 0);
 	setlocale(LC_ALL, "C");
@@ -553,11 +553,19 @@ void ndWorld::Save(const char* const path)
 	nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
 	asciifile.LinkEndChild(worldNode);
 
+	Save(worldNode);
+
+	asciifile.SaveFile(path);
+	setlocale(LC_ALL, oldloc);
+}
+
+void ndWorld::Save(nd::TiXmlElement* const worldNode) const
+{
 	nd::TiXmlElement* const config = new nd::TiXmlElement("settings");
 	worldNode->LinkEndChild(config);
 
-	SaveParam(config, "description", "Newton Dynamics 4.00");
-	SaveParam(config, "revision", 100);
+	SaveParam(config, "description", "string", "Newton Dynamics 4.00");
+	SaveParam(config, "revision", "string", "1.00");
 	SaveParam(config, "solverSubsteps", m_subSteps);
 	SaveParam(config, "solverIterations", m_solverIterations);
 
@@ -602,7 +610,4 @@ void ndWorld::Save(const char* const path)
 			bodyIndex++;
 		}
 	}
-		
-	asciifile.SaveFile(path);
-	setlocale(LC_ALL, oldloc);
 }

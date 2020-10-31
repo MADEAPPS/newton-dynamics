@@ -568,21 +568,11 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			{
 				mainMenu = 3;
 			}
-			ImGui::Separator();
-
-			if (ImGui::MenuItem("Serialize", "")) 
-			{
-				mainMenu = 4;
-			}
-			if (ImGui::MenuItem("Deserialize", "")) 
-			{
-				mainMenu = 5;
-			}
 
 			ImGui::Separator();
 			if (ImGui::MenuItem("import ply file", "")) 
 			{
-				mainMenu = 6;
+				mainMenu = 4;
 			}
 
 			ImGui::Separator();
@@ -710,45 +700,36 @@ void ndDemoEntityManager::ShowMainMenuBar()
 
 		case 3:
 		{
-			m_currentScene = -1;
-			dAssert(0);
-			//char fileName[1024];
-			//if (dGetSaveFileNameNgd(fileName, 1024)) {
-			//	ndMakeViualMesh context(m_world);
-			//	dScene testScene(m_world);
-			//	testScene.NewtonWorldToScene(m_world, &context);
-			//	testScene.Serialize(fileName);
-			//}
+			//m_currentScene = -1;
+			char fileName[1024];
+			if (dGetSaveFileNameNgd(fileName, 1024)) 
+			{
+				_strlwr(fileName);
+				char* name = strrchr(fileName, '/');
+				if (!name)
+				{
+					name = strrchr(fileName, '\\');
+				}
+				if (!name)
+				{
+					name = fileName;
+				}
+
+				char* ext = strrchr(name, '.');
+				if (!ext)
+				{
+					strcat(fileName, ".ngd");
+				} 
+				else if (strcmp(ext, ".ngd"))
+				{
+					strcpy(ext, ".ngd");
+				}
+				m_world->Save(fileName);
+			}
 			break;
 		}
 
 		case 4:
-		{
-			m_currentScene = -1;
-			char fileName[1024];
-			if (dGetSaveFileNameSerialization(fileName, 1024)) 
-			{
-				SerializedPhysicScene(fileName);
-			}
-			break;
-		}
-
-		case 5:
-		{
-			// open Scene
-			m_currentScene = -1;
-			char fileName[1024];
-			Cleanup();
-			if (dGetOpenFileNameSerialization(fileName, 1024)) 
-			{
-				ApplyMenuOptions();
-				DeserializedPhysicScene(fileName);
-				ResetTimer();
-			}
-			break;
-		}
-
-		case 6:
 		{
 			// open Scene
 			m_currentScene = -1;
@@ -768,7 +749,6 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			// load a demo 
 			if (m_currentScene != -1) 
 			{
-				//DeserializedPhysicScene("C:/temp/test.bin");
 				LoadDemo(m_currentScene);
 				m_lastCurrentScene = m_currentScene;
 				m_currentScene = -1;
@@ -1100,104 +1080,6 @@ void ndDemoEntityManager::LoadScene (const char* const fileName)
 */
 }
 
-void ndDemoEntityManager::SerializeFile (void* const serializeHandle, const void* const buffer, int size)
-{
-	// check that each chunk is a multiple of 4 bytes, this is useful for easy little to big Indian conversion
-	dAssert ((size & 0x03) == 0);
-	fwrite (buffer, size, 1, (FILE*) serializeHandle);
-}
-
-void ndDemoEntityManager::DeserializeFile (void* const serializeHandle, void* const buffer, int size)
-{
-	// check that each chunk is a multiple of 4 bytes, this is useful for easy little to big Indian conversion
-	dAssert ((size & 0x03) == 0);
-	size_t ret = fread (buffer, size, 1, (FILE*) serializeHandle);
-	ret = 0;
-}
-
-/*
-void ndDemoEntityManager::BodySerialization (NewtonBody* const body, void* const bodyUserData, NewtonSerializeCallback serializeCallback, void* const serializeHandle)
-{
-	// here the use can save information of this body, ex:
-	// a string naming the body,  
-	// serialize the visual mesh, or save a link to the visual mesh
-	// save labels for looking up the body call backs
-
-	// for the demos I will simple write three stream to identify what body it is, the application can do anything
-	const char* const bodyIndentification = "gravityBody\0\0\0\0";
-	int size = (strlen (bodyIndentification) + 3) & -4;
-	serializeCallback (serializeHandle, &size, sizeof (size));
-	serializeCallback (serializeHandle, bodyIndentification, size);
-}
-
-void ndDemoEntityManager::BodyDeserialization (NewtonBody* const body, void* const bodyUserData, NewtonDeserializeCallback deserializecallback, void* const serializeHandle)
-{
-	int size;
-	char bodyIndentification[256];
-
-	deserializecallback (serializeHandle, &size, sizeof (size));
-	deserializecallback (serializeHandle, bodyIndentification, size);
-
-	// get the world and the scene form the world user data
-	NewtonWorld* const world = NewtonBodyGetWorld(body);
-	ndDemoEntityManager* const scene = (ndDemoEntityManager*)NewtonWorldGetUserData(world);
-
-	// here we attach a visual object to the entity, 
-	dMatrix matrix;
-	NewtonBodyGetMatrix(body, &matrix[0][0]);
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	scene->Append (entity);
-
-	NewtonBodySetUserData (body, entity);
-	NewtonBodySetTransformCallback(body, ndDemoEntity::TransformCallback);
-	NewtonBodySetForceAndTorqueCallback(body, PhysicsApplyGravityForce);
-	NewtonCollision* const collision = NewtonBodyGetCollision(body);
-
-	#ifdef USE_STATIC_MESHES_DEBUG_COLLISION
-	if (NewtonCollisionGetType(collision) == SERIALIZE_ID_TREE) {
-		NewtonStaticCollisionSetDebugCallback (collision, ShowMeshCollidingFaces);
-	}
-	#endif
-
-	//for visual mesh we will collision mesh and convert it to a visual mesh using NewtonMesh 
-	dTree <ndDemoMeshInterface*, const void*>* const cache = (dTree <ndDemoMeshInterface*, const void*>*)bodyUserData;
-	dTree <ndDemoMeshInterface*, const void*>::dTreeNode* node = cache->Find(NewtonCollisionDataPointer (collision));
-	if (!node) {
-		ndDemoMeshInterface* mesh = new ndDemoMesh(bodyIndentification, scene->m_shaderCache, collision, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga");
-		node = cache->Insert(mesh, NewtonCollisionDataPointer (collision));
-	} else {
-		node->GetInfo()->AddRef();
-	}
-
-	ndDemoMeshInterface* const mesh = node->GetInfo();
-	entity->SetMesh(mesh, dGetIdentityMatrix());
-	mesh->Release();
-}
-*/
-
-void ndDemoEntityManager::SerializedPhysicScene(const char* const name)
-{
-	dAssert(0);
-	//NewtonSerializeToFile(m_world, name, BodySerialization, nullptr);
-}
-
-
-void ndDemoEntityManager::DeserializedPhysicScene(const char* const name)
-{
-	dAssert(0);
-/*
-	// add the sky
-	CreateSkyBox();
-
-	dQuaternion rot;
-	dVector origin(-30.0f, 10.0f, 10.0f, 0.0f);
-	SetCameraMatrix(rot, origin);
-
-	dTree <ndDemoMeshInterface*, const void*> cache;
-	NewtonDeserializeFromFile(m_world, name, BodyDeserialization, &cache);
-*/
-}
-
 int ndDemoEntityManager::Print (const dVector& color, const char *fmt, ... ) const
 {
 	va_list argptr;
@@ -1209,23 +1091,6 @@ int ndDemoEntityManager::Print (const dVector& color, const char *fmt, ... ) con
 	ImGui::Text(string, "");
 	return 0;
 }
-
-/*
-void ndDemoEntityManager::OnCreateContact(const NewtonWorld* const world, NewtonJoint* const contact)
-{
-//	ndDemoEntityManager* const scene = (ndDemoEntityManager*) NewtonWorldGetUserData(world);
-//	dCustomScopeLock lock(&scene->m_contactLock);
-//	NewtonJointSetUserData(contact, scene->m_contactList.Append(contact));
-}
-
-void ndDemoEntityManager::OnDestroyContact(const NewtonWorld* const world, NewtonJoint* const contact)
-{
-//	ndDemoEntityManager* const scene = (ndDemoEntityManager*)NewtonWorldGetUserData(world);
-//	dList<NewtonJoint*>::dListNode* const cooky = (dList<NewtonJoint*>::dListNode*)NewtonJointGetUserData(contact);
-//	dCustomScopeLock lock(&scene->m_contactLock);
-//	scene->m_contactList.Remove(cooky);
-}
-*/
 
 void ndDemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVector& position)
 {

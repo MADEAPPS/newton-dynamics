@@ -597,7 +597,7 @@ class dScopeSpinLock
 	dSpinLock& m_spinLock;
 };
 
-D_CORE_API void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const value);
+D_CORE_API void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, const char* const type, const char* const value);
 D_CORE_API void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt32 value);
 D_CORE_API void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dInt64 value);
 D_CORE_API void SaveParam(nd::TiXmlElement* const rootNode, const char* const name, dFloat32 value);
