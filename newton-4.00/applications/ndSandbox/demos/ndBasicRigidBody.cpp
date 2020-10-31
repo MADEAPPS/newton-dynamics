@@ -83,10 +83,10 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 	
-	const int n = 1;
-	const int stackHigh = 1;
-	//const int n = 10;
-	//const int stackHigh = 7;
+	//const int n = 1;
+	//const int stackHigh = 1;
+	const int n = 10;
+	const int stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)
@@ -103,6 +103,7 @@ void ndBasicRigidBody (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene);
+//scene->GetWorld()->Load("C://tmp//newton-4.00//applications//ndSandbox//xxx.ngd");
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 	AddCapsulesStacks(scene, origin1);

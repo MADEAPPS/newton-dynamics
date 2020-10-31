@@ -27,8 +27,8 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0		// setting basic rigidbody
-#define DEFAULT_SCENE	1		// setting basic Trigger
+#define DEFAULT_SCENE	0		// setting basic rigidbody
+//#define DEFAULT_SCENE	1		// setting basic Trigger
 //#define DEFAULT_SCENE	2		// setting basic player
 //#define DEFAULT_SCENE	3		// static mesh collision 
 //#define DEFAULT_SCENE	4		// setting basic joints
@@ -224,7 +224,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
-	//m_collisionDisplayMode = 3;
+	m_collisionDisplayMode = 3;
 	//m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
 
@@ -692,6 +692,7 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			if (dGetOpenFileNameNgd(fileName, 1024)) 
 			{
 				ApplyMenuOptions();
+				CreateSkyBox();
 				m_world->Load(fileName);
 				ResetTimer();
 			}

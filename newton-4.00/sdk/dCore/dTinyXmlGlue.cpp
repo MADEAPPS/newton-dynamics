@@ -142,6 +142,17 @@ D_CORE_API dInt32 xmlGetInt(const nd::TiXmlNode* const rootNode, const char* con
 	return value;
 }
 
+dInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* const name)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
+	dAssert(element);
+	const char* const data = element->Attribute("int64");
+
+	dInt64 value;
+	sscanf(data, "%lld", &value);
+	return value;
+}
+
 dFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name)
 {
 	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
@@ -205,7 +216,7 @@ dMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name
 	sscanf(angleData, "%f %f %f", &euler.m_x, &euler.m_y, &euler.m_z);
 	euler = euler.Scale(dDegreeToRad);
 
-	dMatrix matrix (dPitchMatrix(euler.m_x) * dYawMatrix(euler.m_y) * dRollMatrix(euler.m_y));
+	dMatrix matrix (dPitchMatrix(euler.m_x) * dYawMatrix(euler.m_y) * dRollMatrix(euler.m_z));
 	matrix.m_posit = posit;
 	return matrix;
 }

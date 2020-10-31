@@ -290,7 +290,7 @@ void ndBasicTrigger (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene);
 
 	// build a floor
-	AddTrigger(scene);
+	//AddTrigger(scene);
 
 	AddBox(scene, dVector(0.0f, 0.0f, -3.0f, 1.0f));
 	AddSphere(scene, dVector(0.0f, 0.0f, 0.0f, 1.0f));

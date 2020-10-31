@@ -64,9 +64,7 @@ class ndShapeInstance: public dClassAlloc
 
 	D_COLLISION_API ndShapeInstance(ndShape* const shape);
 	D_COLLISION_API ndShapeInstance(const ndShapeInstance& instance);
-	//ndShapeInstance(const ndShapeInstance& meshInstance, const ndShape* const shape);
-	//ndShapeInstance(const dgWorld* const world, const dShape* const childCollision, dInt32 shapeID, const dMatrix& matrix);
-	//ndShapeInstance(const dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber);
+	D_COLLISION_API ndShapeInstance(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache);
 	D_COLLISION_API ~ndShapeInstance();
 	D_COLLISION_API ndShapeInstance& operator=(const ndShapeInstance& src);
 

@@ -47,7 +47,7 @@ ndBody::ndBody()
 	m_uniqueIDCount++;
 }
 
-ndBody::ndBody(const nd::TiXmlNode* const xmlNode)
+ndBody::ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
 	:m_matrix(dGetIdentityMatrix())
 	,m_veloc(dVector::m_zero)
 	,m_omega(dVector::m_zero)
@@ -63,7 +63,7 @@ ndBody::ndBody(const nd::TiXmlNode* const xmlNode)
 	m_uniqueIDCount++;
 	m_transformIsDirty = 1;
 
-	m_matrix = xmlGetMatrix(xmlNode, "matrix");
+	SetMatrix(xmlGetMatrix(xmlNode, "matrix"));
 	m_veloc = xmlGetVector3(xmlNode, "veloc");
 	m_omega = xmlGetVector3(xmlNode, "omega");
 	m_localCentreOfMass = xmlGetVector3(xmlNode, "centreOfMass");

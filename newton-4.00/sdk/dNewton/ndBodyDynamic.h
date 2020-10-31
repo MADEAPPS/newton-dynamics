@@ -43,7 +43,7 @@ class ndBodyDynamic: public ndBodyKinematic
 {
 	public:
 	D_NEWTON_API ndBodyDynamic();
-	D_NEWTON_API ndBodyDynamic(const nd::TiXmlNode* const xmlNode);
+	D_NEWTON_API ndBodyDynamic(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache);
 	D_NEWTON_API virtual ~ndBodyDynamic ();
 
 	D_NEWTON_API virtual ndBodyDynamic* GetAsBodyDynamic() { return this; }

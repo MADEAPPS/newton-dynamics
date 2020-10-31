@@ -416,11 +416,9 @@ ndShapeInstance::ndShapeInstance(ndShape* const shape)
 	,m_maxScale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
 	,m_shape(shape->AddRef())
 	,m_ownerBody(nullptr)
-	//,m_subCollisionHandle(nullptr)
 	,m_skinThickness(dFloat32(0.0f))
 	,m_scaleType(m_unit)
 	,m_collisionMode(true)
-	//,m_isExternal(true)
 {
 }
 
@@ -438,6 +436,33 @@ ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance)
 	,m_scaleType(instance.m_scaleType)
 	,m_collisionMode(instance.m_collisionMode)
 {
+}
+
+ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
+	:dClassAlloc()
+	,m_globalMatrix(dGetIdentityMatrix())
+	,m_localMatrix(dGetIdentityMatrix())
+	,m_aligmentMatrix(dGetIdentityMatrix())
+	,m_scale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
+	,m_invScale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
+	,m_maxScale(dFloat32(1.0f), dFloat32(1.0f), dFloat32(1.0f), dFloat32(0.0f))
+	,m_shape(nullptr)
+	,m_ownerBody(nullptr)
+	,m_skinThickness(dFloat32(0.0f))
+	,m_scaleType(m_unit)
+	,m_collisionMode(true)
+{
+	dInt32 index = xmlGetInt(xmlNode, "shapeNodeId");
+	m_shape = shapesCache.Find(index)->GetInfo()->AddRef();
+
+	m_localMatrix = xmlGetMatrix(xmlNode, "localMatrix");
+	m_aligmentMatrix = xmlGetMatrix(xmlNode, "aligmentMatrix");
+	m_skinThickness = xmlGetFloat(xmlNode, "skinThickness");
+	m_collisionMode = xmlGetInt(xmlNode, "collisionMode") ? true : false;
+	m_shapeMaterial.m_userId = xmlGetInt64(xmlNode, "materialID");
+	
+	dVector scale (xmlGetVector3(xmlNode, "scale"));
+	SetScale(scale);
 }
 
 ndShapeInstance::~ndShapeInstance()

@@ -1,4 +1,4 @@
-/* Copyright (c) <2003-2019> <Julio Jerez, Newton Game Dynamics>
+su/* Copyright (c) <2003-2019> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -686,22 +686,17 @@ void ndWorld::LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShap
 		const char* const name = node->Value();
 		if (!strcmp(name, "ndBodyDynamic"))
 		{
-			body = new ndBodyDynamic(node);
+			body = new ndBodyDynamic(node, shapesCache);
 		}
 		else
 		{
-			body = new ndBodyTriggerVolume(node);
+			body = new ndBodyTriggerVolume(node, shapesCache);
 		}
 		if (body)
 		{
-			//dAssert(0);
-			//dInt32 shapeId;
-			//const nd::TiXmlElement* const element = (nd::TiXmlElement*) node;
-			//element->Attribute("nodeId", &shapeId);
-			//shapesCache.Insert(shape->AddRef(), shapeId);
+			AddBody(body);
 		}
 	}
-
 }
 
 void ndWorld::Load(const nd::TiXmlElement* const rootNode)

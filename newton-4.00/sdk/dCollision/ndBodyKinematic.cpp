@@ -112,8 +112,8 @@ ndBodyKinematic::ndBodyKinematic()
 	SetMassMatrix(dVector::m_zero);
 }
 
-ndBodyKinematic::ndBodyKinematic(const nd::TiXmlNode* const xmlNode)
-	:ndBody(xmlNode->FirstChild("ndBody"))
+ndBodyKinematic::ndBodyKinematic(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
+	:ndBody(xmlNode->FirstChild("ndBody"), shapesCache)
 	,m_invWorldInertiaMatrix(dGetZeroMatrix())
 	,m_shapeInstance(ndDummyCollision::GetNullShape())
 	,m_mass(dVector::m_zero)
@@ -137,10 +137,12 @@ ndBodyKinematic::ndBodyKinematic(const nd::TiXmlNode* const xmlNode)
 	,m_index(0)
 	,m_sleepingCounter(0)
 {
-	//dAssert(0);
-	//m_shapeInstance.Save(paramNode, shapesCache);
+	m_invWorldInertiaMatrix[3][3] = dFloat32(1.0f);
+	ndShapeInstance instance(xmlNode->FirstChild("ndShapeInstance"), shapesCache);
+	SetCollisionShape(instance);
 
 	dFloat32 invMass = xmlGetFloat(xmlNode, "invMass");
+	SetMassMatrix(dVector::m_zero);
 	if (invMass > dFloat32 (0.0f))
 	{
 		dVector invInertia(xmlGetVector3(xmlNode, "invPrincipalInertia"));

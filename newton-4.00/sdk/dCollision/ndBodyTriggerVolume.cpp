@@ -29,8 +29,8 @@ ndBodyTriggerVolume::ndBodyTriggerVolume()
 	m_contactTestOnly = 1;
 }
 
-ndBodyTriggerVolume::ndBodyTriggerVolume(const nd::TiXmlNode* const xmlNode)
-	:ndBodyKinematic(xmlNode->FirstChild("ndBodyKinematic"))
+ndBodyTriggerVolume::ndBodyTriggerVolume(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
+	:ndBodyKinematic(xmlNode->FirstChild("ndBodyKinematic"), shapesCache)
 {
 	// nothing was saved
 	m_contactTestOnly = 1;

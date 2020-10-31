@@ -44,8 +44,8 @@ ndBodyDynamic::ndBodyDynamic()
 {
 }
 
-ndBodyDynamic::ndBodyDynamic(const nd::TiXmlNode* const xmlNode)
-	:ndBodyKinematic(xmlNode->FirstChild("ndBodyKinematic"))
+ndBodyDynamic::ndBodyDynamic(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
+	:ndBodyKinematic(xmlNode->FirstChild("ndBodyKinematic"), shapesCache)
 	,m_accel(dVector::m_zero)
 	,m_alpha(dVector::m_zero)
 	,m_externalForce(dVector::m_zero)

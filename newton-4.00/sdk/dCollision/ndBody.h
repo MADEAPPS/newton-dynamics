@@ -38,7 +38,7 @@ class ndBody: public dClassAlloc
 {
 	public:
 	D_COLLISION_API ndBody();
-	D_COLLISION_API ndBody(const nd::TiXmlNode* const xmlNode);
+	D_COLLISION_API ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache);
 	D_COLLISION_API virtual ~ndBody();
 
 	virtual ndBody* GetAsBody() { return this;}
