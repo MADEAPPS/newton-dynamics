@@ -460,6 +460,14 @@ ndShapeInstance::ndShapeInstance(const nd::TiXmlNode* const xmlNode, const dTree
 	m_skinThickness = xmlGetFloat(xmlNode, "skinThickness");
 	m_collisionMode = xmlGetInt(xmlNode, "collisionMode") ? true : false;
 	m_shapeMaterial.m_userId = xmlGetInt64(xmlNode, "materialID");
+	m_shapeMaterial.m_alignPad = xmlGetInt64(xmlNode, "materialUserData");
+
+	for (dInt32 i = 0; i < sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0]); i++)
+	{
+		char name[64];
+		sprintf(name, "intData%d", i);
+		m_shapeMaterial.m_userParam[i].m_intData = xmlGetInt64(xmlNode, name);
+	}
 	
 	dVector scale (xmlGetVector3(xmlNode, "scale"));
 	SetScale(scale);
@@ -479,6 +487,7 @@ ndShapeInstance& ndShapeInstance::operator=(const ndShapeInstance& instance)
 	m_invScale = instance.m_invScale;
 	m_maxScale = instance.m_maxScale;
 	m_scaleType = instance.m_scaleType;
+	m_shapeMaterial = instance.m_shapeMaterial;
 	m_skinThickness = instance.m_skinThickness;
 	m_collisionMode = instance.m_collisionMode;
 
@@ -843,4 +852,11 @@ void ndShapeInstance::Save(nd::TiXmlElement* const rootNode, const dTree<dUnsign
 	xmlSaveParam(paramNode, "skinThickness", m_skinThickness);
 	xmlSaveParam(paramNode, "collisionMode", m_collisionMode ? 1 : 0);
 	xmlSaveParam(paramNode, "materialID", m_shapeMaterial.m_userId);
+	xmlSaveParam(paramNode, "materialUserData", dInt64(m_shapeMaterial.m_alignPad));
+	for (dInt32 i = 0; i < sizeof(m_shapeMaterial.m_userParam) / sizeof(m_shapeMaterial.m_userParam[0]); i++)
+	{
+		char name[64];
+		sprintf(name, "intData%d", i);
+		xmlSaveParam(paramNode, name, dInt64(m_shapeMaterial.m_userParam[i].m_intData));
+	}
 }

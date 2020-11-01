@@ -136,6 +136,11 @@ void ndBody::SetMatrix(const dMatrix& matrix)
 	m_globalCentreOfMass = m_matrix.TransformVector(m_localCentreOfMass);
 }
 
+D_COLLISION_API const nd::TiXmlNode* ndBody::FindNode(const nd::TiXmlNode* const rootNode, const char* const name)
+{
+	return rootNode->FirstChild(name);
+}
+
 nd::TiXmlElement* ndBody::CreateRootElement(nd::TiXmlElement* const rootNode, const char* const name, dInt32 nodeid) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement(name);

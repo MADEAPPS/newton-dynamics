@@ -68,6 +68,7 @@ class ndBody: public dClassAlloc
 	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
 	protected:
+	D_COLLISION_API static const nd::TiXmlNode* FindNode(const nd::TiXmlNode* const rootNode, const char* const name);
 	D_COLLISION_API virtual nd::TiXmlElement* CreateRootElement(nd::TiXmlElement* const rootNode, const char* const name, dInt32 nodeid) const;
 	virtual void AttachContact(ndContact* const contact) {}
 	virtual void DetachContact(ndContact* const contact) {}

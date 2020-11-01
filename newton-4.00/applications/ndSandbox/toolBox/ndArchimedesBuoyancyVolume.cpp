@@ -20,6 +20,15 @@ ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume()
 {
 }
 
+ndArchimedesBuoyancyVolume::ndArchimedesBuoyancyVolume(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
+	:ndBodyTriggerVolume(ndBody::FindNode(xmlNode, "ndBodyTriggerVolume"), shapesCache)
+{
+	m_plane = xmlGetVector3(xmlNode, "planeNormal");
+	m_plane.m_w = xmlGetFloat(xmlNode, "planeDist");
+	m_density = xmlGetFloat(xmlNode, "density");
+	m_hasPlane = xmlGetInt(xmlNode, "hasPlane") ? true : false;
+}
+
 void ndArchimedesBuoyancyVolume::CalculatePlane(ndBodyKinematic* const body)
 {
 	class ndCastTriggerPlane : public ndRayCastClosestHitCallback
@@ -131,9 +140,9 @@ void ndArchimedesBuoyancyVolume::Save(nd::TiXmlElement* const rootNode, dInt32 n
 	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndArchimedesBuoyancyVolume", nodeid);
 	ndBodyTriggerVolume::Save(paramNode, nodeid, shapesCache);
 
-	xmlSaveParam(paramNode, "invMass", m_density);
-	xmlSaveParam(paramNode, "hasPlane", m_hasPlane ? 1 : 0);
-	xmlSaveParam(paramNode, "plane", m_plane);
+	xmlSaveParam(paramNode, "planeNormal", m_plane);
 	xmlSaveParam(paramNode, "planeDist", m_plane.m_w);
+	xmlSaveParam(paramNode, "density", m_density);
+	xmlSaveParam(paramNode, "hasPlane", m_hasPlane ? 1 : 0);
 }
 

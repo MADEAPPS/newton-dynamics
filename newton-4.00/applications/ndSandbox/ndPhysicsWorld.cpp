@@ -79,6 +79,10 @@ void ndPhysicsWorld::OnPostUpdate(dFloat32 timestep)
 
 ndBody* ndPhysicsWorld::LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache) const
 {
-	return new ndBodyTriggerVolume();
-	//return new ndArchimedesBuoyancyVolume();
+	if (!strcmp(bodyClassName, "ndArchimedesBuoyancyVolume"))
+	{
+		return new ndArchimedesBuoyancyVolume(parentNode, shapesCache);
+	}
+
+	return nullptr;
 }
