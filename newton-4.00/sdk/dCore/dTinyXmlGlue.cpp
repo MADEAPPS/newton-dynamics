@@ -44,7 +44,7 @@ static char* FloatToString(char* const buffer, dFloat32 value)
 
 static void CleanWhiteSpace(const char* const value)
 {
-	dInt32 size = strlen(value) - 1;
+	size_t size = strlen(value) - 1;
 	if (value[size] == ' ')
 	{
 		char* ptr = (char*)value;
@@ -98,11 +98,6 @@ void xmlSaveParam(nd::TiXmlElement* const rootNode, const char* const name, cons
 	euler0 = euler0.Scale(dRadToDegree);
 
 	char buffer[256];
-	//sprintf(buffer, "%sEulerAngles", name);
-	//xmlSaveParam(rootNode, buffer, euler0);
-	//sprintf(buffer, "%sPosition", name);
-	//xmlSaveParam(rootNode, buffer, value.m_posit);
-
 	nd::TiXmlElement* const node = new nd::TiXmlElement(name);
 	rootNode->LinkEndChild(node);
 
@@ -170,9 +165,9 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 	element->Attribute("count", &count);
 	array.SetCount(count);
 
-	dInt32 start = 0;
 	const char* const data = element->Attribute("floatArray");
 
+	size_t start = 0;
 	dVector point(dVector::m_zero);
 	for (dInt32 i = 0; i < count; i++)
 	{
