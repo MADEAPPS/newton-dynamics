@@ -198,8 +198,8 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVe
 	return velocStep;
 }
 
-void ndBodyDynamic::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+void ndBodyDynamic::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
 {
 	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyDynamic", nodeid);
-	ndBodyKinematic::Save(paramNode, nodeid, shapesCache);
+	ndBodyKinematic::Save(paramNode, assetPath, nodeid, shapesCache);
 }

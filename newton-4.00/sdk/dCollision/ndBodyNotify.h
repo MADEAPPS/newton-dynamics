@@ -39,7 +39,9 @@ class ndBodyNotify: public dClassAlloc
 	void SetGravity(const dVector& defualtGravity);
 
 	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix);
+
 	D_COLLISION_API virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep);
+	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath) const;
 
 	private:
 	dVector m_defualtGravity;

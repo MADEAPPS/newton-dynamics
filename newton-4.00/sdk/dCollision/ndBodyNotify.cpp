@@ -40,3 +40,9 @@ void ndBodyNotify::OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
 	}
 }
 
+void ndBodyNotify::Save(nd::TiXmlElement* const rootNode, const char* const assetPath) const
+{
+	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndBodyNotify");
+	rootNode->LinkEndChild(paramNode);
+	xmlSaveParam(paramNode, "gravity", m_defualtGravity);
+}

@@ -150,7 +150,7 @@ nd::TiXmlElement* ndBody::CreateRootElement(nd::TiXmlElement* const rootNode, co
 	return paramNode;
 }
 
-void ndBody::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
 {
 	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBody", nodeid);
 	xmlSaveParam(paramNode, "matrix", m_matrix);
@@ -160,4 +160,6 @@ void ndBody::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<d
 	xmlSaveParam(paramNode, "autoSleep", m_autoSleep ? 1 : 0);
 	xmlSaveParam(paramNode, "useGyroTorque", m_gyroTorqueOn ? 1 : 0);
 	xmlSaveParam(paramNode, "collideWithLinkedBodies", m_collideWithLinkedBodies ? 1 : 0);
+
+	m_notifyCallback->Save(rootNode, assetPath);
 }

@@ -622,11 +622,11 @@ void ndBodyKinematic::IntegrateExternalForce(dFloat32 timestep)
 	}
 }
 
-void ndBodyKinematic::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+void ndBodyKinematic::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
 {
 	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyKinematic", nodeid);
 
-	ndBody::Save(paramNode, nodeid, shapesCache);
+	ndBody::Save(paramNode, assetPath, nodeid, shapesCache);
 
 	m_shapeInstance.Save(paramNode, shapesCache);
 	xmlSaveParam(paramNode, "invMass", m_invMass.m_w);

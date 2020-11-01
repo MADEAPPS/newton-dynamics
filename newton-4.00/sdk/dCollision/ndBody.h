@@ -65,7 +65,7 @@ class ndBody: public dClassAlloc
 	D_COLLISION_API dMatrix GetMatrix() const;
 	D_COLLISION_API void SetMatrix(const dMatrix& matrix);
 	D_COLLISION_API dQuaternion GetRotation() const;
-	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
+	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
 	protected:
 	D_COLLISION_API static const nd::TiXmlNode* FindNode(const nd::TiXmlNode* const rootNode, const char* const name);

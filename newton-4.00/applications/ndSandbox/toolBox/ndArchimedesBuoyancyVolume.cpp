@@ -135,10 +135,10 @@ void ndArchimedesBuoyancyVolume::OnTriggerExit(ndBodyKinematic* const body, dFlo
 	//dTrace(("exit trigger body: %d\n", body->GetId()));
 }
 
-void ndArchimedesBuoyancyVolume::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+void ndArchimedesBuoyancyVolume::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
 {
 	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndArchimedesBuoyancyVolume", nodeid);
-	ndBodyTriggerVolume::Save(paramNode, nodeid, shapesCache);
+	ndBodyTriggerVolume::Save(paramNode, assetPath, nodeid, shapesCache);
 
 	xmlSaveParam(paramNode, "planeNormal", m_plane);
 	xmlSaveParam(paramNode, "planeDist", m_plane.m_w);

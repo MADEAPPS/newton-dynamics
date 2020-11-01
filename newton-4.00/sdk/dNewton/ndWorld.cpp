@@ -627,7 +627,7 @@ void ndWorld::Save(nd::TiXmlElement* const worldNode, const char* const assetPat
 		for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
 		{
 			ndBodyKinematic* const body = bodyNode->GetInfo();
-			body->Save(bodiesNode, bodyIndex, uniqueShapes);
+			body->Save(bodiesNode, assetPath, bodyIndex, uniqueShapes);
 			bodyIndex++;
 		}
 	}
@@ -720,7 +720,7 @@ void ndWorld::LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShap
 	}
 }
 
-void ndWorld::LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache)
+void ndWorld::LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath)
 {
 	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndBodies");
 	dAssert(shapes);
@@ -739,7 +739,7 @@ void ndWorld::LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShap
 		}
 		else
 		{
-			body = LoadUserDefinedBody(parentNode, bodyClassName, shapesCache);
+			body = LoadUserDefinedBody(parentNode, bodyClassName, shapesCache, assetPath);
 		}
 		if (body)
 		{
@@ -748,7 +748,7 @@ void ndWorld::LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShap
 	}
 }
 
-ndBody* ndWorld::LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache) const
+ndBody* ndWorld::LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath) const
 {
 	dAssert(0);
 	return nullptr;
@@ -760,7 +760,7 @@ void ndWorld::Load(const nd::TiXmlElement* const rootNode, const char* const ass
 
 	LoadSettings(rootNode);
 	LoadShapes(rootNode, uniqueShapes, assetPath);
-	LoadBodies(rootNode, uniqueShapes);
+	LoadBodies(rootNode, uniqueShapes, assetPath);
 
 	while (uniqueShapes.GetRoot())
 	{
