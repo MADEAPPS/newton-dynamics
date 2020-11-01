@@ -25,7 +25,6 @@
 #include "ndContact.h"
 #include "ndBodyNotify.h"
 
-
 dUnsigned32 ndBody::m_uniqueIDCount = 0;
 
 ndBody::ndBody()
@@ -70,6 +69,13 @@ ndBody::ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, d
 	m_autoSleep = xmlGetInt(xmlNode, "autoSleep") ? 1 : 0;
 	m_gyroTorqueOn = xmlGetInt(xmlNode, "useGyroTorque") ? 1 : 0;
 	m_collideWithLinkedBodies = xmlGetInt(xmlNode, "collideWithLinkedBodies") ? 1 : 0;
+
+	const nd::TiXmlNode* const notifyNode = xmlNode->FirstChild("ndBodyNotify");
+	if (notifyNode)
+	{
+		m_notifyCallback = new ndBodyNotify(notifyNode);
+		m_notifyCallback->m_body = this;
+	}
 }
 
 ndBody::~ndBody()
@@ -161,5 +167,8 @@ void ndBody::Save(nd::TiXmlElement* const rootNode, const char* const assetPath,
 	xmlSaveParam(paramNode, "useGyroTorque", m_gyroTorqueOn ? 1 : 0);
 	xmlSaveParam(paramNode, "collideWithLinkedBodies", m_collideWithLinkedBodies ? 1 : 0);
 
-	m_notifyCallback->Save(rootNode, assetPath);
+	if (m_notifyCallback)
+	{
+		m_notifyCallback->Save(paramNode, assetPath);
+	}
 }

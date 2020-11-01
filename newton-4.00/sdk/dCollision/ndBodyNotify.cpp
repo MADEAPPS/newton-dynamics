@@ -24,6 +24,13 @@
 #include "ndBodyNotify.h"
 #include "ndBodyKinematic.h"
 
+ndBodyNotify::ndBodyNotify(const nd::TiXmlNode* const rootNode)
+	:dClassAlloc()
+	,m_body(nullptr)
+{
+	m_defualtGravity = xmlGetVector3(rootNode, "gravity");
+}
+
 void ndBodyNotify::OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
 {
 	ndBodyKinematic* const body = GetBody()->GetAsBodyKinematic();
