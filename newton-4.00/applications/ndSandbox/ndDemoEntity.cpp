@@ -14,10 +14,9 @@
 #include "ndDemoEntity.h"
 
 ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, dFloat32 gravity)
-	:ndBodyNotify()
+	:ndBodyNotify(dVector (dFloat32 (0.0f), gravity, dFloat32(0.0f), dFloat32(0.0f)))
 	,m_entity(entity)
 	,m_manager(manager)
-	,m_gravity(gravity)
 {
 }
 
@@ -35,7 +34,7 @@ void ndDemoEntityNotify::OnApplyExternalForce(dInt32 threadIndex, dFloat32 times
 	if (body->GetInvMass() > 0.0f)
 	{
 		dVector massMatrix(body->GetMassMatrix());
-		dVector force(0.0f, m_gravity * massMatrix.m_w, 0.0f, 0.0f);
+		dVector force(GetGravity().Scale(massMatrix.m_w));
 		body->SetForce(force);
 		body->SetTorque(dVector::m_zero);
 

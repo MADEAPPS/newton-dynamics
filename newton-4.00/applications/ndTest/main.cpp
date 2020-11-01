@@ -70,7 +70,7 @@ class ndDemoEntityNotify: public ndBodyNotify
 {
 	public:
 	ndDemoEntityNotify()
-		:ndBodyNotify()
+		:ndBodyNotify(dVector (0.0f, -10.0f, 0.0f, 0.0f))
 	{
 		// here we set the application user data that 
 		// goes with the game engine, for now is just null

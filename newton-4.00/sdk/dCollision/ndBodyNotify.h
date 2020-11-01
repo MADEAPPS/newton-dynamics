@@ -24,44 +24,65 @@
 
 #include "ndCollisionStdafx.h"
 
+class ndBody;
+
 D_MSV_NEWTON_ALIGN_32
 class ndBodyNotify: public dClassAlloc
 {
 	public:  
-	ndBodyNotify()
-		:dClassAlloc()
-		,m_body(nullptr)
-	{
-	}
+	ndBodyNotify(const dVector& defualtGravity);
+	virtual ~ndBodyNotify();
 
-	virtual ~ndBodyNotify()
-	{
-	}
+	ndBody* GetBody();
+	virtual void* GetUserData() const;
+	dVector GetGravity() const;
+	void SetGravity(const dVector& defualtGravity);
 
-	ndBody* GetBody()
-	{
-		return m_body;
-	}
-
-	virtual void* GetUserData() const
-	{
-		return nullptr;
-	}
-
-	virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
-	{
-	}
-
-	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
-	{
-	}
+	virtual void OnTranform(dInt32 threadIndex, const dMatrix& matrix);
+	D_COLLISION_API virtual void OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep);
 
 	private:
+	dVector m_defualtGravity;
 	ndBody* m_body;
-
 	friend class ndBody;
 
 } D_GCC_NEWTON_ALIGN_32;
+
+inline ndBodyNotify::ndBodyNotify(const dVector& defualtGravity)
+	:dClassAlloc()
+	,m_defualtGravity(defualtGravity & dVector::m_triplexMask)
+	,m_body(nullptr)
+{
+}
+
+inline ndBodyNotify::~ndBodyNotify()
+{
+}
+
+inline ndBody* ndBodyNotify::GetBody()
+{
+	return m_body;
+}
+
+inline dVector ndBodyNotify::GetGravity() const
+{
+	return m_defualtGravity;
+}
+
+inline void ndBodyNotify::SetGravity(const dVector& defualtGravity)
+{
+	m_defualtGravity = defualtGravity & dVector::m_triplexMask;
+}
+
+
+inline void* ndBodyNotify::GetUserData() const
+{
+	return nullptr;
+}
+
+inline void ndBodyNotify::OnTranform(dInt32 threadIndex, const dMatrix& matrix)
+{
+}
 
 #endif 
 

@@ -34,7 +34,6 @@ class ndDemoEntityNotify: public ndBodyNotify
 
 	ndDemoEntity* m_entity;
 	ndDemoEntityManager* m_manager;
-	dFloat32 m_gravity;
 };
 
 class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
