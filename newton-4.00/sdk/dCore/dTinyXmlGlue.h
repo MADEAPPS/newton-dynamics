@@ -41,6 +41,7 @@ D_CORE_API dInt64 xmlGetInt64(const nd::TiXmlNode* const rootNode, const char* c
 D_CORE_API dFloat32 xmlGetFloat(const nd::TiXmlNode* const rootNode, const char* const name);
 D_CORE_API dVector xmlGetVector3(const nd::TiXmlNode* const rootNode, const char* const name);
 D_CORE_API dMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name);
+D_CORE_API const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name);
 D_CORE_API void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const name, dArray<dVector>& array);
 
 #endif

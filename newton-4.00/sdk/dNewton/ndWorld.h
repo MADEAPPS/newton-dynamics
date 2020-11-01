@@ -67,7 +67,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	D_NEWTON_API void DeleteBody(ndBody* const body);
 
 	D_NEWTON_API void Load(const char* const path);
-	D_NEWTON_API void Load(const nd::TiXmlElement* const rootNode);
+	D_NEWTON_API void Load(const nd::TiXmlElement* const rootNode, const char* const assetPath);
 	D_NEWTON_API virtual ndBody* LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache) const;
 
 	D_NEWTON_API void Save(const char* const path) const;
@@ -113,8 +113,8 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	private:
 	void SubStepUpdate(dFloat32 timestep);
 	void LoadSettings(const nd::TiXmlNode* const rootNode);
-	void LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache);
 	void LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache);
+	void LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
 
 	ndScene* m_scene;
 	ndBodyDynamic* m_sentinelBody;

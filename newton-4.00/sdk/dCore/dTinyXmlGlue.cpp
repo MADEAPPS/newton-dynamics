@@ -220,3 +220,10 @@ dMatrix xmlGetMatrix(const nd::TiXmlNode* const rootNode, const char* const name
 	matrix.m_posit = posit;
 	return matrix;
 }
+
+const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name)
+{
+	const nd::TiXmlElement* const element = (nd::TiXmlElement*) rootNode->FirstChild(name);
+	dAssert(element);
+	return element->Attribute("string");
+}

@@ -33,6 +33,7 @@ class ndShapeStaticBVH : public ndShapeStaticMesh, public dAabbPolygonSoup
 {
 	public:
 	D_COLLISION_API ndShapeStaticBVH(const dPolygonSoupBuilder& builder);
+	D_COLLISION_API ndShapeStaticBVH(const nd::TiXmlNode* const xmlNode, const char* const assetPath);
 	D_COLLISION_API virtual ~ndShapeStaticBVH();
 
 	protected:

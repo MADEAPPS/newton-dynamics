@@ -645,7 +645,27 @@ void ndWorld::Load(const char* const path)
 	const nd::TiXmlElement* const rootNode = doc.RootElement();
 	if (doc.FirstChild("ndWorld"))
 	{
-		Load(rootNode);
+		char assetPath[1024];
+		strcpy(assetPath, path);
+
+		char* name = strrchr(assetPath, '/');
+		if (!name)
+		{
+			name = strrchr(assetPath, '\\');
+		}
+		if (!name)
+		{
+			name = assetPath;
+		}
+
+		char* ext = strrchr(name, '.');
+		if (!ext)
+		{
+			ext = name;
+		}
+		ext[0] = 0;
+
+		Load(rootNode, assetPath);
 	}
 
 	setlocale(LC_ALL, oldloc);
@@ -657,7 +677,7 @@ void ndWorld::LoadSettings(const nd::TiXmlNode* const rootNode)
 	dAssert(settings);
 }
 
-void ndWorld::LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache)
+void ndWorld::LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath)
 {
 	const nd::TiXmlNode* const shapes = rootNode->FirstChild("ndShapes");
 	dAssert(shapes);
@@ -681,6 +701,10 @@ void ndWorld::LoadShapes(const nd::TiXmlNode* const rootNode, dTree<const ndShap
 		else if (!strcmp(name, "ndShapeConvexHull"))
 		{
 			shape = new ndShapeConvexHull(node);
+		}
+		else if (!strcmp(name, "ndShapeStaticBVH"))
+		{
+			shape = new ndShapeStaticBVH(node, assetPath);
 		}
 		else
 		{
@@ -730,12 +754,12 @@ ndBody* ndWorld::LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, cons
 	return nullptr;
 }
 
-void ndWorld::Load(const nd::TiXmlElement* const rootNode)
+void ndWorld::Load(const nd::TiXmlElement* const rootNode, const char* const assetPath)
 {
 	dTree<const ndShape*, dUnsigned32> uniqueShapes;
 
 	LoadSettings(rootNode);
-	LoadShapes(rootNode, uniqueShapes);
+	LoadShapes(rootNode, uniqueShapes, assetPath);
 	LoadBodies(rootNode, uniqueShapes);
 
 	while (uniqueShapes.GetRoot())

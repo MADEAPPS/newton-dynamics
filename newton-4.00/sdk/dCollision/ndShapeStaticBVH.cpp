@@ -155,6 +155,19 @@ ndShapeStaticBVH::ndShapeStaticBVH(const dPolygonSoupBuilder& builder)
 	m_trianglesCount = data.m_triangleCount;
 }
 
+ndShapeStaticBVH::ndShapeStaticBVH(const nd::TiXmlNode* const xmlNode, const char* const assetPath)
+	:ndShapeStaticMesh(m_boundingBoxHierachy)
+	,dAabbPolygonSoup()
+	,m_trianglesCount(0)
+{
+
+	D_CORE_API const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name);
+	const char* const assetName = xmlGetString(xmlNode, "assetName");
+	char pathCopy[1024];
+	sprintf(pathCopy, "%s/%s", assetPath, assetName);
+	Deserialize(pathCopy);
+}
+
 ndShapeStaticBVH::~ndShapeStaticBVH(void)
 {
 }
