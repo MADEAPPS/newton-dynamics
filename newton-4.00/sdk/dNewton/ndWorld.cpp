@@ -553,13 +553,34 @@ void ndWorld::Save(const char* const path) const
 	nd::TiXmlElement* const worldNode = new nd::TiXmlElement("ndWorld");
 	asciifile.LinkEndChild(worldNode);
 
-	Save(worldNode);
+	char assetPath[1024];
+	strcpy(assetPath, path);
+
+	char* name = strrchr(assetPath, '/');
+	if (!name)
+	{
+		name = strrchr(assetPath, '\\');
+	}
+	if (!name)
+	{
+		name = assetPath;
+	}
+
+	char* ext = strrchr(name, '.');
+	if (!ext)
+	{
+		ext = name;
+	}
+	ext[0] = 0;
+	_mkdir(assetPath);
+
+	Save(worldNode, assetPath);
 
 	asciifile.SaveFile(path);
 	setlocale(LC_ALL, oldloc);
 }
 
-void ndWorld::Save(nd::TiXmlElement* const worldNode) const
+void ndWorld::Save(nd::TiXmlElement* const worldNode, const char* const assetPath) const
 {
 	nd::TiXmlElement* const config = new nd::TiXmlElement("settings");
 	worldNode->LinkEndChild(config);
@@ -593,7 +614,7 @@ void ndWorld::Save(nd::TiXmlElement* const worldNode) const
 		{
 			dInt32 nodeId = *it;
 			const ndShape* const shape = it.GetKey();
-			shape->Save(shapesNode, nodeId);
+			shape->Save(shapesNode, assetPath, nodeId);
 		}
 	}
 

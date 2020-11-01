@@ -43,7 +43,7 @@ class ndShapeConvexHull : public ndShapeConvex
 	bool Create(dInt32 count, dInt32 strideInBytes, const dFloat32* const vertexArray, dFloat32 tolerance);
 	virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 
-	D_COLLISION_API virtual void Save(nd::TiXmlElement* const xmlNode, dInt32 nodeid) const;
+	D_COLLISION_API virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
 
 	private:
 	dVector SupportVertexBruteForce(const dVector& dir, dInt32* const vertexIndex) const;

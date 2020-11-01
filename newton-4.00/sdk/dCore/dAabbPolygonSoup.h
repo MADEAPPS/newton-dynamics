@@ -192,7 +192,7 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 	class dgNodeBuilder;
 
 	virtual void GetAABB (dVector& p0, dVector& p1) const;
-	//virtual void Serialize (dgSerialize callback, void* const userData) const;
+	virtual void Serialize (const char* const path) const;
 	//virtual void Deserialize (dgDeserialize callback, void* const userData, dInt32 revisionNumber);
 
 	protected:

@@ -612,10 +612,10 @@ void ndShapeCapsule::CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) c
 	p1 = max_q0.GetMax(max_q1) & dVector::m_triplexMask;
 }
 
-void ndShapeCapsule::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
+D_COLLISION_API void ndShapeCapsule::Save( nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid ) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeCapsule");
-	rootNode->LinkEndChild(paramNode);
+	xmlNode->LinkEndChild(paramNode);
 
 	paramNode->SetAttribute("nodeId", nodeid);
 

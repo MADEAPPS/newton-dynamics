@@ -1010,10 +1010,10 @@ void ndShapeConvexHull::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& 
 	}
 }
 
-void ndShapeConvexHull::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
+D_COLLISION_API void ndShapeConvexHull::Save( nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid ) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeConvexHull");
-	rootNode->LinkEndChild(paramNode);
+	xmlNode->LinkEndChild(paramNode);
 
 	paramNode->SetAttribute("nodeId", nodeid);
 

@@ -380,10 +380,10 @@ void ndShapeSphere::DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debu
 	}
 }
 
-void ndShapeSphere::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
+D_COLLISION_API void ndShapeSphere::Save( nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid ) const
 {
 	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeSphere");
-	rootNode->LinkEndChild(paramNode);
+	xmlNode->LinkEndChild(paramNode);
 
 	paramNode->SetAttribute("nodeId", nodeid);
 

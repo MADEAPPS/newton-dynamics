@@ -1195,20 +1195,30 @@ void dAabbPolygonSoup::Create (const dPolygonSoupBuilder& builder)
 	}
 }
 
-/*
-void dAabbPolygonSoup::Serialize (dgSerialize callback, void* const userData) const
+void dAabbPolygonSoup::Serialize (const char* const path) const
 {
-	callback (userData, &m_vertexCount, sizeof (dInt32));
-	callback (userData, &m_indexCount, sizeof (dInt32));
-	callback (userData, &m_nodesCount, sizeof (dInt32));
-	callback (userData, &m_nodesCount, sizeof (dInt32));
-	if (m_aabb) {
-		callback (userData,  m_localVertex, dInt32 (sizeof (dTriplex) * m_vertexCount));
-		callback (userData,  m_indices, dInt32 (sizeof (dInt32) * m_indexCount));
-		callback (userData, m_aabb, dInt32 (sizeof (dNode) * m_nodesCount));
+	FILE* const file = fopen(path, "wb");
+	dAssert(file);
+	//callback (userData, &m_vertexCount, sizeof (dInt32));
+	//callback (userData, &m_indexCount, sizeof (dInt32));
+	//callback (userData, &m_nodesCount, sizeof (dInt32));
+	fwrite(&m_vertexCount, sizeof(dInt32), 1, file);
+	fwrite(&m_indexCount, sizeof(dInt32), 1, file);
+	fwrite(&m_nodesCount, sizeof(dInt32), 1, file);
+	if (m_aabb) 
+	{
+	//	callback (userData,  m_localVertex, dInt32 (sizeof (dTriplex) * m_vertexCount));
+	//	callback (userData,  m_indices, dInt32 (sizeof (dInt32) * m_indexCount));
+	//	callback (userData, m_aabb, dInt32 (sizeof (dNode) * m_nodesCount));
+		fwrite(m_localVertex, sizeof(dTriplex) * m_vertexCount, 1, file);
+		fwrite(m_indices, sizeof(dInt32) * m_indexCount, 1, file);
+		fwrite(m_aabb, sizeof(dNode) * m_nodesCount, 1, file);
 	}
+
+	fclose(file);
 }
 
+/*
 void dAabbPolygonSoup::Deserialize (dgDeserialize callback, void* const userData, dInt32 revisionNumber)
 {
 	m_strideInBytes = sizeof (dTriplex);

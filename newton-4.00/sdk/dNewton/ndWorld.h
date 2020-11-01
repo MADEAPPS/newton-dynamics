@@ -71,7 +71,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	D_NEWTON_API virtual ndBody* LoadUserDefinedBody(const nd::TiXmlNode* const parentNode, const char* const bodyClassName, dTree<const ndShape*, dUnsigned32>& shapesCache) const;
 
 	D_NEWTON_API void Save(const char* const path) const;
-	D_NEWTON_API void Save(nd::TiXmlElement* const rootNode) const;
+	D_NEWTON_API void Save(nd::TiXmlElement* const rootNode, const char* const assetPath) const;
 
 	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;

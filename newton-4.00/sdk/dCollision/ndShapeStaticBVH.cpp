@@ -315,8 +315,17 @@ void ndShapeStaticBVH::GetCollidingFaces(ndPolygonMeshDesc* const data) const
 	ForAllSectors(*data, data->m_boxDistanceTravelInMeshSpace, data->m_maxT, GetPolygon, data);
 }
 
-void ndShapeStaticBVH::Save(nd::TiXmlElement* const rootNode, dInt32 nodeid) const
+D_COLLISION_API void ndShapeStaticBVH::Save( nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid ) const
 {
+	nd::TiXmlElement* const paramNode = new nd::TiXmlElement("ndShapeStaticBVH");
+	xmlNode->LinkEndChild(paramNode);
 
+	paramNode->SetAttribute("nodeId", nodeid);
 
+	char pathCopy[1024];
+	sprintf(pathCopy, "%s/asset%d.bin", assetPath, nodeid);
+	Serialize(pathCopy);
+
+	sprintf(pathCopy, "asset%d.bin", nodeid);
+	xmlSaveParam(paramNode, "assetName", "string", pathCopy);
 }
