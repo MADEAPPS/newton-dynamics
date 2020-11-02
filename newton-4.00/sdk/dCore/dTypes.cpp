@@ -176,7 +176,7 @@ dFloatExceptions::dFloatExceptions(dUnsigned32 mask)
 	#ifndef IOS
 		fesetenv(FE_DFL_DISABLE_SSE_DENORMS_ENV);
 	#endif
-#elif defined (WIN32)
+#elif (defined (_WIN_64_VER) || defined (_WIN_32_VER))
 	_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
 #elif defined (_ARM_VER)
 	//_MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
