@@ -23,7 +23,7 @@
 #define __D_TYPES_H__
 
 #ifdef _MSC_VER 
-	#ifdef _M_ARM
+    #if defined (_M_ARM) || defined (_M_ARM64)
 		#ifndef _ARM_VER
 			#define _ARM_VER
 		#endif
