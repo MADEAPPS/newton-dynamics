@@ -1,4 +1,4 @@
-su/* Copyright (c) <2003-2019> <Julio Jerez, Newton Game Dynamics>
+/* Copyright (c) <2003-2019> <Julio Jerez, Newton Game Dynamics>
 * 
 * This software is provided 'as-is', without any express or implied
 * warranty. In no event will the authors be held liable for any damages
@@ -176,75 +176,6 @@ void ndWorld::ApplyExternalForces()
 		}
 	};
 	m_scene->SubmitJobs<ndApplyExternalForces>();
-}
-
-void ndWorld::SubStepUpdate(dFloat32 timestep)
-{
-	D_TRACKTIME();
-
-	// do the a pre-physics step
-	m_scene->m_lru = m_scene->m_lru + 1;
-	m_scene->SetTimestep(timestep);
-
-	m_scene->BuildBodyArray();
-
-	ndBodyKinematic* sentinelBody = m_sentinelBody;
-	sentinelBody->PrepareStep(m_scene->GetActiveBodyArray().GetCount());
-	sentinelBody->m_resting = 1;
-	//sentinelBody->m_sleeping = 1;
-	sentinelBody->m_autoSleep = 1;
-	sentinelBody->m_equilibrium = 1;
-	m_scene->GetActiveBodyArray().PushBack(sentinelBody);
-
-
-	ApplyExternalForces();
-
-	// update the collision system
-	m_scene->UpdateAabb();
-	m_scene->FindCollidingPairs();
-	m_scene->BuildContactArray();
-	m_scene->CalculateContacts();
-	m_scene->DeleteDeadContact();
-
-	// update all special models.
-	UpdateSkeletons();
-	UpdatePrelisteners();
-
-	// calculate internal forces, integrate bodies and update matrices.
-	DynamicsUpdate();
-	UpdatePostlisteners();
-}
-
-void ndWorld::ThreadFunction()
-{
-	dUnsigned64 timeAcc = dGetTimeInMicrosenconds();
-	const bool collisionUpdate = m_collisionUpdate;
-	m_collisionUpdate = true;
-	if (collisionUpdate)
-	{
-		m_scene->CollisionOnlyUpdate();
-	}
-	else
-	{
-		D_TRACKTIME();
-		m_scene->Begin();
-		m_scene->BalanceScene();
-	
-		dInt32 const steps = m_subSteps;
-		dFloat32 timestep = m_timestep / steps;
-		for (dInt32 i = 0; i < steps; i++)
-		{
-			SubStepUpdate(timestep);
-		}
-	
-		m_scene->SetTimestep(m_timestep);
-		m_scene->TransformUpdate();
-		UpdateListenersPostTransform();
-		PostUpdate(m_timestep);
-		m_scene->End();
-	}
-	m_frameIndex++;
-	m_lastExecutionTime = (dGetTimeInMicrosenconds() - timeAcc) * dFloat32(1.0e-6f);
 }
 
 void ndWorld::PostUpdate(dFloat32 timestep)
@@ -772,4 +703,76 @@ void ndWorld::Load(const nd::TiXmlElement* const rootNode, const char* const ass
 		shape->Release();
 		uniqueShapes.Remove(uniqueShapes.GetRoot());
 	}
+}
+
+void ndWorld::ThreadFunction()
+{
+	dUnsigned64 timeAcc = dGetTimeInMicrosenconds();
+	const bool collisionUpdate = m_collisionUpdate;
+	m_collisionUpdate = true;
+	if (collisionUpdate)
+	{
+		m_scene->CollisionOnlyUpdate();
+	}
+	else
+	{
+		D_TRACKTIME();
+		m_scene->Begin();
+		m_scene->BalanceScene();
+
+		dInt32 const steps = m_subSteps;
+		dFloat32 timestep = m_timestep / steps;
+		for (dInt32 i = 0; i < steps; i++)
+		{
+			SubStepUpdate(timestep);
+		}
+
+		m_scene->SetTimestep(m_timestep);
+		m_scene->TransformUpdate();
+		UpdateListenersPostTransform();
+		PostUpdate(m_timestep);
+		m_scene->End();
+	}
+	m_frameIndex++;
+	m_lastExecutionTime = (dGetTimeInMicrosenconds() - timeAcc) * dFloat32(1.0e-6f);
+}
+void ndWorld::SubStepUpdate(dFloat32 timestep)
+{
+	D_TRACKTIME();
+
+	// do the a pre-physics step
+	m_scene->m_lru = m_scene->m_lru + 1;
+	m_scene->SetTimestep(timestep);
+
+static int xxx = 0;
+xxx++;
+if (xxx >= 1000)
+xxx = 0;
+
+	m_scene->BuildBodyArray();
+
+	ndBodyKinematic* sentinelBody = m_sentinelBody;
+	sentinelBody->PrepareStep(m_scene->GetActiveBodyArray().GetCount());
+	sentinelBody->m_resting = 1;
+	//sentinelBody->m_sleeping = 1;
+	sentinelBody->m_autoSleep = 1;
+	sentinelBody->m_equilibrium = 1;
+	m_scene->GetActiveBodyArray().PushBack(sentinelBody);
+
+	ApplyExternalForces();
+
+	// update the collision system
+	m_scene->UpdateAabb();
+	m_scene->FindCollidingPairs();
+	m_scene->BuildContactArray();
+	m_scene->CalculateContacts();
+	m_scene->DeleteDeadContact();
+
+	// update all special models.
+	UpdateSkeletons();
+	UpdatePrelisteners();
+
+	// calculate internal forces, integrate bodies and update matrices.
+	DynamicsUpdate();
+	UpdatePostlisteners();
 }
