@@ -730,7 +730,6 @@ void ndBodyPlayerCapsuleImpulseSolver::ApplyReaction(dFloat32 timestep)
 void ndBodyPlayerCapsule::IntegrateExternalForce(dFloat32 timestep)
 {
 	ndBodyPlayerCapsuleContactSolver contactSolver(this);
-
 	dFloat32 timeLeft = timestep;
 	const dFloat32 timeEpsilon = timestep * (1.0f / 16.0f);
 

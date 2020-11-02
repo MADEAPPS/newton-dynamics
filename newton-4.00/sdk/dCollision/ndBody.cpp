@@ -62,7 +62,7 @@ ndBody::ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, d
 	m_uniqueIDCount++;
 	m_transformIsDirty = 1;
 
-	SetMatrix(xmlGetMatrix(xmlNode, "matrix"));
+	dMatrix matrix(xmlGetMatrix(xmlNode, "matrix"));
 	m_veloc = xmlGetVector3(xmlNode, "veloc");
 	m_omega = xmlGetVector3(xmlNode, "omega");
 	m_localCentreOfMass = xmlGetVector3(xmlNode, "centreOfMass");
@@ -70,6 +70,7 @@ ndBody::ndBody(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, d
 	m_gyroTorqueOn = xmlGetInt(xmlNode, "useGyroTorque") ? 1 : 0;
 	m_collideWithLinkedBodies = xmlGetInt(xmlNode, "collideWithLinkedBodies") ? 1 : 0;
 
+	SetMatrix(matrix);
 	const nd::TiXmlNode* const notifyNode = xmlNode->FirstChild("ndBodyNotify");
 	if (notifyNode)
 	{

@@ -100,7 +100,6 @@ dAssert (0);
 	return t;
 }
 
-
 dVector ndShapeStaticBVH::SupportVertex (const dVector& dir) const
 {
 	return ForAllSectorsSupportVectex (dir);
@@ -160,12 +159,27 @@ ndShapeStaticBVH::ndShapeStaticBVH(const nd::TiXmlNode* const xmlNode, const cha
 	,dAabbPolygonSoup()
 	,m_trianglesCount(0)
 {
-
 	D_CORE_API const char* xmlGetString(const nd::TiXmlNode* const rootNode, const char* const name);
 	const char* const assetName = xmlGetString(xmlNode, "assetName");
 	char pathCopy[1024];
 	sprintf(pathCopy, "%s/%s", assetPath, assetName);
 	Deserialize(pathCopy);
+
+	dVector p0;
+	dVector p1;
+	GetAABB(p0, p1);
+	m_boxSize = (p1 - p0) * dVector::m_half;
+	m_boxOrigin = (p1 + p0) * dVector::m_half;
+
+	ndMeshVertexListIndexList data;
+	data.m_indexList = nullptr;
+	data.m_userDataList = nullptr;
+	data.m_maxIndexCount = 1000000000;
+	data.m_triangleCount = 0;
+	dVector zero(dVector::m_zero);
+	dFastAabbInfo box(dGetIdentityMatrix(), dVector(dFloat32(1.0e15f)));
+	ForAllSectors(box, zero, dFloat32(1.0f), GetTriangleCount, &data);
+	m_trianglesCount = data.m_triangleCount;
 }
 
 ndShapeStaticBVH::~ndShapeStaticBVH(void)

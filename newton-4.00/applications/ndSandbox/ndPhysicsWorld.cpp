@@ -13,6 +13,7 @@
 #include "ndPhysicsWorld.h"
 #include "ndDemoEntityManager.h"
 #include "ndDemoCameraManager.h"
+#include "ndBasicPlayerCapsule.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
 #define MAX_PHYSICS_FPS				60.0f
@@ -28,6 +29,11 @@ ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 
 ndPhysicsWorld::~ndPhysicsWorld()
 {
+}
+
+ndDemoEntityManager* ndPhysicsWorld::GetManager()
+{
+	return m_manager;
 }
 
 void ndPhysicsWorld::AdvanceTime(dFloat32 timetep)
@@ -82,6 +88,10 @@ ndBody* ndPhysicsWorld::LoadUserDefinedBody(const nd::TiXmlNode* const parentNod
 	if (!strcmp(bodyClassName, "ndArchimedesBuoyancyVolume"))
 	{
 		return new ndArchimedesBuoyancyVolume(parentNode, shapesCache);
+	}
+	else if (!strcmp(bodyClassName, "ndBasicPlayerCapsule"))
+	{
+		return new ndBasicPlayerCapsule(parentNode, shapesCache, (ndPhysicsWorld*)this);
 	}
 
 	return nullptr;

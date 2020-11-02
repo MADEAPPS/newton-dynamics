@@ -23,10 +23,10 @@
 #define PLAYER_JUMP_SPEED				5.0f
 
 ndBasicPlayerCapsule::ndBasicPlayerCapsule(ndDemoEntityManager* const scene, const dMatrix& localAxis, const dMatrix& location,
-	dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight)
+	dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight, bool isPlayer)
 	:ndBodyPlayerCapsule(localAxis, mass, radius, height, stepHeight)
 	,m_scene(scene)
-	,m_isPlayer(false)
+	,m_isPlayer(isPlayer)
 {
 	SetMatrix(location);
 	ndDemoEntity* const entity = new ndDemoEntity(location, nullptr);
@@ -41,6 +41,39 @@ ndBasicPlayerCapsule::ndBasicPlayerCapsule(ndDemoEntityManager* const scene, con
 	ndPhysicsWorld* const world = scene->GetWorld();
 	world->AddBody(this);
 	scene->AddEntity(entity);
+
+	if (isPlayer)
+	{
+		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
+	}
+}
+
+ndBasicPlayerCapsule::ndBasicPlayerCapsule(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache, ndPhysicsWorld* const world)
+	:ndBodyPlayerCapsule(ndBody::FindNode(xmlNode, "ndBodyPlayerCapsule"), shapesCache)
+{
+	m_isPlayer = xmlGetInt(xmlNode, "isPlayer") ? true : false;
+	m_scene = world->GetManager();
+	if (m_isPlayer)
+	{
+		m_scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
+	}
+
+	ndDemoEntity* const entity = new ndDemoEntity(m_localFrame, nullptr);
+	const ndShapeInstance& shape = GetCollisionShape();
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", m_scene->GetShaderCache(), &shape, "smilli.tga", "marble.tga", "marble.tga");
+	entity->SetMesh(mesh, dGetIdentityMatrix());
+	mesh->Release();
+
+	m_scene->AddEntity(entity);
+	SetNotifyCallback(new ndDemoEntityNotify(m_scene, entity));
+}
+
+void ndBasicPlayerCapsule::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+{
+	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBasicPlayerCapsule", nodeid);
+	ndBodyPlayerCapsule::Save(paramNode, assetPath, nodeid, shapesCache);
+
+	xmlSaveParam(paramNode, "isPlayer", m_isPlayer ? 1 : 0);
 }
 
 void ndBasicPlayerCapsule::ApplyInputs(dFloat32 timestep)

@@ -16,6 +16,7 @@
 
 class ndDemoMesh;
 class ndDemoEntity;
+class ndPhysicsWorld;
 class ndDemoEntityManager;
 
 class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
@@ -38,7 +39,10 @@ class ndBasicPlayerCapsule: public ndBodyPlayerCapsule
 	};
 
 	ndBasicPlayerCapsule(ndDemoEntityManager* const scene, const dMatrix& localAxis, 
-		const dMatrix& location, dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight);
+		const dMatrix& location, dFloat32 mass, dFloat32 radius, dFloat32 height, dFloat32 stepHeight, bool isPlayer = false);
+
+	ndBasicPlayerCapsule(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache, ndPhysicsWorld* const world);
+	void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
 	void ApplyInputs(dFloat32 timestep);
 	dFloat32 ContactFrictionCallback(const dVector& position, const dVector& normal, dInt32 contactId, const ndBodyKinematic* const otherbody) const;
