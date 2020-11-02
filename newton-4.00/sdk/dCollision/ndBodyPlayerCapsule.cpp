@@ -87,6 +87,7 @@ ndBodyPlayerCapsule::ndBodyPlayerCapsule(const dMatrix& localAxis, dFloat32 mass
 	m_stepHeight = dFloat32(0.0f);
 	m_contactPatch = dFloat32(0.0f);
 	m_height = height;
+	m_radius = radius;
 	m_weistScale = dFloat32(3.0f);
 	m_crouchScale = dFloat32(0.5f);
 	m_isAirbone = false;
@@ -111,6 +112,34 @@ ndBodyPlayerCapsule::ndBodyPlayerCapsule(const dMatrix& localAxis, dFloat32 mass
 	m_localFrame.m_posit = dVector::m_wOne;
 	m_contactPatch = radius / m_weistScale;
 	m_stepHeight = dMax(stepHeight, m_contactPatch * dFloat32(2.0f));
+}
+
+ndBodyPlayerCapsule::ndBodyPlayerCapsule(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
+	:ndBodyKinematic(xmlNode->FirstChild("ndBodyKinematic"), shapesCache)
+{
+	m_contactTestOnly = 1;
+	m_impulse = dVector::m_zero;
+	m_headingAngle = dFloat32(0.0f);
+	m_forwardSpeed = dFloat32(0.0f);
+	m_lateralSpeed = dFloat32(0.0f);
+	m_stepHeight = dFloat32(0.0f);
+	m_contactPatch = dFloat32(0.0f);
+
+	m_mass = xmlGetFloat(xmlNode, "mass");
+	m_height = xmlGetFloat(xmlNode, "height");
+	m_radius = xmlGetFloat(xmlNode, "radius");
+	m_weistScale = xmlGetFloat(xmlNode, "weistScale");
+	m_crouchScale = xmlGetFloat(xmlNode, "crouchScale");
+	m_isAirbone = xmlGetFloat(xmlNode, "isAirbone") ? true : false;
+	m_isOnFloor = xmlGetFloat(xmlNode, "isOnFloor") ? true : false;
+	m_isCrouched = xmlGetFloat(xmlNode, "isCrouched") ? true : false;
+	m_localFrame = xmlGetMatrix(xmlNode, "localFrame");
+
+	SetMassMatrix(m_mass, GetCollisionShape());
+	m_invMass = GetInvMass();
+	m_contactPatch = m_radius / m_weistScale;
+	m_stepHeight = xmlGetFloat(xmlNode, "stepHeight");
+	m_headingAngle = xmlGetFloat(xmlNode, "headingAngle");
 }
 
 ndBodyPlayerCapsule::~ndBodyPlayerCapsule()
@@ -754,4 +783,23 @@ void ndBodyPlayerCapsule::IntegrateExternalForce(dFloat32 timestep)
 	}
 
 	UpdatePlayerStatus(contactSolver);
+}
+
+void ndBodyPlayerCapsule::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const
+{
+	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodyPlayerCapsule", nodeid);
+	ndBodyKinematic::Save(paramNode, assetPath, nodeid, shapesCache);
+
+	xmlSaveParam(paramNode, "localFrame", m_localFrame);
+	xmlSaveParam(paramNode, "mass", m_mass);
+	xmlSaveParam(paramNode, "m_raheight", m_height);
+	xmlSaveParam(paramNode, "height", m_height);
+	xmlSaveParam(paramNode, "radius", m_radius);
+	xmlSaveParam(paramNode, "headingAngle", m_headingAngle);
+	xmlSaveParam(paramNode, "stepHeight", m_stepHeight);
+	xmlSaveParam(paramNode, "weistScale", m_weistScale);
+	xmlSaveParam(paramNode, "crouchScale", m_crouchScale);
+	xmlSaveParam(paramNode, "isAirbone", m_isAirbone ? 1 : 0);
+	xmlSaveParam(paramNode, "isOnFloor", m_isOnFloor ? 1 : 0);
+	xmlSaveParam(paramNode, "isCrouched", m_isCrouched ? 1 : 0);
 }

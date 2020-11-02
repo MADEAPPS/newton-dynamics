@@ -737,6 +737,10 @@ void ndWorld::LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShap
 		{
 			body = new ndBodyTriggerVolume(parentNode, shapesCache);
 		}
+		else if (!strcmp(bodyClassName, "ndBodyPlayerCapsule"))
+		{
+			body = new ndBodyPlayerCapsule(parentNode, shapesCache);
+		}
 		else
 		{
 			body = LoadUserDefinedBody(parentNode, bodyClassName, shapesCache, assetPath);

@@ -154,16 +154,16 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	player->m_isPlayer = true;
 	scene->SetUpdateCameraFunction(ndBasicPlayerCapsule::UpdateCameraCallback, player);
 
-	AddShapes(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f));
-	AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
-	AddPlatform(scene, 30.0f, dVector(10.0f, 0.5f, 1.125f, 0.0f));
-	AddPlatform(scene, 30.0f, dVector(10.0f, 1.0f, 1.250f, 0.0f));
-
-	location.m_posit.m_z += 2.0f;
-	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
-
-	location.m_posit.m_z += 2.0f;
-	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	//AddShapes(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f));
+	//AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
+	//AddPlatform(scene, 30.0f, dVector(10.0f, 0.5f, 1.125f, 0.0f));
+	//AddPlatform(scene, 30.0f, dVector(10.0f, 1.0f, 1.250f, 0.0f));
+	//
+	//location.m_posit.m_z += 2.0f;
+	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	//
+	//location.m_posit.m_z += 2.0f;
+	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
