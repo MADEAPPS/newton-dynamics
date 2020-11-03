@@ -1776,7 +1776,8 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 	ndBodyKinematic* const body1 = contact->GetBody1();
 
 	dAssert(!contact->m_isDead);
-	if (!(contact->m_isDead | (body0->m_equilibrium & body1->m_equilibrium)))
+	//if (!(contact->m_isDead | (body0->m_equilibrium & body1->m_equilibrium)))
+	if (!(body0->m_equilibrium & body1->m_equilibrium))
 	{
 		dUnsigned32 active = contact->m_active;
 		if (ValidateContactCache(contact, deltaTime))
@@ -1851,6 +1852,16 @@ void ndScene::CalculateContacts(dInt32 threadIndex, ndContact* const contact)
 	}
 
 	contact->m_isDead = contact->m_isDead | (body0->m_equilibrium & body1->m_equilibrium & !contact->m_active);
+	//if (!contact->m_isDead)
+	//{
+	//	if (!contact->m_active)
+	//	{
+	//		if (body0->m_equilibrium & body1->m_equilibrium)
+	//		{
+	//			contact->m_isDead = 1;
+	//		}
+	//	}
+	//}
 }
 
 void ndScene::BuildContactArray()

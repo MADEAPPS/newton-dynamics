@@ -203,14 +203,26 @@ ndContact* ndBodyKinematic::FindContact(const ndBody* const otherBody) const
 void ndBodyKinematic::AttachContact(ndContact* const contact)
 {
 	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
-	m_equilibrium = 0;
+	if (m_invMass.m_w > dFloat32(0.0f))
+	{
+		m_equilibrium = 0;
+	}
+	//else if (m_equilibrium)
+	//{
+	//	dInt32 mask = m_veloc.TestZero().GetSignMask() | m_omega.TestZero().GetSignMask();
+	//	if (mask != 0x0f)
+	//	{
+	//	}
+	//}
+
 	m_contactList.AttachContact(contact);
 }
 
 void ndBodyKinematic::DetachContact(ndContact* const contact)
 {
 	dAssert((this == contact->GetBody0()) || (this == contact->GetBody1()));
-	m_equilibrium = 0;
+	//m_equilibrium = 0;
+	m_equilibrium = contact->m_body0->m_equilibrium & contact->m_body1->m_equilibrium;
 	m_contactList.DetachContact(contact);
 }
 

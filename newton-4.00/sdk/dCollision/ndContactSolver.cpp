@@ -469,7 +469,7 @@ dInt32 ndContactSolver::ConvexToStaticMeshContacts()
 
 	ndShapeStaticMesh* const polysoup = m_instance1.GetShape()->GetAsShapeStaticMeshShape();
 	polysoup->GetCollidingFaces(&data);
-	
+
 	if (data.m_faceCount) 
 	{
 		if (m_ccdMode) 

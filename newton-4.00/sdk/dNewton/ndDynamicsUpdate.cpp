@@ -168,19 +168,19 @@ void ndDynamicsUpdate::BuildIsland()
 	{
 		D_TRACKTIME();
 		const ndJointList& jointList = m_world->GetJointList();
-		ndConstraintArray& contactArray = scene->GetActiveContactArray();
+		ndConstraintArray& jointArray = scene->GetActiveContactArray();
 
-		int index = contactArray.GetCount();
-		contactArray.SetCount(index + jointList.GetCount());
+		int index = jointArray.GetCount();
+		jointArray.SetCount(index + jointList.GetCount());
 		for (ndJointList::dListNode* node = jointList.GetFirst(); node; node = node->GetNext())
 		{
-			contactArray[index] = node->GetInfo();
+			jointArray[index] = node->GetInfo();
 			index++;
 		}
 
-		for (dInt32 i = contactArray.GetCount() - 1; i >= 0; i--)
+		for (dInt32 i = jointArray.GetCount() - 1; i >= 0; i--)
 		{
-			ndConstraint* const joint = contactArray[i];
+			ndConstraint* const joint = jointArray[i];
 			ndBodyKinematic* const body1 = joint->GetBody1();
 			if (body1->GetInvMass() > dFloat32(0.0f))
 			{
@@ -217,9 +217,9 @@ void ndDynamicsUpdate::BuildIsland()
 			}
 		}
 
-		for (dInt32 i = contactArray.GetCount() - 1; i >= 0; i--)
+		for (dInt32 i = jointArray.GetCount() - 1; i >= 0; i--)
 		{
-			ndConstraint* const joint = contactArray[i];
+			ndConstraint* const joint = jointArray[i];
 			ndBodyKinematic* const body1 = joint->GetBody1();
 			if (body1->GetInvMass() == dFloat32(0.0f))
 			{
@@ -240,10 +240,9 @@ void ndDynamicsUpdate::BuildIsland()
 
 		dInt32 count = 0;
 		ndBodyIndexPair* const buffer = (ndBodyIndexPair*)&m_internalForces[0];
-		for (dInt32 i = bodyArray.GetCount() - 1; i >= 0; i--)
+		for (dInt32 i = bodyArray.GetCount() - 2; i >= 0; i--)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
-			//if (!(body->m_islandSleep)
 			if (!(body->m_resting & body->m_islandSleep))
 			{
 				buffer[count].m_body = body;

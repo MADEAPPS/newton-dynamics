@@ -212,7 +212,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	// initialized the physics world for the new scene
 	//m_showUI = false;
 	//m_showAABB = true;
-	//m_hideVisualMeshes = true;
+	m_hideVisualMeshes = true;
 	//m_showScene = true;
 	//m_autoSleepMode = false;
 	//m_sceneType = 1;
@@ -222,7 +222,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;
 	//m_showNormalForces = true;
-	//m_showContactPoints = true;
+	m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
 	m_collisionDisplayMode = 3;
 	//m_showListenersDebugInfo = true;
@@ -766,6 +766,7 @@ void ndDemoEntityManager::LoadDemo(int menu)
 	// make the sky box 
 	CreateSkyBox();
 	m_demosSelection[menu].m_launchDemoCallback(this);
+
 	sprintf(newTitle, "Newton Dynamics %d.%.2i demo: %s", D_NEWTON_ENGINE_MAJOR_VERSION, D_NEWTON_ENGINE_MINOR_VERSION, m_demosSelection[menu].m_name);
 	glfwSetWindowTitle(m_mainFrame, newTitle);
 	ApplyMenuOptions();

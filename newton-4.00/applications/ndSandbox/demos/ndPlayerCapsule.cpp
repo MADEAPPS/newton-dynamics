@@ -149,17 +149,17 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	dFloat32 radio = 0.5f;
 	dFloat32 mass = 100.0f;
 	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height/4.0f, true);
+	
+	location.m_posit.m_z += 2.0f;
+	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	
+	location.m_posit.m_z += 2.0f;
+	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
 
 	AddShapes(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f));
 	AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
 	AddPlatform(scene, 30.0f, dVector(10.0f, 0.5f, 1.125f, 0.0f));
 	AddPlatform(scene, 30.0f, dVector(10.0f, 1.0f, 1.250f, 0.0f));
-	
-	location.m_posit.m_z += 2.0f;
-	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
-	
-	location.m_posit.m_z += 2.0f;
-	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);

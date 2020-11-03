@@ -736,18 +736,21 @@ void ndWorld::ThreadFunction()
 	m_frameIndex++;
 	m_lastExecutionTime = (dGetTimeInMicrosenconds() - timeAcc) * dFloat32(1.0e-6f);
 }
+
+int xxxxxxx;
 void ndWorld::SubStepUpdate(dFloat32 timestep)
 {
 	D_TRACKTIME();
 
+xxxxxxx++;
+
+extern int xxxxxxx;
+if (xxxxxxx >= 481)
+xxxxxxx *= 1;
+
 	// do the a pre-physics step
 	m_scene->m_lru = m_scene->m_lru + 1;
 	m_scene->SetTimestep(timestep);
-
-static int xxx = 0;
-xxx++;
-if (xxx >= 1000)
-xxx = 0;
 
 	m_scene->BuildBodyArray();
 

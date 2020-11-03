@@ -60,10 +60,10 @@ static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	const int n = 5;
-	const int stackHigh = 5;
-	//const int n = 10;
-	//const int stackHigh = 7;
+	//const int n = 5;
+	const int n = 1;
+	//const int stackHigh = 5;
+	const int stackHigh = 1;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)
@@ -108,6 +108,13 @@ static void AddPlatform(ndDemoEntityManager* const scene, dFloat32 mass, const d
 
 void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
+scene->GetWorld()->Load("C:/tmp/newton-4.00/applications/ndSandbox/xxx.ngd");
+dQuaternion rot1;
+//dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+dVector origin1(14.0f, 1.0f, 0.0f, 0.0f);
+scene->SetCameraMatrix(rot1, origin1);
+return;
+
 	// build a floor
 	//BuildFlatPlane(scene, false);
 	//BuildStaticMesh(scene, "flatPlane.fbx", false);
@@ -126,20 +133,21 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	dFloat32 height = 1.9f;
 	dFloat32 radio = 0.5f;
 	dFloat32 mass = 100.0f;
-	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height/4.0f, true);
+	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height/4.0f, true);
+
+	//location.m_posit.m_z += 2.0f;
+	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	//
+	//location.m_posit.m_z += 2.0f;
+	//new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
 
 	AddShapes(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f));
-	AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
-	AddPlatform(scene, 30.0f, dVector(10.0f, 0.5f, 1.125f, 0.0f));
-	AddPlatform(scene, 30.0f, dVector(10.0f, 1.0f, 1.250f, 0.0f));
-	
-	location.m_posit.m_z += 2.0f;
-	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
-	
-	location.m_posit.m_z += 2.0f;
-	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
+	//AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
+	//AddPlatform(scene, 30.0f, dVector(10.0f, 0.5f, 1.125f, 0.0f));
+	//AddPlatform(scene, 30.0f, dVector(10.0f, 1.0f, 1.250f, 0.0f));
 
 	dQuaternion rot;
-	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	//dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(3.0f, 1.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
