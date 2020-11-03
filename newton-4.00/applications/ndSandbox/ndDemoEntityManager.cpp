@@ -1366,7 +1366,6 @@ void ndDemoEntityManager::RenderScene()
 		RenderWorldScene(this);
 	}
 
-
 	//if (m_showRaycastHit) {
 	//	RenderRayCastHit(m_world);
 	//}

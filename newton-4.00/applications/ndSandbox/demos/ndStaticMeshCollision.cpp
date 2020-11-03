@@ -106,6 +106,49 @@ static void AddPlatform(ndDemoEntityManager* const scene, dFloat32 mass, const d
 	mesh->Release();
 }
 
+static void AddConvexHull(ndDemoEntityManager* const scene, const dVector& origin, const dInt32 segments)
+{
+	dVector points[1024];
+	dInt32 count = 0;
+	for (dInt32 i = 0; i < segments; i++)
+	{
+		dFloat32 y = 0.7f * dCos((dFloat32(2.0f) * dPi) * i / segments);
+		dFloat32 z = 0.7f * dSin((dFloat32(2.0f) * dPi) * i / segments);
+		points[count++] = dVector(-0.5f, 0.7f * y, 0.7f* z, 0.0f);
+		points[count++] = dVector(0.5f, 0.7f * y, 0.7f* z, 0.0f);
+		//points[count++] = dVector(0.25f, y, z, 0.0f);
+		points[count++] = dVector(-0.25f, y, z, 0.0f);
+	}
+
+	//ndShapeInstance shape(new ndShapeBox(1.0f, 2.0f, 0.7f));
+	ndShapeInstance shape(new ndShapeConvexHull(count, sizeof(dVector), 0.0f, &points[0].m_x));
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit.m_y = floor.m_y + 10.0f;
+
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	entity->SetMesh(mesh, dGetIdentityMatrix());
+
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(shape);
+	body->SetMassMatrix(10.0f, shape);
+	body->SetGyroMode(true);
+
+	world->AddBody(body);
+	scene->AddEntity(entity);
+
+	mesh->Release();
+}
+
 void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 {
 //scene->GetWorld()->Load("C:/tmp/newton-4.00/applications/ndSandbox/xxx.ngd");
@@ -115,7 +158,7 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 //return;
 
 	// build a floor
-	//BuildFlatPlane(scene, false);
+	//BuildFlatPlane(scene, true);
 	//BuildStaticMesh(scene, "flatPlane.fbx", false);
 	BuildStaticMesh(scene, "track.fbx", false);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
@@ -144,6 +187,10 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 	AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
 	AddPlatform(scene, 30.0f, dVector(10.0f, 0.5f, 1.125f, 0.0f));
 	AddPlatform(scene, 30.0f, dVector(10.0f, 1.0f, 1.250f, 0.0f));
+	
+	AddConvexHull(scene, dVector(8.0f, 1.0f, -3.0f, 0.0f), 15);
+	AddConvexHull(scene, dVector(7.0f, 1.0f, -3.0f, 0.0f), 10);
+	AddConvexHull(scene, dVector(6.0f, 1.0f, -3.0f, 0.0f), 6);
 
 	dQuaternion rot;
 	//dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
