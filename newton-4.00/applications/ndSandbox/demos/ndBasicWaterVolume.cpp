@@ -55,6 +55,10 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 
 	ndBodySphFluid* const fluidObject = new ndBodySphFluid();
 	fluidObject->SetMatrix(matrix);
+
+	fluidObject->AddParticle(0.1f, dVector(matrix.m_posit), dVector::m_zero);
+	
+
 	world->AddBody(fluidObject);
 
 }

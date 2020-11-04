@@ -36,43 +36,24 @@ class ndBodyParticleSet: public ndBody
 	D_NEWTON_API virtual ndBodyParticleSet* GetAsBodyParticleSet();
 	D_NEWTON_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
-	//D_NEWTON_API virtual ndBodyParticleSet* GetAsBodyDynamic() { return this; }
-	//D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep);
-	//D_NEWTON_API virtual void AddDampingAcceleration(dFloat32 timestep);
-	//D_NEWTON_API virtual void IntegrateVelocity(dFloat32 timestep);
-	//
-	//D_NEWTON_API void SetForce(const dVector& force);
-	//D_NEWTON_API void SetTorque(const dVector& torque);
-	//
-	//virtual dVector GetForce() const;
-	//virtual dVector GetTorque() const;
-	//
-	//dVector GetAccel() const;
-	//virtual void SetAccel(const dVector& accel);
-	//
-	//dVector GetAlpha() const;
-	//virtual void SetAlpha(const dVector& alpha);
-	//
-	//ndJacobian IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep);
+	dInt32 GetCount() const;
+	D_NEWTON_API virtual void AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity) = 0;
 
 	protected:
+	dArray<dVector> m_posit;
 
 	ndBodyParticleSetList::dListNode* m_listNode;
-	//dVector m_accel;
-	//dVector m_alpha;
-	//dVector m_externalForce;
-	//dVector m_externalTorque;
-	//dVector m_impulseForce;
-	//dVector m_impulseTorque;
-	//dVector m_savedExternalForce;
-	//dVector m_savedExternalTorque;
-	//friend class ndDynamicsUpdate;
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline ndBodyParticleSet* ndBodyParticleSet::GetAsBodyParticleSet() 
 { 
 	return this; 
+}
+
+inline dInt32 ndBodyParticleSet::GetCount() const
+{
+	return m_posit.GetCount();
 }
 
 #endif 

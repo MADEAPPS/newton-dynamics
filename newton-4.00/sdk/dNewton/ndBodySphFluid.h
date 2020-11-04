@@ -35,37 +35,10 @@ class ndBodySphFluid: public ndBodyParticleSet
 
 	D_NEWTON_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
-	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
-
-	//D_NEWTON_API virtual ndBodySphFluid* GetAsBodyDynamic() { return this; }
-	//D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep);
-	//D_NEWTON_API virtual void AddDampingAcceleration(dFloat32 timestep);
-	//D_NEWTON_API virtual void IntegrateVelocity(dFloat32 timestep);
-	//
-	//D_NEWTON_API void SetForce(const dVector& force);
-	//D_NEWTON_API void SetTorque(const dVector& torque);
-	//
-	//virtual dVector GetForce() const;
-	//virtual dVector GetTorque() const;
-	//
-	//dVector GetAccel() const;
-	//virtual void SetAccel(const dVector& accel);
-	//
-	//dVector GetAlpha() const;
-	//virtual void SetAlpha(const dVector& alpha);
-	//
-	//ndJacobian IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep);
+	D_NEWTON_API virtual void AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity);
 
 	protected:
-	//dVector m_accel;
-	//dVector m_alpha;
-	//dVector m_externalForce;
-	//dVector m_externalTorque;
-	//dVector m_impulseForce;
-	//dVector m_impulseTorque;
-	//dVector m_savedExternalForce;
-	//dVector m_savedExternalTorque;
-	//friend class ndDynamicsUpdate;
+	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline dFloat32 ndBodySphFluid::RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const

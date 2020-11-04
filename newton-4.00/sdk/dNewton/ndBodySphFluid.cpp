@@ -63,3 +63,8 @@ void ndBodySphFluid::Save(nd::TiXmlElement* const rootNode, const char* const as
 	nd::TiXmlElement* const paramNode = CreateRootElement(rootNode, "ndBodySphFluid", nodeid);
 	ndBodyParticleSet::Save(paramNode, assetPath, nodeid, shapesCache);
 }
+
+void ndBodySphFluid::AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity)
+{
+
+}
