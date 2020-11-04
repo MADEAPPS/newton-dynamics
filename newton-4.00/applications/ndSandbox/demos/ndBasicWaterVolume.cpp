@@ -24,7 +24,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	ndShapeInstance box(new ndShapeBox(8.0f, 8.0f, 8.0f));
+	ndShapeInstance box(new ndShapeBox(20.0f, 10.0f, 20.0f));
 	dMatrix uvMatrix(dGetIdentityMatrix());
 	uvMatrix[0][0] *= 1.0f / 20.0f;
 	uvMatrix[1][1] *= 1.0f / 10.0f;
@@ -55,7 +55,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 void ndBasicWaterVolume (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	//BuildFlatPlane(scene, true);
+	BuildFlatPlane(scene, true);
 
 	dMatrix location(dGetIdentityMatrix());
 
