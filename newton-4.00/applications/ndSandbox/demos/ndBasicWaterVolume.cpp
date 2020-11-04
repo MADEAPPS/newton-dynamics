@@ -38,9 +38,37 @@ class ndWaterVolumeEntity : public ndDemoEntity
 
 		scene->AddEntity(this);
 		geometry->Release();
+
+		dFloat32 diameter = 0.5f;
+		ndShapeInstance shape(new ndShapeSphere(diameter));
+
+		m_meshParticle = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 	}
+
+	~ndWaterVolumeEntity()
+	{
+		m_meshParticle->Release();
+	}
+
+	void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
+	{
+		dMatrix nodeMatrix(m_matrix * matrix);
+		m_meshParticle->Render(scene, nodeMatrix);
+
+		ndDemoEntity::Render(timeStep, scene, matrix);
+	}
+
+	ndDemoMesh* m_meshParticle;
 };
 
+class ndWaterVolumeCallback: public ndDemoEntityNotify
+{
+	public:
+	ndWaterVolumeCallback(ndDemoEntityManager* const manager, ndDemoEntity* const entity)
+		:ndDemoEntityNotify(manager, entity)
+	{
+	}
+};
 
 static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& location)
 {
@@ -54,6 +82,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, dVector(20.0f, 10.0f, 20.0f, 0.0f));
 
 	ndBodySphFluid* const fluidObject = new ndBodySphFluid();
+	fluidObject->SetNotifyCallback(new ndWaterVolumeCallback(scene, entity));
 	fluidObject->SetMatrix(matrix);
 
 	fluidObject->AddParticle(0.1f, dVector(matrix.m_posit), dVector::m_zero);
