@@ -30,14 +30,16 @@
 //#define DEFAULT_SCENE	0		// setting basic rigidbody
 //#define DEFAULT_SCENE	1		// setting basic Trigger
 //#define DEFAULT_SCENE	2		// setting basic player
-#define DEFAULT_SCENE	3		// static mesh collision 
-//#define DEFAULT_SCENE	4		// setting basic joints
-//#define DEFAULT_SCENE	5		// conservation of angular momentum 
+#define DEFAULT_SCENE	3		// particle water volume 
+//#define DEFAULT_SCENE	4		// static mesh collision 
+//#define DEFAULT_SCENE	5		// setting basic joints
+//#define DEFAULT_SCENE	6		// conservation of angular momentum 
 						 
 // demos forward declaration 
 void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
 void ndBasicRigidBody(ndDemoEntityManager* const scene);
+void ndBasicWaterVolume(ndDemoEntityManager* const scene);
 void ndPlayerCapsuleDemo(ndDemoEntityManager* const scene);
 void ndBasicAngularMomentum(ndDemoEntityManager* const scene);
 void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
@@ -47,6 +49,7 @@ ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] =
 	{ "basic rigid body", ndBasicRigidBody },
 	{ "basic trigger", ndBasicTrigger },
 	{ "basic player", ndPlayerCapsuleDemo },
+	{ "basic water volume", ndBasicWaterVolume },
 	{ "static mesh", ndStaticMeshCollisionDemo },
 	{ "basic joints", ndBasicJoints },
 	{ "angular momentum", ndBasicAngularMomentum },
