@@ -43,6 +43,7 @@
 #include <ndShapeConvex.h>
 #include <ndBodyDynamic.h>
 #include <ndContactList.h>
+#include <ndBodySphFluid.h>
 #include <ndSkeletonList.h>
 #include <ndBodyKinematic.h>
 #include <ndContactSolver.h>
@@ -50,6 +51,7 @@
 #include <ndRayCastNotify.h>
 #include <ndContactNotify.h>
 #include <ndDynamicsUpdate.h>
+#include <ndBodyParticleSet.h>
 #include <ndSkeletonContainer.h>
 #include <ndJointBallAndSocket.h>
 #include <ndJointKinematicController.h>
