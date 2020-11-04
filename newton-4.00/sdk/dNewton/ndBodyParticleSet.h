@@ -33,6 +33,7 @@ class ndBodyParticleSet: public ndBody
 	D_NEWTON_API ndBodyParticleSet(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache);
 	D_NEWTON_API virtual ~ndBodyParticleSet ();
 
+	D_NEWTON_API virtual ndBodyParticleSet* GetAsBodyParticleSet();
 	D_NEWTON_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
 	//D_NEWTON_API virtual ndBodyParticleSet* GetAsBodyDynamic() { return this; }
@@ -66,6 +67,10 @@ class ndBodyParticleSet: public ndBody
 	//friend class ndDynamicsUpdate;
 } D_GCC_NEWTON_ALIGN_32 ;
 
+inline ndBodyParticleSet* ndBodyParticleSet::GetAsBodyParticleSet() 
+{ 
+	return this; 
+}
 
 #endif 
 

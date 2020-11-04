@@ -36,6 +36,18 @@ class ndJointBilateralConstraint;
 
 #define D_SLEEP_ENTRIES			8
 
+
+class ndBodyParticleSet;
+class ndBodyParticleSetList: public dList<ndBodyParticleSet*, dContainersFreeListAlloc<ndBodyParticleSet*>>
+{
+	public:
+	ndBodyParticleSetList()
+		:dList<ndBodyParticleSet*, dContainersFreeListAlloc<ndBodyParticleSet*>>()
+	{
+	}
+};
+
+
 D_MSV_NEWTON_ALIGN_32
 class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 {
@@ -120,6 +132,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	ndBodyDynamic* m_sentinelBody;
 	ndJointList m_jointList;
 	ndSkeletonList m_skeletonList;
+	ndBodyParticleSetList m_particleSetList;
 
 	dFloat32 m_timestep;
 	dFloat32 m_lastExecutionTime;

@@ -25,6 +25,7 @@
 #include "ndWorldScene.h"
 #include "ndBodyDynamic.h"
 #include "ndSkeletonList.h"
+#include "ndBodyParticleSet.h"
 #include "ndJointBilateralConstraint.h"
 
 ndWorld::ndWorld()
@@ -34,6 +35,7 @@ ndWorld::ndWorld()
 	,m_sentinelBody(nullptr)
 	,m_jointList()
 	,m_skeletonList()
+	,m_particleSetList()
 	,m_timestep(dFloat32 (0.0f))
 	,m_lastExecutionTime(dFloat32(0.0f))
 	,m_freezeAccel2(D_FREEZE_ACCEL2)
@@ -92,6 +94,13 @@ ndWorld::~ndWorld()
 		delete joint;
 	}
 
+	while (m_particleSetList.GetFirst())
+	{
+		ndBodyParticleSet* const body = m_particleSetList.GetFirst()->GetInfo();
+		RemoveBody(body);
+		delete body;
+	}
+
 	const ndBodyList& bodyList = GetBodyList();
 	while (bodyList.GetFirst())
 	{
@@ -114,8 +123,8 @@ void ndWorld::ClearCache()
 	ndJointList::FlushFreeList();
 	ndContactList::FlushFreeList();
 	ndSkeletonList::FlushFreeList();
-	ndSkeletonList::FlushFreeList();
 	ndContactPointList::FlushFreeList();
+	ndBodyParticleSetList::FlushFreeList();
 	ndScene::ndFitnessList::FlushFreeList();
 	ndBodyKinematic::ndContactMap::FlushFreeList();
 	ndSkeletonContainer::ndNodeList::FlushFreeList();
@@ -192,6 +201,11 @@ bool ndWorld::AddBody(ndBody* const body)
 	{
 		return m_scene->AddBody(kinematicBody);
 	}
+	else if (body->GetAsBodyParticleSet())
+	{
+		//m_particleSetList.Append(body->GetAsBodyParticleSet());
+	}
+
 	return false;
 }
 
@@ -202,6 +216,11 @@ void ndWorld::RemoveBody(ndBody* const body)
 	if (kinematicBody)
 	{
 		m_scene->RemoveBody(kinematicBody);
+	}
+	else if (body->GetAsBodyParticleSet())
+	{
+		dAssert(0);
+		//m_particleSetList.Append(body->GetAsBodyParticleSet());
 	}
 }
 

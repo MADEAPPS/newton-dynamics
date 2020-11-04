@@ -30,6 +30,7 @@ class ndBodyNotify;
 class ndBodyDynamic;
 class ndBodyKinematic;
 class ndRayCastNotify;
+class ndBodyParticleSet;
 class ndBodyTriggerVolume;
 class ndJointBilateralConstraint;
 
@@ -45,6 +46,7 @@ class ndBody: public dClassAlloc
 	virtual ndBodyDynamic* GetAsBodyDynamic() { return nullptr; }
 	virtual ndBodyKinematic* GetAsBodyKinematic() { return nullptr; }
 	virtual ndBodyKinematic* GetAsBodyPlayerCapsule() { return nullptr; }
+	virtual ndBodyParticleSet* GetAsBodyParticleSet() { return nullptr; }
 	virtual ndBodyTriggerVolume* GetAsBodyTriggerVolume() { return nullptr; }
 
 	dUnsigned32 GetId() const;
