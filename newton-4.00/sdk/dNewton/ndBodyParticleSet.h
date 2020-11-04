@@ -36,7 +36,8 @@ class ndBodyParticleSet: public ndBody
 	D_NEWTON_API virtual ndBodyParticleSet* GetAsBodyParticleSet();
 	D_NEWTON_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
-	dInt32 GetCount() const;
+	const dArray<dVector>& GetPositions() const ;
+
 	D_NEWTON_API virtual void AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity) = 0;
 
 	protected:
@@ -51,9 +52,9 @@ inline ndBodyParticleSet* ndBodyParticleSet::GetAsBodyParticleSet()
 	return this; 
 }
 
-inline dInt32 ndBodyParticleSet::GetCount() const
+inline const dArray<dVector>& ndBodyParticleSet::GetPositions() const
 {
-	return m_posit.GetCount();
+	return m_posit;
 }
 
 #endif 

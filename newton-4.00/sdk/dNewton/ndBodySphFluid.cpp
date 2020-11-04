@@ -66,5 +66,7 @@ void ndBodySphFluid::Save(nd::TiXmlElement* const rootNode, const char* const as
 
 void ndBodySphFluid::AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity)
 {
-
+	dVector p(position);
+	p.m_w = dFloat32(1.0f);
+	m_posit.PushBack(position);
 }

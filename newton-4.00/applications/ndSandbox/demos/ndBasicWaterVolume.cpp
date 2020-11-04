@@ -23,8 +23,9 @@
 class ndWaterVolumeEntity : public ndDemoEntity
 {
 	public:
-	ndWaterVolumeEntity(ndDemoEntityManager* const scene, const dMatrix& location, const dVector& size)
+	ndWaterVolumeEntity(ndDemoEntityManager* const scene, const dMatrix& location, const dVector& size, ndBodySphFluid* const fluidBody)
 		:ndDemoEntity(location, nullptr)
+		,m_fluidBody(fluidBody)
 	{
 		ndShapeInstance box(new ndShapeBox(20.0f, 10.0f, 20.0f));
 		dMatrix uvMatrix(dGetIdentityMatrix());
@@ -53,12 +54,18 @@ class ndWaterVolumeEntity : public ndDemoEntity
 	void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 	{
 		dMatrix nodeMatrix(m_matrix * matrix);
-		m_meshParticle->Render(scene, nodeMatrix);
+		const dArray<dVector>& positions = m_fluidBody->GetPositions();
+		for (dInt32 i = positions.GetCount() - 1; i >= 0; i--)
+		{
+			nodeMatrix.m_posit = positions[i];
+			m_meshParticle->Render(scene, nodeMatrix);
+		}
 
 		ndDemoEntity::Render(timeStep, scene, matrix);
 	}
 
 	ndDemoMesh* m_meshParticle;
+	ndBodySphFluid* m_fluidBody;
 };
 
 class ndWaterVolumeCallback: public ndDemoEntityNotify
@@ -79,13 +86,25 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 	matrix.m_posit = floor;
 	matrix.m_posit.m_w = 1.0f;
 	matrix.m_posit.m_y += 4.0f;
-	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, dVector(20.0f, 10.0f, 20.0f, 0.0f));
 
 	ndBodySphFluid* const fluidObject = new ndBodySphFluid();
+	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, dVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject);
+
 	fluidObject->SetNotifyCallback(new ndWaterVolumeCallback(scene, entity));
 	fluidObject->SetMatrix(matrix);
 
-	fluidObject->AddParticle(0.1f, dVector(matrix.m_posit), dVector::m_zero);
+	dInt32 partCount = 10;
+	for (dInt32 i = 0; i < partCount; i++)
+	{
+		for (dInt32 j = 0; j < partCount; j++)
+		{
+			for (dInt32 k = 0; k < partCount; k++)
+			{
+				dVector posit(i * 1.0f, j * 1.0f, k * 1.0f, 0.0f);
+				fluidObject->AddParticle(0.1f, matrix.m_posit + posit, dVector::m_zero);
+			}
+		}
+	}
 	
 
 	world->AddBody(fluidObject);
