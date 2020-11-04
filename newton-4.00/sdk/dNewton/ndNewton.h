@@ -54,6 +54,7 @@
 #include <ndBodyParticleSet.h>
 #include <ndSkeletonContainer.h>
 #include <ndJointBallAndSocket.h>
+#include <ndBodyParticleSetList.h>
 #include <ndJointKinematicController.h>
 
 #endif 

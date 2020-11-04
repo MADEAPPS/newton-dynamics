@@ -55,7 +55,6 @@ ndBodySphFluid::ndBodySphFluid(const nd::TiXmlNode* const xmlNode, const dTree<c
 
 ndBodySphFluid::~ndBodySphFluid()
 {
-	dAssert(0);
 }
 
 void ndBodySphFluid::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const

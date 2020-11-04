@@ -203,9 +203,11 @@ bool ndWorld::AddBody(ndBody* const body)
 	}
 	else if (body->GetAsBodyParticleSet())
 	{
-		//m_particleSetList.Append(body->GetAsBodyParticleSet());
+		ndBodyParticleSet* const particleSet = body->GetAsBodyParticleSet();
+		dAssert(particleSet->m_listNode == nullptr);
+		ndBodyParticleSetList::dListNode* const node = m_particleSetList.Append(particleSet);
+		particleSet->m_listNode = node;
 	}
-
 	return false;
 }
 
@@ -219,8 +221,9 @@ void ndWorld::RemoveBody(ndBody* const body)
 	}
 	else if (body->GetAsBodyParticleSet())
 	{
-		dAssert(0);
-		//m_particleSetList.Append(body->GetAsBodyParticleSet());
+		ndBodyParticleSet* const particleSet = body->GetAsBodyParticleSet();
+		dAssert(particleSet->m_listNode);
+		m_particleSetList.Remove(particleSet->m_listNode);
 	}
 }
 

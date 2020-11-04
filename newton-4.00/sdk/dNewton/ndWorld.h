@@ -26,6 +26,7 @@
 #include "ndJointList.h"
 #include "ndSkeletonList.h"
 #include "ndDynamicsUpdate.h"
+#include "ndBodyParticleSetList.h"
 
 class ndWorld;
 class ndBodyDynamic;
@@ -35,17 +36,6 @@ class ndJointBilateralConstraint;
 #define D_NEWTON_ENGINE_MINOR_VERSION 00
 
 #define D_SLEEP_ENTRIES			8
-
-
-class ndBodyParticleSet;
-class ndBodyParticleSetList: public dList<ndBodyParticleSet*, dContainersFreeListAlloc<ndBodyParticleSet*>>
-{
-	public:
-	ndBodyParticleSetList()
-		:dList<ndBodyParticleSet*, dContainersFreeListAlloc<ndBodyParticleSet*>>()
-	{
-	}
-};
 
 
 D_MSV_NEWTON_ALIGN_32

@@ -26,6 +26,7 @@
 
 ndBodyParticleSet::ndBodyParticleSet()
 	:ndBody()
+	,m_listNode(nullptr)
 	//,m_accel(dVector::m_zero)
 	//,m_alpha(dVector::m_zero)
 	//,m_externalForce(dVector::m_zero)
@@ -55,7 +56,6 @@ ndBodyParticleSet::ndBodyParticleSet(const nd::TiXmlNode* const xmlNode, const d
 
 ndBodyParticleSet::~ndBodyParticleSet()
 {
-	dAssert(0);
 }
 
 void ndBodyParticleSet::Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const

@@ -23,7 +23,7 @@
 #define __D_BODY_PARTICLE_SET_H__
 
 #include "ndNewtonStdafx.h"
-
+#include "ndBodyParticleSetList.h"
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodyParticleSet: public ndBody
@@ -56,6 +56,8 @@ class ndBodyParticleSet: public ndBody
 	//ndJacobian IntegrateForceAndToque(const dVector& force, const dVector& torque, const dVector& timestep);
 
 	protected:
+
+	ndBodyParticleSetList::dListNode* m_listNode;
 	//dVector m_accel;
 	//dVector m_alpha;
 	//dVector m_externalForce;
@@ -65,6 +67,7 @@ class ndBodyParticleSet: public ndBody
 	//dVector m_savedExternalForce;
 	//dVector m_savedExternalTorque;
 	//friend class ndDynamicsUpdate;
+	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline ndBodyParticleSet* ndBodyParticleSet::GetAsBodyParticleSet() 
