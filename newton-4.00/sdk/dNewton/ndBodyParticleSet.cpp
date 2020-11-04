@@ -35,7 +35,7 @@ ndBodyParticleSet::ndBodyParticleSet()
 	//,m_savedExternalForce(dVector::m_zero)
 	//,m_savedExternalTorque(dVector::m_zero)
 {
-	dAssert(0);
+	//dAssert(0);
 }
 
 ndBodyParticleSet::ndBodyParticleSet(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)

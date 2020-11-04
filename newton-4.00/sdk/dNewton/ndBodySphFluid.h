@@ -35,6 +35,8 @@ class ndBodySphFluid: public ndBodyParticleSet
 
 	D_NEWTON_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
+	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
+
 	//D_NEWTON_API virtual ndBodySphFluid* GetAsBodyDynamic() { return this; }
 	//D_NEWTON_API virtual void ApplyExternalForces(dInt32 threadIndex, dFloat32 timestep);
 	//D_NEWTON_API virtual void AddDampingAcceleration(dFloat32 timestep);
@@ -66,6 +68,10 @@ class ndBodySphFluid: public ndBodyParticleSet
 	//friend class ndDynamicsUpdate;
 } D_GCC_NEWTON_ALIGN_32 ;
 
+inline dFloat32 ndBodySphFluid::RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const
+{
+	return dFloat32(1.2f);
+}
 
 #endif 
 

@@ -20,11 +20,11 @@
 #include "ndDemoEntityManager.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
-static void AddTrigger(ndDemoEntityManager* const scene)
+static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& location)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 
-	ndShapeInstance box(new ndShapeBox(20.0f, 10.0f, 20.0f));
+	ndShapeInstance box(new ndShapeBox(8.0f, 8.0f, 8.0f));
 	dMatrix uvMatrix(dGetIdentityMatrix());
 	uvMatrix[0][0] *= 1.0f / 20.0f;
 	uvMatrix[1][1] *= 1.0f / 10.0f;
@@ -32,66 +32,35 @@ static void AddTrigger(ndDemoEntityManager* const scene)
 	uvMatrix.m_posit = dVector(0.5f, 0.5f, 0.5f, 1.0f);
 	ndDemoMesh* const geometry = new ndDemoMesh("trigger", scene->GetShaderCache(), &box, "metal_30.tga", "metal_30.tga", "logo_php.tga", 0.5f, uvMatrix);
 
-	dVector floor(FindFloor(*world, dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	dMatrix matrix(dGetIdentityMatrix());
+	dMatrix matrix(location);
+	dVector floor(FindFloor(*world, matrix.m_posit, 200.0f));
 	matrix.m_posit = floor;
 	matrix.m_posit.m_w = 1.0f;
-	matrix.m_posit.m_y += 2.0f;
+	matrix.m_posit.m_y += 4.0f;
 
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
 	entity->SetMesh(geometry, dGetIdentityMatrix());
 
-	ndBodyTriggerVolume* const body = new ndArchimedesBuoyancyVolume();
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(matrix);
-	body->SetCollisionShape(box);
+	ndBodySphFluid* const fluidObject = new ndBodySphFluid();
+	fluidObject->SetMatrix(matrix);
+	world->AddBody(fluidObject);
 
-	world->AddBody(body);
+	//body->SetCollisionShape(box);
+	//body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 
 	scene->AddEntity(entity);
 	geometry->Release();
 }
 
-static void AddShape(ndDemoEntityManager* const scene, const dMatrix& location,
-	const ndShapeInstance& shape, dFloat32 mass, dFloat32 density)
-{
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
-
-	dMatrix matrix(location);
-	ndPhysicsWorld* const world = scene->GetWorld();
-
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y + 10.0f;
-
-	ndBodyDynamic* const body = new ndBodyDynamic();
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(mesh, dGetIdentityMatrix());
-
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(matrix);
-	body->SetCollisionShape(shape);
-	body->SetMassMatrix(mass, shape);
-	body->SetGyroMode(true);
-
-	// save the density with the body shape.
-	ndShapeMaterial material;
-	material.m_userParam[0].m_floatData = density;
-	body->GetCollisionShape().SetMaterial(material);
-
-	world->AddBody(body);
-	scene->AddEntity(entity);
-
-	mesh->Release();
-}
-
-
 void ndBasicWaterVolume (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFlatPlane(scene, true);
+	//BuildFlatPlane(scene, true);
 
-	// build a floor
-	AddTrigger(scene);
+	dMatrix location(dGetIdentityMatrix());
+
+	// adding a water volume
+	AddWaterVolume(scene, location);
 
 	dQuaternion rot;
 	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
