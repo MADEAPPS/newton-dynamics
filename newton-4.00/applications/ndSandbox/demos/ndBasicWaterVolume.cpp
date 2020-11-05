@@ -27,7 +27,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		:ndDemoEntity(location, nullptr)
 		,m_fluidBody(fluidBody)
 	{
-		ndShapeInstance box(new ndShapeBox(15.0f, 10.0f, 15.0f));
+		ndShapeInstance box(new ndShapeBox(9.0f, 10.0f, 9.0f));
 		dMatrix uvMatrix(dGetIdentityMatrix());
 		uvMatrix[0][0] *= 1.0f / 20.0f;
 		uvMatrix[1][1] *= 1.0f / 10.0f;
@@ -91,8 +91,8 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 	fluidObject->SetMatrix(matrix);
 
 	dInt32 partCount = 10;
-	dFloat32 offset = diameter * partCount / 2;
-	dVector origin(-offset, -offset, -offset, dFloat32(0.0f));
+	dFloat32 offset = 1.5f * diameter * partCount / 2;
+	dVector origin(-offset, -offset + 1.0f, -offset, dFloat32(0.0f));
 	origin += matrix.m_posit;
 	dFloat32 spacing = diameter * 1.5f;
 	for (dInt32 i = 0; i < partCount; i++)
@@ -121,6 +121,6 @@ void ndBasicWaterVolume (ndDemoEntityManager* const scene)
 	AddWaterVolume(scene, location);
 
 	dQuaternion rot;
-	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
