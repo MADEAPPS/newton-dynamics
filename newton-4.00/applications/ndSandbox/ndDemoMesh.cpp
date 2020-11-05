@@ -1774,14 +1774,18 @@ void ndDemoMeshIntance::SetParticles(dInt32 count, const dVector* const offset)
 	m_instanceCount = count;
 }
 
-void ndDemoMeshIntance::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+void ndDemoMeshIntance::RenderBatch(int start, ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
-	dVector baseOffset(modelMatrix.m_posit & dVector::m_triplexMask);
 	glBindBuffer(GL_ARRAY_BUFFER, m_offsetBuffer);
 	ndMeshVector* const offsetBuffer = (ndMeshVector*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	for (dInt32 i = m_instanceCount - 1; i >= 0; i--)
+
+	dVector baseOffset(modelMatrix.m_posit & dVector::m_triplexMask);
+
+	const dInt32 base = start * m_maxInstanceCount;
+	const dInt32 count = ((base + m_maxInstanceCount) > m_instanceCount) ? m_instanceCount - base : m_maxInstanceCount;
+	for (dInt32 i = 0; i < count; i++)
 	{
-		dVector worldOffest(m_offsets[i] + baseOffset);
+		dVector worldOffest(m_offsets[base + i] + baseOffset);
 		dVector locapOffset(modelMatrix.UntransformVector(worldOffest));
 		offsetBuffer[i].m_x = locapOffset.m_x;
 		offsetBuffer[i].m_y = locapOffset.m_y;
@@ -1794,25 +1798,25 @@ void ndDemoMeshIntance::Render(ndDemoEntityManager* const scene, const dMatrix& 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glUseProgram(m_shader);
-	
+
 	ndDemoCamera* const camera = scene->GetCamera();
-	
+
 	const dMatrix& viewMatrix = camera->GetViewMatrix();
 	const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
 	dMatrix viewModelMatrix(modelMatrix * viewMatrix);
 	dVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
-	
+
 	glUniform1i(m_textureLocation, 0);
 	glUniform1f(m_transparencyLocation, 1.0f);
 	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight.m_x);
 	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
 	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-	
+
 	glBindVertexArray(m_vetextArrayBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-	
+
 	glActiveTexture(GL_TEXTURE0);
 	for (dListNode* node = GetFirst(); node; node = node->GetNext())
 	{
@@ -1822,15 +1826,25 @@ void ndDemoMeshIntance::Render(ndDemoEntityManager* const scene, const dMatrix& 
 			glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient.m_x);
 			glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse.m_x);
 			glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular.m_x);
-	
+
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
 			glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), m_instanceCount);
 		}
 	}
-	
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 	glUseProgram(0);
+}
+
+void ndDemoMeshIntance::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+{
+	dInt32 segments = (m_instanceCount - 1) / m_maxInstanceCount;
+	for (dInt32 i = 0; i < segments; i ++)
+	{
+		RenderBatch(i, scene, modelMatrix);
+	}
+	RenderBatch(segments, scene, modelMatrix);
 }

@@ -90,16 +90,16 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 	fluidObject->SetNotifyCallback(new ndWaterVolumeCallback(scene, entity));
 	fluidObject->SetMatrix(matrix);
 
-	dInt32 partCount = 10;
-	dFloat32 offset = 1.5f * diameter * partCount / 2;
+	dInt32 particleCountPerAxis = 20;
+	dFloat32 offset = 1.5f * diameter * particleCountPerAxis / 2;
 	dVector origin(-offset, -offset + 1.0f, -offset, dFloat32(0.0f));
 	origin += matrix.m_posit;
 	dFloat32 spacing = diameter * 1.5f;
-	for (dInt32 i = 0; i < partCount; i++)
+	for (dInt32 i = 0; i < particleCountPerAxis; i++)
 	{
-		for (dInt32 j = 0; j < partCount; j++)
+		for (dInt32 j = 0; j < particleCountPerAxis; j++)
 		{
-			for (dInt32 k = 0; k < partCount; k++)
+			for (dInt32 k = 0; k < particleCountPerAxis; k++)
 			{
 				dVector posit(i * spacing, j * spacing, k * spacing, 0.0f);
 				fluidObject->AddParticle(0.1f, origin + posit, dVector::m_zero);
@@ -121,6 +121,6 @@ void ndBasicWaterVolume (ndDemoEntityManager* const scene)
 	AddWaterVolume(scene, location);
 
 	dQuaternion rot;
-	dVector origin(-20.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-30.0f, 5.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

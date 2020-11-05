@@ -164,6 +164,9 @@ class ndDemoMeshIntance : public ndDemoMesh
 	virtual void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 	void SetParticles(dInt32 count, const dVector* const offset);
 
+	private:
+	void RenderBatch(dInt32 start, ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+
 	const dVector* m_offsets;
 	dInt32 m_instanceCount;
 	dInt32 m_maxInstanceCount;
