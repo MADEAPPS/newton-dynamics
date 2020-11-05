@@ -84,11 +84,10 @@ class ndDynamicsUpdate
 	public:
 	ndDynamicsUpdate();
 	~ndDynamicsUpdate();
-	void DynamicsUpdate();
-
-	void Clear();
 
 	private:
+	void Clear();
+	void Update();
 	void DefaultUpdate();
 	
 	void BuildIsland();

@@ -69,7 +69,7 @@ void ndDynamicsUpdate::Clear()
 	m_internalForcesBack.Resize(0);
 }
 
-void ndDynamicsUpdate::DynamicsUpdate()
+void ndDynamicsUpdate::Update()
 {
 	m_world = (ndWorld*)this;
 	m_timestep = m_world->GetScene()->GetTimestep();

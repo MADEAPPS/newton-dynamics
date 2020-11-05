@@ -38,6 +38,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	D_NEWTON_API virtual void AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity);
 
 	protected:
+	D_NEWTON_API virtual void Update(dFloat32 timestep);
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
 } D_GCC_NEWTON_ALIGN_32 ;
 

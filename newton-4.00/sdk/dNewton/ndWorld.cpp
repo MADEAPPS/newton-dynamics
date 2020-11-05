@@ -796,7 +796,21 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	UpdateSkeletons();
 	UpdatePrelisteners();
 
+	// Update Particle base physics
+	ParticleUpdate();
+
 	// calculate internal forces, integrate bodies and update matrices.
-	DynamicsUpdate();
+	ndDynamicsUpdate::Update();
 	UpdatePostlisteners();
+}
+
+
+void ndWorld::ParticleUpdate()
+{
+	D_TRACKTIME();
+	for (ndBodyParticleSetList::dListNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyParticleSet* const body = node->GetInfo();
+		body->Update(m_timestep);
+	}
 }

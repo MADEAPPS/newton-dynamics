@@ -113,6 +113,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	D_NEWTON_API virtual void UpdateListenersPostTransform();
 
 	private:
+	void ParticleUpdate();
 	void SubStepUpdate(dFloat32 timestep);
 	void LoadSettings(const nd::TiXmlNode* const rootNode);
 	void LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);

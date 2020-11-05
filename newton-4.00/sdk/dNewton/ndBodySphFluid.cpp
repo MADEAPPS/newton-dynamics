@@ -70,3 +70,8 @@ void ndBodySphFluid::AddParticle(const dFloat32 mass, const dVector& position, c
 	p.m_w = dFloat32(1.0f);
 	m_posit.PushBack(position);
 }
+
+void ndBodySphFluid::Update(dFloat32 timestep)
+{
+
+}
