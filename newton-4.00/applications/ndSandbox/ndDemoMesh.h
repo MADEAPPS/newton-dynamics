@@ -166,6 +166,7 @@ class ndDemoMeshIntance : public ndDemoMesh
 
 	const dVector* m_offsets;
 	dInt32 m_instanceCount;
+	dInt32 m_maxInstanceCount;
 	GLuint m_offsetBuffer;
 };
 

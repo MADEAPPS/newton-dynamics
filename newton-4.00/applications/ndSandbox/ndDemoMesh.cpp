@@ -16,6 +16,14 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 
+//glBindBuffer(GL_ARRAY_BUFFER, m_offsetBuffer);
+//ndMeshVector* const offsetBuffer = (ndMeshVector*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+//for (GLenum err = glGetError(); err; err = glGetError())
+//{
+//	dTrace(("%i\n", err));
+//}
+//glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 
 ndDemoSubMeshMaterial::ndDemoSubMeshMaterial()
 	:m_ambient(0.8f, 0.8f, 0.8f, 1.0f)
@@ -906,17 +914,11 @@ void ndFlatShadedDebugMesh::Render(ndDemoEntityManager* const scene, const dMatr
 	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 
 	glBindVertexArray(m_vetextArrayBuffer);
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_triangleIndexBuffer);
 
 	glDrawElements(GL_TRIANGLES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);
 	glUseProgram(0);
 }
@@ -1048,15 +1050,11 @@ void ndWireFrameDebugMesh::Render(ndDemoEntityManager* const scene, const dMatri
 	glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &projectionViewModelMatrix[0][0]);
 
 	glBindVertexArray(m_vetextArrayBuffer);
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_lineIndexBuffer);
 
 	glDrawElements(GL_LINES, m_indexCount, GL_UNSIGNED_INT, (void*)0);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);
 	glUseProgram(0);
 
@@ -1544,10 +1542,6 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 			//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 			glBindVertexArray(m_vetextArrayBuffer);
-			glEnableVertexAttribArray(0);
-			glEnableVertexAttribArray(1);
-			glEnableVertexAttribArray(2);
-			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 			glActiveTexture(GL_TEXTURE0);
@@ -1567,10 +1561,6 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 			}
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glDisableVertexAttribArray(2);
-			glDisableVertexAttribArray(1);
-			glDisableVertexAttribArray(0);
 			glBindVertexArray(0);
 			glUseProgram(0);
 
@@ -1604,10 +1594,6 @@ void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const dMat
 		glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 
 		glBindVertexArray(m_vetextArrayBuffer);
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
 		glActiveTexture(GL_TEXTURE0);
@@ -1629,10 +1615,6 @@ void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const dMat
 		}
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glDisableVertexAttribArray(2);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(0);
 		glBindVertexArray(0);
 		glUseProgram(0);
 
@@ -1645,6 +1627,7 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 	:ndDemoMesh(name)
 	,m_offsets(nullptr)
 	,m_instanceCount(0)
+	,m_maxInstanceCount(1024 * 8)
 	,m_offsetBuffer(0)
 {
 	ndShapeInstanceMeshBuilder mesh(*collision);
@@ -1691,9 +1674,11 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 
 	dArray<dInt32> indices;
 	dArray<ndMeshPointUV> points;
+	dArray<ndMeshVector> offsets;
 
 	points.SetCount(vertexCount);
 	indices.SetCount(indexCount);
+	offsets.SetCount(m_maxInstanceCount);
 
 	mesh.GetVertexChannel(sizeof(ndMeshPointUV), &points[0].m_posit.m_x);
 	mesh.GetNormalChannel(sizeof(ndMeshPointUV), &points[0].m_normal.m_x);
@@ -1747,13 +1732,15 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 
 	glGenBuffers(1, &m_offsetBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_offsetBuffer);
+	glBufferData(GL_ARRAY_BUFFER, m_maxInstanceCount * sizeof(ndMeshVector), &offsets[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshVector), 0);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glVertexAttribDivisor(3, 1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
+	glDisableVertexAttribArray(3);
 	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
@@ -1774,11 +1761,6 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 
 	m_vertexCount = points.GetCount();
 	m_indexCount = indices.GetCount();
-
-glBindBuffer(GL_ARRAY_BUFFER, m_offsetBuffer);
-ndMeshVector* const offsetBuffer = (ndMeshVector*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-glBindBuffer(GL_ARRAY_BUFFER, 0);
-
 }
 
 ndDemoMeshIntance::~ndDemoMeshIntance()
@@ -1794,20 +1776,21 @@ void ndDemoMeshIntance::SetParticles(dInt32 count, const dVector* const offset)
 
 void ndDemoMeshIntance::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
-	//dVector baseOffset(modelMatrix.m_posit & dVector::m_triplexMask);
-	//glBindBuffer(GL_ARRAY_BUFFER, m_offsetBuffer);
-	//ndMeshVector* const offsetBuffer = (ndMeshVector*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	//for (dInt32 i = m_offsets.GetCount() - 1; i >= 0; i--)
-	//{
-	//	dVector worldOffest(m_offsets[i] + baseOffset);
-	//	m_offsets[i] = modelMatrix.UntransformVector(worldOffest);
-	//}
-	//glUnmapBuffer(GL_ARRAY_BUFFER);
+	dVector baseOffset(modelMatrix.m_posit & dVector::m_triplexMask);
+	glBindBuffer(GL_ARRAY_BUFFER, m_offsetBuffer);
+	ndMeshVector* const offsetBuffer = (ndMeshVector*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	for (dInt32 i = m_instanceCount - 1; i >= 0; i--)
+	{
+		dVector worldOffest(m_offsets[i] + baseOffset);
+		dVector locapOffset(modelMatrix.UntransformVector(worldOffest));
+		offsetBuffer[i].m_x = locapOffset.m_x;
+		offsetBuffer[i].m_y = locapOffset.m_y;
+		offsetBuffer[i].m_z = locapOffset.m_z;
+	}
+	glUnmapBuffer(GL_ARRAY_BUFFER);
 
 	//ndDemoMesh::Render(scene, matrix);
 
-
-/*
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glUseProgram(m_shader);
@@ -1827,13 +1810,8 @@ void ndDemoMeshIntance::Render(ndDemoEntityManager* const scene, const dMatrix& 
 	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 	
 	glBindVertexArray(m_vetextArrayBuffer);
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-
 	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-
 	
 	glActiveTexture(GL_TEXTURE0);
 	for (dListNode* node = GetFirst(); node; node = node->GetNext())
@@ -1847,16 +1825,12 @@ void ndDemoMeshIntance::Render(ndDemoEntityManager* const scene, const dMatrix& 
 	
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 			glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
-			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+			glDrawElementsInstanced(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)), m_instanceCount);
 		}
 	}
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);
 	glUseProgram(0);
-*/
 }
