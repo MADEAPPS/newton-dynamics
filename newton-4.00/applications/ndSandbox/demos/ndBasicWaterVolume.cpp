@@ -23,11 +23,11 @@
 class ndWaterVolumeEntity : public ndDemoEntity
 {
 	public:
-	ndWaterVolumeEntity(ndDemoEntityManager* const scene, const dMatrix& location, const dVector& size, ndBodySphFluid* const fluidBody)
+	ndWaterVolumeEntity(ndDemoEntityManager* const scene, const dMatrix& location, const dVector& size, ndBodySphFluid* const fluidBody, dFloat32 radius)
 		:ndDemoEntity(location, nullptr)
 		,m_fluidBody(fluidBody)
 	{
-		ndShapeInstance box(new ndShapeBox(20.0f, 10.0f, 20.0f));
+		ndShapeInstance box(new ndShapeBox(15.0f, 10.0f, 15.0f));
 		dMatrix uvMatrix(dGetIdentityMatrix());
 		uvMatrix[0][0] *= 1.0f / 20.0f;
 		uvMatrix[1][1] *= 1.0f / 10.0f;
@@ -40,8 +40,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		scene->AddEntity(this);
 		geometry->Release();
 
-		dFloat32 diameter = 0.5f;
-		ndShapeInstance shape(new ndShapeSphere(diameter));
+		ndShapeInstance shape(new ndShapeSphere(radius));
 
 		m_meshParticle = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 	}
@@ -87,28 +86,31 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 	matrix.m_posit.m_w = 1.0f;
 	matrix.m_posit.m_y += 4.0f;
 
+	dFloat32 diameter = 0.5f;
 	ndBodySphFluid* const fluidObject = new ndBodySphFluid();
-	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, dVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject);
+	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, dVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject, diameter * 0.5f);
 
 	fluidObject->SetNotifyCallback(new ndWaterVolumeCallback(scene, entity));
 	fluidObject->SetMatrix(matrix);
 
 	dInt32 partCount = 10;
+	dFloat32 offset = diameter * partCount / 2;
+	dVector origin(-offset, -offset, -offset, dFloat32(0.0f));
+	origin += matrix.m_posit;
+	dFloat32 spacing = diameter * 1.5f;
 	for (dInt32 i = 0; i < partCount; i++)
 	{
 		for (dInt32 j = 0; j < partCount; j++)
 		{
 			for (dInt32 k = 0; k < partCount; k++)
 			{
-				dVector posit(i * 1.0f, j * 1.0f, k * 1.0f, 0.0f);
-				fluidObject->AddParticle(0.1f, matrix.m_posit + posit, dVector::m_zero);
+				dVector posit(i * spacing, j * spacing, k * spacing, 0.0f);
+				fluidObject->AddParticle(0.1f, origin + posit, dVector::m_zero);
 			}
 		}
 	}
-	
 
 	world->AddBody(fluidObject);
-
 }
 
 void ndBasicWaterVolume (ndDemoEntityManager* const scene)

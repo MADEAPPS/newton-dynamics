@@ -50,8 +50,8 @@ class dArray
 	T& operator[] (dInt32 i);
 	const T& operator[] (dInt32 i) const;
 
-	//void PushBack(T& element);
-	void PushBack(const T element);
+	void PushBack(const T& element);
+	//void PushBack(const T element);
 
 	protected:
 	T* m_array;
@@ -112,8 +112,8 @@ T& dArray<T>::operator[] (dInt32 i)
 }
 
 template<class T>
-//void dArray<T>::PushBack(T& element)
-void dArray<T>::PushBack(const T element)
+void dArray<T>::PushBack(const T& element)
+//void dArray<T>::PushBack(const T element)
 {
 	dAssert(m_size <= m_capacity);
 	if (m_size == m_capacity)

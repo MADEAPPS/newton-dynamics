@@ -277,35 +277,6 @@ class dMeshEffect: public dPolyhedra
 
 		void Clear();
 		void PushBack(const T& element);
-
-		//void CopyFrom(const dChannel<T, type>& source)
-		//{
-		//	dArray<T>& me = *this;
-		//	dChannel& src = *((dChannel*)&source);
-		//
-		//	Clear();
-		//	m_count = src.m_count;
-		//	dAssert(m_type == src.m_type);
-		//	for (dInt32 i = 0; i < m_count; i++) 
-		//	{
-		//		me[i] = src[i];
-		//	}
-		//}
-		//void Reserve(dInt32 size)
-		//{
-		//	dArray<T>::Resize(size);
-		//	m_count = size;
-		//}
-		//void SetCount(dInt32 count)
-		//{
-		//	if (m_count) 
-		//	{
-		//		dAssert(count >= 0);
-		//		dAssert(m_count >= count);
-		//		m_count = count;
-		//	}
-		//}
-
 		
 		dChannelType m_type;
 		bool m_isValid;
