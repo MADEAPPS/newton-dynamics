@@ -1457,18 +1457,17 @@ void ndDemoMesh::OptimizeForRender(const dArray<ndMeshPointUV>& points, const dA
 
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)(2 * sizeof(ndMeshVector)));
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindVertexArray(0);
+	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
 
 	glGenBuffers(1, &m_indexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.GetCount() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
-
-	glBindVertexArray(0);
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glDisableVertexAttribArray(2);
-	glDisableVertexAttribArray(1);
-	glDisableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glUseProgram(m_shader);
 	m_textureLocation = glGetUniformLocation(m_shader, "texture");
@@ -1646,6 +1645,7 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 	:ndDemoMesh(name)
 	,m_offsets(nullptr)
 	,m_instanceCount(0)
+	,m_offsetBuffer(0)
 {
 	ndShapeInstanceMeshBuilder mesh(*collision);
 
@@ -1721,7 +1721,13 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 
 	m_hasTransparency = hasTransparency;
 
-	// optimize this mesh for hardware buffers if possible
+	// load index buffer.
+	glGenBuffers(1, &m_indexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.GetCount() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	// create vertex semantic layout
 	glGenVertexArrays(1, &m_vetextArrayBuffer);
 	glBindVertexArray(m_vetextArrayBuffer);
 
@@ -1737,18 +1743,20 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)(2 * sizeof(ndMeshVector)));
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	glGenBuffers(1, &m_indexBuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.GetCount() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+	glGenBuffers(1, &m_offsetBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_offsetBuffer);
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshVector), 0);
+	glVertexAttribDivisor(3, 1);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glDisableVertexAttribArray(2);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glUseProgram(m_shader);
 	m_textureLocation = glGetUniformLocation(m_shader, "texture");
@@ -1766,6 +1774,16 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 
 	m_vertexCount = points.GetCount();
 	m_indexCount = indices.GetCount();
+
+glBindBuffer(GL_ARRAY_BUFFER, m_offsetBuffer);
+ndMeshVector* const offsetBuffer = (ndMeshVector*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+}
+
+ndDemoMeshIntance::~ndDemoMeshIntance()
+{
+	glDeleteBuffers(1, &m_offsetBuffer);
 }
 
 void ndDemoMeshIntance::SetParticles(dInt32 count, const dVector* const offset)
@@ -1776,10 +1794,69 @@ void ndDemoMeshIntance::SetParticles(dInt32 count, const dVector* const offset)
 
 void ndDemoMeshIntance::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
-	dMatrix matrix(modelMatrix);
-	for (dInt32 i = m_instanceCount-1; i >= 0; i--)
+	//dVector baseOffset(modelMatrix.m_posit & dVector::m_triplexMask);
+	//glBindBuffer(GL_ARRAY_BUFFER, m_offsetBuffer);
+	//ndMeshVector* const offsetBuffer = (ndMeshVector*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	//for (dInt32 i = m_offsets.GetCount() - 1; i >= 0; i--)
+	//{
+	//	dVector worldOffest(m_offsets[i] + baseOffset);
+	//	m_offsets[i] = modelMatrix.UntransformVector(worldOffest);
+	//}
+	//glUnmapBuffer(GL_ARRAY_BUFFER);
+
+	//ndDemoMesh::Render(scene, matrix);
+
+
+/*
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glUseProgram(m_shader);
+	
+	ndDemoCamera* const camera = scene->GetCamera();
+	
+	const dMatrix& viewMatrix = camera->GetViewMatrix();
+	const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
+	dMatrix viewModelMatrix(modelMatrix * viewMatrix);
+	dVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+	
+	glUniform1i(m_textureLocation, 0);
+	glUniform1f(m_transparencyLocation, 1.0f);
+	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight.m_x);
+	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	
+	glBindVertexArray(m_vetextArrayBuffer);
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+
+	
+	glActiveTexture(GL_TEXTURE0);
+	for (dListNode* node = GetFirst(); node; node = node->GetNext())
 	{
-		matrix.m_posit = m_offsets[i];
-		ndDemoMesh::Render(scene, matrix);
+		ndDemoSubMesh& segment = node->GetInfo();
+		if (!segment.m_hasTranparency)
+		{
+			glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient.m_x);
+			glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse.m_x);
+			glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_specular.m_x);
+	
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+			glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
+			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+		}
 	}
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
+	glBindVertexArray(0);
+	glUseProgram(0);
+*/
 }

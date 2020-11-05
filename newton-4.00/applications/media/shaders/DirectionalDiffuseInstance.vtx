@@ -13,6 +13,7 @@
 layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec3 in_normal;
 layout(location = 2) in vec2 in_uv;
+layout(location = 3) in vec3 in_positionOffset;
 
 uniform mat4 normalMatrix;
 uniform mat4 viewModelMatrix;
@@ -28,8 +29,11 @@ void main()
 {	
 	lightDir = vec3(directionalLightDir.x, directionalLightDir.y, directionalLightDir.z);
 
-	uv = in_uv;
+	vec3 instancedPosit = in_position + in_positionOffset;
+	//vec3 instancedPosit = in_position;
+	posit = vec3 (viewModelMatrix * vec4(instancedPosit, 1.0));
 	normal = vec3 (normalize (normalMatrix * vec4(in_normal, 0.0)));
-	posit = vec3 (viewModelMatrix * vec4(in_position, 1.0));
+	uv = in_uv;
+
 	gl_Position = projectionMatrix * vec4(posit, 1.0);
 }
