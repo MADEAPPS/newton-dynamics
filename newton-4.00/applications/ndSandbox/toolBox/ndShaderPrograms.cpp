@@ -59,7 +59,8 @@ ndShaderPrograms::~ndShaderPrograms(void)
 	{
 		glDeleteShader(m_skinningDiffuseEffect);
 	}
-	if (m_diffuseIntanceEffect) {
+	if (m_diffuseIntanceEffect) 
+	{
 		glDeleteShader(m_diffuseIntanceEffect);
 	}
 }
@@ -74,8 +75,8 @@ bool ndShaderPrograms::CreateAllEffects()
 	m_diffuseEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuse");
 	m_skinningDiffuseEffect = CreateShaderEffect ("SkinningDirectionalDiffuse", "DirectionalDiffuse");
 	m_diffuseNoTextureEffect = CreateShaderEffect ("DirectionalDiffuse", "DirectionalDiffuseNoTexture");
+	m_diffuseIntanceEffect = CreateShaderEffect ("DirectionalDiffuseInstance", "DirectionalDiffuse");
 
-//	m_diffuseIntanceEffect = CreateShaderEffect ("DirectionalDiffuseInstance", "DirectionalDiffuseInstance");
 	return true;
 }
 

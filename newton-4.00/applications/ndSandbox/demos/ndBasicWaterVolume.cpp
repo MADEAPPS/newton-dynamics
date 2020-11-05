@@ -57,7 +57,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		const dArray<dVector>& positions = m_fluidBody->GetPositions();
 		m_meshParticle->SetParticles(positions.GetCount(), &positions[0]);
 		m_meshParticle->Render(scene, nodeMatrix);
-		ndDemoEntity::Render(timeStep, scene, matrix);
+		//ndDemoEntity::Render(timeStep, scene, matrix);
 	}
 
 	ndBodySphFluid* m_fluidBody;

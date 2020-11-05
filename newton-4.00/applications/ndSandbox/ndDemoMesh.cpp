@@ -1643,10 +1643,129 @@ void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const dMat
 }
 
 ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity, const dMatrix& uvMatrix)
-	:ndDemoMesh(name, shaderCache, collision, texture0, texture1, texture2, opacity, uvMatrix)
+	:ndDemoMesh(name)
 	,m_offsets(nullptr)
 	,m_instanceCount(0)
 {
+	ndShapeInstanceMeshBuilder mesh(*collision);
+
+	dMatrix aligmentUV(uvMatrix);
+	//m_shader = shaderCache.m_diffuseEffect;
+	m_shader = shaderCache.m_diffuseIntanceEffect;
+
+	// apply uv projections
+	ndShapeInfo info(collision->GetShapeInfo());
+	switch (info.m_collisionType)
+	{
+		case ndShapeID::m_sphereCollision:
+		case ndShapeID::m_capsuleCollision:
+		{
+			mesh.SphericalMapping(LoadTexture(texture0), &aligmentUV[0][0]);
+			break;
+		}
+
+		case ndShapeID::m_boxCollision:
+		{
+			dInt32 tex0 = LoadTexture(texture0);
+			mesh.UniformBoxMapping(tex0, aligmentUV);
+			break;
+		}
+
+		default:
+		{
+			dInt32 tex0 = LoadTexture(texture0);
+			mesh.UniformBoxMapping(tex0, aligmentUV);
+		}
+	}
+
+	// extract the materials index array for mesh
+	ndIndexArray* const geometryHandle = mesh.MaterialGeometryBegin();
+
+	// extract vertex data  from the newton mesh		
+	dInt32 vertexCount = mesh.GetPropertiesCount();
+	dInt32 indexCount = 0;
+	for (dInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
+	{
+		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
+	}
+
+	dArray<dInt32> indices;
+	dArray<ndMeshPointUV> points;
+
+	points.SetCount(vertexCount);
+	indices.SetCount(indexCount);
+
+	mesh.GetVertexChannel(sizeof(ndMeshPointUV), &points[0].m_posit.m_x);
+	mesh.GetNormalChannel(sizeof(ndMeshPointUV), &points[0].m_normal.m_x);
+	mesh.GetUV0Channel(sizeof(ndMeshPointUV), &points[0].m_uv.m_u);
+
+	dInt32 segmentStart = 0;
+	bool hasTransparency = false;
+	for (dInt32 handle = mesh.GetFirstMaterial(geometryHandle); handle != -1; handle = mesh.GetNextMaterial(geometryHandle, handle))
+	{
+		dInt32 material = mesh.GetMaterialID(geometryHandle, handle);
+		ndDemoSubMesh* const segment = AddSubMesh();
+
+		segment->m_material.m_textureHandle = (GLuint)material;
+		segment->SetOpacity(opacity);
+		hasTransparency = hasTransparency | segment->m_hasTranparency;
+
+		segment->m_indexCount = mesh.GetMaterialIndexCount(geometryHandle, handle);
+
+		segment->m_segmentStart = segmentStart;
+		mesh.GetMaterialGetIndexStream(geometryHandle, handle, (dInt32*)&indices[segmentStart]);
+		segmentStart += segment->m_indexCount;
+	}
+
+	mesh.MaterialGeomteryEnd(geometryHandle);
+
+	m_hasTransparency = hasTransparency;
+
+	// optimize this mesh for hardware buffers if possible
+	glGenVertexArrays(1, &m_vetextArrayBuffer);
+	glBindVertexArray(m_vetextArrayBuffer);
+
+	glGenBuffers(1, &m_vertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, points.GetCount() * sizeof(ndMeshPointUV), &points[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)sizeof(ndMeshVector));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)(2 * sizeof(ndMeshVector)));
+
+	glGenBuffers(1, &m_indexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.GetCount() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+
+	glBindVertexArray(0);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glDisableVertexAttribArray(2);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glUseProgram(m_shader);
+	m_textureLocation = glGetUniformLocation(m_shader, "texture");
+	m_transparencyLocation = glGetUniformLocation(m_shader, "transparency");
+	m_normalMatrixLocation = glGetUniformLocation(m_shader, "normalMatrix");
+	m_projectMatrixLocation = glGetUniformLocation(m_shader, "projectionMatrix");
+	m_viewModelMatrixLocation = glGetUniformLocation(m_shader, "viewModelMatrix");
+	m_directionalLightDirLocation = glGetUniformLocation(m_shader, "directionalLightDir");
+
+	m_materialAmbientLocation = glGetUniformLocation(m_shader, "material_ambient");
+	m_materialDiffuseLocation = glGetUniformLocation(m_shader, "material_diffuse");
+	m_materialSpecularLocation = glGetUniformLocation(m_shader, "material_specular");
+
+	glUseProgram(0);
+
+	m_vertexCount = points.GetCount();
+	m_indexCount = indices.GetCount();
 }
 
 void ndDemoMeshIntance::SetParticles(dInt32 count, const dVector* const offset)
