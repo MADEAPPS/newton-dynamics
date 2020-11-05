@@ -1641,3 +1641,26 @@ void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const dMat
 		glDisable(GL_BLEND);
 	}
 }
+
+ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity, const dMatrix& uvMatrix)
+	:ndDemoMesh(name, shaderCache, collision, texture0, texture1, texture2, opacity, uvMatrix)
+	,m_offsets(nullptr)
+	,m_instanceCount(0)
+{
+}
+
+void ndDemoMeshIntance::SetParticles(dInt32 count, const dVector* const offset)
+{
+	m_offsets = offset;
+	m_instanceCount = count;
+}
+
+void ndDemoMeshIntance::Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+{
+	dMatrix matrix(modelMatrix);
+	for (dInt32 i = m_instanceCount-1; i >= 0; i--)
+	{
+		matrix.m_posit = m_offsets[i];
+		ndDemoMesh::Render(scene, matrix);
+	}
+}

@@ -155,6 +155,18 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	bool m_hasTransparency;
 };
 
+class ndDemoMeshIntance : public ndDemoMesh
+{
+	public: 
+	ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
+
+	virtual void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+	void SetParticles(dInt32 count, const dVector* const offset);
+
+	const dVector* m_offsets;
+	dInt32 m_instanceCount;
+};
+
 class ndDemoSkinMesh: public ndDemoMeshInterface
 {
 	public:

@@ -42,7 +42,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 
 		ndShapeInstance shape(new ndShapeSphere(radius));
 
-		m_meshParticle = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+		m_meshParticle = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 	}
 
 	~ndWaterVolumeEntity()
@@ -53,18 +53,15 @@ class ndWaterVolumeEntity : public ndDemoEntity
 	void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 	{
 		dMatrix nodeMatrix(m_matrix * matrix);
-		const dArray<dVector>& positions = m_fluidBody->GetPositions();
-		for (dInt32 i = positions.GetCount() - 1; i >= 0; i--)
-		{
-			nodeMatrix.m_posit = positions[i];
-			m_meshParticle->Render(scene, nodeMatrix);
-		}
 
+		const dArray<dVector>& positions = m_fluidBody->GetPositions();
+		m_meshParticle->SetParticles(positions.GetCount(), &positions[0]);
+		m_meshParticle->Render(scene, nodeMatrix);
 		ndDemoEntity::Render(timeStep, scene, matrix);
 	}
 
-	ndDemoMesh* m_meshParticle;
 	ndBodySphFluid* m_fluidBody;
+	ndDemoMeshIntance* m_meshParticle;
 };
 
 class ndWaterVolumeCallback: public ndDemoEntityNotify
