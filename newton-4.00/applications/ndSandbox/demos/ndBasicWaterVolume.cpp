@@ -40,7 +40,9 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		scene->AddEntity(this);
 		geometry->Release();
 
-		ndShapeInstance shape(new ndShapeSphere(radius));
+		dFloat32 shapeSize = radius * 2.0f;
+		//ndShapeInstance shape(new ndShapeSphere(radius));
+		ndShapeInstance shape(new ndShapeBox(shapeSize, shapeSize, shapeSize));
 
 		m_meshParticle = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 	}
