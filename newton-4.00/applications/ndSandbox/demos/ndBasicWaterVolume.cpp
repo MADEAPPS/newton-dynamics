@@ -58,7 +58,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		const dArray<dVector>& positions = m_fluidBody->GetPositions();
 		m_meshParticle->SetParticles(positions.GetCount(), &positions[0]);
 		m_meshParticle->Render(scene, nodeMatrix);
-		ndDemoEntity::Render(timeStep, scene, matrix);
+		//ndDemoEntity::Render(timeStep, scene, matrix);
 	}
 
 	ndBodySphFluid* m_fluidBody;
@@ -82,27 +82,32 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 	dVector floor(FindFloor(*world, matrix.m_posit, 200.0f));
 	matrix.m_posit = floor;
 	matrix.m_posit.m_w = 1.0f;
-	matrix.m_posit.m_y += 4.0f;
 
-	dFloat32 diameter = 0.5f;
+	dFloat32 diameter = 0.25f;
 	ndBodySphFluid* const fluidObject = new ndBodySphFluid();
-	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, dVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject, diameter * 0.5f);
+	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, dVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject, diameter * 0.25f);
 
 	fluidObject->SetNotifyCallback(new ndWaterVolumeCallback(scene, entity));
 	fluidObject->SetMatrix(matrix);
 
+	fluidObject->SetParticleRadius(diameter * 0.5f);
+
 	dInt32 particleCountPerAxis = 20;
-	dFloat32 offset = 1.5f * diameter * particleCountPerAxis / 2;
-	dVector origin(-offset, -offset + 1.0f, -offset, dFloat32(0.0f));
+	//dInt32 particleCountPerAxis = 3;
+	dFloat32 spacing = diameter * 1.0f;
+
+	dFloat32 offset = spacing * particleCountPerAxis / 2.0f;
+	dVector origin(-offset, 1.0f, -offset, dFloat32(0.0f));
 	origin += matrix.m_posit;
-	dFloat32 spacing = diameter * 1.5f;
-	for (dInt32 i = 0; i < particleCountPerAxis; i++)
+	
+	for (dInt32 z = 0; z < particleCountPerAxis; z++)
 	{
-		for (dInt32 j = 0; j < particleCountPerAxis; j++)
+		for (dInt32 y = 0; y < particleCountPerAxis; y++)
+		//for (dInt32 y = 0; y < 1; y++)
 		{
-			for (dInt32 k = 0; k < particleCountPerAxis; k++)
+			for (dInt32 x = 0; x < particleCountPerAxis; x++)
 			{
-				dVector posit(i * spacing, j * spacing, k * spacing, 0.0f);
+				dVector posit(x * spacing, y * spacing, z * spacing, 0.0f);
 				fluidObject->AddParticle(0.1f, origin + posit, dVector::m_zero);
 			}
 		}
@@ -122,6 +127,6 @@ void ndBasicWaterVolume (ndDemoEntityManager* const scene)
 	AddWaterVolume(scene, location);
 
 	dQuaternion rot;
-	dVector origin(-30.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-5.0f, 1.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

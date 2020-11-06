@@ -36,22 +36,28 @@ class ndBodyParticleSet: public ndBody
 	D_NEWTON_API virtual ndBodyParticleSet* GetAsBodyParticleSet();
 	D_NEWTON_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
-	const dArray<dVector>& GetPositions() const ;
+	const dArray<dVector>& GetPositions() const;
 
+	void SetParticleRadius(dFloat32 raidus);
 	D_NEWTON_API virtual void AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity) = 0;
 
 	D_NEWTON_API virtual void Update(dFloat32 timestep) = 0;
 
 	protected:
 	dArray<dVector> m_posit;
-
 	ndBodyParticleSetList::dListNode* m_listNode;
+	dFloat32 m_radius;
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline ndBodyParticleSet* ndBodyParticleSet::GetAsBodyParticleSet() 
 { 
 	return this; 
+}
+
+inline void ndBodyParticleSet::SetParticleRadius(dFloat32 raidus)
+{
+	m_radius = raidus;
 }
 
 inline const dArray<dVector>& ndBodyParticleSet::GetPositions() const
