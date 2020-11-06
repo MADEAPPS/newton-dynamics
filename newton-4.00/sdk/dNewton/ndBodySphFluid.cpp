@@ -149,6 +149,7 @@ void ndBodySphFluid::Update(dFloat32 timestep)
 	const dVector invDiameter(dFloat32(1.0f) / diameter);
 
 	UpdateAABB();
+dTree<dInt32, dInt64> xxxx;
 
 	dVector neighborkDirs[8];
 	neighborkDirs[0] = dVector(-m_radius, -m_radius, -m_radius, dFloat32(0.0f));
@@ -172,6 +173,9 @@ void ndBodySphFluid::Update(dFloat32 timestep)
 		hashGridMap[count] = hashKey;
 		count++;
 
+		dInt64 xxxx1 = (dInt64) hashKey.m_posit.m_z * 100000 + (dInt64)hashKey.m_posit.m_y * 1000 + (dInt64)hashKey.m_posit.m_x;
+		xxxx.Insert(count, xxxx1);
+
 		hashKey.m_homeCell = 0;
 		for (dInt32 j = 0; j < sizeof(neighborkDirs) / sizeof(neighborkDirs[0]); j++)
 		{
@@ -186,6 +190,6 @@ void ndBodySphFluid::Update(dFloat32 timestep)
 		}
 	}
 
-	dSort(&hashGridMap[0], count, Compare);
+	//dSort(&hashGridMap[0], count, Compare);
 
 }
