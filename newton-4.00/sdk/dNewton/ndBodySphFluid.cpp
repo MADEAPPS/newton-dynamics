@@ -156,22 +156,22 @@ void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 	{
 		const ndGridHash& entry = hashArray[i];
 
-		dInt32 xlow = entry.m_xLow;
+		const dInt32 xlow = entry.m_xLow;
 		histogram[0][xlow] = histogram[0][xlow] + 1;
 
-		dInt32 xHigh = entry.m_xLow;
+		const dInt32 xHigh = entry.m_xHigh;
 		histogram[1][xHigh] = histogram[1][xHigh] + 1;
 
-		dInt32 ylow = entry.m_yLow;
+		const dInt32 ylow = entry.m_yLow;
 		histogram[2][ylow] = histogram[2][ylow] + 1;
 
-		dInt32 yHigh = entry.m_yLow;
+		const dInt32 yHigh = entry.m_yHigh;
 		histogram[3][yHigh] = histogram[3][yHigh] + 1;
 
-		dInt32 zlow = entry.m_zLow;
+		const dInt32 zlow = entry.m_zLow;
 		histogram[4][zlow] = histogram[4][zlow] + 1;
 
-		dInt32 zHigh = entry.m_zLow;
+		dInt32 zHigh = entry.m_zHigh;
 		histogram[5][zHigh] = histogram[5][zHigh] + 1;
 	}
 
@@ -182,7 +182,7 @@ void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 	{
 		for (dInt32 j = 0; j < 6; j++)
 		{
-			dInt32 n = histogram[j][i];
+			const dInt32 n = histogram[j][i];
 			histogram[j][i] = acc[j];
 			acc[j] += n;
 		}
@@ -197,8 +197,8 @@ void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 		for (dInt32 i = 0; i < count; i++)
 		{
 			const ndGridHash& entry = hashArray[i];
-			dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-			dInt32 index = scan0[key];
+			const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
+			const dInt32 index = scan0[key];
 			tmpArray[index] = entry;
 			scan0[key] = index + 1;
 		}
@@ -209,8 +209,8 @@ void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 		for (dInt32 i = 0; i < count; i++)
 		{
 			const ndGridHash& entry = tmpArray[i];
-			dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-			dInt32 index = scan1[key];
+			const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
+			const dInt32 index = scan1[key];
 			hashArray[index] = entry;
 			scan1[key] = index + 1;
 		}
