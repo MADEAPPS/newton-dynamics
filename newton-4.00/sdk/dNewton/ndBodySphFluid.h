@@ -79,6 +79,16 @@ class ndBodySphFluid: public ndBodyParticleSet
 				dUnsigned64 m_y : 20;
 				dUnsigned64 m_z : 20;
 			};
+			struct
+			{
+				dUnsigned64 m_xLow : 10;
+				dUnsigned64 m_xHigh : 10;
+				dUnsigned64 m_yLow : 10;
+				dUnsigned64 m_yHigh : 10;
+				dUnsigned64 m_zLow : 10;
+				dUnsigned64 m_zHigh : 10;
+			};
+
 			dUnsigned64 m_gridHash;
 		};
 		dInt32 m_particleIndex;

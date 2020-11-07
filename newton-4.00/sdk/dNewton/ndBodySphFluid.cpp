@@ -88,7 +88,132 @@ dInt32 ndBodySphFluid::Compare(const ndGridHash* const hashA, const ndGridHash* 
 
 void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 {
+#if 1
 	dSort(&hashArray[0], count, Compare);
+#else
+
+	//memset(histogram, 0, sizeof(histogram));
+	//for (dInt32 i = 0; i < elements; i++)
+	//{
+	//	dInt32 key = getRadixKey(&array[i], context);
+	//	for (dInt32 j = 0; j < radixPass; j++)
+	//	{
+	//		dInt32 radix = (key >> (j << 3)) & 0xff;
+	//		histogram[radix][j] = histogram[radix][j] + 1;
+	//	}
+	//}
+	//
+	//for (dInt32 radix = 0; radix < radixPass; radix += 2)
+	//{
+	//	scanCount[0] = 0;
+	//	for (dInt32 i = 1; i < 256; i++)
+	//	{
+	//		scanCount[i] = scanCount[i - 1] + histogram[i - 1][radix];
+	//	}
+	//	dInt32 radixShift = radix << 3;
+	//	for (dInt32 i = 0; i < elements; i++)
+	//	{
+	//		dInt32 key = (getRadixKey(&array[i], context) >> radixShift) & 0xff;
+	//		dInt32 index = scanCount[key];
+	//		tmpArray[index] = array[i];
+	//		scanCount[key] = index + 1;
+	//	}
+	//
+	//	if ((radix + 1) < radixPass)
+	//	{
+	//		scanCount[0] = 0;
+	//		for (dInt32 i = 1; i < 256; i++) {
+	//			scanCount[i] = scanCount[i - 1] + histogram[i - 1][radix + 1];
+	//		}
+	//
+	//		dInt32 radixShift = (radix + 1) << 3;
+	//		for (dInt32 i = 0; i < elements; i++)
+	//		{
+	//			dInt32 key = (getRadixKey(&array[i], context) >> radixShift) & 0xff;
+	//			dInt32 index = scanCount[key];
+	//			array[index] = tmpArray[i];
+	//			scanCount[key] = index + 1;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		memcpy(array, tmpArray, elements * sizeof(T));
+	//	}
+	//}
+	//
+	//#ifdef _DEBUG
+	//for (dInt32 i = 0; i < (elements - 1); i++)
+	//{
+	//	dAssert(getRadixKey(&array[i], context) <= getRadixKey(&array[i + 1], context));
+	//}
+	//#endif
+
+
+	//dInt32 scanCount[256];
+	//dInt32 histogram[256][4];
+	//dAssert(radixPass >= 1);
+	//dAssert(radixPass <= 4);
+
+count = 10;
+for (dInt32 i = 0; i < 10; i++)
+{
+hashArray[i].m_xLow = 10 - i;
+}
+
+	static dArray<ndGridHash> tmpArrayBuffer;
+	tmpArrayBuffer.SetCount(count);
+
+	dInt32 histogram[6][1<<10];
+	memset(histogram, 0, sizeof(histogram));
+	for (dInt32 i = 0; i < count; i++)
+	{
+	//	dInt32 key = getRadixKey(&array[i], context);
+	//	for (dInt32 j = 0; j < radixPass; j++)
+	//	{
+	//		dInt32 radix = (key >> (j << 3)) & 0xff;
+	//		histogram[radix][j] = histogram[radix][j] + 1;
+	//	}
+		const ndGridHash& entry = hashArray[i];
+		dInt32 xlow = entry.m_xLow;
+		histogram[0][xlow] = histogram[0][xlow] + 1;
+	}
+
+	dInt32 scanCount[1 << 10];
+	//for (dInt32 radix = 0; radix < radixPass; radix += 2)
+	{
+		//scanCount[0] = 0;
+		//for (dInt32 i = 1; i < 256; i++)
+		//{
+		//	scanCount[i] = scanCount[i - 1] + histogram[i - 1][radix];
+		//}
+
+		dInt32 acc = 0;
+		for (dInt32 i = 0; i < (1 << 10); i++)
+		{
+			scanCount[i] = acc;
+			acc += histogram[0][i];
+		}
+
+		//dInt32 radixShift = radix << 3;
+		ndGridHash* const tmpArray = &tmpArrayBuffer[0];
+		for (dInt32 i = 0; i < count; i++)
+		{
+			const ndGridHash& entry = hashArray[i];
+			dInt32 key = entry.m_xLow;
+			dInt32 index = scanCount[key];
+			tmpArray[index] = entry;
+			scanCount[key] = index + 1;
+		}
+		
+	}
+	
+	#ifdef _DEBUG
+	//for (dInt32 i = 0; i < (elements - 1); i++)
+	//{
+	//	dAssert(getRadixKey(&array[i], context) <= getRadixKey(&array[i + 1], context));
+	//}
+	#endif
+#endif
 }
 #endif
 
@@ -132,7 +257,7 @@ void ndBodySphFluid::Update(dFloat32 timestep)
 #else
 
 	static dArray<ndGridHash> hashGridMap;
-	hashGridMap.SetCount(m_posit.GetCount() * 8);
+	hashGridMap.SetCount(m_posit.GetCount() * 16);
 
 	dInt32 count = 0;
 	for (dInt32 i = 0; i < m_posit.GetCount(); i++)
