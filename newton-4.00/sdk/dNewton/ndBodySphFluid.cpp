@@ -53,7 +53,6 @@ void ndBodySphFluid::Save(nd::TiXmlElement* const rootNode, const char* const as
 void ndBodySphFluid::AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity)
 {
 	dVector point(position);
-point += dVector(0.25f);
 	point.m_w = dFloat32(1.0f);
 	m_posit.PushBack(point);
 }
@@ -67,89 +66,39 @@ void ndBodySphFluid::UpdateAABB()
 		box0 = box0.GetMin(m_posit[i]);
 		box1 = box1.GetMax(m_posit[i]);
 	}
-	//m_box0 = box0 - dVector(m_radius);
-	//m_box1 = box1 + dVector(m_radius);
-	m_box0 = box0;
-	m_box1 = box1;
+	m_box0 = box0 - dVector(m_radius * dFloat32(2.0f));
+	m_box1 = box1 + dVector(m_radius * dFloat32(2.0f));
 }
 
-union ndGridHash
+#ifndef D_USE_IN_PLACE_BUCKETS
+dInt32 ndBodySphFluid::Compare(const ndGridHash* const hashA, const ndGridHash* const hashB, void* const context)
 {
-	ndGridHash(const dVector& mask, dInt32 cellType)
-		:m_posit((mask.Floor()).GetInt())
-	{
-		m_homeCell = cellType;
-	}
-
-	ndGridHash(const ndGridHash& src)
-		:m_posit(src.m_posit)
-	{
-	}
-
-	struct 
-	{
-		dInt32 m_x;
-		dInt32 m_y;
-		dInt32 m_z;
-		union
-		{
-			dInt32 m_mask;
-			struct 
-			{
-				dInt32 m_id : 22;
-				dInt32 m_notUsed : 9;
-				dInt32 m_homeCell : 1;
-			};
-		};
-	};
-	dVector m_posit;
-};
-
-static dInt32 Compare(const ndGridHash* hashA, const ndGridHash* const hashB, void* const context)
-{
-	if (hashA->m_x > hashB->m_x)
-	{
-		return 1;
-	}
-	else if (hashA->m_x < hashB->m_x)
+	dUnsigned64 gridHashA = hashA->m_gridHash * 2 + hashA->m_cellType;
+	dUnsigned64 gridHashB = hashB->m_gridHash * 2 + hashB->m_cellType;
+	if (gridHashA < gridHashB)
 	{
 		return -1;
 	}
-	else if (hashA->m_y > hashB->m_y)
+	else if (gridHashA > gridHashB)
 	{
 		return 1;
 	}
-	else if (hashA->m_y < hashB->m_y)
-	{
-		return -1;
-	}
-	else if (hashA->m_z > hashB->m_z)
-	{
-		return 1;
-	}
-	else if (hashA->m_z < hashB->m_z)
-	{
-		return -1;
-	}
-	else
-	{
-		return 0;
-	}
-
-	dAssert(0);
+	return 0;
 }
+
+void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
+{
+	dSort(&hashArray[0], count, Compare);
+}
+#endif
 
 void ndBodySphFluid::Update(dFloat32 timestep)
 {
-	static dArray<ndGridHash> hashGridMap;
-	hashGridMap.SetCount(m_posit.GetCount() * 8);
-
 	const dFloat32 diameter = m_radius * dFloat32(2.0f);
-	const dFloat32 diameterPadd = diameter * dFloat32(1.0625f);
-	const dVector invDiameter(dFloat32(1.0f) / diameter);
+	const dFloat32 gridSize = diameter * dFloat32(1.0625f);
+	const dVector invGridSize(dFloat32(1.0f) / gridSize);
 
 	UpdateAABB();
-dTree<dInt32, dInt64> xxxx;
 
 	dVector neighborkDirs[8];
 	neighborkDirs[0] = dVector(-m_radius, -m_radius, -m_radius, dFloat32(0.0f));
@@ -160,29 +109,45 @@ dTree<dInt32, dInt64> xxxx;
 	neighborkDirs[5] = dVector( m_radius, -m_radius,  m_radius, dFloat32(0.0f));
 	neighborkDirs[6] = dVector(-m_radius,  m_radius,  m_radius, dFloat32(0.0f));
 	neighborkDirs[7] = dVector( m_radius,  m_radius,  m_radius, dFloat32(0.0f));
-
-	dInt32 count = 0;
-	dVector neighboarghHatch(dVector::m_zero);
+	
+#ifdef D_USE_IN_PLACE_BUCKETS
+	ndCellMap uniqueGridId;
 	for (dInt32 i = 0; i < m_posit.GetCount(); i++)
 	{
-		neighboarghHatch.m_w = dFloat32(i);
 		dVector r(m_posit[i] - m_box0);
-		dVector p(r * invDiameter + neighboarghHatch);
+		dVector p(r * invGridSize);
+		ndGridHash hashKey(p, i, ndHomeGrid);
+		uniqueGridId.AddGrid(hashKey);
 
-		ndGridHash hashKey(p, 1);
+		for (dInt32 j = 0; j < sizeof(neighborkDirs) / sizeof(neighborkDirs[0]); j++)
+		{
+			ndGridHash neighborKey(p + neighborkDirs[j], i, ndAdjacentGrid);
+			if (neighborKey.m_gridHash != hashKey.m_gridHash)
+			{
+				uniqueGridId.AddGrid(neighborKey);
+			}
+		}
+	}
+
+#else
+
+	static dArray<ndGridHash> hashGridMap;
+	hashGridMap.SetCount(m_posit.GetCount() * 8);
+
+	dInt32 count = 0;
+	for (dInt32 i = 0; i < m_posit.GetCount(); i++)
+	{
+		dVector r(m_posit[i] - m_box0);
+		dVector p(r * invGridSize);
+
+		ndGridHash hashKey(p, i, ndHomeGrid);
 		hashGridMap[count] = hashKey;
 		count++;
 
-		dInt64 xxxx1 = (dInt64) hashKey.m_posit.m_z * 100000 + (dInt64)hashKey.m_posit.m_y * 1000 + (dInt64)hashKey.m_posit.m_x;
-		xxxx.Insert(count, xxxx1);
-
-		hashKey.m_homeCell = 0;
 		for (dInt32 j = 0; j < sizeof(neighborkDirs) / sizeof(neighborkDirs[0]); j++)
 		{
-			ndGridHash neighborKey(p + neighborkDirs[j], 0);
-			dVector test(neighborKey.m_posit == hashKey.m_posit);
-			dInt32 encroaching = test.GetSignMask() & 0x07;
-			if (encroaching != 0x07)
+			ndGridHash neighborKey(p + neighborkDirs[j], i, ndAdjacentGrid);
+			if (neighborKey.m_gridHash != hashKey.m_gridHash)
 			{
 				hashGridMap[count] = neighborKey;
 				count++;
@@ -190,6 +155,7 @@ dTree<dInt32, dInt64> xxxx;
 		}
 	}
 
-	//dSort(&hashGridMap[0], count, Compare);
+	SortBuckets(&hashGridMap[0], count);
+#endif
 
 }

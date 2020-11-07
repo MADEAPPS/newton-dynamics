@@ -25,6 +25,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndBodyParticleSet.h"
 
+//#define D_USE_IN_PLACE_BUCKETS
+
 D_MSV_NEWTON_ALIGN_32
 class ndBodySphFluid: public ndBodyParticleSet
 {
@@ -42,6 +44,87 @@ class ndBodySphFluid: public ndBodyParticleSet
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
 
 	private:
+	enum ndGridType
+	{
+		ndHomeGrid = 0,
+		ndAdjacentGrid = 1,
+	};
+
+	class ndGridHash
+	{
+		public:
+		ndGridHash(const dVector& grid, dInt32 particelIndex, ndGridType cellType)
+		{
+			dAssert(grid.m_x >= dFloat32 (0.0f));
+			dAssert(grid.m_y >= dFloat32 (0.0f));
+			dAssert(grid.m_z >= dFloat32 (0.0f));
+			dAssert(grid.m_x < dFloat32 (1<<20));
+			dAssert(grid.m_y < dFloat32 (1<<20));
+			dAssert(grid.m_z < dFloat32 (1<<20));
+
+			dVector hash(grid.GetInt());
+
+			m_x = hash.m_ix;
+			m_y = hash.m_iy;
+			m_z = hash.m_iz;
+			m_cellType = cellType;
+			m_particleIndex = particelIndex;
+		}
+
+		union
+		{
+			struct
+			{
+				dUnsigned64 m_x : 20;
+				dUnsigned64 m_y : 20;
+				dUnsigned64 m_z : 20;
+			};
+			dUnsigned64 m_gridHash;
+		};
+		dInt32 m_particleIndex;
+		ndGridType m_cellType;
+	};
+
+#ifdef D_USE_IN_PLACE_BUCKETS
+	class ndGrid : public dList<ndGridHash>
+	{
+		public:
+		ndGrid()
+			:dList<ndGridHash>()
+		{
+		}
+	};
+
+	class ndCellMap: public dTree<ndGrid, dInt64>
+	{
+		public:
+		ndCellMap()
+			:dTree<ndGrid, dInt64>()
+		{
+		}
+
+		void AddGrid(ndGridHash hash)
+		{
+			bool wasFound;
+
+			dTreeNode* const node = FindCreate(hash.m_gridHash, wasFound);
+			ndGrid& bucket = node->GetInfo();
+			if (hash.m_cellType)
+			{
+				bucket.Addtop(hash);
+			}
+			else
+			{
+				bucket.Append(hash);
+			}
+		}
+	};
+#else
+	static dInt32 Compare(const ndGridHash* const hashA, const ndGridHash* const hashB, void* const context);
+
+	void SortBuckets(ndGridHash* const hashArray, dInt32 count);
+#endif
+
 	void UpdateAABB();
 	dVector m_box0;
 	dVector m_box1;

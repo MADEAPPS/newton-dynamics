@@ -52,10 +52,6 @@ class dRedBackNode
 	D_CORE_API void RotateRight(dRedBackNode** const head); 
 	D_CORE_API void RemoveFixup (dRedBackNode* const node, dRedBackNode* * const head); 
 
-	//D_CORE_API dRedBackNode* GetLeft() const;
-	//D_CORE_API dRedBackNode* GetRight() const;
-	//D_CORE_API dRedBackNode* GetParent() const;
-
 	D_CORE_API dRedBackNode (dRedBackNode* const parent);
 	D_CORE_API inline void Initdata (dRedBackNode* const parent);
 	D_CORE_API inline void SetColor (REDBLACK_COLOR color);
@@ -85,10 +81,15 @@ class dTree
 	public:
 	class dTreeNode: public allocator, public dRedBackNode
 	{
-		dTreeNode (
-			const OBJECT &info, 
-			const KEY &key, 
-			dTreeNode* parentNode)
+
+		dTreeNode(const KEY &key, dTreeNode* parentNode)
+			:allocator()
+			,dRedBackNode(parentNode), m_info(), m_key(key)
+		{
+			//dAssert ((dUnsigned64 (&m_info) & 0x0f) == 0);
+		}
+
+		dTreeNode (const OBJECT &info, const KEY &key, dTreeNode* parentNode)
 			:allocator()
 			,dRedBackNode(parentNode), m_info (info), m_key (key)
 		{
@@ -241,12 +242,13 @@ class dTree
 
 	dTreeNode* Find (KEY key) const;
 	dTreeNode* FindGreater (KEY key) const;
+	dTreeNode* FindLessEqual(KEY key) const;
 	dTreeNode* FindGreaterEqual (KEY key) const;
-	dTreeNode* FindLessEqual (KEY key) const;
+	dTreeNode* FindCreate(KEY key, bool& wasFound);
 
 	dTreeNode* GetNodeFromInfo (OBJECT &info) const;
 
-	dTreeNode* Insert (const OBJECT &element, KEY key, bool& elementWasInTree);
+	dTreeNode* Insert (const OBJECT &element, KEY key, bool& wasFound);
 	dTreeNode* Insert (const OBJECT &element, KEY key);
 	dTreeNode* Insert (dTreeNode* const node, KEY key);
 
@@ -544,12 +546,11 @@ typename dTree<OBJECT, KEY, allocator>::dTreeNode* dTree<OBJECT, KEY, allocator>
 }
 
 template<class OBJECT, class KEY, class allocator>
-typename dTree<OBJECT, KEY, allocator>::dTreeNode* dTree<OBJECT, KEY, allocator>::Insert (const OBJECT &element, KEY key, bool& elementWasInTree)
+typename dTree<OBJECT, KEY, allocator>::dTreeNode* dTree<OBJECT, KEY, allocator>::Insert (const OBJECT &element, KEY key, bool& wasFound)
 {
 	dTreeNode* parent = nullptr;
 	dTreeNode* ptr = m_head;
 	dInt32 val = 0;
-	elementWasInTree = false;
 	while (ptr != nullptr) 
 	{
 		parent = ptr;
@@ -569,12 +570,13 @@ typename dTree<OBJECT, KEY, allocator>::dTreeNode* dTree<OBJECT, KEY, allocator>
 		else 
 		{
 			dAssert (CompareKeys (ptr->m_key, key) == 0) ;
-			elementWasInTree = true;
+			wasFound = true;
 			return ptr;
 		}
 	}
 
 	m_count	++;
+	wasFound = false;
 	ptr = new dTreeNode (element, key, parent);
 	if (!parent) 
 	{
@@ -594,6 +596,59 @@ typename dTree<OBJECT, KEY, allocator>::dTreeNode* dTree<OBJECT, KEY, allocator>
 
 	dTreeNode** const headPtr = (dTreeNode**) &m_head;
 	ptr->InsertFixup ((dRedBackNode**)headPtr);
+	return ptr;
+}
+
+template<class OBJECT, class KEY, class allocator>
+typename dTree<OBJECT, KEY, allocator>::dTreeNode* dTree<OBJECT, KEY, allocator>::FindCreate(KEY key, bool& wasFound)
+{
+	dTreeNode* parent = nullptr;
+	dTreeNode* ptr = m_head;
+	dInt32 val = 0;
+	while (ptr != nullptr)
+	{
+		parent = ptr;
+		if (key < ptr->m_key)
+		{
+			dAssert(CompareKeys(ptr->m_key, key) == -1);
+			val = -1;
+			ptr = ptr->GetLeft();
+		}
+		else if (key > ptr->m_key)
+		{
+			dAssert(CompareKeys(ptr->m_key, key) == 1);
+			val = 1;
+			ptr = ptr->GetRight();
+		}
+		else
+		{
+			dAssert(CompareKeys(ptr->m_key, key) == 0);
+			wasFound = true;
+			return ptr;
+		}
+	}
+
+	m_count++;
+	wasFound = false;
+	ptr = new dTreeNode(key, parent);
+	if (!parent)
+	{
+		m_head = ptr;
+	}
+	else
+	{
+		if (val < 0)
+		{
+			parent->m_left = ptr;
+		}
+		else
+		{
+			parent->m_right = ptr;
+		}
+	}
+
+	dTreeNode** const headPtr = (dTreeNode**)&m_head;
+	ptr->InsertFixup((dRedBackNode**)headPtr);
 	return ptr;
 }
 
