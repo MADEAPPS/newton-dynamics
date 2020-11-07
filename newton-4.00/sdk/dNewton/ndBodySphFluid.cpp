@@ -27,9 +27,8 @@
 ndBodySphFluid::ndBodySphFluid()
 	:ndBodyParticleSet()
 	,m_box0(dFloat32(-1e10f))
-	,m_box1(dFloat32(-1e10f))
+	,m_box1(dFloat32(1e10f))
 {
-//	dAssert(0);
 }
 
 ndBodySphFluid::ndBodySphFluid(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache)
@@ -70,7 +69,7 @@ void ndBodySphFluid::UpdateAABB()
 	m_box1 = box1 + dVector(m_radius * dFloat32(2.0f));
 }
 
-#ifndef D_USE_IN_PLACE_BUCKETS
+
 dInt32 ndBodySphFluid::Compare(const ndGridHash* const hashA, const ndGridHash* const hashB, void* const context)
 {
 	dUnsigned64 gridHashA = hashA->m_gridHash * 2 + hashA->m_cellType;
@@ -148,8 +147,6 @@ void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 	//}
 	//#endif
 
-//count = 10;
-
 	static dArray<ndGridHash> tmpArrayBuffer;
 	tmpArrayBuffer.SetCount(count);
 
@@ -222,14 +219,20 @@ void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 	}
 	
 	#ifdef _DEBUG
-	//for (dInt32 i = 0; i < (elements - 1); i++)
-	//{
-	//	dAssert(getRadixKey(&array[i], context) <= getRadixKey(&array[i + 1], context));
-	//}
+	for (dInt32 i = 0; i < (count - 1); i++)
+	{
+		const ndGridHash& entry0 = hashArray[i + 0];
+		const ndGridHash& entry1 = hashArray[i + 1];
+		//dUnsigned64 gridHashA = entry0.m_gridHash * 2 + entry0.m_cellType;
+		//dUnsigned64 gridHashB = entry1.m_gridHash * 2 + entry1.m_cellType;
+
+		dUnsigned64 gridHashA = entry0.m_gridHash;
+		dUnsigned64 gridHashB = entry1.m_gridHash;
+		dAssert(gridHashA <= gridHashB);
+	}
 	#endif
 #endif
 }
-#endif
 
 void ndBodySphFluid::Update(dFloat32 timestep)
 {
@@ -248,27 +251,6 @@ void ndBodySphFluid::Update(dFloat32 timestep)
 	neighborkDirs[5] = dVector( m_radius, -m_radius,  m_radius, dFloat32(0.0f));
 	neighborkDirs[6] = dVector(-m_radius,  m_radius,  m_radius, dFloat32(0.0f));
 	neighborkDirs[7] = dVector( m_radius,  m_radius,  m_radius, dFloat32(0.0f));
-	
-#ifdef D_USE_IN_PLACE_BUCKETS
-	ndCellMap uniqueGridId;
-	for (dInt32 i = 0; i < m_posit.GetCount(); i++)
-	{
-		dVector r(m_posit[i] - m_box0);
-		dVector p(r * invGridSize);
-		ndGridHash hashKey(p, i, ndHomeGrid);
-		uniqueGridId.AddGrid(hashKey);
-
-		for (dInt32 j = 0; j < sizeof(neighborkDirs) / sizeof(neighborkDirs[0]); j++)
-		{
-			ndGridHash neighborKey(p + neighborkDirs[j], i, ndAdjacentGrid);
-			if (neighborKey.m_gridHash != hashKey.m_gridHash)
-			{
-				uniqueGridId.AddGrid(neighborKey);
-			}
-		}
-	}
-
-#else
 
 	static dArray<ndGridHash> hashGridMap;
 	hashGridMap.SetCount(m_posit.GetCount() * 16);
@@ -295,7 +277,4 @@ void ndBodySphFluid::Update(dFloat32 timestep)
 	}
 
 	SortBuckets(&hashGridMap[0], count);
-
-#endif
-
 }
