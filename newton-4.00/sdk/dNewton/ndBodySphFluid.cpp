@@ -69,27 +69,8 @@ void ndBodySphFluid::UpdateAABB()
 	m_box1 = box1 + dVector(m_radius * dFloat32(2.0f));
 }
 
-
-dInt32 ndBodySphFluid::Compare(const ndGridHash* const hashA, const ndGridHash* const hashB, void* const context)
-{
-	dUnsigned64 gridHashA = hashA->m_gridHash * 2 + hashA->m_cellType;
-	dUnsigned64 gridHashB = hashB->m_gridHash * 2 + hashB->m_cellType;
-	if (gridHashA < gridHashB)
-	{
-		return -1;
-	}
-	else if (gridHashA > gridHashB)
-	{
-		return 1;
-	}
-	return 0;
-}
-
 void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 {
-#if 0
-	dSort(&hashArray[0], count, Compare);
-#else
 
 	//memset(histogram, 0, sizeof(histogram));
 	//for (dInt32 i = 0; i < elements; i++)
@@ -171,7 +152,7 @@ void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 		const dInt32 zlow = entry.m_zLow;
 		histogram[4][zlow] = histogram[4][zlow] + 1;
 
-		dInt32 zHigh = entry.m_zHigh;
+		const dInt32 zHigh = entry.m_zHigh;
 		histogram[5][zHigh] = histogram[5][zHigh] + 1;
 	}
 
@@ -231,7 +212,6 @@ void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 		dAssert(gridHashA <= gridHashB);
 	}
 	#endif
-#endif
 }
 
 void ndBodySphFluid::Update(dFloat32 timestep)

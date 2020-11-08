@@ -95,8 +95,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 		ndGridType m_cellType;
 	};
 
-	static dInt32 Compare(const ndGridHash* const hashA, const ndGridHash* const hashB, void* const context);
-
 	void SortBuckets(ndGridHash* const hashArray, dInt32 count);
 
 	void UpdateAABB();
