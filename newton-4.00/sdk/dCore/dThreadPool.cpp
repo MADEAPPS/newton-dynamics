@@ -24,7 +24,7 @@
 #include "dProfiler.h"
 
 #ifdef D_LOCK_FREE_THREADS_POOL
-void dThreadPool::dThreadLockFreeUpdate::Execute(void* const context)
+void dThreadPool::dThreadLockFreeUpdate::Execute()
 {
 	m_begin.store(true);
 	while (m_begin.load())
@@ -32,7 +32,7 @@ void dThreadPool::dThreadLockFreeUpdate::Execute(void* const context)
 		dThreadPoolJob* const job = m_job.exchange(nullptr);
 		if (job)
 		{
-			job->Execute(context);
+			job->Execute();
 			m_joindInqueue->fetch_add(-1);
 		}
 		else
@@ -60,7 +60,7 @@ void dThreadPool::dWorkerThread::ThreadFunction()
 {
 	dAssert(m_job);
 	D_SET_TRACK_NAME(m_name);
-	m_job->Execute(nullptr);
+	m_job->Execute();
 	m_owner->m_sync.Release();
 }
 
@@ -134,7 +134,7 @@ void dThreadPool::SetCount(dInt32 count)
 	}
 }
 
-void dThreadPool::ExecuteJobs(dThreadPoolJob** const jobs, void* const context)
+void dThreadPool::ExecuteJobs(dThreadPoolJob** const jobs)
 {
 #ifdef D_LOCK_FREE_THREADS_POOL
 	if (m_count > 0)
@@ -147,7 +147,7 @@ void dThreadPool::ExecuteJobs(dThreadPoolJob** const jobs, void* const context)
 		}
 
 		jobs[m_count]->m_threadIndex = m_count;
-		jobs[m_count]->Execute(context);
+		jobs[m_count]->Execute();
 		while (m_joindInqueue.load())
 		{
 			std::this_thread::yield();
@@ -156,7 +156,7 @@ void dThreadPool::ExecuteJobs(dThreadPoolJob** const jobs, void* const context)
 	else
 	{
 		jobs[0]->m_threadIndex = 0;
-		jobs[0]->Execute(context);
+		jobs[0]->Execute();
 	}
 #else
 	if (m_count > 0)
@@ -189,7 +189,7 @@ void dThreadPool::Begin()
 
 	class ndDoNothing : public dThreadPoolJob
 	{
-		virtual void Execute(void* const context)
+		virtual void Execute()
 		{
 			D_TRACKTIME();
 		}

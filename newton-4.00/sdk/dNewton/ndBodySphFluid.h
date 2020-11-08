@@ -52,6 +52,10 @@ class ndBodySphFluid: public ndBodyParticleSet
 	class ndGridHash
 	{
 		public:
+		ndGridHash()
+		{
+		}
+
 		ndGridHash(const dVector& grid, dInt32 particelIndex, ndGridType cellType)
 		{
 			dAssert(grid.m_x >= dFloat32 (0.0f));
@@ -102,7 +106,8 @@ class ndBodySphFluid: public ndBodyParticleSet
 	dVector m_box0;
 	dVector m_box1;
 	dArray<ndGridHash> m_hashGridMap;
-	dArray<ndGridHash> m_sortGridMapBuffer;
+	dArray<ndGridHash> m_hashGridMapScratchBuffer;
+	dAtomic<dInt32> m_iterator;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline dFloat32 ndBodySphFluid::RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const

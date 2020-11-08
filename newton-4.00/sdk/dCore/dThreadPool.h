@@ -41,7 +41,7 @@ class dThreadPoolJob
 	virtual ~dThreadPoolJob() {}
 	dInt32 GetThredID() const { return m_threadIndex; }
 
-	virtual void Execute(void* const context) = 0;
+	virtual void Execute() = 0;
 
 	private:
 	dInt32 m_threadIndex;
@@ -78,7 +78,7 @@ class dThreadPool: public dSyncMutex, public dThread
 		{
 		}
 
-		virtual void Execute(void* const context);
+		virtual void Execute();
 		private:
 		dAtomic<dThreadPoolJob*> m_job;
 		dAtomic<bool> m_begin;
@@ -96,7 +96,7 @@ class dThreadPool: public dSyncMutex, public dThread
 	D_CORE_API void SetCount(dInt32 count);
 
 	D_CORE_API void TickOne();
-	D_CORE_API void ExecuteJobs(dThreadPoolJob** const jobs, void* const context = nullptr);
+	D_CORE_API void ExecuteJobs(dThreadPoolJob** const jobs);
 
 	D_CORE_API void Begin();
 	D_CORE_API void End();

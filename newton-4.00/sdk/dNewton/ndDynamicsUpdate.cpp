@@ -323,7 +323,7 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 			}
 		}
 
-		virtual void Execute(void* const context)
+		virtual void Execute()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
@@ -434,7 +434,7 @@ void ndDynamicsUpdate::InitBodyArray()
 			}
 		}
 
-		virtual void Execute(void* const context)
+		virtual void Execute()
 		{
 			D_TRACKTIME();
 
@@ -716,7 +716,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			}
 		}
 
-		virtual void Execute(void* const context)
+		virtual void Execute()
 		{
 			D_TRACKTIME();
 
@@ -809,7 +809,7 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 			}
 		}
 
-		virtual void Execute(void* const context)
+		virtual void Execute()
 		{
 			D_TRACKTIME();
 
@@ -863,7 +863,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			return accNorm;
 		}
 
-		virtual void Execute(void* const context)
+		virtual void Execute()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
@@ -1102,7 +1102,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 			}
 		}
 
-		virtual void Execute(void* const context)
+		virtual void Execute()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
@@ -1158,7 +1158,7 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 			return hasJointFeeback;
 		}
 
-		virtual void Execute(void* const context)
+		virtual void Execute()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
@@ -1234,7 +1234,7 @@ void ndDynamicsUpdate::IntegrateBodies()
 			}
 		}
 
-		virtual void Execute(void* const context)
+		virtual void Execute()
 		{
 			D_TRACKTIME();
 
@@ -1282,7 +1282,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 			}
 		}
 
-		virtual void Execute(void* const context)
+		virtual void Execute()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
@@ -1522,7 +1522,7 @@ void ndDynamicsUpdate::InitSkeletons()
 	class ndInitSkeletons : public ndScene::ndBaseJob
 	{
 		public:
-		virtual void Execute(void* const context)
+		virtual void Execute()
 		{
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
@@ -1560,7 +1560,7 @@ void ndDynamicsUpdate::UpdateSkeletons()
 	class ndUpdateSkeletons : public ndScene::ndBaseJob
 	{
 		public:
-		virtual void Execute(void* const context)
+		virtual void Execute()
 		{
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();

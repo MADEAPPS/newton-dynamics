@@ -65,6 +65,7 @@ class ndScene
 		dAtomic<int>* m_it;
 		ndScene* m_owner;
 		dFloat32 m_timestep;
+		void* m_context;
 	};
 
 	protected:
@@ -248,10 +249,11 @@ void ndScene::SubmitJobs(void* const context)
 	{
 		extJob[i].m_it = &it;
 		extJob[i].m_owner = this;
+		extJob[i].m_context = context;
 		extJob[i].m_timestep = m_timestep;
 		extJobPtr[i] = &extJob[i];
 	}
-	ExecuteJobs(extJobPtr, context);
+	ExecuteJobs(extJobPtr);
 }
 
 inline dFloat32 ndScene::GetTimestep() const
