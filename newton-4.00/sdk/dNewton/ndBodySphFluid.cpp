@@ -71,100 +71,52 @@ void ndBodySphFluid::UpdateAABB()
 
 void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 {
-
-	//memset(histogram, 0, sizeof(histogram));
-	//for (dInt32 i = 0; i < elements; i++)
-	//{
-	//	dInt32 key = getRadixKey(&array[i], context);
-	//	for (dInt32 j = 0; j < radixPass; j++)
-	//	{
-	//		dInt32 radix = (key >> (j << 3)) & 0xff;
-	//		histogram[radix][j] = histogram[radix][j] + 1;
-	//	}
-	//}
-	//
-	//for (dInt32 radix = 0; radix < radixPass; radix += 2)
-	//{
-	//	scanCount[0] = 0;
-	//	for (dInt32 i = 1; i < 256; i++)
-	//	{
-	//		scanCount[i] = scanCount[i - 1] + histogram[i - 1][radix];
-	//	}
-	//	dInt32 radixShift = radix << 3;
-	//	for (dInt32 i = 0; i < elements; i++)
-	//	{
-	//		dInt32 key = (getRadixKey(&array[i], context) >> radixShift) & 0xff;
-	//		dInt32 index = scanCount[key];
-	//		tmpArray[index] = array[i];
-	//		scanCount[key] = index + 1;
-	//	}
-	//
-	//	if ((radix + 1) < radixPass)
-	//	{
-	//		scanCount[0] = 0;
-	//		for (dInt32 i = 1; i < 256; i++) {
-	//			scanCount[i] = scanCount[i - 1] + histogram[i - 1][radix + 1];
-	//		}
-	//
-	//		dInt32 radixShift = (radix + 1) << 3;
-	//		for (dInt32 i = 0; i < elements; i++)
-	//		{
-	//			dInt32 key = (getRadixKey(&array[i], context) >> radixShift) & 0xff;
-	//			dInt32 index = scanCount[key];
-	//			array[index] = tmpArray[i];
-	//			scanCount[key] = index + 1;
-	//		}
-	//	}
-	//	else
-	//	{
-	//		memcpy(array, tmpArray, elements * sizeof(T));
-	//	}
-	//}
-	//
-	//#ifdef _DEBUG
-	//for (dInt32 i = 0; i < (elements - 1); i++)
-	//{
-	//	dAssert(getRadixKey(&array[i], context) <= getRadixKey(&array[i + 1], context));
-	//}
-	//#endif
-
 	static dArray<ndGridHash> tmpArrayBuffer;
 	tmpArrayBuffer.SetCount(count);
 
-	dInt32 histogram[6][1<<10];
-	memset(histogram, 0, sizeof(histogram));
+	dInt32 histogram0[1<<11];
+	dInt32 histogram1[5][1<<10];
+	memset(histogram0, 0, sizeof(histogram0));
+	memset(histogram1, 0, sizeof(histogram1));
 	for (dInt32 i = 0; i < count; i++)
 	{
 		const ndGridHash& entry = hashArray[i];
 
-		const dInt32 xlow = entry.m_xLow;
-		histogram[0][xlow] = histogram[0][xlow] + 1;
+		const dInt32 xlow = dInt32 (entry.m_xLow * 2 + entry.m_cellType);
+		histogram0[xlow] = histogram0[xlow] + 1;
 
 		const dInt32 xHigh = entry.m_xHigh;
-		histogram[1][xHigh] = histogram[1][xHigh] + 1;
+		histogram1[0][xHigh] = histogram1[0][xHigh] + 1;
 
 		const dInt32 ylow = entry.m_yLow;
-		histogram[2][ylow] = histogram[2][ylow] + 1;
+		histogram1[1][ylow] = histogram1[1][ylow] + 1;
 
 		const dInt32 yHigh = entry.m_yHigh;
-		histogram[3][yHigh] = histogram[3][yHigh] + 1;
+		histogram1[2][yHigh] = histogram1[2][yHigh] + 1;
 
 		const dInt32 zlow = entry.m_zLow;
-		histogram[4][zlow] = histogram[4][zlow] + 1;
+		histogram1[3][zlow] = histogram1[3][zlow] + 1;
 
 		const dInt32 zHigh = entry.m_zHigh;
-		histogram[5][zHigh] = histogram[5][zHigh] + 1;
+		histogram1[4][zHigh] = histogram1[4][zHigh] + 1;
+	}
+	
+	dInt32 acc0 = 0;
+	for (dInt32 i = 0; i < (1 << 11); i++)
+	{
+		const dInt32 n = histogram0[i];
+		histogram0[i] = acc0;
+		acc0 += n;
 	}
 
-
-	dInt32 acc[6];
+	dInt32 acc[5];
 	memset(acc, 0, sizeof(acc));
 	for (dInt32 i = 0; i < (1 << 10); i++)
 	{
-		for (dInt32 j = 0; j < 6; j++)
+		for (dInt32 j = 0; j < 5; j++)
 		{
-			const dInt32 n = histogram[j][i];
-			histogram[j][i] = acc[j];
+			const dInt32 n = histogram1[j][i];
+			histogram1[j][i] = acc[j];
 			acc[j] += n;
 		}
 	}
@@ -172,9 +124,33 @@ void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 	dInt32 shiftbits = 0;
 	dUnsigned64 mask = ~dUnsigned64(dInt64(-1 << 10));
 	ndGridHash* const tmpArray = &tmpArrayBuffer[0];
-	for (dInt32 radix = 0; radix < 3; radix ++)
+
+	for (dInt32 i = 0; i < count; i++)
 	{
-		dInt32* const scan0 = &histogram[radix * 2 + 0][0];
+		const ndGridHash& entry = hashArray[i];
+		const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits) * 2 + entry.m_cellType;
+		const dInt32 index = histogram0[key];
+		tmpArray[index] = entry;
+		histogram0[key] = index + 1;
+	}
+	mask <<= 10;
+	shiftbits += 10;
+	
+	dInt32* const scan2 = &histogram1[0][0];
+	for (dInt32 i = 0; i < count; i++)
+	{
+		const ndGridHash& entry = tmpArray[i];
+		const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
+		const dInt32 index = scan2[key];
+		hashArray[index] = entry;
+		scan2[key] = index + 1;
+	}
+	mask <<= 10;
+	shiftbits += 10;
+
+	for (dInt32 radix = 0; radix < 2; radix ++)
+	{
+		dInt32* const scan0 = &histogram1[radix * 2 + 1][0];
 		for (dInt32 i = 0; i < count; i++)
 		{
 			const ndGridHash& entry = hashArray[i];
@@ -185,8 +161,8 @@ void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 		}
 		mask <<= 10;
 		shiftbits += 10;
-
-		dInt32* const scan1 = &histogram[radix * 2 + 1][0];
+		
+		dInt32* const scan1 = &histogram1[radix * 2 + 2][0];
 		for (dInt32 i = 0; i < count; i++)
 		{
 			const ndGridHash& entry = tmpArray[i];
@@ -204,11 +180,11 @@ void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 	{
 		const ndGridHash& entry0 = hashArray[i + 0];
 		const ndGridHash& entry1 = hashArray[i + 1];
-		//dUnsigned64 gridHashA = entry0.m_gridHash * 2 + entry0.m_cellType;
-		//dUnsigned64 gridHashB = entry1.m_gridHash * 2 + entry1.m_cellType;
+		//dUnsigned64 gridHashA = entry0.m_gridHash * 2;
+		//dUnsigned64 gridHashB = entry1.m_gridHash * 2;
+		dUnsigned64 gridHashA = entry0.m_gridHash * 2 + entry0.m_cellType;
+		dUnsigned64 gridHashB = entry1.m_gridHash * 2 + entry1.m_cellType;
 
-		dUnsigned64 gridHashA = entry0.m_gridHash;
-		dUnsigned64 gridHashB = entry1.m_gridHash;
 		dAssert(gridHashA <= gridHashB);
 	}
 	#endif
