@@ -41,7 +41,7 @@ class ndBodyParticleSet: public ndBody
 	void SetParticleRadius(dFloat32 raidus);
 	D_NEWTON_API virtual void AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity) = 0;
 
-	D_NEWTON_API virtual void Update(dFloat32 timestep) = 0;
+	D_NEWTON_API virtual void Update(const ndWorld* const workd, dFloat32 timestep) = 0;
 
 	protected:
 	dArray<dVector> m_posit;

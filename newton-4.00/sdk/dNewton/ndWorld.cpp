@@ -811,6 +811,6 @@ void ndWorld::ParticleUpdate()
 	for (ndBodyParticleSetList::dListNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
 	{
 		ndBodyParticleSet* const body = node->GetInfo();
-		body->Update(m_timestep);
+		body->Update(this, m_timestep);
 	}
 }

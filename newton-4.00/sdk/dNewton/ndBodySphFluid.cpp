@@ -28,6 +28,7 @@ ndBodySphFluid::ndBodySphFluid()
 	:ndBodyParticleSet()
 	,m_box0(dFloat32(-1e10f))
 	,m_box1(dFloat32(1e10f))
+	,m_hashGridMap()
 {
 }
 
@@ -69,15 +70,17 @@ void ndBodySphFluid::UpdateAABB()
 	m_box1 = box1 + dVector(m_radius * dFloat32(2.0f));
 }
 
-void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
+void ndBodySphFluid::SortBuckets()
 {
-	static dArray<ndGridHash> tmpArrayBuffer;
-	tmpArrayBuffer.SetCount(count);
+	const dInt32 count = m_hashGridMap.GetCount();
+	m_sortGridMapBuffer.SetCount(count);
 
 	dInt32 histogram0[1<<11];
 	dInt32 histogram1[5][1<<10];
 	memset(histogram0, 0, sizeof(histogram0));
 	memset(histogram1, 0, sizeof(histogram1));
+
+	ndGridHash* const hashArray = &m_hashGridMap[0];
 	for (dInt32 i = 0; i < count; i++)
 	{
 		const ndGridHash& entry = hashArray[i];
@@ -123,7 +126,7 @@ void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 
 	dInt32 shiftbits = 0;
 	dUnsigned64 mask = ~dUnsigned64(dInt64(-1 << 10));
-	ndGridHash* const tmpArray = &tmpArrayBuffer[0];
+	ndGridHash* const tmpArray = &m_sortGridMapBuffer[0];
 
 	for (dInt32 i = 0; i < count; i++)
 	{
@@ -180,8 +183,6 @@ void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 	{
 		const ndGridHash& entry0 = hashArray[i + 0];
 		const ndGridHash& entry1 = hashArray[i + 1];
-		//dUnsigned64 gridHashA = entry0.m_gridHash * 2;
-		//dUnsigned64 gridHashB = entry1.m_gridHash * 2;
 		dUnsigned64 gridHashA = entry0.m_gridHash * 2 + entry0.m_cellType;
 		dUnsigned64 gridHashB = entry1.m_gridHash * 2 + entry1.m_cellType;
 
@@ -190,8 +191,9 @@ void ndBodySphFluid::SortBuckets(ndGridHash* const hashArray, dInt32 count)
 	#endif
 }
 
-void ndBodySphFluid::Update(dFloat32 timestep)
+void ndBodySphFluid::Update(const ndWorld* const workd, dFloat32 timestep)
 {
+/*
 	const dFloat32 diameter = m_radius * dFloat32(2.0f);
 	const dFloat32 gridSize = diameter * dFloat32(1.0625f);
 	const dVector invGridSize(dFloat32(1.0f) / gridSize);
@@ -208,8 +210,10 @@ void ndBodySphFluid::Update(dFloat32 timestep)
 	neighborkDirs[6] = dVector(-m_radius,  m_radius,  m_radius, dFloat32(0.0f));
 	neighborkDirs[7] = dVector( m_radius,  m_radius,  m_radius, dFloat32(0.0f));
 
-	static dArray<ndGridHash> hashGridMap;
-	hashGridMap.SetCount(m_posit.GetCount() * 16);
+	if (m_hashGridMap.GetCapacity() < m_posit.GetCount() * 16)
+	{
+		m_hashGridMap.SetCount(m_posit.GetCount() * 16);
+	}
 
 	dInt32 count = 0;
 	for (dInt32 i = 0; i < m_posit.GetCount(); i++)
@@ -218,7 +222,7 @@ void ndBodySphFluid::Update(dFloat32 timestep)
 		dVector p(r * invGridSize);
 
 		ndGridHash hashKey(p, i, ndHomeGrid);
-		hashGridMap[count] = hashKey;
+		m_hashGridMap[count] = hashKey;
 		count++;
 
 		for (dInt32 j = 0; j < sizeof(neighborkDirs) / sizeof(neighborkDirs[0]); j++)
@@ -226,11 +230,58 @@ void ndBodySphFluid::Update(dFloat32 timestep)
 			ndGridHash neighborKey(p + neighborkDirs[j], i, ndAdjacentGrid);
 			if (neighborKey.m_gridHash != hashKey.m_gridHash)
 			{
-				hashGridMap[count] = neighborKey;
+				m_hashGridMap[count] = neighborKey;
 				count++;
 			}
 		}
 	}
+	m_hashGridMap.SetCount(count);
+*/
+	UpdateAABB();
+	CreateGrids(workd);
+	SortBuckets();
+}
 
-	SortBuckets(&hashGridMap[0], count);
+void ndBodySphFluid::CreateGrids(const ndWorld* const workd)
+{
+	const dFloat32 diameter = m_radius * dFloat32(2.0f);
+	const dFloat32 gridSize = diameter * dFloat32(1.0625f);
+	const dVector invGridSize(dFloat32(1.0f) / gridSize);
+
+	dVector neighborkDirs[8];
+	neighborkDirs[0] = dVector(-m_radius, -m_radius, -m_radius, dFloat32(0.0f));
+	neighborkDirs[1] = dVector(m_radius, -m_radius, -m_radius, dFloat32(0.0f));
+	neighborkDirs[2] = dVector(-m_radius, m_radius, -m_radius, dFloat32(0.0f));
+	neighborkDirs[3] = dVector(m_radius, m_radius, -m_radius, dFloat32(0.0f));
+	neighborkDirs[4] = dVector(-m_radius, -m_radius, m_radius, dFloat32(0.0f));
+	neighborkDirs[5] = dVector(m_radius, -m_radius, m_radius, dFloat32(0.0f));
+	neighborkDirs[6] = dVector(-m_radius, m_radius, m_radius, dFloat32(0.0f));
+	neighborkDirs[7] = dVector(m_radius, m_radius, m_radius, dFloat32(0.0f));
+
+	if (m_hashGridMap.GetCapacity() < m_posit.GetCount() * 16)
+	{
+		m_hashGridMap.SetCount(m_posit.GetCount() * 16);
+	}
+
+	dInt32 count = 0;
+	for (dInt32 i = 0; i < m_posit.GetCount(); i++)
+	{
+		dVector r(m_posit[i] - m_box0);
+		dVector p(r * invGridSize);
+
+		ndGridHash hashKey(p, i, ndHomeGrid);
+		m_hashGridMap[count] = hashKey;
+		count++;
+
+		for (dInt32 j = 0; j < sizeof(neighborkDirs) / sizeof(neighborkDirs[0]); j++)
+		{
+			ndGridHash neighborKey(p + neighborkDirs[j], i, ndAdjacentGrid);
+			if (neighborKey.m_gridHash != hashKey.m_gridHash)
+			{
+				m_hashGridMap[count] = neighborKey;
+				count++;
+			}
+		}
+	}
+	m_hashGridMap.SetCount(count);
 }
