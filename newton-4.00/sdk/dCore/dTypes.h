@@ -499,6 +499,11 @@ D_CORE_API dUnsigned64 dGetTimeInMicrosenconds();
 	class dAtomic
 	{
 		public:
+		dAtomic<T>()
+			: m_val(T(val))
+		{
+		}
+
 		dAtomic<T>(T val)
 			: m_val(val)
 		{
@@ -540,6 +545,11 @@ D_CORE_API dUnsigned64 dGetTimeInMicrosenconds();
 	class dAtomic: public std::atomic<T>
 	{
 		public: 
+		dAtomic<T>()
+			: std::atomic<T>(T(0))
+		{
+		}
+
 		dAtomic<T>(T val)
 			:std::atomic<T>(val)
 		{
