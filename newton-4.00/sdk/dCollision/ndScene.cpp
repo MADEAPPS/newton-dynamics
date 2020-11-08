@@ -1446,7 +1446,7 @@ void ndScene::BuildBodyArray()
 	class ndBuildBodyArray : public ndBaseJob
 	{
 		public:
-		virtual void Execute()
+		virtual void Execute(void* const context)
 		{
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
@@ -1537,7 +1537,7 @@ void ndScene::CalculateContacts()
 	class ndCalculateContacts : public ndBaseJob
 	{
 		public:
-		virtual void Execute()
+		virtual void Execute(void* const context)
 		{
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
@@ -1578,7 +1578,7 @@ void ndScene::UpdateAabb()
 	class ndUpdateAabbJob : public ndBaseJob
 	{
 		public:
-		virtual void Execute()
+		virtual void Execute(void* const context)
 		{
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
@@ -1642,7 +1642,7 @@ void ndScene::FindCollidingPairs()
 	class ndFindCollidindPairsFullScan : public ndBaseJob
 	{
 		public:
-		virtual void Execute()
+		virtual void Execute(void* const context)
 		{
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
@@ -1677,7 +1677,7 @@ void ndScene::FindCollidingPairs()
 	class ndFindCollidindPairsTwoWays : public ndBaseJob
 	{
 		public:
-		virtual void Execute()
+		virtual void Execute(void* const context)
 		{
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();
@@ -1732,7 +1732,7 @@ void ndScene::TransformUpdate()
 	class ndTransformUpdate : public ndBaseJob
 	{
 		public:
-		virtual void Execute()
+		virtual void Execute(void* const context)
 		{
 			D_TRACKTIME();
 			const dInt32 threadIndex = GetThredID();

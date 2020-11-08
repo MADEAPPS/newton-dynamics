@@ -39,7 +39,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	D_NEWTON_API virtual void AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity);
 
 	protected:
-	D_NEWTON_API virtual void Update(const ndWorld* const workd, dFloat32 timestep);
+	D_NEWTON_API virtual void Update(const ndWorld* const world, dFloat32 timestep);
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
 
 	private:
@@ -97,7 +97,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 
 	void UpdateAABB();
 	void SortBuckets();
-	void CreateGrids(const ndWorld* const workd);
+	void CreateGrids(const ndWorld* const world);
 
 	dVector m_box0;
 	dVector m_box1;

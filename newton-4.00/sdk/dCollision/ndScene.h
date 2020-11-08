@@ -99,7 +99,7 @@ class ndScene
 	const dArray<ndBodyKinematic*>& GetActiveBodyArray() const;
 
 	template <class T>
-	void SubmitJobs();
+	void SubmitJobs(void* const context = nullptr);
 
 	dFloat32 GetTimestep() const;
 	void SetTimestep(dFloat32 timestep);
@@ -237,7 +237,7 @@ inline const ndContactList& ndScene::GetContactList() const
 }
 
 template <class T>
-void ndScene::SubmitJobs()
+void ndScene::SubmitJobs(void* const context)
 {
 	dAtomic<dInt32> it(0);
 	T extJob[D_MAX_THREADS_COUNT];
@@ -251,7 +251,7 @@ void ndScene::SubmitJobs()
 		extJob[i].m_timestep = m_timestep;
 		extJobPtr[i] = &extJob[i];
 	}
-	ExecuteJobs(extJobPtr);
+	ExecuteJobs(extJobPtr, context);
 }
 
 inline dFloat32 ndScene::GetTimestep() const

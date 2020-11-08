@@ -148,7 +148,7 @@ void ndWorld::ApplyExternalForces()
 	class ndApplyExternalForces: public ndScene::ndBaseJob
 	{
 		public:
-		virtual void Execute()
+		virtual void Execute(void* const context)
 		{
 			D_TRACKTIME();
 
