@@ -431,16 +431,17 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 		{
 			public:
 			ndBodySphFluid* m_fluid;
-			dInt32 m_sizes[D_MAX_THREADS_COUNT + 2];
+			dInt32 m_treadCount;
+			dInt32 m_sizes[2 * D_MAX_THREADS_COUNT + 1];
 		};
 
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			ndContext* const context = (ndContext*)m_context;
+			const ndContext* const context = (ndContext*)m_context;
 			ndBodySphFluid* const fluid = context->m_fluid;
-			dInt32 threadindex = GetThredID();
-			dInt32* const batches = &context->m_sizes[threadindex * 2];
+			const dInt32 threadindex = context->m_treadCount - GetThredID() - 1;
+			const dInt32* const batches = &context->m_sizes[threadindex * 2];
 			if (batches[1] != batches[2])
 			{
 				ndGridHash* const input0 = &fluid->m_hashGridMap[batches[0]];
@@ -502,6 +503,7 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 		const dInt32 count = m_hashGridMap.GetCount();
 		const dInt32 size = count / threadCount;
 		context.m_fluid = this;
+		context.m_treadCount = threadCount;
 		memset(context.m_sizes, 0, sizeof(context.m_sizes));
 		for (dInt32 i = 0; i < (threadCount - 1); i++)
 		{
@@ -510,7 +512,7 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 		context.m_sizes[threadCount - 1] = count - size * (threadCount - 1);
 
 		dInt32 acc = 0;
-		for (dInt32 i = 0; i < D_MAX_THREADS_COUNT + 2; i++)
+		for (dInt32 i = 0; i < (2 * D_MAX_THREADS_COUNT + 1); i++)
 		{
 			dInt32 a = context.m_sizes[i];
 			context.m_sizes[i] = acc;
@@ -522,7 +524,7 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 		{
 			scene->SubmitJobs<ndBodySphFluidMergeSort>(&context);
 			threadCount >>= 1;
-			for (dInt32 i = 1; i < (D_MAX_THREADS_COUNT + 2)>>1; i ++)
+			for (dInt32 i = 1; i < D_MAX_THREADS_COUNT; i ++)
 			{
 				context.m_sizes[i] = context.m_sizes[2 * i];
 			}
