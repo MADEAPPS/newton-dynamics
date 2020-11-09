@@ -188,7 +188,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 	m_iterator.store(0);
 	ndScene* const scene = world->GetScene();
 	scene->SubmitJobs<ndCreateGrid>(this);
-	m_hashGridMap.SetCount(m_iterator);
+	m_hashGridMap.SetCount(m_iterator.load());
 }
 
 void ndBodySphFluid::SortBatch(const ndWorld* const world, dInt32 threadID)
