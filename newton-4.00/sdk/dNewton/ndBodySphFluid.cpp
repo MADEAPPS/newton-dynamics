@@ -414,7 +414,7 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 	}
 #else
 
-	class ndBodySphFluidGenerateCounters : public ndScene::ndBaseJob
+	class ndBodySphFluidRadixSort : public ndScene::ndBaseJob
 	{
 		virtual void Execute()
 		{
@@ -424,38 +424,67 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 		}
 	};
 
+	class ndBodySphFluidMergeSort : public ndScene::ndBaseJob
+	{
+		public:
+		class ndContext
+		{
+			public:
+			ndBodySphFluid* m_fluid;
+			dInt32 m_sizes[D_MAX_THREADS_COUNT + 2];
+		};
+
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndContext* const context = (ndContext*)m_context;
+			ndBodySphFluid* const fluid = context->m_fluid;
+			dInt32 threadindex = GetThredID();
+			dInt32* const batches = &context->m_sizes[threadindex * 2];
+			if (batches[1] != batches[2])
+			{
+				ndGridHash* const input0 = &fluid->m_hashGridMap[batches[0]];
+				ndGridHash* const input1 = &fluid->m_hashGridMap[batches[1]];
+				ndGridHash* const output = &fluid->m_hashGridMapScratchBuffer[batches[0]];
+			}
+		}
+	};
+
 	ndScene* const scene = world->GetScene();
 	m_hashGridMapScratchBuffer.SetCount(m_hashGridMap.GetCount());
-	scene->SubmitJobs<ndBodySphFluidGenerateCounters>(this);
+	scene->SubmitJobs<ndBodySphFluidRadixSort>(this);
 
 	dInt32 threadCount = world->GetThreadCount();
 	if (threadCount > 1)
 	{
+		ndBodySphFluidMergeSort::ndContext context;
 		const dInt32 count = m_hashGridMap.GetCount();
 		const dInt32 size = count / threadCount;
-		dInt32 sizes[D_MAX_THREADS_COUNT + 2];
-		memset(sizes, 0, sizeof(sizes));
+		//dInt32 sizes[D_MAX_THREADS_COUNT + 2];
+		context.m_fluid = this;
+		memset(context.m_sizes, 0, sizeof(context.m_sizes));
 		for (dInt32 i = 0; i < (threadCount - 1); i++)
 		{
-			sizes[i] = size;
+			context.m_sizes[i] = size;
 		}
-		sizes[threadCount - 1] = count - size * (threadCount - 1);
+		context.m_sizes[threadCount - 1] = count - size * (threadCount - 1);
 
 		dInt32 acc = 0;
 		for (dInt32 i = 0; i < D_MAX_THREADS_COUNT + 2; i++)
 		{
-			dInt32 a = sizes[i];
-			sizes[i] = acc;
+			dInt32 a = context.m_sizes[i];
+			context.m_sizes[i] = acc;
 			acc += a;
 		}
 
 		threadCount--;
 		while (threadCount)
 		{
+			scene->SubmitJobs<ndBodySphFluidMergeSort>(&context);
 			threadCount >>= 1;
 			for (dInt32 i = 1; i < (D_MAX_THREADS_COUNT + 2)>>1; i ++)
 			{
-				sizes[i] = sizes[2 * i];
+				context.m_sizes[i] = context.m_sizes[2 * i];
 			}
 		}
 	}
