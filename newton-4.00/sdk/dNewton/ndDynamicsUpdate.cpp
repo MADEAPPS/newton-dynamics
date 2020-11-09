@@ -29,6 +29,8 @@
 
 #define D_BASH_SIZE	64
 
+//#define D_USE_STANDARD_SORT
+
 ndDynamicsUpdate::ndDynamicsUpdate()
 	:m_velocTol(dFloat32(1.0e-8f))
 	,m_islands()
@@ -135,17 +137,9 @@ dInt32 ndDynamicsUpdate::CompareIslandBodies(const ndBodyIndexPair* const  pairA
 	union dKey
 	{
 		dKey(dUnsigned32 low, dUnsigned32 high)
-			//:m_low(low)
-			//,m_high(high)
 			:m_val((high<<31) + low)
 		{
 		}
-		//dUnsigned64 m_val;
-		//struct
-		//{
-		//	dUnsigned32 m_low;
-		//	dUnsigned32 m_high;
-		//};
 		dUnsigned32 m_val;
 	};
 	dKey keyA(pairA->m_root->m_uniqueID, pairA->m_root->m_bodyIsConstrained);
@@ -276,9 +270,9 @@ void ndDynamicsUpdate::BuildIsland()
 		m_unConstrainedBodyCount = 0;
 		if (count)
 		{
-			#if 1
+			#ifdef D_USE_STANDARD_SORT
 			dSort(buffer0, count, CompareIslandBodies);
-			ndBodyIndexPair* const buffer1 = buffer0;
+			const ndBodyIndexPair* const buffer1 = buffer0;
 			#else
 			dInt32 scans[2];
 			scans[0] = 0;
@@ -299,6 +293,7 @@ void ndDynamicsUpdate::BuildIsland()
 				scans[key] = j + 1;
 			}
 			#endif
+
 			for (dInt32 i = 0; i < count; i++)
 			{
 				m_bodyIslandOrder[i] = buffer1[i].m_body;

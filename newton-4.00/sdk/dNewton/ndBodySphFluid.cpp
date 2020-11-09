@@ -446,6 +446,47 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 				ndGridHash* const input0 = &fluid->m_hashGridMap[batches[0]];
 				ndGridHash* const input1 = &fluid->m_hashGridMap[batches[1]];
 				ndGridHash* const output = &fluid->m_hashGridMapScratchBuffer[batches[0]];
+
+				dInt32 countInput0 = batches[1] - batches[0];
+				dInt32 countInput1 = batches[2] - batches[1];
+				dInt32 count0 = 0;
+				dInt32 count1 = 0;
+				dInt32 outputCount = 0;
+
+				ndGridHash entry0(input0[count0]);
+				ndGridHash entry1(input1[count1]);
+				while (countInput0 && countInput1)
+				{
+					dUnsigned64 gridHash0 = entry0.m_gridHash * 2 + entry0.m_cellType;
+					dUnsigned64 gridHashB = entry1.m_gridHash * 2 + entry1.m_cellType;
+					if (gridHash0 <= gridHashB)
+					{
+						output[outputCount] = entry0;
+						count0++;
+						outputCount++;
+						countInput0--;
+						entry0 = input0[count0];
+					}
+					else
+					{
+						output[outputCount] = entry1;
+						count1++;
+						outputCount++;
+						countInput1--;
+						entry1 = input1[count1];
+					}
+				}
+				if (countInput0)
+				{
+					dAssert(!countInput1);
+					memcpy(&output[outputCount], &input0[count0], countInput0 * sizeof(ndGridHash));
+				}
+				if (countInput1)
+				{
+					dAssert(!countInput0);
+					memcpy(&output[outputCount], &input1[count1], countInput1 * sizeof (ndGridHash));
+				}
+				memcpy(input0, output, (batches[2] - batches[0]) * sizeof(ndGridHash));
 			}
 		}
 	};
@@ -460,7 +501,6 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 		ndBodySphFluidMergeSort::ndContext context;
 		const dInt32 count = m_hashGridMap.GetCount();
 		const dInt32 size = count / threadCount;
-		//dInt32 sizes[D_MAX_THREADS_COUNT + 2];
 		context.m_fluid = this;
 		memset(context.m_sizes, 0, sizeof(context.m_sizes));
 		for (dInt32 i = 0; i < (threadCount - 1); i++)
@@ -488,12 +528,9 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 			}
 		}
 	}
-
-
 #endif
 
-
-	#ifdef _DEBUG___
+#ifdef _DEBUG
 	for (dInt32 i = 0; i < (m_hashGridMap.GetCount()-1); i++)
 	{
 		const ndGridHash& entry0 = m_hashGridMap[i + 0];
@@ -502,5 +539,5 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 		dUnsigned64 gridHashB = entry1.m_gridHash * 2 + entry1.m_cellType;
 		dAssert(gridHashA <= gridHashB);
 	}
-	#endif
+#endif
 }
