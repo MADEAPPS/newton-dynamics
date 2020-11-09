@@ -428,6 +428,38 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 	m_hashGridMapScratchBuffer.SetCount(m_hashGridMap.GetCount());
 	scene->SubmitJobs<ndBodySphFluidGenerateCounters>(this);
 
+	dInt32 threadCount = world->GetThreadCount();
+	if (threadCount > 1)
+	{
+		const dInt32 count = m_hashGridMap.GetCount();
+		const dInt32 size = count / threadCount;
+		dInt32 sizes[D_MAX_THREADS_COUNT + 2];
+		memset(sizes, 0, sizeof(sizes));
+		for (dInt32 i = 0; i < (threadCount - 1); i++)
+		{
+			sizes[i] = size;
+		}
+		sizes[threadCount - 1] = count - size * (threadCount - 1);
+
+		dInt32 acc = 0;
+		for (dInt32 i = 0; i < D_MAX_THREADS_COUNT + 2; i++)
+		{
+			dInt32 a = sizes[i];
+			sizes[i] = acc;
+			acc += a;
+		}
+
+		threadCount--;
+		while (threadCount)
+		{
+			threadCount >>= 1;
+			for (dInt32 i = 1; i < (D_MAX_THREADS_COUNT + 2)>>1; i ++)
+			{
+				sizes[i] = sizes[2 * i];
+			}
+		}
+	}
+
 
 #endif
 
