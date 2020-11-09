@@ -117,8 +117,8 @@ inline ndBodyKinematic* ndDynamicsUpdate::FindRootAndSplit(ndBodyKinematic* cons
 
 dInt32 ndDynamicsUpdate::CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const context)
 {
-	dInt32 keyA = islandA->m_count * 2 + islandA->m_root->m_bodyIsConstrained;
-	dInt32 keyB = islandB->m_count * 2 + islandB->m_root->m_bodyIsConstrained;;
+	dUnsigned32 keyA = islandA->m_count * 2 + islandA->m_root->m_bodyIsConstrained;
+	dUnsigned32 keyB = islandB->m_count * 2 + islandB->m_root->m_bodyIsConstrained;;
 	if (keyA < keyB)
 	{
 		return 1;
@@ -135,16 +135,18 @@ dInt32 ndDynamicsUpdate::CompareIslandBodies(const ndBodyIndexPair* const  pairA
 	union dKey
 	{
 		dKey(dUnsigned32 low, dUnsigned32 high)
-			:m_low(low)
-			,m_high(high)
+			//:m_low(low)
+			//,m_high(high)
+			:m_val((high<<31) + low)
 		{
 		}
-		dUnsigned64 m_val;
-		struct
-		{
-			dUnsigned32 m_low;
-			dUnsigned32 m_high;
-		};
+		//dUnsigned64 m_val;
+		//struct
+		//{
+		//	dUnsigned32 m_low;
+		//	dUnsigned32 m_high;
+		//};
+		dUnsigned32 m_val;
 	};
 	dKey keyA(pairA->m_root->m_uniqueID, pairA->m_root->m_bodyIsConstrained);
 	dKey keyB(pairB->m_root->m_uniqueID, pairB->m_root->m_bodyIsConstrained);
@@ -239,13 +241,13 @@ void ndDynamicsUpdate::BuildIsland()
 		m_internalForces.SetCount(bodyArray.GetCount());
 
 		dInt32 count = 0;
-		ndBodyIndexPair* const buffer = (ndBodyIndexPair*)&m_internalForces[0];
+		ndBodyIndexPair* const buffer0 = (ndBodyIndexPair*)&m_internalForces[0];
 		for (dInt32 i = bodyArray.GetCount() - 2; i >= 0; i--)
 		{
 			ndBodyKinematic* const body = bodyArray[i];
 			if (!(body->m_resting & body->m_islandSleep))
 			{
-				buffer[count].m_body = body;
+				buffer0[count].m_body = body;
 				if (body->GetInvMass() > dFloat32(0.0f))
 				{
 					ndBodyKinematic* root = body->m_islandParent;
@@ -254,7 +256,7 @@ void ndDynamicsUpdate::BuildIsland()
 						root = root->m_islandParent;
 					}
 
-					buffer[count].m_root = root;
+					buffer0[count].m_root = root;
 					if (root->m_rank != -1)
 					{
 						root->m_rank = -1;
@@ -262,7 +264,7 @@ void ndDynamicsUpdate::BuildIsland()
 				}
 				else
 				{
-					buffer[count].m_root = body;
+					buffer0[count].m_root = body;
 					body->m_rank = -1;
 				}
 				count++;
@@ -274,18 +276,39 @@ void ndDynamicsUpdate::BuildIsland()
 		m_unConstrainedBodyCount = 0;
 		if (count)
 		{
-			dSort(buffer, count, CompareIslandBodies);
-
+			#if 1
+			dSort(buffer0, count, CompareIslandBodies);
+			ndBodyIndexPair* const buffer1 = buffer0;
+			#else
+			dInt32 scans[2];
+			scans[0] = 0;
+			scans[1] = 0;
 			for (dInt32 i = 0; i < count; i++)
 			{
-				m_bodyIslandOrder[i] = buffer[i].m_body;
-				if (buffer[i].m_root->m_rank == -1)
+				dInt32 j = 1-buffer0[i].m_root->m_bodyIsConstrained;
+				scans[j] ++;
+			}
+			scans[1] = scans[0];
+			scans[0] = 0;
+			ndBodyIndexPair* const buffer1 = buffer0 + count;
+			for (dInt32 i = 0; i < count; i++)
+			{
+				const dInt32 key = 1-buffer0[i].m_root->m_bodyIsConstrained;
+				const dInt32 j = scans[key];
+				buffer1[j] = buffer0[i];
+				scans[key] = j + 1;
+			}
+			#endif
+			for (dInt32 i = 0; i < count; i++)
+			{
+				m_bodyIslandOrder[i] = buffer1[i].m_body;
+				if (buffer1[i].m_root->m_rank == -1)
 				{
-					buffer[i].m_root->m_rank = 0;
-					ndIsland island(buffer[i].m_root);
+					buffer1[i].m_root->m_rank = 0;
+					ndIsland island(buffer1[i].m_root);
 					m_islands.PushBack(island);
 				}
-				buffer[i].m_root->m_rank += 1;
+				buffer1[i].m_root->m_rank += 1;
 			}
 
 			dInt32 start = 0;
