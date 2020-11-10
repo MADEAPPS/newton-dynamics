@@ -37,11 +37,14 @@ ndWorld::ndWorld()
 	,m_skeletonList()
 	,m_particleSetList()
 	,m_timestep(dFloat32 (0.0f))
-	,m_lastExecutionTime(dFloat32(0.0f))
 	,m_freezeAccel2(D_FREEZE_ACCEL2)
 	,m_freezeAlpha2(D_FREEZE_ACCEL2)
 	,m_freezeSpeed2(D_FREEZE_SPEED2)
 	,m_freezeOmega2(D_FREEZE_SPEED2)
+	,m_averageUpdateTime(dFloat32(0.0f))
+	,m_averageTimestepAcc(dFloat32(0.0f))
+	,m_averageFramesCount(dFloat32(0.0f))
+	,m_lastExecutionTime(dFloat32(0.0f))
 	,m_subSteps(1)
 	,m_solverIterations(4)
 	,m_frameIndex(0)
@@ -755,19 +758,30 @@ void ndWorld::ThreadFunction()
 		PostUpdate(m_timestep);
 		m_scene->End();
 	}
+	
 	m_frameIndex++;
 	m_lastExecutionTime = (dGetTimeInMicrosenconds() - timeAcc) * dFloat32(1.0e-6f);
+	CalculateAverageUpdateTime();
 }
 
-//int xxxxxxx;
+void ndWorld::CalculateAverageUpdateTime()
+{
+	m_averageFramesCount += dFloat32 (1.0f);
+	m_averageTimestepAcc += m_lastExecutionTime;
+
+	dAssert(m_averageTimestepAcc >= dFloat32(0.0f));
+	const dFloat32 movingAverageFrames = dFloat32 (16);
+	if (m_averageFramesCount >= movingAverageFrames)
+	{
+		m_averageUpdateTime = m_averageTimestepAcc/m_averageFramesCount;
+		m_averageTimestepAcc = dFloat32 (0.0f);
+		m_averageFramesCount -= movingAverageFrames;
+	}
+}
+
 void ndWorld::SubStepUpdate(dFloat32 timestep)
 {
 	D_TRACKTIME();
-
-//xxxxxxx++;
-//extern int xxxxxxx;
-//if (xxxxxxx >= 481)
-//xxxxxxx *= 1;
 
 	// do the a pre-physics step
 	m_scene->m_lru = m_scene->m_lru + 1;
@@ -803,7 +817,6 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	ndDynamicsUpdate::Update();
 	UpdatePostlisteners();
 }
-
 
 void ndWorld::ParticleUpdate()
 {

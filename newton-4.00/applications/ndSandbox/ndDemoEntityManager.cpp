@@ -899,7 +899,10 @@ void ndDemoEntityManager::RenderStats()
 			sprintf (text, "fps:             %6.3f", m_fps);
 			ImGui::Text(text, "");
 
-			sprintf (text, "physics time:   %6.3f ms", m_world->GetUpdateTime() * 1.0e3f);
+			//sprintf (text, "physics time:   %6.3f ms", m_world->GetUpdateTime() * 1.0e3f);
+			//ImGui::Text(text, "");
+
+			sprintf(text, "physics time:   %6.3f ms", m_world->GetAverageUpdateTime() * 1.0e3f);
 			ImGui::Text(text, "");
 
 			if (m_currentPlugin) 
@@ -961,17 +964,18 @@ void ndDemoEntityManager::CalculateFPS(dFloat32 timestep)
 	m_timestepAcc += timestep;
 
 	// this probably happing on loading of and a pause, just rest counters
-	if ((m_timestepAcc <= 0.0f) || (m_timestepAcc > 2.0f))
+	if ((m_timestepAcc <= 0.0f) || (m_timestepAcc > 4.0f))
 	{
 		m_timestepAcc = 0;
 		m_framesCount = 0;
 	}
 
 	//update fps every quarter of a second
-	if (m_timestepAcc >= 0.25f) 
+	const dFloat32 movingAverage = 0.5f;
+	if (m_timestepAcc >= movingAverage)
 	{
 		m_fps = dFloat32 (m_framesCount) / m_timestepAcc;
-		m_timestepAcc -= 0.25f;
+		m_timestepAcc -= movingAverage;
 		m_framesCount = 0;
 	}
 }

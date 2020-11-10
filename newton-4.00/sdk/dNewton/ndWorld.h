@@ -89,6 +89,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 
 	dFloat32 GetUpdateTime() const;
 	dUnsigned32 GetFrameIndex() const;
+	dFloat32 GetAverageUpdateTime() const;
 
 	ndContactNotify* GetContactNotify() const;
 	void SetContactNotify(ndContactNotify* const notify);
@@ -114,6 +115,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 
 	private:
 	void ParticleUpdate();
+	void CalculateAverageUpdateTime();
 	void SubStepUpdate(dFloat32 timestep);
 	void LoadSettings(const nd::TiXmlNode* const rootNode);
 	void LoadBodies(const nd::TiXmlNode* const rootNode, dTree<const ndShape*, dUnsigned32>& shapesCache, const char* const assetPath);
@@ -126,11 +128,15 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	ndBodyParticleSetList m_particleSetList;
 
 	dFloat32 m_timestep;
-	dFloat32 m_lastExecutionTime;
 	dFloat32 m_freezeAccel2;
 	dFloat32 m_freezeAlpha2;
 	dFloat32 m_freezeSpeed2;
 	dFloat32 m_freezeOmega2;
+	dFloat32 m_averageUpdateTime;
+	dFloat32 m_averageTimestepAcc;
+	dFloat32 m_averageFramesCount;
+	dFloat32 m_lastExecutionTime;
+
 	dgSolverProgressiveSleepEntry m_sleepTable[D_SLEEP_ENTRIES];
 
 	dInt32 m_subSteps;
@@ -223,6 +229,11 @@ inline const ndSkeletonList& ndWorld::GetSkeletonList() const
 inline dFloat32 ndWorld::GetUpdateTime() const
 {
 	return m_lastExecutionTime;
+}
+
+inline dFloat32 ndWorld::GetAverageUpdateTime() const
+{
+	return m_averageUpdateTime;
 }
 
 inline dUnsigned32 ndWorld::GetFrameIndex() const
