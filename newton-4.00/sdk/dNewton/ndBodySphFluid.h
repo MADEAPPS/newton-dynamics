@@ -25,6 +25,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndBodyParticleSet.h"
 
+//#define D_USED_OLD_SORT
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodySphFluid: public ndBodyParticleSet
@@ -104,7 +105,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 	void CreateGrids(const ndWorld* const world);
 
 	void SortBatch(const ndWorld* const world, dInt32 threadID);
-
 	dVector m_box0;
 	dVector m_box1;
 	dArray<ndGridHash> m_hashGridMap;
