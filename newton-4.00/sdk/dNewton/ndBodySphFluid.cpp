@@ -95,7 +95,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 		m_hashGridMap.SetCount(m_posit.GetCount() * 16);
 	}
 
-	class ndCreateGrid: public ndScene::ndBaseJob
+	class ndCreateGrids: public ndScene::ndBaseJob
 	{
 		public:
 		void ExecuteBatch(const dInt32 start, const dInt32 count)
@@ -110,6 +110,9 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 				ndGridHash hashKey(p, i, ndHomeGrid);
 				m_scratchBuffer[m_scratchBufferCount] = hashKey;
 				m_scratchBufferCount++;
+				m_fluid->m_upperDigisIsValid[0] |= hashKey.m_xHigh;
+				m_fluid->m_upperDigisIsValid[1] |= hashKey.m_yHigh;
+				m_fluid->m_upperDigisIsValid[2] |= hashKey.m_zHigh;
 			
 				for (dInt32 j = 0; j < sizeof(m_neighborkDirs) / sizeof(m_neighborkDirs[0]); j++)
 				{
@@ -187,15 +190,15 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 	}
 	m_iterator.store(0);
 	ndScene* const scene = world->GetScene();
-	scene->SubmitJobs<ndCreateGrid>(this);
+	m_upperDigisIsValid[0] = 0;
+	m_upperDigisIsValid[1] = 0;
+	m_upperDigisIsValid[2] = 0;
+	scene->SubmitJobs<ndCreateGrids>(this);
 	m_hashGridMap.SetCount(m_iterator.load());
 }
 
 void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId, const dInt32 threadCount)
 {
-	//const dInt32 threadCount = world->GetThreadCount();
-	//const dInt32 threadCount = 1;
-
 	const dInt32 count = m_hashGridMap.GetCount();
 
 	const dInt32 size = count / threadCount;
@@ -265,15 +268,19 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 	mask <<= 10;
 	shiftbits += 10;
 
-	dInt32* const scan2 = &histogram1[0][0];
-	for (dInt32 i = 0; i < batchSize; i++)
+//	if (m_upperDigisIsValid[0]) 
 	{
-		const ndGridHash& entry = tmpArray[i];
-		const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-		const dInt32 index = scan2[key];
-		hashArray[index] = entry;
-		scan2[key] = index + 1;
+		dInt32* const scan2 = &histogram1[0][0];
+		for (dInt32 i = 0; i < batchSize; i++)
+		{
+			const ndGridHash& entry = tmpArray[i];
+			const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
+			const dInt32 index = scan2[key];
+			hashArray[index] = entry;
+			scan2[key] = index + 1;
+		}
 	}
+
 	mask <<= 10;
 	shiftbits += 10;
 
@@ -692,7 +699,6 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 			}
 		}
 	};
-
 	
 	const dInt32 threadCount = world->GetThreadCount();
 	m_hashGridMapScratchBuffer.SetCount(m_hashGridMap.GetCount());
@@ -705,36 +711,28 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 	{
 		ndScene* const scene = world->GetScene();
 
-		//for (int i = 0; i < 16; i++)
-		//{
-		//	m_hashGridMap[i].m_cellType = ndHomeGrid;
-		//	m_hashGridMap[i].m_x = 0;
-		//	m_hashGridMap[i].m_y = 0;
-		//	m_hashGridMap[i].m_z = 0;
-		//}
-
-//SortBatch(world, 0, 1);
-
 		ndContext context;
 		context.m_fluid = this;
-		//for (dInt32 pass = 0; pass < 6; pass++)
-		for (dInt32 pass = 0; pass < 6; pass+=2)
+		for (dInt32 pass = 0; pass < 6; pass++)
 		{
-			context.m_pass = pass;
-			scene->SubmitJobs<ndBodySphFluidCountDigits>(&context);
-			scene->SubmitJobs<ndBodySphFluidAddPartialSum>(&context);
-			
-			dInt32 acc = 0;
-			for (dInt32 i = 0; i < sizeof(context.m_scan) / sizeof(dInt32); i++)
+			if (!(pass & 1) || m_upperDigisIsValid[pass >> 1])
 			{
-				dInt32 sum = context.m_scan[i];
-				context.m_scan[i] = acc;
-				acc += sum;
+				context.m_pass = pass;
+				scene->SubmitJobs<ndBodySphFluidCountDigits>(&context);
+				scene->SubmitJobs<ndBodySphFluidAddPartialSum>(&context);
+
+				dInt32 acc = 0;
+				for (dInt32 i = 0; i < sizeof(context.m_scan) / sizeof(dInt32); i++)
+				{
+					dInt32 sum = context.m_scan[i];
+					context.m_scan[i] = acc;
+					acc += sum;
+				}
+				AddCounters(world, context);
+
+				scene->SubmitJobs<ndBodySphFluidSortBuckects>(&context);
+				m_hashGridMap.Swap(m_hashGridMapScratchBuffer);
 			}
-			AddCounters(world, context);
-		
-			scene->SubmitJobs<ndBodySphFluidSortBuckects>(&context);
-			m_hashGridMap.Swap(m_hashGridMapScratchBuffer);
 		}	
 	}
 

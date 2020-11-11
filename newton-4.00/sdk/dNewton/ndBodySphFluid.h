@@ -124,6 +124,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	dVector m_box1;
 	dArray<ndGridHash> m_hashGridMap;
 	dArray<ndGridHash> m_hashGridMapScratchBuffer;
+	dInt32 m_upperDigisIsValid[3];
 	dAtomic<dInt32> m_iterator;
 } D_GCC_NEWTON_ALIGN_32 ;
 
