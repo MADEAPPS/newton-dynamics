@@ -717,7 +717,8 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 
 		ndContext context;
 		context.m_fluid = this;
-		for (dInt32 pass = 0; pass < 6; pass++)
+		//for (dInt32 pass = 0; pass < 6; pass++)
+		for (dInt32 pass = 0; pass < 6; pass+=2)
 		{
 			context.m_pass = pass;
 			scene->SubmitJobs<ndBodySphFluidCountDigits>(&context);
