@@ -423,7 +423,7 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 		{
 			D_TRACKTIME();
 			ndBodySphFluid* const fluid = (ndBodySphFluid*)m_context;
-			fluid->SortBatch(m_owner->GetWorld(), GetThredID());
+			fluid->SortBatch(m_owner->GetWorld(), GetThredID(), m_owner->GetThreadCount());
 		}
 	};
 
@@ -552,87 +552,18 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 void ndBodySphFluid::AddCounters(const ndWorld* const world, ndContext& context) const
 {
 	D_TRACKTIME();
-	dInt32 acc[D_MAX_THREADS_COUNT];
-	acc[0] = 0;
-	for (dInt32 i = 0; i < sizeof(context.m_scan.m_histogram0) / sizeof(dInt32); i++)
-	{
-		dInt32 a = context.m_scan.m_histogram0[i];
-		context.m_scan.m_histogram0[i] = acc[0];
-		acc[0] += a;
-	}
 
+	dInt32 acc[1 << 11];
 	memset(acc, 0, sizeof(acc));
-	for (dInt32 i = 0; i < sizeof(context.m_scan.m_histogram0) / (2 * sizeof(dInt32)); i++)
-	{
-		for (dInt32 j = 0; j < 5; j++)
-		{
-			dInt32 a = context.m_scan.m_histogram1[j][i];
-			context.m_scan.m_histogram1[j][i] = acc[j];
-			acc[j] += a;
-		}
-	}
-
-	memset(&context.m_acc, 0, sizeof(ndCounters));
 	
 	const dInt32 threadCount = world->GetThreadCount();
-	for (dInt32 j = 0; j < threadCount; j++)
+	for (dInt32 threadId = 0; threadId < threadCount; threadId++)
 	{
-		for (dInt32 i = 0; i < sizeof(context.m_scan.m_histogram0) / sizeof(dInt32); i++)
+		for (dInt32 i = 0; i < sizeof(context.m_scan) / sizeof(dInt32); i++)
 		{
-			dInt32 a = context.m_sizes[j]->m_histogram0[i];
-			context.m_sizes[j]->m_histogram0[i] = context.m_acc.m_histogram0[i] + context.m_scan.m_histogram0[i];
-			context.m_acc.m_histogram0[i] += a;
-		}
-
-		for (dInt32 k = 0; k < 5; k++)
-		{
-			for (dInt32 i = 0; i < sizeof(context.m_scan.m_histogram0) / (2 * sizeof(dInt32)); i++)
-			{
-				dInt32 a = context.m_sizes[j]->m_histogram1[k][i];
-				context.m_sizes[j]->m_histogram1[k][i] = context.m_acc.m_histogram1[k][i] + context.m_scan.m_histogram1[k][i];
-				context.m_acc.m_histogram1[k][i] += a;
-			}
-		}
-	}
-}
-
-void ndBodySphFluid::SortTest(const ndWorld* const world, dInt32 pass, dInt32 threadId, ndContext& context)
-{
-	const dInt32 count = m_hashGridMap.GetCount();
-	dInt32 threadCount = world->GetThreadCount();
-	const dInt32 size = count / threadCount;
-	const dInt32 start = threadId * size;
-	const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
-
-	ndGridHash* const hashArray = (pass & 1) ? &m_hashGridMapScratchBuffer[start] : &m_hashGridMap[start];
-	ndGridHash* const tmpArray = (pass & 1) ? &m_hashGridMap[0] : &m_hashGridMapScratchBuffer[0];
-
-	dInt32 shiftbits = pass * 10;
-	dUnsigned64 mask = ~dUnsigned64(dInt64(-1 << 10));
-	mask = mask << shiftbits;
-	if (pass)
-	{
-		dInt32* const histogram = context.m_sizes[threadId]->m_histogram1[pass - 1];
-		for (dInt32 i = 0; i < batchSize; i++)
-		{
-			const ndGridHash& entry = hashArray[i];
-			const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-			const dInt32 index = histogram[key];
-			tmpArray[index] = entry;
-			histogram[key] = index + 1;
-		}
-	}
-	else
-	{
-		dInt32* const histogram = context.m_sizes[threadId]->m_histogram0;
-		for (dInt32 i = 0; i < batchSize; i++)
-		{
-			const ndGridHash& entry = hashArray[i];
-			const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits) * 2 + entry.m_cellType;
-			//const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-			const dInt32 index = histogram[key];
-			tmpArray[index] = entry;
-			histogram[key] = index + 1;
+			dInt32 a = context.m_histogram[threadId][i];
+			context.m_histogram[threadId][i] = acc[i] + context.m_scan[i];
+			acc[i] += a;
 		}
 	}
 }
@@ -645,41 +576,43 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 		virtual void Execute()
 		{
 			D_TRACKTIME();
+
 			ndWorld* const world = m_owner->GetWorld();
 			ndContext* const context = (ndContext*)m_context;
 			ndBodySphFluid* const fluid = context->m_fluid;
 			const dInt32 threadId = GetThredID();
 			const dInt32 threadCount = world->GetThreadCount();
-
-			ndCounters* const counter = context->m_sizes[threadId];
-
+			
 			const dInt32 count = fluid->m_hashGridMap.GetCount();
 			const dInt32 size = count / threadCount;
 			const dInt32 start = threadId * size;
 			const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
-
+			
 			ndGridHash* const hashArray = &fluid->m_hashGridMap[start];
-			for (dInt32 i = 0; i < batchSize; i++)
+			dInt32* const histogram = context->m_histogram[threadId];
+			if (context->m_pass)
 			{
-				const ndGridHash& entry = hashArray[i];
-				const dInt32 xlow = dInt32(entry.m_xLow * 2 + entry.m_cellType);
-				//const dInt32 xlow = dInt32(entry.m_xLow);
-				counter->m_histogram0[xlow] += 1;
+				memset(histogram, 0, sizeof(context->m_scan)/2);
+				dInt32 shiftbits = context->m_pass * 10;
+				dUnsigned64 mask = ~dUnsigned64(dInt64(-1 << 10));
+				mask = mask << shiftbits;
 
-				const dInt32 xHigh = entry.m_xHigh;
-				counter->m_histogram1[0][xHigh] += 1;
-
-				const dInt32 ylow = entry.m_yLow;
-				counter->m_histogram1[1][ylow] += 1;
-
-				const dInt32 yHigh = entry.m_yHigh;
-				counter->m_histogram1[2][yHigh] += 1;
-
-				const dInt32 zlow = entry.m_zLow;
-				counter->m_histogram1[3][zlow] += 1;
-
-				const dInt32 zHigh = entry.m_zHigh;
-				counter->m_histogram1[4][zHigh] += 1;
+				for (dInt32 i = 0; i < batchSize; i++)
+				{
+					const ndGridHash& entry = hashArray[i];
+					const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
+					histogram[key] += 1;
+				}
+			}
+			else
+			{
+				memset(histogram, 0, sizeof(context->m_scan));
+				for (dInt32 i = 0; i < batchSize; i++)
+				{
+					const ndGridHash& entry = hashArray[i];
+					const dInt32 xlow = dInt32(entry.m_xLow * 2 + entry.m_cellType);
+					histogram[xlow] += 1;
+				}
 			}
 		}
 	};
@@ -691,44 +624,75 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndContext* const context = (ndContext*)m_context;
-			const dInt32 id = GetThredID();
+			const dInt32 threadId = GetThredID();
 			const dInt32 threadCount = world->GetThreadCount();
+			
+			const dInt32 count = context->m_pass ? sizeof (context->m_scan) / sizeof (dInt32) : sizeof(context->m_scan) / (2 * sizeof(dInt32));
+			const dInt32 size = count / threadCount;
+			const dInt32 start = threadId * size;
+			const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
 
-			ndCounters** const counters = context->m_sizes;
-
-			const dInt32 count0 = sizeof(ndCounters::m_histogram0) / sizeof(dInt32);
-			const dInt32 size0 = count0 / threadCount;
-			const dInt32 start0 = id * size0;
-			const dInt32 batchSize0 = (id == threadCount - 1) ? count0 - start0 : size0;
-
-			for (dInt32 i = 0; i < batchSize0; i++)
+			dInt32* const scan = context->m_scan;
+			for (dInt32 i = 0; i < batchSize; i++)
 			{
 				dInt32 acc = 0;
 				for (dInt32 j = 0; j < threadCount; j++)
 				{
-					acc += counters[j]->m_histogram0[i + start0];
+					acc += context->m_histogram[j][i + start];
 				}
-				context->m_scan.m_histogram0[i + start0] = acc;
+				scan[i + start] = acc;
 			}
+		}
+	};
 
-			const dInt32 count1 = count0/2;
-			const dInt32 size1 = count1 / threadCount;
-			const dInt32 start1 = id * size1;
-			const dInt32 batchSize1 = (id == threadCount - 1) ? count1 - start1 : size1;
-			for (dInt32 i = 0; i < batchSize1; i++)
-			{ 
-				for (dInt32 k = 0; k < 5; k++)
+	class ndBodySphFluidSortBuckects : public ndScene::ndBaseJob
+	{
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			ndContext* const context = (ndContext*)m_context;
+			ndBodySphFluid* const fluid = context->m_fluid;
+			const dInt32 threadId = GetThredID();
+			const dInt32 threadCount = world->GetThreadCount();
+
+			const dInt32 count = fluid->m_hashGridMap.GetCount();
+			const dInt32 size = count / threadCount;
+			const dInt32 start = threadId * size;
+			const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
+
+			ndGridHash* const srcArray = (context->m_pass & 1) ? &fluid->m_hashGridMapScratchBuffer[start] : &fluid->m_hashGridMap[start];
+			ndGridHash* const dstArray = (context->m_pass & 1) ? &fluid->m_hashGridMap[0] : &fluid->m_hashGridMapScratchBuffer[0];
+
+			dInt32 shiftbits = context->m_pass * 10;
+			dUnsigned64 mask = ~dUnsigned64(dInt64(-1 << 10));
+			mask = mask << shiftbits;
+			dInt32* const histogram = context->m_histogram[threadId];
+			if (context->m_pass)
+			{
+				for (dInt32 i = 0; i < batchSize; i++)
 				{
-					dInt32 acc = 0;
-					for (dInt32 j = 0; j < threadCount; j++)
-					{
-						acc += counters[j]->m_histogram1[k][i + start1];
-					}
-					context->m_scan.m_histogram1[k][i + start1] = acc;
+					const ndGridHash& entry = srcArray[i];
+					const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
+					const dInt32 index = histogram[key];
+					dstArray[index] = entry;
+					histogram[key] = index + 1;
+				}
+			}
+			else
+			{
+				for (dInt32 i = 0; i < batchSize; i++)
+				{
+					const ndGridHash& entry = srcArray[i];
+					const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits) * 2 + entry.m_cellType;
+					const dInt32 index = histogram[key];
+					dstArray[index] = entry;
+					histogram[key] = index + 1;
 				}
 			}
 		}
 	};
+
 	
 	const dInt32 threadCount = world->GetThreadCount();
 	m_hashGridMapScratchBuffer.SetCount(m_hashGridMap.GetCount());
@@ -741,46 +705,37 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 	{
 		ndScene* const scene = world->GetScene();
 
-		//m_hashGridMap.SetCount(6);
-		//m_hashGridMap[0].m_gridHash = 0; m_hashGridMap[0].m_x = 2; m_hashGridMap[0].m_cellType = ndHomeGrid;
-		//m_hashGridMap[1].m_gridHash = 0; m_hashGridMap[1].m_x = 0; m_hashGridMap[1].m_cellType = ndHomeGrid;
-		//m_hashGridMap[2].m_gridHash = 0; m_hashGridMap[2].m_x = 2; m_hashGridMap[2].m_cellType = ndHomeGrid;
-		//m_hashGridMap[3].m_gridHash = 0; m_hashGridMap[3].m_x = 1; m_hashGridMap[3].m_cellType = ndHomeGrid;
-		//m_hashGridMap[4].m_gridHash = 0; m_hashGridMap[4].m_x = 0; m_hashGridMap[4].m_cellType = ndHomeGrid;
-		//m_hashGridMap[5].m_gridHash = 0; m_hashGridMap[5].m_x = 3; m_hashGridMap[5].m_cellType = ndHomeGrid;
-		//memset(&m_hashGridMapScratchBuffer[0], 9, 6 * sizeof(ndGridHash));
-		for (int i = 0; i < 8; i++)
-		{
-			m_hashGridMap[i].m_x = 0;
-			//m_hashGridMap[i].m_y = 0;
-			//m_hashGridMap[i].m_z = 0;
-		}
-SortBatch(world, 0, 1);
+		//for (int i = 0; i < 16; i++)
+		//{
+		//	m_hashGridMap[i].m_cellType = ndHomeGrid;
+		//	m_hashGridMap[i].m_x = 0;
+		//	m_hashGridMap[i].m_y = 0;
+		//	m_hashGridMap[i].m_z = 0;
+		//}
+
+//SortBatch(world, 0, 1);
 
 		ndContext context;
-		ndCounters* const counters = dAlloca(ndCounters, threadCount);
-		memset(counters, 0, threadCount * sizeof(ndCounters));
-
 		context.m_fluid = this;
-		for (dInt32 i = 0; i < threadCount; i++)
-		{
-			context.m_sizes[i] = &counters[i];
-		}
-
-		scene->SubmitJobs<ndBodySphFluidCountDigits>(&context);
-		scene->SubmitJobs<ndBodySphFluidAddPartialSum>(&context);
-		AddCounters(world, context);
-		
 		for (dInt32 pass = 0; pass < 6; pass++)
 		{
-			for (dInt32 threadID = 0; threadID < threadCount; threadID++)
+			context.m_pass = pass;
+			scene->SubmitJobs<ndBodySphFluidCountDigits>(&context);
+			scene->SubmitJobs<ndBodySphFluidAddPartialSum>(&context);
+			
+			dInt32 acc = 0;
+			for (dInt32 i = 0; i < sizeof(context.m_scan) / sizeof(dInt32); i++)
 			{
-				SortTest(world, pass, threadID, context);
+				dInt32 sum = context.m_scan[i];
+				context.m_scan[i] = acc;
+				acc += sum;
 			}
-		}
+			AddCounters(world, context);
+		
+			scene->SubmitJobs<ndBodySphFluidSortBuckects>(&context);
+		}	
 	}
 
-SortBatch(world, 0, 1);
 #ifdef _DEBUG
 	for (dInt32 i = 0; i < (m_hashGridMap.GetCount() - 1); i++)
 	{

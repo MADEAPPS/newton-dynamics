@@ -101,25 +101,25 @@ class ndBodySphFluid: public ndBodyParticleSet
 	};
 
 #ifndef D_USED_OLD_SORT
-	class ndCounters
-	{
-		public:
-		dInt32 m_histogram0[1 << 11];
-		dInt32 m_histogram1[5][1 << 10];
-	};
+	//class ndCounters
+	//{
+	//	public:
+	//	//dInt32 m_histogram0[1 << 11];
+	//	//dInt32 m_histogram1[5][1 << 10];
+	//	//dInt32 m_histogram1[1 << 10];
+	//	dInt32 m_histogram[2][1 << 11];
+	//};
 
 	class ndContext
 	{
 		public:
 		ndBodySphFluid* m_fluid;
-		ndCounters m_scan;
-		ndCounters m_acc;
-		ndCounters* m_sizes[D_MAX_THREADS_COUNT];
+		dInt32 m_pass;
+		dInt32 m_scan[1 << 11];
+		dInt32 m_histogram[D_MAX_THREADS_COUNT][1 << 11];
 	};
 
 	void AddCounters(const ndWorld* const world, ndContext& context) const;
-
-	void SortTest(const ndWorld* const world, dInt32 pass, dInt32 threadIndex, ndContext& context);
 
 #endif
 
