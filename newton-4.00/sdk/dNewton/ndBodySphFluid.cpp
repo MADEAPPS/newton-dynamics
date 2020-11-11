@@ -90,7 +90,7 @@ void ndBodySphFluid::Update(const ndWorld* const world, dFloat32 timestep)
 void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 {
 	D_TRACKTIME();
-	if (m_hashGridMap.GetCapacity() < m_posit.GetCount() * 16)
+	if (m_hashGridMap.GetCount() < m_posit.GetCount() * 16)
 	{
 		m_hashGridMap.SetCount(m_posit.GetCount() * 16);
 	}
@@ -124,7 +124,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 				if (m_scratchBufferCount >= D_BASH_SIZE)
 				{
 					dInt32 entry = m_fluid->m_iterator.fetch_add(m_scratchBufferCount);
-					dAssert(m_fluid->m_iterator.load() < m_fluid->m_hashGridMap.GetCapacity());
+					dAssert(m_fluid->m_iterator.load() < m_fluid->m_hashGridMap.GetCount());
 					memcpy(&m_fluid->m_hashGridMap[entry], m_scratchBuffer, m_scratchBufferCount * sizeof(ndGridHash));
 					m_scratchBufferCount = 0;
 				}
@@ -166,7 +166,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			if (m_scratchBufferCount)
 			{
 				dInt32 entry = m_fluid->m_iterator.fetch_add(m_scratchBufferCount);
-				dAssert(m_fluid->m_iterator.load() < m_fluid->m_hashGridMap.GetCapacity());
+				dAssert(m_fluid->m_iterator.load() < m_fluid->m_hashGridMap.GetCount());
 				memcpy(&m_fluid->m_hashGridMap[entry], m_scratchBuffer, m_scratchBufferCount * sizeof(ndGridHash));
 			}
 		}
@@ -181,7 +181,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 		ndGridHash m_scratchBuffer[D_BASH_SIZE + 64];
 	};
 
-	if (m_hashGridMap.GetCapacity() < m_posit.GetCount() * 16)
+	if (m_hashGridMap.GetCount() < m_posit.GetCount() * 16)
 	{
 		m_hashGridMap.SetCount(m_posit.GetCount() * 16);
 	}
