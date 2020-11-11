@@ -210,10 +210,10 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 	memset(histogram0, 0, sizeof(histogram0));
 	memset(histogram1, 0, sizeof(histogram1));
 
-	ndGridHash* const hashArray = &m_hashGridMap[start];
+	ndGridHash* srcArray = &m_hashGridMap[start];
 	for (dInt32 i = 0; i < batchSize; i++)
 	{
-		const ndGridHash& entry = hashArray[i];
+		const ndGridHash& entry = srcArray[i];
 
 		const dInt32 xlow = dInt32(entry.m_xLow * 2 + entry.m_cellType);
 		histogram0[xlow] = histogram0[xlow] + 1;
@@ -255,32 +255,32 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 
 	dInt32 shiftbits = 0;
 	dUnsigned64 mask = ~dUnsigned64(dInt64(-1 << 10));
-	ndGridHash* const tmpArray = &m_hashGridMapScratchBuffer[start];
-
+	ndGridHash* dstArray = &m_hashGridMapScratchBuffer[start];
 	for (dInt32 i = 0; i < batchSize; i++)
 	{
-		const ndGridHash& entry = hashArray[i];
+		const ndGridHash& entry = srcArray[i];
 		const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits) * 2 + entry.m_cellType;
 		const dInt32 index = histogram0[key];
-		tmpArray[index] = entry;
+		dstArray[index] = entry;
 		histogram0[key] = index + 1;
 	}
 	mask <<= 10;
 	shiftbits += 10;
+	dSwap(dstArray, srcArray);
 
-//	if (m_upperDigisIsValid[0]) 
+	if (m_upperDigisIsValid[0]) 
 	{
 		dInt32* const scan2 = &histogram1[0][0];
 		for (dInt32 i = 0; i < batchSize; i++)
 		{
-			const ndGridHash& entry = tmpArray[i];
+			const ndGridHash& entry = dstArray[i];
 			const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
 			const dInt32 index = scan2[key];
-			hashArray[index] = entry;
+			srcArray[index] = entry;
 			scan2[key] = index + 1;
 		}
+		dSwap(dstArray, srcArray);
 	}
-
 	mask <<= 10;
 	shiftbits += 10;
 
@@ -289,27 +289,37 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 		dInt32* const scan0 = &histogram1[radix * 2 + 1][0];
 		for (dInt32 i = 0; i < batchSize; i++)
 		{
-			const ndGridHash& entry = hashArray[i];
+			const ndGridHash& entry = srcArray[i];
 			const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
 			const dInt32 index = scan0[key];
-			tmpArray[index] = entry;
+			dstArray[index] = entry;
 			scan0[key] = index + 1;
 		}
 		mask <<= 10;
 		shiftbits += 10;
+		dSwap(dstArray, srcArray);
 
-		dInt32* const scan1 = &histogram1[radix * 2 + 2][0];
-		for (dInt32 i = 0; i < batchSize; i++)
+		if (m_upperDigisIsValid[radix + 1])
 		{
-			const ndGridHash& entry = tmpArray[i];
-			const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-			const dInt32 index = scan1[key];
-			hashArray[index] = entry;
-			scan1[key] = index + 1;
+			dInt32* const scan1 = &histogram1[radix * 2 + 2][0];
+			for (dInt32 i = 0; i < batchSize; i++)
+			{
+				const ndGridHash& entry = dstArray[i];
+				const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
+				const dInt32 index = scan1[key];
+				srcArray[index] = entry;
+				scan1[key] = index + 1;
+			}
+			dSwap(dstArray, srcArray);
 		}
 		mask <<= 10;
 		shiftbits += 10;
 	}
+	if (srcArray != &m_hashGridMap[0])
+	{
+		m_hashGridMap.Swap(m_hashGridMapScratchBuffer);
+	}
+	dAssert(srcArray == &m_hashGridMap[0]);
 }
 
 #ifdef D_USED_MERGE_SORT
