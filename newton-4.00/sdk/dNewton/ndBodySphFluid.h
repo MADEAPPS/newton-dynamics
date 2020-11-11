@@ -101,14 +101,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 	};
 
 #ifndef D_USED_MERGE_SORT
-	//class ndCounters
-	//{
-	//	public:
-	//	//dInt32 m_histogram0[1 << 11];
-	//	//dInt32 m_histogram1[5][1 << 10];
-	//	//dInt32 m_histogram1[1 << 10];
-	//	dInt32 m_histogram[2][1 << 11];
-	//};
 
 	class ndContext
 	{

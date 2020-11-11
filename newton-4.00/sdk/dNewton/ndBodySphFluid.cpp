@@ -661,8 +661,8 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 			const dInt32 start = threadId * size;
 			const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
 
-			ndGridHash* const srcArray = (context->m_pass & 1) ? &fluid->m_hashGridMapScratchBuffer[start] : &fluid->m_hashGridMap[start];
-			ndGridHash* const dstArray = (context->m_pass & 1) ? &fluid->m_hashGridMap[0] : &fluid->m_hashGridMapScratchBuffer[0];
+			ndGridHash* const srcArray = &fluid->m_hashGridMap[start];
+			ndGridHash* const dstArray = &fluid->m_hashGridMapScratchBuffer[0];
 
 			dInt32 shiftbits = context->m_pass * 10;
 			dUnsigned64 mask = ~dUnsigned64(dInt64(-1 << 10));
@@ -733,6 +733,7 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 			AddCounters(world, context);
 		
 			scene->SubmitJobs<ndBodySphFluidSortBuckects>(&context);
+			m_hashGridMap.Swap(m_hashGridMapScratchBuffer);
 		}	
 	}
 

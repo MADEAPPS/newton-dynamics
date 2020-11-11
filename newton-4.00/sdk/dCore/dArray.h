@@ -50,8 +50,8 @@ class dArray
 	T& operator[] (dInt32 i);
 	const T& operator[] (dInt32 i) const;
 
+	void Swap(dArray& other);
 	void PushBack(const T& element);
-	//void PushBack(const T element);
 
 	protected:
 	T* m_array;
@@ -188,6 +188,14 @@ void dArray<T>::Resize(dInt32 size)
 		m_array = newArray;
 		m_capacity = size;
 	}
+}
+
+template<class T>
+void dArray<T>::Swap(dArray& other)
+{
+	dSwap(m_array, other.m_array);
+	dSwap(m_size, other.m_size);
+	dSwap(m_capacity, other.m_capacity);
 }
 
 #endif
