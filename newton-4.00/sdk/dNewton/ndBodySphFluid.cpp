@@ -305,7 +305,7 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 	}
 }
 
-#ifdef D_USED_OLD_SORT
+#ifdef D_USED_MERGE_SORT
 
 void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 {

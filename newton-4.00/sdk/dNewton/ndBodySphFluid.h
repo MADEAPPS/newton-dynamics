@@ -25,7 +25,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndBodyParticleSet.h"
 
-//#define D_USED_OLD_SORT
+//#define D_USED_MERGE_SORT
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodySphFluid: public ndBodyParticleSet
@@ -100,7 +100,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 		ndGridType m_cellType;
 	};
 
-#ifndef D_USED_OLD_SORT
+#ifndef D_USED_MERGE_SORT
 	//class ndCounters
 	//{
 	//	public:
