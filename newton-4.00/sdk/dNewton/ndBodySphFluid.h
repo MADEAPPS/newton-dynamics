@@ -100,11 +100,34 @@ class ndBodySphFluid: public ndBodyParticleSet
 		ndGridType m_cellType;
 	};
 
+#ifndef D_USED_OLD_SORT
+	class ndCounters
+	{
+		public:
+		dInt32 m_histogram0[1 << 11];
+		dInt32 m_histogram1[5][1 << 10];
+	};
+
+	class ndContext
+	{
+		public:
+		ndBodySphFluid* m_fluid;
+		ndCounters m_scan;
+		ndCounters m_acc;
+		ndCounters* m_sizes[D_MAX_THREADS_COUNT];
+	};
+
+	void AddCounters(const ndWorld* const world, ndContext& context) const;
+
+	void SortTest(const ndWorld* const world, dInt32 pass, dInt32 threadIndex, ndContext& context);
+
+#endif
+
 	void UpdateAABB();
 	void SortBuckets(const ndWorld* const world);
 	void CreateGrids(const ndWorld* const world);
-
 	void SortBatch(const ndWorld* const world, dInt32 threadID);
+
 	dVector m_box0;
 	dVector m_box1;
 	dArray<ndGridHash> m_hashGridMap;

@@ -548,132 +548,97 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 
 #else
 
-void ndBodySphFluid::SortBuckets(const ndWorld* const world)
+void ndBodySphFluid::AddCounters(const ndWorld* const world, ndContext& context) const
 {
 	D_TRACKTIME();
-#if 0
-	const dInt32 count = m_hashGridMap.GetCount();
-	m_hashGridMapScratchBuffer.SetCount(count);
-
-	dInt32 histogram0[1 << 11];
-	dInt32 histogram1[5][1 << 10];
-	memset(histogram0, 0, sizeof(histogram0));
-	memset(histogram1, 0, sizeof(histogram1));
-
-	ndGridHash* const hashArray = &m_hashGridMap[0];
-	for (dInt32 i = 0; i < count; i++)
+	dInt32 acc[D_MAX_THREADS_COUNT];
+	acc[0] = 0;
+	for (dInt32 i = 0; i < sizeof(context.m_scan.m_histogram0) / sizeof(dInt32); i++)
 	{
-		const ndGridHash& entry = hashArray[i];
-
-		const dInt32 xlow = dInt32(entry.m_xLow * 2 + entry.m_cellType);
-		histogram0[xlow] = histogram0[xlow] + 1;
-
-		const dInt32 xHigh = entry.m_xHigh;
-		histogram1[0][xHigh] = histogram1[0][xHigh] + 1;
-
-		const dInt32 ylow = entry.m_yLow;
-		histogram1[1][ylow] = histogram1[1][ylow] + 1;
-
-		const dInt32 yHigh = entry.m_yHigh;
-		histogram1[2][yHigh] = histogram1[2][yHigh] + 1;
-
-		const dInt32 zlow = entry.m_zLow;
-		histogram1[3][zlow] = histogram1[3][zlow] + 1;
-
-		const dInt32 zHigh = entry.m_zHigh;
-		histogram1[4][zHigh] = histogram1[4][zHigh] + 1;
+		dInt32 a = context.m_scan.m_histogram0[i];
+		context.m_scan.m_histogram0[i] = acc[0];
+		acc[0] += a;
 	}
 
-	dInt32 acc0 = 0;
-	for (dInt32 i = 0; i < (1 << 11); i++)
-	{
-		const dInt32 n = histogram0[i];
-		histogram0[i] = acc0;
-		acc0 += n;
-	}
-	dInt32 acc[5];
 	memset(acc, 0, sizeof(acc));
-	for (dInt32 i = 0; i < (1 << 10); i++)
+	for (dInt32 i = 0; i < sizeof(context.m_scan.m_histogram0) / (2 * sizeof(dInt32)); i++)
 	{
 		for (dInt32 j = 0; j < 5; j++)
 		{
-			const dInt32 n = histogram1[j][i];
-			histogram1[j][i] = acc[j];
-			acc[j] += n;
+			dInt32 a = context.m_scan.m_histogram1[j][i];
+			context.m_scan.m_histogram1[j][i] = acc[j];
+			acc[j] += a;
 		}
 	}
 
-	dInt32 shiftbits = 0;
+	memset(&context.m_acc, 0, sizeof(ndCounters));
+	
+	const dInt32 threadCount = world->GetThreadCount();
+	for (dInt32 j = 0; j < threadCount; j++)
+	{
+		for (dInt32 i = 0; i < sizeof(context.m_scan.m_histogram0) / sizeof(dInt32); i++)
+		{
+			dInt32 a = context.m_sizes[j]->m_histogram0[i];
+			context.m_sizes[j]->m_histogram0[i] = context.m_acc.m_histogram0[i] + context.m_scan.m_histogram0[i];
+			context.m_acc.m_histogram0[i] += a;
+		}
+
+		for (dInt32 k = 0; k < 5; k++)
+		{
+			for (dInt32 i = 0; i < sizeof(context.m_scan.m_histogram0) / (2 * sizeof(dInt32)); i++)
+			{
+				dInt32 a = context.m_sizes[j]->m_histogram1[k][i];
+				context.m_sizes[j]->m_histogram1[k][i] = context.m_acc.m_histogram1[k][i] + context.m_scan.m_histogram1[k][i];
+				context.m_acc.m_histogram1[k][i] += a;
+			}
+		}
+	}
+}
+
+void ndBodySphFluid::SortTest(const ndWorld* const world, dInt32 pass, dInt32 threadId, ndContext& context)
+{
+	const dInt32 count = m_hashGridMap.GetCount();
+	dInt32 threadCount = world->GetThreadCount();
+	const dInt32 size = count / threadCount;
+	const dInt32 start = threadId * size;
+	const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
+
+	ndGridHash* const hashArray = (pass & 1) ? &m_hashGridMapScratchBuffer[start] : &m_hashGridMap[start];
+	ndGridHash* const tmpArray = (pass & 1) ? &m_hashGridMap[0] : &m_hashGridMapScratchBuffer[0];
+
+	dInt32 shiftbits = pass * 10;
 	dUnsigned64 mask = ~dUnsigned64(dInt64(-1 << 10));
-	ndGridHash* const tmpArray = &m_hashGridMapScratchBuffer[0];
-
-	for (dInt32 i = 0; i < count; i++)
+	mask = mask << shiftbits;
+	if (pass)
 	{
-		const ndGridHash& entry = hashArray[i];
-		const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits) * 2 + entry.m_cellType;
-		const dInt32 index = histogram0[key];
-		tmpArray[index] = entry;
-		histogram0[key] = index + 1;
-	}
-	mask <<= 10;
-	shiftbits += 10;
-
-	dInt32* const scan2 = &histogram1[0][0];
-	for (dInt32 i = 0; i < count; i++)
-	{
-		const ndGridHash& entry = tmpArray[i];
-		const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-		const dInt32 index = scan2[key];
-		hashArray[index] = entry;
-		scan2[key] = index + 1;
-	}
-	mask <<= 10;
-	shiftbits += 10;
-
-	for (dInt32 radix = 0; radix < 2; radix++)
-	{
-		dInt32* const scan0 = &histogram1[radix * 2 + 1][0];
-		for (dInt32 i = 0; i < count; i++)
+		dInt32* const histogram = context.m_sizes[threadId]->m_histogram1[pass - 1];
+		for (dInt32 i = 0; i < batchSize; i++)
 		{
 			const ndGridHash& entry = hashArray[i];
 			const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-			const dInt32 index = scan0[key];
+			const dInt32 index = histogram[key];
 			tmpArray[index] = entry;
-			scan0[key] = index + 1;
+			histogram[key] = index + 1;
 		}
-		mask <<= 10;
-		shiftbits += 10;
-
-		dInt32* const scan1 = &histogram1[radix * 2 + 2][0];
-		for (dInt32 i = 0; i < count; i++)
-		{
-			const ndGridHash& entry = tmpArray[i];
-			const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
-			const dInt32 index = scan1[key];
-			hashArray[index] = entry;
-			scan1[key] = index + 1;
-		}
-		mask <<= 10;
-		shiftbits += 10;
 	}
-#else
-
-	class ndCounters
+	else
 	{
-		public:
-		dInt32 m_histogram0[1 << 11];
-		dInt32 m_histogram1[5][1 << 10];
-	};
+		dInt32* const histogram = context.m_sizes[threadId]->m_histogram0;
+		for (dInt32 i = 0; i < batchSize; i++)
+		{
+			const ndGridHash& entry = hashArray[i];
+			const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits) * 2 + entry.m_cellType;
+			//const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
+			const dInt32 index = histogram[key];
+			tmpArray[index] = entry;
+			histogram[key] = index + 1;
+		}
+	}
+}
 
-	class ndContext
-	{
-		public:
-		ndBodySphFluid* m_fluid;
-		ndCounters m_scan;
-		ndCounters m_acc;
-		ndCounters* m_sizes[D_MAX_THREADS_COUNT];
-	};
-
+void ndBodySphFluid::SortBuckets(const ndWorld* const world)
+{
+	D_TRACKTIME();
 	class ndBodySphFluidCountDigits : public ndScene::ndBaseJob
 	{
 		virtual void Execute()
@@ -696,9 +661,8 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 			for (dInt32 i = 0; i < batchSize; i++)
 			{
 				const ndGridHash& entry = hashArray[i];
-
-				//const dInt32 xlow = dInt32(entry.m_xLow * 2 + entry.m_cellType);
-				const dInt32 xlow = dInt32(entry.m_xLow);
+				const dInt32 xlow = dInt32(entry.m_xLow * 2 + entry.m_cellType);
+				//const dInt32 xlow = dInt32(entry.m_xLow);
 				counter->m_histogram0[xlow] += 1;
 
 				const dInt32 xHigh = entry.m_xHigh;
@@ -776,13 +740,14 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 	{
 		ndScene* const scene = world->GetScene();
 
-		//m_hashGridMap.SetCount(6);
-		//m_hashGridMap[0].m_gridHash = 0; m_hashGridMap[0].m_x = 2; m_hashGridMap[0].m_cellType = ndHomeGrid;
-		//m_hashGridMap[1].m_gridHash = 0; m_hashGridMap[1].m_x = 0; m_hashGridMap[1].m_cellType = ndHomeGrid;
-		//m_hashGridMap[2].m_gridHash = 0; m_hashGridMap[2].m_x = 2; m_hashGridMap[2].m_cellType = ndHomeGrid;
-		//m_hashGridMap[3].m_gridHash = 0; m_hashGridMap[3].m_x = 1; m_hashGridMap[3].m_cellType = ndHomeGrid;
-		//m_hashGridMap[4].m_gridHash = 0; m_hashGridMap[4].m_x = 0; m_hashGridMap[4].m_cellType = ndHomeGrid;
-		//m_hashGridMap[5].m_gridHash = 0; m_hashGridMap[5].m_x = 3; m_hashGridMap[5].m_cellType = ndHomeGrid;
+		m_hashGridMap.SetCount(6);
+		m_hashGridMap[0].m_gridHash = 0; m_hashGridMap[0].m_x = 2; m_hashGridMap[0].m_cellType = ndHomeGrid;
+		m_hashGridMap[1].m_gridHash = 0; m_hashGridMap[1].m_x = 0; m_hashGridMap[1].m_cellType = ndHomeGrid;
+		m_hashGridMap[2].m_gridHash = 0; m_hashGridMap[2].m_x = 2; m_hashGridMap[2].m_cellType = ndHomeGrid;
+		m_hashGridMap[3].m_gridHash = 0; m_hashGridMap[3].m_x = 1; m_hashGridMap[3].m_cellType = ndHomeGrid;
+		m_hashGridMap[4].m_gridHash = 0; m_hashGridMap[4].m_x = 0; m_hashGridMap[4].m_cellType = ndHomeGrid;
+		m_hashGridMap[5].m_gridHash = 0; m_hashGridMap[5].m_x = 3; m_hashGridMap[5].m_cellType = ndHomeGrid;
+		memset(&m_hashGridMapScratchBuffer[0], 9, 6 * sizeof(ndGridHash));
 
 		ndContext context;
 		ndCounters* const counters = dAlloca(ndCounters, threadCount);
@@ -796,65 +761,26 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 
 		scene->SubmitJobs<ndBodySphFluidCountDigits>(&context);
 		scene->SubmitJobs<ndBodySphFluidAddPartialSum>(&context);
-
+		AddCounters(world, context);
+		
+		for (dInt32 pass = 0; pass < 6; pass++)
 		{
-			//D_TRACKTIME();
-			dInt32 acc[D_MAX_THREADS_COUNT];
-			acc[0] = 0;
-			for (dInt32 i = 0; i < sizeof(context.m_scan.m_histogram0) / sizeof(dInt32); i++)
+			for (dInt32 threadID = 0; threadID < threadCount; threadID++)
 			{
-				dInt32 a = context.m_scan.m_histogram0[i];
-				context.m_scan.m_histogram0[i] = acc[0];
-				acc[0] += a;
-			}
-
-			memset(acc, 0, sizeof(acc));
-			for (dInt32 i = 0; i < sizeof(context.m_scan.m_histogram0) / (2 * sizeof(dInt32)); i++)
-			{
-				for (dInt32 j = 0; j < 5; j++)
-				{
-					dInt32 a = context.m_scan.m_histogram1[j][i];
-					context.m_scan.m_histogram1[j][i] = acc[j];
-					acc[j] += a;
-				}
-			}
-
-			memset(&context.m_acc, 0, sizeof(ndCounters));
-			D_TRACKTIME();
-			for (dInt32 j = 0; j < threadCount; j++)
-			{
-				for (dInt32 i = 0; i < sizeof(context.m_scan.m_histogram0) / sizeof(dInt32); i++)
-				{
-					dInt32 a = context.m_sizes[j]->m_histogram0[i];
-					context.m_sizes[j]->m_histogram0[i] = context.m_acc.m_histogram0[i] + context.m_scan.m_histogram0[i];
-					context.m_acc.m_histogram0[i] += a;
-				}
-
-				for (dInt32 k = 0; k < 5; k++)
-				{
-					for (dInt32 i = 0; i < sizeof(context.m_scan.m_histogram0) / (2 * sizeof(dInt32)); i++)
-					{
-						dInt32 a = context.m_sizes[j]->m_histogram1[k][i];
-						context.m_sizes[j]->m_histogram1[k][i] = context.m_acc.m_histogram1[k][i] + context.m_scan.m_histogram1[k][i];
-						context.m_acc.m_histogram1[k][i] += a;
-					}
-				}
+				SortTest(world, pass, threadID, context);
 			}
 		}
-
-		//dAssert(0);
 	}
-#endif
 
 #ifdef _DEBUG
-	//for (dInt32 i = 0; i < (m_hashGridMap.GetCount() - 1); i++)
-	//{
-	//	const ndGridHash& entry0 = m_hashGridMap[i + 0];
-	//	const ndGridHash& entry1 = m_hashGridMap[i + 1];
-	//	dUnsigned64 gridHashA = entry0.m_gridHash * 2 + entry0.m_cellType;
-	//	dUnsigned64 gridHashB = entry1.m_gridHash * 2 + entry1.m_cellType;
-	//	dAssert(gridHashA <= gridHashB);
-	//}
+	for (dInt32 i = 0; i < (m_hashGridMap.GetCount() - 1); i++)
+	{
+		const ndGridHash& entry0 = m_hashGridMap[i + 0];
+		const ndGridHash& entry1 = m_hashGridMap[i + 1];
+		dUnsigned64 gridHashA = entry0.m_gridHash * 2 + entry0.m_cellType;
+		dUnsigned64 gridHashB = entry1.m_gridHash * 2 + entry1.m_cellType;
+		dAssert(gridHashA <= gridHashB);
+	}
 #endif
 }
 
