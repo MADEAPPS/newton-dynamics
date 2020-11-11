@@ -25,7 +25,6 @@
 #include "ndNewtonStdafx.h"
 #include "ndBodyParticleSet.h"
 
-//#define D_USED_MERGE_SORT
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodySphFluid: public ndBodyParticleSet
@@ -100,8 +99,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 		ndGridType m_cellType;
 	};
 
-#ifndef D_USED_MERGE_SORT
-
 	class ndContext
 	{
 		public:
@@ -111,13 +108,10 @@ class ndBodySphFluid: public ndBodyParticleSet
 		dInt32 m_histogram[D_MAX_THREADS_COUNT][1 << 11];
 	};
 
-	void AddCounters(const ndWorld* const world, ndContext& context) const;
-
-#endif
-
 	void UpdateAABB();
 	void SortBuckets(const ndWorld* const world);
 	void CreateGrids(const ndWorld* const world);
+	void AddCounters(const ndWorld* const world, ndContext& context) const;
 	void SortBatch(const ndWorld* const world, const dInt32 threadId, const dInt32 threadCount);
 
 	dVector m_box0;
