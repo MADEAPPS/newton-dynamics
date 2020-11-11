@@ -191,15 +191,16 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 	m_hashGridMap.SetCount(m_iterator.load());
 }
 
-void ndBodySphFluid::SortBatch(const ndWorld* const world, dInt32 threadID)
+void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId, const dInt32 threadCount)
 {
-	dInt32 threadCount = world->GetThreadCount();
+	//const dInt32 threadCount = world->GetThreadCount();
+	//const dInt32 threadCount = 1;
 
 	const dInt32 count = m_hashGridMap.GetCount();
 
 	const dInt32 size = count / threadCount;
-	const dInt32 start = threadID * size;
-	const dInt32 batchSize = (threadID == threadCount - 1) ? count - start : size;
+	const dInt32 start = threadId * size;
+	const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
 
 	dInt32 histogram0[1 << 11];
 	dInt32 histogram1[5][1 << 10];
@@ -647,15 +648,15 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 			ndWorld* const world = m_owner->GetWorld();
 			ndContext* const context = (ndContext*)m_context;
 			ndBodySphFluid* const fluid = context->m_fluid;
-			const dInt32 id = GetThredID();
+			const dInt32 threadId = GetThredID();
 			const dInt32 threadCount = world->GetThreadCount();
 
-			ndCounters* const counter = context->m_sizes[id];
+			ndCounters* const counter = context->m_sizes[threadId];
 
 			const dInt32 count = fluid->m_hashGridMap.GetCount();
 			const dInt32 size = count / threadCount;
-			const dInt32 start = id * size;
-			const dInt32 batchSize = (id == threadCount - 1) ? count - start : size;
+			const dInt32 start = threadId * size;
+			const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
 
 			ndGridHash* const hashArray = &fluid->m_hashGridMap[start];
 			for (dInt32 i = 0; i < batchSize; i++)
@@ -734,20 +735,27 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 	if (threadCount <= 1)
 	{
 		dAssert(threadCount == 1);
-		SortBatch(world, 0);
+		SortBatch(world, 0, 1);
 	}
 	else
 	{
 		ndScene* const scene = world->GetScene();
 
-		m_hashGridMap.SetCount(6);
-		m_hashGridMap[0].m_gridHash = 0; m_hashGridMap[0].m_x = 2; m_hashGridMap[0].m_cellType = ndHomeGrid;
-		m_hashGridMap[1].m_gridHash = 0; m_hashGridMap[1].m_x = 0; m_hashGridMap[1].m_cellType = ndHomeGrid;
-		m_hashGridMap[2].m_gridHash = 0; m_hashGridMap[2].m_x = 2; m_hashGridMap[2].m_cellType = ndHomeGrid;
-		m_hashGridMap[3].m_gridHash = 0; m_hashGridMap[3].m_x = 1; m_hashGridMap[3].m_cellType = ndHomeGrid;
-		m_hashGridMap[4].m_gridHash = 0; m_hashGridMap[4].m_x = 0; m_hashGridMap[4].m_cellType = ndHomeGrid;
-		m_hashGridMap[5].m_gridHash = 0; m_hashGridMap[5].m_x = 3; m_hashGridMap[5].m_cellType = ndHomeGrid;
-		memset(&m_hashGridMapScratchBuffer[0], 9, 6 * sizeof(ndGridHash));
+		//m_hashGridMap.SetCount(6);
+		//m_hashGridMap[0].m_gridHash = 0; m_hashGridMap[0].m_x = 2; m_hashGridMap[0].m_cellType = ndHomeGrid;
+		//m_hashGridMap[1].m_gridHash = 0; m_hashGridMap[1].m_x = 0; m_hashGridMap[1].m_cellType = ndHomeGrid;
+		//m_hashGridMap[2].m_gridHash = 0; m_hashGridMap[2].m_x = 2; m_hashGridMap[2].m_cellType = ndHomeGrid;
+		//m_hashGridMap[3].m_gridHash = 0; m_hashGridMap[3].m_x = 1; m_hashGridMap[3].m_cellType = ndHomeGrid;
+		//m_hashGridMap[4].m_gridHash = 0; m_hashGridMap[4].m_x = 0; m_hashGridMap[4].m_cellType = ndHomeGrid;
+		//m_hashGridMap[5].m_gridHash = 0; m_hashGridMap[5].m_x = 3; m_hashGridMap[5].m_cellType = ndHomeGrid;
+		//memset(&m_hashGridMapScratchBuffer[0], 9, 6 * sizeof(ndGridHash));
+		for (int i = 0; i < 8; i++)
+		{
+			m_hashGridMap[i].m_x = 0;
+			//m_hashGridMap[i].m_y = 0;
+			//m_hashGridMap[i].m_z = 0;
+		}
+SortBatch(world, 0, 1);
 
 		ndContext context;
 		ndCounters* const counters = dAlloca(ndCounters, threadCount);
@@ -772,6 +780,7 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 		}
 	}
 
+SortBatch(world, 0, 1);
 #ifdef _DEBUG
 	for (dInt32 i = 0; i < (m_hashGridMap.GetCount() - 1); i++)
 	{

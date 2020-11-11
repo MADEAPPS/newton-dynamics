@@ -126,7 +126,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	void UpdateAABB();
 	void SortBuckets(const ndWorld* const world);
 	void CreateGrids(const ndWorld* const world);
-	void SortBatch(const ndWorld* const world, dInt32 threadID);
+	void SortBatch(const ndWorld* const world, const dInt32 threadId, const dInt32 threadCount);
 
 	dVector m_box0;
 	dVector m_box1;

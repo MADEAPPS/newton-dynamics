@@ -92,19 +92,19 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 
 	fluidObject->SetParticleRadius(diameter * 0.5f);
 
-	dInt32 particleCountPerAxis = 32;
-	//dInt32 particleCountPerAxis = 5;
+	//dInt32 particleCountPerAxis = 32;
+	dInt32 particleCountPerAxis = 1;
 	dFloat32 spacing = diameter * 1.0f;
 
 	dFloat32 offset = spacing * particleCountPerAxis / 2.0f;
 	dVector origin(-offset, 1.0f, -offset, dFloat32(0.0f));
 	origin += matrix.m_posit;
 	
-	for (dInt32 z = 0; z < particleCountPerAxis; z++)
-	//for (dInt32 z = 0; z < 1; z++)
+	//for (dInt32 z = 0; z < particleCountPerAxis; z++)
+	for (dInt32 z = 0; z < 1; z++)
 	{
-		for (dInt32 y = 0; y < particleCountPerAxis; y++)
-		//for (dInt32 y = 0; y < 1; y++)
+		//for (dInt32 y = 0; y < particleCountPerAxis; y++)
+		for (dInt32 y = 0; y < 1; y++)
 		{
 			for (dInt32 x = 0; x < particleCountPerAxis; x++)
 			{
