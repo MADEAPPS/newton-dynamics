@@ -46,6 +46,7 @@
 #include <dClassAlloc.h>
 #include <dRefCounter.h>
 #include <dThreadPool.h>
+#include <dIsoSurface.h>
 #include <dQuaternion.h>
 #include <dMeshEffect.h>
 #include <dTinyXmlGlue.h>
