@@ -26,10 +26,12 @@
 #define __D_ISO_SURFACE_H__
 
 #include "dCoreStdafx.h"
+#include "dTypes.h"
+#include "dArray.h"
+#include "dTree.h"
 
-
-#include <map>
-#include <vector>
+//#include <map>
+//#include <vector>
 
 struct POINT3DID 
 {
@@ -37,14 +39,14 @@ struct POINT3DID
 	dFloat32 x, y, z;
 };
 
-typedef std::map<dInt32, POINT3DID> ID2POINT3DID;
+//typedef std::map<dInt32, POINT3DID> ID2POINT3DID;
 
 struct TRIANGLE 
 {
 	dInt32 pointID[3];
 };
 
-typedef std::vector<TRIANGLE> TRIANGLEVECTOR;
+//typedef std::vector<TRIANGLE> TRIANGLEVECTOR;
 
 class dIsoSurface 
 {
@@ -87,10 +89,11 @@ class dIsoSurface
 	dVector* m_pvec3dNormals;
 
 	// List of POINT3Ds which form the iso surface.
-	ID2POINT3DID m_i2pt3idVertices;
+	//ID2POINT3DID m_i2pt3idVertices;
+	dTree<POINT3DID, dInt32> m_i2pt3idVertices;
 
 	// List of TRIANGLES which form the triangulation of the iso surface.
-	TRIANGLEVECTOR m_trivecTriangles;
+	dArray<TRIANGLE> m_trivecTriangles;
 
 	// Returns the edge ID.
 	dInt32 GetEdgeID(dInt32 nX, dInt32 nY, dInt32 nZ, dInt32 nEdgeNo);

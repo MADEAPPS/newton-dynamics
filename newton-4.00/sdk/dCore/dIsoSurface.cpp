@@ -398,19 +398,22 @@ void dIsoSurface::GenerateSurface(const dFloat32* ptScalarField, dFloat32 tIsoLe
 					{
 						POINT3DID pt = CalculateIntersection(x, y, z, 3);
 						dInt32 id = GetEdgeID(x, y, z, 3);
-						m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+						//m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+						m_i2pt3idVertices.Insert(pt, id);
 					}
 					if (m_edgeTable[tableIndex] & 1) 
 					{
 						POINT3DID pt = CalculateIntersection(x, y, z, 0);
 						dInt32 id = GetEdgeID(x, y, z, 0);
-						m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+						//m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+						m_i2pt3idVertices.Insert(pt, id);
 					}
 					if (m_edgeTable[tableIndex] & 256) 
 					{
 						POINT3DID pt = CalculateIntersection(x, y, z, 8);
 						dInt32 id = GetEdgeID(x, y, z, 8);
-						m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+						//m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+						m_i2pt3idVertices.Insert(pt, id);
 					}
 
 					if (x == m_nCellsX - 1) 
@@ -419,13 +422,15 @@ void dIsoSurface::GenerateSurface(const dFloat32* ptScalarField, dFloat32 tIsoLe
 						{
 							POINT3DID pt = CalculateIntersection(x, y, z, 2);
 							dInt32 id = GetEdgeID(x, y, z, 2);
-							m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							//m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							m_i2pt3idVertices.Insert(pt, id);
 						}
 						if (m_edgeTable[tableIndex] & 2048) 
 						{
 							POINT3DID pt = CalculateIntersection(x, y, z, 11);
 							dInt32 id = GetEdgeID(x, y, z, 11);
-							m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							//m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							m_i2pt3idVertices.Insert(pt, id);
 						}
 					}
 					if (y == m_nCellsY - 1) 
@@ -434,13 +439,15 @@ void dIsoSurface::GenerateSurface(const dFloat32* ptScalarField, dFloat32 tIsoLe
 						{
 							POINT3DID pt = CalculateIntersection(x, y, z, 1);
 							dInt32 id = GetEdgeID(x, y, z, 1);
-							m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							//m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							m_i2pt3idVertices.Insert(pt, id);
 						}
 						if (m_edgeTable[tableIndex] & 512) 
 						{
 							POINT3DID pt = CalculateIntersection(x, y, z, 9);
 							dInt32 id = GetEdgeID(x, y, z, 9);
-							m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							//m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							m_i2pt3idVertices.Insert(pt, id);
 						}
 					}
 					if (z == m_nCellsZ - 1) 
@@ -449,13 +456,15 @@ void dIsoSurface::GenerateSurface(const dFloat32* ptScalarField, dFloat32 tIsoLe
 						{
 							POINT3DID pt = CalculateIntersection(x, y, z, 4);
 							dInt32 id = GetEdgeID(x, y, z, 4);
-							m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							//m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							m_i2pt3idVertices.Insert(pt, id);
 						}
 						if (m_edgeTable[tableIndex] & 128) 
 						{
 							POINT3DID pt = CalculateIntersection(x, y, z, 7);
 							dInt32 id = GetEdgeID(x, y, z, 7);
-							m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							//m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							m_i2pt3idVertices.Insert(pt, id);
 						}
 					}
 					if ((x == m_nCellsX - 1) && (y == m_nCellsY - 1))
@@ -464,7 +473,8 @@ void dIsoSurface::GenerateSurface(const dFloat32* ptScalarField, dFloat32 tIsoLe
 						{
 							POINT3DID pt = CalculateIntersection(x, y, z, 10);
 							dInt32 id = GetEdgeID(x, y, z, 10);
-							m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							//m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							m_i2pt3idVertices.Insert(pt, id);
 						}
 					}
 					if ((x == m_nCellsX - 1) && (z == m_nCellsZ - 1))
@@ -473,7 +483,8 @@ void dIsoSurface::GenerateSurface(const dFloat32* ptScalarField, dFloat32 tIsoLe
 						{
 							POINT3DID pt = CalculateIntersection(x, y, z, 6);
 							dInt32 id = GetEdgeID(x, y, z, 6);
-							m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							//m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							m_i2pt3idVertices.Insert(pt, id);
 						}
 					}
 					if ((y == m_nCellsY - 1) && (z == m_nCellsZ - 1))
@@ -482,7 +493,8 @@ void dIsoSurface::GenerateSurface(const dFloat32* ptScalarField, dFloat32 tIsoLe
 						{
 							POINT3DID pt = CalculateIntersection(x, y, z, 5);
 							dInt32 id = GetEdgeID(x, y, z, 5);
-							m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							//m_i2pt3idVertices.insert(ID2POINT3DID::value_type(id, pt));
+							m_i2pt3idVertices.Insert(pt, id);
 						}
 					}
 
@@ -496,7 +508,8 @@ void dIsoSurface::GenerateSurface(const dFloat32* ptScalarField, dFloat32 tIsoLe
 						triangle.pointID[0] = pointID0;
 						triangle.pointID[1] = pointID1;
 						triangle.pointID[2] = pointID2;
-						m_trivecTriangles.push_back(triangle);
+						//m_trivecTriangles.push_back(triangle);
+						m_trivecTriangles.PushBack(triangle);
 					}
 				}
 			}
@@ -698,53 +711,77 @@ POINT3DID dIsoSurface::Interpolate(dFloat32 fX1, dFloat32 fY1, dFloat32 fZ1, dFl
 void dIsoSurface::RenameVerticesAndTriangles()
 {
 	dInt32 nextID = 0;
-	ID2POINT3DID::iterator mapIterator = m_i2pt3idVertices.begin();
-	TRIANGLEVECTOR::iterator vecIterator = m_trivecTriangles.begin();
+	//ID2POINT3DID::iterator mapIterator = m_i2pt3idVertices.begin();
+	//TRIANGLEVECTOR::iterator vecIterator = m_trivecTriangles.begin();
 
 	// Rename vertices.
-	while (mapIterator != m_i2pt3idVertices.end()) 
+	dTree<POINT3DID, dInt32>::Iterator mapIterator(m_i2pt3idVertices);
+	//while (mapIterator != m_i2pt3idVertices.end()) 
+	for (mapIterator.Begin(); mapIterator; mapIterator++)
 	{
-		(*mapIterator).second.newID = nextID;
+		//(*mapIterator).second.newID = nextID;
+		POINT3DID& point = *mapIterator;
+		point.newID = nextID;
 		nextID++;
-		mapIterator++;
+		//mapIterator++;
 	}
 
 	// Now rename triangles.
-	while (vecIterator != m_trivecTriangles.end()) 
+	//while (vecIterator != m_trivecTriangles.end()) 
+	for (dInt32 k = 0; k < m_trivecTriangles.GetCount(); k ++)
 	{
 		for (dInt32 i = 0; i < 3; i++) 
 		{
-			dInt32 newID = m_i2pt3idVertices[(*vecIterator).pointID[i]].newID;
-			(*vecIterator).pointID[i] = newID;
+			//dInt32 newID = m_i2pt3idVertices[(*vecIterator).pointID[i]].newID;
+			//(*vecIterator).pointID[i] = newID;
+			//dInt32 newID = m_i2pt3idVertices[m_trivecTriangles[k].pointID[i]].newID;
+			dTree<POINT3DID, dInt32>::dTreeNode* const node = m_i2pt3idVertices.Find(m_trivecTriangles[k].pointID[i]);
+			dAssert(node);
+			dInt32 newID = node->GetInfo().newID;
+			m_trivecTriangles[k].pointID[i] = newID;
 		}
-		vecIterator++;
+		//vecIterator++;
 	}
 
 	// Copy all the vertices and triangles into two arrays so that they
 	// can be efficiently accessed.
 	// Copy vertices.
-	mapIterator = m_i2pt3idVertices.begin();
-	m_nVertices = dInt32 (m_i2pt3idVertices.size());
+	//mapIterator = m_i2pt3idVertices.begin();
+	//m_nVertices = dInt32 (m_i2pt3idVertices.size());
+	m_nVertices = m_i2pt3idVertices.GetCount();
 	m_ppt3dVertices = new dVector[m_nVertices];
+
+	//dTree<POINT3DID, dInt32>::Iterator mapIterator(m_i2pt3idVertices);
+	mapIterator.Begin();
 	for (dInt32 i = 0; i < m_nVertices; i++, mapIterator++) 
 	{
-		m_ppt3dVertices[i][0] = (*mapIterator).second.x;
-		m_ppt3dVertices[i][1] = (*mapIterator).second.y;
-		m_ppt3dVertices[i][2] = (*mapIterator).second.z;
+		POINT3DID& point = *mapIterator;
+		//m_ppt3dVertices[i][0] = (*mapIterator).second.x;
+		//m_ppt3dVertices[i][1] = (*mapIterator).second.y;
+		//m_ppt3dVertices[i][2] = (*mapIterator).second.z;
+		m_ppt3dVertices[i][0] = point.x;
+		m_ppt3dVertices[i][1] = point.y;
+		m_ppt3dVertices[i][2] = point.z;
 	}
 	// Copy vertex indices which make triangles.
-	vecIterator = m_trivecTriangles.begin();
-	m_nTriangles = dInt32(m_trivecTriangles.size());
+	//vecIterator = m_trivecTriangles.begin();
+	//m_nTriangles = dInt32(m_trivecTriangles.size());
+	m_nTriangles = m_trivecTriangles.GetCount();
 	m_piTriangleIndices = new dInt32[m_nTriangles*3];
-	for (dInt32 i = 0; i < m_nTriangles; i++, vecIterator++)
+	//for (dInt32 i = 0; i < m_nTriangles; i++, vecIterator++)
+	for (dInt32 i = 0; i < m_nTriangles; i++)
 	{
-		m_piTriangleIndices[i*3] = (*vecIterator).pointID[0];
-		m_piTriangleIndices[i*3+1] = (*vecIterator).pointID[1];
-		m_piTriangleIndices[i*3+2] = (*vecIterator).pointID[2];
+		const TRIANGLE& triang = m_trivecTriangles[i];
+		//m_piTriangleIndices[i*3] = (*vecIterator).pointID[0];
+		//m_piTriangleIndices[i*3+1] = (*vecIterator).pointID[1];
+		//m_piTriangleIndices[i*3+2] = (*vecIterator).pointID[2];
+		m_piTriangleIndices[i * 3 + 0] = triang.pointID[0];
+		m_piTriangleIndices[i * 3 + 1] = triang.pointID[1];
+		m_piTriangleIndices[i * 3 + 2] = triang.pointID[2];
 	}
 
-	m_i2pt3idVertices.clear();
-	m_trivecTriangles.clear();
+	m_i2pt3idVertices.RemoveAll();
+	m_trivecTriangles.Clear();
 }
 
 void dIsoSurface::CalculateNormals()
