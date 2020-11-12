@@ -91,6 +91,27 @@ class dVector
 	{
 	}
 
+	D_INLINE void *operator new[](size_t size)
+	{
+		return dMemory::Malloc(size);
+	}
+
+	D_INLINE void *operator new (size_t size)
+	{
+		return dMemory::Malloc(size);
+	}
+
+	D_INLINE void operator delete[] (void* ptr)
+	{
+		dMemory::Free(ptr);
+	}
+
+	D_INLINE void operator delete (void* ptr)
+	{
+		dMemory::Free(ptr);
+	}
+
+
 	D_INLINE dFloat32 GetScalar () const
 	{
 		//return m_x;

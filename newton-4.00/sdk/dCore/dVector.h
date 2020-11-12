@@ -24,6 +24,7 @@
 
 #include "dCoreStdafx.h"
 #include "dTypes.h"
+#include "dMemory.h"
 
 #define dCheckVector(x) (dCheckFloat(x[0]) && dCheckFloat(x[1]) && dCheckFloat(x[2]) && dCheckFloat(x[3]))
 

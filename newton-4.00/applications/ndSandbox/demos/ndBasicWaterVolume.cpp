@@ -83,6 +83,17 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 	matrix.m_posit = floor;
 	matrix.m_posit.m_w = 1.0f;
 
+
+	dFloat32 xxx[3][3][3];
+	for (int i = 0; i < 27; i++)
+	{
+		dFloat32* yyy = &xxx[0][0][0];
+		yyy[i] = 1.0f;
+	}
+	dIsoSurface surfase;
+	xxx[1][1][1] = 0.0f;
+	surfase.GenerateSurface(&xxx[0][0][0], 0.5f, 2, 2, 2, 1.0f, 1.0f, 1.0f);
+
 	dFloat32 diameter = 0.25f;
 	ndBodySphFluid* const fluidObject = new ndBodySphFluid();
 	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, dVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject, diameter * 0.25f);

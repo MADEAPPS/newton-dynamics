@@ -27,13 +27,14 @@
 
 #include "dCoreStdafx.h"
 
+
 #include <map>
 #include <vector>
 
 struct POINT3DID 
 {
 	dInt32 newID;
-	float x, y, z;
+	dFloat32 x, y, z;
 };
 
 typedef std::map<dInt32, POINT3DID> ID2POINT3DID;
@@ -45,16 +46,15 @@ struct TRIANGLE
 
 typedef std::vector<TRIANGLE> TRIANGLEVECTOR;
 
-template <class T>
 class dIsoSurface 
 {
 	public:
-	dIsoSurface();
-	~dIsoSurface();
+	D_CORE_API dIsoSurface();
+	D_CORE_API ~dIsoSurface();
 	
 	// Generates the iso surface from the scalar field contained in the
 	// buffer ptScalarField[].
-	void GenerateSurface(const T* ptScalarField, T tIsoLevel, dInt32 nCellsX, dInt32 nCellsY,  dInt32 nCellsZ, float fCellLengthX, float fCellLengthY, float fCellLengthZ);
+	D_CORE_API void GenerateSurface(const dFloat32* ptScalarField, dFloat32 tIsoLevel, dInt32 nCellsX, dInt32 nCellsY,  dInt32 nCellsZ, dFloat32 fCellLengthX, dFloat32 fCellLengthY, dFloat32 fCellLengthZ);
 
 	// Returns true if a valid surface has been generated.
 	bool IsSurfaceValid();
@@ -65,7 +65,7 @@ class dIsoSurface
 	// Returns the length, width, and height of the volume in which the
 	// iso surface in enclosed in.  Returns -1 if the surface is not
 	// valid.
-	int GetVolumeLengths(float& fVolLengthX, float& fVolLengthY, float& fVolLengthZ);
+	int GetVolumeLengths(dFloat32& fVolLengthX, dFloat32& fVolLengthY, dFloat32& fVolLengthZ);
 
 	protected:
 	// The number of vertices which make up the iso surface.
@@ -104,7 +104,7 @@ class dIsoSurface
 
 	// Interpolates between two grid points to produce the point at which
 	// the iso surface intersects an edge.
-	POINT3DID Interpolate(float fX1, float fY1, float fZ1, float fX2, float fY2, float fZ2, T tVal1, T tVal2);
+	POINT3DID Interpolate(dFloat32 fX1, dFloat32 fY1, dFloat32 fZ1, dFloat32 fX2, dFloat32 fY2, dFloat32 fZ2, dFloat32 tVal1, dFloat32 tVal2);
  
 	// Renames vertices and triangles so that they can be accessed more
 	// efficiently.
@@ -117,13 +117,13 @@ class dIsoSurface
 	dInt32 m_nCellsX, m_nCellsY, m_nCellsZ;
 
 	// Cell length in x, y, and z directions.
-	float m_fCellLengthX, m_fCellLengthY, m_fCellLengthZ;
+	dFloat32 m_fCellLengthX, m_fCellLengthY, m_fCellLengthZ;
 
 	// The buffer holding the scalar field.
-	const T* m_ptScalarField;
+	const dFloat32* m_ptScalarField;
 
 	// The iso surface value.
-	T m_tIsoLevel;
+	dFloat32 m_tIsoLevel;
 
 	// Indicates whether a valid surface is present.
 	bool m_bValidSurface;
@@ -132,6 +132,7 @@ class dIsoSurface
 	static const dInt32 m_edgeTable[256];
 	static const dInt32 m_triTable[256][16];
 };
+
 
 #endif
 

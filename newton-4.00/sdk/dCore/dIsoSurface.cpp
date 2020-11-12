@@ -25,7 +25,8 @@
 #include "dMatrix.h"
 #include "dIsoSurface.h"
 
-template <class T> const dInt32 dIsoSurface<T>::m_edgeTable[256] = 
+
+const dInt32 dIsoSurface::m_edgeTable[256] = 
 {
 	0x0  , 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,
 	0x80c, 0x905, 0xa0f, 0xb06, 0xc0a, 0xd03, 0xe09, 0xf00,
@@ -61,7 +62,7 @@ template <class T> const dInt32 dIsoSurface<T>::m_edgeTable[256] =
 	0x70c, 0x605, 0x50f, 0x406, 0x30a, 0x203, 0x109, 0x0
 };
 
-template <class T> const dInt32 dIsoSurface<T>::m_triTable[256][16] = 
+const dInt32 dIsoSurface::m_triTable[256][16] = 
 {
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 	{0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
@@ -321,7 +322,7 @@ template <class T> const dInt32 dIsoSurface<T>::m_triTable[256][16] =
 	{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
 };
 
-template <class T> dIsoSurface<T>::dIsoSurface()
+dIsoSurface::dIsoSurface()
 {
 	m_fCellLengthX = 0;
 	m_fCellLengthY = 0;
@@ -340,12 +341,12 @@ template <class T> dIsoSurface<T>::dIsoSurface()
 	m_bValidSurface = false;
 }
 
-template <class T> dIsoSurface<T>::~dIsoSurface()
+dIsoSurface::~dIsoSurface()
 {
 	DeleteSurface();
 }
 
-template <class T> void dIsoSurface<T>::GenerateSurface(const T* ptScalarField, T tIsoLevel, dInt32 nCellsX, dInt32 nCellsY, dInt32 nCellsZ, float fCellLengthX, float fCellLengthY, float fCellLengthZ)
+void dIsoSurface::GenerateSurface(const dFloat32* ptScalarField, dFloat32 tIsoLevel, dInt32 nCellsX, dInt32 nCellsY, dInt32 nCellsZ, dFloat32 fCellLengthX, dFloat32 fCellLengthY, dFloat32 fCellLengthZ)
 {
 	if (m_bValidSurface)
 		DeleteSurface();
@@ -507,12 +508,12 @@ template <class T> void dIsoSurface<T>::GenerateSurface(const T* ptScalarField, 
 	m_bValidSurface = true;
 }
 
-template <class T> bool dIsoSurface<T>::IsSurfaceValid()
+bool dIsoSurface::IsSurfaceValid()
 {
 	return m_bValidSurface;
 }
 
-template <class T> void dIsoSurface<T>::DeleteSurface()
+void dIsoSurface::DeleteSurface()
 {
 	m_fCellLengthX = 0;
 	m_fCellLengthY = 0;
@@ -543,7 +544,7 @@ template <class T> void dIsoSurface<T>::DeleteSurface()
 	m_bValidSurface = false;
 }
 
-template <class T> int dIsoSurface<T>::GetVolumeLengths(float& fVolLengthX, float& fVolLengthY, float& fVolLengthZ)
+int dIsoSurface::GetVolumeLengths(dFloat32& fVolLengthX, dFloat32& fVolLengthY, dFloat32& fVolLengthZ)
 {
 	if (IsSurfaceValid()) 
 	{
@@ -556,7 +557,7 @@ template <class T> int dIsoSurface<T>::GetVolumeLengths(float& fVolLengthX, floa
 		return -1;
 }
 
-template <class T> dInt32 dIsoSurface<T>::GetEdgeID(dInt32 nX, dInt32 nY, dInt32 nZ, dInt32 nEdgeNo)
+dInt32 dIsoSurface::GetEdgeID(dInt32 nX, dInt32 nY, dInt32 nZ, dInt32 nEdgeNo)
 {
 	switch (nEdgeNo) 
 	{
@@ -590,14 +591,14 @@ template <class T> dInt32 dIsoSurface<T>::GetEdgeID(dInt32 nX, dInt32 nY, dInt32
 	}
 }
 
-template <class T> dInt32 dIsoSurface<T>::GetVertexID(dInt32 nX, dInt32 nY, dInt32 nZ)
+dInt32 dIsoSurface::GetVertexID(dInt32 nX, dInt32 nY, dInt32 nZ)
 {
 	return 3*(nZ*(m_nCellsY + 1)*(m_nCellsX + 1) + nY*(m_nCellsX + 1) + nX);
 }
 
-template <class T> POINT3DID dIsoSurface<T>::CalculateIntersection(dInt32 nX, dInt32 nY, dInt32 nZ, dInt32 nEdgeNo)
+POINT3DID dIsoSurface::CalculateIntersection(dInt32 nX, dInt32 nY, dInt32 nZ, dInt32 nEdgeNo)
 {
-	float x1, y1, z1, x2, y2, z2;
+	dFloat32 x1, y1, z1, x2, y2, z2;
 	dInt32 v1x = nX, v1y = nY, v1z = nZ;
 	dInt32 v2x = nX, v2y = nY, v2z = nZ;
 	
@@ -674,19 +675,19 @@ template <class T> POINT3DID dIsoSurface<T>::CalculateIntersection(dInt32 nX, dI
 
 	dInt32 nPointsInXDirection = (m_nCellsX + 1);
 	dInt32 nPointsInSlice = nPointsInXDirection*(m_nCellsY + 1);
-	T val1 = m_ptScalarField[v1z*nPointsInSlice + v1y*nPointsInXDirection + v1x];
-	T val2 = m_ptScalarField[v2z*nPointsInSlice + v2y*nPointsInXDirection + v2x];
+	dFloat32 val1 = m_ptScalarField[v1z*nPointsInSlice + v1y*nPointsInXDirection + v1x];
+	dFloat32 val2 = m_ptScalarField[v2z*nPointsInSlice + v2y*nPointsInXDirection + v2x];
 	POINT3DID intersection = Interpolate(x1, y1, z1, x2, y2, z2, val1, val2);
 	
 	return intersection;
 }
 
-template <class T> POINT3DID dIsoSurface<T>::Interpolate(float fX1, float fY1, float fZ1, float fX2, float fY2, float fZ2, T tVal1, T tVal2)
+POINT3DID dIsoSurface::Interpolate(dFloat32 fX1, dFloat32 fY1, dFloat32 fZ1, dFloat32 fX2, dFloat32 fY2, dFloat32 fZ2, dFloat32 tVal1, dFloat32 tVal2)
 {
 	POINT3DID interpolation;
-	float mu;
+	dFloat32 mu;
 
-	mu = float((m_tIsoLevel - tVal1))/(tVal2 - tVal1);
+	mu = dFloat32((m_tIsoLevel - tVal1))/(tVal2 - tVal1);
 	interpolation.x = fX1 + mu*(fX2 - fX1);
 	interpolation.y = fY1 + mu*(fY2 - fY1);
 	interpolation.z = fZ1 + mu*(fZ2 - fZ1);
@@ -694,7 +695,7 @@ template <class T> POINT3DID dIsoSurface<T>::Interpolate(float fX1, float fY1, f
 	return interpolation;
 }
 
-template <class T> void dIsoSurface<T>::RenameVerticesAndTriangles()
+void dIsoSurface::RenameVerticesAndTriangles()
 {
 	dInt32 nextID = 0;
 	ID2POINT3DID::iterator mapIterator = m_i2pt3idVertices.begin();
@@ -723,7 +724,7 @@ template <class T> void dIsoSurface<T>::RenameVerticesAndTriangles()
 	// can be efficiently accessed.
 	// Copy vertices.
 	mapIterator = m_i2pt3idVertices.begin();
-	m_nVertices = m_i2pt3idVertices.size();
+	m_nVertices = dInt32 (m_i2pt3idVertices.size());
 	m_ppt3dVertices = new dVector[m_nVertices];
 	for (dInt32 i = 0; i < m_nVertices; i++, mapIterator++) 
 	{
@@ -733,7 +734,7 @@ template <class T> void dIsoSurface<T>::RenameVerticesAndTriangles()
 	}
 	// Copy vertex indices which make triangles.
 	vecIterator = m_trivecTriangles.begin();
-	m_nTriangles = m_trivecTriangles.size();
+	m_nTriangles = dInt32(m_trivecTriangles.size());
 	m_piTriangleIndices = new dInt32[m_nTriangles*3];
 	for (dInt32 i = 0; i < m_nTriangles; i++, vecIterator++)
 	{
@@ -746,7 +747,7 @@ template <class T> void dIsoSurface<T>::RenameVerticesAndTriangles()
 	m_trivecTriangles.clear();
 }
 
-template <class T> void dIsoSurface<T>::CalculateNormals()
+void dIsoSurface::CalculateNormals()
 {
 	m_nNormals = m_nVertices;
 	m_pvec3dNormals = new dVector[m_nNormals];
@@ -790,13 +791,9 @@ template <class T> void dIsoSurface<T>::CalculateNormals()
 	// Normalize normals.
 	for (dInt32 i = 0; i < m_nNormals; i++)
 	{
-		float length = sqrt(m_pvec3dNormals[i][0]*m_pvec3dNormals[i][0] + m_pvec3dNormals[i][1]*m_pvec3dNormals[i][1] + m_pvec3dNormals[i][2]*m_pvec3dNormals[i][2]);
+		dFloat32 length = sqrt(m_pvec3dNormals[i][0]*m_pvec3dNormals[i][0] + m_pvec3dNormals[i][1]*m_pvec3dNormals[i][1] + m_pvec3dNormals[i][2]*m_pvec3dNormals[i][2]);
 		m_pvec3dNormals[i][0] /= length;
 		m_pvec3dNormals[i][1] /= length;
 		m_pvec3dNormals[i][2] /= length;
 	}
 }
-
-//template class dIsoSurface<short>;
-//template class dIsoSurface<unsigned short>;
-//template class dIsoSurface<float>;
