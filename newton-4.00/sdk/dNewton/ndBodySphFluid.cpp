@@ -535,9 +535,10 @@ D_NEWTON_API void ndBodySphFluid::GenerateIsoSurface(const ndWorld* const world,
 		dVector r(posit[i] - origin);
 		dVector p(r * invGridSize);
 		ndGridHash hashKey(p, i, ndHomeGrid);
-		m_hashGridMapScratchBuffer[i] = hashKey;
+		m_hashGridMap[i] = hashKey;
 	}
 
+	SortBatch(world, 0, 1);
 const dVector invGridSize1(dFloat32(1.0f) / gridSize);
 
 	//dFloat32 xxx[3][3][3];

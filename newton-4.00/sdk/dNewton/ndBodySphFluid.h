@@ -117,7 +117,6 @@ class ndBodySphFluid: public ndBodyParticleSet
 	void CaculateAABB(const ndWorld* const world, dVector& boxP0, dVector& boxP1) const;
 	void SortBatch(const ndWorld* const world, const dInt32 threadId, const dInt32 threadCount);
 
-
 	dVector m_box0;
 	dVector m_box1;
 	dArray<ndGridHash> m_hashGridMap;

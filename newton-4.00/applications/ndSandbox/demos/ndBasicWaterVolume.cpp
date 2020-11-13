@@ -77,7 +77,8 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 	{
 		ndBodySphFluid* const fluid = GetBody()->GetAsBodySphFluid();
 		dAssert(fluid);
-		fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.25f);
+		//fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.25f);
+		fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.28f);
 	}
 };
 
