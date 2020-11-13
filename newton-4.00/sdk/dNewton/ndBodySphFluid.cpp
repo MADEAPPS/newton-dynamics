@@ -418,7 +418,7 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 		}
 	};
 
-	class ndBodySphFluidSortBuckects : public ndScene::ndBaseJob
+	class ndBodySphFluidReorderBuckets: public ndScene::ndBaseJob
 	{
 		virtual void Execute()
 		{
@@ -496,7 +496,7 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 				}
 				AddCounters(world, context);
 
-				scene->SubmitJobs<ndBodySphFluidSortBuckects>(&context);
+				scene->SubmitJobs<ndBodySphFluidReorderBuckets>(&context);
 				m_hashGridMap.Swap(m_hashGridMapScratchBuffer);
 			}
 		}	
@@ -514,3 +514,8 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 #endif
 }
 
+
+void ndBodySphFluid::GenerateIsoSurface()
+{
+
+}

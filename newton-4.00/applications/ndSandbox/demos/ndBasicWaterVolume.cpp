@@ -72,6 +72,13 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 		:ndDemoEntityNotify(manager, entity)
 	{
 	}
+
+	void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
+	{
+		ndBodySphFluid* const fluid = GetBody()->GetAsBodySphFluid();
+		dAssert(fluid);
+		fluid->GenerateIsoSurface();
+	}
 };
 
 static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& location)
@@ -84,15 +91,15 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 	matrix.m_posit.m_w = 1.0f;
 
 
-	dFloat32 xxx[3][3][3];
-	for (int i = 0; i < 27; i++)
-	{
-		dFloat32* yyy = &xxx[0][0][0];
-		yyy[i] = 1.0f;
-	}
-	dIsoSurface surfase;
-	xxx[1][1][1] = 0.0f;
-	surfase.GenerateSurface(&xxx[0][0][0], 0.5f, 2, 2, 2, 1.0f, 1.0f, 1.0f);
+	//dFloat32 xxx[3][3][3];
+	//for (int i = 0; i < 27; i++)
+	//{
+	//	dFloat32* yyy = &xxx[0][0][0];
+	//	yyy[i] = 1.0f;
+	//}
+	//dIsoSurface surfase;
+	//xxx[1][1][1] = 0.0f;
+	//surfase.GenerateSurface(&xxx[0][0][0], 0.5f, 2, 2, 2, 1.0f, 1.0f, 1.0f);
 
 	dFloat32 diameter = 0.25f;
 	ndBodySphFluid* const fluidObject = new ndBodySphFluid();
@@ -103,8 +110,8 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 
 	fluidObject->SetParticleRadius(diameter * 0.5f);
 
-	dInt32 particleCountPerAxis = 32;
-	//dInt32 particleCountPerAxis = 20;
+	//dInt32 particleCountPerAxis = 32;
+	dInt32 particleCountPerAxis = 1;
 	dFloat32 spacing = diameter * 1.0f;
 
 	dFloat32 offset = spacing * particleCountPerAxis / 2.0f;

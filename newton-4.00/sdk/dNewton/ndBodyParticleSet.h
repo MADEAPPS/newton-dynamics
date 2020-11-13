@@ -32,11 +32,10 @@ class ndBodyParticleSet: public ndBody
 	D_NEWTON_API ndBodyParticleSet();
 	D_NEWTON_API ndBodyParticleSet(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache);
 	D_NEWTON_API virtual ~ndBodyParticleSet ();
-
-	D_NEWTON_API virtual ndBodyParticleSet* GetAsBodyParticleSet();
 	D_NEWTON_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
 	const dArray<dVector>& GetPositions() const;
+	virtual ndBodyParticleSet* GetAsBodyParticleSet();
 
 	void SetParticleRadius(dFloat32 raidus);
 	D_NEWTON_API virtual void AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity) = 0;

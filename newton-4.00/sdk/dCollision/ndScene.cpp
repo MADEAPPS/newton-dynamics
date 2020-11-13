@@ -1726,7 +1726,7 @@ void ndScene::FindCollidingPairs()
 	}
 }
 
-void ndScene::TransformUpdate()
+void ndScene::UpdateTransform()
 {
 	D_TRACKTIME();
 	class ndTransformUpdate : public ndBaseJob
@@ -1764,6 +1764,7 @@ void ndScene::TransformUpdate()
 
 		}
 	};
+
 	SubmitJobs<ndTransformUpdate>();
 }
 

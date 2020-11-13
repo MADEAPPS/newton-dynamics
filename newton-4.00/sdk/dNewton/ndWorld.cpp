@@ -145,6 +145,17 @@ void ndWorld::UpdateListenersPostTransform()
 {
 }
 
+void ndWorld::UpdateTransforms()
+{
+	for (ndBodyParticleSetList::dListNode* node = m_particleSetList.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyParticleSet* const particleSet = node->GetInfo();
+		particleSet->GetNotifyCallback()->OnTranform(0, particleSet->GetMatrix());
+	}
+
+	m_scene->UpdateTransform();
+}
+
 void ndWorld::ApplyExternalForces()
 {
 	D_TRACKTIME();
@@ -753,7 +764,7 @@ void ndWorld::ThreadFunction()
 		}
 
 		m_scene->SetTimestep(m_timestep);
-		m_scene->TransformUpdate();
+		UpdateTransforms();
 		UpdateListenersPostTransform();
 		PostUpdate(m_timestep);
 		m_scene->End();

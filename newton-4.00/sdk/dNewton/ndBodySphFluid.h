@@ -34,9 +34,12 @@ class ndBodySphFluid: public ndBodyParticleSet
 	D_NEWTON_API ndBodySphFluid(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache);
 	D_NEWTON_API virtual ~ndBodySphFluid ();
 
+	virtual ndBodySphFluid* GetAsBodySphFluid();
 	D_NEWTON_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
 	D_NEWTON_API virtual void AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity);
+
+	D_NEWTON_API virtual void GenerateIsoSurface();
 
 	protected:
 	D_NEWTON_API virtual void Update(const ndWorld* const world, dFloat32 timestep);
@@ -125,6 +128,11 @@ class ndBodySphFluid: public ndBodyParticleSet
 inline dFloat32 ndBodySphFluid::RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const
 {
 	return dFloat32(1.2f);
+}
+
+inline ndBodySphFluid* ndBodySphFluid::GetAsBodySphFluid()
+{ 
+	return this; 
 }
 
 #endif 

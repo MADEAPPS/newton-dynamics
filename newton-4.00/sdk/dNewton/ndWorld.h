@@ -108,6 +108,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	
 	protected:
 	D_NEWTON_API virtual void UpdateSkeletons();
+	D_NEWTON_API virtual void UpdateTransforms();
 	D_NEWTON_API virtual void ApplyExternalForces();
 	D_NEWTON_API virtual void UpdatePrelisteners();
 	D_NEWTON_API virtual void UpdatePostlisteners();
