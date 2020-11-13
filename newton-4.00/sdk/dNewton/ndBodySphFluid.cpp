@@ -66,7 +66,7 @@ void ndBodySphFluid::AddParticle(const dFloat32 mass, const dVector& position, c
 	m_posit.PushBack(point);
 }
 
-void ndBodySphFluid::UpdateAABB()
+void ndBodySphFluid::CaculateAABB(const ndWorld* const world, dVector& boxP0, dVector& boxP1) const
 {
 	D_TRACKTIME();
 	dVector box0(dFloat32(1e20f));
@@ -76,13 +76,21 @@ void ndBodySphFluid::UpdateAABB()
 		box0 = box0.GetMin(m_posit[i]);
 		box1 = box1.GetMax(m_posit[i]);
 	}
-	m_box0 = box0 - dVector(m_radius * dFloat32(2.0f));
-	m_box1 = box1 + dVector(m_radius * dFloat32(2.0f));
+	//m_box0 = box0 - dVector(m_radius * dFloat32(2.0f));
+	//m_box1 = box1 + dVector(m_radius * dFloat32(2.0f));
+
+	boxP0 = box0;
+	boxP1 = box1;
 }
 
 void ndBodySphFluid::Update(const ndWorld* const world, dFloat32 timestep)
 {
-	UpdateAABB();
+	dVector boxP0;
+	dVector boxP1;
+	CaculateAABB(world, boxP0, boxP1);
+	m_box0 = boxP0 - dVector(m_radius * dFloat32(2.0f));
+	m_box1 = boxP1 + dVector(m_radius * dFloat32(2.0f));
+
 	CreateGrids(world);
 	SortBuckets(world);
 }
@@ -514,15 +522,31 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 #endif
 }
 
-void ndBodySphFluid::GenerateIsoSurface(const ndWorld* const world)
+D_NEWTON_API void ndBodySphFluid::GenerateIsoSurface(const ndWorld* const world, dFloat32 gridSize)
 {
-	dFloat32 xxx[3][3][3];
-	for (int i = 0; i < 27; i++)
+	dVector origin;
+	dVector boxP1;
+	CaculateAABB(world, origin, boxP1);
+	const dVector invGridSize (dFloat32 (1.0f) / gridSize);
+
+	const dVector* const posit = &m_posit[0];
+	for (dInt32 i = 0; i < m_posit.GetCount(); i++)
 	{
-		dFloat32* yyy = &xxx[0][0][0];
-		yyy[i] = 1.0f;
+		dVector r(posit[i] - origin);
+		dVector p(r * invGridSize);
+		ndGridHash hashKey(p, i, ndHomeGrid);
+		m_hashGridMapScratchBuffer[i] = hashKey;
 	}
-	dIsoSurface surfase;
-	xxx[1][1][1] = 0.0f;
-	surfase.GenerateSurface(&xxx[0][0][0], 0.5f, 2, 2, 2, 1.0f, 1.0f, 1.0f);
+
+const dVector invGridSize1(dFloat32(1.0f) / gridSize);
+
+	//dFloat32 xxx[3][3][3];
+	//for (int i = 0; i < 27; i++)
+	//{
+	//	dFloat32* yyy = &xxx[0][0][0];
+	//	yyy[i] = 1.0f;
+	//}
+	//dIsoSurface surfase;
+	//xxx[1][1][1] = 0.0f;
+	//surfase.GenerateSurface(&xxx[0][0][0], 0.5f, 2, 2, 2, 1.0f, 1.0f, 1.0f);
 }

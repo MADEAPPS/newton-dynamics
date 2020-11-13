@@ -39,7 +39,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 
 	D_NEWTON_API virtual void AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity);
 
-	D_NEWTON_API virtual void GenerateIsoSurface(const ndWorld* const world);
+	D_NEWTON_API virtual void GenerateIsoSurface(const ndWorld* const world, dFloat32 gridSize);
 
 	protected:
 	D_NEWTON_API virtual void Update(const ndWorld* const world, dFloat32 timestep);
@@ -111,11 +111,12 @@ class ndBodySphFluid: public ndBodyParticleSet
 		dInt32 m_histogram[D_MAX_THREADS_COUNT][1 << 11];
 	};
 
-	void UpdateAABB();
 	void SortBuckets(const ndWorld* const world);
 	void CreateGrids(const ndWorld* const world);
 	void AddCounters(const ndWorld* const world, ndContext& context) const;
+	void CaculateAABB(const ndWorld* const world, dVector& boxP0, dVector& boxP1) const;
 	void SortBatch(const ndWorld* const world, const dInt32 threadId, const dInt32 threadCount);
+
 
 	dVector m_box0;
 	dVector m_box1;
