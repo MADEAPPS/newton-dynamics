@@ -514,8 +514,15 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 #endif
 }
 
-
-void ndBodySphFluid::GenerateIsoSurface()
+void ndBodySphFluid::GenerateIsoSurface(const ndWorld* const world)
 {
-
+	dFloat32 xxx[3][3][3];
+	for (int i = 0; i < 27; i++)
+	{
+		dFloat32* yyy = &xxx[0][0][0];
+		yyy[i] = 1.0f;
+	}
+	dIsoSurface surfase;
+	xxx[1][1][1] = 0.0f;
+	surfase.GenerateSurface(&xxx[0][0][0], 0.5f, 2, 2, 2, 1.0f, 1.0f, 1.0f);
 }
