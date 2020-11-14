@@ -19,6 +19,7 @@
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityManager.h"
 #include "ndBasicPlayerCapsule.h"
+#include "ndHeightFieldPrimitive.h"
 
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoMesh* const mesh, const ndShapeInstance& shape,
@@ -159,8 +160,10 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 
 	// build a floor
 	//BuildFlatPlane(scene, true);
-	//BuildStaticMesh(scene, "flatPlane.fbx", false);
-	BuildStaticMesh(scene, "track.fbx", false);
+	BuildHeightFieldTerrain(scene);
+return;
+	BuildStaticMesh(scene, "flatPlane.fbx", false);
+	//BuildStaticMesh(scene, "track.fbx", false);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
 	//BuildStaticMesh(scene, "excavator.fbx", false);
 

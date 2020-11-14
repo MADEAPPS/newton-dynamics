@@ -42,7 +42,7 @@ static inline dUnsigned8 randomSeed(dInt32 i)
 static dFloat32 grad(dInt32 hash, dFloat32 x) 
 {
 	const dInt32 h = hash & 0x0F;  
-	dFloat32 grad = 1.0f + (h & 7);    
+	dFloat32 grad = dFloat32 (1.0f) + (h & 7);    
 	if ((h & 8) != 0)
 	{
 		grad = -grad;
@@ -55,7 +55,7 @@ static dFloat32 grad(dInt32 hash, dFloat32 x, dFloat32 y)
 	const dInt32 h = hash & 0x3F;  
 	const dFloat32 u = h < 4 ? x : y;  
 	const dFloat32 v = h < 4 ? y : x;
-	return ((h & 1) ? -u : u) + ((h & 2) ? -2.0f * v : 2.0f * v); 
+	return ((h & 1) ? -u : u) + ((h & 2) ? -dFloat32 (2.0f) * v : dFloat32 (2.0f) * v); 
 }
 
 static dFloat32 grad(dInt32 hash, dFloat32 x, dFloat32 y, dFloat32 z) 
@@ -66,30 +66,29 @@ static dFloat32 grad(dInt32 hash, dFloat32 x, dFloat32 y, dFloat32 z)
 	return ((h & 1) ? -u : u) + ((h & 2) ? -v : v);
 }
 
-
 dFloat32 dPerlinNoise(dFloat32 x)
 {
 	dInt32 i0 = dInt32 (dFloor(x));
 	dInt32 i1 = i0 + 1;
 	dFloat32 x0 = x - i0;
-	dFloat32 x1 = x0 - 1.0f;
+	dFloat32 x1 = x0 - dFloat32 (1.0f);
 
-	dFloat32 t0 = 1.0f - x0*x0;
+	dFloat32 t0 = dFloat32 (1.0f) - x0*x0;
 	t0 *= t0;
 	dFloat32 n0 = t0 * t0 * grad(randomSeed(i0), x0);
 
-	dFloat32 t1 = 1.0f - x1*x1;
+	dFloat32 t1 = dFloat32 (1.0f) - x1*x1;
 	t1 *= t1;
 	dFloat32 n1 = t1 * t1 * grad(randomSeed(i1), x1);
-	return 0.395f * (n0 + n1);
+	return dFloat32 (0.395f) * (n0 + n1);
 }
 
 dFloat32 dPerlinNoise(dFloat32 x, dFloat32 y) 
 {
 	// F2 = (sqrt(3) - 1) / 2
-	const dFloat32 F2 = 0.366025403f; 
+	const dFloat32 F2 = dFloat32 (0.366025403f); 
 	// G2 = (3 - sqrt(3)) / 6   = F2 / (1 + 2 * K)
-	const dFloat32 G2 = 0.211324865f;  
+	const dFloat32 G2 = dFloat32 (0.211324865f);  
 
 	const dFloat32 s = (x + y) * F2; 
 	const dFloat32 xs = x + s;
@@ -117,45 +116,45 @@ dFloat32 dPerlinNoise(dFloat32 x, dFloat32 y)
 
 	const dFloat32 x1 = x0 - i1 + G2;
 	const dFloat32 y1 = y0 - j1 + G2;
-	const dFloat32 x2 = x0 - 1.0f + 2.0f * G2;
-	const dFloat32 y2 = y0 - 1.0f + 2.0f * G2;
+	const dFloat32 x2 = x0 - dFloat32 (1.0f) + dFloat32 (2.0f) * G2;
+	const dFloat32 y2 = y0 - dFloat32 (1.0f) + dFloat32 (2.0f) * G2;
 
 	const dInt32 gi0 = randomSeed(i + randomSeed(j));
 	const dInt32 gi1 = randomSeed(i + i1 + randomSeed(j + j1));
 	const dInt32 gi2 = randomSeed(i + 1 + randomSeed(j + 1));
 
-	dFloat32 t0 = 0.5f - x0*x0 - y0*y0;
+	dFloat32 t0 = dFloat32 (0.5f) - x0*x0 - y0*y0;
 
-	dFloat32 n0 = 0.0f;
-	if (t0 >= 0.0f) 
+	dFloat32 n0 = dFloat32 (0.0f);
+	if (t0 >= dFloat32 (0.0f)) 
 	{
 		t0 *= t0;
 		n0 = t0 * t0 * grad(gi0, x0, y0);
 	}
 
-	dFloat32 n1 = 0.0f;
-	dFloat32 t1 = 0.5f - x1*x1 - y1*y1;
-	if (t1 >= 0.0f) 
+	dFloat32 n1 = dFloat32 (0.0f);
+	dFloat32 t1 = dFloat32 (0.5f) - x1*x1 - y1*y1;
+	if (t1 >= dFloat32 (0.0f)) 
 	{
 		t1 *= t1;
 		n1 = t1 * t1 * grad(gi1, x1, y1);
 	}
 
-	dFloat32 n2 = 0.0f;
-	dFloat32 t2 = 0.5f - x2*x2 - y2*y2;
-	if (t2 >= 0.0f) 
+	dFloat32 n2 = dFloat32 (0.0f);
+	dFloat32 t2 = dFloat32 (0.5f) - x2*x2 - y2*y2;
+	if (t2 >= dFloat32 (0.0f)) 
 	{
 		t2 *= t2;
 		n2 = t2 * t2 * grad(gi2, x2, y2);
 	}
 
-	return 45.23065f * (n0 + n1 + n2);
+	return dFloat32 (45.23065f) * (n0 + n1 + n2);
 }
 
 dFloat32 dPerlinNoise(dFloat32 x, dFloat32 y, dFloat32 z) 
 {
-	const dFloat32 F3 = 1.0f / 3.0f;
-	const dFloat32 G3 = 1.0f / 6.0f;
+	const dFloat32 F3 = dFloat32 (1.0f) / dFloat32 (3.0f);
+	const dFloat32 G3 = dFloat32 (1.0f) / dFloat32 (6.0f);
 
 	dFloat32 s = (x + y + z) * F3; 
 	dInt32 i = dInt32 (dFloor(x + s));
@@ -205,111 +204,106 @@ dFloat32 dPerlinNoise(dFloat32 x, dFloat32 y, dFloat32 z)
 	dFloat32 x1 = x0 - i1 + G3;
 	dFloat32 y1 = y0 - j1 + G3;
 	dFloat32 z1 = z0 - k1 + G3;
-	dFloat32 x2 = x0 - i2 + 2.0f * G3;
-	dFloat32 y2 = y0 - j2 + 2.0f * G3;
-	dFloat32 z2 = z0 - k2 + 2.0f * G3;
-	dFloat32 x3 = x0 - 1.0f + 3.0f * G3;
-	dFloat32 y3 = y0 - 1.0f + 3.0f * G3;
-	dFloat32 z3 = z0 - 1.0f + 3.0f * G3;
+	dFloat32 x2 = x0 - i2 + dFloat32 (2.0f) * G3;
+	dFloat32 y2 = y0 - j2 + dFloat32 (2.0f) * G3;
+	dFloat32 z2 = z0 - k2 + dFloat32 (2.0f) * G3;
+	dFloat32 x3 = x0 - dFloat32 (1.0f) + dFloat32 (3.0f) * G3;
+	dFloat32 y3 = y0 - dFloat32 (1.0f) + dFloat32 (3.0f) * G3;
+	dFloat32 z3 = z0 - dFloat32 (1.0f) + dFloat32 (3.0f) * G3;
 
 	dInt32 gi0 = randomSeed(i + randomSeed(j + randomSeed(k)));
 	dInt32 gi1 = randomSeed(i + i1 + randomSeed(j + j1 + randomSeed(k + k1)));
 	dInt32 gi2 = randomSeed(i + i2 + randomSeed(j + j2 + randomSeed(k + k2)));
 	dInt32 gi3 = randomSeed(i + 1 + randomSeed(j + 1 + randomSeed(k + 1)));
 
-	dFloat32 n0 = 0.0f;
-	dFloat32 t0 = 0.6f - x0*x0 - y0*y0 - z0*z0;
+	dFloat32 n0 = dFloat32 (0.0f);
+	dFloat32 t0 = dFloat32 (0.6f) - x0*x0 - y0*y0 - z0*z0;
 	if (t0 >= 0) 
 	{
 		t0 *= t0;
 		n0 = t0 * t0 * grad(gi0, x0, y0, z0);
 	}
 
-	dFloat32 n1 = 0.0f;
-	dFloat32 t1 = 0.6f - x1*x1 - y1*y1 - z1*z1;
+	dFloat32 n1 = dFloat32 (0.0f);
+	dFloat32 t1 = dFloat32 (0.6f) - x1*x1 - y1*y1 - z1*z1;
 	if (t1 >= 0) 
 	{
 		t1 *= t1;
 		n1 = t1 * t1 * grad(gi1, x1, y1, z1);
 	}
 
-	dFloat32 n2 = 0.0f;
-	dFloat32 t2 = 0.6f - x2*x2 - y2*y2 - z2*z2;
+	dFloat32 n2 = dFloat32 (0.0f);
+	dFloat32 t2 = dFloat32 (0.6f) - x2*x2 - y2*y2 - z2*z2;
 	if (t2 >= 0) 
 	{
 		t2 *= t2;
 		n2 = t2 * t2 * grad(gi2, x2, y2, z2);
 	}
 
-	dFloat32 n3 = 0.0f;
-	dFloat32 t3 = 0.6f - x3*x3 - y3*y3 - z3*z3;
+	dFloat32 n3 = dFloat32 (0.0f);
+	dFloat32 t3 = dFloat32 (0.6f) - x3*x3 - y3*y3 - z3*z3;
 	if (t3 >= 0) 
 	{
 		t3 *= t3;
 		n3 = t3 * t3 * grad(gi3, x3, y3, z3);
 	}
-	return 32.0f*(n0 + n1 + n2 + n3);
+	return dFloat32 (dFloat32 (2.0f))*(n0 + n1 + n2 + n3);
 }
 
-dFloat32 BrownianMotion(size_t octaves, dFloat32 x)
+dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 amplitude, dFloat32 persistence, dFloat32 period, dFloat32 lacunarity)
 {
-	dAssert(0);
-	return 0;
-	//dFloat32 output = 0.f;
-	//dFloat32 denom = 0.f;
-	//dFloat32 frequency = mFrequency;
-	//dFloat32 amplitude = mAmplitude;
-	//
-	//for (size_t i = 0; i < octaves; i++) 
-	//{
-	//	output += (amplitude * noise(x * frequency));
-	//	denom += amplitude;
-	//
-	//	frequency *= mLacunarity;
-	//	amplitude *= mPersistence;
-	//}
-	//
+	dFloat32 output = dFloat32(0.0f);
+	dFloat32 denom = dFloat32(0.0f);
+
+	dFloat32 frequency = dFloat32(1.0f) / period;
+	lacunarity = dFloat32(1.0f) / lacunarity;
+	for (dInt32 i = 0; i < octaves; i++)
+	{
+		output += (amplitude * dPerlinNoise(x * frequency));
+		denom += amplitude;
+
+		frequency *= lacunarity;
+		amplitude *= persistence;
+	}
 	//return (output / denom);
+	return output;
 }
 
-dFloat32 BrownianMotion(size_t octaves, dFloat32 x, dFloat32 y)
+dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 y, dFloat32 amplitude, dFloat32 persistence, dFloat32 period, dFloat32 lacunarity)
 {
-	dAssert(0);
-	return 0;
-	//dFloat32 output = 0.f;
-	//dFloat32 denom = 0.f;
-	//dFloat32 frequency = mFrequency;
-	//dFloat32 amplitude = mAmplitude;
-	//
-	//for (size_t i = 0; i < octaves; i++) {
-	//	output += (amplitude * noise(x * frequency, y * frequency));
-	//	denom += amplitude;
-	//
-	//	frequency *= mLacunarity;
-	//	amplitude *= mPersistence;
-	//}
-	//
+	dFloat32 output = dFloat32 (0.0f);
+	dFloat32 denom = dFloat32 (0.0f);
+	
+	dFloat32 frequency = dFloat32(1.0f) / period;
+	lacunarity = dFloat32(1.0f) / lacunarity;
+	for (dInt32 i = 0; i < octaves; i++) 
+	{
+		output += (amplitude * dPerlinNoise(x * frequency, y * frequency));
+		denom += amplitude;
+	
+		frequency *= lacunarity;
+		amplitude *= persistence;
+	}
+	
 	//return (output / denom);
+	return output;
 }
 
-dFloat32 BrownianMotion(size_t octaves, dFloat32 x, dFloat32 y, dFloat32 z)
+dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 amplitude, dFloat32 persistence, dFloat32 period, dFloat32 lacunarity)
 {
-	dAssert(0);
-	return 0;
+	dFloat32 output = dFloat32(0.0f);
+	dFloat32 denom = dFloat32(0.0f);
 
-	//dFloat32 output = 0.f;
-	//dFloat32 denom = 0.f;
-	//dFloat32 frequency = mFrequency;
-	//dFloat32 amplitude = mAmplitude;
-	//
-	//for (size_t i = 0; i < octaves; i++) 
-	//{
-	//	output += (amplitude * noise(x * frequency, y * frequency, z * frequency));
-	//	denom += amplitude;
-	//
-	//	frequency *= mLacunarity;
-	//	amplitude *= mPersistence;
-	//}
-	//
+	dFloat32 frequency = dFloat32(1.0f) / period;
+	lacunarity = dFloat32(1.0f) / lacunarity;
+	for (dInt32 i = 0; i < octaves; i++)
+	{
+		output += (amplitude * dPerlinNoise(x * frequency, y * frequency));
+		denom += amplitude;
+
+		frequency *= lacunarity;
+		amplitude *= persistence;
+	}
 	//return (output / denom);
+	return output;
 }

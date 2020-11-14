@@ -9,21 +9,9 @@
 * freely
 */
 
-// HeightFieldPrimitive.h: interface for the HeightFieldPrimitive class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #ifndef __HeightFieldPrimitive_H__
 #define __HeightFieldPrimitive_H__
 
-#if 0
-#define HEIGHTFIELD_DEFAULT_SIZE		7
-//#define HEIGHTFIELD_DEFAULT_SIZE		6
-#define HEIGHTFIELD_DEFAULT_CELLSIZE	8.0f
-
-class ndDemoEntityManager;
-NewtonBody* CreateHeightFieldTerrain (ndDemoEntityManager* const scene, int sizeInPowerOfTwos, dFloat32 cellSize, dFloat32 elevationScale, dFloat32 roughness, dFloat32 maxElevation, dFloat32 minElevation);
-
-#endif
+ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene);
 #endif 
 

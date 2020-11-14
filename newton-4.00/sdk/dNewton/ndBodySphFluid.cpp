@@ -538,6 +538,12 @@ D_NEWTON_API void ndBodySphFluid::GenerateIsoSurface(const ndWorld* const world,
 		m_hashGridMap[i] = hashKey;
 	}
 
+for (int i = 0; i < 200; i ++)
+{
+	dFloat32 xxx0 = dPerlinNoise(i / 100.0f, 1.0f);
+	dFloat32 xxx1 = dPerlinNoise(i / 100.0f, 2.0f);
+}
+
 	SortBatch(world, 0, 1);
 const dVector invGridSize1(dFloat32(1.0f) / gridSize);
 

@@ -182,157 +182,6 @@ const char* ndDemoMesh::GetTextureName (const ndDemoSubMesh* const subMesh) cons
 	return subMesh->m_material.m_textureName;
 }
 
-void ndDemoMesh::SpliteSegment(dListNode* const node, dInt32 maxIndexCount)
-{
-	dAssert(0);
-#if 0
-	const ndDemoSubMesh& segment = node->GetInfo(); 
-	if (segment.m_indexCount > maxIndexCount) 
-	{
-		dVector minBox (1.0e10f, 1.0e10f, 1.0e10f, 0.0f);
-		dVector maxBox (-1.0e10f, -1.0e10f, -1.0e10f, 0.0f);
-		for (dInt32 i = 0; i < segment.m_indexCount; i ++) 
-		{
-			dInt32 index = segment.m_indexes[i];
-			for (dInt32 j = 0; j < 3; j ++) 
-			{
-				minBox[j] = (m_vertex[index * 3 + j] < minBox[j]) ? m_vertex[index * 3 + j] : minBox[j];
-				maxBox[j] = (m_vertex[index * 3 + j] > maxBox[j]) ? m_vertex[index * 3 + j] : maxBox[j];
-			}
-		}
-
-		dInt32 index = 0;
-		dFloat32 maxExtend = -1.0e10f;
-		for (dInt32 j = 0; j < 3; j ++) 
-		{
-			dFloat32 ext = maxBox[j] - minBox[j];
-			if (ext > maxExtend ) 
-			{
-				index = j;
-				maxExtend = ext;
-			}
-		}
-
-		dInt32 leftCount = 0;
-		dInt32 rightCount = 0;
-		dFloat32 spliteDist = (maxBox[index ] + minBox[index]) * 0.5f;
-		for (dInt32 i = 0; i < segment.m_indexCount; i += 3) 
-		{
-			bool isleft = true;
-			for (dInt32 j = 0; j < 3; j ++) 
-			{
-				dInt32 vertexIndex = segment.m_indexes[i + j];
-				isleft &= (m_vertex[vertexIndex * 3 + index] < spliteDist);
-			}
-			if (isleft) 
-			{
-				leftCount += 3;
-			} 
-			else 
-			{
-				rightCount += 3;
-			}
-		}
-
-		if (leftCount && rightCount) 
-		{
-			dListNode* const leftNode = Append();
-			dListNode* const rightNode = Append();
-			ndDemoSubMesh* const leftSubMesh = &leftNode->GetInfo();
-			ndDemoSubMesh* const rightSubMesh = &rightNode->GetInfo();
-			leftSubMesh->AllocIndexData (leftCount);
-			rightSubMesh->AllocIndexData (rightCount);
-
-			leftSubMesh->m_textureHandle = AddTextureRef (segment.m_textureHandle);
-			rightSubMesh->m_textureHandle = AddTextureRef (segment.m_textureHandle);
-			leftSubMesh->m_textureName = segment.m_textureName;
-			rightSubMesh->m_textureName = segment.m_textureName;
-
-			leftCount = 0;
-			rightCount = 0;
-			for (dInt32 i = 0; i < segment.m_indexCount; i += 3) 
-			{
-				bool isleft = true;
-				for (dInt32 j = 0; j < 3; j ++) 
-				{
-					dInt32 vertexIndex = segment.m_indexes[i + j];
-					isleft &= (m_vertex[vertexIndex * 3 + index] < spliteDist);
-				}
-				if (isleft) 
-				{
-					leftSubMesh->m_indexes[leftCount + 0] = segment.m_indexes[i + 0];
-					leftSubMesh->m_indexes[leftCount + 1] = segment.m_indexes[i + 1];
-					leftSubMesh->m_indexes[leftCount + 2] = segment.m_indexes[i + 2];
-					leftCount += 3;
-				} 
-				else 
-				{
-					rightSubMesh->m_indexes[rightCount + 0] = segment.m_indexes[i + 0];
-					rightSubMesh->m_indexes[rightCount + 1] = segment.m_indexes[i + 1];
-					rightSubMesh->m_indexes[rightCount + 2] = segment.m_indexes[i + 2];
-					rightCount += 3;
-				}
-			}
-			SpliteSegment(leftNode, maxIndexCount);
-			SpliteSegment(rightNode, maxIndexCount);
-
-		} 
-		else 
-		{
-			leftCount = 0;
-			rightCount = 0;
-			for (dInt32 i = 0; i < segment.m_indexCount; i += 3) 
-			{
-				if (i / 3 & 1) 
-				{
-					leftCount += 3;
-				}
-				else 
-				{
-					rightCount += 3;
-				}
-			}
-
-			dListNode* const leftNode = Append();
-			dListNode* const rightNode = Append();
-			ndDemoSubMesh* const leftSubMesh = &leftNode->GetInfo();
-			ndDemoSubMesh* const rightSubMesh = &rightNode->GetInfo();
-			leftSubMesh->AllocIndexData(leftCount);
-			rightSubMesh->AllocIndexData(rightCount);
-
-			leftSubMesh->m_textureHandle = AddTextureRef(segment.m_textureHandle);
-			rightSubMesh->m_textureHandle = AddTextureRef(segment.m_textureHandle);
-			leftSubMesh->m_textureName = segment.m_textureName;
-			rightSubMesh->m_textureName = segment.m_textureName;
-
-			leftCount = 0;
-			rightCount = 0;
-			for (dInt32 i = 0; i < segment.m_indexCount; i += 3) 
-			{
-				if (i / 3 & 1) 
-				{
-					leftSubMesh->m_indexes[leftCount + 0] = segment.m_indexes[i + 0];
-					leftSubMesh->m_indexes[leftCount + 1] = segment.m_indexes[i + 1];
-					leftSubMesh->m_indexes[leftCount + 2] = segment.m_indexes[i + 2];
-					leftCount += 3;
-				} 
-				else 
-				{
-					rightSubMesh->m_indexes[rightCount + 0] = segment.m_indexes[i + 0];
-					rightSubMesh->m_indexes[rightCount + 1] = segment.m_indexes[i + 1];
-					rightSubMesh->m_indexes[rightCount + 2] = segment.m_indexes[i + 2];
-					rightCount += 3;
-				}
-			}
-			SpliteSegment(leftNode, maxIndexCount);
-			SpliteSegment(rightNode, maxIndexCount);
-		}
-
-		Remove(node);
-	}
-#endif
-}
-
 
 ndDemoSubMesh* ndDemoMesh::AddSubMesh()
 {
@@ -1071,6 +920,7 @@ ndDemoMesh::ndDemoMesh(const char* const name)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
+	,m_hasTransparency(false)
 {
 	m_name = name;
 }
@@ -1084,6 +934,7 @@ ndDemoMesh::ndDemoMesh(const ndDemoMesh& mesh, const ndShaderPrograms& shaderCac
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)
 	,m_vetextArrayBuffer(0)
+	,m_hasTransparency(false)
 {
 	dAssert(0);
 	//AllocVertexData(mesh.m_vertexCount);
@@ -1296,124 +1147,6 @@ ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, cons
 	OptimizeForRender(points, indices);
 }
 
-ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCache, dFloat32* const elevation, dInt32 size, dFloat32 cellSize, dFloat32 texelsDensity, dInt32 tileSize)
-	:ndDemoMeshInterface()
-	,dList<ndDemoSubMesh>()
-	,m_indexCount(0)
-	,m_vertexCount(0)
-	,m_shader(0)
-	,m_indexBuffer(0)
-	,m_vertexBuffer(0)
-	,m_vetextArrayBuffer(0)
-{
-	dAssert(0);
-/*	
-	dFloat32* elevationMap[4096];
-	dVector* normalMap[4096];
-	dFloat32* const normalsPtr = new dFloat32[size * size * 4];
-	//	dVector* const normals = new dVector [size * size];
-	dVector* const normals = (dVector*)normalsPtr;
-
-	for (dInt32 i = 0; i < size; i++) {
-		elevationMap[i] = &elevation[i * size];
-		normalMap[i] = &normals[i * size];
-	}
-
-	memset(normals, 0, (size * size) * sizeof(dVector));
-	for (dInt32 z = 0; z < size - 1; z++) {
-		for (dInt32 x = 0; x < size - 1; x++) {
-			dVector p0((x + 0) * cellSize, elevationMap[z + 0][x + 0], (z + 0) * cellSize, dFloat32(0.0f));
-			dVector p1((x + 1) * cellSize, elevationMap[z + 0][x + 1], (z + 0) * cellSize, dFloat32(0.0f));
-			dVector p2((x + 1) * cellSize, elevationMap[z + 1][x + 1], (z + 1) * cellSize, dFloat32(0.0f));
-			dVector p3((x + 0) * cellSize, elevationMap[z + 1][x + 0], (z + 1) * cellSize, dFloat32(0.0f));
-
-			dVector e10(p1 - p0);
-			dVector e20(p2 - p0);
-			dVector n0(e20.CrossProduct(e10));
-			dAssert(n0.m_w == dFloat32(0.0f));
-			n0 = n0.Scale(1.0f / dSqrt(n0.DotProduct(n0).GetScalar()));
-			normalMap[z + 0][x + 0] += n0;
-			normalMap[z + 0][x + 1] += n0;
-			normalMap[z + 1][x + 1] += n0;
-
-			dVector e30(p3 - p0);
-			dVector n1(e30.CrossProduct(e20));
-			dAssert(n1.m_w == dFloat32(0.0f));
-			n1 = n1.Scale(1.0f / dSqrt(n1.DotProduct(n1).GetScalar()));
-			normalMap[z + 0][x + 0] += n1;
-			normalMap[z + 1][x + 0] += n1;
-			normalMap[z + 1][x + 1] += n1;
-		}
-	}
-
-	for (dInt32 i = 0; i < size * size; i++) {
-		dAssert(normals[i].m_w == dFloat32(0.0f));
-		normals[i] = normals[i].Scale(1.0f / dSqrt(normals[i].DotProduct(normals[i]).GetScalar()));
-	}
-
-	AllocVertexData(size * size);
-
-	dFloat32* const vertex = m_vertex;
-	dFloat32* const normal = m_normal;
-	dFloat32* const uv = m_uv;
-
-	dInt32 index0 = 0;
-	for (dInt32 z = 0; z < size; z++) {
-		for (dInt32 x = 0; x < size; x++) {
-			vertex[index0 * 3 + 0] = x * cellSize;
-			vertex[index0 * 3 + 1] = elevationMap[z][x];
-			vertex[index0 * 3 + 2] = z * cellSize;
-
-			normal[index0 * 3 + 0] = normalMap[z][x].m_x;
-			normal[index0 * 3 + 1] = normalMap[z][x].m_y;
-			normal[index0 * 3 + 2] = normalMap[z][x].m_z;
-
-			uv[index0 * 2 + 0] = x * texelsDensity;
-			uv[index0 * 2 + 1] = z * texelsDensity;
-			index0++;
-		}
-	}
-
-	dInt32 segmentsCount = (size - 1) / tileSize;
-	for (dInt32 z0 = 0; z0 < segmentsCount; z0++) {
-		dInt32 z = z0 * tileSize;
-		for (dInt32 x0 = 0; x0 < segmentsCount; x0++) {
-			dInt32 x = x0 * tileSize;
-
-			ndDemoSubMesh* const tile = AddSubMesh();
-			tile->AllocIndexData(tileSize * tileSize * 6);
-			unsigned* const indexes = tile->m_indexes;
-
-			//strcpy (tile->m_textureName, "grassanddirt.tga");
-			tile->m_textureName = "grassanddirt.tga";
-			tile->m_textureHandle = LoadTexture(tile->m_textureName.GetStr());
-
-			dInt32 index1 = 0;
-			dInt32 x1 = x + tileSize;
-			dInt32 z1 = z + tileSize;
-			for (dInt32 z2 = z; z2 < z1; z2++) {
-				for (dInt32 x2 = x; x2 < x1; x2++) {
-					dInt32 i0 = x2 + 0 + (z2 + 0) * size;
-					dInt32 i1 = x2 + 1 + (z2 + 0) * size;
-					dInt32 i2 = x2 + 1 + (z2 + 1) * size;
-					dInt32 i3 = x2 + 0 + (z2 + 1) * size;
-
-					indexes[index1 + 0] = i0;
-					indexes[index1 + 1] = i2;
-					indexes[index1 + 2] = i1;
-
-					indexes[index1 + 3] = i0;
-					indexes[index1 + 4] = i3;
-					indexes[index1 + 5] = i2;
-					index1 += 6;
-				}
-			}
-		}
-	}
-	delete[] normalsPtr;
-	OptimizeForRender();
-*/	
-}
 
 ndDemoMesh::~ndDemoMesh()
 {
@@ -1424,21 +1157,6 @@ void ndDemoMesh::OptimizeForRender(const dArray<ndMeshPointUV>& points, const dA
 {
 	// first make sure the previous optimization is removed
 	ResetOptimization();
-
-	//if (indices.GetCount() > 128 * 128 * 6)
-	//{
-	//	dAssert(0);
-	//	dListNode* nextNode;
-	//	for (dListNode* node = GetFirst(); node; node = nextNode)
-	//	{
-	//		ndDemoSubMesh& segment = node->GetInfo();
-	//		nextNode = node->GetNext();
-	//		if (segment.m_indexCount > 128 * 128 * 6)
-	//		{
-	//			SpliteSegment(node, 128 * 128 * 6);
-	//		}
-	//	}
-	//}
 
 	glGenVertexArrays(1, &m_vetextArrayBuffer);
 	glBindVertexArray(m_vetextArrayBuffer);
