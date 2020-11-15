@@ -384,7 +384,6 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 
 	ndDemoCamera* const camera = scene->GetCamera();
 	dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
-	//dMatrix invViewProjectionMatrix(viewProjectionMatrix.Inverse4x4());
 	dMatrix invViewProjectionMatrix(camera->GetProjectionMatrix().Inverse4x4() * camera->GetViewMatrix().Inverse());
 
 	ndMeshVector4 color;
@@ -465,6 +464,64 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 	glUseProgram(0);
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
+
+void RenderParticles(ndDemoEntityManager* const scene)
+{
+	ndWorld* const world = scene->GetWorld();
+	GLuint shader = scene->GetShaderCache().m_wireFrame;
+
+	ndDemoCamera* const camera = scene->GetCamera();
+	dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+	dMatrix invViewProjectionMatrix(camera->GetProjectionMatrix().Inverse4x4() * camera->GetViewMatrix().Inverse());
+
+	ndMeshVector4 color;
+	color.m_x = 1.0f;
+	color.m_y = 1.0f;
+	color.m_z = 0.0f;
+	color.m_w = 1.0f;
+
+	glUseProgram(shader);
+
+	dInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	dInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+
+	glUniform4fv(shadeColorLocation, 1, &color.m_x);
+	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+
+	GLint viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	dFloat32 pizelSize = 8.0f / viewport[2];
+
+	ndMeshVector pointBuffer[4];
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), pointBuffer);
+
+	const ndBodyParticleSetList& particles = world->GetParticleList();
+	for (ndBodyParticleSetList::dListNode* particleNode = particles.GetFirst(); particleNode; particleNode = particleNode->GetNext())
+	{
+		ndBodyParticleSet* const particle = particleNode->GetInfo();
+		const dArray<dVector>& positions = particle->GetPositions();
+		for (dInt32 i = 0; i < positions.GetCount(); i ++)
+		{
+			dVector particlePosit(positions[i]);
+			particlePosit.m_y += 1.0f;
+			particlePosit.m_w = 1.0f;
+			dVector point(viewProjectionMatrix.TransformVector1x4(particlePosit));
+			dFloat32 zDist = point.m_w;
+			point = point.Scale(1.0f / zDist);
+
+			pointBuffer[0] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, pizelSize, zDist);
+			pointBuffer[1] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, -pizelSize, zDist);
+			pointBuffer[2] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, pizelSize, zDist);
+			pointBuffer[3] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, -pizelSize, zDist);
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		}
+	}
+
+	glUseProgram(0);
+	glDisableClientState(GL_VERTEX_ARRAY);
+}
+
 
 void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 {

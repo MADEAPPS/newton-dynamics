@@ -79,6 +79,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	const ndJointList& GetJointList() const;
 	const ndContactList& GetContactList() const;
 	const ndSkeletonList& GetSkeletonList() const;
+	const ndBodyParticleSetList& GetParticleList() const;
 
 	ndBodyDynamic* GetSentinelBody() const;
 
@@ -95,9 +96,6 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	void SetContactNotify(ndContactNotify* const notify);
 
 	void DebugScene(ndSceneTreeNotiFy* const notify);
-
-	//void SetCollisionUpdate(bool mode);
-	//const bool GetCollisionUpdate() const;
 
 	D_NEWTON_API void ClearCache();
 
@@ -227,6 +225,11 @@ inline const ndSkeletonList& ndWorld::GetSkeletonList() const
 	return m_skeletonList;
 }
 
+inline const ndBodyParticleSetList& ndWorld::GetParticleList() const
+{
+	return m_particleSetList;
+}
+
 inline dFloat32 ndWorld::GetUpdateTime() const
 {
 	return m_lastExecutionTime;
@@ -241,7 +244,6 @@ inline dUnsigned32 ndWorld::GetFrameIndex() const
 {
 	return m_frameIndex;
 }
-
 
 inline void ndWorld::OnPostUpdate(dFloat32 timestep)
 {

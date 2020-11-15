@@ -89,11 +89,13 @@ class ndWaterVolumeEntity : public ndDemoEntity
 	{
 		dMatrix nodeMatrix(m_matrix * matrix);
 
-		const dArray<dVector>& positions = m_fluidBody->GetPositions();
-		m_meshParticle->SetParticles(positions.GetCount(), &positions[0]);
-		nodeMatrix.m_posit.m_y += 1.0f;
-		m_meshParticle->Render(scene, nodeMatrix);
+		//const dArray<dVector>& positions = m_fluidBody->GetPositions();
+		//m_meshParticle->SetParticles(positions.GetCount(), &positions[0]);
+		//nodeMatrix.m_posit.m_y += 1.0f;
+		//m_meshParticle->Render(scene, nodeMatrix);
 	
+		nodeMatrix.m_posit.m_y += 1.0f;
+
 		nodeMatrix.m_posit.m_z += 0.0f;
 		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
 		dScopeSpinLock lock(m_lock);

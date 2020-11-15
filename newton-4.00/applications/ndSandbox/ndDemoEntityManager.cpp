@@ -227,7 +227,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
-	//m_collisionDisplayMode = 3;
+	m_collisionDisplayMode = 3;
 	//m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
 
@@ -1231,7 +1231,7 @@ void ndDemoEntityManager::DrawDebugShapes()
 			}
 
 			dMatrix matrix(shapeInstance.GetScaledTransform(body->GetMatrix()));
-			int sleepState = body->GetSleepState();
+			dInt32 sleepState = body->GetSleepState();
 			dVector color((sleepState == 1) ? sleepColor : awakeColor);
 
 			if (m_collisionDisplayMode >= 2)
@@ -1251,6 +1251,8 @@ void ndDemoEntityManager::DrawDebugShapes()
 			}
 		}
 	}
+
+	RenderParticles(this);
 }
 
 void ndDemoEntityManager::RenderScene()
