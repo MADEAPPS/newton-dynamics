@@ -223,7 +223,7 @@ origin.m_y = 1.0f;
 void ndBasicWaterVolume (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	//BuildFlatPlane(scene, true);
+	BuildFlatPlane(scene, true);
 
 	dMatrix location(dGetIdentityMatrix());
 

@@ -58,7 +58,8 @@ vec3 PhongDirectionalShading(vec3 normalDir)
 	//vec3 diffuseCoeff = vec3(1.0f, 0.0f, 0.0f); 
 	vec3 specularCoeff = vec3(0.0f, 0.0f, 0.0f);
 	
-	vec3 emission = vec3(0.0f, 0.0f, 0.0f);
+	//vec3 emission = vec3(0.0f, 0.0f, 0.0f);
+	vec3 emission = vec3(0.3f, 0.3f, 0.3f);
 	float shininess = 20.0f;
 	
 	vec3 ambientColor = ambientCoeff + emission; 
