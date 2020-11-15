@@ -129,6 +129,7 @@ void ndWorld::ClearCache()
 	ndContactPointList::FlushFreeList();
 	ndBodyParticleSetList::FlushFreeList();
 	ndScene::ndFitnessList::FlushFreeList();
+	dIsoSurface::dIsoVertexMap::FlushFreeList();
 	ndBodyKinematic::ndContactMap::FlushFreeList();
 	ndSkeletonContainer::ndNodeList::FlushFreeList();
 }

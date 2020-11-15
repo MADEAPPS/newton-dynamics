@@ -25,7 +25,7 @@
 #include "dMatrix.h"
 #include "dIsoSurface.h"
 
-
+#if 0
 const dInt32 dIsoSurfaceOld::m_edgeTable[256] = 
 {
 	0x0  , 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,
@@ -799,7 +799,7 @@ void dIsoSurfaceOld::CalculateNormals()
 		m_pvec3dNormals[i][2] /= length;
 	}
 }
-
+#endif
 
 
 const dInt32 dIsoSurface::m_edgeTable[256] =
@@ -1098,7 +1098,6 @@ const dInt32 dIsoSurface::m_triangleTable[256][16] =
 	{ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }
 };
 
-
 dIsoSurface::dIsoSurface()
 {
 }
@@ -1116,7 +1115,7 @@ void dIsoSurface::Begin(dFloat32 isovalue, dFloat32 gridSize, dInt32 sizex, dInt
 	m_isoValue = isovalue;
 
 	m_points.SetCount(0);
-	m_trivecTriangles.SetCount(0);
+	m_trianglesList.SetCount(0);
 }
 
 void dIsoSurface::End()
@@ -1314,14 +1313,14 @@ void dIsoSurface::ProcessCell(const dIsoCell& cell)
 	
 		for (dInt32 i = 0; m_triangleTable[tableIndex][i] != -1; i += 3)
 		{
-			dIsoSurfaceTriangle triangle;
+			dIsoTriangle triangle;
 			dUnsigned64 pointID0 = GetEdgeID(cell, m_triangleTable[tableIndex][i]);
 			dUnsigned64 pointID1 = GetEdgeID(cell, m_triangleTable[tableIndex][i + 1]);
 			dUnsigned64 pointID2 = GetEdgeID(cell, m_triangleTable[tableIndex][i + 2]);
 			triangle.m_pointId[0] = pointID0;
 			triangle.m_pointId[1] = pointID1;
 			triangle.m_pointId[2] = pointID2;
-			m_trivecTriangles.PushBack(triangle);
+			m_trianglesList.PushBack(triangle);
 		}
 	}
 }
@@ -1331,51 +1330,37 @@ void dIsoSurface::RemapIndexList()
 	dFloat32 nextID = 0;
 
 	// calculate monotonic index list
-	dTree<dVector, dUnsigned64>::Iterator mapIterator(m_vertexMap);
-	for (mapIterator.Begin(); mapIterator; mapIterator++)
+	dIsoVertexMap::Iterator iter(m_vertexMap);
+	for (iter.Begin(); iter; iter++)
 	{
-		dVector& point = mapIterator.GetNode()->GetInfo();
+		dVector& point = iter.GetNode()->GetInfo();
 		point.m_w = nextID;
 		nextID += 1.0f;
 	}
 
 	// Now remap triangles.
-	for (dInt32 k = 0; k < m_trivecTriangles.GetCount(); k++)
+	for (dInt32 k = 0; k < m_trianglesList.GetCount(); k++)
 	{
 		for (dInt32 i = 0; i < 3; i++)
 		{
-			dTree<dVector, dUnsigned64>::dTreeNode* const node = m_vertexMap.Find(m_trivecTriangles[k].m_pointId[i]);
+			dIsoVertexMap::dTreeNode* const node = m_vertexMap.Find(m_trianglesList[k].m_pointId[i]);
 			dAssert(node);
 			dInt32 newID = dInt32 (node->GetInfo().m_w);
-			m_trivecTriangles[k].m_pointId[i] = newID;
+			m_trianglesList[k].m_pointId[i] = newID;
 		}
 	}
 
-	// Copy all the vertices and triangles into two arrays so that they
-	// can be efficiently accessed.
-	// Copy vertices.
-	//m_nVertices = m_i2pt3idVertices.GetCount();
-	//m_ppt3dVertices = new dVector[m_nVertices];
+	// Copy all the vertices to a flat array
 	m_points.SetCount(m_vertexMap.GetCount());
 
-	mapIterator.Begin();
+	iter.Begin();
 	for (dInt32 i = 0; i < m_vertexMap.GetCount(); i++)
 	{
-		dVector& point = mapIterator.GetNode()->GetInfo();
+		dVector& point = iter.GetNode()->GetInfo();
 		m_points[i] = point & dVector::m_triplexMask;
-		mapIterator++;
+		iter++;
 	}
-
-	//m_nTriangles = m_trivecTriangles.GetCount();
-	//m_piTriangleIndices = new dInt32[m_nTriangles * 3];
-	//for (dInt32 i = 0; i < m_nTriangles; i++)
-	//{
-	//	const dIsoSurfaceTriangle& triang = m_trivecTriangles[i];
-	//	m_piTriangleIndices[i * 3 + 0] = triang.m_pointId[0];
-	//	m_piTriangleIndices[i * 3 + 1] = triang.m_pointId[1];
-	//	m_piTriangleIndices[i * 3 + 2] = triang.m_pointId[2];
-	//}
-	//m_trivecTriangles.Clear();
+	
 	m_vertexMap.RemoveAll();
 }
 
@@ -1386,11 +1371,11 @@ void dIsoSurface::CalculateNormals()
 	// Set all normals to 0.
 	memset(&m_normals[0], 0, m_normals.GetCount() * sizeof(dVector));
 
-	for (dInt32 i = 0; i < m_trivecTriangles.GetCount(); i++)
+	for (dInt32 i = 0; i < m_trianglesList.GetCount(); i++)
 	{
-		dInt32 id0 = dInt32(m_trivecTriangles[i].m_pointId[0]);
-		dInt32 id1 = dInt32(m_trivecTriangles[i].m_pointId[1]);
-		dInt32 id2 = dInt32(m_trivecTriangles[i].m_pointId[2]);
+		dInt32 id0 = dInt32(m_trianglesList[i].m_pointId[0]);
+		dInt32 id1 = dInt32(m_trianglesList[i].m_pointId[1]);
+		dInt32 id2 = dInt32(m_trianglesList[i].m_pointId[2]);
 		dVector vec1 (m_points[id1] - m_points[id0]);
 		dVector vec2 (m_points[id2] - m_points[id0]);
 		dVector normal = vec1.CrossProduct(vec2);

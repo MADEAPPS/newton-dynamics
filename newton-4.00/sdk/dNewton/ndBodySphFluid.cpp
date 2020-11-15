@@ -563,9 +563,9 @@ D_NEWTON_API void ndBodySphFluid::GenerateIsoSurface(const ndWorld* const world,
 		dAssert((hashBox1.m_y - hashBox0.m_y) > 1);
 		dAssert((hashBox1.m_x - hashBox0.m_x) > 1);
 
-
-		dFloat32 xxx[6][6][6];
+/*
 		{
+			dFloat32 xxx[6][6][6];
 			for (dInt32 i = 0; i < 6 * 6 * 6; i++)
 			{
 				dFloat32* yyy = &xxx[0][0][0];
@@ -584,13 +584,8 @@ D_NEWTON_API void ndBodySphFluid::GenerateIsoSurface(const ndWorld* const world,
 			isoSurcase.GenerateSurface(&xxx[0][0][0], 0.5f, 5, 5, 5, gridSize, gridSize, gridSize);
 			cellCount *= 1;
 		}
-
-
-
-
-
-
-
+*/
+		dFloat32 xxx[6][6][6];
 		memset(xxx, 0, sizeof(xxx));
 		for (dInt32 i = 0; i < uniqueCount; i++)
 		{

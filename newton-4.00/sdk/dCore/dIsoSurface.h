@@ -30,6 +30,7 @@
 #include "dArray.h"
 #include "dTree.h"
 
+#if 0
 class dIsoSurfacePointId 
 {
 	public:
@@ -129,9 +130,9 @@ class dIsoSurfaceOld
 	static const dInt32 m_edgeTable[256];
 	static const dInt32 m_triTable[256][16];
 };
+#endif
 
-
-class dIsoSurface
+class dIsoSurface: public dClassAlloc
 {
 	public:
 	class dIsoCell
@@ -143,12 +144,16 @@ class dIsoSurface
 		dInt32 m_z;
 	};
 
-	class dIsoSurfaceTriangle
+	class dIsoTriangle
 	{
 		public:
 		dUnsigned64 m_pointId[3];
 	};
 
+	class dIsoVertexMap: public dTree<dVector, dUnsigned64, dContainersFreeListAlloc<dVector>>
+	{
+		public: 
+	};
 
 	D_CORE_API dIsoSurface();
 	D_CORE_API ~dIsoSurface();
@@ -170,8 +175,9 @@ class dIsoSurface
 
 	dArray<dVector> m_points;
 	dArray<dVector> m_normals;
-	dTree<dVector, dUnsigned64> m_vertexMap;
-	dArray<dIsoSurfaceTriangle> m_trivecTriangles;
+	dArray<dIsoTriangle> m_trianglesList;
+
+	dIsoVertexMap m_vertexMap;
 	dInt32 m_xCellSize;
 	dInt32 m_yCellSize;
 	dInt32 m_zCellSize;
