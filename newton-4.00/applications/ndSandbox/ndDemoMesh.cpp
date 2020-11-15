@@ -16,15 +16,6 @@
 #include "ndTargaToOpenGl.h"
 #include "ndDemoEntityManager.h"
 
-//glBindBuffer(GL_ARRAY_BUFFER, m_offsetBuffer);
-//ndMeshVector* const offsetBuffer = (ndMeshVector*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-//for (GLenum err = glGetError(); err; err = glGetError())
-//{
-//	dTrace(("%i\n", err));
-//}
-//glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-
 ndDemoSubMeshMaterial::ndDemoSubMeshMaterial()
 	:m_ambient(0.8f, 0.8f, 0.8f, 1.0f)
 	,m_diffuse(0.8f, 0.8f, 0.8f, 1.0f)
@@ -94,56 +85,6 @@ void ndDemoSubMesh::SetOpacity(dFloat32 opacity)
 }
 
 /*
-ndDemoMesh::ndDemoMesh(NewtonMesh* const mesh, const ndShaderPrograms& shaderCache)
-	:ndDemoMeshInterface()
-	,m_uv(nullptr)
-	,m_vertex(nullptr)
-	,m_normal(nullptr)
-	,m_vertexCount(0)
-	,m_optimizedOpaqueDiplayList(0)		
-	,m_optimizedTransparentDiplayList(0)
-{
-	// extract vertex data  from the newton mesh		
-	AllocVertexData(NewtonMeshGetPointCount (mesh));
-
-	// a valid newton mesh always has a vertex channel
-	NewtonMeshGetVertexChannel(mesh, 3 * sizeof (dFloat32), (dFloat32*)m_vertex);
-	if (NewtonMeshHasNormalChannel(mesh)) {
-		NewtonMeshGetNormalChannel(mesh, 3 * sizeof (dFloat32), (dFloat32*)m_normal);
-	}
-	if (NewtonMeshHasUV0Channel(mesh)) {
-		NewtonMeshGetUV0Channel(mesh, 2 * sizeof (dFloat32), (dFloat32*)m_uv);
-	}
-
-	// extract the materials index array for mesh
-	void* const meshCookie = NewtonMeshBeginHandle (mesh); 
-	for (dInt32 handle = NewtonMeshFirstMaterial (mesh, meshCookie); handle != -1; handle = NewtonMeshNextMaterial (mesh, meshCookie, handle)) {
-		dInt32 textureId = NewtonMeshMaterialGetMaterial (mesh, meshCookie, handle); 
-		dInt32 indexCount = NewtonMeshMaterialGetIndexCount (mesh, meshCookie, handle); 
-		ndDemoSubMesh* const segment = AddSubMesh();
-
-		segment->m_shiness = 1.0f;
-		segment->m_opacity = 1.0f;
-		segment->m_ambient = dVector (0.8f, 0.8f, 0.8f, 1.0f);
-		segment->m_diffuse = dVector (0.8f, 0.8f, 0.8f, 1.0f);
-		segment->m_specular = dVector (0.0f, 0.0f, 0.0f, 1.0f);
-		segment->m_textureHandle = textureId;
-
-		segment->AllocIndexData (indexCount);
-		// for 16 bit indices meshes
-		//NewtonMeshMaterialGetIndexStreamShort (mesh, meshCookie, handle, (short int*)segment->m_indexes); 
-
-		segment->m_shader = shaderCache.m_diffuseEffect;
-
-		// for 32 bit indices mesh
-		NewtonMeshMaterialGetIndexStream (mesh, meshCookie, handle, (int*)segment->m_indexes); 
-	}
-	NewtonMeshEndHandle (mesh, meshCookie); 
-
-	// see if this mesh can be optimized
-	OptimizeForRender ();
-}
-
 NewtonMesh* ndDemoMesh::CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix)
 {
 	NewtonMesh* const mesh = NewtonMeshCreate(world);
@@ -181,7 +122,6 @@ const char* ndDemoMesh::GetTextureName (const ndDemoSubMesh* const subMesh) cons
 {
 	return subMesh->m_material.m_textureName;
 }
-
 
 ndDemoSubMesh* ndDemoMesh::AddSubMesh()
 {
@@ -916,6 +856,16 @@ ndDemoMesh::ndDemoMesh(const char* const name)
 	,dList<ndDemoSubMesh>()
 	,m_indexCount(0)
 	,m_vertexCount(0)
+	,m_textureLocation(0)
+	,m_transparencyLocation(0)
+	,m_normalMatrixLocation(0)
+	,m_projectMatrixLocation(0)
+	,m_viewModelMatrixLocation(0)
+	,m_directionalLightDirLocation(0)
+	,m_materialAmbientLocation(0)
+	,m_materialDiffuseLocation(0)
+	,m_materialSpecularLocation(0)
+
 	,m_shader(0)
 	,m_indexBuffer(0)
 	,m_vertexBuffer(0)

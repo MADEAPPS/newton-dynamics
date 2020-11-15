@@ -20,12 +20,40 @@
 #include "ndDemoEntityManager.h"
 #include "ndArchimedesBuoyancyVolume.h"
 
+
+class ndIsoSurfaceMesh : public ndDemoMesh
+{
+	public:
+	ndIsoSurfaceMesh(const ndShaderPrograms& shaderCache)
+		:ndDemoMesh("isoSurface")
+	{
+		m_shader = shaderCache.m_diffuseEffect;
+
+		ndDemoSubMesh* const segment = AddSubMesh();
+		//segment->m_material.m_textureHandle = (GLuint)material;
+		segment->m_material.m_textureHandle = (GLuint)1;
+
+		segment->SetOpacity(1.0f);
+		segment->m_segmentStart = 0;
+		segment->m_indexCount = 0;
+	}
+
+	void UpdateBuffers(const dArray<ndMeshPointUV>& points, const dArray<dInt32>& indexList)
+	{
+		OptimizeForRender(points, indexList);
+
+		ndDemoSubMesh& segment = GetFirst()->GetInfo();
+		segment.m_indexCount = indexList.GetCount();
+	}
+};
+
 class ndWaterVolumeEntity : public ndDemoEntity
 {
 	public:
 	ndWaterVolumeEntity(ndDemoEntityManager* const scene, const dMatrix& location, const dVector& size, ndBodySphFluid* const fluidBody, dFloat32 radius)
 		:ndDemoEntity(location, nullptr)
 		,m_fluidBody(fluidBody)
+		,m_hasNewMesh(false)
 	{
 		ndShapeInstance box(new ndShapeBox(9.0f, 10.0f, 9.0f));
 		dMatrix uvMatrix(dGetIdentityMatrix());
@@ -44,11 +72,17 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		ndShapeInstance shape(new ndShapeBox(radius * 2.0f, radius * 2.0f, radius * 2.0f));
 
 		m_meshParticle = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+
+		m_isoSurfaceMesh0 = new ndIsoSurfaceMesh(scene->GetShaderCache());
+		m_isoSurfaceMesh1 = new ndIsoSurfaceMesh(scene->GetShaderCache());
 	}
 
 	~ndWaterVolumeEntity()
 	{
+		dScopeSpinLock lock(m_lock);
 		m_meshParticle->Release();
+		m_isoSurfaceMesh0->Release();
+		m_isoSurfaceMesh1->Release();
 	}
 
 	void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
@@ -57,12 +91,53 @@ class ndWaterVolumeEntity : public ndDemoEntity
 
 		const dArray<dVector>& positions = m_fluidBody->GetPositions();
 		m_meshParticle->SetParticles(positions.GetCount(), &positions[0]);
+		nodeMatrix.m_posit.m_y += 1.0f;
 		m_meshParticle->Render(scene, nodeMatrix);
-		//ndDemoEntity::Render(timeStep, scene, matrix);
+	
+		nodeMatrix.m_posit.m_z += 0.0f;
+		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
+		dScopeSpinLock lock(m_lock);
+		if (m_hasNewMesh)
+		{
+			m_hasNewMesh = false;
+			m_isoSurfaceMesh1->UpdateBuffers(m_points, m_indexList);
+			dSwap(m_isoSurfaceMesh0, m_isoSurfaceMesh1);
+		}
+	}
+
+	void UpdateIsoSuface(const dIsoSurface& isoSurface)
+	{
+		m_points.SetCount(isoSurface.GetVertexCount());
+		const dVector* const points = isoSurface.GetPoints();
+		const dVector* const normals = isoSurface.GetNormals();
+		for (dInt32 i = 0; i < isoSurface.GetVertexCount(); i++)
+		{
+			m_points[i].m_posit = ndMeshVector(GLfloat(points[i].m_x), GLfloat(points[i].m_y), GLfloat(points[i].m_z));
+			m_points[i].m_normal = ndMeshVector(GLfloat(normals[i].m_x), GLfloat(normals[i].m_y), GLfloat(normals[i].m_z));
+			m_points[i].m_uv.m_u = GLfloat(0.0f);
+			m_points[i].m_uv.m_v = GLfloat(0.0f);
+		}
+
+		m_indexList.SetCount(isoSurface.GetIndexCount());
+		const dUnsigned64* const indexList = isoSurface.GetIndexList();
+		for (dInt32 i = 0; i < isoSurface.GetIndexCount(); i++)
+		{
+			m_indexList[i] = dInt32(indexList[i]);
+		}
+
+		dScopeSpinLock lock(m_lock);
+		m_hasNewMesh = true;
 	}
 
 	ndBodySphFluid* m_fluidBody;
 	ndDemoMeshIntance* m_meshParticle;
+
+	dArray<dInt32> m_indexList;
+	dArray<ndMeshPointUV> m_points;
+	mutable bool m_hasNewMesh;
+	mutable dSpinLock m_lock;
+	mutable ndIsoSurfaceMesh* m_isoSurfaceMesh0;
+	mutable ndIsoSurfaceMesh* m_isoSurfaceMesh1;
 };
 
 class ndWaterVolumeCallback: public ndDemoEntityNotify
@@ -80,10 +155,10 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 
 		//fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.25f);
 		fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.28f);
-		const dIsoSurface& isoFurface = fluid->GetIsoSurface();
+		const dIsoSurface& isoSurface = fluid->GetIsoSurface();
 
-		// here we update the render mesh,
-		//the render mesh will have a double bugger for quick map and unmap operations
+		ndWaterVolumeEntity* const entity = (ndWaterVolumeEntity*)GetUserData();
+		entity->UpdateIsoSuface(isoSurface);
 	}
 };
 
