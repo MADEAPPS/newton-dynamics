@@ -94,7 +94,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		//nodeMatrix.m_posit.m_y += 1.0f;
 		//m_meshParticle->Render(scene, nodeMatrix);
 	
-		//nodeMatrix.m_posit.m_y += 11.0f;
+		nodeMatrix.m_posit.m_y += 0.25f;
 		//nodeMatrix.m_posit.m_z += 0.0f;
 
 		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
@@ -109,26 +109,29 @@ class ndWaterVolumeEntity : public ndDemoEntity
 
 	void UpdateIsoSuface(const dIsoSurface& isoSurface)
 	{
-		m_points.SetCount(isoSurface.GetVertexCount());
-		const dVector* const points = isoSurface.GetPoints();
-		const dVector* const normals = isoSurface.GetNormals();
-		for (dInt32 i = 0; i < isoSurface.GetVertexCount(); i++)
+		if (isoSurface.GetVertexCount())
 		{
-			m_points[i].m_posit = ndMeshVector(GLfloat(points[i].m_x), GLfloat(points[i].m_y), GLfloat(points[i].m_z));
-			m_points[i].m_normal = ndMeshVector(GLfloat(normals[i].m_x), GLfloat(normals[i].m_y), GLfloat(normals[i].m_z));
-			m_points[i].m_uv.m_u = GLfloat(0.0f);
-			m_points[i].m_uv.m_v = GLfloat(0.0f);
-		}
+			m_points.SetCount(isoSurface.GetVertexCount());
+			const dVector* const points = isoSurface.GetPoints();
+			const dVector* const normals = isoSurface.GetNormals();
+			for (dInt32 i = 0; i < isoSurface.GetVertexCount(); i++)
+			{
+				m_points[i].m_posit = ndMeshVector(GLfloat(points[i].m_x), GLfloat(points[i].m_y), GLfloat(points[i].m_z));
+				m_points[i].m_normal = ndMeshVector(GLfloat(normals[i].m_x), GLfloat(normals[i].m_y), GLfloat(normals[i].m_z));
+				m_points[i].m_uv.m_u = GLfloat(0.0f);
+				m_points[i].m_uv.m_v = GLfloat(0.0f);
+			}
 
-		m_indexList.SetCount(isoSurface.GetIndexCount());
-		const dUnsigned64* const indexList = isoSurface.GetIndexList();
-		for (dInt32 i = 0; i < isoSurface.GetIndexCount(); i++)
-		{
-			m_indexList[i] = dInt32(indexList[i]);
-		}
+			m_indexList.SetCount(isoSurface.GetIndexCount());
+			const dUnsigned64* const indexList = isoSurface.GetIndexList();
+			for (dInt32 i = 0; i < isoSurface.GetIndexCount(); i++)
+			{
+				m_indexList[i] = dInt32(indexList[i]);
+			}
 
-		dScopeSpinLock lock(m_lock);
-		m_hasNewMesh = true;
+			dScopeSpinLock lock(m_lock);
+			m_hasNewMesh = true;
+		}
 	}
 
 	ndBodySphFluid* m_fluidBody;
@@ -156,7 +159,7 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 		dAssert(fluid);
 
 		//fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.25f);
-		fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.125f);
+		fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.15f);
 		const dIsoSurface& isoSurface = fluid->GetIsoSurface();
 
 		ndWaterVolumeEntity* const entity = (ndWaterVolumeEntity*)GetUserData();
@@ -183,20 +186,24 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 	fluidObject->SetParticleRadius(diameter * 0.5f);
 
 	//dInt32 particleCountPerAxis = 32;
-	dInt32 particleCountPerAxis = 1;
+	dInt32 particleCountPerAxis = 3;
 	dFloat32 spacing = diameter * 1.0f;
 
 	dFloat32 offset = spacing * particleCountPerAxis / 2.0f;
 	dVector origin(-offset, 1.0f, -offset, dFloat32(0.0f));
 	origin += matrix.m_posit;
+origin.m_x = 0.0f;
+origin.m_z = 0.0f;
+origin.m_y = 1.0f;
 	
 	for (dInt32 z = 0; z < particleCountPerAxis; z++)
 	//for (dInt32 z = 0; z < 1; z++)
 	{
-		for (dInt32 y = 0; y < particleCountPerAxis; y++)
-		//for (dInt32 y = 0; y < 1; y++)
+		//for (dInt32 y = 0; y < particleCountPerAxis; y++)
+		for (dInt32 y = 0; y < 1; y++)
 		{
-			for (dInt32 x = 0; x < particleCountPerAxis; x++)
+			//for (dInt32 x = 0; x < particleCountPerAxis; x++)
+			for (dInt32 x = 0; x < 1; x++)
 			{
 				dVector posit(x * spacing, y * spacing, z * spacing, 0.0f);
 				fluidObject->AddParticle(0.1f, origin + posit, dVector::m_zero);

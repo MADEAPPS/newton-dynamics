@@ -205,17 +205,17 @@ inline const dInt32 dIsoSurface::GetVertexCount() const
 
 inline const dVector* dIsoSurface::GetPoints() const
 {
-	return &m_points[0];
+	return m_points.GetCount() ? &m_points[0] : nullptr;
 }
 
 inline const dVector* dIsoSurface::GetNormals() const
 {
-	return &m_normals[0];
+	return m_normals.GetCount() ? &m_normals[0] : nullptr;
 }
 
 inline const dUnsigned64* dIsoSurface::GetIndexList() const
 {
-	return &m_trianglesList[0].m_pointId[0];
+	return m_trianglesList.GetCount() ? &m_trianglesList[0].m_pointId[0] : nullptr;
 }
 
 #endif

@@ -1370,25 +1370,28 @@ void dIsoSurface::CalculateNormals()
 	m_normals.SetCount(m_points.GetCount());
 
 	// Set all normals to 0.
-	memset(&m_normals[0], 0, m_normals.GetCount() * sizeof(dVector));
-
-	for (dInt32 i = 0; i < m_trianglesList.GetCount(); i++)
+	if (m_normals.GetCount())
 	{
-		dInt32 id0 = dInt32(m_trianglesList[i].m_pointId[0]);
-		dInt32 id1 = dInt32(m_trianglesList[i].m_pointId[1]);
-		dInt32 id2 = dInt32(m_trianglesList[i].m_pointId[2]);
-		dVector vec1 (m_points[id1] - m_points[id0]);
-		dVector vec2 (m_points[id2] - m_points[id0]);
-		dVector normal = vec1.CrossProduct(vec2);
-		m_normals[id0] += normal;
-		m_normals[id1] += normal;
-		m_normals[id2] += normal;
-	}
+		memset(&m_normals[0], 0, m_normals.GetCount() * sizeof(dVector));
 
-	// Normalize normals.
-	for (dInt32 i = 0; i < m_normals.GetCount(); i++)
-	{
-		//m_normals[i] = m_normals[i].Normalize();
-		m_normals[i] = m_normals[i] * m_normals[i].InvMagSqrt();
+		for (dInt32 i = 0; i < m_trianglesList.GetCount(); i++)
+		{
+			dInt32 id0 = dInt32(m_trianglesList[i].m_pointId[0]);
+			dInt32 id1 = dInt32(m_trianglesList[i].m_pointId[1]);
+			dInt32 id2 = dInt32(m_trianglesList[i].m_pointId[2]);
+			dVector vec1(m_points[id1] - m_points[id0]);
+			dVector vec2(m_points[id2] - m_points[id0]);
+			dVector normal = vec1.CrossProduct(vec2);
+			m_normals[id0] += normal;
+			m_normals[id1] += normal;
+			m_normals[id2] += normal;
+		}
+
+		// Normalize normals.
+		for (dInt32 i = 0; i < m_normals.GetCount(); i++)
+		{
+			//m_normals[i] = m_normals[i].Normalize();
+			m_normals[i] = m_normals[i] * m_normals[i].InvMagSqrt();
+		}
 	}
 }
