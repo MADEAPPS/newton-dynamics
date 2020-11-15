@@ -154,7 +154,7 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 		dAssert(fluid);
 
 		//fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.25f);
-		fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.28f);
+		fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.125f);
 		const dIsoSurface& isoSurface = fluid->GetIsoSurface();
 
 		ndWaterVolumeEntity* const entity = (ndWaterVolumeEntity*)GetUserData();
