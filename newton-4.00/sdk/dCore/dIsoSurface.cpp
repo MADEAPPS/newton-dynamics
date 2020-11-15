@@ -1106,8 +1106,9 @@ dIsoSurface::~dIsoSurface()
 {
 }
 
-void dIsoSurface::Begin(dFloat32 isovalue, dFloat32 gridSize, dInt32 sizex, dInt32 sizey, dInt32 sizez)
+void dIsoSurface::Begin(const dVector& origin, dFloat32 isovalue, dFloat32 gridSize, dInt32 sizex, dInt32 sizey, dInt32 sizez)
 {
+	m_origin = origin & dVector::m_triplexMask;
 	m_xCellSize = sizex;
 	m_yCellSize = sizey;
 	m_zCellSize = sizez;
@@ -1357,7 +1358,7 @@ void dIsoSurface::RemapIndexList()
 	for (dInt32 i = 0; i < m_vertexMap.GetCount(); i++)
 	{
 		dVector& point = iter.GetNode()->GetInfo();
-		m_points[i] = point & dVector::m_triplexMask;
+		m_points[i] = point + m_origin;
 		iter++;
 	}
 	

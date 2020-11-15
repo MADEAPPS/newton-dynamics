@@ -504,7 +504,6 @@ void RenderParticles(ndDemoEntityManager* const scene)
 		for (dInt32 i = 0; i < positions.GetCount(); i ++)
 		{
 			dVector particlePosit(positions[i]);
-			particlePosit.m_y += 1.0f;
 			particlePosit.m_w = 1.0f;
 			dVector point(viewProjectionMatrix.TransformVector1x4(particlePosit));
 			dFloat32 zDist = point.m_w;

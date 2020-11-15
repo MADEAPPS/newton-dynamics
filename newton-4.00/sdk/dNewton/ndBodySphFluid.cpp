@@ -600,7 +600,7 @@ D_NEWTON_API void ndBodySphFluid::GenerateIsoSurface(const ndWorld* const world,
 		dInt32 gridCountX = dInt32(hashBox1.m_x - hashBox0.m_x) + 32;
 		dInt32 gridCountY = dInt32(hashBox1.m_y - hashBox0.m_y) + 32;
 		dInt32 gridCountZ = dInt32(hashBox1.m_z - hashBox0.m_z) + 32;
-		m_isoSurcase.Begin(dFloat32(0.5f), gridSize, gridCountX, gridCountY, gridCountZ);
+		m_isoSurcase.Begin(boxP0, dFloat32(0.5f), gridSize, gridCountX, gridCountY, gridCountZ);
 
 		dIsoSurface::dIsoCell cell;
 		for (dInt32 z = 0; z < 5; z++)

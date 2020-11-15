@@ -94,9 +94,9 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		//nodeMatrix.m_posit.m_y += 1.0f;
 		//m_meshParticle->Render(scene, nodeMatrix);
 	
-		nodeMatrix.m_posit.m_y += 1.0f;
+		//nodeMatrix.m_posit.m_y += 11.0f;
+		//nodeMatrix.m_posit.m_z += 0.0f;
 
-		nodeMatrix.m_posit.m_z += 0.0f;
 		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
 		dScopeSpinLock lock(m_lock);
 		if (m_hasNewMesh)
@@ -201,6 +201,9 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 				dVector posit(x * spacing, y * spacing, z * spacing, 0.0f);
 				fluidObject->AddParticle(0.1f, origin + posit, dVector::m_zero);
 
+				//dVector xxxx(dVector::m_zero);
+				//fluidObject->AddParticle(0.1f, xxxx, dVector::m_zero);
+
 				//posit += dVector(0.01f, 0.01f, 0.01f, 0.0f);
 				//fluidObject->AddParticle(0.1f, origin + posit, dVector::m_zero);
 			}
@@ -213,7 +216,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 void ndBasicWaterVolume (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFlatPlane(scene, true);
+	//BuildFlatPlane(scene, true);
 
 	dMatrix location(dGetIdentityMatrix());
 

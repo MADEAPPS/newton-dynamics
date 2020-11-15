@@ -158,7 +158,7 @@ class dIsoSurface: public dClassAlloc
 	D_CORE_API dIsoSurface();
 	D_CORE_API ~dIsoSurface();
 
-	D_CORE_API void Begin(dFloat32 isovalue, dFloat32 gridSize, dInt32 sizex, dInt32 sizey, dInt32 sizez);
+	D_CORE_API void Begin(const dVector& origin, dFloat32 isovalue, dFloat32 gridSize, dInt32 sizex, dInt32 sizey, dInt32 sizez);
 	D_CORE_API void ProcessCell(const dIsoCell& cell);
 	D_CORE_API void End();
 
@@ -177,6 +177,7 @@ class dIsoSurface: public dClassAlloc
 	void RemapIndexList();
 	void CalculateNormals();
 
+	dVector m_origin;
 	dArray<dVector> m_points;
 	dArray<dVector> m_normals;
 	dArray<dIsoTriangle> m_trianglesList;
