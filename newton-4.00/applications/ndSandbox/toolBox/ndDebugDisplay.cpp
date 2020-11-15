@@ -475,9 +475,9 @@ void RenderParticles(ndDemoEntityManager* const scene)
 	dMatrix invViewProjectionMatrix(camera->GetProjectionMatrix().Inverse4x4() * camera->GetViewMatrix().Inverse());
 
 	ndMeshVector4 color;
-	color.m_x = 1.0f;
-	color.m_y = 1.0f;
-	color.m_z = 0.0f;
+	color.m_x = 50.0f / 255.0f;
+	color.m_y = 100.0f / 255.0f;
+	color.m_z = 200.0f / 255.0f;
 	color.m_w = 1.0f;
 
 	glUseProgram(shader);
