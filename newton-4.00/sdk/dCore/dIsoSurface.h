@@ -159,10 +159,14 @@ class dIsoSurface: public dClassAlloc
 	D_CORE_API ~dIsoSurface();
 
 	D_CORE_API void Begin(dFloat32 isovalue, dFloat32 gridSize, dInt32 sizex, dInt32 sizey, dInt32 sizez);
-
 	D_CORE_API void ProcessCell(const dIsoCell& cell);
-
 	D_CORE_API void End();
+
+	const dInt32 GetIndexCount() const;
+	const dInt32 GetVertexCount() const;
+	const dVector* GetPoints() const;
+	const dVector* GetNormals() const;
+	const dUnsigned64* GetIndexList() const;
 
 	private:
 	dUnsigned64 GetVertexID(dInt32 x, dInt32 y, dInt32 z);
@@ -188,6 +192,30 @@ class dIsoSurface: public dClassAlloc
 	static const dInt32 m_triangleTable[][16];
 };
 
+inline const dInt32 dIsoSurface::GetIndexCount() const
+{
+	return m_trianglesList.GetCount() * 3;
+}
+
+inline const dInt32 dIsoSurface::GetVertexCount() const
+{
+	return m_points.GetCount();
+}
+
+inline const dVector* dIsoSurface::GetPoints() const
+{
+	return &m_points[0];
+}
+
+inline const dVector* dIsoSurface::GetNormals() const
+{
+	return &m_normals[0];
+}
+
+inline const dUnsigned64* dIsoSurface::GetIndexList() const
+{
+	return &m_trianglesList[0].m_pointId[0];
+}
 
 #endif
 

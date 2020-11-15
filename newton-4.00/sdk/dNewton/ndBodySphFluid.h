@@ -41,6 +41,8 @@ class ndBodySphFluid: public ndBodyParticleSet
 
 	D_NEWTON_API virtual void GenerateIsoSurface(const ndWorld* const world, dFloat32 gridSize);
 
+	const dIsoSurface& GetIsoSurface() const;
+
 	protected:
 	D_NEWTON_API virtual void Update(const ndWorld* const world, dFloat32 timestep);
 	virtual dFloat32 RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const;
@@ -134,6 +136,11 @@ inline dFloat32 ndBodySphFluid::RayCast(ndRayCastNotify& callback, const dFastRa
 inline ndBodySphFluid* ndBodySphFluid::GetAsBodySphFluid()
 { 
 	return this; 
+}
+
+inline const dIsoSurface& ndBodySphFluid::GetIsoSurface() const
+{
+	return m_isoSurcase;
 }
 
 #endif 

@@ -77,8 +77,13 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 	{
 		ndBodySphFluid* const fluid = GetBody()->GetAsBodySphFluid();
 		dAssert(fluid);
+
 		//fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.25f);
 		fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.28f);
+		const dIsoSurface& isoFurface = fluid->GetIsoSurface();
+
+		// here we update the render mesh,
+		//the render mesh will have a double bugger for quick map and unmap operations
 	}
 };
 
