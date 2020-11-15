@@ -26,6 +26,29 @@
 
 #define D_BASH_SIZE 256
 
+/*
+{
+dFloat32 xxx[6][6][6];
+for (dInt32 i = 0; i < 6 * 6 * 6; i++)
+{
+dFloat32* yyy = &xxx[0][0][0];
+yyy[i] = 1.0f;
+}
+for (dInt32 i = 0; i < uniqueCount; i++)
+{
+dInt32 x = m_hashGridMap[i].m_x;
+dInt32 y = m_hashGridMap[i].m_y;
+dInt32 z = m_hashGridMap[i].m_z;
+
+xxx[z][y][x] = 0.0f;
+}
+
+dIsoSurfaceOld isoSurcase;
+isoSurcase.GenerateSurface(&xxx[0][0][0], 0.5f, 5, 5, 5, gridSize, gridSize, gridSize);
+cellCount *= 1;
+}
+*/
+
 ndBodySphFluid::ndBodySphFluid()
 	:ndBodyParticleSet()
 	,m_box0(dFloat32(-1e10f))
@@ -558,35 +581,17 @@ D_NEWTON_API void ndBodySphFluid::GenerateIsoSurface(const ndWorld* const world,
 
 	dUnsigned64 cellCount = (hashBox1.m_z - hashBox0.m_z) * (hashBox1.m_y - hashBox0.m_y) * (hashBox1.m_x - hashBox0.m_x);
 
-	if (cellCount <= 128)
+	//if (cellCount <= 128)
+	if (cellCount <= 256)
 	{
 		dAssert((hashBox1.m_z - hashBox0.m_z) > 1);
 		dAssert((hashBox1.m_y - hashBox0.m_y) > 1);
 		dAssert((hashBox1.m_x - hashBox0.m_x) > 1);
 
-/*
-		{
-			dFloat32 xxx[6][6][6];
-			for (dInt32 i = 0; i < 6 * 6 * 6; i++)
-			{
-				dFloat32* yyy = &xxx[0][0][0];
-				yyy[i] = 1.0f;
-			}
-			for (dInt32 i = 0; i < uniqueCount; i++)
-			{
-				dInt32 x = m_hashGridMap[i].m_x;
-				dInt32 y = m_hashGridMap[i].m_y;
-				dInt32 z = m_hashGridMap[i].m_z;
-
-				xxx[z][y][x] = 0.0f;
-			}
-
-			dIsoSurfaceOld isoSurcase;
-			isoSurcase.GenerateSurface(&xxx[0][0][0], 0.5f, 5, 5, 5, gridSize, gridSize, gridSize);
-			cellCount *= 1;
-		}
-*/
-		dFloat32 xxx[10][10][10];
+		const int x_ = 6;
+		const int y_ = 6;
+		const int z_ = 20;
+		dFloat32 xxx[z_][y_][x_];
 		memset(xxx, 0, sizeof(xxx));
 		for (dInt32 i = 0; i < uniqueCount; i++)
 		{
@@ -602,13 +607,13 @@ D_NEWTON_API void ndBodySphFluid::GenerateIsoSurface(const ndWorld* const world,
 		m_isoSurcase.Begin(boxP0, dFloat32(0.5f), gridSize, gridCountX, gridCountY, gridCountZ);
 		
 		dIsoSurface::dIsoCell cell;
-		for (dInt32 z = 0; z < 9; z++)
+		for (dInt32 z = 0; z < z_-1; z++)
 		{
 			cell.m_z = z;
-			for (dInt32 y = 0; y < 9; y++)
+			for (dInt32 y = 0; y < y_-1; y++)
 			{
 				cell.m_y = y;
-				for (dInt32 x = 0; x < 9; x++)
+				for (dInt32 x = 0; x < x_-1; x++)
 				{
 					cell.m_x = x;
 					cell.m_isoValues[0][0][0] = xxx[z + 0][y + 0][x + 0];
