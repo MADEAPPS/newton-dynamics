@@ -33,9 +33,10 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 		//segment->m_material.m_textureHandle = (GLuint)material;
 		segment->m_material.m_textureHandle = (GLuint)1;
 
-		segment->SetOpacity(1.0f);
+		segment->SetOpacity(0.3f);
 		segment->m_segmentStart = 0;
 		segment->m_indexCount = 0;
+		m_hasTransparency = true;
 	}
 
 	void UpdateBuffers(const dArray<ndMeshPointUV>& points, const dArray<dInt32>& indexList)
@@ -95,7 +96,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 
 		// the mesh in is global space I need to fix that
 		dMatrix nodeMatrix(dGetIdentityMatrix());
-nodeMatrix.m_posit.m_y += 0.25f;
+nodeMatrix.m_posit.m_y += 0.125f;
 
 		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
 		dScopeSpinLock lock(m_lock);

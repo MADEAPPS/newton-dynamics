@@ -1241,7 +1241,7 @@ void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const dMat
 {
 	if (m_isVisible)
 	{
-		glDisable(GL_CULL_FACE);
+		//glDisable(GL_CULL_FACE);
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1264,6 +1264,8 @@ void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const dMat
 		glBindVertexArray(m_vetextArrayBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
 
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 		glActiveTexture(GL_TEXTURE0);
 		for (dListNode* node = GetFirst(); node; node = node->GetNext())
 		{
@@ -1281,6 +1283,8 @@ void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const dMat
 				glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
 			}
 		}
+
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
