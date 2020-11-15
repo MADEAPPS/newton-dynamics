@@ -1328,15 +1328,18 @@ void dIsoSurface::ProcessCell(const dIsoCell& cell)
 
 void dIsoSurface::RemapIndexList()
 {
-	dFloat32 nextID = 0;
+	dInt32 nextID = 0;
 
 	// calculate monotonic index list
+	m_points.SetCount(m_vertexMap.GetCount());
 	dIsoVertexMap::Iterator iter(m_vertexMap);
 	for (iter.Begin(); iter; iter++)
 	{
 		dVector& point = iter.GetNode()->GetInfo();
-		point.m_w = nextID;
-		nextID += 1.0f;
+		m_points[nextID] = point + m_origin;
+		dAssert(m_points[nextID].m_w == dFloat32(0.0f));
+		point.m_w = dFloat32(nextID);
+		nextID ++;
 	}
 
 	// Now remap triangles.
@@ -1346,22 +1349,10 @@ void dIsoSurface::RemapIndexList()
 		{
 			dIsoVertexMap::dTreeNode* const node = m_vertexMap.Find(m_trianglesList[k].m_pointId[i]);
 			dAssert(node);
-			dInt32 newID = dInt32 (node->GetInfo().m_w);
-			m_trianglesList[k].m_pointId[i] = newID;
+			dInt32 id = dInt32 (node->GetInfo().m_w);
+			m_trianglesList[k].m_pointId[i] = id;
 		}
 	}
-
-	// Copy all the vertices to a flat array
-	m_points.SetCount(m_vertexMap.GetCount());
-
-	iter.Begin();
-	for (dInt32 i = 0; i < m_vertexMap.GetCount(); i++)
-	{
-		dVector& point = iter.GetNode()->GetInfo();
-		m_points[i] = point + m_origin;
-		iter++;
-	}
-	
 	m_vertexMap.RemoveAll();
 }
 

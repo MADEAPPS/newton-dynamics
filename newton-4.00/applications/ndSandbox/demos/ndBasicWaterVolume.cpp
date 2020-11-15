@@ -87,15 +87,15 @@ class ndWaterVolumeEntity : public ndDemoEntity
 
 	void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 	{
-		dMatrix nodeMatrix(m_matrix * matrix);
-
+		//dMatrix nodeMatrix(m_matrix * matrix);
 		//const dArray<dVector>& positions = m_fluidBody->GetPositions();
 		//m_meshParticle->SetParticles(positions.GetCount(), &positions[0]);
 		//nodeMatrix.m_posit.m_y += 1.0f;
 		//m_meshParticle->Render(scene, nodeMatrix);
-	
-		nodeMatrix.m_posit.m_y += 0.25f;
-		//nodeMatrix.m_posit.m_z += 0.0f;
+
+		// the mesh in is global space I need to fix that
+		dMatrix nodeMatrix(dGetIdentityMatrix());
+nodeMatrix.m_posit.m_y += 0.25f;
 
 		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
 		dScopeSpinLock lock(m_lock);
@@ -159,7 +159,7 @@ class ndWaterVolumeCallback: public ndDemoEntityNotify
 		dAssert(fluid);
 
 		//fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.25f);
-		fluid->GenerateIsoSurface(m_manager->GetWorld(), 0.15f);
+		fluid->GenerateIsoSurface(m_manager->GetWorld());
 		const dIsoSurface& isoSurface = fluid->GetIsoSurface();
 
 		ndWaterVolumeEntity* const entity = (ndWaterVolumeEntity*)GetUserData();
@@ -178,7 +178,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 
 	dFloat32 diameter = 0.25f;
 	ndBodySphFluid* const fluidObject = new ndBodySphFluid();
-	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, dVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject, diameter * 0.25f);
+	ndWaterVolumeEntity* const entity = new ndWaterVolumeEntity(scene, matrix, dVector(20.0f, 10.0f, 20.0f, 0.0f), fluidObject, diameter * 0.5f);
 
 	fluidObject->SetNotifyCallback(new ndWaterVolumeCallback(scene, entity));
 	fluidObject->SetMatrix(matrix);
@@ -191,10 +191,8 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 
 	dFloat32 offset = spacing * particleCountPerAxis / 2.0f;
 	dVector origin(-offset, 1.0f, -offset, dFloat32(0.0f));
-	origin += matrix.m_posit;
-origin.m_x = 0.0f;
-origin.m_z = 0.0f;
-origin.m_y = 1.0f;
+
+	matrix.m_posit += origin;
 	
 	for (dInt32 z = 0; z < particleCountPerAxis; z++)
 	//for (dInt32 z = 0; z < 1; z++)
@@ -205,8 +203,8 @@ origin.m_y = 1.0f;
 			//for (dInt32 x = 0; x < particleCountPerAxis; x++)
 			for (dInt32 x = 0; x < 1; x++)
 			{
-				dVector posit(x * spacing, y * spacing, z * spacing, 0.0f);
-				fluidObject->AddParticle(0.1f, origin + posit, dVector::m_zero);
+				dVector posit (matrix.TransformVector(dVector (x * spacing, y * spacing, z * spacing, dFloat32 (1.0f))));
+				fluidObject->AddParticle(0.1f, posit, dVector::m_zero);
 
 				//dVector xxxx(dVector::m_zero);
 				//fluidObject->AddParticle(0.1f, xxxx, dVector::m_zero);

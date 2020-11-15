@@ -39,7 +39,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 
 	D_NEWTON_API virtual void AddParticle(const dFloat32 mass, const dVector& position, const dVector& velocity);
 
-	D_NEWTON_API virtual void GenerateIsoSurface(const ndWorld* const world, dFloat32 gridSize);
+	D_NEWTON_API virtual void GenerateIsoSurface(const ndWorld* const world);
 
 	const dIsoSurface& GetIsoSurface() const;
 

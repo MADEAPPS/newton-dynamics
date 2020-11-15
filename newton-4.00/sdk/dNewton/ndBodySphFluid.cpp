@@ -542,12 +542,14 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 #endif
 }
 
-D_NEWTON_API void ndBodySphFluid::GenerateIsoSurface(const ndWorld* const world, dFloat32 gridSize)
+D_NEWTON_API void ndBodySphFluid::GenerateIsoSurface(const ndWorld* const world)
 {
 	D_TRACKTIME();
 	dVector boxP0;
 	dVector boxP1;
 	CaculateAABB(world, boxP0, boxP1);
+
+	dFloat32 gridSize = m_radius * dFloat32(2.0f);
 	const dVector invGridSize (dFloat32 (1.0f) / gridSize);
 
 	dVector padd(dFloat32(2.0f) * gridSize);
