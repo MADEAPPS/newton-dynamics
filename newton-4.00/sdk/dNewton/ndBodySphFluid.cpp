@@ -70,15 +70,12 @@ void ndBodySphFluid::CaculateAABB(const ndWorld* const world, dVector& boxP0, dV
 {
 	D_TRACKTIME();
 	dVector box0(dFloat32(1e20f));
-	dVector box1(dFloat32(1e20f));
+	dVector box1(dFloat32(-1e20f));
 	for (dInt32 i = m_posit.GetCount() - 1; i >= 0; i--)
 	{
 		box0 = box0.GetMin(m_posit[i]);
 		box1 = box1.GetMax(m_posit[i]);
 	}
-	//m_box0 = box0 - dVector(m_radius * dFloat32(2.0f));
-	//m_box1 = box1 + dVector(m_radius * dFloat32(2.0f));
-
 	boxP0 = box0;
 	boxP1 = box1;
 }
@@ -524,36 +521,110 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 
 D_NEWTON_API void ndBodySphFluid::GenerateIsoSurface(const ndWorld* const world, dFloat32 gridSize)
 {
-	dVector origin;
+	dVector boxP0;
 	dVector boxP1;
-	CaculateAABB(world, origin, boxP1);
+	CaculateAABB(world, boxP0, boxP1);
 	const dVector invGridSize (dFloat32 (1.0f) / gridSize);
 
+	dVector padd(dFloat32(2.0f) * gridSize);
+	boxP0 -= padd & dVector::m_triplexMask;
+	boxP1 += padd & dVector::m_triplexMask;
+
+	m_hashGridMap.SetCount(m_posit.GetCount());
+	m_hashGridMapScratchBuffer.SetCount(m_posit.GetCount());
 	const dVector* const posit = &m_posit[0];
-	for (dInt32 i = 0; i < m_posit.GetCount(); i++)
+	
+	for (dInt32 i = m_posit.GetCount() - 1; i >= 0; i--)
 	{
-		dVector r(posit[i] - origin);
+		dVector r(posit[i] - boxP0);
 		dVector p(r * invGridSize);
 		ndGridHash hashKey(p, i, ndHomeGrid);
 		m_hashGridMap[i] = hashKey;
 	}
 
-for (int i = 0; i < 200; i ++)
-{
-	dFloat32 xxx0 = dPerlinNoise(i / 100.0f, 1.0f);
-	dFloat32 xxx1 = dPerlinNoise(i / 100.0f, 2.0f);
-}
-
 	SortBatch(world, 0, 1);
-const dVector invGridSize1(dFloat32(1.0f) / gridSize);
+	dInt32 uniqueCount = 0;
+	for (dInt32 i = 0; i < m_hashGridMap.GetCount(); i++)
+	{
+		dUnsigned64 key0 = m_hashGridMap[i].m_gridHash;
+		m_hashGridMap[uniqueCount].m_gridHash = m_hashGridMap[i].m_gridHash;
+		uniqueCount++;
+		for (i ++; (i < m_hashGridMap.GetCount()) && (key0 == m_hashGridMap[i].m_gridHash); i++);
+	}
 
-	//dFloat32 xxx[3][3][3];
-	//for (int i = 0; i < 27; i++)
-	//{
-	//	dFloat32* yyy = &xxx[0][0][0];
-	//	yyy[i] = 1.0f;
-	//}
-	//dIsoSurface surfase;
-	//xxx[1][1][1] = 0.0f;
-	//surfase.GenerateSurface(&xxx[0][0][0], 0.5f, 2, 2, 2, 1.0f, 1.0f, 1.0f);
+	ndGridHash hashBox0(dVector::m_zero, 0, ndHomeGrid);
+	ndGridHash hashBox1((boxP1 - boxP0) * invGridSize, 0, ndHomeGrid);
+
+	dUnsigned64 cellCount = (hashBox1.m_z - hashBox0.m_z) * (hashBox1.m_y - hashBox0.m_y) * (hashBox1.m_x - hashBox0.m_x);
+
+	if (cellCount <= 128)
+	{
+		dAssert((hashBox1.m_z - hashBox0.m_z) > 1);
+		dAssert((hashBox1.m_y - hashBox0.m_y) > 1);
+		dAssert((hashBox1.m_x - hashBox0.m_x) > 1);
+
+
+		dFloat32 xxx[6][6][6];
+		{
+			for (dInt32 i = 0; i < 6 * 6 * 6; i++)
+			{
+				dFloat32* yyy = &xxx[0][0][0];
+				yyy[i] = 1.0f;
+			}
+			for (dInt32 i = 0; i < uniqueCount; i++)
+			{
+				dInt32 x = m_hashGridMap[i].m_x;
+				dInt32 y = m_hashGridMap[i].m_y;
+				dInt32 z = m_hashGridMap[i].m_z;
+
+				xxx[z][y][x] = 0.0f;
+			}
+
+			dIsoSurfaceOld isoSurcase;
+			isoSurcase.GenerateSurface(&xxx[0][0][0], 0.5f, 5, 5, 5, gridSize, gridSize, gridSize);
+			cellCount *= 1;
+		}
+
+
+
+
+
+
+
+		memset(xxx, 0, sizeof(xxx));
+		for (dInt32 i = 0; i < uniqueCount; i++)
+		{
+			dInt32 x = m_hashGridMap[i].m_x;
+			dInt32 y = m_hashGridMap[i].m_y;
+			dInt32 z = m_hashGridMap[i].m_z;
+		
+			xxx[z][y][x] = 1.0f;
+		}
+
+		m_isoSurcase.Begin(dFloat32(0.5f), gridSize, 100, 100, 100);
+
+		dIsoSurface::dIsoCell cell;
+		for (dInt32 z = 0; z < 5; z++)
+		{
+			cell.m_z = z;
+			for (dInt32 y = 0; y < 5; y++)
+			{
+				cell.m_y = y;
+				for (dInt32 x = 0; x < 5; x++)
+				{
+					cell.m_x = x;
+					cell.m_isoValues[0][0][0] = xxx[z + 0][y + 0][x + 0];
+					cell.m_isoValues[0][0][1] = xxx[z + 0][y + 0][x + 1];
+					cell.m_isoValues[0][1][0] = xxx[z + 0][y + 1][x + 0];
+					cell.m_isoValues[0][1][1] = xxx[z + 0][y + 1][x + 1];
+					cell.m_isoValues[1][0][0] = xxx[z + 1][y + 0][x + 0];
+					cell.m_isoValues[1][0][1] = xxx[z + 1][y + 0][x + 1];
+					cell.m_isoValues[1][1][0] = xxx[z + 1][y + 1][x + 0];
+					cell.m_isoValues[1][1][1] = xxx[z + 1][y + 1][x + 1];
+					m_isoSurcase.ProcessCell(cell);
+				}
+			}
+		}
+		m_isoSurcase.End();
+	}
 }

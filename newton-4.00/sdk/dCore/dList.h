@@ -203,7 +203,7 @@ class dList
 	~dList ();
 
 	operator dInt32() const;
-	dInt32 GetCount() const;
+	const dInt32 GetCount() const;
 	dListNode* GetLast() const;
 	dListNode* GetFirst() const;
 	dListNode* Append ();
@@ -259,7 +259,7 @@ dList<T,allocator>::~dList ()
 }
 
 template<class T, class allocator = dContainersAlloc<T> >
-dInt32 dList<T,allocator>::GetCount() const
+const dInt32 dList<T,allocator>::GetCount() const
 {
 	return m_count;
 }

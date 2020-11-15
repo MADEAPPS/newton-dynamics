@@ -123,6 +123,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 	dArray<ndGridHash> m_hashGridMapScratchBuffer;
 	dInt32 m_upperDigisIsValid[3];
 	dAtomic<dInt32> m_iterator;
+	dIsoSurface m_isoSurcase;
 } D_GCC_NEWTON_ALIGN_32 ;
 
 inline dFloat32 ndBodySphFluid::RayCast(ndRayCastNotify& callback, const dFastRayTest& ray, const dFloat32 maxT) const

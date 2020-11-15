@@ -30,29 +30,24 @@
 #include "dArray.h"
 #include "dTree.h"
 
-//#include <map>
-//#include <vector>
-
-struct POINT3DID 
-{
-	dInt32 newID;
-	dFloat32 x, y, z;
-};
-
-//typedef std::map<dInt32, POINT3DID> ID2POINT3DID;
-
-struct TRIANGLE 
-{
-	dInt32 pointID[3];
-};
-
-//typedef std::vector<TRIANGLE> TRIANGLEVECTOR;
-
-class dIsoSurface 
+class dIsoSurfacePointId 
 {
 	public:
-	D_CORE_API dIsoSurface();
-	D_CORE_API ~dIsoSurface();
+	dFloat32 m_x, m_y, m_z;
+	dInt32 m_newId;
+};
+
+class dIsoSurfaceTriangle 
+{
+	public:
+	dInt32 m_pointId[3];
+};
+
+class dIsoSurfaceOld 
+{
+	public:
+	D_CORE_API dIsoSurfaceOld();
+	D_CORE_API ~dIsoSurfaceOld();
 	
 	// Generates the iso surface from the scalar field contained in the
 	// buffer ptScalarField[].
@@ -89,11 +84,10 @@ class dIsoSurface
 	dVector* m_pvec3dNormals;
 
 	// List of POINT3Ds which form the iso surface.
-	//ID2POINT3DID m_i2pt3idVertices;
-	dTree<POINT3DID, dInt32> m_i2pt3idVertices;
+	dTree<dIsoSurfacePointId, dInt32> m_i2pt3idVertices;
 
 	// List of TRIANGLES which form the triangulation of the iso surface.
-	dArray<TRIANGLE> m_trivecTriangles;
+	dArray<dIsoSurfaceTriangle> m_trivecTriangles;
 
 	// Returns the edge ID.
 	dInt32 GetEdgeID(dInt32 nX, dInt32 nY, dInt32 nZ, dInt32 nEdgeNo);
@@ -103,11 +97,11 @@ class dIsoSurface
 
 	// Calculates the intersection point of the iso surface with an
 	// edge.
-	POINT3DID CalculateIntersection(dInt32 nX, dInt32 nY, dInt32 nZ, dInt32 nEdgeNo);
+	dIsoSurfacePointId CalculateIntersection(dInt32 nX, dInt32 nY, dInt32 nZ, dInt32 nEdgeNo);
 
 	// Interpolates between two grid points to produce the point at which
 	// the iso surface intersects an edge.
-	POINT3DID Interpolate(dFloat32 fX1, dFloat32 fY1, dFloat32 fZ1, dFloat32 fX2, dFloat32 fY2, dFloat32 fZ2, dFloat32 tVal1, dFloat32 tVal2);
+	dIsoSurfacePointId Interpolate(dFloat32 fX1, dFloat32 fY1, dFloat32 fZ1, dFloat32 fX2, dFloat32 fY2, dFloat32 fZ2, dFloat32 tVal1, dFloat32 tVal2);
  
 	// Renames vertices and triangles so that they can be accessed more
 	// efficiently.
@@ -116,10 +110,10 @@ class dIsoSurface
 	// Calculates the normals.
 	void CalculateNormals();
 
-	// No. of cells in x, y, and z directions.
+	// No. of cells in m_x, m_y, and m_z directions.
 	dInt32 m_nCellsX, m_nCellsY, m_nCellsZ;
 
-	// Cell length in x, y, and z directions.
+	// Cell length in m_x, m_y, and m_z directions.
 	dFloat32 m_fCellLengthX, m_fCellLengthY, m_fCellLengthZ;
 
 	// The buffer holding the scalar field.
@@ -134,6 +128,58 @@ class dIsoSurface
 	// Lookup tables used in the construction of the iso surface.
 	static const dInt32 m_edgeTable[256];
 	static const dInt32 m_triTable[256][16];
+};
+
+
+class dIsoSurface
+{
+	public:
+	class dIsoCell
+	{
+		public:
+		dFloat32 m_isoValues[2][2][2];
+		dInt32 m_x;
+		dInt32 m_y;
+		dInt32 m_z;
+	};
+
+	class dIsoSurfaceTriangle
+	{
+		public:
+		dUnsigned64 m_pointId[3];
+	};
+
+
+	D_CORE_API dIsoSurface();
+	D_CORE_API ~dIsoSurface();
+
+	D_CORE_API void Begin(dFloat32 isovalue, dFloat32 gridSize, dInt32 sizex, dInt32 sizey, dInt32 sizez);
+
+	D_CORE_API void ProcessCell(const dIsoCell& cell);
+
+	D_CORE_API void End();
+
+	private:
+	dUnsigned64 GetVertexID(dInt32 x, dInt32 y, dInt32 z);
+	dUnsigned64 GetEdgeID(const dIsoCell& cell, dInt32 edgeCode);
+	dVector CalculateIntersection(const dIsoCell& cell, dInt32 edgeCode);
+	dVector Interpolate(dFloat32 fX1, dFloat32 fY1, dFloat32 fZ1, dFloat32 fX2, dFloat32 fY2, dFloat32 fZ2, dFloat32 tVal1, dFloat32 tVal2);
+
+	void RemapIndexList();
+	void CalculateNormals();
+
+	dArray<dVector> m_points;
+	dArray<dVector> m_normals;
+	dTree<dVector, dUnsigned64> m_vertexMap;
+	dArray<dIsoSurfaceTriangle> m_trivecTriangles;
+	dInt32 m_xCellSize;
+	dInt32 m_yCellSize;
+	dInt32 m_zCellSize;
+	dFloat32 m_gridSize;
+	dFloat32 m_isoValue;
+
+	static const dInt32 m_edgeTable[];
+	static const dInt32 m_triangleTable[][16];
 };
 
 
