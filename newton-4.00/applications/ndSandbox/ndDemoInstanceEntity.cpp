@@ -128,24 +128,20 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 	glBufferData(GL_ARRAY_BUFFER, m_maxInstanceCount * sizeof(ndMeshMatrix), &offsets[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshVector4), (void*) (0 * sizeof(ndMeshVector4)));
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*) (0 * sizeof(ndMeshVector4)));
 	glVertexAttribDivisor(3, 1);
-
-	//glEnableVertexAttribArray(3);
-	//glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*) (0 * sizeof(ndMeshVector4)));
-	//glVertexAttribDivisor(3, 1);
-	//
-	//glEnableVertexAttribArray(4);
-	//glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*)(1 * sizeof(ndMeshVector4)));
-	//glVertexAttribDivisor(4, 1);
-	//
-	//glEnableVertexAttribArray(5);
-	//glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*)(2 * sizeof(ndMeshVector4)));
-	//glVertexAttribDivisor(5, 1);
-	//
-	//glEnableVertexAttribArray(6);
-	//glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*)(3 * sizeof(ndMeshVector4)));
-	//glVertexAttribDivisor(6, 1);
+	
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*)(1 * sizeof(ndMeshVector4)));
+	glVertexAttribDivisor(4, 1);
+	
+	glEnableVertexAttribArray(5);
+	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*)(2 * sizeof(ndMeshVector4)));
+	glVertexAttribDivisor(5, 1);
+	
+	glEnableVertexAttribArray(6);
+	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*)(3 * sizeof(ndMeshVector4)));
+	glVertexAttribDivisor(6, 1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -187,29 +183,19 @@ void ndDemoMeshIntance::RenderBatch(int start, ndDemoEntityManager* const scene,
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_matrixOffsetBuffer);
 
-	//ndMeshMatrix* const matrixBuffer = (ndMeshMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	ndMeshVector4* const matrixBuffer = (ndMeshVector4*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	ndMeshMatrix* const matrixBuffer = (ndMeshMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 
 	const dInt32 base = start * m_maxInstanceCount;
 	const dInt32 count = ((base + m_maxInstanceCount) > m_instanceCount) ? m_instanceCount - base : m_maxInstanceCount;
 	for (dInt32 i = 0; i < count; i++)
 	{
-		#if 1
-			dMatrix matrix(m_offsets[base + i]);
-			matrixBuffer[i].m_x = GLfloat(matrix.m_posit.m_x);
-			matrixBuffer[i].m_y = GLfloat(matrix.m_posit.m_y);
-			matrixBuffer[i].m_z = GLfloat(matrix.m_posit.m_z);
-			matrixBuffer[i].m_w = GLfloat(matrix.m_posit.m_w);
-		#else
-			dAssert(0);
-			dMatrix matrix(m_offsets[base + i].Transpose4X4());
-			const dFloat32* const src = &matrix[0][0];
-			dFloat32* const dst = &matrixBuffer[i].m_array[0].m_x;
-			for (dInt32 j = 0; j < 16; j++) 
-			{
-				dst[j] = GLfloat(src[j]);
-			}
-		#endif
+		dMatrix matrix(m_offsets[base + i]);
+		const dFloat32* const src = &matrix[0][0];
+		dFloat32* const dst = &matrixBuffer[i].m_array[0].m_x;
+		for (dInt32 j = 0; j < 16; j++) 
+		{
+			dst[j] = GLfloat(src[j]);
+		}
 	}
 
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -290,7 +276,7 @@ ndDemoInstanceEntity::~ndDemoInstanceEntity(void)
 void ndDemoInstanceEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
 	//ndDemoEntity::Render(timestep, scene, matrix);
-	
+	//return;
 	//count active instances 
 	dInt32 count = 0;
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())

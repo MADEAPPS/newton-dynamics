@@ -13,9 +13,7 @@
 layout(location = 0) in vec3 in_position;
 layout(location = 1) in vec3 in_normal;
 layout(location = 2) in vec2 in_uv;
-
-layout(location = 3) in vec4 in_matrixOffset;
-//layout(location = 3) in mat4 in_matrixOffset;
+layout(location = 3) in mat4 in_matrixOffset;
 
 uniform mat4 viewModelMatrix;
 uniform mat4 projectionMatrix;
@@ -28,11 +26,12 @@ out vec3 lightDir;
 
 void main()
 {	
+	// rotate lighet to view space.
 	lightDir = vec3(directionalLightDir.x, directionalLightDir.y, directionalLightDir.z);
+	//lightDir = vec3 (in_matrixOffset * vec4(directionalLightDir.x, directionalLightDir.y, directionalLightDir.z, 0.0));
 
 	// calculate position
-	//vec4 instancePosit = in_matrixOffset * vec4(in_position, 1.0);
-	vec4 instancePosit = in_matrixOffset + vec4(in_position, 0.0);
+	vec4 instancePosit = in_matrixOffset * vec4(in_position, 1.0);
 	posit = vec3 (viewModelMatrix * instancePosit);
 
 	// calculate normal
