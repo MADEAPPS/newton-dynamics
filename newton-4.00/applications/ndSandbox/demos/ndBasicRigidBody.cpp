@@ -21,8 +21,7 @@
 #include "ndDemoInstanceEntity.h"
 
 static void AddShape(ndDemoEntityManager* const scene,
-	ndDemoInstanceEntity* const rootEntity, 
-	ndDemoMesh* const sphereMesh, const ndShapeInstance& sphereShape,
+	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
 	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
 {
 	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
@@ -38,7 +37,6 @@ static void AddShape(ndDemoEntityManager* const scene,
 	{
 		ndBodyDynamic* const body = new ndBodyDynamic();
 		ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
-		entity->SetMesh(sphereMesh, dGetIdentityMatrix());
 
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 		body->SetMatrix(matrix);
@@ -57,8 +55,6 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 	ndDemoMeshIntance* const instanceMesh = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
-
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
 	scene->AddEntity(rootEntity);
 
@@ -71,12 +67,10 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 		for (dInt32 j = 0; j < n; j++)
 		{
 			dVector location((j - n / 2) * 4.0f, 0.0f, (i - n / 2) * 4.0f, 0.0f);
-			//AddShape(scene, rootEntity, instanceMesh, shape, 10.0f, location + origin, 1.0f, stackHigh, 2.0f);
-			AddShape(scene, rootEntity, mesh, shape, 10.0f, location + origin, 1.0f, stackHigh, 2.0f);
+			AddShape(scene, rootEntity, shape, 10.0f, location + origin, 1.0f, stackHigh, 2.0f);
 		}
 	}
 
-	mesh->Release();
 	instanceMesh->Release();
 }
 
