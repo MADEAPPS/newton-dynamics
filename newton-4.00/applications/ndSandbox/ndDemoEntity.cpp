@@ -22,9 +22,11 @@ ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDem
 
 ndDemoEntityNotify::~ndDemoEntityNotify()
 {
-	dAssert(m_entity->m_rootNode);
-	m_manager->RemoveEntity(m_entity);
-	delete m_entity;
+	if (m_entity->m_rootNode)
+	{
+		m_manager->RemoveEntity(m_entity);
+		delete m_entity;
+	}
 }
 
 void ndDemoEntityNotify::OnApplyExternalForce(dInt32 threadIndex, dFloat32 timestep)
@@ -356,150 +358,6 @@ void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, c
 }
 
 /*
-ndDemoEntity* ndDemoEntity::LoadNGD_mesh(const char* const fileName, NewtonWorld* const world, const ndShaderPrograms& shaderCache)
-{
-	dScene scene(world);
-
-	char pathName[2048];
-	dGetWorkingFileName(fileName, pathName);
-	scene.Deserialize(pathName);
-
-	// this will apply all global the scale to the mesh
-	scene.FreezeScale();
-
-	// this will apply all local scale and transform to the mesh
-	scene.FreezeGeometryPivot();
-
-	int rootCount = 0;
-	dScene::dTreeNode* meshRootNodeArray[256];
-	dScene::dTreeNode* const root = scene.GetRootNode();
-	for (void* child = scene.GetFirstChildLink(root); child; child = scene.GetNextChildLink(root, child)) {
-		dScene::dTreeNode* const sceneNode = scene.GetNodeFromLink(child);
-		dNodeInfo* const nodeInfo = scene.GetInfoFromNode(sceneNode);
-		if (nodeInfo->GetTypeId() == dSceneNodeInfo::GetRttiType()) {
-			meshRootNodeArray[rootCount] = sceneNode;
-			rootCount ++;
-		}
-	}
-
-	dTree<ndDemoEntity*, dScene::dTreeNode*> boneMap;
-	ndDemoEntity* returnEntity = nullptr;
-	ndDemoEntity* entity__[256];
-	entity__[0] = nullptr;
-	if (rootCount) {
-		int stack = 0;
-		int modifiersCount = 0;
-		ndDemoEntity* entityStack[256];
-		dScene::dTreeNode* nodeStack[256];
-		ndDemoEntity* entityModifiers[256];
-		dScene::dTreeNode* nodeModifiers[256];
-
-		ndDemoEntity* parent = nullptr;
-		if (rootCount > 1) {
-			parent = new ndDemoEntity(dGetIdentityMatrix(), nullptr);
-		}
-		for (dInt32 i = 0; i < rootCount; i ++) {
-			entity__[stack] = new ndDemoEntity(dGetIdentityMatrix(), parent);
-			entityStack[stack] = entity__[stack];
-			nodeStack[stack] = meshRootNodeArray[stack];
-			stack ++;
-		}
-
-		dTree<ndDemoMeshInterface*, dScene::dTreeNode*> meshDictionary;
-		while (stack) {
-			stack--;
-
-			ndDemoEntity* const entity = entityStack[stack];
-			dScene::dTreeNode* sceneNode = nodeStack[stack];
-
-			boneMap.Insert(entity, sceneNode);
-
-			dSceneNodeInfo* const sceneInfo = (dSceneNodeInfo*)scene.GetInfoFromNode(sceneNode);
-			dMatrix matrix(sceneInfo->GetTransform());
-			dQuaternion rot(matrix);
-			entity->m_curPosition = matrix.m_posit;
-			entity->m_nextPosition = matrix.m_posit;
-			entity->m_curRotation = rot;
-			entity->m_nextRotation = rot;
-			entity->m_matrix = matrix;
-			entity->SetNameID(sceneInfo->GetName());
-			const char* const name = entity->GetName().GetStr();
-			//dTrace(("%s\n", name));
-			if (strstr(name, "Hidden") || strstr(name, "hidden")) {
-				entity->m_isVisible = false;
-				//dTrace(("%s %s\n", name, entity->GetParent()->GetName().GetStr()));
-			}
-
-			for (void* child = scene.GetFirstChildLink(sceneNode); child; child = scene.GetNextChildLink(sceneNode, child)) {
-				dScene::dTreeNode* const meshNode = scene.GetNodeFromLink(child);
-				dNodeInfo* const nodeInfo = scene.GetInfoFromNode(meshNode);
-
-				if (nodeInfo->GetTypeId() == dMeshNodeInfo::GetRttiType()) {
-					dTree<ndDemoMeshInterface*, dScene::dTreeNode*>::dTreeNode* cacheNode = meshDictionary.Find(meshNode);
-					if (!cacheNode) {
-						ndDemoMeshInterface* const mesh = new ndDemoMesh(&scene, meshNode, shaderCache);
-						cacheNode = meshDictionary.Insert(mesh, meshNode);
-					}
-					ndDemoMeshInterface* const mesh = cacheNode->GetInfo();
-					entity->SetMesh(mesh, sceneInfo->GetGeometryTransform());
-
-					for (void* modifierChild = scene.GetFirstChildLink(meshNode); modifierChild; modifierChild = scene.GetNextChildLink(sceneNode, modifierChild)) {
-						dScene::dTreeNode* const modifierNode = scene.GetNodeFromLink(modifierChild);
-						dGeometryNodeSkinClusterInfo* const modifierInfo = (dGeometryNodeSkinClusterInfo*)scene.GetInfoFromNode(modifierNode);
-						if (modifierInfo->GetTypeId() == dGeometryNodeSkinClusterInfo::GetRttiType()) {
-							entityModifiers[modifiersCount] = entity;
-							nodeModifiers[modifiersCount] = meshNode;
-							modifiersCount++;
-							break;
-						}
-					}
-
-				} else if (nodeInfo->GetTypeId() == dLineNodeInfo::GetRttiType()) {
-					dTree<ndDemoMeshInterface*, dScene::dTreeNode*>::dTreeNode* cacheNode = meshDictionary.Find(meshNode);
-					if (!cacheNode) {
-						ndDemoMeshInterface* const mesh = new ndDemoBezierCurve(&scene, meshNode);
-						cacheNode = meshDictionary.Insert(mesh, meshNode);
-					}
-					ndDemoMeshInterface* const mesh = cacheNode->GetInfo();
-					entity->SetMesh(mesh, sceneInfo->GetGeometryTransform());
-				}
-			}
-
-			for (void* child = scene.GetFirstChildLink(sceneNode); child; child = scene.GetNextChildLink(sceneNode, child)) {
-				dScene::dTreeNode* const node = scene.GetNodeFromLink(child);
-				dNodeInfo* const nodeInfo = scene.GetInfoFromNode(node);
-				if (nodeInfo->IsType(dSceneNodeInfo::GetRttiType())) {
-					nodeStack[stack] = node;
-					entityStack[stack] = new ndDemoEntity(dGetIdentityMatrix(), entity);
-					stack++;
-				}
-			}
-		}
-
-		while (meshDictionary.GetCount()) {
-			dTree<ndDemoMeshInterface*, dScene::dTreeNode*>::dTreeNode* const node = meshDictionary.GetRoot();
-			ndDemoMeshInterface* const mesh = node->GetInfo();
-			mesh->Release();
-			meshDictionary.Remove(node);
-		}
-
-		returnEntity = entity__[0] ? (entity__[0]->GetParent() ? entity__[0]->GetParent() : entity__[0]) : nullptr;
-		if (modifiersCount) {
-			for (dInt32 i = 0; i < modifiersCount; i++) {
-				dScene::dTreeNode* const skinMeshNode = nodeModifiers[i];
-				dAssert (((dMeshNodeInfo*)scene.GetInfoFromNode(skinMeshNode))->GetTypeId() == dMeshNodeInfo::GetRttiType());
-				ndDemoEntity* const skinEntity = entityModifiers[i];
-				ndDemoSkinMesh* const skinMesh = new ndDemoSkinMesh(&scene, skinEntity, skinMeshNode, boneMap, shaderCache);
-				skinEntity->SetMesh(skinMesh, skinEntity->GetMeshMatrix());
-				skinMesh->Release();
-			}
-		}
-	}
-
-	return returnEntity;
-}
-
-
 NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const world) const
 {
 	int count = 1;

@@ -13,36 +13,50 @@
 #include "ndDemoMesh.h"
 #include "ndDemoInstanceEntity.h"
 
-
 ndDemoInstanceEntity::ndDemoInstanceEntity(const ndDemoInstanceEntity& copyFrom)
 	:ndDemoEntity(copyFrom)
+	,m_instanceMesh(copyFrom.m_instanceMesh)
 {
 	dAssert(0);
+	m_instanceMesh->AddRef();
 }
 
-ndDemoInstanceEntity::ndDemoInstanceEntity(const dMatrix& matrix, ndDemoEntity* const parent)
-	:ndDemoEntity(matrix, parent)
+ndDemoInstanceEntity::ndDemoInstanceEntity(ndDemoMeshIntance* const instanceMesh)
+	:ndDemoEntity(dGetIdentityMatrix(), nullptr)
+	,m_instanceMesh(instanceMesh)
 {
+	m_instanceMesh->AddRef();
 }
 
 ndDemoInstanceEntity::~ndDemoInstanceEntity(void)
 {
+	m_instanceMesh->Release();
 }
 
-void ndDemoInstanceEntity::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrixIn) const
+void ndDemoInstanceEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrixIn) const
 {
-	dAssert(0);
-	//glPushMatrix();
-	//
-	//// Set The matrix for this entity Node
-	//glMultMatrix(&m_matrix[0][0]);
-	//for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) {
-	//	glPushMatrix();
-	//	dMatrix matrix(m_meshMatrix * child->GetRenderMatrix());
-	//	glMultMatrix(&matrix[0][0]);
-	//	m_mesh->Render(scene, TODO);
-	//	glPopMatrix();
+	//dMatrix nodeMatrix(m_matrix * matrixIn);
+	//for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
+	//{
+	//	child->Render(timestep, scene, nodeMatrix);
 	//}
-	//
-	//glPopMatrix();
+
+	dMatrix nodeMatrix(m_matrix * matrixIn);
+	dInt32 count = 0;
+	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
+	{
+		count++;
+	}
+
+	dInt32 index = 0;
+	dVector* const matrixStack = dAlloca(dVector, count);
+	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
+	{
+		dMatrix matrix(child->GetCurrentMatrix());
+		matrixStack[index] = matrix.m_posit;
+		index++;
+	}
+
+	m_instanceMesh->SetParticles(count, &matrixStack[0]);
+	m_instanceMesh->Render(scene, nodeMatrix);
 }

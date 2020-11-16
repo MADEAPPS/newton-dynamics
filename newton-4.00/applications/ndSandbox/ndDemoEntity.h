@@ -56,7 +56,6 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 
 	ndDemoEntity(const ndDemoEntity& copyFrom);
 	ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent);
-	//ndDemoEntity(ndDemoEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<ndDemoMeshInterface*, dScene::dTreeNode*>& meshCache, ndDemoEntityManager::EntityDictionary& entityDictionary, ndDemoEntity* const parent = nullptr);
 	virtual ~ndDemoEntity(void);
 
 	ndDemoMeshInterface* GetMesh() const;
@@ -65,13 +64,10 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 	const dMatrix& GetMeshMatrix() const;  
 	void SetMeshMatrix(const dMatrix& matrix);  
 
-	//void SetMatrix(const dMatrix& matrix);
-
 	UserData* GetUserData ();
 	void SetUserData (UserData* const data);
 
 	dNodeBaseHierarchy* CreateClone () const;
-	//static ndDemoEntity* LoadNGD_mesh (const char* const fileName, NewtonWorld* const world, const ndShaderPrograms& shaderCache);
 
 	const dMatrix& GetRenderMatrix () const;
 	dMatrix CalculateGlobalMatrix (const ndDemoEntity* const root = nullptr) const;

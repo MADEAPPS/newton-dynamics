@@ -27,10 +27,10 @@
 
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
-//#define DEFAULT_SCENE	0		// setting basic rigidbody
+#define DEFAULT_SCENE	0		// setting basic rigidbody
 //#define DEFAULT_SCENE	1		// setting basic Trigger
 //#define DEFAULT_SCENE	2		// setting basic player
-#define DEFAULT_SCENE	3		// particle water volume 
+//#define DEFAULT_SCENE	3		// particle water volume 
 //#define DEFAULT_SCENE	4		// static mesh collision 
 //#define DEFAULT_SCENE	5		// setting basic joints
 //#define DEFAULT_SCENE	6		// conservation of angular momentum 
@@ -227,7 +227,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
-	m_collisionDisplayMode = 3;
+	//m_collisionDisplayMode = 3;
 	//m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
 

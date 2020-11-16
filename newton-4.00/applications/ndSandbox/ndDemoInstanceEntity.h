@@ -14,18 +14,18 @@
 
 #include "ndDemoEntity.h"
 
+class ndDemoMeshIntance;
 
 class ndDemoInstanceEntity: public ndDemoEntity
 {
 	public:
-
+	ndDemoInstanceEntity(ndDemoMeshIntance* const instanceMesh);
 	ndDemoInstanceEntity(const ndDemoInstanceEntity& copyFrom);
-	ndDemoInstanceEntity(const dMatrix& matrix, ndDemoEntity* const parent);
-	//ndDemoInstanceEntity(DemoInstanceEntityManager& world, const dScene* const scene, dScene::dTreeNode* const rootSceneNode, dTree<DemoMeshInterface*, dScene::dTreeNode*>& meshCache, DemoInstanceEntityManager::EntityDictionary& entityDictionary, ndDemoInstanceEntity* const parent = nullptr);
 	virtual ~ndDemoInstanceEntity(void);
 
 	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
 
+	ndDemoMeshIntance* m_instanceMesh;
 };
 
 #endif
