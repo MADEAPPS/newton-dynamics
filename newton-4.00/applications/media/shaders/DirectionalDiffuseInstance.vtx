@@ -31,8 +31,8 @@ void main()
 	lightDir = vec3(directionalLightDir.x, directionalLightDir.y, directionalLightDir.z);
 
 	// calculate position
-	//vec4 instancePosit = in_matrixOffset * vec4(posit, 1.0);
-	vec4 instancePosit = in_matrixOffset + vec4(posit, 0.0);
+	//vec4 instancePosit = in_matrixOffset * vec4(in_position, 1.0);
+	vec4 instancePosit = in_matrixOffset + vec4(in_position, 0.0);
 	posit = vec3 (viewModelMatrix * instancePosit);
 
 	// calculate normal
