@@ -221,7 +221,6 @@ void ndSkyBox::Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const
 	dMatrix skyMatrix(dGetIdentityMatrix());
 	dMatrix viewMatrix(camera->GetViewMatrix());
 	skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, 0.0f, 1.0f));
-	//skyMatrix.m_posit = viewMatrix.UntransformVector(dVector(0.0f, 0.25f, -800.0f, 1.0f));
 
 	dMatrix viewModelMatrix(skyMatrix * camera->GetViewMatrix());
 	dMatrix projectionViewModelMatrix(skyMatrix * camera->GetViewMatrix() * camera->GetProjectionMatrix());

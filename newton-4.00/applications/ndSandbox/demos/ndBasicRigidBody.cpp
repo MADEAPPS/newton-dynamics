@@ -55,9 +55,11 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 {
 	dFloat32 diameter = 1.0f;
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
-	ndDemoMeshIntance* const mesh = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndDemoMeshIntance* const instanceMesh = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(mesh);
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+
+	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
 	scene->AddEntity(rootEntity);
 
 	//const int n = 1;
@@ -69,10 +71,13 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 		for (dInt32 j = 0; j < n; j++)
 		{
 			dVector location((j - n / 2) * 4.0f, 0.0f, (i - n / 2) * 4.0f, 0.0f);
+			//AddShape(scene, rootEntity, instanceMesh, shape, 10.0f, location + origin, 1.0f, stackHigh, 2.0f);
 			AddShape(scene, rootEntity, mesh, shape, 10.0f, location + origin, 1.0f, stackHigh, 2.0f);
 		}
 	}
+
 	mesh->Release();
+	instanceMesh->Release();
 }
 
 void ndBasicRigidBody (ndDemoEntityManager* const scene)

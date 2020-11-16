@@ -121,25 +121,31 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(ndMeshPointUV), (void*)(2 * sizeof(ndMeshVector)));
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+
+	// set vertex buffer for matrix instances
 	glGenBuffers(1, &m_matrixOffsetBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, m_matrixOffsetBuffer);
 	glBufferData(GL_ARRAY_BUFFER, m_maxInstanceCount * sizeof(ndMeshMatrix), &offsets[0], GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(3);
-	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*) (0 * sizeof(ndMeshVector4)));
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshVector4), (void*) (0 * sizeof(ndMeshVector4)));
 	glVertexAttribDivisor(3, 1);
 
-	glEnableVertexAttribArray(4);
-	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*)(1 * sizeof(ndMeshVector4)));
-	glVertexAttribDivisor(4, 1);
-
-	glEnableVertexAttribArray(5);
-	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*)(2 * sizeof(ndMeshVector4)));
-	glVertexAttribDivisor(5, 1);
-
-	glEnableVertexAttribArray(6);
-	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*)(3 * sizeof(ndMeshVector4)));
-	glVertexAttribDivisor(6, 1);
+	//glEnableVertexAttribArray(3);
+	//glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*) (0 * sizeof(ndMeshVector4)));
+	//glVertexAttribDivisor(3, 1);
+	//
+	//glEnableVertexAttribArray(4);
+	//glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*)(1 * sizeof(ndMeshVector4)));
+	//glVertexAttribDivisor(4, 1);
+	//
+	//glEnableVertexAttribArray(5);
+	//glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*)(2 * sizeof(ndMeshVector4)));
+	//glVertexAttribDivisor(5, 1);
+	//
+	//glEnableVertexAttribArray(6);
+	//glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(ndMeshMatrix), (void*)(3 * sizeof(ndMeshVector4)));
+	//glVertexAttribDivisor(6, 1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -180,34 +186,30 @@ void ndDemoMeshIntance::SetTransforms(dInt32 count, const dMatrix* const matrixA
 void ndDemoMeshIntance::RenderBatch(int start, ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
 	glBindBuffer(GL_ARRAY_BUFFER, m_matrixOffsetBuffer);
-	//ndMeshVector* const offsetBuffer = (ndMeshVector*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-	//
-	//dVector baseOffset(modelMatrix.m_posit & dVector::m_triplexMask);
-	//
-	//const dInt32 base = start * m_maxInstanceCount;
-	//const dInt32 count = ((base + m_maxInstanceCount) > m_instanceCount) ? m_instanceCount - base : m_maxInstanceCount;
-	//for (dInt32 i = 0; i < count; i++)
-	//{
-	//	dVector worldOffest(m_offsets[base + i] + baseOffset);
-	//	dVector locapOffset(modelMatrix.UntransformVector(worldOffest));
-	//	offsetBuffer[i].m_x = locapOffset.m_x;
-	//	offsetBuffer[i].m_y = locapOffset.m_y;
-	//	offsetBuffer[i].m_z = locapOffset.m_z;
-	//}
 
-	ndMeshMatrix* const matrixBuffer = (ndMeshMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	//ndMeshMatrix* const matrixBuffer = (ndMeshMatrix*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	ndMeshVector4* const matrixBuffer = (ndMeshVector4*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 
 	const dInt32 base = start * m_maxInstanceCount;
 	const dInt32 count = ((base + m_maxInstanceCount) > m_instanceCount) ? m_instanceCount - base : m_maxInstanceCount;
 	for (dInt32 i = 0; i < count; i++)
 	{
-		dMatrix matrix(m_offsets[base + i].Transpose4X4());
-		const dFloat32* const src = &matrix[0][0];
-		dFloat32* const dst = &matrixBuffer[i].m_array[0].m_x;
-		for (dInt32 j = 0; j < 16; j++) 
-		{
-			dst[j] = GLfloat(src[j]);
-		}
+		#if 1
+			dMatrix matrix(m_offsets[base + i]);
+			matrixBuffer[i].m_x = GLfloat(matrix.m_posit.m_x);
+			matrixBuffer[i].m_y = GLfloat(matrix.m_posit.m_y);
+			matrixBuffer[i].m_z = GLfloat(matrix.m_posit.m_z);
+			matrixBuffer[i].m_w = GLfloat(matrix.m_posit.m_w);
+		#else
+			dAssert(0);
+			dMatrix matrix(m_offsets[base + i].Transpose4X4());
+			const dFloat32* const src = &matrix[0][0];
+			dFloat32* const dst = &matrixBuffer[i].m_array[0].m_x;
+			for (dInt32 j = 0; j < 16; j++) 
+			{
+				dst[j] = GLfloat(src[j]);
+			}
+		#endif
 	}
 
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -226,7 +228,6 @@ void ndDemoMeshIntance::RenderBatch(int start, ndDemoEntityManager* const scene,
 	glUniform1i(m_textureLocation, 0);
 	glUniform1f(m_transparencyLocation, 1.0f);
 	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight.m_x);
-	//glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
 	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
 
@@ -286,27 +287,28 @@ ndDemoInstanceEntity::~ndDemoInstanceEntity(void)
 	m_instanceMesh->Release();
 }
 
-void ndDemoInstanceEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrixIn) const
+void ndDemoInstanceEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 {
-	dMatrix nodeMatrix(m_matrix * matrixIn);
-
-	// count active instances 
+	//ndDemoEntity::Render(timestep, scene, matrix);
+	
+	//count active instances 
 	dInt32 count = 0;
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
 	{
 		count++;
 	}
-
+	
 	// prepare the transforms buffer form all the children matrices
 	dInt32 index = 0;
 	dMatrix* const matrixStack = dAlloca(dMatrix, count);
-
+	
 	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling())
 	{
 		matrixStack[index] = child->GetCurrentMatrix();
 		index++;
 	}
-
 	m_instanceMesh->SetTransforms(count, &matrixStack[0]);
+	
+	dMatrix nodeMatrix(m_matrix * matrix);
 	m_instanceMesh->Render(scene, nodeMatrix);
 }
