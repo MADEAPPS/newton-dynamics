@@ -16,39 +16,15 @@
 #include "ndPhysicsUtils.h"
 #include "ndPhysicsWorld.h"
 #include "ndTargaToOpenGl.h"
+#include "ndMakeStaticMap.h"
 #include "ndDemoEntityManager.h"
+#include "ndDemoInstanceEntity.h"
 #include "ndBasicPlayerCapsule.h"
 
-static void BuildFloorBox(ndDemoEntityManager* const scene)
-{
-	ndPhysicsWorld* const world = scene->GetWorld();
-
-	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
-	dMatrix uvMatrix(dGetIdentityMatrix());
-	uvMatrix[0][0] *= 0.025f;
-	uvMatrix[1][1] *= 0.025f;
-	uvMatrix[2][2] *= 0.025f;
-	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
-	
-	dMatrix matrix(dGetIdentityMatrix());
-	matrix.m_posit.m_y = -0.5f;
-	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-	entity->SetMesh(geometry, dGetIdentityMatrix());
-	
-	ndBodyDynamic* const body = new ndBodyDynamic();
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-	body->SetMatrix(matrix);
-	body->SetCollisionShape(box);
-	
-	world->AddBody(body);
-	
-	scene->AddEntity(entity);
-	geometry->Release();
-}
-
 static void AddShape(ndDemoEntityManager* const scene,
-	ndDemoMesh* const mesh, const ndShapeInstance& shape,
-	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count)
+	ndDemoInstanceEntity* const rootEntity,
+	ndDemoMesh* const sphereMesh, const ndShapeInstance& sphereShape,
+	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
 {
 	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
 	matrix.m_posit = origin;
@@ -57,50 +33,49 @@ static void AddShape(ndDemoEntityManager* const scene,
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f * 0.99f;
-
-	matrix.m_posit.m_y += 10.0f;
+	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f * 0.99f + 7.0f;
 
 	for (dInt32 i = 0; i < count; i++)
 	{
 		ndBodyDynamic* const body = new ndBodyDynamic();
-		ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
-		entity->SetMesh(mesh, dGetIdentityMatrix());
+		ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
+		entity->SetMesh(sphereMesh, dGetIdentityMatrix());
 
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
 		body->SetMatrix(matrix);
-		body->SetCollisionShape(shape);
-		body->SetMassMatrix(mass, shape);
+		body->SetCollisionShape(sphereShape);
+		body->SetMassMatrix(mass, sphereShape);
 		body->SetGyroMode(true);
 
 		world->AddBody(body);
-		scene->AddEntity(entity);
-
-		matrix.m_posit.m_y += diameter * 0.99f * 3.0f;
+		matrix.m_posit.m_y += diameter * 3.0f;
 	}
 }
 
-static void AddShapes(ndDemoEntityManager* const scene, const dVector& origin)
+static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& origin)
 {
 	dFloat32 diameter = 1.0f;
 	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
-	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+	ndDemoMeshIntance* const mesh = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
-	const int n = 5;
-	const int stackHigh = 5;
-	//const int n = 10;
-	//const int stackHigh = 7;
+	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(mesh);
+	scene->AddEntity(rootEntity);
+
+	//const int n = 1;
+	//const int stackHigh = 4;
+	const int n = 10;
+	const int stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)
 		{
 			dVector location((j - n / 2) * 4.0f, 0.0f, (i - n / 2) * 4.0f, 0.0f);
-			AddShape(scene, mesh, shape, 10.0f, location + origin, 1.0f, stackHigh);
+			AddShape(scene, rootEntity, mesh, shape, 10.0f, location + origin, 1.0f, stackHigh, 2.0f);
 		}
 	}
-
 	mesh->Release();
 }
+
 
 static void AddPlatform(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin)
 {
@@ -156,7 +131,7 @@ void ndPlayerCapsuleDemo (ndDemoEntityManager* const scene)
 	location.m_posit.m_z += 2.0f;
 	new ndBasicPlayerCapsule(scene, localAxis, location, mass, radio, height, height / 4.0f);
 
-	AddShapes(scene, dVector (22.0f, 0.0f, 0.0f, 0.0f));
+	AddCapsulesStacks(scene, dVector (32.0f, 0.0f, 0.0f, 0.0f));
 	AddPlatform(scene, 30.0f, dVector(10.0f, 0.0f, 0.0f, 0.0f));
 	AddPlatform(scene, 30.0f, dVector(10.0f, 0.5f, 1.125f, 0.0f));
 	AddPlatform(scene, 30.0f, dVector(10.0f, 1.0f, 1.250f, 0.0f));

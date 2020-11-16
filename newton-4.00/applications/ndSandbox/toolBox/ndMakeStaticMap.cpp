@@ -13,7 +13,37 @@
 #include "ndDemoMesh.h"
 #include "ndLoadFbxMesh.h"
 #include "ndPhysicsWorld.h"
+#include "ndMakeStaticMap.h"
 #include "ndDemoEntityManager.h"
+
+ndBodyKinematic* BuildFloorBox(ndDemoEntityManager* const scene)
+{
+	ndPhysicsWorld* const world = scene->GetWorld();
+
+	ndShapeInstance box(new ndShapeBox(200.0f, 1.0f, 200.f));
+	dMatrix uvMatrix(dGetIdentityMatrix());
+	uvMatrix[0][0] *= 0.025f;
+	uvMatrix[1][1] *= 0.025f;
+	uvMatrix[2][2] *= 0.025f;
+	ndDemoMesh* const geometry = new ndDemoMesh("box", scene->GetShaderCache(), &box, "marbleCheckBoard.tga", "marbleCheckBoard.tga", "marbleCheckBoard.tga", 1.0f, uvMatrix);
+
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit.m_y = -0.5f;
+	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
+	entity->SetMesh(geometry, dGetIdentityMatrix());
+
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(box);
+
+	world->AddBody(body);
+
+	scene->AddEntity(entity);
+	geometry->Release();
+	return body;
+}
+
 
 ndBodyKinematic* BuildFlatPlane(ndDemoEntityManager* const scene, bool optimized)
 {

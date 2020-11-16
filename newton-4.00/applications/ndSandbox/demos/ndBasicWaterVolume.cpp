@@ -69,11 +69,6 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		scene->AddEntity(this);
 		geometry->Release();
 
-		//ndShapeInstance shape(new ndShapeSphere(radius));
-		ndShapeInstance shape(new ndShapeBox(radius * 2.0f, radius * 2.0f, radius * 2.0f));
-
-		m_meshParticle = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
-
 		m_isoSurfaceMesh0 = new ndIsoSurfaceMesh(scene->GetShaderCache());
 		m_isoSurfaceMesh1 = new ndIsoSurfaceMesh(scene->GetShaderCache());
 	}
@@ -81,20 +76,15 @@ class ndWaterVolumeEntity : public ndDemoEntity
 	~ndWaterVolumeEntity()
 	{
 		dScopeSpinLock lock(m_lock);
-		m_meshParticle->Release();
 		m_isoSurfaceMesh0->Release();
 		m_isoSurfaceMesh1->Release();
 	}
 
 	void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const
 	{
+		// for now the mesh in is global space I need to fix that
 		//dMatrix nodeMatrix(m_matrix * matrix);
-		//const dArray<dVector>& positions = m_fluidBody->GetPositions();
-		//m_meshParticle->SetParticles(positions.GetCount(), &positions[0]);
-		//nodeMatrix.m_posit.m_y += 1.0f;
-		//m_meshParticle->Render(scene, nodeMatrix);
 
-		// the mesh in is global space I need to fix that
 		dMatrix nodeMatrix(dGetIdentityMatrix());
 nodeMatrix.m_posit.m_y += 0.125f;
 	
@@ -141,8 +131,6 @@ nodeMatrix.m_posit.m_y += 0.125f;
 	}
 
 	ndBodySphFluid* m_fluidBody;
-	ndDemoMeshIntance* m_meshParticle;
-
 	dArray<dInt32> m_indexList;
 	dArray<ndMeshPointUV> m_points;
 	mutable bool m_hasNewMesh;
