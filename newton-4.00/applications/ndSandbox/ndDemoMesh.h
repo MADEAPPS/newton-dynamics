@@ -37,6 +37,11 @@ struct ndMeshVector4: public ndMeshVector
 	GLfloat m_w;
 };
 
+struct ndMeshMatrix
+{
+	ndMeshVector4 m_array[4];
+};
+
 struct ndMeshUV
 {
 	GLfloat m_u;
@@ -148,24 +153,6 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	GLuint m_vertexBuffer;
 	GLuint m_vetextArrayBuffer;
 	bool m_hasTransparency;
-};
-
-class ndDemoMeshIntance : public ndDemoMesh
-{
-	public: 
-	ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
-	~ndDemoMeshIntance();
-
-	virtual void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
-	void SetParticles(dInt32 count, const dVector* const offset);
-
-	private:
-	void RenderBatch(dInt32 start, ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
-
-	const dVector* m_offsets;
-	dInt32 m_instanceCount;
-	dInt32 m_maxInstanceCount;
-	GLuint m_offsetBuffer;
 };
 
 class ndDemoSkinMesh: public ndDemoMeshInterface

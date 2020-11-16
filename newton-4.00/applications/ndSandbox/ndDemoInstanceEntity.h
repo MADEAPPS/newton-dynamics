@@ -12,9 +12,27 @@
 #ifndef __DEMO_INSTANCE_ENTITY_H__
 #define __DEMO_INSTANCE_ENTITY_H__
 
+#include "ndDemoMesh.h"
 #include "ndDemoEntity.h"
 
-class ndDemoMeshIntance;
+class ndDemoMeshIntance : public ndDemoMesh
+{
+	public:
+	ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity = 1.0f, const dMatrix& uvMatrix = dGetIdentityMatrix());
+	~ndDemoMeshIntance();
+
+	virtual void Render(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+	void SetTransforms(dInt32 count, const dMatrix* const matrixArray);
+
+	private:
+	void RenderBatch(dInt32 start, ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
+
+	const dMatrix* m_offsets;
+	dInt32 m_instanceCount;
+	dInt32 m_maxInstanceCount;
+	GLuint m_matrixOffsetBuffer;
+};
+
 
 class ndDemoInstanceEntity: public ndDemoEntity
 {
