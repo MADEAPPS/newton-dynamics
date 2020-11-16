@@ -119,18 +119,16 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	ndDemoSubMesh* AddSubMesh();
 	virtual const char* GetTextureName (const ndDemoSubMesh* const subMesh) const;
 
+	virtual void RenderNormals();
 	virtual void Render (ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 	virtual void RenderTransparency(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
-	virtual void RenderNormals ();
-	
+	void OptimizeForRender(const dArray<ndMeshPointUV>& points, const dArray<dInt32>& indices);
 	//virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
 
 	protected:
 	virtual ~ndDemoMesh();
-
-	public:
 	void ResetOptimization();
-	void OptimizeForRender(const dArray<ndMeshPointUV>& points, const dArray<dInt32>& indices);
+	void RenderGeometry(ndDemoEntityManager* const scene, const dMatrix& modelMatrix);
 
 	dInt32 m_indexCount;
 	dInt32 m_vertexCount;

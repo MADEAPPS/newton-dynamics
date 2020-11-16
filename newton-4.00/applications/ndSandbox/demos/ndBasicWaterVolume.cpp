@@ -33,7 +33,7 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 		//segment->m_material.m_textureHandle = (GLuint)material;
 		segment->m_material.m_textureHandle = (GLuint)1;
 
-		segment->SetOpacity(0.3f);
+		segment->SetOpacity(0.2f);
 		segment->m_segmentStart = 0;
 		segment->m_indexCount = 0;
 		m_hasTransparency = true;
@@ -97,8 +97,10 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		// the mesh in is global space I need to fix that
 		dMatrix nodeMatrix(dGetIdentityMatrix());
 nodeMatrix.m_posit.m_y += 0.125f;
-
+	
+		// render the fluid;
 		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
+		
 		dScopeSpinLock lock(m_lock);
 		if (m_hasNewMesh)
 		{
@@ -106,6 +108,9 @@ nodeMatrix.m_posit.m_y += 0.125f;
 			m_isoSurfaceMesh1->UpdateBuffers(m_points, m_indexList);
 			dSwap(m_isoSurfaceMesh0, m_isoSurfaceMesh1);
 		}
+
+		// render the cage;
+		ndDemoEntity::Render(timeStep, scene, matrix);
 	}
 
 	void UpdateIsoSuface(const dIsoSurface& isoSurface)

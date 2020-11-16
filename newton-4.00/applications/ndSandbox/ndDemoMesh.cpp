@@ -1237,61 +1237,68 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 	}
 }
 
+
+void ndDemoMesh::RenderGeometry(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
+{
+	glUseProgram(m_shader);
+
+	ndDemoCamera* const camera = scene->GetCamera();
+
+	const dMatrix& viewMatrix = camera->GetViewMatrix();
+	const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
+	dMatrix viewModelMatrix(modelMatrix * viewMatrix);
+	dVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
+
+	glUniform1i(m_textureLocation, 0);
+	glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight.m_x);
+	glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+	glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
+	glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
+
+	glBindVertexArray(m_vetextArrayBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
+
+	glActiveTexture(GL_TEXTURE0);
+	for (dListNode* node = GetFirst(); node; node = node->GetNext())
+	{
+		ndDemoSubMesh& segment = node->GetInfo();
+		if (segment.m_hasTranparency)
+		{
+			glUniform1f(m_transparencyLocation, segment.m_material.m_opacity);
+			glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_material.m_specular.m_x);
+			glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_material.m_ambient.m_x);
+			glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_material.m_diffuse.m_x);
+			glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_material.m_shiness));
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+			glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
+			glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
+		}
+	}
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	glUseProgram(0);
+}
+
 void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
 	if (m_isVisible)
 	{
-		//glDisable(GL_CULL_FACE);
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		glDepthMask(GL_FALSE);
 		glEnable(GL_BLEND);
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		glUseProgram(m_shader);
+		glFrontFace(GL_CW);
+		RenderGeometry(scene, modelMatrix);
 
-		ndDemoCamera* const camera = scene->GetCamera();
-
-		const dMatrix& viewMatrix = camera->GetViewMatrix();
-		const dMatrix& projectionMatrix = camera->GetProjectionMatrix();
-		dMatrix viewModelMatrix(modelMatrix * viewMatrix);
-		dVector directionaLight(viewMatrix.RotateVector(dVector(-1.0f, 1.0f, 0.0f, 0.0f)).Normalize());
-
-		glUniform1i(m_textureLocation, 0);
-		glUniform4fv(m_directionalLightDirLocation, 1, &directionaLight.m_x);
-		glUniformMatrix4fv(m_normalMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-		glUniformMatrix4fv(m_projectMatrixLocation, 1, false, &projectionMatrix[0][0]);
-		glUniformMatrix4fv(m_viewModelMatrixLocation, 1, false, &viewModelMatrix[0][0]);
-
-		glBindVertexArray(m_vetextArrayBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBuffer);
-
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-		glActiveTexture(GL_TEXTURE0);
-		for (dListNode* node = GetFirst(); node; node = node->GetNext())
-		{
-			ndDemoSubMesh& segment = node->GetInfo();
-			if (segment.m_hasTranparency)
-			{
-				glUniform1f(m_transparencyLocation, segment.m_material.m_opacity);
-				glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_material.m_specular.m_x);
-				glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_material.m_ambient.m_x);
-				glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_material.m_diffuse.m_x);
-				glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_material.m_shiness));
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-				glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
-				glDrawElements(GL_TRIANGLES, segment.m_indexCount, GL_UNSIGNED_INT, (void*)(segment.m_segmentStart * sizeof(GL_UNSIGNED_INT)));
-			}
-		}
-
-		//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-		glUseProgram(0);
-
+		glFrontFace(GL_CCW);
+		RenderGeometry(scene, modelMatrix);
+		
 		glEnable(GL_CULL_FACE);
 		glDisable(GL_BLEND);
+		glDepthMask(GL_TRUE);
 	}
 }
 
