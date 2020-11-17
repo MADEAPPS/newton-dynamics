@@ -34,6 +34,9 @@ static const dUnsigned8 seed[256] =
 };
 
 
+#define D_NEW_PERLING
+
+#ifdef D_NEW_PERLING
 static inline dUnsigned8 randomSeed(dInt32 i)
 {
 	return seed[i];
@@ -307,3 +310,71 @@ dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 y, dFloat32 z, dFlo
 	//return (output / denom);
 	return output;
 }
+
+#else
+
+
+static inline dFloat32 Interpolate(dFloat32 t, dFloat32 v1, dFloat32 v2)
+{
+	return v1 + t * (v2 - v1);
+}
+
+static inline dFloat32 CubicSmoothing(dFloat32 val) 
+{
+	dFloat32 val3 = val * val * val;
+	dFloat32 val4 = val3 * val;
+	return 6.0f * val4 * val - 15.0f * val4 + 10.0f * val3;
+}
+
+
+static inline dFloat32 Gradient(dInt32 x, dFloat32 dx)
+{
+	dInt32 h = seed[x & 255];
+	h &= 3;
+	return ((h & 1) ? -dx : dx);
+}
+
+dFloat32 dPerlinNoise(dFloat32 x)
+{
+	dInt32 ix = dInt32(dFloor(x));
+	dFloat32 dx = x - ix;
+
+	dFloat32 w00 = Gradient(ix, dx);
+	dFloat32 w10 = Gradient(ix + 1, dx - 1.0f);
+	dFloat32 wx = CubicSmoothing(dx);
+	dFloat32 x0 = Interpolate(wx, w00, w10);
+	return x0;
+}
+
+
+dFloat32 dPerlinNoise(dFloat32 x, dFloat32 y)
+{
+	dAssert(0);
+	return 0;
+}
+
+dFloat32 dPerlinNoise(dFloat32 x, dFloat32 y, dFloat32 z)
+{
+	dAssert(0);
+	return 0;
+}
+
+dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 amplitude, dFloat32 persistence, dFloat32 period, dFloat32 lacunarity)
+{
+	dAssert(0);
+	return 0;
+}
+
+dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 y, dFloat32 amplitude, dFloat32 persistence, dFloat32 period, dFloat32 lacunarity)
+{
+	dAssert(0);
+	return 0;
+}
+
+dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 amplitude, dFloat32 persistence, dFloat32 period, dFloat32 lacunarity)
+{
+	dAssert(0);
+	return 0;
+}
+
+#endif
