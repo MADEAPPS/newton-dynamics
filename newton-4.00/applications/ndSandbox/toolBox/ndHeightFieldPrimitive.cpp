@@ -268,14 +268,14 @@ static void MakeGridPoints(dArray<dVector>& gridPoints)
 
 	dFloat32 cellSize = D_TERRAIN_GRID_SIZE;
 	
-
+	dFloat32 scale__ = 1.0f / 80.0f;
 	dFloat32 minHeight = dFloat32(1.0e10f);
 	dFloat32 maxHight = dFloat32(-1.0e10f);
 	for (dInt32 z = 0; z < D_TERRAIN_HEIGHT; z++)
 	{
 		for (dInt32 x = 0; x < D_TERRAIN_WIDTH; x++)
 		{
-			dFloat32 noiseVal = BrownianMotion(octaves, dFloat32(x), dFloat32(z), amplitude, persistance, frequency, lacunarity);
+			dFloat32 noiseVal = BrownianMotion(octaves, scale__ * dFloat32(x), scale__ * dFloat32(z), amplitude, persistance, frequency, lacunarity);
 			gridPoints[z * D_TERRAIN_WIDTH + x] = dVector(x * cellSize, noiseVal, z * cellSize, dFloat32 (0.0f));
 			minHeight = dMin(minHeight, noiseVal);
 			maxHight = dMax(maxHight, noiseVal);

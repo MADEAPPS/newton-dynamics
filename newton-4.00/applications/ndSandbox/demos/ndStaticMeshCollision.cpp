@@ -160,7 +160,8 @@ void ndStaticMeshCollisionDemo (ndDemoEntityManager* const scene)
 
 	// build a floor
 	//BuildFlatPlane(scene, true);
-	//BuildHeightFieldTerrain(scene);
+	BuildHeightFieldTerrain(scene);
+return;
 	//BuildStaticMesh(scene, "flatPlane.fbx", false);
 	BuildStaticMesh(scene, "track.fbx", false);
 	//BuildStaticMesh(scene, "playerarena.fbx", true);
