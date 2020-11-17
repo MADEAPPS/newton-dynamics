@@ -346,6 +346,21 @@ dFloat32 dPerlinNoise(dFloat32 x)
 	return x0;
 }
 
+dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 amplitude, dFloat32 persistence, dFloat32 period, dFloat32 lacunarity)
+{
+	dFloat32 r = 0.0f;
+	dFloat32 a = 1.0f;
+	dInt32 freq = 1;
+
+	for (dInt32 i = 0; i < octaves; i++)
+	{
+		dFloat32 fx = x * freq;
+		r += dPerlinNoise(fx) * a;
+		a *= persistence;
+		freq = 2 << i;
+	}
+	return r;
+}
 
 dFloat32 dPerlinNoise(dFloat32 x, dFloat32 y)
 {
@@ -359,22 +374,41 @@ dFloat32 dPerlinNoise(dFloat32 x, dFloat32 y, dFloat32 z)
 	return 0;
 }
 
-dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 amplitude, dFloat32 persistence, dFloat32 period, dFloat32 lacunarity)
-{
-	dAssert(0);
-	return 0;
-}
 
 dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 y, dFloat32 amplitude, dFloat32 persistence, dFloat32 period, dFloat32 lacunarity)
 {
-	dAssert(0);
-	return 0;
+	dFloat32 r = 0.0f;
+	dFloat32 a = 1.0f;
+	dInt32 freq = 1;
+
+	for (dInt32 i = 0; i < octaves; i++)
+	{
+		dFloat32 fx = x * freq;
+		dFloat32 fy = y * freq;
+		r += dPerlinNoise (fx, fy) * a;
+		a *= persistence;
+		freq = 2 << i;
+	}
+
+	return r;
 }
 
 dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 amplitude, dFloat32 persistence, dFloat32 period, dFloat32 lacunarity)
 {
-	dAssert(0);
-	return 0;
+	dFloat32 r = 0.0f;
+	dFloat32 a = 1.0f;
+	dInt32 freq = 1;
+
+	for (dInt32 i = 0; i < octaves; i++)
+	{
+		dFloat32 fx = x * freq;
+		dFloat32 fy = y * freq;
+		dFloat32 fz = z * freq;
+		r += dPerlinNoise(fx, fy, fz) * a;
+		a *= persistence;
+		freq = 2 << i;
+	}
+	return r;
 }
 
 #endif
