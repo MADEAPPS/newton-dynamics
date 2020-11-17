@@ -34,7 +34,7 @@ static const dUnsigned8 seed[256] =
 };
 
 
-#define D_NEW_PERLING
+//#define D_NEW_PERLING
 
 #ifdef D_NEW_PERLING
 static inline dUnsigned8 randomSeed(dInt32 i)
@@ -334,6 +334,24 @@ static inline dFloat32 Gradient(dInt32 x, dFloat32 dx)
 	return ((h & 1) ? -dx : dx);
 }
 
+static inline dFloat32 Gradient(int32_t x, int32_t y, dFloat32 dx, dFloat32 dy)
+{
+	int32_t h = seed[(seed[x & 255] + y) & 255];
+	h &= 3;
+	return ((h & 1) ? -dx : dx) + ((h & 2) ? -dy : dy);
+}
+
+static inline dFloat32 Gradient(int32_t x, int32_t y, int32_t z, dFloat32 dx, dFloat32 dy, dFloat32 dz)
+{
+	int32_t h = seed[seed[seed[x & 255] + y & 255] + z & 255];
+	h &= 15;
+
+	//	Ken Perlins original impl
+	dFloat32 u = h < 8 ? dx : dy;
+	dFloat32 v = h < 4 ? dy : (h == 12 || h == 14) ? dx : dz;
+	return ((h & 1) ? -u : u) + ((h & 2) ? -v : v);
+}
+
 dFloat32 dPerlinNoise(dFloat32 x)
 {
 	dInt32 ix = dInt32(dFloor(x));
@@ -344,6 +362,62 @@ dFloat32 dPerlinNoise(dFloat32 x)
 	dFloat32 wx = CubicSmoothing(dx);
 	dFloat32 x0 = Interpolate(wx, w00, w10);
 	return x0;
+}
+
+
+dFloat32 dPerlinNoise(dFloat32 x, dFloat32 y)
+{
+	dInt32 ix = dInt32(dFloor(x));
+	dInt32 iy = dInt32(dFloor(y));
+	dFloat32 dx = x - ix;
+	dFloat32 dy = y - iy;
+
+	dFloat32 w00 = Gradient(ix, iy, dx, dy);
+	dFloat32 w10 = Gradient(ix + 1, iy, dx - 1.0f, dy);
+	dFloat32 w01 = Gradient(ix, iy + 1, dx, dy - 1.0f);
+	dFloat32 w11 = Gradient(ix + 1, iy + 1, dx - 1.0f, dy - 1.0f);
+
+	dFloat32 wx = CubicSmoothing(dx);
+	dFloat32 wy = CubicSmoothing(dy);
+
+	dFloat32 x0 = Interpolate(wx, w00, w10);
+	dFloat32 x1 = Interpolate(wx, w01, w11);
+
+	return Interpolate(wy, x0, x1);
+}
+
+dFloat32 dPerlinNoise(dFloat32 x, dFloat32 y, dFloat32 z)
+{
+	dInt32 ix = dInt32(dFloor(x));
+	dInt32 iy = dInt32(dFloor(y));
+	dInt32 iz = dInt32(dFloor(z));
+
+	dFloat32 dx = x - ix;
+	dFloat32 dy = y - iy;
+	dFloat32 dz = z - iz;
+
+	dFloat32 w000 = Gradient(ix, iy, iz, dx, dy, dz);
+	dFloat32 w100 = Gradient(ix + 1, iy, iz, dx - 1, dy, dz);
+	dFloat32 w010 = Gradient(ix, iy + 1, iz, dx, dy - 1, dz);
+	dFloat32 w110 = Gradient(ix + 1, iy + 1, iz, dx - 1, dy - 1, dz);
+	dFloat32 w001 = Gradient(ix, iy, iz + 1, dx, dy, dz - 1);
+	dFloat32 w101 = Gradient(ix + 1, iy, iz + 1, dx - 1, dy, dz - 1);
+	dFloat32 w011 = Gradient(ix, iy + 1, iz + 1, dx, dy - 1, dz - 1);
+	dFloat32 w111 = Gradient(ix + 1, iy + 1, iz + 1, dx - 1, dy - 1, dz - 1);
+	
+	dFloat32 wx = CubicSmoothing(dx);
+	dFloat32 wy = CubicSmoothing(dy);
+	dFloat32 wz = CubicSmoothing(dz);
+
+	dFloat32 x00 = Interpolate(wx, w000, w100);
+	dFloat32 x10 = Interpolate(wx, w010, w110);
+	dFloat32 x01 = Interpolate(wx, w001, w101);
+	dFloat32 x11 = Interpolate(wx, w011, w111);
+
+	dFloat32 y0 = Interpolate(wy, x00, x10);
+	dFloat32 y1 = Interpolate(wy, x01, x11);
+
+	return Interpolate(wz, y0, y1);
 }
 
 dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 amplitude, dFloat32 persistence, dFloat32 period, dFloat32 lacunarity)
@@ -361,19 +435,6 @@ dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 amplitude, dFloat32
 	}
 	return r;
 }
-
-dFloat32 dPerlinNoise(dFloat32 x, dFloat32 y)
-{
-	dAssert(0);
-	return 0;
-}
-
-dFloat32 dPerlinNoise(dFloat32 x, dFloat32 y, dFloat32 z)
-{
-	dAssert(0);
-	return 0;
-}
-
 
 dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 y, dFloat32 amplitude, dFloat32 persistence, dFloat32 period, dFloat32 lacunarity)
 {
