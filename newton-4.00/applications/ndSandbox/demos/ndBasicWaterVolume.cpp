@@ -89,7 +89,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 		//dMatrix nodeMatrix(m_matrix * matrix);
 
 		dMatrix nodeMatrix(dGetIdentityMatrix());
-nodeMatrix.m_posit.m_y += 0.125f;
+		//nodeMatrix.m_posit.m_y += 0.125f;
 	
 		// render the fluid;
 		m_isoSurfaceMesh0->Render(scene, nodeMatrix);
@@ -183,7 +183,7 @@ static void AddWaterVolume(ndDemoEntityManager* const scene, const dMatrix& loca
 	fluidObject->SetParticleRadius(diameter * 0.5f);
 
 	//dInt32 particleCountPerAxis = 32;
-	dInt32 particleCountPerAxis = 7;
+	dInt32 particleCountPerAxis = 1;
 	dFloat32 spacing = diameter * 1.0f;
 
 	dFloat32 offset = spacing * particleCountPerAxis / 2.0f;
