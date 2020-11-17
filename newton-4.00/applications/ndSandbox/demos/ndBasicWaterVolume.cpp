@@ -33,7 +33,10 @@ class ndIsoSurfaceMesh : public ndDemoMesh
 		//segment->m_material.m_textureHandle = (GLuint)material;
 		segment->m_material.m_textureHandle = (GLuint)1;
 
-		segment->SetOpacity(0.2f);
+		segment->m_material.m_diffuse = dVector(0.1f, 0.6f, 0.9f, 0.0f);
+		segment->m_material.m_ambient = dVector(0.1f, 0.6f, 0.9f, 0.0f);
+
+		segment->SetOpacity(0.4f);
 		segment->m_segmentStart = 0;
 		segment->m_indexCount = 0;
 		m_hasTransparency = true;
@@ -100,7 +103,7 @@ nodeMatrix.m_posit.m_y += 0.125f;
 		}
 
 		// render the cage;
-		ndDemoEntity::Render(timeStep, scene, matrix);
+		//ndDemoEntity::Render(timeStep, scene, matrix);
 	}
 
 	void UpdateIsoSuface(const dIsoSurface& isoSurface)

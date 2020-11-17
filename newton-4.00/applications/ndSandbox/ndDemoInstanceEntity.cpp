@@ -17,10 +17,10 @@
 
 ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderPrograms& shaderCache, const ndShapeInstance* const collision, const char* const texture0, const char* const texture1, const char* const texture2, dFloat32 opacity, const dMatrix& uvMatrix)
 	:ndDemoMesh(name)
-	, m_offsets(nullptr)
-	, m_instanceCount(0)
-	, m_maxInstanceCount(1024 * 8)
-	, m_matrixOffsetBuffer(0)
+	,m_offsets(nullptr)
+	,m_instanceCount(0)
+	,m_maxInstanceCount(1024)
+	,m_matrixOffsetBuffer(0)
 {
 	ndShapeInstanceMeshBuilder mesh(*collision);
 

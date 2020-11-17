@@ -1237,7 +1237,6 @@ void ndDemoMesh::Render(ndDemoEntityManager* const scene, const dMatrix& modelMa
 	}
 }
 
-
 void ndDemoMesh::RenderGeometry(ndDemoEntityManager* const scene, const dMatrix& modelMatrix)
 {
 	glUseProgram(m_shader);
@@ -1265,10 +1264,15 @@ void ndDemoMesh::RenderGeometry(ndDemoEntityManager* const scene, const dMatrix&
 		if (segment.m_hasTranparency)
 		{
 			glUniform1f(m_transparencyLocation, segment.m_material.m_opacity);
-			glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_material.m_specular.m_x);
-			glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_material.m_ambient.m_x);
-			glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_material.m_diffuse.m_x);
+			//glMaterialParam(GL_FRONT, GL_SPECULAR, &segment.m_material.m_specular.m_x);
+			//glMaterialParam(GL_FRONT, GL_AMBIENT, &segment.m_material.m_ambient.m_x);
+			//glMaterialParam(GL_FRONT, GL_DIFFUSE, &segment.m_material.m_diffuse.m_x);
 			glMaterialf(GL_FRONT, GL_SHININESS, GLfloat(segment.m_material.m_shiness));
+
+			glUniform3fv(m_materialDiffuseLocation, 1, &segment.m_material.m_diffuse.m_x);
+			glUniform3fv(m_materialAmbientLocation, 1, &segment.m_material.m_ambient.m_x);
+			glUniform3fv(m_materialSpecularLocation, 1, &segment.m_material.m_ambient.m_x);
+
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 			glBindTexture(GL_TEXTURE_2D, segment.m_material.m_textureHandle);
