@@ -45,18 +45,15 @@ static inline dFloat32 CubicSmoothing(dFloat32 val)
 	return 6.0f * val4 * val - 15.0f * val4 + 10.0f * val3;
 }
 
-
 static inline dFloat32 Gradient(dInt32 x, dFloat32 dx)
 {
 	dInt32 h = seed[x & 255];
-	h &= 3;
 	return ((h & 1) ? -dx : dx);
 }
 
 static inline dFloat32 Gradient(int32_t x, int32_t y, dFloat32 dx, dFloat32 dy)
 {
 	int32_t h = seed[(seed[x & 255] + y) & 255];
-	h &= 3;
 	return ((h & 1) ? -dx : dx) + ((h & 2) ? -dy : dy);
 }
 
@@ -65,7 +62,7 @@ static inline dFloat32 Gradient(int32_t x, int32_t y, int32_t z, dFloat32 dx, dF
 	int32_t h = seed[seed[seed[x & 255] + y & 255] + z & 255];
 	h &= 15;
 
-	//	Ken Perlins original impl
+	//	Ken Perlins original implementation
 	dFloat32 u = h < 8 ? dx : dy;
 	dFloat32 v = h < 4 ? dy : (h == 12 || h == 14) ? dx : dz;
 	return ((h & 1) ? -u : u) + ((h & 2) ? -v : v);
@@ -82,7 +79,6 @@ dFloat32 dPerlinNoise(dFloat32 x)
 	dFloat32 x0 = Interpolate(wx, w00, w10);
 	return x0;
 }
-
 
 dFloat32 dPerlinNoise(dFloat32 x, dFloat32 y)
 {
