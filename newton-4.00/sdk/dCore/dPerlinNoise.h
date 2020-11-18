@@ -18,8 +18,8 @@ D_CORE_API dFloat32 dPerlinNoise(dFloat32 x);
 D_CORE_API dFloat32 dPerlinNoise(dFloat32 x, dFloat32 y);
 D_CORE_API dFloat32 dPerlinNoise(dFloat32 x, dFloat32 y, dFloat32 z);
 
-D_CORE_API dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 amplitude, dFloat32 persistence, dFloat32 period, dFloat32 lacunarity);
-D_CORE_API dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 y, dFloat32 amplitude, dFloat32 persistence, dFloat32 period, dFloat32 lacunarity);
-D_CORE_API dFloat32 BrownianMotion(dInt32 octaves, dFloat32 x, dFloat32 y, dFloat32 z, dFloat32 amplitude, dFloat32 persistence, dFloat32 period, dFloat32 lacunarity);
+D_CORE_API dFloat32 BrownianMotion(dInt32 octaves, dFloat32 persistence, dFloat32 x);
+D_CORE_API dFloat32 BrownianMotion(dInt32 octaves, dFloat32 persistence, dFloat32 x, dFloat32 y);
+D_CORE_API dFloat32 BrownianMotion(dInt32 octaves, dFloat32 persistence, dFloat32 x, dFloat32 y, dFloat32 z);
 #endif
 

@@ -139,25 +139,22 @@ class HeightfieldMap
 
 #endif
 
-#define D_TERRAIN_WIDTH				1024
-#define D_TERRAIN_HEIGHT			1024
+#define D_TERRAIN_WIDTH				1024 * 2
+#define D_TERRAIN_HEIGHT			1024 * 2
 
 #define D_TERRAIN_NOISE_OCTAVES		8
-#define D_TERRAIN_NOISE_AMPLITUD	1.0f
-#define D_TERRAIN_NOISE_PERSISTANCE	0.5f
-
-#define D_TERRAIN_NOISE_FREQUENCY	256.0f
-#define D_TERRAIN_NOISE_LACUNARITY	0.6f
+#define D_TERRAIN_NOISE_PERSISTANCE	0.45f
+#define D_TERRAIN_NOISE_GRID_SCALE  (1.0f / 200.0f)
 
 #define D_TERRAIN_GRID_SIZE			4.0f
-#define D_TERRAIN_ELEVATION_SCALE	40.0f
+#define D_TERRAIN_ELEVATION_SCALE	100.0f
 
 #define D_TERRAIN_TILE_SIZE			128
 
 class ndHeightfieldMesh : public ndDemoMesh
 {
 	public: 
-	ndHeightfieldMesh(const dArray<dVector>& gridMap, const ndShaderPrograms& shaderCache)
+	ndHeightfieldMesh(const dArray<dVector>& heightfield, const ndShaderPrograms& shaderCache)
 		:ndDemoMesh ("heightfield")
 	{
 		dArray<ndMeshPointUV> points;
@@ -166,7 +163,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 		m_shader = shaderCache.m_diffuseEffect;
 
 		BuildTilesArray(indexList);
-		BuildVertexAndNormals(indexList, gridMap, points);
+		BuildVertexAndNormals(indexList, heightfield, points);
 		OptimizeForRender(points, indexList);
 	}
 
@@ -256,27 +253,24 @@ class ndHeightfieldMesh : public ndDemoMesh
 	}
 };
 
-static void MakeGridPoints(dArray<dVector>& gridPoints)
+static void MakeNoiseHeightfield(dArray<dVector>& heightfield)
 {
-	gridPoints.SetCount(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
+	heightfield.SetCount(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
 
 	dInt32 octaves = D_TERRAIN_NOISE_OCTAVES;
-	dFloat32 amplitude = D_TERRAIN_NOISE_AMPLITUD;
 	dFloat32 persistance = D_TERRAIN_NOISE_PERSISTANCE;
-	dFloat32 frequency = D_TERRAIN_NOISE_FREQUENCY;
-	dFloat32 lacunarity = D_TERRAIN_NOISE_LACUNARITY;
+	dFloat32 noiseGridScale = D_TERRAIN_NOISE_GRID_SCALE;
 
 	dFloat32 cellSize = D_TERRAIN_GRID_SIZE;
 	
-	dFloat32 scale__ = 1.0f / 80.0f;
 	dFloat32 minHeight = dFloat32(1.0e10f);
 	dFloat32 maxHight = dFloat32(-1.0e10f);
 	for (dInt32 z = 0; z < D_TERRAIN_HEIGHT; z++)
 	{
 		for (dInt32 x = 0; x < D_TERRAIN_WIDTH; x++)
 		{
-			dFloat32 noiseVal = BrownianMotion(octaves, scale__ * dFloat32(x), scale__ * dFloat32(z), amplitude, persistance, frequency, lacunarity);
-			gridPoints[z * D_TERRAIN_WIDTH + x] = dVector(x * cellSize, noiseVal, z * cellSize, dFloat32 (0.0f));
+			dFloat32 noiseVal = BrownianMotion(octaves, persistance, noiseGridScale * dFloat32(x), noiseGridScale * dFloat32(z));
+			heightfield[z * D_TERRAIN_WIDTH + x] = dVector(x * cellSize, noiseVal, z * cellSize, dFloat32 (0.0f));
 			minHeight = dMin(minHeight, noiseVal);
 			maxHight = dMax(maxHight, noiseVal);
 		}
@@ -284,21 +278,21 @@ static void MakeGridPoints(dArray<dVector>& gridPoints)
 
 	dFloat32 highScale = D_TERRAIN_ELEVATION_SCALE;
 	dFloat32 scale = dFloat32(2.0f) / (maxHight - minHeight);
-	for (dInt32 i = 0; i < gridPoints.GetCapacity(); i++)
+	for (dInt32 i = 0; i < heightfield.GetCapacity(); i++)
 	{
-		dFloat32 y = gridPoints[i].m_y;
+		dFloat32 y = heightfield[i].m_y;
 		y = scale * (y - minHeight) - dFloat32(1.0f);
-		gridPoints[i].m_y *= highScale;
+		heightfield[i].m_y *= highScale;
 	}
 }
 
 ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene)
 {
-	dArray<dVector> gridMap;
-	MakeGridPoints(gridMap);
+	dArray<dVector> heightfield;
+	MakeNoiseHeightfield(heightfield);
 	
 	// create the visual mesh
-	ndDemoMesh* const mesh = new ndHeightfieldMesh(gridMap, scene->GetShaderCache());
+	ndDemoMesh* const mesh = new ndHeightfieldMesh(heightfield, scene->GetShaderCache());
 
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit.m_z = -200.0f;
