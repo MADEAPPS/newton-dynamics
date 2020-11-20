@@ -25,6 +25,7 @@
 #include "ndNewtonStdafx.h"
 #include "ndBodyParticleSet.h"
 
+#define D_RADIX_DIGIT_SIZE	10
 
 D_MSV_NEWTON_ALIGN_32
 class ndBodySphFluid: public ndBodyParticleSet
@@ -84,18 +85,18 @@ class ndBodySphFluid: public ndBodyParticleSet
 		{
 			struct
 			{
-				dUnsigned64 m_x : 20;
-				dUnsigned64 m_y : 20;
-				dUnsigned64 m_z : 20;
+				dUnsigned64 m_x : D_RADIX_DIGIT_SIZE * 2;
+				dUnsigned64 m_y : D_RADIX_DIGIT_SIZE * 2;
+				dUnsigned64 m_z : D_RADIX_DIGIT_SIZE * 2;
 			};
 			struct
 			{
-				dUnsigned64 m_xLow : 10;
-				dUnsigned64 m_xHigh : 10;
-				dUnsigned64 m_yLow : 10;
-				dUnsigned64 m_yHigh : 10;
-				dUnsigned64 m_zLow : 10;
-				dUnsigned64 m_zHigh : 10;
+				dUnsigned64 m_xLow  : D_RADIX_DIGIT_SIZE;
+				dUnsigned64 m_xHigh : D_RADIX_DIGIT_SIZE;
+				dUnsigned64 m_yLow  : D_RADIX_DIGIT_SIZE;
+				dUnsigned64 m_yHigh : D_RADIX_DIGIT_SIZE;
+				dUnsigned64 m_zLow  : D_RADIX_DIGIT_SIZE;
+				dUnsigned64 m_zHigh : D_RADIX_DIGIT_SIZE;
 			};
 
 			dUnsigned64 m_gridHash;
@@ -109,7 +110,7 @@ class ndBodySphFluid: public ndBodyParticleSet
 		public:
 		ndBodySphFluid* m_fluid;
 		dInt32 m_pass;
-		dInt32 m_scan[1 << 11];
+		dInt32 m_scan[1 << (D_RADIX_DIGIT_SIZE + 1)];
 		dInt32 m_histogram[D_MAX_THREADS_COUNT][1 << 11];
 	};
 

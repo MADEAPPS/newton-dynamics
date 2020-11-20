@@ -233,8 +233,8 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 	const dInt32 start = threadId * size;
 	const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
 
-	dInt32 histogram0[1 << 11];
-	dInt32 histogram1[5][1 << 10];
+	dInt32 histogram0[1 << (D_RADIX_DIGIT_SIZE * 2)];
+	dInt32 histogram1[5][1 << D_RADIX_DIGIT_SIZE];
 	memset(histogram0, 0, sizeof(histogram0));
 	memset(histogram1, 0, sizeof(histogram1));
 
@@ -263,7 +263,7 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 	}
 
 	dInt32 acc0 = 0;
-	for (dInt32 i = 0; i < (1 << 11); i++)
+	for (dInt32 i = 0; i < (1 << (D_RADIX_DIGIT_SIZE + 1)); i++)
 	{
 		const dInt32 n = histogram0[i];
 		histogram0[i] = acc0;
@@ -271,7 +271,7 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 	}
 	dInt32 acc[5];
 	memset(acc, 0, sizeof(acc));
-	for (dInt32 i = 0; i < (1 << 10); i++)
+	for (dInt32 i = 0; i < (1 << D_RADIX_DIGIT_SIZE); i++)
 	{
 		for (dInt32 j = 0; j < 5; j++)
 		{
@@ -282,7 +282,7 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 	}
 
 	dInt32 shiftbits = 0;
-	dUnsigned64 mask = ~dUnsigned64(dInt64(-1 << 10));
+	dUnsigned64 mask = ~dUnsigned64(dInt64(-1 << D_RADIX_DIGIT_SIZE));
 	ndGridHash* dstArray = &m_hashGridMapScratchBuffer[start];
 	for (dInt32 i = 0; i < batchSize; i++)
 	{
@@ -292,8 +292,8 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 		dstArray[index] = entry;
 		histogram0[key] = index + 1;
 	}
-	mask <<= 10;
-	shiftbits += 10;
+	mask <<= D_RADIX_DIGIT_SIZE;
+	shiftbits += D_RADIX_DIGIT_SIZE;
 	dSwap(dstArray, srcArray);
 
 	if (m_upperDigisIsValid[0]) 
@@ -309,8 +309,8 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 		}
 		dSwap(dstArray, srcArray);
 	}
-	mask <<= 10;
-	shiftbits += 10;
+	mask <<= D_RADIX_DIGIT_SIZE;
+	shiftbits += D_RADIX_DIGIT_SIZE;
 
 	for (dInt32 radix = 0; radix < 2; radix++)
 	{
@@ -323,8 +323,8 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 			dstArray[index] = entry;
 			scan0[key] = index + 1;
 		}
-		mask <<= 10;
-		shiftbits += 10;
+		mask <<= D_RADIX_DIGIT_SIZE;
+		shiftbits += D_RADIX_DIGIT_SIZE;
 		dSwap(dstArray, srcArray);
 
 		if (m_upperDigisIsValid[radix + 1])
@@ -340,8 +340,8 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 			}
 			dSwap(dstArray, srcArray);
 		}
-		mask <<= 10;
-		shiftbits += 10;
+		mask <<= D_RADIX_DIGIT_SIZE;
+		shiftbits += D_RADIX_DIGIT_SIZE;
 	}
 	if (srcArray != &m_hashGridMap[0])
 	{
@@ -394,8 +394,8 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 			if (context->m_pass)
 			{
 				memset(histogram, 0, sizeof(context->m_scan)/2);
-				dInt32 shiftbits = context->m_pass * 10;
-				dUnsigned64 mask = ~dUnsigned64(dInt64(-1 << 10));
+				dInt32 shiftbits = context->m_pass * D_RADIX_DIGIT_SIZE;
+				dUnsigned64 mask = ~dUnsigned64(dInt64(-1 << D_RADIX_DIGIT_SIZE));
 				mask = mask << shiftbits;
 
 				for (dInt32 i = 0; i < batchSize; i++)
@@ -465,8 +465,8 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 			ndGridHash* const srcArray = &fluid->m_hashGridMap[start];
 			ndGridHash* const dstArray = &fluid->m_hashGridMapScratchBuffer[0];
 
-			dInt32 shiftbits = context->m_pass * 10;
-			dUnsigned64 mask = ~dUnsigned64(dInt64(-1 << 10));
+			dInt32 shiftbits = context->m_pass * D_RADIX_DIGIT_SIZE;
+			dUnsigned64 mask = ~dUnsigned64(dInt64(-1 << D_RADIX_DIGIT_SIZE));
 			mask = mask << shiftbits;
 			dInt32* const histogram = context->m_histogram[threadId];
 			if (context->m_pass)
