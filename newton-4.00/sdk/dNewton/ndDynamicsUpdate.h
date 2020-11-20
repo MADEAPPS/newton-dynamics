@@ -24,12 +24,14 @@
 
 #include "ndNewtonStdafx.h"
 
-//#define D_BODY_LRU_STEP					2	
-//#define D_MAX_SKELETON_JOINT_COUNT		256
+//#define D_USE_STANDARD_SORT
+//#define D_BODY_LRU_STEP				2	
+//#define D_MAX_SKELETON_JOINT_COUNT	256
 //#define D_MAX_CONTINUE_COLLISON_STEPS	8
 #define D_SMALL_ISLAND_COUNT			32
 #define	D_FREEZZING_VELOCITY_DRAG		dFloat32 (0.9f)
 #define	D_SOLVER_MAX_ERROR				(D_FREEZE_MAG * dFloat32 (0.5f))
+
 
 //#define D_CCD_EXTRA_CONTACT_COUNT			(8 * 3)
 
@@ -111,8 +113,11 @@ class ndDynamicsUpdate
 	void GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* const joint);
 
 	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const context);
-	static dInt32 CompareIslandBodies(const ndBodyIndexPair* const  A, const ndBodyIndexPair* const B, void* const context);
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
+
+#ifdef D_USE_STANDARD_SORT
+	static dInt32 CompareIslandBodies(const ndBodyIndexPair* const  A, const ndBodyIndexPair* const B, void* const context);
+#endif
 
 	dVector m_velocTol;
 	dArray<ndIsland> m_islands;

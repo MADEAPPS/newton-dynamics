@@ -29,8 +29,6 @@
 
 #define D_BASH_SIZE	64
 
-//#define D_USE_STANDARD_SORT
-
 ndDynamicsUpdate::ndDynamicsUpdate()
 	:m_velocTol(dFloat32(1.0e-8f))
 	,m_islands()
@@ -132,6 +130,7 @@ dInt32 ndDynamicsUpdate::CompareIslands(const ndIsland* const islandA, const ndI
 	return 0;
 }
 
+#ifdef D_USE_STANDARD_SORT
 dInt32 ndDynamicsUpdate::CompareIslandBodies(const ndBodyIndexPair* const  pairA, const ndBodyIndexPair* const pairB, void* const context)
 {
 	union dKey
@@ -155,6 +154,8 @@ dInt32 ndDynamicsUpdate::CompareIslandBodies(const ndBodyIndexPair* const  pairA
 	}
 	return 0;
 }
+#endif
+
 void ndDynamicsUpdate::BuildIsland()
 {
 	ndScene* const scene = m_world->GetScene();
@@ -271,15 +272,17 @@ void ndDynamicsUpdate::BuildIsland()
 		if (count)
 		{
 			#ifdef D_USE_STANDARD_SORT
+			// sort using quick sort o(n * log(n))
 			dSort(buffer0, count, CompareIslandBodies);
 			const ndBodyIndexPair* const buffer1 = buffer0;
 			#else
+			// sort using counting sort o(n)
 			dInt32 scans[2];
 			scans[0] = 0;
 			scans[1] = 0;
 			for (dInt32 i = 0; i < count; i++)
 			{
-				dInt32 j = 1-buffer0[i].m_root->m_bodyIsConstrained;
+				dInt32 j = 1 - buffer0[i].m_root->m_bodyIsConstrained;
 				scans[j] ++;
 			}
 			scans[1] = scans[0];
@@ -287,7 +290,7 @@ void ndDynamicsUpdate::BuildIsland()
 			ndBodyIndexPair* const buffer1 = buffer0 + count;
 			for (dInt32 i = 0; i < count; i++)
 			{
-				const dInt32 key = 1-buffer0[i].m_root->m_bodyIsConstrained;
+				const dInt32 key = 1 - buffer0[i].m_root->m_bodyIsConstrained;
 				const dInt32 j = scans[key];
 				buffer1[j] = buffer0[i];
 				scans[key] = j + 1;

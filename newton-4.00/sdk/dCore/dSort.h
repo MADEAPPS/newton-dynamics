@@ -165,18 +165,18 @@ void dgRadixSort(T* const array, T* const tmpArray, dInt32 elements, dInt32 radi
 		}
 	}
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	for (dInt32 i = 0; i < (elements - 1); i++) 
 	{
 		dAssert(getRadixKey(&array[i], context) <= getRadixKey(&array[i + 1], context));
 	}
-#endif
+	#endif
 }
 
 template <class T>
 void dSort(T* const array, dInt32 elements, dInt32(*compare) (const T* const  A, const T* const B, void* const context), void* const context = nullptr)
 {
-	//D_TRACKTIME();
+	D_TRACKTIME();
 	const dInt32 batchSize = 8;
 	dInt32 stack[1024][2];
 
@@ -260,18 +260,18 @@ void dSort(T* const array, dInt32 elements, dInt32(*compare) (const T* const  A,
 		array[j] = tmp;
 	}
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	for (dInt32 i = 0; i < (elements - 1); i++) 
 	{
 		dAssert(compare(&array[i], &array[i + 1], context) <= 0);
 	}
-#endif
+	#endif
 }
 
 template <class T>
 void dSortIndirect(T** const array, dInt32 elements, dInt32(*compare) (const T* const  A, const T* const B, void* const context), void* const context = nullptr)
 {
-	//D_TRACKTIME();
+	D_TRACKTIME();
 	const dInt32 batchSize = 8;
 	dInt32 stack[1024][2];
 
@@ -355,149 +355,12 @@ void dSortIndirect(T** const array, dInt32 elements, dInt32(*compare) (const T* 
 		array[j] = tmp;
 	}
 
-#ifdef _DEBUG
+	#ifdef _DEBUG
 	for (dInt32 i = 0; i < (elements - 1); i++) 
 	{
 		dAssert(compare(array[i], array[i + 1], context) <= 0);
 	}
-#endif
-}
-
-class dgParallelSortRange
-{
-	public:
-	dgParallelSortRange() {}
-	dgParallelSortRange(dInt32 i0, dInt32 i1)
-		:m_i0(i0)
-		, m_i1(i1)
-	{
-	}
-	dInt32 m_i0;
-	dInt32 m_i1;
-};
-
-template <class T>
-class dgParallelSourtDesc
-{
-	public:
-	typedef dInt32(*CompareFunction) (const T* const A, const T* const B, void* const context);
-
-	dgParallelSourtDesc(dThreadPool& threadPool, T* const array, dInt32 elements, CompareFunction compareFunct, void* const context)
-		:m_data(array)
-		,m_callback(compareFunct)
-		,m_context(context)
-		,m_threadCount(threadPool.GetThreadCount())
-	{
-		dDownHeap<dgParallelSortRange, dInt32> rangeMerge(m_buffer, sizeof(m_buffer));
-
-		dgParallelSortRange range(0, elements - 1);
-		rangeMerge.Push(range, elements);
-
-		const dInt32 batchSize = D_PARALLET_SORT_BATCH_SIZE;
-		const dInt32 rangesCount = m_threadCount;
-
-		while ((rangeMerge.GetCount() < rangesCount) && (rangeMerge.Value() > batchSize)) 
-		{
-			dgParallelSortRange splitRange(rangeMerge[0]);
-			rangeMerge.Pop();
-
-			const dInt32 lo = splitRange.m_i0;
-			const dInt32 hi = splitRange.m_i1;
-			const dInt32 mid = (lo + hi) >> 1;
-			if (m_callback(&array[lo], &array[mid], context) > 0) 
-			{
-				dSwap(array[lo], array[mid]);
-			}
-			if (m_callback(&array[mid], &array[hi], context) > 0) 
-			{
-				dSwap(array[mid], array[hi]);
-			}
-			if (m_callback(&array[lo], &array[mid], context) > 0) 
-			{
-				dSwap(array[lo], array[mid]);
-			}
-			dInt32 i = lo;
-			dInt32 j = hi;
-			T pivot(array[mid]);
-			for (;;) 
-			{
-				do 
-				{
-					i++;
-				} while (m_callback(&array[i], &pivot, context) < 0);
-				do 
-				{
-					j--;
-				} while (m_callback(&array[j], &pivot, context) > 0);
-
-				if (i >= j) 
-				{
-					break;
-				}
-				dSwap(array[i], array[j]);
-			}
-
-			dgParallelSortRange newRange0(lo, j);
-			dgParallelSortRange newRange1(j + 1, hi);
-			rangeMerge.Push(newRange0, j - lo + 1);
-			rangeMerge.Push(newRange1, hi - j);
-		}
-
-		m_rangeMerge = &rangeMerge;
-		for (dInt32 i = 0; i < m_threadCount; i++) 
-		{
-			threadPool.QueueJob(dgParallelKernel, this, nullptr, __FUNCTION__);
-		}
-		threadPool.SynchronizationBarrier();
-
-		#ifdef _DEBUG
-		for (dInt32 i = 0; i < (elements - 1); i++) 
-		{
-			dAssert(m_callback(&m_data[i], &m_data[i + 1], context) <= 0);
-		}
-		#endif
-	}
-
-	static void dgParallelKernel(void* const context, void* const worldContext, dInt32 threadID)
-	{
-		D_TRACKTIME();
-		dgParallelSourtDesc<T>* const me = (dgParallelSourtDesc<T>*) context;
-		me->dgParallelKernel(threadID);
-	}
-
-	void dgParallelKernel(dInt32 threadID) 
-	{
-		dDownHeap<dgParallelSortRange, dInt32>& rangeMerge = *((dDownHeap<dgParallelSortRange, dInt32>*)m_rangeMerge);
-		const dInt32 count = rangeMerge.GetCount();
-		for (dInt32 i = threadID; i < count; i += m_threadCount) 
-		{
-			dgParallelSortRange range(rangeMerge[i]);
-			T* const data = &m_data[range.m_i0];
-			dSort(data, range.m_i1 - range.m_i0 + 1, m_callback, m_context);
-		}
-	}
-
-	T* m_data;
-	void* m_rangeMerge;
-	CompareFunction m_callback;
-	void* m_context;
-	int m_threadCount;
-	dInt8 m_buffer[256 * sizeof (dgParallelSortRange)];
-};
-
-template <class T>
-void dgParallelSort(dThreadPool& threadPool, T* const array, dInt32 elements, dInt32(*compare) (const T* const A, const T* const B, void* const context), void* const context = nullptr)
-{
-	//D_TRACKTIME();
-	if ((threadPool.GetThreadCount() <= 1) || (elements < D_PARALLET_SORT_BATCH_SIZE)) 
-	{
-//	if (1) {
-		dSort(array, elements, compare, context);
-	} 
-	else 
-	{
-		dgParallelSourtDesc<T> sort(threadPool, array, elements, compare, context);
-	}
+	#endif
 }
 
 #endif
