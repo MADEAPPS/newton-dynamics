@@ -139,12 +139,13 @@ class HeightfieldMap
 
 #endif
 
-#define D_TERRAIN_WIDTH				1024 * 2
-#define D_TERRAIN_HEIGHT			1024 * 2
+#define D_TERRAIN_WIDTH				1024 * 4
+#define D_TERRAIN_HEIGHT			1024 * 4
 
 #define D_TERRAIN_NOISE_OCTAVES		8
 #define D_TERRAIN_NOISE_PERSISTANCE	0.5f
-#define D_TERRAIN_NOISE_GRID_SCALE  1.0f / (dFloat32 (D_TERRAIN_WIDTH) / 5)
+//#define D_TERRAIN_NOISE_GRID_SCALE  1.0f / (dFloat32 (D_TERRAIN_WIDTH) / 5)
+#define D_TERRAIN_NOISE_GRID_SCALE  (1.0f / 500.0f)
 
 #define D_TERRAIN_GRID_SIZE			4.0f
 #define D_TERRAIN_ELEVATION_SCALE	150.0f
@@ -157,8 +158,8 @@ class ndHeightfieldMesh : public ndDemoMesh
 	ndHeightfieldMesh(const dArray<dVector>& heightfield, const ndShaderPrograms& shaderCache)
 		:ndDemoMesh ("heightfield")
 	{
-		dArray<ndMeshPointUV> points;
-		dArray<dInt32> indexList;
+		dArray<ndMeshPointUV> points(heightfield.GetCount());
+		dArray<dInt32> indexList(6 * D_TERRAIN_WIDTH * D_TERRAIN_WIDTH + 1024);
 
 		m_shader = shaderCache.m_diffuseEffect;
 
@@ -208,20 +209,19 @@ class ndHeightfieldMesh : public ndDemoMesh
 		segment->m_indexCount = indexList.GetCount() - start;
 	}
 
-	void BuildVertexAndNormals(const dArray<dInt32>& indexList, const dArray<dVector>& gridMap, dArray<ndMeshPointUV>& points)
+	void BuildVertexAndNormals(const dArray<dInt32>& indexList, const dArray<dVector>& heightfield, dArray<ndMeshPointUV>& points)
 	{
-		points.Resize(gridMap.GetCount());
-		points.SetCount(gridMap.GetCount());
-		memset(&points[0], 0, gridMap.GetCount() * sizeof(ndMeshPointUV));
+		points.SetCount(heightfield.GetCount());
+		memset(&points[0], 0, heightfield.GetCount() * sizeof(ndMeshPointUV));
 
 		for (dInt32 i = 0; i < indexList.GetCount(); i += 3)
 		{
 			const dInt32 i0 = indexList[i + 0];
 			const dInt32 i1 = indexList[i + 1];
 			const dInt32 i2 = indexList[i + 2];
-			const dVector& p0 = gridMap[i0];
-			const dVector& p1 = gridMap[i1];
-			const dVector& p2 = gridMap[i2];
+			const dVector& p0 = heightfield[i0];
+			const dVector& p1 = heightfield[i1];
+			const dVector& p2 = heightfield[i2];
 
 			dVector e10(p1 - p0);
 			dVector e20(p2 - p0);
@@ -246,7 +246,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 		{
 			dVector normal(points[i].m_normal.m_x, points[i].m_normal.m_y, points[i].m_normal.m_z, dFloat32(0.0f));
 			normal = normal.Normalize();
-			points[i].m_posit = ndMeshVector(gridMap[i].m_x, gridMap[i].m_y, gridMap[i].m_z);
+			points[i].m_posit = ndMeshVector(heightfield[i].m_x, heightfield[i].m_y, heightfield[i].m_z);
 			points[i].m_normal = ndMeshVector(normal.m_x, normal.m_y, normal.m_z);
 			points[i].m_uv.m_u = dFloat32(0.0f);
 			points[i].m_uv.m_v = dFloat32(0.0f);
@@ -257,12 +257,11 @@ class ndHeightfieldMesh : public ndDemoMesh
 static void MakeNoiseHeightfield(dArray<dVector>& heightfield)
 {
 	heightfield.SetCount(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
-
-	dInt32 octaves = D_TERRAIN_NOISE_OCTAVES;
-	dFloat32 persistance = D_TERRAIN_NOISE_PERSISTANCE;
-	dFloat32 noiseGridScale = D_TERRAIN_NOISE_GRID_SCALE;
-
-	dFloat32 cellSize = D_TERRAIN_GRID_SIZE;
+	
+	const dInt32 octaves = D_TERRAIN_NOISE_OCTAVES;
+	const dFloat32 cellSize = D_TERRAIN_GRID_SIZE;
+	const dFloat32 persistance = D_TERRAIN_NOISE_PERSISTANCE;
+	const dFloat32 noiseGridScale = D_TERRAIN_NOISE_GRID_SCALE;
 	
 	dFloat32 minHeight = dFloat32(1.0e10f);
 	dFloat32 maxHight = dFloat32(-1.0e10f);
