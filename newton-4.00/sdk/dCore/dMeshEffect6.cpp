@@ -1647,6 +1647,7 @@ void dMeshEffect::CalculateNormals(dFloat64 angleInRadians)
 	dBigVector faceNormal[256];
 
 	UnpackAttibuteData();
+	m_attrib.m_normalChannel.Resize(m_attrib.m_pointChannel.GetCount());
 	m_attrib.m_normalChannel.SetCount(m_attrib.m_pointChannel.GetCount());
 	m_attrib.m_normalChannel.m_isValid = true;
 
@@ -1828,8 +1829,13 @@ void dMeshEffect::BoxMapping(dInt32 front, dInt32 side, dInt32 top, const dMatri
 void dMeshEffect::UniformBoxMapping(dInt32 material, const dMatrix& textureMatrix)
 {
 	UnpackAttibuteData();
+
+	m_attrib.m_uv0Channel.Resize(m_attrib.m_pointChannel.GetCount());
 	m_attrib.m_uv0Channel.SetCount(m_attrib.m_pointChannel.GetCount());
+
+	m_attrib.m_materialChannel.Resize(m_attrib.m_pointChannel.GetCount());
 	m_attrib.m_materialChannel.SetCount(m_attrib.m_pointChannel.GetCount());
+
 	m_attrib.m_uv0Channel.m_isValid = true;
 	m_attrib.m_materialChannel.m_isValid = true;
 
@@ -1905,8 +1911,13 @@ void dMeshEffect::SphericalMapping(dInt32 material, const dMatrix& uvAligment)
 	}
 
 	UnpackAttibuteData();
+
+	m_attrib.m_uv0Channel.Resize(m_attrib.m_pointChannel.GetCount());
 	m_attrib.m_uv0Channel.SetCount(m_attrib.m_pointChannel.GetCount());
+
+	m_attrib.m_materialChannel.Resize(m_attrib.m_pointChannel.GetCount());
 	m_attrib.m_materialChannel.SetCount(m_attrib.m_pointChannel.GetCount());
+
 	m_attrib.m_uv0Channel.m_isValid = true;
 	m_attrib.m_materialChannel.m_isValid = true;
 

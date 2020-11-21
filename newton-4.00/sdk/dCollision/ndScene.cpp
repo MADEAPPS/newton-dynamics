@@ -190,7 +190,7 @@ ndScene::ndScene()
 	,dThreadPool("newtonWorker")
 	,m_bodyList()
 	,m_contactList()
-	,m_activeBodyArray()
+	,m_activeBodyArray(1024)
 	,m_activeConstraintArray()
 	,m_contactLock()
 	,m_rootNode(nullptr)
@@ -201,8 +201,6 @@ ndScene::ndScene()
 	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_fullScan(true)
 {
-	m_activeBodyArray.Resize(256);
-	m_activeConstraintArray.Resize(256);
 	m_contactNotifyCallback->m_scene = this;
 }
 

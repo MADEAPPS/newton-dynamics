@@ -80,6 +80,12 @@ class dPolygonSoupBuilder: public dClassAlloc
 			:dArray<dBigVector>()
 		{
 		}
+
+		dgVertexArray(dInt32 count)
+			:dArray<dBigVector>(count)
+		{
+		}
+
 	};
 
 	class dgIndexArray: public dArray<dInt32>
@@ -89,6 +95,12 @@ class dPolygonSoupBuilder: public dClassAlloc
 			:dArray<dInt32>()
 		{
 		}
+
+		dgIndexArray(dInt32 count)
+			:dArray<dInt32>(count)
+		{
+		}
+
 	};
 
 	dgIndexArray m_faceVertexCount;

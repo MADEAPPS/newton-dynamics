@@ -108,9 +108,9 @@ class ndDynamicsUpdate
 
 	void DetermineSleepStates();
 	void UpdateIslandState(const ndIsland& island);
+	void BuildJacobianMatrix(ndConstraint* const joint);
+	dFloat32 CalculateJointsForce(ndConstraint* const joint);
 	void GetJacobianDerivatives(dInt32 baseIndex, ndConstraint* const joint);
-	void BuildJacobianMatrix(ndConstraint* const joint, ndJacobian* const output, bool singleThreaded);
-	dFloat32 CalculateJointsForce(ndConstraint* const joint, ndJacobian* const output, bool singleThreaded);
 
 	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const context);
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
@@ -123,9 +123,11 @@ class ndDynamicsUpdate
 	dArray<ndIsland> m_islands;
 	dArray<ndBodyKinematic*> m_bodyIslandOrder;
 	dArray<ndJacobian> m_internalForces;
+	dArray<ndJacobian> m_internalForcesBack;
 	ndConstraintArray m_jointArray;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
+	dFloat32 m_accelNorm[D_MAX_THREADS_COUNT];
 	dInt32 m_hasJointFeeback[D_MAX_THREADS_COUNT];
 
 	ndWorld* m_world;

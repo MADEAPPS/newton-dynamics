@@ -347,24 +347,18 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 		}
 	}
 
-	//dArray<dInt32> vertexIndexArray;
-	//dInt32 vCount = geom->getVertexCount();
-	//vertexIndexArray.SetCount(vCount);
-	//vCount = dVertexListToIndexList((dFloat64*) (&vertices->x), dInt32 (sizeof(ofbx::Vec3)), 3, vCount, &vertexIndexArray[0], dFloat64(0.0f));
-
 	dMeshEffect::dMeshVertexFormat format;
 	format.m_vertex.m_data = &vertices[0].x;
 	format.m_vertex.m_indexList = indexArray;
-	//format.m_vertex.m_indexList = &vertexIndexArray[0];
 	format.m_vertex.m_strideInBytes = sizeof(ofbx::Vec3);
 
 	format.m_faceCount = faceCount;
 	format.m_faceIndexCount = faceIndexArray;
 	format.m_faceMaterial = faceMaterialArray;
 	
-	dArray<dVector> normalArray;
 	if (geom->getNormals())
 	{
+		dArray<dVector> normalArray(indexCount);
 		normalArray.SetCount(indexCount);
 		const ofbx::Vec3* const normals = geom->getNormals();
 		for (dInt32 i = 0; i < indexCount; ++i)
@@ -378,21 +372,23 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 		format.m_normal.m_strideInBytes = sizeof(dVector);
 	}
 
-	dArray<dVector> uvArray;
-	uvArray.SetCount(indexCount);
-	memset(&uvArray[0].m_x, 0, indexCount * sizeof(dVector));
+	//dArray<dVector> uvArray(indexCount);
+	//uvArray.SetCount(indexCount);
+	//memset(&uvArray[0].m_x, 0, indexCount * sizeof(dVector));
 	if (geom->getUVs())
 	{
+		dArray<dVector> uvArray(indexCount);
+		uvArray.SetCount(indexCount);
 		const ofbx::Vec2* const uv = geom->getUVs();
 		for (dInt32 i = 0; i < indexCount; ++i)
 		{
 			ofbx::Vec2 n = uv[i];
 			uvArray[i] = dVector(dFloat32(n.x), dFloat32(n.y), dFloat32(0.0f), dFloat32(0.0f));
 		}
+		format.m_uv0.m_data = &uvArray[0].m_x;
+		format.m_uv0.m_indexList = indexArray;
+		format.m_uv0.m_strideInBytes = sizeof(dVector);
 	}
-	format.m_uv0.m_data = &uvArray[0].m_x;
-	format.m_uv0.m_indexList = indexArray;
-	format.m_uv0.m_strideInBytes = sizeof(dVector);
 
 	mesh->BuildFromIndexList(&format);
 	//mesh->RepairTJoints();

@@ -322,6 +322,16 @@ const dInt32 dIsoSurface::m_triangleTable[256][16] =
 };
 
 dIsoSurface::dIsoSurface()
+	:m_origin(dVector::m_zero)
+	,m_points(1024)
+	,m_normals(1024)
+	,m_trianglesList(1024)
+	,m_vertexMap()
+	,m_xCellSize(0)
+	,m_yCellSize(0)
+	,m_zCellSize(0)
+	,m_gridSize(dFloat32 (0.0f))
+	,m_isoValue(dFloat32(0.0f))
 {
 }
 

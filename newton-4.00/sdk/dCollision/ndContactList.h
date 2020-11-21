@@ -30,7 +30,7 @@ class ndConstraintArray: public dArray<ndConstraint*>
 {
 	public: 
 	ndConstraintArray()
-		:dArray<ndConstraint*>()
+		:dArray<ndConstraint*>(1024)
 	{
 	}
 };

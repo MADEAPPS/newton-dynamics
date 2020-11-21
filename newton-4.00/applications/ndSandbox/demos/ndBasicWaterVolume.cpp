@@ -110,6 +110,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 	{
 		if (isoSurface.GetVertexCount())
 		{
+			m_points.Resize(isoSurface.GetVertexCount());
 			m_points.SetCount(isoSurface.GetVertexCount());
 			const dVector* const points = isoSurface.GetPoints();
 			const dVector* const normals = isoSurface.GetNormals();
@@ -121,6 +122,7 @@ class ndWaterVolumeEntity : public ndDemoEntity
 				m_points[i].m_uv.m_v = GLfloat(0.0f);
 			}
 
+			m_indexList.Resize(isoSurface.GetIndexCount());
 			m_indexList.SetCount(isoSurface.GetIndexCount());
 			const dUnsigned64* const indexList = isoSurface.GetIndexList();
 			for (dInt32 i = 0; i < isoSurface.GetIndexCount(); i++)

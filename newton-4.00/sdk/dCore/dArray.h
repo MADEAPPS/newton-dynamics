@@ -36,6 +36,7 @@ class dArray
 {
 	public:
 	dArray();
+	dArray(dInt32 count);
 	dArray(const dArray& source);
 
 	~dArray ();
@@ -67,6 +68,15 @@ dArray<T>::dArray()
 	,m_size(0)
 	,m_capacity(0)
 {
+}
+
+template<class T>
+dArray<T>::dArray(dInt32 count)
+	:m_array(nullptr)
+	,m_size(0)
+	,m_capacity(0)
+{
+	Resize(count);
 }
 
 template<class T>
@@ -113,7 +123,6 @@ T& dArray<T>::operator[] (dInt32 i)
 
 template<class T>
 void dArray<T>::PushBack(const T& element)
-//void dArray<T>::PushBack(const T element)
 {
 	dAssert(m_size <= m_capacity);
 	if (m_size == m_capacity)
@@ -164,7 +173,6 @@ void dArray<T>::Resize(dInt32 size)
 		{
 			for (dInt32 i = 0; i < m_capacity; i++)
 			{
-				//newArray[i] = m_array[i];
 				memcpy(&newArray[i], &m_array[i], sizeof(T));
 			}
 			dMemory::Free(m_array);
@@ -180,7 +188,6 @@ void dArray<T>::Resize(dInt32 size)
 		{
 			for (dInt32 i = 0; i < size; i++) 
 			{
-				//newArray[i] = m_array[i];
 				memcpy(&newArray[i], &m_array[i], sizeof(T));
 			}
 			dMemory::Free(m_array);

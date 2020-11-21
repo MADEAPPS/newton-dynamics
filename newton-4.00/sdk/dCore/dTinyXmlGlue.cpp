@@ -163,6 +163,7 @@ void xmlGetFloatArray3(const nd::TiXmlNode* const rootNode, const char* const na
 	dAssert(element);
 	dInt32 count;
 	element->Attribute("count", &count);
+	array.Resize(count);
 	array.SetCount(count);
 
 	const char* const data = element->Attribute("floatArray");

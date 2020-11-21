@@ -195,7 +195,7 @@ dConvexHull3d::dConvexHull3d(const dConvexHull3d& source)
 	,m_diag(source.m_diag)
 	,m_aabbP0 (source.m_aabbP0)
 	,m_aabbP1 (source.m_aabbP1)
-	,m_points()
+	,m_points(source.m_count)
 {
 	m_points.SetCount(source.m_count);
 	m_points[m_count-1].m_w = dFloat64 (0.0f);

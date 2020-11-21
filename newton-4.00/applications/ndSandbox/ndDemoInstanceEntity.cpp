@@ -63,9 +63,9 @@ ndDemoMeshIntance::ndDemoMeshIntance(const char* const name, const ndShaderProgr
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
 
-	dArray<dInt32> indices;
-	dArray<ndMeshPointUV> points;
-	dArray<ndMeshMatrix> offsets;
+	dArray<dInt32> indices(indexCount);
+	dArray<ndMeshPointUV> points(vertexCount);
+	dArray<ndMeshMatrix> offsets(m_maxInstanceCount);
 
 	points.SetCount(vertexCount);
 	indices.SetCount(indexCount);

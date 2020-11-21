@@ -585,6 +585,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 		public:
 		ndDrawShape()
 			:ndShapeDebugCallback()
+			,m_triangles(1024)
 		{
 		}
 
@@ -631,7 +632,7 @@ ndFlatShadedDebugMesh::ndFlatShadedDebugMesh(const ndShaderPrograms& shaderCache
 	ndDrawShape drawShapes;
 	collision->DebugShape(dGetIdentityMatrix(), drawShapes);
 
-	dArray<dInt32> m_triangles;
+	dArray<dInt32> m_triangles(drawShapes.m_triangles.GetCount());
 	m_triangles.SetCount(drawShapes.m_triangles.GetCount());
 	dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_triangles[0].m_posit.m_x, sizeof(ndPointNormal), sizeof(ndPointNormal), 0, drawShapes.m_triangles.GetCount(), &m_triangles[0], dFloat32(1.0e-6f));
 	
@@ -720,6 +721,7 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 		public:
 		ndDrawShape()
 			:ndShapeDebugCallback()
+			,m_lines(1024)
 		{
 		}
 
@@ -749,7 +751,7 @@ ndWireFrameDebugMesh::ndWireFrameDebugMesh(const ndShaderPrograms& shaderCache, 
 	ndDrawShape drawShapes;
 	collision->DebugShape(dGetIdentityMatrix(), drawShapes);
 
-	dArray<dInt32> m_lines;
+	dArray<dInt32> m_lines(drawShapes.m_lines.GetCount());
 	m_lines.SetCount(drawShapes.m_lines.GetCount());
 	dInt32 vertexCount = dVertexListToIndexList(&drawShapes.m_lines[0].m_x, sizeof(ndMeshVector), sizeof(ndMeshVector), 0, drawShapes.m_lines.GetCount(), &m_lines[0], dFloat32(1.0e-6f));
 
@@ -990,8 +992,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, const ndShaderPrograms& shaderCac
 		indexCount += mesh.GetMaterialIndexCount(geometryHandle, handle);
 	}
 
-	dArray<dInt32> indices;
-	dArray<ndMeshPointUV> points;
+	dArray<dInt32> indices(indexCount);
+	dArray<ndMeshPointUV> points(vertexCount);
 	
 	points.SetCount(vertexCount);
 	indices.SetCount(indexCount);
@@ -1051,8 +1053,8 @@ ndDemoMesh::ndDemoMesh(const char* const name, dMeshEffect* const meshNode, cons
 		indexCount += meshNode->GetMaterialIndexCount(geometryHandle, handle);
 	}
 
-	dArray<dInt32> indices;
-	dArray<ndMeshPointUV> points;
+	dArray<dInt32> indices(indexCount);
+	dArray<ndMeshPointUV> points(vertexCount);
 
 	points.SetCount(vertexCount);
 	indices.SetCount(indexCount);

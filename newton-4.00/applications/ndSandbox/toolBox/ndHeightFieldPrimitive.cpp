@@ -210,6 +210,7 @@ class ndHeightfieldMesh : public ndDemoMesh
 
 	void BuildVertexAndNormals(const dArray<dInt32>& indexList, const dArray<dVector>& gridMap, dArray<ndMeshPointUV>& points)
 	{
+		points.Resize(gridMap.GetCount());
 		points.SetCount(gridMap.GetCount());
 		memset(&points[0], 0, gridMap.GetCount() * sizeof(ndMeshPointUV));
 
@@ -288,7 +289,7 @@ static void MakeNoiseHeightfield(dArray<dVector>& heightfield)
 
 ndBodyKinematic* BuildHeightFieldTerrain(ndDemoEntityManager* const scene)
 {
-	dArray<dVector> heightfield;
+	dArray<dVector> heightfield(D_TERRAIN_WIDTH * D_TERRAIN_HEIGHT);
 	MakeNoiseHeightfield(heightfield);
 	
 	// create the visual mesh

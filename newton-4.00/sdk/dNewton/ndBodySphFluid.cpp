@@ -53,8 +53,8 @@ ndBodySphFluid::ndBodySphFluid()
 	:ndBodyParticleSet()
 	,m_box0(dFloat32(-1e10f))
 	,m_box1(dFloat32(1e10f))
-	,m_hashGridMap()
-	,m_hashGridMapScratchBuffer()
+	,m_hashGridMap(1024)
+	,m_hashGridMapScratchBuffer(1024)
 	,m_iterator(0)
 {
 }

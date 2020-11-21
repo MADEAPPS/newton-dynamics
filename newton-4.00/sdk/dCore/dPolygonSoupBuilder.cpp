@@ -143,10 +143,10 @@ dPolygonSoupBuilder::dPolygonSoupBuilder ()
 }
 
 dPolygonSoupBuilder::dPolygonSoupBuilder (const dPolygonSoupBuilder& source)
-	:m_faceVertexCount()
-	,m_vertexIndex()
+	:m_faceVertexCount(source.m_faceVertexCount.GetCount())
+	,m_vertexIndex(source.m_vertexIndex.GetCount())
 	,m_normalIndex()
-	,m_vertexPoints()
+	,m_vertexPoints(source.m_vertexPoints.GetCount())
 	,m_normalPoints()
 {
 	m_run = DG_POINTS_RUN;
@@ -160,6 +160,8 @@ dPolygonSoupBuilder::dPolygonSoupBuilder (const dPolygonSoupBuilder& source)
 
 	if (m_normalPoints.GetCount())
 	{
+		m_normalIndex.Resize(source.m_normalIndex.GetCount());
+		m_normalPoints.Resize(source.m_normalPoints.GetCount());
 		m_normalIndex.SetCount(source.m_normalIndex.GetCount());
 		m_normalPoints.SetCount(source.m_normalPoints.GetCount());
 
@@ -327,6 +329,8 @@ void dPolygonSoupBuilder::PackArray()
 		}
 		k ++;
 	}
+
+	m_vertexPoints.Resize(vertexCount);
 	m_vertexPoints.SetCount(vertexCount);
 	m_run = DG_POINTS_RUN;
 }
@@ -525,8 +529,11 @@ void dPolygonSoupBuilder::OptimizeByIndividualFaces()
 		polygonIndex += oldCount;
 	}
 	dAssert (polygonIndex == m_vertexIndex.GetCount());
-	m_faceVertexCount.SetCount(newFaceCount);
+
+	m_vertexIndex.Resize(newIndexCount);
+	m_faceVertexCount.Resize(newFaceCount);
 	m_vertexIndex.SetCount(newIndexCount);
+	m_faceVertexCount.SetCount(newFaceCount);
 }
 
 void dPolygonSoupBuilder::End(bool optimize)
@@ -552,6 +559,7 @@ void dPolygonSoupBuilder::End(bool optimize)
 	if (faceCount)
 	{
 		// calculate all face the normals
+		m_normalPoints.Resize(faceCount);
 		m_normalPoints.SetCount(faceCount);
 		for (dInt32 i = 0; i < faceCount; i++)
 		{
@@ -579,6 +587,8 @@ void dPolygonSoupBuilder::End(bool optimize)
 		}
 		// compress normals array
 		//m_normalIndex[m_faceCount] = 0;
+
+		m_normalIndex.Resize(faceCount);;
 		m_normalIndex.SetCount(faceCount);
 		dInt32 normalCount = dVertexListToIndexList(&m_normalPoints[0].m_x, sizeof(dBigVector), 3, faceCount, &m_normalIndex[0], dFloat32(1.0e-6f));
 		dAssert(normalCount <= m_normalPoints.GetCount());

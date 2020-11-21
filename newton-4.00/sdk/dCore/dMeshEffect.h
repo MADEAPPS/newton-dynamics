@@ -609,6 +609,8 @@ inline void dMeshEffect::dPointFormat::Clear()
 
 inline void dMeshEffect::dPointFormat::SetCount(dInt32 count)
 {
+	m_layers.Resize(count);
+	m_vertex.Resize(count);
 	m_layers.SetCount(count);
 	m_vertex.SetCount(count);
 }
@@ -652,6 +654,14 @@ inline void dMeshEffect::dAttibutFormat::Clear()
 
 inline void dMeshEffect::dAttibutFormat::SetCount(dInt32 count)
 {
+	m_pointChannel.Resize(count);
+	m_materialChannel.Resize(count);
+	m_normalChannel.Resize(count);
+	m_binormalChannel.Resize(count);
+	m_colorChannel.Resize(count);
+	m_uv0Channel.Resize(count);
+	m_uv1Channel.Resize(count);
+
 	m_pointChannel.SetCount(count);
 	m_materialChannel.SetCount(count);
 	m_normalChannel.SetCount(count);
