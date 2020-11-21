@@ -3148,6 +3148,9 @@ void dMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 	dInt32 layerIndex = 0;
 	dInt32 vertexStride = dInt32(format->m_vertex.m_strideInBytes / sizeof(dFloat64));
 	const dFloat64* const vertex = format->m_vertex.m_data;
+
+	m_points.m_layers.Resize(vertexCount);
+	m_points.m_vertex.Resize(vertexCount);
 	for (dInt32 i = 0; i < vertexCount; i++) 
 	{
 		dInt32 index = i * vertexStride;
@@ -3207,7 +3210,8 @@ void dMeshEffect::BuildFromIndexList(const dMeshVertexFormat* const format)
 						if (format->m_faceMaterial) 
 						{
 							dInt32 materialIndex = format->m_faceMaterial[j];
-							for (dInt32 i = 0; i < indexCount; i++) {
+							for (dInt32 i = 0; i < indexCount; i++) 
+							{
 								m_attrib.m_materialChannel.PushBack(materialIndex);
 							}
 						}

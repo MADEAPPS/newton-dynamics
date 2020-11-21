@@ -33,8 +33,8 @@ ndShapeInstanceMeshBuilder::ndShapeInstanceMeshBuilder(const ndShapeInstance& in
 	{
 		public:
 		dgMeshEffectBuilder()
-			:m_vertex()
-			,m_faceIndexCount()
+			:m_vertex(256)
+			,m_faceIndexCount(256)
 			,m_brush(0)
 		{
 		}
