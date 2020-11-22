@@ -873,23 +873,6 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 	class ndCalculateJointsAcceleration: public ndScene::ndBaseJob
 	{
 		public:
-		void ExecuteBatch(const dInt32 start, const dInt32 count, 
-			const ndConstraintArray& jointArray, ndJointAccelerationDecriptor joindDesc,
-			dArray<ndLeftHandSide>& leftHandSide,
-			dArray<ndRightHandSide>& rightHandSide)
-		{
-			//D_TRACKTIME();
-			for (dInt32 i = 0; i < count; i++)
-			{
-				ndConstraint* const joint = jointArray[i + start];
-				const dInt32 pairStart = joint->m_rowStart;
-				joindDesc.m_rowsCount = joint->m_rowCount;
-				joindDesc.m_leftHandSide = &leftHandSide[pairStart];
-				joindDesc.m_rightHandSide = &rightHandSide[pairStart];
-				joint->JointAccelerations(&joindDesc);
-			}
-		}
-
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -903,18 +886,22 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 			joindDesc.m_firstPassCoefFlag = world->m_firstPassCoef;
 			dArray<ndLeftHandSide>& leftHandSide = world->m_leftHandSide;
 			dArray<ndRightHandSide>& rightHandSide = world->m_rightHandSide;
-
-			const dInt32 stepSize = D_BASH_SIZE;
+			
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 jointCount = jointArray.GetCount();
-			const dInt32 jointCountBatches = jointCount & -stepSize;
-			dInt32 index = m_it->fetch_add(stepSize);
-			for (; index < jointCountBatches; index = m_it->fetch_add(stepSize))
+			const dInt32 step = jointCount / threadCount;
+			const dInt32 start = threadIndex * step;
+			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : jointCount - start;
+
+			for (dInt32 i = 0; i < count; i++)
 			{
-				ExecuteBatch(index, stepSize, jointArray, joindDesc, leftHandSide, rightHandSide);
-			}
-			if (index < jointCount)
-			{
-				ExecuteBatch(index, jointCount - index, jointArray, joindDesc, leftHandSide, rightHandSide);
+				ndConstraint* const joint = jointArray[i + start];
+				const dInt32 pairStart = joint->m_rowStart;
+				joindDesc.m_rowsCount = joint->m_rowCount;
+				joindDesc.m_leftHandSide = &leftHandSide[pairStart];
+				joindDesc.m_rightHandSide = &rightHandSide[pairStart];
+				joint->JointAccelerations(&joindDesc);
 			}
 		}
 	};
