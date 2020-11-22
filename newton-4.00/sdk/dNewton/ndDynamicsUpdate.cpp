@@ -331,7 +331,7 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 			ndWorld* const world = m_owner->GetWorld();
 			dArray<ndBodyKinematic*>& bodyArray = world->m_bodyIslandOrder;
 
-			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadIndex = GetThredId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = world->m_unConstrainedBodyCount;
 			const dInt32 base = bodyArray.GetCount() - bodyCount;
@@ -428,7 +428,7 @@ void ndDynamicsUpdate::InitBodyArray()
 			ndWorld* const world = m_owner->GetWorld();
 			dArray<ndBodyKinematic*>& bodyArray = world->m_bodyIslandOrder;
 
-			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadIndex = GetThredId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - world->m_unConstrainedBodyCount;
 			const dInt32 step = bodyCount / threadCount;
@@ -734,7 +734,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 			else 
 			{
 				#ifdef D_LOCK_FREE_SOLVER
-					const dInt32 threadIndex = GetThredID();
+					const dInt32 threadIndex = GetThredId();
 					const dInt32 step = jointCount / threadCount;
 					const dInt32 start = threadIndex * step;
 					const dInt32 count = ((threadIndex + 1) < threadCount) ? step : jointCount - start;
@@ -751,7 +751,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 
 				#else
 
-					const dInt32 threadIndex = GetThredID();
+					const dInt32 threadIndex = GetThredId();
 					const dInt32 step = jointCount / threadCount;
 					const dInt32 start = threadIndex * step;
 					const dInt32 count = ((threadIndex + 1) < threadCount) ? step : jointCount - start;
@@ -776,7 +776,7 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadIndex = GetThredId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
 			const dInt32 step = bodyCount / threadCount;
@@ -884,7 +884,7 @@ void ndDynamicsUpdate::CalculateJointsAcceleration()
 			dArray<ndLeftHandSide>& leftHandSide = world->m_leftHandSide;
 			dArray<ndRightHandSide>& rightHandSide = world->m_rightHandSide;
 			
-			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadIndex = GetThredId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 jointCount = jointArray.GetCount();
 			const dInt32 step = jointCount / threadCount;
@@ -937,7 +937,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			else
 			{
 				#ifdef D_LOCK_FREE_SOLVER
-					const dInt32 threadIndex = GetThredID();
+					const dInt32 threadIndex = GetThredId();
 					const dInt32 step = jointCount / threadCount;
 					const dInt32 start = threadIndex * step;
 					const dInt32 count = ((threadIndex + 1) < threadCount) ? step : jointCount - start;
@@ -952,7 +952,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 					dFloat32* const accelNorm = (dFloat32*)m_context;
 					accelNorm[threadIndex] = accNorm;
 				#else
-					const dInt32 threadIndex = GetThredID();
+					const dInt32 threadIndex = GetThredId();
 					const dInt32 step = jointCount / threadCount;
 					const dInt32 start = threadIndex * step;
 					const dInt32 count = ((threadIndex + 1) < threadCount) ? step : jointCount - start;
@@ -977,7 +977,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
-			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadIndex = GetThredId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
 			const dInt32 step = bodyCount / threadCount;
@@ -1222,7 +1222,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 			ndWorld* const world = m_owner->GetWorld();
 			dArray<ndBodyKinematic*>& bodyArray = world->m_bodyIslandOrder;
 
-			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadIndex = GetThredId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - world->m_unConstrainedBodyCount;
 			const dInt32 step = bodyCount / threadCount;
@@ -1285,7 +1285,7 @@ void ndDynamicsUpdate::UpdateForceFeedback()
 			const ndConstraintArray& jointArray = world->m_jointArray;
 			dArray<ndRightHandSide>& rightHandSide = world->m_rightHandSide;
 
-			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadIndex = GetThredId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 jointCount = jointArray.GetCount();
 			const dInt32 step = jointCount / threadCount;
@@ -1331,7 +1331,7 @@ void ndDynamicsUpdate::IntegrateBodies()
 			ndWorld* const world = m_owner->GetWorld();
 			dArray<ndBodyKinematic*>& bodyArray = world->m_bodyIslandOrder;
 
-			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadIndex = GetThredId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount();
 			const dInt32 step = bodyCount / threadCount;
@@ -1387,7 +1387,7 @@ void ndDynamicsUpdate::DetermineSleepStates()
 			ndWorld* const world = m_owner->GetWorld();
 			const dArray<ndIsland>& islandArray = world->m_islands;
 			
-			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadIndex = GetThredId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 islandCount = islandArray.GetCount();
 			const dInt32 step = islandCount / threadCount;
@@ -1623,7 +1623,7 @@ void ndDynamicsUpdate::InitSkeletons()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadIndex = GetThredId();
 			ndWorld* const world = m_owner->GetWorld();
 			ndSkeletonList::dListNode* node = world->GetSkeletonList().GetFirst();
 			for (dInt32 i = 0; i < threadIndex; i++)
@@ -1661,7 +1661,7 @@ void ndDynamicsUpdate::UpdateSkeletons()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadIndex = GetThredId();
 			ndWorld* const world = m_owner->GetWorld();
 			ndSkeletonList::dListNode* node = world->GetSkeletonList().GetFirst();
 			for (dInt32 i = 0; i < threadIndex; i++)

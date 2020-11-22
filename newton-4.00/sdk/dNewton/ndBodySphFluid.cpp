@@ -381,7 +381,7 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 			ndWorld* const world = m_owner->GetWorld();
 			ndContext* const context = (ndContext*)m_context;
 			ndBodySphFluid* const fluid = context->m_fluid;
-			const dInt32 threadId = GetThredID();
+			const dInt32 threadId = GetThredId();
 			const dInt32 threadCount = world->GetThreadCount();
 			
 			const dInt32 count = fluid->m_hashGridMap.GetCount();
@@ -425,7 +425,7 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndContext* const context = (ndContext*)m_context;
-			const dInt32 threadId = GetThredID();
+			const dInt32 threadId = GetThredId();
 			const dInt32 threadCount = world->GetThreadCount();
 			
 			const dInt32 count = context->m_pass ? sizeof (context->m_scan) / sizeof (dInt32) : sizeof(context->m_scan) / (2 * sizeof(dInt32));
@@ -454,7 +454,7 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 			ndWorld* const world = m_owner->GetWorld();
 			ndContext* const context = (ndContext*)m_context;
 			ndBodySphFluid* const fluid = context->m_fluid;
-			const dInt32 threadId = GetThredID();
+			const dInt32 threadId = GetThredId();
 			const dInt32 threadCount = world->GetThreadCount();
 
 			const dInt32 count = fluid->m_hashGridMap.GetCount();

@@ -167,7 +167,7 @@ void ndWorld::ApplyExternalForces()
 		{
 			D_TRACKTIME();
 			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadIndex = GetThredId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
 			const dInt32 step = bodyCount / threadCount;
