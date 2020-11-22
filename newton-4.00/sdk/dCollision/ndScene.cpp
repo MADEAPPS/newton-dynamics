@@ -19,7 +19,6 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndScene.h"
@@ -30,8 +29,6 @@
 #include "ndContactSolver.h"
 #include "ndBodyTriggerVolume.h"
 #include "ndJointBilateralConstraint.h"
-
-#define D_BASH_SIZE					64
 
 #define D_CONTACT_DELAY_FRAMES		4
 #define D_NARROW_PHASE_DIST			dFloat32 (0.2f)
@@ -1530,31 +1527,18 @@ void ndScene::CalculateContacts()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const dInt32 threadIndex = GetThredID();
-			const dInt32 threadsCount = m_owner->GetThreadCount();
-
 			ndConstraintArray& activeContacts = m_owner->m_activeConstraintArray;
-
-			const dInt32 stepSize = D_BASH_SIZE;
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 contactCount = activeContacts.GetCount();
-			const dInt32 contactCountBatches = contactCount & -stepSize;
-			dInt32 index = m_it->fetch_add(stepSize);
-			for (; index < contactCountBatches; index = m_it->fetch_add(stepSize))
+			const dInt32 step = contactCount / threadCount;
+			const dInt32 start = threadIndex * step;
+			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : contactCount - start;
+
+			for (dInt32 i = 0; i < count; i++)
 			{
-				for (dInt32 j = 0; j < D_BASH_SIZE; j++)
-				{
-					dAssert(activeContacts[index + j]->GetAsContact());
-					m_owner->CalculateContacts(threadIndex, activeContacts[index + j]->GetAsContact());
-				}
-			}
-			if (index < contactCount)
-			{
-				const dInt32 count = contactCount - index;
-				for (dInt32 j = 0; j < count; j++)
-				{
-					dAssert(activeContacts[index + j]->GetAsContact());
-					m_owner->CalculateContacts(threadIndex, activeContacts[index + j]->GetAsContact());
-				}
+				dAssert(activeContacts[start + i]->GetAsContact());
+				m_owner->CalculateContacts(threadIndex, activeContacts[start + i]->GetAsContact());
 			}
 		}
 	};
@@ -1615,31 +1599,18 @@ void ndScene::FindCollidingPairs()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const dInt32 threadIndex = GetThredID();
-			const dInt32 threadsCount = m_owner->GetThreadCount();
-
 			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-
-			const dInt32 stepSize = D_BASH_SIZE;
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
-			const dInt32 contactCountBatches = bodyCount & -stepSize;
-			dInt32 index = m_it->fetch_add(stepSize);
-			for (; index < contactCountBatches; index = m_it->fetch_add(stepSize))
+			const dInt32 step = bodyCount / threadCount;
+			const dInt32 start = threadIndex * step;
+			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
+			
+			for (dInt32 i = 0; i < count; i++)
 			{
-				for (dInt32 j = 0; j < stepSize; j++)
-				{
-					ndBodyKinematic* const body = bodyArray[index + j];
-					m_owner->FindCollidinPairs(threadIndex, body, true);
-				}
-			}
-			if (index < bodyCount)
-			{
-				const dInt32 count = bodyCount - index;
-				for (dInt32 j = 0; j < count; j++)
-				{
-					ndBodyKinematic* const body = bodyArray[index + j];
-					m_owner->FindCollidinPairs(threadIndex, body, true);
-				}
+				ndBodyKinematic* const body = bodyArray[start + i];
+				m_owner->FindCollidinPairs(threadIndex, body, true);
 			}
 		}
 	};
@@ -1650,36 +1621,21 @@ void ndScene::FindCollidingPairs()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const dInt32 threadIndex = GetThredID();
-			const dInt32 threadsCount = m_owner->GetThreadCount();
 
 			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-
-			const dInt32 stepSize = D_BASH_SIZE;
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
-			const dInt32 contactCountBatches = bodyCount & -stepSize;
-			dInt32 index = m_it->fetch_add(stepSize);
-			for (; index < contactCountBatches; index = m_it->fetch_add(stepSize))
+			const dInt32 step = bodyCount / threadCount;
+			const dInt32 start = threadIndex * step;
+			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
+
+			for (dInt32 i = 0; i < count; i++)
 			{
-				for (dInt32 j = 0; j < stepSize; j++)
+				ndBodyKinematic* const body = bodyArray[start + i];
+				if (!body->m_equilibrium)
 				{
-					ndBodyKinematic* const body = bodyArray[index + j];
-					if (!body->m_equilibrium)
-					{
-						m_owner->FindCollidinPairs(threadIndex, body, false);
-					}
-				}
-			}
-			if (index < bodyCount)
-			{
-				const dInt32 count = bodyCount - index;
-				for (dInt32 j = 0; j < count; j++)
-				{
-					ndBodyKinematic* const body = bodyArray[index + j];
-					if (!body->m_equilibrium)
-					{
-						m_owner->FindCollidinPairs(threadIndex, body, false);
-					}
+					m_owner->FindCollidinPairs(threadIndex, body, false);
 				}
 			}
 		}
@@ -1705,33 +1661,19 @@ void ndScene::UpdateTransform()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const dInt32 threadIndex = GetThredID();
-			const dInt32 threadsCount = m_owner->GetThreadCount();
-
 			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-
-			const dInt32 stepSize = D_BASH_SIZE;
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
-			const dInt32 contactCountBatches = bodyCount & -stepSize;
-			dInt32 index = m_it->fetch_add(stepSize);
-			for (; index < contactCountBatches; index = m_it->fetch_add(stepSize))
-			{
-				for (dInt32 j = 0; j < stepSize; j++)
-				{
-					ndBodyKinematic* const body = bodyArray[index + j];
-					m_owner->UpdateTransformNotify(threadIndex, body);
-				}
-			}
-			if (index < bodyCount)
-			{
-				const dInt32 count = bodyCount - index;
-				for (dInt32 j = 0; j < count; j++)
-				{
-					ndBodyKinematic* const body = bodyArray[index + j];
-					m_owner->UpdateTransformNotify(threadIndex, body);
-				}
-			}
+			const dInt32 step = bodyCount / threadCount;
+			const dInt32 start = threadIndex * step;
+			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
 
+			for (dInt32 i = 0; i < count; i++)
+			{
+				ndBodyKinematic* const body = bodyArray[start + i];
+				m_owner->UpdateTransformNotify(threadIndex, body);
+			}
 		}
 	};
 
