@@ -165,7 +165,6 @@ void ndDynamicsUpdate::BuildIsland()
 		}
 
 		dInt32 rowCount = 0;
-		//for (dInt32 i = jointArray.GetCount() - 1; i >= 0; i--)
 		for (dInt32 i = 0; i < jointArray.GetCount(); i ++)
 		{
 			ndConstraint* const joint = jointArray[i];
@@ -210,7 +209,6 @@ void ndDynamicsUpdate::BuildIsland()
 			}
 		}
 
-		//for (dInt32 i = jointArray.GetCount() - 1; i >= 0; i--)
 		for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 		{
 			ndConstraint* const joint = jointArray[i];
@@ -329,18 +327,6 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 	class ndIntegrateUnconstrainedBodies : public ndScene::ndBaseJob
 	{
 		public:
-		void ExecuteBatch(const dInt32 start, const dInt32 count, dArray<ndBodyKinematic*>& bodyArray, dFloat32 timestep)
-		{
-			//D_TRACKTIME();
-			for (dInt32 i = 0; i < count; i++)
-			{
-				ndBodyKinematic* const body = bodyArray[start + i]->GetAsBodyKinematic();
-				dAssert(body);
-				body->UpdateInvInertiaMatrix();
-				body->AddDampingAcceleration(m_timestep);
-				body->IntegrateExternalForce(timestep);
-			}
-		}
 
 		virtual void Execute()
 		{
@@ -348,20 +334,22 @@ void ndDynamicsUpdate::IntegrateUnconstrainedBodies()
 			ndWorld* const world = m_owner->GetWorld();
 			dArray<ndBodyKinematic*>& bodyArray = world->m_bodyIslandOrder;
 
-			const dFloat32 timestep = m_timestep;
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = world->m_unConstrainedBodyCount;
 			const dInt32 base = bodyArray.GetCount() - bodyCount;
+			const dInt32 step = bodyCount / threadCount;
+			const dInt32 start = threadIndex * step;
+			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
+			const dFloat32 timestep = m_timestep;
 
-			const dInt32 stepSize = D_BASH_SIZE;
-			const dInt32 bodyCountBatches = bodyCount & -stepSize;
-			dInt32 index = m_it->fetch_add(stepSize);
-			for (; index < bodyCountBatches; index = m_it->fetch_add(stepSize))
+			for (dInt32 i = 0; i < count; i++)
 			{
-				ExecuteBatch(index + base, stepSize, bodyArray, timestep);
-			}
-			if (index < bodyCount)
-			{
-				ExecuteBatch(index + base, bodyCount - index, bodyArray, timestep);
+				ndBodyKinematic* const body = bodyArray[base + start + i]->GetAsBodyKinematic();
+				dAssert(body);
+				body->UpdateInvInertiaMatrix();
+				body->AddDampingAcceleration(m_timestep);
+				body->IntegrateExternalForce(timestep);
 			}
 		}
 	};
