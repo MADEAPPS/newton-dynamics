@@ -1571,57 +1571,38 @@ void ndScene::UpdateAabb()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const dInt32 threadIndex = GetThredID();
-			const dInt32 threadsCount = m_owner->GetThreadCount();
-
 			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-	
-			const dInt32 stepSize = D_BASH_SIZE;
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
-			const dInt32 contactCountBatches = bodyCount & -stepSize;
-			dInt32 index = m_it->fetch_add(stepSize);
-			for (; index < contactCountBatches; index = m_it->fetch_add(stepSize))
+			const dInt32 step = bodyCount / threadCount;
+			const dInt32 start = threadIndex * step;
+			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
+
+			dUnsigned32* const sleepBodiesLane = (dUnsigned32*)m_context;
+			for (dInt32 i = 0; i < count; i++)
 			{
-				for (dInt32 j = 0; j < stepSize; j++)
+				ndBodyKinematic* const body = bodyArray[start + i];
+				if (!body->m_equilibrium)
 				{
-					ndBodyKinematic* const body = bodyArray[index + j];
-					if (!body->m_equilibrium)
-					{
-						m_owner->UpdateAabb(threadIndex, body);
-					}
-					else
-					{
-						m_owner->m_sleepBodiesLane[threadIndex] += 1;
-					}
+					m_owner->UpdateAabb(threadIndex, body);
 				}
-			}
-			if (index < bodyCount)
-			{
-				const dInt32 count = bodyCount - index;
-				for (dInt32 j = 0; j < count; j++)
+				else
 				{
-					ndBodyKinematic* const body = bodyArray[index + j];
-					if (!body->m_equilibrium)
-					{
-						m_owner->UpdateAabb(threadIndex, body);
-					}
-					else
-					{
-						m_owner->m_sleepBodiesLane[threadIndex] += 1;
-					}
+					sleepBodiesLane[threadIndex] += 1;
 				}
 			}
 		}
 	};
 
-	memset(m_sleepBodiesLane, 0, sizeof(m_sleepBodiesLane));
-
-	SubmitJobs<ndUpdateAabbJob>();
+	dUnsigned32 sleepBodiesLane[D_MAX_THREADS_COUNT];
+	memset(sleepBodiesLane, 0, sizeof(sleepBodiesLane));
+	SubmitJobs<ndUpdateAabbJob>(sleepBodiesLane);
 
 	m_sleepBodies = 0;
 	for (dInt32 i = 0; i < GetThreadCount(); i++)
 	{
-		m_sleepBodies += m_sleepBodiesLane[i];
+		m_sleepBodies += sleepBodiesLane[i];
 	}
 }
 

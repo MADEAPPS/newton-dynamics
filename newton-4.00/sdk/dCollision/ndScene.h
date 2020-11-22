@@ -177,7 +177,7 @@ class ndScene
 	ndContactNotify* m_contactNotifyCallback;
 	dFloat32 m_timestep;
 	dUnsigned32 m_sleepBodies;
-	dUnsigned32 m_sleepBodiesLane[D_MAX_THREADS_COUNT];
+	//dUnsigned32 m_sleepBodiesLane[D_MAX_THREADS_COUNT];
 	dUnsigned32 m_lru;
 	bool m_fullScan;
 
