@@ -32,6 +32,7 @@
 #include "ndJointBilateralConstraint.h"
 
 #define D_BASH_SIZE					64
+
 #define D_CONTACT_DELAY_FRAMES		4
 #define D_NARROW_PHASE_DIST			dFloat32 (0.2f)
 #define D_CONTACT_TRANSLATION_ERROR	dFloat32 (1.0e-3f)
@@ -197,7 +198,6 @@ ndScene::ndScene()
 	,m_contactNotifyCallback(new ndContactNotify())
 	,m_timestep(dFloat32 (0.0f))
 	,m_sleepBodies(0)
-	,m_activeBodyCount(0)
 	,m_lru(D_CONTACT_DELAY_FRAMES)
 	,m_fullScan(true)
 {
@@ -1444,6 +1444,7 @@ void ndScene::BuildBodyArray()
 	class ndBuildBodyArray : public ndBaseJob
 	{
 		public:
+		#define D_LOCAL_POOL_SIZE 256
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -1455,6 +1456,7 @@ void ndScene::BuildBodyArray()
 				node = node ? node->GetNext() : nullptr;
 			}
 
+			dAtomic<dUnsigned32>& activeBodyCount = *((dAtomic<dUnsigned32>*)m_context);
 			dArray<ndBodyKinematic*>& activeBodyArray = m_owner->m_activeBodyArray;
 
 			dInt32 bodyCount = 0;
@@ -1466,16 +1468,6 @@ void ndScene::BuildBodyArray()
 				if (body)
 				{
 					const ndShape* const shape = body->GetCollisionShape().GetShape()->GetAsShapeNull();
-					//if (shape)
-					//{
-					//	dAssert(0);
-					//	if (body->GetSceneBodyNode())
-					//	{
-					//		dScopeSpinLock lock(m_owner->m_contactLock);
-					//		m_owner->RemoveBody(body);
-					//	}
-					//}
-					//else
 					if (!shape)
 					{
 						bool inScene = true;
@@ -1488,11 +1480,11 @@ void ndScene::BuildBodyArray()
 						{
 							m_buffer[bodyCount] = body;
 							bodyCount++;
-							if (bodyCount >= D_BASH_SIZE)
+							if (bodyCount >= D_LOCAL_POOL_SIZE)
 							{
 								bodyCount = 0;
-								const dInt32 baseIndex = m_owner->m_activeBodyCount.fetch_add(D_BASH_SIZE);
-								for (dInt32 i = 0; i < D_BASH_SIZE; i++)
+								const dInt32 baseIndex = activeBodyCount.fetch_add(D_LOCAL_POOL_SIZE);
+								for (dInt32 i = 0; i < D_LOCAL_POOL_SIZE; i++)
 								{
 									const dInt32 index = baseIndex + i;
 									m_buffer[i]->PrepareStep(index);
@@ -1510,7 +1502,7 @@ void ndScene::BuildBodyArray()
 
 			if (bodyCount) 
 			{
-				const dInt32 baseIndex = m_owner->m_activeBodyCount.fetch_add(bodyCount);
+				const dInt32 baseIndex = activeBodyCount.fetch_add(bodyCount);
 				for (dInt32 i = 0; i < bodyCount; i++)
 				{
 					const dInt32 index = baseIndex + i;
@@ -1520,13 +1512,13 @@ void ndScene::BuildBodyArray()
 			}
 		}
 
-		ndBodyKinematic* m_buffer[D_BASH_SIZE];
+		ndBodyKinematic* m_buffer[D_LOCAL_POOL_SIZE];
 	};
 
-	m_activeBodyCount.store(0);
+	dAtomic<dUnsigned32> activeBodyCount(0);
 	m_activeBodyArray.SetCount(m_bodyList.GetCount());
-	SubmitJobs<ndBuildBodyArray>();
-	m_activeBodyArray.SetCount(m_activeBodyCount.load());
+	SubmitJobs<ndBuildBodyArray>(&activeBodyCount);
+	m_activeBodyArray.SetCount(activeBodyCount.load());
 }
 
 void ndScene::CalculateContacts()
@@ -1622,7 +1614,6 @@ void ndScene::UpdateAabb()
 		}
 	};
 
-	//m_sleepBodies.store(0);
 	memset(m_sleepBodiesLane, 0, sizeof(m_sleepBodiesLane));
 
 	SubmitJobs<ndUpdateAabbJob>();

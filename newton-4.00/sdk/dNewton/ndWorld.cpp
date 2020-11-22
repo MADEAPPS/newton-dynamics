@@ -166,35 +166,21 @@ void ndWorld::ApplyExternalForces()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-
-			const dInt32 threadIndex = GetThredID();
 			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-
-			const dInt32 stepSize = 64;
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
-			const dInt32 contactCountBatches = bodyCount & -stepSize;
-			dInt32 index = m_it->fetch_add(stepSize);
-			for (; index < contactCountBatches; index = m_it->fetch_add(stepSize))
+			const dInt32 step = bodyCount / threadCount;
+			const dInt32 start = threadIndex * step;
+			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
+			const dFloat32 timestep = m_timestep;
+
+			for (dInt32 i = 0; i < count; i++)
 			{
-				for (dInt32 j = 0; j < stepSize; j++)
+				ndBodyDynamic* const body = bodyArray[start + i]->GetAsBodyDynamic();
+				if (body)
 				{
-					ndBodyDynamic* const body = bodyArray[index + j]->GetAsBodyDynamic();
-					if (body)
-					{
-						body->ApplyExternalForces(threadIndex, m_timestep);
-					}
-				}
-			}
-			if (index < bodyCount)
-			{
-				const dInt32 count = bodyCount - index;
-				for (dInt32 j = 0; j < count; j++)
-				{
-					ndBodyDynamic* const body = bodyArray[index + j]->GetAsBodyDynamic();
-					if (body)
-					{
-						body->ApplyExternalForces(threadIndex, m_timestep);
-					}
+					body->ApplyExternalForces(threadIndex, timestep);
 				}
 			}
 		}
