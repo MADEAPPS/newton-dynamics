@@ -425,9 +425,20 @@ void ndDynamicsUpdate::InitBodyArray()
 	class ndInitBodyArray: public ndScene::ndBaseJob
 	{
 		public:
-		void ExecuteBatch(const dInt32 start, const dInt32 count, dArray<ndBodyKinematic*>& bodyArray, dFloat32 timestep)
+		virtual void Execute()
 		{
-			//D_TRACKTIME();
+			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			dArray<ndBodyKinematic*>& bodyArray = world->m_bodyIslandOrder;
+
+			const dInt32 threadIndex = GetThredID();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			const dInt32 bodyCount = bodyArray.GetCount() - world->m_unConstrainedBodyCount;
+			const dInt32 step = bodyCount / threadCount;
+			const dInt32 start = threadIndex * step;
+			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : bodyCount - start;
+			const dFloat32 timestep = m_timestep;
+
 			for (dInt32 i = 0; i < count; i++)
 			{
 				ndBodyKinematic* const body = bodyArray[start + i]->GetAsBodyDynamic();
@@ -440,29 +451,6 @@ void ndDynamicsUpdate::InitBodyArray()
 					kinBody->m_accel = kinBody->m_veloc;
 					kinBody->m_alpha = kinBody->m_omega;
 				}
-			}
-		}
-
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-
-			ndWorld* const world = m_owner->GetWorld();
-			dArray<ndBodyKinematic*>& bodyArray = world->m_bodyIslandOrder;
-
-			const dFloat32 timestep = m_timestep;
-			const dInt32 bodyCount = bodyArray.GetCount() - world->m_unConstrainedBodyCount;
-
-			const dInt32 stepSize = D_BASH_SIZE;
-			const dInt32 bodyCountBatches = bodyCount & -stepSize;
-			dInt32 index = m_it->fetch_add(stepSize);
-			for (; index < bodyCountBatches; index = m_it->fetch_add(stepSize))
-			{
-				ExecuteBatch(index, stepSize, bodyArray, timestep);
-			}
-			if (index < bodyCount)
-			{
-				ExecuteBatch(index, bodyCount - index, bodyArray, timestep);
 			}
 		}
 	};
