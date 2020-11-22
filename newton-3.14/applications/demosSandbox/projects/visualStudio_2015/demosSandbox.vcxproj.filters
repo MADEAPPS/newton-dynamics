@@ -171,6 +171,9 @@
     <ClCompile Include="..\..\sdkDemos\demos\FlatLandGame.cpp">
       <Filter>demos</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sdkDemos\demos\BlackbirdDreamTest.cpp">
+     <Filter>demos</Filter>      
+    </ClCompile>
     <ClCompile Include="..\..\sdkDemos\toolBox\dWoodFracture.cpp">
       <Filter>utils</Filter>
     </ClCompile>

@@ -39,7 +39,7 @@
 //#define DEFAULT_SCENE	4		// gyroscope precession
 //#define DEFAULT_SCENE	5		// closest distance
 //#define DEFAULT_SCENE	6		// primitive collision
-#define DEFAULT_SCENE	7		// kinematic bodies
+//#define DEFAULT_SCENE	7		// kinematic bodies
 //#define DEFAULT_SCENE	8		// Object Placement
 //#define DEFAULT_SCENE	9		// primitive convex cast 
 //#define DEFAULT_SCENE	10		// box stacks
@@ -73,6 +73,7 @@
 //#define DEFAULT_SCENE	38		// advanced player controller
 //#define DEFAULT_SCENE	39		// cloth patch			
 //#define DEFAULT_SCENE	40		// soft bodies	
+#define DEFAULT_SCENE	41		// BlackbirdDream Test
 						 
 /// demos forward declaration 
 void Friction (DemoEntityManager* const scene);
@@ -116,6 +117,7 @@ void ConstructionVehicle (DemoEntityManager* const scene);
 void StandardJoints (DemoEntityManager* const scene);
 void SixAxisManipulators(DemoEntityManager* const scene);
 void Hexapod(DemoEntityManager* const scene);
+void BlackbirdDreamTest(DemoEntityManager* const scene);
 
 DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] = 
 {
@@ -160,6 +162,7 @@ DemoEntityManager::SDKDemos DemoEntityManager::m_demosSelection[] =
 	{"Advanced player controller", "demonstrate player interacting with other objects", AdvancedPlayerController},
 	{"Simple cloth Patch", "show simple cloth patch", ClothPatch},
 	{"Simple soft Body", "show simple soft body", SoftBodies},
+	{"Blackbird Dream Test", "Blackbird Dream Test", BlackbirdDreamTest},
 };
 
 DemoEntityManager::ButtonKey::ButtonKey (bool state)
