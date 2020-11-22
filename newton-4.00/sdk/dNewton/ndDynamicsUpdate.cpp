@@ -917,20 +917,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 	class ndCalculateJointsForce : public ndScene::ndBaseJob
 	{
 		public:
-		dFloat32 ExecuteBatch(const dInt32 start, const dInt32 count, ndConstraintArray& jointArray, ndJacobian* const internalForces)
-		{
-			//D_TRACKTIME();
-			ndWorld* const world = m_owner->GetWorld();
-			dFloat32 accNorm = dFloat32(0.0f);
-
-			for (dInt32 i = 0; i < count; i++)
-			{
-				ndConstraint* const joint = jointArray[i + start];
-				accNorm += world->CalculateJointsForce(joint, internalForces, false);
-			}
-			return accNorm;
-		}
-
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -948,8 +934,6 @@ void ndDynamicsUpdate::CalculateJointsForce()
 					ndConstraint* const joint = jointArray[i];
 					accNorm += world->CalculateJointsForce(joint, internalForces, true);
 				}
-				//const dInt32 threadIndex = GetThredID();
-				//world->m_accelNorm[threadIndex] = accNorm;
 				dFloat32* const accelNorm = (dFloat32*)m_context;
 				accelNorm[0] = accNorm;
 			}
@@ -958,28 +942,21 @@ void ndDynamicsUpdate::CalculateJointsForce()
 				#ifdef D_LOCK_FREE_SOLVER___
 					dAssert(0);
 				#else
-					const dInt32 stepSize = D_BASH_SIZE;
-					const dInt32 jointCountBatches = jointCount & -stepSize;
+					const dInt32 threadIndex = GetThredID();
+					const dInt32 step = jointCount / threadCount;
+					const dInt32 start = threadIndex * step;
+					const dInt32 count = ((threadIndex + 1) < threadCount) ? step : jointCount - start;
 
 					ndJacobian* const internalForces = &world->m_internalForces[bodyCount];
-					dInt32 index = m_it->fetch_add(stepSize);
-					for (; index < jointCountBatches; index = m_it->fetch_add(stepSize))
+					for (dInt32 i = 0; i < count; i++)
 					{
-						accNorm += ExecuteBatch(index, stepSize, jointArray, internalForces);
+						ndConstraint* const joint = jointArray[i + start];
+						accNorm += world->CalculateJointsForce(joint, internalForces, false);
 					}
-					if (index < jointCount)
-					{
-						accNorm += ExecuteBatch(index, jointCount - index, jointArray, internalForces);
-					}
-
-					const dInt32 threadIndex = GetThredID();
-					//world->m_accelNorm[threadIndex] = accNorm;
-					//const dInt32 threadIndex = GetThredID();
 					dFloat32* const accelNorm = (dFloat32*)m_context;
 					accelNorm[threadIndex] = accNorm;
 				#endif
 			}
-
 		}
 	};
 
@@ -988,7 +965,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 	const dInt32 bodyCount = scene->GetActiveBodyArray().GetCount();
 	const dInt32 threadsCount = dMax (scene->GetThreadCount(), 1);
 
-	dFloat32 m_accelNorm[D_MAX_THREADS_COUNT][D_MAX_THREADS_COUNT];
+	dFloat32 m_accelNorm[D_MAX_THREADS_COUNT];
 	dFloat32 accNorm = D_SOLVER_MAX_ERROR * dFloat32(2.0f);
 	for (dInt32 i = 0; (i < passes) && (accNorm > D_SOLVER_MAX_ERROR); i++) 
 	{
@@ -1012,7 +989,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		accNorm = dFloat32(0.0f);
 		for (dInt32 j = 0; j < threadsCount; j++) 
 		{
-			accNorm = dMax(accNorm, m_accelNorm[0][j]);
+			accNorm = dMax(accNorm, m_accelNorm[j]);
 		}
 	}
 }
