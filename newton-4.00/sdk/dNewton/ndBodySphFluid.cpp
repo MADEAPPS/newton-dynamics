@@ -24,7 +24,6 @@
 #include "ndWorld.h"
 #include "ndBodySphFluid.h"
 
-#define D_BASH_SIZE 256
 
 /*
 {
@@ -55,7 +54,6 @@ ndBodySphFluid::ndBodySphFluid()
 	,m_box1(dFloat32(1e10f))
 	,m_hashGridMap(1024)
 	,m_hashGridMapScratchBuffer(1024)
-	,m_iterator(0)
 {
 }
 
@@ -65,7 +63,6 @@ ndBodySphFluid::ndBodySphFluid(const nd::TiXmlNode* const xmlNode, const dTree<c
 	,m_box1(dFloat32(1e10f))
 	,m_hashGridMap()
 	,m_hashGridMapScratchBuffer()
-	,m_iterator(0)
 {
 	// nothing was saved
 	dAssert(0);
@@ -112,7 +109,7 @@ void ndBodySphFluid::Update(const ndWorld* const world, dFloat32 timestep)
 	m_box1 = boxP1 + dVector(m_radius * dFloat32(2.0f));
 
 	CreateGrids(world);
-	SortBuckets(world);
+	SortGrids(world);
 }
 
 void ndBodySphFluid::CreateGrids(const ndWorld* const world)
@@ -126,142 +123,149 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 	class ndCreateGrids: public ndScene::ndBaseJob
 	{
 		public:
-		void ExecuteBatch(const dInt32 start, const dInt32 count)
+		class ndContext
 		{
-			const dVector* const posit = &m_fluid->m_posit[0];
-			const dVector origin(m_fluid->m_box0);
+			public:
+			ndBodySphFluid* m_fluid;
+			dAtomic<dInt32> m_iterator;
+		};
+
+		#define D_SCRATCH_BUFFER_SIZE (1024 * 2)
+
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+
+			dVector m_neighborkDirs[8];
+
+			ndBodySphFluid* const fluid = ((ndContext*)m_context)->m_fluid;
+			const dFloat32 radius = fluid->m_radius;
+
+			m_neighborkDirs[0] = dVector(-radius, -radius, -radius, dFloat32(0.0f));
+			m_neighborkDirs[1] = dVector(radius, -radius, -radius, dFloat32(0.0f));
+			m_neighborkDirs[2] = dVector(-radius, radius, -radius, dFloat32(0.0f));
+			m_neighborkDirs[3] = dVector(radius, radius, -radius, dFloat32(0.0f));
+			m_neighborkDirs[4] = dVector(-radius, -radius, radius, dFloat32(0.0f));
+			m_neighborkDirs[5] = dVector(radius, -radius, radius, dFloat32(0.0f));
+			m_neighborkDirs[6] = dVector(-radius, radius, radius, dFloat32(0.0f));
+			m_neighborkDirs[7] = dVector(radius, radius, radius, dFloat32(0.0f));
+
+			const dInt32 threadIndex = GetThredId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			const dInt32 particleCount = fluid->m_posit.GetCount();
+			const dInt32 step = particleCount / threadCount;
+			const dInt32 start = threadIndex * step;
+			const dInt32 count = ((threadIndex + 1) < threadCount) ? step : particleCount - start;
+
+			const dFloat32 diameter = radius * dFloat32(2.0f);
+			const dFloat32 gridSize = diameter * dFloat32(1.0625f);
+
+			const dVector origin(fluid->m_box0);
+			const dVector invGridSize(dFloat32(1.0f) / gridSize);
+
+			const dVector* const posit = &fluid->m_posit[0];
+
+			dInt32 scratchBufferCount = 0;
+			ndGridHash scratchBuffer[D_SCRATCH_BUFFER_SIZE + 128];
+
+			dAtomic<dInt32>& iterator = ((ndContext*)m_context)->m_iterator;
 			for (dInt32 i = 0; i < count; i++)
 			{
 				dVector r(posit[start + i] - origin);
-				dVector p(r * m_invGridSize);
-				
+				dVector p(r * invGridSize);
+			
 				ndGridHash hashKey(p, i, ndHomeGrid);
-				m_scratchBuffer[m_scratchBufferCount] = hashKey;
-				m_scratchBufferCount++;
-				m_fluid->m_upperDigisIsValid[0] |= hashKey.m_xHigh;
-				m_fluid->m_upperDigisIsValid[1] |= hashKey.m_yHigh;
-				m_fluid->m_upperDigisIsValid[2] |= hashKey.m_zHigh;
+				scratchBuffer[scratchBufferCount] = hashKey;
+				scratchBufferCount++;
+				fluid->m_upperDigisIsValid[0] |= hashKey.m_xHigh;
+				fluid->m_upperDigisIsValid[1] |= hashKey.m_yHigh;
+				fluid->m_upperDigisIsValid[2] |= hashKey.m_zHigh;
 			
 				for (dInt32 j = 0; j < sizeof(m_neighborkDirs) / sizeof(m_neighborkDirs[0]); j++)
 				{
 					ndGridHash neighborKey(p + m_neighborkDirs[j], i, ndAdjacentGrid);
 					if (neighborKey.m_gridHash != hashKey.m_gridHash)
 					{
-						m_scratchBuffer[m_scratchBufferCount] = neighborKey;
-						m_scratchBufferCount++;
+						scratchBuffer[scratchBufferCount] = neighborKey;
+						scratchBufferCount++;
 					}
 				}
-
-				if (m_scratchBufferCount >= D_BASH_SIZE)
+			
+				if (scratchBufferCount > D_SCRATCH_BUFFER_SIZE)
 				{
-					dInt32 entry = m_fluid->m_iterator.fetch_add(m_scratchBufferCount);
-					dAssert(m_fluid->m_iterator.load() < m_fluid->m_hashGridMap.GetCount());
-					memcpy(&m_fluid->m_hashGridMap[entry], m_scratchBuffer, m_scratchBufferCount * sizeof(ndGridHash));
-					m_scratchBufferCount = 0;
+					dInt32 entry = iterator.fetch_add(scratchBufferCount);
+					dAssert(iterator.load() < fluid->m_hashGridMap.GetCount());
+					memcpy(&fluid->m_hashGridMap[entry], scratchBuffer, scratchBufferCount * sizeof(ndGridHash));
+					scratchBufferCount = 0;
 				}
 			}
-		}
-
-		virtual void Execute()
-		{
-			D_TRACKTIME();
-			m_fluid = (ndBodySphFluid*)m_context;
-
-			m_radius = m_fluid->m_radius;
-			m_diameter = m_radius * dFloat32(2.0f);
-			m_gridSize = m_diameter * dFloat32(1.0625f);
-			m_invGridSize = dVector(dFloat32(1.0f) / m_gridSize);
-
-			m_neighborkDirs[0] = dVector(-m_radius, -m_radius, -m_radius, dFloat32(0.0f));
-			m_neighborkDirs[1] = dVector(m_radius, -m_radius, -m_radius, dFloat32(0.0f));
-			m_neighborkDirs[2] = dVector(-m_radius, m_radius, -m_radius, dFloat32(0.0f));
-			m_neighborkDirs[3] = dVector(m_radius, m_radius, -m_radius, dFloat32(0.0f));
-			m_neighborkDirs[4] = dVector(-m_radius, -m_radius, m_radius, dFloat32(0.0f));
-			m_neighborkDirs[5] = dVector(m_radius, -m_radius, m_radius, dFloat32(0.0f));
-			m_neighborkDirs[6] = dVector(-m_radius, m_radius, m_radius, dFloat32(0.0f));
-			m_neighborkDirs[7] = dVector(m_radius, m_radius, m_radius, dFloat32(0.0f));
-
-			m_scratchBufferCount = 0;
-			const dInt32 stepSize = D_BASH_SIZE;
-			const dInt32 particleCount = m_fluid->m_posit.GetCount();
-			const dInt32 particleCountBatches = particleCount & -stepSize;
-			dInt32 index = m_it->fetch_add(stepSize);
-			for (; index < particleCountBatches; index = m_it->fetch_add(stepSize))
+			
+			if (scratchBufferCount)
 			{
-				ExecuteBatch(index, stepSize);
-			}
-			if (index < particleCount)
-			{
-				ExecuteBatch(index, particleCount- index);
-			}
-			if (m_scratchBufferCount)
-			{
-				dInt32 entry = m_fluid->m_iterator.fetch_add(m_scratchBufferCount);
-				dAssert(m_fluid->m_iterator.load() < m_fluid->m_hashGridMap.GetCount());
-				memcpy(&m_fluid->m_hashGridMap[entry], m_scratchBuffer, m_scratchBufferCount * sizeof(ndGridHash));
+				dInt32 entry = iterator.fetch_add(scratchBufferCount);
+				dAssert(iterator.load() < fluid->m_hashGridMap.GetCount());
+				memcpy(&fluid->m_hashGridMap[entry], scratchBuffer, scratchBufferCount * sizeof(ndGridHash));
 			}
 		}
-
-		dVector m_neighborkDirs[8];
-		dVector m_invGridSize;
-		ndBodySphFluid* m_fluid;
-		dFloat32 m_diameter;
-		dFloat32 m_gridSize;
-		dFloat32 m_radius;
-		dInt32 m_scratchBufferCount;
-		ndGridHash m_scratchBuffer[D_BASH_SIZE + 64];
 	};
 
 	if (m_hashGridMap.GetCount() < m_posit.GetCount() * 16)
 	{
+		m_hashGridMap.Resize(m_posit.GetCount() * 16);
 		m_hashGridMap.SetCount(m_posit.GetCount() * 16);
 	}
-	m_iterator.store(0);
+
 	ndScene* const scene = world->GetScene();
 	m_upperDigisIsValid[0] = 0;
 	m_upperDigisIsValid[1] = 0;
 	m_upperDigisIsValid[2] = 0;
-	scene->SubmitJobs<ndCreateGrids>(this);
-	m_hashGridMap.SetCount(m_iterator.load());
+
+	ndCreateGrids::ndContext context;
+	context.m_fluid = this;
+	scene->SubmitJobs<ndCreateGrids>(&context);
+	m_hashGridMap.SetCount(context.m_iterator.load());
 }
 
-void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId, const dInt32 threadCount)
+void ndBodySphFluid::SortSingleThreaded(const ndWorld* const world)
 {
 	const dInt32 count = m_hashGridMap.GetCount();
 
-	const dInt32 size = count / threadCount;
-	const dInt32 start = threadId * size;
-	const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
+	//const dInt32 size = count / threadCount;
+	//const dInt32 start = threadId * size;
+	//const dInt32 batchSize = (threadId == threadCount - 1) ? count - start : size;
+	//const dInt32 start = 0;
+	//const dInt32 size = count;
+	//const dInt32 batchSize = count;
 
-	dInt32 histogram0[1 << (D_RADIX_DIGIT_SIZE * 2)];
+	dInt32 histogram0[1 << (D_RADIX_DIGIT_SIZE + 1)];
 	dInt32 histogram1[5][1 << D_RADIX_DIGIT_SIZE];
 	memset(histogram0, 0, sizeof(histogram0));
 	memset(histogram1, 0, sizeof(histogram1));
 
-	ndGridHash* srcArray = &m_hashGridMap[start];
-	for (dInt32 i = 0; i < batchSize; i++)
+	ndGridHash* srcArray = &m_hashGridMap[0];
+	for (dInt32 i = 0; i < count; i++)
 	{
 		const ndGridHash& entry = srcArray[i];
-
+	
 		const dInt32 xlow = dInt32(entry.m_xLow * 2 + entry.m_cellType);
 		histogram0[xlow] = histogram0[xlow] + 1;
-
+	
 		const dInt32 xHigh = entry.m_xHigh;
 		histogram1[0][xHigh] = histogram1[0][xHigh] + 1;
-
+	
 		const dInt32 ylow = entry.m_yLow;
 		histogram1[1][ylow] = histogram1[1][ylow] + 1;
-
+	
 		const dInt32 yHigh = entry.m_yHigh;
 		histogram1[2][yHigh] = histogram1[2][yHigh] + 1;
-
+	
 		const dInt32 zlow = entry.m_zLow;
 		histogram1[3][zlow] = histogram1[3][zlow] + 1;
-
+	
 		const dInt32 zHigh = entry.m_zHigh;
 		histogram1[4][zHigh] = histogram1[4][zHigh] + 1;
 	}
-
+	
 	dInt32 acc0 = 0;
 	for (dInt32 i = 0; i < (1 << (D_RADIX_DIGIT_SIZE + 1)); i++)
 	{
@@ -280,11 +284,11 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 			acc[j] += n;
 		}
 	}
-
+	
 	dInt32 shiftbits = 0;
 	dUnsigned64 mask = ~dUnsigned64(dInt64(-1 << D_RADIX_DIGIT_SIZE));
-	ndGridHash* dstArray = &m_hashGridMapScratchBuffer[start];
-	for (dInt32 i = 0; i < batchSize; i++)
+	ndGridHash* dstArray = &m_hashGridMapScratchBuffer[0];
+	for (dInt32 i = 0; i < count; i++)
 	{
 		const ndGridHash& entry = srcArray[i];
 		const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits) * 2 + entry.m_cellType;
@@ -295,11 +299,11 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 	mask <<= D_RADIX_DIGIT_SIZE;
 	shiftbits += D_RADIX_DIGIT_SIZE;
 	dSwap(dstArray, srcArray);
-
+	
 	if (m_upperDigisIsValid[0]) 
 	{
 		dInt32* const scan2 = &histogram1[0][0];
-		for (dInt32 i = 0; i < batchSize; i++)
+		for (dInt32 i = 0; i < count; i++)
 		{
 			const ndGridHash& entry = dstArray[i];
 			const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
@@ -311,11 +315,11 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 	}
 	mask <<= D_RADIX_DIGIT_SIZE;
 	shiftbits += D_RADIX_DIGIT_SIZE;
-
+	
 	for (dInt32 radix = 0; radix < 2; radix++)
 	{
 		dInt32* const scan0 = &histogram1[radix * 2 + 1][0];
-		for (dInt32 i = 0; i < batchSize; i++)
+		for (dInt32 i = 0; i < count; i++)
 		{
 			const ndGridHash& entry = srcArray[i];
 			const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
@@ -326,11 +330,11 @@ void ndBodySphFluid::SortBatch(const ndWorld* const world, const dInt32 threadId
 		mask <<= D_RADIX_DIGIT_SIZE;
 		shiftbits += D_RADIX_DIGIT_SIZE;
 		dSwap(dstArray, srcArray);
-
+	
 		if (m_upperDigisIsValid[radix + 1])
 		{
 			dInt32* const scan1 = &histogram1[radix * 2 + 2][0];
-			for (dInt32 i = 0; i < batchSize; i++)
+			for (dInt32 i = 0; i < count; i++)
 			{
 				const ndGridHash& entry = dstArray[i];
 				const dInt32 key = dUnsigned32((entry.m_gridHash & mask) >> shiftbits);
@@ -369,7 +373,7 @@ void ndBodySphFluid::AddCounters(const ndWorld* const world, ndContext& context)
 	}
 }
 
-void ndBodySphFluid::SortBuckets(const ndWorld* const world)
+void ndBodySphFluid::SortParallel(const ndWorld* const world)
 {
 	D_TRACKTIME();
 	class ndBodySphFluidCountDigits : public ndScene::ndBaseJob
@@ -493,41 +497,45 @@ void ndBodySphFluid::SortBuckets(const ndWorld* const world)
 			}
 		}
 	};
-	
+
+	ndContext context;
+	context.m_fluid = this;
+	ndScene* const scene = world->GetScene();
+	for (dInt32 pass = 0; pass < 6; pass++)
+	{
+		if (!(pass & 1) || m_upperDigisIsValid[pass >> 1])
+		{
+			context.m_pass = pass;
+			scene->SubmitJobs<ndBodySphFluidCountDigits>(&context);
+			scene->SubmitJobs<ndBodySphFluidAddPartialSum>(&context);
+
+			dInt32 acc = 0;
+			for (dInt32 i = 0; i < sizeof(context.m_scan) / sizeof(dInt32); i++)
+			{
+				dInt32 sum = context.m_scan[i];
+				context.m_scan[i] = acc;
+				acc += sum;
+			}
+			AddCounters(world, context);
+
+			scene->SubmitJobs<ndBodySphFluidReorderBuckets>(&context);
+			m_hashGridMap.Swap(m_hashGridMapScratchBuffer);
+		}
+	}	
+}
+
+void ndBodySphFluid::SortGrids(const ndWorld* const world)
+{
 	const dInt32 threadCount = world->GetThreadCount();
 	m_hashGridMapScratchBuffer.SetCount(m_hashGridMap.GetCount());
 	if (threadCount <= 1)
 	{
 		dAssert(threadCount == 1);
-		SortBatch(world, 0, 1);
+		SortSingleThreaded(world);
 	}
 	else
 	{
-		ndScene* const scene = world->GetScene();
-
-		ndContext context;
-		context.m_fluid = this;
-		for (dInt32 pass = 0; pass < 6; pass++)
-		{
-			if (!(pass & 1) || m_upperDigisIsValid[pass >> 1])
-			{
-				context.m_pass = pass;
-				scene->SubmitJobs<ndBodySphFluidCountDigits>(&context);
-				scene->SubmitJobs<ndBodySphFluidAddPartialSum>(&context);
-
-				dInt32 acc = 0;
-				for (dInt32 i = 0; i < sizeof(context.m_scan) / sizeof(dInt32); i++)
-				{
-					dInt32 sum = context.m_scan[i];
-					context.m_scan[i] = acc;
-					acc += sum;
-				}
-				AddCounters(world, context);
-
-				scene->SubmitJobs<ndBodySphFluidReorderBuckets>(&context);
-				m_hashGridMap.Swap(m_hashGridMapScratchBuffer);
-			}
-		}	
+		SortParallel(world);
 	}
 
 #ifdef _DEBUG
@@ -568,7 +576,10 @@ D_NEWTON_API void ndBodySphFluid::GenerateIsoSurface(const ndWorld* const world)
 		m_hashGridMap[i] = hashKey;
 	}
 
-	SortBatch(world, 0, 1);
+	ndContext context;
+	context.m_fluid = this;
+
+	SortSingleThreaded(world);
 	dInt32 uniqueCount = 0;
 	for (dInt32 i = 0; i < m_hashGridMap.GetCount();)
 	{

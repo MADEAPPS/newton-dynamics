@@ -111,21 +111,22 @@ class ndBodySphFluid: public ndBodyParticleSet
 		ndBodySphFluid* m_fluid;
 		dInt32 m_pass;
 		dInt32 m_scan[1 << (D_RADIX_DIGIT_SIZE + 1)];
-		dInt32 m_histogram[D_MAX_THREADS_COUNT][1 << 11];
+		dInt32 m_histogram[D_MAX_THREADS_COUNT][1 << (D_RADIX_DIGIT_SIZE + 1)];
 	};
 
-	void SortBuckets(const ndWorld* const world);
+	void SortGrids(const ndWorld* const world);
 	void CreateGrids(const ndWorld* const world);
 	void AddCounters(const ndWorld* const world, ndContext& context) const;
 	void CaculateAABB(const ndWorld* const world, dVector& boxP0, dVector& boxP1) const;
-	void SortBatch(const ndWorld* const world, const dInt32 threadId, const dInt32 threadCount);
+
+	void SortParallel(const ndWorld* const world);
+	void SortSingleThreaded(const ndWorld* const world);
 
 	dVector m_box0;
 	dVector m_box1;
 	dArray<ndGridHash> m_hashGridMap;
 	dArray<ndGridHash> m_hashGridMapScratchBuffer;
 	dInt32 m_upperDigisIsValid[3];
-	dAtomic<dInt32> m_iterator;
 	dIsoSurface m_isoSurcase;
 } D_GCC_NEWTON_ALIGN_32 ;
 

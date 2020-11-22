@@ -62,7 +62,6 @@ class ndScene
 	class ndBaseJob: public dThreadPoolJob
 	{
 		public:
-		dAtomic<int>* m_it;
 		ndScene* m_owner;
 		dFloat32 m_timestep;
 		void* m_context;
@@ -239,14 +238,12 @@ inline const ndContactList& ndScene::GetContactList() const
 template <class T>
 void ndScene::SubmitJobs(void* const context)
 {
-	dAtomic<dInt32> it(0);
 	T extJob[D_MAX_THREADS_COUNT];
 	dThreadPoolJob* extJobPtr[D_MAX_THREADS_COUNT];
 
 	const dInt32 threadCount = GetThreadCount();
 	for (dInt32 i = 0; i < threadCount; i++)
 	{
-		extJob[i].m_it = &it;
 		extJob[i].m_owner = this;
 		extJob[i].m_context = context;
 		extJob[i].m_timestep = m_timestep;
