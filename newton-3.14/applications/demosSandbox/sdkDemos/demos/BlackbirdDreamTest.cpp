@@ -239,9 +239,9 @@ void BlackbirdDreamTest(DemoEntityManager* const scene)
 	// place camera into position
 	dMatrix camMatrix (dGetIdentityMatrix());
 	dQuaternion rot (camMatrix);
-	camMatrix.m_posit.m_y = 7.0f;
-	camMatrix.m_posit.m_x = -20.0f;
-	camMatrix.m_posit.m_z = 10.0f;
+	camMatrix.m_posit.m_y = 5.0f;
+	camMatrix.m_posit.m_x = -5.0f;
+	camMatrix.m_posit.m_z = 5.0f;
 
 	scene->SetCameraMatrix(rot, camMatrix.m_posit);
 }
