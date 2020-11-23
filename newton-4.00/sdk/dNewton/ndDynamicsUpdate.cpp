@@ -27,7 +27,7 @@
 #include "ndDynamicsUpdate.h"
 #include "ndJointBilateralConstraint.h"
 
-//#define D_PROFILE_JOINTS
+#define D_PROFILE_JOINTS
 #define D_LOCK_FREE_SOLVER
 
 ndDynamicsUpdate::ndDynamicsUpdate()
