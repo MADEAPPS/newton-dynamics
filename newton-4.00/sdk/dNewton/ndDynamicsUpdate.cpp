@@ -27,6 +27,7 @@
 #include "ndDynamicsUpdate.h"
 #include "ndJointBilateralConstraint.h"
 
+//#define D_PROFILE_JOINTS
 #define D_LOCK_FREE_SOLVER
 
 ndDynamicsUpdate::ndDynamicsUpdate()
@@ -1008,8 +1009,12 @@ void ndDynamicsUpdate::CalculateJointsForce()
 
 	dFloat32 m_accelNorm[D_MAX_THREADS_COUNT];
 	dFloat32 accNorm = D_SOLVER_MAX_ERROR * dFloat32(2.0f);
+
 	for (dInt32 i = 0; (i < passes) && (accNorm > D_SOLVER_MAX_ERROR); i++) 
 	{
+#ifdef D_PROFILE_JOINTS
+		dUnsigned64 cpuClock = dGetCpuClock();
+#endif
 		#ifdef D_LOCK_FREE_SOLVER
 			if (threadsCount == 1)
 			{
@@ -1027,6 +1032,23 @@ void ndDynamicsUpdate::CalculateJointsForce()
 			scene->SubmitJobs<ndCalculateJointsForce>(m_accelNorm);
 			memcpy(&m_internalForces[0], &m_internalForces[bodyCount], bodyCount * sizeof(ndJacobian));
 		#endif
+
+#ifdef D_PROFILE_JOINTS
+		static dUnsigned64 ticks = 0;
+		static dUnsigned64 joints = 0;
+		static dInt32 averageCount = 0;
+		cpuClock = dGetCpuClock() - cpuClock;
+		ticks += cpuClock;
+		joints += m_world->m_jointArray.GetCount();
+		averageCount++;
+		if (averageCount > 1000)
+		{
+			dgExpandTraceMessage("ticks per joints: %d\n", ticks / joints);
+			joints = 0;
+			ticks = 0;
+			averageCount = 0;
+		}
+#endif
 
 		accNorm = dFloat32(0.0f);
 		for (dInt32 j = 0; j < threadsCount; j++) 

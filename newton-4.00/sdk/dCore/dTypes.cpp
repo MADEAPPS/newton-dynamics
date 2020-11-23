@@ -25,142 +25,17 @@
 #include "dVector.h"
 #include "dMatrix.h"
 
-#if 0
-#include "dgDebug.h"
 
-#include "dgMemory.h"
-
-
-dFloat64 dgRoundToFloat(dFloat64 val)
+dUnsigned64 dGetCpuClock()
 {
-	dInt32 exp;
-	dFloat64 mantissa = frexp(val, &exp);
-
-	const dFloat64 power = 1 << 23;
-	const dFloat64 invPower = dFloat64(1.0f) / power;
-	mantissa = floor(mantissa * power) * invPower;
-
-	dFloat64 val1 = ldexp(mantissa, exp);
-	return val1;
+	return __rdtsc();
 }
-
-
-void dgGetMinMax (dBigVector &minOut, dBigVector &maxOut, const dFloat64* const vertexArray, dInt32 vCount, dInt32 strideInBytes)
-{
-	dInt32 stride = dInt32 (strideInBytes / sizeof (dFloat64));
-	const dFloat64* vArray = vertexArray + stride;
-
-	dAssert (stride >= 3);
-	minOut = dBigVector (vertexArray[0], vertexArray[1], vertexArray[2], dFloat64 (0.0f)); 
-	maxOut = dBigVector (vertexArray[0], vertexArray[1], vertexArray[2], dFloat64 (0.0f)); 
-
-	for (dInt32 i = 1; i < vCount; i ++) {
-		minOut.m_x = dMin (minOut.m_x, vArray[0]);
-		minOut.m_y = dMin (minOut.m_y, vArray[1]);
-		minOut.m_z = dMin (minOut.m_z, vArray[2]);
-
-		maxOut.m_x = dMax (maxOut.m_x, vArray[0]);
-		maxOut.m_y = dMax (maxOut.m_y, vArray[1]);
-		maxOut.m_z = dMax (maxOut.m_z, vArray[2]);
-
-		vArray += stride;
-	}
-}
-
-//#define SERIALIZE_END	'dne '
-#define SERIALIZE_END   0x646e6520
-
-struct dgSerializeMarkerData
-{
-	dgSerializeMarkerData()
-		:m_maker0(SERIALIZE_END)
-		,m_maker1(SERIALIZE_END)
-		,m_maker2(SERIALIZE_END)
-		,m_revision(m_currentRevision)
-	{
-	}
-	dInt32 m_maker0;
-	dInt32 m_maker1;
-	dInt32 m_maker2;
-	dInt32 m_revision;
-};
-
-void dgSerializeMarker(dgSerialize serializeCallback, void* const userData)
-{
-	dgSerializeMarkerData marker;
-	serializeCallback (userData, &marker, sizeof (dgSerializeMarkerData));
-}
-
-dInt32 dgDeserializeMarker(dgDeserialize serializeCallback, void* const userData)
-{
-	dInt32 state = 0;
-	while (state != 3) {
-		dInt32 marker;
-		serializeCallback (userData, &marker, sizeof (marker));
-		switch (state) 
-		{
-			case 0:
-			{
-				if (marker == SERIALIZE_END) {
-					state = 1;
-					break;
-				} else {
-					state = 0;
-				}
-				break;
-			}
-
-			case 1:
-			{
-				if (marker == SERIALIZE_END) {
-					state = 2;
-					break;
-				} else {
-					state = 0;
-				}
-				break;
-			}
-
-			case 2:
-			{
-				if (marker == SERIALIZE_END) {
-					state = 3;
-					break;
-				} else {
-					state = 0;
-				}
-				break;
-			}
-		}
-	} 
-
-	dInt32 revision;
-	serializeCallback (userData, &revision, sizeof (revision));
-	return revision;
-}
-
-#endif
 
 dUnsigned64 dGetTimeInMicrosenconds()
 {
-#if 0
-	static LARGE_INTEGER frequency;
-	static LARGE_INTEGER baseCount;
-	if (!frequency.QuadPart) {
-		QueryPerformanceFrequency(&frequency);
-		QueryPerformanceCounter(&baseCount);
-	}
-
-	LARGE_INTEGER count;
-	QueryPerformanceCounter(&count);
-	count.QuadPart -= baseCount.QuadPart;
-	dUnsigned64 timeStamp = dUnsigned64(count.QuadPart * LONGLONG(1000000) / frequency.QuadPart);
-
-#else
 	static std::chrono::high_resolution_clock::time_point timeStampBase = std::chrono::high_resolution_clock::now();
 	std::chrono::high_resolution_clock::time_point currentTimeStamp = std::chrono::high_resolution_clock::now();
 	dUnsigned64 timeStamp = std::chrono::duration_cast<std::chrono::microseconds>(currentTimeStamp - timeStampBase).count();
-#endif
 	return timeStamp;
 }
 

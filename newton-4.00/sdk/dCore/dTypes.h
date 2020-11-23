@@ -409,14 +409,12 @@ D_INLINE bool dAreEqual(T A, T B, T tol)
 	{
 		return true;
 	}
-	//return dAbs(A - B) < tol;
 
 	dInt32 exp0;
 	dFloat64 mantissa0 = frexp(dFloat64 (A), &exp0);
 	
 	dInt32 exp1;
 	dFloat64 mantissa1 = frexp(dFloat64(B), &exp1);
-	//if (exp0 != exp1)
 	if (dAbs(exp0 - exp1) > 1)
 	{
 		return false;
@@ -451,7 +449,8 @@ D_INLINE T AnglesAdd (T angleInRadiand1, T angleInRadiand0)
 #ifdef D_NEWTON_USE_DOUBLE
 	union dFloatSign
 	{
-		struct {
+		struct 
+		{
 			dInt32 m_dommy;
 			dInt32 m_iVal;
 		} m_integer;
@@ -460,7 +459,8 @@ D_INLINE T AnglesAdd (T angleInRadiand1, T angleInRadiand0)
 #else
 	union dFloatSign
 	{
-		struct {
+		struct 
+		{
 			dInt32 m_iVal;
 		} m_integer;
 		dFloat32 m_fVal;
@@ -469,7 +469,8 @@ D_INLINE T AnglesAdd (T angleInRadiand1, T angleInRadiand0)
 
 union dDoubleInt
 {
-	struct {
+	struct 
+	{
 		dInt32 m_intL;
 		dInt32 m_intH;
 	};
@@ -485,13 +486,8 @@ union dDoubleInt
 	#define _stricmp(x,y) strcasecmp(x,y)
 #endif
 
-enum dSerializeRevisionNumber
-{
-	m_firstRevision = 100,
-	// add new serialization revision number here
-	m_currentRevision 
-};
 
+D_CORE_API dUnsigned64 dGetCpuClock();
 D_CORE_API dUnsigned64 dGetTimeInMicrosenconds();
 
 #ifdef D_USE_THREAD_EMULATION
@@ -638,26 +634,6 @@ class dSetPrecisionDouble
 	dInt32 m_mask; 
 	#endif
 };
-
-
-#ifdef _MACOSX_VER
-#include <sys/time.h>
-#ifndef CLOCK_REALTIME
-	#define CLOCK_REALTIME 0
-#endif
-#ifndef CLOCK_MONOTONIC
-	#define CLOCK_MONOTONIC 0
-#endif
-//clock_gettime is not implemented on OSX
-D_INLINE int clock_gettime(int /*clk_id*/, struct timespec* t) {
-    struct timeval now;
-    int rv = gettimeofday(&now, nullptr);
-    if (rv) return rv;
-    t->tv_sec  = now.tv_sec;
-    t->tv_nsec = now.tv_usec * 1000;
-    return 0;
-}
-#endif
 
 #endif
 

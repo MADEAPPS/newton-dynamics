@@ -220,7 +220,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_autoSleepMode = false;
 	//m_sceneType = 1;
 	//m_solverPasses = 4;
-	//m_workerThreads = 2;
+	m_workerThreads = 4;
 	//m_solverSubSteps = 2;
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;
