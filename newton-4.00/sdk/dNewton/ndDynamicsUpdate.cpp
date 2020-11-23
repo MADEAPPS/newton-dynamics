@@ -27,7 +27,7 @@
 #include "ndDynamicsUpdate.h"
 #include "ndJointBilateralConstraint.h"
 
-#define D_PROFILE_JOINTS
+//#define D_PROFILE_JOINTS
 #define D_LOCK_FREE_SOLVER
 
 ndDynamicsUpdate::ndDynamicsUpdate()
@@ -1043,7 +1043,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		averageCount++;
 		if (averageCount > 1000)
 		{
-			dgExpandTraceMessage("ticks per joints: %d\n", ticks / joints);
+			dgExpandTraceMessage("ticks per joints: %d\n", ticks * threadsCount / joints);
 			joints = 0;
 			ticks = 0;
 			averageCount = 0;
