@@ -62,7 +62,7 @@ static void AddRagdollBodies(DemoEntityManager* const scene, NewtonBody* const f
 
 	location.m_posit.m_z = 5.0f;
 	float rootmass = 10.f;
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 2; i++) {
 		// make a root body attached to the world
 
 		//if (i == 3) { rootmass = 1000.f; }
