@@ -37,7 +37,8 @@ class dCustomHinge: public dCustomJoint
 	CUSTOM_JOINTS_API void SetFriction (dFloat frictionTorque);
 
 	CUSTOM_JOINTS_API void EnableMotor(bool state, dFloat motorSpeed);
-	CUSTOM_JOINTS_API void SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
+	CUSTOM_JOINTS_API void SetAsSpringDamper(bool state, dFloat spring, dFloat damper);
+	CUSTOM_JOINTS_API void SetMassIndependentSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper);
 
 	CUSTOM_JOINTS_API virtual void Debug(dDebugDisplay* const debugDisplay) const;
 

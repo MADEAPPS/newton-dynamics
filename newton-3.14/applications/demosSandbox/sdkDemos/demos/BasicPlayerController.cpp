@@ -358,20 +358,20 @@ static void CreateBridge(DemoEntityManager* const scene, NewtonBody* const playg
 	NewtonBodyGetMatrix(array[0], &matrix[0][0]);
 	matrix.m_posit = matrix.m_posit + matrix.m_up.Scale(size.m_y * 0.5f) - matrix.m_right.Scale(size.m_z * 0.5f);
 	dCustomHinge* hinge = new dCustomHinge(matrix, array[0], playgroundBody);
-	hinge->SetAsSpringDamper(true, 0.9f, 0.0f, 20.0f);
+	hinge->SetMassIndependentSpringDamper(true, 0.9f, 0.0f, 20.0f);
 
 	for (int i = 1; i < count; i ++) {
 		dMatrix matrix;
 		NewtonBodyGetMatrix(array[i], &matrix[0][0]);
 		matrix.m_posit = matrix.m_posit + matrix.m_up.Scale(size.m_y * 0.5f) - matrix.m_right.Scale(size.m_z * 0.5f);
 		dCustomHinge* const hinge = new dCustomHinge(matrix, array[i-1], array[i]);
-		hinge->SetAsSpringDamper(true, 0.9f, 0.0f, 20.0f);
+		hinge->SetMassIndependentSpringDamper(true, 0.9f, 0.0f, 20.0f);
 	}
 
 	NewtonBodyGetMatrix(array[count - 1], &matrix[0][0]);
 	matrix.m_posit = matrix.m_posit + matrix.m_up.Scale(size.m_y * 0.5f) + matrix.m_right.Scale(size.m_z * 0.5f);
 	hinge = new dCustomHinge(matrix, array[count - 1], playgroundBody);
-	hinge->SetAsSpringDamper(true, 0.9f, 0.0f, 20.0f);
+	hinge->SetMassIndependentSpringDamper(true, 0.9f, 0.0f, 20.0f);
 
 
 	geometry->Release();

@@ -203,11 +203,19 @@ dgFloat32 NewtonUserJoint::CalculateZeroMotorAcceleration() const
 	return accel;
 }
 
-void NewtonUserJoint::SetSpringDamperAcceleration (dgFloat32 rowStiffness, dFloat spring, dFloat damper)
+void NewtonUserJoint::SetMassIndependentSpringDamperAcceleration (dgFloat32 rowStiffness, dFloat spring, dFloat damper)
 {
 	dgInt32 index = m_rows - 1;
 	if ((index >= 0) &&  (index < dgInt32 (m_maxDOF))) {
-		dgBilateralConstraint::SetSpringDamperAcceleration (index, *m_param, rowStiffness, spring, damper);
+		dgBilateralConstraint::SetMassIndependentSpringDamperAcceleration (index, *m_param, rowStiffness, spring, damper);
+	}
+}
+
+void NewtonUserJoint::SetMassDependentSpringDamperAcceleration(dgFloat32 spring, dgFloat32 damper)
+{
+	dgInt32 index = m_rows - 1;
+	if ((index >= 0) && (index < dgInt32(m_maxDOF))) {
+		dgBilateralConstraint::SetMassDependentSpringDamperAcceleration(index, *m_param, spring, damper);
 	}
 }
 

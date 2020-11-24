@@ -41,7 +41,8 @@ static void AttachLimbBody(DemoEntityManager* const scene, const dVector& dir, N
 	dCustomHinge* const hinge = new dCustomHinge(location, rootBody, parent);
 	//hinge->EnableLimits(true);
 	hinge->SetLimits(-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
-	hinge->SetAsSpringDamper(true, 1.f, 500.f, 10.f);
+	hinge->SetMassIndependentSpringDamper(true, 1.f, 500.f, 10.f);
+	//hinge->SetMassIndependentSpringDamper(true, 1.f, 400.f, 0.f);
 
 	geometry->Release();
 	NewtonDestroyCollision(collision);
@@ -77,7 +78,7 @@ static void AddRagdollBodies(DemoEntityManager* const scene, NewtonBody* const f
 
 		// now make some limb body and attach them to the root body
 		//   AttachLimbBody (scene, matrix.m_right.Scale ( 1.0f), rootBody);
-		AttachLimbBody(scene, matrix.m_right.Scale(-1.0f), rootBody, 1.f * i + 0.01f);
+		AttachLimbBody(scene, matrix.m_right.Scale(-1.0f), rootBody, 10.0f * i + 0.01f);
 		//   AttachLimbBody(scene, matrix.m_right.Scale(-1.0f), rootBody, 0.01f);
 
 		location.m_posit.m_z += 2.5f;

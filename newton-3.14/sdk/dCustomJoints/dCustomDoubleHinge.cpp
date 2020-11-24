@@ -126,7 +126,7 @@ dFloat dCustomDoubleHinge::GetFriction1() const
 void dCustomDoubleHinge::SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
 	NewtonUserJointAddAngularRow(m_joint, -m_curJointAngle1.GetAngle(), &matrix1.m_up[0]);
-	NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation1, m_spring1, m_damper1);
+	NewtonUserJointSetRowMassIndependentSpringDamperAcceleration(m_joint, m_springDamperRelaxation1, m_spring1, m_damper1);
 }
 
 void dCustomDoubleHinge::Debug(dDebugDisplay* const debugDisplay) const

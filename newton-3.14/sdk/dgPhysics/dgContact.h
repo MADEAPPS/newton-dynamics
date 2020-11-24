@@ -124,6 +124,7 @@ class dgContactMaterial: public dgContactPoint
 {
 	public:
 	enum {
+		m_none			  = 0,
 		m_isSoftContact	  = 1<<0,
 		m_collisionEnable = 1<<1,
 		m_friction0Enable = 1<<2,

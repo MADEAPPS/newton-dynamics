@@ -530,7 +530,7 @@ class dExcavatorModel: public dModelRootNode
 			NewtonBodyGetMatrix(linkBody, &hingeMatrix[0][0]);
 			hingeMatrix = dRollMatrix(90.0f * dDegreeToRad) * hingeMatrix;
 			dCustomHinge* const hinge = new dCustomHinge(hingeMatrix, linkBody, linkNode0->GetBody());
-			hinge->SetAsSpringDamper(true, 0.9f, 0.0f, 5.0f);
+			hinge->SetMassIndependentSpringDamper(true, 0.9f, 0.0f, 5.0f);
 			dModelNode* const linkNode1 = new dModelNode(linkBody, bindMatrix, linkNode0);
 			linkNode0 = linkNode1;
 		}
@@ -539,7 +539,7 @@ class dExcavatorModel: public dModelRootNode
 		NewtonBodyGetMatrix(firstLinkBody, &hingeMatrix[0][0]);
 		hingeMatrix = dRollMatrix(90.0f * dDegreeToRad) * hingeMatrix;
 		dCustomHinge* const hinge = new dCustomHinge(hingeMatrix, firstLinkBody, linkNode0->GetBody());
-		hinge->SetAsSpringDamper(true, 0.9f, 0.0f, 5.0f);
+		hinge->SetMassIndependentSpringDamper(true, 0.9f, 0.0f, 5.0f);
 		NewtonDestroyCollision(linkCollision);
 	}
 

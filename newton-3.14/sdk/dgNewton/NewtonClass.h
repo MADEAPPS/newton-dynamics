@@ -71,7 +71,8 @@ class NewtonUserJoint: public dgUserConstraint
 	dgFloat32 GetAcceleration () const;
 	dgFloat32 CalculateZeroMotorAcceleration() const;
 	
-	void SetSpringDamperAcceleration (dgFloat32 rowStiffness, dgFloat32 springK, dgFloat32 springD);
+	void SetMassDependentSpringDamperAcceleration(dgFloat32 spring, dgFloat32 damper);
+	void SetMassIndependentSpringDamperAcceleration (dgFloat32 rowStiffness, dgFloat32 springK, dgFloat32 springD);
 	void SetUpdateFeedbackFunction (NewtonUserBilateralCallback getFeedback);
 
 	void SetMassScale (dgFloat32 scale0, dgFloat32 scale1);

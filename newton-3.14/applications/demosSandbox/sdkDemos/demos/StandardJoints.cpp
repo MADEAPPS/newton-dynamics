@@ -200,11 +200,11 @@ class dFlexyPipeSpinner: public dCustomBallAndSocket
 			// when angle is very small we use Cartesian approximation 
 			dFloat angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 			NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_up[0]);
-			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, relaxation, spring, damper);
+			NewtonUserJointSetRowMassIndependentSpringDamperAcceleration(m_joint, relaxation, spring, damper);
 			
 			dFloat angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 			NewtonUserJointAddAngularRow(m_joint, angle1, &matrix1.m_right[0]);
-			NewtonUserJointSetRowSpringDamperAcceleration(m_joint, relaxation, spring, damper);
+			NewtonUserJointSetRowMassIndependentSpringDamperAcceleration(m_joint, relaxation, spring, damper);
 		} else {
 			// angle is large enough that we calculable the actual cone angle
 			dVector lateralDir(matrix1[0].CrossProduct(matrix0[0]));
@@ -221,7 +221,7 @@ class dFlexyPipeSpinner: public dCustomBallAndSocket
 			} else {
 				// apply spring damper action
 				NewtonUserJointAddAngularRow(m_joint, -coneAngle, &lateralDir[0]);
-				NewtonUserJointSetRowSpringDamperAcceleration(m_joint, relaxation, spring, damper);	
+				NewtonUserJointSetRowMassIndependentSpringDamperAcceleration(m_joint, relaxation, spring, damper);	
 			}
 		}
 	}
@@ -605,7 +605,7 @@ static void AddDoubleHinge(DemoEntityManager* const scene, const dVector& origin
 
 		NewtonBodyGetMatrix(box2, &matrix[0][0]);
 		dCustomDoubleHinge* const joint = new dCustomDoubleHinge(matrix, box2, box0);
-		joint->SetAsSpringDamper(true, 0.7f, 80.0f, 0.0f);
+		joint->SetMassIndependentSpringDamper(true, 0.7f, 80.0f, 0.0f);
 	}
 
 	{
@@ -773,7 +773,7 @@ static void AddHingeSpringDamper (DemoEntityManager* const scene, const dVector&
 
 	// set limit on second axis
 	hinge->SetLimits (-120.0f * dDegreeToRad, 120.0f * dDegreeToRad);
-	hinge->SetAsSpringDamper(true, 0.8f, 300.0f, 1.0f);
+	hinge->SetMassIndependentSpringDamper(true, 0.8f, 300.0f, 1.0f);
 }
 
 

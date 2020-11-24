@@ -106,12 +106,20 @@ void dCustomHinge::EnableMotor(bool state, dFloat motorSpeed)
 	m_motorSpeed = motorSpeed;
 }
 
-void dCustomHinge::SetAsSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
+void dCustomHinge::SetMassIndependentSpringDamper(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
 {
 	m_spring = spring;
 	m_damper = damper;
 	m_options.m_option1 = state;
 	m_springDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
+}
+
+void dCustomHinge::SetAsSpringDamper(bool state, dFloat spring, dFloat damper)
+{
+	m_spring = spring;
+	m_damper = damper;
+	m_options.m_option1 = state;
+	m_springDamperRelaxation = 0.0f;
 }
 
 dFloat dCustomHinge::GetJointAngle () const
@@ -187,7 +195,11 @@ void dCustomHinge::Debug(dDebugDisplay* const debugDisplay) const
 void dCustomHinge::SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)
 {
 	NewtonUserJointAddAngularRow(m_joint, -m_curJointAngle.GetAngle(), &matrix0.m_front[0]);
-	NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, m_damper);
+	if (m_springDamperRelaxation == 0.0f) {
+		NewtonUserJointSetRowMassDependentSpringDamperAcceleration(m_joint, m_spring, m_damper);
+	} else {
+		NewtonUserJointSetRowMassIndependentSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, m_damper);
+	}
 }
 
 void dCustomHinge::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, dFloat timestep)

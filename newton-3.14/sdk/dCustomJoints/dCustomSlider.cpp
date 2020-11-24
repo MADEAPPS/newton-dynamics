@@ -136,7 +136,7 @@ void dCustomSlider::Debug(dDebugDisplay* const debugDisplay) const
 void dCustomSlider::SubmitConstraintSpringDamper(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& p0, const dVector& p1, dFloat timestep)
 {
 	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
-	NewtonUserJointSetRowSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, m_damper);
+	NewtonUserJointSetRowMassIndependentSpringDamperAcceleration(m_joint, m_springDamperRelaxation, m_spring, m_damper);
 }
 
 void dCustomSlider::SubmitConstraintLimits(const dMatrix& matrix0, const dMatrix& matrix1, const dVector& p0, const dVector& p1, dFloat timestep)
