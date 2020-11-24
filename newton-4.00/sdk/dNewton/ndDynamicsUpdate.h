@@ -109,8 +109,8 @@ class ndDynamicsUpdate
 	void DetermineSleepStates();
 	void UpdateIslandState(const ndIsland& island);
 	void GetJacobianDerivatives(ndConstraint* const joint);
-	void BuildJacobianMatrix(ndConstraint* const joint, ndJacobian* const output, bool singleThreaded);
-	dFloat32 CalculateJointsForce(ndConstraint* const joint, ndJacobian* const output, bool singleThreaded);
+	void BuildJacobianMatrix(ndConstraint* const joint, ndJacobian* const output);
+	dFloat32 CalculateJointsForce(ndConstraint* const joint, ndJacobian* const output);
 
 	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const context);
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
