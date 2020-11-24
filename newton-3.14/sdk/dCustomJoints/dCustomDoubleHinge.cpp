@@ -30,7 +30,7 @@ dCustomDoubleHinge::dCustomDoubleHinge(const dMatrix& pinAndPivotFrame, NewtonBo
 	,m_jointOmega1(0.0f)
 	,m_spring1(0.0f)
 	,m_damper1(0.0f)
-	,m_springDamperRelaxation1(0.9f)
+	,m_springDamperRelaxation1(0.1f)
 {
 }
 
@@ -43,7 +43,7 @@ dCustomDoubleHinge::dCustomDoubleHinge(const dMatrix& pinAndPivotFrameChild, con
 	,m_jointOmega1(0.0f)
 	,m_spring1(0.0f)
 	,m_damper1(0.0f)
-	,m_springDamperRelaxation1(0.9f)
+	,m_springDamperRelaxation1(0.1f)
 {
 }
 
@@ -92,7 +92,7 @@ void dCustomDoubleHinge::SetAsSpringDamper1(bool state, dFloat springDamperRelax
 	m_spring1 = spring;
 	m_damper1 = damper;
 	m_options.m_option4 = state;
-	m_springDamperRelaxation1 = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
+	m_springDamperRelaxation1 = dClamp(springDamperRelaxation, dFloat(0.01f), dFloat(0.999f));
 }
 
 dFloat dCustomDoubleHinge::GetJointAngle1() const

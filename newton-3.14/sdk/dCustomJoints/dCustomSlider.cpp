@@ -32,7 +32,7 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrame, NewtonBody* const
 	,m_friction(0.0f)
 	,m_spring(0.0f)
 	,m_damper(0.0f)
-	,m_springDamperRelaxation(0.9f)
+	,m_springDamperRelaxation(0.1f)
 {
 	// calculate the two local matrix of the pivot point
 	CalculateLocalMatrix (pinAndPivotFrame, m_localMatrix0, m_localMatrix1);
@@ -47,7 +47,7 @@ dCustomSlider::dCustomSlider (const dMatrix& pinAndPivotFrameChild, const dMatri
 	,m_friction(0.0f)
 	,m_spring(0.0f)
 	,m_damper(0.0f)
-	,m_springDamperRelaxation(0.9f)
+	,m_springDamperRelaxation(0.1f)
 {
 	dMatrix	dummy;
 	CalculateLocalMatrix(pinAndPivotFrameChild, m_localMatrix0, dummy);
@@ -101,7 +101,7 @@ void dCustomSlider::SetAsSpringDamper(bool state, dFloat springDamperRelaxation,
 	m_spring = spring;
 	m_damper = damper;
 	m_options.m_option1 = state;
-	m_springDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.99f));
+	m_springDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.01f), dFloat(0.990f));
 }
 
 dFloat dCustomSlider::GetJointPosit () const

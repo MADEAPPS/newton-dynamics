@@ -32,7 +32,7 @@ dCustomHinge::dCustomHinge(const dMatrix& pinAndPivotFrame, NewtonBody* const ch
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_motorSpeed(0.0f)
-	,m_springDamperRelaxation(0.9f)
+	,m_springDamperRelaxation(0.1f)
 	,m_limitReached(false)
 {
 	// calculate the two local matrix of the pivot point
@@ -49,7 +49,7 @@ dCustomHinge::dCustomHinge (const dMatrix& pinAndPivotFrameChild, const dMatrix&
 	,m_spring(0.0f)
 	,m_damper(0.0f)
 	,m_motorSpeed(0.0f)
-	,m_springDamperRelaxation(0.9f)
+	,m_springDamperRelaxation(0.1f)
 	,m_limitReached(false)
 {
 	dMatrix	dummy;
@@ -111,7 +111,7 @@ void dCustomHinge::SetMassIndependentSpringDamper(bool state, dFloat springDampe
 	m_spring = spring;
 	m_damper = damper;
 	m_options.m_option1 = state;
-	m_springDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.0f), dFloat(0.999f));
+	m_springDamperRelaxation = dClamp(springDamperRelaxation, dFloat(0.1f), dFloat(0.999f));
 }
 
 void dCustomHinge::SetAsSpringDamper(bool state, dFloat spring, dFloat damper)

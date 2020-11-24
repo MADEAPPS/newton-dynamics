@@ -41,8 +41,8 @@ static void AttachLimbBody(DemoEntityManager* const scene, const dVector& dir, N
 	dCustomHinge* const hinge = new dCustomHinge(location, rootBody, parent);
 	//hinge->EnableLimits(true);
 	hinge->SetLimits(-45.0f * dDegreeToRad, 45.0f * dDegreeToRad);
-	hinge->SetMassIndependentSpringDamper(true, 1.f, 500.f, 10.f);
-	//hinge->SetMassIndependentSpringDamper(true, 1.f, 400.f, 0.f);
+	hinge->SetAsSpringDamper(true, 500.f, 10.f);
+	//hinge->SetMassIndependentSpringDamper(true, 0.3f, 500.f, 10.f);
 
 	geometry->Release();
 	NewtonDestroyCollision(collision);
