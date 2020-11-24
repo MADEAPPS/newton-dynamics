@@ -49,6 +49,12 @@ dThreadPool::dWorkerThread::dWorkerThread()
 	,m_job(nullptr)
 	,m_threadIndex(0)
 {
+	//#ifdef _WIN32
+		//there is a thread latancy of about 0.5 ms that I can't get rid off.
+		//this does not seems to do anything, beside I do not like it.
+		//std::thread& thread = *this;
+		//SetThreadPriority(thread.native_handle(), THREAD_PRIORITY_ABOVE_NORMAL);
+	//#endif
 }
 
 dThreadPool::dWorkerThread::~dWorkerThread()
