@@ -767,45 +767,6 @@ void ndDynamicsUpdate::InitJacobianMatrix()
 	}
 }
 
-void ndDynamicsUpdate::CalculateForces()
-{
-	D_TRACKTIME();
-	dInt32 hasJointFeeback = 0;
-	if (m_jointArray.GetCount())
-	{
-		m_firstPassCoef = dFloat32(0.0f);
-		if (m_world->m_skeletonList.GetCount()) 
-		{
-			InitSkeletons();
-		}
-
-		for (dInt32 step = 0; step < 4; step++)
-		{
-			CalculateJointsAcceleration();
-			CalculateJointsForce();
-			if (m_world->m_skeletonList.GetCount())
-			{
-				UpdateSkeletons();
-			}
-			IntegrateBodiesVelocity();
-		}
-		
-		UpdateForceFeedback();
-		for (dInt32 i = 0; i < m_world->GetThreadCount(); i++)
-		{
-			hasJointFeeback |= m_hasJointFeeback[i];
-		}
-	}
-
-	IntegrateBodies();
-
-	if (hasJointFeeback) 
-	{
-		dAssert(0);
-	//	UpdateKinematicFeedback();
-	}
-}
-
 void ndDynamicsUpdate::CalculateJointsAcceleration()
 {
 	D_TRACKTIME();
@@ -1598,5 +1559,44 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		{
 			accNorm = dMax(accNorm, m_accelNorm[j]);
 		}
+	}
+}
+
+void ndDynamicsUpdate::CalculateForces()
+{
+	D_TRACKTIME();
+	dInt32 hasJointFeeback = 0;
+	if (m_jointArray.GetCount())
+	{
+		m_firstPassCoef = dFloat32(0.0f);
+		if (m_world->m_skeletonList.GetCount())
+		{
+			InitSkeletons();
+		}
+
+		for (dInt32 step = 0; step < 4; step++)
+		{
+			CalculateJointsAcceleration();
+			CalculateJointsForce();
+			if (m_world->m_skeletonList.GetCount())
+			{
+				UpdateSkeletons();
+			}
+			IntegrateBodiesVelocity();
+		}
+
+		UpdateForceFeedback();
+		for (dInt32 i = 0; i < m_world->GetThreadCount(); i++)
+		{
+			hasJointFeeback |= m_hasJointFeeback[i];
+		}
+	}
+
+	IntegrateBodies();
+
+	if (hasJointFeeback)
+	{
+		dAssert(0);
+		//	UpdateKinematicFeedback();
 	}
 }
