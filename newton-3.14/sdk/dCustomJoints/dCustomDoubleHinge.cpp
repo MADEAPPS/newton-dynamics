@@ -87,12 +87,12 @@ void dCustomDoubleHinge::SetLimits1(dFloat minAngle, dFloat maxAngle)
 	m_maxAngle1 = dAbs(maxAngle);
 }
 
-void dCustomDoubleHinge::SetAsSpringDamper1(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
+void dCustomDoubleHinge::SetAsSpringDamper1(bool state, dFloat spring, dFloat damper)
 {
 	m_spring1 = spring;
 	m_damper1 = damper;
 	m_options.m_option4 = state;
-	m_springDamperRelaxation1 = dClamp(springDamperRelaxation, dFloat(0.01f), dFloat(0.999f));
+	m_springDamperRelaxation1 = 0.0f;
 }
 
 void dCustomDoubleHinge::SetMassIndependentSpringDamper1(bool state, dFloat springDamperRelaxation, dFloat spring, dFloat damper)
@@ -100,7 +100,7 @@ void dCustomDoubleHinge::SetMassIndependentSpringDamper1(bool state, dFloat spri
 	m_spring1 = spring;
 	m_damper1 = damper;
 	m_options.m_option4 = state;
-	m_springDamperRelaxation1 = 0.0f;
+	m_springDamperRelaxation1 = dClamp(springDamperRelaxation, dFloat(0.01f), dFloat(0.999f));
 }
 
 dFloat dCustomDoubleHinge::GetJointAngle1() const
