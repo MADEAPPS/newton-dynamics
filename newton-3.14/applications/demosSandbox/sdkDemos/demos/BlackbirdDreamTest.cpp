@@ -20,7 +20,8 @@
 static void AttachLimbBody(DemoEntityManager* const scene, const dVector& dir, NewtonBody* const parent, float masse)
 {
 	NewtonWorld* const world = scene->GetNewton();
-	dVector size(0.4f, 0.25f, 0.75f, 0.0f);
+	//dVector size(0.4f, 0.25f, 0.75f, 0.0f);
+	dVector size(0.4f, 0.25f, 1.5f, 0.0f);
 
 	NewtonCollision* const collision = CreateConvexCollision(world, dGetIdentityMatrix(), size, _BOX_PRIMITIVE, 0);
 	DemoMesh* const geometry = new DemoMesh("box", scene->GetShaderCache(), collision, "smilli.tga", "logo_php.tga", "frowny.tga");
@@ -28,7 +29,7 @@ static void AttachLimbBody(DemoEntityManager* const scene, const dVector& dir, N
 	dMatrix location;
 	NewtonBodyGetMatrix(parent, &location[0][0]);
 
-	location.m_posit += dir.Scale(0.5f);
+	location.m_posit += dir.Scale(0.5f * size.m_z);
 	location.m_posit.m_y -= 0.5f;
 
 	// make a root body attached to the world
@@ -36,7 +37,7 @@ static void AttachLimbBody(DemoEntityManager* const scene, const dVector& dir, N
 
 	// constrain these object to motion on the plane only
 	//   location.m_posit -= dir.Scale (0.5f);
-	location.m_posit -= dir.Scale(0.5f);
+	location.m_posit -= dir.Scale(0.5f * size.m_z);
 
 	dCustomHinge* const hinge = new dCustomHinge(location, rootBody, parent);
 	//hinge->EnableLimits(true);
