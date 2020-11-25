@@ -21,8 +21,8 @@ endif()
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	add_subdirectory(dCore)
 	add_subdirectory(dNewton)
-	add_subdirectory(dCollision)
 	add_subdirectory(dTinyxml)
+	add_subdirectory(dCollision)
 
 else()
 
@@ -34,6 +34,8 @@ else()
 	include_directories(dTinyxml/)
 	include_directories(dCollision/)
 	include_directories(dNewton/dJoints/)
+
+	add_subdirectory(dNewton/dNewtonAvx2)
 	
 	# source and header files
 	file(GLOB HEADERS dTinyxml/*.h dCore/*.h dNewton/*.h dCollision/*.h dNewton/dJoints/*.h)
