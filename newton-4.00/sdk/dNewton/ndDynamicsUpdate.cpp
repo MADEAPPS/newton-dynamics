@@ -1561,11 +1561,13 @@ void ndDynamicsUpdate::Update()
 
 		InitWeights();
 		InitBodyArray();
-
-		//InitJacobianMatrix();
-		//CalculateForces();
+#if 1
+		InitJacobianMatrix();
+		CalculateForces();
+#else
 		InitJacobianMatrixAvx2();
 		CalculateForcesAvx2();
+#endif
 	
 		DetermineSleepStates();
 	}
