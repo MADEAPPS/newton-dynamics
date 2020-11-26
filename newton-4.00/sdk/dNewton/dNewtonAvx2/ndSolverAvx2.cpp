@@ -29,6 +29,7 @@
 
 //#define D_PROFILE_JOINTS
 
+#if 0
 ndDynamicsUpdate::ndDynamicsUpdate()
 	:m_velocTol(dFloat32(1.0e-8f))
 	,m_islands(1024)
@@ -66,17 +67,6 @@ void ndDynamicsUpdate::Clear()
 	m_bodyIslandOrder.Resize(0);
 }
 
-void ndDynamicsUpdate::UpdateGeneric()
-{
-	BuildIsland();
-	if (m_islands.GetCount())
-	{
-		IntegrateUnconstrainedBodies();
-		DefaultUpdate();
-		DetermineSleepStates();
-	}
-}
-
 void ndDynamicsUpdate::DefaultUpdate()
 {
 	D_TRACKTIME();
@@ -112,6 +102,32 @@ dInt32 ndDynamicsUpdate::CompareIslands(const ndIsland* const islandA, const ndI
 	}
 	return 0;
 }
+
+#ifdef D_USE_STANDARD_SORT
+dInt32 ndDynamicsUpdate::CompareIslandBodies(const ndBodyIndexPair* const  pairA, const ndBodyIndexPair* const pairB, void* const context)
+{
+	union dKey
+	{
+		dKey(dUnsigned32 low, dUnsigned32 high)
+			:m_val((high<<31) + low)
+		{
+		}
+		dUnsigned32 m_val;
+	};
+	dKey keyA(pairA->m_root->m_uniqueID, pairA->m_root->m_bodyIsConstrained);
+	dKey keyB(pairB->m_root->m_uniqueID, pairB->m_root->m_bodyIsConstrained);
+
+	if (keyA.m_val < keyB.m_val)
+	{
+		return 1;
+	}
+	else if (keyA.m_val > keyB.m_val)
+	{
+		return -1;
+	}
+	return 0;
+}
+#endif
 
 void ndDynamicsUpdate::BuildIsland()
 {
@@ -234,6 +250,11 @@ void ndDynamicsUpdate::BuildIsland()
 		m_unConstrainedBodyCount = 0;
 		if (count)
 		{
+			#ifdef D_USE_STANDARD_SORT
+			// sort using quick sort o(n * log(n))
+			dSort(buffer0, count, CompareIslandBodies);
+			const ndBodyIndexPair* const buffer1 = buffer0;
+			#else
 			// sort using counting sort o(n)
 			dInt32 scans[2];
 			scans[0] = 0;
@@ -253,6 +274,7 @@ void ndDynamicsUpdate::BuildIsland()
 				buffer1[j] = buffer0[i];
 				scans[key] = j + 1;
 			}
+			#endif
 
 			for (dInt32 i = 0; i < count; i++)
 			{
@@ -1566,11 +1588,18 @@ void ndDynamicsUpdate::CalculateForces()
 	}
 }
 
-void ndDynamicsUpdate::Update()
-{
-	m_world = (ndWorld*)this;
-	m_timestep = m_world->GetScene()->GetTimestep();
+#endif
 
-	UpdateGeneric();
-	//UpdateAvx2();
+void ndDynamicsUpdate::UpdateAvx2()
+{
+	//m_world = (ndWorld*)this;
+	//m_timestep = m_world->GetScene()->GetTimestep();
+	//
+	//BuildIsland();
+	//if (m_islands.GetCount())
+	//{
+	//	IntegrateUnconstrainedBodies();
+	//	DefaultUpdate();
+	//	DetermineSleepStates();
+	//}
 }

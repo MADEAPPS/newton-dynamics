@@ -23,14 +23,11 @@
 #define __D_INTERSECTION_H__
 
 #include "dCoreStdafx.h"
-//#include "dgObb.h"
 #include "dDebug.h"
 #include "dVector.h"
 #include "dMatrix.h"
 
 class dPlane;
-//class dgObject;
-//class dPolyhedra;
 
 enum dIntersectStatus
 {
@@ -141,7 +138,7 @@ class dFastRayTest
 		m_unitDir = m_diff.Normalize();
 	}
 
-	dFloat32 PolygonIntersect(const dVector& normal, dFloat32 maxT, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount) const;
+	D_CORE_API dFloat32 PolygonIntersect(const dVector& normal, dFloat32 maxT, const dFloat32* const polygon, dInt32 strideInBytes, const dInt32* const indexArray, dInt32 indexCount) const;
 
 	D_INLINE dInt32 BoxTest(const dVector& minBox, const dVector& maxBox) const
 	{

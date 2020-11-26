@@ -191,18 +191,19 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 	class dgSpliteInfo;
 	class dgNodeBuilder;
 
-	virtual void GetAABB (dVector& p0, dVector& p1) const;
-	virtual void Serialize (const char* const path) const;
-	virtual void Deserialize (const char* const path);
+	D_CORE_API virtual void GetAABB (dVector& p0, dVector& p1) const;
+	D_CORE_API virtual void Serialize (const char* const path) const;
+	D_CORE_API virtual void Deserialize (const char* const path);
 
 	protected:
-	dAabbPolygonSoup ();
-	virtual ~dAabbPolygonSoup ();
+	D_CORE_API dAabbPolygonSoup ();
+	D_CORE_API virtual ~dAabbPolygonSoup ();
 
-	void Create (const dPolygonSoupBuilder& builder);
-	void CalculateAdjacendy ();
-	virtual void ForAllSectorsRayHit (const dFastRayTest& ray, dFloat32 maxT, dRayIntersectCallback callback, void* const context) const;
-	virtual void ForAllSectors (const dFastAabbInfo& obbAabb, const dVector& boxDistanceTravel, dFloat32 m_maxT, dAaabbIntersectCallback callback, void* const context) const;
+	D_CORE_API void Create (const dPolygonSoupBuilder& builder);
+	D_CORE_API void CalculateAdjacendy ();
+	D_CORE_API virtual void ForAllSectorsRayHit (const dFastRayTest& ray, dFloat32 maxT, dRayIntersectCallback callback, void* const context) const;
+	D_CORE_API virtual void ForAllSectors (const dFastAabbInfo& obbAabb, const dVector& boxDistanceTravel, dFloat32 m_maxT, dAaabbIntersectCallback callback, void* const context) const;
+	D_CORE_API virtual dVector ForAllSectorsSupportVectex(const dVector& dir) const;
 
 	inline void* GetRootNode() const 
 	{
@@ -230,7 +231,7 @@ class dAabbPolygonSoup: public dPolygonSoupDatabase
 		p1 = p1 & dVector::m_triplexMask;
 	}
 
-	virtual dVector ForAllSectorsSupportVectex (const dVector& dir) const;
+	
 
 	private:
 	dgNodeBuilder* BuildTopDown (dgNodeBuilder* const leafArray, dInt32 firstBox, dInt32 lastBox, dgNodeBuilder** const allocator) const;

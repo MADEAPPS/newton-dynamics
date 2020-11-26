@@ -44,36 +44,10 @@ dPolygonSoupDatabase::~dPolygonSoupDatabase ()
 	}
 }
 
-dUnsigned32 dPolygonSoupDatabase::GetTagId(const dInt32* const face, dInt32 indexCount) const
-{
-	return dUnsigned32 (face[indexCount]);
-}
-
 void dPolygonSoupDatabase::SetTagId(const dInt32* const facePtr, dInt32 indexCount, dUnsigned32 newID) const
 {
 	dUnsigned32* const face = (dUnsigned32*) facePtr;
 	face[indexCount] = newID;
 }
-
-dInt32 dPolygonSoupDatabase::GetVertexCount()	const
-{
-	return m_vertexCount;
-}
-
-dFloat32* dPolygonSoupDatabase::GetLocalVertexPool() const
-{
-	return m_localVertex;
-}
-
-dInt32 dPolygonSoupDatabase::GetStrideInBytes() const
-{
-	return m_strideInBytes;
-}
-
-dFloat32 dPolygonSoupDatabase::GetRadius() const
-{
-	return 0.0f;
-}
-
 
 

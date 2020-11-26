@@ -18,6 +18,8 @@ if (NEWTON_BUILD_PROFILER)
 	add_subdirectory(dProfiler)
 endif()
 
+add_subdirectory(dNewton/dNewtonAvx2)
+
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	add_subdirectory(dCore)
 	add_subdirectory(dNewton)
@@ -34,8 +36,6 @@ else()
 	include_directories(dTinyxml/)
 	include_directories(dCollision/)
 	include_directories(dNewton/dJoints/)
-
-	add_subdirectory(dNewton/dNewtonAvx2)
 	
 	# source and header files
 	file(GLOB HEADERS dTinyxml/*.h dCore/*.h dNewton/*.h dCollision/*.h dNewton/dJoints/*.h)
@@ -60,6 +60,7 @@ else()
 		add_definitions(-D_D_COLLISION_EXPORT_DLL)
 		add_definitions(-D_D_NEWTON_EXPORT_DLL)
 		add_library(${projectName} SHARED ${CPP_SOURCE})
+		target_link_libraries (${projectName} ndSolverAvx2)
 	else()
 		add_library(${projectName} STATIC ${CPP_SOURCE})
 	endif()

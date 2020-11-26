@@ -25,37 +25,12 @@ endif()
 add_definitions(-DNEWTONCPU_EXPORTS)
 add_library(${projectName} STATIC ${source})
 
-target_include_directories(${projectName} PUBLIC ../../../dCore ../../dCollision)
-
-#if (NEWTON_BUILD_PROFILER)
-#		target_link_libraries (${projectName} dProfiler)
-#endif ()
-
-#if (MSVC)
-#	if(CMAKE_VS_MSBUILD_COMMAND OR CMAKE_VS_DEVENV_COMMAND)
-#		set_target_properties(${projectName} PROPERTIES COMPILE_FLAGS "/YudgNewtonPluginStdafx.h")
-#		set_source_files_properties(dgNewtonPluginStdafx.cpp PROPERTIES COMPILE_FLAGS "/YcdgNewtonPluginStdafx.h")
-#	endif()
-#else()
-#	target_compile_options(${projectName} PRIVATE -mavx2 -mfma)
-#endif()
+include_directories(../../dCore/)
+include_directories(../../dNewton/)
+include_directories(../../dTinyxml/)
+include_directories(../../dCollision/)
 
 install(TARGETS ${projectName} 
 		LIBRARY DESTINATION lib
 		ARCHIVE DESTINATION lib
 		RUNTIME DESTINATION bin)
-
-#add_custom_command(
-#	TARGET ${projectName} POST_BUILD
-#	COMMAND ${CMAKE_COMMAND}
-#	ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/applications/demosSandbox/${CMAKE_CFG_INTDIR}/$<TARGET_FILE_NAME:${projectName}>)
-
-#if (NEWTON_BUILD_SANDBOX_DEMOS)
-#	if (NEWTON_DOUBLE_PRECISION)
-#		add_custom_command(TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-#						   ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/applications/demosSandbox/${CMAKE_CFG_INTDIR}/newtonPlugins/${CMAKE_CFG_INTDIR}_double/$<TARGET_FILE_NAME:${projectName}>)
-#	else ()
-#		add_custom_command(TARGET ${projectName} POST_BUILD COMMAND ${CMAKE_COMMAND}
-#						   ARGS -E copy $<TARGET_FILE:${projectName}> ${PROJECT_BINARY_DIR}/applications/demosSandbox/${CMAKE_CFG_INTDIR}/newtonPlugins/${CMAKE_CFG_INTDIR}/$<TARGET_FILE_NAME:${projectName}>)
-#	endif()
-#endif ()

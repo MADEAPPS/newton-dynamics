@@ -21,6 +21,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 include_directories(../dCore)
 include_directories(../dNewton)
+include_directories(../dTinyxml/)
 include_directories(../dCollision)
 
 add_library(${projectName} STATIC ${CPP_SOURCE})

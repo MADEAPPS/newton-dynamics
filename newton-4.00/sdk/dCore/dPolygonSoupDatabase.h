@@ -36,9 +36,6 @@ class dPolygonSoupDatabase: public dClassAlloc
 
 	dUnsigned32 GetTagId(const dInt32* const face, dInt32 indexCount) const;
 	void SetTagId(const dInt32* const face, dInt32 indexCount, dUnsigned32 newID) const;
-
-	//virtual void Serialize (dgSerialize callback, void* const userData) const = 0;
-	//virtual void Deserialize (dgDeserialize callback, void* const userData, dInt32 revisionNumber) = 0;
 		
 	protected:
 	dPolygonSoupDatabase(const char* const name = nullptr);
@@ -48,6 +45,31 @@ class dPolygonSoupDatabase: public dClassAlloc
 	dInt32 m_strideInBytes;
 	dFloat32* m_localVertex;
 };
+
+inline dInt32 dPolygonSoupDatabase::GetVertexCount()	const
+{
+	return m_vertexCount;
+}
+
+inline dFloat32* dPolygonSoupDatabase::GetLocalVertexPool() const
+{
+	return m_localVertex;
+}
+
+inline dInt32 dPolygonSoupDatabase::GetStrideInBytes() const
+{
+	return m_strideInBytes;
+}
+
+inline dFloat32 dPolygonSoupDatabase::GetRadius() const
+{
+	return dFloat32 (0.0f);
+}
+
+inline dUnsigned32 dPolygonSoupDatabase::GetTagId(const dInt32* const face, dInt32 indexCount) const
+{
+	return dUnsigned32(face[indexCount]);
+}
 
 #endif
 

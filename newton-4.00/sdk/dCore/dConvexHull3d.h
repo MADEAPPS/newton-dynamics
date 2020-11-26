@@ -64,9 +64,9 @@ class dConvexHull3d: public dClassAlloc, public dList<dConvexHull3dFace>
 #endif
 
 	public:
-	dConvexHull3d(const dConvexHull3d& source);
-	dConvexHull3d(const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount = 0x7fffffff);
-	virtual ~dConvexHull3d();
+	D_CORE_API dConvexHull3d(const dConvexHull3d& source);
+	D_CORE_API dConvexHull3d(const dFloat64* const vertexCloud, dInt32 strideInBytes, dInt32 count, dFloat64 distTol, dInt32 maxVertexCount = 0x7fffffff);
+	D_CORE_API virtual ~dConvexHull3d();
 
 	dInt32 GetVertexCount() const;
 	const dBigVector* GetVertexPool() const;
