@@ -113,11 +113,16 @@ class ndDynamicsUpdate
 	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const context);
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
-	// Generic solver implementation
-	void JointUpdateGeneric();
 
 	// Avx2 solver implementation
-	void JointUpdateAvx2();
+	void InitSkeletonsAvx2();
+	void UpdateSkeletonsAvx2();
+	void CalculateForcesAvx2();
+	void InitJacobianMatrixAvx2();
+	void CalculateJointsForceAvx2();
+	void IntegrateBodiesVelocityAvx2();
+	void CalculateJointsAccelerationAvx2();
+	void BuildJacobianMatrixAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
 
 	dVector m_velocTol;
 	dArray<ndIsland> m_islands;

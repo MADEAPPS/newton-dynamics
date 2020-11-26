@@ -1385,7 +1385,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 	D_TRACKTIME();
 	class ndCalculateJointsForce : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			D_TRACKTIME();
@@ -1546,15 +1546,6 @@ void ndDynamicsUpdate::CalculateForces()
 	}
 }
 
-void ndDynamicsUpdate::JointUpdateGeneric()
-{
-	D_TRACKTIME();
-	InitWeights();
-	InitBodyArray();
-	InitJacobianMatrix();
-	CalculateForces();
-}
-
 void ndDynamicsUpdate::Update()
 {
 	m_world = (ndWorld*)this;
@@ -1566,8 +1557,16 @@ void ndDynamicsUpdate::Update()
 		IntegrateUnconstrainedBodies();
 
 		//JointUpdateGeneric();
-		JointUpdateAvx2();
-		
+		//JointUpdateAvx2();
+
+		InitWeights();
+		InitBodyArray();
+
+		//InitJacobianMatrix();
+		//CalculateForces();
+		InitJacobianMatrixAvx2();
+		CalculateForcesAvx2();
+	
 		DetermineSleepStates();
 	}
 }
