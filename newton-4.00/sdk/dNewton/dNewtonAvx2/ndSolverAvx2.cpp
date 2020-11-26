@@ -1590,16 +1590,11 @@ void ndDynamicsUpdate::CalculateForces()
 
 #endif
 
-void ndDynamicsUpdate::UpdateAvx2()
+void ndDynamicsUpdate::JointUpdateAvx2()
 {
-	//m_world = (ndWorld*)this;
-	//m_timestep = m_world->GetScene()->GetTimestep();
-	//
-	//BuildIsland();
-	//if (m_islands.GetCount())
-	//{
-	//	IntegrateUnconstrainedBodies();
-	//	DefaultUpdate();
-	//	DetermineSleepStates();
-	//}
+	D_TRACKTIME();
+	InitWeights();
+	InitBodyArray();
+	InitJacobianMatrix();
+	CalculateForces();
 }

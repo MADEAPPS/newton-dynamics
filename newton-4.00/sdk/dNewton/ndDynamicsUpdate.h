@@ -89,10 +89,7 @@ class ndDynamicsUpdate
 	void Update();
 
 	private:
-	// Generic solver implementation
-	void UpdateGeneric();
 	void Clear();
-	void DefaultUpdate();
 	void BuildIsland();
 	void InitWeights();
 	void InitBodyArray();
@@ -116,8 +113,11 @@ class ndDynamicsUpdate
 	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const context);
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
+	// Generic solver implementation
+	void JointUpdateGeneric();
+
 	// Avx2 solver implementation
-	void UpdateAvx2();
+	void JointUpdateAvx2();
 
 	dVector m_velocTol;
 	dArray<ndIsland> m_islands;

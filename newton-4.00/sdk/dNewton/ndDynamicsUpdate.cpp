@@ -66,26 +66,6 @@ void ndDynamicsUpdate::Clear()
 	m_bodyIslandOrder.Resize(0);
 }
 
-void ndDynamicsUpdate::UpdateGeneric()
-{
-	BuildIsland();
-	if (m_islands.GetCount())
-	{
-		IntegrateUnconstrainedBodies();
-		DefaultUpdate();
-		DetermineSleepStates();
-	}
-}
-
-void ndDynamicsUpdate::DefaultUpdate()
-{
-	D_TRACKTIME();
-	InitWeights();
-	InitBodyArray();
-	InitJacobianMatrix();
-	CalculateForces();
-}
-
 inline ndBodyKinematic* ndDynamicsUpdate::FindRootAndSplit(ndBodyKinematic* const body)
 {
 	ndBodyKinematic* node = body;
@@ -1566,11 +1546,28 @@ void ndDynamicsUpdate::CalculateForces()
 	}
 }
 
+void ndDynamicsUpdate::JointUpdateGeneric()
+{
+	D_TRACKTIME();
+	InitWeights();
+	InitBodyArray();
+	InitJacobianMatrix();
+	CalculateForces();
+}
+
 void ndDynamicsUpdate::Update()
 {
 	m_world = (ndWorld*)this;
 	m_timestep = m_world->GetScene()->GetTimestep();
 
-	UpdateGeneric();
-	//UpdateAvx2();
+	BuildIsland();
+	if (m_islands.GetCount())
+	{
+		IntegrateUnconstrainedBodies();
+
+		//JointUpdateGeneric();
+		JointUpdateAvx2();
+		
+		DetermineSleepStates();
+	}
 }
