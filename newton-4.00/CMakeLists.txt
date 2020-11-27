@@ -21,11 +21,6 @@ option("NEWTON_BUILD_SINGLE_THREADED" "multi threaded" OFF)
 option("NEWTON_DOUBLE_PRECISION" "generate double precision" OFF)
 option("NEWTON_STATIC_RUNTIME_LIBRARIES" "use windows static libraries" OFF)
 option("NEWTON_USE_PLUGIN_DLL" "use plugins dlls" OFF)
-option("NEWTON_WITH_AVX_PLUGIN" "adding avx parallel solver (forces shared libs)" OFF)
-option("NEWTON_WITH_AVX2_PLUGIN" "adding avx2 parallel solver (forces shared libs)" OFF)
-option("NEWTON_WITH_SSE4_PLUGIN" "adding sse4 parallel solver (forces shared libs)" OFF)
-option("NEWTON_WITH_REFERENCE_GPU_PLUGIN" "adding gpu reference solver, gpu solve using avx2" OFF)
-
 
 set(CMAKE_CONFIGURATION_TYPES Debug RelWithDebInfo Release)
 set(CMAKE_DEBUG_POSTFIX "_d")
@@ -185,13 +180,7 @@ elseif(MINGW)
 	endif()
 endif()
 
-#if(NEWTON_WITH_SSE4_PLUGIN OR NEWTON_WITH_AVX_PLUGIN OR NEWTON_WITH_AVX2_PLUGIN)
-# If building any of the plugins, then switch to shared libraries.
-# set(NEWTON_BUILD_SHARED_LIBS ON)
-#endif()
-
 if(NEWTON_BUILD_PROFILER)
-	#add_definitions(-D_DG_USE_PROFILER)
 	add_definitions(-DD_PROFILER)
 endif()
 

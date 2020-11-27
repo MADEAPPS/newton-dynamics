@@ -33,8 +33,9 @@ include_directories(../dTinyxml/)
 include_directories(../dCollision/)
 
 if (MSVC)
-       set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /fp:fast")
-       set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /fp:fast")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /fp:fast")
+	set_source_files_properties(./ndSolverAvx2.cpp PROPERTIES COMPILE_FLAGS " /arch:AVX2 " )
 endif(MSVC)
 
 if(NEWTON_BUILD_SHARED_LIBS)

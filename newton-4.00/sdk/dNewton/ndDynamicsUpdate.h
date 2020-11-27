@@ -87,6 +87,7 @@ class ndDynamicsUpdate
 
 	protected:
 	void Update();
+	void UpdateAvx2();
 
 	private:
 	void Clear();
@@ -113,8 +114,8 @@ class ndDynamicsUpdate
 	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const context);
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
-
 	// Avx2 solver implementation
+	void BuildIslandAvx2();
 	void InitSkeletonsAvx2();
 	void UpdateSkeletonsAvx2();
 	void CalculateForcesAvx2();

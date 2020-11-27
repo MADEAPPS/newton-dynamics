@@ -18,8 +18,6 @@ if (NEWTON_BUILD_PROFILER)
 	add_subdirectory(dProfiler)
 endif()
 
-add_subdirectory(dNewton/dNewtonAvx2)
-
 if (NEWTON_BUILD_CREATE_SUB_PROJECTS)
 	add_subdirectory(dCore)
 	add_subdirectory(dNewton)
@@ -51,6 +49,10 @@ else()
 		dNewton/dJoints/*.h 
 		dNewton/dJoints/*.cpp)
 
+	if(MSVC)
+		 set_source_files_properties(dNewton/ndSolverAvx2.cpp PROPERTIES COMPILE_FLAGS " /arch:AVX2 " )
+	endif(MSVC)
+
 	source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 	add_definitions(-D_D_SINGLE_LIBRARY)
@@ -60,7 +62,6 @@ else()
 		add_definitions(-D_D_COLLISION_EXPORT_DLL)
 		add_definitions(-D_D_NEWTON_EXPORT_DLL)
 		add_library(${projectName} SHARED ${CPP_SOURCE})
-		target_link_libraries (${projectName} ndSolverAvx2)
 	else()
 		add_library(${projectName} STATIC ${CPP_SOURCE})
 	endif()

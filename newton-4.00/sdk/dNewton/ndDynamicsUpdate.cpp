@@ -116,12 +116,13 @@ void ndDynamicsUpdate::BuildIsland()
 		for (dInt32 i = 0; i < jointArray.GetCount(); i ++)
 		{
 			ndConstraint* const joint = jointArray[i];
+			ndBodyKinematic* const body1 = joint->GetBody1();
+
 			const dInt32 rows = joint->GetRowsCount();
 			joint->m_rowCount = rows;
 			joint->m_rowStart = rowCount;
 			rowCount += rows;
-
-			ndBodyKinematic* const body1 = joint->GetBody1();
+			
 			if (body1->GetInvMass() > dFloat32(0.0f))
 			{
 				ndBodyKinematic* const body0 = joint->GetBody0();
@@ -225,17 +226,20 @@ void ndDynamicsUpdate::BuildIsland()
 			}
 			scans[1] = scans[0];
 			scans[0] = 0;
-			ndBodyIndexPair* const buffer1 = buffer0 + count;
+			ndBodyIndexPair* const buffer2 = buffer0 + count;
 			for (dInt32 i = 0; i < count; i++)
 			{
 				const dInt32 key = 1 - buffer0[i].m_root->m_bodyIsConstrained;
 				const dInt32 j = scans[key];
-				buffer1[j] = buffer0[i];
+				buffer2[j] = buffer0[i];
 				scans[key] = j + 1;
 			}
 
+			const ndBodyIndexPair* const buffer1 = buffer0 + count;
 			for (dInt32 i = 0; i < count; i++)
 			{
+				dAssert((i == count - 1) || (buffer0[i].m_root->m_bodyIsConstrained >= buffer0[i + 1].m_root->m_bodyIsConstrained));
+
 				m_bodyIslandOrder[i] = buffer1[i].m_body;
 				if (buffer1[i].m_root->m_rank == -1)
 				{
@@ -1556,18 +1560,10 @@ void ndDynamicsUpdate::Update()
 	{
 		IntegrateUnconstrainedBodies();
 
-		//JointUpdateGeneric();
-		//JointUpdateAvx2();
-
 		InitWeights();
 		InitBodyArray();
-#if 1
 		InitJacobianMatrix();
 		CalculateForces();
-#else
-		InitJacobianMatrixAvx2();
-		CalculateForcesAvx2();
-#endif
 	
 		DetermineSleepStates();
 	}
