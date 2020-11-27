@@ -149,5 +149,16 @@ class ndDynamicsUpdate
 } D_GCC_NEWTON_ALIGN_32;
 
 
+inline ndBodyKinematic* ndDynamicsUpdate::FindRootAndSplit(ndBodyKinematic* const body)
+{
+	ndBodyKinematic* node = body;
+	while (node->m_islandParent != node)
+	{
+		ndBodyKinematic* const prev = node;
+		node = node->m_islandParent;
+		prev->m_islandParent = node->m_islandParent;
+	}
+	return node;
+}
 #endif
 

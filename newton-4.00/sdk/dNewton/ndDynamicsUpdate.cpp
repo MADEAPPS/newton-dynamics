@@ -66,18 +66,6 @@ void ndDynamicsUpdate::Clear()
 	m_bodyIslandOrder.Resize(0);
 }
 
-inline ndBodyKinematic* ndDynamicsUpdate::FindRootAndSplit(ndBodyKinematic* const body)
-{
-	ndBodyKinematic* node = body;
-	while (node->m_islandParent != node)
-	{
-		ndBodyKinematic* const prev = node;
-		node = node->m_islandParent;
-		prev->m_islandParent = node->m_islandParent;
-	}
-	return node;
-}
-
 dInt32 ndDynamicsUpdate::CompareIslands(const ndIsland* const islandA, const ndIsland* const islandB, void* const context)
 {
 	dUnsigned32 keyA = islandA->m_count * 2 + islandA->m_root->m_bodyIsConstrained;
