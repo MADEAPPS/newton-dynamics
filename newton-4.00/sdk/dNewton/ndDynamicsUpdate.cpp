@@ -226,7 +226,7 @@ void ndDynamicsUpdate::BuildIsland()
 			const ndBodyIndexPair* const buffer1 = buffer0 + count;
 			for (dInt32 i = 0; i < count; i++)
 			{
-				dAssert((i == count - 1) || (buffer0[i].m_root->m_bodyIsConstrained >= buffer0[i + 1].m_root->m_bodyIsConstrained));
+				dAssert((i == count - 1) || (buffer1[i].m_root->m_bodyIsConstrained >= buffer1[i + 1].m_root->m_bodyIsConstrained));
 
 				m_bodyIslandOrder[i] = buffer1[i].m_body;
 				if (buffer1[i].m_root->m_rank == -1)
