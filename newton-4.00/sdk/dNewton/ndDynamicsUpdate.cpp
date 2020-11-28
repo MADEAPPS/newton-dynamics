@@ -27,8 +27,6 @@
 #include "ndDynamicsUpdate.h"
 #include "ndJointBilateralConstraint.h"
 
-//#define D_PROFILE_JOINTS
-
 ndDynamicsUpdate::ndDynamicsUpdate()
 	:m_velocTol(dFloat32(1.0e-8f))
 	,m_islands(1024)
@@ -104,21 +102,21 @@ void ndDynamicsUpdate::BuildIsland()
 		for (dInt32 i = 0; i < jointArray.GetCount(); i ++)
 		{
 			ndConstraint* const joint = jointArray[i];
-			ndBodyKinematic* const body1 = joint->GetBody1();
-
 			const dInt32 rows = joint->GetRowsCount();
 			joint->m_rowCount = rows;
 			joint->m_rowStart = rowCount;
 			rowCount += rows;
+
+			ndBodyKinematic* const body0 = joint->GetBody0();
+			ndBodyKinematic* const body1 = joint->GetBody1();
+
+			const dInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
+			body0->m_bodyIsConstrained = 1;
+			body0->m_resting = body0->m_resting & resting;
 			
 			if (body1->GetInvMass() > dFloat32(0.0f))
 			{
-				ndBodyKinematic* const body0 = joint->GetBody0();
-
-				body0->m_bodyIsConstrained = 1;
 				body1->m_bodyIsConstrained = 1;
-				const dInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
-				body0->m_resting = body0->m_resting & resting;
 				body1->m_resting = body1->m_resting & resting;
 
 				ndBodyKinematic* root0 = FindRootAndSplit(body0);
@@ -144,18 +142,8 @@ void ndDynamicsUpdate::BuildIsland()
 					root1->m_islandSleep = 0;
 				}
 			}
-		}
-
-		for (dInt32 i = 0; i < jointArray.GetCount(); i++)
-		{
-			ndConstraint* const joint = jointArray[i];
-			ndBodyKinematic* const body1 = joint->GetBody1();
-			if (body1->GetInvMass() == dFloat32(0.0f))
+			else
 			{
-				ndBodyKinematic* const body0 = joint->GetBody0();
-				const dInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
-				body0->m_bodyIsConstrained = 1;
-				body0->m_resting = body0->m_resting & resting;
 				if (!body0->m_islandSleep)
 				{
 					ndBodyKinematic* const root = FindRootAndSplit(body0);
@@ -163,6 +151,24 @@ void ndDynamicsUpdate::BuildIsland()
 				}
 			}
 		}
+
+		//for (dInt32 i = 0; i < jointArray.GetCount(); i++)
+		//{
+		//	ndConstraint* const joint = jointArray[i];
+		//	ndBodyKinematic* const body1 = joint->GetBody1();
+		//	if (body1->GetInvMass() == dFloat32(0.0f))
+		//	{
+		//		ndBodyKinematic* const body0 = joint->GetBody0();
+		//		const dInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
+		//		body0->m_bodyIsConstrained = 1;
+		//		body0->m_resting = body0->m_resting & resting;
+		//		if (!body0->m_islandSleep)
+		//		{
+		//			ndBodyKinematic* const root = FindRootAndSplit(body0);
+		//			root->m_islandSleep = 0;
+		//		}
+		//	}
+		//}
 
 		// re use body array and working buffer 
 		m_internalForces.SetCount(bodyArray.GetCount());
@@ -1482,7 +1488,7 @@ void ndDynamicsUpdate::CalculateJointsForce()
 		ticks += cpuClock;
 		joints += m_world->m_jointArray.GetCount();
 		averageCount++;
-		if (averageCount > 1000)
+		if (averageCount > 10000)
 		{
 			dgExpandTraceMessage("ticks per joints: %d\n", ticks / joints);
 			joints = 0;

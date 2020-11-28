@@ -27,6 +27,8 @@
 //#define D_BODY_LRU_STEP				2	
 //#define D_MAX_SKELETON_JOINT_COUNT	256
 //#define D_MAX_CONTINUE_COLLISON_STEPS	8
+
+#define D_PROFILE_JOINTS
 #define D_SMALL_ISLAND_COUNT			32
 #define	D_FREEZZING_VELOCITY_DRAG		dFloat32 (0.9f)
 #define	D_SOLVER_MAX_ERROR				(D_FREEZE_MAG * dFloat32 (0.5f))
@@ -124,6 +126,7 @@ class ndDynamicsUpdate
 	void IntegrateBodiesVelocityAvx2();
 	void CalculateJointsAccelerationAvx2();
 	void BuildJacobianMatrixAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
+	dFloat32 CalculateJointsForceAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
 
 	dVector m_velocTol;
 	dArray<ndIsland> m_islands;
