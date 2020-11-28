@@ -125,6 +125,7 @@ class ndDynamicsUpdate
 	void CalculateJointsForceAvx2();
 	void IntegrateBodiesVelocityAvx2();
 	void CalculateJointsAccelerationAvx2();
+	dInt32 GetSortKeyAvx2(const ndConstraint* const joint);
 	void BuildJacobianMatrixAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
 	dFloat32 CalculateJointsForceAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
 

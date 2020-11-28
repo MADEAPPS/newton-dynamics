@@ -30,6 +30,24 @@
 
 #define D_SOA_WORD_GROUP_SIZE	8 
 
+#define D_RADIX_BITS	5
+#define D_RADIX_DIGIT	(1<<(D_RADIX_BITS + 1))
+
+inline dInt32 ndDynamicsUpdate::GetSortKeyAvx2(const ndConstraint* const joint)
+{
+	const ndBodyKinematic* const body0 = joint->GetBody0();
+	const ndBodyKinematic* const body1 = joint->GetBody1();
+
+	const dInt32 rows = joint->GetRowsCount();
+	dAssert(rows < D_RADIX_DIGIT / 2);
+
+	//const dInt32 isResting = !(body0->m_resting & body1->m_resting) << D_RADIX_BITS;
+	const dInt32 isResting = 0;
+	const dInt32 key = D_RADIX_DIGIT/2 - rows + isResting;
+	dAssert(key >= 0 && key < D_RADIX_DIGIT);
+	return key;
+}
+
 void ndDynamicsUpdate::BuildIslandAvx2()
 {
 	ndScene* const scene = m_world->GetScene();
@@ -51,25 +69,14 @@ void ndDynamicsUpdate::BuildIslandAvx2()
 
 		if (jointArray.GetCount())
 		{
-			const dInt32 savedCount = jointArray.GetCount();
-			jointArray.SetCount(2 * savedCount + D_SOA_WORD_GROUP_SIZE);
-
-			const dInt32 radixSize = 64;
 			dInt32 rowCount = 0;
-			dInt32 jointCountSpans[radixSize];
-			memset(jointCountSpans, 0, sizeof(jointCountSpans));
-			ndConstraint** const JointTmpBuffer = &jointArray[savedCount];
-			for (dInt32 i = 0; i < savedCount; i++)
+			for (dInt32 i = 0; i < jointArray.GetCount(); i++)
 			{
 				ndConstraint* const joint = jointArray[i];
 				const dInt32 rows = joint->GetRowsCount();
 				joint->m_rowCount = rows;
 				joint->m_rowStart = rowCount;
 				rowCount += rows;
-
-				JointTmpBuffer[i] = joint;
-				dAssert(rows < radixSize);
-				jointCountSpans[radixSize - rows - 1] ++;
 
 				ndBodyKinematic* const body0 = joint->GetBody0();
 				ndBodyKinematic* const body1 = joint->GetBody1();
@@ -116,8 +123,23 @@ void ndDynamicsUpdate::BuildIslandAvx2()
 				}
 			}
 
+			const dInt32 savedCount = jointArray.GetCount();
+			jointArray.SetCount(2 * savedCount + D_SOA_WORD_GROUP_SIZE);
+
+			dInt32 jointCountSpans[D_RADIX_DIGIT];
+			memset(jointCountSpans, 0, sizeof(jointCountSpans));
+			ndConstraint** const JointTmpBuffer = &jointArray[savedCount];
+
+			for (dInt32 i = 0; i < savedCount; i++)
+			{
+				ndConstraint* const joint = jointArray[i];
+				JointTmpBuffer[i] = joint;
+				const dInt32 key = GetSortKeyAvx2(joint);
+				jointCountSpans[key] ++;
+			}
+
 			dInt32 acc = 0;
-			for (dInt32 i = 0; i < radixSize; i++)
+			for (dInt32 i = 0; i < sizeof(jointCountSpans) / sizeof(jointCountSpans[0]); i++)
 			{
 				const dInt32 val = jointCountSpans[i];
 				jointCountSpans[i] = acc;
@@ -127,10 +149,17 @@ void ndDynamicsUpdate::BuildIslandAvx2()
 			for (dInt32 i = 0; i < savedCount; i++)
 			{
 				ndConstraint* const joint = JointTmpBuffer[i];
-				const dInt32 rows = joint->GetRowsCount();
-				const dInt32 j = jointCountSpans[radixSize - rows - 1];
-				jointArray[j] = joint;
-				jointCountSpans[radixSize - rows - 1] = j + 1;
+				const dInt32 key = GetSortKeyAvx2(joint);
+				const dInt32 entry = jointCountSpans[key];
+				jointArray[entry] = joint;
+				jointCountSpans[key] = entry + 1;
+			}
+
+			const dInt32 mask = -dInt32(D_SOA_WORD_GROUP_SIZE);
+			const dInt32 jointCountSoa = (savedCount + D_SOA_WORD_GROUP_SIZE - 1) & mask;
+			for (dInt32 i = savedCount; i < jointCountSoa; i++)
+			{
+				jointArray[i] = nullptr;
 			}
 
 			jointArray.SetCount(savedCount);
@@ -140,9 +169,10 @@ void ndDynamicsUpdate::BuildIslandAvx2()
 			{
 				const ndConstraint* const joint0 = jointArray[i + 0];
 				const ndConstraint* const joint1 = jointArray[i + 1];
-				const dInt32 rows0 = joint0->GetRowsCount();
-				const dInt32 rows1 = joint1->GetRowsCount();
-				dAssert(rows0 >= rows1);
+
+				const dInt32 key0 = GetSortKeyAvx2(joint0);
+				const dInt32 key1 = GetSortKeyAvx2(joint1);
+				dAssert(key0 <= key1);
 			}
 			#endif
 		}
@@ -199,9 +229,9 @@ void ndDynamicsUpdate::BuildIslandAvx2()
 			for (dInt32 i = 0; i < count; i++)
 			{
 				const dInt32 key = 1 - buffer0[i].m_root->m_bodyIsConstrained;
-				const dInt32 j = scans[key];
-				buffer2[j] = buffer0[i];
-				scans[key] = j + 1;
+				const dInt32 slot = scans[key];
+				buffer2[slot] = buffer0[i];
+				scans[key] = slot + 1;
 			}
 
 			const ndBodyIndexPair* const buffer1 = buffer0 + count;
