@@ -201,7 +201,10 @@
 #else
 	#if defined(_MSC_VER)
 		#define	D_GCC_NEWTON_ALIGN_16 	 
-		#define	D_MSV_NEWTON_ALIGN_16    __declspec(align(16))
+		#define	D_MSV_NEWTON_ALIGN_16	__declspec(align(16))
+		
+		#define	D_GCC_NEWTON_ALIGN_32 
+		#define	D_MSV_NEWTON_ALIGN_32	__declspec(align(32))
 	#else
 		#define	D_GCC_NEWTON_ALIGN_16     __attribute__((aligned (16)))
 		#define	D_MSV_NEWTON_ALIGN_16
@@ -209,9 +212,6 @@
 		#define	D_GCC_NEWTON_ALIGN_32     __attribute__((aligned (32)))
 		#define	D_MSV_NEWTON_ALIGN_32
 	#endif
-
-	#define	D_MSV_NEWTON_ALIGN_32 D_MSV_NEWTON_ALIGN_16   
-	#define	D_GCC_NEWTON_ALIGN_32 D_GCC_NEWTON_ALIGN_16	 
 #endif
 
 #if defined(_MSC_VER)

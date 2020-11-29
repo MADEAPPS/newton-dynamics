@@ -134,6 +134,7 @@ class ndDynamicsUpdate
 	dArray<ndBodyKinematic*> m_bodyIslandOrder;
 	dArray<ndJacobian> m_internalForces;
 	ndConstraintArray m_jointArray;
+	ndConstraintArray m_soaJointArray;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
 	dInt32 m_hasJointFeeback[D_MAX_THREADS_COUNT];
