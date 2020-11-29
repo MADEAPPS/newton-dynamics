@@ -138,7 +138,8 @@ class ndDynamicsUpdate
 	ndConstraintArray m_soaJointArray;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
-	dArray<ndAvx2::ndSoaMatrixElement> m_massMatrix;
+	dArray<dInt32> m_soaJointRows;
+	dArray<ndAvx2::ndSoaMatrixElement> m_soaMassMatrix;
 	dInt32 m_hasJointFeeback[D_MAX_THREADS_COUNT];
 
 	ndWorld* m_world;

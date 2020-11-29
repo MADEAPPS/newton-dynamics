@@ -405,7 +405,64 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 		}
 	};
 
-	class ndMatrixMatrixTransposeAvx2 : public ndScene::ndBaseJob
+	class ndSortJointGroupAvx2 : public ndScene::ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+
+			ndWorld* const world = m_owner->GetWorld();
+			ndConstraint** const jointArray = &world->m_soaJointArray[0];
+			const dInt32 jointCount = world->m_soaJointArray.GetCount();
+
+			const dInt32 threadIndex = GetThredId();
+			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
+			dAssert(jointCount % D_SOA_WORD_GROUP_SIZE == 0);
+			const dInt32 soaJointCount = jointCount / D_SOA_WORD_GROUP_SIZE;
+			for (dInt32 i = threadIndex; i < soaJointCount; i += threadCount)
+			{
+				const dInt32 index = i * D_SOA_WORD_GROUP_SIZE;
+				ndConstraint** const array = &jointArray[index];
+				const ndConstraint* const lastJoint = array[D_SOA_WORD_GROUP_SIZE - 1];
+				if (lastJoint)
+				{
+					for (dInt32 j = 1; j < D_SOA_WORD_GROUP_SIZE; j++) 
+					{
+						dInt32 slot = j;
+						ndConstraint* const joint = array[slot];
+						for (; (slot > 0) && (array[slot - 1]->m_rowCount < joint->m_rowCount); slot--)
+						{
+							array[slot] = array[slot - 1];
+						}
+						array[slot] = joint;
+					}
+				}
+				else
+				{
+					for (dInt32 count = D_SOA_WORD_GROUP_SIZE - 1; count >= 0; count--)
+					{
+						if (array[count])
+						{
+							for (dInt32 j = 1; j <= count; j++)
+							{
+								dInt32 slot = j;
+								ndConstraint* const joint = array[slot];
+								for (; (slot > 0) && (array[slot - 1]->m_rowCount < joint->m_rowCount); slot--)
+								{
+									array[slot] = array[slot - 1];
+								}
+								array[slot] = joint;
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+	};
+
+	class ndTransposeMassMatrixAvx2 : public ndScene::ndBaseJob
 	{
 		public:
 		virtual void Execute()
@@ -421,13 +478,16 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 			const ndLeftHandSide* const leftHandSide = &world->m_leftHandSide[0];
 			const ndRightHandSide* const rightHandSide = &world->m_rightHandSide[0];
 
-			dArray<ndAvx2::ndSoaMatrixElement>& massMatrix = world->m_massMatrix;
+			dArray<ndAvx2::ndSoaMatrixElement>& massMatrix = world->m_soaMassMatrix;
 
+			ndSoaFloat zero(dFloat32(0.0f));
 			dAssert(jointCount % D_SOA_WORD_GROUP_SIZE == 0);
 			const dInt32 soaJointCount = jointCount / D_SOA_WORD_GROUP_SIZE;
+			const dInt32* const soaJointRows = &world->m_soaJointRows[0];
 			for (dInt32 i = threadIndex; i < soaJointCount; i += threadCount)
 			{
 				const dInt32 index = i * D_SOA_WORD_GROUP_SIZE;
+				const dInt32 soaRowBase = soaJointRows[i];
 				const ndConstraint* const lastJoint = jointArray[index + D_SOA_WORD_GROUP_SIZE - 1];
 				if (lastJoint && (lastJoint->m_rowCount == jointArray[index]->m_rowCount))
 				{
@@ -442,6 +502,7 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 
 					const ndConstraint* const joint = jointArray[index];
 					const dInt32 rowCount = joint->m_rowCount;
+					
 					for (dInt32 j = 0; j < rowCount; j++)
 					{
 						dVector tmp[8];
@@ -453,7 +514,7 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 						const ndLeftHandSide* const row5 = &leftHandSide[joint5->m_rowStart + j];
 						const ndLeftHandSide* const row6 = &leftHandSide[joint6->m_rowStart + j];
 						const ndLeftHandSide* const row7 = &leftHandSide[joint7->m_rowStart + j];
-						ndAvx2::ndSoaMatrixElement& row = massMatrix[0];
+						ndAvx2::ndSoaMatrixElement& row = massMatrix[soaRowBase + j];
 
 						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
 							row0->m_Jt.m_jacobianM0.m_linear,
@@ -583,10 +644,9 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 				else 
 				{
 					const ndConstraint* const firstJoint = jointArray[index];
-					ndSoaFloat zero(dFloat32(0.0f));
 					for (dInt32 j = 0; j < firstJoint->m_rowCount; j++)
 					{
-						ndAvx2::ndSoaMatrixElement& row = massMatrix[0];
+						ndAvx2::ndSoaMatrixElement& row = massMatrix[soaRowBase + j];
 						row.m_Jt.m_jacobianM0.m_linear.m_x = zero;
 						row.m_Jt.m_jacobianM0.m_linear.m_y = zero;
 						row.m_Jt.m_jacobianM0.m_linear.m_z = zero;
@@ -633,9 +693,8 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 						{
 							for (dInt32 k = 0; k < joint->m_rowCount; k++)
 							{
-								ndAvx2::ndSoaMatrixElement& row = massMatrix[0];
+								ndAvx2::ndSoaMatrixElement& row = massMatrix[soaRowBase + k];
 								const ndLeftHandSide* const lhs = &leftHandSide[joint->m_rowStart + k];
-								const ndRightHandSide* const rhs = &rightHandSide[joint->m_rowStart + k];
 
 								row.m_Jt.m_jacobianM0.m_linear.m_x[j] = lhs->m_Jt.m_jacobianM0.m_linear.m_x;
 								row.m_Jt.m_jacobianM0.m_linear.m_y[j] = lhs->m_Jt.m_jacobianM0.m_linear.m_y;
@@ -663,6 +722,7 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 								row.m_JMinv.m_jacobianM1.m_angular.m_y[j] = lhs->m_JMinv.m_jacobianM1.m_angular.m_y;
 								row.m_JMinv.m_jacobianM1.m_angular.m_z[j] = lhs->m_JMinv.m_jacobianM1.m_angular.m_z;
 
+								const ndRightHandSide* const rhs = &rightHandSide[joint->m_rowStart + k];
 								row.m_force[j] = rhs->m_force;
 								row.m_diagDamp[j] = rhs->m_diagDamp;
 								row.m_invJinvMJt[j] = rhs->m_invJinvMJt;
@@ -734,8 +794,8 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 		#ifdef _DEBUG
 		for (dInt32 i = 0; i < jointArray.GetCount() - 1; i++)
 		{
-			const ndConstraint* const joint0 = jointArray[i + 0];
-			const ndConstraint* const joint1 = jointArray[i + 1];
+			const ndConstraint* const joint0 = m_soaJointArray[i + 0];
+			const ndConstraint* const joint1 = m_soaJointArray[i + 1];
 		
 			const dInt32 key0 = GetSortKeyAvx2(joint0);
 			const dInt32 key1 = GetSortKeyAvx2(joint1);
@@ -747,14 +807,20 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 		{
 			m_soaJointArray[i] = nullptr;
 		}
+		scene->SubmitJobs<ndSortJointGroupAvx2>();
 
-
-		//dAssert(jointCount % D_SOA_WORD_GROUP_SIZE == 0);
-		//const dInt32 soaJointCount = jointCount / D_SOA_WORD_GROUP_SIZE;
-		m_massMatrix.SetCount(100);
-
-
-		scene->SubmitJobs<ndMatrixMatrixTransposeAvx2>();
+		dInt32 soaJointRowCount = 0;
+		const dInt32 soaJointCountBatches = soaJointCount / D_SOA_WORD_GROUP_SIZE;
+		m_soaJointRows.SetCount(soaJointCountBatches);
+		for (dInt32 i = 0; i < soaJointCountBatches; i++)
+		{
+			const ndConstraint* const joint = m_soaJointArray[i * D_SOA_WORD_GROUP_SIZE];
+			m_soaJointRows[i] = soaJointRowCount;
+			soaJointRowCount += joint->m_rowCount;
+		}
+		m_soaMassMatrix.SetCount(soaJointRowCount);
+		
+		scene->SubmitJobs<ndTransposeMassMatrixAvx2>();
 	}
 }
 
