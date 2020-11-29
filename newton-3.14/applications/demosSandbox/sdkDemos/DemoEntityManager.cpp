@@ -1337,7 +1337,7 @@ void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVec
 	m_cameraManager->SetCameraMatrix(this, rotation, position);
 }
 
-void DemoEntityManager::UpdatePhysics(dFloat timestep)
+void DemoEntityManager::UpdatePhysics()
 {
 	// update the physics
 	if (m_world && !m_suspendPhysicsUpdate) {
@@ -1511,7 +1511,7 @@ void DemoEntityManager::RenderScene()
 {
 	dFloat timestep = dGetElapsedSeconds();	
 	CalculateFPS(timestep);
-	UpdatePhysics(timestep);
+	UpdatePhysics();
 
 	D_TRACKTIME();
 	// Get the interpolated location of each body in the scene

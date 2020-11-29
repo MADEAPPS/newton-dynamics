@@ -147,7 +147,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	//void RenderUI();
 	void RenderScene();
 	
-	void UpdatePhysics(dFloat timestep);
+	void UpdatePhysics();
 	dFloat CalculateInteplationParam () const;
 
 	void CalculateFPS(dFloat timestep);
