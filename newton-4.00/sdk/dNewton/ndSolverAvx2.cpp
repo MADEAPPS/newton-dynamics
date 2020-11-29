@@ -27,141 +27,7 @@
 #include "ndDynamicsUpdate.h"
 #include "ndJointBilateralConstraint.h"
 
-
-#define D_SOA_WORD_GROUP_SIZE	8 
-
-#define D_RADIX_BITS	5
-#define D_RADIX_DIGIT	(1<<(D_RADIX_BITS + 1))
-
-D_MSV_NEWTON_ALIGN_32
-class dgSoaFloat
-{
-	public:
-	D_INLINE dgSoaFloat()
-	{
-	}
-
-	D_INLINE dgSoaFloat(const dFloat32 val)
-		:m_type(_mm256_set1_ps(val))
-	{
-	}
-
-	D_INLINE dgSoaFloat(const __m256 type)
-		:m_type(type)
-	{
-	}
-
-	D_INLINE dgSoaFloat(const dgSoaFloat& copy)
-		: m_type(copy.m_type)
-	{
-	}
-
-	D_INLINE dgSoaFloat(const dVector& low, const dVector& high)
-		:m_type(_mm256_set_m128(high.m_type, low.m_type))
-	{
-	}
-
-
-	D_INLINE dgSoaFloat(const dgSoaFloat* const baseAddr, const dgSoaFloat& index)
-		: m_type(_mm256_i32gather_ps(&(*baseAddr)[0], index.m_typeInt, 4))
-	{
-	}
-
-	D_INLINE dFloat32& operator[] (dInt32 i)
-	{
-		dAssert(i < D_SOA_WORD_GROUP_SIZE);
-		dAssert(i >= 0);
-		//return m_f[i];
-		dFloat32* const ptr = (dFloat32*)&m_type;
-		return ptr[i];
-	}
-
-	D_INLINE const dFloat32& operator[] (dInt32 i) const
-	{
-		dAssert(i < D_SOA_WORD_GROUP_SIZE);
-		dAssert(i >= 0);
-		//return m_f[i];
-		const dFloat32* const ptr = (dFloat32*)&m_type;
-		return ptr[i];
-	}
-
-	D_INLINE dgSoaFloat operator+ (const dgSoaFloat& A) const
-	{
-		return _mm256_add_ps(m_type, A.m_type);
-	}
-
-	D_INLINE dgSoaFloat operator- (const dgSoaFloat& A) const
-	{
-		return _mm256_sub_ps(m_type, A.m_type);
-	}
-
-	D_INLINE dgSoaFloat operator* (const dgSoaFloat& A) const
-	{
-		return _mm256_mul_ps(m_type, A.m_type);
-	}
-
-	D_INLINE dgSoaFloat MulAdd(const dgSoaFloat& A, const dgSoaFloat& B) const
-	{
-		return _mm256_fmadd_ps(A.m_type, B.m_type, m_type);
-	}
-
-	D_INLINE dgSoaFloat MulSub(const dgSoaFloat& A, const dgSoaFloat& B) const
-	{
-		return _mm256_fnmadd_ps(A.m_type, B.m_type, m_type);
-	}
-
-	D_INLINE dgSoaFloat operator> (const dgSoaFloat& A) const
-	{
-		return _mm256_cmp_ps(m_type, A.m_type, _CMP_GT_OQ);
-	}
-
-	D_INLINE dgSoaFloat operator< (const dgSoaFloat& A) const
-	{
-		return _mm256_cmp_ps(m_type, A.m_type, _CMP_LT_OQ);
-	}
-
-	D_INLINE dgSoaFloat operator| (const dgSoaFloat& A) const
-	{
-		return _mm256_or_ps(m_type, A.m_type);
-	}
-
-	D_INLINE dgSoaFloat operator& (const dgSoaFloat& A) const
-	{
-		return _mm256_and_ps(m_type, A.m_type);
-	}
-
-	D_INLINE dgSoaFloat GetMin(const dgSoaFloat& A) const
-	{
-		return _mm256_min_ps(m_type, A.m_type);
-	}
-
-	D_INLINE dgSoaFloat GetMax(const dgSoaFloat& A) const
-	{
-		return _mm256_max_ps(m_type, A.m_type);
-	}
-
-	D_INLINE dFloat32 AddHorizontal() const
-	{
-		__m256 tmp0(_mm256_add_ps(m_type, _mm256_permute2f128_ps(m_type, m_type, 1)));
-		__m256 tmp1(_mm256_hadd_ps(tmp0, tmp0));
-		__m256 tmp2(_mm256_hadd_ps(tmp1, tmp1));
-		//int xxx = _mm256_cvtsi256_si32 (tmp2);
-		return *((dFloat32*)&tmp2);
-	}
-	
-	static D_INLINE void FlushRegisters()
-	{
-		_mm256_zeroall();
-	}
-
-	union
-	{
-		__m256 m_type;
-		__m256i m_typeInt;
-	};
-} D_GCC_NEWTON_ALIGN_32;
-
-
+using namespace ndAvx2;
 
 inline dInt32 ndDynamicsUpdate::GetSortKeyAvx2(const ndConstraint* const joint)
 {
@@ -172,7 +38,7 @@ inline dInt32 ndDynamicsUpdate::GetSortKeyAvx2(const ndConstraint* const joint)
 	dAssert(rows < D_RADIX_DIGIT / 2);
 
 	const dInt32 isResting = !(body0->m_resting & body1->m_resting) << D_RADIX_BITS;
-	const dInt32 key = D_RADIX_DIGIT/2 - rows + isResting;
+	const dInt32 key = D_RADIX_DIGIT / 2 - rows + isResting;
 	dAssert(key >= 0 && key < D_RADIX_DIGIT);
 	return key;
 }
@@ -552,18 +418,11 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 
 			const dInt32 threadIndex = GetThredId();
 			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
-			//const dInt32 step = jointCount / threadCount;
-			//const dInt32 start = threadIndex * step;
-			//const dInt32 count = ((threadIndex + 1) < threadCount) ? step : jointCount - start;
+			const ndLeftHandSide* const leftHandSide = &world->m_leftHandSide[0];
+			const ndRightHandSide* const rightHandSide = &world->m_rightHandSide[0];
 
-			//	const dgJointInfo* const jointInfoArray = m_jointArray;
-			//	dgSoaMatrixElement* const massMatrixArray = &m_massMatrix[0];
-			//
-			//	const dInt32 step = m_threadCounts;
-			//	const dInt32 jointCount = m_jointCount;
+			dArray<ndAvx2::ndSoaMatrixElement>& massMatrix = world->m_massMatrix;
 
-			ndLeftHandSide* const leftHandSide = &world->m_leftHandSide[0];
-static dgSoaFloat xxxx;
 			dAssert(jointCount % D_SOA_WORD_GROUP_SIZE == 0);
 			const dInt32 soaJointCount = jointCount / D_SOA_WORD_GROUP_SIZE;
 			for (dInt32 i = threadIndex; i < soaJointCount; i += threadCount)
@@ -573,17 +432,8 @@ static dgSoaFloat xxxx;
 				const ndConstraint* const lastJoint = jointArray[index + D_SOA_WORD_GROUP_SIZE - 1];
 				if (lastJoint && (lastJoint->m_rowCount == joint->m_rowCount))
 				{
-					const dInt32 rowCount = joint->m_rowCount;
-
-					
 					//ndRightHandSide* const rhs = &m_rightHandSide[index + i];
 
-					//row->m_JMinv.m_jacobianM0.m_linear = row->m_Jt.m_jacobianM0.m_linear * invMass0;
-					//row->m_JMinv.m_jacobianM0.m_angular = invInertia0.RotateVector(row->m_Jt.m_jacobianM0.m_angular);
-					//row->m_JMinv.m_jacobianM1.m_linear = row->m_Jt.m_jacobianM1.m_linear * invMass1;
-					//row->m_JMinv.m_jacobianM1.m_angular = invInertia1.RotateVector(row->m_Jt.m_jacobianM1.m_angular);
-					//
-					//const ndJacobian& JMinvM0 = row->m_JMinv.m_jacobianM0;
 
 					const ndConstraint* const joint0 = jointArray[index + 0];
 					const ndConstraint* const joint1 = jointArray[index + 1];
@@ -594,53 +444,143 @@ static dgSoaFloat xxxx;
 					const ndConstraint* const joint6 = jointArray[index + 6];
 					const ndConstraint* const joint7 = jointArray[index + 7];
 
+					const dInt32 rowCount = joint->m_rowCount;
 					for (dInt32 j = 0; j < rowCount; j++)
 					{
-						ndLeftHandSide* const row0 = &leftHandSide[joint0->m_rowStart + j];
-						ndLeftHandSide* const row1 = &leftHandSide[joint1->m_rowStart + j];
-						ndLeftHandSide* const row2 = &leftHandSide[joint2->m_rowStart + j];
-						ndLeftHandSide* const row3 = &leftHandSide[joint3->m_rowStart + j];
-						ndLeftHandSide* const row4 = &leftHandSide[joint4->m_rowStart + j];
-						ndLeftHandSide* const row5 = &leftHandSide[joint5->m_rowStart + j];
-						ndLeftHandSide* const row6 = &leftHandSide[joint6->m_rowStart + j];
-						ndLeftHandSide* const row7 = &leftHandSide[joint7->m_rowStart + j];
-
 						dVector tmp[8];
+						const ndLeftHandSide* const row0 = &leftHandSide[joint0->m_rowStart + j];
+						const ndLeftHandSide* const row1 = &leftHandSide[joint1->m_rowStart + j];
+						const ndLeftHandSide* const row2 = &leftHandSide[joint2->m_rowStart + j];
+						const ndLeftHandSide* const row3 = &leftHandSide[joint3->m_rowStart + j];
+						const ndLeftHandSide* const row4 = &leftHandSide[joint4->m_rowStart + j];
+						const ndLeftHandSide* const row5 = &leftHandSide[joint5->m_rowStart + j];
+						const ndLeftHandSide* const row6 = &leftHandSide[joint6->m_rowStart + j];
+						const ndLeftHandSide* const row7 = &leftHandSide[joint7->m_rowStart + j];
+						ndAvx2::ndSoaMatrixElement& row = massMatrix[0];
+
 						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
 							row0->m_Jt.m_jacobianM0.m_linear,
 							row1->m_Jt.m_jacobianM0.m_linear,
 							row2->m_Jt.m_jacobianM0.m_linear,
 							row3->m_Jt.m_jacobianM0.m_linear);
-
 						dVector::Transpose4x4(tmp[4], tmp[5], tmp[6], tmp[7],
 							row4->m_Jt.m_jacobianM0.m_linear,
 							row5->m_Jt.m_jacobianM0.m_linear,
 							row6->m_Jt.m_jacobianM0.m_linear,
 							row7->m_Jt.m_jacobianM0.m_linear);
-
-						dgSoaFloat x(tmp[0], tmp[4]);
-						dgSoaFloat y(tmp[1], tmp[5]);
-						dgSoaFloat z(tmp[2], tmp[6]);
-
-						xxxx = xxxx + x;
-
+						row.m_Jt.m_jacobianM0.m_linear.m_x = ndSoaFloat(tmp[0], tmp[4]);
+						row.m_Jt.m_jacobianM0.m_linear.m_y = ndSoaFloat(tmp[1], tmp[5]);;
+						row.m_Jt.m_jacobianM0.m_linear.m_z = ndSoaFloat(tmp[2], tmp[6]);
 						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
 							row0->m_Jt.m_jacobianM0.m_angular,
 							row1->m_Jt.m_jacobianM0.m_angular,
 							row2->m_Jt.m_jacobianM0.m_angular,
 							row3->m_Jt.m_jacobianM0.m_angular);
-
 						dVector::Transpose4x4(tmp[4], tmp[5], tmp[6], tmp[7],
 							row4->m_Jt.m_jacobianM0.m_angular,
 							row5->m_Jt.m_jacobianM0.m_angular,
 							row6->m_Jt.m_jacobianM0.m_angular,
 							row7->m_Jt.m_jacobianM0.m_angular);
+						row.m_Jt.m_jacobianM0.m_angular.m_x = ndSoaFloat(tmp[0], tmp[4]);
+						row.m_Jt.m_jacobianM0.m_angular.m_y = ndSoaFloat(tmp[1], tmp[5]);;
+						row.m_Jt.m_jacobianM0.m_angular.m_z = ndSoaFloat(tmp[2], tmp[6]);
 
-						x = dgSoaFloat(tmp[0], tmp[4]);
-						y = dgSoaFloat(tmp[1], tmp[5]);
-						z = dgSoaFloat(tmp[2], tmp[6]);
+						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
+							row0->m_Jt.m_jacobianM1.m_linear,
+							row1->m_Jt.m_jacobianM1.m_linear,
+							row2->m_Jt.m_jacobianM1.m_linear,
+							row3->m_Jt.m_jacobianM1.m_linear);
+						dVector::Transpose4x4(tmp[4], tmp[5], tmp[6], tmp[7],
+							row4->m_Jt.m_jacobianM1.m_linear,
+							row5->m_Jt.m_jacobianM1.m_linear,
+							row6->m_Jt.m_jacobianM1.m_linear,
+							row7->m_Jt.m_jacobianM1.m_linear);
+						row.m_Jt.m_jacobianM1.m_linear.m_x = ndSoaFloat(tmp[0], tmp[4]);
+						row.m_Jt.m_jacobianM1.m_linear.m_y = ndSoaFloat(tmp[1], tmp[5]);;
+						row.m_Jt.m_jacobianM1.m_linear.m_z = ndSoaFloat(tmp[2], tmp[6]);
+						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
+							row0->m_Jt.m_jacobianM1.m_angular,
+							row1->m_Jt.m_jacobianM1.m_angular,
+							row2->m_Jt.m_jacobianM1.m_angular,
+							row3->m_Jt.m_jacobianM1.m_angular);
+						dVector::Transpose4x4(tmp[4], tmp[5], tmp[6], tmp[7],
+							row4->m_Jt.m_jacobianM1.m_angular,
+							row5->m_Jt.m_jacobianM1.m_angular,
+							row6->m_Jt.m_jacobianM1.m_angular,
+							row7->m_Jt.m_jacobianM1.m_angular);
+						row.m_Jt.m_jacobianM1.m_angular.m_x = ndSoaFloat(tmp[0], tmp[4]);
+						row.m_Jt.m_jacobianM1.m_angular.m_y = ndSoaFloat(tmp[1], tmp[5]);;
+						row.m_Jt.m_jacobianM1.m_angular.m_z = ndSoaFloat(tmp[2], tmp[6]);
 
-						xxxx = xxxx + x;
+
+						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
+							row0->m_JMinv.m_jacobianM0.m_linear,
+							row1->m_JMinv.m_jacobianM0.m_linear,
+							row2->m_JMinv.m_jacobianM0.m_linear,
+							row3->m_JMinv.m_jacobianM0.m_linear);
+						dVector::Transpose4x4(tmp[4], tmp[5], tmp[6], tmp[7],
+							row4->m_JMinv.m_jacobianM0.m_linear,
+							row5->m_JMinv.m_jacobianM0.m_linear,
+							row6->m_JMinv.m_jacobianM0.m_linear,
+							row7->m_JMinv.m_jacobianM0.m_linear);
+						row.m_JMinv.m_jacobianM0.m_linear.m_x = ndSoaFloat(tmp[0], tmp[4]);
+						row.m_JMinv.m_jacobianM0.m_linear.m_y = ndSoaFloat(tmp[1], tmp[5]);;
+						row.m_JMinv.m_jacobianM0.m_linear.m_z = ndSoaFloat(tmp[2], tmp[6]);
+						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
+							row0->m_JMinv.m_jacobianM0.m_angular,
+							row1->m_JMinv.m_jacobianM0.m_angular,
+							row2->m_JMinv.m_jacobianM0.m_angular,
+							row3->m_JMinv.m_jacobianM0.m_angular);
+						dVector::Transpose4x4(tmp[4], tmp[5], tmp[6], tmp[7],
+							row4->m_JMinv.m_jacobianM0.m_angular,
+							row5->m_JMinv.m_jacobianM0.m_angular,
+							row6->m_JMinv.m_jacobianM0.m_angular,
+							row7->m_JMinv.m_jacobianM0.m_angular);
+						row.m_JMinv.m_jacobianM0.m_angular.m_x = ndSoaFloat(tmp[0], tmp[4]);
+						row.m_JMinv.m_jacobianM0.m_angular.m_y = ndSoaFloat(tmp[1], tmp[5]);;
+						row.m_JMinv.m_jacobianM0.m_angular.m_z = ndSoaFloat(tmp[2], tmp[6]);
+
+						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
+							row0->m_JMinv.m_jacobianM1.m_linear,
+							row1->m_JMinv.m_jacobianM1.m_linear,
+							row2->m_JMinv.m_jacobianM1.m_linear,
+							row3->m_JMinv.m_jacobianM1.m_linear);
+						dVector::Transpose4x4(tmp[4], tmp[5], tmp[6], tmp[7],
+							row4->m_JMinv.m_jacobianM1.m_linear,
+							row5->m_JMinv.m_jacobianM1.m_linear,
+							row6->m_JMinv.m_jacobianM1.m_linear,
+							row7->m_JMinv.m_jacobianM1.m_linear);
+						row.m_JMinv.m_jacobianM1.m_linear.m_x = ndSoaFloat(tmp[0], tmp[4]);
+						row.m_JMinv.m_jacobianM1.m_linear.m_y = ndSoaFloat(tmp[1], tmp[5]);;
+						row.m_JMinv.m_jacobianM1.m_linear.m_z = ndSoaFloat(tmp[2], tmp[6]);
+						dVector::Transpose4x4(tmp[0], tmp[1], tmp[2], tmp[3],
+							row0->m_JMinv.m_jacobianM1.m_angular,
+							row1->m_JMinv.m_jacobianM1.m_angular,
+							row2->m_JMinv.m_jacobianM1.m_angular,
+							row3->m_JMinv.m_jacobianM1.m_angular);
+						dVector::Transpose4x4(tmp[4], tmp[5], tmp[6], tmp[7],
+							row4->m_JMinv.m_jacobianM1.m_angular,
+							row5->m_JMinv.m_jacobianM1.m_angular,
+							row6->m_JMinv.m_jacobianM1.m_angular,
+							row7->m_JMinv.m_jacobianM1.m_angular);
+						row.m_JMinv.m_jacobianM1.m_angular.m_x = ndSoaFloat(tmp[0], tmp[4]);
+						row.m_JMinv.m_jacobianM1.m_angular.m_y = ndSoaFloat(tmp[1], tmp[5]);;
+						row.m_JMinv.m_jacobianM1.m_angular.m_z = ndSoaFloat(tmp[2], tmp[6]);
+
+
+						dInt32* const normalIndex = (dInt32*)&row.m_normalForceIndex[0];
+						for (dInt32 k = 0; k < D_SOA_WORD_GROUP_SIZE; k++)
+						{
+							const ndConstraint* const soaJoint = jointArray[index + k];
+							const ndRightHandSide* const rhs = &rightHandSide[soaJoint->m_rowStart + j];
+							row.m_force[k] = rhs->m_force;
+							row.m_diagDamp[k] = rhs->m_diagDamp;
+							row.m_invJinvMJt[k] = rhs->m_invJinvMJt;
+							row.m_coordenateAccel[k] = rhs->m_coordenateAccel;
+							row.m_lowerBoundFrictionCoefficent[k] = rhs->m_lowerBoundFrictionCoefficent;
+							row.m_upperBoundFrictionCoefficent[k] = rhs->m_upperBoundFrictionCoefficent;
+							normalIndex[k] = (rhs->m_normalForceIndex + 1) * D_SOA_WORD_GROUP_SIZE + k;
+						}
 					}
 				}
 				else
@@ -730,6 +670,12 @@ static dgSoaFloat xxxx;
 		{
 			m_soaJointArray[i] = nullptr;
 		}
+
+
+		//dAssert(jointCount % D_SOA_WORD_GROUP_SIZE == 0);
+		//const dInt32 soaJointCount = jointCount / D_SOA_WORD_GROUP_SIZE;
+		m_massMatrix.SetCount(100);
+
 
 		scene->SubmitJobs<ndMatrixMatrixTransposeAvx2>();
 	}

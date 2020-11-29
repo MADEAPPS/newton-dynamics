@@ -40,6 +40,7 @@
 #include <ndConstraint.h>
 #include <ndBodyNotify.h>
 #include <ndSceneMixed.h>
+#include <ndSolverAvx2.h>
 #include <ndShapeConvex.h>
 #include <ndBodyDynamic.h>
 #include <ndContactList.h>

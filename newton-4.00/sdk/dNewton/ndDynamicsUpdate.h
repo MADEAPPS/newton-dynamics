@@ -23,6 +23,7 @@
 #define __D_WORLD_DYNAMICS_UPDATE_H__
 
 #include "ndNewtonStdafx.h"
+#include "ndSolverAvx2.h"
 
 //#define D_BODY_LRU_STEP				2	
 //#define D_MAX_SKELETON_JOINT_COUNT	256
@@ -137,6 +138,7 @@ class ndDynamicsUpdate
 	ndConstraintArray m_soaJointArray;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
+	dArray<ndAvx2::ndSoaMatrixElement> m_massMatrix;
 	dInt32 m_hasJointFeeback[D_MAX_THREADS_COUNT];
 
 	ndWorld* m_world;

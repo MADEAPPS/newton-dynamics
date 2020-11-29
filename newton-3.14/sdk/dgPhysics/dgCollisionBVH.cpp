@@ -211,35 +211,20 @@ dgFloat32 dgCollisionBVH::RayHit (void* const context, const dgFloat32* const po
 	normal = normal & dgVector::m_triplexMask;
 	dgFloat32 t = me.PolygonIntersect (normal, me.m_t, polygon, strideInBytes, indexArray, indexCount);
 	if (t <= (me.m_t * dgFloat32 (1.0001f))) {
-//		if ((t * dgFloat32 (1.0001f)) >= me.m_t) {
-//			dgFloat32 dist0;
-//			dgFloat32 dist1;
-//			dist0 = me.m_diff % normal;
-//			dist1 = me.m_diff % me.m_normal;
-//			if (dist0 < dist1) {
-//				me.m_t = t;
-//				me.m_normal = normal;
-//				me.m_id = me.m_me->GetTagId(indexArray, indexCount);
-//			} else {
-//				t = me.m_t;
-//			}
-//		} else {
-			me.m_t = t;
-			me.m_normal = normal;
-			me.m_id = me.m_me->GetTagId(indexArray, indexCount);
-//		}
+		me.m_t = t;
+		me.m_normal = normal;
+		me.m_id = me.m_me->GetTagId(indexArray, indexCount);
 	}
 	return t;
 }
 
 dgFloat32 dgCollisionBVH::RayHitUser (void* const context, const dgFloat32* const polygon, dgInt32 strideInBytes, const dgInt32* const indexArray, dgInt32 indexCount)
 {
-	dgAssert (0);
 	dgFloat32 t = dgFloat32 (1.2f);
 	dgBVHRay& me = *((dgBVHRay*) context);
 	dgVector normal (&polygon[indexArray[indexCount + 1] * (strideInBytes / sizeof (dgFloat32))]);
 	normal = normal & dgVector::m_triplexMask;
-dgAssert (0);
+
 	t = me.PolygonIntersect (normal, me.m_t, polygon, strideInBytes, indexArray, indexCount);
 	if (t < dgFloat32 (1.0f)) {
 		if (t < me.m_t) {
