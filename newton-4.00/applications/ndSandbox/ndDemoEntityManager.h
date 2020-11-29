@@ -231,6 +231,8 @@ class ndDemoEntityManager: public dList <ndDemoEntity*>
 	bool m_showRaycastHit;
 	bool m_profilerMode;
 
+	dInt32 m_solverMode;
+
 	ndLightSource m_directionalLight;
 	ndDebugMeshCache m_debugShapeCache;
 

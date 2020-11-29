@@ -128,6 +128,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_asynchronousPhysicsUpdate(false)
 	,m_showRaycastHit(false)
 	,m_profilerMode(false)
+	,m_solverMode(0)
 	//,m_directionalLight(0.0f, 1.0f, 0.0f, 0.0f)
 	,m_debugShapeCache()
 {
@@ -525,6 +526,8 @@ void ndDemoEntityManager::ApplyMenuOptions()
 		body->SetAutoSleep(state);
 	}
 
+	m_world->SelectSolver(m_solverMode);
+
 	//NewtonSelectBroadphaseAlgorithm(m_world, m_sceneType);
 	//NewtonSetParallelSolverOnLargeIsland(m_world, m_solveLargeIslandInParallel ? 1 : 0);
 	//
@@ -612,6 +615,11 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show UI", &m_showUI);
 			ImGui::Checkbox("show stats", &m_showStats);
 			ImGui::Checkbox("concurrent physics update", &m_asynchronousPhysicsUpdate);
+			ImGui::Separator();
+
+			ImGui::Text("solvers");
+			ImGui::RadioButton("default", &m_solverMode, 0);
+			ImGui::RadioButton("avx2", &m_solverMode, 1);
 			ImGui::Separator();
 
 			//int index = 0;
@@ -938,6 +946,9 @@ void ndDemoEntityManager::RenderStats()
 			ImGui::Text(text, "");
 
 			sprintf(text, "Substeps:       %d", m_world->GetSubSteps());
+			ImGui::Text(text, "");
+
+			sprintf(text, "%s", m_solverMode ? "avx2 solver" : "default solver");
 			ImGui::Text(text, "");
 
 			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  

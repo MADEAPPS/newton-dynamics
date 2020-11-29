@@ -61,6 +61,9 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	dInt32 GetSubSteps() const;
 	void SetSubSteps(dInt32 subSteps);
 
+	dInt32 GetSelectedSolver() const;
+	void SelectSolver(dInt32 solver);
+
 	D_NEWTON_API bool AddBody(ndBody* const body);
 	D_NEWTON_API void RemoveBody(ndBody* const body);
 	D_NEWTON_API void AddJoint(ndJointBilateralConstraint* const joint);
@@ -138,6 +141,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 
 	dgSolverProgressiveSleepEntry m_sleepTable[D_SLEEP_ENTRIES];
 
+	dInt32 m_solver;
 	dInt32 m_subSteps;
 	dInt32 m_solverIterations;
 	dUnsigned32 m_frameIndex;
@@ -265,6 +269,16 @@ inline void ndWorld::Update(dFloat32 timestep)
 
 	// update the next frame asynchronous 
 	m_scene->TickOne();
+}
+
+inline dInt32 ndWorld::GetSelectedSolver() const
+{
+	return m_solver;
+}
+
+inline void ndWorld::SelectSolver(dInt32 solver)
+{
+	m_solver = dClamp(solver, 0, 1);
 }
 
 #endif

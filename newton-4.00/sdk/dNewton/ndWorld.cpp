@@ -45,6 +45,7 @@ ndWorld::ndWorld()
 	,m_averageTimestepAcc(dFloat32(0.0f))
 	,m_averageFramesCount(dFloat32(0.0f))
 	,m_lastExecutionTime(dFloat32(0.0f))
+	,m_solver(0)
 	,m_subSteps(1)
 	,m_solverIterations(4)
 	,m_frameIndex(0)
@@ -812,8 +813,14 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	ParticleUpdate();
 
 	// calculate internal forces, integrate bodies and update matrices.
-	//ndDynamicsUpdate::Update();
-	ndDynamicsUpdate::UpdateAvx2();
+	if (m_solver == 0)
+	{
+		ndDynamicsUpdate::Update();
+	} 
+	else
+	{
+		ndDynamicsUpdate::UpdateAvx2();
+	}
 
 	UpdatePostlisteners();
 }
