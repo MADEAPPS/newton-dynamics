@@ -812,8 +812,8 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	ParticleUpdate();
 
 	// calculate internal forces, integrate bodies and update matrices.
-	ndDynamicsUpdate::Update();
-	//ndDynamicsUpdate::UpdateAvx2();
+	//ndDynamicsUpdate::Update();
+	ndDynamicsUpdate::UpdateAvx2();
 
 	UpdatePostlisteners();
 }
