@@ -128,7 +128,7 @@ class ndDynamicsUpdate
 	void CalculateJointsAccelerationAvx2();
 	dInt32 GetSortKeyAvx2(const ndConstraint* const joint);
 	void BuildJacobianMatrixAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
-	dFloat32 CalculateJointsForceAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
+	dFloat32 CalculateJointsForceAvx2(ndConstraint** const jointGroup, ndAvx2::ndSoaMatrixElement* const massMatrix, ndJacobian* const internalForces);
 
 	dVector m_velocTol;
 	dArray<ndIsland> m_islands;
@@ -153,6 +153,9 @@ class ndDynamicsUpdate
 	dUnsigned32 m_maxRowsCount;
 	dInt32 m_unConstrainedBodyCount;
 	dAtomic<dUnsigned32> m_rowsCount;
+
+	static ndAvx2::ndSoaFloat m_one;
+	static ndAvx2::ndSoaFloat m_zero;
 	friend class ndWorld;
 } D_GCC_NEWTON_ALIGN_32;
 

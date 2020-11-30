@@ -29,6 +29,9 @@
 
 using namespace ndAvx2;
 
+ndSoaFloat ndDynamicsUpdate::m_one(dFloat32 (1.0f));
+ndSoaFloat ndDynamicsUpdate::m_zero(dFloat32(0.0f));
+
 inline dInt32 ndDynamicsUpdate::GetSortKeyAvx2(const ndConstraint* const joint)
 {
 	const ndBodyKinematic* const body0 = joint->GetBody0();
@@ -480,7 +483,7 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 
 			dArray<ndAvx2::ndSoaMatrixElement>& massMatrix = world->m_soaMassMatrix;
 
-			ndSoaFloat zero(dFloat32(0.0f));
+			
 			dAssert(jointCount % D_SOA_WORD_GROUP_SIZE == 0);
 			const dInt32 soaJointCount = jointCount / D_SOA_WORD_GROUP_SIZE;
 			const dInt32* const soaJointRows = &world->m_soaJointRows[0];
@@ -647,38 +650,38 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 					for (dInt32 j = 0; j < firstJoint->m_rowCount; j++)
 					{
 						ndAvx2::ndSoaMatrixElement& row = massMatrix[soaRowBase + j];
-						row.m_Jt.m_jacobianM0.m_linear.m_x = zero;
-						row.m_Jt.m_jacobianM0.m_linear.m_y = zero;
-						row.m_Jt.m_jacobianM0.m_linear.m_z = zero;
-						row.m_Jt.m_jacobianM0.m_angular.m_x = zero;
-						row.m_Jt.m_jacobianM0.m_angular.m_y = zero;
-						row.m_Jt.m_jacobianM0.m_angular.m_z = zero;
-						row.m_Jt.m_jacobianM1.m_linear.m_x = zero;
-						row.m_Jt.m_jacobianM1.m_linear.m_y = zero;
-						row.m_Jt.m_jacobianM1.m_linear.m_z = zero;
-						row.m_Jt.m_jacobianM1.m_angular.m_x = zero;
-						row.m_Jt.m_jacobianM1.m_angular.m_y = zero;
-						row.m_Jt.m_jacobianM1.m_angular.m_z = zero;
+						row.m_Jt.m_jacobianM0.m_linear.m_x = m_zero;
+						row.m_Jt.m_jacobianM0.m_linear.m_y = m_zero;
+						row.m_Jt.m_jacobianM0.m_linear.m_z = m_zero;
+						row.m_Jt.m_jacobianM0.m_angular.m_x = m_zero;
+						row.m_Jt.m_jacobianM0.m_angular.m_y = m_zero;
+						row.m_Jt.m_jacobianM0.m_angular.m_z = m_zero;
+						row.m_Jt.m_jacobianM1.m_linear.m_x = m_zero;
+						row.m_Jt.m_jacobianM1.m_linear.m_y = m_zero;
+						row.m_Jt.m_jacobianM1.m_linear.m_z = m_zero;
+						row.m_Jt.m_jacobianM1.m_angular.m_x = m_zero;
+						row.m_Jt.m_jacobianM1.m_angular.m_y = m_zero;
+						row.m_Jt.m_jacobianM1.m_angular.m_z = m_zero;
 
-						row.m_JMinv.m_jacobianM0.m_linear.m_x = zero;
-						row.m_JMinv.m_jacobianM0.m_linear.m_y = zero;
-						row.m_JMinv.m_jacobianM0.m_linear.m_z = zero;
-						row.m_JMinv.m_jacobianM0.m_angular.m_x = zero;
-						row.m_JMinv.m_jacobianM0.m_angular.m_y = zero;
-						row.m_JMinv.m_jacobianM0.m_angular.m_z = zero;
-						row.m_JMinv.m_jacobianM1.m_linear.m_x = zero;
-						row.m_JMinv.m_jacobianM1.m_linear.m_y = zero;
-						row.m_JMinv.m_jacobianM1.m_linear.m_z = zero;
-						row.m_JMinv.m_jacobianM1.m_angular.m_x = zero;
-						row.m_JMinv.m_jacobianM1.m_angular.m_y = zero;
-						row.m_JMinv.m_jacobianM1.m_angular.m_z = zero;
+						row.m_JMinv.m_jacobianM0.m_linear.m_x = m_zero;
+						row.m_JMinv.m_jacobianM0.m_linear.m_y = m_zero;
+						row.m_JMinv.m_jacobianM0.m_linear.m_z = m_zero;
+						row.m_JMinv.m_jacobianM0.m_angular.m_x = m_zero;
+						row.m_JMinv.m_jacobianM0.m_angular.m_y = m_zero;
+						row.m_JMinv.m_jacobianM0.m_angular.m_z = m_zero;
+						row.m_JMinv.m_jacobianM1.m_linear.m_x = m_zero;
+						row.m_JMinv.m_jacobianM1.m_linear.m_y = m_zero;
+						row.m_JMinv.m_jacobianM1.m_linear.m_z = m_zero;
+						row.m_JMinv.m_jacobianM1.m_angular.m_x = m_zero;
+						row.m_JMinv.m_jacobianM1.m_angular.m_y = m_zero;
+						row.m_JMinv.m_jacobianM1.m_angular.m_z = m_zero;
 
-						row.m_force = zero;
-						row.m_diagDamp = zero;
-						row.m_invJinvMJt = zero;
-						row.m_coordenateAccel = zero;
-						row.m_lowerBoundFrictionCoefficent = zero;
-						row.m_upperBoundFrictionCoefficent = zero;
+						row.m_force = m_zero;
+						row.m_diagDamp = m_zero;
+						row.m_invJinvMJt = m_zero;
+						row.m_coordenateAccel = m_zero;
+						row.m_lowerBoundFrictionCoefficent = m_zero;
+						row.m_upperBoundFrictionCoefficent = m_zero;
 						dInt32* const normalIndex = (dInt32*)&row.m_normalForceIndex[0];
 						for (dInt32 k = 0; k < D_SOA_WORD_GROUP_SIZE; k++)
 						{
@@ -862,154 +865,474 @@ void ndDynamicsUpdate::CalculateJointsAccelerationAvx2()
 			}
 		}
 	};
+
+
+	class ndUpdateAccelerationAvx2 : public ndScene::ndBaseJob
+	{
+		public:
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+
+			ndWorld* const world = m_owner->GetWorld();
+			const ndConstraintArray& jointArray = world->m_soaJointArray;
+			const dArray<ndRightHandSide>& rightHandSide = world->m_rightHandSide;
+
+			const dInt32 threadIndex = GetThredId();
+			const dInt32 threadCount = m_owner->GetThreadCount();
+			const dInt32 soaJointCount = jointArray.GetCount();
+
+			const dInt32* const soaJointRows = &world->m_soaJointRows[0];
+			ndSoaMatrixElement* const massMatrix = &world->m_soaMassMatrix[0];
+
+			const dInt32 soaJointCountBatches = soaJointCount / D_SOA_WORD_GROUP_SIZE;
+			for (dInt32 i = threadIndex; i < soaJointCountBatches; i += threadCount)
+			{
+				const ndConstraint* const * jointGroup = &jointArray[i * D_SOA_WORD_GROUP_SIZE];
+				const ndConstraint* const firstJoint = jointGroup[0];
+				const ndConstraint* const lastJoint = jointGroup[D_SOA_WORD_GROUP_SIZE - 1];
+				const dInt32 rowStartBase = soaJointRows[i];
+				if (lastJoint && (firstJoint->m_rowCount == lastJoint->m_rowCount))
+				{
+					dAssert(0);
+					//ndConstraint* const joint = jointArray[i + start];
+					//const dInt32 pairStart = joint->m_rowStart;
+					//joindDesc.m_rowsCount = joint->m_rowCount;
+					//joindDesc.m_leftHandSide = &leftHandSide[pairStart];
+					//joindDesc.m_rightHandSide = &rightHandSide[pairStart];
+					//joint->JointAccelerations(&joindDesc);
+				} 
+				else
+				{
+					for (dInt32 j = 0; j < D_SOA_WORD_GROUP_SIZE; j++)
+					{
+						const ndConstraint* const Joint = jointGroup[j];
+						if (Joint)
+						{
+							const dInt32 rowCount = Joint->m_rowCount;
+							for (dInt32 k = 0; k < rowCount; k++) 
+							{
+								ndSoaMatrixElement* const row = &massMatrix[rowStartBase + k];
+								row->m_coordenateAccel[j] = rightHandSide[rowStartBase + k].m_coordenateAccel;
+							}
+						}
+					}
+				}
+			}
+		}
+	};
 	
 	ndScene* const scene = m_world->GetScene();
 	scene->SubmitJobs<ndCalculateJointsAccelerationAvx2>();
 	m_firstPassCoef = dFloat32(1.0f);
+
+	scene->SubmitJobs<ndUpdateAccelerationAvx2>();
 }
 
-dFloat32 ndDynamicsUpdate::CalculateJointsForceAvx2(ndConstraint* const joint, ndJacobian* const internalForces)
+dFloat32 ndDynamicsUpdate::CalculateJointsForceAvx2(ndConstraint** const jointGroup, ndSoaMatrixElement* const massMatrix, ndJacobian* const internalForces)
 {
 	//D_TRACKTIME();
-	dVector accNorm(dVector::m_zero);
-	dFloat32 normalForce[D_CONSTRAINT_MAX_ROWS + 1];
+	//dVector accNorm(dVector::m_zero);
+	//dFloat32 normalForce[D_CONSTRAINT_MAX_ROWS + 1];
+	//
+	//ndBodyKinematic* const body0 = joint->GetBody0();
+	//ndBodyKinematic* const body1 = joint->GetBody1();
+	//dAssert(body0);
+	//dAssert(body1);
+	//
+	//const dInt32 m0 = body0->m_index;
+	//const dInt32 m1 = body1->m_index;
+	//const dInt32 rowStart = joint->m_rowStart;
+	//const dInt32 rowsCount = joint->m_rowCount;
+	//
 
-	ndBodyKinematic* const body0 = joint->GetBody0();
-	ndBodyKinematic* const body1 = joint->GetBody1();
-	dAssert(body0);
-	dAssert(body1);
+	ndSoaFloat weight0;
+	ndSoaFloat weight1;
+	ndSoaVector6 forceM0;
+	ndSoaVector6 forceM1;
+	ndSoaFloat preconditioner0;
+	ndSoaFloat preconditioner1;
+	ndSoaFloat normalForce[D_CONSTRAINT_MAX_ROWS + 1];
 
-	const dInt32 m0 = body0->m_index;
-	const dInt32 m1 = body1->m_index;
-	const dInt32 rowStart = joint->m_rowStart;
-	const dInt32 rowsCount = joint->m_rowCount;
-
-	dInt32 isSleeping = body0->m_resting & body1->m_resting;
-	if (!isSleeping)
+	if (jointGroup[D_SOA_WORD_GROUP_SIZE - 1])
 	{
-		dVector preconditioner0(joint->m_preconditioner0);
-		dVector preconditioner1(joint->m_preconditioner1);
-
-		dVector forceM0(m_internalForces[m0].m_linear * preconditioner0);
-		dVector torqueM0(m_internalForces[m0].m_angular * preconditioner0);
-		dVector forceM1(m_internalForces[m1].m_linear * preconditioner1);
-		dVector torqueM1(m_internalForces[m1].m_angular * preconditioner1);
-
-		preconditioner0 = preconditioner0.Scale(body0->m_weigh);
-		preconditioner1 = preconditioner1.Scale(body1->m_weigh);
-
-		normalForce[0] = dFloat32(1.0f);
-		for (dInt32 j = 0; j < rowsCount; j++)
+		for (dInt32 i = 0; i < D_SOA_WORD_GROUP_SIZE; i++)
 		{
-			ndRightHandSide* const rhs = &m_rightHandSide[rowStart + j];
-			const ndLeftHandSide* const lhs = &m_leftHandSide[rowStart + j];
-			dVector a(lhs->m_JMinv.m_jacobianM0.m_linear * forceM0);
-			a = a.MulAdd(lhs->m_JMinv.m_jacobianM0.m_angular, torqueM0);
-			a = a.MulAdd(lhs->m_JMinv.m_jacobianM1.m_linear, forceM1);
-			a = a.MulAdd(lhs->m_JMinv.m_jacobianM1.m_angular, torqueM1);
-			a = dVector(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
-			dVector f(rhs->m_force + rhs->m_invJinvMJt * a.GetScalar());
+			const ndConstraint* const joint = jointGroup[i];
+			const ndBodyKinematic* const body0 = joint->GetBody0();
+			const ndBodyKinematic* const body1 = joint->GetBody1();
 
-			dAssert(rhs->m_normalForceIndex >= -1);
-			dAssert(rhs->m_normalForceIndex <= rowsCount);
+			const dInt32 m0 = body0->m_index;
+			const dInt32 m1 = body1->m_index;
 
-			const dInt32 frictionIndex = rhs->m_normalForceIndex + 1;
-			const dFloat32 frictionNormal = normalForce[frictionIndex];
-			const dVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
-			const dVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
+			preconditioner0[i] = joint->m_preconditioner0;
+			preconditioner1[i] = joint->m_preconditioner1;
 
-			a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
-			f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-			accNorm = accNorm.MulAdd(a, a);
+			forceM0.m_linear.m_x[i] = m_internalForces[m0].m_linear.m_x;
+			forceM0.m_linear.m_y[i] = m_internalForces[m0].m_linear.m_y;
+			forceM0.m_linear.m_z[i] = m_internalForces[m0].m_linear.m_z;
+			forceM0.m_angular.m_x[i] = m_internalForces[m0].m_angular.m_x;
+			forceM0.m_angular.m_y[i] = m_internalForces[m0].m_angular.m_y;
+			forceM0.m_angular.m_z[i] = m_internalForces[m0].m_angular.m_z;
+			
+			forceM1.m_linear.m_x[i] = m_internalForces[m1].m_linear.m_x;
+			forceM1.m_linear.m_y[i] = m_internalForces[m1].m_linear.m_y;
+			forceM1.m_linear.m_z[i] = m_internalForces[m1].m_linear.m_z;
+			forceM1.m_angular.m_x[i] = m_internalForces[m1].m_angular.m_x;
+			forceM1.m_angular.m_y[i] = m_internalForces[m1].m_angular.m_y;
+			forceM1.m_angular.m_z[i] = m_internalForces[m1].m_angular.m_z;
 
-			dVector deltaForce(f - dVector(rhs->m_force));
-
-			rhs->m_force = f.GetScalar();
-			normalForce[j + 1] = f.GetScalar();
-
-			dVector deltaForce0(deltaForce * preconditioner0);
-			dVector deltaForce1(deltaForce * preconditioner1);
-
-			forceM0 = forceM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_linear, deltaForce0);
-			torqueM0 = torqueM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_angular, deltaForce0);
-			forceM1 = forceM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_linear, deltaForce1);
-			torqueM1 = torqueM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_angular, deltaForce1);
+			weight0[i] = body0->m_weigh;
+			weight1[i] = body1->m_weigh;
 		}
-
-		const dFloat32 tol = dFloat32(0.5f);
-		const dFloat32 tol2 = tol * tol;
-
-		dVector maxAccel(accNorm);
-		for (dInt32 k = 0; (k < 4) && (maxAccel.GetScalar() > tol2); k++)
+	}
+	else
+	{
+		for (dInt32 i = 0; i < D_SOA_WORD_GROUP_SIZE; i++)
 		{
-			maxAccel = dVector::m_zero;
-			for (dInt32 j = 0; j < rowsCount; j++)
+			const ndConstraint* const joint = jointGroup[i];
+			if (joint)
 			{
-				ndRightHandSide* const rhs = &m_rightHandSide[rowStart + j];
-				const ndLeftHandSide* const lhs = &m_leftHandSide[rowStart + j];
+				const ndBodyKinematic* const body0 = joint->GetBody0();
+				const ndBodyKinematic* const body1 = joint->GetBody1();
 
-				dVector a(lhs->m_JMinv.m_jacobianM0.m_linear * forceM0);
-				a = a.MulAdd(lhs->m_JMinv.m_jacobianM0.m_angular, torqueM0);
-				a = a.MulAdd(lhs->m_JMinv.m_jacobianM1.m_linear, forceM1);
-				a = a.MulAdd(lhs->m_JMinv.m_jacobianM1.m_angular, torqueM1);
-				//a = dVector(rhs->m_coordenateAccel + rhs->m_gyroAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
-				a = dVector(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
-				dVector f(rhs->m_force + rhs->m_invJinvMJt * a.GetScalar());
+				const dInt32 m0 = body0->m_index;
+				const dInt32 m1 = body1->m_index;
 
-				dAssert(rhs->m_normalForceIndex >= -1);
-				dAssert(rhs->m_normalForceIndex <= rowsCount);
+				preconditioner0[i] = joint->m_preconditioner0;
+				preconditioner1[i] = joint->m_preconditioner1;
 
-				const dInt32 frictionIndex = rhs->m_normalForceIndex + 1;
-				const dFloat32 frictionNormal = normalForce[frictionIndex];
-				const dVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
-				const dVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
+				forceM0.m_linear.m_x[i] = m_internalForces[m0].m_linear.m_x;
+				forceM0.m_linear.m_y[i] = m_internalForces[m0].m_linear.m_y;
+				forceM0.m_linear.m_z[i] = m_internalForces[m0].m_linear.m_z;
+				forceM0.m_angular.m_x[i] = m_internalForces[m0].m_angular.m_x;
+				forceM0.m_angular.m_y[i] = m_internalForces[m0].m_angular.m_y;
+				forceM0.m_angular.m_z[i] = m_internalForces[m0].m_angular.m_z;
 
-				a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
-				f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
-				maxAccel = maxAccel.MulAdd(a, a);
+				forceM1.m_linear.m_x[i] = m_internalForces[m1].m_linear.m_x;
+				forceM1.m_linear.m_y[i] = m_internalForces[m1].m_linear.m_y;
+				forceM1.m_linear.m_z[i] = m_internalForces[m1].m_linear.m_z;
+				forceM1.m_angular.m_x[i] = m_internalForces[m1].m_angular.m_x;
+				forceM1.m_angular.m_y[i] = m_internalForces[m1].m_angular.m_y;
+				forceM1.m_angular.m_z[i] = m_internalForces[m1].m_angular.m_z;
 
-				dVector deltaForce(f - rhs->m_force);
+				weight0[i] = body0->m_weigh;
+				weight1[i] = body1->m_weigh;
+			}
+			else 
+			{
+				preconditioner0[i] = dFloat32(0.0f);
+				preconditioner1[i] = dFloat32(0.0f);
 
-				rhs->m_force = f.GetScalar();
-				normalForce[j + 1] = f.GetScalar();
+				forceM0.m_linear.m_x[i] = dFloat32(0.0f);
+				forceM0.m_linear.m_y[i] = dFloat32(0.0f);
+				forceM0.m_linear.m_z[i] = dFloat32(0.0f);
+				forceM0.m_angular.m_x[i] = dFloat32(0.0f);
+				forceM0.m_angular.m_y[i] = dFloat32(0.0f);
+				forceM0.m_angular.m_z[i] = dFloat32(0.0f);
 
-				dVector deltaForce0(deltaForce * preconditioner0);
-				dVector deltaForce1(deltaForce * preconditioner1);
-				forceM0 = forceM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_linear, deltaForce0);
-				torqueM0 = torqueM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_angular, deltaForce0);
-				forceM1 = forceM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_linear, deltaForce1);
-				torqueM1 = torqueM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_angular, deltaForce1);
+				forceM1.m_linear.m_x[i] = dFloat32(0.0f);
+				forceM1.m_linear.m_y[i] = dFloat32(0.0f);
+				forceM1.m_linear.m_z[i] = dFloat32(0.0f);
+				forceM1.m_angular.m_x[i] = dFloat32(0.0f);
+				forceM1.m_angular.m_y[i] = dFloat32(0.0f);
+				forceM1.m_angular.m_z[i] = dFloat32(0.0f);
+
+				weight0[i] = dFloat32(0.0f);
+				weight1[i] = dFloat32(0.0f);
 			}
 		}
 	}
 
-	dVector forceM0(dVector::m_zero);
-	dVector torqueM0(dVector::m_zero);
-	dVector forceM1(dVector::m_zero);
-	dVector torqueM1(dVector::m_zero);
+	//dVector preconditioner0(joint->m_preconditioner0);
+	//dVector preconditioner1(joint->m_preconditioner1);
+	//dVector forceM0(m_internalForces[m0].m_linear * preconditioner0);
+	//dVector torqueM0(m_internalForces[m0].m_angular * preconditioner0);
+	//dVector forceM1(m_internalForces[m1].m_linear * preconditioner1);
+	//dVector torqueM1(m_internalForces[m1].m_angular * preconditioner1);
+	//preconditioner0 = preconditioner0.Scale(body0->m_weigh);
+	//preconditioner1 = preconditioner1.Scale(body1->m_weigh);
 
+	forceM0.m_linear.m_x = forceM0.m_linear.m_x * preconditioner0;
+	forceM0.m_linear.m_y = forceM0.m_linear.m_y * preconditioner0;
+	forceM0.m_linear.m_z = forceM0.m_linear.m_z * preconditioner0;
+	forceM0.m_angular.m_x = forceM0.m_angular.m_x * preconditioner0;
+	forceM0.m_angular.m_y = forceM0.m_angular.m_y * preconditioner0;
+	forceM0.m_angular.m_z = forceM0.m_angular.m_z * preconditioner0;
+
+	forceM1.m_linear.m_x = forceM1.m_linear.m_x * preconditioner1;
+	forceM1.m_linear.m_y = forceM1.m_linear.m_y * preconditioner1;
+	forceM1.m_linear.m_z = forceM1.m_linear.m_z * preconditioner1;
+	forceM1.m_angular.m_x = forceM1.m_angular.m_x * preconditioner1;
+	forceM1.m_angular.m_y = forceM1.m_angular.m_y * preconditioner1;
+	forceM1.m_angular.m_z = forceM1.m_angular.m_z * preconditioner1;
+
+	preconditioner0 = preconditioner0 * weight0;
+	preconditioner0 = preconditioner1 * weight1;
+	
+	//normalForce[0] = dFloat32(1.0f);
+	normalForce[0] = m_one;
+	ndSoaFloat accNorm(m_zero);
+	const dInt32 rowsCount = jointGroup[0]->m_rowCount;
 	for (dInt32 j = 0; j < rowsCount; j++)
 	{
-		const ndRightHandSide* const rhs = &m_rightHandSide[rowStart + j];
-		const ndLeftHandSide* const lhs = &m_leftHandSide[rowStart + j];
+		//ndRightHandSide* const rhs = &m_rightHandSide[rowStart + j];
+		//const ndLeftHandSide* const lhs = &m_leftHandSide[rowStart + j];
+		ndSoaMatrixElement* const row = &massMatrix[j];
 
-		dVector f(rhs->m_force);
-		forceM0 = forceM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_linear, f);
-		torqueM0 = torqueM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_angular, f);
-		forceM1 = forceM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_linear, f);
-		torqueM1 = torqueM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_angular, f);
+		//dVector a(lhs->m_JMinv.m_jacobianM0.m_linear * forceM0);
+		//a = a.MulAdd(lhs->m_JMinv.m_jacobianM0.m_angular, torqueM0);
+		//a = a.MulAdd(lhs->m_JMinv.m_jacobianM1.m_linear, forceM1);
+		//a = a.MulAdd(lhs->m_JMinv.m_jacobianM1.m_angular, torqueM1);
+		ndSoaFloat a0(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x);
+		ndSoaFloat a1(row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x);
+		a0 = a0.MulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_x, forceM0.m_angular.m_x);
+		a1 = a1.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_z, forceM1.m_angular.m_z);
+
+		a0 = a0.MulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_y, forceM0.m_linear.m_y);
+		a1 = a1.MulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_y, forceM1.m_linear.m_y);
+		a0 = a0.MulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_y, forceM0.m_angular.m_y);
+		a1 = a1.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_y, forceM1.m_angular.m_y);
+
+		a0 = a0.MulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_z, forceM0.m_linear.m_z);
+		a1 = a1.MulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_z, forceM1.m_linear.m_z);
+		a0 = a0.MulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_z, forceM0.m_angular.m_z);
+		a1 = a1.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_z, forceM1.m_angular.m_z);
+
+		a0 = a0 + a1;
+		//a = dVector(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
+		a0 = a0.MulAdd(row->m_force, row->m_diagDamp);
+		a0 = row->m_coordenateAccel - a0;
+		
+		//dVector f(rhs->m_force + rhs->m_invJinvMJt * a.GetScalar());
+		ndSoaFloat f(row->m_force.MulAdd(row->m_invJinvMJt, a0));
+	
+		//const dInt32 frictionIndex = rhs->m_normalForceIndex + 1;
+		//const dFloat32 frictionNormal = normalForce[frictionIndex];
+		const ndSoaFloat frictionNormal(normalForce, row->m_normalForceIndex);
+
+		//const dVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
+		//const dVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
+		const ndSoaFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
+		const ndSoaFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
+
+		//a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
+		a0 = a0 & (f < upperFrictionForce) & (f > lowerFrictionForce);
+
+		//f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
+		f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
+
+		//accNorm = accNorm.MulAdd(a, a);
+		accNorm = accNorm.MulAdd(a0, a0);
+	
+		//dVector deltaForce(f - dVector(rhs->m_force));
+		const ndSoaFloat deltaForce(f - row->m_force);
+	
+		//rhs->m_force = f.GetScalar();
+		row->m_force = f;
+
+		//normalForce[j + 1] = f.GetScalar();
+		normalForce[j + 1] = f;
+		
+		//dVector deltaForce0(deltaForce * preconditioner0);
+		//dVector deltaForce1(deltaForce * preconditioner1);
+		const ndSoaFloat deltaForce0(deltaForce * preconditioner0);
+		const ndSoaFloat deltaForce1(deltaForce * preconditioner1);
+		
+		//forceM0 = forceM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_linear, deltaForce0);
+		//torqueM0 = torqueM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_angular, deltaForce0);
+		//forceM1 = forceM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_linear, deltaForce1);
+		//torqueM1 = torqueM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_angular, deltaForce1);
+
+		forceM0.m_linear.m_x = forceM0.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_x, deltaForce0);
+		forceM0.m_linear.m_y = forceM0.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_y, deltaForce0);
+		forceM0.m_linear.m_z = forceM0.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_z, deltaForce0);
+		forceM0.m_angular.m_x = forceM0.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_x, deltaForce0);
+		forceM0.m_angular.m_y = forceM0.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_y, deltaForce0);
+		forceM0.m_angular.m_z = forceM0.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_z, deltaForce0);
+
+		forceM1.m_linear.m_x = forceM1.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_x, deltaForce1);
+		forceM1.m_linear.m_y = forceM1.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_y, deltaForce1);
+		forceM1.m_linear.m_z = forceM1.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_z, deltaForce1);
+		forceM1.m_angular.m_x = forceM1.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_x, deltaForce1);
+		forceM1.m_angular.m_y = forceM1.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_y, deltaForce1);
+		forceM1.m_angular.m_z = forceM1.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_z, deltaForce1);
+	}
+	
+	const dFloat32 tol = dFloat32(0.5f);
+	const dFloat32 tol2 = tol * tol;
+	
+	ndSoaFloat maxAccel(accNorm);
+	for (dInt32 k = 0; (k < 4) && (maxAccel.AddHorizontal() > tol2); k++)
+	{
+		maxAccel = m_zero;
+		for (dInt32 j = 0; j < rowsCount; j++)
+		{
+			//ndRightHandSide* const rhs = &m_rightHandSide[rowStart + j];
+			//const ndLeftHandSide* const lhs = &m_leftHandSide[rowStart + j];
+			ndSoaMatrixElement* const row = &massMatrix[j];
+		
+			//dVector a(lhs->m_JMinv.m_jacobianM0.m_linear * forceM0);
+			//a = a.MulAdd(lhs->m_JMinv.m_jacobianM0.m_angular, torqueM0);
+			//a = a.MulAdd(lhs->m_JMinv.m_jacobianM1.m_linear, forceM1);
+			//a = a.MulAdd(lhs->m_JMinv.m_jacobianM1.m_angular, torqueM1);
+			ndSoaFloat a0(row->m_JMinv.m_jacobianM0.m_linear.m_x * forceM0.m_linear.m_x);
+			ndSoaFloat a1(row->m_JMinv.m_jacobianM1.m_linear.m_x * forceM1.m_linear.m_x);
+			a0 = a0.MulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_x, forceM0.m_angular.m_x);
+			a1 = a1.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_z, forceM1.m_angular.m_z);
+
+			a0 = a0.MulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_y, forceM0.m_linear.m_y);
+			a1 = a1.MulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_y, forceM1.m_linear.m_y);
+			a0 = a0.MulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_y, forceM0.m_angular.m_y);
+			a1 = a1.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_y, forceM1.m_angular.m_y);
+
+			a0 = a0.MulAdd(row->m_JMinv.m_jacobianM0.m_linear.m_z, forceM0.m_linear.m_z);
+			a1 = a1.MulAdd(row->m_JMinv.m_jacobianM1.m_linear.m_z, forceM1.m_linear.m_z);
+			a0 = a0.MulAdd(row->m_JMinv.m_jacobianM0.m_angular.m_z, forceM0.m_angular.m_z);
+			a1 = a1.MulAdd(row->m_JMinv.m_jacobianM1.m_angular.m_z, forceM1.m_angular.m_z);
+
+			a0 = a0 + a1;
+			//a = dVector(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
+			a0 = a0.MulAdd(row->m_force, row->m_diagDamp);
+			a0 = row->m_coordenateAccel - a0;
+
+			//dVector f(rhs->m_force + rhs->m_invJinvMJt * a.GetScalar());
+			ndSoaFloat f(row->m_force.MulAdd(row->m_invJinvMJt, a0));
+
+			//const dInt32 frictionIndex = rhs->m_normalForceIndex + 1;
+			//const dFloat32 frictionNormal = normalForce[frictionIndex];
+			const ndSoaFloat frictionNormal(normalForce, row->m_normalForceIndex);
+
+			//const dVector lowerFrictionForce(frictionNormal * rhs->m_lowerBoundFrictionCoefficent);
+			//const dVector upperFrictionForce(frictionNormal * rhs->m_upperBoundFrictionCoefficent);
+			const ndSoaFloat lowerFrictionForce(frictionNormal * row->m_lowerBoundFrictionCoefficent);
+			const ndSoaFloat upperFrictionForce(frictionNormal * row->m_upperBoundFrictionCoefficent);
+
+			//a = a & (f < upperFrictionForce) & (f > lowerFrictionForce);
+			a0 = a0 & (f < upperFrictionForce) & (f > lowerFrictionForce);
+
+			//f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
+			f = f.GetMax(lowerFrictionForce).GetMin(upperFrictionForce);
+
+			//maxAccel = maxAccel.MulAdd(a, a);
+			maxAccel = maxAccel.MulAdd(a0, a0);
+			
+			//dVector deltaForce(f - rhs->m_force);
+			const ndSoaFloat deltaForce(f - row->m_force);
+			
+			//rhs->m_force = f.GetScalar();
+			row->m_force = f;
+
+			//normalForce[j + 1] = f.GetScalar();
+			normalForce[j + 1] = f;
+			
+			//dVector deltaForce0(deltaForce * preconditioner0);
+			//dVector deltaForce1(deltaForce * preconditioner1);
+			const ndSoaFloat deltaForce0(deltaForce * preconditioner0);
+			const ndSoaFloat deltaForce1(deltaForce * preconditioner1);
+
+			//forceM0 = forceM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_linear, deltaForce0);
+			//torqueM0 = torqueM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_angular, deltaForce0);
+			//forceM1 = forceM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_linear, deltaForce1);
+			//torqueM1 = torqueM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_angular, deltaForce1);
+			forceM0.m_linear.m_x = forceM0.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_x, deltaForce0);
+			forceM0.m_linear.m_y = forceM0.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_y, deltaForce0);
+			forceM0.m_linear.m_z = forceM0.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_z, deltaForce0);
+			forceM0.m_angular.m_x = forceM0.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_x, deltaForce0);
+			forceM0.m_angular.m_y = forceM0.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_y, deltaForce0);
+			forceM0.m_angular.m_z = forceM0.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_z, deltaForce0);
+
+			forceM1.m_linear.m_x = forceM1.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_x, deltaForce1);
+			forceM1.m_linear.m_y = forceM1.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_y, deltaForce1);
+			forceM1.m_linear.m_z = forceM1.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_z, deltaForce1);
+			forceM1.m_angular.m_x = forceM1.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_x, deltaForce1);
+			forceM1.m_angular.m_y = forceM1.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_y, deltaForce1);
+			forceM1.m_angular.m_z = forceM1.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_z, deltaForce1);
+		}
+	}
+	
+	//dVector forceM0(dVector::m_zero);
+	//dVector torqueM0(dVector::m_zero);
+	//dVector forceM1(dVector::m_zero);
+	//dVector torqueM1(dVector::m_zero);
+	forceM0.m_linear.m_x = m_zero;
+	forceM0.m_linear.m_y = m_zero;
+	forceM0.m_linear.m_z = m_zero;
+	forceM0.m_angular.m_x = m_zero;
+	forceM0.m_angular.m_y = m_zero;
+	forceM0.m_angular.m_z = m_zero;
+
+	forceM1.m_linear.m_x = m_zero;
+	forceM1.m_linear.m_y = m_zero;
+	forceM1.m_linear.m_z = m_zero;
+	forceM1.m_angular.m_x = m_zero;
+	forceM1.m_angular.m_y = m_zero;
+	forceM1.m_angular.m_z = m_zero;
+
+	
+	for (dInt32 j = 0; j < rowsCount; j++)
+	{
+	//	const ndRightHandSide* const rhs = &m_rightHandSide[rowStart + j];
+	//	const ndLeftHandSide* const lhs = &m_leftHandSide[rowStart + j];
+		const ndSoaMatrixElement* const row = &massMatrix[j];
+	
+	//	dVector f(rhs->m_force);
+		const ndSoaFloat f(row->m_force);
+	//	forceM0 = forceM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_linear, f);
+	//	torqueM0 = torqueM0.MulAdd(lhs->m_Jt.m_jacobianM0.m_angular, f);
+	//	forceM1 = forceM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_linear, f);
+	//	torqueM1 = torqueM1.MulAdd(lhs->m_Jt.m_jacobianM1.m_angular, f);
+
+		forceM0.m_linear.m_x = forceM0.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_x, f);
+		forceM0.m_linear.m_y = forceM0.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_y, f);
+		forceM0.m_linear.m_z = forceM0.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_linear.m_z, f);
+		forceM0.m_angular.m_x = forceM0.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_x, f);
+		forceM0.m_angular.m_y = forceM0.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_y, f);
+		forceM0.m_angular.m_z = forceM0.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM0.m_angular.m_z, f);
+
+		forceM1.m_linear.m_x = forceM1.m_linear.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_x, f);
+		forceM1.m_linear.m_y = forceM1.m_linear.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_y, f);
+		forceM1.m_linear.m_z = forceM1.m_linear.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_linear.m_z, f);
+		forceM1.m_angular.m_x = forceM1.m_angular.m_x.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_x, f);
+		forceM1.m_angular.m_y = forceM1.m_angular.m_y.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_y, f);
+		forceM1.m_angular.m_z = forceM1.m_angular.m_z.MulAdd(row->m_Jt.m_jacobianM1.m_angular.m_z, f);
+	}
+	
+	for (dInt32 j = 0; j < D_SOA_WORD_GROUP_SIZE; j++)
+	{
+		const ndConstraint* const joint = jointGroup[j];
+		if (joint)
+		{
+			const ndBodyKinematic* const body0 = joint->GetBody0();
+			const ndBodyKinematic* const body1 = joint->GetBody1();
+
+			const dInt32 m0 = body0->m_index;
+			const dInt32 m1 = body1->m_index;
+
+			ndJacobian m_body0Force;
+			ndJacobian m_body1Force;
+
+			m_body0Force.m_linear = dVector(forceM0.m_linear.m_x[j], forceM0.m_linear.m_y[j], forceM0.m_linear.m_z[j], dFloat32(0.0f));
+			m_body0Force.m_angular = dVector(forceM0.m_angular.m_x[j], forceM0.m_angular.m_y[j], forceM0.m_angular.m_z[j], dFloat32(0.0f));
+
+			m_body1Force.m_linear = dVector(forceM1.m_linear.m_x[j], forceM1.m_linear.m_y[j], forceM1.m_linear.m_z[j], dFloat32(0.0f));
+			m_body1Force.m_angular = dVector(forceM1.m_angular.m_x[j], forceM1.m_angular.m_y[j], forceM1.m_angular.m_z[j], dFloat32(0.0f));
+
+			ndJacobian& outBody0 = internalForces[m0];
+			//outBody0.m_linear += forceM0;
+			//outBody0.m_angular += torqueM0;
+			outBody0.m_linear += m_body0Force.m_linear;
+			outBody0.m_angular += m_body0Force.m_angular;
+
+			ndJacobian& outBody1 = internalForces[m1];
+			//outBody1.m_linear += forceM1;
+			//outBody1.m_angular += torqueM1;
+			outBody1.m_linear += m_body1Force.m_linear;
+			outBody1.m_angular += m_body1Force.m_angular;
+		}
 	}
 
-
-	ndJacobian& outBody0 = internalForces[m0];
-	outBody0.m_linear += forceM0;
-	outBody0.m_angular += torqueM0;
-
-	ndJacobian& outBody1 = internalForces[m1];
-	outBody1.m_linear += forceM1;
-	outBody1.m_angular += torqueM1;
-
-	return accNorm.GetScalar();
+	return accNorm.AddHorizontal();
 }
 
 void ndDynamicsUpdate::CalculateJointsForceAvx2()
@@ -1018,7 +1341,7 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 	class ndCalculateJointsForceAvx2 : public ndScene::ndBaseJob
 	{
 		public:
-		virtual void Execute()
+		virtual void Execute____()
 		{
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
@@ -1033,7 +1356,7 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 				for (dInt32 i = 0; i < jointCount; i++)
 				{
 					ndConstraint* const joint = jointArray[i];
-					accNorm += world->CalculateJointsForceAvx2(joint, internalForces);
+					accNorm += world->CalculateJointsForce(joint, internalForces);
 				}
 				dFloat32* const accelNorm = (dFloat32*)m_context;
 				accelNorm[0] = accNorm;
@@ -1046,10 +1369,62 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 				for (dInt32 i = threadIndex; i < jointCount; i += threadCount)
 				{
 					ndConstraint* const joint = jointArray[i];
-					accNorm += world->CalculateJointsForceAvx2(joint, internalForces);
+					accNorm += world->CalculateJointsForce(joint, internalForces);
 				}
 				dFloat32* const accelNorm = (dFloat32*)m_context;
 				accelNorm[threadIndex] = accNorm;
+			}
+		}
+
+		virtual void Execute()
+		{
+			D_TRACKTIME();
+			ndWorld* const world = m_owner->GetWorld();
+			//ndConstraintArray& jointArray = world->m_jointArray;
+			ndConstraintArray& jointArray = world->m_soaJointArray;
+			ndSoaMatrixElement* const soaMassMatrix = &world->m_soaMassMatrix[0];
+			const dInt32* const soaJointRows = &world->m_soaJointRows[0];
+			dFloat32 accNorm = dFloat32(0.0f);
+			const dInt32 jointCount = jointArray.GetCount() / D_SOA_WORD_GROUP_SIZE;
+			const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
+			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
+
+			if (threadCount == 1)
+			{
+				ndJacobian* const internalForces = &world->m_internalForces[bodyCount];
+				for (dInt32 j = 0; j < jointCount; j++)
+				{
+					ndConstraint** const jointGroup = &jointArray[j * D_SOA_WORD_GROUP_SIZE];
+
+					bool isSleeping = true;
+					for (dInt32 i = 0; (i < D_SOA_WORD_GROUP_SIZE) && isSleeping; i++)
+					{
+						const ndConstraint* const joint = jointGroup[i];
+						if (joint)
+						{
+							ndBodyKinematic* const body0 = joint->GetBody0();
+							ndBodyKinematic* const body1 = joint->GetBody1();
+							dAssert(body0);
+							dAssert(body1);
+
+							const dInt32 m0 = body0->m_index;
+							const dInt32 m1 = body1->m_index;
+
+							isSleeping &= body0->m_resting;
+							isSleeping &= body1->m_resting;
+						}
+					}
+					if (!isSleeping)
+					{
+						accNorm += world->CalculateJointsForceAvx2(jointGroup, &soaMassMatrix[soaJointRows[j]], internalForces);
+					}
+				}
+				dFloat32* const accelNorm = (dFloat32*)m_context;
+				accelNorm[0] = accNorm;
+			}
+			else
+			{
+				dAssert(0);
 			}
 		}
 	};
