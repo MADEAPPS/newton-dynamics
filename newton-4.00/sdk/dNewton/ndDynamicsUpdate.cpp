@@ -782,7 +782,7 @@ dFloat32 ndDynamicsUpdate::CalculateJointsForce(ndConstraint* const joint, ndJac
 		
 		preconditioner0 = preconditioner0.Scale(body0->m_weigh);
 		preconditioner1 = preconditioner1.Scale(body1->m_weigh);
-		
+
 		normalForce[0] = dFloat32(1.0f);
 		for (dInt32 j = 0; j < rowsCount; j++) 
 		{

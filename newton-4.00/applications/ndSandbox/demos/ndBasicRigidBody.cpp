@@ -59,15 +59,18 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
 	scene->AddEntity(rootEntity);
 
-	const int n = 2;
-	const int stackHigh = 7;
-	//const int n = 10;
+	//const int n = 2;
 	//const int stackHigh = 7;
+	//const int n = 1;
+	//const int stackHigh = 1;
+
+	const int n = 10;
+	const int stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)
 	{
 		for (dInt32 j = 0; j < n; j++)
 		{
-			dVector location((j - n / 2) * 8.0f, 0.0f, (i - n / 2) * 8.0f, 0.0f);
+			dVector location((j - n / 2) * 4.0f, 0.0f, (i - n / 2) * 4.0f, 0.0f);
 			AddShape(scene, rootEntity, shape, 10.0f, location + origin, diameter, stackHigh);
 		}
 	}

@@ -123,6 +123,7 @@ class ndDynamicsUpdate
 	void UpdateSkeletonsAvx2();
 	void CalculateForcesAvx2();
 	void InitJacobianMatrixAvx2();
+	void UpdateForceFeedbackAvx2();
 	void CalculateJointsForceAvx2();
 	void IntegrateBodiesVelocityAvx2();
 	void CalculateJointsAccelerationAvx2();

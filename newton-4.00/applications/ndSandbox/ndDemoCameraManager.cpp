@@ -241,6 +241,8 @@ void ndDemoCameraManager::UpdatePickBody(ndDemoEntityManager* const scene, bool 
 			ndBodyKinematic* const body = MousePickBody (scene->GetWorld(), p0, p1, param, posit, normal);
 			if (body) 
 			{
+				dTrace(("picked body id: %d\n", body->GetId()));
+
 				m_targetPicked = body;
 				dMatrix matrix (m_targetPicked->GetMatrix());
 				
