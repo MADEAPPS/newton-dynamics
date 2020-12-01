@@ -340,8 +340,7 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 		public:
 		virtual void Execute()
 		{
-			D_TRACKTIME();
-
+			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndConstraint** const jointArray = &world->m_jointArray[0];
 			const dInt32 jointCount = world->m_jointArray.GetCount();
@@ -382,7 +381,7 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 		public:
 		virtual void Execute()
 		{
-			D_TRACKTIME();
+			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			const dInt32 threadIndex = GetThredId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
@@ -413,8 +412,7 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 		public:
 		virtual void Execute()
 		{
-			D_TRACKTIME();
-
+			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndConstraint** const jointArray = &world->m_soaJointArray[0];
 			const dInt32 jointCount = world->m_soaJointArray.GetCount();
@@ -470,8 +468,7 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 		public:
 		virtual void Execute()
 		{
-			D_TRACKTIME();
-
+			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndConstraint** const jointArray = &world->m_soaJointArray[0];
 			const dInt32 jointCount = world->m_soaJointArray.GetCount();
@@ -835,8 +832,7 @@ void ndDynamicsUpdate::CalculateJointsAccelerationAvx2()
 		public:
 		virtual void Execute()
 		{
-			D_TRACKTIME();
-	
+			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			const ndConstraintArray& jointArray = world->m_jointArray;
 	
@@ -872,8 +868,7 @@ void ndDynamicsUpdate::CalculateJointsAccelerationAvx2()
 		public:
 		virtual void Execute()
 		{
-			D_TRACKTIME();
-
+			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			const ndConstraintArray& jointArray = world->m_soaJointArray;
 			const dArray<ndRightHandSide>& rightHandSide = world->m_rightHandSide;
@@ -1252,7 +1247,7 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 		public:
 		virtual void Execute()
 		{
-			D_TRACKTIME();
+			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndConstraintArray& jointArray = world->m_soaJointArray;
 			ndSoaMatrixElement* const soaMassMatrix = &world->m_soaMassMatrix[0];
@@ -1307,7 +1302,7 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 		public:
 		virtual void Execute()
 		{
-			D_TRACKTIME();
+			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			const dInt32 threadIndex = GetThredId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
@@ -1348,21 +1343,9 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 #endif
 		if (threadsCount == 1)
 		{
-			//static int xxxx;
-			//dTrace(("%d:", xxxx));
-			//if (xxxx >= 112)
-			//	xxxx *= 1;
-			//xxxx++;
-
 			memset(&m_internalForces[bodyCount], 0, bodyCount * sizeof(ndJacobian));
 			scene->SubmitJobs<ndCalculateJointsForceAvx2>(m_accelNorm);
 			memcpy(&m_internalForces[0], &m_internalForces[bodyCount], bodyCount * sizeof(ndJacobian));
-
-			//for (int i = 0; i < bodyCount; i++)
-			//{
-			//	dTrace(("(%f %f %f)  ", m_internalForces[i].m_linear.m_x, m_internalForces[i].m_linear.m_y, m_internalForces[i].m_linear.m_z));
-			//}
-			//dTrace(("\n"));
 		}
 		else
 		{
@@ -1403,7 +1386,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocityAvx2()
 		public:
 		virtual void Execute()
 		{
-			D_TRACKTIME();
+			//D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			dArray<ndBodyKinematic*>& bodyArray = world->m_bodyIslandOrder;
 
@@ -1465,7 +1448,7 @@ void ndDynamicsUpdate::InitSkeletonsAvx2()
 		public:
 		virtual void Execute()
 		{
-			D_TRACKTIME();
+			//D_TRACKTIME();
 			const dInt32 threadIndex = GetThredId();
 			ndWorld* const world = m_owner->GetWorld();
 			ndSkeletonList::dListNode* node = world->GetSkeletonList().GetFirst();
@@ -1503,7 +1486,7 @@ void ndDynamicsUpdate::UpdateSkeletonsAvx2()
 		public:
 		virtual void Execute()
 		{
-			D_TRACKTIME();
+			//D_TRACKTIME();
 			const dInt32 threadIndex = GetThredId();
 			ndWorld* const world = m_owner->GetWorld();
 			ndSkeletonList::dListNode* node = world->GetSkeletonList().GetFirst();
