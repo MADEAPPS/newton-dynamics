@@ -949,7 +949,7 @@ void ndDemoEntityManager::RenderStats()
 			sprintf(text, "Substeps:       %d", m_world->GetSubSteps());
 			ImGui::Text(text, "");
 
-			sprintf(text, "%s", m_solverMode ? "avx2 solver" : "default solver");
+			sprintf(text, "%s", m_solverMode ? "solver:         avx2" : "solver:         default");
 			ImGui::Text(text, "");
 
 			m_suspendPhysicsUpdate = m_suspendPhysicsUpdate || (ImGui::IsMouseHoveringWindow() && ImGui::IsMouseDown(0));  
