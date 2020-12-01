@@ -58,8 +58,8 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
 	scene->AddEntity(rootEntity);
 
-	//const int n = 3;
-	//const int stackHigh = 3;
+	//const int n = 1;
+	//const int stackHigh = 8;
 	const int n = 10;
 	const int stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)

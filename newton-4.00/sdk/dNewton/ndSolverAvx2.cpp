@@ -894,13 +894,17 @@ void ndDynamicsUpdate::CalculateJointsAccelerationAvx2()
 				const dInt32 soaRowStartBase = soaJointRows[i];
 				if (lastJoint && (firstJoint->m_rowCount == lastJoint->m_rowCount))
 				{
-					dAssert(0);
-					//ndConstraint* const joint = jointArray[i + start];
-					//const dInt32 pairStart = joint->m_rowStart;
-					//joindDesc.m_rowsCount = joint->m_rowCount;
-					//joindDesc.m_leftHandSide = &leftHandSide[pairStart];
-					//joindDesc.m_rightHandSide = &rightHandSide[pairStart];
-					//joint->JointAccelerations(&joindDesc);
+					const dInt32 rowCount = firstJoint->m_rowCount;
+					for (dInt32 j = 0; j < D_SOA_WORD_GROUP_SIZE; j++)
+					{
+						const ndConstraint* const Joint = jointGroup[j];
+						const dInt32 startBase = Joint->m_rowStart;
+						for (dInt32 k = 0; k < rowCount; k++)
+						{
+							ndSoaMatrixElement* const row = &massMatrix[soaRowStartBase + k];
+							row->m_coordenateAccel[j] = rightHandSide[startBase + k].m_coordenateAccel;
+						}
+					}
 				} 
 				else
 				{
