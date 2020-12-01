@@ -1250,6 +1250,49 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 	class ndCalculateJointsForceAvx2 : public ndScene::ndBaseJob
 	{
 		public:
+		bool IsSleepingGroup(ndConstraint** const jointGroup) const
+		{
+			bool isSleeping = true;
+			if (jointGroup[D_SOA_WORD_GROUP_SIZE - 1])
+			{
+				for (dInt32 i = 0; (i < D_SOA_WORD_GROUP_SIZE) && isSleeping; i++)
+				{
+					const ndConstraint* const joint = jointGroup[i];
+					ndBodyKinematic* const body0 = joint->GetBody0();
+					ndBodyKinematic* const body1 = joint->GetBody1();
+					dAssert(body0);
+					dAssert(body1);
+
+					const dInt32 m0 = body0->m_index;
+					const dInt32 m1 = body1->m_index;
+
+					isSleeping &= body0->m_resting;
+					isSleeping &= body1->m_resting;
+				}
+			}
+			else
+			{
+				for (dInt32 i = 0; (i < D_SOA_WORD_GROUP_SIZE) && isSleeping; i++)
+				{
+					const ndConstraint* const joint = jointGroup[i];
+					if (joint)
+					{
+						ndBodyKinematic* const body0 = joint->GetBody0();
+						ndBodyKinematic* const body1 = joint->GetBody1();
+						dAssert(body0);
+						dAssert(body1);
+
+						const dInt32 m0 = body0->m_index;
+						const dInt32 m1 = body1->m_index;
+
+						isSleeping &= body0->m_resting;
+						isSleeping &= body1->m_resting;
+					}
+				}
+			}
+			return isSleeping;
+		}
+
 		virtual void Execute()
 		{
 			//D_TRACKTIME();
@@ -1268,26 +1311,7 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 				for (dInt32 j = 0; j < jointCount; j++)
 				{
 					ndConstraint** const jointGroup = &jointArray[j * D_SOA_WORD_GROUP_SIZE];
-
-					bool isSleeping = true;
-					for (dInt32 i = 0; (i < D_SOA_WORD_GROUP_SIZE) && isSleeping; i++)
-					{
-						const ndConstraint* const joint = jointGroup[i];
-						if (joint)
-						{
-							ndBodyKinematic* const body0 = joint->GetBody0();
-							ndBodyKinematic* const body1 = joint->GetBody1();
-							dAssert(body0);
-							dAssert(body1);
-
-							const dInt32 m0 = body0->m_index;
-							const dInt32 m1 = body1->m_index;
-
-							isSleeping &= body0->m_resting;
-							isSleeping &= body1->m_resting;
-						}
-					}
-					if (!isSleeping)
+					if (!IsSleepingGroup(jointGroup))
 					{
 						accNorm += world->CalculateJointsForceAvx2(jointGroup, &soaMassMatrix[soaJointRows[j]], internalForces);
 					}
@@ -1297,7 +1321,19 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 			}
 			else
 			{
-				dAssert(0);
+				const dInt32 threadIndex = GetThredId();
+				ndJacobian* const internalForces = &world->m_internalForces[bodyCount * (threadIndex + 1)];
+				memset(internalForces, 0, bodyCount * sizeof(ndJacobian));
+				for (dInt32 j = threadIndex; j < jointCount; j += threadCount)
+				{
+					ndConstraint** const jointGroup = &jointArray[j * D_SOA_WORD_GROUP_SIZE];
+					if (!IsSleepingGroup(jointGroup))
+					{
+						accNorm += world->CalculateJointsForceAvx2(jointGroup, &soaMassMatrix[soaJointRows[j]], internalForces);
+					}
+				}
+				dFloat32* const accelNorm = (dFloat32*)m_context;
+				accelNorm[threadIndex] = accNorm;
 			}
 		}
 	};
