@@ -216,7 +216,7 @@ DemoEntityManager::DemoEntityManager ()
 	,m_broadPhaseType(0)
 	,m_workerThreads(1)
 	,m_solverPasses(4)
-	,m_solverSubSteps(2)
+	,m_solverSubSteps(MAX_PHYSICS_SUB_STEPS)
 	,m_debugDisplayMode(0)
 	,m_collisionDisplayMode(0)
 	,m_showUI(true)
@@ -570,11 +570,8 @@ void DemoEntityManager::Cleanup ()
 
 	ApplyMenuOptions();
 
-	// Set the Newton world user data
-	NewtonWorldSetUserData(m_world, this);
-
 	// set the number of sub steps
-	NewtonSetNumberOfSubsteps (m_world, MAX_PHYSICS_SUB_STEPS);
+	NewtonSetNumberOfSubsteps (m_world, m_solverSubSteps);
 
 	// register contact creation destruction callbacks
 	NewtonWorldSetCreateDestroyContactCallback(m_world, OnCreateContact, OnDestroyContact);
