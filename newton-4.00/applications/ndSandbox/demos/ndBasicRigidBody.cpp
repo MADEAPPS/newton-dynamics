@@ -22,7 +22,7 @@
 
 static void AddShape(ndDemoEntityManager* const scene,
 	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
-	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count, dFloat32 xxxx)
+	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count)
 {
 	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
 	matrix.m_posit = origin;
@@ -31,7 +31,8 @@ static void AddShape(ndDemoEntityManager* const scene,
 	ndPhysicsWorld* const world = scene->GetWorld();
 
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f * 0.99f + 7.0f;
+	//matrix.m_posit.m_y = floor.m_y + diameter * 0.5f + 7.0f;
+	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f + 7.0f;
 
 	for (dInt32 i = 0; i < count; i++)
 	{
@@ -45,7 +46,7 @@ static void AddShape(ndDemoEntityManager* const scene,
 		body->SetGyroMode(true);
 
 		world->AddBody(body);
-		matrix.m_posit.m_y += diameter * 3.0f;
+		matrix.m_posit.m_y += diameter * 2.5f;
 	}
 }
 
@@ -67,7 +68,7 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 		for (dInt32 j = 0; j < n; j++)
 		{
 			dVector location((j - n / 2) * 8.0f, 0.0f, (i - n / 2) * 8.0f, 0.0f);
-			AddShape(scene, rootEntity, shape, 10.0f, location + origin, 1.0f, stackHigh, 2.0f);
+			AddShape(scene, rootEntity, shape, 10.0f, location + origin, diameter, stackHigh);
 		}
 	}
 
