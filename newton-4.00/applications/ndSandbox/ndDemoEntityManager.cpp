@@ -240,16 +240,6 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	Cleanup();
 	ResetTimer();
 
-	//m_currentPlugin = 0;
-	//void* preferedPlugin = NewtonGetPreferedPlugin(m_world);
-	//for (void* ptr = NewtonGetFirstPlugin(m_world); ptr; ptr = NewtonGetNextPlugin(m_world, ptr)) {
-	//	m_currentPlugin ++;
-	//	if (ptr == preferedPlugin) {
-	//		break;
-	//	}
-	//}
-	////m_currentPlugin = 0;
-
 	m_shaderCache.CreateAllEffects();
 
 /*
@@ -279,11 +269,13 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	int xxx = 0;
 	const int xxxxxx = 450;
 	dDownHeap<int, unsigned> xxxxx (xxxxxx + 2);
-	for (dInt32 i = 0; i < xxxxxx; i ++){
+	for (dInt32 i = 0; i < xxxxxx; i ++)
+	{
 		xxxxx.Push (xxx, i);
 	}
 
-	for (dInt32 i = 0; i < 10000; i ++){
+	for (dInt32 i = 0; i < 10000; i ++)
+	{
 		int index = dRand() % xxxxxx;
 		int key = xxxxx.Value(index);
 		xxxxx.Remove (index);
