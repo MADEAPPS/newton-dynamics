@@ -33,9 +33,11 @@
 #include <ndShape.h>
 #include <ndWorld.h>
 #include <ndScene.h>
+#include <ndModel.h>
 #include <ndContact.h>
 #include <ndShapeBox.h>
 #include <ndShapeNull.h>
+#include <ndModelList.h>
 #include <ndSceneNode.h>
 #include <ndConstraint.h>
 #include <ndBodyNotify.h>

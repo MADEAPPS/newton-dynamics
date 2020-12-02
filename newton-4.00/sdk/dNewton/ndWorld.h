@@ -24,11 +24,13 @@
 
 #include "ndNewtonStdafx.h"
 #include "ndJointList.h"
+#include "ndModelList.h"
 #include "ndSkeletonList.h"
 #include "ndDynamicsUpdate.h"
 #include "ndBodyParticleSetList.h"
 
 class ndWorld;
+class ndModel;
 class ndBodyDynamic;
 class ndJointBilateralConstraint;
 
@@ -69,6 +71,9 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	D_NEWTON_API void AddJoint(ndJointBilateralConstraint* const joint);
 	D_NEWTON_API void RemoveJoint(ndJointBilateralConstraint* const joint);
 
+	D_NEWTON_API void AddModel(ndModel* const model);
+	D_NEWTON_API void RemoveModel(ndModel* const model);
+
 	D_NEWTON_API void DeleteBody(ndBody* const body);
 
 	D_NEWTON_API void Load(const char* const path);
@@ -80,6 +85,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 
 	const ndBodyList& GetBodyList() const;
 	const ndJointList& GetJointList() const;
+	const ndModelList& GetModelList() const;
 	const ndContactList& GetContactList() const;
 	const ndSkeletonList& GetSkeletonList() const;
 	const ndBodyParticleSetList& GetParticleList() const;
@@ -116,6 +122,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	D_NEWTON_API virtual void UpdateListenersPostTransform();
 
 	private:
+	void ModelUpdate();
 	void ParticleUpdate();
 	void CalculateAverageUpdateTime();
 	void SubStepUpdate(dFloat32 timestep);
@@ -126,6 +133,7 @@ class ndWorld: public dClassAlloc, public ndDynamicsUpdate
 	ndScene* m_scene;
 	ndBodyDynamic* m_sentinelBody;
 	ndJointList m_jointList;
+	ndModelList m_modelList;
 	ndSkeletonList m_skeletonList;
 	ndBodyParticleSetList m_particleSetList;
 
@@ -232,6 +240,11 @@ inline const ndSkeletonList& ndWorld::GetSkeletonList() const
 inline const ndBodyParticleSetList& ndWorld::GetParticleList() const
 {
 	return m_particleSetList;
+}
+
+inline const ndModelList& ndWorld::GetModelList() const
+{
+	return m_modelList;
 }
 
 inline dFloat32 ndWorld::GetUpdateTime() const

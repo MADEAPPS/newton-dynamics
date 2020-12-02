@@ -33,10 +33,11 @@ else()
 	include_directories(dNewton/)
 	include_directories(dTinyxml/)
 	include_directories(dCollision/)
+	include_directories(dNewton/dModels/)
 	include_directories(dNewton/dJoints/)
 	
 	# source and header files
-	file(GLOB HEADERS dTinyxml/*.h dCore/*.h dNewton/*.h dCollision/*.h dNewton/dJoints/*.h)
+	file(GLOB HEADERS dTinyxml/*.h dCore/*.h dNewton/*.h dCollision/*.h dNewton/dJoints/*.h dNewton/dModels/*.h)
 	file(GLOB CPP_SOURCE 
 		dTinyxml/*.h
 		dTinyxml/*.cpp
@@ -46,6 +47,8 @@ else()
 		dNewton/*.cpp
 		dCollision/*.h 
 		dCollision/*.cpp
+		dNewton/dModels/*.h 
+		dNewton/dModels/*.cpp
 		dNewton/dJoints/*.h 
 		dNewton/dJoints/*.cpp)
 

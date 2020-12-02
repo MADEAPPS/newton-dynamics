@@ -22,6 +22,7 @@
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
+#include "ndModel.h"
 #include "ndWorldScene.h"
 #include "ndBodyDynamic.h"
 #include "ndSkeletonList.h"
@@ -34,6 +35,7 @@ ndWorld::ndWorld()
 	,m_scene(nullptr)
 	,m_sentinelBody(nullptr)
 	,m_jointList()
+	,m_modelList()
 	,m_skeletonList()
 	,m_particleSetList()
 	,m_timestep(dFloat32 (0.0f))
@@ -124,6 +126,7 @@ void ndWorld::ClearCache()
 {
 	ndContact::FlushFreeList();
 	ndBodyList::FlushFreeList();
+	ndModelList::FlushFreeList();
 	ndJointList::FlushFreeList();
 	ndContactList::FlushFreeList();
 	ndSkeletonList::FlushFreeList();
@@ -273,6 +276,23 @@ void ndWorld::RemoveJoint(ndJointBilateralConstraint* const joint)
 	joint->m_worldNode = nullptr;
 	joint->m_body0Node = nullptr;
 	joint->m_body1Node = nullptr;
+}
+
+void ndWorld::AddModel(ndModel* const model)
+{
+	if (!model->m_node)
+	{
+		model->m_node = m_modelList.Append(model);
+	}
+}
+
+void ndWorld::RemoveModel(ndModel* const model)
+{
+	if (model->m_node)
+	{
+		m_modelList.Remove(model->m_node);
+		model->m_node = nullptr;
+	}
 }
 
 dInt32 ndWorld::CompareJointByInvMass(const ndJointBilateralConstraint* const jointA, const ndJointBilateralConstraint* const jointB, void* notUsed)
@@ -832,5 +852,15 @@ void ndWorld::ParticleUpdate()
 	{
 		ndBodyParticleSet* const body = node->GetInfo();
 		body->Update(this, m_timestep);
+	}
+}
+
+void ndWorld::ModelUpdate()
+{
+	D_TRACKTIME();
+	for (ndModelList::dListNode* node = m_modelList.GetFirst(); node; node = node->GetNext())
+	{
+		ndModel* const model = node->GetInfo();
+		model->Update(this, m_timestep);
 	}
 }

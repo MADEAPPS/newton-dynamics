@@ -19,10 +19,14 @@ endif()
 
 #source and header files
 file(GLOB CPP_SOURCE 
-	*.h *.cpp 
+	*.h 
+	*.cpp 
+	dModels/*.h	
+	dJoints/*.cpp
 	dJoints/*.h
 	dJoints/*.cpp)
 file(GLOB HEADERS *.h dJoints/*.h)
+file(GLOB HEADERS *.h dModels/*.h)
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 

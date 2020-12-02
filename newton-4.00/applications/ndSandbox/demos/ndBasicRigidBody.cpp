@@ -64,7 +64,7 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 	//const int n = 1;
 	//const int stackHigh = 1;
 
-	const int n = 10;
+	const int n = 20;
 	const int stackHigh = 7;
 	for (dInt32 i = 0; i < n; i++)
 	{
