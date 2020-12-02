@@ -81,21 +81,26 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 }
 */
 
+
+static void BuildVehicle(ndDemoEntityManager* const scene)
+{
+	fbxDemoEntity* const entity = LoadFbxMesh("viper.fbx");
+	entity->BuildRenderMeshes(scene);
+	scene->AddEntity(entity);
+}
+
 void ndBasicVehicle (ndDemoEntityManager* const scene)
 {
 	// build a floor
 	BuildFloorBox(scene);
 
-	fbxDemoEntity* const entity = LoadFbxMesh("viper.fbx");
-	entity->BuildRenderMeshes(scene);
-	scene->AddEntity(entity);
-
-
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 //	AddCapsulesStacks(scene, origin1);
 
+	BuildVehicle(scene);
+
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
-	dVector origin(-40.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }

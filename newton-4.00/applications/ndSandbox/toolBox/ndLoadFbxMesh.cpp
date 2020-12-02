@@ -55,11 +55,14 @@ void fbxDemoEntity::BuildRenderMeshes(ndDemoEntityManager* const scene)
 		stack--;
 		fbxDemoEntity* const ent = entBuffer[stack];
 	
-		if (ent->m_fbxMeshEffect && (ent->GetName().Find("hidden") == -1))
+		if (ent->m_fbxMeshEffect)
 		{
-			ndDemoMesh* const mesh = new ndDemoMesh(ent->GetName().GetStr(), ent->m_fbxMeshEffect, scene->GetShaderCache());
-			ent->SetMesh(mesh, ent->GetMeshMatrix());
-			mesh->Release();
+			if ((ent->GetName().Find("hidden") == -1) && (ent->GetName().Find("Hidden") == -1))
+			{
+				ndDemoMesh* const mesh = new ndDemoMesh(ent->GetName().GetStr(), ent->m_fbxMeshEffect, scene->GetShaderCache());
+				ent->SetMesh(mesh, ent->GetMeshMatrix());
+				mesh->Release();
+			}
 		}
 	
 		for (fbxDemoEntity* child = (fbxDemoEntity*)ent->GetChild(); child; child = (fbxDemoEntity*)child->GetSibling())
@@ -356,9 +359,10 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 	format.m_faceIndexCount = faceIndexArray;
 	format.m_faceMaterial = faceMaterialArray;
 	
+	dArray<dVector> normalArray;
 	if (geom->getNormals())
 	{
-		dArray<dVector> normalArray(indexCount);
+		normalArray.Resize(indexCount);
 		normalArray.SetCount(indexCount);
 		const ofbx::Vec3* const normals = geom->getNormals();
 		for (dInt32 i = 0; i < indexCount; ++i)
@@ -372,12 +376,10 @@ static void ImportMeshNode(ofbx::Object* const fbxNode, fbxGlobalNoceMap& nodeMa
 		format.m_normal.m_strideInBytes = sizeof(dVector);
 	}
 
-	//dArray<dVector> uvArray(indexCount);
-	//uvArray.SetCount(indexCount);
-	//memset(&uvArray[0].m_x, 0, indexCount * sizeof(dVector));
+	dArray<dVector> uvArray;
 	if (geom->getUVs())
 	{
-		dArray<dVector> uvArray(indexCount);
+		uvArray.Resize(indexCount);
 		uvArray.SetCount(indexCount);
 		const ofbx::Vec2* const uv = geom->getUVs();
 		for (dInt32 i = 0; i < indexCount; ++i)
