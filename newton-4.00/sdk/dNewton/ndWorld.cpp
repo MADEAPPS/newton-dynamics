@@ -832,6 +832,9 @@ void ndWorld::SubStepUpdate(dFloat32 timestep)
 	// Update Particle base physics
 	ParticleUpdate();
 
+	// Update all models
+	ModelUpdate();
+
 	// calculate internal forces, integrate bodies and update matrices.
 	if (m_solver == 0)
 	{
