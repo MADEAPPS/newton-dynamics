@@ -357,97 +357,110 @@ void ndDemoEntity::Render(dFloat32 timestep, ndDemoEntityManager* const scene, c
 	}
 }
 
-/*
-NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const world) const
+ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const world) const
+//NewtonCollision* ndDemoEntity::CreateCollisionFromchildren(NewtonWorld* const world) const
 {
 	int count = 1;
-	NewtonCollision* shapeArray[128];
+	ndShapeInstance* shapeArray[128];
 	
 	shapeArray[0] = nullptr;
-	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) {
-		//const char* const name = child->GetName().GetStr();
+	for (ndDemoEntity* child = GetChild(); child; child = child->GetSibling()) 
+	{
 		dString tmpName(child->GetName());
 		tmpName.ToLower();
 		const char* const name = tmpName.GetStr();
-
-		if (strstr (name, "sphere")) {
-			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
+	
+		if (strstr (name, "sphere")) 
+		{
 			dAssert(0);
-			//dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
-			dFloat32* const array = mesh->m_vertex;
-			dVector extremes(0.0f);
-			for (dInt32 i = 0; i < mesh->m_vertexCount; i++) {
-				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
-				extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
-				extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
-			}
-
-			dMatrix matrix(child->GetCurrentMatrix());
-			shapeArray[count] = NewtonCreateSphere(world, extremes.m_x, 0, &matrix[0][0]);
-			count++;
-			dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
-		} else if (strstr (name, "box")) {
-			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
+			//ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
+			////dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
+			//dFloat32* const array = mesh->m_vertex;
+			//dVector extremes(0.0f);
+			//for (dInt32 i = 0; i < mesh->m_vertexCount; i++) {
+			//	extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
+			//	extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
+			//	extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
+			//}
+			//
+			//dMatrix matrix(child->GetCurrentMatrix());
+			//shapeArray[count] = NewtonCreateSphere(world, extremes.m_x, 0, &matrix[0][0]);
+			//count++;
+			//dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
+		} 
+		else if (strstr (name, "box")) 
+		{
 			dAssert(0);
-			//dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
-			// go over the vertex array and find and collect all vertices's weighted by this bone.
-			dFloat32* const array = mesh->m_vertex;
-			dVector extremes(0.0f);
-			for (dInt32 i = 0; i < mesh->m_vertexCount; i++) {
-				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
-				extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
-				extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
-			}
-
-			extremes = extremes.Scale (2.0f); 
-			dMatrix matrix(child->GetCurrentMatrix());
-			shapeArray[count] = NewtonCreateBox(world, extremes.m_x, extremes.m_y, extremes.m_z, 0, &matrix[0][0]);
-			count++;
-			dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
-
-		} else if (strstr (name, "capsule")) {
-			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
+			//ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
+			////dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
+			//// go over the vertex array and find and collect all vertices's weighted by this bone.
+			//dFloat32* const array = mesh->m_vertex;
+			//dVector extremes(0.0f);
+			//for (dInt32 i = 0; i < mesh->m_vertexCount; i++) {
+			//	extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
+			//	extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
+			//	extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
+			//}
+			//
+			//extremes = extremes.Scale (2.0f); 
+			//dMatrix matrix(child->GetCurrentMatrix());
+			//shapeArray[count] = NewtonCreateBox(world, extremes.m_x, extremes.m_y, extremes.m_z, 0, &matrix[0][0]);
+			//count++;
+			//dAssert(count < sizeof(shapeArray) / sizeof (shapeArray[0]));
+		} 
+		else if (strstr (name, "capsule")) 
+		{
 			dAssert(0);
-			//dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
-			dFloat32* const array = mesh->m_vertex;
-			dVector extremes(0.0f);
-			for (dInt32 i = 0; i < mesh->m_vertexCount; i++) {
-				extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
-				extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
-				extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
-			}
-			dFloat32 high = 2.0f * dMax (extremes.m_y - extremes.m_x, dFloat32 (0.0f));
-
-			dMatrix alighMatrix(dRollMatrix(90.0f * dDegreeToRad));
-			dMatrix matrix (alighMatrix * child->GetCurrentMatrix());
-			shapeArray[count] = NewtonCreateCapsule(world, extremes.m_x, extremes.m_x, high, 0, &matrix[0][0]);
-			count++;
-			dAssert(count < sizeof(shapeArray)/ sizeof (shapeArray[0]));
-		} else if (strstr(name, "convexhull")) {
+			//ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
+			////dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
+			//dFloat32* const array = mesh->m_vertex;
+			//dVector extremes(0.0f);
+			//for (dInt32 i = 0; i < mesh->m_vertexCount; i++) {
+			//	extremes.m_x = dMax(extremes.m_x, array[i * 3 + 0]);
+			//	extremes.m_y = dMax(extremes.m_y, array[i * 3 + 1]);
+			//	extremes.m_z = dMax(extremes.m_z, array[i * 3 + 2]);
+			//}
+			//dFloat32 high = 2.0f * dMax (extremes.m_y - extremes.m_x, dFloat32 (0.0f));
+			//
+			//dMatrix alighMatrix(dRollMatrix(90.0f * dDegreeToRad));
+			//dMatrix matrix (alighMatrix * child->GetCurrentMatrix());
+			//shapeArray[count] = NewtonCreateCapsule(world, extremes.m_x, extremes.m_x, high, 0, &matrix[0][0]);
+			//count++;
+			//dAssert(count < sizeof(shapeArray)/ sizeof (shapeArray[0]));
+		} 
+		else if (strstr(name, "convexhull")) 
+		{
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
-			dAssert(0);
-			//dAssert(mesh->IsType(ndDemoMesh::GetRttiType()));
-			dFloat32* const array = mesh->m_vertex;
-			dMatrix matrix(child->GetCurrentMatrix());
-			shapeArray[count] = NewtonCreateConvexHull(world, mesh->m_vertexCount, array, 3 * sizeof (dFloat32), 0.01f, 0, &matrix[0][0]);
+
+			glBindBuffer(GL_ARRAY_BUFFER, mesh->m_vertexBuffer);
+			const dFloat32* const points = (dFloat32*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+
+			shapeArray[count] = new ndShapeInstance(new ndShapeConvexHull(mesh->m_vertexCount, sizeof(ndMeshPointUV), 0.01f, points));
+			shapeArray[count]->SetLocalMatrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
 			count++;
 			dAssert(count < sizeof(shapeArray) / sizeof(shapeArray[0]));
+
+			glUnmapBuffer(GL_ARRAY_BUFFER);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 	}
-
-	if (count > 2) {
-		NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
-		NewtonCompoundCollisionBeginAddRemove (compound);	
-		for (dInt32 i = 1; i < count; i ++) {
-			NewtonCompoundCollisionAddSubCollision (compound, shapeArray[i]);
-			NewtonDestroyCollision(shapeArray[i]);
-		}
-		NewtonCompoundCollisionEndAddRemove (compound);	
-		shapeArray[0] = compound;
-		count = 1;
-	} if (count == 2) {
+	
+	if (count > 2) 
+	{
+		dAssert(0);
+	//	NewtonCollision* const compound = NewtonCreateCompoundCollision (world, 0);
+	//	NewtonCompoundCollisionBeginAddRemove (compound);	
+	//	for (dInt32 i = 1; i < count; i ++) {
+	//		NewtonCompoundCollisionAddSubCollision (compound, shapeArray[i]);
+	//		NewtonDestroyCollision(shapeArray[i]);
+	//	}
+	//	NewtonCompoundCollisionEndAddRemove (compound);	
+	//	shapeArray[0] = compound;
+	//	count = 1;
+	} 
+	else if (count == 2) 
+	{
 		shapeArray[0] = shapeArray[1];
 	}
 	return shapeArray[0];
 }
-*/

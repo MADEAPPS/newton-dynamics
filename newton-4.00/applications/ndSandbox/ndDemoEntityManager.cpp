@@ -225,14 +225,15 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_solverMode = 1;
 	//m_sceneType = 1;
 	//m_solverPasses = 4;
-	m_workerThreads = 4;
+	//m_workerThreads = 4;
 	//m_solverSubSteps = 2;
 	//m_showRaycastHit = true;
 	//m_showCenterOfMass = false;
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
-	//m_collisionDisplayMode = 3;
+	m_collisionDisplayMode = 3;
+	//m_collisionDisplayMode = 1;
 	//m_showListenersDebugInfo = true;
 	m_asynchronousPhysicsUpdate = true;
 

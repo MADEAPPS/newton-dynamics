@@ -84,9 +84,26 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 
 static void BuildVehicle(ndDemoEntityManager* const scene)
 {
-	fbxDemoEntity* const entity = LoadFbxMesh("viper.fbx");
-	entity->BuildRenderMeshes(scene);
-	scene->AddEntity(entity);
+	//fbxDemoEntity* const vehicleEntity = LoadFbxMesh("viper.fbx");
+	fbxDemoEntity* const vehicleEntity = LoadFbxMesh("viper1.fbx");
+	vehicleEntity->BuildRenderMeshes(scene);
+	scene->AddEntity(vehicleEntity);
+
+	ndWorld* const world = scene->GetWorld();
+	dFloat32 mass = 1000.0f;
+	dMatrix matrix(dGetIdentityMatrix());
+	ndShapeInstance* const chassisCollision = vehicleEntity->CreateCollisionFromchildren(scene->GetWorld());
+
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, vehicleEntity));
+	body->SetMatrix(matrix);
+	body->SetCollisionShape(*chassisCollision);
+	body->SetMassMatrix(mass, *chassisCollision);
+	body->SetGyroMode(true);
+
+	world->AddBody(body);
+	
+	delete chassisCollision;
 }
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)

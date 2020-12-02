@@ -86,7 +86,7 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 
 	void RenderBone() const;
 	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
-	//NewtonCollision* CreateCollisionFromchildren(NewtonWorld* const world) const;
+	ndShapeInstance* CreateCollisionFromchildren(ndWorld* const world) const;
 
 	//static void TransformCallback(const NewtonBody* body, const dFloat32* matrix, int threadIndex);
 

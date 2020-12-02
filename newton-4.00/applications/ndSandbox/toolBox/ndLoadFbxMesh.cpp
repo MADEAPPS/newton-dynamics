@@ -57,11 +57,13 @@ void fbxDemoEntity::BuildRenderMeshes(ndDemoEntityManager* const scene)
 	
 		if (ent->m_fbxMeshEffect)
 		{
-			if ((ent->GetName().Find("hidden") == -1) && (ent->GetName().Find("Hidden") == -1))
+			ndDemoMesh* const mesh = new ndDemoMesh(ent->GetName().GetStr(), ent->m_fbxMeshEffect, scene->GetShaderCache());
+			ent->SetMesh(mesh, ent->GetMeshMatrix());
+			mesh->Release();
+
+			if ((ent->GetName().Find("hidden") >= 0) || (ent->GetName().Find("Hidden") >= 0))
 			{
-				ndDemoMesh* const mesh = new ndDemoMesh(ent->GetName().GetStr(), ent->m_fbxMeshEffect, scene->GetShaderCache());
-				ent->SetMesh(mesh, ent->GetMeshMatrix());
-				mesh->Release();
+				mesh->m_isVisible = false;
 			}
 		}
 	

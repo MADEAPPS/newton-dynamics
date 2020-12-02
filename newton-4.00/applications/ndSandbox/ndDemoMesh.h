@@ -153,6 +153,7 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	GLuint m_vertexBuffer;
 	GLuint m_vetextArrayBuffer;
 	bool m_hasTransparency;
+	friend class ndDemoEntity;
 };
 
 class ndDemoSkinMesh: public ndDemoMeshInterface
