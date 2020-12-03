@@ -40,7 +40,6 @@ void ndJointSlider::SubmitSpringDamper(ndConstraintDescritor& desc, const dMatri
 	dVector p1(matrix.m_posit + matrix.m_front.Scale (m_posit));
 	AddLinearRowJacobian(desc, p1, p0, matrix[0]);
 	SetMassSpringDamperAcceleration(desc, m_springK, m_damperC);
-dTrace(("%f\n", m_posit));
 }
 
 void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)

@@ -72,9 +72,8 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 }
 
 
-static void BuildSlider(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass)
+static void BuildSlider(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass, dFloat32 diameter)
 {
-	dFloat32 diameter = 0.5f;
 	//ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
 	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
@@ -105,9 +104,9 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene);
 
-	//BuildBallSocket(scene, dVector(0.0f, 0.0f, 0.0f, 0.0f));
-	BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 0.0f), 10);
-	BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 0.0f), 100);
+	BuildBallSocket(scene, dVector(0.0f, 0.0f, 0.0f, 0.0f));
+	BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 0.0f), 10.0f, 0.5f);
+	BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 0.0f), 100.0f, 0.75f);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
