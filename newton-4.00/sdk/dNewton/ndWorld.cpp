@@ -107,6 +107,13 @@ ndWorld::~ndWorld()
 		delete body;
 	}
 
+	while (m_modelList.GetFirst())
+	{
+		ndModel* const model = m_modelList.GetFirst()->GetInfo();
+		RemoveModel(model);
+		delete model;
+	}
+
 	const ndBodyList& bodyList = GetBodyList();
 	while (bodyList.GetFirst())
 	{

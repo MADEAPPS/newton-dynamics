@@ -19,15 +19,28 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "dCoreStdafx.h"
+#ifndef __D_MULTIBODY_VEHICLE_H__
+#define __D_MULTIBODY_VEHICLE_H__
+
 #include "ndNewtonStdafx.h"
-#include "ndWorld.h"
 #include "ndModel.h"
 
-
-ndModel::ndModel(const nd::TiXmlNode* const xmlNode)
-	:dClassAlloc()
-	,m_node(nullptr)
+class ndWorld;
+class ndMultiBodyVehicle: public ndModel
 {
-	dAssert(0);
-}
+	public:
+	D_NEWTON_API ndMultiBodyVehicle(const dVector& frontDir, const dVector& upDir);
+	D_NEWTON_API ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode);
+	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
+
+	D_NEWTON_API void AddChassis(ndBodyDynamic* const chassis);
+	D_NEWTON_API void AddTire(ndWorld* const world, ndBodyDynamic* const tire);
+
+	protected:
+	D_NEWTON_API virtual void Update(const ndWorld* const world, dFloat32 timestep) const;
+
+	dMatrix m_localFrame;
+	ndBodyDynamic* m_chassis;
+};
+
+#endif

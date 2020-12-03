@@ -30,7 +30,7 @@ class ndModel: public dClassAlloc
 {
 	public:
 	ndModel();
-	D_NEWTON_API ndModel(const nd::TiXmlNode* const xmlNode, const dTree<const ndShape*, dUnsigned32>& shapesCache);
+	D_NEWTON_API ndModel(const nd::TiXmlNode* const xmlNode);
 	virtual ~ndModel ();
 
 	protected:
