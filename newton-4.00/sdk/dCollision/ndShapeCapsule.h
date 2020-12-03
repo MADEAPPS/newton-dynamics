@@ -36,7 +36,6 @@ class ndShapeCapsule : public ndShapeConvex
 	protected:
 	D_COLLISION_API void Init (dFloat32 radio0, dFloat32 radio1, dFloat32 height);
 
-	protected:
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
 	D_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
 	D_COLLISION_API virtual void DebugShape(const dMatrix& matrix, ndShapeDebugCallback& debugCallback) const;

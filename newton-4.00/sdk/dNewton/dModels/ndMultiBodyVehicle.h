@@ -41,6 +41,7 @@ class ndMultiBodyVehicle: public ndModel
 
 	dMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;
+	ndShapeChamferCylinder m_tireShape;
 };
 
 #endif

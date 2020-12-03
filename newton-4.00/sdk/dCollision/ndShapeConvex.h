@@ -91,7 +91,7 @@ class ndShapeConvex: public ndShape
 
 	//virtual void SerializeLow(dgSerialize callback, void* const userData) const;
 	//dInt32 RayCastClosestFace (dVector* tetrahedrum, const dVector& origin, dFloat32& pointDist) const;
-	//dInt32 BuildCylinderCapPoly (dFloat32 radius, const dMatrix& transform, dVector* const vertexOut) const;
+	dInt32 BuildCylinderCapPoly (dFloat32 radius, const dMatrix& transform, dVector* const vertexOut) const;
 
 	dVector* m_vertex;
 	ndConvexSimplexEdge* m_simplex;

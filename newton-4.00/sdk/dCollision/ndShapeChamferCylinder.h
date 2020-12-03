@@ -19,26 +19,27 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef _D_SHAPE_SPHERE_H__
-#define _D_SHAPE_SPHERE_H__
+#ifndef _D_SHAPE_CHAMFER_CYLINDER_H__
+#define _D_SHAPE_CHAMFER_CYLINDER_H__
 
 #include "ndShapeConvex.h"
 
-#define D_SPHERE_VERTEX_COUNT 18
+#define DG_CHAMFERCYLINDER_SLICES         4
+#define DG_CHAMFERCYLINDER_BRAKES		  8
+#define DG_MAX_CHAMFERCYLINDER_DIR_COUNT  8
 
-D_MSV_NEWTON_ALIGN_32
-class ndShapeSphere: public ndShapeConvex
+class ndShapeChamferCylinder: public ndShapeConvex
 {
 	public:
-	D_COLLISION_API ndShapeSphere(dFloat32 radius);
-	D_COLLISION_API ndShapeSphere(const nd::TiXmlNode* const xmlNode);
-	D_COLLISION_API virtual ~ndShapeSphere();
+	D_COLLISION_API ndShapeChamferCylinder(dFloat32 radius, dFloat32 height);
+	D_COLLISION_API ndShapeChamferCylinder(const nd::TiXmlNode* const xmlNode);
+	D_COLLISION_API virtual ~ndShapeChamferCylinder();
 
-	virtual ndShapeSphere* GetAsShapeSphere() { return this; }
+	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() { return this; }
 
 	protected:
-	D_COLLISION_API void Init(dFloat32 radius);
-	D_COLLISION_API virtual void MassProperties();
+
+	D_COLLISION_API void Init(dFloat32 radius, dFloat32 height);
 
 	D_COLLISION_API virtual ndShapeInfo GetShapeInfo() const;
 	D_COLLISION_API virtual void CalcAABB(const dMatrix& matrix, dVector& p0, dVector& p1) const;
@@ -46,22 +47,23 @@ class ndShapeSphere: public ndShapeConvex
 	D_COLLISION_API virtual dVector SupportVertexSpecialProjectPoint(const dVector& point, const dVector& dir) const;
 	D_COLLISION_API virtual dVector SupportVertex(const dVector& dir, dInt32* const vertexIndex) const;
 	D_COLLISION_API virtual dVector SupportVertexSpecial(const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const;
-	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, dFloat32 maxT, const ndBody* const body, ndContactPoint& contactOut) const;
+	D_COLLISION_API virtual dFloat32 RayCast(ndRayCastNotify& callback, const dVector& localP0, const dVector& localP1, const ndBody* const body, ndContactPoint& contactOut) const;
 	D_COLLISION_API virtual void Save(nd::TiXmlElement* const xmlNode, const char* const assetPath, dInt32 nodeid) const;
 
 	virtual dInt32 CalculatePlaneIntersection(const dVector& normal, const dVector& point, dVector* const contactsOut) const;
 
-	void TesselateTriangle(dInt32 level, const dVector& p0, const dVector& p1, const dVector& p2, dInt32& count, dVector* const ouput) const;
-
-	dVector m_vertex[D_SPHERE_VERTEX_COUNT];
+	private:
+	dFloat32 m_height;
 	dFloat32 m_radius;
 
+	dVector m_vertex[DG_CHAMFERCYLINDER_BRAKES * (DG_CHAMFERCYLINDER_SLICES + 1)];
 	static dInt32 m_shapeRefCount;
-	static dVector m_unitSphere[];
 	static ndConvexSimplexEdge m_edgeArray[];
+	static dVector m_shapesDirs[];
+	static dVector m_yzMask;
 
-} D_GCC_NEWTON_ALIGN_32;
-
+	friend class dgWorld;
+};
 
 #endif 
 

@@ -532,7 +532,8 @@ bool ndShapeConvexHull::Create(dInt32 count, dInt32 strideInBytes, const dFloat3
 					// insert left branch AABB
 					dVector leftBoxP0(dFloat32(1.0e15f));
 					dVector leftBoxP1(-dFloat32(1.0e15f));
-					for (dInt32 i = 0; i < i0; i++) {
+					for (dInt32 i = 0; i < i0; i++) 
+					{
 						const dVector& p = vertexNodeList[box.m_vertexStart + i]->GetInfo();
 						leftBoxP0 = leftBoxP0.GetMin(p);
 						leftBoxP1 = leftBoxP1.GetMax(p);

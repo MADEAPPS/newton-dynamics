@@ -38,6 +38,7 @@ class ndShapeInstance;
 class ndShapeStaticMesh;
 class ndShapeConvexPolygon;
 class ndShapeDebugCallback;
+class ndShapeChamferCylinder;
 
 #ifdef _DEBUG
 //	#define DG_DEBUG_AABB
@@ -49,7 +50,7 @@ enum ndShapeID
 	m_sphereCollision = 0,
 	m_capsuleCollision,
 	//m_cylinderCollision,
-	//m_chamferCylinderCollision,
+	m_chamferCylinderCollision,
 	m_boxCollision,
 	//m_coneCollision,
 	m_convexHull, // this must be the last convex shape ID
@@ -225,6 +226,7 @@ class ndShape: public dClassAlloc
 	virtual ndShapeConvexPolygon* GetAsShapeAsConvexPolygon() { return nullptr; }
 	virtual ndShapeConvex* GetAsShapeConvex() { return nullptr; }
 	virtual ndShapeStaticMesh* GetAsShapeStaticMeshShape() { return nullptr; }
+	virtual ndShapeChamferCylinder* GetAsShapeChamferCylinder() { return nullptr; }
 
 	virtual dInt32 GetConvexVertexCount() const;
 

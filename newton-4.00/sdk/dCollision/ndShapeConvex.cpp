@@ -1131,3 +1131,39 @@ dVector ndShapeConvex::CalculateVolumeIntegral(const dMatrix& globalMatrix, cons
 	cg.m_w = volume;
 	return cg;
 }
+
+//dInt32 dgCollisionConvex::BuildCylinderCapPoly(dFloat32 radius, const dMatrix& transform, dVector* const vertexOut) const
+dInt32 ndShapeConvex::BuildCylinderCapPoly(dFloat32 radius, const dMatrix& transform, dVector* const vertexOut) const
+{
+	/*
+	dFloat32 h = 2.0;
+	dInt32 n = 8;
+	dFloat32 a0 = h * h * (dgPi / n);
+
+	dFloat32 h0 = h * dgSin (0.5 * dgPI2 / n);
+	dFloat32 h1 = h * dgCos (0.5 * dgPI2 / n);
+	dFloat32 a1 = h * h * (dgSin (0.5 * dgPI2 / n) * dgCos (0.5 * dgPI2 / n));
+
+	dFloat32 a = h * h * (dgPi / n - 0.5f * dgSin (dgPI2 / n));
+
+	for (int i = 8; i < 16; i ++) {
+	dFloat32 den = dgPi / i - 0.5f * dgSin (dgPI2 / i);
+	dFloat32 h1 = dgSqrt (a / den);
+	dFloat32 h2 = dgSqrt (a / den);
+	}
+	*/
+
+	dInt32 count = (radius < dFloat32(1.0f)) ? 8 : ((radius < dFloat32(2.0f)) ? 12 : 16);
+
+	dFloat32 angle = dFloat32 (2.0f) * dPi / count;
+	dVector r(dFloat32(0.0f), dFloat32(0.0f), radius, dFloat32(0.0f));
+	dMatrix rotation(dPitchMatrix(angle));
+
+	for (dInt32 i = 0; i < count; i++) 
+	{
+		vertexOut[i] = transform.TransformVector(r);
+		r = rotation.RotateVector(r);
+	}
+
+	return count;
+}

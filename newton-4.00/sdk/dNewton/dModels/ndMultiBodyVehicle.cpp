@@ -30,6 +30,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& u
 	:ndModel()
 	,m_localFrame(dGetIdentityMatrix())
 	,m_chassis(nullptr)
+	,m_tireShape(dFloat32 (0.75f), dFloat32(0.5f))
 {
 	m_localFrame.m_front = frontDir & dVector::m_triplexMask;
 	m_localFrame.m_up = upDir & dVector::m_triplexMask;
@@ -39,7 +40,11 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& u
 
 ndMultiBodyVehicle::ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode)
 	:ndModel(xmlNode)
+	,m_localFrame(dGetIdentityMatrix())
+	,m_chassis(nullptr)
+	,m_tireShape(dFloat32(0.75f), dFloat32(0.5f))
 {
+	dAssert(0);
 }
 
 ndMultiBodyVehicle::~ndMultiBodyVehicle()
@@ -54,10 +59,11 @@ void ndMultiBodyVehicle::AddChassis(ndBodyDynamic* const chassis)
 void ndMultiBodyVehicle::AddTire(ndWorld* const world, ndBodyDynamic* const tire)
 {
 	dMatrix tireFrame(dGetIdentityMatrix());
-	tireFrame.m_front = dVector(1.0f, 0.0f, 0.0f, 0.0f);
-	tireFrame.m_up = dVector(0.0f, 1.0f, 0.0f, 0.0f);
-	tireFrame.m_right = tireFrame.m_front.CrossProduct(tireFrame.m_up);
-	dMatrix matrix (tireFrame * tire->GetMatrix());
+	tireFrame.m_front = dVector(0.0f, 0.0f, 1.0f, 0.0f);
+	tireFrame.m_up    = dVector(0.0f, 1.0f, 0.0f, 0.0f);
+	tireFrame.m_right = dVector(-1.0f, 0.0f, 0.0f, 0.0f);
+	dMatrix matrix (tireFrame * m_localFrame * m_chassis->GetMatrix());
+	matrix.m_posit = tire->GetMatrix().m_posit;
 
 	//ndJointBallAndSocket* const joint = new ndJointBallAndSocket(matrix, chassis, tireBody);
 	ndJointHinge* const joint = new ndJointHinge(matrix, tire, m_chassis);

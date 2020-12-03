@@ -57,6 +57,7 @@
 #include <ndBodyPlayerCapsule.h>
 #include <ndBodyTriggerVolume.h>
 #include <ndShapeConvexPolygon.h>
+#include <ndShapeChamferCylinder.h>
 #include <ndJointBilateralConstraint.h>
 #include <ndShapeInstanceMeshBuilder.h>
 

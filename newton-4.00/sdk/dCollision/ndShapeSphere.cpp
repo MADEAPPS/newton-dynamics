@@ -19,16 +19,12 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-
 #include "dCoreStdafx.h"
 #include "ndCollisionStdafx.h"
 #include "ndContact.h"
 #include "ndShapeSphere.h"
 #include "ndContactSolver.h"
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
 #define D_SPHERE_EDGE_COUNT 96
 
@@ -36,110 +32,6 @@ dInt32 ndShapeSphere::m_shapeRefCount = 0;
 dVector ndShapeSphere::m_unitSphere[D_SPHERE_VERTEX_COUNT];
 ndShapeConvex::ndConvexSimplexEdge ndShapeSphere::m_edgeArray[D_SPHERE_EDGE_COUNT];
 
-#if 0
-ndShapeSphere::ndShapeSphere(dgMemoryAllocator* const allocator, dUnsigned32 signature, dFloat32 radii)
-	:dgCollisionConvex(allocator, signature, m_sphereCollision) 
-{
-	Init (radii, allocator);
-}
-
-ndShapeSphere::ndShapeSphere(dgWorld* const world, dgDeserialize deserialization, void* const userData, dInt32 revisionNumber)
-	:dgCollisionConvex (world, deserialization, userData, revisionNumber)
-{
-	dFloat32 radios;
-	deserialization (userData, &radios, sizeof (radios));
-	Init (radios, world->GetAllocator());
-}
-
-
-void ndShapeSphere::SetCollisionBBox (const dVector& p0__, const dVector& p1__)
-{
-	dAssert (0);
-}
-
-dInt32 ndShapeSphere::CalculateSignature (dFloat32 radius)
-{
-	dUnsigned32 buffer[2];
-	radius = dAbs (radius);
-
-	buffer[0] = m_sphereCollision;
-	buffer[1] = Quantize (radius);
-	return Quantize(buffer, sizeof (buffer));
-}
-
-dInt32 ndShapeSphere::CalculateSignature () const
-{
-	return CalculateSignature(m_radius);
-}
-
-void ndShapeSphere::DebugCollision (const dMatrix& matrix, dgCollision::OnDebugCollisionMeshCallback callback, void* const userData) const
-{
-	dTriplex pool[1024 * 2];
-	dVector tmpVectex[1024 * 2];
-
-	dVector p0 ( dFloat32 (1.0f), dFloat32 (0.0f), dFloat32 (0.0f), dFloat32 (0.0f)); 
-	dVector p1 (-dFloat32 (1.0f), dFloat32 (0.0f), dFloat32 (0.0f), dFloat32 (0.0f)); 
-	dVector p2 ( dFloat32 (0.0f), dFloat32 (1.0f), dFloat32 (0.0f), dFloat32 (0.0f)); 
-	dVector p3 ( dFloat32 (0.0f),-dFloat32 (1.0f), dFloat32 (0.0f), dFloat32 (0.0f));
-	dVector p4 ( dFloat32 (0.0f), dFloat32 (0.0f), dFloat32 (1.0f), dFloat32 (0.0f));
-	dVector p5 ( dFloat32 (0.0f), dFloat32 (0.0f),-dFloat32 (1.0f), dFloat32 (0.0f));
-
-	dInt32 index = 3;
-	dInt32 count = 0;
-	TesselateTriangle (index, p4, p0, p2, count, tmpVectex);
-	TesselateTriangle (index, p4, p2, p1, count, tmpVectex);
-	TesselateTriangle (index, p4, p1, p3, count, tmpVectex);
-	TesselateTriangle (index, p4, p3, p0, count, tmpVectex);
-	TesselateTriangle (index, p5, p2, p0, count, tmpVectex);
-	TesselateTriangle (index, p5, p1, p2, count, tmpVectex);
-	TesselateTriangle (index, p5, p3, p1, count, tmpVectex);
-	TesselateTriangle (index, p5, p0, p3, count, tmpVectex);
-
-	for (dInt32 i = 0; i < count; i ++) {
-		tmpVectex[i] = tmpVectex[i].Scale (m_radius);
-	}
-
-	//dMatrix matrix (GetLocalMatrix() * matrixPtr);
-	matrix.TransformTriplex (&pool[0].m_x, sizeof (dTriplex), &tmpVectex[0].m_x, sizeof (dVector), count);
-	for (dInt32 i = 0; i < count; i += 3) {
-		callback (userData, 3, &pool[i].m_x, 0);
-	}
-}
-
-dFloat32 dgCollisionPoint::GetVolume () const
-{
-	dAssert (0);
-	return dFloat32 (0.0f); 
-}
-
-dVector dgCollisionPoint::SupportVertex (const dVector& dir, dInt32* const vertexIndex) const
-{
-	return dVector (dFloat32 (0.0f)); 
-}
-
-dVector dgCollisionPoint::SupportVertexSpecial (const dVector& dir, dFloat32 skinThickness, dInt32* const vertexIndex) const
-{
-	return dVector (dFloat32 (0.0f)); 
-}
-
-void ndShapeSphere::Serialize(dgSerialize callback, void* const userData) const
-{
-	SerializeLow(callback, userData);
-	callback (userData, &m_radius, sizeof (m_radius));
-}
-
-void ndShapeSphere::CalculateImplicitContacts(dInt32 count, dgContactPoint* const contactPoints) const
-{
-	for (dInt32 i = 0; i < count; i++) {
-		dVector normal(contactPoints[i].m_point & dVector::m_triplexMask);
-		dAssert(normal.DotProduct(normal).GetScalar() > dFloat32(0.0f));
-		normal = normal.Normalize();
-		contactPoints[i].m_normal = normal * dVector::m_negOne;
-		contactPoints[i].m_point = normal.Scale(m_radius);
-	}
-}
-
-#endif
 
 ndShapeSphere::ndShapeSphere(dFloat32 radius)
 	:ndShapeConvex(m_sphereCollision)
