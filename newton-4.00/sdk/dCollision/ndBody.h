@@ -71,6 +71,9 @@ class ndBody: public dClassAlloc
 	D_COLLISION_API dQuaternion GetRotation() const;
 	D_COLLISION_API virtual void Save(nd::TiXmlElement* const rootNode, const char* const assetPath, dInt32 nodeid, const dTree<dUnsigned32, const ndShape*>& shapesCache) const;
 
+	D_COLLISION_API dVector GetVelocityAtPoint(const dVector& point) const;
+
+
 	protected:
 	D_COLLISION_API static const nd::TiXmlNode* FindNode(const nd::TiXmlNode* const rootNode, const char* const name);
 	D_COLLISION_API virtual nd::TiXmlElement* CreateRootElement(nd::TiXmlElement* const rootNode, const char* const name, dInt32 nodeid) const;
@@ -146,6 +149,12 @@ inline const dVector& ndBody::GetCentreOfMass() const
 {
 	return m_localCentreOfMass;
 }
+
+inline dVector ndBody::GetVelocityAtPoint(const dVector& point) const
+{
+	return m_veloc + m_omega.CrossProduct(point - m_globalCentreOfMass);
+}
+
 
 #endif 
 
