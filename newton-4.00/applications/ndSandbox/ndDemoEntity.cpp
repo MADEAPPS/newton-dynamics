@@ -49,11 +49,10 @@ void ndDemoEntityNotify::OnTranform(dInt32 threadIndex, const dMatrix& matrix)
 {
 	// apply this transformation matrix to the application user data.
 	ndBody* const body = GetBody();
-	dMatrix transform(matrix);
 	dQuaternion rot(body->GetRotation());
 
 	dScopeSpinLock lock(m_entity->m_lock);
-	m_entity->SetMatrixUsafe(rot, transform.m_posit);
+	m_entity->SetMatrixUsafe(rot, matrix.m_posit);
 }
 
 ndDemoEntity::ndDemoEntity(const dMatrix& matrix, ndDemoEntity* const parent)

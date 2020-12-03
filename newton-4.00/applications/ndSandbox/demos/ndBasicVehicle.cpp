@@ -21,6 +21,27 @@
 #include "ndDemoEntityManager.h"
 #include "ndDemoInstanceEntity.h"
 
+class ndTireNotifyNotify : public ndDemoEntityNotify
+{
+	public:
+	ndTireNotifyNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, ndBodyDynamic* const chassis)
+		:ndDemoEntityNotify(manager, entity)
+		,m_chassis(chassis)
+	{
+	}
+
+	void OnTranform(dInt32 threadIndex, const dMatrix& matrix)
+	{
+		dMatrix parentMatrix(m_chassis->GetMatrix());
+		dMatrix localMatrix(matrix * parentMatrix.Inverse());
+
+		dQuaternion rot(localMatrix);
+		dScopeSpinLock lock(m_entity->GetLock());
+		m_entity->SetMatrixUsafe(rot, localMatrix.m_posit);
+	}
+
+	ndBodyDynamic* m_chassis;
+};
 
 /*
 static void AddShape(ndDemoEntityManager* const scene,
@@ -143,13 +164,17 @@ static ndBodyDynamic* AddTireVehicle(ndDemoEntityManager* const scene, ndBodyDyn
 	ndDemoEntity* const tireMesh = chassMesh->Find(tireName);
 	dMatrix matrix(tireMesh->CalculateGlobalMatrix(nullptr));
 	ndBodyDynamic* const tireBody = new ndBodyDynamic();
-	tireBody->SetNotifyCallback(new ndDemoEntityNotify(scene, tireMesh));
+	tireBody->SetNotifyCallback(new ndTireNotifyNotify(scene, tireMesh, chassis));
 	tireBody->SetMatrix(matrix);
 	tireBody->SetCollisionShape(tireCollision);
 	tireBody->SetMassMatrix(mass, tireCollision);
 	//tireBody->SetGyroMode(false);
 
 	world->AddBody(tireBody);
+
+	ndJointBallAndSocket* const joint = new ndJointBallAndSocket(matrix, chassis, tireBody);
+	world->AddJoint(joint);
+
 	return tireBody;
 }
 

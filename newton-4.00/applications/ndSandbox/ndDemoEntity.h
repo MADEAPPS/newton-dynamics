@@ -13,6 +13,7 @@
 #define __DEMO_ENTITY_H__
 
 #include "ndDemoEntityManager.h"
+#include "ndPhysicsUtils.h"
 
 class ndDemoEntity;
 class ndShaderPrograms;
@@ -21,7 +22,7 @@ class ndDemoMeshInterface;
 class ndDemoEntityNotify: public ndBodyNotify
 {
 	public:
-	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, dFloat32 gravity = -10.0f);
+	ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDemoEntity* const entity, dFloat32 gravity = DEMO_GRAVITY);
 	virtual ~ndDemoEntityNotify();
 
 	void* GetUserData() const
@@ -88,7 +89,11 @@ class ndDemoEntity : public dNodeHierarchy<ndDemoEntity>
 	virtual void Render(dFloat32 timeStep, ndDemoEntityManager* const scene, const dMatrix& matrix) const;
 	ndShapeInstance* CreateCollisionFromchildren(ndWorld* const world) const;
 
-	//static void TransformCallback(const NewtonBody* body, const dFloat32* matrix, int threadIndex);
+	dSpinLock& GetLock()
+	{
+		return m_lock;
+	}
+		
 
 	protected:
 	mutable dMatrix m_matrix;			// interpolated matrix
