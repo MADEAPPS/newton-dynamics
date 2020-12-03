@@ -178,19 +178,20 @@ static ndBodyDynamic* AddTireVehicle(ndDemoEntityManager* const scene, ndBodyDyn
 	return tireBody;
 }
 
-static void BuildVehicle(ndDemoEntityManager* const scene)
+static void BuildVehicle(ndDemoEntityManager* const scene, const dMatrix& matrix)
 {
 	//fbxDemoEntity* const vehicleEntity = LoadFbxMesh("viper.fbx");
 	fbxDemoEntity* const vehicleEntity = LoadFbxMesh("viper1.fbx");
+	vehicleEntity->ResetMatrix(*scene, vehicleEntity->CalculateGlobalMatrix() * matrix);
 	vehicleEntity->BuildRenderMeshes(scene);
 	scene->AddEntity(vehicleEntity);
 
 	ndBodyDynamic* const chassis = CreateChassis(scene, vehicleEntity);
 
 	AddTireVehicle(scene, chassis, "rr_tire");
-	AddTireVehicle(scene, chassis, "rl_tire");
-	AddTireVehicle(scene, chassis, "fr_tire");
-	AddTireVehicle(scene, chassis, "fl_tire");
+	//AddTireVehicle(scene, chassis, "rl_tire");
+	//AddTireVehicle(scene, chassis, "fr_tire");
+	//AddTireVehicle(scene, chassis, "fl_tire");
 }
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
@@ -201,7 +202,11 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
 //	AddCapsulesStacks(scene, origin1);
 
-	BuildVehicle(scene);
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix = dRollMatrix(45.0f * dDegreeToRad) * dPitchMatrix(45.0f * dDegreeToRad);
+
+	matrix.m_posit = dVector(0.0f, 4.0f, 0.0f, 1.0f);
+	BuildVehicle(scene, matrix);
 
 
 	dQuaternion rot;
