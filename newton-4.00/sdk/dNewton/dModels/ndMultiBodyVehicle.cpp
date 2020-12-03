@@ -30,8 +30,9 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& u
 	:ndModel()
 	,m_localFrame(dGetIdentityMatrix())
 	,m_chassis(nullptr)
-	,m_tireShape(dFloat32 (0.75f), dFloat32(0.5f))
+	,m_tireShape(new ndShapeChamferCylinder(dFloat32(0.75f), dFloat32(0.5f)))
 {
+	m_tireShape->AddRef();
 	m_localFrame.m_front = frontDir & dVector::m_triplexMask;
 	m_localFrame.m_up = upDir & dVector::m_triplexMask;
 	m_localFrame.m_right = m_localFrame.m_front.CrossProduct(m_localFrame.m_up).Normalize();
@@ -42,13 +43,14 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode)
 	:ndModel(xmlNode)
 	,m_localFrame(dGetIdentityMatrix())
 	,m_chassis(nullptr)
-	,m_tireShape(dFloat32(0.75f), dFloat32(0.5f))
+	,m_tireShape(new ndShapeChamferCylinder(dFloat32(0.75f), dFloat32(0.5f)))
 {
-	dAssert(0);
+	m_tireShape->AddRef();
 }
 
 ndMultiBodyVehicle::~ndMultiBodyVehicle()
 {
+	m_tireShape->Release();
 }
 
 void ndMultiBodyVehicle::AddChassis(ndBodyDynamic* const chassis)
@@ -68,6 +70,14 @@ void ndMultiBodyVehicle::AddTire(ndWorld* const world, ndBodyDynamic* const tire
 	//ndJointBallAndSocket* const joint = new ndJointBallAndSocket(matrix, chassis, tireBody);
 	ndJointHinge* const joint = new ndJointHinge(matrix, tire, m_chassis);
 	world->AddJoint(joint);
+}
+
+ndShapeInstance ndMultiBodyVehicle::CreateTireShape(dFloat32 radius, dFloat32 width) const
+{
+	ndShapeInstance tireCollision(m_tireShape);
+	dVector scale(2.0f * width, radius, radius, 0.0f);
+	tireCollision.SetScale(scale);
+	return tireCollision;
 }
 
 void ndMultiBodyVehicle::Update(const ndWorld* const world, dFloat32 timestep) const

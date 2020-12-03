@@ -33,6 +33,8 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode);
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
 
+	D_NEWTON_API ndShapeInstance CreateTireShape(dFloat32 radius, dFloat32 width) const;
+
 	D_NEWTON_API void AddChassis(ndBodyDynamic* const chassis);
 	D_NEWTON_API void AddTire(ndWorld* const world, ndBodyDynamic* const tire);
 
@@ -41,7 +43,7 @@ class ndMultiBodyVehicle: public ndModel
 
 	dMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;
-	ndShapeChamferCylinder m_tireShape;
+	ndShapeChamferCylinder* m_tireShape;
 };
 
 #endif

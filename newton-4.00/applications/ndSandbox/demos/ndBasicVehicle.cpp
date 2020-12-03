@@ -125,13 +125,8 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndDemoEntity* const chassisEntity = (ndDemoEntity*)chassis->GetNotifyCallback()->GetUserData();
 		CalculateTireDimensions(tireName, width, radius, world, chassisEntity);
 
-		//m_tireShape = NewtonCreateChamferCylinder(world, 0.75f, 0.5f, 0, NULL);
-
 		dFloat32 mass(20.0f);
-		//ndShapeInstance tireCollision(new ndShapeSphere(width));
-		ndShapeInstance tireCollision(new ndShapeChamferCylinder(0.75f, 0.5f));
-		dVector scale(2.0f * width, radius, radius, 0.0f);
-		tireCollision.SetScale(scale);
+		ndShapeInstance tireCollision(CreateTireShape(radius, width));
 
 		ndDemoEntity* const tireEntiry = chassisEntity->Find(tireName);
 		dMatrix matrix(tireEntiry->CalculateGlobalMatrix(nullptr));
