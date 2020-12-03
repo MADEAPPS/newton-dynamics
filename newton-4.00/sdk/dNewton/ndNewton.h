@@ -40,6 +40,7 @@
 #include <ndModelList.h>
 #include <ndSceneNode.h>
 #include <ndConstraint.h>
+#include <ndJointHinge.h>
 #include <ndBodyNotify.h>
 #include <ndSceneMixed.h>
 #include <ndSolverAvx2.h>

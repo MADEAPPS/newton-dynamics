@@ -9,7 +9,6 @@
 * freely
 */
 
-
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndJointBallAndSocket.h"

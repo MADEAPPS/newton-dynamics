@@ -81,12 +81,13 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 
 	virtual const dUnsigned32 GetRowsCount() const;
 	virtual void JacobianDerivative(ndConstraintDescritor& desc);
-	
 
 	virtual ndBodyKinematic* GetBody0() const;
 	virtual ndBodyKinematic* GetBody1() const;
+
 	
 	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const;
+	D_COLLISION_API dFloat32 CalculateAngle(const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;
 
 	D_COLLISION_API virtual void JointAccelerations(ndJointAccelerationDecriptor* const desc);
 	D_COLLISION_API void CalculateLocalMatrix(const dMatrix& pinsAndPivotFrame, dMatrix& localMatrix0, dMatrix& localMatrix1) const;
@@ -111,7 +112,6 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	dVector m_r0[DG_BILATERAL_CONTRAINT_DOF];
 	dVector m_r1[DG_BILATERAL_CONTRAINT_DOF];
 	ndForceImpactPair m_jointForce[DG_BILATERAL_CONTRAINT_DOF];
-
 	dFloat32 m_motorAcceleration[DG_BILATERAL_CONTRAINT_DOF];
 	ndBodyKinematic* m_body0;
 	ndBodyKinematic* m_body1;
@@ -119,6 +119,7 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	ndJointList::dListNode* m_body0Node;
 	ndJointList::dListNode* m_body1Node;
 
+	dFloat32 m_maxAngleError;
 	dFloat32 m_defualtDiagonalRegularizer;
 	dUnsigned32 m_maxDof			: 6;
 	dUnsigned32 m_solverModel		: 2;

@@ -105,6 +105,7 @@ static ndBodyDynamic* AddTireVehicle(ndDemoEntityManager* const scene, ndBodyDyn
 
 	ndDemoEntity* const tireEntiry = chassisEntity->Find(tireName);
 	dMatrix matrix(tireEntiry->CalculateGlobalMatrix(nullptr));
+
 	ndBodyDynamic* const tireBody = new ndBodyDynamic();
 	tireBody->SetNotifyCallback(new ndTireNotifyNotify(scene, tireEntiry, chassis));
 	tireBody->SetMatrix(matrix);
@@ -114,7 +115,15 @@ static ndBodyDynamic* AddTireVehicle(ndDemoEntityManager* const scene, ndBodyDyn
 
 	world->AddBody(tireBody);
 
-	ndJointBallAndSocket* const joint = new ndJointBallAndSocket(matrix, chassis, tireBody);
+
+	dMatrix tireFrame(dGetIdentityMatrix());
+	tireFrame.m_front = dVector(1.0f, 0.0f, 0.0f, 0.0f);
+	tireFrame.m_up = dVector(0.0f, 1.0f, 0.0f, 0.0f);
+	tireFrame.m_right = tireFrame.m_front.CrossProduct(tireFrame.m_up);
+	matrix = tireFrame * tireEntiry->CalculateGlobalMatrix(nullptr);
+
+	//ndJointBallAndSocket* const joint = new ndJointBallAndSocket(matrix, chassis, tireBody);
+	ndJointHinge* const joint = new ndJointHinge(matrix, tireBody, chassis);
 	world->AddJoint(joint);
 
 	return tireBody;

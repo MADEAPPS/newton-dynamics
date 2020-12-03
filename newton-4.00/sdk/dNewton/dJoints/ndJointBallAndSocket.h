@@ -9,13 +9,11 @@
 * freely
 */
 
-
 #ifndef __D_JOINT_BALLANDSOCKET_H__
 #define __D_JOINT_BALLANDSOCKET_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
-
 
 class ndJointBallAndSocket: public ndJointBilateralConstraint
 {

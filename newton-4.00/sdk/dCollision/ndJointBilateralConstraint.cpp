@@ -23,17 +23,6 @@
 #include "ndCollisionStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-//#include "dgBody.h"
-//#include "dgWorld.h"
-//#include "dgConstraint.h"
-//#include "dgWorldDynamicUpdate.h"
-//#include "ndJointBilateralConstraint.h"
-
-
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
 #define DG_VEL_DAMP				 (dFloat32(100.0f))
 #define DG_POS_DAMP				 (dFloat32(1500.0f))
 
@@ -455,7 +444,6 @@ void ndJointBilateralConstraint::JointAccelerations(dgJointAccelerationDecriptor
 }
 #endif
 
-
 ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix)
 	:ndConstraint()
 	,dClassAlloc()
@@ -482,6 +470,7 @@ ndJointBilateralConstraint::ndJointBilateralConstraint(dInt32 maxDof, ndBodyKine
 	m_enableCollision = 0;
 	m_rowIsMotor = 0;
 	m_defualtDiagonalRegularizer = dFloat32(0.0f);
+	m_maxAngleError = dFloat32(5.0f) * dDegreeToRad;
 	//SetStiffness(dFloat32(0.0f));
 	
 	memset(m_jointForce, 0, sizeof(m_jointForce));
@@ -502,6 +491,16 @@ void ndJointBilateralConstraint::DebugJoint(ndConstraintDebugCallback& debugCall
 	CalculateGlobalMatrix(matrix0, matrix1);
 	debugCallback.DrawFrame(matrix0);
 	debugCallback.DrawFrame(matrix1);
+}
+
+dFloat32 ndJointBilateralConstraint::CalculateAngle(const dVector& dir, const dVector& cosDir, const dVector& sinDir) const
+{
+	//dAssert(dAbs(sinDir.DotProduct3(cosDir)) < dFloat (1.0e-4f));
+	dAssert(dir.m_w == dFloat32(0.0f));
+	dVector projectDir(dir - sinDir * dir.DotProduct(sinDir));
+	dFloat32 cosAngle = projectDir.DotProduct(cosDir).GetScalar();
+	dFloat32 sinAngle = sinDir.DotProduct(projectDir.CrossProduct(cosDir)).GetScalar();
+	return dAtan2(sinAngle, cosAngle);
 }
 
 void ndJointBilateralConstraint::CalculateLocalMatrix(const dMatrix& globalMatrix, dMatrix& localMatrix0, dMatrix& localMatrix1) const
