@@ -133,8 +133,8 @@ ndJacobian ndBodyDynamic::IntegrateForceAndToque(const dVector& force, const dVe
 {
 	ndJacobian velocStep;
 
-	if ((dAbs(m_invMass.m_x - m_invMass.m_y) < dFloat32(1.0e-1f)) &&
-		(dAbs(m_invMass.m_x - m_invMass.m_z) < dFloat32(1.0e-1f)))
+	if ((dAbs(m_invMass.m_x - m_invMass.m_y) < dFloat32(1.0e-5f)) &&
+		(dAbs(m_invMass.m_x - m_invMass.m_z) < dFloat32(1.0e-5f)))
 	{
 		velocStep.m_angular = torque * m_invMass * timestep;
 		dAssert(velocStep.m_angular.m_w == dFloat32(0.0f));

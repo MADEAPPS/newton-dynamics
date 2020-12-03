@@ -43,65 +43,6 @@ class ndTireNotifyNotify : public ndDemoEntityNotify
 	ndBodyDynamic* m_chassis;
 };
 
-/*
-static void AddShape(ndDemoEntityManager* const scene,
-	ndDemoInstanceEntity* const rootEntity, const ndShapeInstance& sphereShape,
-	dFloat32 mass, const dVector& origin, const dFloat32 diameter, int count)
-{
-	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
-	matrix.m_posit = origin;
-	matrix.m_posit.m_w = 1.0f;
-
-	ndPhysicsWorld* const world = scene->GetWorld();
-
-	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
-	//matrix.m_posit.m_y = floor.m_y + diameter * 0.5f + 7.0f;
-	matrix.m_posit.m_y = floor.m_y + diameter * 0.5f + 7.0f;
-
-	for (dInt32 i = 0; i < count; i++)
-	{
-		ndBodyDynamic* const body = new ndBodyDynamic();
-		ndDemoEntity* const entity = new ndDemoEntity(matrix, rootEntity);
-
-		body->SetNotifyCallback(new ndDemoEntityNotify(scene, entity));
-		body->SetMatrix(matrix);
-		body->SetCollisionShape(sphereShape);
-		body->SetMassMatrix(mass, sphereShape);
-		body->SetGyroMode(true);
-
-		world->AddBody(body);
-		matrix.m_posit.m_y += diameter * 2.5f;
-	}
-}
-
-static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& origin)
-{
-	dFloat32 diameter = 1.0f;
-	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
-	ndDemoMeshIntance* const instanceMesh = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
-
-	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(instanceMesh);
-	scene->AddEntity(rootEntity);
-
-	//const int n = 2;
-	//const int stackHigh = 7;
-	//const int n = 1;
-	//const int stackHigh = 1;
-	const int n = 10;
-	const int stackHigh = 7;
-	for (dInt32 i = 0; i < n; i++)
-	{
-		for (dInt32 j = 0; j < n; j++)
-		{
-			dVector location((j - n / 2) * 4.0f, 0.0f, (i - n / 2) * 4.0f, 0.0f);
-			AddShape(scene, rootEntity, shape, 10.0f, location + origin, diameter, stackHigh);
-		}
-	}
-
-	instanceMesh->Release();
-}
-*/
-
 static ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, fbxDemoEntity* const chassisEntity)
 {
 	dFloat32 mass = 1000.0f;
@@ -115,7 +56,8 @@ static ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, fbxDemoEnt
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(*chassisCollision);
 	body->SetMassMatrix(mass, *chassisCollision);
-	body->SetGyroMode(true);
+	//body->SetGyroMode(true);
+	body->SetGyroMode(false);
 
 	world->AddBody(body);
 	delete chassisCollision;
@@ -187,11 +129,11 @@ static void BuildVehicle(ndDemoEntityManager* const scene, const dMatrix& matrix
 	scene->AddEntity(vehicleEntity);
 
 	ndBodyDynamic* const chassis = CreateChassis(scene, vehicleEntity);
-
+	//chassis;
 	AddTireVehicle(scene, chassis, "rr_tire");
-	//AddTireVehicle(scene, chassis, "rl_tire");
-	//AddTireVehicle(scene, chassis, "fr_tire");
-	//AddTireVehicle(scene, chassis, "fl_tire");
+	AddTireVehicle(scene, chassis, "rl_tire");
+	AddTireVehicle(scene, chassis, "fr_tire");
+	AddTireVehicle(scene, chassis, "fl_tire");
 }
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
