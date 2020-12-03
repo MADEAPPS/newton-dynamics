@@ -434,6 +434,14 @@ void ndDemoEntityManager::Cleanup ()
 	// destroy the Newton world
 	if (m_world) 
 	{
+		const ndBodyList& bodyList = m_world->GetBodyList();
+		for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+		{
+			ndBodyKinematic* const body = bodyNode->GetInfo();
+			ndDemoEntityNotify* const callback = (ndDemoEntityNotify*)body->GetNotifyCallback();
+			callback->m_entity = nullptr;
+		}
+
 		// get serialization call back before destroying the world
 		delete m_world;
 	}

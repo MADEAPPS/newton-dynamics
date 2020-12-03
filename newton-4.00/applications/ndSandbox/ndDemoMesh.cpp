@@ -1307,3 +1307,19 @@ void ndDemoMesh::RenderTransparency(ndDemoEntityManager* const scene, const dMat
 		glDepthMask(GL_TRUE);
 	}
 }
+
+void ndDemoMesh::GetVertexArray(dArray<dVector>& points) const
+{
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	const ndMeshPointUV* const data = (ndMeshPointUV*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+
+	points.Resize(m_vertexCount);
+	points.SetCount(m_vertexCount);
+	for (int i = 0; i < m_vertexCount; i++)
+	{
+		points[i] = dVector(data[i].m_posit.m_x, data[i].m_posit.m_y, data[i].m_posit.m_z, dFloat32 (0.0f));
+	}
+
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}

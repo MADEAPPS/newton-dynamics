@@ -22,7 +22,7 @@ ndDemoEntityNotify::ndDemoEntityNotify(ndDemoEntityManager* const manager, ndDem
 
 ndDemoEntityNotify::~ndDemoEntityNotify()
 {
-	if (m_entity->m_rootNode)
+	if (m_entity && m_entity->m_rootNode)
 	{
 		m_manager->RemoveEntity(m_entity);
 		delete m_entity;
@@ -430,18 +430,13 @@ ndShapeInstance* ndDemoEntity::CreateCollisionFromchildren(ndWorld* const world)
 		} 
 		else if (strstr(name, "convexhull")) 
 		{
+			dArray<dVector> points;
 			ndDemoMesh* const mesh = (ndDemoMesh*)child->GetMesh();
-
-			glBindBuffer(GL_ARRAY_BUFFER, mesh->m_vertexBuffer);
-			const dFloat32* const points = (dFloat32*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
-
-			shapeArray[count] = new ndShapeInstance(new ndShapeConvexHull(mesh->m_vertexCount, sizeof(ndMeshPointUV), 0.01f, points));
+			mesh->GetVertexArray(points);
+			shapeArray[count] = new ndShapeInstance(new ndShapeConvexHull(mesh->m_vertexCount, sizeof(dVector), 0.01f, &points[0].m_x));
 			shapeArray[count]->SetLocalMatrix(child->GetMeshMatrix() * child->GetCurrentMatrix());
 			count++;
 			dAssert(count < sizeof(shapeArray) / sizeof(shapeArray[0]));
-
-			glUnmapBuffer(GL_ARRAY_BUFFER);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
 		}
 	}
 	

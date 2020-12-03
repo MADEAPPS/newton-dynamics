@@ -130,6 +130,8 @@ class ndDemoMesh: public ndDemoMeshInterface, public dList<ndDemoSubMesh>
 	void OptimizeForRender(const dArray<ndMeshPointUV>& points, const dArray<dInt32>& indices);
 	//virtual NewtonMesh* CreateNewtonMesh(NewtonWorld* const world, const dMatrix& meshMatrix);
 
+	void GetVertexArray(dArray<dVector>& points) const;
+
 	protected:
 	virtual ~ndDemoMesh();
 	void ResetOptimization();

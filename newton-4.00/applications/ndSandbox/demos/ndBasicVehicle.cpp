@@ -81,17 +81,12 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 }
 */
 
-
-static void BuildVehicle(ndDemoEntityManager* const scene)
+static ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, fbxDemoEntity* const vehicleEntity)
 {
-	//fbxDemoEntity* const vehicleEntity = LoadFbxMesh("viper.fbx");
-	fbxDemoEntity* const vehicleEntity = LoadFbxMesh("viper1.fbx");
-	vehicleEntity->BuildRenderMeshes(scene);
-	scene->AddEntity(vehicleEntity);
-
-	ndWorld* const world = scene->GetWorld();
 	dFloat32 mass = 1000.0f;
 	dMatrix matrix(dGetIdentityMatrix());
+
+	ndWorld* const world = scene->GetWorld();
 	ndShapeInstance* const chassisCollision = vehicleEntity->CreateCollisionFromchildren(scene->GetWorld());
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
@@ -102,8 +97,72 @@ static void BuildVehicle(ndDemoEntityManager* const scene)
 	body->SetGyroMode(true);
 
 	world->AddBody(body);
-	
 	delete chassisCollision;
+	return body;
+}
+
+static void CalculateTireDimensions(const char* const tireName, dFloat32& width, dFloat32& radius, ndWorld* const world, ndDemoEntity* const vehEntity)
+{
+	// find the the tire visual mesh 
+	ndDemoEntity* const tirePart = vehEntity->Find(tireName);
+	dAssert(tirePart);
+	
+	// make a convex hull collision shape to assist in calculation of the tire shape size
+	ndDemoMesh* const tireMesh = (ndDemoMesh*)tirePart->GetMesh();
+
+	dArray<dVector> temp;
+	tireMesh->GetVertexArray(temp);
+
+	dVector minVal(1.0e10f);
+	dVector maxVal(-1.0e10f);
+	for (dInt32 i = 0; i < temp.GetCount(); i++)
+	{
+		minVal = minVal.GetMin(temp[i]);
+		maxVal = maxVal.GetMax(temp[i]);
+	}
+
+	dVector size(maxVal - minVal);
+	width = size.m_y;
+	radius = size.m_x * 0.5f;
+}
+
+static ndBodyDynamic* AddTireVehicle(ndDemoEntityManager* const scene, ndBodyDynamic* const chassis, const char* const tireName)
+{
+	//rr_tire
+	dFloat32 width;
+	dFloat32 radius;
+	ndWorld* const world = scene->GetWorld();
+	ndDemoEntity* const chassMesh = (ndDemoEntity*)chassis->GetNotifyCallback()->GetUserData();
+	CalculateTireDimensions(tireName, width, radius, world, chassMesh);
+
+	//m_tireShape = NewtonCreateChamferCylinder(world, 0.75f, 0.5f, 0, NULL);
+
+	dFloat32 mass(20.0f);
+	ndShapeInstance tireCollision (new ndShapeSphere(width));
+
+	ndDemoEntity* const tireMesh = chassMesh->Find(tireName);
+	dMatrix matrix(tireMesh->CalculateGlobalMatrix(nullptr));
+	ndBodyDynamic* const tireBody = new ndBodyDynamic();
+	tireBody->SetNotifyCallback(new ndDemoEntityNotify(scene, tireMesh));
+	tireBody->SetMatrix(matrix);
+	tireBody->SetCollisionShape(tireCollision);
+	tireBody->SetMassMatrix(mass, tireCollision);
+	//tireBody->SetGyroMode(false);
+
+	world->AddBody(tireBody);
+	return tireBody;
+}
+
+static void BuildVehicle(ndDemoEntityManager* const scene)
+{
+	//fbxDemoEntity* const vehicleEntity = LoadFbxMesh("viper.fbx");
+	fbxDemoEntity* const vehicleEntity = LoadFbxMesh("viper1.fbx");
+	vehicleEntity->BuildRenderMeshes(scene);
+	scene->AddEntity(vehicleEntity);
+
+	ndBodyDynamic* const chassis = CreateChassis(scene, vehicleEntity);
+
+	AddTireVehicle(scene, chassis, "rr_tire");
 }
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
@@ -115,6 +174,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 //	AddCapsulesStacks(scene, origin1);
 
 	BuildVehicle(scene);
+
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
