@@ -55,14 +55,21 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		vehicleEntity->BuildRenderMeshes(scene);
 		scene->AddEntity(vehicleEntity);
 
+		ndWorld* const world = scene->GetWorld();
+
+		// create the vehicle chassis as a normal rigid body
 		ndBodyDynamic* const chassis = CreateChassis(scene, vehicleEntity);
+
+		// create the tire chassis as a normal rigid body
 		ndBodyDynamic* const rr_tire = CreateTireBody(scene, chassis, "rr_tire");
 		ndBodyDynamic* const rl_tire = CreateTireBody(scene, chassis, "rl_tire");
 		ndBodyDynamic* const fr_tire = CreateTireBody(scene, chassis, "fr_tire");
 		ndBodyDynamic* const fl_tire = CreateTireBody(scene, chassis, "fl_tire");
-
-		ndWorld* const world = scene->GetWorld();
+		
+		// 1- add chassis to the vehicle mode 
 		AddChassis(chassis);
+
+		// 2- each tire to the mode, this function will create the tire joints
 		AddTire(world, rr_tire);
 		AddTire(world, rl_tire);
 		AddTire(world, fr_tire);
