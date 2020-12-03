@@ -19,7 +19,7 @@
 #include "ndMakeStaticMap.h"
 #include "ndDemoEntityManager.h"
 
-static ndBodyDynamic* MakeCapule(ndDemoEntityManager* const scene, const dMatrix& matrix, const ndShapeInstance& capsule, ndDemoMesh* const mesh, dFloat32 mass)
+static ndBodyDynamic* MakePrimitive(ndDemoEntityManager* const scene, const dMatrix& matrix, const ndShapeInstance& capsule, ndDemoMesh* const mesh, dFloat32 mass)
 {
 	ndPhysicsWorld* const world = scene->GetWorld();
 	ndDemoEntity* const entity = new ndDemoEntity(matrix, nullptr);
@@ -38,8 +38,8 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 {
 	dFloat32 mass = 1.0f;
 	dFloat32 diameter = 0.5f;
-	ndShapeInstance capsule(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
-	ndDemoMesh* const mesh = new ndDemoMesh("capsule", scene->GetShaderCache(), &capsule, "marble.tga", "marble.tga", "marble.tga");
+	ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
 	//dMatrix matrix(dGetIdentityMatrix());
 	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
@@ -52,9 +52,9 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 	matrix.m_posit.m_y = floor.m_y;
 
 	matrix.m_posit.m_y += 5.0f;
-	ndBodyDynamic* const body0 = MakeCapule(scene, matrix, capsule, mesh, mass);
+	ndBodyDynamic* const body0 = MakePrimitive(scene, matrix, shape, mesh, mass);
 	matrix.m_posit.m_y += 1.0f;
-	ndBodyDynamic* const body1 = MakeCapule(scene, matrix, capsule, mesh, mass);
+	ndBodyDynamic* const body1 = MakePrimitive(scene, matrix, shape, mesh, mass);
 
 	dMatrix bodyMatrix0(body0->GetMatrix());
 	dMatrix bodyMatrix1(body1->GetMatrix());
@@ -76,8 +76,9 @@ static void BuildSlider(ndDemoEntityManager* const scene, const dVector& origin)
 {
 	dFloat32 mass = 1.0f;
 	dFloat32 diameter = 0.5f;
-	ndShapeInstance capsule(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
-	ndDemoMesh* const mesh = new ndDemoMesh("capsule", scene->GetShaderCache(), &capsule, "marble.tga", "marble.tga", "marble.tga");
+	//ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
+	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
+	ndDemoMesh* const mesh = new ndDemoMesh("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
 
 	dMatrix matrix(dRollMatrix(90.0f * dDegreeToRad));
 	matrix.m_posit = origin;
@@ -88,22 +89,13 @@ static void BuildSlider(ndDemoEntityManager* const scene, const dVector& origin)
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 
-	matrix.m_posit.m_y += 5.0f;
-	ndBodyDynamic* const body0 = MakeCapule(scene, matrix, capsule, mesh, mass);
 	matrix.m_posit.m_y += 1.0f;
-	ndBodyDynamic* const body1 = MakeCapule(scene, matrix, capsule, mesh, mass);
 
-	dMatrix bodyMatrix0(body0->GetMatrix());
-	dMatrix bodyMatrix1(body1->GetMatrix());
-	dMatrix pinMatrix(bodyMatrix0);
-	pinMatrix.m_posit = (bodyMatrix0.m_posit + bodyMatrix1.m_posit).Scale(0.5f);
-	ndJointBallAndSocket* const joint0 = new ndJointBallAndSocket(pinMatrix, body0, body1);
-	world->AddJoint(joint0);
-
-	bodyMatrix1.m_posit.m_y += 0.5f;
 	ndBodyDynamic* const fixBody = world->GetSentinelBody();
-	ndJointBallAndSocket* const joint1 = new ndJointBallAndSocket(bodyMatrix1, body1, fixBody);
-	world->AddJoint(joint1);
+	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
+	
+	ndJointSlider* const joint = new ndJointSlider(matrix, body, fixBody);
+	world->AddJoint(joint);
 
 	mesh->Release();
 }
@@ -117,6 +109,6 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 0.0f));
 
 	dQuaternion rot;
-	dVector origin(-10.0f, 5.0f, 0.0f, 0.0f);
+	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
