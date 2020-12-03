@@ -57,7 +57,6 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params); 
 
 	dFloat32 GetRowAcceleration (dInt32 index, dgContraintDescritor& desc) const;
-	dFloat32 CalculateMotorAcceleration (dInt32 index, dgContraintDescritor& desc) const;
 	void SetMotorAcceleration (dInt32 index, dFloat32 acceleration, dgContraintDescritor& desc);
 	void SetSpringDamperAcceleration (dInt32 index, dgContraintDescritor& desc, dFloat32 rowStiffness, dFloat32 spring, dFloat32 damper);
 	void SetJacobianDerivative (dInt32 index, dgContraintDescritor& desc, const dFloat32* const jacobianA, const dFloat32* const jacobianB, dgForceImpactPair* const jointForce);
@@ -99,6 +98,7 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	virtual dInt32 GetSolverModel() const;
 	virtual void SetSolverModel(dInt32 model);
 
+	dFloat32 GetMotorZeroAcceleration(ndConstraintDescritor& desc) const;
 	void SetHighFriction(ndConstraintDescritor& desc, dFloat32 friction);
 	void SetLowerFriction(ndConstraintDescritor& desc, dFloat32 friction);
 	void SetMotorAcceleration(ndConstraintDescritor& desc, dFloat32 acceleration);
@@ -163,6 +163,14 @@ inline ndBodyKinematic* ndJointBilateralConstraint::GetBody0() const
 inline ndBodyKinematic* ndJointBilateralConstraint::GetBody1() const
 {
 	return m_body1;
+}
+
+inline dFloat32 ndJointBilateralConstraint::GetMotorZeroAcceleration(ndConstraintDescritor& desc) const
+{
+	const dInt32 index = desc.m_rowsCount - 1;
+	dAssert(index >= 0);
+	dAssert(index < dInt32(m_maxDof));
+	return desc.m_zeroRowAcceleration[index];
 }
 
 inline void ndJointBilateralConstraint::SetMotorAcceleration(ndConstraintDescritor& desc, dFloat32 acceleration)

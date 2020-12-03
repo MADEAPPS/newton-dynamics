@@ -94,6 +94,8 @@ static void BuildSlider(ndDemoEntityManager* const scene, const dVector& origin,
 	
 	ndJointSlider* const joint = new ndJointSlider(matrix, body, fixBody);
 	joint->SetAsSpringDamper(true, 20.0f, 1.0f);
+	//joint->SetFriction(mass * 10.0f * 2.0f);
+	//joint->EnableLimits(true, -0.5f, 0.5f);
 	world->AddJoint(joint);
 
 	mesh->Release();

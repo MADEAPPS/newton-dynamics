@@ -93,6 +93,11 @@ ndWorld::~ndWorld()
 {
 	Sync();
 
+	while (m_skeletonList.GetFirst())
+	{
+		m_skeletonList.Remove(m_skeletonList.GetFirst());
+	}
+
 	while (m_jointList.GetFirst())
 	{
 		ndJointBilateralConstraint* const joint = m_jointList.GetFirst()->GetInfo();

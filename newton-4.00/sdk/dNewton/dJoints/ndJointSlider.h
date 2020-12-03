@@ -22,19 +22,25 @@ class ndJointSlider: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointSlider();
 
+	D_NEWTON_API void SetFriction(dFloat32 friction);
+	D_NEWTON_API void EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimit);
 	D_NEWTON_API void SetAsSpringDamper(bool state, dFloat32 spring, dFloat32 damper);
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
 	private:
 	void SubmitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix);
+	void SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
 
 	protected:
 	dFloat32 m_posit;
 	dFloat32 m_speed;
-
 	dFloat32 m_springK;
 	dFloat32 m_damperC;
+	dFloat32 m_minLimit;
+	dFloat32 m_maxLimit;
+	dFloat32 m_friction;
 
+	bool m_hasLimits;
 	bool m_isStringDamper;
 };
 

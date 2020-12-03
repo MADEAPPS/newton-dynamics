@@ -19,12 +19,30 @@ ndJointSlider::ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* c
 	,m_speed(dFloat32(0.0f))
 	,m_springK(dFloat32(0.0f))
 	,m_damperC(dFloat32(0.0f))
+	,m_minLimit(dFloat32(0.0f))
+	,m_maxLimit(dFloat32(0.0f))
+	,m_friction(dFloat32(0.0f))
+	,m_hasLimits(false)
 	,m_isStringDamper(false)
 {
 }
 
 ndJointSlider::~ndJointSlider()
 {
+}
+
+void ndJointSlider::SetFriction(dFloat32 friction)
+{
+	m_friction = dAbs(friction);
+}
+
+void ndJointSlider::EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimit)
+{
+	m_hasLimits = state;
+	dAssert(minLimit <= 0.0f);
+	dAssert(maxLimit >= 0.0f);
+	m_minLimit = minLimit;
+	m_maxLimit = maxLimit;
 }
 
 void ndJointSlider::SetAsSpringDamper(bool state, dFloat32 spring, dFloat32 damper)
@@ -40,6 +58,40 @@ void ndJointSlider::SubmitSpringDamper(ndConstraintDescritor& desc, const dMatri
 	dVector p1(matrix.m_posit + matrix.m_front.Scale (m_posit));
 	AddLinearRowJacobian(desc, p1, p0, matrix[0]);
 	SetMassSpringDamperAcceleration(desc, m_springK, m_damperC);
+}
+
+void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
+{
+//	, const dVector& p0, const dVector& p1
+	if ((m_minLimit == dFloat32 (0.0f)) && (m_maxLimit == dFloat32(0.0f)))
+	{
+		dAssert(0);
+	//	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
+	//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	}
+	else 
+	{
+		dFloat32 x = m_posit + m_speed * desc.m_timestep;
+		if (x < m_minLimit)
+		{
+			dVector p1(matrix1.m_posit + matrix1.m_front.Scale (m_minLimit));
+			AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
+			SetLowerFriction(desc, -m_friction); 
+		}
+		else if (x > m_maxLimit)
+		{
+			dVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_maxLimit));
+			AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, matrix1.m_front);
+			SetHighFriction(desc, m_friction);
+		}
+		else if (m_friction > dFloat32 (0.0f)) 
+		{
+			AddLinearRowJacobian(desc, matrix0.m_posit, matrix0.m_posit, matrix1.m_front);
+			SetMotorAcceleration(desc, -m_speed * desc.m_invTimestep);
+			SetLowerFriction(desc, -m_friction);
+			SetHighFriction(desc, m_friction);
+		}
+	}
 }
 
 void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
@@ -105,28 +157,23 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	//	NewtonUserJointSetRowAcceleration(m_joint, alpha);
 	}
 
-	if (m_isStringDamper)
+	if (m_hasLimits)
+	{
+		if (m_isStringDamper)
+		{
+			dAssert(0);
+			//SubmitSpringDamper(desc, matrix1);
+			//SubmitConstraintLimitSpringDamper(matrix0, matrix1, p0, p1, timestep);
+		}
+		else
+		{
+			SubmitConstraintLimits(desc, matrix0, matrix1);
+		}
+	}
+	else if (m_isStringDamper)
 	{
 		SubmitSpringDamper(desc, matrix1);
 	}
-	//if (m_options.m_option0) {
-	//	if (m_options.m_option1) {
-	//		SubmitConstraintLimitSpringDamper(matrix0, matrix1, p0, p1, timestep);
-	//	}
-	//	else {
-	//		SubmitConstraintLimits(matrix0, matrix1, p0, p1, timestep);
-	//	}
-	//}
-	//else if (m_options.m_option1) {
-	//	SubmitConstraintSpringDamper(matrix0, matrix1, p0, p1, timestep);
-	//}
-	//else if (m_friction != 0.0f) {
-	//	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
-	//	NewtonUserJointSetRowAcceleration(m_joint, -m_speed / timestep);
-	//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	//	NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
-	//	NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
-	//}
 }
 
 
