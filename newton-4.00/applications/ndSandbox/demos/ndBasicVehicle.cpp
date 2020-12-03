@@ -141,13 +141,10 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene);
 
-	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-//	AddCapsulesStacks(scene, origin1);
+	dVector location(0.0f, 4.0f, 0.0f, 1.0f);
 
 	dMatrix matrix(dGetIdentityMatrix());
-	matrix = dRollMatrix(45.0f * dDegreeToRad) * dPitchMatrix(45.0f * dDegreeToRad);
-
-	matrix.m_posit = dVector(0.0f, 4.0f, 0.0f, 1.0f);
+	matrix.m_posit = location;
 	BuildVehicle(scene, matrix);
 
 
