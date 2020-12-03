@@ -102,16 +102,16 @@ static void AddCapsulesStacks(ndDemoEntityManager* const scene, const dVector& o
 }
 */
 
-static ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, fbxDemoEntity* const vehicleEntity)
+static ndBodyDynamic* CreateChassis(ndDemoEntityManager* const scene, fbxDemoEntity* const chassisEntity)
 {
 	dFloat32 mass = 1000.0f;
-	dMatrix matrix(dGetIdentityMatrix());
+	dMatrix matrix(chassisEntity->CalculateGlobalMatrix(nullptr));
 
 	ndWorld* const world = scene->GetWorld();
-	ndShapeInstance* const chassisCollision = vehicleEntity->CreateCollisionFromchildren(scene->GetWorld());
+	ndShapeInstance* const chassisCollision = chassisEntity->CreateCollisionFromchildren(scene->GetWorld());
 
 	ndBodyDynamic* const body = new ndBodyDynamic();
-	body->SetNotifyCallback(new ndDemoEntityNotify(scene, vehicleEntity));
+	body->SetNotifyCallback(new ndDemoEntityNotify(scene, chassisEntity));
 	body->SetMatrix(matrix);
 	body->SetCollisionShape(*chassisCollision);
 	body->SetMassMatrix(mass, *chassisCollision);
@@ -153,18 +153,18 @@ static ndBodyDynamic* AddTireVehicle(ndDemoEntityManager* const scene, ndBodyDyn
 	dFloat32 width;
 	dFloat32 radius;
 	ndWorld* const world = scene->GetWorld();
-	ndDemoEntity* const chassMesh = (ndDemoEntity*)chassis->GetNotifyCallback()->GetUserData();
-	CalculateTireDimensions(tireName, width, radius, world, chassMesh);
+	ndDemoEntity* const chassisEntity = (ndDemoEntity*)chassis->GetNotifyCallback()->GetUserData();
+	CalculateTireDimensions(tireName, width, radius, world, chassisEntity);
 
 	//m_tireShape = NewtonCreateChamferCylinder(world, 0.75f, 0.5f, 0, NULL);
 
 	dFloat32 mass(20.0f);
 	ndShapeInstance tireCollision (new ndShapeSphere(width));
 
-	ndDemoEntity* const tireMesh = chassMesh->Find(tireName);
-	dMatrix matrix(tireMesh->CalculateGlobalMatrix(nullptr));
+	ndDemoEntity* const tireEntiry = chassisEntity->Find(tireName);
+	dMatrix matrix(tireEntiry->CalculateGlobalMatrix(nullptr));
 	ndBodyDynamic* const tireBody = new ndBodyDynamic();
-	tireBody->SetNotifyCallback(new ndTireNotifyNotify(scene, tireMesh, chassis));
+	tireBody->SetNotifyCallback(new ndTireNotifyNotify(scene, tireEntiry, chassis));
 	tireBody->SetMatrix(matrix);
 	tireBody->SetCollisionShape(tireCollision);
 	tireBody->SetMassMatrix(mass, tireCollision);
@@ -188,6 +188,9 @@ static void BuildVehicle(ndDemoEntityManager* const scene)
 	ndBodyDynamic* const chassis = CreateChassis(scene, vehicleEntity);
 
 	AddTireVehicle(scene, chassis, "rr_tire");
+	AddTireVehicle(scene, chassis, "rl_tire");
+	AddTireVehicle(scene, chassis, "fr_tire");
+	AddTireVehicle(scene, chassis, "fl_tire");
 }
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
