@@ -292,10 +292,27 @@ void dgBilateralConstraint::SetMassDependentSpringDamperAcceleration(dgInt32 ind
 		dgFloat32 ks = dgAbs(spring);
 		dgFloat32 kd = dgAbs(damper);
 		dgFloat32 ksd = dt * ks;
+
+		const dgMatrix& invInertia0 = m_body0->m_invWorldInertiaMatrix;
+		const dgMatrix& invInertia1 = m_body1->m_invWorldInertiaMatrix;
+		const dgVector invMass0(m_body0->m_invMass[3]);
+		const dgVector invMass1(m_body1->m_invMass[3]);
+
+		dgJacobian jacobian0InvMass;
+		dgJacobian jacobian1InvMass;
+		jacobian0InvMass.m_linear = jacobian0.m_linear * invMass0;
+		jacobian0InvMass.m_angular = invInertia0.RotateVector(jacobian0.m_angular);
+		jacobian1InvMass.m_linear = jacobian1.m_linear * invMass1;
+		jacobian1InvMass.m_angular = invInertia1.RotateVector(jacobian1.m_angular);
+
+		const dgVector tmpDiag(
+			jacobian0InvMass.m_linear * jacobian0.m_linear + jacobian0InvMass.m_angular * jacobian0.m_angular +
+			jacobian1InvMass.m_linear * jacobian1.m_linear + jacobian1InvMass.m_angular * jacobian1.m_angular);
+		dgFloat32 diag = tmpDiag.AddHorizontal().GetScalar();
 		
 		dgFloat32 den = dt * kd + dt * ksd;
 		dgFloat32 accel = ks * relPosit + kd * relVeloc + ksd * relVeloc;
-		desc.m_diagonalRegularizer[index] = dgFloat32(1.0f) / den;
+		desc.m_diagonalRegularizer[index] = den/diag;
 		SetMotorAcceleration(index, accel, desc);
 	}
 }

@@ -22,11 +22,20 @@ class ndJointSlider: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointSlider();
 
+	D_NEWTON_API void SetAsSpringDamper(bool state, dFloat32 spring, dFloat32 damper);
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
+
+	private:
+	void SubmitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix);
 
 	protected:
 	dFloat32 m_posit;
 	dFloat32 m_speed;
+
+	dFloat32 m_springK;
+	dFloat32 m_damperC;
+
+	bool m_isStringDamper;
 };
 
 #endif 

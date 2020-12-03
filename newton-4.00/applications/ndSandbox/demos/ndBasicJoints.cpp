@@ -72,9 +72,8 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 }
 
 
-static void BuildSlider(ndDemoEntityManager* const scene, const dVector& origin)
+static void BuildSlider(ndDemoEntityManager* const scene, const dVector& origin, dFloat32 mass)
 {
-	dFloat32 mass = 1.0f;
 	dFloat32 diameter = 0.5f;
 	//ndShapeInstance shape(new ndShapeCapsule(diameter * 0.5f, diameter * 0.5f, diameter * 1.0f));
 	ndShapeInstance shape(new ndShapeBox(diameter, diameter, diameter));
@@ -89,12 +88,13 @@ static void BuildSlider(ndDemoEntityManager* const scene, const dVector& origin)
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 
-	matrix.m_posit.m_y += 1.0f;
+	matrix.m_posit.m_y += 2.0f;
 
 	ndBodyDynamic* const fixBody = world->GetSentinelBody();
 	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 	
 	ndJointSlider* const joint = new ndJointSlider(matrix, body, fixBody);
+	joint->SetAsSpringDamper(true, 20.0f, 1.0f);
 	world->AddJoint(joint);
 
 	mesh->Release();
@@ -106,7 +106,8 @@ void ndBasicJoints (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene);
 
 	//BuildBallSocket(scene, dVector(0.0f, 0.0f, 0.0f, 0.0f));
-	BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 0.0f));
+	BuildSlider(scene, dVector(0.0f, 0.0f, 2.0f, 0.0f), 10);
+	BuildSlider(scene, dVector(0.0f, 0.0f, 4.0f, 0.0f), 100);
 
 	dQuaternion rot;
 	dVector origin(-10.0f, 2.0f, 0.0f, 0.0f);

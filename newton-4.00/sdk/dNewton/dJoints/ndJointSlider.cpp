@@ -15,11 +15,32 @@
 
 ndJointSlider::ndJointSlider(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
+	,m_posit(dFloat32 (0.0f))
+	,m_speed(dFloat32(0.0f))
+	,m_springK(dFloat32(0.0f))
+	,m_damperC(dFloat32(0.0f))
+	,m_isStringDamper(false)
 {
 }
 
 ndJointSlider::~ndJointSlider()
 {
+}
+
+void ndJointSlider::SetAsSpringDamper(bool state, dFloat32 spring, dFloat32 damper)
+{
+	m_springK = dAbs(spring);
+	m_damperC = dAbs(damper);
+	m_isStringDamper = state;
+}
+
+void ndJointSlider::SubmitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix)
+{
+	dVector p0(matrix.m_posit);
+	dVector p1(matrix.m_posit + matrix.m_front.Scale (m_posit));
+	AddLinearRowJacobian(desc, p1, p0, matrix[0]);
+	SetMassSpringDamperAcceleration(desc, m_springK, m_damperC);
+dTrace(("%f\n", m_posit));
 }
 
 void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
@@ -29,10 +50,6 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 
 	// calculate the position of the pivot point and the Jacobian direction vectors, in global space. 
 	CalculateGlobalMatrix(matrix0, matrix1);
-
-	////AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[0]);
-	//AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[1]);
-	//AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1[2]);
 
 	// calculate position and speed	
 	const dVector veloc0(m_body0->GetVelocityAtPoint(matrix0.m_posit));
@@ -89,6 +106,10 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	//	NewtonUserJointSetRowAcceleration(m_joint, alpha);
 	}
 
+	if (m_isStringDamper)
+	{
+		SubmitSpringDamper(desc, matrix1);
+	}
 	//if (m_options.m_option0) {
 	//	if (m_options.m_option1) {
 	//		SubmitConstraintLimitSpringDamper(matrix0, matrix1, p0, p1, timestep);

@@ -99,9 +99,10 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	virtual dInt32 GetSolverModel() const;
 	virtual void SetSolverModel(dInt32 model);
 
-	void SetHighFriction(ndConstraintDescritor& desc, dInt32 index, dFloat32 friction);
-	void SetLowerFriction(ndConstraintDescritor& desc, dInt32 index, dFloat32 friction);
-	void SetMotorAcceleration(ndConstraintDescritor& desc, dInt32 index, dFloat32 acceleration);
+	void SetHighFriction(ndConstraintDescritor& desc, dFloat32 friction);
+	void SetLowerFriction(ndConstraintDescritor& desc, dFloat32 friction);
+	void SetMotorAcceleration(ndConstraintDescritor& desc, dFloat32 acceleration);
+	D_COLLISION_API void SetMassSpringDamperAcceleration(ndConstraintDescritor& desc, dFloat32 spring, dFloat32 damper);
 
 	void SetSkeletonFlag(bool flag);
 
@@ -164,8 +165,11 @@ inline ndBodyKinematic* ndJointBilateralConstraint::GetBody1() const
 	return m_body1;
 }
 
-inline void ndJointBilateralConstraint::SetMotorAcceleration(ndConstraintDescritor& desc, dInt32 index, dFloat32 acceleration)
+inline void ndJointBilateralConstraint::SetMotorAcceleration(ndConstraintDescritor& desc, dFloat32 acceleration)
 {
+	const dInt32 index = desc.m_rowsCount - 1;
+	dAssert(index >= 0);
+	dAssert(index < dInt32(m_maxDof));
 	m_rowIsMotor |= (1 << index);
 	desc.m_flags[index] = 0;
 	m_motorAcceleration[index] = acceleration;
@@ -173,8 +177,10 @@ inline void ndJointBilateralConstraint::SetMotorAcceleration(ndConstraintDescrit
 	desc.m_penetrationStiffness[index] = acceleration;
 }
 
-inline void ndJointBilateralConstraint::SetLowerFriction(ndConstraintDescritor& desc, dInt32 index, dFloat32 friction)
+inline void ndJointBilateralConstraint::SetLowerFriction(ndConstraintDescritor& desc, dFloat32 friction)
 {
+	const dInt32 index = desc.m_rowsCount - 1;
+	dAssert(index >= 0);
 	dAssert(index < dInt32 (m_maxDof));
 	desc.m_forceBounds[index].m_low = dClamp(friction, dFloat32(D_MIN_BOUND), dFloat32(-0.001f));
 	dAssert(desc.m_forceBounds[index].m_normalIndex == D_INDEPENDENT_ROW);
@@ -192,8 +198,10 @@ inline void ndJointBilateralConstraint::SetLowerFriction(ndConstraintDescritor& 
 	#endif
 }
 
-inline void ndJointBilateralConstraint::SetHighFriction(ndConstraintDescritor& desc, dInt32 index, dFloat32 friction)
+inline void ndJointBilateralConstraint::SetHighFriction(ndConstraintDescritor& desc, dFloat32 friction)
 {
+	const dInt32 index = desc.m_rowsCount - 1;
+	dAssert(index >= 0);
 	dAssert(index < dInt32(m_maxDof));
 	
 	desc.m_forceBounds[index].m_upper = dClamp(friction, dFloat32(0.001f), dFloat32(D_MAX_BOUND));

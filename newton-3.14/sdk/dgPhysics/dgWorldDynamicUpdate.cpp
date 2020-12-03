@@ -529,7 +529,8 @@ dgInt32 dgWorldDynamicUpdate::GetJacobianDerivatives(dgContraintDescritor& const
 		
 		row->m_Jt = constraintParam.m_jacobian[i];
 		rhs->m_diagDamp = dgFloat32(0.0f);
-		rhs->m_diagonalRegularizer = dgClamp (constraintParam.m_diagonalRegularizer[i], dgFloat32(1.0e-5f), dgFloat32(1.0f));
+		//rhs->m_diagonalRegularizer = dgClamp (constraintParam.m_diagonalRegularizer[i], dgFloat32(1.0e-5f), dgFloat32(1.0f));
+		rhs->m_diagonalRegularizer = dgMax (constraintParam.m_diagonalRegularizer[i], dgFloat32(1.0e-5f));
 		rhs->m_coordenateAccel = constraintParam.m_jointAccel[i];
 		rhs->m_restitution = constraintParam.m_restitution[i];
 		rhs->m_penetration = constraintParam.m_penetration[i];
