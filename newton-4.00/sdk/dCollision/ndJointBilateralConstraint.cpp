@@ -495,7 +495,6 @@ void ndJointBilateralConstraint::DebugJoint(ndConstraintDebugCallback& debugCall
 
 dFloat32 ndJointBilateralConstraint::CalculateAngle(const dVector& dir, const dVector& cosDir, const dVector& sinDir) const
 {
-	//dAssert(dAbs(sinDir.DotProduct3(cosDir)) < dFloat (1.0e-4f));
 	dAssert(dir.m_w == dFloat32(0.0f));
 	dVector projectDir(dir - sinDir * dir.DotProduct(sinDir));
 	dFloat32 cosAngle = projectDir.DotProduct(cosDir).GetScalar();

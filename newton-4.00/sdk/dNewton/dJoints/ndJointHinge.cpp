@@ -43,9 +43,7 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	// two rows to restrict rotation around around the parent coordinate system
 	const dFloat32 angleError = m_maxAngleError;
 	const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
-	//NewtonUserJointAddAngularRow(m_joint, angle0, &matrix1.m_up[0]);
 	AddAngularRowJacobian(desc, &matrix1.m_up[0], angle0);
-	//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	if (dAbs(angle0) > angleError) 
 	{
 		dAssert(0);
@@ -54,53 +52,13 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 
 	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
-	//NewtonUserJointAddAngularRow(m_joint, angle1, &matrix1.m_right[0]);
-	AddAngularRowJacobian(desc, &matrix1.m_right[0], angle0);
-	//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+	AddAngularRowJacobian(desc, &matrix1.m_right[0], angle1);
 	if (dAbs(angle1) > angleError) 
 	{
 		dAssert(0);
 		//const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle1 / (timestep * timestep);
 		//NewtonUserJointSetRowAcceleration(m_joint, alpha);
 	}
-
-
-	//if (m_options.m_option2) 
-	//{
-	//	// the joint is motor
-	//	dFloat32 accel = (m_motorSpeed - m_jointOmega) / timestep;
-	//	NewtonUserJointAddAngularRow(m_joint, 0.0f, &matrix0.m_front[0]);
-	//	NewtonUserJointSetRowAcceleration(m_joint, accel);
-	//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	//	NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
-	//	NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
-	//}
-	//else 
-	//{
-	//	// the joint is not motor
-	//	if (m_options.m_option0) 
-	//	{
-	//		if (m_options.m_option1) 
-	//		{
-	//			SubmitConstraintLimitSpringDamper(matrix0, matrix1, timestep);
-	//		}
-	//		else {
-	//			SubmitConstraintLimits(matrix0, matrix1, timestep);
-	//		}
-	//	}
-	//	else if (m_options.m_option1) 
-	//	{
-	//		SubmitConstraintSpringDamper(matrix0, matrix1, timestep);
-	//	}
-	//	else if (m_friction != 0.0f) 
-	//	{
-	//		NewtonUserJointAddAngularRow(m_joint, 0, &matrix0.m_front[0]);
-	//		NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-	//		NewtonUserJointSetRowAcceleration(m_joint, -m_jointOmega / timestep);
-	//		NewtonUserJointSetRowMinimumFriction(m_joint, -m_friction);
-	//		NewtonUserJointSetRowMaximumFriction(m_joint, m_friction);
-	//	}
-	//}
 }
 
 
