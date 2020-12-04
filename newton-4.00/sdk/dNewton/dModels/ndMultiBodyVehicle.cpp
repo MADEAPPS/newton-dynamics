@@ -203,10 +203,28 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	for (dList<ndJointWheel*>::dListNode* node = m_tiresList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointWheel* const tire = node->GetInfo();
-		tire->DebugJoint(context);
+		ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
 
-		dVector color(1.0f, 1.0f, 1.0f, 0.0f);
-		context.DrawArrow(tire->GetBody0()->GetMatrix(), color, -1.0f);
+		//tire->DebugJoint(context);
+		//dVector color(1.0f, 1.0f, 1.0f, 0.0f);
+		//context.DrawArrow(tireBody->GetMatrix(), color, -1.0f);
+
+		const ndBodyKinematic::ndContactMap& contactMap = tireBody->GetContactMap();
+		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
+		for (it.Begin(); it; it++)
+		{
+			ndContact* const contact = *it;
+			if (contact->IsActive())
+			{
+				const ndContactPointList& contactPoints = contact->GetContactPoints();
+				for (ndContactPointList::dListNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
+				{
+					const ndContactMaterial& contactPoint = contactNode->GetInfo();
+					dMatrix frame(contactPoint.m_normal, contactPoint.m_dir0, contactPoint.m_dir1, contactPoint.m_point);
+					context.DrawFrame(frame);
+				}
+			}
+		}
 	}
 }
 
