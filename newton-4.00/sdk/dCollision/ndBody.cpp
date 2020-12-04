@@ -110,10 +110,10 @@ void ndBody::SetNotifyCallback(ndBodyNotify* const notify)
 	}
 }
 
-void ndBody::SetOmega(const dVector& veloc)
+void ndBody::SetOmega(const dVector& omega)
 {
 	m_equilibrium = 0;
-	m_omega = veloc;
+	m_omega = omega;
 }
 
 void ndBody::SetVelocity(const dVector& veloc)

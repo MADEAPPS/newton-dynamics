@@ -68,8 +68,16 @@ void ndMultiBodyVehicle::AddTire(ndWorld* const world, ndBodyDynamic* const tire
 	dMatrix matrix (tireFrame * m_localFrame * m_chassis->GetMatrix());
 	matrix.m_posit = tire->GetMatrix().m_posit;
 
-	//ndJointBallAndSocket* const joint = new ndJointBallAndSocket(matrix, chassis, tireBody);
+	// make tire inertia spherical
+	dVector inertia(tire->GetMassMatrix());
+	dFloat32 maxInertia(dMax(dMax(inertia.m_x, inertia.m_y), inertia.m_z));
+	inertia.m_x = maxInertia;
+	inertia.m_y = maxInertia;
+	inertia.m_z = maxInertia;
+	tire->SetMassMatrix(inertia);
+
 	ndJointWheel* const joint = new ndJointWheel(matrix, tire, m_chassis);
+	m_tires.Append(joint);
 	world->AddJoint(joint);
 }
 
@@ -81,7 +89,49 @@ ndShapeInstance ndMultiBodyVehicle::CreateTireShape(dFloat32 radius, dFloat32 wi
 	return tireCollision;
 }
 
-void ndMultiBodyVehicle::Update(const ndWorld* const world, dFloat32 timestep) const
+void ndMultiBodyVehicle::Update(const ndWorld* const world, dFloat32 timestep)
 {
+	ProjectJointErrors();
+}
 
+void ndMultiBodyVehicle::ProjectJointErrors()
+{
+	const dVector chassisOmega(m_chassis->GetOmega());
+	const dVector upDir(m_chassis->GetMatrix().RotateVector(m_localFrame.m_up));
+	for (dList<ndJointWheel*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext())
+	{
+		ndJointWheel* const tire = node->GetInfo();
+		ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
+		dAssert(tireBody != m_chassis);
+		if (!tireBody->GetSleepState())
+		{
+			dMatrix tireMatrix;
+			dMatrix chassisMatrix;
+			tire->CalculateGlobalMatrix(tireMatrix, chassisMatrix);
+
+			// align tire matrix 
+			const dVector relPosit(tireMatrix.m_posit - chassisMatrix.m_posit);
+			const dFloat32 distance = relPosit.DotProduct(upDir).GetScalar();
+			const dFloat32 spinAngle = -tire->CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
+
+			dMatrix newTireMatrix(dPitchMatrix(spinAngle) * chassisMatrix);
+			newTireMatrix.m_posit = chassisMatrix.m_posit + upDir.Scale(distance);
+
+			dMatrix tireBodyMatrix(tire->GetLocalMatrix0().Inverse() * newTireMatrix);
+			tireBody->SetMatrix(tireBodyMatrix);
+
+			// align tire velocity
+			const dVector chassiVelocity(m_chassis->GetVelocityAtPoint(tireBodyMatrix.m_posit));
+			const dVector relVeloc(tireBody->GetVelocity() - chassiVelocity);
+			const dFloat32 speed = relVeloc.DotProduct(upDir).GetScalar();
+			const dVector tireVelocity(chassiVelocity + upDir.Scale(speed));
+			tireBody->SetVelocity(tireVelocity);
+
+			// align tire angular velocity
+			const dVector relOmega(tireBody->GetOmega() - chassisOmega);
+			const dFloat32 rpm = relOmega.DotProduct(chassisMatrix.m_front).GetScalar();
+			const dVector tireOmega(chassisOmega + chassisMatrix.m_front.Scale(rpm));
+			tireBody->SetOmega(tireOmega);
+		}
+	}
 }

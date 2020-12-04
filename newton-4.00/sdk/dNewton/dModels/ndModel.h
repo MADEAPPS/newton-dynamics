@@ -34,7 +34,7 @@ class ndModel: public dClassAlloc
 	virtual ~ndModel ();
 
 	protected:
-	virtual void Update(const ndWorld* const world, dFloat32 timestep) const = 0;
+	virtual void Update(const ndWorld* const world, dFloat32 timestep) = 0;
 	ndModelList::dListNode* m_node;
 
 	friend class ndWorld;

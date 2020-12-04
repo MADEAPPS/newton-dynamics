@@ -62,6 +62,8 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	D_COLLISION_API virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
 	D_COLLISION_API dFloat32 CalculateSpringDamperAcceleration(dFloat32 dt, dFloat32 ks, dFloat32 x, dFloat32 kd, dFloat32 v) const;
 	
+	const dMatrix& GetLocalMatrix0() const;
+	const dMatrix& GetLocalMatrix1() const;
 
 	virtual dInt32 GetSolverModel() const;
 	virtual void SetSolverModel(dInt32 model);
@@ -131,6 +133,16 @@ inline ndBodyKinematic* ndJointBilateralConstraint::GetBody0() const
 inline ndBodyKinematic* ndJointBilateralConstraint::GetBody1() const
 {
 	return m_body1;
+}
+
+inline const dMatrix& ndJointBilateralConstraint::GetLocalMatrix0() const
+{
+	return m_localMatrix0;
+}
+
+inline const dMatrix& ndJointBilateralConstraint::GetLocalMatrix1() const
+{
+	return m_localMatrix1;
 }
 
 inline dFloat32 ndJointBilateralConstraint::GetMotorZeroAcceleration(ndConstraintDescritor& desc) const

@@ -154,7 +154,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		return tireBody;
 	}
 
-	void Update(const ndWorld* const world, dFloat32 timestep) const
+	void Update(const ndWorld* const world, dFloat32 timestep)
 	{
 		ndMultiBodyVehicle::Update(world, timestep);
 	}

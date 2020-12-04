@@ -26,6 +26,7 @@
 #include "ndModel.h"
 
 class ndWorld;
+class ndJointWheel;
 class ndMultiBodyVehicle: public ndModel
 {
 	public:
@@ -38,12 +39,16 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API void AddChassis(ndBodyDynamic* const chassis);
 	D_NEWTON_API void AddTire(ndWorld* const world, ndBodyDynamic* const tire);
 
+	private:
+	void ProjectJointErrors();
+
 	protected:
-	D_NEWTON_API virtual void Update(const ndWorld* const world, dFloat32 timestep) const;
+	D_NEWTON_API virtual void Update(const ndWorld* const world, dFloat32 timestep);
 
 	dMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;
 	ndShapeChamferCylinder* m_tireShape;
+	dList<ndJointWheel*> m_tires;
 };
 
 #endif

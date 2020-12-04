@@ -1015,40 +1015,6 @@ void ndDemoEntityManager::PushTransparentMesh (const ndDemoMeshInterface* const 
 	m_tranparentHeap.Push (entry, dist.m_z);
 }
 
-/*
-void ndDemoEntityManager::LoadVisualScene(dScene* const scene, EntityDictionary& dictionary)
-{
-	// load all meshes into a Mesh cache for reuse
-	dTree<ndDemoMeshInterface*, dScene::dTreeNode*> meshDictionary;
-	for (dScene::dTreeNode* node = scene->GetFirstNode (); node; node = scene->GetNextNode (node)) {
-		dNodeInfo* info = scene->GetInfoFromNode(node);
-		if (info->GetTypeId() == dMeshNodeInfo::GetRttiType()) {
-			ndDemoMeshInterface* const mesh = new ndDemoMesh(scene, node, m_shaderCache);
-			meshDictionary.Insert(mesh, node);
-		}
-	}
-
-	// create an entity for every root node in the mesh
-	// a root node or scene entity is a dSceneNodeInfo with a direct link to the root of the dScene node.
-	dScene::dTreeNode* const root = scene->GetRootNode();
-	for (void* child = scene->GetFirstChildLink(root); child; child = scene->GetNextChildLink (root, child)) {
-		dScene::dTreeNode* node = scene->GetNodeFromLink(child);
-		dNodeInfo* info = scene->GetInfoFromNode(node);
-		if (info->GetTypeId() == dSceneNodeInfo::GetRttiType()) {
-			// we found a root dSceneNodeInfo, convert it to a Scene entity and load all it children 
-			ndDemoEntity* const entityRoot = new ndDemoEntity (*this, scene, node, meshDictionary, dictionary);
-			Append(entityRoot);
-		}
-	}
-
-	// release all meshes before exiting
-	dTree<ndDemoMeshInterface*, dScene::dTreeNode*>::Iterator iter (meshDictionary);
-	for (iter.Begin(); iter; iter++) {
-		ndDemoMeshInterface* const mesh = iter.GetNode()->GetInfo();
-		mesh->Release();
-	}
-}
-*/
 
 void ndDemoEntityManager::ImportPLYfile (const char* const fileName)
 {

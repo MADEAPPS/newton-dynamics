@@ -436,38 +436,6 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 
 void RenderCenterOfMass(ndDemoEntityManager* const scene)
 {
-	//glDisable(GL_LIGHTING);
-	//glDisable(GL_TEXTURE_2D);
-	//
-	//glColor3f(0.0f, 0.0f, 1.0f);
-	//
-	//glBegin(GL_LINES);
-	//for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
-	//	dMatrix matrix;
-	//	dVector com(0.0f);
-	//
-	//	NewtonBodyGetCentreOfMass(body, &com[0]);
-	//	NewtonBodyGetMatrix(body, &matrix[0][0]);
-	//
-	//	dVector o(matrix.TransformVector(com));
-	//
-	//	dVector x(o + matrix.RotateVector(dVector(1.0f, 0.0f, 0.0f, 0.0f)));
-	//	glColor3f(1.0f, 0.0f, 0.0f);
-	//	glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
-	//	glVertex3f(GLfloat(x.m_x), GLfloat(x.m_y), GLfloat(x.m_z));
-	//
-	//	dVector y(o + matrix.RotateVector(dVector(0.0f, 1.0f, 0.0f, 0.0f)));
-	//	glColor3f(0.0f, 1.0f, 0.0f);
-	//	glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
-	//	glVertex3f(GLfloat(y.m_x), GLfloat(y.m_y), GLfloat(y.m_z));
-	//
-	//	dVector z(o + matrix.RotateVector(dVector(0.0f, 0.0f, 1.0f, 0.0f)));
-	//	glColor3f(0.0f, 0.0f, 1.0f);
-	//	glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
-	//	glVertex3f(GLfloat(z.m_x), GLfloat(z.m_y), GLfloat(z.m_z));
-	//}
-	//glEnd();
-
 	ndWorld* const world = scene->GetWorld();
 	GLuint shader = scene->GetShaderCache().m_wireFrame;
 
@@ -475,7 +443,6 @@ void RenderCenterOfMass(ndDemoEntityManager* const scene)
 	dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
 	
 	glUseProgram(shader);
-
 
 	dInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
 	dInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
