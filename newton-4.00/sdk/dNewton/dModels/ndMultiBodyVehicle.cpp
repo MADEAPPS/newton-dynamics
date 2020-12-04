@@ -204,6 +204,9 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	{
 		ndJointWheel* const tire = node->GetInfo();
 		tire->DebugJoint(context);
+
+		dVector color(1.0f, 1.0f, 1.0f, 0.0f);
+		context.DrawArrow(tire->GetBody0()->GetMatrix(), color, -1.0f);
 	}
 }
 

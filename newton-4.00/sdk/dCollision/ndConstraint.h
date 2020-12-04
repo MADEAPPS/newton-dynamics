@@ -70,45 +70,13 @@ class ndConstraintDebugCallback: public dClassAlloc
 		DrawLine(matrix.m_posit, z, dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f)));
 	}
 
-	//virtual void DrawPoint(const dVector& p0, dFloat32 thinckness = dFloat32(1.0f)) = 0;
-	//virtual void SetOrthRendering() {};
-	//virtual void ResetOrthRendering() {};
-	//
-	//dFloat32 GetScale() const
-	//{ 
-	//	return m_debugScale; 
-	//} 
-	//
-	//void SetScale(dFloat32 scale) 
-	//{ 
-	//	m_debugScale = scale; 
-	//}
-	//
-	//void DrawFrame(const dMatrix& matrix) 
-	//{ 
-	//	DrawFrame(matrix, m_debugScale); 
-	//}
-	//
-	//void DrawFrame(const dMatrix& matrix, dFloat32 scale)
-	//{
-	//	dVector x(matrix.m_posit + matrix.RotateVector(dVector(scale, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f))));
-	//	SetColor(dVector(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f)));
-	//	DrawLine(matrix.m_posit, x);
-	//
-	//	dVector y(matrix.m_posit + matrix.RotateVector(dVector(dFloat32(0.0f), scale, dFloat32(0.0f), dFloat32(0.0f))));
-	//	SetColor(dVector(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f)));
-	//	DrawLine(matrix.m_posit, y);
-	//
-	//	dVector z(matrix.m_posit + matrix.RotateVector(dVector(dFloat32(0.0f), dFloat32(0.0f), scale, dFloat32(0.0f))));
-	//	SetColor(dVector(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f)));
-	//	DrawLine(matrix.m_posit, z);
-	//}
-	
+	virtual void DrawArrow(const dMatrix& matrix, const dVector& color, dFloat32 length)
+	{
+		dVector p1(matrix.m_posit + matrix.RotateVector(dVector(m_debugScale * length, dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f))));
+		DrawLine(matrix.m_posit, p1, color);
+	}
+		
 	dFloat32 m_debugScale;
-	//int m_width;
-	//int m_height;
-
-
 } D_GCC_NEWTON_ALIGN_32;
 
 D_MSV_NEWTON_ALIGN_32
