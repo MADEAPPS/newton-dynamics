@@ -62,12 +62,9 @@ void ndJointSlider::SubmitSpringDamper(ndConstraintDescritor& desc, const dMatri
 
 void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
 {
-//	, const dVector& p0, const dVector& p1
 	if ((m_minLimit == dFloat32 (0.0f)) && (m_maxLimit == dFloat32(0.0f)))
 	{
-		dAssert(0);
-	//	NewtonUserJointAddLinearRow(m_joint, &p0[0], &p1[0], &matrix1.m_front[0]);
-	//	NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
+		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
 	}
 	else 
 	{
@@ -91,6 +88,35 @@ void ndJointSlider::SubmitConstraintLimits(ndConstraintDescritor& desc, const dM
 			SetLowerFriction(desc, -m_friction);
 			SetHighFriction(desc, m_friction);
 		}
+	}
+}
+
+void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
+{
+	dFloat32 x = m_posit + m_speed * desc.m_timestep;
+	if (x < m_minLimit)
+	{
+		dVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_minLimit));
+		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
+		SetLowerFriction(desc, dFloat32 (0.0f));
+
+		const dFloat32 springAccel = CalculateSpringDamperAcceleration(desc.m_timestep, m_springK, m_posit, m_damperC, m_speed);
+		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc) + springAccel;
+		SetMotorAcceleration(desc, stopAccel);
+	}
+	else if (x > m_maxLimit)
+	{
+		dVector p1(matrix1.m_posit + matrix1.m_front.Scale(m_maxLimit));
+		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_front);
+		SetHighFriction(desc, dFloat32(0.0f));
+
+		const dFloat32 springAccel = CalculateSpringDamperAcceleration(desc.m_timestep, m_springK, m_posit, m_damperC, m_speed);
+		const dFloat32 stopAccel = GetMotorZeroAcceleration(desc) + springAccel;
+		SetMotorAcceleration(desc, stopAccel);
+	}
+	else 
+	{
+		SubmitSpringDamper(desc, matrix1);
 	}
 }
 
@@ -161,9 +187,7 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	{
 		if (m_isStringDamper)
 		{
-			dAssert(0);
-			//SubmitSpringDamper(desc, matrix1);
-			//SubmitConstraintLimitSpringDamper(matrix0, matrix1, p0, p1, timestep);
+			SubmitConstraintLimitSpringDamper(desc, matrix0, matrix1);
 		}
 		else
 		{

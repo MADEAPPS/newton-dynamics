@@ -30,6 +30,7 @@ class ndJointSlider: public ndJointBilateralConstraint
 	private:
 	void SubmitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix);
 	void SubmitConstraintLimits(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
+	void SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
 
 	protected:
 	dFloat32 m_posit;

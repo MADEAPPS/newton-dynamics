@@ -32,45 +32,11 @@
 D_MSV_NEWTON_ALIGN_32
 class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 {
-/*
-	public:
-	virtual void SetDestructorCallback (OnConstraintDestroy destructor);
-	virtual void Serialize (dgSerialize serializeCallback, void* const userData) = 0;
+	//virtual dFloat32 GetStiffness() const;
+	//virtual void SetStiffness(dFloat32 stiffness);
+	//virtual dFloat32 GetMassScaleBody0() const;
+	//virtual dFloat32 GetMassScaleBody1() const;
 
-	bool IsRowMotor(dInt32 index) const {return m_rowIsMotor & (1 << index) ? true : false; }
-
-	protected:
-	virtual void Init (){dgAssert (0);}
-	virtual void Remove (dgWorld* world) {dgAssert (0);}
-
-	virtual dFloat32 GetStiffness() const;
-	virtual void SetStiffness(dFloat32 stiffness);
-
-	virtual dFloat32 GetMassScaleBody0() const;
-	virtual dFloat32 GetMassScaleBody1() const;
-
-	void CalculateMatrixOffset (const dVector& pivot, const dVector& dir, dMatrix& matrix0, dMatrix& matrix1) const;
-	void SetPivotAndPinDir(const dVector &pivot, const dVector &pinDirection, dMatrix& matrix0, dMatrix& matrix1) const;
-	void SetPivotAndPinDir(const dVector& pivot, const dVector& pinDirection0, const dVector& pinDirection1, dMatrix& matrix0, dMatrix& matrix1) const;
-	dVector CalculateGlobalMatrixAndAngle (const dMatrix& localMatrix0, const dMatrix& localMatrix1, dMatrix& globalMatrix0, dMatrix& globalMatrix1) const;
-
-	virtual void JointAccelerations(dgJointAccelerationDecriptor* const params); 
-
-	dFloat32 GetRowAcceleration (dInt32 index, dgContraintDescritor& desc) const;
-	void SetMotorAcceleration (dInt32 index, dFloat32 acceleration, dgContraintDescritor& desc);
-	void SetSpringDamperAcceleration (dInt32 index, dgContraintDescritor& desc, dFloat32 rowStiffness, dFloat32 spring, dFloat32 damper);
-	void SetJacobianDerivative (dInt32 index, dgContraintDescritor& desc, const dFloat32* const jacobianA, const dFloat32* const jacobianB, dgForceImpactPair* const jointForce);
-	void CalculatePointDerivative (dInt32 index, dgContraintDescritor& desc, const dVector& normalGlobal, const dgPointParam& param, dgForceImpactPair* const jointForce);
-	void CalculateAngularDerivative (dInt32 index, dgContraintDescritor& desc, const dVector& normalGlobal, dFloat32 stiffness, dFloat32 jointAngle, dgForceImpactPair* const jointForce);
-
-	void AppendToJointList();
-	
-	dFloat32 m_massScaleBody0;
-	dFloat32 m_massScaleBody1;
-	dFloat32 m_defualtDiagonalRegularizer;
-	OnConstraintDestroy m_destructor;
-	dBilateralConstraintList::dListNode* m_jointNode;
-*/
 	public:
 	D_COLLISION_API ndJointBilateralConstraint(dInt32 maxDof, ndBodyKinematic* const body0, ndBodyKinematic* const body1, const dMatrix& globalMatrix);
 	D_COLLISION_API virtual ~ndJointBilateralConstraint();
@@ -94,6 +60,8 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 	D_COLLISION_API void AddLinearRowJacobian(ndConstraintDescritor& desc, const dVector& pivot0, const dVector& pivot1, const dVector& dir);
 
 	D_COLLISION_API virtual void DebugJoint(ndConstraintDebugCallback& debugCallback) const;
+	D_COLLISION_API dFloat32 CalculateSpringDamperAcceleration(dFloat32 dt, dFloat32 ks, dFloat32 x, dFloat32 kd, dFloat32 v) const;
+	
 
 	virtual dInt32 GetSolverModel() const;
 	virtual void SetSolverModel(dInt32 model);

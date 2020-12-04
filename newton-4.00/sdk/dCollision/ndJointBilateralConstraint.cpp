@@ -510,6 +510,18 @@ void ndJointBilateralConstraint::CalculateLocalMatrix(const dMatrix& globalMatri
 	localMatrix1 = globalMatrix * m_body1->GetMatrix().Inverse();
 }
 
+dFloat32 ndJointBilateralConstraint::CalculateSpringDamperAcceleration(dFloat32 dt, dFloat32 ks, dFloat32 x, dFloat32 kd, dFloat32 v) const
+{
+	//at = - (ks * x + kd * v);
+	//at =  [- ks (x2 - x1) - kd * (v2 - v1) - dt * ks * (v2 - v1)] / [1 + dt * kd + dt * dt * ks] 
+	dFloat32 ksd = dt * ks;
+	dFloat32 num = ks * x + kd * v + ksd * v;
+	dFloat32 den = dFloat32(1.0f) + dt * kd + dt * ksd;
+	dAssert(den > 0.0f);
+	dFloat32 accel = -num / den;
+	return accel;
+}
+
 void ndJointBilateralConstraint::AddLinearRowJacobian(ndConstraintDescritor& desc, const dVector& pivot0, const dVector& pivot1, const dVector& dir)
 {
 	dgPointParam param;
