@@ -21,6 +21,7 @@ class ndJointWheel: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointWheel();
 
+	D_NEWTON_API void SetBrakeTorque(dFloat32 torque);
 	D_NEWTON_API void SetSteeringAngle(dFloat32 steeringAngle);
 	
 	private:
@@ -36,7 +37,7 @@ class ndJointWheel: public ndJointBilateralConstraint
 	dFloat32 m_damperC;
 	dFloat32 m_minLimit;
 	dFloat32 m_maxLimit;
-	dFloat32 m_breakTorque;
+	dFloat32 m_brakeTorque;
 };
 
 #endif 

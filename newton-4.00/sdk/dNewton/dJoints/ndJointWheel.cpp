@@ -22,7 +22,7 @@ ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 	,m_damperC(dFloat32(0.0f))
 	,m_minLimit(dFloat32(0.0f))
 	,m_maxLimit(dFloat32(0.0f))
-	,m_breakTorque(dFloat32(0.0f))
+	,m_brakeTorque(dFloat32(0.0f))
 {
 	m_springK = 5000.0f;
 	m_damperC = 100.0f;
@@ -32,6 +32,11 @@ ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 
 ndJointWheel::~ndJointWheel()
 {
+}
+
+void ndJointWheel::SetBrakeTorque(dFloat32 torque)
+{
+	m_brakeTorque = torque;
 }
 
 void ndJointWheel::SetSteeringAngle(dFloat32 steeringAngle)
@@ -112,41 +117,25 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[0]);
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[2]);
 
-	const dFloat32 angleError = m_maxAngleError;
-
-	//const dFloat32 angle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
-	//AddAngularRowJacobian(desc, matrix1.m_front, angle0);
 	const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	AddAngularRowJacobian(desc, &matrix1.m_up[0], angle0);
-	if (dAbs(angle0) > angleError) 
-	{
-		//dAssert(0);
-		dTrace(("joint error\n"));
-	//	const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle0 / (timestep * timestep);
-	//	NewtonUserJointSetRowAcceleration(m_joint, alpha);
-	}
-	
-	//const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
-	//AddAngularRowJacobian(desc, matrix1.m_up, angle1);
-	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
-	AddAngularRowJacobian(desc, &matrix1.m_right[0], angle1);
-	if (dAbs(angle1) > angleError) 
-	{
-		dAssert(0);
-	//	const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle1 / (timestep * timestep);
-	//	NewtonUserJointSetRowAcceleration(m_joint, alpha);
-	}
-	
-	const dFloat32 angle2 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
-	AddAngularRowJacobian(desc, matrix1.m_right, angle2);
-	if (dAbs(angle2) > angleError) 
-	{
-		dAssert(0);
-	//	const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle2 / (timestep * timestep);
-	//	NewtonUserJointSetRowAcceleration(m_joint, alpha);
-	}
 
+	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
+	
 	SubmitConstraintLimitSpringDamper(desc, matrix0, matrix1);
+
+	if (m_brakeTorque > dFloat32(0.0f))
+	{
+		const dVector tireOmega(m_body0->GetOmega());
+		const dVector chassisOmega(m_body1->GetOmega());
+		dVector relOmega(tireOmega - chassisOmega);
+		dFloat32 rpm = relOmega.DotProduct(matrix1.m_front).GetScalar();
+		AddAngularRowJacobian(desc, matrix1.m_front, dFloat32 (0.0f));
+		SetMotorAcceleration(desc, -rpm * desc.m_invTimestep);
+		SetLowerFriction(desc, -m_brakeTorque);
+		SetHighFriction(desc, m_brakeTorque);
+	}
 }
 
 

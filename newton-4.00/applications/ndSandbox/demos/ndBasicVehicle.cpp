@@ -48,6 +48,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 	public:
 	ndBasicMultiBodyVehicle(ndDemoEntityManager* const scene, const dMatrix& matrix)
 		:ndMultiBodyVehicle(dVector(1.0f, 0.0f, 0.0f, 0.0f), dVector(0.0f, 1.0f, 0.0f, 0.0f))
+		,m_steerAngle(0.0f)
 	{
 		//fbxDemoEntity* const vehicleEntity = LoadFbxMesh("viper.fbx");
 		fbxDemoEntity* const vehicleEntity = LoadFbxMesh("viper1.fbx");
@@ -80,9 +81,15 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndJointWheel* const fr_tire = AddTire(world, fr_tire_body);
 		ndJointWheel* const fl_tire = AddTire(world, fl_tire_body);
 
-		// configure vehicle parts
+		// configure vehicle steering
 		SetAsSteering(fr_tire);
 		SetAsSteering(fl_tire);
+
+		// configure the tires brake
+		SetAsBrake(rr_tire);
+		SetAsBrake(rl_tire);
+		SetAsBrake(fr_tire);
+		SetAsBrake(fl_tire);
 	}
 
 	private:
@@ -160,8 +167,19 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 	void Update(const ndWorld* const world, dFloat32 timestep)
 	{
+		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
+
+		dFloat32 brake = 1000.0f * dFloat32(scene->GetKeyState('K'));
+		dFloat32 steerAngle = 35.0f * (dFloat32(scene->GetKeyState('J')) - dFloat32(scene->GetKeyState('L')));
+		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
+
+		SetBrakeTorque(brake);
+		SetSteeringAngle(m_steerAngle * dDegreeToRad);
+
 		ndMultiBodyVehicle::Update(world, timestep);
 	}
+
+	dFloat32 m_steerAngle;
 };
 
 void ndBasicVehicle (ndDemoEntityManager* const scene)
@@ -169,7 +187,7 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 	// build a floor
 	BuildFloorBox(scene);
 
-	dVector location(0.0f, 4.0f, 0.0f, 1.0f);
+	dVector location(0.0f, 1.0f, 0.0f, 1.0f);
 
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = location;

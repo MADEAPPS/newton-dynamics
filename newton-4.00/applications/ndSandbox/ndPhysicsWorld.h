@@ -23,7 +23,7 @@ class ndPhysicsWorld: public ndWorld
 	virtual ~ndPhysicsWorld();
 
 	void AdvanceTime(dFloat32 timestep);
-	ndDemoEntityManager* GetManager();;
+	ndDemoEntityManager* GetManager();
 
 	private:
 	void OnPostUpdate(dFloat32 timestep);
