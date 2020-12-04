@@ -35,6 +35,7 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
 
 	D_NEWTON_API void SetBrakeTorque(dFloat32 brakeToqrue);
+	D_NEWTON_API void SetHandBrakeTorque(dFloat32 brakeToqrue);
 	D_NEWTON_API void SetSteeringAngle(dFloat32 angleInRadians);
 
 	D_NEWTON_API ndShapeInstance CreateTireShape(dFloat32 radius, dFloat32 width) const;
@@ -43,6 +44,7 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndJointWheel* AddTire(ndWorld* const world, ndBodyDynamic* const tire);
 
 	D_NEWTON_API void SetAsBrake(ndJointWheel* const tire);
+	D_NEWTON_API void SetAsHandBrake(ndJointWheel* const tire);
 	D_NEWTON_API void SetAsSteering(ndJointWheel* const tire);
 
 	private:
@@ -58,9 +60,11 @@ class ndMultiBodyVehicle: public ndModel
 	ndShapeChamferCylinder* m_tireShape;
 	dList<ndJointWheel*> m_tiresList;
 	dList<ndJointWheel*> m_brakeTires;
+	dList<ndJointWheel*> m_handBrakeTires;
 	dList<ndJointWheel*> m_steeringTires;
 	dFloat32 m_brakeTorque;
 	dFloat32 m_steeringAngle;
+	dFloat32 m_handBrakeTorque;
 	dFloat32 m_steeringAngleMemory;
 };
 

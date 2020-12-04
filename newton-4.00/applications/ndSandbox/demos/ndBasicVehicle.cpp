@@ -90,6 +90,11 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		SetAsBrake(rl_tire);
 		SetAsBrake(fr_tire);
 		SetAsBrake(fl_tire);
+
+		// configure the tires hand brake
+		SetAsHandBrake(rr_tire);
+		SetAsHandBrake(rl_tire);
+
 	}
 
 	private:
@@ -170,10 +175,12 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndDemoEntityManager* const scene = ((ndPhysicsWorld*)world)->GetManager();
 
 		dFloat32 brake = 1000.0f * dFloat32(scene->GetKeyState('K'));
+		dFloat32 handBrake = 1000.0f * dFloat32(scene->GetKeyState(' '));
 		dFloat32 steerAngle = 35.0f * (dFloat32(scene->GetKeyState('J')) - dFloat32(scene->GetKeyState('L')));
 		m_steerAngle = m_steerAngle + (steerAngle - m_steerAngle) * 0.15f;
 
 		SetBrakeTorque(brake);
+		SetHandBrakeTorque(handBrake);
 		SetSteeringAngle(m_steerAngle * dDegreeToRad);
 
 		ndMultiBodyVehicle::Update(world, timestep);
