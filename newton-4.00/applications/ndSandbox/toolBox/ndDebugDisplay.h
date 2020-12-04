@@ -44,6 +44,7 @@ void RenderBodiesAABB(ndDemoEntityManager* const scene);
 void RenderCenterOfMass(ndDemoEntityManager* const scene);
 void RenderContactPoints(ndDemoEntityManager* const scene);
 void RenderJointsDebugInfo(ndDemoEntityManager* const scene);
+void RenderModelsDebugInfo(ndDemoEntityManager* const scene);
 
 #endif
 

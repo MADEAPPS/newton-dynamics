@@ -198,6 +198,15 @@ void ndMultiBodyVehicle::ApplySteering()
 	}
 }
 
+void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
+{
+	for (dList<ndJointWheel*>::dListNode* node = m_tiresList.GetFirst(); node; node = node->GetNext())
+	{
+		ndJointWheel* const tire = node->GetInfo();
+		tire->DebugJoint(context);
+	}
+}
+
 void ndMultiBodyVehicle::ApplyBrakes()
 {
 	for (dList<ndJointWheel*>::dListNode* node = m_tiresList.GetFirst(); node; node = node->GetNext())

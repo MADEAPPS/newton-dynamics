@@ -25,6 +25,8 @@
 #include "ndNewtonStdafx.h"
 #include "ndModelList.h"
 
+class ndConstraintDebugCallback;
+
 D_MSV_NEWTON_ALIGN_32
 class ndModel: public dClassAlloc
 {
@@ -32,6 +34,8 @@ class ndModel: public dClassAlloc
 	ndModel();
 	D_NEWTON_API ndModel(const nd::TiXmlNode* const xmlNode);
 	virtual ~ndModel ();
+
+	virtual void Debug(ndConstraintDebugCallback& context) const;
 
 	protected:
 	virtual void Update(const ndWorld* const world, dFloat32 timestep) = 0;
@@ -49,6 +53,11 @@ inline ndModel::ndModel()
 inline ndModel::~ndModel()
 {
 	dAssert(!m_node);
+}
+
+inline void ndModel::Debug(ndConstraintDebugCallback& context) const
+{
+
 }
 #endif 
 

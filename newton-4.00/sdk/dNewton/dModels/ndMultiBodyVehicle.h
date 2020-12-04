@@ -53,6 +53,7 @@ class ndMultiBodyVehicle: public ndModel
 	void ApplyAligmentAndBalancing();
 
 	protected:
+	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 	D_NEWTON_API virtual void Update(const ndWorld* const world, dFloat32 timestep);
 
 	dMatrix m_localFrame;

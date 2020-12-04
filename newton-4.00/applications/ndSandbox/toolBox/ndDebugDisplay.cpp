@@ -605,3 +605,60 @@ void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 		joint->DebugJoint(debugJoint);
 	}
 }
+
+void RenderModelsDebugInfo(ndDemoEntityManager* const scene)
+{
+	class ndJoindDebug : public ndConstraintDebugCallback
+	{
+		public:
+		ndJoindDebug(ndDemoEntityManager* const scene)
+		{
+			ndDemoCamera* const camera = scene->GetCamera();
+			dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+			m_shader = scene->GetShaderCache().m_wireFrame;
+
+			glUseProgram(m_shader);
+
+			m_shadeColorLocation = glGetUniformLocation(m_shader, "shadeColor");
+			m_projectionViewModelMatrixLocation = glGetUniformLocation(m_shader, "projectionViewModelMatrix");
+			glUniformMatrix4fv(m_projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+
+			glEnableClientState(GL_VERTEX_ARRAY);
+			glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), m_line);
+		}
+
+		~ndJoindDebug()
+		{
+			glDisableClientState(GL_VERTEX_ARRAY);
+			glUseProgram(0);
+		}
+
+		void DrawLine(const dVector& p0, const dVector& p1, const dVector& color)
+		{
+			m_line[0].m_x = p0.m_x;
+			m_line[0].m_y = p0.m_y;
+			m_line[0].m_z = p0.m_z;
+			m_line[1].m_x = p1.m_x;
+			m_line[1].m_y = p1.m_y;
+			m_line[1].m_z = p1.m_z;
+			glUniform4fv(m_shadeColorLocation, 1, &color.m_x);
+			glDrawArrays(GL_LINES, 0, 2);
+		}
+
+		GLuint m_shader;
+		dInt32 m_shadeColorLocation;
+		dInt32 m_projectionViewModelMatrixLocation;
+
+		ndMeshVector m_line[2];
+	};
+
+	ndJoindDebug debugJoint(scene);
+	ndWorld* const workd = scene->GetWorld();
+	//const ndJointList& jointList = workd->GetJointList();
+	const ndModelList& modelList = workd->GetModelList();
+	for (ndModelList::dListNode* jointNode = modelList.GetFirst(); jointNode; jointNode = jointNode->GetNext())
+	{
+		ndModel* const model = jointNode->GetInfo();
+		model->Debug(debugJoint);
+	}
+}

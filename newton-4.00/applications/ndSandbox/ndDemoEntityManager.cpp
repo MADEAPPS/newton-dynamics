@@ -125,6 +125,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	,m_updateMenuOptions(true)
 	,m_showContactPoints(false)
 	,m_showJointDebugInfo(false)
+	,m_showModelsDebugInfo(false)
 	,m_showListenersDebugInfo(false)
 	,m_showCollidingFaces(false)
 	,m_suspendPhysicsUpdate(false)
@@ -232,6 +233,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showNormalForces = true;
 	//m_showContactPoints = true;
 	//m_showJointDebugInfo = true;
+	m_showModelsDebugInfo = true;
 	//m_collisionDisplayMode = 3;
 	//m_collisionDisplayMode = 1;
 	//m_showListenersDebugInfo = true;
@@ -663,7 +665,8 @@ void ndDemoEntityManager::ShowMainMenuBar()
 			ImGui::Checkbox("show normal forces", &m_showNormalForces);
 			ImGui::Checkbox("show center of mass", &m_showCenterOfMass);
 			ImGui::Checkbox("show body frame", &m_showBodyFrame);
-			ImGui::Checkbox("show joint debug info", &m_showJointDebugInfo);
+			ImGui::Checkbox("show joints debug info", &m_showJointDebugInfo);
+			ImGui::Checkbox("show models debug info", &m_showModelsDebugInfo);
 			ImGui::Checkbox("show listeners debug info", &m_showListenersDebugInfo);
 			ImGui::Checkbox("show colliding faces", &m_showCollidingFaces);
 
@@ -1374,6 +1377,11 @@ void ndDemoEntityManager::RenderScene()
 	if (m_showJointDebugInfo) 
 	{
 		RenderJointsDebugInfo(this);
+	}
+
+	if (m_showModelsDebugInfo)
+	{
+		RenderModelsDebugInfo(this);
 	}
 
 	if (m_showCenterOfMass) 
