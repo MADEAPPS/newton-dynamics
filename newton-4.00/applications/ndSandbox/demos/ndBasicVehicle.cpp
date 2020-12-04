@@ -60,6 +60,11 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		// create the vehicle chassis as a normal rigid body
 		ndBodyDynamic* const chassis = CreateChassis(scene, vehicleEntity);
 
+		// lower vehicle com;
+		dVector com(chassis->GetCentreOfMass());
+		com -= m_localFrame.m_up.Scale(0.25f);
+		chassis->SetCentreOfMass(com);
+
 		// create the tire chassis as a normal rigid body
 		ndBodyDynamic* const rr_tire = CreateTireBody(scene, chassis, "rr_tire");
 		ndBodyDynamic* const rl_tire = CreateTireBody(scene, chassis, "rl_tire");

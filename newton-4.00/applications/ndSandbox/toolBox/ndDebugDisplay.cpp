@@ -407,36 +407,6 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 	ndMeshVector pointBuffer[4];
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, sizeof (ndMeshVector), pointBuffer);
-#if 0
-	const ndBodyList& bodyList = world->GetBodyList();
-	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
-	{
-		ndBodyKinematic* const body = bodyNode->GetInfo();
-		const ndBodyKinematic::ndContactMap& contactMap = body->GetContactMap();
-		ndBodyKinematic::ndContactMap::Iterator iter(contactMap);
-		for (iter.Begin(); iter; iter++)
-		{
-			const ndContact* const contact = *iter;
-			if (contact->IsActive())
-			{
-				const ndContactPointList& contactPoints = contact->GetContactPoints();
-				for (ndContactPointList::dListNode* contactPointsNode = contactPoints.GetFirst(); contactPointsNode; contactPointsNode = contactPointsNode->GetNext())
-				{
-					const ndContactPoint& contactPoint = contactPointsNode->GetInfo();
-					dVector point(viewProjectionMatrix.TransformVector1x4(contactPoint.m_point));
-					dFloat32 zDist = point.m_w;
-					point = point.Scale(1.0f / zDist);
-
-					pointBuffer[0] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, pizelSize, zDist);
-					pointBuffer[1] = CalculatePoint(invViewProjectionMatrix, point, -pizelSize, -pizelSize, zDist);
-					pointBuffer[2] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, pizelSize, zDist);
-					pointBuffer[3] = CalculatePoint(invViewProjectionMatrix, point, pizelSize, -pizelSize, zDist);
-					glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-				}
-			}
-		}
-	}
-#else
 	const ndContactList& contactList = world->GetContactList();
 	for (ndContactList::dListNode* contactNode = contactList.GetFirst(); contactNode; contactNode = contactNode->GetNext())
 	{
@@ -459,10 +429,102 @@ void RenderContactPoints(ndDemoEntityManager* const scene)
 			}
 		}
 	}
-#endif
 
 	glUseProgram(0);
 	glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+void RenderCenterOfMass(ndDemoEntityManager* const scene)
+{
+	//glDisable(GL_LIGHTING);
+	//glDisable(GL_TEXTURE_2D);
+	//
+	//glColor3f(0.0f, 0.0f, 1.0f);
+	//
+	//glBegin(GL_LINES);
+	//for (NewtonBody* body = NewtonWorldGetFirstBody(world); body; body = NewtonWorldGetNextBody(world, body)) {
+	//	dMatrix matrix;
+	//	dVector com(0.0f);
+	//
+	//	NewtonBodyGetCentreOfMass(body, &com[0]);
+	//	NewtonBodyGetMatrix(body, &matrix[0][0]);
+	//
+	//	dVector o(matrix.TransformVector(com));
+	//
+	//	dVector x(o + matrix.RotateVector(dVector(1.0f, 0.0f, 0.0f, 0.0f)));
+	//	glColor3f(1.0f, 0.0f, 0.0f);
+	//	glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
+	//	glVertex3f(GLfloat(x.m_x), GLfloat(x.m_y), GLfloat(x.m_z));
+	//
+	//	dVector y(o + matrix.RotateVector(dVector(0.0f, 1.0f, 0.0f, 0.0f)));
+	//	glColor3f(0.0f, 1.0f, 0.0f);
+	//	glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
+	//	glVertex3f(GLfloat(y.m_x), GLfloat(y.m_y), GLfloat(y.m_z));
+	//
+	//	dVector z(o + matrix.RotateVector(dVector(0.0f, 0.0f, 1.0f, 0.0f)));
+	//	glColor3f(0.0f, 0.0f, 1.0f);
+	//	glVertex3f(GLfloat(o.m_x), GLfloat(o.m_y), GLfloat(o.m_z));
+	//	glVertex3f(GLfloat(z.m_x), GLfloat(z.m_y), GLfloat(z.m_z));
+	//}
+	//glEnd();
+
+	ndWorld* const world = scene->GetWorld();
+	GLuint shader = scene->GetShaderCache().m_wireFrame;
+
+	ndDemoCamera* const camera = scene->GetCamera();
+	dMatrix viewProjectionMatrix(camera->GetViewMatrix() * camera->GetProjectionMatrix());
+	
+	glUseProgram(shader);
+
+
+	dInt32 shadeColorLocation = glGetUniformLocation(shader, "shadeColor");
+	dInt32 projectionViewModelMatrixLocation = glGetUniformLocation(shader, "projectionViewModelMatrix");
+	glUniformMatrix4fv(projectionViewModelMatrixLocation, 1, false, &viewProjectionMatrix[0][0]);
+
+	ndMeshVector line[2];
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glVertexPointer(3, GL_FLOAT, sizeof(ndMeshVector), line);
+
+	const ndBodyList& bodyList = world->GetBodyList();
+	for (ndBodyList::dListNode* bodyNode = bodyList.GetFirst(); bodyNode; bodyNode = bodyNode->GetNext())
+	{
+		ndBodyKinematic* const body = bodyNode->GetInfo();
+
+		dMatrix matrix(body->GetMatrix());
+		dVector com(body->GetCentreOfMass());
+		
+		dVector o(matrix.TransformVector(com));
+		line[0].m_x = o.m_x;
+		line[0].m_y = o.m_y;
+		line[0].m_z = o.m_z;
+
+		dVector x(o + matrix.RotateVector(dVector(0.5f, 0.0f, 0.0f, 0.0f)));
+		line[1].m_x = x.m_x;
+		line[1].m_y = x.m_y;
+		line[1].m_z = x.m_z;
+		dVector color(1.0f, 0.0f, 0.0f, 0.0f);
+		glUniform4fv(shadeColorLocation, 1, &color.m_x);
+		glDrawArrays(GL_LINES, 0, 2);
+
+		x = o + matrix.RotateVector(dVector(0.0f, 0.5f, 0.0f, 0.0f));
+		line[1].m_x = x.m_x;
+		line[1].m_y = x.m_y;
+		line[1].m_z = x.m_z;
+		color = dVector(0.0f, 1.0f, 0.0f, 0.0f);
+		glUniform4fv(shadeColorLocation, 1, &color.m_x);
+		glDrawArrays(GL_LINES, 0, 2);
+
+		x = o + matrix.RotateVector(dVector(0.0f, 0.0f, 0.5f, 0.0f));
+		line[1].m_x = x.m_x;
+		line[1].m_y = x.m_y;
+		line[1].m_z = x.m_z;
+		color = dVector (0.0f, 0.0f, 1.0f, 0.0f);
+		glUniform4fv(shadeColorLocation, 1, &color.m_x);
+		glDrawArrays(GL_LINES, 0, 2);
+	}
+
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glUseProgram(0);
 }
 
 void RenderParticles(ndDemoEntityManager* const scene)
@@ -520,7 +582,6 @@ void RenderParticles(ndDemoEntityManager* const scene)
 	glUseProgram(0);
 	glDisableClientState(GL_VERTEX_ARRAY);
 }
-
 
 void RenderJointsDebugInfo(ndDemoEntityManager* const scene)
 {

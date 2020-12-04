@@ -1398,11 +1398,7 @@ void ndDemoEntityManager::RenderScene()
 	//if (m_showBodyFrame) {
 	//	RenderBodyFrame(m_world);
 	//}
-	//
-	//if (m_showCenterOfMass) {
-	//	RenderCenterOfMass(m_world);
-	//}
-	//
+
 	//if (m_showListenersDebugInfo) {
 	//	dJointDebugDisplay listenerDebugRender (m_cameraManager->GetCamera()->GetCurrentMatrix());
 	//	listenerDebugRender.SetScale(0.5f);
@@ -1412,6 +1408,11 @@ void ndDemoEntityManager::RenderScene()
 	if (m_showJointDebugInfo) 
 	{
 		RenderJointsDebugInfo(this);
+	}
+
+	if (m_showCenterOfMass) 
+	{
+		RenderCenterOfMass(this);
 	}
 
 	//if (m_showNormalForces) {

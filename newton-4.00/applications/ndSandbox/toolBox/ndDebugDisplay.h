@@ -20,9 +20,6 @@
 class ndDemoEntityManager;
 
 #if 0
-
-
-void RenderCenterOfMass (NewtonWorld* const world);
 void RenderBodyFrame (NewtonWorld* const world);
 void RenderRayCastHit(NewtonWorld* const world);
 void RenderNormalForces (NewtonWorld* const world);
@@ -40,9 +37,11 @@ void ClearDebugDisplay(NewtonWorld* const world);
 void ShowMeshCollidingFaces (const NewtonBody* const staticCollisionBody, const NewtonBody* const body, int faceID, int vertexCount, const dFloat32* const vertex, int vertexstrideInBytes);
 #endif
 
+
 void RenderParticles(ndDemoEntityManager* const scene);
 void RenderWorldScene(ndDemoEntityManager* const scene);
 void RenderBodiesAABB(ndDemoEntityManager* const scene);
+void RenderCenterOfMass(ndDemoEntityManager* const scene);
 void RenderContactPoints(ndDemoEntityManager* const scene);
 void RenderJointsDebugInfo(ndDemoEntityManager* const scene);
 
