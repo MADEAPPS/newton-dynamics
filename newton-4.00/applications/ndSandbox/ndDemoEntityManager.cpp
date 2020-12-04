@@ -32,8 +32,8 @@
 //#define DEFAULT_SCENE	2		// setting basic player
 //#define DEFAULT_SCENE	3		// particle water volume 
 //#define DEFAULT_SCENE	4		// static mesh collision 
-#define DEFAULT_SCENE	5		// setting basic joints
-//#define DEFAULT_SCENE	6		// setting basic vehicle
+//#define DEFAULT_SCENE	5		// setting basic joints
+#define DEFAULT_SCENE	6		// setting basic vehicle
 //#define DEFAULT_SCENE	7		// conservation of angular momentum 
 						 
 // demos forward declaration 

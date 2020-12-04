@@ -22,7 +22,8 @@
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
-#include "ndJointHinge.h"
+//#include "ndJointHinge.h"
+#include "ndJointWheel.h"
 #include "ndBodyDynamic.h"
 #include "ndMultiBodyVehicle.h"
 
@@ -68,7 +69,7 @@ void ndMultiBodyVehicle::AddTire(ndWorld* const world, ndBodyDynamic* const tire
 	matrix.m_posit = tire->GetMatrix().m_posit;
 
 	//ndJointBallAndSocket* const joint = new ndJointBallAndSocket(matrix, chassis, tireBody);
-	ndJointHinge* const joint = new ndJointHinge(matrix, tire, m_chassis);
+	ndJointWheel* const joint = new ndJointWheel(matrix, tire, m_chassis);
 	world->AddJoint(joint);
 }
 

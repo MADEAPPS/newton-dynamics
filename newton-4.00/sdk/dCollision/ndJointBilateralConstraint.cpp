@@ -700,27 +700,28 @@ void ndJointBilateralConstraint::SetMassSpringDamperAcceleration(ndConstraintDes
 	dFloat32 kd = dAbs(damper);
 	dFloat32 ksd = dt * ks;
 
-	const dMatrix& invInertia0 = m_body0->m_invWorldInertiaMatrix;
-	const dMatrix& invInertia1 = m_body1->m_invWorldInertiaMatrix;
-	const dVector invMass0(m_body0->m_invMass[3]);
-	const dVector invMass1(m_body1->m_invMass[3]);
+	//const dMatrix& invInertia0 = m_body0->m_invWorldInertiaMatrix;
+	//const dMatrix& invInertia1 = m_body1->m_invWorldInertiaMatrix;
+	//const dVector invMass0(m_body0->m_invMass[3]);
+	//const dVector invMass1(m_body1->m_invMass[3]);
+	//
+	//ndJacobian jacobian0InvMass;
+	//ndJacobian jacobian1InvMass;
+	//jacobian0InvMass.m_linear = jacobian0.m_linear * invMass0;
+	//jacobian0InvMass.m_angular = invInertia0.RotateVector(jacobian0.m_angular);
+	//jacobian1InvMass.m_linear = jacobian1.m_linear * invMass1;
+	//jacobian1InvMass.m_angular = invInertia1.RotateVector(jacobian1.m_angular);
+	//const dVector tmpDiag(
+	//	jacobian0InvMass.m_linear * jacobian0.m_linear + jacobian0InvMass.m_angular * jacobian0.m_angular +
+	//	jacobian1InvMass.m_linear * jacobian1.m_linear + jacobian1InvMass.m_angular * jacobian1.m_angular);
+	//dFloat32 diag = tmpDiag.AddHorizontal().GetScalar();
+	////dFloat32 den = dFloat32 (1.0f) + dt * kd + dt * ksd;
 
-	ndJacobian jacobian0InvMass;
-	ndJacobian jacobian1InvMass;
-	jacobian0InvMass.m_linear = jacobian0.m_linear * invMass0;
-	jacobian0InvMass.m_angular = invInertia0.RotateVector(jacobian0.m_angular);
-	jacobian1InvMass.m_linear = jacobian1.m_linear * invMass1;
-	jacobian1InvMass.m_angular = invInertia1.RotateVector(jacobian1.m_angular);
-
-	const dVector tmpDiag(
-		jacobian0InvMass.m_linear * jacobian0.m_linear + jacobian0InvMass.m_angular * jacobian0.m_angular +
-		jacobian1InvMass.m_linear * jacobian1.m_linear + jacobian1InvMass.m_angular * jacobian1.m_angular);
-	dFloat32 diag = tmpDiag.AddHorizontal().GetScalar();
-
-	//dFloat32 den = dFloat32 (1.0f) + dt * kd + dt * ksd;
 	dFloat32 den = dt * kd + dt * ksd;
+	//dFloat32 accel = (ks * relPosit + kd * relVeloc + ksd * relVeloc) / (dFloat32(1.0f) + den);
 	dFloat32 accel = ks * relPosit + kd * relVeloc + ksd * relVeloc;
-	desc.m_diagonalRegularizer[index] = den/diag;
+
+	desc.m_diagonalRegularizer[index] = dFloat32 (1.0f) / den;
 	SetMotorAcceleration(desc, accel);
 }
 

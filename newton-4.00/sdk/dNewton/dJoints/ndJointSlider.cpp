@@ -52,11 +52,9 @@ void ndJointSlider::SetAsSpringDamper(bool state, dFloat32 spring, dFloat32 damp
 	m_isStringDamper = state;
 }
 
-void ndJointSlider::SubmitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix)
+void ndJointSlider::SubmitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
 {
-	dVector p0(matrix.m_posit);
-	dVector p1(matrix.m_posit + matrix.m_front.Scale (m_posit));
-	AddLinearRowJacobian(desc, p1, p0, matrix[0]);
+	AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_front);
 	SetMassSpringDamperAcceleration(desc, m_springK, m_damperC);
 }
 
@@ -116,7 +114,7 @@ void ndJointSlider::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& des
 	}
 	else 
 	{
-		SubmitSpringDamper(desc, matrix1);
+		SubmitSpringDamper(desc, matrix0, matrix1);
 	}
 }
 
@@ -143,19 +141,11 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	const dVector projectedPoint = p1 + pin.Scale(pin.DotProduct(prel).GetScalar());
 
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[1]);
-	//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
-	AddLinearRowJacobian(desc, &p0[0], &projectedPoint[0], matrix1[2]);
-	//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
-
-	//SubmitAngularRow(matrix0, matrix1, timestep);
-
+	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[2]);
 
 	const dFloat32 angleError = m_maxAngleError;
-
 	const dFloat32 angle0 = CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front);
 	AddAngularRowJacobian(desc, matrix1.m_front, angle0);
-	//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	if (dAbs(angle0) > angleError) 
 	{
 		dAssert(0);
@@ -165,7 +155,6 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	
 	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	AddAngularRowJacobian(desc, matrix1.m_up, angle1);
-	//NewtonUserJointSetRowStiffness(m_joint, m_stiffness);
 	if (dAbs(angle1) > angleError) 
 	{
 		dAssert(0);
@@ -196,7 +185,7 @@ void ndJointSlider::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 	else if (m_isStringDamper)
 	{
-		SubmitSpringDamper(desc, matrix1);
+		SubmitSpringDamper(desc, matrix0, matrix1);
 	}
 }
 

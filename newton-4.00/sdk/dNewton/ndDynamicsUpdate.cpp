@@ -480,7 +480,7 @@ void ndDynamicsUpdate::GetJacobianDerivatives(ndConstraint* const joint)
 		row->m_Jt = constraintParam.m_jacobian[i];
 		rhs->m_diagDamp = dFloat32(0.0f);
 		//rhs->m_diagonalRegularizer = dClamp(constraintParam.m_diagonalRegularizer[i], dFloat32(1.0e-5f), dFloat32(1.0f));
-		rhs->m_diagonalRegularizer = rhs->m_diagonalRegularizer = dMax(constraintParam.m_diagonalRegularizer[i], dFloat32(1.0e-5f));
+		rhs->m_diagonalRegularizer = dMax(constraintParam.m_diagonalRegularizer[i], dFloat32(1.0e-5f));
 
 		rhs->m_coordenateAccel = constraintParam.m_jointAccel[i];
 		rhs->m_restitution = constraintParam.m_restitution[i];

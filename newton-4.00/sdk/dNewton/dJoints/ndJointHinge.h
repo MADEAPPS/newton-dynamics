@@ -22,6 +22,7 @@ class ndJointHinge: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointHinge();
 
+	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 };
 

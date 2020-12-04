@@ -51,7 +51,7 @@ static void BuildBallSocket(ndDemoEntityManager* const scene, const dVector& ori
 	dVector floor(FindFloor(*world, matrix.m_posit + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
 	matrix.m_posit.m_y = floor.m_y;
 
-	matrix.m_posit.m_y += 5.0f;
+	matrix.m_posit.m_y += 1.0f;
 	ndBodyDynamic* const body0 = MakePrimitive(scene, matrix, shape, mesh, mass);
 	matrix.m_posit.m_y += 1.0f;
 	ndBodyDynamic* const body1 = MakePrimitive(scene, matrix, shape, mesh, mass);
@@ -93,7 +93,7 @@ static void BuildSlider(ndDemoEntityManager* const scene, const dVector& origin,
 	ndBodyDynamic* const body = MakePrimitive(scene, matrix, shape, mesh, mass);
 	
 	ndJointSlider* const joint = new ndJointSlider(matrix, body, fixBody);
-	joint->SetAsSpringDamper(true, 20.0f, 1.0f);
+	joint->SetAsSpringDamper(true, 500.0f, 5.0f);
 	//joint->SetFriction(mass * 10.0f * 2.0f);
 	joint->EnableLimits(true, -1.0f, 1.0f);
 	world->AddJoint(joint);
