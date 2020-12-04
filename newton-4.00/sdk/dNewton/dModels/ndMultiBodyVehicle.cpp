@@ -32,6 +32,9 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& u
 	,m_localFrame(dGetIdentityMatrix())
 	,m_chassis(nullptr)
 	,m_tireShape(new ndShapeChamferCylinder(dFloat32(0.75f), dFloat32(0.5f)))
+	,m_tiresList()
+	,m_steeringTire()
+	,m_steeringAngle(dFloat32 (0.0f))
 {
 	m_tireShape->AddRef();
 	m_localFrame.m_front = frontDir & dVector::m_triplexMask;
@@ -59,7 +62,7 @@ void ndMultiBodyVehicle::AddChassis(ndBodyDynamic* const chassis)
 	m_chassis = chassis;
 }
 
-void ndMultiBodyVehicle::AddTire(ndWorld* const world, ndBodyDynamic* const tire)
+ndJointWheel* ndMultiBodyVehicle::AddTire(ndWorld* const world, ndBodyDynamic* const tire)
 {
 	dMatrix tireFrame(dGetIdentityMatrix());
 	tireFrame.m_front = dVector(0.0f, 0.0f, 1.0f, 0.0f);
@@ -76,9 +79,10 @@ void ndMultiBodyVehicle::AddTire(ndWorld* const world, ndBodyDynamic* const tire
 	inertia.m_z = maxInertia;
 	tire->SetMassMatrix(inertia);
 
-	ndJointWheel* const joint = new ndJointWheel(matrix, tire, m_chassis);
-	m_tires.Append(joint);
-	world->AddJoint(joint);
+	ndJointWheel* const tireJoint = new ndJointWheel(matrix, tire, m_chassis);
+	m_tiresList.Append(tireJoint);
+	world->AddJoint(tireJoint);
+	return tireJoint;
 }
 
 ndShapeInstance ndMultiBodyVehicle::CreateTireShape(dFloat32 radius, dFloat32 width) const
@@ -89,16 +93,22 @@ ndShapeInstance ndMultiBodyVehicle::CreateTireShape(dFloat32 radius, dFloat32 wi
 	return tireCollision;
 }
 
-void ndMultiBodyVehicle::Update(const ndWorld* const world, dFloat32 timestep)
+void ndMultiBodyVehicle::SetAsSteering(ndJointWheel* const tire)
 {
-	ProjectJointErrors();
+	m_steeringTire.Append(tire);
 }
 
-void ndMultiBodyVehicle::ProjectJointErrors()
+void ndMultiBodyVehicle::Update(const ndWorld* const world, dFloat32 timestep)
+{
+	ApplyAligmentAndBalacing();
+	ApplySteering();
+}
+
+void ndMultiBodyVehicle::ApplyAligmentAndBalacing()
 {
 	const dVector chassisOmega(m_chassis->GetOmega());
 	const dVector upDir(m_chassis->GetMatrix().RotateVector(m_localFrame.m_up));
-	for (dList<ndJointWheel*>::dListNode* node = m_tires.GetFirst(); node; node = node->GetNext())
+	for (dList<ndJointWheel*>::dListNode* node = m_tiresList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointWheel* const tire = node->GetInfo();
 		ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
@@ -133,5 +143,16 @@ void ndMultiBodyVehicle::ProjectJointErrors()
 			const dVector tireOmega(chassisOmega + chassisMatrix.m_front.Scale(rpm));
 			tireBody->SetOmega(tireOmega);
 		}
+	}
+}
+
+void ndMultiBodyVehicle::ApplySteering()
+{
+	m_steeringAngle = dFloat32 (25.0f) * dDegreeToRad;
+	for (dList<ndJointWheel*>::dListNode* node = m_steeringTire.GetFirst(); node; node = node->GetNext())
+	{
+		ndJointWheel* const tire = node->GetInfo();
+		//ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
+		tire->SetSteeringAngle(m_steeringAngle);
 	}
 }

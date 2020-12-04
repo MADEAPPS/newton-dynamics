@@ -37,10 +37,13 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndShapeInstance CreateTireShape(dFloat32 radius, dFloat32 width) const;
 
 	D_NEWTON_API void AddChassis(ndBodyDynamic* const chassis);
-	D_NEWTON_API void AddTire(ndWorld* const world, ndBodyDynamic* const tire);
+	D_NEWTON_API ndJointWheel* AddTire(ndWorld* const world, ndBodyDynamic* const tire);
+
+	D_NEWTON_API void SetAsSteering(ndJointWheel* const tire);
 
 	private:
-	void ProjectJointErrors();
+	void ApplySteering();
+	void ApplyAligmentAndBalacing();
 
 	protected:
 	D_NEWTON_API virtual void Update(const ndWorld* const world, dFloat32 timestep);
@@ -48,7 +51,9 @@ class ndMultiBodyVehicle: public ndModel
 	dMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;
 	ndShapeChamferCylinder* m_tireShape;
-	dList<ndJointWheel*> m_tires;
+	dList<ndJointWheel*> m_tiresList;
+	dList<ndJointWheel*> m_steeringTire;
+	dFloat32 m_steeringAngle;
 };
 
 #endif

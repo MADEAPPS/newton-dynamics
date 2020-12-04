@@ -15,6 +15,7 @@
 
 ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
+	,m_baseFrame(m_localMatrix1)
 	,m_posit(dFloat32 (0.0f))
 	,m_speed(dFloat32(0.0f))
 	,m_springK(dFloat32(0.0f))
@@ -22,8 +23,6 @@ ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* con
 	,m_minLimit(dFloat32(0.0f))
 	,m_maxLimit(dFloat32(0.0f))
 	,m_breakTorque(dFloat32(0.0f))
-	//,m_hasLimits(false)
-	//,m_isStringDamper(false)
 {
 	m_springK = 5000.0f;
 	m_damperC = 100.0f;
@@ -35,26 +34,26 @@ ndJointWheel::~ndJointWheel()
 {
 }
 
-//void ndJointWheel::SetFriction(dFloat32 friction)
-//{
-//	m_friction = dAbs(friction);
-//}
-//
-//void ndJointWheel::EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimit)
-//{
-//	m_hasLimits = state;
-//	dAssert(minLimit <= 0.0f);
-//	dAssert(maxLimit >= 0.0f);
-//	m_minLimit = minLimit;
-//	m_maxLimit = maxLimit;
-//}
+void ndJointWheel::SetSteeringAngle(dFloat32 steeringAngle)
+{
+	dMatrix tireMatrix;
+	dMatrix chassisMatrix;
 
-//void ndJointWheel::SetAsSpringDamper(bool state, dFloat32 spring, dFloat32 damper)
-//{
-//	m_springK = dAbs(spring);
-//	m_damperC = dAbs(damper);
-//	m_isStringDamper = state;
-//}
+	const dMatrix steeringMatrix(dYawMatrix(steeringAngle));
+	m_localMatrix1 = steeringMatrix * m_baseFrame;
+
+	CalculateGlobalMatrix(tireMatrix, chassisMatrix);
+
+	const dVector relPosit(tireMatrix.m_posit - chassisMatrix.m_posit);
+	const dFloat32 distance = relPosit.DotProduct(chassisMatrix.m_up).GetScalar();
+	const dFloat32 spinAngle = -CalculateAngle(tireMatrix.m_up, chassisMatrix.m_up, chassisMatrix.m_front);
+
+	dMatrix newTireMatrix(dPitchMatrix(spinAngle) * chassisMatrix);
+	newTireMatrix.m_posit = chassisMatrix.m_posit + chassisMatrix.m_up.Scale(distance);
+
+	const dMatrix tireBodyMatrix(m_localMatrix0.Inverse() * newTireMatrix);
+	m_body0->SetMatrix(tireBodyMatrix);
+}
 
 void ndJointWheel::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
 {
@@ -121,7 +120,8 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	AddAngularRowJacobian(desc, &matrix1.m_up[0], angle0);
 	if (dAbs(angle0) > angleError) 
 	{
-		dAssert(0);
+		//dAssert(0);
+		dTrace(("joint error\n"));
 	//	const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle0 / (timestep * timestep);
 	//	NewtonUserJointSetRowAcceleration(m_joint, alpha);
 	}

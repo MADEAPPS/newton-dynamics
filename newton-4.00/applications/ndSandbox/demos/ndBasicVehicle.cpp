@@ -66,19 +66,23 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		chassis->SetCentreOfMass(com);
 
 		// create the tire chassis as a normal rigid body
-		ndBodyDynamic* const rr_tire = CreateTireBody(scene, chassis, "rr_tire");
-		ndBodyDynamic* const rl_tire = CreateTireBody(scene, chassis, "rl_tire");
-		ndBodyDynamic* const fr_tire = CreateTireBody(scene, chassis, "fr_tire");
-		ndBodyDynamic* const fl_tire = CreateTireBody(scene, chassis, "fl_tire");
+		ndBodyDynamic* const rr_tire_body = CreateTireBody(scene, chassis, "rr_tire");
+		ndBodyDynamic* const rl_tire_body = CreateTireBody(scene, chassis, "rl_tire");
+		ndBodyDynamic* const fr_tire_body = CreateTireBody(scene, chassis, "fr_tire");
+		ndBodyDynamic* const fl_tire_body = CreateTireBody(scene, chassis, "fl_tire");
 		
 		// 1- add chassis to the vehicle mode 
 		AddChassis(chassis);
 
 		// 2- each tire to the mode, this function will create the tire joints
-		AddTire(world, rr_tire);
-		AddTire(world, rl_tire);
-		AddTire(world, fr_tire);
-		AddTire(world, fl_tire);
+		ndJointWheel* const rr_tire = AddTire(world, rr_tire_body);
+		ndJointWheel* const rl_tire = AddTire(world, rl_tire_body);
+		ndJointWheel* const fr_tire = AddTire(world, fr_tire_body);
+		ndJointWheel* const fl_tire = AddTire(world, fl_tire_body);
+
+		// configure vehicle parts
+		SetAsSteering(fr_tire);
+		SetAsSteering(fl_tire);
 	}
 
 	private:

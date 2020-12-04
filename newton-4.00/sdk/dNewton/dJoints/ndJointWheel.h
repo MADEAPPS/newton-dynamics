@@ -21,9 +21,7 @@ class ndJointWheel: public ndJointBilateralConstraint
 	D_NEWTON_API ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
 	D_NEWTON_API virtual ~ndJointWheel();
 
-	//D_NEWTON_API void SetFriction(dFloat32 friction);
-	//D_NEWTON_API void EnableLimits(bool state, dFloat32 minLimit, dFloat32 maxLimit);
-	//D_NEWTON_API void SetAsSpringDamper(bool state, dFloat32 spring, dFloat32 damper);
+	D_NEWTON_API void SetSteeringAngle(dFloat32 steeringAngle);
 	
 	private:
 	void SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
@@ -31,6 +29,7 @@ class ndJointWheel: public ndJointBilateralConstraint
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
+	dMatrix m_baseFrame;
 	dFloat32 m_posit;
 	dFloat32 m_speed;
 	dFloat32 m_springK;
@@ -38,9 +37,6 @@ class ndJointWheel: public ndJointBilateralConstraint
 	dFloat32 m_minLimit;
 	dFloat32 m_maxLimit;
 	dFloat32 m_breakTorque;
-
-	//bool m_hasLimits;
-	//bool m_isStringDamper;
 };
 
 #endif 
