@@ -1345,8 +1345,8 @@ void DemoEntityManager::UpdatePhysics()
 
 		unsigned64 currentTime = dGetTimeInMicrosenconds ();
 		unsigned64 nextTime = currentTime - m_microsecunds;
-		if (nextTime > timestepMicrosecunds * 2) {
-			m_microsecunds = currentTime - timestepMicrosecunds * 2;
+		if (nextTime > timestepMicrosecunds * 8) {
+			m_microsecunds = currentTime - timestepMicrosecunds * 8;
 			nextTime = currentTime - m_microsecunds;
 		}
 
