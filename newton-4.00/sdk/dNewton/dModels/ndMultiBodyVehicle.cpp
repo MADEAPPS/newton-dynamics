@@ -205,6 +205,15 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	chassisMatrix.m_posit = chassisMatrix.TransformVector(m_chassis->GetCentreOfMass());
 	context.DrawFrame(chassisMatrix);
 
+	dVector veloc(m_chassis->GetVelocity());
+	dVector p0(chassisMatrix.m_posit + m_localFrame.m_up.Scale(1.0f));
+	dVector p1(p0 + veloc.Scale (0.25f));
+	context.DrawLine(p0, p1, dVector(1.0f, 1.0f, 0.0f, 0.0f));
+
+	dVector p2(p0 + chassisMatrix.RotateVector(m_localFrame.m_front).Scale(0.5f));
+	context.DrawLine(p0, p2, dVector(1.0f, 1.0f, 1.0f, 0.0f));
+
+
 	dVector weight(m_chassis->GetForce());
 	dFloat32 scale = dSqrt(weight.DotProduct(weight).GetScalar());
 	weight = weight.Normalize().Scale(-2.0f);
@@ -326,8 +335,6 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 
 	const dFloat32 lateralFrictionCoefficient = cz / gamma;
 	const dFloat32 longitudinalFrictionCoefficient = cx / gamma;
-
-//dTrace(("u:%f v:%f\n", longitudinalFrictionCoefficient, lateralFrictionCoefficient));
 
 	contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
 	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
