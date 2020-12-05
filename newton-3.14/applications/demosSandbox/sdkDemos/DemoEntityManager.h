@@ -147,7 +147,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	//void RenderUI();
 	void RenderScene();
 	
-	void UpdatePhysics();
+	void UpdatePhysics(dFloat timestep);
 	dFloat CalculateInteplationParam () const;
 
 	void CalculateFPS(dFloat timestep);
@@ -185,6 +185,7 @@ class DemoEntityManager: public dList <DemoEntity*>
 	UpdateCameraCallback m_updateCamera;
 
 	unsigned64 m_microsecunds;
+	dFloat m_timeAccumulator;
 	TransparentHeap m_tranparentHeap;
 
 	int m_currentScene;

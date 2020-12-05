@@ -17,7 +17,7 @@
 #include "ndArchimedesBuoyancyVolume.h"
 
 #define MAX_PHYSICS_FPS				60.0f
-#define MAX_PHYSICS_RECOVER_STEPS	2
+//#define MAX_PHYSICS_RECOVER_STEPS	2
 
 ndPhysicsWorld::ndPhysicsWorld(ndDemoEntityManager* const manager)
 	:ndWorld()
@@ -36,41 +36,38 @@ ndDemoEntityManager* ndPhysicsWorld::GetManager()
 	return m_manager;
 }
 
-void ndPhysicsWorld::AdvanceTime(dFloat32 timetep)
+void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
 {
-	const dFloat32 timeLimit = (1.0f / MAX_PHYSICS_FPS);
-	if (timetep > MAX_PHYSICS_RECOVER_STEPS * 2 * timeLimit)
+	const dFloat32 descreteStep = (1.0f / MAX_PHYSICS_FPS);
+
+	dInt32 maxSteps = 10;
+	m_timeAccumulator += timestep;
+	// if the time step is more than max types step tow away steps.
+	if (m_timeAccumulator > timestep * maxSteps)
 	{
-		// clamp timestep because was probably on a brake point for a long time.
-		timetep = MAX_PHYSICS_RECOVER_STEPS * 2 * timeLimit;
+		m_timeAccumulator -= timestep;
 	}
 
-	m_timeAccumulator += timetep;
-	if (m_timeAccumulator > timeLimit)
+	while (m_timeAccumulator > descreteStep)
 	{
-		D_TRACKTIME();
-		for (int recover = MAX_PHYSICS_RECOVER_STEPS; recover && (m_timeAccumulator > timeLimit); recover--)
-		{
-			Update(timeLimit);
-			m_timeAccumulator -= timeLimit;
+		Update(descreteStep);
+		m_timeAccumulator -= descreteStep;
 
-//xxxx++;
-//if (xxxx == 500)
-//{
-//	Sync();
-//	xxxx = 0;
-//	const ndBodyList& bodyList = GetBodyList();
-//	ndBodyKinematic* body = bodyList.GetFirst()->GetNext()->GetInfo();
-//	//RemoveBody(body);
-//	//delete body;
-//	DeleteBody(body);
-//}
-
-		}
-		if (!m_manager->m_asynchronousPhysicsUpdate)
-		{
-			Sync();
-		}
+		//xxxx++;
+		//if (xxxx == 500)
+		//{
+		//	Sync();
+		//	xxxx = 0;
+		//	const ndBodyList& bodyList = GetBodyList();
+		//	ndBodyKinematic* body = bodyList.GetFirst()->GetNext()->GetInfo();
+		//	//RemoveBody(body);
+		//	//delete body;
+		//	DeleteBody(body);
+		//}
+	}
+	if (!m_manager->m_asynchronousPhysicsUpdate)
+	{
+		Sync();
 	}
 }
 

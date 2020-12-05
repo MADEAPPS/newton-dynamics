@@ -201,7 +201,8 @@ DemoEntityManager::DemoEntityManager ()
 	,m_renderDemoGUI(NULL)
 	,m_renderHelpMenus(NULL)
 	,m_updateCamera(NULL)
-	,m_microsecunds(0)
+	,m_microsecunds(0)	
+	,m_timeAccumulator(dFloat32 (0.0f))
 	,m_tranparentHeap()
 	,m_currentScene(DEFAULT_SCENE)
 	,m_lastCurrentScene(DEFAULT_SCENE)
@@ -1334,63 +1335,38 @@ void DemoEntityManager::SetCameraMatrix (const dQuaternion& rotation, const dVec
 	m_cameraManager->SetCameraMatrix(this, rotation, position);
 }
 
-void DemoEntityManager::UpdatePhysics()
+void DemoEntityManager::UpdatePhysics(dFloat timestep)
 {
 	// update the physics
 	if (m_world && !m_suspendPhysicsUpdate) {
 		D_TRACKTIME();
 
-		dFloat timestepInSecunds = 1.0f / MAX_PHYSICS_FPS;
-		unsigned64 timestepMicrosecunds = unsigned64 (timestepInSecunds * 1000000.0f);
-
-		unsigned64 currentTime = dGetTimeInMicrosenconds ();
-		unsigned64 nextTime = currentTime - m_microsecunds;
-
-		int maxPhysicsSteps = 10;
-		if (nextTime > timestepMicrosecunds * maxPhysicsSteps) {
-			m_microsecunds = currentTime - timestepMicrosecunds * maxPhysicsSteps;
-			nextTime = currentTime - m_microsecunds;
-		}
-
-		bool newUpdate = false;
-		dFloat physicsTime = 0.0f;
-		//while (nextTime >= timestepMicrosecunds) 
-		if (nextTime >= timestepMicrosecunds) 
-		{
-			newUpdate = true;
-			ClearDebugDisplay(m_world);
-
-#ifdef DEMO_CHECK_ASYN_UPDATE
-			g_checkAsyncUpdate = 1;
-#endif
-			if (m_asynchronousPhysicsUpdate) {
-				NewtonUpdateAsync(m_world, timestepInSecunds);
-#ifdef DEMO_CHECK_ASYN_UPDATE
-				NewtonWaitForUpdateToFinish(m_world);
-				g_checkAsyncUpdate = 0;
-#endif
-			} else {
-				NewtonUpdate(m_world, timestepInSecunds);
-			}
-
-			physicsTime += NewtonGetLastUpdateTime(m_world);
-			
-			nextTime -= timestepMicrosecunds;
-			m_microsecunds += timestepMicrosecunds;
-		}
-
-		if (newUpdate) {
-			m_physicsFramesCount ++;
-			m_mainThreadPhysicsTimeAcc += physicsTime;
-			if (m_physicsFramesCount >= 16) {
-				m_mainThreadPhysicsTime = m_mainThreadPhysicsTimeAcc / m_physicsFramesCount;
-				m_physicsFramesCount = 0;
-				m_mainThreadPhysicsTimeAcc = 0.0f;
-			}
-
-		}
+		const dFloat32 descreteStep = (1.0f / MAX_PHYSICS_FPS);
 		
-//dTrace (("%f\n", m_mainThreadPhysicsTime));
+		dInt32 maxSteps = 10;
+		m_timeAccumulator += timestep;
+		// if the time step is more than max types step tow away steps.
+		if (m_timeAccumulator > timestep * maxSteps) 
+		{
+			m_timeAccumulator -= timestep;
+		}
+
+		while (m_timeAccumulator > descreteStep) 
+		{
+			if (m_asynchronousPhysicsUpdate) 
+			{
+				NewtonUpdateAsync(m_world, descreteStep);
+			}
+			else 
+			{
+				NewtonUpdate(m_world, descreteStep);
+			}
+			m_timeAccumulator -= descreteStep;
+		}
+		if (!m_asynchronousPhysicsUpdate) 
+		{
+			NewtonWaitForUpdateToFinish(m_world);
+		}
 	}
 }
 
@@ -1510,7 +1486,7 @@ void DemoEntityManager::RenderScene()
 {
 	dFloat timestep = dGetElapsedSeconds();	
 	CalculateFPS(timestep);
-	UpdatePhysics();
+	UpdatePhysics(timestep);
 
 	D_TRACKTIME();
 	// Get the interpolated location of each body in the scene

@@ -18,10 +18,6 @@
 #include "DebugDisplay.h"
 #include "dHighResolutionTimer.h"
 
-#ifdef DEMO_CHECK_ASYN_UPDATE
-int g_checkAsyncUpdate = 1;
-#endif
-
 //const D_MESH_HEADER	"Newton Mesh"
 static const char* D_MESH_HEADER = "Newton Mesh";
 
@@ -644,11 +640,6 @@ void PhysicsApplyGravityForce (const NewtonBody* body, dFloat timestep, int thre
 		omega = omega.Normalize().Scale(maxMag);
 		NewtonBodySetOmega(body, &omega[0]);
 	}
-
-
-#ifdef DEMO_CHECK_ASYN_UPDATE
-	dAssert(g_checkAsyncUpdate);
-#endif
 
 	// test going to sleep bug
 //	NewtonBodySetSleepState(body, 0);
