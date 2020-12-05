@@ -1348,7 +1348,7 @@ void DemoEntityManager::UpdatePhysics(dFloat timestep)
 		// if the time step is more than max types step tow away steps.
 		while (m_timeAccumulator > descreteStep * maxSteps) 
 		{
-			m_timeAccumulator -= timestep;
+			m_timeAccumulator -= descreteStep;
 		}
 
 		while (m_timeAccumulator > descreteStep) 
