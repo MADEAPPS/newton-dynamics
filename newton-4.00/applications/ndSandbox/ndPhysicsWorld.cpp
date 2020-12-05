@@ -43,7 +43,7 @@ void ndPhysicsWorld::AdvanceTime(dFloat32 timestep)
 	dInt32 maxSteps = 10;
 	m_timeAccumulator += timestep;
 	// if the time step is more than max types step tow away steps.
-	if (m_timeAccumulator > timestep * maxSteps)
+	while (m_timeAccumulator > descreteStep * maxSteps)
 	{
 		m_timeAccumulator -= timestep;
 	}
