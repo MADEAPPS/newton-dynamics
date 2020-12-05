@@ -338,6 +338,8 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
 	contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
 	contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
+
+	//contactPoint.m_material.m_restitution = 0.0f;
 }
 
 void ndMultiBodyVehicle::ApplyTiremodel()

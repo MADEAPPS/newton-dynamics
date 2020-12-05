@@ -27,6 +27,8 @@
 #include "ndDynamicsUpdate.h"
 #include "ndJointBilateralConstraint.h"
 
+//static int xxxx;
+
 ndDynamicsUpdate::ndDynamicsUpdate()
 	:m_velocTol(dFloat32(1.0e-8f))
 	,m_islands(1024)
@@ -936,6 +938,14 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 					const dVector force(dynBody->GetForce() + forceAndTorque.m_linear);
 					const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
 
+//if (dynBody->GetId() == 5)
+//{
+//dTrace(("%d (%f %f %f)\n", xxxx, force.m_x, force.m_y, force.m_z));
+////dTrace(("%d (%f %f %f) (%f %f %f)\n", xxxx, force.m_x, force.m_y, force.m_z, torque.m_x, torque.m_y, torque.m_z));
+//if (xxxx >= 58)
+//	xxxx *= 1;
+//}
+
 					const ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
 					if (!body->m_resting)
 					{
@@ -1563,4 +1573,5 @@ void ndDynamicsUpdate::Update()
 	
 		DetermineSleepStates();
 	}
+//	xxxx++;
 }

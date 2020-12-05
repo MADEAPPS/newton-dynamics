@@ -276,6 +276,11 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 
 	const dInt32 count = desc->m_rowsCount;
 
+static int xxxxx;
+if (m_body0->GetId() == 3 || m_body1->GetId() == 3)
+xxxxx *= 1;
+xxxxx++;
+
 	dFloat32 timestep = dFloat32(1.0f);
 	dFloat32 invTimestep = dFloat32(1.0f);
 	if (desc->m_timestep > dFloat32(0.0f)) 
@@ -287,6 +292,7 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 	ndRightHandSide* const rightHandSide = desc->m_rightHandSide;
 	const ndLeftHandSide* const leftHandSide = desc->m_leftHandSide;
 
+//	dTrace(("("));
 	for (dInt32 k = 0; k < count; k++) 
 	{
 		// note: using restitution been negative to indicate that the acceleration was override
@@ -327,10 +333,18 @@ void ndContact::JointAccelerations(ndJointAccelerationDecriptor* const desc)
 					penetrationVeloc = -(rhs->m_penetration * rhs->m_penetrationStiffness);
 				}
 				vRel = vRel * restitution + penetrationVeloc;
+
+				dFloat32 a = aRel - vRel * invTimestep;
+				if (a < dFloat32 (0.0f))
+				{
+					vRel = aRel * timestep;
+				}
 			}
 		
 			const dFloat32 relGyro = (jacobian0.m_angular * gyroAlpha0 + jacobian1.m_angular * gyroAlpha1).AddHorizontal().GetScalar();
 			rhs->m_coordenateAccel = relGyro + aRel - vRel * invTimestep;
+			//dTrace(("%f ", rhs->m_coordenateAccel));
 		}
 	}
+//	dTrace((")\n"));
 }
