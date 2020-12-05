@@ -140,7 +140,7 @@ void ndMultiBodyVehicle::Update(const ndWorld* const world, dFloat32 timestep)
 	ApplyAligmentAndBalancing();
 	ApplyBrakes();
 	ApplySteering();
-	ApplyTyremodel();
+	ApplyTiremodel();
 }
 
 void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
@@ -201,6 +201,19 @@ void ndMultiBodyVehicle::ApplySteering()
 
 void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 {
+	dMatrix chassisMatrix(m_chassis->GetMatrix());
+	chassisMatrix.m_posit = chassisMatrix.TransformVector(m_chassis->GetCentreOfMass());
+	context.DrawFrame(chassisMatrix);
+
+	dVector weight(m_chassis->GetForce());
+	dFloat32 scale = dSqrt(weight.DotProduct(weight).GetScalar());
+	weight = weight.Normalize().Scale(-2.0f);
+
+	dVector forceColor(dFloat32 (1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+	dVector lateralColor(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
+	dVector longitudinalColor(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f));
+	context.DrawLine(chassisMatrix.m_posit, chassisMatrix.m_posit + weight, forceColor);
+
 	for (dList<ndJointWheel*>::dListNode* node = m_tiresList.GetFirst(); node; node = node->GetNext())
 	{
 		ndJointWheel* const tire = node->GetInfo();
@@ -222,7 +235,20 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 				{
 					const ndContactMaterial& contactPoint = contactNode->GetInfo();
 					dMatrix frame(contactPoint.m_normal, contactPoint.m_dir0, contactPoint.m_dir1, contactPoint.m_point);
-					context.DrawFrame(frame);
+
+					dVector localPosit(m_localFrame.UntransformVector(chassisMatrix.UntransformVector(contactPoint.m_point)));
+					dFloat32 offset = (localPosit.m_z > dFloat32(0.0f)) ? dFloat32(0.15f) : dFloat32(-0.15f);
+					frame.m_posit += contactPoint.m_dir0.Scale(offset);
+					//context.DrawFrame(frame);
+
+					dFloat32 normalForce = dFloat32 (2.0f) * contactPoint.m_normal_Force.m_force / scale;
+					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_normal.Scale (normalForce), forceColor);
+
+					dFloat32 lateralForce = dFloat32(2.0f) * contactPoint.m_dir0_Force.m_force / scale;
+					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir0.Scale(lateralForce), lateralColor);
+
+					dFloat32 longitudinalForce = dFloat32(2.0f) * contactPoint.m_dir1_Force.m_force / scale;
+					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir1.Scale(longitudinalForce), longitudinalColor);
 				}
 			}
 		}
@@ -254,7 +280,7 @@ void ndMultiBodyVehicle::ApplyBrakes()
 	}
 }
 
-void ndMultiBodyVehicle::ApplyTyremodel()
+void ndMultiBodyVehicle::ApplyTiremodel()
 {
 	for (dList<ndJointWheel*>::dListNode* node = m_tiresList.GetFirst(); node; node = node->GetNext())
 	{
@@ -273,11 +299,15 @@ void ndMultiBodyVehicle::ApplyTyremodel()
 				{
 					ndContactMaterial& contactPoint = contactNode->GetInfo();
 					const dVector fronDir(contactPoint.m_normal.CrossProduct(tireMatrix.m_front));
-					dAssert(fronDir.DotProduct(fronDir).GetScalar() > dFloat32 (1.0e-3f));
-					contactPoint.m_dir1 = fronDir.Normalize();
-					contactPoint.m_dir0 = contactPoint.m_dir1.CrossProduct(contactPoint.m_normal);
+					if (fronDir.DotProduct(fronDir).GetScalar() > dFloat32(1.0e-3f))
+					{
+						contactPoint.m_dir1 = fronDir.Normalize();
+						contactPoint.m_dir0 = contactPoint.m_dir1.CrossProduct(contactPoint.m_normal);
+					}
+dTrace(("%f ", contactPoint.m_normal_Force.m_force));
 				}
 			}
 		}
 	}
+dTrace(("\n"));
 }

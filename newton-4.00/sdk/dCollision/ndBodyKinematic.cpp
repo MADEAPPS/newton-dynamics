@@ -272,36 +272,14 @@ void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 {
 	mass = dAbs(mass);
 
-	//if (m_collision->IsType(dgCollision::dgCollisionMesh_RTTI) || m_collision->IsType(dgCollision::dgCollisionScene_RTTI)) {
-	//	mass = DG_INFINITE_MASS * 2.0f;
-	//}
-
 	ndShape* const shape = m_shapeInstance.GetShape();
 	if ((mass < D_MINIMUM_MASS) || shape->GetAsShapeNull() || !shape->GetAsShapeConvex())
 	{
 		mass = D_INFINITE_MASS * 2.0f;
 	}
 
-	//if (m_collision->IsType(dgCollision::dgCollisionCompound_RTTI)) 
-	//{
-	//	const dgCollision* const childShape = m_collision->GetChildShape();
-	//	if ((childShape->m_inertia.m_x < dFloat32(1.0e-5f)) || (childShape->m_inertia.m_y < dFloat32(1.0e-5f)) || (childShape->m_inertia.m_z < dFloat32(1.0e-5f))) 
-	//	{
-	//		mass = DG_INFINITE_MASS * 2.0f;
-	//	}
-	//}
-
 	if (mass >= D_INFINITE_MASS)
 	{
-		//if (m_masterNode) {
-		//	if (m_invMass.m_w != dFloat32(0.0f)) {
-		//		dgBodyMasterList& masterList(*m_world);
-		//		if (masterList.GetFirst() != m_masterNode) {
-		//			masterList.InsertAfter(masterList.GetFirst(), m_masterNode);
-		//		}
-		//	}
-		//}
-
 		m_mass.m_x = D_INFINITE_MASS;
 		m_mass.m_y = D_INFINITE_MASS;
 		m_mass.m_z = D_INFINITE_MASS;
@@ -321,13 +299,6 @@ void ndBodyKinematic::SetMassMatrix(dFloat32 mass, const dMatrix& inertia)
 		dAssert(Ixx > dFloat32(0.0f));
 		dAssert(Iyy > dFloat32(0.0f));
 		dAssert(Izz > dFloat32(0.0f));
-
-		//if (m_masterNode) {
-		//	if (m_invMass.m_w == dFloat32(0.0f)) {
-		//		dgBodyMasterList& masterList(*m_world);
-		//		masterList.RotateToEnd(m_masterNode);
-		//	}
-		//}
 
 		m_mass.m_x = Ixx1;
 		m_mass.m_y = Iyy1;
