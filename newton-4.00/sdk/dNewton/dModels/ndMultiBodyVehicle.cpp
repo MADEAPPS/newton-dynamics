@@ -213,7 +213,6 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	dVector p2(p0 + chassisMatrix.RotateVector(m_localFrame.m_front).Scale(0.5f));
 	context.DrawLine(p0, p2, dVector(1.0f, 1.0f, 1.0f, 0.0f));
 
-
 	dVector weight(m_chassis->GetForce());
 	dFloat32 scale = dSqrt(weight.DotProduct(weight).GetScalar());
 	weight = weight.Normalize().Scale(-2.0f);
@@ -291,8 +290,6 @@ void ndMultiBodyVehicle::ApplyBrakes()
 
 void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContactMaterial& contactPoint) const
 {
-	const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
-
 	// calculate longitudinal slip ratio
 	const ndBodyDynamic* const tireBody = tire->GetBody0()->GetAsBodyDynamic();
 	const ndBodyDynamic* const otherBody = (contactPoint.m_body0 == tireBody) ? ((ndBodyKinematic*)contactPoint.m_body1)->GetAsBodyDynamic() : ((ndBodyKinematic*)contactPoint.m_body0)->GetAsBodyDynamic();
@@ -323,6 +320,7 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 	const dFloat32 cx = tireLongitudinalStiffness * u;
 	const dFloat32 gamma = dSqrt(cx * cx + cz * cz) + dFloat32 (1.0e-3f);
 
+	const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);
 	// the code bellow not needed if we use a rigid body solver, 
 	// since the solve will calculate the correct forces.
 	//dAssert(gamma > dFloat32(0.0f));
@@ -333,8 +331,8 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 	//	normalForce = gamma * (dFloat32(1.0f) - gamma / dFloat32 (3.0f) + gamma * gamma / dFloat32 (27.0f));
 	//}
 
-	const dFloat32 lateralFrictionCoefficient = cz / gamma;
-	const dFloat32 longitudinalFrictionCoefficient = cx / gamma;
+	const dFloat32 lateralFrictionCoefficient = frictionCoefficient * cz / gamma;
+	const dFloat32 longitudinalFrictionCoefficient = frictionCoefficient * cx / gamma;
 
 	contactPoint.m_material.m_staticFriction0 = lateralFrictionCoefficient;
 	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
