@@ -95,7 +95,11 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		// configure the tires hand brake
 		SetAsHandBrake(rr_tire);
 		SetAsHandBrake(rl_tire);
+	}
 
+	void SetAsPlayer(ndDemoEntityManager* const scene)
+	{
+		scene->SetUpdateCameraFunction(UpdateCameraCallback, this);
 	}
 
 	private:
@@ -157,11 +161,11 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		dFloat32 mass(20.0f);
 		ndShapeInstance tireCollision(CreateTireShape(radius, width));
 
-		ndDemoEntity* const tireEntiry = chassisEntity->Find(tireName);
-		dMatrix matrix(tireEntiry->CalculateGlobalMatrix(nullptr));
+		ndDemoEntity* const tireEntity = chassisEntity->Find(tireName);
+		dMatrix matrix(tireEntity->CalculateGlobalMatrix(nullptr));
 
 		ndBodyDynamic* const tireBody = new ndBodyDynamic();
-		tireBody->SetNotifyCallback(new ndTireNotifyNotify(scene, tireEntiry, chassis));
+		tireBody->SetNotifyCallback(new ndTireNotifyNotify(scene, tireEntity, chassis));
 		tireBody->SetMatrix(matrix);
 		tireBody->SetCollisionShape(tireCollision);
 		tireBody->SetMassMatrix(mass, tireCollision);
@@ -192,6 +196,75 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		return dFloat32(1.4f);
 	}
 
+	static void UpdateCameraCallback(ndDemoEntityManager* const manager, void* const context, dFloat32 timestep)
+	{
+		ndBasicMultiBodyVehicle* const me = (ndBasicMultiBodyVehicle*)context;
+		me->SetCamera(manager, timestep);
+	}
+
+	void SetCamera(ndDemoEntityManager* const manager, dFloat32 timestep)
+	{
+		//dAssert(0);
+		//if (m_isPlayer)
+		//{
+			//ndDemoCamera* const camera = m_scene->GetCamera();
+			//dMatrix camMatrix(camera->GetNextMatrix());
+			//
+			//ndDemoEntityNotify* const notify = (ndDemoEntityNotify*)GetNotifyCallback();
+			//ndDemoEntity* const player = (ndDemoEntity*)notify->GetUserData();
+			//dMatrix playerMatrix(player->GetNextMatrix());
+			//
+			//dFloat32 height = 2.0f;
+			//dVector frontDir(camMatrix[0]);
+			//dVector upDir(0.0f, 1.0f, 0.0f, 0.0f);
+			//dVector camOrigin = playerMatrix.TransformVector(upDir.Scale(height));
+			//camOrigin -= frontDir.Scale(PLAYER_THIRD_PERSON_VIEW_DIST);
+			//
+			//camera->SetNextMatrix(*m_scene, camMatrix, camOrigin);
+			//
+			//dFloat32 angle0 = camera->GetYawAngle();
+			//dFloat32 angle1 = GetHeadingAngle();
+			//dFloat32 error = AnglesAdd(angle1, -angle0);
+			////dFloat32 error = 1.0f;
+			//
+			//if ((dAbs(error) > 1.0e-3f) ||
+			//	m_scene->GetKeyState(' ') ||
+			//	m_scene->GetKeyState('A') ||
+			//	m_scene->GetKeyState('D') ||
+			//	m_scene->GetKeyState('W') ||
+			//	m_scene->GetKeyState('S'))
+			//{
+			//	SetSleepState(false);
+			//}
+			//
+			//m_playerInput.m_heading = camera->GetYawAngle();
+			//m_playerInput.m_forwardSpeed = (dInt32(m_scene->GetKeyState('W')) - dInt32(m_scene->GetKeyState('S'))) * PLAYER_WALK_SPEED;
+			//m_playerInput.m_strafeSpeed = (dInt32(m_scene->GetKeyState('D')) - dInt32(m_scene->GetKeyState('A'))) * PLAYER_WALK_SPEED;
+			//m_playerInput.m_jump = m_scene->GetKeyState(' ') && IsOnFloor();
+			//
+			//if (m_playerInput.m_forwardSpeed && m_playerInput.m_strafeSpeed)
+			//{
+			//	dFloat32 invMag = PLAYER_WALK_SPEED / dSqrt(m_playerInput.m_forwardSpeed * m_playerInput.m_forwardSpeed + m_playerInput.m_strafeSpeed * m_playerInput.m_strafeSpeed);
+			//	m_playerInput.m_forwardSpeed *= invMag;
+			//	m_playerInput.m_strafeSpeed *= invMag;
+			//}
+		//}
+
+		//ndDemoEntity* const player = (ndDemoEntity*)NewtonBodyGetUserData(m_player->GetBody());
+		//DemoEntityManager* const scene = (DemoEntityManager*)NewtonWorldGetUserData(GetWorld());
+		//ndBodyDynamic* const body = m_chassis;
+		ndDemoEntity* const chassisEntity = (ndDemoEntity*)m_chassis->GetNotifyCallback()->GetUserData();
+		ndDemoCamera* const camera = manager->GetCamera();
+		dMatrix camMatrix(camera->GetNextMatrix());
+		dMatrix playerMatrix(chassisEntity->GetNextMatrix());
+
+		dVector frontDir(camMatrix[0]);
+		dVector camOrigin(0.0f);
+		camOrigin = playerMatrix.m_posit + dVector(0.0f, 1.0f, 0.0f, 0.0f);
+		camOrigin -= frontDir.Scale(10.0f);
+
+		camera->SetNextMatrix(*manager, camMatrix, camOrigin);
+	}
 
 	dFloat32 m_steerAngle;
 };
@@ -205,9 +278,10 @@ void ndBasicVehicle (ndDemoEntityManager* const scene)
 
 	dMatrix matrix(dGetIdentityMatrix());
 	matrix.m_posit = location;
-	//BuildVehicle(scene, matrix);
+
 	ndBasicMultiBodyVehicle* const vehicle = new ndBasicMultiBodyVehicle(scene, matrix);
 	scene->GetWorld()->AddModel(vehicle);
+	vehicle->SetAsPlayer(scene);
 
 	dQuaternion rot;
 	//dVector origin(-80.0f, 5.0f, 0.0f, 0.0f);
