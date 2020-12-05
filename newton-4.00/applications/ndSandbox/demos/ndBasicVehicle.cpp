@@ -187,7 +187,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndMultiBodyVehicle::Update(world, timestep);
 	}
 
-	virtual dFloat32 GetFrictionCoeficient(ndJointWheel* const tire, const ndContactMaterial& contactPoint) const
+	virtual dFloat32 GetFrictionCoeficient(const ndJointWheel* const tire, const ndContactMaterial& contactPoint) const
 	{
 		return dFloat32(1.4f);
 	}
