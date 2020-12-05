@@ -34,6 +34,11 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndMultiBodyVehicle(const nd::TiXmlNode* const xmlNode);
 	D_NEWTON_API virtual ~ndMultiBodyVehicle ();
 
+	virtual dFloat32 GetFrictionCoeficient(ndJointWheel* const tire, const ndContactMaterial& contactPoint) const
+	{
+		return dFloat32(1.4f);
+	}
+
 	D_NEWTON_API void SetBrakeTorque(dFloat32 brakeToqrue);
 	D_NEWTON_API void SetHandBrakeTorque(dFloat32 brakeToqrue);
 	D_NEWTON_API void SetSteeringAngle(dFloat32 angleInRadians);

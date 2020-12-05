@@ -303,16 +303,15 @@ void ndMultiBodyVehicle::ApplyTiremodel()
 					{
 						contactPoint.m_dir1 = fronDir.Normalize();
 						contactPoint.m_dir0 = contactPoint.m_dir1.CrossProduct(contactPoint.m_normal);
-contactPoint.m_material.m_staticFriction0 = dFloat32(1.0f);
-contactPoint.m_material.m_staticFriction1 = dFloat32(1.0f);
-contactPoint.m_material.m_dynamicFriction0 = dFloat32(1.0f);
-contactPoint.m_material.m_dynamicFriction1 = dFloat32(1.0f);
-//contactPoint.m_material.m_restitution = dFloat32(0.1f);
+
+						const dFloat32 frictionCoeficent = GetFrictionCoeficient(tire, contactPoint);
+						contactPoint.m_material.m_staticFriction0 = frictionCoeficent;
+						contactPoint.m_material.m_staticFriction1 = frictionCoeficent;
+						contactPoint.m_material.m_dynamicFriction0 = frictionCoeficent;
+						contactPoint.m_material.m_dynamicFriction1 = frictionCoeficent;
 					}
-//dTrace(("%f ", contactPoint.m_normal_Force.m_force));
 				}
 			}
 		}
 	}
-//dTrace(("\n"));
 }

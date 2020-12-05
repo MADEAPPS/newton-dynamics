@@ -187,6 +187,12 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		ndMultiBodyVehicle::Update(world, timestep);
 	}
 
+	virtual dFloat32 GetFrictionCoeficient(ndJointWheel* const tire, const ndContactMaterial& contactPoint) const
+	{
+		return dFloat32(1.4f);
+	}
+
+
 	dFloat32 m_steerAngle;
 };
 

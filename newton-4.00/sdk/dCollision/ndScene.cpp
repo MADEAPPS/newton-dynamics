@@ -1109,8 +1109,9 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 		contactPoint->m_body1 = contactArray[i].m_body1;
 		contactPoint->m_shapeInstance0 = contactArray[i].m_shapeInstance0;
 		contactPoint->m_shapeInstance1 = contactArray[i].m_shapeInstance1;
-		//contactPoint->m_shapeId0 = contactArray[i].m_shapeId0;
-		//contactPoint->m_shapeId1 = contactArray[i].m_shapeId1;
+		contactPoint->m_shapeId0 = contactArray[i].m_shapeId0;
+		contactPoint->m_shapeId1 = contactArray[i].m_shapeId1;
+
 		//contactPoint->m_softness = material->m_softness;
 		//contactPoint->m_skinThickness = material->m_skinThickness;
 		//contactPoint->m_staticFriction0 = material->m_staticFriction0;
@@ -1120,7 +1121,6 @@ void ndScene::ProcessContacts(dInt32 threadIndex, dInt32 contactCount, ndContact
 		//contactPoint->m_flags = ndContactMaterial::m_collisionEnable | (material->m_flags & (ndContactMaterial::m_friction0Enable | ndContactMaterial::m_friction1Enable));
 		//contactPoint->m_userData = material->m_userData;
 		contactPoint->m_material = material;
-		//dAssert(dAbs(contactPoint->m_normal.DotProduct(contactPoint->m_normal).GetScalar() - dFloat32(1.0f)) < dFloat32(1.0e-1f));
 	
 		if (staticMotion) 
 		{
