@@ -140,6 +140,7 @@ void ndMultiBodyVehicle::Update(const ndWorld* const world, dFloat32 timestep)
 	ApplyAligmentAndBalancing();
 	ApplyBrakes();
 	ApplySteering();
+	ApplyTyremodel();
 }
 
 void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
@@ -253,3 +254,30 @@ void ndMultiBodyVehicle::ApplyBrakes()
 	}
 }
 
+void ndMultiBodyVehicle::ApplyTyremodel()
+{
+	for (dList<ndJointWheel*>::dListNode* node = m_tiresList.GetFirst(); node; node = node->GetNext())
+	{
+		ndJointWheel* const tire = node->GetInfo();
+
+		const dMatrix tireMatrix (tire->GetLocalMatrix1() * tire->GetBody1()->GetMatrix());
+		const ndBodyKinematic::ndContactMap& contactMap = tire->GetBody0()->GetContactMap();
+		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
+		for (it.Begin(); it; it++)
+		{
+			ndContact* const contact = *it;
+			if (contact->IsActive())
+			{
+				const ndContactPointList& contactPoints = contact->GetContactPoints();
+				for (ndContactPointList::dListNode* contactNode = contactPoints.GetFirst(); contactNode; contactNode = contactNode->GetNext())
+				{
+					ndContactMaterial& contactPoint = contactNode->GetInfo();
+					const dVector fronDir(contactPoint.m_normal.CrossProduct(tireMatrix.m_front));
+					dAssert(fronDir.DotProduct(fronDir).GetScalar() > dFloat32 (1.0e-3f));
+					contactPoint.m_dir1 = fronDir.Normalize();
+					contactPoint.m_dir0 = contactPoint.m_dir1.CrossProduct(contactPoint.m_normal);
+				}
+			}
+		}
+	}
+}

@@ -50,6 +50,7 @@ class ndMultiBodyVehicle: public ndModel
 	private:
 	void ApplyBrakes();
 	void ApplySteering();
+	void ApplyTyremodel();
 	void ApplyAligmentAndBalancing();
 
 	protected:
