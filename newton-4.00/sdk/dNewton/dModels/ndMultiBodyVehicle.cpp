@@ -245,10 +245,10 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_normal.Scale (normalForce), forceColor);
 
 					dFloat32 lateralForce = dFloat32(2.0f) * contactPoint.m_dir0_Force.m_force / scale;
-					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir0.Scale(lateralForce), lateralColor);
+					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir0.Scale(-lateralForce), lateralColor);
 
 					dFloat32 longitudinalForce = dFloat32(2.0f) * contactPoint.m_dir1_Force.m_force / scale;
-					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir1.Scale(longitudinalForce), longitudinalColor);
+					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir1.Scale(-longitudinalForce), longitudinalColor);
 				}
 			}
 		}
@@ -309,10 +309,10 @@ contactPoint.m_material.m_dynamicFriction0 = dFloat32(1.0f);
 contactPoint.m_material.m_dynamicFriction1 = dFloat32(1.0f);
 //contactPoint.m_material.m_restitution = dFloat32(0.1f);
 					}
-dTrace(("%f ", contactPoint.m_normal_Force.m_force));
+//dTrace(("%f ", contactPoint.m_normal_Force.m_force));
 				}
 			}
 		}
 	}
-dTrace(("\n"));
+//dTrace(("\n"));
 }
