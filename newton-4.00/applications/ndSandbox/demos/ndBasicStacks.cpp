@@ -75,7 +75,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	BuildFloorBox(scene);
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	BoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 4);
+	BoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 2);
 
 	dQuaternion rot;
 	dVector origin(-6.0f, 1.0f, 0.0f, 0.0f);
