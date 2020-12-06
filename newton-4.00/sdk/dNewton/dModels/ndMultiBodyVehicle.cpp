@@ -89,7 +89,7 @@ void ndMultiBodyVehicle::SetSteeringAngle(dFloat32 angleInRadians)
 	m_steeringAngle = angleInRadians;
 }
 
-ndJointWheel* ndMultiBodyVehicle::AddTire(ndWorld* const world, ndBodyDynamic* const tire)
+ndJointWheel* ndMultiBodyVehicle::AddTire(ndWorld* const world, const ndJointWheel::ndWheelDescriptor& desc, ndBodyDynamic* const tire)
 {
 	dMatrix tireFrame(dGetIdentityMatrix());
 	tireFrame.m_front = dVector(0.0f, 0.0f, 1.0f, 0.0f);
@@ -106,7 +106,7 @@ ndJointWheel* ndMultiBodyVehicle::AddTire(ndWorld* const world, ndBodyDynamic* c
 	inertia.m_z = maxInertia;
 	tire->SetMassMatrix(inertia);
 
-	ndJointWheel* const tireJoint = new ndJointWheel(matrix, tire, m_chassis);
+	ndJointWheel* const tireJoint = new ndJointWheel(matrix, tire, m_chassis, desc);
 	m_tiresList.Append(tireJoint);
 	world->AddJoint(tireJoint);
 	return tireJoint;
@@ -313,11 +313,9 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 	const dFloat32 v = lateralSleep * den;
 	const dFloat32 u = longitudialSlip * den;
 
-	dFloat32 tireLateralStiffness = 1.0f;
-	dFloat32 tireLongitudinalStiffness = 1.0f;
-
-	const dFloat32 cz = tireLateralStiffness * v;
-	const dFloat32 cx = tireLongitudinalStiffness * u;
+	const ndJointWheel::ndWheelDescriptor& info = tire->GetInfo();
+	const dFloat32 cz = info.m_laterialStiffeness * v;
+	const dFloat32 cx = info.m_longitudinalStiffeness * u;
 	const dFloat32 gamma = dSqrt(cx * cx + cz * cz) + dFloat32 (1.0e-3f);
 
 	const dFloat32 frictionCoefficient = GetFrictionCoeficient(tire, contactPoint);

@@ -27,6 +27,7 @@
 
 class ndWorld;
 class ndJointWheel;
+
 class ndMultiBodyVehicle: public ndModel
 {
 	public:
@@ -46,7 +47,7 @@ class ndMultiBodyVehicle: public ndModel
 	D_NEWTON_API ndShapeInstance CreateTireShape(dFloat32 radius, dFloat32 width) const;
 
 	D_NEWTON_API void AddChassis(ndBodyDynamic* const chassis);
-	D_NEWTON_API ndJointWheel* AddTire(ndWorld* const world, ndBodyDynamic* const tire);
+	D_NEWTON_API ndJointWheel* AddTire(ndWorld* const world, const ndJointWheel::ndWheelDescriptor& desc, ndBodyDynamic* const tire);
 
 	D_NEWTON_API void SetAsBrake(ndJointWheel* const tire);
 	D_NEWTON_API void SetAsHandBrake(ndJointWheel* const tire);

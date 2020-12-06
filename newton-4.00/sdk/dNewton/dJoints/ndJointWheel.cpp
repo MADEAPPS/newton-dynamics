@@ -13,21 +13,14 @@
 #include "ndNewtonStdafx.h"
 #include "ndJointWheel.h"
 
-ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointWheel::ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& info)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
 	,m_baseFrame(m_localMatrix1)
+	,m_info(info)
 	,m_posit(dFloat32 (0.0f))
 	,m_speed(dFloat32(0.0f))
-	,m_springK(dFloat32(0.0f))
-	,m_damperC(dFloat32(0.0f))
-	,m_minLimit(dFloat32(0.0f))
-	,m_maxLimit(dFloat32(0.0f))
 	,m_brakeTorque(dFloat32(0.0f))
 {
-	m_springK = 5000.0f;
-	m_damperC = 100.0f;
-	m_minLimit = -0.05f;
-	m_maxLimit = 0.2f;
 }
 
 ndJointWheel::~ndJointWheel()
@@ -63,32 +56,32 @@ void ndJointWheel::SetSteeringAngle(dFloat32 steeringAngle)
 void ndJointWheel::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1)
 {
 	dFloat32 x = m_posit + m_speed * desc.m_timestep;
-	if (x < m_minLimit)
+	if (x < m_info.m_minLimit)
 	{
-		dVector p1(matrix1.m_posit + matrix1.m_up.Scale(m_minLimit));
+		dVector p1(matrix1.m_posit + matrix1.m_up.Scale(m_info.m_minLimit));
 		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_up);
 		SetLowerFriction(desc, dFloat32 (0.0f));
 
 		dFloat32 accel = GetMotorZeroAcceleration(desc);
 		dFloat32 scale = dAbs(accel) < dFloat32(120.0f) ? dFloat32(1.0f) : dFloat32(0.25f);
-		accel += scale * CalculateSpringDamperAcceleration(desc.m_timestep, m_springK, m_posit, m_damperC, m_speed);
+		accel += scale * CalculateSpringDamperAcceleration(desc.m_timestep, m_info.m_springK, m_posit, m_info.m_damperC, m_speed);
 		SetMotorAcceleration(desc, accel);
 	}
-	else if (x > m_maxLimit)
+	else if (x > m_info.m_maxLimit)
 	{
-		dVector p1(matrix1.m_posit + matrix1.m_up.Scale(m_maxLimit));
+		dVector p1(matrix1.m_posit + matrix1.m_up.Scale(m_info.m_maxLimit));
 		AddLinearRowJacobian(desc, matrix0.m_posit, p1, matrix1.m_up);
 		SetHighFriction(desc, dFloat32(0.0f));
 
 		dFloat32 accel = GetMotorZeroAcceleration(desc);
 		dFloat32 scale = dAbs(accel) < dFloat32(120.0f) ? dFloat32(1.0f) : dFloat32(0.25f);
-		accel += scale * CalculateSpringDamperAcceleration(desc.m_timestep, m_springK, m_posit, m_damperC, m_speed);
+		accel += scale * CalculateSpringDamperAcceleration(desc.m_timestep, m_info.m_springK, m_posit, m_info.m_damperC, m_speed);
 		SetMotorAcceleration(desc, accel);
 	}
 	else 
 	{
 		AddLinearRowJacobian(desc, matrix0.m_posit, matrix1.m_posit, matrix1.m_up);
-		SetMassSpringDamperAcceleration(desc, m_springK, m_damperC);
+		SetMassSpringDamperAcceleration(desc, m_info.m_springK, m_info.m_damperC);
 	}
 }
 

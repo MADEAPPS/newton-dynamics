@@ -77,10 +77,19 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		AddChassis(chassis);
 
 		// 2- each tire to the mode, this function will create the tire joints
-		ndJointWheel* const rr_tire = AddTire(world, rr_tire_body);
-		ndJointWheel* const rl_tire = AddTire(world, rl_tire_body);
-		ndJointWheel* const fr_tire = AddTire(world, fr_tire_body);
-		ndJointWheel* const fl_tire = AddTire(world, fl_tire_body);
+
+		ndJointWheel::ndWheelDescriptor tireInfo;
+		tireInfo.m_springK = 5000.0f;
+		tireInfo.m_damperC = 100.0f;
+		tireInfo.m_minLimit = -0.05f;
+		tireInfo.m_maxLimit = 0.2f;
+		tireInfo.m_laterialStiffeness = 1.0f;
+		tireInfo.m_longitudinalStiffeness = 1.0f;
+
+		ndJointWheel* const rr_tire = AddTire(world, tireInfo, rr_tire_body);
+		ndJointWheel* const rl_tire = AddTire(world, tireInfo, rl_tire_body);
+		ndJointWheel* const fr_tire = AddTire(world, tireInfo, fr_tire_body);
+		ndJointWheel* const fl_tire = AddTire(world, tireInfo, fl_tire_body);
 
 		// configure vehicle steering
 		SetAsSteering(fr_tire);

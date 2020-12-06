@@ -18,11 +18,32 @@
 class ndJointWheel: public ndJointBilateralConstraint
 {
 	public:
-	D_NEWTON_API ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	class ndWheelDescriptor
+	{
+		public:
+		dFloat32 m_springK;
+		dFloat32 m_damperC;
+		dFloat32 m_minLimit;
+		dFloat32 m_maxLimit;
+		dFloat32 m_laterialStiffeness;
+		dFloat32 m_longitudinalStiffeness;
+	};
+
+	D_NEWTON_API ndJointWheel(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent, const ndWheelDescriptor& desc);
 	D_NEWTON_API virtual ~ndJointWheel();
 
 	D_NEWTON_API void SetBrakeTorque(dFloat32 torque);
 	D_NEWTON_API void SetSteeringAngle(dFloat32 steeringAngle);
+
+	const ndWheelDescriptor& GetInfo() const
+	{
+		return m_info;
+	}
+
+	void SetInfo(const ndWheelDescriptor& info)
+	{
+		m_info = info;
+	}
 	
 	private:
 	void SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc, const dMatrix& matrix0, const dMatrix& matrix1);
@@ -31,12 +52,9 @@ class ndJointWheel: public ndJointBilateralConstraint
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
 	dMatrix m_baseFrame;
+	ndWheelDescriptor m_info;
 	dFloat32 m_posit;
 	dFloat32 m_speed;
-	dFloat32 m_springK;
-	dFloat32 m_damperC;
-	dFloat32 m_minLimit;
-	dFloat32 m_maxLimit;
 	dFloat32 m_brakeTorque;
 };
 
