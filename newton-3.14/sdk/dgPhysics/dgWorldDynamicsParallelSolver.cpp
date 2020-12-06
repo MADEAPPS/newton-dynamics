@@ -29,7 +29,7 @@
 #include "dgWorldDynamicUpdate.h"
 #include "dgWorldDynamicsParallelSolver.h"
 
-#define D_USE_SOA_SOLVER
+//#define D_USE_SOA_SOLVER
 
 class dgWorldDynamicUpdate::dgParallelClusterArray
 {
