@@ -28,15 +28,17 @@
 #define PROJECTILE_INITIAL_SPEED	20.0f
 
 //#define DEFAULT_SCENE	0		// setting basic rigidbody
-//#define DEFAULT_SCENE	1		// setting basic Trigger
-//#define DEFAULT_SCENE	2		// setting basic player
-//#define DEFAULT_SCENE	3		// particle water volume 
-//#define DEFAULT_SCENE	4		// static mesh collision 
-//#define DEFAULT_SCENE	5		// setting basic joints
-#define DEFAULT_SCENE	6		// setting basic vehicle
-//#define DEFAULT_SCENE	7		// conservation of angular momentum 
+#define DEFAULT_SCENE	1		// setting basic Stacks
+//#define DEFAULT_SCENE	2		// setting basic Trigger
+//#define DEFAULT_SCENE	3		// setting basic player
+//#define DEFAULT_SCENE	4		// particle water volume 
+//#define DEFAULT_SCENE	5		// static mesh collision 
+//#define DEFAULT_SCENE	6		// setting basic joints
+//#define DEFAULT_SCENE	7		// setting basic vehicle
+//#define DEFAULT_SCENE	8		// conservation of angular momentum 
 						 
 // demos forward declaration 
+void ndBasicStacks(ndDemoEntityManager* const scene);
 void ndBasicJoints(ndDemoEntityManager* const scene);
 void ndBasicVehicle(ndDemoEntityManager* const scene);
 void ndBasicTrigger(ndDemoEntityManager* const scene);
@@ -48,7 +50,8 @@ void ndStaticMeshCollisionDemo(ndDemoEntityManager* const scene);
 
 ndDemoEntityManager::SDKDemos ndDemoEntityManager::m_demosSelection[] = 
 {
-	{ "basic rigid body", ndBasicRigidBody },
+	{ "basic rigidbody", ndBasicRigidBody },
+	{ "basic stack", ndBasicStacks },
 	{ "basic trigger", ndBasicTrigger },
 	{ "basic player", ndPlayerCapsuleDemo },
 	{ "basic water volume", ndBasicWaterVolume },
@@ -222,7 +225,7 @@ ndDemoEntityManager::ndDemoEntityManager ()
 	//m_showAABB = true;
 	//m_hideVisualMeshes = true;
 	//m_showScene = true;
-	//m_autoSleepMode = false;
+	m_autoSleepMode = false;
 	//m_solverMode = 1;
 	//m_sceneType = 1;
 	//m_solverPasses = 4;
