@@ -59,10 +59,12 @@ static void BoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const dVec
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
+	dMatrix rotation(dYawMatrix(15.0f * dDegreeToRad));
 	for (int i = 0; i < count; i++) 
 	{
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
 		baseMatrix.m_posit += baseMatrix.m_up.Scale(blockBoxSize.m_x);
+		baseMatrix = rotation * baseMatrix;
 	}
 
 	geometry->Release();
