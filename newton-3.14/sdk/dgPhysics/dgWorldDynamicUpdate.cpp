@@ -447,12 +447,6 @@ void dgWorldDynamicUpdate::CalculateClusterReactionForcesKernel (void* const con
 	dgInt32 count = descriptor->m_clusterCount;
 	dgBodyCluster* const clusters = &world->m_clusterData[descriptor->m_firstCluster];
 
-//static int xxx;
-//xxx++;
-//if (xxx >= 59)
-//xxx *=1;
-//dgTrace(("\nframe %d\n", xxx));
-
 	for (dgInt32 i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1); i < count; i = dgAtomicExchangeAndAdd(&descriptor->m_atomicCounter, 1)) {
 		dgBodyCluster* const cluster = &clusters[i]; 
 		world->ResolveClusterForces (cluster, threadID, timestep);
