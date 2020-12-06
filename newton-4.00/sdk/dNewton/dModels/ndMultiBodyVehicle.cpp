@@ -233,15 +233,18 @@ void ndMultiBodyVehicle::ApplySteering()
 
 void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 {
+	// draw vehicle cordinade system;
 	dMatrix chassisMatrix(m_chassis->GetMatrix());
 	chassisMatrix.m_posit = chassisMatrix.TransformVector(m_chassis->GetCentreOfMass());
 	context.DrawFrame(chassisMatrix);
 
+	// draw velocity vector
 	dVector veloc(m_chassis->GetVelocity());
 	dVector p0(chassisMatrix.m_posit + m_localFrame.m_up.Scale(1.0f));
 	dVector p1(p0 + veloc.Scale (0.25f));
 	context.DrawLine(p0, p1, dVector(1.0f, 1.0f, 0.0f, 0.0f));
 
+	// draw front direction for side slip angle reference
 	dVector p2(p0 + chassisMatrix.RotateVector(m_localFrame.m_front).Scale(0.5f));
 	context.DrawLine(p0, p2, dVector(1.0f, 1.0f, 1.0f, 0.0f));
 
@@ -249,9 +252,10 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 	dFloat32 scale = dSqrt(weight.DotProduct(weight).GetScalar());
 	weight = weight.Normalize().Scale(-2.0f);
 
-	dVector forceColor(dFloat32 (1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
-	dVector lateralColor(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
-	dVector longitudinalColor(dFloat32(0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f));
+	// draw vehicle weight;
+	dVector forceColor(dFloat32 (0.0f), dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f));
+	dVector lateralColor(dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f), dFloat32(0.0f));
+	dVector longitudinalColor(dFloat32(0.0f), dFloat32(1.0f), dFloat32(0.0f), dFloat32(0.0f));
 	context.DrawLine(chassisMatrix.m_posit, chassisMatrix.m_posit + weight, forceColor);
 
 	for (dList<ndJointWheel*>::dListNode* node = m_tiresList.GetFirst(); node; node = node->GetNext())
@@ -263,6 +267,7 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 		//dVector color(1.0f, 1.0f, 1.0f, 0.0f);
 		//context.DrawArrow(tireBody->GetMatrix(), color, -1.0f);
 
+		// draw tire forces
 		const ndBodyKinematic::ndContactMap& contactMap = tireBody->GetContactMap();
 		ndBodyKinematic::ndContactMap::Iterator it(contactMap);
 		for (it.Begin(); it; it++)
@@ -277,22 +282,32 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 					dMatrix frame(contactPoint.m_normal, contactPoint.m_dir0, contactPoint.m_dir1, contactPoint.m_point);
 
 					dVector localPosit(m_localFrame.UntransformVector(chassisMatrix.UntransformVector(contactPoint.m_point)));
-					dFloat32 offset = (localPosit.m_z > dFloat32(0.0f)) ? dFloat32(0.15f) : dFloat32(-0.15f);
+					dFloat32 offset = (localPosit.m_z > dFloat32(0.0f)) ? dFloat32(0.2f) : dFloat32(-0.2f);
 					frame.m_posit += contactPoint.m_dir0.Scale(offset);
+					frame.m_posit += contactPoint.m_normal.Scale(0.1f);
 					//context.DrawFrame(frame);
 
+					// normal force
 					dFloat32 normalForce = dFloat32 (2.0f) * contactPoint.m_normal_Force.m_force / scale;
 					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_normal.Scale (normalForce), forceColor);
+					//if (normalForce > 30)
+					//{
+					//	normalForce *= 1;
+					//}
+					//dTrace(("%f ", normalForce));
 
+					// lateral force
 					dFloat32 lateralForce = dFloat32(2.0f) * contactPoint.m_dir0_Force.m_force / scale;
-					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir0.Scale(-lateralForce), lateralColor);
+					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir0.Scale(lateralForce), lateralColor);
 
+					// longitudinal force
 					dFloat32 longitudinalForce = dFloat32(2.0f) * contactPoint.m_dir1_Force.m_force / scale;
-					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir1.Scale(-longitudinalForce), longitudinalColor);
+					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_dir1.Scale(longitudinalForce), longitudinalColor);
 				}
 			}
 		}
 	}
+	//dTrace(("\n"));
 }
 
 void ndMultiBodyVehicle::ApplyBrakes()
@@ -369,7 +384,7 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 	contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
 	contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
 
-	//contactPoint.m_material.m_restitution = 0.0f;
+contactPoint.m_material.m_restitution = 0.0f;
 }
 
 void ndMultiBodyVehicle::ApplyTiremodel()
