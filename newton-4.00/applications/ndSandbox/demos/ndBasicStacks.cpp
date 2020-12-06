@@ -70,7 +70,6 @@ static void BoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const dVec
 	geometry->Release();
 }
 
-
 void ndBasicStacks (ndDemoEntityManager* const scene)
 {
 	// build a floor

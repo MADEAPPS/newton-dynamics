@@ -788,6 +788,9 @@ dFloat32 ndDynamicsUpdate::CalculateJointsForce(ndConstraint* const joint, ndJac
 		preconditioner0 = preconditioner0.Scale(body0->m_weigh);
 		preconditioner1 = preconditioner1.Scale(body1->m_weigh);
 
+//static int xxxxxx;
+//xxxxxx++;
+
 		normalForce[0] = dFloat32(1.0f);
 		for (dInt32 j = 0; j < rowsCount; j++) 
 		{
@@ -938,13 +941,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 					const dVector force(dynBody->GetForce() + forceAndTorque.m_linear);
 					const dVector torque(dynBody->GetTorque() + forceAndTorque.m_angular);
 
-//if (dynBody->GetId() == 5)
-//{
-//dTrace(("%d (%f %f %f)\n", xxxx, force.m_x, force.m_y, force.m_z));
-////dTrace(("%d (%f %f %f) (%f %f %f)\n", xxxx, force.m_x, force.m_y, force.m_z, torque.m_x, torque.m_y, torque.m_z));
-//if (xxxx >= 58)
-//	xxxx *= 1;
-//}
+//dTrace(("%d bodyid: %d f(%f %f %f)\n", xxxx, dynBody->GetId(), force.m_x, force.m_y, force.m_z));
 
 					const ndJacobian velocStep(dynBody->IntegrateForceAndToque(force, torque, timestep4));
 					if (!body->m_resting)
@@ -964,6 +961,7 @@ void ndDynamicsUpdate::IntegrateBodiesVelocity()
 					dAssert(body->m_omega.m_w == dFloat32(0.0f));
 				}
 			}
+//xxxx++;
 		}
 	};
 
@@ -1573,5 +1571,4 @@ void ndDynamicsUpdate::Update()
 	
 		DetermineSleepStates();
 	}
-//	xxxx++;
 }
