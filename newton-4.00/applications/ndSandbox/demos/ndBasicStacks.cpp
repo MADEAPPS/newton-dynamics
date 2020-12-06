@@ -81,6 +81,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	BoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 
 	dQuaternion rot;
-	dVector origin(-6.0f, 1.0f, 0.0f, 0.0f);
+	//dVector origin(-6.0f, 1.0f, 0.0f, 0.0f);
+	dVector origin(-40.0f, 10.0f, 0.0f, 0.0f);
 	scene->SetCameraMatrix(rot, origin);
 }
