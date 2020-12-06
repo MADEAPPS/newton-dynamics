@@ -172,6 +172,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 	desc.m_jointAccel[normalIndex] = relGyro + relSpeed * impulseOrForceScale;
 	if (contact.m_material.m_flags & m_overrideNormalAccel)
 	{
+		dAssert(0);
 		desc.m_jointAccel[normalIndex] += contact.m_normal_Force.m_force;
 	}
 //return;
@@ -200,6 +201,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 		{
 			// note: using restitution been negative to indicate that the acceleration was override
 			desc.m_restitution[jacobIndex] = dFloat32(-1.0f);
+			dAssert(0);
 			desc.m_jointAccel[jacobIndex] = contact.m_dir0_Force.m_force;
 		}
 		else 
@@ -243,6 +245,7 @@ void ndContact::JacobianContactDerivative(ndConstraintDescritor& desc, const ndC
 		{
 			// note: using restitution been negative to indicate that the acceleration was override
 			desc.m_restitution[jacobIndex] = dFloat32(-1.0f);
+			dAssert(0);
 			desc.m_jointAccel[jacobIndex] = contact.m_dir1_Force.m_force;
 		}
 		else 

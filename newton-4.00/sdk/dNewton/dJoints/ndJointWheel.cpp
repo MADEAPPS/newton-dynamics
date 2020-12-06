@@ -74,8 +74,9 @@ void ndJointWheel::SubmitConstraintLimitSpringDamper(ndConstraintDescritor& desc
 		SetHighFriction(desc, dFloat32(0.0f));
 
 		dFloat32 accel = GetMotorZeroAcceleration(desc);
-		dFloat32 scale = dAbs(accel) < dFloat32(120.0f) ? dFloat32(1.0f) : dFloat32(0.25f);
-		accel += scale * CalculateSpringDamperAcceleration(desc.m_timestep, m_info.m_springK, m_posit, m_info.m_damperC, m_speed);
+		dFloat32 scale = dAbs(accel) < dFloat32(100.0f) ? dFloat32(1.0f) : dFloat32(0.10f);
+		accel += CalculateSpringDamperAcceleration(desc.m_timestep, m_info.m_springK, m_posit, m_info.m_damperC, m_speed);
+		accel *= scale;
 		SetMotorAcceleration(desc, accel);
 	}
 	else 
@@ -130,5 +131,3 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 		SetHighFriction(desc, m_brakeTorque);
 	}
 }
-
-
