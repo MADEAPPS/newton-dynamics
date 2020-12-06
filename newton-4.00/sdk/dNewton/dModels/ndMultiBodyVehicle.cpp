@@ -290,11 +290,6 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 					// normal force
 					dFloat32 normalForce = dFloat32 (2.0f) * contactPoint.m_normal_Force.m_force / scale;
 					context.DrawLine(frame.m_posit, frame.m_posit + contactPoint.m_normal.Scale (normalForce), forceColor);
-					//if (normalForce > 30)
-					//{
-					//	normalForce *= 1;
-					//}
-					//dTrace(("%f ", normalForce));
 
 					// lateral force
 					dFloat32 lateralForce = dFloat32(2.0f) * contactPoint.m_dir0_Force.m_force / scale;
@@ -307,7 +302,6 @@ void ndMultiBodyVehicle::Debug(ndConstraintDebugCallback& context) const
 			}
 		}
 	}
-	//dTrace(("\n"));
 }
 
 void ndMultiBodyVehicle::ApplyBrakes()
