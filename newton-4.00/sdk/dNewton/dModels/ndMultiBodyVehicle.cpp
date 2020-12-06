@@ -36,6 +36,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& u
 	,m_brakeTires()
 	,m_handBrakeTires()
 	,m_steeringTires()
+	,m_differentials()
 	,m_brakeTorque(dFloat32(0.0f))
 	,m_steeringAngle(dFloat32 (0.0f))
 	,m_handBrakeTorque(dFloat32(0.0f))
@@ -112,6 +113,27 @@ ndJointWheel* ndMultiBodyVehicle::AddTire(ndWorld* const world, const ndJointWhe
 	return tireJoint;
 }
 
+ndBodyDynamic* ndMultiBodyVehicle::AddDifferential(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndJointWheel* const leftTire, ndJointWheel* const rightTire)
+{
+//	return nullptr;
+	dAssert(m_chassis);
+
+	ndShapeInstance diffCollision(new ndShapeSphere(radius));
+	diffCollision.SetCollisionMode(false);
+
+	ndBodyDynamic* const differential = new ndBodyDynamic();
+	differential->SetMatrix(m_chassis->GetMatrix());
+	differential->SetCollisionShape(diffCollision);
+	differential->SetMassMatrix(mass, diffCollision);
+	differential->SetGyroMode(false);
+
+	
+	world->AddBody(differential);
+	m_differentials.Append(differential);
+	return differential;
+
+}
+
 ndShapeInstance ndMultiBodyVehicle::CreateTireShape(dFloat32 radius, dFloat32 width) const
 {
 	ndShapeInstance tireCollision(m_tireShape);
@@ -183,6 +205,16 @@ void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 			const dVector tireOmega(chassisOmega + chassisMatrix.m_front.Scale(rpm));
 			tireBody->SetOmega(tireOmega);
 		}
+	}
+
+	for (dList<ndBodyDynamic*>::dListNode* node = m_differentials.GetFirst(); node; node = node->GetNext())
+	{
+		ndBodyDynamic* const diff = node->GetInfo();
+		dMatrix matrix(m_chassis->GetMatrix());
+		matrix.m_posit += matrix.RotateVector(m_localFrame.m_up);
+		diff->SetMatrix(matrix);
+		diff->SetVelocity(m_chassis->GetVelocity());
+		diff->SetOmega(m_chassis->GetOmega());
 	}
 }
 

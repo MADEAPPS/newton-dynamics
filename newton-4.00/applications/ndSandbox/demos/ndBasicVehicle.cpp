@@ -104,6 +104,9 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		// configure the tires hand brake
 		SetAsHandBrake(rr_tire);
 		SetAsHandBrake(rl_tire);
+
+		// add the slip differential
+		ndBodyDynamic* const differential = AddDifferential(world, 20.0f, 0.25f, rl_tire, rr_tire);
 	}
 
 	void SetAsPlayer(ndDemoEntityManager* const scene)

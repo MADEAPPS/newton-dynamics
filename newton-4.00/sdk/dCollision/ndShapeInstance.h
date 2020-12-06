@@ -494,21 +494,6 @@ D_INLINE dVector ndShapeInstance::SupportVertexSpecialProjectPoint(const dVector
 	}
 }
 
-//D_INLINE ndShapeInstance::ndShapeInstance(const ndShapeInstance& instance, const ndShape* const shape)
-//	:m_globalMatrix(instance.m_globalMatrix)
-//	,m_localMatrix(instance.m_localMatrix)
-//	,m_aligmentMatrix(instance.m_aligmentMatrix)
-//	,m_scale(instance.m_scale)
-//	,m_invScale(instance.m_invScale)
-//	,m_maxScale(instance.m_maxScale)
-//	,m_shape(instance.m_shape->AddRef())
-//	,m_ownerBody(instance.m_ownerBody)
-//	,m_skinThickness(instance.m_skinThickness)
-//	,m_scaleType(instance.m_scaleType)
-//	,m_collisionMode(instance.m_collisionMode)
-//{
-//}
-
 D_INLINE bool ndShapeInstance::GetCollisionMode() const
 {
 	return m_collisionMode;
