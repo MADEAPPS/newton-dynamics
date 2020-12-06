@@ -59,7 +59,7 @@ static void BoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const dVec
 	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
 	scene->AddEntity(rootEntity);
 
-	dMatrix rotation(dYawMatrix(15.0f * dDegreeToRad));
+	dMatrix rotation(dYawMatrix(20.0f * dDegreeToRad));
 	for (int i = 0; i < count; i++) 
 	{
 		AddRigidBody(scene, baseMatrix, shape, rootEntity, mass);
@@ -74,10 +74,11 @@ static void BoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const dVec
 void ndBasicStacks (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	BuildFloorBox(scene);
+	//BuildFloorBox(scene);
+	BuildFlatPlane(scene, true);
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	BoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 2);
+	BoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 
 	dQuaternion rot;
 	dVector origin(-6.0f, 1.0f, 0.0f, 0.0f);
