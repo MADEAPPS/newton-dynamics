@@ -493,9 +493,8 @@ void ndWorld::UpdateSkeletons()
 									}
 									else if (loopCount < (sizeof(loopJoints) / sizeof(loopJoints[0]))) 
 									{
-										dAssert(0);
-									//	loopJoints[loopCount] = (ndJointBilateralConstraint*)constraint1;
-									//	loopCount++;
+										loopJoints[loopCount] = (ndJointBilateralConstraint*)constraint1;
+										loopCount++;
 									}
 								}
 								else if ((constraint1->m_solverModel == 1) && (loopCount < (sizeof(loopJoints) / sizeof(loopJoints[0])))) 

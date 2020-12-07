@@ -49,7 +49,6 @@ class ndJointBilateralConstraint: public ndConstraint, public dClassAlloc
 
 	virtual ndBodyKinematic* GetBody0() const;
 	virtual ndBodyKinematic* GetBody1() const;
-
 	
 	void CalculateGlobalMatrix(dMatrix& matrix0, dMatrix& matrix1) const;
 	D_COLLISION_API dFloat32 CalculateAngle(const dVector& planeDir, const dVector& cosDir, const dVector& sinDir) const;

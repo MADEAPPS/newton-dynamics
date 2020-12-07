@@ -62,6 +62,9 @@ class ndMultiBodyVehicle: public ndModel
 	void ApplyAligmentAndBalancing();
 	void BrushTireModel(const ndJointWheel* const tire, ndContactMaterial& contactPoint) const;
 
+	private:
+	ndBodyDynamic* CreateInternalBodyPart(ndWorld* const world, dFloat32 mass, dFloat32 radius) const;
+
 	protected:
 	D_NEWTON_API virtual void Debug(ndConstraintDebugCallback& context) const;
 	D_NEWTON_API virtual void Update(const ndWorld* const world, dFloat32 timestep);

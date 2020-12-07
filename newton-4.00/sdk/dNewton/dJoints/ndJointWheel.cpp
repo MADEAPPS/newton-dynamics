@@ -112,7 +112,7 @@ void ndJointWheel::JacobianDerivative(ndConstraintDescritor& desc)
 	AddLinearRowJacobian(desc, p0, projectedPoint, matrix1[2]);
 
 	const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
-	AddAngularRowJacobian(desc, &matrix1.m_up[0], angle0);
+	AddAngularRowJacobian(desc, matrix1.m_up, angle0);
 
 	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, matrix1.m_right, angle1);

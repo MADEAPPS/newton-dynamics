@@ -48,7 +48,7 @@ void ndJointDoubleHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	// two rows to restrict rotation around around the parent coordinate system
 	const dFloat32 angleError = m_maxAngleError;
 	const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
-	AddAngularRowJacobian(desc, &matrix1.m_up[0], angle0);
+	AddAngularRowJacobian(desc, matrix1.m_up, angle0);
 	if (dAbs(angle0) > angleError)
 	{
 		dAssert(0);
@@ -57,7 +57,7 @@ void ndJointDoubleHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	}
 
 	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
-	AddAngularRowJacobian(desc, &matrix1.m_right[0], angle1);
+	AddAngularRowJacobian(desc, matrix1.m_right, angle1);
 	if (dAbs(angle1) > angleError)
 	{
 		dAssert(0);

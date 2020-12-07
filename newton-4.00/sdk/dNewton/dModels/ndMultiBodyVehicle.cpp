@@ -28,9 +28,101 @@
 #include "ndJointDoubleHinge.h"
 #include "ndMultiBodyVehicle.h"
 
-class ndDifferential : public ndJointDoubleHinge
+class ndDifferential: public ndJointBilateralConstraint
 {
+	public:
+	ndDifferential (const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+		:ndJointBilateralConstraint(2, child, parent, pinAndPivotFrame)
+	{
+	}
 
+	void AlignMatrix()
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		matrix1.m_posit += matrix1.m_up.Scale(1.0f);
+
+		m_body0->SetMatrix(matrix1);
+		m_body0->SetVelocity(m_body1->GetVelocity());
+
+		dVector omega0(m_body0->GetOmega());
+		dVector omega1(m_body1->GetOmega());
+		dVector omega(
+			matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar()) +
+			matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega0).GetScalar()) +
+			matrix1.m_right.Scale(matrix1.m_right.DotProduct(omega1).GetScalar()));
+
+		//omega += matrix1.m_front.Scale(5.0f) - matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar());
+		//omega += matrix1.m_up.Scale(5.0f) - matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega0).GetScalar());
+
+		m_body0->SetOmega(omega);
+	}
+
+	void JacobianDerivative(ndConstraintDescritor& desc)
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		// save the current joint Omega
+		//dVector omega0(m_body0->GetOmega());
+		//dVector omega1(m_body1->GetOmega());
+
+		// only one rows to restrict rotation around around the parent coordinate system
+		const dFloat32 angleError = m_maxAngleError;
+		const dFloat32 angle = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+		AddAngularRowJacobian(desc, matrix1.m_right, angle);
+		if (dAbs(angle) > angleError)
+		{
+			dAssert(0);
+			//const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle1 / (timestep * timestep);
+			//NewtonUserJointSetRowAcceleration(m_joint, alpha);
+		}
+	}
+};
+
+class ndDifferentialAxle : public ndJointBilateralConstraint
+{
+	public:
+	ndDifferentialAxle(const dVector& pin0, const dVector& upPin, ndBodyKinematic* const differentialBody0,
+					   const dVector& pin1, ndBodyKinematic* const body1)
+		:ndJointBilateralConstraint(1, differentialBody0, body1, dGetIdentityMatrix())
+	{
+		dMatrix temp;
+		dMatrix matrix0(pin0, upPin, pin0.CrossProduct(upPin), dVector::m_wOne);
+		dMatrix matrix1(pin1);
+		CalculateLocalMatrix(matrix0, m_localMatrix0, temp);
+		CalculateLocalMatrix(matrix1, temp, m_localMatrix1);
+	}
+
+	void JacobianDerivative(ndConstraintDescritor& desc)
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		AddAngularRowJacobian(desc, matrix1.m_right, dFloat32 (0.0f));
+		
+		ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
+		ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
+
+		jacobian0.m_angular = matrix0.m_front + matrix0.m_up;
+		jacobian1.m_angular = matrix1.m_front;
+		
+		//if ((differential->m_mode == dMultiBodyVehicleDifferential::m_open) ||
+		//	(differential->m_mode == dMultiBodyVehicleDifferential::m_slipLocked)) {
+		//	jacobian1.m_angular = diffMatrix.m_front + diffMatrix.m_up.Scale(m_diffSign);
+		//}
+		
+		const dVector& omega0 = m_body0->GetOmega();
+		const dVector& omega1 = m_body1->GetOmega();
+		
+		const dVector relOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+		dFloat32 w = (relOmega.m_x + relOmega.m_y + relOmega.m_z) * dFloat32 (0.5f);
+		SetMotorAcceleration(desc, -w * desc.m_invTimestep);
+	}
 };
 
 ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& upDir)
@@ -119,23 +211,41 @@ ndJointWheel* ndMultiBodyVehicle::AddTire(ndWorld* const world, const ndJointWhe
 	return tireJoint;
 }
 
-ndDifferential* ndMultiBodyVehicle::AddDifferential(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndJointWheel* const leftTire, ndJointWheel* const rightTire)
+ndBodyDynamic* ndMultiBodyVehicle::CreateInternalBodyPart(ndWorld* const world, dFloat32 mass, dFloat32 radius) const
 {
-	dAssert(m_chassis);
-
 	ndShapeInstance diffCollision(new ndShapeSphere(radius));
 	diffCollision.SetCollisionMode(false);
 
-	ndBodyDynamic* const differentialBody = new ndBodyDynamic();
-	differentialBody->SetMatrix(m_chassis->GetMatrix());
-	differentialBody->SetCollisionShape(diffCollision);
-	differentialBody->SetMassMatrix(mass, diffCollision);
-	differentialBody->SetGyroMode(false);
-	world->AddBody(differentialBody);
+	dAssert(m_chassis);
+	ndBodyDynamic* const body = new ndBodyDynamic();
+	body->SetMatrix(m_localFrame * m_chassis->GetMatrix());
+	body->SetCollisionShape(diffCollision);
+	body->SetMassMatrix(mass, diffCollision);
+	body->SetGyroMode(false);
+	world->AddBody(body);
+	return body;
+}
 
-	//m_differentials.Append(differential);
-	//return differential;
-	return nullptr;
+ndDifferential* ndMultiBodyVehicle::AddDifferential(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndJointWheel* const leftTire, ndJointWheel* const rightTire)
+{
+	ndBodyDynamic* const differentialBody = CreateInternalBodyPart(world, mass, radius);
+
+	ndDifferential* const differential = new ndDifferential(differentialBody->GetMatrix(), differentialBody, m_chassis);
+	world->AddJoint(differential);
+	m_differentials.Append(differential);
+
+	dVector pin0(differentialBody->GetMatrix().RotateVector(differential->GetLocalMatrix0().m_front));
+	dVector upPin(differentialBody->GetMatrix().RotateVector(differential->GetLocalMatrix0().m_up));
+	dVector leftPin1(leftTire->GetBody0()->GetMatrix().RotateVector(leftTire->GetLocalMatrix0().m_front));
+
+	ndDifferentialAxle* const leftAxle = new ndDifferentialAxle(pin0, upPin, differentialBody, leftPin1, leftTire->GetBody0());
+	world->AddJoint(leftAxle);
+
+	dVector rightPin1(rightTire->GetBody0()->GetMatrix().RotateVector(rightTire->GetLocalMatrix0().m_front));
+	ndDifferentialAxle* const rightAxle = new ndDifferentialAxle(pin0, upPin.Scale (dFloat32 (-1.0f)), differentialBody, leftPin1, rightTire->GetBody0());
+	world->AddJoint(rightAxle);
+
+	return differential;
 }
 
 ndShapeInstance ndMultiBodyVehicle::CreateTireShape(dFloat32 radius, dFloat32 width) const
@@ -213,12 +323,8 @@ void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 
 	for (dList<ndDifferential*>::dListNode* node = m_differentials.GetFirst(); node; node = node->GetNext())
 	{
-		ndBodyDynamic* const diff = node->GetInfo()->GetBody0()->GetAsBodyDynamic();
-		dMatrix matrix(m_chassis->GetMatrix());
-		matrix.m_posit += matrix.RotateVector(m_localFrame.m_up);
-		diff->SetMatrix(matrix);
-		diff->SetVelocity(m_chassis->GetVelocity());
-		diff->SetOmega(m_chassis->GetOmega());
+		ndDifferential* const diff = node->GetInfo();
+		diff->AlignMatrix();
 	}
 }
 
@@ -381,8 +487,7 @@ void ndMultiBodyVehicle::BrushTireModel(const ndJointWheel* const tire, ndContac
 	contactPoint.m_material.m_dynamicFriction0 = lateralFrictionCoefficient;
 	contactPoint.m_material.m_staticFriction1 = longitudinalFrictionCoefficient;
 	contactPoint.m_material.m_dynamicFriction1 = longitudinalFrictionCoefficient;
-
-contactPoint.m_material.m_restitution = 0.0f;
+	//contactPoint.m_material.m_restitution = 0.0f;
 }
 
 void ndMultiBodyVehicle::ApplyTiremodel()
