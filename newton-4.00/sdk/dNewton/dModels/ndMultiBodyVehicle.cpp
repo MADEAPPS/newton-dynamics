@@ -22,10 +22,16 @@
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
 #include "ndWorld.h"
-//#include "ndJointHinge.h"
+#include "ndJointHinge.h"
 #include "ndJointWheel.h"
 #include "ndBodyDynamic.h"
+#include "ndJointDoubleHinge.h"
 #include "ndMultiBodyVehicle.h"
+
+class ndDifferential : public ndJointDoubleHinge
+{
+
+};
 
 ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& upDir)
 	:ndModel()
@@ -113,25 +119,23 @@ ndJointWheel* ndMultiBodyVehicle::AddTire(ndWorld* const world, const ndJointWhe
 	return tireJoint;
 }
 
-ndBodyDynamic* ndMultiBodyVehicle::AddDifferential(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndJointWheel* const leftTire, ndJointWheel* const rightTire)
+ndDifferential* ndMultiBodyVehicle::AddDifferential(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndJointWheel* const leftTire, ndJointWheel* const rightTire)
 {
-//	return nullptr;
 	dAssert(m_chassis);
 
 	ndShapeInstance diffCollision(new ndShapeSphere(radius));
 	diffCollision.SetCollisionMode(false);
 
-	ndBodyDynamic* const differential = new ndBodyDynamic();
-	differential->SetMatrix(m_chassis->GetMatrix());
-	differential->SetCollisionShape(diffCollision);
-	differential->SetMassMatrix(mass, diffCollision);
-	differential->SetGyroMode(false);
+	ndBodyDynamic* const differentialBody = new ndBodyDynamic();
+	differentialBody->SetMatrix(m_chassis->GetMatrix());
+	differentialBody->SetCollisionShape(diffCollision);
+	differentialBody->SetMassMatrix(mass, diffCollision);
+	differentialBody->SetGyroMode(false);
+	world->AddBody(differentialBody);
 
-	
-	world->AddBody(differential);
-	m_differentials.Append(differential);
-	return differential;
-
+	//m_differentials.Append(differential);
+	//return differential;
+	return nullptr;
 }
 
 ndShapeInstance ndMultiBodyVehicle::CreateTireShape(dFloat32 radius, dFloat32 width) const
@@ -207,9 +211,9 @@ void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 		}
 	}
 
-	for (dList<ndBodyDynamic*>::dListNode* node = m_differentials.GetFirst(); node; node = node->GetNext())
+	for (dList<ndDifferential*>::dListNode* node = m_differentials.GetFirst(); node; node = node->GetNext())
 	{
-		ndBodyDynamic* const diff = node->GetInfo();
+		ndBodyDynamic* const diff = node->GetInfo()->GetBody0()->GetAsBodyDynamic();
 		dMatrix matrix(m_chassis->GetMatrix());
 		matrix.m_posit += matrix.RotateVector(m_localFrame.m_up);
 		diff->SetMatrix(matrix);

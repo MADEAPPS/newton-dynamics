@@ -9,23 +9,25 @@
 * freely
 */
 
-#ifndef __D_JOINT_HINGE_H__
-#define __D_JOINT_HINGE_H__
+#ifndef __D_JOINT_DOUBLE_HINGE_H__
+#define __D_JOINT_DOUBLE_HINGE_H__
 
 #include "ndNewtonStdafx.h"
 #include "ndJointBilateralConstraint.h"
 
-class ndJointHinge: public ndJointBilateralConstraint
+class ndJointDoubleHinge: public ndJointBilateralConstraint
 {
 	public:
-	D_NEWTON_API ndJointHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
-	D_NEWTON_API virtual ~ndJointHinge();
+	D_NEWTON_API ndJointDoubleHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent);
+	D_NEWTON_API virtual ~ndJointDoubleHinge();
 
 	protected:
 	D_NEWTON_API void JacobianDerivative(ndConstraintDescritor& desc);
 
-	dFloat32 m_jointAngle;
-	dFloat32 m_jointSpeed;
+	dFloat32 m_jointAngle0;
+	dFloat32 m_jointSpeed0;
+	dFloat32 m_jointAngle1;
+	dFloat32 m_jointSpeed1;
 };
 
 #endif 

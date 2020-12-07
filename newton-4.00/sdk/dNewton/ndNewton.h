@@ -58,6 +58,7 @@
 #include <ndContactNotify.h>
 #include <ndDynamicsUpdate.h>
 #include <ndBodyParticleSet.h>
+#include <ndJointDoubleHinge.h>
 #include <ndMultiBodyVehicle.h>
 #include <ndSkeletonContainer.h>
 #include <ndJointBallAndSocket.h>

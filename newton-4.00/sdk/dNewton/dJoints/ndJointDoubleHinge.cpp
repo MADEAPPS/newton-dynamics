@@ -11,20 +11,22 @@
 
 #include "dCoreStdafx.h"
 #include "ndNewtonStdafx.h"
-#include "ndJointHinge.h"
+#include "ndJointDoubleHinge.h"
 
-ndJointHinge::ndJointHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+ndJointDoubleHinge::ndJointDoubleHinge(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
 	:ndJointBilateralConstraint(6, child, parent, pinAndPivotFrame)
-	,m_jointAngle(dFloat32(0.0f))
-	,m_jointSpeed(dFloat32(0.0f))
+	,m_jointAngle0(dFloat32(0.0f))
+	,m_jointSpeed0(dFloat32(0.0f))
+	,m_jointAngle1(dFloat32(0.0f))
+	,m_jointSpeed1(dFloat32(0.0f))
 {
 }
 
-ndJointHinge::~ndJointHinge()
+ndJointDoubleHinge::~ndJointDoubleHinge()
 {
 }
 
-void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
+void ndJointDoubleHinge::JacobianDerivative(ndConstraintDescritor& desc)
 {
 	dMatrix matrix0;
 	dMatrix matrix1;
@@ -39,15 +41,15 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 	dVector omega1(m_body1->GetOmega());
 
 	// the joint angle can be determined by getting the angle between any two non parallel vectors
-	const dFloat32 deltaAngle = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_jointAngle);
-	m_jointAngle += deltaAngle;
-	m_jointSpeed = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
+	const dFloat32 deltaAngle0 = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_jointAngle0);
+	m_jointAngle0 += deltaAngle0;
+	m_jointSpeed0 = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
 
 	// two rows to restrict rotation around around the parent coordinate system
 	const dFloat32 angleError = m_maxAngleError;
 	const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
 	AddAngularRowJacobian(desc, &matrix1.m_up[0], angle0);
-	if (dAbs(angle0) > angleError) 
+	if (dAbs(angle0) > angleError)
 	{
 		dAssert(0);
 		//const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle0 / (timestep * timestep);
@@ -56,7 +58,7 @@ void ndJointHinge::JacobianDerivative(ndConstraintDescritor& desc)
 
 	const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 	AddAngularRowJacobian(desc, &matrix1.m_right[0], angle1);
-	if (dAbs(angle1) > angleError) 
+	if (dAbs(angle1) > angleError)
 	{
 		dAssert(0);
 		//const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle1 / (timestep * timestep);
