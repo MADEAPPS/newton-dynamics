@@ -42,7 +42,7 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 		dMatrix matrix1;
 		CalculateGlobalMatrix(matrix0, matrix1);
 
-		matrix1.m_posit += matrix1.m_up.Scale(1.0f);
+		//matrix1.m_posit += matrix1.m_up.Scale(1.0f);
 
 		m_body0->SetMatrix(matrix1);
 		m_body0->SetVelocity(m_body1->GetVelocity());
@@ -54,7 +54,7 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 			matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega1).GetScalar()) +
 			matrix1.m_right.Scale(matrix1.m_right.DotProduct(omega1).GetScalar()));
 
-		omega += matrix1.m_front.Scale(-20.0f) - matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar());
+		omega += matrix1.m_front.Scale(-40.0f) - matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar());
 		//omega += matrix1.m_up.Scale(5.0f) - matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega0).GetScalar());
 
 		m_body0->SetOmega(omega);
