@@ -107,6 +107,9 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 
 		// add the slip differential
 		ndDifferential* const differential = AddDifferential(world, 20.0f, 0.25f, rl_tire, rr_tire);
+
+		// add a motor
+		AddMotor(world, 20, 0.25f, differential);
 	}
 
 	void SetAsPlayer(ndDemoEntityManager* const scene)

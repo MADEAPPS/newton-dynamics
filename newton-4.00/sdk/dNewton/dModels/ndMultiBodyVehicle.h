@@ -28,6 +28,7 @@
 class ndWorld;
 class ndJointWheel;
 class ndDifferential;
+class ndMultiBodyVehicleMotor;
 
 class ndMultiBodyVehicle: public ndModel
 {
@@ -49,6 +50,7 @@ class ndMultiBodyVehicle: public ndModel
 
 	D_NEWTON_API void AddChassis(ndBodyDynamic* const chassis);
 	D_NEWTON_API ndJointWheel* AddTire(ndWorld* const world, const ndJointWheel::ndWheelDescriptor& desc, ndBodyDynamic* const tire);
+	D_NEWTON_API ndMultiBodyVehicleMotor* AddMotor(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndDifferential* const differential);
 	D_NEWTON_API ndDifferential* AddDifferential(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndJointWheel* const leftTire, ndJointWheel* const rightTire);
 
 	D_NEWTON_API void SetAsBrake(ndJointWheel* const tire);
@@ -71,6 +73,7 @@ class ndMultiBodyVehicle: public ndModel
 
 	dMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;
+	ndMultiBodyVehicle* m_motor;
 	ndShapeChamferCylinder* m_tireShape;
 	dList<ndJointWheel*> m_tiresList;
 	dList<ndJointWheel*> m_brakeTires;

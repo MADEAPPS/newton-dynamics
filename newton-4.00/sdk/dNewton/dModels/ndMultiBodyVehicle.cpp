@@ -28,6 +28,62 @@
 #include "ndJointDoubleHinge.h"
 #include "ndMultiBodyVehicle.h"
 
+class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
+{
+	public:
+	ndMultiBodyVehicleMotor(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
+		:ndJointBilateralConstraint(1, child, parent, pinAndPivotFrame)
+	{
+	}
+
+	void AlignMatrix()
+	{
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		//matrix1.m_posit += matrix1.m_up.Scale(1.0f);
+
+		m_body0->SetMatrix(matrix1);
+		m_body0->SetVelocity(m_body1->GetVelocity());
+
+		dVector omega0(m_body0->GetOmega());
+		dVector omega1(m_body1->GetOmega());
+		dVector omega(
+			matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar()) +
+			matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega0).GetScalar()) +
+			matrix1.m_right.Scale(matrix1.m_right.DotProduct(omega1).GetScalar()));
+
+		//omega += matrix1.m_front.Scale(5.0f) - matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar());
+		//omega += matrix1.m_up.Scale(5.0f) - matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega0).GetScalar());
+
+		m_body0->SetOmega(omega);
+	}
+
+	void JacobianDerivative(ndConstraintDescritor& desc)
+	{
+		dAssert(0);
+		//dMatrix matrix0;
+		//dMatrix matrix1;
+		//CalculateGlobalMatrix(matrix0, matrix1);
+		//
+		//// save the current joint Omega
+		//dVector omega0(m_body0->GetOmega());
+		//dVector omega1(m_body1->GetOmega());
+		//
+		//// only one rows to restrict rotation around around the parent coordinate system
+		//const dFloat32 angleError = m_maxAngleError;
+		//const dFloat32 angle = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+		//AddAngularRowJacobian(desc, matrix1.m_right, angle);
+		//if (dAbs(angle) > angleError)
+		//{
+		//	dAssert(0);
+		//	//const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle1 / (timestep * timestep);
+		//	//NewtonUserJointSetRowAcceleration(m_joint, alpha);
+		//}
+	}
+};
+
 class ndDifferential: public ndJointBilateralConstraint
 {
 	public:
@@ -129,6 +185,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& u
 	:ndModel()
 	,m_localFrame(dGetIdentityMatrix())
 	,m_chassis(nullptr)
+	,m_motor(nullptr)
 	,m_tireShape(new ndShapeChamferCylinder(dFloat32(0.75f), dFloat32(0.5f)))
 	,m_tiresList()
 	,m_brakeTires()
@@ -246,6 +303,13 @@ ndDifferential* ndMultiBodyVehicle::AddDifferential(ndWorld* const world, dFloat
 	world->AddJoint(rightAxle);
 
 	return differential;
+}
+
+ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndWorld* const world, dFloat32 mass, dFloat32 radius, ndDifferential* const differential)
+{
+	//dAssert(0);
+	ndBodyDynamic* const motorBody = CreateInternalBodyPart(world, mass, radius);
+	return nullptr;
 }
 
 ndShapeInstance ndMultiBodyVehicle::CreateTireShape(dFloat32 radius, dFloat32 width) const
