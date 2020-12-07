@@ -35,7 +35,7 @@ static void AddRigidBody(ndDemoEntityManager* const scene, const dMatrix& matrix
 	world->AddBody(body);
 }
 
-static void BoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& size, dInt32 count)
+static void BuildBoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& size, dInt32 count)
 {
 	// build a standard block stack of 20 * 3 boxes for a total of 60
 	ndWorld* const world = scene->GetWorld();
@@ -70,6 +70,66 @@ static void BoxStack(ndDemoEntityManager* const scene, dFloat32 mass, const dVec
 	geometry->Release();
 }
 
+//static void BuildPyramid(DemoEntityManager* const scene, dFloat mass, const dVector& origin, const dVector& size, int count, PrimitiveType type, const dMatrix& shapeMatrix = dGetIdentityMatrix())
+static void BuildPyramid(ndDemoEntityManager* const scene, dFloat32 mass, const dVector& origin, const dVector& size, dInt32 count)
+{
+	dMatrix matrix(dGetIdentityMatrix());
+	matrix.m_posit = origin;
+	matrix.m_posit.m_w = 1.0f;
+
+	// create the shape and visual mesh as a common data to be re used
+	ndWorld* const world = scene->GetWorld();
+
+	//NewtonCollision* const collision = CreateConvexCollision(world, shapeMatrix, size, type, defaultMaterialID);
+	//DemoMesh* const geometry = new DemoMesh("cylinder_1", scene->GetShaderCache(), collision, "wood_4.tga", "wood_4.tga", "wood_1.tga");
+	ndShapeInstance shape(new ndShapeBox(size.m_x, size.m_y, size.m_z));
+	ndDemoMeshIntance* const geometry = new ndDemoMeshIntance("shape", scene->GetShaderCache(), &shape, "marble.tga", "marble.tga", "marble.tga");
+
+	//	matrix = dRollMatrix(dPi/2.0f);
+	//dFloat startElevation = 100.0f;
+	//dVector floor(FindFloor(world, dVector(matrix.m_posit.m_x, startElevation, matrix.m_posit.m_z, 0.0f), 2.0f * startElevation));
+
+	dVector floor(FindFloor(*world, origin + dVector(0.0f, 100.0f, 0.0f, 0.0f), 200.0f));
+	matrix.m_posit.m_y = floor.m_y + origin.m_y * 0.5f;
+
+	//matrix.m_posit.m_y = floor.m_y + size.m_y / 2.0f;
+	//
+	//// get the dimension from shape itself
+	//dVector minP(0.0f);
+	//dVector maxP(0.0f);
+	//CalculateAABB(collision, dGetIdentityMatrix(), minP, maxP);
+	//
+	//dFloat stepz = maxP.m_z - minP.m_z + 0.03125f;
+	//dFloat stepy = (maxP.m_y - minP.m_y) - 0.01f;
+	//
+	//dFloat y0 = matrix.m_posit.m_y + stepy / 2.0f;
+	//dFloat z0 = matrix.m_posit.m_z - stepz * count / 2;
+	//
+	//matrix.m_posit.m_y = y0;
+	//
+	//DemoInstanceEntity* const parentInstance = new DemoInstanceEntity(dGetIdentityMatrix(), NULL);
+	//scene->Append(parentInstance);
+	//parentInstance->SetMesh(geometry, dGetIdentityMatrix());
+
+	ndDemoInstanceEntity* const rootEntity = new ndDemoInstanceEntity(geometry);
+	scene->AddEntity(rootEntity);
+
+	for (int j = 0; j < count; j++) 
+	{
+	//	matrix.m_posit.m_z = z0;
+		for (int i = 0; i < (count - j); i++) 
+		{
+	//		//CreateSimpleSolid (scene, geometry, mass, matrix, collision, defaultMaterialID);
+	//		CreateInstancedSolid(scene, parentInstance, mass, matrix, collision, defaultMaterialID);
+	//		matrix.m_posit.m_z += stepz;
+		}
+	//	z0 += stepz * 0.5f;
+	//	matrix.m_posit.m_y += stepy;
+	}
+
+	geometry->Release();
+}
+
 void ndBasicStacks (ndDemoEntityManager* const scene)
 {
 	// build a floor
@@ -77,7 +137,7 @@ void ndBasicStacks (ndDemoEntityManager* const scene)
 	BuildFlatPlane(scene, true);
 
 	dVector origin1(0.0f, 0.0f, 0.0f, 0.0f);
-	BoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 3);
+	BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
 
 	dQuaternion rot;
 	//dVector origin(-6.0f, 1.0f, 0.0f, 0.0f);

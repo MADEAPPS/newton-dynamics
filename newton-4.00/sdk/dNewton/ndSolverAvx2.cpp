@@ -2015,16 +2015,17 @@ void ndDynamicsUpdate::InitJacobianMatrixAvx2()
 			else
 			{
 				const dInt32 threadIndex = GetThredId();
-				const dInt32 step = jointCount / threadCount;
-				const dInt32 start = threadIndex * step;
-				const dInt32 count = ((threadIndex + 1) < threadCount) ? step : jointCount - start;
+				//const dInt32 step = jointCount / threadCount;
+				//const dInt32 start = threadIndex * step;
+				//const dInt32 count = ((threadIndex + 1) < threadCount) ? step : jointCount - start;
 
 				const dInt32 bodyCount = m_owner->GetActiveBodyArray().GetCount();
 				ndJacobian* const internalForces = &world->m_internalForces[threadIndex * bodyCount];
 				memset(internalForces, 0, bodyCount * sizeof(ndJacobian));
-				for (dInt32 i = 0; i < count; i++)
+				//for (dInt32 i = 0; i < count; i++)
+				for (dInt32 i = threadIndex; i < jointCount; i += threadCount)
 				{
-					ndConstraint* const joint = jointArray[i + start];
+					ndConstraint* const joint = jointArray[i];
 					world->GetJacobianDerivatives(joint);
 					world->BuildJacobianMatrix(joint, internalForces);
 				}
@@ -2552,15 +2553,12 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 			else
 			{
 				const dInt32 threadIndex = GetThredId();
-				const dInt32 step = jointCount / threadCount;
-				const dInt32 start = threadIndex * step;
-				const dInt32 count = ((threadIndex + 1) < threadCount) ? step : jointCount - start;
 
 				ndJacobian* const internalForces = &world->m_internalForces[bodyCount * (threadIndex + 1)];
 				memset(internalForces, 0, bodyCount * sizeof(ndJacobian));
-				for (dInt32 i = 0; i < count; i++)
+				for (dInt32 i = threadIndex; i < jointCount; i += threadCount)
 				{
-					ndConstraint* const joint = jointArray[i + start];
+					ndConstraint* const joint = jointArray[i];
 					accNorm += world->CalculateJointsForceAvx2(joint, internalForces);
 				}
 				dFloat32* const accelNorm = (dFloat32*)m_context;
@@ -2571,7 +2569,7 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 
 	class ndInitJacobianAccumulatePartialForces : public ndScene::ndBaseJob
 	{
-	public:
+		public:
 		virtual void Execute()
 		{
 			//D_TRACKTIME();

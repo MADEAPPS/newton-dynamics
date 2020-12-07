@@ -566,7 +566,6 @@ void ndDynamicsUpdate::BuildJacobianMatrix(ndConstraint* const joint, ndJacobian
 		rhs->m_coordenateAccel += extenalAcceleration * forceImpulseScale;
 		dAssert(rhs->m_jointFeebackForce);
 		const dFloat32 force = rhs->m_jointFeebackForce->GetInitiailGuess() * forceImpulseScale;
-		//const dFloat32 force = rhs->m_jointFeebackForce->m_force * forceImpulseScale;
 
 		rhs->m_force = isBilateral ? dClamp(force, rhs->m_lowerBoundFrictionCoefficent, rhs->m_upperBoundFrictionCoefficent) : force;
 		rhs->m_maxImpact = dFloat32(0.0f);
@@ -586,8 +585,6 @@ void ndDynamicsUpdate::BuildJacobianMatrix(ndConstraint* const joint, ndJacobian
 
 		dVector f0(rhs->m_force * preconditioner0);
 		dVector f1(rhs->m_force * preconditioner1);
-		//forceAcc0 = forceAcc0.MulAdd(JtM0, f0);
-		//forceAcc1 = forceAcc1.MulAdd(JtM1, f1);
 		forceAcc0 = forceAcc0 + JtM0.m_linear * f0;
 		torqueAcc0 = torqueAcc0 + JtM0.m_angular * f0;
 		forceAcc1 = forceAcc1 + JtM1.m_linear * f1;
