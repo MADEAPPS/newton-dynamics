@@ -54,7 +54,7 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 			matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega1).GetScalar()) +
 			matrix1.m_right.Scale(matrix1.m_right.DotProduct(omega1).GetScalar()));
 
-		//omega += matrix1.m_front.Scale(5.0f) - matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar());
+		omega += matrix1.m_front.Scale(-20.0f) - matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar());
 		//omega += matrix1.m_up.Scale(5.0f) - matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega0).GetScalar());
 
 		m_body0->SetOmega(omega);
@@ -82,6 +82,38 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 
 		const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 		AddAngularRowJacobian(desc, matrix1.m_right, angle1);
+	}
+};
+
+class ndMultiBodyVehicleMotorGearBox : public ndJointBilateralConstraint
+{
+	public: 
+	ndMultiBodyVehicleMotorGearBox(ndBodyKinematic* const motor, ndBodyKinematic* const differential)
+		:ndJointBilateralConstraint(1, motor, differential, motor->GetMatrix())
+	{
+	}
+
+	void JacobianDerivative(ndConstraintDescritor& desc)
+	{
+
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+
+		AddAngularRowJacobian(desc, matrix1.m_right, dFloat32(0.0f));
+
+		ndJacobian& jacobian0 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM0;
+		ndJacobian& jacobian1 = desc.m_jacobian[desc.m_rowsCount - 1].m_jacobianM1;
+
+		jacobian0.m_angular = matrix0.m_front;
+		jacobian1.m_angular = matrix1.m_front;
+
+		const dVector& omega0 = m_body0->GetOmega();
+		const dVector& omega1 = m_body1->GetOmega();
+
+		const dVector relOmega(omega0 * jacobian0.m_angular + omega1 * jacobian1.m_angular);
+		dFloat32 w = (relOmega.m_x + relOmega.m_y + relOmega.m_z) * dFloat32(0.5f);
+		SetMotorAcceleration(desc, -w * desc.m_invTimestep);
 	}
 };
 
@@ -182,6 +214,7 @@ ndMultiBodyVehicle::ndMultiBodyVehicle(const dVector& frontDir, const dVector& u
 	,m_chassis(nullptr)
 	,m_motor(nullptr)
 	,m_tireShape(new ndShapeChamferCylinder(dFloat32(0.75f), dFloat32(0.5f)))
+	,m_gearBox(nullptr)
 	,m_tiresList()
 	,m_brakeTires()
 	,m_handBrakeTires()
@@ -307,6 +340,10 @@ ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndWorld* const world, dFlo
 
 	m_motor = new ndMultiBodyVehicleMotor(motorBody, m_chassis);
 	world->AddJoint(m_motor);
+
+	m_gearBox = new ndMultiBodyVehicleMotorGearBox(motorBody, differential->GetBody0());
+	world->AddJoint(m_gearBox);
+
 	return m_motor;
 }
 

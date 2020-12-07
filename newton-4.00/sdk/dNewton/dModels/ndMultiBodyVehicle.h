@@ -29,6 +29,7 @@ class ndWorld;
 class ndJointWheel;
 class ndDifferential;
 class ndMultiBodyVehicleMotor;
+class ndMultiBodyVehicleMotorGearBox;
 
 class ndMultiBodyVehicle: public ndModel
 {
@@ -75,6 +76,7 @@ class ndMultiBodyVehicle: public ndModel
 	ndBodyDynamic* m_chassis;
 	ndMultiBodyVehicleMotor* m_motor;
 	ndShapeChamferCylinder* m_tireShape;
+	ndMultiBodyVehicleMotorGearBox* m_gearBox;
 	dList<ndJointWheel*> m_tiresList;
 	dList<ndJointWheel*> m_brakeTires;
 	dList<ndJointWheel*> m_handBrakeTires;
