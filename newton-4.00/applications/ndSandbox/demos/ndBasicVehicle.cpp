@@ -127,7 +127,7 @@ class ndBasicMultiBodyVehicle : public ndMultiBodyVehicle
 		body->SetNotifyCallback(new ndDemoEntityNotify(scene, chassisEntity));
 		body->SetMatrix(matrix);
 		body->SetCollisionShape(*chassisCollision);
-		//body->SetMassMatrix(mass, *chassisCollision);
+		body->SetMassMatrix(mass, *chassisCollision);
 		//body->SetGyroMode(true);
 		body->SetGyroMode(false);
 
