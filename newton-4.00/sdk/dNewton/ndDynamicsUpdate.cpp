@@ -37,8 +37,9 @@ ndDynamicsUpdate::ndDynamicsUpdate()
 	,m_jointArray()
 	,m_leftHandSide(1024 * 4)
 	,m_rightHandSide(1024)
-	,m_soaJointRows(1024)
-	,m_soaMassMatrix(1024)
+	//,m_soaJointRows(1024)
+	//,m_soaJointArray();
+	//,m_soaMassMatrix(1024)
 	,m_timestep(dFloat32 (0.0f))
 	,m_invTimestep(dFloat32(0.0f))
 	,m_firstPassCoef(dFloat32(0.0f))
@@ -770,8 +771,8 @@ dFloat32 ndDynamicsUpdate::CalculateJointsForce(ndConstraint* const joint, ndJac
 		preconditioner0 = preconditioner0.Scale(body0->m_weigh);
 		preconditioner1 = preconditioner1.Scale(body1->m_weigh);
 
-static int xxxxxx;
-xxxxxx++;
+//static int xxxxxx;
+//xxxxxx++;
 
 		normalForce[0] = dFloat32(1.0f);
 		for (dInt32 j = 0; j < rowsCount; j++) 

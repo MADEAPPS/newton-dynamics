@@ -118,29 +118,38 @@ class ndDynamicsUpdate
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
 	// Avx2 solver implementation
-	//void BuildIslandAvx2();
-	//void InitSkeletonsAvx2();
-	//void UpdateSkeletonsAvx2();
-	//void CalculateForcesAvx2();
-	//void InitJacobianMatrixAvx2();
-	//void UpdateForceFeedbackAvx2();
-	//void CalculateJointsForceAvx2();
-	//void IntegrateBodiesVelocityAvx2();
-	//void CalculateJointsAccelerationAvx2();
+	void BuildIslandAvx2();
+	void InitWeightsAvx2();
+	void InitBodyArrayAvx2();
+	void InitSkeletonsAvx2();
+	void IntegrateBodiesAvx2();
+	void UpdateSkeletonsAvx2();
+	void CalculateForcesAvx2();
+	void InitJacobianMatrixAvx2();
+	void DetermineSleepStatesAvx2();
+	void UpdateForceFeedbackAvx2();
+	void CalculateJointsForceAvx2();
+	void IntegrateBodiesVelocityAvx2();
+	void IntegrateUnconstrainedBodiesAvx2();
+	void CalculateJointsAccelerationAvx2();
+	
 	//dInt32 GetSortKeyAvx2(const ndConstraint* const joint);
-	//void BuildJacobianMatrixAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
-	//dFloat32 CalculateJointsForceAvx2(ndConstraint** const jointGroup, ndAvx2::ndSoaMatrixElement* const massMatrix, ndJacobian* const internalForces);
+	void UpdateIslandStateAvx2(const ndIsland& island);
+	void GetJacobianDerivativesAvx2(ndConstraint* const joint);
+	void BuildJacobianMatrixAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
+	dFloat32 CalculateJointsForceAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
+	static dInt32 CompareIslandsAvx2(const ndIsland* const islandA, const ndIsland* const islandB, void* const context);
 
 	dVector m_velocTol;
 	dArray<ndIsland> m_islands;
 	dArray<ndBodyKinematic*> m_bodyIslandOrder;
 	dArray<ndJacobian> m_internalForces;
 	ndConstraintArray m_jointArray;
-	ndConstraintArray m_soaJointArray;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
-	dArray<dInt32> m_soaJointRows;
-	dArray<ndAvx2::ndSoaMatrixElement> m_soaMassMatrix;
+	//dArray<dInt32> m_soaJointRows;
+	//ndConstraintArray m_soaJointArray;
+	//dArray<ndAvx2::ndSoaMatrixElement> m_soaMassMatrix;
 	dInt32 m_hasJointFeeback[D_MAX_THREADS_COUNT];
 
 	ndWorld* m_world;
