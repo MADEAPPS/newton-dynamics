@@ -156,24 +156,6 @@ void ndDynamicsUpdate::BuildIsland()
 			}
 		}
 
-		//for (dInt32 i = 0; i < jointArray.GetCount(); i++)
-		//{
-		//	ndConstraint* const joint = jointArray[i];
-		//	ndBodyKinematic* const body1 = joint->GetBody1();
-		//	if (body1->GetInvMass() == dFloat32(0.0f))
-		//	{
-		//		ndBodyKinematic* const body0 = joint->GetBody0();
-		//		const dInt32 resting = body0->m_equilibrium & body1->m_equilibrium;
-		//		body0->m_bodyIsConstrained = 1;
-		//		body0->m_resting = body0->m_resting & resting;
-		//		if (!body0->m_islandSleep)
-		//		{
-		//			ndBodyKinematic* const root = FindRootAndSplit(body0);
-		//			root->m_islandSleep = 0;
-		//		}
-		//	}
-		//}
-
 		// re use body array and working buffer 
 		m_internalForces.SetCount(bodyArray.GetCount());
 
@@ -788,8 +770,8 @@ dFloat32 ndDynamicsUpdate::CalculateJointsForce(ndConstraint* const joint, ndJac
 		preconditioner0 = preconditioner0.Scale(body0->m_weigh);
 		preconditioner1 = preconditioner1.Scale(body1->m_weigh);
 
-//static int xxxxxx;
-//xxxxxx++;
+static int xxxxxx;
+xxxxxx++;
 
 		normalForce[0] = dFloat32(1.0f);
 		for (dInt32 j = 0; j < rowsCount; j++) 
@@ -845,7 +827,6 @@ dFloat32 ndDynamicsUpdate::CalculateJointsForce(ndConstraint* const joint, ndJac
 				a = a.MulAdd(lhs->m_JMinv.m_jacobianM0.m_angular, torqueM0);
 				a = a.MulAdd(lhs->m_JMinv.m_jacobianM1.m_linear, forceM1);
 				a = a.MulAdd(lhs->m_JMinv.m_jacobianM1.m_angular, torqueM1);
-				//a = dVector(rhs->m_coordenateAccel + rhs->m_gyroAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
 				a = dVector(rhs->m_coordenateAccel - rhs->m_force * rhs->m_diagDamp) - a.AddHorizontal();
 				dVector f(rhs->m_force + rhs->m_invJinvMJt * a.GetScalar());
 		

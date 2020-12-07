@@ -118,18 +118,18 @@ class ndDynamicsUpdate
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
 
 	// Avx2 solver implementation
-	void BuildIslandAvx2();
-	void InitSkeletonsAvx2();
-	void UpdateSkeletonsAvx2();
-	void CalculateForcesAvx2();
-	void InitJacobianMatrixAvx2();
-	void UpdateForceFeedbackAvx2();
-	void CalculateJointsForceAvx2();
-	void IntegrateBodiesVelocityAvx2();
-	void CalculateJointsAccelerationAvx2();
-	dInt32 GetSortKeyAvx2(const ndConstraint* const joint);
-	void BuildJacobianMatrixAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
-	dFloat32 CalculateJointsForceAvx2(ndConstraint** const jointGroup, ndAvx2::ndSoaMatrixElement* const massMatrix, ndJacobian* const internalForces);
+	//void BuildIslandAvx2();
+	//void InitSkeletonsAvx2();
+	//void UpdateSkeletonsAvx2();
+	//void CalculateForcesAvx2();
+	//void InitJacobianMatrixAvx2();
+	//void UpdateForceFeedbackAvx2();
+	//void CalculateJointsForceAvx2();
+	//void IntegrateBodiesVelocityAvx2();
+	//void CalculateJointsAccelerationAvx2();
+	//dInt32 GetSortKeyAvx2(const ndConstraint* const joint);
+	//void BuildJacobianMatrixAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
+	//dFloat32 CalculateJointsForceAvx2(ndConstraint** const jointGroup, ndAvx2::ndSoaMatrixElement* const massMatrix, ndJacobian* const internalForces);
 
 	dVector m_velocTol;
 	dArray<ndIsland> m_islands;
