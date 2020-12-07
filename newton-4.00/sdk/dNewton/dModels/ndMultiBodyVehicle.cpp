@@ -31,8 +31,8 @@
 class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 {
 	public:
-	ndMultiBodyVehicleMotor(const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-		:ndJointBilateralConstraint(1, child, parent, pinAndPivotFrame)
+	ndMultiBodyVehicleMotor(ndBodyKinematic* const motor, ndBodyKinematic* const chassis)
+		:ndJointBilateralConstraint(3, motor, chassis, motor->GetMatrix())
 	{
 	}
 
@@ -42,7 +42,7 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 		dMatrix matrix1;
 		CalculateGlobalMatrix(matrix0, matrix1);
 
-		//matrix1.m_posit += matrix1.m_up.Scale(1.0f);
+		matrix1.m_posit += matrix1.m_up.Scale(1.0f);
 
 		m_body0->SetMatrix(matrix1);
 		m_body0->SetVelocity(m_body1->GetVelocity());
@@ -51,7 +51,7 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 		dVector omega1(m_body1->GetOmega());
 		dVector omega(
 			matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar()) +
-			matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega0).GetScalar()) +
+			matrix1.m_up.Scale(matrix1.m_up.DotProduct(omega1).GetScalar()) +
 			matrix1.m_right.Scale(matrix1.m_right.DotProduct(omega1).GetScalar()));
 
 		//omega += matrix1.m_front.Scale(5.0f) - matrix1.m_front.Scale(matrix1.m_front.DotProduct(omega0).GetScalar());
@@ -62,33 +62,34 @@ class ndMultiBodyVehicleMotor: public ndJointBilateralConstraint
 
 	void JacobianDerivative(ndConstraintDescritor& desc)
 	{
-		dAssert(0);
-		//dMatrix matrix0;
-		//dMatrix matrix1;
-		//CalculateGlobalMatrix(matrix0, matrix1);
-		//
+		dMatrix matrix0;
+		dMatrix matrix1;
+		CalculateGlobalMatrix(matrix0, matrix1);
+		
 		//// save the current joint Omega
-		//dVector omega0(m_body0->GetOmega());
-		//dVector omega1(m_body1->GetOmega());
-		//
-		//// only one rows to restrict rotation around around the parent coordinate system
-		//const dFloat32 angleError = m_maxAngleError;
-		//const dFloat32 angle = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
-		//AddAngularRowJacobian(desc, matrix1.m_right, angle);
-		//if (dAbs(angle) > angleError)
-		//{
-		//	dAssert(0);
-		//	//const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle1 / (timestep * timestep);
-		//	//NewtonUserJointSetRowAcceleration(m_joint, alpha);
-		//}
+		dVector omega0(m_body0->GetOmega());
+		dVector omega1(m_body1->GetOmega());
+
+		//// the joint angle can be determined by getting the angle between any two non parallel vectors
+		//const dFloat32 deltaAngle = AnglesAdd(-CalculateAngle(matrix0.m_up, matrix1.m_up, matrix1.m_front), -m_jointAngle);
+		//m_jointAngle += deltaAngle;
+		//m_jointSpeed = matrix1.m_front.DotProduct(omega0 - omega1).GetScalar();
+
+		// two rows to restrict rotation around around the parent coordinate system
+		const dFloat32 angleError = m_maxAngleError;
+		const dFloat32 angle0 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_up);
+		AddAngularRowJacobian(desc, matrix1.m_up, angle0);
+
+		const dFloat32 angle1 = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
+		AddAngularRowJacobian(desc, matrix1.m_right, angle1);
 	}
 };
 
 class ndDifferential: public ndJointBilateralConstraint
 {
 	public:
-	ndDifferential (const dMatrix& pinAndPivotFrame, ndBodyKinematic* const child, ndBodyKinematic* const parent)
-		:ndJointBilateralConstraint(2, child, parent, pinAndPivotFrame)
+	ndDifferential (ndBodyKinematic* const differential, ndBodyKinematic* const chassis)
+		:ndJointBilateralConstraint(2, differential, chassis, differential->GetMatrix())
 	{
 	}
 
@@ -130,12 +131,6 @@ class ndDifferential: public ndJointBilateralConstraint
 		const dFloat32 angleError = m_maxAngleError;
 		const dFloat32 angle = CalculateAngle(matrix0.m_front, matrix1.m_front, matrix1.m_right);
 		AddAngularRowJacobian(desc, matrix1.m_right, angle);
-		if (dAbs(angle) > angleError)
-		{
-			dAssert(0);
-			//const dFloat32 alpha = NewtonUserJointCalculateRowZeroAcceleration(m_joint) + dFloat32(0.25f) * angle1 / (timestep * timestep);
-			//NewtonUserJointSetRowAcceleration(m_joint, alpha);
-		}
 	}
 };
 
@@ -287,7 +282,7 @@ ndDifferential* ndMultiBodyVehicle::AddDifferential(ndWorld* const world, dFloat
 {
 	ndBodyDynamic* const differentialBody = CreateInternalBodyPart(world, mass, radius);
 
-	ndDifferential* const differential = new ndDifferential(differentialBody->GetMatrix(), differentialBody, m_chassis);
+	ndDifferential* const differential = new ndDifferential(differentialBody, m_chassis);
 	world->AddJoint(differential);
 	m_differentials.Append(differential);
 
@@ -309,7 +304,10 @@ ndMultiBodyVehicleMotor* ndMultiBodyVehicle::AddMotor(ndWorld* const world, dFlo
 {
 	//dAssert(0);
 	ndBodyDynamic* const motorBody = CreateInternalBodyPart(world, mass, radius);
-	return nullptr;
+
+	m_motor = new ndMultiBodyVehicleMotor(motorBody, m_chassis);
+	world->AddJoint(m_motor);
+	return m_motor;
 }
 
 ndShapeInstance ndMultiBodyVehicle::CreateTireShape(dFloat32 radius, dFloat32 width) const
@@ -389,6 +387,11 @@ void ndMultiBodyVehicle::ApplyAligmentAndBalancing()
 	{
 		ndDifferential* const diff = node->GetInfo();
 		diff->AlignMatrix();
+	}
+
+	if (m_motor)
+	{
+		m_motor->AlignMatrix();
 	}
 }
 

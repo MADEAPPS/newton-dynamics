@@ -73,7 +73,7 @@ class ndMultiBodyVehicle: public ndModel
 
 	dMatrix m_localFrame;
 	ndBodyDynamic* m_chassis;
-	ndMultiBodyVehicle* m_motor;
+	ndMultiBodyVehicleMotor* m_motor;
 	ndShapeChamferCylinder* m_tireShape;
 	dList<ndJointWheel*> m_tiresList;
 	dList<ndJointWheel*> m_brakeTires;
