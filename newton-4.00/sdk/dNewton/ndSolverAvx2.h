@@ -202,6 +202,11 @@ namespace ndAvx2
 		ndSoaFloat m_upperBoundFrictionCoefficent;
 	} D_GCC_NEWTON_ALIGN_32;
 
+	class ndSoaMassMatrixElement
+	{
+		public:
+		ndSoaMatrixElement m_matrix[D_CONSTRAINT_MAX_ROWS];
+	};
 };
 
 #endif

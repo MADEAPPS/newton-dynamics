@@ -2363,6 +2363,9 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 			const dInt32 threadIndex = GetThredId();
 			const dInt32 threadCount = dMax(m_owner->GetThreadCount(), 1);
 			m_outputForces = &world->m_internalForces[bodyCount * (threadIndex + 1)];
+			m_massMatrix = &world->m_massMatrixAvx2[threadIndex].m_matrix[0];
+
+			int xxx = sizeof(ndSoaMassMatrixElement);
 
 			memset(m_outputForces, 0, bodyCount * sizeof(ndJacobian));
 			for (dInt32 i = threadIndex; i < jointCount; i += threadCount)
@@ -2373,7 +2376,8 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 			dFloat32* const accelNorm = (dFloat32*)m_context;
 			accelNorm[threadIndex] = accNorm;
 		}
-
+		
+		ndSoaMatrixElement* m_massMatrix;
 		ndJacobian* m_outputForces;
 		ndJacobian* m_internalForces;
 		ndRightHandSide* m_rightHandSide;
@@ -2422,6 +2426,12 @@ void ndDynamicsUpdate::CalculateJointsForceAvx2()
 	const dInt32 passes = m_solverPasses;
 	const dInt32 threadsCount = dMax(scene->GetThreadCount(), 1);
 
+	if (threadsCount < m_massMatrixAvx2.GetCapacity())
+	{
+		m_massMatrixAvx2.Resize(threadsCount);
+	}
+
+	m_massMatrixAvx2.SetCount(threadsCount);
 	dFloat32 m_accelNorm[D_MAX_THREADS_COUNT];
 	dFloat32 accNorm = D_SOLVER_MAX_ERROR * dFloat32(2.0f);
 
