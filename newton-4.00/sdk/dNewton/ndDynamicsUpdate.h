@@ -111,8 +111,6 @@ class ndDynamicsUpdate
 	void DetermineSleepStates();
 	void UpdateIslandState(const ndIsland& island);
 	void GetJacobianDerivatives(ndConstraint* const joint);
-	void BuildJacobianMatrix(ndConstraint* const joint, ndJacobian* const output);
-	//dFloat32 CalculateJointsForce(ndConstraint* const joint, ndJacobian* const output);
 
 	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const context);
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
@@ -126,18 +124,15 @@ class ndDynamicsUpdate
 	void UpdateSkeletonsAvx2();
 	void CalculateForcesAvx2();
 	void InitJacobianMatrixAvx2();
-	void DetermineSleepStatesAvx2();
 	void UpdateForceFeedbackAvx2();
+	void DetermineSleepStatesAvx2();
 	void CalculateJointsForceAvx2();
 	void IntegrateBodiesVelocityAvx2();
-	void IntegrateUnconstrainedBodiesAvx2();
 	void CalculateJointsAccelerationAvx2();
+	void IntegrateUnconstrainedBodiesAvx2();
 	
 	//dInt32 GetSortKeyAvx2(const ndConstraint* const joint);
 	void UpdateIslandStateAvx2(const ndIsland& island);
-	void GetJacobianDerivativesAvx2(ndConstraint* const joint);
-	void BuildJacobianMatrixAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
-	//dFloat32 CalculateJointsForceAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
 	static dInt32 CompareIslandsAvx2(const ndIsland* const islandA, const ndIsland* const islandB, void* const context);
 
 	dVector m_velocTol;
@@ -162,7 +157,6 @@ class ndDynamicsUpdate
 	dUnsigned32 m_solverPasses;
 	dUnsigned32 m_maxRowsCount;
 	dInt32 m_unConstrainedBodyCount;
-	dAtomic<dUnsigned32> m_rowsCount;
 
 	static ndAvx2::ndSoaFloat m_one;
 	static ndAvx2::ndSoaFloat m_zero;
