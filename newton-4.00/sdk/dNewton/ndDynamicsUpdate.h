@@ -112,7 +112,7 @@ class ndDynamicsUpdate
 	void UpdateIslandState(const ndIsland& island);
 	void GetJacobianDerivatives(ndConstraint* const joint);
 	void BuildJacobianMatrix(ndConstraint* const joint, ndJacobian* const output);
-	dFloat32 CalculateJointsForce(ndConstraint* const joint, ndJacobian* const output);
+	//dFloat32 CalculateJointsForce(ndConstraint* const joint, ndJacobian* const output);
 
 	static dInt32 CompareIslands(const ndIsland* const  A, const ndIsland* const B, void* const context);
 	ndBodyKinematic* FindRootAndSplit(ndBodyKinematic* const body);
@@ -137,7 +137,7 @@ class ndDynamicsUpdate
 	void UpdateIslandStateAvx2(const ndIsland& island);
 	void GetJacobianDerivativesAvx2(ndConstraint* const joint);
 	void BuildJacobianMatrixAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
-	dFloat32 CalculateJointsForceAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
+	//dFloat32 CalculateJointsForceAvx2(ndConstraint* const joint, ndJacobian* const internalForces);
 	static dInt32 CompareIslandsAvx2(const ndIsland* const islandA, const ndIsland* const islandB, void* const context);
 
 	dVector m_velocTol;
