@@ -22,7 +22,7 @@ file(GLOB CPP_SOURCE
 	*.h 
 	*.cpp 
 	dModels/*.h	
-	dJoints/*.cpp
+	dModels/*.cpp
 	dJoints/*.h
 	dJoints/*.cpp)
 file(GLOB HEADERS *.h dJoints/*.h)
@@ -32,6 +32,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/" FILES ${CPP_SOURCE})
 
 include_directories(./)
 include_directories(dJoints/)
+include_directories(dModels/)
 include_directories(../dCore/)
 include_directories(../dTinyxml/)
 include_directories(../dCollision/)
@@ -71,7 +72,7 @@ if (MSVC)
 
 endif(MSVC)
 
-target_link_libraries(${projectName} ndTinyxml ndCore ndCollision ndSolverAvx2)
+target_link_libraries(${projectName} ndTinyxml ndCore ndCollision)
 
 install(TARGETS ${projectName} 
 		LIBRARY DESTINATION lib

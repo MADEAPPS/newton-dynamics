@@ -116,8 +116,8 @@ static void BuildPyramid(ndDemoEntityManager* const scene, dFloat32 mass, const 
 void ndBasicStacks (ndDemoEntityManager* const scene)
 {
 	// build a floor
-	//BuildFloorBox(scene);
-	BuildFlatPlane(scene, true);
+	BuildFloorBox(scene);
+	//BuildFlatPlane(scene, true);
 
 	dVector origin1(0.0f, 0.0f, 4.0f, 0.0f);
 	BuildBoxStack(scene, 1.0f, origin1, dVector(0.5f, 0.5f, 0.5f, 0.0f), 20);
