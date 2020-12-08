@@ -131,7 +131,7 @@ class ndDynamicsUpdate
 	void CalculateJointsAccelerationAvx2();
 	void IntegrateUnconstrainedBodiesAvx2();
 	
-	//dInt32 GetSortKeyAvx2(const ndConstraint* const joint);
+	dInt32 GetSortKeyAvx2(const ndConstraint* const joint);
 	void UpdateIslandStateAvx2(const ndIsland& island);
 	static dInt32 CompareIslandsAvx2(const ndIsland* const islandA, const ndIsland* const islandB, void* const context);
 
@@ -142,9 +142,6 @@ class ndDynamicsUpdate
 	ndConstraintArray m_jointArray;
 	dArray<ndLeftHandSide> m_leftHandSide;
 	dArray<ndRightHandSide> m_rightHandSide;
-	//dArray<dInt32> m_soaJointRows;
-	//ndConstraintArray m_soaJointArray;
-	//dArray<ndAvx2::ndSoaMatrixElement> m_soaMassMatrix;
 	dInt32 m_hasJointFeeback[D_MAX_THREADS_COUNT];
 
 	ndWorld* m_world;
