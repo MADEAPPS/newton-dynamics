@@ -45,7 +45,7 @@ class dThreadPoolJob
 	{
 	}
 
-	const dInt32 GetThredId() const 
+	const dInt32 GetThreadId() const 
 	{ 
 		return m_threadIndex; 
 	}

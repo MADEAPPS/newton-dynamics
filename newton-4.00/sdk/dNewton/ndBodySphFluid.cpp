@@ -150,7 +150,7 @@ void ndBodySphFluid::CreateGrids(const ndWorld* const world)
 			m_neighborkDirs[6] = dVector(-radius, radius, radius, dFloat32(0.0f));
 			m_neighborkDirs[7] = dVector(radius, radius, radius, dFloat32(0.0f));
 
-			const dInt32 threadIndex = GetThredId();
+			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 particleCount = fluid->m_posit.GetCount();
 			const dInt32 step = particleCount / threadCount;
@@ -385,7 +385,7 @@ void ndBodySphFluid::SortParallel(const ndWorld* const world)
 			ndWorld* const world = m_owner->GetWorld();
 			ndContext* const context = (ndContext*)m_context;
 			ndBodySphFluid* const fluid = context->m_fluid;
-			const dInt32 threadId = GetThredId();
+			const dInt32 threadId = GetThreadId();
 			const dInt32 threadCount = world->GetThreadCount();
 			
 			const dInt32 count = fluid->m_hashGridMap.GetCount();
@@ -429,7 +429,7 @@ void ndBodySphFluid::SortParallel(const ndWorld* const world)
 			D_TRACKTIME();
 			ndWorld* const world = m_owner->GetWorld();
 			ndContext* const context = (ndContext*)m_context;
-			const dInt32 threadId = GetThredId();
+			const dInt32 threadId = GetThreadId();
 			const dInt32 threadCount = world->GetThreadCount();
 			
 			const dInt32 count = context->m_pass ? sizeof (context->m_scan) / sizeof (dInt32) : sizeof(context->m_scan) / (2 * sizeof(dInt32));
@@ -458,7 +458,7 @@ void ndBodySphFluid::SortParallel(const ndWorld* const world)
 			ndWorld* const world = m_owner->GetWorld();
 			ndContext* const context = (ndContext*)m_context;
 			ndBodySphFluid* const fluid = context->m_fluid;
-			const dInt32 threadId = GetThredId();
+			const dInt32 threadId = GetThreadId();
 			const dInt32 threadCount = world->GetThreadCount();
 
 			const dInt32 count = fluid->m_hashGridMap.GetCount();

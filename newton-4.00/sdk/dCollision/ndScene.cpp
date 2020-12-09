@@ -1445,7 +1445,7 @@ void ndScene::BuildBodyArray()
 		virtual void Execute()
 		{
 			D_TRACKTIME();
-			const dInt32 threadIndex = GetThredId();
+			const dInt32 threadIndex = GetThreadId();
 
 			ndBodyList::dListNode* node = m_owner->m_bodyList.GetFirst();
 			for (dInt32 i = 0; i < threadIndex; i++)
@@ -1528,7 +1528,7 @@ void ndScene::CalculateContacts()
 		{
 			D_TRACKTIME();
 			ndConstraintArray& activeContacts = m_owner->m_activeConstraintArray;
-			const dInt32 threadIndex = GetThredId();
+			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 contactCount = activeContacts.GetCount();
 			const dInt32 step = contactCount / threadCount;
@@ -1556,7 +1556,7 @@ void ndScene::UpdateAabb()
 		{
 			D_TRACKTIME();
 			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-			const dInt32 threadIndex = GetThredId();
+			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
 			const dInt32 step = bodyCount / threadCount;
@@ -1600,7 +1600,7 @@ void ndScene::FindCollidingPairs()
 		{
 			D_TRACKTIME();
 			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-			const dInt32 threadIndex = GetThredId();
+			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
 			const dInt32 step = bodyCount / threadCount;
@@ -1623,7 +1623,7 @@ void ndScene::FindCollidingPairs()
 			D_TRACKTIME();
 
 			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-			const dInt32 threadIndex = GetThredId();
+			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
 			const dInt32 step = bodyCount / threadCount;
@@ -1662,7 +1662,7 @@ void ndScene::UpdateTransform()
 		{
 			D_TRACKTIME();
 			const dArray<ndBodyKinematic*>& bodyArray = m_owner->GetActiveBodyArray();
-			const dInt32 threadIndex = GetThredId();
+			const dInt32 threadIndex = GetThreadId();
 			const dInt32 threadCount = m_owner->GetThreadCount();
 			const dInt32 bodyCount = bodyArray.GetCount() - 1;
 			const dInt32 step = bodyCount / threadCount;
